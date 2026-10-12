@@ -20,6 +20,15 @@ cd "$(dirname "$0")" || exit 1
 FOLDER="$(pwd -P)"
 set -o pipefail
 LOG="build_log.txt"
+# The round seal at its full size: macOS 26 sets an app's own icon in a grey square when it is not Apple's rounded
+# square, and shrinks it, but leaves a custom icon as it is; so each copy is given the seal as its custom icon, as
+# Finder's Get Info would. To undo: Get Info on the app, click the small icon at the top, press Delete.
+seal_icon(){ [ -f "$1" ] && [ -d "$2" ] || return 0
+  osascript -l JavaScript - "$1" "$2" >>"$LOG" 2>&1 <<'JS' || true
+ObjC.import('AppKit');
+function run(a){var i=$.NSImage.alloc.initWithContentsOfFile(a[0]);if(!i||i.isNil())return 'seal: no picture';return $.NSWorkspace.sharedWorkspace.setIconForFileOptions(i,a[1],0)?'seal: set':'seal: refused';}
+JS
+}
 : > "$LOG"
 T0=$SECONDS
 STEP_T=$SECONDS
@@ -52,7 +61,7 @@ tools_failed(){
     say "Two ways forward:"
     say "  1. Connect and run this again. That is all."
     say "  2. Build offline: on any connected Mac run"
-    say "       python3 -m pip download pyinstaller pywebview cmake setuptools wheel -d wheels"
+    say "       python3 -m pip download pyinstaller pywebview cmake certifi setuptools wheel -d wheels"
     say "     then copy the resulting wheels folder next to this file."
   elif grep -qi "certificate_verify_failed" "$LOG"; then
     say "The download was refused by a certificate check, which usually means a"
@@ -168,7 +177,7 @@ step 3 "The build tools (PyInstaller and pywebview)"
 VENV="$WORK/.buildenv"
 VPY="$VENV/bin/python"
 TOOLS_OK=0
-if [ -x "$VPY" ] && "$VPY" -c "import webview, PyInstaller" >/dev/null 2>&1 && [ -x "$VENV/bin/cmake" ]; then
+if [ -x "$VPY" ] && "$VPY" -c "import webview, PyInstaller, certifi" >/dev/null 2>&1 && [ -x "$VENV/bin/cmake" ]; then
   TOOLS_OK=1
 fi
 if [ "$TOOLS_OK" -eq 1 ]; then
@@ -189,13 +198,13 @@ else
     say "Installing from the local wheels folder (no connection needed)..."
     runlive "$VPY" -m pip install --no-index --find-links wheels setuptools wheel || tools_failed
     runlive "$VPY" -m pip install --no-index --find-links wheels --no-build-isolation proxy_tools || tools_failed
-    runlive "$VPY" -m pip install --no-index --find-links wheels --only-binary=:all: pyinstaller pywebview cmake || tools_failed
+    runlive "$VPY" -m pip install --no-index --find-links wheels --only-binary=:all: pyinstaller pywebview cmake certifi || tools_failed
   else
     say "Downloading and installing them now (about 60 MB, one time; cached"
     say "on this Mac afterwards, so the next run skips this entirely):"
     runlive "$VPY" -m pip install --disable-pip-version-check --upgrade pip || tools_failed
     runlive "$VPY" -m pip install --disable-pip-version-check proxy_tools || tools_failed
-    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake || tools_failed
+    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake certifi || tools_failed
   fi
 fi
 say "PyInstaller: $("$VPY" -m PyInstaller --version 2>&1)"
@@ -265,7 +274,7 @@ say "put together on this Mac's disk, not on this folder."
 rm -rf "$WORK/sources/build" "$WORK/sources/dist"
 # R77: this build's own number (the version, the day and the time it was
 # built), shown in About and in Finder's Get Info, as the cloud builds show theirs
-BUILD_NO="3.2.$(date +%Y%m%d).$(date +%H%M)"
+BUILD_NO="3.3.$(date +%Y%m%d).$(date +%H%M)"
 if "$VPY" "$SRC/tools/stamp_build.py" "$SRC/ingenium.html" "$BUILD_NO" >>"$LOG" 2>&1; then
   say "Build number: $BUILD_NO"
 else
@@ -314,6 +323,8 @@ fi
 # uses right-click then Open; MACOS_IF_BLOCKED.txt has the other routes.
 xattr -dr com.apple.quarantine "$DEST" >/dev/null 2>&1 || true
 xattr -dr com.apple.quarantine "$FOLDER/$APP_FILE.app" >/dev/null 2>&1 || true
+seal_icon "$FOLDER/ingenium.png" "$DEST"
+seal_icon "$FOLDER/ingenium.png" "$FOLDER/$APP_FILE.app"
 endstep
 
 say ""

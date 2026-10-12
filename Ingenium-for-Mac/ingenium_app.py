@@ -51,16 +51,32 @@ import urllib.request
 # frozen app cannot see the system Python's certificate file, so certifi's own
 # copy is bundled by the spec and pointed at here. urllib reads SSL_CERT_FILE
 # when building its default SSL context.
-try:
-    import certifi as _certifi
-    _CERT_FILE = _certifi.where()
-    if _CERT_FILE and os.path.isfile(_CERT_FILE):
-        os.environ.setdefault("SSL_CERT_FILE", _CERT_FILE)
-        os.environ.setdefault("REQUESTS_CA_BUNDLE", _CERT_FILE)
-    else:
-        _CERT_FILE = None
-except Exception:
-    _CERT_FILE = None
+# R84: an app built without certifi used to fall back on the certificate
+# folder its Python was compiled to look in, which exists on some Macs (one
+# with Homebrew, say) and not on others. There every download from Hugging
+# Face was refused, which is why Velox would not install on a Mac mini while
+# it did on another Mac. Without certifi, the system's own bundle is used
+# (macOS keeps one at /etc/ssl/cert.pem); Windows reads its own store.
+def _find_cert_file():
+    try:
+        import certifi as _certifi
+        p = _certifi.where()
+        if p and os.path.isfile(p):
+            return p
+    except Exception:
+        pass
+    if not sys.platform.startswith("win"):
+        for p in ("/etc/ssl/cert.pem", "/private/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt",
+                  "/etc/pki/tls/certs/ca-bundle.crt"):
+            if os.path.isfile(p):
+                return p
+    return None
+
+
+_CERT_FILE = _find_cert_file()
+if _CERT_FILE:
+    os.environ.setdefault("SSL_CERT_FILE", _CERT_FILE)
+    os.environ.setdefault("REQUESTS_CA_BUNDLE", _CERT_FILE)
 
 # R65: who this app is. app.json (the same file the phone and tablet builds
 # read) names the app; Ingenium's builder writes a new one for each new app,
@@ -1329,6 +1345,19 @@ class IngeniumApi:
     def save_state(self, raw):
         return _save_state(raw)
 
+    # R81: big texts, kept apart from the desk (see _big_put above).
+    def big_put(self, bid, text):
+        return _big_put(bid, text)
+
+    def big_get(self, bid):
+        return _big_get(bid)
+
+    def big_del(self, bid):
+        return _big_del(bid)
+
+    def big_gc(self, live):
+        return _big_gc(live)
+
     def close_app(self, which):
         """Close a native instrument window."""
         if which not in self.APP_TITLES:
@@ -1521,6 +1550,19 @@ class IngeniumApiSingle:
 
     def save_state(self, raw):
         return _save_state(raw)
+
+    # R81: big texts, kept apart from the desk (see _big_put above).
+    def big_put(self, bid, text):
+        return _big_put(bid, text)
+
+    def big_get(self, bid):
+        return _big_get(bid)
+
+    def big_del(self, bid):
+        return _big_del(bid)
+
+    def big_gc(self, live):
+        return _big_gc(live)
 
 
 def _read_html_text(path):
@@ -2380,6 +2422,35 @@ class _InstallStopped(Exception):
     pass
 
 
+def _is_cert_error(e):
+    r = getattr(e, "reason", None)
+    return "certificate" in str(r if r is not None else e).lower()
+
+
+def _curl_fetch(url, part, job, say, exe="/usr/bin/curl"):
+    """R84: the Mac's own curl, which trusts the system's certificates,
+    carries a download that Python's own check refused. It carries on from
+    where the part file stops; the caller checks the fingerprint after."""
+    if not os.path.isfile(exe):
+        return False
+    args = [exe, "-L", "--fail", "--silent", "--show-error", "--retry", "3", "-A", "Ingenium",
+            "-C", "-", "-o", str(part), url]
+    p = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    while p.poll() is None:
+        if job["stop"].is_set():
+            p.kill()
+            raise _InstallStopped()
+        try:
+            say(received=os.path.getsize(str(part)), phase="download")
+        except Exception:
+            pass
+        time.sleep(0.4)
+    err = (p.stderr.read() if p.stderr else b"").decode("utf-8", "replace").strip()
+    if p.returncode != 0:
+        raise RuntimeError("the download stopped (%s)" % (err[-240:] or ("curl gave %d" % p.returncode)))
+    return True
+
+
 def _install_worker(job, sp):
     def say(**kw):
         with _INSTALLS_LOCK:
@@ -2422,6 +2493,7 @@ def _install_worker(job, sp):
                 h = hashlib.sha256()
         ctx = ssl.create_default_context(cafile=_CERT_FILE) if _CERT_FILE else ssl.create_default_context()
         last_err = ""
+        cert_fail = False
         for attempt in range(1, 7):
             if have >= sp["size"]:
                 break
@@ -2466,9 +2538,27 @@ def _install_worker(job, sp):
                     break
             except Exception as e:
                 last_err = _relay_reason(e) if "_relay_reason" in globals() else str(e)
+                if _is_cert_error(e):
+                    cert_fail = True
+                    break
             if have < sp["size"]:
                 if job["stop"].wait(min(16, 2 ** attempt)):
                     raise _InstallStopped()
+        if cert_fail and have < sp["size"] and sys.platform == "darwin":
+            log_problem("install of %s: Python refused the certificate (%s); the Mac's own curl carries it"
+                        % (sp.get("key"), last_err))
+            if _curl_fetch(sp["url"], part, job, say):
+                have = part.stat().st_size if part.is_file() else 0
+                say(phase="verify", received=have)
+                h = hashlib.sha256()
+                with open(str(part), "rb") as fh:
+                    while True:
+                        chunk = fh.read(4 << 20)
+                        if not chunk:
+                            break
+                        h.update(chunk)
+                        if job["stop"].is_set():
+                            raise _InstallStopped()
         if have != sp["size"]:
             raise RuntimeError("the download stopped part way (%s). Install again to carry on from where it stopped."
                                % (last_err or "no reason given"))
@@ -3321,6 +3411,94 @@ def _save_state(raw):
         return False
 
 
+# R81: big texts (a whole app pasted or attached, a page kept for the
+# preview) live apart from the desk, one file each, in a folder beside it.
+# The page keeps them in its own store as well; this copy is the one that
+# survives a web view whose storage forgets.
+_BIG_ID = re.compile(r"^big_[a-z0-9]{7,40}$")
+
+
+def _big_dir():
+    p = _desk_path()
+    if p is None:
+        return None
+    d = p.parent / "big"
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        return None
+    return d
+
+
+def _big_file(bid):
+    if not isinstance(bid, str) or not _BIG_ID.match(bid):
+        return None
+    d = _big_dir()
+    return None if d is None else d / (bid + ".txt")
+
+
+def _big_put(bid, text):
+    f = _big_file(bid)
+    if f is None:
+        return {"ok": False, "error": "no place to keep it"}
+    txt = text if isinstance(text, str) else str(text)
+    if len(txt) > 64 * 1024 * 1024:
+        return {"ok": False, "error": "too large to keep on disk"}
+    try:
+        tmp = str(f) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
+            fh.write(txt)
+        os.replace(tmp, str(f))
+        return {"ok": True}
+    except Exception:
+        log_problem("big_put failed", sys.exc_info())
+        return {"ok": False, "error": "it could not be written"}
+
+
+def _big_get(bid):
+    f = _big_file(bid)
+    try:
+        if f is not None and f.is_file():
+            return {"ok": True, "text": f.read_text(encoding="utf-8")}
+    except Exception:
+        log_problem("big_get failed", sys.exc_info())
+    return {"ok": False, "error": "not kept here"}
+
+
+def _big_del(bid):
+    f = _big_file(bid)
+    try:
+        if f is not None and f.is_file():
+            f.unlink()
+        return True
+    except Exception:
+        return False
+
+
+def _big_gc(live):
+    """Let go of what the desk no longer names, ten minutes after it was
+    written at the earliest (a text being sent is never let go)."""
+    d = _big_dir()
+    if d is None:
+        return 0
+    keep = set(x for x in (live or []) if isinstance(x, str))
+    now = time.time()
+    gone = 0
+    try:
+        for f in d.glob("big_*.txt"):
+            if f.stem in keep:
+                continue
+            try:
+                if now - f.stat().st_mtime > 600:
+                    f.unlink()
+                    gone += 1
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return gone
+
+
 def _start_local_server(directory, html_name=None):
     """Serve `directory` on 127.0.0.1, quietly, in a daemon thread. Returns the
     port, or raises. Loopback only: nothing is exposed off this machine, and
@@ -3685,6 +3863,28 @@ def _start_monitor_thread(window):
 
 import pathlib
 
+
+def show_seal_in_dock(picture):
+    """macOS 26 sets an app's own icon in a grey square when it is not Apple's rounded square, and shrinks it.
+    While the app runs, the Dock shows the picture the app gives it, so the round seal is given here, at its full size.
+    Anywhere else (Windows, an older Mac) nothing changes."""
+    if sys.platform != "darwin":
+        return
+    try:
+        pic = resource_path(picture)
+        if not os.path.isfile(pic):
+            return
+        from AppKit import NSApplication, NSImage
+        img = NSImage.alloc().initWithContentsOfFile_(pic)
+        if img is not None:
+            NSApplication.sharedApplication().setApplicationIconImage_(img)
+    except Exception:
+        try:
+            log_problem("dock seal", sys.exc_info())
+        except Exception:
+            pass
+
+
 def main():
     global _APP_HTML_PATH
     app_html = find_app_html()
@@ -3933,6 +4133,7 @@ def main():
     # unpack directory. pywebview versions differ on which keywords they
     # accept, so each richer attempt degrades to the plainer one, and only a
     # genuine start failure reports anything.
+    show_seal_in_dock('ingenium.png')
     _start_monitor_thread(window)
     _store = storage_dir()
     _started = False

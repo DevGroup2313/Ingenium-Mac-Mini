@@ -245,7 +245,7 @@ It names the cause rather than pointing at a log: a Python too new for
 PyInstaller, no connection, or a certificate check on a workplace network. For
 the first of those, install Python 3.12 or 3.13 alongside what you have. You
 can also build with no connection at all by running, on any connected Mac,
-`python3 -m pip download pyinstaller pywebview cmake setuptools wheel -d wheels` and copying the
+`python3 -m pip download pyinstaller pywebview cmake certifi setuptools wheel -d wheels` and copying the
 resulting `wheels` folder next to the script.
 
 ## Moving the app
