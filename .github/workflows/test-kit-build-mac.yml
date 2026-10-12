@@ -11,11 +11,9 @@
 # times against the monthly allowance.
 name: Test the kit's Mac build (Intel Mac)
 
+# Started by hand only (Actions, then Run workflow): Apple machines cost the most minutes.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/test-kit-build-mac.yml'
 
 permissions:
   contents: read
