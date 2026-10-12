@@ -1,0 +1,86 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# R75: runs "Build Mac App.command" the way an owner does on an Intel MacBook
+# with macOS 15: from the folder the Mac kit gives, with only what macOS and
+# Apple's command line tools bring (Apple's own Python 3, no Homebrew), and
+# with the finished icon taken away so that the icon is made from scratch.
+# The build must end with Ingenium.app on the Desktop, its engine compiled on
+# that Mac, and the app's own test passed. It starts by hand, or when this
+# file itself changes, and never otherwise: an Intel Mac minute counts ten
+# times against the monthly allowance.
+name: Test the kit's Mac build (Intel Mac)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/test-kit-build-mac.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  kit-build:
+    runs-on: macos-15-intel
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lay out the folder as the Mac kit gives it
+        run: |
+          KIT="$RUNNER_TEMP/kit/Ingenium-for-Mac"
+          mkdir -p "$KIT"
+          git archive HEAD | tar -x -C "$KIT"
+          # the hardest case: no finished icon, so the build must make one
+          rm -f "$KIT/ingenium.icns"
+          ls -la "$KIT"
+          echo "KIT=$KIT" >> "$GITHUB_ENV"
+          sw_vers; uname -m; /usr/bin/python3 --version; xcode-select -p
+
+      - name: Run Build Mac App.command (as on a Mac with only Apple's tools)
+        run: |
+          cd "$KIT"
+          set +e
+          printf '\n%.0s' $(seq 1 20) | env -i HOME="$HOME" USER="$USER" LOGNAME="$USER" SHELL=/bin/zsh LANG=en_US.UTF-8 TERM=dumb \
+            TMPDIR="${TMPDIR:-/tmp}" PATH=/usr/bin:/bin:/usr/sbin:/sbin bash "Build Mac App.command"
+          code=$?
+          set -e
+          echo "The build file ended with code $code"
+          APP="$HOME/Desktop/Ingenium.app"
+          {
+            echo "### Build Mac App.command on an Intel Mac ($(sw_vers -productVersion), Apple's Python $(/usr/bin/python3 --version 2>&1 | cut -d' ' -f2))"
+            grep -E '^\[[0-9]/8\]|took [0-9]+s|^Found: |^Seal |seal could not|^PyInstaller: |^Passed: |did not pass|^SUCCESS|did NOT finish|could not be installed|Total time' build_log.txt | sed 's/^/    /'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$code" = 0
+          grep -q '^SUCCESS' build_log.txt
+          grep -q '^Passed: ' build_log.txt
+          test -x "$APP/Contents/MacOS/Ingenium"
+          test -x "$APP/Contents/MacOS/engine/macos-x64/llama-server"
+          ls "$APP/Contents/Resources" | grep -i icns
+
+      - name: The built app answers again on its own (window closed)
+        run: |
+          APP="$HOME/Desktop/Ingenium.app"
+          "$APP/Contents/MacOS/Ingenium" --selftest-model builtin --selftest-out "$RUNNER_TEMP/again.json" || true
+          python3 - "$RUNNER_TEMP/again.json" <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, sys
+          r = json.load(open(sys.argv[1]))
+          print("* The app on the Desktop: ok %s; engine %s (%s); model %s; reply %r" % (
+              r.get("ok"), (r.get("engine") or {}).get("version"), (r.get("engine") or {}).get("platform"),
+              (r.get("builtin") or {}).get("name"), r.get("reply")))
+          sys.exit(0 if r.get("ok") else 1)
+          PY
+
+      - name: Keep the build's log with this run
+        if: always()
+        run: |
+          tail -n 60 "$KIT/build_log.txt" || true
+          mkdir -p "$RUNNER_TEMP/out" && cp "$KIT/build_log.txt" "$RUNNER_TEMP/out/" 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kit-build-log
+          path: ${{ runner.temp }}/out/
+          retention-days: 7
