@@ -20,6 +20,15 @@ cd "$(dirname "$0")" || exit 1
 FOLDER="$(pwd -P)"
 set -o pipefail
 LOG="build_log.txt"
+# The round seal at its full size: macOS 26 sets an app's own icon in a grey square when it is not Apple's rounded
+# square, and shrinks it, but leaves a custom icon as it is; so each copy is given the seal as its custom icon, as
+# Finder's Get Info would. To undo: Get Info on the app, click the small icon at the top, press Delete.
+seal_icon(){ [ -f "$1" ] && [ -d "$2" ] || return 0
+  osascript -l JavaScript - "$1" "$2" >>"$LOG" 2>&1 <<'JS' || true
+ObjC.import('AppKit');
+function run(a){var i=$.NSImage.alloc.initWithContentsOfFile(a[0]);if(!i||i.isNil())return 'seal: no picture';return $.NSWorkspace.sharedWorkspace.setIconForFileOptions(i,a[1],0)?'seal: set':'seal: refused';}
+JS
+}
 : > "$LOG"
 T0=$SECONDS
 STEP_T=$SECONDS
@@ -265,7 +274,7 @@ say "put together on this Mac's disk, not on this folder."
 rm -rf "$WORK/sources/build" "$WORK/sources/dist"
 # R77: this build's own number (the version, the day and the time it was
 # built), shown in About and in Finder's Get Info, as the cloud builds show theirs
-BUILD_NO="3.2.$(date +%Y%m%d).$(date +%H%M)"
+BUILD_NO="3.3.$(date +%Y%m%d).$(date +%H%M)"
 if "$VPY" "$SRC/tools/stamp_build.py" "$SRC/ingenium.html" "$BUILD_NO" >>"$LOG" 2>&1; then
   say "Build number: $BUILD_NO"
 else
@@ -314,6 +323,8 @@ fi
 # uses right-click then Open; MACOS_IF_BLOCKED.txt has the other routes.
 xattr -dr com.apple.quarantine "$DEST" >/dev/null 2>&1 || true
 xattr -dr com.apple.quarantine "$FOLDER/$APP_FILE.app" >/dev/null 2>&1 || true
+seal_icon "$FOLDER/ingenium.png" "$DEST"
+seal_icon "$FOLDER/ingenium.png" "$FOLDER/$APP_FILE.app"
 endstep
 
 say ""
