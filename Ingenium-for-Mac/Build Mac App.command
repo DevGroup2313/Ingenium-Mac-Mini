@@ -52,7 +52,7 @@ tools_failed(){
     say "Two ways forward:"
     say "  1. Connect and run this again. That is all."
     say "  2. Build offline: on any connected Mac run"
-    say "       python3 -m pip download pyinstaller pywebview cmake setuptools wheel -d wheels"
+    say "       python3 -m pip download pyinstaller pywebview cmake certifi setuptools wheel -d wheels"
     say "     then copy the resulting wheels folder next to this file."
   elif grep -qi "certificate_verify_failed" "$LOG"; then
     say "The download was refused by a certificate check, which usually means a"
@@ -168,7 +168,7 @@ step 3 "The build tools (PyInstaller and pywebview)"
 VENV="$WORK/.buildenv"
 VPY="$VENV/bin/python"
 TOOLS_OK=0
-if [ -x "$VPY" ] && "$VPY" -c "import webview, PyInstaller" >/dev/null 2>&1 && [ -x "$VENV/bin/cmake" ]; then
+if [ -x "$VPY" ] && "$VPY" -c "import webview, PyInstaller, certifi" >/dev/null 2>&1 && [ -x "$VENV/bin/cmake" ]; then
   TOOLS_OK=1
 fi
 if [ "$TOOLS_OK" -eq 1 ]; then
@@ -189,13 +189,13 @@ else
     say "Installing from the local wheels folder (no connection needed)..."
     runlive "$VPY" -m pip install --no-index --find-links wheels setuptools wheel || tools_failed
     runlive "$VPY" -m pip install --no-index --find-links wheels --no-build-isolation proxy_tools || tools_failed
-    runlive "$VPY" -m pip install --no-index --find-links wheels --only-binary=:all: pyinstaller pywebview cmake || tools_failed
+    runlive "$VPY" -m pip install --no-index --find-links wheels --only-binary=:all: pyinstaller pywebview cmake certifi || tools_failed
   else
     say "Downloading and installing them now (about 60 MB, one time; cached"
     say "on this Mac afterwards, so the next run skips this entirely):"
     runlive "$VPY" -m pip install --disable-pip-version-check --upgrade pip || tools_failed
     runlive "$VPY" -m pip install --disable-pip-version-check proxy_tools || tools_failed
-    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake || tools_failed
+    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake certifi || tools_failed
   fi
 fi
 say "PyInstaller: $("$VPY" -m PyInstaller --version 2>&1)"
