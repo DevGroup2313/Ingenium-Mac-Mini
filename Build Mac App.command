@@ -274,7 +274,7 @@ say "put together on this Mac's disk, not on this folder."
 rm -rf "$WORK/sources/build" "$WORK/sources/dist"
 # R77: this build's own number (the version, the day and the time it was
 # built), shown in About and in Finder's Get Info, as the cloud builds show theirs
-BUILD_NO="3.5.$(date +%Y%m%d).$(date +%H%M)"
+BUILD_NO="3.6.$(date +%Y%m%d).$(date +%H%M)"
 if "$VPY" "$SRC/tools/stamp_build.py" "$SRC/ingenium.html" "$BUILD_NO" >>"$LOG" 2>&1; then
   say "Build number: $BUILD_NO"
 else
