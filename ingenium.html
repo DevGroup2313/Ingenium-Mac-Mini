@@ -1999,14 +1999,30 @@ body.cs-on[data-csview="full"] #page-chat .chat-card{flex:1 1 auto; max-width:no
 body.cs-on[data-csview="full"] .cs-handle{display:none}
 body.cs-on[data-csview="full"] #csHideChat{display:none}
 body.cs-on.chat-drawer-on #page-chat .chat-card{min-width:280px}
-/* narrow windows: the stage opens over the chat, whole */
+/* R98: narrow windows. The chat and the stage share the screen; neither covers the other.
+   A middling window keeps them side by side with smaller floors; a phone-narrow one stacks them,
+   the chat above and the stage as a sheet below it, with a grip to give either more room. */
 @media (max-width:920px){
-  body.cs-on #page-chat .chat-col{display:block}
-  body.cs-on #page-chat .chat-card{max-width:none}
-  body.cs-on .cs-handle{display:none !important}
-  body.cs-on #csPane{position:fixed; top:calc(8px + var(--sat,0px)); right:calc(8px + var(--sar,0px)); bottom:calc(8px + var(--sab,0px)); left:calc(8px + var(--sal,0px)); z-index:520; min-width:0}
-  #csHideChat, #csShowChat, #csFloat, #csFull{display:none !important}
+  body.cs-on #page-chat .chat-card{min-width:240px; max-width:calc(100% - 252px)}
+  body.cs-on .cs-pane{min-width:240px}
+  #csFloat{display:none !important}
 }
+@media (max-width:620px){
+  body.cs-on #page-chat .chat-col{display:block}
+  body.cs-on #page-chat .chat-card{max-width:none; min-width:0}
+  body.cs-on .cs-handle{display:none !important}
+  body.cs-on:not([data-csview="full"]) #csPane{position:fixed; left:calc(6px + var(--sal,0px)); right:calc(6px + var(--sar,0px)); bottom:calc(6px + var(--sab,0px)); top:auto;
+    height:var(--cs-sheet-h,46vh); min-width:0; z-index:520; padding-top:18px; border-radius:16px 16px 12px 12px; box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+  body.cs-on:not([data-csview="full"]):not([data-cschat="hidden"]) #page-chat .chat-wrap{height:max(190px, calc(100vh - var(--chat-top,250px) - var(--cs-sheet-h,46vh) + 14px)) !important}
+  body.cs-on:not([data-csview="full"]):not([data-cschat="hidden"]) .main{padding-bottom:calc(var(--cs-sheet-h,46vh) + 14px)}
+  body.cs-on[data-cschat="hidden"]:not([data-csview="full"]) #csPane{top:calc(6px + var(--sat,0px)); height:auto}
+  body.cs-on #csSheetGrip{display:block}
+  body.cs-on #csFull{display:none !important}
+}
+.cs-sheet-grip{display:none; position:absolute; top:0; left:0; right:0; height:18px; cursor:row-resize; touch-action:none; z-index:2}
+.cs-sheet-grip::before{content:""; position:absolute; left:50%; top:6px; width:46px; height:5px; margin-left:-23px; border-radius:3px; background:var(--ink-3); opacity:.5}
+.cs-sheet-grip:hover::before, .cs-sheet-grip:focus-visible::before{background:var(--accent); opacity:.9}
+.cs-sheet-grip:focus-visible{outline:none}
 /* a page a reply carries, as a card in the reply; an app sent as a file, as a key */
 .cs-card{display:flex; align-items:center; gap:11px; width:100%; max-width:430px; margin:10px 0 2px; padding:9px 12px; text-align:left;
   border:1px solid rgba(106,63,181,.35); border-radius:12px; background:linear-gradient(180deg,var(--card-hi),var(--card-lo));
@@ -3042,7 +3058,7 @@ body[data-chatstyle="claude"] #page-chat .msg.me{align-self:flex-end;max-width:m
 body[data-chatstyle="claude"] #page-chat .msg .msg-acts{opacity:0;transition:opacity .16s ease}
 /* her own message: its keys sit just under the bubble, as Claude's do, so the bubble holds only her words */
 body[data-chatstyle="claude"] #page-chat .msg.me{position:relative;margin-bottom:22px;padding-bottom:11px !important}
-body[data-chatstyle="claude"] #page-chat .msg.me > .me-acts{position:absolute;right:2px;top:100%;margin-top:3px;white-space:nowrap}
+body[data-chatstyle="claude"] #page-chat .msg.me > .me-acts{position:absolute;right:2px;top:100%;margin-top:3px;white-space:nowrap;flex-wrap:nowrap}
 body[data-chatstyle="claude"] #page-chat .msg:hover .msg-acts,body[data-chatstyle="claude"] #page-chat .msg:focus-within .msg-acts,
 body[data-chatstyle="claude"] #page-chat .msg:last-child .msg-acts,body[data-chatstyle="claude"] #page-chat .msg.bot:nth-last-child(2) .msg-acts{opacity:1}
 @media (hover:none){body[data-chatstyle="claude"] #page-chat .msg .msg-acts{opacity:1}}
@@ -3066,6 +3082,18 @@ body.cc-blank #page-chat .composer{margin-bottom:auto !important}
 body[data-chatmode="code"] .main > #page-chat{max-width:none !important}
 body[data-chatmode="code"] .cc-side{flex-basis:244px;width:244px}
 body[data-chatmode="code"].cs-on #page-chat .chat-card{flex:0 0 var(--cs-chat-w,38%);min-width:340px}
+/* R98: the clean look kept the chat's share of the split from applying in the Chat page. Unset, the chat and the
+   stage halve the room beside the conversations' column; once the handle is dragged, its width wins */
+body[data-chatstyle="claude"][data-chatmode="chat"].cs-on:not([data-csview="float"]):not([data-csview="full"]) #page-chat .chat-card{flex:1 1 0;min-width:300px}
+body[data-chatstyle="claude"][data-chatmode="chat"].cs-on:not([data-csview="float"]):not([data-csview="full"]) #page-chat .cs-pane{flex:1 1 0}
+body[data-chatstyle="claude"][data-chatmode="chat"].cs-on:not([data-csview="float"]):not([data-csview="full"]) #chatCol[style*="--cs-chat-w"] .chat-card{flex:0 0 var(--cs-chat-w)}
+@media (max-width:920px){body[data-chatstyle="claude"][data-chatmode].cs-on:not([data-csview="float"]):not([data-csview="full"]) #page-chat .chat-card{min-width:240px}}
+@media (min-width:821px) and (max-width:1180px){
+  body.cs-on:not([data-csview="float"]):not([data-csview="full"]) .cc-side{position:fixed;left:0;top:50px;bottom:0;z-index:760;width:min(84vw,300px);max-height:none;border-radius:0 16px 16px 0;background:var(--card-hi);box-shadow:0 10px 40px rgba(0,0,0,.18)}
+  body.cs-on:not([data-csview="float"]):not([data-csview="full"]):not(.cc-side-open) .cc-side{display:none}
+  body.cs-on.cc-side-off.cc-side-open .cc-side{display:flex}}
+@media (max-width:620px){body[data-chatstyle="claude"][data-chatmode].cs-on:not([data-csview="float"]):not([data-csview="full"]) #page-chat .chat-card,
+  body[data-chatstyle="claude"][data-chatmode].cs-on:not([data-csview="float"]):not([data-csview="full"]) #chatCol[style*="--cs-chat-w"] .chat-card{min-width:0;flex:1 1 auto;max-width:none}}
 body[data-chatstyle="claude"][data-chatmode="code"] #page-chat .chat-scroll{padding:10px 10px 26px;gap:16px}
 body[data-chatstyle="claude"][data-chatmode="code"] #page-chat .msg.bot{font:14.5px/1.62 var(--sans)}
 body[data-chatstyle="claude"][data-chatmode="code"] #page-chat .msg.me{align-self:stretch;max-width:none;border-radius:12px !important;background:rgba(var(--fam-rgb),.055) !important;
@@ -3423,6 +3451,7 @@ body[data-theme="night"] .ed-new{color:#9fe0b4}
         <!-- R82: the chat's stage: the Forge's preview (its 628 row), beside the conversation -->
         <div class="cs-handle" id="csHandle" role="separator" aria-orientation="vertical" aria-label="Resize the chat and the preview" tabindex="0" title="Drag to resize the chat and the preview (or use the arrow keys)"></div>
         <div class="card preview-pane cs-pane" id="csPane" aria-label="Live preview">
+          <div class="cs-sheet-grip" id="csSheetGrip" role="separator" aria-orientation="horizontal" aria-label="Resize the chat and the preview" tabindex="0" title="Drag to give the chat or the preview more room (double-click: half and half)"></div>
           <div class="stagebar cs-bar" id="csBar">
             <button class="cs-key" id="csShowChat" title="Show the chat again">› Show</button>
             <span class="seg" role="group" aria-label="View"><button class="seg-btn active" id="csViewPrev" aria-pressed="true">👁️ Preview</button><button class="seg-btn" id="csViewCode" aria-pressed="false">🧾 Code</button></span>
@@ -8343,7 +8372,8 @@ function csMeasure(){var card=document.querySelector("#page-chat .chat-card");if
 function csApplyWidth(){var col=$("chatCol");if(!col)return;var f=0;try{localStorage.removeItem("ingenium_cs_w");f=+localStorage.getItem("ingenium_cs_share")||0;}catch(e){}
   if(f>=0.15&&f<=0.85)col.style.setProperty("--cs-chat-w","calc("+(f*100).toFixed(2)+"% - 6px)");else col.style.removeProperty("--cs-chat-w");}
 function csSetWidth(px,keep){var col=$("chatCol");if(!col)return;var r=col.getBoundingClientRect();
-  var w=Math.round(Math.max(300,Math.min(r.width-352,px)));col.style.setProperty("--cs-chat-w",w+"px");csMeasure();
+  var nar=(window.innerWidth||1200)<=920;/* R98: a middling window keeps both, with smaller floors */
+  var w=Math.round(Math.max(nar?240:300,Math.min(r.width-(nar?252:352),px)));col.style.setProperty("--cs-chat-w",w+"px");csMeasure();
   if(keep&&r.width>0){try{localStorage.setItem("ingenium_cs_share",((w+6)/r.width).toFixed(4));}catch(e){}csApplyWidth();}}
 function csCopyText(t,btn){var done=function(){if(!btn)return;var o=btn.textContent;btn.textContent="Copied";setTimeout(function(){btn.textContent=o;},1400);};
   var old=function(){try{var ta=el("textarea");ta.value=t;ta.style.cssText="position:fixed;left:-9999px";document.body.appendChild(ta);ta.select();var ok=document.execCommand("copy");ta.remove();if(ok)done();}catch(e){}};
@@ -16413,6 +16443,8 @@ function ccRowMenu(c,anchor){var old=$("ccMenu");if(old)old.remove();var m=el("d
      if(state.activeChat===c.id){state.activeChat=null;ccEnter(CC.mode||"chat");}else{saveState();ccPaintSide();}}]].forEach(function(a){var b=el("button","menu-btn"+(a[0]==="Delete"?" danger":""),a[0]);b.type="button";b.onclick=function(){m.remove();a[1]();};m.appendChild(b);});
   document.body.appendChild(m);var r=anchor.getBoundingClientRect();m.style.position="fixed";m.style.left=Math.min(r.left,innerWidth-200)+"px";m.style.top=(r.bottom+4)+"px";m.hidden=false;
   setTimeout(function(){document.addEventListener("pointerdown",function f(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener("pointerdown",f,true);}},true);},0);}
+/* R98: the conversations' column opens over the chat on a narrow window, and also while the stage shares a middling one */
+function ccSideOver(){var w=window.innerWidth||1200;return w<=820||(w<=1180&&document.body.classList.contains("cs-on")&&document.body.getAttribute("data-csview")!=="float"&&document.body.getAttribute("data-csview")!=="full");}
 function ccPaintSide(){var h=ccSideHost();if(!h)return;var cs=ccState();h.innerHTML="";document.body.classList.toggle("cc-side-off",cs.side===false);
   if(!CC.mode)return;
   var top=el("div","cc-side-top");var nb=el("button","cc-new",CC.mode==="code"?"＋ New session":"＋ New chat");nb.type="button";nb.onclick=function(){$("chatNew").click();};top.appendChild(nb);
@@ -16449,7 +16481,7 @@ function ccPaintHead(){var top=document.querySelector("#page-chat .chat-top");if
   if(!t){t=el("button","cc-title");t.id="ccTitle";t.type="button";t.title="Rename";top.insertBefore(t,top.firstChild);
     t.onclick=function(){var c=curChat();var v=prompt("Name this conversation",chatTitle(c));if(v&&v.trim()){c.title=v.trim().slice(0,120);saveState();ccPaintHead();ccPaintSide();}};}
   var sb=$("ccSideBtn");if(!sb){sb=el("button","chat-top-key sq cc-sidebtn","☰");sb.id="ccSideBtn";sb.type="button";sb.title="Show the list of conversations";top.insertBefore(sb,top.firstChild);
-    sb.onclick=function(){if(window.innerWidth<=820){document.body.classList.toggle("cc-side-open");return;}var cs=ccState();cs.side=cs.side===false;saveState();ccPaintSide();ccPaintHead();};}
+    sb.onclick=function(){if(ccSideOver()){document.body.classList.toggle("cc-side-open");return;}var cs=ccState();cs.side=cs.side===false;saveState();ccPaintSide();ccPaintHead();};}
   sb.hidden=ccState().side!==false&&window.innerWidth>820;
   var c=state.chats.filter(function(x){return x.id===state.activeChat;})[0];t.textContent=c?chatTitle(c):(CC.mode==="code"?"Code":"New conversation");
   var cb=$("ccCodeBar");if(CC.mode!=="code"){if(cb)cb.hidden=true;return;}
@@ -16552,6 +16584,50 @@ ccStyle();
   r.querySelectorAll(".seg-btn").forEach(function(x){x.onclick=function(){ccState().style=x.getAttribute("data-v");saveState();ccStyle();tick();};});tick();})();
 window.IngCode={enter:ccEnter,project:ccProj,projects:ccProjects,make:ccMakeProject,session:ccNewSession,preview:ccShowPreview,undo:ccUndo,load:ccLoadAll,welcome:ccWelcome};
 ;try{window.__ingParts["p24"]="running";}catch(_){}
+</script>
+<script>try{(window.__ingParts=window.__ingParts||{})["p25"]="started";}catch(_){}
+/* R98: on a phone-narrow window the stage is a sheet under the chat; its grip gives either more room.
+   The share is kept as a fraction of the window's height, so turning the device keeps the proportion. */
+(function csSheet(){
+  var g=$("csSheetGrip");if(!g)return;var root=document.documentElement;
+  function lim(f){return Math.max(.22,Math.min(.8,f));}
+  function apply(f){document.body.style.setProperty("--cs-sheet-h",(lim(f)*100).toFixed(2)+"vh");try{csMeasure();}catch(e){}try{chatFit();}catch(e){}}
+  function load(){var f=0;try{f=+localStorage.getItem("ingenium_cs_sheet")||0;}catch(e){}if(f)apply(f);}
+  function keep(f){try{localStorage.setItem("ingenium_cs_sheet",lim(f).toFixed(4));}catch(e){}}
+  function cur(){var p=$("csPane");var h=p?p.getBoundingClientRect().height:0;return (h||(window.innerHeight*.46))/(window.innerHeight||800);}
+  load();
+  g.addEventListener("pointerdown",function(e){if(e.button)return;e.preventDefault();var H=window.innerHeight||800,y0=e.clientY,f0=cur(),f=f0;
+    try{g.setPointerCapture(e.pointerId);}catch(_){}try{csDragOn();}catch(_){}
+    function mv(ev){f=lim(f0+(y0-ev.clientY)/H);apply(f);}
+    function up(){g.removeEventListener("pointermove",mv);g.removeEventListener("pointerup",up);g.removeEventListener("pointercancel",up);try{csDragOff();}catch(_){}keep(f);}
+    g.addEventListener("pointermove",mv);g.addEventListener("pointerup",up);g.addEventListener("pointercancel",up);});
+  g.addEventListener("dblclick",function(){apply(.46);keep(.46);});
+  g.addEventListener("keydown",function(e){var d=e.key==="ArrowUp"?.05:(e.key==="ArrowDown"?-.05:0);if(!d)return;e.preventDefault();var f=lim(cur()+d);apply(f);keep(f);});
+})();
+/* R98: the chat's width beside the stage is measured from where the chat starts, past the conversations'
+   column, so the handle follows the pointer and the stage never runs off the window */
+function csSideOff(){var col=$("chatCol"),card=document.querySelector("#page-chat .chat-card");if(!col||!card)return 0;
+  var a=col.getBoundingClientRect(),c=card.getBoundingClientRect();return c.width?Math.max(0,Math.round(c.left-a.left)):0;}
+csApplyWidth=function(){var col=$("chatCol");if(!col)return;var f=0;try{localStorage.removeItem("ingenium_cs_w");f=+localStorage.getItem("ingenium_cs_share")||0;}catch(e){}
+  if(!(f>=0.15&&f<=0.85)||(window.innerWidth||1200)<=620){col.style.removeProperty("--cs-chat-w");return;}
+  var r=col.getBoundingClientRect();if(!r.width)return;var av=r.width-csSideOff(),nar=(window.innerWidth||1200)<=920;
+  col.style.setProperty("--cs-chat-w",Math.round(Math.max(nar?240:300,Math.min(av-(nar?252:352),f*av-6)))+"px");};
+csSetWidth=function(px,keep){var col=$("chatCol");if(!col)return;var r=col.getBoundingClientRect(),off=csSideOff(),av=r.width-off;
+  var nar=(window.innerWidth||1200)<=920;var w=Math.round(Math.max(nar?240:300,Math.min(av-(nar?252:352),px-off)));
+  col.style.setProperty("--cs-chat-w",w+"px");try{csMeasure();}catch(e){}
+  if(keep&&av>0){try{localStorage.setItem("ingenium_cs_share",((w+6)/av).toFixed(4));}catch(e){}}};
+(function(){var t=0;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(function(){if(csIsOn())csApplyWidth();},140);});})();
+/* R98: when the stage opens on a middling window, the studio's column folds to give the chat and the stage
+   the width, and comes back when the stage closes (unless it was folded by hand) */
+(function csNarrowNav(){var auto=false;
+  function fit(){var want=csIsOn()&&(window.innerWidth||1200)<=1180&&document.body.getAttribute("data-csview")!=="float";
+    var c=document.body.classList;
+    if(want&&!c.contains("nav-collapsed")){c.add("nav-collapsed");auto=true;}
+    else if(!want&&auto){auto=false;var code=(typeof CC!=="undefined"&&CC&&CC.navAuto);if(!state.navCollapsed&&!code)c.remove("nav-collapsed");}
+    try{csMeasure();}catch(e){}}
+  var o=csOpen;csOpen=function(){var r=o.apply(this,arguments);try{fit();}catch(e){}return r;};
+  var t=0;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(fit,120);});fit();})();
+;try{window.__ingParts["p25"]="running";}catch(_){}
 </script>
 <script>/* R95: every part has now wrapped how a message is drawn: draw the conversation again so it shows them at once */
 (function(){function redraw(){try{if(typeof renderChat==="function"&&document.getElementById("chatScroll"))renderChat();}catch(e){try{console.error("Ingenium: the conversation could not be drawn again",e);}catch(_){}}}
