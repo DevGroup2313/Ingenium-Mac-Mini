@@ -58,9 +58,9 @@ jobs:
     env:
       INGENIUM_CHIP: ${{ matrix.chip }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -77,7 +77,7 @@ jobs:
 
       - name: The engine, from the build cache when it was compiled before
         id: engine
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: engine/${{ matrix.plat }}
           # one compile per engine release: change v1 to v2 to compile again
@@ -94,7 +94,7 @@ jobs:
       # kept in its own build cache, so the engine is not compiled again
       - name: The trainer, from the build cache when it was compiled before
         id: trainer
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: engine-trainer/${{ matrix.plat }}
           key: trainer-${{ matrix.plat }}-b11321-v1
@@ -111,7 +111,7 @@ jobs:
           chmod 755 engine/${{ matrix.plat }}/llama-finetune
 
       - name: The built-in models, from the build cache when they were downloaded before
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ingenium-models
           key: model-${{ hashFiles('desktop_model.json') }}
@@ -155,7 +155,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="3.4.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="3.5.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           INGENIUM_VERSION="$V" python3 -m PyInstaller --noconfirm --clean ingenium.spec

@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 80
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Lay out the folder as the Mac kit gives it
         run: |
