@@ -3,6 +3,11 @@
 # NO LICENCE IS GRANTED. See LICENCE.txt.
 #
 # Lays out the Ingenium seal for the Mac app's icon (standard library only).
+# R104 (15 October 2026): the icon is the seal in layered depth, as the door
+# and the top bar now show it (the face and rim at the back, the ring, the star
+# and the heart stone each standing above the last, with light shadows), drawn
+# still and facing from the page's own drawing; icons/ and ingenium.icns hold
+# the new pictures.
 # R71: the seal is the raised seal the app shows on its door and in its top
 # bar, approved on 7 October 2026: the face and its bevelled rim, the star cut
 # into lit and shaded halves, the heart stone, and their short shadows, all
