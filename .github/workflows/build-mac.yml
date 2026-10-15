@@ -155,7 +155,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="3.11.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="3.12.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           INGENIUM_VERSION="$V" python3 -m PyInstaller --noconfirm --clean ingenium.spec
