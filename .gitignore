@@ -1,5 +1,5 @@
 # made by the builds; never committed
-build/
+/build/
 dist/
 .buildenv/
 engine/macos-*/
