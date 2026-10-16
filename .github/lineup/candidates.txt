@@ -1,17 +1,22 @@
-# round 3: the chosen models' files and architectures
-repo JetBrains/Mellum2.1-12B-A2.5B-Thinking-GGUF
-repo bartowski/AesCode-8B-GGUF
-repo google/gemma-4-12B-it-qat-q4_0-gguf
-repo google/gemma-4-E4B-it-qat-q4_0-gguf
-repo google/gemma-4-E2B-it-qat-q4_0-gguf
-repo google/gemma-4-26B-A4B-it-qat-q4_0-gguf
-repo LiquidAI/LFM2.5-8B-A1B-GGUF
-repo LiquidAI/LFM2.5-24B-A2B-GGUF
-repo ibm-granite/granite-4.2-8b-GGUF
-repo ibm-granite/granite-4.2-3b-GGUF
-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
-repo Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF
-search * KAT-Coder-V2.5-Dev-GGUF
-card JetBrains/Mellum2.1-12B-A2.5B-Thinking
-card microsoft/AesCode-8B
-card ibm-granite/granite-4.2-3b
+# round 4: each file downloads without signing in
+head https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking-GGUF/resolve/main/Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf
+head https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf
+head https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/mmproj-gemma-4-12b-it-qat-q4_0.gguf
+head https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/main/gemma-4-E4B_q4_0-it.gguf
+head https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf
+head https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/main/gemma-4-26B_q4_0-it.gguf
+head https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-GGUF/resolve/main/LFM2.5-8B-A1B-Q4_K_M.gguf
+head https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF/resolve/main/LFM2.5-24B-A2B-Q4_K_M.gguf
+head https://huggingface.co/ibm-granite/granite-4.2-3b-GGUF/resolve/main/granite-4.2-3b-Q4_K_M.gguf
+head https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
+head https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf
+head https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking/raw/main/LICENSE
+head https://huggingface.co/LiquidAI/LFM2.5-8B-A1B/raw/main/LICENSE
+head https://huggingface.co/LiquidAI/LFM2.5-24B-A2B/raw/main/LICENSE
+head https://huggingface.co/google/gemma-4-12B-it/raw/main/LICENSE
+head https://huggingface.co/ibm-granite/granite-4.2-3b/raw/main/LICENSE
+head https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/raw/main/LICENSE
+head https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/raw/main/LICENSE
+repo google/gemma-4-12B-it
+repo JetBrains/Mellum2.1-12B-A2.5B-Thinking
+card google/gemma-4-12B-it

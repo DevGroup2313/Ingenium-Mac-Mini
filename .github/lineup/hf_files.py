@@ -44,8 +44,8 @@ def repo(name):
         return
     card = info.get("cardData") or {}
     gg = info.get("gguf") or {}
-    print("R %s created=%s licence=%s base=%s arch=%s ctx=%s params=%s" % (name, (info.get("createdAt") or "")[:10], card.get("license"),
-          card.get("base_model"), gg.get("architecture"), gg.get("context_length"), gg.get("total")))
+    print("R %s created=%s licence=%s base=%s arch=%s ctx=%s params=%s gated=%s" % (name, (info.get("createdAt") or "")[:10], card.get("license"),
+          card.get("base_model"), gg.get("architecture"), gg.get("context_length"), gg.get("total"), info.get("gated")))
     try:
         files = get("models/%s/tree/main?recursive=true" % name)
     except Exception as e:
@@ -57,6 +57,16 @@ def repo(name):
             continue
         lfs = f.get("lfs") or {}
         print("F %s %s %s %s" % (name, p, lfs.get("size", f.get("size")), lfs.get("oid", "")))
+
+
+def head(url):
+    """whether a file downloads without signing in (a gated model answers 401 or 403)"""
+    try:
+        req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "ingenium-lineup/1"})
+        with urllib.request.urlopen(req, timeout=60) as r:
+            print("H %s %s %s" % (url, r.status, r.headers.get("Content-Length") or r.headers.get("X-Linked-Size")))
+    except Exception as e:
+        print("H %s ERROR %s" % (url, e))
 
 
 def card(name):
@@ -86,3 +96,5 @@ for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encodin
         repo(w[1])
     elif w[0] == "card":
         card(w[1])
+    elif w[0] == "head":
+        head(w[1])
