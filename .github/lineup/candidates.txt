@@ -1,31 +1,41 @@
-# round 1: who has made what lately, and the best-known coding GGUFs
-search Qwen
-search mistralai
-search JetBrains
-search ByteDance-Seed
-search google gemma
-search openai
-search LiquidAI
-search microsoft
-search nvidia
-search ibm-granite
-search deepseek-ai
-search zai-org
-search moonshotai
-search Kwaipilot
-search inclusionAI
-search allenai
-search HuggingFaceTB
-search ServiceNow-AI
-search tencent
-search unsloth Coder
-search unsloth gemma-4
-search unsloth Devstral
-search ggml-org
-repo Qwen/Qwen2.5-Coder-14B-Instruct-GGUF
-repo Qwen/Qwen2.5-Coder-7B-Instruct-GGUF
-repo Qwen/Qwen2.5-Coder-3B-Instruct-GGUF
-repo Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF
-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
-repo ggml-org/gpt-oss-20b-GGUF
-repo JetBrains/Mellum2-12B-A2.5B-Thinking-GGUF-Q4_K_M
+# round 2: names searched across Hugging Face; the newest candidates' files; their makers' scores
+search * Qwen3.8
+search * Qwen3.6
+search * Qwen3.7
+search * Devstral
+search * Mellum
+search * AesCode
+search * KAT-Coder
+search * Qwen3.5-Coder
+search * LFM2.5-8B-A1B
+search * Ministral
+search * Phi-5
+search * Seed-Coder
+repo google/gemma-4-12B-it-qat-q4_0-gguf
+repo google/gemma-4-E4B-it-qat-q4_0-gguf
+repo google/gemma-4-E2B-it-qat-q4_0-gguf
+repo google/gemma-4-26B-A4B-it-qat-q4_0-gguf
+repo LiquidAI/LFM2.5-24B-A2B-GGUF
+repo LiquidAI/LFM2.5-8B-A1B-GGUF
+repo ibm-granite/granite-4.2-8b-GGUF
+repo ibm-granite/granite-4.2-3b-GGUF
+repo unsloth/Seed-Coder-8B-Reasoning-GGUF
+repo ggml-org/Qwen3.8-27B-GGUF
+repo ggml-org/Qwen3.8-Flash-Next-GGUF
+repo ggml-org/GLM-5.3-Flash-GGUF
+repo ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF
+repo unsloth/Qwen3-Coder-Next-GGUF
+card google/gemma-4-12B-it
+card google/gemma-4-E4B-it
+card LiquidAI/LFM2.5-24B-A2B
+card LiquidAI/LFM2.5-8B-A1B
+card ibm-granite/granite-4.2-8b
+card microsoft/AesCode-8B
+card JetBrains/Mellum2-12B-A2.5B-Thinking
+card Qwen/Qwen3-Coder-30B-A3B-Instruct
+card openai/gpt-oss-20b
+card zai-org/GLM-5.3-Flash
+card ByteDance-Seed/Seed-Coder-8B-Reasoning
+card Qwen/Qwen2.5-Coder-14B-Instruct
+card Kwaipilot/KAT-Coder-V2.5-Dev
+card moonshotai/Kimi-K2.7-Code

@@ -22,7 +22,9 @@ def get(path):
 
 
 def search(author, words):
-    q = {"author": author, "sort": "createdAt", "direction": "-1", "limit": "60"}
+    q = {"sort": "createdAt", "direction": "-1", "limit": "60"}
+    if author != "*":
+        q["author"] = author
     if words:
         q["search"] = words
     try:
@@ -55,6 +57,23 @@ def repo(name):
         print("F %s %s %s %s" % (name, p, lfs.get("size", f.get("size")), lfs.get("oid", "")))
 
 
+def card(name):
+    """the maker's own scores for code, as its model card gives them"""
+    try:
+        req = urllib.request.Request("https://huggingface.co/%s/raw/main/README.md" % name, headers={"User-Agent": "ingenium-lineup/1"})
+        text = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+    except Exception as e:
+        print("C %s ERROR %s" % (name, e))
+        return
+    n = 0
+    for ln in text.splitlines():
+        if re.search(r"(?i)livecodebench|humaneval|swe-?bench|aider|mbpp|bigcodebench|terminal-?bench|codeforces|parameters|context length|active", ln) and len(ln) < 600:
+            print("C %s | %s" % (name, ln.strip()))
+            n += 1
+            if n >= 40:
+                break
+
+
 for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encoding="utf-8"):
     w = line.split()
     if not w or w[0].startswith("#"):
@@ -63,3 +82,5 @@ for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encodin
         search(w[1], " ".join(w[2:]))
     elif w[0] == "repo":
         repo(w[1])
+    elif w[0] == "card":
+        card(w[1])
