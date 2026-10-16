@@ -83,6 +83,12 @@ edit("seals.map(function(k,i){return lxhImage(k,i,1.2)", "seals.map(function(k,i
 edit('var name=personal?(author||String(heading||title).split(/·/)[0].trim()):(apps.length?apps.map(function(k){return LXH_NAMES[k];}).join(" and "):String(heading||title).split(/·/)[0].trim());',
      'var name=meta.name||(personal?(author||String(heading||title).split(/·/)[0].trim()):(apps.length?apps.map(function(k){return LXH_NAMES[k];}).join(" and "):String(heading||title).split(/·/)[0].trim()));', "R107 set name")
 
+
+# ---- R108: an app whose copy was lost (a store cleared) is kept again when its file is added again ----
+edit('if(cur&&cur.sha256===meta.sha256)return Promise.resolve("same");',
+     '/* R108: the same app again: "unchanged" only if its copy is really still here; a copy that was lost is kept again */\n'
+     '  if(cur&&cur.sha256===meta.sha256)return libText(key).then(function(t){if(t)return "same";return libPut(cur.ref,u8,text).then(function(){return "kept";});},function(){return libPut(cur.ref,u8,text).then(function(){return "kept";});});', "R108 relink")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:
@@ -111,10 +117,13 @@ assert out.count(MARK) == 1
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 blob = "\n".join(open(m, encoding="utf-8").read().rstrip("\n") for m in mods) + "\n"
 blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))
+if "/*R109_WIDTHS*/null" in blob:
+    _w = json.load(open(os.path.join(HERE, "pdf_widths.json")))
+    blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R107_LAYERS*/null" in blob:
     blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
 if "/*R107_MASTER*/null" in blob:
-    blob = blob.replace("/*R107_MASTER*/null", json.dumps({k: "data:image/png;base64," + v["b64"] for k, v in _ms.items()}))
+    blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master
 out = out.replace(MARK, blob + MARK)
 dest = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
 open(dest, "w", encoding="utf-8").write(out)

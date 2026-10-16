@@ -116,7 +116,7 @@ def sync_sources():
     dst = os.path.join(R["mini"], "source", "build")
     if not os.path.isdir(dst) or os.path.realpath(dst) == os.path.realpath(H):
         return
-    for f in ("build_page.py", "release.py", "version.json", "master_seal.json", "lx_layers.json"):
+    for f in ("build_page.py", "release.py", "version.json", "master_seal.json", "lx_layers.json", "pdf_widths.json"):
         shutil.copy2(os.path.join(H, f), os.path.join(dst, f))
     md = os.path.join(dst, "modules")
     os.makedirs(md, exist_ok=True)
