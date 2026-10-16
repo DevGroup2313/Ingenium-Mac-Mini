@@ -1,0 +1,21 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# Reads from Hugging Face the files Ingenium's model lineup can offer (name,
+# size, SHA-256, licence), for writing the lineup in the page. Its output is
+# the job's log; it builds nothing and changes nothing.
+name: Model lineup sources
+on:
+  push:
+    paths:
+      - '.github/lineup/**'
+      - '.github/workflows/lineup-sources.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the candidates from Hugging Face
+        run: python3 .github/lineup/hf_files.py .github/lineup/candidates.txt
