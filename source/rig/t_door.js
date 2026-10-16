@@ -1,0 +1,34 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+(async () => {
+  const S = process.env.S;
+  const info = await (await fetch('http://127.0.0.1:18999/')).json();
+  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await ctx.addInitScript(({ names }) => { const api = {}; for (const n of names) api[n] = (...a) => fetch('http://127.0.0.1:18999/call/' + n, { method: 'POST', body: JSON.stringify(a) }).then(r => r.json()).then(j => j.v); window.pywebview = { api }; window.addEventListener('DOMContentLoaded', () => setTimeout(() => window.dispatchEvent(new Event('pywebviewready')), 50)); }, { names: info.names });
+  const page = await ctx.newPage();
+  const url = `http://127.0.0.1:${info.port}/ingenium.html?b=test`;
+  const doorOpen = () => page.evaluate(() => !document.getElementById('introDoor').hasAttribute('hidden'));
+  const load = async () => { await page.goto(url); await page.waitForFunction(() => window.__ingReady === true, null, { timeout: 120000 }); await page.waitForTimeout(1800); };
+  const out = {};
+  await load(); out.first = await doorOpen(); out.hasSwitch = await page.evaluate(() => !!document.getElementById('introStraight') && !document.getElementById('introStraight').checked);
+  await page.screenshot({ path: S + '/shots/door_switch.png' });
+  await page.click('#introEnter'); out.afterEnter = await doorOpen();
+  await load(); out.secondStart = await doorOpen();
+  await page.click('#introStraightRow'); await page.waitForTimeout(300); out.switchOn = await page.evaluate(() => document.getElementById('introStraight').checked && state.doorStraight === true);
+  await page.click('#introEnter'); await page.waitForTimeout(1200);
+  await load(); out.straightStart = await doorOpen();
+  await page.click('#brandSealBtn'); await page.waitForTimeout(600); out.sealOpensDoor = await doorOpen();
+  await page.click('#introStraightRow'); await page.waitForTimeout(300); await page.click('#introEnter'); await page.waitForTimeout(1200);
+  await load(); out.backToDoor = await doorOpen();
+  // grip within the window
+  await page.click('#introEnter'); await page.evaluate(() => go('chat')); await page.waitForTimeout(800);
+  const g = await page.evaluate(() => { const b = document.querySelector('.chat-grip').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2, innerHeight, document.documentElement.scrollHeight]; });
+  out.gripVisible = g[1] < g[2]; out.noScroll = g[3] <= g[2];
+  await page.mouse.move(g[0], g[1]); await page.mouse.down(); await page.mouse.move(g[0], g[1] - 250, { steps: 8 }); await page.mouse.up(); await page.waitForTimeout(300);
+  out.shorter = await page.evaluate(() => [document.querySelector('#page-chat .chat-wrap').getBoundingClientRect().height | 0, window.scrollY, document.documentElement.scrollHeight - innerHeight]);
+  const g2 = await page.evaluate(() => { const b = document.querySelector('.chat-grip').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; });
+  await page.mouse.move(g2[0], g2[1]); await page.mouse.down(); await page.mouse.move(g2[0], g2[1] + 700, { steps: 10 }); await page.mouse.up(); await page.waitForTimeout(300);
+  out.longerCapped = await page.evaluate(() => [document.querySelector('#page-chat .chat-wrap').getBoundingClientRect().height | 0, window.scrollY, document.documentElement.scrollHeight - innerHeight]);
+  console.log(JSON.stringify(out, null, 1));
+  await browser.close();
+})();
