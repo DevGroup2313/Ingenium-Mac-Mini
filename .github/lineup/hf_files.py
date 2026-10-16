@@ -43,7 +43,9 @@ def repo(name):
         print("R %s ERROR %s" % (name, e))
         return
     card = info.get("cardData") or {}
-    print("R %s created=%s licence=%s base=%s" % (name, (info.get("createdAt") or "")[:10], card.get("license"), card.get("base_model")))
+    gg = info.get("gguf") or {}
+    print("R %s created=%s licence=%s base=%s arch=%s ctx=%s params=%s" % (name, (info.get("createdAt") or "")[:10], card.get("license"),
+          card.get("base_model"), gg.get("architecture"), gg.get("context_length"), gg.get("total")))
     try:
         files = get("models/%s/tree/main?recursive=true" % name)
     except Exception as e:
