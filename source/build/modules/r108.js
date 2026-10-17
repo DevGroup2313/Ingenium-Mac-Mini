@@ -189,7 +189,16 @@ function modelPlan(){var o={link:false,key:null,spec:null,rec:null,chosen:null,n
   if(!c)c=readyModels()[0]||null;
   o.chosen=c;
   try{if(c===o.rec&&o.spec)o.need=lineupNeedGB(o.spec);else if(c)o.need=fitVerdict(c).need;else if(o.spec)o.need=lineupNeedGB(o.spec);}catch(e){}
+  /* R113: the best model for each task. Writing takes the strongest model here; reading may take the quicker Scriba when she
+     asks for it; and when a stronger model than the one chosen is ready on this device, the brief says so. */
+  o.stronger=null;o.readRec=null;o.readKey=null;
+  try{var cs=strength(c);readyModels().forEach(function(m){if(c&&m.id===c.id)return;var s=strength(m);if(s>cs*1.25&&s>0&&(!o.stronger||s>strength(o.stronger)))o.stronger=m;});}catch(e){}
+  try{var rk=lineupKeyFor("scriba");var rr=rk?lineupRec(rk):null;if(rr&&c&&rr.id!==c.id&&strength(rr)<strength(c)){o.readKey=rk;o.readRec=rr;}}catch(e){}
+  o.reader=(b.fastRead&&o.readRec)?o.readRec:c;
   return o;}
+/* how strong a model is, for choosing between those here: the lineup's parameter count, else its size on disk */
+function strength(m){if(!m)return 0;try{var k=lineupKeyOfRec(m);if(k&&ING_LINEUP.models[k]&&ING_LINEUP.models[k].params)return ING_LINEUP.models[k].params;}catch(e){}
+  var b=m.sizeBytes||m.fileSize||m.bytes||m.size||0;return b>1e6?b/7e8:(m.params||0);}
 function devName(d){return {"mac-arm":"this Mac","desktop":"this computer","android":"this tablet","ios":"this iPhone or iPad"}[d]||"this device";}
 function partsOf(k,depth,m){var p=R7.prep[k];if(!p||!p.P)return null;try{return lxPartsFor(p.P,depth,m).length;}catch(e){return null;}}
 R7.prep={};
@@ -356,7 +365,10 @@ function addMe(which){var i=document.createElement("input");i.type="file";i.acce
 function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7().brief;box.innerHTML="";
   if(o.link){box.appendChild(h("b",null,esc("Your other computer reads and writes")));box.appendChild(h("div","need",esc("Lector uses "+(state.cloud&&state.cloud.model||"its model")+" on "+(state.cloud&&state.cloud.computer||"the computer you linked")+", the stronger model, and this device only watches.")));}
   else{var c=o.chosen,isRec=c&&o.rec&&c.id===o.rec.id,name=c?c.customName:(o.spec?o.spec.name:"Magister");
-    box.appendChild(h("b",null,esc((isRec?"Ingenium's choice: Magister · ":"Reading and writing: ")+name)));
+    var reader=o.reader||c,twoModels=reader&&c&&reader.id!==c.id;
+    box.appendChild(h("b",null,esc(twoModels?"Reading: "+reader.customName+" · Writing: "+name+(isRec?" (Magister)":""):(isRec?"Ingenium's choice: Magister · ":"Reading and writing: ")+name)));
+    if(o.stronger){var sg=h("div","need");sg.appendChild(document.createTextNode("A stronger model is ready on "+devName(o.dev)+": "+o.stronger.customName+". For a doctoral standard, use it. "));
+      sg.appendChild(btn("quiet","Use "+o.stronger.customName,function(){B.modelId=o.stronger.id;saveSoon();paintModel();}));box.appendChild(sg);}
     var tot=0,known=true;B.apps.forEach(function(k){var r=runFor(k,B.depth);if(r&&r.status==="done")return;var n=partsOf(k,B.depth,c);if(n==null)known=false;else tot+=n;});
     var docs=KINDS.filter(function(d){return B.docs[d[0]];}).length,line=[];
     if(o.need&&o.spare)line.push("Needs about "+o.need.toFixed(1)+" GB of the "+o.spare.toFixed(1)+" GB "+devName(o.dev)+" can spare.");
@@ -375,11 +387,17 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
     var ds=h("div","l-seg");ds.innerHTML='<span class="l-thumb"></span>';[["overview","Overview"],["thorough","Every line of its code"]].forEach(function(x){var b=h("button");b.type="button";b.textContent=x[1];b.setAttribute("data-v",x[0]);b.setAttribute("aria-pressed",B.depth===x[0]?"true":"false");
       b.onclick=function(){if(R7.running)return;B.depth=x[0];saveSoon();paintModel();paintBrief();};ds.appendChild(b);});det.appendChild(ds);
     det.appendChild(h("div","need","Overview: its screens, its words, the notes in its code and how it is built. Every line: all of that and every line of its own code, for the deepest documents; this can take hours on a small model."));
+    /* R113: the examiner's pass, and a quicker reader */
+    var sw1=h("label","l-sw"),c1=document.createElement("input");c1.type="checkbox";c1.id="l7Metic";c1.checked=B.meticulous!==false;c1.onchange=function(){B.meticulous=c1.checked;saveSoon();paintModel();};
+    sw1.appendChild(c1);sw1.appendChild(document.createTextNode("Examine each section against the material (doctoral standard; about twice the writing time)"));det.appendChild(sw1);
+    if(o.readRec){var sw2=h("label","l-sw"),c2=document.createElement("input");c2.type="checkbox";c2.id="l7FastRead";c2.checked=!!B.fastRead;c2.onchange=function(){B.fastRead=c2.checked;saveSoon();paintModel();};
+      sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Faster reading: "+o.readRec.customName+" (Scriba) takes the notes; "+name+" writes"));det.appendChild(sw2);}
+    det.appendChild(h("div","need","Ingenium chooses the strongest model this device holds for the writing, because a doctoral standard needs it; the notes may be taken by a quicker model when time matters more than nuance."));
     box.appendChild(det);segThumbs(box);}}
 function estimate(m,parts,docs){if(!m)return "";var avg=null;if(LX.times&&LX.times.length)avg=LX.times.reduce(function(a,b){return a+b;},0)/LX.times.length;
   if(avg==null){try{var p=paceEstimate(m);if(p&&p.lo>0){var tps=(p.lo+p.hi)/2,ctx=lxCtx(m),inTok=lxBudget(ctx,700,false)/3.2;avg=700/tps+inTok/(tps*8);}}catch(e){}}
   if(avg==null)return "The time appears after the first part.";
-  var secs=parts*avg+docs*10*avg*1.3;return "About "+lxDur(secs)+(LX.times&&LX.times.length?".":", as a rough guide until the first part is read.");}
+  var secs=parts*avg+docs*10*avg*1.3*(meticulous()?1.9:1);return "About "+lxDur(secs)+(LX.times&&LX.times.length?".":", as a rough guide until the first part is read.");}
 
 /* the steps and the main key */
 function phase(){var j=job();if(!j)return "choose";if(j.status==="done")return "done";if(j.status==="writing")return "write";return "read";}
@@ -560,7 +578,8 @@ function r7Go(){if(R7.running||LX.busy){ingToast("Lector is busy. Wait for it, o
   if(!kinds.length){ingToast("Choose at least one document in the brief.");return;}
   var o=modelPlan();if(!o.link&&!o.chosen){ingToast("No model is ready on this device yet. Ingenium's choice for Lector is "+(o.spec?o.spec.name:"Magister")+": get it in the brief, or on the Models page.");return;}
   if((kinds.indexOf("cover")>=0)&&B.purpose!=="portfolio"&&!L7().posts[B.purpose])ingToast("No "+(B.purpose==="job"?"posting":"programme's call")+" was added, so the letter is written for any reader. Add it in the brief to fit the letter to it.");
-  L7().job={key:setKey(apps,B.purpose),apps:apps,purpose:B.purpose,kinds:kinds,depth:B.depth||"overview",modelId:o.chosen?o.chosen.id:null,status:"reading",at:Date.now(),made:{},err:""};
+  if(o.stronger&&B.modelId)ingToast("A stronger model is ready here ("+o.stronger.customName+"). Lector writes with "+o.chosen.customName+", as you chose; change it in the brief for a stronger draft.");
+  L7().job={key:setKey(apps,B.purpose),apps:apps,purpose:B.purpose,kinds:kinds,depth:B.depth||"overview",modelId:o.chosen?o.chosen.id:null,readModelId:(o.reader&&o.chosen&&o.reader.id!==o.chosen.id)?o.reader.id:null,meticulous:B.meticulous!==false,status:"reading",at:Date.now(),made:{},err:""};
   saveState();R7.ev=[];R7.pin=null;paintStream();paintAll();if(one())setPanel("read");r7Run();}
 function beginDoc(){if(R7.running||LX.busy||typeof LX_PICK==="undefined"||!LX_PICK||!LX_PICK.P)return;var o=modelPlan();if(!o.link&&!o.chosen){ingToast("No model is ready on this device yet.");return;}
   var m=o.chosen,P=LX_PICK.P,parts=lxPartsFor(P,"overview",m);
@@ -576,13 +595,13 @@ function ensureRun(k,j){var f=runFor(k,j.depth);
   addEv({k:"step",app:k,label:"Measuring",text:"Measuring "+nm(k)+" before it is read: its size, the words on its screens, the sentences it says, the notes in its code and how it is built. This takes a moment and needs no model."});
   return libText(k).then(function(text){if(!text)throw new Error(nm(k)+" is no longer on this device. Add it again (Your apps).");var meta=kept(k);
     return lxPrepare(meta.name||(nm(k)+".html"),text,function(s){R7.prepNote=nm(k)+": "+s;paintProgress();}).then(function(P){R7.prepNote="";
-      var m=modelById(j.modelId),parts=lxPartsFor(P,j.depth,m);
+      var m=modelById(j.readModelId||j.modelId),parts=lxPartsFor(P,j.depth,m);
       var run={id:"lx_"+Date.now().toString(36),name:nm(k),app:k,sha:meta.sha256||"",version:meta.version||"",file:meta.name||"",kind:"app",depth:j.depth,modelId:m?m.id:null,created:Date.now(),updated:Date.now(),
         status:"reading",done:0,total:parts.length,facts:P.facts,partsRef:IngBig.newId(),notesRef:IngBig.newId(),mergeRef:IngBig.newId(),analysisRef:IngBig.newId(),writings:{}};
       R7.src={};var nl=[],i=-1;while((i=text.indexOf("\n",i+1))>=0)nl.push(i);R7.src[k]={text:text,nl:nl};R7.parts[run.id]=parts;
       return Promise.all([lxPutJSON(run.partsRef,parts),lxPutJSON(run.notesRef,parts.map(function(){return "";}))]).then(function(){var s=lxState();s.runs.unshift(run);s.active=run.id;saveState();return run;});});});}
 function readRun(run){if(run.status==="done")return Promise.resolve();
-  if(job()&&job().modelId&&!run.modelId)run.modelId=job().modelId;
+  if(job()&&(job().readModelId||job().modelId)&&!run.modelId)run.modelId=job().readModelId||job().modelId;
   return new Promise(function(res,rej){lxStart(run.id);var waited=0;
     var t=setInterval(function(){waited++;if(LX.busy&&LX.runId===run.id)return;if(run.status==="done"){clearInterval(t);res();return;}
       if(LX.yielded===run.id&&!LX.stop)return;  /* paused for a message in the chat: it carries on by itself */
@@ -612,7 +631,39 @@ var PLAN={dossier:[["Title and summary","Begin with one title line in bold; then
     ["Technical implementation","Architecture, technologies, devices, offline work and data.",[A_BUILT],320],["Evaluation and evidence","What shows that it works: testing, revisions, use.",[A_MADE,A_LIM],260],
     ["Contribution and significance","What it adds to research, practice or teaching.",[A_RES,A_SK],280],["Limitations and future work","Honest limits and the next steps.",[A_LIM],220]],
   portfolio:[["What it is","",[A_IN,A_DOES],180],["What it shows of my work","",[A_SK,A_RES],180],["How it was made","",[A_MADE,A_BUILT],160],["Where it goes next","",[A_LIM],120]]};
-function sysW(){var me=author()||"the owner";return "You are Lector, writing on the owner's own device for "+me+", who designed and built these apps alone. Write in British English, in the first person as her, in clear, exact prose of the standard expected in an Oxford or Cambridge doctoral application: precise, measured, specific and unhurried, never promotional. Use only what the material given shows: the measured facts, the analysis, her CV and the posting. Never invent a fact, a number, a name, a date, a post, a qualification or a quotation. Where a fact about her is needed and is not in the material, write a short placeholder in square brackets, such as [your current role]. Keep every figure exactly as given. Do not use these words: leverage, seamless, robust, cutting-edge, passionate, delve, tapestry, showcase, innovative, empower, harness, unlock, journey, testament, realm. Do not repeat the heading you are given, and add no headings of your own unless asked.";}
+/* R113 (17 October 2026), her word: "I want the output from Lector to be well written and be up to Oxbridge DPhil standards and be
+   extremely meticulous." The charter below is given to the model for every piece it writes, and each section is then examined
+   against the material a second time (the Examine switch in the brief), before Ingenium's own checks of figures and style. */
+var CHARTER="\n\nTHE STANDARD. Write as a doctoral candidate writes for an Oxford or Cambridge examiner. Each paragraph carries one idea: a topic sentence first, the evidence next (a measured fact or a passage of the analysis, named in the sentence), and a closing sentence that ties it to the aim of the section. Prefer the specific to the general, the concrete figure to the adjective, the plain word to the grand one. Every evaluative claim rests on something in the material; where the material is silent, say nothing rather than guess. Calibrate every hedge: what is measured is stated plainly, what is inferred is marked as inferred (\"the measures suggest\", \"on this reading\"), and nothing is called proven. No superlative without a measure beside it. Name each app exactly as the material names it, and use one term for one thing throughout. Define a technical term the first time it is needed, in a few words, and avoid jargon the examiner would have to look up. British spelling and punctuation; the formal register throughout; no contractions, no rhetorical questions, no exclamation marks, no lists or bullet points in prose sections, no sentence beyond about thirty words unless its structure needs it. Do not open with a generality about the world or close with a cliché; begin with the matter in hand. Do not repeat what another section is for: a dossier's Aims are not its Methods. Quote nothing that is not in the material.";
+var BANNED=["leverage","seamless","robust","cutting-edge","passionate","delve","tapestry","showcase","innovative","empower","harness","unlock","journey","testament","realm","game-changing","world-class","state-of-the-art","revolutionary","unparalleled","best-in-class","groundbreaking","synergy","holistic","paradigm","elevate","transformative","dynamic","vibrant"];
+function sysW(){var me=author()||"the owner";return "You are Lector, writing on the owner's own device for "+me+", who designed and built these apps alone. Write in British English, in the first person as her, in clear, exact prose of the standard expected in an Oxford or Cambridge doctoral application: precise, measured, specific and unhurried, never promotional. Use only what the material given shows: the measured facts, the analysis, her CV and the posting. Never invent a fact, a number, a name, a date, a post, a qualification or a quotation. Where a fact about her is needed and is not in the material, write a short placeholder in square brackets, such as [your current role]. Keep every figure exactly as given. Do not use these words: "+BANNED.join(", ")+". Do not repeat the heading you are given, and add no headings of your own unless asked."+CHARTER;}
+function meticulous(){var B=L7().brief;return B.meticulous!==false;}
+/* the examiner's pass: the draft of a section, read against the material a second time, and revised */
+function review(kind,title,body,G,o){if(!meticulous()||!body||body.length<80)return Promise.resolve(body);
+  var label=docLabel(kind,G.apps,G.purpose).toLowerCase();setLive(kind,o.plan||[title],o.i||0,"Examining the "+label+(o.plan?" · "+title:"")+" against the material");
+  return ask(function(sc){var u="Below is the draft of "+(o.plan?"the section \""+title+"\" of ":"")+"a "+label+" about "+about(G)+forLine(G)+". Examine it as an Oxford or Cambridge doctoral examiner would, against the material that follows, and return the revised text.\n"+
+      "1. Strike, or mark as inferred, every claim the material does not support; keep every claim it does support.\n2. Make every figure exactly what the material gives; take out any figure the material does not give.\n3. One idea to a paragraph, the topic sentence first; take out filler, repetition and promotional words; prefer the concrete to the general.\n4. British English, the formal register, no contractions"+(o.prose!==false?", no bullet points":"")+"; sentences of a reasonable length.\n5. Keep the first person and her voice, and the placeholders in square brackets where they stand.\n6. Keep it close to "+(o.words||300)+" words.\n"+(o.extra||"")+
+      "Return only the revised text: no heading, no notes on what you changed, no commentary.\n\n"+context(G,sc,{keys:o.keys,anShare:0.4,post:true,postShare:0.1,cv:!!o.cv,cvShare:0.1,voice:false,letters:false})+"\n\nTHE DRAFT:\n"+body;
+    return [{role:"system",content:sysW()+" You are now the examiner of a draft, and you return the revised text and nothing else."},{role:"user",content:u}];},Math.max(LX_OUT_SECTION,Math.round(body.length/3.2)+200),0.25)
+  .then(function(x){var r=clean(x,title);if(!r||r.length<body.length*0.4||/^(the draft|here is|revised)/i.test(r.slice(0,24)))return body;
+    var ch=wordsChanged(body,r);addEv({k:"check",label:"Examined · "+(o.plan?title:docLabel(kind,G.apps,G.purpose)),text:ch?Math.round(ch*100)+"% of the words were changed in the examiner's pass; the figures were held to the measures and the claims to the material.":"The examiner's pass left the draft as it was."});return r;},function(){return body;});}
+/* the share of words that differ between the draft and the revision: those taken away and those added, over the draft's count */
+function wordsChanged(a,b){var A={},n=0,added=0,left=0;String(a).toLowerCase().split(/\W+/).forEach(function(w){if(w){A[w]=(A[w]||0)+1;n++;}});
+  String(b).toLowerCase().split(/\W+/).forEach(function(w){if(!w)return;if(A[w]>0)A[w]--;else added++;});Object.keys(A).forEach(function(w){left+=A[w];});
+  return n?Math.min(1,(added+left)/n):0;}
+/* Ingenium's own pass over the finished text: British spellings set right, and what remains for her to look at */
+var SPELL=[["color","colour"],["colors","colours"],["colored","coloured"],["organize","organise"],["organized","organised"],["organizes","organises"],["organizing","organising"],["organization","organisation"],["organizations","organisations"],["recognize","recognise"],["recognized","recognised"],["recognizes","recognises"],["realize","realise"],["realized","realised"],["realizes","realises"],["analyze","analyse"],["analyzed","analysed"],["analyzes","analyses"],["analyzing","analysing"],["behavior","behaviour"],["behaviors","behaviours"],["favor","favour"],["favorite","favourite"],["favorites","favourites"],["honor","honour"],["labor","labour"],["center","centre"],["centers","centres"],["centered","centred"],["defense","defence"],["catalog","catalogue"],["modeling","modelling"],["modeled","modelled"],["traveled","travelled"],["traveling","travelling"],["canceled","cancelled"],["labeled","labelled"],["labeling","labelling"],["fulfill","fulfil"],["enrollment","enrolment"],["gray","grey"],["theater","theatre"],["meter","metre"],["meters","metres"],["liter","litre"],["liters","litres"],["optimize","optimise"],["optimized","optimised"],["optimizing","optimising"],["optimization","optimisation"],["customize","customise"],["customized","customised"],["summarize","summarise"],["summarized","summarised"],["emphasize","emphasise"],["emphasized","emphasised"],["prioritize","prioritise"],["prioritized","prioritised"],["minimize","minimise"],["minimized","minimised"],["maximize","maximise"],["maximized","maximised"],["utilize","utilise"],["utilized","utilised"],["practicing","practising"],["licensed","licenced"],["program","programme"],["programs","programmes"]];
+var CONTR=/\b(?:don't|doesn't|didn't|can't|cannot't|won't|wouldn't|couldn't|shouldn't|isn't|aren't|wasn't|weren't|haven't|hasn't|hadn't|it's|that's|there's|I'm|I've|I'd|I'll|we're|we've|they're|you're|let's)\b/gi;
+function styleFix(md){var fixed={},parts=md.split(/(```[\s\S]*?```|`[^`\n]*`|https?:\/\/\S+|\[[^\]]*\]\([^)]*\))/);
+  for(var i=0;i<parts.length;i+=2){var t=parts[i];
+    SPELL.forEach(function(p){var re=new RegExp("\\b"+p[0]+"\\b","gi");t=t.replace(re,function(w){var out=p[1];if(w===w.toUpperCase()&&w.length>1)out=out.toUpperCase();else if(w.charAt(0)===w.charAt(0).toUpperCase())out=out.charAt(0).toUpperCase()+out.slice(1);fixed[p[0]+" → "+p[1]]=(fixed[p[0]+" → "+p[1]]||0)+1;return out;});});
+    parts[i]=t;}
+  var out=parts.join(""),body=out.split("\n---\n")[0],prose=body.split("\n").filter(function(l){return l.trim()&&!/^\s*(#|\||[-*]\s|\d+[.)]\s)/.test(l);}).join(" ");
+  var contr=(prose.match(CONTR)||[]).length,promo=0;BANNED.forEach(function(w){var m=prose.match(new RegExp("\\b"+w.replace(/-/g,"[- ]")+"\\b","gi"));if(m)promo+=m.length;});
+  var longS=prose.split(/(?<=[.!?])\s+(?=[A-Z\[])/).filter(function(s){return s.split(/\s+/).length>45;}).length;
+  var fx=Object.keys(fixed);return {md:out,fixed:fx,contractions:contr,promo:promo,long:longS,
+    line:(fx.length?fx.length+" spelling"+(fx.length===1?"":"s")+" set to British ("+fx.slice(0,4).join(", ")+(fx.length>4?"…":"")+").":"")+
+      ((contr||promo||longS)?" Left for you to look at: "+[contr?contr+" contraction"+(contr===1?"":"s"):"",promo?promo+" promotional word"+(promo===1?"":"s"):"",longS?longS+" sentence"+(longS===1?"":"s")+" of more than 45 words":""].filter(Boolean).join(", ")+".":(fx.length?"":" Style: no contractions, no promotional words, no over-long sentences."))};}
 function cut(t,n){t=String(t||"");if(n<=0)return "";if(t.length<=n)return t;var c=t.slice(0,n),p=Math.max(c.lastIndexOf(". "),c.lastIndexOf("\n"));return (p>n*0.6?c.slice(0,p+1):c)+" […]";}
 function factsShort(r){var f=r.facts||{};return "- "+r.name+(r.version?" (version "+r.version+")":"")+": "+fmtBytes(f.chars||0)+" in one file; "+fmtBytes(f.jsChars||0)+" of its own scripts; "+(f.functions||0)+" named functions; "+(f.headings||0)+" headings on its screens; "+(f.sayings||0)+" sentences in English"+(f.sayingsFr?" and "+f.sayingsFr+" in French":"")+"; "+(f.comments||0)+" notes left in its code"+(f.passes?"; "+f.passes+" numbered passes ("+f.passFirst+" to "+f.passLast+")":"")+".";}
 function gather(j){var runs=j.apps.map(function(k){return runFor(k,j.depth);}).filter(Boolean),M=L7().me,P=j.purpose!=="portfolio"?L7().posts[j.purpose]:null;
@@ -663,8 +714,9 @@ function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+se
   function put(md){R7.docMd[kind]=head+pieces.concat(md?[md]:[]).join("\n\n");}
   if(kind==="dossier"||kind==="portfolio"){var plan=PLAN[kind],k=0,titles=plan.map(function(s){return G.runs.length>1&&s[0]==="What it does"?"What the apps do":s[0];});
     return (function next(){if(LX.stop)return Promise.reject(stopErr());if(k>=plan.length)return Promise.resolve();var s=plan[k++],t=titles[k-1];setLive(kind,titles,k-1,"Writing the "+label.toLowerCase()+" · "+t+" ("+k+" of "+plan.length+")");
-      return ask(function(sc){return sectionMsgs(G,kind,s,sc);},LX_OUT_SECTION,0.45).then(function(x){var body=clean(x,t);pieces.push("## "+t+"\n"+body);put();
-        addEv({k:"done",label:label+" · "+t,text:body.length>420?body.slice(0,420)+"…":body});return next();});})()
+      return ask(function(sc){return sectionMsgs(G,kind,s,sc);},LX_OUT_SECTION,0.45).then(function(x){var draft=clean(x,t);
+        addEv({k:"done",label:label+" · "+t,text:draft.length>420?draft.slice(0,420)+"…":draft});
+        return review(kind,t,draft,G,{plan:titles,i:k-1,keys:s[2],words:s[3],cv:/Title|Contribution|Context/.test(s[0])});}).then(function(body){pieces.push("## "+t+"\n"+body);put();return next();});})()
       .then(function(){if(kind==="dossier")pieces.push(references(G));return finish();});}
   if(kind==="appendix"){setLive(kind,["Introduction","A. Measures","B. Technologies","C. Features","D. Design for focus and well-being","E. Development history","F. Web addresses"],0,"Writing the "+label.toLowerCase()+" · its introduction");
     return ask(function(sc){return [{role:"system",content:sysW()},{role:"user",content:"Write a short introduction, about 90 words, to the technical appendix of "+about(G)+forLine(G)+". Say what the tables that follow show: measures taken from the files themselves, the technologies found in the code, and passages from the analysis. No headings.\n\n"+context(G,sc,{})}];},300,0.3)
@@ -673,13 +725,13 @@ function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+se
     var to=G.post?(G.purpose==="programme"?"an application to this programme: ":"the post of ")+[G.post.title,G.post.org].filter(Boolean).join(", "):"any reader of my portfolio, introducing my work (use placeholders such as [the post] and [the organisation] where a letter names them)";
     return ask(function(sc){return [{role:"system",content:sysW()},{role:"user",content:"Write a cover letter, for "+to+". Four or five paragraphs. Begin with \"Dear [the reader's name],\" unless the posting names the reader. The opening says what I am applying for and why in one or two sentences. The middle paragraphs set my work on "+about(G)+" against what the "+(G.purpose==="programme"?"programme":"post")+" asks for, with concrete details from the material. The closing is brief and courteous. End with \"Yours sincerely,\" and my name on its own line. Names, posts and dates come only from my CV; leave anything else in square brackets. No headings, no address block.\n\n"+
       context(G,sc,{keys:[A_IN,A_SK,A_DOES,A_RES],anShare:0.36,post:true,postShare:0.2,cv:true,cvShare:0.16,voice:true,letters:true})}];},1200,0.5)
-      .then(function(x){pieces.push(clean(x));put();return finish();});}
+      .then(function(x){return review(kind,"The letter",clean(x),G,{keys:[A_IN,A_SK,A_DOES,A_RES],words:380,cv:true,extra:"7. Keep the letter's shape: the greeting, four or five paragraphs, the close. It must fit what the "+(G.purpose==="programme"?"programme":"post")+" asks for where the material allows, and claim nothing the material does not show.\n"});}).then(function(body){pieces.push(body);put();return finish();});}
   if(kind==="cv"){setLive(kind,["Projects"],0,"Writing the "+label.toLowerCase());
     return ask(function(sc){return [{role:"system",content:sysW()},{role:"user",content:"Write the Projects section of my CV for "+about(G)+forLine(G)+". For each app: a title line in bold (its name, what it is in a few words, and [the years] unless my CV gives them), then 3 to 5 bullet points, each starting with a strong verb, naming concrete features or results and using the exact figures given. After the apps, one line beginning \"Skills:\" with the skills they show together. Match the style of my CV where it is given. No other headings.\n\n"+
       context(G,sc,{keys:[A_IN,A_DOES,A_SK,A_BUILT],anShare:0.5,post:true,postShare:0.08,cv:true,cvShare:0.14})}];},1100,0.4)
-      .then(function(x){pieces.push("## Projects\n"+clean(x,"Projects"));put();return finish();});}
+      .then(function(x){return review(kind,"Projects",clean(x,"Projects"),G,{keys:[A_IN,A_DOES,A_SK,A_BUILT],words:260,cv:true,prose:false,extra:"7. Keep the CV's shape: a bold title line for each app, then its bullet points, each beginning with a strong verb and giving an exact figure where the material gives one.\n"});}).then(function(body){pieces.push("## Projects\n"+body);put();return finish();});}
   return Promise.reject(new Error("Lector does not know how to write that document."));
-  function finish(){var md=head+pieces.join("\n\n")+"\n\n---\n*Drafted by "+lxModelName({modelId:job()&&job().modelId})+" in Ingenium's Lector on "+lxDate()+", from full readings of "+listNames(G.apps)+". The measures are exact; check every other statement before you use it.*";R7.docMd[kind]=md;return md;}}
+  function finish(){var md=head+pieces.join("\n\n")+"\n\n---\n*Drafted by "+lxModelName({modelId:job()&&job().modelId})+" in Ingenium's Lector on "+lxDate()+", from full readings of "+listNames(G.apps)+(meticulous()&&kind!=="appendix"?", and examined section by section against the material":"")+". The measures are exact; check every other statement before you use it.*";R7.docMd[kind]=md;return md;}}
 function references(G){var a=author(),parts=a.trim().split(/\s+/),sur=parts.pop()||a,ini=parts.map(function(p){return p.charAt(0).toUpperCase()+".";}).join(" ");
   return "## References\n"+G.runs.map(function(r){var meta=kept(appOf(r))||{};var y=(meta.date&&String(meta.date).slice(0,4))||String(new Date().getFullYear());
     return (a?sur+", "+ini+" ":"")+"("+y+") *"+r.name+"*"+(r.version||meta.version?", version "+(r.version||meta.version):"")+" [software]. Offline application, kept on the owner's devices.";}).join("\n\n");}
@@ -707,8 +759,9 @@ function check(md,G){var src=[];G.runs.forEach(function(r,i){src.push(lxFactsTex
   var fills=(body.match(/\[(?:your|to fill|the reader|the post|the years|the date|the organisation)[^\]]*\]/gi)||[]).length;
   return {figures:figures,unmatched:unmatched.slice(0,24),fills:fills};}
 function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{apps:j.apps.slice(),purpose:j.purpose,docs:{},older:{}};S.docs=S.docs||{};S.older=S.older||{};
+  var sf=styleFix(md);md=sf.md;R7.docMd[kind]=md;
   var chk=check(md,G),ref=IngBig.newId();
-  addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(chk.figures?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures were not found in the measures, the analysis, your CV or the posting, and are marked for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+".":"Every figure ("+chk.figures+") was found in the measures, the analysis, your CV or the posting."):"No figures to check.")+
+  addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures were not found in the measures, the analysis, your CV or the posting, and are marked for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+".":"Every figure ("+chk.figures+") was found in the measures, the analysis, your CV or the posting."):"No figures to check.")+
     (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(G.runs.length===4?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
   return IngBig.put(ref,md).then(function(){var old=S.docs[kind];if(old){S.older[kind]=[old].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}}
     S.docs[kind]={ref:ref,made:Date.now(),model:lxModelName({modelId:j.modelId}),title:setName(j.apps)+" · "+docLabel(kind,j.apps,j.purpose),chk:chk};saveState();});}
