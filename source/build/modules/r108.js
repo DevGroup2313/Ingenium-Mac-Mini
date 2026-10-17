@@ -154,7 +154,7 @@ function appOf(run){return run&&(run.app||appOfText((run.name||"")+" "+(run.file
 function L7(){var s=lxState();
   if(!s.brief||typeof s.brief!=="object")s.brief={apps:[],purpose:"portfolio",docs:{dossier:true,appendix:true,portfolio:false,cover:false,cv:false},depth:"overview",fmt:"docx",modelId:null};
   if(!Array.isArray(s.brief.apps))s.brief.apps=[];if(!s.brief.docs)s.brief.docs={dossier:true};
-  if(!s.me||typeof s.me!=="object")s.me={cv:null,writing:[],letters:[],voice:true};
+  if(!s.me||typeof s.me!=="object")s.me={cv:null,writing:[],letters:[],voice:true,cite:true};
   if(!Array.isArray(s.me.writing))s.me.writing=[];if(!Array.isArray(s.me.letters))s.me.letters=[];
   if(!s.posts||typeof s.posts!=="object")s.posts={job:null,programme:null};
   if(!s.sets||typeof s.sets!=="object")s.sets={};
@@ -354,7 +354,12 @@ function meCard(){var s=sec("Your facts and your voice"),M=L7().me,f=h("div","l-
     [btn("quiet","Add",function(){addMe("writing");})].concat(M.writing.length?[btn("quiet","Remove all",function(){M.writing.forEach(function(x){IngBig.del(x.ref);});M.writing=[];saveSoon();paintBrief();})]:[])));
   f.appendChild(row("✉","Your past cover letters",M.letters.length?M.letters.length+" letter"+(M.letters.length>1?"s":"")+", for their shape and tone":"Letters you have written before, as templates",
     [btn("quiet","Add",function(){addMe("letters");})].concat(M.letters.length?[btn("quiet","Remove all",function(){M.letters.forEach(function(x){IngBig.del(x.ref);});M.letters=[];saveSoon();paintBrief();})]:[])));
+  /* R115: her sources, kept in Fontes, cited in the documents */
+  var nSrc=0;try{nSrc=(typeof fontesItems==="function"?fontesItems():[]).length;}catch(e){}
+  f.appendChild(row("❝","Your sources (Fontes)",nSrc?nSrc+" source"+(nSrc===1?"":"s")+" kept"+(M.cite!==false?", cited by number in the dossier and the portfolio piece, with a References list in your chosen style":", not cited"):"Add sources in Fontes (My sources) and the documents can cite them",
+    [btn("quiet","Open Fontes",function(){try{openFontes();}catch(e){ingToast("Fontes is not in this build.");}})]));
   var sw=h("label","l-sw");var c=document.createElement("input");c.type="checkbox";c.checked=M.voice!==false;c.onchange=function(){M.voice=c.checked;saveSoon();};sw.appendChild(c);sw.appendChild(document.createTextNode("Write in my own voice"));f.appendChild(sw);
+  var sw2=h("label","l-sw");var c2=document.createElement("input");c2.type="checkbox";c2.id="l7Cite";c2.checked=M.cite!==false;c2.onchange=function(){M.cite=c2.checked;saveSoon();paintBrief();};sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Cite my sources in the documents"));f.appendChild(sw2);
   s.appendChild(f);s.appendChild(h("p","l-hint","Kept on this device. Lector never invents a fact about you: anything it cannot find in your CV is left in square brackets for you to fill."));return s;}
 function addMe(which){var i=document.createElement("input");i.type="file";i.accept=".docx,.pdf,.txt,.md";i.multiple=which!=="cv";
   i.onchange=function(){var fs=[].slice.call(i.files||[]);if(!fs.length)return;var M=L7().me;
@@ -634,7 +639,7 @@ var PLAN={dossier:[["Title and summary","Begin with one title line in bold; then
 /* R113 (17 October 2026), her word: "I want the output from Lector to be well written and be up to Oxbridge DPhil standards and be
    extremely meticulous." The charter below is given to the model for every piece it writes, and each section is then examined
    against the material a second time (the Examine switch in the brief), before Ingenium's own checks of figures and style. */
-var CHARTER="\n\nTHE STANDARD. Write as a doctoral candidate writes for an Oxford or Cambridge examiner. Each paragraph carries one idea: a topic sentence first, the evidence next (a measured fact or a passage of the analysis, named in the sentence), and a closing sentence that ties it to the aim of the section. Prefer the specific to the general, the concrete figure to the adjective, the plain word to the grand one. Every evaluative claim rests on something in the material; where the material is silent, say nothing rather than guess. Calibrate every hedge: what is measured is stated plainly, what is inferred is marked as inferred (\"the measures suggest\", \"on this reading\"), and nothing is called proven. No superlative without a measure beside it. Name each app exactly as the material names it, and use one term for one thing throughout. Define a technical term the first time it is needed, in a few words, and avoid jargon the examiner would have to look up. British spelling and punctuation; the formal register throughout; no contractions, no rhetorical questions, no exclamation marks, no lists or bullet points in prose sections, no sentence beyond about thirty words unless its structure needs it. Do not open with a generality about the world or close with a cliché; begin with the matter in hand. Do not repeat what another section is for: a dossier's Aims are not its Methods. Quote nothing that is not in the material.";
+var CHARTER="\n\nTHE STANDARD. Write as a doctoral candidate writes for an Oxford or Cambridge examiner. Each paragraph carries one idea: a topic sentence first, the evidence next (a measured fact or a passage of the analysis, named in the sentence), and a closing sentence that ties it to the aim of the section. Prefer the specific to the general, the concrete figure to the adjective, the plain word to the grand one. Every evaluative claim rests on something in the material; where the material is silent, say nothing rather than guess. Calibrate every hedge: what is measured is stated plainly, what is inferred is marked as inferred (\"the measures suggest\", \"on this reading\"), and nothing is called proven. No superlative without a measure beside it. Name each app exactly as the material names it, and use one term for one thing throughout. Define a technical term the first time it is needed, in a few words, and avoid jargon the examiner would have to look up. British spelling and punctuation; the formal register throughout; no contractions, no rhetorical questions, no exclamation marks, no lists or bullet points in prose sections, no sentence beyond about thirty words unless its structure needs it. Do not open with a generality about the world or close with a cliché; begin with the matter in hand. Do not repeat what another section is for: a dossier's Aims are not its Methods. Quote nothing that is not in the material. Where a list of her sources is given, cite a source by its number in square brackets only where it supports the sentence, and cite nothing that is not on that list.";
 var BANNED=["leverage","seamless","robust","cutting-edge","passionate","delve","tapestry","showcase","innovative","empower","harness","unlock","journey","testament","realm","game-changing","world-class","state-of-the-art","revolutionary","unparalleled","best-in-class","groundbreaking","synergy","holistic","paradigm","elevate","transformative","dynamic","vibrant"];
 function sysW(){var me=author()||"the owner";return "You are Lector, writing on the owner's own device for "+me+", who designed and built these apps alone. Write in British English, in the first person as her, in clear, exact prose of the standard expected in an Oxford or Cambridge doctoral application: precise, measured, specific and unhurried, never promotional. Use only what the material given shows: the measured facts, the analysis, her CV and the posting. Never invent a fact, a number, a name, a date, a post, a qualification or a quotation. Where a fact about her is needed and is not in the material, write a short placeholder in square brackets, such as [your current role]. Keep every figure exactly as given. Do not use these words: "+BANNED.join(", ")+". Do not repeat the heading you are given, and add no headings of your own unless asked."+CHARTER;}
 function meticulous(){var B=L7().brief;return B.meticulous!==false;}
@@ -643,7 +648,8 @@ function review(kind,title,body,G,o){if(!meticulous()||!body||body.length<80)ret
   var label=docLabel(kind,G.apps,G.purpose).toLowerCase();setLive(kind,o.plan||[title],o.i||0,"Examining the "+label+(o.plan?" · "+title:"")+" against the material");
   return ask(function(sc){var u="Below is the draft of "+(o.plan?"the section \""+title+"\" of ":"")+"a "+label+" about "+about(G)+forLine(G)+". Examine it as an Oxford or Cambridge doctoral examiner would, against the material that follows, and return the revised text.\n"+
       "1. Strike, or mark as inferred, every claim the material does not support; keep every claim it does support.\n2. Make every figure exactly what the material gives; take out any figure the material does not give.\n3. One idea to a paragraph, the topic sentence first; take out filler, repetition and promotional words; prefer the concrete to the general.\n4. British English, the formal register, no contractions"+(o.prose!==false?", no bullet points":"")+"; sentences of a reasonable length.\n5. Keep the first person and her voice, and the placeholders in square brackets where they stand.\n6. Keep it close to "+(o.words||300)+" words.\n"+(o.extra||"")+
-      "Return only the revised text: no heading, no notes on what you changed, no commentary.\n\n"+context(G,sc,{keys:o.keys,anShare:0.4,post:true,postShare:0.1,cv:!!o.cv,cvShare:0.1,voice:false,letters:false})+"\n\nTHE DRAFT:\n"+body;
+      (G.sources&&G.sources.length?"7. Keep each citation in square brackets where it stands when the source supports the sentence; take it out where it does not; add none that is not on the list of her sources.\n":"")+
+      "Return only the revised text: no heading, no notes on what you changed, no commentary.\n\n"+context(G,sc,{keys:o.keys,anShare:0.4,post:true,postShare:0.1,cv:!!o.cv,cvShare:0.1,voice:false,letters:false,sources:!!(G.sources&&G.sources.length)})+"\n\nTHE DRAFT:\n"+body;
     return [{role:"system",content:sysW()+" You are now the examiner of a draft, and you return the revised text and nothing else."},{role:"user",content:u}];},Math.max(LX_OUT_SECTION,Math.round(body.length/3.2)+200),0.25)
   .then(function(x){var r=clean(x,title);if(!r||r.length<body.length*0.4||/^(the draft|here is|revised)/i.test(r.slice(0,24)))return body;
     var ch=wordsChanged(body,r);addEv({k:"check",label:"Examined · "+(o.plan?title:docLabel(kind,G.apps,G.purpose)),text:ch?Math.round(ch*100)+"% of the words were changed in the examiner's pass; the figures were held to the measures and the claims to the material.":"The examiner's pass left the draft as it was."});return r;},function(){return body;});}
@@ -669,7 +675,13 @@ function factsShort(r){var f=r.facts||{};return "- "+r.name+(r.version?" (versio
 function gather(j){var runs=j.apps.map(function(k){return runFor(k,j.depth);}).filter(Boolean),M=L7().me,P=j.purpose!=="portfolio"?L7().posts[j.purpose]:null;
   return Promise.all([Promise.all(runs.map(function(r){return lxJSON(r.analysisRef,{});})),M.cv?IngBig.load(M.cv.ref):null,
       Promise.all(M.writing.map(function(x){return IngBig.load(x.ref);})),Promise.all(M.letters.map(function(x){return IngBig.load(x.ref);})),P?IngBig.load(P.ref):null])
-    .then(function(r){return {runs:runs,an:r[0],cv:r[1]||"",writing:(r[2]||[]).filter(Boolean),letters:(r[3]||[]).filter(Boolean),voice:M.voice!==false,post:P?Object.assign({},P,{text:r[4]||""}):null,apps:j.apps,purpose:j.purpose};});}
+    .then(function(r){var G={runs:runs,an:r[0],cv:r[1]||"",writing:(r[2]||[]).filter(Boolean),letters:(r[3]||[]).filter(Boolean),voice:M.voice!==false,post:P?Object.assign({},P,{text:r[4]||""}):null,apps:j.apps,purpose:j.purpose,sources:[]};
+      /* R115: her sources from Fontes, formatted in her chosen style, numbered for the model to cite */
+      if(M.cite===false||typeof fontesItems!=="function")return G;var items=[];try{items=fontesItems().slice(0,40);}catch(e){}if(!items.length)return G;
+      var style=(state.fontes&&state.fontes.style)||"apa";
+      return fontesFormat(items,style).then(function(rows){var by={};rows.forEach(function(x){by[String(x.id)]=x.text;});
+        G.sources=items.map(function(c,i){return {n:i+1,text:by[String(c.id)]||(typeof fontesPlain==="function"?fontesPlain(c):String(c.title||"")),title:c.title||"",abstract:String(c.abstract||"").replace(/<[^>]+>/g,"").slice(0,600),peer:/article-journal|review/.test(c.type||""),note:c.ingNote||""};});
+        G.style=style;return G;},function(){return G;});});}
 function clean(t,title){t=String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim();var L=t.split("\n");
   while(L.length&&(/^#{1,6}\s/.test(L[0])||(title&&L[0].replace(/[*#:]/g,"").trim().toLowerCase()===String(title).toLowerCase())))L.shift();
   return L.join("\n").trim();}
@@ -690,6 +702,9 @@ function context(G,scale,o){var R=room()*scale,parts=[];var many=G.runs.length>1
   if(o.cv&&G.cv)parts.push("HER CV (the only source of facts about her: names, dates, posts, qualifications):\n"+cut(G.cv,Math.floor(R*(o.cvShare||0.12))));
   if(o.voice&&G.voice&&G.writing.length)parts.push("HER OWN WRITING (match its voice, rhythm and vocabulary; do not copy its content):\n"+cut(G.writing.join("\n\n---\n\n"),Math.floor(R*0.08)));
   if(o.letters&&G.letters.length)parts.push("HER PAST COVER LETTERS (for their shape and tone only; their facts may be out of date):\n"+cut(G.letters.join("\n\n---\n\n"),Math.floor(R*0.1)));
+  /* R115: her sources, to cite by number where they bear on a claim; never a source that is not here */
+  if(o.sources&&G.sources&&G.sources.length)parts.push("HER SOURCES (kept in Fontes; cite one by its number in square brackets, like [2], only where it supports the sentence; use no source that is not on this list and invent none; a source marked peer-reviewed may carry more weight):\n"+
+    cut(G.sources.map(function(s){return "["+s.n+"] "+s.text+(s.peer?" [peer-reviewed journal]":"")+(s.note?"\n    Her note: "+s.note:"")+(s.abstract?"\n    Abstract: "+s.abstract:"");}).join("\n"),Math.floor(R*(o.srcShare||0.14))));
   return parts.join("\n\n");}
 function about(G){var n=G.runs.length;return n===4?"the four apps of The Offline Project ("+listNames(G.apps)+"), as one body of work":n>1?listNames(G.apps)+", together, as one body of work":G.runs[0].name;}
 function forLine(G){if(!G.post)return G.purpose==="programme"?" for a doctoral or academic application":G.purpose==="job"?" for a job application":" for my professional portfolio";
@@ -698,7 +713,7 @@ function sectionMsgs(G,kind,s,scale){var many=G.runs.length>1,t=s[0];if(many&&t=
   var u="Write the section \""+t+"\" of a "+docLabel(kind,G.apps,G.purpose).toLowerCase()+" about "+about(G)+forLine(G)+". "+(s[1]||"")+
     (many&&s[0]==="What it does"?" Give each app its own paragraph, beginning with its name in bold.":"")+(many&&s[0]!=="What it does"?" Write about the apps together, naming each where it matters.":"")+
     " Use only what the material shows; where it says nothing on a point, leave the point out rather than guess. About "+s[3]+" words, in paragraphs.\n\n"+
-    context(G,scale,{keys:s[2],anShare:0.52,post:true,postShare:0.1,cv:/Title|Contribution|Context/.test(s[0]),cvShare:0.08,voice:true});
+    context(G,scale,{keys:s[2],anShare:0.52,post:true,postShare:0.1,cv:/Title|Contribution|Context/.test(s[0]),cvShare:0.08,voice:true,sources:/Context|Research|Contribution|Accessibility|Design and methods|Limitations|What it shows/.test(s[0])});
   return [{role:"system",content:sysW()},{role:"user",content:u}];}
 function setLive(kind,plan,i,label){R7.live={kind:kind,plan:plan,i:i,of:plan?plan.length:1,writingSection:true};R7.step=label;paintProgress();paintLive();if(R7.doc===kind)paintDoc();else paintTabs();}
 function writeAll(j){var kinds=j.kinds.filter(function(k){return !j.made[k];}),i=0;
@@ -717,7 +732,7 @@ function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+se
       return ask(function(sc){return sectionMsgs(G,kind,s,sc);},LX_OUT_SECTION,0.45).then(function(x){var draft=clean(x,t);
         addEv({k:"done",label:label+" · "+t,text:draft.length>420?draft.slice(0,420)+"…":draft});
         return review(kind,t,draft,G,{plan:titles,i:k-1,keys:s[2],words:s[3],cv:/Title|Contribution|Context/.test(s[0])});}).then(function(body){pieces.push("## "+t+"\n"+body);put();return next();});})()
-      .then(function(){if(kind==="dossier")pieces.push(references(G));return finish();});}
+      .then(function(){var cited=citedIn(pieces.join("\n"),G);if(cited.length)pieces.push("## References\n"+cited.map(function(s){return "["+s.n+"] "+s.text;}).join("\n\n"));if(kind==="dossier")pieces.push(references(G).replace(/^## References\n/,cited.length?"## The works\n":"## References\n"));return finish();});}
   if(kind==="appendix"){setLive(kind,["Introduction","A. Measures","B. Technologies","C. Features","D. Design for focus and well-being","E. Development history","F. Web addresses"],0,"Writing the "+label.toLowerCase()+" · its introduction");
     return ask(function(sc){return [{role:"system",content:sysW()},{role:"user",content:"Write a short introduction, about 90 words, to the technical appendix of "+about(G)+forLine(G)+". Say what the tables that follow show: measures taken from the files themselves, the technologies found in the code, and passages from the analysis. No headings.\n\n"+context(G,sc,{})}];},300,0.3)
       .then(function(intro){pieces.push(clean(intro));tables(G).forEach(function(t){pieces.push(t);});put();return finish();});}
@@ -732,6 +747,9 @@ function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+se
       .then(function(x){return review(kind,"Projects",clean(x,"Projects"),G,{keys:[A_IN,A_DOES,A_SK,A_BUILT],words:260,cv:true,prose:false,extra:"7. Keep the CV's shape: a bold title line for each app, then its bullet points, each beginning with a strong verb and giving an exact figure where the material gives one.\n"});}).then(function(body){pieces.push("## Projects\n"+body);put();return finish();});}
   return Promise.reject(new Error("Lector does not know how to write that document."));
   function finish(){var md=head+pieces.join("\n\n")+"\n\n---\n*Drafted by "+lxModelName({modelId:job()&&job().modelId})+" in Ingenium's Lector on "+lxDate()+", from full readings of "+listNames(G.apps)+(meticulous()&&kind!=="appendix"?", and examined section by section against the material":"")+". The measures are exact; check every other statement before you use it.*";R7.docMd[kind]=md;return md;}}
+/* R115: the sources the text cites, in the order of their numbers; a number that matches no source is left to the check */
+function citedIn(text,G){var S=G.sources||[],used={};String(text).replace(/\[(\d+(?:\s*[,–-]\s*\d+)*)\]/g,function(all,inner){inner.split(/[,–-]/).forEach(function(n){n=+String(n).trim();if(n>=1&&n<=S.length)used[n]=1;});return all;});
+  return S.filter(function(s){return used[s.n];});}
 function references(G){var a=author(),parts=a.trim().split(/\s+/),sur=parts.pop()||a,ini=parts.map(function(p){return p.charAt(0).toUpperCase()+".";}).join(" ");
   return "## References\n"+G.runs.map(function(r){var meta=kept(appOf(r))||{};var y=(meta.date&&String(meta.date).slice(0,4))||String(new Date().getFullYear());
     return (a?sur+", "+ini+" ":"")+"("+y+") *"+r.name+"*"+(r.version||meta.version?", version "+(r.version||meta.version):"")+" [software]. Offline application, kept on the owner's devices.";}).join("\n\n");}
@@ -753,6 +771,8 @@ function tables(G){var out=[],runs=G.runs,many=runs.length>1,F=runs.map(function
 /* every figure in the document, looked for in what it was written from */
 function check(md,G){var src=[];G.runs.forEach(function(r,i){src.push(lxFactsText(r),factsShort(r),JSON.stringify(r.facts||{}),JSON.stringify(G.an[i]||{}),String(r.version||""));});src.push(G.cv||"",G.post&&G.post.text||"");
   var hay=src.join("\n").replace(/(\d),(\d{3})/g,"$1$2");var body=md.split("\n---\n")[0];var seen={},figures=0,unmatched=[];
+  /* R115: a citation's number is not a figure, and the References list is not checked for figures */
+  body=body.split(/\n## References\n/)[0].replace(/\[(\d+(?:\s*[,–-]\s*\d+)*)\]/g,"");
   var re=/(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g,m;
   body.split("\n").forEach(function(line){if(/^\|/.test(line.trim()))return;var l=line.replace(/^#+\s*\d+[.)]\s*/,"").replace(/^\s*\d+[.)]\s+/,"");
     while((m=re.exec(l))){var f=m[0],n=f.replace(/,/g,"");if(+n<=12&&!/\./.test(n))continue;if(seen[f])continue;seen[f]=1;figures++;if(hay.indexOf(n)<0)unmatched.push(f);}});

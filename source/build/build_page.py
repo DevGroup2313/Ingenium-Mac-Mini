@@ -147,6 +147,21 @@ edit("""      +lxhPara(lxhInline(c,{sz:11,b:i===0||k===0,color:i===0?th.accent:"
 edit("""  if(note)body.push(lxhPara(lxhInline(note,{i:1,sz:10.5,color:"454549"}),{before:12,after:6,line:1.3}));""",
      """  if(note)body.push(lxhPara(lxhInline(note,{i:1,sz:10.5,color:th.ink2||"454549"}),{before:12,after:6,line:1.3}));""", "R2i note")
 
+# ---- R115 (17 October 2026): every search vetted, with or without the scholarly indexes; Peer-reviewed only ----
+edit('    if(!sch&&!(w.web&&w.research))return orig.apply(this,arguments);\n',
+     '    /* R115: every search is vetted the same way, with or without the scholarly indexes */\n', "R115 vet every search")
+edit('"🎓 Searching scholarly sources and the web…"',
+     '(sch?"🎓 Searching scholarly sources and the web…":"🌐 Searching the web; each source is checked…")', "R115 status")
+edit('      wb.sort(schRank);var all=sc.concat(wb.slice(0,deep?4:3));',
+     '      wb.sort(schRank);var all=(typeof schPeerOnly==="function"&&schPeerOnly())?sc.filter(schIsPeer):sc.concat(wb.slice(0,deep?4:3));\n'
+     '      if(!all.length&&typeof schPeerOnly==="function"&&schPeerOnly())throw new Error("no peer-reviewed source was found for this; switch Peer-reviewed only off in Settings to allow preprints, books and web pages");',
+     "R115 peer-reviewed only")
+edit('Retracted work is left out, preprints are named as such, and each source shows what was checked.</div></div></div>',
+     'Retracted work is left out, preprints are named as such, and each source shows what was checked.</div></div></div>\n'
+     '        <div class="sch-set"><label class="eswitch"><input type="checkbox" id="srchPeer"><span class="etrack"></span></label>\n'
+     '          <div><b>Peer-reviewed only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no encyclopaedias, no web pages. A journal listed in DOAJ is marked as peer review confirmed; others as journal articles whose review is not independently confirmed.</div></div></div>',
+     "R115 peer-reviewed switch")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:
