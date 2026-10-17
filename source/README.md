@@ -28,10 +28,12 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     node rig/t_academic.js http://127.0.0.1:8150/ingenium.html <out>          # every search vetted, Peer-reviewed only, Fontes as a database, Lector citing, 24 checks
     node rig/t_models_care.js http://127.0.0.1:8150/ingenium.html <out>       # quality tiers on the houses, the pace measured, health by model, the catalogue, 24 checks
     node rig/t_studio_care.js http://127.0.0.1:8150/ingenium.html <out>       # Blend's judge and ready-made blends, the tour's chapters, the export, the shelf, 22 checks
-    node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus in their frames: handovers, theme, saving, opening one another, 17 checks
+    node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus in their frames, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
 
-`build/apps/` holds the whole Tabula and Abacus (her own single-page apps, the files Carpe Diem carries, taken from
-carpe_diem.html on 17 October 2026) and `dark.json`, Carpe Diem's night dress for each; `build_page.py` rides them into the
-page as base64 text and `modules/r118.js` opens them in a frame on their pages.
+`build/apps/` holds the whole Tabula and Abacus (her own single-page apps, the files Carpe Diem carries), `dark.json`
+(Carpe Diem's night dress for each) and `cd_prep.js` (Carpe Diem's own preparation of the two before it shows them: the
+fold bar and real pages for Tabula, the sheet bar for Abacus). All four come out of carpe_diem.html with
+`python3 -I apps/extract_from_carpe_diem.py path/to/carpe_diem.html`; `build_page.py` rides them into the page and
+`modules/r118.js` opens them in a frame on their pages.
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

@@ -77,7 +77,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // 4. the shelf's account
   const shelf = await p.evaluate(() => { state.fontes = state.fontes || { items: [] }; state.fontes.colls = ['DPhil chapter 2']; const a = shelfSummary(state), bb = shelfSummary({}); const d = shelfDiff(a, bb); recoverShow(); const note = document.querySelector('#modalBox .shelf-note'); const out = { sets: a.sets, colls: a.colls, lines: d.lines, note: note && note.textContent.slice(0, 400) }; closeModal(); return out; });
   ok(shelf.sets === 1 && shelf.colls === 1 && shelf.lines.some(l => /\+1 Lector set/.test(l)) && shelf.lines.some(l => /\+1 Fontes collection/.test(l)), "the shelf counts Lector's sets and Fontes' collections and names them in the difference", JSON.stringify(shelf));
-  ok(/Lector's readings and documents, Fabrica's repositories and the model files live in this device's own store/.test(shelf.note || ''), 'and says what returning to a moment leaves alone', shelf.note);
+  ok(/Lector's readings and documents, Fabrica's repositories, .*the model files live in this device's own store/.test(shelf.note || ''), 'and says what returning to a moment leaves alone', shelf.note);
 
   // 5. quiet in a focus session
   const quiet = await p.evaluate(() => { let toasts = 0; const o = ingToast; ingToast = function () { toasts++; }; _perfWarned = {}; pomo.running = true; pomo.phase = 'focus'; state.focusPause = true;

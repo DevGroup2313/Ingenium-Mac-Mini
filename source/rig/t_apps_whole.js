@@ -48,6 +48,17 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.screenshot({ path: OUT + '/apps-abacus-night.png' });
   await p.evaluate(() => { state.theme = 'light'; applyTheme(); });
 
+  // 4b. prepared as Carpe Diem prepares it: the old bottom bar hidden, a second sheet added with +, the frame reaching the window's foot
+  const cdp = await p.evaluate(async () => { const f = document.getElementById('ingApp-abacus'), w = f.contentWindow, d = w.document; const tb = d.querySelector('.tabs-bottom');
+    const sheets = () => [...d.querySelectorAll('.ab-sheet')].filter(e => /^Sheet \d+$/.test(e.textContent.trim())).length; const before = sheets(); const add = [...d.querySelectorAll('button')].find(b => b.title === 'Add a sheet'); if (add) add.click(); await new Promise(r => setTimeout(r, 600));
+    const after = sheets(); const r = f.getBoundingClientRect(); return { oldBarHidden: !tb || w.getComputedStyle(tb).display === 'none', addTitle: !!add, before, after, bottomGap: Math.round(innerHeight - r.bottom) }; });
+  ok(cdp.oldBarHidden && cdp.addTitle && cdp.after === cdp.before + 1, "Abacus is prepared as Carpe Diem prepares it: its old bottom bar hidden, and Add a sheet adds a sheet", JSON.stringify(cdp));
+  ok(cdp.bottomGap >= 0 && cdp.bottomGap <= 40, 'the frame reaches the foot of the window, so the status line is in view', String(cdp.bottomGap));
+  await p.evaluate(() => go('tabula')); await p.waitForTimeout(1500);
+  const tfold = await p.evaluate(() => { const d = document.getElementById('ingApp-tabula').contentWindow.document; return { fold: !!d.getElementById('cd-802-foldbar'), pages: !!d.getElementById('cd-realpages'), fab: (() => { const e = d.querySelector('.sticky-fab'); return !e || getComputedStyle(e).display === 'none'; })() }; });
+  ok(tfold.fold && tfold.pages && tfold.fab, "Tabula is prepared as Carpe Diem prepares it: its fold bar, its real pages, no second notes key", JSON.stringify(tfold));
+  await p.evaluate(() => go('abacus')); await p.waitForTimeout(600);
+
   // 5. the host's duties: a file the app makes is saved by Ingenium; the app's keys open one another
   const saved = await p.evaluate(async () => { window.__saved = null; saveFileNative = function (name, mime, data) { window.__saved = { name, mime, text: new TextDecoder().decode(data) }; };
     const f = document.getElementById('ingApp-abacus'); f.contentWindow.__ingSaveFile('test.csv', 'text/csv', 'a,b\n1,2'); await new Promise(r => setTimeout(r, 400)); return window.__saved; });

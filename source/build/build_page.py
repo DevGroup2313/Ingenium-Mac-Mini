@@ -203,6 +203,8 @@ if "/*R109_WIDTHS*/null" in blob:
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R108_FONTS*/null" in blob:
     blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
+if "/*R118_CDPREP*/" in blob:
+    blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:
     blob = blob.replace("/*R118_DARK*/null", open(os.path.join(HERE, "apps", "dark.json")).read().strip())
 if "/*R116_QUANTS*/null" in blob:

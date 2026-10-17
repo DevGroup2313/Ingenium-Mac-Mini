@@ -21,12 +21,15 @@ body[data-theme="night"] .ing-app-frame{background:#141210}
 "use strict";
 function $(id){return document.getElementById(id);}
 var DARK=/*R118_DARK*/null;
+/* Carpe Diem's own preparation of the two apps (from __cdPrepSrc, taken by apps/extract_from_carpe_diem.py) */
+/*R118_CDPREP*/
+var cdPrep=(typeof ingCdPrep==="function")?ingCdPrep:function(w,h){return h;};
 var NAMES={tabula:"Tabula",abacus:"Abacus"},frames={},pendingCsv=null,pendingLite=null;
 function decode(id){var n=$(id);if(!n)return null;try{var b=atob(n.textContent.trim()),u8=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u8[i]=b.charCodeAt(i);return new TextDecoder().decode(u8);}catch(e){return null;}}
 function night(){return document.body.getAttribute("data-theme")==="night";}
 /* the app's page, prepared for this host: no Close key (the page is its window), English, Carpe Diem's own night
    dress for it, a theme bridge, and for Abacus the same hand-to-host saving Tabula already has */
-function prep(which){var html=decode("ing-app-"+which);if(!html)return null;var dark=(DARK&&DARK[which])||"";
+function prep(which){var html=decode("ing-app-"+which);if(!html)return null;var dark=(DARK&&DARK[which])||"";try{html=cdPrep(which,html);}catch(e){}
   var head='<script>window.__CD_NOCLOSE=1;window.__APP_LANG__="en";window.__ING_HOST=1;<\/script>';
   var bridge='<style id="ing-dark">'+dark+'</style><script>(function(){var W='+JSON.stringify(which)+';function ap(d){document.documentElement.classList.toggle("cd-dark",!!d);}'
     +'function post(){try{parent.postMessage({kind:"cd-theme-state",which:W,dark:document.documentElement.classList.contains("cd-dark")},"*");}catch(e){}}'
@@ -62,7 +65,12 @@ function mount(which,host){host.innerHTML="";var card=host.closest(".card");if(c
   if(which==="tabula")handTabula();if(which==="abacus")pendingLite=pendingCsv==null?abacusLiteCsv():null;
   var ifr=document.createElement("iframe");ifr.className="ing-app-frame";ifr.id="ingApp-"+which;ifr.setAttribute("title",NAMES[which]);ifr.setAttribute("loading","eager");
   ifr.addEventListener("load",function(){themeTo(ifr);if(which==="abacus")setTimeout(function(){handAbacus(ifr);},60);});
-  ifr.srcdoc=html;host.appendChild(ifr);frames[which]=ifr;}
+  ifr.srcdoc=html;host.appendChild(ifr);frames[which]=ifr;setTimeout(function(){fit(ifr);},0);}
+/* the frame reaches from where it starts to the foot of the window, so the apps' own status lines are in view */
+function fit(ifr){try{if(!ifr||!ifr.isConnected||!ifr.offsetParent)return;var top=ifr.getBoundingClientRect().top+(window.scrollY||window.pageYOffset||0);
+  var min=window.innerWidth<=760?440:520;ifr.style.height=Math.max(min,Math.round(window.innerHeight-top-12))+"px";}catch(e){}}
+window.addEventListener("resize",function(){for(var k in frames)fit(frames[k]);});
+(function onGo(){if(typeof go!=="function")return;var o=go;go=function(page){var r=o.apply(this,arguments);try{if(frames[page])setTimeout(function(){fit(frames[page]);},30);}catch(e){}return r;};window.go=go;})();
 buildTabula=function(host){mount("tabula",host);};buildAbacus=function(host){mount("abacus",host);};
 window.buildTabula=buildTabula;window.buildAbacus=buildAbacus;
 /* a table sent to Abacus from elsewhere (the sheets in a reply) goes into the whole app */
