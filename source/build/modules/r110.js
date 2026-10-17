@@ -707,6 +707,18 @@ function remirror(){var a=mshell(),m=mstate();if(!a||!m)return Promise.resolve(f
   return backend().eachRec(function(k){MIR.fresh.add(k);}).then(function(){return backend().allRepos();}).then(function(rs){rs.forEach(function(r){MIR.dirty.add(r.id);});
     m.segs=[];return mirrorNow();}).then(function(){old.forEach(function(b){try{a.big_del(b);}catch(e){}});return true;},function(e){m.segs=old.concat(m.segs);throw e;});}
 
+/* R114: a ref moved by a copy brought from outside (GitHub's); when it is the branch in use, the working copy follows,
+   and changes not yet committed come along when they do not clash */
+function setRef(id,name,oid,opt){opt=opt||{};return locked(id,function(){return load(id).then(function(r){var k=/^refs\//.test(name)?name:"refs/heads/"+name;
+  if(!okRefName(k.replace(/^refs\/(heads|tags)\//,"")))throw new Error("“"+name+"” cannot be a ref's name");if(!/^[0-9a-f]{40}$/.test(oid))throw new Error("not a version's id");
+  var old=r.refs[k]||null,onIt=!!(r.head&&r.head.ref===k);
+  function done(){r.refs[k]=oid;r.log=(r.log||[]).concat([{at:Date.now(),from:old,to:oid,why:opt.why||("ref "+k+" set")}]).slice(-200);return save(r).then(summary);}
+  if(!onIt||old===oid)return done();
+  return Promise.all([treeFiles(old),treeFiles(oid)]).then(function(x){var cur=x[0],next=x[1],mine=changesBetween(cur,r.work),work={},p,clash=[];for(p in next)work[p]=next[p];
+    mine.forEach(function(c){var p2=c.path;if((cur[p2]?cur[p2][1]:null)!==(next[p2]?next[p2][1]:null)||(c.from&&(cur[c.from]?cur[c.from][1]:null)!==(next[c.from]?next[c.from][1]:null)))clash.push(p2);});
+    if(clash.length&&!opt.force)throw new Error("your changes to "+clash.slice(0,4).join(", ")+(clash.length>4?" and others":"")+" would be lost: commit them first");
+    if(!opt.force)mine.forEach(function(c){if(c.kind==="removed")delete work[c.path];else{if(c.from)delete work[c.from];work[c.path]=c.now;}});
+    r.work=work;return done();});});});}
 /* notes kept beside a version: its test results, the packages made from it */
 function setNote(id,oid,key,val){return locked(id,function(){return load(id).then(function(r){r.notes=r.notes||{};var n=r.notes[oid]=r.notes[oid]||{};if(val==null)delete n[key];else n[key]=val;
   var ks=Object.keys(r.notes);if(ks.length>400)ks.slice(0,ks.length-400).forEach(function(k){delete r.notes[k];});return save(r).then(function(){return n;});});});}
@@ -717,7 +729,7 @@ return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
   status:status,commit:commit,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,stopMerge:stopMerge,revert:revert,
-  setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},
+  setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,gc:gc,setAuthor:setAuthor,author:function(){return who;},
   core:{sha1:sha1,sha1JS:sha1JS,inflateRaw:inflateRaw,inflateZ:inflateZ,deflateZ:deflateZ,storedZ:storedZ,makeDelta:makeDelta,applyDelta:applyDelta,writePack:writePack,readPack:readPack,
     zip:zip,unzip:unzip,unzipData:unzipData,lineDiff:lineDiff,hunks:hunks,merge3:merge3,unified:unified,splitLines:splitLines,parseTree:parseTree,parseCommit:parseCommit,treeBody:treeBody,

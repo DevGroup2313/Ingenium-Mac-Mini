@@ -17,3 +17,13 @@
   `mockcloud.py`, seal, Code page, coding models, smoke test of every page).
 
 Changing this folder starts no build. The builds start when `ingenium.html` (or a build file) changes.
+
+Stages 2l to 2n (17 October 2026) added three page tests that run against the built page served by any static
+server (`python3 -m http.server 8150` in the folder that holds it), with Playwright's Chromium:
+
+    node rig/t_fabrica.js http://127.0.0.1:8150/ingenium.html <out>           # Fabrica, 33 checks; real git clones its bundle
+    python3 rig/ghmock.py 8170 &                                              # a stand-in GitHub API, hashing objects as git does
+    node rig/t_fabrica_github.js http://127.0.0.1:8150/ingenium.html <out>    # GitHub inside Fabrica, 20 checks
+    node rig/t_lector_doctoral.js http://127.0.0.1:8150/ingenium.html <out>   # Lector's charter, examiner's pass and model guidance, 11 checks
+
+The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

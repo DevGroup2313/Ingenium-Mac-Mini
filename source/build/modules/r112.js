@@ -574,10 +574,12 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
       p.then(function(x){saveBytes(x[0],x[1],x[2]);toast("Saved: "+x[0]+", "+kb(x[2].length)+".");b.disabled=false;},function(e){b.disabled=false;fail(e);});});e.appendChild(b);cp.appendChild(e);});
   var gh=h("div","f-cp"),on=!!FBS().gh;gh.innerHTML='<div class="t">GitHub, only when you choose<small>'+(on?"A copy there, when you want one. Nothing leaves this device until you send it yourself.":"Off. Everything works without it.")+"</small></div>";
   var lab=h("label","f-sw");lab.innerHTML='<input type="checkbox"'+(on?" checked":"")+' aria-label="GitHub">';lab.querySelector("input").onchange=function(){FBS().gh=this.checked;saveSoon();paintShip();};gh.appendChild(lab);cp.appendChild(gh);
-  if(on){var g2=h("div","f-cp");g2.innerHTML='<div class="t">Send its versions<small>GitHub needs a connection and your sign-in, which Ingenium never keeps. Save the bundle and, on any computer with git: git clone '+esc(r.slug)+'.bundle, then git push to your repository.</small></div>';
-    g2.appendChild(btn("sm","Save the bundle",function(){IngRepo.bundle(r.id).then(function(b){saveBytes(r.slug+".bundle","application/octet-stream",b);toast("Saved: "+r.slug+".bundle, "+kb(b.length)+".");},fail);}));cp.appendChild(g2);
-    var g3=h("div","f-cp");g3.innerHTML='<div class="t">Bring theirs<small>GitHub\'s Download ZIP, or a bundle from git bundle create: it comes in here as an app of its own, history and all.</small></div>';
+  if(on){if(window.fbGitHub&&typeof fbGitHub.paint==="function"){try{fbGitHub.paint(r,cp,{btn:btn,h:h,esc:esc,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,saveBytes:saveBytes,refresh:function(){C.diff={};C.files={};C.log={};return refresh().then(paint);},busy:busy,unbusy:unbusy});}catch(e){fail(e);}}
+    else{var g2=h("div","f-cp");g2.innerHTML='<div class="t">Send its versions<small>GitHub needs a connection and your sign-in. Save the bundle and, on any computer with git: git clone '+esc(r.slug)+'.bundle, then git push to your repository.</small></div>';
+      g2.appendChild(btn("sm","Save the bundle",function(){IngRepo.bundle(r.id).then(function(b){saveBytes(r.slug+".bundle","application/octet-stream",b);toast("Saved: "+r.slug+".bundle, "+kb(b.length)+".");},fail);}));cp.appendChild(g2);}
+    var g3=h("div","f-cp");g3.innerHTML='<div class="t">Bring a copy in by file<small>GitHub\'s Download ZIP, or a bundle from git bundle create: it comes in here as an app of its own, history and all.</small></div>';
     g3.appendChild(btn("sm","Choose the file",function(){pickFile(".zip,.bundle",function(file){importFile(file);});}));cp.appendChild(g3);}}
+window.fbPaintShip=paintShip;
 function testNow(){var r=cur();if(!r||!r.head)return;S.testing={id:r.id,checks:[]};paintShip();
   IngShip.test(r.id,{onStep:function(c){if(S.testing&&S.testing.id===r.id){S.testing.checks.push(c);paintShip();}}}).then(function(out){S.testing=null;return refresh().then(function(){paint();var bad=(out.checks||[]).filter(function(c){return c.state!=="ok"&&c.state!=="none"&&c.state!=="skip";});
     toast(out.ok?"Every check passed. Next: ship it.":bad.length+" check"+(bad.length===1?"":"s")+" found something to look at.");});},function(e){S.testing=null;paintShip();fail(e);});}
@@ -676,6 +678,8 @@ try{new MutationObserver(function(){if($("fb")&&$("page-fabrica").classList.cont
 try{var nm=(state&&state.profile&&state.profile.name)||(state&&state.userName)||"";if(nm)IngRepo.setAuthor({name:nm});}catch(e){}
 try{if($("page-fabrica").classList.contains("active")){document.body.classList.add("fb-on");render();}}catch(e){}
 window.fbRender=render;window.fbSync=syncFromCode;
+/* R114: Code opened on an app, with something to say once it is open */
+window.fbOpenInCode=function(r,path,after){openInCode(r,path);if(after)setTimeout(after,900);};
 })();
 ;try{window.__ingParts["p44"]="running";}catch(_){}
 </script>
