@@ -38,6 +38,116 @@ function author(){try{return lxhAuthor()||"";}catch(e){return "";}}
 function month(){try{return lxhMonth();}catch(e){return "";}}
 function today(){try{return new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});}catch(e){return "";}}
 function appOfText(t){try{var a=IngHouseDocs.apps(t);return a.length===1?a[0]:null;}catch(e){return null;}}
+
+/* ---------------- the paper of each app (her word, 17 October): "give Inkwell's documents the Inkwell colour palette and
+   design and the same for the Forge and Carpe Diem", and "the documents on the Lector page to have a dark mode look and
+   not be white on dark mode". A document about one app is set in that app's own hand and colours, as its door shows
+   them: Carpe Diem white with its ocean blue and gilt, The Forge cool white with its steel blue and the ember of its
+   forge, Inkwell on warm laid paper in ink navy and brass, set in Cormorant as Inkwell is, Ingenium in amethyst. A
+   document about two, three or all four is set as The Offline Project: vellum, ink and the master seal's gilt, each
+   app's own sections in its own colour. Her CV and her letters stay plain. By night each paper is the app's own night:
+   Carpe Diem's slate and sky blue, The Forge's charcoal and ember, Inkwell's midnight ink and brass, with the seals as
+   each app shows them by night. Printed, a page is always the day paper. ---------------- */
+var LX7_FONTS=/*R108_FONTS*/null;
+var SANS='-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif',TIMES='"Times New Roman",Times,serif',GEORGIA='Georgia,"Iowan Old Style","Times New Roman",serif',
+  CORM='"Lector Cormorant","Cormorant Garamond",Cormorant,Garamond,Georgia,serif',CINZEL='"Lector Cinzel",Cinzel,"Trajan Pro",Optima,Georgia,serif',IOWAN='"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif';
+var PT={
+  neutral:{body:TIMES,disp:TIMES,caps:TIMES,h2:TIMES,fs:15,h1:24,h1w:700,h1ls:"0",capsw:600,capsls:".18em",capsfs:11.5,h2w:700,h2ls:"0",h2fs:16,
+    day:{desk:"#efeaf4",bg:"#ffffff",tex:"none",ink:"#1e1828",ink2:"#454549",acc:"#2b2b33",title:"#1e1828",sub:"#454549",gold:"#8a7650",caps:"#8a7650",tint:"#f2f2f4",hair:"rgba(30,24,40,.14)",line:"rgba(30,24,40,.14)",rule:"#4a405a",code:"#f4f2f6",fill:"#8a6526",chk:"#b0302f",frame:"transparent",qbg:"transparent",qink:"#454549"},
+    night:{desk:"#121016",bg:"#1e1c23",tex:"none",ink:"#ece9f1",ink2:"#b9b3c4",acc:"#e8e3ef",title:"#f4f1f8",sub:"#c9c2d4",gold:"#c9b07a",caps:"#c9b07a",tint:"rgba(255,255,255,.05)",hair:"rgba(255,255,255,.12)",line:"rgba(255,255,255,.12)",rule:"rgba(255,255,255,.42)",code:"rgba(255,255,255,.05)",fill:"#d9b77a",chk:"#e88a8a",frame:"transparent",qbg:"transparent",qink:"#b9b3c4"}},
+  ingenium:{upper:1,orn:1,keys:1,body:TIMES,disp:IOWAN,caps:SANS,h2:TIMES,fs:15,h1:26,h1w:600,h1ls:".03em",capsw:700,capsls:".2em",capsfs:10.5,h2w:700,h2ls:"0",h2fs:16,
+    day:{desk:"#efeaf4",bg:"#ffffff",tex:"none",ink:"#1e1828",ink2:"#4a4358",acc:"#6a3fb5",title:"#4e2c8a",sub:"#4b3a6e",gold:"#b88a3a",caps:"#6a3fb5",tint:"#f1ecfa",hair:"rgba(34,26,46,.12)",line:"rgba(106,63,181,.22)",rule:"#4a405a",code:"#f6f3fa",fill:"#8a6526",chk:"#b0302f",frame:"transparent",qbg:"#f6f2fc",qink:"#3d2f5c"},
+    night:{desk:"#120e19",bg:"#221b2e",tex:"none",ink:"#ece6f6",ink2:"#c3b8d6",acc:"#c4a8f0",title:"#dccbff",sub:"#b7a5d6",gold:"#d8b46a",caps:"#c4a8f0",tint:"rgba(183,156,230,.10)",hair:"rgba(205,184,240,.13)",line:"rgba(196,168,240,.28)",rule:"rgba(205,184,240,.45)",code:"rgba(255,255,255,.05)",fill:"#e0be78",chk:"#f08f8f",frame:"transparent",qbg:"rgba(183,156,230,.08)",qink:"#d9cdee"}},
+  cd:{roman:1,h3caps:1,body:GEORGIA,disp:GEORGIA,caps:SANS,h2:GEORGIA,fs:14.5,h1:27,h1w:700,h1ls:".02em",capsw:700,capsls:".22em",capsfs:10.5,h2w:700,h2ls:".01em",h2fs:16,
+    day:{desk:"#f5f5f7",bg:"#ffffff",tex:"none",ink:"#1d1d1f",ink2:"#454549",acc:"#1b6b93",title:"#121218",sub:"#145671",gold:"#b88a3a",caps:"#1b6b93",tint:"#eaf2f7",hair:"rgba(27,107,147,.14)",line:"rgba(184,138,58,.55)",rule:"#1b6b93",code:"#f2f6f8",fill:"#8a6526",chk:"#b0302f",frame:"rgba(27,107,147,.40)",qbg:"#e9eff2",qink:"#173f53"},
+    night:{desk:"#121013",bg:"#20262e",tex:"none",ink:"#e8e8ea",ink2:"#a9b0b8",acc:"#5baedb",title:"#f0ede6",sub:"#8fc4e6",gold:"#d9b45a",caps:"#5baedb",tint:"rgba(91,174,219,.10)",hair:"rgba(255,255,255,.10)",line:"rgba(217,180,90,.45)",rule:"rgba(91,174,219,.6)",code:"rgba(255,255,255,.05)",fill:"#e0be78",chk:"#e07a7a",frame:"rgba(91,174,219,.38)",qbg:"#1a2630",qink:"#dbe8f1"}},
+  forge:{roman:1,body:GEORGIA,disp:GEORGIA,caps:SANS,h2:GEORGIA,fs:14.5,h1:27,h1w:700,h1ls:".02em",capsw:700,capsls:".22em",capsfs:10.5,h2w:700,h2ls:".01em",h2fs:16,
+    day:{desk:"#e9ecef",bg:"#fbfcfd",tex:"none",ink:"#121619",ink2:"#39424c",acc:"#17577a",title:"#121619",sub:"#a55a22",gold:"#b88a3a",caps:"#1b6b93",tint:"#eef1f4",hair:"rgba(10,30,46,.13)",line:"rgba(165,90,34,.45)",rule:"#39424c",code:"#eef1f4",fill:"#8a6526",chk:"#b0302f",frame:"rgba(10,30,46,.24)",qbg:"#eef1f4",qink:"#2a333d"},
+    night:{desk:"#0a0c0f",bg:"#1d232b",tex:"none",ink:"#e2e6ea",ink2:"#a3adb7",acc:"#5baedb",title:"#f0ede6",sub:"#cf8a52",gold:"#d9b45a",caps:"#5baedb",tint:"rgba(207,138,82,.10)",hair:"rgba(255,255,255,.09)",line:"rgba(207,138,82,.5)",rule:"rgba(255,255,255,.38)",code:"rgba(255,255,255,.05)",fill:"#e0be78",chk:"#e07a7a",frame:"rgba(255,255,255,.13)",qbg:"rgba(207,138,82,.08)",qink:"#ead7c6"}},
+  inkwell:{body:CORM,disp:CORM,caps:CORM,h2:CORM,fs:17.5,h1:36,h1w:600,h1ls:".01em",capsw:600,capsls:".32em",capsfs:12,h2w:700,h2ls:".01em",h2fs:20,
+    day:{desk:"#efe9db",bg:"#fffdf6",tex:"repeating-linear-gradient(0deg,rgba(110,90,50,.035) 0 1px,transparent 1px 5px),radial-gradient(120% 80% at 50% 0%,#fffef9 0%,#fffdf6 55%,#f8f1df 100%)",ink:"#231d15",ink2:"#5f5646",acc:"#1f4f68",title:"#1f4f68",sub:"#8a6526",gold:"#a97e2c",caps:"#8a6526",tint:"#f3ecda",hair:"#e3d9c2",line:"rgba(169,126,44,.6)",rule:"#a97e2c",code:"#f5efe0",fill:"#8a6526",chk:"#b0302f",frame:"rgba(169,126,44,.38)",qbg:"#f6efdf",qink:"#3a3020"},
+    night:{desk:"#070b10",bg:"#101821",tex:"repeating-linear-gradient(0deg,rgba(255,240,200,.02) 0 1px,transparent 1px 5px),radial-gradient(120% 80% at 50% 0%,#152230 0%,#101821 60%,#0c131b 100%)",ink:"#ebe3cf",ink2:"#b3a88c",acc:"#d4bc86",title:"#ebe3cf",sub:"#c9a964",gold:"#c9a964",caps:"#c9a964",tint:"#16202b",hair:"#1f2c39",line:"rgba(201,169,100,.55)",rule:"rgba(201,169,100,.7)",code:"#0c131b",fill:"#d4bc86",chk:"#e88a8a",frame:"rgba(201,169,100,.32)",qbg:"#0c131b",qink:"#dcd2bb"}},
+  family:{body:GEORGIA,disp:CINZEL,caps:CINZEL,h2:CINZEL,fs:14.5,h1:25,h1w:600,h1ls:".08em",capsw:600,capsls:".26em",capsfs:11,h2w:600,h2ls:".05em",h2fs:15,
+    day:{desk:"#f6f1e6",bg:"#fffdf8",tex:"radial-gradient(120% 80% at 50% 0%,#fffefb 0%,#fffdf8 55%,#f9f3e4 100%)",ink:"#1f2a36",ink2:"#4a4a52",acc:"#23364a",title:"#1f2a36",sub:"#7a5f2e",gold:"#a8843c",caps:"#8a6a2c",tint:"#f4eedf",hair:"rgba(60,45,20,.15)",line:"rgba(168,132,60,.6)",rule:"#a8843c",code:"#f6f1e6",fill:"#8a6526",chk:"#b0302f",frame:"rgba(168,132,60,.42)",qbg:"#f6f0e2",qink:"#2c3a48"},
+    night:{desk:"#0d1218",bg:"#141c25",tex:"radial-gradient(120% 80% at 50% 0%,#18222d 0%,#141c25 60%,#10171f 100%)",ink:"#f1ead8",ink2:"#cfc6b2",acc:"#e2c98f",title:"#f1ead8",sub:"#d8b46a",gold:"#d8b46a",caps:"#d8b46a",tint:"rgba(216,180,106,.10)",hair:"rgba(220,190,120,.15)",line:"rgba(216,180,106,.55)",rule:"rgba(216,180,106,.65)",code:"rgba(255,255,255,.04)",fill:"#e0c27c",chk:"#e88a8a",frame:"rgba(216,180,106,.36)",qbg:"rgba(216,180,106,.07)",qink:"#e8dfc9"}}};
+/* in a document about several apps, each app's own sections in its own colour, by day and by night */
+var OWN={day:{cd:"#1b6b93",forge:"#17577a",ingenium:"#6a3fb5",inkwell:"#1f4f68"},night:{cd:"#5baedb",forge:"#cf8a52",ingenium:"#c4a8f0",inkwell:"#d4bc86"}};
+function roman(n){var v=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]],r="";v.forEach(function(p){while(n>=p[0]){r+=p[1];n-=p[0];}});return r;}
+var LATIN=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVGVSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
+/* the date as Carpe Diem and The Forge write it on their doors: XVII·OCTOBRIS·MMXXVI */
+function romanDate(d){d=d||new Date();return roman(d.getDate())+"\u00b7"+LATIN[d.getMonth()]+"\u00b7"+roman(d.getFullYear());}
+function themeOf(kind,apps){if(kind==="cover"||kind==="cv")return "neutral";apps=apps||[];if(apps.length>1)return "family";return PT[apps[0]]?apps[0]:"neutral";}
+/* the paper's rules, for the page (night follows Ingenium's own switch) or for a saved web page (night follows the reader's device; printed, always day) */
+function paperCss(forPage){var S=forPage?"#lx7 ":"",out=[];
+  function vars(v){return "--p-frame:"+v.frame+";--p-qbg:"+v.qbg+";--p-qink:"+v.qink+";--p-desk:"+v.desk+";--p-bg:"+v.bg+";--p-tex:"+v.tex+";--p-ink:"+v.ink+";--p-ink2:"+v.ink2+";--p-acc:"+v.acc+";--p-title:"+v.title+";--p-sub:"+v.sub+";--p-gold:"+v.gold+";--p-caps:"+v.caps+";--p-tint:"+v.tint+";--p-hair:"+v.hair+";--p-line:"+v.line+";--p-rule:"+v.rule+";--p-code:"+v.code+";--p-fill:"+v.fill+";--p-chk:"+v.chk;}
+  function own(m){return Object.keys(OWN[m]).map(function(k){return "--c-"+k+":"+OWN[m][k];}).join(";");}
+  var DAYSH="0 1px 0 rgba(40,22,68,.06),0 3px 8px rgba(40,22,68,.08),0 18px 40px rgba(40,22,68,.12)",NIGHTSH="0 0 0 1px rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.38),0 20px 44px rgba(0,0,0,.5)";
+  Object.keys(PT).forEach(function(k){var t=PT[k];
+    out.push(S+".th-"+k+"{--p-body:"+t.body+";--p-disp:"+t.disp+";--p-capsf:"+t.caps+";--p-h2f:"+t.h2+";--p-fs:"+t.fs+"px;--p-h1:"+t.h1+"px;--p-h1w:"+t.h1w+";--p-h1ls:"+t.h1ls+";--p-capsw:"+t.capsw+";--p-capsls:"+t.capsls+";--p-capsfs:"+t.capsfs+"px;--p-h2w:"+t.h2w+";--p-h2ls:"+t.h2ls+";--p-h2fs:"+t.h2fs+"px;"+vars(t.day)+";"+own("day")+";--p-sh:"+DAYSH+"}");
+    var nightRule=".th-"+k+"{"+vars(t.night)+";"+own("night")+";--p-sh:"+NIGHTSH+"}";
+    if(forPage)out.push('body[data-theme="night"] #lx7 '+nightRule);else out.push("@media screen and (prefers-color-scheme:dark){"+nightRule+"}");});
+  var P=S+".l-paper";
+  out.push(P+"{max-width:640px;margin:0 auto;background-color:var(--p-bg);background-image:var(--p-tex);color:var(--p-ink);border-radius:3px;box-shadow:var(--p-sh);padding:46px 52px 52px;font:var(--p-fs)/1.62 var(--p-body);text-align:left}",
+    P+" + .l-paper{margin-top:16px}",
+    P+" .cv{display:flex;flex-direction:column;align-items:center;gap:9px;padding:10px 0 18px;border-bottom:1px solid var(--p-line);margin-bottom:24px;text-align:center}",
+    P+" .cv .seals{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:2px}",
+    P+" .cv .seals img,"+P+" .cv .seals .sn{width:84px;height:84px;object-fit:contain}",
+    P+" .cv .seals img.master,"+P+" .cv .seals .sn.master{width:118px;height:auto}",
+    P+" .cv .seals .sn{position:relative;display:inline-block}",
+    P+" .cv .seals .sn img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}",
+    P+" .cv h1{font:var(--p-h1w) var(--p-h1)/1.18 var(--p-disp);letter-spacing:var(--p-h1ls);margin:6px 0 0;color:var(--p-title)}",
+    P+" .cv .caps{display:flex;align-items:center;gap:12px;font:var(--p-capsw) var(--p-capsfs)/1.3 var(--p-capsf);letter-spacing:var(--p-capsls);text-transform:uppercase;color:var(--p-caps);max-width:100%}",
+    P+" .cv .caps i{display:block;width:44px;height:1px;background:var(--p-line);flex:0 1 44px}",
+    P+" .cv .sub{font:italic var(--p-fs)/1.45 var(--p-body);color:var(--p-acc)}",
+    P+" .cv .for,"+P+" .cv .by{font:calc(var(--p-fs) - 1.5px)/1.4 var(--p-body);color:var(--p-ink2)}",
+    P+" h2{font:var(--p-h2w) var(--p-h2fs)/1.3 var(--p-h2f);letter-spacing:var(--p-h2ls);margin:24px 0 9px;color:var(--p-acc)}",
+    P+" h2.own-cd{color:var(--c-cd)}"+P+" h2.own-forge{color:var(--c-forge)}"+P+" h2.own-ingenium{color:var(--c-ingenium)}"+P+" h2.own-inkwell{color:var(--c-inkwell)}",
+    P+" h3{font:italic 700 calc(var(--p-fs) + .5px)/1.3 var(--p-body);margin:16px 0 6px;color:var(--p-sub)}",
+    P+" p{margin:0 0 10px}",P+" ul,"+P+" ol{margin:0 0 10px;padding-left:22px}",P+" li{margin:0 0 4px}",P+" li::marker{color:var(--p-acc)}",
+    P+" hr{border:0;border-top:1px solid var(--p-line);margin:18px 0}",
+    P+" blockquote{margin:0 0 10px 18px;padding-left:12px;border-left:2px solid var(--p-line);font-style:italic;color:var(--p-ink2)}",
+    P+" pre{background:var(--p-code);color:var(--p-ink);padding:8px 10px;border-radius:4px;border:1px solid var(--p-hair);font:12px/1.5 ui-monospace,\"SF Mono\",Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}",
+    P+" table{width:100%;border-collapse:collapse;font:calc(var(--p-fs) - 2px)/1.45 var(--p-body);margin:8px 0 14px;display:block;overflow-x:auto}",
+    P+" th,"+P+" td{border-bottom:1px solid var(--p-hair);padding:5px 6px;text-align:left;vertical-align:top}",
+    P+" th{font-weight:700;color:var(--p-acc);border-top:1.5px solid var(--p-rule);border-bottom:1.5px solid var(--p-rule);background:var(--p-tint)}",
+    P+" .note{font-style:italic;font-size:calc(var(--p-fs) - 2px);color:var(--p-ink2);border-top:1px solid var(--p-line);padding-top:10px;margin-top:18px}",
+    P+" .wait{color:var(--p-ink2);opacity:.8;font-style:italic;font-size:calc(var(--p-fs) - 1.5px)}",
+    P+" .fill{color:var(--p-fill);font-style:italic;border-bottom:1.5px dotted var(--p-gold)}",
+    P+" .chk{border-bottom:1.5px dotted var(--p-chk);cursor:help}",
+    P+" .lhead{text-align:right;font:calc(var(--p-fs) - 2px)/1.5 var(--p-body);color:var(--p-ink2);margin-bottom:22px}",
+    P+" .lhead b{display:block;font:700 calc(var(--p-fs) + 1px)/1.3 var(--p-disp);color:var(--p-title)}",
+    P+" a{color:var(--p-acc)}",P+" [data-live] .l-caret{background:var(--p-acc)}",
+    /* a fine frame inset in the page, as each door has one (Carpe Diem's blue, The Forge's steel, Inkwell's brass, the set's gilt) */
+    P+"{position:relative}",P+"::before{content:\"\";position:absolute;inset:12px;border:1px solid var(--p-frame);border-radius:2px;pointer-events:none}",
+    P+" blockquote{background:var(--p-qbg);color:var(--p-qink);padding:8px 12px;border-radius:0 6px 6px 0}",
+    P+" .cv .tag{font:italic calc(var(--p-fs) + 1.5px)/1.4 var(--p-disp);color:var(--p-acc);margin-top:-2px}",
+    P+" h2 .no{font-variant-numeric:lining-nums}",
+    /* Carpe Diem: its small headings in its own spaced blue capitals */
+    S+".th-cd h3{font:700 11.5px/1.4 "+SANS+";letter-spacing:.14em;text-transform:uppercase;color:var(--p-acc);margin:18px 0 7px}",
+    /* Ingenium: the title in spaced capitals, as its wordmark; a four-pointed star set in the rule under the cover; each section's number on a small lilac key */
+    S+".th-ingenium .cv h1{text-transform:uppercase;letter-spacing:.16em;font-size:calc(var(--p-h1) - 3px)}",
+    S+".th-ingenium .cv{border-bottom:0;position:relative;padding-bottom:26px}",
+    S+".th-ingenium .cv::before{content:\"\";position:absolute;bottom:0;left:12%;right:12%;height:1px;background:var(--p-line)}",
+    S+".th-ingenium .cv::after{content:\"\\2726\";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);padding:0 10px;font:15px/20px "+SANS+";color:var(--p-acc);background-color:var(--p-bg)}",
+    S+".th-ingenium h2{display:flex;align-items:baseline;gap:9px}",
+    S+".th-ingenium h2 .no{flex:0 0 auto;display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:6px;background:var(--p-tint);border:1px solid var(--p-line);font:700 12px/1 "+SANS+";color:var(--p-acc);transform:translateY(-2px)}",
+    S+".th-ingenium h2 .dot{display:none}");
+  if(forPage)out.push("#lx7 .l-desk[class*=\"th-\"]{background:var(--p-desk)}");
+  else out.push("body{margin:0;background:var(--p-desk)}",".l-paper{max-width:720px;margin:28px auto;padding:56px 64px 64px}",
+    "@media (max-width:760px){.l-paper{margin:0;padding:28px 20px;border-radius:0}}",
+    "@media print{body{background:#fff}.l-paper{box-shadow:none;margin:0;max-width:none;padding:0;background-image:none}}","@page{size:A4;margin:25mm 25mm 22mm}");
+  return out.join("\n");}
+/* the faces the papers are set in (Inkwell's Cormorant, Cinzel for The Offline Project), both under the SIL Open Font Licence */
+function fontCss(which){var F=LX7_FONTS||{},out=[];function face(fam,key,w,st){if(F[key])out.push('@font-face{font-family:"'+fam+'";font-style:'+st+';font-weight:'+w+';font-display:swap;src:url('+F[key]+') format("woff2")}');}
+  if(!which||which==="inkwell"){face("Lector Cormorant","cormorant-500-normal",500,"normal");face("Lector Cormorant","cormorant-600-normal",600,"normal");face("Lector Cormorant","cormorant-700-normal",700,"normal");face("Lector Cormorant","cormorant-500-italic",500,"italic");}
+  if(!which||which==="family")face("Lector Cinzel","cinzel-600-normal",600,"normal");
+  return out.join("\n");}
+function paperStyle(){if(document.getElementById("l7PaperCss"))return;var st=document.createElement("style");st.id="l7PaperCss";st.textContent=fontCss()+"\n"+paperCss(true);document.head.appendChild(st);}
+/* a seal on the paper, flat: by day its picture; by night the app's own night seal, its layers laid one on another */
+function paperSeal(k,mode){var L=LX7_LAYERS||{};
+  if(k==="master"){var src=masterSrc(mode==="night");return '<img class="master'+(mode?" s"+mode.charAt(0):"")+'" src="'+src+'" alt="The master seal of The Offline Project">';}
+  if(mode==="night"&&L[k+"N"])return '<span class="sn" role="img" aria-label="'+esc(nm(k))+'\'s seal">'+L[k+"N"].filter(function(x){return !x.side;}).map(function(x){return '<img src="'+x.src+'" alt="">';}).join("")+'</span>';
+  return '<img'+(mode?' class="sd"':'')+' src="'+flatSrc(k)+'" alt="'+esc(nm(k))+'\'s seal">';}
 function appOf(run){return run&&(run.app||appOfText((run.name||"")+" "+(run.file||"")))||null;}
 
 /* ---------------- what Lector keeps ---------------- */
@@ -382,14 +492,15 @@ function paintTabs(){var box=$("l7Dtabs");if(!box)return;var tabs=tabsList();if(
 var paperRaf=0;function paintPaperLive(){if(!R7.live||R7.live.kind!==R7.doc)return;if(paperRaf)return;paperRaf=(window.requestAnimationFrame||setTimeout)(function(){paperRaf=0;var p=document.querySelector("#l7Desk [data-live]");
   if(!p){paintDoc();return;}p.textContent=LX.live||"";p.appendChild(h("span","l-caret"));});}
 function paintDoc(){var desk=$("l7Desk"),ol=$("l7Outline");if(!desk)return;var kind=R7.doc||"analysis",apps=sorted(curApps()),j=job();
+  paperStyle();desk.className="l-desk th-"+themeOf(kind,apps);
   var keepScroll=desk.__kind===kind?desk.scrollTop:0;desk.__kind=kind;
   var meta={apps:apps,name:j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label:docLabel(kind,apps,curPurpose()),forText:kind==="analysis"?"":forText(curPurpose())};
-  if(kind==="analysis"){analysisMd(j).then(function(md){if(R7.doc!=="analysis")return;if(!md){desk.innerHTML='<div class="l-paper"><p class="wait">The notes and the analysis appear here as Lector reads: a note after every part, then the analysis, one section at a time.</p></div>';ol.innerHTML="";return;}
+  if(kind==="analysis"){analysisMd(j).then(function(md){if(R7.doc!=="analysis")return;if(!md){desk.innerHTML='<div class="l-paper th-'+themeOf("analysis",apps)+'"><p class="wait">The notes and the analysis appear here as Lector reads: a note after every part, then the analysis, one section at a time.</p></div>';ol.innerHTML="";return;}
       desk.innerHTML=paper("analysis",md,meta);outline(md,null);desk.scrollTop=keepScroll;});return;}
   if(R7.live&&R7.live.kind===kind){var md=R7.docMd[kind]||"";desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,md,Object.assign({},meta,{live:true}));outline(md,R7.live);desk.scrollTop=desk.scrollHeight;return;}
   var s=stored(kind);
   if(!s){desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,"",Object.assign({},meta,{wait:true}));outline("",null);return;}
-  IngBig.load(s.ref).then(function(md){if(R7.doc!==kind)return;R7.cur={kind:kind,md:md||"",meta:meta,chk:s.chk};desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,md||"",Object.assign({},meta,{chk:s.chk}));outline(md||"",null);desk.scrollTop=keepScroll;
+  IngBig.load(s.ref).then(function(md){if(R7.doc!==kind)return;R7.cur={kind:kind,md:md||"",meta:meta,chk:s.chk};desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,md||"",Object.assign({},meta,{chk:s.chk,made:s.made}));outline(md||"",null);desk.scrollTop=keepScroll;
     if(s.chk&&s.chk.unmatched&&s.chk.unmatched.length){var dc=$("l7DocChip");if(dc){dc.className="l-chip";dc.textContent=s.chk.unmatched.length+" figure"+(s.chk.unmatched.length>1?"s":"")+" to check";}}});}
 function rule(kind){return '<div class="l-rule"><span class="i">○</span>'+(kind==="cover"?"No seal on cover letters: your letters stay plain, as you asked.":kind==="cv"?"No seal on your CV.":"")+'</div>';}
 function forText(p){var P=p&&p!=="portfolio"&&L7().posts[p];if(!P)return "";return [P.title,P.org].filter(Boolean).join(" · ");}
@@ -412,19 +523,25 @@ function inl(t,chk){var s=lxInline(t,esc);s=s.replace(/\[((?:your|to fill|the re
   if(chk&&chk.unmatched&&chk.unmatched.length)chk.unmatched.forEach(function(f){var re=new RegExp("(^|[^\\w.,])("+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w])","g");
     s=s.replace(re,'$1<span class="chk" title="Not found in the measures, the analysis, your CV or the posting: check it">$2</span>');});
   return s;}
-function paper(kind,md,o){var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=APPS[a[0]],color=personal||!th?"#2B2B33":th.color,fill=personal||!th?"#F2F2F4":th.fill;
+function paper(kind,md,o){var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":(night()?"night":"day");
+  var open='<div class="l-paper th-'+th+'">';
   var out=[],blocks=lxBlocks(md);if(blocks.length&&blocks[0].k==="h"&&blocks[0].lv===1)blocks.shift();
   var note=null;if(blocks.length>1&&blocks[blocks.length-2].k==="hr"&&blocks[blocks.length-1].k==="p"){note=blocks.pop().t;blocks.pop();}
-  if(!personal&&kind!=="analysis"){var seals=a.length===4&&ING_SEALS.master?['<img class="master" src="'+flatSrc("master")+'" alt="The master seal of The Offline Project">']:a.map(function(k){return '<img src="'+flatSrc(k)+'" alt="'+esc(nm(k))+'\'s seal">';});
-    out.push('<div class="cv">'+(seals.length?'<div class="seals">'+seals.join("")+'</div>':'')+'<h1>'+esc(o.name||"")+'</h1><div class="sub">'+esc(o.label||"")+'</div>'+(o.forText?'<div class="for">Prepared for '+esc(o.forText)+'</div>':'')+(author()?'<div class="by">'+esc(author()+"  ·  "+month())+'</div>':'')+'</div>');}
-  else if(kind==="analysis")out.push('<div class="cv"><h1>'+esc(o.name||"")+'</h1><div class="sub">Notes and analysis</div></div>');
+  function seal(k){return mode==="both"?paperSeal(k,"day")+paperSeal(k,"night"):paperSeal(k,mode==="night"?"night":"");}
+  if(!personal&&kind!=="analysis"){var ks=a.length===4&&ING_SEALS.master?["master"]:a;
+    var T=PT[th]||{};
+    out.push('<div class="cv">'+(ks.length?'<div class="seals">'+ks.map(seal).join("")+'</div>':'')+'<h1>'+esc(o.name||"")+'</h1>'+
+      '<div class="caps"><i></i><span>'+esc(T.roman?romanDate(o.made?new Date(o.made):null):(o.label||""))+'</span><i></i></div>'+(T.roman&&o.label?'<div class="tag">'+esc(o.label)+'</div>':'')+
+      (o.forText?'<div class="sub">Prepared for '+esc(o.forText)+'</div>':'')+(author()?'<div class="by">'+esc(author()+"  ·  "+month())+'</div>':'')+'</div>');}
+  else if(kind==="analysis")out.push('<div class="cv"><h1>'+esc(o.name||"")+'</h1><div class="caps"><i></i><span>Notes and analysis</span><i></i></div></div>');
   if(kind==="cover")out.push('<div class="lhead"><b>'+esc(author()||"")+'</b>'+esc(today())+'</div>');
-  if(o.wait){out.push('<p class="wait">'+(job()?"Written after the reading, section by section, as you watch.":"Written after the reading. Press Start reading in the brief.")+'</p>');return '<div class="l-paper" style="--app:'+color+';--fill:'+fill+'">'+out.join("")+'</div>';}
+  if(o.wait){out.push('<p class="wait">'+(job()?"Written after the reading, section by section, as you watch.":"Written after the reading. Press Start reading in the brief.")+'</p>');return open+out.join("")+'</div>';}
   var n=0,hi=0,refs=false,lettered=blocks.some(function(b){return b.k==="h"&&b.lv===2&&/^[A-H][.)]\s/.test(b.t);}),list=null;
   function flush(){if(list){out.push("<"+list.t+">"+list.items.join("")+"</"+list.t+">");list=null;}}
   blocks.forEach(function(b){if(b.k==="ul"||b.k==="ol"){var t=b.k;if(!list||list.t!==t){flush();list={t:t,items:[]};}list.items.push("<li>"+inl(b.t,o.chk)+"</li>");return;}flush();
     if(b.k==="h"){var t2=b.t.trim();if(b.lv<=2){refs=/^(works cited|references|bibliography|sources)$/i.test(t2);if(!refs&&!lettered&&!/^(\d+|[A-H])[.)]\s/.test(t2)&&kind!=="analysis")t2=(++n)+". "+t2;
-        var own=a.length>1?(IngHouseDocs.apps(t2).filter(function(k){return a.indexOf(k)>=0;})):[];out.push('<h2 data-h="'+(hi++)+'"'+(own.length===1?' style="color:'+APPS[own[0]].color+'"':'')+'>'+inl(t2)+'</h2>');}
+        var own=a.length>1?(IngHouseDocs.apps(t2).filter(function(k){return a.indexOf(k)>=0;})):[],nm2=/^(\d+|[A-H])([.)])\s+([\s\S]*)$/.exec(t2);
+        out.push('<h2 data-h="'+(hi++)+'"'+(own.length===1?' class="own-'+own[0]+'"':'')+'>'+(nm2?'<span class="no">'+nm2[1]+'</span><span class="dot">'+nm2[2]+' </span><span>'+inl(nm2[3])+'</span>':inl(t2))+'</h2>');}
       else out.push('<h3>'+inl(t2)+'</h3>');return;}
     if(b.k==="p")out.push("<p>"+inl(b.t,o.chk)+"</p>");else if(b.k==="quote")out.push("<blockquote>"+inl(b.t,o.chk)+"</blockquote>");else if(b.k==="hr")out.push("<hr>");
     else if(b.k==="code")out.push("<pre>"+esc(b.lines.join("\n"))+"</pre>");
@@ -432,7 +549,7 @@ function paper(kind,md,o){var personal=kind==="cover"||kind==="cv",a=o.apps||[],
   flush();
   if(o.live)out.push('<p data-live="1">'+esc(LX.live||"")+'<span class="l-caret"></span></p>');
   if(note)out.push('<p class="note">'+inl(note.replace(/^\*|\*$/g,""))+'</p>');
-  return '<div class="l-paper" style="--app:'+color+';--fill:'+fill+'">'+out.join("")+'</div>';}
+  return open+out.join("")+'</div>';}
 
 /* ---------------- reading a set ---------------- */
 function r7Go(){if(R7.running||LX.busy){ingToast("Lector is busy. Wait for it, or pause it first.");return;}
@@ -609,14 +726,9 @@ function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to s
   else if(fmt==="pdf"){if(window.LxPdf&&typeof LxPdf.make==="function"){LxPdf.make(title,d.md,{kind:meta.kind,apps:apps,name:sealed(d.kind)?name:(d.kind==="analysis"?name:""),subtitle:label,forText:meta.forText,author:author(),month:month(),
       seals:sealed(d.kind)?(apps.length===4&&ING_SEALS.master?[{key:"master",src:flatSrc("master")}]:apps.map(function(k){return {key:k,src:flatSrc(k)};})):[]}).then(function(u8){saveFileNative(file+".pdf","application/pdf",u8);},function(e){ingToast("The PDF could not be made: "+(e&&e.message||e));});}
     else ingToast("PDF is not available in this copy of Ingenium. Save it as Word, and open it in Pages or Word to keep a PDF.");}});}
-function htmlDoc(kind,md,o){var css="body{margin:0;background:#efeaf4;font:15px/1.62 'Times New Roman',Times,serif;color:#1e1828}.l-paper{max-width:720px;margin:28px auto;background:#fff;padding:56px 64px 64px;box-shadow:0 3px 8px rgba(40,22,68,.08),0 18px 40px rgba(40,22,68,.12)}"+
-  ".cv{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0 8px;border-bottom:1px solid rgba(30,24,40,.14);margin-bottom:22px;text-align:center}.seals{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}.seals img{width:96px;height:96px;object-fit:contain}.seals img.master{width:150px;height:auto}"+
-  ".cv h1{font-size:26px;margin:4px 0 0;color:var(--app)}.sub{font-style:italic;color:#454549}.for,.by{font-size:14px;color:#454549}h2{font-size:17px;margin:24px 0 8px;color:var(--app)}h3{font-style:italic;font-size:15.5px;margin:16px 0 6px;color:#454549}"+
-  "p{margin:0 0 10px}ul,ol{margin:0 0 10px;padding-left:24px}blockquote{margin:0 0 10px 20px;font-style:italic;color:#454549}pre{background:#f4f2f6;padding:8px 10px;white-space:pre-wrap;font-size:12.5px}"+
-  "table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0 14px}th,td{border-bottom:1px solid rgba(30,24,40,.14);padding:5px 6px;text-align:left;vertical-align:top}th{border-top:1.5px solid #4a405a;border-bottom:1.5px solid #4a405a;background:var(--fill)}"+
-  ".note{font-style:italic;font-size:13.5px;color:#5a5068;border-top:1px solid rgba(30,24,40,.14);padding-top:10px;margin-top:20px}.fill{color:#8a6526;font-style:italic}.lhead{text-align:right;font-size:14px;color:#454549;margin-bottom:22px}.lhead b{display:block;font-size:17px;color:#1e1828}"+
-  "@media print{body{background:#fff}.l-paper{box-shadow:none;margin:0;max-width:none;padding:0}}@page{size:A4;margin:25mm 25mm 22mm}@media (max-width:760px){.l-paper{margin:0;padding:28px 20px}}";
-  return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="generator" content="Ingenium Lector"><title>'+esc(o.title)+'</title><style>'+css+'</style></head><body>'+paper(kind,md,o)+'</body></html>';}
+function htmlDoc(kind,md,o){var th=themeOf(kind,o.apps),css=fontCss(th==="inkwell"?"inkwell":th==="family"?"family":"none")+"\n"+paperCss(false)+
+  "\n.l-paper .cv .seals .sn{display:none}@media screen and (prefers-color-scheme:dark){.l-paper .cv .seals .sd{display:none}.l-paper .cv .seals .sn{display:inline-block}}@media print{.l-paper .cv .seals .sn{display:none !important}.l-paper .cv .seals .sd{display:inline-block !important}}";
+  return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="generator" content="Ingenium Lector"><title>'+esc(o.title)+'</title><style>'+css+'</style></head><body class="th-'+th+'">'+paper(kind,md,Object.assign({},o,{both:true}))+'</body></html>';}
 
 /* ---------------- layout: the height of the window, the panels, the grips, the tabs ---------------- */
 function one(){var r=$("lx7");return !!(r&&r.classList.contains("l-one"));}
@@ -664,7 +776,7 @@ function wireFrame(){var U=L7().ui;
   watchFollow();}
 window.addEventListener("resize",layoutSoon);
 /* the theme changes the seals' faces */
-try{new MutationObserver(function(){if($("lx7")&&$("page-lector").classList.contains("active"))paintBrief();}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
+try{new MutationObserver(function(){if($("lx7")&&$("page-lector").classList.contains("active")){paintBrief();paintDoc();}}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 
 /* ---------------- Lector's own reading, drawn here ---------------- */
 /* R86 took a "build" from any text that followed CD-BUILD-MARKER, and in Ingenium that is Lector's own pattern

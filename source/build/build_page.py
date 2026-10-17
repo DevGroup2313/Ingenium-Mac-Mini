@@ -89,6 +89,64 @@ edit('if(cur&&cur.sha256===meta.sha256)return Promise.resolve("same");',
      '/* R108: the same app again: "unchanged" only if its copy is really still here; a copy that was lost is kept again */\n'
      '  if(cur&&cur.sha256===meta.sha256)return libText(key).then(function(t){if(t)return "same";return libPut(cur.ref,u8,text).then(function(){return "kept";});},function(){return libPut(cur.ref,u8,text).then(function(){return "kept";});});', "R108 relink")
 
+# ---- R2i (17 October 2026): her word, "give Inkwell's documents the Inkwell colour palette and design and the same for the
+# Forge and Carpe Diem". The Word file keeps her house hand (Times New Roman at 12 points, her margins, numbered sections)
+# and takes each app's own palette and its door's design: the title in the app's own ink and face, the small capitals
+# between two fine gilt lines, "Prepared for" in the app's colour, a gilt rule under the cover, tables ruled in the
+# app's colour; a document about two or more apps is set as The Offline Project (vellum ink and the master seal's gilt) ----
+edit('var LXH_THEMES={cd:{accent:"1B6B93",sub:"454549",fill:"EAF2F7"},forge:{accent:"17577A",sub:"8A6A22",fill:"F6F0E2"},\n'
+     '  ingenium:{accent:"6A3FB5",sub:"4B3A6E",fill:"F1ECFA"},inkwell:{accent:"1F4F68",sub:"8A6526",fill:"F4EFE3"},neutral:{accent:"2B2B33",sub:"454549",fill:"F2F2F4"}};',
+     'var LXH_THEMES={cd:{accent:"1B6B93",sub:"145671",fill:"EAF2F7",title:"121218",line:"B88A3A",caps:"1B6B93",ink:"1D1D1F",ink2:"454549",font:"Georgia",rule:"1B6B93",roman:1,frame:"8DB5CA"},\n'
+     '  forge:{accent:"17577A",sub:"A55A22",fill:"EEF1F4",title:"121619",line:"A55A22",caps:"1B6B93",ink:"121619",ink2:"39424C",font:"Georgia",rule:"39424C",roman:1,frame:"B4BEC8"},\n'
+     '  ingenium:{accent:"6A3FB5",sub:"4B3A6E",fill:"F1ECFA",title:"4E2C8A",line:"B9A6DD",caps:"6A3FB5",ink:"1D1D1F",ink2:"454549",font:null,rule:"4A405A",upper:1,orn:1},\n'
+     '  inkwell:{accent:"1F4F68",sub:"8A6526",fill:"F3ECDA",title:"1F4F68",line:"A97E2C",caps:"8A6526",ink:"231D15",ink2:"5F5646",font:"Georgia",rule:"A97E2C",frame:"D6C08E"},\n'
+     '  family:{accent:"23364A",sub:"7A5F2E",fill:"F4EEDF",title:"1F2A36",line:"A8843C",caps:"8A6A2C",ink:"1F2A36",ink2:"4A4A52",font:"Georgia",rule:"A8843C",frame:"D2BC86"},\n'
+     '  neutral:{accent:"2B2B33",sub:"454549",fill:"F2F2F4",title:"2B2B33",line:"8A7650",caps:"8A7650",ink:"1D1D1F",ink2:"454549",font:null,rule:"4A405A"}};', "R2i themes")
+edit("function lxhRun(t,o){o=o||{};return '<w:r><w:rPr><w:rFonts w:ascii=\"Times New Roman\" w:hAnsi=\"Times New Roman\" w:cs=\"Times New Roman\"/>'+(o.b?\"<w:b/>\":\"\")+(o.i?\"<w:i/>\":\"\")+(o.color?'<w:color w:val=\"'+o.color+'\"/>':\"\")+(o.sz?",
+     "function lxhRun(t,o){o=o||{};var f=o.font||\"Times New Roman\";return '<w:r><w:rPr><w:rFonts w:ascii=\"'+f+'\" w:hAnsi=\"'+f+'\" w:cs=\"'+f+'\"/>'+(o.b?\"<w:b/>\":\"\")+(o.i?\"<w:i/>\":\"\")+(o.caps?\"<w:caps/>\":\"\")+(o.color?'<w:color w:val=\"'+o.color+'\"/>':\"\")+(o.caps?'<w:spacing w:val=\"'+o.caps+'\"/>':\"\")+(o.sz?", "R2i run face")
+edit('var personal=kind==="cv"||kind==="cover",th=LXH_THEMES[personal?"neutral":(apps[0]||"neutral")];',
+     'var personal=kind==="cv"||kind==="cover",th=LXH_THEMES[personal?"neutral":(apps.length>1?"family":(apps[0]||"neutral"))]||LXH_THEMES.neutral;', "R2i theme of the set")
+edit("""  body.push(lxhPara(lxhRun(name,{b:1,sz:personal?22:20,color:th.accent}),{center:1,after:5,line:1.25}));
+  body.push(lxhPara(lxhRun(meta.subtitle||label,{i:1,sz:12,color:"454549"}),{center:1,after:8,line:1.25}));
+  if(meta.forText)body.push(lxhPara(lxhRun("Prepared for "+meta.forText,{sz:11,color:"454549"}),{center:1,after:4,line:1.25}));
+  if(author&&!personal)body.push(lxhPara(lxhRun(author+"  ·  "+lxhMonth(),{sz:11,color:"454549"}),{center:1,after:4,line:1.25}));
+  body.push(lxhPara(lxhRun("",{}),{after:10}));""",
+     """  if(personal){body.push(lxhPara(lxhRun(name,{b:1,sz:22,color:th.accent}),{center:1,after:5,line:1.25}));
+    body.push(lxhPara(lxhRun(meta.subtitle||label,{i:1,sz:12,color:"454549"}),{center:1,after:8,line:1.25}));
+    if(meta.forText)body.push(lxhPara(lxhRun("Prepared for "+meta.forText,{sz:11,color:"454549"}),{center:1,after:4,line:1.25}));
+    body.push(lxhPara(lxhRun("",{}),{after:10}));}
+  else{/* R2i: the cover in the app's own design: its title, its small capitals between two fine lines, then for whom and by whom */
+    var rom=function(n){var v=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]],r="";v.forEach(function(p){while(n>=p[0]){r+=p[1];n-=p[0];}});return r;},dd=new Date(),
+      LAT=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVGVSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
+    /* Carpe Diem and The Forge carry the date as their doors write it (XVII\u00b7OCTOBRIS\u00b7MMXXVI), Ingenium its title in spaced capitals */
+    body.push(lxhPara(lxhRun(name,{b:1,sz:th.upper?20:23,color:th.title||th.accent,font:th.font,caps:th.upper?70:0}),{center:1,after:6,line:1.2}));
+    body.push(lxhPara(lxhRun("\\u2014\\u2014   ",{sz:9.5,color:th.line})+lxhRun(th.roman?rom(dd.getDate())+"\\u00b7"+LAT[dd.getMonth()]+"\\u00b7"+rom(dd.getFullYear()):(meta.subtitle||label),{b:1,sz:9.5,color:th.caps,caps:44})+lxhRun("   \\u2014\\u2014",{sz:9.5,color:th.line}),{center:1,after:th.roman?4:9,line:1.2}));
+    if(th.roman)body.push(lxhPara(lxhRun(meta.subtitle||label,{i:1,sz:13,color:th.accent,font:th.font}),{center:1,after:8,line:1.25}));
+    if(meta.forText)body.push(lxhPara(lxhRun("Prepared for "+meta.forText,{i:1,sz:12,color:th.accent}),{center:1,after:4,line:1.25}));
+    if(author)body.push(lxhPara(lxhRun(author+"  ·  "+lxhMonth(),{sz:11,color:th.ink2||"454549"}),{center:1,after:4,line:1.25}));
+    if(th.orn)body.push(lxhPara(lxhRun("\\u2014\\u2014\\u2014\\u2014\\u2014\\u2014   ",{sz:10,color:th.line})+lxhRun("\\u2726",{sz:13,color:th.accent})+lxhRun("   \\u2014\\u2014\\u2014\\u2014\\u2014\\u2014",{sz:10,color:th.line}),{center:1,before:6,after:18,line:1.2}));
+    else body.push('<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="'+th.line+'"/></w:pBdr><w:spacing w:before="120" w:after="360"/><w:ind w:left="1700" w:right="1700"/></w:pPr></w:p>');}""", "R2i cover")
+# the frame of the app's door around the cover page (first page only)
+edit("""+'<w:pgMar w:top="1195" w:right="1181" w:bottom="1094" w:left="1181" w:header="567" w:footer="567" w:gutter="0"/><w:titlePg/></w:sectPr></w:body></w:document>';""",
+     """+'<w:pgMar w:top="1195" w:right="1181" w:bottom="1094" w:left="1181" w:header="567" w:footer="567" w:gutter="0"/>'
+    +(!personal&&th.frame?'<w:pgBorders w:offsetFrom="page" w:display="firstPage">'+["top","left","bottom","right"].map(function(e){return '<w:'+e+' w:val="single" w:sz="4" w:space="28" w:color="'+th.frame+'"/>';}).join("")+'</w:pgBorders>':'')
+    +'<w:titlePg/></w:sectPr></w:body></w:document>';""", "R2i frame")
+edit("""    if(b.k==="p"){body.push(refs?lxhPara(lxhInline(b.t,{sz:10.5,color:"1D1D1F"}),{after:4,line:1.3,ind:[432,432]}):lxhPara(lxhInline(b.t,{sz:12,color:"1D1D1F"}),{after:10,line:1.5}));return;}
+    if(b.k==="ul"){body.push(lxhPara(lxhRun("•\\t",{sz:12,color:cur.accent})+lxhInline(b.t,{sz:12,color:"1D1D1F"}),{after:5,line:1.35,ind:[432,288]}));return;}
+    if(b.k==="ol"){body.push(lxhPara(lxhRun(b.n+".\\t",{sz:12,color:cur.accent})+lxhInline(b.t,{sz:12,color:"1D1D1F"}),{after:5,line:1.35,ind:[432,288]}));return;}
+    if(b.k==="quote"){body.push(lxhPara(lxhInline(b.t,{i:1,sz:11.5,color:"454549"}),{after:10,line:1.4,ind:[567,0]}));return;}""",
+     """    var INK=th.ink||"1D1D1F",INK2=th.ink2||"454549";
+    if(b.k==="p"){body.push(refs?lxhPara(lxhInline(b.t,{sz:10.5,color:INK}),{after:4,line:1.3,ind:[432,432]}):lxhPara(lxhInline(b.t,{sz:12,color:INK}),{after:10,line:1.5}));return;}
+    if(b.k==="ul"){body.push(lxhPara(lxhRun("•\\t",{sz:12,color:cur.accent})+lxhInline(b.t,{sz:12,color:INK}),{after:5,line:1.35,ind:[432,288]}));return;}
+    if(b.k==="ol"){body.push(lxhPara(lxhRun(b.n+".\\t",{sz:12,color:cur.accent})+lxhInline(b.t,{sz:12,color:INK}),{after:5,line:1.35,ind:[432,288]}));return;}
+    if(b.k==="quote"){body.push(lxhPara(lxhInline(b.t,{i:1,sz:11.5,color:INK2}),{after:10,line:1.4,ind:[567,0]}));return;}""", "R2i ink")
+edit("""  var b=function(k,on){return '<w:'+k+(on?' w:val="single" w:sz="4" w:space="0" w:color="C8C8CC"/>':' w:val="nil"/>');};""",
+     """  var b=function(k,on){return '<w:'+k+(on?' w:val="single" w:sz="'+(k==="insideH"?4:8)+'" w:space="0" w:color="'+(k==="insideH"?"D5D2CC":(th.rule||"C8C8CC"))+'"/>':' w:val="nil"/>');};""", "R2i table rules")
+edit("""      +lxhPara(lxhInline(c,{sz:11,b:i===0||k===0,color:i===0?th.accent:"1D1D1F"}),{after:2,line:1.2})+'</w:tc>';});x+='</w:tr>';});""",
+     """      +lxhPara(lxhInline(c,{sz:11,b:i===0||k===0,color:i===0?th.accent:(th.ink||"1D1D1F")}),{after:2,line:1.2})+'</w:tc>';});x+='</w:tr>';});""", "R2i table ink")
+edit("""  if(note)body.push(lxhPara(lxhInline(note,{i:1,sz:10.5,color:"454549"}),{before:12,after:6,line:1.3}));""",
+     """  if(note)body.push(lxhPara(lxhInline(note,{i:1,sz:10.5,color:th.ink2||"454549"}),{before:12,after:6,line:1.3}));""", "R2i note")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:
@@ -120,6 +178,8 @@ blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))
 if "/*R109_WIDTHS*/null" in blob:
     _w = json.load(open(os.path.join(HERE, "pdf_widths.json")))
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
+if "/*R108_FONTS*/null" in blob:
+    blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
 if "/*R107_LAYERS*/null" in blob:
     blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
 if "/*R107_MASTER*/null" in blob:
