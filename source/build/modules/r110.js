@@ -707,11 +707,17 @@ function remirror(){var a=mshell(),m=mstate();if(!a||!m)return Promise.resolve(f
   return backend().eachRec(function(k){MIR.fresh.add(k);}).then(function(){return backend().allRepos();}).then(function(rs){rs.forEach(function(r){MIR.dirty.add(r.id);});
     m.segs=[];return mirrorNow();}).then(function(){old.forEach(function(b){try{a.big_del(b);}catch(e){}});return true;},function(e){m.segs=old.concat(m.segs);throw e;});}
 
+/* notes kept beside a version: its test results, the packages made from it */
+function setNote(id,oid,key,val){return locked(id,function(){return load(id).then(function(r){r.notes=r.notes||{};var n=r.notes[oid]=r.notes[oid]||{};if(val==null)delete n[key];else n[key]=val;
+  var ks=Object.keys(r.notes);if(ks.length>400)ks.slice(0,ks.length-400).forEach(function(k){delete r.notes[k];});return save(r).then(function(){return n;});});});}
+function notes(id,oid){return load(id).then(function(r){var n=r.notes||{};return oid?(n[oid]||{}):n;});}
+function headOf(id){return load(id).then(function(r){return headOid(r);});}
 function _use(be){BE=be;ST=new Store(be);ST.onPut=function(oid){if(mshell())MIR.fresh.add(oid);};locks={};recovered=null;}
 return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
   status:status,commit:commit,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,stopMerge:stopMerge,revert:revert,
+  setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,gc:gc,setAuthor:setAuthor,author:function(){return who;},
   core:{sha1:sha1,sha1JS:sha1JS,inflateRaw:inflateRaw,inflateZ:inflateZ,deflateZ:deflateZ,storedZ:storedZ,makeDelta:makeDelta,applyDelta:applyDelta,writePack:writePack,readPack:readPack,
     zip:zip,unzip:unzip,unzipData:unzipData,lineDiff:lineDiff,hunks:hunks,merge3:merge3,unified:unified,splitLines:splitLines,parseTree:parseTree,parseCommit:parseCommit,treeBody:treeBody,

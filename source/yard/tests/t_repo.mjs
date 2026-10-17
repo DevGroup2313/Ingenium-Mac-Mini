@@ -180,7 +180,7 @@ let lgAll;
   const theirsN = +git(MM, 'rev-list', '--count', 'HEAD').trim();
   ok('I a bundle from git comes in whole', ours.length === theirsN && ours[0].oid === git(MM, 'rev-parse', 'HEAD').trim(), `${ours.length} commits, ${res.objects} objects, ${ms} ms`);
   const page = await R.read(res.id, 'ingenium.html');
-  ok('I the page in the working copy is the same as git\'s', Buffer.compare(Buffer.from(page), fs.readFileSync(path.join(MM, 'ingenium.html'))) === 0);
+  ok('I the page in the working copy is the same as git\'s', Buffer.compare(Buffer.from(page), sh('git', ['-C', MM, 'show', 'HEAD:ingenium.html'])) === 0);
   const old = await R.readText(res.id, 'ingenium.html', vers[3]);
   ok('I an older version reads back', old === sh('git', ['-C', MM, 'show', `${vers[3]}:ingenium.html`]).toString());
   let stored = 0; for (const [k, v] of be._objects) stored += v.b.length;
