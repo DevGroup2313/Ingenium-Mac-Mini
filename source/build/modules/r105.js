@@ -62,7 +62,7 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
       var row=el("div","lu-cd"+(k===cur?" on":""));row.setAttribute("data-cd",k);
       var t=el("div","lu-cd-t");t.appendChild(el("div","lu-cd-name",sp.name));
       t.appendChild(el("div","lu-cd-meta",sp.maker+" · "+fmtBytes(sp.size)+(sp.thinks?" · reasons first":"")));
-      t.appendChild(el("div","lu-cd-fit"+(fits?"":" no"),fits?"Needs about "+need.toFixed(1)+" GB: fits here.":"Needs about "+need.toFixed(1)+" GB: more than "+label()+" has to spare. It may not load."));
+      t.appendChild(el("div","lu-cd-fit"+(fits?"":" no"),use==null?"Needs about "+need.toFixed(1)+" GB of memory.":fits?"Needs about "+need.toFixed(1)+" GB: fits here.":"Needs about "+need.toFixed(1)+" GB: more than "+label()+" has to spare. It may not load."));
       row.appendChild(t);
       var a=el("div","lu-cd-acts");
       if(web){var pg=el("a","btn xs","Model page");pg.href=sp.page;pg.target="_blank";pg.rel="noopener noreferrer";a.appendChild(pg);}

@@ -195,6 +195,8 @@ if "/*R109_WIDTHS*/null" in blob:
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R108_FONTS*/null" in blob:
     blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
+if "/*R116_QUANTS*/null" in blob:
+    blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:
     blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
 if "/*R107_MASTER*/null" in blob:
