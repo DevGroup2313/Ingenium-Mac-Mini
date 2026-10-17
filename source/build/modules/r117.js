@@ -160,6 +160,9 @@ function exLectorDocs(){var out=[];try{var sets=(lxState().sets)||{};Object.keys
       var files=[{name:name.replace(/\.docx$/,".md"),data:String(md)}];if(bytes)files.push({name:name,data:bytes});return files;},function(){return null;});})).then(function(L){var files=[];L.forEach(function(x){if(x)x.forEach(function(f){files.push(f);});});return files;});}
 function exFabrica(){if(!window.IngRepo||typeof IngRepo.list!=="function")return Promise.resolve([]);
   return IngRepo.list().then(function(repos){return Promise.all((repos||[]).map(function(r){return IngRepo.bundle(r.id).then(function(b){return {name:"fabrica/"+exSafeName(r.slug||r.name||r.id)+".bundle",data:b};},function(){return null;});}));}).then(function(L){return L.filter(Boolean);},function(){return [];});}
+/* the whole Tabula and Abacus keep their own stores (localStorage keys of their own); the export carries them as JSON */
+function exAppStores(){var out={tabula:null,abacus:null},T={},A={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i)||"";if(/^(tabula_|cd_letterheads|cd_marks|cd_signatures|cd_sign_prefs|cd_cite_style)/.test(k))T[k]=localStorage.getItem(k);else if(/^abacus_/.test(k))A[k]=localStorage.getItem(k);}}catch(e){}
+  if(Object.keys(T).length)out.tabula=JSON.stringify(T,null,1);if(Object.keys(A).length)out.abacus=JSON.stringify(A,null,1);return out;}
 openExport=function(){var box=modalOpen('<h3>Export your data</h3><p class="small muted" style="margin-top:0">Choose what goes in the file. It is made on this device and saved where you choose; nothing is sent anywhere.</p>'
     +'<div class="ex-list">'
     +'<label><input type="checkbox" id="exChats" checked> Conversations, each as a readable Markdown file (with times and references)</label>'
@@ -168,6 +171,7 @@ openExport=function(){var box=modalOpen('<h3>Export your data</h3><p class="smal
     +'<label><input type="checkbox" id="exDocs" checked> Tabula document and Abacus sheets</label>'
     +'<label><input type="checkbox" id="exLector" checked> Lector\'s documents, each as a Word file and as Markdown</label>'
     +'<label><input type="checkbox" id="exFabrica" checked> Fabrica\'s repositories, each as a git bundle <span class="small muted">(git clone name.bundle opens it anywhere)</span></label>'
+    +'<label><input type="checkbox" id="exApps" checked> Tabula\'s documents and Abacus\'s workbooks (the whole apps\' own stores, as JSON)</label>'
     +'<label><input type="checkbox" id="exSources" checked> My sources (BibTeX, RIS and CSL-JSON) and blend houses</label>'
     +'<label><input type="checkbox" id="exSettings" checked> Settings and the list of models (not the model files)</label>'
     +'<label><input type="checkbox" id="exKeys"> Include connection keys and tokens <span class="small muted">(only if the file stays with you)</span></label>'
@@ -189,12 +193,13 @@ openExport=function(){var box=modalOpen('<h3>Export your data</h3><p class="smal
       files.push({name:"blend-houses.json",data:JSON.stringify(state.blendHouses||[],null,1)});}
     if(on("exSettings")){var s2=strip(state);["chats","notes","parked","reminders","tabulaDoc","abacus","fontes","blendHouses","perf"].forEach(function(k){delete s2[k];});files.push({name:"settings.json",data:JSON.stringify(s2,null,1)});}
     if(on("exWhole"))files.push({name:"ingenium-desk-backup.json",data:JSON.stringify(strip(state))});
+    if(on("exApps")){var ap=exAppStores();if(ap.tabula)files.push({name:"apps/tabula-store.json",data:ap.tabula});if(ap.abacus)files.push({name:"apps/abacus-store.json",data:ap.abacus});}
     var wantL=on("exLector"),wantF=on("exFabrica");
     if(!files.length&&!wantL&&!wantF){ingToast("Tick at least one thing to export.");return;}
     go_.disabled=true;go_.textContent="Gathering…";
     Promise.all([wantL?exLectorDocs():[],wantF?exFabrica():[]]).then(function(rs){rs[0].forEach(function(f){files.push(f);});rs[1].forEach(function(f){files.push(f);});
       if(!files.length){ingToast("Nothing to export yet.");go_.disabled=false;go_.textContent="Make the file";return;}
-      files.push({name:"README.txt",data:"Ingenium "+ING_VERSION+", exported "+new Date().toString()+".\nConversations are in Markdown (readable anywhere) and JSON. Sources open in Zotero (BibTeX or RIS). Lector's documents are Word files, with the same text as Markdown beside each. A Fabrica repository is a git bundle: git clone <name>.bundle opens it with its whole history. The whole-desk backup is read back in Settings, Import a backup.\n"});
+      files.push({name:"README.txt",data:"Ingenium "+ING_VERSION+", exported "+new Date().toString()+".\nConversations are in Markdown (readable anywhere) and JSON. Sources open in Zotero (BibTeX or RIS). Lector's documents are Word files, with the same text as Markdown beside each. apps/ holds Tabula's and Abacus's own stores as JSON. A Fabrica repository is a git bundle: git clone <name>.bundle opens it with its whole history. The whole-desk backup is read back in Settings, Import a backup.\n"});
       saveFileNative("Ingenium-export-"+day+".zip","application/zip",makeZip(files));closeModal();ingToast(files.length+" files exported.");},
       function(e){go_.disabled=false;go_.textContent="Make the file";ingToast("The export stopped: "+(e&&e.message||e));});};};
 window.openExport=openExport;(function rewire(){var k=$("exPick");if(k)k.onclick=openExport;})();
@@ -203,7 +208,7 @@ window.openExport=openExport;(function rewire(){var k=$("exPick");if(k)k.onclick
 (function shelf(){if(typeof shelfSummary!=="function")return;var o=shelfSummary;
   shelfSummary=function(st){var s=o.apply(this,arguments);st=st||{};try{var lx=st.lector||{};s.sets=lx.sets?Object.keys(lx.sets).length:0;s.colls=st.fontes&&Array.isArray(st.fontes.colls)?st.fontes.colls.length:0;s.houses=st.lineupQuality?Object.keys(st.lineupQuality).length:0;}catch(e){}return s;};window.shelfSummary=shelfSummary;
   var od=shelfDiff;shelfDiff=function(a,b){var d=od.apply(this,arguments);try{var L={sets:"Lector set",colls:"Fontes collection",houses:"quality choice"};Object.keys(L).forEach(function(k){var x=(a[k]||0)-(b[k]||0);if(x)d.lines.push((x>0?"+":"−")+Math.abs(x)+" "+L[k]+(Math.abs(x)===1?"":"s"));});}catch(e){}return d;};window.shelfDiff=shelfDiff;
-  var or=recoverShow;recoverShow=function(){var r=or.apply(this,arguments);try{var host=$("snapList");if(host&&!host.parentNode.querySelector(".shelf-note"))host.after(el("div","shelf-note","Returning to a moment changes the desk: conversations, notes, settings and the lists kept there. Lector's readings and documents, Fabrica's repositories and the model files live in this device's own store and are left as they are."));}catch(e){}return r;};window.recoverShow=recoverShow;})();
+  var or=recoverShow;recoverShow=function(){var r=or.apply(this,arguments);try{var host=$("snapList");if(host&&!host.parentNode.querySelector(".shelf-note"))host.after(el("div","shelf-note","Returning to a moment changes the desk: conversations, notes, settings and the lists kept there. Lector's readings and documents, Fabrica's repositories, Tabula's and Abacus's own stores and the model files live in this device's own store and are left as they are."));}catch(e){}return r;};window.recoverShow=recoverShow;})();
 
 /* ---------- 6. quiet in a focus session: Ingenium's own asides wait with the web ---------- */
 (function quiet(){if(typeof perfWarn==="function"){var o=perfWarn;perfWarn=function(p){try{if(typeof focusPauseOn==="function"&&focusPauseOn())return;}catch(e){}return o.apply(this,arguments);};window.perfWarn=perfWarn;}

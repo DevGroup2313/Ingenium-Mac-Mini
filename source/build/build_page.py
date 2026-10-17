@@ -187,6 +187,14 @@ out = out[:_m.start(2)] + json.dumps(_seals) + out[_m.end(2):]
 
 MARK = '<script>/* R95: every part has now wrapped'
 assert out.count(MARK) == 1
+# ---- R118 (17 October 2026): the full Tabula and Abacus, her own single-page apps (the same files Carpe Diem carries),
+#      ride inside the page as base64 text and open in a frame on their pages ----
+import base64 as _b64
+_apps = ""
+for _name in ("tabula", "abacus"):
+    _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
+    _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
+out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 blob = "\n".join(open(m, encoding="utf-8").read().rstrip("\n") for m in mods) + "\n"
 blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))
@@ -195,6 +203,8 @@ if "/*R109_WIDTHS*/null" in blob:
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R108_FONTS*/null" in blob:
     blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
+if "/*R118_DARK*/null" in blob:
+    blob = blob.replace("/*R118_DARK*/null", open(os.path.join(HERE, "apps", "dark.json")).read().strip())
 if "/*R116_QUANTS*/null" in blob:
     blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:
