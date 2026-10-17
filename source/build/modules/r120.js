@@ -1,0 +1,99 @@
+<script>try{(window.__ingParts=window.__ingParts||{})["p51"]="started";}catch(_){}
+/* R120 · THE FORGE AND INKWELL, CARRIED INSIDE INGENIUM
+   Her request (17 October 2026): "update its copies of the Forge and Inkwell since they have been updated recently."
+   Ingenium now carries The Forge and Inkwell inside its own page, compressed, with each page's size and SHA-256
+   fingerprint (source/build/apps/builtin, written by apps/update_builtin.py from the apps' own repositories).
+   Soon after the app opens, when the app library holds no copy of one, or an older one, the built-in page is unpacked,
+   checked against its size and fingerprint, and kept on this device; the copy before it stays one step back. A copy
+   she added herself that is newer, or that Ingenium cannot place in order, is never replaced without her say: the
+   card offers the built-in copy instead. Lector reads them, Fabrica opens them and the chat attaches them, as before.
+   The Forge is named by its pass (630) as its BUILD_INFO names it; its stamp (9s62) is kept as the build. */
+(function r120(){
+var BI=/*R120_BUILTIN*/null;
+if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
+var KEYS=["inkwell","forge"],DONE={},RUN=null;
+
+/* ---------- versions: a pass (630), a dotted version (7.42) or a Forge stamp (9s62); unlike kinds are not compared ---------- */
+function parts(v){v=String(v||"").trim();var m;
+  if((m=/^(\d+)s(\d+)$/.exec(v)))return {t:"stamp",n:[+m[1],+m[2]]};
+  if(/^\d+(\.\d+)*$/.test(v))return {t:"num",n:v.split(".").map(Number)};
+  return null;}
+function cmp(a,b){var x=parts(a),y=parts(b);if(!x||!y||x.t!==y.t)return null;
+  for(var i=0;i<Math.max(x.n.length,y.n.length);i++){var p=x.n[i]||0,q=y.n[i]||0;if(p!==q)return p>q?1:-1;}return 0;}
+/* how the kept copy stands against the built-in one */
+function standing(k){var b=BI[k],m=libState().apps[k];if(!b)return "absent";if(!m||!m.ref)return "none";
+  if(String(m.sha256||"").toLowerCase()===b.sha256)return "same";
+  var pairs=[[b.version,m.version],[b.build,m.version],[b.version,m.build],[b.build,m.build]];
+  for(var i=0;i<pairs.length;i++){var c=cmp(pairs[i][0],pairs[i][1]);if(c!==null)return c>0?"older":(c<0?"newer":"other");}
+  return "other";}
+
+/* ---------- the built-in page: decoded, inflated, and checked before it is kept ---------- */
+function bytesOf(k){var el=document.getElementById("ing-builtin-"+k);if(!el)return Promise.reject(new Error("this page carries no copy of "+LIB_NAMES[k]));
+  return new Promise(function(res){var s=atob(el.textContent.trim()),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);res(u);})
+    .then(function(gz){try{if(typeof DecompressionStream==="function")
+        return new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer().then(function(b){return new Uint8Array(b);},function(){return ingInflateGzip(gz);});}catch(e){}
+      return ingInflateGzip(gz);});}
+function unpack(k){var b=BI[k];
+  return bytesOf(k).then(function(u8){if(u8.length!==b.size)throw new Error(LIB_NAMES[k]+" did not unpack whole (its size differs)");
+    return libSha(u8).then(function(h){if(h!==b.sha256)throw new Error(LIB_NAMES[k]+" did not unpack whole (its fingerprint differs)");return u8;});});}
+function keep(k){var b=BI[k];
+  return unpack(k).then(function(u8){var text=new TextDecoder().decode(u8);
+    return libKeep(k,{title:b.title,version:b.version,build:b.build||"",date:b.date||"",size:b.size,sha256:b.sha256,name:b.name,source:"built in"},u8,text);});}
+/* a kept copy whose bytes are gone from this device is kept again */
+function present(m){if(!m||!m.ref)return Promise.resolve(false);
+  return libTx("readonly",function(s){return s.count(m.ref);}).then(function(n){if(n>0)return true;
+    return libText(m.key||"").then(function(t){return !!t;},function(){return false;});},function(){return true;});}
+
+/* ---------- the quiet first start: once per opening, when nothing else is busy ---------- */
+function seed(opts){opts=opts||{};if(RUN)return RUN;if(typeof libOn==="function"&&!libOn())return Promise.resolve({});
+  var out={},kept=[],t0=Date.now();
+  RUN=KEYS.reduce(function(p,k){return p.then(function(){var st=standing(k);if(st==="absent"){out[k]="absent";return;}
+      var m=libState().apps[k];
+      var check=st==="same"?present(Object.assign({key:k},m)).then(function(ok){return ok?"same":"lost";}):Promise.resolve(st);
+      return check.then(function(s){out[k]=s;if(s!=="none"&&s!=="older"&&s!=="lost")return;
+        return keep(k).then(function(r){out[k]=s==="lost"?"kept again":"kept";kept.push(LIB_NAMES[k]+" "+BI[k].version);},function(e){out[k]="failed: "+(e&&e.message||e);});});});},Promise.resolve())
+  .then(function(){DONE=out;window.__ingBuiltin={states:out,ms:Date.now()-t0};
+    if(kept.length&&!LIB.busy){LIB.warn=false;LIB.note="Kept on this device from inside Ingenium: "+kept.join(", ")+". Each was checked against its fingerprint.";}
+    repaint();RUN=null;return out;});
+  return RUN;}
+function useBuiltin(k,btn){if(LIB.busy)return;if(btn){btn.disabled=true;btn.textContent="Keeping…";}LIB.busy="Keeping the built-in "+LIB_NAMES[k]+" "+BI[k].version+"…";libPaint();
+  keep(k).then(function(r){LIB.busy=null;LIB.warn=false;DONE[k]="kept";
+      LIB.note=(r==="same"?"Already kept, unchanged: ":"Kept on this device: ")+LIB_NAMES[k]+" "+BI[k].version+" (built in). The copy before it stays one step back.";},
+    function(e){LIB.busy=null;LIB.warn=true;LIB.note=String(e&&e.message||e);})
+  .then(repaint);}
+function repaint(){try{libPaint();}catch(e){}
+  try{if(typeof lxRender==="function"&&document.getElementById("l7Bf"))lxRender();}catch(e){}
+  try{var c=$("libCard");if(c){var n=document.createElement("div");n.innerHTML=libCardHtml();if(n.firstChild){c.replaceWith(n.firstChild);libWire();}}}catch(e){}}
+
+/* ---------- the Your apps card says what Ingenium carries, and offers it where her copy differs ---------- */
+function day(d){if(!d)return "";try{return new Date(d+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});}catch(e){return d;}}
+function line(){var names=KEYS.slice().reverse().filter(function(k){return BI[k];}).map(function(k){var b=BI[k];return esc(LIB_NAMES[k]+" "+b.version)+(b.date?" ("+esc(day(b.date))+")":"");});
+  var keys=KEYS.slice().reverse().filter(function(k){var s=standing(k);return BI[k]&&(s==="newer"||s==="other");}).map(function(k){var s=standing(k);
+    return '<button class="btn small ghost" type="button" data-bi-use="'+k+'" title="'+(s==="newer"?"Your kept copy is newer; this goes back to the built-in one, and yours stays one step back":"Your kept copy is a different build; yours stays one step back")+'">Use the built-in '+esc(LIB_NAMES[k]+" "+BI[k].version)+'</button>';});
+  return '<p class="small muted lib-builtin" id="libBuiltin">Built into this Ingenium: '+names.join(" and ")+'. They are kept here on first start, checked against their fingerprints. A newer copy you add yourself always stays.</p>'
+    +(keys.length?'<div class="lx-row lib-builtin-keys">'+keys.join("")+'</div>':"");}
+/* the same, in the Your apps section of Lector's page */
+function lectorLine(busy){var wrap=document.createElement("div");wrap.className="lib-builtin-wrap";wrap.id="libBuiltin";
+  var tmp=document.createElement("div");tmp.innerHTML=line();var p=tmp.querySelector("p");if(p){p.className="l-hint lib-builtin";p.removeAttribute("id");wrap.appendChild(p);}
+  var ks=tmp.querySelectorAll("[data-bi-use]");if(ks.length){var row=document.createElement("div");row.className="l-keys";
+    [].forEach.call(ks,function(b){var k=b.getAttribute("data-bi-use"),x=document.createElement("button");x.type="button";x.className="l-btn quiet";x.textContent=b.textContent;x.title=b.title;x.setAttribute("data-bi-use",k);
+      x.onclick=function(){if(busy){ingToast("Lector is at work on a set. Pause it first.");return;}useBuiltin(k,x);};row.appendChild(x);});wrap.appendChild(row);}
+  return wrap;}
+(function wrapCard(){var oh=libCardHtml;libCardHtml=function(){var h=oh.apply(this,arguments);if(!h)return h;
+    var i=h.indexOf('<div class="lx-row">');return i>=0?h.slice(0,i)+line()+h.slice(i):h;};
+  var ow=libWire;libWire=function(){var r=ow.apply(this,arguments);
+    document.querySelectorAll("[data-bi-use]").forEach(function(b){b.onclick=function(){useBuiltin(b.getAttribute("data-bi-use"),b);};});return r;};})();
+
+/* ---------- the Forge named by its pass, as its own BUILD_INFO names it ---------- */
+(function(){var o=libVersionOf;libVersionOf=function(key,text){var m;
+  if(key==="forge"&&(m=/window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"/.exec(String(text||""))))return m[1];
+  return o.apply(this,arguments);};})();
+
+/* ---------- when: after the app is ready and the page is idle ---------- */
+function later(){var go=function(){if(LIB.busy){setTimeout(later,15000);return;}seed();};
+  if(typeof requestIdleCallback==="function")requestIdleCallback(go,{timeout:20000});else setTimeout(go,500);}
+(function start(){var tries=0;(function wait(){if(window.__ingReady===true){setTimeout(later,9000);return;}if(++tries<240)setTimeout(wait,500);})();})();
+window.IngBuiltin={lectorLine:lectorLine,meta:BI,standing:standing,seed:seed,keep:keep,unpack:unpack,use:useBuiltin,cmp:cmp,states:function(){return DONE;}};
+})();
+;try{window.__ingParts["p51"]="running";}catch(_){}
+</script>

@@ -162,6 +162,20 @@ edit('Retracted work is left out, preprints are named as such, and each source s
      '          <div><b>Peer-reviewed only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no encyclopaedias, no web pages. A journal listed in DOAJ is marked as peer review confirmed; others as journal articles whose review is not independently confirmed.</div></div></div>',
      "R115 peer-reviewed switch")
 
+# ---- R119 (17 October 2026): the Inbox, Carpe Diem's 💭; its words on the Focus page, in the guide and on the button ----
+edit('<h2 class="sec">Parked thoughts</h2></div>\n          <p class="small muted">Something popped into your head? Park it here and carry on. It waits until you are ready. The 💭 button at the side parks one from any page.</p>\n          <div class="fx-park-in"><input type="text" id="fxParkIn" placeholder="Park a thought, then press Enter" maxlength="500"></div>',
+     '<h2 class="sec">💭 The Inbox</h2></div>\n          <p class="small muted">Something popped into your head? Catch it and carry on: Ctrl and the full stop anywhere, or the 💭 at the side. It waits here until you send it where it belongs.</p>\n          <div class="fx-park-in"><input type="text" id="fxParkIn" placeholder="Catch a thought, then press Enter" maxlength="2000"></div>',
+     "R119 Focus card")
+edit('<b>Park a thought.</b> 💭 at the side keeps a stray thought for later, from any page, so it does not pull you away from what you are doing.',
+     '<b>Catch a thought.</b> Ctrl and the full stop, or the 💭 at the side, keeps a stray thought in the Inbox, from any page, so it does not pull you away from what you are doing. Sort it later: to a note, to Tabula, into steps, to the chat, to a reminder, or done.',
+     "R119 guide tip")
+edit('<div>The thought bubble parks a stray thought for later. It waits on the Focus page.</div>',
+     '<div>The thought bubble catches a stray thought (Ctrl and the full stop do the same). It waits in the Inbox, on the Focus page.</div>',
+     "R119 guide side tip")
+edit('<button class="rail-btn" id="fabPark" title="Park a thought" aria-label="Park a thought">',
+     '<button class="rail-btn" id="fabPark" title="Catch a thought" aria-label="Catch a thought">',
+     "R119 side button")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:
@@ -194,6 +208,16 @@ _apps = ""
 for _name in ("tabula", "abacus"):
     _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
+# ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
+#      each is checked here against its own size and fingerprint before it rides along ----
+import gzip as _gz, hashlib as _hl
+_bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
+for _k in ("forge", "inkwell"):
+    _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
+    _raw = _gz.decompress(_z)
+    if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
+        sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
+    _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 blob = "\n".join(open(m, encoding="utf-8").read().rstrip("\n") for m in mods) + "\n"
@@ -207,6 +231,8 @@ if "/*R118_CDPREP*/" in blob:
     blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:
     blob = blob.replace("/*R118_DARK*/null", open(os.path.join(HERE, "apps", "dark.json")).read().strip())
+if "/*R120_BUILTIN*/null" in blob:
+    blob = blob.replace("/*R120_BUILTIN*/null", json.dumps(_bi))
 if "/*R116_QUANTS*/null" in blob:
     blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:

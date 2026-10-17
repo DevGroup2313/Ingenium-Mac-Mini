@@ -29,6 +29,13 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     node rig/t_models_care.js http://127.0.0.1:8150/ingenium.html <out>       # quality tiers on the houses, the pace measured, health by model, the catalogue, 24 checks
     node rig/t_studio_care.js http://127.0.0.1:8150/ingenium.html <out>       # Blend's judge and ready-made blends, the tour's chapters, the export, the shelf, 22 checks
     node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus in their frames, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
+    node rig/t_inbox.js http://127.0.0.1:8150/ingenium.html <out>             # the Inbox, Carpe Diem's 💭 quill line in Ingenium's colours: catch, drift, sort to six places, suggestions, the Focus page, night, 27 checks
+    node rig/t_builtin.js http://127.0.0.1:8150/ingenium.html <out>           # The Forge and Inkwell carried inside: kept on first start, never over a newer copy, Lector reads a newer copy afresh, 24 checks (written for The Forge 630 and Inkwell 7.42)
+
+`build/apps/builtin/` holds the copies of The Forge and Inkwell that Ingenium carries (each page compressed, with
+`builtin.json` naming its version, date, size and SHA-256 fingerprint). To update them, run
+`python3 -I build/apps/update_builtin.py path/to/the_forge.html path/to/Inkwell.html`; the build checks each against its
+fingerprint before it rides along.
 
 `build/apps/` holds the whole Tabula and Abacus (her own single-page apps, the files Carpe Diem carries), `dark.json`
 (Carpe Diem's night dress for each) and `cd_prep.js` (Carpe Diem's own preparation of the two before it shows them: the

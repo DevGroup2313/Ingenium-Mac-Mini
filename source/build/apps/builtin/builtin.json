@@ -1,0 +1,22 @@
+{
+ "forge": {
+  "key": "forge",
+  "title": "The Forge",
+  "version": "630",
+  "build": "9s62",
+  "date": "2026-10-17",
+  "size": 12668114,
+  "sha256": "7807e618d0e4680b576776360dabd8b86385bcf7f6298b9a26bcd156f14abc85",
+  "name": "the_forge.html"
+ },
+ "inkwell": {
+  "key": "inkwell",
+  "title": "Inkwell",
+  "version": "7.42",
+  "build": "",
+  "date": "2026-10-16",
+  "size": 3059708,
+  "sha256": "ec731f500e3e5cc7bfea007f1d15fadfabbdae434851d89fac1bb58e05c1db7f",
+  "name": "Inkwell.html"
+ }
+}

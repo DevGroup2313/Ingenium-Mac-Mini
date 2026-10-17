@@ -163,13 +163,21 @@ function L7(){var s=lxState();
 var saveT=0;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(function(){try{saveState();}catch(e){}},400);}
 function kept(k){try{var m=libState().apps[k];return m&&m.ref?m:null;}catch(e){return null;}}
 function appRuns(k){return lxState().runs.filter(function(r){return r.kind==="app"&&appOf(r)===k;});}
-function runFor(k,depth){var rs=appRuns(k),meta=kept(k);
+function runFor0(k,depth){var rs=appRuns(k),meta=kept(k);
   function deep(r){return depth!=="thorough"||r.depth==="thorough";}
   function same(r){return meta&&r.sha&&r.sha===meta.sha256?1:0;}
   var done=rs.filter(function(r){return r.status==="done"&&deep(r);}).sort(function(a,b){return (same(b)-same(a))||((b.finished||b.updated||0)-(a.finished||a.updated||0));});
   if(done.length)return done[0];
   var open=rs.filter(function(r){return r.status!=="done"&&r.depth===(depth||"overview")&&(!r.sha||!meta||r.sha===meta.sha256);});
   return open[0]||null;}
+/* R120: a reading made from an earlier copy of the app, now that a newer copy is kept (one she added, or the one built
+   into Ingenium). Documents written from it would describe the app as it was, so Lector reads the new copy afresh,
+   unless she chooses to keep the earlier reading (a choice that holds only for the copy kept now). */
+/* the reading Lector goes by: the earlier copy's reading counts only when she chose to keep it */
+function runFor(k,depth){var f=runFor0(k,depth),meta=kept(k);if(f&&f.status==="done"&&meta&&f.sha&&meta.sha256&&f.sha!==meta.sha256&&!useEarlier(k))return freshFor(k,depth);return f;}
+function staleRun(k,depth){var f=runFor0(k,depth),meta=kept(k);if(!f||f.status!=="done"||!meta||!f.sha||!meta.sha256||f.sha===meta.sha256)return null;return f;}
+function useEarlier(k){var B=L7().brief,meta=kept(k);return !!(B.useEarlier&&meta&&B.useEarlier[k]===meta.sha256);}
+function freshFor(k,depth){var meta=kept(k);return appRuns(k).filter(function(r){return r.status!=="done"&&r.depth===(depth||"overview")&&(!r.sha||!meta||r.sha===meta.sha256);})[0]||null;}
 function setKey(apps,purpose){var p=purpose||"portfolio",post=p!=="portfolio"&&L7().posts[p]?L7().posts[p].id:"";return sorted(apps).join("+")+"|"+p+(post?"|"+post:"");}
 function job(){return L7().job||null;}
 var R7={running:false,parts:{},notes:{},seen:{},src:{},nl:{},ev:[],pin:null,follow:true,panel:null,live:null,doc:null,step:"",prepNote:"",docMd:{},chk:{},w:0,built:false};
@@ -262,7 +270,8 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
   ORDER.forEach(function(k){var on=B.apps.indexOf(k)>=0,meta=kept(k),run=runFor(k,B.depth);
     var b=h("button","l-app"+(meta?"":" none"));b.type="button";b.style.setProperty("--app",APPS[k].color);b.setAttribute("aria-pressed",on?"true":"false");b.setAttribute("data-k",k);
     b.appendChild(sealEl(k));b.appendChild(h("span","nm",esc(nm(k))));
-    var st=!meta?"Not added yet":run&&run.status==="done"?"Read "+lxDate(run.finished||run.updated):run?"Read in part: "+(run.done||0)+" of "+(run.total||0):"Not read yet";
+    var old=meta?staleRun(k,B.depth):null,fresh=old&&!useEarlier(k)?freshFor(k,B.depth):null;
+    var st=!meta?"Not added yet":old&&!useEarlier(k)?(fresh?"Read in part: "+(fresh.done||0)+" of "+(fresh.total||0):"Read from "+(old.version||"an earlier copy")):run&&run.status==="done"?"Read "+lxDate(run.finished||run.updated):run?"Read in part: "+(run.done||0)+" of "+(run.total||0):"Not read yet";
     b.appendChild(h("span","st",esc(st+(meta&&meta.version?" · "+meta.version:""))));
     b.onclick=function(){if(busy){ingToast("Lector is at work on a set. Pause it to change the brief.");return;}
       if(!kept(k)){ingToast(nm(k)+" is not on this device yet. Add your apps first.");return;}
@@ -276,6 +285,13 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
   var row=h("div","l-keys");row.appendChild(btn("sm"+(ORDER.filter(kept).length?"":" pri"),"＋ Add your apps",function(){try{libPickFiles();}catch(e){}}));
   if(!kept("ingenium")&&location.protocol!=="file:")row.appendChild(btn("quiet","Keep this copy of Ingenium",function(){try{libKeepSelf();}catch(e){}}));
   s1.appendChild(row);
+  /* R120: a chosen app read from an earlier copy: Lector says so, and she chooses */
+  try{B.apps.forEach(function(k){var old=staleRun(k,B.depth),meta=kept(k);if(!old||!meta)return;var ue=useEarlier(k);
+    s1.appendChild(h("p","l-hint l-stale",esc(nm(k))+(ue?" is written about from its reading of "+esc(old.version||"an earlier copy")+", as you chose. The copy kept now is "+esc(meta.version||"newer")+"."
+      :" was read from an earlier copy ("+esc(old.version||"its version was not named")+", "+esc(lxDate(old.finished||old.updated))+"). The copy kept now is "+esc(meta.version||"newer")+": Lector reads it afresh when you start, so the documents describe it as it is now.")));
+    var kr=h("div","l-keys");kr.appendChild(btn("quiet",ue?"Read "+(meta.version||"the new copy")+" afresh instead":"Keep the earlier reading",function(){if(busy)return;B.useEarlier=B.useEarlier||{};if(ue)delete B.useEarlier[k];else B.useEarlier[k]=meta.sha256;saveSoon();paintBrief();paintModel();paintTabs();paintDoc();paintMain();}));s1.appendChild(kr);});}catch(e){}
+  /* R120: what Ingenium carries inside it, and the built-in copy offered where hers differs */
+  try{if(window.IngBuiltin&&IngBuiltin.lectorLine){var bl=IngBuiltin.lectorLine(busy);if(bl)s1.appendChild(bl);}}catch(e){}
   var ln=h("p","l-libnote"+(LIB&&LIB.warn?" warn":""));ln.id="libNote";ln.setAttribute("aria-live","polite");ln.textContent=(LIB&&(LIB.busy||LIB.note))||"";ln.hidden=!(LIB&&(LIB.busy||LIB.note));s1.appendChild(ln);
   if(!ORDER.filter(kept).length)s1.appendChild(h("p","l-hint","Add your apps from the files you already have: each app's own page (.html), or the zip you install it from. Each is checked and kept on this device; nothing is sent anywhere."));
   box.appendChild(s1);
@@ -592,7 +608,9 @@ function beginDoc(){if(R7.running||LX.busy||typeof LX_PICK==="undefined"||!LX_PI
     partsRef:IngBig.newId(),notesRef:IngBig.newId(),mergeRef:IngBig.newId(),analysisRef:IngBig.newId(),writings:{}};
   Promise.all([lxPutJSON(run.partsRef,parts),lxPutJSON(run.notesRef,parts.map(function(){return "";}))]).then(function(){var s=lxState();s.runs.unshift(run);s.active=run.id;LX_PICK=null;
     L7().job={key:"doc:"+run.id,apps:[],doc:run.id,purpose:"portfolio",kinds:[],depth:"overview",modelId:run.modelId,status:"reading",at:Date.now(),made:{},err:""};saveState();R7.ev=[];paintStream();R7.doc="analysis";paintAll();if(one())setPanel("read");r7Run();});}
-function ensureRun(k,j){var f=runFor(k,j.depth);
+function ensureRun(k,j){var f=runFor(k,j.depth),old=staleRun(k,j.depth);
+  if(old&&!useEarlier(k)){var mk=kept(k);
+    if(!R7.ev.some(function(e){return e.k==="step"&&e.app===k&&e.label==="A newer copy";}))addEv({k:"step",app:k,label:"A newer copy",text:nm(k)+" was read from an earlier copy ("+(old.version||"its version was not named")+", on "+lxDate(old.finished||old.updated)+"). The copy kept now is "+(mk&&mk.version||"newer")+", so Lector reads it afresh and the documents describe it as it is now. The earlier reading stays kept."});}
   /* a reading left half-way keeps going from where it stopped, unless its parts were lost (a store cleared): then it starts again */
   if(f&&f.status!=="done")return lxJSON(f.partsRef,[]).then(function(p){if(p&&p.length)return f;
     var s=lxState();s.runs=s.runs.filter(function(r){return r.id!==f.id;});if(s.active===f.id)s.active=null;saveState();return ensureRun(k,j);});
@@ -616,7 +634,7 @@ function r7Run(){var j=job();if(!j||R7.running)return;if(LX.busy){ingToast("Lect
   var i=0,apps=j.doc?[]:j.apps;
   function nextApp(){if(LX.stop)return Promise.reject(stopErr());if(j.doc){var dr=lxRun(j.doc);return dr?readRun(dr):Promise.reject(new Error("That reading is no longer kept."));}
     if(i>=apps.length)return Promise.resolve();var k=apps[i++];
-    return ensureRun(k,j).then(function(run){if(run.status==="done"){if(!R7.ev.some(function(e){return e.k==="step"&&e.app===k;}))addEv({k:"step",app:k,label:"Read before",text:nm(k)+" was read in full on "+lxDate(run.finished||run.updated)+(run.depth==="thorough"?", every line of its code":"")+". Lector uses that reading."});return nextApp();}
+    return ensureRun(k,j).then(function(run){if(run.status==="done"){if(!R7.ev.some(function(e){return e.k==="step"&&e.app===k;}))addEv({k:"step",app:k,label:"Read before",text:nm(k)+" was read in full on "+lxDate(run.finished||run.updated)+(run.depth==="thorough"?", every line of its code":"")+". Lector uses that reading."+(staleRun(k,j.depth)?" It is the reading of an earlier copy ("+(run.version||"its version was not named")+"), as you chose.":"")});return nextApp();}
       return readRun(run).then(function(){addEv({k:"done",app:k,label:"Read in full",text:"All "+(run.total||0)+" parts of "+run.name+" are read, the notes joined and the analysis written."});paintBrief();return nextApp();});});}
   var p=j.status==="writing"?Promise.resolve():nextApp();
   p.then(function(){if(LX.stop)throw stopErr();if(j.doc)return;j.status="writing";saveState();paintAll();return writeAll(j);})
@@ -874,7 +892,7 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.cl
 /* a set left under way when the app closed waits, paused, for Go on */
 (function(){try{var j=L7().job;if(j&&(j.status==="reading"||j.status==="writing"))j.status=j.status==="writing"?"writing":"paused";}catch(e){}})();
 ORDER.forEach(function(k){if(L7().brief.apps.indexOf(k)>=0)prepare(k);});
-window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost};
+window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost};
 try{if($("page-lector").classList.contains("active")){document.body.classList.add("lx7-on");render();}}catch(e){}
 })();
 ;try{window.__ingParts["p40"]="running";}catch(_){}
