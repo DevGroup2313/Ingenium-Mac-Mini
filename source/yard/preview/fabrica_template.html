@@ -1,0 +1,603 @@
+<title>Ingenium Workshop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Officina: Ingenium as her own offline GitHub. A live preview for her approval, in Ingenium's own raised look (the
+   same keys, slabs, segments and spring as the Lector page she approved), with no glow and no pulsing (her word,
+   17 October). One frame the height of the window: her apps on the left, the work on the selected app in the middle,
+   testing and shipping on the right; one panel at a time, under tabs, on an upright tablet or a phone. */
+:root{
+  --bg:#f5f3f7; --bg-2:#efeaf4; --card:#faf8fc; --card-hi:#ffffff; --card-lo:#eee8f4;
+  --face-a:#ffffff; --face-b:#f9f7fc;
+  --ink-1:#221a2e; --ink-2:#4a4358; --ink-3:#6c6579; --hair:rgba(34,26,46,.10); --hair-2:rgba(34,26,46,.06);
+  --accent:#6a3fb5; --accent-soft:rgba(106,63,181,.12); --ring:rgba(106,63,181,.5);
+  --gold:#b88a3a; --gold-soft:rgba(202,162,74,.16); --gold-ink:#7d5d22; --ok:#2f7a55; --ok-soft:rgba(47,122,85,.12); --warn:#9a5a12; --warn-soft:rgba(184,116,46,.12);
+  --add:#1f7a4d; --add-bg:rgba(47,160,100,.10); --del:#a33a3a; --del-bg:rgba(200,70,70,.09);
+  --code-bg:#f7f5fa; --code-ink:#2a2236; --code-com:#8a8296;
+  --slab:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 rgba(40,22,68,.10),0 3px 0 rgba(40,22,68,.05),0 6px 12px rgba(40,22,68,.07),0 18px 36px rgba(40,22,68,.08);
+  --slab-hi:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 rgba(40,22,68,.11),0 4px 0 rgba(40,22,68,.05),0 9px 16px rgba(40,22,68,.09),0 24px 44px rgba(40,22,68,.10);
+  --pop:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
+  --pop-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --press:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --well:inset 0 1px 2.5px rgba(40,22,68,.08); --well-bg:rgba(34,26,46,.03);
+  --pill-sh:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1.5px 0 rgba(40,20,70,.10),0 1px 0 rgba(40,20,70,.12),0 3px 4px rgba(40,20,70,.09),0 7px 10px rgba(40,20,70,.06);
+  --pri-a:#7348be; --pri-b:#5d37a1; --pri-edge:#4b2a86; --pri-ledge:#3a2070;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pri-ledge),0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16);
+  --pri-sh-hi:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 var(--pri-ledge),0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18);
+  --pri-press:inset 0 2px 6px rgba(20,8,40,.45),0 1px 1px rgba(40,22,68,.2);
+  --spring:cubic-bezier(.34,1.35,.64,1);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --bg-2:#17121f; --card:#1c1626; --card-hi:#201a2b; --card-lo:#2a2239; --face-a:#2a2239; --face-b:#251e33;
+  --ink-1:#f3eefb; --ink-2:#d3c9e3; --ink-3:#a99cc1; --hair:rgba(205,184,240,.11); --hair-2:rgba(205,184,240,.07);
+  --accent:#b79ce6; --accent-soft:rgba(183,156,230,.16); --ring:rgba(183,156,230,.45);
+  --gold:#d8b46a; --gold-soft:rgba(216,180,106,.16); --gold-ink:#e3c58a; --ok:#7fd1a6; --ok-soft:rgba(127,209,166,.14); --warn:#e6b26a; --warn-soft:rgba(230,178,106,.14);
+  --add:#8fdcb0; --add-bg:rgba(127,209,166,.10); --del:#f0a0a0; --del-bg:rgba(240,120,120,.10);
+  --code-bg:#17121f; --code-ink:#e8e1f4; --code-com:#8a8296;
+  --slab:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
+  --slab-hi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 4px 0 rgba(0,0,0,.3),0 9px 16px rgba(0,0,0,.4),0 24px 44px rgba(0,0,0,.45);
+  --pop:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.50),0 9px 14px rgba(0,0,0,.36);
+  --pop-hi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.40);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --well:inset 0 1px 3px rgba(0,0,0,.4); --well-bg:rgba(10,6,18,.35);
+  --pill-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
+  --pri-a:#7a56c8; --pri-b:#5b3aa1; --pri-edge:#2c1956; --pri-ledge:#170b30;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--pri-ledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --pri-sh-hi:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--pri-ledge),0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --bg-2:#17121f; --card:#1c1626; --card-hi:#201a2b; --card-lo:#2a2239; --face-a:#2a2239; --face-b:#251e33;
+  --ink-1:#f3eefb; --ink-2:#d3c9e3; --ink-3:#a99cc1; --hair:rgba(205,184,240,.11); --hair-2:rgba(205,184,240,.07);
+  --accent:#b79ce6; --accent-soft:rgba(183,156,230,.16); --ring:rgba(183,156,230,.45);
+  --gold:#d8b46a; --gold-soft:rgba(216,180,106,.16); --gold-ink:#e3c58a; --ok:#7fd1a6; --ok-soft:rgba(127,209,166,.14); --warn:#e6b26a; --warn-soft:rgba(230,178,106,.14);
+  --add:#8fdcb0; --add-bg:rgba(127,209,166,.10); --del:#f0a0a0; --del-bg:rgba(240,120,120,.10);
+  --code-bg:#17121f; --code-ink:#e8e1f4; --code-com:#8a8296;
+  --slab:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
+  --slab-hi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 4px 0 rgba(0,0,0,.3),0 9px 16px rgba(0,0,0,.4),0 24px 44px rgba(0,0,0,.45);
+  --pop:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.50),0 9px 14px rgba(0,0,0,.36);
+  --pop-hi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.40);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --well:inset 0 1px 3px rgba(0,0,0,.4); --well-bg:rgba(10,6,18,.35);
+  --pill-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
+  --pri-a:#7a56c8; --pri-b:#5b3aa1; --pri-edge:#2c1956; --pri-ledge:#170b30;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--pri-ledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --pri-sh-hi:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--pri-ledge),0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4);
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink-1);font:14px/1.5 var(--sans);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 28px}
+button{font:inherit;color:inherit}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* ---------- Ingenium's keys: they lift, sink and settle with a spring; nothing glows ---------- */
+.btn,.pv-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--hair);background:linear-gradient(var(--face-a),var(--face-b));border-radius:10px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:var(--pop);color:var(--ink-1);
+  transition:transform .16s var(--spring),box-shadow .16s ease,background-color .15s,color .15s,border-color .15s,opacity .2s}
+.btn:hover:not(:disabled),.pv-btn:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.btn:active:not(:disabled),.pv-btn:active{transform:translateY(1px) scale(.985);box-shadow:var(--press);transition-duration:.06s}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.pri{background:linear-gradient(var(--pri-a),var(--pri-b));border-color:var(--pri-edge);color:#fff;box-shadow:var(--pri-sh);text-shadow:0 1px 1px rgba(30,10,60,.35)}
+.btn.pri:hover:not(:disabled){box-shadow:var(--pri-sh-hi)}
+.btn.pri:active:not(:disabled){box-shadow:var(--pri-press)}
+.btn.next{animation:pop .55s var(--spring)}
+.btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--accent);padding:3px 6px}
+.btn.quiet:hover:not(:disabled){transform:none;box-shadow:none;text-decoration:underline}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:999px}
+.seg{position:relative;display:inline-flex;gap:2px;border:1px solid var(--hair);border-radius:999px;padding:3px;background:var(--well-bg);box-shadow:var(--well);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg .thumb{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:linear-gradient(var(--pri-a),var(--pri-b));border:1px solid var(--pri-edge);box-shadow:var(--pri-sh);transition:transform .38s var(--spring),width .38s var(--spring);pointer-events:none;z-index:0}
+.seg button{position:relative;z-index:1;border:1px solid transparent;background:transparent;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-3);white-space:nowrap;transition:color .2s,transform .12s var(--spring)}
+.seg button:hover{color:var(--ink-1)}
+.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{color:#fff;text-shadow:0 1px 1px rgba(30,10,60,.3)}
+.seg button:active{transform:translateY(1px)}
+.seg .n{display:inline-block;min-width:17px;padding:0 5px;margin-left:5px;border-radius:999px;font-size:11px;line-height:17px;background:var(--gold-soft);color:var(--gold-ink)}
+.seg button[aria-selected="true"] .n{background:rgba(255,255,255,.22);color:#fff}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:linear-gradient(var(--face-a),var(--face-b));border:1px solid var(--hair);color:var(--ink-2);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;box-shadow:var(--pill-sh)}
+.chip.ok{color:var(--ok)} .chip.warn{color:var(--warn)} .chip.live{color:var(--accent);border-color:var(--ring)}
+.chip .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ring);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:600;white-space:nowrap;color:var(--ink-1);background:var(--card-hi);box-shadow:var(--pill-sh)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:#3aa46c}
+.sw{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);cursor:pointer;user-select:none}
+.sw input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:var(--well-bg);border:1px solid var(--hair);box-shadow:var(--well);position:relative;cursor:pointer;margin:0;flex:0 0 auto;transition:background .25s}
+.sw input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pop);transition:transform .35s var(--spring)}
+.sw input:checked{background:linear-gradient(var(--pri-a),var(--pri-b))}
+.sw input:checked::after{transform:translateX(16px)}
+@keyframes rise3{from{opacity:0;transform:perspective(1400px) rotateX(6deg) translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.015)}100%{transform:none}}
+@keyframes sway{0%,100%{transform:perspective(380px) rotateY(-16deg) rotateX(4deg)}50%{transform:perspective(380px) rotateY(16deg) rotateX(-4deg)}}
+@keyframes fill{from{width:0}}
+
+/* ---------- the preview's own bar (not part of Ingenium) ---------- */
+.pv{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);padding:12px 0;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;border-bottom:1px solid var(--hair)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--bg)}
+.pv-name{display:flex;flex-direction:column;min-width:0;flex:1 1 260px}
+.pv-name b{font:600 16px/1.2 var(--serif);letter-spacing:.04em}
+.pv-name span{font-size:12px;color:var(--ink-3)}
+.pv-ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;min-width:0;max-width:100%}
+.pv-grp{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.pv-grp > label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.pv-btn{font-size:12.5px;padding:6px 12px;border-radius:999px}
+
+/* ---------- the device ---------- */
+.stage{display:flex;justify-content:center;padding-top:18px}
+.dev{width:100%;max-width:1680px;height:max(660px,calc(100vh - 150px));border-radius:18px;overflow:hidden;border:1px solid var(--hair);background:var(--bg);box-shadow:var(--slab);display:flex;flex-direction:column;transition:max-width .35s ease}
+.dev[data-w="laptop"]{max-width:1100px;height:720px}
+.dev[data-w="fire"]{max-width:800px;height:1060px;border-radius:28px;border-width:10px;border-color:var(--card-lo)}
+.dev[data-w="phone"]{max-width:390px;height:800px;border-radius:38px;border-width:10px;border-color:var(--card-lo)}
+.ib{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--hair-2);background:var(--card-hi);flex:0 0 auto}
+.ib > img{width:30px;height:30px;animation:sway 7s ease-in-out infinite}
+.ib b{font:600 13px/1 var(--serif);letter-spacing:.3em}
+.ib .pills{margin-left:auto;display:flex;gap:6px;min-width:0;overflow:hidden;padding:4px 2px 8px}
+
+/* ---------- Officina ---------- */
+.of{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:14px 18px 16px;gap:12px}
+.of-head{display:flex;align-items:flex-end;gap:12px 18px;flex-wrap:wrap}
+.of-head h1{font:600 25px/1.1 var(--serif);margin:0;letter-spacing:.045em}
+.of-head p{margin:4px 0 0;color:var(--ink-2);font-size:14px;max-width:64ch}
+.steps{display:flex;gap:6px;list-style:none;margin:0 0 0 auto;padding:4px 2px 8px;align-items:center}
+.steps li{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink-3);padding:4px 11px 4px 5px;border-radius:999px;border:1px solid var(--hair);background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pill-sh);height:30px;white-space:nowrap;transition:color .3s,border-color .3s,transform .3s var(--spring),box-shadow .3s}
+.steps li i{font-style:normal;width:19px;height:19px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;background:var(--well-bg);box-shadow:var(--well)}
+.steps li.done{color:var(--ink-2)} .steps li.done i{background:var(--ok-soft);color:var(--ok);box-shadow:none}
+.steps li.now{color:var(--accent);font-weight:700;border-color:var(--ring);transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.steps li.now i{background:linear-gradient(var(--pri-a),var(--pri-b));color:#fff;box-shadow:0 1px 0 var(--pri-ledge),0 2px 4px rgba(40,22,68,.25)}
+.steps .sep{width:10px;height:2px;border-radius:2px;background:var(--hair);padding:0;border:0;box-shadow:none}
+.tabs{display:none}
+.panels{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:290px minmax(0,1.25fr) minmax(300px,1fr);gap:16px}
+.pn{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--card-hi);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--slab);animation:rise3 .6s var(--spring) backwards;transition:transform .4s var(--spring),box-shadow .4s ease;transform-origin:50% 100%}
+@media (hover:hover){.pn:hover{transform:translateY(-2px);box-shadow:var(--slab-hi)}}
+.pn:nth-child(2){animation-delay:.06s}.pn:nth-child(3){animation-delay:.12s}
+.pn-h{display:flex;align-items:center;gap:9px;padding:11px 14px 10px;border-bottom:1px solid var(--hair-2);flex:0 0 auto;min-height:52px;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.pn-h h2{font:600 15px/1 var(--serif);letter-spacing:.06em;color:var(--ink-1);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pn-h .chip{margin-left:auto}
+.pn-b{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none}
+.pn-b::-webkit-scrollbar{display:none}
+.pn-f{flex:0 0 auto;border-top:1px solid var(--hair-2);padding:11px 14px 13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(var(--face-b),var(--face-a))}
+.sec{padding:13px 14px 12px;border-bottom:1px solid var(--hair-2)}
+.sec:last-child{border-bottom:0}
+.sec h3{font:600 14px/1.3 var(--serif);letter-spacing:.03em;margin:0 0 10px;color:var(--ink-1);display:flex;align-items:center;gap:8px}
+.sec h3 .chip{margin-left:auto;font-family:var(--sans)}
+.hint{font-size:12.5px;color:var(--ink-3);margin:8px 0 0;line-height:1.5}
+
+/* the seals: each app's own seal in its own layers, at depth, swaying as on Lector's page; they turn toward the pointer,
+   lift, and sink when pressed; by night each app's own night seal */
+.ls{position:relative;display:inline-block;width:var(--S,56px);height:var(--S,56px);perspective:calc(var(--S,56px) * 4);--rx:0deg;--ry:0deg;--lift:0px;--sc:1;flex:0 0 auto}
+.ls-tilt{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--sc));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.ls-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:lsSway 7s ease-in-out infinite}
+.ls-l{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;pointer-events:none;backface-visibility:hidden;transform:translateZ(calc(var(--S,56px) * var(--z))) scale(calc(1 - var(--z) / 4))}
+.ls-l.side{transform:translateZ(calc(var(--S,56px) * -.03)) translateY(2.5%) scale(1.0075)}
+.ls-cast{position:absolute;left:14%;right:14%;bottom:-9%;height:14%;border-radius:50%;display:block;background:radial-gradient(closest-side,rgba(42,20,80,.26),rgba(42,20,80,0));filter:blur(1.5px);transform:translateZ(calc(var(--S,56px) * -.08))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ls-cast{background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0))}}
+:root[data-theme="dark"] .ls-cast{background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0))}
+@keyframes lsSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
+.ls.hov{--lift:calc(var(--S,56px) * -.06);--sc:1.04}
+.ls.down{--lift:calc(var(--S,56px) * .02);--sc:.97}
+.ls.new{border-radius:50%;border:1.5px dashed var(--ring);display:inline-grid;place-items:center;color:var(--accent);font:600 calc(var(--S,56px) * .38)/1 var(--serif)}
+.ls.new span{display:block;animation:lsSway 7s ease-in-out infinite}
+
+/* her apps: Lector's tiles, two by two; the chosen one raised, with its tick */
+.repos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 14px}
+.repo{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 6px 10px;border:1px solid var(--hair);border-radius:12px;background:linear-gradient(var(--face-a),var(--face-b));cursor:pointer;text-align:center;box-shadow:var(--pop);overflow:hidden;min-width:0;
+  transition:transform .18s var(--spring),box-shadow .18s,border-color .2s;animation:rise .45s var(--spring) backwards}
+.repo:nth-child(2){animation-delay:.05s}.repo:nth-child(3){animation-delay:.1s}.repo:nth-child(4){animation-delay:.15s}.repo:nth-child(5){animation-delay:.2s}
+.repo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--app,var(--accent));opacity:.35;transition:opacity .25s}
+.repo:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.repo:active{transform:translateY(1px) scale(.985);box-shadow:var(--press);transition-duration:.06s}
+.repo[aria-pressed="true"]{border-color:var(--ring);box-shadow:var(--pop-hi),inset 0 0 0 1px var(--ring);transform:translateY(-3px)}
+.repo[aria-pressed="true"]::before{opacity:1}
+.repo[aria-pressed="true"]::after{content:"✓";position:absolute;top:6px;right:8px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;color:#fff;font-weight:700;background:linear-gradient(var(--pri-a),var(--pri-b));box-shadow:0 1px 0 var(--pri-ledge);animation:pop .4s var(--spring)}
+.repo .ls{--S:56px}
+.repo:not([aria-pressed="true"]) .ls{filter:saturate(.8)}
+.repo .nm{font:600 13px/1.2 var(--serif);color:var(--ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
+.repo .nm em{font:500 11.5px var(--sans);font-style:normal;color:var(--ink-3)}
+.repo[aria-pressed="true"] .nm{color:var(--ink-1)}
+.repo .stl{font-size:11px;color:var(--ink-3);line-height:1.3;max-width:100%;padding:0 6px;display:flex;align-items:center;gap:5px;justify-content:center}
+.repo .stl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.repo .st{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+.repo .st.changed{background:var(--gold)} .repo .st.tested{background:var(--accent)}
+.repo.wide{grid-column:1 / -1;flex-direction:row;justify-content:center;gap:12px;padding:10px 12px}
+.repo.wide .ls{--S:42px}
+.repo.wide .tx{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+.dev[data-w="fire"] .repos,.dev[data-w="phone"] .repos{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+
+/* the work: a branch, the views, the changes */
+.pn-h .ls{--S:34px}
+.branch{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--hair);border-radius:999px;padding:3px 10px 3px 8px;font-size:12px;font-weight:600;color:var(--ink-2);background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pill-sh);cursor:pointer;transition:transform .16s var(--spring)}
+.branch:hover{transform:translateY(-1px)}
+.branch svg{width:13px;height:13px}
+.views{padding:10px 12px 0;flex:0 0 auto}
+.files{padding:10px 12px 0;display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+.frow{display:flex;align-items:center;gap:9px;padding:7px 10px;text-align:left;width:100%;border-radius:10px;border:1px solid var(--hair-2);background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pill-sh);cursor:pointer;transition:transform .16s var(--spring),box-shadow .16s,border-color .2s;font-size:13px}
+.frow:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.frow[aria-pressed="true"]{border-color:var(--ring);box-shadow:var(--pop-hi),inset 0 0 0 1px var(--ring)}
+.frow .p{flex:1 1 auto;min-width:0;font-family:var(--mono);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frow .k{flex:0 0 auto;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--gold-soft);color:var(--gold-ink)}
+.frow .k.added{background:var(--add-bg);color:var(--add)} .frow .k.moved{background:var(--accent-soft);color:var(--accent)}
+.frow .c{flex:0 0 auto;font:600 11.5px/1 var(--mono)}
+.frow .c .a{color:var(--add)} .frow .c .r{color:var(--del)}
+.diff{margin:10px 12px 12px;border:1px solid var(--hair);border-radius:12px;background:var(--code-bg);box-shadow:var(--well);overflow:hidden;display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+.diff-h{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:12px;color:var(--ink-3);border-bottom:1px solid var(--hair-2);flex-wrap:wrap}
+.diff-h b{color:var(--ink-1);font-weight:600;font-family:var(--mono);font-size:12px}
+.diff-h .btn{margin-left:auto}
+.dcode{margin:0;padding:6px 0 10px;font:12px/1.6 var(--mono);color:var(--code-ink);overflow:auto;flex:1 1 0;min-height:120px;scrollbar-width:none}
+.dcode::-webkit-scrollbar{display:none}
+.dl{display:flex;white-space:pre;padding-right:14px}
+.dl i{flex:0 0 auto;width:52px;text-align:right;padding-right:8px;color:var(--code-com);font-style:normal;user-select:none;font-variant-numeric:tabular-nums}
+.dl s{flex:0 0 auto;width:16px;text-decoration:none;color:var(--code-com);user-select:none}
+.dl.add{background:var(--add-bg)} .dl.add s{color:var(--add)}
+.dl.del{background:var(--del-bg)} .dl.del s{color:var(--del)}
+.dl.hunk{color:var(--accent);background:var(--accent-soft);font-family:var(--sans);font-size:11.5px;font-weight:600;padding:3px 12px;margin:6px 0 2px}
+.work{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+.keep{display:flex;flex-direction:column;gap:8px;width:100%}
+.keep textarea{width:100%;min-height:58px;resize:vertical;border-radius:10px;border:1px solid var(--hair);background:var(--well-bg);box-shadow:var(--well);color:var(--ink-1);font:13.5px/1.45 var(--sans);padding:8px 11px}
+.keep .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.keep .row .btn.pri{margin-left:auto}
+.empty{padding:22px 16px;color:var(--ink-2);font-size:13.5px;line-height:1.6;animation:rise .4s var(--spring)}
+.empty b{display:block;font:600 17px/1.3 var(--serif);color:var(--ink-1);margin-bottom:6px;letter-spacing:.02em}
+
+/* files */
+.tree{padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:2px}
+.node{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:8px;cursor:pointer;transition:background .15s,transform .16s var(--spring)}
+.node:hover{background:var(--accent-soft);transform:translateX(2px)}
+.node[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.node .ic{width:16px;text-align:center;color:var(--ink-3);flex:0 0 auto}
+.node .nm{font-family:var(--mono);font-size:12.5px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.node .sz{font-size:11.5px;color:var(--ink-3);flex:0 0 auto;font-variant-numeric:tabular-nums}
+
+/* history */
+.hist{padding:12px 12px 16px 26px;position:relative;display:flex;flex-direction:column;gap:10px}
+.hist::before{content:"";position:absolute;left:15px;top:18px;bottom:18px;width:2px;border-radius:2px;background:var(--hair)}
+.cm{position:relative;border:1px solid var(--hair);border-radius:12px;padding:9px 12px 8px;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pop);cursor:pointer;animation:rise .4s var(--spring) backwards;transition:transform .18s var(--spring),box-shadow .18s,border-color .2s}
+.cm::before{content:"";position:absolute;left:-16px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--card-hi);border:2px solid var(--accent)}
+.cm.merge::before{border-color:var(--gold)}
+.cm:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.cm[aria-expanded="true"]{border-color:var(--ring);box-shadow:var(--pop-hi),inset 0 0 0 1px var(--ring)}
+.cm b{font:600 13.5px/1.35 var(--sans);display:block}
+.cm .meta{display:flex;gap:6px 9px;align-items:center;flex-wrap:wrap;margin-top:3px;font-size:11.5px;color:var(--ink-3)}
+.cm .id{font-family:var(--mono);font-size:11px;padding:0 6px;border-radius:5px;background:var(--well-bg);box-shadow:var(--well)}
+.tag{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--gold-soft);color:var(--gold-ink);border:1px solid rgba(184,138,58,.3)}
+.cm .more{display:none;margin-top:8px;border-top:1px solid var(--hair-2);padding-top:8px}
+.cm[aria-expanded="true"] .more{display:block}
+.cm .more ul{margin:0 0 8px;padding-left:18px;font-size:12.5px;color:var(--ink-2)}
+.cm .more ul li{font-family:var(--mono);font-size:12px}
+.cm .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ideas */
+.ideas{padding:12px;display:flex;flex-direction:column;gap:10px}
+.idea{border:1px solid var(--hair);border-radius:12px;padding:11px 13px;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pop);transition:transform .18s var(--spring),box-shadow .18s;animation:rise .4s var(--spring) backwards}
+.idea:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.idea.on{border-color:var(--ring)}
+.idea b{font:600 14px/1.3 var(--serif);display:flex;align-items:center;gap:8px}
+.idea p{margin:4px 0 9px;font-size:12.5px;color:var(--ink-2)}
+.idea .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* test and ship */
+.checks{display:flex;flex-direction:column;gap:7px}
+.ck{display:flex;align-items:flex-start;gap:10px;font-size:13px;padding:2px 0}
+.ck .m{flex:0 0 auto;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--well-bg);box-shadow:var(--well);color:var(--ink-3);transition:background .3s,color .3s,transform .3s var(--spring)}
+.ck.run .m{color:var(--accent);background:var(--accent-soft);box-shadow:none}
+.ck.ok .m{background:var(--ok-soft);color:var(--ok);box-shadow:none;transform:scale(1.06)}
+.ck.warn .m{background:var(--warn-soft);color:var(--warn);box-shadow:none}
+.ck small{display:block;font-size:12px;color:var(--ink-3)}
+.targets{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.tg{position:relative;display:flex;flex-direction:column;gap:5px;padding:10px 11px 10px;border:1px solid var(--hair);border-radius:12px;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pop);transition:transform .18s var(--spring),box-shadow .18s,border-color .2s;min-width:0}
+.tg:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.tg .top{display:flex;align-items:center;gap:8px}
+.tg svg{width:20px;height:20px;flex:0 0 auto;color:var(--accent)}
+.tg b{font:600 13px/1.25 var(--sans);min-width:0}
+.tg small{font-size:11.5px;color:var(--ink-3);line-height:1.35}
+.tg .bar{height:6px;border-radius:999px;background:var(--well-bg);box-shadow:var(--well);overflow:hidden;margin-top:2px}
+.tg .bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--pri-a),var(--pri-b));transition:width .6s var(--spring)}
+.tg .foot{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap}
+.tg .foot .chip{font-size:11px;padding:2px 8px}
+.tg.done{border-color:rgba(47,122,85,.35)}
+.copies{display:flex;flex-direction:column;gap:7px}
+.cp{display:flex;align-items:center;gap:10px;font-size:13px;padding:7px 10px;border-radius:10px;border:1px solid var(--hair-2);background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pill-sh);transition:transform .16s var(--spring),box-shadow .16s}
+.cp:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.cp .t{flex:1 1 auto;min-width:0}
+.cp small{display:block;font-size:11.5px;color:var(--ink-3)}
+
+/* a sheet over the page: bringing an app in, running one */
+.sheet-wrap{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:rgba(17,13,24,.35);animation:rise .2s ease;padding:14px}
+.sheet{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--card-hi);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--slab-hi);padding:16px 18px 16px;animation:rise3 .45s var(--spring);scrollbar-width:none}
+.sheet h3{font:600 18px/1.25 var(--serif);margin:0 0 4px;letter-spacing:.02em}
+.sheet > p{margin:0 0 12px;color:var(--ink-2);font-size:13.5px}
+.opt{display:flex;gap:11px;align-items:flex-start;padding:10px 12px;border:1px solid var(--hair);border-radius:12px;background:linear-gradient(var(--face-a),var(--face-b));box-shadow:var(--pop);margin-bottom:9px;cursor:pointer;width:100%;text-align:left;transition:transform .16s var(--spring),box-shadow .16s}
+.opt:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.opt .ic{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-weight:700}
+.opt b{display:block;font-size:13.5px}
+.opt small{display:block;font-size:12px;color:var(--ink-3)}
+.sheet .end{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.runframe{margin:6px auto 12px;width:220px;height:300px;border-radius:22px;border:8px solid var(--card-lo);background:linear-gradient(#ffffff,#f3f2ee);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-shadow:var(--slab);color:#1d1d1f;text-align:center}
+.runframe .ls{--S:76px}
+.runframe b{font:700 19px/1.2 Georgia,serif}
+.runframe small{font-size:11px;color:#1b6b93;letter-spacing:.2em;font-weight:700}
+.toast{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:25;background:var(--card-hi);border:1px solid var(--ring);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;box-shadow:var(--pop-hi);animation:rise .3s var(--spring);max-width:calc(100% - 24px);text-align:center}
+
+/* smaller frames: one panel at a time, chosen by tabs (her Fire tablet upright, her iPhone) */
+.dev[data-w="fire"] .tabs,.dev[data-w="phone"] .tabs{display:flex;position:relative}
+.dev[data-w="fire"] .tabs button,.dev[data-w="phone"] .tabs button{flex:1 1 0;justify-content:center}
+.dev[data-w="fire"] .panels,.dev[data-w="phone"] .panels{grid-template-columns:minmax(0,1fr)}
+.dev[data-w="fire"] .pn,.dev[data-w="phone"] .pn{display:none}
+.dev[data-w="fire"] .pn.show,.dev[data-w="phone"] .pn.show{display:flex}
+.dev[data-w="fire"] .of-head p,.dev[data-w="phone"] .of-head p{display:none}
+.dev[data-w="fire"] .steps li span,.dev[data-w="phone"] .steps li span{display:none}
+.dev[data-w="fire"] .steps li,.dev[data-w="phone"] .steps li{padding:4px 5px}
+.dev[data-w="fire"] .steps li.now,.dev[data-w="phone"] .steps li.now{padding:4px 11px 4px 5px}
+.dev[data-w="fire"] .steps li.now span,.dev[data-w="phone"] .steps li.now span{display:inline}
+.dev[data-w="phone"] .of{padding:10px 10px 12px}
+.dev[data-w="phone"] .of-head h1{font-size:22px}
+.dev[data-w="phone"] .steps{margin-left:0}
+.dev[data-w="phone"] .ib .pills .pill:not(:first-child){display:none}
+.dev[data-w="phone"] #pWork .pn-h{flex-wrap:wrap;row-gap:6px}
+.dev[data-w="phone"] #pWork .pn-h h2{flex:1 1 auto;min-width:0}
+.dev[data-w="phone"] #workChip{order:5;margin-left:0}
+.dev[data-w="phone"] #runBtn{order:6;margin-left:auto!important}
+.dev[data-w="phone"] .keep .hint{display:none}
+.dev[data-w="phone"] .views .seg button{padding:5px 9px}
+.dev[data-w="laptop"] .panels{grid-template-columns:250px minmax(0,1.2fr) minmax(270px,1fr)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- below the preview: what she asked for, and where it is ---------- */
+.asked{max-width:1100px;margin:30px auto 0;display:flex;flex-direction:column;gap:10px}
+.asked h2{font:600 19px/1.25 var(--serif);letter-spacing:.04em;margin:0}
+.asked .lead{margin:0 0 4px;color:var(--ink-2);max-width:72ch}
+.ask-it{display:flex;gap:12px;align-items:flex-start;background:var(--card-hi);border:1px solid var(--hair);border-radius:12px;padding:11px 14px;box-shadow:var(--pill-sh)}
+.ask-it .k{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ok-soft);color:var(--ok);font-weight:700;font-size:13px}
+.ask-it .k.next{background:var(--accent-soft);color:var(--accent)}
+.ask-it q{display:block;font:italic 14.5px/1.45 var(--serif);color:var(--ink-1)}
+.ask-it em{display:block;font-style:normal;color:var(--ink-2);font-size:13.5px;margin-top:3px}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.names button{border:1px solid var(--hair);background:linear-gradient(var(--face-a),var(--face-b));border-radius:999px;padding:6px 13px;font:600 13px/1 var(--serif);letter-spacing:.04em;cursor:pointer;box-shadow:var(--pop);color:var(--ink-2);transition:transform .16s var(--spring),box-shadow .16s}
+.names button:hover{transform:translateY(-2px);box-shadow:var(--pop-hi)}
+.names button[aria-pressed="true"]{background:linear-gradient(var(--pri-a),var(--pri-b));border-color:var(--pri-edge);color:#fff;box-shadow:var(--pri-sh)}
+</style>
+
+<div class="pv" role="region" aria-label="Preview controls">
+  <div class="pv-name"><b>Fabrica · a preview for your approval</b><span>Nothing here changes Ingenium. Press anything: keep a version, test it, ship it.</span></div>
+  <div class="pv-ctl">
+    <div class="pv-grp"><label>Screen</label><div class="seg" id="pvW"><button data-v="mac" aria-pressed="true">Mac mini</button><button data-v="laptop">MacBook</button><button data-v="fire">Fire upright</button><button data-v="phone">iPhone</button></div></div>
+    <div class="pv-grp"><label>Look</label><div class="seg" id="pvTheme"><button data-v="light" aria-pressed="true">Day</button><button data-v="dark">Night</button></div></div>
+    <button class="pv-btn" id="pvReset" type="button">Start again</button>
+  </div>
+</div>
+
+<div class="stage"><div class="dev" id="dev" data-w="mac" style="position:relative">
+  <div class="ib"><img id="ibSeal" alt=""><b>INGENIUM</b>
+    <div class="pills"><span class="pill"><span class="dot"></span>At the desk</span><span class="pill"><span class="dot"></span>Qwen3.5 9B · Faber</span><span class="pill" id="ibName">Fabrica</span></div></div>
+  <div class="of" id="of">
+    <div class="of-head">
+      <div><h1 id="pageName">Fabrica</h1><p>Your own GitHub, on this device: each of your apps kept with every version, changed, tested and shipped to every device from here. GitHub is there only when you want it.</p></div>
+      <ol class="steps" id="steps" aria-label="Where this app is">
+        <li data-s="change"><i>1</i><span>Change</span></li><li class="sep" aria-hidden="true"></li>
+        <li data-s="keep"><i>2</i><span>Keep</span></li><li class="sep" aria-hidden="true"></li>
+        <li data-s="test"><i>3</i><span>Test</span></li><li class="sep" aria-hidden="true"></li>
+        <li data-s="ship"><i>4</i><span>Ship</span></li>
+      </ol>
+    </div>
+    <div class="seg tabs" id="tabs" role="tablist" aria-label="Fabrica's panels"><span class="thumb"></span>
+      <button role="tab" data-p="apps">Your apps</button><button role="tab" data-p="work" aria-selected="true">The work</button><button role="tab" data-p="ship">Test and ship</button></div>
+    <div class="panels" id="panels">
+      <section class="pn" id="pApps" aria-label="Your apps">
+        <div class="pn-h"><h2>Your apps</h2><span class="chip" id="appsChip">5 kept here</span></div>
+        <div class="pn-b"><div class="repos" id="repos"></div>
+          <div class="sec" style="border-top:1px solid var(--hair-2)"><p class="hint" style="margin:0">Each app is a real git repository. Any git, and GitHub, opens what is kept here, and nothing it holds ever leaves this device unless you send it.</p></div></div>
+        <div class="pn-f"><button class="btn" id="newBtn" type="button">＋ New app</button><button class="btn" id="bringBtn" type="button">Bring one in</button></div>
+      </section>
+      <section class="pn show" id="pWork" aria-label="The work">
+        <div class="pn-h"><span class="ls" id="whSeal"></span><h2 id="whName"></h2><button class="branch" id="branchBtn" type="button" title="Your ideas: each one is a branch"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.8"/><circle cx="4" cy="12.5" r="1.8"/><circle cx="12" cy="6" r="1.8"/><path d="M4 5.3v5.4M12 7.8c0 2.4-3 2.6-6.6 3.6"/></svg><span id="branchName">main</span></button><span class="chip" id="workChip"></span><button class="btn sm" id="runBtn" type="button" style="margin-left:6px">Run ▸</button></div>
+        <div class="views"><div class="seg" id="views" role="tablist" aria-label="The work on this app"><span class="thumb"></span><button role="tab" data-v="changes" aria-selected="true">Changes<span class="n" id="nChanges"></span></button><button role="tab" data-v="files">Files</button><button role="tab" data-v="history">History</button><button role="tab" data-v="ideas">Ideas</button></div></div>
+        <div class="work" id="work"></div>
+        <div class="pn-f" id="workFoot"></div>
+      </section>
+      <section class="pn" id="pShip" aria-label="Test and ship">
+        <div class="pn-h"><h2>Test and ship</h2><span class="chip" id="shipChip"></span></div>
+        <div class="pn-b">
+          <div class="sec"><h3>Test this version <span class="chip" id="testChip">Not tested yet</span></h3><div class="checks" id="checks"></div>
+            <div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap"><button class="btn" id="testBtn" type="button">Test this version</button></div></div>
+          <div class="sec"><h3>Ship to your devices <span class="chip" id="shipState">Ready to make</span></h3><div class="targets" id="targets"></div>
+            <p class="hint">Made here, from the version you kept: no compiler and no connection. Each package is named with its build number and kept beside its version, so an older one is always there.</p></div>
+          <div class="sec"><h3>Copies, and GitHub</h3><div class="copies" id="copies"></div></div>
+        </div>
+        <div class="pn-f"><button class="btn pri" id="shipBtn" type="button" style="flex:1 1 auto">Make them all</button></div>
+      </section>
+    </div>
+  </div>
+</div></div>
+
+<section class="asked" aria-label="Your requests in this design">
+  <h2>What you asked for, and where it is</h2>
+  <p class="lead">Each line is your own wording, then where this design answers it. The apps are yours; the changes and versions shown are examples drawn from their real files.</p>
+  <div id="askList"></div>
+  <h2 style="margin-top:14px">Its name</h2>
+  <p class="lead">Like Lector, Tabula and Abacus, a Latin name for what it does. Choose one, or tell me your own.</p>
+  <div class="names" id="names"><button data-n="Officina" aria-pressed="true">Officina · the workshop</button><button data-n="Fabrica">Fabrica · where things are made</button><button data-n="Scriptorium">Scriptorium · where works are kept and copied</button><button data-n="Repositories">Repositories · plainly</button></div>
+</section>
+
+<script>
+var SEALS=__SEALS__;
+var LAYERS=__LAYERS__;
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+function h(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+var dark=false;
+function night(){return document.documentElement.getAttribute("data-theme")==="dark"||(!document.documentElement.getAttribute("data-theme")&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);}
+function sealSrc(k){var n=night();return SEALS[k+(n?"N":"")]||SEALS[k];}
+var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
+/* Lector's own seal: the app's layers at their depths, with a cast shadow, swaying; by night the app's night layers */
+function sealEl(k,size){var root=h("span","ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
+  var L=LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key];
+  if(!ls){root.className="ls new";var st=h("span",null,"✦");root.appendChild(st);return root;}
+  var tilt=h("span","ls-tilt"),idle=h("span","ls-idle");idle.style.animationDelay=(-(DELAY[k]||0))+"s";
+  idle.appendChild(h("i","ls-cast"));
+  ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
+  tilt.appendChild(idle);root.appendChild(tilt);return root;}
+
+/* ---------- her apps, each a repository (example changes, from their real files) ---------- */
+var D={};
+function fresh(){D={sel:"cd",view:"changes",file:0,toast:null,sheet:null,repos:{
+  cd:{name:"Carpe Diem",color:"#1B6B93",ver:"1051",branch:"main",ideas:[{n:"main",d:"Where Carpe Diem ships from. Every package is made from here.",on:true},{n:"autumn-room",d:"Your autumn room for the magazine, 2 versions ahead of main.",ahead:2}],
+    changes:[{p:"index.html",k:"changed",a:14,r:3,diff:[["h","the sky key on the Today page, around line 41,208"],[" ",41206,'<div class="cd-sky" role="group" aria-label="Today feels">'],["-",41207,'  <button class="cd-sky-btn" data-sky="sunny">☀️ Sunny</button>'],["+",41207,'  <button class="cd-sky-btn" data-sky="sunny" aria-pressed="false">☀️ Sunny</button>'],["+",41208,'  <button class="cd-sky-btn" data-sky="misty" aria-pressed="false">🌫️ Misty</button>'],[" ",41209,'  <button class="cd-sky-btn" data-sky="windy">🍃 Windy</button>'],["h","the colour of the sky keys, around line 2,914"],[" ",2913,"  --accent: #1B6B93;"],["-",2914,"  --sky-key: rgba(27,107,147,.10);"],["+",2914,"  --sky-key: rgba(27,107,147,.14);"],["+",2915,"  --sky-key-edge: rgba(27,107,147,.32);"],[" ",2916,"  --gold-line: #b88a3a;"]]},
+      {p:"sw.js",k:"changed",a:1,r:1,diff:[["h","the name of the offline copy"],[" ",3,"// Carpe Diem keeps itself for when there is no connection"],["-",4,"const CACHE = 'carpe-diem-1051';"],["+",4,"const CACHE = 'carpe-diem-1052';"]]},
+      {p:"icons/sky-misty.svg",k:"added",a:9,r:0,diff:[["h","a new picture"],["+",1,'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'],["+",2,'  <path d="M4 10h16M3 14h18M6 18h12" stroke="#1B6B93"/>'],["+",3,"</svg>"]]}],
+    history:[{t:"The magazine's reading room, by night",w:"Yesterday, 22:41",id:"7c41e2a",tag:"v1051",files:["index.html","sw.js"]},{t:"Bring in autumn-room",w:"16 Oct, 18:02",id:"e19b0c3",merge:true,files:["index.html"]},{t:"The door's seal sways in Calm",w:"16 Oct, 09:15",id:"3a8f611",files:["index.html"]},{t:"Brought in from Carpe Diem 1050 (your app library)",w:"15 Oct, 20:20",id:"b02d9fe",tag:"v1050",files:["index.html","sw.js","manifest.webmanifest","icons/…  (24 files)"]}],
+    files:[["index.html","15.3 MB"],["sw.js","4 KB"],["manifest.webmanifest","1 KB"],["icons/","24 files"],["desktop/carpe_diem_app.py","96 KB"],["android/","38 files"],["ingenium.build.json","1 KB"]],kept:false,tested:false,shipped:false},
+  forge:{name:"The Forge",color:"#17577A",ver:"628",branch:"main",ideas:[{n:"main",d:"Where The Forge ships from.",on:true}],changes:[],history:[{t:"Editor: the live preview under the editor on a tablet",w:"Today, 01:12",id:"91d0a7e",tag:"v628",files:["the_forge.html"]},{t:"Brought in from The Forge 9s61 (its kit)",w:"15 Oct, 20:25",id:"5f2e88b",files:["the_forge.html","fire/…  (41 files)"]}],
+    files:[["the_forge.html","12.2 MB"],["fire/","41 files"],["mac/","12 files"],["windows/","9 files"],["ingenium.build.json","1 KB"]],kept:true,tested:true,shipped:false},
+  ingenium:{name:"Ingenium",color:"#6A3FB5",ver:"4.0",branch:"main",ideas:[{n:"main",d:"Where Ingenium ships from: built from its sources (source/build).",on:true},{n:"officina",d:"This page, being made. 6 versions ahead of main.",ahead:6}],changes:[],history:[{t:"Each app's documents in its own design, by day and by night",w:"Today, 03:58",id:"9daae1e",tag:"stage 2i",files:["ingenium.html","source/build/modules/r108.js"]},{t:"Lector as she approved it, on every device",w:"16 Oct, 22:58",id:"c1120cf",tag:"stage 2h",files:["ingenium.html"]}],
+    files:[["ingenium.html","16.8 MB"],["source/build/","modules, edits, seals"],["ingenium_app.py","208 KB"],["ingenium_android_project/","Fire and Android"],["ingenium_ios/","iPhone and iPad"],["ingenium.build.json","1 KB"]],kept:true,tested:true,shipped:true},
+  inkwell:{name:"Inkwell",color:"#1F4F68",ver:"7.41",branch:"main",ideas:[{n:"main",d:"Where Inkwell ships from.",on:true}],changes:[{p:"Inkwell.html",k:"changed",a:6,r:2,diff:[["h","the dark favicon, around line 112"],[" ",111,'<link rel="icon" href="favicon.svg">'],["-",112,'<link rel="icon" media="(prefers-color-scheme: dark)" href="favicon.svg">'],["+",112,'<link rel="icon" media="(prefers-color-scheme: dark)" href="favicon-night.svg">']]},{p:"favicon-night.svg",k:"added",a:4,r:0,diff:[["h","a new picture"],["+",1,'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'],["+",2,'  <circle cx="32" cy="32" r="30" fill="#101821" stroke="#c9a964"/>'],["+",3,"</svg>"]]}],
+    history:[{t:"Brought in from Inkwell 7.41 (its zip, with vendor/)",w:"15 Oct, 20:31",id:"0aa7c55",tag:"v7.41",files:["Inkwell.html","vendor/…  (212 files)"]}],
+    files:[["Inkwell.html","2.8 MB"],["vendor/","212 files · 40 MB"],["ios/","its own Swift"],["ingenium.build.json","1 KB"]],kept:false,tested:false,shipped:false},
+  next:{name:"Your next app",color:"#b88a3a",ver:"",branch:"main",ideas:[{n:"main",d:"Where it will ship from.",on:true}],changes:[],history:[],files:[],kept:false,tested:false,shipped:false,isNew:true}}};}
+fresh();
+function R(){return D.repos[D.sel];}
+var ORDER=["cd","forge","ingenium","inkwell","next"];
+function stepOf(r){if(r.isNew)return "change";if(r.changes.length)return "keep";if(!r.tested)return "test";if(!r.shipped)return "ship";return "done";}
+function tileLine(r){if(r.isNew)return "Started today";var s=stepOf(r);if(s==="keep")return r.changes.length+" to keep";if(s==="test")return "Kept · to test";if(s==="ship")return "Ready to ship";return "Shipped"+(r.ver?" "+r.ver:"");}
+function stateLine(r){if(r.isNew)return "Started today · nothing kept yet";var s=stepOf(r);if(s==="keep")return r.branch+" · "+r.changes.length+" change"+(r.changes.length>1?"s":"")+" not kept yet";if(s==="test")return r.branch+" · kept, not tested yet";if(s==="ship")return r.branch+" · tested, ready to ship";return r.branch+" · shipped "+(r.ver?"v"+r.ver:"");}
+
+/* ---------- painting ---------- */
+function paint(){paintRepos();paintWork();paintShip();paintSteps();thumbs();}
+function paintRepos(){var box=$("repos");box.innerHTML="";ORDER.forEach(function(k){var r=D.repos[k],b=h("button","repo"+(r.isNew?" wide":""));b.type="button";b.style.setProperty("--app",r.color);b.setAttribute("aria-pressed",k===D.sel?"true":"false");b.setAttribute("data-k",k);
+  var s=stepOf(r),st='<i class="st'+(s==="keep"||s==="change"?" changed":s==="test"||s==="ship"?" tested":"")+'" title="'+(s==="done"?"Shipped":s==="keep"?"Changes not kept yet":s==="test"?"Kept, not tested":s==="ship"?"Tested":"New")+'"></i>';
+  b.appendChild(sealEl(k,r.isNew?42:56));
+  var nm='<span class="nm">'+esc(r.name)+(r.ver?" <em>"+esc(r.ver)+"</em>":"")+'</span><span class="stl">'+st+"<span>"+esc(tileLine(r))+"</span></span>";
+  if(r.isNew){var tx=h("span","tx",nm);b.appendChild(tx);}else b.insertAdjacentHTML("beforeend",nm);
+  b.onclick=function(){D.sel=k;D.view=R().changes.length?"changes":"history";D.file=0;if(one())setPanel("work");paint();};box.appendChild(b);});}
+function paintSteps(){var s=stepOf(R()),order=["change","keep","test","ship"],i=order.indexOf(s);if(s==="done")i=4;
+  [].forEach.call($("steps").querySelectorAll("li[data-s]"),function(li){var j=order.indexOf(li.getAttribute("data-s"));li.className=j<i?"done":j===i?"now":"";});}
+function views(){[].forEach.call($("views").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===D.view?"true":"false");});$("nChanges").textContent=R().changes.length||"";$("nChanges").hidden=!R().changes.length;}
+function paintWork(){var r=R(),w=$("work"),f=$("workFoot");w.innerHTML="";f.innerHTML="";
+  var ws=$("whSeal"),nw=sealEl(D.sel,34);nw.id="whSeal";ws.replaceWith(nw);
+  $("whName").textContent=r.name;$("branchName").textContent=r.branch;
+  var s=stepOf(r),chip=$("workChip");chip.className="chip"+(s==="keep"?" warn":s==="done"?" ok":"");chip.innerHTML='<span class="d"></span>'+(r.isNew?"New":s==="keep"?r.changes.length+" not kept":s==="test"?"Kept":s==="ship"?"Tested":"Shipped");
+  views();
+  if(D.view==="changes"){
+    if(r.isNew){w.appendChild(h("div","empty","<b>A new app, ready for its first page</b>Describe it in Chat or open it in Code: every change the model makes, and every save of yours, lands here as a change to keep. Or bring in a page you already have."));
+      f.appendChild(btn("pri","Open it in Code",function(){toast("In Ingenium: Code opens with this app as its project.");}));f.appendChild(btn("","Bring a page in",function(){sheet("bring");}));return;}
+    if(!r.changes.length){w.appendChild(h("div","empty","<b>Nothing changed since the last version</b>Every change you or the model make in Chat or Code appears here first, file by file, with exactly what changed. You keep it as a version when it is right."));
+      f.appendChild(btn("","Open it in Code",function(){toast("In Ingenium: Code opens "+r.name+" as its project, on the idea “"+r.branch+"”.");}));return;}
+    var list=h("div","files");r.changes.forEach(function(c,i){var row=h("button","frow");row.type="button";row.setAttribute("aria-pressed",i===D.file?"true":"false");
+      row.innerHTML='<span class="p">'+esc(c.p)+'</span><span class="k '+c.k+'">'+c.k+'</span><span class="c"><span class="a">+'+c.a+'</span> <span class="r">−'+c.r+'</span></span>';row.onclick=function(){D.file=i;paintWork();};list.appendChild(row);});
+    w.appendChild(list);var c=r.changes[D.file]||r.changes[0],dv=h("div","diff");
+    dv.innerHTML='<div class="diff-h"><b>'+esc(c.p)+'</b><span>what changed</span><button class="btn quiet sm" type="button">Put it back</button></div>';
+    dv.querySelector(".btn").onclick=function(){r.changes.splice(D.file,1);D.file=0;toast("Put back as it was in the last version. Nothing else changed.");paint();};
+    var pre=h("pre","dcode");c.diff.forEach(function(l){if(l[0]==="h"){pre.appendChild(h("div","dl hunk",esc(l[1])));return;}
+      var d=h("div","dl"+(l[0]==="+"?" add":l[0]==="-"?" del":""));d.innerHTML="<i>"+l[1].toLocaleString("en-GB")+"</i><s>"+(l[0]===" "?"":l[0]==="+"?"+":"−")+"</s>"+esc(l[2]);pre.appendChild(d);});
+    dv.appendChild(pre);w.appendChild(dv);
+    var k=h("div","keep");k.innerHTML='<textarea id="msg" placeholder="What changed? One line, then any detail.">'+(r.msg||"")+'</textarea><div class="row"><button class="btn quiet sm" type="button" id="writeMsg">Write it for me</button><span class="hint" style="margin:0">Kept as a version: you can always go back to it.</span><button class="btn pri next" type="button" id="keepBtn">Keep this version</button></div>';
+    f.appendChild(k);$("writeMsg").onclick=function(){var m=D.sel==="cd"?"A misty sky on the Today page\n\nA fourth sky, Misty, beside Sunny and Windy, with its own picture; the sky keys a shade deeper; the offline copy renamed so devices take the new page.":"Inkwell's favicon by night\n\nA night favicon in midnight ink and brass, used when the device is dark.";$("msg").value=m;r.msg=m;};
+    $("msg").oninput=function(){r.msg=this.value;};
+    $("keepBtn").onclick=function(){var m=($("msg").value||"").trim();if(!m){$("msg").focus();toast("A few words first: what changed?");return;}
+      r.history.unshift({t:m.split("\n")[0],w:"Just now",id:Math.random().toString(16).slice(2,9),files:r.changes.map(function(c){return c.p;}),fresh:true});r.changes=[];r.msg="";r.kept=true;r.tested=false;r.shipped=false;D.view="history";
+      toast("Kept: "+m.split("\n")[0]+". Next: test it.");if(one())setPanel("ship");paint();};
+    return;}
+  if(D.view==="files"){var tr=h("div","tree");if(!r.files.length)w.appendChild(h("div","empty","<b>No files yet</b>The first page you make or bring in appears here."));
+    r.files.forEach(function(fl,i){var n=h("div","node");n.tabIndex=0;var dir=/\/$/.test(fl[0]);n.innerHTML='<span class="ic">'+(dir?"▸":"·")+'</span><span class="nm">'+esc(fl[0])+'</span><span class="sz">'+esc(fl[1])+"</span>";n.setAttribute("aria-pressed",i===D.ffile?"true":"false");
+      n.onclick=function(){D.ffile=i;paintWork();};tr.appendChild(n);});w.appendChild(tr);
+    if(r.files.length){var sel=r.files[D.ffile||0];w.appendChild(h("div","sec","<p class='hint' style='margin:0'><b style='color:var(--ink-1);font-family:var(--mono)'>"+esc(sel[0])+"</b> · "+esc(sel[1])+". Every file is kept, pictures, keys and other binary files too, at its own path, as in the app itself.</p>"));}
+    f.appendChild(btn("","Open in Code",function(){toast("In Ingenium: Code opens this file in "+r.name+".");}));f.appendChild(btn("quiet","Save a copy",function(){toast("Saved to your Downloads.");}));return;}
+  if(D.view==="history"){if(!r.history.length){w.appendChild(h("div","empty","<b>No versions yet</b>The first version you keep starts its history. Nothing in it is ever written over."));return;}
+    var hb=h("div","hist");r.history.forEach(function(c,i){var e=h("div","cm"+(c.merge?" merge":""));e.tabIndex=0;e.setAttribute("aria-expanded",c.open?"true":"false");if(c.fresh)e.style.animationDelay="0s";
+      e.innerHTML="<b>"+esc(c.t)+'</b><div class="meta"><span>'+esc(c.w)+'</span><span class="id">'+esc(c.id)+"</span>"+(c.tag?'<span class="tag">'+esc(c.tag)+"</span>":"")+(i===0?'<span class="chip ok" style="font-size:11px;padding:1px 8px"><span class="d"></span>you are here</span>':"")+"</div>"+
+        '<div class="more"><ul>'+c.files.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+'</ul><div class="acts"></div></div>';
+      var acts=e.querySelector(".acts");acts.appendChild(btn("sm","See the changes",function(ev){ev.stopPropagation();toast("Its changes open beside it, line by line.");}));
+      if(i>0){acts.appendChild(btn("sm","Undo it",function(ev){ev.stopPropagation();r.history.unshift({t:"Undo “"+c.t+"”",w:"Just now",id:Math.random().toString(16).slice(2,9),files:c.files,fresh:true});r.tested=false;r.shipped=false;toast("Undone in a new version. The old one is still there.");paint();}));
+        acts.appendChild(btn("sm","Look at this version",function(ev){ev.stopPropagation();toast("Showing "+r.name+" as it was at "+c.id+". Nothing is changed.");}));}
+      e.onclick=function(){c.open=!c.open;paintWork();};hb.appendChild(e);});w.appendChild(hb);
+    f.appendChild(btn("","Mark a release",function(){var c=r.history[0];if(!c.tag){c.tag="v"+(r.ver||"1")+".1";toast("Release "+c.tag+" marked on “"+c.t+"”.");paintWork();}else toast("This version is already the release "+c.tag+".");}));return;}
+  if(D.view==="ideas"){var ib=h("div","ideas");r.ideas.forEach(function(d){var e=h("div","idea"+(d.n===r.branch?" on":""));e.innerHTML="<b>"+esc(d.n)+(d.n===r.branch?' <span class="chip live" style="font:600 11px var(--sans);padding:1px 8px">working here</span>':"")+(d.ahead?' <span class="tag">'+d.ahead+" ahead</span>":"")+"</b><p>"+esc(d.d)+"</p>";
+      var a=h("div","acts");if(d.n!==r.branch)a.appendChild(btn("sm","Work on this",function(){r.branch=d.n;toast("Now working on “"+d.n+"”. Your files follow it.");paint();}));
+      if(d.n!=="main")a.appendChild(btn("sm","Bring it into main",function(){r.ideas=r.ideas.filter(function(x){return x!==d;});r.branch="main";r.history.unshift({t:"Bring in "+d.n,w:"Just now",id:Math.random().toString(16).slice(2,9),merge:true,files:["index.html"],fresh:true});r.tested=false;r.shipped=false;
+        toast("Brought into main: no two changes crossed. Next: test it.");paint();}));
+      e.appendChild(a);ib.appendChild(e);});w.appendChild(ib);
+    f.appendChild(btn("","＋ New idea from here",function(){var n="idea-"+(r.ideas.length);r.ideas.push({n:n,d:"A new idea from the version you are on. main is not touched until you bring it in."});toast("A new idea, “"+n+"”: try anything; main stays as it is.");paintWork();}));}}
+function btn(cls,label,on){var b=h("button","btn"+(cls?" "+cls:""));b.type="button";b.textContent=label;if(on)b.onclick=on;return b;}
+
+var CHECKS=[["The page reads cleanly","its markup is whole, and every script in it parses"],["Every file it names is here","pictures, scripts, its manifest and its offline copy"],["It opens with no errors","in a quiet window of its own, as on your devices"],["Its own self-test","the checks the app carries for itself"],["Its build number moves forward","so every device takes it as an update"]];
+var TARGETS=[["fire","Fire tablet","An app to install (.apk), signed with your key",'<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M10 18.5h4"/>'],["iphone","iPhone and iPad","For Sideloadly (.ipa)",'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>'],["macmini","Mac mini","An app for Apple silicon (.app, zipped)",'<rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 16v2M17 16v2"/>'],["macbook","MacBook Pro","An app for Intel (.app, zipped)",'<rect x="5" y="4.5" width="14" height="10" rx="1.5"/><path d="M2.5 18.5h19"/>'],["windows","Windows","The app and its installer (.zip)",'<path d="M3 5.5l8-1.2v7.2H3zM12.5 4.1L21 3v8.5h-8.5zM3 12.8h8v7.2l-8-1.2zM12.5 12.8H21V21l-8.5-1.1z"/>'],["web","Web app","Installable, works offline (.zip)",'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 2.6 2.7 15.4 0 18M12 3c-2.7 2.6-2.7 15.4 0 18"/>'],["page","One page","The whole app in one file (.html)",'<path d="M6 2.5h8l4 4V21.5H6z"/><path d="M14 2.5v4h4"/>'],["kits","Build kits","For GitHub, should you want them (.zip)",'<path d="M4 7.5l8-4 8 4v9l-8 4-8-4z"/><path d="M4 7.5l8 4 8-4M12 11.5v9"/>']];
+function paintShip(){var r=R(),cb=$("checks");cb.innerHTML="";var tested=r.tested;
+  CHECKS.forEach(function(c,i){var e=h("div","ck"+(tested?" ok":(D.testing!=null&&i<D.testing?" ok":D.testing===i?" run":"")));e.innerHTML='<span class="m">'+(tested||(D.testing!=null&&i<D.testing)?"✓":D.testing===i?"…":"○")+'</span><div>'+esc(c[0])+"<small>"+esc(c[1])+"</small></div>";cb.appendChild(e);});
+  var tc=$("testChip");tc.className="chip"+(tested?" ok":"");tc.innerHTML=tested?'<span class="d"></span>Passed':(r.isNew||!r.history.length?"Nothing to test yet":r.changes.length?"Keep first, then test":"Not tested yet");
+  $("testBtn").disabled=!!r.isNew||!r.history.length||!!r.changes.length||D.testing!=null;$("testBtn").className="btn"+(stepOf(r)==="test"?" pri next":"");
+  var tb=$("targets");tb.innerHTML="";var made=r.made||{};
+  TARGETS.forEach(function(t){var e=h("div","tg"+(made[t[0]]==="done"?" done":""));var m=made[t[0]];
+    e.innerHTML='<div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">'+t[3]+"</svg><b>"+esc(t[1])+"</b></div><small>"+esc(t[2])+"</small>"+
+      (typeof m==="number"?'<div class="bar"><i style="width:'+m+'%"></i></div>':"")+'<div class="foot"></div>';
+    var ft=e.querySelector(".foot");if(m==="done"){ft.appendChild(h("span","chip ok",'<span class="d"></span>Made'));var sv=btn("quiet sm","Save",function(){toast(r.name+" for "+t[1]+" saved to your Downloads.");});ft.appendChild(sv);}
+    else if(typeof m!=="number")ft.appendChild(h("span","chip",r.tested?"Ready to make":"After its test"));tb.appendChild(e);});
+  var ss=$("shipState"),all=TARGETS.every(function(t){return made[t[0]]==="done";});ss.className="chip"+(all?" ok":"");ss.innerHTML=all?'<span class="d"></span>All made':(r.tested?"Ready to make":"After its test");
+  var sb=$("shipBtn");sb.disabled=!r.tested||D.shipping||all;sb.textContent=all?"Made for every device":"Make them all";
+  var sc=$("shipChip");sc.className="chip"+(all?" ok":"");sc.textContent=all?"Shipped":r.tested?"Tested":"Waiting";
+  var cp=$("copies");cp.innerHTML="";[["A folder for git","Its files with their whole history (.git inside), zipped: any git on a Mac opens it","Save"],["The whole history in one file","A git bundle: one file to keep or to clone anywhere","Save"],["A zip of its files","As GitHub's Download ZIP makes it","Save"]].forEach(function(c){var e=h("div","cp");e.innerHTML='<div class="t">'+esc(c[0])+"<small>"+esc(c[1])+"</small></div>";e.appendChild(btn("quiet sm",c[2],function(){toast(c[0]+" of "+r.name+": saved to your Downloads.");}));cp.appendChild(e);});
+  var gh=h("div","cp");gh.innerHTML='<div class="t">GitHub, only when you choose<small>'+(D.gh?"Send this app's versions to its repository on GitHub, or bring theirs here. Nothing is sent until you press Send.":"Off. Everything works without it.")+"</small></div>";
+  var lab=h("label","sw");lab.innerHTML='<input type="checkbox"'+(D.gh?" checked":"")+">";lab.querySelector("input").onchange=function(){D.gh=this.checked;paintShip();};gh.appendChild(lab);cp.appendChild(gh);
+  if(D.gh){var g2=h("div","cp");g2.innerHTML='<div class="t">DevGroup2313/'+esc(r.name.replace(/^The /,"").replace(/\s+/g,"-"))+"<small>Its versions here match GitHub's, name for name.</small></div>";g2.appendChild(btn("sm","Send",function(){toast("Sent to GitHub: only the versions it did not have.");}));g2.appendChild(btn("quiet sm","Bring theirs",function(){toast("Nothing new on GitHub.");}));cp.appendChild(g2);}}
+$("testBtn").onclick=function(){var r=R();D.testing=0;paintShip();(function step(){setTimeout(function(){D.testing++;if(D.testing>=CHECKS.length){D.testing=null;r.tested=true;r.shipped=false;r.made={};toast("Every check passed. Next: ship it.");paint();return;}paintShip();step();},520);})();};
+$("shipBtn").onclick=function(){var r=R();r.made={};D.shipping=true;TARGETS.forEach(function(t,i){r.made[t[0]]=0;});paintShip();var t0=Date.now();
+  var timer=setInterval(function(){var el=(Date.now()-t0)/1000,done=0;TARGETS.forEach(function(t,i){var v=Math.min(100,Math.round((el-i*0.25)*60));if(v>=100){r.made[t[0]]="done";done++;}else r.made[t[0]]=Math.max(0,v);});
+    paintShip();if(done===TARGETS.length){clearInterval(timer);D.shipping=false;r.shipped=true;toast(r.name+" is made for every device. Each is kept beside its version.");paint();}},120);};
+
+/* ---------- sheets: bringing an app in, running one ---------- */
+function sheet(kind){var dev=$("dev"),wrap=h("div","sheet-wrap"),s=h("div","sheet");wrap.appendChild(s);
+  if(kind==="bring"){s.innerHTML="<h3>Bring an app in</h3><p>Whatever you bring keeps its history if it has one; if not, it starts with a first version.</p>";
+    [["♦","From your app library","Carpe Diem, The Forge, Inkwell or Ingenium, as Ingenium already keeps them"],["⇩","A zip","Your app's own zip, its install kit, or GitHub's Download ZIP"],["⎇","A git bundle, or a folder with its .git","Its whole history comes with it, branch for branch"],["◎","From GitHub","Only if you choose: one of your repositories, by its name"]].forEach(function(o){var b=h("button","opt");b.type="button";b.innerHTML='<span class="ic">'+o[0]+"</span><span><b>"+esc(o[1])+"</b><small>"+esc(o[2])+"</small></span>";b.onclick=function(){wrap.remove();toast(o[1]+": in Ingenium you choose the file, and it comes in here.");};s.appendChild(b);});}
+  else{var r=R();s.innerHTML="<h3>"+esc(r.name)+" is running</h3><p>In a window of its own, at its own address, so what it saves is its own and never mixes with Ingenium's.</p>";var fr=h("div","runframe");fr.appendChild(sealEl(D.sel,76));fr.appendChild(h("b",null,esc(r.name)));fr.appendChild(h("small",null,{cd:"XVII·OCTOBRIS·MMXXVI",forge:"XVII·OCTOBRIS·MMXXVI",inkwell:"AN OFFLINE WRITING STUDIO",ingenium:"4.0"}[D.sel]||""));s.appendChild(fr);
+    var seg=h("div","seg");seg.innerHTML='<span class="thumb"></span><button aria-pressed="true">As a window</button><button>Fire size</button><button>iPhone size</button>';s.appendChild(seg);[].forEach.call(seg.querySelectorAll("button"),function(b,i){b.onclick=function(){[].forEach.call(seg.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});fr.style.width=[220,190,150][i]+"px";fr.style.height=[300,300,290][i]+"px";thumbs();};});}
+  var end=h("div","end");end.appendChild(btn("","Close",function(){wrap.remove();}));s.appendChild(end);wrap.onclick=function(e){if(e.target===wrap)wrap.remove();};dev.appendChild(wrap);thumbs();}
+$("bringBtn").onclick=function(){sheet("bring");};
+$("newBtn").onclick=function(){D.sel="next";D.view="changes";paint();toast("A new app: give it its first page in Chat or Code, or bring one in.");};
+$("runBtn").onclick=function(){if(R().isNew){toast("Nothing to run yet: give it a first page.");return;}sheet("run");};
+$("branchBtn").onclick=function(){D.view="ideas";paintWork();thumbs();};
+[].forEach.call($("views").querySelectorAll("button"),function(b){b.onclick=function(){D.view=b.getAttribute("data-v");paintWork();thumbs();};});
+var tt=null;function toast(m){var old=document.querySelector(".toast");if(old)old.remove();var t=h("div","toast",esc(m));$("dev").appendChild(t);clearTimeout(tt);tt=setTimeout(function(){t.remove();},3600);}
+
+/* ---------- the segments' sliding thumbs ---------- */
+function thumbs(){[].forEach.call(document.querySelectorAll(".seg"),function(sg){var th=sg.querySelector(".thumb");if(!th){th=h("span","thumb");sg.insertBefore(th,sg.firstChild);}
+  var on=sg.querySelector('button[aria-pressed="true"],button[aria-selected="true"]');if(!on||!on.offsetWidth){th.style.width="0";return;}th.style.width=on.offsetWidth+"px";th.style.transform="translateX("+(on.offsetLeft-3)+"px)";});}
+
+/* ---------- one panel at a time on a tablet upright or a phone ---------- */
+function one(){var w=$("dev").getAttribute("data-w");return w==="fire"||w==="phone";}
+function setPanel(p){[].forEach.call($("tabs").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-p")===p?"true":"false");});
+  [["apps","pApps"],["work","pWork"],["ship","pShip"]].forEach(function(x){$(x[1]).classList.toggle("show",x[0]===p);});thumbs();}
+[].forEach.call($("tabs").querySelectorAll("button"),function(b){b.onclick=function(){setPanel(b.getAttribute("data-p"));};});
+
+/* ---------- the preview's own controls ---------- */
+function segPick(id,fn){[].forEach.call($(id).querySelectorAll("button"),function(b){b.onclick=function(){[].forEach.call($(id).querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});fn(b.getAttribute("data-v"));thumbs();};});}
+segPick("pvW",function(v){$("dev").setAttribute("data-w",v);setPanel("work");setTimeout(thumbs,380);});
+segPick("pvTheme",function(v){document.documentElement.setAttribute("data-theme",v);$("ibSeal").src=sealSrc("ingenium");paint();});
+$("pvReset").onclick=function(){fresh();D.testing=null;D.shipping=false;paint();toast("Back to the start.");};
+[].forEach.call($("names").querySelectorAll("button"),function(b){b.onclick=function(){[].forEach.call($("names").querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});var n=b.getAttribute("data-n");$("pageName").textContent=n;$("ibName").textContent=n;};});
+if(night()){[].forEach.call($("pvTheme").querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x.getAttribute("data-v")==="dark"?"true":"false");});}
+$("ibSeal").src=sealSrc("ingenium");
+
+/* ---------- her words ---------- */
+var ASK=[["I want Ingenium to be my own offline GitHub","Each app is a real git repository on the device: every version kept, ideas (branches), releases (tags), the changes line by line, bringing an idea back into main, undoing an older change with a new version. Any git and GitHub open what is kept here.",1],
+  ["fully capable to build, test, run and ship ready made apps and zip packages for all of my apps and any future ones","Test this version (five checks, recorded with the version), Run (its own window, at its own address), and Ship: every device's package made here from the version you kept, for your four apps and any new one.",1],
+  ["I want for Github to be optional","Off until you turn it on. Copies for any git (a folder, a bundle, a zip) need no account; Send to GitHub only when you press it.",1],
+  ["make edits and customise all of my apps inside of Ingenium's Chat and Build pages","Every change made in Chat or Code lands in Changes, file by file, to keep as a version; Open it in Code works on any app here.",1],
+  ["bake and ship newly created apps with their install zip packages on all of my devices","＋ New app starts a repository; Make them all makes the Fire, iPhone and iPad, Mac mini, MacBook Pro, Windows, web and one-page packages, and GitHub kits if you want them.",1],
+  ["the zip packages builder to make apps inside of Ingenium the same way that they are made on here in this chat and also on github","Packages are made from each app's shell as GitHub makes it, with your page, its name and its seal put in, and signed as GitHub signs it. GitHub builds a new shell only when a shell itself changes.",1],
+  ["troubleshoot and fix any bugs inside of any of my apps","Test this version opens the app in a quiet window and reports any error; the model reads the report in Code. Any older version is one press away.",1],
+  ["upload my 4 current apps on there and continue working on developing and building new ones","Bring one in: from your app library, a zip, a bundle or a folder; your four apps are listed here with their versions.",1],
+  ["I want the Forge to have that same capability later","The engine is its own part, written so The Forge can carry it unchanged when we come to it.",0]];
+var al=$("askList");ASK.forEach(function(a){var e=h("div","ask-it");e.innerHTML='<span class="k'+(a[2]?"":" next")+'">'+(a[2]?"✓":"○")+"</span><div><q>"+esc(a[0])+"</q><em>"+esc(a[1])+"</em></div>";al.appendChild(e);});
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+var devEl=$("dev");
+devEl.addEventListener("pointermove",function(e){var t=e.target&&e.target.closest?e.target.closest(".repo,.pn-h,.runframe"):null,ls=t&&t.querySelector(".ls:not(.new)");
+  [].forEach.call(devEl.querySelectorAll(".ls.hov"),function(x){if(x!==ls){x.classList.remove("hov","down");x.style.removeProperty("--rx");x.style.removeProperty("--ry");}});
+  if(!ls||e.pointerType==="touch")return;var r=ls.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;ls.classList.add("hov");
+  ls.style.setProperty("--ry",(clamp(px,-.8,.8)*30).toFixed(1)+"deg");ls.style.setProperty("--rx",(-clamp(py,-.8,.8)*24).toFixed(1)+"deg");},{passive:true});
+devEl.addEventListener("pointerleave",function(){[].forEach.call(devEl.querySelectorAll(".ls.hov"),function(x){x.classList.remove("hov","down");x.style.removeProperty("--rx");x.style.removeProperty("--ry");});});
+devEl.addEventListener("pointerdown",function(e){var t=e.target&&e.target.closest?e.target.closest(".repo"):null,ls=t&&t.querySelector(".ls");if(ls)ls.classList.add("down");},{passive:true});
+devEl.addEventListener("pointerup",function(){[].forEach.call(devEl.querySelectorAll(".ls.down"),function(x){x.classList.remove("down");});},{passive:true});
+paint();setTimeout(thumbs,50);window.addEventListener("resize",thumbs);
+try{new MutationObserver(function(){$("ibSeal").src=sealSrc("ingenium");}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
+})();
+</script>
