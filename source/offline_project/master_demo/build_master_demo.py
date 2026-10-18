@@ -9,6 +9,7 @@ And: "I want a live interactive preview of the master Offline Project demo so I 
 What it writes, into OUT_DIR:
   index.html                      the site (site.html beside this file): the hall with the crest, the four rooms, the devices
   assets/seals/<app>[N].png       the four seals by day and night, taken from the approved preview of the master seal
+  assets/icons/                   the master shield as the site's icon (favicon.ico, 32 and 192 pixel PNGs, the phone's home-screen icon)
   assets/devices/<device>_<day|night>.jpg   the crest on each device, from the owner's images
   apps/<slug>.html                each app's live demonstration, as it is, with two things added at the top of its page:
                                   its character set, and a shim that keeps its storage in a corner of its own (op:<app>:),
@@ -69,6 +70,35 @@ for k in ("cd", "cdN", "forge", "forgeN", "ingenium", "ingeniumN", "inkwell", "i
     # the same seal inside the page itself (a viewer that cannot reach the files beside the page still shows it)
     buf = io.BytesIO(); im.resize((512, 512), Image.LANCZOS).save(buf, "WEBP", quality=92, method=6)
     IMG["seals"][k] = "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+
+# 1b. THE SITE'S ICON, the master shield (the owner's words, 18 October 2026: "I want for the master shield to be the website
+#     url icon"): the shield of the approved preview (its REF image, the shield without its ribbon, which stays legible at the
+#     size of a browser tab), for the tab, the address bar, bookmarks and a phone's home screen
+mr = re.search(r'var REF = "(data:image/png;base64,[^"]+)"', seal_src)
+if not mr:
+    raise SystemExit("the preview of the master seal does not hold the shield (var REF)")
+SHIELD = Image.open(io.BytesIO(base64.b64decode(mr.group(1).split(",", 1)[1]))).convert("RGBA")
+os.makedirs(os.path.join(OUT, "assets/icons"), exist_ok=True)
+
+
+def shield_square(n, pad=0.0, bg=None):
+    c = Image.new("RGBA", (n, n), bg or (0, 0, 0, 0))
+    inner = n * (1 - 2 * pad)
+    k = min(inner / SHIELD.size[0], inner / SHIELD.size[1])
+    im = SHIELD.resize((max(1, round(SHIELD.size[0] * k)), max(1, round(SHIELD.size[1] * k))), Image.LANCZOS)
+    c.alpha_composite(im, ((n - im.size[0]) // 2, (n - im.size[1]) // 2))
+    return c
+
+
+shield_square(256).save(os.path.join(OUT, "assets/icons/favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
+shield_square(32).save(os.path.join(OUT, "assets/icons/shield-32.png"), optimize=True)
+shield_square(192, 0.04).save(os.path.join(OUT, "assets/icons/shield-192.png"), optimize=True)
+# a phone's home screen fills a transparent corner with black, so the shield stands on the hall's own ground there
+shield_square(180, 0.1, (245, 243, 247, 255)).convert("RGB").save(os.path.join(OUT, "assets/icons/apple-touch-icon.png"), optimize=True)
+ICON_LINKS = ('\n<link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48">'
+              '\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/shield-32.png">'
+              '\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/shield-192.png">'
+              '\n<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">')
 
 # 2. THE DEVICES, from the owner's images (only the pictures named for a device; the banner stays out)
 DEVICES = ("iphone", "ipad", "macbook_pro", "mac_mini_4k", "windows", "fire_hd10_upright", "fire_hd10_sideways")
@@ -221,6 +251,9 @@ if site.count("/*@@BUILD@@*/{}") != 1:
     raise SystemExit("site.html: the place for the build was not found")
 build["img"] = IMG
 site = site.replace("/*@@BUILD@@*/{}", json.dumps(build, ensure_ascii=False).replace("</", "<\\/"))
+if site.count("<title>The Offline Project</title>") != 1:
+    raise SystemExit("site.html: the title was not found")
+site = site.replace("<title>The Offline Project</title>", "<title>The Offline Project</title>" + ICON_LINKS, 1)
 if not A.inkwell:
     d0 = 'content="Carpe Diem, The Forge, Ingenium and Inkwell: four apps that live on your own device, each with its live demonstration."'
     if site.count(d0) != 1:
