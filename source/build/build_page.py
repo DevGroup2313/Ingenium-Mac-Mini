@@ -248,6 +248,15 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tb = _ilu.spec_from_file_location("tabula_big_patch", os.path.join(HERE, "apps", "tabula_big_patch.py"))
         _tbm = _ilu.module_from_spec(_tb); _tb.loader.exec_module(_tbm)
         _html = _tbm.patch(_html)
+        # R128: its paragraphs run on across pages, and a note no longer lays out the whole thesis, by Inkwell 7.45's recipe
+        # (apps/tabula_flow_patch.py)
+        _tf = _ilu.spec_from_file_location("tabula_flow_patch", os.path.join(HERE, "apps", "tabula_flow_patch.py"))
+        _tfm = _ilu.module_from_spec(_tf); _tf.loader.exec_module(_tfm)
+        _html = _tfm.patch(_html)
+        # R129: and keeps its raised pages and 3D notes key when it stands alone (apps/tabula_look_patch.py)
+        _tl = _ilu.spec_from_file_location("tabula_look_patch", os.path.join(HERE, "apps", "tabula_look_patch.py"))
+        _tlm = _ilu.module_from_spec(_tl); _tl.loader.exec_module(_tlm)
+        _html = _tlm.patch(_html)
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
 #      each is checked here against its own size and fingerprint before it rides along ----

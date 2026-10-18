@@ -515,6 +515,9 @@ try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR)&&!ING_TOUR.some(fu
 /* the tour: the apps card says Tabula holds a thesis (5.3, R127: apps/tabula_big_patch.py) */
 try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR))ING_TOUR.forEach(function(c){if(c&&c.sub==="Tabula and Abacus"&&typeof c.b==="string"&&c.b.indexOf("100,000")<0)
   c.b+=" Tabula holds a thesis of 100,000 words: a keystroke is answered at once, because only the pages an edit moves are laid out again, and a long document is kept in the browser's larger store, so it is not lost.";});}catch(e){}
+/* the tour: a paragraph runs on across pages, and a footnote is placed in a moment (5.5, R128: apps/tabula_flow_patch.py) */
+try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR))ING_TOUR.forEach(function(c){if(c&&c.sub==="Tabula and Abacus"&&typeof c.b==="string"&&c.b.indexOf("runs on")<0)
+  c.b+=" A paragraph runs on to the next page, as in Word, so no page ends in a blank gap, and a footnote is placed in a moment, even in a thesis.";});}catch(e){}
 
 window.IngRecipe={data:RX,measureAll:measureAll,measureOne:measureOne,measureEdition:measureEdition,edAt:edAt,latest:latest,addDocs:addDocs,check:check,apply:apply,saveDoc:saveDoc,undo:undo,factsText:factsText,layer:layer,
   docxParas:docxParas,editXml:editXml,parasOfXml:parasOfXml,word:word,open:openSheet,close:closeSheet,sourcesToFontes:sourcesToFontes,recipeMd:recipeMd,state:st,frameMeasure:frameMeasure};
