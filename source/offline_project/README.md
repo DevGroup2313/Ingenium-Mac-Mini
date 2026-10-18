@@ -52,6 +52,31 @@ The 💭 side button and its panel, a Focus page as its own room in the side nav
 theme guard (the moon by day, the sun by night) and the same preview fix. `forge_631/forge631.py` applies it to a 630
 page; `forge_631/forge_support.html` is the Forge's adapter. The Forge stays in English, as the owner asked.
 
+## What changed in Carpe Diem 1053 (18 October 2026)
+
+Tabula keeps every part of a document when it saves itself or moves between windows. Measured: its autosave, and its
+hand-over to a floating window or a window of its own, carried only the main text, so the footnotes, endnotes,
+bibliography, header, footer and contents were lost after a crash or a move. The fix is one patch
+(`../build/apps/tabula_patch.py`) shared by Carpe Diem 1053, Ingenium 5.0 and The Forge 632. When autosave cannot keep a
+document, Tabula now says so on the page and offers a copy. A header or footer now comes back shown when it was shown, and a page restored early keeps
+its header and footer. The thoughts panel follows day and night while it is open, the
+Focus page takes version 2 of the support module, and the mini Forge in the Author Studio holds only the Editor, Files
+and Settings (its Tabula placeholder and hidden Tabula key are gone). `carpe_diem_1053/cd1053.py` applies all of this to a
+1052 page; `carpe_diem_1053/cd_repo_1053.py` writes it into a website repository.
+
+## What changed in The Forge 632 (18 October 2026)
+
+The Forge carries her apps inside its own page, as Ingenium does, so no app library file (the old zip) is needed: Ingenium
+5.0, Carpe Diem 1052 and Inkwell 7.43, each compressed with its size and SHA-256 fingerprint, and its own lean page as its
+copy of itself. On the first start of each new Forge, a few seconds in, they are kept in its store (IndexedDB
+'forge-applib'), checked as the zip's apps were, and never over a newer copy she keeps. The copies are lean (her choice):
+Ingenium comes without the apps Ingenium carries, and the Forge's copy of itself without the apps it carries. The page
+also takes the shared thoughts panel that follows day and night while open, and version 2 of the support module.
+`forge_632/forge632.py` applies all of this to a 631 page; `forge_632/forge_repo_632.py` writes it into the Windows and
+iPhone and iPad repositories. The page is about 48 MB. It needs a browser that can unpack gzip by itself
+(DecompressionStream); on one that cannot (an iPhone or iPad older than iOS 16.4, for example), the Forge says so and
+each app's own file can still be chosen.
+
 ## Three things to know
 
 1. **The uploaded 1051 files held a script that did not belong.** Each began its `<head>` with

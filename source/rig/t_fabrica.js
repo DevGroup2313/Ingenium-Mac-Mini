@@ -91,7 +91,8 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); });
   await p.setViewportSize({ width: 800, height: 1280 }); await p.waitForTimeout(500);
   const fire = await p.evaluate(() => { const r = document.getElementById('fb'); return { one: r.classList.contains('f-one'), tabs: getComputedStyle(document.getElementById('fbTabs')).display, shown: [...r.querySelectorAll('.f-pn')].filter(x => x.offsetParent).map(x => x.id), scroll: document.documentElement.scrollHeight - innerHeight, bottom: Math.round(r.getBoundingClientRect().bottom), vh: innerHeight }; });
-  ok(fire.one && fire.tabs !== 'none' && fire.shown.join() === 'fbWork' && fire.scroll <= 2 && fire.bottom <= fire.vh + 2, 'upright tablet: one panel at a time under tabs; no page scroll', JSON.stringify(fire));
+  /* R123: Fabrica was opened afresh just above (the page loop ends on it), so on a narrow frame it shows Your apps */
+  ok(fire.one && fire.tabs !== 'none' && fire.shown.join() === 'fbApps' && fire.scroll <= 2 && fire.bottom <= fire.vh + 2, 'upright tablet: one panel at a time under tabs; no page scroll', JSON.stringify(fire));
   await p.evaluate(() => { [...document.querySelectorAll('#fbTabs button')].find(x => x.dataset.p === 'ship').click(); }); await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + '/fab-fire.png' });
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(500);
@@ -132,7 +133,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const keys = await p.evaluate(() => { const ks = [...document.querySelectorAll('#fb .f-btn:not(.quiet), #fb .f-repo, #fb .f-frow, #fb .f-cm, #fb .f-opt')].filter(x => x.offsetParent); return { n: ks.length, flat: ks.filter(k => { const cs = getComputedStyle(k); return cs.boxShadow === 'none' || !/cubic-bezier\(0\.34, 1\.35/.test(cs.transition); }).map(k => k.className) }; });
   ok(keys.n >= 5 && keys.flat.length === 0, 'every key is raised (a shadow) and springs (the spring curve): none is flat or stiff', JSON.stringify(keys));
   // the other pages still work and the whole page has no errors
-  const pages = await p.evaluate(async () => { const out = []; for (const pg of ['home', 'chat', 'lector', 'build', 'tabula', 'fabrica']) { go(pg); await new Promise(r => setTimeout(r, 250)); out.push(pg + ':' + document.getElementById('page-' + pg).classList.contains('active') + ':' + document.body.classList.contains('fb-on')); } return out; });
+  const pages = await p.evaluate(async () => { const out = []; for (const pg of ['home', 'chat', 'lector', 'build', 'tabula', 'fabrica']) { go(pg); await new Promise(r => setTimeout(r, 250)); out.push(pg + ':' + (pg === 'tabula' ? (IngDesk.state().shown && IngDesk.state().active === 'tabula') : document.getElementById('page-' + pg).classList.contains('active')) + ':' + document.body.classList.contains('fb-on')); } /* R123: Tabula opens on the Desk */ return out; });
   ok(pages.join(' ') === 'home:true:false chat:true:false lector:true:false build:true:false tabula:true:false fabrica:true:true', 'moving between pages keeps each one whole; fb-on only on Fabrica', pages.join(' '));
   await p.reload(); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 120000 }); await p.waitForTimeout(1000);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); go('fabrica'); }); await p.waitForTimeout(1200);

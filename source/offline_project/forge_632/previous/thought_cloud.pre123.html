@@ -1,0 +1,635 @@
+<style id="tc-css">
+/* ============ THE THOUGHTS PANEL (shared by Ingenium, The Forge and Carpe Diem) ============
+   Her words (17 October 2026): the old panel was "really heavy to drag around the screen", its shadow "overwhelming
+   the entire page"; she asked for "the same light, popped out animated movement of the sticky notes", "resizeable and
+   draggable anywhere", minimise and close no longer the same, the 💭 given the bell's little number, and reminders so
+   a thought put away is never forgotten. Then, of the first puffed cloud: "fake and childish. I want it to look
+   weighted and 3D ... realistic ... match Ingenium's graphics", and the number "purple to match Ingenium's colour and
+   not be red". So the panel is a raised slab in each app's own desk language: a matte face, a crisp fine edge, a
+   short dark edge beneath for its thickness, and soft layered casts kept short; small raised beads lead to the 💭.
+   Picked up, it lifts and sways like a sticky note; set down, it seats with a spring. It moves on its own compositor
+   layer (a transform, never left and top), so dragging it repaints nothing.
+   One file, one look, each app in its own colours: data-tc-app="ingenium" | "forge" | "cd", by day and by night. */
+.tc-el{--tc-fam:40,22,68;--tc-face-a:#ffffff;--tc-face-b:#fbfafd;--tc-lip:rgba(255,255,255,0);--tc-rim:rgba(40,22,68,.09);
+  --tc-ink:#221a2e;--tc-soft:rgba(96,84,112,.58);--tc-acc:#6a3fb5;--tc-acc-hi:#7d55cc;--tc-acc-lo:#5a339b;--tc-acc-edge:#3f2275;--tc-on-acc:#ffffff;
+  --tc-gold:#b88a3a;--tc-badge:#6a3fb5;--tc-badge-hi:#8059cf;--tc-badge-ink:#ffffff;
+  --tc-sheet:#ffffff;--tc-card:#ffffff;--tc-card-b:#fbfafd;--tc-line:rgba(40,22,68,.09);--tc-veil:rgba(28,18,44,.20);--tc-menu-hover:#f4f0fa;
+  --tc-serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --tc-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --tc-spring:cubic-bezier(.34,1.35,.64,1);
+  --tc-key:inset 0 -1.5px 0 rgba(var(--tc-fam),.13),0 0 0 .5px rgba(var(--tc-fam),.10),0 2px 0 rgba(var(--tc-fam),.25),0 4px 5px rgba(var(--tc-fam),.16),0 9px 14px rgba(var(--tc-fam),.10);
+  --tc-key-hi:inset 0 -1.5px 0 rgba(var(--tc-fam),.13),0 0 0 .5px rgba(var(--tc-fam),.10),0 3px 0 rgba(var(--tc-fam),.25),0 6px 8px rgba(var(--tc-fam),.18),0 13px 20px rgba(var(--tc-fam),.12);
+  --tc-seat:inset 0 2px 5px rgba(var(--tc-fam),.22),0 0 0 .5px rgba(var(--tc-fam),.10),0 1px 1px rgba(var(--tc-fam),.18);
+  /* the sticky notes as they are drawn on the page (their dress module): lit top and left edges, a solid wall on the
+     right and beneath for the paper's thickness, and three close casts */
+  --tc-wall:#b5adc4;
+  /* her word, of the sticky-note look: "remove the heavy shadow": the paper keeps its thickness, and only a short,
+     light shadow sits beneath it */
+  --tc-slab:inset 0 2px 0 rgba(255,255,255,.72),inset 2px 0 0 rgba(255,255,255,.42),inset -2px 0 0 var(--tc-wall),inset 0 -3px 0 var(--tc-wall),0 0 0 1px var(--tc-rim),
+    0 1px 2px rgba(var(--tc-fam),.10),0 5px 9px -5px rgba(var(--tc-fam),.16);
+  --tc-slab-up:inset 0 2px 0 rgba(255,255,255,.72),inset 2px 0 0 rgba(255,255,255,.42),inset -2px 0 0 var(--tc-wall),inset 0 -3px 0 var(--tc-wall),0 0 0 1px var(--tc-rim),
+    0 2px 3px rgba(var(--tc-fam),.10),0 9px 12px -7px rgba(var(--tc-fam),.18);
+  --tc-modal:0 0 0 1px var(--tc-rim),0 1px 0 rgba(var(--tc-fam),.06),0 4px 7px rgba(var(--tc-fam),.08),0 20px 36px rgba(var(--tc-fam),.14)}
+.tc-el[data-tc-night="1"]{--tc-face-a:#2c2440;--tc-face-b:#272036;--tc-lip:rgba(255,255,255,.07);--tc-rim:rgba(205,184,240,.12);
+  --tc-ink:#f3eefb;--tc-soft:rgba(211,201,227,.55);--tc-acc:#a685e6;--tc-acc-hi:#b79ce6;--tc-acc-lo:#8662cf;--tc-acc-edge:#2b1b4f;--tc-on-acc:#16101f;
+  --tc-gold:#e3bd69;--tc-badge:#a685e6;--tc-badge-hi:#bba0ee;--tc-badge-ink:#16101f;
+  --tc-sheet:#221b2e;--tc-card:#2a2239;--tc-card-b:#272035;--tc-line:rgba(205,184,240,.10);--tc-veil:rgba(6,3,12,.50);--tc-menu-hover:#352b49;
+  --tc-key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 0 0 .5px rgba(205,184,240,.10),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.50),0 9px 14px rgba(0,0,0,.36);
+  --tc-key-hi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 0 0 .5px rgba(205,184,240,.10),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.40);
+  --tc-seat:inset 0 2px 5px rgba(0,0,0,.55),0 1px 1px rgba(0,0,0,.40);
+  --tc-wall:#16111f;
+  --tc-slab:inset 0 2px 0 rgba(255,255,255,.08),inset 2px 0 0 rgba(255,255,255,.04),inset -2px 0 0 var(--tc-wall),inset 0 -3px 0 var(--tc-wall),0 0 0 1px var(--tc-rim),
+    0 1px 2px rgba(0,0,0,.40),0 5px 9px -5px rgba(0,0,0,.45);
+  --tc-slab-up:inset 0 2px 0 rgba(255,255,255,.10),inset 2px 0 0 rgba(255,255,255,.05),inset -2px 0 0 var(--tc-wall),inset 0 -3px 0 var(--tc-wall),0 0 0 1px var(--tc-rim),
+    0 2px 3px rgba(0,0,0,.40),0 9px 12px -7px rgba(0,0,0,.50);
+  --tc-modal:0 0 0 1px var(--tc-rim),0 1px 0 rgba(0,0,0,.5),0 4px 7px rgba(0,0,0,.45),0 20px 36px rgba(0,0,0,.5)}
+/* The Forge and Carpe Diem: their own blue keys on near-white, the family's fine gold edge, ink of deep slate */
+.tc-el[data-tc-app="forge"],.tc-el[data-tc-app="cd"]{--tc-fam:16,42,58;--tc-wall:#a7b4bf;--tc-face-a:#ffffff;--tc-face-b:#fbfcfd;--tc-rim:rgba(16,42,58,.10);
+  --tc-ink:#1d1d1f;--tc-soft:rgba(70,84,94,.58);--tc-acc:#1b6b93;--tc-acc-hi:#2a7ea8;--tc-acc-lo:#155a7c;--tc-acc-edge:#0d3d55;--tc-on-acc:#ffffff;
+  --tc-gold:#b88a3a;--tc-badge:#1b6b93;--tc-badge-hi:#2f84ae;--tc-badge-ink:#ffffff;--tc-sheet:#ffffff;--tc-card:#ffffff;--tc-card-b:#fbfcfd;
+  --tc-line:rgba(16,42,58,.09);--tc-veil:rgba(10,28,40,.20);--tc-menu-hover:#eef4f8;
+  --tc-serif:Georgia,"Iowan Old Style","Times New Roman",serif;--tc-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+/* the Forge's keys are its anvil blue and its edge the brass of its seal */
+.tc-el[data-tc-app="forge"]{--tc-acc:#17577a;--tc-acc-hi:#22698f;--tc-acc-lo:#124866;--tc-acc-edge:#0a3049;--tc-rim:rgba(138,106,34,.20);--tc-badge:#17577a;--tc-badge-hi:#2a7099;--tc-gold:#a8812f}
+.tc-el[data-tc-app="forge"][data-tc-night="1"],.tc-el[data-tc-app="cd"][data-tc-night="1"]{--tc-wall:#11161b;--tc-face-a:#262e37;--tc-face-b:#222930;--tc-lip:rgba(255,255,255,.07);--tc-rim:rgba(214,178,98,.20);
+  --tc-ink:#e8e8ea;--tc-soft:rgba(200,212,222,.55);--tc-acc:#5baedb;--tc-acc-hi:#74bde5;--tc-acc-lo:#3d8fbe;--tc-acc-edge:#123247;--tc-on-acc:#0d1820;
+  --tc-gold:#d9b45a;--tc-badge:#5baedb;--tc-badge-hi:#7cc3ea;--tc-badge-ink:#0d1820;--tc-sheet:#1c2229;--tc-card:#262e37;--tc-card-b:#222930;--tc-line:rgba(255,255,255,.08);--tc-menu-hover:#2e3842}
+
+/* whatever the host app's own rules, what is hidden here stays hidden */
+.tc-el [hidden],.tc-el[hidden]{display:none !important}
+/* ---------- the panel ---------- */
+.tc-cloud{position:fixed;left:0;top:0;z-index:2147482995;width:560px;box-sizing:border-box;will-change:transform;touch-action:none;
+  user-select:none;-webkit-user-select:none;cursor:grab;color:var(--tc-ink)}
+.tc-cloud *{box-sizing:border-box}
+.tc-cloud.tc-held{cursor:grabbing}
+.tc-tilt{transition:transform .5s var(--tc-spring);transform-origin:50% 50%}
+.tc-lift{transition:transform .34s var(--tc-spring);transform-origin:50% 60%}
+.tc-cloud:hover .tc-lift{transform:translateY(-2px)}
+.tc-cloud.tc-held .tc-lift{transform:translateY(-3px) scale(1.012);transition-duration:.18s}
+.tc-cloud.tc-sizing .tc-lift{transform:translateY(-2px)}
+.tc-pop,.tc-float{position:relative;transform-origin:50% 50%}
+.tc-body{position:relative;display:flex;align-items:flex-start;gap:10px;padding:13px 14px 13px 16px;min-height:62px;border-radius:24px;
+  background:linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));box-shadow:var(--tc-slab);transition:box-shadow .2s ease}
+.tc-cloud.tc-held .tc-body{box-shadow:var(--tc-slab-up)}
+.tc-cloud.tc-tall .tc-body{border-radius:20px}
+.tc-cloud.tc-sized .tc-body{height:100%}
+.tc-cloud.tc-narrow .tc-body{flex-wrap:wrap;padding:14px 14px 12px 16px}
+.tc-cloud.tc-narrow .tc-field{flex-basis:calc(100% - 40px)}
+.tc-cloud.tc-narrow .tc-keys{width:100%;justify-content:flex-end}
+.tc-glyph{flex:none;font-size:22px;line-height:1;margin-top:7px;cursor:grab;
+  filter:drop-shadow(0 -1px 0 rgba(255,255,255,.9)) drop-shadow(0 2px 0 rgba(var(--tc-fam),.28)) drop-shadow(0 3px 3px rgba(var(--tc-fam),.20))}
+.tc-el[data-tc-night="1"] .tc-glyph{filter:drop-shadow(0 2px 0 rgba(0,0,0,.6)) drop-shadow(0 3px 3px rgba(0,0,0,.45))}
+.tc-dot{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;
+  background:linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));
+  box-shadow:inset 0 1px 0 var(--tc-lip),inset 0 -1px 0 rgba(var(--tc-fam),.12),0 0 0 1px var(--tc-rim),0 1.5px 0 rgba(var(--tc-fam),.22),0 3px 4px rgba(var(--tc-fam),.14)}
+.tc-el[data-tc-night="1"] .tc-dot{box-shadow:inset 0 1px 0 var(--tc-lip),inset 0 -1px 0 rgba(0,0,0,.4),0 0 0 1px var(--tc-rim),0 1.5px 0 rgba(0,0,0,.7),0 3px 4px rgba(0,0,0,.45)}
+.tc-field{position:relative;flex:1;min-width:0;display:block}
+.tc-cloud.tc-sized .tc-field{align-self:stretch;display:flex}
+.tc-cloud.tc-sized .tc-in{flex:1;height:auto}
+.tc-in{display:block;width:100%;min-height:36px;margin:0;padding:7px 2px 10px;border:0;outline:0;background:transparent;box-shadow:none;resize:none;
+  cursor:text;touch-action:auto;user-select:text;-webkit-user-select:text;overflow-y:hidden;white-space:pre-wrap;overflow-wrap:anywhere;
+  font:italic 17px/1.42 var(--tc-serif);color:var(--tc-ink);scrollbar-width:thin}
+.tc-cloud.tc-sized .tc-in{overflow-y:auto}
+/* the writing sits on the panel itself, whatever the host app does to its other text boxes */
+html body .tc-cloud textarea.tc-in,html body .tc-cloud textarea.tc-in:focus,html body .tc-cloud textarea.tc-in:focus-visible,html body .tc-cloud textarea.tc-in:hover{
+  border:0 !important;outline:0 !important;box-shadow:none !important;background:transparent !important;border-radius:0 !important;
+  padding:7px 2px 10px !important;margin:0 !important;font:italic 17px/1.42 var(--tc-serif) !important;color:var(--tc-ink) !important;min-width:0 !important;max-width:none !important}
+.tc-in::placeholder{color:var(--tc-soft)}
+.tc-rule{position:absolute;left:2px;bottom:3px;height:1.5px;width:0;border-radius:2px;pointer-events:none;
+  background:linear-gradient(90deg,var(--tc-gold),transparent);opacity:.7;transition:width .3s ease}
+.tc-keys{display:flex;align-items:center;gap:7px;flex:none;margin-top:1px}
+/* keys: matte face, crisp edge, a short dark edge beneath; they spring up under the pointer and seat when pressed */
+.tc-key{appearance:none;-webkit-appearance:none;border:0;margin:0;cursor:pointer;flex:none;white-space:nowrap;
+  font:600 13px/1 var(--tc-sans);letter-spacing:.01em;padding:9px 15px;border-radius:999px;color:var(--tc-acc);
+  background:linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));box-shadow:var(--tc-key);
+  transition:transform .12s var(--tc-spring),box-shadow .12s ease,filter .12s ease}
+.tc-key:hover{transform:translateY(-1.5px);box-shadow:var(--tc-key-hi)}
+.tc-key:active{transform:translateY(2px);box-shadow:var(--tc-seat);transition-duration:.05s}
+.tc-key:focus-visible{outline:2px solid var(--tc-acc);outline-offset:2px}
+.tc-key:disabled{opacity:.6;cursor:default}
+.tc-key.tc-keep{color:var(--tc-on-acc);background:linear-gradient(180deg,var(--tc-acc-hi),var(--tc-acc) 55%,var(--tc-acc-lo));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1.5px 0 rgba(0,0,0,.18),0 2px 0 var(--tc-acc-edge),0 4px 5px rgba(var(--tc-fam),.20),0 9px 14px rgba(var(--tc-fam),.12)}
+.tc-key.tc-keep:hover{filter:brightness(1.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1.5px 0 rgba(0,0,0,.18),0 3px 0 var(--tc-acc-edge),0 6px 8px rgba(var(--tc-fam),.22),0 13px 20px rgba(var(--tc-fam),.14)}
+.tc-key.tc-keep:active{box-shadow:inset 0 2px 5px rgba(0,0,0,.30),0 1px 0 var(--tc-acc-edge)}
+.tc-key.tc-round{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:15px;line-height:1}
+.tc-key.tc-min{font-size:20px;font-weight:500}
+.tc-key.tc-small{padding:7px 12px;font-size:12px}
+.tc-ask{display:flex;align-items:center;flex-wrap:wrap;gap:7px;font:600 13px/1.3 var(--tc-sans);color:var(--tc-ink)}
+.tc-ask span{margin-right:2px}
+/* resized from any of its four edges and four corners; the bottom-right corner shows its grip */
+.tc-rz{position:absolute;z-index:3;touch-action:none}
+.tc-rz[data-rz="n"]{top:-5px;left:18px;right:18px;height:10px;cursor:ns-resize}
+.tc-rz[data-rz="s"]{bottom:-5px;left:18px;right:18px;height:10px;cursor:ns-resize}
+.tc-rz[data-rz="e"]{right:-5px;top:18px;bottom:18px;width:10px;cursor:ew-resize}
+.tc-rz[data-rz="w"]{left:-5px;top:18px;bottom:18px;width:10px;cursor:ew-resize}
+.tc-rz[data-rz="nw"],.tc-rz[data-rz="ne"],.tc-rz[data-rz="sw"],.tc-rz[data-rz="se"]{width:20px;height:20px}
+.tc-rz[data-rz="nw"]{left:-5px;top:-5px;cursor:nwse-resize}.tc-rz[data-rz="se"]{right:-5px;bottom:-5px;cursor:nwse-resize}
+.tc-rz[data-rz="ne"]{right:-5px;top:-5px;cursor:nesw-resize}.tc-rz[data-rz="sw"]{left:-5px;bottom:-5px;cursor:nesw-resize}
+.tc-rz[data-rz="se"]::before{content:"";position:absolute;right:13px;bottom:11px;width:13px;height:13px;border-radius:2px;opacity:0;transition:opacity .2s;
+  background:linear-gradient(135deg,transparent 0 46%,var(--tc-soft) 46% 54%,transparent 54% 66%,var(--tc-soft) 66% 74%,transparent 74%)}
+.tc-cloud:hover .tc-rz[data-rz="se"]::before,.tc-cloud:focus-within .tc-rz[data-rz="se"]::before,.tc-cloud.tc-sizing .tc-rz[data-rz="se"]::before{opacity:.75}
+@media (hover:none){.tc-rz[data-rz="se"]::before{opacity:.55}}
+.tc-mote{position:fixed;left:0;top:0;z-index:2147482996;pointer-events:none;white-space:pre;color:var(--tc-gold)}
+
+/* ---------- the second look: LAYERED DEPTH, as Ingenium's seal stands (its R104, from Carpe Diem's and the Forge's
+   seals). The panel is cut in layers, each at its own depth: its body at the back, the face, the writing a little
+   above the face, the keys above that and the 💭 in front. It sways slowly so the layers slide past one another;
+   under a mouse it turns to follow it, and its light follows too; held, it lifts; pressed, it sinks. The angles are
+   the seal's, made small for a panel that holds writing, and it holds still while she writes. ---------- */
+.tc-cloud[data-tc-look="layered"]{perspective:1500px;--rx:0deg;--ry:0deg;--gx:30%;--gy:18%}
+.tc-cloud[data-tc-look="layered"] :is(.tc-tilt,.tc-lift,.tc-pop,.tc-float,.tc-body){transform-style:preserve-3d}
+.tc-cloud[data-tc-look="layered"] .tc-tilt{transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.tc-cloud[data-tc-look="layered"] .tc-float{animation:tcSway 9s ease-in-out infinite}
+.tc-cloud[data-tc-look="layered"]:focus-within .tc-float,.tc-cloud[data-tc-look="layered"].tc-held .tc-float,.tc-cloud[data-tc-look="layered"].tc-sizing .tc-float,.tc-cloud[data-tc-look="layered"].tc-hover .tc-float{animation-play-state:paused}
+@keyframes tcSway{0%,100%{transform:rotateY(-2.2deg) rotateX(1deg)}50%{transform:rotateY(2.2deg) rotateX(-1deg)}}
+.tc-back{display:none}
+.tc-cloud[data-tc-look="layered"] .tc-back{display:block;position:absolute;inset:0;border-radius:24px;transform:translateZ(-9px);pointer-events:none;
+  background:linear-gradient(180deg,var(--tc-wall),color-mix(in srgb,var(--tc-wall) 70%,#000));
+  box-shadow:0 0 0 1px var(--tc-rim),0 4px 8px rgba(var(--tc-fam),.16),0 14px 26px rgba(var(--tc-fam),.14),0 28px 44px -10px rgba(var(--tc-fam),.16)}
+.tc-el[data-tc-night="1"][data-tc-look="layered"] .tc-back{box-shadow:0 0 0 1px var(--tc-rim),0 4px 8px rgba(0,0,0,.42),0 14px 26px rgba(0,0,0,.40),0 28px 44px -10px rgba(0,0,0,.42)}
+.tc-cloud[data-tc-look="layered"].tc-tall .tc-back{border-radius:20px}
+.tc-cloud[data-tc-look="layered"] .tc-body{
+  background:radial-gradient(circle at var(--gx) var(--gy),rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 46%),linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b) 60%,color-mix(in srgb,var(--tc-face-b) 92%,var(--tc-wall)));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(var(--tc-fam),.10),0 0 0 1px var(--tc-rim)}
+.tc-el[data-tc-night="1"][data-tc-look="layered"] .tc-body{
+  background:radial-gradient(circle at var(--gx) var(--gy),rgba(255,255,255,.13) 0%,rgba(255,255,255,0) 46%),linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.4),0 0 0 1px var(--tc-rim)}
+.tc-cloud[data-tc-look="layered"] .tc-field{transform:translateZ(5px)}
+.tc-cloud[data-tc-look="layered"] .tc-keys,.tc-cloud[data-tc-look="layered"] .tc-ask{transform:translateZ(12px)}
+.tc-cloud[data-tc-look="layered"] .tc-glyph{transform:translateZ(18px)}
+.tc-cloud[data-tc-look="layered"].tc-hover .tc-lift{transform:translateZ(14px)}
+.tc-cloud[data-tc-look="layered"].tc-held .tc-lift{transform:translateZ(22px) scale(1.01)}
+.tc-cloud[data-tc-look="layered"].tc-down .tc-lift{transform:translateZ(-4px);transition-duration:.08s}
+.tc-el[data-tc-still="1"][data-tc-look="layered"] .tc-float{animation:none}
+.tc-el[data-tc-still="1"][data-tc-look="layered"] .tc-tilt{transform:none}
+@media (prefers-reduced-motion:reduce){.tc-cloud[data-tc-look="layered"] .tc-float{animation:none}.tc-cloud[data-tc-look="layered"] .tc-tilt{transform:none}}
+
+/* ---------- the 💭's number: the bell's treatment, in the app's own colour ---------- */
+.tc-badge{position:absolute !important;top:-3px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;box-sizing:border-box;
+  background:linear-gradient(180deg,var(--tc-badge-hi),var(--tc-badge));color:var(--tc-badge-ink);font:800 10px/18px var(--tc-sans) !important;text-align:center;letter-spacing:0;text-shadow:none !important;filter:none !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.15),0 1px 0 rgba(var(--tc-fam),.35),0 2px 4px rgba(var(--tc-fam),.30);z-index:4;pointer-events:none;transform:none;animation:none}
+.tc-badge.tc-bump{animation:tcBadge .5s var(--tc-spring)}
+@keyframes tcBadge{0%{transform:scale(.5)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.tc-draft{position:absolute !important;font-size:0 !important;left:-4px;bottom:1px;width:12px;height:12px;border-radius:50%;pointer-events:none;z-index:4;
+  background:linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));box-shadow:0 0 0 2px var(--tc-acc),0 1px 0 rgba(var(--tc-fam),.3),0 2px 4px rgba(var(--tc-fam),.25);
+  animation:tcDraft 3.4s ease-in-out infinite}
+@keyframes tcDraft{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+.tc-wiggle{animation:tcWiggle .8s ease-in-out}
+@keyframes tcWiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-10deg) scale(1.06)}40%{transform:rotate(8deg) scale(1.06)}60%{transform:rotate(-5deg)}80%{transform:rotate(2deg)}}
+
+/* ---------- the reminder: a small raised panel beside the 💭 ---------- */
+.tc-nudge{position:fixed;left:0;top:0;z-index:2147482994;width:300px;will-change:transform;color:var(--tc-ink)}
+.tc-nudge .tc-body{display:block;padding:15px 16px 13px;min-height:0;border-radius:20px}
+.tc-nudge-t{font:13.5px/1.45 var(--tc-sans);margin:0 20px 9px 0}
+.tc-nudge-t q{display:block;margin-top:4px;font:italic 15px/1.4 var(--tc-serif);quotes:"\201C" "\201D"}
+.tc-nudge-k{display:flex;flex-wrap:wrap;gap:6px}
+.tc-nudge-x{position:absolute;right:9px;top:8px;width:24px;height:24px;border:0;border-radius:50%;background:transparent;color:var(--tc-soft);cursor:pointer;font:15px/24px var(--tc-sans)}
+.tc-nudge-x:hover{color:var(--tc-ink)}
+
+/* ---------- the Inbox ---------- */
+.tc-veil{position:fixed;inset:0;z-index:2147482990;display:flex;align-items:center;justify-content:center;background:var(--tc-veil);
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tc-sheet{position:relative;width:min(580px,100%);max-height:min(88vh,780px);display:flex;flex-direction:column;gap:10px;padding:20px 20px 16px;border-radius:20px;
+  background:var(--tc-sheet);color:var(--tc-ink);font:14px/1.5 var(--tc-sans);box-shadow:var(--tc-modal)}
+.tc-sheet h3{margin:0;font:600 23px/1.2 var(--tc-serif);letter-spacing:.005em;display:flex;align-items:center;gap:9px}
+.tc-sheet .tc-lead{margin:0;color:var(--tc-soft);font-size:13px}
+.tc-sheet-x{position:absolute;right:14px;top:14px}
+.tc-bal{display:flex;flex-wrap:wrap;gap:6px}
+.tc-chip{appearance:none;border:0;cursor:pointer;font:600 12px/1 var(--tc-sans);padding:7px 11px;border-radius:999px;color:var(--tc-ink);
+  background:linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b));box-shadow:var(--tc-key);transition:transform .12s var(--tc-spring),box-shadow .12s ease}
+.tc-chip:hover{transform:translateY(-1px);box-shadow:var(--tc-key-hi)}
+.tc-chip:active{transform:translateY(1.5px);box-shadow:var(--tc-seat)}
+.tc-chip[aria-pressed="true"]{color:var(--tc-acc);box-shadow:var(--tc-seat),0 0 0 1.5px var(--tc-acc)}
+.tc-chip:focus-visible{outline:2px solid var(--tc-acc);outline-offset:2px}
+.tc-list{display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0;padding:3px 3px 8px;margin:0 -3px}
+.tc-item{padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,var(--tc-card),var(--tc-card-b));box-shadow:0 0 0 1px var(--tc-line),0 1px 0 rgba(var(--tc-fam),.06),0 3px 8px rgba(var(--tc-fam),.06)}
+.tc-el[data-tc-night="1"] .tc-item{box-shadow:0 0 0 1px var(--tc-line),0 2px 0 rgba(0,0,0,.4),0 4px 10px rgba(0,0,0,.3)}
+.tc-item.tc-hl{box-shadow:0 0 0 2px var(--tc-acc),0 3px 8px rgba(var(--tc-fam),.10)}
+.tc-item-t{font:italic 16px/1.45 var(--tc-serif);white-space:pre-wrap;overflow-wrap:anywhere}
+.tc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;font-size:11.5px;color:var(--tc-soft)}
+.tc-meta .tc-chip{font-size:11.5px;padding:5px 9px}
+.tc-acts{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.tc-sug{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:8px;font-size:12.5px}
+.tc-sug b{color:var(--tc-acc)}
+.tc-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:2px}
+.tc-foot .tc-end{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tc-empty{padding:22px 6px;text-align:center;font:italic 18px/1.4 var(--tc-serif);color:var(--tc-soft)}
+.tc-menu{position:absolute;z-index:3;min-width:190px;padding:6px;border-radius:14px;background:var(--tc-sheet);box-shadow:var(--tc-modal);display:flex;flex-direction:column;gap:2px}
+.tc-menu button{appearance:none;border:0;background:transparent;text-align:left;cursor:pointer;padding:8px 10px;border-radius:9px;font:13px/1.2 var(--tc-sans);color:var(--tc-ink)}
+.tc-menu button:hover,.tc-menu button:focus-visible{background:var(--tc-menu-hover);outline:none}
+
+/* ---------- less motion: still, and nothing lost ---------- */
+.tc-el[data-tc-still="1"].tc-draft,.tc-el[data-tc-still="1"] .tc-draft{animation:none}
+.tc-el[data-tc-still="1"] .tc-tilt,.tc-el[data-tc-still="1"] .tc-lift,.tc-el[data-tc-still="1"] .tc-key,.tc-el[data-tc-still="1"] .tc-chip,.tc-el[data-tc-still="1"] .tc-body{transition:none}
+.tc-el[data-tc-still="1"].tc-held .tc-lift{transform:none}
+@media (prefers-reduced-motion:reduce){.tc-draft,.tc-badge.tc-bump,.tc-wiggle{animation:none}.tc-tilt,.tc-lift,.tc-key,.tc-chip,.tc-rule,.tc-body{transition:none}}
+@media (max-width:520px){.tc-sheet{padding:18px 14px 14px;border-radius:18px}}
+</style>
+<script>
+/* THE THOUGHTS PANEL · see the note at the top of its styles. One factory, ThoughtCloud.create(host), used by each app
+   with its own host: where its thoughts are kept, its 💭 button, where a thought can go, its night, its quiet times. */
+(function(){
+"use strict";
+if(window.ThoughtCloud)return;
+
+var SPH={academic:{icon:"🎓",label:"Academic",word:"academic",fr:"Académique",frw:"académique"},work:{icon:"💼",label:"Professional",word:"professional",fr:"Professionnel",frw:"professionnelle"},
+  creative:{icon:"🎨",label:"Creative",word:"creative",fr:"Créatif",frw:"créative"},personal:{icon:"🌱",label:"Personal",word:"personal",fr:"Personnel",frw:"personnelle"}};
+/* the language: each app says which it speaks (Carpe Diem is fully bilingual); English unless told otherwise */
+var LANGF=null;function isFr(){try{return !!(LANGF&&LANGF()==="fr");}catch(e){return false;}}
+function T(en,fr){return isFr()?fr:en;}
+function sLabel(k){return isFr()?SPH[k].fr:SPH[k].label;}
+function sWord(k){return isFr()?SPH[k].frw:SPH[k].word;}
+function loc(){return isFr()?"fr-FR":undefined;}
+var SK=["academic","work","creative","personal"];
+var WORDS={
+  academic:"thèses?|mémoires?|chapitres?|séminaires?|cours|examens?|bibliographie|recherches?|colloques?|université|professeurs?|devoirs?|thesis|dissertation|chapters?|supervisors?|seminars?|lectures?|essays?|reading list|readings?|journals?|citations?|cite|references?|bibliograph\\w*|exams?|modules?|courses?|tutors?|tutorials?|professors?|dphil|phd|research\\w*|archives?|library|librarian|conferences?|abstracts?|literature|fieldwork|ethics|viva|footnotes?|lector|fontes|grants?|scholarships?|programmes?|university|college|faculty|marking|grades?|syllabus|curriculum|ascensus",
+  work:"travail|emplois?|factures?|réunions?|entretiens?|candidatures?|échéances?|contrats?|collègues?|salaire|rapports?|bureau|work|jobs?|clients?|invoices?|meetings?|boss|managers?|interviews?|cv|résumé|resume|cover letters?|applications?|deadlines?|contracts?|colleagues?|salary|payroll|linkedin|proposals?|budgets?|reports?|office|shifts?|recruit\\w*|portfolio|forge|fabrica|releases?|builds?|repositor\\w*|repo|github|bugs?|ship|installers?|customers?",
+  creative:"peinture|peindre|dessin\\w*|chansons?|musique|poèmes?|poésie|roman\\w*|tricot\\w*|couture|toiles?|mélodies?|personnages?|scènes?|aquarelles?|paint\\w*|draw\\w*|sketch\\w*|songs?|music|lyrics?|poems?|poetry|story|stories|novels?|design\\w*|art|artwork|photo\\w*|films?|craft\\w*|knit\\w*|sew\\w*|colou?rs?|canvas|illustrat\\w*|melod\\w*|chords?|characters?|plots?|scenes?|sculpt\\w*|pottery|danc\\w*|inkwell|calligraph\\w*|watercolou?rs?|zines?|comics?|animation|idea for|verse|stanza|imago"
+};
+var WRX={};Object.keys(WORDS).forEach(function(k){WRX[k]=new RegExp("(?:^|[^\\p{L}])(?:"+WORDS[k]+")(?=$|[^\\p{L}])","giu");});
+function guess(t){var best="personal",n=0;["academic","work","creative"].forEach(function(k){var m=(String(t||"").match(WRX[k])||[]).length;if(m>n){n=m;best=k;}});return best;}
+
+function el(tag,cls,attrs,kids){var n=document.createElement(tag);if(cls)n.className=cls;
+  if(attrs)for(var k in attrs){var v=attrs[k];if(v==null||v===false)continue;
+    if(k==="text")n.textContent=v;else if(k==="html")n.innerHTML=v;else if(k==="on")for(var e in v)n.addEventListener(e,v[e]);else n.setAttribute(k,v===true?"":v);}
+  (kids||[]).forEach(function(c){if(c)n.appendChild(typeof c==="string"?document.createTextNode(c):c);});return n;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function trunc(t,n){t=String(t||"").replace(/\s+/g," ").trim();return t.length>n?t.slice(0,n-1).trimEnd()+"…":t;}
+function dayKey(d){d=d||new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function pl(n,en,fr){return n+" "+(isFr()?fr:en)+(n===1?"":"s");}
+function ago(at){var s=Math.max(0,(Date.now()-at)/1000);if(s<60)return T("just now","à l’instant");var m=Math.round(s/60);if(m<60)return isFr()?"il y a "+pl(m,"","minute"):pl(m,"minute","")+" ago";
+  var h=Math.round(m/60);if(h<24)return isFr()?"il y a "+pl(h,"","heure"):pl(h,"hour","")+" ago";var d=Math.round(h/24);if(d===1)return T("yesterday","hier");if(d<7)return isFr()?"il y a "+d+" jours":d+" days ago";
+  var w=Math.round(d/7);if(w<5)return isFr()?"il y a "+pl(w,"","semaine"):pl(w,"week","")+" ago";return new Date(at).toLocaleDateString(loc(),{day:"numeric",month:"long"});}
+function waited(at){var d=Math.floor((Date.now()-at)/864e5);if(d<1){var h=Math.floor((Date.now()-at)/36e5);return h<1?T("less than an hour","moins d’une heure"):pl(h,"hour","heure");}return pl(d,"day","jour");}
+function when(t){var d=new Date(t),n=new Date(),tm=d.toLocaleTimeString(loc(),{hour:"numeric",minute:"2-digit"});
+  if(dayKey(d)===dayKey(n))return T("today, ","aujourd’hui, ")+tm;var tmr=new Date(n.getTime()+864e5);if(dayKey(d)===dayKey(tmr))return T("tomorrow, ","demain, ")+tm;
+  return d.toLocaleDateString(loc(),{weekday:"long",day:"numeric",month:"long"})+", "+tm;}
+function at9(daysAhead){var d=new Date();d.setDate(d.getDate()+daysAhead);d.setHours(9,0,0,0);return d.getTime();}
+var REMIND=[[["In an hour","Dans une heure"],function(){return Date.now()+36e5;}],[["This evening","Ce soir"],function(){var d=new Date();d.setHours(18,0,0,0);return d.getTime()>Date.now()+18e5?d.getTime():Date.now()+3*36e5;}],
+  [["Tomorrow morning","Demain matin"],function(){return at9(1);}],[["In three days","Dans trois jours"],function(){return at9(3);}],[["Next week","La semaine prochaine"],function(){return at9(7);}]];
+
+function create(host){
+  var H=host||{},P=H.prefix||"tc_",app=H.app||"ingenium";if(H.lang)LANGF=H.lang;
+  function hv(v){return typeof v==="function"?v():v;}
+  function ls(k,v){try{if(arguments.length>1){if(v==null)localStorage.removeItem(P+k);else localStorage.setItem(P+k,JSON.stringify(v));return v;}
+    var s=localStorage.getItem(P+k);return s==null?null:JSON.parse(s);}catch(e){return null;}}
+  function list(){var l=H.list?H.list():[];return Array.isArray(l)?l:[];}
+  function save(){try{H.save&&H.save();}catch(e){}}
+  function changed(){save();try{H.onChange&&H.onChange();}catch(e){}badge();}
+  function uid(){return H.uid?H.uid():"t"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+  function toast(t){try{H.toast&&H.toast(t);}catch(e){}}
+  function night(){try{return !!(H.night&&H.night());}catch(e){return false;}}
+  function still(){try{if(H.calm&&H.calm())return true;return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+  function quiet(){try{return !!(H.quiet&&H.quiet());}catch(e){return false;}}
+  function fab(){try{return H.fab?H.fab():null;}catch(e){return null;}}
+  function badgeStyle(){return "app";}
+  /* two looks to choose between: "note" (the sticky notes' seating and pop) and "layered" (the seal's layered depth) */
+  function look(){var v=ls("look")||H.look||"note";return v==="layered"?"layered":"note";}
+  function dress(n){n.classList.add("tc-el");n.setAttribute("data-tc-app",app);n.setAttribute("data-tc-night",night()?"1":"0");
+    n.setAttribute("data-tc-still",still()?"1":"0");n.setAttribute("data-tc-badge",badgeStyle());n.setAttribute("data-tc-look",look());return n;}
+  function redress(){[].forEach.call(document.querySelectorAll('.tc-el[data-tc-app="'+app+'"]'),dress);}
+
+  /* the day's count: how many were caught today */
+  function today(){var d=ls("day");if(!d||d.k!==dayKey())d={k:dayKey(),n:0};return d;}
+  function countToday(){var d=today();d.n++;ls("day",d);}
+  function draft(){var d=ls("draft");return d&&typeof d.t==="string"&&d.t.trim()?d:null;}
+
+  /* ================= THE 💭 AND ITS NUMBER ================= */
+  var lastTotal=null;
+  function badge(){var f=fab();if(!f)return;
+    var b=f.querySelector(".tc-badge"),dd=f.querySelector(".tc-draft");
+    if(!b){b=dress(el("span","tc-badge",{"aria-hidden":"true"}));f.appendChild(b);}
+    if(!dd){dd=dress(el("span","tc-draft",{"aria-hidden":"true"}));f.appendChild(dd);}
+    dress(b);dress(dd);
+    var n=list().length,dr=draft(),total=n+(dr?1:0),t=today().n;
+    b.textContent=total>99?"99+":String(total);b.hidden=!total;dd.hidden=!dr;
+    /* a host app may dress every span inside its side buttons (size, font, display, a drop shadow): the number and
+       the dot are pinned in place on the element itself, which no rule of the page can outrank */
+    pin(b,{position:"absolute",top:"-3px",right:"-5px",left:"auto",bottom:"auto",width:"auto","min-width":"18px",height:"18px","line-height":"18px","font-size":"10px","font-weight":"800",
+      padding:"0 5px",margin:"0",display:total?"block":"none",filter:"none",visibility:"visible",opacity:"1","border-radius":"9px","box-sizing":"border-box","text-align":"center",overflow:"visible",
+      background:"linear-gradient(180deg,var(--tc-badge-hi),var(--tc-badge))",color:"var(--tc-badge-ink)","text-shadow":"none"});
+    pin(dd,{position:"absolute",left:"-4px",bottom:"1px",top:"auto",right:"auto",width:"12px",height:"12px","min-width":"0","font-size":"0","line-height":"0",padding:"0",margin:"0",
+      display:dr?"block":"none",filter:"none",visibility:"visible",opacity:"1","border-radius":"50%",background:"linear-gradient(180deg,var(--tc-face-a),var(--tc-face-b))"});
+    if(lastTotal!==null&&total>lastTotal&&!still()){b.classList.remove("tc-bump");void b.offsetWidth;b.classList.add("tc-bump");}
+    lastTotal=total;
+    var bits=[];if(n)bits.push(n+T(" in the Inbox"," dans la Boîte"));if(dr)bits.push(T("1 put away","1 mise de côté"));if(t)bits.push(t+T(" caught today"," saisie"+(t===1?"":"s")+" aujourd’hui"));
+    var title=(dr?T("Bring back your thought","Rouvrir votre pensée"):T("Catch a thought","Saisir une pensée"))+(bits.length?" ("+bits.join(", ")+")":"");
+    if(f.getAttribute("title")!==title){f.setAttribute("title",title);f.setAttribute("aria-label",title);}
+    var ob=cloud&&cloud.querySelector(".tc-open");if(ob)ob.textContent=T("Inbox","Boîte")+(n?" · "+n:"");}
+  function pin(n,props){for(var k in props){if(n.style.getPropertyValue(k)!==props[k]||n.style.getPropertyPriority(k)!=="important")n.style.setProperty(k,props[k],"important");}}
+  function wiggle(){var f=fab();if(!f||still())return;var g=f.firstElementChild||f;g.classList.remove("tc-wiggle");void g.offsetWidth;g.classList.add("tc-wiggle");
+    setTimeout(function(){g.classList.remove("tc-wiggle");},1000);}
+  function bump(){var f=fab();if(!f||still()||!f.animate)return;var g=f.firstElementChild||f;
+    g.animate([{transform:"scale(1)"},{transform:"scale(1.28)",offset:.38},{transform:"scale(.94)",offset:.7},{transform:"scale(1)"}],{duration:560,easing:"ease-out"});}
+  function fabCenter(){var f=fab();if(!f)return null;var r=f.getBoundingClientRect();if(!r.width||!r.height)return null;return {x:r.left+r.width/2,y:r.top+r.height/2,r:r};}
+
+  /* ================= THE CLOUD ================= */
+  var cloud=null,C={};
+  function sizeOf(){var s=ls("size");return s&&s.w?s:null;}
+  function open(prefill,opts){opts=opts||{};
+    if(cloud&&going){try{cloud.getAnimations({subtree:true}).forEach(function(a){a.cancel();});}catch(e){}drop(cloud);}
+    if(cloud){var ta0=cloud.querySelector(".tc-in");if(prefill&&ta0&&!ta0.value)ta0.value=prefill;if(ta0)ta0.focus();return api;}
+    closeNudge();
+    var dr=draft();if(prefill==null&&dr)prefill=dr.t;
+    var ta=el("textarea","tc-in",{rows:"1",maxlength:"2000",spellcheck:"true",autocomplete:"off","aria-label":T("Your thought","Votre pensée"),placeholder:hv(H.placeholder)||T("A thought, a task, a worry: let it go","Une pensée, une tâche, un souci : laissez-la aller")});
+    if(prefill)ta.value=prefill;
+    var rule=el("i","tc-rule"),n=list().length;
+    var keys=el("div","tc-keys",null,[
+      el("button","tc-key tc-keep",{type:"button",text:T("Keep","Garder"),title:T("Keep it in the Inbox (Ctrl and Enter)","La garder dans la Boîte (Ctrl et Entrée)"),on:{click:function(){keep();}}}),
+      el("button","tc-key tc-open",{type:"button",text:T("Inbox","Boîte")+(n?" · "+n:""),title:T("Open the Inbox","Ouvrir la Boîte"),on:{click:function(){var v=ta.value.trim();if(v){putAway(true);}else shut(true);openInbox();}}}),
+      el("button","tc-key tc-round tc-min",{type:"button",text:"−",title:T("Put it away for now: the 💭 keeps your words and reminds you","La mettre de côté : le 💭 garde vos mots et vous la rappelle"),"aria-label":T("Put the thought away for now","Mettre la pensée de côté"),on:{click:function(){putAway();}}}),
+      el("button","tc-key tc-round tc-x",{type:"button",text:"✕",title:T("Close","Fermer"),"aria-label":T("Close","Fermer"),on:{click:function(){closeAsk();}}})]);
+    var ask=el("div","tc-ask",{hidden:true},[el("span",null,{text:T("Keep these words in the Inbox?","Garder ces mots dans la Boîte ?")}),
+      el("button","tc-key tc-keep tc-small",{type:"button",text:T("Keep them","Les garder"),on:{click:function(){keep();}}}),
+      el("button","tc-key tc-small",{type:"button",text:T("Let them go","Les laisser partir"),on:{click:function(){ls("draft",null);var me=cloud;puffAway(function(){drop(me);});}}}),
+      el("button","tc-key tc-small",{type:"button",text:T("Back","Retour"),on:{click:function(){askOff();}}})]);
+    var body=el("div","tc-body",null,[el("span","tc-glyph",{"aria-hidden":"true",text:"💭",title:T("Drag me anywhere","Déplacez-moi où vous voulez")}),el("div","tc-field",null,[ta,rule]),keys,ask]);
+    var rz=["n","s","e","w","nw","ne","sw","se"].map(function(d){return el("span","tc-rz",{"data-rz":d,"aria-hidden":"true",title:d==="se"?T("Drag any edge or corner to resize; double-click for the usual size","Tirez un bord ou un coin pour changer la taille ; double-cliquez pour la taille habituelle"):null});});
+    var dots=[el("i","tc-dot"),el("i","tc-dot"),el("i","tc-dot")];
+    var flt=el("div","tc-float",null,[el("i","tc-back",{"aria-hidden":"true"}),body].concat(rz)),pop=el("div","tc-pop",null,[flt]);
+    var lift=el("div","tc-lift",null,dots.concat([pop])),tilt=el("div","tc-tilt",null,[lift]);
+    cloud=dress(el("div","tc-cloud",{role:"dialog","aria-label":T("Catch a thought","Saisir une pensée")},[tilt]));
+    C={ta:ta,rule:rule,keys:keys,ask:ask,body:body,rz:rz,dots:dots,flt:flt,pop:pop,lift:lift,tilt:tilt,x:0,y:0,seed:Math.floor(Math.random()*9)};
+    var sz=sizeOf();cloud.style.width=(sz?Math.min(sz.w,window.innerWidth-12):Math.min(560,window.innerWidth-24))+"px";
+    if(sz&&sz.h){cloud.classList.add("tc-sized");body.style.height=Math.min(sz.h,window.innerHeight*.8)+"px";}
+    document.body.appendChild(cloud);
+    narrow();grow();draw();
+    var pos=ls("pos"),fc=fabCenter();
+    if(pos&&typeof pos.x==="number")place(pos.x,pos.y);
+    else if(fc&&window.innerWidth<640)place((window.innerWidth-cloud.offsetWidth)/2,fc.r.top-cloud.offsetHeight-40);
+    else if(fc)place(fc.r.left-cloud.offsetWidth-34,fc.y-cloud.offsetHeight/2-28);
+    else place((window.innerWidth-cloud.offsetWidth)/2,76);
+    dotsAim();
+    wire();
+    if(!still()&&cloud.animate)popIn();
+    setTimeout(function(){try{ta.focus();var l=ta.value.length;ta.setSelectionRange(l,l);}catch(e){}},30);
+    badge();
+    return api;}
+
+  function place(x,y){var w=cloud.offsetWidth,h=cloud.offsetHeight;
+    C.x=clamp(x,6,Math.max(6,window.innerWidth-w-6));C.y=clamp(y,6,Math.max(6,window.innerHeight-h-6));
+    cloud.style.transform="translate3d("+Math.round(C.x)+"px,"+Math.round(C.y)+"px,0)";}
+  function draw(){if(!cloud)return;var w=C.body.offsetWidth,h=C.body.offsetHeight;if(!w||!h)return;
+    if(w===C.dw&&h===C.dh)return;C.dw=w;C.dh=h;cloud.classList.toggle("tc-tall",h>92);dotsAim();}
+  function narrow(){if(cloud)cloud.classList.toggle("tc-narrow",cloud.offsetWidth<440);}
+  function grow(){var ta=C.ta;if(!ta)return;C.rule.style.width=Math.min(96,ta.value.length*2.2)+"%";
+    if(cloud.classList.contains("tc-sized")){ta.style.height="";return;}
+    ta.style.height="auto";var room=Math.max(80,Math.min(window.innerHeight*0.42,window.innerHeight-(C.y||76)-120)),want=Math.min(ta.scrollHeight,room);
+    ta.style.height=want+"px";ta.style.overflowY=ta.scrollHeight>room+1?"auto":"hidden";}
+  /* the thought-bubble's little dots, always pointing at the 💭 */
+  function dotsAim(){if(!cloud)return;var fc=fabCenter(),w=C.body.offsetWidth,h=C.body.offsetHeight,cx=C.x+w/2,cy=C.y+h/2;
+    var ang=fc?Math.atan2(fc.y-cy,fc.x-cx):0,a=w/2-4,b=h/2-2,co=Math.cos(ang),si=Math.sin(ang),e=1/Math.sqrt((co/a)*(co/a)+(si/b)*(si/b));
+    var far=fc?Math.hypot(fc.x-cx,fc.y-cy)-e:999,sizes=[8,5.5,3.5],dist=[e+9,e+23,e+34];
+    C.dots.forEach(function(d,i){var r=sizes[i],dd=Math.min(dist[i],e+Math.max(6,far*(i+1)/4));
+      d.style.width=d.style.height=(2*r)+"px";d.style.transform="translate("+(w/2+co*dd-r).toFixed(1)+"px,"+(h/2+si*dd-r).toFixed(1)+"px)";
+      d.style.visibility=fc&&far>14?"visible":"hidden";});}
+  function popIn(){var fc=fabCenter(),w=C.body.offsetWidth,h=C.body.offsetHeight,ox="50%",oy="50%";
+    if(fc){ox=clamp(fc.x-C.x,0,w)+"px";oy=clamp(fc.y-C.y,0,h)+"px";}
+    C.pop.style.transformOrigin=ox+" "+oy;
+    C.dots.slice().reverse().forEach(function(d,i){d.animate([{opacity:0,scale:"0"},{opacity:1,scale:"1.15",offset:.65},{opacity:1,scale:"1"}],{duration:260,delay:i*55,easing:"ease-out",fill:"backwards"});});
+    /* it pops out as a sticky note does (the notes' own notePop): up from the 💭, a touch past its place with a turn
+       of the wrist, and seated */
+    if(look()==="layered"){C.pop.style.transformOrigin="50% 100%";
+      C.pop.animate([{opacity:0,transform:"rotateX(58deg) translateY(28px) scale(.92)"},{opacity:1,transform:"rotateX(-7deg) translateY(-5px) scale(1.01)",offset:.58},
+        {opacity:1,transform:"rotateX(2.5deg) translateY(1px)",offset:.8},{opacity:1,transform:"none"}],{duration:640,delay:90,easing:"cubic-bezier(.2,.8,.3,1)",fill:"backwards"});return;}
+    var SP="cubic-bezier(.34,1.56,.64,1)";
+    C.pop.animate([{opacity:0,transform:"scale(.55) rotate(4deg) translateY(16px)",easing:SP},{opacity:1,transform:"scale(1.05) rotate(-1.2deg) translateY(-4px)",offset:.55,easing:SP},
+      {opacity:1,transform:"scale(.99) rotate(.4deg) translateY(0)",offset:.8,easing:SP},{opacity:1,transform:"none"}],{duration:500,delay:100,fill:"backwards"});}
+  function towardFab(scale){var fc=fabCenter();if(!fc)return null;var w=C.body.offsetWidth,h=C.body.offsetHeight;
+    return "translate("+Math.round(fc.x-(C.x+w/2))+"px,"+Math.round(fc.y-(C.y+h/2))+"px) scale("+scale+")";}
+  var going=false;
+  /* each leaving takes only its own cloud with it, so a new cloud opened meanwhile is never taken too */
+  function drop(node){if(node&&node.parentNode)node.parentNode.removeChild(node);if(node&&node===cloud){cloud=null;C={};going=false;}badge();}
+  function remove(){drop(cloud);}
+  function shut(now){if(!cloud)return;ls("draft",null);var me=cloud;if(now||still()||!cloud.animate){drop(me);return;}puffAway(function(){drop(me);});}
+  /* closing, it sinks a little onto the page and is gone */
+  function puffAway(done){if(!cloud||going)return;going=true;
+    if(still()||!cloud.animate){done();return;}
+    var job=C.pop.animate([{transform:"none",opacity:1},{transform:"translateY(-2px) scale(1.006)",opacity:1,offset:.25},{transform:"translateY(8px) scale(.96)",opacity:0}],{duration:280,easing:"cubic-bezier(.4,0,.7,.2)",fill:"forwards"});
+    C.dots.forEach(function(d,i){d.animate([{opacity:1},{opacity:0}],{duration:160,delay:i*30,fill:"forwards"});});
+    var fired=false,once=function(){if(fired)return;fired=true;done();};job.finished.catch(function(){}).then(once);setTimeout(once,700);}
+
+  /* Keep: the words drift into the 💭, letter by letter, and the cloud puffs away */
+  function keep(){if(!cloud||going)return;var ta=C.ta,v=ta.value.trim();if(!v){closeAsk();return;}
+    var item={id:uid(),t:v.slice(0,2000),at:Date.now(),sphere:guess(v)};
+    list().unshift(item);if(list().length>300)list().length=300;ls("draft",null);countToday();changed();
+    var me=cloud,done1=false,fc=fabCenter(),fin=function(){if(done1)return;done1=true;drop(me);bump();badge();toast(hv(H.keptText)||T("Kept in the Inbox. Back to what you were doing.","Gardée dans la Boîte. Retour à ce que vous faisiez."));};
+    if(still()||!fc||!document.body.animate){fin();return;}
+    going=true;
+    var ir=ta.getBoundingClientRect(),cs=getComputedStyle(ta),meas=document.createElement("canvas").getContext("2d");meas.font=cs.fontStyle+" "+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+    var lh=parseFloat(cs.lineHeight)||parseFloat(cs.fontSize)*1.42,padL=parseFloat(cs.paddingLeft)||0,padT=parseFloat(cs.paddingTop)||0,x=ir.left+padL,y=ir.top+padT-ta.scrollTop,jobs=[];
+    ta.style.color="transparent";C.rule.style.opacity="0";
+    v.slice(0,160).split("").forEach(function(ch,i){if(ch==="\n"){x=ir.left+padL;y+=lh;return;}
+      var w=meas.measureText(ch).width;if(x+w>ir.right-2){x=ir.left+padL;y+=lh;}
+      if(y<ir.top-lh||y>ir.bottom){x+=w;return;}
+      var mo=dress(el("span","tc-mote",{text:ch}));mo.style.font=meas.font;mo.style.transform="translate("+x+"px,"+y+"px)";document.body.appendChild(mo);
+      var ex=fc.x-x,ey=fc.y-y,sx=x,sy=y;
+      jobs.push(mo.animate([{transform:"translate("+sx+"px,"+sy+"px)",opacity:1},{transform:"translate("+(sx+ex*.4)+"px,"+(sy+ey*.2-18-(i%5)*4)+"px) rotate("+(i%2?12:-12)+"deg)",opacity:.9,offset:.5},
+        {transform:"translate("+(sx+ex)+"px,"+(sy+ey)+"px) scale(.3)",opacity:0}],{duration:780,delay:i*15,easing:"cubic-bezier(.4,0,.3,1)",fill:"forwards"})
+        .finished.catch(function(){}).then(function(){mo.remove();}));
+      x+=w;});
+    setTimeout(function(){if(me!==cloud)return;going=false;puffAway(function(){});},150);
+    Promise.all(jobs).then(fin);setTimeout(fin,3600);}
+
+  /* − : put away for now; the words stay with the 💭, which shows a little cloud of its own and a number, and a
+     reminder comes later if it is still waiting */
+  function putAway(quietly){if(!cloud||going)return;var v=C.ta.value;
+    if(!v.trim()){shut();return;}
+    ls("draft",{t:v.slice(0,2000),at:Date.now(),nudged:0});
+    var to=towardFab(.08),me=cloud;
+    var fin=function(){drop(me);if(!quietly)toast(T("Put away. The 💭 keeps your words and will remind you.","Mise de côté. Le 💭 garde vos mots et vous la rappellera."));};
+    if(still()||!cloud.animate||!to){fin();return;}
+    going=true;
+    C.dots.forEach(function(d,i){d.animate([{opacity:1},{opacity:0,transform:d.style.transform+" scale(.2)"}],{duration:220,delay:i*40,fill:"forwards"});});
+    C.pop.style.transformOrigin="50% 50%";
+    C.pop.animate([{transform:"none",opacity:1},{transform:"scale(1.04)",opacity:1,offset:.25},{transform:to,opacity:0}],{duration:460,easing:"cubic-bezier(.5,0,.7,.4)",fill:"forwards"})
+      .finished.catch(function(){}).then(fin);}
+  function closeAsk(){if(!cloud)return;if(!C.ta.value.trim()){shut();return;}C.keys.hidden=true;C.ask.hidden=false;
+    var b=C.ask.querySelector(".tc-keep");if(b)b.focus();}
+  function askOff(){if(!cloud)return;C.ask.hidden=true;C.keys.hidden=false;C.ta.focus();}
+
+  /* dragged from anywhere that is not the words or a key: lifted like a sticky note, swaying with the hand, and set
+     down with a soft spring; resized from its corner */
+  function wire(){var ta=C.ta;
+    ta.addEventListener("input",function(){grow();});
+    ta.addEventListener("keydown",function(e){
+      if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();keep();}
+      else if(e.key==="Escape"){e.preventDefault();e.stopPropagation();if(!C.ask.hidden)askOff();else if(ta.value.trim())putAway();else shut();}});
+    C.ask.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();e.stopPropagation();askOff();}});
+    if(window.ResizeObserver){C.ro=new ResizeObserver(function(){draw();narrow();});C.ro.observe(C.body);}
+    /* the layered look: it turns to follow a mouse, and its light follows; pressed, it sinks */
+    var me=cloud;
+    me.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"&&look()==="layered"&&!still())me.classList.add("tc-hover");});
+    me.addEventListener("pointermove",function(e){if(look()!=="layered"||me.classList.contains("tc-held"))return;var r=C.body.getBoundingClientRect();if(!r.width)return;
+      var x=clamp((e.clientX-r.left)/r.width,-.2,1.2),y=clamp((e.clientY-r.top)/r.height,-.2,1.2);
+      me.style.setProperty("--gx",(x*100).toFixed(1)+"%");me.style.setProperty("--gy",(y*100).toFixed(1)+"%");
+      if(e.pointerType==="mouse"&&!still()){me.style.setProperty("--ry",((x-.5)*7).toFixed(2)+"deg");me.style.setProperty("--rx",(-(y-.5)*5).toFixed(2)+"deg");}});
+    me.addEventListener("pointerleave",function(){me.classList.remove("tc-hover","tc-down");me.style.setProperty("--rx","0deg");me.style.setProperty("--ry","0deg");});
+    me.addEventListener("pointerdown",function(e){if(look()==="layered"&&!still()&&!e.target.closest("textarea"))me.classList.add("tc-down");});
+    document.addEventListener("pointerup",function(){me.classList.remove("tc-down");},true);
+    cloud.addEventListener("pointerdown",function(e){
+      if(e.target.closest("textarea,button,.tc-rz"))return;if(e.pointerType==="mouse"&&e.button!==0)return;
+      e.preventDefault();var x0=e.clientX,y0=e.clientY,bx=C.x,by=C.y,moved=false,pid=e.pointerId,raf=0,nx=bx,ny=by,lx=x0,lt=performance.now(),tiltV=0;
+      function mv(ev){if(ev.pointerId!==pid)return;var dx=ev.clientX-x0,dy=ev.clientY-y0;
+        if(!moved){if(Math.abs(dx)+Math.abs(dy)<3)return;moved=true;cloud.classList.add("tc-held");}
+        ev.preventDefault();nx=bx+dx;ny=by+dy;var t=performance.now(),vx=(ev.clientX-lx)/Math.max(8,t-lt);lx=ev.clientX;lt=t;
+        tiltV=clamp(tiltV*.6+vx*1.6,-3,3);
+        if(!raf)raf=requestAnimationFrame(function(){raf=0;if(!cloud)return;place(nx,ny);if(!still())C.tilt.style.transform="rotate("+tiltV.toFixed(2)+"deg)";dotsAim();});}
+      function up(ev){if(ev.pointerId!==pid)return;document.removeEventListener("pointermove",mv,true);document.removeEventListener("pointerup",up,true);document.removeEventListener("pointercancel",up,true);
+        if(!cloud)return;cloud.classList.remove("tc-held");C.tilt.style.transform="";
+        if(moved){ls("pos",{x:Math.round(C.x),y:Math.round(C.y)});dotsAim();}else C.ta.focus();}
+      document.addEventListener("pointermove",mv,true);document.addEventListener("pointerup",up,true);document.addEventListener("pointercancel",up,true);});
+    /* every edge and corner resizes: the right and bottom ones grow it away from its place, the left and top ones
+       grow it toward them, its far side staying where it is */
+    C.rz.forEach(function(hd){var dir=hd.getAttribute("data-rz");
+      hd.addEventListener("pointerdown",function(e){if(e.pointerType==="mouse"&&e.button!==0)return;e.preventDefault();e.stopPropagation();
+        var x0=e.clientX,y0=e.clientY,w0=cloud.offsetWidth,h0=C.body.offsetHeight,X0=C.x,Y0=C.y,pid=e.pointerId,raf=0,W=w0,Hh=h0,X=X0,Y=Y0,tall=dir.indexOf("n")>=0||dir.indexOf("s")>=0;
+        cloud.classList.add("tc-sizing");
+        function mv(ev){if(ev.pointerId!==pid)return;ev.preventDefault();var dx=ev.clientX-x0,dy=ev.clientY-y0;
+          if(dir.indexOf("e")>=0)W=clamp(w0+dx,280,Math.min(900,window.innerWidth-X0-6));
+          if(dir.indexOf("w")>=0){W=clamp(w0-dx,280,Math.min(900,X0+w0-6));X=X0+(w0-W);}
+          if(dir.indexOf("s")>=0)Hh=clamp(h0+dy,62,Math.min(window.innerHeight*.8,window.innerHeight-Y0-6));
+          if(dir.indexOf("n")>=0){Hh=clamp(h0-dy,62,Math.min(window.innerHeight*.8,Y0+h0-6));Y=Y0+(h0-Hh);}
+          if(!raf)raf=requestAnimationFrame(function(){raf=0;if(!cloud)return;cloud.style.width=W+"px";
+            if(tall){cloud.classList.add("tc-sized");C.body.style.height=Hh+"px";C.ta.style.height="";}
+            C.x=X;C.y=Y;cloud.style.transform="translate3d("+Math.round(X)+"px,"+Math.round(Y)+"px,0)";narrow();if(!tall)grow();draw();});}
+        function up(ev){if(ev.pointerId!==pid)return;document.removeEventListener("pointermove",mv,true);document.removeEventListener("pointerup",up,true);document.removeEventListener("pointercancel",up,true);
+          if(!cloud)return;cloud.classList.remove("tc-sizing");var sized=cloud.classList.contains("tc-sized");
+          ls("size",{w:Math.round(cloud.offsetWidth),h:sized?Math.round(C.body.offsetHeight):0});ls("pos",{x:Math.round(C.x),y:Math.round(C.y)});dotsAim();}
+        document.addEventListener("pointermove",mv,true);document.addEventListener("pointerup",up,true);document.addEventListener("pointercancel",up,true);});
+      hd.addEventListener("dblclick",function(e){e.preventDefault();ls("size",null);cloud.classList.remove("tc-sized");C.body.style.height="";cloud.style.width=Math.min(560,window.innerWidth-24)+"px";narrow();grow();draw();place(C.x,C.y);});});}
+  window.addEventListener("resize",function(){if(cloud){place(C.x,C.y);narrow();grow();draw();}if(nudgeEl)aimNudge();});
+
+  /* ================= THE INBOX ================= */
+  var SUG={},sheetEl=null,filter="all";
+  function take(id){var l=list();for(var i=l.length-1;i>=0;i--)if(l[i].id===id)l.splice(i,1);delete SUG[id];changed();}
+  function done1(){return {key:"done",label:T("✓ Done","✓ Fait"),word:T("done","fait"),run:function(it){toast(T("Done. One less thing to hold.","Fait. Une chose de moins à porter."));}};}
+  function places(){var p=(hv(H.places)||[]).slice();return p.concat([done1()]);}
+  function placeByKey(k){var ps=places();for(var i=0;i<ps.length;i++)if(ps[i].key===k)return ps[i];return null;}
+  function send(it,p,after){var keepIt=false;try{keepIt=p.run(it,api)===false;}catch(e){}if(!keepIt)take(it.id);if(after)after();}
+  function actsFor(it,after){var row=el("div","tc-acts");places().forEach(function(p){
+      row.appendChild(el("button","tc-chip",{type:"button",text:p.label,on:{click:function(){send(it,p,after);}}}));});return row;}
+  function sphereOf(it){if(!it.sphere||!SPH[it.sphere])it.sphere=guess(it.t);return it.sphere;}
+  function menu(anchor,items){closeMenu();var m=dress(el("div","tc-menu",{role:"menu"}));
+    items.forEach(function(x){m.appendChild(el("button",null,{type:"button",role:"menuitem",text:x[0],on:{click:function(e){e.stopPropagation();closeMenu();x[1]();}}}));});
+    var host=anchor.closest(".tc-sheet")||document.body,hr=host.getBoundingClientRect(),ar=anchor.getBoundingClientRect();
+    host.appendChild(m);var left=clamp(ar.left-hr.left,6,hr.width-m.offsetWidth-6),top=ar.bottom-hr.top+6;
+    if(ar.bottom+m.offsetHeight+10>window.innerHeight)top=ar.top-hr.top-m.offsetHeight-6;
+    m.style.left=left+"px";m.style.top=top+"px";var f=m.querySelector("button");if(f)f.focus();menuEl=m;}
+  var menuEl=null;function closeMenu(){if(menuEl){menuEl.remove();menuEl=null;}}
+  function balance(items){var c={};SK.forEach(function(k){c[k]=0;});items.forEach(function(it){c[sphereOf(it)]++;});return c;}
+  function balanceWords(c){return SK.filter(function(k){return c[k];}).map(function(k){return c[k]+" "+sWord(k)+(isFr()&&c[k]>1?"s":"");}).join(", ");}
+  function openInbox(focusId){closeNudge();closeSheet();
+    var veil=dress(el("div","tc-veil",{role:"presentation"})),sh=el("div","tc-sheet",{role:"dialog","aria-modal":"true","aria-label":T("The Inbox","La Boîte")});
+    veil.appendChild(sh);sheetEl=veil;document.body.appendChild(veil);
+    veil.addEventListener("pointerdown",function(e){if(e.target===veil)closeSheet();});
+    veil.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();if(menuEl)closeMenu();else closeSheet();}});
+    function drawSheet(){if(!sheetEl)return;var items=list(),c=balance(items),t=today().n;sh.innerHTML="";closeMenu();
+      sh.appendChild(el("h3",null,null,[el("span",null,{"aria-hidden":"true",text:"💭"}),T("The Inbox","La Boîte")]));
+      sh.appendChild(el("button","tc-key tc-round tc-sheet-x",{type:"button",text:"✕",title:T("Close","Fermer"),"aria-label":T("Close the Inbox","Fermer la Boîte"),on:{click:closeSheet}}));
+      sh.appendChild(el("p","tc-lead",{text:(items.length?items.length+T(" waiting"," en attente")+(t?" · "+t+T(" caught today"," saisie"+(t===1?"":"s")+" aujourd’hui"):"")+T(". Send each one where it belongs, or let it go.",". Envoyez chacune à sa place, ou laissez-la partir."):T("Nothing is waiting.","Rien n’attend.")+(t?" "+t+T(" caught today, all sorted."," saisie"+(t===1?"":"s")+" aujourd’hui, toutes triées."):""))}));
+      if(items.length){var bal=el("div","tc-bal");
+        bal.appendChild(el("button","tc-chip",{type:"button","aria-pressed":filter==="all"?"true":"false",text:T("All · ","Toutes · ")+items.length,on:{click:function(){filter="all";drawSheet();}}}));
+        SK.forEach(function(k){if(!c[k])return;bal.appendChild(el("button","tc-chip",{type:"button","aria-pressed":filter===k?"true":"false",text:SPH[k].icon+" "+sLabel(k)+" · "+c[k],on:{click:function(){filter=filter===k?"all":k;drawSheet();}}}));});
+        sh.appendChild(bal);}
+      var L=el("div","tc-list");sh.appendChild(L);
+      var shown=items.filter(function(it){return filter==="all"||sphereOf(it)===filter;});
+      if(!shown.length)L.appendChild(el("div","tc-empty",{text:items.length?T("Nothing here in this part of your life.","Rien ici dans cette part de votre vie."):T("The Inbox is empty. A clear head.","La Boîte est vide. Une tête dégagée.")}));
+      shown.forEach(function(it){var row=el("div","tc-item"+(it.id===focusId?" tc-hl":""),{"data-id":it.id});
+        row.appendChild(el("div","tc-item-t",{text:it.t}));
+        var s=sphereOf(it),meta=el("div","tc-meta",null,[el("span",null,{text:ago(it.at)})]);
+        var sc=el("button","tc-chip",{type:"button",text:SPH[s].icon+" "+sLabel(s),title:T("Which part of your life this belongs to","À quelle part de votre vie elle appartient"),
+          on:{click:function(){menu(sc,SK.map(function(k){return [SPH[k].icon+" "+sLabel(k),function(){it.sphere=k;it.sphereSet=1;changed();drawSheet();}];}));}}});
+        var rc=el("button","tc-chip",{type:"button",text:it.remindAt?"⏰ "+when(it.remindAt):T("⏰ Remind me","⏰ Me la rappeler"),title:T("When should this come back to you?","Quand doit-elle vous revenir ?"),
+          on:{click:function(){menu(rc,REMIND.map(function(r){return [T(r[0][0],r[0][1]),function(){it.remindAt=r[1]();it.reminded=0;changed();drawSheet();toast(T("It will come back to you ","Elle vous reviendra ")+when(it.remindAt)+".");}];})
+            .concat(it.remindAt?[[T("No reminder","Pas de rappel"),function(){it.remindAt=null;changed();drawSheet();}]]:[]));}}});
+        meta.appendChild(sc);meta.appendChild(rc);row.appendChild(meta);
+        var sg=SUG[it.id],sp=sg&&placeByKey(sg.to);
+        if(sp)row.appendChild(el("div","tc-sug",null,[el("span",null,null,[T("Suggested: ","Suggestion : "),el("b",null,{text:sp.word}),sg.why?": "+sg.why:""]),
+          el("button","tc-key tc-keep tc-small",{type:"button",text:T("Do it","Le faire"),on:{click:function(){send(it,sp,drawSheet);}}})]));
+        row.appendChild(actsFor(it,drawSheet));L.appendChild(row);});
+      var foot=el("div","tc-foot");sh.appendChild(foot);
+      foot.appendChild(el("button","tc-key tc-keep",{type:"button",text:T("+ Catch another","+ En saisir une autre"),on:{click:function(){closeSheet();open("");}}}));
+      if(items.length&&H.suggest)foot.appendChild(el("button","tc-key",{type:"button",text:T("✨ Suggest where each goes","✨ Suggérer une place pour chacune"),title:hv(H.suggestTitle)||T("Your model on this device suggests a place for each; nothing moves until you press Do it","Une place suggérée pour chacune ; rien ne bouge avant que vous appuyiez sur Le faire"),
+        on:{click:function(){var b=this;b.disabled=true;b.textContent=T("Thinking…","Un instant…");Promise.resolve().then(function(){return H.suggest(items.slice(0,12),places());})
+          .then(function(map){if(map)for(var k in map)SUG[k]=map[k];drawSheet();},function(e){toast(String(e&&e.message||e));drawSheet();});}}}));
+      var end=el("div","tc-end");foot.appendChild(end);
+      var cad=cadence(),cadLabel={gentle:T("Gentle reminders","Rappels doux"),often:T("Frequent reminders","Rappels fréquents"),off:T("Reminders off","Rappels désactivés")}[cad];
+      var cb=el("button","tc-chip",{type:"button",text:"⏰ "+cadLabel,title:T("How often the 💭 reminds you of what waits","À quelle fréquence le 💭 vous rappelle ce qui attend"),
+        on:{click:function(){menu(cb,[[T("Gentle: every few hours","Doux : toutes les quelques heures"),function(){cadence("gentle");drawSheet();}],[T("Often: about every hour","Souvent : environ toutes les heures"),function(){cadence("often");drawSheet();}],[T("Off: only the number on the 💭","Désactivés : seulement le nombre sur le 💭"),function(){cadence("off");drawSheet();}]]);}}});
+      end.appendChild(cb);
+      if(items.length>1){var lg=el("button","tc-key",{type:"button",text:T("Let them all go","Tout laisser partir"),on:{click:function(){
+          end.innerHTML="";end.appendChild(el("span",null,{text:T("Let all "+items.length+" go?","Laisser partir les "+items.length+" ?")}));
+          end.appendChild(el("button","tc-key tc-small",{type:"button",text:T("Yes, let them go","Oui, les laisser partir"),on:{click:function(){list().length=0;SUG={};changed();drawSheet();}}}));
+          end.appendChild(el("button","tc-key tc-keep tc-small",{type:"button",text:T("Keep them","Les garder"),on:{click:drawSheet}}));}}});end.appendChild(lg);}
+      if(focusId){var hl=sh.querySelector(".tc-hl");if(hl)setTimeout(function(){hl.scrollIntoView({block:"center",behavior:still()?"auto":"smooth"});},40);}}
+    sheetEl.__draw=drawSheet;drawSheet();
+    if(!still()&&sh.animate)sh.animate([{opacity:0,transform:"translateY(10px) scale(.97)"},{opacity:1,transform:"translateY(-2px) scale(1.005)",offset:.7},{opacity:1,transform:"none"}],{duration:380,easing:"cubic-bezier(.2,.8,.3,1)"});
+    var f=sh.querySelector(".tc-sheet-x");if(f)setTimeout(function(){f.focus();},20);
+    return veil;}
+  function closeSheet(){closeMenu();if(sheetEl){sheetEl.remove();sheetEl=null;}}
+
+  /* ================= REMINDERS ================= */
+  var nudgeEl=null,nudgeTimer=0,started=Date.now();
+  function cadence(v){if(v){ls("cadence",v);return v;}return ls("cadence")||H.cadence||"gentle";}
+  function closeNudge(){clearTimeout(nudgeTimer);if(nudgeEl){var n=nudgeEl;nudgeEl=null;
+    if(!still()&&n.animate)n.animate([{opacity:1},{opacity:0,transform:n.style.transform+" scale(.92)"}],{duration:180,fill:"forwards"}).finished.catch(function(){}).then(function(){n.remove();});else n.remove();}}
+  function aimNudge(){if(!nudgeEl)return;var fc=fabCenter(),w=nudgeEl.offsetWidth,h=nudgeEl.offsetHeight,x,y;
+    if(fc){x=fc.r.left-w-30;y=fc.y-h/2;}else{x=window.innerWidth-w-24;y=window.innerHeight-h-120;}
+    x=clamp(x,8,window.innerWidth-w-8);y=clamp(y,8,window.innerHeight-h-8);nudgeEl.style.transform="translate3d("+Math.round(x)+"px,"+Math.round(y)+"px,0)";
+    var dots=nudgeEl.querySelectorAll(".tc-dot");if(fc){var cx=x+w/2,cy=y+h/2,ang=Math.atan2(fc.y-cy,fc.x-cx),co=Math.cos(ang),si=Math.sin(ang),a=w/2-4,bb=h/2-2,e=1/Math.sqrt((co/a)*(co/a)+(si/bb)*(si/bb));
+      [[6,e+8],[4,e+19]].forEach(function(p,i){var d=dots[i];d.style.width=d.style.height=2*p[0]+"px";d.style.transform="translate("+(w/2+co*p[1]-p[0])+"px,"+(h/2+si*p[1]-p[0])+"px)";});}}
+  function nudge(text,quote,keys,ms){closeNudge();
+    var x=el("button","tc-nudge-x",{type:"button",text:"✕","aria-label":T("Close the reminder","Fermer le rappel"),on:{click:closeNudge}});
+    var k=el("div","tc-nudge-k");keys.forEach(function(kk,i){k.appendChild(el("button","tc-key tc-small"+(i===0?" tc-keep":""),{type:"button",text:kk[0],on:{click:function(){closeNudge();kk[1]();}}}));});
+    var body=el("div","tc-body",null,[el("p","tc-nudge-t",null,[text,quote?el("q",null,{text:trunc(quote,110)}):null]),k,x]);
+    var n=dress(el("div","tc-nudge",{role:"status","aria-live":"polite"},[el("div","tc-float",null,[el("i","tc-dot"),el("i","tc-dot"),body])]));
+    nudgeEl=n;document.body.appendChild(n);aimNudge();wiggle();
+    if(!still()&&n.animate)n.animate([{opacity:0,transform:n.style.transform+" scale(.6)"},{opacity:1,transform:n.style.transform+" scale(1.05)",offset:.6},{opacity:1,transform:n.style.transform}],{duration:460,easing:"cubic-bezier(.2,.9,.3,1.2)"});
+    var hold=false;n.addEventListener("pointerenter",function(){hold=true;clearTimeout(nudgeTimer);});n.addEventListener("pointerleave",function(){hold=false;nudgeTimer=setTimeout(closeNudge,6000);});
+    nudgeTimer=setTimeout(function(){if(!hold)closeNudge();},ms||16000);return n;}
+  function oldestBySphere(items){var o={};items.forEach(function(it){var s=sphereOf(it);if(!o[s]||it.at<o[s].at)o[s]=it;});return o;}
+  function nudgeKind(kind,force){var items=list(),dr=draft();
+    if(kind==="draft"&&dr){dr.nudged=Date.now();ls("draft",dr);
+      return nudge(T("You put a thought away "+ago(dr.at)+":","Vous avez mis une pensée de côté "+ago(dr.at)+" :"),dr.t,[[T("Bring it back","La reprendre"),function(){open();}],[T("Keep it in the Inbox","La garder dans la Boîte"),function(){var d=draft();if(d){list().unshift({id:uid(),t:d.t,at:d.at,sphere:guess(d.t)});ls("draft",null);countToday();changed();toast(T("Kept in the Inbox.","Gardée dans la Boîte."));}}]]);}
+    if(kind==="due"){var due=items.filter(function(it){return it.remindAt&&it.remindAt<=Date.now()&&!it.reminded;}).sort(function(a,b){return a.remindAt-b.remindAt;})[0];
+      if(!due&&force)due=items[0];if(!due)return null;due.reminded=Date.now();save();
+      return nudge(T("A thought you asked to come back to"+(due.at?", from "+ago(due.at):"")+":","Une pensée que vous vouliez retrouver"+(due.at?", notée "+ago(due.at):"")+" :"),due.t,[[T("Open it","L’ouvrir"),function(){due.remindAt=null;save();openInbox(due.id);}],
+        [T("Later","Plus tard"),function(){due.remindAt=Date.now()+2*36e5;due.reminded=0;save();toast(T("It will come back ","Elle reviendra ")+when(due.remindAt)+".");}],[T("Done","Fait"),function(){take(due.id);toast(T("Done. One less thing to hold.","Fait. Une chose de moins à porter."));}]]);}
+    if(kind==="roundup"&&(items.length||force)){ls("roundAt",Date.now());
+      if(!items.length)return nudge(T("Nothing waits in the Inbox. A clear head.","Rien n’attend dans la Boîte. Une tête dégagée."),null,[[T("Catch a thought","Saisir une pensée"),function(){open("");}]]);
+      var o=oldestBySphere(items),last=ls("roundSphere"),pool=SK.filter(function(k){return o[k];}),pick=pool.filter(function(k){return k!==last;});
+      if(!pick.length)pick=pool;pick.sort(function(a,b){return o[a].at-o[b].at;});var s=pick[0],it=o[s];ls("roundSphere",s);
+      var c=balance(items),head=items.length===1?T("One thought is waiting in the Inbox.","Une pensée attend dans la Boîte."):T(items.length+" thoughts are waiting in the Inbox: "+balanceWords(c)+".",items.length+" pensées attendent dans la Boîte : "+balanceWords(c)+".");
+      return nudge(head+T(" Your oldest "+sWord(s)+" one has waited "+waited(it.at)+":"," Votre plus ancienne pensée "+sWord(s)+" attend depuis "+waited(it.at)+" :"),it.t,[[T("Open the Inbox","Ouvrir la Boîte"),function(){openInbox(it.id);}],[T("Not now","Pas maintenant"),function(){ls("roundAt",Date.now());}]]);}
+    return null;}
+  function tick(){try{badge();if(!cloud)redress();
+    if(document.hidden||quiet()||cloud||sheetEl||nudgeEl)return;var now=Date.now(),dr=draft(),cad=cadence();
+    var due=list().some(function(it){return it.remindAt&&it.remindAt<=now&&!it.reminded;});
+    if(due){nudgeKind("due");return;}
+    if(cad==="off")return;
+    if(dr&&now-dr.at>15*6e4&&(!dr.nudged||now-dr.nudged>45*6e4)){nudgeKind("draft");return;}
+    var gap=cad==="often"?60*6e4:150*6e4,last=ls("roundAt")||0;
+    if(list().length&&now-started>8*6e4&&now-last>gap)nudgeKind("roundup");}catch(e){}}
+  setInterval(tick,30000);document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(tick,1500);});
+
+  /* Ctrl and the full stop, from anywhere */
+  function keyCatch(doc){if(!doc||doc.__tcKey)return;doc.__tcKey=1;
+    doc.addEventListener("keydown",function(e){if(e.ctrlKey&&!e.altKey&&!e.metaKey&&(e.key==="."||e.code==="Period")){e.preventDefault();e.stopPropagation();if(cloud&&!draft())C.ta.focus();else open();}},true);}
+  if(H.hotkey!==false)keyCatch(document);
+  /* the 💭 itself */
+  function wireFab(){var f=fab();if(!f||f.__tc)return;f.__tc=1;if(getComputedStyle(f).position==="static")f.style.position="relative";
+    f.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();if(cloud){putAway();return;}open();},true);badge();}
+  wireFab();setTimeout(tick,4000);
+
+  /* a thought caught somewhere else (a line on a page), kept as the panel keeps one */
+  function add(t){t=String(t||"").trim();if(!t)return null;var it={id:uid(),t:t.slice(0,2000),at:Date.now(),sphere:guess(t)};list().unshift(it);if(list().length>300)list().length=300;countToday();changed();bump();return it;}
+  var api={add:add,open:open,keep:keep,putAway:putAway,close:closeAsk,shut:shut,inbox:openInbox,closeInbox:closeSheet,nudge:nudgeKind,badge:badge,wireFab:wireFab,keyCatch:keyCatch,
+    actsFor:actsFor,places:places,spheres:SPH,guess:guess,list:list,draft:draft,today:function(){return today().n;},cadence:cadence,tick:tick,redress:redress,
+    isOpen:function(){return !!cloud;},cloud:function(){return cloud;},refresh:function(){if(sheetEl&&sheetEl.__draw)sheetEl.__draw();badge();},
+    setBadgeStyle:function(v){ls("badge",v);redress();badge();},look:look,setLook:function(v){ls("look",v==="layered"?"layered":"note");redress();},when:when,ago:ago,sphereLabel:sLabel,T:T};
+  return api;}
+
+window.ThoughtCloud={create:create,guess:guess,spheres:SPH,v:2};
+})();
+</script>

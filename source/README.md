@@ -42,6 +42,18 @@ the third path the Carpe Diem copy already there stays. The build checks each ag
 along. Ingenium does not carry itself (a page cannot hold its own copy): from 4.9 each new version keeps its own page in
 the app library on first start, checked against the version it names, so Lector and Fabrica can work on it.
 
+From 5.0, The Forge carries Ingenium in the same way, so the two carry each other. A page cannot hold a full copy of an
+app that holds a full copy of it back, so each carries a lean copy of the other (the owner's choice, 18 October 2026):
+Ingenium carries the Forge's lean page (the Forge without the apps it carries), and the Forge carries Ingenium's lean
+page (Ingenium without the apps it carries). The order of a release that changes both:
+1. Build the Forge's lean page: `python3 -I offline_project/forge_632/forge632.py the_forge_631.html OUT_DIR`.
+2. Put it into Ingenium: `update_builtin.py OUT_DIR/the_forge_632_lean.html Inkwell.html [carpe_diem.html]`, then
+   build and release Ingenium's page.
+3. Take Ingenium's lean page from the release page: `python3 -I build/apps/make_lean.py ingenium.html ingenium_lean.html`
+   (or build it with `ING_LEAN=1 python3 build_page.py OUT.html`).
+4. Build the Forge's full page with the apps it carries: `forge632.py the_forge_631.html OUT_DIR ingenium_lean.html
+   carpe_diem.html Inkwell.html`. Its own copy of itself is its lean page, the same bytes Ingenium carries.
+
 `build/thoughts/` holds the two shared sources that Ingenium, Carpe Diem and The Forge each carry whole inside their
 own page, so no app depends on another: `thought_cloud.html` (the 💭 thought panel and the Inbox) and
 `support_core.html` (the support module: calm, smaller steps, time, low-energy days, routines, the Focus room, Just
