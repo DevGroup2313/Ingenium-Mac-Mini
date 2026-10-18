@@ -1,0 +1,682 @@
+<title>The Offline Project</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Carpe Diem, The Forge, Ingenium and Inkwell: four apps that live on your own device, each with its live demonstration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+/* A hall with the crest at its centre: each quarter of the crest is a door into one app's room, where the app runs live.
+   The crest is the master seal as approved (shield, gilt cross and rim, the four seals struck into their quarters, the book,
+   the ribbon); each quarter now also moves as its own app's seal moves. */
+:root{
+  --ground:#f5f3f7; --ground-2:#ebe6f1; --panel:#ffffff; --ink:#221a2e; --ink-2:#4a4358; --ink-3:#6c6579; --hair:rgba(34,26,46,.12);
+  --gilt:#8f6b2b; --gilt-hi:#c8a35a; --gilt-wash:rgba(176,138,62,.13); --focus:#6a3fb5;
+  --key:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.22),0 4px 5px rgba(40,22,68,.14),0 9px 14px rgba(40,22,68,.09);
+  --key-up:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.22),0 6px 8px rgba(40,22,68,.16),0 13px 20px rgba(40,22,68,.11);
+  --key-down:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --slab:0 1px 0 rgba(40,22,68,.05),0 2px 6px rgba(40,22,68,.05),0 14px 34px rgba(40,22,68,.08);
+  --q-cd-a:#3483a9; --q-cd-b:#1b5a7a; --q-cd-ink:#f4f8fb;
+  --q-fg-a:#fbf5e6; --q-fg-b:#e9dcb9; --q-fg-ink:#3b2f17;
+  --q-in-a:#f6f2fd; --q-in-b:#ddd1f3; --q-in-ink:#2c1d4f;
+  --q-iw-a:#24607d; --q-iw-b:#143a4d; --q-iw-ink:#f2f6f8;
+  --display:"Alegreya SC","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --text:"Alegreya Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#110d18; --ground-2:#191321; --panel:#1f1929; --ink:#f3eefb; --ink-2:#d3c9e3; --ink-3:#a99cc1; --hair:rgba(205,184,240,.13);
+  --gilt:#d9b866; --gilt-hi:#ecd9a0; --gilt-wash:rgba(217,184,102,.11); --focus:#b79ce6;
+  --key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-up:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --key-down:inset 0 3px 7px rgba(0,0,0,.7),0 1px 0 rgba(0,0,0,.6);
+  --slab:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 14px 34px rgba(0,0,0,.36);
+  --q-cd-a:#1f5f80; --q-cd-b:#0f3346; --q-fg-a:#4b4233; --q-fg-b:#2e281d; --q-fg-ink:#f3e9cf; --q-in-a:#3d3160; --q-in-b:#251d3c; --q-in-ink:#ece4fb; --q-iw-a:#174459; --q-iw-b:#0a2230;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#110d18; --ground-2:#191321; --panel:#1f1929; --ink:#f3eefb; --ink-2:#d3c9e3; --ink-3:#a99cc1; --hair:rgba(205,184,240,.13);
+  --gilt:#d9b866; --gilt-hi:#ecd9a0; --gilt-wash:rgba(217,184,102,.11); --focus:#b79ce6;
+  --key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-up:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --key-down:inset 0 3px 7px rgba(0,0,0,.7),0 1px 0 rgba(0,0,0,.6);
+  --slab:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 14px 34px rgba(0,0,0,.36);
+  --q-cd-a:#1f5f80; --q-cd-b:#0f3346; --q-fg-a:#4b4233; --q-fg-b:#2e281d; --q-fg-ink:#f3e9cf; --q-in-a:#3d3160; --q-in-b:#251d3c; --q-in-ink:#ece4fb; --q-iw-a:#174459; --q-iw-b:#0a2230;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 16px/1.55 var(--text);-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 28px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--ground)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:.02em}
+
+/* ---------- the bar ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--ground);background:color-mix(in srgb,var(--ground) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--hair);margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)))}
+.bar-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));flex-wrap:wrap}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.mark .ms{flex:0 0 auto}
+.mark b{font:700 15px/1.1 var(--display);letter-spacing:.16em;white-space:nowrap}
+.chip{font:600 11px/1 var(--text);letter-spacing:.08em;text-transform:uppercase;color:var(--gilt);border:1px solid color-mix(in srgb,var(--gilt) 45%,transparent);border-radius:999px;padding:4px 8px}
+.ctl{margin-left:auto;display:flex;gap:8px;align-items:center}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--ground-2);border:1px solid var(--hair)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink-3);font:600 12.5px/1 var(--text);padding:7px 11px;border-radius:999px;cursor:pointer;transition:background-color .15s,color .15s}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--key)}
+.key{appearance:none;border:1px solid var(--hair);background:var(--panel);color:var(--ink);font:600 13.5px/1.1 var(--text);padding:9px 15px;border-radius:999px;cursor:pointer;box-shadow:var(--key);
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
+.key:active{transform:translateY(1px);box-shadow:var(--key-down)}
+.key.gilt{background:linear-gradient(#d8b96c,#b48d43);border-color:#8a6526;color:#1f1608;text-shadow:0 1px 0 rgba(255,240,200,.45)}
+.key[disabled]{opacity:.55;cursor:default;transform:none}
+.icon-key{width:38px;height:38px;padding:0;justify-content:center;font-size:16px}
+
+/* ---------- the hall ---------- */
+.hall{display:block}
+.hero{display:grid;justify-items:center;text-align:center;padding:26px 0 8px;gap:6px;position:relative}
+.hero::before{content:"";position:absolute;left:50%;top:24px;width:min(760px,100%);height:min(560px,70vw);transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(closest-side,var(--gilt-wash),transparent 72%)}
+.hero h1{font-size:clamp(30px,4.4vw,46px);letter-spacing:.14em;margin-top:6px;position:relative}
+.lede{max-width:58ch;color:var(--ink-2);font-size:clamp(16px,1.6vw,18px);margin:4px auto 0;position:relative}
+.hint{color:var(--ink-3);font-size:14.5px;margin:2px 0 0;position:relative}
+.caption{min-height:3.1em;display:grid;gap:2px;align-content:start;margin-top:4px;position:relative}
+.caption b{font:700 19px/1.2 var(--display);letter-spacing:.08em}
+.caption span{color:var(--ink-2);font-size:15px}
+.crest-stage{position:relative;display:grid;place-items:center;padding:10px 0 4px}
+
+/* the master seal (from the approved preview, unchanged in its construction) */
+@property --part{syntax:"<number>";inherits:true;initial-value:1}
+.ms{position:relative;width:var(--W,300px);height:calc(var(--W,300px) * 4 / 3);perspective:calc(var(--W,300px) * 4);--rx:0deg;--ry:0deg;--lift:0px;--sc:1;--part:1;flex:0 0 auto;touch-action:manipulation}
+.ms-tilt{position:absolute;inset:0;display:block;transform-style:preserve-3d;pointer-events:none;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--sc));transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.ms-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;pointer-events:none;animation:msSway 7s ease-in-out infinite}
+.ms-l{position:absolute;inset:0;display:block;transform-style:preserve-3d;pointer-events:none;transform:translateZ(calc(var(--W,300px) * var(--z) * var(--part))) scale(calc(1 - var(--z) * var(--part) / 4))}
+.ms-l > svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.ms-cast{position:absolute;left:14%;right:14%;bottom:-3%;height:8%;border-radius:50%;background:radial-gradient(closest-side,rgba(42,20,80,.30),rgba(42,20,80,0));filter:blur(4px);transform:translateZ(calc(var(--W,300px) * -.06))}
+.ms.night .ms-cast{background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,0))}
+.ms.hov{--lift:calc(var(--W,300px) * -.03);--sc:1.02}
+.ms.down{--lift:calc(var(--W,300px) * .012);--sc:.985}
+.ms.rise{animation:msRise 1.6s cubic-bezier(.2,.8,.2,1) both}
+.ms.small .ms-idle{animation-duration:9s}
+@keyframes msSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
+@keyframes msRise{0%{--part:0;opacity:.35;transform:translateY(18px) scale(.9)}55%{opacity:1}100%{--part:1;opacity:1;transform:none}}
+.ms.leave{animation:msLeave .5s cubic-bezier(.5,0,.75,0) forwards;transform-origin:var(--ox,50%) var(--oy,50%)}
+@keyframes msLeave{to{transform:scale(1.35);opacity:0}}
+/* the doors: one per seal, carried in the seals' own layer so they turn with the crest */
+.ms-doors{pointer-events:none}
+.ms-door{position:absolute;border-radius:50%;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ms-door:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:2px}
+.ms-door.book{border-radius:6px}
+
+/* each quarter moves as its own app's seal moves */
+.q .body{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.q .lamp{opacity:0;transition:opacity .3s}
+.ms[data-hot="cd"] .q-cd .lamp,.ms[data-hot="forge"] .q-forge .lamp,.ms[data-hot="ingenium"] .q-ingenium .lamp,.ms[data-hot="inkwell"] .q-inkwell .lamp,.ms[data-hot="book"] .q-book .lamp{opacity:1}
+.ms[data-hot="cd"] .q-cd .body,.ms[data-hot="forge"] .q-forge .body,.ms[data-hot="ingenium"] .q-ingenium .body,.ms[data-hot="inkwell"] .q-inkwell .body,.ms[data-hot="book"] .q-book .body{transform:scale(1.05)}
+/* Carpe Diem: the ring that breathes round its seal, and the stamp when it is pressed (cdSealBreathe, cdSealStamp) */
+.q-cd .halo{animation:qHalo 4.5s ease-in-out infinite}
+@keyframes qHalo{0%,100%{opacity:.16;transform:scale(.97)}50%{opacity:.66;transform:scale(1.09)}}
+.q-cd .ripple{opacity:0}
+.q-cd.press .ripple{animation:qStamp .55s ease-out}
+@keyframes qStamp{0%{opacity:.95;transform:scale(.92)}100%{opacity:0;transform:scale(1.55)}}
+/* The Forge: the sparks over the anvil glint in turn, and a sheen crosses the seal (fsGlint, fsbSheen) */
+.q-forge .glint{transform-box:fill-box;transform-origin:center;animation:qGlint 3.2s ease-in-out infinite}
+.q-forge .glint.g2{animation-delay:1.6s}
+@keyframes qGlint{0%,100%{opacity:.25;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+.q-forge .sheen{animation:qSheen 8s cubic-bezier(.45,0,.25,1) 1.4s infinite}
+@keyframes qSheen{0%{transform:translateX(-120px)}24%,100%{transform:translateX(120px)}}
+.q-forge.press .glint{animation:qBurst .5s ease-out}
+@keyframes qBurst{0%{opacity:1;transform:scale(1)}50%{opacity:1;transform:scale(1.9)}100%{opacity:.4;transform:scale(1)}}
+/* Ingenium: the star turns a quarter at a time and its heart stone beats (sealEngine, sealBeat) */
+.q-ingenium .spin{animation:qEngine 9s cubic-bezier(.45,.05,.55,.95) infinite}
+@keyframes qEngine{0%{transform:rotate(0deg)}22%{transform:rotate(90deg)}44%{transform:rotate(180deg)}66%{transform:rotate(270deg)}88%,100%{transform:rotate(360deg)}}
+.q-ingenium .beat{animation:qBeat 3.2s ease-in-out infinite}
+@keyframes qBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1.04)}42%{transform:scale(1.12)}56%{transform:scale(1)}}
+/* Inkwell: the wax breathes a soft glow, and knocks when it is pressed (sealBreathe, sealKnock) */
+.q-inkwell .glow,.q-book .glow{animation:qGlow 6s ease-in-out infinite}
+@keyframes qGlow{0%,100%{opacity:.08}50%{opacity:.6}}
+.q.press .body{animation:qKnock .5s cubic-bezier(.34,1.56,.64,1)}
+.q-cd.press .body{animation:none}
+@keyframes qKnock{0%{transform:scale(.9)}45%{transform:scale(1.12) rotate(-4deg)}100%{transform:scale(1) rotate(0deg)}}
+.still .ms-idle,.still .q *{animation-play-state:paused !important}
+@media (prefers-reduced-motion:reduce){.ms-idle,.ms.rise,.ms.leave,.q *{animation:none !important}.ms-tilt,.q .body{transition:none}}
+
+/* ---------- the four ---------- */
+.section{margin-top:44px}
+.section > h2{font-size:clamp(22px,2.6vw,28px);letter-spacing:.12em;text-align:center}
+.section > p.sub{text-align:center;color:var(--ink-3);margin:6px auto 0;max-width:60ch}
+.four{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;margin:22px auto 0;max-width:980px;padding:3px;border-radius:22px;
+  background:linear-gradient(135deg,#ecd9a0,#c8a35a 28%,#90703a 62%,#c8a35a 85%,#58401a);box-shadow:var(--slab)}
+.room-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start;padding:22px 22px 20px;text-decoration:none;min-width:0;position:relative;transition:filter .2s}
+.room-card:hover{filter:brightness(1.04)}
+.room-card .medal{width:92px;height:92px;flex:0 0 auto}
+.room-card h3{font-size:22px;letter-spacing:.08em}
+.room-card .date{font:500 11.5px/1.3 var(--display);letter-spacing:.2em;opacity:.78;margin-top:2px}
+.room-card p{margin:8px 0 0;font-size:15px;line-height:1.5}
+.room-card .runs{margin-top:10px;font-size:13px;opacity:.85}
+.room-card .go{display:inline-flex;gap:6px;align-items:center;margin-top:12px;font-weight:700;font-size:14px;letter-spacing:.02em}
+.room-card .go::after{content:"→";transition:transform .2s}
+.room-card:hover .go::after{transform:translateX(4px)}
+.rc-cd{background:linear-gradient(135deg,var(--q-cd-a),var(--q-cd-b));color:var(--q-cd-ink);border-radius:19px 0 0 0}
+.rc-forge{background:linear-gradient(225deg,var(--q-fg-a),var(--q-fg-b));color:var(--q-fg-ink);border-radius:0 19px 0 0}
+.rc-ingenium{background:linear-gradient(135deg,var(--q-in-a),var(--q-in-b));color:var(--q-in-ink);border-radius:0 0 0 19px}
+.rc-inkwell{background:linear-gradient(225deg,var(--q-iw-a),var(--q-iw-b));color:var(--q-iw-ink);border-radius:0 0 19px 0}
+/* without Inkwell: Ingenium's card spans the row, and the devices (the owner's pictures show all four seals) stay out */
+.trio .rc-ingenium{grid-column:1/-1;border-radius:0 0 19px 19px}.trio #devices{display:none}
+@media (max-width:540px){.mark b{display:none}.chip{font-size:10px;padding:3px 7px}}
+@media (max-width:720px){.four{grid-template-columns:minmax(0,1fr)}.rc-cd{border-radius:19px 19px 0 0}.rc-forge,.rc-ingenium{border-radius:0}.rc-inkwell{border-radius:0 0 19px 19px}.room-card{grid-template-columns:minmax(0,1fr)}.room-card .medal{width:76px;height:76px}}
+
+/* ---------- the devices ---------- */
+.shelf{margin:22px calc(-1 * max(16px,env(safe-area-inset-left,0px))) 0;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px max(16px,env(safe-area-inset-left,0px)) 14px}
+.shelf-in{display:flex;gap:16px;width:max-content;margin:0 auto}
+.shelf figure{margin:0;scroll-snap-align:center;display:grid;gap:8px;justify-items:center}
+.shelf img{height:clamp(200px,34vw,330px);width:auto;max-width:none;border-radius:12px;box-shadow:var(--slab);background:var(--ground-2);border:6px solid #17141d}
+.shelf .hand img{border-width:9px;border-radius:24px}
+.shelf .desk img{border-width:7px 7px 14px;border-radius:10px 10px 6px 6px}
+.shelf figcaption{font-size:13.5px;color:var(--ink-3)}
+
+footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;color:var(--ink-3);font-size:13.5px}
+.foot .builds{font-variant-numeric:tabular-nums}
+
+/* ---------- a room ---------- */
+.room{padding-top:18px}
+.room-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.room-top .back{margin-right:4px}
+.switch{display:flex;gap:6px;flex-wrap:wrap}
+.switch a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:5px 11px 5px 6px;border-radius:999px;border:1px solid var(--hair);background:var(--panel);box-shadow:var(--key);font:600 13px/1 var(--text);color:var(--ink-2);transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s}
+.switch a:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
+.switch a[aria-current="page"]{color:var(--ink);border-color:color-mix(in srgb,var(--gilt) 60%,transparent);background:var(--gilt-wash)}
+.room-grid{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:22px;margin-top:16px;align-items:start}
+.room-info{display:grid;gap:12px;position:sticky;top:76px;min-width:0}
+.room-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.room-head .medal{width:96px;height:96px}
+.room-head h1{font-size:30px;letter-spacing:.1em}
+.room-head .date{font:500 12px/1.3 var(--display);letter-spacing:.2em;color:var(--gilt)}
+.room-info p{margin:0;color:var(--ink-2)}
+.medal svg{display:block;width:100%;height:100%}
+.switch svg{display:block;width:24px;height:24px;flex:0 0 auto}
+.tryb{display:grid;gap:8px}
+.try{margin:0;padding:12px 14px 12px 34px;border-radius:14px;background:var(--panel);border:1px solid var(--hair);box-shadow:var(--slab);display:grid;gap:6px;font-size:15px}
+.try-h{font:700 13px/1 var(--display);letter-spacing:.16em;color:var(--gilt);margin:0}
+.try li::marker{color:var(--gilt);font-weight:700}
+.room-keys{display:flex;flex-wrap:wrap;gap:8px}
+.runs-line{font-size:13.5px;color:var(--ink-3)}
+.note{font-size:13.5px;color:var(--ink-3);min-height:1.2em}
+.stage{display:grid;gap:10px;min-width:0}
+.stage-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.stage-bar .status{font-size:13.5px;color:var(--ink-3)}
+.well{position:relative;height:min(80vh,900px);min-height:540px;border-radius:18px;background:var(--ground-2);border:1px solid var(--hair);box-shadow:inset 0 2px 10px rgba(0,0,0,.08);
+  display:flex;justify-content:center;align-items:stretch;padding:12px;overflow:hidden}
+.frame{position:relative;width:100%;max-width:100%;height:100%;border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:var(--slab);transition:max-width .45s cubic-bezier(.2,.8,.2,1),border-width .3s,border-radius .3s}
+.stage[data-w="tablet"] .frame{max-width:820px;border:10px solid #15121b;border-radius:28px}
+.stage[data-w="phone"] .frame{max-width:390px;border:10px solid #15121b;border-radius:34px}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+.veil{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;background:var(--panel);text-align:center;padding:20px;transition:opacity .4s}
+.veil[data-gone="1"]{opacity:0;pointer-events:none}
+.veil .medal{width:110px;height:110px;animation:veilBreath 2.6s ease-in-out infinite}
+@keyframes veilBreath{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.05);opacity:1}}
+.veil b{font:700 17px/1.2 var(--display);letter-spacing:.1em}
+.veil span{font-size:14px;color:var(--ink-3);max-width:40ch}
+.room-in{animation:roomIn .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes roomIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (max-width:900px){.room-grid{grid-template-columns:minmax(0,1fr)}.room-info{position:static}.well{height:76vh;min-height:480px;padding:6px}.stage .seg.widths{display:none}}
+@media (prefers-reduced-motion:reduce){.room-in,.veil .medal{animation:none}.frame{transition:none}}
+</style>
+
+<div id="app">
+<header class="bar"><div class="bar-in">
+  <a class="mark" href="#" id="markLink" aria-label="The Offline Project, the crest"><span id="markSeal"></span><b>THE OFFLINE PROJECT</b></a>
+  <span class="chip" id="previewChip" hidden data-i18n="preview">Preview</span>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Language"><button type="button" id="lnEn" aria-pressed="true">EN</button><button type="button" id="lnFr" aria-pressed="false">FR</button></div>
+    <button type="button" class="key icon-key" id="themeKey" aria-pressed="false" data-i18n-label="theme" aria-label="Night">☾</button>
+    <button type="button" class="key icon-key" id="stillKey" aria-pressed="false" data-i18n-label="still" aria-label="Pause the motion">❚❚</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<section class="hall" id="hall" aria-labelledby="hallTitle">
+  <div class="hero">
+    <div class="crest-stage" id="crest"></div>
+    <h1 id="hallTitle">The Offline Project</h1>
+    <p class="lede" data-i18n="lede">Four apps that live on your own device. They need no account and no connection, and nothing you make in them leaves it.</p>
+    <p class="hint" data-i18n="hint">Press a seal to open its app, live, in this page.</p>
+    <div class="caption" id="caption" aria-live="polite"><b id="capName">Carpe Diem · The Forge · Ingenium · Inkwell</b><span id="capLine"></span></div>
+  </div>
+
+  <section class="section" id="four" aria-labelledby="fourTitle">
+    <h2 id="fourTitle" data-i18n="fourTitle">The four apps</h2>
+    <p class="sub" data-i18n="fourSub">Each sits in its quarter of the crest. Each opens here as it is, with its own guided tour.</p>
+    <div class="four" id="fourGrid"></div>
+  </section>
+
+  <section class="section" id="devices" aria-labelledby="devTitle">
+    <h2 id="devTitle" data-i18n="devTitle">On every device</h2>
+    <p class="sub" data-i18n="devSub">The crest as it stands on each screen the apps are built for, by day and by night.</p>
+    <div class="shelf" tabindex="0" aria-label="Devices"><div class="shelf-in" id="shelf"></div></div>
+  </section>
+</section>
+
+<section class="room" id="room" hidden aria-labelledby="roomTitle">
+  <div class="room-top">
+    <a class="key back" href="#" data-i18n="back">← The crest</a>
+    <nav class="switch" id="switch" aria-label="The four apps"></nav>
+  </div>
+  <div class="room-grid">
+    <aside class="room-info">
+      <div class="room-head"><div class="medal" id="roomMedal"></div><div><h1 id="roomTitle">Carpe Diem</h1><div class="date" id="roomDate"></div></div></div>
+      <p id="roomAbout"></p>
+      <div id="variantBox" hidden><div class="seg" role="group" id="variants" aria-label="Demonstration"></div></div>
+      <div class="tryb"><p class="try-h" id="tryH">Try this</p><ol class="try" id="roomTry" aria-labelledby="tryH"></ol></div>
+      <div class="room-keys">
+        <button type="button" class="key gilt" id="tourKey" disabled data-i18n="tour">Start the guided tour</button>
+        <a class="key" id="aloneKey" href="#" target="_blank" rel="noopener" data-i18n="alone">Open on its own ↗</a>
+      </div>
+      <div class="note" id="roomNote" aria-live="polite"></div>
+      <div class="runs-line" id="roomRuns"></div>
+    </aside>
+    <div class="stage" id="stage" data-w="computer">
+      <div class="stage-bar">
+        <div class="seg widths" role="group" aria-label="Screen"><button type="button" data-w="computer" aria-pressed="true" data-i18n="computer">Computer</button><button type="button" data-w="tablet" aria-pressed="false" data-i18n="tablet">Tablet</button><button type="button" data-w="phone" aria-pressed="false" data-i18n="phone">Phone</button></div>
+        <span class="status" id="stageStatus"></span>
+      </div>
+      <div class="well"><div class="frame" id="frameBox">
+        <iframe id="demoFrame" title="Live demonstration" allow="fullscreen; clipboard-write"></iframe>
+        <div class="veil" id="veil"><div class="medal" id="veilMedal"></div><b id="veilTitle"></b><span id="veilLine"></span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot wrap">
+  <span>© 2026 Yannie D. Forest. <span data-i18n="rights">All rights reserved.</span></span>
+  <span class="builds" id="builds"></span>
+</footer>
+</main>
+</div>
+
+<script>
+var BUILD = /*@@BUILD@@*/{};
+(function () {
+"use strict";
+/* ============================== words ============================== */
+var W = {
+  en: { lede: "Four apps that live on your own device. They need no account and no connection, and nothing you make in them leaves it.",
+    hint: "Press a seal to open its app, live, in this page.", fourTitle: "The four apps", fourSub: "Each sits in its quarter of the crest. Each opens here as it is, with its own guided tour.",
+    devTitle: "On every device", devSub: "The crest as it stands on each screen the apps are built for, by day and by night.",
+    back: "← The crest", tour: "Start the guided tour", alone: "Open on its own ↗", computer: "Computer", tablet: "Tablet", phone: "Phone",
+    rights: "All rights reserved.", preview: "Preview", theme: ["Night", "Day"], still: ["Pause the motion", "Let it move"],
+    all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "Runs on", tryH: "Try this",
+    opening: "Opening {app}", sizeLine: "{mb} MB, opened in this page. Nothing is sent anywhere.", ready: "{app} is open. Everything you do stays in this browser.",
+    tourGo: "The tour has started in the app.", tourWait: "The app is still opening.", tourNone: "This app keeps its tour in its own menu.",
+    failed: "This demonstration could not be opened here. Try “Open on its own”.", parts: "Opening, {pct}%", door: "Open {app}", book: "The four apps", screen: "Screen" },
+  fr: { lede: "Quatre apps qui vivent sur votre appareil. Elles ne demandent ni compte ni connexion, et rien de ce que vous y faites n’en sort.",
+    hint: "Touchez un sceau pour ouvrir son app, en direct, dans cette page.", fourTitle: "Les quatre apps", fourSub: "Chacune a son quartier du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée.",
+    devTitle: "Sur chaque appareil", devSub: "Le blason tel qu’il se tient sur chaque écran pour lequel les apps sont construites, de jour et de nuit.",
+    back: "← Le blason", tour: "Lancer la visite guidée", alone: "Ouvrir seule ↗", computer: "Ordinateur", tablet: "Tablette", phone: "Téléphone",
+    rights: "Tous droits réservés.", preview: "Aperçu", theme: ["Nuit", "Jour"], still: ["Arrêter le mouvement", "Laisser bouger"],
+    all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Fonctionne sur", tryH: "À essayer",
+    opening: "Ouverture de {app}", sizeLine: "{mb} Mo, ouverte dans cette page. Rien n’est envoyé nulle part.", ready: "{app} est ouverte. Tout ce que vous faites reste dans ce navigateur.",
+    tourGo: "La visite a commencé dans l’app.", tourWait: "L’app s’ouvre encore.", tourNone: "Cette app garde sa visite dans son propre menu.",
+    failed: "Cette démonstration n’a pas pu s’ouvrir ici. Essayez « Ouvrir seule ».", parts: "Ouverture, {pct} %", door: "Ouvrir {app}", book: "Les quatre apps", screen: "Écran" }
+};
+var APPS = [
+  { slug: "carpe-diem", k: "cd", name: { en: "Carpe Diem", fr: "Carpe Diem" }, date: "XVI · AVGVSTI · MMXXVI", tour: "demoStartTour",
+    line: { en: "A study for the whole day: focus, readings, lessons and writing.", fr: "Un bureau d’étude pour toute la journée : concentration, lectures, leçons et écriture." },
+    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words.",
+             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots." },
+    tries: { en: ["Open the door and choose the shape of your day.", "On the Focus page, break a task into small steps.", "Catch a passing thought in the 💭 Inbox.", "Open Tabula from the Workspace and write."],
+             fr: ["Ouvrez la porte et choisissez la forme de votre journée.", "Sur la page Focus, découpez une tâche en petites étapes.", "Attrapez une pensée au vol dans la boîte 💭.", "Ouvrez Tabula depuis l’Espace de travail et écrivez."] },
+    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
+  { slug: "the-forge", k: "forge", name: { en: "The Forge", fr: "La Forge" }, date: "XVI · AVGVSTI · MMXXVI", tour: "forgeStartTour",
+    line: { en: "A workshop for changing the apps themselves, without code.", fr: "Un atelier pour modifier les apps elles-mêmes, sans code." },
+    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample and Inkwell to work on, and makes no app or install package.",
+             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem et Inkwell pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
+    tries: { en: ["Open the Editor and choose Carpe Diem.", "Point at a part of the preview and change its words or its colour.", "Choose how much help you want: First day, Finding my way or At ease.", "Press step 5 to see what the full Forge makes."],
+             fr: ["Ouvrez l’Éditeur et choisissez Carpe Diem.", "Désignez une partie de l’aperçu et changez ses mots ou sa couleur.", "Choisissez le niveau d’aide qui vous convient.", "Touchez l’étape 5 pour voir ce que fabrique la Forge complète."] },
+    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
+  { slug: "ingenium", k: "ingenium", name: { en: "Ingenium", fr: "Ingenium" }, date: "", tour: "tourStart",
+    line: { en: "Your own AI, kept on your own device.", fr: "Votre propre IA, gardée sur votre appareil." },
+    about: { en: "Ingenium runs an AI model on your own device. You can read its thinking, build an assistant of your own, keep your sources in Fontes, and take one step at a time in its Focus room. To chat, it needs a model file, which stays on your device; everything else works here.",
+             fr: "Ingenium fait tourner un modèle d’IA sur votre appareil. Vous pouvez lire son raisonnement, bâtir votre propre assistant, garder vos sources dans Fontes, et avancer pas à pas dans sa salle Focus. Pour converser, il lui faut un fichier de modèle, qui reste sur votre appareil ; tout le reste fonctionne ici." },
+    tries: { en: ["Take the tour: it begins with what a model is.", "Open Focus, its support room, and take one step at a time.", "Look through your models: Fast, Balanced and Best, for each device.", "Open Fontes and keep a source."],
+             fr: ["Suivez la visite : elle commence par ce qu’est un modèle.", "Ouvrez Focus, sa salle de soutien, et avancez pas à pas.", "Parcourez vos modèles : rapide, équilibré et meilleur, pour chaque appareil.", "Ouvrez Fontes et gardez une source."] },
+    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet", fr: "Mac · Windows · iPhone et iPad · tablette Fire" } },
+  { slug: "inkwell", k: "inkwell", name: { en: "Inkwell", fr: "Inkwell" }, date: "XXIII · SEPTEMBRIS · MMXXVI", tour: "startTour",
+    line: { en: "A writing desk that corrects, clarifies and coaches, offline.", fr: "Un pupitre d’écriture qui corrige, éclaircit et conseille, hors ligne." },
+    about: { en: "Inkwell corrects as you write, offline: spelling and grammar, notes on clarity and style, register and form. It can rewrite a sentence, draft with you, and coach you through an argument with Socrat. Notes pin to the desk, and Tabula and Scriba sit beside the page.",
+             fr: "Inkwell corrige pendant que vous écrivez, hors ligne : orthographe et grammaire, remarques de clarté et de style, registre et forme. Il réécrit une phrase, rédige avec vous, et vous accompagne dans un raisonnement avec Socrat. Les notes s’épinglent au pupitre, et Tabula et Scriba se tiennent près de la page." },
+    tries: { en: ["Open the sample page and read the marks.", "Open a suggestion and accept it.", "Rewrite a sentence, offline.", "Pin a note to the desk with Schedae."],
+             fr: ["Ouvrez la page d’exemple et lisez les marques.", "Ouvrez une suggestion et acceptez-la.", "Réécrivez une phrase, hors ligne.", "Épinglez une note au pupitre avec Schedae."] },
+    runs: { en: "Mac · Windows · Fire tablet", fr: "Mac · Windows · tablette Fire" } }
+];
+/* a build may leave an app out (BUILD.without): the site without Inkwell has three rooms, and the book in Inkwell's quarter */
+var WITHOUT = BUILD.without || [], TRIO = WITHOUT.indexOf("inkwell") >= 0;
+APPS = APPS.filter(function (a) { return WITHOUT.indexOf(a.k) < 0; });
+if (TRIO) {
+  Object.assign(W.en, { lede: "Three apps that live on your own device. They need no account and no connection, and nothing you make in them leaves it.",
+    fourTitle: "The three apps", book: "The three apps", all: "Carpe Diem · The Forge · Ingenium" });
+  Object.assign(W.fr, { lede: "Trois apps qui vivent sur votre appareil. Elles ne demandent ni compte ni connexion, et rien de ce que vous y faites n’en sort.",
+    fourTitle: "Les trois apps", book: "Les trois apps", all: "Carpe Diem · La Forge · Ingenium" });
+  document.documentElement.classList.add("trio");
+}
+var BYSLUG = {}, BYK = {}; APPS.forEach(function (a) { BYSLUG[a.slug] = a; BYK[a.k] = a; a.variants = (BUILD.apps && BUILD.apps[a.slug]) || []; });
+var DEVICES = [["iphone", "iPhone", "iPhone"], ["ipad", "iPad", "iPad"], ["macbook_pro", "MacBook Pro", "MacBook Pro"], ["mac_mini_4k", "Mac mini", "Mac mini"], ["windows", "Windows", "Windows"],
+  ["fire_hd10_upright", "Fire HD 10, upright", "Fire HD 10, debout"], ["fire_hd10_sideways", "Fire HD 10, sideways", "Fire HD 10, à l’horizontale"]];
+
+var store = { get: function (k, d) { try { var v = localStorage.getItem("op:" + k); return v === null ? d : v; } catch (e) { return d; } }, set: function (k, v) { try { localStorage.setItem("op:" + k, v); } catch (e) {} } };
+var lang = store.get("lang", (navigator.language || "").slice(0, 2) === "fr" ? "fr" : "en");
+var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+function t(key) { var v = W[lang][key]; return v === undefined ? W.en[key] : v; }
+function colon() { return lang === "fr" ? "\u00a0: " : ": "; }
+function fill(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o[k] === undefined ? m : o[k]; }); }
+function $(id) { return document.getElementById(id); }
+function night() { var r = document.documentElement.getAttribute("data-theme"); if (r === "dark") return true; if (r === "light") return false; try { return matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { return false; } }
+
+/* ============================== the crest (the approved master seal) ============================== */
+var n = 0;
+var PAL = { day: { cdA: "#3483a9", cdB: "#1b5a7a", fgA: "#fbf5e6", fgB: "#e9dcb9", inA: "#f6f2fd", inB: "#ddd1f3", iwA: "#24607d", iwB: "#143a4d",
+    g1: "#ecd9a0", g2: "#c8a35a", g3: "#90703a", g4: "#58401a", patina: ".30", rbA: "#fffaf0", rbB: "#eee2c4", rbEdge: "#b6893a", rbInk: "#1d4a63", rbFoldA: "#d9c79c", rbFoldB: "#b8a171", dmL: "rgba(255,255,255,.09)", dmD: "rgba(40,22,68,.06)", shine: "rgba(255,255,255,.32)", lamp: "rgba(255,250,235,.22)" },
+  night: { cdA: "#1f5f80", cdB: "#0f3346", fgA: "#4b4233", fgB: "#2e281d", inA: "#3d3160", inB: "#251d3c", iwA: "#174459", iwB: "#0a2230",
+    g1: "#e9d295", g2: "#c19c52", g3: "#896730", g4: "#4a3512", patina: ".34", rbA: "#20384d", rbB: "#122637", rbEdge: "#c99a46", rbInk: "#f0d48e", rbFoldA: "#0f2131", rbFoldB: "#08141f", dmL: "rgba(255,255,255,.06)", dmD: "rgba(255,255,255,.05)", shine: "rgba(255,255,255,.16)", lamp: "rgba(240,212,142,.16)" } };
+var SH_OUT = "M22,16 H278 Q286,16 286,24 V176 C286,262 222,318 150,352 C78,318 14,262 14,176 V24 Q14,16 22,16 Z";
+var SH_IN = "M29,26 H271 Q275,26 275,30 V176 C275,254 216,304 150,337 C84,304 25,254 25,176 V30 Q25,26 29,26 Z";
+var MED = [{ k: "cd", cx: 86, cy: 98, r: 49, qx: 0, qy: 0, qw: 150, qh: 178 }, { k: "forge", cx: 214, cy: 98, r: 49, qx: 150, qy: 0, qw: 150, qh: 178 },
+  { k: "ingenium", cx: 94.5, cy: 234, r: 42, qx: 0, qy: 178, qw: 150, qh: 222 }, { k: "inkwell", cx: 205.5, cy: 234, r: 42, qx: 150, qy: 178, qw: 150, qh: 222 }];
+var MEDK = {}; MED.forEach(function (m) { MEDK[m.k] = m; });
+/* where each seal's art sits in its picture: centre and radius of the disc, on a square of 1600 */
+var DISC = { cd: [800, 800, 780], forge: [800, 800, 722], ingenium: [799, 799, 757], inkwell: [806, 800, 772] };
+/* the seals and pictures travel inside the page (BUILD.img), so a viewer that cannot reach the files beside it still shows them */
+function seal(k, nt) { var key = k + (nt ? "N" : ""); return (BUILD.img && BUILD.img.seals && BUILD.img.seals[key]) || ("assets/seals/" + key + ".png"); }
+function svg(inner, vb) { return '<svg viewBox="' + (vb || "0 0 300 400") + '" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false">' + inner + '</svg>'; }
+function back(id, P) { return svg(
+  '<defs><clipPath id="ci' + id + '"><path d="' + SH_IN + '"/></clipPath>' +
+  '<linearGradient id="cdg' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + P.cdA + '"/><stop offset="1" stop-color="' + P.cdB + '"/></linearGradient>' +
+  '<linearGradient id="fgg' + id + '" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + P.fgA + '"/><stop offset="1" stop-color="' + P.fgB + '"/></linearGradient>' +
+  '<linearGradient id="ing' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + P.inA + '"/><stop offset="1" stop-color="' + P.inB + '"/></linearGradient>' +
+  '<linearGradient id="iwg' + id + '" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + P.iwA + '"/><stop offset="1" stop-color="' + P.iwB + '"/></linearGradient>' +
+  '<pattern id="dmL' + id + '" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect x="0" y="0" width="14" height="14" fill="none" stroke="' + P.dmL + '" stroke-width=".7"/></pattern>' +
+  '<pattern id="dmD' + id + '" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect x="0" y="0" width="14" height="14" fill="none" stroke="' + P.dmD + '" stroke-width=".7"/></pattern>' +
+  '<linearGradient id="sh' + id + '" x1="0" y1="0" x2=".8" y2=".9"><stop offset="0" stop-color="' + P.shine + '"/><stop offset=".45" stop-color="rgba(255,255,255,0)"/></linearGradient>' +
+  '<filter id="ib' + id + '" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter></defs>' +
+  '<g clip-path="url(#ci' + id + ')">' +
+  '<rect x="0" y="0" width="150" height="178" fill="url(#cdg' + id + ')"/><rect x="150" y="0" width="150" height="178" fill="url(#fgg' + id + ')"/>' +
+  '<rect x="0" y="178" width="150" height="222" fill="url(#ing' + id + ')"/><rect x="150" y="178" width="150" height="222" fill="url(#iwg' + id + ')"/>' +
+  '<rect x="0" y="0" width="150" height="178" fill="url(#dmL' + id + ')"/><rect x="150" y="0" width="150" height="178" fill="url(#dmD' + id + ')"/>' +
+  '<rect x="0" y="178" width="150" height="222" fill="url(#dmD' + id + ')"/><rect x="150" y="178" width="150" height="222" fill="url(#dmL' + id + ')"/>' +
+  '<path d="' + SH_IN + '" fill="none" stroke="rgba(20,10,30,.42)" stroke-width="9" filter="url(#ib' + id + ')"/>' +
+  '<path d="' + SH_IN + '" fill="url(#sh' + id + ')"/></g>'); }
+function gold(id, P, dir) { return '<linearGradient id="' + id + '" x1="0" y1="0" x2="' + (dir === "h" ? 1 : 0) + '" y2="' + (dir === "h" ? 0 : 1) + '"><stop offset="0" stop-color="' + P.g1 + '"/><stop offset=".28" stop-color="' + P.g2 + '"/><stop offset=".62" stop-color="' + P.g3 + '"/><stop offset=".85" stop-color="' + P.g2 + '"/><stop offset="1" stop-color="' + P.g4 + '"/></linearGradient>'; }
+function frame(id, P) { return svg('<defs>' + gold('gv' + id, P, "v") + gold('gh' + id, P, "h") +
+  '<clipPath id="cf' + id + '"><path d="' + SH_IN + '"/></clipPath>' +
+  '<filter id="ds' + id + '" x="-10%" y="-10%" width="120%" height="125%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="#1b0e2a" flood-opacity=".38"/></filter>' +
+  '<filter id="pt' + id + '" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035 .05" numOctaves="3" seed="11"/>' +
+  '<feColorMatrix type="matrix" values="0 0 0 0 .30  0 0 0 0 .20  0 0 0 0 .06  1.4 0 0 0 -.55"/><feComponentTransfer><feFuncA type="linear" slope="' + P.patina + '"/></feComponentTransfer></filter>' +
+  '<clipPath id="gc' + id + '"><path clip-rule="evenodd" d="' + SH_OUT + ' ' + SH_IN + '"/><rect x="146.6" y="26" width="6.8" height="320"/><rect x="25" y="174.6" width="250" height="6.8"/></clipPath></defs>' +
+  '<path d="' + SH_OUT + ' ' + SH_IN + '" fill="url(#gv' + id + ')" fill-rule="evenodd" filter="url(#ds' + id + ')"/>' +
+  '<path d="' + SH_OUT + '" fill="none" stroke="' + P.g4 + '" stroke-width=".9"/><path d="' + SH_IN + '" fill="none" stroke="' + P.g4 + '" stroke-opacity=".8" stroke-width=".9"/>' +
+  '<path d="M24,19.5 H276" stroke="' + P.g1 + '" stroke-opacity=".55" stroke-width=".8"/>' +
+  '<g clip-path="url(#cf' + id + ')" filter="url(#ds' + id + ')"><rect x="146.6" y="0" width="6.8" height="400" fill="url(#gh' + id + ')"/><rect x="0" y="174.6" width="300" height="6.8" fill="url(#gv' + id + ')"/>' +
+  '<path d="M146.6,0 V400 M153.4,0 V400 M0,174.6 H300 M0,181.4 H300" stroke="' + P.g4 + '" stroke-opacity=".75" stroke-width=".4"/>' +
+  '<path d="M147.3,0 V400 M0,175.3 H300" stroke="' + P.g1 + '" stroke-opacity=".5" stroke-width=".3"/>' +
+  '<path d="M150,0 V400 M0,178 H300" stroke="' + P.g4 + '" stroke-opacity=".28" stroke-width=".25"/></g>' +
+  '<rect x="0" y="0" width="300" height="400" clip-path="url(#gc' + id + ')" filter="url(#pt' + id + ')" style="mix-blend-mode:multiply"/>'); }
+function bookArt(id, P) { var B = "M150,186.5 C145,183.6 139.5,183 134.8,183.8 V170.8 C139.5,170 145,170.6 150,173.6 C155,170.6 160.5,170 165.2,170.8 V183.8 C160.5,183 155,183.6 150,186.5 Z";
+  return ['<defs>' + gold('bg' + id, P, "v") +
+  '<linearGradient id="bp' + id + '" x1="0" y1="0" x2="1" y2=".4"><stop offset="0" stop-color="' + P.g2 + '"/><stop offset=".45" stop-color="' + P.g1 + '"/><stop offset=".5" stop-color="' + P.g3 + '"/><stop offset=".56" stop-color="' + P.g2 + '"/><stop offset="1" stop-color="' + P.g3 + '"/></linearGradient></defs>', 
+  '<g><path d="' + B + '" fill="none" stroke="rgba(40,24,0,.55)" stroke-width="1.3" transform="translate(-.45,-.45)"/>' +
+  '<path d="' + B + '" fill="none" stroke="rgba(255,244,210,.55)" stroke-width="1.1" transform="translate(.45,.5)"/>' +
+  '<path d="M150,188.4 C145,185.5 139,184.9 133.4,185.7 V171.9 L134.8,170.8 V183.8 C139.5,183 145,183.6 150,186.5 C155,183.6 160.5,183 165.2,183.8 V170.8 L166.6,171.9 V185.7 C161,184.9 155,185.5 150,188.4 Z" fill="url(#bg' + id + ')" stroke="' + P.g4 + '" stroke-width=".55" stroke-linejoin="round"/>' +
+  '<path d="' + B + '" fill="url(#bp' + id + ')" stroke="' + P.g4 + '" stroke-width=".7" stroke-linejoin="round"/>' +
+  '<path d="M150,173.6 V186.5" stroke="' + P.g4 + '" stroke-width=".75"/>' +
+  '<path d="M137.6,174.2 C140.8,173.8 144.2,174.3 147.4,175.6 M137.6,177.2 C140.8,176.8 144.2,177.3 147.4,178.6 M137.6,180.2 C140.8,179.8 144.2,180.3 147.4,181.6 M162.4,174.2 C159.2,173.8 155.8,174.3 152.6,175.6 M162.4,177.2 C159.2,176.8 155.8,177.3 152.6,178.6 M162.4,180.2 C159.2,179.8 155.8,180.3 152.6,181.6" fill="none" stroke="' + P.g4 + '" stroke-opacity=".8" stroke-width=".5" stroke-linecap="round"/>' +
+  '<path d="M135.2,170.9 C139.6,170.2 145,170.8 149.8,173.6 M150.2,173.6 C155,170.8 160.4,170.2 164.8,170.9" fill="none" stroke="' + P.g1 + '" stroke-width=".45" stroke-linecap="round" opacity=".9"/></g>']; }
+function boss(id, P) { var a = bookArt(id, P); return svg(a[0] + a[1]); }
+/* the quarter of an app a build leaves out: the book of the boss, struck larger in a gilt ring, glowing slowly */
+function emblem(m, id, P, nt, opts) { var a = bookArt('e' + id, P), o = "transform-origin:" + m.cx + "px " + m.cy + "px", g = [];
+  g.push('<defs><radialGradient id="ef' + id + '" cx="' + m.cx + '" cy="' + m.cy + '" r="' + m.r + '" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="rgba(255,244,214,' + (nt ? .10 : .16) + ')"/><stop offset="1" stop-color="rgba(255,244,214,0)"/></radialGradient>' +
+    gold('er' + id, P, "v") + '<filter id="eg' + id + '" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6"/></filter>' +
+    '<filter id="es' + id + '" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.4" stdDeviation="1.2" flood-color="#0b0614" flood-opacity=".45"/></filter></defs>' + a[0]);
+  g.push('<g class="q q-book">');
+  if (opts && opts.lamp) g.push('<rect class="lamp" x="' + m.qx + '" y="' + m.qy + '" width="' + m.qw + '" height="' + m.qh + '" fill="' + P.lamp + '" clip-path="url(#' + opts.lamp + ')"/>');
+  g.push('<circle class="glow" cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r - 1) + '" fill="none" stroke="' + P.g2 + '" stroke-width="3.2" filter="url(#eg' + id + ')"/>');
+  g.push('<g class="body" style="' + o + '"><circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r - 2) + '" fill="url(#ef' + id + ')"/>' +
+    '<g filter="url(#es' + id + ')"><circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r - 2) + '" fill="none" stroke="url(#er' + id + ')" stroke-width="2.6"/>' +
+    '<circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r - 6.5) + '" fill="none" stroke="' + P.g2 + '" stroke-opacity=".7" stroke-width=".8"/>' +
+    '<g transform="translate(' + m.cx + ' ' + (m.cy + 1) + ') scale(2.05) translate(-150 -178.6)">' + a[1] + '</g></g></g></g>');
+  return g.join(""); }
+function ribbon(id, P) { return svg('<defs>' +
+  '<linearGradient id="rb' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + P.rbA + '"/><stop offset="1" stop-color="' + P.rbB + '"/></linearGradient>' +
+  '<linearGradient id="rf' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + P.rbFoldA + '"/><stop offset="1" stop-color="' + P.rbFoldB + '"/></linearGradient>' +
+  '<filter id="rs' + id + '" x="-10%" y="-30%" width="120%" height="170%"><feDropShadow dx="0" dy="2.2" stdDeviation="2" flood-color="#1b0e2a" flood-opacity=".35"/></filter>' +
+  '<path id="rt' + id + '" d="M48,366.5 Q150,390.5 252,366.5"/></defs>' +
+  '<g filter="url(#rs' + id + ')">' +
+  '<path d="M44,352 L14,358 L24,371 L12,385 L50,380 Z" fill="url(#rf' + id + ')" stroke="' + P.rbEdge + '" stroke-width=".8" stroke-linejoin="round"/>' +
+  '<path d="M256,352 L286,358 L276,371 L288,385 L250,380 Z" fill="url(#rf' + id + ')" stroke="' + P.rbEdge + '" stroke-width=".8" stroke-linejoin="round"/>' +
+  '<path d="M44,352 L52,358 L50,380 Z M256,352 L248,358 L250,380 Z" fill="' + P.rbFoldB + '" opacity=".9"/>' +
+  '<path d="M44,352 Q150,376 256,352 L250,380 Q150,404 50,380 Z" fill="url(#rb' + id + ')" stroke="' + P.rbEdge + '" stroke-width="1.1" stroke-linejoin="round"/>' +
+  '<path d="M47.5,356 Q150,380 252.5,356 M49.5,376.4 Q150,400.4 250.5,376.4" fill="none" stroke="' + P.rbEdge + '" stroke-opacity=".55" stroke-width=".5"/>' +
+  '<text font-family="Alegreya SC,Iowan Old Style,Palatino Linotype,Palatino,Book Antiqua,Georgia,serif" font-size="11.2" font-weight="700" letter-spacing="1.9" fill="' + P.rbInk + '" text-anchor="middle" dominant-baseline="middle">' +
+  '<textPath href="#rt' + id + '" xlink:href="#rt' + id + '" startOffset="50%">THE · OFFLINE · PROJECT</textPath></text></g>'); }
+/* one seal, set into its quarter, and moving as its own app moves it */
+function img(href, x, y, w) { return '<image href="' + href + '" xlink:href="' + href + '" x="' + x.toFixed(3) + '" y="' + y.toFixed(3) + '" width="' + w.toFixed(3) + '" height="' + w.toFixed(3) + '" preserveAspectRatio="none"/>'; }
+function medal(m, id, P, nt, opts) {
+  var D = DISC[m.k], s = m.r / D[2], z = 1600 * s, x0 = m.cx - D[0] * s, y0 = m.cy - D[1] * s, href = seal(m.k, nt), o = "transform-origin:" + m.cx + "px " + m.cy + "px";
+  var d = ['<defs><clipPath id="sc' + id + '"><circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + m.r + '"/></clipPath>' +
+    '<linearGradient id="sd' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(20,10,0,' + (nt ? .6 : .45) + ')"/><stop offset=".45" stop-color="rgba(20,10,0,0)"/><stop offset="1" stop-color="rgba(255,250,235,' + (nt ? .12 : .25) + ')"/></linearGradient>' +
+    '<filter id="sb' + id + '" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation=".7"/></filter>'];
+  if (m.k === "forge") d.push('<linearGradient id="sn' + id + '" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(255,255,255,0)"/><stop offset=".5" stop-color="rgba(255,255,255,' + (nt ? .22 : .5) + ')"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>');
+  if (m.k === "ingenium") d.push('<radialGradient id="mg' + id + '" cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r * .6) + '" gradientUnits="userSpaceOnUse"><stop offset=".9" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>' +
+    '<mask id="mk' + id + '" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="400"><circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r * .6) + '" fill="url(#mg' + id + ')"/></mask>' +
+    '<clipPath id="st' + id + '"><circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r * .125) + '"/></clipPath>');
+  if (m.k === "inkwell") d.push('<filter id="gw' + id + '" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6"/></filter>');
+  if (m.k === "cd") d.push('<filter id="hb' + id + '" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8"/></filter>');
+  d.push('</defs>');
+  var g = ['<g class="q q-' + m.k + '">'];
+  if (opts && opts.lamp) g.push('<rect class="lamp" x="' + m.qx + '" y="' + m.qy + '" width="' + m.qw + '" height="' + m.qh + '" fill="' + P.lamp + '" clip-path="url(#' + opts.lamp + ')"/>');
+  if (m.k === "cd") g.push('<circle class="halo" style="' + o + '" cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r + 1.4) + '" fill="none" stroke="' + (nt ? "rgba(150,205,235,.9)" : "rgba(255,255,255,.95)") + '" stroke-width="2.6" filter="url(#hb' + id + ')"/>');
+  if (m.k === "inkwell") g.push('<circle class="glow" cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r + .8) + '" fill="none" stroke="' + (nt ? "#7fb4d6" : "#a97e2c") + '" stroke-width="3.2" filter="url(#gw' + id + ')"/>');
+  g.push('<g class="body" style="' + o + '"><g clip-path="url(#sc' + id + ')">' + img(href, x0, y0, z));
+  if (m.k === "ingenium") {
+    g.push('<g class="spin" style="' + o + '"><g mask="url(#mk' + id + ')">' + img(href, x0, y0, z) + '</g></g>');
+    g.push('<g class="beat" style="' + o + '"><g clip-path="url(#st' + id + ')">' + img(href, x0, y0, z) + '</g></g>');
+  }
+  if (m.k === "forge") {
+    g.push('<g class="sheen"><rect x="' + (m.cx - 9) + '" y="' + (m.cy - m.r - 12) + '" width="18" height="' + (2 * m.r + 24) + '" fill="url(#sn' + id + ')" transform="rotate(22 ' + m.cx + ' ' + m.cy + ')"/></g>');
+    var sp = function (x, y, r, cls) { return '<path class="glint ' + cls + '" d="M' + x + ',' + (y - r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y + ' Q' + x + ',' + y + ' ' + x + ',' + (y + r) + ' Q' + x + ',' + y + ' ' + (x - r) + ',' + y + ' Q' + x + ',' + y + ' ' + x + ',' + (y - r) + ' Z" fill="#fffbea"/>'; };
+    g.push(sp(m.cx - .7, m.cy - 15.6, 4.6, "g1") + sp(m.cx + 6.6, m.cy - 21.5, 2.6, "g2"));
+  }
+  g.push('<circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r - 1.2) + '" fill="none" stroke="url(#sd' + id + ')" stroke-width="3" filter="url(#sb' + id + ')"/></g>');
+  g.push('<circle cx="' + m.cx + '" cy="' + m.cy + '" r="' + (m.r + .15) + '" fill="none" stroke="rgba(30,18,4,.45)" stroke-width=".5"/></g>');
+  if (m.k === "cd") g.push('<circle class="ripple" style="' + o + '" cx="' + m.cx + '" cy="' + m.cy + '" r="' + m.r + '" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2.4" filter="url(#hb' + id + ')"/>');
+  g.push('</g>');
+  return d.join("") + g.join("");
+}
+function seals(id, P, nt) {
+  var out = '<defs><clipPath id="sq' + id + '"><path d="' + SH_IN + '"/></clipPath></defs>';
+  MED.forEach(function (m, i) { out += (BYK[m.k] ? medal : emblem)(m, id + "s" + i, P, nt, { lamp: "sq" + id }); });
+  return svg(out);
+}
+/* a seal on its own (the cards, the rooms, the switch): the same seal and motion, framed by itself */
+function lone(k, nt, pad) { var m = MEDK[k], id = "L" + (n++), p = pad === undefined ? 7 : pad, P = PAL[nt ? "night" : "day"];
+  return svg(medal(m, id, P, nt), (m.cx - m.r - p) + " " + (m.cy - m.r - p) + " " + (2 * (m.r + p)) + " " + (2 * (m.r + p))); }
+function master(nt, Wd, opts) {
+  opts = opts || {}; var id = "m" + (n++), P = PAL[nt ? "night" : "day"];
+  var ms = document.createElement("div"); ms.className = "ms " + (nt ? "night" : "day") + (opts.rise ? " rise" : "") + (opts.small ? " small" : ""); ms.style.setProperty("--W", Wd + "px");
+  if (!opts.doors) { ms.setAttribute("role", "img"); ms.setAttribute("aria-label", "The crest of The Offline Project"); }
+  var tilt = document.createElement("div"); tilt.className = "ms-tilt"; var idle = document.createElement("div"); idle.className = "ms-idle";
+  var cast = document.createElement("i"); cast.className = "ms-cast"; idle.appendChild(cast);
+  function layer(z, html) { var d = document.createElement("div"); d.className = "ms-l"; d.style.setProperty("--z", String(z)); if (html) d.innerHTML = html; idle.appendChild(d); return d; }
+  layer(0, back(id, P)); layer(.03, frame(id, P)); layer(.002, seals(id, P, nt)); layer(.1, ribbon(id, P)); layer(.031, boss(id, P));
+  if (opts.doors) {
+    var dl = layer(.002); dl.classList.add("ms-doors");
+    MED.forEach(function (m) { var a = BYK[m.k], el = document.createElement("a");
+      if (!a) { el.className = "ms-door"; el.href = "#four"; el.setAttribute("aria-label", t("book")); el.style.cssText = "left:" + ((m.cx - m.r) / 3) + "%;top:" + ((m.cy - m.r) / 4) + "%;width:" + (2 * m.r / 3) + "%;height:" + (2 * m.r / 4) + "%"; dl.appendChild(el); return; }
+      el.className = "ms-door"; el.href = "#" + a.slug; el.setAttribute("data-k", m.k);
+      el.setAttribute("aria-label", fill(t("door"), { app: a.name[lang] }));
+      el.style.cssText = "left:" + ((m.cx - m.r) / 3) + "%;top:" + ((m.cy - m.r) / 4) + "%;width:" + (2 * m.r / 3) + "%;height:" + (2 * m.r / 4) + "%";
+      dl.appendChild(el); });
+    var bk = document.createElement("a"); bk.className = "ms-door book"; bk.href = "#four"; bk.setAttribute("aria-label", t("book"));
+    bk.style.cssText = "left:" + (131 / 3) + "%;top:" + (168 / 4) + "%;width:" + (38 / 3) + "%;height:" + (23 / 4) + "%"; dl.appendChild(bk);
+  }
+  tilt.appendChild(idle); ms.appendChild(tilt);
+  ms.addEventListener("animationend", function (e) { if (e.animationName === "msRise") ms.classList.remove("rise"); });
+  return ms;
+}
+
+/* ============================== the hall ============================== */
+var crestEl = $("crest"), lastW = 0;
+function crestSize() { var vh = window.innerHeight || 800, vw = document.documentElement.clientWidth || 400; return Math.round(Math.max(210, Math.min(420, vh * 0.58 * 0.75, vw - 40))); }
+function paintCrest(rise) { var w = crestSize(); lastW = w; crestEl.innerHTML = ""; crestEl.appendChild(master(night(), w, { doors: true, rise: rise && !reduced })); }
+function paintMark() { var h = $("markSeal"); h.innerHTML = ""; h.appendChild(master(night(), 27, { small: true })); }
+function capShow(k) { var a = k && BYK[k]; $("capName").textContent = a ? a.name[lang] : t("all"); $("capLine").textContent = a ? a.line[lang] : ""; var ms = crestEl.querySelector(".ms"); if (ms) { if (k) ms.setAttribute("data-hot", k); else ms.removeAttribute("data-hot"); } }
+function paintFour() {
+  var g = $("fourGrid"), nt = night(); g.innerHTML = "";
+  APPS.forEach(function (a) { var c = document.createElement("a"); c.className = "room-card rc-" + a.k; c.href = "#" + a.slug;
+    c.innerHTML = '<div class="medal">' + lone(a.k, nt) + '</div><div><h3>' + a.name[lang] + '</h3>' + (a.date ? '<div class="date">' + a.date + '</div>' : '') +
+      '<p>' + a.line[lang] + '</p><div class="runs">' + t("runs") + colon() + a.runs[lang] + '</div><span class="go">' + t("open") + '</span></div>';
+    g.appendChild(c); });
+}
+function paintShelf() { var s = $("shelf"), nt = night(); s.innerHTML = "";
+  DEVICES.forEach(function (d) { var f = document.createElement("figure"); f.className = /iphone|ipad|fire/.test(d[0]) ? "hand" : "desk"; var i = new Image(); i.loading = "lazy"; i.decoding = "async"; i.alt = (lang === "fr" ? d[2] : d[1]);
+    var dk = d[0] + "_" + (nt ? "night" : "day"); i.src = (BUILD.img && BUILD.img.devices && BUILD.img.devices[dk]) || ("assets/devices/" + dk + ".jpg"); f.appendChild(i); var c = document.createElement("figcaption"); c.textContent = lang === "fr" ? d[2] : d[1]; f.appendChild(c); s.appendChild(f); }); }
+crestEl.addEventListener("pointerover", function (e) { var d = e.target.closest && e.target.closest(".ms-door[data-k]"); capShow(d ? d.getAttribute("data-k") : null); });
+crestEl.addEventListener("pointerout", function (e) { if (!e.relatedTarget || !crestEl.contains(e.relatedTarget)) capShow(null); });
+crestEl.addEventListener("focusin", function (e) { var d = e.target.closest && e.target.closest(".ms-door[data-k]"); if (d) capShow(d.getAttribute("data-k")); });
+crestEl.addEventListener("focusout", function () { capShow(null); });
+/* the press: the seal answers as its app's seal answers, the crest comes forward through that quarter, and the room opens */
+crestEl.addEventListener("click", function (e) {
+  var d = e.target.closest && e.target.closest(".ms-door[data-k]"); if (!d) return; e.preventDefault();
+  var k = d.getAttribute("data-k"), m = MEDK[k], ms = crestEl.querySelector(".ms"), q = ms && ms.querySelector(".q-" + k);
+  if (q) { q.classList.remove("press"); void q.getBoundingClientRect(); q.classList.add("press"); }
+  if (reduced || !ms) { location.hash = "#" + BYK[k].slug; return; }
+  setTimeout(function () { ms.style.setProperty("--ox", (m.cx / 3) + "%"); ms.style.setProperty("--oy", (m.cy / 4) + "%"); ms.classList.add("leave"); }, 260);
+  setTimeout(function () { location.hash = "#" + BYK[k].slug; }, 700);
+});
+/* the turn toward the pointer, the lift and the press, as in the preview */
+document.addEventListener("pointermove", function (e) { var ms = e.target && e.target.closest ? e.target.closest("#crest .ms") : null;
+  document.querySelectorAll("#crest .ms.hov").forEach(function (x) { if (x !== ms) { x.classList.remove("hov", "down"); x.style.removeProperty("--rx"); x.style.removeProperty("--ry"); } });
+  if (!ms || e.pointerType === "touch") return; var r = ms.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+  ms.classList.add("hov"); ms.style.setProperty("--ry", (Math.max(-.7, Math.min(.7, px)) * 26).toFixed(1) + "deg"); ms.style.setProperty("--rx", (-Math.max(-.7, Math.min(.7, py)) * 18).toFixed(1) + "deg"); }, { passive: true });
+document.addEventListener("pointerdown", function (e) { var ms = e.target && e.target.closest ? e.target.closest("#crest .ms") : null; if (ms) ms.classList.add("down"); }, { passive: true });
+document.addEventListener("pointerup", function () { document.querySelectorAll("#crest .ms.down").forEach(function (x) { x.classList.remove("down"); }); }, { passive: true });
+
+/* ============================== a room ============================== */
+var cur = null, curVar = 0, loadedSrc = "", frameEl = $("demoFrame"), tourReady = false, readyTimer = 0;
+function paintSwitch() { var s = $("switch"), nt = night(); s.innerHTML = "";
+  APPS.forEach(function (a) { var l = document.createElement("a"); l.href = "#" + a.slug; if (cur && cur.slug === a.slug) l.setAttribute("aria-current", "page");
+    l.innerHTML = lone(a.k, nt, 4) + "<span>" + a.name[lang] + "</span>"; s.appendChild(l); }); }
+function paintRoom() {
+  if (!cur) return; var a = cur, nt = night();
+  $("roomMedal").innerHTML = lone(a.k, nt); $("veilMedal").innerHTML = lone(a.k, nt);
+  $("roomTitle").textContent = a.name[lang]; $("roomDate").textContent = a.date; $("roomAbout").textContent = a.about[lang];
+  $("tryH").textContent = t("tryH"); $("roomTry").innerHTML = a.tries[lang].map(function (x) { return "<li>" + x + "</li>"; }).join("");
+  $("roomRuns").textContent = t("runs") + colon() + a.runs[lang];
+  var vb = $("variantBox"), vs = $("variants"); vs.innerHTML = "";
+  if (a.variants.length > 1) { vb.hidden = false; a.variants.forEach(function (v, i) { var b = document.createElement("button"); b.type = "button"; b.textContent = v.label[lang]; b.setAttribute("aria-pressed", i === curVar ? "true" : "false");
+      b.addEventListener("click", function () { if (curVar === i) return; curVar = i; paintRoom(); loadDemo(); }); vs.appendChild(b); }); } else vb.hidden = true;
+  var v = a.variants[curVar] || {}; $("aloneKey").href = v.file || "#";
+  $("veilTitle").textContent = fill(t("opening"), { app: a.name[lang] }); $("veilLine").textContent = v.mb ? fill(t("sizeLine"), { mb: v.mb }) : "";
+  paintSwitch(); document.title = a.name[lang] + " · The Offline Project";
+}
+var FORCE_DOC = /[?&]srcdoc=1/.test(location.search), FORCE_SRC = /[?&]direct=1/.test(location.search), loadSeq = 0, viaDoc = false, docSeq = -1;
+function loadDemo() {
+  var v = cur && cur.variants[curVar]; if (!v) return;
+  if (loadedSrc === v.file) return;
+  tourReady = false; $("tourKey").disabled = true; $("roomNote").textContent = ""; $("veil").removeAttribute("data-gone"); $("stageStatus").textContent = fill(t("opening"), { app: cur.name[lang] }) + "…";
+  loadedSrc = v.file; clearTimeout(readyTimer); loadSeq++;
+  if ((BUILD.preview || FORCE_DOC) && !FORCE_SRC) loadByDoc(v, loadSeq); else loadBySrc(v);
+}
+function loadBySrc(v) { viaDoc = false; frameEl.removeAttribute("srcdoc"); frameEl.src = v.file; }
+/* the app's page (or its parts) is fetched beside this page and written into the frame, with its address for its own files */
+function loadByDoc(v, seq) {
+  viaDoc = true; var urls = v.parts || [v.file], txt = [];
+  var chain = Promise.resolve();
+  urls.forEach(function (u, i) { chain = chain.then(function () { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u + ": " + r.status); return r.text(); })
+    .then(function (s) { txt[i] = s; if (seq === loadSeq) $("veilLine").textContent = fill(t("parts"), { pct: Math.round(100 * (i + 1) / urls.length) }); }); }); });
+  chain.then(function () {
+    if (seq !== loadSeq) return;
+    var h = txt.join(""); txt = null; var base = "apps/"; try { base = new URL("apps/", document.baseURI).href; } catch (e) {}
+    var tag = '<base href="' + base + '">', m = /^\s*<!doctype[^>]*>/i.exec(h);
+    h = m ? h.slice(0, m[0].length) + tag + h.slice(m[0].length) : tag + h;
+    docSeq = seq; frameEl.removeAttribute("src"); frameEl.srcdoc = h;
+  }).catch(function () { if (seq === loadSeq) loadBySrc(v); });
+}
+frameEl.addEventListener("load", function () {
+  if (!loadedSrc) return;
+  /* the blank page a frame passes through on its way is not the app */
+  if (viaDoc && docSeq !== loadSeq) return;
+  if (!viaDoc) { try { if (frameEl.contentWindow.location.href === "about:blank") return; } catch (e) {} }
+  var started = Date.now(), app = cur, seq = loadSeq;
+  (function wait() {
+    if (app !== cur || seq !== loadSeq) return;
+    var w = null, ok = false, bad = false;
+    try { w = frameEl.contentWindow; var loader = w.__opLoader === true, err = loader && w.document.getElementById("e");
+      ok = !!(w.__opShimP && w.document.body && w.document.body.children.length > 2 && !loader);
+      bad = !w.__opShimP && !loader && Date.now() - started > 2500 || !!(err && !err.hidden);
+    } catch (e) { bad = true; }
+    if (bad && !viaDoc) { var v = cur.variants[curVar]; loadSeq++; loadByDoc(v, loadSeq); return; }
+    if (bad && viaDoc) { $("stageStatus").textContent = t("failed"); $("veilLine").textContent = t("failed"); return; }
+    if (!ok && Date.now() - started < 90000) { readyTimer = setTimeout(wait, 400); return; }
+    $("veil").setAttribute("data-gone", "1");
+    $("stageStatus").textContent = fill(t("ready"), { app: app.name[lang] });
+    readyTimer = setTimeout(function () { tourReady = true; $("tourKey").disabled = false; }, 1800);
+  })();
+});
+$("tourKey").addEventListener("click", function () {
+  var note = $("roomNote"); if (!cur) return; if (!tourReady) { note.textContent = t("tourWait"); return; }
+  try {
+    var w = frameEl.contentWindow, fn = cur.tour;
+    if (!w || typeof w[fn] !== "function") { note.textContent = t("tourNone"); return; }
+    if ((cur.k === "cd" || cur.k === "forge") && typeof w.cdCloseDoor === "function" && w.document.getElementById("cd-door")) { try { w.cdCloseDoor(); } catch (e) {} }
+    setTimeout(function () { try { if (fn === "startTour") w[fn](true); else if (fn === "tourStart") w[fn](0); else w[fn](); note.textContent = t("tourGo"); } catch (e) { note.textContent = t("tourNone"); } }, 300);
+    try { frameEl.focus(); } catch (e) {}
+  } catch (e) { note.textContent = t("tourNone"); }
+});
+document.querySelectorAll(".seg.widths button").forEach(function (b) { b.addEventListener("click", function () { var w = b.getAttribute("data-w"); $("stage").setAttribute("data-w", w);
+  document.querySelectorAll(".seg.widths button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); }); });
+
+/* ============================== the way between ============================== */
+function route() {
+  var h = (location.hash || "").replace(/^#/, ""), a = BYSLUG[h];
+  if (a) {
+    var changed = !cur || cur.slug !== a.slug; if (changed) curVar = 0; cur = a;
+    $("hall").hidden = true; $("room").hidden = false; paintRoom();
+    var r = $("room"); r.classList.remove("room-in"); void r.offsetWidth; if (!reduced) r.classList.add("room-in");
+    window.scrollTo(0, 0); loadDemo();
+  } else {
+    var wasRoom = !$("room").hidden; cur = null;
+    $("room").hidden = true; $("hall").hidden = false; document.title = "The Offline Project";
+    if (wasRoom) { paintCrest(true); window.scrollTo(0, 0); }
+    if (h === "four" || h === "devices") { var t0 = $(h); if (t0) setTimeout(function () { t0.scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); }, 30); }
+  }
+}
+window.addEventListener("hashchange", route);
+$("markLink").addEventListener("click", function (e) { e.preventDefault(); if (location.hash && location.hash !== "#") location.hash = ""; else { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); } });
+document.querySelector(".room-top .back").addEventListener("click", function (e) { e.preventDefault(); location.hash = ""; });
+
+/* ============================== words, day and night, stillness ============================== */
+function paintWords() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(function (e) { var v = t(e.getAttribute("data-i18n")); if (typeof v === "string") e.textContent = v; });
+  $("lnEn").setAttribute("aria-pressed", lang === "en" ? "true" : "false"); $("lnFr").setAttribute("aria-pressed", lang === "fr" ? "true" : "false");
+  var nt = night(); $("themeKey").textContent = nt ? "☀" : "☾"; $("themeKey").setAttribute("aria-label", t("theme")[nt ? 1 : 0]); $("themeKey").setAttribute("aria-pressed", nt ? "true" : "false");
+  var st = document.body.classList.contains("still"); $("stillKey").setAttribute("aria-label", t("still")[st ? 1 : 0]); $("stillKey").textContent = st ? "▶" : "❚❚";
+  $("builds").textContent = BUILD.line || "";
+  capShow(null); paintFour(); paintShelf();
+  crestEl.querySelectorAll(".ms-door[data-k]").forEach(function (d) { d.setAttribute("aria-label", fill(t("door"), { app: BYK[d.getAttribute("data-k")].name[lang] })); });
+  if (cur) paintRoom();
+}
+function setLang(l) { lang = l; store.set("lang", l); paintWords(); }
+$("lnEn").addEventListener("click", function () { setLang("en"); });
+$("lnFr").addEventListener("click", function () { setLang("fr"); });
+function repaintTheme() { paintCrest(false); paintMark(); paintWords(); }
+$("themeKey").addEventListener("click", function () { var nt = !night(); document.documentElement.setAttribute("data-theme", nt ? "dark" : "light"); store.set("theme", nt ? "dark" : "light"); repaintTheme(); });
+$("stillKey").addEventListener("click", function () { document.body.classList.toggle("still"); store.set("still", document.body.classList.contains("still") ? "1" : ""); paintWords(); });
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { if (!document.documentElement.getAttribute("data-theme")) repaintTheme(); }); } catch (e) {}
+var saved = store.get("theme", ""); if (saved) document.documentElement.setAttribute("data-theme", saved);
+if (store.get("still", "")) document.body.classList.add("still");
+if (BUILD.preview) $("previewChip").hidden = false;
+var rt = 0; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (Math.abs(crestSize() - lastW) > 12 && $("room").hidden) paintCrest(false); }, 200); });
+
+paintCrest(true); paintMark(); paintWords(); route();
+})();
+</script>

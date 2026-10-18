@@ -15,6 +15,17 @@ Tabula also takes R129 (source/build/apps/tabula_look_patch.py): the raised page
 page, so it keeps its look when it stands alone. The owner's words: "Why does Tabula look flat and have this small gap
 between the pages, please restore Tabula's look." "This is a big regression even on Schedae button." (The picture was a
 test photograph of Tabula opened by itself; in Carpe Diem its pages are drawn as before.)
+
+And R130 (source/build/apps/tabula_notes_patch.py): Tabula's footnotes as Word sets them, by Inkwell 7.48's recipe: each
+page's notes at its foot, a note written where it stands, the numbers set as Word sets them, real footnotes in Word
+files, notes through copy and paste. The owner's words: "apply the new footnotes addition to all of the other Tabula to
+keep full parity across Tabula."
+
+And R132 (source/build/apps/tabula_room_patch.py and cd_room_patch.py): room to grow. Tabula autosaves a document
+of up to 256 MB in the larger store (it stopped at 80 MB) and leaves the small store to the desk; Carpe Diem's desk,
+when the small store (about 5 MB) refuses it, is kept in the larger store and opens from there on the next start; the
+browser is asked to keep both. The owner's words: "I want for the local storage limits for all of my apps to be
+expanded please."
 usage: cd1056.py IN_1055.html OUT.html"""
 import base64, gzip, json, os, re, sys, importlib.util
 
@@ -33,6 +44,9 @@ def load(name, path):
 selfsrc = load("selfsrc", os.path.join(HERE, "..", "carpe_diem_1052", "selfsrc.py"))
 tflow = load("tabula_flow_patch", os.path.join(HERE, "..", "..", "build", "apps", "tabula_flow_patch.py"))
 tlook = load("tabula_look_patch", os.path.join(HERE, "..", "..", "build", "apps", "tabula_look_patch.py"))
+tnotes = load("tabula_notes_patch", os.path.join(HERE, "..", "..", "build", "apps", "tabula_notes_patch.py"))
+troom = load("tabula_room_patch", os.path.join(HERE, "..", "..", "build", "apps", "tabula_room_patch.py"))
+cdroom = load("cd_room_patch", os.path.join(HERE, "..", "..", "build", "apps", "cd_room_patch.py"))
 
 
 def rep(a, b, count=1):
@@ -50,7 +64,7 @@ if not m or len(re.findall(r'var TABULA_SRC = "', s)) != 1:
 tab = base64.b64decode(m.group(1)).decode("utf-8")
 if "R127-TABULA-THESIS" not in tab:
     raise SystemExit("this Tabula lacks pass 1055's thesis patch (R127)")
-tab = tlook.patch(tflow.patch(tab))
+tab = troom.patch(tnotes.patch(tlook.patch(tflow.patch(tab))))
 s = s[:m.start(1)] + base64.b64encode(tab.encode("utf-8")).decode("ascii") + s[m.end(1):]
 
 # 2. THE TOUR SAYS SO, in pass 1054's card on autosave, after pass 1055's sentence
@@ -123,6 +137,9 @@ m = re.search(r'CD_BUILD=\{date:"2026-10-18",pass:"1055",stamp:"528171055"', s)
 if not m:
     raise SystemExit("no CD_BUILD 1055")
 s = s.replace(m.group(0), 'CD_BUILD={date:"2026-10-18",pass:"1056",stamp:"528171056"')
+
+# 4b. ROOM TO GROW (R132): a desk the small store refuses is kept in the larger store
+s = cdroom.patch(s)
 
 # 5. THE PAGE'S PHOTOGRAPH OF ITSELF, taken again, so a copy, a room window and Edit this app all carry 1056
 s = selfsrc.rephoto(s)

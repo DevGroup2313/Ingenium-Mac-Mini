@@ -17,6 +17,8 @@ const notes = (f) => f.evaluate(() => ({ text: document.getElementById('editor')
   const f = await open(p);
   await f.evaluate(() => { const ed = document.getElementById('editor'); ed.focus(); ed.innerHTML = '<p>The archive was closed in 1931.</p>'; const r = document.createRange(); r.selectNodeContents(ed.querySelector('p')); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
     window.prompt = () => 'Smith, Archives of Empire (Oxford: Clarendon, 2001), 45.'; document.getElementById('insFoot').click(); });
+  /* since R130 (Inkwell 7.48's recipe) Insert footnote takes the pen to the note at the page's foot, with no prompt box */
+  await p.waitForTimeout(900); if (await f.evaluate(() => !!(document.activeElement && document.activeElement.classList.contains('cd-fnpt')))) await p.keyboard.type('Smith, Archives of Empire (Oxford: Clarendon, 2001), 45.');
   await p.waitForTimeout(800);
   /* the header, written as typing writes it: Header on the ribbon, then the words, with the input event typing fires
      (Tabula's per-section header store follows that event) */
