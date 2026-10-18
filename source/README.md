@@ -28,10 +28,12 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     node rig/t_academic.js http://127.0.0.1:8150/ingenium.html <out>          # every search vetted, Peer-reviewed only, Fontes as a database, Lector citing, 24 checks
     node rig/t_models_care.js http://127.0.0.1:8150/ingenium.html <out>       # quality tiers on the houses, the pace measured, health by model, the catalogue, 24 checks
     node rig/t_studio_care.js http://127.0.0.1:8150/ingenium.html <out>       # Blend's judge and ready-made blends, the tour's chapters, the export, the shelf, 22 checks
-    node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus in their frames, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
+    node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus on the Desk, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
     node rig/t_thoughts.js http://127.0.0.1:8150/ingenium.html <out>          # the thought cloud (the shared thoughts/thought_cloud.html): light, dragged and resized like a sticky note, put away with a number, the Inbox, reminders, 48 checks
     node rig/t_builtin.js http://127.0.0.1:8150/ingenium.html <out>           # Carpe Diem, The Forge and Inkwell carried inside: kept on first start, never over a newer copy, Lector reads a newer copy afresh, 26 checks (written for Carpe Diem 1052, The Forge 631 and Inkwell 7.42)
     node rig/t_support.js http://127.0.0.1:8150/ingenium.html <out>           # the shared support module (thoughts/support_core.html) in Focus: routines, Today asks of you, a low-energy day, the Focus room, Just start, the switches; and Ingenium's own copy of itself in the app library, 41 checks
+    node rig/t_desk.js http://127.0.0.1:8150/ingenium.html <out>              # the five apps as Carpe Diem opens them: the Desk bar and its tabs, the float key, floating windows, a second document, a window of its own with every side button and the shared desk, the thought panel's day and night, 48 checks
+    node rig/t_fabrica_narrow.js http://127.0.0.1:8150/ingenium.html <out>    # on a phone and an upright tablet Fabrica always opens on Your apps, 4 checks
 
 `build/apps/builtin/` holds the copies of The Forge, Inkwell and Carpe Diem that Ingenium carries (each page
 compressed, with `builtin.json` naming its version, date, size and SHA-256 fingerprint). To update them, run
@@ -45,10 +47,16 @@ own page, so no app depends on another: `thought_cloud.html` (the 💭 thought p
 `support_core.html` (the support module: calm, smaller steps, time, low-energy days, routines, the Focus room, Just
 start). `build_page.py` writes the first in before `modules/r119.js` and the second before `modules/r121.js`.
 
-`build/apps/` holds the whole Tabula and Abacus (her own single-page apps, the files Carpe Diem carries), `dark.json`
-(Carpe Diem's night dress for each) and `cd_prep.js` (Carpe Diem's own preparation of the two before it shows them: the
-fold bar and real pages for Tabula, the sheet bar for Abacus). All four come out of carpe_diem.html with
-`python3 -I apps/extract_from_carpe_diem.py path/to/carpe_diem.html`; `build_page.py` rides them into the page and
-`modules/r118.js` opens them in a frame on their pages.
+`build/apps/` holds Carpe Diem's five apps, whole (her own single-page apps, the files Carpe Diem carries): Tabula,
+Abacus, Imago (`slides.html`), Scriba and Fontes. Beside them are `dark.json` (Carpe Diem's night dress for each) and
+`cd_prep.js` (Carpe Diem's own preparation of an app before it shows it). All of these come out of carpe_diem.html with
+`python3 -I apps/extract_from_carpe_diem.py path/to/carpe_diem.html`. `cd_inject.json` holds what Carpe Diem adds to an
+app's frame once it is open (the cut stones on the app keys, its seal, its pen); it is taken from the running page with
+`node apps/harvest_cd_dress.js http://127.0.0.1:8150/carpe_diem.html`. `build_page.py` rides all of it into the page.
+`modules/r118.js` prepares each app and `modules/r123.js` opens it as Carpe Diem does: full width with the Desk bar at
+the top, the float key on the side column, floating windows with a tab each on the Desk bar, and a window of its own.
+A window of its own carries every side button. The windows share the notes, the reminders, the thought Inbox, day and
+night and the Clepsydra's settings, and only the main window writes the saved desk. In the Mac and Windows apps
+`ingenium_app.py` opens that window and holds the shared parts (`open_lite`, `lite_hub_put`, `lite_hub_get`).
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

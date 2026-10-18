@@ -288,6 +288,15 @@ function create(host){
   function dress(n){n.classList.add("tc-el");n.setAttribute("data-tc-app",app);n.setAttribute("data-tc-night",night()?"1":"0");
     n.setAttribute("data-tc-still",still()?"1":"0");n.setAttribute("data-tc-badge",badgeStyle());n.setAttribute("data-tc-look",look());return n;}
   function redress(){[].forEach.call(document.querySelectorAll('.tc-el[data-tc-app="'+app+'"]'),dress);}
+  /* day or night follows the app at once, whatever is open: the cloud, a put-away draft's number, the Inbox, a
+     reminder. The page's own light is watched (its attributes and classes), so a switch made by the theme button,
+     by Display, or by the system in Auto reaches the panel in the same moment it reaches the rest of the app. */
+  var lastNight=null,nightQ=0;
+  function nightCheck(){nightQ=0;var n=night();if(n!==lastNight){lastNight=n;redress();}}
+  function nightSoon(){if(!nightQ)nightQ=setTimeout(nightCheck,30);}
+  try{var mo=new MutationObserver(nightSoon);mo.observe(document.documentElement,{attributes:true});
+    if(document.body)mo.observe(document.body,{attributes:true});else document.addEventListener("DOMContentLoaded",function(){try{mo.observe(document.body,{attributes:true});}catch(e){}});}catch(e){}
+  try{var mq=window.matchMedia("(prefers-color-scheme: dark)");if(mq.addEventListener)mq.addEventListener("change",nightSoon);else if(mq.addListener)mq.addListener(nightSoon);}catch(e){}
 
   /* the day's count: how many were caught today */
   function today(){var d=ls("day");if(!d||d.k!==dayKey())d={k:dayKey(),n:0};return d;}
@@ -603,7 +612,7 @@ function create(host){
       var c=balance(items),head=items.length===1?T("One thought is waiting in the Inbox.","Une pensée attend dans la Boîte."):T(items.length+" thoughts are waiting in the Inbox: "+balanceWords(c)+".",items.length+" pensées attendent dans la Boîte : "+balanceWords(c)+".");
       return nudge(head+T(" Your oldest "+sWord(s)+" one has waited "+waited(it.at)+":"," Votre plus ancienne pensée "+sWord(s)+" attend depuis "+waited(it.at)+" :"),it.t,[[T("Open the Inbox","Ouvrir la Boîte"),function(){openInbox(it.id);}],[T("Not now","Pas maintenant"),function(){ls("roundAt",Date.now());}]]);}
     return null;}
-  function tick(){try{badge();if(!cloud)redress();
+  function tick(){try{badge();nightCheck();if(!cloud)redress();
     if(document.hidden||quiet()||cloud||sheetEl||nudgeEl)return;var now=Date.now(),dr=draft(),cad=cadence();
     var due=list().some(function(it){return it.remindAt&&it.remindAt<=now&&!it.reminded;});
     if(due){nudgeKind("due");return;}

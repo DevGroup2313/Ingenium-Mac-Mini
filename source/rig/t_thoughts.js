@@ -111,8 +111,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(!ce.open && ce.n === 3 && ce.motes === 0, 'Ctrl and Enter keeps it; with less motion it simply goes, with no drift', JSON.stringify(ce));
   await p.evaluate(() => document.body.setAttribute('data-motion', 'calm'));
   // inside the whole Tabula
-  await p.evaluate(() => go('tabula')); await p.waitForSelector('#ingApp-tabula'); await wait(3500);
-  const inFrame = await p.evaluate(async () => { const f = document.getElementById('ingApp-tabula'); const ev = new f.contentWindow.KeyboardEvent('keydown', { key: '.', code: 'Period', ctrlKey: true, bubbles: true, cancelable: true }); f.contentDocument.body.dispatchEvent(ev); await new Promise(r => setTimeout(r, 400)); const open = !!document.querySelector('.tc-cloud'); IngInbox.tc.shut(true); return { open, prevented: ev.defaultPrevented }; });
+  await p.evaluate(() => go('tabula')); await p.waitForSelector('#ing-desk iframe[data-app="tabula"]'); await wait(3500);
+  const inFrame = await p.evaluate(async () => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const ev = new f.contentWindow.KeyboardEvent('keydown', { key: '.', code: 'Period', ctrlKey: true, bubbles: true, cancelable: true }); f.contentDocument.body.dispatchEvent(ev); await new Promise(r => setTimeout(r, 400)); const open = !!document.querySelector('.tc-cloud'); IngInbox.tc.shut(true); return { open, prevented: ev.defaultPrevented }; });
   ok(inFrame.open && inFrame.prevented, 'Ctrl and the full stop works inside Tabula\'s frame too', JSON.stringify(inFrame));
 
   // 6. the Inbox
@@ -141,9 +141,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const note = await p.evaluate(() => ({ text: state.notes[0].text, pinned: state.notes[0].pinned, n: state.parked.length }));
   ok(note.text === 'An old parked thought' && note.pinned && note.n === 1, 'To a note pins it as a Schedae note', JSON.stringify(note));
   await p.evaluate(() => { const row = document.querySelector('.tc-item'); [...row.querySelectorAll('.tc-acts button')].find(b => /To Tabula/.test(b.textContent)).click(); });
-  await p.waitForFunction(() => { const f = document.getElementById('ingApp-tabula'); try { return /Ask the supervisor about chapter two/.test(f.contentDocument.getElementById('editor').innerText); } catch (e) { return false; } }, null, { timeout: 30000 }).then(() => ok(true, 'To Tabula sends it into the whole Tabula, and the Inbox closes'), () => ok(false, 'To Tabula sends it into the whole Tabula'));
-  const tab = await p.evaluate(() => ({ page: document.querySelector('.section.active').id, n: state.parked.length, sheet: !!document.querySelector('.tc-sheet') }));
-  ok(tab.page === 'page-tabula' && tab.n === 0 && !tab.sheet, 'Tabula\'s page is open and the Inbox is empty', JSON.stringify(tab));
+  await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); try { return /Ask the supervisor about chapter two/.test(f.contentDocument.getElementById('editor').innerText); } catch (e) { return false; } }, null, { timeout: 30000 }).then(() => ok(true, 'To Tabula sends it into the whole Tabula, and the Inbox closes'), () => ok(false, 'To Tabula sends it into the whole Tabula'));
+  const tab = await p.evaluate(() => ({ page: IngDesk.state().shown && IngDesk.state().active, n: state.parked.length, sheet: !!document.querySelector('.tc-sheet') }));
+  ok(tab.page === 'tabula' && tab.n === 0 && !tab.sheet, 'Tabula is open on the Desk and the Inbox is empty', JSON.stringify(tab));
 
   // 7. the model's suggestion
   await p.evaluate(() => { state.parked = [{ id: 's1', t: 'Write the abstract for the conference', at: Date.now() }, { id: 's2', t: 'Is a mixed-methods design right for chapter three?', at: Date.now() - 1000 }, { id: 's3', t: 'The idea about seasons in the calm room', at: Date.now() - 2000 }]; saveState();

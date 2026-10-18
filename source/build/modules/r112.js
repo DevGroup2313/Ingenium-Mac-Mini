@@ -340,7 +340,7 @@ function sealEl(k,size){var root=h("span","f-ls");root.setAttribute("aria-hidden
 /* ---------- what is kept of the page's own state ---------- */
 function FBS(){if(!state.fabrica||typeof state.fabrica!=="object")state.fabrica={};var f=state.fabrica;if(!f.links)f.links={};if(!f.drafts)f.drafts={};return f;}
 function saveSoon(){try{saveState();}catch(e){}}
-var S={view:"changes",file:0,panel:"work",dir:"",cmp:null,testing:null,making:null,busy:false,open:{}};
+var S={view:"changes",file:0,panel:"apps",dir:"",cmp:null,testing:null,making:null,busy:false,open:{}};
 var C={repos:[],status:{},notes:{},diff:{},files:{},log:{},tags:{},lastErr:{}};
 function sel(){var id=FBS().sel;return C.repos.filter(function(r){return r.id===id;})[0]||null;}
 function cur(){return sel();}
@@ -411,7 +411,7 @@ function setPanel(p){S.panel=p;var tabs=$("fbTabs");if(tabs)[].forEach.call(tabs
 function fit(){var root=$("fb");if(!root||!root.offsetParent)return;var r=root.getBoundingClientRect(),se=document.scrollingElement||document.documentElement,top=r.top+(se?se.scrollTop:0);
   var hgt=Math.max(420,Math.floor(window.innerHeight-top-12));root.style.setProperty("--f-h",hgt+"px");
   var w=r.width,isOne=w<900,isPhone=w<540,isMid=!isOne&&w<1180;
-  if(root.classList.contains("f-one")!==isOne){root.classList.toggle("f-one",isOne);if(isOne)setPanel(S.panel||"work");}
+  if(root.classList.contains("f-one")!==isOne){root.classList.toggle("f-one",isOne);if(isOne)setPanel(S.panel||"apps");}
   root.classList.toggle("f-phone",isPhone);root.classList.toggle("f-mid",isMid);thumbs();}
 var fitT=0;function layoutSoon(){clearTimeout(fitT);fitT=setTimeout(fit,30);}
 function thumbs(){var root=$("fb");if(!root)return;[].forEach.call(root.querySelectorAll(".f-seg"),function(sg){var th=sg.querySelector(".f-thumb");if(!th){th=h("span","f-thumb");sg.insertBefore(th,sg.firstChild);}
@@ -430,7 +430,7 @@ function paintRepos(){var box=$("fbRepos");box.innerHTML="";var rs=C.repos;$("fb
     var s=stepOf(r),st='<i class="st'+(s==="keep"?" changed":s==="change"?" new":s==="test"||s==="ship"?" tested":"")+'" title="'+(s==="done"?"Shipped":s==="keep"?"Changes not kept yet":s==="test"?"Kept, not tested":s==="ship"?"Tested":"New")+'"></i>';
     b.appendChild(sealEl(appOf(r),56));var v=verOf(r);
     b.insertAdjacentHTML("beforeend",'<span class="nm">'+esc(r.name)+(v?" <em>"+esc(v)+"</em>":"")+'</span><span class="stl">'+st+"<span>"+esc(tileLine(r))+"</span></span>");
-    b.onclick=function(){FBS().sel=r.id;saveSoon();S.view=statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";if(one())setPanel("work");paint();syncFromCode(r);};box.appendChild(b);});}
+    b.onclick=function(){FBS().sel=r.id;saveSoon();S.view=statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";S.panel="work";if(one())setPanel("work");paint();syncFromCode(r);};box.appendChild(b);});}
 function views(){var r=cur(),n=r?statusOf(r).changes.length:0;[].forEach.call($("fbViews").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===S.view?"true":"false");});
   $("fbNChanges").textContent=n||"";$("fbNChanges").hidden=!n;}
 function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML="";f.innerHTML="";
@@ -671,7 +671,8 @@ function install(){if($("page-fabrica"))return;
   if(window.PAGES&&PAGES.indexOf("fabrica")<0)PAGES.push("fabrica");}
 function render(){if(!$("fb")){build();}refresh().then(function(){paint();layoutSoon();var r=cur();if(r)syncFromCode(r);},function(e){paint();fail(e);});}
 install();
-try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.classList.toggle("fb-on",p==="fabrica");if(p==="fabrica"){render();setTimeout(fit,120);}}catch(e){try{console.error("R112",e);}catch(_){}}return r;};window.go=go;}catch(e){}
+try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.classList.toggle("fb-on",p==="fabrica");/* R123: on a narrow screen Fabrica always opens on Your apps (the owner's word); choosing an app moves to its work */
+    if(p==="fabrica"){S.panel="apps";if(one())setPanel("apps");render();setTimeout(fit,120);}}catch(e){try{console.error("R112",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 window.addEventListener("resize",function(){if($("fb"))layoutSoon();});
 try{new MutationObserver(function(){if($("fb")&&$("page-fabrica").classList.contains("active"))paint();}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 /* the engine's author line: her name on every version */

@@ -13,6 +13,11 @@ EDITS = []
 def edit(old, new, label):
     EDITS.append((old, new, label))
 
+# ---- R123: a window of its own (#ingapp=...) shows one app and never writes Ingenium's own desk, so it can never
+#      put an older copy of the desk over the newer one the main window keeps ----
+edit('function saveState(){try{\n  state.__deskAt=Date.now();',
+     'function saveState(){if(/[#&]ingapp=/.test(location.hash||""))return;try{\n  state.__deskAt=Date.now();', "R123 lite window never saves")
+
 # ---- R101: the reply keeps at most half the memory; her request is never the part cut ----
 edit('  return Math.max(1500,(ctx-replyTokens()-256)*3);}',
      '  /* R101: the reply keeps at most half of the memory, so a document or a change never leaves 1,500 characters for everything else */\n'
@@ -205,7 +210,7 @@ assert out.count(MARK) == 1
 #      ride inside the page as base64 text and open in a frame on their pages ----
 import base64 as _b64
 _apps = ""
-for _name in ("tabula", "abacus"):
+for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago (slides), Scriba and Fontes too
     _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
@@ -241,6 +246,9 @@ if "/*R118_CDPREP*/" in blob:
     blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:
     blob = blob.replace("/*R118_DARK*/null", open(os.path.join(HERE, "apps", "dark.json")).read().strip())
+if "/*R123_INJECT*/null" in blob:  # R123: Carpe Diem's dress for the apps' frames (apps/harvest_cd_dress.js)
+    _inj = json.dumps(json.load(open(os.path.join(HERE, "apps", "cd_inject.json"), encoding="utf-8")), separators=(",", ":"))
+    blob = blob.replace("/*R123_INJECT*/null", _inj.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
 if "/*R120_BUILTIN*/null" in blob:
     blob = blob.replace("/*R120_BUILTIN*/null", json.dumps(_bi))
 if "/*R116_QUANTS*/null" in blob:
