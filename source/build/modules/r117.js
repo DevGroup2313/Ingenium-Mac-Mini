@@ -145,7 +145,7 @@ window.IngBlendPresets={list:PRESETS,recs:presetRecs,paint:paintPresets,parse:pa
     {chap:"Fabrica",sub:"GitHub inside",go:function(){go("fabrica");},ring:["#fbShip","#fbPanels"],
      t:"🌐 GitHub, when you want it",b:"Sign in with a token and each repository can be sent to GitHub and brought back, version for version, with the same identities. Releases, builds and their installers are reached from here. Without a token, Fabrica works entirely on this device."}];
   var scholar=[
-    {chap:"Scholarship",sub:"Every search vetted",go:function(){go("settings");},ring:["#srchPeer","#srchScholar"],
+    {chap:"Scholarship",sub:"Every search vetted",go:function(){go("settings");},ring:["#srchPeer + .etrack","#srchScholar + .etrack"],/* R125: the switches' own inputs are drawn 0 by 0; their tracks are what shows */
      t:"🔍 Searches you can trust",b:"Web search and Research look in the scholarly indexes first (OpenAlex, Crossref, Europe PMC, arXiv) and vet every source: a journal article with peer review confirmed, a preprint named as such, an encyclopaedia, a university page or an unvetted website. Peer-reviewed only keeps replies to journal articles, reviews and scholarly books.",
      tip:"Retracted work is left out. Each source under a reply says what was checked."},
     {chap:"Scholarship",sub:"Fontes",go:function(){go("chat");},ring:["#chatImgBtn"],

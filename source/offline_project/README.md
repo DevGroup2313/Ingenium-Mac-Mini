@@ -64,6 +64,21 @@ Focus page takes version 2 of the support module, and the mini Forge in the Auth
 and Settings (its Tabula placeholder and hidden Tabula key are gone). `carpe_diem_1053/cd1053.py` applies all of this to a
 1052 page; `carpe_diem_1053/cd_repo_1053.py` writes it into a website repository.
 
+## What changed in Carpe Diem 1054 (18 October 2026)
+
+The tour says what Tabula's autosave keeps since 1053: one card, in English and French, follows "Real files, saved to
+your device", added as the page opens (carpe_diem_1054/cd1054.py; cd_repo_1054.py writes the website repositories).
+The tour has 201 cards. Nothing else changes but the build stamp and the page's photograph of itself.
+
+## What changed in The Forge 633 (18 October 2026)
+
+The tour and the Guidebook describe the workshop as it stands (forge_633/forge633.py): nine rooms on the rail in four
+groups; the Editor's five steps; new cards for Files, Focus, the Inbox, the Agenda and Projects (English and French);
+the Editing switch card rings the key at the head of the room, where the switch now is (it rang a hidden element on
+632 too). Magister's tip and the Guidebook say four questions for each module, and year 1, term 1 eight lessons, as the
+rooms have them. The lesson after the carried apps are kept names the fingerprints written beside them. The tour has 31
+cards. It carries Ingenium 5.1 (lean), Carpe Diem 1054 and Inkwell 7.43. Its look is unchanged.
+
 ## What changed in The Forge 632 (18 October 2026)
 
 The Forge carries her apps inside its own page, as Ingenium does, so no app library file (the old zip) is needed: Ingenium
