@@ -54,7 +54,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(await p.evaluate(() => !document.getElementById('sc-focus-room')), 'Esc leaves the room');
 
   // 3. today asks of you
-  await p.evaluate(() => { state.reminders.push({ text: 'Call the library about the inter-library loan' }); state.parked = state.parked || []; state.parked.unshift({ id: 'r121t', t: 'Look up the archive hours', at: Date.now(), remindAt: Date.now() + 3600e3 }); saveState(); fxRender(); });
+  await p.evaluate(() => { state.reminders.push({ text: 'Call the library about the inter-library loan' }); state.parked = state.parked || []; state.parked.unshift({ id: 'r121t', t: 'Look up the archive hours', at: Date.now(), remindAt: (function () { const d = new Date(); d.setHours(23, 58, 0, 0); return Math.max(Date.now() + 1000, Math.min(d.getTime(), Date.now() + 3600e3)); })() /* later today, never past midnight */ }); saveState(); fxRender(); });
   await p.waitForTimeout(300);
   const today = await p.evaluate(() => [...document.querySelectorAll('#fxTodayHost .sc-row')].map(r => r.querySelector('.sc-ico').textContent + ' ' + r.querySelector('.sc-txt').textContent));
   const nowInbox = await p.evaluate(() => [...document.querySelectorAll('#fxNow .fx-txt')].map(t => t.textContent).find(t => /Inbox|parked/.test(t)));
