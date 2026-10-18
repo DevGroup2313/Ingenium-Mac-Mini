@@ -70,6 +70,13 @@ The tour says what Tabula's autosave keeps since 1053: one card, in English and 
 your device", added as the page opens (carpe_diem_1054/cd1054.py; cd_repo_1054.py writes the website repositories).
 The tour has 201 cards. Nothing else changes but the build stamp and the page's photograph of itself.
 
+## What changed in The Forge 634 (18 October 2026)
+
+It carries Ingenium 5.2 (lean), whose Lector now keeps the owner's documents true to each new build: it measures the apps on
+the owner's device, finds every figure an update changed in the owner's own words, and updates the Word files in place, keeping each
+version (forge_634/forge634.py; forge_repo_634.py writes the Windows and iPhone/iPad repositories). It also carries
+Carpe Diem 1054 and Inkwell 7.43, and a copy of itself. Nothing else in the Forge changes but its build stamp (9s66).
+
 ## What changed in The Forge 633 (18 October 2026)
 
 The tour and the Guidebook describe the workshop as it stands (forge_633/forge633.py): nine rooms on the rail in four

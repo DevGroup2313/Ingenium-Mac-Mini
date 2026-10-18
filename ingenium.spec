@@ -31,7 +31,7 @@ APP_FILE = re.sub(r'[^A-Za-z0-9._-]', '', str(_cfg.get('file_name') or '')) or '
 APP_ID = str(_cfg.get('app_id') or 'com.yannieforest.ingenium')
 if not re.match(r'^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)+$', APP_ID):
     raise SystemExit('app.json: app_id %r is not a valid id (letters and digits, dots between)' % APP_ID)
-APP_VERSION = os.environ.get('INGENIUM_VERSION', '5.1')
+APP_VERSION = os.environ.get('INGENIUM_VERSION', '5.2')
 _own = [('ingenium.html', '.')]
 # R75: the seal is the icon when it is there; a build without it still
 # finishes, with the plain icon

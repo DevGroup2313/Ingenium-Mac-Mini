@@ -285,6 +285,9 @@ if "/*R118_DARK*/null" in blob:
 if "/*R123_INJECT*/null" in blob:  # R123: Carpe Diem's dress for the apps' frames (apps/harvest_cd_dress.js)
     _inj = json.dumps(json.load(open(os.path.join(HERE, "apps", "cd_inject.json"), encoding="utf-8")), separators=(",", ":"))
     blob = blob.replace("/*R123_INJECT*/null", _inj.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
+if "/*R126_RECIPE*/null" in blob:  # R126: Lector's recipe (recipe/recipe.json, written by gen_recipe.py): her rules, the verified sources, her kinds of document
+    _rx = json.dumps(json.load(open(os.path.join(HERE, "recipe", "recipe.json"), encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))
+    blob = blob.replace("/*R126_RECIPE*/null", _rx.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
 if "/*R120_BUILTIN*/null" in blob:
     blob = blob.replace("/*R120_BUILTIN*/null", json.dumps(_bi))
 if "/*R116_QUANTS*/null" in blob:
