@@ -244,6 +244,10 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tp = _ilu.spec_from_file_location("tabula_patch", os.path.join(HERE, "apps", "tabula_patch.py"))
         _tpm = _ilu.module_from_spec(_tp); _tp.loader.exec_module(_tpm)
         _html = _tpm.patch(_html)
+        # R127: and holds a thesis of 100,000 words, by Inkwell 7.44's recipe (apps/tabula_big_patch.py)
+        _tb = _ilu.spec_from_file_location("tabula_big_patch", os.path.join(HERE, "apps", "tabula_big_patch.py"))
+        _tbm = _ilu.module_from_spec(_tb); _tb.loader.exec_module(_tbm)
+        _html = _tbm.patch(_html)
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
 #      each is checked here against its own size and fingerprint before it rides along ----
