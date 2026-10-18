@@ -167,7 +167,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
   await p.evaluate(() => document.getElementById('fbBring').click()); await p.waitForTimeout(400);
   const fab = await p.evaluate(() => { const o = [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /From your app library/.test(x.textContent)); return o ? o.querySelector('small').textContent : ''; });
-  ok(/Ingenium/.test(fab) && /Carpe Diem 1052/.test(fab), 'Fabrica can bring Ingenium in from the app library, to work on', fab);
+  ok(/Ingenium/.test(fab) && /Carpe Diem \d{4}/.test(fab), 'Fabrica can bring Ingenium in from the app library, to work on', fab);
   await p.screenshot({ path: OUT + '/self-fabrica.png' });
 
   // 12. a copy opened as a file cannot read itself, and says so

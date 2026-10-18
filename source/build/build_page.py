@@ -208,6 +208,20 @@ edit('<button class="rail-btn" id="fabPark" title="Park a thought" aria-label="P
      '<button class="rail-btn" id="fabPark" title="Catch a thought" aria-label="Catch a thought">',
      "R119 side button")
 
+# ---- R133 (18 October 2026): a conversation opened from elsewhere is the one the Chat page shows. Since R112 the Chat
+#      page opens on the conversation it last showed (ccState().activeChat), so the pages that start a conversation of
+#      their own tell it first, as R131 does: Decode a message and Draft a reply (their text had gone into whichever
+#      conversation was open, under its title), a chat with one's own AI, and a blend carried on in the chat ----
+edit('state.chats.push(c);state.activeChat=c.id;saveState();go("chat");try{renderChat();}catch(e){}\n  var ci=$("chatInput");',
+     'state.chats.push(c);state.activeChat=c.id;try{ccState().activeChat=c.id;}catch(_){}saveState();go("chat");try{renderChat();}catch(e){}\n  var ci=$("chatInput");',
+     "R133 Decode a message and Draft a reply open their own conversation")
+edit('state.activeChat=c.id;aiChooseFor(ai,{quiet:true});go("chat");',
+     'state.activeChat=c.id;try{ccState().activeChat=c.id;}catch(_){}aiChooseFor(ai,{quiet:true});go("chat");',
+     "R133 a chat with one's own AI opens on it")
+edit('state.activeChat=c.id;saveState();go("chat");try{renderChat();}catch(e){}}\n/* repaint only the card that changed',
+     'state.activeChat=c.id;try{ccState().activeChat=c.id;}catch(_){}saveState();go("chat");try{renderChat();}catch(e){}}\n/* repaint only the card that changed',
+     "R133 a blend carried on in the chat opens on it")
+
 # ---- R132 (18 October 2026): room to grow. The owner's words: "I want for the local storage limits for all of my apps to
 #      be expanded please." The desk said whether this view's small store (about 5 MB) took it, and modules/r132.js keeps
 #      a desk that store refused in this device's larger store (IndexedDB); the store a page keeps, and the steps back
