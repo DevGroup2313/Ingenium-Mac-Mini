@@ -1,6 +1,6 @@
 // R124: Tabula keeps every part of a document (its footnotes, endnotes, bibliography, header, footer and contents) when
 // it autosaves, when it moves into a floating window, and when the app starts again; and when autosave cannot keep a
-// document, the page says so with a way to keep a copy.
+// document, the page says so with a way to keep a copy. R127: a document too large for localStorage is kept in IndexedDB.
 // node rig/t_tabula_keep.js <url> <outdir>
 const pw = require('/opt/node-tools/node_modules/playwright');
 const fs = require('fs');
@@ -37,7 +37,16 @@ const notes = (f) => f.evaluate(() => ({ text: document.getElementById('editor')
   const f2 = await open(p2);
   const back = await notes(f2);
   ok(/archive was closed/.test(back.text) && back.notes.length === 1 && /2nd ed\./.test(back.notes[0]) && /Chapter Two/.test(back.header), 'after the app starts again, the autosaved page comes back whole', JSON.stringify(back));
-  await f2.evaluate(() => { document.getElementById('editor').innerHTML = '<p>' + 'x'.repeat(4100000) + '</p>'; window.__tabulaFlush(); }); await p2.waitForTimeout(400);
+  /* R127: a document past localStorage's room (four million characters) is kept in IndexedDB, with a small marker in
+     localStorage, and no warning */
+  await f2.evaluate(() => { document.getElementById('editor').innerHTML = '<p>' + 'x'.repeat(4100000) + '</p>'; window.__tabulaFlush(); }); await p2.waitForTimeout(2500);
+  const big = await f2.evaluate(() => new Promise(res => { const m = localStorage.getItem('tabula_autosave') || ''; const warn = !!document.getElementById('cdSaveWarn');
+    const rq = indexedDB.open('tabula-big', 1); rq.onerror = () => res({ m: m.slice(0, 80), warn, idb: -1 });
+    rq.onsuccess = () => { try { const g = rq.result.transaction('kv', 'readonly').objectStore('kv').get('tabula_autosave'); g.onsuccess = () => { rq.result.close(); res({ m: m.slice(0, 80), warn, idb: (g.result || '').length }); }; } catch (e) { res({ m: m.slice(0, 80), warn, idb: -2 }); } }; }));
+  ok(/__tabIdb/.test(big.m) && big.m.length < 200 && big.idb > 4100000 && !big.warn, 'a document of 4.1 million characters is autosaved in IndexedDB, with a small marker in localStorage and no warning', JSON.stringify(big));
+  /* and when IndexedDB refuses to keep it (its room is full), the page says so and offers a copy */
+  await f2.evaluate(() => { IDBObjectStore.prototype.put = function () { throw new DOMException('full', 'QuotaExceededError'); };
+    document.getElementById('editor').innerHTML = '<p>' + 'y'.repeat(4100000) + '</p>'; window.__tabulaFlush(); }); await p2.waitForTimeout(2500);
   const warn = await f2.evaluate(() => { const w = document.getElementById('cdSaveWarn'); return w ? { t: w.innerText.slice(0, 90), keys: [...w.querySelectorAll('button')].map(b => b.textContent) } : null; });
   ok(warn && /Autosave cannot keep this document/.test(warn.t) && warn.keys.join() === 'Save as .docx,Save as PDF,Close', 'when autosave cannot keep a document, the page says so and offers a copy', JSON.stringify(warn));
   await p2.screenshot({ path: OUT + '/autosave-warning.png' });

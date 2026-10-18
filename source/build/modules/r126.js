@@ -112,11 +112,29 @@ function measureOne(key,o){o=o||{};var get=o.text?Promise.resolve(o.text):(typeo
     var rec={at:Date.now(),copy:o.label||(meta&&meta.source==="built in"?"the copy Ingenium carries":meta&&meta.source==="this copy"?"this copy of Ingenium":"the copy kept on this device"),v:v};
     var slot=o.extraId?("x:"+o.extraId):key;var H=S.facts[slot]=S.facts[slot]||[];
     if(H.length&&H[0].v&&H[0].v.sha===v.sha)H[0]=rec;else{H.unshift(rec);while(H.length>6)H.pop();}save();return rec;});}
+function measureEdition(key,text,ed,label,fileName){var S=st(),x=ed?S.extra.filter(function(e){return e.app===key&&e.edition===ed;})[0]:null;
+  var id=x?x.id:"e"+Date.now().toString(36);label=label||(ed?edName(ed):fileName)||"another copy";
+  return measureOne(key,{text:text,label:label,extraId:id}).then(function(rec){if(x){x.label=label;x.name=fileName||x.name;x.at=Date.now();}
+      else S.extra.push({id:id,app:key,edition:ed||"",label:label,name:fileName||"",at:Date.now()});save();return rec;});}
 function measureAll(onStep){if(BUSY)return BUSY;var ks=keptKeys(),out={},i=0;
   BUSY=(function next(){if(i>=ks.length)return Promise.resolve(out);var k=ks[i++];if(onStep)onStep(k,i,ks.length);
     return measureOne(k).then(function(r){out[k]=r;},function(e){out[k]={error:String(e&&e.message||e)};}).then(next);})()
     .then(function(r){BUSY=null;st().measured=Date.now();save();return r;},function(e){BUSY=null;throw e;});return BUSY;}
 function latest(slot){var H=st().facts[slot];return H&&H[0]?H[0]:null;}
+/* EDITIONS (the owner's word, 18 October 2026: "update the figures of Carpe Diem to reflect the full version of the latest
+   build"). A copy measured as an edition keeps its own history, and a figure the owner's words give to that edition ("27.6 MB
+   in the full edition") is checked against that copy alone: never against the demonstration Ingenium carries. */
+var EDITIONS=[{id:"full",name:"Full edition",re:/\bfull edition\b/gi},{id:"committee",name:"Committee demonstration",re:/\bcommittee (?:demonstration|demo)\b/gi},{id:"sample",name:"Public sample",re:/\bpublic sample\b/gi}];
+function edName(id){var e=EDITIONS.filter(function(x){return x.id===id;})[0];return e?e.name:"";}
+function edGuess(s){s=String(s||"").toLowerCase();return /full/.test(s)?"full":/committee|comit/.test(s)?"committee":/sample|chantillon/.test(s)?"sample":"";}
+function edCopy(key,ed){var S=st(),x=S.extra.filter(function(e){return e.app===key&&e.edition===ed;})[0];return x&&latest("x:"+x.id)?x:null;}
+/* the edition a figure belongs to: the nearest edition named after it in its clause (within a short reach), else the nearest
+   before it; a clause ends at a semicolon or a full stop */
+function edAt(s,i,len){var a=i,b=i+len;while(a>0&&s.charAt(a-1)!==";"&&!(s.charAt(a-1)===" "&&s.charAt(a-2)==="."))a--;
+  while(b<s.length&&s.charAt(b)!==";"&&!(s.charAt(b)==="."&&(b+1>=s.length||s.charAt(b+1)===" ")))b++;
+  var after=null,before=null;EDITIONS.forEach(function(E){var re=new RegExp(E.re.source,"gi"),m,c=s.slice(a,b);while((m=re.exec(c))){var at=a+m.index;
+      if(at>=i+len&&at-(i+len)<=90&&(!after||at<after.at))after={id:E.id,at:at};if(at+m[0].length<=i&&i-(at+m[0].length)<=60&&(!before||at>before.at))before={id:E.id,at:at};}});
+  return after?after.id:before?before.id:null;}
 
 /* ================= the figures, and how each stands in the owner's words ================= */
 /* each figure: its key, its label, how it was measured, and the forms it takes in prose (the same template filled with
@@ -164,6 +182,11 @@ function olds(key){var S=st(),H=S.facts[key]||[],cur=H[0]?H[0].v:null,o={};if(!c
   function add(k,val){if(val==null||val==="")return;if(String(val)===String(cur[k]))return;(o[k]=o[k]||[]);if(o[k].indexOf(String(val))<0)o[k].push(String(val));}
   H.slice(1).forEach(function(h){Object.keys(h.v||{}).forEach(function(k){if(typeof h.v[k]!=="object")add(k,h.v[k]);});});
   var B=RX.base&&RX.base.apps&&RX.base.apps[key];if(B)Object.keys(B).forEach(function(k){add(k,B[k]);});
+  return {cur:cur,old:o};}
+function oldsEd(key,x){var H=st().facts["x:"+x.id]||[],cur=H[0]?H[0].v:null,o={};if(!cur)return {cur:null,old:{}};
+  function add(k,val){if(val==null||val===""||typeof val==="object")return;if(String(val)===String(cur[k]))return;(o[k]=o[k]||[]);if(o[k].indexOf(String(val))<0)o[k].push(String(val));}
+  H.slice(1).forEach(function(h){Object.keys(h.v||{}).forEach(function(k){add(k,h.v[k]);});});
+  var B=RX.base&&RX.base.editions&&RX.base.editions[key]&&RX.base.editions[key][x.edition];if(B)Object.keys(B).forEach(function(k){add(k,B[k]);});
   return {cur:cur,old:o};}
 
 /* ================= 2. KEEP: the owner's documents, on this device ================= */
@@ -233,15 +256,25 @@ function editXml(xml,edits){var P=parasOfXml(xml),by={},ops=[];
 var GUARD=/(last measured|as measured|since|from|earlier|before|until|introduced|replaced|older|previous|prior to|up to|added|added at)\s+(at\s+)?(build|pass|version|Carpe Diem|The Forge|Ingenium|Inkwell)?\s*$/i;
 function edge(s,i,len){var b=s.charAt(i-1),a=s.charAt(i+len);return !/[A-Za-z0-9]/.test(b)&&!/[0-9]/.test(a)&&!(/[A-Za-z]/.test(a)&&/[A-Za-z]$/.test(s.substr(i,len)));}
 function figFinds(paras,tpl){var out=[],taken={};
-  KEYS.forEach(function(key){var O=olds(key);if(!O.cur)return;if(tpl&&tpl.apps&&tpl.apps.indexOf(key)<0)return;
+  KEYS.forEach(function(key){if(tpl&&tpl.apps&&tpl.apps.indexOf(key)<0)return;
+    /* the copy Ingenium keeps answers for figures that name no edition, or an edition with no copy of its own that is
+       made from the same build (a demonstration); the full edition holds more, so only its own copy answers for it */
+    var srcs=[];var O0=olds(key);if(O0.cur)srcs.push({O:O0,ed:null,L:latest(key)});
+    EDITIONS.forEach(function(E){var xc=edCopy(key,E.id);if(xc)srcs.push({O:oldsEd(key,xc),ed:E.id,L:latest("x:"+xc.id),x:xc});});
+    function mine(src,ed){if(src.ed)return ed===src.ed;if(!ed)return true;if(ed==="full")return false;return !edCopy(key,ed);}
+    srcs.forEach(function(src){var O=src.O;
     FIG[key].forEach(function(fd){var olist=O.old[fd.k];if(!olist||O.cur[fd.k]==null)return;var nowForms=fd.forms(O.cur[fd.k]);
       olist.forEach(function(ov){var oldForms=fd.forms(ov);
         oldForms.forEach(function(form,fi){if(!form||nowForms[fi]==null||form===nowForms[fi])return;
-          paras.forEach(function(p,pi){var s=p.text,i=-1;while((i=s.indexOf(form,i+1))>=0){if(!edge(s,i,form.length))continue;var id=pi+":"+i;
+          paras.forEach(function(p,pi){var s=p.text,i=-1;while((i=s.indexOf(form,i+1))>=0){if(!edge(s,i,form.length))continue;
+              if(!mine(src,edAt(s,i,form.length)))continue;
               var over=false;for(var j=i;j<i+form.length;j++)if(taken[pi+":"+j]){over=true;break;}if(over)continue;for(var j2=i;j2<i+form.length;j2++)taken[pi+":"+j2]=1;
               var before=s.slice(Math.max(0,i-60),i),guarded=fd.ctx===BUILDCTX&&GUARD.test(before);
-              out.push({kind:"figure",app:key,fact:fd.k,label:NAME[key]+": "+fd.label,p:pi,at:i,len:form.length,from:form,to:nowForms[fi],on:!guarded,
-                why:guarded?"Its sentence speaks of an earlier build on purpose (“"+before.trim().slice(-40)+"”), so it is left as it is unless you tick it.":"Measured "+day(latest(key).at)+" from "+latest(key).copy+".",ctx:s});}});});});});});
+              /* "as last measured at build 1051" said of an edition that has now been measured again is true only with the new build */
+              var remeasured=guarded&&!!src.ed&&/last measured/i.test(before);if(remeasured)guarded=false;
+              var whose=src.ed?src.L.copy+" ("+edName(src.ed).toLowerCase()+")":src.L.copy;
+              out.push({kind:"figure",app:key,edition:src.ed||"",fact:fd.k,label:NAME[key]+(src.ed?", "+edName(src.ed).toLowerCase():"")+": "+fd.label,p:pi,at:i,len:form.length,from:form,to:nowForms[fi],on:!guarded,
+                why:guarded?"Its sentence speaks of an earlier build on purpose (“"+before.trim().slice(-40)+"”), so it is left as it is unless you tick it.":remeasured?"This edition was measured again on "+day(src.L.at)+", from "+whose+": the build it was last measured at is now "+O.cur[fd.k]+".":"Measured "+day(src.L.at)+" from "+whose+".",ctx:s});}});});});});});});
   return out;}
 var RULES=[
   {id:"lector",test:function(t,tpl){return tpl&&tpl.academic;},re:/\bLector\b/g,msg:"An academic document names Lector. Your rule: Lector stays out of dossiers, appendices, supplements and academic CVs."},
@@ -333,7 +366,11 @@ function factsText(){var out=[];KEYS.forEach(function(k){var L=latest(k);if(!L)r
     if(k==="inkwell")bits.push("version "+v.version,"guided tour of "+v.tour+" cards");
     bits.push(v.mb+" MB ("+nf(v.bytes)+" bytes) and "+nf(v.lines)+" lines in "+L.copy);
     var R=v.requests;if(R)bits.push("requests on opening in Ingenium’s measuring frame, where none can leave the device: "+(R.outside.length?R.outside.length+" to outside services ("+R.outside.slice(0,3).join(", ")+")":"none to outside services")+(R.loopback.length?"; "+R.loopback.length+" to the device’s own loopback address":"")+(R.own.length?"; "+R.own.length+" to a file in its own folder":""));
-    out.push("- "+NAME[k]+" (measured "+day(L.at)+"): "+bits.filter(Boolean).join("; ")+".");});
+    out.push("- "+NAME[k]+" (measured "+day(L.at)+"): "+bits.filter(Boolean).join("; ")+".");
+    EDITIONS.forEach(function(E){var xc=edCopy(k,E.id);if(!xc)return;var XL=latest("x:"+xc.id),xv=XL.v,xb=[];
+      if(xv.pass)xb.push("build "+xv.pass+(xv.date?", dated "+isoDay(xv.date):""));if(xv.tour!=null)xb.push("guided tour of "+xv.tour+" cards");if(xv.tutor!=null)xb.push("tutor of "+xv.tutor+" entries");
+      if(xv.courses!=null)xb.push(xv.courses+" Ascensus courses");xb.push(xv.mb+" MB ("+nf(xv.bytes)+" bytes) and "+nf(xv.lines)+" lines");
+      out.push("- "+NAME[k]+", "+E.name.toLowerCase()+" (measured "+day(XL.at)+" from "+XL.copy+"; give these figures to this edition only): "+xb.join("; ")+".");});});
   Object.keys(RX.devrec||{}).forEach(function(k){var D=RX.devrec[k];out.push("- "+NAME[k]+", from "+D.source+" (attribute these; they were not measured on this device): "+D.items.map(function(x){return x[0]+": "+x[1];}).join("; ")+".");});
   return out.join("\n");}
 function layerRules(short){return "\n\nTHE OWNER'S RULES (the recipe kept in Ingenium):\n"+RX.rules.map(function(r){return "- "+r.title+(short?"":": "+r.text);}).join("\n");}
@@ -356,6 +393,7 @@ function recipeMd(){var L=["# The recipe","","Kept in Ingenium, "+RX.date+". The
 
 /* ================= the page ================= */
 function rowsFor(key,slot){var H=st().facts[slot||key]||[],cur=H[0],prev=H[1];if(!cur)return [];var B=(RX.base.apps||{})[key]||{};
+  if(slot&&slot.indexOf("x:")===0){var xe=st().extra.filter(function(e){return "x:"+e.id===slot;})[0];B=(xe&&xe.edition&&RX.base.editions&&RX.base.editions[key]&&RX.base.editions[key][xe.edition])||{};}
   return FIG[key].filter(function(fd){return cur.v[fd.k]!=null;}).map(function(fd){var was=prev?prev.v[fd.k]:B[fd.k];
     return {label:fd.label,now:String(cur.v[fd.k]),was:was!=null&&String(was)!==String(cur.v[fd.k])?String(was):"",how:fd.how};});}
 function sec(){var s=el("div","l-sec rx-sec");s.id="lxRxSec";s.appendChild(el("h3",null,"The recipe"));
@@ -393,20 +431,23 @@ function paintFacts(body){var S=st();
   body.appendChild(el("p","rx-note","Each app is opened from the copy kept on this device, in a hidden frame with no access to Ingenium’s storage and a policy that refuses every request: what it tries is written down, and nothing leaves the device. Its figures are read from the app itself; size, lines and the SHA-256 fingerprint from the copy."));
   var keys=el("div","rx-keys");var mb=btnq(BUSY?"Measuring…":"Measure now",function(){runMeasure(mb);},"pri");mb.disabled=!!BUSY;keys.appendChild(mb);
   keys.appendChild(btnq("Measure another copy…",function(){var i=document.createElement("input");i.type="file";i.accept=".html,.htm";i.onchange=function(){var f=i.files&&i.files[0];if(!f)return;
-      var form=el("div","rx-app rx-form");form.appendChild(el("h3",null,"Another copy: "+f.name));form.appendChild(el("div","rx-sub","An edition you keep outside Ingenium, such as a committee demonstration or a full edition. It is measured the same way and kept beside the others."));
+      var form=el("div","rx-app rx-form");form.appendChild(el("h3",null,"Another copy: "+f.name));form.appendChild(el("div","rx-sub","An edition you keep outside Ingenium, such as a committee demonstration or a full edition. It is measured the same way and kept beside the others; measured again after an update, it keeps its history, and the figures your documents give to that edition are checked against it alone."));
       var sel=el("select","rx-sel");sel.setAttribute("aria-label","Which app it is a copy of");KEYS.forEach(function(k){var o=el("option",null,NAME[k]);o.value=k;sel.appendChild(o);});
       sel.value=/forge/i.test(f.name)?"forge":/ingenium/i.test(f.name)?"ingenium":/inkwell/i.test(f.name)?"inkwell":"cd";
+      var es=el("select","rx-sel");es.setAttribute("aria-label","Which edition it is");[["full","Full edition"],["committee","Committee demonstration"],["sample","Public sample"],["","Another copy"]].forEach(function(o){var op=el("option",null,o[1]);op.value=o[0];es.appendChild(op);});
+      es.value=edGuess(f.name);
       var nm=el("input","rx-sel");nm.type="text";nm.value=f.name.replace(/\.html?$/i,"");nm.setAttribute("aria-label","A name for this copy");nm.style.minWidth="220px";
-      var row=el("div","rx-keys");row.appendChild(sel);row.appendChild(nm);
+      var row=el("div","rx-keys");row.appendChild(sel);row.appendChild(es);row.appendChild(nm);
       var go2=btnq("Measure it",function(){var key=sel.value,label=nm.value.trim()||f.name;go2.disabled=true;go2.textContent="Measuring…";
-        bufOf(f).then(function(b){var text=new TextDecoder().decode(new Uint8Array(b)),id="e"+Date.now().toString(36);
-          return measureOne(key,{text:text,label:label,extraId:id}).then(function(){S.extra.push({id:id,app:key,label:label,name:f.name,at:Date.now()});save();paintSheet();toast(label+" is measured.");});})
+        bufOf(f).then(function(b){var text=new TextDecoder().decode(new Uint8Array(b));
+          return measureEdition(key,text,es.value,label,f.name).then(function(){paintSheet();toast(label+" is measured.");});})
         .catch(function(e){toast(String(e&&e.message||e));go2.disabled=false;go2.textContent="Measure it";});},"pri");
       row.appendChild(go2);row.appendChild(btnq("Cancel",function(){form.remove();},"quiet"));form.appendChild(row);keys.parentNode.insertBefore(form,keys.nextSibling);};i.click();}));
   body.appendChild(keys);
   var any=false;KEYS.concat(S.extra.map(function(x){return "x:"+x.id;})).forEach(function(slot){var key=slot.indexOf("x:")===0?(S.extra.filter(function(x){return "x:"+x.id===slot;})[0]||{}).app:slot;if(!key)return;
     var H=S.facts[slot];if(!H||!H[0])return;any=true;var L=H[0],box=el("div","rx-app");box.style.setProperty("--app",{cd:"#1B6B93",forge:"#17577A",ingenium:"#6A3FB5",inkwell:"#1F4F68"}[key]);
-    var t=el("h3",null,NAME[key]+(slot.indexOf("x:")===0?" · "+L.copy:""));box.appendChild(t);
+    var xe=slot.indexOf("x:")===0?S.extra.filter(function(e){return "x:"+e.id===slot;})[0]:null;
+    var t=el("h3",null,NAME[key]+(xe?" · "+(xe.edition?edName(xe.edition)+(L.copy&&L.copy!==edName(xe.edition)?" ("+L.copy+")":""):L.copy):""));box.appendChild(t);
     box.appendChild(el("div","rx-sub","Measured "+day(L.at)+" from "+L.copy+(L.v.read?"":" · the app’s own figures could not be read in the frame; size and fingerprint only")+" · SHA-256 "+String(L.v.sha||"").slice(0,16)+"…"));
     var tb=el("table","rx-t"),tr=el("tr");["Figure","Now","Before","How"].forEach(function(hh){tr.appendChild(el("th",null,hh));});tb.appendChild(tr);
     rowsFor(key,slot).forEach(function(r){var row=el("tr");row.appendChild(el("td",null,r.label));row.appendChild(el("td","n",r.now));row.appendChild(el("td","w",r.was));row.appendChild(el("td","h",r.how));tb.appendChild(row);});
@@ -471,8 +512,11 @@ try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR)&&!ING_TOUR.some(fu
   if(at>=0)ING_TOUR.splice(at+1,0,{r126:1,chap:"Lector",sub:"The recipe",go:function(){go("lector");},ring:["#lxRxSec"],t:"🧾 The recipe",
     b:"The recipe keeps your documents true to each new build. Measure now opens each of your apps in a frame from which nothing can leave this device and reads its figures. Then, in Your documents, Check finds every figure an update has changed in your own words, and every sentence that breaks one of your rules, and Update changes your Word file itself, keeping the version before.",
     tip:"After an update arrives, press Measure now, then Check. Your dossiers, CVs and kit catch up in a minute."});}}catch(e){}
+/* the tour: the apps card says Tabula holds a thesis (5.3, R127: apps/tabula_big_patch.py) */
+try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR))ING_TOUR.forEach(function(c){if(c&&c.sub==="Tabula and Abacus"&&typeof c.b==="string"&&c.b.indexOf("100,000")<0)
+  c.b+=" Tabula holds a thesis of 100,000 words: a keystroke is answered at once, because only the pages an edit moves are laid out again, and a long document is kept in the browser's larger store, so it is not lost.";});}catch(e){}
 
-window.IngRecipe={data:RX,measureAll:measureAll,measureOne:measureOne,latest:latest,addDocs:addDocs,check:check,apply:apply,saveDoc:saveDoc,undo:undo,factsText:factsText,layer:layer,
+window.IngRecipe={data:RX,measureAll:measureAll,measureOne:measureOne,measureEdition:measureEdition,edAt:edAt,latest:latest,addDocs:addDocs,check:check,apply:apply,saveDoc:saveDoc,undo:undo,factsText:factsText,layer:layer,
   docxParas:docxParas,editXml:editXml,parasOfXml:parasOfXml,word:word,open:openSheet,close:closeSheet,sourcesToFontes:sourcesToFontes,recipeMd:recipeMd,state:st,frameMeasure:frameMeasure};
 })();
 ;try{window.__ingParts["p54"]="running";}catch(_){}

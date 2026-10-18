@@ -36,7 +36,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const ms = Date.now() - t0;
   ok(m.cd && m.cd.pass === '1054' && m.cd.tour === 201 && m.cd.tutor === 323 && m.cd.read, 'Carpe Diem is measured from its kept copy: build 1054, 201 tour cards, 323 tutor entries', JSON.stringify(m.cd));
   ok(m.forge && /^\d{3}$/.test(m.forge.pass || '') && /^9s\d+$/.test(m.forge.stamp || '') && m.forge.tour === 31, 'The Forge is measured: its pass and stamp from its About panel, 31 tour cards (its lean copy carries no apps)', JSON.stringify(m.forge));
-  ok(m.inkwell && m.inkwell.version === '7.43' && m.inkwell.tour === 49, 'Inkwell is measured: 7.43, 49 tour cards', JSON.stringify(m.inkwell));
+  ok(m.inkwell && m.inkwell.version === '7.44' && m.inkwell.tour === 49, 'Inkwell is measured: 7.44, 49 tour cards', JSON.stringify(m.inkwell));
   ok(m.ingenium && /^5\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 34, 'Ingenium is measured: its version, 18 house models, 34 in the catalogue', JSON.stringify(m.ingenium));
   ok(m.inkwell && m.inkwell.req && m.inkwell.req.loopback.length === 1 && m.inkwell.req.outside.length === 0, 'what an app tries is written down: Inkwell\'s check of its loopback helper, refused in the frame', JSON.stringify(m.inkwell && m.inkwell.req));
   ok(left.length === 0, 'nothing left the page while the apps were measured', JSON.stringify(left.slice(0, 5)) + ' in ' + ms + ' ms');
@@ -92,6 +92,43 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // undo
   const un = await p.evaluate((id) => { const d = state.recipe.docs.find(x => x.id === id); IngRecipe.undo(d); return IngRecipe.check(d).then(F => F.filter(x => x.on && x.to != null).length); }, made.id);
   ok(un === 3, 'Undo brings the version before back', un);
+
+  // 4b. an edition kept outside Ingenium: the full edition's figures answer to a copy measured as the full edition, and
+  //     to nothing else; the committee demonstration's figures beside them are left to the copy Ingenium carries
+  const ed = await p.evaluate(() => {
+    const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+    const para = t => '<w:p><w:r><w:t xml:space="preserve">' + t + '</w:t></w:r></w:p>';
+    const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + '><w:body>' +
+      para('One HTML file of 16.6 MB in the committee demonstration and the public sample; about 27.6 MB in the full edition, as last measured at build 1051.') +
+      para('About 27.6 MB and 73,249 lines in the full edition (build 1051); 16.6 MB in the committee demonstration (build 1054).') + '<w:sectPr/></w:body></w:document>';
+    const ct = '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+    const rels = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+    const f = new File([makeZip([{ name: '[Content_Types].xml', data: ct }, { name: '_rels/.rels', data: rels }, { name: 'word/document.xml', data: doc }])], 'Test_Dossier_Sociology.docx');
+    const pick = F => F.filter(x => x.k === 'figure').map(x => ({ from: x.from, to: x.to, on: x.on, ed: x.edition || '', p: x.p }));
+    return IngRecipe.addDocs([f]).then(ds => ds[0]).then(d => IngRecipe.check(d).then(F0 => {
+      const before = pick(F0.map(x => ({ k: x.kind, from: x.from, to: x.to, on: x.on, edition: x.edition, p: x.p })));
+      return libText('cd').then(t => {
+        const full = t + '\n' + Array(4000).fill('<!-- the full edition carries more -->').join('\n');
+        return IngRecipe.measureEdition('cd', full, 'full', 'Full edition', 'carpe_diem.html').then(rec => {
+          const again = IngRecipe.measureEdition('cd', full + '\n<!-- one more -->', 'full', 'Full edition', 'carpe_diem.html');
+          return again.then(rec2 => IngRecipe.check(d).then(F1 => ({ before, after: pick(F1.map(x => ({ k: x.kind, from: x.from, to: x.to, on: x.on, edition: x.edition, p: x.p }))),
+            mb: rec2.v.mb, lines: rec2.v.lines, pass: rec2.v.pass, slots: state.recipe.extra.filter(x => x.edition === 'full').length,
+            hist: (state.recipe.facts['x:' + state.recipe.extra.filter(x => x.edition === 'full')[0].id] || []).length,
+            layer: /full edition \(measured/.test(IngRecipe.factsText()), at: [IngRecipe.edAt('about 27.6 MB in the full edition', 6, 7), IngRecipe.edAt('16.6 MB in the committee demonstration', 0, 7)] })));
+        });
+      });
+    }));
+  });
+  const fe = (from, p) => ed.after.find(x => x.from === from && (p === undefined || x.p === p));
+  ok(!ed.before.some(x => x.ed === 'full' || x.from === '27.6 MB') && !ed.before.some(x => x.on && /1051/.test(x.from)), 'before a full edition is measured, its figures are left alone', JSON.stringify(ed.before));
+  ok(ed.at[0] === 'full' && ed.at[1] === 'committee', 'each figure belongs to the edition its clause names', JSON.stringify(ed.at));
+  ok(ed.slots === 1 && ed.hist === 2, 'measured twice as the full edition, it is one copy with its history', JSON.stringify({ slots: ed.slots, hist: ed.hist }));
+  ok(fe('27.6 MB', 0) && fe('27.6 MB', 0).on && fe('27.6 MB', 0).to === ed.mb + ' MB' && fe('27.6 MB', 0).ed === 'full', 'the full edition\'s size is found and ticked, with the size of the copy measured as the full edition', JSON.stringify(fe('27.6 MB', 0)) + ' ' + ed.mb);
+  ok(fe('73,249 lines') && fe('73,249 lines').on && fe('73,249 lines').to === ed.lines.toLocaleString('en-GB') + ' lines', 'and its lines', JSON.stringify(fe('73,249 lines')));
+  const b0 = ed.after.find(x => x.p === 0 && /1051/.test(x.from)), b1 = ed.after.find(x => x.p === 1 && /1051/.test(x.from));
+  ok(b0 && b0.on && /1054/.test(b0.to) && b1 && b1.on, '"as last measured at build 1051" is ticked once the full edition is measured again: it now reads its new build', JSON.stringify([b0, b1]));
+  ok(!ed.after.some(x => x.from === '16.6 MB' || /1054/.test(x.from)), 'the committee demonstration\'s figures beside them are not touched', JSON.stringify(ed.after.filter(x => x.ed !== 'full')));
+  ok(ed.layer, 'the full edition\'s measures travel with Lector\'s sections, given to that edition only');
 
   // 5. writing by the recipe: the layer that travels with Lector's sections, and the sources for My sources
   const lay = await p.evaluate(() => { const L = IngRecipe.layer(); return { rules: /THE OWNER'S RULES \(the recipe/.test(L), facts: /MEASURED BY THE RECIPE/.test(L) && /Carpe Diem \(measured/.test(L), dev: /development notes/.test(L), len: L.length }; });
