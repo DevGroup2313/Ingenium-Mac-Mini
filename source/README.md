@@ -29,13 +29,21 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     node rig/t_models_care.js http://127.0.0.1:8150/ingenium.html <out>       # quality tiers on the houses, the pace measured, health by model, the catalogue, 24 checks
     node rig/t_studio_care.js http://127.0.0.1:8150/ingenium.html <out>       # Blend's judge and ready-made blends, the tour's chapters, the export, the shelf, 22 checks
     node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus in their frames, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
-    node rig/t_inbox.js http://127.0.0.1:8150/ingenium.html <out>             # the Inbox, Carpe Diem's 💭 quill line in Ingenium's colours: catch, drift, sort to six places, suggestions, the Focus page, night, 27 checks
-    node rig/t_builtin.js http://127.0.0.1:8150/ingenium.html <out>           # The Forge and Inkwell carried inside: kept on first start, never over a newer copy, Lector reads a newer copy afresh, 24 checks (written for The Forge 630 and Inkwell 7.42)
+    node rig/t_thoughts.js http://127.0.0.1:8150/ingenium.html <out>          # the thought cloud (the shared thoughts/thought_cloud.html): light, dragged and resized like a sticky note, put away with a number, the Inbox, reminders, 48 checks
+    node rig/t_builtin.js http://127.0.0.1:8150/ingenium.html <out>           # Carpe Diem, The Forge and Inkwell carried inside: kept on first start, never over a newer copy, Lector reads a newer copy afresh, 26 checks (written for Carpe Diem 1052, The Forge 631 and Inkwell 7.42)
+    node rig/t_support.js http://127.0.0.1:8150/ingenium.html <out>           # the shared support module (thoughts/support_core.html) in Focus: routines, Today asks of you, a low-energy day, the Focus room, Just start, the switches; and Ingenium's own copy of itself in the app library, 41 checks
 
-`build/apps/builtin/` holds the copies of The Forge and Inkwell that Ingenium carries (each page compressed, with
-`builtin.json` naming its version, date, size and SHA-256 fingerprint). To update them, run
-`python3 -I build/apps/update_builtin.py path/to/the_forge.html path/to/Inkwell.html`; the build checks each against its
-fingerprint before it rides along.
+`build/apps/builtin/` holds the copies of The Forge, Inkwell and Carpe Diem that Ingenium carries (each page
+compressed, with `builtin.json` naming its version, date, size and SHA-256 fingerprint). To update them, run
+`python3 -I build/apps/update_builtin.py path/to/the_forge.html path/to/Inkwell.html [path/to/carpe_diem.html]`; without
+the third path the Carpe Diem copy already there stays. The build checks each against its fingerprint before it rides
+along. Ingenium does not carry itself (a page cannot hold its own copy): from 4.9 each new version keeps its own page in
+the app library on first start, checked against the version it names, so Lector and Fabrica can work on it.
+
+`build/thoughts/` holds the two shared sources that Ingenium, Carpe Diem and The Forge each carry whole inside their
+own page, so no app depends on another: `thought_cloud.html` (the 💭 thought panel and the Inbox) and
+`support_core.html` (the support module: calm, smaller steps, time, low-energy days, routines, the Focus room, Just
+start). `build_page.py` writes the first in before `modules/r119.js` and the second before `modules/r121.js`.
 
 `build/apps/` holds the whole Tabula and Abacus (her own single-page apps, the files Carpe Diem carries), `dark.json`
 (Carpe Diem's night dress for each) and `cd_prep.js` (Carpe Diem's own preparation of the two before it shows them: the

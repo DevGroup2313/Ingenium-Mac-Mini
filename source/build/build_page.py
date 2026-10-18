@@ -212,7 +212,7 @@ for _name in ("tabula", "abacus"):
 #      each is checked here against its own size and fingerprint before it rides along ----
 import gzip as _gz, hashlib as _hl
 _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
-for _k in ("forge", "inkwell"):
+for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Diem rides along too
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
@@ -220,7 +220,17 @@ for _k in ("forge", "inkwell"):
     _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
-blob = "\n".join(open(m, encoding="utf-8").read().rstrip("\n") for m in mods) + "\n"
+# ---- R121: the shared thought cloud (thoughts/thought_cloud.html, the same file the Forge and Carpe Diem carry) is
+#      written in just before the Inbox module that uses it, and the shared support module (thoughts/support_core.html)
+#      just before Ingenium's part of it (modules/r121.js) ----
+def _modtext(m):
+    t = open(m, encoding="utf-8").read().rstrip("\n")
+    if os.path.basename(m) == "r119.js":
+        t = open(os.path.join(HERE, "thoughts", "thought_cloud.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r121.js":  # R121: the shared support module, before Ingenium's own part of it
+        t = open(os.path.join(HERE, "thoughts", "support_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    return t
+blob = "\n".join(_modtext(m) for m in mods) + "\n"
 blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))
 if "/*R109_WIDTHS*/null" in blob:
     _w = json.load(open(os.path.join(HERE, "pdf_widths.json")))

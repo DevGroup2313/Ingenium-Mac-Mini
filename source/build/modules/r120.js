@@ -7,11 +7,18 @@
    checked against its size and fingerprint, and kept on this device; the copy before it stays one step back. A copy
    she added herself that is newer, or that Ingenium cannot place in order, is never replaced without her say: the
    card offers the built-in copy instead. Lector reads them, Fabrica opens them and the chat attaches them, as before.
-   The Forge is named by its pass (630) as its BUILD_INFO names it; its stamp (9s62) is kept as the build. */
+   The Forge is named by its pass (630) as its BUILD_INFO names it; its stamp (9s62) is kept as the build.
+   R122 (18 October 2026), at the owner's word, "add Carpe Diem into Ingenium as well to finish the Offline Project":
+   Carpe Diem (the committee demo's standalone page, 1052) is carried and kept the same way, named by its pass.
+   And the same day: "I want for Ingenium to also have an updated copy of itself to ready and work on to complete the
+   Offline Project apps." A page cannot carry itself inside itself, so each new version keeps its own page instead:
+   on first start it reads the page it was opened from, checks that the page names the version that is running, and
+   keeps it in the app library beside the others, where Lector reads it and Fabrica opens it. A newer Ingenium added
+   by hand is never replaced. Where the page was opened as a file and cannot read itself, the card says so. */
 (function r120(){
 var BI=/*R120_BUILTIN*/null;
 if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
-var KEYS=["inkwell","forge"],DONE={},RUN=null;
+var KEYS=["inkwell","forge","cd"].filter(function(k){return BI[k];}),DONE={},RUN=null;
 
 /* ---------- versions: a pass (630), a dotted version (7.42) or a Forge stamp (9s62); unlike kinds are not compared ---------- */
 function parts(v){v=String(v||"").trim();var m;
@@ -52,6 +59,7 @@ function seed(opts){opts=opts||{};if(RUN)return RUN;if(typeof libOn==="function"
       var check=st==="same"?present(Object.assign({key:k},m)).then(function(ok){return ok?"same":"lost";}):Promise.resolve(st);
       return check.then(function(s){out[k]=s;if(s!=="none"&&s!=="older"&&s!=="lost")return;
         return keep(k).then(function(r){out[k]=s==="lost"?"kept again":"kept";kept.push(LIB_NAMES[k]+" "+BI[k].version);},function(e){out[k]="failed: "+(e&&e.message||e);});});});},Promise.resolve())
+  .then(function(){return selfSeed().then(function(st){out.ingenium=st;if(st==="kept"||st==="kept again")kept.push("Ingenium "+selfVersion()+" (this copy)");});})
   .then(function(){DONE=out;window.__ingBuiltin={states:out,ms:Date.now()-t0};
     if(kept.length&&!LIB.busy){LIB.warn=false;LIB.note="Kept on this device from inside Ingenium: "+kept.join(", ")+". Each was checked against its fingerprint.";}
     repaint();RUN=null;return out;});
@@ -67,10 +75,11 @@ function repaint(){try{libPaint();}catch(e){}
 
 /* ---------- the Your apps card says what Ingenium carries, and offers it where her copy differs ---------- */
 function day(d){if(!d)return "";try{return new Date(d+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});}catch(e){return d;}}
+function also(a){return a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1];}
 function line(){var names=KEYS.slice().reverse().filter(function(k){return BI[k];}).map(function(k){var b=BI[k];return esc(LIB_NAMES[k]+" "+b.version)+(b.date?" ("+esc(day(b.date))+")":"");});
   var keys=KEYS.slice().reverse().filter(function(k){var s=standing(k);return BI[k]&&(s==="newer"||s==="other");}).map(function(k){var s=standing(k);
     return '<button class="btn small ghost" type="button" data-bi-use="'+k+'" title="'+(s==="newer"?"Your kept copy is newer; this goes back to the built-in one, and yours stays one step back":"Your kept copy is a different build; yours stays one step back")+'">Use the built-in '+esc(LIB_NAMES[k]+" "+BI[k].version)+'</button>';});
-  return '<p class="small muted lib-builtin" id="libBuiltin">Built into this Ingenium: '+names.join(" and ")+'. They are kept here on first start, checked against their fingerprints. A newer copy you add yourself always stays.</p>'
+  return '<p class="small muted lib-builtin" id="libBuiltin">Built into this Ingenium: '+also(names)+'. They are kept here on first start, checked against their fingerprints. A newer copy you add yourself always stays.'+selfLine()+'</p>'
     +(keys.length?'<div class="lx-row lib-builtin-keys">'+keys.join("")+'</div>':"");}
 /* the same, in the Your apps section of Lector's page */
 function lectorLine(busy){var wrap=document.createElement("div");wrap.className="lib-builtin-wrap";wrap.id="libBuiltin";
@@ -89,11 +98,45 @@ function lectorLine(busy){var wrap=document.createElement("div");wrap.className=
   if(key==="forge"&&(m=/window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"/.exec(String(text||""))))return m[1];
   return o.apply(this,arguments);};})();
 
+/* ---------- Ingenium's own copy of itself, as it is now ---------- */
+var SELF={state:null};
+function selfVersion(){try{return String(typeof ING_VERSION!=="undefined"?ING_VERSION:"");}catch(e){return "";}}
+function selfStanding(){var v=selfVersion(),m=libState().apps.ingenium;if(!v)return "absent";if(!m||!m.ref)return "none";
+  var c=cmp(v,m.version);if(c===null)return "other";return c>0?"older":(c<0?"newer":"same");}
+/* the page this copy was opened from: fetched, or read the older way where a fetch is refused */
+function selfBytes(){var url=location.href.split("#")[0];
+  return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("no");return r.arrayBuffer();})
+    .catch(function(){return new Promise(function(res,rej){try{var x=new XMLHttpRequest();x.open("GET",url,true);x.responseType="arraybuffer";
+      x.onload=function(){if((x.status===200||x.status===0)&&x.response&&x.response.byteLength)res(x.response);else rej(new Error("no"));};x.onerror=function(){rej(new Error("no"));};x.send();}catch(e){rej(e);}});})
+    .then(function(b){return new Uint8Array(b);});}
+/* the version the page names, read from its bytes without turning the whole page into text */
+function namedVersion(u8){var pat='ING_VERSION="',p=[];for(var i=0;i<pat.length;i++)p.push(pat.charCodeAt(i));
+  for(var k=0,n=u8.length-p.length;k<n;k++){if(u8[k]!==p[0])continue;var j=1;while(j<p.length&&u8[k+j]===p[j])j++;
+    if(j===p.length){var e=k+j,v="";while(e<u8.length&&u8[e]!==34&&v.length<20)v+=String.fromCharCode(u8[e++]);return v;}}
+  return "";}
+function keepSelf(){var v=selfVersion();
+  return selfBytes().then(function(u8){var head=new TextDecoder().decode(u8.subarray(0,Math.min(u8.length,400000)));
+      if(libDetect(head)!=="ingenium")throw new Error("the page read back is not Ingenium's");
+      var nv=namedVersion(u8);if(nv!==v)throw new Error("the page read back names "+(nv||"no version")+", not "+v);
+      return libSha(u8).then(function(h){var text=libShell()?new TextDecoder().decode(u8):"";
+        return libKeep("ingenium",{title:"Ingenium",version:v,build:"",date:"",size:u8.length,sha256:h,name:"ingenium.html",source:"this copy"},u8,text);});});}
+function selfSeed(){var st=selfStanding();if(st==="absent"||st==="newer"||st==="other"){SELF.state=st;return Promise.resolve(st);}
+  var m=libState().apps.ingenium,check=st==="same"?present(Object.assign({key:"ingenium"},m)).then(function(ok){return ok?"same":"lost";}):Promise.resolve(st);
+  return check.then(function(s){if(s==="same"){SELF.state="same";return "same";}
+    return keepSelf().then(function(r){SELF.state=s==="lost"?"kept again":"kept";return SELF.state;},
+      function(e){SELF.state="unread";SELF.why=String(e&&e.message||e);return "unread";});});}
+function selfLine(){var v=selfVersion();if(!v)return "";var st=SELF.state,m=libState().apps.ingenium;
+  if(st==="unread")return ' This copy, Ingenium '+esc(v)+', could not read its own page here (it was opened as a file), so it is not kept beside them: add Ingenium’s page with Add your apps.';
+  if(m&&m.ref&&cmp(v,m.version)===0)return ' Ingenium '+esc(v)+' keeps a copy of itself beside them, ready for Lector and Fabrica.';
+  if(m&&m.ref&&cmp(v,m.version)<0)return ' A newer Ingenium ('+esc(m.version)+') that you added stays as it is.';
+  return ' Ingenium '+esc(v)+' keeps a copy of itself beside them on first start.';}
+
 /* ---------- when: after the app is ready and the page is idle ---------- */
 function later(){var go=function(){if(LIB.busy){setTimeout(later,15000);return;}seed();};
   if(typeof requestIdleCallback==="function")requestIdleCallback(go,{timeout:20000});else setTimeout(go,500);}
 (function start(){var tries=0;(function wait(){if(window.__ingReady===true){setTimeout(later,9000);return;}if(++tries<240)setTimeout(wait,500);})();})();
-window.IngBuiltin={lectorLine:lectorLine,meta:BI,standing:standing,seed:seed,keep:keep,unpack:unpack,use:useBuiltin,cmp:cmp,states:function(){return DONE;}};
+window.IngBuiltin={lectorLine:lectorLine,meta:BI,standing:standing,seed:seed,keep:keep,unpack:unpack,use:useBuiltin,cmp:cmp,states:function(){return DONE;},
+  self:{version:selfVersion,standing:selfStanding,keep:keepSelf,seed:selfSeed,state:function(){return SELF;},namedVersion:namedVersion}};
 })();
 ;try{window.__ingParts["p51"]="running";}catch(_){}
 </script>

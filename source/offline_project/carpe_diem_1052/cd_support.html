@@ -1,0 +1,123 @@
+<style id="cd-support-1052-css">
+/* PASS 1052 · THE FOCUS PAGE. The supports leave the Overview, where they could be forgotten, for a page of their own
+   on the bar, laid out as Ingenium's Focus page is and dressed in Carpe Diem's glass and blue. The 💭 opens the
+   thoughts panel, the sticky notes' light raised slab, with − to put words away and ✕ to let them go. Everything
+   here lives in this file: Carpe Diem leans on no other app. */
+#section-focus .sc-page{max-width:1120px;padding-top:6px}
+#section-focus .sc-top .sc-title{margin:0 0 6px}
+#section-focus .sc-page .glass.sc-card{border-radius:18px}
+#section-focus .sc-page .sc-seg .cd-seg{font:inherit;font-size:12px;cursor:pointer;border-radius:999px;padding:5px 12px;border:1px solid rgba(27,107,147,.22);background:rgba(255,255,255,.7);color:var(--text-secondary,#454549)}
+#section-focus .sc-page .sc-seg .cd-seg.on{background:var(--accent,#1b6b93);border-color:transparent;color:#fff}
+body[data-theme="night"] #section-focus .sc-page .sc-seg .cd-seg{background:rgba(255,255,255,.05);border-color:rgba(91,174,219,.28);color:#cfe4f2}
+body[data-theme="night"] #section-focus .sc-page .sc-seg .cd-seg.on{background:#5baedb;color:#0e1a22}
+#section-focus .sc-page select{font:inherit;font-size:13px;padding:7px 10px;border-radius:10px;border:1px solid var(--hairline,rgba(0,0,0,.08));background:rgba(255,255,255,.7);color:var(--text-primary,#1d1d1f)}
+body[data-theme="night"] #section-focus .sc-page select{background:rgba(255,255,255,.05);color:#e6eaee}
+body.mode-folio #section-focus .sc-page .sc-seg .cd-seg.on{background:#1f6f96}
+/* the old line and its Overview section are retired; nothing of them is drawn */
+#cd-capture,#cd-sup-ov{display:none !important}
+</style>
+<script id="cd-support-1052">
+(function(){
+"use strict";
+if(window.__cdSupport1052)return;window.__cdSupport1052=1;
+function $(id){return document.getElementById(id);}
+function fr(){try{return state.lang==="fr";}catch(e){return false;}}
+function T(en,f){return fr()?f:en;}
+function ready(fn,n){n=n||0;if(typeof state!=="undefined"&&state&&window.ThoughtCloud&&window.SupportCore&&window.cdSupport&&document.body)fn();else if(n<300)setTimeout(function(){ready(fn,n+1);},200);}
+ready(function(){
+  function S(){if(!state.support||typeof state.support!=="object")state.support={};return state.support;}
+  function save(){try{saveState();}catch(e){}}
+  function box(){var s=S();if(!Array.isArray(s.box))s.box=[];return s.box;}
+  function night(){return document.body.getAttribute("data-theme")==="night";}
+  function tr(t){try{return typeof trd==="function"?trd(t):t;}catch(e){return t;}}
+  function hm(s){var m=/(\d{1,2}):(\d{2})/.exec(String(s||""));return m?(+m[1])*60+(+m[2]):null;}
+  function go(id){try{showSection(id);}catch(e){}}
+  var SC=null,TC=null;
+
+  /* ---- where a thought can go, in Carpe Diem ---- */
+  function places(){return [
+    {key:"note",label:T("🗒️ To a note","🗒️ En note"),word:T("a Schedae note","une note Schedae"),run:function(it){try{var n=newStickyNote();n.text=it.t;saveState();renderStickyPins();}catch(e){}SC.toast(T("Pinned as a Schedae note.","Épinglée en note Schedae."));}},
+    {key:"tabula",label:T("📝 To Tabula","📝 Vers Tabula"),word:"Tabula",run:function(it){try{openTextInTabula(T("From the Inbox","Depuis la Boîte"),it.t);}catch(e){}}},
+    {key:"task",label:T("🪜 Make it a task","🪜 En faire une tâche"),word:T("a task with small steps","une tâche en petites étapes"),run:function(it){SC.newTask(it.t,SC.steps(it.t));go("focus");SC.toast(T("A task with small steps, on the Focus page.","Une tâche en petites étapes, sur la page Concentration."));}},
+    {key:"reminder",label:T("⏰ To the bell","⏰ Vers la cloche"),word:T("a reminder","un rappel"),run:function(it){try{addUserReminder(todayString(),it.t.slice(0,140),"");if(typeof renderReminders==="function")renderReminders();}catch(e){}SC.toast(T("Added to today’s reminders, under the bell.","Ajoutée aux rappels du jour, sous la cloche."));}}];}
+
+  TC=ThoughtCloud.create({app:"cd",prefix:"cd_tc_",lang:function(){return fr()?"fr":"en";},fab:function(){return $("cd-thought-fab");},list:box,save:save,
+    toast:function(m){if(SC)SC.toast(m);},night:night,calm:function(){return !!(SC&&SC.on("calm"));},
+    quiet:function(){try{if(pomo.running&&pomo.phase==="focus")return true;}catch(e){}return !!($("sc-quiet")||$("sc-focus-room")||document.querySelector("#cd-door")||document.querySelector("#demo-entry"));},
+    places:places,onChange:function(){if(SC)SC.refresh();try{window.cdSupport.tick();}catch(e){}},
+    placeholder:function(){return T("A thought, a task, a worry: let it go","Une pensée, une tâche, un souci : laissez-la aller");},
+    suggestTitle:function(){return T("A place for each, from its words; nothing moves until you press Do it","Une place pour chacune, d’après ses mots ; rien ne bouge avant Le faire");},
+    suggest:function(items){var map={};items.forEach(function(it){var t=it.t||"",to="note",why="";
+        if(/\b(remind|call|phone|email|pay|book|appointment|rappel|appeler|payer|rendez)/i.test(t)){to="reminder";why=T("it has a when","elle a un moment");}
+        else if(t.length>220||/\n/.test(t)){to="tabula";why=T("it is long enough to write out","elle est assez longue pour être écrite");}
+        else if(/^(read|write|finish|start|draft|plan|prepare|fix|clean|lire|écrire|finir|commencer|préparer)\b/i.test(t)){to="task";why=T("it is something to do","c’est une chose à faire");}
+        else why=T("a short thought to keep in view","une courte pensée à garder sous les yeux");map[it.id]={to:to,why:why};});return map;},
+    hotkey:false});
+  window.__cdTC=TC;
+
+  /* ---- today's plan, read from the Agenda ---- */
+  function plan(){var ds=todayString(),wd=null;try{if(typeof isWorkday==="function"&&!isWorkday(parseDate(ds)))return null;}catch(e){}try{wd=weekdayFor(ds);}catch(e){return null;}
+    var blocks=[];["pre","morning","afternoon","evening"].forEach(function(k){var b=wd&&wd[k];if(!b)return;var m=/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/.exec(String(b.time||""));
+      blocks.push({id:b.id,title:tr(b.title),from:m?(+m[1])*60+(+m[2]):null,to:m?(+m[3])*60+(+m[4]):null,
+        tasks:(b.tasks||[]).map(function(t){return {id:t.id,title:tr(t.title),at:hm(t.time),done:(function(){try{return isDone(ds,b.id,t.id);}catch(e){return false;}})()};})});});
+    return {ds:ds,blocks:blocks};}
+  function days(a,b){try{return Math.round((parseDate(a)-parseDate(b))/864e5);}catch(e){return null;}}
+  function pl(n,en,f){return n+" "+(fr()?f:en)+(n===1?"":"s");}
+  function todayRows(){var rows=[],p=plan();
+    if(p){var all=0,done=0,next=null;p.blocks.forEach(function(b){b.tasks.forEach(function(t){all++;if(t.done)done++;else if(!next)next=t;});});
+      rows.push({ico:"📅",essential:true,text:all?T(done+" of "+all+" items in today’s plan are done"+(next?". Next: "+next.title:". The day’s study is in."),done+" sur "+all+" moments du plan du jour sont faits"+(next?". Ensuite : "+next.title:". La journée d’étude est faite.")):T("Today’s plan is empty.","Le plan du jour est vide."),
+        acts:[[T("Open the Agenda","Ouvrir l’Agenda"),function(){go("schedule");}]]});}
+    else rows.push({ico:"📅",text:T("No plan for today: a day of rest.","Pas de plan aujourd’hui : un jour de repos."),acts:[[T("Open the Agenda","Ouvrir l’Agenda"),function(){go("schedule");}]]});
+    try{var rd=(state.currentReadings||[]).filter(function(r){return r.active!==false;});
+      if(rd.length)rows.push({ico:"📖",text:T("Reading now: ","En lecture : ")+rd.slice(0,3).map(function(r){return tr(r.title);}).join(", ")+(rd.length>3?T(", and "+(rd.length-3)+" more",", et "+(rd.length-3)+" de plus"):"")+T(". A few pages is enough.",". Quelques pages suffisent."),acts:[[T("Open the Library","Ouvrir la Bibliothèque"),function(){go("books");}]]});}catch(e){}
+    try{var q=state.ascent&&state.ascent.quests;if(q&&q.date===todayString()&&q.picks&&q.picks.length){var dn=Object.keys(q.done||{}).filter(function(k){return q.done[k];}).length;
+      rows.push({ico:"🏔",text:T(dn+" of "+q.picks.length+" of today’s Ascensus labours are done.",dn+" sur "+q.picks.length+" travaux d’Ascensus du jour sont faits."),acts:[[T("Open Ascensus","Ouvrir Ascensus"),function(){go("ascent");}]]});}}catch(e){}
+    try{var ms=((state.candidature&&state.candidature.milestones)||[]).filter(function(m){return !m.done&&m.date;}).sort(function(a,b){return a.date<b.date?-1:1;});
+      if(ms.length){var m=ms[0],d=days(m.date,todayString());rows.push({ico:"🎯",essential:d!=null&&d<=1,
+        text:T("Next milestone: ","Prochaine étape : ")+tr(m.label)+(d==null?"":" · "+(d<0?T(pl(-d,"day","jour")+" overdue","en retard de "+pl(-d,"day","jour")):(d===0?T("today","aujourd’hui"):T("in ","dans ")+pl(d,"day","jour")))),
+        acts:[[T("Open Projects","Ouvrir Projets"),function(){go("applications");}]]});}}catch(e){}
+    try{var rem=(state.userReminders||[]).filter(function(r){return !r.done&&r.date&&r.date<=todayString();});
+      if(rem.length)rows.push({ico:"🔔",essential:true,text:rem.length===1?T("One reminder is due: ","Un rappel arrive à échéance : ")+rem[0].title:T(rem.length+" reminders are due. The first: ",rem.length+" rappels arrivent à échéance. Le premier : ")+rem[0].title,
+        acts:[[T("Open the bell","Ouvrir la cloche"),function(){try{openReminders();}catch(e){var b=$("reminders-fab");if(b)b.click();}}]]});}catch(e){}
+    var n=box().length;if(n)rows.push({ico:"💭",text:n===1?T("One thought waits in the Inbox to be sorted.","Une pensée attend d’être triée dans la Boîte."):T(n+" thoughts wait in the Inbox to be sorted.",n+" pensées attendent d’être triées dans la Boîte."),acts:[[T("Sort them","Les trier"),function(){TC.inbox();}]]});
+    return rows;}
+
+  /* the seven switches are the ones the Display panel already keeps, so the two never disagree */
+  var SW={};["calm","tiny","time","energy","inbox","routines","focus"].forEach(function(k){SW[k]={get:function(){return window.cdSupport.on(k);},
+    set:function(v){S()[k==="routines"?"routinesOn":k]=v;save();try{window.cdSupport.tick();}catch(e){}}};});
+
+  SC=SupportCore.create({app:"cd",lang:function(){return fr()?"fr":"en";},appName:"Carpe Diem",store:S,save:save,night:night,today:function(){return todayString();},sw:SW,
+    tc:function(){return window.cdSupport.on("inbox")?TC:null;},dayWord:{en:"study day",fr:"journée d’étude"},accent:function(){return night()?"#5baedb":"#1b6b93";},
+    cls:{card:"glass",btn:"btn btn-soft btn-sm",primary:"btn btn-primary btn-sm",ghost:"btn btn-soft btn-sm",title:"section-title",lede:"section-sub",seg:"",segBtn:"cd-seg",segOn:"on",select:""},
+    pageTitle:function(){return "🧭 "+T("Focus","Concentration");},
+    lede:function(){return T("Support that fits how you study: one step at a time, time you can see, a calm screen when you need it, and a place for every stray thought. Each support has its own switch, here or in Display.","Une aide qui suit votre façon d’étudier : une étape à la fois, le temps visible, un écran calme quand il le faut, et une place pour chaque pensée qui passe. Chaque aide a son propre réglage, ici ou dans Affichage.");},
+    plan:plan,oldSteps:function(k){var a=S().steps||{};return a[k]||null;},
+    timer:{state:function(){if(typeof pomo==="undefined")return null;return {running:!!pomo.running,phase:pomo.phase,remaining:pomo.remaining,total:pomoPhaseLen(pomo.phase),focusLen:pomo.focusLen};},
+      start:function(n){pomo.focusLen=n;try{pomoSave();}catch(e){}pomoReset();pomoStart();},toggle:function(){if(!pomo.running&&pomo.phase!=="focus"&&pomo.remaining>=pomoPhaseLen(pomo.phase)){pomo.phase="focus";pomo.remaining=pomoPhaseLen("focus");}pomoToggleRun();},
+      stop:function(){pomoReset();},open:function(){openPomodoro();}},
+    timerName:function(){return T("The Clepsydra","La Clepsydra");},finishLine:function(){return T("Finish the sentence you are on.","Terminez la phrase en cours.");},
+    todayTitle:function(){return T("Today asks of you","Ce que la journée vous demande");},todayRows:todayRows,
+    taskExample:function(){return T("For example: read chapter two","Par exemple : lire le chapitre deux");},
+    routines:function(){return [
+      {id:"start",when:"start",icon:"🌅",en:"Start of the study day",fr:"Début de la journée d’étude",steps:[{en:"Water, tea, and anything you take in the morning",fr:"De l’eau, du thé, et ce que vous prenez le matin"},{en:"Clear one corner of the desk",fr:"Dégager un coin du bureau"},{en:"Look at today’s plan: just look",fr:"Regarder le plan du jour : simplement regarder"},{en:"Choose the first small step",fr:"Choisir la première petite étape"},{en:"Start one Clepsydra sprint",fr:"Lancer un sprint de Clepsydra"}]},
+      {id:"end",when:"end",icon:"🌙",en:"End of the study day",fr:"Fin de la journée d’étude",steps:[{en:"Write where the work stopped, in one line",fr:"Noter où le travail s’est arrêté, en une ligne"},{en:"Empty your head into the Inbox",fr:"Vider sa tête dans la Boîte"},{en:"Tick what you finished, and let the rest go",fr:"Cocher ce qui est fini, et laisser le reste"},{en:"Choose tomorrow’s first small step",fr:"Choisir la première petite étape de demain"},{en:"Close the rooms, and the lid",fr:"Fermer les salles, et le couvercle"}]}];},
+    lowActs:function(row,k){var gentle=false;try{gentle=templateForDate(todayString())==="recovery";}catch(e){}
+      if(!gentle)row.appendChild(k.btn("🌿 "+T("Make today a Gentle Day","Faire d’aujourd’hui une Journée douce"),"ghost",function(){try{setTemplateForDate(todayString(),"recovery");}catch(e){}try{renderSchedule();}catch(e){}SC.toast(T("Today is a Gentle Day now.","Aujourd’hui est maintenant une Journée douce."));k.refresh();}));}});
+  window.__cdSC=SC;
+
+  /* ---- the page on the bar ---- */
+  function mount(){var host=$("cd-focus-page");if(host)SC.render(host);}
+  if(!window.showSection.__cdFocus){var orig=window.showSection;var w=function(id){var r=orig.apply(this,arguments);if(id==="focus"){mount();try{document.body.classList.remove("cd-hero");}catch(e){}}return r;};w.__cdFocus=1;window.showSection=w;}
+  function label(){var b=document.querySelector('.nav-bar .nav-btn[data-section="focus"]');if(b){var t=T("Focus","Concentration");if(b.textContent!==t)b.textContent=t;}}
+  try{var sec=$("section-focus");if(sec&&!sec.classList.contains("hidden"))mount();}catch(e){}
+
+  /* ---- the light and dark mark: the moon by day, the sun by night ---- */
+  (function themeGlyph(){function paint(){try{var f=$("cd-theme-fab");if(!f)return;var want=night()?"☀️":"🌙";if(f.textContent.indexOf(want)<0&&typeof cdThemeIcon==="function")cdThemeIcon();}catch(e){}}
+    try{new MutationObserver(paint).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}paint();setTimeout(paint,1500);})();
+
+  function keep(){label();try{TC.wireFab();TC.badge();}catch(e){}}
+  keep();setInterval(keep,1500);
+  window.cdFocus={sc:SC,tc:TC,mount:mount};
+});
+})();
+</script>

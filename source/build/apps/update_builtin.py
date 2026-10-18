@@ -1,7 +1,8 @@
-# R120: the copies of The Forge and Inkwell that Ingenium carries inside it.
-# Usage:  python3 -I update_builtin.py path/to/the_forge.html path/to/Inkwell.html
-# Writes, beside this file: builtin/forge.html.gz and builtin/inkwell.html.gz (each page exactly as given, compressed),
-# and builtin/builtin.json (for each: its version, build, date, size, SHA-256 fingerprint and file name).
+# R120: the copies of The Forge and Inkwell that Ingenium carries inside it; R122 (18 October 2026) adds Carpe Diem.
+# Usage:  python3 -I update_builtin.py path/to/the_forge.html path/to/Inkwell.html [path/to/carpe_diem.html]
+# Writes, beside this file: builtin/forge.html.gz, builtin/inkwell.html.gz and builtin/cd.html.gz (each page exactly
+# as given, compressed), and builtin/builtin.json (for each: its version, build, date, size, SHA-256 fingerprint and
+# file name). Without a third path, the Carpe Diem copy already kept here stays as it is.
 # build_page.py embeds them; modules/r120.js keeps them in the app library on first start, checked against the
 # fingerprint, and never puts them over a newer copy she added herself.
 import gzip, hashlib, json, os, re, sys
@@ -28,6 +29,13 @@ def forge(text):
     return {"key": "forge", "title": "The Forge", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
 
 
+def carpediem(text):
+    m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)"', text)
+    if not m or not re.search(r"<title>[^<]*Carpe Diem", text[:400000]) or 'id="section-forge"' in text:
+        sys.exit("this does not look like Carpe Diem's page (no build stamp, or no Carpe Diem title)")
+    return {"key": "cd", "title": "Carpe Diem", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
+
+
 def inkwell(text):
     m = re.search(r"const BUILD='\s*([\d.]+)((?:\s*·\s*[A-Z]+){3})?", text)
     if not m or not re.search(r"<title>Inkwell\b", text[:20000]):
@@ -41,7 +49,12 @@ def inkwell(text):
 
 
 meta = {}
-for path, read in ((sys.argv[1], forge), (sys.argv[2], inkwell)):
+try:
+    meta = {k: v for k, v in json.load(open(os.path.join(OUT, "builtin.json"))).items() if k == "cd"}
+except (OSError, ValueError):
+    pass
+jobs = [(sys.argv[1], forge), (sys.argv[2], inkwell)] + ([(sys.argv[3], carpediem)] if len(sys.argv) > 3 else [])
+for path, read in jobs:
     raw = open(path, "rb").read()
     info = read(raw.decode("utf-8", errors="replace"))
     info.update(size=len(raw), sha256=hashlib.sha256(raw).hexdigest(), name=os.path.basename(path))
