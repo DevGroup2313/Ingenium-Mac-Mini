@@ -212,11 +212,20 @@ import base64 as _b64
 _apps = ""
 for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago (slides), Scriba and Fontes too
     _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
+    if _name == "tabula":  # R124: Tabula keeps every part of a document when it autosaves or moves (apps/tabula_patch.py)
+        import importlib.util as _ilu
+        _tp = _ilu.spec_from_file_location("tabula_patch", os.path.join(HERE, "apps", "tabula_patch.py"))
+        _tpm = _ilu.module_from_spec(_tp); _tp.loader.exec_module(_tpm)
+        _html = _tpm.patch(_html)
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
 #      each is checked here against its own size and fingerprint before it rides along ----
 import gzip as _gz, hashlib as _hl
 _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
+# R124: ING_LEAN=1 builds the lean copy that The Forge carries: the same page without the apps Ingenium carries (a page
+# cannot hold a full copy of an app that holds a full copy of it back)
+if os.environ.get("ING_LEAN") == "1":
+    _bi = {}
 for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Diem rides along too
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
