@@ -126,6 +126,9 @@ def sync_sources():
             os.remove(m)
     for m in have:
         shutil.copy2(os.path.join(H, "modules", m), os.path.join(md, m))
+    # R126: Lector's recipe (her rules, the verified sources, her kinds of document), which build_page.py writes in
+    os.makedirs(os.path.join(dst, "recipe"), exist_ok=True)
+    shutil.copy2(os.path.join(H, "recipe", "recipe.json"), os.path.join(dst, "recipe", "recipe.json"))
     print("sources copied to", os.path.dirname(dst))
 
 if __name__ == "__main__":
