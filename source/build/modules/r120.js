@@ -105,6 +105,8 @@ function selfStanding(){var v=selfVersion(),m=libState().apps.ingenium;if(!v)ret
   var c=cmp(v,m.version);if(c===null)return "other";return c>0?"older":(c<0?"newer":"same");}
 /* the page this copy was opened from: fetched, or read the older way where a fetch is refused */
 function selfBytes(){var url=location.href.split("#")[0];
+  /* R131: a page written into a frame (about:srcdoc, as a website shows Ingenium in a room) has no address to read back */
+  if(!/^(https?|file):/i.test(location.protocol))return Promise.reject(new Error("this copy has no address of its own to read back"));
   return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("no");return r.arrayBuffer();})
     .catch(function(){return new Promise(function(res,rej){try{var x=new XMLHttpRequest();x.open("GET",url,true);x.responseType="arraybuffer";
       x.onload=function(){if((x.status===200||x.status===0)&&x.response&&x.response.byteLength)res(x.response);else rej(new Error("no"));};x.onerror=function(){rej(new Error("no"));};x.send();}catch(e){rej(e);}});})
@@ -126,7 +128,7 @@ function selfSeed(){var st=selfStanding();if(st==="absent"||st==="newer"||st==="
     return keepSelf().then(function(r){SELF.state=s==="lost"?"kept again":"kept";return SELF.state;},
       function(e){SELF.state="unread";SELF.why=String(e&&e.message||e);return "unread";});});}
 function selfLine(){var v=selfVersion();if(!v)return "";var st=SELF.state,m=libState().apps.ingenium;
-  if(st==="unread")return ' This copy, Ingenium '+esc(v)+', could not read its own page here (it was opened as a file), so it is not kept beside them: add Ingenium’s page with Add your apps.';
+  if(st==="unread")return ' This copy, Ingenium '+esc(v)+', could not read its own page here ('+(/^(https?|file):/i.test(location.protocol)?'it was opened as a file':'it was written into a frame')+'), so it is not kept beside them: add Ingenium’s page with Add your apps.';
   if(m&&m.ref&&cmp(v,m.version)===0)return ' Ingenium '+esc(v)+' keeps a copy of itself beside them, ready for Lector and Fabrica.';
   if(m&&m.ref&&cmp(v,m.version)<0)return ' A newer Ingenium ('+esc(m.version)+') that you added stays as it is.';
   return ' Ingenium '+esc(v)+' keeps a copy of itself beside them on first start.';}

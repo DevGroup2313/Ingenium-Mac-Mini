@@ -208,6 +208,38 @@ edit('<button class="rail-btn" id="fabPark" title="Park a thought" aria-label="P
      '<button class="rail-btn" id="fabPark" title="Catch a thought" aria-label="Catch a thought">',
      "R119 side button")
 
+# ---- R132 (18 October 2026): room to grow. The owner's words: "I want for the local storage limits for all of my apps to
+#      be expanded please." The desk said whether this view's small store (about 5 MB) took it, and modules/r132.js keeps
+#      a desk that store refused in this device's larger store (IndexedDB); the store a page keeps, and the steps back
+#      the code keeps, are allowed more room ----
+edit('catch(e1){try{SNAPRING.forEach(function(k){localStorage.removeItem(k);});localStorage.setItem(KEY,raw);}catch(e2){ingStoreFull();}}}\n  else memStore[KEY]=raw;',
+     'catch(e1){try{SNAPRING.forEach(function(k){localStorage.removeItem(k);});localStorage.setItem(KEY,raw);}catch(e2){lsOk=false;ingStoreFull();}}}\n  else memStore[KEY]=raw;\n'
+     '  /* R132: a desk the small store refused (or a view with none) is kept in the larger store on this device */\n'
+     '  try{if(window.__deskOverflow)window.__deskOverflow(raw,HAS_LS&&lsOk);}catch(e){}',
+     "R132 the desk says whether the small store took it")
+edit('  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
+     '  var lsOk=true;\n  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
+     "R132 the small store's answer")
+edit('if(txt.length>16*1024*1024){if(!cur.said){cur.said=1;csPush("warn","Ingenium keeps up to 16 MB of what a page stores; this page has stored more, so its newest changes are kept only while it is open.");}return;}',
+     'if(txt.length>256*1024*1024){if(!cur.said){cur.said=1;csPush("warn","Ingenium keeps up to 256 MB of what a page stores; this page has stored more, so its newest changes are kept only while it is open.");}return;}',
+     "R132 a page's own store: 256 MB")
+edit('/* the steps back that are kept: a large app keeps fewer (each step is a whole copy of the file), about 150 MB a file */',
+     '/* the steps back that are kept: a large app keeps fewer (each step is a whole copy of the file), about 600 MB a file (R132; it was 150 MB) */',
+     "R132 steps back: the note")
+edit('keep=Math.max(5,Math.min(80,Math.floor(150*1024*1024/size)));',
+     'keep=Math.max(5,Math.min(200,Math.floor(600*1024*1024/size)));',
+     "R132 steps back: 600 MB a file, 200 steps")
+edit('if(pr.versions.length>200)pr.versions.splice(0,pr.versions.length-200);',
+     'if(pr.versions.length>500)pr.versions.splice(0,pr.versions.length-500);',
+     "R132 steps back: 500 in a project")
+
+# ---- R131 (18 October 2026): the trainer can open with a text already given (modules/r131.js hands it the history the
+#      owner brought in from Claude) ----
+edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null},step=watch?3:(modelId?2:0),poll=null,cores=4,done=null,prevActive=null;',
+     'var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null},step=watch?3:(modelId?2:0),poll=null,cores=4,done=null,prevActive=null;\n'
+     '  if(window.__trainPreset){var _tp=window.__trainPreset;window.__trainPreset=null;if(_tp.text)w.text=String(_tp.text);if(_tp.name)w.name=String(_tp.name).slice(0,60);if(!watch&&w.text)step=1;}',
+     "R131 the trainer opens with a text already given")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:
@@ -257,6 +289,14 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tl = _ilu.spec_from_file_location("tabula_look_patch", os.path.join(HERE, "apps", "tabula_look_patch.py"))
         _tlm = _ilu.module_from_spec(_tl); _tl.loader.exec_module(_tlm)
         _html = _tlm.patch(_html)
+        # R130: its footnotes as Word sets them, at each page's foot, by Inkwell 7.48's recipe (apps/tabula_notes_patch.py)
+        _tn = _ilu.spec_from_file_location("tabula_notes_patch", os.path.join(HERE, "apps", "tabula_notes_patch.py"))
+        _tnm = _ilu.module_from_spec(_tn); _tn.loader.exec_module(_tnm)
+        _html = _tnm.patch(_html)
+        # R132: room to grow: autosave up to 256 MB in the larger store, the small store left to the desk (apps/tabula_room_patch.py)
+        _tr = _ilu.spec_from_file_location("tabula_room_patch", os.path.join(HERE, "apps", "tabula_room_patch.py"))
+        _trm = _ilu.module_from_spec(_tr); _tr.loader.exec_module(_trm)
+        _html = _trm.patch(_html)
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
 #      each is checked here against its own size and fingerprint before it rides along ----
