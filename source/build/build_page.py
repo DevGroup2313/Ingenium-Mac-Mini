@@ -18,6 +18,33 @@ def edit(old, new, label):
 edit('function saveState(){try{\n  state.__deskAt=Date.now();',
      'function saveState(){if(/[#&]ingapp=/.test(location.hash||""))return;try{\n  state.__deskAt=Date.now();', "R123 lite window never saves")
 
+# ---- R125: the chaptered tour opens again. The 3.12 page's short feature tour (seven cards) declared its own
+#      tourStart(i) and tourEnd() at the top level, after the chaptered tour's, so it replaced them: the door's tour key,
+#      Home's, and every chapter in the Chapters menu opened the seven cards instead of the chaptered tour, and the
+#      chaptered tour's End called the short tour's. The short tour keeps its cards under names of its own. ----
+edit('function tourStart(i){i=i||0;var s=TOUR[i];if(!s){tourEnd();return;}',
+     'function featTourStart(i){i=i||0;var s=TOUR[i];if(!s){featTourEnd();return;}', "R125 short tour start")
+edit('sk.onclick=tourEnd;', 'sk.onclick=featTourEnd;', "R125 short tour close")
+edit('bk.onclick=function(){tourStart(i-1);};', 'bk.onclick=function(){featTourStart(i-1);};', "R125 short tour back")
+edit('nx.onclick=function(){tourStart(i+1);};', 'nx.onclick=function(){featTourStart(i+1);};', "R125 short tour next")
+edit('function tourEnd(){var ov=$("tourOv");', 'function featTourEnd(){var ov=$("tourOv");', "R125 short tour end")
+edit('if(e.key==="Escape"&&$("tourOv"))tourEnd();', 'if(e.key==="Escape"&&$("tourOv"))featTourEnd();', "R125 short tour escape")
+
+# ---- R125: the short tour's ring rule (a fixed box with a page-wide shade) is kept to its own overlay. The chaptered
+#      tour marks the element it describes with the same class, tour-ring, so every element it rang was lifted out of
+#      the page (position: fixed) and laid over its neighbours, with a shade round it: Lector's app tiles over the line
+#      below them, a reply's thinking over the reply. ----
+edit('.tour-ring{position:fixed;border-radius:14px;box-shadow:0 0 0 4px var(--accent),0 0 0 9999px rgba(20,12,36,.42);transition:all .25s ease}',
+     '#tourOv .tour-ring{position:fixed;border-radius:14px;box-shadow:0 0 0 4px var(--accent),0 0 0 9999px rgba(20,12,36,.42);transition:all .25s ease}',
+     "R125 short tour ring kept to its overlay")
+
+# ---- R125: the tour's example conversation shows again. Opening the Chat page now chooses the conversation the page
+#      remembers (ccEnter, in the Chat and Code pages), which came after the tour had chosen its example, so the cards
+#      "A reply arrives" and "Reading its thinking" showed an empty page. The example is chosen once the page is open;
+#      what the page remembers is left alone. ----
+edit('  state.activeChat=c.id;go("chat");\n  if(done&&!c.messages.length){',
+     '  go("chat");state.activeChat=c.id;\n  if(done&&!c.messages.length){', "R125 tour example chat")
+
 # ---- R101: the reply keeps at most half the memory; her request is never the part cut ----
 edit('  return Math.max(1500,(ctx-replyTokens()-256)*3);}',
      '  /* R101: the reply keeps at most half of the memory, so a document or a change never leaves 1,500 characters for everything else */\n'
