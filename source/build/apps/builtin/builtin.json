@@ -2,31 +2,31 @@
  "cd": {
   "key": "cd",
   "title": "Carpe Diem",
-  "version": "1054",
-  "build": "528171054",
+  "version": "1055",
+  "build": "528171055",
   "date": "2026-10-18",
-  "size": 16569210,
-  "sha256": "d9dea782db095ed8f2971aca473059f95ec0adbe8a564d1ab6c063e6994a972a",
+  "size": 16593412,
+  "sha256": "631128bbee446b931c246fc2671bb322f2f176f674085a3d4fdd10c6c7caaec5",
   "name": "carpe_diem.html"
  },
  "forge": {
   "key": "forge",
   "title": "The Forge",
-  "version": "635",
-  "build": "9s67",
+  "version": "636",
+  "build": "9s68",
   "date": "2026-10-18",
-  "size": 12860883,
-  "sha256": "8433fbc7a8caf63f01eef0a324afdd90626201b9fee145c312cd0bb8dc7bc0b9",
+  "size": 12862115,
+  "sha256": "1ea17dfe8add63e554ba970174fcb90d289fb34badcee9713cafc27f2f21d4ca",
   "name": "the_forge.html"
  },
  "inkwell": {
   "key": "inkwell",
   "title": "Inkwell",
-  "version": "7.44",
+  "version": "7.45",
   "build": "",
   "date": "2026-10-18",
-  "size": 3646339,
-  "sha256": "50dd7502b8a09633dca6ec6b928db43b8d56dbb3b25fae23d197e4b421bfe96e",
+  "size": 3719754,
+  "sha256": "ffc2649de6584998ddade7eee334ebfbc96ac01546521d35b4995218a51eff55",
   "name": "Inkwell.html"
  }
 }
