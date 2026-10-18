@@ -530,7 +530,16 @@ function create(host){
   function refresh(){if(!root&&!mounts)return;if(busyTyping()){paintClocks();return;}if(root)render();drawMounts();}
   function paintClocks(){hosts().forEach(function(h){[].forEach.call(h.querySelectorAll('[data-sc-clock]'),function(n){var t=hhmm();if(n.textContent!==t)n.textContent=t;});});}
   var lastSig="";
-  function tick(){try{applyAll();}catch(e){}
+  /* what is open over the page (a sheet, the Focus room, the two-minute chip) follows day and night at once too */
+  var lastNight=null,nightQ=0;
+  function nightSync(){nightQ=0;var n=night();if(n===lastNight)return;lastNight=n;var v=n?"1":"0";
+    try{if(sheetEl)sheetEl.setAttribute("data-tc-night",v);}catch(e){}
+    ["sc-focus-room","sc-just"].forEach(function(id){var x=document.getElementById(id);if(x)x.setAttribute("data-sc-night",v);});
+    try{refresh();}catch(e){}}
+  function nightSoon(){if(!nightQ)nightQ=setTimeout(nightSync,30);}
+  try{var mo=new MutationObserver(nightSoon);mo.observe(document.documentElement,{attributes:true});
+    if(document.body)mo.observe(document.body,{attributes:true});}catch(e){}
+  function tick(){try{applyAll();}catch(e){}try{nightSync();}catch(e){}
     if(visible()){var m=tm(),sig=hhmm()+"|"+(m?(m.running?Math.floor(m.remaining/30):"p"+m.remaining):"")+"|"+(tc()?tc().list().length+(tc().draft()?"d":""):"")+"|"+isFr()+"|"+night();
       if(sig!==lastSig){lastSig=sig;refresh();}}}
   function applyAll(){var c=on("calm");try{document.documentElement.toggleAttribute("data-sc-calm",c);}catch(e){}try{H.applyCalm&&H.applyCalm(c);}catch(e){}

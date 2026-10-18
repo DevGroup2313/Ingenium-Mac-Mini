@@ -134,7 +134,7 @@ function selfLine(){var v=selfVersion();if(!v)return "";var st=SELF.state,m=libS
 /* ---------- when: after the app is ready and the page is idle ---------- */
 function later(){var go=function(){if(LIB.busy){setTimeout(later,15000);return;}seed();};
   if(typeof requestIdleCallback==="function")requestIdleCallback(go,{timeout:20000});else setTimeout(go,500);}
-(function start(){var tries=0;(function wait(){if(window.__ingReady===true){setTimeout(later,9000);return;}if(++tries<240)setTimeout(wait,500);})();})();
+(function start(){if(/[#&]ingapp=/.test(location.hash||""))return;/* R123: a window of its own keeps nothing */var tries=0;(function wait(){if(window.__ingReady===true){setTimeout(later,9000);return;}if(++tries<240)setTimeout(wait,500);})();})();
 window.IngBuiltin={lectorLine:lectorLine,meta:BI,standing:standing,seed:seed,keep:keep,unpack:unpack,use:useBuiltin,cmp:cmp,states:function(){return DONE;},
   self:{version:selfVersion,standing:selfStanding,keep:keepSelf,seed:selfSeed,state:function(){return SELF;},namedVersion:namedVersion}};
 })();

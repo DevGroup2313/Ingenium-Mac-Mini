@@ -24,13 +24,18 @@ var DARK=/*R118_DARK*/null;
 /* Carpe Diem's own preparation of the two apps (from __cdPrepSrc, taken by apps/extract_from_carpe_diem.py) */
 /*R118_CDPREP*/
 var cdPrep=(typeof ingCdPrep==="function")?ingCdPrep:function(w,h){return h;};
-var NAMES={tabula:"Tabula",abacus:"Abacus"},frames={},pendingCsv=null,pendingLite=null;
+var NAMES={tabula:"Tabula",abacus:"Abacus",slides:"Imago",scriba:"Scriba",fontes:"Fontes"},frames={},pendingCsv=null,pendingLite=null;
+/* R123: what Carpe Diem adds to each app's frame once it is open (its cut stones on the ribbon's app keys, its seal, its
+   pen that writes into any field), taken from the running Carpe Diem 1052 by apps/harvest_cd_dress.js */
+var INJECT=/*R123_INJECT*/null;
 function decode(id){var n=$(id);if(!n)return null;try{var b=atob(n.textContent.trim()),u8=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u8[i]=b.charCodeAt(i);return new TextDecoder().decode(u8);}catch(e){return null;}}
 function night(){return document.body.getAttribute("data-theme")==="night";}
 /* the app's page, prepared for this host: no Close key (the page is its window), English, Carpe Diem's own night
    dress for it, a theme bridge, and for Abacus the same hand-to-host saving Tabula already has */
-function prep(which){var html=decode("ing-app-"+which);if(!html)return null;var dark=(DARK&&DARK[which])||"";try{html=cdPrep(which,html);}catch(e){}
-  var head='<script>window.__CD_NOCLOSE=1;window.__APP_LANG__="en";window.__ING_HOST=1;<\/script>';
+function prep(which,opts){opts=opts||{};var html=decode("ing-app-"+which);if(!html)return null;var dark=(DARK&&DARK[which])||"";try{html=cdPrep(which,html);}catch(e){}
+  /* R123: the app's own Close key shows where Carpe Diem shows it (an app open full width); a floating window has its own
+     ✕ instead. A second document is the app's own instance (Carpe Diem's __CD_INSTANCE), kept apart from the first. */
+  var head='<script>'+(opts.close?'':'window.__CD_NOCLOSE=1;')+(opts.inst?'window.__CD_INSTANCE='+(+opts.inst)+';':'')+'window.__APP_LANG__="en";window.__ING_HOST=1;<\/script>';
   var bridge='<style id="ing-dark">'+dark+'</style><script>(function(){var W='+JSON.stringify(which)+';function ap(d){document.documentElement.classList.toggle("cd-dark",!!d);}'
     +'function post(){try{parent.postMessage({kind:"cd-theme-state",which:W,dark:document.documentElement.classList.contains("cd-dark")},"*");}catch(e){}}'
     +'function init(){ap('+(night()?"true":"false")+');post();}'
@@ -41,7 +46,19 @@ function prep(which){var html=decode("ing-app-"+which);if(!html)return null;var 
   if(which==="abacus"){
     html=html.replace("function importCSV(text){","window.__ingImportCSV=function(t){importCSV(t);};window.__ingBook=function(){return {data:data,COLS:COLS,ROWS:ROWS,title:(document.getElementById(\"docTitle\")||{}).value||\"\"};};window.__ingSaveFile=function(n,m,c){saveFile(n,m,c);};function importCSV(text){");
     html=html.replace("function saveFile(name,mime,content){","function saveFile(name,mime,content){try{if(window.parent&&window.parent!==window){var __p=(content instanceof Uint8Array)?content.buffer.slice(content.byteOffset,content.byteOffset+content.byteLength):(content instanceof ArrayBuffer?content:new TextEncoder().encode(String(content)).buffer);window.parent.postMessage({kind:\"carpe-save\",name:name,mime:mime,bytes:__p},\"*\");return;}}catch(e){}");}
-  html=html.replace("<head>","<head>"+head);var bi=html.lastIndexOf("</body>");html=bi>=0?html.slice(0,bi)+bridge+html.slice(bi):html+bridge;return html;}
+  html=html.replace("<head>","<head>"+head);
+  /* Carpe Diem's dress, in the places and the order Carpe Diem gives it */
+  try{var items=(INJECT&&INJECT.apps&&INJECT.apps[which])||[],hs="",bs="";items.forEach(function(it){var t=INJECT.texts[it[3]];if(t==null)return;t=String(t).replace(/<\/(script|style)/gi,"<\\/$1");
+      var tag=it[0]==="script"?'<script id="'+it[1]+'">'+t+'<\/script>':'<style id="'+it[1]+'">'+t+'</style>';if(it[2]==="head")hs+=tag;else bs+=tag;});
+    if(hs){var hi=html.indexOf("</head>");html=hi>=0?html.slice(0,hi)+hs+html.slice(hi):hs+html;}
+    /* the app keys inside the frame are named stones by their labels, as Carpe Diem names them (its cdTagStudioButtons):
+       the class and the data-cd-stonekey that its stone rules grip, again as the app redraws its ribbon */
+    bs+='<script id="ing-stone-tags">(function(){var MAP={Tabula:"tabula-btn",Abacus:"abacus-btn",Imago:"imago-btn",Scriba:"scriba-btn",Fontes:"fontes-btn"};'
+      +'function tag(){try{var b=document.querySelectorAll("button");for(var i=0;i<b.length;i++){var x=b[i],l=(x.textContent||"").trim().replace(/\\s*\\([^)]*\\)\\s*$/,"").trim();'
+      +'if(!MAP[l])continue;if(x.getBoundingClientRect().width>220)continue;if(String(x.className).indexOf(MAP[l])<0)x.className+=" "+MAP[l];if(x.getAttribute("data-cd-stonekey")!==MAP[l])x.setAttribute("data-cd-stonekey",MAP[l]);}}catch(e){}}'
+      +'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tag);else tag();setInterval(tag,1200);})();<\/script>';
+    bridge=bs+bridge;}catch(e){}
+  var bi=html.lastIndexOf("</body>");html=bi>=0?html.slice(0,bi)+bridge+html.slice(bi):html+bridge;return html;}
 function hashOf(s){s=String(s||"");var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return s.length+":"+h;}
 /* the small tablet's page goes to the whole Tabula once; Lector's documents go the same way, each time */
 function handTabula(){try{var d=state.tabulaDoc;if(!d||!d.body||!String(d.body).trim())return false;var h=hashOf(d.body);if(d.handed===h)return false;
@@ -78,6 +95,8 @@ window.buildTabula=buildTabula;window.buildAbacus=buildAbacus;
 /* the host's duties: the files the apps make, their theme, and their requests to open one another */
 window.addEventListener("message",function(ev){var d=ev&&ev.data;if(!d||typeof d.kind!=="string")return;
   var mine=false;for(var k in frames){if(frames[k]&&frames[k].contentWindow===ev.source)mine=true;}if(!mine)return;
+  /* R123: opening, closing and new windows belong to the desk (modules/r123.js) */
+  try{if(window.IngDesk&&IngDesk.onMessage(d,ev))return;}catch(e){}
   if(d.kind==="carpe-save"&&d.name){try{var u8=d.bytes instanceof Uint8Array?d.bytes:new Uint8Array(d.bytes||[]);saveFileNative(String(d.name),String(d.mime||"application/octet-stream"),u8);}catch(e){ingToast("The file could not be saved: "+(e&&e.message||e));}return;}
   if(d.kind==="carpe-print"){try{ev.source.postMessage({kind:"carpe-print-reply",ok:false},"*");}catch(e){}return;}
   if(d.kind==="carpe-open"){if(d.which==="tabula"||d.which==="abacus")go(d.which);else ingToast((d.which==="slides"?"Imago (slides)":"That app")+" is part of Carpe Diem, not of Ingenium.");return;}
@@ -89,7 +108,8 @@ window.addEventListener("message",function(ev){var d=ev&&ev.data;if(!d||typeof d
   if(lt)lt.textContent="Your writing tablet, whole: the same Tabula as in Carpe Diem, with its documents, footnotes, letterheads, signatures and exports, kept on this device.";
   if(la)la.textContent="The reckoning grid, whole: the same Abacus as in Carpe Diem, with its workbooks, formulas, formats and CSV in and out, kept on this device.";
   try{ING_TOUR.forEach(function(s){if(s.sub==="Tabula and Abacus"){s.b="Tabula is the writing tablet, whole: the same app as in Carpe Diem, with its documents, footnotes, letterheads, signatures and exports. Abacus, below it in the list, is the reckoning grid, whole: workbooks, formulas, formats and CSV in and out. Both keep your work on this device, and either opens in a window of its own.";}});}catch(e){}})();
-window.IngApps2={prep:prep,frames:frames,hand:{tabula:handTabula,abacus:handAbacus},decode:decode};
+window.IngApps2={prep:prep,frames:frames,hand:{tabula:handTabula,abacus:handAbacus},decode:decode,NAMES:NAMES,themeTo:themeTo,night:night,
+  pending:function(){return {csv:pendingCsv,lite:pendingLite};},setLite:function(v){pendingLite=v;},liteCsv:abacusLiteCsv};
 })();
 ;try{window.__ingParts["p49"]="running";}catch(_){}
 </script>

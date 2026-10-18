@@ -1,8 +1,12 @@
 # R118: takes the whole Tabula and Abacus out of Carpe Diem, with everything Carpe Diem does to them before it shows them,
-# so Ingenium shows the very same apps. Usage:  python3 -I extract_from_carpe_diem.py path/to/carpe_diem.html
-# Writes, beside this file: tabula.html and abacus.html (the apps as Carpe Diem carries them, base64-decoded),
-# dark.json (Carpe Diem's night dress for each) and cd_prep.js (Carpe Diem's preparation of the two, as a function
-# ingCdPrep(which, html) that build_page.py writes into modules/r118.js).
+# so Ingenium shows the very same apps. R123 (18 October 2026) takes all five: Tabula, Abacus, Imago (slides), Scriba
+# and Fontes, and Carpe Diem's whole preparation of them.
+# Usage:  python3 -I extract_from_carpe_diem.py path/to/carpe_diem.html
+# Writes, beside this file: tabula.html, abacus.html, slides.html, scriba.html and fontes.html (the apps as Carpe Diem
+# carries them, base64-decoded), dark.json (Carpe Diem's night dress for each) and cd_prep.js (Carpe Diem's own
+# __cdPrepSrc, as a function ingCdPrep(which, html) that build_page.py writes into modules/r118.js).
+# What Carpe Diem adds to each app's frame once it is open (its cut stones, its pen, its seal) is taken separately, from
+# the running page, by harvest_cd_dress.js, into cd_inject.json.
 import base64, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -64,8 +68,10 @@ def function_text(head):
             if depth == 0: return src[i:j + 1]
 
 
+APPS = ("tabula", "abacus", "slides", "scriba", "fontes")
+
 # 1. the apps
-for name in ("tabula", "abacus"):
+for name in APPS:
     m = re.search(r'var ' + name.upper() + r'_SRC = "([^"]+)"', src)
     html = base64.b64decode(m.group(1)).decode("utf-8")
     open(os.path.join(HERE, name + ".html"), "w", encoding="utf-8").write(html)
@@ -75,20 +81,22 @@ for name in ("tabula", "abacus"):
 block = src[src.index("var DARK={"):]
 block = block[:block.index("};") + 2]
 dark = {}
-for key in ("tabula", "abacus"):
+for key in APPS:
     m = re.search(key + r':"((?:[^"\\]|\\.)*)"', block)
     dark[key] = json.loads('"' + m.group(1) + '"')
 open(os.path.join(HERE, "dark.json"), "w").write(json.dumps(dark, indent=0))
 
-# 3. the preparation: the Tabula and Abacus branches of __cdPrepSrc, with the two scripts it adds to Tabula
+# 3. the preparation: Carpe Diem's whole __cdPrepSrc, with the two scripts it adds to Tabula. Its night dress and theme
+#    bridge are left to Ingenium's own (prep in modules/r118.js); a hand-off between frames (window.__cdHandoff) stays.
 prep = function_text("function __cdPrepSrc(which,__wl){")
-t0, t1 = prep.index("if(which==='tabula')"), prep.index("if(which==='scriba')")
-a0, a1 = prep.index("if(which==='abacus')"), prep.index("if(which==='slides')")
-branches = (prep[t0:t1] + prep[a0:a1]).replace("window.__cdRealPagesJs", "__cdRealPagesJs")
+head = "function __cdPrepSrc(which,__wl){var __h=__cdDecSrc(which);"
+assert prep.startswith(head), prep[:80]
+body = prep[len(head):].replace("window.__cdRealPagesJs", "__cdRealPagesJs").replace("'<head>'+__cdDarkInject(which)", "'<head>'")
+assert "__cdDarkInject" not in body and "__cdDecSrc" not in body
 fold = js_literals(expr_after("var __cdFoldBarJs = "))
 pages = js_literals(expr_after("window.__cdRealPagesJs="))
-js = ("function ingCdPrep(which,__h){var __cdFoldBarJs=" + json.dumps(fold) + ";var __cdRealPagesJs=" + json.dumps(pages) + ";\n"
-      + branches + "\nreturn __h;}")
+js = ("function ingCdPrep(which,__h){var __wl=\"en\";var __cdFoldBarJs=" + json.dumps(fold) + ";var __cdRealPagesJs=" + json.dumps(pages) + ";\n"
+      + body)
 js = js.replace("</script", "<\\/script")
 open(os.path.join(HERE, "cd_prep.js"), "w", encoding="utf-8").write(js)
 print("cd_prep.js", len(js), "characters; fold bar", len(fold), "; real pages", len(pages))
