@@ -64,6 +64,17 @@ Focus page takes version 2 of the support module, and the mini Forge in the Auth
 and Settings (its Tabula placeholder and hidden Tabula key are gone). `carpe_diem_1053/cd1053.py` applies all of this to a
 1052 page; `carpe_diem_1053/cd_repo_1053.py` writes it into a website repository.
 
+## What changed in Carpe Diem 1057 (19 October 2026)
+
+The mini Forge in the Author Studio is The Forge 639. Every edition of 1056 still carried the one made from The Forge 629
+(12 October), and in the full edition's device pages it had lost pass 1055's rule, so it offered Inkwell and Ingenium
+again; it also opened on whichever Carpe Diem had last been chosen in it (on the owner's Mac, a 1051), not on the app
+around it. `carpe_diem_1057/cd1057.py` makes the mini Forge again from The Forge 639 (lean), as the 629 one was made,
+with the French layer (1052), no Tabula (1053) and Carpe Diem alone (1055, given more weight, because The Forge 639's
+own rule for its app keys outranked it); hands it this very build each time it has loaded; stops the false "no room
+left" notice when Carpe Diem is shown in its sealed preview; and asks for the demonstration editions' offline keeper
+only on a website. `cd_repo_1057.py` writes the website repository and `cd_gift_1057.py` the owner's private one.
+
 ## What changed in Carpe Diem 1054 (18 October 2026)
 
 The tour says what Tabula's autosave keeps since 1053: one card, in English and French, follows "Real files, saved to
