@@ -45,6 +45,11 @@ _sp = importlib.util.spec_from_file_location("no_build_dates", os.path.join(os.p
 nbd = importlib.util.module_from_spec(_sp); _sp.loader.exec_module(nbd)
 s = nbd.forge(s)
 
+# 1c. FABRICA'S FRAME FOLLOWS THE ROOM'S HEAD while the help card above it unfolds (forge_fit.py, shared with Carpe Diem 1058)
+_sp = importlib.util.spec_from_file_location("forge_fit", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "forge_fit.py"))
+ff = importlib.util.module_from_spec(_sp); _sp.loader.exec_module(ff)
+s = ff.fabrica(s)
+
 lean = s
 os.makedirs(out_dir, exist_ok=True)
 open(os.path.join(out_dir, "the_forge_641_lean.html"), "w", encoding="utf-8").write(lean)

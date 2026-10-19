@@ -97,7 +97,16 @@ number"). `no_build_dates.py` makes the change in each page as it is built: Carp
 "This build was finished on" sentence is gone. Ingenium reads "Version 5.9" (`build_page.py`, edit R134), and the
 lines of its app library name each app and its version only (`modules/r120.js`). Each page still records its date
 in its build record (`CD_BUILD`, and Ingenium's page date), where the tests and the documents' measurements read it;
-the site keeps its Latin dates, and Inkwell its own.
+the site keeps its Latin dates, and Inkwell its own. The same module corrects the texts that read the build by its date
+or by an old number: the Guide's "Which build am I running" (every edition of a build shares its stamp; a demonstration
+adds its edition's name) and its tip on the build line, in English and French; a Magister lesson that quoted
+"Build 2026-10-17 · 630 · 9s62"; the glossary's "this Forge is build 630"; and the build line written into the
+Forge's page before its script runs, which now carries its own build.
+
+`forge_fit.py`: Fabrica's frame in the Forge (and in Carpe Diem's mini Forge) follows the room's head at every frame
+while the room opens and just after a press. It was fitted at 120 and 500 milliseconds and then every 700, so while
+the help card above it unfolded it could stand about 45 pixels below the window's edge (the Forge's Fabrica test
+caught it on the full page).
 
 Lector's recipe (`build/recipe/recipe.json`, written by the documents' `gen_recipe.py`) now names the builds the
 documents describe (Carpe Diem 1058, The Forge 641, Ingenium 5.9, Inkwell 7.49) and Inkwell's figures from its

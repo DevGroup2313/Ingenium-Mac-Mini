@@ -35,7 +35,8 @@ if not m:
 NEW = ('**Build 1058, 19 October 2026.** The About panel ends with "1058 · 528171058 · %s".' % m.group(1)
        + "\n\n**New in build 1058.** The mini Forge in the Author Studio is now The Forge 641 (it was The Forge 639). It\n"
        "still opens on this very build of Carpe Diem each time and edits Carpe Diem alone. The app now shows its build\n"
-       "number and stamp, with no date.")
+       "number and stamp, with no date, and the Guide says so: every edition shares the stamp, and a demonstration adds\n"
+       "its edition's name.")
 r = r.replace(m.group(0), NEW, 1)
 if r.count("**New in build 1057.**") != 1:
     raise SystemExit("README: 'New in build 1057' not found once")
