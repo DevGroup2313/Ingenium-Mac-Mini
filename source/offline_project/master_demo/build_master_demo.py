@@ -21,9 +21,11 @@ What it writes, into OUT_DIR:
 
 The owner's words, on the approved preview: "I only want the committee tour features for Carpe Diem and I want an alternate
 version of the Offline project that does not have Inkwell." So --cd-sample is optional (the site gives Carpe Diem's room the
-Committee demo alone), and so is --inkwell: without it the site has three rooms, the gilt book of the boss stands in
-Inkwell's quarter of the crest and opens the list of the apps, the words say three, and the devices, whose pictures show
-all four seals, stay out.
+Committee demo alone), and so is --inkwell: without it the site has three rooms, the words say three, and the devices,
+whose pictures show all four seals, stay out. The owner's words (19 October 2026): "For the master shield seal alternative
+with no Inkwell. I want you to entirely remove the fourth quadrant and only have it turn into one in the bottom and two at
+the top". So its crest has three fields: Carpe Diem and The Forge above, Ingenium alone across the foot, and the gilt cross
+is a T. Its icons are drawn from that crest (--shield).
 
 --mode preview  writes index.html without its document skeleton (the Artifact host adds one); each app travels as script
                 parts (apps/<slug>.partN.js), which any viewer that runs the page can load, read as files where it can
@@ -46,6 +48,8 @@ ap.add_argument("--cd-sample", help="Carpe Diem's Public sample, offered beside 
 ap.add_argument("--inkwell", help="Inkwell's page (left out: the site of three apps)")
 ap.add_argument("--inkwell-vendor", help="Inkwell's vendor folder (its word lists, citation styles and PDF reader), copied to apps/vendor")
 ap.add_argument("--mode", choices=("preview", "site", "app"), default="preview")
+ap.add_argument("--shield", help="a picture of the shield for the site's icons, in place of the preview's (the site without Inkwell gives its own,"
+                " three fields, drawn by shield_shot.js from its crest)")
 ap.add_argument("--max-file", type=int, default=None)
 A = ap.parse_args()
 if A.inkwell_vendor and not A.inkwell:
@@ -85,6 +89,9 @@ mr = re.search(r'var REF = "(data:image/png;base64,[^"]+)"', seal_src)
 if not mr:
     raise SystemExit("the preview of the master seal does not hold the shield (var REF)")
 SHIELD = Image.open(io.BytesIO(base64.b64decode(mr.group(1).split(",", 1)[1]))).convert("RGBA")
+if A.shield:
+    SHIELD = Image.open(A.shield).convert("RGBA")
+    SHIELD = SHIELD.crop(SHIELD.getbbox())
 os.makedirs(os.path.join(OUT, "assets/icons"), exist_ok=True)
 
 

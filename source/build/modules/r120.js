@@ -74,9 +74,9 @@ function repaint(){try{libPaint();}catch(e){}
   try{var c=$("libCard");if(c){var n=document.createElement("div");n.innerHTML=libCardHtml();if(n.firstChild){c.replaceWith(n.firstChild);libWire();}}}catch(e){}}
 
 /* ---------- the Your apps card says what Ingenium carries, and offers it where her copy differs ---------- */
-function day(d){if(!d)return "";try{return new Date(d+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});}catch(e){return d;}}
+/* R134: the apps it carries are named by version alone, with no date (the owner's words: "keep only the build number") */
 function also(a){return a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1];}
-function line(){var names=KEYS.slice().reverse().filter(function(k){return BI[k];}).map(function(k){var b=BI[k];return esc(LIB_NAMES[k]+" "+b.version)+(b.date?" ("+esc(day(b.date))+")":"");});
+function line(){var names=KEYS.slice().reverse().filter(function(k){return BI[k];}).map(function(k){var b=BI[k];return esc(LIB_NAMES[k]+" "+b.version);});
   var keys=KEYS.slice().reverse().filter(function(k){var s=standing(k);return BI[k]&&(s==="newer"||s==="other");}).map(function(k){var s=standing(k);
     return '<button class="btn small ghost" type="button" data-bi-use="'+k+'" title="'+(s==="newer"?"Your kept copy is newer; this goes back to the built-in one, and yours stays one step back":"Your kept copy is a different build; yours stays one step back")+'">Use the built-in '+esc(LIB_NAMES[k]+" "+BI[k].version)+'</button>';});
   return '<p class="small muted lib-builtin" id="libBuiltin">Built into this Ingenium: '+also(names)+'. They are kept here on first start, checked against their fingerprints. A newer copy you add yourself always stays.'+selfLine()+'</p>'
