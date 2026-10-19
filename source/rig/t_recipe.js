@@ -34,7 +34,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const t0 = Date.now();
   const m = await p.evaluate(() => IngRecipe.measureAll().then(r => { const o = {}; Object.keys(r).forEach(k => { const v = r[k].v || {}; o[k] = r[k].error ? { error: r[k].error } : { pass: v.pass, version: v.version, tour: v.tour, read: v.read, sha: (v.sha || '').slice(0, 12), bytes: v.bytes, req: v.requests, tutor: v.tutor, house: v.house, catalog: v.catalog, carried: (v.carried || []).length, stamp: v.stamp }; }); return o; }), null);
   const ms = Date.now() - t0;
-  ok(m.cd && m.cd.pass === '1056' && m.cd.tour === 201 && m.cd.tutor === 323 && m.cd.read, 'Carpe Diem is measured from its kept copy: build 1056, 201 tour cards, 323 tutor entries', JSON.stringify(m.cd));
+  ok(m.cd && m.cd.pass === '1057' && m.cd.tour === 201 && m.cd.tutor === 323 && m.cd.read, 'Carpe Diem is measured from its kept copy: build 1057, 201 tour cards, 323 tutor entries', JSON.stringify(m.cd));
   ok(m.forge && /^\d{3}$/.test(m.forge.pass || '') && /^9s\d+$/.test(m.forge.stamp || '') && m.forge.tour === 32, 'The Forge is measured: its pass and stamp from its About panel, 32 tour cards (639: a card for Fabrica) (its lean copy carries no apps)', JSON.stringify(m.forge));
   ok(m.inkwell && m.inkwell.version === '7.48' && m.inkwell.tour === 49, 'Inkwell is measured: 7.48, 49 tour cards', JSON.stringify(m.inkwell));
   ok(m.ingenium && /^5\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 34, 'Ingenium is measured: its version, 18 house models, 34 in the catalogue', JSON.stringify(m.ingenium));
@@ -62,13 +62,13 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
     const rels = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
     const u8 = makeZip([{ name: '[Content_Types].xml', data: ct }, { name: '_rels/.rels', data: rels }, { name: 'word/document.xml', data: doc }]);
     const f = new File([u8], 'Test_Appendix_Digital_Humanities.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    // an earlier measurement of Carpe Diem, as if 1051 had been measured before 1056
+    // an earlier measurement of Carpe Diem, as if 1051 had been measured before 1057
     const H = state.recipe.facts.cd; const old = JSON.parse(JSON.stringify(H[0])); old.v.pass = '1051'; old.v.tour = 199; old.v.tutor = 320; old.v.sha = 'older'; old.at = Date.now() - 86400000 * 6; H.splice(1, 0, old);
     return IngRecipe.addDocs([f]).then(ds => ds[0]).then(d => IngRecipe.check(d).then(F => ({ id: d.id, tpl: d.tpl, bin: !!d.bin, F: F.map(x => ({ k: x.kind, r: x.rule, f: x.fact, from: x.from, to: x.to, on: x.on, p: x.p })) })));
   });
   ok(made.bin && made.tpl === 'appendix-dh', 'the Word file is kept here, whole, and known as an appendix for the digital humanities', JSON.stringify({ tpl: made.tpl, bin: made.bin }));
   const F = made.F, find = (from, on) => F.find(x => x.from === from && (on === undefined || x.on === on));
-  ok(find('Carpe Diem build 1051', true) && find('Carpe Diem build 1051').to === 'Carpe Diem build 1056', 'a build an update changed is found in the owner\'s words, ticked, with its new figure', JSON.stringify(find('Carpe Diem build 1051')));
+  ok(find('Carpe Diem build 1051', true) && find('Carpe Diem build 1051').to === 'Carpe Diem build 1057', 'a build an update changed is found in the owner\'s words, ticked, with its new figure', JSON.stringify(find('Carpe Diem build 1051')));
   ok(find('tour of 199 cards', true) && find('tour of 199 cards').to === 'tour of 201 cards', 'so is the tour', JSON.stringify(find('tour of 199 cards')));
   ok(find('320-entry', true) && find('320-entry').to === '323-entry', 'so is a figure split across two runs of the Word file', JSON.stringify(find('320-entry')));
   const guarded = F.find(x => x.p === 2 && x.k === 'figure');
@@ -83,7 +83,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const up = await p.evaluate((id) => { const d = state.recipe.docs.find(x => x.id === id); return IngRecipe.apply(d).then(n => IngBig.load(d.bin).then(s => { const bin = atob(s), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++)u8[i] = bin.charCodeAt(i);
     return libZipData(u8, libZipEntries(u8)['word/document.xml']).then(x => { const xml = new TextDecoder().decode(x); return IngRecipe.docxParas(u8).then(P => ({ n, ver: d.ver.length, P: P.map(p => p.text), bold: /<w:rPr><w:b\/><\/w:rPr><w:t xml:space="preserve">entry corpus/.test(xml), wellFormed: !new DOMParser().parseFromString(xml, 'application/xml').querySelector('parsererror') })); }); })); }, made.id);
   ok(up.n === 3, 'the three ticked figures are changed', JSON.stringify(up.n));
-  ok(up.P[0] === 'Carpe Diem build 1056, dated 12 October 2026, holds a guided tour of 201 cards.' && up.P[1] === 'Its tutor of 323-entry corpus is written by hand.', 'the owner\'s sentences read as before, with the new figures', JSON.stringify(up.P.slice(0, 2)));
+  ok(up.P[0] === 'Carpe Diem build 1057, dated 12 October 2026, holds a guided tour of 201 cards.' && up.P[1] === 'Its tutor of 323-entry corpus is written by hand.', 'the owner\'s sentences read as before, with the new figures', JSON.stringify(up.P.slice(0, 2)));
   ok(up.P[2] === 'The size of the full edition is as last measured at build 1051.' && up.P[3].indexOf('Lector') === 0, 'what was not ticked is untouched', JSON.stringify(up.P.slice(2, 4)));
   ok(up.bold && up.wellFormed, 'the bold run keeps its bold, and the Word file\'s XML is well formed', JSON.stringify({ bold: up.bold, wf: up.wellFormed }));
   ok(up.ver === 1, 'the version before is kept', up.ver);
@@ -100,7 +100,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
     const para = t => '<w:p><w:r><w:t xml:space="preserve">' + t + '</w:t></w:r></w:p>';
     const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + '><w:body>' +
       para('One HTML file of 16.6 MB in the committee demonstration and the public sample; about 27.6 MB in the full edition, as last measured at build 1051.') +
-      para('About 27.6 MB and 73,249 lines in the full edition (build 1051); 16.6 MB in the committee demonstration (build 1056).') + '<w:sectPr/></w:body></w:document>';
+      para('About 27.6 MB and 73,249 lines in the full edition (build 1051); 16.6 MB in the committee demonstration (build 1057).') + '<w:sectPr/></w:body></w:document>';
     const ct = '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
     const rels = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
     const f = new File([makeZip([{ name: '[Content_Types].xml', data: ct }, { name: '_rels/.rels', data: rels }, { name: 'word/document.xml', data: doc }])], 'Test_Dossier_Sociology.docx');
@@ -126,8 +126,8 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(fe('27.6 MB', 0) && fe('27.6 MB', 0).on && fe('27.6 MB', 0).to === ed.mb + ' MB' && fe('27.6 MB', 0).ed === 'full', 'the full edition\'s size is found and ticked, with the size of the copy measured as the full edition', JSON.stringify(fe('27.6 MB', 0)) + ' ' + ed.mb);
   ok(fe('73,249 lines') && fe('73,249 lines').on && fe('73,249 lines').to === ed.lines.toLocaleString('en-GB') + ' lines', 'and its lines', JSON.stringify(fe('73,249 lines')));
   const b0 = ed.after.find(x => x.p === 0 && /1051/.test(x.from)), b1 = ed.after.find(x => x.p === 1 && /1051/.test(x.from));
-  ok(b0 && b0.on && /1056/.test(b0.to) && b1 && b1.on, '"as last measured at build 1051" is ticked once the full edition is measured again: it now reads its new build', JSON.stringify([b0, b1]));
-  ok(!ed.after.some(x => x.from === '16.6 MB' || /1056/.test(x.from)), 'the committee demonstration\'s figures beside them are not touched', JSON.stringify(ed.after.filter(x => x.ed !== 'full')));
+  ok(b0 && b0.on && /1057/.test(b0.to) && b1 && b1.on, '"as last measured at build 1051" is ticked once the full edition is measured again: it now reads its new build', JSON.stringify([b0, b1]));
+  ok(!ed.after.some(x => x.from === '16.6 MB' || /1057/.test(x.from)), 'the committee demonstration\'s figures beside them are not touched', JSON.stringify(ed.after.filter(x => x.ed !== 'full')));
   ok(ed.layer, 'the full edition\'s measures travel with Lector\'s sections, given to that edition only');
 
   // 5. writing by the recipe: the layer that travels with Lector's sections, and the sources for My sources
