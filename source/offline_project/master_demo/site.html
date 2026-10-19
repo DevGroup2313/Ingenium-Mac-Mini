@@ -137,7 +137,6 @@ h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;l
 .q.press .body{animation:qKnock .5s cubic-bezier(.34,1.56,.64,1)}
 .q-cd.press .body{animation:none}
 @keyframes qKnock{0%{transform:scale(.9)}45%{transform:scale(1.12) rotate(-4deg)}100%{transform:scale(1) rotate(0deg)}}
-.still .ms-idle,.still .q *{animation-play-state:paused !important}
 @media (prefers-reduced-motion:reduce){.ms-idle,.ms.rise,.ms.leave,.q *{animation:none !important}.ms-tilt,.q .body{transition:none}}
 
 /* ---------- the four ---------- */
@@ -179,8 +178,6 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 
 /* ---------- a room ---------- */
 .room{padding-top:18px}
-.room-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.room-top .back{margin-right:4px}
 .switch{display:flex;gap:6px;flex-wrap:wrap}
 .switch a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:5px 11px 5px 6px;border-radius:999px;border:1px solid var(--hair);background:var(--panel);box-shadow:var(--key);font:600 13px/1 var(--text);color:var(--ink-2);transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s}
 .switch a:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
@@ -221,6 +218,8 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 @media (max-width:900px){.room-grid{grid-template-columns:minmax(0,1fr)}.room-info{position:static}.well{height:76vh;min-height:480px;padding:6px}.stage .seg.widths{display:none}}
 @media (prefers-reduced-motion:reduce){.room-in,.veil .medal{animation:none}.frame{transition:none}}
 
+/* a page that is put away stays away, whichever host draws this page (the preview host adds the same rule) */
+[hidden]{display:none !important}
 /* ---------- THE TOP BAR: the crest's mark, the four apps and the devices as raised keys, and language and light, all in one bar ---------- */
 .bar-in{flex-wrap:nowrap;gap:14px}
 .tray{display:flex;align-items:center;gap:4px;padding:4px;margin:0 auto;border-radius:999px;background:var(--ground-2);border:1px solid var(--hair);
@@ -244,7 +243,7 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 .tool[aria-pressed="true"]{animation:keySettle .34s cubic-bezier(.34,1.35,.64,1)}
 @keyframes keySettle{0%{scale:.95}55%{scale:1.04}100%{scale:1}}
 @media (max-width:1180px){.mark b{display:none}}
-@media (max-width:820px){.tkey:not([aria-current="page"]) .tk-t{display:none}.tkey:not([aria-current="page"]){padding:5px}.tkey.tk-word:not([aria-current="page"]) .tk-t{display:inline}.tkey.tk-word:not([aria-current="page"]){padding:9px 12px}}
+@media (max-width:820px){.tray{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);padding-right:18px}.tkey:not([aria-current="page"]) .tk-t{display:none}.tkey:not([aria-current="page"]){padding:5px}.tkey.tk-word:not([aria-current="page"]) .tk-t{display:inline}.tkey.tk-word:not([aria-current="page"]){padding:9px 12px}}
 @media (max-width:520px){.tkey.tk-word:not([aria-current="page"]){display:none}.bar-in{gap:8px}}
 .room{padding-top:22px}.room-grid{margin-top:0}
 
@@ -351,7 +350,7 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
         <span class="status" id="stageStatus"></span>
       </div>
       <div class="well"><div class="frame" id="frameBox">
-        <iframe id="demoFrame" title="Live demonstration" allow="fullscreen; clipboard-write"></iframe>
+        <iframe id="demoFrame" title="Live demonstration" allow="fullscreen *; clipboard-write *; microphone *"></iframe>
         <div class="veil" id="veil"><div class="medal" id="veilMedal"></div><b id="veilTitle"></b><span id="veilLine"></span></div>
       </div></div>
     </div>
@@ -375,7 +374,7 @@ var W = {
     hint: "Press a seal to open its app, live, in this page.", fourTitle: "The four apps", fourSub: "Each sits in its quarter of the crest. Each opens here as it is, with its own guided tour.",
     devTitle: "On every device", devSub: "The crest as it stands on each screen the apps are built for, by day and by night.",
     back: "← The crest", tour: "Start the guided tour", alone: "Open on its own ↗", computer: "Computer", tablet: "Tablet", phone: "Phone",
-    rights: "All rights reserved.", crestKey: "The crest", devKey: "Devices", preview: "Preview", theme: ["Night", "Day"], still: ["Pause the motion", "Let it move"],
+    rights: "All rights reserved.", crestKey: "The crest", devKey: "Devices", theme: ["Night", "Day"],
     all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "Runs on", tryH: "Try this",
     opening: "Opening {app}", sizeLine: "{mb} MB, opened in this page. Nothing is sent anywhere.", ready: "{app} is open. Everything you do stays in this browser.",
     tourGo: "The tour has started in the app.", tourWait: "The app is still opening.", tourNone: "This app keeps its tour in its own menu.",
@@ -384,7 +383,7 @@ var W = {
     hint: "Touchez un sceau pour ouvrir son app, en direct, dans cette page.", fourTitle: "Les quatre apps", fourSub: "Chacune a son quartier du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée.",
     devTitle: "Sur chaque appareil", devSub: "Le blason tel qu’il se tient sur chaque écran pour lequel les apps sont construites, de jour et de nuit.",
     back: "← Le blason", tour: "Lancer la visite guidée", alone: "Ouvrir seule ↗", computer: "Ordinateur", tablet: "Tablette", phone: "Téléphone",
-    rights: "Tous droits réservés.", crestKey: "Le blason", devKey: "Appareils", preview: "Aperçu", theme: ["Nuit", "Jour"], still: ["Arrêter le mouvement", "Laisser bouger"],
+    rights: "Tous droits réservés.", crestKey: "Le blason", devKey: "Appareils", theme: ["Nuit", "Jour"],
     all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Fonctionne sur", tryH: "À essayer",
     opening: "Ouverture de {app}", sizeLine: "{mb} Mo, ouverte dans cette page. Rien n’est envoyé nulle part.", ready: "{app} est ouverte. Tout ce que vous faites reste dans ce navigateur.",
     tourGo: "La visite a commencé dans l’app.", tourWait: "L’app s’ouvre encore.", tourNone: "Cette app garde sa visite dans son propre menu.",
@@ -830,7 +829,7 @@ document.addEventListener("click", function (e) {
   if (sb && !reduced) { knock(sb); setTimeout(function () { go(h); }, 220); } else go(h);
 });
 
-/* ============================== words, day and night, stillness ============================== */
+/* ============================== words, day and night ============================== */
 function paintWords() {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach(function (e) { var v = t(e.getAttribute("data-i18n")); if (typeof v === "string") e.textContent = v; });
