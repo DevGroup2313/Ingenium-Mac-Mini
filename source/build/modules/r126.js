@@ -65,6 +65,7 @@ var PROBE=String(function(TOK){var REQ=[],sent=0;
     /* The Forge */
     sh("forgeTour",function(){return FORGE_TOUR.length;});
     sh("forgeBuild",function(){var e=document.querySelector("#aboutStamp .build");return e?e.textContent.trim():undefined;});
+    sh("forgeRec",function(){var r=window.CD_BUILD;return r&&r.pass?{date:String(r.date||""),pass:String(r.pass),stamp:String(r.stamp||"")}:undefined;});
     sh("forgeCarried",function(){return JSON.parse(document.getElementById("forge-bi-meta").textContent).apps.map(function(a){return {title:a.title,version:String(a.version),size:a.size,sha256:a.sha256,self:!!a.self};});});
     /* Ingenium */
     sh("ingVersion",function(){return ING_VERSION;});sh("ingTour",function(){return ING_TOUR.length;});
@@ -96,7 +97,7 @@ function factsOf(key,text,r,label){var u8=new TextEncoder().encode(text),f=(r&&r
   v.bytes=u8.length;v.mb=(u8.length/1e6).toFixed(1);v.lines=text.split("\n").length;
   if(key==="cd"&&f.cdBuild){v.pass=String(f.cdBuild.pass||"");v.stamp=String(f.cdBuild.stamp||"");v.date=String(f.cdBuild.date||"");v.edition=String(f.cdBuild.edition||"");}
   if(key==="cd"){["Tour","Tutor","Concepts","ConceptsDescribed","Guiding","Quizzes","Courses","Guide","Styles","Apps"].forEach(function(k){if(f["cd"+k]!=null)v[k.charAt(0).toLowerCase()+k.slice(1)]=f["cd"+k];});}
-  if(key==="forge"){var b=/(\d{4}-\d{2}-\d{2})\s*·\s*(\d+)\s*·\s*(\S+)/.exec(f.forgeBuild||"");if(b){v.date=b[1];v.pass=b[2];v.stamp=b[3];}if(f.forgeTour!=null)v.tour=f.forgeTour;if(f.forgeCarried)v.carried=f.forgeCarried;}
+  if(key==="forge"){/* its own build record first; else its About line, which shows "Build 641 · 9s73" since the dates left the apps (19 October), and showed a date before it until then */var r=f.forgeRec,b=/(?:(\d{4}-\d{2}-\d{2})\s*·\s*)?(\d+)\s*·\s*(\S+)/.exec(f.forgeBuild||"");if(r){v.pass=r.pass;v.stamp=r.stamp;if(r.date)v.date=r.date;}else if(b){if(b[1])v.date=b[1];v.pass=b[2];v.stamp=b[3];}if(f.forgeTour!=null)v.tour=f.forgeTour;if(f.forgeCarried)v.carried=f.forgeCarried;}
   if(key==="ingenium"){if(f.ingVersion)v.version=String(f.ingVersion);if(f.ingTour!=null)v.tour=f.ingTour;if(f.ingPages)v.pages=f.ingPages;
     var L=f.ingLineup;if(L){v.house=L.house;v.pinned=L.pinned;v.catalog=L.catalog;v.models=L.models;v.makers=L.makers;v.houseMakers=L.houseMakers;v.pmin=L.pmin;v.pmax=L.pmax;}}
   if(key==="inkwell"){var ib=/^([\d.]+)/.exec(String(f.inkBuild||""));if(ib)v.version=ib[1];if(f.inkTour!=null)v.tour=f.inkTour;}

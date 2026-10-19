@@ -254,6 +254,12 @@ edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelI
      '  if(window.__trainPreset){var _tp=window.__trainPreset;window.__trainPreset=null;if(_tp.text)w.text=String(_tp.text);if(_tp.name)w.name=String(_tp.name).slice(0,60);if(!watch&&w.text)step=1;}',
      "R131 the trainer opens with a text already given")
 
+# ---- R134: the version shows without a date (the owner's words, 19 October 2026: "I want you to remove the dates from the
+#      apps, keep only the build number please"): "Version 5.9", with its build number when the page was stamped by a
+#      build, and no longer "page of 19 October 2026" when it was not. The date stays in ING_PAGE_DATE, unshown. ----
+edit('function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:" · page of "+ING_PAGE_DATE);}',
+     'function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:"");}', "R134 the version line names no date")
+
 for old, new, label in EDITS:
     n = out.count(old)
     if n != 1:

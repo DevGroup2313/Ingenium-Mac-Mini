@@ -75,6 +75,35 @@ own rule for its app keys outranked it); hands it this very build each time it h
 left" notice when Carpe Diem is shown in its sealed preview; and asks for the demonstration editions' offline keeper
 only on a website. `cd_repo_1057.py` writes the website repository and `cd_gift_1057.py` the owner's private one.
 
+## What changed in Carpe Diem 1058, The Forge 641 and Ingenium 5.9 (19 October 2026)
+
+The owner's words: "The Forge 641 needs to contain Ingenium 5.9 and Ingenium 5.9 should contain the Forge 641. And both
+The Forge 641 and Ingenium 5.9 should have Carpe Diem 1058 which has the mini Forge 641", with Inkwell 7.49. There is no
+circle, because each app carries the other's lean page, which carries no apps. The order:
+
+1. The Forge 641's lean page (`forge_641/forge641.py`, from the 640 lean page: only the build stamp changes, 9s73).
+2. Carpe Diem 1058 in every edition (`carpe_diem_1058/cd1058.py`): its mini Forge is made from that lean page by pass
+   1057's recipe, and checked to differ from the 1057 one only in its stamp.
+3. Ingenium 5.9 carries The Forge 641 (lean), Carpe Diem 1058 and Inkwell 7.49; then its own lean page is made.
+4. The Forge 641's full page carries Ingenium 5.9 (lean), Carpe Diem 1058, Inkwell 7.49 and its own lean page; its
+   demonstration (`forge_demo/forge_demo_641.py`) carries Carpe Diem 1058's Public sample, with Inkwell 7.49 or without.
+
+`cd_repo_1058.py`, `cd_gift_1058.py` and `forge_641/forge_repo_641.py` write the repositories; the Forge's README names
+the versions it carries from the page itself.
+
+The apps show their build number, not a date (the owner's words: "remove the dates from the apps, keep only the build
+number"). `no_build_dates.py` makes the change in each page as it is built: Carpe Diem's opening line and About read
+"Build 1058 · 528171058" with the edition, The Forge's About and footer read "Build 641 · 9s73", and the Forge's
+"This build was finished on" sentence is gone. Ingenium reads "Version 5.9" (`build_page.py`, edit R134), and the
+lines of its app library name each app and its version only (`modules/r120.js`). Each page still records its date
+in its build record (`CD_BUILD`, and Ingenium's page date), where the tests and the documents' measurements read it;
+the site keeps its Latin dates, and Inkwell its own.
+
+Lector's recipe (`build/recipe/recipe.json`, written by the documents' `gen_recipe.py`) now names the builds the
+documents describe (Carpe Diem 1058, The Forge 641, Ingenium 5.9, Inkwell 7.49) and Inkwell's figures from its
+development notes up to 7.49. The full edition's figures are measured from its file at 1058, not copied. The recipe
+test sets its own older scenario (a document written when the full edition was last measured at 1051) before it checks.
+
 ## What changed in The Forge 640 and Ingenium 5.8 (19 October 2026)
 
 The Forge 640 (stamp 9s72) carries Carpe Diem 1057, whose mini Forge is The Forge 639, with Ingenium 5.7 (lean),
@@ -98,10 +127,13 @@ demonstration, with Carpe Diem's Public sample and Inkwell, or Carpe Diem alone)
 * `--mode preview`: the private review page on claude.ai, whose host adds the document skeleton. Each app travels as
   script parts (`apps/<slug>.partN.js`), so it loads even where the host refuses to let a page read its own files.
 
-The page has a top bar: the crest, each app with its seal, and the devices, as raised keys, the current page in gilt,
-with French and night at its right end. The Preview tag, the pause key and the loose keys above each room are gone.
-Each seal is a push-button ported from the apps' own: it sways, turns toward the pointer, lifts, sinks when pressed and
-rises again, and it keeps still when the device asks for reduced motion.
+The page has a mini top bar, as the apps' own pages have: the crest's mark on the left, and two small keys on the right
+for French and for night. The Preview tag and the pause key are gone. Each room opens with "← The crest" and the apps by
+name, the one you are in marked. Each seal on the page is a push-button ported from the apps' own: it sways, turns toward
+the pointer, lifts, sinks when pressed and rises again, and it keeps still when the device asks for reduced motion. In the
+site without Inkwell the crest has three fields, Carpe Diem and The Forge above and Ingenium alone across the foot, with
+no fourth quarter (the owner's words: "entirely remove the fourth quadrant and only have it turn into one in the bottom
+and two at the top"); its icons are drawn from that crest (`master_demo/shield_shot.js`, then `--shield`).
 
 ## What changed in Carpe Diem 1054 (18 October 2026)
 
