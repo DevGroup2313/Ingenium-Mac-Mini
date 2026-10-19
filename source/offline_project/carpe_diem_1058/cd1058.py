@@ -39,6 +39,7 @@ def load(name, path):
 
 selfsrc = load("selfsrc", os.path.join(HERE, "..", "carpe_diem_1052", "selfsrc.py"))
 nbd = load("no_build_dates", os.path.join(HERE, "..", "no_build_dates.py"))
+ff = load("forge_fit", os.path.join(HERE, "..", "forge_fit.py"))
 
 
 def block(page, bid):
@@ -94,8 +95,9 @@ if k < 0:
     raise SystemExit("the Forge has no body end")
 mf = mf[:k] + ride + mf[k:]
 # The Forge 641 is The Forge 639 with a new stamp and no date shown: so is the mini Forge (its build, from its record,
-# is written into its build line, so the record is changed first)
-want = nbd.forge(old.replace(FORGE_OLD, FORGE_NEW).replace('window.__cdMiniForge={from:"639",slim:true};', 'window.__cdMiniForge={from:"641",slim:true};'))
+# is written into its build line, so the record is changed first), and its Fabrica frame follows the room's head
+# (forge_fit.py)
+want = ff.fabrica(nbd.forge(old.replace(FORGE_OLD, FORGE_NEW).replace('window.__cdMiniForge={from:"639",slim:true};', 'window.__cdMiniForge={from:"641",slim:true};')))
 if mf != want:
     raise SystemExit("the new mini Forge differs from the 1057 one beyond its stamp")
 z = bytearray(gzip.compress(mf.encode("utf-8"), 9, mtime=0))

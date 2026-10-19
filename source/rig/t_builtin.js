@@ -22,7 +22,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.waitForFunction(() => window.__ingBuiltin && window.__ingBuiltin.states, null, { timeout: 90000 });
   const auto = await p.evaluate(() => ({ st: window.__ingBuiltin.states, ms: window.__ingBuiltin.ms, f: libState().apps.forge, i: libState().apps.inkwell }));
   ok(auto.st.forge === 'kept' && auto.st.inkwell === 'kept', 'soon after it opens, both are unpacked, checked and kept', JSON.stringify(auto.st) + ' in ' + auto.ms + ' ms');
-  ok(auto.f.version === '641' && auto.f.source === 'built in' && auto.f.sha256 === '653fc9ff1ef5e96aef6639dad7618768f12d616738f481d9284a680c0423836f' && auto.i.version === '7.49',
+  ok(auto.f.version === '641' && auto.f.source === 'built in' && auto.f.sha256 === 'c0f049d19d7f719e19c8080475ec11875f5bd319a663bc2bcf3b6d2eba83e544' && auto.i.version === '7.49',
     'the library names them as their own builds name them, with their fingerprints', JSON.stringify({ f: [auto.f.version, auto.f.build, auto.f.source, auto.f.size], i: [auto.i.version, auto.i.source, auto.i.size] }));
   const txt = await p.evaluate(() => Promise.all([libText('forge'), libText('inkwell')]).then(([f, i]) => ({ f: f && /pass:"641"/.test(f) && /id="section-forge"/.test(f), fl: f && f.length, i: i && /const BUILD='7\.49/.test(i), il: i && i.length })));
   ok(txt.f && txt.i, 'their pages read back whole from this device', JSON.stringify(txt));

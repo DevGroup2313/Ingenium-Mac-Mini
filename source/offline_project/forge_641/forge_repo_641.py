@@ -9,7 +9,9 @@ V = {a["key"]: a["version"] for a in meta["apps"]}
 NEW = "\n".join(textwrap.wrap(
     "New in 641. The Carpe Diem it carries is %s, whose mini Forge is now The Forge 641 (it was 639). The full page "
     "carries Ingenium %s, which carries The Forge 641 in turn, Carpe Diem %s and Inkwell %s. The About panel and the "
-    "footer show the build number and stamp, Build 641 · 9s73, with no date. Nothing else in the Forge changes." % (V["cd"], V["ingenium"], V["cd"], V["inkwell"]), 72)) + "\n\nNew in 640, the build before."
+    "footer show the build number and stamp, Build 641 · 9s73, with no date, and the Guide, a Magister lesson and the "
+    "glossary no longer read the build by a date or by an old number. Fabrica's frame now follows the room's head while "
+    "the help card above it unfolds, so it no longer runs below the window's edge. Nothing else in the Forge changes." % (V["cd"], V["ingenium"], V["cd"], V["inkwell"]), 72)) + "\n\nNew in 640, the build before."
 
 
 def edit(path, pairs):
