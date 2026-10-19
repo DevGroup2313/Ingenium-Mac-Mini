@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>The Offline Project</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Carpe Diem, The Forge, Ingenium and Inkwell: four apps that live on your own device, each with its live demonstration.">
@@ -219,16 +220,91 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 @keyframes roomIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media (max-width:900px){.room-grid{grid-template-columns:minmax(0,1fr)}.room-info{position:static}.well{height:76vh;min-height:480px;padding:6px}.stage .seg.widths{display:none}}
 @media (prefers-reduced-motion:reduce){.room-in,.veil .medal{animation:none}.frame{transition:none}}
+
+/* ---------- THE TOP BAR: the crest's mark, the four apps and the devices as raised keys, and language and light, all in one bar ---------- */
+.bar-in{flex-wrap:nowrap;gap:14px}
+.tray{display:flex;align-items:center;gap:4px;padding:4px;margin:0 auto;border-radius:999px;background:var(--ground-2);border:1px solid var(--hair);
+  box-shadow:inset 0 1px 3px rgba(30,20,50,.12);overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;overscroll-behavior-x:contain}
+.tray::-webkit-scrollbar{display:none}
+.tkey{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:5px 13px 5px 6px;border-radius:999px;text-decoration:none;color:var(--ink-2);
+  font:600 13px/1 var(--text);letter-spacing:.01em;background:var(--panel);border:1px solid var(--hair);box-shadow:var(--key);white-space:nowrap;
+  transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s,background-color .16s,color .16s;-webkit-tap-highlight-color:transparent;will-change:transform}
+.tkey.tk-word{padding:9px 14px}
+.tkey:hover{transform:translateY(-2px);box-shadow:var(--key-up);color:var(--ink)}
+.tkey:active{transform:translateY(1px);box-shadow:var(--key-down);transition-duration:.05s}
+.tkey[aria-current="page"]{background:linear-gradient(#d8b96c,#b48d43);border-color:#8a6526;color:#1f1608;text-shadow:0 1px 0 rgba(255,240,200,.45);animation:keySettle .34s cubic-bezier(.34,1.35,.64,1)}
+.tk-seal{width:24px;height:24px;display:block;flex:0 0 auto}
+.tk-seal svg{width:100%;height:100%;display:block}
+.tools{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--ground-2);border:1px solid var(--hair);box-shadow:inset 0 1px 3px rgba(30,20,50,.12);flex:0 0 auto}
+.tool{appearance:none;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid var(--hair);background:var(--panel);color:var(--ink);font:700 11.5px/1 var(--text);letter-spacing:.05em;
+  cursor:pointer;box-shadow:var(--key);display:grid;place-items:center;transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s;-webkit-tap-highlight-color:transparent}
+.tool#themeKey{font-size:15px}
+.tool:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
+.tool:active{transform:translateY(1px);box-shadow:var(--key-down);transition-duration:.05s}
+.tool[aria-pressed="true"]{animation:keySettle .34s cubic-bezier(.34,1.35,.64,1)}
+@keyframes keySettle{0%{scale:.95}55%{scale:1.04}100%{scale:1}}
+@media (max-width:1180px){.mark b{display:none}}
+@media (max-width:820px){.tkey:not([aria-current="page"]) .tk-t{display:none}.tkey:not([aria-current="page"]){padding:5px}.tkey.tk-word:not([aria-current="page"]) .tk-t{display:inline}.tkey.tk-word:not([aria-current="page"]){padding:9px 12px}}
+@media (max-width:520px){.tkey.tk-word:not([aria-current="page"]){display:none}.bar-in{gap:8px}}
+.room{padding-top:22px}.room-grid{margin-top:0}
+
+/* ---------- THE KEYS: every control is a raised key that lifts, sinks and settles ---------- */
+.seg{box-shadow:inset 0 1px 3px rgba(30,20,50,.12)}
+.seg button{transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s,background-color .16s,color .16s;-webkit-tap-highlight-color:transparent}
+.seg button:hover{transform:translateY(-1px);color:var(--ink);box-shadow:0 1px 0 rgba(30,20,50,.12),0 3px 6px rgba(30,20,50,.10)}
+.seg button:active{transform:translateY(1px);box-shadow:var(--key-down);transition-duration:.05s}
+.seg button[aria-pressed="true"]{animation:keySettle .34s cubic-bezier(.34,1.35,.64,1)}
+.key{will-change:transform}
+.room-card .go{padding:8px 15px;border-radius:999px;background:color-mix(in srgb,currentColor 12%,transparent);border:1px solid color-mix(in srgb,currentColor 30%,transparent);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.16),0 2px 0 rgba(0,0,0,.22),0 5px 10px rgba(0,0,0,.16);
+  transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s;will-change:transform}
+.room-card:hover .go{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -2px 0 rgba(0,0,0,.16),0 3px 0 rgba(0,0,0,.22),0 8px 14px rgba(0,0,0,.18)}
+.room-card:active .go{transform:translateY(1px);box-shadow:inset 0 2px 5px rgba(0,0,0,.26),0 1px 1px rgba(0,0,0,.2);transition-duration:.05s}
+
+/* ---------- THE SEALS, AS THEIR APPS PRESS THEM (Carpe Diem 1045 and 1047, Inkwell, Ingenium) ---------- */
+@property --sby{syntax:"<length>";inherits:true;initial-value:0px}
+.sb{--S:92px;--sby:0px;--rx:0deg;--ry:0deg;position:relative;display:block;width:var(--S);height:var(--S);perspective:calc(var(--S) * 4);cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:--sby .3s cubic-bezier(.25,1.5,.4,1)}
+.sb-cast{position:absolute;left:12%;right:12%;bottom:-7%;height:14%;border-radius:50%;background:radial-gradient(closest-side,rgba(28,16,4,.40),rgba(28,16,4,0));
+  filter:blur(calc(var(--S) * .035));opacity:.85;transition:opacity .3s ease,transform .3s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.sb.night .sb-cast{background:radial-gradient(closest-side,rgba(0,0,0,.75),rgba(0,0,0,0))}
+.sb-tilt{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--sby));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.sb-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:sbSway 7s ease-in-out infinite}
+.sb-base{position:absolute;inset:1.5%;border-radius:50%;display:block;transform:translateZ(-1px);
+  background:radial-gradient(circle at var(--gx,36%) var(--gy,26%),rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 44%),radial-gradient(circle at 50% 40%,#ffffff 0%,#f8f6f1 62%,#e4ded2 100%);
+  box-shadow:inset 0 calc(var(--S) * .014) calc(var(--S) * .022) rgba(255,255,255,.95),inset 0 calc(var(--S) * -.03) calc(var(--S) * .055) rgba(40,26,8,.17),
+    0 0 0 calc(var(--S) * .006) rgba(160,124,58,.32),0 calc(var(--S) * .012) calc(var(--S) * .016) rgba(40,26,8,.26),0 calc(var(--S) * .03) calc(var(--S) * .05) rgba(40,26,8,.12)}
+.sb.night .sb-base{background:radial-gradient(circle at var(--gx,36%) var(--gy,26%),rgba(255,255,255,.13) 0%,rgba(255,255,255,0) 44%),radial-gradient(circle at 50% 40%,#2a2238 0%,#1d1729 62%,#120e1a 100%);
+  box-shadow:inset 0 calc(var(--S) * .014) calc(var(--S) * .022) rgba(255,255,255,.1),inset 0 calc(var(--S) * -.03) calc(var(--S) * .055) rgba(0,0,0,.5),
+    0 0 0 calc(var(--S) * .006) rgba(217,184,102,.3),0 calc(var(--S) * .012) calc(var(--S) * .016) rgba(0,0,0,.55),0 calc(var(--S) * .03) calc(var(--S) * .05) rgba(0,0,0,.3)}
+.sb-face{position:absolute;inset:0;display:block;transform:translateZ(calc(var(--S) * .09))}
+.sb-face svg{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(0 calc(var(--S) * .018) calc(var(--S) * .02) rgba(30,18,4,.32))}
+.sb.night .sb-face svg{filter:drop-shadow(0 calc(var(--S) * .018) calc(var(--S) * .024) rgba(0,0,0,.7))}
+.sb-glare{position:absolute;inset:5%;border-radius:50%;display:block;transform:translateZ(calc(var(--S) * .12));pointer-events:none;opacity:0;mix-blend-mode:soft-light;
+  background:radial-gradient(circle at var(--gx,40%) var(--gy,30%),rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 52%);transition:opacity .3s ease}
+.sb.hover{--sby:calc(var(--S) * -.035)}
+.sb.hover .sb-cast{opacity:.6;transform:translateY(calc(var(--S) * .03)) scale(1.1)}
+.sb.hover .sb-glare{opacity:1}
+.sb.hover .sb-idle{animation-play-state:paused}
+.sb.down{--sby:calc(var(--S) * .025);transition-duration:.07s}
+.sb.down .sb-cast{opacity:1;transform:scale(.9);transition-duration:.07s}
+.sb.knock .sb-tilt{animation:sbKnock .5s cubic-bezier(.3,.7,.3,1)}
+.sb.rise .sb-idle{animation:sbRise .9s cubic-bezier(.2,.9,.25,1) both,sbSway 7s ease-in-out .9s infinite}
+.sb:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:50%}
+@keyframes sbSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
+@keyframes sbKnock{0%{translate:0 calc(var(--S) * .03)}45%{translate:0 calc(var(--S) * -.035)}75%{translate:0 calc(var(--S) * .008)}100%{translate:0 0}}
+@keyframes sbRise{0%{opacity:0;scale:.86}60%{opacity:1;scale:1.03}100%{opacity:1;scale:1}}
+.room-card .medal .sb,.room-head .medal .sb{margin:0 auto}
+@media (prefers-reduced-motion:reduce){.sb,.sb-idle,.sb-tilt,.sb-cast,.tkey,.tool,.seg button,.room-card .go{animation:none !important;transition:none !important}}
 </style>
 
 <div id="app">
 <header class="bar"><div class="bar-in">
   <a class="mark" href="#" id="markLink" aria-label="The Offline Project, the crest"><span id="markSeal"></span><b>THE OFFLINE PROJECT</b></a>
-  <span class="chip" id="previewChip" hidden data-i18n="preview">Preview</span>
-  <div class="ctl">
-    <div class="seg" role="group" aria-label="Language"><button type="button" id="lnEn" aria-pressed="true">EN</button><button type="button" id="lnFr" aria-pressed="false">FR</button></div>
-    <button type="button" class="key icon-key" id="themeKey" aria-pressed="false" data-i18n-label="theme" aria-label="Night">☾</button>
-    <button type="button" class="key icon-key" id="stillKey" aria-pressed="false" data-i18n-label="still" aria-label="Pause the motion">❚❚</button>
+  <nav class="tray" id="tray" aria-label="The Offline Project"></nav>
+  <div class="tools" role="group" aria-label="Language and light">
+    <button type="button" class="tool" id="langKey" lang="fr">FR</button>
+    <button type="button" class="tool" id="themeKey" aria-pressed="false" aria-label="Night">☾</button>
   </div>
 </div></header>
 
@@ -256,10 +332,6 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 </section>
 
 <section class="room" id="room" hidden aria-labelledby="roomTitle">
-  <div class="room-top">
-    <a class="key back" href="#" data-i18n="back">← The crest</a>
-    <nav class="switch" id="switch" aria-label="The four apps"></nav>
-  </div>
   <div class="room-grid">
     <aside class="room-info">
       <div class="room-head"><div class="medal" id="roomMedal"></div><div><h1 id="roomTitle">Carpe Diem</h1><div class="date" id="roomDate"></div></div></div>
@@ -303,7 +375,7 @@ var W = {
     hint: "Press a seal to open its app, live, in this page.", fourTitle: "The four apps", fourSub: "Each sits in its quarter of the crest. Each opens here as it is, with its own guided tour.",
     devTitle: "On every device", devSub: "The crest as it stands on each screen the apps are built for, by day and by night.",
     back: "← The crest", tour: "Start the guided tour", alone: "Open on its own ↗", computer: "Computer", tablet: "Tablet", phone: "Phone",
-    rights: "All rights reserved.", preview: "Preview", theme: ["Night", "Day"], still: ["Pause the motion", "Let it move"],
+    rights: "All rights reserved.", crestKey: "The crest", devKey: "Devices", preview: "Preview", theme: ["Night", "Day"], still: ["Pause the motion", "Let it move"],
     all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "Runs on", tryH: "Try this",
     opening: "Opening {app}", sizeLine: "{mb} MB, opened in this page. Nothing is sent anywhere.", ready: "{app} is open. Everything you do stays in this browser.",
     tourGo: "The tour has started in the app.", tourWait: "The app is still opening.", tourNone: "This app keeps its tour in its own menu.",
@@ -312,7 +384,7 @@ var W = {
     hint: "Touchez un sceau pour ouvrir son app, en direct, dans cette page.", fourTitle: "Les quatre apps", fourSub: "Chacune a son quartier du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée.",
     devTitle: "Sur chaque appareil", devSub: "Le blason tel qu’il se tient sur chaque écran pour lequel les apps sont construites, de jour et de nuit.",
     back: "← Le blason", tour: "Lancer la visite guidée", alone: "Ouvrir seule ↗", computer: "Ordinateur", tablet: "Tablette", phone: "Téléphone",
-    rights: "Tous droits réservés.", preview: "Aperçu", theme: ["Nuit", "Jour"], still: ["Arrêter le mouvement", "Laisser bouger"],
+    rights: "Tous droits réservés.", crestKey: "Le blason", devKey: "Appareils", preview: "Aperçu", theme: ["Nuit", "Jour"], still: ["Arrêter le mouvement", "Laisser bouger"],
     all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Fonctionne sur", tryH: "À essayer",
     opening: "Ouverture de {app}", sizeLine: "{mb} Mo, ouverte dans cette page. Rien n’est envoyé nulle part.", ready: "{app} est ouverte. Tout ce que vous faites reste dans ce navigateur.",
     tourGo: "La visite a commencé dans l’app.", tourWait: "L’app s’ouvre encore.", tourNone: "Cette app garde sa visite dans son propre menu.",
@@ -496,6 +568,33 @@ function seals(id, P, nt) {
   return svg(out);
 }
 /* a seal on its own (the cards, the rooms, the switch): the same seal and motion, framed by itself */
+/* the seal as its app presses it (Carpe Diem 1045 and 1047, Inkwell, Ingenium): it rises into place, sways so its depth
+   shows, turns toward the pointer and lifts, sinks when pressed, and knocks before it opens its app */
+function sealButton(k, nt, size) {
+  return '<span class="sb rise ' + (nt ? 'night' : 'day') + '" style="--S:' + size + 'px" data-k="' + k + '"><i class="sb-cast"></i><span class="sb-tilt"><span class="sb-idle">' +
+    '<i class="sb-base"></i><span class="sb-face">' + lone(k, nt, 3) + '</span><i class="sb-glare"></i></span></span></span>';
+}
+function knock(sb) {
+  if (!sb) return; var q = sb.querySelector(".q");
+  sb.classList.remove("knock"); if (q) q.classList.remove("press"); void sb.offsetWidth; sb.classList.add("knock"); if (q) q.classList.add("press");
+  setTimeout(function () { sb.classList.remove("knock"); if (q) q.classList.remove("press"); }, 650);
+}
+(function () {
+  var hot = null;
+  function sbOf(e) { var h = e.target && e.target.closest ? e.target.closest("a,button,.sb") : null; if (!h) return null; return h.classList.contains("sb") ? h : h.querySelector(".sb"); }
+  function cool(sb) { if (!sb) return; sb.classList.remove("hover", "down"); sb.style.setProperty("--rx", "0deg"); sb.style.setProperty("--ry", "0deg"); }
+  document.addEventListener("pointerover", function (e) { var sb = sbOf(e); if (hot && hot !== sb) cool(hot); hot = sb; if (sb && e.pointerType !== "touch") sb.classList.add("hover"); }, { passive: true });
+  document.addEventListener("pointermove", function (e) {
+    var sb = hot; if (!sb || e.pointerType !== "mouse" || reduced) return; var r = sb.getBoundingClientRect();
+    var x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+    sb.style.setProperty("--ry", ((x - .5) * 26).toFixed(1) + "deg"); sb.style.setProperty("--rx", (-(y - .5) * 22).toFixed(1) + "deg");
+    sb.style.setProperty("--gx", (x * 100).toFixed(1) + "%"); sb.style.setProperty("--gy", (y * 100).toFixed(1) + "%"); }, { passive: true });
+  document.addEventListener("pointerdown", function (e) { var sb = sbOf(e); if (sb) sb.classList.add("down"); }, { passive: true });
+  function up() { document.querySelectorAll(".sb.down").forEach(function (x) { x.classList.remove("down"); }); }
+  document.addEventListener("pointerup", up, { passive: true }); document.addEventListener("pointercancel", up, { passive: true });
+  document.addEventListener("click", function (e) { var sb = e.target && e.target.closest ? e.target.closest(".sb") : null; if (sb && !sb.closest("a")) knock(sb); });
+  document.addEventListener("animationend", function (e) { if (e.animationName === "sbRise" && e.target.closest) { var sb = e.target.closest(".sb"); if (sb) sb.classList.remove("rise"); } });
+})();
 function lone(k, nt, pad) { var m = MEDK[k], id = "L" + (n++), p = pad === undefined ? 7 : pad, P = PAL[nt ? "night" : "day"];
   return svg(medal(m, id, P, nt), (m.cx - m.r - p) + " " + (m.cy - m.r - p) + " " + (2 * (m.r + p)) + " " + (2 * (m.r + p))); }
 function master(nt, Wd, opts) {
@@ -531,7 +630,7 @@ function capShow(k) { var a = k && BYK[k]; $("capName").textContent = a ? a.name
 function paintFour() {
   var g = $("fourGrid"), nt = night(); g.innerHTML = "";
   APPS.forEach(function (a) { var c = document.createElement("a"); c.className = "room-card rc-" + a.k; c.href = "#" + a.slug;
-    c.innerHTML = '<div class="medal">' + lone(a.k, nt) + '</div><div><h3>' + a.name[lang] + '</h3>' + (a.date ? '<div class="date">' + a.date + '</div>' : '') +
+    c.innerHTML = '<div class="medal">' + sealButton(a.k, nt, 92) + '</div><div><h3>' + a.name[lang] + '</h3>' + (a.date ? '<div class="date">' + a.date + '</div>' : '') +
       '<p>' + a.line[lang] + '</p><div class="runs">' + t("runs") + colon() + a.runs[lang] + '</div><span class="go">' + t("open") + '</span></div>';
     g.appendChild(c); });
 }
@@ -547,9 +646,9 @@ crestEl.addEventListener("click", function (e) {
   var d = e.target.closest && e.target.closest(".ms-door[data-k]"); if (!d) return; e.preventDefault();
   var k = d.getAttribute("data-k"), m = MEDK[k], ms = crestEl.querySelector(".ms"), q = ms && ms.querySelector(".q-" + k);
   if (q) { q.classList.remove("press"); void q.getBoundingClientRect(); q.classList.add("press"); }
-  if (reduced || !ms) { location.hash = "#" + BYK[k].slug; return; }
+  if (reduced || !ms) { go(BYK[k].slug); return; }
   setTimeout(function () { ms.style.setProperty("--ox", (m.cx / 3) + "%"); ms.style.setProperty("--oy", (m.cy / 4) + "%"); ms.classList.add("leave"); }, 260);
-  setTimeout(function () { location.hash = "#" + BYK[k].slug; }, 700);
+  setTimeout(function () { go(BYK[k].slug); }, 700);
 });
 /* the turn toward the pointer, the lift and the press, as in the preview */
 document.addEventListener("pointermove", function (e) { var ms = e.target && e.target.closest ? e.target.closest("#crest .ms") : null;
@@ -561,44 +660,99 @@ document.addEventListener("pointerup", function () { document.querySelectorAll("
 
 /* ============================== a room ============================== */
 var cur = null, curVar = 0, loadedSrc = "", frameEl = $("demoFrame"), tourReady = false, readyTimer = 0;
-function paintSwitch() { var s = $("switch"), nt = night(); s.innerHTML = "";
-  APPS.forEach(function (a) { var l = document.createElement("a"); l.href = "#" + a.slug; if (cur && cur.slug === a.slug) l.setAttribute("aria-current", "page");
-    l.innerHTML = lone(a.k, nt, 4) + "<span>" + a.name[lang] + "</span>"; s.appendChild(l); }); }
+/* the bar: the crest, the four apps and the devices, each a raised key; the page you are on is the filled one */
+function paintSwitch() { var s = $("tray"), nt = night(), here = cur ? cur.slug : ((location.hash || "").replace(/^#/, "") === "devices" ? "devices" : ""); s.innerHTML = "";
+  function key(href, html, on, label) { var l = document.createElement("a"); l.className = "tkey"; l.href = href; if (on) l.setAttribute("aria-current", "page"); if (label) l.setAttribute("aria-label", label); l.innerHTML = html; s.appendChild(l); return l; }
+  key("#", '<span class="tk-t">' + t("crestKey") + '</span>', here === "", t("crestKey")).classList.add("tk-word");
+  APPS.forEach(function (a) { key("#" + a.slug, '<span class="tk-seal" aria-hidden="true">' + lone(a.k, nt, 4) + '</span><span class="tk-t">' + a.name[lang] + '</span>', here === a.slug, a.name[lang]); });
+  if (!BUILD.without || BUILD.without.indexOf("inkwell") < 0) key("#devices", '<span class="tk-t">' + t("devKey") + '</span>', here === "devices", t("devKey")).classList.add("tk-word");
+  var on = s.querySelector('[aria-current="page"]'); if (on && s.scrollWidth > s.clientWidth) { try { on.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} } }
 function paintRoom() {
   if (!cur) return; var a = cur, nt = night();
-  $("roomMedal").innerHTML = lone(a.k, nt); $("veilMedal").innerHTML = lone(a.k, nt);
+  $("roomMedal").innerHTML = sealButton(a.k, nt, 84); $("veilMedal").innerHTML = lone(a.k, nt);
   $("roomTitle").textContent = a.name[lang]; $("roomDate").textContent = a.date; $("roomAbout").textContent = a.about[lang];
   $("tryH").textContent = t("tryH"); $("roomTry").innerHTML = a.tries[lang].map(function (x) { return "<li>" + x + "</li>"; }).join("");
   $("roomRuns").textContent = t("runs") + colon() + a.runs[lang];
   var vb = $("variantBox"), vs = $("variants"); vs.innerHTML = "";
   if (a.variants.length > 1) { vb.hidden = false; a.variants.forEach(function (v, i) { var b = document.createElement("button"); b.type = "button"; b.textContent = v.label[lang]; b.setAttribute("aria-pressed", i === curVar ? "true" : "false");
       b.addEventListener("click", function () { if (curVar === i) return; curVar = i; paintRoom(); loadDemo(); }); vs.appendChild(b); }); } else vb.hidden = true;
-  var v = a.variants[curVar] || {}; $("aloneKey").href = v.file || "#";
+  var v = a.variants[curVar] || {}; $("aloneKey").href = BUILD.app ? "#" + a.slug : (v.file || "#");
   $("veilTitle").textContent = fill(t("opening"), { app: a.name[lang] }); $("veilLine").textContent = v.mb ? fill(t("sizeLine"), { mb: v.mb }) : "";
   paintSwitch(); document.title = a.name[lang] + " · The Offline Project";
 }
+var VENDOR_TAG = BUILD.vendorTag || "";
 var FORCE_DOC = /[?&]srcdoc=1/.test(location.search), FORCE_SRC = /[?&]direct=1/.test(location.search), loadSeq = 0, viaDoc = false, docSeq = -1;
 function loadDemo() {
   var v = cur && cur.variants[curVar]; if (!v) return;
   if (loadedSrc === v.file) return;
   tourReady = false; $("tourKey").disabled = true; $("roomNote").textContent = ""; $("veil").removeAttribute("data-gone"); $("stageStatus").textContent = fill(t("opening"), { app: cur.name[lang] }) + "…";
   loadedSrc = v.file; clearTimeout(readyTimer); loadSeq++;
-  if ((BUILD.preview || FORCE_DOC) && !FORCE_SRC) loadByDoc(v, loadSeq); else loadBySrc(v);
+  if ((BUILD.preview || BUILD.app || FORCE_DOC) && !FORCE_SRC) loadByDoc(v, loadSeq); else loadBySrc(v);
 }
 function loadBySrc(v) { viaDoc = false; frameEl.removeAttribute("srcdoc"); frameEl.src = v.file; }
-/* the app's page (or its parts) is fetched beside this page and written into the frame, with its address for its own files */
+/* the app's page is put together beside this page and written into the frame, with its address for its own files. It is
+   found inside this page (the one-file app), or in parts: each part a small script that hands its share over (a page may
+   always load its own scripts), and, where a script cannot come, read as a file. Each road is tried once; if none
+   answers, the reason is shown, and nothing loops. */
+function gunzip64(text) {
+  var b64 = text.replace(/\s+/g, ""), bin = atob(b64), u = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  if (!window.DecompressionStream) return Promise.reject(new Error("this browser cannot unpack the app (it needs a browser from 2023 or later)"));
+  var ds = new DecompressionStream("gzip"), w = ds.writable.getWriter(); w.write(u); w.close();
+  return new Response(ds.readable).text();
+}
+function fromInside(v) { var el = document.getElementById(v.inside); return el ? gunzip64(el.textContent) : Promise.reject(new Error("not inside this page")); }
+/* Inkwell's word lists, citation styles and PDF reader: inside this page (the one-file app), or beside it, read as files or
+   as their script copies; Inkwell's own frame asks for them here (BUILD.vendorTag) */
+var VENDOR = null, vendorWait = {};
+function unpackVendor() { if (VENDOR || !BUILD.app) return Promise.resolve(); var el = document.getElementById("op-vendor"); if (!el) return Promise.resolve();
+  return gunzip64(el.textContent).then(function (s) { VENDOR = JSON.parse(s); }); }
+window.__opVendorNow = function (n) { return VENDOR && Object.prototype.hasOwnProperty.call(VENDOR, n) ? VENDOR[n] : null; };
+window.__opVendor = function (n, s) { var f = vendorWait[n]; if (f) { delete vendorWait[n]; f(s); } };
+window.__opVendorGet = function (n) {
+  if (BUILD.app) return unpackVendor().then(function () { var s = window.__opVendorNow(n); if (s == null) throw new Error("no " + n); return s; });
+  var url = "apps/vendor/" + n;
+  return fetch(url).then(function (r) { if (!r.ok) throw new Error(n + ": " + r.status); return r.text(); }).catch(function () {
+    if (/\.m?js$/.test(n)) throw new Error("no " + n);
+    return new Promise(function (res, rej) { var sc = document.createElement("script"); vendorWait[n] = res; sc.onerror = function () { delete vendorWait[n]; rej(new Error("no " + n)); }; sc.src = url + ".js"; document.head.appendChild(sc); });
+  });
+};
+function partByScript(v, i) {
+  return new Promise(function (res, rej) {
+    var done = false, sc = document.createElement("script"), t0 = setTimeout(function () { end(new Error("part " + (i + 1) + " took too long")); }, 120000);
+    function end(err, s) { if (done) return; done = true; clearTimeout(t0); try { sc.remove(); } catch (e) {} if (err) rej(err); else res(s); }
+    (window.__opParts = window.__opParts || {})[v.slug + ":" + i] = function (s) { end(null, s); };
+    sc.onerror = function () { end(new Error("part " + (i + 1) + " could not be loaded")); };
+    sc.onload = function () { setTimeout(function () { end(new Error("part " + (i + 1) + " did not hand its text over")); }, 50); };
+    sc.src = v.parts[i]; document.head.appendChild(sc);
+  });
+}
+function partByFile(v, i) {
+  return fetch(v.parts[i]).then(function (r) { if (!r.ok) throw new Error("part " + (i + 1) + ": " + r.status); return r.text(); })
+    .then(function (s) { var a = s.indexOf("\n"), b = s.lastIndexOf("\n)"); return JSON.parse(s.slice(a + 1, b)); });
+}
+window.__opPart = function (slug, i, s) { var f = window.__opParts && window.__opParts[slug + ":" + i]; if (f) f(s); };
+function inParts(v, seq) {
+  var txt = [], chain = Promise.resolve();
+  v.parts.forEach(function (u, i) { chain = chain.then(function () {
+    return partByScript(v, i).catch(function () { return partByFile(v, i); }).then(function (s) { txt[i] = s;
+      if (seq === loadSeq) $("veilLine").textContent = fill(t("parts"), { pct: Math.round(100 * (i + 1) / v.parts.length) }); }); }); });
+  return chain.then(function () { return txt.join(""); });
+}
 function loadByDoc(v, seq) {
-  viaDoc = true; var urls = v.parts || [v.file], txt = [];
-  var chain = Promise.resolve();
-  urls.forEach(function (u, i) { chain = chain.then(function () { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u + ": " + r.status); return r.text(); })
-    .then(function (s) { txt[i] = s; if (seq === loadSeq) $("veilLine").textContent = fill(t("parts"), { pct: Math.round(100 * (i + 1) / urls.length) }); }); }); });
-  chain.then(function () {
+  viaDoc = true;
+  var got = v.inside ? (v.vendor ? unpackVendor().then(function () { return fromInside(v); }) : fromInside(v)) : v.parts ? inParts(v, seq) : fetch(v.file).then(function (r) { if (!r.ok) throw new Error(v.file + ": " + r.status); return r.text(); });
+  got.then(function (h) {
     if (seq !== loadSeq) return;
-    var h = txt.join(""); txt = null; var base = "apps/"; try { base = new URL("apps/", document.baseURI).href; } catch (e) {}
-    var tag = '<base href="' + base + '">', m = /^\s*<!doctype[^>]*>/i.exec(h);
+    var base = "apps/"; try { base = new URL("apps/", document.baseURI).href; } catch (e) {}
+    var tag = (v.inside ? "" : '<base href="' + base + '">') + (v.vendor ? VENDOR_TAG : ""), m = /^\s*<!doctype[^>]*>/i.exec(h);
     h = m ? h.slice(0, m[0].length) + tag + h.slice(m[0].length) : tag + h;
     docSeq = seq; frameEl.removeAttribute("src"); frameEl.srcdoc = h;
-  }).catch(function () { if (seq === loadSeq) loadBySrc(v); });
+  }).catch(function (e) {
+    if (seq !== loadSeq) return;
+    var why = (e && e.message) || String(e);
+    $("stageStatus").textContent = t("failed"); $("veilLine").textContent = t("failed") + " (" + why + ")";
+  });
 }
 frameEl.addEventListener("load", function () {
   if (!loadedSrc) return;
@@ -613,7 +767,7 @@ frameEl.addEventListener("load", function () {
       ok = !!(w.__opShimP && w.document.body && w.document.body.children.length > 2 && !loader);
       bad = !w.__opShimP && !loader && Date.now() - started > 2500 || !!(err && !err.hidden);
     } catch (e) { bad = true; }
-    if (bad && !viaDoc) { var v = cur.variants[curVar]; loadSeq++; loadByDoc(v, loadSeq); return; }
+    if (bad && !viaDoc && !BUILD.preview && !BUILD.app) { var v = cur.variants[curVar]; loadSeq++; loadByDoc(v, loadSeq); return; }
     if (bad && viaDoc) { $("stageStatus").textContent = t("failed"); $("veilLine").textContent = t("failed"); return; }
     if (!ok && Date.now() - started < 90000) { readyTimer = setTimeout(wait, 400); return; }
     $("veil").setAttribute("data-gone", "1");
@@ -621,6 +775,14 @@ frameEl.addEventListener("load", function () {
     readyTimer = setTimeout(function () { tourReady = true; $("tourKey").disabled = false; }, 1800);
   })();
 });
+$("aloneKey").addEventListener("click", function (e) {
+  if (!BUILD.app) return; e.preventDefault(); e.stopPropagation(); var v = cur && cur.variants[curVar]; if (!v) return;
+  var w = window.open("", "_blank");
+  (v.vendor ? unpackVendor().then(function () { return fromInside(v); }) : fromInside(v)).then(function (h) {
+    var u = URL.createObjectURL(new Blob([h], { type: "text/html" }));
+    if (w) w.location.href = u; else location.href = u;
+  }).catch(function (er) { if (w) w.close(); $("roomNote").textContent = t("failed") + " (" + ((er && er.message) || er) + ")"; });
+}, true);
 $("tourKey").addEventListener("click", function () {
   var note = $("roomNote"); if (!cur) return; if (!tourReady) { note.textContent = t("tourWait"); return; }
   try {
@@ -647,36 +809,47 @@ function route() {
     $("room").hidden = true; $("hall").hidden = false; document.title = "The Offline Project";
     if (wasRoom) { paintCrest(true); window.scrollTo(0, 0); }
     if (h === "four" || h === "devices") { var t0 = $(h); if (t0) setTimeout(function () { t0.scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); }, 30); }
+    paintSwitch();
   }
 }
 window.addEventListener("hashchange", route);
-$("markLink").addEventListener("click", function (e) { e.preventDefault(); if (location.hash && location.hash !== "#") location.hash = ""; else { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); } });
-document.querySelector(".room-top .back").addEventListener("click", function (e) { e.preventDefault(); location.hash = ""; });
+window.addEventListener("popstate", route);
+function go(h) {
+  h = String(h || "").replace(/^#/, "");
+  var want = h ? "#" + h : location.pathname + location.search;
+  try { if ((location.hash || "") !== (h ? "#" + h : "")) history.pushState(null, "", want); } catch (e) { try { location.hash = h; return; } catch (e2) {} }
+  route();
+}
+window.__opGo = go;
+document.addEventListener("click", function (e) {
+  if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null; if (!a) return;
+  var h = a.getAttribute("href").replace(/^#/, ""); e.preventDefault();
+  if (a.id === "markLink" && !h && $("room").hidden) { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); return; }
+  var sb = a.querySelector(".sb");
+  if (sb && !reduced) { knock(sb); setTimeout(function () { go(h); }, 220); } else go(h);
+});
 
 /* ============================== words, day and night, stillness ============================== */
 function paintWords() {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach(function (e) { var v = t(e.getAttribute("data-i18n")); if (typeof v === "string") e.textContent = v; });
-  $("lnEn").setAttribute("aria-pressed", lang === "en" ? "true" : "false"); $("lnFr").setAttribute("aria-pressed", lang === "fr" ? "true" : "false");
+  $("langKey").textContent = lang === "fr" ? "EN" : "FR"; $("langKey").setAttribute("lang", lang === "fr" ? "en" : "fr"); $("langKey").setAttribute("aria-label", lang === "fr" ? "English" : "Français");
   var nt = night(); $("themeKey").textContent = nt ? "☀" : "☾"; $("themeKey").setAttribute("aria-label", t("theme")[nt ? 1 : 0]); $("themeKey").setAttribute("aria-pressed", nt ? "true" : "false");
-  var st = document.body.classList.contains("still"); $("stillKey").setAttribute("aria-label", t("still")[st ? 1 : 0]); $("stillKey").textContent = st ? "▶" : "❚❚";
   $("builds").textContent = BUILD.line || "";
-  capShow(null); paintFour(); paintShelf();
+  capShow(null); paintFour(); paintShelf(); paintSwitch();
   crestEl.querySelectorAll(".ms-door[data-k]").forEach(function (d) { d.setAttribute("aria-label", fill(t("door"), { app: BYK[d.getAttribute("data-k")].name[lang] })); });
   if (cur) paintRoom();
 }
 function setLang(l) { lang = l; store.set("lang", l); paintWords(); }
-$("lnEn").addEventListener("click", function () { setLang("en"); });
-$("lnFr").addEventListener("click", function () { setLang("fr"); });
+$("langKey").addEventListener("click", function () { setLang(lang === "fr" ? "en" : "fr"); });
 function repaintTheme() { paintCrest(false); paintMark(); paintWords(); }
 $("themeKey").addEventListener("click", function () { var nt = !night(); document.documentElement.setAttribute("data-theme", nt ? "dark" : "light"); store.set("theme", nt ? "dark" : "light"); repaintTheme(); });
-$("stillKey").addEventListener("click", function () { document.body.classList.toggle("still"); store.set("still", document.body.classList.contains("still") ? "1" : ""); paintWords(); });
 try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { if (!document.documentElement.getAttribute("data-theme")) repaintTheme(); }); } catch (e) {}
 var saved = store.get("theme", ""); if (saved) document.documentElement.setAttribute("data-theme", saved);
-if (store.get("still", "")) document.body.classList.add("still");
-if (BUILD.preview) $("previewChip").hidden = false;
 var rt = 0; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (Math.abs(crestSize() - lastW) > 12 && $("room").hidden) paintCrest(false); }, 200); });
 
 paintCrest(true); paintMark(); paintWords(); route();
+if (BUILD.site && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
 })();
 </script>

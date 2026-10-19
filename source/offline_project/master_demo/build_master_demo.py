@@ -25,12 +25,16 @@ Committee demo alone), and so is --inkwell: without it the site has three rooms,
 Inkwell's quarter of the crest and opens the list of the apps, the words say three, and the devices, whose pictures show
 all four seals, stay out.
 
---mode preview  writes index.html without its document skeleton (the Artifact host adds one) and shows a Preview chip
---mode site     writes a whole document, for a web host such as GitHub Pages, and never splits a page (--max-file 0)
+--mode preview  writes index.html without its document skeleton (the Artifact host adds one); each app travels as script
+                parts (apps/<slug>.partN.js), which any viewer that runs the page can load, read as files where it can
+--mode site     writes a whole document, for a web host such as GitHub Pages, and never splits a page (--max-file 0); with
+                its manifest and offline keeper (sw.js) it installs as a web app and opens offline once visited
+--mode app      writes OUT_DIR/The_Offline_Project.html: one self-contained file, every app (and Inkwell's word lists, styles
+                and PDF reader) compressed inside it, that opens on any device with no connection and nothing beside it
 
 usage: build_master_demo.py --seal SEAL_PREVIEW.html --images DIR [--cd-sample F] --cd-committee F --forge-demo F
                             --ingenium F [--inkwell F [--inkwell-vendor DIR]] --out DIR [--mode preview|site] [--max-file BYTES]"""
-import argparse, base64, io, json, os, re, shutil
+import argparse, base64, gzip, io, json, os, re, shutil
 
 from PIL import Image
 
@@ -41,12 +45,15 @@ for a in ("seal", "images", "cd-committee", "forge-demo", "ingenium", "out"):
 ap.add_argument("--cd-sample", help="Carpe Diem's Public sample, offered beside the Committee demo (left out: the Committee demo alone)")
 ap.add_argument("--inkwell", help="Inkwell's page (left out: the site of three apps)")
 ap.add_argument("--inkwell-vendor", help="Inkwell's vendor folder (its word lists, citation styles and PDF reader), copied to apps/vendor")
-ap.add_argument("--mode", choices=("preview", "site"), default="preview")
+ap.add_argument("--mode", choices=("preview", "site", "app"), default="preview")
 ap.add_argument("--max-file", type=int, default=None)
 A = ap.parse_args()
 if A.inkwell_vendor and not A.inkwell:
     raise SystemExit("--inkwell-vendor is for a site that carries Inkwell")
 MAX = A.max_file if A.max_file is not None else (15000000 if A.mode == "preview" else 0)
+if A.mode != "preview":
+    MAX = 0
+INSIDE = []  # the one-file app: each app's page, compressed, in a block of the page
 OUT = A.out
 for d in ("assets/seals", "assets/devices", "apps"):
     os.makedirs(os.path.join(OUT, d), exist_ok=True)
@@ -95,6 +102,7 @@ shield_square(32).save(os.path.join(OUT, "assets/icons/shield-32.png"), optimize
 shield_square(192, 0.04).save(os.path.join(OUT, "assets/icons/shield-192.png"), optimize=True)
 # a phone's home screen fills a transparent corner with black, so the shield stands on the hall's own ground there
 shield_square(180, 0.1, (245, 243, 247, 255)).convert("RGB").save(os.path.join(OUT, "assets/icons/apple-touch-icon.png"), optimize=True)
+shield_square(512, 0.08, (245, 243, 247, 255)).convert("RGB").save(os.path.join(OUT, "assets/icons/shield-512.png"), optimize=True)
 ICON_LINKS = ('\n<link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48">'
               '\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/shield-32.png">'
               '\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/shield-192.png">'
@@ -149,12 +157,17 @@ LOADER = """<!doctype html>
 .b i{display:block;height:100%;width:0;background:#b08a3e;transition:width .25s}.e{max-width:36ch;margin:10px auto 0;color:#a33}</style></head>
 <body><div class="w"><div>__TITLE__</div><div class="b"><i id="b"></i></div><div class="e" id="e" hidden></div></div>
 <script>
-/* This demonstration is larger than one file of the host allows, so it travels in parts: they are fetched, joined and
-   written into this page, and the app then runs exactly as it is. */
-(function(){window.__opLoader=true;var parts=__PARTS__,sizes=__SIZES__,total=__TOTAL__,got=0,txt=[];
-function step(i){if(i>=parts.length){window.__opLoader=false;var h=txt.join("");txt=null;document.open();document.write(h);document.close();return;}
-fetch(parts[i]).then(function(r){if(!r.ok)throw new Error("part "+(i+1)+": "+r.status);return r.text();}).then(function(s){txt.push(s);got+=sizes[i];document.getElementById("b").style.width=Math.round(100*got/total)+"%";step(i+1);})
-.catch(function(e){var x=document.getElementById("e");x.hidden=false;x.textContent="This demonstration could not be opened here ("+(e&&e.message||e)+").";});}
+/* This demonstration is larger than one file of the host allows, so it travels in parts. Each part is a small script
+   that hands its share of the page to this one (a page may always load its own scripts); where a script cannot come,
+   the part is read as a file instead. The parts are joined and written into this page, and the app runs as it is. */
+(function(){window.__opLoader=true;var parts=__PARTS__,sizes=__SIZES__,total=__TOTAL__,got=0,txt=[],slug=__SLUG__;
+function done(){window.__opLoader=false;var h=txt.join("");txt=null;document.open();document.write(h);document.close();}
+function fail(e){var x=document.getElementById("e");x.hidden=false;x.textContent="This demonstration could not be opened here ("+(e&&e.message||e)+").";}
+function have(i,s){txt[i]=s;got+=sizes[i];document.getElementById("b").style.width=Math.round(100*got/total)+"%";step(i+1);}
+function byFile(i){fetch(parts[i]).then(function(r){if(!r.ok)throw new Error("part "+(i+1)+": "+r.status);return r.text();}).then(function(s){var a=s.indexOf("\n"),b=s.lastIndexOf("\n)");have(i,JSON.parse(s.slice(a+1,b)));}).catch(fail);}
+window.__opPart=function(sl,i,s){if(sl===slug&&typeof s==="string"&&txt[i]===undefined)have(i,s);};
+function step(i){if(i>=parts.length){done();return;}var sc=document.createElement("script"),t=setTimeout(function(){sc.onerror();},120000);sc.src=parts[i];
+sc.onload=function(){clearTimeout(t);if(txt[i]===undefined)byFile(i);};sc.onerror=function(){clearTimeout(t);sc.onerror=sc.onload=null;if(txt[i]===undefined)byFile(i);};document.head.appendChild(sc);}
 step(0);})();
 </script></body></html>
 """
@@ -199,20 +212,30 @@ for slug, key, path, title, label in APPS:
     for old in os.listdir(os.path.join(OUT, "apps")):
         if old.startswith(slug + ".part"):
             os.remove(os.path.join(OUT, "apps", old))
-    if MAX and len(b) > MAX:
-        n = -(-len(b) // MAX)
+    if A.mode == "app":
+        z = gzip.compress(b, 9, mtime=0)
+        INSIDE.append('<script type="op/gz64" id="op-app-%s">%s</script>' % (slug, base64.b64encode(z).decode("ascii")))
+        how = "inside the page (%d bytes compressed)" % len(z)
+        parts = None
+    elif MAX:
+        # each part is a script that hands its share of the page to the page that asks (__opPart), so a viewer that
+        # refuses to read files beside the page still loads them; written as a string, a part grows, so they are smaller
+        n = max(1, -(-len(b) // min(MAX, 7000000)))
         step = -(-len(s) // n)
         names, sizes = [], []
         for i in range(n):
-            chunk = s[i * step:(i + 1) * step].encode("utf-8")
-            nm = "%s.part%d.txt" % (slug, i + 1)
-            open(os.path.join(OUT, "apps", nm), "wb").write(chunk)
+            chunk = s[i * step:(i + 1) * step]
+            nm = "%s.part%d.js" % (slug, i + 1)
+            # plain ASCII, so it reads the same whatever character set the host sends it with
+            js = "__opPart(%s,%d,\n%s\n);\n" % (json.dumps(slug), i, json.dumps(chunk, ensure_ascii=True))
+            open(os.path.join(OUT, "apps", nm), "w", encoding="utf-8").write(js)
             names.append(nm)
-            sizes.append(len(chunk))
-            if len(chunk) > 16000000:
+            sizes.append(len(chunk.encode("utf-8")))
+            if len(js.encode("utf-8")) > 15500000:
                 raise SystemExit("%s: a part is still too large" % slug)
         open(page, "w", encoding="utf-8").write(LOADER.replace("__TITLE__", title).replace("__PARTS__", json.dumps(names))
-                                                 .replace("__SIZES__", json.dumps(sizes)).replace("__TOTAL__", str(sum(sizes))))
+                                                 .replace("__SIZES__", json.dumps(sizes)).replace("__TOTAL__", str(sum(sizes)))
+                                                 .replace("__SLUG__", json.dumps(slug)))
         how = "%d parts" % n
         parts = ["apps/" + x for x in names]
     else:
@@ -220,8 +243,13 @@ for slug, key, path, title, label in APPS:
         how = "one page"
         parts = None
     entry = {"file": "apps/%s.html" % slug, "mb": round(len(b) / 1e6, 1)}
+    if A.mode == "app":
+        entry["inside"] = "op-app-" + slug
+    if slug == "inkwell" and A.inkwell_vendor and A.mode != "site":
+        entry["vendor"] = True
     if parts:
         entry["parts"] = parts
+        entry["slug"] = slug
     if label:
         entry["label"] = label
     group = "carpe-diem" if slug.startswith("carpe-diem") else slug
@@ -243,13 +271,46 @@ if A.inkwell_vendor:
     for f in keep:
         shutil.copyfile(os.path.join(A.inkwell_vendor, f), os.path.join(VD, f))
     shutil.copytree(os.path.join(A.inkwell_vendor, "csl"), os.path.join(VD, "csl"))
+    names = [f for f in keep] + ["csl/" + f for f in sorted(os.listdir(os.path.join(VD, "csl")))]
+    if A.mode == "preview":
+        # what Inkwell reads as a file also comes as a script, for a viewer that will not let a page read files beside it
+        for nm in names:
+            if nm.endswith(".js"):
+                continue
+            txt = open(os.path.join(VD, nm), encoding="utf-8").read()
+            open(os.path.join(VD, nm + ".js"), "w", encoding="utf-8").write("__opVendor(%s,\n%s\n);\n" % (json.dumps(nm), json.dumps(txt, ensure_ascii=True)))
+    if A.mode == "app":
+        allv = {nm: open(os.path.join(VD, nm), encoding="utf-8").read() for nm in names}
+        z = gzip.compress(json.dumps(allv, ensure_ascii=False).encode("utf-8"), 9, mtime=0)
+        INSIDE.append('<script type="op/gz64" id="op-vendor">%s</script>' % base64.b64encode(z).decode("ascii"))
+        shutil.rmtree(VD)
     print("  inkwell vendor          %10d bytes" % sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(VD) for f in fs))
+
+
+# 3c. INKWELL'S FILES, HANDED TO IT BY THE PAGE AROUND IT: written into a frame, Inkwell still asks for vendor/<file> beside
+#     itself. In the one-file app there is nothing beside it, and a viewer may refuse a page that reads files: so its asks
+#     (a file read, a script, a worker) are answered by the page around it, from inside itself or from the script copies.
+VENDOR_TAG = """<script id="op-vendor-shim">(function(){var P;try{P=window.parent;if(!P||P===window||!P.__opVendorGet)return;}catch(e){return;}
+function nm(u){try{u=String(u&&u.url||u);var m=/(?:^|\\/)vendor\\/([^?#]+)/.exec(u);return m?decodeURIComponent(m[1]):null;}catch(e){return null;}}
+function ty(n){return /\\.m?js$/.test(n)?"text/javascript":/\\.(csl|xml)$/.test(n)?"application/xml":"text/plain";}
+function blob(n){var s=P.__opVendorNow(n);return s==null?null:URL.createObjectURL(new Blob([s],{type:ty(n)}));}
+var real=window.fetch&&window.fetch.bind(window);
+if(real)window.fetch=function(u,o){var n=nm(u);if(!n)return real(u,o);return P.__opVendorGet(n).then(function(s){return new Response(s,{status:200,headers:{"Content-Type":ty(n)}});},function(){return real(u,o);});};
+try{var d=Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype,"src");if(d&&d.set)Object.defineProperty(HTMLScriptElement.prototype,"src",{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){var n=nm(v),b=n&&blob(n);d.set.call(this,b||v);}});}catch(e){}
+try{var W=window.Worker;if(W){var NW=function(u,o){var n=nm(u),b=n&&blob(n);return new W(b||u,o);};NW.prototype=W.prototype;window.Worker=NW;}}catch(e){}
+})();</script>"""
 
 # 4. THE SITE
 site = open(os.path.join(HERE, "site.html"), encoding="utf-8").read()
 if site.count("/*@@BUILD@@*/{}") != 1:
     raise SystemExit("site.html: the place for the build was not found")
 build["img"] = IMG
+if A.inkwell_vendor and A.mode != "site":
+    build["vendorTag"] = VENDOR_TAG
+if A.mode == "app":
+    build["app"] = True
+if A.mode == "site":
+    build["site"] = True
 site = site.replace("/*@@BUILD@@*/{}", json.dumps(build, ensure_ascii=False).replace("</", "<\\/"))
 if site.count("<title>The Offline Project</title>") != 1:
     raise SystemExit("site.html: the title was not found")
@@ -259,8 +320,45 @@ if not A.inkwell:
     if site.count(d0) != 1:
         raise SystemExit("site.html: the description was not found")
     site = site.replace(d0, 'content="Carpe Diem, The Forge and Ingenium: three apps that live on your own device, each with its live demonstration."')
+if A.mode in ("site", "app"):
+    head = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
+            '<meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)">\n<meta name="theme-color" content="#110d18" media="(prefers-color-scheme: dark)">\n')
+    if A.mode == "site":
+        head += '<link rel="manifest" href="manifest.webmanifest">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-title" content="Offline Project">\n'
+    site = head + site.replace("<div id=\"app\">", "</head>\n<body>\n<div id=\"app\">", 1) + "\n" + "\n".join(INSIDE) + "\n</body>\n</html>\n"
+if A.mode == "app":
+    # nothing beside it: its icons travel inside it too
+    for rel in ("assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/apple-touch-icon.png"):
+        mime = "image/x-icon" if rel.endswith(".ico") else "image/png"
+        site = site.replace('href="%s"' % rel, 'href="data:%s;base64,%s"' % (mime, base64.b64encode(open(os.path.join(OUT, rel), "rb").read()).decode("ascii")))
+    name = "The_Offline_Project.html" if A.inkwell else "The_Offline_Project_without_Inkwell.html"
+    open(os.path.join(OUT, name), "w", encoding="utf-8").write(site)
+    print("app", name, len(site.encode("utf-8")), "bytes;", build["line"])
+else:
+    open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(site)
+    print("site", A.mode, len(site.encode("utf-8")), "bytes;", build["line"])
 if A.mode == "site":
-    site = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
-            + site.replace("<div id=\"app\">", "</head>\n<body>\n<div id=\"app\">", 1) + "\n</body>\n</html>\n")
-open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(site)
-print("site", A.mode, len(site.encode("utf-8")), "bytes;", build["line"])
+    # 5. THE WEB APP: it installs from the browser, and once visited it opens with no connection (each app is kept the first
+    #    time it is opened)
+    man = {"name": "The Offline Project", "short_name": "Offline Project", "start_url": "./", "scope": "./", "display": "standalone",
+           "background_color": "#f5f3f7", "theme_color": "#f5f3f7", "description": "Four apps that live on your own device.",
+           "icons": [{"src": "assets/icons/shield-192.png", "sizes": "192x192", "type": "image/png"},
+                     {"src": "assets/icons/shield-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+                     {"src": "assets/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}
+    open(os.path.join(OUT, "manifest.webmanifest"), "w", encoding="utf-8").write(json.dumps(man, indent=1))
+    ver = "-".join([versions["cd"], versions["forge"], versions["ingenium"]] + ([versions["inkwell"]] if A.inkwell else []))
+    SW = """/* The Offline Project's keeper: the hall, its pictures and icons are kept when it is installed, and each app the
+   first time it is opened, so the whole site opens again with no connection. A new build brings a new name, and the old
+   keep is let go. */
+const CACHE = "offline-project-%s";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/shield-512.png", "assets/icons/apple-touch-icon.png"];
+self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
+self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("offline-project-") && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener("fetch", e => {
+  const r = e.request; if (r.method !== "GET") return;
+  const u = new URL(r.url); if (u.origin !== location.origin || !u.pathname.startsWith(new URL("./", self.registration.scope).pathname)) return;
+  e.respondWith(caches.open(CACHE).then(c => c.match(r, { ignoreSearch: true }).then(hit => hit || fetch(r).then(res => { if (res.ok) c.put(r, res.clone()); return res; }).catch(() => c.match("index.html")))));
+});
+""" % ver
+    open(os.path.join(OUT, "sw.js"), "w", encoding="utf-8").write(SW)
+    print("web app: manifest.webmanifest and sw.js (%s)" % ver)
