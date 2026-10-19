@@ -75,6 +75,34 @@ own rule for its app keys outranked it); hands it this very build each time it h
 left" notice when Carpe Diem is shown in its sealed preview; and asks for the demonstration editions' offline keeper
 only on a website. `cd_repo_1057.py` writes the website repository and `cd_gift_1057.py` the owner's private one.
 
+## What changed in The Forge 640 and Ingenium 5.8 (19 October 2026)
+
+The Forge 640 (stamp 9s72) carries Carpe Diem 1057, whose mini Forge is The Forge 639, with Ingenium 5.7 (lean),
+Inkwell 7.48 and its own lean page; nothing else in the Forge changes but its build stamp (`forge_640/forge640.py`;
+`forge_repo_640.py` writes the Windows, Mac and iPhone/iPad repositories; `forge_demo/forge_demo_640.py` makes its
+demonstration, with Carpe Diem's Public sample and Inkwell, or Carpe Diem alone). Ingenium 5.8 carries The Forge 640
+(lean), Carpe Diem 1057 and Inkwell 7.48.
+
+## The Offline Project's site, as a web app and as one file (19 October 2026)
+
+`master_demo/build_master_demo.py` writes the site in three ways from one page (`master_demo/site.html`):
+
+* `--mode site`: a folder for a web host such as GitHub Pages. With its `manifest.webmanifest` and its own keeper
+  (`sw.js`), a phone, a tablet or a computer can install it from the browser, and once each app has been opened it
+  opens again with no connection. In `DevGroup2313/carpe-diem-offline`: `offline-project/` (four apps) and
+  `offline-project-without-inkwell/` (three).
+* `--mode app`: one file, `The_Offline_Project.html` (about 60 MB; without Inkwell about 51 MB), that holds every
+  app compressed inside it, with Inkwell's word lists, citation styles and PDF reader. It opens from a computer's
+  disk with nothing beside it and no connection. It needs a browser that can unpack gzip by itself
+  (DecompressionStream).
+* `--mode preview`: the private review page on claude.ai, whose host adds the document skeleton. Each app travels as
+  script parts (`apps/<slug>.partN.js`), so it loads even where the host refuses to let a page read its own files.
+
+The page has a top bar: the crest, each app with its seal, and the devices, as raised keys, the current page in gilt,
+with French and night at its right end. The Preview tag, the pause key and the loose keys above each room are gone.
+Each seal is a push-button ported from the apps' own: it sways, turns toward the pointer, lifts, sinks when pressed and
+rises again, and it keeps still when the device asks for reduced motion.
+
 ## What changed in Carpe Diem 1054 (18 October 2026)
 
 The tour says what Tabula's autosave keeps since 1053: one card, in English and French, follows "Real files, saved to

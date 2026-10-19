@@ -16,8 +16,8 @@ What it writes, into OUT_DIR:
                                   because the four now share one web address, and Carpe Diem and the Forge use the same names.
                                   The shim also stops a service worker from being installed: one app's worker would answer
                                   for the others.
-  A page larger than --max-file (the private preview's limit is 16 MB a file) is written as a small page that fetches
-  its parts (apps/<slug>.partN.txt) and writes them into itself, so the app runs exactly as it is.
+  A page larger than --max-file (the private preview's limit is 16 MB a file) is written as a small page that loads
+  its parts (apps/<slug>.partN.js) and writes them into itself, so the app runs exactly as it is.
 
 The owner's words, on the approved preview: "I only want the committee tour features for Carpe Diem and I want an alternate
 version of the Offline project that does not have Inkwell." So --cd-sample is optional (the site gives Carpe Diem's room the
@@ -33,7 +33,7 @@ all four seals, stay out.
                 and PDF reader) compressed inside it, that opens on any device with no connection and nothing beside it
 
 usage: build_master_demo.py --seal SEAL_PREVIEW.html --images DIR [--cd-sample F] --cd-committee F --forge-demo F
-                            --ingenium F [--inkwell F [--inkwell-vendor DIR]] --out DIR [--mode preview|site] [--max-file BYTES]"""
+                            --ingenium F [--inkwell F [--inkwell-vendor DIR]] --out DIR [--mode preview|site|app] [--max-file BYTES]"""
 import argparse, base64, gzip, io, json, os, re, shutil
 
 from PIL import Image
@@ -347,18 +347,24 @@ if A.mode == "site":
                      {"src": "assets/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}
     open(os.path.join(OUT, "manifest.webmanifest"), "w", encoding="utf-8").write(json.dumps(man, indent=1))
     ver = "-".join([versions["cd"], versions["forge"], versions["ingenium"]] + ([versions["inkwell"]] if A.inkwell else []))
+    # Inkwell reads its word lists and citation styles only when a feature first needs them, so they are kept as soon as
+    # Inkwell itself is first opened: its spelling and citations then work with no connection too
+    WITH = {"apps/inkwell.html": ["apps/vendor/" + n for n in names if "LICENCE" not in n]} if (A.inkwell and A.inkwell_vendor) else {}
     SW = """/* The Offline Project's keeper: the hall, its pictures and icons are kept when it is installed, and each app the
-   first time it is opened, so the whole site opens again with no connection. A new build brings a new name, and the old
-   keep is let go. */
+   first time it is opened (with the files it reads later), so the whole site opens again with no connection. A new build
+   brings a new name, and the old keep is let go. */
 const CACHE = "offline-project-%s";
+const WITH = %s;
 const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/shield-512.png", "assets/icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("offline-project-") && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
   const r = e.request; if (r.method !== "GET") return;
-  const u = new URL(r.url); if (u.origin !== location.origin || !u.pathname.startsWith(new URL("./", self.registration.scope).pathname)) return;
+  const u = new URL(r.url), home = new URL("./", self.registration.scope).pathname; if (u.origin !== location.origin || !u.pathname.startsWith(home)) return;
+  const also = WITH[u.pathname.slice(home.length)];
+  if (also) e.waitUntil(caches.open(CACHE).then(c => Promise.all(also.map(f => c.match(f).then(h => h || c.add(f).catch(() => {}))))));
   e.respondWith(caches.open(CACHE).then(c => c.match(r, { ignoreSearch: true }).then(hit => hit || fetch(r).then(res => { if (res.ok) c.put(r, res.clone()); return res; }).catch(() => c.match("index.html")))));
 });
-""" % ver
+""" % (ver, json.dumps(WITH))
     open(os.path.join(OUT, "sw.js"), "w", encoding="utf-8").write(SW)
     print("web app: manifest.webmanifest and sw.js (%s)" % ver)
