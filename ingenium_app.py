@@ -5058,6 +5058,105 @@ def _install_right_press_monitor(window):
         log_problem("right-press monitor failed", sys.exc_info())
 
 
+# ---- R151 (Ingenium 6.1, 20 October 2026): Refresh from the Mac's own menu and keys ----------------------------
+# The owner's words: "I want a refresh button added to Ingenium and the Forge, that refreshed the app if it glitches
+# or freezes." The page has its own Refresh key, which saves the desk first, but a frozen page cannot answer a key of
+# its own. So the app menu holds "Refresh Ingenium", and Command+R reaches the app before the page: the page is asked
+# to refresh itself (saving first, and asking when a reply is still being written); when it gives no answer within two
+# seconds, the window loads the page again by itself.
+_REFRESH_MONITOR = None
+_REFRESH_LOCK = threading.Lock()
+_REFRESH_URL = {"url": None}
+
+
+def _refresh_window(window):
+    """Runs on its own thread (a menu action or the key monitor starts it)."""
+    if not _REFRESH_LOCK.acquire(False):
+        return
+    try:
+        answer = {}
+
+        def _ask():
+            try:
+                answer["v"] = window.evaluate_js(
+                    "(function(){try{if(typeof window.ingRefresh==='function'){window.ingRefresh('menu');return 'page';}}"
+                    "catch(e){}return 'none';})()")
+            except BaseException:
+                answer["v"] = "!" + repr(sys.exc_info()[1])
+
+        t = threading.Thread(target=_ask, daemon=True)
+        t.start()
+        t.join(2.0)
+        if answer.get("v") == "page":
+            log_problem("refresh: the page refreshes itself")
+            return
+        log_problem("refresh: no answer from the page (%r); the window loads it again" % (answer.get("v"),))
+        url = None
+        try:
+            url = window.get_current_url()
+        except BaseException:
+            url = None
+        url = url or _REFRESH_URL["url"]
+        if url:
+            window.load_url(url)
+    except BaseException:
+        log_problem("refresh failed", sys.exc_info())
+    finally:
+        _REFRESH_LOCK.release()
+
+
+def _refresh_menu(webview, window):
+    """The app menu's "Refresh Ingenium", or None where this pywebview cannot add to the app menu (6.2 and later can)."""
+    if sys.platform != "darwin":
+        return None
+    try:
+        ver = tuple(int(x) for x in re.findall(r"\d+", str(getattr(webview, "__version__", "0")))[:2])
+        if ver < (6, 2):
+            return None
+        from webview.menu import Menu, MenuAction
+
+        def refresh_ingenium():
+            _refresh_window(window)
+
+        return [Menu("__app__", [MenuAction("Refresh %s" % APP_NAME, refresh_ingenium)])]
+    except Exception:
+        log_problem("refresh menu: not available", sys.exc_info())
+        return None
+
+
+def _install_refresh_key_monitor(window):
+    """macOS only: Command+R (with Shift too) in the main window refreshes, even while the page is frozen."""
+    global _REFRESH_MONITOR
+    if _REFRESH_MONITOR is not None or sys.platform != "darwin":
+        return
+    try:
+        import AppKit
+        mask = getattr(AppKit, "NSEventMaskKeyDown", getattr(AppKit, "NSKeyDownMask", 1 << 10))
+        flag_cmd = getattr(AppKit, "NSEventModifierFlagCommand", getattr(AppKit, "NSCommandKeyMask", 1 << 20))
+        flag_alt = getattr(AppKit, "NSEventModifierFlagOption", getattr(AppKit, "NSAlternateKeyMask", 1 << 19))
+        flag_ctrl = getattr(AppKit, "NSEventModifierFlagControl", getattr(AppKit, "NSControlKeyMask", 1 << 18))
+
+        def _handler(ev):
+            try:
+                f = ev.modifierFlags()
+                if not (f & flag_cmd) or (f & flag_alt) or (f & flag_ctrl):
+                    return ev
+                if str(ev.charactersIgnoringModifiers() or "").lower() != "r":
+                    return ev
+                win = ev.window()
+                if win is None or str(win.title() or "") != WINDOW_TITLE:
+                    return ev
+                threading.Thread(target=_refresh_window, args=(window,), daemon=True).start()
+                return None  # the app has it; the page does not see it as well
+            except BaseException:
+                return ev
+
+        _REFRESH_MONITOR = AppKit.NSEvent.addLocalMonitorForEventsMatchingMask_handler_(mask, _handler)
+        log_problem("refresh key monitor installed" if _REFRESH_MONITOR is not None else "refresh key monitor: AppKit refused it")
+    except Exception:
+        log_problem("refresh key monitor failed", sys.exc_info())
+
+
 def _post_start(window):
     """Kept for compatibility with builds that pass it to webview.start."""
     _install_right_press_monitor(window)
@@ -5084,11 +5183,13 @@ def _start_monitor_thread(window):
         try:
             from PyObjCTools import AppHelper
             AppHelper.callAfter(_install_right_press_monitor, window)
+            AppHelper.callAfter(_install_refresh_key_monitor, window)  # R151
             return
         except Exception:
             pass
         try:
             _install_right_press_monitor(window)
+            _install_refresh_key_monitor(window)  # R151
         except Exception:
             log_problem("right-press monitor thread failed", sys.exc_info())
 
@@ -5489,7 +5590,10 @@ def main():
     _store = storage_dir()
     _started = False
     _start_err = None
+    _REFRESH_URL["url"] = app_url
+    _menu = _refresh_menu(webview, window)  # R151: "Refresh Ingenium" in the app menu
     for kwargs in (
+        dict(gui=None, debug=False, private_mode=False, storage_path=_store, menu=_menu) if (_store and _menu) else None,
         dict(gui=None, debug=False, private_mode=False, storage_path=_store) if _store else None,
         dict(gui=None, debug=False, private_mode=False),
         dict(gui=None, debug=False),

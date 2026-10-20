@@ -16,7 +16,8 @@ What it does, each change found exactly once or the pass stops:
   1. the build stamp: 643, 9s75;
   2. Fabrica, fresh from Ingenium's modules (forge_fabrica.py: R110, R111, R112, R140's views of GitHub's own, R114), with the
      frame that follows the room's head (forge_fit.py), unless --keep-fabrica;
-  3. every block in blocks/ (name order), before </body>: each one a part of this pass, made and tested on its own;
+  3. every block in blocks_early/ right after <body> (the loading page, painted before the rest is read), and every block in
+     blocks/ (name order), before </body>: each one a part of this pass, made and tested on its own;
   4. the full page only: every block in blocks_full/ (large data, such as the wallpapers, that the lean page Ingenium carries
      leaves out), then the apps it carries, as passes 632 to 642.
 
@@ -97,6 +98,37 @@ def blocks(folder):
 
 k = s.rfind("</body>")
 s = s[:k] + "\n" + "\n".join(blocks("blocks")) + "\n" + s[k:]
+# the loading page comes first in the body (only blocks named in --only when a block is tested on its own)
+early = blocks("blocks_early")
+if early:
+    rep('<body data-theme="light">\n', '<body data-theme="light">\n' + "\n".join(early) + "\n")
+
+
+def boot_map(t):
+    """The loading page's bar: where each of the page's scripts begins, in thousandths of the page. The page is walked as
+    the browser reads it: a script ends at the first "</script" after it opens, so text inside one that only looks like a
+    tag is not counted."""
+    mark = "/*FORGE_BOOT_MAP*/"
+    i = t.find(mark)
+    if i < 0:
+        return t
+    j = t.index("]", i) + 1
+    t = t[:i] + mark + "[]" + t[j:]
+    marks, pos, low = [], 0, t.lower()
+    while True:
+        a = low.find("<script", pos)
+        if a < 0:
+            break
+        marks.append(a)
+        z = low.find("</script", a + 7)
+        if z < 0:
+            break
+        pos = z + 8
+    m = [min(999, int(x * 1000 / len(t))) for x in marks]
+    return t.replace(mark + "[]", mark + json.dumps(m, separators=(",", ":")), 1)
+
+
+s = boot_map(s)
 lean = s
 os.makedirs(out_dir, exist_ok=True)
 open(os.path.join(out_dir, "the_forge_643_lean.html"), "w", encoding="utf-8").write(lean)
@@ -106,7 +138,7 @@ if only is not None:
     # a block's own tests: its large data too, in a page of its own
     t = lean
     k = t.rfind("</body>")
-    t = t[:k] + "\n" + "\n".join(full_extra) + "\n" + t[k:]
+    t = boot_map(t[:k] + "\n" + "\n".join(full_extra) + "\n" + t[k:])
     open(os.path.join(out_dir, "the_forge_643_test.html"), "w", encoding="utf-8").write(t)
     print("test page with", sorted(only))
 if not apps_in:
@@ -161,7 +193,7 @@ sig = hashlib.sha256((STAMP + "|" + "|".join(m["sha256"] for m in metas)).encode
 meta_block = '<script type="application/json" id="forge-bi-meta">%s</script>' % json.dumps(
     {"format": "forge-builtin", "stamp": STAMP, "sig": sig, "apps": metas}, separators=(",", ":")).replace("</", "<\\/")
 k = lean.rfind("</body>")
-full = lean[:k] + "\n" + "\n".join(full_extra) + "\n<!-- PASS 643 · the apps the Forge carries (lean copies), and its own page -->\n" + meta_block + "\n" + "\n".join(blocks_out) + "\n" + lean[k:]
+full = boot_map(lean[:k] + "\n" + "\n".join(full_extra) + "\n<!-- PASS 643 · the apps the Forge carries (lean copies), and its own page -->\n" + meta_block + "\n" + "\n".join(blocks_out) + "\n" + lean[k:])
 open(os.path.join(out_dir, "the_forge.html"), "w", encoding="utf-8").write(full)
 print("full", len(full.encode("utf-8")), hashlib.sha256(full.encode("utf-8")).hexdigest())
 for m in metas:

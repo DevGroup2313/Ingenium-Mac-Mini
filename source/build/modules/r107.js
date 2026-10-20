@@ -359,6 +359,41 @@ body[data-motion="minimal"] #lx7 .l-pn:hover{transform:none}
 #lx7.l-phone .l-paper .cv .seals img.crest{width:92px;height:auto}
 #lx7.l-phone .l-paper .cv .seals img.crest.c-duo{width:180px}
 @media (prefers-reduced-motion:reduce){#lx7 *,#lx7 *::before,#lx7 *::after{animation:none !important;transition:none !important}}
+/* 6.1 · Ask Lector: the owner's own requests, written and sent from the foot of the document. The owner's words (20 October
+   2026): "I also want a compose text chat area for the Lector page so I can write and send my more specific requests." */
+#lx7 .l-cmp{flex:0 0 auto;border-top:1px solid var(--l-hair2);background:var(--l-card);display:flex;flex-direction:column;min-height:0}
+#lx7 .l-cmp-h{display:flex;align-items:center;gap:8px;padding:8px 14px 0;font-size:12px;color:var(--l-ink3)}
+#lx7 .l-cmp-h b{font-weight:700;color:var(--l-ink2);letter-spacing:.02em}
+#lx7 .l-cmp-h .l-cmp-tg{margin-left:auto;border:0;background:none;color:var(--l-acc);font:600 12px var(--l-sans);cursor:pointer;padding:2px 4px;border-radius:6px}
+#lx7 .l-cmp-h .l-cmp-tg:focus-visible{outline:2px solid var(--l-ring);outline-offset:2px}
+#lx7 .l-cmp-th{max-height:min(22vh,190px);overflow:auto;overscroll-behavior:contain;padding:8px 14px 2px;display:flex;flex-direction:column;gap:8px}
+#lx7 .l-cmp-th[hidden]{display:none}
+#lx7 .l-cmp-m{max-width:88%;padding:8px 11px;border-radius:12px;font-size:13.5px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;box-shadow:var(--l-pill)}
+#lx7 .l-cmp-m.me{align-self:flex-end;background:var(--l-accs);color:var(--l-ink1);border-bottom-right-radius:4px}
+#lx7 .l-cmp-m.me .for{display:block;margin-top:3px;font-size:11.5px;color:var(--l-ink3);white-space:normal}
+#lx7 .l-cmp-m.lx{align-self:flex-start;background:linear-gradient(var(--l-a),var(--l-b));border:1px solid var(--l-hair2);border-bottom-left-radius:4px}
+#lx7 .l-cmp-m.lx.err{border-color:rgba(184,67,63,.35)}
+#lx7 .l-cmp-m.lx.wait{color:var(--l-ink3)}
+#lx7 .l-cmp-m .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#lx7 .l-cmp-m .acts .l-btn{padding:4px 10px;font-size:12px}
+#lx7 .l-cmp-f{display:flex;align-items:flex-end;gap:8px;padding:8px 12px 4px}
+#lx7 .l-cmp-in{flex:1 1 auto;min-width:0;display:flex;border:1px solid var(--l-hair);border-radius:14px;background:var(--l-wellbg);box-shadow:var(--l-well);padding:8px 11px;transition:border-color .2s,box-shadow .2s}
+#lx7 .l-cmp-in:focus-within{border-color:var(--l-ring);box-shadow:var(--l-well),0 0 0 3px var(--l-accs)}
+#lx7 .l-cmp-in textarea{flex:1 1 auto;min-width:0;border:0;background:transparent;resize:none;font:14px/1.5 var(--l-sans);color:var(--l-ink1);height:1.5em;min-height:1.5em;max-height:9em;overflow:auto;padding:0;outline:none}
+#lx7 .l-cmp-in textarea::placeholder{color:var(--l-ink3)}
+#lx7 .l-cmp-row{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;padding:2px 14px 9px;font-size:12px;color:var(--l-ink3)}
+#lx7 .l-cmp-row label{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+#lx7 .l-cmp-row .l-cmp-hint{margin-left:auto;padding:0}
+#lx7 .l-cmp-row select{font:600 12px var(--l-sans);color:var(--l-ink2);background:linear-gradient(var(--l-a),var(--l-b));border:1px solid var(--l-hair);border-radius:8px;padding:3px 6px;max-width:100%;box-shadow:var(--l-pill)}
+#lx7 .l-cmp-send{flex:0 0 auto;width:40px;height:40px;padding:0;border-radius:12px;margin-bottom:1px}
+#lx7 .l-cmp-send svg{width:18px;height:18px}
+#lx7 .l-cmp-hint{font-size:11.5px;color:var(--l-ink3)}
+#lx7 .l-cmp-reqs{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px 0}
+#lx7 .l-cmp-req{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:3px 4px 3px 10px;border-radius:99px;font-size:12px;background:var(--l-golds);color:var(--l-ink1);border:1px solid rgba(184,138,58,.25)}
+#lx7 .l-cmp-req span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:32em}
+#lx7 .l-cmp-req button{border:0;background:none;color:var(--l-ink3);cursor:pointer;font-size:14px;line-height:1;padding:2px 5px;border-radius:99px}
+#lx7 .l-cmp-req button:hover{color:var(--l-ink1);background:rgba(0,0,0,.06)}
+#lx7.l-phone .l-cmp-th{max-height:24vh}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p39"]="started";}catch(_){}
 /* R107 · Lector's page, as she approved it. The reading itself (the parts, the notes, the joining, the analysis) is

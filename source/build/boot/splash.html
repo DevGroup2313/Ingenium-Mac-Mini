@@ -1,0 +1,108 @@
+<div id="ing-boot" aria-busy="true">
+<style>
+/* R151 (Ingenium 6.1). The owner's words, 20 October 2026: "I also want a loading page added to the apps that informs the
+   user that the page is still being painted instead of letting a user think that the app has crashed or is lagging and
+   glitching." This is the first thing in the page's body, so it is painted before the rest of the page is read. It covers
+   the half-made page until the last part has run, says plainly what is happening, shows how far the painting has got, and
+   after a long wait offers to start again. Its ring turns on the compositor, so it keeps turning while the page's own
+   work holds everything else still. */
+#ing-boot{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;
+  padding:16px;box-sizing:border-box;background:#f5f3f7;color:#221a2e;
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  transition:opacity .3s ease,visibility .3s}
+#ing-boot.ib-night{background:#16131c;color:#efe9f6}
+#ing-boot.ib-done{opacity:0;visibility:hidden;pointer-events:none}
+#ing-boot.ib-gone{display:none}
+#ing-boot .ib-card{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px;text-align:center;
+  opacity:0;animation:ibIn .45s ease .3s forwards}
+@keyframes ibIn{to{opacity:1}}
+#ing-boot .ib-seal{position:relative;width:104px;height:104px;margin-bottom:6px}
+#ing-boot .ib-seal img{display:block;width:104px;height:104px;border-radius:50%;
+  filter:drop-shadow(0 2px 2px rgba(40,20,70,.22)) drop-shadow(0 8px 18px rgba(40,20,70,.18))}
+#ing-boot.ib-night .ib-seal img{filter:drop-shadow(0 2px 3px rgba(0,0,0,.55)) drop-shadow(0 8px 20px rgba(0,0,0,.45))}
+#ing-boot .ib-ring{position:absolute;top:-10px;right:-10px;bottom:-10px;left:-10px;border-radius:50%;
+  border:3px solid rgba(106,63,181,.14);border-top-color:#6a3fb5;animation:ibSpin 1.15s linear infinite;will-change:transform}
+#ing-boot.ib-night .ib-ring{border-color:rgba(183,156,230,.16);border-top-color:#b79ce6}
+@keyframes ibSpin{to{transform:rotate(360deg)}}
+#ing-boot .ib-name{margin:0;font:700 26px/1.15 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;letter-spacing:.01em}
+#ing-boot .ib-say{margin:0;font-size:15px;color:#4a4358}
+#ing-boot.ib-night .ib-say{color:#cfc6dc}
+#ing-boot .ib-bar{width:100%;max-width:280px;height:7px;border-radius:99px;background:rgba(106,63,181,.13);overflow:hidden;margin-top:4px}
+#ing-boot.ib-night .ib-bar{background:rgba(183,156,230,.14)}
+#ing-boot .ib-bar i{display:block;height:100%;width:3%;border-radius:inherit;background:linear-gradient(90deg,#8a63d2,#6a3fb5);transition:width .35s ease}
+#ing-boot.ib-night .ib-bar i{background:linear-gradient(90deg,#cdb8f0,#9b7ad8)}
+#ing-boot .ib-pct{font-size:12.5px;color:#6c6579;font-variant-numeric:tabular-nums;min-height:1.5em}
+#ing-boot.ib-night .ib-pct{color:#a79bbb}
+#ing-boot .ib-more{margin:4px 0 0;font-size:14px;line-height:1.55;color:#4a4358}
+#ing-boot.ib-night .ib-more{color:#cfc6dc}
+#ing-boot .ib-keys{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+#ing-boot .ib-keys[hidden],#ing-boot .ib-more[hidden]{display:none}
+/* the keys popped out like the rest of the family's: a light top face, a darker lower edge, a lift on hover, a press */
+#ing-boot .ib-key{font:600 14px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:11px 18px;border-radius:12px;cursor:pointer;
+  border:1px solid rgba(34,26,46,.12);background:linear-gradient(180deg,#ffffff,#efeaf4);color:#221a2e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(78,44,138,.18),0 4px 10px rgba(40,20,70,.12);
+  transition:transform .25s cubic-bezier(.34,1.35,.64,1),box-shadow .25s}
+#ing-boot .ib-key.ib-main{border-color:#4e2c8a;color:#fff;background:linear-gradient(180deg,#8a63d2,#6a3fb5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 #4e2c8a,0 5px 12px rgba(78,44,138,.32)}
+#ing-boot .ib-key:hover{transform:translateY(-1px)}
+#ing-boot .ib-key:active{transform:translateY(1px);box-shadow:inset 0 1px 2px rgba(0,0,0,.12),0 1px 0 rgba(78,44,138,.2)}
+#ing-boot .ib-key:focus-visible{outline:3px solid #b79ce6;outline-offset:2px}
+#ing-boot.ib-night .ib-key:not(.ib-main){background:linear-gradient(180deg,#2c2338,#211a2b);color:#efe9f6;border-color:rgba(255,255,255,.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:reduce){#ing-boot .ib-card{animation:none;opacity:1}#ing-boot .ib-ring{animation-duration:4s}#ing-boot{transition:none}}
+@media print{#ing-boot{display:none}}
+</style>
+<div class="ib-card">
+  <div class="ib-seal"><img alt="" width="104" height="104" src="ING_BOOT_SEAL_DAY" data-night="ING_BOOT_SEAL_NIGHT"><span class="ib-ring" aria-hidden="true"></span></div>
+  <h1 class="ib-name">Ingenium</h1>
+  <p class="ib-say" id="ib-say">Getting ready. The page is still being painted; nothing has crashed.</p>
+  <div class="ib-bar" role="progressbar" aria-label="How much of the page is painted" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="ib-bar"></i></div>
+  <div class="ib-pct" id="ib-pct" aria-hidden="true"></div>
+  <p class="ib-more" id="ib-more" role="status" hidden></p>
+  <div class="ib-keys" id="ib-keys" hidden><button type="button" class="ib-key ib-main" id="ib-refresh">Refresh</button><button type="button" class="ib-key" id="ib-wait">Keep waiting</button></div>
+</div>
+</div>
+<script>/* R151: the loading page's own few lines. They run before anything else in the body and ask nothing of the rest. */
+(function(){"use strict";var b=document.getElementById("ing-boot");if(!b)return;
+  function $b(id){return document.getElementById(id);}
+  /* how far through the page the reading has got: where each of the page's scripts begins, in thousandths of the whole
+     (written in when the page is built) */
+  var MAP=/*ING_BOOT_MAP*/[],T0=Date.now(),night=false,last=-1,lastMove=Date.now(),stage=0,seg=-1,segAt=Date.now(),finished=false,gen=0;
+  try{var st=JSON.parse(localStorage.getItem("ingenium_v4")||"{}"),t=st&&st.theme||"auto";
+    night=t==="night"||(t==="auto"&&!!(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches));}
+  catch(e){try{night=!!matchMedia("(prefers-color-scheme: dark)").matches;}catch(_){}}
+  var img=b.querySelector("img");
+  function look(n){b.classList.toggle("ib-night",!!n);if(img){var d=img.getAttribute("data-day")||img.getAttribute("src");img.setAttribute("data-day",d);img.setAttribute("src",n?img.getAttribute("data-night"):d);}}
+  look(night);
+  var again=false;try{again=!!sessionStorage.getItem("ing_refresh_at");sessionStorage.removeItem("ing_refresh_at");}catch(e){}
+  if(again)$b("ib-say").textContent="Starting again after Refresh. The page is being painted; nothing has crashed.";
+  function frac(){var n=document.scripts.length,k=Math.max(0,Math.min(MAP.length-1,n-1));
+    if(!MAP.length)return Math.min(.9,n/300);
+    /* a script can be long (the apps Ingenium carries ride in a few of them), so between two marks the bar keeps
+       creeping towards the next one rather than standing still */
+    if(k!==seg){seg=k;segAt=Date.now();}
+    var a=MAP[k]/1000,z=(k+1<MAP.length?MAP[k+1]:1000)/1000,s=(Date.now()-segAt)/1000;
+    return a+(z-a)*0.85*(1-Math.exp(-s/4));}
+  function show(p){var bar=$b("ib-bar");if(bar)bar.style.width=p+"%";var pb=b.querySelector(".ib-bar");if(pb)pb.setAttribute("aria-valuenow",String(p));
+    var pc=$b("ib-pct");if(pc)pc.textContent=p>=100?"Ready":p+"% painted";}
+  function say(t,keys){var m=$b("ib-more");if(m){m.hidden=false;m.textContent=t;}var k=$b("ib-keys");if(k)k.hidden=!keys;}
+  function tick(){if(finished)return;if(window.__ingReady===true){done();return;}
+    var p=Math.max(3,Math.min(97,Math.round(frac()*100)));if(p>last){last=p;lastMove=Date.now();show(p);}
+    var s=(Date.now()-T0)/1000;
+    if(stage<1&&s>15){stage=1;say("This is taking longer than usual. A large page paints slowly on a tablet or a phone, and the first start after an update is the slowest. It is still working.",false);}
+    if(stage<2&&s>45&&Date.now()-lastMove>20000){stage=2;say("Nothing has moved for a while. You can keep waiting, or press Refresh to start Ingenium again. Your saved work stays where it is.",true);}
+    if(stage<3&&document.readyState==="complete"&&s>8&&window.__ingReady!==true&&Date.now()-lastMove>8000){stage=3;
+      say("Ingenium did not finish starting. Press Refresh to try again. Your saved work stays where it is.",true);var w=$b("ib-wait");if(w)w.textContent="Show it anyway";}
+    setTimeout(tick,250);}
+  function done(force){if(finished&&!force)return;finished=true;show(100);b.setAttribute("aria-busy","false");
+    /* two frames, so the page beneath is painted before the cover lifts */
+    var raf=window.requestAnimationFrame||function(f){return setTimeout(f,16);};
+    var g=gen;raf(function(){raf(function(){if(g!==gen)return;b.classList.add("ib-done");setTimeout(function(){if(g===gen)b.classList.add("ib-gone");},400);});});}
+  $b("ib-refresh").onclick=function(){try{sessionStorage.setItem("ing_refresh_at",String(Date.now()));}catch(e){}try{location.reload();}catch(e){location.href=location.href;}};
+  $b("ib-wait").onclick=function(){if(stage>=3){done(true);return;}stage=1;lastMove=Date.now();say("Still working. Thank you for waiting.",false);};
+  /* the Refresh key in the top bar shows this page again while Ingenium starts over (modules/r151.js) */
+  window.__ingBoot={el:b,done:function(){done(true);},look:look,again:function(text){finished=true;gen++;b.classList.remove("ib-done","ib-gone");b.setAttribute("aria-busy","true");
+    show(0);var pc=$b("ib-pct");if(pc)pc.textContent="";$b("ib-say").textContent=text||"Starting Ingenium again. Your work is saved.";var m=$b("ib-more");if(m)m.hidden=true;var k=$b("ib-keys");if(k)k.hidden=true;}};
+  tick();
+})();
+</script>

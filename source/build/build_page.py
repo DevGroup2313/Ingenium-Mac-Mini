@@ -10,8 +10,8 @@ else:  # the repository keeps the 3.12 base gzipped (source/build/base312.html.g
     base = gzip.open(_bp + ".gz", "rt", encoding="utf-8").read()
 out = base
 EDITS = []
-def edit(old, new, label):
-    EDITS.append((old, new, label))
+def edit(old, new, label, times=1):
+    EDITS.append((old, new, label, times))
 
 # ---- R123: a window of its own (#ingapp=...) shows one app and never writes Ingenium's own desk, so it can never
 #      put an older copy of the desk over the newer one the main window keeps ----
@@ -260,10 +260,48 @@ edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelI
 edit('function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:" · page of "+ING_PAGE_DATE);}',
      'function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:"");}', "R134 the version line names no date")
 
-for old, new, label in EDITS:
+# ---- 6.1 (20 October 2026): no watermarks. The owner's words: "I don't want any watermarks on its documents or hidden in
+#      its texts." Lector's notes and analysis no longer close with a line naming the model, Ingenium and the date; a Word file
+#      no longer names Ingenium as its author or as the program that made it; a PDF no longer names Ingenium as its producer
+#      and creator. The author of a Word file is the owner's name where Lector knows it, and otherwise left empty. ----
+edit('var md="# "+title+"\\n\\n"+pieces.join("\\n\\n")+"\\n\\n---\\n*Drafted by "+lxModelName(run)+" in Ingenium\'s Lector on "+lxDate()+(opts.all?", from its readings of your apps":", from a full reading of "+run.name)+". The measures are exact; the rest is a draft: check every statement before you use it.*";',
+     'var md="# "+title+"\\n\\n"+pieces.join("\\n\\n");', "6.1 no closing line on the analysis")
+edit('<dc:creator>Ingenium</dc:creator>', '<dc:creator></dc:creator>', "6.1 a Word file names no author it was not given", 3)
+edit('lxX(author||"Ingenium")', 'lxX(author||"")', "6.1 Lector's Word file: the owner as author, or none")
+edit('<Application>Ingenium</Application>', '', "6.1 a Word file names no program", 3)
+edit('<Application>Ingenium Lector</Application>', '', "6.1 Lector's Word file names no program")
+edit('" /Producer (Ingenium) /Creator (Ingenium) >>"', '" >>"', "6.1 a PDF names no producer")
+
+# ---- R151 (Ingenium 6.1, 20 October 2026): the loading page and the Refresh key. The owner's words: "I want a refresh button
+#      added to Ingenium and the Forge, that refreshed the app if it glitches or freezes. I also want a loading page added to
+#      the apps that informs the user that the page is still being painted instead of letting a user think that the app has
+#      crashed or is lagging and glitching." The loading page (boot/splash.html) is the first thing in the body, so it is
+#      painted before the rest is read; its seal is the page's large icon made small here. The key's own work (saving first,
+#      asking when a reply is still being written, the keys F5 and Ctrl+R or Command+R) is in modules/r151.js; its press
+#      reloads the page even when that module never ran. ----
+import io as _io, base64 as _b64s
+def _small_seal(uri, px=208):
+    try:
+        from PIL import Image as _Im
+        _im = _Im.open(_io.BytesIO(_b64s.b64decode(uri.split(",", 1)[1]))).convert("RGBA").resize((px, px), _Im.LANCZOS)
+        _bo = _io.BytesIO(); _im.save(_bo, "PNG", optimize=True)
+        return "data:image/png;base64," + _b64s.b64encode(_bo.getvalue()).decode("ascii")
+    except ImportError:  # no Pillow on this machine: the large icon itself, only heavier
+        return uri
+_PI0 = json.load(open(os.path.join(HERE, "..", "icon", "new", "out", "page_icons.json")))
+_splash = open(os.path.join(HERE, "boot", "splash.html"), encoding="utf-8").read().strip("\n")
+_splash = _splash.replace("ING_BOOT_SEAL_DAY", _small_seal(_PI0["big"]["day"])).replace("ING_BOOT_SEAL_NIGHT", _small_seal(_PI0["big"]["night"]))
+edit('<body data-theme="day" data-motion="full">\n',
+     '<body data-theme="day" data-motion="full">\n' + _splash + '\n', "R151 the loading page, first in the body")
+edit('    <button class="cl-key" id="displayBtn" title="Display: theme, depth, navigation, frame, motion" aria-label="Display">',
+     '    <button class="cl-key" id="refreshBtn" title="Refresh: start Ingenium again if it glitches or stops answering. Your work is saved first. (F5 or Ctrl+R; Command+R on a Mac)" aria-label="Refresh Ingenium" onclick="(window.ingRefresh||function(){location.reload();})()"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 4.2v4.6H15"/></svg><span class="kl">Refresh</span></button>\n'
+     '    <button class="cl-key" id="displayBtn" title="Display: theme, depth, navigation, frame, motion" aria-label="Display">',
+     "R151 the Refresh key in the top bar")
+
+for old, new, label, times in EDITS:
     n = out.count(old)
-    if n != 1:
-        sys.exit("edit %r: found %d times" % (label, n))
+    if n != times:
+        sys.exit("edit %r: found %d times, not %d" % (label, n, times))
     out = out.replace(old, new)
 
 # ---- R104: the icons are the layered seal standing still (drawn by icon/gen_icons.py) ----
@@ -386,6 +424,25 @@ if "/*R107_LAYERS*/null" in blob:
 if "/*R107_MASTER*/null" in blob:
     blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master
 out = out.replace(MARK, blob + MARK)
-dest = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
+# ---- R151: where each of the page's scripts begins, in thousandths of the page, for the loading page's bar. The page is
+#      walked as the browser reads it: a script ends at the first "</script" after it opens, so text inside a script that
+#      only looks like a tag is not counted ----
+def _script_map(text):
+    marks, pos, low = [], 0, text.lower()
+    while True:
+        i = low.find("<script", pos)
+        if i < 0:
+            break
+        marks.append(i)
+        j = low.find("</script", i + 7)
+        if j < 0:
+            break
+        pos = j + 8
+    return [min(999, int(m * 1000 / len(text))) for m in marks]
+_bm = "/*ING_BOOT_MAP*/[]"
+if out.count(_bm) != 1:
+    sys.exit("the loading page's map: its place was not found once")
+out = out.replace(_bm, "/*ING_BOOT_MAP*/" + json.dumps(_script_map(out), separators=(",", ":")))
+dest =sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
 open(dest, "w", encoding="utf-8").write(out)
 print("built", dest, len(out), "bytes;", len(EDITS), "edits;", len(mods), "modules")
