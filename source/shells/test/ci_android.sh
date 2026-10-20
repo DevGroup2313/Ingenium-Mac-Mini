@@ -24,6 +24,9 @@ FABRICA_VC=$VC node "$T/make_apk.mjs" $M $D "$T/test_page.html" $I "$W/v1.apk" c
 FABRICA_VC=$((VC + 1)) node "$T/make_apk.mjs" $M $D "$T/test_page.html" $I "$W/v2.apk" com.yannieforest.shelltest "Shell Test" "$W/test.p12" test-pass-123 | tail -1 || exit 1
 FABRICA_ALIAS=com.yannie.carpediem.MainActivity node "$T/make_apk.mjs" $M $D "$W/the_forge.html" $I "$W/forge.apk" com.yannieforest.theforge.test "The Forge" "$W/test.p12" test-pass-123 | tail -1 || exit 1
 
+# 6.1: no step may hang the job: an emulator that loses its connection (Android 14 did, twice, opening the 13 MB Forge)
+# ends the step after a few minutes with a plain report, instead of waiting forty minutes for the job's limit
+adb() { timeout "${ADB_WAIT:-240}" "$(type -P adb)" "$@"; }
 adb wait-for-device
 report() {   # $1 package, $2 component: starts it with the page test and prints the page's report
   adb logcat -c

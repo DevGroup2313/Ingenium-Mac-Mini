@@ -228,7 +228,12 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          # 6.1: Android 14's emulator lost its connection while opening The Forge (a 13 MB page) twice, with its default
+          # memory; it now has 4 GB, as a tablet has
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 6000M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
           disable-animations: true
           script: bash source/shells/test/ci_android.sh ${{ matrix.api }} source/shells/out/checks
 
