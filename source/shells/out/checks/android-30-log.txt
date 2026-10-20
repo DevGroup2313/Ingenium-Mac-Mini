@@ -1,6 +1,6 @@
+--------- beginning of kernel
 --------- beginning of main
 --------- beginning of system
---------- beginning of kernel
-10-20 13:18:37.475  5326  5326 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35702)
-10-20 13:18:37.476  5326  5326 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
-10-20 13:18:37.478  5326  5326 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
+10-20 18:15:03.685  5264  5264 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35702)
+10-20 18:15:03.686  5264  5264 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
+10-20 18:15:03.687  5264  5264 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
