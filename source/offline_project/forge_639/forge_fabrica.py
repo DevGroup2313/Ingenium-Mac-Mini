@@ -75,6 +75,22 @@ body[data-theme="night"] #fb{--f-bg:#0d141a;--f-card:#141d25;--f-hi:#17212a;--f-
 #fb .f-edit-report{max-height:9em;overflow:auto;font:12px/1.45 var(--f-mono);white-space:pre-wrap;background:var(--f-wellbg);border:1px solid var(--f-hair2);border-radius:9px;padding:8px 10px;margin:0 0 10px;color:var(--f-ink2)}
 </style>'''
 
+# one save after another: the Forge's desktop shells keep the place chosen in one dialog slot, so the five packages saved at
+# once came out under one another's names (the owner's words, 20 October 2026: "The Mac's package has the Fire Tablet's zip
+# install. The mac mini holds the Iphone and Ipad, only the windows actually holds the right folder"). Each save now waits for
+# the one before it to finish.
+FORGE_SAVE = r'''var saveQ=Promise.resolve();
+function saveBytes(name,mime,data){var job=saveQ.then(function(){return saveOne(name,mime,data);});saveQ=job.catch(function(){});return job;}
+function saveOne(name,mime,data){try{var api=window.pywebview&&window.pywebview.api;if(api&&api.save_file){var u8=data instanceof Uint8Array?data:new Uint8Array(data),bin="",CH=0x8000;
+    for(var i=0;i<u8.length;i+=CH)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));
+    return Promise.resolve(api.save_file(String(name),String(mime||"application/octet-stream"),btoa(bin))).then(function(ok){if(!ok)return saveAnchor(name,mime,data);},function(){return saveAnchor(name,mime,data);});}}catch(e){}
+  try{if(typeof window.cdSaveBytesToHost==="function"&&window.cdSaveBytesToHost(name,mime,data))return new Promise(function(res){setTimeout(res,600);});}catch(e){}
+  return saveAnchor(name,mime,data);}
+function saveAnchor(name,mime,data){var u=URL.createObjectURL(new Blob([data],{type:mime})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u);},4000);
+  return new Promise(function(res){setTimeout(res,400);});}
+
+'''
+
 # the Forge's own ways in and out, in place of Ingenium's Code (a model): a file editor here, the Forge's Editor for the
 # apps it knows (their edits come back as changes to keep), the Forge's app library, and the Forge's mount
 FORGE_JS = r'''/* ---------- PASS 639 · the Forge changes an app's files itself, with no model: a file editor here, and the Forge's
@@ -153,7 +169,7 @@ def block():
     p = Src("r112")
     p.rep('#page-fabrica.fb-page > .page-title,#page-fabrica.fb-page > .lede{display:none !important}\n', '')
     p.rep('body.fb-on .main{padding-bottom:10px !important}\n', '')
-    p.rep('body.fb-on .foot{display:none !important}\n', '')
+    p.cut("/* 6.0: Ingenium's own foot only", '#fb{\n', '')
     p.rep('if(typeof IngRepo==="undefined"||typeof IngShip==="undefined"||typeof go!=="function")return;',
           'if(typeof IngRepo==="undefined"||typeof IngShip==="undefined")return;\n' + LOCAL_STATE)
     p.rep("Your own GitHub, on this device: each of your apps kept with every version, changed, tested and shipped from here. GitHub is there only when you want it.",
@@ -161,31 +177,43 @@ def block():
     # the work: written here, or in the Forge's Editor, not by a model
     p.rep('"<b>A new app, ready for its first page</b>Describe it in Chat or open it in Code: every change the model makes, and every save of yours, lands here as a change to keep. Or bring in a page you already have."',
           '"<b>A new app, ready for its first page</b>Write its first page here, or bring in a page you already have. Every save of yours lands here as a change to keep."')
-    p.rep('f.appendChild(btn("pri","Open it in Code",function(){openInCode(r);}));f.appendChild(btn("","Bring a page in",function(){sheetBring(r);}));return;}',
-          'f.appendChild(btn("pri","Write its first page",function(){openInCode(r,"index.html");}));f.appendChild(btn("","Bring a page in",function(){sheetBring(r);}));return;}')
+    p.rep('f.appendChild(btn("pri","Open it in Code",function(){openInCode(r);}));f.appendChild(btn("","Write its first page",function(){openEditor(r,"index.html");}));',
+          'f.appendChild(btn("pri","Write its first page",function(){openEditor(r,"index.html");}));')
     p.rep('"<b>Nothing changed since the last version</b>Every change you or the model make in Chat or Code appears here first, file by file, with exactly what changed. You keep it as a version when it is right."',
           '"<b>Nothing changed since the last version</b>Every change you save here, or bring back from the Editor, appears here first, file by file, with exactly what changed. You keep it as a version when it is right."')
-    p.rep('f.appendChild(btn("","Open it in Code",function(){openInCode(r);}));return;}',
-          'f.appendChild(btn("","Edit a file",function(){openInCode(r);}));return;}')
+    p.rep('f.appendChild(btn("","Open it in Code",function(){openInCode(r);}));f.appendChild(btn("","Edit a file",function(){openEditor(r);}));return;}',
+          'f.appendChild(btn("","Edit a file",function(){openEditor(r);}));return;}')
     p.rep('Open them in Code, keep one of each, then keep this version.', 'Edit them here, keep one of each, then keep this version.')
     p.rep('open them in Code, keep one of each, then keep this version.', 'edit them here, keep one of each, then keep this version.')
-    p.rep('f.appendChild(btn("","Open it in Code",function(){openInCode(r,selp?selp.path:null);}));',
-          'f.appendChild(btn("",selp?"Edit this file":"Edit a file",function(){openInCode(r,selp?selp.path:null);}));')
-    # a file saved by the desktop shells' own dialog where there is one, else downloaded
-    p.rep('if(typeof saveFileNative==="function")return saveFileNative(name,mime,data);',
-          'if(typeof window.cdSaveBytesToHost==="function"&&window.cdSaveBytesToHost(name,mime,data))return true;')
-    # the install packages are the Forge's own five
-    p.rep('["kits","Build kits","Six kits: Fire, iPhone, iPad, Mac mini, MacBook, Windows (.zip)",',
-          '["kits","Install packages","Five: Mac, Mac mini, Windows, iPhone and iPad, Fire (.zip)",')
+    p.rep('f.appendChild(btn("","Open it in Code",function(){openInCode(r,selp?selp.path:null);}));\n', '')
+    # a file saved by the desktop shells' own dialog where there is one, else downloaded; one save after another (6.0)
+    p.cut('function saveBytes(name,mime,data){', '/* the history: every version kept', FORGE_SAVE)
+    # the install packages are the Forge's own five; the APK and the IPA Ingenium makes in its own shells are not in the Forge
+    p.rep('var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android device: signed here, it installs as it is"],\n'
+          '  ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],\n'
+          '  ["web",', 'var TARGETS=[["web",')
+    p.rep('["kits","Build kits (.zip)","Projects for a computer or GitHub to build: you choose the devices"]]',
+          '["kits","Install packages (.zip)","Five: Mac, Mac mini, Windows, iPhone and iPad, Fire"]]')
+    p.rep('if(!p.chosen)p.chosen=["apk","page"];', 'if(!p.chosen)p.chosen=["kits","page"];')
+    p.rep('var pk=$("fbPkg");pk.innerHTML="";pk.hidden=!r;\n  if(r){', 'var pk=$("fbPkg");pk.innerHTML="";pk.hidden=true;\n  if(false){')
     p.rep('function kitsHere(){return typeof kitStore==="function"&&typeof kitAssemble==="function"&&typeof makeZip==="function"&&!!document.getElementById("ingenium-kit-bundle");}',
           'function kitsHere(){try{return !!(window.FORGE&&FORGE.fab&&FORGE.fab.kits&&FORGE.fab.hasKits());}catch(e){return false;}}')
     p.rep('"The kits are made on a computer: this build of Ingenium carries no kit store."', '"This copy of the Forge carries no install packages."')
-    p.cut('/* the six build kits, as the Build page makes them', '/* ---------- running the app ---------- */',
-          '/* the five install packages, made by the Forge\'s own packager from the version kept (PASS 639) */\n'
-          'function makeKits(r){return IngShip.onePage(r.id).then(function(x){var base=(r.slug||r.name||"app").replace(/[^\\w.-]+/g,"_");\n'
-          '  return FORGE.fab.kits(x.html,base,function(i,n){if(S.making){S.making.prog.kits=Math.round(10+85*i/n);paintShip();}}).then(function(list){if(!list.length)throw new Error("this copy of the Forge carries no install packages");\n'
-          '    var total=0,made=[];list.forEach(function(k){total+=k.size;made.push({name:k.name,size:k.size});saveBytes(k.name,"application/zip",k.bytes);});\n'
-          '    return IngRepo.setNote(r.id,x.commit,"kits",{at:Date.now(),size:total,made:made}).then(function(){return total;});});});}\n\n')
+    p.cut('/* the build kits: the devices chosen, one zip each, saved one after another */', '/* what was made, kept on this device beside its version',
+          '/* the five install packages, made by the Forge\'s own packager from the version kept (PASS 639), each saved after the one\n'
+          '   before it and kept under Releases (6.0) */\n'
+          'function sheetKits(r){makeOne(r,"kits").catch(function(){});}\n'
+          'function makeKits(r){return IngShip.onePage(r.id,{quiet:true}).then(function(x){var base=(r.slug||r.name||"app").replace(/[^\\w.-]+/g,"_");\n'
+          '  return FORGE.fab.kits(x.html,base,function(i,n){if(S.making){S.making.prog.kits=Math.round(10+60*i/n);paintShip();}}).then(function(list){if(!list.length)throw new Error("this copy of the Forge carries no install packages");\n'
+          '    var total=0,made=[],chain=Promise.resolve();\n'
+          '    list.forEach(function(k,i){chain=chain.then(function(){say(r,"kits","Saving "+k.name+"…");total+=k.size;made.push({name:k.name,size:k.size});\n'
+          '      return saveBytes(k.name,"application/zip",k.bytes).then(function(){return keepMade(r,x.commit,"kits",k.name,"application/zip",k.bytes);}).then(function(){if(S.making){S.making.prog.kits=Math.round(70+28*(i+1)/list.length);paintShip();}});});});\n'
+          '    return chain.then(function(){return IngRepo.setNote(r.id,x.commit,"kits",{at:Date.now(),size:total,made:made});}).then(function(){return total;});});});}\n')
+    # the app's menu: no Build page, no Code and no APK or IPA details in the Forge; its file editor is the Forge's own (FORGE_JS)
+    p.rep('  item("Open it in Build",function(){openInBuild(r);});\n  item("Open it in Code",function(){openInCode(r);});\n', '')
+    p.rep('  item("Package details",function(){sheetPackage(r);});\n', '')
+    p.cut("/* the app's files, written here: any text file, saved as a change to keep", '/* the releases: each version',
+          '/* the app\'s files: the Forge\'s own file editor (FORGE_JS) */\nfunction openEditor(r,path,report){openInCode(r,path,report);}\n')
     p.rep('URL.revokeObjectURL(u);if(typeof csShow==="function"){go("chat");csShow({kind:"file",html:html,name:x.page||(r.slug+".html")},{user:true});}else toast("This build cannot open a window; save the one page and open it.");',
           'URL.revokeObjectURL(u);saveBytes(x.page||(r.slug+".html"),"text/html",new TextEncoder().encode(html));toast("This window cannot open another, so the one page is saved instead: open it to run "+r.name+".");')
     # bringing apps in: the Forge's app library and its Editor; no Code
@@ -207,8 +235,9 @@ def block():
     p.rep('toast("A new app, "+name+": give it its first page in Chat or Code, or bring one in.");', 'toast("A new app, "+name+": write its first page here, or bring one in.");')
     # in place of Code and the Ingenium page: the Forge's file editor, its Editor, and its room
     p.cut('/* ---------- Code and Fabrica keep the same files ---------- */', ';try{window.__ingParts["p44"]="running";}catch(_){}', FORGE_JS + "\n")
+    # (the APK and IPA code stays, unreached: the Forge has no apk or ipa target and no Package details)
     js112 = p.s
-    if re.search(r"\bccMakeProject\(|\bccNewSession\(|\bccLoadAll\(|\bgo\(\"(?:code|chat)\"\)|kitStore\(|libApps\(", js112):
+    if re.search(r"\bccMakeProject\(|\bccNewSession\(|\bccLoadAll\(|\bgo\(\"(?:code|chat|build)\"\)|kitStore\(|libApps\(|IngBuild|openInBuild|saveFileNative", js112):
         raise SystemExit("r112: a way into Code or Ingenium's kits is still there")
 
     # R114, GitHub: the Forge's keeping; its Troubleshoot opens the file editor with the report

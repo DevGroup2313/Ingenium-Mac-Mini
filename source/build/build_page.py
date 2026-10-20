@@ -332,6 +332,22 @@ for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Di
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
         sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
     _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+# ---- R136 (Ingenium 6.0, 20 October 2026): the shells Fabrica fills to make an APK and an IPA on the device (source/shells).
+#      The Android shell is compiled by shells/android/build_dex.sh; the iPhone and iPad shell by GitHub's Macs
+#      (.github/workflows/build-shells.yml), checked here against the fingerprint that build wrote beside it ----
+_shells = os.path.normpath(os.path.join(HERE, "..", "shells", "out"))
+_ios_rec = os.path.join(_shells, "ios-shell.json")
+for _sid, _sf in (("ing-android-shell", "android-shell.dex"), ("ing-ios-shell", "ios-shell.zip")):
+    _sp = os.path.join(_shells, _sf)
+    if not os.path.isfile(_sp):
+        print("no " + _sf + ": this page will make no " + ("APK" if "android" in _sid else "IPA"))
+        continue
+    _sb = open(_sp, "rb").read()
+    if _sf == "ios-shell.zip" and os.path.isfile(_ios_rec):
+        _rec = json.load(open(_ios_rec))["device"]
+        if len(_sb) != _rec["bytes"] or _hl.sha256(_sb).hexdigest() != _rec["sha256"]:
+            sys.exit("ios-shell.zip: its size or fingerprint does not match ios-shell.json")
+    _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 # ---- R121: the shared thought cloud (thoughts/thought_cloud.html, the same file the Forge and Carpe Diem carry) is

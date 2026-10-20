@@ -21,7 +21,7 @@ Changing this folder starts no build. The builds start when `ingenium.html` (or 
 Stages 2l to 2n (17 October 2026) added three page tests that run against the built page served by any static
 server (`python3 -m http.server 8150` in the folder that holds it), with Playwright's Chromium:
 
-    node rig/t_fabrica.js http://127.0.0.1:8150/ingenium.html <out>           # Fabrica, 33 checks; real git clones its bundle
+    node rig/t_fabrica.js http://127.0.0.1:8150/ingenium.html <out>           # Fabrica, 34 checks; real git clones its bundle
     python3 rig/ghmock.py 8170 &                                              # a stand-in GitHub API, hashing objects as git does
     node rig/t_fabrica_github.js http://127.0.0.1:8150/ingenium.html <out>    # GitHub inside Fabrica, 20 checks
     node rig/t_lector_doctoral.js http://127.0.0.1:8150/ingenium.html <out>   # Lector's charter, examiner's pass and model guidance, 11 checks
@@ -77,5 +77,24 @@ the top, the float key on the side column, floating windows with a tab each on t
 A window of its own carries every side button. The windows share the notes, the reminders, the thought Inbox, day and
 night and the Clepsydra's settings, and only the main window writes the saved desk. In the Mac and Windows apps
 `ingenium_app.py` opens that window and holds the shared parts (`open_lite`, `lite_hub_put`, `lite_hub_get`).
+
+6.0 (20 October 2026) adds three modules and the shells Fabrica fills:
+
+- `modules/r136.js`: an APK and an IPA made inside the page, with no connection. The APK is the generic Android shell
+  (`shells/out/android-shell.dex`, written into the page by `build_page.py`) with the app's page, its manifest, its icons and
+  both v1 and v2 signatures, signed with a key made on the device or brought in from a .p12 or .jks file. The IPA is the
+  unsigned iPhone and iPad shell (`shells/out/ios-shell.zip`, built by GitHub's macOS runner) with the app's page and icons;
+  Sideloadly or AltStore signs it with an Apple ID as it installs it.
+- `modules/r137.js`: every page takes the whole width of a wide window, the Apps group of the rail folds, saves go one at a
+  time, Code opens as Chat opens and lets its app be closed or removed, and the dividers show their grips.
+- `modules/r138.js`: Build holds a page of any size part by part (each script, style and block of markup), with a search
+  across the whole page, and runs and saves the whole app.
+- `shells/`: the sources of the two shells, their build (`.github/workflows/build-shells.yml` in this repository) and the
+  reports of the emulator and simulator checks (`shells/out/checks/`).
+
+    node rig/t_v6.js http://127.0.0.1:8150/ingenium.html <out> <tools>       # 6.0, 28 checks: the folding rail, the wide window, the five ship cards, an APK checked by apksig and androguard, an IPA, Releases, removing an app from Fabrica and Code, Build with a 13 MB page
+
+`offline_project/forge_639/forge_fabrica.py` carries the new Fabrica into the Forge (without the APK and IPA cards, which need
+Ingenium's shells), and its saves now go one after another there too: `rig/t_forge_fabrica.js`, 45 checks.
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

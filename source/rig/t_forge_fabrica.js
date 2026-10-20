@@ -92,12 +92,15 @@ const room = (p, r) => p.click('.nav-inner .nav-btn[data-room="' + r + '"]').the
   const test = await p.evaluate(() => ({ chip: document.getElementById('fbTestChip').textContent, checks: [...document.querySelectorAll('#fbChecks .f-ck')].map(c => c.className.replace('f-ck', '').trim() || '-'), steps: [...document.querySelectorAll('#fbSteps li[data-s]')].map(l => l.className).join(' ') }));
   ok(/Passed/.test(test.chip) && test.checks.slice(0, 3).join() === 'ok,ok,ok' && test.steps === 'done done done now', 'tested in a quiet window: the checks pass and the step moves to Ship', JSON.stringify(test));
   const tg = await p.evaluate(() => [...document.querySelectorAll('#fbTargets .f-tg')].map(x => x.querySelector('b').textContent + '|' + x.querySelector('small').textContent).join(' / '));
-  ok(/Install packages\|Five: Mac, Mac mini, Windows, iPhone and iPad, Fire/.test(tg), 'the third target is the Forge\'s five install packages', tg);
-  await p.evaluate(() => document.getElementById('fbMakeAll').click()); await p.waitForFunction(() => /All made/.test(document.getElementById('fbShipState').textContent), null, { timeout: 240000 }); await p.waitForTimeout(1500);
+  ok(/Install packages( \(\.zip\))?\|Five: Mac, Mac mini, Windows, iPhone and iPad, Fire/.test(tg) && !/APK|IPA/.test(tg), 'the third target is the Forge\'s five install packages (no APK or IPA card in the Forge)', tg);
+  // 6.0: the cards are chosen by pressing them; all three here
+  await p.evaluate(() => document.querySelectorAll('#fbTargets .f-tg').forEach(e => { if (e.getAttribute('aria-pressed') !== 'true') e.click(); }));
+  await p.evaluate(() => document.getElementById('fbMakeAll').click()); await p.waitForFunction(() => /Made/.test(document.getElementById('fbShipState').textContent), null, { timeout: 240000 }); await p.waitForTimeout(1500);
   const ship = await p.evaluate(() => ({ state: document.getElementById('fbShipState').textContent, chips: [...document.querySelectorAll('#fbTargets .f-tg .foot .f-chip')].map(x => x.textContent), tile: document.querySelector('#fbRepos .f-repo .stl span').textContent }));
-  ok(/All made/.test(ship.state) && ship.chips.filter(c => /Made/.test(c)).length === 3 && /Shipped/.test(ship.tile), 'shipped: all three are made and noted beside the version', JSON.stringify(ship));
+  ok(/Made/.test(ship.state) && ship.chips.filter(c => /Made/.test(c)).length === 3 && /Shipped/.test(ship.tile), 'shipped: all three are made and noted beside the version', JSON.stringify(ship));
   const kits = dl.filter(n => /_(mac|mac_mini|windows|ios|fire)_/.test(n));
   ok(dl.some(n => /\.html$/.test(n)) && dl.some(n => /web.*\.zip$/.test(n)) && kits.length === 5, 'saved: the one page, the web app and five install packages', dl.join(', '));
+  ok(kits.map(n => /_(mac_mini|mac|windows|ios|fire)_/.exec(n)[1]).join() === 'mac,mac_mini,windows,ios,fire', 'the five are saved one after another, each under its own name', kits.join(', '));
   await p.screenshot({ path: OUT + '/ff-shipped.png' });
 
   // the copies, checked by real git: the bundle and the folder with its .git

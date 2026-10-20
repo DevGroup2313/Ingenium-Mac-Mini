@@ -59,9 +59,13 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // ship: one page and a web app, made on the device
   const dl = []; p.on('download', d => dl.push(d.suggestedFilename()));
   await p.evaluate(() => { saveFileNative = function (name, mime, data) { const u = URL.createObjectURL(new Blob([data], { type: mime })); const a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }; });
-  await p.evaluate(() => document.getElementById('fbMakeAll').click()); await p.waitForFunction(() => /All made/.test(document.getElementById('fbShipState').textContent), null, { timeout: 60000 }); await p.waitForTimeout(600);
+  // 6.0: the cards are chosen by pressing them (the APK and one page at first); here one page and the web app
+  await p.evaluate(() => { const card = k => document.querySelector('#fbTargets .f-tg[data-k="' + k + '"]'); if (card('apk').getAttribute('aria-pressed') === 'true') card('apk').click(); if (card('web').getAttribute('aria-pressed') !== 'true') card('web').click(); });
+  const picked = await p.evaluate(() => [...document.querySelectorAll('#fbTargets .f-tg[aria-pressed="true"]')].map(e => e.dataset.k).sort().join());
+  ok(picked === 'page,web', 'the cards are chosen by pressing them', picked);
+  await p.evaluate(() => document.getElementById('fbMakeAll').click()); await p.waitForFunction(() => /Made/.test(document.getElementById('fbShipState').textContent), null, { timeout: 60000 }); await p.waitForTimeout(600);
   const ship = await p.evaluate(() => ({ state: document.getElementById('fbShipState').textContent, chips: [...document.querySelectorAll('#fbTargets .f-tg .foot .f-chip')].map(x => x.textContent), tile: document.querySelector('#fbRepos .f-repo .stl span').textContent, step: [...document.querySelectorAll('#fbSteps li[data-s]')].map(l => l.className).join(' ') }));
-  ok(/All made/.test(ship.state) && ship.chips.filter(c => /Made/.test(c)).length >= 2 && /Shipped/.test(ship.tile), 'shipped: one page and a web app are made and noted beside the version', JSON.stringify(ship));
+  ok(/Made/.test(ship.state) && ship.chips.filter(c => /Made/.test(c)).length >= 2 && /Shipped/.test(ship.tile), 'shipped: one page and a web app are made and noted beside the version', JSON.stringify(ship));
   ok(dl.some(n => /\.html$/.test(n)) && dl.some(n => /web.*\.zip$/.test(n)), 'both packages were saved', dl.join(', '));
   await p.screenshot({ path: OUT + '/fab-shipped.png' });
   // the bundle, checked by real git
