@@ -1,0 +1,10 @@
+Android 30: 11, WebView com.google.android.webview, 83.0.4103.106
+Performing Streamed Install
+Success
+PASS version 1 opens: {"title":"Shell Test run 1","text":47,"errors":0,"storage":true,"bridge":true}
+Performing Streamed Install
+Success
+PASS version 2 installs over it and keeps its storage: {"title":"Shell Test run 2","text":48,"errors":0,"storage":true,"bridge":true}
+Performing Streamed Install
+Success
+PASS The Forge (13 MB page) opens by its launcher name: {"title":"The Forge","text":6113,"errors":0,"storage":true,"bridge":true}
