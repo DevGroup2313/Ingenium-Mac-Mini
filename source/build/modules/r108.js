@@ -274,6 +274,8 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
      /* 6.1: the document's size: smaller, fit to the panel, larger */
      '<div class="l-zoom" id="l7Zoom" role="group" aria-label="The document\'s size"><button type="button" data-z="-" aria-label="Smaller" title="Smaller">−</button><button type="button" data-z="fit" aria-pressed="true" title="Fit the page to the panel">Fit</button><button type="button" data-z="+" aria-label="Larger" title="Larger">+</button><span class="pc" aria-live="polite"></span></div></div>'+
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk"></div>'+
+     /* 6.1: Ask Lector, the owner's own requests (paintAsk) */
+     '<div class="l-cmp" id="l7Ask" role="region" aria-label="Ask Lector"></div>'+
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
      '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
    '</div></div>';
@@ -286,6 +288,7 @@ function render(){var root=build();if(!root)return;L7();paintBrief();paintSteps(
   if(!R7.crestsAhead&&window.IngSeal){R7.crestsAhead=true;try{var SS=L7().sets;Object.keys(SS).forEach(function(k){var x=SS[k];if(x&&x.apps&&crestKind(x.apps))IngSeal.prepare(sorted(x.apps));});}catch(e){}}
   layoutSoon();}
 function paintAll(){if(!$("lx7"))return;paintBrief();paintSteps();paintMain();paintProgress();paintTabs();paintDoc();}
+/* 6.1: the compose area follows the document shown (paintDoc is wrapped once, below, by the Ask Lector part) */
 
 /* the brief */
 function sec(title){var s=h("div","l-sec");s.appendChild(h("h3",null,esc(title)));return s;}
@@ -598,7 +601,7 @@ function inl(t,chk){var s=lxInline(t,esc);s=s.replace(/\[((?:your|to fill|the re
   if(chk&&chk.unmatched&&chk.unmatched.length)chk.unmatched.forEach(function(f){var re=new RegExp("(^|[^\\w.,])("+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w])","g");
     s=s.replace(re,'$1<span class="chk" title="Not found in the measures, the analysis, your CV or the posting: check it">$2</span>');});
   return s;}
-function paper(kind,md,o){var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":(night()?"night":"day");
+function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":(night()?"night":"day");
   var open='<div class="l-paper th-'+th+'">';
   var out=[],blocks=lxBlocks(md);if(blocks.length&&blocks[0].k==="h"&&blocks[0].lv===1)blocks.shift();
   var note=null;if(blocks.length>1&&blocks[blocks.length-2].k==="hr"&&blocks[blocks.length-1].k==="p"){note=blocks.pop().t;blocks.pop();}
@@ -698,7 +701,7 @@ var PLAN={dossier:[["Title and summary","Begin with one title line in bold; then
    against the material a second time (the Examine switch in the brief), before Ingenium's own checks of figures and style. */
 var CHARTER="\n\nTHE STANDARD. Write as a doctoral candidate writes for an Oxford or Cambridge examiner. Each paragraph carries one idea: a topic sentence first, the evidence next (a measured fact or a passage of the analysis, named in the sentence), and a closing sentence that ties it to the aim of the section. Prefer the specific to the general, the concrete figure to the adjective, the plain word to the grand one. Every evaluative claim rests on something in the material; where the material is silent, say nothing rather than guess. Calibrate every hedge: what is measured is stated plainly, what is inferred is marked as inferred (\"the measures suggest\", \"on this reading\"), and nothing is called proven. No superlative without a measure beside it. Name each app exactly as the material names it, and use one term for one thing throughout. Define a technical term the first time it is needed, in a few words, and avoid jargon the examiner would have to look up. British spelling and punctuation; the formal register throughout; no contractions, no rhetorical questions, no exclamation marks, no lists or bullet points in prose sections, no sentence beyond about thirty words unless its structure needs it. Do not open with a generality about the world or close with a cliché; begin with the matter in hand. Do not repeat what another section is for: a dossier's Aims are not its Methods. Quote nothing that is not in the material. Where a list of her sources is given, cite a source by its number in square brackets only where it supports the sentence, and cite nothing that is not on that list.";
 var BANNED=["leverage","seamless","robust","cutting-edge","passionate","delve","tapestry","showcase","innovative","empower","harness","unlock","journey","testament","realm","game-changing","world-class","state-of-the-art","revolutionary","unparalleled","best-in-class","groundbreaking","synergy","holistic","paradigm","elevate","transformative","dynamic","vibrant"];
-function sysW(){var me=author()||"the owner";return "You are Lector, writing on the owner's own device for "+me+", who designed and built these apps alone. Write in British English, in the first person as her, in clear, exact prose of the standard expected in an Oxford or Cambridge doctoral application: precise, measured, specific and unhurried, never promotional. Use only what the material given shows: the measured facts, the analysis, her CV and the posting. Never invent a fact, a number, a name, a date, a post, a qualification or a quotation. Where a fact about her is needed and is not in the material, write a short placeholder in square brackets, such as [your current role]. Keep every figure exactly as given. Do not use these words: "+BANNED.join(", ")+". Do not repeat the heading you are given, and add no headings of your own unless asked."+CHARTER;}
+function sysW(){var me=author()||"the owner";return "You are Lector, writing on the owner's own device for "+me+", who designed and built these apps alone. Write in British English, in the first person as her, in clear, exact prose of the standard expected in an Oxford or Cambridge doctoral application: precise, measured, specific and unhurried, never promotional. Use only what the material given shows: the measured facts, the analysis, her CV and the posting. Never invent a fact, a number, a name, a date, a post, a qualification or a quotation. Where a fact about her is needed and is not in the material, write a short placeholder in square brackets, such as [your current role]. Keep every figure exactly as given. Do not use these words: "+BANNED.join(", ")+". Do not repeat the heading you are given, and add no headings of your own unless asked."+CHARTER+askStanding();}
 function meticulous(){var B=L7().brief;return B.meticulous!==false;}
 /* the examiner's pass: the draft of a section, read against the material a second time, and revised */
 function review(kind,title,body,G,o){if(!meticulous()||!body||body.length<80)return Promise.resolve(body);
@@ -744,12 +747,12 @@ function clean(t,title){t=String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").
   return L.join("\n").trim();}
 function ask(build,max,temp){var scale=1,tries=0,busyN=0;
   return new Promise(function(res,rej){(function go1(){if(LX.stop){rej(stopErr());return;}var msgs=build(scale);LX.live="";paintLiveSoon();
-    lxAsk({modelId:job()&&job().modelId},msgs,max,temp,function(t){LX.live=t;paintLiveSoon();}).then(function(t){res(t);},function(e){var m=String(e&&e.message||e);
+    lxAsk({modelId:(job()&&job().modelId)||R7.askModel},msgs,max,temp,function(t){LX.live=t;paintLiveSoon();}).then(function(t){res(t);},function(e){var m=String(e&&e.message||e);
       if(LX.stop){rej(stopErr());return;}
       if(m==="busy"&&busyN++<400){setTimeout(go1,1500);return;}
       if(lxIsCtxError(e)&&scale>0.3){scale*=0.7;setTimeout(go1,300);return;}
       if(++tries<=2){setTimeout(go1,2000);return;}rej(e);});})();});}
-function room(){var m=modelById(job()&&job().modelId);var ctx=lxCtx(m);return lxBudget(ctx,LX_OUT_SECTION,false);}
+function room(){var m=modelById((job()&&job().modelId)||R7.askModel);var ctx=lxCtx(m);return lxBudget(ctx,LX_OUT_SECTION,false);}
 function material(G,keys,cap){var per=Math.floor(cap/Math.max(1,G.runs.length));
   return G.runs.map(function(r,i){var a=G.an[i]||{};var t=keys.filter(function(k){return a[k];}).map(function(k){return "("+k+") "+a[k];}).join("\n\n");return "### "+r.name+"\n"+cut(t,per);}).join("\n\n");}
 function context(G,scale,o){var R=room()*scale,parts=[];var many=G.runs.length>1;
@@ -803,7 +806,12 @@ function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+se
       context(G,sc,{keys:[A_IN,A_DOES,A_SK,A_BUILT],anShare:0.5,post:true,postShare:0.08,cv:true,cvShare:0.14})}];},1100,0.4)
       .then(function(x){return review(kind,"Projects",clean(x,"Projects"),G,{keys:[A_IN,A_DOES,A_SK,A_BUILT],words:260,cv:true,prose:false,extra:"7. Keep the CV's shape: a bold title line for each app, then its bullet points, each beginning with a strong verb and giving an exact figure where the material gives one.\n"});}).then(function(body){pieces.push("## Projects\n"+body);put();return finish();});}
   return Promise.reject(new Error("Lector does not know how to write that document."));
-  function finish(){var md=head+pieces.join("\n\n")+"\n\n---\n*Drafted by "+lxModelName({modelId:job()&&job().modelId})+" in Ingenium's Lector on "+lxDate()+", from full readings of "+listNames(G.apps)+(meticulous()&&kind!=="appendix"?", and examined section by section against the material":"")+". The measures are exact; check every other statement before you use it.*";R7.docMd[kind]=md;return md;}}
+  /* 6.1: the document ends with its own last word. The owner's words (20 October 2026): "I don't want any watermarks on its
+     documents or hidden in its texts." It no longer closes with a line naming the model, Ingenium and the date; what was
+     checked, and what is left to check, is said in the Thinking panel instead. */
+  function finish(){var md=head+pieces.join("\n\n");R7.docMd[kind]=md;return md;}}
+/* 6.1: a document kept before 6.1 still ends with that line: it is left out wherever the document is shown, copied or saved */
+function unmark(md){return String(md==null?"":md).replace(/\n*(?:-{3,}|\*{3,})\s*\n+\*Drafted by [^\n]*?(?:Lector|Ingenium)[^\n]*\*\s*$/,"");}
 /* R115: the sources the text cites, in the order of their numbers; a number that matches no source is left to the check */
 function citedIn(text,G){var S=G.sources||[],used={};String(text).replace(/\[(\d+(?:\s*[,–-]\s*\d+)*)\]/g,function(all,inner){inner.split(/[,–-]/).forEach(function(n){n=+String(n).trim();if(n>=1&&n<=S.length)used[n]=1;});return all;});
   return S.filter(function(s){return used[s.n];});}
@@ -844,8 +852,8 @@ function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{ap
     S.docs[kind]={ref:ref,made:Date.now(),model:lxModelName({modelId:j.modelId}),title:setName(j.apps)+" · "+docLabel(kind,j.apps,j.purpose),chk:chk};saveState();});}
 
 /* ---------------- saving ---------------- */
-function curDoc(){var kind=R7.doc||"analysis";if(kind==="analysis")return analysisMd(job()).then(function(md){return md?{kind:kind,md:md}:null;});
-  var s=stored(kind);if(!s)return Promise.resolve(null);return IngBig.load(s.ref).then(function(md){return md?{kind:kind,md:md,chk:s.chk}:null;});}
+function curDoc(){var kind=R7.doc||"analysis";if(kind==="analysis")return analysisMd(job()).then(function(md){return md?{kind:kind,md:unmark(md)}:null;});
+  var s=stored(kind);if(!s)return Promise.resolve(null);return IngBig.load(s.ref).then(function(md){return md?{kind:kind,md:unmark(md),chk:s.chk}:null;});}
 function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to save yet: this document is written after the reading.");return;}
   var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title),fmt=L7().brief.fmt||"docx";
   var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
@@ -867,7 +875,159 @@ function crestFor(ck,apps,fmt){if(!ck||!window.IngSeal||fmt==="md")return Promis
   return p.catch(function(e){ingToast("The set’s seal could not be drawn on this device, so the document carries each app’s own seal. "+(e&&e.message||""));return null;});}
 function htmlDoc(kind,md,o){var th=themeOf(kind,o.apps),css=fontCss(th==="inkwell"?"inkwell":th==="family"?"family":"none")+"\n"+paperCss(false)+
   "\n.l-paper .cv .seals .sn{display:none}@media screen and (prefers-color-scheme:dark){.l-paper .cv .seals .sd{display:none}.l-paper .cv .seals .sn{display:inline-block}}@media print{.l-paper .cv .seals .sn{display:none !important}.l-paper .cv .seals .sd{display:inline-block !important}}";
-  return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="generator" content="Ingenium Lector"><title>'+esc(o.title)+'</title><style>'+css+'</style></head><body class="th-'+th+'">'+paper(kind,md,Object.assign({},o,{both:true}))+'</body></html>';}
+  return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>'+esc(o.title)+'</title><style>'+css+'</style></head><body class="th-'+th+'">'+paper(kind,md,Object.assign({},o,{both:true}))+'</body></html>';}
+
+/* ---------------- 6.1 · ASK LECTOR: THE OWNER'S OWN REQUESTS ----------------
+   The owner's words (20 October 2026): "I also want a compose text chat area for the Lector page so I can write and send my
+   more specific requests." At the foot of the document, a box to write in and a key to send. A request can:
+   · change the document shown: Lector finds the section the request names (or the whole document when it is short, or
+     the section in view), rewrites only that, from the same material, and keeps the version before so it can be put back;
+   · change one chosen section, or the whole document;
+   · be kept for everything Lector writes for this set: it then goes with every section, every examination and every letter;
+   · or be answered in the conversation, for a line to copy elsewhere.
+   Every rewrite keeps to the material as the first writing did: no fact, figure, name or date is invented. */
+var ASKS_MAX=40;
+function askThread(){var S=L7();if(!S.asks||typeof S.asks!=="object")S.asks={};var k=curKey();if(!Array.isArray(S.asks[k]))S.asks[k]=[];return S.asks[k];}
+function askReqs(){var S=L7();if(!S.reqs||typeof S.reqs!=="object")S.reqs={};var k=curKey();if(!Array.isArray(S.reqs[k]))S.reqs[k]=[];return S.reqs[k];}
+/* the standing requests, for the instructions every piece is written with */
+function askStanding(){var r=[];try{r=askReqs();}catch(e){}if(!r.length)return "";
+  return "\n\nTHE OWNER'S OWN REQUESTS FOR THIS SET. Follow each one wherever it applies, before any general rule above, except the rule never to invent a fact:\n"+r.map(function(x,i){return (i+1)+". "+x.text;}).join("\n");}
+function askWords(t){return (String(t||"").match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu)||[]).length;}
+/* a document in its parts: what comes before the first "##" heading, then each section with its heading */
+function askParts(md){md=unmark(md);var head=[],parts=[],cur=null;
+  md.split("\n").forEach(function(l){var m=/^##(?!#)\s*(.+?)\s*$/.exec(l);if(m){cur={title:m[1],lines:[]};parts.push(cur);}else if(cur)cur.lines.push(l);else head.push(l);});
+  return {head:head.join("\n").replace(/\s+$/,""),parts:parts.map(function(p){return {title:p.title,body:p.lines.join("\n").trim()};})};}
+function askJoin(d){return [d.head].concat(d.parts.map(function(p){return "## "+p.title+"\n"+p.body;})).filter(function(x){return String(x).trim();}).join("\n\n");}
+/* a letter has no sections: its text after the title is one part */
+function askBodyOnly(d){var hm=/^(#\s[^\n]*\n*)([\s\S]*)$/.exec(d.head);return hm?{title:hm[1].replace(/\s+$/,""),body:hm[2].trim()}:{title:"",body:d.head.trim()};}
+function askKeys(kind,title){var plan=PLAN[kind]||PLAN.dossier,all=[];plan.forEach(function(x){(x[2]||[]).forEach(function(k){if(all.indexOf(k)<0)all.push(k);});});
+  var t=String(title||"").toLowerCase().replace("what the apps do","what it does");for(var i=0;i<plan.length;i++)if(plan[i][0].toLowerCase()===t)return plan[i][2];return all;}
+/* the section a request names: the most of its title's words found in the request */
+function askNamed(text,parts){var q=" "+String(text||"").toLowerCase().replace(/[^\p{L}\p{N}]+/gu," ")+" ",best=-1,bs=0;
+  parts.forEach(function(p,i){var t=String(p.title).toLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").trim();if(!t)return;
+    if(q.indexOf(" "+t+" ")>=0){if(100>bs){bs=100;best=i;}return;}
+    var ws=t.split(" ").filter(function(w){return w.length>=4&&!/^(what|with|from|that|this|their|about|which|where|apps)$/.test(w);}),hit=ws.filter(function(w){return q.indexOf(" "+w+" ")>=0;}).length;
+    var sc=ws.length?hit/ws.length*10+hit:0;if(hit&&(hit>=2||ws.length===1)&&sc>bs){bs=sc;best=i;}});
+  return best;}
+/* the section the owner is reading: the last heading above the middle of the desk */
+function askInView(parts){var dk=$("l7Desk");if(!dk)return -1;var hs=[].slice.call(dk.querySelectorAll("[data-h]")),mid=dk.getBoundingClientRect().top+dk.clientHeight*0.4,at=-1;
+  hs.forEach(function(e){var i=+e.getAttribute("data-h");if(e.getBoundingClientRect().top<=mid)at=i;});return at>=0&&at<parts.length?at:(parts.length?0:-1);}
+function askJob(){var j=job();if(j&&j.key===curKey()&&!j.doc)return j;var B=L7().brief,o=modelPlan();
+  return {key:curKey(),apps:curApps(),purpose:curPurpose(),depth:B.depth||"overview",modelId:o.chosen?o.chosen.id:null};}
+function askNoMaterial(G){return !G||!G.runs||!G.runs.length;}
+function askContext(G,sc,kind,title){if(askNoMaterial(G))return "There is no other material for this set on this device now: use only what the document itself says.";
+  return context(G,sc,{keys:askKeys(kind,title),anShare:0.4,post:true,postShare:0.08,cv:true,cvShare:0.08,voice:true,letters:kind==="cover",sources:true});}
+var ASK_RULES="Keep every fact and figure exactly as the material gives it; never invent a fact, a figure, a name, a date or a quotation; where my request needs a fact the material does not give, leave a short place for it in square brackets. Keep my voice and the first person.";
+/* what the set is, in words: from its readings, or from the apps' names when no reading is kept on this device */
+function askAbout(G){return G&&G.runs&&G.runs.length?about(G):(listNames(G&&G.apps||[])||"my work");}
+function askMsgs(mode,o,G,sc){var label=docLabel(o.kind,G.apps,G.purpose).toLowerCase(),me="MY REQUEST:\n"+o.text+"\n\n";
+  if(mode==="sec")return [{role:"system",content:sysW()},{role:"user",content:"Below is "+(o.title?"the section \""+o.title+"\" of ":"")+"my "+label+" about "+askAbout(G)+forLine(G)+". Rewrite it as I ask, and change nothing I have not asked you to change.\n\n"+me+
+    (o.title?"THE SECTION AS IT STANDS:\n":"THE TEXT AS IT STANDS:\n")+o.body+"\n\nReturn only the rewritten text: no heading, no note on what you changed, no remark before or after it. "+ASK_RULES+"\n\n"+askContext(G,sc,o.kind,o.title)}];
+  if(mode==="whole")return [{role:"system",content:sysW()},{role:"user",content:"Below is my "+label+" about "+askAbout(G)+forLine(G)+", whole. Rewrite it as I ask, and change nothing I have not asked you to change.\n\n"+me+
+    "THE DOCUMENT AS IT STANDS:\n"+o.body+"\n\nReturn the whole document, every section with its heading line (## and its title) as it stands unless I ask to change it, and nothing before or after it. "+ASK_RULES+"\n\n"+askContext(G,sc,o.kind,"")}];
+  return [{role:"system",content:sysW()},{role:"user",content:me+"Answer it directly, in plain prose and no longer than it needs, from the material below"+(o.body?" and from my "+label+" as it stands":"")+". "+ASK_RULES+(o.body?"\n\nMY "+label.toUpperCase()+" AS IT STANDS:\n"+cut(o.body,Math.floor(room()*sc*0.3)):"")+"\n\n"+askContext(G,sc,o.kind||"dossier","")}];}
+/* a new version of the document, the one before kept so it can be put back */
+function askKeep(kind,md,G){var S=L7().sets[curKey()];if(!S||!S.docs||!S.docs[kind])return Promise.reject(new Error("This document is no longer kept on this device."));
+  var prev=S.docs[kind],ref=IngBig.newId(),chk=askNoMaterial(G)?prev.chk:check(md,G);
+  return IngBig.put(ref,md).then(function(){S.older=S.older||{};S.older[kind]=[prev].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}
+    S.docs[kind]=Object.assign({},prev,{ref:ref,made:Date.now(),chk:chk,asked:(prev.asked||0)+1});saveState();return {prevRef:prev.ref,newRef:ref,chk:chk};});}
+/* put back a version kept: the one shown now takes its place among the versions kept */
+function askUse(kind,ref){var S=L7().sets[curKey()];if(!S||!S.docs||!S.docs[kind]||!S.older||!S.older[kind])return false;var i=-1;
+  S.older[kind].forEach(function(x,k){if(x&&x.ref===ref)i=k;});if(i<0)return false;var back=S.older[kind].splice(i,1)[0];S.older[kind].unshift(S.docs[kind]);S.docs[kind]=back;saveState();return true;}
+function askCopy(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){ingToast("Copied.");},function(){askCopy2(t);});return;}}catch(e){}askCopy2(t);}
+function askCopy2(t){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-9999px;top:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ingToast("Copied.");}catch(e){ingToast("It could not be copied here.");}a.remove();}
+var ASK={busy:false,entry:null};
+function askSend(text,target){text=String(text||"").trim();if(!text)return;var kind=R7.doc||"analysis",th=askThread();
+  var e={id:"q"+Date.now().toString(36),at:Date.now(),text:text,kind:kind,target:target,status:"working",reply:""};
+  if(target==="all"){askReqs().push({id:e.id,text:text,at:e.at});e.status="kept";e.reply="Kept. Lector follows it in everything it writes for "+(setName(curApps())||"this set")+" from now on"+(LX.busy&&LX.writing?", beginning with the next section it writes":"")+". It shows above this box, where you can take it away.";
+    th.push(e);askTrim();saveState();paintAsk();return;}
+  if(ASK.busy||LX.busy||R7.running){e.status="error";e.reply="Lector is at work on this set now. Send the request again when it has finished, or keep it for the writing so every piece written from now on follows it.";e.offerKeep=true;th.push(e);askTrim();saveState();paintAsk();return;}
+  var o=modelPlan();if(!o.chosen){e.status="error";e.reply="No model is ready on this device yet, so Lector cannot write. Bring one in on the Models page, then send the request again.";th.push(e);askTrim();saveState();paintAsk();return;}
+  th.push(e);askTrim();saveState();ASK.busy=true;ASK.entry=e;LX.busy=true;LX.stop=false;R7.askModel=o.chosen.id;paintAsk();
+  var j=askJob(),md=R7.cur&&R7.cur.kind===kind?R7.cur.md:null,st=kind!=="analysis"?stored(kind):null;
+  var load=st?(md!=null?Promise.resolve(md):IngBig.load(st.ref)):kind==="analysis"?analysisMd(job()).then(function(x){return x||"";}):Promise.resolve("");
+  var G0;
+  load.then(function(m){md=unmark(m||"");return gather(j).catch(function(){return {runs:[],an:[],cv:"",writing:[],letters:[],voice:true,post:null,apps:j.apps,purpose:j.purpose,sources:[]};});})
+  .then(function(G){G0=G;var d=askParts(md);
+    if(target==="answer"||!st){e.mode="answer";R7.step="Answering your request";paintProgress();
+      return ask(function(sc){return askMsgs("answer",{text:text,kind:kind==="analysis"?"dossier":kind,body:md},G,sc);},1400,0.5).then(function(x){e.reply=clean(x);e.status="done";});}
+    var whole=target==="whole",idx=-1,title=null;
+    if(!d.parts.length){var b=askBodyOnly(d);e.mode="sec";e.title=docLabel(kind,G.apps,G.purpose);
+      R7.step="Rewriting the "+e.title.toLowerCase()+" as you asked";paintProgress();
+      return ask(function(sc){return askMsgs("sec",{text:text,kind:kind,title:null,body:b.body},G,sc);},Math.min(4000,Math.ceil(b.body.length/3)+600),0.45).then(function(x){var nb=clean(x);if(!nb)throw new Error("The model gave back no text.");
+        var nmd=(b.title?b.title+"\n\n":"")+nb;e.before=askWords(b.body);e.after=askWords(nb);return askKeep(kind,nmd,G).then(function(r){e.prevRef=r.prevRef;e.newRef=r.newRef;e.status="done";
+          e.reply="Rewrote the "+e.title.toLowerCase()+" as you asked ("+e.after+" words; it had "+e.before+").";});});}
+    if(/^sec:\d+$/.test(target))idx=+target.slice(4);
+    else if(!whole){idx=askNamed(text,d.parts);if(idx<0){if(md.length<=room()*0.3)whole=true;else{idx=askInView(d.parts);e.inView=true;}}}
+    if(whole){e.mode="whole";R7.step="Rewriting the whole document as you asked";paintProgress();
+      return ask(function(sc){return askMsgs("whole",{text:text,kind:kind,body:askJoin({head:"",parts:d.parts})},G,sc);},Math.min(6000,Math.ceil(md.length/3)+800),0.45).then(function(x){
+        var nd=askParts(clean(x));if(nd.parts.length<Math.max(1,Math.ceil(d.parts.length/2)))throw new Error("The model gave back the document without most of its sections, so nothing was changed.");
+        var nmd=askJoin({head:d.head,parts:nd.parts});e.before=askWords(md);e.after=askWords(nmd);
+        return askKeep(kind,nmd,G).then(function(r){e.prevRef=r.prevRef;e.newRef=r.newRef;e.status="done";e.reply="Rewrote the whole document as you asked ("+e.after+" words; it had "+e.before+").";});});}
+    var p=d.parts[idx];if(!p)throw new Error("Lector could not tell which part of the document the request is for. Choose a section in the list beside the box and send it again.");
+    e.mode="sec";e.title=p.title;R7.step="Rewriting “"+p.title+"” as you asked";paintProgress();
+    return ask(function(sc){return askMsgs("sec",{text:text,kind:kind,title:p.title,body:p.body},G,sc);},Math.min(3000,Math.ceil(p.body.length/3)+600),0.45).then(function(x){var nb=clean(x,p.title);if(!nb)throw new Error("The model gave back no text.");
+      e.before=askWords(p.body);e.after=askWords(nb);d.parts[idx]={title:p.title,body:nb};var nmd=askJoin(d);
+      return askKeep(kind,nmd,G).then(function(r){e.prevRef=r.prevRef;e.newRef=r.newRef;e.status="done";
+        e.reply="Rewrote “"+p.title+"” as you asked ("+e.after+" words; it had "+e.before+")."+(e.inView?" Your request named no section, so Lector took the one you were reading.":"")+
+          (r.chk&&r.chk.unmatched&&r.chk.unmatched.length?" "+r.chk.unmatched.length+" figure"+(r.chk.unmatched.length>1?"s are":" is")+" marked for you to check.":"");});});})
+  .then(null,function(err){e.status=err&&err.stopped?"stopped":"error";e.reply=err&&err.stopped?"Stopped. Nothing was changed.":"It could not be done: "+String(err&&err.message||err)+" Nothing was changed.";})
+  .then(function(){ASK.busy=false;ASK.entry=null;LX.busy=false;LX.stop=false;LX.live="";R7.step="";R7.askModel=null;saveState();paintProgress();paintBrief();paintDoc();});}
+function askTrim(){var th=askThread();while(th.length>ASKS_MAX)th.shift();}
+function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis",st=kind!=="analysis"?stored(kind):null,th=askThread(),reqs=askReqs();
+  if(!box.__built){box.__built=true;box.innerHTML=
+    '<div class="l-cmp-h"><b>Ask Lector</b><span class="n"></span><button type="button" class="l-cmp-tg" aria-expanded="true">Hide the conversation</button></div>'+
+    '<div class="l-cmp-reqs" aria-label="Requests kept for the writing"></div>'+
+    '<div class="l-cmp-th" role="log" aria-live="polite" aria-label="Your requests and Lector\'s answers"></div>'+
+    '<form class="l-cmp-f"><div class="l-cmp-in"><textarea rows="1" aria-label="Your request to Lector" placeholder="Write your request to Lector…" aria-describedby="l7AskHint"></textarea></div>'+
+    '<button type="submit" class="l-btn pri l-cmp-send" aria-label="Send the request" title="Send (Enter)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4"/><path d="M5 9l5-5 5 5"/></svg></button></form>'+
+    '<div class="l-cmp-row"><label><span>For</span> <select aria-label="What the request is for"></select></label>'+
+    '<span class="l-cmp-hint" id="l7AskHint" title="Lector changes only what you ask, keeps every fact to the material, and each change can be put back.">Enter sends · Shift and Enter, a new line</span></div>';
+    var ta=box.querySelector("textarea"),f=box.querySelector("form"),sel=box.querySelector("select");
+    function grow(){if(!ta.value){ta.style.height="";return;}ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,150)+"px";}
+    ta.addEventListener("input",grow);
+    ta.addEventListener("keydown",function(ev){if(ev.key==="Enter"&&!ev.shiftKey&&!ev.isComposing){ev.preventDefault();f.requestSubmit?f.requestSubmit():f.dispatchEvent(new Event("submit",{cancelable:true}));}});
+    f.addEventListener("submit",function(ev){ev.preventDefault();var t=ta.value.trim();if(!t){ta.focus();return;}if(ASK.busy){ingToast("Lector is still answering your last request.");return;}
+      ta.value="";grow();askSend(t,sel.value);});
+    box.querySelector(".l-cmp-tg").onclick=function(){var S=L7();S.askShut=!S.askShut;saveSoon();paintAsk();};}
+  var S=L7(),shut=!!S.askShut,tg=box.querySelector(".l-cmp-tg"),thb=box.querySelector(".l-cmp-th");
+  box.querySelector(".n").textContent=th.length?"· "+th.length+" request"+(th.length>1?"s":""):"";
+  tg.hidden=!th.length;tg.textContent=shut?"Show the conversation":"Hide the conversation";tg.setAttribute("aria-expanded",shut?"false":"true");thb.hidden=shut||!th.length;
+  /* the requests kept for the writing */
+  var rb=box.querySelector(".l-cmp-reqs");rb.innerHTML="";rb.hidden=!reqs.length;
+  reqs.forEach(function(r){var c=h("span","l-cmp-req");c.title=r.text;c.appendChild(h("span",null,esc(r.text)));var x=document.createElement("button");x.type="button";x.textContent="×";x.setAttribute("aria-label","Stop following: "+r.text);
+    x.onclick=function(){var a=askReqs(),i=a.indexOf(r);if(i>=0)a.splice(i,1);saveState();paintAsk();};c.appendChild(x);rb.appendChild(c);});
+  /* what a request can be for, with the document shown */
+  var sel=box.querySelector("select"),was=sel.value,opts=[];
+  if(st){opts.push(["auto","This document: Lector finds the place"]);opts.push(["whole","The whole document"]);
+    var md=R7.cur&&R7.cur.kind===kind?R7.cur.md:"";askParts(md).parts.forEach(function(p,i){if(/^(References|The works)$/i.test(p.title))return;opts.push(["sec:"+i,"Only “"+(p.title.length>48?p.title.slice(0,46)+"…":p.title)+"”"]);});}
+  opts.push(["all","Everything Lector writes for this set"]);opts.push(["answer","Just answer me"]);
+  sel.innerHTML="";opts.forEach(function(o){var op=document.createElement("option");op.value=o[0];op.textContent=o[1];sel.appendChild(op);});
+  sel.value=opts.some(function(o){return o[0]===was;})?was:(st?"auto":"all");
+  var ta=box.querySelector("textarea");ta.placeholder=st?"Write your request to Lector…":kind==="analysis"?"A request to keep for the writing, or a question…":"A request for the writing, or a question…";
+  box.querySelector(".l-cmp-send").disabled=ASK.busy;
+  /* the conversation */
+  if(shut||!th.length){thb.innerHTML="";return;}
+  thb.innerHTML="";th.forEach(function(e){var me=h("div","l-cmp-m me");me.appendChild(document.createTextNode(e.text));
+    var forTxt=e.target==="all"?"For everything written for this set":e.target==="answer"?"To answer":e.title?"For “"+e.title+"”":e.target==="whole"?"For the whole document":"For "+(e.kind==="analysis"?"the notes and analysis":docLabel(e.kind,curApps(),curPurpose()).toLowerCase());
+    me.appendChild(h("span","for",esc(forTxt)));thb.appendChild(me);
+    var lx=h("div","l-cmp-m lx"+(e.status==="error"||e.status==="stopped"?" err":e.status==="working"?" wait":""));
+    if(e.status==="working"){lx.appendChild(document.createTextNode(R7.step?R7.step+"… The words appear in the Thinking panel as they are written.":"Working…"));
+      var a0=h("div","acts"),stp=btn("quiet","Stop",function(){LX.stop=true;try{if(window.Engine&&Engine.abort)Engine.abort();}catch(x){}try{if(typeof cloudAbort==="function")cloudAbort();}catch(x){}});a0.appendChild(stp);lx.appendChild(a0);}
+    else lx.appendChild(document.createTextNode(e.reply||""));
+    var acts=h("div","acts");
+    if(e.status==="done"&&e.mode==="answer")acts.appendChild(btn("quiet","Copy",function(){askCopy(e.reply);}));
+    if(e.status==="done"&&e.prevRef&&e.kind===kind){acts.appendChild(btn("quiet",e.undone?"Use the rewrite again":"Put back the version before",function(){
+      if(ASK.busy||LX.busy){ingToast("Lector is busy. Wait a moment.");return;}
+      if(!askUse(e.kind,e.undone?e.newRef:e.prevRef)){ingToast("That version is no longer kept: Lector keeps the last three.");return;}e.undone=!e.undone;saveState();paintDoc();}));
+      if(e.title)acts.appendChild(btn("quiet","Show it",function(){var dk=$("l7Desk"),hs=[].slice.call(dk.querySelectorAll("[data-h]")),t=hs.filter(function(x){return String(x.textContent||"").trim()===e.title;})[0];
+        if(t)dk.scrollTo({top:dk.scrollTop+t.getBoundingClientRect().top-dk.getBoundingClientRect().top-14,behavior:"smooth"});}));}
+    if(e.offerKeep&&e.status==="error")acts.appendChild(btn("quiet","Keep it for the writing",function(){e.offerKeep=false;askSend(e.text,"all");}));
+    if(acts.childNodes.length)lx.appendChild(acts);thb.appendChild(lx);});
+  thb.scrollTop=thb.scrollHeight;}
+(function(){var pd=paintDoc;paintDoc=function(){var r=pd.apply(this,arguments);try{paintAsk();}catch(e){try{console.warn("Lector: the request box could not be drawn",e);}catch(_){}}return r;};})();
+/* the document is loaded after paintDoc returns: the list of its sections follows once it is there */
+(function(){var last=null;setInterval(function(){try{if(!$("l7Ask"))return;var c=R7.cur&&(R7.cur.kind+":"+(R7.cur.md||"").length);if(c!==last){last=c;paintAsk();}}catch(e){}},700);})();
 
 /* ---------------- layout: the height of the window, the panels, the grips, the tabs ---------------- */
 function one(){var r=$("lx7");return !!(r&&r.classList.contains("l-one"));}

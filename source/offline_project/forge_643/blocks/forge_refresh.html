@@ -1,0 +1,88 @@
+<style id="forge-refresh-css">
+/* PASS 643 · Refresh, and a word while a room is painted */
+#forge-painting{position:fixed;left:50%;top:64px;z-index:2147482000;display:flex;align-items:center;gap:9px;padding:8px 14px 8px 11px;border-radius:99px;
+  transform:translate(-50%,-8px);opacity:0;pointer-events:none;font:600 13.5px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  color:#28303a;background:rgba(255,255,255,.94);border:1px solid rgba(40,48,58,.1);box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 6px 18px rgba(16,24,32,.16);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:opacity .16s ease,transform .3s cubic-bezier(.34,1.35,.64,1)}
+body[data-theme="night"] #forge-painting{color:#e9eef2;background:rgba(32,27,22,.94);border-color:rgba(255,255,255,.1)}
+/* it fades in a little after the press, so a room that opens at once never shows it */
+#forge-painting.on{opacity:1;transform:translate(-50%,0);transition-delay:110ms}
+#forge-painting .fp-ring{width:15px;height:15px;border-radius:50%;border:2.5px solid rgba(184,138,58,.2);border-top-color:#b88a3a;animation:fpSpin .9s linear infinite;will-change:transform}
+body[data-theme="night"] #forge-painting .fp-ring{border-color:rgba(217,180,90,.2);border-top-color:#d9b45a}
+@keyframes fpSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#forge-painting .fp-ring{animation-duration:3s}}
+#forge-refresh-btn.is-turning{pointer-events:none;opacity:.7}
+</style>
+<script id="forge-refresh-js">
+/* PASS 643 · REFRESH. The owner's words (20 October 2026): "I want a refresh button added to Ingenium and the Forge, that
+   refreshed the app if it glitches or freezes. I also want a loading page added to the apps that informs the user that the
+   page is still being painted instead of letting a user think that the app has crashed or is lagging and glitching."
+   Refresh (the key beside Display, F5, Ctrl+R, or Command+R on a Mac) saves first and starts the Forge again, showing the
+   loading page meanwhile (blocks_early/splash.html). While Fabrica is still making something, it asks first. A press on a
+   room that has not been opened yet shows "Painting …" while the room is painted; the note goes when the frames run
+   smoothly again. */
+(function(){"use strict";
+function busyWhat(){
+  try{if(document.querySelector("#fb .f-toast"))return "Fabrica is still making something.";}catch(e){}
+  try{if(window.__forgeBusy)return String(window.__forgeBusy);}catch(e){}
+  return "";}
+function ask(text){
+  /* the Forge's own question when it has one; the browser's plain one otherwise */
+  try{if(typeof window.forgeAsk==="function")return Promise.resolve(window.forgeAsk({title:"Refresh the Forge?",text:text,yes:"Refresh",no:"Keep waiting"}));}catch(e){}
+  return new Promise(function(res){var d=document.createElement("div");d.id="forge-refresh-ask";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","fra-t");
+    d.style.cssText="position:fixed;inset:0;z-index:2147482950;background:rgba(16,20,26,.42);display:flex;align-items:center;justify-content:center;padding:16px;font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+    var night=document.body.getAttribute("data-theme")==="night";
+    d.innerHTML='<div style="max-width:420px;width:100%;border-radius:16px;padding:20px 22px 16px;box-shadow:0 24px 60px rgba(0,0,0,.34);background:'+(night?'#201b16;color:#e9eef2':'#fffefb;color:#28303a')+'">'
+      +'<h2 id="fra-t" style="margin:0 0 8px;font:700 18px/1.3 Georgia,serif">Refresh the Forge?</h2><p style="margin:0 0 14px"></p>'
+      +'<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn btn-ghost btn-sm" data-a="0">Keep waiting</button><button type="button" class="btn btn-soft btn-sm" data-a="1">Refresh</button></div></div>';
+    d.querySelector("p").textContent=text;
+    function end(v){try{d.remove();}catch(e){}document.removeEventListener("keydown",esc,true);res(v);}
+    function esc(e){if(e.key==="Escape"){e.preventDefault();end(false);}}
+    d.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-a]");if(t)end(t.getAttribute("data-a")==="1");else if(e.target===d)end(false);});
+    document.addEventListener("keydown",esc,true);document.body.appendChild(d);try{d.querySelector('[data-a="0"]').focus();}catch(e){}});}
+var going=false;
+function refresh(){if(going)return Promise.resolve(false);var busy=busyWhat();
+  return (busy?ask(busy+" Refreshing stops it, and the part not yet finished may be lost. Everything already saved stays."):Promise.resolve(true)).then(function(ok){
+    if(!ok)return false;going=true;var k=document.getElementById("forge-refresh-btn");if(k)k.classList.add("is-turning");
+    try{if(typeof saveState==="function")saveState();}catch(e){}
+    try{sessionStorage.setItem("forge_refresh_at",String(Date.now()));}catch(e){}
+    /* a Refresh asked for from the open Forge is not a failed start: the boot guard (9s31) is told so, or a few quick
+       Refreshes in a row would look to it like starts that crashed, and it would set the owner's work aside */
+    try{localStorage.setItem("forge:bootalive","0");localStorage.setItem("forge:crashn","0");}catch(e){}
+    try{if(window.__forgeBoot){window.__forgeBoot.look(document.body.getAttribute("data-theme")==="night");window.__forgeBoot.again();}}catch(e){}
+    setTimeout(function(){try{location.reload();}catch(e){location.href=location.href;}},380);return true;});}
+window.forgeRefresh=refresh;
+window.ingRefresh=window.ingRefresh||refresh;  /* the desktop app's menu asks for this name, in both apps */
+window.addEventListener("keydown",function(e){var k=e.key;
+  if(!((k==="F5"&&!e.altKey)||((e.ctrlKey||e.metaKey)&&!e.altKey&&(k==="r"||k==="R"))))return;
+  e.preventDefault();e.stopPropagation();refresh();},true);
+/* the key, beside Display in the cluster of keys at the top */
+function place(){if(document.getElementById("forge-refresh-btn"))return true;var d=document.getElementById("display-btn");if(!d||!d.parentNode)return false;
+  var k=document.createElement("button");k.id="forge-refresh-btn";k.className="cl-icon";k.type="button";k.textContent="Refresh";
+  k.title="Refresh: start the Forge again if it glitches or stops answering. Your work is saved first. (F5 or Ctrl+R; Command+R on a Mac)";
+  k.setAttribute("aria-label","Refresh the Forge");k.addEventListener("click",function(){refresh();});d.parentNode.insertBefore(k,d);return true;}
+if(!place()){var n=0,iv=setInterval(function(){if(place()||++n>120)clearInterval(iv);},250);}
+
+/* ---------- "Painting …" while a room is painted ---------- */
+var chip=null,opened={},shownAt=0,watch=0;
+var raf=window.requestAnimationFrame?window.requestAnimationFrame.bind(window):function(f){return setTimeout(function(){f(Date.now());},16);};
+function chipEl(){if(chip)return chip;chip=document.createElement("div");chip.id="forge-painting";chip.setAttribute("role","status");chip.setAttribute("aria-live","polite");
+  chip.innerHTML='<span class="fp-ring" aria-hidden="true"></span><span class="fp-t"></span>';document.body.appendChild(chip);return chip;}
+function chipOn(t){var c=chipEl();c.querySelector(".fp-t").textContent=t;if(!c.classList.contains("on"))shownAt=Date.now();c.classList.add("on");}
+function chipOff(){if(!chip)return;var up=Date.now()-shownAt,wait=up<160?0:Math.max(0,520-up);setTimeout(function(){if(chip)chip.classList.remove("on");},wait);}
+function settle(){var my=++watch,lastT=0,smooth=0,t0=Date.now();
+  (function f(){raf(function(){if(my!==watch)return;var now=Date.now();if(lastT&&now-lastT<50)smooth++;else smooth=0;lastT=now;
+    if(smooth>=3||now-t0>8000){chipOff();return;}f();});})();}
+function roomNow(){return document.body.getAttribute("data-froom")||"";}
+document.addEventListener("pointerdown",function(e){var b=e.target&&e.target.closest?e.target.closest(".nav-inner [data-room]"):null;
+  if(!b||e.button>0)return;var r=b.getAttribute("data-room");if(!r||r===roomNow()||opened[r])return;
+  /* the room's name as the rail writes it, without the picture in front */
+  var name=String(b.getAttribute("aria-label")||b.textContent||r).replace(/\s+/g," ").trim().replace(/^[^\p{L}\p{N}]+/u,"")||r;
+  chipOn("Painting "+name+"…");
+  var up=function(){document.removeEventListener("pointerup",up,true);setTimeout(function(){if(roomNow()!==r)chipOff();},500);};
+  document.addEventListener("pointerup",up,true);},true);
+document.addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest(".nav-inner [data-room]"):null;if(!b)return;
+  opened[b.getAttribute("data-room")]=true;if(chip&&chip.classList.contains("on"))settle();});
+try{opened[roomNow()]=true;}catch(e){}
+})();
+</script>

@@ -147,7 +147,7 @@ function write(pages,imgs,title,meta){
     obj(CAT,"<< /Type /Catalog /Pages "+PAGES+" 0 R >>");
     obj(PAGES,"<< /Type /Pages /Kids ["+PG.map(function(p){return p.page+" 0 R";}).join(" ")+"] /Count "+PG.length+" >>");
     var d=new Date(),ds="D:"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+("0"+d.getHours()).slice(-2)+("0"+d.getMinutes()).slice(-2)+("0"+d.getSeconds()).slice(-2);
-    obj(INFO,"<< /Title "+utf16(title||"")+" /Author "+utf16((meta&&meta.author)||"")+" /Producer (Ingenium Lector) /CreationDate ("+ds+") >>");
+    obj(INFO,"<< /Title "+utf16(title||"")+" /Author "+utf16((meta&&meta.author)||"")+" /CreationDate ("+ds+") >>");
     ["Times-Roman","Times-Bold","Times-Italic","Times-BoldItalic","Courier"].forEach(function(f,i){obj(F0+i,"<< /Type /Font /Subtype /Type1 /BaseFont /"+f+" /Encoding /WinAnsiEncoding >>");});
     IM.forEach(function(x){if(!x)return;var fl=x.im.flate?" /Filter /FlateDecode":"";
       obj(x.a,"<< /Type /XObject /Subtype /Image /Width "+x.im.w+" /Height "+x.im.h+" /ColorSpace /DeviceGray /BitsPerComponent 8"+fl+" /Length "+x.im.a.length+" >>",x.im.a);
