@@ -1,0 +1,171 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# Builds the shells Fabrica fills (Ingenium 6.0) where they can only be built:
+# the iPhone and iPad shell needs Xcode, so it is compiled here on GitHub's Macs,
+# unsigned, checked in Apple's iPhone simulator, and kept in this branch at
+#   source/shells/out/ios-shell.zip       (Shell.app for iPhone and iPad)
+#   source/shells/out/ios-shell-sim.zip   (the same for the simulator, for the checks)
+#   source/shells/out/ios-shell.json      (what was built, with its fingerprints)
+# build_page.py rides ios-shell.zip into the page; on the device Fabrica writes an
+# app's page, name, id, version and icons into a copy of it and saves the IPA.
+#
+# It runs only when the shells' own sources change (never for a new page), so it
+# never starts the app builds, and it never publishes anything: its one result is
+# the commit back to this branch.
+name: Build the shells Fabrica fills
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/shells/**'
+      - '!source/shells/out/**'
+      - '.github/workflows/build-shells.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shells-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    name: iPhone and iPad shell (build, simulator check, keep)
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Tools on this Mac
+        run: |
+          xcodebuild -version
+          brew install xcodegen
+
+      - name: Make the Xcode project
+        working-directory: source/shells/ios
+        run: xcodegen generate
+
+      - name: Build for iPhone and iPad, and for the simulator (unsigned)
+        working-directory: source/shells/ios
+        run: |
+          set -o pipefail
+          for SDK in iphoneos iphonesimulator; do
+            xcodebuild -project IngeniumShell.xcodeproj -target Shell -configuration Release -sdk "$SDK" \
+              SYMROOT="$RUNNER_TEMP/build-$SDK" \
+              CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+              build >> "$RUNNER_TEMP/build-log.txt" 2>&1
+            echo "built for $SDK"
+          done
+          APP="$RUNNER_TEMP/build-iphoneos/Release-iphoneos/Shell.app"
+          ls -la "$APP"
+          file "$APP/Shell"
+          plutil -lint "$APP/Info.plist"
+          head -c 200 "$APP/Info.plist"; echo
+          ls "$APP/www" "$APP"/AppIcon* || true
+
+      - name: If the build failed, show why
+        if: failure()
+        run: |
+          grep -n "error:" "$RUNNER_TEMP/build-log.txt" | head -n 40 || echo "(no lines with error:)"
+          tail -n 80 "$RUNNER_TEMP/build-log.txt" || echo "(no build log was written)"
+
+      - name: Open the shell in the iPhone simulator and check its page
+        timeout-minutes: 30
+        run: |
+          set +e
+          within() {   # runs a command for at most $1 seconds (macOS has no timeout command)
+            local n=$1; shift
+            set -m
+            "$@" & local p=$!
+            set +m
+            ( sleep "$n"; kill -TERM -- "-$p" 2>/dev/null || kill "$p" 2>/dev/null ) > /dev/null 2>&1 < /dev/null & local w=$!
+            wait "$p"; local rc=$?
+            kill "$w" > /dev/null 2>&1; wait "$w" 2> /dev/null
+            return $rc
+          }
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)['devices']
+          rts=sorted([k for k in d if 'iOS' in k], key=lambda k:[int(x) for x in k.split('iOS-')[-1].split('-') if x.isdigit()])
+          for rt in reversed(rts):
+              for dev in d[rt]:
+                  if dev['name'].startswith('iPhone'): print(dev['udid']); sys.exit(0)
+          ")
+          if [ -z "$UDID" ]; then echo "::warning::No iPhone simulator on this runner; the check was skipped."; exit 0; fi
+          APP="$RUNNER_TEMP/build-iphonesimulator/Release-iphonesimulator/Shell.app"
+          BID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          xcrun simctl boot "$UDID" > /dev/null 2>&1
+          within 600 xcrun simctl bootstatus "$UDID" -b > /dev/null || { echo "::warning::The simulator did not start in 10 minutes; the check was skipped."; exit 0; }
+          within 300 xcrun simctl install "$UDID" "$APP" || { echo "::error::The shell did not install in the simulator."; exit 1; }
+          LOG="$RUNNER_TEMP/pagetest.log"
+          xcrun simctl launch --console-pty "$UDID" "$BID" -shell_pagetest > "$LOG" 2>&1 &
+          LP=$!
+          for i in $(seq 1 120); do
+            if grep -q "SHELL_PAGETEST PAGE" "$LOG" 2> /dev/null; then break; fi
+            sleep 3
+          done
+          kill "$LP" > /dev/null 2>&1
+          grep -v '^[[:space:]]*$' "$LOG" | tail -n 30
+          mkdir -p "$RUNNER_TEMP/shots"
+          within 120 xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/shell-page.png" > /dev/null 2>&1
+          LINE=$(grep "SHELL_PAGETEST PAGE" "$LOG" | tail -n 1)
+          within 120 xcrun simctl shutdown "$UDID" > /dev/null 2>&1
+          if [ -z "$LINE" ]; then echo "::error::The shell started but its page did not report."; exit 1; fi
+          echo "${LINE#*SHELL_PAGETEST PAGE }" > "$RUNNER_TEMP/pagetest.json"
+          python3 -c "
+          import json,sys
+          r=json.load(open('$RUNNER_TEMP/pagetest.json'))
+          bad=[w for w,ok in (('no title',r.get('title')),('no storage',r.get('storage')),('no file saver',r.get('bridge'))) if not ok]
+          print('page:',r)
+          sys.exit(1 if bad else 0)
+          " || { echo "::error::the shell's page check found a problem"; exit 1; }
+          echo "### iPhone simulator: the shell's page opened" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$(cat "$RUNNER_TEMP/pagetest.json")\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the built shells in this branch
+        run: |
+          set -e
+          OUT="$GITHUB_WORKSPACE/source/shells/out"
+          mkdir -p "$OUT"
+          rm -f "$OUT/ios-shell.zip" "$OUT/ios-shell-sim.zip"
+          (cd "$RUNNER_TEMP/build-iphoneos/Release-iphoneos" && zip -qry -9 -X "$OUT/ios-shell.zip" Shell.app)
+          (cd "$RUNNER_TEMP/build-iphonesimulator/Release-iphonesimulator" && zip -qry -9 -X "$OUT/ios-shell-sim.zip" Shell.app)
+          python3 - "$OUT" <<'PY'
+          import hashlib, json, os, subprocess, sys
+          out = sys.argv[1]
+          def info(n):
+              p = os.path.join(out, n); b = open(p, 'rb').read()
+              return {"file": n, "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()}
+          xc = subprocess.run(["xcodebuild", "-version"], capture_output=True, text=True).stdout.split("\n")
+          rec = {"made": subprocess.run(["date", "-u", "+%Y-%m-%dT%H:%MZ"], capture_output=True, text=True).stdout.strip(),
+                 "from": os.environ.get("GITHUB_SHA", "")[:7], "xcode": " ".join(x for x in xc if x).strip(),
+                 "device": info("ios-shell.zip"), "simulator": info("ios-shell-sim.zip"),
+                 "executable": "Shell", "bundle": "Shell.app", "min_ios": "15.0"}
+          json.dump(rec, open(os.path.join(out, "ios-shell.json"), "w"), indent=1)
+          print(json.dumps(rec, indent=1))
+          PY
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/shells/out/ios-shell.zip source/shells/out/ios-shell-sim.zip source/shells/out/ios-shell.json
+          if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
+          git commit -m "The iPhone and iPad shell, built by GitHub (Xcode, unsigned), for Fabrica"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep $((i * 10))
+          done
+          echo "::error::the built shell could not be kept in the branch"; exit 1
+
+      - name: Keep the picture and the log with this run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shell-check
+          path: |
+            ${{ runner.temp }}/shots/*.png
+            ${{ runner.temp }}/build-log.txt
+          if-no-files-found: ignore

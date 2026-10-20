@@ -1,0 +1,12 @@
+-nowarn
+-source
+8
+-target
+8
+-bootclasspath
+/tmp/claude-0/-home-user/02db3569-4f80-5425-acc7-7b83b521aecb/scratchpad/tools/android-all.jar
+-encoding
+UTF-8
+-d
+/tmp/claude-0/-home-user/02db3569-4f80-5425-acc7-7b83b521aecb/scratchpad/shellbuild/classes
+src/studio/ingenium/shell/ShellActivity.java
