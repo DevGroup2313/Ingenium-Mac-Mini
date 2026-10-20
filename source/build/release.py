@@ -49,7 +49,8 @@ def wanted(path, kits, source, shared, generated):
         return False
     # the page's own sources and tests (source/) and the read-only lineup workflow's inputs stay out of every kit
     # and the images of The Offline Project (brand/), kept in the repositories for her, not installed with the app
-    if path.startswith("source/") or path.startswith("brand/") or path.startswith(".github/lineup/") or path == ".github/workflows/lineup-sources.yml":
+    # and the workflow that builds the shells Fabrica fills (6.0), which builds from source/ only
+    if path.startswith("source/") or path.startswith("brand/") or path.startswith(".github/lineup/") or path in (".github/workflows/lineup-sources.yml", ".github/workflows/build-shells.yml"):
         return False
     for kit in kits:
         if kit["source"] != source:
