@@ -1,0 +1,57 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# The iPhone and iPad shell that Fabrica fills (Ingenium 6.0), for XcodeGen.
+# The cloud build (.github/workflows/build-shells.yml) runs `xcodegen generate`,
+# builds it unsigned for iPhone and iPad and for the simulator, checks it in the
+# simulator, and keeps the built app in source/shells/out/ for build_page.py.
+# Two choices make it fillable on the device:
+#  - no asset catalog: the icons are loose files named in Info.plist
+#    (CFBundleIconFiles), so Fabrica can draw each app's own icons in their place;
+#  - Info.plist stays XML (INFOPLIST_OUTPUT_FORMAT), so Fabrica can write the app's
+#    name, id and version into it as text.
+name: IngeniumShell
+options:
+  bundleIdPrefix: com.yannieforest
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    ENABLE_BITCODE: NO
+targets:
+  Shell:
+    type: application
+    platform: iOS
+    sources:
+      - path: Shell
+        excludes:
+          - "www"
+          - "www/**"
+          - "Icons"
+          - "Icons/**"
+      - path: Shell/www
+        type: folder
+        buildPhase: resources
+      - path: Shell/Icons
+        buildPhase: resources
+    dependencies:
+      - sdk: WebKit.framework
+      - sdk: UniformTypeIdentifiers.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yannieforest.ingeniumshell
+        PRODUCT_NAME: Shell
+        INFOPLIST_FILE: Shell/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_OUTPUT_FORMAT: xml
+        TARGETED_DEVICE_FAMILY: "1,2"
+        COMPRESS_PNG_FILES: NO
+        STRIP_PNG_TEXT: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        DEAD_CODE_STRIPPING: YES
+        SWIFT_OPTIMIZATION_LEVEL: "-O"
+        CODE_SIGN_STYLE: Manual
