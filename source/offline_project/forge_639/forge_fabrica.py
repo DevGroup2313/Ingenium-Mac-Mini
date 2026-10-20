@@ -81,7 +81,8 @@ body[data-theme="night"] #fb{--f-bg:#0d141a;--f-card:#141d25;--f-hi:#17212a;--f-
 # the one before it to finish.
 FORGE_SAVE = r'''var saveQ=Promise.resolve();
 function saveBytes(name,mime,data){var job=saveQ.then(function(){return saveOne(name,mime,data);});saveQ=job.catch(function(){});return job;}
-function saveOne(name,mime,data){try{var api=window.pywebview&&window.pywebview.api;if(api&&api.save_file){var u8=data instanceof Uint8Array?data:new Uint8Array(data),bin="",CH=0x8000;
+function saveOne(name,mime,data){try{if(typeof window.cdSaveBytesQueued==="function"){var q=window.cdSaveBytesQueued(name,mime,data instanceof Uint8Array?data:new Uint8Array(data));if(q)return q;}}catch(e){}
+  try{var api=window.pywebview&&window.pywebview.api;if(api&&api.save_file){var u8=data instanceof Uint8Array?data:new Uint8Array(data),bin="",CH=0x8000;
     for(var i=0;i<u8.length;i+=CH)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));
     return Promise.resolve(api.save_file(String(name),String(mime||"application/octet-stream"),btoa(bin))).then(function(ok){if(!ok)return saveAnchor(name,mime,data);},function(){return saveAnchor(name,mime,data);});}}catch(e){}
   try{if(typeof window.cdSaveBytesToHost==="function"&&window.cdSaveBytesToHost(name,mime,data))return new Promise(function(res){setTimeout(res,600);});}catch(e){}
@@ -146,6 +147,10 @@ var lastTop=null;setInterval(function(){var r=$("fb");if(!r||!roomOn())return;va
 try{new MutationObserver(function(){if($("fb")&&roomOn())paint();}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 try{if(roomOn())window.__forgeFabricaMount();}catch(e){}
 window.fbRender=render;window.fbSync=syncFromCode;
+/* what R140 (GitHub's own views: code at any version, issues, pull requests, compare, actions, projects, wiki, insights, settings) works with */
+window.fbHubHost={S:S,C:C,cur:cur,FBS:FBS,saveSoon:saveSoon,h:h,esc:esc,btn:btn,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,busy:busy,unbusy:unbusy,
+  refresh:refresh,paint:paint,paintWork:paintWork,thumbs:thumbs,diffList:diffList,openEditor:openEditor,saveBytes:saveBytes,mimeOf:mimeOf,notesOf:notesOf,statusOf:statusOf,setPanel:setPanel,one:one,
+  pkgOf:pkgOf,appOf:appOf,sealEl:sealEl,draftMessage:draftMessage};
 /* R114's Troubleshoot: the last test's report, shown beside the app's files in the file editor */
 window.fbOpenInCode=function(r,path){openInCode(r,path);};
 window.fbEditWithReport=function(r,report){openInCode(r,null,report);};

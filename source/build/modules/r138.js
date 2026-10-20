@@ -102,6 +102,7 @@ function paintBox(){var ep=$("editorPane"),box=$("bdBox");if(!box){box=E("div");
   function key(label,fn,cls,title){var b=E("button","btn small"+(cls?" "+cls:""),label);b.type="button";if(title)b.title=title;b.onclick=fn;tl.appendChild(b);return b;}
   key("Run the whole app",function(){runNow();},"primary","The whole page, in the preview on the right");
   key("Save the page",function(){saveFileNative(BD.name.replace(/[^\w.() -]+/g,"_")||"page.html","text/html",whole());},"","Save it as one .html file");
+  if(window.IngDownload)key("📦 Download as an app",function(){IngDownload.open({getHtml:function(){return Promise.resolve(whole());},name:BD.name,title:BD.title&&BD.title!==BD.name?BD.title:null});},"","This app for each of your devices: Mac, Mac mini, Windows, iPhone and iPad, Fire, web; one at a time or all");
   if(BD.repo&&typeof window.fbFromBuild==="function")key("Keep in Fabrica",toFabrica,"","Your changes go to "+(BD.title||"the app")+" in Fabrica, as changes to keep");
   key("Close it",function(){if(BD.parts.some(function(p){return p.changed;})&&!window.confirm("Close "+(BD.title||BD.name)+"? Your changes stay kept here only until another page is opened."))return;close();},"ghost");
   box.appendChild(tl);
