@@ -1,0 +1,9 @@
+Android 34: 14, WebView com.google.android.webview, 113.0.5672.136
+Performing Streamed Install
+Success
+PASS version 1 opens: {"title":"Shell Test run 1","text":47,"errors":0,"storage":true,"bridge":true}
+Performing Streamed Install
+Success
+PASS version 2 installs over it and keeps its storage: {"title":"Shell Test run 2","text":48,"errors":0,"storage":true,"bridge":true}
+Performing Streamed Install
+Success
