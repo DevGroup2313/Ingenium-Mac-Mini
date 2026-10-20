@@ -133,8 +133,10 @@ function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;
     })(m,idx);}
   parts.push(html.slice(last));
   return Promise.all(jobs).then(function(){return {html:parts.join(""),inlined:n,missing:missing,tooBig:big};});}
+/* 6.0: opt.quiet makes the page for another package (an APK, an IPA) without noting a one page made */
 function onePage(id,opt){opt=opt||{};return snapshot(id,opt.ref).then(function(snap){return recipe(id,snap).then(function(rec){var page=mainPage(snap,rec);if(!page)throw new Error("there is no page in this version");
-  return readText(id,snap.commit,page).then(function(html){return onePageFrom(id,snap,page,html);}).then(function(r){r.page=page;r.commit=snap.commit;r.bytes=te.encode(r.html);
+  return readText(id,snap.commit,page).then(function(html){return onePageFrom(id,snap,page,html);}).then(function(r){r.page=page;r.commit=snap.commit;r.bytes=te.encode(r.html);r.recipe=rec;
+    if(opt.quiet)return r;
     return IngRepo.setNote(id,snap.commit,"onePage",{at:Date.now(),size:r.bytes.length,inlined:r.inlined,missing:r.missing.length}).then(function(){return r;});});});});}
 
 /* ---------- a web app to install: its files, its manifest, and an offline copy of itself ---------- */
