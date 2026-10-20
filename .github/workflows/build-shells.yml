@@ -10,6 +10,13 @@
 # build_page.py rides ios-shell.zip into the page; on the device Fabrica writes an
 # app's page, name, id, version and icons into a copy of it and saves the IPA.
 #
+# It also checks what Fabrica makes, with the page's own code (modules/r136.js, run in
+# Node): IPAs filled from the simulator's copy, opened in Apple's iPhone simulator, and
+# APKs opened in Android's emulator at Android 9, 11 and 14 (the Fire tablet's Fire OS 7
+# and 8 are built on Android 9 and 11), including an update installed over the app
+# that keeps its storage. What they report, with a picture, is kept in
+# source/shells/out/checks.
+#
 # It runs only when the shells' own sources change (never for a new page), so it
 # never starts the app builds, and it never publishes anything: its one result is
 # the commit back to this branch.
@@ -21,6 +28,7 @@ on:
     paths:
       - 'source/shells/**'
       - '!source/shells/out/**'
+      - 'source/build/modules/r136.js'
       - '.github/workflows/build-shells.yml'
   workflow_dispatch: {}
 
@@ -126,6 +134,25 @@ jobs:
           echo "### iPhone simulator: the shell's page opened" >> "$GITHUB_STEP_SUMMARY"
           echo "\`$(cat "$RUNNER_TEMP/pagetest.json")\`" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Fill the shell as Fabrica does, and open it in the simulator
+        timeout-minutes: 30
+        run: |
+          (cd "$RUNNER_TEMP/build-iphonesimulator/Release-iphonesimulator" && zip -qry -X "$RUNNER_TEMP/sim-shell.zip" Shell.app)
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)['devices']
+          rts=sorted([k for k in d if 'iOS' in k], key=lambda k:[int(x) for x in k.split('iOS-')[-1].split('-') if x.isdigit()])
+          for rt in reversed(rts):
+              for dev in d[rt]:
+                  if dev['name'].startswith('iPhone'): print(dev['udid']); sys.exit(0)
+          ")
+          xcrun simctl boot "$UDID" > /dev/null 2>&1; xcrun simctl bootstatus "$UDID" -b > /dev/null
+          bash source/shells/test/ci_ios.sh "$RUNNER_TEMP/sim-shell.zip" "$UDID" source/shells/out/checks
+          RC=$?
+          xcrun simctl shutdown "$UDID" > /dev/null 2>&1
+          cat source/shells/out/checks/ios.txt >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+
       - name: Keep the built shells in this branch
         run: |
           set -e
@@ -151,7 +178,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add source/shells/out/ios-shell.zip source/shells/out/ios-shell-sim.zip source/shells/out/ios-shell.json
+          git add source/shells/out/ios-shell.zip source/shells/out/ios-shell-sim.zip source/shells/out/ios-shell.json source/shells/out/checks
           if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
           git commit -m "The iPhone and iPad shell, built by GitHub (Xcode, unsigned), for Fabrica"
           for i in 1 2 3 4; do
@@ -169,3 +196,53 @@ jobs:
             ${{ runner.temp }}/shots/*.png
             ${{ runner.temp }}/build-log.txt
           if-no-files-found: ignore
+
+  android:
+    name: Android shell, filled as Fabrica fills it (emulator, Android ${{ matrix.api }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api: 28
+            target: default
+          - api: 30
+            target: google_apis
+          - api: 34
+            target: google_apis
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Let the emulator use hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Make the APKs and open them in the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: bash source/shells/test/ci_android.sh ${{ matrix.api }} source/shells/out/checks
+
+      - name: Keep what the emulator showed in this branch
+        if: always()
+        run: |
+          [ -f "source/shells/out/checks/android-${{ matrix.api }}.txt" ] && cat "source/shells/out/checks/android-${{ matrix.api }}.txt" >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/shells/out/checks || true
+          if git diff --cached --quiet; then echo "nothing to keep"; exit 0; fi
+          git commit -m "What the Android ${{ matrix.api }} emulator showed of the APKs Fabrica makes"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep $((i * 7))
+          done
+          echo "::warning::the emulator's report could not be kept in the branch"
