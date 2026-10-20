@@ -878,13 +878,17 @@ function setPanel(p){R7.panel=p;var tabs=$("l7Tabs");if(tabs)[].forEach.call(tab
    the same size in the middle even though the Document panel itself is spread out to fill the screen."
    The page keeps its own measure (640 points wide, as printed) and is zoomed as a whole, so it keeps its proportions and its
    type is set again at the larger size, sharp. Fit makes it as wide as the panel, never smaller than its own size (a phone
-   or a narrow panel reads it as before, the page narrowing to fit); the keys beside Fit make it smaller or larger, in steps.
+   or a narrow panel reads it as before, the page narrowing to fit) and never more than three times it; the keys beside Fit
+   make it smaller or larger, in steps.
    The choice is kept with her other settings (state.v61.seals.zoom: "fit" or a number). */
 var ZSTEPS=[.5,.6,.7,.8,.9,1,1.1,1.25,1.5,1.75,2,2.25,2.5,3,3.5,4,5,6];
+/* Fit stops at three times the page's own size: past that (a panel more than 1,900 points wide, the others folded away) a page
+   becomes a poster, a heading to a screen; the + key still takes it further for whoever wants it */
+var FITMAX=3;
 function zoomPref(){try{var S=state.v61&&state.v61.seals;var z=S&&S.zoom;return z==null||z==="fit"?"fit":clamp(+z||1,ZSTEPS[0],ZSTEPS[ZSTEPS.length-1]);}catch(e){return "fit";}}
 function setZoomPref(z){try{var V=state.v61=state.v61||{},S=V.seals=V.seals||{};S.zoom=z;saveSoon();}catch(e){}applyZoom();}
 function fitZoom(){var desk=$("l7Desk");if(!desk||!desk.clientWidth)return 1;var cs=getComputedStyle(desk),w=desk.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
-  return clamp(Math.floor(w/640*100)/100,1,ZSTEPS[ZSTEPS.length-1]);}
+  return clamp(Math.floor(w/640*100)/100,1,FITMAX);}
 function curZoom(){var p=zoomPref();return p==="fit"?fitZoom():p;}
 function applyZoom(){var desk=$("l7Desk");if(!desk)return;var p=zoomPref(),z=curZoom(),was=parseFloat(desk.style.getPropertyValue("--l-zoom"))||1;
   if(Math.abs(was-z)>.001){var r=desk.scrollHeight>desk.clientHeight?desk.scrollTop/desk.scrollHeight:0;desk.style.setProperty("--l-zoom",String(z));if(r)desk.scrollTop=r*desk.scrollHeight;}
