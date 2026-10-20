@@ -192,6 +192,10 @@ async function pixel(p, dataUrl, vb, pts) {
   ok(other.cached && other.media.length === 1 && other.media[0] === 'word/media/seal-master.png', 'a Word file made from the same set by another road carries the crest too, once it is drawn', other);
   const cvx = await p.evaluate(() => { const u8 = IngHouseDocs.docx('CV entry', '## Projects\n\nx', { kind: 'cv', apps: ['cd', 'forge', 'ingenium'] }); const s = new TextDecoder('latin1').decode(u8); return (s.match(/word\/media\//g) || []).length; });
   ok(cvx === 0, 'a CV stays plain', cvx);
+  const onex = await p.evaluate(() => { const u8 = IngHouseDocs.docx('Carpe Diem · Project dossier', '## One\n\nx', { kind: 'dossier', apps: ['cd'] }); const s = new TextDecoder('latin1').decode(u8); return (s.match(/word\/media\/seal-[\w-]+\.png/g) || []).filter((v, i, a) => a.indexOf(v) === i); });
+  ok(onex.length === 1 && onex[0] === 'word/media/seal-cd.png', 'a document about one app keeps that app\'s own seal, as before', onex);
+  const forx = await p.evaluate(() => { const u8 = IngHouseDocs.docx('Carpe Diem and Tide Clock · Project dossier', '## One\n\nx', { kind: 'dossier', apps: ['cd', 'tideclock'] }); const s = new TextDecoder('latin1').decode(u8); return (s.match(/word\/media\/seal-[\w-]+\.png/g) || []).filter((v, i, a) => a.indexOf(v) === i); });
+  ok(forx.join() === 'word/media/seal-cd.png', 'a set naming an app outside the four is left as the house style made it (no crest)', forx);
 
   // ---------------- the document on a large display ----------------
   async function measure() { return p.evaluate(() => { const d = document.getElementById('l7Desk'), pp = d.querySelector('.l-paper'), cs = getComputedStyle(d); const inner = d.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
@@ -214,7 +218,11 @@ async function pixel(p, dataUrl, vb, pts) {
   await p.evaluate(() => document.querySelector('#l7Zoom [data-z="fit"]').click()); await p.waitForTimeout(300);
   await p.evaluate(() => { document.querySelector('#l7Brief .l-fold').click(); }); await p.waitForTimeout(300); await p.evaluate(() => { document.querySelector('#l7Read .l-fold').click(); }); await p.waitForTimeout(700);
   const w4 = await measure();
-  ok(w4.fit === 'true' && w4.zoom > w1.zoom && Math.abs(w4.paper - w4.desk) <= Math.max(12, w4.desk * 0.02), 'with the other panels folded away, Fit fills the wider panel', w4);
+  ok(w4.fit === 'true' && w4.zoom > w1.zoom && (Math.abs(w4.paper - w4.desk) <= Math.max(12, w4.desk * 0.02) || (w4.zoom === 3 && Math.abs(w4.paper - 1920) <= 4)), 'with the other panels folded away, Fit grows the page with the panel (up to three times its size, so it never turns into a poster)', w4);
+  await p.evaluate(() => document.querySelector('#l7Zoom [data-z="+"]').click()); await p.waitForTimeout(300);
+  const w4b = await measure();
+  ok(w4b.fit === 'false' && w4b.zoom === 3.5 && w4b.paper > w4.paper, 'and the + key still takes it larger for whoever wants it', [w4.pc, w4b.pc]);
+  await p.evaluate(() => document.querySelector('#l7Zoom [data-z="fit"]').click()); await p.waitForTimeout(300);
   await p.screenshot({ path: path.join(OUT, 's61-wide-3440-folded.png') });
   await theme(p, 'night'); await p.screenshot({ path: path.join(OUT, 's61-wide-3440-night.png') }); await theme(p, 'day');
   await p.evaluate(() => { document.querySelector('#l7Brief .l-fold').click(); }); await p.waitForTimeout(200); await p.evaluate(() => { document.querySelector('#l7Read .l-fold').click(); }); await p.waitForTimeout(300);
@@ -232,6 +240,9 @@ async function pixel(p, dataUrl, vb, pts) {
   const w6 = await measure();
   ok(w6.zoom >= 1 && w6.zoom < 1.3 && w6.paper <= w6.desk + 2 && w6.over <= 1, 'at 1440 by 900 the page fits its panel at its own size or a little larger', w6);
   await p.screenshot({ path: path.join(OUT, 's61-1440-fit.png') });
+  const lay = await p.evaluate(() => ({ pageScroll: document.scrollingElement.scrollHeight - innerHeight, shown: ['l7Brief', 'l7Read', 'l7Doc'].filter(id => getComputedStyle(document.getElementById(id)).display !== 'none').length, one: document.getElementById('lx7').classList.contains('l-one'),
+    keysOnRow: (() => { const z = document.getElementById('l7Zoom').getBoundingClientRect(), d = document.getElementById('l7Doc').getBoundingClientRect(); return z.right <= d.right + 1 && z.left >= d.left - 1; })() }));
+  ok(lay.pageScroll <= 1 && lay.shown === 3 && !lay.one && lay.keysOnRow, 'at 1440 by 900 the three panels stand side by side, the page itself does not scroll, and the size keys sit inside the document panel', lay);
   const sharp = await p.evaluate(() => { const pp = document.querySelector('#l7Desk .l-paper'); return getComputedStyle(pp).transform; });
   ok(sharp === 'none', 'the page is zoomed (laid out again), not scaled as a picture', sharp);
   const mineErrs = p.__errs.filter(e => mine(e, R));
