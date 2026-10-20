@@ -156,6 +156,13 @@ body.l7-resizing.row,body.l7-resizing.row *{cursor:row-resize !important}
 #lx7 .l-setname{margin-top:10px;font-size:13px;color:var(--l-ink2);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 #lx7 .l-setname b{font:600 14px/1.3 var(--l-serif);color:var(--l-ink1)}
 #lx7 .l-setname img{width:28px;height:auto}
+/* 6.1 · the set's crest beside its name (IngSeal, r140), live; its layers fill it */
+#lx7 .l-setname.has-crest{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;row-gap:1px;align-items:center}
+#lx7 .l-setname.has-crest > .ing-crest{grid-row:1 / span 3;margin:4px 0}
+#lx7 .l-setname.has-crest > :not(.ing-crest){grid-column:2;justify-self:start}
+#lx7 .l-setname.has-crest > span{font-size:12.5px;color:var(--l-ink3)}
+#lx7 .l-setname.has-crest > .l-btn{margin-left:-6px}
+#lx7 .l-setname .ing-crest img.ic-l{width:100%;height:100%}
 #lx7 .l-libnote{font-size:12.5px;color:var(--l-ink2);margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--l-wellbg);box-shadow:var(--l-well)}
 #lx7 .l-libnote.warn{color:#9a4b14}
 #lx7 .l-purp{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:4px}
@@ -178,6 +185,12 @@ body.l7-resizing.row,body.l7-resizing.row *{cursor:row-resize !important}
 #lx7 .l-mark{display:inline-flex;align-items:center;gap:2px;flex:0 0 auto}
 #lx7 .l-mark img{width:18px;height:18px;object-fit:contain}
 #lx7 .l-mark img.ms{width:16px;height:22px}
+/* 6.1 · the set's one picture in the Documents list, by day or by night as the page is */
+#lx7 .l-mark img.ing-crest-img{width:auto;height:24px;object-fit:contain;filter:drop-shadow(0 1px 1.5px rgba(40,22,68,.22))}
+#lx7 .l-mark img.ing-crest-img.ic-master{height:27px}
+#lx7 .l-mark img.ing-crest-img.ic-duo{height:19px}
+#lx7 .l-mark img.ing-crest-img.ic-one{width:21px;height:21px}
+body[data-theme="night"] #lx7 .l-mark img.ing-crest-img{filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.5))}
 #lx7 .l-mark.none{font-size:11px;font-weight:600;color:var(--l-ink3);border:1px dashed var(--l-hair);border-radius:999px;padding:1px 8px}
 #lx7 .l-facts{display:flex;flex-direction:column;gap:9px}
 #lx7 .l-fact{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;font-weight:500}
@@ -254,6 +267,23 @@ body.l7-resizing.row,body.l7-resizing.row *{cursor:row-resize !important}
 #lx7 .l-dtabs .dot{width:7px;height:7px;border-radius:50%;background:var(--l-lo);border:1px solid var(--l-hair)}
 #lx7 .l-dtabs .dot.live{background:var(--l-acc);border-color:var(--l-acc)}
 #lx7 .l-dtabs .dot.done{background:#3aa46c;border-color:#3aa46c}
+/* 6.1 · the documents' tabs and, at the right, the document's size: smaller, Fit, larger (raised keys in a well) */
+/* in a narrow panel the size keys go below the tabs, at the right, so the tabs keep the row */
+#lx7 .l-drow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 12px 0;flex:0 0 auto;min-width:0}
+#lx7 .l-drow .l-dtabs{margin:0;flex:0 1 auto;min-width:0;max-width:none}
+#lx7 .l-zoom{display:inline-flex;align-items:center;gap:3px;margin-left:auto;padding:3px;border:1px solid var(--l-hair);border-radius:999px;background:var(--l-wellbg);box-shadow:var(--l-well);flex:0 0 auto}
+#lx7 .l-zoom button{min-width:28px;height:26px;padding:0 9px;border-radius:999px;border:1px solid var(--l-hair);background:linear-gradient(var(--l-a),var(--l-b));font-size:13px;font-weight:700;line-height:1;color:var(--l-ink2);cursor:pointer;box-shadow:var(--l-pop);
+  transition:transform .16s var(--l-spring),box-shadow .16s ease,background-color .15s,color .15s}
+#lx7 .l-zoom button[data-z="fit"]{font-size:12px;padding:0 11px}
+#lx7 .l-zoom button:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--l-pophi);color:var(--l-ink1)}
+#lx7 .l-zoom button:active:not(:disabled){transform:translateY(1px) scale(.97);box-shadow:var(--l-press);transition-duration:.06s}
+#lx7 .l-zoom button[aria-pressed="true"]{background:linear-gradient(var(--l-pa),var(--l-pb));border-color:var(--l-pedge);color:#fff;box-shadow:var(--l-psh);text-shadow:0 1px 1px rgba(30,10,60,.35)}
+#lx7 .l-zoom button[aria-pressed="true"]:hover:not(:disabled){box-shadow:var(--l-pshhi);color:#fff}
+#lx7 .l-zoom button:disabled{opacity:.45;cursor:default;box-shadow:none}
+#lx7 .l-zoom .pc{min-width:40px;text-align:center;font-size:11.5px;font-weight:600;color:var(--l-ink3);font-variant-numeric:tabular-nums;padding:0 3px 0 2px}
+/* the page zoomed as a whole: its type is set again at the larger size, so it stays sharp */
+#lx7 .l-desk .l-paper,#lx7 .l-desk .l-rule{zoom:var(--l-zoom,1)}
+#lx7.l-phone .l-zoom .pc{display:none}
 #lx7 .l-outline{display:flex;gap:6px;padding:10px 12px 12px;overflow-x:auto;flex:0 0 auto;border-bottom:1px solid var(--l-hair2)}
 #lx7 .l-outline:empty{display:none}
 #lx7 .l-outline button{border:1px solid var(--l-hair);background:linear-gradient(var(--l-a),var(--l-b));border-radius:999px;padding:4px 11px;font-size:12px;font-weight:600;color:var(--l-ink2);cursor:pointer;white-space:nowrap;display:flex;gap:5px;align-items:center;box-shadow:var(--l-pill);transition:transform .16s var(--l-spring)}
@@ -326,6 +356,8 @@ body[data-motion="minimal"] #lx7 .l-pn:hover{transform:none}
 #lx7.l-phone .l-paper{padding:22px 16px 26px;font-size:14px}
 #lx7.l-phone .l-desk{padding:12px 8px 20px}
 #lx7.l-phone .l-paper .cv .seals img,#lx7.l-phone .l-paper .cv .seals .sn{width:62px;height:62px}
+#lx7.l-phone .l-paper .cv .seals img.crest{width:92px;height:auto}
+#lx7.l-phone .l-paper .cv .seals img.crest.c-duo{width:180px}
 @media (prefers-reduced-motion:reduce){#lx7 *,#lx7 *::before,#lx7 *::after{animation:none !important;transition:none !important}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p39"]="started";}catch(_){}
