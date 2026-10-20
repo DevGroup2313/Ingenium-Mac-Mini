@@ -355,6 +355,32 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-split::before{content:"";width:4px;height:44px;align-self:center;border-radius:4px;background:var(--f-hair);box-shadow:var(--f-well);transition:background .2s,height .3s var(--f-spring)}
 #fb .f-split:hover::before,#fb .f-split.drag::before{background:var(--f-acc);height:84px}
 #fb.f-one .f-split{display:none}
+#fb .f-split[hidden]{display:none}
+/* 6.1 · a panel folds away to a narrow strip that keeps its name, and the others take its room (the owner's words, 20 October
+   2026: "I want to be able to collapse sections of the Fabrica and Lector pages so that I can hide them from view and see the
+   other panels and their contents better"); a section of Test and ship folds to its heading */
+#fb .f-fold{flex:0 0 auto;width:30px;height:30px;margin-left:4px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--f-hair);background:var(--f-hi);color:var(--f-ink2);cursor:pointer;box-shadow:var(--f-key,0 1px 0 var(--f-hair));transition:transform .25s var(--f-spring),background .2s}
+#fb .f-fold:hover{background:var(--f-accs);color:var(--f-acc)}
+#fb .f-fold:focus-visible,#fb .f-secfold:focus-visible{outline:2px solid var(--f-ring);outline-offset:2px}
+#fb .f-fold svg{width:14px;height:14px}
+#fb .f-pn-h .f-fold{margin-left:auto}
+#fb #fbWork .f-pn-h .f-fold{margin-left:4px}
+#fb .f-pn.is-folded{cursor:pointer}
+#fb .f-pn.is-folded > :not(.f-pn-h){display:none !important}
+#fb .f-pn.is-folded .f-pn-h{flex:1 1 auto;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;padding:10px 0;border-bottom:0;min-height:0}
+#fb .f-pn.is-folded .f-pn-h > :not(h2):not(.f-fold):not(.f-chip){display:none !important}
+#fb .f-pn.is-folded .f-pn-h h2{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;font-size:14px;margin:0}
+#fb .f-pn.is-folded .f-pn-h .f-chip{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;padding:8px 3px}
+#fb .f-pn.is-folded .f-fold{margin:0;order:-1}
+#fb .f-pn.is-folded .f-fold svg{transform:rotate(180deg)}
+#fb.f-one .f-fold{display:none}
+#fb .f-sec > h3{display:flex;align-items:center}
+#fb .f-secfold{margin-left:auto;flex:0 0 auto;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--f-ink3);cursor:pointer;transition:transform .25s var(--f-spring),background .2s}
+#fb .f-secfold:hover{background:var(--f-accs);color:var(--f-acc)}
+#fb .f-secfold svg{width:13px;height:13px;transition:transform .25s var(--f-spring)}
+#fb .f-sec.is-shut > :not(h3){display:none !important}
+#fb .f-sec.is-shut .f-secfold svg{transform:rotate(-90deg)}
+#fb .f-sec.is-shut > h3{margin-bottom:0}
 body.fb-drag,body.fb-drag *{cursor:col-resize !important;-webkit-user-select:none !important;user-select:none !important}
 /* reduced motion: no animation and no gliding, but a key still answers a press at once (6.0: nothing was left to answer) */
 @media (prefers-reduced-motion:reduce){#fb *,#fb *::before,#fb *::after{animation:none !important;transition-duration:.01ms !important}}
@@ -423,15 +449,15 @@ function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").p
    '<ol class="f-steps" id="fbSteps" aria-label="Where this app is"><li data-s="change"><i>1</i><span>Change</span></li><li class="sep" aria-hidden="true"></li><li data-s="keep"><i>2</i><span>Keep</span></li><li class="sep" aria-hidden="true"></li><li data-s="test"><i>3</i><span>Test</span></li><li class="sep" aria-hidden="true"></li><li data-s="ship"><i>4</i><span>Ship</span></li></ol></div>'+
    '<div class="f-seg f-tabs" id="fbTabs" role="tablist" aria-label="Fabrica\'s panels"><span class="f-thumb"></span><button type="button" role="tab" data-p="apps">Your apps</button><button type="button" role="tab" data-p="work" aria-selected="true">The work</button><button type="button" role="tab" data-p="ship">Test and ship</button></div>'+
    '<div class="f-panels" id="fbPanels">'+
-    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2>Your apps</h2><span class="f-chip" id="fbAppsChip"></span></div>'+
+    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2>Your apps</h2><span class="f-chip" id="fbAppsChip"></span><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-pn-b"><div class="f-repos" id="fbRepos"></div><div class="f-sec" style="border-top:1px solid var(--f-hair2)"><p class="f-hint" style="margin:0">Each app is a real git repository. Any git, and GitHub, opens what is kept here, and nothing it holds leaves this device unless you send it.</p></div></div>'+
      '<div class="f-pn-f"><button class="f-btn" id="fbNew" type="button">＋ New app</button><button class="f-btn" id="fbBring" type="button">Bring one in</button></div></section>'+
     '<section class="f-pn show" id="fbWork" aria-label="The work"><div class="f-pn-h"><span class="f-ls" id="fbWhSeal"></span><h2 id="fbWhName"></h2>'+
      '<button class="f-branch" id="fbBranch" type="button" title="Your ideas: each one is a branch"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.8"/><circle cx="4" cy="12.5" r="1.8"/><circle cx="12" cy="6" r="1.8"/><path d="M4 5.3v5.4M12 7.8c0 2.4-3 2.6-6.6 3.6"/></svg><span id="fbBranchName">main</span></button>'+
-     '<span class="f-chip" id="fbWorkChip"></span><button class="f-btn sm" id="fbRun" type="button" style="margin-left:6px">Run ▸</button><button class="f-btn sm" id="fbMore" type="button" title="Rename, edit a file, package details, remove" aria-haspopup="menu">⋯</button></div>'+
+     '<span class="f-chip" id="fbWorkChip"></span><button class="f-btn sm" id="fbRun" type="button" style="margin-left:6px">Run ▸</button><button class="f-btn sm" id="fbMore" type="button" title="Rename, edit a file, package details, remove" aria-haspopup="menu">⋯</button><button class="f-fold" type="button" data-f="work" aria-expanded="true" title="Fold The work away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-views"><div class="f-seg" id="fbViews" role="tablist" aria-label="The work on this app"><span class="f-thumb"></span><button type="button" role="tab" data-v="changes" aria-selected="true">Changes<span class="n" id="fbNChanges"></span></button><button type="button" role="tab" data-v="files">Files</button><button type="button" role="tab" data-v="history">History</button><button type="button" role="tab" data-v="releases">Releases</button><button type="button" role="tab" data-v="ideas">Ideas</button></div></div>'+
      '<div class="f-work" id="fbWorkBody"></div><div class="f-pn-f" id="fbWorkFoot"></div></section>'+
-    '<section class="f-pn" id="fbShip" aria-label="Test and ship"><div class="f-pn-h"><h2>Test and ship</h2><span class="f-chip" id="fbShipChip"></span></div>'+
+    '<section class="f-pn" id="fbShip" aria-label="Test and ship"><div class="f-pn-h"><h2>Test and ship</h2><span class="f-chip" id="fbShipChip"></span><button class="f-fold" type="button" data-f="ship" aria-expanded="true" title="Fold Test and ship away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-pn-b"><div class="f-sec"><h3>Test this version <span class="f-chip" id="fbTestChip">Not tested yet</span></h3><div class="f-checks" id="fbChecks"></div><div class="f-row" style="margin-top:11px"><button class="f-btn" id="fbTest" type="button">Test this version</button></div></div>'+
      '<div class="f-sec"><h3>Ship to your devices <span class="f-chip" id="fbShipState">Ready to make</span></h3><div class="f-targets" id="fbTargets"></div><div class="f-pkg" id="fbPkg"></div><p class="f-hint">Press a card to choose it; its own key makes it alone. Everything is made here from the version you kept, with no compiler and no connection, and kept under Releases.</p></div>'+
      '<div class="f-sec"><h3>Copies, and GitHub</h3><div class="f-copies" id="fbCopies"></div></div></div>'+
@@ -447,6 +473,7 @@ function wire(){
   $("fbTest").onclick=function(){testNow();};
   $("fbMakeAll").onclick=function(){makeChosen();};
   $("fbMore").onclick=function(e){e.stopPropagation();menuMore($("fbMore"));};
+  wireFolds();
   [].forEach.call($("fbViews").querySelectorAll("button"),function(b){b.onclick=function(){S.view=b.getAttribute("data-v");S.cmp=null;S.file=0;paintWork();thumbs();};});
   [].forEach.call($("fbTabs").querySelectorAll("button"),function(b){b.onclick=function(){setPanel(b.getAttribute("data-p"));};});
   var root=$("fb");
@@ -468,18 +495,38 @@ function fit(){var root=$("fb");if(!root||!root.offsetParent)return;var r=root.g
   var hgt=Math.max(420,Math.floor(window.innerHeight-top-12));root.style.setProperty("--f-h",hgt+"px");
   var w=r.width,isOne=w<900,isPhone=w<540,isMid=!isOne&&w<1180;
   if(root.classList.contains("f-one")!==isOne){root.classList.toggle("f-one",isOne);if(isOne)setPanel(S.panel||"apps");}
-  root.classList.toggle("f-phone",isPhone);root.classList.toggle("f-mid",isMid);thumbs();}
+  root.classList.toggle("f-phone",isPhone);root.classList.toggle("f-mid",isMid);paintFolds();thumbs();}
 var fitT=0;function layoutSoon(){clearTimeout(fitT);fitT=setTimeout(fit,30);}
 /* 6.0 · the dividers: the owner's words (20 October 2026): "I want to be able to resize the panels ... for the Lector and
    Fabrica pages as well. I just want the option to resize every section to my liking inside of the app." The widths of
    Your apps and of Test and ship are kept (state.fabrica.cols); the work takes the rest. */
 function colsNow(){var c=FBS().cols;return c&&c.a>0&&c.c>0?c:null;}
-function applyCols(){var p=$("fbPanels"),c=colsNow();if(!p)return;if(!c||one()){p.style.gridTemplateColumns="";return;}
-  var w=p.getBoundingClientRect().width,a=Math.max(200,Math.min(c.a,w-560)),z=Math.max(260,Math.min(c.c,w-a-320));p.style.gridTemplateColumns=a+"px minmax(0,1fr) "+z+"px";}
+function folds(){var f=FBS().fold;return f&&typeof f==="object"?f:{};}
+function applyCols(){var p=$("fbPanels"),c=colsNow(),F=folds();if(!p)return;paintFolds();
+  if(one()||(!c&&!F.apps&&!F.work&&!F.ship)){p.style.gridTemplateColumns="";return;}
+  var w=p.getBoundingClientRect().width,mid=$("fb").classList.contains("f-mid"),a=c?Math.max(200,Math.min(c.a,w-560)):(mid?250:290),z=c?Math.max(260,Math.min(c.c,w-a-320)):0;
+  p.style.gridTemplateColumns=[F.apps?"44px":(F.work&&F.ship?"minmax(0,1fr)":a+"px"),F.work?"44px":"minmax(0,1.25fr)",F.ship?"44px":(F.work?"minmax(0,1fr)":(z?z+"px":"minmax("+(mid?270:300)+"px,1fr)"))].join(" ");}
+/* 6.1 · folding a panel away: its strip keeps its name, and a press anywhere on it opens it again */
+var FOLDS=[["apps","fbApps","Your apps"],["work","fbWork","The work"],["ship","fbShip","Test and ship"]];
+function paintFolds(){var F=folds();FOLDS.forEach(function(x){var pn=$(x[1]);if(!pn)return;var on=!!F[x[0]]&&!one();pn.classList.toggle("is-folded",on);
+    var k=pn.querySelector(".f-fold");if(k){k.setAttribute("aria-expanded",on?"false":"true");k.title=on?"Open "+x[2]+" again":"Fold "+x[2]+" away; press again to open it";k.setAttribute("aria-label",k.title);}});}
+function foldPanel(k,on){var F=FBS().fold=folds();if(on==null)on=!F[k];
+  if(on&&FOLDS.filter(function(x){return x[0]!==k&&!F[x[0]];}).length===0){toast("One panel stays open: open another before folding this one.");return;}
+  if(on)F[k]=true;else delete F[k];saveSoon();applyCols();splits();thumbs();
+  var x=FOLDS.filter(function(y){return y[0]===k;})[0];toast(x[2]+(on?" is folded away. Press its strip to open it again.":" is open again."));}
+function wireFolds(){FOLDS.forEach(function(x){var pn=$(x[1]);if(!pn)return;var k=pn.querySelector(".f-fold");
+    if(k)k.onclick=function(e){e.stopPropagation();foldPanel(x[0]);};
+    pn.addEventListener("click",function(e){if(pn.classList.contains("is-folded")&&!e.target.closest(".f-fold")){e.preventDefault();e.stopPropagation();foldPanel(x[0],false);}},true);});
+  /* the sections of Test and ship fold to their headings */
+  var shut=FBS().secs=FBS().secs&&typeof FBS().secs==="object"?FBS().secs:{};
+  [].forEach.call($("fbShip").querySelectorAll(".f-pn-b > .f-sec"),function(sec,i){var key=["test","ship","copies"][i]||("s"+i),hd=sec.querySelector("h3");if(!hd||hd.querySelector(".f-secfold"))return;
+    var b=h("button","f-secfold");b.type="button";b.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>';
+    function show(){var on=!!shut[key];sec.classList.toggle("is-shut",on);b.setAttribute("aria-expanded",on?"false":"true");var nm=hd.firstChild&&hd.firstChild.nodeType===3?hd.firstChild.nodeValue.trim():"this section";b.title=(on?"Open ":"Fold ")+nm;b.setAttribute("aria-label",b.title);}
+    b.onclick=function(e){e.stopPropagation();if(shut[key])delete shut[key];else shut[key]=true;saveSoon();show();};hd.appendChild(b);show();});}
 function splits(){var p=$("fbPanels");if(!p)return;applyCols();var pn=[$("fbApps"),$("fbWork"),$("fbShip")],sp=p.querySelectorAll(".f-split");
   if(sp.length!==2){[].forEach.call(sp,function(x){x.remove();});sp=[0,1].map(function(i){var d=h("div","f-split");d.setAttribute("role","separator");d.setAttribute("aria-orientation","vertical");
       d.setAttribute("aria-label",i?"Give The work or Test and ship more room":"Give Your apps or The work more room");d.tabIndex=0;d.title="Drag to resize; double press to put the widths back";wireSplit(d,i);p.appendChild(d);return d;});}
-  if(one())return;var pr=p.getBoundingClientRect();
+  if(one())return;var pr=p.getBoundingClientRect(),F=folds();sp[0].hidden=!!(F.apps||F.work);sp[1].hidden=!!(F.work||F.ship);
   [0,1].forEach(function(i){var a=pn[i].getBoundingClientRect(),b=pn[i+1].getBoundingClientRect();sp[i].style.left=Math.round((a.right+b.left)/2-pr.left)+"px";});}
 function wireSplit(d,i){d.addEventListener("pointerdown",function(e){if(e.button!==0)return;e.preventDefault();var p=$("fbPanels"),pr=p.getBoundingClientRect(),a=$("fbApps").getBoundingClientRect().width,z=$("fbShip").getBoundingClientRect().width,x0=e.clientX;
     d.classList.add("drag");document.body.classList.add("fb-drag");try{d.setPointerCapture(e.pointerId);}catch(_){}
@@ -523,7 +570,9 @@ function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML
   if(S.view==="files")return paintFiles(r,w,f);
   if(S.view==="history")return paintHistory(r,w,f);
   if(S.view==="ideas")return paintIdeas(r,w,f);
-  if(S.view==="releases")return paintReleases(r,w,f);}
+  if(S.view==="releases")return paintReleases(r,w,f);
+  /* 6.1 · the views of GitHub's own (R140): code at any version, issues, pull requests, compare, actions, projects, wiki, insights, settings */
+  if(window.fbHub&&fbHub.views&&fbHub.views[S.view])return fbHub.views[S.view](r,w,f);}
 
 /* the changes: what differs from the last version, file by file, line by line */
 function paintChanges(r,w,f){
@@ -647,6 +696,14 @@ var KNOWN={forge:{id:"com.yannieforest.theforge",alias:"com.yannie.carpediem.Mai
   cd:{id:"com.yannie.carpediem",alias:"com.yannie.carpediem.MainActivity",and:["CarpeNative"],ios:["CarpeNative","pywebview"]},
   inkwell:{id:"studio.inkwell.app",alias:"",and:["InkwellNative","CarpeNative"],ios:["InkwellNative","CarpeNative"]},
   ingenium:{id:"com.yannieforest.ingenium.web",alias:"",and:["IngeniumNative"],ios:["IngeniumNative"],note:"Ingenium's own Fire tablet app, built by GitHub, carries the model engine and its models; this package is Ingenium's page in Fabrica's shell, without them. Its id is its own, so it installs beside your Ingenium and never over it."}};
+window.fbKnown=KNOWN;
+/* 6.1 · Download as an app (R139), from the version kept: every device with its emoji, one at a time or all; what is made is kept
+   under Releases like the cards' own */
+function downloadAsApp(r){if(!window.IngDownload){toast("This copy has no Download as an app.");return;}if(!r||!r.head){toast("Keep a first version first.");return;}var P=pkgOf(r),snap=null;
+  IngDownload.open({getHtml:function(){busy("Reading the version you kept…");return IngShip.onePage(r.id,{quiet:true}).then(function(x){unbusy();snap=x;return x.html;},function(e){unbusy();fail(e);return "";});},
+    title:P.title,id:P.id,version:P.version||verOf(r)||"",keyId:P.keyId,app:P.app,alias:P.alias,
+    onMade:function(k,name,mime,bytes){if(!snap)return;var kind={mac:"kits",macarm:"kits",windows:"kits",ipa:"ipa",apk:"apk",web:"web",html:"page"}[k]||"page";
+      return keepMade(r,snap.commit,kind,name,mime,bytes).then(function(){return IngRepo.setNote(r.id,snap.commit,NOTE[kind],{at:Date.now(),size:bytes.length,name:name});}).then(function(){return refresh();}).then(paint);}});}
 var KITS=[["fire","Fire tablet"],["iphone","iPhone"],["ipad","iPad"],["mac","MacBook (Intel)"],["macarm","Mac mini (Apple silicon)"],["windows","Windows"]];
 function kitsHere(){return typeof kitStore==="function"&&typeof kitAssemble==="function"&&typeof makeZip==="function"&&!!document.getElementById("ingenium-kit-bundle");}
 function targetHere(k){try{if(k==="kits")return kitsHere();if(k==="apk")return !!(window.IngApk&&document.getElementById("ing-android-shell"));if(k==="ipa")return !!(window.IngIpa&&IngIpa.has());}catch(e){return false;}return true;}
@@ -680,7 +737,8 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
   var pk=$("fbPkg");pk.innerHTML="";pk.hidden=!r;
   if(r){var P=pkgOf(r);pk.innerHTML="<span>"+esc(P.title)+" · <code>"+esc(P.id)+"</code>"+(P.version?" · version "+esc(P.version):"")+"</span>";
     var kl=h("span",null,"signed with "+(P.keyId==="device"?"this device's key":"a key you brought in"));pk.appendChild(kl);
-    pk.appendChild(btn("quiet sm","Package details",function(){sheetPackage(r);}));}
+    pk.appendChild(btn("quiet sm","Package details",function(){sheetPackage(r);}));
+    if(window.IngDownload&&r.head)pk.appendChild(btn("sm","📦 Download as an app…",function(){downloadAsApp(r);}));}
   var chosen=r?pref.chosen.filter(targetHere):[],all=r&&chosen.length&&chosen.every(function(k){return !!n[NOTE[k]];});
   var ss=$("fbShipState");ss.className="f-chip"+(all?" ok":"");ss.innerHTML=!r?"":all?'<span class="d"></span>Made':r.head?(tested(r)?"Ready to make":"After its test"):"After a first version";
   var mb=$("fbMakeAll");mb.disabled=!r||!r.head||!!mk||!chosen.length;mb.textContent=mk?"Making…":!chosen.length?"Choose what to make above":(all?"Make the chosen again":"Make the chosen")+" ("+chosen.length+")";mb.className="f-btn pri"+(r&&stepOf(r)==="ship"?" next":"");
@@ -809,6 +867,7 @@ function menuMore(anchor){var r=cur();if(!r){toast("Choose an app on the left fi
   var m=h("div","f-menu");m.setAttribute("role","menu");
   function item(label,fn,cls){var b=h("button",cls||null,esc(label));b.type="button";b.setAttribute("role","menuitem");b.onclick=function(e){e.stopPropagation();m.remove();fn();};m.appendChild(b);}
   item("Edit a file",function(){openEditor(r);});
+  if(window.IngDownload)item("📦 Download as an app…",function(){downloadAsApp(r);});
   item("Open it in Build",function(){openInBuild(r);});
   item("Open it in Code",function(){openInCode(r);});
   m.appendChild(h("hr"));
@@ -944,6 +1003,10 @@ try{new MutationObserver(function(){if($("fb")&&$("page-fabrica").classList.cont
 try{var nm=(state&&state.profile&&state.profile.name)||(state&&state.userName)||"";if(nm)IngRepo.setAuthor({name:nm});}catch(e){}
 try{if($("page-fabrica").classList.contains("active")){document.body.classList.add("fb-on");render();}}catch(e){}
 window.fbRender=render;window.fbSync=syncFromCode;
+/* 6.1 · what R140 (GitHub's own views) works with */
+window.fbHubHost={S:S,C:C,cur:cur,FBS:FBS,saveSoon:saveSoon,h:h,esc:esc,btn:btn,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,busy:busy,unbusy:unbusy,
+  refresh:refresh,paint:paint,paintWork:paintWork,thumbs:thumbs,diffList:diffList,openEditor:openEditor,saveBytes:saveBytes,mimeOf:mimeOf,notesOf:notesOf,statusOf:statusOf,setPanel:setPanel,one:one,
+  pkgOf:pkgOf,appOf:appOf,sealEl:sealEl,draftMessage:draftMessage};
 /* R114: Code opened on an app, with something to say once it is open */
 window.fbOpenInCode=function(r,path,after){openInCode(r,path);if(after)setTimeout(after,900);};
 })();

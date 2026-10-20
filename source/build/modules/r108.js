@@ -239,15 +239,15 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
    '<ol class="l-steps" id="l7Steps" aria-label="Where Lector is"><li data-s="choose"><i>1</i><span>Choose</span></li><li class="sep" aria-hidden="true"></li><li data-s="read"><i>2</i><span>Read</span></li><li class="sep" aria-hidden="true"></li><li data-s="write"><i>3</i><span>Write</span></li><li class="sep" aria-hidden="true"></li><li data-s="done"><i>4</i><span>Save</span></li></ol></div>'+
    '<div class="l-tabs" id="l7Tabs" role="tablist" aria-label="Lector\'s panels"><span class="l-thumb"></span><button type="button" role="tab" data-p="brief">The brief</button><button type="button" role="tab" data-p="read">Thinking <span class="d" id="l7TabLive" hidden></span></button><button type="button" role="tab" data-p="doc">The document</button></div>'+
    '<div class="l-panels" id="l7Panels">'+
-    '<section class="l-pn" id="l7Brief" aria-label="The brief"><div class="l-pn-h"><h2>The brief</h2><span class="l-chip" id="l7BriefChip">Ready</span></div><div class="l-pn-b"><div class="l-bf" id="l7Bf"></div></div><div class="l-pn-f" id="l7BriefF"></div></section>'+
+    '<section class="l-pn" id="l7Brief" aria-label="The brief"><div class="l-pn-h"><h2>The brief</h2><span class="l-chip" id="l7BriefChip">Ready</span><button class="l-fold" type="button" data-f="brief" aria-expanded="true" title="Fold the brief away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div><div class="l-pn-b"><div class="l-bf" id="l7Bf"></div></div><div class="l-pn-f" id="l7BriefF"></div></section>'+
     '<div class="l-gut" id="l7G1" role="separator" aria-orientation="vertical" tabindex="0" title="Drag to make the brief wider or narrower · press twice to put it back"><i></i></div>'+
-    '<section class="l-pn" id="l7Read" aria-label="Thinking"><div class="l-pn-h"><h2>Thinking</h2><span class="l-chip" id="l7ReadChip">Waiting</span></div>'+
+    '<section class="l-pn" id="l7Read" aria-label="Thinking"><div class="l-pn-h"><h2>Thinking</h2><span class="l-chip" id="l7ReadChip">Waiting</span><button class="l-codefold" type="button" id="l7CodeFold" aria-expanded="true" title="Fold the code window away">Code</button><button class="l-fold" type="button" data-f="read" aria-expanded="true" title="Fold the thinking away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="l-rd" id="l7Rd"><div class="l-now" id="l7Now"><div class="l-now-h" id="l7NowH"></div><pre class="l-code" id="l7Code" aria-label="The part Lector is reading"></pre></div>'+
      '<div class="l-vg" id="l7Vg" role="separator" aria-orientation="horizontal" tabindex="0" title="Drag to make the code window taller or shorter · press twice to put it back"><i></i></div>'+
      '<div class="l-stream" id="l7Stream" aria-live="polite"></div></div>'+
      '<div class="l-pn-f"><div class="l-prog"><div class="lbl"><b id="l7ProgA"></b><span id="l7ProgB"></span></div><div class="l-bar" id="l7Bar"><i id="l7BarI"></i></div></div><span id="l7ReadKey"></span></div></section>'+
     '<div class="l-gut" id="l7G2" role="separator" aria-orientation="vertical" tabindex="0" title="Drag to share the room between the thinking and the document · press twice to put it back"><i></i></div>'+
-    '<section class="l-pn" id="l7Doc" aria-label="The document"><div class="l-pn-h"><h2>The document</h2><span class="l-chip" id="l7DocChip"></span></div>'+
+    '<section class="l-pn" id="l7Doc" aria-label="The document"><div class="l-pn-h"><h2>The document</h2><span class="l-chip" id="l7DocChip"></span><button class="l-fold" type="button" data-f="doc" aria-expanded="true" title="Fold the document away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="l-dtabs" id="l7Dtabs" role="tablist" aria-label="Documents"></div><div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk"></div>'+
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
      '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
@@ -832,7 +832,25 @@ function fit(){var root=$("lx7");if(!root||!root.offsetParent)return;var r=root.
   applySizes();segThumbs(root);}
 var fitT=0;function layoutSoon(){clearTimeout(fitT);fitT=setTimeout(fit,30);}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function applySizes(){var P=$("l7Panels");if(!P)return;var U=L7().ui;if(one()){P.style.removeProperty("--w1");P.style.removeProperty("--w2");}
+/* 6.1 · a panel folds away to a narrow strip that keeps its name, and the others take its room; the code window folds too
+   (the owner's words, 20 October 2026: "I want to be able to collapse sections of the Fabrica and Lector pages so that I can
+   hide them from view and see the other panels and their contents better") */
+var FOLDS=[["brief","l7Brief","The brief"],["read","l7Read","Thinking"],["doc","l7Doc","The document"]];
+function folds(){var U=L7().ui;return U.fold&&typeof U.fold==="object"?U.fold:{};}
+function applyFolds(){var P=$("l7Panels");if(!P)return;var F=one()?{}:folds(),open=FOLDS.filter(function(x){return !F[x[0]];}).length;
+  FOLDS.forEach(function(x){var pn=$(x[1]);if(!pn)return;var on=!!F[x[0]];pn.classList.toggle("is-folded",on);var k=pn.querySelector(".l-fold");
+    if(k){k.setAttribute("aria-expanded",on?"false":"true");k.title=on?"Open "+x[2].toLowerCase()+" again":"Fold "+x[2].toLowerCase()+" away; press again to open it";k.setAttribute("aria-label",k.title);}});
+  if(!(F.brief||F.read||F.doc))P.style.removeProperty("grid-template-columns");
+  else P.style.gridTemplateColumns=[F.brief?"44px":(open>1?"var(--w1,300px)":"minmax(0,1fr)"),"16px",F.read?"44px":(F.doc?"minmax(240px,1fr)":"minmax(240px,var(--w2,1fr))"),"16px",F.doc?"44px":(F.read?"minmax(280px,1fr)":"minmax(280px,1.18fr)")].join(" ");
+  var g1=$("l7G1"),g2=$("l7G2");if(g1)g1.classList.toggle("off",!!(F.brief||F.read));if(g2)g2.classList.toggle("off",!!(F.read||F.doc));
+  var U=L7().ui,cf=$("l7CodeFold"),nw=$("l7Now"),vg=$("l7Vg");if(cf&&nw&&vg){nw.hidden=!!U.codeShut;vg.hidden=!!U.codeShut;cf.setAttribute("aria-expanded",U.codeShut?"false":"true");cf.title=U.codeShut?"Show the code window again":"Fold the code window away";cf.classList.toggle("off",!!U.codeShut);}}
+function foldPanel(k,on){var U=L7().ui,F=U.fold=folds();if(on==null)on=!F[k];
+  if(on&&FOLDS.filter(function(x){return x[0]!==k&&!F[x[0]];}).length===0){ingToast("One panel stays open: open another before folding this one.");return;}
+  if(on)F[k]=true;else delete F[k];saveSoon();applySizes();segThumbs($("lx7"));}
+function wireFolds(){FOLDS.forEach(function(x){var pn=$(x[1]);if(!pn)return;var k=pn.querySelector(".l-fold");if(k)k.onclick=function(e){e.stopPropagation();foldPanel(x[0]);};
+    pn.addEventListener("click",function(e){if(pn.classList.contains("is-folded")&&!e.target.closest(".l-fold")){e.preventDefault();e.stopPropagation();foldPanel(x[0],false);}},true);});
+  var cf=$("l7CodeFold");if(cf)cf.onclick=function(e){e.stopPropagation();var U=L7().ui;U.codeShut=!U.codeShut;if(!U.codeShut)delete U.codeShut;saveSoon();applySizes();};}
+function applySizes(){var P=$("l7Panels");if(!P)return;var U=L7().ui;applyFolds();if(one()){P.style.removeProperty("--w1");P.style.removeProperty("--w2");}
   else{var W=P.getBoundingClientRect().width;if(U.w1)P.style.setProperty("--w1",clamp(U.w1,230,Math.max(230,Math.min(560,W-32-240-280)))+"px");else P.style.removeProperty("--w1");
     if(U.w2)P.style.setProperty("--w2",clamp(U.w2,240,Math.max(240,W-32-280-(U.w1||300)))+"px");else P.style.removeProperty("--w2");}
   var now=$("l7Now");if(now){if(U.now){var rd=$("l7Rd").getBoundingClientRect().height;now.style.height=clamp(U.now,90,Math.max(90,rd-150))+"px";now.style.maxHeight="none";}else{now.style.removeProperty("height");now.style.removeProperty("max-height");}}}
@@ -845,7 +863,7 @@ function dragger(el,axis,move){if(!el||el.__d)return;el.__d=1;
 function segThumbs(root){if(!root)return;[].forEach.call(root.querySelectorAll(".l-seg,.l-tabs"),function(seg){var th=seg.querySelector(".l-thumb");if(!th)return;
   var on=seg.querySelector('button[aria-pressed="true"],button[aria-selected="true"]');if(!on||!on.offsetWidth){th.style.width="0";return;}
   th.style.width=on.offsetWidth+"px";th.style.transform="translateX("+(on.offsetLeft-3)+"px)";});}
-function wireFrame(){var U=L7().ui;
+function wireFrame(){var U=L7().ui;wireFolds();
   dragger($("l7G1"),"x",function(x){U.w1=Math.round(x-$("l7Brief").getBoundingClientRect().left);});
   dragger($("l7G2"),"x",function(x){U.w2=Math.round(x-$("l7Read").getBoundingClientRect().left-8);});
   dragger($("l7Vg"),"y",function(y){U.now=Math.round(y-$("l7Now").getBoundingClientRect().top-7);});

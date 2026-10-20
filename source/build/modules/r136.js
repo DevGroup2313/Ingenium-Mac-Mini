@@ -363,8 +363,20 @@ function iconSource(html){var head=typeof html==="string"?html.slice(0,3000000):
 function drawIcons(src,sizes,onWhite){if(typeof document==="undefined")return Promise.reject(new Error("icons are drawn in a window"));
   return new Promise(function(res,rej){var im=new Image();im.onload=function(){res(im);};im.onerror=function(){rej(new Error("the app's icon could not be read"));};im.src=src;}).then(function(im){
     return Promise.all(sizes.map(function(z){var c=document.createElement("canvas");c.width=z;c.height=z;var x=c.getContext("2d");x.imageSmoothingEnabled=true;try{x.imageSmoothingQuality="high";}catch(e){}
-      if(onWhite){x.fillStyle="#ffffff";x.fillRect(0,0,z,z);var inner=Math.round(z*0.88),off=Math.round((z-inner)/2);x.drawImage(im,off,off,inner,inner);}else x.drawImage(im,0,0,z,z);
+      if(onWhite){var D=discOf(im);x.fillStyle=D.rim;x.fillRect(0,0,z,z);var inner=Math.round(z*0.985),off=Math.round((z-inner)/2);x.drawImage(im,D.x,D.y,D.w,D.h,off,off,inner,inner);}else x.drawImage(im,0,0,z,z);
       return new Promise(function(r2){c.toBlob(function(b){b.arrayBuffer().then(function(ab){r2(new Uint8Array(ab));});},"image/png");});}));});}
+/* 6.1 · an iPhone and iPad icon fills its square: iOS cuts every icon to its rounded square and shows no transparency, so a
+   round seal drawn small on white looked like a miniature in a grey square (the owner's words, 20 October 2026: "it changes to
+   this miniature icon inside of a grey square that I despise"). The seal's own disc (its solid part, a soft shadow left out)
+   is drawn as large as the square allows, on the colour of its outer ring; a square icon stays as it is. */
+function discOf(im){var W=im.naturalWidth||im.width,H=im.naturalHeight||im.height,N=256,c=document.createElement("canvas");c.width=N;c.height=N;var x=c.getContext("2d");x.drawImage(im,0,0,N,N);
+  var d;try{d=x.getImageData(0,0,N,N).data;}catch(e){return {x:0,y:0,w:W,h:H,rim:"#ffffff"};}
+  var x0=N,y0=N,x1=-1,y1=-1,X,Y;for(Y=0;Y<N;Y++)for(X=0;X<N;X++)if(d[(Y*N+X)*4+3]>200){if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
+  if(x1<0)return {x:0,y:0,w:W,h:H,rim:"#ffffff"};
+  var side=Math.max(x1-x0+1,y1-y0+1),cx=(x0+x1+1)/2,cy=(y1-y0)>(x1-x0)?y0+side/2:(y0+y1+1)/2,row=Math.round(cy);
+  function first(from,to,step){for(var i=from;i!==to;i+=step){var k=(Math.min(N-1,Math.max(0,row))*N+i)*4;if(d[k+3]>230)return [d[k],d[k+1],d[k+2]];}return [255,255,255];}
+  var l=first(0,N,1),r=first(N-1,-1,-1),rim="rgb("+[0,1,2].map(function(i){return Math.round((l[i]+r[i])/2);}).join(",")+")";
+  var f=W/N;return {x:Math.max(0,(cx-side/2)*f),y:Math.max(0,(cy-side/2)*f),w:Math.min(W,side*f),h:Math.min(H,side*f),rim:rim};}
 /* a seal of letters on the app's colour, for an app that names no icon */
 function letterIcon(title,colour){if(typeof document==="undefined")return null;var c=document.createElement("canvas");c.width=512;c.height=512;var x=c.getContext("2d");
   x.fillStyle=colour||"#6a3fb5";x.beginPath();x.arc(256,256,240,0,Math.PI*2);x.fill();x.fillStyle="#fff";x.font="600 220px Georgia,serif";x.textAlign="center";x.textBaseline="middle";

@@ -299,6 +299,25 @@ body[data-motion="minimal"] #lx7 .l-pn:hover{transform:none}
 #lx7.l-one .l-tabs .d{width:6px;height:6px;border-radius:50%;background:currentColor}
 #lx7.l-one .l-panels{grid-template-columns:minmax(0,1fr) !important}
 #lx7.l-one .l-gut{display:none}
+/* 6.1 · folding a panel, and the code window, away */
+#lx7 .l-fold,#lx7 .l-codefold{flex:0 0 auto;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid var(--l-hair);background:linear-gradient(var(--l-a),var(--l-b));color:var(--l-ink2);cursor:pointer;transition:transform .25s var(--l-spring),background .2s}
+#lx7 .l-fold{width:30px;margin-left:auto}
+#lx7 .l-codefold{margin-left:auto;padding:0 10px;font-size:12px;font-weight:600}
+#lx7 .l-codefold + .l-fold{margin-left:6px}
+#lx7 .l-codefold.off{color:var(--l-ink3);border-style:dashed}
+#lx7 .l-fold:hover,#lx7 .l-codefold:hover{background:var(--l-accs);color:var(--l-acc)}
+#lx7 .l-fold svg{width:14px;height:14px}
+#lx7 .l-pn.is-folded{cursor:pointer}
+#lx7 .l-pn.is-folded > :not(.l-pn-h){display:none !important}
+#lx7 .l-pn.is-folded .l-pn-h{flex:1 1 auto;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;padding:10px 0;border-bottom:0}
+#lx7 .l-pn.is-folded .l-pn-h > :not(h2):not(.l-fold):not(.l-chip){display:none !important}
+#lx7 .l-pn.is-folded .l-pn-h h2,#lx7 .l-pn.is-folded .l-pn-h .l-chip{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;margin:0}
+#lx7 .l-pn.is-folded .l-pn-h .l-chip{padding:8px 3px}
+#lx7 .l-pn.is-folded .l-fold{margin:0;order:-1}
+#lx7 .l-pn.is-folded .l-fold svg{transform:rotate(180deg)}
+#lx7 .l-gut.off{visibility:hidden;pointer-events:none}
+#lx7 .l-now[hidden],#lx7 .l-vg[hidden]{display:none !important}
+#lx7.l-one .l-fold{display:none}
 #lx7.l-one .l-pn{display:none}
 #lx7.l-one .l-pn.show{display:flex}
 #lx7.l-one .l-paper{padding:30px 26px 34px}
