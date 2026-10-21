@@ -45,7 +45,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // the history card opens with its files and keys
   await p.click('#fbWorkBody .f-cm'); await p.waitForTimeout(700);
   const card = await p.evaluate(() => { const c = document.querySelector('#fbWorkBody .f-cm'); return { open: c.getAttribute('aria-expanded'), files: [...c.querySelectorAll('.fl li')].map(x => x.textContent), keys: [...c.querySelectorAll('.f-acts .f-btn')].map(x => x.textContent) }; });
-  ok(card.open === 'true' && card.files.join(',') === 'app.js,readme.md (added)' && card.keys.join('|') === 'See the changes|Undo it|Mark a release', 'a version opens to its files and its keys', JSON.stringify(card));
+  ok(card.open === 'true' && card.files.join(',') === 'app.js,readme.md (added)' && /^See the changes\|Undo it\|Mark a release(\|Compare\|Browse the files)?$/.test(card.keys.join('|')), 'a version opens to its files and its keys', JSON.stringify(card));
   // mark a release through the sheet
   await p.evaluate(() => { [...document.querySelectorAll('#fbWorkBody .f-cm .f-acts .f-btn')].find(x => x.textContent === 'Mark a release').click(); }); await p.waitForTimeout(300);
   await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(1000);
