@@ -1,0 +1,7 @@
+While the Forge starts, a loading page now says the page is still being painted and how far it has got, so a slow start
+never looks like a crash; after a long wait it offers to start again. Refresh the app is a key in the Display menu and at
+the top of Settings: it saves your work first and starts the Forge again, and asks first while Fabrica is still making
+something. On a Mac, the app menu holds Refresh The Forge, which works even when the page has stopped answering; on the
+Fire tablet, the iPhone and the iPad, the app asks whether to wait or start again when the page stops answering. A room
+opened for the first time shows a short note while it is painted. Fabrica now has the views of GitHub beside its own:
+Code, Issues, Pull requests, Compare, Actions, Projects, Wiki, Insights and Settings, kept on this device.

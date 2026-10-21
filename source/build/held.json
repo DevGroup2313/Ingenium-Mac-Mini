@@ -1,0 +1,4 @@
+{
+  "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
+  "modules": ["r142.js", "r143.js", "r144.js"]
+}

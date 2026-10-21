@@ -12,6 +12,18 @@ body[data-theme="night"] #forge-painting .fp-ring{border-color:rgba(217,180,90,.
 @keyframes fpSpin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#forge-painting .fp-ring{animation-duration:3s}}
 #forge-refresh-btn.is-turning{pointer-events:none;opacity:.7}
+.cd-display-menu .fr-row{display:block;padding:7px 8px;margin:8px -8px 0;border-top:1px solid rgba(23,87,122,.12);font:400 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:0;text-transform:none;color:inherit}
+body[data-theme="night"] .cd-display-menu .fr-row{border-top-color:rgba(255,255,255,.1)}
+#forge-refresh-btn{display:inline-flex;align-items:center;gap:5px}
+#forge-refresh-btn .fr-i{width:13px;height:13px;flex:0 0 auto}
+#forge-refresh-btn.is-turning .fr-i{animation:fpSpin .6s cubic-bezier(.34,1.35,.64,1)}
+#forge-refresh-card{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:14px 16px;border-radius:14px;
+  background:rgba(255,255,255,.72);border:1px solid rgba(23,87,122,.16);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 6px 16px rgba(16,42,58,.08)}
+body[data-theme="night"] #forge-refresh-card{background:rgba(32,27,22,.72);border-color:rgba(255,255,255,.1)}
+#forge-refresh-card .frc-t{flex:1 1 260px;min-width:0;font-size:13.5px;line-height:1.5}
+#forge-refresh-card .frc-t b{display:block;font-size:15px;margin-bottom:2px}
+#forge-refresh-card .frc-k{display:inline-flex;align-items:center;gap:6px}
+#forge-refresh-card .frc-k .fr-i{width:14px;height:14px}
 </style>
 <script id="forge-refresh-js">
 /* PASS 643 · REFRESH. The owner's words (20 October 2026): "I want a refresh button added to Ingenium and the Forge, that
@@ -56,12 +68,36 @@ window.ingRefresh=window.ingRefresh||refresh;  /* the desktop app's menu asks fo
 window.addEventListener("keydown",function(e){var k=e.key;
   if(!((k==="F5"&&!e.altKey)||((e.ctrlKey||e.metaKey)&&!e.altKey&&(k==="r"||k==="R"))))return;
   e.preventDefault();e.stopPropagation();refresh();},true);
-/* the key, beside Display in the cluster of keys at the top */
-function place(){if(document.getElementById("forge-refresh-btn"))return true;var d=document.getElementById("display-btn");if(!d||!d.parentNode)return false;
-  var k=document.createElement("button");k.id="forge-refresh-btn";k.className="cl-icon";k.type="button";k.textContent="Refresh";
-  k.title="Refresh: start the Forge again if it glitches or stops answering. Your work is saved first. (F5 or Ctrl+R; Command+R on a Mac)";
-  k.setAttribute("aria-label","Refresh the Forge");k.addEventListener("click",function(){refresh();});d.parentNode.insertBefore(k,d);return true;}
-if(!place()){var n=0,iv=setInterval(function(){if(place()||++n>120)clearInterval(iv);},250);}
+/* the key, first in the Display menu. The owner's words (21 October 2026): "I want a visible button inside of the app that
+   says that it is to refresh the app, so it is accesible to any user and easy to locate." and "Put the refresh the app
+   button inside of the display panel, that keeps things neater." The Forge draws its Display menu afresh each time it opens
+   and after each choice in it, so the key is put back whenever the menu is drawn. */
+function inMenu(menu){if(!menu)return;var head=menu.querySelector(".cd-dm-head");
+  /* the menu sorts its rows into sections a moment after it is drawn, and keeps its title first: the key rides inside
+     the title's block, so it stays at the top and the sorting is left as it was */
+  if(!head||head.querySelector("#forge-refresh-row"))return;
+  /* a row like the menu's others (21 October 2026, the owner's words: "match the look of the other buttons on the panel"):
+     its label, one key of the menu's own kind, and its tip */
+  var row=document.createElement("div");row.className="fr-row";row.id="forge-refresh-row";
+  var lab=document.createElement("div");lab.className="cd-dm-label";lab.textContent="\ud83d\udd04 Refresh";
+  var k=document.createElement("button");k.id="forge-refresh-btn";k.type="button";k.className="cd-seg";
+  k.innerHTML=ARROW+'<span class="fr-l">Refresh the app</span>';
+  k.title="Refresh the app: start the Forge again if it glitches or stops answering. Your work is saved first.";
+  k.addEventListener("click",function(){refresh();});
+  var tip=document.createElement("div");tip.className="cd-dm-tip";tip.textContent="\ud83d\udca1 If the app glitches or stops answering. Your work is saved first.";
+  row.appendChild(lab);row.appendChild(k);row.appendChild(tip);
+  head.appendChild(row);}
+function watchMenus(){if(watchMenus.on)return;watchMenus.on=true;
+  new MutationObserver(function(){var m=document.querySelector(".cd-display-menu");if(m)inMenu(m);}).observe(document.body,{childList:true,subtree:true});}
+/* the same, larger, at the top of the Settings room */
+function card(){var room=document.getElementById("room-settings");if(!room||document.getElementById("forge-refresh-card"))return !!room;
+  var host=room.querySelector(".room-body")||room,c=document.createElement("div");c.id="forge-refresh-card";c.setAttribute("role","region");c.setAttribute("aria-labelledby","forge-refresh-h");
+  c.innerHTML='<div class="frc-t"><b id="forge-refresh-h">If the app glitches or stops answering</b><span>Refresh the app: the Forge starts again in a few seconds. Your work is saved first, and nothing is lost.</span></div>'+
+    '<button type="button" class="stone solid frc-k">'+ARROW+'Refresh the app</button>';
+  c.querySelector("button").addEventListener("click",function(){refresh();});host.insertBefore(c,host.firstChild);return true;}
+var ARROW='<svg class="fr-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 4.2v4.6H15"/></svg>';
+try{watchMenus();}catch(e){}
+if(!card()){var n=0,iv=setInterval(function(){if(card()||++n>120)clearInterval(iv);},250);}
 
 /* ---------- "Painting …" while a room is painted ---------- */
 var chip=null,opened={},shownAt=0,watch=0;

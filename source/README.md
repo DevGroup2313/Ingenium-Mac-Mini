@@ -97,4 +97,28 @@ night and the Clepsydra's settings, and only the main window writes the saved de
 `offline_project/forge_639/forge_fabrica.py` carries the new Fabrica into the Forge (without the APK and IPA cards, which need
 Ingenium's shells), and its saves now go one after another there too: `rig/t_forge_fabrica.js`, 45 checks.
 
+6.1 (21 October 2026) adds:
+
+- `boot/splash.html` (written first into the body by `build_page.py`): the loading page. It is painted before the rest of
+  the page is read, says the page is still being painted and how far it has got (from where each script begins, written in
+  at build time), lifts once the page is ready, and offers Refresh when a start takes too long or never finishes.
+- `modules/r151.js`: Refresh the app, the Display panel's first row and a card at the top of Settings. It saves the desk
+  first, asks while a reply, a Lector piece or a package is still being made, and answers F5, Ctrl+R and Command+R too; a
+  page opened for the first time shows "Painting …" while it is drawn. On a Mac, `ingenium_app.py` adds Refresh Ingenium
+  to the app menu and Command+R, which reload the window even when the page has stopped answering.
+- `modules/r141.js`: Fabrica's GitHub views (Code, Issues, Pull requests, Compare, Actions, Projects, Wiki, Insights,
+  Settings), in Ingenium and in the Forge (store `forge_hub` there).
+- `modules/r147.js`: the new Home. `modules/r148.js`: Lector's writing guard (no loops, the owner's manner).
+- `modules/r108.js`: Ask Lector at the foot of the document; documents no longer close with a line naming the model, and
+  Word, PDF and web files name no program (no watermarks). `modules/r152.js`: the accessibility audit's fixes.
+- `held.json`: modules still being finished or reviewed (storage `r142`, backup `r143`, tour `r144`) stay out of a release
+  build (`release.py page` sets ING_RELEASE=1); every other build keeps them in.
+
+    node rig/t_61_refresh.js <url> <out>     # 24 checks: the loading page, Refresh in Display and Settings, F5 and Ctrl+R, the painting note, a page that never finishes starting
+    node rig/t_61_ask.js <url> <out>         # 20: Ask Lector, and older documents shown and saved without their closing line
+    node rig/t_61_hub.js <url> <out>         # 93: Fabrica's GitHub views, also inside the Forge's Fabrica
+    node rig/t_61_home.js <url> <out>        # 61: the new Home
+    node rig/t_61_seals.js <url> <out>       # 53: The Offline Project's crests
+    node rig/a11y/axe_walk.js <url> <axe.min.js> <out>   # axe-core on every page, day and night, desk and phone: 0 rules broken
+
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

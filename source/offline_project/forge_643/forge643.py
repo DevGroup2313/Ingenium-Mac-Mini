@@ -25,16 +25,23 @@ usage:
   forge643.py FORGE642_LEAN.html OUT_DIR [--only NAME[,NAME]] [--keep-fabrica]
       writes OUT_DIR/the_forge_643_lean.html (and, with --only, only those blocks, for a block's own tests)
   forge643.py FORGE642_LEAN.html OUT_DIR INGENIUM_LEAN.html CARPE_DIEM.html INKWELL.html
-      also writes OUT_DIR/the_forge.html, the full page."""
+      also writes OUT_DIR/the_forge.html, the full page.
+  --release leaves out the blocks held.json names."""
 import base64, gzip, hashlib, importlib.util, json, os, re, sys
 
-STAMP, PASS, DATE = "9s75", "643", "2026-10-20"
+STAMP, PASS, DATE = "9s75", "643", "2026-10-21"
 HERE = os.path.dirname(os.path.abspath(__file__))
 argv = [a for a in sys.argv[1:]]
 only = None
 keep_fab = "--keep-fabrica" in argv
 if keep_fab:
     argv.remove("--keep-fabrica")
+# a release pass leaves out the blocks held.json names (still being finished, or not yet through their review)
+held = set()
+if "--release" in argv:
+    argv.remove("--release")
+    held = set(json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "held.json")))["blocks"])
+    print("held out of this release:", ", ".join(sorted(held)) or "nothing")
 if "--only" in argv:
     k = argv.index("--only")
     only = set(argv[k + 1].split(","))
@@ -88,6 +95,8 @@ def blocks(folder):
             continue
         key = name[:-5]
         if only is not None and key not in only:
+            continue
+        if key in held:
             continue
         t = open(os.path.join(d, name), encoding="utf-8").read()
         if re.search(r"<script[^>]+src=[\"']https?://", t):

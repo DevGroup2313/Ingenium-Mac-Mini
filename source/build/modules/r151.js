@@ -13,6 +13,18 @@
 @media (prefers-reduced-motion:reduce){#ing-painting .ip-ring{animation-duration:3s}#ing-painting{transition:opacity .18s ease}}
 /* the Refresh key turns once when pressed */
 #refreshBtn.is-turning .kico{animation:ipSpin .6s cubic-bezier(.34,1.35,.64,1)}
+/* 6.1, 21 October 2026. The owner's words: "I want a visible button inside of the app that says that it is to refresh the
+   app, so it is accesible to any user and easy to locate." and "Put the refresh the app button inside of the display panel,
+   that keeps things neater." and "match the look of the other buttons on the panel". It is the panel's first row, a key
+   like its others, in words with its arrow. */
+#displayPanel #refreshBtn{display:inline-flex;align-items:center;gap:5px}
+#displayPanel #refreshBtn .kico{display:block;width:13px;height:13px;flex:0 0 auto}
+/* the same, larger, at the top of Settings, where anyone looking for help is likely to look */
+#ing-refresh-card{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#ing-refresh-card .rc-t{flex:1 1 260px;min-width:0}
+#ing-refresh-card .rc-t b{display:block;font-size:15px;margin-bottom:2px}
+#ing-refresh-card .rc-k{display:inline-flex;align-items:center;gap:6px}
+#ing-refresh-card .rc-k svg{width:14px;height:14px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p72"]="started";}catch(_){}
 /* ============ R151 · REFRESH, AND A WORD WHILE A PAGE IS PAINTED ============
@@ -55,6 +67,15 @@ window.ingRefresh=refresh;
 window.addEventListener("keydown",function(e){var k=e.key;
   var r=(k==="F5"&&!e.altKey)||((e.ctrlKey||e.metaKey)&&!e.altKey&&(k==="r"||k==="R"));
   if(!r)return;e.preventDefault();e.stopPropagation();refresh("key");},true);
+
+/* ---------- the same key, larger, at the top of Settings ---------- */
+function refreshCard(){var pg=document.getElementById("page-settings");if(!pg||document.getElementById("ing-refresh-card"))return;
+  var c=document.createElement("div");c.className="card";c.id="ing-refresh-card";c.setAttribute("role","region");c.setAttribute("aria-labelledby","ing-refresh-h");
+  c.innerHTML='<div class="rc-t"><b id="ing-refresh-h">If the app glitches or stops answering</b><span class="small muted">Refresh the app: Ingenium starts again in a few seconds. Your work is saved first, and nothing is lost.</span></div>'+
+    '<button type="button" class="btn rc-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 4.2v4.6H15"/></svg>Refresh the app</button>';
+  c.querySelector("button").addEventListener("click",function(){refresh("settings");});
+  var lede=pg.querySelector(".lede"),at=lede?lede.nextSibling:pg.firstChild;pg.insertBefore(c,at);}
+try{refreshCard();}catch(e){}
 
 /* ---------- "Painting …" while a page is painted ---------- */
 var chip=null,opened={},shownAt=0,watch=0;

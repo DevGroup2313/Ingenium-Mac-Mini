@@ -69,7 +69,8 @@ def old_bundle(page):
 
 def page():
     vj = json.load(open(os.path.join(H, "version.json")))
-    subprocess.run([sys.executable, os.path.join(H, "build_page.py"), os.path.join(H, "ingenium.html")], check=True)
+    subprocess.run([sys.executable, os.path.join(H, "build_page.py"), os.path.join(H, "ingenium.html")], check=True,
+                   env=dict(os.environ, ING_RELEASE="1"))  # 6.1: modules held.json names stay out of a release
     pg = open(os.path.join(H, "ingenium.html"), encoding="utf-8").read()
     pg, n = re.subn(r'var ING_VERSION="[0-9.]+",ING_PAGE_DATE="[^"]*";', 'var ING_VERSION="%s",ING_PAGE_DATE="%s";' % (vj["v"], vj["date"]), pg)
     assert n == 1, "ING_VERSION"
@@ -117,7 +118,7 @@ def sync_sources():
     dst = os.path.join(R["mini"], "source", "build")
     if not os.path.isdir(dst) or os.path.realpath(dst) == os.path.realpath(H):
         return
-    for f in ("build_page.py", "release.py", "version.json", "master_seal.json", "lx_layers.json", "pdf_widths.json", "lx_fonts.json"):
+    for f in ("build_page.py", "release.py", "version.json", "held.json", "master_seal.json", "lx_layers.json", "pdf_widths.json", "lx_fonts.json"):
         shutil.copy2(os.path.join(H, f), os.path.join(dst, f))
     md = os.path.join(dst, "modules")
     os.makedirs(md, exist_ok=True)
