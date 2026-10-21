@@ -293,10 +293,17 @@ _splash = open(os.path.join(HERE, "boot", "splash.html"), encoding="utf-8").read
 _splash = _splash.replace("ING_BOOT_SEAL_DAY", _small_seal(_PI0["big"]["day"])).replace("ING_BOOT_SEAL_NIGHT", _small_seal(_PI0["big"]["night"]))
 edit('<body data-theme="day" data-motion="full">\n',
      '<body data-theme="day" data-motion="full">\n' + _splash + '\n', "R151 the loading page, first in the body")
-edit('    <button class="cl-key" id="displayBtn" title="Display: theme, depth, navigation, frame, motion" aria-label="Display">',
-     '    <button class="cl-key" id="refreshBtn" title="Refresh: start Ingenium again if it glitches or stops answering. Your work is saved first. (F5 or Ctrl+R; Command+R on a Mac)" aria-label="Refresh Ingenium" onclick="(window.ingRefresh||function(){location.reload();})()"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 4.2v4.6H15"/></svg><span class="kl">Refresh</span></button>\n'
-     '    <button class="cl-key" id="displayBtn" title="Display: theme, depth, navigation, frame, motion" aria-label="Display">',
-     "R151 the Refresh key in the top bar")
+# 21 October 2026, the owner's words: "Put the refresh the app button inside of the display panel, that keeps things neater."
+# and "The refresh the app button is too big and bulky, it does not need to be that wide, match the look of the other
+# buttons on the panel please." It is the Display panel's first row (App, Refresh), a key like the panel's others, in
+# words with its arrow; its press reloads the page even when modules/r151.js never ran.
+edit('<div id="displayPanel" hidden>\n  <div class="sch-head"><span class="sch-title">Display</span><button class="cl-chev" id="dpClose" title="Close" aria-label="Close the display panel">×</button></div>\n',
+     '<div id="displayPanel" hidden>\n  <div class="sch-head"><span class="sch-title">Display</span><button class="cl-chev" id="dpClose" title="Close" aria-label="Close the display panel">×</button></div>\n'
+     '  <div class="dp-sec">App</div>\n'
+     '  <div class="dp-row dp-refresh"><div class="dp-label">Refresh</div>\n'
+     '    <div class="seg"><button type="button" class="seg-btn" id="refreshBtn" title="Refresh the app: start Ingenium again if it glitches or stops answering. Your work is saved first." onclick="(window.ingRefresh||function(){location.reload();})()"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.6 4.2v4.6H15"/></svg>Refresh the app</button></div>\n'
+     '    <div class="dp-note">If the app glitches or stops answering. Your work is saved first.</div></div>\n',
+     "R151 the Refresh key, first in the Display panel")
 
 for old, new, label, times in EDITS:
     n = out.count(old)
@@ -388,6 +395,12 @@ for _sid, _sf in (("ing-android-shell", "android-shell.dex"), ("ing-ios-shell", 
     _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
+# 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
+# those still being finished, or not yet through their independent review. Every other build keeps them in.
+if os.environ.get("ING_RELEASE") == "1" and os.path.exists(os.path.join(HERE, "held.json")):
+    _held = set(json.load(open(os.path.join(HERE, "held.json")))["modules"])
+    mods = [m for m in mods if os.path.basename(m) not in _held]
+    print("held out of this release:", ", ".join(sorted(_held)) or "nothing")
 # ---- R121: the shared thought cloud (thoughts/thought_cloud.html, the same file the Forge and Carpe Diem carry) is
 #      written in just before the Inbox module that uses it, and the shared support module (thoughts/support_core.html)
 #      just before Ingenium's part of it (modules/r121.js) ----

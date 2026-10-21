@@ -24,6 +24,9 @@ async function watchLoad(p) {
   }
   return seen;
 }
+// the key lives in the Display panel (the owner's words, 21 October 2026: "Put the refresh the app button inside of the
+// display panel, that keeps things neater."): open it first
+async function openDisplay(p) { await p.evaluate(() => { const d = document.getElementById('displayPanel'); if (d && d.hidden) document.getElementById('displayBtn').click(); }); await p.waitForTimeout(350); }
 async function enter(p) {
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
   await p.waitForTimeout(600);
@@ -52,15 +55,29 @@ async function enter(p) {
   await enter(p);
 
   // 2 · the Refresh key, in the top bar, labelled
-  const key = await p.evaluate(() => { const k = document.getElementById('refreshBtn'); if (!k) return null; const r = k.getBoundingClientRect();
-    return { label: k.getAttribute('aria-label'), title: k.title, vis: !!k.offsetParent && r.width > 0, next: k.nextElementSibling && k.nextElementSibling.id }; });
-  ok(key && key.vis && key.label === 'Refresh Ingenium' && key.next === 'displayBtn', 'the Refresh key stands in the top bar beside Display, labelled for a screen reader', key);
+  const bar = await p.evaluate(() => { const k = document.getElementById('refreshBtn'); return { inBar: !!(k && k.closest('.topbar,.topbar-tools')), inPanel: !!(k && k.closest('#displayPanel')) }; });
+  ok(!bar.inBar && bar.inPanel, 'the key is in the Display panel, not in the top bar', bar);
+  await openDisplay(p);
+  const key = await p.evaluate(() => { const k = document.getElementById('refreshBtn'); if (!k) return null; const r = k.getBoundingClientRect(), panel = document.getElementById('displayPanel');
+    const first = panel.querySelector('.sch-head').nextElementSibling;
+    const other = document.querySelector('#dpTheme .seg-btn'), o = other.getBoundingClientRect(), cs = getComputedStyle(k), co = getComputedStyle(other);
+    const same = k.classList.contains('seg-btn') && Math.abs(r.height - o.height) <= 2 && cs.borderRadius === co.borderRadius && cs.fontSize === co.fontSize && r.width < panel.getBoundingClientRect().width * 0.75;
+    const rows = [...panel.children].map(c => c.className);
+    return { name: k.innerText.trim(), vis: !!k.offsetParent && r.width > 60 && r.bottom <= innerHeight, first: rows[1] === 'dp-sec' && rows[2].indexOf('dp-refresh') >= 0, tag: k.tagName, same, w: Math.round(r.width), h: Math.round(r.height), oh: Math.round(o.height) }; });
+  ok(key && key.vis && key.first && key.name === 'Refresh the app' && key.tag === 'BUTTON', 'Display opens with "Refresh the app" first, in words, as a button', key);
+  ok(key && key.same, 'the key has the look and size of the panel\'s other keys (not a wide bar)', key);
+  await p.screenshot({ path: path.join(OUT, 'r61-display-panel.png') });
+  await p.evaluate(() => document.getElementById('dpClose').click());
+  await p.evaluate(() => go('settings')); await p.waitForTimeout(400);
+  const crd = await p.evaluate(() => { const c = document.getElementById('ing-refresh-card'); const pg = document.getElementById('page-settings'); return c ? { text: c.innerText.replace(/\s+/g, ' ').trim(), first: pg.querySelector('.card') === c } : null; });
+  ok(crd && crd.first && /If the app glitches or stops answering/.test(crd.text) && /Refresh the app/.test(crd.text), 'Settings opens with a large "Refresh the app" key, first of its cards', crd);
+  await p.evaluate(() => go('home'));
   await shot(p, 'r61-topbar-day');
 
   // 3 · Refresh saves the desk first, then starts again, and the loading page says so
   await p.evaluate(() => { state.__r151probe = 'kept-' + Date.now(); window.__r151mark = 1; });
   const probe = await p.evaluate(() => state.__r151probe);
-  const n0 = navs; await Promise.all([p.waitForNavigation({ timeout: 15000 }).catch(() => { }), p.click('#refreshBtn')]);
+  const n0 = navs; await openDisplay(p); await Promise.all([p.waitForNavigation({ timeout: 15000 }).catch(() => { }), p.click('#refreshBtn')]);
   const s3 = await watchLoad(p);
   const kept = await p.evaluate(() => { try { return JSON.parse(localStorage.getItem('ingenium_v4') || '{}').__r151probe; } catch (e) { return 'err'; } });
   ok(navs > n0 && kept === probe, 'Refresh saves the desk first and starts Ingenium again', { navs: navs - n0, kept, probe });
@@ -80,15 +97,15 @@ async function enter(p) {
 
   // 5 · while a reply is still being written, Refresh asks first
   await p.evaluate(() => { go('chat'); const m = document.createElement('div'); m.className = 'msg bot msg-live'; m.id = 'r151live'; const sc = document.getElementById('chatScroll') || document.querySelector('#page-chat'); sc.appendChild(m); });
-  const n3 = navs; await p.click('#refreshBtn'); await p.waitForTimeout(500);
+  const n3 = navs; await openDisplay(p); await p.click('#refreshBtn'); await p.waitForTimeout(500);
   const asked = await p.evaluate(() => { const t = document.body.innerText; return /Refresh Ingenium\?/.test(t) && /A reply is still being written/.test(t); });
   ok(asked, 'with a reply still being written, Refresh asks first and says why');
   await shot(p, 'r61-ask');
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Keep waiting' && x.offsetParent); if (k) k.click(); });
   await p.waitForTimeout(900);
   ok(navs === n3 && await p.evaluate(() => !!document.getElementById('r151live')), 'Keep waiting leaves the page as it is', navs - n3);
-  await p.click('#refreshBtn'); await p.waitForTimeout(400);
-  await Promise.all([p.waitForNavigation({ timeout: 15000 }).catch(() => { }), p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Refresh' && x.offsetParent && !x.closest('.cl-key') && x.id !== 'refreshBtn'); if (k) k.click(); })]);
+  await openDisplay(p); await p.click('#refreshBtn'); await p.waitForTimeout(400);
+  await Promise.all([p.waitForNavigation({ timeout: 15000 }).catch(() => { }), p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Refresh' && x.offsetParent && x.id !== 'refreshBtn'); if (k) k.click(); })]);
   await watchLoad(p);
   ok(navs > n3, 'and Refresh, once agreed, starts again', navs - n3);
   await p.waitForTimeout(800); await enter(p);
@@ -121,14 +138,15 @@ async function enter(p) {
   await p.evaluate(() => { state.theme = 'day'; saveState(); window.__ingBoot.done(); });
   const ph = await ctx.newPage(); await ph.setViewportSize({ width: 390, height: 844 });
   ph.goto(URL_).catch(() => { }); await watchLoad(ph); await ph.waitForTimeout(700); await enter(ph);
-  const fit = await ph.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, k: !!document.getElementById('refreshBtn') }));
+  await openDisplay(ph);
+  const fit = await ph.evaluate(() => { const k = document.getElementById('refreshBtn'), r = k.getBoundingClientRect(); return { over: document.documentElement.scrollWidth - innerWidth, k: r.width > 0 && r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, words: k.innerText.trim() }; });
   await ph.screenshot({ path: path.join(OUT, 'r61-phone.png') });
-  ok(fit.over <= 0 && fit.k, 'on a phone the top bar keeps the Refresh key with no sideways scroll', fit);
+  ok(fit.over <= 0 && fit.k && fit.words === 'Refresh the app', 'on a phone Display opens with "Refresh the app" in full view, and no sideways scroll', fit);
   await ph.close();
 
   // 8 · a page that never finishes starting says so and offers Refresh
   const stuck = await ctx.newPage();
-  await stuck.route('**/ingenium.html', async r => { const res = await r.fetch(); let t = await res.text(); t = t.replace('window.__ingReady=true;', '/* not ready, for the test */'); await r.fulfill({ response: res, body: t }); });
+  await stuck.route(URL_, async r => { const res = await r.fetch(); let t = await res.text(); t = t.replace('window.__ingReady=true;', '/* not ready, for the test */'); await r.fulfill({ response: res, body: t }); });
   stuck.goto(URL_).catch(() => { });
   await stuck.waitForTimeout(15000);
   const st = await stuck.evaluate(() => ({ keys: !document.getElementById('ib-keys').hidden, more: document.getElementById('ib-more').textContent, wait: document.getElementById('ib-wait').textContent }));
