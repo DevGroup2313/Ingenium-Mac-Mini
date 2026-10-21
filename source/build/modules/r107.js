@@ -359,6 +359,7 @@ body[data-motion="minimal"] #lx7 .l-pn:hover{transform:none}
 #lx7.l-phone .l-paper .cv .seals img.crest{width:92px;height:auto}
 #lx7.l-phone .l-paper .cv .seals img.crest.c-duo{width:180px}
 @media (prefers-reduced-motion:reduce){#lx7 *,#lx7 *::before,#lx7 *::after{animation:none !important;transition:none !important}}
+#lx7 .l-desk:focus-visible{outline:2px solid var(--l-ring);outline-offset:-3px}
 /* 6.1 · Ask Lector: the owner's own requests, written and sent from the foot of the document. The owner's words (20 October
    2026): "I also want a compose text chat area for the Lector page so I can write and send my more specific requests." */
 #lx7 .l-cmp{flex:0 0 auto;border-top:1px solid var(--l-hair2);background:var(--l-card);display:flex;flex-direction:column;min-height:0}

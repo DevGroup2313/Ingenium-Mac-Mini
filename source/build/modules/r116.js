@@ -32,7 +32,7 @@
 .cat-tools input[type=search]{flex:1 1 170px;min-width:120px;padding:6px 10px;border-radius:999px;border:.5px solid var(--hairline);background:var(--card);color:var(--ink-1);font:13px var(--sans)}
 .cat-group{font:600 12px/1 var(--sans);color:var(--ink-3);margin:12px 0 6px;letter-spacing:.02em;text-transform:uppercase}
 .cat-tag{font:600 10px/1 var(--sans);padding:3px 7px;border-radius:999px;background:var(--accent-soft,rgba(106,63,181,.10));color:var(--accent,#6a3fb5);margin-left:4px;vertical-align:1px}
-.cat-tag.code{background:rgba(47,122,85,.12);color:#2f7a55}.cat-tag.eyes{background:rgba(24,112,160,.12);color:#1d6a93}
+.cat-tag.code{background:rgba(47,122,85,.12);color:#22603f}/* 6.1: darker, for 4.5:1 at this size (the accessibility audit) */.cat-tag.eyes{background:rgba(24,112,160,.12);color:#1d6a93}
 .cat-more{margin-top:8px}
 body[data-theme="night"] .hm-tag.ok,body[data-theme="night"] .cat-tag.code{color:#8fd0a9}
 body[data-theme="night"] .hm-tag.warn{color:#e2bd68}body[data-theme="night"] .hm-tag.bad{color:#e49a8e}
