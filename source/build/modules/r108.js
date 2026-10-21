@@ -273,7 +273,7 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
      '<div class="l-drow"><div class="l-dtabs" id="l7Dtabs" role="tablist" aria-label="Documents"></div>'+
      /* 6.1: the document's size: smaller, fit to the panel, larger */
      '<div class="l-zoom" id="l7Zoom" role="group" aria-label="The document\'s size"><button type="button" data-z="-" aria-label="Smaller" title="Smaller">−</button><button type="button" data-z="fit" aria-pressed="true" title="Fit the page to the panel">Fit</button><button type="button" data-z="+" aria-label="Larger" title="Larger">+</button><span class="pc" aria-live="polite"></span></div></div>'+
-     '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk"></div>'+
+     '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
      /* 6.1: Ask Lector, the owner's own requests (paintAsk) */
      '<div class="l-cmp" id="l7Ask" role="region" aria-label="Ask Lector"></div>'+
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
@@ -977,7 +977,7 @@ function askTrim(){var th=askThread();while(th.length>ASKS_MAX)th.shift();}
 function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis",st=kind!=="analysis"?stored(kind):null,th=askThread(),reqs=askReqs();
   if(!box.__built){box.__built=true;box.innerHTML=
     '<div class="l-cmp-h"><b>Ask Lector</b><span class="n"></span><button type="button" class="l-cmp-tg" aria-expanded="true">Hide the conversation</button></div>'+
-    '<div class="l-cmp-reqs" aria-label="Requests kept for the writing"></div>'+
+    '<div class="l-cmp-reqs" role="group" aria-label="Requests kept for the writing"></div>'+
     '<div class="l-cmp-th" role="log" aria-live="polite" aria-label="Your requests and Lector\'s answers"></div>'+
     '<form class="l-cmp-f"><div class="l-cmp-in"><textarea rows="1" aria-label="Your request to Lector" placeholder="Write your request to Lector…" aria-describedby="l7AskHint"></textarea></div>'+
     '<button type="submit" class="l-btn pri l-cmp-send" aria-label="Send the request" title="Send (Enter)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4"/><path d="M5 9l5-5 5 5"/></svg></button></form>'+

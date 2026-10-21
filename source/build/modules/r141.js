@@ -62,6 +62,7 @@
 #fb button.h-lab:hover{transform:translateY(-1px)}
 #fb button.h-lab[aria-pressed="false"]{opacity:.5;box-shadow:none}
 #fb button.h-lab[aria-pressed="true"]::before{content:"✓";font-size:10px}
+#fb .f-seg button[aria-pressed="true"] .n{background:rgba(255,255,255,.22);color:#fff}
 #fb .h-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:8px 12px 0}
 #fb .h-empty-n{color:var(--f-ink3);font-size:12.5px}
 #fb .h-tl{position:relative;display:flex;flex-direction:column;gap:12px;padding:6px 12px 12px 34px}
@@ -286,7 +287,7 @@ function clone(x){return JSON.parse(JSON.stringify(x));}
 function seq(list,fn){var out=[],i=0;function next(){if(i>=list.length)return Promise.resolve(out);var k=i++;
   return Promise.resolve(fn(list[k],k)).then(function(v){out[k]=v;return k%40===39?new Promise(function(res){setTimeout(res,0);}).then(next):next();});}return next();}
 /* asked, in the page's own words where it has a way to ask; the Forge has none of Ingenium's, so its own confirm */
-function ask(title,text,yes,danger){try{if(typeof window.ingAsk==="function")return Promise.resolve(window.ingAsk({title:title,text:text,yes:yes||"Yes",no:"Keep it",danger:!!danger}));}catch(e){}
+function ask(title,text,yes,danger,no){try{if(typeof window.ingAsk==="function")return Promise.resolve(window.ingAsk({title:title,text:text,yes:yes||"Yes",no:no||"Keep it",danger:!!danger}));}catch(e){}
   return Promise.resolve(window.confirm(title+"\n\n"+text));}
 function who(){try{var a=IngRepo.author&&IngRepo.author();if(a&&a.name)return a.name;}catch(e){}return "You";}
 
@@ -325,7 +326,7 @@ var REC={},RECP={},RECERR={},SAVEQ={};
 /* the record of an app, if it is read already; otherwise it is read now and the view painted again */
 function recOf(r){if(REC[r.id])return REC[r.id];if(!RECP[r.id]&&!RECERR[r.id]){RECP[r.id]=recP(r.id).then(function(){delete RECP[r.id];repaint();},function(e){delete RECP[r.id];RECERR[r.id]=e;repaint();});}return null;}
 function recP(id){if(REC[id])return Promise.resolve(REC[id]);return getRec(id).then(function(x){if(!REC[id])REC[id]=norm(x||fresh(id),id);return REC[id];});}
-function keep(rec){rec.changed=Date.now();REC[rec.id]=rec;var job=(SAVEQ[rec.id]||Promise.resolve()).then(function(){return putRec(rec);});SAVEQ[rec.id]=job.catch(function(){});
+function keep(rec){rec.changed=Date.now();REC[rec.id]=rec;badges(rec);var job=(SAVEQ[rec.id]||Promise.resolve()).then(function(){return putRec(rec);});SAVEQ[rec.id]=job.catch(function(){});
   return job.catch(function(e){fail(new Error("this could not be kept on the device ("+(e&&e.message||e)+")"));throw e;});}
 function forget(id){delete REC[id];delete VS[id];var st=hs();var i=st.stars.indexOf(id);if(i>=0){st.stars.splice(i,1);stSave();}return delRec(id).catch(function(){});}
 
@@ -384,9 +385,10 @@ function mdInline(s,o){o=o||{};var held=[];function hold(x){held.push(x);return 
   s=s.replace(/(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g,function(m,t,c){if(/^ .* $/.test(c)&&c.trim())c=c.slice(1,-1);return hold("<code>"+esc(c)+"</code>");});
   s=s.replace(/\\([\\`*_{}\[\]()#+\-.!|~<>])/g,function(m,c){return hold(esc(c));});
   if(o.wiki)s=s.replace(/\[\[([^\]\n|]+)(?:\|([^\]\n]+))?\]\]/g,function(m,a,b){var page=(b||a).trim(),text=a.trim();return hold(o.wiki(page,text));});
-  s=s.replace(/!\[([^\]\n]*)\]\(\s*<?([^\s)>]+)>?(?:\s+"[^"\n]*")?\s*\)/g,function(m,alt,src){return hold(o.img?o.img(src,alt):'<span class="h-alt">'+esc(alt||"a picture")+"</span>");});
+  /* an address may hold brackets of its own, as javascript:alert(1) or a page about Tide_(clock) does: one pair is read as part of it */
+  s=s.replace(/!\[([^\]\n]*)\]\(\s*(?:<([^\s<>]+)>|((?:[^\s()<>]|\([^\s()<>]*\))+))(?:\s+"[^"\n]*")?\s*\)/g,function(m,alt,s1,s2){var src=s1||s2;return hold(o.img?o.img(src,alt):'<span class="h-alt">'+esc(alt||"a picture")+"</span>");});
   if(!o.nolink){
-    s=s.replace(/\[((?:[^\[\]\n]|\[[^\]\n]*\])+)\]\(\s*<?([^\s)>]+)>?(?:\s+"([^"\n]*)")?\s*\)/g,function(m,text,url,title){var o2={};for(var k in o)o2[k]=o[k];o2.nolink=true;return hold(mdLink(url,mdInline(text,o2),title,o));});
+    s=s.replace(/\[((?:[^\[\]\n]|\[[^\]\n]*\])+)\]\(\s*(?:<([^\s<>]+)>|((?:[^\s()<>]|\([^\s()<>]*\))+))(?:\s+"([^"\n]*)")?\s*\)/g,function(m,text,u1,u2,title){var url=u1||u2;var o2={};for(var k in o)o2[k]=o[k];o2.nolink=true;return hold(mdLink(url,mdInline(text,o2),title,o));});
     s=s.replace(/<((?:https?:\/\/|mailto:)[^\s<>]+)>/g,function(m,u){return hold(mdLink(u,esc(u),null,o));});
     s=s.replace(/(^|[\s(])((?:https?:\/\/|www\.)[^\s<]*[^\s<.,:;"')\]!?*_~])/g,function(m,pre,u){return pre+hold(mdLink(/^www\./i.test(u)?"https://"+u:u,esc(u),null,o));});}
   s=esc(s);
@@ -527,15 +529,15 @@ function markMerged(rec,p,o){p.state="merged";p.pending=null;p.merged={at:Date.n
 function afterKept(id,oid){return recP(id).then(function(rec){return IngRepo.info(id).then(function(r){return scan(r,true).then(function(res){
     if(res.closed.length)setTimeout(function(){toast("Issue "+nums(res.closed)+(res.closed.length>1?" are":" is")+" closed by this version.");},1700);
     else if(res.merged.length)setTimeout(function(){toast("Pull request "+nums(res.merged)+(res.merged.length>1?" are":" is")+" merged.");},1700);
-    if(rec.auto&&oid)runChecks(r,oid,"kept").catch(function(){});repaint();});});}).catch(function(e){try{console.warn("R141 after a version",e);}catch(_){}});}
+    if(rec.auto&&oid)runChecks(r,oid,"kept",r.detached?null:r.branch).catch(function(){});repaint();});});}).catch(function(e){try{console.warn("R141 after a version",e);}catch(_){}});}
 
 /* ---------- Actions: Fabrica's own five checks as runs, one at a time ---------- */
 var RUNQ=Promise.resolve(),LIVE={};
-function runChecks(r,ref,by){if(typeof IngShip==="undefined"||!IngShip.test)return Promise.reject(new Error("this copy has no checks to run"));
+function runChecks(r,ref,by,label){if(typeof IngShip==="undefined"||!IngShip.test)return Promise.reject(new Error("this copy has no checks to run"));
   var job=RUNQ.then(function(){var t0=Date.now();LIVE[r.id]={ref:ref,checks:[],at:t0,by:by};repaint();
     return IngShip.test(r.id,{ref:ref,onStep:function(c){if(LIVE[r.id]){LIVE[r.id].checks.push(c);repaint();}}}).then(function(out){
       return Promise.all([recP(r.id),IngRepo.log(r.id,{ref:out.commit,max:1}).catch(function(){return [];})]).then(function(x){var rec=x[0],c=x[1][0]||{};rec.runN=(rec.runN||0)+1;
-        var run={n:rec.runN,oid:out.commit,short:String(out.commit||"").slice(0,7),title:c.title||"",ref:refLabel(ref),at:Date.now(),took:Date.now()-t0,ok:!!(out.ok&&out.page),page:out.page||"",checks:(out.checks||[]).map(function(k){return {id:k.id,label:k.label,state:k.state,detail:k.detail};}),by:by};
+        var run={n:rec.runN,oid:out.commit,short:String(out.commit||"").slice(0,7),title:c.title||"",ref:label||refLabel(ref),at:Date.now(),took:Date.now()-t0,ok:!!(out.ok&&out.page),page:out.page||"",checks:(out.checks||[]).map(function(k){return {id:k.id,label:k.label,state:k.state,detail:k.detail};}),by:by};
         rec.runs.unshift(run);rec.runs=rec.runs.slice(0,100);delete LIVE[r.id];return keep(rec).then(function(){return run;});});});})
   .then(function(run){repaint();var x=X();if(x)x.refresh().then(function(){x.paint();},function(){});return run;},function(e){delete LIVE[r.id];repaint();throw e;});
   RUNQ=job.catch(function(){});return job;}
@@ -571,8 +573,14 @@ function mdInto(el,html,r,rec,ref){el.innerHTML=html;
 function openItem(r,n){var rec=REC[r.id];if(!rec)return;var it=itemN(rec,n);if(!it){toast("There is no #"+n+" here.");return;}
   if(it.kind==="pr"){var v=V(r).pr;v.open=n;v.tab="conv";show("pulls");}else{V(r).iss.open=n;show("issues");}}
 
+/* a row of keys, one pressed. Every repaint makes the row afresh, so its sliding thumb is placed at once the first time
+   (it would otherwise grow from nothing and leave the pressed key's white words on a pale ground for a moment), and slides
+   after that; in a sheet, where nothing repaints, it is placed when the row is on the page */
+function segBox(label){var seg=h("div","f-seg"),th=h("span","f-thumb");seg.setAttribute("role","group");seg.setAttribute("aria-label",label);th.style.transition="none";seg.appendChild(th);
+  var raf=window.requestAnimationFrame||function(fn){return setTimeout(fn,16);};
+  raf(function(){if(seg.isConnected&&!th.style.width)try{var x=X();if(x)x.thumbs();}catch(e){}raf(function(){th.style.transition="";});});return seg;}
 /* ---------- a box to write Markdown in, with its preview ---------- */
-function composer(opt){opt=opt||{};var wrap=h("div","h-compose"),seg=h("div","f-seg"),ta=h("textarea"),pv=h("div","h-prev h-md");seg.setAttribute("role","group");seg.setAttribute("aria-label","Write or preview");
+function composer(opt){opt=opt||{};var wrap=h("div","h-compose"),seg=segBox("Write or preview"),ta=h("textarea"),pv=h("div","h-prev h-md");
   var bw=h("button",null,"Write"),bp=h("button",null,"Preview");bw.type=bp.type="button";bw.setAttribute("aria-pressed","true");bp.setAttribute("aria-pressed","false");seg.appendChild(bw);seg.appendChild(bp);
   ta.placeholder=opt.ph||"Write here. Markdown works: **bold**, _italic_, `code`, lists, links, tables, and #3 to point at an issue.";ta.setAttribute("aria-label",opt.label||"Text");ta.value=opt.value||"";if(opt.id)ta.id=opt.id;ta.style.minHeight=(opt.rows||5)*1.5+"em";
   pv.hidden=true;function mode(p){bw.setAttribute("aria-pressed",p?"false":"true");bp.setAttribute("aria-pressed",p?"true":"false");ta.hidden=p;pv.hidden=!p;
@@ -650,7 +658,7 @@ function repoMd(dir){return {path:function(u){return joinPath(dir,u);},img:funct
 function codeFile(r,v,ref,w,f,rec){var key=gk(r,"files|"+ref),list=want(key,function(){return IngRepo.files(r.id,ref);});
   var dir=v.file.indexOf("/")>=0?v.file.replace(/[^/]+$/,""):"";v.dir=dir;crumbs(r,v,v.file,w,true);
   var isMd=/\.(md|markdown)$/i.test(v.file);if(v.mode==="prev"&&!isMd)v.mode="view";
-  var seg=h("div","f-seg");seg.setAttribute("role","group");seg.setAttribute("aria-label","How to look at this file");
+  var seg=segBox("How to look at this file");
   (isMd?[["prev","Preview"]]:[]).concat([["view","Code"],["blame","Blame"],["hist","History"]]).forEach(function(m){var b=T("button",null,m[1]);b.type="button";b.setAttribute("aria-pressed",v.mode===m[0]?"true":"false");b.setAttribute("data-m",m[0]);b.onclick=function(){v.mode=m[0];repaint(true);};seg.appendChild(b);});
   var sb=h("div","h-bar h-blk");sb.appendChild(seg);if(v.qrun)sb.appendChild(rightOf(btn("quiet sm","Back to the search",function(){v.res=true;repaint(true);})));w.appendChild(sb);
   sig(r,"code|"+ref+"|"+v.file+"|"+v.mode);
@@ -748,14 +756,15 @@ function marked(line,re){var s=String(line),first=-1,m;re.all.lastIndex=0;var sp
   spans.forEach(function(sp){if(sp[0]<from||sp[0]>=to)return;out+=esc(s.slice(p,sp[0]))+'<mark class="h-mk">'+esc(s.slice(sp[0],Math.min(sp[1],to)))+"</mark>";p=Math.min(sp[1],to);});
   out+=esc(s.slice(p,to))+(to<s.length?"…":"");return out;}
 function codeSearch(r,v,ref,w,f,rec){var qq=v.qrun,key=gk(r,"search|"+ref+"|"+(qq.cs?1:0)+"|"+qq.q),res=want(key,function(){return search(r,ref,qq.q,qq.cs);});sig(r,"search|"+key);
+  /* the way out is there while it searches and when a pattern cannot be read, not only beside results */
+  f.appendChild(btn("","Close the search",function(){v.res=false;v.qrun=null;v.q="";repaint(true);}));
   if(res===undefined)return waitBox(w,"Searching every file at "+refLabel(ref)+" for “"+qq.q+"”…");if(isErr(res))return errBox(w,res.__err,key);
   var nt=h("p","h-note2 h-blk");nt.id="hSearchNote";nt.textContent=(res.total?plural(res.total,"line")+" in "+plural(res.files.length,"file"):"Nothing found")+" for “"+qq.q+"” at "+refLabel(ref)+", in "+plural(res.searched,"file")+" searched"+(res.skipped?" ("+plural(res.skipped,"picture or other binary file","pictures and other binary files")+" left out)":"")+"."+(res.capped?" The first 2,000 lines found are shown.":"");w.appendChild(nt);
   res.files.forEach(function(x){var box=h("div","h-res h-blk"),hd=h("div","h-res-h");hd.appendChild(T("span",null,x.path));hd.appendChild(T("span","f-chip",plural(x.hits.length,"line")));box.appendChild(hd);
     x.lines.forEach(function(l,i){var n=x.hits[i],b=h("button","h-res-l","<i>"+n+"</i><span>"+marked(l,res.re)+"</span>");b.type="button";b.setAttribute("aria-label",x.path+", line "+n);
       b.onclick=function(){v.file=x.path;v.mode="view";v.line=n;v.res=false;v.show=2000;repaint(true);};box.appendChild(b);});
     if(x.hits.length>x.lines.length){var more=btn("quiet sm","and "+plural(x.hits.length-x.lines.length,"more line")+" in this file",function(){v.file=x.path;v.mode="view";v.line=x.hits[x.lines.length];v.res=false;repaint(true);});more.style.margin="4px 8px 8px";box.appendChild(more);}
-    w.appendChild(box);});
-  f.appendChild(btn("","Close the search",function(){v.res=false;v.qrun=null;v.q="";repaint(true);}));}
+    w.appendChild(box);});}
 
 /* ======================= ISSUES ======================= */
 function needRec(r,w,what){var rec=recOf(r);if(rec)return rec;
@@ -763,7 +772,7 @@ function needRec(r,w,what){var rec=recOf(r);if(rec)return rec;
   waitBox(w,"Reading "+what+"…");return null;}
 var SCANT={};function scanSoon(r){clearTimeout(SCANT[r.id]);SCANT[r.id]=setTimeout(function(){scan(r).then(function(x){if(x.changed)repaint();},function(){});},40);}
 function backBar(w,label,fn){var b=h("div","h-bar h-blk"),k=btn("quiet sm","‹ "+label,fn);k.setAttribute("data-k","back");b.appendChild(k);w.appendChild(b);return b;}
-function segOf(label,list,val,on){var seg=h("div","f-seg");seg.setAttribute("role","group");seg.setAttribute("aria-label",label);
+function segOf(label,list,val,on){var seg=segBox(label);
   list.forEach(function(s){var b=h("button",null,esc(s[1])+(s[2]!=null?'<span class="n">'+s[2]+"</span>":""));b.type="button";b.setAttribute("data-s",s[0]);b.setAttribute("aria-pressed",val===s[0]?"true":"false");b.onclick=function(){on(s[0]);};seg.appendChild(b);});return seg;}
 function matchQ(it,q,rec){q=String(q||"").trim().toLowerCase();if(!q)return true;var words=q.split(/\s+/),hay=[it.title,it.body].concat(it.comments.map(function(c){return c.body;})).join("\n").toLowerCase();
   return words.every(function(wd){var m=/^label:(.+)$/.exec(wd);if(m)return it.labels.some(function(l){return l.toLowerCase()===m[1];});m=/^is:(open|closed|merged)$/.exec(wd);if(m)return it.state===m[1]||(m[1]==="closed"&&it.state==="merged");
@@ -826,7 +835,7 @@ function issueOne(r,rec,it,v,w,f){sig(r,"issue|"+it.n);backBar(w,"All issues",fu
   evs.sort(function(a,b){return a.at-b.at;}).forEach(function(x){if(x.c){tl.appendChild(cmtCard(r,rec,x.c).el);return;}
     if(x.ref){var e=evLine("acc","Mentioned in ",x.ref.at);e.insertBefore(versionBtn(r,x.ref.oid,x.ref.short,x.ref.title),e.lastChild.previousSibling||null);if(x.ref.idea)e.insertBefore(document.createTextNode(" on "+x.ref.idea+" "),e.querySelector("small"));tl.appendChild(e);return;}
     if(x.pr){var e2=evLine("acc","Mentioned in ",x.at);e2.insertBefore(prBtn(r,x.pr.n,x.pr.title),e2.querySelector("small"));tl.appendChild(e2);return;}
-    var ev=x.e;if(ev.kind==="closed"){var e3=evLine("acc","Closed"+(ev.by&&ev.by.kind?" by ":""),ev.at);if(ev.by&&ev.by.kind==="version")e3.insertBefore(versionBtn(r,ev.by.oid,ev.by.short,ev.by.title),e3.querySelector("small"));
+    var ev=x.e;if(ev.kind==="closed"){var e3=evLine("acc","Closed"+(ev.by&&(ev.by.kind==="version"||ev.by.kind==="pr")?" by ":""),ev.at);if(ev.by&&ev.by.kind==="version")e3.insertBefore(versionBtn(r,ev.by.oid,ev.by.short,ev.by.title),e3.querySelector("small"));
         else if(ev.by&&ev.by.kind==="pr")e3.insertBefore(prBtn(r,ev.by.n),e3.querySelector("small"));tl.appendChild(e3);return;}
     if(ev.kind==="reopened"){tl.appendChild(evLine("ok","Reopened",ev.at));return;}
     if(ev.kind==="labels"){tl.appendChild(evLine("",esc((ev.add.length?"Labels given: "+ev.add.join(", "):"")+(ev.add.length&&ev.del.length?"; ":"")+(ev.del.length?"taken away: "+ev.del.join(", "):"")),ev.at));return;}
@@ -849,6 +858,13 @@ function issueOne(r,rec,it,v,w,f){sig(r,"issue|"+it.n);backBar(w,"All issues",fu
 function prInfo(r,from,to){return Promise.all([IngRepo.resolve(r.id,"refs/heads/"+from),IngRepo.resolve(r.id,"refs/heads/"+to)]).then(function(x){return between(r,x[1],x[0]).then(function(b){b.fromOid=x[0];b.toOid=x[1];b.files=0;b.both=[];
   if(!b.base||!b.ahead.length)return b;
   return Promise.all([IngRepo.diff(r.id,{from:b.base,to:x[0],namesOnly:true}),IngRepo.diff(r.id,{from:b.base,to:x[1],namesOnly:true})]).then(function(d){var A={};d[0].forEach(function(c){A[c.path]=1;});b.files=d[0].length;b.both=d[1].filter(function(c){return A[c.path];}).map(function(c){return c.path;});return b;});});});}
+/* the idea a new pull request starts from, as GitHub offers the branch just pushed: the one worked on if it has versions the
+   target lacks, otherwise the idea with something to bring in whose newest version is newest (twelve looked at, at most) */
+function pickFrom(r,to){var bs=r.branches.filter(function(b){return b!==to;});if(!bs.length)return Promise.resolve(null);
+  return IngRepo.resolve(r.id,"refs/heads/"+to).then(function(toOid){return seq(bs.slice(0,12),function(b){return IngRepo.log(r.id,{ref:"refs/heads/"+b,max:1}).then(function(l){var tip=l[0];if(!tip||!toOid)return null;
+      return between(r,toOid,tip.oid).then(function(x){return {b:b,n:x.ahead.length,when:tip.when};});}).catch(function(){return null;});});})
+    .then(function(list){list=list.filter(function(x){return x&&x.n>0;});if(!list.length)return null;var mine=list.filter(function(x){return x.b===r.branch&&!r.detached;})[0];if(mine)return mine.b;
+      return list.sort(function(a,b){return b.when-a.when;})[0].b;});}
 function reviewState(p){var last=null;p.comments.forEach(function(c){if(c.kind==="approve"||c.kind==="changes")last=c.kind;});return last;}
 function paintPulls(r,w,f){var rec=needRec(r,w,"the pull requests");if(!rec)return;scanSoon(r);var v=V(r).pr;
   if(v.open==="new")return prNew(r,rec,v,w,f);
@@ -872,7 +888,9 @@ function prNew(r,rec,v,w,f){sig(r,"pr-new");backBar(w,"All pull requests",functi
   if(r.branches.length<2){var e=h("div","f-empty h-blk","<b>A pull request needs two ideas</b>Start a new idea in Ideas, keep a version on it, and come back: it can then ask to be brought into "+esc(defBranch(r,rec))+".");w.appendChild(e);
     f.appendChild(btn("pri","Go to Ideas",function(){show("ideas");}));return;}
   var fm=v.form||(v.form={from:null,to:null,title:"",body:""});if(!fm.to||r.branches.indexOf(fm.to)<0)fm.to=defBranch(r,rec);
-  if(!fm.from||r.branches.indexOf(fm.from)<0||fm.from===fm.to)fm.from=(r.branch&&r.branch!==fm.to)?r.branch:branchOpts(r,fm.to)[0].v;
+  if(!fm.from||r.branches.indexOf(fm.from)<0||fm.from===fm.to){var pk0=want(gk(r,"prpick|"+fm.to),function(){return pickFrom(r,fm.to);});
+    if(pk0===undefined){f.appendChild(btn("","Cancel",function(){v.open=null;v.form=null;repaint(true);}));return waitBox(w,"Looking for an idea with something to bring in…");}
+    fm.from=pk0&&!isErr(pk0)&&pk0!==fm.to&&r.branches.indexOf(pk0)>=0?pk0:(r.branch&&r.branch!==fm.to)?r.branch:branchOpts(r,fm.to)[0].v;}
   var form=h("div","h-form h-blk");form.appendChild(T("h3","h-sub","A new pull request")).style.margin="0";
   var pk=h("div","h-pick");pk.style.padding="0";var la=h("label");la.appendChild(T("span",null,"Bring the idea"));var sa=picker(branchOpts(r,null),fm.from,"The idea to bring in",function(x){fm.from=x;repaint(true);});sa.id="hPrFrom";la.appendChild(sa);
   var lb=h("label");lb.appendChild(T("span",null,"into"));var sb=picker(branchOpts(r,null),fm.to,"The idea it goes into",function(x){fm.to=x;repaint(true);});sb.id="hPrTo";lb.appendChild(sb);
@@ -1026,7 +1044,7 @@ function paintActions(r,w,f){var rec=needRec(r,w,"the runs");if(!rec)return;var 
   if(!rec.runs.length&&!LIVE[r.id]){list.appendChild(h("div","f-empty","<b>No runs yet</b>Choose a version above and run the checks, or let them run on every version you keep."));return;}
   rec.runs.forEach(function(x,i){var open=v.open===x.n,e=h("div","h-run");e.setAttribute("aria-expanded",open?"true":"false");e.setAttribute("data-n",x.n);e.style.animationDelay=Math.min(i,10)*0.03+"s";
     var hb=document.createElement("button");hb.type="button";hb.setAttribute("aria-expanded",open?"true":"false");
-    hb.innerHTML='<span class="h-dot '+(!x.page?"none":x.ok?"ok":"bad")+'">'+(!x.page?"○":x.ok?"✓":"!")+'</span><span class="t"><b>#'+x.n+" · "+esc(runWord(x))+" · "+esc(x.title||x.short)+"</b><small>"+esc((x.by==="kept"?"when it was kept":"by hand")+" · "+x.ref+" · "+x.short+" · "+when(x.at)+" · "+(x.took/1000).toFixed(1)+" s")+"</small></span>";
+    hb.innerHTML='<span class="h-dot '+(!x.page?"none":x.ok?"ok":"bad")+'">'+(!x.page?"○":x.ok?"✓":"!")+'</span><span class="t"><b>#'+x.n+" · "+esc(runWord(x))+" · "+esc(x.title||x.short)+"</b><small>"+esc([x.by==="kept"?"when it was kept":"by hand",x.ref!==x.short?x.ref:"",x.short,when(x.at),(x.took/1000).toFixed(1)+" s"].filter(Boolean).join(" · "))+"</small></span>";
     hb.onclick=function(){v.open=open?null:x.n;repaint();};e.appendChild(hb);
     if(open){var bd2=h("div","h-body");bd2.appendChild(ckRows(x.checks,false));var row=h("div","f-row");row.style.marginTop="10px";
       row.appendChild(btn("sm","Run it again",function(){runChecks(r,x.oid,"hand").then(function(run){v.open=run.n;},fail);}));
@@ -1210,6 +1228,17 @@ function paintSettings(r,w,f){var rec=needRec(r,w,"the settings");if(!rec)return
   var r5=h("div","f-row"),fk=btn("","Fork "+r.name,function(){if(!r.head){toast("Keep a first version first.");return;}askLine("Fork "+r.name,"The new app's name.",r.name+" fork",function(nm){return fork(r,nm).then(function(id){openApp(id,"history");toast(nm+" is here, with the whole history of "+r.name+".");});});});fk.id="hSetFork";r5.appendChild(fk);s5.appendChild(r5);w.appendChild(s5);
   var s6=h("div","h-box h-blk");s6.innerHTML='<b class="h-big">Use as a template</b>A new app that starts from this one\'s files as they are in the version kept now, with a fresh history of its own.';
   var r6=h("div","f-row"),tp=btn("","Use as a template",function(){if(!r.head){toast("Keep a first version first.");return;}askLine("A new app from "+r.name,"The new app's name.","",function(nm){return template(r,nm).then(function(id){openApp(id,"history");toast(nm+" is here, made from "+r.name+".");});},"My new app");});tp.id="hSetTpl";r6.appendChild(tp);s6.appendChild(r6);w.appendChild(s6);
+  /* the store's copy, in the owner's hands: every app's issues, pull requests, wiki, board, runs and labels in one file, to keep
+     or to carry to another device (the apps themselves travel as a folder for git, or their whole history in one file) */
+  var s7=h("div","h-box h-blk");s7.innerHTML='<b class="h-big">Issues and pages, in one file</b>The issues, pull requests, wiki, board, runs and labels of every app in Fabrica, in one file to keep, or to bring to another device. The apps themselves are saved apart, as A folder for git under Test and ship; on another device each app\'s notes find it by its name.';
+  var r7=h("div","f-row"),ex=btn("","Save a copy",function(){ex.disabled=true;exportAll().then(function(d){var x=X(),nm="fabrica-issues-and-pages-"+new Date().toISOString().slice(0,10)+".json";
+      return x.saveBytes(nm,"application/json",new TextEncoder().encode(JSON.stringify(d))).then(function(){toast("Saved: "+nm+", with the notes of "+plural(d.apps.length,"app")+".");});}).then(function(){ex.disabled=false;},function(e){ex.disabled=false;fail(e);});});ex.id="hSetExport";
+  var fi=h("input");fi.type="file";fi.accept=".json,application/json";fi.hidden=true;fi.id="hSetImportFile";fi.setAttribute("aria-label","A copy of Fabrica's issues and pages to bring back");
+  fi.onchange=function(){var file=fi.files&&fi.files[0];if(!file)return;
+    (file.text?file.text():new Response(file).text()).then(function(t){try{var d=JSON.parse(t);}catch(e){throw new Error("that is not a backup of Fabrica's issues and pages");}if(!d||d.kind!=="ingenium-hub"||!Array.isArray(d.apps))throw new Error("that is not a backup of Fabrica's issues and pages");
+      return ask("Bring back the issues and pages in “"+file.name+"”?","It holds the notes of "+plural(d.apps.length,"app")+". For each of them, what the copy holds takes the place of what is here now. Apps the copy does not name are not touched.","Bring them back",false,"Not now").then(function(y){return y?importAll(d):null;});})
+    .then(function(res){fi.value="";if(res){toast("Brought back: the notes of "+plural(res.apps,"app")+(res.byName?", "+res.byName+" found by name":"")+"."+(res.skipped?" "+plural(res.skipped,"app")+" in the copy "+(res.skipped===1?"is":"are")+" not in Fabrica here: bring "+(res.skipped===1?"it":"them")+" in, then bring the copy back again.":""));repaint(true);}},function(e){fi.value="";fail(e);});};
+  var im=btn("","Bring a copy back",function(){fi.click();});im.id="hSetImport";r7.appendChild(ex);r7.appendChild(im);r7.appendChild(fi);s7.appendChild(r7);w.appendChild(s7);
   w.appendChild(T("p","h-note2 h-blk","To rename this app, or to remove it from Fabrica, use ⋯ beside its name above."));}
 /* a fork: the bundle of every version, brought in as an app of its own (without the family app's own package id, so a fork's
    package never installs over the app it came from) */
@@ -1221,12 +1250,24 @@ function template(r,name){return IngRepo.files(r.id,r.head).then(function(list){
 function openApp(id,view){var x=X();if(!x)return;x.FBS().sel=id;x.saveSoon();x.S.view=view||"history";x.S.file=0;x.S.cmp=null;try{x.C.diff={};x.C.files={};x.C.log={};}catch(e){}x.refresh().then(function(){x.paint();});}
 
 /* ======================= what Fabrica and the backup see ======================= */
-function exportAll(){return allRecs().catch(function(){return [];}).then(function(recs){var m={};recs.forEach(function(x){m[x.id]=x;});Object.keys(REC).forEach(function(id){m[id]=REC[id];});
-  return {kind:"ingenium-hub",version:1,at:Date.now(),stars:hs().stars.slice(),apps:Object.keys(m).map(function(id){return clone(m[id]);})};});}
+/* each app's record goes with its name: on another device an app brought in from its git folder or its bundle has a new id,
+   and its notes find it by its name there */
+function namesHere(){return IngRepo.list().then(function(rs){return Array.isArray(rs)?rs:[];},function(){return [];});}
+function exportAll(){return Promise.all([allRecs().catch(function(){return [];}),namesHere()]).then(function(x){var m={},nm={};x[0].forEach(function(r){m[r.id]=r;});Object.keys(REC).forEach(function(id){m[id]=REC[id];});
+  x[1].forEach(function(r){nm[r.id]=r.name;});
+  return {kind:"ingenium-hub",version:1,at:Date.now(),stars:hs().stars.slice(),apps:Object.keys(m).map(function(id){var c=clone(m[id]);if(nm[id])c.name=nm[id];return c;})};});}
 function importAll(data){try{if(typeof data==="string")data=JSON.parse(data);}catch(e){return Promise.reject(new Error("that is not a backup of Fabrica's issues and pages"));}
   if(!data||data.kind!=="ingenium-hub"||!Array.isArray(data.apps))return Promise.reject(new Error("that is not a backup of Fabrica's issues and pages"));
-  var n=0;return seq(data.apps,function(x){if(!x||typeof x.id!=="string"||!x.id)return;var rec=norm(clone(x),x.id);REC[rec.id]=rec;delete RECERR[rec.id];n++;return putRec(rec);}).then(function(){var st=hs();
-    (data.stars||[]).concat(data.apps.filter(function(x){return x&&x.star;}).map(function(x){return x.id;})).forEach(function(id){if(typeof id==="string"&&st.stars.indexOf(id)<0)st.stars.push(id);});stSave();SCANSIG={};DONE={};repaint();return {apps:n};});}
+  return namesHere().then(function(rs){var ids={},byName={},moved={},n=0,skipped=0;rs.forEach(function(r){ids[r.id]=1;(byName[r.name]=byName[r.name]||[]).push(r.id);});
+    var named={};data.apps.forEach(function(x){if(x&&typeof x.id==="string")named[x.id]=1;});
+    return seq(data.apps,function(x){if(!x||typeof x.id!=="string"||!x.id)return;var id=x.id;
+      /* an id not on this device: the one app here of the same name, if no other record in the copy is already its own */
+      if(!ids[id]&&x.name&&byName[x.name]&&byName[x.name].length===1&&!named[byName[x.name][0]]){moved[id]=byName[x.name][0];id=moved[id];}
+      /* the notes of an app that is not here are left in the copy: bring the app in first, then the copy again */
+      if(rs.length&&!ids[id]){skipped++;return;}var rec=norm(clone(x),id);rec.id=id;delete rec.name;REC[id]=rec;delete RECERR[id];n++;return putRec(rec);})
+    .then(function(){var st=hs();
+      (data.stars||[]).concat(data.apps.filter(function(x){return x&&x.star;}).map(function(x){return x.id;})).forEach(function(id){id=moved[id]||id;if(typeof id==="string"&&st.stars.indexOf(id)<0)st.stars.push(id);});stSave();SCANSIG={};DONE={};repaint();
+      return {apps:n,skipped:skipped,byName:Object.keys(moved).length};});});}
 
 var VIEWS=[["code","Code"],["issues","Issues"],["pulls","Pull requests"],["compare","Compare"],["actions","Actions"],["projects","Projects"],["wiki","Wiki"],["insights","Insights"],["settings","Settings"]];
 var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pulls:paintPulls,compare:paintCompare,actions:paintActions,projects:paintProjects,wiki:paintWiki,insights:paintInsights,settings:paintSettings},
@@ -1252,13 +1293,23 @@ var LASTVIEW="";
 function ensureTabs(){var vb=$("fbViews");if(!vb)return false;if(!vb.querySelector('button[data-v="code"]')){
     VIEWS.forEach(function(x){var b=document.createElement("button");b.type="button";b.setAttribute("role","tab");b.setAttribute("data-v",x[0]);b.setAttribute("aria-selected","false");b.setAttribute("aria-controls","fbWorkBody");
       b.innerHTML=esc(x[1])+(x[0]==="issues"||x[0]==="pulls"?'<span class="n" hidden></span>':"");
-      b.onclick=function(){var hh=X();if(!hh)return;hh.S.view=x[0];hh.S.cmp=null;hh.S.file=0;var w=$("fbWorkBody");if(w)w.scrollTop=0;hh.paintWork();try{hh.thumbs();}catch(e){}tabIntoView();};vb.appendChild(b);});
+      b.onclick=function(){var hh=X();if(!hh)return;toTop(hh,x[0]);hh.S.view=x[0];hh.S.cmp=null;hh.S.file=0;var w=$("fbWorkBody");if(w)w.scrollTop=0;hh.paintWork();try{hh.thumbs();}catch(e){}tabIntoView();};vb.appendChild(b);});
     [].forEach.call(vb.querySelectorAll('button[data-v]'),function(b){b.setAttribute("aria-controls","fbWorkBody");});
     wireTabs(vb);}
   watchWork();decorateSoon();return true;}
+/* a press on a tab goes to the top of that view, as on GitHub: Issues to the list of issues, Code to the app's first folder.
+   Words being written are not lost: a new issue or pull request keeps its draft, and a wiki page being edited stays open. */
+function toTop(hh,view){var r=null;try{r=hh.cur();}catch(e){}if(!r)return;var v=V(r);
+  if(view==="code"){v.code.file=null;v.code.dir="";v.code.res=false;v.code.line=0;}
+  else if(view==="issues")v.iss.open=null;
+  else if(view==="pulls"){v.pr.open=null;v.pr.tab="conv";}
+  else if(view==="wiki"&&v.wiki.mode==="hist"){v.wiki.mode="view";v.wiki.rev=null;}}
 function wireTabs(vb){if(vb.__h)return;vb.__h=1;
   vb.addEventListener("wheel",function(e){if(vb.scrollWidth<=vb.clientWidth+2)return;if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){vb.scrollLeft+=e.deltaY;e.preventDefault();}},{passive:false});
   vb.addEventListener("scroll",masks,{passive:true});window.addEventListener("resize",function(){setTimeout(masks,60);});
+  /* the chosen tab stays in sight when the row changes width: a window made narrower, or the work shown on a phone after
+     another panel (the row had no width while it was hidden) */
+  try{var lastW=-1,ro=new ResizeObserver(function(){if(!vb.isConnected){ro.disconnect();return;}var cw=vb.clientWidth;if(cw!==lastW){lastW=cw;if(cw>0){tabIntoView();masks();}}});ro.observe(vb);}catch(e){}
   vb.addEventListener("keydown",function(e){if(["ArrowLeft","ArrowRight","Home","End"].indexOf(e.key)<0)return;var bs=[].slice.call(vb.querySelectorAll('button[role="tab"]')),i=bs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();
     var j=e.key==="Home"?0:e.key==="End"?bs.length-1:(i+(e.key==="ArrowRight"?1:-1)+bs.length)%bs.length;bs[j].focus();var l=bs[j].offsetLeft;if(l<vb.scrollLeft||l+bs[j].offsetWidth>vb.scrollLeft+vb.clientWidth)vb.scrollLeft=l-vb.clientWidth/2+bs[j].offsetWidth/2;});
   setTimeout(masks,100);}
@@ -1271,9 +1322,11 @@ function watchWork(){var wb=$("fbWorkBody");if(!wb||WATCHED===wb)return;WATCHED=
 function decorateSoon(){clearTimeout(DT);DT=setTimeout(decorate,30);}
 function decorate(){var x=X();if(!x||!$("fb"))return;var r=null;try{r=x.cur();}catch(e){}counts(r);historyKeys(r,x);starTiles();masks();
   var vw=x.S.view+"|"+(r?r.id:"");if(vw!==LASTVIEW){LASTVIEW=vw;tabIntoView();}}
-function counts(r){var vb=$("fbViews");if(!vb)return;var rec=r?recOf(r):null;
+function counts(r,noScan){var vb=$("fbViews");if(!vb)return;var rec=r?recOf(r):null;
   [["issues",function(x){return x.issues;}],["pulls",function(x){return x.pulls;}]].forEach(function(k){var b=vb.querySelector('button[data-v="'+k[0]+'"] .n');if(!b)return;var n=rec?k[1](rec).filter(function(i){return i.state==="open";}).length:0;b.textContent=n?String(n):"";b.hidden=!n;});
-  if(rec&&r)scanSoon(r);}
+  if(rec&&r&&!noScan)scanSoon(r);}
+/* the open issues and pull requests counted on their tabs the moment a record changes, not at the next paint */
+function badges(rec){var x=X(),r=null;if(!x||!$("fbViews"))return;try{r=x.cur();}catch(e){}if(r&&rec&&r.id===rec.id)counts(r,true);}
 function historyKeys(r,x){if(!r||x.S.view!=="history")return;[].forEach.call(document.querySelectorAll('#fbWorkBody .f-cm[aria-expanded="true"] .f-acts'),function(acts){if(acts.querySelector(".h-cmpk"))return;var card=acts.closest(".f-cm"),idEl=card&&card.querySelector(".id");if(!idEl)return;var short=idEl.textContent.trim();
   function go2(fn){return function(ev){ev.stopPropagation();IngRepo.resolve(r.id,short).then(function(oid){return IngRepo.log(r.id,{ref:oid,max:1});}).then(function(l){if(l[0])fn(l[0]);},fail);};}
   var k=btn("sm h-cmpk","Compare",go2(function(c){var cv=V(r).cmp;cv.a=c.parents[0]||"empty";cv.b=c.oid;cv.focus=null;show("compare");}));k.title="Set this version beside any other, line by line";acts.appendChild(k);

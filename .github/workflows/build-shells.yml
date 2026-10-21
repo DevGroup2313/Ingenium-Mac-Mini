@@ -204,13 +204,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # 6.1: Android 14's emulator (37.2) stopped answering while opening The Forge with swiftshader_indirect, which
+        # the emulator's own documentation lists as obsolete since 36.4.9; Android 14 now uses its successor, swiftshader.
+        # Android 9 and 11 pass as they are and keep theirs.
         include:
           - api: 28
             target: default
+            gpu: swiftshader_indirect
           - api: 30
             target: google_apis
+            gpu: swiftshader_indirect
           - api: 34
             target: google_apis
+            gpu: swiftshader
     steps:
       - name: Get the sources
         uses: actions/checkout@v5
@@ -233,21 +239,27 @@ jobs:
           ram-size: 4096M
           heap-size: 512M
           disk-size: 6000M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
+          emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim -camera-back none -memory 4096
           disable-animations: true
           script: bash source/shells/test/ci_android.sh ${{ matrix.api }} source/shells/out/checks
 
       - name: Keep what the emulator showed in this branch
         if: always()
         run: |
-          [ -f "source/shells/out/checks/android-${{ matrix.api }}.txt" ] && cat "source/shells/out/checks/android-${{ matrix.api }}.txt" >> "$GITHUB_STEP_SUMMARY"
+          C=source/shells/out/checks
+          [ -f "$C/android-${{ matrix.api }}.txt" ] && cat "$C/android-${{ matrix.api }}.txt" >> "$GITHUB_STEP_SUMMARY"
+          # 6.1: only this job's own files, laid on the branch as it stands now. Rebasing this run's commit onto a branch
+          # that already held an earlier report of the same files stopped on a conflict, and the report was lost.
+          K="$RUNNER_TEMP/keep-${{ matrix.api }}"; mkdir -p "$K"
+          cp "$C"/android-${{ matrix.api }}[.-]* "$K"/ 2>/dev/null || { echo "nothing to keep"; exit 0; }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add source/shells/out/checks || true
-          if git diff --cached --quiet; then echo "nothing to keep"; exit 0; fi
-          git commit -m "What the Android ${{ matrix.api }} emulator showed of the APKs Fabrica makes"
           for i in 1 2 3 4 5; do
-            git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            if git fetch -q origin "$GITHUB_REF_NAME" && git reset -q --hard FETCH_HEAD; then
+              mkdir -p "$C" && cp "$K"/* "$C"/ && git add "$C"
+              if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
+              git commit -q -m "What the Android ${{ matrix.api }} emulator showed of the APKs Fabrica makes" && git push -q origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            fi
             sleep $((i * 7))
           done
           echo "::warning::the emulator's report could not be kept in the branch"
