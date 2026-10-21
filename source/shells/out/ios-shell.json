@@ -1,16 +1,16 @@
 {
- "made": "2026-10-20T13:18Z",
- "from": "6abf540",
+ "made": "2026-10-21T00:14Z",
+ "from": "e158714",
  "xcode": "Xcode 16.4 Build version 16F6",
  "device": {
   "file": "ios-shell.zip",
   "bytes": 141874,
-  "sha256": "6dc710c66b6458c59722889a6cc17b80c8db3c3eb0a03107aad7de5aa9d2c40d"
+  "sha256": "c4639e497e480ee3f933779c64d2034d48ff432d3ef71a522b5ca14ff5df978d"
  },
  "simulator": {
   "file": "ios-shell-sim.zip",
   "bytes": 212458,
-  "sha256": "6640ca74f628cdfe80da8511c0778fbc0fa093e5baa8b3b47c2a0a8e8a4c6064"
+  "sha256": "93553c1db07062fb8fa20bbf138e91c47503956c9e34c7d85aa3d10f8cee00cd"
  },
  "executable": "Shell",
  "bundle": "Shell.app",
