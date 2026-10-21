@@ -224,7 +224,7 @@ function toast(t){try{ingToast(t);}catch(e){}}
 function shown(){return home.classList.contains("active");}
 /* the Cormorant italic the owner's pictures set the four names in (the face Lector's papers use, under the SIL Open Font
    Licence); filled in by the build, and registered only when the plaque is drawn */
-var FONTS=/*R108_FONTS*/null;
+var FONTS=window.LX7_FONTS||null; /* 6.1: Lector's fonts (r108), carried once in the page */
 
 /* ---------- icons: the side column's own, so a key looks like the page it opens ---------- */
 var SV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';

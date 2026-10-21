@@ -81,7 +81,7 @@ const room = (p, r) => p.click('.nav-inner .nav-btn[data-room="' + r + '"]').the
   ok(hist.view === 'history' && hist.cards.length === 2 && /Changes to app\.js/.test(hist.cards[0]) && hist.cards[1] === 'First version', 'kept: the history shows both versions, newest first', JSON.stringify(hist));
   await p.click('#fbWorkBody .f-cm'); await p.waitForTimeout(700);
   const card = await p.evaluate(() => { const c = document.querySelector('#fbWorkBody .f-cm'); return { files: [...c.querySelectorAll('.fl li')].map(x => x.textContent), keys: [...c.querySelectorAll('.f-acts .f-btn')].map(x => x.textContent) }; });
-  ok(card.files.join(',') === 'app.js,readme.md (added)' && card.keys.join('|') === 'See the changes|Undo it|Mark a release', 'a version opens to its files and its keys', JSON.stringify(card));
+  ok(card.files.join(',') === 'app.js,readme.md (added)' && /^See the changes\|Undo it\|Mark a release(\|Compare\|Browse the files)?$/.test(card.keys.join('|')), 'a version opens to its files and its keys', JSON.stringify(card));
   await p.evaluate(() => { [...document.querySelectorAll('#fbWorkBody .f-cm .f-acts .f-btn')].find(x => x.textContent === 'Mark a release').click(); }); await p.waitForTimeout(300);
   await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(1000);
   const tag = await p.evaluate(() => ({ tags: [...document.querySelectorAll('#fbWorkBody .f-tag')].map(x => x.textContent), ver: (document.querySelector('#fbRepos .f-repo .nm em') || {}).textContent }));

@@ -6,7 +6,8 @@ Ingenium's level, as a full offline mini GitHub without AI."
 The engines are Ingenium's, read from source/build/modules as Ingenium builds them, so a fix there reaches the Forge at
 its next pass: R110 (each app a repository of real git objects, with branches, tags, a three-way merge, a revert, a
 history never written over, and the folder, bundle and zip any git reads), R111 (five checks on a version, and the app
-as one page or as a web app), R112 (the Fabrica page) and R114 (GitHub, only when switched on). What changes here, each
+as one page or as a web app), R112 (the Fabrica page), R114 (GitHub, only when switched on) and, from pass 643, R141
+(Fabrica's GitHub views, their notes in the Forge's store forge_hub). What changes here, each
 change found exactly once or the pass stops:
   - the store is the Forge's own (forge_repos), and Fabrica keeps its settings under a key of its own
     (fabrica:state), outside the Forge's backup, so a GitHub token never travels in a backup file;
@@ -260,8 +261,13 @@ def block():
     if "Code is not in this build" in g.s:
         raise SystemExit("r114: the old Code route is still there")
 
+    # PASS 643: Fabrica's GitHub views (R141: Code, Issues, Pull requests, Compare, Actions, Projects, Wiki, Insights,
+    # Settings), drawn with Fabrica's own tokens, so in the Forge's blue; their notes in the Forge's own store (forge_hub)
+    h = Src("r141")
+    h.rep('var HUBDB="ingenium_hub";', 'var HUBDB="forge_hub";')
+
     # the Forge's colours come after Ingenium's styles, so they win
-    return "\n".join([KEEP, r110.s, r111.s, js112, g.s, FORGE_CSS])
+    return "\n".join([KEEP, r110.s, r111.s, js112, g.s, h.s, FORGE_CSS])
 
 
 if __name__ == "__main__":

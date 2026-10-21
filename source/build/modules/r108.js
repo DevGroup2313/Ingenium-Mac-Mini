@@ -50,6 +50,8 @@ function appOfText(t){try{var a=IngHouseDocs.apps(t);return a.length===1?a[0]:nu
    Carpe Diem's slate and sky blue, The Forge's charcoal and ember, Inkwell's midnight ink and brass, with the seals as
    each app shows them by night. Printed, a page is always the day paper. ---------------- */
 var LX7_FONTS=/*R108_FONTS*/null;
+/* 6.1: the fonts are shared with the new Home page (r147), so the page carries them once */
+try{window.LX7_FONTS=LX7_FONTS;}catch(e){}
 var SANS='-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif',TIMES='"Times New Roman",Times,serif',GEORGIA='Georgia,"Iowan Old Style","Times New Roman",serif',
   CORM='"Lector Cormorant","Cormorant Garamond",Cormorant,Garamond,Georgia,serif',CINZEL='"Lector Cinzel",Cinzel,"Trajan Pro",Optima,Georgia,serif',IOWAN='"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif';
 var PT={
