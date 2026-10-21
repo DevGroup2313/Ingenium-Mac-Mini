@@ -1,0 +1,882 @@
+<style id="forge-storage-css">
+/* PASS 643 · STORAGE, ITS LIMITS AND ITS ERRORS: Settings, Storage (the gauge with its marks at 80 % and 95 %, what takes the
+   room, the limit, old copies, the app library's versions, Clean the library, the log), the notice under the top bar, and the
+   preview of Clean the library. The Forge's blue and gold, by day and by night. */
+#fsxCard,#fsxNote,#fsxDlg{--fx-acc:#17577A;--fx-gold:#9a6f24;--fx-ink1:#121619;--fx-ink2:#39424c;--fx-ink3:#55606b;
+  --fx-hair:rgba(23,87,122,.16);--fx-well:rgba(23,87,122,.07);--fx-wellsh:inset 0 1px 2.5px rgba(10,30,46,.13);
+  --fx-a:#fdfefe;--fx-b:#f1f4f7;--fx-slab:inset 0 -1px 0 rgba(10,30,46,.08),0 1px 0 rgba(10,30,46,.17),0 3px 4px rgba(10,30,46,.08),0 8px 14px rgba(10,30,46,.06);
+  --fx-pill:inset 0 -1.5px 0 rgba(10,30,46,.1),0 1px 0 rgba(10,30,46,.16),0 3px 4px rgba(10,30,46,.08);
+  --fx-ok:#1f6640;--fx-oks:rgba(34,107,69,.11);--fx-warn:#6f430a;--fx-warns:rgba(184,138,58,.17);--fx-full:#8a2a1b;--fx-fulls:rgba(190,70,50,.11);
+  --fx-fa:#2a78a3;--fx-fb:#17577A;--fx-spring:cubic-bezier(.34,1.35,.64,1)}
+body[data-theme="night"] #fsxCard,body[data-theme="night"] #fsxNote,body[data-theme="night"] #fsxDlg{--fx-acc:#6db3dc;--fx-gold:#d9b45a;--fx-ink1:#e2e6ea;--fx-ink2:#c5cdd5;--fx-ink3:#a3b3c1;
+  --fx-hair:rgba(79,156,200,.22);--fx-well:rgba(0,0,0,.3);--fx-wellsh:inset 0 1px 3px rgba(0,0,0,.55);--fx-a:#1b2129;--fx-b:#161b21;
+  --fx-slab:inset 0 1px 0 rgba(255,255,255,.05),inset 0 -2px 0 rgba(0,0,0,.4),0 2px 0 rgba(0,0,0,.6),0 4px 5px rgba(0,0,0,.42);
+  --fx-pill:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1.5px 0 rgba(0,0,0,.45),0 1px 0 rgba(0,0,0,.6),0 3px 4px rgba(0,0,0,.4);
+  --fx-ok:#8fd8ae;--fx-oks:rgba(127,209,166,.14);--fx-warn:#efc77f;--fx-warns:rgba(217,180,90,.15);--fx-full:#f4ad9d;--fx-fulls:rgba(240,120,100,.14);--fx-fa:#5aa7d3;--fx-fb:#2f7aa6}
+#storageCard{display:none !important}
+#fsxCard{color:var(--fx-ink1)}
+#fsxCard .fsx-lead{margin:2px 0 14px;max-width:72ch;color:var(--fx-ink2)}
+#fsxCard h3.fsx-title{margin:0 0 4px;font:700 17px/1.3 Georgia,"Iowan Old Style","Times New Roman",serif;color:var(--fx-ink1)}
+#fsxCard h3.fsx-title:focus{outline:none}#fsxCard h3.fsx-title:focus-visible{outline:2px solid var(--fx-acc);outline-offset:4px;border-radius:4px}
+#fsxCard h4.fsx-h{font:700 11.5px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--fx-ink3);margin:22px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--fx-hair)}
+#fsxCard p{margin:0 0 8px}
+#fsxCard .fsx-small{font-size:12.5px;line-height:1.5;color:var(--fx-ink3)}
+#fsxCard .fsx-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+#fsxCard :focus-visible,#fsxNote :focus-visible,#fsxDlg :focus-visible{outline:2px solid var(--fx-acc);outline-offset:2px}
+#fsxCard .fsx-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* the gauge: a slab with the figure, the meter in its well, and the marks at 80 % and 95 % */
+#fsxCard .fsx-gauge{padding:14px 16px 12px;border-radius:14px;border:1px solid var(--fx-hair);background:linear-gradient(var(--fx-a),var(--fx-b));box-shadow:var(--fx-slab)}
+#fsxCard .fsx-big{display:flex;align-items:baseline;gap:4px 9px;flex-wrap:wrap}
+#fsxCard .fsx-big b{font:600 27px/1.1 Georgia,"Iowan Old Style","Times New Roman",serif;color:var(--fx-ink1);font-variant-numeric:tabular-nums}
+#fsxCard .fsx-big span{color:var(--fx-ink2);font-size:14px}
+#fsxCard .fsx-meter{position:relative;height:13px;border-radius:999px;background:var(--fx-well);box-shadow:var(--fx-wellsh);margin:12px 0 4px;overflow:hidden}
+#fsxCard .fsx-fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:linear-gradient(var(--fx-fa),var(--fx-fb));box-shadow:inset 0 1px 0 rgba(255,255,255,.3);transition:width .7s var(--fx-spring)}
+#fsxCard .fsx-meter[data-level="1"] .fsx-fill{background:linear-gradient(#d2a24f,#a97a2a)}
+#fsxCard .fsx-meter[data-level="2"] .fsx-fill{background:linear-gradient(#cf6a52,#a1402c)}
+#fsxCard .fsx-tick{position:absolute;top:2px;bottom:2px;width:2px;margin-left:-1px;border-radius:2px;background:var(--fx-ink3);opacity:.5}
+#fsxCard .fsx-marks{position:relative;height:15px;font-size:11px;color:var(--fx-ink3)}
+#fsxCard .fsx-marks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+#fsxCard .fsx-state{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:var(--fx-ink2)}
+#fsxCard .fsx-warn{margin-top:12px;padding:11px 13px;border-radius:12px;border:1px solid transparent;font-size:13.5px;line-height:1.5}
+#fsxCard .fsx-warn p{margin:0 0 9px;color:var(--fx-ink1)}
+#fsxCard .fsx-warn[data-level="1"]{background:var(--fx-warns);border-color:rgba(184,138,58,.32)}
+#fsxCard .fsx-warn[data-level="2"]{background:var(--fx-fulls);border-color:rgba(190,70,50,.32)}
+/* kept for good */
+#fsxCard .fsx-persist{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 0}
+#fsxCard .fsx-persist p{margin:0;flex:1 1 260px;color:var(--fx-ink2);font-size:13.5px}
+#fsxCard .fsx-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:var(--fx-ink3);box-shadow:0 0 0 3px var(--fx-well)}
+#fsxCard .fsx-persist[data-kept="yes"] .fsx-dot{background:#2f8a5a}
+#fsxCard .fsx-persist[data-kept="no"] .fsx-dot{background:#c0903e}
+/* what takes the room: one small slab for each store */
+#fsxCard .fsx-kinds{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:8px}
+#fsxCard .fsx-kinds li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding:10px 12px;border-radius:12px;border:1px solid var(--fx-hair);background:linear-gradient(var(--fx-a),var(--fx-b));box-shadow:var(--fx-pill);min-width:0}
+#fsxCard .fsx-kinds li.fsx-wait{display:block;color:var(--fx-ink3);font-size:13px;box-shadow:none;background:var(--fx-well)}
+#fsxCard .fsx-kinds .k-name{font-weight:600;font-size:14px;color:var(--fx-ink1);overflow-wrap:anywhere}
+#fsxCard .fsx-kinds .k-size{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;color:var(--fx-ink1);text-align:right;white-space:nowrap}
+#fsxCard .fsx-kinds .k-what{grid-column:1/-1;font-size:12.5px;line-height:1.4;color:var(--fx-ink3)}
+#fsxCard .fsx-kinds .k-bar{grid-column:1/-1;height:6px;border-radius:999px;background:var(--fx-well);box-shadow:var(--fx-wellsh);overflow:hidden;margin-top:5px}
+#fsxCard .fsx-kinds .k-bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(var(--fx-fa),var(--fx-fb));transition:width .6s var(--fx-spring)}
+#fsxCard .fsx-mrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}
+#fsxCard .fsx-mrow p{margin:0;flex:1 1 280px}
+/* the limit and the old copies */
+#fsxCard label.fsx-l{display:block;font-size:13px;font-weight:600;color:var(--fx-ink2);margin-bottom:5px}
+#fsxCard input[type="number"],#fsxCard select{font:inherit;font-size:14px;padding:7px 10px;border-radius:9px;border:1px solid var(--fx-hair);background:var(--fx-well);box-shadow:var(--fx-wellsh);color:var(--fx-ink1);min-height:36px;box-sizing:border-box}
+#fsxCard #fsxLimit{width:8.5em}#fsxCard #fsxKeep{width:5em}#fsxCard select{width:auto;min-width:5.5em}
+#fsxCard .fsx-switch{display:flex;gap:12px;align-items:flex-start;margin:2px 0 14px;cursor:pointer}
+#fsxCard .fsx-switch input{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:42px;height:24px;margin:1px 0 0;border-radius:999px;position:relative;cursor:pointer;
+  background:var(--fx-well);box-shadow:var(--fx-wellsh);border:1px solid var(--fx-hair);transition:background .2s ease}
+#fsxCard .fsx-switch input::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 4px rgba(0,0,0,.15);transition:transform .25s var(--fx-spring)}
+#fsxCard .fsx-switch input:checked{background:linear-gradient(var(--fx-fa),var(--fx-fb));border-color:transparent}
+#fsxCard .fsx-switch input:checked::after{transform:translateX(18px)}
+#fsxCard .fsx-switch b{display:block;font-size:14px;color:var(--fx-ink1)}
+#fsxCard .fsx-keepn{margin:0 0 8px}
+/* the library: one slab for each app, its versions newest first */
+#fsxCard .fsx-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:10px;align-items:start}
+#fsxCard .fsx-app{padding:12px 13px;border-radius:14px;border:1px solid var(--fx-hair);background:linear-gradient(var(--fx-a),var(--fx-b));box-shadow:var(--fx-slab);min-width:0}
+#fsxCard .fsx-app h5{margin:0 0 4px;font:600 15.5px/1.3 Georgia,"Iowan Old Style","Times New Roman",serif;color:var(--fx-ink1);display:flex;gap:4px 8px;align-items:baseline;flex-wrap:wrap}
+#fsxCard .fsx-app h5 span{font:500 12.5px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--fx-ink3)}
+#fsxCard .fsx-vers{list-style:none;margin:0;padding:0}
+#fsxCard .fsx-vers li{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--fx-hair)}
+#fsxCard .fsx-vers .v-name{font-weight:700;color:var(--fx-ink1);font-variant-numeric:tabular-nums}
+#fsxCard .fsx-vers .v-meta{font-size:12.5px;color:var(--fx-ink3);flex:1 1 9em}
+#fsxCard .fsx-chip{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 9px;line-height:1.5;background:var(--fx-well);color:var(--fx-ink2);border:1px solid var(--fx-hair);white-space:nowrap}
+#fsxCard .fsx-chip.ok{background:var(--fx-oks);color:var(--fx-ok);border-color:transparent}
+#fsxCard .fsx-chip.warn{background:var(--fx-warns);color:var(--fx-warn);border-color:transparent}
+#fsxCard .fsx-chip.mine{background:rgba(184,138,58,.16);color:var(--fx-warn);border-color:rgba(184,138,58,.35)}
+#fsxCard button.fsx-pin{min-height:30px;padding:4px 11px;font-size:12px;border-radius:999px}
+#fsxCard button.fsx-pin[aria-pressed="true"]{background:linear-gradient(#c79a4a,#a3772c) !important;color:#fff !important;border-color:#7d5a1f !important;box-shadow:inset 0 2px 5px rgba(60,40,10,.35),0 1px 1px rgba(60,40,10,.25) !important}
+#fsxCard .fsx-none{margin:0;color:var(--fx-ink3);font-size:13.5px}
+#fsxCard .fsx-cleanrow{margin-top:12px}
+#fsxCard .fsx-cleanrow .fsx-small{flex:1 1 240px}
+/* the log, and what this copy carries */
+#fsxCard details{margin-top:14px;border:1px solid var(--fx-hair);border-radius:12px;padding:0 12px;background:var(--fx-well)}
+#fsxCard details summary{cursor:pointer;padding:10px 0;font-weight:600;font-size:14px;color:var(--fx-ink1);list-style-position:inside;min-height:24px}
+#fsxCard details[open] summary{border-bottom:1px solid var(--fx-hair);margin-bottom:8px}
+#fsxCard .fsx-log{margin:0 0 10px;padding:0;list-style:none}
+#fsxCard .fsx-log>li{padding:8px 0;border-bottom:1px solid var(--fx-hair);font-size:13.5px;line-height:1.5;color:var(--fx-ink2)}
+#fsxCard .fsx-log>li:last-child{border-bottom:0}
+#fsxCard .fsx-log>li b{color:var(--fx-ink1)}
+#fsxCard .fsx-log ul{margin:4px 0 0 18px;padding:0;font-size:12.5px;color:var(--fx-ink3)}
+#fsxCard .fsx-parts{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:7px}
+#fsxCard .fsx-parts li{display:flex;gap:6px 9px;align-items:baseline;flex-wrap:wrap;font-size:13.5px;color:var(--fx-ink2)}
+#fsxCard .fsx-parts li b{color:var(--fx-ink1)}
+/* the notice: a slab under the top bar, never in the way of the work */
+#fsxNote{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));z-index:2147481500;width:min(580px,calc(100vw - 32px));box-sizing:border-box;display:flex;gap:12px;align-items:flex-start;
+  padding:13px 14px 12px;border-radius:16px;color:var(--fx-ink1);background:#fffefb;border:1px solid rgba(23,87,122,.2);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 0 rgba(10,30,46,.12),0 8px 18px rgba(10,30,46,.15),0 22px 44px rgba(10,30,46,.12);
+  opacity:0;transform:translate(-50%,-10px);transition:opacity .2s ease,transform .38s cubic-bezier(.34,1.35,.64,1)}
+#fsxNote.on{opacity:1;transform:translate(-50%,0)}
+#fsxNote .fsx-ndot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:#17577A;box-shadow:0 0 0 4px rgba(23,87,122,.14)}
+#fsxNote.fsx-warn .fsx-ndot{background:#b88a3a;box-shadow:0 0 0 4px rgba(184,138,58,.18)}
+#fsxNote.fsx-full .fsx-ndot{background:#b4402a;box-shadow:0 0 0 4px rgba(190,70,50,.16)}
+#fsxNote .fsx-nb{min-width:0;flex:1 1 auto}
+#fsxNote .fsx-nb b{display:block;font-size:14.5px;margin-bottom:3px}
+#fsxNote .fsx-nb p{margin:0 0 10px;font-size:13.5px;line-height:1.5;color:var(--fx-ink2)}
+#fsxNote .fsx-nk{display:flex;flex-wrap:wrap;gap:8px}
+body[data-theme="night"] #fsxNote{background:#1b2129;border-color:rgba(79,156,200,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 0 rgba(0,0,0,.6),0 8px 18px rgba(0,0,0,.45),0 22px 44px rgba(0,0,0,.45)}
+body[data-theme="night"] #fsxNote .fsx-ndot{background:#6db3dc}
+/* the preview of Clean the library */
+#fsxDlg{position:fixed;inset:0;z-index:2147482500;background:rgba(10,20,28,.46);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+#fsxDlg .fsx-pv{width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto;box-sizing:border-box;border-radius:16px;padding:18px 20px 16px;background:#fffefb;color:var(--fx-ink1);border:1px solid rgba(23,87,122,.22);box-shadow:0 24px 60px rgba(0,0,0,.34)}
+body[data-theme="night"] #fsxDlg .fsx-pv{background:#1b2129;border-color:rgba(79,156,200,.26)}
+#fsxDlg h2{margin:0 0 6px;font:700 18px/1.3 Georgia,"Iowan Old Style","Times New Roman",serif;color:var(--fx-ink1)}
+#fsxDlg .fsx-pv-lead{margin:0 0 12px;font-size:13.5px;line-height:1.55;color:var(--fx-ink2)}
+#fsxDlg .fsx-pv-list{max-height:min(46vh,420px);overflow:auto;margin:0 0 12px;padding:4px 12px;border-radius:12px;border:1px solid var(--fx-hair);box-shadow:var(--fx-wellsh);background:var(--fx-well)}
+#fsxDlg .fsx-pv-list h3{margin:10px 0 4px;font-size:13px;font-weight:700;color:var(--fx-ink1);display:flex;justify-content:space-between;gap:10px}
+#fsxDlg .fsx-pv-list ul{margin:0 0 6px;padding:0 0 0 18px;font-size:13px;line-height:1.55;color:var(--fx-ink2)}
+#fsxDlg .fsx-proof{margin:2px 0 8px;font-size:12px;color:var(--fx-ink3)}
+#fsxDlg .fsx-pv-total{font-weight:700;margin:0 0 12px;color:var(--fx-ink1)}
+#fsxDlg .fsx-pv-keys{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+@media (max-width:560px){#fsxCard .fsx-big b{font-size:23px}#fsxCard .fsx-gauge{padding:12px}#fsxNote{top:calc(58px + env(safe-area-inset-top,0px))}#fsxDlg .fsx-pv{padding:16px 14px 14px}}
+@media (prefers-reduced-motion:reduce){#fsxCard .fsx-fill,#fsxCard .k-bar i,#fsxNote,#fsxCard .fsx-switch input,#fsxCard .fsx-switch input::after{transition:none}}
+</style>
+<script id="forge-storage-js">
+/* PASS 643 · STORAGE, ITS LIMITS AND ITS ERRORS. The owner's words (20 October 2026): "for the Forge, I want you to implement
+   storage management policies to automatically evict old app versions when storage limits are approached. Add robust error
+   handling for ZIP file corruption, storage quota exceeded, and missing dependencies. ... Add user-controlled storage limits
+   with warnings before reaching capacity. ... Implement a "clean library" function to remove unused app versions and free up
+   space." Ingenium 6.1 has the same (its R142); this is the Forge's own, for the Forge's stores.
+
+   What the Forge keeps, and where (every store is measured; nothing is sent anywhere):
+     forge-applib   the app library: a record ('meta') and the page ('bytes') of each copy of Carpe Diem, the Forge, Inkwell
+                    and Ingenium. Until 643 it kept two copies of each app, the newest and the one before it; a copy pushed
+                    out of 'earlier' is now set on the older shelf (app:older-<fingerprint>) in the same transaction, so
+                    the newest N stay whatever happens and the older ones go only when room runs short or when she cleans;
+    forge-files    the files she brought into Files;              forge-studio  her new apps and the Studio's edits;
+    forge_repos    Fabrica's history (git objects and refs);      fabrica_made  Fabrica's packages, kept to save again;
+    forge_hub      Fabrica's issues and pull requests;            cd-room, cd-lite  the desk's larger copy and its parcels;
+    forge-selftest the store test's scratch;                      localStorage  the settings and notes (about 5 MB).
+   What may go, and only this: an app's library versions beyond the newest N (never its newest, its only one, or one she
+   marks Keep always), Fabrica's packages beyond N for each app and kind (they can be made again), and pieces nothing uses,
+   each proven so: a library page with no record, the edits of a new app that is no longer here, a store test's scratch
+   left behind. Her files, new apps, edits, Fabrica's history, issues and settings are never touched.
+   window.ForgeErr.say(e): an error in plain words with what to do: a full store (also inside every IndexedDB transaction
+   and every localStorage write of the Forge), a damaged zip (which file inside it, and what is wrong) wherever the Forge
+   reads zips (the library, Fabrica's bring-in, the Editor), and a missing part. */
+(function(){"use strict";
+var W=window,D=document;
+if(W.ForgeErr&&W.ForgeStore)return;
+function $i(i){return D.getElementById(i);}
+function fr(){try{return D.documentElement.lang==="fr";}catch(e){return false;}}
+function T(en,f){return fr()?f:en;}
+function E(t,c,x){var e=D.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+function B(n){n=+n||0;var u=fr()?["o","Ko","Mo","Go","To"]:["B","KB","MB","GB","TB"],i=0;while(n>=1024&&i<4){n/=1024;i++;}
+  var s=(i===0||n>=100)?n.toFixed(0):n.toFixed(1);if(fr())s=s.replace(".",",");return s+" "+u[i];}
+function BZ(n){return n>0?B(n):T("Empty","Vide");}
+function day(t){try{return new Date(t).toLocaleDateString(fr()?"fr-FR":"en-GB",{day:"numeric",month:"short",year:"numeric"});}catch(e){return "";}}
+function dayTime(t){try{var d=new Date(t);return day(t)+", "+d.toLocaleTimeString(fr()?"fr-FR":"en-GB",{hour:"2-digit",minute:"2-digit"});}catch(e){return "";}}
+function pc(x){return (x>0&&x<0.005)?T("under 1 %","moins de 1 %"):Math.round(x*100)+" %";}
+function N(n,en1,enN,fr1,frN){return n+" "+(fr()?(n>1?frN:fr1):(n===1?en1:enN));}
+function cap(s){s=String(s||"");return s.charAt(0).toUpperCase()+s.slice(1);}
+function reduced(){try{return W.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+function later(f,ms){return setTimeout(function(){try{f();}catch(e){}},ms||0);}
+var SESSION_AT=Math.round((W.performance&&performance.timeOrigin)||Date.now()),STARTED=Date.now();
+var EVICT_AT=0.90,WARN1=0.80,WARN2=0.95,DEEP_MAX=160*1048576,MIN_AGE=60*60000,LIBDB="forge-applib";
+var NAMES={cd:["Carpe Diem","Carpe Diem"],forge:["The Forge","La Forge"],inkwell:["Inkwell","Inkwell"],ingenium:["Ingenium","Ingenium"]};
+function appName(a){try{var p=W.__forgeEd&&__forgeEd.profile(a);if(p&&p.name)return fr()?((p.fr&&p.fr.name)||p.name):p.name;}catch(e){}var n=NAMES[a];return n?n[fr()?1:0]:String(a||"");}
+
+/* ---------- her settings: one key of the Forge's own (carried by the backup, as every forge: key is) ---------- */
+var SK="forge:storage:v643",MEMS=null,SAVING=false;
+function S(){if(MEMS)return MEMS;var v=null;try{v=JSON.parse(localStorage.getItem(SK)||"null");}catch(e){}
+  if(!v||typeof v!=="object"){v={};
+    /* 642's card: her limit and her choice carried over, then its keys let go, so its tidying never runs beside this one */
+    try{var mb=parseInt(localStorage.getItem("forge:storage:limitMB")||"",10);if(mb>0)v.limit=mb*1048576;var a=localStorage.getItem("forge:storage:auto");if(a==="0")v.auto=false;else if(a==="1")v.auto=true;}catch(e){}}
+  if(typeof v.auto!=="boolean")v.auto=true;
+  if(!(v.keepN>=1))v.keepN=3;
+  if(!Array.isArray(v.log))v.log=[];
+  if(!v.warned||typeof v.warned!=="object")v.warned={level:0,at:0};
+  MEMS=v;return v;}
+function keepN(){return Math.max(1,Math.min(20,Math.round(+S().keepN||3)));}
+function save(){SAVING=true;try{localStorage.setItem(SK,JSON.stringify(S()));try{localStorage.removeItem("forge:storage:limitMB");localStorage.removeItem("forge:storage:auto");}catch(e){}}catch(e){/* the small store is full: kept for this visit */}SAVING=false;}
+
+/* ================================================================================================================
+   1. ForgeErr: errors in plain words, with what to do
+   ================================================================================================================ */
+var Q={lastAt:0,shownAt:0,busy:false,noStore:false,lastWhere:""};
+function msgOf(e){if(e==null)return "";if(typeof e==="string")return e;try{return String(e.message||e.name||e.code||e);}catch(x){return "";}}
+function isFull(e){if(!e)return false;
+  if(e.fsxKind==="full")return true;
+  var nm=e.name||(e.cause&&e.cause.name)||"";if(nm==="QuotaExceededError"||nm==="NS_ERROR_DOM_QUOTA_REACHED")return true;
+  try{if(typeof DOMException!=="undefined"&&e instanceof DOMException&&(e.code===22||e.code===1014))return true;}catch(x){}
+  if(e.cause&&e.cause!==e&&isFull(e.cause))return true;
+  var m=msgOf(e);
+  return /quota (has been |was )?(exceeded|reached)|QuotaExceeded|storage is full|store is full|no room left|disk is full|no space left|not enough space|ENOSPC/i.test(m);}
+var PARTS_RAW=[
+  [/^noidb$|keeps no store|indexedDB is not defined|window\.indexedDB|will not keep repositories|cannot keep things in its own store/i,"store"],
+  [/^nostream$|cannot unpack|DecompressionStream is not defined/i,"unzip"],
+  [/no Web Crypto|crypto\.subtle is undefined/i,"crypto"],
+  [/carries no install packages/i,"kits"],
+  [/carries no apps|this copy of the Forge carries no apps/i,"carried"],
+  [/IngRepo is not defined|Fabrica is not here/i,"fabrica"]];
+function PART_WORDS(id){return ({
+  store:T("This window cannot keep things in the Forge’s own store: it may be a private window, or storage may be switched off for this page. What you make now lasts only while the window is open. Open the Forge in an ordinary window, or use its Mac, Windows, iPhone, iPad or Fire app.",
+          "Cette fenêtre ne peut rien garder dans la mémoire de la Forge : c’est peut-être une fenêtre privée, ou le stockage est coupé pour cette page. Ce que vous faites maintenant ne dure que tant que la fenêtre est ouverte. Ouvrez la Forge dans une fenêtre ordinaire, ou utilisez son app Mac, Windows, iPhone, iPad ou Fire."),
+  unzip:T("This browser cannot unpack zips. A newer browser, or the Forge’s Mac or Windows app, can. Choose each app’s own page instead of a zip meanwhile.",
+          "Ce navigateur ne sait pas déballer les zips. Un navigateur plus récent, ou l’app Mac ou Windows de la Forge, le sait. En attendant, choisissez la page de chaque app plutôt qu’un zip."),
+  pack:T("This browser cannot pack zips quickly, so backups and packages are made more slowly, without compression. They still work.",
+         "Ce navigateur ne sait pas emballer vite les zips : les sauvegardes et les paquets se font plus lentement, sans compression. Ils fonctionnent quand même."),
+  crypto:T("This window has no Web Crypto, so fingerprints are worked out more slowly in plain JavaScript. Open the Forge from its own app, or from a secure address, to have it.",
+           "Cette fenêtre n’a pas Web Crypto : les empreintes sont calculées plus lentement, en JavaScript simple. Ouvrez la Forge depuis son app, ou depuis une adresse sûre, pour l’avoir."),
+  carried:T("This copy of the Forge carries no apps (it is the lean copy that Ingenium carries). Choose each app’s own file in the Editor, and the Forge keeps it; or open the full Forge, which carries them.",
+            "Cette copie de la Forge ne porte aucune app (c’est la copie légère que porte Ingenium). Choisissez le fichier de chaque app dans l’Éditeur, et la Forge le garde ; ou ouvrez la Forge complète, qui les porte."),
+  kits:T("This copy of the Forge carries no install packages, so it cannot make the Mac, Windows, iPhone, iPad and Fire packages here. The full Forge carries them: open the_forge.html, or the Forge’s Mac or Windows app.",
+         "Cette copie de la Forge ne porte pas les paquets d’installation : elle ne peut pas faire ici les paquets Mac, Windows, iPhone, iPad et Fire. La Forge complète les porte : ouvrez the_forge.html, ou l’app Mac ou Windows de la Forge."),
+  fabrica:T("Fabrica is not in this copy of the Forge, so its history and packages cannot be read here. Open the full Forge.",
+            "Fabrica n’est pas dans cette copie de la Forge : son historique et ses paquets ne peuvent pas être lus ici. Ouvrez la Forge complète.")})[id]||"";}
+function partOf(m,e){if(e&&e.code){if(e.code==="noidb")return "store";if(e.code==="nostream")return "unzip";}for(var i=0;i<PARTS_RAW.length;i++)if(PARTS_RAW[i][0].test(m))return PARTS_RAW[i][1];return null;}
+var ZIP_RAW=[[/^notlib$|\bnot a zip\b|is not a zip file|this is not a zip file/i,"notzip"],[/zip's directory is damaged|list of files is broken|bad zip directory/i,"directory"],
+  [/a file in the zip is broken|bad zip entry|a zip entry is broken/i,"entry"],[/packed in a way/i,"method"],[/this zip could not be read|zip is empty/i,"unread"]];
+function zipRawOf(m){for(var i=0;i<ZIP_RAW.length;i++)if(ZIP_RAW[i][0].test(m))return ZIP_RAW[i][1];return null;}
+function kind(e){if(!e)return "other";
+  if(e.fsxKind)return e.fsxKind;
+  if(isFull(e))return "full";
+  if(Array.isArray(e.missing)&&e.missing.length)return "files";
+  var m=msgOf(e);
+  if(partOf(m,e))return "missing";
+  if(zipRawOf(m))return "zip";
+  return "other";}
+function zipWords(m,name){var k=zipRawOf(m),f=name?"“"+name+"”":T("This file","Ce fichier"),again=T(" Copy or download it again."," Copiez-le ou téléchargez-le de nouveau.");
+  if(k==="notzip")return T(f+" is not a zip file, so it cannot be opened as one.",f+" n’est pas un fichier zip : il ne peut pas s’ouvrir comme tel.");
+  if(k==="directory")return T(f+" is damaged: the list of the files inside it is broken.",f+" est abîmé : la liste des fichiers qu’il contient est cassée.")+again;
+  if(k==="entry")return T(f+" is damaged: a file inside it is broken.",f+" est abîmé : un fichier à l’intérieur est cassé.")+again;
+  if(k==="method")return T("A file inside "+f+" is packed in a way the Forge does not unpack. The Forge reads stored and deflated files; make the zip again with ordinary compression.","Un fichier dans "+f+" est emballé d’une façon que la Forge ne sait pas déballer. La Forge lit les fichiers stockés et compressés (deflate) ; refaites le zip avec la compression ordinaire.");
+  if(k==="unread")return T(f+" could not be read: it may be damaged, empty or cut short.",f+" n’a pas pu être lu : il est peut-être abîmé, vide ou coupé.")+again;
+  return cap(m);}
+function filesWords(list,page){list=list||[];if(!list.length)return "";var p=page?"“"+page+"”":"";
+  return fr()?((p?"La page "+p:"La page")+(list.length===1?" nomme un fichier qui n’est pas dans l’app : "+list[0]+".":" nomme "+list.length+" fichiers qui ne sont pas dans l’app : "+list.slice(0,4).join(", ")+(list.length>4?" et "+(list.length-4)+" autres":"")+".")+" Ajoutez-"+(list.length===1?"le":"les")+", ou retirez ce nom de la page.")
+    :((p?"The page "+p:"The page")+(list.length===1?" names a file that is not in the app: "+list[0]+".":" names "+list.length+" files that are not in the app: "+list.slice(0,4).join(", ")+(list.length>4?" and "+(list.length-4)+" more":"")+".")+" Add "+(list.length===1?"it":"them")+", or take the name out of the page.");}
+function FULL_WORDS(where){if(where==="localStorage")return T("The small store that keeps the Forge’s settings and notes is full (browsers give it about 5 MB), so the last change could not be kept. Nothing kept before is lost. Settings, Storage shows what takes the room.",
+    "La petite mémoire qui garde les réglages et les notes de la Forge est pleine (les navigateurs lui donnent environ 5 Mo) : le dernier changement n’a pas pu être gardé. Rien de ce qui était gardé n’est perdu. Réglages, Stockage montre ce qui prend la place.");
+  return T("This device’s storage for the Forge is full, so this could not be kept. Nothing kept before is lost. Settings, Storage shows what takes the room and can free some.",
+    "Le stockage de cet appareil pour la Forge est plein : ceci n’a pas pu être gardé. Rien de ce qui était gardé n’est perdu. Réglages, Stockage montre ce qui prend la place et peut en libérer.");}
+/* e: any error; ctx: {name: the file's name, quiet: no notice, where} -> one plain sentence or a few, with what to do */
+function say(e,ctx){ctx=ctx||{};var k=kind(e),m=msgOf(e);
+  try{if(k==="full"){if(!ctx.quiet)full({where:ctx.where||(e&&e.fsxWhere)||""});return FULL_WORDS(ctx.where||(e&&e.fsxWhere));}
+    if(e&&e.fsxPlain)return m;
+    if(k==="zip")return zipWords(m,ctx.name||(e&&e.fileName));
+    if(k==="missing"){var p=partOf(m,e)||(e&&e.part)||"store";return PART_WORDS(p)||cap(m);}
+    if(k==="files")return filesWords(e.missing,e.page);}catch(x){}
+  return cap(m||T("something went wrong","quelque chose n’a pas marché"));}
+/* an error that says the same in plain words, when it is one of these kinds; any other stays as it is */
+function plainErr(e,ctx){var k=kind(e);if(k==="other"||(e&&e.fsxPlain))return e;
+  var x=new Error(say(e,Object.assign({quiet:true},ctx||{})));x.name=(e&&e.name)||"Error";x.fsxKind=k;x.cause=e;x.fsxPlain=true;
+  /* the codes the Forge's own code reads (noidb, nostream, broken) stay on it */
+  try{if(e&&e.code!=null)x.code=e.code;if(e&&e.app)x.app=e.app;if(e&&e.zip)x.zip=e.zip;}catch(_){}return x;}
+function ZipError(message,info){var e=new Error(message);e.name="ZipError";e.fsxKind="zip";e.zip=info||{};e.fsxPlain=true;return e;}
+
+/* ---------- the zip, checked: which file inside it, and what is wrong with it ---------- */
+var CRC_T=null;
+function crc32(u8){var t=CRC_T,c,i,k;if(!t){t=CRC_T=new Int32Array(256);for(i=0;i<256;i++){c=i;for(k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[i]=c;}}
+  c=-1;for(i=0;i<u8.length;i++)c=t[(c^u8[i])&255]^(c>>>8);return (c^-1)>>>0;}
+var METHODS={1:"Shrink",2:"Reduce",3:"Reduce",4:"Reduce",5:"Reduce",6:"Implode",9:"Deflate64",10:"PKWARE Implode",12:"bzip2",14:"LZMA",18:"IBM TERSE",19:"LZ77",93:"Zstandard",95:"XZ",96:"JPEG",97:"WavPack",98:"PPMd",99:"AES"};
+function methName(m){return (METHODS[m]||T("an unknown method","une méthode inconnue"))+" ("+T("method","méthode")+" "+m+")";}
+function looksLike(u8){if(!u8||!u8.length)return T("an empty file","un fichier vide");var h=u8.subarray(0,Math.min(u8.length,512)),s="";try{s=new TextDecoder().decode(h).replace(/^﻿/,"").trim().slice(0,200);}catch(e){}
+  var b=function(a){for(var i=0;i<a.length;i++)if(h[i]!==a[i])return false;return true;};
+  if(/^<!doctype html|^<html[\s>]|^<head[\s>]|^<body[\s>]/i.test(s))return T("a web page","une page web");
+  if(/^<\?xml/i.test(s))return T("an XML file","un fichier XML");
+  if(b([0x25,0x50,0x44,0x46]))return T("a PDF","un PDF");
+  if(b([0x1f,0x8b]))return T("a gzip file","un fichier gzip");
+  if(b([0x52,0x61,0x72,0x21]))return T("a RAR archive","une archive RAR");
+  if(b([0x37,0x7a,0xbc,0xaf]))return T("a 7-Zip archive","une archive 7-Zip");
+  if(b([0x89,0x50,0x4e,0x47]))return T("a PNG picture","une image PNG");
+  if(b([0xff,0xd8,0xff]))return T("a JPEG picture","une image JPEG");
+  if(/^#\s*v[23] git bundle/.test(s))return T("a git bundle","un paquet git (bundle)");
+  if(/^[\[{]/.test(s))return T("a JSON file","un fichier JSON");
+  var txt=0;for(var i=0;i<h.length;i++){var c=h[i];if(c===9||c===10||c===13||(c>=32&&c<127)||c>=0xc2)txt++;}
+  if(h.length&&txt/h.length>0.95)return T("plain text","du texte simple");
+  return T("something else: it does not begin the way a zip does","autre chose : il ne commence pas comme un zip");}
+function wholeAtStart(u8,dv){var p=0,n=0;while(p+30<=u8.length&&dv.getUint32(p,true)===0x04034b50){var fl=dv.getUint16(p+6,true),csz=dv.getUint32(p+18,true),nl=dv.getUint16(p+26,true),xl=dv.getUint16(p+28,true);
+    if(fl&8)break;var end=p+30+nl+xl+csz;if(end>u8.length)break;n++;p=end;}return n;}
+function unpack(c,meth,usz){if(meth===0)return Promise.resolve(c);
+  try{if(typeof W.DecompressionStream==="function"){return new Response(new Blob([c]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer().then(function(b){return new Uint8Array(b);});}}catch(e){}
+  return new Promise(function(res){var core=W.IngRepo&&IngRepo.core;if(core&&typeof core.inflateRaw==="function"){var r=core.inflateRaw(c,0,usz);res(r&&r.data?r.data:r);return;}throw new Error("nostream");});}
+/* u8: the zip's bytes; name: its file name; opt.deep (default true): unpack each file and compare its check sum
+   -> {ok, name, files, entries:[{name, size}], problems:[{file, kind, what}], message} */
+function zipCheck(u8,name,opt){opt=opt||{};name=String(name||T("this file","ce fichier"));
+  return Promise.resolve().then(function(){if(!(u8 instanceof Uint8Array))u8=new Uint8Array(u8&&u8.buffer?u8.buffer:u8);
+    var n=u8.length,probs=[],ents=[];
+    function P(file,k,what){probs.push({file:file,kind:k,what:what});}
+    function fin(){var r={ok:!probs.length,name:name,files:ents.filter(function(x){return !x.dir;}).length,entries:ents.filter(function(x){return !x.dir;}).map(function(x){return {name:x.name,size:x.usz};}),problems:probs,message:""};
+      if(probs.length)r.message=zipMessage(name,probs);return r;}
+    if(n<4||!(u8[0]===0x50&&u8[1]===0x4b&&(u8[2]===3||u8[2]===5||u8[2]===7||u8[2]===0x30))){P(null,"notzip",looksLike(u8));return fin();}
+    var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),eo=-1,i;
+    for(i=n-22;i>=Math.max(0,n-65557);i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
+    if(eo<0){var w=wholeAtStart(u8,dv);P(null,"short",T("it is cut short: it ends after "+B(n)+", before the list of its files","il est coupé : il s’arrête après "+B(n)+", avant la liste de ses fichiers")+(w?T(" (the first "+N(w,"file","files")+" in it "+(w===1?"is":"are")+" whole)"," (les "+N(w,"premier fichier","premiers fichiers")+" sont entiers)"):""));return fin();}
+    var cnt=dv.getUint16(eo+10,true),cdSize=dv.getUint32(eo+12,true),cdo=dv.getUint32(eo+16,true);
+    if((cdo===0xffffffff||cnt===0xffff||cdSize===0xffffffff)&&eo>=20&&dv.getUint32(eo-20,true)===0x07064b50&&typeof dv.getBigUint64==="function"){
+      var z=Number(dv.getBigUint64(eo-20+8,true));if(z+56<=n&&dv.getUint32(z,true)===0x06064b50){cnt=Number(dv.getBigUint64(z+32,true));cdSize=Number(dv.getBigUint64(z+40,true));cdo=Number(dv.getBigUint64(z+48,true));}}
+    if(cdo>n||cdo+cdSize>n){P(null,"short",T("it is cut short: the list of its files points past its end","il est coupé : la liste de ses fichiers pointe au-delà de sa fin"));return fin();}
+    if(!cnt){P(null,"empty",T("it holds no file at all","il ne contient aucun fichier"));return fin();}
+    var p=cdo,dec=new TextDecoder();
+    for(var k=0;k<cnt;k++){if(p+46>n||dv.getUint32(p,true)!==0x02014b50){P(null,"directory",T("the list of the files inside it is broken after "+k+" of "+cnt+" files","la liste des fichiers qu’il contient est cassée après "+k+" fichiers sur "+cnt));break;}
+      var fl=dv.getUint16(p+8,true),meth=dv.getUint16(p+10,true),crc=dv.getUint32(p+16,true),csz=dv.getUint32(p+20,true),usz=dv.getUint32(p+24,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lho=dv.getUint32(p+42,true);
+      var nm=dec.decode(u8.subarray(p+46,Math.min(n,p+46+nl)));
+      if((csz===0xffffffff||usz===0xffffffff||lho===0xffffffff)&&typeof dv.getBigUint64==="function"){var xp=p+46+nl,xe=Math.min(n,xp+xl);while(xp+4<=xe){var id=dv.getUint16(xp,true),sz=dv.getUint16(xp+2,true),q=xp+4;
+        if(id===1){if(usz===0xffffffff&&q+8<=xe){usz=Number(dv.getBigUint64(q,true));q+=8;}if(csz===0xffffffff&&q+8<=xe){csz=Number(dv.getBigUint64(q,true));q+=8;}if(lho===0xffffffff&&q+8<=xe){lho=Number(dv.getBigUint64(q,true));}}xp+=4+sz;}}
+      ents.push({name:nm,flags:fl,meth:meth,crc:crc,csz:csz,usz:usz,lho:lho,dir:/\/$/.test(nm)&&!usz});p+=46+nl+xl+cl;}
+    ents.forEach(function(e){if(e.dir)return;
+      if(e.lho+30>n){P(e.name,"short",T("it is missing: the zip is cut short before it","il manque : le zip est coupé avant lui"));e.bad=1;return;}
+      if(dv.getUint32(e.lho,true)!==0x04034b50){P(e.name,"damaged",T("where it should begin, the zip holds something else","là où il devrait commencer, le zip contient autre chose"));e.bad=1;return;}
+      var s=e.lho+30+dv.getUint16(e.lho+26,true)+dv.getUint16(e.lho+28,true);e.start=s;
+      if(s+e.csz>n){P(e.name,"short",T("it is cut short: the zip ends "+B(s+e.csz-n)+" before its end","il est coupé : le zip s’arrête "+B(s+e.csz-n)+" avant sa fin"));e.bad=1;return;}
+      if(e.flags&1){P(e.name,"locked",T("it is locked with a password, and the Forge opens only zips without one","il est verrouillé par un mot de passe, et la Forge n’ouvre que les zips sans mot de passe"));e.bad=1;return;}
+      if(e.meth!==0&&e.meth!==8){P(e.name,"method",T("it is packed with "+methName(e.meth)+", which the Forge does not unpack (it reads stored and deflated files)","il est emballé avec "+methName(e.meth)+", que la Forge ne sait pas déballer (elle lit les fichiers stockés et compressés en deflate)"));e.bad=1;return;}});
+    if(opt.deep===false)return fin();
+    var chain=Promise.resolve();
+    ents.forEach(function(e){if(e.dir||e.bad)return;chain=chain.then(function(){return unpack(u8.subarray(e.start,e.start+e.csz),e.meth,e.usz).then(function(d){
+        if(d.length!==e.usz){P(e.name,"damaged",T("it unpacks to "+B(d.length)+" where it should be "+B(e.usz),"il se déballe en "+B(d.length)+" alors qu’il devrait faire "+B(e.usz)));return;}
+        if(crc32(d)!==e.crc)P(e.name,"crc",T("what it holds does not match its check sum (CRC), so it changed after it was packed","ce qu’il contient ne correspond pas à sa somme de contrôle (CRC) : il a changé après avoir été emballé"));},
+      function(x){if(msgOf(x)==="nostream"){P(e.name,"nostream",T("this browser cannot unpack it","ce navigateur ne sait pas le déballer"));return;}P(e.name,"damaged",T("its packed data is broken and cannot be unpacked","ses données emballées sont cassées et ne peuvent pas être déballées"));});});});
+    return chain.then(fin);});}
+function zipMessage(name,probs){var f="“"+name+"”",a=probs[0],more=probs.length-1,again=T(" Copy or download it again."," Copiez-le ou téléchargez-le de nouveau.");
+  if(a.kind==="notzip")return T(f+" is not a zip: it is "+a.what+".",f+" n’est pas un zip : c’est "+a.what+".");
+  if(a.kind==="nostream")return PART_WORDS("unzip");
+  if(!a.file)return T(f+" is "+(a.kind==="short"?"incomplete: ":"damaged: ")+a.what+".",f+" est "+(a.kind==="short"?"incomplet : ":"abîmé : ")+a.what+".")+(a.kind==="empty"?"":again);
+  var tail=more?T(" "+cap(N(more,"more file","more files"))+" inside "+(more===1?"has":"have")+" a problem too."," "+cap(N(more,"autre fichier","autres fichiers"))+" à l’intérieur "+(more===1?"a":"ont")+" aussi un problème."):"";
+  if(a.kind==="method"||a.kind==="locked")return T("“"+a.file+"” inside "+f+": "+a.what+".","« "+a.file+" » dans "+f+" : "+a.what+".")+tail+(a.kind==="method"?T(" Make the zip again with ordinary compression."," Refaites le zip avec la compression ordinaire."):"");
+  return T(f+" is damaged: “"+a.file+"” inside it: "+a.what+".",f+" est abîmé : « "+a.file+" » à l’intérieur : "+a.what+".")+tail+again;}
+
+/* ---------- the parts a copy of the Forge, or a browser, may or may not have ---------- */
+function storeOk(){try{return !!W.indexedDB&&!Q.noStore;}catch(e){return false;}}
+function parts(){var out=[];
+  function add(id,ok,en,f,whyEn,whyFr){out.push({id:id,ok:!!ok,label:T(en,f),why:T(whyEn,whyFr)});}
+  add("store",storeOk(),"Its own store on this device","Sa propre mémoire sur cet appareil","keeps your apps, files and Fabrica between visits","garde vos apps, vos fichiers et Fabrica d’une visite à l’autre");
+  var dz=false,cz=false;try{new DecompressionStream("deflate-raw");dz=true;}catch(e){}try{new CompressionStream("deflate-raw");cz=true;}catch(e){}
+  add("unzip",dz||!!(W.IngRepo&&IngRepo.core&&IngRepo.core.inflateRaw),"Unpacking zips","Déballer les zips","opens zips, backups and the apps the Forge carries","ouvre les zips, les sauvegardes et les apps que porte la Forge");
+  add("pack",cz,"Packing zips quickly","Emballer vite les zips","makes backups and packages smaller","rend les sauvegardes et les paquets plus petits");
+  add("crypto",!!(W.crypto&&crypto.subtle),"Fingerprints (Web Crypto)","Empreintes (Web Crypto)","checks that what arrives is whole, quickly","vérifie vite que ce qui arrive est entier");
+  var carried=false;try{carried=!!$i("forge-bi-meta");}catch(e){}
+  add("carried",carried,"Your apps, carried inside","Vos apps, portées dedans","the full Forge carries Carpe Diem, Inkwell, Ingenium and itself","la Forge complète porte Carpe Diem, Inkwell, Ingenium et elle-même");
+  var kits=false;try{kits=!!(W.FORGE&&FORGE.fab&&typeof FORGE.fab.hasKits==="function"&&FORGE.fab.hasKits());}catch(e){}
+  add("kits",kits,"The install packages","Les paquets d’installation","make the Mac, Windows, iPhone, iPad and Fire packages","font les paquets Mac, Windows, iPhone, iPad et Fire");
+  add("fabrica",!!W.IngRepo,"Fabrica","Fabrica","keeps every version of the apps you make","garde chaque version des apps que vous faites");
+  add("persist",!!(navigator.storage&&navigator.storage.persist),"Keeping for good","Garder pour de bon","asks the browser never to clear the Forge’s things","demande au navigateur de ne jamais effacer ce que garde la Forge");
+  return out;}
+
+/* ---------- the notice under the top bar ---------- */
+var NOTE={t:0,back:null};
+function closeNote(){var n=$i("fsxNote");if(!n)return;clearTimeout(NOTE.t);n.classList.remove("on");var b=NOTE.back;NOTE.back=null;
+  var had=n.contains(D.activeElement);setTimeout(function(){try{n.remove();}catch(e){}},reduced()?0:260);
+  try{if(had&&b&&D.contains(b))b.focus();}catch(e){}}
+/* o: {kind: "full"|"warn"|"info", title, text, keys: [[label, fn, primary]], stay} */
+function notice(o){o=o||{};var old=$i("fsxNote");if(old)old.remove();clearTimeout(NOTE.t);
+  var n=E("div","fsx-"+(o.kind||"info"));n.id="fsxNote";n.setAttribute("role",o.kind==="full"?"alert":"status");n.setAttribute("aria-live",o.kind==="full"?"assertive":"polite");
+  var dot=E("span","fsx-ndot");dot.setAttribute("aria-hidden","true");n.appendChild(dot);
+  var body=E("div","fsx-nb");body.appendChild(E("b",null,o.title||""));body.appendChild(E("p",null,o.text||""));
+  var ks=E("div","fsx-nk");
+  (o.keys||[]).forEach(function(k){var b=E("button",k[2]?"stone solid":"solid",k[0]);b.type="button";b.onclick=function(){closeNote();try{k[1]();}catch(e){}};ks.appendChild(b);});
+  var c=E("button","solid",T("Close","Fermer"));c.type="button";c.onclick=closeNote;ks.appendChild(c);
+  body.appendChild(ks);n.appendChild(body);
+  n.addEventListener("keydown",function(e){if(e.key==="Escape"){e.stopPropagation();closeNote();}});
+  NOTE.back=D.activeElement;D.body.appendChild(n);
+  var show=function(){n.classList.add("on");};if(reduced())show();else (W.requestAnimationFrame||setTimeout)(show);
+  if(o.kind==="info"&&!o.stay)NOTE.t=setTimeout(closeNote,16000);
+  return n;}
+
+/* a full store: said at once; when she lets the Forge free room on its own, old copies go first */
+function full(o){o=o||{};var now=Date.now();Q.lastAt=now;Q.lastWhere=o.where||"";
+  if(Q.busy||(Q.shownAt&&now-Q.shownAt<15000&&!o.force))return;Q.shownAt=now;
+  var s=S(),keys=[[T("Open Storage","Ouvrir Stockage"),openStorage,true]],ls=o.where==="localStorage";
+  function tell(ev){var freed=ev&&ev.items&&ev.items.length;
+    notice({kind:"full",title:ls?T("The Forge’s small store is full","La petite mémoire de la Forge est pleine"):T("This device’s storage for the Forge is full","Le stockage de cet appareil pour la Forge est plein"),
+      text:ls?FULL_WORDS("localStorage"):T("Something could not be kept just now, because the room the Forge has here is used up. Nothing kept before is lost. ","Quelque chose n’a pas pu être gardé à l’instant : la place de la Forge ici est épuisée. Rien de ce qui était gardé n’est perdu. ")
+        +(freed?T("The Forge removed "+N(ev.items.length,"old copy","old copies")+" to free "+B(ev.bytes)+" (Settings, Storage lists them). Try once more.","La Forge a retiré "+N(ev.items.length,"ancienne copie","anciennes copies")+" pour libérer "+B(ev.bytes)+" (Réglages, Stockage les liste). Réessayez.")
+          :(s.auto?T("There are no old copies left to remove. Settings, Storage shows what takes the room.","Il ne reste aucune ancienne copie à retirer. Réglages, Stockage montre ce qui prend la place.")
+            :T("Settings, Storage shows what takes the room, and Clean the library frees old copies.","Réglages, Stockage montre ce qui prend la place, et Nettoyer la bibliothèque libère les anciennes copies."))),keys:keys});}
+  if(!ls&&s.auto&&storeOk()){Q.busy=true;evict("full").then(function(ev){Q.busy=false;tell(ev);},function(){Q.busy=false;tell(null);});}
+  else{addLog({at:now,why:ls?"fullsmall":"full",items:[],bytes:0});tell(null);}}
+
+/* ================================================================================================================
+   2. ForgeStore: the stores, measured
+   ================================================================================================================ */
+var KNOWN=["forge-applib","forge-files","forge-studio","forge_repos","fabrica_made","forge_hub","cd-room","cd-lite","forge-selftest"];
+function LABEL(name){var L={
+  "forge-applib":[T("Your app library","Votre bibliothèque d’apps"),T("The copies of Carpe Diem, the Forge, Inkwell and Ingenium kept here, each version","Les copies de Carpe Diem, de la Forge, d’Inkwell et d’Ingenium gardées ici, chaque version")],
+  "forge-files":[T("Files","Fichiers"),T("The files you brought into Files","Les fichiers apportés dans Fichiers")],
+  "forge-studio":[T("The Studio","Le Studio"),T("Your new apps and the Studio’s edits","Vos nouvelles apps et les modifications du Studio")],
+  "forge_repos":[T("Fabrica’s history","L’historique de Fabrica"),T("Every version of the apps you make in Fabrica","Chaque version des apps que vous faites dans Fabrica")],
+  "fabrica_made":[T("Fabrica’s packages","Les paquets de Fabrica"),T("Apps and install packages Fabrica made, kept to save again","Apps et paquets d’installation faits par Fabrica, gardés pour les enregistrer de nouveau")],
+  "forge_hub":[T("Fabrica’s issues and pull requests","Les tickets et demandes de Fabrica"),T("What you wrote about your apps in Fabrica","Ce que vous avez écrit sur vos apps dans Fabrica")],
+  "cd-room":[T("The desk’s larger copy","La copie plus grande du bureau"),T("Your desk, when the small store is too full for it","Votre bureau, quand la petite mémoire est trop pleine pour lui")],
+  "cd-lite":[T("Rooms sent to windows","Pièces envoyées aux fenêtres"),T("A room on its way to a window of its own","Une pièce en route vers sa propre fenêtre")],
+  "forge-selftest":[T("The store test’s scratch","Le brouillon du test de la mémoire"),T("Left by a store test; it clears itself when the test ends","Laissé par un test de la mémoire ; il s’efface quand le test finit")]}[name];
+  return L||[T("Another store: ","Une autre mémoire : ")+name,T("Kept by a part of the Forge or an app it opened","Gardée par une partie de la Forge ou une app qu’elle a ouverte")];}
+function utf8Len(s){var n=0,L=s.length,c,i;for(i=0;i<L;i++){c=s.charCodeAt(i);if(c<0x80)n++;else if(c<0x800)n+=2;else if(c>=0xD800&&c<0xDC00&&i+1<L){n+=4;i++;}else n+=3;}return n;}
+function sizeOf(v,d){d=d||0;if(v==null)return 1;var t=typeof v;
+  if(t==="string")return utf8Len(v);if(t==="number")return 8;if(t==="boolean")return 1;
+  try{if(v instanceof ArrayBuffer)return v.byteLength;if(ArrayBuffer.isView(v))return v.byteLength;if(typeof Blob!=="undefined"&&v instanceof Blob)return v.size;}catch(e){}
+  if(t!=="object"||d>8)return 16;var n=2,k;
+  if(Array.isArray(v)){for(k=0;k<v.length;k++)n+=sizeOf(v[k],d+1)+1;return n;}
+  for(k in v)if(Object.prototype.hasOwnProperty.call(v,k))n+=k.length+2+sizeOf(v[k],d+1);return n;}
+function dbNames(){if(!storeOk())return Promise.resolve([]);
+  try{if(typeof indexedDB.databases==="function")return indexedDB.databases().then(function(l){return (l||[]).map(function(x){return x&&x.name;}).filter(Boolean);},function(){return KNOWN.slice();});}catch(e){}
+  return Promise.resolve(KNOWN.slice());}
+/* a store that exists is opened as it is; one that does not exist is never made by looking for it */
+function openExisting(name){return new Promise(function(res){var rq;try{rq=indexedDB.open(name);}catch(e){res(null);return;}
+  var fresh=false,done=false,tm=setTimeout(function(){if(!done){done=true;res(null);}},8000);
+  rq.onupgradeneeded=function(){fresh=true;try{rq.transaction.abort();}catch(e){}};
+  rq.onsuccess=function(){var d=rq.result;clearTimeout(tm);if(done){try{d.close();}catch(e){}return;}done=true;if(fresh){try{d.close();}catch(e){}res(null);return;}d.onversionchange=function(){try{d.close();}catch(e){}};res(d);};
+  rq.onerror=function(ev){try{if(ev&&ev.preventDefault)ev.preventDefault();}catch(e){}clearTimeout(tm);var er=rq.error;if(er&&!fresh&&(er.name==="InvalidStateError"||er.name==="SecurityError"))Q.noStore=true;if(!done){done=true;res(null);}};
+  rq.onblocked=function(){};});}
+function txDone(t){return new Promise(function(res,rej){t.oncomplete=function(){res(true);};t.onerror=function(){rej(t.error);};t.onabort=function(){rej(t.error||new Error("aborted"));};});}
+function walk(d,sn,onEach){return new Promise(function(res){var n=0,b=0;try{var t=d.transaction(sn,"readonly"),rq=t.objectStore(sn).openCursor();
+    rq.onsuccess=function(){var c=rq.result;if(!c)return;var sz=sizeOf(c.value)+sizeOf(c.key);n++;b+=sz;if(onEach){try{onEach(c.key,c.value,sz);}catch(e){}}c.continue();};
+    t.oncomplete=function(){res({n:n,bytes:b});};t.onabort=t.onerror=function(){res({n:n,bytes:b,err:true});};}catch(e){res({n:0,bytes:0,err:true});}});}
+function getAll(d,sn,what){return new Promise(function(res){try{if(!d.objectStoreNames.contains(sn)){res([]);return;}var t=d.transaction(sn,"readonly"),s=t.objectStore(sn),r=what==="keys"?s.getAllKeys():s.getAll();
+  t.oncomplete=function(){res(r.result||[]);};t.onabort=t.onerror=function(){res([]);};}catch(e){res([]);}});}
+function getOne(d,sn,key){return new Promise(function(res){try{var t=d.transaction(sn,"readonly"),r=t.objectStore(sn).get(key);t.oncomplete=function(){res(r.result);};t.onabort=t.onerror=function(){res(undefined);};}catch(e){res(undefined);}});}
+function delKeys(dbn,sn,keys){if(!keys.length)return Promise.resolve(0);return openExisting(dbn).then(function(d){if(!d)return 0;
+  var stores=(Array.isArray(sn)?sn:[sn]).filter(function(x){return d.objectStoreNames.contains(x);});if(!stores.length){d.close();return 0;}
+  var t=d.transaction(stores,"readwrite");keys.forEach(function(k){stores.forEach(function(x){t.objectStore(x).delete(k);});});
+  return txDone(t).then(function(){d.close();return keys.length;},function(e){try{d.close();}catch(_){}throw e;});});}
+function lsSize(){var n=0,c=0,big=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),v=localStorage.getItem(k)||"",s=(k.length+v.length)*2;n+=s;c++;big.push([k,s]);}}catch(e){}
+  big.sort(function(a,b){return b[1]-a[1];});return {bytes:n,n:c,big:big.slice(0,3)};}
+function estimate(){try{if(navigator.storage&&navigator.storage.estimate)return navigator.storage.estimate().then(function(e){return {usage:e.usage||0,quota:e.quota||0};},function(){return null;});}catch(e){}return Promise.resolve(null);}
+/* the app library and Fabrica's packages are measured from their records, so their pages are never read to be counted */
+function sizeLib(d){return Promise.all([getAll(d,"meta"),getAll(d,"bytes","keys")]).then(function(r){var meta={},b=0,n=0;r[0].forEach(function(m){if(m&&m.id){meta[m.id]=m;b+=sizeOf(m);}});
+  var lone=[];r[1].forEach(function(k){n++;if(meta[k])b+=(+meta[k].size||0);else lone.push(k);});
+  return lone.reduce(function(p,k){return p.then(function(){return getOne(d,"bytes",k).then(function(v){b+=sizeOf(v);});});},Promise.resolve()).then(function(){return {n:n,bytes:b};});});}
+function sizeMade(d){return Promise.all([getAll(d,"meta"),getAll(d,"bytes","keys")]).then(function(r){var b=0,meta={};r[0].forEach(function(m){if(m&&m.key){meta[m.key]=m;b+=sizeOf(m)+(+m.size||0);}});return {n:r[1].length,bytes:b};});}
+var M={last:null,busy:null};
+function measure(){if(M.busy)return M.busy;
+  M.busy=dbNames().then(function(names){KNOWN.forEach(function(k){if(names.indexOf(k)<0&&typeof indexedDB.databases!=="function")names.push(k);});var out=[];
+      return names.reduce(function(p,name){return p.then(function(){return openExisting(name).then(function(d){if(!d)return;var tot={db:name,n:0,bytes:0};
+        var job=name===LIBDB?sizeLib(d):(name==="fabrica_made"?sizeMade(d):[].slice.call(d.objectStoreNames).reduce(function(q,sn){return q.then(function(){return walk(d,sn).then(function(r){tot.n+=r.n;tot.bytes+=r.bytes;});});},Promise.resolve()).then(function(){return tot;}));
+        return job.then(function(r){try{d.close();}catch(e){}out.push({db:name,n:r.n,bytes:r.bytes});},function(){try{d.close();}catch(e){}});});});},Promise.resolve()).then(function(){return out;});})
+    .then(function(dbs){return estimate().then(function(est){var ls=lsSize(),total=ls.bytes;dbs.forEach(function(x){total+=x.bytes;});
+      var r={at:Date.now(),dbs:dbs,ls:ls,est:est,total:total};M.last=r;return r;});})
+    .then(function(r){M.busy=null;return r;},function(e){M.busy=null;throw e;});
+  return M.busy;}
+function effLimit(quota){var L=+S().limit>0?+S().limit:0;if(L&&quota)return Math.min(L,quota);return L||quota||0;}
+function level(p){return p==null?0:(p>=WARN2?2:(p>=WARN1?1:0));}
+function status(){return estimate().then(function(est){var usage=est?est.usage:(M.last?M.last.total:null),quota=est?est.quota:0,lim=effLimit(quota);
+  var pct=(usage!=null&&lim>0)?usage/lim:null;
+  return {usage:usage,quota:quota,limit:+S().limit>0?+S().limit:null,eff:lim,pct:pct,level:level(pct),mine:+S().limit>0&&(!quota||+S().limit<=quota)};});}
+function persisted(){try{if(navigator.storage&&navigator.storage.persisted)return navigator.storage.persisted().then(function(p){return !!p;},function(){return null;});}catch(e){}return Promise.resolve(null);}
+function askPersist(){try{if(!navigator.storage||!navigator.storage.persist)return Promise.resolve(null);
+  return navigator.storage.persist().then(function(p){S().persist={at:Date.now(),granted:!!p};save();return !!p;},function(){return null;});}catch(e){return Promise.resolve(null);}}
+
+/* ---------- the app library's versions: newest first ---------- */
+function olderKey(app,sha,at){var k=String(sha||"").slice(0,12)||("t"+Number(at||Date.now()).toString(36));return {slot:"older-"+k,id:app+":older-"+k};}
+function rank(m){return m.slot==="newest"?0:(m.slot==="earlier"?1:2);}
+function libMeta(){var L=W.__forgeLib;if(L&&typeof L.meta==="function")return L.meta().then(function(M0){return M0||{};},function(){return null;});
+  return openExisting(LIBDB).then(function(d){if(!d)return null;return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}var o={};a.forEach(function(m){if(m&&m.id)o[m.id]=m;});return o;});});}
+function libApps(){return libMeta().then(function(M0){if(!M0)return null;var by={};Object.keys(M0).forEach(function(id){var m=M0[id];if(!m||!m.app||!m.slot)return;(by[m.app]=by[m.app]||[]).push(m);});
+  return Object.keys(by).sort(function(a,b){return ["forge","cd","inkwell","ingenium"].indexOf(a)-["forge","cd","inkwell","ingenium"].indexOf(b);}).map(function(a){var l=by[a];
+    l.sort(function(x,y){return rank(x)-rank(y)||(y.at||0)-(x.at||0);});
+    /* a newest copy missing (a store that lost it): the first kept is the one that stays */
+    return {key:a,name:appName(a),chain:l};});});}
+function verLabel(app,v){return app.name+(v.version?" "+v.version:"")+(v.version?"":T(" (kept "+day(v.at)+")"," (gardée le "+day(v.at)+")"));}
+function srcWords(v){var s=v.source||"";return s==="builtin"?T("carried inside the Forge","portée dans la Forge"):s==="self"?T("the Forge’s own page","la page même de la Forge"):s==="library"?T("from the app library","de la bibliothèque d’apps"):s==="made"?T("your version","votre version"):T("a file you chose","un fichier choisi");}
+
+/* A copy pushed out of 'earlier' is set on the older shelf in the same transaction (all or nothing: on a full device the
+   keep is refused whole and what was kept stays). The same bytes are never kept twice. */
+var LIBPUT=null;
+(function hookLibrary(){try{var P=W.IDBObjectStore&&IDBObjectStore.prototype;if(!P||!P.put||P.put.__fsx)return;var op=P.put;LIBPUT=op;
+  var np=function(value){try{if(this.name==="meta"&&value&&typeof value==="object"&&typeof value.id==="string"&&value.app){var t=this.transaction;
+      if(t&&t.mode==="readwrite"&&t.db&&t.db.name===LIBDB)libPut(this,t,value,op);}}catch(e){}
+    return op.apply(this,arguments);};
+  np.__fsx=true;P.put=np;}catch(e){}})();
+function libPut(ms,t,value,op){var m=/^(.+):(newest|earlier)$/.exec(value.id);if(!m)return;var app=m[1],slot=m[2];
+  var st=t.__fsx||(t.__fsx={shas:{}});if(value.sha256)st.shas[app+"|"+value.sha256]=1;
+  var bs=null;try{if([].indexOf.call(t.objectStoreNames,"bytes")>=0)bs=t.objectStore("bytes");}catch(e){}
+  if(value.sha256){var oi=olderKey(app,value.sha256).id,g0=ms.get(oi);
+    g0.onsuccess=function(){var o=g0.result;if(!o)return;
+      /* an older version come back as the newest or the earlier copy leaves the older shelf, and its Keep always goes with it */
+      if(o.pin&&!value.pin){try{op.call(ms,Object.assign({},value,{pin:true}));}catch(e){}}
+      try{ms.delete(oi);if(bs)bs.delete(oi);}catch(e){}};}
+  if(slot!=="earlier"||!bs)return;
+  var g=ms.get(value.id),gb=bs.get(value.id),old,ob,n=0;
+  function both(){if(++n<2)return;if(!old||!ob||!ob.bytes)return;
+    if(old.sha256&&(old.sha256===value.sha256||st.shas[app+"|"+old.sha256]))return;
+    var k=olderKey(app,old.sha256,old.at),rec=Object.assign({},old,{id:k.id,slot:k.slot,older:true,shelved:Date.now()});
+    try{op.call(ms,rec);op.call(bs,{id:k.id,bytes:ob.bytes});}catch(e){}}
+  g.onsuccess=function(){old=g.result;both();};gb.onsuccess=function(){ob=gb.result;both();};}
+/* a version set on the older shelf by hand (a backup read back): kept as it was */
+function keepOlder(m,u8){if(!m||!m.app||!u8||!u8.length)return Promise.reject(new Error("bad"));
+  return openExisting(LIBDB).then(function(d){if(!d)throw Object.assign(new Error("noidb"),{code:"noidb"});
+    var k=olderKey(m.app,m.sha256,m.at),rec=Object.assign({},m,{id:k.id,slot:k.slot,older:true,at:m.at||Date.now()}),t=d.transaction(["meta","bytes"],"readwrite");
+    var buf=(u8.byteOffset===0&&u8.byteLength===u8.buffer.byteLength)?u8.buffer:u8.slice().buffer;
+    t.objectStore("meta").put(rec);t.objectStore("bytes").put({id:k.id,bytes:buf});
+    return txDone(t).then(function(){d.close();libChanged();return rec;},function(e){try{d.close();}catch(_){}throw e;});});}
+function pin(id,on){return openExisting(LIBDB).then(function(d){if(!d)return false;return getOne(d,"meta",id).then(function(m){if(!m){d.close();return false;}
+    if(on)m.pin=true;else delete m.pin;var t=d.transaction("meta","readwrite");t.objectStore("meta").put(m);
+    return txDone(t).then(function(){d.close();return true;},function(){try{d.close();}catch(e){}return false;});});}).then(function(ok){if(ok){libChanged();paintApps();}return ok;});}
+function libChanged(){try{if(W.__forgeLib&&typeof __forgeLib.meta==="function")__forgeLib.meta().catch(function(){});}catch(e){}try{if(typeof W.__forgeLibPaint==="function")__forgeLibPaint();}catch(e){}}
+
+/* ---------- what may go: the exact list ---------- */
+function repoNames(){try{if(W.IngRepo&&typeof IngRepo.list==="function")return Promise.race([IngRepo.list().then(function(l){var o={};(l||[]).forEach(function(r){o[r.id]=r.name;});return o;}),new Promise(function(res){setTimeout(function(){res({});},4000);})]).catch(function(){return {};});}catch(e){}return Promise.resolve({});}
+function KIND_WORDS(k){return ({web:T("web app","app web"),onePage:T("one page","une page"),page:T("one page","une page"),kits:T("install packages","paquets d’installation"),apk:T("Fire tablet app","app pour tablette Fire"),ipa:T("iPhone and iPad app","app iPhone et iPad"),mac:T("Mac app","app Mac"),win:T("Windows app","app Windows")})[k]||k||T("package","paquet");}
+function storeTestRunning(){try{var b=$i("stTestGo");if(b&&b.disabled)return true;if(W.__forgeStoreTest&&W.__forgeStoreTest.busy)return true;}catch(e){}return false;}
+function plan(){var NK=keepN(),items=[],kept={newest:0,pinned:0,inN:0,packages:0,young:0},proof={lib:0,apps:0};
+  return libApps().then(function(apps){
+    /* 1. the library: beyond the newest N, never the newest, the only one, or one marked Keep always */
+    (apps||[]).forEach(function(app){app.chain.forEach(function(v,i){
+      if(i===0){kept.newest++;return;}if(v.pin){kept.pinned++;return;}if(i<NK){kept.inN++;return;}
+      items.push({kind:"library",id:v.id,app:app.key,slot:v.slot,sha:v.sha256||"",label:verLabel(app,v)+" · "+srcWords(v)+T(", kept "+day(v.at),", gardée le "+day(v.at)),bytes:+v.size||0,at:v.at||0});});});
+    /* 2. Fabrica's packages: the newest N versions of each app and kind stay (they can be made again) */
+    return openExisting("fabrica_made").then(function(d){if(!d)return [];return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}return a;});}).then(function(meta){
+      if(!meta.length)return;return repoNames().then(function(names){var groups={};
+        meta.forEach(function(m){if(!m||!m.key)return;var g=(m.repo||"")+"|"+(m.kind||"");(groups[g]=groups[g]||[]).push(m);});
+        Object.keys(groups).forEach(function(g){var list=groups[g],at={};list.forEach(function(m){at[m.commit]=Math.max(at[m.commit]||0,m.at||0);});
+          var commits=Object.keys(at).sort(function(a,b){return at[b]-at[a];});
+          list.forEach(function(m){if(commits.indexOf(m.commit)<NK){kept.packages++;return;}
+            items.push({kind:"package",key:m.key,label:(names[m.repo]||T("An app","Une app"))+" · "+KIND_WORDS(m.kind)+" · "+m.name+T(", made "+day(m.at),", fait le "+day(m.at)),bytes:+m.size||0,at:m.at||0});});});});});})
+    .then(function(){
+      /* 3a. pages in the library that no record names: only the library's records name its pages */
+      return openExisting(LIBDB).then(function(d){if(!d)return;return Promise.all([getAll(d,"meta","keys"),getAll(d,"bytes","keys")]).then(function(r){var have={};r[0].forEach(function(k){have[k]=1;});proof.lib=r[0].length;
+        var lone=r[1].filter(function(k){return !have[k];});
+        return lone.reduce(function(p,k){return p.then(function(){return getOne(d,"bytes",k).then(function(v){items.push({kind:"orphan-lib",id:k,label:T("An app page kept with no record of what it is","Une page d’app gardée sans fiche qui dise ce qu’elle est")+" ("+String(k).split(":")[0]+")",bytes:sizeOf(v),at:0});});});},Promise.resolve());})
+        .then(function(){try{d.close();}catch(e){}});});})
+    .then(function(){
+      /* 3b. edits of a new app that is no longer here: a new app's edits are named by that app alone (new:<its id>) */
+      return openExisting("forge-studio").then(function(d){if(!d)return;return Promise.all([getAll(d,"apps","keys"),getAll(d,"edits")]).then(function(r){var have={};r[0].forEach(function(k){have[k]=1;});proof.apps=r[0].length;
+        r[1].forEach(function(v){if(!v||typeof v.id!=="string"||v.id.indexOf("new:")!==0)return;var aid=v.id.slice(4);if(have[aid])return;
+          var t0=+v.t||0;if(!t0||t0>SESSION_AT-10*60000||t0>Date.now()-MIN_AGE){kept.young++;return;}
+          items.push({kind:"orphan-edits",id:v.id,label:T("The edits of a new app that is no longer here, from "+day(t0),"Les modifications d’une nouvelle app qui n’est plus là, du "+day(t0)),bytes:sizeOf(v),at:t0});});
+        try{d.close();}catch(e){}});});})
+    .then(function(){
+      /* 3c. a store test's scratch left behind: only the store test uses it, it clears it when it ends, and none runs now */
+      if(storeTestRunning())return;
+      return dbNames().then(function(names){if(names.indexOf("forge-selftest")<0)return;return openExisting("forge-selftest").then(function(d){if(!d)return;
+        return [].slice.call(d.objectStoreNames).reduce(function(q,sn){return q.then(function(b){return walk(d,sn).then(function(r){return b+r.bytes;});});},Promise.resolve(0)).then(function(b){try{d.close();}catch(e){}
+          items.push({kind:"scratch",id:"forge-selftest",label:T("A store test’s scratch, left behind when a test stopped early","Le brouillon d’un test de la mémoire, laissé quand un test s’est arrêté tôt"),bytes:b,at:0});});});});})
+    .then(function(){var total=0;items.forEach(function(it){total+=it.bytes;});
+      return {at:Date.now(),keepN:NK,items:items,bytes:total,kept:kept,proof:proof};});}
+function itemId(it){return it.kind+"|"+(it.id||it.key);}
+var EV={busy:null,lastAt:0};
+/* removes what a plan lists, each checked again first: what has come into use since stays where it is */
+function clean(p,why){if(EV.busy)return EV.busy.then(function(){return clean(p,why);},function(){return clean(p,why);});
+  EV.busy=plan().then(function(now){var ok={};now.items.forEach(function(it){ok[itemId(it)]=it;});
+      var todo=(p&&p.items?p.items:now.items).filter(function(it){return ok[itemId(it)];}),skipped=(p&&p.items?p.items.length:0)-todo.length,done=[];
+      function of(k){return todo.filter(function(x){return x.kind===k;});}
+      var chain=Promise.resolve();
+      /* the library first, one copy at a time, through the library itself, so the Editor's line follows */
+      of("library").forEach(function(it){chain=chain.then(function(){var L=W.__forgeLib;
+        var go=(L&&typeof L.drop==="function")?L.drop(it.app,it.slot):delKeys(LIBDB,["meta","bytes"],[it.id]);
+        return Promise.resolve(go).then(function(){done.push(it);},function(){});});});
+      return chain
+        .then(function(){var pk=of("package");return delKeys("fabrica_made",["meta","bytes"],pk.map(function(x){return x.key;})).then(function(){done=done.concat(pk);},function(){});})
+        .then(function(){var ol=of("orphan-lib");return delKeys(LIBDB,"bytes",ol.map(function(x){return x.id;})).then(function(){done=done.concat(ol);},function(){});})
+        .then(function(){var oe=of("orphan-edits");return delKeys("forge-studio","edits",oe.map(function(x){return x.id;})).then(function(){done=done.concat(oe);},function(){});})
+        .then(function(){var sc=of("scratch");if(!sc.length||storeTestRunning())return;return new Promise(function(res){try{var r=indexedDB.deleteDatabase("forge-selftest");r.onsuccess=function(){done=done.concat(sc);res();};r.onerror=r.onblocked=function(){res();};}catch(e){res();}});})
+        .then(function(){var bytes=0;done.forEach(function(x){bytes+=x.bytes;});
+          var ev={at:Date.now(),why:why||"clean",items:done.map(function(x){return {k:x.kind,label:x.label,bytes:x.bytes};}),bytes:bytes,skipped:skipped};
+          if(done.length||why!=="limit")addLog(ev);if(why!=="clean")EV.lastAt=Date.now();
+          if(done.length)diary(ev);
+          if(done.some(function(x){return x.kind==="library"||x.kind==="orphan-lib";}))libChanged();
+          return ev;});})
+    .then(function(ev){EV.busy=null;paintSoon();return ev;},function(e){EV.busy=null;throw e;});
+  return EV.busy;}
+/* when room runs short: the pieces nothing uses first, then the packages, then the library's oldest versions, only as many
+   as bring it back under 80 % of the limit; when the store is full, all that may go */
+function evict(why,need){return plan().then(function(p){if(!p.items.length){if(why==="full")addLog({at:Date.now(),why:"full",items:[],bytes:0});EV.lastAt=Date.now();return {items:[],bytes:0};}
+  var order={"orphan-lib":0,"orphan-edits":0,"scratch":0,"package":1,"library":2},list=p.items.slice().sort(function(a,b){return (order[a.kind]-order[b.kind])||((a.at||0)-(b.at||0));}),take=list;
+  if(why==="limit"&&need>0){take=[];var sum=0;for(var i=0;i<list.length&&sum<need;i++){take.push(list[i]);sum+=list[i].bytes;}}
+  return clean({items:take},why);});}
+function addLog(ev){var s=S();s.log.unshift({at:ev.at,why:ev.why,bytes:ev.bytes||0,skipped:ev.skipped||0,items:(ev.items||[]).slice(0,30),more:Math.max(0,(ev.items||[]).length-30)});
+  if(s.log.length>50)s.log.length=50;save();paintLog();}
+function diary(ev){try{if(W.FORGE&&typeof FORGE.diary==="function")FORGE.diary("storage",WHY(ev.why)+": "+N(ev.items.length,"item removed","items removed","élément retiré","éléments retirés")+", "+B(ev.bytes)+T(" freed"," libérés")+" ("+ev.items.slice(0,6).map(function(x){return x.label.split(" · ")[0];}).join("; ")+(ev.items.length>6?"…":"")+").");}catch(e){}}
+
+/* ---------- the room, checked: after writes, now and then, and when Storage is open ---------- */
+var CK={busy:null,last:null,t:0};
+function check(){if(CK.busy)return CK.busy;
+  CK.busy=status().then(function(st){CK.last=st;var s=S();
+      var go=s.auto&&st.pct!=null&&st.pct>=EVICT_AT&&!EV.busy&&(!EV.lastAt||Date.now()-EV.lastAt>10*60000)&&storeOk();
+      if(!go)return st;
+      return evict("limit",st.usage-WARN1*st.eff).then(function(ev){return status().then(function(st2){if(ev&&ev.items&&ev.items.length){st2.freed=ev;settle(st2,st.usage-ev.bytes);}return st2;});});})
+    .then(function(st){CK.last=st;warn(st);paintGauge();return st;})
+    .then(function(r){CK.busy=null;return r;},function(){CK.busy=null;return null;});
+  return CK.busy;}
+/* the browser's count lags behind what was just removed: what is left is what was there less what went */
+function settle(st,left){if(st.usage==null||!(left>=0)||st.usage<=left)return st;st.usage=left;st.pct=st.eff>0?left/st.eff:null;st.level=level(st.pct);return st;}
+function warn(st){var s=S(),w=s.warned;if(!st)return;
+  if(st.freed){var ev=st.freed,still=st.pct!=null&&st.level>0;s.warned={level:st.level,at:Date.now()};save();
+    notice({kind:still?"warn":"info",title:T("Room was running short","La place venait à manquer"),
+      text:T("The Forge removed "+N(ev.items.length,"old copy","old copies")+" on its own and freed "+B(ev.bytes)+". Your newest "+keepN()+" versions of each app, and everything you made, stay.","La Forge a retiré seule "+N(ev.items.length,"ancienne copie","anciennes copies")+" et libéré "+B(ev.bytes)+". Vos "+keepN()+" versions les plus récentes de chaque app, et tout ce que vous avez fait, restent.")
+        +(still?T(" It is still at "+pc(st.pct)+" of "+(st.mine?"your limit":"its room")+": Clean the library, or raise your limit."," Elle est encore à "+pc(st.pct)+" de "+(st.mine?"votre limite":"sa place")+" : nettoyez la bibliothèque, ou relevez votre limite."):"")+T(" Settings, Storage lists what went."," Réglages, Stockage liste ce qui est parti."),keys:[[T("Open Storage","Ouvrir Stockage"),openStorage,true]]});return;}
+  if(st.pct==null)return;
+  if(st.level<w.level){s.warned={level:st.level,at:Date.now()};save();return;}
+  if(st.level>w.level){s.warned={level:st.level,at:Date.now()};save();
+    var of=st.mine?T("the limit you set","la limite que vous avez fixée"):T("the room the browser gives it","la place que lui donne le navigateur");
+    notice({kind:"warn",title:st.level===2?T("Storage is nearly full","Le stockage est presque plein"):T("Storage is getting full","Le stockage se remplit"),
+      text:st.level===2?T("The Forge has used "+pc(st.pct)+" of "+of+" ("+B(st.usage)+" of "+B(st.eff)+"). Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit.","La Forge a utilisé "+pc(st.pct)+" de "+of+" ("+B(st.usage)+" sur "+B(st.eff)+"). Bientôt, de nouvelles choses pourraient ne plus être gardées. Nettoyer la bibliothèque libère les anciennes copies, ou vous pouvez relever votre limite.")
+        :T("The Forge has used "+pc(st.pct)+" of "+of+" ("+B(st.usage)+" of "+B(st.eff)+"). Nothing needs doing yet. When you like, Clean the library frees old copies.","La Forge a utilisé "+pc(st.pct)+" de "+of+" ("+B(st.usage)+" sur "+B(st.eff)+"). Rien à faire pour l’instant. Quand vous voulez, Nettoyer la bibliothèque libère les anciennes copies."),
+      keys:[[T("Open Storage","Ouvrir Stockage"),openStorage,true]]});}}
+function soon(){if(Date.now()-STARTED<20000)return;clearTimeout(CK.t);CK.t=setTimeout(function(){if(!EV.busy)check();},6000);}
+
+/* ================================================================================================================
+   3. Where errors reach her: every IndexedDB write, every localStorage write, the library, Fabrica, the Editor
+   ================================================================================================================ */
+(function hookWrites(){try{var P=W.IDBDatabase&&IDBDatabase.prototype;if(!P||!P.transaction||P.transaction.__fsx)return;var o=P.transaction;
+  var n=function(stores,mode){var t=o.apply(this,arguments);
+    try{if(mode==="readwrite"){var dbn=this.name;
+      t.addEventListener("abort",function(){var er=t.error;if(er&&isFull(er)){Q.lastDb=dbn;full({where:dbn});}});
+      t.addEventListener("complete",function(){if(!EV.busy)soon();});}}catch(e){}
+    return t;};
+  n.__fsx=true;P.transaction=n;}catch(e){}})();
+(function hookSmallStore(){try{var P=W.Storage&&Storage.prototype;if(!P||!P.setItem||P.setItem.__fsx)return;var o=P.setItem;
+  var n=function(k,v){try{return o.apply(this,arguments);}catch(e){if(!SAVING&&isFull(e)){try{e.fsxWhere="localStorage";}catch(x){}later(function(){full({where:"localStorage"});});}throw e;}};
+  n.__fsx=true;P.setItem=n;}catch(e){}})();
+W.addEventListener("unhandledrejection",function(e){try{var r=e&&e.reason;if(r&&isFull(r))full({where:r.fsxWhere||"background"});}catch(_){}});
+function wrapApi(obj,tag){if(!obj||obj["__fsx"+tag])return;Object.keys(obj).forEach(function(k){var f=obj[k];if(typeof f!=="function"||f.__fsxw)return;
+    var w=function(){var r=f.apply(this,arguments);if(r&&typeof r.then==="function")return r.then(null,function(e){var k2=kind(e);throw (k2==="full"||k2==="missing")?plainErr(e):e;});return r;};
+    w.__fsxw=true;w.__orig=f;Object.keys(f).forEach(function(p){try{w[p]=f[p];}catch(x){}});try{obj[k]=w;}catch(x){}});
+  try{Object.defineProperty(obj,"__fsx"+tag,{value:true});}catch(e){}}
+function u8Of(x){try{if(x instanceof Uint8Array)return x;if(x instanceof ArrayBuffer)return new Uint8Array(x);if(x&&x.buffer instanceof ArrayBuffer)return new Uint8Array(x.buffer,x.byteOffset||0,x.byteLength);}catch(e){}return null;}
+function isZipHead(b){return !!b&&b.length>=4&&b[0]===0x50&&b[1]===0x4b&&(b[2]===3||b[2]===5||b[2]===7||b[2]===0x30);}
+function readBuf(f){if(f.arrayBuffer)return f.arrayBuffer();return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(r.error);};r.readAsArrayBuffer(f);});}
+function headOf(f){try{return readBuf(f.slice(0,8)).then(function(b){return new Uint8Array(b);});}catch(e){return Promise.resolve(new Uint8Array(0));}}
+var WIRED={};
+function wireFabrica(){if(WIRED.fab||!W.IngRepo)return !!WIRED.fab;WIRED.fab=true;
+  /* a zip brought into Fabrica is checked first: a damaged one says which file and what */
+  ["fromZip","importAny"].forEach(function(fn){var o=IngRepo[fn];if(typeof o!=="function"||o.__fsxz)return;
+    var w=function(u8,opt){var self=this,args=arguments,b=u8Of(u8);
+      if(!b||!isZipHead(b))return o.apply(self,args);
+      var nm=(opt&&(opt.fileName||opt.name)?String(opt.fileName||opt.name):T("the zip","le zip"));if(!/\.zip$/i.test(nm)&&opt&&(opt.fileName||opt.name))nm+=".zip";
+      return zipCheck(b,nm,{deep:b.length<=DEEP_MAX}).then(function(r){if(!r.ok)throw ZipError(r.message,r);return o.apply(self,args);});};
+    w.__fsxz=true;IngRepo[fn]=w;});
+  wrapApi(IngRepo,"r");
+  /* a page that names a file that is not there: said once for each version made */
+  if(W.IngShip&&typeof IngShip.onePage==="function"&&!IngShip.onePage.__fsx){var o1=IngShip.onePage,said={};
+    var n1=function(id){return o1.apply(this,arguments).then(function(r){try{if(r&&r.missing&&r.missing.length){var k=id+"|"+r.commit;if(!said[k]){said[k]=1;
+        notice({kind:"warn",title:T("A file the page names is missing","Un fichier que nomme la page manque"),text:filesWords(r.missing,r.page)+T(" It was made without "+(r.missing.length===1?"it.":"them.")," Elle a été faite sans "+(r.missing.length===1?"lui.":"eux."))});}}}catch(e){}return r;});};
+    n1.__fsx=true;Object.keys(o1).forEach(function(k){try{n1[k]=o1[k];}catch(e){}});IngShip.onePage=n1;}
+  if(W.IngShip)wrapApi(IngShip,"s");
+  try{if(W.fbHub&&typeof W.fbHub==="object")wrapApi(W.fbHub,"h");}catch(e){}
+  return true;}
+function wireLibrary(){var L=W.__forgeLib;if(!L||WIRED.lib)return !!WIRED.lib;WIRED.lib=true;
+  if(typeof L.importFile==="function"&&!L.importFile.__fsx){var oi=L.importFile;
+    var ni=function(file){var self=this,args=arguments;if(!file||typeof file.slice!=="function")return oi.apply(self,args);
+      return readBuf(file).then(function(ab){var u8=new Uint8Array(ab);return zipCheck(u8,file.name||"",{deep:u8.length<=DEEP_MAX});}).then(function(r){
+        if(!r.ok){notice({kind:"warn",title:T("The app library file could not be opened","Le fichier de la bibliothèque d’apps n’a pas pu être ouvert"),text:r.message,stay:true});return r;}
+        return oi.apply(self,args);},function(){return oi.apply(self,args);});};
+    ni.__fsx=true;L.importFile=ni;}
+  if(typeof L.keepRaw==="function"&&!L.keepRaw.__fsx){var ok=L.keepRaw;var nk=function(m,u8,slot){if(slot&&/^older-/.test(slot))return keepOlder(m,u8);return ok.apply(this,arguments);};nk.__fsx=true;L.keepRaw=nk;}
+  wrapApi(L,"l");
+  return true;}
+/* the Editor: a zip chosen in step 1 is checked; a damaged one is explained, and a whole one opens the app page inside it */
+function wireEditor(){var inp=$i("edShell");if(!inp)return false;if(inp.__fsx)return true;var orig=inp.onchange;if(typeof orig!=="function")return false;inp.__fsx=true;
+  function line(t,warn){var s=$i("edShellState");if(s){s.textContent=t;if(warn)s.classList.add("warn");else s.classList.remove("warn");}}
+  inp.onchange=function(ev){var self=this,args=arguments,f=inp.files&&inp.files[0];if(!f)return orig.apply(self,args);
+    headOf(f).then(function(h){if(!isZipHead(h)&&!/\.zip$/i.test(f.name||""))return orig.apply(self,args);
+      return readBuf(f).then(function(ab){var u8=new Uint8Array(ab);return zipCheck(u8,f.name,{deep:u8.length<=DEEP_MAX}).then(function(r){
+        if(!r.ok){line(r.message,true);notice({kind:"warn",title:T("This zip could not be opened","Ce zip n’a pas pu être ouvert"),text:r.message,stay:true});try{inp.value="";}catch(e){}return;}
+        var pages=r.entries.filter(function(x){return /\.html?$/i.test(x.name)&&!/(^|\/)__MACOSX\//.test(x.name);});
+        var pick=pages.length===1?pages[0]:pages.filter(function(x){return /(^|\/)index\.html?$/i.test(x.name);}).sort(function(a,b){return a.name.split("/").length-b.name.split("/").length;})[0];
+        if(!pick){var t=pages.length?T("“"+f.name+"” holds "+pages.length+" pages ("+pages.slice(0,4).map(function(x){return x.name;}).join(", ")+(pages.length>4?"…":"")+") and none is called index.html. Unpack it and choose the page you want.","« "+f.name+" » contient "+pages.length+" pages ("+pages.slice(0,4).map(function(x){return x.name;}).join(", ")+(pages.length>4?"…":"")+") et aucune ne s’appelle index.html. Déballez-le et choisissez la page voulue.")
+            :T("“"+f.name+"” holds no web page (.html), so there is nothing to open in the Editor. Choose the app’s own page.","« "+f.name+" » ne contient aucune page web (.html) : rien à ouvrir dans l’Éditeur. Choisissez la page même de l’app.");
+          line(t,true);notice({kind:"info",title:T("Which page?","Quelle page ?"),text:t,stay:true});try{inp.value="";}catch(e){}return;}
+        return pageFrom(u8,pick.name).then(function(data){var name=pick.name.split("/").pop();
+          try{var dt=new DataTransfer();dt.items.add(new File([data],name,{type:"text/html"}));inp.files=dt.files;}catch(e){
+            var txt=new TextDecoder().decode(data);try{W.__forgeEd.open(txt,name);}catch(x){}line(T("Opened “"+name+"” from inside “"+f.name+"”.","« "+name+" » ouverte depuis « "+f.name+" »."));return;}
+          orig.apply(self,args);later(function(){var s=$i("edShellState");if(s&&s.textContent.indexOf(f.name)<0)s.textContent=s.textContent+T(" (from inside “"+f.name+"”)"," (depuis « "+f.name+" »)");},400);});});});})
+    .catch(function(e){var t=say(e,{name:f.name});line(t,true);notice({kind:kind(e)==="full"?"full":"warn",title:T("The file could not be opened","Le fichier n’a pas pu être ouvert"),text:t});});};
+  return true;}
+function pageFrom(u8,name){var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),n=u8.length,eo=-1,i;for(i=n-22;i>=Math.max(0,n-65557);i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
+  var cnt=dv.getUint16(eo+10,true),p=dv.getUint32(eo+16,true),dec=new TextDecoder();
+  for(var k=0;k<cnt;k++){var meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),usz=dv.getUint32(p+24,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lho=dv.getUint32(p+42,true);
+    if(dec.decode(u8.subarray(p+46,p+46+nl))===name){var s=lho+30+dv.getUint16(lho+26,true)+dv.getUint16(lho+28,true);return unpack(u8.subarray(s,s+csz),meth,usz);}p+=46+nl+xl+cl;}
+  return Promise.reject(new Error("this zip could not be read"));}
+function wireToast(){if(typeof W.cdToast!=="function"||W.cdToast.__fsx)return;var ot=W.cdToast;
+  var nt=function(t){try{var s=String(t==null?"":t);if(/QuotaExceeded|quota (has been |was )?exceeded|storage is full|no space left/i.test(s)){full({});return;}}catch(e){}return ot.apply(this,arguments);};
+  nt.__fsx=true;W.cdToast=nt;}
+function wireAll(){var a=wireFabrica(),b=wireLibrary(),c=wireEditor();wireToast();return a&&b&&c;}
+
+/* ================================================================================================================
+   4. Settings, Storage
+   ================================================================================================================ */
+function openStorage(){try{if(W.FORGE&&typeof FORGE.openRoom==="function")FORGE.openRoom("settings");else if(typeof W.openRoom==="function")W.openRoom("settings");}catch(e){}
+  setTimeout(function(){if(!seat())return;var tab=D.querySelector('#room-settings [data-tab="storage"]');if(tab&&tab.getAttribute("aria-selected")!=="true")tab.click();
+    setTimeout(function(){var c=$i("fsxCard"),h=$i("fsxH");if(!c)return;try{c.scrollIntoView({block:"start",behavior:reduced()?"auto":"smooth"});}catch(e){}
+      try{h.focus({preventScroll:true});}catch(e){try{h.focus();}catch(_){}}opened();},60);},80);}
+function words(){var c=$i("fsxCard");if(!c)return;[].forEach.call(c.querySelectorAll("[data-en]"),function(n){var t=fr()?n.getAttribute("data-fr"):n.getAttribute("data-en");if(n.textContent!==t)n.textContent=t;});
+  [].forEach.call(c.querySelectorAll("[data-aen]"),function(n){n.setAttribute("aria-label",fr()?n.getAttribute("data-afr"):n.getAttribute("data-aen"));});
+  var tab=D.querySelector('#room-settings [data-tab="storage"]');if(tab)tab.textContent=T("Storage","Stockage");}
+function w(tag,cls,en,f,attrs){return "<"+tag+(cls?' class="'+cls+'"':"")+(attrs||"")+' data-en="'+esc(en)+'" data-fr="'+esc(f)+'">'+esc(en)+"</"+tag+">";}
+function esc(t){return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+/* the tab and its page: light, made once the rooms are built; the stores are measured only when the page is in sight */
+function seat(){if($i("fsxCard"))return true;var room=$i("room-settings");if(!room)return false;
+  var bar=room.querySelector(".page-tabs:not(.forge-family)")||room.querySelector(".page-tabs"),first=bar&&bar.querySelector("[data-tab]");
+  var bk=room.querySelector('.page[data-page="backup"]');if(!bar||!first||!bk)return false;
+  try{var old=$i("storageCard");if(old)old.remove();}catch(e){}
+  var tab=first.cloneNode(false);tab.classList.remove("active");tab.removeAttribute("data-cd-on");tab.setAttribute("data-tab","storage");tab.setAttribute("aria-selected","false");tab.setAttribute("role","tab");tab.id="fsxTab";tab.textContent=T("Storage","Stockage");
+  var after=bar.querySelector('[data-tab="backup"]');if(after&&after.nextSibling)bar.insertBefore(tab,after.nextSibling);else bar.appendChild(tab);
+  var page=D.createElement("div");page.className="page";page.setAttribute("data-page","storage");page.setAttribute("data-on","0");page.id="fsxPage";page.setAttribute("role","tabpanel");page.setAttribute("aria-labelledby","fsxTab");
+  page.innerHTML='<section class="panel card" id="fsxCard" aria-labelledby="fsxH">'
+    +w("h3","fsx-title","Storage","Stockage",' id="fsxH" tabindex="-1"')
+    +w("p","fsx-lead","What the Forge keeps on this device, how much room it takes, and how much it may take. Old copies can go; your own work always stays.","Ce que la Forge garde sur cet appareil, la place que cela prend, et celle qu’elle peut prendre. Les anciennes copies peuvent partir ; votre propre travail reste toujours.")
+    +'<div class="fsx-gauge"><div class="fsx-big"><b id="fsxUsed">…</b><span id="fsxOf"></span></div>'
+    +w("span","fsx-sr","Room used, of the limit","Place utilisée, sur la limite",' id="fsxMeterL"')
+    +'<div class="fsx-meter" id="fsxMeter" role="meter" aria-labelledby="fsxMeterL" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-level="0"><i class="fsx-fill" id="fsxFill"></i><i class="fsx-tick" style="left:80%"></i><i class="fsx-tick" style="left:95%"></i></div>'
+    +'<div class="fsx-marks" aria-hidden="true"><span style="left:80%">80&nbsp;%</span><span style="left:95%">95&nbsp;%</span></div>'
+    +'<p class="fsx-state" id="fsxState" aria-live="polite"></p>'
+    +'<div class="fsx-warn" id="fsxWarn" data-level="0" hidden><p id="fsxWarnT"></p><div class="fsx-row">'+w("button","stone solid","Clean the library…","Nettoyer la bibliothèque…",' type="button" id="fsxWarnClean"')+w("button","solid","Change my limit","Changer ma limite",' type="button" id="fsxWarnLimit"')+'</div></div></div>'
+    +'<div class="fsx-persist" id="fsxPersistRow" data-kept=""><span class="fsx-dot" aria-hidden="true"></span><p id="fsxPersist">…</p>'+w("button","solid","Ask the browser to keep it","Demander au navigateur de la garder",' type="button" id="fsxPersistAsk" hidden')+'</div>'
+    +w("h4","fsx-h","What takes the room","Ce qui prend la place")
+    +'<ul class="fsx-kinds" id="fsxKinds"><li class="fsx-wait">…</li></ul>'
+    +'<div class="fsx-mrow"><p class="fsx-small" id="fsxMeasured"></p>'+w("button","solid","Measure again","Mesurer de nouveau",' type="button" id="fsxMeasure"')+'</div>'
+    +w("h4","fsx-h","Your limit","Votre limite")
+    +'<div>'+w("label","fsx-l","The most room the Forge may take here","La plus grande place que la Forge peut prendre ici",' for="fsxLimit"')
+    +'<div class="fsx-row"><input type="number" id="fsxLimit" min="0" step="any" inputmode="decimal"><select id="fsxUnit" data-aen="Unit of the limit" data-afr="Unité de la limite" aria-label="Unit of the limit"><option value="1048576">MB</option><option value="1073741824">GB</option></select>'
+    +w("button","solid","No limit of my own","Pas de limite à moi",' type="button" id="fsxLimitClear"')+'</div><p class="fsx-small" id="fsxLimitNote" style="margin-top:7px"></p></div>'
+    +w("h4","fsx-h","Old copies","Anciennes copies")
+    +'<label class="fsx-switch" for="fsxAuto"><input type="checkbox" role="switch" id="fsxAuto" aria-describedby="fsxAutoD"><span>'+w("b","","Free room on its own when it runs short","Libérer de la place seule quand elle manque")+w("span","fsx-small","At 90 % of your limit, or when the store is full, old copies go first, oldest first, only as many as needed.","À 90 % de votre limite, ou quand la mémoire est pleine, les anciennes copies partent d’abord, les plus anciennes en premier, juste ce qu’il faut.",' id="fsxAutoD"')+'</span></label>'
+    +'<div class="fsx-keepn">'+w("label","fsx-l","Versions kept of each app, whatever happens","Versions gardées de chaque app, quoi qu’il arrive",' for="fsxKeep"')+'<input type="number" id="fsxKeep" min="1" max="20" step="1" inputmode="numeric"></div>'
+    +w("p","fsx-small","What may go, and only this: an app’s older versions beyond the newest you keep (never its newest, its only one, or one you mark Keep always), Fabrica’s older packages (they can be made again), and pieces nothing uses. Your files, new apps, edits, Fabrica’s history, issues and settings are never removed.","Ce qui peut partir, et seulement cela : les anciennes versions d’une app au-delà des plus récentes que vous gardez (jamais sa plus récente, sa seule, ni une que vous marquez Garder toujours), les anciens paquets de Fabrica (ils peuvent être refaits), et les morceaux que rien n’utilise. Vos fichiers, nouvelles apps, modifications, l’historique de Fabrica, ses tickets et vos réglages ne sont jamais retirés.")
+    +w("h4","fsx-h","Your app library","Votre bibliothèque d’apps")
+    +'<div class="fsx-apps" id="fsxApps"></div>'
+    +'<div class="fsx-row fsx-cleanrow">'+w("button","stone solid","Clean the library…","Nettoyer la bibliothèque…",' type="button" id="fsxClean"')+w("span","fsx-small","You see exactly what would go before anything does.","Vous voyez exactement ce qui partirait avant que rien ne parte.",' id="fsxCleanNote"')+'</div>'
+    +'<details id="fsxLogBox"><summary><span data-en="What was removed, and when" data-fr="Ce qui a été retiré, et quand">What was removed, and when</span> <span id="fsxLogN"></span></summary><ol class="fsx-log" id="fsxLog"></ol></details>'
+    +'<details id="fsxPartsBox"><summary data-en="What this copy of the Forge carries" data-fr="Ce que porte cette copie de la Forge">What this copy of the Forge carries</summary><ul class="fsx-parts" id="fsxParts"></ul></details>'
+    +'</section>';
+  bk.parentNode.insertBefore(page,bk.nextSibling);
+  wireCard();words();
+  try{new MutationObserver(function(){if(page.getAttribute("data-on")==="1")opened();}).observe(page,{attributes:true,attributeFilter:["data-on"]});}catch(e){}
+  if(page.getAttribute("data-on")==="1")later(opened,0);
+  return true;}
+function wireCard(){var lim=$i("fsxLimit"),unit=$i("fsxUnit");
+  showLimit();
+  function setLimit(){var v=parseFloat(String(lim.value).replace(",","."));var s2=S(),note=$i("fsxLimitNote");
+    if(!(v>0)){s2.limit=null;}else{var b=Math.round(v*(+unit.value));if(b<20*1048576){if(note){note.textContent=T("A limit is at least 20 MB: the Forge itself takes about 13 MB.","Une limite fait au moins 20 Mo : la Forge elle-même prend environ 13 Mo.");}showLimit();return;}s2.limit=b;}
+    s2.warned={level:0,at:0};save();paintSoon();check();}
+  lim.addEventListener("change",setLimit);unit.addEventListener("change",function(){if(lim.value)setLimit();});
+  $i("fsxLimitClear").onclick=function(){lim.value="";setLimit();};
+  var au=$i("fsxAuto");au.checked=!!S().auto;au.onchange=function(){S().auto=au.checked;save();paintSoon();if(au.checked)check();};
+  var kn=$i("fsxKeep");kn.value=String(keepN());kn.addEventListener("change",function(){var v=Math.round(+kn.value);if(!(v>=1))v=1;if(v>20)v=20;kn.value=String(v);S().keepN=v;save();paintApps();});
+  $i("fsxMeasure").onclick=function(){var b=$i("fsxMeasure");b.disabled=true;measure().then(function(){b.disabled=false;paintKinds();status().then(function(st){CK.last=st;paintAll();});},function(){b.disabled=false;});};
+  $i("fsxClean").onclick=function(){preview($i("fsxClean"));};
+  $i("fsxWarnClean").onclick=function(){preview($i("fsxWarnClean"));};
+  $i("fsxWarnLimit").onclick=function(){try{lim.focus();lim.select();}catch(e){}};
+  $i("fsxPersistAsk").onclick=function(){var b=$i("fsxPersistAsk");b.disabled=true;askPersist().then(function(){b.disabled=false;paintPersist();});};
+  $i("fsxApps").addEventListener("click",function(e){var b=e.target&&e.target.closest?e.target.closest("button[data-pin]"):null;if(!b)return;
+    var id=b.getAttribute("data-pin"),on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on?"true":"false");
+    pin(id,on).then(function(){var again=D.querySelector('#fsxApps button[data-pin="'+id.replace(/"/g,'\\"')+'"]');if(again)again.focus();});});}
+function showLimit(){var lim=$i("fsxLimit"),unit=$i("fsxUnit");if(!lim)return;var L=+S().limit>0?+S().limit:0;if(!L){lim.value="";return;}
+  var g=L>=1073741824&&L%104857600===0;unit.value=g?"1073741824":"1048576";lim.value=String(+(L/+unit.value).toFixed(2));}
+var PT=0;function paintSoon(){clearTimeout(PT);PT=setTimeout(paintAll,90);}
+function paintAll(){if(!$i("fsxCard"))return;words();paintGauge();paintKinds();paintApps();paintLog();paintParts();paintPersist();
+  var au=$i("fsxAuto"),kn=$i("fsxKeep");if(au)au.checked=!!S().auto;if(kn&&D.activeElement!==kn)kn.value=String(keepN());if(D.activeElement!==$i("fsxLimit"))showLimit();
+  var n=$i("fsxLimitNote");if(n){var st=CK.last,L=+S().limit>0?+S().limit:0;
+    n.textContent=T("Warnings come at 80 % and 95 % of it.","Les avertissements viennent à 80 % et à 95 %.")+(st&&st.quota?(L>st.quota?T(" Your limit is more than the browser gives the Forge here ("+B(st.quota)+"), so the browser’s room is the one that counts."," Votre limite dépasse ce que le navigateur donne ici à la Forge ("+B(st.quota)+") : c’est la place du navigateur qui compte."):(L?"":T(" Without one of your own, the limit is the room the browser gives the Forge here: "+B(st.quota)+"."," Sans limite à vous, la limite est la place que le navigateur donne ici à la Forge : "+B(st.quota)+"."))):"");}}
+function paintGauge(){if(!$i("fsxCard"))return;var st=CK.last;
+  if(!st){status().then(function(x){CK.last=x;paintGauge();});return;}
+  var used=$i("fsxUsed"),of=$i("fsxOf"),m=$i("fsxMeter"),f=$i("fsxFill"),t=$i("fsxState"),wn=$i("fsxWarn");
+  if(st.usage==null){used.textContent=T("Not known","Inconnu");of.textContent=T("this browser does not say how much room the Forge takes","ce navigateur ne dit pas quelle place prend la Forge");m.setAttribute("aria-valuenow","0");m.setAttribute("aria-valuetext",T("not known","inconnu"));f.style.width="0";t.textContent="";wn.hidden=true;return;}
+  used.textContent=st.usage>0?B(st.usage):"0 "+T("MB","Mo");of.textContent=st.eff?T("of "+B(st.eff)+(st.mine?", the limit you set":", the room the browser gives the Forge here"),"sur "+B(st.eff)+(st.mine?", la limite que vous avez fixée":", la place que le navigateur donne ici à la Forge")):T("used","utilisés");
+  var p=st.pct==null?0:Math.max(0,Math.min(1,st.pct));m.setAttribute("data-level",String(st.level));m.setAttribute("aria-valuenow",String(Math.round(p*100)));
+  m.setAttribute("aria-valuetext",T(pc(p)+" of "+(st.mine?"your limit":"the room the browser gives")+" ("+B(st.usage)+" of "+B(st.eff)+")",pc(p)+" de "+(st.mine?"votre limite":"la place que donne le navigateur")+" ("+B(st.usage)+" sur "+B(st.eff)+")"));
+  f.style.width=Math.max(st.usage>0?1:0,p*100)+"%";
+  t.textContent=st.level===0?T("Plenty of room","Bien assez de place")+(st.pct!=null?T(": "+pc(st.pct)+" used."," : "+pc(st.pct)+" utilisés."):".")+(S().auto?T(" Old copies go on their own if it runs short."," Les anciennes copies partent seules si la place manque."):""):"";
+  wn.hidden=st.level===0;wn.setAttribute("data-level",String(st.level));var wt=$i("fsxWarnT");
+  if(st.level>0){wt.textContent="";var bb=E("b",null,st.level===2?T("Nearly full: "+pc(st.pct)+".","Presque plein : "+pc(st.pct)+"."):T("Getting full: "+pc(st.pct)+".","Ça se remplit : "+pc(st.pct)+"."));wt.appendChild(bb);
+    wt.appendChild(D.createTextNode(" "+(st.level===2?T("Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit.","Bientôt, de nouvelles choses pourraient ne plus être gardées. Nettoyer la bibliothèque libère les anciennes copies, ou vous pouvez relever votre limite.")
+      :T("Nothing needs doing yet. When you like, Clean the library frees old copies","Rien à faire pour l’instant. Quand vous voulez, Nettoyer la bibliothèque libère les anciennes copies")+(S().auto?T(", and at 90 % old copies go on their own.",", et à 90 % les anciennes copies partent seules."):"."))));}}
+function paintPersist(){var row=$i("fsxPersistRow");if(!row)return;
+  persisted().then(function(p){var t=$i("fsxPersist"),k=$i("fsxPersistAsk"),s=S(),a=s.persist;if(!t)return;
+    row.setAttribute("data-kept",p?"yes":(p===false?"no":""));
+    if(p)t.textContent=T("Kept for good: the browser has agreed not to clear what the Forge keeps here to make room.","Gardée pour de bon : le navigateur a accepté de ne pas effacer ce que la Forge garde ici pour faire de la place.");
+    else if(p===false)t.textContent=T("Not kept for good yet: if the disk runs very short, the browser may clear what the Forge keeps here.","Pas encore gardée pour de bon : si le disque manque vraiment de place, le navigateur peut effacer ce que la Forge garde ici.")+(a?T(" Asked on "+day(a.at)+"; the answer was "+(a.granted?"yes":"no")+"."," Demandé le "+day(a.at)+" ; la réponse a été "+(a.granted?"oui":"non")+"."):"");
+    else t.textContent=T("This browser does not say whether it keeps the Forge’s things for good.","Ce navigateur ne dit pas s’il garde pour de bon ce que garde la Forge.");
+    k.hidden=!!p||p===null;k.textContent=a?T("Ask the browser again","Redemander au navigateur"):T("Ask the browser to keep it","Demander au navigateur de la garder");
+    /* asked once when Storage is first opened; Firefox asks the person, so there only the key asks */
+    if(p===false&&!a&&!/Firefox\//.test(navigator.userAgent||"")){askPersist().then(function(){paintPersist();});}});}
+function paintKinds(){var ul=$i("fsxKinds");if(!ul)return;var r=M.last;if(!r){ul.innerHTML="";ul.appendChild(E("li","fsx-wait",T("Measuring…","Mesure…")));return;}
+  var rows=r.dbs.map(function(x){var L=LABEL(x.db);return {name:L[0],what:L[1],bytes:x.bytes,n:x.n,db:x.db};});
+  var big=r.ls.big&&r.ls.big.length?T("; the largest: ","; la plus grande : ")+r.ls.big.slice(0,2).map(function(b){return b[0]+" ("+B(b[1])+")";}).join(", "):"";
+  rows.push({name:T("Settings and notes","Réglages et notes"),what:T("The small store (localStorage), about 5 MB in all","La petite mémoire (localStorage), environ 5 Mo en tout")+big,bytes:r.ls.bytes,n:r.ls.n,db:"localStorage"});
+  rows.sort(function(a,b){return b.bytes-a.bytes;});var max=rows.reduce(function(a,x){return Math.max(a,x.bytes);},1);
+  ul.innerHTML="";rows.forEach(function(x){var li=E("li");li.setAttribute("data-db",x.db);li.appendChild(E("span","k-name",x.name));li.appendChild(E("span","k-size",BZ(x.bytes)));
+    li.appendChild(E("span","k-what",x.what+" · "+N(x.n,"entry","entries","entrée","entrées")));var bar=E("span","k-bar");bar.setAttribute("aria-hidden","true");var i=E("i");i.style.width=Math.max(x.bytes>0?1:0,Math.round(x.bytes/max*100))+"%";bar.appendChild(i);li.appendChild(bar);ul.appendChild(li);});
+  var ms=$i("fsxMeasured");if(ms)ms.textContent=T("Measured "+dayTime(r.at)+": "+B(r.total)+" in these stores.","Mesuré le "+dayTime(r.at)+" : "+B(r.total)+" dans ces mémoires.")+(r.est?T(" The browser counts "+B(r.est.usage)+" for the Forge in all, and gives it up to "+B(r.est.quota)+" here."," Le navigateur compte "+B(r.est.usage)+" pour la Forge en tout, et lui donne jusqu’à "+B(r.est.quota)+" ici."):"");}
+var APPS_N=0;
+function paintApps(){var box=$i("fsxApps");if(!box)return;var my=++APPS_N;
+  libApps().then(function(apps){if(my!==APPS_N)return;var NK=keepN(),f=D.activeElement,fid=f&&f.getAttribute&&f.getAttribute("data-pin");box.innerHTML="";
+    if(apps===null){box.appendChild(E("p","fsx-none",storeOk()?T("The app library did not answer.","La bibliothèque d’apps n’a pas répondu."):PART_WORDS("store")));return;}
+    if(!apps.length){box.appendChild(E("p","fsx-none",T("No app is kept in the library yet. The Editor keeps your apps here when you open or make them.","Aucune app n’est encore gardée dans la bibliothèque. L’Éditeur y garde vos apps quand vous les ouvrez ou les faites.")));return;}
+    apps.forEach(function(app){var d=E("div","fsx-app"),h=E("h5",null,app.name),tot=0;app.chain.forEach(function(v){tot+=+v.size||0;});
+      h.appendChild(E("span",null,N(app.chain.length,"version","versions","version","versions")+" · "+B(tot)));d.appendChild(h);var ul=E("ul","fsx-vers");
+      app.chain.forEach(function(v,i){var li=E("li");li.appendChild(E("span","v-name",v.version||T("Unnamed","Sans nom")));li.appendChild(E("span","v-meta",B(v.size||0)+" · "+srcWords(v)+" · "+T("kept ","gardée le ")+day(v.at)));
+        var chip;if(i===0)chip=E("span","fsx-chip ok",app.chain.length===1?T("Newest and only","La plus récente et la seule"):T("Newest","La plus récente"));
+        else if(v.pin)chip=E("span","fsx-chip mine",T("Kept by you","Gardée par vous"));
+        else if(i<NK)chip=E("span","fsx-chip",T("Among your newest "+NK,"Parmi vos "+NK+" plus récentes"));
+        else chip=E("span","fsx-chip warn",T("Goes when room runs short","Part quand la place manque"));
+        li.appendChild(chip);
+        if(i>0){var b=E("button","solid fsx-pin",T("Keep always","Garder toujours"));b.type="button";b.setAttribute("aria-pressed",v.pin?"true":"false");b.setAttribute("data-pin",v.id);
+          b.setAttribute("aria-label",T("Keep always: ","Garder toujours : ")+app.name+" "+(v.version||day(v.at)));li.appendChild(b);}
+        ul.appendChild(li);});d.appendChild(ul);box.appendChild(d);});
+    if(fid){var again=D.querySelector('#fsxApps button[data-pin="'+fid.replace(/"/g,'\\"')+'"]');if(again)try{again.focus();}catch(e){}}});}
+function WHY(k){return ({limit:T("Room was running short, so old copies went on their own","La place manquait : les anciennes copies sont parties seules"),clean:T("You cleaned the library","Vous avez nettoyé la bibliothèque"),full:T("The store was full","La mémoire était pleine"),fullsmall:T("The small store was full","La petite mémoire était pleine")})[k]||k;}
+function paintLog(){var ol=$i("fsxLog");if(!ol)return;var L=S().log;$i("fsxLogN").textContent="("+L.length+")";ol.innerHTML="";
+  if(!L.length){ol.appendChild(E("li",null,T("Nothing has been removed yet.","Rien n’a encore été retiré.")));return;}
+  L.forEach(function(ev){var li=E("li");li.appendChild(E("b",null,dayTime(ev.at)));
+    li.appendChild(D.createTextNode(" · "+WHY(ev.why)+" · "+(ev.items&&ev.items.length?T(N(ev.items.length+(ev.more||0),"item","items")+" removed, "+B(ev.bytes)+" freed",N(ev.items.length+(ev.more||0),"élément retiré","éléments retirés")+", "+B(ev.bytes)+" libérés"):T("nothing old was left to remove","il ne restait rien d’ancien à retirer"))+(ev.skipped?T(" ("+N(ev.skipped,"item","items")+" had come into use and stayed)"," ("+N(ev.skipped,"élément était","éléments étaient")+" de nouveau utilisés et sont restés)"):"")+"."));
+    if(ev.items&&ev.items.length){var ul=E("ul");ev.items.slice(0,12).forEach(function(x){ul.appendChild(E("li",null,x.label+" · "+B(x.bytes)));});
+      var more=ev.items.length-12+(ev.more||0);if(more>0)ul.appendChild(E("li",null,T("and "+more+" more","et "+more+" autres")));li.appendChild(ul);}
+    ol.appendChild(li);});}
+function paintParts(){var ul=$i("fsxParts");if(!ul)return;ul.innerHTML="";parts().forEach(function(p){var li=E("li");
+  li.appendChild(E("span","fsx-chip "+(p.ok?"ok":"warn"),p.ok?T("Here","Présent"):T("Not here","Absent")));li.appendChild(E("b",null,p.label));li.appendChild(D.createTextNode(" · "+p.why+(p.ok?"":" · "+PART_WORDS(p.id))));ul.appendChild(li);});}
+function opened(){if(!seat())return;var s=S(),au=$i("fsxAuto");if(au)au.checked=!!s.auto;
+  status().then(function(st){CK.last=st;paintAll();});
+  if(!M.last||Date.now()-M.last.at>300000)measure().then(function(){paintKinds();},function(){});}
+
+/* ---------- Clean the library: the exact list, then one press ---------- */
+function GROUPS(){return [["library",T("Older app versions","Anciennes versions d’apps")],["package",T("Older Fabrica packages","Anciens paquets de Fabrica")],["orphan-lib",T("App pages nothing names","Pages d’apps que rien ne nomme")],["orphan-edits",T("Edits nothing uses","Modifications que rien n’utilise")],["scratch",T("A test’s leftovers","Les restes d’un test")]];}
+function proofLine(k,p){if(k==="orphan-lib")return T("Checked first: the library’s "+N(p.proof.lib,"record names","records name")+" every page it keeps, and none names these.","Vérifié d’abord : "+N(p.proof.lib,"fiche de la bibliothèque nomme","fiches de la bibliothèque nomment")+" chaque page qu’elle garde, et aucune ne nomme celles-ci.");
+  if(k==="orphan-edits")return T("Checked first: the Studio’s "+N(p.proof.apps,"new app was","new apps were")+" read, and none of them is the app these edits belong to. Only edits older than an hour are listed.","Vérifié d’abord : "+N(p.proof.apps,"nouvelle app du Studio a été lue","nouvelles apps du Studio ont été lues")+", et aucune n’est l’app de ces modifications. Seules les modifications de plus d’une heure sont listées.");
+  if(k==="scratch")return T("Only the store test uses it; no test is running now, and a test that ends clears it itself.","Seul le test de la mémoire l’utilise ; aucun test ne tourne maintenant, et un test qui finit l’efface lui-même.");
+  if(k==="package")return T("Fabrica makes these again from their version whenever you ask.","Fabrica les refait depuis leur version quand vous voulez.");
+  return "";}
+var DLG={back:null};
+function closeDlg(){var d=$i("fsxDlg");if(!d)return;d.remove();D.removeEventListener("keydown",dlgKeys,true);var b=DLG.back;DLG.back=null;try{if(b&&D.contains(b))b.focus();}catch(e){}}
+function dlgKeys(e){var d=$i("fsxDlg");if(!d)return;if(e.key==="Escape"){e.preventDefault();e.stopPropagation();var no=d.querySelector("[data-no]");if(!no||!no.disabled)closeDlg();return;}
+  if(e.key==="Tab"){var f=[].filter.call(d.querySelectorAll("button,[tabindex='0']"),function(x){return !x.disabled&&x.offsetParent!==null;});if(!f.length)return;var a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&D.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&D.activeElement===z){e.preventDefault();a.focus();}}}
+function preview(back){closeDlg();DLG.back=back||D.activeElement;
+  var d=E("div");d.id="fsxDlg";var pv=E("div","fsx-pv");pv.setAttribute("role","dialog");pv.setAttribute("aria-modal","true");pv.setAttribute("aria-labelledby","fsxPvH");
+  var h=E("h2",null,T("Clean the library","Nettoyer la bibliothèque"));h.id="fsxPvH";pv.appendChild(h);var lead=E("p","fsx-pv-lead",T("Looking for old copies…","Recherche des anciennes copies…"));lead.setAttribute("role","status");pv.appendChild(lead);
+  d.appendChild(pv);d.addEventListener("click",function(e){if(e.target===d){var no=d.querySelector("[data-no]");if(!no||!no.disabled)closeDlg();}});D.body.appendChild(d);D.addEventListener("keydown",dlgKeys,true);
+  var c0=E("button","solid",T("Close","Fermer"));c0.type="button";c0.setAttribute("data-no","1");c0.onclick=closeDlg;var k0=E("div","fsx-pv-keys");k0.appendChild(c0);pv.appendChild(k0);try{c0.focus();}catch(e){}
+  return plan().then(function(p){if(!$i("fsxDlg"))return p;pv.innerHTML="";pv.appendChild(h);
+    if(!p.items.length){pv.appendChild(E("p","fsx-pv-lead",T("Nothing to clean. Every copy kept is the newest of its app, among your newest "+p.keepN+", one you keep always, or in use.","Rien à nettoyer. Chaque copie gardée est la plus récente de son app, parmi vos "+p.keepN+" plus récentes, une que vous gardez toujours, ou en usage.")));
+      var k1=E("div","fsx-pv-keys"),c1=E("button","stone solid",T("Close","Fermer"));c1.type="button";c1.setAttribute("data-no","1");c1.onclick=closeDlg;k1.appendChild(c1);pv.appendChild(k1);setTimeout(function(){try{c1.focus();}catch(e){}},30);return p;}
+    pv.appendChild(E("p","fsx-pv-lead",T("Exactly these "+N(p.items.length,"item","items")+" would go. Your own work stays: your files, new apps, edits, Fabrica’s history and issues, your newest "+p.keepN+" versions of each app and the ones you keep always.","Exactement "+(p.items.length===1?"cet élément partirait":"ces "+p.items.length+" éléments partiraient")+". Votre propre travail reste : vos fichiers, nouvelles apps, modifications, l’historique et les tickets de Fabrica, vos "+p.keepN+" versions les plus récentes de chaque app et celles que vous gardez toujours.")));
+    var list=E("div","fsx-pv-list");list.setAttribute("tabindex","0");list.setAttribute("role","region");list.setAttribute("aria-label",T("What would go","Ce qui partirait"));
+    GROUPS().forEach(function(g){var its=p.items.filter(function(x){return x.kind===g[0];});if(!its.length)return;var b=0;its.forEach(function(x){b+=x.bytes;});
+      var hh=E("h3");hh.appendChild(E("span",null,g[1]+" ("+its.length+")"));hh.appendChild(E("span",null,B(b)));list.appendChild(hh);
+      var ul=E("ul");its.forEach(function(x){ul.appendChild(E("li",null,x.label+" · "+B(x.bytes)));});list.appendChild(ul);
+      var pl=proofLine(g[0],p);if(pl)list.appendChild(E("p","fsx-proof",pl));});
+    pv.appendChild(list);pv.appendChild(E("p","fsx-pv-total",T("Frees "+B(p.bytes)+".","Libère "+B(p.bytes)+".")));
+    var keys=E("div","fsx-pv-keys"),no=E("button","solid",T("Not now","Pas maintenant")),yes=E("button","stone solid",T("Remove these · "+B(p.bytes),"Retirer · "+B(p.bytes)));no.type=yes.type="button";no.setAttribute("data-no","1");yes.id="fsxPvYes";
+    no.onclick=closeDlg;
+    yes.onclick=function(){yes.disabled=no.disabled=true;yes.textContent=T("Removing…","Retrait…");
+      clean(p,"clean").then(function(ev){if(!$i("fsxDlg"))return;pv.innerHTML="";pv.appendChild(h);
+        var t=T("Done. ","C’est fait. ")+(ev.items.length?T("Removed "+N(ev.items.length,"item","items")+" and freed "+B(ev.bytes)+".",N(ev.items.length,"élément retiré","éléments retirés")+", "+B(ev.bytes)+" libérés."):T("Nothing was removed.","Rien n’a été retiré."))+(ev.skipped?T(" "+cap(N(ev.skipped,"item","items"))+" had come into use since and stayed."," "+cap(N(ev.skipped,"élément était","éléments étaient"))+" de nouveau utilisés et sont restés."):"")+T(" The list is in What was removed, and when."," La liste est dans Ce qui a été retiré, et quand.");
+        var r=E("p","fsx-pv-lead",t);r.id="fsxPvDone";r.setAttribute("role","status");pv.appendChild(r);var k=E("div","fsx-pv-keys"),c=E("button","stone solid",T("Close","Fermer"));c.type="button";c.setAttribute("data-no","1");c.onclick=closeDlg;k.appendChild(c);pv.appendChild(k);setTimeout(function(){try{c.focus();}catch(e){}},30);
+        measure().then(function(){paintKinds();},function(){});check();},
+      function(e){yes.disabled=no.disabled=false;yes.textContent=T("Remove these · "+B(p.bytes),"Retirer · "+B(p.bytes));notice({kind:kind(e)==="full"?"full":"warn",title:T("Clean the library stopped","Le nettoyage s’est arrêté"),text:say(e,{quiet:true})});});};
+    keys.appendChild(no);keys.appendChild(yes);pv.appendChild(keys);setTimeout(function(){try{no.focus();}catch(e){}},30);return p;},
+  function(e){if(!$i("fsxDlg"))return;lead.textContent=say(e,{quiet:true});});}
+
+/* ---------- the start: light. The hooks above at once; the tab once the rooms are built; the first look at the room later ---------- */
+function start(){var n=0;
+  /* 642's card kept its limit and its tidying under keys of its own: carried over once, then let go */
+  try{if(localStorage.getItem("forge:storage:limitMB")!=null||localStorage.getItem("forge:storage:auto")!=null){S();save();}}catch(e){}
+  (function tryAll(){var a=seat(),b=wireAll();if((!a||!b)&&++n<120)setTimeout(tryAll,500);})();
+  try{new MutationObserver(function(){words();if($i("fsxPage")&&$i("fsxPage").getAttribute("data-on")==="1")paintSoon();}).observe(D.documentElement,{attributes:true,attributeFilter:["lang"]});}catch(e){}
+  W.addEventListener("forge:lib",function(){if($i("fsxPage")&&$i("fsxPage").getAttribute("data-on")==="1"){clearTimeout(start.t);start.t=setTimeout(function(){paintApps();},600);}});
+  setTimeout(function(){check();},25000);
+  setInterval(function(){if(!D.hidden)check();},15*60000);}
+if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){setTimeout(start,1200);});else setTimeout(start,1200);
+
+W.ForgeStore={measure:measure,status:status,check:check,plan:plan,clean:clean,evict:evict,versions:function(a){return libApps().then(function(l){var x=(l||[]).filter(function(y){return y.key===a;})[0];return x?x.chain:[];});},
+  pin:pin,keepOlder:keepOlder,settings:function(){return S();},
+  set:function(o){o=o||{};var s=S();if("limit" in o)s.limit=o.limit>0?Math.round(+o.limit):null;if("auto" in o)s.auto=!!o.auto;if("keepN" in o)s.keepN=Math.max(1,Math.min(20,Math.round(+o.keepN||3)));
+    if("limit" in o)s.warned={level:0,at:0};save();paintSoon();return s;},
+  open:openStorage,preview:preview,log:function(){return S().log.slice();},persist:askPersist,persisted:persisted,effLimit:effLimit,
+  _:{sizeOf:sizeOf,olderKey:olderKey,EVICT_AT:EVICT_AT,last:function(){return {measure:M.last,status:CK.last};},seat:seat,wire:wireAll}};
+W.ForgeErr={say:say,kind:kind,isFull:isFull,full:full,zip:zipCheck,ZipError:ZipError,parts:parts,missing:function(id){return PART_WORDS(id);},plain:plainErr,notice:notice,closeNotice:closeNote,crc32:crc32};
+/* 642's card answered here; the same names now reach this one */
+W.__forgeStorage={measure:measure,clean:function(){return preview();},last:function(){return M.last;},level:function(){var st=CK.last;return !st?"":(st.level===2?"full":(st.level===1?"warn":""));},limit:function(){return +S().limit||0;}};
+})();
+</script>
