@@ -83,6 +83,8 @@ lxAsk=function(run,msgs,maxTok,temp,onPiece){var tries=0,best="";
       if(tries<=2){boost=tries;return new Promise(function(res){setTimeout(res,400);}).then(go);}
       boost=0;return tidy(best);},function(e){boost=0;throw e;});}
   return go();};
+/* 6.2: the marks of the wrappers before it (the recipe's __recipe) stay, so each still knows it is in the chain */
+Object.keys(oAsk).forEach(function(k){try{lxAsk[k]=oAsk[k];}catch(e){}});
 window.lxAsk=lxAsk;
 window.IngWrite={loopAt:loopAt,beforeLoop:beforeLoop,tidy:tidy,manner:MANNER};
 })();

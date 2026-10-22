@@ -1,0 +1,58 @@
+<style id="forge-644-a11y-css">
+/* PASS 644 · WHAT THE ACCESSIBILITY AUDIT FOUND IN THE FORGE, PUT RIGHT.
+   axe-core (WCAG 2.1 A and AA) on every room, by day and by night, on a desk and a phone, found three rules broken in 643:
+   1. the line under each room's head that says what is happening underneath (#tutorLine) was grey on grey, 2.4 to 4.4 to
+      1 against the 4.5 the rule asks for: it now has 6.2 by day and 8.3 by night;
+   2. the save notice was still read while it faded away (a word nearly the colour of the page): it is hidden once faded;
+      Fabrica's two narrow-screen tabs not chosen were 4.0 to 1: now 5.6;
+   3. in Fabrica, a divider the keyboard can move said nothing of where it stood, and a panel that scrolls could not be
+      scrolled from the keyboard. Ingenium had these put right in its own Fabrica (its module r152); the same is done here.
+   And as in Ingenium, the icons drawn beside the words of a key are hidden from screen readers, as decoration.
+   The accessibility tree (rig/a11y/ax_tree.js) found two more in every room: the Forge had no main region (a screen
+   reader's way to the room, past the masthead and the rail), and a few words that can be edited in place were read as
+   nothing. The room is the main region now, the rail the rooms' navigation, and an editable line a text box with its name.
+   Each is put right as each room opens. */
+html body #section-forge #tutorLine#tutorLine,html body #tutorLine#tutorLine{color:#4f565d !important}
+body[data-theme="night"] #section-forge #tutorLine#tutorLine,body[data-theme="night"] #tutorLine#tutorLine{color:#a3aab1 !important}
+#cd-save-notice[style*="opacity: 0"]{visibility:hidden;transition:visibility 0s .3s}
+html body #fb .f-tabs button[role="tab"]:not([aria-selected="true"]){color:#4c5964}
+body[data-theme="night"] #fb .f-tabs button[role="tab"]:not([aria-selected="true"]){color:#b9c3cc}
+#fb .f-pn-b[tabindex="0"]:focus-visible{outline:2px solid var(--f-acc,#17577a);outline-offset:-2px}
+</style>
+<script id="forge-644-a11y-js">
+/* PASS 644 · what the accessibility audit found in the Forge, put right: see the note above */
+(function(){"use strict";
+if(window.__forgeA11y644)return;window.__forgeA11y644=1;
+/* a divider: where it stands, in per cent of the room the first panel takes */
+function where(sep){var vert=sep.getAttribute("aria-orientation")!=="horizontal",prev=sep.previousElementSibling,par=sep.parentElement;
+  while(prev&&(prev.getAttribute("role")==="separator"||getComputedStyle(prev).display==="none"))prev=prev.previousElementSibling;
+  if(!prev||!par)return null;var a=prev.getBoundingClientRect(),p=par.getBoundingClientRect(),whole=vert?p.width:p.height,part=vert?a.width:a.height;
+  if(!(whole>0))return null;return Math.max(0,Math.min(100,Math.round(part/whole*100)));}
+function seps(){[].forEach.call(document.querySelectorAll('[role="separator"][tabindex]'),function(s){var v=where(s);if(v==null)v=50;
+  if(s.getAttribute("aria-valuenow")!==String(v)){s.setAttribute("aria-valuemin","0");s.setAttribute("aria-valuemax","100");s.setAttribute("aria-valuenow",String(v));
+    s.setAttribute("aria-valuetext",v+" per cent for the first panel");}});}
+/* a panel that scrolls, with nothing in it the keyboard can reach, takes the focus itself and is named by its heading */
+var REACH='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+function scrolls(){[].forEach.call(document.querySelectorAll("#fb .f-pn-b"),function(b){var can=b.scrollHeight>b.clientHeight+2||b.scrollWidth>b.clientWidth+2;
+  var mine=b.getAttribute("data-a11y-tab")==="1";
+  if(can&&!b.querySelector(REACH)){if(!b.hasAttribute("tabindex")){b.setAttribute("tabindex","0");b.setAttribute("data-a11y-tab","1");
+      var pn=b.closest(".f-pn"),h=pn&&pn.querySelector("h2");b.setAttribute("role","region");b.setAttribute("aria-label",(h?h.textContent.trim():"Panel")+", scrolls");}}
+  else if(mine){b.removeAttribute("tabindex");b.removeAttribute("data-a11y-tab");b.removeAttribute("role");b.removeAttribute("aria-label");}});}
+/* the landmarks: the room is the main region, the rail the rooms' navigation */
+function marks(){if(!document.querySelector('main,[role="main"]')){var a=document.querySelector("#cd-scroll > .app")||document.querySelector(".app");if(a){a.setAttribute("role","main");a.setAttribute("aria-label","The room");}}
+  var nv=document.querySelector(".nav-inner");if(nv&&!nv.closest('nav,[role="navigation"]')&&!nv.getAttribute("role")){nv.setAttribute("role","navigation");nv.setAttribute("aria-label","The Forge’s rooms");}
+  [].forEach.call(document.querySelectorAll('[contenteditable="true"]:not([role])'),function(c){c.setAttribute("role","textbox");c.setAttribute("aria-multiline","true");
+    if(!c.getAttribute("aria-label")&&!c.getAttribute("aria-labelledby")){var t=c.getAttribute("title")||c.getAttribute("data-placeholder")||c.getAttribute("placeholder")||"Text you can edit";c.setAttribute("aria-label",t.replace(/\s+/g," ").slice(0,90));}});}
+/* the icons beside the words: decoration */
+function icons(){[].forEach.call(document.querySelectorAll('svg:not([aria-hidden]):not([role="img"]):not([aria-label]):not([aria-labelledby])'),function(g){
+  if(g.querySelector("title")||g.closest('[aria-hidden="true"]'))return;g.setAttribute("aria-hidden","true");g.setAttribute("focusable","false");});}
+var soon=0;function later(){clearTimeout(soon);soon=setTimeout(function(){try{seps();scrolls();icons();marks();}catch(e){}},120);}
+["pointerup","keyup","resize","click"].forEach(function(t){window.addEventListener(t,later,true);});
+/* a room opened, by a key or by the Forge itself: put right at once, and again once it has drawn its lists */
+(function hook(n){var F=window.FORGE;if(F&&typeof F.openRoom==="function"&&!F.openRoom.__a11y644){var o=F.openRoom;F.openRoom=function(){var r=o.apply(this,arguments);later();setTimeout(later,600);return r;};F.openRoom.__a11y644=1;return;}
+  if(n<60)setTimeout(function(){hook(n+1);},500);})(0);
+setInterval(function(){if(!document.hidden)later();},1200);
+later();
+window.forgeA11y={seps:seps,scrolls:scrolls,icons:icons,marks:marks};
+})();
+</script>

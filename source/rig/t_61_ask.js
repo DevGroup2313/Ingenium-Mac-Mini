@@ -39,9 +39,11 @@ const DOC = '# Ingenium · Dossier\n\n## Title and summary\n**Ingenium**\n\nA lo
     saveState(); go('lector');
   }, DOC);
   await p.waitForTimeout(1500);
+  // 6.2: Ask Lector is its own tab beside the thinking; the document panel's key opens it on the document shown
+  await p.click('#l7AskDoc'); await p.waitForTimeout(400);
   const box = await p.evaluate(() => { const a = document.getElementById('l7Ask'); if (!a) return null; const s = a.querySelector('select');
-    return { vis: !!a.offsetParent, ta: !!a.querySelector('textarea[aria-label="Your request to Lector"]'), opts: [...s.options].map(o => o.textContent), val: s.value, inDoc: !!a.closest('#l7Doc') }; });
-  ok(box && box.vis && box.ta && box.inDoc, 'the request box stands at the foot of the document panel, labelled', box);
+    return { vis: !!a.offsetParent, ta: !!a.querySelector('textarea[aria-label="Your request to Lector"]'), opts: [...s.options].map(o => o.textContent), val: s.value, inMid: !!a.closest('#l7Read'), tab: document.getElementById('l7MidAsk').getAttribute('aria-selected'), focus: document.activeElement && document.activeElement.tagName }; });
+  ok(box && box.vis && box.ta && box.inMid && box.tab === 'true' && box.focus === 'TEXTAREA', 'the document panel\'s Ask Lector key opens the request box, its own tab beside the thinking, ready to write in', box);
   ok(box && box.opts.includes('Only “Where it goes next”') && box.val === 'auto', 'it can be for the document, one of its sections, the whole set, or an answer', box && box.opts);
   const shown = await p.evaluate(() => document.getElementById('l7Desk').innerText);
   ok(!/Drafted by/.test(shown) && /Where it goes next/.test(shown), "a document kept before 6.1 shows without its 'Drafted by' line");
@@ -112,7 +114,9 @@ const DOC = '# Ingenium · Dossier\n\n## Title and summary\n**Ingenium**\n\nA lo
   ok(!/255, 255, 255\)$/.test(nightBg.split(' / ')[0]), 'by night the box is dark, its words light', nightBg);
   await p.evaluate(() => { document.body.setAttribute('data-theme', 'day'); });
   await p.setViewportSize({ width: 390, height: 844 }); await p.evaluate(() => { try { lxRender(); } catch (e) { } }); await p.waitForTimeout(700);
+  // on a phone the document panel's Ask Lector key opens the request box in the thinking panel
   await p.evaluate(() => { const t = [...document.querySelectorAll('#lx7 [role=tab]')].find(x => /document/i.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(500);
+  await p.click('#l7AskDoc'); await p.waitForTimeout(500);
   const ph = await p.evaluate(() => { const a = document.getElementById('l7Ask'); const r = a.getBoundingClientRect(); return { w: Math.round(r.width), vis: !!a.offsetParent, over: document.documentElement.scrollWidth - innerWidth }; });
   await p.screenshot({ path: path.join(OUT, 'ask-phone.png') });
   ok(ph.vis && ph.w <= 390 && ph.over <= 0, 'on a phone the box fits the width', ph);
