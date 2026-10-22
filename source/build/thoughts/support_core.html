@@ -130,6 +130,8 @@
    drawn inside, so the card keeps its size and place. */
 #sc-toast[data-sc-look="1"],#sc-just[data-sc-look="1"]{background:var(--sc-r-face);color:var(--sc-r-ink);box-shadow:inset 0 0 0 1px var(--sc-r-rim),0 2px 0 rgba(0,0,0,.16),0 6px 20px rgba(0,0,0,.30)}
 #sc-toast[data-sc-look="1"][data-sc-still="1"]{transition:none}
+/* the card takes the width its words need (up to its limit), not half the screen, since it is centred from the middle */
+#sc-toast[data-sc-look="1"]{width:max-content}
 #sc-just[data-sc-look="1"] .sc-just-bar{background:var(--sc-r-track)}
 #sc-just[data-sc-look="1"] .sc-just-bar i{background:var(--sc-r-rim)}
 #sc-just[data-sc-look="1"] button{color:var(--sc-r-ink);border-color:var(--sc-r-line)}

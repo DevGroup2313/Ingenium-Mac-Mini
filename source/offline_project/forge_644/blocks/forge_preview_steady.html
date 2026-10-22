@@ -1,0 +1,102 @@
+<style id="forge-preview-steady-644">
+/* PASS 644 · THE PREVIEW HOLDS STILL WHILE THE EDITOR SCROLLS. The owner's words (21 October 2026): "The live preview
+   panel keeps on shaking when I scroll on the Forge's Editor page, please fix that issue."
+   Measured. In Chromium the panel was already still (pass 631). In WebKit, the engine of the Mac apps, driven in
+   WebKitGTK 2.52.6 with real wheel input and filmed at 60 frames a second, the panel stood 1 or 2 px off its seat, against
+   the bar at the top, in about half the frames of every wheel scroll (182 to 377 frames a run, in seven runs): that is
+   the shaking. Two causes, found by taking them away one at a time:
+   1. A CLIP BETWEEN THE PANEL AND THE BOX THAT SCROLLS. The rule "THE LIVE PREVIEW STAYS IN VIEW UNDER THE BAR" puts
+      overflow-x:clip on .app and #section-forge, so that no sideways scroll bar appears. Both sit between the preview
+      (#stage, sticky) and the box that scrolls (#cd-scroll). WebKit then draws the preview inside a clipping layer that
+      the page places, while its own scrolling thread places the preview, and the two disagree by a pixel or two. With
+      the clip lifted the preview no longer moves against the bar. Nothing in the rooms with a preview is wider than
+      the page (measured from 901 to 2560 px wide) and #cd-scroll still hides anything sideways, so the clip is lifted
+      only where the preview stands beside the page (wider than 900 px), and kept everywhere else.
+   2. THE FORGE'S OWN LOOPS. Eight endless decorations (the seal's sway, the dot's breath, the side keys) keep WebKit's
+      page thread sending new layers while the page scrolls; when that thread falls behind, the bar and the preview are
+      drawn a scroll step late. With the clip lifted alone, in six filmed runs, that reached 50 px and twice parted the
+      preview from the bar; with the loops held as well, no more than 9 px and never apart. They hold still while the
+      page scrolls and go on a moment after it stops, as the Forge's timers already do (pass 1013).
+   Nothing else changes: no height, no position and no transform is written while the page scrolls. */
+@media (min-width:901px){
+  html:not(#ps1):not(#ps2):not(#ps3):not(#ps4):not(#ps5):not(#ps6):not(#ps7) body.forge-app[data-stageview="split"]:not([data-stageless="1"]) .app,
+  html:not(#ps1):not(#ps2):not(#ps3):not(#ps4):not(#ps5):not(#ps6):not(#ps7) body.forge-app[data-stageview="split"]:not([data-stageless="1"]) #section-forge{overflow-x:visible !important}
+}
+</style>
+<script id="forge-preview-steady-644-js">
+/* PASS 644 · the preview holds still while the Editor scrolls: see the note above */
+(function(){
+"use strict";
+if(window.__forgePreviewSteady644)return;window.__forgePreviewSteady644=1;
+var held=[],on=false,timer=0,QUIET=300;
+function $(id){return document.getElementById(id);}
+/* the preview stands beside the page (wider than 900 px) or floats over it */
+function previewUp(){
+  var b=document.body;if(!b||b.getAttribute("data-stageless")==="1")return false;
+  var v=b.getAttribute("data-stageview");
+  if(v==="float")return true;
+  return v==="split"&&window.innerWidth>900;
+}
+/* the Forge's own endless loops, in this page only (the app in the preview keeps its own) */
+function loops(){
+  var out=[];
+  try{
+    if(!document.getAnimations)return out;
+    var all=document.getAnimations();
+    for(var i=0;i<all.length;i++){
+      var a=all[i],e=a.effect,t=e&&e.target;
+      if(!a.animationName||a.playState!=="running"||!t||t.nodeType!==1||e.pseudoElement)continue;
+      var it=e.getComputedTiming?e.getComputedTiming().iterations:0;
+      if(it===Infinity&&out.indexOf(t)<0)out.push(t);
+    }
+  }catch(x){}
+  return out;
+}
+function hold(){
+  if(on)return;
+  on=true;
+  var ts=loops();
+  for(var i=0;i<ts.length;i++){
+    var s=ts[i].style;
+    held.push({el:ts[i],v:s.getPropertyValue("animation-play-state"),p:s.getPropertyPriority("animation-play-state")});
+    s.setProperty("animation-play-state","paused","important");
+  }
+}
+function release(){
+  timer=0;on=false;
+  var h=held;held=[];
+  for(var i=0;i<h.length;i++){
+    try{var s=h[i].el.style;if(h[i].v)s.setProperty("animation-play-state",h[i].v,h[i].p);else s.removeProperty("animation-play-state");}catch(x){}
+  }
+}
+function busy(){
+  if(!on&&!previewUp())return;
+  hold();
+  if(timer)clearTimeout(timer);
+  timer=setTimeout(release,QUIET);
+}
+/* the keys that scroll the page; never while typing */
+var KEYS={PageDown:1,PageUp:1,Home:1,End:1,ArrowDown:1,ArrowUp:1," ":1,Spacebar:1};
+function key(e){
+  if(!KEYS[e.key])return;
+  var t=e.target;
+  if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  busy();
+}
+function scrolled(e){
+  var sc=$("cd-scroll");
+  if(e.target!==sc)return;
+  /* the clip is lifted beside the preview: the page never moves sideways */
+  if(sc.scrollLeft&&previewUp())sc.scrollLeft=0;
+  busy();
+}
+try{
+  window.addEventListener("wheel",busy,{capture:true,passive:true});
+  window.addEventListener("touchmove",busy,{capture:true,passive:true});
+  document.addEventListener("keydown",key,true);
+  document.addEventListener("scroll",scrolled,{capture:true,passive:true});
+}catch(x){}
+/* for the tests: what is held now */
+window.__forgePreviewSteady={held:function(){return held.length;},on:function(){return on;},up:previewUp};
+})();
+</script>
