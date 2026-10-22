@@ -1,0 +1,106 @@
+INGENIUM
+Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+
+===========================================================================
+OWNERSHIP AND LICENCE
+Version 2, 22 October 2026. This notice replaces every earlier notice.
+===========================================================================
+
+1. WHO OWNS INGENIUM
+
+Ingenium is the original work of Yannie D. Forest (the owner). The owner
+holds every right in it: its source code, its page and every build of it,
+its apps for each device, its text, guide and tour, its visual design,
+icons, seal and name. This covers every version and edition, past and
+future, and every part of it, whole or in part. The only exception is the
+work of others named in section 8.
+
+2. NO ONE ELSE HAS ANY RIGHT IN IT
+
+No right of any kind is given to anyone by this notice, by the code being
+readable, by the code being published or shared, by holding a copy, or in
+any other way. Only the owner may use, run, copy, install, distribute,
+publish, host, sell, rent, lend, license, edit, change, translate, adapt,
+remove, or do anything else with Ingenium or any part of it.
+
+Without a permission from the owner, given as section 3 sets out, no one
+may:
+
+  - use, run, open or install it;
+  - copy it, download it to keep, or store it;
+  - give, send, share, publish, host, upload, distribute, sell, rent, lend
+    or license it, in whole or in part, publicly or privately;
+  - edit, change, adapt, translate or extend it, or make any work based on
+    it;
+  - reverse engineer, decompile or take it apart, or take any part of it for
+    use elsewhere, except where the law allows this without permission;
+  - remove, hide or change this notice, its build stamp, its seal or its
+    name;
+  - present any copy, changed or not, as the owner's release, or present the
+    owner's work as anyone else's;
+  - add any software to it, or release any software under its name or seal;
+  - use it, or anything made from it, to train, tune or test any machine
+    learning system;
+  - use it in any product or service, or for any commercial purpose.
+
+3. PERMISSION COMES FROM THE OWNER ALONE
+
+Only the owner can give permission, and only in writing: a permission file
+signed with the owner's key, which Ingenium shows as valid, or a letter or
+message from the owner. Every permission:
+
+  - names the person it is given to, and covers that person alone;
+  - names what it allows, and allows nothing more;
+  - may name an end date, and ends on that date;
+  - cannot be passed on, shared, sold or sublicensed;
+  - can be withdrawn by the owner at any time, for any reason or none; it
+    ends as soon as the owner tells its holder that it has ended;
+  - ends at once, without any notice, if its holder breaks it or this
+    notice.
+
+When a permission ends, its holder must stop using Ingenium at once, must
+delete every copy they hold, and must confirm this to the owner if the owner
+asks. Nothing done under a permission gives its holder any further right.
+
+4. COPIES THAT DID NOT COME FROM THE OWNER
+
+Only the owner releases Ingenium. A copy from anyone else, or a copy that
+has been changed in any way, is not the owner's release and may be harmful.
+Each release names its build and lists its fingerprint (SHA-256) in
+BUILD_INFO.txt. A copy whose fingerprint differs is not the owner's release.
+
+5. MARKS IN EVERY COPY
+
+Each build carries its build stamp. Each permission carries the name of the
+person it was given to and its own number. This is stated here plainly, not
+hidden.
+
+6. NO WARRANTY
+
+Ingenium is provided as it is, without any warranty. The owner is not liable
+for any loss that comes from its use. Keep your own backups.
+
+7. WHERE THIS APPLIES
+
+This notice applies wherever Ingenium is found: in this repository, in every
+build, in every app made from it, and in every copy of any of them. Ingenium
+also carries copies of other apps by the owner (The Forge, Carpe Diem and
+Inkwell). Each is the owner's work, under its own notice.
+
+8. THE WORK OF OTHERS
+
+The apps for each device also carry software and models made by others,
+listed in THIRD_PARTY_NOTICES.txt, each under its own licence. Those parts
+are not the owner's work: their own licences apply to them alone, and
+nothing here takes away a right those licences give. Everything else in
+Ingenium is the owner's.
+
+9. THE LAW
+
+Nothing in this notice limits a right that the law gives you and that cannot
+be limited by agreement. If any part of this notice cannot be enforced, the
+rest of it still applies.
+
+===========================================================================
+To ask for permission, ask the owner.
+===========================================================================

@@ -185,6 +185,20 @@ html body .tc-cloud textarea.tc-in,html body .tc-cloud textarea.tc-in:focus,html
 .tc-nudge-k{display:flex;flex-wrap:wrap;gap:6px}
 .tc-nudge-x{position:absolute;right:9px;top:8px;width:24px;height:24px;border:0;border-radius:50%;background:transparent;color:var(--tc-soft);cursor:pointer;font:15px/24px var(--tc-sans)}
 .tc-nudge-x:hover{color:var(--tc-ink)}
+/* a reminder in the app's own reminder card, when the app gives one (TC.reminders(look)), by day and by night: the face,
+   its ink, a fine rim drawn inside (so the panel keeps its size), its beads to the 💭, and keys that read on it. An app
+   that gives none keeps the panel's face above. */
+.tc-el.tc-nudge[data-tc-remind="1"]{color:var(--tc-r-ink)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-body,.tc-el.tc-nudge[data-tc-remind="1"] .tc-dot{background:var(--tc-r-face);
+  box-shadow:inset 0 0 0 1px var(--tc-r-rim),0 2px 0 rgba(0,0,0,.18),0 6px 18px rgba(0,0,0,.28)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-nudge-t{color:var(--tc-r-ink)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-nudge-x{color:var(--tc-r-soft)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-nudge-x:hover{color:var(--tc-r-ink);background:rgba(255,255,255,.10)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-key{color:var(--tc-r-ink);background:transparent;box-shadow:inset 0 0 0 1px var(--tc-r-line)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-key:hover{background:rgba(255,255,255,.10);box-shadow:inset 0 0 0 1px var(--tc-r-ink)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-key.tc-keep{color:var(--tc-r-key-ink);background:var(--tc-r-key);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-key.tc-keep:hover{filter:brightness(1.04);box-shadow:0 3px 0 rgba(0,0,0,.28)}
+.tc-el.tc-nudge[data-tc-remind="1"] .tc-key:focus-visible,.tc-el.tc-nudge[data-tc-remind="1"] .tc-nudge-x:focus-visible{outline:2px solid var(--tc-r-ink);outline-offset:2px}
 
 /* ---------- the Inbox ---------- */
 .tc-veil{position:fixed;inset:0;z-index:2147482990;display:flex;align-items:center;justify-content:center;background:var(--tc-veil);
@@ -286,7 +300,16 @@ function create(host){
   /* two looks to choose between: "note" (the sticky notes' seating and pop) and "layered" (the seal's layered depth) */
   function look(){var v=ls("look")||H.look||"note";return v==="layered"?"layered":"note";}
   function dress(n){n.classList.add("tc-el");n.setAttribute("data-tc-app",app);n.setAttribute("data-tc-night",night()?"1":"0");
-    n.setAttribute("data-tc-still",still()?"1":"0");n.setAttribute("data-tc-badge",badgeStyle());n.setAttribute("data-tc-look",look());return n;}
+    n.setAttribute("data-tc-still",still()?"1":"0");n.setAttribute("data-tc-badge",badgeStyle());n.setAttribute("data-tc-look",look());
+    if(n.classList.contains("tc-nudge"))dressRemind(n);return n;}
+  /* the app's reminder card, given after the panel is made: TC.reminders({face,ink,soft,rim,line,key,keyInk,night:{...}}).
+     With one, each reminder beside the 💭 comes in it; with none, nothing changes. */
+  var RLOOK=null;
+  function rlook(){if(!RLOOK)return null;var l={},k,n=night()&&RLOOK.night;for(k in RLOOK)if(k!=="night")l[k]=RLOOK[k];if(n)for(k in n)l[k]=n[k];return l;}
+  function dressRemind(n){var l=rlook();
+    [["face","--tc-r-face"],["ink","--tc-r-ink"],["soft","--tc-r-soft"],["rim","--tc-r-rim"],["line","--tc-r-line"],["key","--tc-r-key"],["keyInk","--tc-r-key-ink"]].forEach(function(p){
+      if(l&&l[p[0]]!=null)n.style.setProperty(p[1],l[p[0]]);else n.style.removeProperty(p[1]);});
+    if(l)n.setAttribute("data-tc-remind","1");else n.removeAttribute("data-tc-remind");return n;}
   function redress(){[].forEach.call(document.querySelectorAll('.tc-el[data-tc-app="'+app+'"]'),dress);}
   /* day or night follows the app at once, whatever is open: the cloud, a put-away draft's number, the Inbox, a
      reminder. The page's own light is watched (its attributes and classes), so a switch made by the theme button,
@@ -636,7 +659,8 @@ function create(host){
   var api={add:add,open:open,keep:keep,putAway:putAway,close:closeAsk,shut:shut,inbox:openInbox,closeInbox:closeSheet,nudge:nudgeKind,badge:badge,wireFab:wireFab,keyCatch:keyCatch,
     actsFor:actsFor,places:places,spheres:SPH,guess:guess,list:list,draft:draft,today:function(){return today().n;},cadence:cadence,tick:tick,redress:redress,
     isOpen:function(){return !!cloud;},cloud:function(){return cloud;},refresh:function(){if(sheetEl&&sheetEl.__draw)sheetEl.__draw();badge();},
-    setBadgeStyle:function(v){ls("badge",v);redress();badge();},look:look,setLook:function(v){ls("look",v==="layered"?"layered":"note");redress();},when:when,ago:ago,sphereLabel:sLabel,T:T};
+    setBadgeStyle:function(v){ls("badge",v);redress();badge();},look:look,setLook:function(v){ls("look",v==="layered"?"layered":"note");redress();},when:when,ago:ago,sphereLabel:sLabel,T:T,
+    reminders:function(l){RLOOK=l&&typeof l==="object"?l:null;if(nudgeEl)dressRemind(nudgeEl);return !!RLOOK;}};
   return api;}
 
 window.ThoughtCloud={create:create,guess:guess,spheres:SPH,v:2};
