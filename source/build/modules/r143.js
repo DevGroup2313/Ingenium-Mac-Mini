@@ -846,7 +846,7 @@ function wire(){var c=UI.card;
   [].forEach.call(c.querySelectorAll('.bk-seg [role="tab"]'),function(b){b.onclick=function(){select(b.id.replace("bkTab-",""),false);};});
   c.querySelector(".bk-seg").addEventListener("keydown",function(e){var tabs=["make","restore","move"],cur=tabs.indexOf((document.activeElement&&document.activeElement.id||"").replace("bkTab-",""));if(cur<0)return;
     var nx=e.key==="ArrowRight"?(cur+1)%3:e.key==="ArrowLeft"?(cur+2)%3:e.key==="Home"?0:e.key==="End"?2:-1;if(nx<0)return;e.preventDefault();select(tabs[nx],true);});
-  var ky=q("#bkOptKy"),pw=q("#bkPw");ky.onchange=function(){pw.hidden=!ky.checked;if(ky.checked)setTimeout(function(){q("#bkPw1").focus();},30);q("#bkMakeErr").textContent="";};
+  var ky=q("#bkOptKy"),pw=q("#bkPw");ky.onchange=function(){pw.hidden=!ky.checked;if(ky.checked)setTimeout(function(){if(document.activeElement===ky||document.activeElement===document.body)q("#bkPw1").focus();},30);q("#bkMakeErr").textContent="";};
   if(!subtle()){ky.disabled=true;q("#bkOptKyD").textContent="This browser offers no encryption here, so the keys cannot be locked and stay out.";}
   q("#bkMake").onclick=doMake;q("#bkStop").onclick=function(){if(UI.stop)UI.stop.stopped=true;q("#bkStop").disabled=true;};
   q("#bkAgain").onclick=function(){if(UI.made)Promise.resolve(saveFileNative(UI.made.name,"application/zip",UI.made.blob)).catch(function(){});};

@@ -67,21 +67,38 @@ body[data-theme="night"] #ihBubble,body[data-theme="night"] #ihAsk,body[data-the
 .ih-k.pri:not(#ih-z):active:not(:disabled),.ih-k.pri.is-down:not(#ih-z){box-shadow:var(--ih-ppress)}
 .ih-k.sm:not(#ih-z){padding:5px 11px;min-height:28px;font-size:12px;border-radius:999px}
 .ih-k.quiet:not(#ih-z){color:var(--ih-ink2)}
-.ih-k.row:not(#ih-z){display:flex;width:100%;justify-content:flex-start;text-align:left;white-space:normal;border-radius:12px;padding:9px 12px;font-size:13.5px}
-.ih-k.row.on:not(#ih-z){color:var(--ih-acc);box-shadow:var(--ih-pop),inset 0 0 0 1.5px var(--ih-acc)}
 .ih-k.wrap:not(#ih-z){white-space:normal;text-align:left;justify-content:flex-start}
 .ih-k.ih-pop{animation:ihPop .55s var(--ih-spring)}
 @keyframes ihPop{0%{transform:translateY(6px) scale(.94);opacity:.4}60%{transform:translateY(-2px) scale(1.02);opacity:1}100%{transform:none}}
 #ingTour .tour-tries .ih-k{justify-content:flex-start;text-align:left;width:100%}
 #ingTour .tour-act.ih-k{margin-top:10px}
-/* the chapter list: each chapter a key, its parts small keys under it */
-#tourMenu .tour-mi.ih-k{margin:8px 0 4px}
+/* the Chapters key opens a list: a raised pill with its caret, as the Forge's is */
+.ih-k.tour-chap .ih-caret{font-size:10px;line-height:1;opacity:.75;margin-left:1px}
+.ih-k.tour-chap[aria-expanded="true"]:not(#ih-z){transform:translateY(1px);box-shadow:var(--ih-press)}
+/* the chapter lists are flat, as the Forge's and Carpe Diem's are (the owner's words, 22 October 2026: "I don't like the raised
+   chapters list look, make them flat. I only want buttons and collapsible toggles made 3d animated."): each chapter a row
+   with a fine rim on the card's face, the one you are in ringed in the accent; its parts plain lines under it. Nothing lifts or
+   sinks; a row only takes a tint on hover. */
+#tourMenu .tour-mi.ih-flat:not(#ih-z){display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;margin:0 0 6px;padding:10px 12px;
+  text-align:left;white-space:normal;border:1px solid var(--ih-hair);border-radius:10px;background:var(--ih-card);box-shadow:none;transform:none;
+  font:500 14px/1.3 var(--ih-sans);color:var(--ih-ink1);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s}
+#tourMenu .tour-mi.ih-flat:not(#ih-z):hover{background:var(--ih-accs);border-color:var(--ih-ring)}
+#tourMenu .tour-mi.ih-flat.on:not(#ih-z){box-shadow:inset 0 0 0 1.5px var(--ih-acc);color:var(--ih-acc);font-weight:600}
+#tourMenu .tour-mi.ih-flat .tour-mi-n{font-size:11px;font-weight:700;color:var(--ih-ink3);min-width:16px}
+#tourMenu .tour-mi.ih-flat.on .tour-mi-n{color:var(--ih-acc)}
 #tourMenu .tour-mi .tour-mi-ok{margin-left:auto}
-#tourMenu .ih-subs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 6px 34px}
-#tourMenu .ih-subs .tour-ms.ih-k{font-weight:500;color:var(--ih-ink2)}
+#tourMenu .ih-subs{display:block;margin:-3px 0 6px}
+#tourMenu .tour-ms.ih-flat:not(#ih-z){display:block;width:100%;box-sizing:border-box;margin:0 0 2px;padding:4px 12px 4px 40px;text-align:left;white-space:normal;
+  border:0;border-radius:8px;background:transparent;box-shadow:none;transform:none;font:400 12.5px/1.5 var(--ih-sans);color:var(--ih-ink3);cursor:pointer;
+  transition:background-color .15s,color .15s}
+#tourMenu .tour-ms.ih-flat:not(#ih-z):hover{color:var(--ih-ink1);background:var(--ih-well)}
+#tourMenu .tour-ms.ih-flat.on:not(#ih-z){color:var(--ih-acc);font-weight:600}
+#tourMenu .tour-mi.ih-flat:focus-visible,#tourMenu .tour-ms.ih-flat:focus-visible,#guideTour .tour-entry-chap.ih-flat:focus-visible{outline:2px solid var(--ih-acc);outline-offset:2px}
 #tourMenu .tour-card > .tour-link.ih-k{display:flex;margin:12px auto 0}
 #guideTour .tour-entry-row{gap:10px}
-#guideTour .tour-entry-chap.ih-k{justify-content:flex-start;text-align:left;white-space:normal;border-radius:12px;padding:9px 12px}
+#guideTour .tour-entry-chap.ih-flat:not(#ih-z){justify-content:flex-start;text-align:left;white-space:normal;border-radius:10px;padding:9px 12px;
+  border:1px solid var(--ih-hair);background:var(--ih-card);box-shadow:none;transform:none;color:var(--ih-ink1);transition:background-color .15s,border-color .15s}
+#guideTour .tour-entry-chap.ih-flat:not(#ih-z):hover{background:var(--ih-accs);border-color:var(--ih-ring)}
 
 /* ---------- the level, wherever it is chosen ---------- */
 .ih-lv{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
@@ -271,10 +288,13 @@ function cardsFor(lv){var out=[];T.forEach(function(s,k){if(shownAt(k,lv))out.pu
     tip:"Help speaks the way you chose: New to this, Some experience or Expert. Change it on any help card or in Settings."});}catch(e){warn(e);}})();
 
 /* ---------- the keys of the tour's panel, popped out like Fabrica's ---------- */
-function keyify(root){if(!root)return;[].forEach.call(root.querySelectorAll("button"),function(b){if(b.classList.contains("ih-k"))return;b.classList.add("ih-k");
+function keyify(root){if(!root)return;[].forEach.call(root.querySelectorAll("button"),function(b){if(b.classList.contains("ih-k")||b.classList.contains("ih-flat"))return;
+  /* a chapter in a list is a row, not a key: flat, as in the Forge's and Carpe Diem's tours */
+  if(b.classList.contains("tour-mi")||b.classList.contains("tour-ms")||b.classList.contains("tour-entry-chap")){b.classList.add("ih-flat");return;}
+  b.classList.add("ih-k");
   if(b.classList.contains("primary"))b.classList.add("pri");
-  if(b.classList.contains("tour-chap")||b.classList.contains("tour-ms"))b.classList.add("sm");
-  if(b.classList.contains("tour-mi")||b.classList.contains("tour-entry-chap"))b.classList.add("row");
+  if(b.classList.contains("tour-chap")){b.classList.add("sm");b.setAttribute("aria-haspopup","dialog");b.setAttribute("aria-expanded",$i("tourMenu")?"true":"false");
+    if(!b.querySelector(".ih-caret"))b.appendChild(mk("span","ih-caret","\u25BE",{"aria-hidden":"true"}));}
   if(b.classList.contains("tour-link"))b.classList.add("quiet");});}
 
 /* ---------- the tour, by level: the original functions stay; these choose among the cards ---------- */
@@ -371,8 +391,18 @@ onLevel.push(function(){if($i("ingTour")&&!D.querySelector("#ingTour .ih-pick")&
 function menuDress(){var m=$i("tourMenu");if(!m)return;var p=m.querySelector(".tour-card");if(!p)return;
   p.setAttribute("role","dialog");p.setAttribute("aria-label","Chapters of the tour");
   var kids=[].slice.call(p.children),box=null;
-  kids.forEach(function(n){if(n.classList.contains("tour-ms")){if(!box){box=mk("div","ih-subs",null,{role:"group"});n.before(box);}box.appendChild(n);}else box=null;});
-  keyify(p);var on=p.querySelector(".tour-mi.on")||p.querySelector(".tour-mi");if(on)try{on.focus({preventScroll:true});}catch(e){}}
+  var chapOf=null;kids.forEach(function(n){if(n.classList.contains("tour-mi"))chapOf=n;
+    if(n.classList.contains("tour-ms")){if(!box){box=mk("div","ih-subs",null,{role:"group"});if(chapOf)box.setAttribute("aria-label","Parts of "+chapOf.textContent.replace(/^\d+/,"").trim());n.before(box);}box.appendChild(n);}else box=null;});
+  keyify(p);
+  /* the part of the chapter you are in, marked as the Forge marks it */
+  try{var onRow=p.querySelector(".tour-mi.on"),i=W.tourI,subs=W.tourChapSubs(i),here=null;subs.forEach(function(su){if(su.start>=0&&su.start<=i)here=su.sub;});
+    var g=onRow&&onRow.nextElementSibling;if(here&&g&&g.classList.contains("ih-subs"))[].forEach.call(g.querySelectorAll(".tour-ms"),function(b){if(b.textContent.trim()===here){b.classList.add("on");b.setAttribute("aria-current","step");}});}catch(e){warn(e);}
+  var on=p.querySelector(".tour-mi.on")||p.querySelector(".tour-mi");if(on)try{on.focus({preventScroll:true});
+    /* the list opens where you are: the chapter you are in, near the middle of the list */
+    if(p.scrollHeight>p.clientHeight){var pr=p.getBoundingClientRect(),orr=on.getBoundingClientRect();p.scrollTop+=orr.top-pr.top-(p.clientHeight-orr.height)/2+40;}}catch(e){}
+  setChapKey(true);
+  try{var mo=new MutationObserver(function(){if(!D.body.contains(m)){mo.disconnect();setChapKey(false);}});mo.observe(D.body,{childList:true,subtree:false});}catch(e){}}
+function setChapKey(open){var c=D.querySelector("#ingTour .tour-chap");if(c)c.setAttribute("aria-expanded",open?"true":"false");}
 /* the Guide's start of the tour: the level is shown and changed there too */
 function entryDress(){var g=$i("guideTour");if(!g)return;keyify(g);var go=$i("tourGo");if(go&&!go.classList.contains("ih-k")){go.classList.add("ih-k","pri");}
   if(!g.querySelector(".ih-lv")){var w=mk("div","ih-entrylv");w.appendChild(mk("p","small muted","How much the tour shows: choose your level."));

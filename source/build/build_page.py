@@ -410,6 +410,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "thought_cloud.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r121.js":  # R121: the shared support module, before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "support_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
+        t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
 blob = "\n".join(_modtext(m) for m in mods) + "\n"
 blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))

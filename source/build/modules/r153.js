@@ -49,6 +49,8 @@ give(0);
    when both were the one note */
 (function(){var o=window.ingToast;if(typeof o!=="function"||o.__r153)return;
   var w=function(){try{var s=document.getElementById("sc-toast");if(s)s.classList.remove("show");}catch(e){}return o.apply(this,arguments);};
+  /* the marks earlier wrappers left on it (storage's __r142) stay, so none of them wraps it a second time */
+  Object.keys(o).forEach(function(p){try{w[p]=o[p];}catch(e){}});
   w.__r153=1;window.ingToast=w;})();
 function seat(){var s=document.getElementById("sc-toast");if(!s||s.__r153)return!!s;s.__r153=1;
   try{new MutationObserver(function(){if(s.classList.contains("show")){var n=document.getElementById("ingToast");if(n)n.style.display="none";}})

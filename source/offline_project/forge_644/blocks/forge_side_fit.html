@@ -1,0 +1,36 @@
+<style id="forge-644-side-fit-css">
+/* PASS 644 · THE SIDE COLUMN ON A SHORT SCREEN: see the note in the script below. The keys a little smaller and closer
+   where the column would not fit; nowhere else. */
+html.f644-tight body #sticky-fab#sticky-fab,html.f644-tight body #horo-fab#horo-fab,html.f644-tight body #cd-theme-fab#cd-theme-fab,
+html.f644-tight body #cd-thought-fab#cd-thought-fab,html.f644-tight body #forge-quiet-fab#forge-quiet-fab,html.f644-tight body #reminders-fab#reminders-fab,
+html.f644-tight body #cd-float-fab#cd-float-fab{width:38px !important;height:38px !important;min-width:0 !important;min-height:0 !important}
+html.f644-tight body #sticky-fab > span,html.f644-tight body #horo-fab > span,html.f644-tight body #cd-theme-fab > span,html.f644-tight body #cd-thought-fab > span,
+html.f644-tight body #forge-quiet-fab > span,html.f644-tight body #reminders-fab > span,html.f644-tight body #cd-float-fab > span{font-size:24px !important}
+</style>
+<script id="forge-644-side-fit">
+/* PASS 644 · THE SIDE COLUMN ON A SHORT SCREEN.
+   Measured on 643, a phone held sideways (844 x 390, touch): the column is packed from the foot at 116 pixels with 56
+   between keys, so the keys and the chevron above them reach 395 pixels up a 390-pixel window. The bell and the thought
+   sat under the masthead (its foot at 56) and the chevron was cut off above the window. The leaf joins the column on
+   every screen now, as in Ingenium (the owner's words, 22 October 2026), so there are seven. Where the column fits it stays
+   exactly as it was. Where it does not, the keys come a little smaller (38 pixels) and closer (never less than 3 pixels
+   apart), the foot comes down (never below 12 pixels and the device's safe area), so every key and the chevron stand between
+   the masthead and the foot of the window. Ingenium's column does the same (modules/r155.js). */
+(function(){"use strict";
+var L={b0:52,st:56,at:0,sig:""};
+function shown(id){var e=document.getElementById(id);if(!e)return false;var c=getComputedStyle(e);return c.display!=="none"&&c.visibility!=="hidden"&&e.getBoundingClientRect().width>0;}
+function measure(ids){var root=document.documentElement,coarse=!!(document.body&&document.body.classList.contains("cd-coarse"));var b0=coarse?116:52,st=56,n=0,first=null;
+  for(var k=0;k<ids.length;k++)if(shown(ids[k])){n++;if(!first)first=document.getElementById(ids[k]);}
+  var m=document.getElementById("cd-masthead"),top=m?Math.max(0,m.getBoundingClientRect().bottom):0,H=window.innerHeight||800;
+  /* room for the highest key's offset: the window, less the masthead and the chevron above that key (40 up, 21 tall) */
+  var room=H-top-61-6,tight=false;
+  if(n>1&&b0+st*(n-1)>room){tight=true;root.classList.add("f644-tight");
+    var kh=first?first.getBoundingClientRect().height||38:38,safe=0;
+    try{var pr=document.createElement("div");pr.style.cssText="position:fixed;bottom:0;height:env(safe-area-inset-bottom);visibility:hidden";document.body.appendChild(pr);safe=pr.getBoundingClientRect().height||0;pr.remove();}catch(e){}
+    var gap=kh+3,low=12+safe;b0=Math.max(low,Math.min(b0,room-gap*(n-1)));st=Math.max(gap,Math.min(56,(room-b0)/(n-1)));}
+  if(!tight)root.classList.remove("f644-tight");
+  L.b0=b0;L.st=st;L.at=Date.now();}
+/* pack() asks for each key in turn (i = 0 for the lowest): the column is measured once a pass, at its first key */
+window.__f644Col=function(i,ids){if(i===0||Date.now()-L.at>1000)measure(ids||["sticky-fab","horo-fab","cd-theme-fab","cd-thought-fab","forge-quiet-fab","reminders-fab","cd-float-fab"]);return Math.round(L.b0+L.st*i);};
+})();
+</script>

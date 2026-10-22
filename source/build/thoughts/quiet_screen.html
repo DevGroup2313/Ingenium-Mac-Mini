@@ -34,6 +34,8 @@
 .qsc-cap[hidden]{display:none !important}
 .qsc-screen[data-qsc-still="1"] .qsc-key{transition:none}
 @media (max-width:480px){.qsc-big{font-size:22px}.qsc-orb{width:130px;height:130px}}
+/* a timed note that comes while the screen is open waits until after (hooks.hold) */
+html[data-qsc-open] [data-qsc-held]{visibility:hidden !important}
 </style>
 <script id="qsc-js">
 /* THE QUIET SCREEN (shared): see the note above. Plain words, one way back.
@@ -44,12 +46,15 @@
      tc: fn -> the thoughts panel (ThoughtCloud) or null: with one, "💭 A thought came in" opens it,
      hush: fn, called as it opens (speech is always stopped),  onOpen: fn,  onClose: fn,
      allow: fn(node) -> true where focus may go while it is open (the thoughts panel always may),
-     returnTo: fn -> where focus goes back when the place it came from is gone })
+     returnTo: fn -> where focus goes back when the place it came from is gone,
+     hold: {toast: fn -> the app's timed note element, replay: fn(text) shows it again, after: fn} -> a timed note that comes
+       while the screen is open (not one that answers a press made here) is held back and shown once it closes; after()
+       is called then too, so a thought that asked to come back meanwhile comes now })
    gives {open, close, isOpen, el, dress, words, lastInput} (lastInput: when a key or the pointer was last pressed while it
    was open, so an app can tell a note that answers a press from a timed one). */
 (function(){
 "use strict";
-if(window.QuietScreen&&window.QuietScreen.v>=1)return;
+if(window.QuietScreen&&window.QuietScreen.v>=2)return;
 /* Ingenium's own words, exactly */
 var WORDS={name:"Quiet screen",big:"Nothing needs doing right now.",
   breathe:"Breathe in as the circle grows, and out as it shrinks. Stay as long as you like.",
@@ -71,6 +76,19 @@ function shown(n){try{if(n.disabled)return false;var r=n.getBoundingClientRect()
 function create(H){H=H||{};
   var id=H.id||"qsc-screen",root=null,big=null,small=null,back=null,cap=null,catchKey=null;
   var open=false,from=null,mo=null,mq=null,lastIn=0;
+  /* what waits while it is open: the app's timed note (hooks.hold) */
+  var held=null,moBody=null,moToast=null;
+  function holdEl(){try{return H.hold&&H.hold.toast?H.hold.toast():null;}catch(e){return null;}}
+  function holdLook(){var t=holdEl();if(!t||!open)return;
+    if(moToast&&moToast.__t!==t){try{moToast.disconnect();}catch(e){}moToast=null;}
+    if(!moToast){try{moToast=new MutationObserver(holdLook);moToast.__t=t;moToast.observe(t,{attributes:true,attributeFilter:["class"],childList:true,characterData:true,subtree:true});}catch(e){}}
+    if(t.classList.contains("show")&&!t.hasAttribute("data-qsc-held")&&Date.now()-lastIn>1500){held=t.textContent;t.setAttribute("data-qsc-held","1");}
+    else if(!t.classList.contains("show")&&t.hasAttribute("data-qsc-held"))t.removeAttribute("data-qsc-held");}
+  function holdOn(){if(!H.hold)return;held=null;try{moBody=new MutationObserver(holdLook);moBody.observe(document.body,{childList:true});}catch(e){}holdLook();}
+  function holdOff(){if(!H.hold)return;try{if(moBody)moBody.disconnect();if(moToast)moToast.disconnect();}catch(e){}moBody=moToast=null;
+    var t=holdEl(),h=held;held=null;
+    if(t&&t.hasAttribute("data-qsc-held")){t.classList.remove("show");t.removeAttribute("data-qsc-held");}
+    setTimeout(function(){if(h){try{H.hold.replay&&H.hold.replay(h);}catch(e){}}try{H.hold.after&&H.hold.after();}catch(e){}},900);}
   function hv(v){try{return typeof v==="function"?v():v;}catch(e){return null;}}
   function night(){try{return !!(H.night&&H.night());}catch(e){return false;}}
   function reduced(){try{return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
@@ -135,9 +153,9 @@ function create(H){H=H||{};
     try{H.hush&&H.hush();}catch(e){}
     dress();open=true;root.removeAttribute("hidden");
     try{document.documentElement.setAttribute("data-qsc-open","1");}catch(e){}
-    watch(true);home();
+    watch(true);home();holdOn();
     try{H.onOpen&&H.onOpen();}catch(e){}}
-  function close(){if(!open||!root)return;open=false;watch(false);root.setAttribute("hidden","");
+  function close(){if(!open||!root)return;open=false;watch(false);root.setAttribute("hidden","");holdOff();
     try{document.documentElement.removeAttribute("data-qsc-open");}catch(e){}
     /* focus goes back to where it was, or to the place the app names */
     var to=from;from=null;
@@ -148,6 +166,6 @@ function create(H){H=H||{};
   return {open:openIt,close:close,isOpen:function(){return open;},el:function(){return build();},dress:dress,
     words:WORDS,lastInput:function(){return lastIn;}};}
 
-window.QuietScreen={create:create,words:WORDS,v:1};
+window.QuietScreen={create:create,words:WORDS,v:2};
 })();
 </script>

@@ -10,7 +10,7 @@ const pw = require('/opt/node-tools/node_modules/playwright'); const fs = requir
 const URL_ = process.argv[2], OUT = process.argv[3], APP = process.argv[4];
 if (!URL_ || !OUT || !/^(ingenium|forge)$/.test(APP || '')) { console.log('usage: node t_quiet_apps.js <url> <outdir> <ingenium|forge>'); process.exit(2); }
 fs.mkdirSync(OUT, { recursive: true });
-const AXE = [process.env.AXE, '/tmp/claude-0/-home-user/02db3569-4f80-5425-acc7-7b83b521aecb/scratchpad/a11y/package/axe.min.js', '/opt/node-tools/node_modules/axe-core/axe.min.js'].filter(f => f && fs.existsSync(f))[0];
+const AXE = [process.env.AXE, process.env.AXE_JS, path.join(__dirname, 'a11y', 'axe.min.js'), '/opt/node-tools/node_modules/axe-core/axe.min.js'].filter(f => f && fs.existsSync(f))[0];
 let pass = 0, fail = 0; const notes = [];
 const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 420) : '')); c ? pass++ : fail++; };
 const info = (m, d) => { console.log('INFO ' + m + (d !== undefined ? '  ' + JSON.stringify(d).slice(0, 420) : '')); notes.push(m); };
@@ -23,7 +23,8 @@ const W = { big: 'Nothing needs doing right now.', breathe: 'Breathe in as the c
 // each app: where its parts are, and how to work its own switches
 const A = {
   ingenium: {
-    key: '#fabQuiet', screen: '#quietScreen', back: '#qsBack', small: '#qsSmall', big: '.qs-big', cap: '#qsCatch', orb: '.qs-orb',
+    // 6.2 (R154): Ingenium opens the shared screen too, as the Forge does
+    key: '#fabQuiet', screen: '#ingQuiet', back: '#ingQuiet-back', small: '#ingQuiet-small', big: '#ingQuiet .qsc-big', cap: '#ingQuiet-catch', orb: '#ingQuiet .qsc-orb',
     others: ['#fabBell', '#fabTheme', '#fabTimer', '#fabNote', '#fabPark', '#railChevron'], moon: '#fabTheme', fold: '#railChevron', bell: '#fabBell', thought: '#fabPark', header: '.topbar',
     bg: { day: [235, 231, 240], night: [21, 17, 28] },
     async boot(p) {
@@ -38,6 +39,7 @@ const A = {
     tc: () => window.IngInbox && IngInbox.tc,
     list: () => IngInbox.list(),
     support: p => p.evaluate(() => { IngSupport.sc.quiet(); }),
+    note: (p, t) => p.evaluate(t => IngSupport.sc.toast(t, 9000, true), t),
     async focusWay(p) { await p.evaluate(() => go('focus')); await p.waitForTimeout(700); return '#fxCalmCard .fx-quiet'; },
     async tour(p) { return p.evaluate(() => { const T = window.ING_TOUR || []; const s = T.find(x => [].concat(x.ring || []).indexOf('#fabQuiet') >= 0);
       return { present: !!s, words: s ? (s.t || '') : '' }; }); },
@@ -64,6 +66,7 @@ const A = {
     tc: () => window.forgeSupport && forgeSupport.tc,
     list: () => forgeSupport.tc.list(),
     support: p => p.evaluate(() => { forgeSupport.sc.quiet(); }),
+    note: (p, t) => p.evaluate(t => forgeSupport.sc.toast(t, 9000, true), t),
     async focusWay(p) { await p.evaluate(() => FORGE.openRoom('focus')); await p.waitForTimeout(1200); return '#room-focus .forge-quiet-way'; },
     async tour(p) { return p.evaluate(async () => { const T = (typeof DEMO_TOUR !== 'undefined' && DEMO_TOUR) || window.FORGE_TOUR || [];
       const i = T.findIndex(x => x && x.sub === 'The quiet screen'), j = T.findIndex(x => x && x.sub === 'The Inbox'); if (i < 0) return { present: false };
@@ -223,11 +226,11 @@ async function sideKey(p, where) {
     ok(!!w2 && /Quiet probe/.test(w2), 'and comes once the screen is closed', w2);
     await p.evaluate(a => { try { document.querySelectorAll('.tc-nudge').forEach(n => n.remove()); const L = (a === 'ingenium' ? IngInbox.list() : forgeSupport.tc.list()); const i = L.findIndex(x => x.id === 'qprobe'); if (i >= 0) L.splice(i, 1); } catch (e) { } }, APP);
   } else ok(false, 'the app has a thoughts panel to test with');
-  if (APP === 'forge') {
-    // a timed note (five minutes before the next item) that comes while it is open waits too
+  {
+    // a timed note (five minutes before the next item) that comes while it is open waits too, in both apps (the shared hold)
     await clickKey(p); await p.waitForTimeout(1700);
-    await p.evaluate(() => forgeSupport.sc.toast('In five minutes: quiet probe. Finish the line you are writing.', 9000, true)); await p.waitForTimeout(300);
-    const t1 = await p.evaluate(() => { const t = document.getElementById('sc-toast'); return t && { held: t.hasAttribute('data-fq-held'), vis: getComputedStyle(t).visibility }; });
+    await A.note(p, 'In five minutes: quiet probe. Finish the line you are writing.'); await p.waitForTimeout(300);
+    const t1 = await p.evaluate(() => { const t = document.getElementById('sc-toast'); return t && { held: t.hasAttribute('data-qsc-held'), vis: getComputedStyle(t).visibility }; });
     ok(t1 && t1.held && t1.vis === 'hidden', 'a timed note that comes while it is open is held back', t1);
     await closeAll(p); await p.waitForTimeout(1300);
     const t2 = await p.evaluate(() => { const t = document.getElementById('sc-toast'); return t && { show: t.classList.contains('show'), vis: getComputedStyle(t).visibility, text: t.textContent }; });
@@ -237,10 +240,6 @@ async function sideKey(p, where) {
     const sp = await p.evaluate(a => ({ mine: !document.querySelector(a.screen).hidden, old: !!document.getElementById('sc-quiet') }), S);
     ok(sp.mine && !sp.old, 'the support module\'s "I need quiet" opens this screen, not its older dark one', sp);
     await closeAll(p);
-  } else {
-    await A.support(p); await p.waitForTimeout(400);
-    const sp = await p.evaluate(a => ({ mine: !document.querySelector(a.screen).hidden, old: !!document.getElementById('sc-quiet') }), S);
-    ok(sp.mine && !sp.old, 'the support module\'s "I need quiet" opens this screen', sp); await closeAll(p);
   }
 
   // Focus has a way in
@@ -340,11 +339,11 @@ async function sideKey(p, where) {
   const side = await lp.evaluate(a => { const h = document.querySelector(a.header), hb = h ? h.getBoundingClientRect().bottom : 0; const k = document.querySelector(a.key);
     const kv = !!(k && getComputedStyle(k).display !== 'none' && k.getBoundingClientRect().width);
     const keys = a.others.concat([a.key]).map(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(), c = getComputedStyle(e); if (!r.width || c.display === 'none' || +c.opacity < 0.05) return null; return [sel, Math.round(r.top), Math.round(r.bottom)]; }).filter(Boolean);
-    return { header: Math.round(hb), leaf: kv, keys, clear: keys.every(x => x[1] >= hb - 1 && x[2] <= innerHeight) }; }, S);
-  ok(side.clear, 'a phone held sideways: every side key stands clear of the bar at the top and inside the window', side);
-  if (!side.leaf) { const w2 = await A.focusWay(lp); const fw = await lp.evaluate(sel => !!document.querySelector(sel), w2);
-    ok(fw, 'where the leaf steps aside (a short screen), Focus still has its way in', { leaf: side.leaf, focusWay: fw }); }
-  else info('a phone held sideways: the leaf is in the column');
+    const sorted = keys.slice().sort((p, q) => p[1] - q[1]), apart = sorted.every((x, i) => i === 0 || x[1] >= sorted[i - 1][2]);
+    return { header: Math.round(hb), leaf: kv, keys, apart, clear: keys.every(x => x[1] >= hb - 1 && x[2] <= innerHeight) }; }, S);
+  // the owner's words (22 October 2026): "I want the leaf Quiet Screen emoji on the side buttons in the same way that it is placed on Ingenium"
+  ok(side.clear && side.apart, 'a phone held sideways: every side key stands clear of the bar at the top, inside the window, none over another', side);
+  ok(side.leaf, 'and the leaf is in the column there too, as on every screen', side.leaf);
   await lp.screenshot({ path: path.join(OUT, APP + '-phone-sideways.png') });
   await lc.close();
 

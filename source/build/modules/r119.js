@@ -74,6 +74,7 @@ function calm(){try{return document.body.getAttribute("data-motion")==="minimal"
 /* quiet times: a focus session running on the Clepsydra, or the quiet screen open; reminders wait until after */
 function quiet(){try{if(window.IngSupport&&!IngSupport.sc.on("inbox"))return true;}catch(e){}/* R121: the Inbox switched off stays silent */
   try{if(typeof pomo!=="undefined"&&pomo&&pomo.running&&pomo.phase==="focus")return true;}catch(e){}
+  try{if(window.IngQuiet&&IngQuiet.isOpen())return true;}catch(e){}/* R154: the shared quiet screen */
   var q=$("quietScreen");return !!(q&&!q.hidden);}
 
 var TC=ThoughtCloud.create({app:"ingenium",prefix:"ing_tc_",fab:function(){return $("fabPark");},list:list,save:function(){try{saveState();}catch(e){}},

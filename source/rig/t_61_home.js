@@ -168,7 +168,7 @@ async function seed(p) { return p.evaluate(async () => {
   await home(p, 500); await press(p, '#homeTour'); await p.waitForTimeout(500);
   const tour = await p.evaluate(() => { const t = document.getElementById('ingTour'); const on = !!(t && t.getBoundingClientRect().width > 0); try { tourEnd(); } catch (e) {} return on; });
   ok(tour, 'the guided tour still starts from Home', tour);
-  await home(p, 500); await press(p, '#hx .hx-row .hx-btn:not(#homeTour):not(#hxWall)'); a = await active(p);
+  await home(p, 500); await press(p, '#hxGuide'); a = await active(p);
   ok(a.page === 'page-guide', 'the short guide key opens the Guide', a);
   await home(p, 500); await press(p, '#hxModelsKey'); a = await active(p);
   ok(a.page === 'page-models', 'the models key opens the Models page', a);

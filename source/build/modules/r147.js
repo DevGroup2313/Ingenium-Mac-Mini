@@ -75,7 +75,7 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-row{display:flex;flex-wrap:wrap;gap:8px}
 @container hx (max-width:559px){.hx-head{padding:16px 15px;gap:12px 14px;align-items:start}.hx-seal{width:58px;height:58px;margin-top:2px}.hx-seal .ing-crest{--W:58px !important}
   .hx-hello{font-size:24px}.hx-lede{font-size:14px}.hx-next{padding:12px}}
-@container hx (min-width:880px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(300px,400px);padding:24px 26px}.hx-next{grid-column:auto}.hx-seal{width:92px;height:92px}.hx-seal .ing-crest{--W:92px !important}}
+@container hx (min-width:880px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(300px,440px);padding:24px 26px}.hx-next{grid-column:auto}.hx-seal{width:92px;height:92px}.hx-seal .ing-crest{--W:92px !important}}
 @container hx (min-width:1640px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(360px,480px)}}
 /* ---- keys: buttons that stand out of the page ---- */
 .hx-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 15px;border-radius:11px;border:1px solid var(--x-hair);
@@ -87,7 +87,10 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-btn.pri{background:linear-gradient(var(--x-pa),var(--x-pb));border-color:var(--x-pedge);color:#fff;box-shadow:var(--x-psh);text-shadow:0 1px 1px rgba(30,10,60,.35)}
 .hx-btn.pri:hover{box-shadow:var(--x-pshhi)}
 .hx-btn.pri:active{box-shadow:var(--x-ppress)}
-.hx-btn.wide{width:100%;min-height:44px;font-size:14.5px}
+/* the next step is as wide as its words, at the left like the keys under it (the owner's words, 22 October 2026: the
+   "Bring in your first model" button "is too wide, I don't like how it looks") */
+.hx-btn.wide{align-self:flex-start;width:auto;max-width:100%;min-height:40px;padding:9px 18px;font-size:14px}
+.hx-row-top{align-items:center}
 .hx-btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--x-acc);min-height:30px;padding:4px 8px}
 .hx-btn.quiet:hover{transform:none;text-decoration:underline}
 .hx-btn[hidden]{display:none}
@@ -297,11 +300,13 @@ function build(){
   var nh=mk("span","hx-next-h","Your next step");nh.id="hxNextH";nx.appendChild(nh);
   var note=old.note||mk("span");note.id="heroStepNote";note.className="";nx.appendChild(note);
   var next=old.next||mk("button");next.id="heroNext";next.type="button";next.className="hx-btn pri wide";if(!old.next)next.onclick=function(){go("models");};
-  nx.appendChild(next);
-  var row=mk("div","hx-row");
+  /* the next step and the tour side by side, the guide (and the wallpapers) under them (the owner's words, 22 October 2026:
+     "Move the Take the guided tour button up top next to the Bring in your first model") */
+  var first=mk("div","hx-row hx-row-top");first.appendChild(next);
   var tour=old.tour||mk("button");tour.id="homeTour";tour.type="button";tour.className="hx-btn";tour.innerHTML=icon("tour")+'<span>Take the guided tour</span>';
-  if(!old.tour)tour.onclick=function(){try{var t=state.tour||{};tourStart(t.done?0:(t.last||0));}catch(e){}};row.appendChild(tour);
-  var guide=mk("button","hx-btn");guide.type="button";guide.innerHTML=icon("guide")+'<span>Read the short guide</span>';guide.onclick=function(){go("guide");};row.appendChild(guide);
+  if(!old.tour)tour.onclick=function(){try{var t=state.tour||{};tourStart(t.done?0:(t.last||0));}catch(e){}};first.appendChild(tour);nx.appendChild(first);
+  var row=mk("div","hx-row");
+  var guide=mk("button","hx-btn");guide.id="hxGuide";guide.type="button";guide.innerHTML=icon("guide")+'<span>Read the short guide</span>';guide.onclick=function(){go("guide");};row.appendChild(guide);
   /* a key into the wallpapers, shown only once that part of Ingenium is here */
   var wall=mk("button","hx-btn");wall.type="button";wall.id="hxWall";wall.hidden=true;wall.innerHTML=icon("wall")+'<span>Wallpapers</span>';
   wall.setAttribute("aria-label","Wallpapers: choose the picture behind Ingenium");
