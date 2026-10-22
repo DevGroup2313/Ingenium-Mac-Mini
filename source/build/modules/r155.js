@@ -15,8 +15,9 @@ html.ing-side-tight body #railChevron#railChevron::before{top:3px;right:3px;bott
 /* R155 · the side keys on a short screen: see the note at the top of its styles */
 (function(){"use strict";
 if(window.__r155)return;window.__r155=1;
-/* from the foot up, as they stand: the notes, the Clepsydra, day or night, the 💭, the leaf, the bell; the chevron above */
-var IDS=["fabNote","fabTimer","fabTheme","fabPark","fabQuiet","fabBell"],CHEV="railChevron",TIGHT="ing-side-tight";
+/* from the foot up, as they stand: the notes, the Clepsydra, day or night, the 💭, the leaf, the bell, and while an app is open
+   the float key; the chevron above them all */
+var IDS=["fabNote","fabTimer","fabTheme","fabPark","fabQuiet","fabBell","fabFloat"],CHEV="railChevron",TIGHT="ing-side-tight";
 var last="";
 function $(id){return document.getElementById(id);}
 function counted(e){if(!e)return false;var c=getComputedStyle(e);return c.display!=="none"&&c.visibility!=="hidden";}

@@ -93,7 +93,8 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
   await p.waitForTimeout(800);
   await p.click('#fabFloat'); await p.waitForTimeout(4000);
   const f4 = await p.evaluate(() => { const w = document.querySelector('.ing-fw'); const r = w.getBoundingClientRect(); return { s: IngDesk.state(), keys: [...w.querySelectorAll('.ing-fw-keys button')].map(b => b.textContent), r: [r.left, r.top, r.width, r.height].map(Math.round), title: w.querySelector('.ing-fw-title').textContent }; });
-  ok(f4.s.windows.join() === 'tabula' && !f4.s.shown && f4.keys.join(' ') === '↗ ＋ − □ ✕' && f4.title === 'Tabula', 'the float key sends the app into a window with Carpe Diem\'s five keys', JSON.stringify(f4));
+  // 6.2: a sixth key, after ↗, takes the window back into the desk (an icon, so no text)
+  ok(f4.s.windows.join() === 'tabula' && !f4.s.shown && f4.keys.join(' ') === '↗  ＋ − □ ✕' && f4.title === 'Tabula', 'the float key sends the app into a window with Carpe Diem\'s five keys and the way back into the desk', JSON.stringify(f4));
   const fw = await (await p.$('.ing-fw iframe')).contentFrame();
   const kept = await fw.evaluate(() => (document.getElementById('editor') || {}).innerText || '');
   ok(/difficulty was the point/.test(kept), 'what was written goes with it', kept.slice(0, 60));
@@ -200,7 +201,9 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
     await pop.screenshot({ path: OUT + '/own-window-clepsydra.png' });
     await pop.evaluate(() => { try { closeModalBox(); } catch (e) {} try { closeModal(); } catch (e) {} }); await pop.waitForTimeout(300);
     await pop.click('#fabQuiet'); await pop.waitForTimeout(500);
-    const quiet = await pop.evaluate(() => { const q = document.getElementById('quietScreen'); return !!q && getComputedStyle(q).display !== 'none' && q.getBoundingClientRect().width > 0; });
+    // 6.2: the shared quiet screen (#ingQuiet, modules/r154.js); it must stand over the app, not under it
+    const quiet = await pop.evaluate(() => { const q = document.getElementById('ingQuiet') || document.getElementById('quietScreen'); if (!q || getComputedStyle(q).display === 'none' || !(q.getBoundingClientRect().width > 0)) return false;
+      const t = document.elementFromPoint(innerWidth / 2, innerHeight / 2); return !!t && q.contains(t); });
     await pop.keyboard.press('Escape'); await pop.evaluate(() => { try { quietClose(); } catch (e) {} }); await pop.waitForTimeout(300);
     ok(!!clep && clep.over && quiet, 'the Clepsydra and the quiet screen open there over the app', JSON.stringify({ clep, quiet }));
     // Ingenium's own pages open in the main window
@@ -256,7 +259,7 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
   const q = await ctx2.newPage(); await q.goto(URL_); await enter(q);
   await q.evaluate(() => go('tabula')); await q.waitForTimeout(4000); await q.click('#fabFloat'); await q.waitForTimeout(3000);
   const t9 = await q.evaluate(() => [...document.querySelectorAll('.ing-fw-keys button')].map(b => b.textContent).join(' '));
-  ok(t9 === '＋ − □ ✕', 'in the Fire app the floating window has no ↗, since a second window cannot be had there', t9);
+  ok(t9 === ' ＋ − □ ✕', 'in the Fire app the floating window has no ↗, since a second window cannot be had there (the way back into the desk stays)', t9);
   await q.screenshot({ path: OUT + '/fire-float.png' });
   await ctx2.close();
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
