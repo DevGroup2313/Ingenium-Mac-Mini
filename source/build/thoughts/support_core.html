@@ -125,6 +125,16 @@
 #sc-just button{font:12px system-ui,sans-serif;color:inherit;background:transparent;border:1px solid rgba(127,127,127,.35);border-radius:999px;padding:4px 10px;cursor:pointer}
 #sc-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(12px);opacity:0;pointer-events:none;z-index:2147483100;max-width:min(520px,calc(100vw - 32px));padding:10px 16px;border-radius:14px;background:rgba(30,34,40,.94);color:#f1f3f5;font:13px/1.45 system-ui,sans-serif;transition:opacity .25s ease,transform .25s ease}
 #sc-toast.show{opacity:1;transform:translateX(-50%)}
+/* what is shown at a time (the five-minute word, the end of the two minutes, the two-minute chip) wears the app's own
+   reminder card when the app gives one (SC.reminders(look)); an app that gives none keeps the dark note above. The rim is
+   drawn inside, so the card keeps its size and place. */
+#sc-toast[data-sc-look="1"],#sc-just[data-sc-look="1"]{background:var(--sc-r-face);color:var(--sc-r-ink);box-shadow:inset 0 0 0 1px var(--sc-r-rim),0 2px 0 rgba(0,0,0,.16),0 6px 20px rgba(0,0,0,.30)}
+#sc-toast[data-sc-look="1"][data-sc-still="1"]{transition:none}
+#sc-just[data-sc-look="1"] .sc-just-bar{background:var(--sc-r-track)}
+#sc-just[data-sc-look="1"] .sc-just-bar i{background:var(--sc-r-rim)}
+#sc-just[data-sc-look="1"] button{color:var(--sc-r-ink);border-color:var(--sc-r-line)}
+#sc-just[data-sc-look="1"] button:hover{background:rgba(255,255,255,.10)}
+#sc-just[data-sc-look="1"] button:focus-visible{outline:2px solid var(--sc-r-ink);outline-offset:2px}
 .sc-rt-dots{display:flex;gap:7px;justify-content:center;margin:4px 0 10px}
 .sc-rt-dots i{width:10px;height:10px;border-radius:50%;background:rgba(127,127,127,.22)}
 .sc-rt-dots i.on{background:var(--tc-acc,#1b6b93)}
@@ -219,8 +229,19 @@ function create(host){
   function dayWord(){return hv(H.dayWord)||{en:"day",fr:"journée"};}
   function appName(){return hv(H.appName)||app;}
   function tc(){try{return hv(H.tc)||null;}catch(e){return null;}}
-  function toast(m,ms){try{if(H.toast){H.toast(m,ms);return;}}catch(e){}
+  /* the app's reminder card, given after the module is made: SC.reminders({face,ink,rim,line,track,night:{...}}).
+     With one, what is shown at a time comes in it (by night, with what night changes), here rather than in the app's
+     own toast; with none, nothing changes. */
+  var LOOK=null;
+  function look(){if(!LOOK)return null;var l={},k,n=night()&&LOOK.night;for(k in LOOK)if(k!=="night")l[k]=LOOK[k];if(n)for(k in n)l[k]=n[k];return l;}
+  function dressLook(n){if(!n)return n;var l=look();
+    [["face","--sc-r-face"],["ink","--sc-r-ink"],["rim","--sc-r-rim"],["line","--sc-r-line"],["track","--sc-r-track"]].forEach(function(p){
+      if(l&&l[p[0]]!=null)n.style.setProperty(p[1],l[p[0]]);else n.style.removeProperty(p[1]);});
+    if(l)n.setAttribute("data-sc-look","1");else n.removeAttribute("data-sc-look");return n;}
+  function reminders(l){LOOK=l&&typeof l==="object"?l:null;dressLook(document.getElementById("sc-toast"));dressLook(document.getElementById("sc-just"));return !!LOOK;}
+  function toast(m,ms,timed){try{if(H.toast&&!(timed&&LOOK)){H.toast(m,ms);return;}}catch(e){}
     var t=document.getElementById("sc-toast");if(!t){t=el("div",null,{id:"sc-toast",role:"status","aria-live":"polite"});document.body.appendChild(t);}
+    dressLook(t);if(LOOK)t.setAttribute("data-sc-still",still()?"1":"0");
     t.textContent=m;t.classList.add("show");clearTimeout(t.__h);t.__h=setTimeout(function(){t.classList.remove("show");},ms||4200);}
   function btn(label,kind,fn,extra,key){var b=el("button",(C(kind||"ghost")||"")+(extra?" "+extra:""),{type:"button",text:label,"data-sc-key":key||null,on:{click:function(e){e.stopPropagation();fn.call(this,e);}}});return b;}
 
@@ -244,7 +265,7 @@ function create(host){
     w.appendChild(el("div","sc-track",null,[el("i",null,{style:"width:"+pct.toFixed(1)+"%"})]));return w;}
   function warnSoon(){if(!on("time"))return;var m=timeModel();if(!m||!m.next)return;var gap=m.next.t.at-m.now;if(gap>5||gap<=0)return;
     var key=today()+":"+m.next.b.id+":"+m.next.t.id,s=S();if(!s.warned||s.warned.d!==today())s.warned={d:today(),k:{}};if(s.warned.k[key])return;
-    s.warned.k[key]=1;save();toast(T("In five minutes: ","Dans cinq minutes : ")+m.next.t.title+". "+hv(H.finishLine||T("Finish the line you are on.","Terminez la ligne en cours.")),9000);}
+    s.warned.k[key]=1;save();toast(T("In five minutes: ","Dans cinq minutes : ")+m.next.t.title+". "+hv(H.finishLine||T("Finish the line you are on.","Terminez la ligne en cours.")),9000,true);}
 
   /* ================= THE TIMER (each app's own Clepsydra) ================= */
   function tm(){try{return H.timer&&H.timer.state?H.timer.state():null;}catch(e){return null;}}
@@ -328,10 +349,10 @@ function create(host){
   var JS={end:0,iv:null};
   function justStart(){stopJust(true);JS.end=Date.now()+120000;
     var chip=el("div",null,{id:"sc-just",role:"timer","data-sc-night":night()?"1":"0","data-sc-app":app},[el("span","sc-just-t"),el("span","sc-just-bar",null,[el("i")]),el("button",null,{type:"button",text:T("Stop","Arrêter"),on:{click:function(){stopJust();}}})]);
-    chip.style.setProperty("--sc-j",hv(H.accent)||"#1b6b93");document.body.appendChild(chip);
+    chip.style.setProperty("--sc-j",hv(H.accent)||"#1b6b93");dressLook(chip);document.body.appendChild(chip);
     var tick=function(){var left=Math.max(0,JS.end-Date.now()),s=Math.ceil(left/1000);chip.querySelector(".sc-just-t").textContent=T("Just start","Juste commencer")+" · "+Math.floor(s/60)+":"+pad(s%60);
       chip.querySelector(".sc-just-bar i").style.width=(100-left/1200)+"%";
-      if(!left){stopJust(true);toast(T("Two minutes. You started. Carry on, or stop here: both count.","Deux minutes. Vous avez commencé. Continuez, ou arrêtez-vous ici : les deux comptent."),7000);}};
+      if(!left){stopJust(true);toast(T("Two minutes. You started. Carry on, or stop here: both count.","Deux minutes. Vous avez commencé. Continuez, ou arrêtez-vous ici : les deux comptent."),7000,true);}};
     tick();JS.iv=setInterval(tick,500);}
   function stopJust(quiet){clearInterval(JS.iv);JS.iv=null;var c=document.getElementById("sc-just");if(c)c.remove();if(!quiet)toast(T("Stopped. Starting at all was the hard part.","Arrêté. Commencer, c’était le plus dur."));}
 
@@ -535,6 +556,7 @@ function create(host){
   function nightSync(){nightQ=0;var n=night();if(n===lastNight)return;lastNight=n;var v=n?"1":"0";
     try{if(sheetEl)sheetEl.setAttribute("data-tc-night",v);}catch(e){}
     ["sc-focus-room","sc-just"].forEach(function(id){var x=document.getElementById(id);if(x)x.setAttribute("data-sc-night",v);});
+    if(LOOK){dressLook(document.getElementById("sc-toast"));dressLook(document.getElementById("sc-just"));}
     try{refresh();}catch(e){}}
   function nightSoon(){if(!nightQ)nightQ=setTimeout(nightSync,30);}
   try{var mo=new MutationObserver(nightSoon);mo.observe(document.documentElement,{attributes:true});
@@ -550,7 +572,8 @@ function create(host){
   return {render:render,refresh:refresh,mount:mount,card:build,tick:tick,on:on,set:setOn,rows:myRows,lowToday:lowToday,setLow:setLow,
     routines:routines,runRoutine:runRoutine,editRoutines:editRoutines,suggestedRoutine:suggested,rName:rName,openFocus:openFocus,closeFocus:closeFocus,
     justStart:justStart,stopJust:stopJust,quiet:quiet,closeQuiet:closeQuiet,timeBar:timeBar,timeModel:timeModel,nextTask:nextTask,plan:plan,
-    tasks:tasks,current:cur,newTask:newTask,fromPlan:fromPlan,steps:stepTemplates,applyAll:applyAll,sheet:sheet,closeSheet:closeSheet,T:T,store:S,toast:toast};}
+    tasks:tasks,current:cur,newTask:newTask,fromPlan:fromPlan,steps:stepTemplates,applyAll:applyAll,sheet:sheet,closeSheet:closeSheet,T:T,store:S,toast:toast,
+    reminders:reminders};}
 
 window.SupportCore={create:create,v:2};
 })();

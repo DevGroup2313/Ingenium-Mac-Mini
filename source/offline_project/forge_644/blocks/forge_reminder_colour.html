@@ -1,0 +1,42 @@
+<style id="forge-reminder-colour-644">
+/* PASS 644 · THE REMINDERS IN THE FORGE'S OWN BLUE CARD. The owner's words (21 October 2026): "I want the time reminders
+   that show up on the screen to be in a blue card or a better colour that matches the app better instead of the black
+   colour it currently is, please make the fix."
+   What was black, measured: the word five minutes before the next item of the day ("In five minutes: ...") and the end
+   of the two minutes came in the support module's own note, rgba(30,34,40,.94), by day and by night; the two-minute chip
+   and a thought that asked to come back were near black by night (#20242a, #262e37). Custodia's "A pause, earned",
+   shown after a long stretch of focus, had no card at all: its class was written as an attribute, so the page's glass
+   never reached it and its words lay over the page.
+   Now each of them wears the Forge's own toast (cdToast): its deep blue #0c3c52, its brass rim #bd9a52 and its cream ink
+   #f4efe4, by day and by night, in the same place and at the same size as before. The shared modules draw the card
+   (SupportCore and ThoughtCloud, .reminders(look)); this block gives them the Forge's colours, and dresses Custodia. */
+#custodia-overlay > div{background:#0c3c52;color:#f4efe4;box-shadow:inset 0 0 0 1px #bd9a52,0 2px 0 rgba(0,0,0,.18),0 14px 40px rgba(0,0,0,.40)}
+#custodia-overlay > div > div{color:#f4efe4 !important}
+#custodia-overlay > div > div:last-child{color:rgba(244,239,228,.82) !important}
+#custodia-overlay button{font:600 12.5px/1.25 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:8px 14px;border-radius:999px;cursor:pointer;color:#f4efe4;background:transparent;border:1px solid rgba(244,239,228,.48)}
+#custodia-overlay button:hover{background:rgba(255,255,255,.10);border-color:#f4efe4}
+#custodia-overlay button[classname~="btn-primary"]{background:#f4efe4;color:#0c3c52;border-color:#f4efe4;box-shadow:0 2px 0 rgba(0,0,0,.28)}
+#custodia-overlay button[classname~="btn-primary"]:hover{background:#fbf8f1}
+#custodia-overlay button:focus-visible{outline:2px solid #f4efe4;outline-offset:2px}
+</style>
+<script id="forge-reminder-colour-644-js">
+/* PASS 644 · the reminders in the Forge's own blue card: see the note above */
+(function(){
+"use strict";
+if(window.__forgeReminderColour644)return;window.__forgeReminderColour644=1;
+/* the Forge's own toast (cdToast), the same by day and by night */
+var LOOK={face:"#0c3c52",ink:"#f4efe4",soft:"rgba(244,239,228,.82)",rim:"#bd9a52",line:"rgba(244,239,228,.48)",
+  key:"#f4efe4",keyInk:"#0c3c52",track:"rgba(244,239,228,.22)"};
+/* the support module and the thoughts panel are made once the Forge's desk is read: wait for them */
+function give(n){var f=window.forgeSupport;
+  if(f&&f.sc&&f.tc&&typeof f.sc.reminders==="function"&&typeof f.tc.reminders==="function"){f.sc.reminders(LOOK);f.tc.reminders(LOOK);return;}
+  if(n<300)setTimeout(function(){give(n+1);},200);}
+give(0);
+/* Custodia's card has a role but no name: it takes its title's */
+function name(){var o=document.getElementById("custodia-overlay");if(!o||o.getAttribute("aria-label"))return;
+  var c=o.firstElementChild,t=c&&c.children[1];o.setAttribute("aria-label",t&&t.textContent?t.textContent:"A pause");}
+function watch(){try{new MutationObserver(name).observe(document.body,{childList:true});}catch(e){}}
+if(document.body)watch();else document.addEventListener("DOMContentLoaded",watch);
+})();
+</script>
