@@ -37,10 +37,11 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   });
   await p.evaluate(() => go('lector')); await p.waitForTimeout(1500);
   // the brief: the model lines and the switches
-  const brief = await p.evaluate(() => { const m = document.getElementById('l7Model'); const sel = m.querySelector('select'); return { head: m.querySelector('b') && m.querySelector('b').textContent, metic: !!document.getElementById('l7Metic'), checked: document.getElementById('l7Metic') && document.getElementById('l7Metic').checked, options: sel ? [...sel.options].map(o => o.textContent) : [], stronger: (m.textContent.match(/A stronger model is ready[^.]*\./) || [''])[0] }; });
+  // 6.2: the model is chosen in How Lector reads, at the top of the brief (#l7HowModel)
+  const brief = await p.evaluate(() => { const m = document.getElementById('l7Model'); const sel = document.getElementById('l7HowModel'); return { head: m.querySelector('b') && m.querySelector('b').textContent, metic: !!document.getElementById('l7Metic'), checked: document.getElementById('l7Metic') && document.getElementById('l7Metic').checked, options: sel ? [...sel.options].map(o => o.textContent) : [], stronger: (m.textContent.match(/A stronger model is ready[^.]*\./) || [''])[0] }; });
   ok(brief.metic && brief.checked, 'the brief has the Examine switch, on by default', JSON.stringify(brief));
   // choose the 4B by hand: the brief says a stronger one is ready, and one press takes it
-  await p.evaluate(() => { const sel = document.querySelector('#l7Model select'); sel.value = 'mfake4'; sel.dispatchEvent(new Event('change')); }); await p.waitForTimeout(400);
+  await p.evaluate(() => { const sel = document.getElementById('l7HowModel'); sel.value = 'mfake4'; sel.dispatchEvent(new Event('change')); }); await p.waitForTimeout(400);
   const strong = await p.evaluate(() => { const m = document.getElementById('l7Model'); const k = [...m.querySelectorAll('button')].find(x => /^Use Stand-in 12B/.test(x.textContent)); return { line: (m.textContent.match(/A stronger model is ready on [^:]+: Stand-in 12B\. For a doctoral standard, use it\./) || [''])[0], key: !!k }; });
   ok(/Stand-in 12B/.test(strong.line) && strong.key, 'with a weaker model chosen, the brief names the stronger one that is ready and offers it', JSON.stringify(strong));
   await p.evaluate(() => { [...document.querySelectorAll('#l7Model button')].find(x => /^Use Stand-in 12B/.test(x.textContent)).click(); }); await p.waitForTimeout(400);
@@ -65,7 +66,8 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(ev.some(t => /1 spelling set to British \(color → colour\)/.test(t)) && ev.some(t => /1 contraction/.test(t)), 'Ingenium\'s own check set the spelling right and named the contraction left', ev.filter(t => /spelling|contraction/.test(t)).slice(0, 1).join(''));
   ok(ev.some(t => /Every figure \(\d+\) was found/.test(t)), 'with the unsupported figure struck by the examiner, every figure left is found in the measures', ev.filter(t => /figure/.test(t)).slice(0, 1).join(''));
   const doc = await p.evaluate(() => { const d = document.getElementById('l7Desk'); const t = d ? d.innerText : ''; return { colour: /colour scheme/.test(t), color: /\bcolor\b/.test(t), awards: /9,999/.test(t), foot: /examined section by section against the material/.test(t) }; });
-  ok(doc.colour && !doc.color && !doc.awards && doc.foot, 'the document on the desk: British spelling, no invented figure, and its footer says it was examined', JSON.stringify(doc));
+  // 6.1 took the closing line off every document (the owner's words: no watermarks), so no footer names the model or the examination
+  ok(doc.colour && !doc.color && !doc.awards && !doc.foot, 'the document on the desk: British spelling, no invented figure, and no closing line', JSON.stringify(doc));
   await p.screenshot({ path: OUT + '/lector-done.png' });
   ok(errs.length === 0, 'no script errors', errs.join(' | '));
   console.log(pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);

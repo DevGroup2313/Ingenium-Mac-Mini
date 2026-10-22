@@ -1,3 +1,38 @@
+<style id="r108-62-css">
+/* 6.2 · LECTOR: HOW IT READS IN VIEW, ASK LECTOR BESIDE THE THINKING, EVERY FUNCTION.
+   The owner's words (22 October 2026): "I used to be able to select the type of reading I wanted done on Lector, I could
+   choose between a quick reading and a more deeper and thorough analysis alongside the models that would be doing the
+   reading, I want that restored into the Lector page"; "I want the compose text to send to Lector to further refine the
+   documents to actually be read by Lector and actually adjust the documents"; "The Ask Lector section does not work and
+   should probable be moved to another section on the page and be better intergrated"; "have Lector conduct a deep and
+   thorough analysis of every app and alll of their functions". */
+#lx7 .l-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#lx7 .l-how{display:flex;flex-direction:column;gap:7px}
+#lx7 .l-how .l-doc input[type=radio]{accent-color:var(--l-acc);width:16px;height:16px;flex:0 0 auto;margin:0}
+#lx7 .l-how .l-doc[aria-checked="true"],#lx7 .l-how .l-doc:has(input:checked){border-color:var(--l-ring);box-shadow:var(--l-pill),inset 0 0 0 1px var(--l-ring)}
+#lx7 .l-how .l-doc .t small{display:block}
+#lx7 .l-how-model{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+#lx7 .l-how-model > span{font-size:12px;font-weight:600;color:var(--l-ink2)}
+#lx7 .l-how-model select{font:600 13px var(--l-sans);color:var(--l-ink1);background:linear-gradient(var(--l-a),var(--l-b));border:1px solid var(--l-hair);border-radius:10px;padding:7px 9px;box-shadow:var(--l-pill);max-width:100%}
+#lx7 .l-how .l-sw{font-size:12.5px}
+/* the middle panel's two tabs: the thinking, and Ask Lector */
+#lx7 .l-mid{display:inline-flex;gap:2px;padding:3px;border-radius:11px;background:var(--l-wellbg);box-shadow:var(--l-well);border:1px solid var(--l-hair2);flex:0 0 auto}
+#lx7 .l-mid button{border:0;background:transparent;color:var(--l-ink2);font:600 13px/1 var(--l-serif);letter-spacing:.04em;padding:7px 11px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+#lx7 .l-mid button[aria-selected="true"]{background:linear-gradient(var(--l-a),var(--l-b));color:var(--l-ink1);box-shadow:var(--l-pill)}
+#lx7 .l-mid button:focus-visible{outline:2px solid var(--l-ring);outline-offset:1px}
+#lx7 .l-mid .n{font:700 11px var(--l-sans);color:var(--l-acc)}
+#lx7 #l7Read[data-mid="ask"] .l-codefold{display:none}
+#lx7 .l-rd[hidden],#lx7 #l7Read[data-mid="ask"] > .l-rd{display:none !important}
+/* Ask Lector, the whole of the middle panel */
+#lx7 .l-cmp.l-askpane{flex:1 1 0;border-top:0;min-height:0}
+#lx7 .l-cmp.l-askpane[hidden]{display:none}
+#lx7 .l-askpane .l-cmp-intro{padding:10px 14px 0;font-size:12.5px;line-height:1.5;color:var(--l-ink3)}
+#lx7 .l-askpane .l-cmp-reqs-h{padding:8px 14px 0;font-size:12px;font-weight:600;color:var(--l-ink2)}
+#lx7 .l-askpane .l-cmp-th{flex:1 1 0;max-height:none;min-height:80px}
+#lx7 .l-askpane .l-cmp-empty{flex:1 1 0;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;color:var(--l-ink3);font-size:13px;line-height:1.55}
+#lx7 .l-askpane .l-cmp-m.lx .live{display:block;margin-top:6px;padding-top:6px;border-top:1px dashed var(--l-hair);color:var(--l-ink2);max-height:12em;overflow:auto;font-size:12.5px}
+#lx7 .l-askdoc{margin-left:auto}
+</style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p40"]="started";}catch(_){}
 /* R108 · LECTOR'S NEW PAGE, AND WHAT IT CAN NOW DO
    Her requests, in her words (16 October and before): three live panels side by side, "so I can see the thinking
@@ -23,8 +58,9 @@ var APPS={cd:{name:"Carpe Diem",abbr:"CD",color:"#1B6B93",fill:"#EAF2F7",sub:"#4
   ingenium:{name:"Ingenium",abbr:"Ingenium",color:"#6A3FB5",fill:"#F1ECFA",sub:"#4B3A6E"},inkwell:{name:"Inkwell",abbr:"Inkwell",color:"#1F4F68",fill:"#F4EFE3",sub:"#8A6526"}};
 var ORDER=["cd","forge","ingenium","inkwell"];
 var KINDS=[["dossier","Project dossier","The full account, section by section"],["appendix","Appendix","Measured tables and the evidence"],
-  ["portfolio","Portfolio piece","Two pages for your catalogue"],["cover","Cover letter","Fitted to the posting"],["cv","CV entry","Your projects, for your CV"]];
-var HOUSE={dossier:"dossier",appendix:"appendix",portfolio:"summary",cover:"cover",cv:"cv",analysis:"summary"};
+  ["portfolio","Portfolio piece","Two pages for your catalogue"],["cover","Cover letter","Fitted to the posting"],["cv","CV entry","Your projects, for your CV"],
+  ["functions","Every function","Each app's screens, keys and functions, measured from its own code"]];
+var HOUSE={dossier:"dossier",appendix:"appendix",portfolio:"summary",cover:"cover",cv:"cv",analysis:"summary",functions:"appendix"};
 function nm(k){return APPS[k]?APPS[k].name:k;}
 function sorted(a){return ORDER.filter(function(k){return (a||[]).indexOf(k)>=0;});}
 function listNames(ks){var n=ks.map(nm);if(n.length<2)return n[0]||"";if(n.length===2)return n[0]+" and "+n[1];return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
@@ -33,8 +69,8 @@ function setName(a){a=sorted(a);return a.length===4?"The Offline Project":listNa
 function setKind(a){var n=sorted(a).length;return n===4?"all four":n===3?"a trio of The Offline Project":n===2?"a duo":n===1?"on its own":"";}
 function docLabel(kind,a,purpose){var all=sorted(a).length===4;
   return {dossier:all?"Master project dossier":"Project dossier",appendix:all?"Master appendix":"Appendix",portfolio:"Portfolio piece",
-    cover:purpose==="programme"?"Cover letter for the programme":"Cover letter",cv:"CV entry",analysis:"Notes and analysis"}[kind]||kind;}
-function sealed(kind){return kind==="dossier"||kind==="appendix"||kind==="portfolio";}
+    cover:purpose==="programme"?"Cover letter for the programme":"Cover letter",cv:"CV entry",analysis:"Notes and analysis",functions:all?"Every function, all four apps":"Every function"}[kind]||kind;}
+function sealed(kind){return kind==="dossier"||kind==="appendix"||kind==="portfolio"||kind==="functions";}
 function author(){try{return lxhAuthor()||"";}catch(e){return "";}}
 function month(){try{return lxhMonth();}catch(e){return "";}}
 function today(){try{return new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});}catch(e){return "";}}
@@ -265,23 +301,35 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
    '<div class="l-panels" id="l7Panels">'+
     '<section class="l-pn" id="l7Brief" aria-label="The brief"><div class="l-pn-h"><h2>The brief</h2><span class="l-chip" id="l7BriefChip">Ready</span><button class="l-fold" type="button" data-f="brief" aria-expanded="true" title="Fold the brief away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div><div class="l-pn-b"><div class="l-bf" id="l7Bf"></div></div><div class="l-pn-f" id="l7BriefF"></div></section>'+
     '<div class="l-gut" id="l7G1" role="separator" aria-orientation="vertical" tabindex="0" title="Drag to make the brief wider or narrower · press twice to put it back"><i></i></div>'+
-    '<section class="l-pn" id="l7Read" aria-label="Thinking"><div class="l-pn-h"><h2>Thinking</h2><span class="l-chip" id="l7ReadChip">Waiting</span><button class="l-codefold" type="button" id="l7CodeFold" aria-expanded="true" title="Fold the code window away">Code</button><button class="l-fold" type="button" data-f="read" aria-expanded="true" title="Fold the thinking away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
-     '<div class="l-rd" id="l7Rd"><div class="l-now" id="l7Now"><div class="l-now-h" id="l7NowH"></div><pre class="l-code" id="l7Code" aria-label="The part Lector is reading"></pre></div>'+
+    '<section class="l-pn" id="l7Read" aria-label="Thinking and Ask Lector" data-mid="rd"><div class="l-pn-h"><h2 class="l-vh">Thinking and Ask Lector</h2><div class="l-mid" id="l7Mid" role="tablist" aria-label="Thinking or Ask Lector"><button type="button" role="tab" id="l7MidRd" aria-controls="l7Rd" aria-selected="true">Thinking</button><button type="button" role="tab" id="l7MidAsk" aria-controls="l7Ask" aria-selected="false" tabindex="-1">Ask Lector <span class="n" id="l7AskN"></span></button></div><span class="l-chip" id="l7ReadChip">Waiting</span><button class="l-codefold" type="button" id="l7CodeFold" aria-expanded="true" title="Fold the code window away">Code</button><button class="l-fold" type="button" data-f="read" aria-expanded="true" title="Fold the thinking away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
+     '<div class="l-rd" id="l7Rd" role="tabpanel" aria-labelledby="l7MidRd"><div class="l-now" id="l7Now"><div class="l-now-h" id="l7NowH"></div><pre class="l-code" id="l7Code" aria-label="The part Lector is reading"></pre></div>'+
      '<div class="l-vg" id="l7Vg" role="separator" aria-orientation="horizontal" tabindex="0" title="Drag to make the code window taller or shorter · press twice to put it back"><i></i></div>'+
      '<div class="l-stream" id="l7Stream" aria-live="polite"></div></div>'+
+     /* 6.2: Ask Lector, its own tab beside the thinking (paintAsk) */
+     '<div class="l-cmp l-askpane" id="l7Ask" role="tabpanel" aria-labelledby="l7MidAsk" hidden></div>'+
      '<div class="l-pn-f"><div class="l-prog"><div class="lbl"><b id="l7ProgA"></b><span id="l7ProgB"></span></div><div class="l-bar" id="l7Bar"><i id="l7BarI"></i></div></div><span id="l7ReadKey"></span></div></section>'+
     '<div class="l-gut" id="l7G2" role="separator" aria-orientation="vertical" tabindex="0" title="Drag to share the room between the thinking and the document · press twice to put it back"><i></i></div>'+
-    '<section class="l-pn" id="l7Doc" aria-label="The document"><div class="l-pn-h"><h2>The document</h2><span class="l-chip" id="l7DocChip"></span><button class="l-fold" type="button" data-f="doc" aria-expanded="true" title="Fold the document away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
+    '<section class="l-pn" id="l7Doc" aria-label="The document"><div class="l-pn-h"><h2>The document</h2><span class="l-chip" id="l7DocChip"></span><button type="button" class="l-btn sm l-askdoc" id="l7AskDoc" title="Ask Lector to change this document">Ask Lector</button><button class="l-fold" type="button" data-f="doc" aria-expanded="true" title="Fold the document away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="l-drow"><div class="l-dtabs" id="l7Dtabs" role="tablist" aria-label="Documents"></div>'+
      /* 6.1: the document's size: smaller, fit to the panel, larger */
      '<div class="l-zoom" id="l7Zoom" role="group" aria-label="The document\'s size"><button type="button" data-z="-" aria-label="Smaller" title="Smaller">−</button><button type="button" data-z="fit" aria-pressed="true" title="Fit the page to the panel">Fit</button><button type="button" data-z="+" aria-label="Larger" title="Larger">+</button><span class="pc" aria-live="polite"></span></div></div>'+
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
-     /* 6.1: Ask Lector, the owner's own requests (paintAsk) */
-     '<div class="l-cmp" id="l7Ask" role="region" aria-label="Ask Lector"></div>'+
+
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
      '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
    '</div></div>';
-  wireFrame();return $("lx7");}
+  wireFrame();wireMid();return $("lx7");}
+/* 6.2: the middle panel shows the thinking or Ask Lector; the document panel's key opens Ask Lector on the document shown */
+function midTab(which,focus){var rd=$("l7Rd"),ak=$("l7Ask"),pn=$("l7Read");if(!rd||!ak)return;R7.mid=which;var a=which==="ask";
+  rd.hidden=a;ak.hidden=!a;if(pn)pn.setAttribute("data-mid",a?"ask":"rd");
+  [["l7MidRd",!a],["l7MidAsk",a]].forEach(function(x){var b=$(x[0]);if(b){b.setAttribute("aria-selected",x[1]?"true":"false");b.tabIndex=x[1]?0:-1;}});
+  if(a){try{paintAsk();}catch(e){}if(focus){var ta=ak.querySelector("textarea");if(ta)try{ta.focus();}catch(e){}}}else{try{layoutSoon();}catch(e){}}}
+function wireMid(){var m=$("l7Mid");if(!m||m.__w)return;m.__w=1;
+  $("l7MidRd").onclick=function(){midTab("rd");};$("l7MidAsk").onclick=function(){midTab("ask",true);};
+  m.addEventListener("keydown",function(e){if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight"&&e.key!=="Home"&&e.key!=="End")return;e.preventDefault();
+    var to=(e.key==="ArrowLeft"||e.key==="Home")?"rd":"ask";midTab(to);$(to==="rd"?"l7MidRd":"l7MidAsk").focus();});
+  var k=$("l7AskDoc");if(k)k.onclick=function(){if(one())setPanel("read");midTab("ask",true);var sel=$("l7Ask").querySelector("select");if(sel&&stored(R7.doc||"analysis"))sel.value="auto";};
+  midTab(R7.mid||"rd");}
 
 /* ---------------- painting ---------------- */
 function render(){var root=build();if(!root)return;L7();paintBrief();paintSteps();paintMain();paintProgress();paintTabs();paintDoc();if(!R7.built){R7.built=true;paintStream();showSomething();}
@@ -292,6 +340,28 @@ function render(){var root=build();if(!root)return;L7();paintBrief();paintSteps(
 function paintAll(){if(!$("lx7"))return;paintBrief();paintSteps();paintMain();paintProgress();paintTabs();paintDoc();}
 /* 6.1: the compose area follows the document shown (paintDoc is wrapped once, below, by the Ask Lector part) */
 
+/* 6.2: how Lector reads: a quick reading or a deep, thorough analysis, and the model that reads and writes */
+function howCard(busy){var B=L7().brief,o=modelPlan(),c=o.chosen,s=sec("How Lector reads");s.id="l7How";var g=h("div","l-how");g.setAttribute("role","radiogroup");g.setAttribute("aria-label","How Lector reads");
+  function parts(depth){var tot=0,known=true;B.apps.forEach(function(k){var r=runFor(k,depth);if(r&&r.status==="done")return;var n=partsOf(k,depth,c);if(n==null)known=false;else tot+=n;});return known?tot:null;}
+  var docs=KINDS.filter(function(d){return B.docs[d[0]];}).length;
+  [["overview","Quick reading","Its screens, its words, the notes in its code and how it is built."],
+   ["thorough","Deep, thorough analysis","All of that, and every function and every line of its own code, for the deepest documents. With it, Every function is written too."]].forEach(function(x){
+    var row=h("label","l-doc"),r=document.createElement("input");r.type="radio";r.name="l7Depth";r.value=x[0];r.checked=(B.depth||"overview")===x[0];r.disabled=busy;
+    r.onchange=function(){if(R7.running||!r.checked)return;B.depth=x[0];if(x[0]==="thorough"&&B.docs.functions==null)B.docs.functions=true;saveSoon();paintBrief();paintTabs();paintDoc();};
+    row.appendChild(r);var t=h("span","t");t.appendChild(h("b",null,esc(x[1])));var n=parts(x[0]),est=n?estimate(c,n,docs):"";
+    t.appendChild(h("small",null,esc(x[2]+(n==null?" Measuring your apps…":n?" "+n+" part"+(n===1?"":"s")+" to read"+(est?"; "+est.replace(/\.$/,"").toLowerCase():"")+".":" Already read: Lector writes from that reading."))));
+    row.appendChild(t);g.appendChild(row);});
+  s.appendChild(g);
+  var mw=h("label","l-how-model");mw.appendChild(h("span",null,"Read and written by"));var sel=document.createElement("select");sel.id="l7HowModel";sel.disabled=busy;
+  var o0=document.createElement("option");o0.value="";o0.textContent="Ingenium's choice"+(o.rec?" ("+o.rec.customName+")":o.spec?" ("+o.spec.name+", when you have it)":"");sel.appendChild(o0);
+  readyModels().forEach(function(m){var op=document.createElement("option");op.value=m.id;op.textContent=m.customName+(o.rec&&m.id===o.rec.id?" · recommended":"");if(B.modelId===m.id)op.selected=true;sel.appendChild(op);});
+  sel.onchange=function(){B.modelId=sel.value||null;saveSoon();paintBrief();};mw.appendChild(sel);s.appendChild(mw);
+  if(!readyModels().length)s.appendChild(h("p","l-hint",esc("No model is on this device yet. "+(o.spec?"Ingenium's choice here is "+o.spec.name+": get it below, under Who reads and writes, or on the Models page.":"Bring one in on the Models page."))));
+  var sw1=h("label","l-sw"),c1=document.createElement("input");c1.type="checkbox";c1.id="l7Metic";c1.checked=B.meticulous!==false;c1.disabled=busy;c1.onchange=function(){B.meticulous=c1.checked;saveSoon();paintModel();};
+  sw1.appendChild(c1);sw1.appendChild(document.createTextNode("Examine each section against the material (doctoral standard; about twice the writing time)"));s.appendChild(sw1);
+  if(o.readRec){var sw2=h("label","l-sw"),c2=document.createElement("input");c2.type="checkbox";c2.id="l7FastRead";c2.checked=!!B.fastRead;c2.disabled=busy;c2.onchange=function(){B.fastRead=c2.checked;saveSoon();paintModel();};
+    sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Faster reading: "+o.readRec.customName+" takes the notes; "+(c?c.customName:"the model above")+" writes"));s.appendChild(sw2);}
+  return s;}
 /* the brief */
 function sec(title){var s=h("div","l-sec");s.appendChild(h("h3",null,esc(title)));return s;}
 function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy=R7.running||LX.busy;
@@ -331,6 +401,8 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
   var ln=h("p","l-libnote"+(LIB&&LIB.warn?" warn":""));ln.id="libNote";ln.setAttribute("aria-live","polite");ln.textContent=(LIB&&(LIB.busy||LIB.note))||"";ln.hidden=!(LIB&&(LIB.busy||LIB.note));s1.appendChild(ln);
   if(!ORDER.filter(kept).length)s1.appendChild(h("p","l-hint","Add your apps from the files you already have: each app's own page (.html), or the zip you install it from. Each is checked and kept on this device; nothing is sent anywhere."));
   box.appendChild(s1);
+  /* 6.2: how Lector reads, and with which model, in view at the top of the brief */
+  box.appendChild(howCard(busy));
   /* what it is for */
   var s2=sec("What it is for"),pseg=h("div","l-seg");pseg.innerHTML='<span class="l-thumb"></span>';
   [["portfolio","My portfolio"],["job","A job"],["programme","A programme"]].forEach(function(p){var b=h("button");b.type="button";b.textContent=p[1];b.setAttribute("data-v",p[0]);b.setAttribute("aria-pressed",B.purpose===p[0]?"true":"false");
@@ -439,20 +511,10 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
     if(o.need&&o.spare){var m=h("div","l-meter"),i=document.createElement("i");var f=Math.min(1,o.need/o.spare);i.style.width=Math.round(f*100)+"%";if(f>.85)i.className="tight";m.appendChild(i);box.appendChild(m);}
     if(!c&&o.spec){var gk=h("div","l-keys");gk.appendChild(btn("sm pri","Get "+o.spec.name+" ("+fmtBytes(o.spec.size)+")",function(){try{lineupInstall(o.key).then(function(){paintModel();},function(e){ingToast("It could not be fetched: "+(e&&e.message||e));});ingToast("Fetching "+o.spec.name+". Lector is ready to start when it arrives.");}catch(e){go("models");}}));box.appendChild(gk);}
     else if(o.spec&&!isRec&&!B.modelId){box.appendChild(h("div","need",esc("Ingenium's choice for Lector here is "+o.spec.name+" (Magister, the strongest this device can hold). Get it on the Models page; until then Lector uses "+name+".")));}
-    var det=document.createElement("details");det.appendChild(h("summary",null,"Why this model, and other choices"));
+    var det=document.createElement("details");det.appendChild(h("summary",null,"Why this model"));
     det.appendChild(h("div",null,esc(o.spec?(o.spec.why||"")+" Lector reads best with the strongest model "+devName(o.dev)+" holds; a smaller one reads faster.":"A larger model writes a better analysis; a smaller one reads faster.")));
-    var sel=document.createElement("select");sel.setAttribute("aria-label","The model Lector uses");
-    var o0=document.createElement("option");o0.value="";o0.textContent="Ingenium's choice"+(o.rec?" ("+o.rec.customName+")":"");sel.appendChild(o0);
-    readyModels().forEach(function(m){var op=document.createElement("option");op.value=m.id;op.textContent=m.customName;if(B.modelId===m.id)op.selected=true;sel.appendChild(op);});
-    sel.onchange=function(){B.modelId=sel.value||null;saveSoon();paintModel();};det.appendChild(sel);
-    var ds=h("div","l-seg");ds.innerHTML='<span class="l-thumb"></span>';[["overview","Overview"],["thorough","Every line of its code"]].forEach(function(x){var b=h("button");b.type="button";b.textContent=x[1];b.setAttribute("data-v",x[0]);b.setAttribute("aria-pressed",B.depth===x[0]?"true":"false");
-      b.onclick=function(){if(R7.running)return;B.depth=x[0];saveSoon();paintModel();paintBrief();};ds.appendChild(b);});det.appendChild(ds);
-    det.appendChild(h("div","need","Overview: its screens, its words, the notes in its code and how it is built. Every line: all of that and every line of its own code, for the deepest documents; this can take hours on a small model."));
-    /* R113: the examiner's pass, and a quicker reader */
-    var sw1=h("label","l-sw"),c1=document.createElement("input");c1.type="checkbox";c1.id="l7Metic";c1.checked=B.meticulous!==false;c1.onchange=function(){B.meticulous=c1.checked;saveSoon();paintModel();};
-    sw1.appendChild(c1);sw1.appendChild(document.createTextNode("Examine each section against the material (doctoral standard; about twice the writing time)"));det.appendChild(sw1);
-    if(o.readRec){var sw2=h("label","l-sw"),c2=document.createElement("input");c2.type="checkbox";c2.id="l7FastRead";c2.checked=!!B.fastRead;c2.onchange=function(){B.fastRead=c2.checked;saveSoon();paintModel();};
-      sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Faster reading: "+o.readRec.customName+" (Scriba) takes the notes; "+name+" writes"));det.appendChild(sw2);}
+    /* 6.2: the model, the depth and the two switches stand at the top of the brief now (How Lector reads); this keeps the reasons */
+    det.appendChild(h("div","need","A quick reading takes its screens, its words, the notes in its code and how it is built. A deep, thorough analysis takes all of that and every line of its own code, for the deepest documents; this can take hours on a small model."));
     det.appendChild(h("div","need","Ingenium chooses the strongest model this device holds for the writing, because a doctoral standard needs it; the notes may be taken by a quicker model when time matters more than nuance."));
     box.appendChild(det);segThumbs(box);}}
 function estimate(m,parts,docs){if(!m)return "";var avg=null;if(LX.times&&LX.times.length)avg=LX.times.reduce(function(a,b){return a+b;},0)/LX.times.length;
@@ -541,6 +603,8 @@ function paintLive(){var st=$("l7Stream");if(!st)return;var txt=LX.live||"",busy
   if(!c){c=h("div","l-th");c.id="l7LiveCard";var w=h("div","where");w.appendChild(h("span","tag live","Writing now"));w.appendChild(h("span","lbl"));c.appendChild(w);var b=h("div","body");c.appendChild(b);c.classList.add("open");st.appendChild(c);}
   c.querySelector(".lbl").textContent=R7.step||"";var b2=c.querySelector(".body");b2.textContent=txt.length>3000?"…"+txt.slice(-3000):txt;var car=h("span","l-caret");b2.appendChild(car);
   if(R7.follow)st.scrollTop=st.scrollHeight;paintPaperLive();}
+(function(){var pl=paintLive;paintLive=function(){var r=pl.apply(this,arguments);try{if(ASK.busy){var lv=document.querySelector('#l7Ask .l-cmp-m.lx.wait [data-live]'),t=LX.live||"";
+  if(!lv&&t){paintAsk();return r;}if(lv){lv.textContent=t.length>1200?"…"+t.slice(-1200):t;}}}catch(e){}return r;};})();
 function watchFollow(){var st=$("l7Stream");if(!st||st.__w)return;st.__w=1;st.addEventListener("scroll",function(){var atEnd=st.scrollHeight-st.scrollTop-st.clientHeight<28;R7.follow=atEnd;
   var j=st.querySelector(".l-jump");if(!atEnd&&!j&&R7.running){j=btn("pri sm l-jump","↓ Back to now",function(){R7.follow=true;R7.pin=null;markPinned();showCurrentPart();st.scrollTop=st.scrollHeight;j.remove();});st.appendChild(j);}
   else if(atEnd&&j)j.remove();},{passive:true});}
@@ -645,7 +709,7 @@ function r7Go(){if(R7.running||LX.busy){ingToast("Lector is busy. Wait for it, o
   if((kinds.indexOf("cover")>=0)&&B.purpose!=="portfolio"&&!L7().posts[B.purpose])ingToast("No "+(B.purpose==="job"?"posting":"programme's call")+" was added, so the letter is written for any reader. Add it in the brief to fit the letter to it.");
   if(o.stronger&&B.modelId)ingToast("A stronger model is ready here ("+o.stronger.customName+"). Lector writes with "+o.chosen.customName+", as you chose; change it in the brief for a stronger draft.");
   L7().job={key:setKey(apps,B.purpose),apps:apps,purpose:B.purpose,kinds:kinds,depth:B.depth||"overview",modelId:o.chosen?o.chosen.id:null,readModelId:(o.reader&&o.chosen&&o.reader.id!==o.chosen.id)?o.reader.id:null,meticulous:B.meticulous!==false,status:"reading",at:Date.now(),made:{},err:""};
-  saveState();R7.ev=[];R7.pin=null;paintStream();paintAll();if(one())setPanel("read");r7Run();}
+  saveState();R7.ev=[];R7.pin=null;paintStream();paintAll();if(one())setPanel("read");try{midTab("rd");}catch(e){}r7Run();}
 function beginDoc(){if(R7.running||LX.busy||typeof LX_PICK==="undefined"||!LX_PICK||!LX_PICK.P)return;var o=modelPlan();if(!o.link&&!o.chosen){ingToast("No model is ready on this device yet.");return;}
   var m=o.chosen,P=LX_PICK.P,parts=lxPartsFor(P,"overview",m);
   var run={id:"lx_"+Date.now().toString(36),name:LX_PICK.name,file:LX_PICK.name,kind:"doc",depth:"overview",modelId:m?m.id:null,created:Date.now(),updated:Date.now(),status:"reading",done:0,total:parts.length,facts:P.facts,
@@ -784,7 +848,7 @@ function writeAll(j){var kinds=j.kinds.filter(function(k){return !j.made[k];}),i
       LX.busy=true;LX.runId=null;LX.writing=kind;R7.docMd[kind]="# "+setName(G.apps)+" · "+docLabel(kind,G.apps,G.purpose)+"\n\n";
       addEv({k:"step",label:docLabel(kind,G.apps,G.purpose),text:"Writing the "+docLabel(kind,G.apps,G.purpose).toLowerCase()+" for "+setName(G.apps)+(G.post?", fitted to "+(G.post.title||"the posting"):"")+(G.voice&&G.writing.length?", in your own voice":"")+"."});
       R7.doc=kind;
-      return writeDoc(kind,G).then(function(md){return keepDoc(j,kind,md,G);}).then(function(){j.made[kind]=true;LX.writing=null;R7.live=null;saveState();paintAll();return next();},
+      return (kind==="functions"?atlasDoc(G):writeDoc(kind,G)).then(function(md){return keepDoc(j,kind,md,G);}).then(function(){j.made[kind]=true;LX.writing=null;R7.live=null;saveState();paintAll();return next();},
         function(e){LX.writing=null;LX.busy=false;R7.live=null;throw e;});}
     return next().then(function(){LX.busy=false;LX.writing=null;});});}
 function writeDoc(kind,G){var label=docLabel(kind,G.apps,G.purpose),head="# "+setName(G.apps)+" · "+label+"\n\n",pieces=[];
@@ -845,9 +909,54 @@ function check(md,G){var src=[];G.runs.forEach(function(r,i){src.push(lxFactsTex
     while((m=re.exec(l))){var f=m[0],n=f.replace(/,/g,"");if(+n<=12&&!/\./.test(n))continue;if(seen[f])continue;seen[f]=1;figures++;if(hay.indexOf(n)<0)unmatched.push(f);}});
   var fills=(body.match(/\[(?:your|to fill|the reader|the post|the years|the date|the organisation)[^\]]*\]/gi)||[]).length;
   return {figures:figures,unmatched:unmatched.slice(0,24),fills:fills};}
+/* 6.2 · EVERY FUNCTION: a deep reading of each app's own code, measured, with no model. For each app: its screens and rooms,
+   its keys, and every named function in its own scripts, part by part (each part named by the note at its head), with the
+   line it begins on and the note written above it. A library carried whole and minified is counted, not listed. */
+function atlasOf(name,text){var nl=[],i=-1;while((i=text.indexOf("\n",i+1))>=0)nl.push(i);function line(pos){var a=0,b=nl.length;while(a<b){var m=(a+b)>>1;if(nl[m]<pos)a=m+1;else b=m;}return a+1;}
+  var A={name:name,lines:nl.length+1,screens:[],keys:[],parts:[],fns:0,libs:0,libFns:0};
+  /* screens and rooms: sections, pages and rooms with an id, and the heading inside each */
+  var re=/<(section|div|main|article)\b[^>]*\bid="((?:page|room|section|screen|view|tab)-[\w-]+|[\w-]*(?:-page|-room|-screen|-view))"[^>]*>/gi,m;
+  while((m=re.exec(text))){var near=text.slice(m.index,m.index+4000),hm=/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i.exec(near),t=hm?hm[1].replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim():"";
+    if(A.screens.length<400)A.screens.push({id:m[2],title:t.slice(0,90),line:line(m.index)});}
+  /* keys written in the page itself (the ones the scripts draw are named in their parts) */
+  var kr=/<button\b([^>]*)>([\s\S]{0,400}?)<\/button>/gi;
+  while((m=kr.exec(text))){var at=m[1],lab=(/aria-label="([^"]{1,120})"/i.exec(at)||/title="([^"]{1,120})"/i.exec(at)||[])[1]||m[2].replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim(),idm=/\bid="([^"]{1,60})"/i.exec(at);
+    if(lab&&!/^[\s\W]*$/.test(lab)&&A.keys.length<1500)A.keys.push({label:lab.slice(0,80),id:idm?idm[1]:"",line:line(m.index)});}
+  /* every script of its own, part by part */
+  var sr=/<script\b([^>]*)>([\s\S]*?)<\/script>/gi,n=0;
+  while((m=sr.exec(text))){var attrs=m[1],code=m[2];if(/\bsrc=/i.test(attrs))continue;var ty=(/\btype="([^"]*)"/i.exec(attrs)||[])[1]||"";
+    if(ty&&!/^(text\/javascript|module|application\/javascript)$/i.test(ty))continue;if(code.length<40)continue;n++;
+    var start=m.index+m[0].indexOf(">")+1,L0=line(start),lines=code.split("\n").length,avg=code.length/Math.max(1,lines);
+    var head=((/^\s*(?:try\{[^}]*\}catch\(_\)\{\})?\s*\/\*\s*([^\n*]{4,120})/.exec(code)||/^\s*\/\/\s*([^\n]{4,120})/.exec(code)||[])[1]||((/\bid="([^"]+)"/i.exec(attrs)||[])[1]?"Script “"+(/\bid="([^"]+)"/i.exec(attrs)||[])[1]+"”":"Script "+n)).trim();
+    var fr=/(?:\bfunction\s+([A-Za-z_$][\w$]*)\s*\(|(?:^|[;{}\n,]\s*)(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s+)?(?:function\b|\([^()]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)|(?:^|[;{}\n])\s*((?:window|W|self)\.[A-Za-z_$][\w$]*|[A-Za-z_$][\w$]*\.prototype\.[A-Za-z_$][\w$]*)\s*=\s*function\b)/g,f,list=[];
+    while((f=fr.exec(code))){var nmF=f[1]||f[2]||f[3];if(!nmF||nmF.length<3)continue;var pos=f.index,before=code.slice(Math.max(0,pos-360),pos);
+      var note=(/\/\*([^*]|\*(?!\/)){3,320}\*\/\s*$/.exec(before)||/(?:^|\n)\s*\/\/([^\n]{3,200})\n?\s*$/.exec(before)||[""])[0].replace(/^\s*\/\*+|\*+\/\s*$|^\s*\/\//g,"").replace(/\s+/g," ").trim();
+      list.push({name:nmF,line:L0+code.slice(0,pos).split("\n").length-1+(code.charAt(pos)==="\n"?1:0),note:note.slice(0,170)});}
+    if(avg>420&&lines<60){A.libs++;A.libFns+=list.length;A.parts.push({title:head,line:L0,lines:lines,lib:true,count:list.length});continue;}
+    A.fns+=list.length;if(list.length)A.parts.push({title:head,line:L0,lines:lines,fns:list});}
+  return A;}
+function atlasMd(G,atl){var md=["Measured from each app's own page on "+today()+": every screen and room, every key written in the page, and every named function in its own code, with the line it begins on and the note written above it. Nothing here was written by a model; the counts are exact."];
+  function cell(t){return String(t==null?"":t).replace(/\|/g,"\\|").replace(/\n/g," ");}
+  atl.forEach(function(A){
+    md.push("## "+A.name+": in brief\n| Measure | Count |\n|---|---|\n| Lines in its page | "+A.lines.toLocaleString("en-GB")+" |\n| Screens and rooms | "+A.screens.length+" |\n| Keys written in the page | "+A.keys.length+" |\n| Parts of its own code | "+A.parts.filter(function(p){return !p.lib;}).length+" |\n| Named functions in its own code | "+A.fns.toLocaleString("en-GB")+" |"+(A.libs?"\n| Libraries carried whole (minified) | "+A.libs+", with "+A.libFns.toLocaleString("en-GB")+" functions |":""));
+    if(A.screens.length)md.push("## "+A.name+": its screens and rooms\n| Screen | Its heading | Line |\n|---|---|---|\n"+A.screens.map(function(x){return "| `"+cell(x.id)+"` | "+cell(x.title||"·")+" | "+x.line+" |";}).join("\n"));
+    if(A.keys.length)md.push("## "+A.name+": its keys\n| Key | Name in the code | Line |\n|---|---|---|\n"+A.keys.map(function(x){return "| "+cell(x.label)+" | "+(x.id?"`"+cell(x.id)+"`":"·")+" | "+x.line+" |";}).join("\n"));
+    md.push("## "+A.name+": its functions, part by part");
+    A.parts.forEach(function(p){if(p.lib){md.push("### "+cell(p.title)+" (line "+p.line+")\nA library carried whole and minified: "+p.count+" functions, counted and not listed.");return;}
+      md.push("### "+cell(p.title)+" (lines "+p.line+" to "+(p.line+p.lines-1)+", "+p.fns.length+" function"+(p.fns.length===1?"":"s")+")\n| Function | Line | The note above it |\n|---|---|---|\n"+p.fns.map(function(f){return "| `"+cell(f.name)+"` | "+f.line+" | "+cell(f.note||"·")+" |";}).join("\n"));});});
+  return md.join("\n\n");}
+function atlasDoc(G){var label=docLabel("functions",G.apps,G.purpose),head="# "+setName(G.apps)+" · "+label+"\n\n",atl=[],i=0;
+  return (function next(){if(LX.stop)return Promise.reject(stopErr());if(i>=G.apps.length)return Promise.resolve();var k=G.apps[i++];
+    setLive("functions",G.apps.map(nm),i-1,"Measuring every function of "+nm(k)+" ("+i+" of "+G.apps.length+")");
+    return libText(k).then(function(text){if(!text)throw new Error(nm(k)+" is no longer on this device. Add it again (Your apps).");
+      return new Promise(function(res){setTimeout(function(){var A=atlasOf(nm(k),text);atl.push(A);
+        addEv({k:"done",label:"Every function · "+nm(k),text:A.fns.toLocaleString("en-GB")+" named functions in "+A.parts.filter(function(p){return !p.lib;}).length+" parts of its own code, "+A.screens.length+" screens and rooms, "+A.keys.length+" keys written in the page"+(A.libs?"; "+A.libs+" librar"+(A.libs===1?"y":"ies")+" carried whole":"")+"."});
+        R7.docMd.functions=head+atlasMd(G,atl);res();},30);});}).then(next);})()
+    .then(function(){return head+atlasMd(G,atl);});}
 function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{apps:j.apps.slice(),purpose:j.purpose,docs:{},older:{}};S.docs=S.docs||{};S.older=S.older||{};
-  var sf=styleFix(md);md=sf.md;R7.docMd[kind]=md;
-  var chk=check(md,G),ref=IngBig.newId();
+  /* 6.2: Every function is measured, not written: its numbers are lines and counts, so it is neither restyled nor checked */
+  var sf=kind==="functions"?{md:md,line:""}:styleFix(md);md=sf.md;R7.docMd[kind]=md;
+  var chk=kind==="functions"?{figures:0,unmatched:[],fills:0}:check(md,G),ref=IngBig.newId();
   addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures were not found in the measures, the analysis, your CV or the posting, and are marked for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+".":"Every figure ("+chk.figures+") was found in the measures, the analysis, your CV or the posting."):"No figures to check.")+
     (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":G.runs.length===4?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
   return IngBig.put(ref,md).then(function(){var old=S.docs[kind];if(old){S.older[kind]=[old].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}}
@@ -925,6 +1034,9 @@ function askAbout(G){return G&&G.runs&&G.runs.length?about(G):(listNames(G&&G.ap
 function askMsgs(mode,o,G,sc){var label=docLabel(o.kind,G.apps,G.purpose).toLowerCase(),me="MY REQUEST:\n"+o.text+"\n\n";
   if(mode==="sec")return [{role:"system",content:sysW()},{role:"user",content:"Below is "+(o.title?"the section \""+o.title+"\" of ":"")+"my "+label+" about "+askAbout(G)+forLine(G)+". Rewrite it as I ask, and change nothing I have not asked you to change.\n\n"+me+
     (o.title?"THE SECTION AS IT STANDS:\n":"THE TEXT AS IT STANDS:\n")+o.body+"\n\nReturn only the rewritten text: no heading, no note on what you changed, no remark before or after it. "+ASK_RULES+"\n\n"+askContext(G,sc,o.kind,o.title)}];
+  /* 6.2: a request for every document, applied a section at a time: a section it does not bear on comes back as it was */
+  if(mode==="every")return [{role:"system",content:sysW()},{role:"user",content:"Below is "+(o.title?"the section \""+o.title+"\" of ":"")+"my "+label+" about "+askAbout(G)+forLine(G)+". I want this request followed in every document I have, wherever it applies.\n\n"+me+
+    (o.title?"THE SECTION AS IT STANDS:\n":"THE TEXT AS IT STANDS:\n")+o.body+"\n\nIf my request does not bear on this text, reply with the single word UNCHANGED and nothing else. Otherwise return only the rewritten text: no heading, no note on what you changed, no remark before or after it. Change nothing I have not asked you to change. "+ASK_RULES+"\n\n"+askContext(G,sc,o.kind,o.title)}];
   if(mode==="whole")return [{role:"system",content:sysW()},{role:"user",content:"Below is my "+label+" about "+askAbout(G)+forLine(G)+", whole. Rewrite it as I ask, and change nothing I have not asked you to change.\n\n"+me+
     "THE DOCUMENT AS IT STANDS:\n"+o.body+"\n\nReturn the whole document, every section with its heading line (## and its title) as it stands unless I ask to change it, and nothing before or after it. "+ASK_RULES+"\n\n"+askContext(G,sc,o.kind,"")}];
   return [{role:"system",content:sysW()},{role:"user",content:me+"Answer it directly, in plain prose and no longer than it needs, from the material below"+(o.body?" and from my "+label+" as it stands":"")+". "+ASK_RULES+(o.body?"\n\nMY "+label.toUpperCase()+" AS IT STANDS:\n"+cut(o.body,Math.floor(room()*sc*0.3)):"")+"\n\n"+askContext(G,sc,o.kind||"dossier","")}];}
@@ -939,10 +1051,27 @@ function askUse(kind,ref){var S=L7().sets[curKey()];if(!S||!S.docs||!S.docs[kind
 function askCopy(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){ingToast("Copied.");},function(){askCopy2(t);});return;}}catch(e){}askCopy2(t);}
 function askCopy2(t){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;left:-9999px;top:0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ingToast("Copied.");}catch(e){ingToast("It could not be copied here.");}a.remove();}
 var ASK={busy:false,entry:null};
+/* 6.2: the documents written for this set, in the order of the brief */
+function askWritten(){var S=L7().sets[curKey()];if(!S||!S.docs)return [];return KINDS.map(function(d){return d[0];}).filter(function(k){return S.docs[k]&&k!=="functions";});}
+/* 6.2: a request followed in every document already written, a section at a time, and kept for all writing from now on */
+function askEvery(text,e,G){var kinds=askWritten(),done=[],i=0;e.multi=[];
+  return (function nextDoc(){if(LX.stop)return Promise.reject(stopErr());if(i>=kinds.length)return Promise.resolve();var kind=kinds[i++],st=stored(kind),label=docLabel(kind,G.apps,G.purpose);
+    return IngBig.load(st.ref).then(function(m){var md=unmark(m||""),d=askParts(md),changed=0,k=0,parts=d.parts.length?d.parts:null;
+      function piece(title,body,put){R7.step="Following your request in the "+label.toLowerCase()+(title?" · "+title:"")+" ("+i+" of "+kinds.length+")";paintProgress();paintAsk();
+        return ask(function(sc){return askMsgs("every",{text:text,kind:kind,title:title,body:body},G,sc);},Math.min(3200,Math.ceil(body.length/3)+600),0.4).then(function(x){var nb=clean(x,title);
+          if(!nb||/^\W*UNCHANGED\W*$/i.test(nb))return;put(nb);changed++;});}
+      var chain=Promise.resolve();
+      if(!parts){var b=askBodyOnly(d);chain=piece(null,b.body,function(nb){md=(b.title?b.title+"\n\n":"")+nb;});}
+      else parts.forEach(function(p,idx){if(/^(References|The works)$/i.test(p.title))return;chain=chain.then(function(){if(LX.stop)throw stopErr();return piece(p.title,p.body,function(nb){d.parts[idx]={title:p.title,body:nb};});});});
+      return chain.then(function(){if(!changed){done.push(label+" (it already followed it)");return;}var nmd=parts?askJoin(d):md;
+        return askKeep(kind,nmd,G).then(function(r){e.multi.push({kind:kind,prevRef:r.prevRef,newRef:r.newRef});done.push(label+" ("+changed+" section"+(changed===1?"":"s")+" changed)");});});}).then(nextDoc);})()
+    .then(function(){return done;});}
 function askSend(text,target){text=String(text||"").trim();if(!text)return;var kind=R7.doc||"analysis",th=askThread();
   var e={id:"q"+Date.now().toString(36),at:Date.now(),text:text,kind:kind,target:target,status:"working",reply:""};
   if(target==="all"){askReqs().push({id:e.id,text:text,at:e.at});e.status="kept";e.reply="Kept. Lector follows it in everything it writes for "+(setName(curApps())||"this set")+" from now on"+(LX.busy&&LX.writing?", beginning with the next section it writes":"")+". It shows above this box, where you can take it away.";
     th.push(e);askTrim();saveState();paintAsk();return;}
+  if(target==="every"&&!askWritten().length){target="all";e.target="all";askReqs().push({id:e.id,text:text,at:e.at});e.status="kept";
+    e.reply="No document is written for "+(setName(curApps())||"this set")+" yet, so Lector keeps the request and follows it in everything it writes. Press Start reading in the brief.";th.push(e);askTrim();saveState();paintAsk();return;}
   if(ASK.busy||LX.busy||R7.running){e.status="error";e.reply="Lector is at work on this set now. Send the request again when it has finished, or keep it for the writing so every piece written from now on follows it.";e.offerKeep=true;th.push(e);askTrim();saveState();paintAsk();return;}
   var o=modelPlan();if(!o.chosen){e.status="error";e.reply="No model is ready on this device yet, so Lector cannot write. Bring one in on the Models page, then send the request again.";th.push(e);askTrim();saveState();paintAsk();return;}
   th.push(e);askTrim();saveState();ASK.busy=true;ASK.entry=e;LX.busy=true;LX.stop=false;R7.askModel=o.chosen.id;paintAsk();
@@ -951,6 +1080,8 @@ function askSend(text,target){text=String(text||"").trim();if(!text)return;var k
   var G0;
   load.then(function(m){md=unmark(m||"");return gather(j).catch(function(){return {runs:[],an:[],cv:"",writing:[],letters:[],voice:true,post:null,apps:j.apps,purpose:j.purpose,sources:[]};});})
   .then(function(G){G0=G;var d=askParts(md);
+    if(target==="every"){e.mode="every";askReqs().push({id:e.id,text:text,at:e.at});saveState();
+      return askEvery(text,e,G).then(function(done){e.status="done";e.reply="Kept for everything Lector writes for "+(setName(G.apps)||"this set")+" from now on, and followed in the documents already written: "+done.join("; ")+".";});}
     if(target==="answer"||!st){e.mode="answer";R7.step="Answering your request";paintProgress();
       return ask(function(sc){return askMsgs("answer",{text:text,kind:kind==="analysis"?"dossier":kind,body:md},G,sc);},1400,0.5).then(function(x){e.reply=clean(x);e.status="done";});}
     var whole=target==="whole",idx=-1,title=null;
@@ -974,13 +1105,16 @@ function askSend(text,target){text=String(text||"").trim();if(!text)return;var k
         e.reply="Rewrote “"+p.title+"” as you asked ("+e.after+" words; it had "+e.before+")."+(e.inView?" Your request named no section, so Lector took the one you were reading.":"")+
           (r.chk&&r.chk.unmatched&&r.chk.unmatched.length?" "+r.chk.unmatched.length+" figure"+(r.chk.unmatched.length>1?"s are":" is")+" marked for you to check.":"");});});})
   .then(null,function(err){e.status=err&&err.stopped?"stopped":"error";e.reply=err&&err.stopped?"Stopped. Nothing was changed.":"It could not be done: "+String(err&&err.message||err)+" Nothing was changed.";})
-  .then(function(){ASK.busy=false;ASK.entry=null;LX.busy=false;LX.stop=false;LX.live="";R7.step="";R7.askModel=null;saveState();paintProgress();paintBrief();paintDoc();});}
+  .then(function(){ASK.busy=false;ASK.entry=null;LX.busy=false;LX.stop=false;LX.live="";R7.step="";R7.askModel=null;saveState();paintProgress();paintBrief();paintDoc();paintAsk();});}
 function askTrim(){var th=askThread();while(th.length>ASKS_MAX)th.shift();}
 function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis",st=kind!=="analysis"?stored(kind):null,th=askThread(),reqs=askReqs();
   if(!box.__built){box.__built=true;box.innerHTML=
-    '<div class="l-cmp-h"><b>Ask Lector</b><span class="n"></span><button type="button" class="l-cmp-tg" aria-expanded="true">Hide the conversation</button></div>'+
+    '<div class="l-cmp-intro">Ask for a change to a document, or for something Lector follows in everything it writes. Lector keeps to your recipe, your facts and the material; it changes only what you ask, and every change can be put back.</div>'+
+    '<div class="l-cmp-reqs-h" hidden>Lector follows these in everything it writes for this set:</div>'+
     '<div class="l-cmp-reqs" role="group" aria-label="Requests kept for the writing"></div>'+
+    '<div class="l-cmp-h"><span class="n"></span><button type="button" class="l-cmp-tg" aria-expanded="true">Hide the conversation</button></div>'+
     '<div class="l-cmp-th" role="log" aria-live="polite" aria-label="Your requests and Lector\'s answers"></div>'+
+    '<div class="l-cmp-empty">Nothing asked yet. Write a request below: for example, “Make the summary shorter and plainer”, or “Name Fabrica in every document”.</div>'+
     '<form class="l-cmp-f"><div class="l-cmp-in"><textarea rows="1" aria-label="Your request to Lector" placeholder="Write your request to Lector…" aria-describedby="l7AskHint"></textarea></div>'+
     '<button type="submit" class="l-btn pri l-cmp-send" aria-label="Send the request" title="Send (Enter)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 16V4"/><path d="M5 9l5-5 5 5"/></svg></button></form>'+
     '<div class="l-cmp-row"><label><span>For</span> <select aria-label="What the request is for"></select></label>'+
@@ -993,19 +1127,24 @@ function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis
       ta.value="";grow();askSend(t,sel.value);});
     box.querySelector(".l-cmp-tg").onclick=function(){var S=L7();S.askShut=!S.askShut;saveSoon();paintAsk();};}
   var S=L7(),shut=!!S.askShut,tg=box.querySelector(".l-cmp-tg"),thb=box.querySelector(".l-cmp-th");
-  box.querySelector(".n").textContent=th.length?"· "+th.length+" request"+(th.length>1?"s":""):"";
+  box.querySelector(".n").textContent=th.length?th.length+" request"+(th.length>1?"s":""):"";
+  var an=$("l7AskN");if(an)an.textContent=ASK.busy?"…":th.length?String(th.length):"";
   tg.hidden=!th.length;tg.textContent=shut?"Show the conversation":"Hide the conversation";tg.setAttribute("aria-expanded",shut?"false":"true");thb.hidden=shut||!th.length;
+  box.querySelector(".l-cmp-empty").hidden=!!th.length;box.querySelector(".l-cmp-reqs-h").hidden=!reqs.length;
   /* the requests kept for the writing */
   var rb=box.querySelector(".l-cmp-reqs");rb.innerHTML="";rb.hidden=!reqs.length;
   reqs.forEach(function(r){var c=h("span","l-cmp-req");c.title=r.text;c.appendChild(h("span",null,esc(r.text)));var x=document.createElement("button");x.type="button";x.textContent="×";x.setAttribute("aria-label","Stop following: "+r.text);
     x.onclick=function(){var a=askReqs(),i=a.indexOf(r);if(i>=0)a.splice(i,1);saveState();paintAsk();};c.appendChild(x);rb.appendChild(c);});
   /* what a request can be for, with the document shown */
   var sel=box.querySelector("select"),was=sel.value,opts=[];
-  if(st){opts.push(["auto","This document: Lector finds the place"]);opts.push(["whole","The whole document"]);
+  var written=askWritten().length;
+  if(st&&kind!=="functions"){opts.push(["auto","This document: Lector finds the place"]);opts.push(["whole","The whole document"]);
     var md=R7.cur&&R7.cur.kind===kind?R7.cur.md:"";askParts(md).parts.forEach(function(p,i){if(/^(References|The works)$/i.test(p.title))return;opts.push(["sec:"+i,"Only “"+(p.title.length>48?p.title.slice(0,46)+"…":p.title)+"”"]);});}
-  opts.push(["all","Everything Lector writes for this set"]);opts.push(["answer","Just answer me"]);
+  /* 6.2: a request for everything is followed in the documents already written too, not only in the writing to come */
+  if(written)opts.push(["every","Every document written ("+written+"), and all writing from now on"]);
+  opts.push(["all","Only the writing from now on"]);opts.push(["answer","Just answer me"]);
   sel.innerHTML="";opts.forEach(function(o){var op=document.createElement("option");op.value=o[0];op.textContent=o[1];sel.appendChild(op);});
-  sel.value=opts.some(function(o){return o[0]===was;})?was:(st?"auto":"all");
+  sel.value=opts.some(function(o){return o[0]===was;})?was:(st&&kind!=="functions"?"auto":written?"every":"all");
   var ta=box.querySelector("textarea");ta.placeholder=st?"Write your request to Lector…":kind==="analysis"?"A request to keep for the writing, or a question…":"A request for the writing, or a question…";
   box.querySelector(".l-cmp-send").disabled=ASK.busy;
   /* the conversation */
@@ -1014,11 +1153,17 @@ function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis
     var forTxt=e.target==="all"?"For everything written for this set":e.target==="answer"?"To answer":e.title?"For “"+e.title+"”":e.target==="whole"?"For the whole document":"For "+(e.kind==="analysis"?"the notes and analysis":docLabel(e.kind,curApps(),curPurpose()).toLowerCase());
     me.appendChild(h("span","for",esc(forTxt)));thb.appendChild(me);
     var lx=h("div","l-cmp-m lx"+(e.status==="error"||e.status==="stopped"?" err":e.status==="working"?" wait":""));
-    if(e.status==="working"){lx.appendChild(document.createTextNode(R7.step?R7.step+"… The words appear in the Thinking panel as they are written.":"Working…"));
+    if(e.status==="working"){lx.appendChild(document.createTextNode(R7.step?R7.step+"…":"Working…"));
+      /* 6.2: the words as Lector writes them, here in the conversation */
+      var lv=h("span","live");lv.setAttribute("data-live","1");var t0=LX.live||"";lv.textContent=t0?(t0.length>1200?"…"+t0.slice(-1200):t0):"";if(t0)lx.appendChild(lv);
       var a0=h("div","acts"),stp=btn("quiet","Stop",function(){LX.stop=true;try{if(window.Engine&&Engine.abort)Engine.abort();}catch(x){}try{if(typeof cloudAbort==="function")cloudAbort();}catch(x){}});a0.appendChild(stp);lx.appendChild(a0);}
     else lx.appendChild(document.createTextNode(e.reply||""));
     var acts=h("div","acts");
     if(e.status==="done"&&e.mode==="answer")acts.appendChild(btn("quiet","Copy",function(){askCopy(e.reply);}));
+    if(e.status==="done"&&e.multi&&e.multi.length){acts.appendChild(btn("quiet",e.undone?"Use the rewrites again":"Put back the versions before",function(){
+      if(ASK.busy||LX.busy){ingToast("Lector is busy. Wait a moment.");return;}var miss=0;
+      e.multi.forEach(function(x){if(!askUse(x.kind,e.undone?x.newRef:x.prevRef))miss++;});if(miss)ingToast(miss+" of them "+(miss===1?"is":"are")+" no longer kept: Lector keeps the last three versions.");
+      e.undone=!e.undone;saveState();paintDoc();}));}
     if(e.status==="done"&&e.prevRef&&e.kind===kind){acts.appendChild(btn("quiet",e.undone?"Use the rewrite again":"Put back the version before",function(){
       if(ASK.busy||LX.busy){ingToast("Lector is busy. Wait a moment.");return;}
       if(!askUse(e.kind,e.undone?e.newRef:e.prevRef)){ingToast("That version is no longer kept: Lector keeps the last three.");return;}e.undone=!e.undone;saveState();paintDoc();}));
@@ -1151,6 +1296,8 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.cl
 (function(){try{var j=L7().job;if(j&&(j.status==="reading"||j.status==="writing"))j.status=j.status==="writing"?"writing":"paused";}catch(e){}})();
 ORDER.forEach(function(k){if(L7().brief.apps.indexOf(k)>=0)prepare(k);});
 window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost};
+/* 6.2: for the tests */
+try{window.IngLector.atlasOf=atlasOf;window.IngLector.atlasMd=atlasMd;window.IngLector.atlasDoc=atlasDoc;window.IngLector.midTab=midTab;window.IngLector.askWritten=askWritten;window.IngLector.askSend=askSend;}catch(e){}
 try{if($("page-lector").classList.contains("active")){document.body.classList.add("lx7-on");render();}}catch(e){}
 })();
 ;try{window.__ingParts["p40"]="running";}catch(_){}

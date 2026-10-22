@@ -73,10 +73,17 @@ async function tree(p) {
       const p = await b.newPage({ viewport: { width: vp.w, height: vp.h } });
       const errs = []; p.on('pageerror', e => errs.push(e.message));
       await p.goto(URL_); await ready(p);
-      if (theme === 'night') await p.evaluate(() => { try { setTheme('night'); } catch (e) { document.body.setAttribute('data-theme', 'night'); } });
-      const pages = FORGE ? ['the_forge'] : ING_PAGES;
+      let pages = ING_PAGES;
+      if (FORGE) {
+        // the Forge: its own theme switch, through the door into the Editor, then every room on the rail
+        await p.evaluate(t => { try { state.theme = t === 'night' ? 'night' : 'light'; applyTheme(); } catch (e) { } }, theme);
+        await p.evaluate(() => { const d = document.getElementById('cd-door'); const k = d && [...d.querySelectorAll('button')].find(x => /^Open the Editor/.test(x.textContent.trim())); if (k) k.click(); });
+        await p.waitForTimeout(900);
+        pages = await p.evaluate(() => [...document.querySelectorAll('.nav-inner [data-room]')].filter(x => x.offsetParent).map(x => x.getAttribute('data-room')).slice(0, 14));
+      } else if (theme === 'night') await p.evaluate(() => { try { setTheme('night'); } catch (e) { document.body.setAttribute('data-theme', 'night'); } });
       for (const pg of pages) {
-        if (!FORGE) { await p.evaluate(pg => { try { go(pg); } catch (e) {} }, pg); await p.waitForTimeout(700); }
+        if (FORGE) { await p.evaluate(r => { const k = document.querySelector('.nav-inner [data-room="' + r + '"]'); if (k) k.click(); }, pg); await p.waitForTimeout(900); }
+        else { await p.evaluate(pg => { try { go(pg); } catch (e) {} }, pg); await p.waitForTimeout(700); }
         const r = await tree(p); r.page = pg; r.vp = vp.name; r.theme = theme; all.push(r);
         bad += r.problems.length;
         console.log((r.problems.length ? 'FAIL ' : 'PASS ') + vp.name + ' ' + theme + ' ' + pg + ': ' + r.controls + ' controls, ' + r.headings + ' headings, ' + r.problems.length + ' problems' + (r.soft.length ? ', ' + r.soft.length + ' soft notes' : ''));

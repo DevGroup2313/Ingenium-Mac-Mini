@@ -413,7 +413,8 @@ function runMeasure(btn){if(BUSY)return;if(btn){btn.disabled=true;btn.textConten
     var S=st();return Promise.all(S.docs.map(function(d){return check(d).catch(function(){});}));})
   .then(function(){place(true);if(document.getElementById("lxRx"))paintSheet();},function(e){toast(String(e&&e.message||e));place(true);});}
 function place(force){var box=document.getElementById("l7Bf");if(!box)return;var have=document.getElementById("lxRxSec");if(have&&!force)return;
-  var s=sec();if(have)have.replaceWith(s);else{var first=box.querySelector(".l-sec");if(first&&first.nextSibling)box.insertBefore(s,first.nextSibling);else box.appendChild(s);}}
+  /* 6.2: after How Lector reads, when the brief has it, so the reading's choices come first */
+  var s=sec();if(have)have.replaceWith(s);else{var first=document.getElementById("l7How")||box.querySelector(".l-sec");if(first&&first.nextSibling)box.insertBefore(s,first.nextSibling);else box.appendChild(s);}}
 var SHEET={tab:"facts",open:{}};
 function openSheet(tab){SHEET.tab=tab||SHEET.tab;var host=document.getElementById("lx7")||document.body,sh=document.getElementById("lxRx");
   if(!sh){sh=el("div");sh.id="lxRx";sh.setAttribute("role","dialog");sh.setAttribute("aria-modal","true");sh.setAttribute("aria-label","The recipe");

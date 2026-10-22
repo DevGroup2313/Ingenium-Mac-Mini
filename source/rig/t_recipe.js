@@ -37,7 +37,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(m.cd && m.cd.pass === '1058' && m.cd.tour === 201 && m.cd.tutor === 323 && m.cd.read, 'Carpe Diem is measured from its kept copy: build 1058, 201 tour cards, 323 tutor entries', JSON.stringify(m.cd));
   ok(m.forge && /^\d{3}$/.test(m.forge.pass || '') && /^9s\d+$/.test(m.forge.stamp || '') && m.forge.tour === 32, 'The Forge is measured: its pass and stamp from its About panel, 32 tour cards (639: a card for Fabrica) (its lean copy carries no apps)', JSON.stringify(m.forge));
   ok(m.inkwell && m.inkwell.version === '7.49' && m.inkwell.tour === 49, 'Inkwell is measured: 7.49, 49 tour cards', JSON.stringify(m.inkwell));
-  ok(m.ingenium && /^5\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 34, 'Ingenium is measured: its version, 18 house models, 34 in the catalogue', JSON.stringify(m.ingenium));
+  ok(m.ingenium && /^[5-9]\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 34, 'Ingenium is measured: its version, 18 house models, 34 in the catalogue', JSON.stringify(m.ingenium));
   ok(m.inkwell && m.inkwell.req && m.inkwell.req.loopback.length === 1 && m.inkwell.req.outside.length === 0, 'what an app tries is written down: Inkwell\'s check of its loopback helper, refused in the frame', JSON.stringify(m.inkwell && m.inkwell.req));
   ok(left.length === 0, 'nothing left the page while the apps were measured', JSON.stringify(left.slice(0, 5)) + ' in ' + ms + ' ms');
   const isolated = await p.evaluate(() => ({ v: ING_VERSION, kept: Object.keys(libState().apps).length, rx: !!state.recipe.facts.cd }));
