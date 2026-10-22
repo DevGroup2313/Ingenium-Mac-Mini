@@ -28,7 +28,7 @@
 (function(){
 "use strict";
 if(window.__forgePreviewSteady644)return;window.__forgePreviewSteady644=1;
-var held=[],on=false,timer=0,QUIET=300;
+var held=[],on=false,timer=0,QUIET=300,typedAt=0;
 function $(id){return document.getElementById(id);}
 /* the preview stands beside the page (wider than 900 px) or floats over it */
 function previewUp(){
@@ -77,10 +77,12 @@ function busy(){
 }
 /* the keys that scroll the page; never while typing */
 var KEYS={PageDown:1,PageUp:1,Home:1,End:1,ArrowDown:1,ArrowUp:1," ":1,Spacebar:1};
+function field(t){return !!(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)));}
 function key(e){
-  if(!KEYS[e.key])return;
   var t=e.target;
-  if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+  /* a key in a field: the page may scroll to follow the caret a moment later, and that is typing too */
+  if(field(t)){typedAt=Date.now();return;}
+  if(!KEYS[e.key])return;
   busy();
 }
 function scrolled(e){
@@ -88,6 +90,8 @@ function scrolled(e){
   if(e.target!==sc)return;
   /* the clip is lifted beside the preview: the page never moves sideways */
   if(sc.scrollLeft&&previewUp())sc.scrollLeft=0;
+  /* the page following the caret while someone types holds nothing */
+  if(Date.now()-typedAt<500&&field(document.activeElement))return;
   busy();
 }
 try{

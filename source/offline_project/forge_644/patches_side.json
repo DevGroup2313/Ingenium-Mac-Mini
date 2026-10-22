@@ -1,0 +1,7 @@
+[
+ {
+  "why": "the side column asks the fit (blocks/forge_side_fit.html) where each key goes; with no fit, or where the column fits, it is as it was",
+  "old": "var n=((document.body&&document.body.classList&&document.body.classList.contains(\"cd-coarse\"))?116:52)+56*i;",
+  "new": "var n=(typeof window.__f644Col===\"function\"?window.__f644Col(i,IDS):((document.body&&document.body.classList&&document.body.classList.contains(\"cd-coarse\"))?116:52)+56*i);"
+ }
+]

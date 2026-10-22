@@ -13,17 +13,14 @@ body.cd-dock-collapsed #forge-quiet-fab,body.cd-win-folded #forge-quiet-fab{tran
 html.cd-nested body.cd-in-window #forge-quiet-fab{display:none !important}
 body:has(#cd-door) #forge-quiet-fab,body:has(#demo-entry) #forge-quiet-fab,body:has(#pomo-modal) #forge-quiet-fab,body.cd-forge-open #forge-quiet-fab{display:none !important}
 html[data-sc-calm] #forge-quiet-fab > *,body[data-motion="minimal"] #forge-quiet-fab > *{animation:none !important}
-/* on a short screen (a phone held sideways, a low window) a sixth key would push the column up into the bar at the
-   top, so the leaf steps aside there and the column is as it was; Focus keeps its way in, beside the clock of Now */
-@media (max-height:480px){html body #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab{display:none !important}}
-@media (max-height:560px){html body.cd-coarse #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab{display:none !important}}
+/* the leaf stays in the column on every screen, as in Ingenium (the owner's words, 22 October 2026: "I want the leaf Quiet
+   Screen emoji on the side buttons in the same way that it is placed on Ingenium"); on a short screen the column closes up
+   to make room (blocks/forge_side_fit.html) */
 /* the leaf rests when the device asks for less motion (the moon's breathing, copied above, is written stronger) */
 @media (prefers-reduced-motion:reduce){html body #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab > *{animation:none !important}}
 /* the way in at the top of Focus: beside the clock of Now */
 #room-focus .sc-head > .forge-quiet-way{margin-left:auto;white-space:nowrap}
 #room-focus .sc-head > .forge-quiet-way + .sc-clock{margin-left:0}
-/* a timed note that comes while the screen is open waits until after */
-html[data-qsc-open] #sc-toast[data-fq-held]{visibility:hidden !important}
 /* the screen's words in the Forge's own serif and sans */
 #forge-quiet{--qsc-serif:var(--cd-serif,Georgia,"Iowan Old Style","Times New Roman",serif);--qsc-sans:var(--cd-sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif)}
 #forge-quiet .qsc-big{letter-spacing:.01em}
@@ -54,26 +51,12 @@ var QS=QuietScreen.create({id:"forge-quiet",look:LOOK,night:night,
   still:function(){return minimal()||calm();},
   /* "💭 A thought came in" while the Inbox is switched on */
   tc:function(){var f=F(),s=SC();try{if(s&&!s.on("inbox"))return null;}catch(e){}return f&&f.tc?f.tc:null;},
-  onOpen:holdOn,onClose:holdOff,
+  /* a timed note (five minutes before the next item, the end of the two minutes) waits until after; a note that answers
+     a press made here (a thought kept) is shown at once; a thought that asked to come back meanwhile comes after */
+  hold:{toast:function(){return $("sc-toast");},replay:function(h){var s=SC();if(s)s.toast(h,9000,true);},
+    after:function(){var f=F();if(f&&f.tc&&f.tc.tick)f.tc.tick();}},
   returnTo:function(){var k=$("forge-quiet-fab");if(seen(k))return k;var w=document.querySelector("#room-focus .forge-quiet-way");return seen(w)?w:null;}});
 window.forgeQuiet={open:function(){QS.open();},close:function(){QS.close();},isOpen:function(){return QS.isOpen();},screen:QS};
-
-/* ---- what waits while it is open: a timed note (five minutes before the next item, the end of the two minutes)
-   comes back after; a note that answers a press made here (a thought kept) is shown at once ---- */
-var held=null,moBody=null,moToast=null;
-function look(){var t=$("sc-toast");if(!t||!QS.isOpen())return;
-  if(moToast&&moToast.__t!==t){try{moToast.disconnect();}catch(e){}moToast=null;}
-  if(!moToast){try{moToast=new MutationObserver(look);moToast.__t=t;moToast.observe(t,{attributes:true,attributeFilter:["class"],childList:true,characterData:true,subtree:true});}catch(e){}}
-  if(t.classList.contains("show")&&!t.hasAttribute("data-fq-held")&&Date.now()-QS.lastInput()>1500){held=t.textContent;t.setAttribute("data-fq-held","1");}
-  else if(!t.classList.contains("show")&&t.hasAttribute("data-fq-held"))t.removeAttribute("data-fq-held");}
-function holdOn(){held=null;try{moBody=new MutationObserver(look);moBody.observe(document.body,{childList:true});}catch(e){}look();}
-function holdOff(){try{if(moBody)moBody.disconnect();if(moToast)moToast.disconnect();}catch(e){}moBody=moToast=null;
-  var t=$("sc-toast"),h=held;held=null;
-  if(t&&t.hasAttribute("data-fq-held")){t.classList.remove("show");t.removeAttribute("data-fq-held");}
-  setTimeout(function(){
-    if(h){var s=SC();try{if(s)s.toast(h,9000,true);}catch(e){}}
-    /* a thought that asked to come back while the screen was open comes now */
-    try{var f=F();if(f&&f.tc&&f.tc.tick)f.tc.tick();}catch(e){}},900);}
 
 /* ---- the leaf in the side column ---- */
 function fab(){var b=$("forge-quiet-fab");if(b)return b;

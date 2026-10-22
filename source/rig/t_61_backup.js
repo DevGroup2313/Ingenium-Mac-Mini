@@ -12,7 +12,8 @@
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const { spawnSync } = require('child_process');
 const URL_ = process.argv[2], OUT = process.argv[3], URL_BASE = process.argv[4] || null;
-const AXE = process.env.AXE || '/tmp/claude-0/-home-user/02db3569-4f80-5425-acc7-7b83b521aecb/scratchpad/a11y/package/axe.min.js';
+// axe-core's axe.min.js: AXE or AXE_JS, or rig/a11y/axe.min.js (the fourth argument is an earlier Ingenium's page)
+const AXE = [process.env.AXE, process.env.AXE_JS, path.join(__dirname, 'a11y', 'axe.min.js')].find(f => f && fs.existsSync(f));
 const BIG_MB = process.env.BK_BIG_MB == null ? 240 : +process.env.BK_BIG_MB;
 fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0;
@@ -369,7 +370,8 @@ async function holdings(p, ids) {
   const back = await pe.evaluate(async (id) => { const t = await IngBig.load(id); return t ? t.length : 0; }, desk.id);
   ok(back === 'Kept only on the computer\'s disk. '.length * 3000, 'restored in a browser, that text is in the large store here', back);
   // restoring onto a computer app: the desk is kept first, and what goes into the stores goes onto the disk too
-  const F = await fresh(b); const pf = F.p; await boot(pf);
+  // the library's first-start keep (r120, 9 seconds after ready) writes to the disk too: let it finish before the fake disk counts
+  const F = await fresh(b); const pf = F.p; await boot(pf); await settle(pf);
   const toDisk = await pf.evaluate(async (b64) => {
     window.__disk = {}; window.__calls = [];
     const fake = { big_put: (id, t) => { __disk[id] = t; __calls.push('big_put:' + id); return { ok: true }; }, big_get: id => (id in __disk ? { ok: true, text: __disk[id] } : { ok: false }),
