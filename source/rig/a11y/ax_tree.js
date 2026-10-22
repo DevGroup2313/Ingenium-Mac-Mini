@@ -54,7 +54,9 @@ async function tree(p) {
       try { if (n.backendDOMNodeId) { const r = await cdp.send('DOM.resolveNode', { backendNodeId: n.backendDOMNodeId }); const o = await cdp.send('Runtime.callFunctionOn', { objectId: r.object.objectId, functionDeclaration: 'function(){var s=getComputedStyle(this);return (s.visibility==="hidden"||s.display==="none"||this.closest("[inert]")||this.tagName==="IFRAME"||this.tagName==="BODY"||this.tagName==="HTML")?"":(this.outerHTML||"").slice(0,200)}', returnByValue: true }); html = o.result.value || ''; } } catch (e) {}
       if (html && !/^<(iframe|body|html)\b/i.test(html)) out.problems.push({ kind: 'takes the focus but has no role', role, where: region(n), html });
     } else if ((role === 'image' || role === 'img') && !name) {
-      out.problems.push({ kind: 'picture with no words', role, where: region(n) });
+      let html = '';
+      try { if (n.backendDOMNodeId) { const r = await cdp.send('DOM.resolveNode', { backendNodeId: n.backendDOMNodeId }); const o = await cdp.send('Runtime.callFunctionOn', { objectId: r.object.objectId, functionDeclaration: 'function(){var p=this.parentElement;return (this.outerHTML||"").slice(0,160)+"  IN  "+(p?p.outerHTML.slice(0,140):"")}', returnByValue: true }); html = o.result.value || ''; } } catch (e) {}
+      out.problems.push({ kind: 'picture with no words', role, where: region(n), html });
     }
   }
   seen.forEach((c, k) => { if (c > 1 && !/\|(tab|option|radio|menuitem|link)\|/.test(k)) out.soft.push({ kind: 'same name twice in one region', what: k, count: c }); });

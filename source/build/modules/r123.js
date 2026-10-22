@@ -38,6 +38,25 @@ html body #fabFloat{bottom:388px}
 @supports (bottom:max(0px)){html body #fabFloat{bottom:max(388px, calc(env(safe-area-inset-bottom) + 384px))}}
 @media (max-width:720px){html body #fabFloat{bottom:calc(env(safe-area-inset-bottom,0px) + 320px)}}
 html body #fabFloat[hidden]{display:none!important}
+/* 6.2: while an app is open the float key stands where the chevron stood, so the chevron steps up above it (the owner's
+   words, 22 October 2026: "the collapsible chevron is covered and hidden from view by the export floating window button") */
+html:not(.ing-lite) body.ing-desk-on #railChevron{bottom:444px}
+@supports (bottom:max(0px)){html:not(.ing-lite) body.ing-desk-on #railChevron{bottom:max(444px, calc(env(safe-area-inset-bottom) + 440px))}}
+@media (max-width:720px){html:not(.ing-lite) body.ing-desk-on #railChevron{bottom:calc(env(safe-area-inset-bottom,0px) + 368px)}}
+/* a floating window's key back into the desk, and a window of its own's tab on the Desk bar */
+.ing-fw-keys button svg{width:14px;height:14px;display:block;margin:auto}
+#ing-deskbar button[data-lite] .own{font-size:11px;opacity:.7;margin-left:3px}
+/* in a window of its own: the way back to Ingenium's desk, a small pill at the top, as the Desk bar is in the main window */
+#ingLiteHome{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:2147482900;display:none;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:999px;border:1px solid rgba(40,22,68,.14);background:rgba(255,255,255,.94);color:#4a2f86;
+  font:600 12.5px/1.2 var(--sans,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 2px 0 rgba(40,22,68,.14),0 6px 14px rgba(40,22,68,.14);transition:transform .15s ease,box-shadow .15s ease}
+#ingLiteHome:hover{transform:translate(-50%,-1px)}
+#ingLiteHome:active{transform:translate(-50%,1px)}
+#ingLiteHome:focus-visible{outline:2px solid #6b4fa0;outline-offset:2px}
+#ingLiteHome svg{width:14px;height:14px}
+html.ing-lite #ingLiteHome{display:inline-flex}
+body[data-theme="night"] #ingLiteHome{background:rgba(42,34,57,.96);color:#e4dcf3;border-color:rgba(205,184,240,.22)}
 #fabFloat svg{width:30px;height:30px;color:var(--accent,#6b4fa0);filter:drop-shadow(0 1px 0 rgba(255,255,255,.7)) drop-shadow(0 2px 3px rgba(40,22,68,.2))}
 body[data-theme="night"] #fabFloat svg{color:#cbb6f0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
 /* the floating windows */
@@ -89,9 +108,10 @@ var APPS=["tabula","abacus","slides","scriba","fontes"],N=A.NAMES;
 /* the dots on the pill, each app's own colour as its stone wears it */
 var DOT={tabula:"#8a8172",abacus:"#2d9a52",slides:"#b34a3c",scriba:"#2f5f9e",fontes:"#c9a14a"};
 var LITE=(function(){var m=/[#&]ingapp=(tabula|abacus|slides|scriba|fontes)(?:&tok=([\w-]+))?/.exec(location.hash||"");return m?{which:m[1],tok:m[2]||""}:null;})();
+var DOCK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M12 8v7M8.5 11.5L12 15l3.5-3.5"/></svg>';
 var FLOAT_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="11" height="11" rx="3"/><path d="M14.5 4H20v5.5"/><path d="M20 4l-8 8"/></svg>';
 function toast(t){try{ingToast(t);}catch(e){}}
-var desk=null,bar=null,fab=null,open=[],active=null,shown=false,wins={},Z=600,front=null;
+var desk=null,bar=null,fab=null,open=[],active=null,shown=false,wins={},Z=600,front=null,lites={},liteRefs={};
 function baseOf(id){return String(id).split("-")[0];}
 function seqOf(id){var p=String(id).split("-");return p.length>1?(parseInt(p[1],10)||0):0;}
 function label(id){var n=seqOf(id);return N[baseOf(id)]+(n>=2?" ("+n+")":"");}
@@ -132,7 +152,7 @@ function closeApp(which,quiet){var f=frameOf(which);if(f){capture(f,which);delet
   if(LITE&&!open.length){closeLite();return;}
   show(shown&&!!active);}
 function paint(){ensure();var ids=Object.keys(wins);
-  var any=open.length+ids.length;bar.classList.toggle("on",!!any&&!LITE);
+  var lt=Object.keys(lites),any=open.length+ids.length+lt.length;bar.classList.toggle("on",!!any&&!LITE);
   if(front&&(!wins[front]||wins[front].classList.contains("folded")))front=null;
   var cur=shown?active:front;
   if(!any){bar.innerHTML="";bar.removeAttribute("data-sig");return;}
@@ -143,12 +163,18 @@ function paint(){ensure();var ids=Object.keys(wins);
     +'<button type="button" class="x" data-tabx="'+id+'" title="Close '+nm+'" aria-label="Close '+nm+'">✕</button>';}
   open.forEach(function(w){h+=tab(w,N[w],N[w]);});
   ids.forEach(function(id){h+=tab(id,label(id),label(id)+", in its floating window");});
+  /* 6.2: an app in a window of its own keeps a tab here: the tab brings that window forward, its ✕ brings the app back */
+  lt.forEach(function(t){var w=lites[t].which;h+='<button type="button" data-tab="lite:'+t+'" data-lite="1" role="tab" title="'+N[w]+', in a window of its own: press to bring it forward">'
+    +'<span class="dot" style="background:'+DOT[w]+'"></span>'+N[w]+'<span class="own" aria-hidden="true">↗</span></button>'
+    +'<button type="button" class="x" data-litex="'+t+'" title="Bring '+N[w]+' back into this desk" aria-label="Bring '+N[w]+' back into this desk">⤓</button>';});
   /* a change of which tab is lit only repaints the light, so a press never lands on a tab that moved under it */
   if(bar.getAttribute("data-sig")!==h){bar.setAttribute("data-sig",h);bar.innerHTML=h;}
   [].forEach.call(bar.querySelectorAll("[data-tab]"),function(t){var v=t.getAttribute("data-tab");t.classList.toggle("on",v==="__desk"?!cur:v===cur);
     var fw=wins[v]&&wins[v].classList.contains("folded");t.classList.toggle("folded",!!fw);
     if(wins[v])t.title=label(v)+(fw?", folded away: press to bring it back":", in its floating window");});}
-function onBar(e){var t=e.target.closest("button");if(!t)return;var tab=t.getAttribute("data-tab"),x=t.getAttribute("data-tabx");
+function onBar(e){var t=e.target.closest("button");if(!t)return;var tab=t.getAttribute("data-tab"),x=t.getAttribute("data-tabx"),lx=t.getAttribute("data-litex");
+  if(tab&&tab.indexOf("lite:")===0){liteForward(tab.slice(5));return;}
+  if(lx){liteHome(lx);return;}
   /* Desk, as in Carpe Diem: the floating windows fold away into their tabs and Ingenium's own desk comes back */
   if(tab==="__desk"){Object.keys(wins).forEach(function(id){fold(wins[id],true);});front=null;show(false);return;}
   if(tab){if(open.indexOf(tab)>=0){active=tab;show(true);}else if(wins[tab])surface(wins[tab]);return;}
@@ -180,6 +206,9 @@ function makeWin(which,n){var id=which+(n>1?"-"+n:"");if(wins[id]){surface(wins[
   function key(txt,title,fn){var b=document.createElement("button");b.type="button";b.textContent=txt;b.title=title;b.setAttribute("aria-label",title);
     b.addEventListener("pointerdown",function(e){e.stopPropagation();});b.onclick=function(e){e.preventDefault();e.stopPropagation();fn(b);};keys.appendChild(b);return b;}
   if(n===1&&canExport())key("↗","Export this window: the same app, in a window of its own",function(){exportWin(id);}).setAttribute("data-ing-export","1");
+  /* 6.2: back into the desk, full width, the work carried across (the owner's words, 22 October 2026: "The exported floating
+     windows have no way back into Ingenium's main desk") */
+  if(n===1)key("","Back into the desk, full width",function(){dockWin(id);}).innerHTML=DOCK_SVG;
   if(n===1&&(which==="tabula"||which==="abacus"||which==="slides"))key("＋","New window · a second document",function(){var k=2;while(wins[which+"-"+k]&&k<3)k++;if(wins[which+"-"+k]){surface(wins[which+"-"+k]);return;}makeWin(which,k);});
   key("−","Fold the window away into its tab on the Desk bar",function(){fold(win,true);});
   key("□","Fill the screen",function(b){var on=win.getAttribute("data-full")!=="1";
@@ -219,6 +248,9 @@ function drag(handle,win,id,mode){handle.addEventListener("pointerdown",function
 function surface(win){try{win.classList.remove("folded");front=(win.id||"").replace(/^ing-fw-/,"");
     var r=win.getBoundingClientRect(),g=clampGeo({x:r.left,y:r.top,w:r.width,h:r.height});win.style.left=g.x+"px";win.style.top=g.y+"px";win.style.width=g.w+"px";win.style.height=g.h+"px";
     raise(win);win.classList.remove("hail");void win.offsetWidth;win.classList.add("hail");setTimeout(function(){win.classList.remove("hail");},1100);paint();}catch(e){}}
+/* a floating window goes back into the desk: its work is taken as it stands and handed to the app, full width */
+function dockWin(id){var w=wins[id];if(!w)return;var which=baseOf(id),f=w.querySelector("iframe");if(f)capture(f,which);delete A.frames["fw:"+id];
+  w.remove();delete wins[id];if(front===id)front=null;openApp(which);}
 function closeWin(id){var w=wins[id];if(!w)return;var f=w.querySelector("iframe");if(f)capture(f,id.split("-")[0]);delete A.frames["fw:"+id];w.remove();delete wins[id];if(front===id)front=null;paint();}
 
 /* ---------- a window of its own ---------- */
@@ -230,10 +262,12 @@ function canExport(){try{var ua=navigator.userAgent||"";
     var api=shell();if(api&&(window.pywebview||typeof api.big_put==="function"))return typeof api.open_lite==="function";
     if(window.webkit&&window.webkit.messageHandlers&&!/Safari\//.test(ua))return false;
     return typeof window.open==="function";}catch(e){return false;}}
-function hold(win){try{var b=win.querySelector(".ing-fw-body");if(!b)return null;var v=document.createElement("div");v.className="ing-fw-veil";v.textContent="Opening in a window of its own…";b.appendChild(v);return v;}catch(e){return null;}}
-function unhold(v){try{if(v)v.remove();}catch(e){}}
-function waitAck(tok,ms){return new Promise(function(res){var t0=Date.now();(function look(){var v=null;try{v=localStorage.getItem("ing_lite_ack_"+tok);}catch(e){}
-    if(v){try{localStorage.removeItem("ing_lite_ack_"+tok);}catch(e){}res(true);return;}if(Date.now()-t0>ms){res(false);return;}setTimeout(look,200);})();});}
+function hold(win){try{var b=win.querySelector(".ing-fw-body");if(!b)return null;var v=document.createElement("div");v.className="ing-fw-veil";v.setAttribute("role","status");v.textContent="Opening in a window of its own…";b.appendChild(v);
+    /* the new window reads the whole page before it can take the app: say how long it has been */
+    var t0=Date.now();v.__t=setInterval(function(){var s=Math.round((Date.now()-t0)/1000);if(s>=4)v.textContent="Opening in a window of its own… the new window is starting ("+s+" s)";},1000);return v;}catch(e){return null;}}
+function unhold(v){try{if(v){clearInterval(v.__t);v.remove();}}catch(e){}}
+function waitAck(tok,ms,gone){return new Promise(function(res){var t0=Date.now();(function look(){var v=null;try{v=localStorage.getItem("ing_lite_ack_"+tok);}catch(e){}
+    if(v){try{localStorage.removeItem("ing_lite_ack_"+tok);}catch(e){}res(true);return;}if(Date.now()-t0>ms||(gone&&gone())){res(false);return;}setTimeout(look,200);})();});}
 function drop(tok){try{localStorage.removeItem("ing_lite_"+tok);}catch(e){}}
 function takenBy(api,tok,ms){return new Promise(function(res){var t0=Date.now();(function look(){Promise.resolve().then(function(){return api.lite_taken(tok);}).then(function(v){
     if(v===true){res(true);return;}if(Date.now()-t0>ms){res(false);return;}setTimeout(look,250);},function(){if(Date.now()-t0>ms){res(false);return;}setTimeout(look,250);});})();});}
@@ -242,18 +276,42 @@ function exportWin(id){var win=wins[id];if(!win)return;var which=id.split("-")[0
   try{if(window.__cdHandoff)delete window.__cdHandoff[which];}catch(e){}
   try{localStorage.setItem("ing_lite_"+tok,JSON.stringify({which:which,handoff:ho,at:Date.now()}));}catch(e){}
   var veil=hold(win),url=location.href.split("#")[0]+"#ingapp="+which+"&tok="+tok,api=shell();
-  function done(ok,why){unhold(veil);if(ok){closeWin(id);return;}drop(tok);if(ho){window.__cdHandoff=window.__cdHandoff||{};window.__cdHandoff[which]=ho;}toast(why);}
+  function done(ok,why){unhold(veil);if(ok){closeWin(id);lites[tok]={which:which,at:Date.now()};paint();return;}drop(tok);if(ho){window.__cdHandoff=window.__cdHandoff||{};window.__cdHandoff[which]=ho;}toast(why);}
   if(api&&typeof api.open_lite==="function"){drop(tok);
     /* the Mac and Windows apps open the window themselves and carry the work across; the app here lets go only once the
        new window has taken it, and a window too slow to take it is closed */
     Promise.resolve().then(function(){return api.open_lite(JSON.stringify({which:which,tok:tok,url:url,title:N[which],handoff:ho}));}).then(function(r){
-      if(r===true||(r&&r.ok===true)){takenBy(api,tok,15000).then(function(ok){if(!ok){try{api.lite_cancel(tok);}catch(e){}}
+      /* 6.2: 90 seconds, not 15: on a slower Mac the new window could still be reading the page when it was closed, so no
+         second window ever showed (the owner's words, 22 October 2026: "a second window is not made") */
+      if(r===true||(r&&r.ok===true)){takenBy(api,tok,90000).then(function(ok){if(!ok){try{api.lite_cancel(tok);}catch(e){}}
           done(ok,"The new window took too long to open, so it was closed and "+N[which]+" stays here, as it was.");});return;}
       done(false,r&&r.why==="safety"?"Ingenium closed unexpectedly last time while an app had a window of its own, so for now apps open here. Next time, ↗ offers windows of their own again."
         :"This copy of Ingenium cannot open a second window, so "+N[which]+" stays here.");},function(){done(false,"A second window could not be opened, so "+N[which]+" stays here.");});
     return;}
-  try{window.open(url,"ing-"+tok,"width=1180,height=840");}catch(e){}
-  waitAck(tok,10000).then(function(ok){done(ok,"The browser kept no new window, so "+N[which]+" stays here, as it was. Allow pop-up windows for Ingenium to send apps outside.");});}
+  var ref=null;try{ref=window.open(url,"ing-"+tok,"width=1180,height=840");}catch(e){}
+  /* a window the browser refused is known at once; one that opens is waited for while it reads the page, unless it is closed */
+  var said="The browser kept no new window, so "+N[which]+" stays here, as it was. Allow pop-up windows for Ingenium to send apps outside.";
+  if(!ref){done(false,said);return;}liteRefs[tok]=ref;
+  waitAck(tok,60000,function(){return ref.closed;}).then(function(ok){done(ok,"The browser kept no new window, so "+N[which]+" stays here, as it was. Allow pop-up windows for Ingenium to send apps outside.");});}
+/* the main window: a window of its own brought forward, or asked to send its app back into this desk */
+function liteForward(tok){var api=shell();
+  if(api&&typeof api.lite_focus==="function"){Promise.resolve().then(function(){return api.lite_focus(tok);}).then(function(r){if(r===false){delete lites[tok];paint();toast("That window is closed.");}},function(){});return;}
+  var w=liteRefs[tok];if(w&&!w.closed){try{w.focus();}catch(e){}return;}delete lites[tok];delete liteRefs[tok];paint();toast("That window is closed.");}
+function liteHome(tok){var api=shell();
+  if(api&&typeof api.lite_cmd==="function"){Promise.resolve().then(function(){return api.lite_cmd(tok,"home");}).then(function(r){if(r===false){delete lites[tok];paint();}},function(){});return;}
+  var w=liteRefs[tok];if(!w||w.closed){delete lites[tok];delete liteRefs[tok];paint();return;}
+  try{localStorage.setItem("ing_lite_cmd_"+tok,"home");}catch(e){}}
+/* in a browser a window of its own is a pop-up: one closed by hand loses its tab here */
+setInterval(function(){var gone=false;Object.keys(liteRefs).forEach(function(t){var w=liteRefs[t];if(!w||w.closed){delete liteRefs[t];if(lites[t]){delete lites[t];gone=true;}}});if(gone)paint();},2000);
+/* a window of its own: its app goes back into the main window's desk, the work carried across, and the window closes */
+function goHome(){if(!LITE)return;var f=frameOf(LITE.which),ho=null;if(f){capture(f,LITE.which);ho=(window.__cdHandoff||{})[LITE.which]||null;}
+  post({kind:"home",which:LITE.which,tok:LITE.tok,handoff:ho}).then(function(ok){if(ok){setTimeout(closeLite,300);return;}
+    toast("Ingenium’s main window could not be reached, so "+N[LITE.which]+" stays in this window.");});}
+function liteCmds(){if(!LITE||!LITE.tok)return;var api=shell();
+  if(api&&typeof api.lite_cmds==="function"){Promise.resolve().then(function(){return api.lite_cmds(LITE.tok);}).then(function(t){var a=[];try{a=JSON.parse(t||"[]");}catch(e){}if(a.indexOf("home")>=0)goHome();},function(){});return;}
+  try{var k="ing_lite_cmd_"+LITE.tok,v=localStorage.getItem(k);if(v){localStorage.removeItem(k);if(v==="home")goHome();}}catch(e){}}
+function liteHomeKey(){if(!LITE||document.getElementById("ingLiteHome"))return;var b=document.createElement("button");b.id="ingLiteHome";b.type="button";
+  b.innerHTML=DOCK_SVG+"<span>Back to Ingenium’s desk</span>";b.title="Put "+N[LITE.which]+" back into Ingenium’s main window, your work with it";b.onclick=goHome;document.body.appendChild(b);}
 function closeLite(){var api=shell();try{if(api&&typeof api.close_lite==="function"&&LITE){api.close_lite(LITE.tok);return;}}catch(e){}try{window.close();}catch(e){}}
 function liteBoot(){document.documentElement.classList.add("ing-lite");
   function go2(p){if(p&&p.handoff){window.__cdHandoff=window.__cdHandoff||{};window.__cdHandoff[LITE.which]=p.handoff;}
@@ -320,6 +378,11 @@ function post(item){item.at=Date.now();var api=shell();
   if(api&&typeof api.lite_post==="function")return Promise.resolve().then(function(){return api.lite_post(JSON.stringify(item));}).then(function(r){return r===true;},function(){return false;});
   try{localStorage.setItem(QP+Date.now().toString(36)+Math.random().toString(36).slice(2,8),JSON.stringify(item));return Promise.resolve(true);}catch(e){return Promise.resolve(false);}}
 function take(it){if(!it||typeof it!=="object")return;
+  /* 6.2: an app comes home from a window of its own; a window of its own was closed */
+  if(it.kind==="home"&&APPS.indexOf(it.which)>=0){if(it.tok)delete lites[it.tok];if(it.handoff){window.__cdHandoff=window.__cdHandoff||{};window.__cdHandoff[it.which]=it.handoff;}
+    var fr=frameOf(it.which);if(fr){delete A.frames["desk:"+it.which];fr.remove();var j=open.indexOf(it.which);if(j>=0)open.splice(j,1);}
+    openApp(it.which);try{var api=shell();if(api&&typeof api.main_focus==="function")api.main_focus();else window.focus();}catch(e){}paint();return;}
+  if(it.kind==="gone"&&typeof it.tok==="string"){if(lites[it.tok]){delete lites[it.tok];paint();}return;}
   if(it.kind==="go"&&typeof it.page==="string"&&/^[a-z]{2,20}$/.test(it.page)&&APPS.indexOf(it.page)<0){try{if(document.getElementById("page-"+it.page))go(it.page);}catch(e){}return;}
   if(it.kind==="place"&&typeof it.t==="string"&&(it.key==="task"||it.key==="chat")){try{var pl=IngInbox.places.filter(function(x){return x.key===it.key;})[0];if(pl)pl.run({t:it.t.slice(0,2000)},IngInbox.tc);}catch(e){}}}
 function drain(){var api=shell();
@@ -334,7 +397,8 @@ function liteSide(){
   try{IngInbox.places.forEach(function(pl){if(pl.key!=="task"&&pl.key!=="chat")return;pl.run=function(it,tc){try{tc.closeInbox();}catch(e){}
       post({kind:"place",key:pl.key,t:String(it.t||"")}).then(function(ok){toast(ok?(pl.key==="chat"?"Sent to the chat in Ingenium’s main window.":"Sent to Steps in Ingenium’s main window.")
         :"Ingenium’s main window could not be reached, so the thought stays in the Inbox.");});};});}catch(e){}
-  setTimeout(function(){liteLive=true;},2500);}
+  setTimeout(function(){liteLive=true;},2500);
+  liteHomeKey();setInterval(liteCmds,1000);}
 
 /* ---------- the apps' requests: open another, close, a new window ---------- */
 function srcOf(ev){var r=null;if(desk)[].forEach.call(desk.querySelectorAll("iframe"),function(f){if(f.contentWindow===ev.source)r={kind:"desk",which:f.getAttribute("data-app")};});
@@ -372,6 +436,7 @@ window.openApp=function(w){if(APPS.indexOf(w)>=0)return openApp(w);};
 window.addEventListener("resize",function(){Object.keys(wins).forEach(function(id){var w=wins[id];if(w.getAttribute("data-full")==="1"){w.style.width=Math.max(260,window.innerWidth-12)+"px";w.style.height=Math.max(180,window.innerHeight-52)+"px";}});});
 
 window.IngDesk={open:openApp,close:closeApp,float:floatApp,window:makeWin,closeWindow:closeWin,exportWindow:exportWin,canExport:canExport,show:show,onMessage:onMessage,
+  dock:dockWin,lites:function(){return JSON.parse(JSON.stringify(lites));},liteForward:liteForward,liteHome:liteHome,goHome:goHome,
   fold:function(id,on){fold(wins[id],on!==false);},surface:function(id){if(wins[id])surface(wins[id]);},
   state:function(){return {open:open.slice(),active:active,shown:shown,windows:Object.keys(wins),folded:Object.keys(wins).filter(function(k){return wins[k].classList.contains("folded");}),front:front,lite:LITE};}};
 if(LITE){document.documentElement.classList.add("ing-lite");try{ensure();}catch(e){}var tries=0;(function wait(){if(document.body&&(window.__ingReady===true||++tries>40)){liteBoot();try{liteSide();hubStart();}catch(e){}return;}setTimeout(wait,150);})();}
