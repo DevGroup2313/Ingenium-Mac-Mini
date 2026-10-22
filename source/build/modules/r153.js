@@ -45,6 +45,15 @@ function give(n){var s=window.IngSupport&&window.IngSupport.sc,t=window.IngInbox
   if(s&&s.__r153)done++;if(t&&t.__r153)done++;
   if(done<2&&n<150)setTimeout(function(){give(n+1);},200);}
 give(0);
+/* the end of the two minutes and Ingenium's own note share the foot of the page: the newer one is shown, as in 6.1,
+   when both were the one note */
+(function(){var o=window.ingToast;if(typeof o!=="function"||o.__r153)return;
+  var w=function(){try{var s=document.getElementById("sc-toast");if(s)s.classList.remove("show");}catch(e){}return o.apply(this,arguments);};
+  w.__r153=1;window.ingToast=w;})();
+function seat(){var s=document.getElementById("sc-toast");if(!s||s.__r153)return!!s;s.__r153=1;
+  try{new MutationObserver(function(){if(s.classList.contains("show")){var n=document.getElementById("ingToast");if(n)n.style.display="none";}})
+    .observe(s,{attributes:true,attributeFilter:["class"]});}catch(e){}return true;}
+(function wait(n){if(!seat()&&n<300)setTimeout(function(){wait(n+1);},500);})(0);
 window.IngReminders={look:LOOK};
 })();
 ;try{window.__ingParts["p74"]="running";}catch(_){}

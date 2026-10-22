@@ -1,0 +1,153 @@
+<style id="qsc-css">
+/* ============ THE QUIET SCREEN (shared; Ingenium's own, carried by any app that asks for it) ============
+   The owner's words (21 October 2026): "I want the "Quiet Screen" feature and page from Ingenium added to the Forge
+   please." So this is Ingenium's quiet screen, the same words, the same breathing circle and the same one way back,
+   made once so another app can carry it whole: QuietScreen.create(hooks) builds it, and each app gives its own
+   colours for day and night (hooks.look), its own motion settings and its own thoughts panel. Nothing here names an
+   app. Still, dim, one way back: the back key, or Esc. While it is open, focus stays inside it (and in the thoughts
+   panel, if one is opened from it), and when it closes, focus goes back to where it was. */
+.qsc-screen{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147482980;display:flex;align-items:center;justify-content:center;
+  box-sizing:border-box;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  background:var(--qsc-bg,#15111c);color:var(--qsc-ink,#d8cfe7);
+  font-family:var(--qsc-sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif);-webkit-text-size-adjust:100%}
+.qsc-screen[hidden]{display:none !important}
+.qsc-inner{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:24px;max-width:520px;margin:auto;box-sizing:border-box}
+/* the circle: it breathes slowly (in for four seconds, out for six), and is still when motion is turned down */
+.qsc-orb{width:150px;height:150px;flex:none;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,var(--qsc-orb-a,rgba(212,194,244,.55)),var(--qsc-orb-b,rgba(106,70,189,.28)) 62%,var(--qsc-orb-c,rgba(106,70,189,.06)));
+  box-shadow:0 0 70px var(--qsc-glow,rgba(138,104,214,.16))}
+.qsc-screen:not([data-qsc-still="1"]) .qsc-orb{animation:qscBreathe 10s ease-in-out infinite}
+@keyframes qscBreathe{0%,100%{transform:scale(.72)}40%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.qsc-screen .qsc-orb{animation:none !important}}
+.qsc-big{font-family:var(--qsc-serif,Georgia,"Times New Roman",serif);font-size:25px;font-weight:400;line-height:1.3;margin:0;color:inherit}
+.qsc-small{font-size:14px;line-height:1.55;margin:0;opacity:.8;color:inherit;max-width:34em}
+/* the keys: quiet, with a fine rim, in the app's own ink */
+.qsc-key{-webkit-appearance:none;appearance:none;font:inherit;font-size:15px;line-height:1.2;cursor:pointer;margin:0;
+  color:var(--qsc-key-ink,currentColor);background:transparent;border:1px solid var(--qsc-key-rim,rgba(216,207,231,.28));border-radius:999px;
+  padding:11px 22px;min-height:44px;box-sizing:border-box;box-shadow:none;text-shadow:none;transition:background-color .15s ease,border-color .15s ease}
+.qsc-key:hover{background:var(--qsc-key-hover,rgba(216,207,231,.08));border-color:var(--qsc-key-ink,currentColor)}
+.qsc-key:focus{outline:none}
+.qsc-key:focus-visible{outline:2px solid var(--qsc-focus,currentColor);outline-offset:3px}
+.qsc-back{margin-top:12px}
+.qsc-cap{margin-top:12px}
+.qsc-cap .qsc-key{font-size:13.5px;padding:9px 18px;min-height:40px}
+.qsc-cap[hidden]{display:none !important}
+.qsc-screen[data-qsc-still="1"] .qsc-key{transition:none}
+@media (max-width:480px){.qsc-big{font-size:22px}.qsc-orb{width:130px;height:130px}}
+</style>
+<script id="qsc-js">
+/* THE QUIET SCREEN (shared): see the note above. Plain words, one way back.
+   QuietScreen.create({
+     id: "my-quiet",                         the screen's id (its keys are id+"-back" and id+"-catch")
+     look: {day:{bg,ink,orbA,orbB,orbC,glow,keyInk,keyRim,keyHover,focus,serif,sans}, night:{...}},
+     night: fn -> true by night,  still: fn -> true when motion is turned down (the orb rests and the words are shorter),
+     tc: fn -> the thoughts panel (ThoughtCloud) or null: with one, "💭 A thought came in" opens it,
+     hush: fn, called as it opens (speech is always stopped),  onOpen: fn,  onClose: fn,
+     allow: fn(node) -> true where focus may go while it is open (the thoughts panel always may),
+     returnTo: fn -> where focus goes back when the place it came from is gone })
+   gives {open, close, isOpen, el, dress, words, lastInput} (lastInput: when a key or the pointer was last pressed while it
+   was open, so an app can tell a note that answers a press from a timed one). */
+(function(){
+"use strict";
+if(window.QuietScreen&&window.QuietScreen.v>=1)return;
+/* Ingenium's own words, exactly */
+var WORDS={name:"Quiet screen",big:"Nothing needs doing right now.",
+  breathe:"Breathe in as the circle grows, and out as it shrinks. Stay as long as you like.",
+  stay:"Stay as long as you like.",back:"I am ready to come back",thought:"💭 A thought came in"};
+/* Ingenium's colours, if an app gives none */
+var DEF={day:{bg:"#ebe7f0",ink:"#3a3347",orbA:"rgba(212,194,244,.55)",orbB:"rgba(106,70,189,.28)",orbC:"rgba(106,70,189,.06)",glow:"rgba(138,104,214,.16)",
+    keyInk:"#3a3347",keyRim:"rgba(58,51,71,.30)",keyHover:"rgba(58,51,71,.06)",focus:"#6b4fa0"},
+  night:{bg:"#15111c",ink:"#d8cfe7",orbA:"rgba(212,194,244,.55)",orbB:"rgba(106,70,189,.28)",orbC:"rgba(106,70,189,.06)",glow:"rgba(138,104,214,.16)",
+    keyInk:"#d8cfe7",keyRim:"rgba(216,207,231,.28)",keyHover:"rgba(216,207,231,.08)",focus:"#d8cfe7"}};
+var VARS=[["bg","--qsc-bg"],["ink","--qsc-ink"],["orbA","--qsc-orb-a"],["orbB","--qsc-orb-b"],["orbC","--qsc-orb-c"],["glow","--qsc-glow"],
+  ["keyInk","--qsc-key-ink"],["keyRim","--qsc-key-rim"],["keyHover","--qsc-key-hover"],["focus","--qsc-focus"],["serif","--qsc-serif"],["sans","--qsc-sans"]];
+var FOCUSABLE='button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';
+
+function el(tag,cls,attrs,text){var n=document.createElement(tag);if(cls)n.className=cls;
+  if(attrs)for(var k in attrs)if(attrs[k]!=null)n.setAttribute(k,attrs[k]);if(text!=null)n.textContent=text;return n;}
+function shown(n){try{if(n.disabled)return false;var r=n.getBoundingClientRect();if(!r.width&&!r.height)return false;
+  var cs=getComputedStyle(n);return cs.visibility!=="hidden"&&cs.display!=="none";}catch(e){return false;}}
+
+function create(H){H=H||{};
+  var id=H.id||"qsc-screen",root=null,big=null,small=null,back=null,cap=null,catchKey=null;
+  var open=false,from=null,mo=null,mq=null,lastIn=0;
+  function hv(v){try{return typeof v==="function"?v():v;}catch(e){return null;}}
+  function night(){try{return !!(H.night&&H.night());}catch(e){return false;}}
+  function reduced(){try{return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+  function still(){try{if(H.still&&H.still())return true;}catch(e){}return reduced();}
+  function tc(){var t=hv(H.tc);return t&&typeof t.open==="function"?t:null;}
+  function cloudOpen(){var t=tc();try{return !!(t&&t.isOpen&&t.isOpen());}catch(e){return false;}}
+  function allowed(n){if(!n||!root)return false;if(root.contains(n))return true;
+    try{if(n.closest&&n.closest(".tc-el,[data-qsc-allow]"))return true;}catch(e){}
+    try{return !!(H.allow&&H.allow(n));}catch(e){return false;}}
+
+  /* built once, the first time it is asked for */
+  function build(){if(root&&root.parentNode)return root;
+    root=document.getElementById(id);if(root)return root;
+    root=el("div","qsc-screen",{id:id,hidden:"",role:"dialog","aria-modal":"true","aria-label":WORDS.name,"aria-describedby":id+"-big "+id+"-small"});
+    var inner=el("div","qsc-inner");
+    inner.appendChild(el("div","qsc-orb",{"aria-hidden":"true"}));
+    big=el("p","qsc-big",{id:id+"-big"},WORDS.big);inner.appendChild(big);
+    small=el("p","qsc-small",{id:id+"-small"},WORDS.stay);inner.appendChild(small);
+    back=el("button","qsc-key qsc-back",{type:"button",id:id+"-back"},WORDS.back);back.addEventListener("click",function(){close();});inner.appendChild(back);
+    cap=el("div","qsc-cap",{hidden:""});
+    catchKey=el("button","qsc-key",{type:"button",id:id+"-catch"},WORDS.thought);
+    catchKey.addEventListener("click",function(){var t=tc();if(!t)return;try{t.open();}catch(e){}});
+    cap.appendChild(catchKey);inner.appendChild(cap);root.appendChild(inner);
+    var host=null;try{host=H.mount?H.mount():null;}catch(e){}(host||document.body).appendChild(root);
+    return root;}
+
+  /* the app's colours, by day or by night, and its motion */
+  function dress(){if(!root)return;var lk=H.look||{},n=night(),base=n?DEF.night:DEF.day,own=(n?lk.night:lk.day)||{};
+    VARS.forEach(function(v){var val=own[v[0]]!=null?own[v[0]]:base[v[0]];if(val!=null)root.style.setProperty(v[1],val);else root.style.removeProperty(v[1]);});
+    root.setAttribute("data-qsc-night",n?"1":"0");var s=still();root.setAttribute("data-qsc-still",s?"1":"0");
+    /* the same words as Ingenium: the breathing words only while the circle breathes */
+    if(small){var w=s?WORDS.stay:WORDS.breathe;if(small.textContent!==w)small.textContent=w;}
+    if(cap){var t=tc();if(t)cap.removeAttribute("hidden");else cap.setAttribute("hidden","");}}
+
+  /* focus stays inside while it is open; Tab goes round its own keys */
+  function keys(){return [].filter.call(root.querySelectorAll(FOCUSABLE),shown);}
+  function home(){try{(back||root).focus({preventScroll:true});}catch(e){try{back.focus();}catch(x){}}}
+  function onKey(e){if(!open)return;lastIn=Date.now();
+    /* the thoughts panel, opened from here, keeps its own keys (Esc puts it away first) */
+    if(cloudOpen()&&!root.contains(document.activeElement))return;
+    var k=e.key;
+    if(k==="Escape"||k==="Esc"){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();close();return;}
+    if(k==="Tab"){var ks=keys();if(!ks.length){e.preventDefault();return;}
+      var a=document.activeElement,i=ks.indexOf(a);
+      if(i<0){e.preventDefault();ks[e.shiftKey?ks.length-1:0].focus();return;}
+      if(e.shiftKey&&i===0){e.preventDefault();ks[ks.length-1].focus();}
+      else if(!e.shiftKey&&i===ks.length-1){e.preventDefault();ks[0].focus();}}}
+  function onFocus(e){if(!open)return;if(!allowed(e.target))home();}
+  function onPress(){lastIn=Date.now();}
+  function watch(on){
+    if(on){window.addEventListener("keydown",onKey,true);document.addEventListener("focusin",onFocus,true);document.addEventListener("pointerdown",onPress,true);
+      try{mo=new MutationObserver(dress);mo.observe(document.documentElement,{attributes:true});if(document.body)mo.observe(document.body,{attributes:true});}catch(e){}
+      try{mq=window.matchMedia("(prefers-reduced-motion: reduce)");if(mq.addEventListener)mq.addEventListener("change",dress);else if(mq.addListener)mq.addListener(dress);}catch(e){mq=null;}}
+    else{window.removeEventListener("keydown",onKey,true);document.removeEventListener("focusin",onFocus,true);document.removeEventListener("pointerdown",onPress,true);
+      try{if(mo)mo.disconnect();}catch(e){}mo=null;
+      try{if(mq){if(mq.removeEventListener)mq.removeEventListener("change",dress);else if(mq.removeListener)mq.removeListener(dress);}}catch(e){}mq=null;}}
+
+  function openIt(){build();if(open){home();return;}
+    var a=document.activeElement;from=a&&a!==document.body&&a!==document.documentElement&&!root.contains(a)?a:null;
+    /* nothing is read aloud here */
+    try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+    try{H.hush&&H.hush();}catch(e){}
+    dress();open=true;root.removeAttribute("hidden");
+    try{document.documentElement.setAttribute("data-qsc-open","1");}catch(e){}
+    watch(true);home();
+    try{H.onOpen&&H.onOpen();}catch(e){}}
+  function close(){if(!open||!root)return;open=false;watch(false);root.setAttribute("hidden","");
+    try{document.documentElement.removeAttribute("data-qsc-open");}catch(e){}
+    /* focus goes back to where it was, or to the place the app names */
+    var to=from;from=null;
+    if(!to||!to.isConnected||!shown(to)){to=null;try{to=H.returnTo?H.returnTo():null;}catch(e){}}
+    if(to)try{to.focus({preventScroll:true});}catch(e){try{to.focus();}catch(x){}}
+    try{H.onClose&&H.onClose();}catch(e){}}
+
+  return {open:openIt,close:close,isOpen:function(){return open;},el:function(){return build();},dress:dress,
+    words:WORDS,lastInput:function(){return lastIn;}};}
+
+window.QuietScreen={create:create,words:WORDS,v:1};
+})();
+</script>

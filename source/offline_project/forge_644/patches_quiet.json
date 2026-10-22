@@ -1,0 +1,22 @@
+[
+ {
+  "why": "the support module's quiet action (the Calm card's I need quiet) opens the Quiet Screen; if it is missing, the module's own still screen is shown as before",
+  "old": "SupportCore.create({app:\"forge\",",
+  "new": "SupportCore.create({app:\"forge\",quietOpen:function(){if(!window.forgeQuiet)throw new Error(\"no quiet screen\");window.forgeQuiet.open();},"
+ },
+ {
+  "why": "the thoughts panel waits while the Quiet Screen is open, as Ingenium's does: its own test of a quiet time is asked first whether the screen is open (once, for the Forge's own panel, made just below)",
+  "old": "  var SC=null,TC=null;",
+  "new": "  var SC=null,TC=null;\n  /* PASS 644 · while the Quiet Screen is open the thoughts panel waits, as in Ingenium (its reminders come after) */\n  (function(){var make=ThoughtCloud.create;ThoughtCloud.create=function(h){ThoughtCloud.create=make;\n    if(h&&typeof h.quiet===\"function\"){var q=h.quiet;h.quiet=function(){try{if(window.forgeQuiet&&window.forgeQuiet.isOpen())return true;}catch(e){}return q.apply(this,arguments);};}\n    return make.apply(this,arguments);};})();"
+ },
+ {
+  "why": "the leaf takes its place in the side column, between the thought bubble and the bell, as in Ingenium",
+  "old": "var IDS=[\"sticky-fab\",\"horo-fab\",\"cd-theme-fab\",\"cd-thought-fab\",\"reminders-fab\",\"cd-float-fab\"];",
+  "new": "var IDS=[\"sticky-fab\",\"horo-fab\",\"cd-theme-fab\",\"cd-thought-fab\",\"forge-quiet-fab\",\"reminders-fab\",\"cd-float-fab\"];"
+ },
+ {
+  "why": "the key that lays the side keys down sits above the column, the leaf counted",
+  "old": "var ids=['cd-float-fab','reminders-fab','cd-thought-fab','cd-theme-fab','horo-fab','sticky-fab'];",
+  "new": "var ids=['cd-float-fab','reminders-fab','forge-quiet-fab','cd-thought-fab','cd-theme-fab','horo-fab','sticky-fab'];"
+ }
+]

@@ -1,0 +1,135 @@
+<style id="forge-quiet-644-css">
+/* PASS 644 · THE QUIET SCREEN, FROM INGENIUM. The owner's words (21 October 2026): "I want the "Quiet Screen" feature
+   and page from Ingenium added to the Forge please." Ingenium's own screen (the shared quiet_screen.html, carried
+   whole): the same words, the same breathing circle, one way back, in the Forge's own colours, cream and deep blue by
+   day, deep night blue by night, with a gold circle. It opens from the leaf in the side column (between the thought
+   bubble and the bell, as in Ingenium), from the top of Focus, and from the support module's I need quiet, which
+   used to open its older, darker screen. While it is open, reminders and the thought bubble wait.
+   The leaf wears the moon's dress, rule by rule (copied at run time, as the thought bubble is), so it is drawn,
+   hidden, laid down and seated exactly as its neighbours are. */
+#forge-quiet-fab{position:fixed;right:16px;width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;z-index:94;display:flex;align-items:center;justify-content:center;background:transparent;padding:0}
+#forge-quiet-fab > span.forge-quiet-glyph{font-size:28px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+body.cd-dock-collapsed #forge-quiet-fab,body.cd-win-folded #forge-quiet-fab{transform:translateX(150%) !important;opacity:0 !important;pointer-events:none !important}
+html.cd-nested body.cd-in-window #forge-quiet-fab{display:none !important}
+body:has(#cd-door) #forge-quiet-fab,body:has(#demo-entry) #forge-quiet-fab,body:has(#pomo-modal) #forge-quiet-fab,body.cd-forge-open #forge-quiet-fab{display:none !important}
+html[data-sc-calm] #forge-quiet-fab > *,body[data-motion="minimal"] #forge-quiet-fab > *{animation:none !important}
+/* on a short screen (a phone held sideways, a low window) a sixth key would push the column up into the bar at the
+   top, so the leaf steps aside there and the column is as it was; Focus keeps its way in, beside the clock of Now */
+@media (max-height:480px){html body #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab{display:none !important}}
+@media (max-height:560px){html body.cd-coarse #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab{display:none !important}}
+/* the leaf rests when the device asks for less motion (the moon's breathing, copied above, is written stronger) */
+@media (prefers-reduced-motion:reduce){html body #forge-quiet-fab#forge-quiet-fab#forge-quiet-fab > *{animation:none !important}}
+/* the way in at the top of Focus: beside the clock of Now */
+#room-focus .sc-head > .forge-quiet-way{margin-left:auto;white-space:nowrap}
+#room-focus .sc-head > .forge-quiet-way + .sc-clock{margin-left:0}
+/* a timed note that comes while the screen is open waits until after */
+html[data-qsc-open] #sc-toast[data-fq-held]{visibility:hidden !important}
+/* the screen's words in the Forge's own serif and sans */
+#forge-quiet{--qsc-serif:var(--cd-serif,Georgia,"Iowan Old Style","Times New Roman",serif);--qsc-sans:var(--cd-sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif)}
+#forge-quiet .qsc-big{letter-spacing:.01em}
+</style>
+<script id="forge-quiet-644-js">
+/* PASS 644 · the Quiet Screen in the Forge: see the note above */
+(function(){
+"use strict";
+if(window.__forgeQuiet644||!window.QuietScreen)return;window.__forgeQuiet644=1;
+function $(id){return document.getElementById(id);}
+function F(){return window.forgeSupport||null;}
+function SC(){var f=F();return f&&f.sc?f.sc:null;}
+function night(){return document.body.getAttribute("data-theme")==="night";}
+function calm(){var s=SC();try{if(s&&s.on("calm"))return true;}catch(e){}return document.documentElement.hasAttribute("data-sc-calm");}
+function minimal(){return document.body.getAttribute("data-motion")==="minimal";}
+function seen(n){try{if(!n||!n.isConnected)return false;var r=n.getBoundingClientRect(),cs=getComputedStyle(n);
+  return r.width>0&&r.height>0&&cs.visibility!=="hidden"&&cs.display!=="none"&&+cs.opacity>0.05&&cs.pointerEvents!=="none";}catch(e){return false;}}
+
+/* the Forge's colours: cream and deep blue by day, deep night blue by night, the circle in its gold */
+var LOOK={
+  day:{bg:"#eee8dc",ink:"#0c3c52",orbA:"rgba(226,193,118,.72)",orbB:"rgba(23,87,122,.26)",orbC:"rgba(23,87,122,.05)",glow:"rgba(189,154,82,.26)",
+    keyInk:"#0c3c52",keyRim:"#bd9a52",keyHover:"rgba(189,154,82,.16)",focus:"#17577a"},
+  night:{bg:"#08141c",ink:"#ece5d5",orbA:"rgba(232,192,100,.44)",orbB:"rgba(79,156,200,.22)",orbC:"rgba(79,156,200,.05)",glow:"rgba(232,192,100,.12)",
+    keyInk:"#ece5d5",keyRim:"rgba(232,192,100,.62)",keyHover:"rgba(232,192,100,.10)",focus:"#e8c064"}};
+
+var QS=QuietScreen.create({id:"forge-quiet",look:LOOK,night:night,
+  /* the circle rests (and the words are shorter) with Minimal motion, with Calm mode, and when the device asks */
+  still:function(){return minimal()||calm();},
+  /* "💭 A thought came in" while the Inbox is switched on */
+  tc:function(){var f=F(),s=SC();try{if(s&&!s.on("inbox"))return null;}catch(e){}return f&&f.tc?f.tc:null;},
+  onOpen:holdOn,onClose:holdOff,
+  returnTo:function(){var k=$("forge-quiet-fab");if(seen(k))return k;var w=document.querySelector("#room-focus .forge-quiet-way");return seen(w)?w:null;}});
+window.forgeQuiet={open:function(){QS.open();},close:function(){QS.close();},isOpen:function(){return QS.isOpen();},screen:QS};
+
+/* ---- what waits while it is open: a timed note (five minutes before the next item, the end of the two minutes)
+   comes back after; a note that answers a press made here (a thought kept) is shown at once ---- */
+var held=null,moBody=null,moToast=null;
+function look(){var t=$("sc-toast");if(!t||!QS.isOpen())return;
+  if(moToast&&moToast.__t!==t){try{moToast.disconnect();}catch(e){}moToast=null;}
+  if(!moToast){try{moToast=new MutationObserver(look);moToast.__t=t;moToast.observe(t,{attributes:true,attributeFilter:["class"],childList:true,characterData:true,subtree:true});}catch(e){}}
+  if(t.classList.contains("show")&&!t.hasAttribute("data-fq-held")&&Date.now()-QS.lastInput()>1500){held=t.textContent;t.setAttribute("data-fq-held","1");}
+  else if(!t.classList.contains("show")&&t.hasAttribute("data-fq-held"))t.removeAttribute("data-fq-held");}
+function holdOn(){held=null;try{moBody=new MutationObserver(look);moBody.observe(document.body,{childList:true});}catch(e){}look();}
+function holdOff(){try{if(moBody)moBody.disconnect();if(moToast)moToast.disconnect();}catch(e){}moBody=moToast=null;
+  var t=$("sc-toast"),h=held;held=null;
+  if(t&&t.hasAttribute("data-fq-held")){t.classList.remove("show");t.removeAttribute("data-fq-held");}
+  setTimeout(function(){
+    if(h){var s=SC();try{if(s)s.toast(h,9000,true);}catch(e){}}
+    /* a thought that asked to come back while the screen was open comes now */
+    try{var f=F();if(f&&f.tc&&f.tc.tick)f.tc.tick();}catch(e){}},900);}
+
+/* ---- the leaf in the side column ---- */
+function fab(){var b=$("forge-quiet-fab");if(b)return b;
+  b=document.createElement("button");b.id="forge-quiet-fab";b.type="button";b.title="Quiet screen";b.setAttribute("aria-label","Quiet screen");
+  b.innerHTML='<span class="forge-quiet-glyph" aria-hidden="true">🌿</span>';
+  b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();QS.open();});
+  /* after the bell in the page's order, so Tab meets the side keys from the top down */
+  var bell=$("reminders-fab");if(bell&&bell.parentNode===document.body)document.body.insertBefore(b,bell.nextSibling);else document.body.appendChild(b);
+  try{if(window.__cdFabPack)window.__cdFabPack();}catch(e){}
+  return b;}
+/* the moon's dress, rule by rule (as the thought bubble's), so the leaf is drawn, hidden and folded as its neighbours */
+function splitSel(t){var out=[],d=0,cur="";for(var i=0;i<t.length;i++){var c=t[i];if(c==="("||c==="[")d++;else if(c===")"||c==="]")d--;if(c===","&&d===0){out.push(cur);cur="";}else cur+=c;}if(cur.trim())out.push(cur);return out.map(function(x){return x.trim();});}
+function mirror(){var n=0;[].forEach.call(document.styleSheets,function(sh){var rules;try{rules=sh.cssRules;}catch(e){return;}if(rules)walk(sh,rules);});
+  function walk(parent,rules){var adds=[];
+    for(var i=0;i<rules.length;i++){var r=rules[i];
+      if(!r.selectorText){if(r.cssRules)walk(r,r.cssRules);continue;}
+      if(r.selectorText.indexOf("#cd-theme-fab")<0)continue;
+      var parts=splitSel(r.selectorText).filter(function(p){return p.indexOf("#cd-theme-fab")>=0&&p.indexOf("#forge-quiet-fab")<0;});if(!parts.length)continue;
+      /* the moon's rules for its own glyph reach only the leaf's glyph */
+      var sel=parts.map(function(p){var q=p.split("#cd-theme-fab").join("#forge-quiet-fab"),k=q.indexOf("#forge-quiet-fab")+16,head=q.slice(0,k),tail=q.slice(k);
+        tail=tail.replace(/>\s*\*/g,"> .forge-quiet-glyph").replace(/\bspan\b(?![.\[:#\w-])/g,"span.forge-quiet-glyph");return head+tail;}).join(", ");
+      var flat=sel.replace(/\s+/g,""),dup=false;
+      for(var j=i+1;j<Math.min(rules.length,i+4);j++){var nx=rules[j];if(nx&&nx.selectorText&&nx.selectorText.replace(/\s+/g,"")===flat){dup=true;break;}}
+      if(dup||!r.style||!r.style.cssText)continue;adds.push({at:i+1,text:sel+"{"+r.style.cssText+"}"});}
+    for(var k=adds.length-1;k>=0;k--){try{parent.insertRule(adds[k].text,adds[k].at);n++;}catch(e){}}}
+  return n;}
+
+/* ---- the ways in at Focus: at the top, beside the clock of Now; and on a low-energy day, beside its own keys ---- */
+function way(label,cls){var b=document.createElement("button");b.type="button";b.className="btn btn-soft btn-sm "+cls;b.textContent=label;
+  b.addEventListener("click",function(e){e.stopPropagation();QS.open();});return b;}
+function seat(){var room=$("room-focus");if(!room)return;
+  var head=room.querySelector('[data-sc-card="now"] .sc-head');
+  if(head&&!head.querySelector(".forge-quiet-way")){var k=way("🌿 Quiet screen","forge-quiet-way");k.title="A still, dim screen, until you are ready";head.insertBefore(k,head.querySelector(".sc-clock"));}
+  var low=room.querySelector(".sc-low .sc-acts");
+  if(low&&!low.querySelector(".forge-quiet-low"))low.insertBefore(way("🌿 I need quiet","forge-quiet-low"),low.lastElementChild);}
+function watchFocus(){var fp=$("focusPages");if(!fp||fp.__fq644)return;fp.__fq644=1;seat();
+  try{new MutationObserver(seat).observe(fp,{childList:true,subtree:true});}catch(e){}}
+
+/* ---- the tour: a card for the leaf, after the thought bubble's ---- */
+function tour(){var done=false;
+  [typeof DEMO_TOUR!=="undefined"?DEMO_TOUR:null,window.FORGE_TOUR].forEach(function(L){if(!Array.isArray(L))return;
+    if(L.some(function(c){return c&&c.q644;})){done=true;return;}
+    var at=-1;L.forEach(function(c,i){if(c&&c.sub==="The Inbox")at=i;});if(at<0)return;var near=L[at];
+    var w={t:"🌿 The quiet screen",
+      b:"Ringed at the side is the leaf, just under the bell. When the page is too much, press it and the Forge steps back: the screen goes still and dim, with one line of words and a slow circle to breathe with. Reminders and the thought bubble wait while it is open. Press I am ready to come back, or Esc, and everything is as you left it. Focus has the same way in, beside the clock of Now.",
+      tip:"Nothing is lost while you rest. Stay as long as you like."};
+    L.splice(at+1,0,{q644:1,chap:near.chap,chapFr:near.chapFr,sub:"The quiet screen",subFr:"The quiet screen",en:w,fr:w,
+      go:function(){try{if(typeof showSection==="function")showSection("forge");}catch(e){}try{if(typeof demoTourSpot==="function")demoTourSpot("#forge-quiet-fab");}catch(e){}}});
+    done=true;});
+  return done;}
+
+/* ---- keeping it in place ---- */
+function keep(){if(!document.body)return;fab();watchFocus();}
+function start(){keep();mirror();tour();
+  [600,2000,6000,15000].forEach(function(ms){setTimeout(function(){mirror();keep();if(ms<=2000)tour();},ms);});
+  setInterval(keep,2000);}
+if(document.body)start();else document.addEventListener("DOMContentLoaded",start);
+})();
+</script>

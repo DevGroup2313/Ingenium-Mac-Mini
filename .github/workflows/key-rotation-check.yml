@@ -1,0 +1,67 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# See LICENCE.txt.
+#
+# Tries the Android signing key change before it is used on the owner's apps. The old release keys of Ingenium and
+# the Forge for the Fire tablet were kept in public repositories, so they are being replaced. Android lets an app move
+# to a new key through a lineage (APK signature scheme v3), so an installed app can be updated without a reinstall,
+# and the old key can be refused afterwards. This checks both, at Android 9, 11 and 14 (the Fire tablet's Fire OS 7
+# and 8 are built on Android 9 and 11), with throwaway keys made in the run. It never touches a real key, never
+# publishes anything and commits nothing: what it found is in the run's summary.
+name: Try the signing key change
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - '.github/workflows/key-rotation-check.yml'
+      - 'source/security/key_rotation_*.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rotation:
+    name: Key change on Android ${{ matrix.api }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api: 28
+            target: default
+          - api: 30
+            target: google_apis
+          - api: 34
+            target: google_apis
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Make the throwaway keys and the five test APKs
+        run: bash source/security/key_rotation_make.sh "$RUNNER_TEMP/rot"
+
+      - name: Let the emulator use hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install them one over the other
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: bash source/security/key_rotation_check.sh ${{ matrix.api }} ${{ runner.temp }}/rot
+
+      - name: What it found
+        if: always()
+        run: |
+          R="$RUNNER_TEMP/rot/rotation-android-${{ matrix.api }}.txt"
+          if [ -f "$R" ]; then cat "$R"; { echo '```'; cat "$R"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; else echo "no report"; fi
+          grep -q "the key change works" "$R"
