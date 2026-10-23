@@ -503,6 +503,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "thought_cloud.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r121.js":  # R121: the shared support module, before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "support_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r160.js":  # R160: the shared import of chats (the Forge carries the same), before Ingenium's own part of it
+        t = open(os.path.join(HERE, "thoughts", "chat_import_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
