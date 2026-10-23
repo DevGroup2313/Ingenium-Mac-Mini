@@ -158,6 +158,7 @@ jobs:
           V="6.2.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
+          echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
           INGENIUM_VERSION="$V" python3 -m PyInstaller --noconfirm --clean ingenium.spec
 
       - name: Put the engine and the models inside, and seal the app

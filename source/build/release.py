@@ -2,7 +2,9 @@
   python3 release.py bump 4.0 "15 October 2026"   -> version strings in every repo's build files
   python3 release.py desktop                       -> the desktop patches (desktop/) not applied yet, in the Mac and Windows repos
   python3 release.py page                          -> build the page, embed the kit store from the repos' HEADs, copy to all four repos,
-                                                      after applying the desktop patches (desktop/) not applied yet (commit them first, then run it again)
+                                                      after applying the desktop patches (desktop/) not applied yet (commit them first, then run it again),
+                                                      and write each repo's BUILD_INFO.txt with the page's fingerprint
+  python3 release.py info                          -> BUILD_INFO.txt alone, from the pages in the repos
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
 H = os.path.dirname(os.path.abspath(__file__))
@@ -50,7 +52,7 @@ KEYLIKE = re.compile(r"(^|/)signing/|\.(keystore|jks|p12|pfx|pem|key|mobileprovi
 
 
 def wanted(path, kits, source, shared, generated):
-    if path == "ingenium.html" or path in generated:
+    if path in ("ingenium.html", "BUILD_INFO.txt") or path in generated:  # 6.2: BUILD_INFO.txt holds the page's fingerprint
         return False
     # 6.2: no signing key, and no note of one, ever goes into the page (build_page.py takes out any that is there too)
     if KEYLIKE.search(path):
@@ -151,7 +153,33 @@ def page():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
     open(os.path.join(H, "ingenium.html"), "w", encoding="utf-8").write(pg)
     print("page %d bytes; kit store %d files (%.0f KB) from %s" % (len(pg), len(files), total / 1024, commits))
+    info()
     sync_sources()
+
+
+def info():
+    """6.2: each release names its build and lists its fingerprint (SHA-256) in BUILD_INFO.txt, as the licence says
+    (LICENCE.txt, version 2), in each of the four repositories (../security/fingerprint.py)."""
+    sys.path.insert(0, os.path.join(H, "..", "security"))
+    import fingerprint
+    vj = json.load(open(os.path.join(H, "version.json")))
+    ed = os.environ.get("ING_EDITION", "master")
+    for k, repo in R.items():
+        pg = os.path.join(repo, "ingenium.html")
+        t = open(pg, encoding="utf-8").read()
+        m = re.search(r'var ING_VERSION="([0-9.]+)",ING_PAGE_DATE="([^"]*)";', t)
+        if not m or m.group(1) != vj["v"]:
+            sys.exit("%s: the page is not version %s" % (pg, vj["v"]))
+        head = ["Ingenium", "Version: %s (%s)" % (vj["v"], vj["date"]), "Edition: %s" % ed,
+                "Copyright (c) 2026 Yannie D. Forest. All rights reserved. See LICENCE.txt.",
+                "The page below is the app itself. The %s apps built from this repository carry it with their build number"
+                " stamped in%s, so each build's summary on GitHub lists the fingerprint of the copy inside it too."
+                % ({"fire": "Fire, Android, iPhone and iPad", "win": "Windows"}.get(k, "Mac"),
+                   " and without its WebAssembly engine (tools/app_page.py)" if k == "fire" else " (tools/stamp_build.py)")]
+        p = os.path.join(repo, "BUILD_INFO.txt")
+        open(p, "w", encoding="utf-8", newline="").write("\n".join(head) + "\n")
+        fingerprint.write(p, ["ingenium.html"])
+        print("BUILD_INFO.txt:", repo, fingerprint.sha(pg)[:16])
 
 def sync_sources():
     """The page's sources travel with it: the Mac mini repository keeps them under source/ (no build starts from it)."""
@@ -181,3 +209,5 @@ if __name__ == "__main__":
         desktop()
     elif sys.argv[1] == "page":
         page()
+    elif sys.argv[1] == "info":
+        info()
