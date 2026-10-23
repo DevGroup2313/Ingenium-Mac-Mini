@@ -5,7 +5,9 @@ as pywebview starts it (bottle.run, through the guard):
 
 Checks: each app script, patched, still compiles, keeps its own text, and calls the guard first thing when it makes its window
 (again patched, it is left as it is); with the guard, a request that names 127.0.0.1 or localhost at the server's port gets
-the page; one that names any other host (DNS rebinding) is refused with 421 and nothing of the page; one with no Host too."""
+the page; one that names any other host (DNS rebinding) is refused with 421 and nothing of the page; one with no Host too;
+a server given its port in its place keeps the same rule; one whose port the guard cannot see answers the computer's own
+name and still refuses every other."""
 import http.client, importlib.util, os, py_compile, shutil, socket, sys, tempfile, threading, time, types
 
 BOTTLE_DIR, APPS = sys.argv[1], sys.argv[2:]
@@ -79,8 +81,8 @@ for _ in range(50):
         time.sleep(0.1)
 
 
-def ask(host):
-    c = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
+def ask(host, at=None):
+    c = http.client.HTTPConnection("127.0.0.1", at or port, timeout=10)
     c.putrequest("GET", "/the_forge.html", skip_host=True, skip_accept_encoding=True)
     if host is not None:
         c.putheader("Host", host)
@@ -96,5 +98,28 @@ ok(st == 200 and d == PAGE, "localhost at the same port too", st)
 for host in ("evil.example:%d" % port, "evil.example", "127.0.0.1:%d" % (port + 1), "192.168.1.20:%d" % port, None):
     st, d = ask(host)
     ok(st == 421 and b"the page" not in d, "a request naming %s is refused, and nothing of the page is in the answer" % (host or "no host"), (st, d[:50]))
+
+
+def serve(start):
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0)); at = s.getsockname()[1]
+    threading.Thread(target=lambda: start(at), daemon=True).start()
+    for _ in range(50):
+        try:
+            socket.create_connection(("127.0.0.1", at), 0.2).close(); break
+        except OSError:
+            time.sleep(0.1)
+    return at
+
+
+# the port in its place rather than by name: the same rule
+p2 = serve(lambda at: bottle.run(app, "wsgiref", "127.0.0.1", at, quiet=True))
+ok(ask("127.0.0.1:%d" % p2, p2)[0] == 200 and ask("127.0.0.1:%d" % (p2 + 1), p2)[0] == 421 and ask("evil.example:%d" % p2, p2)[0] == 421,
+   "a server given its port in its place keeps the same rule (its own port answered; another port, another name refused)")
+# a server started with no port the guard can see (were a later pywebview to start it so): the window still gets its page,
+# by the computer's own name; any other name is still refused
+p3 = serve(lambda at: bottle.run(app=app, server=bottle.WSGIRefServer(host="127.0.0.1", port=at), quiet=True))
+st3 = [ask(h, p3)[0] for h in ("127.0.0.1:%d" % p3, "localhost:%d" % p3, "evil.example:%d" % p3, "evil.example", "192.168.1.20:%d" % p3)]
+ok(st3 == [200, 200, 421, 421, 421], "a server whose port the guard cannot see never leaves the window blank, and still refuses every other name", st3)
 print("\n%d passed, %d failed" % (passed, failed))
 sys.exit(1 if failed else 0)
