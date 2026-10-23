@@ -1,13 +1,13 @@
 // Ingenium 6.3 · a page's own comments taken out of its code (editions.py, every edition; the Forge's passes from 645).
 // The owner's words (23 October 2026): "clear out any dead code or unecessary lines or comments in the code that is not
 // needed. I want you to remove those unecessary stales codes or comments from the code of the app please."
-//   node strip_comments.js IN.html OUT.html [--html] [--word FROM=TO]
+//   node strip_comments.js IN.html OUT.html [--html] [--keep-owner] [--word FROM=TO]
 // Each classic script (no type, or a JavaScript type) is read by acorn (tools/acorn, MIT); every comment it reports is taken
 // out. A comment alone on its line(s) goes with its line, so no empty line is left where it stood; one after code on a line
 // goes with the spaces before it; any other leaves a line break if it held one (so the code reads as it did, semicolons and
 // all) or a space between two words. Each style block's comments go the same way, read outside its quoted strings. Kept: a
-// licence or copyright notice (a comment that names a licence, a copyright, SPDX, or opens with "!"), a note that names the
-// owner as the author, and the build's own
+// licence or copyright notice (a comment that names a licence, a copyright, SPDX, or opens with "!"), with --keep-owner a
+// note that names the owner as its author (not in an edition given away), and the build's own
 // markers (/*ING_BOOT_MAP*/, /*FORGE_BOOT_MAP*/: a name in capitals alone). The page's data blocks and every other script
 // type are left as they are, and so are the apps a page carries in them. A script acorn cannot read stops it.
 //   --html          the comments in the page's own markup go too (not in a script, a style, a text box or a title), but the
@@ -22,8 +22,9 @@ const WORD = (() => { const i = REST.indexOf('--word'); if (i < 0) return null; 
 const HTML = REST.includes('--html');
 let words = 0; const made = new Set(), names = new Set();
 const page = fs.readFileSync(IN, 'utf8');
-const LICENCE = /^\s*!|@license|@preserve|copyright|\(c\)\s*(19|20)\d\d|SPDX-License|licensed under|apache license|mit license|bsd license|gnu general public|all rights reserved|Yannie D\. Forest/i;
-const KEEP = c => LICENCE.test(c) || /^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(c);
+const LICENCE = /^\s*!|@license|@preserve|copyright|\(c\)\s*(19|20)\d\d|SPDX-License|licensed under|apache license|mit license|bsd license|gnu general public|all rights reserved/i;
+const OWNER = REST.includes('--keep-owner') ? /Yannie D\. Forest/ : null;
+const KEEP = c => LICENCE.test(c) || (OWNER && OWNER.test(c)) || /^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(c);
 const KEEP_HTML = c => LICENCE.test(c) || /^\s*BUILD=/.test(c) || /^\[if |^\[endif/i.test(c);
 const JS = t => !t || /^(text|application)\/(java|ecma)script$|^module$/i.test(t);
 const SP = ch => ch === ' ' || ch === '\t';

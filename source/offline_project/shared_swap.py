@@ -51,7 +51,7 @@ def strip_text(t, check=False):
     with tempfile.TemporaryDirectory() as d:
         a, b = os.path.join(d, "in.html"), os.path.join(d, "out.html")
         open(a, "w", encoding="utf-8").write(t)
-        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), a, b, "--html"]))
+        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), a, b, "--html", "--keep-owner"]))
         if check:
             _node([os.path.join(TOOLS, "same_code.js"), a, b])
         out = open(b, encoding="utf-8").read()
