@@ -59,13 +59,39 @@ CSS = r"""
 .ic-dark .ic-mark{color:#b4bcc7}
 .ic-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:4px 10px;border-top:1px solid rgba(127,127,127,.22);font:12px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#4c535c;background:rgba(127,127,127,.05)}
 .ic-dark .ic-bar{color:#b9c1cc}
-.ic-bar select,.ic-bar button{font:inherit;padding:1px 6px;border-radius:6px;border:1px solid rgba(127,127,127,.45);background:transparent;color:inherit;cursor:pointer}
+.ic-bar select,.ic-bar button:not(.ic-themed){font:inherit;padding:1px 6px;border-radius:6px;border:1px solid rgba(127,127,127,.45);background:transparent;color:inherit;cursor:pointer}
 .ic-bar label{display:inline-flex;gap:4px;align-items:center;cursor:pointer}
 .ic-bar :focus-visible{outline:2px solid #2f6fb0;outline-offset:1px}
 .ic-size{margin-left:auto}
 .ic-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .ic-disabled .ic-host{opacity:.6}
 .ic-option-dark{color-scheme:dark}
+/* Glossa, Calm and Lima (learn.js) */
+.ic-glossa,.ic-tidy{flex:0 1 auto;border-top:1px solid rgba(127,127,127,.22);padding:8px 12px;font:13px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:#2b3138;background:rgba(127,127,127,.06);overflow:auto;min-height:3.2em}
+.ic-glossa{max-height:30%}.ic-tidy{max-height:40%}
+.ic-wrap .ic-host{min-height:max(35%,140px)}
+.ic-bar{flex:0 0 auto}
+.ic-dark .ic-glossa,.ic-dark .ic-tidy{color:#dde3ea}
+.ic-gh{font-weight:700;font-size:12px;letter-spacing:.04em;margin-bottom:4px;color:#3d4550}
+.ic-dark .ic-gh{color:#c3cbd5}
+.ic-gr{display:flex;gap:10px;margin:3px 0;align-items:baseline}.ic-gr b{flex:0 0 7.5em;font-weight:600;color:#4c535c}.ic-dark .ic-gr b{color:#b9c1cc}
+.ic-gr span{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.ic-ask:not(.ic-themed),.ic-tbtn:not(.ic-themed),.ic-go:not(.ic-themed){font:inherit;font-size:12.5px;padding:2px 10px;border-radius:7px;border:1px solid rgba(127,127,127,.5);background:transparent;color:inherit;cursor:pointer;margin-top:4px}
+.ic-go{padding:0 6px;margin:0 0 0 6px;font-size:11.5px}
+.ic-tg{margin:8px 0;padding-top:6px;border-top:1px dashed rgba(127,127,127,.25)}.ic-tt{font-weight:650}.ic-ta2{color:#4c535c;font-size:12.5px}.ic-dark .ic-ta2{color:#b9c1cc}
+.ic-tl{list-style:none;margin:4px 0;padding:0;max-height:10em;overflow:auto}.ic-tl li{display:flex;align-items:center;gap:4px;margin:2px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.ic-tsay{margin:2px 0 4px}
+.ic-bar button:not(.ic-themed)[aria-pressed="true"],.ic-bar button:not(.ic-themed)[aria-expanded="true"]{background:rgba(70,130,230,.18);border-color:rgba(70,130,230,.6)}
+/* Calm: softer colours, more room between lines, and the part being worked on in full colour */
+.ic-calm .ic-host .cm-scroller{line-height:1.9}
+.ic-calm .ic-host .cm-activeLine{background:rgba(127,127,127,.05)}
+.ic-calm .ic-host .cm-foldGutter{opacity:.35}
+.ic-calm .cm-line.ic-dim{opacity:.42}
+@media (prefers-reduced-motion:reduce){.ic-host .cm-cursor{animation:none !important}}
+.ic-calm .tok-keyword,.ic-calm .tok-controlKeyword{color:#6d3a85}.ic-calm .tok-string,.ic-calm .tok-string2{color:#2f6347}.ic-calm .tok-number,.ic-calm .tok-atom,.ic-calm .tok-bool{color:#7d4a1e}
+.ic-calm .tok-typeName,.ic-calm .tok-className,.ic-calm .tok-propertyName,.ic-calm .tok-definition{color:#2f5878}.ic-calm .tok-comment{color:#5f6670}
+.ic-dark.ic-calm .tok-keyword,.ic-dark.ic-calm .tok-controlKeyword{color:#c8b3dc}.ic-dark.ic-calm .tok-string,.ic-dark.ic-calm .tok-string2{color:#a9d4b5}.ic-dark.ic-calm .tok-number,.ic-dark.ic-calm .tok-atom,.ic-dark.ic-calm .tok-bool{color:#e3bc96}
+.ic-dark.ic-calm .tok-typeName,.ic-dark.ic-calm .tok-className,.ic-dark.ic-calm .tok-propertyName,.ic-dark.ic-calm .tok-definition{color:#a9c6e0}.ic-dark.ic-calm .tok-comment{color:#a3acb8}
 /* the colours of code, by day (on white: each 4.5 to 1 or more) */
 .ic-wrap .tok-keyword,.ic-wrap .tok-controlKeyword{color:#8b1fa9}
 .ic-wrap .tok-string,.ic-wrap .tok-string2{color:#0b6b37}

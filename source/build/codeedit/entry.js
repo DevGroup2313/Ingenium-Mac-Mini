@@ -10,7 +10,7 @@ import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSp
 import { EditorState, Compartment, StateField, StateEffect, RangeSetBuilder, EditorSelection } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentMore, indentLess, undo, redo } from "@codemirror/commands";
 import { indentOnInput, syntaxHighlighting, bracketMatching, foldGutter, foldKeymap, StreamLanguage, indentUnit,
-  foldAll, unfoldAll } from "@codemirror/language";
+  foldAll, unfoldAll, syntaxTree, ensureSyntaxTree } from "@codemirror/language";
 import { classHighlighter } from "@lezer/highlight";
 import { searchKeymap, highlightSelectionMatches, openSearchPanel, gotoLine, search } from "@codemirror/search";
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
@@ -39,6 +39,7 @@ import { properties } from "@codemirror/legacy-modes/mode/properties";
 import { powerShell } from "@codemirror/legacy-modes/mode/powershell";
 import { diff } from "@codemirror/legacy-modes/mode/diff";
 import { kotlin, objectiveC, dart, csharp, scala } from "@codemirror/legacy-modes/mode/clike";
+import { where, wordAt, lineSays, calmFocus, tidyScan, tidyChanges } from "./learn.js";
 
 /* ---------- 1. the languages, by a file's name or, failing that, by its first words ---------- */
 const S = m => () => StreamLanguage.define(m);
@@ -175,6 +176,9 @@ const COPY = ["width", "height", "minHeight", "maxHeight", "flexGrow", "flexShri
 function lum(c) { const m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/.exec(c || ""); if (!m || (m[4] !== undefined && +m[4] < 0.2)) return null; return (0.2126 * m[1] + 0.7152 * m[2] + 0.0722 * m[3]) / 255; }
 function bgOf(el) { for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const l = lum(getComputedStyle(e).backgroundColor); if (l !== null) return l; } return 1; }
 const NAT = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value");
+/* the choices a person makes in the bar (Glossa open, Calm) stay with them on this device */
+const PREFS = (() => { try { return JSON.parse(localStorage.getItem("ingEditorPrefs") || "{}") || {}; } catch (e) { return {}; } })();
+function savePrefs() { try { localStorage.setItem("ingEditorPrefs", JSON.stringify(PREFS)); } catch (e) { } }
 const all = new Set();
 
 function attach(ta, o) {
@@ -182,11 +186,14 @@ function attach(ta, o) {
   o = o || {};
   const text0 = NAT.get.call(ta);
   const crlf = /\r\n/.test(text0) && !/[^\r]\n/.test(text0.slice(0, 2000000));
-  const C = { lang: new Compartment(), ro: new Compartment(), big: new Compartment(), wrap: new Compartment(), attrs: new Compartment() };
-  const wrapEl = document.createElement("div"); wrapEl.className = "ic-wrap"; if (o.wrapId) wrapEl.id = o.wrapId;
+  const C = { lang: new Compartment(), ro: new Compartment(), big: new Compartment(), wrap: new Compartment(), attrs: new Compartment(), calm: new Compartment() };
+  const TH = o.theme || (window.IngEditor && window.IngEditor.theme) || {};   // the app's own look: its class, its buttons
+  const wrapEl = document.createElement("div"); wrapEl.className = "ic-wrap" + (TH.wrap ? " " + TH.wrap : ""); if (o.wrapId) wrapEl.id = o.wrapId;
   const host = document.createElement("div"); host.className = "ic-host";
   const bar = document.createElement("div"); bar.className = "ic-bar";
-  wrapEl.appendChild(host); wrapEl.appendChild(bar);
+  const gl = document.createElement("div"); gl.className = "ic-glossa"; gl.hidden = true; gl.setAttribute("role", "region"); gl.setAttribute("aria-label", "Glossa: what this means");
+  const td = document.createElement("div"); td.className = "ic-tidy"; td.hidden = true; td.setAttribute("role", "region"); td.setAttribute("aria-label", "Lima: polish the code");
+  wrapEl.appendChild(host); wrapEl.appendChild(gl); wrapEl.appendChild(td); wrapEl.appendChild(bar);
   ta.parentNode.insertBefore(wrapEl, ta.nextSibling);
   ta.classList.add("ic-ta");
   const H = { ta, wrap: wrapEl, view: null, langKey: "text", name: o.name || ta.getAttribute("data-file") || "", wrapOn: !!o.wrap, crlf };
@@ -213,9 +220,11 @@ function attach(ta, o) {
           { key: "Mod-Alt-g", run: gotoLine }, { key: "Tab", run: tab, shift: indentLess }]),
         C.lang.of(langExt(H.langKey, len)), C.big.of(bigExt(len)), C.wrap.of(H.wrapOn ? EditorView.lineWrapping : []),
         C.ro.of([EditorState.readOnly.of(!!ta.disabled || !!ta.readOnly), EditorView.editable.of(!ta.disabled)]), C.attrs.of(attrs()),
+        C.calm.of(PREFS.calm && len < BIG ? calmFocus : []),
         EditorView.updateListener.of(u => {
           if (u.docChanged) { dirtySinceFocus = true; fire(); }
-          if (u.docChanged || u.selectionSet) paintBar();
+          if (u.docChanged || u.selectionSet) { paintBar(); glossSoon(); }
+          if (u.docChanged && !td.hidden) limaSoon();
         }),
         EditorView.domEventHandlers({
           // a shortcut the app listens for on the box (Ctrl+S, Ctrl+Enter, ...) still reaches it; plain keys, and Tab, are the editor's
@@ -257,13 +266,81 @@ function attach(ta, o) {
 
   /* the bar under the editor: where the cursor is, the language (which can be changed), wrapping, size */
   bar.innerHTML = '<span class="ic-pos" aria-live="off"></span><label class="ic-l"><span class="ic-sr">Language</span><select class="ic-lang"></select></label>' +
-    '<label class="ic-w"><input type="checkbox" class="ic-wrapbox"> Wrap</label><button type="button" class="ic-find">Find</button><span class="ic-size"></span>';
+    '<label class="ic-w"><input type="checkbox" class="ic-wrapbox"> Wrap</label><button type="button" class="ic-find">Find</button>' +
+    '<button type="button" class="ic-gl" aria-pressed="false" title="What the code under the cursor means, in plain words">Glossa</button>' +
+    '<button type="button" class="ic-calm" aria-pressed="false" title="Softer colours, more room, and only the part you are working on in full colour">Calm</button>' +
+    '<button type="button" class="ic-em" aria-expanded="false" title="Clear out what the code does not need: you see each change first">Lima</button><span class="ic-size"></span>';
+  /* the bar's keys and the panels' keys wear the app's own buttons (raised, and pressed when on) */
+  const dress = b => { if (TH.btn) { b.classList.add("ic-themed"); TH.btn.split(/\s+/).forEach(c => c && b.classList.add(c)); } };
+  const lit = (b, on) => { if (TH.on) TH.on.split(/\s+/).forEach(c => c && b.classList.toggle(c, !!on)); };
+  bar.querySelectorAll("button").forEach(dress);
   const sel = bar.querySelector(".ic-lang");
   Object.keys(LANGS).forEach(k => { const op = document.createElement("option"); op.value = k; op.textContent = LANGS[k].name; sel.appendChild(op); });
   sel.addEventListener("change", () => setLang(sel.value, true));
   const wb = bar.querySelector(".ic-wrapbox"); wb.checked = H.wrapOn;
   wb.addEventListener("change", () => { H.wrapOn = wb.checked; H.view.dispatch({ effects: C.wrap.reconfigure(H.wrapOn ? EditorView.lineWrapping : []) }); });
   bar.querySelector(".ic-find").addEventListener("click", () => { openSearchPanel(H.view); });
+  /* Glossa: where the cursor is, the word under it, what its line does */
+  const glB = bar.querySelector(".ic-gl"), calmB = bar.querySelector(".ic-calm"), emB = bar.querySelector(".ic-em");
+  let glT = 0;
+  function glossSoon() { if (gl.hidden) return; clearTimeout(glT); glT = setTimeout(gloss, 140); }
+  function gloss() {
+    const s = H.view.state, pos = s.selection.main.head, here = where(s, pos), w = wordAt(s, pos, H.langKey), line = lineSays(s, pos);
+    gl.innerHTML = "";
+    const h = document.createElement("div"); h.className = "ic-gh"; h.textContent = "Glossa · what this means"; gl.appendChild(h);
+    const row = (label, val, cls) => { if (!val) return; const d = document.createElement("div"); d.className = "ic-gr " + (cls || ""); const b = document.createElement("b"); b.textContent = label; d.appendChild(b); const sp = document.createElement("span"); sp.textContent = val; d.appendChild(sp); gl.appendChild(d); };
+    row("Where you are", here.length ? here.join("  ›  ") : "At the top level of the file.");
+    row("This line", line || "—");
+    row("This word", w ? "“" + w.word + "”: " + w.text : "Put the cursor on a word to see what it means.");
+    const ask = o.ask || window.IngEditor.ask;
+    if (typeof ask === "function") { const b = document.createElement("button"); b.type = "button"; b.className = "ic-ask"; b.textContent = "Ask about this line"; b.title = "Opens a question about this line, ready to send";
+      dress(b); b.onclick = () => { const l = s.doc.lineAt(pos); ask({ line: l.text, number: l.number, where: here.join(" › "), lang: LANGS[H.langKey] ? LANGS[H.langKey].name : "" }); }; gl.appendChild(b); }
+  }
+  function setGloss(on) { gl.hidden = !on; glB.setAttribute("aria-pressed", on ? "true" : "false"); lit(glB, on); PREFS.glossa = on; savePrefs(); if (on) gloss(); }
+  glB.addEventListener("click", () => setGloss(gl.hidden));
+  /* Calm */
+  function setCalm(on) { wrapEl.classList.toggle("ic-calm", on); calmB.setAttribute("aria-pressed", on ? "true" : "false"); lit(calmB, on); PREFS.calm = on; savePrefs();
+    H.view.dispatch({ effects: C.calm.reconfigure(on && H.view.state.doc.length < BIG ? calmFocus : []) }); }
+  calmB.addEventListener("click", () => setCalm(!wrapEl.classList.contains("ic-calm")));
+  /* Lima: what can be cleared, shown first, removed only when chosen, all undone with one Undo */
+  /* after an edit (or an Undo), Lima reads the code again once typing pauses, so what it lists is never out of date */
+  let limaT = 0;
+  function limaSoon() { clearTimeout(limaT); if (H.view.state.doc.length > BIG) { const say = td.querySelector(".ic-tsay"); if (say) say.textContent = "The code has changed. Press Lima twice to read it again."; return; } limaT = setTimeout(lima, 1200); }
+  function lima() {
+    const s = H.view.state;
+    td.innerHTML = '<div class="ic-gh">Lima · polish the code</div><div class="ic-tsay">Reading the code…</div>';
+    setTimeout(() => {
+      if (s.doc.length > HUGE) { td.querySelector(".ic-tsay").textContent = "This file is too long to read all at once here. Open it part by part (Build in Ingenium, Files in the Forge) and tidy each part."; return; }
+      const r = tidyScan(s, 5000); td.innerHTML = '<div class="ic-gh">Lima · polish the code</div>';
+      const say = document.createElement("div"); say.className = "ic-tsay"; say.setAttribute("role", "status");
+      say.textContent = (r.complete ? "" : "Only the first part of this long file was read in time. ") + "Nothing changes until you choose. One Undo (Ctrl+Z) puts back everything a button removed.";
+      td.appendChild(say);
+      const group = (title, about, items, kind, list) => {
+        const g = document.createElement("div"); g.className = "ic-tg"; const hd = document.createElement("div"); hd.className = "ic-tt"; hd.textContent = title + (items.length ? " · " + items.length : " · none"); g.appendChild(hd);
+        const p = document.createElement("div"); p.className = "ic-ta2"; p.textContent = about; g.appendChild(p);
+        if (items.length && list) {
+          const ul = document.createElement("ul"); ul.className = "ic-tl";
+          items.slice(0, 200).forEach((it, i) => { const li = document.createElement("li"); const lab = document.createElement("label"); const cb = document.createElement("input"); cb.type = "checkbox"; cb.dataset.i = i; lab.appendChild(cb);
+            lab.appendChild(document.createTextNode(" " + it.label + " ")); li.appendChild(lab); const go = document.createElement("button"); go.type = "button"; go.className = "ic-go"; go.textContent = "Line " + it.line;
+            dress(go); go.onclick = () => { H.view.dispatch({ selection: EditorSelection.single(it.from), scrollIntoView: true }); H.view.focus(); }; li.appendChild(go); ul.appendChild(li); });
+          g.appendChild(ul);
+        }
+        if (items.length) { const b = document.createElement("button"); b.type = "button"; b.className = "ic-tbtn"; dress(b); b.textContent = list ? "Remove the ones chosen" : "Remove " + (kind === "notes" ? "these notes" : kind === "blanks" ? "the extra empty lines" : "these spaces");
+          b.onclick = () => { const chosen = list ? [...g.querySelectorAll("input[type=checkbox]")].filter(c => c.checked).map(c => items[+c.dataset.i]) : items;
+            if (!chosen.length) { say.textContent = "Choose one or more first: each box beside a name."; return; }
+            const ch = tidyChanges(H.view.state, kind, chosen); H.view.dispatch({ changes: ch, userEvent: "delete.tidy" });
+            say.textContent = "Done: " + ch.length + " removed. One Undo (Ctrl+Z) puts them back."; };
+          g.appendChild(b); }
+        td.appendChild(g);
+      };
+      group("Notes for people (comments)", "Notes in the code the computer skips." + (r.kept ? " " + r.kept + " stay always: licences, copyrights, and marks the app reads in itself." : ""), r.notes, "notes", false);
+      group("Empty lines more than one in a row", "Two or more empty lines become one.", r.blanks, "blanks", false);
+      group("Spaces at the ends of lines", "Spaces no one sees, after the last word of a line.", r.trails, "trails", false);
+      group("Styles nothing names", "Style rules whose classes or ids appear nowhere else in this file. Check before removing: code can build a name in pieces.", r.styles, "styles", true);
+      group("Functions nothing calls", "Functions whose name appears only where they are made. Check before removing: another file may call them.", r.functions, "functions", true);
+    }, 30);
+  }
+  emB.addEventListener("click", () => { const on = td.hidden; td.hidden = !on; emB.setAttribute("aria-expanded", on ? "true" : "false"); lit(emB, on); if (on) lima(); });
   function paintBar() {
     if (!H.view) return; const s = H.view.state, h = s.selection.main.head, ln = s.doc.lineAt(h);
     bar.querySelector(".ic-pos").textContent = "Line " + ln.number.toLocaleString() + ", column " + (h - ln.from + 1) + (s.selection.ranges.length > 1 ? " · " + s.selection.ranges.length + " cursors" : "");
@@ -297,7 +374,9 @@ function attach(ta, o) {
   H.sync = sync; H.undo = () => undo(H.view); H.redo = () => redo(H.view); H.foldAll = () => foldAll(H.view); H.unfoldAll = () => unfoldAll(H.view);
   H.find = () => openSearchPanel(H.view);
   H.destroy = () => { try { H.view.destroy(); } catch (e) { } try { wrapEl.remove(); } catch (e) { } all.delete(H); try { delete ta.value; delete ta.selectionStart; delete ta.selectionEnd; delete ta.textLength; delete ta.scrollTop; delete ta.scrollHeight; } catch (e) { } ta.__ingCode = null; };
+  H.gloss = () => setGloss(true); H.calm = setCalm; H.lima = () => { if (td.hidden) emB.click(); else lima(); };
   ta.__ingCode = H; all.add(H); watch(); paintBar();
+  if (PREFS.glossa) setGloss(true); if (PREFS.calm) setCalm(true);
   return H;
 }
 
@@ -317,5 +396,5 @@ else document.addEventListener("DOMContentLoaded", () => new MutationObserver(re
 addEventListener("resize", resync);
 
 window.IngEditor = { attach, auto, sweep, count: () => all.size, langFor, langs: Object.fromEntries(Object.entries(LANGS).map(([k, v]) => [k, v.name])), version: "1",
-  cm: { EditorView, EditorState, MergeView, unifiedMergeView, Decoration, StateField, StateEffect, EditorSelection, syntaxHighlighting, classHighlighter, lineNumbers,
+  cm: { syntaxTree, ensureSyntaxTree, EditorView, EditorState, MergeView, unifiedMergeView, Decoration, StateField, StateEffect, EditorSelection, syntaxHighlighting, classHighlighter, lineNumbers,
     make: (key) => LANGS[key] ? LANGS[key].make() : [] } };

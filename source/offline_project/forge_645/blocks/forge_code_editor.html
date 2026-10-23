@@ -1,4 +1,38 @@
 <style id="forge-645-code-css">
+/* PASS 645 · the code editor in the Forge's own colours and its raised look (the owner: "the look and colour palette of the
+   Forge added to Forge's new pages and sections. Nothing should look white and dull"). Its keys are the Forge's raised buttons
+   (filled with its teal when on); the code sits in a well on the Forge's cool panel, the gutter and the line being worked on in a wash of its
+   deep teal, the helps on panels with a teal edge and its serif headings. By night every colour follows the Forge's night
+   palette. Each colour of code keeps 4.5 to 1. */
+.ic-forge .ic-host{background:linear-gradient(180deg,rgba(23,87,122,.055),rgba(23,87,122,0) 140px),var(--panel,#F7F8FA);box-shadow:inset 0 2px 4px rgba(10,30,46,.10),inset 0 -1px 0 rgba(255,255,255,.6)}
+.ic-forge .ic-host .cm-gutters{background:linear-gradient(90deg,rgba(23,87,122,.12),rgba(23,87,122,.035));border-right:1px solid var(--edge,rgba(23,87,122,.26));color:#4b5761}
+.ic-forge .ic-host .cm-activeLine{background:rgba(23,87,122,.075)}
+.ic-forge .ic-host .cm-activeLineGutter{background:rgba(23,87,122,.17);color:var(--accent,#17577A);font-weight:650}
+.ic-forge .ic-host .cm-selectionBackground{background:rgba(23,87,122,.18) !important}
+.ic-forge .ic-host .cm-focused .cm-selectionBackground{background:rgba(23,87,122,.30) !important}
+.ic-forge .ic-host .cm-editor.cm-focused{outline:2px solid rgba(23,87,122,.6)}
+.ic-forge .ic-host .cm-matchingBracket{background:rgba(176,132,52,.22);outline:1px solid rgba(140,100,30,.6)}
+.ic-forge .ic-bar{background:linear-gradient(180deg,#fdfefe,var(--panel,#F7F8FA));border-top:1px solid var(--edge,rgba(23,87,122,.26));box-shadow:inset 0 1px 0 rgba(255,255,255,.8);color:var(--ink2,#39424C);padding:7px 10px;gap:8px}
+.ic-forge .ic-bar .solid,.ic-forge .ic-glossa .solid,.ic-forge .ic-tidy .solid{padding:3px 11px;font-size:12.5px;min-height:0}
+.ic-forge .ic-bar select{font:600 12.5px var(--cd-sans);color:var(--ink,#121619);border:1px solid var(--edge,rgba(23,87,122,.26));border-radius:8px;padding:4px 8px;background:linear-gradient(180deg,#fff,var(--panel,#F7F8FA));box-shadow:0 1px 0 rgba(10,30,46,.12),0 3px 6px rgba(10,30,46,.08)}
+.ic-forge .ic-glossa,.ic-forge .ic-tidy{background:linear-gradient(180deg,rgba(23,87,122,.09),rgba(23,87,122,.025) 70%),var(--panel,#F7F8FA);border-top:1px solid var(--edge,rgba(23,87,122,.26));box-shadow:inset 4px 0 0 var(--accent,#17577A),inset 0 1px 0 rgba(255,255,255,.75);color:var(--ink,#121619);padding:10px 14px 10px 16px}
+.ic-forge .ic-gh{font:600 15.5px/1.3 var(--cd-serif);color:var(--accent,#17577A);letter-spacing:.01em;margin-bottom:6px}
+.ic-forge .ic-gr b,.ic-forge .ic-ta2{color:var(--ink2,#39424C)}
+.ic-forge .ic-tt{font-family:var(--cd-serif);font-size:14px}
+.ic-forge .ic-mark{background:rgba(23,87,122,.11);color:var(--ink2,#39424C)}
+.ic-forge .tok-keyword,.ic-forge .tok-controlKeyword{color:#17577A}
+.ic-forge .tok-string,.ic-forge .tok-string2{color:#2c6a2c}
+.ic-forge .tok-number,.ic-forge .tok-atom,.ic-forge .tok-bool,.ic-forge .tok-literal{color:#8f5208}
+.ic-forge .tok-typeName,.ic-forge .tok-className,.ic-forge .tok-namespace,.ic-forge .tok-definition,.ic-forge .tok-variableName.tok-definition{color:#6b3f8f}
+.ic-forge .tok-propertyName{color:#0b6262}
+.ic-forge .tok-comment{color:#56616b}
+.ic-forge.ic-dark .tok-keyword,.ic-forge.ic-dark .tok-controlKeyword{color:#86c8ec}
+.ic-forge.ic-dark .tok-string,.ic-forge.ic-dark .tok-string2{color:#9ad99a}
+.ic-forge.ic-dark .tok-number,.ic-forge.ic-dark .tok-atom,.ic-forge.ic-dark .tok-bool,.ic-forge.ic-dark .tok-literal{color:#e9bd7a}
+.ic-forge.ic-dark .tok-typeName,.ic-forge.ic-dark .tok-className,.ic-forge.ic-dark .tok-namespace,.ic-forge.ic-dark .tok-definition{color:#d0b0f0}
+.ic-forge.ic-dark .tok-propertyName{color:#7fd6d6}
+.ic-forge.ic-dark .tok-comment{color:#a6b0ba}
+.ic-forge.ic-dark .ic-host{background:linear-gradient(180deg,rgba(120,190,230,.07),rgba(120,190,230,0) 140px),var(--panel)}
 /* PASS 645 · the Code view of the preview: the whole file in a read-only editor, where the first 400,000 characters stood */
 #section-forge #codeViewWrap{flex:1;margin:12px;border-radius:12px;display:none;background:var(--panel);border:1px solid var(--edge);font:12.5px/1.6 var(--cd-mono);min-height:0;color:var(--ink)}
 body[data-view="code"] #section-forge #codeViewWrap{display:flex}
@@ -16,6 +50,7 @@ body[data-view="changes"] #section-forge #codeViewWrap,body[data-stagefold="1"] 
 (function(){
   if(!window.IngEditor){ try{ console.warn('the shared code editor is missing'); }catch(e){} return; }
   var SMALL=(navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Silk|Kindle/i.test(navigator.userAgent||'');
+  IngEditor.theme={wrap:'ic-forge',btn:'solid',on:'stone'};   /* the Forge's raised buttons (filled teal when on), and its colours (above) */
   try{ if(window.forgeBigText) window.forgeBigText.at=SMALL?8000000:40000000; }catch(e){}
   /* Fabrica's limits, as Ingenium's (its module r165): a file shown line by line in Changes and Compare up to 64 MB, in a
      version's history 48 MB (both versions together were held to 8 and 6 MB), Blame 32 MB (3 MB), the app's search 64 MB a
