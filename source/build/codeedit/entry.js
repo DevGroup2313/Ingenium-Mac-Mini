@@ -181,6 +181,13 @@ const PREFS = (() => { try { return JSON.parse(localStorage.getItem("ingEditorPr
 function savePrefs() { try { localStorage.setItem("ingEditorPrefs", JSON.stringify(PREFS)); } catch (e) { } }
 const all = new Set();
 
+// read-only or disabled as its text box is; it is always one stop for the keyboard (named so, as checkers want a scrolled region
+// to be), so code that cannot be changed can still be reached, read and scrolled, and it says when it cannot be changed
+function roExt(ta) {
+  const ro = !!ta.disabled || !!ta.readOnly;
+  return [EditorState.readOnly.of(ro), EditorView.editable.of(!ta.disabled),
+    EditorView.contentAttributes.of(ro ? { tabindex: '0', 'aria-readonly': 'true' } : { tabindex: '0' })];
+}
 function attach(ta, o) {
   if (!ta || ta.__ingCode) return ta && ta.__ingCode;
   o = o || {};
@@ -219,7 +226,7 @@ function attach(ta, o) {
         keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap, ...completionKeymap,
           { key: "Mod-Alt-g", run: gotoLine }, { key: "Tab", run: tab, shift: indentLess }]),
         C.lang.of(langExt(H.langKey, len)), C.big.of(bigExt(len)), C.wrap.of(H.wrapOn ? EditorView.lineWrapping : []),
-        C.ro.of([EditorState.readOnly.of(!!ta.disabled || !!ta.readOnly), EditorView.editable.of(!ta.disabled)]), C.attrs.of(attrs()),
+        C.ro.of(roExt(ta)), C.attrs.of(attrs()),
         C.calm.of(PREFS.calm && len < BIG ? calmFocus : []),
         EditorView.updateListener.of(u => {
           if (u.docChanged) { dirtySinceFocus = true; fire(); }
@@ -367,7 +374,7 @@ function attach(ta, o) {
   function watch() {
     sync();
     const ro = !!ta.disabled || !!ta.readOnly;
-    if (ro !== lastRo) { lastRo = ro; H.view.dispatch({ effects: [C.ro.reconfigure([EditorState.readOnly.of(ro), EditorView.editable.of(!ta.disabled)]), C.attrs.reconfigure(attrs())] }); }
+    if (ro !== lastRo) { lastRo = ro; H.view.dispatch({ effects: [C.ro.reconfigure(roExt(ta)), C.attrs.reconfigure(attrs())] }); }
   }
   new MutationObserver(watch).observe(ta, { attributes: true, attributeFilter: ["style", "hidden", "disabled", "readonly", "aria-label", "data-file"] });
   H.setLang = setLang; H.setName = n => { H.name = n || ""; if (!o.lang) setLang(langFor(H.name, str().slice(0, 4000)), false); };
