@@ -178,8 +178,9 @@ def block():
     p.cut("/* 6.0: Ingenium's own foot only", '#fb{\n', '')
     p.rep('if(typeof IngRepo==="undefined"||typeof IngShip==="undefined"||typeof go!=="function")return;',
           'if(typeof IngRepo==="undefined"||typeof IngShip==="undefined")return;\n' + LOCAL_STATE)
-    p.rep("Your own GitHub, on this device: each of your apps kept with every version, changed, tested and shipped from here. GitHub is there only when you want it.",
-          "Your own GitHub, in the Forge: each of your apps kept with every version, changed, tested and shipped from here, with no model and no connection. GitHub is there only when you want it.")
+    # (6.3: Fabrica in its own words, the name GitHub only where one connects to it)
+    p.rep("Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here.",
+          "Your workshop, in the Forge: each of your apps kept with every version, changed, tested and shipped from here, with no model and no connection.")
     # the work: written here, or in the Forge's Editor, not by a model
     p.rep('"<b>A new app, ready for its first page</b>Describe it in Chat or open it in Code: every change the model makes, and every save of yours, lands here as a change to keep. Or bring in a page you already have."',
           '"<b>A new app, ready for its first page</b>Write its first page here, or bring in a page you already have. Every save of yours lands here as a change to keep."')
@@ -198,7 +199,7 @@ def block():
     p.rep('var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android device: signed here, it installs as it is"],\n'
           '  ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],\n'
           '  ["web",', 'var TARGETS=[["web",')
-    p.rep('["kits","Build kits (.zip)","Projects for a computer or GitHub to build: you choose the devices"]]',
+    p.rep('["kits","Build kits (.zip)","Projects to build the apps on a computer or online: you choose the devices"]]',
           '["kits","Install packages (.zip)","Five: Mac, Mac mini, Windows, iPhone and iPad, Fire"]]')
     p.rep('if(!p.chosen)p.chosen=["apk","page"];', 'if(!p.chosen)p.chosen=["kits","page"];')
     p.rep('var pk=$("fbPkg");pk.innerHTML="";pk.hidden=!r;\n  if(r){', 'var pk=$("fbPkg");pk.innerHTML="";pk.hidden=true;\n  if(false){')

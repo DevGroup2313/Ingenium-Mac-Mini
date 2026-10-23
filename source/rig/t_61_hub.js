@@ -5,7 +5,7 @@
 // back, found by name on another device), the store's export and import, an app removed
 // taking its record, the Markdown kept safe, the look by day, by night, on a phone and on a 3440 display, and the same views
 // inside the Forge's copy of Fabrica (no Chat, no Code, no Build, no model).
-//   node rig/t_61_hub.js http://127.0.0.1:8201/ingenium.html <out folder>
+//   node rig/t_61_hub.js http://127.0.0.1:8201/ingenium.html <out folder> [forge=<url of the Forge page>]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0;
@@ -24,7 +24,9 @@ const SRC = path.join(__dirname, '..');
   const waitA = async (fn, a, t = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < t) { if (await ev(fn, a).catch(() => false)) return true; await p.waitForTimeout(200); } return false; };
   // (6.3: the tabs are in four rooms, and only the chosen room's show: its room is chosen first, as a person would)
   const tab = async v => { await ev(v => { if (window.fbRooms) { const R = fbRooms.rooms.find(r => r.v.includes(v)); if (R && fbRooms.room() !== R.k) fbRooms.choose(R.k); } }, v); await p.waitForTimeout(200);
-    await p.click('#fbViews button[data-v="' + v + '"]'); await p.waitForTimeout(450); };
+    await p.click('#fbViews button[data-v="' + v + '"]'); await p.waitForTimeout(450);
+    // (6.3: an app's settings are cards that fold; each is opened, as a person would open the one wanted, and stays open)
+    if (v === 'settings') { await ev(() => document.querySelectorAll('#fbWorkBody .fr-fold.fr-shut .fr-fh').forEach(h => h.click())); await p.waitForTimeout(150); } };
   const body = () => ev(() => document.getElementById('fbWorkBody').innerText);
   const toastText = () => ev(() => (document.querySelector('#fb .f-toast') || {}).textContent || '');
   const clickText = async (sel, text) => { const ok2 = await ev(([s, t]) => { const e = [...document.querySelectorAll(s)].find(x => x.textContent.trim() === t && x.offsetParent); if (e) { e.click(); return true; } return false; }, [sel, text]); await p.waitForTimeout(350); return ok2; };
@@ -428,29 +430,33 @@ const SRC = path.join(__dirname, '..');
   ok(errs.length === 0, 'no errors in the page', errs.slice(0, 5));
 
   // ---------- in the Forge's copy of Fabrica: its own store, no Chat, Code, Build or model ----------
-  let block = ''; try { block = cp.execFileSync('python3', ['-c', 'import sys;sys.path.insert(0,sys.argv[1]);import forge_fabrica;sys.stdout.write(forge_fabrica.block())', path.join(SRC, 'offline_project', 'forge_639')], { maxBuffer: 64 << 20 }).toString(); } catch (e) { block = ''; }
+  // (6.3: on the Forge's own page, forge=<url>; the pass 639 builder this used made the Forge's copy from 6.1's sources)
   const hub = fs.readFileSync(path.join(SRC, 'build', 'modules', 'r141.js'), 'utf8');
-  ok(block.length > 100000 && hub.split('var HUBDB="ingenium_hub";').length === 2, 'the Forge\'s Fabrica builds, and the hub names its store in one place the Forge\'s build can rename', block.length);
-  const forgeHtml = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Forge Fabrica</title></head><body style="margin:0;padding:14px;font-family:sans-serif">' +
-    '<div class="room" id="room-fabrica" data-on="1"><div class="room-body"><div id="fbHost"></div></div></div>' + block + hub.replace('var HUBDB="ingenium_hub";', 'var HUBDB="forge_hub";') + '<script>window.__forgeFabricaMount&&__forgeFabricaMount();</script></body></html>';
-  const forgeUrl = new URL('forge_hub_test.html', URL_).href;
-  const f = await ctx.newPage(); const ferrs = []; f.on('pageerror', e => ferrs.push(e.message.slice(0, 300)));
-  await f.route(forgeUrl, r => r.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: forgeHtml }));
-  await f.goto(forgeUrl); await f.waitForTimeout(1500);
-  const fparts = await f.evaluate(() => ({ p62: (window.__ingParts || {}).p62, go: typeof window.go, state: typeof window.state, ask: typeof window.ingAsk, tabs: [...document.querySelectorAll('#fbViews button[data-v]')].length }));
-  ok(fparts.p62 === 'running' && fparts.go === 'undefined' && fparts.ask === 'undefined' && fparts.tabs === 14, 'in the Forge\'s Fabrica (no go, no ingAsk, no Ingenium state) the hub runs and adds its nine tabs', fparts);
-  const fid = await f.evaluate(async () => { const x = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><title>Forge app</title><p>hi</p>' }, { path: 'README.md', data: '# Forge app\n\nMade in the **Forge**.' }], { name: 'Forge app', msg: 'First version' });
-    window.__fbState().sel = x.id; fbRender(); await new Promise(r => setTimeout(r, 900)); return x.id; });
-  await f.click('#fbViews button[data-v="code"]'); await f.waitForTimeout(700);
-  const fcode = await f.evaluate(() => (document.querySelector('#hReadme strong') || {}).textContent);
-  await f.click('#fbViews button[data-v="issues"]'); await f.waitForTimeout(400); await f.click('#hIssNew'); await f.fill('#hIsT', 'A Forge issue'); await f.click('#hIsGo'); await f.waitForTimeout(500);
-  await f.click('#fbViews button[data-v="settings"]'); await f.waitForTimeout(400); await f.click('#hSetStar'); await f.waitForTimeout(700);
-  const fst = await f.evaluate(async fid => { const dbs = indexedDB.databases ? (await indexedDB.databases()).map(d => d.name) : []; const got = await new Promise(res => { const rq = indexedDB.open('forge_hub'); rq.onsuccess = () => { const g = rq.result.transaction('apps').objectStore('apps').get(fid); g.onsuccess = () => res(g.result); }; });
-    return { dbs, issue: got && got.issues[0] && got.issues[0].title, stars: (window.__fbState().v61 || {}).hub && window.__fbState().v61.hub.stars, accent: getComputedStyle(document.querySelector('#hSetStar')).color }; }, fid);
-  ok(fcode === 'Forge' && fst.issue === 'A Forge issue' && fst.dbs.includes('forge_hub') && Array.isArray(fst.stars) && fst.stars.includes(fid), 'there, Code, Issues and a star work, kept in the Forge\'s own store (forge_hub) and its own settings', fst);
-  await f.click('#fbViews button[data-v="compare"]'); await f.waitForTimeout(700); await f.screenshot({ path: OUT + '/hub-forge-compare.png' });
-  await f.click('#fbViews button[data-v="issues"]'); await f.waitForTimeout(500); await f.screenshot({ path: OUT + '/hub-forge-issues.png' });
-  ok(ferrs.length === 0, 'no errors in the Forge\'s copy', ferrs.slice(0, 4));
+  ok(hub.split('var HUBDB="ingenium_hub";').length === 2, 'the hub names its store in one place the Forge\'s build can rename');
+  const FORGE = (process.argv.find(a => a.startsWith('forge=')) || '').slice(6);
+  if (FORGE) {
+    const f = await ctx.newPage(); const ferrs = []; f.on('pageerror', e => ferrs.push(e.message.slice(0, 300)));
+    await f.goto(FORGE); await f.waitForFunction(() => { const b = document.getElementById('forge-boot'); return !b || b.classList.contains('fb-gone'); }, null, { timeout: 120000 }); await f.waitForTimeout(1200);
+    await f.evaluate(() => { const d = document.getElementById('cd-door'); const k = d && [...d.querySelectorAll('button')].find(x => /^Open the Editor/.test(x.textContent.trim())); if (k) k.click(); }); await f.waitForTimeout(800);
+    await f.evaluate(() => FORGE.openRoom('fabrica')); await f.waitForTimeout(1500);
+    const ftab = async v => { await f.evaluate(v => { if (window.fbRooms) { const R = fbRooms.rooms.find(r => r.v.includes(v)); if (R && fbRooms.room() !== R.k) fbRooms.choose(R.k); } }, v); await f.waitForTimeout(200);
+      await f.click('#fbViews button[data-v="' + v + '"]'); await f.waitForTimeout(450);
+      if (v === 'settings') { await f.evaluate(() => document.querySelectorAll('#fbWorkBody .fr-fold.fr-shut .fr-fh').forEach(h => h.click())); await f.waitForTimeout(150); } };
+    const fparts = await f.evaluate(() => ({ p62: (window.__ingParts || {}).p62, ask: typeof window.ingAsk, chat: typeof window.csShow, tabs: [...document.querySelectorAll('#fbViews button[data-v]')].length }));
+    ok(fparts.p62 === 'running' && fparts.ask === 'undefined' && fparts.chat === 'undefined' && fparts.tabs === 14, 'in the Forge\'s Fabrica (no Chat, no ingAsk) the hub runs, with its fourteen tabs', fparts);
+    const fid = await f.evaluate(async () => { const x = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><title>Forge app</title><p>hi</p>' }, { path: 'README.md', data: '# Forge app\n\nMade in the **Forge**.' }], { name: 'Forge app', msg: 'First version' });
+      window.__fbState().sel = x.id; fbRender(); await new Promise(r => setTimeout(r, 900)); return x.id; });
+    await ftab('code'); await f.waitForTimeout(300);
+    const fcode = await f.evaluate(() => (document.querySelector('#hReadme strong') || {}).textContent);
+    await ftab('issues'); await f.click('#hIssNew'); await f.fill('#hIsT', 'A Forge issue'); await f.click('#hIsGo'); await f.waitForTimeout(500);
+    await ftab('settings'); await f.click('#hSetStar'); await f.waitForTimeout(700);
+    const fst = await f.evaluate(async fid => { const dbs = indexedDB.databases ? (await indexedDB.databases()).map(d => d.name) : []; const got = await new Promise(res => { const rq = indexedDB.open('forge_hub'); rq.onsuccess = () => { const g = rq.result.transaction('apps').objectStore('apps').get(fid); g.onsuccess = () => res(g.result); g.onerror = () => res(null); }; rq.onerror = () => res(null); });
+      return { dbs, issue: got && got.issues[0] && got.issues[0].title, stars: (window.__fbState().v61 || {}).hub && window.__fbState().v61.hub.stars }; }, fid);
+    ok(fcode === 'Forge' && fst.issue === 'A Forge issue' && fst.dbs.includes('forge_hub') && Array.isArray(fst.stars) && fst.stars.includes(fid), 'there, Code, Issues and a star work, kept in the Forge\'s own store (forge_hub) and its own settings', fst);
+    await ftab('compare'); await f.waitForTimeout(400); await f.screenshot({ path: OUT + '/hub-forge-compare.png' });
+    await ftab('issues'); await f.waitForTimeout(300); await f.screenshot({ path: OUT + '/hub-forge-issues.png' });
+    ok(ferrs.length === 0, 'no errors in the Forge\'s copy', ferrs.slice(0, 4));
+  } else console.log('(the Forge\'s copy not checked: give forge=<url of the Forge page>)');
 
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
   await b.close(); process.exit(fail ? 1 : 0);
