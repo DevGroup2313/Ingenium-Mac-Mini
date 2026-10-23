@@ -159,7 +159,7 @@ function raise(L,title,body){return api(path(L)+"/issues",{method:"POST",body:{t
 var cache={};
 function paint(r,cp,X){var g=GH(),L=linkOf(r),h=X.h,btn=X.btn,esc=X.esc;
   function row(title,small,keys){var e=h("div","f-cp");e.innerHTML='<div class="t">'+esc(title)+(small?"<small>"+small+"</small>":"")+"</div>";(keys||[]).forEach(function(k){if(k)e.appendChild(k);});cp.appendChild(e);return e;}
-  function openUrl(u){try{var w=window.open(u,"_blank");if(!w)X.toast("Open this address: "+u);}catch(e){X.toast(u);}}
+  function openUrl(u){try{if(!/^https:\/\//i.test(String(u))){X.toast("Open this address: "+u);return;}var a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener noreferrer";document.body.appendChild(a);a.click();a.remove();}catch(e){X.toast(u);}}  /* 6.2: the site opened is told nothing of Ingenium's window */
   function repaint(){try{if(window.fbPaintShip)fbPaintShip();}catch(e){}}
   if(!g.token){row("Sign in to GitHub","A fine-grained token for your repositories, with Contents, Actions and Issues allowed to read and write. It is kept on this device and sent only to GitHub.",[btn("sm","Sign in",function(){
       X.sheetName("Sign in to GitHub","Paste a personal access token. Make one at github.com → Settings → Developer settings → Fine-grained tokens, for the repositories you want Fabrica to reach.",function(t){return signIn(t).then(function(login){X.toast("Signed in as "+login+".");repaint();});},"github_pat_…");})]);return;}

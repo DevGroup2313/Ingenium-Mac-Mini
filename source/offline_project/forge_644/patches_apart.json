@@ -1,0 +1,17 @@
+[
+ {
+  "why": "Fabrica's Run opens the app in a window kept apart (the shared build/thoughts/open_apart.html): from a blob: address it ran as the Forge, and could read all the Forge keeps",
+  "old": "    var u=URL.createObjectURL(new Blob([html],{type:\"text/html\"})),w=null;try{w=window.open(u,\"_blank\");}catch(e){}\n    if(w){toast(r.name+\" is running in a window of its own.\"+(statusOf(r).clean?\"\":\" (The last kept version; the changes not kept yet are not in it.)\"));setTimeout(function(){URL.revokeObjectURL(u);},60000);return;}\n    URL.revokeObjectURL(u);saveBytes(",
+  "new": "    var w=typeof window.ingOpenApart===\"function\"?window.ingOpenApart(html,r.name):null;\n    if(w){toast(r.name+\" is running in a window of its own.\"+(statusOf(r).clean?\"\":\" (The last kept version; the changes not kept yet are not in it.)\"));return;}\n    saveBytes("
+ },
+ {
+  "why": "a link Fabrica's GitHub views open is told nothing of the Forge's window (noopener, noreferrer), and only an https address is opened",
+  "old": "  function openUrl(u){try{var w=window.open(u,\"_blank\");if(!w)X.toast(\"Open this address: \"+u);}catch(e){X.toast(u);}}",
+  "new": "  function openUrl(u){try{if(!/^https:\\/\\//i.test(String(u))){X.toast(\"Open this address: \"+u);return;}var a=document.createElement(\"a\");a.href=u;a.target=\"_blank\";a.rel=\"noopener noreferrer\";document.body.appendChild(a);a.click();a.remove();}catch(e){X.toast(u);}}"
+ },
+ {
+  "why": "the preview's Open shows the page in a window kept apart: written into a blank window, it ran as the Forge",
+  "old": "el('openBtn').onclick=function(){ if(!current){ nothingYet(); return; } var w=window.open('','_blank'); if(w){ w.document.open(); w.document.write(current.doc); w.document.close(); } };",
+  "new": "el('openBtn').onclick=function(){ if(!current){ nothingYet(); return; } var w=window.ingOpenApart?window.ingOpenApart(current.doc,current.name):null; if(!w) el('curName').textContent='The browser did not open a new window: allow pop-ups for the Forge, or use Download and open the file.'; };"
+ }
+]
