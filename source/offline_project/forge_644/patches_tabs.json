@@ -1,0 +1,7 @@
+[
+ {
+  "why": "the family bar's keys are the tabs of a tab list from the moment they are made (axe, in the Reckoner: a tab list whose keys were not yet tabs, between a redraw and the checker that names them)",
+  "old": "var b=document.createElement('button'); b.className='nav-btn'+(r[0]===id?' active':''); b.textContent=r[1]; b.style.flex='1 1 0%';",
+  "new": "var b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected', r[0]===id?'true':'false'); b.className='nav-btn'+(r[0]===id?' active':''); b.textContent=r[1]; b.style.flex='1 1 0%';"
+ }
+]

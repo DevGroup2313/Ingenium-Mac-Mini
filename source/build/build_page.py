@@ -272,6 +272,20 @@ edit('<Application>Ingenium</Application>', '', "6.1 a Word file names no progra
 edit('<Application>Ingenium Lector</Application>', '', "6.1 Lector's Word file names no program")
 edit('" /Producer (Ingenium) /Creator (Ingenium) >>"', '" >>"', "6.1 a PDF names no producer")
 
+# ---- R157 (Ingenium 6.2, 22 October 2026): Ingenium's eyes. A picture Ingenium has looked at (modules/r157.js) goes on
+#      to a model that reads text only, with what Ingenium saw written before the message; that description stays with
+#      the message after a reload, when the picture itself is no longer kept. ----
+edit('if(rec.cid&&chatImages[rec.cid]&&!canSee){', 'if(rec.cid&&chatImages[rec.cid]&&!canSee&&!rec.seen){', "R157 a picture Ingenium looked at goes on to the model")
+edit('return !x.preview&&!x.live&&(x.text||x.attach||x.attachRef||(x.cid&&chatImages[x.cid]));',
+     'return !x.preview&&!x.live&&(x.text||x.attach||x.attachRef||(x.cid&&(chatImages[x.cid]||x.seen)));', "R157 a message whose picture Ingenium saw stays in the history")
+edit('    var ci=x.cid&&chatImages[x.cid];\n    if(role==="user"&&ci&&canSee)return',
+     '    var ci=x.cid&&chatImages[x.cid];\n    if(role==="user"&&x.seen&&!(ci&&canSee)&&window.IngEyes)body=IngEyes.note(x)+(body?"\\n\\n"+body:"");\n    if(role==="user"&&ci&&canSee)return',
+     "R157 what Ingenium saw, before the message, for a model that reads text only")
+# the picture as it was chosen is kept beside the smaller copy the chat makes, for this session only, so Ingenium reads a
+# screenshot's words at their own size and a photo's camera notes (the smaller copy keeps neither)
+edit('stagedImage={name:f.name,dataUrl:url,buf:buf};', 'stagedImage={name:f.name,dataUrl:url,buf:buf,file:f};', "R157 the picture as chosen, kept")
+edit('chatImages[rec.cid]={name:img.name,dataUrl:img.dataUrl,buf:img.buf};', 'chatImages[rec.cid]={name:img.name,dataUrl:img.dataUrl,buf:img.buf,file:img.file||null};', "R157 the picture as chosen, with the message")
+
 # ---- R151 (Ingenium 6.1, 20 October 2026): the loading page and the Refresh key. The owner's words: "I want a refresh button
 #      added to Ingenium and the Forge, that refreshed the app if it glitches or freezes. I also want a loading page added to
 #      the apps that informs the user that the page is still being painted instead of letting a user think that the app has
@@ -393,6 +407,18 @@ for _sid, _sf in (("ing-android-shell", "android-shell.dex"), ("ing-ios-shell", 
         if len(_sb) != _rec["bytes"] or _hl.sha256(_sb).hexdigest() != _rec["sha256"]:
             sys.exit("ios-shell.zip: its size or fingerprint does not match ios-shell.json")
     _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
+# ---- R157 (Ingenium 6.2, 22 October 2026): Ingenium's eyes, the picture reader that needs no model that can see
+#      (eyes/eyes.pack, made by eyes/make_eyes.py: TensorFlow.js, MobileNet v2 in eight bits, Tesseract and its English
+#      data, all Apache-2.0), checked here against eyes.json. The lean copy the Forge carries leaves it out. ----
+if os.environ.get("ING_LEAN") != "1":
+    _em = json.load(open(os.path.join(HERE, "eyes", "eyes.json")))
+    _eb = open(os.path.join(HERE, "eyes", "eyes.pack"), "rb").read()
+    if len(_eb) != _em["pack"]["size"] or _hl.sha256(_eb).hexdigest() != _em["pack"]["sha256"]:
+        sys.exit("eyes.pack: its size or fingerprint does not match eyes.json")
+    _apps += '<script type="ingenium/b64" id="ing-eyes">' + _b64.b64encode(_eb).decode("ascii") + '</script>\n'
+    # their authors' notices (eyes/NOTICE.txt) go with the pack, and Settings shows them
+    _en = open(os.path.join(HERE, "eyes", "NOTICE.txt"), encoding="utf-8").read().replace("</", "<\\/")
+    _apps += '<script type="text/plain" id="ing-eyes-notice">' + _en + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 # 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
