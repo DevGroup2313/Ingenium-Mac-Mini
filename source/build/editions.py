@@ -309,7 +309,8 @@ def strip(out, ed):
     with tempfile.TemporaryDirectory() as d:
         src, mid, dst = os.path.join(d, "in.html"), os.path.join(d, "mid.html"), os.path.join(d, "out.html")
         open(src, "w", encoding="utf-8").write(out)
-        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), src, mid, "--html"]))
+        owner = ["--keep-owner"] if has_lector(ed) else []  # the owner's authorship notes stay where the owner's name does
+        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), src, mid, "--html"] + owner))
         _node([os.path.join(TOOLS, "same_code.js"), src, mid])
         if word:
             rep["words"] = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), mid, dst] + word))["words"]
