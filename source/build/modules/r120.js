@@ -36,7 +36,9 @@ function standing(k){var b=BI[k],m=libState().apps[k];if(!b)return "absent";if(!
 
 /* ---------- the built-in page: decoded, inflated, and checked before it is kept ---------- */
 function bytesOf(k){var el=document.getElementById("ing-builtin-"+k);if(!el)return Promise.reject(new Error("this page carries no copy of "+LIB_NAMES[k]));
-  return new Promise(function(res){var s=atob(el.textContent.trim()),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);res(u);})
+  /* 6.2 (R161): on a computer the copy may still be with the app, fetched the first time it is wanted */
+  return (typeof ingFill==="function"?ingFill("ing-builtin-"+k):Promise.resolve())
+    .then(function(){return new Promise(function(res){var s=atob(el.textContent.trim()),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);res(u);});})
     .then(function(gz){try{if(typeof DecompressionStream==="function")
         return new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer().then(function(b){return new Uint8Array(b);},function(){return ingInflateGzip(gz);});}catch(e){}
       return ingInflateGzip(gz);});}

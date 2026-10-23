@@ -272,6 +272,73 @@ edit('<Application>Ingenium</Application>', '', "6.1 a Word file names no progra
 edit('<Application>Ingenium Lector</Application>', '', "6.1 Lector's Word file names no program")
 edit('" /Producer (Ingenium) /Creator (Ingenium) >>"', '" >>"', "6.1 a PDF names no producer")
 
+# ---- R161 (Ingenium 6.2, 23 October 2026): a quicker start on a computer (desktop/app_quick_62.py, modules/r161.js). A block
+#      carried for later may arrive empty, naming where it is (data-defer); it is fetched from the app, once, before it is
+#      read. Defined here, ahead of everything that reads one: the page's own engine and the kit store wait for theirs. ----
+edit('function ingSlot(id){var e=document.getElementById(id);return (e&&e.textContent.trim().length>100)?e:null;}',
+     'var ING_FILL={};\nfunction ingFill(id){var e=document.getElementById(id);if(!e||!e.getAttribute("data-defer"))return Promise.resolve(e);if(ING_FILL[id])return ING_FILL[id];\n'
+     '  ING_FILL[id]=fetch(e.getAttribute("data-defer"),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("Ingenium could not fetch its "+id+" (HTTP "+r.status+")");return r.text();})\n'
+     '    .then(function(t){e.textContent=t;e.removeAttribute("data-defer");return e;},function(err){delete ING_FILL[id];throw err;});return ING_FILL[id];}\n'
+     'function ingFillAll(){return Promise.all([].slice.call(document.querySelectorAll("script[data-defer]")).map(function(e){return ingFill(e.id);}));}\n'
+     'function ingDeferredLeft(){return document.querySelectorAll("script[data-defer]").length;}\n'
+     'function ingSlot(id){var e=document.getElementById(id);return (e&&(e.getAttribute("data-defer")||e.textContent.trim().length>100))?e:null;}',
+     "R161 a block carried for later, fetched before it is read")
+edit('function ingSlotBlob(e,type){\n', 'function ingSlotBlob(e,type){\n  if(e&&e.getAttribute("data-defer"))return ingFill(e.id).then(function(){return ingSlotBlob(e,type);});\n', "R161 the page's own engine waits for its blocks")
+edit('  var s=document.getElementById("ingenium-kit-bundle");\n',
+     '  var s=document.getElementById("ingenium-kit-bundle");\n  if(s&&s.getAttribute("data-defer"))return ingFill("ingenium-kit-bundle").then(function(){return kitStore();});\n', "R161 the kit store waits for its block")
+
+# ---- R159 (Ingenium 6.2, 23 October 2026): a long memory (modules/r159.js has the rest). A connected model is given its own
+#      window, and Ollama is told how much to keep; a conversation keeps every message its memory holds (it kept 16 to 24);
+#      a model's own settings reach as far as its engine goes. ----
+edit('if(chatSource()==="cloud"&&state.cloud&&state.cloud.on)ctx=Math.max(ctx,100000);',
+     'if(chatSource()==="cloud"&&state.cloud&&state.cloud.on)ctx=Math.max(ctx,typeof ingCloudWindow==="function"?ingCloudWindow():100000);', "R159 a connected model's own window")
+edit('if(all.length-st>24)st=all.length-16;',
+     'var cap=Math.max(24,Math.floor(budget/1200));if(all.length-st>cap)st=all.length-Math.max(16,Math.floor(cap*0.66));', "R159 a conversation keeps what its memory holds")
+edit('options:{num_predict:withThink?replyTokens():maxTok}};',
+     'options:{num_predict:withThink?replyTokens():maxTok,num_ctx:typeof ingCloudWindow==="function"?ingCloudWindow():32768}};', "R159 Ollama is told how much to keep")
+edit('id="emCtx" min="1024" max="32768" step="1024"', 'id="emCtx" min="1024" max="\'+(typeof ingCtxMax==="function"?ingCtxMax(m):32768)+\'" step="1024"', "R159 a model's own memory reaches as far as its engine")
+edit('id="emTokens" min="128" max="4096" step="128"', 'id="emTokens" min="128" max="\'+(typeof ingReplyMax==="function"?ingReplyMax(m):4096)+\'" step="128"', "R159 a model's longest reply reaches as far as it goes")
+
+# ---- R158 (Ingenium 6.2, 23 October 2026): room to grow. The store of large texts (R81) kept every text it was given in
+#      memory for the whole session: an app of 100 MB and each changed copy of it. It now keeps in memory only the most
+#      recently used large texts (300 million characters on a computer, 100 million on a tablet or a phone), and lets go
+#      only of one already written to the device's store and not read by the open conversation; it is read back from
+#      the store when it is wanted (modules/r158.js has the rest). ----
+edit('var IngBig=(function(){var mem={},dbp=null;',
+     'var IngBig=(function(){var mem={},dbp=null,saved={},used={},BIGM=4194304,KEEP=((typeof navigator!=="undefined"&&navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Silk|Kindle/i.test((typeof navigator!=="undefined"&&navigator.userAgent)||""))?1e8:3e8;',
+     "R158 the large store: what is written, and when each was last used")
+edit('function put(id,text){text=String(text==null?"":text);mem[id]=text;',
+     'function put(id,text){text=String(text==null?"":text);mem[id]=text;used[id]=Date.now();delete saved[id];', "R158 a text put is new")
+edit('var p1=tx("readwrite",function(s){return s.put(text,id);}).catch(function(){});',
+     'var p1=tx("readwrite",function(s){return s.put(text,id);}).then(function(){if(mem[id]===text){saved[id]=1;trim();}}).catch(function(){});', "R158 a text written may leave memory")
+edit('function get(id){return id&&has(id)?mem[id]:null;}', 'function get(id){if(id&&has(id)){used[id]=Date.now();return mem[id];}return null;}', "R158 a text read is recent")
+edit('function load(id){if(!id)return Promise.resolve(null);if(has(id))return Promise.resolve(mem[id]);',
+     'function load(id){if(!id)return Promise.resolve(null);if(has(id)){used[id]=Date.now();return Promise.resolve(mem[id]);}', "R158 a text loaded is recent")
+edit('if(typeof t==="string"){mem[id]=t;return t;}', 'if(typeof t==="string"){mem[id]=t;saved[id]=1;used[id]=Date.now();trim();return t;}', "R158 a text read back is written already")
+edit('function del(id){if(!id)return;delete mem[id];', 'function del(id){if(!id)return;delete mem[id];delete saved[id];delete used[id];', "R158 a text let go")
+edit('  function newId(){return "big_"',
+     '  /* the large texts beyond the bound leave memory, the least recently used first; never the newest, one not yet written, or\n'
+     '     one the open conversation or the message being written reads */\n'
+     '  function trim(){var big=[],tot=0;for(var k in mem){if(has(k)&&mem[k].length>=BIGM){big.push(k);tot+=mem[k].length;}}if(tot<=KEEP)return;\n'
+     '    var pin={};try{curMsgs().forEach(function(x){if(x.attachRef)pin[x.attachRef]=1;});}catch(e){}try{(stagedFiles||[]).forEach(function(f){if(f.ref)pin[f.ref]=1;});}catch(e){}\n'
+     '    big.sort(function(a,b){return (used[a]||0)-(used[b]||0);});\n'
+     '    for(var i=0;i<big.length-1&&tot>KEEP;i++){var id=big[i];if(!saved[id]||pin[id])continue;tot-=mem[id].length;delete mem[id];}}\n'
+     '  function newId(){return "big_"', "R158 the large texts beyond the bound leave memory")
+edit('  return {put:put,get:get,load:load,del:del,newId:newId,gc:gc};})();',
+     '  return {put:put,get:get,load:load,del:del,newId:newId,gc:gc,held:function(){var n=0,c=0;for(var k in mem)if(has(k)){n+=mem[k].length;c++;}return {chars:n,texts:c,keep:KEEP};}};})();', "R158 how much the store holds in memory")
+
+# ---- R160 (Ingenium 6.2, 23 October 2026): chats carried over from other assistants (modules/r160.js has the rest). The
+#      large store can keep a text without holding it in memory (thousands of imported conversations wait there until
+#      they are opened), and the list of conversations shows a conversation carried over, and finds it by its first
+#      words, before it is opened. ----
+edit('  function newId(){return "big_"',
+     '  function cold(id,text){text=String(text==null?"":text);delete mem[id];return tx("readwrite",function(s){return s.put(text,id);}).then(function(){return id;});}\n  function newId(){return "big_"',
+     "R160 a text kept without holding it in memory")
+edit('return {put:put,get:get,load:load,del:del,newId:newId,gc:gc,held:', 'return {put:put,cold:cold,get:get,load:load,del:del,newId:newId,gc:gc,held:', "R160 the store's cold keeping, offered")
+edit('if(!q)return (c.messages||[]).length||c.id===state.activeChat;', 'if(!q)return (c.messages||[]).length||c.imported||c.id===state.activeChat;', "R160 a conversation carried over is listed")
+edit('if(chatTitle(c).toLowerCase().indexOf(q)>=0)return true;',
+     'if(chatTitle(c).toLowerCase().indexOf(q)>=0)return true;if(c.imported&&String((c.imported.preview||"")+" "+(c.imported.from||"")).toLowerCase().indexOf(q)>=0)return true;', "R160 a conversation carried over is found by its first words")
+
 # ---- R157 (Ingenium 6.2, 22 October 2026): Ingenium's eyes. A picture Ingenium has looked at (modules/r157.js) goes on
 #      to a model that reads text only, with what Ingenium saw written before the message; that description stays with
 #      the message after a reload, when the picture itself is no longer kept. ----
@@ -439,6 +506,12 @@ def _modtext(m):
     if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
+# 6.2: a module's script ends only where it means to: "</script" written inside its code or a comment would end it early
+for _m in mods:
+    _t = open(_m, encoding="utf-8").read()
+    _opens = len(re.findall(r"^<script\b", _t, flags=re.I | re.M))  # a module's scripts open at the start of a line
+    if _t.lower().count("</script") != _opens:
+        sys.exit(os.path.basename(_m) + ": \"</script\" stands inside its code (write <\\/script), or a script is not closed")
 blob = "\n".join(_modtext(m) for m in mods) + "\n"
 blob = blob.replace("/*R104_ICON*/null", json.dumps(PI["big"]))
 if "/*R109_WIDTHS*/null" in blob:
