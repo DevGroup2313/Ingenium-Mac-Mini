@@ -106,6 +106,14 @@ const PAGE_HELPERS = () => {
   ok(s1.r132 === 'none', "the older room line in Data on this device gives way to the Storage section", s1.r132);
   await shot(p, 's1-storage-day', { fullPage: false });
 
+  // 6.2: every section from here on is built on the app library (its versions, Keep always, what goes on its own), which
+  // only the master edition keeps; in another edition the cleaning of stored texts and packages is checked by t_62_editions.js
+  if (!(await p.evaluate(() => typeof libOn !== 'function' || libOn()))) {
+    const none = await p.evaluate(() => (document.getElementById('stxApps') || {}).textContent || '');
+    ok(/This edition keeps no app library/.test(none), 'this edition keeps no app library, and says so where its versions would be', none.slice(0, 120));
+    console.log('NOTE the ' + (await p.evaluate(() => ING_EDITION)) + ' edition keeps no app library: the library\'s sections are checked in the master edition');
+    console.log(`\n${pass} passed, ${fail} failed`); await b.close(); process.exit(fail ? 1 : 0);
+  }
   // ================= 2 · the owner's work, the library's versions, Fabrica's packages, orphans =================
   const seed = await p.evaluate(async () => {
     const T = __t, O = {};
@@ -128,7 +136,8 @@ const PAGE_HELPERS = () => {
     const W = {}; ['chat', 'lxdoc', 'askv', 'run', 'code', 'codev', 'shelf', 'store'].forEach((k, i) => W[k] = T.oldId(2, 'w' + i + k));
     for (const k in W) await IngBig.put(W[k], 'The owner\'s ' + k + ' text. ' + 'x'.repeat(2000));
     state.chats = state.chats || []; state.chats.push({ id: 'chat_r142', title: 'Storage test chat', created: Date.now(), updated: Date.now(), messages: [{ role: 'me', text: 'See the file', attachRef: W.chat, attachChars: 2000 }] });
-    const lx = lxState(); lx.sets = lx.sets || {}; lx.sets.r142 = { apps: ['cd'], purpose: 'portfolio', docs: { analysis: { ref: W.lxdoc, at: Date.now() } }, older: { analysis: [{ ref: W.askv, at: Date.now() - 1000 }] } };
+    // 6.2: in an edition without Lector the desk can still hold Lector's records (a backup from the master edition, read back), and they still protect what they name
+    const lx = typeof lxState === 'function' ? lxState() : (state.lector = state.lector || {}); lx.sets = lx.sets || {}; lx.runs = lx.runs || []; lx.sets.r142 = { apps: ['cd'], purpose: 'portfolio', docs: { analysis: { ref: W.lxdoc, at: Date.now() } }, older: { analysis: [{ ref: W.askv, at: Date.now() - 1000 }] } };
     lx.runs.push({ id: 'run_r142', name: 'Storage test reading', status: 'done', partsRef: W.run, notesRef: null, mergeRef: null, analysisRef: null, writings: {} });
     state.projects = state.projects || []; state.projects.push({ id: 'proj_r142', name: 'Storage test project', app: false, files: [{ name: 'index.html', ref: W.code, size: 2000 }], versions: [{ prev: W.codev, next: null }] });
     saveState();
@@ -302,7 +311,7 @@ const PAGE_HELPERS = () => {
 
   // ================= 10 · nothing the owner made is ever removed =================
   const fin = await p.evaluate(async (o) => { const big = await __t.keys('ingenium_big', 't'), apps = await __t.keys('ingenium_apps', 'b'); const repos = (await IngRepo.list()).map(r => r.name);
-    const chat = state.chats.find(c => c.id === 'chat_r142'), lx = lxState(); const loads = await Promise.all(Object.values(o.W).map(id => IngBig.load(id)));
+    const chat = state.chats.find(c => c.id === 'chat_r142'), lx = typeof lxState === 'function' ? lxState() : (state.lector || {}); const loads = await Promise.all(Object.values(o.W).map(id => IngBig.load(id)));
     return { missing: Object.values(o.W).filter(x => big.indexOf(x) < 0), loads: loads.every(t => typeof t === 'string' && /The owner's/.test(t)), repos, chat: !!chat, lx: !!(lx.sets.r142 && lx.runs.find(r => r.id === 'run_r142')), proj: !!state.projects.find(x => x.id === 'proj_r142'),
       newest: ['cd', 'inkwell', 'forge'].every(k => apps.indexOf(libState().apps[k].ref) >= 0), pinned: apps.indexOf(o.cd[1].ref) >= 0, keys: (await __t.keys('ingenium_keys', 'k')).length, hub: (await indexedDB.databases()).map(d => d.name) }; }, seed);
   ok(fin.missing.length === 0 && fin.loads && fin.chat && fin.lx && fin.proj, "after every clean and every eviction, the owner's chats, Lector's documents and readings, Ask Lector's versions, Code's project and the recovery shelf all still read back whole", fin.missing);

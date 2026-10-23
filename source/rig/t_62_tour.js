@@ -98,14 +98,15 @@ async function raised(p, sel) {
     await shot(p, 't62-chapters-day');
     const axMenu = await axeOn(p, '#tourMenu', 'the Chapters list by day');
     if (axMenu) ok(axMenu.length === 0, 'axe-core finds nothing in the Chapters list by day', axMenu);
-    // a chapter chosen jumps there
-    await p.evaluate(() => { const b = [...document.querySelectorAll('#tourMenu .tour-mi')].find(x => /Lector/.test(x.textContent)); b && b.click(); }); await p.waitForTimeout(900);
+    // a chapter chosen jumps there (6.2: Lector's, or in an edition without Lector, Fabrica's, which comes after it)
+    const CH = await p.evaluate(() => document.getElementById('page-lector') ? 'Lector' : 'Fabrica'), CHR = new RegExp(CH, 'i');
+    await p.evaluate((CH) => { const b = [...document.querySelectorAll('#tourMenu .tour-mi')].find(x => new RegExp(CH).test(x.textContent)); b && b.click(); }, CH); await p.waitForTimeout(900);
     const jumped = await p.evaluate(() => ({ menu: !!document.getElementById('tourMenu'), meta: (document.querySelector('#ingTour .tour-meta') || {}).textContent || '' }));
-    ok(!jumped.menu && /LECTOR|Lector/.test(jumped.meta), 'choosing Lector in the list goes to the Lector chapter and closes the list', jumped);
+    ok(!jumped.menu && CHR.test(jumped.meta), 'choosing ' + CH + ' in the list goes to the ' + CH + ' chapter and closes the list', jumped);
     await p.click('#ingTour .tour-chap'); await p.waitForTimeout(600);
     const where = await p.evaluate(() => { const m = document.querySelector('#tourMenu .tour-card'), on = m.querySelector('.tour-mi.on'), a = m.getBoundingClientRect(), r = on.getBoundingClientRect();
       return { name: on.textContent.trim(), inside: r.top >= a.top && r.bottom <= a.bottom, scrolled: m.scrollTop }; });
-    ok(/Lector/.test(where.name) && where.inside && where.scrolled > 0, 'opened again from the Lector chapter, the list is scrolled to Lector', where);
+    ok(CHR.test(where.name) && where.inside && where.scrolled > 0, 'opened again from the ' + CH + ' chapter, the list is scrolled to ' + CH, where);
     await p.keyboard.press('Escape'); await p.waitForTimeout(300);
     ok((await p.evaluate(() => document.querySelector('#ingTour .tour-chap').getAttribute('aria-expanded'))) === 'false', 'and the Chapters key says the list is closed again');
     const axCard = await axeOn(p, '#ingTour', 'the tour card by day');
@@ -163,9 +164,11 @@ async function raised(p, sel) {
     await shot(p, 't62-help-chat');
     const axH = await axeOn(p, '#ihPanel', 'the help card');
     if (axH) ok(axH.length === 0, 'axe-core finds nothing in the help card', axH);
-    await p.evaluate(() => go('lector')); await p.waitForTimeout(500);
+    // 6.2: to Lector's page, or in an edition without Lector, to Build's
+    const PG = await p.evaluate(() => document.getElementById('page-lector') ? 'lector' : 'build');
+    await p.evaluate((PG) => go(PG), PG); await p.waitForTimeout(500);
     const follow = await p.evaluate(() => ({ open: !document.getElementById('ihPanel').hidden, title: document.getElementById('ihTitle').textContent }));
-    ok(follow.open && /Lector/.test(follow.title), 'an open help card follows a page change', follow);
+    ok(follow.open && new RegExp(PG, 'i').test(follow.title), 'an open help card follows a page change (to ' + PG + ')', follow);
     await p.keyboard.press('Escape'); await p.waitForTimeout(200);
     ok(await p.evaluate(() => document.getElementById('ihPanel').hidden), 'Escape closes it');
     // Shift+F1 on the focused control; What is this? on the next control pressed

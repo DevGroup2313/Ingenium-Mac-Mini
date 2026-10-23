@@ -50,10 +50,11 @@ async function seed(p) { return p.evaluate(async () => {
   const dh = await IngRepo.head(d.id); await IngRepo.setNote(d.id, dh, 'test', { ok: true, checks: [{ id: 'reads', state: 'ok' }] }); // tested, to ship
   const e = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><title>Forge copy</title>' }], { name: 'The Forge', msg: 'First', app: 'forge' });
   const eh = await IngRepo.head(e.id); await IngRepo.setNote(e.id, eh, 'test', { ok: true, checks: [{ id: 'reads', state: 'ok' }] }); await IngRepo.setNote(e.id, eh, 'onePage', { at: now }); // shipped
-  // a Lector document for a trio
-  const L = IngLector.state(), apps = ['cd', 'forge', 'ingenium'], key = IngLector.setKey(apps, 'portfolio'), ref = IngBig.newId();
+  // a Lector document for a trio (6.2: in an edition with Lector)
+  let key = null;
+  if (window.IngLector) { const L = IngLector.state(), apps = ['cd', 'forge', 'ingenium'], ref = IngBig.newId(); key = IngLector.setKey(apps, 'portfolio');
   await IngBig.put(ref, '# The set\n\n## Overview\n\nA paragraph.\n');
-  L.sets[key] = { apps: apps.slice(), purpose: 'portfolio', docs: { dossier: { ref, made: now - 60000, model: 'test', title: 'test', chk: { figures: 0, unmatched: [], fills: 0 } } }, older: {} };
+  L.sets[key] = { apps: apps.slice(), purpose: 'portfolio', docs: { dossier: { ref, made: now - 60000, model: 'test', title: 'test', chk: { figures: 0, unmatched: [], fills: 0 } } }, older: {} }; }
   saveState();
   return { chats: [c1.id, c2.id, c3.id, blank.id], repos: { a: a.id, b: bb.id, c: c.id, d: d.id, e: e.id }, lkey: key };
   }); }
@@ -65,6 +66,9 @@ async function seed(p) { return p.evaluate(async () => {
   ok(!/\b(claude|gpt|gemini|llama|qwen|mistral|anthropic|openai|deepseek|phi-?\d)\b/i.test(src), 'no model is named anywhere in the module');
   const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox'] });
   let { ctx, p } = await open(b);
+  // 6.2: the gift and demo editions have no Lector; the gift edition's plaque holds Ingenium's own seal
+  const { LX, BLANK } = await p.evaluate(() => ({ LX: !!document.getElementById('page-lector'), BLANK: typeof ING_EDITION !== 'undefined' && ING_EDITION === 'gift' }));
+  if (!LX || BLANK) console.log('NOTE the ' + (await p.evaluate(() => ING_EDITION)) + ' edition: ' + (LX ? '' : 'no Lector') + (BLANK ? (LX ? '' : ', ') + 'Ingenium\'s seal on the plaque' : ''));
 
   // ---------------- the part runs, and the frame is there at once ----------------
   const ms = await p.evaluate(() => window.IngHome && IngHome.buildMs);
@@ -79,11 +83,11 @@ async function seed(p) { return p.evaluate(async () => {
       next: document.getElementById('heroNext').textContent, step: document.getElementById('heroStepNote').textContent };
   });
   ok(frame.ids.length === 7 && frame.oldCards === 0, 'the elements the rest of Ingenium speaks to keep their ids, inside the new Home; the old cards are gone', frame);
-  ok(frame.keys.join() === 'chat,code,build,fabrica,lector,focus' && frame.apps.join() === 'tabula,abacus,slides,scriba,fontes,schedae,clepsydra', 'large keys into the work, and a key for each app and instrument', [frame.keys, frame.apps]);
+  ok(frame.keys.join() === (LX ? 'chat,code,build,fabrica,lector,focus' : 'chat,code,build,fabrica,focus') && frame.apps.join() === 'tabula,abacus,slides,scriba,fontes,schedae,clepsydra', 'large keys into the work, and a key for each app and instrument', [frame.keys, frame.apps]);
   const h = new Date().getHours(), part = h < 5 ? 'Good evening' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   ok(frame.hello.indexOf(part) === 0 && frame.h1 === 'H1' && frame.title === 'Ingenium', 'the greeting fits the time of day, and the page is still headed by its name', [frame.hello, frame.title]);
   ok(frame.next.length > 3 && frame.step.length > 3, 'the next step is still told and offered', [frame.next, frame.step]);
-  ok(frame.lists.length === 3 && frame.plaque && frame.facts === 3, 'three lists of where the owner left off, the plaque, and three plain facts about the models and the engine', frame);
+  ok(frame.lists.length === (LX ? 3 : 2) && frame.plaque && frame.facts === 3, 'three lists of where the owner left off, the plaque, and three plain facts about the models and the engine', frame);
 
   // ---------------- the work, real: conversations, a coding session, Fabrica's apps at each step, a Lector document ----------------
   const made = await seed(p);
@@ -91,7 +95,7 @@ async function seed(p) { return p.evaluate(async () => {
   const lists = await p.evaluate(() => {
     const rows = id => [...document.querySelectorAll('#hxList_' + id + ' .hx-item')].map(b => ({ t: b.querySelector('b').textContent, s: [...b.querySelectorAll('small')].map(x => x.textContent).join(' | '), c: (b.querySelector('.hx-chip') || {}).textContent || '', tone: (b.querySelector('.hx-chip') || { className: '' }).className, label: b.getAttribute('aria-label') }));
     return { chats: rows('chats'), fabrica: rows('fabrica'), lector: rows('lector'), busy: [...document.querySelectorAll('#hx .hx-list')].map(u => u.getAttribute('aria-busy')),
-      meta: ['chat', 'code', 'fabrica', 'lector'].map(k => document.getElementById('hxKm_' + k).textContent) };
+      meta: ['chat', 'code', 'fabrica', 'lector'].map(k => (document.getElementById('hxKm_' + k) || {}).textContent || '') };
   });
   ok(lists.busy.every(x => x === 'false'), 'the lists fill in once Home shows, and say so to a screen reader', lists.busy);
   ok(lists.chats.length === 3 && lists.chats[0].t.indexOf('Make the clock hands gold') === 0 && lists.chats[0].c === 'Code' && /Plan a quiet week/.test(lists.chats[1].t) && /Letter to the library/.test(lists.chats[2].t),
@@ -102,10 +106,10 @@ async function seed(p) { return p.evaluate(async () => {
   ok(fb['Sketch Pad'] && fb['Sketch Pad'].c === 'Started · nothing kept yet' && fb['Tide Clock'] && fb['Tide Clock'].c === '1 change to keep' && fb['Garden Log'] && fb['Garden Log'].c === 'Kept · to test'
     && fb['Ledger'] && fb['Ledger'].c === 'Tested · ready to ship' && /ok/.test(fb['Ledger'].tone) && fb['The Forge'] && fb['The Forge'].c === 'Shipped',
     'each Fabrica app shows the step it is at, in Fabrica\'s own words', lists.fabrica.map(x => x.t + ': ' + x.c));
-  ok(lists.lector.length === 1 && lists.lector[0].t === 'Project dossier' && /^Carpe Diem, The Forge and Ingenium \| Today, \d\d:\d\d · for your portfolio$/.test(lists.lector[0].s), 'the Lector document is listed with its set and when it was written', lists.lector);
-  ok(/^2 conversations · last today/.test(lists.meta[0]) && /^1 session · last today/.test(lists.meta[1]) && /^5 apps · 2 ready · 3 in progress$/.test(lists.meta[2]) && /^1 document · last today/.test(lists.meta[3]), 'the large keys say, in a line, what each holds', lists.meta);
+  if (LX) ok(lists.lector.length === 1 && lists.lector[0].t === 'Project dossier' && /^Carpe Diem, The Forge and Ingenium \| Today, \d\d:\d\d · for your portfolio$/.test(lists.lector[0].s), 'the Lector document is listed with its set and when it was written', lists.lector);
+  ok(/^2 conversations · last today/.test(lists.meta[0]) && /^1 session · last today/.test(lists.meta[1]) && /^5 apps · 2 ready · 3 in progress$/.test(lists.meta[2]) && (LX ? /^1 document · last today/.test(lists.meta[3]) : lists.meta[3] === ''), 'the large keys say, in a line, what each holds', lists.meta);
   const sealsIn = await p.evaluate(() => ({ forge: !!document.querySelector('#hxList_fabrica .hx-item .ing-crest-img'), lector: !!document.querySelector('#hxList_lector .hx-item .ing-crest-img') }));
-  ok(sealsIn.lector && sealsIn.forge, 'the Lector document wears its set\'s crest, and an app of The Offline Project its own seal', sealsIn);
+  ok((!LX || sealsIn.lector) && sealsIn.forge, 'the Lector document wears its set\'s crest, and an app of The Offline Project its own seal', sealsIn);
   await p.screenshot({ path: path.join(OUT, 'h61-wide-day-lists.png'), fullPage: true });
 
   // ---------------- a press goes back ----------------
@@ -119,6 +123,7 @@ async function seed(p) { return p.evaluate(async () => {
   await home(p); await row('fabrica', 'Garden Log'); await p.waitForTimeout(1600);
   a = await active(p); st = await p.evaluate(() => ({ sel: (state.fabrica || {}).sel, name: (document.getElementById('fbWhName') || {}).textContent }));
   ok(a.page === 'page-fabrica' && st.sel === made.repos.c && /Garden Log/.test(st.name || ''), 'a Fabrica app pressed opens in Fabrica, chosen', [a, st]);
+  if (LX) {
   await home(p); await row('lector', 'Project dossier'); await p.waitForTimeout(1400);
   a = await active(p); st = await p.evaluate(() => ({ doc: IngLector.R7.doc, apps: IngLector.state().brief.apps.join(), purpose: IngLector.state().brief.purpose, paper: !!document.querySelector('#l7Desk .l-paper') }));
   ok(a.page === 'page-lector' && st.doc === 'dossier' && st.apps === 'cd,forge,ingenium' && st.purpose === 'portfolio' && st.paper, 'a Lector document pressed opens in Lector, on that document', [a, st]);
@@ -135,6 +140,7 @@ async function seed(p) { return p.evaluate(async () => {
   await home(p); await row('lector', 'Project dossier'); await p.waitForTimeout(1200);
   st = await p.evaluate(() => ({ job: IngLector.state().job, doc: IngLector.R7.doc, apps: IngLector.state().brief.apps.join() }));
   ok(st.job === null && st.doc === 'dossier' && st.apps === 'cd,forge,ingenium', 'with the last reading finished, the document opens', st);
+  }
   // Fabrica's store failing: said in plain words, and the rest of Home carries on
   await p.evaluate(() => { window.__list = IngRepo.list; IngRepo.list = () => Promise.reject(new Error('the store is busy')); });
   await home(p, 1200);
@@ -144,6 +150,7 @@ async function seed(p) { return p.evaluate(async () => {
 
   // ---------------- every key goes where it should ----------------
   const want = { chat: ['page-chat', 'chat'], code: ['page-chat', 'code'], build: ['page-build', ''], fabrica: ['page-fabrica', ''], lector: ['page-lector', ''], focus: ['page-focus', ''] };
+  if (!LX) delete want.lector;
   for (const k of Object.keys(want)) {
     await home(p, 500); await press(p, '#hx .hx-key[data-go="' + k + '"]'); a = await active(p);
     ok(a.page === want[k][0] && a.mode === want[k][1], 'the ' + k + ' key opens ' + k, a);
@@ -172,7 +179,7 @@ async function seed(p) { return p.evaluate(async () => {
   ok(a.page === 'page-guide', 'the short guide key opens the Guide', a);
   await home(p, 500); await press(p, '#hxModelsKey'); a = await active(p);
   ok(a.page === 'page-models', 'the models key opens the Models page', a);
-  for (const [i, pg] of [[0, 'page-chat'], [1, 'page-fabrica'], [2, 'page-lector']]) {
+  for (const [i, pg] of [[0, 'page-chat'], [1, 'page-fabrica']].concat(LX ? [[2, 'page-lector']] : [])) {
     await home(p, 500); await p.evaluate((i) => document.querySelectorAll('#hx .hx-rch .hx-btn')[i].click(), i); await p.waitForTimeout(600); a = await active(p);
     ok(a.page === pg, 'See all opens ' + pg.slice(5), a);
   }
@@ -215,9 +222,10 @@ async function seed(p) { return p.evaluate(async () => {
   await p.evaluate(() => document.getElementById('hxPlaque').scrollIntoView({ block: 'center' })); await p.waitForTimeout(1500);
   const pd = await p.evaluate(() => { const c = document.querySelector('#hxCrest .ing-crest'), r = c && c.getBoundingClientRect(), pl = document.getElementById('hxPlaque').getBoundingClientRect(), ln = document.getElementById('hxLine');
     return { kind: c && c.className, night: c && c.classList.contains('night'), auto: c && c.getAttribute('data-ic-auto'), w: r && Math.round(r.width), centre: r && Math.round((r.left + r.width / 2) - (pl.left + pl.width / 2)), line: ln.textContent, below: r && ln.getBoundingClientRect().top > r.bottom, layers: c ? c.querySelectorAll('img').length : 0, font: getComputedStyle(ln).fontStyle, label: c && c.getAttribute('aria-label') }; });
-  ok(pd.kind && /ic-master/.test(pd.kind) && /is-live/.test(pd.kind) && pd.auto === 'cd+forge+ingenium+inkwell' && !pd.night && pd.layers > 0, 'the plaque holds the master crest, live, by day', pd);
-  ok(Math.abs(pd.centre) <= 2 && pd.line === 'Carpe Diem · The Forge · Ingenium · Inkwell' && pd.below && pd.font === 'italic', 'the crest is centred with the line beneath it, in italic', pd);
-  ok(/The Offline Project/.test(pd.label || ''), 'the crest is named for a screen reader', pd.label);
+  if (BLANK) ok(pd.kind && /is-live/.test(pd.kind) && pd.auto === 'ingenium' && !pd.night && pd.layers > 0, 'the plaque holds Ingenium\'s own seal, live, by day', pd);
+  else ok(pd.kind && /ic-master/.test(pd.kind) && /is-live/.test(pd.kind) && pd.auto === 'cd+forge+ingenium+inkwell' && !pd.night && pd.layers > 0, 'the plaque holds the master crest, live, by day', pd);
+  ok(Math.abs(pd.centre) <= 2 && pd.line === (BLANK ? 'Ingenium' : 'Carpe Diem · The Forge · Ingenium · Inkwell') && pd.below && pd.font === 'italic', 'the crest is centred with the line beneath it, in italic', pd);
+  ok(BLANK ? /Ingenium/.test(pd.label || '') && !/Offline Project|Carpe Diem/.test(pd.label || '') : /The Offline Project/.test(pd.label || ''), 'the crest is named for a screen reader', pd.label);
   const plq = await p.$('#hxPlaque'); await plq.screenshot({ path: path.join(OUT, 'h61-plaque-day.png') });
   await theme(p, 'night'); await p.waitForTimeout(700);
   const pn = await p.evaluate(() => { const c = document.querySelector('#hxCrest .ing-crest'); return { night: c.classList.contains('night'), bg: getComputedStyle(document.getElementById('hxPlaque')).backgroundImage.slice(0, 80), color: getComputedStyle(document.getElementById('hxLine')).color }; });

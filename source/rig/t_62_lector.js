@@ -129,6 +129,12 @@ const APP = '<!doctype html><html><head><title>Lumen</title></head><body>\n<sect
     ok(/\| `noteList` \| \d+ \| the list of notes, newest first \|/.test(at.md) && /Nothing here was written by a model/.test(at.md), 'written as tables a reader can follow', at.md.slice(0, 300));
     // the whole document for a set, through the page's own writing, kept and shown
     // an app the library keeps (the apps Ingenium carries are kept on first start): the real thing, measured whole
+    // 6.2: the full edition carries no app; its library keeps what the person adds: Inkwell's own page is added as a person adds it
+    if (!(await p.evaluate(() => !!document.getElementById('ing-builtin-inkwell')))) {
+      const INK = process.env.INKWELL_HTML || '/tmp/claude-0/-home-user/61388abb-8c01-57dc-aeb9-f70a19a79e0d/scratchpad/ref/inkwell.html';
+      const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.evaluate(() => libPickFiles())]); await fc.setFiles(INK);
+      console.log('NOTE this edition carries no app: Inkwell is added from ' + path.basename(INK) + ', as a person adds it');
+    }
     await p.waitForFunction(() => { try { const a = libState().apps; return !!(a.inkwell && a.inkwell.ref); } catch (e) { return false; } }, null, { timeout: 60000 }).catch(() => {});
     const doc = await p.evaluate(async () => { const md = await IngLector.atlasDoc({ apps: ['inkwell'], runs: [], purpose: 'portfolio' }); return { len: md.length, head: md.slice(0, 120), fns: (md.match(/^\| `[^`]+` \| \d+ \|/gm) || []).length }; });
     ok(doc.len > 50000 && doc.fns > 800 && /Every function/.test(doc.head), 'for Inkwell, measured whole: ' + doc.fns + ' functions from its own page', doc);

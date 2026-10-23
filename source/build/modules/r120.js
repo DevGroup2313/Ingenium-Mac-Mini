@@ -141,7 +141,7 @@ function later(){var go=function(){if(LIB.busy){setTimeout(later,15000);return;}
 (function start(){if(/[#&]ingapp=/.test(location.hash||""))return;/* R123: a window of its own keeps nothing */var tries=0;(function wait(){if(window.__ingReady===true){setTimeout(later,9000);return;}if(++tries<240)setTimeout(wait,500);})();})();
 /* R125 (18 October 2026), the owner's word: "update the tours for all of the apps ... so that everything is cohesive and
    describe the latest versions of the apps". The tour names the apps Ingenium carries, where Lector keeps them. */
-(function tourCard(){try{if(!Array.isArray(ING_TOUR)||ING_TOUR.some(function(s){return s.r125;}))return;var at=-1;
+(function tourCard(){try{if(!BI||!Object.keys(BI).length||!Array.isArray(ING_TOUR)||ING_TOUR.some(function(s){return s.r125;}))return;  /* 6.2: only where the apps are carried */var at=-1;
   ING_TOUR.forEach(function(s,i){if(s.chap==="Lector"&&s.sub==="The brief")at=i;});if(at<0)return;
   ING_TOUR.splice(at+1,0,{r125:1,chap:"Lector",sub:"Your apps",go:function(){go("lector");},ring:[".l-apps"],
     t:"📦 Your apps, carried inside",b:"Your apps, on Lector's page, holds the family's apps. The Forge, Inkwell and Carpe Diem travel inside Ingenium and are kept on this device on its first start, each checked against its fingerprint, beside a copy of this Ingenium itself. Lector reads any of them from end to end, and Fabrica opens them as repositories. A newer copy you add yourself always stays.",
