@@ -9,6 +9,16 @@ The live preview panel keeps on shaking when I scroll on the Forge's Editor page
 no need to add the that page to Inkwell. Please leave it out." And: "Focus on only Ingenium and The Forge for now, don't
 work on Carpe Diem or Inkwell."
 
+And (23 October 2026): "I want the Forge to be just as capable and functional as Ingenium with the same increased capabilities.
+I just want to do it all without AI." So the pass also holds, without a model:
+  - an app of any size in Files' Edit as text, part by part, its data aside (blocks/forge_bigtext.html, patches_bigtext.json);
+  - the chats brought from other assistants (ChatGPT, Claude, Gemini, Grok, DeepSeek and others), kept, searched, read, their
+    code and documents kept as the Forge's own files (blocks/forge_chats.html, with Ingenium's own reader,
+    build/thoughts/chat_import_core.html);
+  - a quicker start: the apps it carries read from files beside the page in the Mac app (forge_quick_split.py,
+    blocks/forge_quick.html, patches_quick.json), and fewer repaints while it is idle (patches_speed.json).
+Tested by tests/t_644_capacity.js, t_644_chats.js and t_644_quick.js.
+
 What it does, each change found exactly once or the pass stops:
   1. the build stamp: 644, 9s76;
   2. the shared modules the Forge carries whole (support_core.html, thought_cloud.html) brought up to date (shared_swap.py);

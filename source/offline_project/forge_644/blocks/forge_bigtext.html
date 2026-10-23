@@ -1,0 +1,124 @@
+<style id="forge-644-bigtext-css">
+/* PASS 644 · A FILE OF ANY SIZE, PART BY PART: see the note in the script below */
+#feParts{display:none;flex-direction:column;gap:8px;margin:8px 0}
+#feParts.on{display:flex}
+#feParts .fe-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px}
+#feParts .fe-head b{font-size:13.5px}
+#feParts .fe-chip{font:600 11px/1.6 var(--cd-sans,system-ui);padding:1px 8px;border-radius:999px;background:var(--glass,rgba(127,127,127,.08));border:1px solid var(--glass-border,rgba(127,127,127,.2))}
+#feParts .fe-find{width:100%;padding:6px 10px;border-radius:9px;border:1px solid var(--glass-border,rgba(127,127,127,.3));font:13px var(--cd-sans,system-ui);background:transparent;color:inherit}
+#feParts .fe-hits{max-height:150px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+#feParts .fe-hit{all:unset;cursor:pointer;font:12px/1.4 var(--cd-mono,monospace);padding:3px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#feParts .fe-hit:hover,#feParts .fe-hit:focus-visible{background:var(--glass,rgba(127,127,127,.12));outline:none}
+#feParts .fe-body{display:flex;gap:8px;min-height:340px}
+#feParts .fe-list{flex:0 0 clamp(170px,30%,260px);max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:2px;border:1px solid var(--glass-border,rgba(127,127,127,.25));border-radius:10px;padding:4px}
+#feParts .fe-part{all:unset;cursor:pointer;display:flex;gap:6px;align-items:center;font-size:12px;padding:4px 6px;border-radius:7px}
+#feParts .fe-part[aria-pressed="true"]{background:var(--glass,rgba(127,127,127,.16));font-weight:600}
+#feParts .fe-part:focus-visible{outline:2px solid #1B6B93;outline-offset:-2px}
+#feParts .fe-part i{font-style:normal;font:600 9.5px var(--cd-mono,monospace);text-transform:uppercase;width:34px;opacity:.7}
+#feParts .fe-part span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#feParts .fe-part small{opacity:.65}
+#feParts .fe-part.changed span::after{content:" •"}
+#feParts .fe-part.data{opacity:.7}
+#feParts .fe-ed{flex:1 1 auto;display:flex;flex-direction:column;gap:6px;min-width:0}
+#feParts .fe-ed textarea{flex:1 1 auto;min-height:320px;width:100%;font:12.5px/1.6 var(--cd-mono,monospace);resize:vertical}
+#feParts .fe-note{font-size:12px;opacity:.8}
+#feParts.fe-hide-ta + textarea{display:none}
+</style>
+<script id="forge-644-bigtext-js">
+/* PASS 644 · A FILE OF ANY SIZE, PART BY PART. The owner's words (23 October 2026): "I want the Forge to be just as capable
+   and functional as Ingenium with the same increased capabilities. I just want to do it all without AI." Files kept in the
+   Forge already wait in its store as they are, of any size; but "Edit a file as text" poured the whole file into one box
+   of text: a page of 100 MB froze the window (WebKit, the Mac app's engine, gives up first). Ingenium's Build opens a page
+   that large part by part (its modules/r138.js), and the Forge now does the same, by the same rules: each script, each style
+   and each stretch of markup is a part of its own, written in a box of its own, quick whatever the whole; embedded data
+   (pictures, the apps an app carries) stands aside as data, shown but not poured into a box; a search finds a word anywhere
+   in the whole file; and Keep the change, Show it on the right and Download it work on the whole file put together.
+   A file up to about 2.5 MB opens in the one box, as before. */
+(function(){ 'use strict';
+if(window.forgeBigText) return;
+var AT=2500000, DATA_AT=400000, PIECE=160000, MAXHITS=300;
+var S=null;   /* {rec, fns, name, parts:[{kind,label,text,changed}], sel} */
+function el(id){ return document.getElementById(id); }
+function mk(tag,cls,txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function human(n){ return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'; }
+function fr(){ return document.documentElement.lang==='fr'; }
+function T(en,f){ return fr()?f:en; }
+
+/* ---------- the parts, as Ingenium's Build cuts them ---------- */
+function labelOf(kind,text){ var head=text.slice(0,600),m;
+  if((m=/^<(?:script|style)\b[^>]*\bid=["']([^"']+)["']/i.exec(head))) return '#'+m[1];
+  if((m=/\/\*\s*=*\s*([^*\n=]{3,90})/.exec(head))) return m[1].trim();
+  if(kind==='markup'){ m=/<([a-z][\w-]*)\b([^>]*)>/i.exec(head); if(m){ var id=/\bid=["']([^"']+)/i.exec(m[2]),cl=/\bclass=["']([^"'\s]+)/i.exec(m[2]); return '<'+m[1].toLowerCase()+(id?'#'+id[1]:cl?'.'+cl[1]:'')+'>'; } }
+  var t=text.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); return t.slice(0,60)||kind; }
+function isData(open,body){ var ty=/\btype=["']([^"']+)["']/i.exec(open), t=ty?ty[1].toLowerCase():'';
+  if(t && !/^(text\/javascript|application\/javascript|module|text\/ecmascript)$/.test(t) && body.length>DATA_AT) return true;
+  if(body.length>DATA_AT){ var sample=body.slice(0,4000), b=(sample.match(/[A-Za-z0-9+\/=]/g)||[]).length; if(b/sample.length>0.97) return true; } return false; }
+function split(text){ var parts=[], re=/<(script|style)\b[^>]*>/gi, m, last=0;
+  function markup(s){ var i=0; while(i<s.length){ var end=Math.min(s.length,i+PIECE); if(end<s.length){ var cut=s.lastIndexOf('\n<',end); if(cut>i+PIECE/3) end=cut+1; } var piece=s.slice(i,end); if(piece) parts.push({kind:'markup',text:piece}); i=end; } }
+  if(!/<(script|style)\b/i.test(text.slice(0,2000000)) && !/^\s*</.test(text)){ markup(text); }
+  else{ while((m=re.exec(text))){ var tag=m[1].toLowerCase(), openEnd=re.lastIndex, cre=new RegExp('<\\/'+tag,'ig'); cre.lastIndex=openEnd; var c=cre.exec(text);
+      var end=c?text.indexOf('>',c.index)+1:text.length; if(end<=0) end=text.length;
+      markup(text.slice(last,m.index)); var body=text.slice(openEnd,c?c.index:end);
+      parts.push({kind:tag==='script'&&isData(m[0],body)?'data':tag,text:text.slice(m.index,end)}); last=end; re.lastIndex=end; }
+    markup(text.slice(last)); }
+  parts.forEach(function(p){ p.label=labelOf(p.kind,p.text); });
+  return parts; }
+function whole(){ return S?S.parts.map(function(p){ return p.text; }).join(''):''; }
+
+/* ---------- the panel ---------- */
+function box(){ var b=el('feParts'); if(b) return b; var ta=el('fileEditText'); if(!ta) return null;
+  b=mk('div'); b.id='feParts'; b.setAttribute('role','region'); b.setAttribute('aria-label',T('The file, part by part','Le fichier, partie par partie'));
+  ta.parentNode.insertBefore(b,ta); return b; }
+function paint(){ var b=box(); if(!b||!S) return; b.innerHTML='';
+  var nData=S.parts.filter(function(p){ return p.kind==='data'; }).length, size=S.parts.reduce(function(a,p){ return a+p.text.length; },0);
+  var h=mk('div','fe-head'); h.appendChild(mk('b',null,S.name)); h.appendChild(mk('span','fe-chip',human(size)));
+  h.appendChild(mk('span','fe-chip',S.parts.length+T(' parts',' parties'))); if(nData) h.appendChild(mk('span','fe-chip',nData+T(' of embedded data',' de données intégrées')));
+  var ch=S.parts.filter(function(p){ return p.changed; }).length; if(ch) h.appendChild(mk('span','fe-chip',ch+T(' changed, not kept yet',' changées, pas encore gardées')));
+  b.appendChild(h);
+  var q=mk('input','fe-find'); q.type='search'; q.placeholder=T('Find a word anywhere in the file','Chercher un mot partout dans le fichier'); q.setAttribute('aria-label',q.placeholder); q.value=S.q||'';
+  var hits=mk('div','fe-hits'); hits.setAttribute('role','list');
+  var qt=0; q.oninput=function(){ S.q=q.value; clearTimeout(qt); qt=setTimeout(function(){ find(hits); },220); };
+  b.appendChild(q); b.appendChild(hits); if(S.q) find(hits);
+  var body=mk('div','fe-body'), list=mk('div','fe-list'); list.setAttribute('aria-label',T('The parts','Les parties'));
+  S.parts.forEach(function(p,i){ var k=mk('button','fe-part'+(p.changed?' changed':'')+(p.kind==='data'?' data':'')); k.type='button'; k.setAttribute('aria-pressed',i===S.sel?'true':'false');
+    k.appendChild(mk('i',null,p.kind==='markup'?'html':p.kind==='script'?'js':p.kind==='style'?'css':'data')); k.appendChild(mk('span',null,p.label)); k.appendChild(mk('small',null,human(p.text.length)));
+    k.onclick=function(){ choose(i); }; list.appendChild(k); });
+  body.appendChild(list);
+  var ed=mk('div','fe-ed'), p=S.parts[S.sel];
+  if(p&&p.kind==='data'){ ed.appendChild(mk('div','fe-note',T('Embedded data ('+human(p.text.length)+'): a picture, a font, a sound or an app the page carries. It stays exactly as it is, and goes with the file whole.','Données intégrées ('+human(p.text.length)+') : une image, une police, un son ou une app que la page porte. Elles restent telles quelles et partent avec le fichier entier.')));
+    ed.appendChild(mk('div','fe-note',p.text.slice(0,140)+'…')); }
+  else if(p){ var ta=mk('textarea'); ta.spellcheck=false; ta.value=p.text; ta.setAttribute('aria-label',T('Part ','Partie ')+(S.sel+1)+': '+p.label); ta.id='feText';
+    ta.oninput=function(){ p.text=ta.value; if(!p.changed){ p.changed=true; var k=list.children[S.sel]; if(k) k.classList.add('changed'); } };
+    ed.appendChild(ta); ed.appendChild(mk('div','fe-note',p.label+' · '+p.text.split('\n').length.toLocaleString()+T(' lines. What you write here is part of the whole file at once; Keep the change keeps it.',' lignes. Ce que vous écrivez ici fait partie du fichier entier aussitôt ; Garder le changement le garde.'))); }
+  body.appendChild(ed); b.appendChild(body); }
+function choose(i,range){ if(!S) return; S.sel=i; paint(); var ta=el('feText'); if(ta){ try{ ta.focus(); if(range){ ta.setSelectionRange(range[0],range[1]); var before=ta.value.slice(0,range[0]).split('\n').length; ta.scrollTop=Math.max(0,(before-4)*20); } }catch(e){} } }
+function find(hits){ hits.innerHTML=''; var q=String(S.q||'').trim(); if(q.length<2) return; var lq=q.toLowerCase(), n=0;
+  for(var i=0;i<S.parts.length&&n<MAXHITS;i++){ var p=S.parts[i]; if(p.kind==='data') continue; var lt=p.text.toLowerCase(), at=lt.indexOf(lq);
+    while(at>=0&&n<MAXHITS){ (function(i,at,t){ var ls=t.lastIndexOf('\n',at)+1, le=t.indexOf('\n',at); if(le<0) le=t.length;
+        var k=mk('button','fe-hit'); k.type='button'; k.setAttribute('role','listitem'); k.textContent=p.label.slice(0,26)+' · '+t.slice(Math.max(ls,at-50),Math.min(le,at+q.length+70));
+        k.onclick=function(){ choose(i,[at,at+q.length]); }; hits.appendChild(k); })(i,at,p.text); n++; at=lt.indexOf(lq,at+lq.length); } }
+  if(!n) hits.appendChild(mk('div','fe-note',T('Nowhere in the file.','Nulle part dans le fichier.')));
+  else if(n>=MAXHITS) hits.appendChild(mk('div','fe-note',T('The first '+MAXHITS+' places: say more to narrow them.','Les '+MAXHITS+' premiers endroits : précisez pour réduire.'))); }
+function show(on){ var b=box(), ta=el('fileEditText'); if(b){ b.classList.toggle('on',!!on); } if(ta) ta.style.display=on?'none':''; }
+
+/* ---------- what the room's own keys do with a file open part by part ---------- */
+window.forgeBigText={ at:AT,
+  active:function(){ return !!S; },
+  open:function(rec,fns){ S={rec:rec,fns:fns||{},name:rec.name,parts:[],sel:0,q:''};
+    try{ if(S.fns.state) S.fns.state('fileEditState',rec.name+' · '+T('opening it part by part…','ouverture partie par partie…'),'ok'); }catch(e){}
+    var f=el('fold-fileEdit'); if(f) f.open=true; show(true); var b=box(); if(b){ b.innerHTML=''; b.appendChild(mk('div','fe-note',T('Opening ','Ouverture de ')+rec.name+' ('+human(rec.blob.size)+')…')); }
+    return rec.blob.text().then(function(text){ if(!S||S.rec!==rec) return; S.parts=split(text); text=null;
+      var first=0; S.parts.some(function(p,i){ if(p.kind==='script'||p.kind==='markup'){ first=i; return true; } return false; }); S.sel=first; paint();
+      try{ if(S.fns.state) S.fns.state('fileEditState',rec.name+' · '+T('part by part','partie par partie')+' · '+S.parts.length+T(' parts',' parties'),'ok'); }catch(e){} }); },
+  close:function(){ S=null; show(false); var b=el('feParts'); if(b) b.innerHTML=''; },
+  text:whole, parts:function(){ return S?S.parts:null; },
+  keep:function(){ if(!S) return Promise.resolve(); var rec=S.rec, blob=new Blob([whole()],{type:rec.type||'text/plain'}); rec.blob=blob; rec.size=blob.size; rec.at=Date.now();
+    var put=S.fns.put; if(typeof put!=='function') return Promise.resolve();
+    return put(rec).then(function(){ if(S) S.parts.forEach(function(p){ p.changed=false; }); paint();
+      try{ S.fns.state('fileEditState',rec.name+' · '+T('kept','gardé'),'ok'); S.fns.paint(); S.fns.diary('file','kept a change in '+rec.name); }catch(e){} },
+      function(e){ try{ S.fns.state('fileEditState',rec.name+': '+(e&&e.message||e),'warn'); }catch(_){} }); },
+  show:function(){ if(!S) return; var rec=S.rec, now=Object.assign({},rec,{blob:new Blob([whole()],{type:rec.type||'text/html'})}); try{ S.fns.show(now); }catch(e){} },
+  download:function(){ if(!S) return; var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([whole()],{type:S.rec.type||'text/plain'})); a.download=S.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} },60000); },
+  choose:choose };
+})();
+</script>
