@@ -24,7 +24,8 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
 (async () => {
   const b = await pw.chromium.launch({ args: ['--no-sandbox'] });
   for (const { ed, url } of EDS) {
-    const master = ed === 'master', ownSelf = ed === 'master' || ed === 'full', lector = ownSelf, blank = ed === 'gift';
+    // Ingenium of its own: the master's; in the full edition only by a permission that allows it (rig/t_62_permits.js)
+    const master = ed === 'master', ownSelf = master, libHere = ed === 'master' || ed === 'full', lector = libHere, blank = ed === 'gift';
     const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); const errs = [];
     p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/favicon|net::ERR|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text()); });
     try {
@@ -33,20 +34,21 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
       const src = await p.evaluate(() => document.documentElement.outerHTML);
       const f = await p.evaluate(() => ({
         edition: ING_EDITION, lib: libOn(), carried: ['cd', 'forge', 'inkwell'].filter(k => document.getElementById('ing-builtin-' + k)),
-        apps: (window.IngApps ? IngApps.list() : []).map(a => a.key), kitSelf: !!document.querySelector('input[name="kitWhat"][value="self"]'), kitWhat: kitWhat(),
+        apps: (window.IngApps ? IngApps.list() : []).map(a => a.key), kitSelf: (k => !!(k && !k.closest('label').hidden))(document.querySelector('input[name="kitWhat"][value="self"]')), kitWhat: kitWhat(),
         kitPh: (document.getElementById('kitId') || {}).placeholder || '', recipe: typeof window.IngRecipe, author: IngRepo.author().name,
         lectorKey: !!document.querySelector('.nav-btn[data-page="lector"]'), lectorPage: !!document.getElementById('page-lector'), lectorCode: typeof window.lxRender,
         pages: PAGES.slice()
       }));
       ok(f.edition === ed, ed + ': it opens, and names its edition', f.edition);
-      ok(f.lib === ownSelf && (master ? f.carried.length === 3 : f.carried.length === 0), ed + ': the app library ' + (ownSelf ? 'here' : 'none') + '; the apps carried inside: ' + (master ? 'here' : 'none'), [f.lib, f.carried]);
-      ok(f.apps.includes('ingenium-self') === ownSelf && f.kitSelf === ownSelf && (ownSelf || f.kitWhat === 'editor'), ed + ': Ingenium of its own to open and to package: ' + (ownSelf ? 'yes' : 'no, a new app only'), f);
+      ok(f.lib === libHere && (master ? f.carried.length === 3 : f.carried.length === 0), ed + ': the app library ' + (libHere ? 'here' : 'none') + '; the apps carried inside: ' + (master ? 'here' : 'none'), [f.lib, f.carried]);
+      ok(f.apps.includes('ingenium-self') === ownSelf && !f.apps.includes('ingenium') && f.kitSelf === ownSelf && (ownSelf || f.kitWhat === 'editor'), ed + ': Ingenium of its own to open and to package: ' + (ownSelf ? 'yes' : ed === 'full' ? 'only by a permission (none here)' : 'no, a new app only'), f);
       // the owner's name, account and app ids
       // the owner's name in the credit lines (the page's head, the door, the foot) and, in the master and full editions, in a note in the code
       const names = (src.match(/Yannie D\. Forest/g) || []).length, credit = (src.match(/Designed and built by Yannie D\. Forest/g) || []).length;
-      const lines = (src.match(/(Copyright \(c\) 2026|Designed and built by|(?:&copy;|©) 2026) Yannie D\. Forest/g) || []).length, other = names - lines;
+      // (and, since R162, in the licence the page carries whole and in its card: "original work of", the owner's name for the card)
+      const lines = (src.match(/(?:(?:Copyright \(c\) 2026|Designed and built by|(?:&copy;|©) 2026|original work of) |OWNER=")Yannie D\. Forest/g) || []).length, other = names - lines;
       const ids = (src.match(/com\.yannie/g) || []).length, acct = (src.match(/DevGroup2313/g) || []).length;
-      ok(credit === 2 && lines === 5 && (master ? other >= 4 : lector ? other === 1 : other === 0) && (master ? ids > 0 && acct > 0 : ids === 0 && acct === 0) && (master ? /^com\.yannieforest\./.test(f.kitPh) : /^app\.ingenium\./.test(f.kitPh)),
+      ok(credit === 2 && lines >= 8 && (master ? other >= 4 : lector ? other === 1 : other === 0) && (master ? ids > 0 && acct > 0 : ids === 0 && acct === 0) && (master ? /^com\.yannieforest\./.test(f.kitPh) : /^app\.ingenium\./.test(f.kitPh)),
         ed + ': the owner\'s copyright line kept; the owner\'s name ' + (master ? 'where the master has it' : 'nowhere else') + ', the owner\'s app ids and account ' + (master ? 'kept' : 'gone'), { names, lines, other, ids, acct, ph: f.kitPh });
       ok((f.recipe === 'object') === master && (master ? f.author === 'Yannie D. Forest' : f.author === ''), ed + ': Lector\'s recipe ' + (master ? 'kept' : 'not in the page') + '; a commit\'s author ' + (master ? 'the owner' : 'unset until the person sets one'), [f.recipe, f.author]);
       // the signing certificate a device makes

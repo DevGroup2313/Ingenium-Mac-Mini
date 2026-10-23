@@ -493,6 +493,21 @@ if os.environ.get("ING_LEAN") != "1":
     _en = open(os.path.join(HERE, "eyes", "NOTICE.txt"), encoding="utf-8").read().replace("</", "<\\/")
     _apps += '<script type="text/plain" id="ing-eyes-notice">' + _en + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
+# ---- 6.2 (security): no signing key in any page. The kit store the page carries (the build files of the repositories, for
+#      Fabrica's kits) once held the Android signing key and the note of its password; every file of that kind is taken out
+#      here, whatever store the page was built with, and release.py never puts one in. A kit carries no key: GitHub signs
+#      with the key kept in the repository's secrets (kits/guides/fire.md, section 7) ----
+_KEYLIKE = re.compile(r"(^|/)signing/|\.(keystore|jks|p12|pfx|pem|key|mobileprovision)$|(^|/)(signing\.properties|SIGNING\.txt)$", re.I)
+_kb = re.search(r'(<script id="ingenium-kit-bundle" type="ingenium/kit-bundle-gz" data-bytes=")(\d+)(">)([^<]*)(</script>)', out)
+if _kb:
+    _bundle = json.loads(_gz.decompress(_b64.b64decode(_kb.group(4))))
+    _gone = [f["p"] for f in _bundle.get("files", []) if _KEYLIKE.search(f.get("p", ""))]
+    if _gone:
+        _bundle["files"] = [f for f in _bundle["files"] if not _KEYLIKE.search(f.get("p", ""))]
+        _raw = json.dumps(_bundle, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        _new = _kb.group(1) + str(len(_raw)) + _kb.group(3) + _b64.b64encode(_gz.compress(_raw, compresslevel=9, mtime=0)).decode("ascii") + _kb.group(5)
+        out = out[:_kb.start()] + _new + out[_kb.end():]
+        print("the kit store: no signing key (%s left out)" % ", ".join(_gone))
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 mods = [m for m in mods if os.path.basename(m) not in editions.skip_modules(ED)]  # 6.2: what an edition leaves out
 # 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
@@ -512,6 +527,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "support_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r160.js":  # R160: the shared import of chats (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "chat_import_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r162.js":  # R162: the shared licence and permissions (the Forge carries the same), before Ingenium's own part of it
+        t = open(os.path.join(HERE, "thoughts", "permit_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
@@ -538,6 +555,13 @@ if "/*R123_INJECT*/null" in blob:  # R123: Carpe Diem's dress for the apps' fram
 if "/*R126_RECIPE*/null" in blob:  # R126: Lector's recipe (recipe/recipe.json, written by gen_recipe.py): her rules, the verified sources, her kinds of document
     _rx = json.dumps(json.load(open(os.path.join(HERE, "recipe", "recipe.json"), encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))
     blob = blob.replace("/*R126_RECIPE*/null", _rx.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
+# ---- R162 (6.2): the licence, the owner's public keys, the owner's list of withdrawn permissions, and the permission a copy made
+#      for one person is given with (security/permits.py, which the Forge's build uses too) ----
+if '/*PERMIT_LICENCE*/""' in blob:
+    sys.path.insert(0, os.path.normpath(os.path.join(HERE, "..", "security")))
+    import permits as _permits
+    blob, _said = _permits.fill(blob, os.path.normpath(os.path.join(HERE, "..", "licence", "LICENCE_ingenium.txt")))
+    print(_said)
 if "/*R120_BUILTIN*/null" in blob:
     blob = blob.replace("/*R120_BUILTIN*/null", json.dumps(_bi))
 if "/*R116_QUANTS*/null" in blob:

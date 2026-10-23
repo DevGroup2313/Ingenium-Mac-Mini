@@ -5,7 +5,7 @@
 import sys, os, re, json, gzip, base64, subprocess, datetime
 H = os.path.dirname(os.path.abspath(__file__))
 R = {"mini": "/home/user/Ingenium-Mac-Mini", "intel": "/home/user/Ingenium-Mac-Intel",
-     "win": "/home/user/Ingenium-Windows", "fire": "/home/user/Ingenium-Android-fire"}
+     "win": "/home/user/Ingenium-HPWindows", "fire": "/home/user/Ingenium-Android-fire"}
 VER_FILES = [
     ("mini", "Build Mac App.command", r'BUILD_NO="\d+\.\d+\.', 'BUILD_NO="{v}.'),
     ("mini", ".github/workflows/build-mac.yml", r'V="\d+\.\d+\.\$', 'V="{v}.$'),
@@ -44,8 +44,14 @@ def committed(repo):
             out[path] = 0o755 if mode == "100755" else 0o644
     return out
 
+KEYLIKE = re.compile(r"(^|/)signing/|\.(keystore|jks|p12|pfx|pem|key|mobileprovision)$|(^|/)(signing\.properties|SIGNING\.txt)$", re.I)
+
+
 def wanted(path, kits, source, shared, generated):
     if path == "ingenium.html" or path in generated:
+        return False
+    # 6.2: no signing key, and no note of one, ever goes into the page (build_page.py takes out any that is there too)
+    if KEYLIKE.search(path):
         return False
     # the page's own sources and tests (source/) and the read-only lineup workflow's inputs stay out of every kit
     # and the images of The Offline Project (brand/), kept in the repositories for her, not installed with the app
@@ -76,6 +82,8 @@ def page():
     assert n == 1, "ING_VERSION"
     ob = old_bundle(pg)
     kitdef = ob["kits"]
+    if os.path.exists(os.path.join(H, "kits", "kits.json")):  # 6.2: kept in the sources (kits/)
+        kitdef = json.load(open(os.path.join(H, "kits", "kits.json"), encoding="utf-8"))
     sources = {"fire": R["fire"], "mac": R["mini"], "windows": R["win"]}
     files, commits, total = [], {}, 0
     for source, repo in sources.items():
@@ -98,9 +106,16 @@ def page():
     tj = os.path.join(H, "tested.json")
     if os.path.exists(tj):
         tested = json.load(open(tj))
+    # 6.2: the kits' guides and definitions are kept in the sources (kits/), where they are read and changed
+    guides = ob["guides"]
+    kd = os.path.join(H, "kits")
+    if os.path.isdir(os.path.join(kd, "guides")):
+        guides = {g: open(os.path.join(kd, "guides", g), encoding="utf-8").read() for g in sorted(os.listdir(os.path.join(kd, "guides"))) if g.endswith(".md")}
+    if os.path.exists(os.path.join(kd, "tested.json")) and not os.path.exists(tj):
+        tested = json.load(open(os.path.join(kd, "tested.json"), encoding="utf-8"))
     made = datetime.date.today()
     bundle = {"v": 1, "made": "%d %s %d" % (made.day, made.strftime("%B"), made.year), "commits": commits,
-              "kits": kitdef, "guides": ob["guides"], "tested": tested, "files": files}
+              "kits": kitdef, "guides": guides, "tested": tested, "files": files}
     raw = json.dumps(bundle, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     b64 = base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode("ascii")
     block = '<script id="%s" type="ingenium/kit-bundle-gz" data-bytes="%d">%s</script>' % (SLOT, len(raw), b64)
