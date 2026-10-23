@@ -52,9 +52,9 @@ function kb(n){try{return fmtBytes(n);}catch(e){return n+" bytes";}}
 
 /* the devices, as the Forge shows them; a kit is the project GitHub (or the computer) builds into the app */
 var DEV=[
-  {k:"mac",e:"🍎",t:"Mac (MacBook, Intel)",d:"The Mac project with its GitHub recipe: GitHub builds the ready-made app and puts it on your Releases page. It also builds on the Mac itself with Build Mac App.command.",kind:"kit",kit:"mac"},
+  {k:"mac",e:"🍎",t:"Mac (MacBook, Intel)",d:"The Mac project with its build recipe: built online, the ready-made app comes to your Releases page. It also builds on the Mac itself with Build Mac App.command.",kind:"kit",kit:"mac"},
   {k:"macarm",e:"🖥️",t:"Mac mini (Apple silicon)",d:"For a Mac with an Apple chip, such as your Mac mini: the same project, built for Apple silicon, with a guide written for it.",kind:"kit",kit:"macarm"},
-  {k:"windows",e:"🪟",t:"Windows",d:"The Windows project with its GitHub recipe: GitHub builds the program and its installer (a Setup .exe that adds a Start menu entry).",kind:"kit",kit:"windows"},
+  {k:"windows",e:"🪟",t:"Windows",d:"The Windows project with its build recipe: built online, the program comes with its installer (a Setup .exe that adds a Start menu entry).",kind:"kit",kit:"windows"},
   {k:"ipa",e:"📱",t:"iPhone and iPad",d:"The app itself (.ipa), made here. Sideloadly or AltStore installs it from a computer with your Apple ID (seven days with a free Apple ID, a year with a paid one).",kind:"ipa",alt:{label:"Or the Xcode projects",kits:["iphone","ipad"]}},
   {k:"apk",e:"🔥",t:"Fire and Android",d:"The app itself (.apk), made and signed here: open it on the tablet to install it. Signed with the same key, each new one installs over the last and keeps your work.",kind:"apk",alt:{label:"Or the Android project",kits:["fire"]}},
   {k:"web",e:"🌐",t:"Web",d:"An installable site: the page, its manifest, its offline worker and its icons, for any web host (https). On iPhone and iPad, Add to Home Screen.",kind:"web"},
@@ -153,7 +153,7 @@ function open(opt){opt=opt||{};
       var t=E("div","dl-t"),bb=E("b",null,d.t),file=E("span","dl-file"),i=E("i",null,d.d),st=E("span","dl-st");st.setAttribute("aria-live","polite");
       t.appendChild(bb);t.appendChild(file);t.appendChild(i);var acts=E("div","dl-row");
       var mk=E("button","btn small","Make and save");mk.type="button";mk.disabled=!here(d);acts.appendChild(mk);
-      if(d.alt){var al=E("button","btn small ghost",d.alt.label);al.type="button";al.disabled=!hereKits();al.title=hereKits()?"The project GitHub builds into the app, with its guide":whyNot({kind:"kit"});acts.appendChild(al);al.onclick=function(){one(d,true);};}
+      if(d.alt){var al=E("button","btn small ghost",d.alt.label);al.type="button";al.disabled=!hereKits();al.title=hereKits()?"The project that is built into the app, with its guide":whyNot({kind:"kit"});acts.appendChild(al);al.onclick=function(){one(d,true);};}
       t.appendChild(acts);t.appendChild(st);row.appendChild(b);row.appendChild(t);list.appendChild(row);
       rows[d.k]={row:row,st:st,file:file,b:b,mk:mk};b.onclick=mk.onclick=function(){if(!here(d)){ingToast(whyNot(d));return;}one(d,false);};});
     paintNames();

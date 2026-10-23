@@ -13,7 +13,8 @@ What it does, each change found exactly once or the pass stops:
   2. the shared modules the Forge carries whole brought up to date (shared_swap.py);
   3. the exact text patches beside this script (patches_*.json), each found the number of times it names;
   4. the shared modules include.json names, then every block in blocks/ (name order), before </body>;
-  5. the full page only: the apps it carries, as passes 632 to 644.
+  4c. the code's own comments out, and the markup's (licence notices and markers kept; the code proved the same);
+  5. the full page only: the apps it carries, as passes 632 to 644 (each as it is).
 
 usage:
   forge645.py FORGE644_LEAN.html OUT_DIR [--only NAME[,NAME]]
@@ -114,6 +115,10 @@ if '/*PERMIT_LICENCE*/""' in s:
     import permits
     s, said = permits.fill(s, os.path.normpath(os.path.join(HERE, "..", "..", "licence", "LICENCE_forge.txt")))
     print(said)
+
+# 4c. THE CODE'S OWN COMMENTS OUT, as in every edition of Ingenium (shared_swap.tidy: licence notices and markers kept, the
+#     code proved the same)
+s = shared.tidy(s, "the Forge")
 
 
 def boot_map(t):

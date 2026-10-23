@@ -413,6 +413,32 @@ edit('text:text.slice(0,400),at:Date.now(),how:how||"you"};L.unshift(it);\n  if(
 edit('state.parked.unshift({id:uid(),t:t.slice(0,500),at:Date.now()});if(state.parked.length>200)state.parked.length=200;',
      'state.parked.unshift({id:uid(),t:t.slice(0,5000),at:Date.now()});if(state.parked.length>2000)state.parked.length=2000;', "6.3 a parked thought keeps 5,000 characters, and 2,000 are kept")
 
+# ---- 6.3: the name GitHub only where the owner connects to it (the owner's words, 23 October 2026: "I want you to remove the name
+#      "GitHub" from the app except for the sections that directly prompts users to connect to GitHub or the tour section that talks
+#      about connecting to GitHub, other than that, I want everything reworded to fit Ingenium and its own identity"): Add from
+#      GitHub, its sign-in, the guide to uploading a kit and the tour's card about it keep the name; the rest says it in Ingenium's
+#      words ----
+edit('The installer or the app from GitHub carries it.',
+     'The installed app carries it.', "6.3 words: The installer or the app from GitHub car")
+edit('any web host that serves https (for example GitHub Pages),',
+     'any web host that serves https,', "6.3 words: any web host that serves https (for exam")
+edit('The Android project, built and tested on GitHub.',
+     'The Android project, built and tested online.', "6.3 words: The Android project, built and tested on")
+edit('The iPhone project, built and tested on GitHub.',
+     'The iPhone project, built and tested online.', "6.3 words: The iPhone project, built and tested on ")
+edit('The Mac app for Intel Macs, built and tested on GitHub (or on the Mac',
+     'The Mac app for Intel Macs, built and tested online (or on the Mac', "6.3 words: The Mac app for Intel Macs, built and te")
+edit('larger ones fit. Built and tested on GitHub.',
+     'larger ones fit. Built and tested online.', "6.3 words: larger ones fit. Built and tested on Git")
+edit('The Windows program, built and tested on GitHub (or on the PC',
+     'The Windows program, built and tested online (or on the PC', "6.3 words: The Windows program, built and tested on")
+edit('a connection, web search, research or GitHub.</p>',
+     'a connection, web search, research, or a copy of an app sent online.</p>', "6.3 words: a connection, web search, research or Gi")
+edit('Upload a kit to a private GitHub repository and GitHub builds the app and tests it.',
+     'Upload a kit to a private GitHub repository, and the app is built and tested there.', "6.3 words: the guide to uploading a kit names GitHub once")
+edit('every step. GitHub builds the Fire tablet, iPhone and iPad apps from their kits;',
+     'every step. The Fire tablet, iPhone and iPad apps are built online from their kits;', "6.3 words: every step. GitHub builds the Fire table")
+
 # ---- 6.2: the install kit names the Windows repository by its real name ----
 edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium-HPWindows"}', "6.2 the Windows repository's name")
 
@@ -559,6 +585,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "code_editor_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r163.js":  # R163: the shared opener of a window kept apart (the Forge carries the same)
         t = open(os.path.join(HERE, "thoughts", "open_apart.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r166.js":  # R166: Fabrica calm, its work in rooms (the Forge carries the same)
+        t = open(os.path.join(HERE, "thoughts", "fabrica_rooms.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
 # 6.2: a module's script ends only where it means to: "</script" written inside its code or a comment would end it early
 for _m in mods:
@@ -601,7 +629,7 @@ if "/*R107_MASTER*/null" in blob:
 blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' layers and the faces they carried for others
 out = out.replace(MARK, blob + MARK)
 out = editions.apply(out, ED)  # 6.2: the edition's own changes (editions.py)
-out = editions.strip(out, ED)  # 6.2: and, without Lector, the code's comments out and nothing of Lector left
+out = editions.strip(out, ED)  # 6.3: every edition without the code's comments (6.2: and, without Lector, nothing of it left)
 # ---- R151: where each of the page's scripts begins, in thousandths of the page, for the loading page's bar. The page is
 #      walked as the browser reads it: a script ends at the first "</script" after it opens, so text inside a script that
 #      only looks like a tag is not counted ----

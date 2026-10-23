@@ -69,7 +69,7 @@ def _personal():
     E.append(('com.yannie.carpediem', 'app.ingenium.carpediem', "app ids: a neutral prefix (Carpe Diem's)", 4))
     E.append(('"DevGroup2313/Ingenium-', '"Ingenium-', "the build files: no account named", 4))
     # Fabrica: the name a Fire tablet's icon points to is the app's own, not the owner's (modules/r139.js)
-    E.append(("The name a home screen icon already points to. An app the Forge or GitHub built for the Fire tablet uses app.ingenium.carpediem.MainActivity; keep it,",
+    E.append(("The name a home screen icon already points to. An app the Forge built, or one built online from its project, for the Fire tablet uses app.ingenium.carpediem.MainActivity; keep it,",
               "The name a home screen icon already points to: keep it,", "Fabrica: the icon's name", 1))
     # Fabrica brings no app in from an app library this edition does not keep (modules/r112.js)
     E.append(('sh.box.appendChild(opt("♦","From your app library",', 'if(libOn())sh.box.appendChild(opt("♦","From your app library",',
@@ -142,7 +142,7 @@ def _blank():
         ("One page (.html), with its scripts and styles inside it: Carpe Diem, The Forge, Inkwell or Ingenium.</span>",
          "One page (.html), with its scripts and styles inside it.</span>", "the chat: an app file", 1),
         ('"Carpe Diem, My Notes…"', '"My Notes, Garden Planner…"', "Fabrica: a new app's name", 1),
-        ("A package of The Forge or Ingenium installs over the one GitHub built when", "A package installs over the one GitHub built when",
+        ("A package of The Forge or Ingenium installs over one built online from its project when", "A package installs over one built online from its project when",
          "Fabrica: the signing key", 1),
         (": the same Tabula as in Carpe Diem, with", ", with", "Tabula: what it is", 2),
         (": the same Abacus as in Carpe Diem, with", ", with", "Abacus: what it is", 2),
@@ -297,21 +297,33 @@ def assets(ed):
 
 
 def strip(out, ed):
-    """The editions without Lector: the code's own comments out (licence notices and the build's markers kept), what is left
-    of Lector renamed, and then nothing of Lector anywhere in the page outside its data."""
-    if has_lector(ed):
+    """Every edition: the code's own comments out, and the markup's (licence notices, the build's line and its markers kept;
+    tools/strip_comments.js), each script then proved to hold the same code (tools/same_code.js). The owner's words (23 October
+    2026): "I want you to remove those unecessary stales codes or comments from the code of the app please." Without Lector,
+    what is left of Lector is renamed too, and then nothing of Lector is anywhere in the page outside its data.
+    ING_KEEP_COMMENTS=1 keeps them (to compare)."""
+    if os.environ.get("ING_KEEP_COMMENTS") == "1":
         return out
     import tempfile, json
+    word = [] if has_lector(ed) else ["--word", "Lector=Reader"]
     with tempfile.TemporaryDirectory() as d:
-        src, dst = os.path.join(d, "in.html"), os.path.join(d, "out.html")
+        src, mid, dst = os.path.join(d, "in.html"), os.path.join(d, "mid.html"), os.path.join(d, "out.html")
         open(src, "w", encoding="utf-8").write(out)
-        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), src, dst, "--word", "Lector=Reader"]))
-        out = open(dst, encoding="utf-8").read()
-    bare = re.sub(r'(<script type="(?:text/plain|ingenium/[\w-]+|application/json)"[^>]*>)(.*?)(</script>)', r"\1\3", out, flags=re.S)
-    left = [m.start() for m in re.finditer(r"Lector", bare)]
-    if left:
-        sys.exit("edition %s: Lector is still named %d times, first: %r" % (ed, len(left), bare[max(0, left[0] - 120):left[0] + 80]))
-    print("edition %s: %d comments out (%d kept), %d words of Lector's left code renamed" % (ed, rep["cut"], rep["kept"], rep["words"]))
+        rep = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), src, mid, "--html"]))
+        _node([os.path.join(TOOLS, "same_code.js"), src, mid])
+        if word:
+            rep["words"] = json.loads(_node([os.path.join(TOOLS, "strip_comments.js"), mid, dst] + word))["words"]
+            mid = dst
+        out = open(mid, encoding="utf-8").read()
+    said = "edition %s: %d comments out (%d whole lines, %d in the markup; %d kept), %d bytes fewer" % (
+        ed, rep["cut"], rep["lines"], rep["html"], rep["kept"], rep["before"] - rep["after"])
+    if word:
+        bare = re.sub(r'(<script type="(?:text/plain|ingenium/[\w-]+|application/json)"[^>]*>)(.*?)(</script>)', r"\1\3", out, flags=re.S)
+        left = [m.start() for m in re.finditer(r"Lector", bare)]
+        if left:
+            sys.exit("edition %s: Lector is still named %d times, first: %r" % (ed, len(left), bare[max(0, left[0] - 120):left[0] + 80]))
+        said += ", %d words of Lector's left code renamed" % rep["words"]
+    print(said)
     return out
 
 

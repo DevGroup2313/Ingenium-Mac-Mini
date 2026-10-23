@@ -646,7 +646,7 @@ function fromZip(u8,opt){opt=opt||{};var z=unzip(u8),ents=z.entries.filter(funct
   var files=[],chain=Promise.resolve();
   ents.forEach(function(e){chain=chain.then(function(){return get(e).then(function(d){var t=e.unix&0o170000,m=t===0o120000?"120000":((e.unix&0o111)?"100755":(e.unix?"100644":null));files.push({path:e.name.slice(prefix.length),data:d,mode:m});});});});
   var name=opt.name||(prefix?prefix.slice(0,-1).replace(/-[0-9a-f]{7,40}$/,"").replace(/-(main|master)$/,""):"Imported");
-  return chain.then(function(){return fromFiles(files,Object.assign({},opt,{name:name,msg:opt.msg||("Brought in from "+(opt.fileName||"a zip")+(/^[0-9a-f]{40}$/.test(z.comment)?" (GitHub commit "+z.comment.slice(0,7)+")":""))}));});}
+  return chain.then(function(){return fromFiles(files,Object.assign({},opt,{name:name,msg:opt.msg||("Brought in from "+(opt.fileName||"a zip")+(/^[0-9a-f]{40}$/.test(z.comment)?" (its version "+z.comment.slice(0,7)+")":""))}));});}
 /* files: [{path, data, mode?}] -> a new repository with them as its first commit */
 function fromFiles(files,opt){opt=opt||{};return create({name:opt.name,app:opt.app,desc:opt.desc}).then(function(s){
   return putFiles(s.id,files,opt.onEach).then(function(){return opt.noCommit?null:commit(s.id,opt.msg||"First version");}).then(function(c){return {id:s.id,commit:c,files:files.length};});});}

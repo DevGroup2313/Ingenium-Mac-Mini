@@ -445,12 +445,12 @@ function verOf(r){return headTag(r);}
 /* ---------- the frame ---------- */
 function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").parentNode===host)return $("fb");
   host.innerHTML='<div id="fb">'+
-   '<div class="f-head"><div><h1>Fabrica</h1><p>Your own GitHub, on this device: each of your apps kept with every version, changed, tested and shipped from here. GitHub is there only when you want it.</p></div>'+
+   '<div class="f-head"><div><h1>Fabrica</h1><p>Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here.</p></div>'+
    '<ol class="f-steps" id="fbSteps" aria-label="Where this app is"><li data-s="change"><i>1</i><span>Change</span></li><li class="sep" aria-hidden="true"></li><li data-s="keep"><i>2</i><span>Keep</span></li><li class="sep" aria-hidden="true"></li><li data-s="test"><i>3</i><span>Test</span></li><li class="sep" aria-hidden="true"></li><li data-s="ship"><i>4</i><span>Ship</span></li></ol></div>'+
    '<div class="f-seg f-tabs" id="fbTabs" role="tablist" aria-label="Fabrica\'s panels"><span class="f-thumb"></span><button type="button" role="tab" data-p="apps">Your apps</button><button type="button" role="tab" data-p="work" aria-selected="true">The work</button><button type="button" role="tab" data-p="ship">Test and ship</button></div>'+
    '<div class="f-panels" id="fbPanels">'+
     '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2>Your apps</h2><span class="f-chip" id="fbAppsChip"></span><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
-     '<div class="f-pn-b"><div class="f-repos" id="fbRepos"></div><div class="f-sec" style="border-top:1px solid var(--f-hair2)"><p class="f-hint" style="margin:0">Each app is a real git repository. Any git, and GitHub, opens what is kept here, and nothing it holds leaves this device unless you send it.</p></div></div>'+
+     '<div class="f-pn-b"><div class="f-repos" id="fbRepos"></div><div class="f-sec" style="border-top:1px solid var(--f-hair2)"><p class="f-hint" style="margin:0">Each app keeps every version in git\'s own format, so any git program can open it, and nothing it holds leaves this device unless you send it.</p></div></div>'+
      '<div class="f-pn-f"><button class="f-btn" id="fbNew" type="button">＋ New app</button><button class="f-btn" id="fbBring" type="button">Bring one in</button></div></section>'+
     '<section class="f-pn show" id="fbWork" aria-label="The work"><div class="f-pn-h"><span class="f-ls" id="fbWhSeal"></span><h2 id="fbWhName"></h2>'+
      '<button class="f-branch" id="fbBranch" type="button" title="Your ideas: each one is a branch"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="4" cy="3.5" r="1.8"/><circle cx="4" cy="12.5" r="1.8"/><circle cx="12" cy="6" r="1.8"/><path d="M4 5.3v5.4M12 7.8c0 2.4-3 2.6-6.6 3.6"/></svg><span id="fbBranchName">main</span></button>'+
@@ -460,7 +460,7 @@ function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").p
     '<section class="f-pn" id="fbShip" aria-label="Test and ship"><div class="f-pn-h"><h2>Test and ship</h2><span class="f-chip" id="fbShipChip"></span><button class="f-fold" type="button" data-f="ship" aria-expanded="true" title="Fold Test and ship away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-pn-b"><div class="f-sec"><h3>Test this version <span class="f-chip" id="fbTestChip">Not tested yet</span></h3><div class="f-checks" id="fbChecks"></div><div class="f-row" style="margin-top:11px"><button class="f-btn" id="fbTest" type="button">Test this version</button></div></div>'+
      '<div class="f-sec"><h3>Ship to your devices <span class="f-chip" id="fbShipState">Ready to make</span></h3><div class="f-targets" id="fbTargets"></div><div class="f-pkg" id="fbPkg"></div><p class="f-hint">Press a card to choose it; its own key makes it alone. Everything is made here from the version you kept, with no compiler and no connection, and kept under Releases.</p></div>'+
-     '<div class="f-sec"><h3>Copies, and GitHub</h3><div class="f-copies" id="fbCopies"></div></div></div>'+
+     '<div class="f-sec"><h3>Copies</h3><div class="f-copies" id="fbCopies"></div></div></div>'+
      '<div class="f-pn-f"><button class="f-btn pri" id="fbMakeAll" type="button" style="flex:1 1 auto">Make the chosen</button></div></section>'+
    '</div></div>';
   wire();return $("fb");}
@@ -687,7 +687,7 @@ var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android dev
   ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],
   ["web","Web app (.zip)","Installs from a browser and works offline; on iPhone and iPad, Add to Home Screen"],
   ["page","One page (.html)","The whole app in one file, for any browser"],
-  ["kits","Build kits (.zip)","Projects for a computer or GitHub to build: you choose the devices"]];
+  ["kits","Build kits (.zip)","Projects to build the apps on a computer or online: you choose the devices"]];
 var NOTE={page:"onePage",web:"webApp",kits:"kits",apk:"apk",ipa:"ipa"};
 /* the family's apps keep the ids, launcher names and bridges their earlier packages had, so a package made here installs over
    one built by the Forge or by GitHub (with that one's key). Ingenium's own Fire app carries the model engine and its models,
@@ -695,7 +695,7 @@ var NOTE={page:"onePage",web:"webApp",kits:"kits",apk:"apk",ipa:"ipa"};
 var KNOWN={forge:{id:"com.yannieforest.theforge",alias:"com.yannie.carpediem.MainActivity",and:["CarpeNative"],ios:["CarpeNative","pywebview"]},
   cd:{id:"com.yannie.carpediem",alias:"com.yannie.carpediem.MainActivity",and:["CarpeNative"],ios:["CarpeNative","pywebview"]},
   inkwell:{id:"studio.inkwell.app",alias:"",and:["InkwellNative","CarpeNative"],ios:["InkwellNative","CarpeNative"]},
-  ingenium:{id:"com.yannieforest.ingenium.web",alias:"",and:["IngeniumNative"],ios:["IngeniumNative"],note:"Ingenium's own Fire tablet app, built by GitHub, carries the model engine and its models; this package is Ingenium's page in Fabrica's shell, without them. Its id is its own, so it installs beside your Ingenium and never over it."}};
+  ingenium:{id:"com.yannieforest.ingenium.web",alias:"",and:["IngeniumNative"],ios:["IngeniumNative"],note:"Ingenium's own Fire tablet app, built online from its project, carries the model engine and its models; this package is Ingenium's page in Fabrica's shell, without them. Its id is its own, so it installs beside your Ingenium and never over it."}};
 window.fbKnown=KNOWN;
 /* 6.1 · Download as an app (R139), from the version kept: every device with its emoji, one at a time or all; what is made is kept
    under Releases like the cards' own */
@@ -744,7 +744,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
   var mb=$("fbMakeAll");mb.disabled=!r||!r.head||!!mk||!chosen.length;mb.textContent=mk?"Making…":!chosen.length?"Choose what to make above":(all?"Make the chosen again":"Make the chosen")+" ("+chosen.length+")";mb.className="f-btn pri"+(r&&stepOf(r)==="ship"?" next":"");
   var sc=$("fbShipChip");sc.className="f-chip"+(shipped(r||{id:""})&&r?" ok":"");sc.textContent=!r?"":r&&shipped(r)?"Shipped":r&&tested(r)?"Tested":r&&r.head?"Waiting":"";
   var cp=$("fbCopies");cp.innerHTML="";if(!r)return;
-  [["folder","A folder for git","Its files with their whole history (.git inside), zipped: any git opens it"],["bundle","The whole history in one file","A git bundle: one file to keep, or to clone anywhere"],["zip","A zip of its files","As GitHub's Download ZIP makes it"]].forEach(function(c){var e=h("div","f-cp");e.innerHTML='<div class="t">'+esc(c[1])+"<small>"+esc(c[2])+"</small></div>";
+  [["folder","A folder for git","Its files with their whole history (.git inside), zipped: any git opens it"],["bundle","The whole history in one file","A git bundle: one file to keep, or to clone anywhere"],["zip","A zip of its files","Its files as they are, in one zip"]].forEach(function(c){var e=h("div","f-cp");e.innerHTML='<div class="t">'+esc(c[1])+"<small>"+esc(c[2])+"</small></div>";
     var b=btn("quiet sm","Save",function(){if(!r.head){toast("Keep a first version first.");return;}b.disabled=true;var p=c[0]==="folder"?IngRepo.gitFolder(r.id).then(function(z){return [r.slug+"-git.zip","application/zip",z];}):c[0]==="bundle"?IngRepo.bundle(r.id).then(function(z){return [r.slug+".bundle","application/octet-stream",z];}):IngRepo.sourceZip(r.id).then(function(z){return [r.slug+"-"+r.head.slice(0,7)+".zip","application/zip",z];});
       p.then(function(x){return saveBytes(x[0],x[1],x[2]).then(function(){toast("Saved: "+x[0]+", "+kb(x[2].length)+".");b.disabled=false;});}).catch(function(e){b.disabled=false;fail(e);});});e.appendChild(b);cp.appendChild(e);});
   var gh=h("div","f-cp"),on=!!FBS().gh;gh.innerHTML='<div class="t">GitHub, only when you choose<small>'+(on?"A copy there, when you want one. Nothing leaves this device until you send it yourself.":"Off. Everything works without it.")+"</small></div>";
@@ -752,7 +752,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
   if(on){if(window.fbGitHub&&typeof fbGitHub.paint==="function"){try{fbGitHub.paint(r,cp,{btn:btn,h:h,esc:esc,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,saveBytes:saveBytes,refresh:function(){C.diff={};C.files={};C.log={};return refresh().then(paint);},busy:busy,unbusy:unbusy});}catch(e){fail(e);}}
     else{var g2=h("div","f-cp");g2.innerHTML='<div class="t">Send its versions<small>GitHub needs a connection and your sign-in. Save the bundle and, on any computer with git: git clone '+esc(r.slug)+'.bundle, then git push to your repository.</small></div>';
       g2.appendChild(btn("sm","Save the bundle",function(){IngRepo.bundle(r.id).then(function(b){return saveBytes(r.slug+".bundle","application/octet-stream",b).then(function(){toast("Saved: "+r.slug+".bundle, "+kb(b.length)+".");});},fail);}));cp.appendChild(g2);}
-    var g3=h("div","f-cp");g3.innerHTML='<div class="t">Bring a copy in by file<small>GitHub\'s Download ZIP, or a bundle from git bundle create: it comes in here as an app of its own, history and all.</small></div>';
+    var g3=h("div","f-cp");g3.innerHTML='<div class="t">Bring a copy in by file<small>A zip of its files, or a bundle from git bundle create: it comes in here as an app of its own, history and all.</small></div>';
     g3.appendChild(btn("sm","Choose the file",function(){pickFile(".zip,.bundle",function(file){importFile(file);});}));cp.appendChild(g3);}}
 window.fbPaintShip=paintShip;
 function testNow(){var r=cur();if(!r||!r.head)return;S.testing={id:r.id,checks:[]};paintShip();
@@ -789,9 +789,9 @@ function makeChosen(){var r=cur();if(!r||!r.head)return;var list=shipPrefs(r).ch
     toast(bad.length?(done.length?done.map(nm).join(", ")+" made; ":"")+nm(bad[0][0])+" was not: "+bad[0][1]:done.length+" made and saved: "+done.map(nm).join(", ")+". Each is kept under Releases too.");});}
 function makeAll(){makeChosen();}
 /* the build kits: the devices chosen, one zip each, saved one after another */
-function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds everything needed to build the app for one device, with a guide to every step: GitHub builds the Fire tablet, iPhone and iPad apps from theirs, and the Mac and Windows kits build on the computer itself. Choose the devices.");
+function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds everything needed to build the app for one device, with a guide to every step: the Fire tablet, iPhone and iPad apps are built online from theirs, and the Mac and Windows kits build on the computer itself. Choose the devices.");
   var picked=pref.kits.slice();
-  KITS.forEach(function(k){var o=opt("✓",k[1],k[0]==="fire"?"An Android project and its GitHub recipe (Fabrica's APK needs none)":k[0]==="iphone"||k[0]==="ipad"?"An Xcode project and its GitHub recipe (Fabrica's IPA needs none)":"The app for this computer, built on it",function(){var i=picked.indexOf(k[0]);if(i>=0)picked.splice(i,1);else picked.push(k[0]);o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");go2.textContent="Make "+picked.length+" kit"+(picked.length===1?"":"s");go2.disabled=!picked.length;});
+  KITS.forEach(function(k){var o=opt("✓",k[1],k[0]==="fire"?"An Android project and its build recipe (Fabrica's APK needs none)":k[0]==="iphone"||k[0]==="ipad"?"An Xcode project and its build recipe (Fabrica's IPA needs none)":"The app for this computer, built on it",function(){var i=picked.indexOf(k[0]);if(i>=0)picked.splice(i,1);else picked.push(k[0]);o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");go2.textContent="Make "+picked.length+" kit"+(picked.length===1?"":"s");go2.disabled=!picked.length;});
     o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");sh.box.appendChild(o);});
   var end=h("div","end"),go2=btn("pri","Make "+picked.length+" kit"+(picked.length===1?"":"s"),function(){pref.kits=picked.slice();saveSoon();sh.close();makeOne(r,"kits",{kits:picked.slice()}).catch(function(){});});
   go2.disabled=!picked.length;end.appendChild(btn("","Close",sh.close));end.appendChild(go2);sh.box.appendChild(end);}
@@ -832,7 +832,7 @@ function opt(ic,title,small,on){var b=h("button","f-opt");b.type="button";b.inne
 function libList(){try{return typeof libApps==="function"?libApps():[];}catch(e){return [];}}
 function sheetBring(into){var sh=sheet("Bring an app in","Whatever you bring keeps its history if it has one; if not, it starts with a first version."),lib=libList();
   sh.box.appendChild(opt("♦","From your app library",lib.length?lib.map(function(m){return (APPS[m.key]?APPS[m.key].name:m.key)+(m.version?" "+m.version:"");}).join(", "):"Nothing is kept there yet: Lector's brief takes your apps' pages",function(){if(!lib.length){toast("Add an app's page in Lector first, or bring a file in here.");return;}sh.close();sheetLibrary(lib,into);}));
-  sh.box.appendChild(opt("⇩","A page, or a zip of its files","Your app's own .html, its install kit, or GitHub's Download ZIP",function(){sh.close();pickFile(".html,.htm,.zip",function(f){importFile(f,into);});}));
+  sh.box.appendChild(opt("⇩","A page, or a zip of its files","Your app's own .html, its install kit, or a zip of its files",function(){sh.close();pickFile(".html,.htm,.zip",function(f){importFile(f,into);});}));
   sh.box.appendChild(opt("⎇","A git bundle, or a folder with its .git (zipped)","Its whole history comes with it, branch for branch",function(){sh.close();pickFile(".bundle,.zip",function(f){importFile(f,into);});}));
   var prs=[];try{prs=typeof ccProjects==="function"?ccProjects():[];}catch(e){}
   sh.box.appendChild(opt("◇","From Code",prs.length?prs.length+" project"+(prs.length===1?"":"s")+" there: "+prs.slice(0,3).map(function(p){return p.name;}).join(", ")+(prs.length>3?"…":""):"No app project in Code yet",function(){if(!prs.length){toast("Make an app in Code first; it will show here.");return;}sh.close();sheetProjects(prs,into);}));
@@ -893,17 +893,17 @@ function sheetPackage(r){var P=pkgOf(r),pref=shipPrefs(r),sh=sheet("Package deta
   function field(label,val,hint,ph){var l=h("label","f-field"),i=h("input");i.type="text";i.value=val||"";if(ph)i.placeholder=ph;l.appendChild(h("span",null,esc(label)));l.appendChild(i);if(hint)l.appendChild(h("small",null,esc(hint)));sh.box.appendChild(l);return i;}
   var fT=field("Its name on the device",P.title,"Under its icon, on the home screen."),fI=field("Its id",P.id,"Letters, digits and dots, such as com.yannieforest.myapp."),
     fV=field("Its version",pref.version||"","Empty: the release you marked on this version, else the build number in its page, else 1.0. Android also gets a version code that rises by itself with every package.",verOf(r)||"from the page"),
-    fA=field("Its launcher name on Android (optional)",P.alias,"The name a home screen icon already points to. An app the Forge or GitHub built for the Fire tablet uses com.yannie.carpediem.MainActivity; keep it, and its icon stays where it is after the update.");
+    fA=field("Its launcher name on Android (optional)",P.alias,"The name a home screen icon already points to. An app the Forge built, or one built online from its project, for the Fire tablet uses com.yannie.carpediem.MainActivity; keep it, and its icon stays where it is after the update.");
   var kl=h("label","f-field"),ks=h("select");kl.appendChild(h("span",null,"The key it is signed with (Android)"));kl.appendChild(ks);
-  kl.appendChild(h("small",null,"Android installs a new package over an app only when both carry the same key. A package of The Forge or Ingenium installs over the one GitHub built when it is signed with that repository's key (its signing folder): bring that key in here."));sh.box.appendChild(kl);
+  kl.appendChild(h("small",null,"Android installs a new package over an app only when both carry the same key. A package of The Forge or Ingenium installs over one built online from its project when it is signed with that project's key (its signing folder): bring that key in here."));sh.box.appendChild(kl);
   function fillKeys(sel){ks.innerHTML="";IngApk.keys.list().then(function(list){if(!list.some(function(k){return k.id==="device";}))list.unshift({id:"device",label:"Made on this device",cn:"",fingerprint:""});
     list.forEach(function(k){var o=document.createElement("option");o.value=k.id;o.textContent=(k.id==="device"?"This device's own key":k.label)+(k.cn&&k.id!=="device"?" ("+k.cn+")":"")+(k.fingerprint?" · "+k.fingerprint.slice(0,12):"");if(k.id===(sel||P.keyId))o.selected=true;ks.appendChild(o);});},fail);}
   fillKeys();
   var kr=h("div","f-row");kr.style.margin="-2px 0 12px";
-  kr.appendChild(btn("sm","Bring a key in (.keystore, .p12)",function(){pickFile(".keystore,.p12,.pfx,.jks,application/x-pkcs12",function(file){sheetName("The password of "+file.name,"The keystore's password (in GitHub's builds, storePassword in signing/signing.properties).",function(pw){
+  kr.appendChild(btn("sm","Bring a key in (.keystore, .p12)",function(){pickFile(".keystore,.p12,.pfx,.jks,application/x-pkcs12",function(file){sheetName("The password of "+file.name,"The keystore's password (in the online builds, storePassword in signing/signing.properties).",function(pw){
       return file.arrayBuffer().then(function(ab){return IngApk.keys.bring(new Uint8Array(ab),pw,file.name.replace(/\.[^.]+$/,""));}).then(function(k){fillKeys(k.id);toast("Kept: "+(k.cn||k.label)+", "+k.fingerprint.slice(0,12)+"…");});},"");});}));
   kr.appendChild(btn("sm","Save this key (.p12)",function(){var id=ks.value||"device";sheetName("A password for the key's file","At least six characters. Keep the file and its password safe: anyone holding both can sign an app that installs over yours.",function(pw){
-      return IngApk.keys.save(id,pw).then(function(u8){return saveBytes((id==="device"?"ingenium-device":"ingenium-"+id)+"-signing.p12","application/x-pkcs12",u8);}).then(function(){toast("Saved. keytool and GitHub's builds open it with the password you chose.");});},"");}));
+      return IngApk.keys.save(id,pw).then(function(u8){return saveBytes((id==="device"?"ingenium-device":"ingenium-"+id)+"-signing.p12","application/x-pkcs12",u8);}).then(function(){toast("Saved. keytool and the online builds open it with the password you chose.");});},"");}));
   sh.box.appendChild(kr);
   var end=h("div","end");end.appendChild(btn("","Close",sh.close));
   end.appendChild(btn("pri","Keep these",function(){var id=fI.value.trim();if(!IngApk.cleanId(id)){fI.focus();toast("“"+id+"” cannot be an id: letters, digits and dots, such as com.yannieforest.myapp.");return;}
@@ -988,7 +988,7 @@ function syncFromCode(r){var pr=r&&projFor(r);if(!pr||typeof ccLoadAll!=="functi
 
 /* ---------- the page in Ingenium: its place in the rail, its section, its turn in go() ---------- */
 function install(){if($("page-fabrica"))return;
-  var sec=h("section","section fb-page");sec.id="page-fabrica";sec.innerHTML='<h1 class="page-title">Fabrica</h1><p class="lede">Your own GitHub, on this device.</p><div id="fbHost"></div>';
+  var sec=h("section","section fb-page");sec.id="page-fabrica";sec.innerHTML='<h1 class="page-title">Fabrica</h1><p class="lede">Your workshop, on this device.</p><div id="fbHost"></div>';
   var after=$("page-build")||$("page-lector");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else document.querySelector(".main").appendChild(sec);
   var nb=document.querySelector('.nav-btn[data-page="build"]')||document.querySelector('.nav-btn[data-page="lector"]');
   if(nb){var b=h("button","nav-btn");b.type="button";b.setAttribute("data-page","fabrica");b.setAttribute("onclick","go('fabrica')");

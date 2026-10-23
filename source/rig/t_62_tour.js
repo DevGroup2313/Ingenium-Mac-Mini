@@ -140,7 +140,10 @@ async function raised(p, sel) {
     // ---------------- 4 · the Guide's chapter keys ----------------
     await p.evaluate(() => go('guide')); await p.waitForTimeout(700);
     const g = await raised(p, '#guideTour .tour-entry-chap');
-    ok(g.found && !g.below && !g.lift && !g.sink, 'the Guide\'s list of chapters is flat too: no shadow beneath, no lift, no sink', g);
+    // 6.3 (the owner's words, 23 October 2026: "I don't like how you made every button wide and flat"): the Guide's chapters are keys,
+    // popped out and as wide as their words; the tour's own list of chapters stays flat
+    const gw = await p.evaluate(() => { const b = document.querySelector('#guideTour .tour-entry-chap'), r = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(b); return { w: r.width, need: rg.getBoundingClientRect().width + 40 }; });
+    ok(g.found && g.below && g.lift && gw.w <= gw.need + 20, 'the Guide\'s chapters are keys: a shadow beneath, they lift, and each as wide as its words', { g, gw });
     const go = await raised(p, '#tourGo');
     ok(go.found && go.below && go.lift, 'and its Take the tour key', go);
 

@@ -142,7 +142,7 @@ window.IngBlendPresets={list:PRESETS,recs:presetRecs,paint:paintPresets,parse:pa
      tip:"Keep a version after each piece of work, with a line saying what changed. The history is yours to read later."},
     {chap:"Fabrica",sub:"Work, test and ship",go:function(){go("fabrica");},ring:["#fbWork","#fbPanels"],
      t:"🧪 The work, tested",b:"The work panel shows what changed since the last version. Test runs the app's own checks; Ship makes the one-page app, the web app and the installers, ready for download, from the version you choose."},
-    {chap:"Fabrica",sub:"GitHub inside",go:function(){go("fabrica");},ring:["#fbShip","#fbPanels"],
+    {chap:"Fabrica",sub:"GitHub inside",go:function(){go("fabrica");try{if(window.fbRooms)fbRooms.part("copies");}catch(e){}},ring:["#fbShip","#fbPanels"],
      t:"🌐 GitHub, when you want it",b:"Sign in with a token and each repository can be sent to GitHub and brought back, version for version, with the same identities. Releases, builds and their installers are reached from here. Without a token, Fabrica works entirely on this device."}];
   var scholar=[
     {chap:"Scholarship",sub:"Every search vetted",go:function(){go("settings");},ring:["#srchPeer + .etrack","#srchScholar + .etrack"],/* R125: the switches' own inputs are drawn 0 by 0; their tracks are what shows */

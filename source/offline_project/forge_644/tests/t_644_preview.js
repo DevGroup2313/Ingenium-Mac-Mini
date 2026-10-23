@@ -140,7 +140,8 @@ const wheelSmall = async (p, q) => { await p.mouse.move(q.x, q.y); for (let i = 
     // never while typing; never in a room without a preview
     await p.evaluate(() => { document.getElementById('fold-studio').open = true; document.getElementById('fsOpenCode').click(); }); await p.waitForTimeout(600);
     // (the focus itself may bring the field into view, which is a scroll: the keys are pressed once that has settled)
-    await p.focus('#fsCode'); await p.waitForTimeout(900);
+    // (from 645 the code is in the shared editor: the keys go to it, as a person's would)
+    await p.evaluate(() => { const t = document.getElementById('fsCode'); if (t.__ingCode) t.__ingCode.view.focus(); else t.focus(); }); await p.waitForTimeout(900);
     await p.keyboard.press('ArrowDown'); await p.keyboard.press('PageDown'); await p.keyboard.press('End');
     const typed = await p.evaluate(() => ({ held: window.__forgePreviewSteady ? window.__forgePreviewSteady.held() : 0, on: window.__forgePreviewSteady ? window.__forgePreviewSteady.on() : null }));
     ok(typed.held === 0 && typed.on === false, 'keys typed in a field never hold anything', typed);

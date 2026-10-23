@@ -93,12 +93,9 @@ body[data-theme="night"] #ihBubble,body[data-theme="night"] #ihAsk,body[data-the
   transition:background-color .15s,color .15s}
 #tourMenu .tour-ms.ih-flat:not(#ih-z):hover{color:var(--ih-ink1);background:var(--ih-well)}
 #tourMenu .tour-ms.ih-flat.on:not(#ih-z){color:var(--ih-acc);font-weight:600}
-#tourMenu .tour-mi.ih-flat:focus-visible,#tourMenu .tour-ms.ih-flat:focus-visible,#guideTour .tour-entry-chap.ih-flat:focus-visible{outline:2px solid var(--ih-acc);outline-offset:2px}
+#tourMenu .tour-mi.ih-flat:focus-visible,#tourMenu .tour-ms.ih-flat:focus-visible{outline:2px solid var(--ih-acc);outline-offset:2px}
 #tourMenu .tour-card > .tour-link.ih-k{display:flex;margin:12px auto 0}
 #guideTour .tour-entry-row{gap:10px}
-#guideTour .tour-entry-chap.ih-flat:not(#ih-z){justify-content:flex-start;text-align:left;white-space:normal;border-radius:10px;padding:9px 12px;
-  border:1px solid var(--ih-hair);background:var(--ih-card);box-shadow:none;transform:none;color:var(--ih-ink1);transition:background-color .15s,border-color .15s}
-#guideTour .tour-entry-chap.ih-flat:not(#ih-z):hover{background:var(--ih-accs);border-color:var(--ih-ring)}
 
 /* ---------- the level, wherever it is chosen ---------- */
 .ih-lv{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
@@ -289,8 +286,9 @@ function cardsFor(lv){var out=[];T.forEach(function(s,k){if(shownAt(k,lv))out.pu
 
 /* ---------- the keys of the tour's panel, popped out like Fabrica's ---------- */
 function keyify(root){if(!root)return;[].forEach.call(root.querySelectorAll("button"),function(b){if(b.classList.contains("ih-k")||b.classList.contains("ih-flat"))return;
-  /* a chapter in a list is a row, not a key: flat, as in the Forge's and Carpe Diem's tours */
-  if(b.classList.contains("tour-mi")||b.classList.contains("tour-ms")||b.classList.contains("tour-entry-chap")){b.classList.add("ih-flat");return;}
+  /* a chapter in the tour's list is a row, not a key: flat, as in the Forge's and Carpe Diem's tours; the Guide's chapters are
+     keys (R166) */
+  if(b.classList.contains("tour-mi")||b.classList.contains("tour-ms")){b.classList.add("ih-flat");return;}
   b.classList.add("ih-k");
   if(b.classList.contains("primary"))b.classList.add("pri");
   if(b.classList.contains("tour-chap")){b.classList.add("sm");b.setAttribute("aria-haspopup","dialog");b.setAttribute("aria-expanded",$i("tourMenu")?"true":"false");
@@ -353,7 +351,7 @@ var XLINE={
   "Your devices":"Another computer serves its models over your home network with its address and a code.",
   "Making things":"Build runs as you type; a zip from Package can be brought into Fabrica.",
   Lector:"Save gives Word, PDF, a web page or Markdown; the dividers between the panels remember where you leave them.",
-  Fabrica:"Each app is a real git repository on this device; GitHub is optional.",
+  Fabrica:"Each app keeps every version on this device, in git's own format.",
   Scholarship:"Fontes keeps your references; a search goes online only when you switch it on.",
   "The side buttons":"The side buttons follow you to every page; the chevron lays them down.",
   "The top bar":"Refresh starts Ingenium again with your work saved first: F5, or Command+R on a Mac.",
@@ -516,11 +514,11 @@ var PG={
     what:"Fabrica keeps your apps as repositories: every version kept, tested and shipped, all on this device.",
     plain:"Think of it as a careful cupboard for your apps: nothing is thrown away, and you can always go back.",
     dos:[["Add an app","Start a new one, or bring one in.","#fbNew, #fbBring"],
-      ["See the work","Its changes, files, history and releases, under tabs.","#fbWork"],
+      ["See the work","Four rooms: Now, Story, Plans and Care; each shows only its own tabs.","#fbRooms, #fbWork"],
       ["Test this version","Run the checks before you ship it.","#fbTest"],
       ["Ship to your devices","Choose the devices, then make them.","#fbMakeAll, #fbShip"]],
     tips:{"new":["Each app keeps every version, so you can always go back.","Test this version before you ship it to your devices."],
-      some:["The tabs under The work show changes, files, history and releases.","GitHub is optional: everything works on this device."],
+      some:["The work has four rooms: Now (changes, files, code), Story (history, compare, releases), Plans and Care.","Everything works on this device, with no connection."],
       expert:["Every app is a real git repository here, with issues, pull requests and compare.","Make the chosen builds each chosen device's package, one after another."]}},
   notes:{name:"Notes",tour:["The side buttons"],
     what:"Notes keeps short notes on this device, and Schedae opens them beside any page.",
@@ -695,7 +693,7 @@ var WHAT=[
   [".f-split","A divider","Drag it to give one panel more room."],
   ["#fbApps, #fbRepos","Your apps","Every app Fabrica keeps. Choose one to work on it."],
   ["#fbWork","The work","The chosen app: its changes, files, history, releases and more, under tabs."],
-  ["#fbShip","Test and ship","Testing, shipping to your devices, and copies to GitHub when you want them."],
+  ["#fbShip","Test and ship","Test, Ship or Copies, one part at a time, chosen at its top."],
   ["#tourGo","Take the tour","Starts the guided tour, at your level."],
   [".tour-entry-chap","A chapter","Opens the tour at this chapter."],
   [".tip-fold-btn","A short note","Opens a short note; press again to fold it."],

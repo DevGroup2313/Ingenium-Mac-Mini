@@ -1,0 +1,33 @@
+<style id="forge-guidebook-fix-645">
+/* The Forge 645 · the Guidebook's newer entries, laid out like the rest. The owner's words (23 October 2026): "There is some layout
+   issues on the Forge's Guidebook, some of the new entries look weird and almost clipped out of the panel."
+   Five entries (The Bakery, Installing on each device, Testing with a screen reader, Every room step by step, Fabrica your workshop)
+   held numbered lists with no room at their left, so the numbers hung at the panel's very edge: every list in an entry now keeps
+   room for its numbers and bullets, in the accent colour. The search keeps a space above the first part, and an entry's line in the
+   list says what it is about (four said "Then:" or nothing). */
+#guide article ol,#guide article ul{padding-left:26px !important;margin:8px 0 12px !important;list-style-position:outside}
+#guide article ol{list-style-type:decimal}
+#guide article li{padding-left:3px}
+#guide article li::marker{color:var(--accent);font-weight:700}
+#guide article dl{margin:6px 0 10px}
+#guide article dd{margin:0 0 9px}
+#guide article pre,#guide article table{max-width:100%;overflow:auto}
+#guide article img,#guide article svg{max-width:100%;height:auto}
+#guide article{overflow-wrap:break-word}
+#guide #guideSearch{margin:0 0 14px}
+</style>
+<script>
+(function forgeGuidebookFix645(){"use strict";if(window.__forgeGuidebookFix645)return;window.__forgeGuidebookFix645=1;
+/* an entry's line in the list: its first sentence of some length, in the words shown (English, or French where only French shows) */
+function about(a){var host=a.querySelector('.fg-en')||a;var els=host.querySelectorAll('p,li,dd');
+  for(var i=0;i<els.length;i++){var t=els[i].textContent.trim().replace(/\s+/g,' ');if(t.length>=30)return t.length>90?t.slice(0,90)+'…':t;}
+  return '';}
+function mend(){var arts=document.querySelectorAll('#guide article');if(!arts.length)return;
+  [].forEach.call(document.querySelectorAll('#guideToc .gb-ch[data-i]'),function(c){var s=c.querySelector('.gb-ch-s');if(!s||s.textContent.trim().length>=25)return;
+    var a=arts[+c.getAttribute('data-i')];if(!a)return;var t=about(a);if(t)s.textContent=t;});}
+var T=0;function soon(){clearTimeout(T);T=setTimeout(mend,30);}
+function hook(){var toc=document.getElementById('guideToc');if(!toc||toc.__fgf)return !!toc;toc.__fgf=1;mend();
+  try{new MutationObserver(soon).observe(toc,{childList:true,subtree:true});}catch(e){}return true;}
+if(!hook()){var n=0,iv=setInterval(function(){if(hook()||++n>120)clearInterval(iv);},500);}
+})();
+</script>
