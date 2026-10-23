@@ -52,10 +52,11 @@ function pct(p){return Math.round(p*100)+"%";}
 /* ---------- the pack: opened once, each part unpacked and checked against its size ---------- */
 function open(){if(P)return Promise.resolve(P);var el=$(PACK);
   if(!el)return Promise.reject(new Error("this copy of Ingenium carries no picture reader"));
-  return new Promise(function(res){var s=atob(el.textContent.trim()),n=s.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=s.charCodeAt(i);
+  /* on a computer the pack may still be with the app (modules/r161.js): fetched the first time it is wanted */
+  return (typeof ingFill==="function"?ingFill(PACK):Promise.resolve()).then(function(){return new Promise(function(res){var s=atob(el.textContent.trim()),n=s.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=s.charCodeAt(i);
     if(String.fromCharCode.apply(null,u.subarray(0,8))!=="INGEYES1")throw new Error("the picture reader's pack is not whole");
     var hl=u[8]|(u[9]<<8)|(u[10]<<16)|(u[11]<<24);
-    P={h:JSON.parse(new TextDecoder().decode(u.subarray(12,12+hl))),base:12+hl,u:u};res(P);});}
+    P={h:JSON.parse(new TextDecoder().decode(u.subarray(12,12+hl))),base:12+hl,u:u};res(P);});});}
 function gunzip(z){try{if(typeof DecompressionStream==="function")
     return new Response(new Blob([z]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer().then(function(b){return new Uint8Array(b);},function(){return ingInflateGzip(z);});}catch(e){}
   return Promise.resolve().then(function(){return ingInflateGzip(z);});}

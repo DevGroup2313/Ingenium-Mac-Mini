@@ -1,0 +1,7 @@
+[
+ {
+  "why": "a carried app the Mac app keeps beside the page (blocks/forge_quick.html) is fetched before it is read",
+  "old": "function biBytes(x){ var n=el(x.id); if(!n) return Promise.reject(err('gone',x.key));",
+  "new": "function biBytes(x){ var n=el(x.id); if(!n) return Promise.reject(err('gone',x.key));\n  if(n.getAttribute('data-defer') && window.forgeFill) return window.forgeFill(x.id).then(function(){ return biBytes(x); }, function(e){ throw err('gone',x.key,e); });"
+ }
+]

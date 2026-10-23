@@ -138,7 +138,9 @@ function find(){var box=$("bdHits"),q=(BD.q||"").trim();if(!box)return;box.inner
 /* ---------- running, saving, Fabrica ---------- */
 function runNow(){var code=whole();$("consolePane").innerHTML="";try{consoleLines=0;updateConsoleCount();}catch(e){}
   try{if(typeof csOpen==="function"){}}catch(e){}
-  $("previewFrame").srcdoc=ingStageDoc(code);$("frameWrap").setAttribute("data-lived","1");}
+  /* 6.2 (R158): a large app runs from a file of its own, never as one giant attribute of the frame */
+  if(typeof window.ingRunInFrame==="function")window.ingRunInFrame($("previewFrame"),code);else $("previewFrame").srcdoc=ingStageDoc(code);
+  $("frameWrap").setAttribute("data-lived","1");}
 /* Build's own Run, Save, Package and kits read the whole page: a page held part by part is put together for them first */
 var oRun=window.runBuild;window.runBuild=function(){if(BD)return runNow();var code=$("codeEditor").value;if(code.length>LARGE){open({name:"page.html",text:code});return;}return oRun.apply(this,arguments);};
 $("runBtn").onclick=function(){window.runBuild();};

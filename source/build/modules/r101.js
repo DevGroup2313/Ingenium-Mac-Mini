@@ -34,8 +34,10 @@ var R1={stash:{}};
 function r1AutoCtx(m,A){if(!m)return 8192;
   var desk=A===DeskAdapter,nat=A===NativeAdapter,ram=deviceMemGB(),top=(+m.ctxLen>0)?+m.ctxLen:(desk?131072:32768);
   if(nat)top=Math.min(top,(typeof nativeInfo!=="undefined"&&nativeInfo&&nativeInfo.maxCtx)||8192);
-  var steps=desk?[32768,24576,16384,12288,8192]:[16384,12288,8192];
-  if(!ram)return Math.min(top,desk?16384:8192);
+  /* 6.2 (R159): a computer goes as far as 131,072 by itself (its engine keeps memory in eight bits past 32,768), the page's
+     own engine to 32,768 */
+  var steps=desk?[131072,98304,65536,49152,32768,24576,16384,12288,8192]:[32768,24576,16384,12288,8192];
+  if(!ram)return Math.min(top,desk?32768:8192);
   var usable=ram*(desk?0.7:0.55);
   for(var i=0;i<steps.length;i++){var c=Math.min(steps[i],top);if(estimateNeedGB(Object.assign({},m,{ctx:c}))<=usable)return c;}
   return Math.min(top,8192);}

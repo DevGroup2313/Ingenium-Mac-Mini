@@ -30,7 +30,12 @@ function measure(ids){var root=document.documentElement,coarse=!!(document.body&
     var gap=kh+3,low=12+safe;b0=Math.max(low,Math.min(b0,room-gap*(n-1)));st=Math.max(gap,Math.min(56,(room-b0)/(n-1)));}
   if(!tight)root.classList.remove("f644-tight");
   L.b0=b0;L.st=st;L.at=Date.now();}
-/* pack() asks for each key in turn (i = 0 for the lowest): the column is measured once a pass, at its first key */
-window.__f644Col=function(i,ids){if(i===0||Date.now()-L.at>1000)measure(ids||["sticky-fab","horo-fab","cd-theme-fab","cd-thought-fab","forge-quiet-fab","reminders-fab","cd-float-fab"]);return Math.round(L.b0+L.st*i);};
+/* pack() asks for each key in turn (i = 0 for the lowest), every 700 ms: the column is measured again only when the window,
+   the number of keys shown (counted from the pass before) or the touch mode has changed, and at least every 5 seconds */
+var DEF=["sticky-fab","horo-fab","cd-theme-fab","cd-thought-fab","forge-quiet-fab","reminders-fab","cd-float-fab"],top=-1;
+window.__f644Col=function(i,ids){
+  if(i===0){var n=top+1,sig=(window.innerWidth||0)+"x"+(window.innerHeight||0)+"|"+n+"|"+(document.body&&document.body.classList.contains("cd-coarse")?1:0);top=-1;
+    if(sig!==L.sig||Date.now()-L.at>5000){L.sig=sig;measure(ids||DEF);}}
+  if(i>top)top=i;return Math.round(L.b0+L.st*i);};
 })();
 </script>

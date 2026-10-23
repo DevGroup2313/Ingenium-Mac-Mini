@@ -2,7 +2,8 @@
 usage: forge_repo_643.py THE_FORGE.html FORGE_WINDOWS_REPO FORGE_IOS_REPO FORGE_MAC_REPO FORGE_FIRE_REPO
 What is new in 644 is read from notes_644.txt beside this script (plain words, one paragraph), followed by the versions of
 the apps the full page carries. (Refresh in the Mac app's menu, and the question when a page stops answering on the Fire
-tablet, the iPhone and the iPad, are written in those repositories' own sources, since pass 643.)"""
+tablet, the iPhone and the iPad, are written in those repositories' own sources, since pass 643.) The Mac project gets the
+quick page and its parts (forge_quick_split.py) and its spec takes the parts folder; every other copy is the full page."""
 import json, os, re, shutil, sys, textwrap
 
 page, win, ios, mac, fire = sys.argv[1:6]
@@ -48,6 +49,15 @@ for rel in ("www/the_forge.html", "iphone-ipad/TheForge/www/the_forge.html"):
 build_info(os.path.join(ios, "iphone-ipad", "BUILD_INFO.txt"))
 readme(os.path.join(ios, "iphone-ipad", "README.txt"))
 shutil.copyfile(page, os.path.join(mac, "Mac project", "the_forge.html"))
+# 644: the Mac app opens the quick page, the apps the Forge carries in files beside it (forge_quick_split.py, checked there
+# byte for byte), and its build takes that folder into the app with the page
+import subprocess
+subprocess.check_call([sys.executable, os.path.join(HERE, "forge_quick_split.py"), page, os.path.join(mac, "Mac project")])
+_spec = os.path.join(mac, "Mac project", "the_forge.spec")
+if "the_forge_parts" not in open(_spec, encoding="utf-8").read():
+    edit(_spec, [("    datas=extra_datas + [('the_forge.html', '.'),",
+                  "    # 644: the apps the Forge carries, in files beside the page (the Mac app opens the quick page)\n"
+                  "    datas=extra_datas + ([('the_forge_parts', 'the_forge_parts')] if os.path.isdir('the_forge_parts') else []) + [('the_forge.html', '.'),")])
 build_info(os.path.join(mac, "Mac project", "BUILD_INFO.txt"))
 readme(os.path.join(mac, "Mac project", "README.txt"))
 for rel in ("the_forge.html", "app/src/main/assets/the_forge.html"):
