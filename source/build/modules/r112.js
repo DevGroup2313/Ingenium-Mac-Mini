@@ -922,7 +922,7 @@ function sheetEdit(r,texts,path,report){var sh=sheet("Edit "+r.name,null);sh.box
   var ta=h("textarea","f-edit-ta");ta.id="fbEdText";ta.spellcheck=false;ta.setAttribute("aria-label","The file's text");
   var info=h("p","f-hint"),dirty=false,orig="",big=false;
   var buildBtn=btn("quiet sm","Open it in Build",function(){if(dirty){toast("Save your change first, or close without it.");return;}sh.close();openInBuild(r,path);});
-  function load(p){path=p;ta.disabled=true;info.textContent="Reading "+p+"…";IngRepo.readText(r.id,p).then(function(t){orig=t==null?"":t;big=orig.length>6*1048576;
+  function load(p){path=p;ta.disabled=true;info.textContent="Reading "+p+"…";IngRepo.readText(r.id,p).then(function(t){orig=t==null?"":t;big=orig.length>(window.ingEditMaxMB||6)*1048576;
       ta.value=big?"":orig;ta.disabled=big;dirty=false;
       info.textContent=t==null?"A new file: it is made when you save it.":big?p+" is "+kb(orig.length)+": open it in Build, which shows a page this size part by part.":orig.split("\n").length.toLocaleString("en-GB")+" lines. Saved here, it waits under Changes until you keep a version.";
       buildBtn.hidden=t==null||!/\.html?$/i.test(p);},function(e){ta.disabled=false;fail(e);});}
@@ -972,7 +972,7 @@ function isText(path,u8){if(/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz
 function openInCode(r,path){if(typeof ccMakeProject!=="function"||typeof ccNewSession!=="function"){toast("Code is not in this build.");return;}
   busy("Opening "+r.name+" in Code…");var pr=projFor(r);
   IngRepo.files(r.id).then(function(list){var td=new TextDecoder(),chain=Promise.resolve(),files=[];
-    list.forEach(function(f){chain=chain.then(function(){return IngRepo.read(r.id,f.path).then(function(b){if(b&&isText(f.path,b)&&b.length<40*1048576)files.push({name:f.path,text:td.decode(b)});});});});
+    list.forEach(function(f){chain=chain.then(function(){return IngRepo.read(r.id,f.path).then(function(b){if(b&&isText(f.path,b)&&b.length<(window.ingFabMB?window.ingFabMB.text:40)*1048576)files.push({name:f.path,text:td.decode(b)});});});});
     return chain.then(function(){return files;});}).then(function(files){
     if(!pr){var main=path||(files.filter(function(f){return /\.html?$/i.test(f.name)&&f.name.indexOf("/")<0;})[0]||files[0]||{}).name||"";return ccMakeProject(r.name,files,main).then(function(p){FBS().links[r.id]=p.id;saveSoon();return p;});}
     return ccLoadAll(pr).then(function(){var have={};(pr.files||[]).forEach(function(f){have[f.name]=f;});var q=Promise.resolve();

@@ -80,9 +80,9 @@ def old_bundle(page):
 
 # 6.2: the desktop apps' own side (ingenium_app.py) changes together with the page (desktop/README.md): each patch once, in
 # this order, where it has not been applied yet (the mark is a function it adds). Refresh is the Mac's alone.
-DESKTOP = [("lite", "_window_page", ("mini", "intel", "win")), ("refresh", "_restart_page_process", ("mini", "intel")),
-           ("ctx", "_engine_kvq", ("mini", "intel", "win")), ("quick", "_quick_page", ("mini", "intel", "win")),
-           ("guard", "_ing_host_ok", ("mini", "intel", "win"))]
+DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refresh_62", "_restart_page_process", ("mini", "intel")),
+           ("app_ctx_62", "_engine_kvq", ("mini", "intel", "win")), ("app_quick_62", "_quick_page", ("mini", "intel", "win")),
+           ("app_guard_62", "_ing_host_ok", ("mini", "intel", "win")), ("app_ctx_63", "_ING_CTX_MAX", ("mini", "intel", "win"))]
 
 
 def desktop():
@@ -91,7 +91,7 @@ def desktop():
             p = os.path.join(R[k], "ingenium_app.py")
             if mark in open(p, encoding="utf-8").read():
                 continue
-            subprocess.run([sys.executable, os.path.join(H, "desktop", "app_%s_62.py" % name), p], check=True)
+            subprocess.run([sys.executable, os.path.join(H, "desktop", name + ".py"), p], check=True)
 
 
 def build(out, edition="master"):

@@ -203,7 +203,7 @@ function readFiles(files,progress){var found=new Found(),list=[].slice.call(file
           var conv1=es.filter(function(e){return /(^|\/)conversations?\.json$/i.test(e.name)||/(^|\/)prod-grok-backend\.json$/i.test(e.name);});
           var gem=es.filter(function(e){return /Gemini Apps\/MyActivity\.(json|html)$/i.test(e.name)||/Bard\/MyActivity\.(json|html)$/i.test(e.name);});
           var proj=es.filter(function(e){return /(^|\/)projects\.json$/i.test(e.name);});
-          var other=!conv1.length&&!gem.length?es.filter(function(e){return /\.(json|jsonl|md|markdown|txt|csv|html?)$/i.test(e.name)&&e.size<200*1048576&&!/(^|\/)(users?|message_feedback|shared_conversations|model_comparisons)\.json$/i.test(e.name);}):[];
+          var other=!conv1.length&&!gem.length?es.filter(function(e){return /\.(json|jsonl|md|markdown|txt|csv|html?)$/i.test(e.name)&&e.size<480*1048576&&!/(^|\/)(users?|message_feedback|shared_conversations|model_comparisons)\.json$/i.test(e.name);}):[];
           found.zip=z;found.zipEntries=es;
           var seq=Promise.resolve();
           conv1.forEach(function(e){seq=seq.then(function(){return z.stream(e).then(function(st){return readJsonInto(found,st,e.name,progress);});});});

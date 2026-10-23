@@ -557,7 +557,7 @@ function open(file,o){o=o||{};var say=o.onProgress||function(){};
   if(!file.size)return Promise.reject(foreign("This file is empty, so it is not a backup."));
   return slice(file,0,Math.min(4,file.size)).then(function(h){
     if(h.length>=2&&h[0]===0x50&&h[1]===0x4b)return openZip(file,say);
-    if(file.size>256*1024*1024)throw foreign();
+    if(file.size>480*1024*1024)throw foreign();
     return readBlob(file).then(function(u){var d;try{d=JSON.parse(TD.decode(u));}catch(e){throw foreign();}return fromJson(d);});});}
 function fromJson(d){if(!d||typeof d!=="object"||Array.isArray(d))throw foreign();
   if(d.kind==="ingenium-hub")throw foreign("This is a copy of Fabrica's issues and pages, not a whole backup. Bring it back in Fabrica: an app's Settings, Bring a copy back.");

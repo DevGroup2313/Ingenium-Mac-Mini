@@ -278,13 +278,13 @@ function create(host){
   function cur(){var ts=tasks(),a=S().active;if(a==="__new")return null;return ts.filter(function(t){return t.id===a;})[0]||ts[0]||null;}
   function nextIdx(t){if(!t)return -1;for(var i=0;i<t.steps.length;i++)if(!t.steps[i].done&&!t.steps[i].skip)return i;for(var j=0;j<t.steps.length;j++)if(!t.steps[j].done)return j;return -1;}
   function view(){return S().view==="all"?"all":"one";}
-  function newTask(title,steps,src){var t={id:uid(),title:String(title||"").trim().slice(0,200)||T("A task","Une tâche"),steps:(steps||[]).map(function(x){return {t:String(x).slice(0,240),done:false};}),at:Date.now()};
-    if(src)t.src=src;tasks().unshift(t);if(tasks().length>40)tasks().length=40;S().active=t.id;save();return t;}
+  function newTask(title,steps,src){var t={id:uid(),title:String(title||"").trim().slice(0,2000)||T("A task","Une tâche"),steps:(steps||[]).map(function(x){return {t:String(x).slice(0,2400),done:false};}),at:Date.now()};
+    if(src)t.src=src;tasks().unshift(t);if(tasks().length>400)tasks().length=400;S().active=t.id;save();return t;}
   function breakDown(title){if(H.breakDown){try{return Promise.resolve(H.breakDown(title));}catch(e){}}return Promise.resolve(stepTemplates(title));}
   function breakStep(t,i){var st=t.steps[i];if(!st)return;var subs=null;
     try{if(H.breakStep)subs=H.breakStep(st.t,t.title);}catch(e){}
     Promise.resolve(subs).then(function(list){if(!list||list.length<2)list=[T("Get ready for: ","Se préparer pour : ")+st.t,T("Do the first two minutes of it","En faire les deux premières minutes"),T("Look at what is left, and choose the next bit","Regarder ce qui reste, et choisir la suite")];
-      t.steps.splice.apply(t.steps,[i,1].concat(list.map(function(x){return {t:String(x).slice(0,240),done:false,sub:true};})));save();refresh();});}
+      t.steps.splice.apply(t.steps,[i,1].concat(list.map(function(x){return {t:String(x).slice(0,2400),done:false,sub:true};})));save();refresh();});}
   /* the next item of the day becomes a task, keeping any steps the app already held for it */
   function fromPlan(n){var key=n.key||(today()+":"+n.block.id+":"+n.task.id),ts=tasks();
     for(var i=0;i<ts.length;i++)if(ts[i].src===key){S().active=ts[i].id;save();return ts[i];}

@@ -117,7 +117,7 @@ function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;
   function bytes(p){if(cache[p])return cache[p];cache[p]=IngRepo.read(id,p,snap.commit);return cache[p];}
   function inlineCss(base,css,depth){var jobs=[],urls=cssUrls(css);urls.forEach(function(u){var p=localPath(base,u);if(!p||!snap.map[p])return;
       jobs.push(bytes(p).then(function(b){if(!b)return;if(/\.css$/i.test(p)&&depth<4)return inlineCss(p,dec(b),depth+1).then(function(t){css=css.split(u).join("data:text/css;base64,"+b64(te.encode(t)));});
-        if(b.length>24*1048576){big++;return;}n++;css=css.split(u).join(dataUri(p,b));}));});
+        if(b.length>(window.ingFabMB?window.ingFabMB.inline:24)*1048576){big++;return;}n++;css=css.split(u).join(dataUri(p,b));}));});
     return Promise.all(jobs).then(function(){return css;});}
   var jobs=[],parts=[],re=/<script\b([^>]*?)\bsrc=(["'])([^"']+)\2([^>]*)>\s*<\/script>|<link\b([^>]*?)\bhref=(["'])([^"']+)\6([^>]*)>|<(img|source|video|audio|input)\b([^>]*?)\b(src|poster)=(["'])([^"']+)\12([^>]*)>|<style\b([^>]*)>([\s\S]*?)<\/style>/gi,m,last=0;
   while((m=re.exec(html))){parts.push(html.slice(last,m.index));var idx=parts.length;parts.push(m[0]);last=re.lastIndex;
@@ -128,7 +128,7 @@ function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;
         if(/stylesheet/i.test(rel))jobs.push(bytes(p2).then(function(b){if(!b)return;return inlineCss(p2,dec(b),0).then(function(css){n++;parts[idx]="<style>\n"+css+"\n</style>";});}));
         else if(/icon|apple-touch-icon/i.test(rel))jobs.push(bytes(p2).then(function(b){if(!b)return;n++;parts[idx]=m[0].replace(m[7],dataUri(p2,b));}));}
       else if(m[13]!==undefined){var p3=localPath(page,m[13]);if(!p3)return;if(!snap.map[p3]){missing.push(p3);return;}
-        jobs.push(bytes(p3).then(function(b){if(!b)return;if(b.length>24*1048576){big++;return;}n++;parts[idx]=m[0].replace(m[13],dataUri(p3,b));}));}
+        jobs.push(bytes(p3).then(function(b){if(!b)return;if(b.length>(window.ingFabMB?window.ingFabMB.inline:24)*1048576){big++;return;}n++;parts[idx]=m[0].replace(m[13],dataUri(p3,b));}));}
       else if(m[16]!==undefined){jobs.push(inlineCss(page,m[16],0).then(function(css){parts[idx]="<style"+m[15]+">"+css+"</style>";}));}
     })(m,idx);}
   parts.push(html.slice(last));

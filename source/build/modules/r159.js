@@ -33,9 +33,9 @@ function activeModel(){try{return state.models.filter(function(x){return x.id===
 function where(m){if(!m)return "page";try{if(typeof INB!=="undefined"&&INB&&m.nativeId)return "native";if(DeskAdapter.accepts(m)||m.shellStored)return "desk";}catch(e){}return "page";}
 W.ingCtxMax=function(m){var w=where(m),train=(m&&+m.ctxLen>0)?+m.ctxLen:0;
   if(w==="native")return (typeof nativeInfo!=="undefined"&&nativeInfo&&nativeInfo.maxCtx)||8192;
-  if(w==="desk")return Math.max(32768,Math.min(262144,train||262144));
+  if(w==="desk")return Math.max(32768,Math.min(1048576,train||262144));   /* 6.3: a model trained for more may be given up to 1,048,576 */
   return 32768;};
-W.ingReplyMax=function(m){var w=where(m);try{if(chatSource()==="cloud"&&state.cloud&&state.cloud.on)return 65536;}catch(e){}return w==="desk"?65536:w==="native"?8192:16384;};
+W.ingReplyMax=function(m){var w=where(m);try{if(chatSource()==="cloud"&&state.cloud&&state.cloud.on)return 131072;}catch(e){}return w==="desk"?131072:w==="native"?16384:32768;};
 /* past 32,768 the computer apps' engine keeps its memory in eight bits (desktop/app_ctx_62.py): half the room */
 if(typeof W.estimateNeedGB==="function"){var oNeed=W.estimateNeedGB;
   W.estimateNeedGB=estimateNeedGB=function(m){var g=oNeed.apply(this,arguments);try{if(m&&+m.ctx>32768&&where(m)==="desk"){var ps=m.paramB?Math.max(0.5,m.paramB/7):1;g-=((+m.ctx)/1024)*0.12*ps*0.5;}}catch(e){}return g;};}

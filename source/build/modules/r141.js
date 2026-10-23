@@ -698,7 +698,7 @@ function blame(r,ref,path){var LIM=400;
     log.forEach(function(c){c.parents.forEach(function(p){if(by[p])kids[p]=(kids[p]||0)+1;});});
     return blobAt(by[top].tree,path).then(function(b0){if(!b0)throw new Error("“"+path+"” is not in this version");return textOf(b0).then(function(t0){
       if(t0==null)throw new Error("a binary file has no lines to look back through");
-      if(t0.length>3*1048576)throw new Error("this file is "+kb(t0.length)+": too large to look back through line by line here. Its History shows every version that changed it");
+      if(t0.length>(window.ingFabMB?window.ingFabMB.blame:3)*1048576)throw new Error("this file is "+kb(t0.length)+": too large to look back through line by line here. Its History shows every version that changed it");
       var lines=split(t0),whoL=new Array(lines.length),Q={},ready=[top],left=lines.length,looked=0,older=0;Q[top]={blob:b0,map:lines.map(function(_,i){return [i,i];})};
       function give(p,pb,pairs){var q=Q[p]||(Q[p]={blob:pb,map:[]}),seen={};q.map.forEach(function(x){seen[x[1]]=1;});pairs.forEach(function(x){if(!seen[x[1]]){q.map.push(x);seen[x[1]]=1;}});}
       function childDone(p){if(!by[p])return;kids[p]--;if(kids[p]<=0)ready.push(p);}
@@ -747,8 +747,8 @@ function codeHist(r,v,ref,w,f){var key=gk(r,"fhist|"+ref+"|"+v.file),hh=want(key
 function makeRe(q,cs){var m=/^\/(.+)\/([a-z]*)$/.exec(q),src=m?m[1]:q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),fl=(cs?"":"i");
   try{return {one:new RegExp(src,fl),all:new RegExp(src,fl+"g")};}catch(e){throw new Error("that pattern cannot be read ("+e.message.replace(/^Invalid regular expression: /,"")+")");}}
 function search(r,ref,q,cs){var re;try{re=makeRe(q,cs);}catch(e){return Promise.reject(e);}
-  return IngRepo.files(r.id,ref).then(function(list){var out=[],total=0,searched=0,skipped=0,CAP=2000;
-    return seq(list,function(f){if(total>=CAP)return;if(BIN.test(f.path)||f.size>8*1048576){skipped++;return;}return textOf(f.oid).then(function(t){if(t==null){skipped++;return;}searched++;
+  return IngRepo.files(r.id,ref).then(function(list){var out=[],total=0,searched=0,skipped=0,CAP=(window.ingFabMB?window.ingFabMB.files:2000);
+    return seq(list,function(f){if(total>=CAP)return;if(BIN.test(f.path)||f.size>(window.ingFabMB?window.ingFabMB.search:8)*1048576){skipped++;return;}return textOf(f.oid).then(function(t){if(t==null){skipped++;return;}searched++;
       var ls=t.split("\n"),hits=[];for(var i=0;i<ls.length&&total<CAP;i++){if(re.one.test(ls[i])){hits.push(i+1);total++;}}
       if(hits.length)out.push({path:f.path,hits:hits,lines:hits.slice(0,12).map(function(n){return ls[n-1];})});});}).then(function(){return {files:out,total:total,searched:searched,skipped:skipped,capped:total>=CAP,re:re};});});}
 function marked(line,re){var s=String(line),first=-1,m;re.all.lastIndex=0;var spans=[];while((m=re.all.exec(s))){if(!m[0].length){re.all.lastIndex++;continue;}spans.push([m.index,m.index+m[0].length]);if(first<0)first=m.index;if(spans.length>40)break;}
@@ -981,9 +981,9 @@ function mergePR(r,rec,p,info,k){k.disabled=true;var key=r.id+"|"+p.n;INFLIGHT[k
 
 /* ======================= COMPARE: any two versions, ideas or releases (the version comparison tool) ======================= */
 function cmpData(r,a,b){return Promise.all([a==="empty"?Promise.resolve("empty"):IngRepo.resolve(r.id,a),IngRepo.resolve(r.id,b)]).then(function(x){if(!x[1])throw new Error("nothing is kept at "+refLabel(b)+" yet");if(!x[0])throw new Error("nothing is kept at "+refLabel(a)+" yet");
-  return Promise.all([between(r,x[0],x[1]),x[0]===x[1]?Promise.resolve([]):IngRepo.diff(r.id,{from:x[0],to:x[1],context:3,limit:8*1048576})]).then(function(y){return {ao:x[0],bo:x[1],bt:y[0],diff:y[1]};});});}
+  return Promise.all([between(r,x[0],x[1]),x[0]===x[1]?Promise.resolve([]):IngRepo.diff(r.id,{from:x[0],to:x[1],context:3,limit:(window.ingFabMB?2*window.ingFabMB.compare:8)*1048576})]).then(function(y){return {ao:x[0],bo:x[1],bt:y[0],diff:y[1]};});});}
 function kindWord(k){return k==="removed"?"taken away":k==="mode"?"mode":k;}
-function hunksInto(pre,c){if(c.binary||!c.hunks.length){pre.appendChild(h("div","f-dl hunk",c.binary?"A binary file: kept whole, with no lines to show ("+kb(c.oldSize)+" → "+kb(c.newSize)+").":c.kind==="moved"?"Moved, with no line changed.":c.kind==="mode"?"Only its mode changed.":(c.oldSize+c.newSize)>8*1048576?"Too large to show line by line here ("+kb(c.newSize)+").":"No lines differ."));return;}
+function hunksInto(pre,c){if(c.binary||!c.hunks.length){pre.appendChild(h("div","f-dl hunk",c.binary?"A binary file: kept whole, with no lines to show ("+kb(c.oldSize)+" → "+kb(c.newSize)+").":c.kind==="moved"?"Moved, with no line changed.":c.kind==="mode"?"Only its mode changed.":(c.oldSize+c.newSize)>(window.ingFabMB?2*window.ingFabMB.compare:8)*1048576?"Too large to show line by line here ("+kb(c.newSize)+").":"No lines differ."));return;}
   c.hunks.forEach(function(hk){pre.appendChild(h("div","f-dl hunk","lines "+(hk.b0+1).toLocaleString("en-GB")+" to "+(hk.b0+hk.bN).toLocaleString("en-GB")+(hk.a0!==hk.b0?" (were "+(hk.a0+1).toLocaleString("en-GB")+" to "+(hk.a0+hk.aN).toLocaleString("en-GB")+")":"")));
     var la=hk.a0,lb=hk.b0;hk.lines.forEach(function(l){var d=document.createElement("div");d.className="f-dl"+(l[0]==="+"?" add":l[0]==="-"?" del":"");var num=l[0]==="-"?(++la):(++lb);if(l[0]===" ")la++;
       var ii=document.createElement("i");ii.textContent=num.toLocaleString("en-GB");var s=document.createElement("s");s.textContent=l[0]===" "?"":l[0]==="+"?"+":"−";d.appendChild(ii);d.appendChild(s);d.appendChild(document.createTextNode(l[1]));pre.appendChild(d);});});}
@@ -1162,8 +1162,8 @@ function insData(r){return Promise.all([allVersions(r,3000),r.head?IngRepo.files
   var people={};all.forEach(function(c){var nm=(c.author&&c.author.name)||"Someone";var p=people[nm]||(people[nm]={name:nm,n:0,first:c.when,last:c.when});p.n++;p.first=Math.min(p.first,c.when);p.last=Math.max(p.last,c.when);});
   var langs={},size=0,otherN={};files.forEach(function(fl){size+=fl.size||0;if(BIN.test(fl.path))return;var L=langOf(fl.path),k=L<0?"Other":LANGS[L][0];langs[k]=(langs[k]||0)+(fl.size||0);if(L<0){var e=(fl.path.split("/").pop().split(".").slice(1).pop()||"").toLowerCase();if(e)otherN[e]=1;}});
   return {versions:all.length,full:!!all.full,weeks:weeks,people:Object.keys(people).map(function(k){return people[k];}).sort(function(a,b){return b.n-a.n;}),langs:langs,other:Object.keys(otherN).slice(0,6),files:files.length,size:size};});}
-function linesData(r){var ref=r.detached?r.head:"refs/heads/"+r.branch;return IngRepo.log(r.id,{ref:ref,max:20}).then(function(l){return seq(l,function(c){return IngRepo.diff(r.id,{from:c.parents[0]||"empty",to:c.oid,context:0,limit:6*1048576}).then(function(d){var a=0,dd=0,big=0;
-  d.forEach(function(x){a+=x.adds;dd+=x.dels;if(!x.binary&&!x.hunks.length&&x.kind!=="moved"&&x.kind!=="mode"&&(x.oldSize+x.newSize)>6*1048576)big++;});return {c:c,adds:a,dels:dd,files:d.length,big:big};});});});}
+function linesData(r){var ref=r.detached?r.head:"refs/heads/"+r.branch;return IngRepo.log(r.id,{ref:ref,max:20}).then(function(l){return seq(l,function(c){return IngRepo.diff(r.id,{from:c.parents[0]||"empty",to:c.oid,context:0,limit:(window.ingFabMB?2*window.ingFabMB.history:6)*1048576}).then(function(d){var a=0,dd=0,big=0;
+  d.forEach(function(x){a+=x.adds;dd+=x.dels;if(!x.binary&&!x.hunks.length&&x.kind!=="moved"&&x.kind!=="mode"&&(x.oldSize+x.newSize)>(window.ingFabMB?2*window.ingFabMB.history:6)*1048576)big++;});return {c:c,adds:a,dels:dd,files:d.length,big:big};});});});}
 function day(t){return new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});}
 function paintInsights(r,w,f){var rec=needRec(r,w,"the insights");if(!rec)return;var v=V(r).ins;sig(r,"insights");
   if(!r.head){w.appendChild(h("div","f-empty h-blk","<b>No insights yet</b>Keep a first version, and what the app holds and how it grows shows here."));return;}
