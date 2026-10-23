@@ -14,3 +14,5 @@ ingenium_crash.log
 ingenium_diag.txt
 # the ten sizes inside ingenium.icns (iconutil -c iconset makes them again)
 /icons/ingenium.iconset/
+# release.py page writes its working copy of the page here too
+/source/build/ingenium.html

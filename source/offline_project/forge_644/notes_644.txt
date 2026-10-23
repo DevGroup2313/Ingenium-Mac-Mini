@@ -1,0 +1,12 @@
+The Quiet Screen from Ingenium is now in the Forge too: the leaf in the side column, or I need quiet on the Calm card,
+opens it. Timed reminders appear in a blue card in the Forge's own colours, and the Editor's live preview holds still while
+the room scrolls. The Forge now does what Ingenium does, without AI: Files' Edit as text opens a file of any size part by
+part, its data kept aside, and Keep the change puts the whole file back together; chats brought in from other assistants
+(ChatGPT, Claude, Gemini, Grok, DeepSeek and others) are kept, searched and read here, and the code and documents in them
+are kept as the Forge's own files. On a Mac the Forge starts sooner: the apps it carries are read from files beside the page
+only when they are used, and the page repaints less while it is idle. Settings, About holds the Forge's licence (version 2)
+whole: the Forge is the owner's sole original work, and every right in it is the owner's; a permission the owner signs is
+checked here against the owner's key, and one that is changed, ended or withdrawn allows nothing. A page opened in a window
+of its own (the preview's Open, Fabrica's Run) now runs in a sealed frame, so it can never read what the Forge keeps; on a
+Mac and on Windows the app's own address answers the Forge's window only. The accessibility audit's findings are put right,
+and the side column fits a short screen.

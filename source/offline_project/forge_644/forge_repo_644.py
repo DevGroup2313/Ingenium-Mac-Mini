@@ -4,7 +4,8 @@ What is new in 644 is read from notes_644.txt beside this script (plain words, o
 the apps the full page carries. (Refresh in the Mac app's menu, and the question when a page stops answering on the Fire
 tablet, the iPhone and the iPad, are written in those repositories' own sources, since pass 643.) The Mac project gets the
 quick page and its parts (forge_quick_split.py) and its spec takes the parts folder; every other copy is the full page. The
-Windows and Mac apps' own address answers their own window only (forge_guard_644.py)."""
+Windows and Mac apps' own address answers their own window only (forge_guard_644.py). Each copy gets the Forge's
+third-party notices (THIRD_PARTY_NOTICES_forge.txt)."""
 import json, os, re, shutil, subprocess, sys, textwrap
 
 page, win, ios, mac, fire = sys.argv[1:6]
@@ -68,4 +69,8 @@ for rel in ("the_forge.html", "app/src/main/assets/the_forge.html"):
 build_info(os.path.join(fire, "BUILD_INFO.txt"))
 edit(os.path.join(fire, "README.txt"), [HEAD])
 edit(os.path.join(fire, "app", "build.gradle"), [("versionName '643'", "versionName '644'")])
+# 644: the open-source software, word lists and fonts the Forge's page carries (inside the apps it carries), and the Mac and
+# Windows apps' packaging, named with their licences beside each copy of the Forge
+for d in (win, os.path.join(ios, "iphone-ipad"), os.path.join(mac, "Mac project"), fire):
+    shutil.copyfile(os.path.join(HERE, "THIRD_PARTY_NOTICES_forge.txt"), os.path.join(d, "THIRD_PARTY_NOTICES.txt"))
 print("The Forge 644 written into", win, ios, mac, "and", fire)

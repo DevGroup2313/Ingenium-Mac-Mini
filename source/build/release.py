@@ -1,6 +1,8 @@
 """Ingenium release helper (kept outside the repositories).
   python3 release.py bump 4.0 "15 October 2026"   -> version strings in every repo's build files
-  python3 release.py page                          -> build the page, embed the kit store from the repos' HEADs, copy to all four repos
+  python3 release.py desktop                       -> the desktop patches (desktop/) not applied yet, in the Mac and Windows repos
+  python3 release.py page                          -> build the page, embed the kit store from the repos' HEADs, copy to all four repos,
+                                                      after applying the desktop patches (desktop/) not applied yet (commit them first, then run it again)
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
 H = os.path.dirname(os.path.abspath(__file__))
@@ -73,8 +75,25 @@ def old_bundle(page):
     m = re.search(r'<script id="%s" type="ingenium/kit-bundle-gz" data-bytes="\d+">([^<]*)</script>' % SLOT, page)
     return json.loads(gzip.decompress(base64.b64decode(m.group(1))))
 
+# 6.2: the desktop apps' own side (ingenium_app.py) changes together with the page (desktop/README.md): each patch once, in
+# this order, where it has not been applied yet (the mark is a function it adds). Refresh is the Mac's alone.
+DESKTOP = [("lite", "_window_page", ("mini", "intel", "win")), ("refresh", "_restart_page_process", ("mini", "intel")),
+           ("ctx", "_engine_kvq", ("mini", "intel", "win")), ("quick", "_quick_page", ("mini", "intel", "win")),
+           ("guard", "_ing_host_ok", ("mini", "intel", "win"))]
+
+
+def desktop():
+    for name, mark, repos in DESKTOP:
+        for k in repos:
+            p = os.path.join(R[k], "ingenium_app.py")
+            if mark in open(p, encoding="utf-8").read():
+                continue
+            subprocess.run([sys.executable, os.path.join(H, "desktop", "app_%s_62.py" % name), p], check=True)
+
+
 def page():
     vj = json.load(open(os.path.join(H, "version.json")))
+    desktop()
     subprocess.run([sys.executable, os.path.join(H, "build_page.py"), os.path.join(H, "ingenium.html")], check=True,
                    env=dict(os.environ, ING_RELEASE="1"))  # 6.1: modules held.json names stay out of a release
     pg = open(os.path.join(H, "ingenium.html"), encoding="utf-8").read()
@@ -85,6 +104,13 @@ def page():
     if os.path.exists(os.path.join(H, "kits", "kits.json")):  # 6.2: kept in the sources (kits/)
         kitdef = json.load(open(os.path.join(H, "kits", "kits.json"), encoding="utf-8"))
     sources = {"fire": R["fire"], "mac": R["mini"], "windows": R["win"]}
+    # 6.2: the kit store is read from each repository's last commit, so a change not committed yet (a version bumped, a
+    # desktop patch just applied) would be missing from the kits: commit it first
+    for source, repo in sources.items():
+        loose = [l[3:] for l in git(repo, "status", "--porcelain").decode().splitlines()
+                 if wanted(l[3:].strip('"'), kitdef["kits"], source, kitdef["shared_mobile"], kitdef["generated"])]
+        if loose:
+            sys.exit("%s: commit these first, or the kits would not carry them: %s" % (repo, ", ".join(loose)))
     files, commits, total = [], {}, 0
     for source, repo in sources.items():
         commits[source] = git(repo, "rev-parse", "--short=7", "HEAD").decode().strip()
@@ -151,5 +177,7 @@ def sync_sources():
 if __name__ == "__main__":
     if sys.argv[1] == "bump":
         bump(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "desktop":
+        desktop()
     elif sys.argv[1] == "page":
         page()
