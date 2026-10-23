@@ -73,4 +73,12 @@ edit(os.path.join(fire, "app", "build.gradle"), [("versionName '643'", "versionN
 # Windows apps' packaging, named with their licences beside each copy of the Forge
 for d in (win, os.path.join(ios, "iphone-ipad"), os.path.join(mac, "Mac project"), fire):
     shutil.copyfile(os.path.join(HERE, "THIRD_PARTY_NOTICES_forge.txt"), os.path.join(d, "THIRD_PARTY_NOTICES.txt"))
+# 644: each release names its build and lists its fingerprint (SHA-256) in BUILD_INFO.txt, as the licence says
+# (LICENCE.txt, version 2); the apps carry these very files (the Windows and iPhone builds check it byte for byte)
+sys.path.insert(0, os.path.normpath(os.path.join(HERE, "..", "..", "security")))
+import fingerprint
+fingerprint.write(os.path.join(win, "BUILD_INFO.txt"), ["the_forge.html"])
+fingerprint.write(os.path.join(mac, "Mac project", "BUILD_INFO.txt"), ["the_forge.html", "the_forge_parts"])
+fingerprint.write(os.path.join(fire, "BUILD_INFO.txt"), ["the_forge.html", "app/src/main/assets/the_forge.html"])
+fingerprint.write(os.path.join(ios, "iphone-ipad", "BUILD_INFO.txt"), ["TheForge/www/the_forge.html"])
 print("The Forge 644 written into", win, ios, mac, "and", fire)
