@@ -26,6 +26,8 @@ NEW = "\n".join(textwrap.wrap(
 def edit(path, pairs):
     s = open(path, encoding="utf-8").read()
     for a, b in pairs:
+        if s.count(a) == 0 and b in s:
+            continue  # written by an earlier run of this script (the page given again)
         if s.count(a) != 1:
             raise SystemExit("%s: %r not found once" % (path, a[:60]))
         s = s.replace(a, b)
