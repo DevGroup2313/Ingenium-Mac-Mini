@@ -238,8 +238,8 @@ edit('  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
      '  var lsOk=true;\n  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
      "R132 the small store's answer")
 edit('if(txt.length>16*1024*1024){if(!cur.said){cur.said=1;csPush("warn","Ingenium keeps up to 16 MB of what a page stores; this page has stored more, so its newest changes are kept only while it is open.");}return;}',
-     'if(txt.length>256*1024*1024){if(!cur.said){cur.said=1;csPush("warn","Ingenium keeps up to 256 MB of what a page stores; this page has stored more, so its newest changes are kept only while it is open.");}return;}',
-     "R132 a page's own store: 256 MB")
+     'if(txt.length>480*1024*1024){if(!cur.said){cur.said=1;csPush("warn","Ingenium keeps up to 480 MB of what a page stores; this page has stored more, so its newest changes are kept only while it is open.");}return;}',
+     "R132 a page's own store: 480 MB (6.3; it was 256 MB)")
 edit('/* the steps back that are kept: a large app keeps fewer (each step is a whole copy of the file), about 150 MB a file */',
      '/* the steps back that are kept: a large app keeps fewer (each step is a whole copy of the file), about 600 MB a file (R132; it was 150 MB) */',
      "R132 steps back: the note")
@@ -398,6 +398,21 @@ edit('if($("cpOpen"))$("cpOpen").onclick=function(){if(!window._chatPreviewHtml)
 edit('$("openPreview").onclick=function(){try{var u=URL.createObjectURL(new Blob([$("codeEditor").value||""],{type:"text/html"}));\n  window.open(u,"_blank");setTimeout(function(){URL.revokeObjectURL(u);},8000);}catch(e){}};',
      '$("openPreview").onclick=function(){ingOpenApart($("codeEditor").value||"","Build");};', "6.2 Build's own window keeps to itself")
 
+# ---- 6.3 (modules/r165.js, room for more): the stage's Edit in Build hands the page to Build's own opener, which takes a page
+#      of any size (part by part past 2.5 MB, R138); it refused anything over 3 MB, from before Build could. And the builder of a
+#      personal AI says its own limits as they are now ----
+edit('if(h.length>3*1024*1024){ingToast("This page is "+fmtBytes(h.length)+", too large for the Build editor to stay quick. Download it or open it in its own window instead.");return;}\n    go("build");$("codeEditor").value=h;try{runBuild();}catch(e){}});',
+     'if(window.IngBuild){IngBuild.open({name:(csCur.name||"page.html"),text:h});return;}\n    go("build");$("codeEditor").value=h;try{runBuild();}catch(e){}});', "6.3 the stage's Edit in Build takes a page of any size")
+edit('note("Twelve examples is the most it keeps; remove one first.");', 'note(AI_MAX_EXAMPLES+" examples is the most it keeps; remove one first.");', "6.3 a personal AI's examples: its limit said as it is", 2)
+edit('bad.push(f.name+" (six files at most)")', 'bad.push(f.name+" ("+AI_MAX_FILES+" files at most)")', "6.3 a personal AI's files: its limit said as it is")
+
+# ---- 6.3 (modules/r165.js): what is kept of words written is ten times as much, as the boxes now hold ----
+edit('it.text=v.slice(0,400);saveState();', 'it.text=v.slice(0,4000);saveState();', "6.3 a remembered item keeps 4,000 characters")
+edit('text:text.slice(0,400),at:Date.now(),how:how||"you"};L.unshift(it);\n  if(L.length>200)L.length=200;',
+     'text:text.slice(0,4000),at:Date.now(),how:how||"you"};L.unshift(it);\n  if(L.length>2000)L.length=2000;', "6.3 a remembered item added keeps 4,000 characters, and 2,000 are kept")
+edit('state.parked.unshift({id:uid(),t:t.slice(0,500),at:Date.now()});if(state.parked.length>200)state.parked.length=200;',
+     'state.parked.unshift({id:uid(),t:t.slice(0,5000),at:Date.now()});if(state.parked.length>2000)state.parked.length=2000;', "6.3 a parked thought keeps 5,000 characters, and 2,000 are kept")
+
 # ---- 6.2: the install kit names the Windows repository by its real name ----
 edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium-HPWindows"}', "6.2 the Windows repository's name")
 
@@ -540,6 +555,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "permit_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r164.js":  # R164: the shared code editor (codeedit/, the Forge carries the same)
+        t = open(os.path.join(HERE, "thoughts", "code_editor_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r163.js":  # R163: the shared opener of a window kept apart (the Forge carries the same)
         t = open(os.path.join(HERE, "thoughts", "open_apart.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t

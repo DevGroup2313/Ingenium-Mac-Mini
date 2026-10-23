@@ -997,7 +997,7 @@ function htmlDoc(kind,md,o){var th=themeOf(kind,o.apps),css=fontCss(th==="inkwel
    · be kept for everything Lector writes for this set: it then goes with every section, every examination and every letter;
    · or be answered in the conversation, for a line to copy elsewhere.
    Every rewrite keeps to the material as the first writing did: no fact, figure, name or date is invented. */
-var ASKS_MAX=40;
+var ASKS_MAX=400;   /* 6.3: the questions asked of a document kept (it was 40) */
 function askThread(){var S=L7();if(!S.asks||typeof S.asks!=="object")S.asks={};var k=curKey();if(!Array.isArray(S.asks[k]))S.asks[k]=[];return S.asks[k];}
 function askReqs(){var S=L7();if(!S.reqs||typeof S.reqs!=="object")S.reqs={};var k=curKey();if(!Array.isArray(S.reqs[k]))S.reqs[k]=[];return S.reqs[k];}
 /* the standing requests, for the instructions every piece is written with */

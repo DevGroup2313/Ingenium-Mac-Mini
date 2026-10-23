@@ -1,0 +1,44 @@
+<style id="forge-645-code-css">
+/* PASS 645 · the Code view of the preview: the whole file in a read-only editor, where the first 400,000 characters stood */
+#section-forge #codeViewWrap{flex:1;margin:12px;border-radius:12px;display:none;background:var(--panel);border:1px solid var(--edge);font:12.5px/1.6 var(--cd-mono);min-height:0;color:var(--ink)}
+body[data-view="code"] #section-forge #codeViewWrap{display:flex}
+body[data-view="code"] #section-forge.fcv-on #codeView{display:none !important}
+body[data-view="changes"] #section-forge #codeViewWrap,body[data-stagefold="1"] #section-forge #codeViewWrap{display:none !important}
+</style>
+<script>
+/* PASS 645 · A CODE EDITOR WHERE CODE IS WRITTEN. The shared editor (build/thoughts/code_editor_core.html, written in just
+   before the blocks; Ingenium carries the same) stands in the place of every box of code: Files' Edit as text and each of its
+   parts, the Studio's code, and Fabrica's file. Colours for each language, line numbers, folding, find and replace (Ctrl+F),
+   go to a line (Ctrl+Alt+G), more than one cursor, undo that remembers far back; the boxes stay what the rest of the Forge
+   reads and writes. With an editor this quick, a file of up to 40 MB opens whole in Files (8 MB on a tablet or a phone; it
+   was 2.5 MB), and a large file in Fabrica no longer holds the window (its plain box read all of it at once). The
+   preview's Code view shows the whole file in a read-only editor (it showed the first 400,000 characters). */
+(function(){
+  if(!window.IngEditor){ try{ console.warn('the shared code editor is missing'); }catch(e){} return; }
+  var SMALL=(navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Silk|Kindle/i.test(navigator.userAgent||'');
+  try{ if(window.forgeBigText) window.forgeBigText.at=SMALL?8000000:40000000; }catch(e){}
+  /* Fabrica's limits, as Ingenium's (its module r165): a file shown line by line in Changes and Compare up to 64 MB, in a
+     version's history 48 MB (both versions together were held to 8 and 6 MB), Blame 32 MB (3 MB), the app's search 64 MB a
+     file and 20,000 files (8 MB and 2,000), a picture or file written into one page 128 MB (24 MB); patches_capacity.json */
+  window.ingFabMB=SMALL?{diff:24,compare:16,history:12,blame:8,search:16,files:5000,inline:32,text:128}
+                       :{diff:96,compare:64,history:48,blame:32,search:64,files:20000,inline:128,text:480};
+  /* the preview's Code view: the whole file, in a read-only editor, with its lines numbered and Find */
+  window.forgeShowCode=function(cur){
+    var pre=document.getElementById('codeView'); if(!pre) return;
+    var ta=document.getElementById('codeViewText');
+    if(!ta){ ta=document.createElement('textarea'); ta.id='codeViewText'; ta.readOnly=true; ta.spellcheck=false; pre.parentNode.insertBefore(ta, pre.nextSibling); }
+    var name=(cur&&cur.name)||'', text=(cur&&(cur.text||cur.doc))||'';
+    if(!ta.__ingCode) IngEditor.attach(ta,{name:name,label:'The code of the file shown (to read)',styled:true,wrapId:'codeViewWrap'});
+    var sec=document.getElementById('section-forge'); if(sec) sec.classList.add('fcv-on');
+    if(ta.__ingCode){ ta.__ingCode.name=name; ta.value=text; } else pre.textContent=text;
+  };
+  /* the file's name is on the line under its title ("app.js · text"), written just after its text: the editor follows it */
+  function fileName(){ var s=document.getElementById('fileEditState'); return s?String(s.textContent||'').split(' \u00b7 ')[0].trim():''; }
+  IngEditor.auto('#fileEditText',{label:'The text of the file',nameFrom:fileName});
+  IngEditor.auto('#feText',{label:'This part of the file',nameFrom:fileName});
+  var st=document.getElementById('fileEditState');
+  if(st) new MutationObserver(function(){ var t=document.getElementById('fileEditText'), n=fileName(); if(t&&t.__ingCode&&n&&n!==t.__ingCode.name) t.__ingCode.setName(n); }).observe(st,{childList:true,characterData:true,subtree:true});
+  IngEditor.auto('#fsCode',{lang:'html',label:'The code of the app'});
+  IngEditor.auto('#fbEdText',{label:"The file's text",nameFrom:function(ta){ var box=ta.parentNode, s=box&&box.querySelector('select'); return s?s.value:''; }});
+})();
+</script>

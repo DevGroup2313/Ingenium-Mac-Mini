@@ -1,0 +1,74 @@
+[
+ {
+  "why": "Fabrica's engine shows a change line by line for a file of up to 96 MB (both versions together were held to 24 MB)",
+  "old": "(opt.limit||24*1048576)",
+  "new": "(opt.limit||(window.ingFabMB?2*window.ingFabMB.diff:24)*1048576)",
+  "count": 1
+ },
+ {
+  "why": "Blame looks back through a file of up to 32 MB (it was 3 MB)",
+  "old": "if(t0.length>3*1048576)",
+  "new": "if(t0.length>(window.ingFabMB?window.ingFabMB.blame:3)*1048576)",
+  "count": 1
+ },
+ {
+  "why": "the app's search reaches 20,000 files (2,000)",
+  "old": "CAP=2000;",
+  "new": "CAP=(window.ingFabMB?window.ingFabMB.files:2000);",
+  "count": 1
+ },
+ {
+  "why": "and reads a file of up to 64 MB (8 MB)",
+  "old": "f.size>8*1048576){skipped++;return;}",
+  "new": "f.size>(window.ingFabMB?window.ingFabMB.search:8)*1048576){skipped++;return;}",
+  "count": 1
+ },
+ {
+  "why": "Compare shows a file of up to 64 MB line by line (both versions together were held to 8 MB)",
+  "old": "limit:8*1048576})",
+  "new": "limit:(window.ingFabMB?2*window.ingFabMB.compare:8)*1048576})",
+  "count": 1
+ },
+ {
+  "why": "and says so the same way",
+  "old": "(c.oldSize+c.newSize)>8*1048576?\"Too large",
+  "new": "(c.oldSize+c.newSize)>(window.ingFabMB?2*window.ingFabMB.compare:8)*1048576?\"Too large",
+  "count": 1
+ },
+ {
+  "why": "a version's history counts a file of up to 48 MB line by line (both versions together were held to 6 MB)",
+  "old": "limit:6*1048576})",
+  "new": "limit:(window.ingFabMB?2*window.ingFabMB.history:6)*1048576})",
+  "count": 1
+ },
+ {
+  "why": "and says so the same way",
+  "old": "(x.oldSize+x.newSize)>6*1048576)big++",
+  "new": "(x.oldSize+x.newSize)>(window.ingFabMB?2*window.ingFabMB.history:6)*1048576)big++",
+  "count": 1
+ },
+ {
+  "why": "a picture or file written into one page may be up to 128 MB (24 MB)",
+  "old": "if(b.length>24*1048576){big++;return;}",
+  "new": "if(b.length>(window.ingFabMB?window.ingFabMB.inline:24)*1048576){big++;return;}",
+  "count": 2
+ },
+ {
+  "why": "the Code view shows the whole file, in a read-only editor (blocks/forge_code_editor.html), not the first 400,000 characters",
+  "old": "if(v==='code' && current) el('codeView').textContent=codeText(current);",
+  "new": "if(v==='code' && current){ if(window.forgeShowCode) forgeShowCode(current); else el('codeView').textContent=codeText(current); }",
+  "count": 1
+ },
+ {
+  "why": "and as the preview's file changes",
+  "old": "if(document.body.getAttribute('data-view')==='code') el('codeView').textContent=codeText(current);",
+  "new": "if(document.body.getAttribute('data-view')==='code'){ if(window.forgeShowCode) forgeShowCode(current); else el('codeView').textContent=codeText(current); }",
+  "count": 1
+ },
+ {
+  "why": "the Tour room keeps 400 steps of its log and 200 to go back to (40 and 30)",
+  "old": "var LOG_MAX = 40, SNAP_MAX = 30;",
+  "new": "var LOG_MAX = 400, SNAP_MAX = 200;",
+  "count": 1
+ }
+]
