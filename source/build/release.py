@@ -5,6 +5,7 @@
                                                       after applying the desktop patches (desktop/) not applied yet (commit them first, then run it again),
                                                       and write each repo's BUILD_INFO.txt with the page's fingerprint
   python3 release.py info                          -> BUILD_INFO.txt alone, from the pages in the repos
+  python3 release.py edition full|gift|demo OUT    -> that edition's release page (stamped, with the kit store), into OUT only
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
 H = os.path.dirname(os.path.abspath(__file__))
@@ -93,12 +94,14 @@ def desktop():
             subprocess.run([sys.executable, os.path.join(H, "desktop", "app_%s_62.py" % name), p], check=True)
 
 
-def page():
+def build(out, edition="master"):
+    """The release page of one edition (editions.py: master, full, gift, demo) into out: built, stamped with the version,
+    and given the kit store read from the repositories' last commits. Returns the page."""
     vj = json.load(open(os.path.join(H, "version.json")))
     desktop()
-    subprocess.run([sys.executable, os.path.join(H, "build_page.py"), os.path.join(H, "ingenium.html")], check=True,
-                   env=dict(os.environ, ING_RELEASE="1"))  # 6.1: modules held.json names stay out of a release
-    pg = open(os.path.join(H, "ingenium.html"), encoding="utf-8").read()
+    subprocess.run([sys.executable, os.path.join(H, "build_page.py"), out], check=True,
+                   env=dict(os.environ, ING_RELEASE="1", ING_EDITION=edition))  # 6.1: modules held.json names stay out of a release
+    pg = open(out, encoding="utf-8").read()
     pg, n = re.subn(r'var ING_VERSION="[0-9.]+",ING_PAGE_DATE="[^"]*";', 'var ING_VERSION="%s",ING_PAGE_DATE="%s";' % (vj["v"], vj["date"]), pg)
     assert n == 1, "ING_VERSION"
     ob = old_bundle(pg)
@@ -149,10 +152,16 @@ def page():
     block = '<script id="%s" type="ingenium/kit-bundle-gz" data-bytes="%d">%s</script>' % (SLOT, len(raw), b64)
     pg, n = re.subn(r'<script id="%s"[^>]*>[^<]*</script>' % SLOT, lambda m: block, pg, count=1)
     assert n == 1 and pg.rstrip().endswith("</html>")
+    open(out, "w", encoding="utf-8").write(pg)
+    print("%s edition: page %d bytes; kit store %d files (%.0f KB) from %s" % (edition, len(pg), len(files), total / 1024, commits))
+    return pg
+
+
+def page():
+    """The master edition into the four repositories (the owner's own apps are built from it)."""
+    pg = build(os.path.join(H, "ingenium.html"))
     for k, repo in R.items():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
-    open(os.path.join(H, "ingenium.html"), "w", encoding="utf-8").write(pg)
-    print("page %d bytes; kit store %d files (%.0f KB) from %s" % (len(pg), len(files), total / 1024, commits))
     info()
     sync_sources()
 
@@ -211,3 +220,5 @@ if __name__ == "__main__":
         page()
     elif sys.argv[1] == "info":
         info()
+    elif sys.argv[1] == "edition":
+        build(sys.argv[3], sys.argv[2])
