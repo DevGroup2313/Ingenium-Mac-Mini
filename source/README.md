@@ -121,4 +121,28 @@ Ingenium's shells), and its saves now go one after another there too: `rig/t_for
     node rig/t_61_seals.js <url> <out>       # 53: The Offline Project's crests
     node rig/a11y/axe_walk.js <url> <axe.min.js> <out>   # axe-core on every page, day and night, desk and phone: 0 rules broken
 
+6.2 (23 October 2026) builds four editions from the same sources. `ING_EDITION` picks one (`build/editions.py`):
+
+    ING_EDITION=master python3 build_page.py OUT.html   # everything (the default)
+    ING_EDITION=full   python3 build_page.py OUT.html   # without the owner's apps and the owner's personal information
+    ING_EDITION=gift   python3 build_page.py OUT.html   # a blank slate: no other app of the owner's, no Ingenium of its own, no Lector
+    ING_EDITION=demo   python3 build_page.py OUT.html   # for the Offline Project's public pages: no Lector, no Ingenium of its own
+
+- **full**: Carpe Diem, The Forge and Inkwell are not carried (its app library starts empty, for the apps the person adds,
+  which Lector reads); no Lector recipe (`modules/r126.js`: the
+  owner's rules, verified sources and kinds of document); the owner's name is in no commit, signing certificate or app id (the app ids
+  begin `app.ingenium.`, a key made on the device names the person's own name); Lector writes for "the author".
+- **gift** and **demo**: no Ingenium of its own to open in Code or Build or to package (the owner alone publishes Ingenium; a
+  new app of the person's own is still packaged), and no Lector: its key, page, modules (`r107`, `r108`, `r126`, `r148`), its
+  base parts (R86 and R99) and every word of it. R86 also holds the chat's document maker (Word, a web page, Markdown,
+  Tabula), so that much stays: `build/tools/keep_decls.js` keeps the declarations the rest of the page calls and those they
+  need. The code's own comments come out (`build/tools/strip_comments.js`; licence notices and the build's markers are
+  kept), and the build stops if the word Lector is still anywhere in the page outside its data. The gift edition also names
+  none of the owner's other apps, and Home shows Ingenium's seal rather than the Offline Project's crest.
+- Every edition keeps the copyright line and the licence. Each change an edition makes must find its text exactly as many
+  times as it says, or the build stops. `build/tools/acorn/` is acorn 8.18.0 and acorn-walk 8.3.5 (MIT, their licences
+  beside them), which the two tools read JavaScript with; the editions without Lector need Node.js to build.
+
+    node rig/t_62_editions.js <out> master=<url> full=<url> gift=<url> demo=<url>   # 61 checks: what each edition holds and shows
+
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

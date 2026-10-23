@@ -2,6 +2,9 @@
 (each must match exactly once), then the new modules before the last script."""
 import sys, os, re, glob, json
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import editions  # 6.2: ING_EDITION=master (the default), full, gift or demo (editions.py)
+ED = editions.name()
 _bp = os.path.join(HERE, "base312.html")
 if os.path.exists(_bp):
     base = open(_bp, encoding="utf-8").read()
@@ -386,6 +389,9 @@ edit('<div id="displayPanel" hidden>\n  <div class="sch-head"><span class="sch-t
      '    <div class="dp-note">If the app glitches or stops answering. Your work is saved first.</div></div>\n',
      "R151 the Refresh key, first in the Display panel")
 
+# ---- 6.2: the install kit names the Windows repository by its real name ----
+edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium-HPWindows"}', "6.2 the Windows repository's name")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
@@ -450,7 +456,7 @@ import gzip as _gz, hashlib as _hl
 _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
 # R124: ING_LEAN=1 builds the lean copy that The Forge carries: the same page without the apps Ingenium carries (a page
 # cannot hold a full copy of an app that holds a full copy of it back)
-if os.environ.get("ING_LEAN") == "1":
+if os.environ.get("ING_LEAN") == "1" or not editions.carries_apps(ED):  # 6.2: only the master edition carries the owner's apps
     _bi = {}
 for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Diem rides along too
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
@@ -488,6 +494,7 @@ if os.environ.get("ING_LEAN") != "1":
     _apps += '<script type="text/plain" id="ing-eyes-notice">' + _en + '</script>\n'
 out = out.replace(MARK, _apps + MARK, 1)
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
+mods = [m for m in mods if os.path.basename(m) not in editions.skip_modules(ED)]  # 6.2: what an edition leaves out
 # 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
 # those still being finished, or not yet through their independent review. Every other build keeps them in.
 if os.environ.get("ING_RELEASE") == "1" and os.path.exists(os.path.join(HERE, "held.json")):
@@ -539,7 +546,10 @@ if "/*R107_LAYERS*/null" in blob:
     blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
 if "/*R107_MASTER*/null" in blob:
     blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master
+blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' layers and the faces they carried for others
 out = out.replace(MARK, blob + MARK)
+out = editions.apply(out, ED)  # 6.2: the edition's own changes (editions.py)
+out = editions.strip(out, ED)  # 6.2: and, without Lector, the code's comments out and nothing of Lector left
 # ---- R151: where each of the page's scripts begins, in thousandths of the page, for the loading page's bar. The page is
 #      walked as the browser reads it: a script ends at the first "</script" after it opens, so text inside a script that
 #      only looks like a tag is not counted ----
@@ -561,4 +571,4 @@ if out.count(_bm) != 1:
 out = out.replace(_bm, "/*ING_BOOT_MAP*/" + json.dumps(_script_map(out), separators=(",", ":")))
 dest =sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
 open(dest, "w", encoding="utf-8").write(out)
-print("built", dest, len(out), "bytes;", len(EDITS), "edits;", len(mods), "modules")
+print("built", dest, len(out), "bytes;", len(EDITS), "edits;", len(mods), "modules; the", ED, "edition")

@@ -17,6 +17,8 @@ const AXE = [process.env.AXE, process.env.AXE_JS, path.join(__dirname, 'a11y', '
 const BIG_MB = process.env.BK_BIG_MB == null ? 240 : +process.env.BK_BIG_MB;
 fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0;
+// 6.2: an edition without Lector (gift, demo) or without the app library (all but the master) is checked for what it has
+let LX = true, LIB = true;
 const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 500) : '')); c ? pass++ : fail++; };
 const shot = (p, n, full) => p.screenshot({ path: path.join(OUT, n + '.png'), fullPage: !!full });
 let dlN = 0;
@@ -178,7 +180,9 @@ async function holdings(p, ids) {
   ok(kb.sel === 'bkTab-restore' && kb.foc === 'bkTab-restore' && kb.vis && kb2 === 'bkTab-move' && kb3 === 'bkTab-make', 'the arrow keys, Home and End move between the tabs and show their panes', { kb, kb2, kb3 });
 
   // ---------------- 2 · what one device holds ----------------
-  const ids = await pa.evaluate(async () => {
+  ({ LX, LIB } = await pa.evaluate(() => ({ LX: typeof lxState === 'function', LIB: typeof libOn !== 'function' || libOn() })));
+  if (!LX || !LIB) console.log('NOTE this edition has ' + (LX ? '' : 'no Lector') + (!LX && !LIB ? ' and ' : '') + (LIB ? '' : 'no app library') + ': those parts are not checked');
+  const ids = await pa.evaluate(async (F) => {
     const enc = s => new TextEncoder().encode(s), o = {};
     o.big1 = IngBig.newId(); await IngBig.put(o.big1, 'A long attachment, line by line.\n'.repeat(9000));
     o.big2 = IngBig.newId(); await IngBig.put(o.big2, ('A large-store entry, with letters from afar: αβγ δ, 漢字, emoji 🌿. ').repeat(52000));
@@ -200,11 +204,11 @@ async function holdings(p, ids) {
     await fbHub.importAll({ kind: 'ingenium-hub', version: 1, apps: [{ id: o.repo, next: 2, issues: [{ n: 1, title: 'Keep the backup whole', body: 'It must come back byte for byte.', state: 'open', by: 'Yannie', at: Date.now(),
       comments: [{ by: 'Yannie', at: Date.now(), body: 'A first comment, with ünïcödé.' }], events: [], labels: ['bug'], refs: [] }], pulls: [] }] });
     // a Lector document
-    o.lx = IngBig.newId(); await IngBig.put(o.lx, '# The brief\n\nA document from Lector, kept whole: ' + 'its words, '.repeat(400));
-    lxState(); state.lector.sets = Object.assign(state.lector.sets || {}, { rt_set: { docs: { brief: { ref: o.lx, title: 'Round Trip · The brief', made: Date.now() } } } });
+    if (F.LX) { o.lx = IngBig.newId(); await IngBig.put(o.lx, '# The brief\n\nA document from Lector, kept whole: ' + 'its words, '.repeat(400));
+    lxState(); state.lector.sets = Object.assign(state.lector.sets || {}, { rt_set: { docs: { brief: { ref: o.lx, title: 'Round Trip · The brief', made: Date.now() } } } }); }
     // an app in the library
     const page = '<!doctype html><title>Inkwell</title>' + '<p>Inkwell page body.</p>'.repeat(60000);
-    await libKeep('inkwell', { version: '7.42', sha256: await AppLib.sha(enc(page)), size: enc(page).length, title: 'Inkwell' }, enc(page), page);
+    if (F.LIB) await libKeep('inkwell', { version: '7.42', sha256: await AppLib.sha(enc(page)), size: enc(page).length, title: 'Inkwell' }, enc(page), page);
     // a signing key, made here
     await IngApk.keys.device();
     // the small store, as an app inside keeps it
@@ -213,17 +217,17 @@ async function holdings(p, ids) {
     await new Promise((res, rej) => { const rq = indexedDB.open('fabrica_made', 1); rq.onupgradeneeded = () => { const d = rq.result; try { d.createObjectStore('meta'); } catch (e) { } try { d.createObjectStore('bytes'); } catch (e) { } };
       rq.onsuccess = () => { const d = rq.result, t = d.transaction(['meta', 'bytes'], 'readwrite'), key = o.repo + '|x|apk|rt.apk'; t.objectStore('meta').put({ key, repo: o.repo, commit: 'x', kind: 'apk', name: 'rt.apk', size: 4, at: Date.now() }, key); t.objectStore('bytes').put(new Uint8Array([80, 75, 3, 4]), key); t.oncomplete = () => { d.close(); res(); }; t.onerror = () => rej(t.error); }; rq.onerror = () => rej(rq.error); });
     saveState(); return o;
-  });
+  }, { LX, LIB });
   await settle(pa);
   const before = await holdings(pa, ids);
   const fpA = await pa.evaluate(() => IngBackup.fingerprints());
-  ok(before.log && before.log.length === 3 && /Round Trip/.test(before.index) && before.big2 && before.lx && before.lib && before.key && before.hub, 'this profile holds the round trip: an app with 3 versions, an issue, long texts, a Lector document, a library app, a key', { log: before.log && before.log.length, lib: before.lib, key: !!before.key });
+  ok(before.log && before.log.length === 3 && /Round Trip/.test(before.index) && before.big2 && (!LX || before.lx) && (!LIB || before.lib) && before.key && before.hub, 'this profile holds the round trip: an app with 3 versions, an issue, long texts, a Lector document, a library app, a key', { log: before.log && before.log.length, lib: before.lib, key: !!before.key });
 
   // ---------------- 3 · backing up, from the card ----------------
   await settings(pa, 'make');
   await pa.waitForFunction(() => /Round Trip App/.test(document.getElementById('bkWhat').textContent), null, { timeout: 30000 });
   const what = await pa.evaluate(() => document.getElementById('bkWhat').innerText);
-  ok(/Round Trip App/.test(what) && /documents? from Lector/.test(what) && /apps? in your library/.test(what) && /Inkwell/.test(what) && /issues and pull requests/.test(what), 'What goes in counts this device: conversations, Fabrica\'s apps by name, issues, Lector, the library', what.replace(/\n/g, ' | '));
+  ok(/Round Trip App/.test(what) && (LX ? /documents? from Lector/.test(what) : !/Lector/.test(what)) && (!LIB || /apps? in your library/.test(what) && /Inkwell/.test(what)) && /issues and pull requests/.test(what), 'What goes in counts this device: conversations, Fabrica\'s apps by name, issues, Lector, the library', what.replace(/\n/g, ' | '));
   await shot(pa, 'b61-backup-day');
   // the keys, locked: a short password and two different ones are refused first
   await pa.click('#bkOptKy'); await pa.fill('#bkPw1', 'short'); await pa.fill('#bkPw2', 'short'); await pa.click('#bkMake');
@@ -243,8 +247,8 @@ async function holdings(p, ids) {
   const zk = pyZip(fileKeys, 'sk-rt-cloud-456', 'BSA-rt-secret-123', 'Round Trip App', 'Hearth 4B');
   ok(!zk.error && zk.test === null && zk.kind === 'ingenium-backup' && zk.format === 1 && zk.app === 'Ingenium' && zk.made && zk.platform && zk.platform.kind === 'browser', 'Python\'s zipfile reads it whole (every CRC right): a manifest naming the app, its version, the date and the device', { test: zk.test, kind: zk.kind, version: zk.version, platform: zk.platform, err: zk.error });
   ok(zk.bad && zk.bad.length === 0 && zk.extra.length === 0 && zk.missing.length === 0 && zk.nfiles > 5 && zk.manifest_last, 'the manifest gives the size and SHA-256 of every part, and every one is right', { n: zk.nfiles, bad: zk.bad, extra: zk.extra });
-  ok(zk.contents && zk.contents.every(c => c[0] && typeof c[1] === 'number' && typeof c[2] === 'number') && zk.census && zk.census.chats >= 3 && zk.census.lector === 1 && zk.census.issues === 1 && (zk.census.fabrica || []).length === 1, 'its contents are listed with counts and sizes, and a census of conversations, apps, issues and documents', zk.contents);
-  ok(['ingenium_big', 'ingenium_apps', 'ingenium_repos'].every(d => zk.stores.includes(d)) && zk.hub && zk.hub.issues === 1 && !zk.stores.includes('ingenium_files') && !zk.stores.includes('ingenium_desk') && !zk.stores.includes('ingenium_keys'), 'every store goes in (the large store, the library, Fabrica\'s apps), Fabrica\'s issues through fbHub.exportAll; the model store never', zk.stores);
+  ok(zk.contents && zk.contents.every(c => c[0] && typeof c[1] === 'number' && typeof c[2] === 'number') && zk.census && zk.census.chats >= 3 && (LX ? zk.census.lector === 1 : !zk.census.lector) && zk.census.issues === 1 && (zk.census.fabrica || []).length === 1, 'its contents are listed with counts and sizes, and a census of conversations, apps, issues and documents', zk.contents);
+  ok(['ingenium_big', 'ingenium_repos'].concat(LIB ? ['ingenium_apps'] : []).every(d => zk.stores.includes(d)) && zk.hub && zk.hub.issues === 1 && !zk.stores.includes('ingenium_files') && !zk.stores.includes('ingenium_desk') && !zk.stores.includes('ingenium_keys'), 'every store goes in (the large store, the library, Fabrica\'s apps), Fabrica\'s issues through fbHub.exportAll; the model store never', zk.stores);
   ok(!zk.stores.includes('fabrica_made') && zk.leftOut.includes("Fabrica's packages"), 'Fabrica\'s packages stay out by default', zk.leftOut);
   ok(['ingenium_files', 'ingenium_keys', 'fabrica_made', 'ingenium_hub'].every(d => zk.excluded.includes(d)), 'the manifest also names each store left out, with the reason (models and file links, the keys, the packages, the issues read through Fabrica)', zk.excluded);
   ok(zk.secrets && zk.secrets.kdf && zk.secrets.kdf.name === 'PBKDF2' && zk.secrets.kdf.iterations >= 600000 && zk.secrets.cipher.name === 'AES-GCM' && zk.secrets.keys === 1 && zk.secrets.connections === 2 && !zk.has['sk-rt-cloud-456'] && !zk.has['BSA-rt-secret-123'], 'chosen, the keys go locked (AES-GCM, PBKDF2 with 600,000 rounds): no connection key is readable anywhere in the file', { secrets: zk.secrets && { keys: zk.secrets.keys, connections: zk.secrets.connections, it: zk.secrets.kdf.iterations }, has: zk.has });
@@ -268,7 +272,7 @@ async function holdings(p, ids) {
       chips: [...s.querySelectorAll('.bk-chips li')].map(x => x.textContent), keys: !!document.getElementById('bkKeyPw') }; });
   const conv = sum.rows.find(r => /^Conversations/.test(r[0])) || [];
   ok(!r1.refused && /Every fingerprint matches/.test(sum.text) && /Made .* on a browser, with Ingenium/.test(sum.text), 'Restore checks every fingerprint first, and says when, where and with which Ingenium the backup was made', sum.text.split('\n').slice(0, 3).join(' | '));
-  ok(+conv[1] >= 3 && conv[3] === conv[1] && sum.rows.some(r => /Apps in Fabrica/.test(r[0]) && r[1] === '1') && sum.rows.some(r => /Issues/.test(r[0]) && r[1] === '1') && sum.rows.some(r => /Lector/.test(r[0]) && r[1] === '1'), 'it shows what the backup holds, what is here now, and what there will be after', sum.rows.slice(0, 9));
+  ok(+conv[1] >= 3 && conv[3] === conv[1] && sum.rows.some(r => /Apps in Fabrica/.test(r[0]) && r[1] === '1') && sum.rows.some(r => /Issues/.test(r[0]) && r[1] === '1') && (LX ? sum.rows.some(r => /Lector/.test(r[0]) && r[1] === '1') : !sum.rows.some(r => /Lector/.test(r[0]))), 'it shows what the backup holds, what is here now, and what there will be after', sum.rows.slice(0, 9));
   ok(sum.mode === 'replace' && /Replace and start again/.test(sum.go) && sum.chips.join() === 'Hearth 4B' && sum.keys && sum.focus === 'bkSum', 'on a fresh device Replace is chosen; the models to fetch again are named; the keys ask for their password; focus moves to the summary', { mode: sum.mode, chips: sum.chips, focus: sum.focus });
   await shot(pb, 'b61-restore-summary-day');
   await pb.fill('#bkKeyPw', 'a wrong password'); await pb.click('#bkGo');
@@ -291,14 +295,15 @@ async function holdings(p, ids) {
   ok(same('log') && same('bundle') && same('index') && same('appjs'), 'the Fabrica app is back with its whole history: the same three versions, the same git bundle byte for byte', { log: after.log, bundle: after.bundle === before.bundle });
   ok(same('hub') && /Keep the backup whole/.test(after.hub || ''), 'its issue and comment are back (fbHub.importAll, after the app)', (after.hub || after.hubErr || '').slice(0, 120));
   ok(same('appName') && same('motion') && same('cloudKey') && same('braveKey') && same('tabula'), 'the settings, the small store and the connection keys are back', { appName: after.appName, cloud: !!after.cloudKey, brave: !!after.braveKey });
-  ok(same('big1') && same('big2') && same('lx') && same('lector'), 'the large-store entries and Lector\'s document are back, byte for byte', { big2: after.big2, lx: after.lx });
-  ok(same('lib') && same('appLib'), 'the app in the library is back, byte for byte', after.lib);
+  ok(same('big1') && same('big2') && (!LX || same('lx') && same('lector')), 'the large-store entries and Lector\'s document are back, byte for byte', { big2: after.big2, lx: after.lx });
+  if (LIB) ok(same('lib') && same('appLib'), 'the app in the library is back, byte for byte', after.lib);
   ok(same('key'), 'the signing key is back, byte for byte, opened by its password', (after.key || '').slice(-20));
   ok(after.models.length === 0, 'the models list of the fresh device stays its own (models never move; their names wait to be fetched)', after.models);
   await settle(pb);
   const fpB2 = await pb.evaluate(() => IngBackup.fingerprints());
   const stores = ['ingenium_big/t', 'ingenium_apps/b', 'ingenium_repos/o', 'ingenium_repos/r', 'ingenium_keys/k'];
-  const diff = stores.filter(k => !fpA.stores[k] || !fpB2.stores[k] || fpA.stores[k].digest !== fpB2.stores[k].digest);
+  // 6.2: an edition without the app library has no library store on either device
+  const diff = stores.filter(k => !(k === 'ingenium_apps/b' && !LIB && !fpA.stores[k] && !fpB2.stores[k]) && (!fpA.stores[k] || !fpB2.stores[k] || fpA.stores[k].digest !== fpB2.stores[k].digest));
   ok(diff.length === 0 && fpA.hub && fpB2.hub && fpA.hub.digest === fpB2.hub.digest, 'store by store, every record has the same fingerprint as on the first device (the large store, the library, Fabrica\'s objects and refs, the keys, the issues)', { diff, a: stores.map(k => fpA.stores[k] && fpA.stores[k].count), b: stores.map(k => fpB2.stores[k] && fpB2.stores[k].count) });
   ok(/Restored from the backup of/.test(toast) && /model to fetch again/.test(toast), 'once started again, a word says it was restored and that a model waits to be fetched', toast);
   await settings(pb);
@@ -382,7 +387,7 @@ async function holdings(p, ids) {
     return { ok: r.ok, problems: r.problems, calls: __calls.filter(c => !/^big_put:big_/.test(c) || true).slice(0, 400), keys: Object.keys(__disk) };
   }, fs.readFileSync(fileKeys).toString('base64'));
   const putIds = toDisk.calls.filter(c => c.startsWith('big_put:')).map(c => c.slice(8));
-  ok(toDisk.ok && toDisk.calls[0] === 'desk_keep_now:before-restore' && toDisk.calls.includes('save_state') && putIds.includes(ids.big2) && putIds.includes(ids.lx) && toDisk.keys.includes('signing_device') && toDisk.keys.some(k => /^big_/.test(k) && k !== ids.big1 && k !== ids.big2 && k !== ids.lx), 'onto a computer app: the desk there is kept first (desk_keep_now), the desk saved to its disk, every long text, the library page, the key and Fabrica\'s apps written to its disk', { first: toDisk.calls[0], n: putIds.length, problems: toDisk.problems });
+  ok(toDisk.ok && toDisk.calls[0] === 'desk_keep_now:before-restore' && toDisk.calls.includes('save_state') && putIds.includes(ids.big2) && (!LX || putIds.includes(ids.lx)) && toDisk.keys.includes('signing_device') && toDisk.keys.some(k => /^big_/.test(k) && k !== ids.big1 && k !== ids.big2 && k !== ids.lx), 'onto a computer app: the desk there is kept first (desk_keep_now), the desk saved to its disk, every long text, the library page, the key and Fabrica\'s apps written to its disk', { first: toDisk.calls[0], n: putIds.length, problems: toDisk.problems });
 
   // ---------------- 8 · moving: the guide for every pair of devices ----------------
   const gd = await pa.evaluate(() => { const D = Object.keys(IngBackup.devices), out = { pairs: 0, bad: [], dash: [] };
