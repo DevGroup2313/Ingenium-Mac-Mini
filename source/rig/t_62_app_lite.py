@@ -99,7 +99,8 @@ try:
     ok(len(win) < len(full) * 0.35 and win.rstrip().endswith(b"</html>") and not gone,
        "the server gives the window page: %.1f of %.1f MB, the payloads left out, the page whole" % (len(win) / 1e6, len(full) / 1e6), gone)
     ok(win == win2 and again <= max(first, 0.5), "made once and kept while the page is unchanged (%.2f s, then %.2f s)" % (first, again))
-    ok(b'id="ing-app-tabula"' in win and b"R123" in win, "the apps a window of its own shows, and the desk's code, are still in it")
+    # (the desk's code by its own name: from 6.3 the page carries no notes, so "R123" is gone with them)
+    ok(b'id="ing-app-tabula"' in win and b"window.IngDesk=" in win and b'["p53"]' in win, "the apps a window of its own shows, and the desk's code, are still in it")
 finally:
     shutil.rmtree(d, ignore_errors=True)
 
