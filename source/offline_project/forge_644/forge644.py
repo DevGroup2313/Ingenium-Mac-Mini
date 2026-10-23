@@ -17,7 +17,9 @@ I just want to do it all without AI." So the pass also holds, without a model:
     build/thoughts/chat_import_core.html);
   - a quicker start: the apps it carries read from files beside the page in the Mac app (forge_quick_split.py,
     blocks/forge_quick.html, patches_quick.json), and fewer repaints while it is idle (patches_speed.json).
-Tested by tests/t_644_capacity.js, t_644_chats.js and t_644_quick.js.
+And its licence (version 2) whole in Settings, About, with the permissions the owner gives, each checked against the owner's
+public keys (the shared build/thoughts/permit_core.html, blocks/forge_permit.html, security/permits.py).
+Tested by tests/t_644_capacity.js, t_644_chats.js, t_644_quick.js and t_644_permits.js.
 
 What it does, each change found exactly once or the pass stops:
   1. the build stamp: 644, 9s76;
@@ -120,6 +122,14 @@ for name in (json.load(open(ip))["shared"] if os.path.exists(ip) else []):
     inc.append("<!-- PASS 644 · the shared " + name + " -->\n" + t)
 k = s.rfind("</body>")
 s = s[:k] + "\n" + "\n".join(inc + blocks("blocks")) + "\n" + s[k:]
+
+# 4b. THE LICENCE AND THE OWNER'S KEYS (blocks/forge_permit.html), written in as Ingenium's build writes its own
+#     (security/permits.py: only the public halves of the owner's keys, each checked)
+if '/*PERMIT_LICENCE*/""' in s:
+    sys.path.insert(0, os.path.normpath(os.path.join(HERE, "..", "..", "security")))
+    import permits
+    s, said = permits.fill(s, os.path.normpath(os.path.join(HERE, "..", "..", "licence", "LICENCE_forge.txt")))
+    print(said)
 
 
 def boot_map(t):

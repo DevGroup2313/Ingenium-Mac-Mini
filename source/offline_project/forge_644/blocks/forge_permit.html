@@ -1,0 +1,31 @@
+<script>
+/* The Forge 644 · ownership, licence and permissions (23 October 2026). The owner's words: "The app is my sole original work
+   and only I am able to do distribute, sell, edit, remove or basically do anything with it, no one else has that right and
+   should not ever have access unless I grant them limited persmission that I can discontinue at any time. I want that made
+   explicit for all of my apps."
+   The Forge's part of the shared PermitCore (build/thoughts/permit_core.html, which include.json brings in, the same file
+   Ingenium carries): a card in Settings, About, with the Forge's licence (version 2) whole, this build, and the permissions
+   kept on this device, each checked against the owner's public keys. forge644.py writes in the licence (licence/LICENCE_forge.txt)
+   and, through security/permits.py, the keys and the owner's latest list of withdrawn permissions. The owner's key itself is
+   made and kept in Ingenium's master edition, not here. */
+(function(){var W=window,D=document;if(!W.PermitCore)return;
+var LICENCE=/*PERMIT_LICENCE*/"",KEYS=/*PERMIT_KEYS*/[],WITHDRAWN=/*PERMIT_WITHDRAWN*/null,GIVEN=/*PERMIT_GIVEN*/null,OWNER=/*OWNER_NAME*/"";
+var B=W.CD_BUILD||{},LS="forge_permits";
+function saveFile(n,m,t){var u8=new TextEncoder().encode(t);
+  try{if(typeof W.cdSaveBytesQueued==="function"){var q=W.cdSaveBytesQueued(n,m,u8);if(q)return q;}}catch(e){}
+  try{if(typeof W.cdSaveBytesToHost==="function"&&W.pywebview&&W.pywebview.api){W.cdSaveBytesToHost(n,m,u8);return Promise.resolve(true);}}catch(e){}
+  return null;}
+var P=PermitCore.create({app:"forge",appName:"The Forge",ownerName:OWNER,version:B.pass||"",stamp:B.stamp||"",licence:LICENCE,keys:KEYS,
+  withdrawn:WITHDRAWN,given:GIVEN,owner:false,id:"forgePermitCard",
+  load:function(){try{return JSON.parse(localStorage.getItem(LS)||"null");}catch(e){return null;}},
+  save:function(s){try{localStorage.setItem(LS,JSON.stringify(s));}catch(e){}},saveFile:saveFile,
+  cls:{card:"panel card",h:"",btn:"solid",pri:"stone solid",note:"muted"}});
+W.forgePermit=P;
+function place(){var ab=D.querySelector('#room-settings [data-page="about"]');if(!ab)return;
+  var at=D.getElementById("aboutForgeBody"),c=D.getElementById("forgePermitCard");if(c&&c.parentNode===ab){P.card(ab);return;}
+  P.card(ab);c=D.getElementById("forgePermitCard");if(c&&at&&at.parentNode===ab&&c.previousElementSibling!==at)ab.insertBefore(c,at.nextSibling);}
+function later(){setTimeout(function(){try{place();}catch(e){}},0);}
+D.addEventListener("click",function(e){var t=e.target&&e.target.closest&&e.target.closest('[data-tab="about"],[data-room="settings"]');if(t)later();},true);
+if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",later);else later();
+})();
+</script>

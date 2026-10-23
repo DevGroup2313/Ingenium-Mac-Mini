@@ -3,8 +3,9 @@ usage: forge_repo_643.py THE_FORGE.html FORGE_WINDOWS_REPO FORGE_IOS_REPO FORGE_
 What is new in 644 is read from notes_644.txt beside this script (plain words, one paragraph), followed by the versions of
 the apps the full page carries. (Refresh in the Mac app's menu, and the question when a page stops answering on the Fire
 tablet, the iPhone and the iPad, are written in those repositories' own sources, since pass 643.) The Mac project gets the
-quick page and its parts (forge_quick_split.py) and its spec takes the parts folder; every other copy is the full page."""
-import json, os, re, shutil, sys, textwrap
+quick page and its parts (forge_quick_split.py) and its spec takes the parts folder; every other copy is the full page. The
+Windows and Mac apps' own address answers their own window only (forge_guard_644.py)."""
+import json, os, re, shutil, subprocess, sys, textwrap
 
 page, win, ios, mac, fire = sys.argv[1:6]
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -41,6 +42,9 @@ def readme(path):
     edit(path, [HEAD, ("New in 642, the build before.", "New in 642."), ("New in 643.", NEW)])
 
 
+# 644: the Forge's own address answers the Forge's own window only (forge_guard_644.py), in the Windows and Mac apps
+subprocess.check_call([sys.executable, os.path.join(HERE, "forge_guard_644.py"), os.path.join(win, "the_forge_app.py"),
+                       os.path.join(mac, "Mac project", "the_forge_app.py")])
 shutil.copyfile(page, os.path.join(win, "the_forge.html"))
 build_info(os.path.join(win, "BUILD_INFO.txt"))
 readme(os.path.join(win, "README.txt"))
@@ -51,7 +55,6 @@ readme(os.path.join(ios, "iphone-ipad", "README.txt"))
 shutil.copyfile(page, os.path.join(mac, "Mac project", "the_forge.html"))
 # 644: the Mac app opens the quick page, the apps the Forge carries in files beside it (forge_quick_split.py, checked there
 # byte for byte), and its build takes that folder into the app with the page
-import subprocess
 subprocess.check_call([sys.executable, os.path.join(HERE, "forge_quick_split.py"), page, os.path.join(mac, "Mac project")])
 _spec = os.path.join(mac, "Mac project", "the_forge.spec")
 if "the_forge_parts" not in open(_spec, encoding="utf-8").read():
