@@ -6,7 +6,7 @@ engine: its start is stood in for, so the arguments it would be given, and what 
 Checks: up to 32,768 tokens the engine starts as before (no eight-bit memory), always with --cache-reuse; past it, with
 -fa on -ctk q8_0 -ctv q8_0; an engine that stops while loading with the eight-bit memory is started again at once without
 it, at the same memory, with a note for the page; every later start that session goes without it; the other retries (on
-the processor) still follow; the memory asked for is held between 512 and 262,144.
+the processor) still follow; the memory asked for is held between 512 and 262,144 (1,048,576 from 6.3).
 (On a real llama.cpp b11321, rig notes: at 131,072 tokens the eight-bit memory took 237 MB against 357 MB, and -ctv q8_0
 without flash attention made the engine stop with "exiting due to model loading error", which is what the retry is for.)"""
 import importlib.util, sys, types
@@ -76,7 +76,9 @@ a = launched[-1].args
 ok(all(x in a for x in ["-fa", "on", "-ctk", "q8_0", "-ctv"]) and a[a.index("-c") + 1] == "131072",
    "131,072 tokens: the memory in eight bits, flash attention on", a)
 start(10 ** 7)
-ok(launched[-1].args[launched[-1].args.index("-c") + 1] == "262144", "a memory asked past 262,144 is held to it")
+# (6.3, desktop/app_ctx_63.py: up to 1,048,576 when the app carries it; 262,144 before)
+CAP = "1048576" if "_ING_CTX_MAX" in open(APP, encoding="utf-8").read() else "262144"
+ok(launched[-1].args[launched[-1].args.index("-c") + 1] == CAP, "a memory asked past the longest is held to it (" + CAP + ")")
 
 # the engine refuses the eight-bit memory while loading
 start(131072)
