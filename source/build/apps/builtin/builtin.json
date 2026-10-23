@@ -12,21 +12,21 @@
  "forge": {
   "key": "forge",
   "title": "The Forge",
-  "version": "643",
-  "build": "9s75",
-  "date": "2026-10-21",
-  "size": 13434219,
-  "sha256": "a85ee32aea55f7cffa6db6a39e5d28a36d46950e68a1a7c9bd3cf23eaf6a9b3f",
-  "name": "the_forge_643_lean.html"
+  "version": "645",
+  "build": "9s77",
+  "date": "2026-10-23",
+  "size": 13977262,
+  "sha256": "785e101beda44981916f89039eadbe301e0eb85885d693abfbd923e4b8a83e02",
+  "name": "the_forge_645_lean.html"
  },
  "inkwell": {
   "key": "inkwell",
   "title": "Inkwell",
-  "version": "7.49",
+  "version": "7.51",
   "build": "",
-  "date": "2026-10-19",
-  "size": 3956172,
-  "sha256": "8d75c2836ff63238c4f3b3b83d5f306c0a95edb1f55d56fc47443e3e2964f390",
+  "date": "2026-10-23",
+  "size": 4079147,
+  "sha256": "ab54ecd3c705ee1ad1ebe5cab19c4de506dcf0158ff0b39c8f56d4acbce3b1eb",
   "name": "Inkwell.html"
  }
 }
