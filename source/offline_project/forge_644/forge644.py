@@ -18,8 +18,10 @@ I just want to do it all without AI." So the pass also holds, without a model:
   - a quicker start: the apps it carries read from files beside the page in the Mac app (forge_quick_split.py,
     blocks/forge_quick.html, patches_quick.json), and fewer repaints while it is idle (patches_speed.json).
 And its licence (version 2) whole in Settings, About, with the permissions the owner gives, each checked against the owner's
-public keys (the shared build/thoughts/permit_core.html, blocks/forge_permit.html, security/permits.py).
-Tested by tests/t_644_capacity.js, t_644_chats.js, t_644_quick.js and t_644_permits.js.
+public keys (the shared build/thoughts/permit_core.html, blocks/forge_permit.html, security/permits.py). And a page the
+preview's Open or Fabrica's Run shows in a window of its own runs in a sandboxed frame there, in no origin of its own, so it
+cannot read what the Forge keeps (the shared build/thoughts/open_apart.html, patches_apart.json).
+Tested by tests/t_644_capacity.js, t_644_chats.js, t_644_quick.js, t_644_permits.js and t_644_apart.js.
 
 What it does, each change found exactly once or the pass stops:
   1. the build stamp: 644, 9s76;

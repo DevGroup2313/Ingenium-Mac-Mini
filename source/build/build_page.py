@@ -389,6 +389,15 @@ edit('<div id="displayPanel" hidden>\n  <div class="sch-head"><span class="sch-t
      '    <div class="dp-note">If the app glitches or stops answering. Your work is saved first.</div></div>\n',
      "R151 the Refresh key, first in the Display panel")
 
+# ---- 6.2 (security, modules/r163.js): a page opened in a window of its own runs in a sandboxed frame there, never as Ingenium.
+#      It was opened from a blob: address, which belongs to Ingenium's origin, so its code could read what Ingenium keeps ----
+edit('$("csOpen").onclick=function(){if(!csCur)return;try{var u=URL.createObjectURL(new Blob([csCur.html],{type:"text/html"}));window.open(u,"_blank");setTimeout(function(){URL.revokeObjectURL(u);},60000);}catch(e){}};',
+     '$("csOpen").onclick=function(){if(!csCur)return;ingOpenApart(csCur.html,csCur.name||csCur.docTitle||"App");};', "6.2 the stage's own window keeps to itself")
+edit('if($("cpOpen"))$("cpOpen").onclick=function(){if(!window._chatPreviewHtml)return;\n  try{var u=URL.createObjectURL(new Blob([window._chatPreviewHtml],{type:"text/html"}));\n  window.open(u,"_blank");setTimeout(function(){URL.revokeObjectURL(u);},8000);}catch(e){}};',
+     'if($("cpOpen"))$("cpOpen").onclick=function(){if(!window._chatPreviewHtml)return;ingOpenApart(window._chatPreviewHtml,"Preview");};', "6.2 the chat preview's own window keeps to itself")
+edit('$("openPreview").onclick=function(){try{var u=URL.createObjectURL(new Blob([$("codeEditor").value||""],{type:"text/html"}));\n  window.open(u,"_blank");setTimeout(function(){URL.revokeObjectURL(u);},8000);}catch(e){}};',
+     '$("openPreview").onclick=function(){ingOpenApart($("codeEditor").value||"","Build");};', "6.2 Build's own window keeps to itself")
+
 # ---- 6.2: the install kit names the Windows repository by its real name ----
 edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium-HPWindows"}', "6.2 the Windows repository's name")
 
@@ -531,6 +540,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "permit_core.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r154.js":  # R154: the shared quiet screen (the Forge carries the same), before Ingenium's own part of it
         t = open(os.path.join(HERE, "thoughts", "quiet_screen.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r163.js":  # R163: the shared opener of a window kept apart (the Forge carries the same)
+        t = open(os.path.join(HERE, "thoughts", "open_apart.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
 # 6.2: a module's script ends only where it means to: "</script" written inside its code or a comment would end it early
 for _m in mods:

@@ -29,7 +29,7 @@ async function open(b, url) {
 }
 async function settings(p) { await p.evaluate(() => go('settings')); await p.waitForSelector('#ingPermitCard', { timeout: 20000 }); await p.waitForTimeout(500); }
 const press = (p, text) => p.evaluate(t => { const b = [...document.querySelectorAll('#ingPermitCard button')].find(x => x.textContent.trim() === t || x.textContent.trim().indexOf(t) === 0); if (!b) return false; b.click(); return true; }, text);
-async function answer(p, pw1, pw2) { await p.waitForSelector('#ingPermitCard .pc-form[role=group] input[type=password]', { timeout: 10000 });
+async function answer(p, pw1, pw2) { await p.waitForSelector('#ingPermitCard .pc-form[role=group] input[type=password]', { timeout: 30000 });
   const ins = await p.$$('#ingPermitCard .pc-form[role=group] input[type=password]'); await ins[0].fill(pw1); if (ins[1]) await ins[1].fill(pw2 == null ? pw1 : pw2);
   await p.evaluate(() => [...document.querySelectorAll('#ingPermitCard .pc-form[role=group] button')].find(b => b.textContent === 'Go on').click()); }
 async function nextDownload(p, n0, ms = 60000) { const t = Date.now(); while (p.__dl.length <= n0 && Date.now() - t < ms) await p.waitForTimeout(100); const d = p.__dl[n0]; if (!d) return null;
