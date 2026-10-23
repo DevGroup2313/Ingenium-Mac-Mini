@@ -1,0 +1,73 @@
+{
+ "made": "make_eyes.py",
+ "float32_weights": 13984940,
+ "parts": {
+  "tf": {
+   "size": 1469843,
+   "sha256": "300dfae273d20b4046f46a06d735688f03675a807561e9bcb5f664eb2f3d2831",
+   "packed": 366414,
+   "from": "@tensorflow/tfjs 4.22.0 dist/tf.min.js",
+   "licence": "Apache-2.0"
+  },
+  "mnv2.json": {
+   "size": 110589,
+   "sha256": "80119e3bd46842271fa54803ba4382d3f5fe0a56eb45d5fbaf638ba0fe560dca",
+   "packed": 5502,
+   "from": "MobileNet v2 1.0 224 (TensorFlow.js), its graph and weight list, weights in uint8",
+   "licence": "Apache-2.0"
+  },
+  "mnv2.bin": {
+   "size": 3575564,
+   "sha256": "26bd154f4165db28400ee5799a3af3d8929886f9975ad28c6b5012ac3a52470e",
+   "packed": 2891644,
+   "from": "MobileNet v2 1.0 224 (TensorFlow.js), its weights quantised to uint8 here",
+   "licence": "Apache-2.0"
+  },
+  "labels": {
+   "size": 23246,
+   "sha256": "96641650cda18de3fa263ebfe6fba72700d7b89cc9419003947ef9fcd3c119cd",
+   "packed": 9983,
+   "from": "@tensorflow-models/mobilenet 2.1.1 ImageNet names",
+   "licence": "Apache-2.0"
+  },
+  "tesseract": {
+   "size": 66695,
+   "sha256": "a8e29918d098b2b06e1012bdaeffb4aec0445c5d5654709023e0bd1f442a80e8",
+   "packed": 10458,
+   "from": "tesseract.js 5.1.1 dist/tesseract.min.js",
+   "licence": "Apache-2.0"
+  },
+  "worker": {
+   "size": 123724,
+   "sha256": "aca1229639fc9907d86f96e825955a2b7c5716d17f3bc3acd71f9c7ab66181fc",
+   "packed": 34953,
+   "from": "tesseract.js 5.1.1 dist/worker.min.js",
+   "licence": "Apache-2.0"
+  },
+  "core.js": {
+   "size": 124391,
+   "sha256": "fc54a973687325599214294ec90ea9665309cbdf6ca727c43a64651f24e923f7",
+   "packed": 28142,
+   "from": "tesseract.js-core 5.1.1 tesseract-core-lstm.js",
+   "licence": "Apache-2.0"
+  },
+  "core.wasm": {
+   "size": 2859424,
+   "sha256": "5db58ea4d1bd4256be81e8ae3b4fa226c4625dfba1850b1b3308dbf3700e9929",
+   "packed": 1054984,
+   "from": "tesseract.js-core 5.1.1 tesseract-core-lstm.wasm",
+   "licence": "Apache-2.0"
+  },
+  "eng": {
+   "size": 2952873,
+   "sha256": "45b4cb346724ac1774f1c36f42f182b887bcdb28ebe63e6fff90ac41f3fcff91",
+   "packed": 2952873,
+   "from": "@tesseract.js-data/eng 1.0.0 4.0.0_best_int (tessdata_best, integer)",
+   "licence": "Apache-2.0"
+  }
+ },
+ "pack": {
+  "size": 7355472,
+  "sha256": "526829510690275ac9e0b17d86f076fc27a1b45dcf6825e95a942ecbd4448bc6"
+ }
+}

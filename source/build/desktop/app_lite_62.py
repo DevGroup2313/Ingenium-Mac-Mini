@@ -113,7 +113,7 @@ rep('''def _start_local_server(directory, html_name=None):''', '''# 6.2: the pag
 # that hold those (about three quarters of the page) are left out of it. Each block is removed whole, so the page's own
 # checks see it absent, as in a copy that never carried it.
 _WINDOW_DROP = ("ing-builtin-cd", "ing-builtin-forge", "ing-builtin-inkwell", "ingenium-kit-bundle",
-                "ingenium-engine-wasm", "ingenium-engine-compat-wasm")
+                "ingenium-engine-wasm", "ingenium-engine-compat-wasm", "ing-eyes")
 _WINDOW_CACHE = {"key": None, "data": None}
 
 

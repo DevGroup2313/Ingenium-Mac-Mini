@@ -14,8 +14,11 @@ async function ready(p) {
   await p.waitForTimeout(600);
 }
 async function run(p, where) {
+  // contrast is judged on what stays on screen: a line fading in is measured once its fade has finished (up to 4 s)
+  await p.waitForFunction(() => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running' || (a.effect && a.effect.getTiming && a.effect.getTiming().iterations === Infinity)), null, { timeout: 4000 }).catch(() => { });
   await p.addScriptTag({ path: AXE });
   return p.evaluate(async (where) => {
+    for (let i = 0; i < 40 && document.getAnimations && document.getAnimations().some(a => a.playState === 'running' && !(a.effect && a.effect.getTiming && a.effect.getTiming().iterations === Infinity)); i++) await new Promise(r => setTimeout(r, 100));
     const r = await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] }, resultTypes: ['violations'] });
     return r.violations.map(v => ({ where, id: v.id, impact: v.impact, help: v.help, n: v.nodes.length,
       nodes: v.nodes.slice(0, 8).map(n => ({ t: n.target.join(' '), html: n.html.slice(0, 220), why: (n.failureSummary || '').slice(0, 300) })) }));
