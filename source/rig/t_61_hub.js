@@ -22,7 +22,9 @@ const SRC = path.join(__dirname, '..');
   const wait = (fn, a, t = 20000) => p.waitForFunction(fn, a, { timeout: t }).then(() => true, () => false);
   // Playwright's waitForFunction takes a promise as truthy and stops at once, so a wait on the store polls here instead
   const waitA = async (fn, a, t = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < t) { if (await ev(fn, a).catch(() => false)) return true; await p.waitForTimeout(200); } return false; };
-  const tab = async v => { await p.click('#fbViews button[data-v="' + v + '"]'); await p.waitForTimeout(450); };
+  // (6.3: the tabs are in four rooms, and only the chosen room's show: its room is chosen first, as a person would)
+  const tab = async v => { await ev(v => { if (window.fbRooms) { const R = fbRooms.rooms.find(r => r.v.includes(v)); if (R && fbRooms.room() !== R.k) fbRooms.choose(R.k); } }, v); await p.waitForTimeout(200);
+    await p.click('#fbViews button[data-v="' + v + '"]'); await p.waitForTimeout(450); };
   const body = () => ev(() => document.getElementById('fbWorkBody').innerText);
   const toastText = () => ev(() => (document.querySelector('#fb .f-toast') || {}).textContent || '');
   const clickText = async (sel, text) => { const ok2 = await ev(([s, t]) => { const e = [...document.querySelectorAll(s)].find(x => x.textContent.trim() === t && x.offsetParent); if (e) { e.click(); return true; } return false; }, [sel, text]); await p.waitForTimeout(350); return ok2; };
@@ -52,11 +54,14 @@ const SRC = path.join(__dirname, '..');
 
   // ---------- the tabs ----------
   const tabs = await ev(() => { const vb = document.getElementById('fbViews'); return { names: [...vb.querySelectorAll('button[data-v]')].map(b => b.getAttribute('data-v')).join(','), roles: [...vb.querySelectorAll('button[data-v]')].every(b => b.getAttribute('role') === 'tab'), over: vb.scrollWidth > vb.clientWidth, ox: getComputedStyle(vb).overflowX }; });
-  ok(tabs.names === 'changes,files,history,releases,ideas,code,issues,pulls,compare,actions,projects,wiki,insights,settings' && tabs.roles, 'fourteen tabs: Fabrica\'s five, then Code, Issues, Pull requests, Compare, Actions, Projects, Wiki, Insights, Settings', tabs.names);
-  ok(tabs.over && /auto|scroll/.test(tabs.ox), 'the tab row is full, so it scrolls sideways', tabs);
+  const rooms = await ev(() => ({ rooms: [...document.querySelectorAll('#fbRooms .fr-room')].map(b => b.textContent.trim() + (b.getAttribute('aria-pressed') === 'true' ? '*' : '')).join(','),
+    shown: [...document.querySelectorAll('#fbViews button[data-v]')].filter(b => !b.hidden).map(b => b.getAttribute('data-v')).join(','), says: (document.getElementById('fbRoomSays') || {}).textContent || '' }));
+  ok(tabs.names === 'changes,files,code,history,compare,releases,ideas,issues,pulls,projects,wiki,actions,insights,settings' && tabs.roles && rooms.rooms === 'Now*,Story,Plans,Care' && rooms.shown === 'changes,files,code' && /as it is now/.test(rooms.says),
+    'fourteen tabs in four rooms (6.3): Now (Changes, Files, Code), Story (History, Compare, Releases), Plans (Ideas, Issues, Pull requests, Projects, Wiki), Care (Checks, Overview, Settings); only the chosen room\'s show, with a line that says what it holds', { tabs: tabs.names, rooms });
+  ok(!tabs.over, 'so the tab row never has to scroll sideways', tabs);
   await ev(() => document.querySelector('#fbViews button[data-v="changes"]').focus()); await p.keyboard.press('End'); await p.waitForTimeout(700);
-  const endTab = await ev(() => [document.activeElement.getAttribute('data-v'), document.getElementById('fbViews').scrollLeft > 0]);
-  ok(endTab[0] === 'settings' && endTab[1], 'the keys move along the tabs (End reaches Settings, and the row scrolls to it)', endTab);
+  const endTab = await ev(() => [document.activeElement.getAttribute('data-v')]);
+  ok(endTab[0] === 'code', 'the keys move along the tabs shown (End reaches Code, the last of Now)', endTab);
 
   // ---------- CODE ----------
   await tab('code'); await wait(() => !!document.getElementById('hReadme'));

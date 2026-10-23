@@ -1,0 +1,142 @@
+[
+ {
+  "old": "Each app is a real git repository. Any git, and GitHub, opens what is kept here, and nothing it holds leaves this device unless you send it.",
+  "new": "Each app keeps every version in git\\'s own format, so any git program can open it, and nothing it holds leaves this device unless you send it.",
+  "count": 1
+ },
+ {
+  "old": "<h3>Copies, and GitHub</h3>",
+  "new": "<h3>Copies</h3>",
+  "count": 1
+ },
+ {
+  "old": "Ingenium's own Fire tablet app, built by GitHub, carries",
+  "new": "Ingenium's own Fire tablet app, built online from its project, carries",
+  "count": 1
+ },
+ {
+  "old": "\"As GitHub's Download ZIP makes it\"",
+  "new": "\"Its files as they are, in one zip\"",
+  "count": 1
+ },
+ {
+  "old": "<small>GitHub\\'s Download ZIP, or a bundle from git bundle create:",
+  "new": "<small>A zip of its files, or a bundle from git bundle create:",
+  "count": 1
+ },
+ {
+  "old": "An app the Forge or GitHub built for the Fire tablet uses",
+  "new": "An app the Forge built, or one built online from its project, for the Fire tablet uses",
+  "count": 1
+ },
+ {
+  "old": "installs over the one GitHub built when it is signed with that repository's key",
+  "new": "installs over one built online from its project when it is signed with that project's key",
+  "count": 1
+ },
+ {
+  "old": "(in GitHub's builds, storePassword in signing/signing.properties)",
+  "new": "(in the online builds, storePassword in signing/signing.properties)",
+  "count": 1
+ },
+ {
+  "old": "Saved. keytool and GitHub's builds open it with the password you chose.",
+  "new": "Saved. keytool and the online builds open it with the password you chose.",
+  "count": 1
+ },
+ {
+  "old": "As GitHub runs a workflow on a version, Fabrica runs its five checks:",
+  "new": "On each version you choose, Fabrica runs its five checks:",
+  "count": 1
+ },
+ {
+  "old": "\" (GitHub commit \"+z.comment.slice(0,7)+\")\"",
+  "new": "\" (its version \"+z.comment.slice(0,7)+\")\"",
+  "count": 1
+ },
+ {
+  "old": "including how GitHub builds the app for you and how to update it later.",
+  "new": "including how the app is built for you online and how to update it later.",
+  "count": 1
+ },
+ {
+  "old": "<i>The Mac project with its GitHub recipe: GitHub builds the ready-made app",
+  "new": "<i>The Mac project with its build recipe, which builds the ready-made app",
+  "count": 1
+ },
+ {
+  "old": "the same universal app and GitHub project as the Mac package",
+  "new": "the same universal app and project as the Mac package",
+  "count": 1
+ },
+ {
+  "old": "<i>The Windows project with its GitHub recipe: GitHub builds the program as a folder",
+  "new": "<i>The Windows project with its build recipe, which builds the program as a folder",
+  "count": 1
+ },
+ {
+  "old": "<i>The Xcode project with its GitHub recipe, which builds",
+  "new": "<i>The Xcode project with its build recipe, which builds",
+  "count": 1
+ },
+ {
+  "old": "Android project with its GitHub recipe that builds the signed APK",
+  "new": "Android project with its build recipe that builds the signed APK",
+  "count": 1
+ },
+ {
+  "old": "<div class=\"section-sub\">Your own GitHub, on this device: every version of each app kept",
+  "new": "<div class=\"section-sub\">Your workshop, on this device: every version of each app kept",
+  "count": 1
+ },
+ {
+  "old": "<h3>Fabrica, your own GitHub · Fabrica, votre propre GitHub</h3>",
+  "new": "<h3>Fabrica, your workshop · Fabrica, votre atelier</h3>",
+  "count": 1
+ },
+ {
+  "old": "It needs no model and no connection; GitHub is a switch you turn on only if you want it.",
+  "new": "It needs no model and no connection; a copy sent online is a switch under Copies, turned on only if you want it.",
+  "count": 1
+ },
+ {
+  "old": "Il ne faut ni modèle ni connexion ; GitHub est un interrupteur que vous n’allumez que si vous le voulez.",
+  "new": "Il ne faut ni modèle ni connexion ; une copie envoyée en ligne est un interrupteur sous Copies, que vous n’allumez que si vous le voulez.",
+  "count": 1
+ },
+ {
+  "old": "(the project GitHub turns into an installer)",
+  "new": "(the project built into an installer)",
+  "count": 1
+ },
+ {
+  "old": "the Mac package’s GitHub recipe builds The Forge.app",
+  "new": "the Mac package’s build recipe builds The Forge.app",
+  "count": 1
+ },
+ {
+  "old": "the Windows package's GitHub recipe builds an installer",
+  "new": "the Windows package's build recipe builds an installer",
+  "count": 1
+ },
+ {
+  "old": "and GitHub builds the app from them.'",
+  "new": "and the app is built from them online.'",
+  "count": 1
+ },
+ {
+  "old": "et GitHub construit l’app à partir d’eux.'",
+  "new": "et l’app est construite à partir d’eux, en ligne.'",
+  "count": 1
+ },
+ {
+  "old": "<p>Your own GitHub, in the Forge: each of your apps kept with every version, changed, tested and shipped from here, with no model and no connection. GitHub is there only when you want it.</p>",
+  "new": "<p>Your workshop, in the Forge: each of your apps kept with every version, changed, tested and shipped from here, with no model and no connection.</p>",
+  "count": 1
+ },
+ {
+  "old": "\"Your app's own .html, its install package, or GitHub's Download ZIP\"",
+  "new": "\"Your app's own .html, its install package, or a zip of its files\"",
+  "count": 1
+ }
+]

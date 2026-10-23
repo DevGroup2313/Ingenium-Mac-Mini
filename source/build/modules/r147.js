@@ -75,8 +75,8 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-row{display:flex;flex-wrap:wrap;gap:8px}
 @container hx (max-width:559px){.hx-head{padding:16px 15px;gap:12px 14px;align-items:start}.hx-seal{width:58px;height:58px;margin-top:2px}.hx-seal .ing-crest{--W:58px !important}
   .hx-hello{font-size:24px}.hx-lede{font-size:14px}.hx-next{padding:12px}}
-@container hx (min-width:880px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(300px,440px);padding:24px 26px}.hx-next{grid-column:auto}.hx-seal{width:92px;height:92px}.hx-seal .ing-crest{--W:92px !important}}
-@container hx (min-width:1640px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(360px,480px)}}
+@container hx (min-width:880px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(340px,500px);padding:24px 26px}.hx-next{grid-column:auto}.hx-seal{width:92px;height:92px}.hx-seal .ing-crest{--W:92px !important}}
+@container hx (min-width:1640px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(380px,560px)}}
 /* ---- keys: buttons that stand out of the page ---- */
 .hx-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 15px;border-radius:11px;border:1px solid var(--x-hair);
   background:linear-gradient(var(--x-a),var(--x-b));color:var(--x-ink1);font-size:13.5px;font-weight:600;line-height:1.25;cursor:pointer;box-shadow:var(--x-pill);
@@ -90,7 +90,15 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 /* the next step is as wide as its words, at the left like the keys under it (the owner's words, 22 October 2026: the
    "Bring in your first model" button "is too wide, I don't like how it looks") */
 .hx-btn.wide{align-self:flex-start;width:auto;max-width:100%;min-height:40px;padding:9px 18px;font-size:14px}
-.hx-row-top{align-items:center}
+/* the tour beside the next step, always (the owner's words, 22 October 2026: "Move the Take the guided tour button up top next
+   to the Bring in your first model"; 23 October: it "does not look changed at all", since a longer next step, "Load LFM2.5 2.6B
+   into the engine", pushed the tour under it): two keys side by side and of one height, their words wrapping inside them; one
+   above the other only where the panel is too narrow for two */
+.hx-next{container:hxn/inline-size}
+.hx-row-top{display:grid;grid-template-columns:auto auto;justify-content:start;align-items:stretch;gap:8px}
+.hx-row-top .hx-btn{white-space:normal;text-wrap:balance;max-width:100%}
+.hx-row-top .hx-btn.wide{align-self:stretch;min-height:44px}
+@container hxn (max-width:330px){.hx-row-top{grid-template-columns:minmax(0,1fr)}}
 .hx-btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--x-acc);min-height:30px;padding:4px 8px}
 .hx-btn.quiet:hover{transform:none;text-decoration:underline}
 .hx-btn[hidden]{display:none}

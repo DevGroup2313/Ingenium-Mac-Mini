@@ -1032,7 +1032,7 @@ function ckRows(checks,live){var box=h("div","f-checks");CKN.forEach(function(k,
 function runWord(x){return !x.page?"No page found":x.ok?"Passed":"Found something";}
 function paintActions(r,w,f){var rec=needRec(r,w,"the runs");if(!rec)return;var v=V(r).act;sig(r,"actions");
   if(typeof IngShip==="undefined"||!IngShip.test){w.appendChild(h("div","f-empty h-blk","<b>No checks in this copy</b>Fabrica's checks are not part of this copy."));return;}
-  var intro=h("div","h-box h-blk");intro.innerHTML='<b class="h-big">Fabrica\'s own checks, as runs</b>As GitHub runs a workflow on a version, Fabrica runs its five checks: the page reads cleanly, every file it names is here, it opens with no errors, its own self-test, and its build number moves forward. Each run is kept here with what it found.';w.appendChild(intro);
+  var intro=h("div","h-box h-blk");intro.innerHTML='<b class="h-big">Fabrica\'s own checks, as runs</b>On each version you choose, Fabrica runs its five checks: the page reads cleanly, every file it names is here, it opens with no errors, its own self-test, and its build number moves forward. Each run is kept here with what it found.';w.appendChild(intro);
   if(!r.head){w.appendChild(h("div","f-empty h-blk","Keep a first version, then run the checks on it."));return;}
   var bar=h("div","h-bar h-blk"),ref=v.ref||(r.detached?r.head:"refs/heads/"+(r.branch||defBranch(r,rec)));
   bar.appendChild(picker(refOptions(r),ref,"The version to check",function(x){v.ref=x;}));
