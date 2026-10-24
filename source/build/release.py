@@ -83,7 +83,8 @@ def old_bundle(page):
 DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refresh_62", "_restart_page_process", ("mini", "intel")),
            ("app_ctx_62", "_engine_kvq", ("mini", "intel", "win")), ("app_quick_62", "_quick_page", ("mini", "intel", "win")),
            ("app_guard_62", "_ing_host_ok", ("mini", "intel", "win")), ("app_ctx_63", "_ING_CTX_MAX", ("mini", "intel", "win")),
-           ("app_win_64", "_another_copy_is_open", ("mini", "intel", "win")), ("app_train_65", "TRAIN_LR_MORE", ("mini", "intel", "win"))]
+           ("app_win_64", "_another_copy_is_open", ("mini", "intel", "win")), ("app_train_65", "TRAIN_LR_MORE", ("mini", "intel", "win")),
+           ("app_studio_65", "_gguf_to_f32", ("mini", "intel", "win"))]
 
 
 def desktop():
