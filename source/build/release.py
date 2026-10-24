@@ -49,6 +49,8 @@ def committed(repo):
             out[path] = 0o755 if mode == "100755" else 0o644
     return out
 
+REPO_CHECKS = (".github/workflows/studio-check.yml", ".github/workflows/studio-device.yml", ".github/workflows/key-rotation-check.yml",
+               ".github/workflows/steps-probe.yml", ".github/workflows/windows-home-check.yml")
 KEYLIKE = re.compile(r"(^|/)signing/|\.(keystore|jks|p12|pfx|pem|key|mobileprovision)$|(^|/)(signing\.properties|SIGNING\.txt)$", re.I)
 
 
@@ -62,6 +64,10 @@ def wanted(path, kits, source, shared, generated):
     # and the images of The Offline Project (brand/), kept in the repositories for her, not installed with the app
     # and the workflow that builds the shells Fabrica fills (6.0), which builds from source/ only
     if path.startswith("source/") or path.startswith("brand/") or path.startswith(".github/lineup/") or path in (".github/workflows/lineup-sources.yml", ".github/workflows/build-shells.yml"):
+        return False
+    # 6.6: and the repositories' own checks, which run from source/ or probe these builds: in a kit they would start on
+    # its first push and fail (the model studio's, the signing key change's, the Windows window's)
+    if path.startswith(".github/diag/") or path in REPO_CHECKS:
         return False
     for kit in kits:
         if kit["source"] != source:
