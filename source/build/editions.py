@@ -65,7 +65,8 @@ def _personal():
     E.append(('UTF8S("Yannie D. Forest")',
               'UTF8S((function(){try{return String(personaGet().name||"").trim();}catch(e){return "";}})()||cn||"Ingenium")',
               "signing certificate: the person's own name", 1))
-    E.append(('com.yannieforest.', 'app.ingenium.', "app ids: a neutral prefix", 14))
+    # 6.5: two more, the example in the Mac and Windows makers' "cannot be an app id" (modules/r170.js)
+    E.append(('com.yannieforest.', 'app.ingenium.', "app ids: a neutral prefix", 16))
     E.append(('com.yannie.carpediem', 'app.ingenium.carpediem', "app ids: a neutral prefix (Carpe Diem's)", 4))
     E.append(('"DevGroup2313/Ingenium-', '"Ingenium-', "the build files: no account named", 4))
     # Fabrica: the name a Fire tablet's icon points to is the app's own, not the owner's (modules/r139.js)
