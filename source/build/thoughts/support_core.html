@@ -186,21 +186,90 @@ function rows(dayWord){return [
   ["routines","🌅",T("Routines","Routines"),T("Step-by-step routines for starting and ending the "+dayWord.en+", offered at the right hour.","Des routines pas à pas pour commencer et finir la "+dayWord.fr+", proposées au bon moment.")],
   ["focus","🎧",T("Focus room","Salle de concentration"),T("A quiet full-screen space with one task, the timer and a soft sound made on this device.","Un espace plein écran et calme, avec une tâche, le minuteur et un son doux fait sur cet appareil.")]];}
 
-/* smaller steps, offered from the words of the task when no model is asked */
-function stepTemplates(title){var t=String(title||"");
-  if(/\b(code|bug|build|app|feature|test|commit|release|deploy|fix|function|script|css|html|page|screen|button|room|editor|bakery|workshop|repo|github)\w*/i.test(t))
-    return T("Open the file and find the place|Read the last thing you changed|Write the smallest piece that works|Run it and look at the result|Save, and note what comes next","Ouvrir le fichier et trouver l’endroit|Relire le dernier changement|Écrire le plus petit morceau qui marche|Le lancer et regarder le résultat|Enregistrer, et noter la suite").split("|");
-  if(/writ|draft|ink|sentence|essay|proposal|synthesis|chapter|report|letter|thesis|paper|abstract|écri|rédig|chapitre|mémoire|thèse|lettre/i.test(t))
-    return T("Open the document|Read the last paragraph you wrote|Write one rough sentence|Write the next sentence","Ouvrir le document|Relire le dernier paragraphe écrit|Écrire une phrase brouillonne|Écrire la phrase suivante").split("|");
-  if(/read|book|article|page|librar|lire|livre|lecture/i.test(t))
-    return T("Find the book and your place|Read one page|Mark one line that matters|Read the next page","Trouver le livre et la page|Lire une page|Marquer une ligne qui compte|Lire la page suivante").split("|");
-  if(/call|phone|email|e-mail|message|reply|text|appel|téléphon|courriel|répond/i.test(t))
-    return T("Find the number or the message|Write the first line|Send it","Trouver le numéro ou le message|Écrire la première ligne|L’envoyer").split("|");
-  if(/clean|tidy|wash|laundry|kitchen|dishes|ranger|nettoy|lessive|vaisselle/i.test(t))
-    return T("Choose one small area|Put away five things|Wipe the one surface|Look, and choose the next area","Choisir un petit coin|Ranger cinq choses|Essuyer une seule surface|Regarder, et choisir le coin suivant").split("|");
-  if(/walk|stretch|lunch|tea|agora|move|break|marche|pause|déjeuner|thé/i.test(t))
-    return T("Stand up|Shoes on, or the kettle on|Go","Se lever|Chaussures, ou la bouilloire|Y aller").split("|");
-  return T("Open what you need|Do the smallest first part, two minutes|Decide the next small part","Ouvrir ce qu’il faut|Faire la toute première partie, deux minutes|Choisir la petite partie suivante").split("|");}
+/* smaller steps, made from the words of the task when no model is asked (the Forge has none) or a model gives no list.
+   6.4, the owner (24 October 2026): Break it down "do not really work". The steps were the same few lines for any task.
+   Now the task is read: its parts ("buy bread and call the bank" is two steps), its doing word and what it is done to,
+   and the steps name that thing, so they are about this task. The first step is always a small one. */
+var SV="write|draft|edit|revise|rewrite|finish|start|begin|complete|read|study|review|learn|practise|practice|email|e-mail|call|phone|ring|text|message|reply|answer|contact|ask|tell|invite|thank|clean|tidy|wash|vacuum|hoover|dust|sort|declutter|empty|iron|fold|buy|shop|order|get|pick|collect|fetch|return|cook|bake|make|prepare|plan|organise|organize|arrange|book|schedule|pay|file|fill|apply|renew|register|sign|submit|send|post|print|fix|code|build|debug|test|install|update|upgrade|set|deploy|commit|release|ship|design|draw|paint|record|upload|download|back|save|walk|run|exercise|stretch|go|take|put|move|pack|check|find|look|research|choose|decide|meet|visit|feed|water|change|cancel|do|work|bring|drop|clear|translate|rehearse";
+var SVF="écrire|rédiger|relire|corriger|finir|terminer|commencer|lire|étudier|réviser|apprendre|appeler|téléphoner|envoyer|répondre|contacter|demander|inviter|remercier|nettoyer|ranger|laver|trier|vider|repasser|plier|acheter|commander|chercher|récupérer|rendre|cuisiner|préparer|faire|planifier|organiser|réserver|payer|remplir|renouveler|inscrire|soumettre|imprimer|réparer|coder|construire|tester|installer|mettre|déployer|publier|dessiner|peindre|enregistrer|sauvegarder|marcher|courir|aller|prendre|déplacer|emballer|vérifier|trouver|choisir|décider|rencontrer|visiter|nourrir|arroser|changer|annuler|travailler|apporter|traduire|répéter";
+function stepVerbRe(){return new RegExp("^(?:"+SV+"|"+SVF+")\\b","i");}
+/* what the person wrote, without "I need to", "remember to" and the like at its start, nor a full stop at its end */
+function stepClean(t){t=String(t||"").replace(/\s+/g," ").trim().replace(/[.!…]+$/,"");
+  for(var k=0;k<3;k++)t=t.replace(/^(?:(?:i|we)\s+(?:really\s+)?(?:need|have|want|must|should|ought|got)\s+(?:to\s+)?|(?:i|we)'?ll\s+|(?:need|have|want|got)\s+to\s+|remember\s+to\s+|try\s+to\s+|don'?t\s+forget\s+to\s+|to\s+|todo:?\s*|task:?\s*|il\s+faut\s+(?:que\s+je\s+)?|je\s+dois\s+|je\s+veux\s+|penser\s+à\s+|ne\s+pas\s+oublier\s+de\s+)/i,"").trim();
+  return t;}
+function stepCap(t){t=String(t||"").trim();return t.charAt(0).toUpperCase()+t.slice(1);}
+/* the steps speak to the person: "my report" in the task is "your report" in a step */
+function stepYou(t){return String(t||"").replace(/\b(my|mine|myself|me|I|our|ours|ourselves|us|we)\b/g,function(w){return {my:"your",mine:"yours",myself:"yourself",me:"you",I:"you",our:"your",ours:"yours",ourselves:"yourselves",us:"you",we:"you"}[w];})
+  .replace(/\bmon\s/gi,"votre ").replace(/\bma\s/gi,"votre ").replace(/\bmes\s/gi,"vos ");}
+/* the task's parts: split where a new doing word starts after "and", "then", a comma or a semicolon; "salt and pepper" stays whole */
+var STEP_SEP=/\s*(?:;|,\s*(?:and\s+|then\s+|et\s+|puis\s+)?|\s(?:and\s+then|and|then|after\s+that|et\s+puis|et|puis|ensuite)\s)\s*/gi;
+function stepParts(t){var vr=stepVerbRe(),bits=t.split(STEP_SEP),seps=t.match(STEP_SEP)||[],out=[];
+  bits.forEach(function(b,k){b=b.trim();if(!b)return;if(!out.length||vr.test(b))out.push(b);else out[out.length-1]+=(seps[k-1]||" ")+b;});
+  return out.map(function(x){return x.replace(/^(?:first|firstly|d'abord)\s+/i,"").trim();}).filter(Boolean);}
+/* each kind of task: the doing words that name it, the words it may be about, its steps in English and in French. {o:...}
+   is what the task is done to, as the person wrote it, or the words after the colon when there is nothing; {t} the task */
+var STEP_KINDS=[
+  ["reach",/^(?:email|e-mail|call|phone|ring|text|message|reply to|reply|answer|contact|ask|tell|invite|thank|write to|get back to|appeler|téléphoner|répondre à|répondre|contacter|demander à|inviter|remercier|écrire à)\b/i,null,
+    "Find the address or the number for {o:them}|Write in one line what you want from this|Write or say the first sentence|Send it, or make the call|Write down the answer, or what happens next",
+    "Trouver l’adresse ou le numéro pour {o:cette personne}|Écrire en une ligne ce que vous en attendez|Écrire ou dire la première phrase|L’envoyer, ou passer l’appel|Noter la réponse, ou la suite"],
+  ["study",/^(?:study|revise|review for|learn|practise|practice|prepare for (?:the |an |my )?(?:exam|test|interview|quiz)|étudier|réviser|apprendre)\b/i,/\b(?:exam|test|quiz|revision|examen|partiel)\b/i,
+    "Gather your notes for {o:it}|Choose one small part to start with|Study that part for fifteen minutes|Test yourself: three questions, without looking|Mark what to go over next",
+    "Rassembler vos notes pour {o:cela}|Choisir une petite partie pour commencer|L’étudier quinze minutes|Vous tester : trois questions, sans regarder|Marquer ce qu’il faut revoir ensuite"],
+  ["read",/^(?:read|look over|go over|lire|parcourir)\b/i,null,
+    "Find {o:what you will read} and open it where you stopped|Read for ten minutes|Write one line about what you read|Read the next part|Mark where you stopped",
+    "Trouver {o:ce que vous allez lire} et l’ouvrir là où vous vous êtes arrêté|Lire dix minutes|Écrire une ligne sur ce que vous avez lu|Lire la partie suivante|Marquer où vous vous êtes arrêté"],
+  ["code",/^(?:code|debug|deploy|commit|refactor|coder|déployer)\b/i,/\b(?:code|bug|app|apps|feature|function|script|css|html|button|menu|layout|screen|editor|repo|github|commit|release|deploy|website|site|database|server|api|tests?|the bakery|the workshop|component|module|plugin|icon|page on a phone)\b/i,
+    "Open the file where the change goes, and find the place|Write in one line what you will see when “{t}” is done|Make the smallest change that could work|Run it and look at the result|Save it, and note in one line what comes next",
+    "Ouvrir le fichier où va le changement, et trouver l’endroit|Écrire en une ligne ce que vous verrez quand « {t} » sera fait|Faire le plus petit changement qui pourrait marcher|Le lancer et regarder le résultat|Enregistrer, et noter en une ligne la suite"],
+  ["write",/^(?:write|draft|edit|revise|rewrite|finish writing|type up|translate|écrire|rédiger|relire|corriger|traduire)\b/i,/\b(?:essay|report|chapter|thesis|dissertation|proposal|article|abstract|letter|paper|draft|synthesis|cover letter|cv|résumé|introduction|conclusion|mémoire|thèse|chapitre|lettre|rapport)\b/i,
+    "Open {o:the document}, or a new page for it|Write its main points or headings, one line each|Write one rough sentence under the first one|Fill in one part at a time; rough is fine|Read it through once and fix one thing|Save it, and note where you stopped",
+    "Ouvrir {o:le document}, ou une page neuve pour cela|Écrire ses idées principales ou ses titres, une ligne chacun|Écrire une phrase brouillonne sous le premier|Remplir une partie à la fois ; le brouillon suffit|Le relire une fois et corriger une chose|Enregistrer, et noter où vous vous êtes arrêté"],
+  ["clean",/^(?:clean|tidy|wash|vacuum|hoover|dust|sort out|sort|declutter|empty|iron|fold|do the (?:dishes|laundry|washing)|nettoyer|ranger|laver|trier|vider|repasser|plier)\b/i,/\b(?:dishes|laundry|washing|vaisselle|lessive)\b/i,
+    "Choose one small part of {o:the room} to start with|Put away five things|Clean one surface|Take out what does not belong there|Stop, look, and choose the next part",
+    "Choisir un petit coin de {o:la pièce} pour commencer|Ranger cinq choses|Nettoyer une surface|Sortir ce qui n’a rien à faire là|S’arrêter, regarder, et choisir le coin suivant"],
+  ["cook",/^(?:cook|bake|make (?:dinner|lunch|breakfast|tea|supper|a meal|the meal|food|soup|a cake|bread)|cuisiner|préparer (?:le|un) (?:dîner|déjeuner|repas|gâteau))\b/i,/\b(?:dinner|lunch|breakfast|supper|meal|recipe|cake|dîner|déjeuner|repas|recette|gâteau)\b/i,
+    "Choose what to make, and find the recipe|Check you have what it needs|Get out the pans and the tools|Do the first step of the recipe|Clear up as you go",
+    "Choisir quoi faire, et trouver la recette|Vérifier que vous avez ce qu’il faut|Sortir les casseroles et les ustensiles|Faire la première étape de la recette|Ranger au fur et à mesure"],
+  ["buy",/^(?:buy|shop for|shop|order|get|pick up|collect|fetch|go shopping|do the shopping|acheter|commander|récupérer|faire les courses)\b/i,/\b(?:groceries|shopping|courses)\b/i,
+    "Write a list of what you need: {o:the things}|Check what you already have|Choose where to get it|Buy it, or order it|Put it away when you have it",
+    "Écrire la liste de ce qu’il faut : {o:les choses}|Vérifier ce que vous avez déjà|Choisir où l’obtenir|L’acheter, ou le commander|Le ranger une fois là"],
+  ["forms",/^(?:pay|file|fill in|fill out|fill|apply for|apply|renew|register|sign up|book|schedule|submit|send off|payer|remplir|renouveler|inscrire|réserver|soumettre)\b/i,/\b(?:bill|tax|taxes|form|application|appointment|invoice|insurance|passport|visa|rent|facture|impôts|formulaire|dossier|rendez-vous|assurance|passeport|loyer)\b/i,
+    "Open the letter, the email or the website for {o:it}|Put what it asks for in front of you|Fill in the first part|Check it once|Send it or pay it, and keep the confirmation",
+    "Ouvrir la lettre, le courriel ou le site pour {o:cela}|Mettre devant vous ce qui est demandé|Remplir la première partie|Vérifier une fois|L’envoyer ou le payer, et garder la confirmation"],
+  ["event",/^(?:plan|organise|organize|arrange|planifier|organiser)\b/i,/\b(?:party|birthday|trip|holiday|vacation|wedding|meeting|event|visit|celebration|journey|conference|fête|anniversaire|voyage|vacances|mariage|réunion|visite)\b/i,
+    "Write in one line what {o:it} is for, and when|Write down who is part of it|List the three things it needs most|Do the first of those three|Put the next one in your plan, with a time",
+    "Écrire en une ligne à quoi sert {o:cela}, et quand|Noter qui en fait partie|Lister les trois choses les plus nécessaires|Faire la première des trois|Mettre la suivante dans votre plan, avec une heure"],
+  ["move",/^(?:walk|run(?!\s+(?:the|a|an|my|our|this|that|it)\b)|exercise|stretch|swim|go to the gym|go for a (?:walk|run|swim)|do yoga|work out|marcher|courir|nager|faire du sport|aller à la salle)\b/i,null,
+    "Put on your shoes or your kit|Fill a glass of water|Start with two minutes|Keep going for the time you planned|Stretch, and drink some water",
+    "Mettre vos chaussures ou votre tenue|Remplir un verre d’eau|Commencer par deux minutes|Continuer le temps prévu|S’étirer, et boire un peu d’eau"],
+  ["pack",/^(?:pack|prepare|get ready|emballer|préparer|se préparer)\b/i,null,
+    "Write a list of what you need for {o:it}|Gather the first three things on the list|Put them in one place|Gather the rest, one at a time|Check the list once more",
+    "Écrire la liste de ce qu’il faut pour {o:cela}|Rassembler les trois premières choses de la liste|Les mettre au même endroit|Rassembler le reste, une chose à la fois|Revérifier la liste"]];
+/* the thing a task is done to: the words after its doing word ("write the grant report": "the grant report"), without
+   what only says when or why ("before the guests come"), nor, for a message, what it is about */
+function stepObject(p,kind){var m=/^(?:set up|sign up for|sign up|fill in|fill out|apply for|reply to|write to|get back to|pick up|shop for|sort out|look over|go over|prepare for|get ready for|type up|finish writing|send off|répondre à|demander à|écrire à|\S+)\s+(.*)$/i.exec(p),o=m?m[1].trim():"";
+  o=o.replace(/^(?:for|to|on|about|with|at|pour|à|de)\s+/i,"").replace(/\s+(?:before|after|by|until|till|when|while|so that|because|since|as soon as|avant|après|pour que|quand|parce que)\s+.*$/i,"")
+    .replace(/\s+(?:today|tonight|tomorrow|this (?:morning|afternoon|evening|week)|now|asap|soon|aujourd'hui|ce soir|demain)$/i,"").trim();
+  if(kind==="reach")o=o.replace(/\s+(?:about|regarding|re|to say|to ask|asking|for|on|au sujet de|pour|sur)\s+.*$/i,"").trim();
+  o=stepYou(o);return o.length>90?o.slice(0,89).trimEnd()+"…":o;}
+function stepFill(s,o,t){return s.replace(/\{o:([^}]*)\}/g,function(m,alt){return o||alt;}).replace(/\{t\}/g,t);}
+function stepTemplates(title){var t=stepClean(title),fr=isFr();
+  if(!t)return T("Open what you need|Do the smallest first part, two minutes|Decide the next small part","Ouvrir ce qu’il faut|Faire la toute première partie, deux minutes|Choisir la petite partie suivante").split("|");
+  var parts=stepParts(t);
+  if(parts.length>=2){var list=parts.slice(0,6).map(function(x){return stepCap(stepYou(x));});
+    if(list.length<3)list.push(T("Tick what is done, and write down anything left","Cocher ce qui est fait, et noter ce qui reste"));
+    return list;}
+  var dv=/^(?:do|work on|finish|start|begin|complete|deal with|handle|get on with|faire|finir|terminer|commencer|s'occuper de|avancer)\s+/i,rest=dv.test(t)?t.replace(dv,""):t,said=trunc(stepYou(t.charAt(0).toLowerCase()+t.slice(1)),80);
+  var pick=null,byWord=false;
+  STEP_KINDS.some(function(K){if(K[1].test(rest)||K[1].test(t)){pick=K;return true;}return false;});
+  if(!pick)STEP_KINDS.some(function(K){if(K[2]&&(K[2].test(rest))){pick=K;byWord=true;return true;}return false;});
+  if(pick){var o=byWord&&rest!==t&&!stepVerbRe().test(rest)?stepYou(rest):stepObject(K1(rest,t,pick),pick[0]);
+    return (fr?pick[4]:pick[3]).split("|").map(function(x){return stepFill(x,o,said);});}
+  var q=T("“","« ")+said+T("”"," »");
+  return T("Write in one line what done looks like for "+q+"|Put what you need for it in front of you|Do the first small part, for five minutes|Look at what is left, and choose the next small part|Stop, and write down where you are",
+    "Écrire en une ligne à quoi ressemble "+q+" une fois fait|Mettre devant vous ce qu’il faut|Faire la première petite partie, cinq minutes|Regarder ce qui reste, et choisir la petite partie suivante|S’arrêter, et noter où vous en êtes").split("|");}
+/* the words the kind was found in: the task after "do" or "finish" when the kind is named there, else the whole task */
+function K1(rest,t,K){return K[1].test(rest)?rest:t;}
 
 /* a soft sound made on the device, so the Focus room works offline */
 var AU={ctx:null,src:null,gain:null};
@@ -432,7 +501,7 @@ function create(host){
       var n=nextTask();if(n)r.appendChild(btn(T("Use my next item: ","Mon prochain moment : ")+trunc(n.task.title,34),"ghost",function(){fromPlan(n);S().view="one";save();refresh();}));
       if(ts.length)r.appendChild(btn(T("Back to my tasks","Retour à mes tâches"),"ghost",function(){S().active=ts[0].id;save();refresh();}));
       r.appendChild(btn("⏱ "+T("Just start · 2 min","Juste commencer · 2 min"),"ghost",justStart,null,"just"));
-      h.appendChild(r);h.appendChild(el("p","sc-note",{style:"margin-top:10px",text:hv(H.breakNote)||T("Break it down offers 3 to 5 small steps from the words of the task. Each is yours to rewrite. The first is meant to take less than five minutes.","Découper propose 3 à 5 petites étapes à partir des mots de la tâche. Chacune est à réécrire. La première doit prendre moins de cinq minutes.")}));return c;}
+      h.appendChild(r);h.appendChild(el("p","sc-note",{style:"margin-top:10px",text:hv(H.breakNote)||T("Break it down reads the task: each part, its doing word and what it is about, and offers 3 to 6 small steps that name it. Each is yours to rewrite. The first is meant to take less than five minutes.","Découper lit la tâche : chaque partie, son verbe et ce qu’elle concerne, et propose 3 à 6 petites étapes qui la nomment. Chacune est à réécrire. La première doit prendre moins de cinq minutes.")}));return c;}
     var top=el("div","sc-task-top");
     if(ts.length>1){var sel=el("select",C("select")||"");ts.forEach(function(x){var o=el("option",null,{text:x.title+" ("+x.steps.filter(function(s){return s.done;}).length+T(" of "," sur ")+x.steps.length+")",value:x.id});if(x.id===t.id)o.selected=true;sel.appendChild(o);});
       sel.onchange=function(){S().active=sel.value;save();refresh();};top.appendChild(sel);}else top.appendChild(el("b","sc-task-title",{text:t.title}));
@@ -577,6 +646,6 @@ function create(host){
     tasks:tasks,current:cur,newTask:newTask,fromPlan:fromPlan,steps:stepTemplates,applyAll:applyAll,sheet:sheet,closeSheet:closeSheet,T:T,store:S,toast:toast,
     reminders:reminders};}
 
-window.SupportCore={create:create,v:2};
+window.SupportCore={create:create,v:2,steps:function(title){return stepTemplates(title);}};
 })();
 </script>
