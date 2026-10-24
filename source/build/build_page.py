@@ -587,6 +587,8 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "open_apart.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r166.js":  # R166: Fabrica calm, its work in rooms (the Forge carries the same)
         t = open(os.path.join(HERE, "thoughts", "fabrica_rooms.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r167.js":  # R167: Fabrica part by part (the Forge carries the same)
+        t = open(os.path.join(HERE, "thoughts", "fabrica_parts.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     return t
 # 6.2: a module's script ends only where it means to: "</script" written inside its code or a comment would end it early
 for _m in mods:

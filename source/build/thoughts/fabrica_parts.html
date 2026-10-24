@@ -1,0 +1,55 @@
+<style id="fabrica-parts-css">
+/* ============ FABRICA, PART BY PART: EACH CHANGE LOOKED OVER AND KEPT OR PUT BACK ON ITS OWN (Ingenium 6.4, The Forge 646) ============
+   The owner's words (23 October 2026): "I want to be able to go through all of my apps line by line on both Ingenium and the Forge
+   and be able to make surgical edits", and both apps to be "great platforms and workbench to do serious coding [...] both with AI
+   and without AI". A change to a file, made by hand or by a model in Chat or Code, used to be kept or put back whole. In Changes,
+   each part of a file that changed (a hunk: the lines that changed, with three lines either side) now has its own key, Put this
+   part back: that part alone returns to the version kept, and every other change stays, ready to be kept. A line over the parts
+   says how. Shared by both apps (build/thoughts/fabrica_parts.html), drawn with Fabrica's own tokens. */
+#fb .fp-hint{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--f-wellbg);box-shadow:var(--f-well);font-size:12.5px;line-height:1.45;color:var(--f-ink2)}
+#fb .f-dl.hunk{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#fb .fp-back{margin-left:auto;font-family:var(--f-sans);white-space:nowrap}
+#fb .fp-n{font:600 11px var(--f-sans);color:var(--f-ink3)}
+</style>
+<script>
+(function fabricaParts(){"use strict";if(window.fbParts)return;
+function $(id){return document.getElementById(id);}
+function X(){return window.fbHubHost||null;}
+function core(){return (window.IngRepo&&IngRepo.core)||null;}
+/* the text with one part of its change undone: the part's lines as they were in the version kept, every other line as it is now */
+function undoPart(work,kept,part){var C=core();if(!C||!C.splitLines||!C.hunks)throw new Error("this copy of Fabrica cannot read changes part by part");
+  var a=C.splitLines(kept||""),b=C.splitLines(work||""),hs=C.hunks(a,b,3);
+  var h=hs.filter(function(x){return x.a0===part.a0&&x.b0===part.b0&&x.aN===part.aN&&x.bN===part.bN;})[0];
+  if(!h)throw new Error("this part has changed since it was shown; look at the changes again");
+  var was=h.lines.filter(function(l){return l[0]!=="+";}).map(function(l){return l[1];});
+  var lines=b.slice(0,h.b0).concat(was,b.slice(h.b0+h.bN));
+  if(!lines.length)return "";
+  var nl=work?/\n$/.test(work):/\n$/.test(kept||"");
+  return lines.join("\n")+(nl?"\n":"");}
+function putBack(r,path,part){
+  return Promise.all([IngRepo.readText(r.id,path),r.head?IngRepo.readText(r.id,path,"HEAD"):Promise.resolve(null)]).then(function(t){
+    var work=t[0]==null?"":t[0],kept=t[1];var text=undoPart(work,kept==null?"":kept,part);
+    /* a new file with nothing left of it, or a file back as it was kept: put back whole, so no change is left behind */
+    if((kept==null&&text==="")||(kept!=null&&text===kept))return IngRepo.discard(r.id,[path]).then(function(){return "whole";});
+    return IngRepo.put(r.id,path,text).then(function(){return "part";});});}
+function decorate(){var x=X(),w=$("fbWorkBody");if(!x||!w||!x.S||x.S.view!=="changes"||x.S.cmp)return;var r=null;try{r=x.cur();}catch(e){}if(!r)return;
+  var key=r.id+"|"+(r.head?"HEAD":"empty")+"|work",have=x.C&&x.C.diff&&x.C.diff[key];if(!have||!have.length)return;
+  var c=have[x.S.file]||have[0];if(!c||c.binary||!c.hunks||!c.hunks.length)return;
+  var dv=w.querySelector(".f-diff");if(!dv||dv.__fp===c)return;dv.__fp=c;
+  if(!w.querySelector(".fp-hint")){var hint=document.createElement("p");hint.className="fp-hint";hint.id="fbPartsHint";
+    hint.textContent=c.hunks.length>1||have.length>1?"Look over each part. Put back any part you do not want, as it was in the version kept; the other changes stay, ready to keep.":"Put back this part if you do not want it; it returns to the version kept.";
+    dv.parentNode.insertBefore(hint,dv);}
+  var heads=dv.querySelectorAll(".f-dl.hunk");if(heads.length!==c.hunks.length)return;
+  [].forEach.call(heads,function(hd,i){if(hd.querySelector(".fp-back"))return;var part=c.hunks[i];
+    var n=document.createElement("span");n.className="fp-n";n.textContent="part "+(i+1)+" of "+c.hunks.length;hd.appendChild(n);
+    var b=x.btn("sm fp-back","Put this part back",function(ev){if(ev)ev.stopPropagation();b.disabled=true;
+      putBack(r,c.path,part).then(function(how){x.toast(how==="whole"?c.path+" is put back as it was in the version kept.":"Part "+(i+1)+" of "+c.path+" is put back as it was in the version kept. The other changes stay.");
+        delete x.C.diff[key];return x.refresh();}).then(function(){x.paint();},function(e){b.disabled=false;x.fail(e);});});
+    b.setAttribute("aria-label","Put back part "+(i+1)+" of "+c.hunks.length+" of "+c.path+", lines "+(part.b0+1)+" to "+(part.b0+part.bN));hd.appendChild(b);});}
+var T=0;function soon(){clearTimeout(T);T=setTimeout(decorate,60);}
+var W=null;function watch(){var w=$("fbWorkBody");if(!w||W===w)return;W=w;try{new MutationObserver(soon).observe(w,{childList:true});}catch(e){}soon();}
+window.fbParts={undoPart:undoPart,putBack:putBack};
+var Q=0;try{new MutationObserver(function(){if(!Q)Q=setTimeout(function(){Q=0;watch();},250);}).observe(document.body,{childList:true,subtree:true});}catch(e){}
+watch();
+})();
+</script>
