@@ -1,2 +1,2 @@
 PASS a test page in the shell Fabrica filled: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true}
-PASS The Forge (13 MB page) in the shell Fabrica filled: {"title":"The Forge","text":6194,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true}
+PASS The Forge (13 MB page) in the shell Fabrica filled: {"title":"The Forge","text":6177,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true}
