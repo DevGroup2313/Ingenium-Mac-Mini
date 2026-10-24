@@ -69,7 +69,7 @@ jobs:
       - name: Train it further with the app's own code, and measure it before and after
         timeout-minutes: 100
         run: |
-          python3 source/rig/studio_check.py "$RUNNER_TEMP/llama-bin" "$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf" "$RUNNER_TEMP/novel.txt" "$RUNNER_TEMP/studio" 3e-6 1e-6 1e-5:8 3e-6:8
+          python3 source/rig/studio_check.py "$RUNNER_TEMP/llama-bin" "$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf" "$RUNNER_TEMP/novel.txt" "$RUNNER_TEMP/studio"
           rc=$?
           { echo '### The model studio, on SmolLM2 135M Instruct'; echo '```'; cat "$RUNNER_TEMP/studio/studio.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
