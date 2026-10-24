@@ -1,0 +1,172 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# The Forge 647's makers on the machines its apps run on: the page source/offline_project/forge_647/tests/maker_page.py
+# makes, with exactly the code and the four shells the Forge carries, makes an APK, an IPA, a Mac app and a Windows app,
+# and saves each where the window can:
+#   - in the Mac shell (WebKit, on its own carpe-app address, as the Forge's iPhone and iPad app opens its page), on
+#     GitHub's Apple silicon Mac; its page check saves straight into a folder;
+#   - in Apple's iPhone simulator, in the iPhone and iPad shell, which reports what it made;
+#   - in pywebview 6.2.1 from a file:// address, as the Forge's Mac app (WebKit) and Windows app (WebView2) open it;
+# then every app saved is read by tools written apart from the makers (verify_made.py: apksigtool and jarsigner for the
+# APK's two signatures, androguard for its manifest, rig/verify_desktop_app.py for the Mac and Windows apps). It builds
+# and publishes nothing.
+name: The Forge's makers, on a Mac, an iPhone and Windows
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/offline_project/forge_647/**'
+      - '.github/workflows/forge-makers-check.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: forge-makers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac-shell:
+    name: Mac shell (WebKit, carpe-app address)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: The page with the Forge's makers, in a Mac app Fabrica's way
+        run: |
+          python3 source/offline_project/forge_647/tests/maker_page.py "$RUNNER_TEMP/forge_makers_check.html"
+          node source/shells/test/make_mac.mjs source/build/modules source/shells/out/mac-shell.zip "$RUNNER_TEMP/forge_makers_check.html" source/shells/test/icons "$RUNNER_TEMP/check.zip" com.yannieforest.forgemakers.check "Forge Makers" CarpeNative | tail -1
+      - name: Open it, and let the page make the four apps
+        timeout-minutes: 10
+        run: |
+          D="$RUNNER_TEMP/x"; mkdir -p "$D" "$RUNNER_TEMP/made"; ditto -x -k "$RUNNER_TEMP/check.zip" "$D"
+          APP=$(ls -d "$D"/*.app | head -1); EXE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")
+          LOG="$RUNNER_TEMP/run.log"
+          SHELL_PAGETEST_SAVE_DIR="$RUNNER_TEMP/made" "$APP/Contents/MacOS/$EXE" -shell_pagetest > "$LOG" 2>&1 &
+          for i in $(seq 1 120); do grep -q "FORGE_MAKERS DONE" "$LOG" && break; sleep 2; done
+          sleep 4; pkill -TERM -f "$APP/Contents/MacOS/$EXE" || true
+          grep "FORGE_MAKERS\|SHELL_PAGETEST SAVED" "$LOG" | cut -c1-400
+          L=$(grep "FORGE_MAKERS DONE" "$LOG" | tail -1); echo "${L#*FORGE_MAKERS DONE }" > "$RUNNER_TEMP/made/forge-check.json"
+          { echo '### The Forge'"'"'s makers in the Mac shell'; echo '```'; cat "$RUNNER_TEMP/made/forge-check.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          ls -la "$RUNNER_TEMP/made"
+          grep -q '"ok":true' "$RUNNER_TEMP/made/forge-check.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: made-mac-shell
+          path: ${{ runner.temp }}/made
+          if-no-files-found: ignore
+
+  ios-sim:
+    name: iPhone simulator (the iPhone and iPad shell)
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - name: The page with the Forge's makers, in an IPA for the simulator
+        run: |
+          python3 source/offline_project/forge_647/tests/maker_page.py "$RUNNER_TEMP/forge_makers_check.html"
+          node source/shells/test/make_ipa.mjs source/build/modules source/shells/out/ios-shell-sim.zip "$RUNNER_TEMP/forge_makers_check.html" source/shells/test/icons "$RUNNER_TEMP/check.ipa" com.yannieforest.forgemakers.check "Forge Makers" CarpeNative | tail -1
+      - name: Install it in the simulator, open it, and let the page make the four apps
+        timeout-minutes: 30
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)['devices']
+          rts=sorted([k for k in d if 'iOS' in k], key=lambda k:[int(x) for x in k.split('iOS-')[-1].split('-') if x.isdigit()])
+          for rt in reversed(rts):
+              for dev in d[rt]:
+                  if dev['name'].startswith('iPhone'): print(dev['udid']); sys.exit(0)
+          ")
+          if [ -z "$UDID" ]; then echo "::warning::No iPhone simulator on this runner"; exit 1; fi
+          xcrun simctl boot "$UDID" > /dev/null 2>&1; xcrun simctl bootstatus "$UDID" -b > /dev/null
+          rm -rf "$RUNNER_TEMP/x" && mkdir -p "$RUNNER_TEMP/x" && (cd "$RUNNER_TEMP/x" && unzip -q "$RUNNER_TEMP/check.ipa")
+          xcrun simctl install "$UDID" "$(ls -d "$RUNNER_TEMP"/x/Payload/*.app | head -1)"
+          LOG="$RUNNER_TEMP/ios.log"; xcrun simctl launch --console-pty "$UDID" com.yannieforest.forgemakers.check -shell_pagetest > "$LOG" 2>&1 & LP=$!
+          for i in $(seq 1 100); do grep -q "FORGE_MAKERS DONE" "$LOG" && break; sleep 3; done
+          kill "$LP" > /dev/null 2>&1 || true
+          grep "FORGE_MAKERS" "$LOG" | cut -c1-400
+          mkdir -p "$RUNNER_TEMP/made"; L=$(grep "FORGE_MAKERS DONE" "$LOG" | tail -1); echo "${L#*FORGE_MAKERS DONE }" > "$RUNNER_TEMP/made/forge-check.json"
+          { echo '### The Forge'"'"'s makers in the iPhone simulator'; echo '```'; cat "$RUNNER_TEMP/made/forge-check.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          xcrun simctl shutdown "$UDID" > /dev/null 2>&1 || true
+          grep -q '"ok":true' "$RUNNER_TEMP/made/forge-check.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: made-ios-sim
+          path: ${{ runner.temp }}/made
+          if-no-files-found: ignore
+
+  pywebview:
+    name: pywebview, as the Forge's ${{ matrix.what }} app opens its page
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - what: Mac
+            runner: macos-15
+            pkgs: '"pywebview==6.2.1"'
+            key: mac-pywebview
+          - what: Windows
+            runner: windows-2025
+            pkgs: '"pywebview==6.2.1" "pythonnet==3.2.0"'
+            key: windows-pywebview
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: pywebview, as the Forge's build installs it
+        run: python -m pip install --quiet ${{ matrix.pkgs }}
+      - name: Open the page from a file:// address, and let it make the four apps
+        timeout-minutes: 10
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          python source/offline_project/forge_647/tests/maker_page.py "$RUNNER_TEMP/forge_makers_check.html"
+          set +e
+          python source/offline_project/forge_647/tests/pywebview_run.py "$RUNNER_TEMP/forge_makers_check.html" "$RUNNER_TEMP/made"
+          rc=$?
+          { echo "### The Forge's makers in pywebview on ${{ matrix.what }}"; echo '```'; cat "$RUNNER_TEMP/made/forge-check.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          ls -la "$RUNNER_TEMP/made"
+          exit $rc
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: made-${{ matrix.key }}
+          path: ${{ runner.temp }}/made
+          if-no-files-found: ignore
+
+  verify:
+    name: Read every app they made
+    needs: [mac-shell, pywebview]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/all
+      - name: The readers (apksigtool and androguard in a place of their own; the JDK's jarsigner and keytool)
+        run: |
+          python3 -m venv "$RUNNER_TEMP/v" && "$RUNNER_TEMP/v/bin/pip" install --quiet apksigtool androguard pillow
+          java -version 2>&1 | head -1
+      - name: Read them
+        run: |
+          rc=0
+          for d in "$RUNNER_TEMP"/all/made-mac-shell "$RUNNER_TEMP"/all/made-mac-pywebview "$RUNNER_TEMP"/all/made-windows-pywebview; do
+            n=$(basename "$d"); echo "== $n"; echo "### $n" >> "$GITHUB_STEP_SUMMARY"
+            if [ ! -d "$d" ]; then echo "FAIL nothing came from $n" | tee -a "$GITHUB_STEP_SUMMARY"; rc=1; continue; fi
+            "$RUNNER_TEMP/v/bin/python3" source/offline_project/forge_647/tests/verify_made.py "$d" "$RUNNER_TEMP/v/bin/apksigtool" "$RUNNER_TEMP/v/bin/python3" > "$RUNNER_TEMP/$n.txt" 2>&1 || rc=1
+            grep -v PROTOTYPE "$RUNNER_TEMP/$n.txt" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+          exit $rc
