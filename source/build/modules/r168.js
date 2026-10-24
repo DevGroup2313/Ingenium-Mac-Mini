@@ -26,7 +26,6 @@ function split(raw){raw=String(raw||"");var think="",ans=raw;
   return {answer:ans.trim(),think:think.trim()};}
 function thinks(m){try{var k=lineupKeyOfRec(m);if(k&&ING_LINEUP.models[k])return !!ING_LINEUP.models[k].thinks;}catch(e){}
   return /think|reason|\br1\b|qwq|qwen3|gemma-?4|mellum/i.test(String((m&&m.fileName)||""));}
-var oAsk=supAsk;
 supAsk=function(prompt,maxTok,onPiece,onThought){var thought="",raw="";
   function piece(t){raw=t;var sp=split(t);if(sp.think&&onThought)try{onThought((thought?thought+"\n":"")+sp.think);}catch(e){}
     if(onPiece&&(sp.answer||!sp.think))onPiece(sp.answer);}
