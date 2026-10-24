@@ -1,0 +1,181 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# The model studio on the machines the apps run on (Ingenium 6.6): GitHub's Apple silicon Mac, Intel Mac and Windows PC,
+# each with the engine and trainer its app carries (the Mac builds' own build caches, compiled by tools/build_engine_mac.sh
+# when not cached; on Windows, llama.cpp's published b11321 build checked by the SHA-256 the Windows repository pins, and
+# the trainer compiled as build-windows.yml compiles it). The desktop app's own code, patched as release.py patches it,
+# widens SmolLM2 135M Instruct (16 bits, checked by its fingerprint) to 32 bits, trains it one pass on a short passage of
+# a public-domain novel, and its engine loads the result and answers (source/rig/studio_device.py). How well it learns is
+# studio-check.yml's work. It builds and publishes nothing.
+name: The model studio, on Mac and Windows
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/build/desktop/app_train_65.py'
+      - 'source/build/desktop/app_studio_65.py'
+      - 'source/rig/studio_device.py'
+      - '.github/workflows/studio-device.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-device-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  mac:
+    name: mac (${{ matrix.chip }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - chip: Apple silicon
+            runner: macos-15
+            plat: macos-arm64
+          - chip: Intel
+            runner: macos-15-intel
+            plat: macos-x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: The engine, from the Mac build's cache
+        id: engine
+        uses: actions/cache@v5
+        with:
+          path: engine/${{ matrix.plat }}
+          key: engine-${{ matrix.plat }}-b11321-portable-v1
+
+      - name: Compile the engine (llama.cpp b11321; only when not cached)
+        if: steps.engine.outputs.cache-hit != 'true'
+        run: |
+          command -v cmake || brew install cmake
+          bash tools/build_engine_mac.sh engine/${{ matrix.plat }} portable "$RUNNER_TEMP/engine-build"
+
+      - name: The trainer, from the Mac build's cache
+        id: trainer
+        uses: actions/cache@v5
+        with:
+          path: engine-trainer/${{ matrix.plat }}
+          key: trainer-${{ matrix.plat }}-b11321-v1
+
+      - name: Compile the trainer (llama.cpp b11321; only when not cached)
+        if: steps.trainer.outputs.cache-hit != 'true'
+        run: |
+          command -v cmake || brew install cmake
+          bash tools/build_engine_mac.sh engine-trainer/${{ matrix.plat }} trainer "$RUNNER_TEMP/engine-build"
+
+      - name: The trainer joins the engine, as in the app
+        run: |
+          cp engine-trainer/${{ matrix.plat }}/llama-finetune engine/${{ matrix.plat }}/llama-finetune
+          chmod 755 engine/${{ matrix.plat }}/llama-finetune
+          ls -la engine/${{ matrix.plat }}
+
+      - name: SmolLM2 135M Instruct, 16 bits (checked by its fingerprint), and the novel
+        run: |
+          f="$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf"
+          curl -fsSL --retry 4 -o "$f" "https://huggingface.co/bartowski/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-f16.gguf"
+          echo "f535f83ec568d040f88ddc04a199fa6da90923bbb41d4dcaed02caa924d6ef57  $f" | shasum -a 256 -c -
+          curl -fsSL --retry 4 -o "$RUNNER_TEMP/novel.txt" "https://www.gutenberg.org/cache/epub/1342/pg1342.txt"
+
+      - name: Widen, train and load it, with the app's own code
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          set +e
+          python3 source/rig/studio_device.py "engine/${{ matrix.plat }}" "$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf" "$RUNNER_TEMP/novel.txt" "$RUNNER_TEMP/studio"
+          rc=$?
+          { echo "### The model studio on the ${{ matrix.chip }} Mac"; echo '```'; cat "$RUNNER_TEMP/studio/studio.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: The engine (llama.cpp's published Windows build of b11321, checked)
+        run: |
+          # the asset and SHA-256 the Windows repository's engine_windows.json pins; the folder holding llama-server.exe
+          # is what the app unpacks
+          python - <<'EOF'
+          import hashlib, os, urllib.request, zipfile
+          z = os.path.join(os.environ["RUNNER_TEMP"], "llama-b11321-bin-win-vulkan-x64.zip")
+          urllib.request.urlretrieve("https://github.com/ggml-org/llama.cpp/releases/download/b11321/llama-b11321-bin-win-vulkan-x64.zip", z)
+          got = hashlib.sha256(open(z, "rb").read()).hexdigest()
+          assert got == "35ee023c2007e65a93f8c9aaa54c846eaadf97adff4332c7ea50a96720f4b2ef", "the engine does not match its checksum: " + got
+          os.makedirs(os.path.join("engine", "windows-x64"), exist_ok=True)
+          with zipfile.ZipFile(z) as src:
+              server = [n for n in src.namelist() if n.replace("\\", "/").split("/")[-1].lower() == "llama-server.exe"][0]
+              base = server[: -len("llama-server.exe")]
+              for n in src.namelist():
+                  if n.startswith(base) and not n.endswith("/") and "/" not in n[len(base):]:
+                      with open(os.path.join("engine", "windows-x64", n[len(base):]), "wb") as out:
+                          out.write(src.read(n))
+          print("Engine verified and unpacked: " + ", ".join(sorted(os.listdir(os.path.join("engine", "windows-x64")))))
+          EOF
+
+      - name: The trainer, from the build cache when it was compiled before
+        id: trainer
+        uses: actions/cache@v5
+        with:
+          path: engine-trainer/windows-x64
+          key: trainer-windows-x64-b11321-v1
+
+      - name: Compile the trainer (llama.cpp b11321, as build-windows.yml does; only when not cached)
+        if: steps.trainer.outputs.cache-hit != 'true'
+        run: |
+          src="$RUNNER_TEMP/llama.cpp-b11321"
+          git -c advice.detachedHead=false clone --quiet --depth 1 --branch b11321 https://github.com/ggml-org/llama.cpp "$src"
+          got="$(git -C "$src" rev-parse HEAD)"
+          case "$got" in b0aca3c*) echo "Source checked: commit ${got:0:7}." ;; *) echo "::error::the source is not the expected commit ($got)"; exit 1 ;; esac
+          cmake -S "$src" -B "$RUNNER_TEMP/trainer-build" -A x64 -DBUILD_SHARED_LIBS=OFF -DLLAMA_OPENSSL=OFF \
+            -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=ON -DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF \
+            -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded > "$RUNNER_TEMP/trainer-cmake.log" 2>&1 \
+            || { tail -40 "$RUNNER_TEMP/trainer-cmake.log"; exit 1; }
+          cmake --build "$RUNNER_TEMP/trainer-build" --config Release --target llama-finetune -j 4 > "$RUNNER_TEMP/trainer-build.log" 2>&1 \
+            || { tail -60 "$RUNNER_TEMP/trainer-build.log"; exit 1; }
+          mkdir -p engine-trainer/windows-x64
+          cp "$RUNNER_TEMP/trainer-build/bin/Release/llama-finetune.exe" engine-trainer/windows-x64/
+
+      - name: The trainer joins the engine, as in the app
+        run: |
+          cp engine-trainer/windows-x64/llama-finetune.exe engine/windows-x64/
+          ls engine/windows-x64
+
+      - name: SmolLM2 135M Instruct, 16 bits (checked by its fingerprint), and the novel
+        run: |
+          f="$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf"
+          curl -fsSL --retry 4 -o "$f" "https://huggingface.co/bartowski/SmolLM2-135M-Instruct-GGUF/resolve/main/SmolLM2-135M-Instruct-f16.gguf"
+          got="$(sha256sum < "$f" | cut -d' ' -f1)"
+          [ "$got" = f535f83ec568d040f88ddc04a199fa6da90923bbb41d4dcaed02caa924d6ef57 ] || { echo "::error::the model does not match its fingerprint ($got)"; exit 1; }
+          echo "Model checked: $got"
+          curl -fsSL --retry 4 -o "$RUNNER_TEMP/novel.txt" "https://www.gutenberg.org/cache/epub/1342/pg1342.txt"
+
+      - name: Widen, train and load it, with the app's own code
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          set +e
+          python source/rig/studio_device.py "engine/windows-x64" "$RUNNER_TEMP/SmolLM2-135M-Instruct-f16.gguf" "$RUNNER_TEMP/novel.txt" "$RUNNER_TEMP/studio"
+          rc=$?
+          { echo "### The model studio on the Windows PC"; echo '```'; cat "$RUNNER_TEMP/studio/studio.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
