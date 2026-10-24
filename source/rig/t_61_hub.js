@@ -95,6 +95,8 @@ const SRC = path.join(__dirname, '..');
   ok(!noEdit[0] && /Editing is for the idea you are working on/.test(noEdit[1]), 'at a release, Edit says plainly that editing is for the idea you work on', noEdit[1]);
   await p.selectOption('#fbWorkBody .h-bar select.h-sel', 'refs/heads/main'); await wait(() => { const l = document.querySelector('#hFileView .h-ln'); return l && /var a = 10;$/.test(l.textContent); });
   await p.click('#fbWorkFoot .f-btn[data-k="edit"]'); await wait(() => !!document.getElementById('fbEdit'));
+  // (the editor says "Reading src/app.js…" until the file is read from the store; the text is looked at once it is there)
+  await wait(() => { const t = document.getElementById('fbEdText'); return !!t && !t.disabled && t.value.length > 0; }, null, 10000);
   const edit = await ev(() => [document.getElementById('fbEdFile').value, document.getElementById('fbEdText').value]);
   ok(edit[0] === 'src/app.js' && /var a = 10;/.test(edit[1]), 'on main, Edit opens Fabrica\'s own editor on this file', edit[0]);
   await ev(() => [...document.querySelectorAll('#fbEdit .f-btn')].find(x => x.textContent === 'Close').click()); await p.waitForTimeout(200);
