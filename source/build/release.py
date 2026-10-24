@@ -82,7 +82,8 @@ def old_bundle(page):
 # this order, where it has not been applied yet (the mark is a function it adds). Refresh is the Mac's alone.
 DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refresh_62", "_restart_page_process", ("mini", "intel")),
            ("app_ctx_62", "_engine_kvq", ("mini", "intel", "win")), ("app_quick_62", "_quick_page", ("mini", "intel", "win")),
-           ("app_guard_62", "_ing_host_ok", ("mini", "intel", "win")), ("app_ctx_63", "_ING_CTX_MAX", ("mini", "intel", "win"))]
+           ("app_guard_62", "_ing_host_ok", ("mini", "intel", "win")), ("app_ctx_63", "_ING_CTX_MAX", ("mini", "intel", "win")),
+           ("app_win_64", "_another_copy_is_open", ("mini", "intel", "win"))]
 
 
 def desktop():

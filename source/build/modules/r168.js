@@ -14,7 +14,8 @@
    Now: the thoughts show while they come, under the answer's box, softly; a model that thinks has room to finish; its
    thoughts never count as its answer; a list written only in its thoughts is taken from there; and when no model is ready,
    or it gives no list, the steps are made from the words of the task (the support module's own, the Forge's too), with one
-   calm line that says so. Stop leaves the task as it was, with its words still in the box. */
+   calm line that says so. Stop leaves the task as it was, with its words still in the box; Use my words instead, beside it,
+   stops the model and gives the steps made from the words at once, so a slow device never keeps anyone waiting. */
 (function(){
 if(typeof supAsk!=="function"||typeof taskBreak!=="function")return;
 /* a model's text with its thoughts taken out: thoughts in <think> tags, closed or not, and before a lone </think> */
@@ -64,6 +65,9 @@ function why(e){var m=String((e&&e.message)||e||"");
 var oRender=fxRenderSteps;
 fxRenderSteps=function(msg){var r=oRender.apply(this,arguments);try{var h=$("fxSteps");if(!h)return r;
     if(fxBusy){var box=$("fxBusyText");if(box&&!$("fxBusyThink")){var th=el("div","fx-busy-think");th.id="fxBusyThink";th.setAttribute("aria-hidden","true");box.parentNode.insertBefore(th,box.nextSibling);}
+      var stop=[].slice.call(h.querySelectorAll(".fx-busy button")).filter(function(b){return b.textContent.trim()==="Stop";})[0];
+      if(stop&&!h.querySelector(".fx-words")){var wk=fxBtn(fxBusy.what==="task"?"Use my words instead":"Split it simply instead","ghost fx-words",function(){if(!fxBusy)return;fxBusy.words=true;try{if(supUsesLink())cloudAbort();else Engine.abort();}catch(e){}});
+        wk.title="Stop the model, and make the steps from the words of the task now";stop.parentNode.insertBefore(wk,stop.nextSibling);}
       fxPaintBusy();return r;}
     if(CALM&&!msg){var n=el("div","fx-note-calm",CALM);n.setAttribute("role","status");h.insertBefore(n,h.firstChild);CALM=null;}
     var ta=$("fxTaskIn");if(ta&&fxRenderSteps.keep){ta.value=fxRenderSteps.keep;fxRenderSteps.keep="";}
@@ -74,27 +78,29 @@ fxPaintBusy=function(){var b=document.getElementById("fxBusyText");if(!b||!fxBus
   var t=document.getElementById("fxBusyThink");if(t){var s=String(fxBusy.think||"").replace(/\s+/g," ").trim();t.textContent=s?"…"+s.slice(-220):"";}};
 window.fxPaintBusy=fxPaintBusy;
 function stopped(){return !!(fxBusy&&fxBusy.stop);}
-document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest(".fx-busy button");if(b&&fxBusy)fxBusy.stop=true;},true);
+document.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest(".fx-busy button");if(b&&fxBusy&&!b.classList.contains("fx-words"))fxBusy.stop=true;},true);
+function words(){return !!(fxBusy&&fxBusy.words);}
 function ask(prompt,max,title){return supAsk(prompt,max,function(t){if(fxBusy){fxBusy.text=t;fxPaintBusy();}},function(t){if(fxBusy){fxBusy.think=t;fxPaintBusy();}});}
 taskBreak=function(title){title=String(title||"").trim();if(!title)return;
   fxBusy={what:"task",title:title,text:"",think:""};fxRenderSteps();
   var prompt="Break this task into small, concrete steps for me.\n\nTask: "+title+"\n\nRules:\n- Between 3 and 8 steps.\n- Each step is one action I can picture myself doing, and starts with a verb.\n- The first step takes less than five minutes.\n- Plain words. No advice, no explanations, no headings.\n\nWrite only the numbered list.";
   function finish(steps,note){fxBusy=null;if(!steps||steps.length<2){steps=offline(title);note=note||"These steps come from the words of your task.";}
     CALM=note||null;taskNew(title,steps);fxRender();}
-  ask(prompt,420,title).then(function(txt){if(stopped()){fxBusy=null;fxRenderSteps.keep=title;fxRenderSteps("Stopped. Nothing was changed.");return;}
+  var asked="These steps come from the words of your task, as you asked. Change any of them in All steps.";
+  ask(prompt,420,title).then(function(txt){if(words())return finish(null,asked);if(stopped()){fxBusy=null;fxRenderSteps.keep=title;fxRenderSteps("Stopped. Nothing was changed.");return;}
       var steps=listOf(txt);if(steps.length<2)steps=lastListOf(supAsk.thought);
       if(steps.length>=2)return finish(steps,null);
       finish(null,supModelName()+" did not write a list this time, so these steps come from the words of your task. Change any of them in All steps.");},
-    function(e){if(stopped()){fxBusy=null;fxRenderSteps.keep=title;fxRenderSteps("Stopped. Nothing was changed.");return;}finish(null,why(e));});};
+    function(e){if(words())return finish(null,asked);if(stopped()){fxBusy=null;fxRenderSteps.keep=title;fxRenderSteps("Stopped. Nothing was changed.");return;}finish(null,why(e));});};
 window.taskBreak=taskBreak;
 taskBreakStep=function(t,i){var st=t.steps[i];if(!st)return;fxBusy={what:"step",title:st.t,text:"",think:""};fxRenderSteps();
   var prompt="This step is too big for me to start: \""+st.t+"\" (part of the task \""+t.title+"\").\n\nBreak it into 2 to 5 smaller steps. Each starts with a verb, the first takes less than two minutes, plain words.\n\nWrite only the numbered list.";
   function put(subs,note){fxBusy=null;if(!subs||subs.length<2){subs=["Get ready for: "+st.t,"Do the first two minutes of it","Look at what is left, and choose the next bit"];}
     t.steps.splice.apply(t.steps,[i,1].concat(subs.map(function(x){return {t:x,done:false,sub:true};})));saveState();CALM=note||null;fxRender();}
-  ask(prompt,300,st.t).then(function(txt){if(stopped()){fxBusy=null;fxRenderSteps("Stopped. Nothing was changed.");return;}
+  ask(prompt,300,st.t).then(function(txt){if(words())return put(null,"The step is split in the simplest way, as you asked. Change any part in All steps.");if(stopped()){fxBusy=null;fxRenderSteps("Stopped. Nothing was changed.");return;}
       var subs=listOf(txt);if(subs.length<2)subs=lastListOf(supAsk.thought);
       put(subs.length>=2?subs:null,subs.length>=2?null:supModelName()+" did not write a list this time, so the step is split in the simplest way. Change any part in All steps.");},
-    function(e){if(stopped()){fxBusy=null;fxRenderSteps("Stopped. Nothing was changed.");return;}put(null,why(e).replace("these steps come from the words of your task","the step is split in the simplest way"));});};
+    function(e){if(words())return put(null,"The step is split in the simplest way, as you asked. Change any part in All steps.");if(stopped()){fxBusy=null;fxRenderSteps("Stopped. Nothing was changed.");return;}put(null,why(e).replace("these steps come from the words of your task","the step is split in the simplest way"));});};
 window.taskBreakStep=taskBreakStep;
 window.__ingStepsFix={split:split,listOf:listOf,lastListOf:lastListOf,thinks:thinks};
 })();
