@@ -1,0 +1,16 @@
+Mac (arm64): macOS 15.7.9, arm64
+{"out":"/Users/runner/work/_temp/mactest-arm64/test.zip","size":219597,"sha256":"484e612239e5ac4bb12171e5b4c460b4739907a2ed8a5ecb8446f400ac932cea","id":"com.yannieforest.shelltest.mac","folder":"Shell Test.app","exe":"ShellTest","signatures":2,"ms":65}
+{"out":"/Users/runner/work/_temp/mactest-arm64/forge.zip","size":5171638,"sha256":"26ce3d75c0a7a570fb77a0599868ec82af1476a432fa4c3cebe1e868687ab8fb","id":"com.yannieforest.theforge.mactest","folder":"The Forge.app","exe":"TheForge","signatures":2,"ms":530}
+     Shell Test.app: com.yannieforest.shelltest.mac, program ShellTest (x86_64 arm64), how to open: 1 file
+PASS a test page in the Mac app Fabrica made: codesign --verify --deep --strict accepts the seal Fabrica wrote (/Users/runner/work/_temp/mactest-arm64/x-mac-arm64-test.png/Shell Test.app: satisfies its Designated Requirement)
+     Gatekeeper's own word (an app from outside the App Store, opened once with Open): /Users/runner/work/_temp/mactest-arm64/x-mac-arm64-test.png/Shell Test.app: rejected 
+PASS a test page in the Mac app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":null,"idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/test_page.html"}
+PASS a test page in the Mac app Fabrica made: the clipboard, written and read back
+PASS a test page in the Mac app Fabrica made: the page saved a file, and it holds what the page gave
+PASS a test page in the Mac app Fabrica made, second start (opened as the Finder opens it): what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":"1792847526404","idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/test_page.html"}
+     The Forge.app: com.yannieforest.theforge.mactest, program TheForge (x86_64 arm64), how to open: 1 file
+PASS The Forge (13 MB page) in the Mac app Fabrica made: codesign --verify --deep --strict accepts the seal Fabrica wrote (/Users/runner/work/_temp/mactest-arm64/x-mac-arm64-forge.png/The Forge.app: satisfies its Designated Requirement)
+     Gatekeeper's own word (an app from outside the App Store, opened once with Open): /Users/runner/work/_temp/mactest-arm64/x-mac-arm64-forge.png/The Forge.app: rejected 
+PASS The Forge (13 MB page) in the Mac app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"The Forge","text":6191,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":null,"idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/the_forge.html"}
+PASS The Forge (13 MB page) in the Mac app Fabrica made: the clipboard, written and read back
+PASS The Forge (13 MB page) in the Mac app Fabrica made: the page saved a file, and it holds what the page gave

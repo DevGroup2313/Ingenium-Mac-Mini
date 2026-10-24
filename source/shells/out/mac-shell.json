@@ -1,0 +1,18 @@
+{
+ "made": "2026-10-24T13:14Z",
+ "from": "f91c71d",
+ "file": "mac-shell.zip",
+ "bytes": 226618,
+ "sha256": "c4471b7d5f6d5f7b9fb9f959c0655c6e9f125bb334e5b6e11e3a31d3e91ac9fe",
+ "bundle": "Shell.app",
+ "executable": "Shell",
+ "archs": [
+  "arm64",
+  "x86_64"
+ ],
+ "min_macos": "12.0",
+ "checked_on": [
+  "macos-15 (Apple silicon)",
+  "macos-15-intel"
+ ]
+}
