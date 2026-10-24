@@ -530,6 +530,19 @@ for _sid, _sf in (("ing-android-shell", "android-shell.dex"), ("ing-ios-shell", 
         if len(_sb) != _rec["bytes"] or _hl.sha256(_sb).hexdigest() != _rec["sha256"]:
             sys.exit("ios-shell.zip: its size or fingerprint does not match ios-shell.json")
     _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
+# ---- R170 (Ingenium 6.5, 24 October 2026): the Mac and Windows shells, so Fabrica makes an app for a Mac and for Windows on
+#      the device too. Both are built by GitHub (.github/workflows/build-shells.yml), opened there as Fabrica fills them, and
+#      checked here against the fingerprint that build wrote beside each ----
+for _sid, _sf, _sj, _what in (("ing-mac-shell", "mac-shell.zip", "mac-shell.json", "Mac app"), ("ing-win-shell", "win-shell.exe", "win-shell.json", "Windows app")):
+    _sp = os.path.join(_shells, _sf)
+    if not os.path.isfile(_sp):
+        print("no " + _sf + ": this page will make no " + _what)
+        continue
+    _sb = open(_sp, "rb").read()
+    _rec = json.load(open(os.path.join(_shells, _sj)))
+    if len(_sb) != _rec["bytes"] or _hl.sha256(_sb).hexdigest() != _rec["sha256"]:
+        sys.exit(_sf + ": its size or fingerprint does not match " + _sj)
+    _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
 # ---- R157 (Ingenium 6.2, 22 October 2026): Ingenium's eyes, the picture reader that needs no model that can see
 #      (eyes/eyes.pack, made by eyes/make_eyes.py: TensorFlow.js, MobileNet v2 in eight bits, Tesseract and its English
 #      data, all Apache-2.0), checked here against eyes.json. The lean copy the Forge carries leaves it out. ----
