@@ -1,5 +1,7 @@
 --------- beginning of main
 --------- beginning of system
-10-21 12:20:02.468  3366  3366 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35702)
-10-21 12:20:02.488  3366  3366 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
-10-21 12:20:02.552  3366  3366 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (35703)
+10-24 13:13:17.778  3269  3269 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33411)
+10-24 13:13:17.801  3269  3269 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33412)
+10-24 13:13:17.870  3269  3269 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33412)
+10-24 13:13:24.302  3269  3269 I IngeniumShell: WARNING the code editor could not start: Object.fromEntries is not a function (67088)
+10-24 13:13:24.315  3269  3269 I IngeniumShell: WARNING the shared code editor is missing (67280)

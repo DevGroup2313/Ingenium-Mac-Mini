@@ -7,4 +7,4 @@ Success
 PASS version 2 installs over it and keeps its storage (run 1, then run 2): {"title":"Shell Test run 2","text":47,"errors":0,"storage":true,"bridge":true}
 Performing Streamed Install
 Success
-PASS The Forge (13 MB page) opens by its launcher name: {"title":"The Forge","text":5293,"errors":0,"storage":true,"bridge":true}
+PASS The Forge (13 MB page) opens by its launcher name: {"title":"The Forge","text":5281,"errors":0,"storage":true,"bridge":true}
