@@ -10,7 +10,7 @@
 //   - a model whose list is written only in its thoughts: that list;
 //   - thoughts that come apart from the answer (Scriba, Qwen3.5) and then a list: the list;
 //   - the model busy: steps from the words, a calm line;
-//   - Stop: nothing changed, the task's words still in the box;
+//   - Stop: nothing changed, the task's words still in the box; Use my words instead, beside it: steps from the words at once;
 //   - Too big? Break it down splits one step into the model's smaller ones;
 //   - axe-core finds nothing on the Focus page; no page errors.
 //   node rig/t_64_steps.js <url of Ingenium> <out folder>
@@ -91,6 +91,14 @@ const DRAFT = ["<think> Let me plan this.\n\nDraft:\n1. Pick a date.\n2. Call fr
     await p.waitForTimeout(500); await p.evaluate(() => { const k = [...document.querySelectorAll('.fx-busy button')].find(x => x.textContent.trim() === 'Stop'); k.click(); }); await p.waitForTimeout(600);
     const st = await p.evaluate(() => ({ n: (state.tasks || []).length, box: (document.getElementById('fxTaskIn') || {}).value, msg: (document.querySelector('#fxSteps .fx-msg') || {}).textContent || '' }));
     ok(st.n === before && st.box === 'tidy the garage' && /Stopped\. Nothing was changed/.test(st.msg), 'Stop: nothing changed, the task\'s words still in the box', st);
+
+    // 7b. Use my words instead: the model stopped, the steps made from the words at once
+    await p.evaluate(c => { __fake.think = []; __fake.content = c; __fake.delay = 120; }, LFMT); await press('pay the electricity bill');
+    await p.waitForTimeout(500);
+    const wk = await p.evaluate(() => { const k = document.querySelector('.fx-busy .fx-words'); return k ? k.textContent.trim() : null; });
+    await p.evaluate(() => document.querySelector('.fx-busy .fx-words').click()); await p.waitForTimeout(600);
+    r = await read();
+    ok(wk === 'Use my words instead' && r.title === 'pay the electricity bill' && r.steps[0] === 'Open the letter, the email or the website for the electricity bill' && /as you asked/.test(r.note), 'Use my words instead, beside Stop: the model stopped, the steps made from the words at once', { wk, r });
 
     // 8. Too big? Break it down
     await p.evaluate(v => { __useModel('LFM2.5-1.2B-Instruct-Q4_K_M.gguf'); __fake.think = []; __fake.content = v; __fake.delay = 15; }, VELOX);
