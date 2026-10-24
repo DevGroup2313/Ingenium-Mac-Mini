@@ -442,6 +442,34 @@ edit('every step. GitHub builds the Fire tablet, iPhone and iPad apps from their
 # ---- 6.2: the install kit names the Windows repository by its real name ----
 edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium-HPWindows"}', "6.2 the Windows repository's name")
 
+# ---- 6.5 (24 October 2026): Train a small model from zero, in four sizes. The owner's words (23 October 2026): "I want Ingenium
+#      to be able to create and train frontier level models inside of the app." A computer at home cannot train a frontier
+#      model (those take weeks on thousands of specialised computers), and the card says so; what it can do grows: beside Tiny
+#      (1.3 million numbers) and Small (6 million), Medium (16 million) and Large (41 million), for a strong computer and much
+#      more text, each saying how much text it wants. The trainer now trains every weight (desktop/app_train_65.py: llama.cpp
+#      left the K and V projections untrained when its batch was smaller than the context), which takes about half as long
+#      again; the estimate follows the times measured for each size (source/rig/train_sizes.txt) ----
+edit('function trainEstimate(chars,size,passes,cores){var perPass=18*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(size==="small"?3.4:1);return Math.max(10,Math.round(perPass*passes+3));}',
+     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16};'
+     'function trainEstimate(chars,size,passes,cores){var perPass=26*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(TRAIN_PACE[size]||1);return Math.max(10,Math.round(perPass*passes+3));}',
+     "6.5 the trainer's estimate for each size")
+edit('[["tiny","Tiny","About 1.3 million numbers: the fastest"],["small","Small","About 6 million numbers: learns more, about three and a half times slower"]]',
+     '[["tiny","Tiny","About 1.3 million numbers: the fastest. A few pages of text are enough."],'
+     '["small","Small","About 6 million numbers: learns more from 50,000 characters or more; about "+TRAIN_PACE.small+" times slower than Tiny."],'
+     '["medium","Medium","About 16 million numbers: for a long book\'s worth of text (500,000 characters or more) and a strong computer; about "+TRAIN_PACE.medium+" times slower than Tiny."],'
+     '["large","Large","About 41 million numbers: for 2 million characters or more, on a strong computer; about "+TRAIN_PACE.large+" times slower than Tiny, often hours."]]',
+     "6.5 four sizes")
+edit('sg.appendChild(seg);b.appendChild(sg);}',
+     'sg.appendChild(seg);b.appendChild(sg);'
+     'var SZ={tiny:["About 1.3 million numbers",2000],small:["About 6 million numbers",50000],medium:["About 16 million numbers",500000],large:["About 41 million numbers",2000000]}[w.size]||["",0];'
+     'var nl=w.text.length,hint=el("div","small muted tr-size");'
+     'hint.textContent=SZ[0]+". "+(nl&&nl<SZ[1]?"It wants "+SZ[1].toLocaleString()+" characters or more; with "+nl.toLocaleString()+", a smaller size learns about as much and sooner, and a larger one only learns this text by heart.":"Its text: "+SZ[1].toLocaleString()+" characters or more.");'
+     'b.appendChild(hint);}',
+     "6.5 what each size wants")
+edit("The tiny model here has about 1.3 million of them; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
+     "The tiny model here has about 1.3 million of them and the large one about 41 million; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
+     "6.5 the lesson names the large size")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
