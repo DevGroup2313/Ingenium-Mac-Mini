@@ -1,0 +1,11 @@
+{
+ "made": "2026-10-24T13:24Z",
+ "from": "eb1e9f9",
+ "file": "win-shell.exe",
+ "bytes": 795136,
+ "sha256": "9332759c123d20a5d9302cfaf0e800a0f6dd9eabede0e47d41982515dfcff5d4",
+ "arch": "x64",
+ "min_windows": "10",
+ "webview2_sdk": "Microsoft.Web.WebView2 1.0.2210.55 (NuGet), sha256 c0945ddfe38272f10f24673a1cb07b54b018f614eec85d3e830628369039ad3d",
+ "checked_on": "windows-2025"
+}
