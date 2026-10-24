@@ -9,7 +9,8 @@ chat, to see that it keeps what it knew.
 import importlib, json, os, pathlib, re, shutil, subprocess, sys, time, urllib.request
 
 BIN, MODEL, NOVEL, OUT = [os.path.abspath(x) for x in sys.argv[1:5]]
-RATES = [float(x) for x in sys.argv[5:]] or [1e-5]
+# each "learning rate[:batches gathered before each step]", such as 1e-5:8
+RUNS = [(float(x.split(":")[0]), int(x.split(":")[1]) if ":" in x else 1) for x in sys.argv[5:]] or [(1e-5, 1)]
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, "..", ".."))
 os.makedirs(OUT, exist_ok=True)
@@ -42,6 +43,9 @@ raw = open(NOVEL, encoding="utf-8", errors="replace").read()
 m1 = re.search(r"\*\*\* ?START OF (THE|THIS) PROJECT GUTENBERG EBOOK[^\n]*\n", raw)
 m2 = re.search(r"\*\*\* ?END OF (THE|THIS) PROJECT GUTENBERG EBOOK", raw)
 book = raw[m1.end() if m1 else 0:m2.start() if m2 else len(raw)].strip()
+# the illustrated edition's captions and their copyright lines are not the novel's prose: left out, as a person's own text has none
+book = re.sub(r"\[Illustration[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\]", "", book)
+book = re.sub(r"\n{3,}", "\n\n", book)
 train_text = book[:120000]
 held = book[-30000:]
 open(os.path.join(OUT, "held.txt"), "w", encoding="utf-8").write(held)
@@ -89,12 +93,13 @@ say("BEFORE: perplexity on the part it never trains on %s" % before)
 say("BEFORE, the passage continued: %r" % c0[:400])
 say("BEFORE, in chat: %r" % q0[:400])
 results = []
-for lr in RATES:
+for lr, period in RUNS:
     app.TRAIN_LR["base"] = (lr, lr / 10)
+    app.TRAIN_PERIOD["base"] = period
     t0 = time.time()
-    r = app._train_start({"base": "smollm2-135m", "text": train_text, "passes": 1, "name": "SmolLM2 135M, the novel, %g" % lr})
+    r = app._train_start({"base": "smollm2-135m", "text": train_text, "passes": 1, "name": "SmolLM2 135M, the novel, %g, %d" % (lr, period)})
     if not r.get("ok"):
-        say("FAIL at %g: %s" % (lr, r))
+        say("FAIL at %g:%d: %s" % (lr, period, r))
         continue
     phases, peak = [], 0
     while True:
@@ -106,17 +111,17 @@ for lr in RATES:
         time.sleep(2)
     secs = round(time.time() - t0)
     if st.get("state") != "done":
-        say("FAIL at %g: %s" % (lr, st.get("error")))
+        say("FAIL at %g:%d: %s" % (lr, period, st.get("error")))
         continue
     out = app._MODEL_PATHS[st["model"]["id"]]
     after = perplexity(out)
     c1, q1 = speak(out)
-    results.append((lr, after))
-    say("AFTER (learning rate %g, one pass, %d s, phases %s): loss %s, held back %s; perplexity on the part it never trains on %s (before %s)"
-        % (lr, secs, " > ".join(phases), st["history"][-1]["loss"] if st.get("history") else None, st["history"][-1]["val"] if st.get("history") else None, after, before))
-    say("AFTER %g, the passage continued: %r" % (lr, c1[:400]))
-    say("AFTER %g, in chat: %r" % (lr, q1[:400]))
-    say("AFTER %g, kept as: %s" % (lr, json.dumps(app._MODEL_META.get(st["model"]["id"]))))
+    results.append(((lr, period), after))
+    say("AFTER (learning rate %g, %d batches a step, one pass, %d s, phases %s): loss %s, held back %s; perplexity on the part it never trains on %s (before %s)"
+        % (lr, period, secs, " > ".join(phases), st["history"][-1]["loss"] if st.get("history") else None, st["history"][-1]["val"] if st.get("history") else None, after, before))
+    say("AFTER %g:%d, the passage continued: %r" % (lr, period, c1[:400]))
+    say("AFTER %g:%d, in chat: %r" % (lr, period, q1[:400]))
+    say("AFTER %g:%d, kept as: %s" % (lr, period, json.dumps(app._MODEL_META.get(st["model"]["id"]))))
 open(os.path.join(OUT, "studio.txt"), "w", encoding="utf-8").write("\n".join(lines) + "\n")
 ok = results and before and min(a for _, a in results if a) < before
 say("PASS: trained further, it reads the novel's own words better than before" if ok else "FAIL: no training read the novel better than before")

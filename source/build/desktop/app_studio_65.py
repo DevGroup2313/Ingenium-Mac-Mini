@@ -36,6 +36,13 @@ TRAIN_LR_MORE = {''')
 rep('''"large": (1e-5, 1e-6)}
 # the batch is the context''', '''"large": (1e-5, 1e-6), "base": (5e-6, 5e-7)}
 # the batch is the context''')
+# a model that already writes well is moved by the average of several batches at a time, so one batch's quirks do not
+# pull every weight (llama.cpp's "period": batches gathered before each step of the optimiser)
+rep('''TRAIN_CTX = 256
+''', '''TRAIN_CTX = 256
+TRAIN_PERIOD = {"base": 8}
+''')
+rep('''"-b", str(TRAIN_CTX),''', '''"-b", str(TRAIN_CTX * TRAIN_PERIOD.get(size, 1)),''')
 
 STUDIO = r'''
 
