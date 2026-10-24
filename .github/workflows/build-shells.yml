@@ -22,6 +22,11 @@
 # and checked as Fabrica fills it (modules/r170.js, in Node), on an Apple silicon Mac and on an Intel one: codesign accepts
 # the seal Fabrica writes, and the app opens, keeps its storage from one start to the next, and saves a file.
 #
+# 6.5: the Windows shell (source/shells/windows), 64-bit, with Microsoft's WebView2, built here and kept at
+#   source/shells/out/win-shell.exe and win-shell.json
+# and checked as Fabrica fills it: the app's own icon on the file, two starts with the storage kept, one copy at a time,
+# a file saved, and The Forge's 13 MB page.
+#
 # It runs only when the shells' own sources change (never for a new page), so it
 # never starts the app builds, and it never publishes anything: its one result is
 # the commit back to this branch.
@@ -377,3 +382,65 @@ jobs:
             sleep $((i * 7))
           done
           echo "::error::the Mac shell could not be kept in the branch"; exit 1
+
+  windows:
+    name: Windows shell (build, fill as Fabrica does, open, keep)
+    runs-on: windows-2025
+    timeout-minutes: 40
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Build the shell (64-bit, WebView2's loader and the C++ runtime inside)
+        shell: pwsh
+        run: pwsh -File source/shells/windows/build_windows.ps1 "$env:RUNNER_TEMP\winshell"
+
+      - name: Fill it as Fabrica does, and open it
+        timeout-minutes: 20
+        shell: pwsh
+        run: |
+          node --version
+          pwsh -File source/shells/test/ci_windows.ps1 "$env:RUNNER_TEMP\winshell\win-shell.exe" "$env:RUNNER_TEMP\checks"
+          $rc = $LASTEXITCODE
+          Get-Content "$env:RUNNER_TEMP\checks\windows.txt" | Add-Content $env:GITHUB_STEP_SUMMARY
+          exit $rc
+
+      - name: Keep the shell and what was seen in this branch
+        shell: bash
+        run: |
+          set -e
+          OUT=source/shells/out; K="$RUNNER_TEMP/keepwin"; mkdir -p "$K/checks"
+          cp "$RUNNER_TEMP/winshell/win-shell.exe" "$K/"
+          cp "$RUNNER_TEMP"/checks/windows* "$K/checks/" 2>/dev/null || true
+          SDK=$(cat "$RUNNER_TEMP/winshell/win-shell-sdk.txt" | tr -d '\r\n\357\273\277')
+          python - "$K" "$SDK" <<'PY'
+          import hashlib, json, os, sys, datetime
+          k, sdk = sys.argv[1], sys.argv[2]; b = open(os.path.join(k, "win-shell.exe"), "rb").read()
+          rec = {"made": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"), "from": os.environ.get("GITHUB_SHA", "")[:7],
+                 "file": "win-shell.exe", "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest(), "arch": "x64",
+                 "min_windows": "10", "webview2_sdk": sdk, "checked_on": "windows-2025"}
+          json.dump(rec, open(os.path.join(k, "win-shell.json"), "w"), indent=1)
+          print(json.dumps(rec, indent=1))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            if git fetch -q origin "$GITHUB_REF_NAME" && git reset -q --hard FETCH_HEAD; then
+              mkdir -p "$OUT/checks"; cp "$K/win-shell.exe" "$K/win-shell.json" "$OUT/"; cp "$K"/checks/* "$OUT/checks/" 2>/dev/null || true
+              git add "$OUT/win-shell.exe" "$OUT/win-shell.json" "$OUT/checks"
+              if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
+              git commit -q -m "The Windows shell, built by GitHub (64-bit, WebView2), for Fabrica" && git push -q origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            fi
+            sleep $((i * 7))
+          done
+          echo "::error::the Windows shell could not be kept in the branch"; exit 1
+
+      - name: Keep the pictures and logs with this run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-shell-check
+          path: |
+            ${{ runner.temp }}/checks/*
+            ${{ runner.temp }}/wintest/*.log
+          if-no-files-found: ignore
