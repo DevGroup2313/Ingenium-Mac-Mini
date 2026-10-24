@@ -17,6 +17,11 @@
 # that keeps its storage. What they report, with a picture, is kept in
 # source/shells/out/checks.
 #
+# 6.5: the Mac shell (source/shells/mac), one program for Apple silicon and Intel, built and sealed ad hoc here and kept at
+#   source/shells/out/mac-shell.zip and mac-shell.json
+# and checked as Fabrica fills it (modules/r170.js, in Node), on an Apple silicon Mac and on an Intel one: codesign accepts
+# the seal Fabrica writes, and the app opens, keeps its storage from one start to the next, and saves a file.
+#
 # It runs only when the shells' own sources change (never for a new page), so it
 # never starts the app builds, and it never publishes anything: its one result is
 # the commit back to this branch.
@@ -29,6 +34,7 @@ on:
       - 'source/shells/**'
       - '!source/shells/out/**'
       - 'source/build/modules/r136.js'
+      - 'source/build/modules/r170.js'
       - '.github/workflows/build-shells.yml'
   workflow_dispatch: {}
 
@@ -263,3 +269,111 @@ jobs:
             sleep $((i * 7))
           done
           echo "::warning::the emulator's report could not be kept in the branch"
+
+  mac:
+    name: Mac shell (build for Apple silicon and Intel, fill as Fabrica does, open on Apple silicon)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Build the shell (one program for both kinds of Mac, sealed ad hoc)
+        run: |
+          xcrun swiftc --version
+          bash source/shells/mac/build_mac.sh "$RUNNER_TEMP/macshell"
+
+      - name: Fill it as Fabrica does, and open it (Apple silicon)
+        timeout-minutes: 20
+        run: |
+          node --version
+          bash source/shells/test/ci_mac.sh "$RUNNER_TEMP/macshell/mac-shell.zip" "$RUNNER_TEMP/checks" arm64
+          RC=$?
+          cat "$RUNNER_TEMP/checks/mac-arm64.txt" >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+
+      - name: Hand the shell and what was seen to the next jobs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-shell
+          path: |
+            ${{ runner.temp }}/macshell/mac-shell.zip
+            ${{ runner.temp }}/checks/mac-*
+          if-no-files-found: ignore
+
+  mac-intel:
+    name: Mac shell, filled as Fabrica fills it (open on Intel)
+    needs: mac
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: The shell the job before built
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-shell
+          path: ${{ runner.temp }}/got
+
+      - name: Fill it as Fabrica does, and open it (Intel)
+        timeout-minutes: 20
+        run: |
+          ZIP=$(find "$RUNNER_TEMP/got" -name mac-shell.zip | head -1)
+          bash source/shells/test/ci_mac.sh "$ZIP" "$RUNNER_TEMP/checks" intel
+          RC=$?
+          cat "$RUNNER_TEMP/checks/mac-intel.txt" >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+
+      - name: Hand what was seen to the next job
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-intel-checks
+          path: ${{ runner.temp }}/checks/mac-*
+          if-no-files-found: ignore
+
+  mac-keep:
+    name: Keep the Mac shell in this branch
+    needs: [mac, mac-intel]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: The shell and what both Macs saw
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/got
+
+      - name: Keep them
+        run: |
+          set -e
+          OUT=source/shells/out; mkdir -p "$OUT/checks"
+          K="$RUNNER_TEMP/keep"; mkdir -p "$K/checks"
+          cp "$(find "$RUNNER_TEMP/got" -name mac-shell.zip | head -1)" "$K/mac-shell.zip"
+          find "$RUNNER_TEMP/got" -path '*mac-*' \( -name 'mac-*.txt' -o -name 'mac-*.png' \) -exec cp {} "$K/checks/" \;
+          python3 - "$K" <<'PY'
+          import hashlib, json, os, sys, datetime
+          k = sys.argv[1]; b = open(os.path.join(k, "mac-shell.zip"), "rb").read()
+          rec = {"made": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%MZ"), "from": os.environ.get("GITHUB_SHA", "")[:7],
+                 "file": "mac-shell.zip", "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest(),
+                 "bundle": "Shell.app", "executable": "Shell", "archs": ["arm64", "x86_64"], "min_macos": "12.0",
+                 "checked_on": ["macos-15 (Apple silicon)", "macos-15-intel"]}
+          json.dump(rec, open(os.path.join(k, "mac-shell.json"), "w"), indent=1)
+          print(json.dumps(rec, indent=1))
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            if git fetch -q origin "$GITHUB_REF_NAME" && git reset -q --hard FETCH_HEAD; then
+              cp "$K/mac-shell.zip" "$K/mac-shell.json" "$OUT/" && cp "$K"/checks/* "$OUT/checks/" 2>/dev/null || true
+              git add "$OUT/mac-shell.zip" "$OUT/mac-shell.json" "$OUT/checks"
+              if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
+              git commit -q -m "The Mac shell, built by GitHub (Apple silicon and Intel in one program, sealed ad hoc), for Fabrica" && git push -q origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            fi
+            sleep $((i * 7))
+          done
+          echo "::error::the Mac shell could not be kept in the branch"; exit 1
