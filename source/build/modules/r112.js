@@ -682,13 +682,17 @@ var ICONS={apk:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M1
   ipa:'<rect x="5.5" y="2.5" width="13" height="19" rx="3"/><path d="M10.5 5.3h3"/><circle cx="12" cy="18.2" r=".9"/>',
   web:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.7 2.6 2.7 15.4 0 18M12 3c-2.7 2.6-2.7 15.4 0 18"/>',
   page:'<path d="M6 2.5h8l4 4V21.5H6z"/><path d="M14 2.5v4h4"/>',
-  kits:'<path d="M4 7.5l8-4 8 4v9l-8 4-8-4z"/><path d="M4 7.5l8 4 8-4M12 11.5v9"/>'};
+  kits:'<path d="M4 7.5l8-4 8 4v9l-8 4-8-4z"/><path d="M4 7.5l8 4 8-4M12 11.5v9"/>',
+  mac:'<rect x="4" y="4.5" width="16" height="11" rx="1.6"/><path d="M2 19.5h20M9.5 19.5l.6-2h3.8l.6 2"/>',
+  win:'<rect x="3" y="4" width="18" height="15" rx="1.8"/><path d="M3 8h18M6 6h.01M8.5 6h.01"/>'};
 var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android device: signed here, it installs as it is"],
   ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],
+  ["mac","Mac app","For a MacBook or a Mac mini (Apple silicon and Intel in one): drag it to Applications and open it"],
+  ["win","Windows app (.exe)","For a Windows 10 or 11 PC: one file that opens as it is, with nothing to install"],
   ["web","Web app (.zip)","Installs from a browser and works offline; on iPhone and iPad, Add to Home Screen"],
   ["page","One page (.html)","The whole app in one file, for any browser"],
   ["kits","Build kits (.zip)","Projects to build the apps on a computer or online: you choose the devices"]];
-var NOTE={page:"onePage",web:"webApp",kits:"kits",apk:"apk",ipa:"ipa"};
+var NOTE={page:"onePage",web:"webApp",kits:"kits",apk:"apk",ipa:"ipa",mac:"macApp",win:"winApp"};
 /* the family's apps keep the ids, launcher names and bridges their earlier packages had, so a package made here installs over
    one built by the Forge or by GitHub (with that one's key). Ingenium's own Fire app carries the model engine and its models,
    which a shell does not: its package here has an id of its own, so it installs beside Ingenium, never over it. */
@@ -702,12 +706,12 @@ window.fbKnown=KNOWN;
 function downloadAsApp(r){if(!window.IngDownload){toast("This copy has no Download as an app.");return;}if(!r||!r.head){toast("Keep a first version first.");return;}var P=pkgOf(r),snap=null;
   IngDownload.open({getHtml:function(){busy("Reading the version you kept…");return IngShip.onePage(r.id,{quiet:true}).then(function(x){unbusy();snap=x;return x.html;},function(e){unbusy();fail(e);return "";});},
     title:P.title,id:P.id,version:P.version||verOf(r)||"",keyId:P.keyId,app:P.app,alias:P.alias,
-    onMade:function(k,name,mime,bytes){if(!snap)return;var kind={mac:"kits",macarm:"kits",windows:"kits",ipa:"ipa",apk:"apk",web:"web",html:"page"}[k]||"page";
+    onMade:function(k,name,mime,bytes){if(!snap)return;var kind={kits:"kits",mac:"mac",windows:"win",ipa:"ipa",apk:"apk",web:"web",html:"page"}[k]||"page";
       return keepMade(r,snap.commit,kind,name,mime,bytes).then(function(){return IngRepo.setNote(r.id,snap.commit,NOTE[kind],{at:Date.now(),size:bytes.length,name:name});}).then(function(){return refresh();}).then(paint);}});}
 var KITS=[["fire","Fire tablet"],["iphone","iPhone"],["ipad","iPad"],["mac","MacBook (Intel)"],["macarm","Mac mini (Apple silicon)"],["windows","Windows"]];
 function kitsHere(){return typeof kitStore==="function"&&typeof kitAssemble==="function"&&typeof makeZip==="function"&&!!document.getElementById("ingenium-kit-bundle");}
-function targetHere(k){try{if(k==="kits")return kitsHere();if(k==="apk")return !!(window.IngApk&&document.getElementById("ing-android-shell"));if(k==="ipa")return !!(window.IngIpa&&IngIpa.has());}catch(e){return false;}return true;}
-function whyNot(k){return k==="kits"?"The kits are made on a computer: this build of Ingenium carries no kit store.":k==="apk"?"This build of Ingenium carries no Android shell.":k==="ipa"?"This build of Ingenium carries no iPhone and iPad shell.":"";}
+function targetHere(k){try{if(k==="kits")return kitsHere();if(k==="apk")return !!(window.IngApk&&document.getElementById("ing-android-shell"));if(k==="ipa")return !!(window.IngIpa&&IngIpa.has());if(k==="mac")return !!(window.IngMac&&IngMac.has());if(k==="win")return !!(window.IngWin&&IngWin.has());}catch(e){return false;}return true;}
+function whyNot(k){return k==="kits"?"The kits are made on a computer: this build of Ingenium carries no kit store.":k==="apk"?"This build of Ingenium carries no Android shell.":k==="ipa"?"This build of Ingenium carries no iPhone and iPad shell.":k==="mac"?"This build of Ingenium carries no Mac shell.":k==="win"?"This build of Ingenium carries no Windows shell.":"";}
 function shipPrefs(r){var f=FBS();if(!f.ship)f.ship={};var p=f.ship[r.id];if(!p)p=f.ship[r.id]={};if(!p.chosen)p.chosen=["apk","page"];if(!p.kits)p.kits=KITS.map(function(k){return k[0];});return p;}
 function slugId(r){var s=String(r.slug||r.name||"app").toLowerCase().replace(/[^a-z0-9]+/g,"");if(!s||/^[0-9]/.test(s))s="app"+s;return "com.yannieforest."+s.slice(0,40);}
 function pkgOf(r){var p=shipPrefs(r),k=appOf(r),K=KNOWN[k]||{};
@@ -765,15 +769,21 @@ function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();mak
   var p;
   if(what==="page")p=IngShip.onePage(r.id).then(function(x){var name=x.name||(r.slug+".html");return saveBytes(name,"text/html",x.bytes).then(function(){return keepMade(r,x.commit,what,name,"text/html",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="web")p=IngShip.webApp(r.id).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
-  else if(what==="apk"||what==="ipa")p=makeDevice(r,what);
+  else if(what==="apk"||what==="ipa"||what==="mac"||what==="win")p=makeDevice(r,what);
   else p=makeKits(r,opt.kits||shipPrefs(r).kits);
   return p.then(function(){making(r,what,100);return refresh();}).then(function(){making(r,what,null);paint();if(!opt.quiet)toast(TARGETS.filter(function(t){return t[0]===what;})[0][1]+" made and saved. It is kept under Releases too.");},
     function(e){making(r,what,null);if(!opt.quiet)fail(e);throw e;});}
-/* the APK or the IPA: the version kept, made into one page, in the shell Ingenium carries (R136) */
+/* the APK, the IPA, the Mac app or the Windows app: the version kept, made into one page, in the shell Ingenium carries
+   (R136; the Mac and Windows shells from 6.5, R170) */
 function makeDevice(r,what){var P=pkgOf(r),said=function(t){say(r,what,t);};
   said("Reading the version you kept…");
   return IngShip.onePage(r.id,{quiet:true}).then(function(x){var vn=String(P.version||verOf(r)||IngShip._.numberOf(x.html,x.recipe||{})||"1.0").replace(/^v(?=\d)/,"");
     said("Drawing its icons…");making(r,what,25);
+    if(what==="mac"||what==="win"){var M=what==="mac"?IngMac:IngWin;
+      return M.iconsFor(x.html,P.title,colorOf(r),flatSrc(P.app)||null).then(function(icons){making(r,what,45);
+        return M.make({html:x.bytes,page:x.page.split("/").pop(),title:P.title,id:P.id,versionName:vn,build:String(IngApk.versionCodeNow()),icons:icons,bridges:P.ios,onStep:said});})
+        .then(function(a){var stem=(P.title.replace(/[^\w.-]+/g,"-").replace(/^-+|-+$/g,"")||"app")+"-"+(what==="mac"?"mac":"windows")+"-"+vn.replace(/[^\w.-]+/g,"");
+          return {name:stem+".zip",mime:"application/zip",bytes:a.bytes,commit:x.commit,info:{at:Date.now(),size:a.size,sha256:a.sha256,id:a.id}};});}
     return IngApk.iconsFor(x.html,P.title,colorOf(r),flatSrc(P.app)||null).then(function(icons){var page=x.page.split("/").pop(),stem=(P.title.replace(/[^\w.-]+/g,"-").replace(/^-+|-+$/g,"")||"app")+"-"+vn.replace(/[^\w.-]+/g,"");
       making(r,what,45);
       if(what==="apk")return IngApk.make({html:x.bytes,page:page,title:P.title,id:P.id,versionName:vn,icons:icons.android,background:"#ffffff",bridges:P.and,alias:P.alias,keyId:P.keyId,onStep:said})

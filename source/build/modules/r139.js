@@ -6,8 +6,9 @@
    download for anything built there and for the Build and possibly Fabrica page."
    The Forge's step 5 (Download the app), in Ingenium: a row for each device with its emoji, the app's name, id and version
    above, each press makes that device's package alone, and All makes every one, one after another, each saved before the
-   next is made. The iPhone and iPad and the Fire tablet rows make the app itself (an IPA, a signed APK) here; the Mac and
-   Windows rows make the project GitHub builds into the app. Offered in Chat and Code (the preview's menu and its Download
+   next is made. The iPhone and iPad and the Fire tablet rows make the app itself (an IPA, a signed APK) here; from 6.5 the
+   Mac and Windows rows do too (R170: one Mac app for Apple silicon and Intel, one Windows program), and each row still
+   offers the project GitHub builds into the app. Offered in Chat and Code (the preview's menu and its Download
    key), in Build and in Fabrica. */
 #modalBox.dl-wide{width:min(920px,96vw) !important;max-width:96vw !important;max-height:92vh;overflow:auto}
 .dl-app h3{margin:0 0 4px;font-size:20px}
@@ -52,9 +53,8 @@ function kb(n){try{return fmtBytes(n);}catch(e){return n+" bytes";}}
 
 /* the devices, as the Forge shows them; a kit is the project GitHub (or the computer) builds into the app */
 var DEV=[
-  {k:"mac",e:"🍎",t:"Mac (MacBook, Intel)",d:"The Mac project with its build recipe: built online, the ready-made app comes to your Releases page. It also builds on the Mac itself with Build Mac App.command.",kind:"kit",kit:"mac"},
-  {k:"macarm",e:"🖥️",t:"Mac mini (Apple silicon)",d:"For a Mac with an Apple chip, such as your Mac mini: the same project, built for Apple silicon, with a guide written for it.",kind:"kit",kit:"macarm"},
-  {k:"windows",e:"🪟",t:"Windows",d:"The Windows project with its build recipe: built online, the program comes with its installer (a Setup .exe that adds a Start menu entry).",kind:"kit",kit:"windows"},
+  {k:"mac",e:"🍎",t:"Mac (MacBook and Mac mini)",d:"The app itself, made here: one app for Apple silicon (your Mac mini) and Intel (your MacBook), macOS 12 or newer. Drag it to Applications; the first time, Control-click it and choose Open.",kind:"mac",alt:{label:"Or the Mac projects",kits:["mac","macarm"]}},
+  {k:"windows",e:"🪟",t:"Windows",d:"The app itself, made here: one program that opens as it is on Windows 10 and 11, with nothing to install. The first time, Windows may ask: More info, then Run anyway.",kind:"win",alt:{label:"Or the Windows project",kits:["windows"]}},
   {k:"ipa",e:"📱",t:"iPhone and iPad",d:"The app itself (.ipa), made here. Sideloadly or AltStore installs it from a computer with your Apple ID (seven days with a free Apple ID, a year with a paid one).",kind:"ipa",alt:{label:"Or the Xcode projects",kits:["iphone","ipad"]}},
   {k:"apk",e:"🔥",t:"Fire and Android",d:"The app itself (.apk), made and signed here: open it on the tablet to install it. Signed with the same key, each new one installs over the last and keeps your work.",kind:"apk",alt:{label:"Or the Android project",kits:["fire"]}},
   {k:"web",e:"🌐",t:"Web",d:"An installable site: the page, its manifest, its offline worker and its icons, for any web host (https). On iPhone and iPad, Add to Home Screen.",kind:"web"},
@@ -69,8 +69,10 @@ function stem(t){return (String(t||"app").replace(/[^\w.-]+/g,"-").replace(/^-+|
 function hereKits(){return typeof kitStore==="function"&&typeof kitAssemble==="function"&&typeof makeZip==="function"&&!!$("ingenium-kit-bundle");}
 function hereApk(){return !!(window.IngApk&&$("ing-android-shell"));}
 function hereIpa(){try{return !!(window.IngIpa&&IngIpa.has());}catch(e){return false;}}
-function here(d){return d.kind==="kit"?hereKits():d.kind==="apk"?hereApk():d.kind==="ipa"?hereIpa():true;}
-function whyNot(d){return d.kind==="kit"?"Made on a computer: the Mac and Windows apps of Ingenium carry the projects (the phone and tablet apps leave them out).":d.kind==="apk"?"This copy of Ingenium carries no Android shell.":d.kind==="ipa"?"This copy of Ingenium carries no iPhone and iPad shell.":"";}
+function hereMac(){try{return !!(window.IngMac&&IngMac.has());}catch(e){return false;}}
+function hereWin(){try{return !!(window.IngWin&&IngWin.has());}catch(e){return false;}}
+function here(d){return d.kind==="kit"?hereKits():d.kind==="apk"?hereApk():d.kind==="ipa"?hereIpa():d.kind==="mac"?hereMac():d.kind==="win"?hereWin():true;}
+function whyNot(d){return d.kind==="kit"?"Made on a computer: the Mac and Windows apps of Ingenium carry the projects (the phone and tablet apps leave them out).":d.kind==="apk"?"This copy of Ingenium carries no Android shell.":d.kind==="ipa"?"This copy of Ingenium carries no iPhone and iPad shell.":d.kind==="mac"?"This copy of Ingenium carries no Mac shell.":d.kind==="win"?"This copy of Ingenium carries no Windows shell.":"";}
 
 /* a picture drawn at one size, as a PNG */
 function png(src,z,fill){return new Promise(function(res,rej){var im=new Image();im.onload=function(){var c=E("canvas");c.width=z;c.height=z;var x=c.getContext("2d");x.imageSmoothingEnabled=true;try{x.imageSmoothingQuality="high";}catch(e){}
@@ -109,6 +111,10 @@ function make(d,P,html,said,alt){var bytes=te.encode(html),page=P.page||"index.h
     return kitStore().then(function(store){return ids.map(function(id){var k=kitAssemble(store,id,who,html);return {name:k.zip,mime:"application/zip",bytes:makeZip(k.entries)};});});}
   if(d.kind==="html")return Promise.resolve([{name:(P.file||stem(P.title)+".html").replace(/[^\w.() -]+/g,"_"),mime:"text/html",bytes:bytes}]);
   if(d.kind==="web"){said("Drawing its icons…");return webZip(P,html).then(function(x){return [x];});}
+  if(d.kind==="mac"||d.kind==="win"){var M=d.kind==="mac"?IngMac:IngWin,vm=String(P.version||"1.0").replace(/^v(?=\d)/,"");said("Drawing its icon…");
+    return M.iconsFor(html,P.title,"#6a3fb5",P.app&&window.ING_SEALS&&ING_SEALS[P.app]?"data:image/png;base64,"+ING_SEALS[P.app].b64:null).then(function(icons){
+      return M.make({html:bytes,page:page,title:P.title,id:P.id,versionName:vm,build:String(IngApk.versionCodeNow()),icons:icons,bridges:P.ios,onStep:said});})
+      .then(function(a){return [{name:stem(P.title)+"-"+(d.kind==="mac"?"mac":"windows")+"-"+stem(vm)+".zip",mime:"application/zip",bytes:a.bytes,info:a}];});}
   said("Drawing its icons…");
   return IngApk.iconsFor(html,P.title,"#6a3fb5",P.app&&window.ING_SEALS&&ING_SEALS[P.app]?"data:image/png;base64,"+ING_SEALS[P.app].b64:null).then(function(icons){var vn=String(P.version||"1.0").replace(/^v(?=\d)/,"");
     if(d.kind==="apk")return IngApk.make({html:bytes,page:page,title:P.title,id:P.id,versionName:vn,icons:icons.android,background:"#ffffff",bridges:P.and,alias:P.alias,keyId:P.keyId||"device",onStep:said})
@@ -146,7 +152,7 @@ function open(opt){opt=opt||{};
     [fT,fI,fV].forEach(function(i){i.addEventListener("input",function(){try{read();}catch(e){}});});ks.onchange=function(){try{read();}catch(e){}};
     /* the devices */
     var list=box.querySelector(".dl-devs"),rows={},busy=false;
-    function nameFor(d){var vn=stem(P.version);return d.kind==="html"?(P.file||stem(P.title)+".html"):d.kind==="web"?stem(P.title)+"-web-"+vn+".zip":d.kind==="apk"?stem(P.title)+"-"+vn+".apk":d.kind==="ipa"?(window.IngIpa?IngIpa.iosName(P.title):stem(P.title))+"-"+vn+".ipa":"the "+d.t+" project (.zip)";}
+    function nameFor(d){var vn=stem(P.version);return d.kind==="html"?(P.file||stem(P.title)+".html"):d.kind==="web"?stem(P.title)+"-web-"+vn+".zip":d.kind==="apk"?stem(P.title)+"-"+vn+".apk":d.kind==="ipa"?(window.IngIpa?IngIpa.iosName(P.title):stem(P.title))+"-"+vn+".ipa":d.kind==="mac"?stem(P.title)+"-mac-"+vn+".zip":d.kind==="win"?stem(P.title)+"-windows-"+vn+".zip":"the "+d.t+" project (.zip)";}
     function paintNames(){DEV.forEach(function(d){var r=rows[d.k];if(r)r.file.textContent=here(d)?nameFor(d):whyNot(d);});}
     DEV.forEach(function(d){var row=E("div","dl-dev"+(here(d)?"":" off"));row.setAttribute("role","listitem");
       var b=E("button","dl-emo",d.e);b.type="button";b.title=here(d)?"Make and save the "+d.t+" package":whyNot(d);b.setAttribute("aria-label",b.title);
@@ -161,7 +167,7 @@ function open(opt){opt=opt||{};
     function lock(on){busy=on;DEV.forEach(function(d){var r=rows[d.k];r.b.disabled=on||!here(d);r.mk.disabled=on||!here(d);});allB.disabled=on;}
     function run(d,alt){var r=rows[d.k];r.row.classList.add("busy");r.row.classList.remove("done");say(d,"Making…","run");
       return Promise.resolve().then(function(){read();return make(d,P,html,function(t){say(d,t,"run");},alt);}).then(function(files){var q=Promise.resolve(),names=[];
-          files.forEach(function(f){q=q.then(function(){say(d,"Saving "+f.name+"…","run");return save(f).then(function(){names.push(f.name+" · "+kb(f.bytes.length));if(typeof opt.onMade==="function"){try{return opt.onMade(d.k,f.name,f.mime,f.bytes,f.info||null);}catch(e){}}});});});
+          files.forEach(function(f){q=q.then(function(){say(d,"Saving "+f.name+"…","run");return save(f).then(function(){names.push(f.name+" · "+kb(f.bytes.length));if(typeof opt.onMade==="function"){try{return opt.onMade(alt?"kits":d.k,f.name,f.mime,f.bytes,f.info||null);}catch(e){}}});});});
           return q.then(function(){r.row.classList.remove("busy");r.row.classList.add("done");say(d,"Saved: "+names.join(", "),"ok");return true;});})
         .catch(function(e){r.row.classList.remove("busy");var m=e&&e.message?e.message:String(e);try{if(window.IngErr)m=IngErr.say(e);}catch(_){}say(d,m.charAt(0).toUpperCase()+m.slice(1),"bad");return false;});}
     function one(d,alt){if(busy)return;lock(true);run(d,alt).then(function(){lock(false);});}
@@ -171,7 +177,7 @@ function open(opt){opt=opt||{};
     allB.onclick=function(){if(busy)return;try{read();}catch(e){ingToast(e.message);return;}lock(true);var q=Promise.resolve(),ok=0,bad=0;
       avail.forEach(function(d,i){q=q.then(function(){allSt.textContent=(i+1)+" of "+avail.length+": "+d.t+"…";return run(d,false).then(function(x){if(x)ok++;else bad++;});});});
       q.then(function(){lock(false);allSt.textContent=ok+" saved"+(bad?", "+bad+" not made (see the row)":"")+".";});};
-    setTimeout(function(){try{rows.apk&&here(DEV[4])?rows.apk.b.focus():allB.focus();}catch(e){}},80);});}
+    setTimeout(function(){try{var ad=DEV.filter(function(x){return x.k==="apk";})[0];rows.apk&&ad&&here(ad)?rows.apk.b.focus():allB.focus();}catch(e){}},80);});}
 
 window.IngDownload={open:open,devices:DEV,make:function(k,P,html){var d=DEV.filter(function(x){return x.k===k;})[0];return make(d,P,html,function(){},false);}};
 
