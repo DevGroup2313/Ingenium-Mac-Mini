@@ -50,7 +50,7 @@ def committed(repo):
     return out
 
 REPO_CHECKS = (".github/workflows/studio-check.yml", ".github/workflows/studio-device.yml", ".github/workflows/key-rotation-check.yml",
-               ".github/workflows/steps-probe.yml", ".github/workflows/windows-home-check.yml")
+               ".github/workflows/steps-probe.yml", ".github/workflows/windows-home-check.yml", ".github/workflows/forge-makers-check.yml")
 KEYLIKE = re.compile(r"(^|/)signing/|\.(keystore|jks|p12|pfx|pem|key|mobileprovision)$|(^|/)(signing\.properties|SIGNING\.txt)$", re.I)
 
 
