@@ -9,6 +9,9 @@ chat, to see that it keeps what it knew.
 import importlib, json, os, pathlib, re, shutil, subprocess, sys, time, urllib.request
 
 BIN, MODEL, NOVEL, OUT = [os.path.abspath(x) for x in sys.argv[1:5]]
+# llama.cpp's programs find their libraries by the folder they were compiled in, which a cached build no longer has; the
+# trainer the app starts inherits this
+os.environ["LD_LIBRARY_PATH"] = BIN
 # each learning rate to try; none given, the app's own (TRAIN_LR["base"]). (llama.cpp b11321 holds a batch to the context, so
 # its "period", batches gathered before each step, is always one here: tried and found to change nothing)
 RUNS = [(float(x), 1) for x in sys.argv[5:]] or [(None, 1)]
@@ -53,7 +56,7 @@ open(os.path.join(OUT, "held.txt"), "w", encoding="utf-8").write(held)
 say("SmolLM2 135M Instruct; the novel: %d characters, trained on the first %d, measured on the last %d" % (len(book), len(train_text), len(held)))
 say("the models it could start from: %s" % json.dumps(app._train_bases()["models"]))
 
-env = dict(os.environ, LD_LIBRARY_PATH=BIN)
+env = dict(os.environ)
 
 
 def perplexity(model):
