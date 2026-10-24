@@ -450,7 +450,7 @@ edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium
 #      left the K and V projections untrained when its batch was smaller than the context), which takes about half as long
 #      again; the estimate follows the times measured for each size (source/rig/train_sizes.txt) ----
 edit('function trainEstimate(chars,size,passes,cores){var perPass=18*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(size==="small"?3.4:1);return Math.max(10,Math.round(perPass*passes+3));}',
-     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16},TRAIN_BASE_PACE=0.55;'
+     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16},TRAIN_BASE_PACE=0.5;'
      'function trainEstimate(chars,size,passes,cores){var pace=/^base:/.test(String(size))?TRAIN_BASE_PACE*(+String(size).slice(5)||135000000)/1328256:(TRAIN_PACE[size]||1);'
      'var perPass=26*(chars/144000)*(3/Math.max(1,(cores||4)-1))*pace;return Math.max(10,Math.round(perPass*passes+3));}',
      "6.5 the trainer's estimate for each size")
@@ -486,7 +486,7 @@ edit('      else{var sg=el("div","field");sg.appendChild(el("span",null,"Size"))
      '      else{var fr=el("div","field");fr.appendChild(el("span",null,"Start from"));var fseg=el("div","seg");'
      '[["zero","A new model","It starts as random numbers and learns only from your text"],["model","A model you have","It keeps what it already knew and learns your text\'s way of writing"]].forEach(function(o){'
      'var bt=el("button","seg-btn"+((w.base?"model":"zero")===o[0]?" active":""),o[1]);bt.type="button";bt.title=o[2];'
-     'bt.onclick=function(){if(o[0]==="zero"){if(w.base){w.base="";w.passes=8;}}else if(!w.base){var c=(w.bases||[]).filter(function(m){return m.trainable&&m.fits;})[0];w.base=c?c.id:"none";w.passes=2;}paint();};fseg.appendChild(bt);});'
+     'bt.onclick=function(){if(o[0]==="zero"){if(w.base){w.base="";w.passes=8;}}else if(!w.base){var c=(w.bases||[]).filter(function(m){return m.trainable&&m.fits;})[0];w.base=c?c.id:"none";w.passes=1;}paint();};fseg.appendChild(bt);});'
      'fr.appendChild(fseg);b.appendChild(fr);}\n'
      '      if(!w.fromModel&&w.base){var bl=w.bases,okm=(bl||[]).filter(function(m){return m.trainable;}),bf=el("div","field");bf.appendChild(el("span",null,"The model"));'
      'if(bl===null)bf.appendChild(el("div","small muted","Reading your models…"));'
@@ -494,11 +494,11 @@ edit('      else{var sg=el("div","field");sg.appendChild(el("span",null,"Size"))
      'else{var bsel=el("select","tr-base");bsel.setAttribute("aria-label","The model to start from");okm.forEach(function(m){var o=el("option",null,m.name+" · "+Math.round((m.params||0)/1e6)+" million numbers · needs about "+m.needGB+" GB"+(m.fits?"":" (more than this computer has)"));o.value=m.id;o.disabled=!m.fits;bsel.appendChild(o);});'
      'if(!okm.some(function(m){return m.id===w.base&&m.fits;}))w.base=(okm.filter(function(m){return m.fits;})[0]||{}).id||"none";bsel.value=w.base;bsel.onchange=function(){w.base=bsel.value;paint();};bf.appendChild(bsel);}'
      'b.appendChild(bf);var nok=(bl||[]).filter(function(m){return !m.trainable;});if(nok.length)b.appendChild(el("div","small muted tr-why",nok.length+" of your models cannot be trained here. "+nok[0].name+": "+nok[0].why));'
-     'b.appendChild(el("div","small muted tr-size","It keeps what it already knew and learns your text\'s way of writing. One or two passes are enough; many more can make it forget what it knew."));}\n'
+     'b.appendChild(el("div","small muted tr-size","It keeps what it already knew and learns your text\'s way of writing. One pass is enough (it reads each part twice); a second can help with much text; more can make it forget what it knew."));}\n'
      '      else if(!w.fromModel){var sg=el("div","field");sg.appendChild(el("span",null,"Size"));var seg=el("div","seg");',
      "6.6 start from a new model or one you have")
 edit('var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=2;rg.max=30;rg.value=w.passes;',
-     'var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=w.base?1:2;rg.max=w.base?10:30;rg.value=w.passes;',
+     'var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=w.base?1:2;rg.max=w.base?5:30;rg.value=w.passes;',
      "6.6 fewer passes for a model you have")
 edit('var est=trainEstimate(w.text.length||10000,w.size,w.passes,cores);',
      'var est=trainEstimate(w.text.length||10000,w.base&&!w.fromModel?"base:"+((((w.bases||[]).filter(function(m){return m.id===w.base;})[0])||{}).params||135000000):w.size,w.passes,cores);',

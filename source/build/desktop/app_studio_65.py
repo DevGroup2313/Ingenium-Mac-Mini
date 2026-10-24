@@ -29,20 +29,16 @@ def rep(old, new, n=1):
     s = s.replace(old, new)
 
 
-# the learning rates for a model started from one the person has (measured on SmolLM2 135M, .github/workflows/studio-check.yml)
+# the learning rates for a model started from one the person has, measured on SmolLM2 135M Instruct trained further on a novel
+# (.github/workflows/studio-check.yml; source/rig/train_sizes.txt, part 4): perplexity on the part it never trained on went
+# from 23.13 to 21.68 at 1e-6, and it kept its way in chat; at 3e-6 to 21.75, its chat wandering into the novel's manner; at
+# 1e-5 it rose (27.80, 28.78) and its chat was lost
 rep('''"large": (3e-5, 3e-6)}
-TRAIN_LR_MORE = {''', '''"large": (3e-5, 3e-6), "base": (1e-5, 1e-6)}
+TRAIN_LR_MORE = {''', '''"large": (3e-5, 3e-6), "base": (1e-6, 1e-7)}
 TRAIN_LR_MORE = {''')
 rep('''"large": (1e-5, 1e-6)}
-# the batch is the context''', '''"large": (1e-5, 1e-6), "base": (5e-6, 5e-7)}
+# the batch is the context''', '''"large": (1e-5, 1e-6), "base": (5e-7, 5e-8)}
 # the batch is the context''')
-# a model that already writes well is moved by the average of several batches at a time, so one batch's quirks do not
-# pull every weight (llama.cpp's "period": batches gathered before each step of the optimiser)
-rep('''TRAIN_CTX = 256
-''', '''TRAIN_CTX = 256
-TRAIN_PERIOD = {"base": 8}
-''')
-rep('''"-b", str(TRAIN_CTX),''', '''"-b", str(TRAIN_CTX * TRAIN_PERIOD.get(size, 1)),''')
 
 STUDIO = r'''
 
@@ -214,7 +210,7 @@ rep('''    more = str(spec.get("from_model") or "")
         info = _gguf_summary(_MODEL_PATHS[base])
         if not info.get("trainable"):
             return {"ok": False, "error": info.get("why") or "That model cannot be trained here."}
-        passes = max(1, min(10, int(spec.get("passes") or 2)))
+        passes = max(1, min(5, int(spec.get("passes") or 1)))
 ''')
 rep('''    threading.Thread(target=_train_run, args=(exe, work, size, passes, name, more), daemon=True).start()''',
     '''    threading.Thread(target=_train_run, args=(exe, work, size, passes, name, more, base), daemon=True).start()''')

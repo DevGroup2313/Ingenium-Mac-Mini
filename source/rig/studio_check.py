@@ -9,8 +9,9 @@ chat, to see that it keeps what it knew.
 import importlib, json, os, pathlib, re, shutil, subprocess, sys, time, urllib.request
 
 BIN, MODEL, NOVEL, OUT = [os.path.abspath(x) for x in sys.argv[1:5]]
-# each "learning rate[:batches gathered before each step]", such as 1e-5:8
-RUNS = [(float(x.split(":")[0]), int(x.split(":")[1]) if ":" in x else 1) for x in sys.argv[5:]] or [(1e-5, 1)]
+# each learning rate to try; none given, the app's own (TRAIN_LR["base"]). (llama.cpp b11321 holds a batch to the context, so
+# its "period", batches gathered before each step, is always one here: tried and found to change nothing)
+RUNS = [(float(x), 1) for x in sys.argv[5:]] or [(None, 1)]
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, "..", ".."))
 os.makedirs(OUT, exist_ok=True)
@@ -94,8 +95,9 @@ say("BEFORE, the passage continued: %r" % c0[:400])
 say("BEFORE, in chat: %r" % q0[:400])
 results = []
 for lr, period in RUNS:
+    if lr is None:
+        lr = app.TRAIN_LR["base"][0]
     app.TRAIN_LR["base"] = (lr, lr / 10)
-    app.TRAIN_PERIOD["base"] = period
     t0 = time.time()
     r = app._train_start({"base": "smollm2-135m", "text": train_text, "passes": 1, "name": "SmolLM2 135M, the novel, %g, %d" % (lr, period)})
     if not r.get("ok"):

@@ -34,3 +34,17 @@ on the part of the text the trainer never trains on (its own split); guessing at
 3. A model in 16 or 8 bits, widened to 32 for the trainer (the model studio's next part)
    Perplexity on 20,000 characters (llama-perplexity, -c 128): the trained Tiny 157.0152; its F16 copy 157.0157 and that
    widened back 157.0157; BF16 157.0107 and widened 157.0076; Q8_0 156.9045 and widened 156.9875.
+
+4. A real open model trained further (.github/workflows/studio-check.yml, GitHub's Linux machine, 4 cores)
+   SmolLM2 135M Instruct, 16 bits (bartowski's file, fingerprint f535f83e...), widened by the app's own code and trained by
+   llama.cpp b11321 on the first 120,000 characters of Pride and Prejudice (Project Gutenberg; the illustrated edition's
+   captions left out), one pass; perplexity on the novel's last 30,000 characters, which it never trains on: 23.13 before.
+     1e-6   21.68   its continuation reads like the novel; in chat it still answers: "A good way to spend a rainy afternoon
+                    is to take a walk along the water's edge, watching the sunset and enjoying the beauty of the landscape."
+     3e-6   21.75   better read, but its chat answer wanders off into the novel's manner
+     1e-5   27.80 and 28.78 (two runs): worse, and its chat was lost; 3e-5 47.0
+   One pass of 120,000 characters took 996 seconds on 3 threads (the page's estimate: 0.5 x Tiny's pace per Tiny's numbers).
+   llama.cpp holds a batch to its context (llama-context.cpp: n_batch = min(n_ctx, n_batch)), so gathering several batches
+   before each step ("period") cannot be had with the 256-token context every weight needs: 3e-6 with eight was the same, to
+   the last figure, as with one. So: 1e-6 from zero passes, one pass by default (llama.cpp reads the text in windows that
+   overlap by half, so a pass reads each part twice).

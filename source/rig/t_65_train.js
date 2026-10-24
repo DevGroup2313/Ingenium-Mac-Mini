@@ -68,15 +68,15 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
       est: document.querySelector('#trBody .tr-est').textContent, note: (document.querySelector('#trBody .tr-size') || {}).textContent || '' }));
     ok(/Train a model you have on your text/.test(bm.title) && bm.opts.length === 2 && /SmolLM2 135M Instruct · 135 million numbers · needs about 2.8 GB/.test(bm.opts[0]) && /\(more than this computer has\) \(off\)$/.test(bm.opts[1]) && bm.val === 'smollm2-135m',
       'a model you have: the trainable ones listed with what they need, one too large for this computer shown but not offered', bm.opts);
-    ok(/Qwen Coder 1\.5B: Its numbers are packed smaller than 8 bits/.test(bm.why) && !bm.size && /One or two passes are enough/.test(bm.note), 'one that cannot be trained says why; no size to choose; one or two passes advised', { why: bm.why, note: bm.note });
+    ok(/Qwen Coder 1\.5B: Its numbers are packed smaller than 8 bits/.test(bm.why) && !bm.size && /One pass is enough/.test(bm.note), 'one that cannot be trained says why; no size to choose; one pass advised', { why: bm.why, note: bm.note });
     const rawB = await p.evaluate(() => [trainEstimate(500000, 'tiny', 2, 8), trainEstimate(500000, 'base:134515008', 2, 8)]);
-    ok(bm.passes.join() === '1,10,2' && rawB[1] > rawB[0] * 20, 'passes from 1 to 10, two to begin with; the estimate follows the model\'s size', { passes: bm.passes, est: rawB });
+    ok(bm.passes.join() === '1,5,1' && rawB[1] > rawB[0] * 20, 'passes from 1 to 5, one to begin with; the estimate follows the model\'s size', { passes: bm.passes, est: rawB });
     await p.screenshot({ path: path.join(OUT, 'train_from_model.png') });
     await p.click('#trNext'); await p.waitForTimeout(1500);
     const asked2 = await p.evaluate(() => window.__trainAsked);
     const line = await p.evaluate(() => (document.getElementById('trLine') || {}).textContent || '');
-    ok(asked2 && asked2.base === 'smollm2-135m' && asked2.passes === 2 && asked2.from_model === '' && /Widening the model to 32-bit numbers/.test(line),
-      'Start training hands the trainer the model to start from and two passes, and the progress names the widening', { asked: asked2 && { base: asked2.base, passes: asked2.passes }, line });
+    ok(asked2 && asked2.base === 'smollm2-135m' && asked2.passes === 1 && asked2.from_model === '' && /Widening the model to 32-bit numbers/.test(line),
+      'Start training hands the trainer the model to start from and one pass, and the progress names the widening', { asked: asked2 && { base: asked2.base, passes: asked2.passes }, line });
     // none of the person's models can be trained
     await p.evaluate(() => { try { closeModal(); } catch (e) {} window.__trainAsked = null; const a = window.trainApi(); a.train_bases = () => ({ ok: true, models: [{ id: 'qwen-q4', name: 'Qwen Coder 1.5B', params: 1.5e9, trainable: false, why: 'packed smaller', fits: true, needGB: 24.6 }] }); });
     await p.evaluate(() => openTrainer(null)); await p.waitForSelector('#trBody'); await p.click('#trNext'); await p.waitForTimeout(200);
