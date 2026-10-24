@@ -55,7 +55,7 @@ spec = importlib.util.spec_from_file_location("ingenium_app", APP)
 ia = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(ia)
 api = ia.IngeniumApi("http://127.0.0.1/")
-api.main_window = FakeWin("main", None)
+api._main_window = api.main_window = FakeWin("main", None)  # 6.4 keeps it as _main_window (app_win_64.py)
 
 # ---- open_lite and the window page ----
 ia._LITE["blocked"] = False

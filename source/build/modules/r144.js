@@ -739,7 +739,7 @@ function match(target){var ctl=target&&target.closest?target.closest(INTERACTIVE
 var hk=null;
 function ensureKey(){hk=$i("ingHelpKey");if(hk)return hk;var host=$i("topTools")||D.querySelector(".topbar");if(!host)return null;
   hk=mk("button","cl-key ih-help",null,{id:"ingHelpKey","aria-haspopup":"dialog","aria-expanded":"false","aria-keyshortcuts":"F1"});hk.type="button";
-  hk.appendChild(mk("span","ih-q","?",{"aria-hidden":"true"}));hk.appendChild(mk("span","kl","Help"));
+  hk.appendChild(mk("span","kl","Help"));hk.appendChild(mk("span","ih-q","?",{"aria-hidden":"true"}));
   hk.addEventListener("click",function(){toggleHelp();});host.appendChild(hk);nameKey();return hk;}
 function nameKey(){if(!hk)return;var n=helpFor(pageNow()).name;hk.setAttribute("aria-label","Help with "+n);
   hk.title="Help with "+n+" (F1): what it is for, what people do here, and What is this? for any control";}
