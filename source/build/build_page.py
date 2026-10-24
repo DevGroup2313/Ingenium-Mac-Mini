@@ -450,8 +450,9 @@ edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium
 #      left the K and V projections untrained when its batch was smaller than the context), which takes about half as long
 #      again; the estimate follows the times measured for each size (source/rig/train_sizes.txt) ----
 edit('function trainEstimate(chars,size,passes,cores){var perPass=18*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(size==="small"?3.4:1);return Math.max(10,Math.round(perPass*passes+3));}',
-     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16};'
-     'function trainEstimate(chars,size,passes,cores){var perPass=26*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(TRAIN_PACE[size]||1);return Math.max(10,Math.round(perPass*passes+3));}',
+     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16},TRAIN_BASE_PACE=0.55;'
+     'function trainEstimate(chars,size,passes,cores){var pace=/^base:/.test(String(size))?TRAIN_BASE_PACE*(+String(size).slice(5)||135000000)/1328256:(TRAIN_PACE[size]||1);'
+     'var perPass=26*(chars/144000)*(3/Math.max(1,(cores||4)-1))*pace;return Math.max(10,Math.round(perPass*passes+3));}',
      "6.5 the trainer's estimate for each size")
 edit('[["tiny","Tiny","About 1.3 million numbers: the fastest"],["small","Small","About 6 million numbers: learns more, about three and a half times slower"]]',
      '[["tiny","Tiny","About 1.3 million numbers: the fastest. A few pages of text are enough."],'
@@ -469,6 +470,59 @@ edit('sg.appendChild(seg);b.appendChild(sg);}',
 edit("The tiny model here has about 1.3 million of them; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
      "The tiny model here has about 1.3 million of them and the large one about 41 million; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
      "6.5 the lesson names the large size")
+
+# ---- 6.6 (24 October 2026): a model you have, trained further on your own text (desktop/app_studio_65.py has the trainer's
+#      side). The size step asks where to start: a new model (random numbers, as before) or one of the person's models that
+#      llama.cpp's trainer can take (Llama-shaped, in 32, 16 or 8 bits), each with the memory its training needs; one it
+#      cannot take says why. A model started from one already trained keeps what it knew, so one or two passes are enough,
+#      and the chart's line for guessing at random belongs to a model trained from zero only ----
+edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null}',
+     'var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null,base:"",bases:null}', "6.6 the wizard remembers where it starts")
+edit('Promise.resolve(a.train_available()).then(function(av){cores=(av&&av.cores)||4;});',
+     'Promise.resolve(a.train_available()).then(function(av){cores=(av&&av.cores)||4;});'
+     'Promise.resolve(typeof a.train_bases==="function"?a.train_bases():null).then(function(r){w.bases=r&&r.models?r.models:[];if(step===2)paint();},function(){w.bases=[];if(step===2)paint();});',
+     "6.6 the models it could start from")
+edit('      else{var sg=el("div","field");sg.appendChild(el("span",null,"Size"));var seg=el("div","seg");',
+     '      else{var fr=el("div","field");fr.appendChild(el("span",null,"Start from"));var fseg=el("div","seg");'
+     '[["zero","A new model","It starts as random numbers and learns only from your text"],["model","A model you have","It keeps what it already knew and learns your text\'s way of writing"]].forEach(function(o){'
+     'var bt=el("button","seg-btn"+((w.base?"model":"zero")===o[0]?" active":""),o[1]);bt.type="button";bt.title=o[2];'
+     'bt.onclick=function(){if(o[0]==="zero"){if(w.base){w.base="";w.passes=8;}}else if(!w.base){var c=(w.bases||[]).filter(function(m){return m.trainable&&m.fits;})[0];w.base=c?c.id:"none";w.passes=2;}paint();};fseg.appendChild(bt);});'
+     'fr.appendChild(fseg);b.appendChild(fr);}\n'
+     '      if(!w.fromModel&&w.base){var bl=w.bases,okm=(bl||[]).filter(function(m){return m.trainable;}),bf=el("div","field");bf.appendChild(el("span",null,"The model"));'
+     'if(bl===null)bf.appendChild(el("div","small muted","Reading your models…"));'
+     'else if(!okm.length){w.base="none";bf.appendChild(el("div","small tr-none","None of your models can be trained here yet. A small open model in 16-bit or 8-bit form can, such as SmolLM2 135M Instruct (271 MB) or SmolLM2 360M Instruct (726 MB), made by Hugging Face\'s own team (Apache 2.0): add one from More models on the Models page (its quality For training), then come back."));}'
+     'else{var bsel=el("select","tr-base");bsel.setAttribute("aria-label","The model to start from");okm.forEach(function(m){var o=el("option",null,m.name+" · "+Math.round((m.params||0)/1e6)+" million numbers · needs about "+m.needGB+" GB"+(m.fits?"":" (more than this computer has)"));o.value=m.id;o.disabled=!m.fits;bsel.appendChild(o);});'
+     'if(!okm.some(function(m){return m.id===w.base&&m.fits;}))w.base=(okm.filter(function(m){return m.fits;})[0]||{}).id||"none";bsel.value=w.base;bsel.onchange=function(){w.base=bsel.value;paint();};bf.appendChild(bsel);}'
+     'b.appendChild(bf);var nok=(bl||[]).filter(function(m){return !m.trainable;});if(nok.length)b.appendChild(el("div","small muted tr-why",nok.length+" of your models cannot be trained here. "+nok[0].name+": "+nok[0].why));'
+     'b.appendChild(el("div","small muted tr-size","It keeps what it already knew and learns your text\'s way of writing. One or two passes are enough; many more can make it forget what it knew."));}\n'
+     '      else if(!w.fromModel){var sg=el("div","field");sg.appendChild(el("span",null,"Size"));var seg=el("div","seg");',
+     "6.6 start from a new model or one you have")
+edit('var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=2;rg.max=30;rg.value=w.passes;',
+     'var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=w.base?1:2;rg.max=w.base?10:30;rg.value=w.passes;',
+     "6.6 fewer passes for a model you have")
+edit('var est=trainEstimate(w.text.length||10000,w.size,w.passes,cores);',
+     'var est=trainEstimate(w.text.length||10000,w.base&&!w.fromModel?"base:"+((((w.bases||[]).filter(function(m){return m.id===w.base;})[0])||{}).params||135000000):w.size,w.passes,cores);',
+     "6.6 the estimate for a model you have")
+edit('a.train_start({name:w.name,text:w.text,size:w.size,passes:w.passes,from_model:w.fromModel||""})',
+     '(w.base==="none"&&!w.fromModel?{ok:false,error:"Choose a model to start from first, or start from a new model."}:a.train_start({name:w.name,text:w.text,size:w.size,passes:w.passes,from_model:w.fromModel||"",base:w.fromModel?"":(w.base||"")}))',
+     "6.6 the trainer is told where to start")
+edit('(w.fromModel?"Train further":"Train a small model from zero")',
+     '(w.fromModel?"Train further":w.base?"Train a model you have on your text":"Train a small model from zero")', "6.6 the wizard's title")
+edit('var ph={preparing:"Preparing",vocabulary:"Learning a vocabulary of 2,048 pieces from your text",model:"Making the new model with random numbers",training:"Training"}[st.phase]||"";',
+     'var ph={preparing:"Preparing",vocabulary:"Learning a vocabulary of 2,048 pieces from your text",model:"Making the new model with random numbers",widening:"Widening the model to 32-bit numbers, which the trainer needs",training:"Training"}[st.phase]||"";',
+     "6.6 the widening step, named")
+edit('Guessing at random among 2,048 pieces gives about 7.6 (the dotted line).',
+     'For a model trained from zero, guessing at random among 2,048 pieces gives about 7.6 (the dotted line).', "6.6 the random line belongs to a new model")
+edit('; guessing at random gives about 7.6."));',
+     '"+(done.nvocab&&done.nvocab!==2048?".":"; for a model trained from zero, guessing at random gives about 7.6.")));', "6.6 the result's random figure")
+edit('function trainChart(hist){var W=420,H=150,L=34,R=12,T=18,B=24,RAND=Math.log(2048);if(!hist||!hist.length)return null;',
+     'function trainChart(hist,noRand){var W=420,H=150,L=34,R=12,T=18,B=24,RAND=Math.log(2048);if(!hist||!hist.length)return null;', "6.6 the chart without the random line")
+edit('var vals=[RAND];', 'var vals=noRand?[]:[RAND];', "6.6 the chart's scale without the random line")
+edit("""+'<line x1="'+L+'" y1="'+y(RAND).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(RAND).toFixed(1)+'" class="tr-rand"/><text x="'+(W-R)+'" y="'+(y(RAND)-4).toFixed(1)+'" text-anchor="end" class="tr-lab">guessing at random</text>'""",
+     """+(noRand?'':'<line x1="'+L+'" y1="'+y(RAND).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(RAND).toFixed(1)+'" class="tr-rand"/><text x="'+(W-R)+'" y="'+(y(RAND)-4).toFixed(1)+'" text-anchor="end" class="tr-lab">guessing at random</text>')""",
+     "6.6 the random line drawn for a new model only")
+edit('var c=trainChart(st.history);', 'var c=trainChart(st.history,!!(st.nvocab&&st.nvocab!==2048));', "6.6 the live chart")
+edit('var ch=trainChart(done.history);', 'var ch=trainChart(done.history,!!(done.nvocab&&done.nvocab!==2048));', "6.6 the result's chart")
 
 for old, new, label, times in EDITS:
     n = out.count(old)
