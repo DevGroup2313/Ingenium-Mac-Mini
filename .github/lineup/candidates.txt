@@ -1,22 +1,9 @@
-# round 4: each file downloads without signing in
-head https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking-GGUF/resolve/main/Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf
-head https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf
-head https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/mmproj-gemma-4-12b-it-qat-q4_0.gguf
-head https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/main/gemma-4-E4B_q4_0-it.gguf
-head https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf
-head https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/main/gemma-4-26B_q4_0-it.gguf
-head https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-GGUF/resolve/main/LFM2.5-8B-A1B-Q4_K_M.gguf
-head https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF/resolve/main/LFM2.5-24B-A2B-Q4_K_M.gguf
-head https://huggingface.co/ibm-granite/granite-4.2-3b-GGUF/resolve/main/granite-4.2-3b-Q4_K_M.gguf
-head https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-head https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf
-head https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking/raw/main/LICENSE
-head https://huggingface.co/LiquidAI/LFM2.5-8B-A1B/raw/main/LICENSE
-head https://huggingface.co/LiquidAI/LFM2.5-24B-A2B/raw/main/LICENSE
-head https://huggingface.co/google/gemma-4-12B-it/raw/main/LICENSE
-head https://huggingface.co/ibm-granite/granite-4.2-3b/raw/main/LICENSE
-head https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/raw/main/LICENSE
-head https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/raw/main/LICENSE
-repo google/gemma-4-12B-it
-repo JetBrains/Mellum2.1-12B-A2.5B-Thinking
-card google/gemma-4-12B-it
+# round 5 (6.5, the model studio): a small open model to train further on the owner's own text. llama.cpp's trainer takes a
+# model in 32-bit numbers, so the source is a GGUF in 16 bits (or the full model); which exist, and how large
+search HuggingFaceTB
+search * SmolLM2 GGUF
+repo HuggingFaceTB/SmolLM2-135M-Instruct-GGUF
+repo HuggingFaceTB/SmolLM2-360M-Instruct-GGUF
+repo bartowski/SmolLM2-135M-Instruct-GGUF
+repo bartowski/SmolLM2-360M-Instruct-GGUF
+head https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/raw/main/README.md
