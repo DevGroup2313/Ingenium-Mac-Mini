@@ -91,7 +91,8 @@ async function boot(p, url) {
 async function fresh(b, vp) { const ctx = await b.newContext({ viewport: vp || { width: 1440, height: 900 }, acceptDownloads: true }); const p = await ctx.newPage(); p.__errs = [];
   p.on('pageerror', e => p.__errs.push(e.message)); return { ctx, p }; }
 async function settings(p, tab) {
-  await p.evaluate(() => go('settings')); await p.waitForSelector('#bkCard', { timeout: 15000 });
+  // 6.7: Settings is in rooms (r173); Backup and moving is in Your data, so that room is opened first, as a person would
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#bkCard', { timeout: 15000 });
   if (tab) { await p.click('#bkTab-' + tab); await p.waitForTimeout(250); }
   await p.evaluate(() => document.getElementById('bkCard').scrollIntoView({ block: 'start' })); await p.waitForTimeout(250);
 }

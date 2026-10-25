@@ -141,7 +141,8 @@ const msgs = p => p.evaluate(() => curMsgs().map(m => ({ role: m.role, text: Str
     ok(ms.filter(m => m.card).length >= 2 && /practice text/.test(ms[ms.length - 1].text), 'with words sent too, the practice note follows what it saw', ms.slice(-3));
 
     // ---- Settings ----
-    await p.evaluate(() => go('settings')); await p.waitForTimeout(600);
+    // 6.7: Settings is in rooms (r173); Ingenium's eyes is in Models and AI, so that room is opened first, as a person would
+    await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'ai'); }); await p.waitForTimeout(600);
     const st = await p.evaluate(() => { const c = document.getElementById('ingEyesCard'); return c ? { on: document.getElementById('eyesOn').checked, words: document.getElementById('eyesWords').checked, after: c.previousElementSibling && c.previousElementSibling.id } : null; });
     ok(st && st.on && st.words, 'Settings: Ingenium\'s eyes, its two switches on', st);
     const nt = await p.evaluate(() => { const d = document.querySelector('#ingEyesCard .ey-notice pre'); return d ? d.textContent : ''; });
