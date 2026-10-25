@@ -1,0 +1,122 @@
+[
+ {
+  "old": "'</b>'+d.text+(d.code?",
+  "new": "'</b>'+(window.IngSafe?IngSafe.html(String(d.text==null?'':d.text)):String(d.text==null?'':d.text).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}))+(d.code?",
+  "count": 1,
+  "why": "the diary: an entry's text drawn through the cleaner (file names, a restored backup)"
+ },
+ {
+  "old": "if(m.who==='you'){ d.textContent=m.text; } else { d.innerHTML=m.text; }",
+  "new": "if(m.who==='you'){ d.textContent=m.text; } else { d.innerHTML=(window.IngSafe?IngSafe.html(String(m.text==null?'':m.text)):String(m.text==null?'':m.text).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})); }",
+  "count": 1,
+  "why": "the command chat: the Forge's own lines drawn through the cleaner (formatting kept)"
+ },
+ {
+  "old": "d.className='cmd-line '+(kind||''); d.innerHTML=line; o.prepend(d);",
+  "new": "d.className='cmd-line '+(kind||''); d.innerHTML=(window.IngSafe?IngSafe.html(String(line==null?'':line)):String(line==null?'':line).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})); o.prepend(d);",
+  "count": 1,
+  "why": "the command line's answer, the same"
+ },
+ {
+  "old": "(f.unit?' \\u00b7 '+f.unit:'')",
+  "new": "(f.unit?' \\u00b7 '+String(f.unit).replace(/</g,'&lt;'):'')",
+  "count": 1,
+  "why": "Fontes: a source's unit escaped as its other fields are"
+ },
+ {
+  "old": "  if (!d || d.kind !== 'carpe-print' || !d.name) return;\n",
+  "new": "  if (!d || d.kind !== 'carpe-print' || !d.name) return;\n  if (window.__forgeFromCarried && !window.__forgeFromCarried(ev)) return;\n",
+  "count": 1,
+  "why": "printing only for the apps the Forge carries"
+ },
+ {
+  "old": "  if (!d || d.kind !== 'carpe-save' || !d.name) return;\n",
+  "new": "  if (!d || d.kind !== 'carpe-save' || !d.name) return;\n  if (window.__forgeFromCarried && !window.__forgeFromCarried(ev)) return;\n",
+  "count": 1,
+  "why": "saving only for the apps the Forge carries"
+ },
+ {
+  "old": "if(!d||d.kind!=='carpe-download')return;try{var blob;",
+  "new": "if(!d||d.kind!=='carpe-download')return;if(window.__forgeFromCarried&&!window.__forgeFromCarried(ev))return;try{var blob;",
+  "count": 1,
+  "why": "downloading only for the apps the Forge carries"
+ },
+ {
+  "old": "  if(e.meth===0) return Promise.resolve(c);\n  if(e.meth!==8) return Promise.reject(err('broken',app));\n  if(!canInflate()) return Promise.reject(err('nostream',app));\n  return new Response(new Blob([c]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer()",
+  "new": "  if(window.__fgZipOk && !window.__fgZipOk(e)) return Promise.reject(err('broken',app));\n  if(e.meth===0) return Promise.resolve(c);\n  if(e.meth!==8) return Promise.reject(err('broken',app));\n  if(!canInflate()) return Promise.reject(err('nostream',app));\n  return new Response(new Blob([c]).stream().pipeThrough(new DecompressionStream('deflate-raw')).pipeThrough(window.__fgCap?window.__fgCap(e.usz):new TransformStream())).arrayBuffer()",
+  "count": 1,
+  "why": "a zip's entry unpacked only up to the size it declares, and refused when that is impossible"
+ },
+ {
+  "old": "  if(opt.headers)Object.keys(opt.headers).forEach(function(k){headers[k]=opt.headers[k];});\n",
+  "new": "  if(!/^https:\\/\\/(api|uploads)\\.github\\.com(\\/|$)/.test(url)&&url.indexOf(g.api.replace(/\\/$/,\"\")+\"/\")!==0)delete headers.Authorization;\n  if(opt.headers)Object.keys(opt.headers).forEach(function(k){headers[k]=opt.headers[k];});\n",
+  "count": 1,
+  "why": "Fabrica: the GitHub key goes to GitHub's own addresses only"
+ },
+ {
+  "old": "f.setAttribute('sandbox','allow-scripts allow-same-origin');",
+  "new": "f.setAttribute('sandbox',(window.__forgeBootSandbox?window.__forgeBootSandbox():'allow-scripts'));",
+  "count": 1,
+  "why": "the boot check: apart, unless the page is the owner's own app"
+ },
+ {
+  "old": "  var lead=(html.indexOf(T_SHIM)<0) ? storeShim(P.previewSub||'', P.previewSeed)+probe : probe;",
+  "new": "  var lead=(window.__forgeBootMem?window.__forgeBootMem(P):'')+((html.indexOf(T_SHIM)<0) ? storeShim(P.previewSub||'', P.previewSeed)+probe : probe);",
+  "count": 1,
+  "why": "the boot check apart: a store in memory; its errors, and what the check reads from a booted page, by message"
+ },
+ {
+  "old": "    if(view && view.length>1500000){",
+  "new": "    try{ if(window.__forgePreviewDress) view=window.__forgePreviewDress(fr, view, kind); }catch(e){}\n    if(view && view.length>1500000){",
+  "count": 1,
+  "why": "the live preview: apart, unless the page is the owner's own app"
+ },
+ {
+  "old": "function showOnStage(doc){ var f=frame(); if(!f) return; try{ if(f.__cdBlobUrl){ URL.revokeObjectURL(f.__cdBlobUrl); f.__cdBlobUrl=null; } }catch(e){}\n  if(doc.length>1500000){",
+  "new": "function showOnStage(doc){ var f=frame(); if(!f) return; try{ if(f.__cdBlobUrl){ URL.revokeObjectURL(f.__cdBlobUrl); f.__cdBlobUrl=null; } }catch(e){}\n  try{ if(window.__forgePreviewDress) doc=window.__forgePreviewDress(f, doc, 'studio'); }catch(e){}\n  if(doc.length>1500000){",
+  "count": 1,
+  "why": "the Studio's stage: apart (it speaks to its app by message)"
+ },
+ {
+  "old": "function setEditorShell(txt,name,opt){\n  ED.shell=txt; ED.shellName=name;",
+  "new": "function setEditorShell(txt,name,opt){\n  ED.shell=txt; ED.shellName=name; try{ if(window.__forgeShellSeen) window.__forgeShellSeen(txt); }catch(e){}",
+  "count": 1,
+  "why": "the app chosen in the Editor: its fingerprint read"
+ },
+ {
+  "old": "fr0 && fr0.contentWindow && fr0.contentWindow.__forgeErrs){",
+  "new": "fr0 && (fr0.getAttribute('data-forge-apart')||'0')==='0' && fr0.contentWindow && fr0.contentWindow.__forgeErrs){",
+  "count": 1,
+  "why": "the boot check before shipping: a preview shown apart is never read from (its window belongs to no origin, and reading it would stop the check), so the check boots the page in its own hidden frame"
+ },
+ {
+  "old": "if (!w || !w.localStorage) continue;",
+  "new": "try { if (!w || !w.localStorage) continue; } catch (e) { continue; }",
+  "count": 1,
+  "why": "the Author Studio's signatures: a frame shown apart is passed over, and the frames after it still get the signatures"
+ },
+ {
+  "old": "function read(w){ try{ var d=w.document; info.title=d.title;",
+  "new": "function read(w){ try{ var X=window.__forgeBootInfo?window.__forgeBootInfo(w,P):null; if(X) w=X; }catch(e){} try{ var d=w.document; info.title=d.title;",
+  "count": 1,
+  "why": "the boot check apart: what a booted page sent by message (title, whether it came up, registry, seed, a fault it kept) read as the check reads a window of the Forge's own"
+ },
+ {
+  "old": "function showDoc(doc, name, text, kind){\n  stageKind=kind||'';",
+  "new": "function showDoc(doc, name, text, kind){\n  try{ if(window.__forgeShowSeen) window.__forgeShowSeen(doc, name, text, kind); }catch(e){}\n  stageKind=kind||'';",
+  "count": 1,
+  "why": "the preview: what it was last asked to show is noted, so a page held blank while its fingerprint is read is then shown, and a bake of the owner's own app is remembered as the owner's"
+ },
+ {
+  "old": "var bakery={shell:null,shellName:'',seed:null,seedName:''};",
+  "new": "var bakery={shell:null,shellName:'',seed:null,seedName:''};\nwindow.__forgeSec={bakery:function(){ return bakery; }, bootCheck:function(h,d,f){ return bootCheck(h,d,f); }, pushEdits:function(){ return pushEdits(); }};",
+  "count": 1,
+  "why": "the bakery's page, the boot check and the live edits, reachable by the security block (and its test): the bakery's page is judged by its own fingerprint"
+ },
+ {
+  "old": "read: fn(cn, 'readClipboard') ? function () { return cn.readClipboard(); }",
+  "new": "read: fn(cn, 'readClipboard') ? function () { var k = ''; try { k = String(window.__cnTok || ''); } catch (e) {} if (k) { try { return cn.readClipboard(k); } catch (e) {} } return cn.readClipboard(); }",
+  "count": 1,
+  "why": "the Fire tablet: a clipboard read carries the key the app gave the Forge's own page (MainActivity.java, 647); a frame inside the page has none"
+ }
+]

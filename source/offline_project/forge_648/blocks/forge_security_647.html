@@ -1,0 +1,275 @@
+<style id="fg-apart-css">
+#fg-apart-note{position:absolute;right:14px;bottom:14px;z-index:5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:calc(100% - 28px);box-sizing:border-box;
+  padding:8px 10px 8px 14px;border-radius:12px;background:var(--panel,#fff);color:var(--ink2,#3d4a55);border:1px solid var(--edge,rgba(23,87,122,.22));
+  box-shadow:var(--panel-relief,0 6px 18px rgba(16,42,58,.18));font:500 12.5px/1.35 var(--cd-sans,system-ui,sans-serif)}
+#fg-apart-note[hidden]{display:none}
+#fg-apart-note .fg-an-b{font:700 12.5px/1 var(--cd-sans,system-ui,sans-serif);padding:8px 12px;border-radius:999px;cursor:pointer;background:var(--fk-face,#F7F8FA);color:var(--accent,#17577A);
+  border:1px solid var(--fk-rim,rgba(23,87,122,.26));box-shadow:var(--fk-key,0 2px 0 rgba(10,30,46,.30),0 4px 5px rgba(10,30,46,.20))}
+#fg-apart-note .fg-an-b:active{transform:translateY(1px);box-shadow:var(--fk-key-down,inset 0 2px 5px rgba(10,30,46,.24))}
+#fg-apart-note .fg-an-b:focus-visible{outline:2px solid var(--accent,#17577A);outline-offset:3px}
+</style>
+<script>
+/* The Forge 647 (25 October 2026), from the security audit of this pass. The owner's words: "I want to be protected from
+   someone stealing my code and also hacking into the apps and releasing malicious software or to steal data and information."
+   1. The live preview (#frame) gave every page it showed the Forge's own origin, so a page brought in from outside (Files, a
+      chat's files, a backup, a library file, GitHub) could read what the Forge keeps (the GitHub key, the library, the owner's
+      key) and call the programs. Now only the owner's own apps keep that: an app opened from the library whose code is,
+      byte for byte, one the Forge carries (its fingerprint in this page), or a build the owner baked from one; with its edits
+      laid on top. Everything else runs apart: a sandbox with no origin, a store of its own in memory, and no way back in.
+      The boot check before shipping does the same.
+   2. The diary, the command chat and Fontes drew text that came from file names, restored backups and the edited app's own
+      labels as markup. They now draw it through the strict cleaner (build/safe_html.js), which keeps formatting only; entries
+      already kept are cleaned as they are drawn.
+   3. Saving and printing asked for by a frame are done only for the apps the Forge carries (their own rooms and windows),
+      never for the preview or a test window.
+   4. A zip brought in (a backup, a library file) is unpacked only up to the size it declares, and refused when it declares
+      more than the Forge could ever hold in memory, or an impossible ratio. */
+(function(){"use strict";
+var W=window,D=document;
+/* safe_html.js · 6.7 (security audit, 25 October 2026). One sanitiser for markup that comes from outside Ingenium's own
+   code: a file opened in one of the carried apps, the clipboard, a backup or desk file brought in, a search provider's
+   answer. ingSafeMake(win) gives, for that window:
+     html(s)     the markup cut down to a safe list of formatting elements and attributes. It is parsed in a document that
+                 has no window, so nothing in it loads or runs while it is read;
+     text(s)     its words alone, read the same way;
+     box(s)      a div in that windowless document, holding html(s), for code that tidies the markup further;
+     nodes(x)    markup, or nodes an app's own reader built, cut down by html(), as a fragment of the window's document;
+     defuse(s)   the markup with only what can run code taken out (scripts, frames, plug-ins, event attributes,
+                 javascript: addresses), returned unchanged, character for character, when it holds none of these;
+     install(o)  o.sinks: defuse stands in front of every way the window's own code turns text into markup;
+                 o.clipboard: HTML read from the clipboard or a drop is cut down by html();
+                 o.links: a javascript: link or window is refused, and a link to another site opens in a new window
+                 (noopener, noreferrer) instead of taking this one away.
+   The same source runs in Ingenium's own page (build_page.py writes it in place of the 3.12 page's unused sanitizeHtml)
+   and, as text, at the head of each carried app's frame (modules/r118.js puts it first in the frame). */
+function ingSafeMake(win){"use strict";
+var doc=win.document,EP=win.Element.prototype;
+var IH=Object.getOwnPropertyDescriptor(EP,"innerHTML")||Object.getOwnPropertyDescriptor(win.HTMLElement.prototype,"innerHTML");
+var inert=null;
+function inertDoc(){if(!inert)inert=doc.implementation.createHTMLDocument("");return inert;}
+function str(v){return v==null?"":String(v);}
+/* a template in the windowless document: its contents never load or run */
+function parse(s){var t=inertDoc().createElement("template");IH.set.call(t,str(s));return t;}
+function set(list){var o={};list.split(" ").forEach(function(k){o[k]=1;});return o;}
+var KEEP=set("a abbr acronym address article aside b bdi bdo big blockquote br caption center cite code col colgroup dd del dfn div dl dt em figcaption figure font footer h1 h2 h3 h4 h5 h6 header hgroup hr i img ins kbd li main mark nav ol p pre q rp rt ruby s samp section small span strike strong sub sup table tbody td tfoot th thead time tr tt u ul var wbr");
+/* gone with all they hold; any other element not kept is unwrapped (its words stay) */
+var DROP=set("script style link meta base title head template noscript xmp iframe frame frameset object embed applet param noembed noframes plaintext listing textarea select option optgroup datalist input button svg math canvas audio video source track picture map area portal fencedframe dialog slot marquee keygen output progress meter");
+var ATTR=set("class style title lang dir id contenteditable spellcheck translate role align valign width height bgcolor color face size href name alt src colspan rowspan headers scope abbr nowrap span start type reversed value cite datetime border cellpadding cellspacing summary rules hspace vspace clear noshade");
+var WS=/[\u0000-\u0020\u007f-\u00a0\u1680\u180e\u2000-\u200f\u2028\u2029\u205f\u3000\ufeff]+/g;
+function scheme(v){var s=str(v).replace(WS,"").toLowerCase(),m=/^([a-z][a-z0-9+.-]*):/.exec(s);return {s:s,sc:m?m[1]:""};}
+function okHref(v){var x=scheme(v);if(!x.sc)return true;return x.sc==="http"||x.sc==="https"||x.sc==="mailto"||x.sc==="tel";}
+function okSrc(v){var x=scheme(v);if(!x.sc)return !!x.s;if(x.sc==="http"||x.sc==="https"||x.sc==="blob")return true;
+  return x.sc==="data"&&/^data:image\/(png|jpe?g|gif|webp|bmp|avif|x-icon|vnd\.microsoft\.icon|svg\+xml)[;,]/.test(x.s);}
+/* a style keeps the properties that only change how words look; nothing that loads, positions over the page, or hides */
+var STYLE_NO=/^(position|z-index|top|left|right|bottom|inset|inset-.*|behavior|-moz-binding|content|cursor|pointer-events|filter|backdrop-filter|mask|mask-.*|-webkit-mask.*|clip-path|offset.*|anchor-.*|position-.*)$/;
+var STYLE_BAD=/url\s*\(|image-set|image\s*\(|element\s*\(|cross-fade|paint\s*\(|expression|javascript|vbscript|@import|\\|attr\s*\(|\/\*|[<>]/i;
+function cleanStyle(v){var out=[];str(v).split(";").forEach(function(d){var i=d.indexOf(":");if(i<1)return;var p=d.slice(0,i).trim().toLowerCase(),val=d.slice(i+1).trim();
+    if(!/^[a-z][a-z-]*$/.test(p)||STYLE_NO.test(p)||!val||val.length>400||STYLE_BAD.test(val))return;out.push(p+":"+val);});
+  return out.join(";");}
+function cleanAttrs(e,tag){var at=e.attributes;for(var i=at.length-1;i>=0;i--){var a=at[i],nm=a.name.toLowerCase(),v=a.value,keep=false;
+    if(nm.slice(0,2)==="on")keep=false;
+    else if(/^data-[a-z0-9_.:-]+$/.test(nm)||/^aria-[a-z]+$/.test(nm))keep=true;
+    else if(ATTR[nm]){
+      if(nm==="href")keep=okHref(v);
+      else if(nm==="src")keep=tag==="img"&&okSrc(v);
+      else if(nm==="cite")keep=okHref(v);
+      else if(nm==="style"){var cs=cleanStyle(v);if(cs){if(cs!==v)e.setAttribute(a.name,cs);keep=true;}}
+      else if(nm==="contenteditable")keep=/^false$/i.test(v);
+      else if(nm==="id")keep=/^[A-Za-z_][\w:.-]{0,120}$/.test(v);
+      else if(nm==="name")keep=tag==="a"&&/^[\w:.-]{1,120}$/.test(v);
+      else if(nm==="type")keep=(tag==="ol"||tag==="ul"||tag==="li")&&/^([1aAiI]|disc|circle|square)$/.test(v);
+      else if(nm==="value")keep=tag==="li"&&/^-?\d{1,9}$/.test(v);
+      else keep=v.length<=2000;}
+    if(!keep)e.removeAttribute(a.name);}}
+function strict(root){(function walk(n){var k=n.firstChild;while(k){var nx=k.nextSibling;
+    if(k.nodeType===1){var tag=String(k.localName).toLowerCase();
+      if(k.namespaceURI!=="http://www.w3.org/1999/xhtml"||DROP[tag])n.removeChild(k);
+      else{walk(k);if(KEEP[tag]){cleanAttrs(k,tag);if(tag==="img"&&!k.hasAttribute("src"))n.removeChild(k);}
+        else{while(k.firstChild)n.insertBefore(k.firstChild,k);n.removeChild(k);}}}
+    else if(k.nodeType!==3)n.removeChild(k);
+    k=nx;}})(root);return root;}
+function html(s){var t=parse(s);strict(t.content);return IH.get.call(t);}
+function text(s){var t=parse(s);return t.content.textContent||"";}
+function box(s){var d=inertDoc().createElement("div");IH.set.call(d,html(s));return d;}
+/* markup or nodes (a fragment built by an app's own reader) cut down by html(), as a fragment of this window's document */
+function nodes(x){var s;if(x&&typeof x==="object"&&x.nodeType){var d=inertDoc().createElement("div");d.appendChild(inertDoc().importNode(x,true));s=IH.get.call(d);}else s=str(x);
+  var t=parse(s);strict(t.content);return doc.importNode(t.content,true);}
+/* ---------- what can run code, and nothing else ---------- */
+var DEFUSE=set("script iframe frame frameset object embed applet param base meta noscript xmp noembed noframes plaintext listing portal fencedframe");
+var URLISH=set("href src action formaction xlink:href data poster background ping codebase cite dynsrc lowsrc to from values by srcset");
+var RISKY=/on[a-z]{3,}\s*=|<\s*\/?\s*(script|iframe|frame|object|embed|applet|param|base|meta|noscript|xmp|noembed|noframes|plaintext|listing|portal|fencedframe|animate|set)\b|j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t|v\s*b\s*s\s*c\s*r\s*i\s*p\s*t|l\s*i\s*v\s*e\s*s\s*c\s*r\s*i\s*p\s*t|data\s*:\s*(text|application)|srcdoc|&#|&colon|&tab|&newline/i;
+function badUrl(v,tag,nm){var x=scheme(v);if(x.sc==="javascript"||x.sc==="vbscript"||x.sc==="livescript")return true;
+  if(nm==="srcset")return /(^|,)\s*(javascript|vbscript):/.test(x.s);
+  return x.sc==="data"&&tag!=="img"&&/^data:(text\/html|application\/(x-)?xhtml|image\/svg\+xml|text\/xml|application\/xml)/.test(x.s);}
+function defuseTree(root){var changed=false;
+  (function walk(n){var k=n.firstChild;while(k){var nx=k.nextSibling;
+    if(k.nodeType===1){var tag=String(k.localName).toLowerCase();
+      if(DEFUSE[tag]||(/^(animate|set|animatetransform|animatemotion)$/.test(tag)&&/^(on|href$|xlink:href$)/i.test(k.getAttribute("attributeName")||k.getAttribute("attributename")||""))){n.removeChild(k);changed=true;}
+      else{var at=k.attributes;for(var i=at.length-1;i>=0;i--){var a=at[i],nm=a.name.toLowerCase();
+          if(nm.slice(0,2)==="on"||nm==="srcdoc"||(URLISH[nm]&&badUrl(a.value,tag,nm))){k.removeAttribute(a.name);changed=true;}}
+        if(tag==="template"&&k.content)walk(k.content);walk(k);}}
+    k=nx;}})(root);
+  return changed;}
+function risky(s){return RISKY.test(str(s));}
+/* the defused markup as nodes of the live document, or null when there is nothing to take out (then the markup goes in
+   exactly as it was written). Nodes, not text read again, so markup cannot change its meaning on a second reading. */
+function defusedNodes(s,owner){s=str(s);if(!RISKY.test(s))return null;var t=parse(s);if(!defuseTree(t.content))return null;return (owner||doc).importNode(t.content,true);}
+function defuse(s){s=str(s);if(!RISKY.test(s))return s;var t=parse(s);if(!defuseTree(t.content))return s;var out=IH.get.call(t),t2=parse(out);
+  return defuseTree(t2.content)?str(text(s)).replace(/[&<>]/g,function(c){return c==="&"?"&amp;":c==="<"?"&lt;":"&gt;";}):out;}
+/* ---------- the guards ---------- */
+function editableOf(t){if(t&&t.nodeType!==1)t=t.parentElement;return t&&t.isContentEditable?t:null;}
+function install(o){o=o||{};var did=win.__ingSafeOn||(win.__ingSafeOn={});
+  if(o.sinks&&!did.sinks){did.sinks=1;
+    var RAW=set("script style textarea title xmp iframe noembed noframes noscript plaintext");
+    Object.defineProperty(EP,"innerHTML",{configurable:true,enumerable:IH.enumerable,get:IH.get,set:function(v){var s=v===null?"":String(v);
+      if(!RAW[String(this.localName).toLowerCase()]){var f=defusedNodes(s,this.ownerDocument);if(f){IH.set.call(this,"");(this.localName==="template"&&this.content?this.content:this).appendChild(f);return;}}
+      IH.set.call(this,s);}});
+    var OH=Object.getOwnPropertyDescriptor(EP,"outerHTML");
+    if(OH&&OH.set)Object.defineProperty(EP,"outerHTML",{configurable:true,enumerable:OH.enumerable,get:OH.get,set:function(v){var s=v===null?"":String(v),f=this.parentNode?defusedNodes(s,this.ownerDocument):null;if(f){this.replaceWith(f);return;}OH.set.call(this,s);}});
+    var IAH=EP.insertAdjacentHTML;
+    EP.insertAdjacentHTML=function(pos,v){var s=str(v),f=defusedNodes(s,this.ownerDocument);if(!f)return IAH.call(this,pos,s);var p=String(pos).toLowerCase();
+      if(p==="beforebegin")this.before(f);else if(p==="afterbegin")this.prepend(f);else if(p==="beforeend")this.append(f);else if(p==="afterend")this.after(f);else return IAH.call(this,pos,"");};
+    var RP=win.Range&&win.Range.prototype,CCF=RP&&RP.createContextualFragment;
+    if(CCF)RP.createContextualFragment=function(v){var s=str(v),f=defusedNodes(s);return f||CCF.call(this,s);};
+    var DP=win.Document.prototype,EC=DP.execCommand;
+    DP.execCommand=function(c,u,v){if(/^inserthtml$/i.test(String(c))&&v!=null)v=defuse(v);return EC.call(this,c,u,v);};
+    ["write","writeln"].forEach(function(k){var W=DP[k];if(W)DP[k]=function(){return W.call(this,defuse([].join.call(arguments,"")));};});
+    var PP=win.DOMParser&&win.DOMParser.prototype,PFS=PP&&PP.parseFromString;
+    if(PFS)PP.parseFromString=function(s,type){var d=PFS.call(this,s,type);try{if(/html/i.test(String(type))&&RISKY.test(str(s)))defuseTree(d);}catch(e){}return d;};
+    var SHU=EP.setHTMLUnsafe;if(SHU)EP.setHTMLUnsafe=function(v){return SHU.call(this,defuse(v));};
+    var PHU=win.Document.parseHTMLUnsafe;if(PHU)win.Document.parseHTMLUnsafe=function(v){var d=PHU.call(win.Document,v);try{defuseTree(d);}catch(e){}return d;};}
+  if(o.clipboard&&!did.clipboard){did.clipboard=1;
+    var DT=win.DataTransfer&&win.DataTransfer.prototype,GD=DT&&DT.getData;
+    if(GD)DT.getData=function(t){var v=GD.call(this,t);try{if(v&&/html/i.test(String(t)))v=html(v);}catch(e){v="";}return v;};
+    var CI=win.ClipboardItem&&win.ClipboardItem.prototype,GT=CI&&CI.getType;
+    if(GT)CI.getType=function(t){var p=GT.call(this,t);if(!/html/i.test(String(t)))return p;return p.then(function(b){return b.text().then(function(s){return new win.Blob([html(s)],{type:b.type||"text/html"});});});};
+    /* a paste or a drop the app itself does not take: if its HTML holds anything that can run, only its formatting goes in */
+    function intake(e,dt,drop){try{if(e.defaultPrevented||!dt||!GD||!editableOf(e.target))return;var raw=GD.call(dt,"text/html");if(!raw||!RISKY.test(raw))return;e.preventDefault();
+        if(drop&&doc.caretRangeFromPoint){var r=doc.caretRangeFromPoint(e.clientX,e.clientY);if(r){var sel=win.getSelection();sel.removeAllRanges();sel.addRange(r);}}
+        doc.execCommand("insertHTML",false,html(raw));}catch(x){}}
+    win.addEventListener("paste",function(e){intake(e,e.clipboardData,false);},false);
+    win.addEventListener("drop",function(e){intake(e,e.dataTransfer,true);},false);}
+  if(o.links&&!did.links){did.links=1;
+    var WO=win.open,pend=null;
+    win.open=function(u){var x=scheme(u);if(x.sc==="javascript"||x.sc==="vbscript"||x.sc==="livescript"||(x.sc==="data"&&!/^data:image\//.test(x.s)))return null;
+      if(pend&&u!=null){try{if(new win.URL(String(u),doc.baseURI).href===pend)pend=null;}catch(e){}}
+      return WO.apply(win,arguments);};
+    win.addEventListener("click",function(e){try{if(e.button>1)return;var t=e.target;if(t&&t.nodeType!==1)t=t.parentElement;var a=t&&t.closest?t.closest("a,area"):null;if(!a)return;
+        var raw=a.getAttribute("href");if(raw==null)raw=a.getAttribute("xlink:href");if(raw==null)return;
+        var x=scheme(raw);if(x.sc==="javascript"||x.sc==="vbscript"||x.sc==="livescript"||x.sc==="data"){if(!editableOf(a))e.preventDefault();return;}
+        if(editableOf(a)||a.hasAttribute("download"))return;
+        var u=new win.URL(raw,doc.baseURI);if(u.protocol!=="http:"&&u.protocol!=="https:")return;
+        var selfHttp=win.location.protocol==="http:"||win.location.protocol==="https:";if(selfHttp&&u.origin===win.origin)return;if(!selfHttp&&!/^https?:/i.test(raw))return;
+        var tg=str(a.getAttribute("target")).toLowerCase();if(tg&&!/^_(self|top|parent|blank)$/.test(tg))return;
+        e.preventDefault();var href=u.href;pend=href;
+        /* after every other handler has had the click: if one of them opened the link itself, it is not opened twice */
+        win.setTimeout(function(){if(pend!==href)return;pend=null;try{WO.call(win,href,"_blank","noopener,noreferrer");}catch(x2){}},0);}catch(x){}},true);}
+  return api;}
+var api={html:html,text:text,box:box,nodes:nodes,defuse:defuse,risky:risky,okHref:okHref,okSrc:okSrc,cleanStyle:cleanStyle,install:install};
+return api;}
+try{ if(!W.IngSafe){ W.IngSafe=ingSafeMake(W); W.IngSafe.src=String(ingSafeMake); } }catch(e){}
+var FULL="allow-scripts allow-same-origin allow-forms allow-modals allow-popups",APART="allow-scripts allow-forms allow-modals allow-popups allow-downloads";
+var MEM='<scr'+'ipt>(function(){function mem(){var m=new Map();return {get length(){return m.size;},key:function(i){return Array.from(m.keys())[i]||null;},'
+  +'getItem:function(k){k=String(k);return m.has(k)?m.get(k):null;},setItem:function(k,v){m.set(String(k),String(v));},removeItem:function(k){m.delete(String(k));},clear:function(){m.clear();}};}'
+  +'["localStorage","sessionStorage"].forEach(function(n){try{window[n].length;}catch(e){try{Object.defineProperty(window,n,{value:mem(),configurable:true,enumerable:true});}catch(e2){}}});'
+  +'function bad(m){try{parent.postMessage({__fgBootErr:String(m).slice(0,400)},"*");}catch(x){}}'
+  +'window.addEventListener("error",function(e){bad((e.message||"error")+(e.lineno?" (line "+e.lineno+")":""));});'
+  +'window.addEventListener("unhandledrejection",function(e){var r=e.reason;bad("Unhandled rejection: "+String((r&&r.message)||r));});'
+  +'})();</scr'+'ipt>';
+function withMem(h){h=String(h==null?"":h);var m=/<head\b[^>]*>/i.exec(h);if(m)return h.slice(0,m.index+m[0].length)+MEM+h.slice(m.index+m[0].length);
+  m=/^\s*<!doctype[^>]*>/i.exec(h);if(m)return m[0]+MEM+h.slice(m[0].length);return MEM+h;}
+/* the boot check of a page apart: what the Forge reads from a booted page (its title, whether it came up, its registry, its
+   seed, a fault it kept), sent by message, since the page belongs to no origin */
+function bootMem(P){ var names=[]; try{ if(P&&P.bootedVar) names.push(String(P.bootedVar)); if(P&&P.faultVar) names.push(String(P.faultVar)); }catch(e){}
+  return MEM+'<scr'+'ipt>(function(){var N='+JSON.stringify(names).replace(/</g,"\\u003c")+',n=0;function tell(){try{var v={};N.forEach(function(k){var x=window[k];'
+    +'v[k]=x?(typeof x==="object"?String((x.message||x.reason)||"fault").slice(0,200):(typeof x==="string"?x.slice(0,200):true)):false;});'
+    +'parent.postMessage({__fgBootInfo:{title:String(document.title||"").slice(0,300),kids:document.body?document.body.children.length:0,registry:!!window.cdSurfacesX,seeded:!!window.CD_SEED_STORE,vars:v}},"*");}catch(x){}}'
+    +'window.addEventListener("load",tell);var t=setInterval(function(){tell();if(++n>24)clearInterval(t);},400);})();</scr'+'ipt>'; }
+/* the fingerprints of the owner's own apps: the copies this page carries, and the builds baked from them here */
+/* (the list of the apps carried comes after this script in the full page, so it is read when first needed) */
+var KEY="fgtrust:shas",CARRIED=null;
+/* (the owner's apps this build was made with are named in the lean page too, forge-trust-shas, so the Forge Ingenium carries
+   knows them) */
+function carried(){ if(CARRIED) return CARRIED; var c={}, mt=D.getElementById("forge-bi-meta"), tl=D.getElementById("forge-trust-shas");
+  try{ if(tl) JSON.parse(tl.textContent).forEach(function(h){ if(/^[0-9a-f]{64}$/i.test(h)) c[String(h).toLowerCase()]=1; }); }catch(e){}
+  if(!mt) return c;
+  try{ JSON.parse(mt.textContent).apps.forEach(function(a){ if(a&&a.sha256) c[String(a.sha256).toLowerCase()]=1; }); }catch(e){} CARRIED=c; return c; }
+function kept(){ try{ var a=JSON.parse(localStorage.getItem(KEY)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function trustedSha(h){ return !!(carried()[h]||kept().indexOf(h)>=0); }
+function note(h){ try{ var a=kept().filter(function(x){ return x!==h; }); a.unshift(h); localStorage.setItem(KEY,JSON.stringify(a.slice(0,64))); }catch(e){} }
+/* the library's own reckoning (crypto.subtle, or its own code where a web view has none) */
+function sha(t){ try{ var u8=new TextEncoder().encode(String(t)); if(typeof W.__forgeLibSha==="function") return Promise.resolve(W.__forgeLibSha(u8)).then(function(h){ return String(h||"").toLowerCase(); },function(){ return ""; });
+    return crypto.subtle.digest("SHA-256",u8).then(function(b){ return Array.from(new Uint8Array(b)).map(function(x){ return (x<16?"0":"")+x.toString(16); }).join(""); }); }catch(e){ return Promise.resolve(""); } }
+/* each page the Editor or the bakery holds, judged by its own fingerprint: the last few read, each read once */
+var TC=[],LAST=null;
+var WAIT='<!doctype html><meta charset="utf-8"><body data-forge-empty="1" style="margin:0"></body>';
+function ed(){ return W.ED||(W.FORGE&&W.FORGE.ED)||(typeof ED!=="undefined"?ED:null); }
+function edShell(){ var E=ed(); return E&&typeof E.shell==="string"&&E.shell?E.shell:null; }
+function bakeShell(){ var B=null; try{ B=(W.__forgeSec&&W.__forgeSec.bakery)?W.__forgeSec.bakery():null; }catch(e){} return B&&typeof B.shell==="string"&&B.shell?B.shell:null; }
+function baseOf(kind){ return kind==="shell"?edShell():kind==="bake"?bakeShell():null; }
+function entry(txt,start){ if(!txt) return null; for(var i=0;i<TC.length;i++){ if(TC[i].txt===txt) return TC[i]; }
+  if(!start) return null; var e={txt:txt,ok:false,wait:true}; TC.unshift(e); if(TC.length>4) TC.length=4;
+  sha(txt).then(function(h){ e.wait=false; e.ok=!!h&&trustedSha(h); reshow(e); },function(){ e.wait=false; reshow(e); }); return e; }
+function own(txt){ var e=entry(txt,false); return !!(e&&!e.wait&&e.ok); }
+/* held blank while its fingerprint was read (a few tenths of a second): then shown, as the owner's own or apart */
+function reshow(e){ if(!LAST||(LAST.kind!=="shell"&&LAST.kind!=="bake")||baseOf(LAST.kind)!==e.txt) return;
+  var f=D.getElementById("frame"), st=f&&f.getAttribute("data-forge-apart");
+  if(st==="wait"||(e.ok&&st==="1")){ try{ W.FORGE.showDoc.apply(W.FORGE,LAST.args); }catch(x){} } }
+W.__forgeShellSeen=function(txt){ entry(txt,true); };
+/* a newer version of one of the owner's apps, not yet carried by the Forge: the owner says it is theirs, with two presses,
+   and from then on it is shown as the owner's own (its fingerprint kept on this device, fgtrust:shas) */
+var NOTE=null,ARMED=0;
+function noteEl(){ if(NOTE&&NOTE.isConnected) return NOTE; var st=D.getElementById("stage"); if(!st) return null;
+  var n=D.createElement("div"); n.id="fg-apart-note"; n.hidden=true; n.setAttribute("role","status");
+  var t=D.createElement("span"); t.className="fg-an-t"; t.textContent="Shown apart: it cannot reach what the Forge keeps.";
+  var b=D.createElement("button"); b.type="button"; b.className="fg-an-b"; b.textContent="This is my own app";
+  b.addEventListener("click",function(){ if(!ARMED){ ARMED=setTimeout(function(){ ARMED=0; b.textContent="This is my own app"; },6000); b.textContent="Press again to let it use the Forge\u2019s storage"; return; }
+    clearTimeout(ARMED); ARMED=0; b.textContent="This is my own app"; var base=LAST&&baseOf(LAST.kind), e=base&&entry(base,false); if(!e||e.wait) return;
+    sha(base).then(function(h){ if(!h) return; note(h); e.ok=true; n.hidden=true; reshow(e); }); });
+  n.appendChild(t); n.appendChild(b); st.appendChild(n); NOTE=n; return n; }
+/* over the preview's own lower edge, never over the keys beneath it */
+function placeNote(){ var n=NOTE, st=D.getElementById("stage"), fr=D.getElementById("frame"); if(!n||n.hidden||!st||!fr) return;
+  var a=st.getBoundingClientRect(), b=fr.getBoundingClientRect(); if(!b.height) return; var bottom=Math.max(8,Math.round(a.bottom-b.bottom+12))+"px"; if(n.style.bottom!==bottom) n.style.bottom=bottom; }
+try{ var RO=new ResizeObserver(function(){ placeNote(); }); setTimeout(function(){ var st=D.getElementById("stage"), fr=D.getElementById("frame"); if(st) RO.observe(st); if(fr) RO.observe(fr); },0); }catch(e){ W.addEventListener("resize",placeNote); }
+function paintNote(kind,mine,wait){ var n=noteEl(); if(!n) return; var show=(kind==="shell"||kind==="bake")&&!mine&&!wait; if(show) placeNote(); if(n.hidden===!show) return; n.hidden=!show; if(show) placeNote();
+  if(ARMED){ clearTimeout(ARMED); ARMED=0; var b=n.querySelector(".fg-an-b"); if(b) b.textContent="This is my own app"; } }
+W.__forgePreviewDress=function(fr,view,kind){ var base=(kind==="shell"||kind==="bake")?baseOf(kind):null, e=base?entry(base,true):null;
+  if(e&&e.wait){ if(fr.getAttribute("sandbox")!==APART) fr.setAttribute("sandbox",APART); fr.setAttribute("data-forge-apart","wait"); try{ if(fr.id==="frame") paintNote(kind,false,true); }catch(x){} return WAIT; }
+  var mine=!!(e&&e.ok); try{ if(fr.id==="frame") paintNote(kind,mine,false); }catch(x){}
+  if(fr.getAttribute("sandbox")!==(mine?FULL:APART)) fr.setAttribute("sandbox",mine?FULL:APART);
+  fr.setAttribute("data-forge-apart",mine?"0":"1");
+  return mine?view:withMem(view); };
+/* the boot check before shipping or baking: with the Forge's origin only when every page it could be checking is the owner's
+   own (the Editor's app, and the bakery's when it holds one) */
+function bootOwn(){ var a=edShell(), b=bakeShell(); if(b) entry(b,true); return !!(a&&own(a)&&(!b||own(b))); }
+W.__forgeBootSandbox=function(){ return bootOwn()?"allow-scripts allow-same-origin":"allow-scripts"; };
+W.__forgeBootMem=function(P){ return bootOwn()?"":bootMem(P); };
+/* the bakery's page is read as soon as it is chosen, so its first preview or bake need not wait */
+setInterval(function(){ try{ var b=bakeShell(); if(b&&!entry(b,false)) entry(b,true); }catch(e){} },1500);
+/* what a booted page apart sent, kept for the window it came from; the boot check reads it as it would read the window */
+var INFO=(typeof WeakMap==="function")?new WeakMap():null;
+W.__forgeBootInfo=function(w,P){ try{ void w.document.title; return null; }catch(e){}
+  var x=INFO&&w?INFO.get(w):null; if(!x) return null; var fake={document:{title:x.title,body:{children:{length:x.kids}}},cdSurfacesX:x.registry?{}:undefined,CD_SEED_STORE:x.seeded?{}:undefined};
+  try{ Object.keys(x.vars||{}).forEach(function(k){ var v=x.vars[k]; fake[k]=v===true?true:(v?{message:String(v)}:undefined); }); }catch(e){}
+  return fake; };
+/* the boot check of a page apart reports its errors and its state by message, from its own hidden frame only */
+W.addEventListener("message",function(ev){ var d=ev.data; if(!d||typeof d!=="object") return;
+  var isErr=typeof d.__fgBootErr==="string", isInfo=d.__fgBootInfo&&typeof d.__fgBootInfo==="object"; if(!isErr&&!isInfo) return;
+  var fs=D.querySelectorAll("iframe"); for(var i=0;i<fs.length;i++){ if(fs[i].contentWindow===ev.source&&fs[i].id!=="frame"){
+      if(isErr&&typeof W.__bootErr==="function"){ try{ W.__bootErr(d.__fgBootErr); }catch(e){} }
+      if(isInfo&&INFO){ try{ var q=d.__fgBootInfo; INFO.set(ev.source,{title:String(q.title||"").slice(0,300),kids:q.kids>>>0,registry:!!q.registry,seeded:!!q.seeded,vars:(q.vars&&typeof q.vars==="object")?q.vars:{}}); }catch(e){} }
+      return; } } });
+/* a build baked from the owner's own app is the owner's own too */
+W.__forgeShowSeen=function(doc,name,text,kind){ LAST={kind:kind,args:[doc,name,text,kind]};
+  if(kind==="bake"&&own(bakeShell())) sha(doc).then(function(h){ if(h) note(h); }); };
+/* saving and printing for a frame: only the apps the Forge carries, in their own rooms and windows */
+W.__forgeFromCarried=function(ev){ try{ var src=ev&&ev.source; if(!src) return false;
+    if(src===W) return true;   /* passed on by the Forge itself (a room in a picture-in-picture window of its own) */
+    var fs=D.querySelectorAll("iframe"); for(var i=0;i<fs.length;i++){ var f=fs[i]; if(f.contentWindow!==src) continue;
+      return /^(frame-(tabula|abacus|slides|scriba|fontes)|cd-fw-frame-)/.test(f.id||"")&&f.getAttribute("data-forge-apart")!=="1"; }
+  }catch(e){} return false; };
+/* a zip's entry is unpacked only up to the size it declares */
+W.__fgCap=function(declared){ var max=(declared>>>0)+65536,n=0; return new TransformStream({transform:function(chunk,c){ n+=chunk.byteLength; if(n>max){ c.error(new Error("This file unpacks to more than it says: it was not read.")); return; } c.enqueue(chunk); }}); };
+W.__fgZipOk=function(e){ var usz=e.usz>>>0,csz=e.csz>>>0; return !(usz>1610612736||(usz>52428800&&csz>0&&usz/csz>1100)); };
+})();
+</script>
