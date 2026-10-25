@@ -316,6 +316,12 @@ async function boot(ctx) {
     const kP1 = await p.evaluate(() => csStoreKey(csCur));
     await p.evaluate((h) => csShow({ kind: 'file', html: h, name: 'my_app.html' }, { user: true }), PROBE('Fabrica app', 'P2')); await settle(); const sP2 = await lastSeed();
     ok(kP1 === 'file:my_app.html' && sP2 && sP2.saved === 'from-P1', 'page-injection 3: Fabrica\'s run of a new version keeps its data (unchanged from 6.6)', { kP1, sP2 });
+    // Fabrica's run names its app (6.7, modules/r112.js run(): sid "fab:<app id>"): two apps whose page has the same name keep apart
+    await p.evaluate((h) => csShow({ kind: 'file', html: h, name: 'index.html', sid: 'fab:appA' }, { user: true }), PROBE('Fabrica A', 'QA')); await settle();
+    const kQA = await p.evaluate(() => csStoreKey(csCur));
+    await p.evaluate((h) => csShow({ kind: 'file', html: h, name: 'index.html', sid: 'fab:appB' }, { user: true }), PROBE('Fabrica B', 'QB')); await settle(); const sQB = await lastSeed();
+    const kQB = await p.evaluate(() => csStoreKey(csCur));
+    ok(kQA === 'fab:appA' && kQB === 'fab:appB' && sQB && sQB.saved === null, 'page-injection 3: two Fabrica apps whose page is called index.html keep their own stores', { kQA, kQB, sQB });
 
     // what 6.6 kept: taken over once by a page that was there before, never by one written or attached later
     const cL = 'c' + (t0 - 86400000).toString(36) + 'sl', cN = 'c' + t0.toString(36) + 'sn';
