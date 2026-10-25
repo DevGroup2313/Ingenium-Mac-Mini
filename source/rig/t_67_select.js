@@ -38,7 +38,9 @@ async function open(b, opts, insets) {
   return { ctx, p };
 }
 const theme = async (p, t) => { await p.evaluate(t => { state.theme = t; applyTheme(); }, t); await p.waitForTimeout(500); };
-const page = async (p, pg, ms = 900) => { await p.evaluate(pg => go(pg), pg); await p.waitForTimeout(ms); };
+// 6.7: Settings shows one room at a time (modules/r173.js); this test looks at every select on it, so it asks for every
+// setting at once, as the owner can with "Show every setting at once"
+const page = async (p, pg, ms = 900) => { await p.evaluate(pg => { go(pg); if (pg === 'settings' && window.IngRooms && IngRooms.all) IngRooms.all(true); }, pg); await p.waitForTimeout(ms); };
 async function seedModels(p) {
   await p.evaluate(() => {
     state.models = (state.models || []).filter(m => !/^m-(small|big)$/.test(m.id)).concat([
@@ -417,7 +419,7 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
 
     // ================= "What is this?" from the keyboard gives each select's own help (review, 25 October 2026) =================
     ({ ctx, p } = await open(b));
-    await p.evaluate(() => go('settings')); await p.waitForTimeout(800);
+    await page(p, 'settings', 800);
     const helpBy = {};
     for (const [id, want] of [['setTheme', /Day, night, or follow the system/], ['setMotion', /How much things move/], ['cxProvider', /cloud or server model/i]]) {
       await p.evaluate(() => { const k = document.getElementById('ingHelpKey'); if (k) k.click(); }); await p.waitForTimeout(400);
@@ -432,7 +434,7 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     // forced colours (Windows High Contrast): the active line stays visible
     const fc = await b.newContext({ viewport: { width: 1440, height: 900 }, forcedColors: 'active' }); const pf = await fc.newPage();
     await pf.goto(URL_); await pf.waitForFunction(() => window.__ingReady === true, null, { timeout: 240000 });
-    await pf.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('settings'); }); await pf.waitForTimeout(800);
+    await pf.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('settings'); if (window.IngRooms && IngRooms.all) IngRooms.all(true); }); await pf.waitForTimeout(800);
     await pf.evaluate(() => { const s = document.getElementById('psLength'); const c = s && s.__r172 && s.__r172.combo; if (c) { c.scrollIntoView({ block: 'center' }); c.focus(); } });
     await pf.keyboard.press('ArrowDown'); await pf.waitForTimeout(250); await pf.keyboard.press('ArrowDown'); await pf.waitForTimeout(250);
     const act = await pf.evaluate(() => { const a = document.querySelector('.r172-opt.r172-act'); if (!a) return null; const cs = getComputedStyle(a); return { outline: cs.outlineStyle + ' ' + cs.outlineWidth, bg: cs.backgroundColor }; });
