@@ -23,7 +23,7 @@ const head = `<!doctype html>
 <style>body{font:16px/1.5 Georgia,serif;margin:40px;color:#241d31;background:#fbf8f2}h1{font-weight:600}#capNote{color:#5a5368}</style>
 </head><body>
 <h1 id="capHead">The Offline Project, master</h1>
-<p id="capNote">Reading its data…</p>
+<p id="capNote">Reading its data ...</p>
 `;
 const code = parts.map(t => `<script>\n${t}\n</script>\n`).join('');
 const tail = `<script>

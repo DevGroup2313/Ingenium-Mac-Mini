@@ -5,11 +5,11 @@ never be on anything public facing and I want a master version of Ingenium and a
 of my apps and my personal info built in. I want a gift version that does not feature Carpe Diem, The Forge, Ingenium's own
 app and Inkwell. I want it to be a blank slate for a new user being gifted the app."
 
-  master  everything (the default).
+  master  everything (the default), the owner's own: the only edition whose Settings can rename the app (6.7.1).
   full    without the owner's apps and the owner's personal information: Carpe Diem, The Forge and Inkwell are not carried (its app
           library starts empty, for the apps the person adds); no Lector recipe (the owner's rules, verified sources and kinds
           of document); the owner's name is in no commit, signing certificate or app id; Lector and the chat write for whoever uses
-          this copy.
+          this copy. Since 6.7.1 its name is fixed as Ingenium (no Name card in Settings), as in the gift and demo editions.
   gift    the full edition with no Ingenium of its own to open, edit or package, and without Lector (it reads and writes
           about the owner's four apps by name): a blank slate for the person it is given to, where no page names Carpe
           Diem, The Forge or Inkwell, and Home shows Ingenium's own seal, not the Offline Project's crest.
@@ -329,10 +329,29 @@ def strip(out, ed):
     return out
 
 
+def _fixed_name():
+    """6.7.1, every edition but the master. The owner's words (25 October 2026): "I wanted the option to rename the app removed
+    from every build or version of the app that is NOT the master version of the app. I only want the master version of the
+    app that only I possess on my devices to have that feature and functionality on the Settings page, nowhere else."
+    Settings has no Name card; the top bar, Home, the help and the files it saves always say Ingenium, whatever an older copy
+    or a backup kept as its name (that value is kept as it was, and shown nowhere). The master edition keeps its Name card."""
+    return [
+        (("CUT", '      <div class="card"><h2 class="sec">Name</h2>', 'Shows in the top bar and on the Home page.</div>\n      </div>\n'), "", "Settings: no Name card", 1),
+        ('$("setAppName").addEventListener("input",function(){state.appName=$("setAppName").value;applyBrand();saveState();});', "",
+         "Settings: nothing listens for a new name", 1),
+        ('T("appname",function(){$("setAppName").value=state.appName;});', "", "start: no name to fill in", 1),
+        ('function applyBrand(){var n=state.appName||"Ingenium";', 'function applyBrand(){var n="Ingenium";', "the top bar and Home say Ingenium", 1),
+        ('function ingAppName(){return ((state.appName||"").trim())||"Ingenium";}', 'function ingAppName(){return "Ingenium";}', "every part asks for Ingenium", 1),
+        ('(state.appName||"Ingenium")', '"Ingenium"', "saved files and the system check are named Ingenium", 6),
+        ('(esc(state.appName)||"Ingenium")', '"Ingenium"', "the system check names Ingenium", 1),
+        ('["#setAppName","The app\'s name","What Ingenium calls itself on this device."],', "", "Help: no Name field to show", 1),
+    ]
+
+
 def edits(ed):
     if ed == "master":
         return []
-    E = []
+    E = _fixed_name()
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed
