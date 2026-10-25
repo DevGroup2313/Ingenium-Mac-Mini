@@ -93,6 +93,7 @@ night and the Clepsydra's settings, and only the main window writes the saved de
   reports of the emulator and simulator checks (`shells/out/checks/`).
 
     node rig/t_v6.js http://127.0.0.1:8150/ingenium.html <out> <tools>       # 6.0, 28 checks: the folding rail, the wide window, the five ship cards, an APK checked by apksig and androguard, an IPA, Releases, removing an app from Fabrica and Code, Build with a 13 MB page
+    node rig/t_67_kits.js <url> <out> [ingenium_app.py]   # 6.7, 160 checks: another app shipped as itself (modules/r178.js): The Forge from the app library by every path (Fabrica's Build kits and cards, Download as an app from Fabrica, Chat and Build, the old Build page's rows) gives the Forge's own packages, entry for entry as its own packager makes them; a plain app's generic kits carry its icon, name and id; the Windows app's own saving writes exactly the bytes made (rig/kit_check.py, rig/t_67_winsave.py)
 
 `offline_project/forge_639/forge_fabrica.py` carries the new Fabrica into the Forge (without the APK and IPA cards, which need
 Ingenium's shells), and its saves now go one after another there too: `rig/t_forge_fabrica.js`, 45 checks.

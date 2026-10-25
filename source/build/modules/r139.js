@@ -60,7 +60,8 @@ var DEV=[
   {k:"web",e:"🌐",t:"Web",d:"An installable site: the page, its manifest, its offline worker and its icons, for any web host (https). On iPhone and iPad, Add to Home Screen.",kind:"web"},
   {k:"html",e:"📄",t:"One HTML file",d:"The whole app in one file, for any browser. Nothing to install.",kind:"html"}];
 
-function titleOf(h){var m=/<title[^>]*>([^<]{1,80})<\/title>/i.exec(String(h||"").slice(0,400000));return m&&m[1].trim()?m[1].trim():"";}
+/* 6.7 (R178): the head is read as far as an app's own packager reads it (a page may carry its pictures and templates before its title) */
+function titleOf(h){var m=/<title[^>]*>([^<]{1,80})<\/title>/i.exec(String(h||"").slice(0,3000000));return m&&m[1].trim()?m[1].trim():"";}
 function knownOf(title){var t=String(title||"");return /\bThe Forge\b/i.test(t)?"forge":/Carpe Diem/i.test(t)?"cd":/Inkwell/i.test(t)?"inkwell":/^Ingenium\b/i.test(t)?"ingenium":"";}
 function KNOWN(){try{return window.fbKnown||{};}catch(e){return {};}}
 function slugId(name){var s=String(name||"app").toLowerCase().replace(/[^a-z0-9]+/g,"");if(!s||/^[0-9]/.test(s))s="app"+s;return "com.yannieforest."+s.slice(0,40);}
@@ -105,12 +106,17 @@ function webZip(P,html){var top=stem(P.title)+"-web-"+stem(P.version)+"/",src=se
 function make(d,P,html,said,alt){var bytes=te.encode(html),page=P.page||"index.html";
   if(alt||d.kind==="kit"){var ids=alt?d.alt.kits:[d.kit];
     if(!hereKits())return Promise.reject(new Error(whyNot({kind:"kit"})));
-    var who={isNew:true,name:P.title.replace(/[^A-Za-z0-9 ._-]/g,"").replace(/\s+/g," ").trim()||"My App",id:P.id,file:typeof kitFileWord==="function"?kitFileWord(P.title):stem(P.title)};
+    var who={isNew:true,name:P.title.replace(/[^A-Za-z0-9 ._-]/g,"").replace(/\s+/g," ").trim()||"My App",id:P.id,file:typeof kitFileWord==="function"?kitFileWord(P.title):stem(P.title),title:P.title,version:P.version,app:P.app};
     var prob=typeof kitIdentityProblem==="function"?kitIdentityProblem(who):null;if(prob)return Promise.reject(new Error(prob));
     said("Reading the projects…");
-    return kitStore().then(function(store){return ids.map(function(id){var k=kitAssemble(store,id,who,html);return {name:k.zip,mime:"application/zip",bytes:makeZip(k.entries)};});});}
+    /* 6.7 (R178): a kit may still be drawing the app's own icons, or be made from the app's own templates; one package is saved once */
+    return kitStore().then(function(store){return Promise.all(ids.map(function(id){return Promise.resolve(kitAssemble(store,id,who,html));})).then(function(ks){var seen={};
+      return ks.filter(function(k){if(seen[k.zip])return false;seen[k.zip]=1;return true;}).map(function(k){return {name:k.zip,mime:"application/zip",bytes:k.bytes||makeZip(k.entries)};});});});}
   if(d.kind==="html")return Promise.resolve([{name:(P.file||stem(P.title)+".html").replace(/[^\w.() -]+/g,"_"),mime:"text/html",bytes:bytes}]);
-  if(d.kind==="web"){said("Drawing its icons…");return webZip(P,html).then(function(x){return [x];});}
+  if(d.kind==="web"){said("Drawing its icons…");
+    /* 6.7 (R178): an app that carries its own package templates is made into its own web package */
+    if(window.IngKits&&IngKits.templates(html))return IngKits.make("web",html,{title:P.title,id:P.id,version:P.version}).then(function(k){return k?[{name:k.zip,mime:"application/zip",bytes:k.bytes}]:webZip(P,html).then(function(x){return [x];});});
+    return webZip(P,html).then(function(x){return [x];});}
   if(d.kind==="mac"||d.kind==="win"){var M=d.kind==="mac"?IngMac:IngWin,vm=String(P.version||"1.0").replace(/^v(?=\d)/,"");said("Drawing its icon…");
     return M.iconsFor(html,P.title,"#6a3fb5",P.app&&window.ING_SEALS&&ING_SEALS[P.app]?"data:image/png;base64,"+ING_SEALS[P.app].b64:null).then(function(icons){
       return M.make({html:bytes,page:page,title:P.title,id:P.id,versionName:vm,build:String(IngApk.versionCodeNow()),icons:icons,bridges:P.ios,onStep:said});})
@@ -152,7 +158,7 @@ function open(opt){opt=opt||{};
     [fT,fI,fV].forEach(function(i){i.addEventListener("input",function(){try{read();}catch(e){}});});ks.onchange=function(){try{read();}catch(e){}};
     /* the devices */
     var list=box.querySelector(".dl-devs"),rows={},busy=false;
-    function nameFor(d){var vn=stem(P.version);return d.kind==="html"?(P.file||stem(P.title)+".html"):d.kind==="web"?stem(P.title)+"-web-"+vn+".zip":d.kind==="apk"?stem(P.title)+"-"+vn+".apk":d.kind==="ipa"?(window.IngIpa?IngIpa.iosName(P.title):stem(P.title))+"-"+vn+".ipa":d.kind==="mac"?stem(P.title)+"-mac-"+vn+".zip":d.kind==="win"?stem(P.title)+"-windows-"+vn+".zip":"the "+d.t+" project (.zip)";}
+    function nameFor(d){var vn=stem(P.version);return d.kind==="html"?(P.file||stem(P.title)+".html"):d.kind==="web"?(window.IngKits&&IngKits.templates(html)?IngKits.zipName("web",IngKits.identity(html,{title:P.title,id:P.id,version:P.version})):stem(P.title)+"-web-"+vn+".zip"):d.kind==="apk"?stem(P.title)+"-"+vn+".apk":d.kind==="ipa"?(window.IngIpa?IngIpa.iosName(P.title):stem(P.title))+"-"+vn+".ipa":d.kind==="mac"?stem(P.title)+"-mac-"+vn+".zip":d.kind==="win"?stem(P.title)+"-windows-"+vn+".zip":"the "+d.t+" project (.zip)";}
     function paintNames(){DEV.forEach(function(d){var r=rows[d.k];if(r)r.file.textContent=here(d)?nameFor(d):whyNot(d);});}
     DEV.forEach(function(d){var row=E("div","dl-dev"+(here(d)?"":" off"));row.setAttribute("role","listitem");
       var b=E("button","dl-emo",d.e);b.type="button";b.title=here(d)?"Make and save the "+d.t+" package":whyNot(d);b.setAttribute("aria-label",b.title);
