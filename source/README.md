@@ -154,4 +154,10 @@ at once. A list of several lines is left as the system draws it, with readable c
 
     node rig/t_67_select.js <url> <out> [axe.min.js]   # 77 checks: every select dressed, contrast open and closed by day and night, keys, code, phone sheet, axe-core
 
+6.7 adds `modules/r176.js`: the analogue sounds of the owner's other two apps, ported voice for voice from their sound
+module (pass 675) and made on the device as they play, placed a little left or right by where they happen and given a small
+room, with a Sound section in the Display panel, a Sound card in Settings and a panel of choices (stored as `ing_sound_67`).
+
+    node rig/t_67_sound.js <url> <out> [axe.min.js]   # 79 checks: the thirteen voices rendered (never silent, never clipping), where they sound and where they never do, the 60 ms rule, the place in stereo, the keys and the choices kept across a reload, axe by day and night on a desk and a phone
+
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.
