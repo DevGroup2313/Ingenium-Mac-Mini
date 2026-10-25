@@ -1,6 +1,6 @@
 """Build the new ingenium.html from the pristine 3.12 page: exact source edits
 (each must match exactly once), then the new modules before the last script."""
-import sys, os, re, glob, json
+import sys, os, re, glob, json, base64
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import editions  # 6.2: ING_EDITION=master (the default), full, gift or demo (editions.py)
@@ -827,6 +827,10 @@ for old, new, label, times in EDITS:
 
 # ---- R104: the icons are the layered seal standing still (drawn by icon/gen_icons.py) ----
 PI = json.load(open(os.path.join(HERE, "..", "icon", "new", "out", "page_icons.json")))
+# 6.7: the Home Screen icon (an iPhone or iPad adds the page with it) stands on white, as the owner asked, not on the black an
+# iPhone puts behind a clear corner (build/icons, the same seals composited on white)
+for _v in ("day", "night"):
+    PI["tab"][_v][1] = "data:image/png;base64," + base64.b64encode(open(os.path.join(HERE, "icons", "apple_touch_%s.png" % _v), "rb").read()).decode()
 _fav = re.compile(r'var I=\{"day": \[.*?\]\}\[dark\?"night":"day"\];', re.S)
 if len(_fav.findall(out)) != 1:
     sys.exit("edit tab icons: not found once")
