@@ -834,7 +834,7 @@ function run(){var r=cur();if(!r)return;if(!r.head){toast("Nothing to run yet: g
     /* 6.2: in a window of its own, in a sandboxed frame (modules/r163.js): never as Ingenium, or the Forge */
     var w=typeof window.ingOpenApart==="function"?window.ingOpenApart(html,r.name):null;
     if(w){toast(r.name+" is running in a window of its own."+(statusOf(r).clean?"":" (The last kept version; the changes not kept yet are not in it.)"));return;}
-    if(typeof csShow==="function"){go("chat");csShow({kind:"file",html:html,name:x.page||(r.slug+".html")},{user:true});}else toast("This build cannot open a window; save the one page and open it.");},function(e){$("fbRun").disabled=false;fail(e);});}
+    if(typeof csShow==="function"){go("chat");csShow({kind:"file",html:html,name:x.page||(r.slug+".html"),sid:"fab:"+String(r.id).slice(0,120)},{user:true});}else toast("This build cannot open a window; save the one page and open it.");},function(e){$("fbRun").disabled=false;fail(e);});}
 
 /* ---------- bringing apps in ---------- */
 function sheet(title,lead){var root=$("fb"),wrap=h("div","f-sheet-wrap"),s=h("div","f-sheet");wrap.appendChild(s);s.innerHTML="<h3>"+esc(title)+"</h3>"+(lead?"<p>"+esc(lead)+"</p>":"");

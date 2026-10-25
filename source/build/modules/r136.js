@@ -298,7 +298,7 @@ function manifest(o){var perms=["android.permission.INTERNET","android.permissio
   if(o.alias)appKids.push(el("activity-alias",[an("name","string",o.alias),an("targetActivity","string",activityName),an("exported","bool",true)],[launch]));
   return el("manifest",[{ns:null,name:"package",type:"string",value:o.id},an("versionCode","int",o.versionCode),an("versionName","string",o.versionName),an("compileSdkVersion","int",34),{ns:null,name:"platformBuildVersionCode",type:"int",value:34}],
     [el("uses-sdk",[an("minSdkVersion","int",22),an("targetSdkVersion","int",34)])].concat(perms.map(function(p){return el("uses-permission",[an("name","string",p)]);}))
-    .concat([el("application",[an("theme","ref",THEME_MATERIAL_LIGHT_NOACTIONBAR),an("label","string",o.title),an("icon","ref",ICON_REF),an("allowBackup","bool",true),an("hardwareAccelerated","bool",true),an("largeHeap","bool",true),an("supportsRtl","bool",true)],appKids)]));}
+    .concat([el("application",[an("theme","ref",THEME_MATERIAL_LIGHT_NOACTIONBAR),an("label","string",o.title),an("icon","ref",ICON_REF),an("allowBackup","bool",!!o.allowBackup),an("hardwareAccelerated","bool",true),an("largeHeap","bool",true),an("supportsRtl","bool",true)],appKids)]));}
 function shellDex(){if(root.__ingAndroidShell)return Promise.resolve(root.__ingAndroidShell);var e=typeof document!=="undefined"&&document.getElementById("ing-android-shell");
   if(!e)return Promise.reject(new Error("this build of Ingenium carries no Android shell"));var u=b64d(e.textContent);root.__ingAndroidShell=u;return Promise.resolve(u);}
 /* o: {html (text or bytes), page ("the_app.html"), title, id, versionName, versionCode, icons ({mdpi..xxxhdpi: PNG bytes}), background, bridges, alias,
@@ -310,7 +310,7 @@ function makeApk(o){var step=o.onStep||function(){};var id=cleanId(o.id);if(!id)
   var bridges=o.bridges||["CarpeNative"];
   step("Writing the manifest");
   return Promise.all([shellDex(),keys.get(o.keyId)]).then(function(x){var dex=x[0],key=x[1];if(!key)throw new Error("the signing key chosen is not on this device");
-    var files=[{name:"AndroidManifest.xml",data:axml(manifest({id:id,versionCode:vc,versionName:vn,title:title,alias:o.alias||""}))},{name:"classes.dex",data:dex},
+    var files=[{name:"AndroidManifest.xml",data:axml(manifest({id:id,versionCode:vc,versionName:vn,title:title,alias:o.alias||"",allowBackup:!!o.allowBackup}))},{name:"classes.dex",data:dex},
       {name:"resources.arsc",data:arsc(id),store:true,align:4}];
     DENSITIES.forEach(function(d){var png=o.icons&&o.icons[d[0]];if(!png)throw new Error("the "+d[0]+" icon is missing");files.push({name:iconPath(d),data:png,store:true,align:4});});
     files.push({name:"assets/shell.json",data:utf8(JSON.stringify({page:page,background:o.background||"#ffffff",bridges:bridges,title:title,made:"Ingenium Fabrica"}))});
