@@ -137,7 +137,7 @@ function go_chat(){if(typeof go==="function")go("chat");}
 function settingsCard(){var pg=$("page-settings");if(!pg||$("ingImportCard"))return;
   var c=el("div","card");c.id="ingImportCard";c.setAttribute("role","region");c.setAttribute("aria-labelledby","ingImportH");
   var h=el("h2","sec","Bring your chats from other assistants");h.id="ingImportH";c.appendChild(h);
-  c.appendChild(el("p","small muted","Choose the export your assistant gave you, as it came (the zip, or a file inside it): ChatGPT, Claude (with its projects), Gemini (Google Takeout), Grok, DeepSeek, Le Chat, Copilot, or any transcript. It is read here, on this device; nothing is sent anywhere. Each conversation joins your list with its own date, and carries on here where it ended."));
+  c.appendChild(el("p","small muted","Choose the export your assistant gave you, as it came (the zip, or a file inside it). Ingenium reads exports from ChatGPT and Claude (with its projects), Gemini's Google Takeout, Grok, DeepSeek, Le Chat and Copilot laid out as they were in October 2026, and plain transcripts. Each layout was tested on sample files made in that layout, not on real exports. It is read here, on this device; nothing is sent anywhere. Each conversation joins your list with its own date (Gemini's are gathered from the times of its prompts), and carries on here where it ended."));
   var row=el("div","imp-row"),b=el("button","btn","Choose your export…");b.type="button";b.onclick=chooseFiles;row.appendChild(b);c.appendChild(row);
   var lst=el("div","imp-list");c.appendChild(lst);
   function paint(){lst.innerHTML="";var by={};(state.chats||[]).forEach(function(x){if(x.imported){by[x.imported.from]=(by[x.imported.from]||0)+1;}});

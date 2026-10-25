@@ -295,7 +295,7 @@ function btn(cls,label,on){var b=h("button","l-btn"+(cls?" "+cls:""));b.type="bu
 function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector");if(pg)pg.classList.add("lx7-page");
   if($("lx7")&&$("lx7").parentNode===host)return $("lx7");
   host.innerHTML='<div id="lx7">'+
-   '<div class="l-head"><div><h1>Lector</h1><p>Reads your apps part by part, thinks out loud as it goes, and writes the documents you need from them. Everything stays on this device.</p></div>'+
+   '<div class="l-head"><div><h1>Lector</h1><p>Reads your apps part by part, thinks out loud as it goes, and writes the documents you need from them. It works on this device, or with your other computer\'s model when you have linked one.</p></div>'+
    '<ol class="l-steps" id="l7Steps" aria-label="Where Lector is"><li data-s="choose"><i>1</i><span>Choose</span></li><li class="sep" aria-hidden="true"></li><li data-s="read"><i>2</i><span>Read</span></li><li class="sep" aria-hidden="true"></li><li data-s="write"><i>3</i><span>Write</span></li><li class="sep" aria-hidden="true"></li><li data-s="done"><i>4</i><span>Save</span></li></ol></div>'+
    '<div class="l-tabs" id="l7Tabs" role="tablist" aria-label="Lector\'s panels"><span class="l-thumb"></span><button type="button" role="tab" data-p="brief">The brief</button><button type="button" role="tab" data-p="read">Thinking <span class="d" id="l7TabLive" hidden></span></button><button type="button" role="tab" data-p="doc">The document</button></div>'+
    '<div class="l-panels" id="l7Panels">'+
@@ -345,7 +345,7 @@ function howCard(busy){var B=L7().brief,o=modelPlan(),c=o.chosen,s=sec("How Lect
   function parts(depth){var tot=0,known=true;B.apps.forEach(function(k){var r=runFor(k,depth);if(r&&r.status==="done")return;var n=partsOf(k,depth,c);if(n==null)known=false;else tot+=n;});return known?tot:null;}
   var docs=KINDS.filter(function(d){return B.docs[d[0]];}).length;
   [["overview","Quick reading","Its screens, its words, the notes in its code and how it is built."],
-   ["thorough","Deep, thorough analysis","All of that, and every function and every line of its own code, for the deepest documents. With it, Every function is written too."]].forEach(function(x){
+   ["thorough","Deep, thorough analysis","All of that, and every line of its own code with the functions declared by name, for the deepest documents. With it, Every function is written too."]].forEach(function(x){
     var row=h("label","l-doc"),r=document.createElement("input");r.type="radio";r.name="l7Depth";r.value=x[0];r.checked=(B.depth||"overview")===x[0];r.disabled=busy;
     r.onchange=function(){if(R7.running||!r.checked)return;B.depth=x[0];if(x[0]==="thorough"&&B.docs.functions==null)B.docs.functions=true;saveSoon();paintBrief();paintTabs();paintDoc();};
     row.appendChild(r);var t=h("span","t");t.appendChild(h("b",null,esc(x[1])));var n=parts(x[0]),est=n?estimate(c,n,docs):"";
@@ -358,7 +358,7 @@ function howCard(busy){var B=L7().brief,o=modelPlan(),c=o.chosen,s=sec("How Lect
   sel.onchange=function(){B.modelId=sel.value||null;saveSoon();paintBrief();};mw.appendChild(sel);s.appendChild(mw);
   if(!readyModels().length)s.appendChild(h("p","l-hint",esc("No model is on this device yet. "+(o.spec?"Ingenium's choice here is "+o.spec.name+": get it below, under Who reads and writes, or on the Models page.":"Bring one in on the Models page."))));
   var sw1=h("label","l-sw"),c1=document.createElement("input");c1.type="checkbox";c1.id="l7Metic";c1.checked=B.meticulous!==false;c1.disabled=busy;c1.onchange=function(){B.meticulous=c1.checked;saveSoon();paintModel();};
-  sw1.appendChild(c1);sw1.appendChild(document.createTextNode("Examine each section against the material (doctoral standard; about twice the writing time)"));s.appendChild(sw1);
+  sw1.appendChild(c1);sw1.appendChild(document.createTextNode("Examine each section against the material: a second pass strikes or marks what the material does not support (about twice the writing time)"));s.appendChild(sw1);
   if(o.readRec){var sw2=h("label","l-sw"),c2=document.createElement("input");c2.type="checkbox";c2.id="l7FastRead";c2.checked=!!B.fastRead;c2.disabled=busy;c2.onchange=function(){B.fastRead=c2.checked;saveSoon();paintModel();};
     sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Faster reading: "+o.readRec.customName+" takes the notes; "+(c?c.customName:"the model above")+" writes"));s.appendChild(sw2);}
   return s;}
@@ -476,7 +476,7 @@ function parsePost(text){var L=text.split("\n").map(function(s){return s.trim();
 function meCard(){var s=sec("Your facts and your voice"),M=L7().me,f=h("div","l-facts");
   function row(ic,title,sub,acts){var r=h("div","l-fact");r.appendChild(h("span","ic",ic));var t=h("div","tx");t.appendChild(h("span",null,esc(title)));t.appendChild(h("small",null,esc(sub)));
     if(acts){var a=h("div","acts");acts.forEach(function(x){a.appendChild(x);});t.appendChild(a);}r.appendChild(t);return r;}
-  f.appendChild(row("✓","Your CV",M.cv?M.cv.name+" · "+fmtBytes(M.cv.chars||0)+" of text, the one source of facts about you":"Your names, dates and posts come from it; nothing about you is invented",
+  f.appendChild(row("✓","Your CV",M.cv?M.cv.name+" · "+fmtBytes(M.cv.chars||0)+" of text, the one source of facts about you":"Lector is told to take your names, dates and posts from it alone",
     [btn("quiet",M.cv?"Replace":"Add your CV",function(){addMe("cv");})].concat(M.cv?[btn("quiet","Remove",function(){IngBig.del(M.cv.ref);M.cv=null;saveSoon();paintBrief();})]:[])));
   f.appendChild(row("¶","Your own writing",M.writing.length?M.writing.length+" piece"+(M.writing.length>1?"s":"")+" of your prose, so it writes as you do":"A few pieces of your prose: essays, statements, articles",
     [btn("quiet","Add",function(){addMe("writing");})].concat(M.writing.length?[btn("quiet","Remove all",function(){M.writing.forEach(function(x){IngBig.del(x.ref);});M.writing=[];saveSoon();paintBrief();})]:[])));
@@ -488,7 +488,7 @@ function meCard(){var s=sec("Your facts and your voice"),M=L7().me,f=h("div","l-
     [btn("quiet","Open Fontes",function(){try{openFontes();}catch(e){ingToast("Fontes is not in this build.");}})]));
   var sw=h("label","l-sw");var c=document.createElement("input");c.type="checkbox";c.checked=M.voice!==false;c.onchange=function(){M.voice=c.checked;saveSoon();};sw.appendChild(c);sw.appendChild(document.createTextNode("Write in my own voice"));f.appendChild(sw);
   var sw2=h("label","l-sw");var c2=document.createElement("input");c2.type="checkbox";c2.id="l7Cite";c2.checked=M.cite!==false;c2.onchange=function(){M.cite=c2.checked;saveSoon();paintBrief();};sw2.appendChild(c2);sw2.appendChild(document.createTextNode("Cite my sources in the documents"));f.appendChild(sw2);
-  s.appendChild(f);s.appendChild(h("p","l-hint","Kept on this device. Lector never invents a fact about you: anything it cannot find in your CV is left in square brackets for you to fill."));return s;}
+  s.appendChild(f);s.appendChild(h("p","l-hint","Kept on this device. Lector is told to take facts about you only from your CV, and to leave a gap in square brackets where it finds none. Figures are checked against the material; names, posts and dates are not, so read every document before you send it."));return s;}
 function addMe(which){var i=document.createElement("input");i.type="file";i.accept=".docx,.pdf,.txt,.md";i.multiple=which!=="cv";
   i.onchange=function(){var fs=[].slice.call(i.files||[]);if(!fs.length)return;var M=L7().me;
     Promise.all(fs.map(function(f){return readAsText(f).then(function(t){t=String(t||"").trim();if(!t)return null;var ref=IngBig.newId();return IngBig.put(ref,t).then(function(){return {ref:ref,name:f.name,chars:t.length,at:Date.now()};});},function(){ingToast(f.name+" could not be read.");return null;});}))
@@ -500,7 +500,7 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
   else{var c=o.chosen,isRec=c&&o.rec&&c.id===o.rec.id,name=c?c.customName:(o.spec?o.spec.name:"Magister");
     var reader=o.reader||c,twoModels=reader&&c&&reader.id!==c.id;
     box.appendChild(h("b",null,esc(twoModels?"Reading: "+reader.customName+" · Writing: "+name+(isRec?" (Magister)":""):(isRec?"Ingenium's choice: Magister · ":"Reading and writing: ")+name)));
-    if(o.stronger){var sg=h("div","need");sg.appendChild(document.createTextNode("A stronger model is ready on "+devName(o.dev)+": "+o.stronger.customName+". For a doctoral standard, use it. "));
+    if(o.stronger){var sg=h("div","need");sg.appendChild(document.createTextNode("A larger model is ready on "+devName(o.dev)+": "+o.stronger.customName+". Larger models usually write better; use it for the most careful writing. "));
       sg.appendChild(btn("quiet","Use "+o.stronger.customName,function(){B.modelId=o.stronger.id;saveSoon();paintModel();}));box.appendChild(sg);}
     var tot=0,known=true;B.apps.forEach(function(k){var r=runFor(k,B.depth);if(r&&r.status==="done")return;var n=partsOf(k,B.depth,c);if(n==null)known=false;else tot+=n;});
     var docs=KINDS.filter(function(d){return B.docs[d[0]];}).length,line=[];
@@ -510,12 +510,12 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
     box.appendChild(h("div","need",esc(line.join(" "))));
     if(o.need&&o.spare){var m=h("div","l-meter"),i=document.createElement("i");var f=Math.min(1,o.need/o.spare);i.style.width=Math.round(f*100)+"%";if(f>.85)i.className="tight";m.appendChild(i);box.appendChild(m);}
     if(!c&&o.spec){var gk=h("div","l-keys");gk.appendChild(btn("sm pri","Get "+o.spec.name+" ("+fmtBytes(o.spec.size)+")",function(){try{lineupInstall(o.key).then(function(){paintModel();},function(e){ingToast("It could not be fetched: "+(e&&e.message||e));});ingToast("Fetching "+o.spec.name+". Lector is ready to start when it arrives.");}catch(e){go("models");}}));box.appendChild(gk);}
-    else if(o.spec&&!isRec&&!B.modelId){box.appendChild(h("div","need",esc("Ingenium's choice for Lector here is "+o.spec.name+" (Magister, the strongest this device can hold). Get it on the Models page; until then Lector uses "+name+".")));}
+    else if(o.spec&&!isRec&&!B.modelId){box.appendChild(h("div","need",esc("Ingenium's choice for Lector here is "+o.spec.name+" (Magister, Ingenium's larger general model for "+devName(o.dev)+"). Get it on the Models page; until then Lector uses "+name+".")));}
     var det=document.createElement("details");det.appendChild(h("summary",null,"Why this model"));
-    det.appendChild(h("div",null,esc(o.spec?(o.spec.why||"")+" Lector reads best with the strongest model "+devName(o.dev)+" holds; a smaller one reads faster.":"A larger model writes a better analysis; a smaller one reads faster.")));
+    det.appendChild(h("div",null,esc(o.spec?(o.spec.why||"")+" A larger model usually reads and writes better; a smaller one reads faster.":"A larger model writes a better analysis; a smaller one reads faster.")));
     /* 6.2: the model, the depth and the two switches stand at the top of the brief now (How Lector reads); this keeps the reasons */
     det.appendChild(h("div","need","A quick reading takes its screens, its words, the notes in its code and how it is built. A deep, thorough analysis takes all of that and every line of its own code, for the deepest documents; this can take hours on a small model."));
-    det.appendChild(h("div","need","Ingenium chooses the strongest model this device holds for the writing, because a doctoral standard needs it; the notes may be taken by a quicker model when time matters more than nuance."));
+    det.appendChild(h("div","need","Ingenium suggests Magister for the writing, and says when a larger model is ready here, as larger models usually write better; the notes may be taken by a quicker model when time matters more than nuance."));
     box.appendChild(det);segThumbs(box);}}
 function estimate(m,parts,docs){if(!m)return "";var avg=null;if(LX.times&&LX.times.length)avg=LX.times.reduce(function(a,b){return a+b;},0)/LX.times.length;
   if(avg==null){try{var p=paceEstimate(m);if(p&&p.lo>0){var tps=(p.lo+p.hi)/2,ctx=lxCtx(m),inTok=lxBudget(ctx,700,false)/3.2;avg=700/tps+inTok/(tps*8);}}catch(e){}}
@@ -644,7 +644,7 @@ function paintDoc(){var desk=$("l7Desk"),ol=$("l7Outline");if(!desk)return;var k
   var s=stored(kind);
   if(!s){desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,"",Object.assign({},meta,{wait:true}));outline("",null);return;}
   IngBig.load(s.ref).then(function(md){if(R7.doc!==kind)return;R7.cur={kind:kind,md:md||"",meta:meta,chk:s.chk};desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,md||"",Object.assign({},meta,{chk:s.chk,made:s.made}));outline(md||"",null);desk.scrollTop=keepScroll;
-    if(s.chk&&s.chk.unmatched&&s.chk.unmatched.length){var dc=$("l7DocChip");if(dc){dc.className="l-chip";dc.textContent=s.chk.unmatched.length+" figure"+(s.chk.unmatched.length>1?"s":"")+" to check";}}});}
+    var nChk=s.chk?(s.chk.unmatched||[]).length+(s.chk.fromNotes||[]).length:0;if(nChk){var dc=$("l7DocChip");if(dc){dc.className="l-chip";dc.textContent=nChk+" figure"+(nChk>1?"s":"")+" to check";}}});}
 function rule(kind){return '<div class="l-rule"><span class="i">○</span>'+(kind==="cover"?"No seal on cover letters: your letters stay plain, as you asked.":kind==="cv"?"No seal on your CV.":"")+'</div>';}
 function forText(p){var P=p&&p!=="portfolio"&&L7().posts[p];if(!P)return "";return [P.title,P.org].filter(Boolean).join(" · ");}
 function outline(md,live){var ol=$("l7Outline");if(!ol)return;ol.innerHTML="";var blocks=lxBlocks(md),n=0;if(blocks.length&&blocks[0].k==="h"&&blocks[0].lv===1)blocks.shift();
@@ -664,8 +664,9 @@ function analysisMd(j){var runs=[];if(j&&j.doc){var dr=lxRun(j.doc);if(dr)runs=[
     return out.join("\n\n");});}
 /* the paper: as printed. Flat seals on the cover, numbered sections, the placeholders and any figure to check marked */
 function inl(t,chk){var s=lxInline(t,esc);s=s.replace(/\[((?:your|to fill|the reader|the post|the years|the date)[^\]<]{0,70})\]/gi,'<span class="fill">[$1]</span>');
-  if(chk&&chk.unmatched&&chk.unmatched.length)chk.unmatched.forEach(function(f){var re=new RegExp("(^|[^\\w.,])("+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w])","g");
-    s=s.replace(re,'$1<span class="chk" title="Not found in the measures, the analysis, your CV or the posting: check it">$2</span>');});
+  function mark(list,why){(list||[]).forEach(function(f){var re=new RegExp("(^|[^\\w.,])("+f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w])","g");
+    s=s.replace(re,'$1<span class="chk" title="'+why+'">$2</span>');});}
+  if(chk){mark(chk.unmatched,"Not found in the measures, your CV or the posting: check it");mark(chk.fromNotes,"Found only in Lector\'s own reading notes, not in the material: check it");}
   return s;}
 function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":(night()?"night":"day");
   var open='<div class="l-paper th-'+th+'">';
@@ -707,7 +708,7 @@ function r7Go(){if(R7.running||LX.busy){ingToast("Lector is busy. Wait for it, o
   if(!kinds.length){ingToast("Choose at least one document in the brief.");return;}
   var o=modelPlan();if(!o.link&&!o.chosen){ingToast("No model is ready on this device yet. Ingenium's choice for Lector is "+(o.spec?o.spec.name:"Magister")+": get it in the brief, or on the Models page.");return;}
   if((kinds.indexOf("cover")>=0)&&B.purpose!=="portfolio"&&!L7().posts[B.purpose])ingToast("No "+(B.purpose==="job"?"posting":"programme's call")+" was added, so the letter is written for any reader. Add it in the brief to fit the letter to it.");
-  if(o.stronger&&B.modelId)ingToast("A stronger model is ready here ("+o.stronger.customName+"). Lector writes with "+o.chosen.customName+", as you chose; change it in the brief for a stronger draft.");
+  if(o.stronger&&B.modelId)ingToast("A larger model is ready here ("+o.stronger.customName+"). Lector writes with "+o.chosen.customName+", as you chose; change it in the brief for a more careful draft.");
   L7().job={key:setKey(apps,B.purpose),apps:apps,purpose:B.purpose,kinds:kinds,depth:B.depth||"overview",modelId:o.chosen?o.chosen.id:null,readModelId:(o.reader&&o.chosen&&o.reader.id!==o.chosen.id)?o.reader.id:null,meticulous:B.meticulous!==false,status:"reading",at:Date.now(),made:{},err:""};
   saveState();R7.ev=[];R7.pin=null;paintStream();paintAll();if(one())setPanel("read");try{midTab("rd");}catch(e){}r7Run();}
 function beginDoc(){if(R7.running||LX.busy||typeof LX_PICK==="undefined"||!LX_PICK||!LX_PICK.P)return;var o=modelPlan();if(!o.link&&!o.chosen){ingToast("No model is ready on this device yet.");return;}
@@ -778,7 +779,7 @@ function review(kind,title,body,G,o){if(!meticulous()||!body||body.length<80)ret
       "Return only the revised text: no heading, no notes on what you changed, no commentary.\n\n"+context(G,sc,{keys:o.keys,anShare:0.4,post:true,postShare:0.1,cv:!!o.cv,cvShare:0.1,voice:false,letters:false,sources:!!(G.sources&&G.sources.length)})+"\n\nTHE DRAFT:\n"+body;
     return [{role:"system",content:sysW()+" You are now the examiner of a draft, and you return the revised text and nothing else."},{role:"user",content:u}];},Math.max(LX_OUT_SECTION,Math.round(body.length/3.2)+200),0.25)
   .then(function(x){var r=clean(x,title);if(!r||r.length<body.length*0.4||/^(the draft|here is|revised)/i.test(r.slice(0,24)))return body;
-    var ch=wordsChanged(body,r);addEv({k:"check",label:"Examined · "+(o.plan?title:docLabel(kind,G.apps,G.purpose)),text:ch?Math.round(ch*100)+"% of the words were changed in the examiner's pass; the figures were held to the measures and the claims to the material.":"The examiner's pass left the draft as it was."});return r;},function(){return body;});}
+    var ch=wordsChanged(body,r);addEv({k:"check",label:"Examined · "+(o.plan?title:docLabel(kind,G.apps,G.purpose)),text:ch?Math.round(ch*100)+"% of the words were changed in the examiner's pass, which is asked to hold the figures to the measures and the claims to the material.":"The examiner's pass left the draft as it was."});return r;},function(){return body;});}
 /* the share of words that differ between the draft and the revision: those taken away and those added, over the draft's count */
 function wordsChanged(a,b){var A={},n=0,added=0,left=0;String(a).toLowerCase().split(/\W+/).forEach(function(w){if(w){A[w]=(A[w]||0)+1;n++;}});
   String(b).toLowerCase().split(/\W+/).forEach(function(w){if(!w)return;if(A[w]>0)A[w]--;else added++;});Object.keys(A).forEach(function(w){left+=A[w];});
@@ -899,16 +900,19 @@ function tables(G){var out=[],runs=G.runs,many=runs.length>1,F=runs.map(function
   [["C. Features",A_DOES],["D. Design for focus and well-being",A_FOC],["E. Development history",A_MADE]].forEach(function(p){var parts=[];runs.forEach(function(r,i){var a=G.an[i]||{};if(a[p[1]])parts.push((many?"### "+r.name+"\n":"")+a[p[1]]);});if(parts.length)out.push("## "+p[0]+"\n"+parts.join("\n\n"));});
   var doms=[];runs.forEach(function(r,i){var d=F[i].domains||[];if(d.length)doms.push((many?"### "+r.name+"\n":"")+d.map(function(x){return "- "+x[0]+" ("+x[1]+")";}).join("\n"));});if(doms.length)out.push("## F. Web addresses named in the code\n"+doms.join("\n\n"));
   return out;}
-/* every figure in the document, looked for in what it was written from */
-function check(md,G){var src=[];G.runs.forEach(function(r,i){src.push(lxFactsText(r),factsShort(r),JSON.stringify(r.facts||{}),JSON.stringify(G.an[i]||{}),String(r.version||""));});src.push(G.cv||"",G.post&&G.post.text||"");
-  var hay=src.join("\n").replace(/(\d),(\d{3})/g,"$1$2");var body=md.split("\n---\n")[0];var seen={},figures=0,unmatched=[];
+/* every figure in the document, looked for in what it was written from. 6.7: a figure is matched whole, never as part of a
+   longer number ("58" is not found in "1058"); the material (the measures, the CV, the posting) is looked in apart from
+   Lector's own reading notes, so a figure found only in those notes is marked for checking too */
+function check(md,G){var mat=[],notes=[];G.runs.forEach(function(r,i){mat.push(lxFactsText(r),factsShort(r),JSON.stringify(r.facts||{}),String(r.version||""));notes.push(JSON.stringify(G.an[i]||{}));});mat.push(G.cv||"",G.post&&G.post.text||"");
+  var re=/(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g,m;
+  function nums(t){var set={},x;re.lastIndex=0;t=String(t);while((x=re.exec(t)))set[x[0].replace(/,/g,"")]=1;re.lastIndex=0;return set;}
+  var M=nums(mat.join("\n")),N=nums(notes.join("\n"));var body=md.split("\n---\n")[0];var seen={},figures=0,unmatched=[],fromNotes=[];
   /* R115: a citation's number is not a figure, and the References list is not checked for figures */
   body=body.split(/\n## References\n/)[0].replace(/\[(\d+(?:\s*[,–-]\s*\d+)*)\]/g,"");
-  var re=/(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g,m;
   body.split("\n").forEach(function(line){if(/^\|/.test(line.trim()))return;var l=line.replace(/^#+\s*\d+[.)]\s*/,"").replace(/^\s*\d+[.)]\s+/,"");
-    while((m=re.exec(l))){var f=m[0],n=f.replace(/,/g,"");if(+n<=12&&!/\./.test(n))continue;if(seen[f])continue;seen[f]=1;figures++;if(hay.indexOf(n)<0)unmatched.push(f);}});
+    re.lastIndex=0;while((m=re.exec(l))){var f=m[0],n=f.replace(/,/g,"");if(+n<=12&&!/\./.test(n))continue;if(seen[f])continue;seen[f]=1;figures++;if(!M[n]){if(N[n])fromNotes.push(f);else unmatched.push(f);}}});
   var fills=(body.match(/\[(?:your|to fill|the reader|the post|the years|the date|the organisation)[^\]]*\]/gi)||[]).length;
-  return {figures:figures,unmatched:unmatched.slice(0,24),fills:fills};}
+  return {figures:figures,unmatched:unmatched.slice(0,24),fromNotes:fromNotes.slice(0,24),fills:fills};}
 /* 6.2 · EVERY FUNCTION: a deep reading of each app's own code, measured, with no model. For each app: its screens and rooms,
    its keys, and every named function in its own scripts, part by part (each part named by the note at its head), with the
    line it begins on and the note written above it. A library carried whole and minified is counted, not listed. */
@@ -935,7 +939,7 @@ function atlasOf(name,text){var nl=[],i=-1;while((i=text.indexOf("\n",i+1))>=0)n
     if(avg>420&&lines<60){A.libs++;A.libFns+=list.length;A.parts.push({title:head,line:L0,lines:lines,lib:true,count:list.length});continue;}
     A.fns+=list.length;if(list.length)A.parts.push({title:head,line:L0,lines:lines,fns:list});}
   return A;}
-function atlasMd(G,atl){var md=["Measured from each app's own page on "+today()+": every screen and room, every key written in the page, and every named function in its own code, with the line it begins on and the note written above it. Nothing here was written by a model; the counts are exact."];
+function atlasMd(G,atl){var md=["Measured from each app's own page on "+today()+", with no model: the screens and rooms whose id takes one of the usual forms (page-, room-, screen- and the like), the keys written in the page, and the functions declared by name (function declarations, and functions given to a named variable, to window or self, or to a prototype), with the line each begins on and the note written above it. Methods written inside objects and classes are not counted, and long lists stop at 400 screens and 1,500 keys. The counts are those this method finds."];
   function cell(t){return String(t==null?"":t).replace(/\|/g,"\\|").replace(/\n/g," ");}
   atl.forEach(function(A){
     md.push("## "+A.name+": in brief\n| Measure | Count |\n|---|---|\n| Lines in its page | "+A.lines.toLocaleString("en-GB")+" |\n| Screens and rooms | "+A.screens.length+" |\n| Keys written in the page | "+A.keys.length+" |\n| Parts of its own code | "+A.parts.filter(function(p){return !p.lib;}).length+" |\n| Named functions in its own code | "+A.fns.toLocaleString("en-GB")+" |"+(A.libs?"\n| Libraries carried whole (minified) | "+A.libs+", with "+A.libFns.toLocaleString("en-GB")+" functions |":""));
@@ -957,7 +961,7 @@ function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{ap
   /* 6.2: Every function is measured, not written: its numbers are lines and counts, so it is neither restyled nor checked */
   var sf=kind==="functions"?{md:md,line:""}:styleFix(md);md=sf.md;R7.docMd[kind]=md;
   var chk=kind==="functions"?{figures:0,unmatched:[],fills:0}:check(md,G),ref=IngBig.newId();
-  addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures were not found in the measures, the analysis, your CV or the posting, and are marked for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+".":"Every figure ("+chk.figures+") was found in the measures, the analysis, your CV or the posting."):"No figures to check.")+
+  addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?((chk.unmatched.length||(chk.fromNotes||[]).length)?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures "+(chk.unmatched.length===1?"matches no figure in the measures, your CV or the posting, and is marked":"match no figure in the measures, your CV or the posting, and are marked")+" for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+". ":"")+((chk.fromNotes||[]).length?chk.fromNotes.length+(chk.fromNotes.length===1?" appears only in Lector's own reading notes, and is marked":" appear only in Lector's own reading notes, and are marked")+" for you to check too: "+chk.fromNotes.slice(0,6).join(", ")+(chk.fromNotes.length>6?"…":"")+". ":""):"Every figure ("+chk.figures+") matches a figure in the measures, your CV or the posting. ")+"Numbers up to twelve, numbers written in words and the rows of tables are not checked.":"No figures to check.")+
     (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":G.runs.length===4?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
   return IngBig.put(ref,md).then(function(){var old=S.docs[kind];if(old){S.older[kind]=[old].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}}
     S.docs[kind]={ref:ref,made:Date.now(),model:lxModelName({modelId:j.modelId}),title:setName(j.apps)+" · "+docLabel(kind,j.apps,j.purpose),chk:chk};saveState();});}
@@ -1103,7 +1107,7 @@ function askSend(text,target){text=String(text||"").trim();if(!text)return;var k
       e.before=askWords(p.body);e.after=askWords(nb);d.parts[idx]={title:p.title,body:nb};var nmd=askJoin(d);
       return askKeep(kind,nmd,G).then(function(r){e.prevRef=r.prevRef;e.newRef=r.newRef;e.status="done";
         e.reply="Rewrote “"+p.title+"” as you asked ("+e.after+" words; it had "+e.before+")."+(e.inView?" Your request named no section, so Lector took the one you were reading.":"")+
-          (r.chk&&r.chk.unmatched&&r.chk.unmatched.length?" "+r.chk.unmatched.length+" figure"+(r.chk.unmatched.length>1?"s are":" is")+" marked for you to check.":"");});});})
+          (r.chk&&((r.chk.unmatched||[]).length+(r.chk.fromNotes||[]).length)?" "+((r.chk.unmatched||[]).length+(r.chk.fromNotes||[]).length)+" figure"+(((r.chk.unmatched||[]).length+(r.chk.fromNotes||[]).length)>1?"s are":" is")+" marked for you to check.":"");});});})
   .then(null,function(err){e.status=err&&err.stopped?"stopped":"error";e.reply=err&&err.stopped?"Stopped. Nothing was changed.":"It could not be done: "+String(err&&err.message||err)+" Nothing was changed.";})
   .then(function(){ASK.busy=false;ASK.entry=null;LX.busy=false;LX.stop=false;LX.live="";R7.step="";R7.askModel=null;saveState();paintProgress();paintBrief();paintDoc();paintAsk();});}
 function askTrim(){var th=askThread();while(th.length>ASKS_MAX)th.shift();}

@@ -25,9 +25,11 @@
 (function r115Academic(){
 "use strict";
 function $(id){return document.getElementById(id);}
-/* ---------- Peer-reviewed only ---------- */
+/* ---------- Journal articles and scholarly books only (the switch was called Peer-reviewed only until 6.7) ---------- */
 function schPeerOnly(){var s=state.search||{};return !!s.peerOnly;}
 function schIsPeer(x){if(!x||x.kind!=="scholarly"||x.preprint||x.retracted)return false;
+  /* 6.7: an editorial, a letter, a comment, a news item, an erratum, a patent or a thesis is not a journal article */
+  if(/^(editorial|letter|comment|news|erratum|correction|patent|thesis|paratext)$/.test(String(x.type||"")))return false;
   return x.venueType==="journal"||x.type==="article"||x.type==="review"||/journal-article|book|chapter|monograph/.test(String(x.type||""));}
 window.schPeerOnly=schPeerOnly;window.schIsPeer=schIsPeer;
 (function wireSettings(){var c=$("srchPeer");if(!c)return;state.search=state.search||{};c.checked=!!state.search.peerOnly;
@@ -65,7 +67,7 @@ function openFontesDb(){var st=fontesState();fontesColls();
     fontesFormat(rows0,sel.value).then(function(rows){list.innerHTML="";var by={};rows.forEach(function(r){by[String(r.id)]=r.text;});
       rows0.forEach(function(c){var row=el("label","fo-row");var cb=document.createElement("input");cb.type="checkbox";cb.value=String(c.id);row.appendChild(cb);
         var side=el("div","fo-side");side.appendChild(el("span","fo-txt",by[String(c.id)]||fontesPlain(c)));
-        var meta=el("div","fo-meta");if(peerOf(c))meta.appendChild(el("span","fo-tag peer","Peer-reviewed journal"));if(c.ingColl)meta.appendChild(el("span","fo-tag",c.ingColl));if(c.DOI)meta.appendChild(el("span","small muted","doi:"+c.DOI));
+        var meta=el("div","fo-meta");if(peerOf(c))meta.appendChild(el("span","fo-tag peer","Journal article"));if(c.ingColl)meta.appendChild(el("span","fo-tag",c.ingColl));if(c.DOI)meta.appendChild(el("span","small muted","doi:"+c.DOI));
         var nk=el("button","fo-k",c.ingNote?"Note":"＋ Note");nk.type="button";nk.onclick=function(e){e.preventDefault();e.stopPropagation();var ex=side.querySelector(".fo-note-in");if(ex){ex.remove();return;}var ta=document.createElement("textarea");ta.className="fo-note-in";ta.value=c.ingNote||"";ta.placeholder="Your note on this source: what it argues, what you take from it, the page.";
           ta.onclick=function(ev){ev.stopPropagation();};ta.onchange=function(){c.ingNote=ta.value.trim();saveState();if(c.ingNote){if(!nd){nd=el("div","fo-note","");side.appendChild(nd);}nd.textContent=c.ingNote;}else if(nd){nd.remove();nd=null;}nk.textContent=c.ingNote?"Note":"＋ Note";ta.remove();};side.appendChild(ta);ta.focus();};meta.appendChild(nk);
         side.appendChild(meta);var nd=null;if(c.ingNote){nd=el("div","fo-note",c.ingNote);side.appendChild(nd);}

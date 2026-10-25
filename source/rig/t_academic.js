@@ -1,4 +1,4 @@
-// R115: the academic safeguards. Every search vetted (with or without the scholarly indexes), Peer-reviewed only,
+// R115: the academic safeguards. Every search labelled (with or without the scholarly indexes), Journal articles and scholarly books only,
 // Fontes as a reference database (find, collections, notes, a file brought in), and Lector citing her sources.
 // The indexes and the web are stand-ins here, so what Ingenium itself does can be checked without the network.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
@@ -28,11 +28,11 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
 
   // 1. the scholarly indexes off: the web search alone still goes through the vetting, each source checked and labelled
   const web = await p.evaluate(async () => { state.search = state.search || {}; state.search.scholar = false; state.search.peerOnly = false; const bot = window.__bot();
-    const r = await webAugment({ text: 'how does a calm interface help attention?', web: 'search' }, bot); return { status: bot.status, n: r.sources.length, kinds: r.sources.map(x => x.kind + ':' + x.vet.trust + ':' + x.vet.checks[0]), ctx: r.context.slice(0, 120), sch: window.__schCalls, web: window.__webCalls }; });
+    const r = await webAugment({ text: 'how does a calm interface help attention?', web: 'search' }, bot); return { status: bot.status, n: r.sources.length, kinds: r.sources.map(x => x.kind + ':' + x.vet.trust + ':' + x.vet.checks[0]), ctx: r.context.slice(0, 260), sch: window.__schCalls, web: window.__webCalls }; });
   ok(web.sch === 0 && web.web === 1 && web.n === 3, 'with the indexes off, only the web is searched, and the reply still gets vetted sources', JSON.stringify(web));
-  ok(/each source is checked/.test(web.status), 'the status says each source is checked', web.status);
+  ok(/each source is labelled by its kind/.test(web.status), 'the status says each source is labelled by its kind (6.7: a web page is labelled by its address, not checked)', web.status);
   ok(web.kinds.every(k => /^web:/.test(k)) && web.kinds.some(k => /Encyclopaedia/.test(k)) && web.kinds.some(k => /Website \(unvetted\)/.test(k)), 'every web source carries its label and trust (encyclopaedia, university, unvetted site)', web.kinds.join(' | '));
-  ok(/vetted by Ingenium on \d{4}-\d{2}-\d{2}/.test(web.ctx), 'the context tells the model the sources were vetted', web.ctx);
+  ok(/gathered by Ingenium on \d{4}-\d{2}-\d{2}/.test(web.ctx) && /a web page by its address only/.test(web.ctx), 'the context tells the model when the sources were gathered and what was checked of each (6.7: a web page is labelled by its address, not vetted)', web.ctx);
 
   // 2. the indexes on: scholarly first, then the best web sources
   const both = await p.evaluate(async () => { state.search.scholar = true; const bot = window.__bot(); const r = await webAugment({ text: 'calm interfaces', web: 'search' }, bot);
@@ -46,13 +46,13 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(peer.n === 2 && /Attention restoration/.test(peer.titles[0]) && /Designing for neurodivergent/.test(peer.titles[1]), 'Peer-reviewed only keeps the journal article and the scholarly book; the preprint and the web pages go', JSON.stringify(peer.titles));
   ok(/peer review confirmed \(journal listed in DOAJ\)/.test(peer.checks), 'and its checks say peer review is confirmed through DOAJ', peer.checks);
   const none = await p.evaluate(async () => { const keep = window.__sch.journal, keepB = window.__sch.book; window.__sch.journal = window.__sch.preprint; window.__sch.book = window.__sch.preprint; try { await webAugment({ text: 'calm interfaces', web: 'search' }, window.__bot()); return 'no error'; } catch (e) { return e.message; } finally { window.__sch.journal = keep; window.__sch.book = keepB; } });
-  ok(/no peer-reviewed source was found/.test(none) && /switch Peer-reviewed only off/.test(none), 'when nothing peer-reviewed is found, the reply says so and names the switch', none);
+  ok(/no journal article or scholarly book was found/.test(none) && /switch Journal articles and scholarly books only off/.test(none), 'when no journal article or scholarly book is found, the reply says so and names the switch (called Peer-reviewed only until 6.7)', none);
   await p.evaluate(() => { state.search.peerOnly = false; saveState(); });
 
   // 4. the switch in Settings: on turns the scholarly indexes on as well
   await p.evaluate(() => go('settings')); await p.waitForTimeout(600);
   const sw = await p.evaluate(() => { const c = document.getElementById('srchPeer'), s = document.getElementById('srchScholar'); if (s) { s.checked = false; state.search.scholar = false; } c.checked = true; c.dispatchEvent(new Event('change')); return { peer: state.search.peerOnly, scholar: state.search.scholar, schChecked: s ? s.checked : null, text: (c.closest('.sch-set') || c.parentNode.parentNode).textContent.slice(0, 80) }; });
-  ok(sw.peer === true && sw.scholar === true && sw.schChecked !== false, 'the Peer-reviewed only switch in Settings turns the scholarly indexes on with it', JSON.stringify(sw));
+  ok(sw.peer === true && sw.scholar === true && sw.schChecked !== false, 'the Journal articles and scholarly books only switch in Settings turns the scholarly indexes on with it', JSON.stringify(sw));
   await p.evaluate(() => { const c = document.getElementById('srchPeer'); c.scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(300);
   await p.screenshot({ path: OUT + '/acad-settings.png' });
   await p.evaluate(() => { const c = document.getElementById('srchPeer'); c.checked = false; c.dispatchEvent(new Event('change')); });
@@ -64,9 +64,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
       { id: 'ing:webcalm', type: 'webpage', title: 'Calm design, a blog post', 'container-title': 'example.com', URL: 'https://example.com/calm', accessed: { 'date-parts': [[2026, 10, 17]] } }]); saveState(); go('chat'); });
   await p.waitForTimeout(400);
   await p.evaluate(() => openFontes()); await p.waitForTimeout(1500);
-  const room = await p.evaluate(() => ({ count: document.getElementById('foCount').textContent, rows: document.querySelectorAll('#foList .fo-row').length, peer: document.querySelectorAll('#foList .fo-tag.peer').length, find: !!document.getElementById('foFind'), coll: !!document.getElementById('foColl'), file: !!document.getElementById('foFile') }));
+  const room = await p.evaluate(() => ({ count: document.getElementById('foCount').textContent, rows: document.querySelectorAll('#foList .fo-row').length, peer: document.querySelectorAll('#foList .fo-tag.peer').length, peerWords: [...document.querySelectorAll('#foList .fo-tag.peer')].map(t => t.textContent).join('|'), find: !!document.getElementById('foFind'), coll: !!document.getElementById('foColl'), file: !!document.getElementById('foFile') }));
   ok(room.rows === 3 && /3 sources · 1 journal article · 1 book or chapter · 1 web page/.test(room.count), 'the room counts the sources by kind', room.count);
-  ok(room.peer === 1 && room.find && room.coll && room.file, 'one source is tagged Peer-reviewed journal; find, collection and file keys are there', JSON.stringify(room));
+  ok(room.peer === 1 && room.peerWords === 'Journal article' && room.find && room.coll && room.file, 'one source is tagged Journal article (6.7: not called peer-reviewed, which is not checked); find, collection and file keys are there', JSON.stringify(room));
   await p.fill('#foFind', 'grandin'); await p.waitForTimeout(900);
   const found = await p.evaluate(() => ({ rows: document.querySelectorAll('#foList .fo-row').length, text: document.getElementById('foList').textContent.slice(0, 120), count: document.getElementById('foCount').textContent }));
   ok(found.rows === 1 && /Grandin/.test(found.text) && /1 shown/.test(found.count), 'find narrows the list to the matching source', JSON.stringify(found));

@@ -63,7 +63,8 @@ function seed(opts){opts=opts||{};if(RUN)return RUN;if(typeof libOn==="function"
         return keep(k).then(function(r){out[k]=s==="lost"?"kept again":"kept";kept.push(LIB_NAMES[k]+" "+BI[k].version);},function(e){out[k]="failed: "+(e&&e.message||e);});});});},Promise.resolve())
   .then(function(){return selfSeed().then(function(st){out.ingenium=st;if(st==="kept"||st==="kept again")kept.push("Ingenium "+selfVersion()+" (this copy)");});})
   .then(function(){DONE=out;window.__ingBuiltin={states:out,ms:Date.now()-t0};
-    if(kept.length&&!LIB.busy){LIB.warn=false;LIB.note="Kept on this device from inside Ingenium: "+kept.join(", ")+". Each was checked against its fingerprint.";}
+    if(kept.length&&!LIB.busy){LIB.warn=false;var carried=kept.filter(function(x){return !/\(this copy\)$/.test(x);}),me=kept.length>carried.length;
+      LIB.note="Kept on this device from inside Ingenium: "+kept.join(", ")+"."+(carried.length?" Each app it carries was checked against its fingerprint.":"")+(me?" This copy of Ingenium was checked for the version it names.":"");}
     repaint();RUN=null;return out;});
   return RUN;}
 function useBuiltin(k,btn){if(LIB.busy)return;if(btn){btn.disabled=true;btn.textContent="Keeping…";}LIB.busy="Keeping the built-in "+LIB_NAMES[k]+" "+BI[k].version+"…";libPaint();

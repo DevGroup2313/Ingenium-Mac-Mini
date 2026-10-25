@@ -35,9 +35,10 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
 /* ============ R105 · CODING MODELS TO CHOOSE FROM ============
    Her word (16 October 2026): "build into Ingenium some really strong, fast and accurate and really powerful local
    models for coding. I want to get the best models per devices made available on the app for me to choose from."
-   Faber, the house for code, now has a ranked list of coding models for each kind of device (written into the
-   lineup; every file read from Hugging Face on the day with its size and SHA-256). Faber takes the strongest that
-   this device's memory holds, as before; under Faber on the Models page every model on the list can be installed
+   Faber, the house for code, now has a list of coding models for each kind of device, in an order Ingenium chose (written
+   into the lineup; every file read from Hugging Face on the day with its size and SHA-256). Faber takes the first on that
+   list that this device's memory holds, as before (6.7: each maker's scores come from its own tests, so they cannot rank
+   the list on one scale); under Faber on the Models page every model on the list can be installed
    and chosen instead, with what it needs and what this device has to spare. */
 (function r5Coders(){
   function dev(){var d=lineupDevice();return d==="web"?"desktop":d;}
@@ -55,7 +56,7 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
     var web=lineupDevice()==="web",use=web?null:lineupUsableGB(),cur=lineupKeyFor("faber",web?"desktop":undefined),picked=state.tierPick&&state.tierPick.faber;
     var box=el("div","lu-coders"),hd=el("div","lu-coders-h");
     hd.appendChild(el("b",null,"Coding models for "+label()));
-    hd.appendChild(el("span",null,use!=null?"about "+use.toFixed(1)+" GB of memory to spare":"best first"));
+    hd.appendChild(el("span",null,use!=null?"about "+use.toFixed(1)+" GB of memory to spare":"in the order Ingenium suggests"));
     box.appendChild(hd);
     var big=null,nBig=ks.filter(function(k){return use!=null&&lineupNeedGB(ING_LINEUP.models[k])>use&&k!==cur&&!lineupRec(k);}).length;
     ks.forEach(function(k){var sp=ING_LINEUP.models[k],rec=web?null:lineupRec(k),job=lineupJobs[k],need=lineupNeedGB(sp),fits=use==null||need<=use;
@@ -84,7 +85,7 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
         big.appendChild(row);}
       else box.appendChild(row);});
     if(big)box.appendChild(big);
-    if(picked&&!web){var bk=el("button","btn xs ghost","Back to the best that fits "+label());bk.type="button";bk.onclick=back;box.appendChild(bk);}
+    if(picked&&!web){var bk=el("button","btn xs ghost","Back to Ingenium's choice for "+label());bk.type="button";bk.onclick=back;box.appendChild(bk);}
     tile.appendChild(box);tile.classList.add("lu-has-coders");
     ks.forEach(function(k){if(lineupJobs[k]&&lineupJobs[k].state==="running")paintJob(k);});}
   function paintJob(k){var job=lineupJobs[k],row=document.querySelector('.lu-cd[data-cd="'+k+'"]');if(!job||!row)return;

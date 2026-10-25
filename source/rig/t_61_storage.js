@@ -374,7 +374,7 @@ const PAGE_HELPERS = () => {
   ok(f1.quota === 12 * 1048576 && f1.chain.length === 4 && f1.usage < 12 * 1048576, 'a device with 12 MB for Ingenium, four versions of an app kept', f1);
   const f2 = await p2.evaluate(async () => { const id = IngBig.newId(); let s = ''; const r = __t.rnd(9000000); for (let i = 0; i < r.length; i += 30000) s += btoa(String.fromCharCode.apply(null, r.subarray(i, i + 30000)));
     await IngBig.put(id, s); await new Promise(z => setTimeout(z, 2500)); return { note: __t.noteText(), log: IngStore.log()[0], chain: __t.chain('cd').map(x => x.v) }; });
-  ok(f2.note && f2.note.role === 'alert' && /This device's storage for Ingenium is full/.test(f2.note.t) && /Nothing kept before is lost/.test(f2.note.t), 'a write the full store refuses (caught inside IndexedDB, though the writer swallows it) is explained at once', f2.note && f2.note.t);
+  ok(f2.note && f2.note.role === 'alert' && /This device's storage for Ingenium is full/.test(f2.note.t) && /Your own work stays/.test(f2.note.t) && !/Nothing kept before is lost/.test(f2.note.t), 'a write the full store refuses (caught inside IndexedDB, though the writer swallows it) is explained at once, and no longer says nothing was lost while it says old copies went', f2.note && f2.note.t);
   ok(f2.log && f2.log.why === 'full' && f2.log.items.length === 3 && f2.chain.join(',') === '704' && /removed 3 old copies to free/.test(f2.note.t), 'old copies go first to make room (the newest stays), and the notice says so', { log: f2.log && f2.log.items.map(x => x.label), chain: f2.chain });
   await shot(p2, 's13-full-note');
   await p2.click('#stxNote button.primary'); await p2.waitForTimeout(1500);

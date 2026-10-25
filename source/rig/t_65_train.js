@@ -39,7 +39,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
     const secs = t => { const m = /Roughly (.*?) on this computer/.exec(t) || []; const s = m[1] || ''; let n = 0; const h = /(\d+)\s*h/.exec(s), mi = /(\d+)\s*min/.exec(s), se = /(\d+)\s*s\b/.exec(s); if (h) n += 3600 * h[1]; if (mi) n += 60 * mi[1]; if (se) n += +se[1]; return n || NaN; };
     const raw = await p.evaluate(() => ['tiny', 'small', 'medium', 'large'].map(k => trainEstimate(500000, k, 8, 8)));
     ok(raw[0] < raw[1] && raw[1] < raw[2] && raw[2] < raw[3], 'the estimate grows with the size, as measured (500,000 characters, 8 passes, 8 cores, seconds)', raw);
-    ok(/wants 50,000 characters or more; with 6,200/.test(est.small.hint) && /wants 2,000,000 characters or more/.test(est.large.hint) && !/wants/.test(est.tiny.hint),
+    ok(/meant for about 50,000 characters or more; you have 6,200\./.test(est.small.hint) && /meant for about 2,000,000 characters or more; you have 6,200\. On 150,000 characters, Small learned as much as Medium and Large/.test(est.large.hint) && !/you have/.test(est.tiny.hint),
       'with too little text for a size, it says so plainly; Tiny asks for no more', { tiny: est.tiny.hint, small: est.small.hint, large: est.large.hint });
     await p.screenshot({ path: path.join(OUT, 'train_sizes.png') });
     await p.evaluate(() => [...document.querySelectorAll('#trBody .seg-btn')].filter(x => /^About/.test(x.title))[2].click()); await p.waitForTimeout(250);
@@ -68,7 +68,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
       est: document.querySelector('#trBody .tr-est').textContent, note: (document.querySelector('#trBody .tr-size') || {}).textContent || '' }));
     ok(/Train a model you have on your text/.test(bm.title) && bm.opts.length === 2 && /SmolLM2 135M Instruct · 135 million numbers · needs about 2.8 GB/.test(bm.opts[0]) && /\(more than this computer has\) \(off\)$/.test(bm.opts[1]) && bm.val === 'smollm2-135m',
       'a model you have: the trainable ones listed with what they need, one too large for this computer shown but not offered', bm.opts);
-    ok(/Qwen Coder 1\.5B: Its numbers are packed smaller than 8 bits/.test(bm.why) && !bm.size && /One pass is enough/.test(bm.note), 'one that cannot be trained says why; no size to choose; one pass advised', { why: bm.why, note: bm.note });
+    ok(/Qwen Coder 1\.5B: Its numbers are packed smaller than 8 bits/.test(bm.why) && !bm.size && /one pass was enough: SmolLM2 135M/.test(bm.note) && /More passes have not been measured/.test(bm.note), 'one that cannot be trained says why; no size to choose; one pass advised, as measured, and more passes said to be unmeasured (6.7)', { why: bm.why, note: bm.note });
     const rawB = await p.evaluate(() => [trainEstimate(500000, 'tiny', 2, 8), trainEstimate(500000, 'base:134515008', 2, 8)]);
     ok(bm.passes.join() === '1,5,1' && rawB[1] > rawB[0] * 20, 'passes from 1 to 5, one to begin with; the estimate follows the model\'s size', { passes: bm.passes, est: rawB });
     await p.screenshot({ path: path.join(OUT, 'train_from_model.png') });

@@ -230,7 +230,7 @@ function zipWords(m,name){var k=zipRawOf(m),f=name?"“"+name+"”":"This file";
   return cap(m);}
 function filesWords(list,page){list=list||[];if(!list.length)return "";
   return (page?"The page "+page:"The page")+(list.length===1?" names a file that is not in the app: "+list[0]+".":" names "+list.length+" files that are not in the app: "+list.slice(0,4).join(", ")+(list.length>4?" and "+(list.length-4)+" more":"")+".")+" Add "+(list.length===1?"it":"them")+", or take the name out of the page.";}
-var FULL_WORDS="This device's storage for Ingenium is full, so this could not be kept. Nothing kept before is lost. Settings, Storage shows what takes the room and can free some.";
+var FULL_WORDS="This device's storage for Ingenium is full, so this could not be kept. Your own work kept before is still there. Settings, Storage shows what takes the room and can free some.";
 /* e: any error; ctx: {name: the file's name, quiet: no notice, where} -> a plain sentence */
 function say(e,ctx){ctx=ctx||{};var k=kind(e),m=msgOf(e);
   try{if(k==="full"){if(!ctx.quiet)full({where:ctx.where});return FULL_WORDS;}
@@ -353,9 +353,9 @@ function full(o){o=o||{};Q.lastAt=Date.now();var now=Date.now();
   var s=S(),keys=[["Open Storage",openStorage,true]];
   function tell(ev){var freed=ev&&ev.items&&ev.items.length;
     notice({kind:"full",title:"This device's storage for Ingenium is full",
-      text:"Something could not be kept just now, because the room Ingenium has here is used up. Nothing kept before is lost. "
-        +(freed?"Ingenium removed "+plural(ev.items.length,"old copy","old copies")+" to free "+B(ev.bytes)+" (Settings, Storage lists them). Try once more."
-          :(s.auto?"There are no old copies left to remove. Settings, Storage shows what takes the room.":"Settings, Storage shows what takes the room, and Clean the library frees old copies.")),keys:keys});}
+      text:"Something could not be kept just now, because the room Ingenium has here is used up. "
+        +(freed?"Ingenium removed "+plural(ev.items.length,"old copy","old copies")+" to free "+B(ev.bytes)+": older versions of apps in your library beyond the newest "+keepN()+" of each, older packages, or stored texts nothing used (Settings, Storage lists them). Your own work stays. Try once more."
+          :"Nothing kept before was removed. "+(s.auto?"There are no old copies left to remove. Settings, Storage shows what takes the room.":"Settings, Storage shows what takes the room, and Clean the library frees old copies.")),keys:keys});}
   if(s.auto&&storeOk()){Q.busy=true;evict("full").then(function(ev){Q.busy=false;tell(ev);},function(){Q.busy=false;tell(null);});}
   else{addLog({at:now,why:"full",items:[],bytes:0});tell(null);}}
 
@@ -364,7 +364,7 @@ function full(o){o=o||{};Q.lastAt=Date.now();var now=Date.now();
    ================================================================================================================ */
 var KNOWN=["ingenium_apps","ingenium_big","ingenium_files","ingenium_keys","ingenium_repos","fabrica_made","ingenium_hub","ingenium_desk","the_foundry_files"];
 var LABELS={
-  ingenium_apps:["Your app library","The pages of your apps, each version kept"],
+  ingenium_apps:["Your app library","The pages of your apps, with their newest versions; older ones may be freed when room runs short"],
   ingenium_big:["Long texts","Files and pages your chats, Lector, Code and Build hold"],
   ingenium_files:["Files and the engine","The engine, links to your files, and files you added"],
   ingenium_keys:["Signing keys","The keys your Android apps are signed with"],

@@ -214,14 +214,14 @@ To use a GGUF model from Hugging Face:
 3. Put the model's licence text into `licences/` and its file name into `licence`.
 4. Edit `mobile_models.json` on GitHub: open it, click the pencil icon, change the values, and click **Commit changes**. A build starts by itself.
 
-For a Fire tablet, choose a model of roughly 0.5B to 1.5B parameters in the Q4_K_M form (a file under about 1 GB). Larger models load slowly or not at all with 2 to 4 GB of memory. These figures are approximate.
+For a Fire tablet, choose a model in the Q4_K_M form. With 2 GB of memory, keep to a file under about 0.4 GB; with 3 GB, under about 0.9 GB; with 4 GB, under about 1.4 GB. These figures follow the app's own estimate and are approximate; the Models page marks each model as fitting or too heavy for the tablet.
 
 [[if !NEW]]
 ## 8a. More models, from inside the app
 
 The Models page needs no new build to gain models:
 
-* **Ingenium's models.** The card at the top shows four houses: **Velox** (the fastest), **Scriba** (it thinks before it answers), **Magister** (the strongest) and **Faber** (the coding model). The two built-in models are Velox and Scriba. Tap **Install** on another, and the app downloads it from Hugging Face over Wi-Fi, checks it against its fixed fingerprint and keeps it. On this app, Magister and Faber are LFM2.5 2.6B (about 1.7 GB). On a tablet with 4 GB of memory or less, the page says it may not fit; it still installs if you ask.
+* **Ingenium's models.** The card at the top shows four houses: **Velox** (the fastest), **Scriba** (it thinks before it answers), **Magister** (a larger model for hard questions) and **Faber** (the coding model). The two built-in models are Velox and Scriba. Tap **Install** on another, and the app downloads it from Hugging Face over Wi-Fi, checks it against its fixed fingerprint and keeps it. On this app, Magister and Faber are LFM2.5 2.6B (about 1.7 GB). On a tablet with 4 GB of memory or less, the page says it may not fit; it still installs if you ask.
 * **Convert a model.** A model in another form (Hugging Face's safetensors, PyTorch's .bin, or MLX) becomes a GGUF on the tablet itself: choose all the files in the model's folder, choose a size, and tap **Convert**. A tablet converts slowly, so small models (up to about 1.5B parameters) suit it best; a computer does the same job much faster.
 * **A computer's models.** A Mac mini or another computer running {APP_NAME} can lend its stronger models over your home Wi-Fi. On that computer, Settings, **Your models on every device**, switch on sharing; here, in the same card, enter the address and the pairing code it shows and tap **Connect**. The chat then uses that computer's models; the source row under the chat switches back to this device's own. If the computer's name does not work, use the number address it shows.
 

@@ -157,7 +157,8 @@ function gatherByTime(recs,src){recs.sort(function(a,b){return a.at-b.at;});var 
     cur.messages.push({role:"user",text:r.q,at:r.at,files:r.files||[]});if(r.a)cur.messages.push({role:"assistant",text:r.a,at:r.at,files:[]});cur.updated=r.at;});
   return out.map(conv);}
 function geminiHtml(text){var d=new DOMParser().parseFromString(text,"text/html"),recs=[];
-  d.querySelectorAll(".outer-cell, .mdl-grid > .outer-cell").forEach(function(c){var cell=c.querySelector(".content-cell");if(!cell)return;var raw=cell.innerText||cell.textContent||"";
+  /* a page parsed and never shown has no layout, so its <br> give no line breaks in its text: each becomes one here (6.7, Ingenium) */
+  d.querySelectorAll(".outer-cell, .mdl-grid > .outer-cell").forEach(function(c){var cell=c.querySelector(".content-cell");if(!cell)return;[].slice.call(cell.querySelectorAll("br")).forEach(function(br){br.replaceWith("\n");});var raw=cell.textContent||"";
     var m=/^(Prompted|Asked)\s+([\s\S]*?)\n([A-Z][a-z]{2} \d{1,2}, \d{4},? [^\n]*)\n([\s\S]*)$/.exec(raw.trim());if(!m)return;recs.push({at:ms(m[3].replace(/ /g," ")),q:m[2].trim(),a:m[4].trim()});});
   return gatherByTime(recs,"Gemini");}
 /* a transcript in words: speakers named at the head of a line ("User:", "## Assistant", "**Claude**", "You said:") */

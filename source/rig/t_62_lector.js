@@ -126,7 +126,7 @@ const APP = '<!doctype html><html><head><title>Lumen</title></head><body>\n<sect
       'every named function in its own code is found, with its line and the note above it', at.names);
     ok(at.parts[0] === 'LUMEN · the notes, kept and drawn:5' && at.parts[1] === 'LUMEN · the clock:1' && /:lib\d+$/.test(at.parts[2]), 'part by part, each named by the note at its head; a minified library counted, not listed', at.parts);
     ok(at.screens.join() === 'page-home=Home,page-notes=Your notes' && at.keys.join() === 'Go somewhere#goBtn,Add a note', 'its screens with their headings, and its keys with their names', { s: at.screens, k: at.keys });
-    ok(/\| `noteList` \| \d+ \| the list of notes, newest first \|/.test(at.md) && /Nothing here was written by a model/.test(at.md), 'written as tables a reader can follow', at.md.slice(0, 300));
+    ok(/\| `noteList` \| \d+ \| the list of notes, newest first \|/.test(at.md) && /with no model:/.test(at.md) && /Methods written inside objects and classes are not counted/.test(at.md), 'written as tables a reader can follow, saying it was measured with no model and what the count leaves out (6.7)', at.md.slice(0, 300));
     // the whole document for a set, through the page's own writing, kept and shown
     // an app the library keeps (the apps Ingenium carries are kept on first start): the real thing, measured whole
     // 6.2: the full edition carries no app; its library keeps what the person adds: Inkwell's own page is added as a person adds it

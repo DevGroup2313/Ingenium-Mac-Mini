@@ -274,7 +274,7 @@ function attach(ta, o) {
   /* the bar under the editor: where the cursor is, the language (which can be changed), wrapping, size */
   bar.innerHTML = '<span class="ic-pos" aria-live="off"></span><label class="ic-l"><span class="ic-sr">Language</span><select class="ic-lang"></select></label>' +
     '<label class="ic-w"><input type="checkbox" class="ic-wrapbox"> Wrap</label><button type="button" class="ic-find">Find</button>' +
-    '<button type="button" class="ic-gl" aria-pressed="false" title="What the code under the cursor means, in plain words">Glossa</button>' +
+    '<button type="button" class="ic-gl" aria-pressed="false" title="What the HTML, CSS or JavaScript under the cursor means, in plain words">Glossa</button>' +
     '<button type="button" class="ic-calm" aria-pressed="false" title="Softer colours, more room, and only the part you are working on in full colour">Calm</button>' +
     '<button type="button" class="ic-em" aria-expanded="false" title="Clear out what the code does not need: you see each change first">Lima</button><span class="ic-size"></span>';
   /* the bar's keys and the panels' keys wear the app's own buttons (raised, and pressed when on) */
