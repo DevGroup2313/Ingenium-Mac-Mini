@@ -5,6 +5,7 @@
                  has no window, so nothing in it loads or runs while it is read;
      text(s)     its words alone, read the same way;
      box(s)      a div in that windowless document, holding html(s), for code that tidies the markup further;
+     nodes(x)    markup, or nodes an app's own reader built, cut down by html(), as a fragment of the window's document;
      defuse(s)   the markup with only what can run code taken out (scripts, frames, plug-ins, event attributes,
                  javascript: addresses), returned unchanged, character for character, when it holds none of these;
      install(o)  o.sinks: defuse stands in front of every way the window's own code turns text into markup;
@@ -62,6 +63,9 @@ function strict(root){(function walk(n){var k=n.firstChild;while(k){var nx=k.nex
 function html(s){var t=parse(s);strict(t.content);return IH.get.call(t);}
 function text(s){var t=parse(s);return t.content.textContent||"";}
 function box(s){var d=inertDoc().createElement("div");IH.set.call(d,html(s));return d;}
+/* markup or nodes (a fragment built by an app's own reader) cut down by html(), as a fragment of this window's document */
+function nodes(x){var s;if(x&&typeof x==="object"&&x.nodeType){var d=inertDoc().createElement("div");d.appendChild(inertDoc().importNode(x,true));s=IH.get.call(d);}else s=str(x);
+  var t=parse(s);strict(t.content);return doc.importNode(t.content,true);}
 /* ---------- what can run code, and nothing else ---------- */
 var DEFUSE=set("script iframe frame frameset object embed applet param base meta noscript xmp noembed noframes plaintext listing portal fencedframe");
 var URLISH=set("href src action formaction xlink:href data poster background ping codebase cite dynsrc lowsrc to from values by srcset");
@@ -133,5 +137,5 @@ function install(o){o=o||{};var did=win.__ingSafeOn||(win.__ingSafeOn={});
         /* after every other handler has had the click: if one of them opened the link itself, it is not opened twice */
         win.setTimeout(function(){if(pend!==href)return;pend=null;try{WO.call(win,href,"_blank","noopener,noreferrer");}catch(x2){}},0);}catch(x){}},true);}
   return api;}
-var api={html:html,text:text,box:box,defuse:defuse,risky:risky,okHref:okHref,okSrc:okSrc,cleanStyle:cleanStyle,install:install};
+var api={html:html,text:text,box:box,nodes:nodes,defuse:defuse,risky:risky,okHref:okHref,okSrc:okSrc,cleanStyle:cleanStyle,install:install};
 return api;}

@@ -197,8 +197,10 @@ var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app l
 var DEVICE_KEYS=["models","activeModelId","perf"];
 var NOTHING=" Nothing was changed.";
 /* 6.7 (security audit): the fields of a connection that say where its key or token is sent. A key belongs to the one
-   address it was saved with; when a restore would change the address, the key is not carried over to it. */
-var ENDP=["base","api","endpoint","host","url","addr","provider","computer","via","model","owner","repo"];
+   address it was saved with; when a restore would change the address, the key is not carried over to it. Only the fields
+   that change where the key goes count: the chosen model, or a GitHub owner and repository, do not (the key still goes to
+   the same address), so a backup that differs from this device only in those carries the key as before. */
+var ENDP=["base","api","endpoint","host","url","addr","provider","computer","via"];
 function connOf(root,path){return path.length>1?getPath(root,path.slice(0,-1)):root;}
 function sameEndpoint(a,b){if(a===b)return true;if(!a||!b||typeof a!=="object"||typeof b!=="object")return false;
   for(var i=0;i<ENDP.length;i++){var k=ENDP[i];if((k in a)||(k in b)){if(String(a[k]==null?"":a[k])!==String(b[k]==null?"":b[k]))return false;}}return true;}
