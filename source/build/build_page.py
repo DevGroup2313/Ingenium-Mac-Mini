@@ -16,6 +16,17 @@ EDITS = []
 def edit(old, new, label, times=1):
     EDITS.append((old, new, label, times))
 
+# ---- 6.7 (security audit, 25 October 2026): on Android the app now gives its bridge only to Ingenium's own frames, as a web
+#      message listener named IngeniumNativeMsg (MainActivity.java), because a JavaScript interface reaches every frame,
+#      sandboxed previews of pages Ingenium did not write included. This gives the listener the shape the page has always
+#      used (IngeniumNative.call and IngeniumNative.saveFile), before any other script runs. On an older web view the app
+#      keeps the JavaScript interface, IngeniumNative is already there, and this does nothing. ----
+edit('<head>\n<meta charset="utf-8">\n<script>/* R100',
+     '<head>\n<meta charset="utf-8">\n<script>(function(){try{var m=window.IngeniumNativeMsg;if(window.IngeniumNative||!m||typeof m.postMessage!=="function")return;'
+     'window.IngeniumNative={call:function(j){m.postMessage(String(j));},saveFile:function(n,t,b){m.postMessage(JSON.stringify({method:"saveFile",'
+     'args:{name:String(n),mime:String(t),b64:String(b)},callId:""}));return true;}};}catch(e){}})();</script>\n<script>/* R100',
+     "6.7 the Android bridge as a message listener, in the page's own frame only")
+
 # ---- R123: a window of its own (#ingapp=...) shows one app and never writes Ingenium's own desk, so it can never
 #      put an older copy of the desk over the newer one the main window keeps ----
 edit('function saveState(){try{\n  state.__deskAt=Date.now();',
