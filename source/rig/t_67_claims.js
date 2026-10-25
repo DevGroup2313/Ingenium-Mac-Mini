@@ -9,6 +9,8 @@
 //      line (now says only what was checked), Lector's figure check (whole figures only), Gemini's Takeout page (its line
 //      breaks), the catalogue's 36 models and the two SmolLM2 files' known sizes;
 //   3. Dictate says what it does before the first use, and nothing is heard until the person chooses.
+//   4. found on review: Magister's tag is "deep", not "strongest"; an editorial or a letter that Crossref calls a journal article is
+//      named as one by its title, and the switch says so; models brought from a known family get their makers' settings.
 //   node rig/t_67_claims.js http://127.0.0.1:8167/ingenium.html <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const http = require('http');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
@@ -43,7 +45,10 @@ const GONE = [
   'while keeping what it knew', 'a larger one only learns this text by heart', 'about "+TRAIN_PACE.large+" times', 'Nothing here leaves the device unless you connect something',
   'with None, nothing leaves the device', 'The engine is single-threaded: small models', 'Each was checked against its fingerprint.',
   'The model\'s own 16-bit numbers', 'training it needs about 7 GB', 'Gemini (Google Takeout), Grok, DeepSeek, Le Chat, Copilot, or any transcript',
-  'every figure an update has changed', 'every figure the recipe knows matches', 'was found in the measures, the analysis, your CV or the posting'];
+  'every figure an update has changed', 'every figure the recipe knows matches', 'was found in the measures, the analysis, your CV or the posting',
+  // found on review: Magister's tag, editorials and letters, Try it, brought models' settings, Lector's peer-reviewed mark
+  'role:"strongest"', 'no preprints, no editorials or letters', 'a preprint, an editorial or a letter, named as such', 'so it still answers as before',
+  'and every model you bring, use Ingenium', 'a source marked peer-reviewed may carry more weight', ' [peer-reviewed journal]'];
 // the corrected words, which must be there
 const THERE = [
   'It goes online only when you ask for something that needs it: a cloud model, a search, a download, GitHub or Dictate.',
@@ -74,7 +79,11 @@ const THERE = [
   'Build opens a page of up to', 'Your own work stays. Try once more.', 'older ones may be freed when room runs short',
   'What the HTML, CSS or JavaScript under the cursor means', 'Each layout was tested on sample files made in that layout, not on real exports.',
   'A model released in BF16, as SmolLM2 is, is converted to F16 for this file.', 'about 6.5 GB of memory', 'Journal article', 'the larger judges both',
-  'or else the largest) rates each answer', 'not checked against sources', 'Most of Ingenium\'s own models answer with the settings their makers recommend',
+  'or else the largest) rates each answer', 'not checked against sources',
+  'Models from the families Ingenium knows (LFM2.5, Qwen3.5, Gemma 4, Mellum and Qwen3-Coder) answer with the settings their makers recommend, whether they are Ingenium\'s own or ones you bring',
+  'role:"deep",line:"Ingenium', 'Editorials and letters are left out when the index names them or the title begins with Editorial or Letter, so a few may still come through.',
+  'an editorial or a letter, named as such when the index says so or its title begins that way', 'so it should still answer much as before',
+  'More passes have not been measured.":TRAIN_STEPS', '" [journal article]"', 'whether it was peer-reviewed was not checked',
   'Before you dictate', 'Train a small model</h2>', 'A model you train further starts from what it already knew.',
   'Each app it carries was checked against its fingerprint.', 'This copy of Ingenium was checked for the version it names.',
   'step 4 of 4 · everything is running, and its answers are written on this device.'.replace('step', 'Step')];
@@ -97,7 +106,13 @@ function sink() { return new Promise(res => { const got = []; const s = http.cre
   const outside = []; p.on('request', r => { const u = r.url(); if (/^https?:/.test(u) && !u.startsWith(new URL(URL_).origin) && !/127\.0\.0\.1/.test(u) && !/^https:\/\/(api\.crossref\.org|www\.ebi\.ac\.uk\/europepmc)\//.test(u)) outside.push(u); });  // the two indexes are answered by the routes below
   // the scholarly indexes, answered here: a retracted paper, its notice and a sound paper (Crossref); an editorial and an article (Europe PMC)
   let crossrefUrl = '';
-  await p.route('https://api.crossref.org/**', r => { crossrefUrl = r.request().url(); r.fulfill({ status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'ok', message: { items: [
+  const EDQ = [
+    { DOI: '10.1136/bmj.ed.1', title: ['Editorial'], type: 'journal-article', 'container-title': ['BMJ'], issued: { 'date-parts': [[2024]] } },
+    { DOI: '10.1136/bmj.le.1', title: ['Letter: Calm rooms in the clinic'], type: 'journal-article', 'container-title': ['BMJ'], issued: { 'date-parts': [[2024]] } },
+    { DOI: '10.1136/bmj.ar.1', title: ['Editorial practices in calm open journals'], type: 'journal-article', 'container-title': ['BMJ'], issued: { 'date-parts': [[2023]] } },
+    { DOI: '10.1136/bmj.ar.2', title: ['Letters of Seneca read for calm'], type: 'journal-article', 'container-title': ['BMJ'], issued: { 'date-parts': [[2022]] } }];
+  await p.route('https://api.crossref.org/**', r => { if (/calmeditorials/.test(r.request().url())) return r.fulfill({ status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'ok', message: { items: EDQ } }) });
+    crossrefUrl = r.request().url(); r.fulfill({ status: 200, headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'ok', message: { items: [
     { DOI: '10.1016/S0140-6736(97)11096-0', title: ['RETRACTED: Ileal-lymphoid-nodular hyperplasia, non-specific colitis, and pervasive developmental disorder in children'], type: 'journal-article', 'container-title': ['The Lancet'], issued: { 'date-parts': [[1998]] }, author: [{ given: 'A', family: 'Wakefield' }], 'updated-by': [{ DOI: '10.1016/s0140-6736(10)60175-4', type: 'retraction', source: 'retraction-watch' }] },
     { DOI: '10.1016/s0140-6736(10)60175-4', title: ['Retraction—Ileal-lymphoid-nodular hyperplasia'], type: 'journal-article', 'container-title': ['The Lancet'], issued: { 'date-parts': [[2010]] }, 'update-to': [{ DOI: '10.1016/S0140-6736(97)11096-0', type: 'retraction' }] },
     { DOI: '10.1000/sound.2021.1', title: ['Hyperplasia in the gut, a sound paper'], type: 'journal-article', 'container-title': ['Journal of Calm Computing'], issued: { 'date-parts': [[2021]] }, author: [{ given: 'Ada', family: 'Lovelace' }] }] } }) }); });
@@ -121,8 +136,21 @@ function sink() { return new Promise(res => { const got = []; const s = http.cre
   const ed = ep.find(x => /editorial/i.test(x.t)), art = ep.find(x => /trial/.test(x.t));
   ok(ed && ed.type === 'editorial' && ed.peer === false && /Editorial in CJEM: not a research article/.test(ed.checks[0]), 'Europe PMC: an editorial is named as one and is kept out of Journal articles and scholarly books only', ed);
   ok(art && art.type === 'article' && art.peer === true, 'and a research article is still a journal article', art);
+  // 2b'. Crossref calls an editorial or a letter a journal article: one whose title begins "Editorial" or "Letter" is named as one and kept out
+  //       of the switch; a research article whose title only starts with those words is not
+  const eq = await p.evaluate(async () => { const r = await schCrossref('calmeditorials', 5); return r.map(x => ({ t: x.title, type: x.type, peer: schIsPeer(x), check: schVet(x).vet.checks[0] })); });
+  const byT = t => eq.find(x => x.t.indexOf(t) === 0) || {};
+  ok(eq.length === 4 && byT('Editorial').type === 'editorial' && byT('Editorial').peer === false && /^Editorial in BMJ: not a research article/.test(byT('Editorial').check)
+    && byT('Letter:').type === 'letter' && byT('Letter:').peer === false && /^Letter in BMJ: not a research article/.test(byT('Letter:').check),
+    'Crossref: a record titled "Editorial" or "Letter: ..." is named as such and kept out of Journal articles and scholarly books only', eq);
+  ok(byT('Editorial practices').peer === true && byT('Letters of Seneca').peer === true && /^Journal article in BMJ/.test(byT('Letters of Seneca').check),
+    'and research articles whose titles only begin with those words stay journal articles', eq);
+  const tk = await p.evaluate(() => ['Guest editorial: why calm', 'Letter to the editor regarding calm', 'Corrigendum to "Calm rooms"', 'Correction of hallux valgus', 'A calm editorial'].map(schTitleKind));
+  ok(JSON.stringify(tk) === JSON.stringify(['editorial', 'letter', 'erratum', '', '']), 'the title check reads only the opening words, and only these kinds', tk);
   const sw = await p.evaluate(() => { const c = document.getElementById('srchPeer'); return c ? (c.closest('.sch-set') || c.parentNode.parentNode).textContent.replace(/\s+/g, ' ').slice(0, 160) : ''; });
   ok(/^ ?Journal articles and scholarly books only/.test(sw), 'the switch in Settings is named for what it keeps', sw);
+  const swAll = await p.evaluate(() => { const c = document.getElementById('srchPeer'); return c ? (c.closest('.sch-set') || c.parentNode.parentNode).textContent.replace(/\s+/g, ' ') : ''; });
+  ok(/Editorials and letters are left out when the index names them or the title begins with Editorial or Letter, so a few may still come through/.test(swAll) && !/no editorials or letters/.test(swAll), 'and it says how editorials and letters are found, and that a few may come through', swAll.slice(80, 400));
 
   // 2c. the measuring frame: a page that moves itself to another address is refused, and written down
   const S = await sink();
@@ -193,6 +221,13 @@ function sink() { return new Promise(res => { const got = []; const s = http.cre
   // 4. the houses card and the lineup's own lines
   const lu = await p.evaluate(() => ({ faber: ING_LINEUP.tiers.find(t => t.id === 'faber').line, mag: ING_LINEUP.tiers.find(t => t.id === 'magister').line, note: (document.getElementById('housesNote') || {}).textContent || '' }));
   ok(lu.faber === 'Made for writing, reading and fixing code.' && /chosen to suit its memory and speed/.test(lu.mag) && /Faber is a house by purpose, not size/.test(lu.note), 'the houses: Faber claims no reasoning its model may not do, and Magister is the larger of a short list, not the strongest the device can hold', lu);
+  await p.evaluate(() => { go('models'); try { renderLineup(); } catch (e) {} }); await p.waitForTimeout(800);
+  const tags = await p.evaluate(() => ({ role: ING_LINEUP.tiers.find(t => t.id === 'magister').role,
+    tile: ((document.querySelector('[data-tier="magister"] .lu-role') || {}).textContent || ''),
+    any: [...document.querySelectorAll('.lu-role, .tier-tag')].map(x => x.textContent).filter(t => /strongest/i.test(t)) }));
+  ok(tags.role === 'deep' && tags.tile === 'deep' && tags.any.length === 0, 'Magister\'s tag on its tile (and so in the chat\'s chooser) is "deep", the houses card\'s word, not "strongest"', tags);
+  const fam = await p.evaluate(() => [{ fileName: 'Qwen3.5-9B-Instruct-Q4_K_M.gguf', customName: 'My own Qwen' }, { fileName: 'gemma-4-E2B-it-Q4_K_M.gguf', customName: 'x' }, { fileName: 'Mistral-7B-Instruct-v0.3.Q4_K_M.gguf', customName: 'Mistral' }].map(samplingFamily));
+  ok(fam[0] === 'qwen3.5' && fam[1] === 'gemma4' && fam[2] === null, 'as the Guide now says: a model you bring from a family Ingenium knows gets its makers\' settings, by its file\'s name; another does not', fam);
   ok(outside.length === 0, 'no request left for another address while all this ran (the indexes were answered here)', outside.slice(0, 5));
   ok(errs.length === 0, 'no page errors', errs.slice(0, 5));
   await b.close();

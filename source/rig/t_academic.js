@@ -119,7 +119,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.waitForFunction(() => { const c = document.getElementById('l7BriefChip'); return c && /Used for this set/.test(c.textContent); }, null, { timeout: 90000 }); await p.waitForTimeout(600);
   const asks = await p.evaluate(() => window.__asks);
   const withSrc = asks.filter(a => !a.examiner && a.sources);
-  ok(withSrc.length > 0 && /\[1\] .*Lovelace/.test(withSrc[0].sources) && /\[peer-reviewed journal\]/.test(withSrc[0].sources) && /Her note: The key study/.test(withSrc[0].sources), 'the writer is given her sources, numbered, with the peer-reviewed mark and her note', withSrc.length ? withSrc[0].sources.slice(240, 520) : 'none');
+  ok(withSrc.length > 0 && /\[1\] [^\n]*Lovelace[^\n]*\[journal article\]/.test(withSrc[0].sources) && !/\[peer-reviewed journal\]/.test(withSrc[0].sources) && /Her note: The key study/.test(withSrc[0].sources), 'the writer is given her sources, numbered, with the journal article mark (peer review is not claimed, as it was not checked) and her note', withSrc.length ? withSrc[0].sources.slice(240, 520) : 'none');
   const doc = await p.evaluate(() => { const d = document.getElementById('l7Desk'); return d ? d.innerText : ''; });
   const refs = (doc.split(/\nReferences\n/)[1] || '').split(/\nDrafted by/)[0];
   ok(/\nReferences\n/.test(doc) && /^\s*\[1\] /.test(refs) && /\[4\] /.test(refs) && !/\[2\] |\[3\] |\[5\] /.test(refs), 'the piece ends with References listing only the two sources cited, [1] and [4]', refs.slice(0, 240).replace(/\n/g, ' / '));

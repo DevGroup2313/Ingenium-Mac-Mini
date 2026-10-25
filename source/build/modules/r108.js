@@ -830,8 +830,8 @@ function context(G,scale,o){var R=room()*scale,parts=[];var many=G.runs.length>1
   if(o.voice&&G.voice&&G.writing.length)parts.push("HER OWN WRITING (match its voice, rhythm and vocabulary; do not copy its content):\n"+cut(G.writing.join("\n\n---\n\n"),Math.floor(R*0.08)));
   if(o.letters&&G.letters.length)parts.push("HER PAST COVER LETTERS (for their shape and tone only; their facts may be out of date):\n"+cut(G.letters.join("\n\n---\n\n"),Math.floor(R*0.1)));
   /* R115: her sources, to cite by number where they bear on a claim; never a source that is not here */
-  if(o.sources&&G.sources&&G.sources.length)parts.push("HER SOURCES (kept in Fontes; cite one by its number in square brackets, like [2], only where it supports the sentence; use no source that is not on this list and invent none; a source marked peer-reviewed may carry more weight):\n"+
-    cut(G.sources.map(function(s){return "["+s.n+"] "+s.text+(s.peer?" [peer-reviewed journal]":"")+(s.note?"\n    Her note: "+s.note:"")+(s.abstract?"\n    Abstract: "+s.abstract:"");}).join("\n"),Math.floor(R*(o.srcShare||0.14))));
+  if(o.sources&&G.sources&&G.sources.length)parts.push("HER SOURCES (kept in Fontes; cite one by its number in square brackets, like [2], only where it supports the sentence; use no source that is not on this list and invent none; a source marked [journal article] comes from a journal, but whether it was peer-reviewed was not checked, so do not call any source peer-reviewed unless her note says so):\n"+
+    cut(G.sources.map(function(s){return "["+s.n+"] "+s.text+(s.peer?" [journal article]":"")+(s.note?"\n    Her note: "+s.note:"")+(s.abstract?"\n    Abstract: "+s.abstract:"");}).join("\n"),Math.floor(R*(o.srcShare||0.14))));
   return parts.join("\n\n");}
 function about(G){var n=G.runs.length;return n===4?"the four apps of The Offline Project ("+listNames(G.apps)+"), as one body of work":n>1?listNames(G.apps)+", together, as one body of work":G.runs[0].name;}
 function forLine(G){if(!G.post)return G.purpose==="programme"?" for a doctoral or academic application":G.purpose==="job"?" for a job application":" for my professional portfolio";
