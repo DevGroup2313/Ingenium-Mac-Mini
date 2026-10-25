@@ -48,7 +48,8 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
 .isc-box .isc-listen.seg-btn{flex:0 0 auto;min-height:34px;padding:6px 11px}
 .isc-listen svg{width:13px;height:13px;flex:0 0 auto}
 .isc-lvl{display:flex;align-items:center;gap:10px;margin-top:10px}
-.isc-lvl label{flex:0 0 auto;min-width:64px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.isc-lvl label{position:relative;flex:0 0 auto;min-width:64px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.isc-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 .isc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--hairline);padding-top:12px;margin-top:2px}
 @media (pointer:coarse),(max-width:600px){
   #dpSound .seg-btn,#ingSoundCard .seg-btn,#ingSoundCard .btn,.isc-box .seg-btn,.isc-box .isc-pill.seg-btn,.isc-box .isc-listen.seg-btn,.isc-box .btn{min-height:44px}
@@ -82,7 +83,8 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
    - The "3D": each sound is placed a little to the left or right by where it happened on the screen (at most 0.35 of the
      way to either side; the middle for the keyboard and for anything with no place), and a small room is around every
      sound: a short reverberation made on the device (a 0.8-second impulse of darkening noise with a few early
-     reflections), mixed low. Where the browser has no stereo panner (older Safari) an equal-power panner does the same,
+     reflections, from a fixed seed so the room is the same every session), mixed low, and the same in both ears, so a
+     sound meant for the middle stays in the middle. Where the browser has no stereo panner (older Safari) an equal-power panner does the same,
      and where it has neither the sound plays in the middle. A sound placed to one side keeps its loudness (equal power,
      levelled to the middle), so nothing is louder or softer than in her other apps, only placed.
    - Where they sound, only where they cannot be mistaken for something else: crossing the welcome door (room); choosing a
@@ -93,14 +95,22 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
      again (a page change 150 ms, a notice 1.5 s), a notice that arrives as the door chime rings or just after a press
      stays silent, and nothing doubles the Clepsydra's own chime when a session ends.
    - Silence when it matters: never while the quiet screen is open, never while a reply is being written word by word,
-     never for typing, and never in Calm mode, which promises "no motion, no sounds". Minimal motion leaves the sounds as
-     they are: motion and sound are different senses, the Sound keys turn them off in one press, and Calm mode is the
-     switch that quiets everything at once. Off means off: nothing plays at all, the Listen and Test keys included.
+     never for typing, and never in the calm look (Settings, Support), in which the focus timer's chime is already always
+     off. Minimal motion leaves the sounds as they are: motion and sound are different senses, the Sound keys turn them
+     off in one press, and the calm look is the switch that quiets everything at once. Off means these sounds are off:
+     nothing of them plays at all, the Listen and Test keys included. The focus timer's chime keeps its own switch, and
+     the words on screen say so rather than promise a silence Off does not give.
    - A browser lets no page sound before it has been touched (iPhone, iPad and Fire tablets most of all), so the sound is
      woken at the first touch or key and never before; it shares the Clepsydra's own audio, so the page holds one.
    - The controls are Ingenium's: a Sound section in the Display panel and a Sound card in Settings (On and Off, a volume
      named in words, More sound choices, Test the sounds), and a panel of choices with each role in plain words, a Listen
-     key for each sound and a level for each role. */
+     key for each sound and a level for each role.
+   THE SECOND LOOK (the same day), after an independent review: the room is one for both ears (it had made centred sounds
+   lean to one side by chance) and comes from a fixed seed; a progress line ending in an ellipsis, Fabrica's included, no
+   longer chimes; a full store or a notice that opens with No is no longer taken for a keeping; Test and Listen say when
+   the volume or a level is at Silent instead of claiming to play; the four level sliders carry their role in their names;
+   the words for Off no longer promise more silence than Off gives; the calm look is named as Settings names it; and a word
+   said a moment ago gives way as soon as the volume, a level or On and Off change, so the note never contradicts the keys. */
 (function r176(){
 "use strict";
 if(window.__r176)return;window.__r176=1;
@@ -111,7 +121,7 @@ var OAC=W.OfflineAudioContext||W.webkitOfflineAudioContext;
 var GAP=60;
 var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150};
 var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
-var PAN_MAX=0.35,ROOM_SEND=0.16,ROOM_LEN=0.8;
+var PAN_MAX=0.35,ROOM_SEND=0.16,ROOM_LEN=0.8,ROOM_SEED=0x1C67;
 
 /* ---------- the four roles and the thirteen names, in plain words ---------- */
 var NAMES={deskChime:"Desk chime",smallBell:"Small bell",waterDrop:"Water drop",
@@ -119,10 +129,10 @@ var NAMES={deskChime:"Desk chime",smallBell:"Small bell",waterDrop:"Water drop",
   dayTurn:"Day turn",lampLit:"Lamp lit",duskFall:"Dusk fall",
   deskSet:"Desk set",bookClose:"Book close",boardLift:"Board lift",shelfPass:"Shelf pass"};
 var ROLES=[
-  ["notify","Notices and reminders","When a reminder or a notice appears.",["deskChime","smallBell","waterDrop"]],
-  ["confirm","Keeping something","When something is saved, kept or copied.",["keepMark","softClick","feltPress"]],
-  ["room","Entering Ingenium","When you go through the welcome door.",["dayTurn","lampLit","duskFall"]],
-  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["deskSet","bookClose","boardLift","shelfPass"]]];
+  ["notify","Notices and reminders","When a reminder or a notice appears.",["deskChime","smallBell","waterDrop"],"for notices and reminders"],
+  ["confirm","Keeping something","When something is saved, kept or copied.",["keepMark","softClick","feltPress"],"for keeping something"],
+  ["room","Entering Ingenium","When you go through the welcome door.",["dayTurn","lampLit","duskFall"],"for entering Ingenium"],
+  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["deskSet","bookClose","boardLift","shelfPass"],"for moving between pages"]];
 var DEF={on:true,vol:0.25,notify:"deskChime",confirm:"keepMark",room:"dayTurn",paper:"deskSet",trim:{notify:1,confirm:1,room:1,paper:1}};
 
 function copy(o){return JSON.parse(JSON.stringify(o));}
@@ -143,13 +153,20 @@ function lvl(role){return cfg.vol*(cfg.trim[role]==null?1:cfg.trim[role]);}
 
 /* ---------- the audio: one context (the Clepsydra's own when it has one), a room, and a place for each sound ---------- */
 var live=null,E=null,OUT=null,faded=false;
-function impulse(c){var sr=c.sampleRate,n=Math.max(2,Math.floor(sr*ROOM_LEN)),b=c.createBuffer(2,n,sr),pre=Math.floor(sr*0.011);
-  for(var ch=0;ch<2;ch++){var d=b.getChannelData(ch),lp=0;
-    for(var i=pre;i<n;i++){var t=(i-pre)/sr,k=0.35+0.5*Math.min(1,t/ROOM_LEN);lp=lp*k+(Math.random()*2-1)*(1-k);d[i]=lp*Math.exp(-t*6.5);}
-    /* a few early reflections, a little apart in each ear */
-    [[0.004,0.55],[0.009,0.38],[0.017,0.26],[0.026,0.17]].forEach(function(r){var at=pre+Math.floor(sr*(r[0]+(ch?0.0023:0)));if(at<n)d[at]+=r[1]*(ch?0.9:1);});
-    /* levelled to carry the sound's own energy, so ROOM_SEND alone says how much room is heard */
-    var en=0;for(var j=0;j<n;j++)en+=d[j]*d[j];var sc=en>0?1/Math.sqrt(en):0;for(var q=0;q<n;q++)d[q]*=sc;}
+/* the room's noise comes from a fixed seed (a small mulberry32), so the room is the same in every session and takes no
+   numbers from Math.random, which the voices' own grains use */
+function seeded(a){a=a|0;return function(){var t=a=(a+0x6D2B79F5)|0;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+/* The same room in both ears. A room drawn apart for each ear made a sound meant for the middle lean to one side, by
+   chance and for the whole session: by up to 2 or 3 dB on the tonal sounds, because each ear heard the sound and its
+   room meet differently (a copy of one room delayed a little for the other ear leaned as much). So the room is one, the
+   same on both sides, a centred sound stays exactly in the middle, and placing a sound is left to the panner alone. */
+function impulse(c){var sr=c.sampleRate,n=Math.max(2,Math.floor(sr*ROOM_LEN)),b=c.createBuffer(2,n,sr),pre=Math.floor(sr*0.011),R=seeded(ROOM_SEED),d=new Float32Array(n),lp=0;
+  for(var i=pre;i<n;i++){var t=(i-pre)/sr,k=0.35+0.5*Math.min(1,t/ROOM_LEN);lp=lp*k+(R()*2-1)*(1-k);d[i]=lp*Math.exp(-t*6.5);}
+  /* a few early reflections */
+  [[0.004,0.55],[0.009,0.38],[0.017,0.26],[0.026,0.17]].forEach(function(r){var at=pre+Math.floor(sr*r[0]);if(at<n)d[at]+=r[1];});
+  /* levelled to carry the sound's own energy, so ROOM_SEND alone says how much room is heard */
+  var en=0;for(var j=0;j<n;j++)en+=d[j]*d[j];var sc=en>0?1/Math.sqrt(en):0;for(var q=0;q<n;q++)d[q]*=sc;
+  for(var ch=0;ch<2;ch++)b.getChannelData(ch).set(d);
   return b;}
 function engine(c,noRoom){var e={c:c};e.master=c.createGain();e.master.gain.value=1;e.master.connect(c.destination);e.room=null;
   if(!noRoom){try{var cv=c.createConvolver();cv.normalize=false;cv.buffer=impulse(c);var wet=c.createGain();wet.gain.value=ROOM_SEND;cv.connect(wet);wet.connect(e.master);e.room=cv;}catch(x){e.room=null;}}
@@ -241,8 +258,10 @@ var V={
 /* ---------- when a sound may play at all ---------- */
 var gestured=false,gestureAt=0,lastPointer=null,lastKeyAt=0;
 function woke(){if(gestured)return true;try{return !!(navigator.userActivation&&navigator.userActivation.hasBeenActive);}catch(e){return false;}}
-function calm(){try{if(D.documentElement.hasAttribute("data-sc-calm"))return true;}catch(e){}
-  try{return !!(W.state&&W.state.support&&W.state.support.calm);}catch(e){return false;}}
+/* the calm look (Settings, Support): "No moving parts, fewer things on screen", and the focus timer's chime is always off
+   in it, so these rest too */
+function calm(){try{if(W.state&&W.state.support&&W.state.support.calm)return true;}catch(e){}
+  try{return !!(D.body&&D.body.getAttribute("data-calm")==="1");}catch(e){return false;}}
 function shown(el){try{return !!el&&!el.hidden&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=="hidden";}catch(e){return false;}}
 function quiet(){try{if(W.IngQuiet&&typeof W.IngQuiet.isOpen==="function"&&W.IngQuiet.isOpen())return true;}catch(e){}
   return shown(D.getElementById("quietScreen"))||shown(D.getElementById("ingQuiet"));}
@@ -260,10 +279,10 @@ function panOf(o){o=o||{};if(num(o.pan))return clamp(o.pan,-PAN_MAX,PAN_MAX);
   return Math.round(clamp((x/w)*2-1,-1,1)*PAN_MAX*1000)/1000;}
 
 /* ---------- playing ---------- */
-var lastAt=0,lastRole={},roomAt=0,chimeAt=0,last=null,played=0;
+var lastAt=0,lastRole={},roomAt=0,chimeAt=0,last=null,played=0,hist=[];
 function sound(voice,L,pan){var e=ctxLive();if(!e||!V[voice])return false;
   try{restore(e);E=e;OUT=route(e,pan||0);V[voice](e.c.currentTime+0.02,L==null?1:L);}catch(x){return false;}finally{E=null;OUT=null;}
-  played++;last={voice:voice,role:roleOf(voice),pan:pan||0,level:L,at:Date.now()};return true;}
+  played++;last={voice:voice,role:roleOf(voice),pan:pan||0,level:L,at:Date.now()};hist.push(last);if(hist.length>24)hist.shift();return true;}
 function play(role,o){o=o||{};if(!isRole(role)||!allowed())return false;
   var now=Date.now();
   if(o.auto&&(now-lastAt<AFTER_ANY||now-roomAt<AFTER_ROOM||now-chimeAt<AFTER_CHIME))return false;
@@ -280,12 +299,19 @@ function voice(name,o){o=o||{};if(!V[name]||!allowed())return false;var now=Date
 /* Test the sounds: the four, one after another, from a little left to a little right */
 var testT=[];
 function stopTest(){testT.forEach(function(t){clearTimeout(t);});testT=[];}
+/* why a key that should sound cannot, in plain words (null when it can) */
+var WORDS=["no","one","two","three","four"];
+function why(role){if(!cfg.on)return "Sounds are off. Turn them on to hear them.";
+  if(calm())return "The calm look is on, so the sounds are resting.";
+  if(!(cfg.vol>0))return "The volume is at Silent. Turn it up to hear the sounds.";
+  if(role&&!(lvl(role)>0))return "This kind of sound is set to Silent. Turn its level up to hear it.";
+  return null;}
 function test(){stopTest();
-  if(!cfg.on){say("Sounds are off. Turn them on to hear them.");return false;}
-  if(calm()){say("Calm mode is on, so the sounds are resting.");return false;}
+  var r=why(null);if(r){say(r);return false;}
   if(quiet()||writing())return false;
-  say("Playing the four sounds, one after another.");
-  var seq=[["paper",-0.3],["confirm",-0.1],["notify",0.1],["room",0.3]];
+  var seq=[["paper",-0.3],["confirm",-0.1],["notify",0.1],["room",0.3]].filter(function(s){return lvl(s[0])>0;});
+  if(!seq.length){say("Each kind of sound is set to Silent. Turn a level up in More sound choices.");return false;}
+  say(seq.length===4?"Playing the four sounds, one after another.":"Playing "+WORDS[seq.length]+" of the four sounds. The "+(4-seq.length===1?"other is":"others are")+" set to Silent.");
   seq.forEach(function(s,i){testT.push(setTimeout(function(){if(!allowed())return;var L=lvl(s[0]);if(L>0&&sound(cfg[s[0]],L,s[1]))lastAt=Date.now();},i*750));});
   testT.push(setTimeout(function(){say(null);},seq.length*750+900));
   return true;}
@@ -310,8 +336,12 @@ function volWord(v){var p=pct(v);return p<=0?"Silent":p<15?"Quiet":p<35?"Gentle"
 function volText(v){return volWord(v)+", "+pct(v)+" percent";}
 function trimWord(v){var p=pct(v);return p<=0?"Silent":p<80?"Softer":p<=120?"Same":"Louder";}
 function trimText(v){var p=pct(v);return (p<=0?"Silent":p<80?"Softer than the others":p<=120?"The same as the others":"Louder than the others")+", "+p+" percent";}
-function idle(only){if(!cfg.on)return "Sounds are off. Ingenium stays silent.";if(calm())return "Calm mode is on, so the sounds are resting.";
-  return only?"":"Soft sounds, made on this device. Off keeps Ingenium silent.";}
+/* Off is these sounds. The focus timer rings a chime of its own, with its own switch, so the words never claim more
+   silence than Off gives */
+function idle(only){if(!cfg.on)return "Sounds are off. The focus timer's chime has its own switch.";
+  if(calm())return "The calm look is on, so the sounds are resting.";
+  if(!(cfg.vol>0))return "The volume is at Silent. Turn it up to hear the sounds.";
+  return only?"":"Soft sounds, made on this device.";}
 var sayT=0,saying="";
 function note(n){var t=saying||idle(n.getAttribute("data-snd-note")==="only");if(n.textContent!==t)n.textContent=t;}
 function say(t){clearTimeout(sayT);saying=t||"";qa("[data-snd-note]").forEach(note);
@@ -329,6 +359,9 @@ function set(p){if(!p||typeof p!=="object")return config();
   if("vol" in p&&num(+p.vol))cfg.vol=clamp(+p.vol,0,1);
   ROLES.forEach(function(r){var k=r[0];if(typeof p[k]==="string"&&r[3].indexOf(p[k])>=0)cfg[k]=p[k];
     if(p.trim&&typeof p.trim==="object"&&p.trim[k]!=null&&p.trim[k]!==""&&num(+p.trim[k]))cfg.trim[k]=clamp(+p.trim[k],0,1.5);});
+  /* a word said a moment ago ("The volume is at Silent") must not outlast the change that answers it: on, the volume or a
+     level moved, the notes go back to what is true now (a key that speaks after it changes something says its word after) */
+  if("on" in p||"vol" in p||p.trim){clearTimeout(sayT);saying="";}
   save();paint();return config();}
 function config(){return copy(cfg);}
 function paint(){
@@ -398,14 +431,14 @@ function openChoices(from){if($("ingSoundChoices")){var h0=$("iscTitle");if(h0)h
     r[3].forEach(function(v){var row=mk("div","isc-opt");
       var lab=mk("label","seg-btn isc-pill");lab.setAttribute("data-voice",v);
       var inp=mk("input");inp.type="radio";inp.name="isc-"+k;inp.value=v;inp.id="isc-"+v;inp.setAttribute("aria-describedby","iscW-"+k);
-      inp.addEventListener("change",function(){if(!inp.checked)return;var o={};o[k]=v;set(o);voice(v,{});});
+      inp.addEventListener("change",function(){if(!inp.checked)return;var o={};o[k]=v;set(o);var w=why(k);if(w)say(w);else voice(v,{});});
       lab.appendChild(inp);lab.appendChild(mk("span","isc-dot"));lab.appendChild(mk("span",null,NAMES[v]));
       var ls=mk("button","seg-btn isc-listen");ls.type="button";ls.setAttribute("data-listen",v);ls.setAttribute("aria-label","Listen to "+NAMES[v]);ls.innerHTML=SPEAKER+"<span>Listen</span>";
-      ls.addEventListener("click",function(e){if(!cfg.on){say("Sounds are off. Turn them on to hear them.");return;}if(calm()){say("Calm mode is on, so the sounds are resting.");return;}
-        voice(v,{event:e,level:lvl(k)});});
+      ls.addEventListener("click",function(e){var w=why(k);if(w){say(w);return;}voice(v,{event:e,level:lvl(k)});});
       row.appendChild(lab);row.appendChild(ls);opts.appendChild(row);});
     fs.appendChild(opts);
-    var lv=mk("div","isc-lvl"),ll=mk("label",null,"Its level");ll.htmlFor="iscL-"+k;
+    /* each level is named for its role, so a screen reader's list of controls tells the four apart */
+    var lv=mk("div","isc-lvl"),ll=mk("label",null,"Its level");ll.htmlFor="iscL-"+k;ll.appendChild(mk("span","isc-sr"," "+r[4]));
     var rg=mk("input");rg.type="range";rg.id="iscL-"+k;rg.min="0";rg.max="150";rg.step="10";rg.setAttribute("data-trim",k);
     rg.addEventListener("input",function(){var o={trim:{}};o.trim[k]=(+rg.value)/100;set(o);});
     rg.addEventListener("change",function(){var o={trim:{}};o.trim[k]=(+rg.value)/100;set(o);voice(cfg[k],{});});
@@ -438,10 +471,15 @@ function closeChoices(){var b=$("ingSoundChoices");if(b&&b.parentNode)b.parentNo
   try{if(to)to.focus();}catch(e){}}
 
 /* ---------- where they sound ---------- */
-var KEPT=/^(saved|kept|copied|added|remembered|restored|stored|installed|exported|imported|downloaded|done|undone|moved|renamed|pinned|sent|backed up|put away)\b|\b(is|are|was|were|has been|have been)( now)? (saved|kept|stored|added|installed|copied|backed up)\b|\bkept in\b/i;
-var NOT=/could not|couldn['’]t|cannot|can['’]t|did not|didn['’]t|not (saved|kept|added|copied)|failed|error|no longer|nothing to/i;
+var KEPT=/^(saved|kept|copied|added|remembered|restored|stored|installed|exported|imported|downloaded|done|undone|moved|renamed|pinned|sent|backed up|put away)\b|^\d+ [a-z ]{1,24}?\b(added|exported|imported|saved|kept|copied)\b|\b(is|are|was|were|has been|have been)( now)? (saved|kept|stored|added|installed|copied|backed up)\b|\bkept in\b/i;
+/* a warning, a refusal or a limit is never taken for a keeping: a store that is full ("so your desk is kept in the app's
+   copy on disk"), a notice that opens with No or Not ("No posting was added"), "the last one chosen was kept" */
+var NOT=/could not|couldn['’]t|cannot|can['’]t|did not|didn['’]t|not (saved|kept|added|copied)|failed|error|no longer|nothing to|\bfull\b|quota|out of space|no room|^(no|not)\b|\bthe last one\b/i;
 function kept(s){return KEPT.test(s)&&!NOT.test(s);}
-function notice(text,el){var s=String(text==null?"":text).trim();if(!s)return false;var role=kept(s)?"confirm":"notify";
+/* a line that ends in an ellipsis is work in progress ("Reading the file…", "Opening it in Build…"), not a notice: it
+   stays silent, and the notice that follows it sounds */
+function progress(s){return /(…|\.\.\.)\s*$/.test(s);}
+function notice(text,el){var s=String(text==null?"":text).trim();if(!s||progress(s))return false;var role=kept(s)?"confirm":"notify";
   return play(role,{auto:true,recent:role==="confirm",el:el||null});}
 function current(){var s=D.querySelector(".main > section.active, main > section.active");if(s&&s.id)return s.id.replace(/^page-/,"");
   var b=D.querySelector(".dock .nav-btn.active");return b?(b.getAttribute("data-page")||""):"";}
@@ -495,7 +533,8 @@ function watchSup(){var h=$("supNotice");if(!h||h.__r176)return;h.__r176=1;
     .observe(h,{childList:true});}catch(e){}}
 function watchScToast(){var s=$("sc-toast");if(!s||s.__r176)return;s.__r176=1;var was=s.classList.contains("show");
   try{new MutationObserver(function(){var now=s.classList.contains("show");if(now&&!was)play("notify",{auto:true,el:s});was=now;}).observe(s,{attributes:true,attributeFilter:["class"]});}catch(e){}}
-/* Fabrica's own notices, in its own corner */
+/* Fabrica's own notices, in its own corner (its progress lines share the look and end in an ellipsis: notice() lets
+   them pass in silence) */
 function watchFb(){var f=$("fb");if(!f||f.__r176)return;f.__r176=1;
   try{new MutationObserver(function(ms){ms.forEach(function(m){Array.prototype.forEach.call(m.addedNodes,function(n){if(n.nodeType===1&&n.classList&&n.classList.contains("f-toast"))notice(n.textContent,n);});});})
     .observe(f,{childList:true});}catch(e){}}
@@ -508,8 +547,8 @@ function bodyWatch(){try{new MutationObserver(function(ms){ms.forEach(function(m
 
 function sweep(){try{ensureDisplay();ensureCard();watchDoor();watchSup();watchScToast();watchFb();wrapToast();wrapChime();wrapSeal();}catch(e){try{console.warn("Ingenium sound:",e&&e.message||e);}catch(_){}}}
 function init(){sweep();bodyWatch();setInterval(sweep,1500);
-  /* Calm mode may change from the Focus page: the notes say so */
-  try{new MutationObserver(function(){paint();}).observe(D.documentElement,{attributes:true,attributeFilter:["data-sc-calm"]});}catch(e){}}
+  /* the calm look may change in Settings: the notes say so */
+  try{new MutationObserver(function(){paint();}).observe(D.body,{attributes:true,attributeFilter:["data-calm"]});}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",init);else init();
 
 W.IngSound={version:176,
@@ -518,7 +557,7 @@ W.IngSound={version:176,
   config:config,set:set,test:test,stop:hush,render:render,
   choices:function(){openChoices(D.activeElement);},close:closeChoices,
   notice:function(t){return notice(t,null);},
-  last:function(){return last?copy(last):null;},count:function(){return played;},
+  last:function(){return last?copy(last):null;},count:function(){return played;},history:function(){return copy(hist);},
   allowed:allowed,
   roles:ROLES.map(function(r){return {id:r[0],name:r[1],when:r[2],voices:r[3].slice()};}),
   names:copy(NAMES),defaults:copy(DEF)};

@@ -158,6 +158,6 @@ at once. A list of several lines is left as the system draws it, with readable c
 module (pass 675) and made on the device as they play, placed a little left or right by where they happen and given a small
 room, with a Sound section in the Display panel, a Sound card in Settings and a panel of choices (stored as `ing_sound_67`).
 
-    node rig/t_67_sound.js <url> <out> [axe.min.js]   # 79 checks: the thirteen voices rendered (never silent, never clipping), where they sound and where they never do, the 60 ms rule, the place in stereo, the keys and the choices kept across a reload, axe by day and night on a desk and a phone
+    node rig/t_67_sound.js <url> <out> [axe.min.js]   # 92 checks: the thirteen voices rendered (never silent, never clipping, a centred sound in the middle with its room), where they sound and where they never do, the 60 ms rule, the place in stereo, the keys and the choices kept across a reload, axe by day and night on a desk and a phone
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.
