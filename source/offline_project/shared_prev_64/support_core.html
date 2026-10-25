@@ -1,0 +1,651 @@
+<style id="sc-css">
+/* THE SUPPORT MODULE · one source, copied whole into each app (Ingenium, Carpe Diem, the Forge), so each runs on
+   its own with no tie to another. It carries the supports Carpe Diem first built for an AuDHD mind: calm mode,
+   smaller steps, time you can see, low-energy days, the Inbox (with the thoughts panel), routines, the Focus room
+   and a two-minute Just start, and it draws them on a Focus page laid out as Ingenium's is. Each app gives it its
+   own cards and keys (its classes), its own colours (the tokens below fall back to the app's own variables), its
+   own words for the day and its own "Today asks of you". */
+.sc-page{--sc-accent:var(--accent,#1b6b93);--sc-deep:var(--accent-deep,var(--accent,#145671));--sc-soft:var(--accent-softer,rgba(27,107,147,.06));
+  --sc-ink:var(--ink-1,var(--text-primary,#1d1d1f));--sc-ink2:var(--ink-2,var(--text-secondary,#454549));--sc-ink3:var(--ink-3,var(--text-tertiary,#62626a));
+  --sc-hair:var(--hairline,rgba(0,0,0,.08));--sc-serif:var(--serif,var(--cd-serif,Georgia,"Times New Roman",serif));--sc-well:var(--bg,#f5f5f7);
+  display:block;max-width:1080px;margin:0 auto;padding:4px 0 40px;box-sizing:border-box}
+.sc-page *,.sc-page *::before,.sc-page *::after{box-sizing:border-box}
+.sc-page[data-sc-app="forge"]{--sc-accent:var(--accent,#17577a)}
+.sc-top{margin:6px 0 18px}
+.sc-top .sc-title{margin:0 0 6px}
+.sc-top .sc-lede{max-width:78ch;margin:0}
+.sc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.sc-wide{grid-column:1/-1}
+@media (max-width:820px){.sc-grid{grid-template-columns:1fr}}
+.sc-page .sc-card{margin:0;padding:18px 20px;border-radius:18px;min-width:0}
+.sc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sc-h{margin:0;font-family:var(--sc-serif);font-weight:600;font-size:17px;letter-spacing:.01em;color:var(--sc-ink)}
+.sc-clock{font-size:12px;color:var(--sc-ink3);font-variant-numeric:tabular-nums}
+.sc-note{font-size:12.5px;line-height:1.55;color:var(--sc-ink3);margin:0 0 10px}
+.sc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--sc-hair)}
+.sc-row:first-child{border-top:0;padding-top:2px}
+.sc-ico{flex:none;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--sc-deep);background:rgba(127,127,127,.12)}
+.sc-txt{flex:1;min-width:0;line-height:1.55;font-size:13.5px;color:var(--sc-ink)}
+.sc-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sc-acts.sc-gap{margin-top:12px}
+.sc-task-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.sc-task-top select{max-width:100%;min-width:0;flex:1 1 220px}
+.sc-task-title{font-size:13.5px;font-weight:600;color:var(--sc-ink)}
+.sc-count{font-size:12px;color:var(--sc-ink3);margin:6px 0 4px}
+.sc-dots{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 12px}
+.sc-dots span{width:11px;height:11px;border-radius:50%;background:rgba(127,127,127,.22);box-shadow:inset 0 1px 1px rgba(0,0,0,.12)}
+.sc-dots span.done{background:linear-gradient(135deg,var(--sc-accent),var(--sc-deep))}
+.sc-dots span.cur{outline:2px solid var(--sc-accent);outline-offset:2px}
+.sc-step{font-family:var(--sc-serif);font-weight:600;font-size:16.5px;letter-spacing:.02em;line-height:1.5;color:var(--sc-ink);padding:22px 24px;border-radius:18px;margin:4px 0 16px;
+  border:1px solid var(--sc-hair);background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.55));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 1px 2px rgba(0,0,0,.06),0 6px 14px -8px rgba(0,0,0,.16)}
+.sc-page[data-sc-night="1"] .sc-step{background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.03));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4),0 6px 14px -8px rgba(0,0,0,.5)}
+.sc-page:not([data-sc-still="1"]) .sc-step{animation:scStepIn .35s ease-out}
+@keyframes scStepIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sc-done-big{font-family:var(--sc-serif);font-weight:600;font-size:16.5px;color:var(--sc-ink);margin:6px 0 14px}
+.sc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.sc-li{display:flex;align-items:center;gap:10px}
+.sc-li input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--sc-accent)}
+.sc-li input[type=text]{flex:1;min-width:0}
+.sc-li.done input[type=text]{text-decoration:line-through;color:var(--sc-ink3)}
+.sc-x{border:0;background:transparent;color:var(--sc-ink3);cursor:pointer;font-size:14px;padding:6px 8px;border-radius:8px}
+.sc-x:hover{color:var(--sc-ink);background:var(--sc-soft)}
+.sc-page input[type=text].sc-in,.sc-page textarea.sc-in,.sc-sheet input.sc-in{width:100%;font:inherit;font-size:14px;color:var(--sc-ink);background:rgba(255,255,255,.7);border:1px solid var(--sc-hair);border-radius:12px;padding:9px 12px;outline:none}
+.sc-page[data-sc-night="1"] input[type=text].sc-in,.sc-page[data-sc-night="1"] textarea.sc-in{background:rgba(255,255,255,.05)}
+.sc-page .sc-in:focus{border-color:var(--sc-accent);box-shadow:0 0 0 3px var(--sc-soft)}
+.sc-label{display:block;font-size:12.5px;color:var(--sc-ink2);margin:0 0 6px}
+.sc-bigclock{font-family:var(--sc-serif);font-size:42px;line-height:1.05;color:var(--sc-ink);font-variant-numeric:tabular-nums;margin:2px 0 6px}
+.sc-timer{margin:14px 0 6px;padding:14px 16px;border-radius:14px;border:1px solid var(--sc-hair);background:rgba(0,0,0,.025);display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.sc-page[data-sc-night="1"] .sc-timer{background:rgba(255,255,255,.035)}
+.sc-timer-now{font-family:var(--sc-serif);font-weight:600;font-size:16.5px;line-height:1.3;color:var(--sc-deep);font-variant-numeric:tabular-nums}
+.sc-bar{margin:12px 0 2px}
+.sc-bar-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--sc-ink2);margin-bottom:6px}
+.sc-bar-n{color:var(--sc-ink3)}
+.sc-track{height:7px;border-radius:99px;background:rgba(127,127,127,.16);overflow:hidden;box-shadow:inset 0 1px 1px rgba(0,0,0,.08)}
+.sc-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sc-accent),var(--sc-deep));transition:width .6s ease}
+.sc-park{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--sc-hair)}
+.sc-park:first-child{border-top:0}
+.sc-park-t{font-size:13.5px;color:var(--sc-ink);word-break:break-word;line-height:1.5}
+.sc-park-m{font-size:11.5px;color:var(--sc-ink3)}
+.sc-park .tc-acts{display:flex;flex-wrap:wrap;gap:6px}
+.sc-sw{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--sc-hair)}
+.sc-sw:first-child{border-top:0}
+.sc-sw-ic{flex:none;width:26px;text-align:center;font-size:17px;line-height:26px}
+.sc-sw-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sc-sw-l{font-size:13.5px;font-weight:600;color:var(--sc-ink)}
+.sc-sw-h{font-size:12px;line-height:1.5;color:var(--sc-ink3)}
+.sc-seg{display:inline-flex;gap:6px;flex-wrap:wrap;flex:none}
+.sc-rt{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--sc-hair)}
+.sc-rt:first-child{border-top:0}
+.sc-rt-ic{flex:none;font-size:20px;width:28px;text-align:center}
+.sc-rt-t{flex:1;min-width:0}
+.sc-rt-n{font-size:13.5px;font-weight:600;color:var(--sc-ink)}
+.sc-rt-s{font-size:12px;color:var(--sc-ink3)}
+.sc-rt.sc-now .sc-rt-s{color:var(--sc-deep)}
+.sc-low{border-left:3px solid var(--sc-accent)}
+.sc-page.sc-solo{max-width:none;margin:0;padding:0}
+.sc-low .sc-h{font-size:16px}
+.sc-empty{font-size:12.5px;color:var(--sc-ink3);padding:4px 0}
+.sc-page .sc-btn{font:inherit;font-size:12.5px;cursor:pointer;border-radius:10px;padding:6px 12px;border:1px solid var(--sc-hair);background:rgba(255,255,255,.7);color:var(--sc-ink)}
+.sc-page .sc-btn.sc-primary{background:var(--sc-accent);border-color:transparent;color:#fff}
+.sc-page .sc-btn.sc-on,.sc-page [aria-pressed="true"].sc-tog{box-shadow:inset 0 0 0 1.5px var(--sc-accent)}
+/* the quiet screen, the Focus room, the two-minute start and the support sheets: drawn over any app */
+#sc-quiet{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;background:radial-gradient(ellipse at 50% 45%,#2a2f38 0%,#15181d 70%);color:#d9dde3;font-family:Georgia,"Times New Roman",serif}
+#sc-quiet .sc-q-ring{width:140px;height:140px;border-radius:50%;border:1.5px solid rgba(217,221,227,.35);box-shadow:0 0 60px rgba(217,221,227,.08) inset}
+#sc-quiet:not([data-sc-still="1"]) .sc-q-ring{animation:scBreath 9s ease-in-out infinite}
+@keyframes scBreath{0%,100%{transform:scale(.82);opacity:.55}45%{transform:scale(1.06);opacity:1}55%{transform:scale(1.06);opacity:1}}
+#sc-quiet .sc-q-w{font-size:19px;letter-spacing:.02em;text-align:center;max-width:30ch;line-height:1.5;opacity:.86}
+#sc-quiet .sc-q-s{font-size:13px;opacity:.6}
+#sc-quiet button{font:15px Georgia,serif;color:#e7eaee;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:10px 22px;cursor:pointer}
+#sc-focus-room{position:fixed;inset:0;z-index:2147482900;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 30%,var(--sc-fr-a,#f7f8fa) 0%,var(--sc-fr-b,#e6ebef) 100%);color:var(--sc-fr-ink,#1d2a33);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#sc-focus-room[data-sc-night="1"]{--sc-fr-a:#1d2228;--sc-fr-b:#101317;--sc-fr-ink:#e2e6ea}
+#sc-focus-room[data-sc-app="ingenium"]{--sc-fr-accent:#6b4fa0}
+#sc-focus-room[data-sc-app="cd"]{--sc-fr-accent:#1b6b93}
+#sc-focus-room[data-sc-app="forge"]{--sc-fr-accent:#17577a}
+#sc-focus-room[data-sc-night="1"][data-sc-app="ingenium"]{--sc-fr-accent:#b79ee6}
+#sc-focus-room[data-sc-night="1"][data-sc-app="cd"],#sc-focus-room[data-sc-night="1"][data-sc-app="forge"]{--sc-fr-accent:#5baedb}
+.sc-fr-in{width:min(560px,100%);display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.sc-fr-k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.65}
+.sc-fr-task{width:100%;font:600 22px/1.35 Georgia,"Times New Roman",serif;text-align:center;color:inherit;background:transparent;border:0;border-bottom:1px solid rgba(127,127,127,.35);padding:6px 4px;outline:none}
+.sc-fr-now{font-size:14px;opacity:.85}
+.sc-fr-ring{--p:0;position:relative;width:210px;height:210px;border-radius:50%;background:conic-gradient(var(--sc-fr-accent) calc(var(--p)*1%),rgba(127,127,127,.16) 0);display:flex;align-items:center;justify-content:center}
+.sc-fr-ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--sc-fr-a,#f7f8fa)}
+.sc-fr-clock{position:relative;font:400 46px/1 Georgia,serif;font-variant-numeric:tabular-nums}
+.sc-fr-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.sc-fr-row button,.sc-fr-snd button{font:14px system-ui,sans-serif;color:inherit;background:rgba(127,127,127,.10);border:1px solid rgba(127,127,127,.28);border-radius:999px;padding:9px 18px;cursor:pointer}
+.sc-fr-row button.sc-fr-go{background:var(--sc-fr-accent);border-color:transparent;color:#fff;font-weight:600}
+.sc-fr-snd{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.sc-fr-snd button{padding:6px 14px;font-size:13px}
+.sc-fr-snd button.on{box-shadow:inset 0 0 0 1.5px var(--sc-fr-accent)}
+.sc-fr-hint{font-size:12px;opacity:.55}
+#sc-just{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147482800;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 18px;border-radius:999px;background:rgba(255,255,255,.96);color:#1d2a33;font:13px system-ui,sans-serif;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.08),0 10px 24px -10px rgba(0,0,0,.25)}
+#sc-just[data-sc-night="1"]{background:rgba(32,36,42,.97);color:#e2e6ea}
+#sc-just .sc-just-bar{width:120px;height:6px;border-radius:99px;background:rgba(127,127,127,.2);overflow:hidden}
+#sc-just .sc-just-bar i{display:block;height:100%;background:var(--sc-j,#1b6b93)}
+#sc-just button{font:12px system-ui,sans-serif;color:inherit;background:transparent;border:1px solid rgba(127,127,127,.35);border-radius:999px;padding:4px 10px;cursor:pointer}
+#sc-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(12px);opacity:0;pointer-events:none;z-index:2147483100;max-width:min(520px,calc(100vw - 32px));padding:10px 16px;border-radius:14px;background:rgba(30,34,40,.94);color:#f1f3f5;font:13px/1.45 system-ui,sans-serif;transition:opacity .25s ease,transform .25s ease}
+#sc-toast.show{opacity:1;transform:translateX(-50%)}
+/* what is shown at a time (the five-minute word, the end of the two minutes, the two-minute chip) wears the app's own
+   reminder card when the app gives one (SC.reminders(look)); an app that gives none keeps the dark note above. The rim is
+   drawn inside, so the card keeps its size and place. */
+#sc-toast[data-sc-look="1"],#sc-just[data-sc-look="1"]{background:var(--sc-r-face);color:var(--sc-r-ink);box-shadow:inset 0 0 0 1px var(--sc-r-rim),0 2px 0 rgba(0,0,0,.16),0 6px 20px rgba(0,0,0,.30)}
+#sc-toast[data-sc-look="1"][data-sc-still="1"]{transition:none}
+/* the card takes the width its words need (up to its limit), not half the screen, since it is centred from the middle */
+#sc-toast[data-sc-look="1"]{width:max-content}
+#sc-just[data-sc-look="1"] .sc-just-bar{background:var(--sc-r-track)}
+#sc-just[data-sc-look="1"] .sc-just-bar i{background:var(--sc-r-rim)}
+#sc-just[data-sc-look="1"] button{color:var(--sc-r-ink);border-color:var(--sc-r-line)}
+#sc-just[data-sc-look="1"] button:hover{background:rgba(255,255,255,.10)}
+#sc-just[data-sc-look="1"] button:focus-visible{outline:2px solid var(--sc-r-ink);outline-offset:2px}
+.sc-rt-dots{display:flex;gap:7px;justify-content:center;margin:4px 0 10px}
+.sc-rt-dots i{width:10px;height:10px;border-radius:50%;background:rgba(127,127,127,.22)}
+.sc-rt-dots i.on{background:var(--tc-acc,#1b6b93)}
+.sc-rt-dots i.now{outline:2px solid var(--tc-acc,#1b6b93);outline-offset:2px}
+.sc-rt-count{text-align:center;font-size:12px;opacity:.7}
+.sc-rt-step{text-align:center;font:600 19px/1.45 Georgia,"Times New Roman",serif;margin:12px 6px 18px}
+.sc-rt-next{text-align:center;font-size:12.5px;opacity:.7;margin-top:12px}
+.sc-rt-done{text-align:center;font:600 18px/1.45 Georgia,serif;margin:14px 0 18px}
+.sc-sheet .sc-row-c{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sc-sheet .sc-ed{border-top:1px solid rgba(127,127,127,.2);padding:12px 0}
+.sc-sheet .sc-ed:first-of-type{border-top:0}
+.sc-sheet .sc-ed-row{display:flex;gap:8px;align-items:center;margin:6px 0}
+.sc-sheet .sc-ed-n{flex:none;width:20px;text-align:center;font-size:12px;opacity:.6}
+.sc-sheet input.sc-in{background:rgba(127,127,127,.06)}
+@media (max-width:600px){.sc-page .sc-card{padding:16px}.sc-bigclock{font-size:36px}.sc-fr-ring{width:180px;height:180px}}
+</style>
+<script id="sc-core">
+/* THE SUPPORT MODULE · see the note at the top of its styles. One factory, SupportCore.create(host). */
+(function(){
+"use strict";
+if(window.SupportCore)return;
+var LANGF=null;
+function isFr(){try{return !!(LANGF&&LANGF()==="fr");}catch(e){return false;}}
+function T(en,fr){return isFr()?fr:en;}
+function el(tag,cls,attrs,kids){var n=document.createElement(tag);if(cls)n.className=cls;
+  if(attrs)for(var k in attrs){var v=attrs[k];if(v==null||v===false)continue;
+    if(k==="text")n.textContent=v;else if(k==="on")for(var e in v)n.addEventListener(e,v[e]);else n.setAttribute(k,v===true?"":v);}
+  (kids||[]).forEach(function(c){if(c)n.appendChild(typeof c==="string"?document.createTextNode(c):c);});return n;}
+function pad(n){return ("0"+n).slice(-2);}
+function dayStr(d){d=d||new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function hhmm(d){d=d||new Date();try{return d.toLocaleTimeString(isFr()?"fr-FR":undefined,{hour:"numeric",minute:"2-digit"});}catch(e){return pad(d.getHours())+":"+pad(d.getMinutes());}}
+function mins(n){n=Math.max(0,Math.round(n));var h=Math.floor(n/60),m=n%60;return h?(h+" h"+(m?" "+m+" min":"")):(m+" min");}
+function span(ms){var m=Math.round(ms/6e4);if(m<1)return T("less than a minute","moins d’une minute");return mins(m);}
+function hm(s){var m=/(\d{1,2})[:h](\d{2})/.exec(String(s||""));return m?(+m[1])*60+(+m[2]):null;}
+function nowMin(){var d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60;}
+function uid(){return "s"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function trunc(t,n){t=String(t||"").replace(/\s+/g," ").trim();return t.length>n?t.slice(0,n-1).trimEnd()+"…":t;}
+
+/* the seven supports, each with its own switch */
+var DEF={calm:false,tiny:true,time:true,energy:true,inbox:true,routines:true,focus:true};
+function rows(dayWord){return [
+  ["calm","🌿",T("Calm mode","Mode calme"),T("No motion, no sounds, softer colours and fewer things on the screen at once. Turn it on when the room feels loud.","Aucun mouvement, aucun son, des couleurs adoucies et moins de choses à l’écran. Activez-le quand la pièce semble bruyante.")],
+  ["tiny","🪜",T("Smaller steps","Petites étapes"),T("Break any task into small steps, shown one at a time, with a two-minute Just start.","Découpez une tâche en petites étapes, montrées une à la fois, avec un Juste commencer de deux minutes.")],
+  ["time","⏳",T("Time you can see","Le temps visible"),T("A bar of the time left in the current block, the next item, and a quiet word five minutes before it.","Une barre du temps restant dans le bloc en cours, le prochain moment, et un mot discret cinq minutes avant.")],
+  ["energy","🔋",T("Low-energy days","Jours de faible énergie"),T("One press, and the day keeps only what is essential. The next morning starts afresh.","Une pression, et la journée ne garde que l’essentiel. Le lendemain matin repart à neuf.")],
+  ["inbox","💭",T("The Inbox","La Boîte"),T("Catch a thought with Ctrl and the full stop, or the 💭 at the side, and sort it later.","Saisissez une pensée avec Ctrl et le point, ou le 💭 sur le côté, et triez plus tard.")],
+  ["routines","🌅",T("Routines","Routines"),T("Step-by-step routines for starting and ending the "+dayWord.en+", offered at the right hour.","Des routines pas à pas pour commencer et finir la "+dayWord.fr+", proposées au bon moment.")],
+  ["focus","🎧",T("Focus room","Salle de concentration"),T("A quiet full-screen space with one task, the timer and a soft sound made on this device.","Un espace plein écran et calme, avec une tâche, le minuteur et un son doux fait sur cet appareil.")]];}
+
+/* smaller steps, made from the words of the task when no model is asked (the Forge has none) or a model gives no list.
+   6.4, the owner (24 October 2026): Break it down "do not really work". The steps were the same few lines for any task.
+   Now the task is read: its parts ("buy bread and call the bank" is two steps), its doing word and what it is done to,
+   and the steps name that thing, so they are about this task. The first step is always a small one. */
+var SV="write|draft|edit|revise|rewrite|finish|start|begin|complete|read|study|review|learn|practise|practice|email|e-mail|call|phone|ring|text|message|reply|answer|contact|ask|tell|invite|thank|clean|tidy|wash|vacuum|hoover|dust|sort|declutter|empty|iron|fold|buy|shop|order|get|pick|collect|fetch|return|cook|bake|make|prepare|plan|organise|organize|arrange|book|schedule|pay|file|fill|apply|renew|register|sign|submit|send|post|print|fix|code|build|debug|test|install|update|upgrade|set|deploy|commit|release|ship|design|draw|paint|record|upload|download|back|save|walk|run|exercise|stretch|go|take|put|move|pack|check|find|look|research|choose|decide|meet|visit|feed|water|change|cancel|do|work|bring|drop|clear|translate|rehearse";
+var SVF="écrire|rédiger|relire|corriger|finir|terminer|commencer|lire|étudier|réviser|apprendre|appeler|téléphoner|envoyer|répondre|contacter|demander|inviter|remercier|nettoyer|ranger|laver|trier|vider|repasser|plier|acheter|commander|chercher|récupérer|rendre|cuisiner|préparer|faire|planifier|organiser|réserver|payer|remplir|renouveler|inscrire|soumettre|imprimer|réparer|coder|construire|tester|installer|mettre|déployer|publier|dessiner|peindre|enregistrer|sauvegarder|marcher|courir|aller|prendre|déplacer|emballer|vérifier|trouver|choisir|décider|rencontrer|visiter|nourrir|arroser|changer|annuler|travailler|apporter|traduire|répéter";
+function stepVerbRe(){return new RegExp("^(?:"+SV+"|"+SVF+")\\b","i");}
+/* what the person wrote, without "I need to", "remember to" and the like at its start, nor a full stop at its end */
+function stepClean(t){t=String(t||"").replace(/\s+/g," ").trim().replace(/[.!…]+$/,"");
+  for(var k=0;k<3;k++)t=t.replace(/^(?:(?:i|we)\s+(?:really\s+)?(?:need|have|want|must|should|ought|got)\s+(?:to\s+)?|(?:i|we)'?ll\s+|(?:need|have|want|got)\s+to\s+|remember\s+to\s+|try\s+to\s+|don'?t\s+forget\s+to\s+|to\s+|todo:?\s*|task:?\s*|il\s+faut\s+(?:que\s+je\s+)?|je\s+dois\s+|je\s+veux\s+|penser\s+à\s+|ne\s+pas\s+oublier\s+de\s+)/i,"").trim();
+  return t;}
+function stepCap(t){t=String(t||"").trim();return t.charAt(0).toUpperCase()+t.slice(1);}
+/* the steps speak to the person: "my report" in the task is "your report" in a step */
+function stepYou(t){return String(t||"").replace(/\b(my|mine|myself|me|I|our|ours|ourselves|us|we)\b/g,function(w){return {my:"your",mine:"yours",myself:"yourself",me:"you",I:"you",our:"your",ours:"yours",ourselves:"yourselves",us:"you",we:"you"}[w];})
+  .replace(/\bmon\s/gi,"votre ").replace(/\bma\s/gi,"votre ").replace(/\bmes\s/gi,"vos ");}
+/* the task's parts: split where a new doing word starts after "and", "then", a comma or a semicolon; "salt and pepper" stays whole */
+var STEP_SEP=/\s*(?:;|,\s*(?:and\s+|then\s+|et\s+|puis\s+)?|\s(?:and\s+then|and|then|after\s+that|et\s+puis|et|puis|ensuite)\s)\s*/gi;
+function stepParts(t){var vr=stepVerbRe(),bits=t.split(STEP_SEP),seps=t.match(STEP_SEP)||[],out=[];
+  bits.forEach(function(b,k){b=b.trim();if(!b)return;if(!out.length||vr.test(b))out.push(b);else out[out.length-1]+=(seps[k-1]||" ")+b;});
+  return out.map(function(x){return x.replace(/^(?:first|firstly|d'abord)\s+/i,"").trim();}).filter(Boolean);}
+/* each kind of task: the doing words that name it, the words it may be about, its steps in English and in French. {o:...}
+   is what the task is done to, as the person wrote it, or the words after the colon when there is nothing; {t} the task */
+var STEP_KINDS=[
+  ["reach",/^(?:email|e-mail|call|phone|ring|text|message|reply to|reply|answer|contact|ask|tell|invite|thank|write to|get back to|appeler|téléphoner|répondre à|répondre|contacter|demander à|inviter|remercier|écrire à)\b/i,null,
+    "Find the address or the number for {o:them}|Write in one line what you want from this|Write or say the first sentence|Send it, or make the call|Write down the answer, or what happens next",
+    "Trouver l’adresse ou le numéro pour {o:cette personne}|Écrire en une ligne ce que vous en attendez|Écrire ou dire la première phrase|L’envoyer, ou passer l’appel|Noter la réponse, ou la suite"],
+  ["study",/^(?:study|revise|review for|learn|practise|practice|prepare for (?:the |an |my )?(?:exam|test|interview|quiz)|étudier|réviser|apprendre)\b/i,/\b(?:exam|test|quiz|revision|examen|partiel)\b/i,
+    "Gather your notes for {o:it}|Choose one small part to start with|Study that part for fifteen minutes|Test yourself: three questions, without looking|Mark what to go over next",
+    "Rassembler vos notes pour {o:cela}|Choisir une petite partie pour commencer|L’étudier quinze minutes|Vous tester : trois questions, sans regarder|Marquer ce qu’il faut revoir ensuite"],
+  ["read",/^(?:read|look over|go over|lire|parcourir)\b/i,null,
+    "Find {o:what you will read} and open it where you stopped|Read for ten minutes|Write one line about what you read|Read the next part|Mark where you stopped",
+    "Trouver {o:ce que vous allez lire} et l’ouvrir là où vous vous êtes arrêté|Lire dix minutes|Écrire une ligne sur ce que vous avez lu|Lire la partie suivante|Marquer où vous vous êtes arrêté"],
+  ["code",/^(?:code|debug|deploy|commit|refactor|coder|déployer)\b/i,/\b(?:code|bug|app|apps|feature|function|script|css|html|button|menu|layout|screen|editor|repo|github|commit|release|deploy|website|site|database|server|api|tests?|the bakery|the workshop|component|module|plugin|icon|page on a phone)\b/i,
+    "Open the file where the change goes, and find the place|Write in one line what you will see when “{t}” is done|Make the smallest change that could work|Run it and look at the result|Save it, and note in one line what comes next",
+    "Ouvrir le fichier où va le changement, et trouver l’endroit|Écrire en une ligne ce que vous verrez quand « {t} » sera fait|Faire le plus petit changement qui pourrait marcher|Le lancer et regarder le résultat|Enregistrer, et noter en une ligne la suite"],
+  ["write",/^(?:write|draft|edit|revise|rewrite|finish writing|type up|translate|écrire|rédiger|relire|corriger|traduire)\b/i,/\b(?:essay|report|chapter|thesis|dissertation|proposal|article|abstract|letter|paper|draft|synthesis|cover letter|cv|résumé|introduction|conclusion|mémoire|thèse|chapitre|lettre|rapport)\b/i,
+    "Open {o:the document}, or a new page for it|Write its main points or headings, one line each|Write one rough sentence under the first one|Fill in one part at a time; rough is fine|Read it through once and fix one thing|Save it, and note where you stopped",
+    "Ouvrir {o:le document}, ou une page neuve pour cela|Écrire ses idées principales ou ses titres, une ligne chacun|Écrire une phrase brouillonne sous le premier|Remplir une partie à la fois ; le brouillon suffit|Le relire une fois et corriger une chose|Enregistrer, et noter où vous vous êtes arrêté"],
+  ["clean",/^(?:clean|tidy|wash|vacuum|hoover|dust|sort out|sort|declutter|empty|iron|fold|do the (?:dishes|laundry|washing)|nettoyer|ranger|laver|trier|vider|repasser|plier)\b/i,/\b(?:dishes|laundry|washing|vaisselle|lessive)\b/i,
+    "Choose one small part of {o:the room} to start with|Put away five things|Clean one surface|Take out what does not belong there|Stop, look, and choose the next part",
+    "Choisir un petit coin de {o:la pièce} pour commencer|Ranger cinq choses|Nettoyer une surface|Sortir ce qui n’a rien à faire là|S’arrêter, regarder, et choisir le coin suivant"],
+  ["cook",/^(?:cook|bake|make (?:dinner|lunch|breakfast|tea|supper|a meal|the meal|food|soup|a cake|bread)|cuisiner|préparer (?:le|un) (?:dîner|déjeuner|repas|gâteau))\b/i,/\b(?:dinner|lunch|breakfast|supper|meal|recipe|cake|dîner|déjeuner|repas|recette|gâteau)\b/i,
+    "Choose what to make, and find the recipe|Check you have what it needs|Get out the pans and the tools|Do the first step of the recipe|Clear up as you go",
+    "Choisir quoi faire, et trouver la recette|Vérifier que vous avez ce qu’il faut|Sortir les casseroles et les ustensiles|Faire la première étape de la recette|Ranger au fur et à mesure"],
+  ["buy",/^(?:buy|shop for|shop|order|get|pick up|collect|fetch|go shopping|do the shopping|acheter|commander|récupérer|faire les courses)\b/i,/\b(?:groceries|shopping|courses)\b/i,
+    "Write a list of what you need: {o:the things}|Check what you already have|Choose where to get it|Buy it, or order it|Put it away when you have it",
+    "Écrire la liste de ce qu’il faut : {o:les choses}|Vérifier ce que vous avez déjà|Choisir où l’obtenir|L’acheter, ou le commander|Le ranger une fois là"],
+  ["forms",/^(?:pay|file|fill in|fill out|fill|apply for|apply|renew|register|sign up|book|schedule|submit|send off|payer|remplir|renouveler|inscrire|réserver|soumettre)\b/i,/\b(?:bill|tax|taxes|form|application|appointment|invoice|insurance|passport|visa|rent|facture|impôts|formulaire|dossier|rendez-vous|assurance|passeport|loyer)\b/i,
+    "Open the letter, the email or the website for {o:it}|Put what it asks for in front of you|Fill in the first part|Check it once|Send it or pay it, and keep the confirmation",
+    "Ouvrir la lettre, le courriel ou le site pour {o:cela}|Mettre devant vous ce qui est demandé|Remplir la première partie|Vérifier une fois|L’envoyer ou le payer, et garder la confirmation"],
+  ["event",/^(?:plan|organise|organize|arrange|planifier|organiser)\b/i,/\b(?:party|birthday|trip|holiday|vacation|wedding|meeting|event|visit|celebration|journey|conference|fête|anniversaire|voyage|vacances|mariage|réunion|visite)\b/i,
+    "Write in one line what {o:it} is for, and when|Write down who is part of it|List the three things it needs most|Do the first of those three|Put the next one in your plan, with a time",
+    "Écrire en une ligne à quoi sert {o:cela}, et quand|Noter qui en fait partie|Lister les trois choses les plus nécessaires|Faire la première des trois|Mettre la suivante dans votre plan, avec une heure"],
+  ["move",/^(?:walk|run(?!\s+(?:the|a|an|my|our|this|that|it)\b)|exercise|stretch|swim|go to the gym|go for a (?:walk|run|swim)|do yoga|work out|marcher|courir|nager|faire du sport|aller à la salle)\b/i,null,
+    "Put on your shoes or your kit|Fill a glass of water|Start with two minutes|Keep going for the time you planned|Stretch, and drink some water",
+    "Mettre vos chaussures ou votre tenue|Remplir un verre d’eau|Commencer par deux minutes|Continuer le temps prévu|S’étirer, et boire un peu d’eau"],
+  ["pack",/^(?:pack|prepare|get ready|emballer|préparer|se préparer)\b/i,null,
+    "Write a list of what you need for {o:it}|Gather the first three things on the list|Put them in one place|Gather the rest, one at a time|Check the list once more",
+    "Écrire la liste de ce qu’il faut pour {o:cela}|Rassembler les trois premières choses de la liste|Les mettre au même endroit|Rassembler le reste, une chose à la fois|Revérifier la liste"]];
+/* the thing a task is done to: the words after its doing word ("write the grant report": "the grant report"), without
+   what only says when or why ("before the guests come"), nor, for a message, what it is about */
+function stepObject(p,kind){var m=/^(?:set up|sign up for|sign up|fill in|fill out|apply for|reply to|write to|get back to|pick up|shop for|sort out|look over|go over|prepare for|get ready for|type up|finish writing|send off|répondre à|demander à|écrire à|\S+)\s+(.*)$/i.exec(p),o=m?m[1].trim():"";
+  o=o.replace(/^(?:for|to|on|about|with|at|pour|à|de)\s+/i,"").replace(/\s+(?:before|after|by|until|till|when|while|so that|because|since|as soon as|avant|après|pour que|quand|parce que)\s+.*$/i,"")
+    .replace(/\s+(?:today|tonight|tomorrow|this (?:morning|afternoon|evening|week)|now|asap|soon|aujourd'hui|ce soir|demain)$/i,"").trim();
+  if(kind==="reach")o=o.replace(/\s+(?:about|regarding|re|to say|to ask|asking|for|on|au sujet de|pour|sur)\s+.*$/i,"").trim();
+  o=stepYou(o);return o.length>90?o.slice(0,89).trimEnd()+"…":o;}
+function stepFill(s,o,t){return s.replace(/\{o:([^}]*)\}/g,function(m,alt){return o||alt;}).replace(/\{t\}/g,t);}
+function stepTemplates(title){var t=stepClean(title),fr=isFr();
+  if(!t)return T("Open what you need|Do the smallest first part, two minutes|Decide the next small part","Ouvrir ce qu’il faut|Faire la toute première partie, deux minutes|Choisir la petite partie suivante").split("|");
+  var parts=stepParts(t);
+  if(parts.length>=2){var list=parts.slice(0,6).map(function(x){return stepCap(stepYou(x));});
+    if(list.length<3)list.push(T("Tick what is done, and write down anything left","Cocher ce qui est fait, et noter ce qui reste"));
+    return list;}
+  var dv=/^(?:do|work on|finish|start|begin|complete|deal with|handle|get on with|faire|finir|terminer|commencer|s'occuper de|avancer)\s+/i,rest=dv.test(t)?t.replace(dv,""):t,said=trunc(stepYou(t.charAt(0).toLowerCase()+t.slice(1)),80);
+  var pick=null,byWord=false;
+  STEP_KINDS.some(function(K){if(K[1].test(rest)||K[1].test(t)){pick=K;return true;}return false;});
+  if(!pick)STEP_KINDS.some(function(K){if(K[2]&&(K[2].test(rest))){pick=K;byWord=true;return true;}return false;});
+  if(pick){var o=byWord&&rest!==t&&!stepVerbRe().test(rest)?stepYou(rest):stepObject(K1(rest,t,pick),pick[0]);
+    return (fr?pick[4]:pick[3]).split("|").map(function(x){return stepFill(x,o,said);});}
+  var q=T("“","« ")+said+T("”"," »");
+  return T("Write in one line what done looks like for "+q+"|Put what you need for it in front of you|Do the first small part, for five minutes|Look at what is left, and choose the next small part|Stop, and write down where you are",
+    "Écrire en une ligne à quoi ressemble "+q+" une fois fait|Mettre devant vous ce qu’il faut|Faire la première petite partie, cinq minutes|Regarder ce qui reste, et choisir la petite partie suivante|S’arrêter, et noter où vous en êtes").split("|");}
+/* the words the kind was found in: the task after "do" or "finish" when the kind is named there, else the whole task */
+function K1(rest,t,K){return K[1].test(rest)?rest:t;}
+
+/* a soft sound made on the device, so the Focus room works offline */
+var AU={ctx:null,src:null,gain:null};
+function noise(kind,vol){stopNoise();if(kind==="off")return;
+  try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;var ctx=AU.ctx||(AU.ctx=new C());if(ctx.state==="suspended")ctx.resume();
+    var len=ctx.sampleRate*4,buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0),last=0,b0=0,b1=0,b2=0;
+    for(var i=0;i<len;i++){var w=Math.random()*2-1;
+      if(kind==="brown"){last=(last+0.02*w)/1.02;d[i]=last*3.5;}else{b0=0.99765*b0+w*0.0990460;b1=0.96300*b1+w*0.2965164;b2=0.57000*b2+w*1.0526913;d[i]=(b0+b1+b2+w*0.1848)*0.12;}}
+    var src=ctx.createBufferSource();src.buffer=buf;src.loop=true;var g=ctx.createGain();g.gain.value=0;src.connect(g);g.connect(ctx.destination);src.start();
+    g.gain.linearRampToValueAtTime(vol,ctx.currentTime+1.2);AU.src=src;AU.gain=g;}catch(e){}}
+function stopNoise(){try{if(AU.gain&&AU.ctx)AU.gain.gain.linearRampToValueAtTime(0,AU.ctx.currentTime+0.4);var s=AU.src;setTimeout(function(){try{s&&s.stop();}catch(e){}},450);}catch(e){}AU.src=null;AU.gain=null;}
+
+function create(host){
+  var H=host||{},app=H.app||"app";if(H.lang)LANGF=H.lang;
+  var started=Date.now();try{var st0=+(sessionStorage.getItem("sc_open_"+app)||0);if(st0&&Date.now()-st0<12*36e5)started=st0;else sessionStorage.setItem("sc_open_"+app,String(started));}catch(e){}
+  function hv(v){return typeof v==="function"?v():v;}
+  function S(){var s=null;try{s=H.store&&H.store();}catch(e){}if(!s||typeof s!=="object")s={};
+    /* the switches live together; an older app kept them loose, so they are gathered once */
+    if(!s.sw||typeof s.sw!=="object"){s.sw={};Object.keys(DEF).forEach(function(k){if(typeof s[k]==="boolean"){s.sw[k]=s[k];}});}
+    return s;}
+  function save(){try{H.save&&H.save();}catch(e){}}
+  function on(k){var s=S();if(H.sw&&H.sw[k]){try{return !!H.sw[k].get();}catch(e){}}return typeof s.sw[k]==="boolean"?s.sw[k]:DEF[k];}
+  function setOn(k,v){if(H.sw&&H.sw[k]){try{H.sw[k].set(!!v);}catch(e){}}else{S().sw[k]=!!v;save();}applyAll();refresh();}
+  function night(){try{return !!(H.night&&H.night());}catch(e){return false;}}
+  function still(){try{if(on("calm"))return true;if(H.still&&H.still())return true;return window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+  function today(){try{return H.today?H.today():dayStr();}catch(e){return dayStr();}}
+  function C(k){var c=H.cls||{};return c[k]!=null?c[k]:({card:"sc-card-own",btn:"sc-btn",primary:"sc-btn sc-primary",ghost:"sc-btn",title:"sc-title-own",lede:"sc-lede-own",seg:"",segBtn:"sc-btn",segOn:"sc-on"})[k];}
+  function dayWord(){return hv(H.dayWord)||{en:"day",fr:"journée"};}
+  function appName(){return hv(H.appName)||app;}
+  function tc(){try{return hv(H.tc)||null;}catch(e){return null;}}
+  /* the app's reminder card, given after the module is made: SC.reminders({face,ink,rim,line,track,night:{...}}).
+     With one, what is shown at a time comes in it (by night, with what night changes), here rather than in the app's
+     own toast; with none, nothing changes. */
+  var LOOK=null;
+  function look(){if(!LOOK)return null;var l={},k,n=night()&&LOOK.night;for(k in LOOK)if(k!=="night")l[k]=LOOK[k];if(n)for(k in n)l[k]=n[k];return l;}
+  function dressLook(n){if(!n)return n;var l=look();
+    [["face","--sc-r-face"],["ink","--sc-r-ink"],["rim","--sc-r-rim"],["line","--sc-r-line"],["track","--sc-r-track"]].forEach(function(p){
+      if(l&&l[p[0]]!=null)n.style.setProperty(p[1],l[p[0]]);else n.style.removeProperty(p[1]);});
+    if(l)n.setAttribute("data-sc-look","1");else n.removeAttribute("data-sc-look");return n;}
+  function reminders(l){LOOK=l&&typeof l==="object"?l:null;dressLook(document.getElementById("sc-toast"));dressLook(document.getElementById("sc-just"));return !!LOOK;}
+  function toast(m,ms,timed){try{if(H.toast&&!(timed&&LOOK)){H.toast(m,ms);return;}}catch(e){}
+    var t=document.getElementById("sc-toast");if(!t){t=el("div",null,{id:"sc-toast",role:"status","aria-live":"polite"});document.body.appendChild(t);}
+    dressLook(t);if(LOOK)t.setAttribute("data-sc-still",still()?"1":"0");
+    t.textContent=m;t.classList.add("show");clearTimeout(t.__h);t.__h=setTimeout(function(){t.classList.remove("show");},ms||4200);}
+  function btn(label,kind,fn,extra,key){var b=el("button",(C(kind||"ghost")||"")+(extra?" "+extra:""),{type:"button",text:label,"data-sc-key":key||null,on:{click:function(e){e.stopPropagation();fn.call(this,e);}}});return b;}
+
+  /* ================= TODAY'S PLAN AND THE TIME YOU CAN SEE ================= */
+  function plan(){try{var p=H.plan?H.plan():null;return p&&Array.isArray(p.blocks)?p:null;}catch(e){return null;}}
+  function nextTask(){var p=plan();if(!p)return null;for(var i=0;i<p.blocks.length;i++)for(var j=0;j<p.blocks[i].tasks.length;j++){var t=p.blocks[i].tasks[j];if(!t.done)return {block:p.blocks[i],task:t};}return null;}
+  function timeModel(){var p=plan();if(!p||!p.blocks.length)return null;var now=nowMin(),cur=null,nxt=null;
+    p.blocks.forEach(function(b){if(b.from!=null&&b.to!=null&&now>=b.from&&now<b.to)cur=b;});
+    var all=[];p.blocks.forEach(function(b){b.tasks.forEach(function(t){if(t.at!=null)all.push({b:b,t:t});});});all.sort(function(a,b){return a.t.at-b.t.at;});
+    for(var i=0;i<all.length;i++)if(all[i].t.at>now&&!all[i].t.done){nxt=all[i];break;}
+    var first=p.blocks.filter(function(b){return b.from!=null;})[0],last=p.blocks.filter(function(b){return b.to!=null;}).slice(-1)[0];
+    return {now:now,cur:cur,next:nxt,first:first,last:last};}
+  function clockOf(m){return pad(Math.floor(m/60))+":"+pad(Math.floor(m%60));}
+  function timeBar(){var m=timeModel();if(!m)return null;var label="",pct=0;
+    if(m.cur){pct=Math.min(100,Math.max(0,(m.now-m.cur.from)/Math.max(1,m.cur.to-m.cur.from)*100));label=String(m.cur.title).replace(/^\S+\s/,"")+" · "+T(mins(m.cur.to-m.now)+" left","encore "+mins(m.cur.to-m.now));}
+    else if(m.first&&m.now<m.first.from)label=T("The day begins at ","La journée commence à ")+clockOf(m.first.from)+" · "+T("in ","dans ")+mins(m.first.from-m.now);
+    else if(m.last&&m.now>=m.last.to){label=T("The planned day is over. What is left can wait.","La journée prévue est finie. Le reste peut attendre.");pct=100;}
+    else label=T("Between blocks, a breathing space","Entre deux blocs, un temps pour respirer");
+    var w=el("div","sc-bar",{role:"group","aria-label":T("Time you can see","Le temps visible")});
+    w.appendChild(el("div","sc-bar-row",null,[el("span",null,{text:"⏳ "+label}),m.next?el("span","sc-bar-n",{text:T("Next: ","Ensuite : ")+m.next.t.title+" · "+(m.next.t.at-m.now<1?T("now","maintenant"):T("in ","dans ")+mins(m.next.t.at-m.now))}):null]));
+    w.appendChild(el("div","sc-track",null,[el("i",null,{style:"width:"+pct.toFixed(1)+"%"})]));return w;}
+  function warnSoon(){if(!on("time"))return;var m=timeModel();if(!m||!m.next)return;var gap=m.next.t.at-m.now;if(gap>5||gap<=0)return;
+    var key=today()+":"+m.next.b.id+":"+m.next.t.id,s=S();if(!s.warned||s.warned.d!==today())s.warned={d:today(),k:{}};if(s.warned.k[key])return;
+    s.warned.k[key]=1;save();toast(T("In five minutes: ","Dans cinq minutes : ")+m.next.t.title+". "+hv(H.finishLine||T("Finish the line you are on.","Terminez la ligne en cours.")),9000,true);}
+
+  /* ================= THE TIMER (each app's own Clepsydra) ================= */
+  function tm(){try{return H.timer&&H.timer.state?H.timer.state():null;}catch(e){return null;}}
+  function fmt(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+pad(s%60);}
+
+  /* ================= SMALLER STEPS ================= */
+  function tasks(){var s=S();if(!Array.isArray(s.tasks))s.tasks=[];return s.tasks;}
+  function cur(){var ts=tasks(),a=S().active;if(a==="__new")return null;return ts.filter(function(t){return t.id===a;})[0]||ts[0]||null;}
+  function nextIdx(t){if(!t)return -1;for(var i=0;i<t.steps.length;i++)if(!t.steps[i].done&&!t.steps[i].skip)return i;for(var j=0;j<t.steps.length;j++)if(!t.steps[j].done)return j;return -1;}
+  function view(){return S().view==="all"?"all":"one";}
+  function newTask(title,steps,src){var t={id:uid(),title:String(title||"").trim().slice(0,2000)||T("A task","Une tâche"),steps:(steps||[]).map(function(x){return {t:String(x).slice(0,2400),done:false};}),at:Date.now()};
+    if(src)t.src=src;tasks().unshift(t);if(tasks().length>400)tasks().length=400;S().active=t.id;save();return t;}
+  function breakDown(title){if(H.breakDown){try{return Promise.resolve(H.breakDown(title));}catch(e){}}return Promise.resolve(stepTemplates(title));}
+  function breakStep(t,i){var st=t.steps[i];if(!st)return;var subs=null;
+    try{if(H.breakStep)subs=H.breakStep(st.t,t.title);}catch(e){}
+    Promise.resolve(subs).then(function(list){if(!list||list.length<2)list=[T("Get ready for: ","Se préparer pour : ")+st.t,T("Do the first two minutes of it","En faire les deux premières minutes"),T("Look at what is left, and choose the next bit","Regarder ce qui reste, et choisir la suite")];
+      t.steps.splice.apply(t.steps,[i,1].concat(list.map(function(x){return {t:String(x).slice(0,2400),done:false,sub:true};})));save();refresh();});}
+  /* the next item of the day becomes a task, keeping any steps the app already held for it */
+  function fromPlan(n){var key=n.key||(today()+":"+n.block.id+":"+n.task.id),ts=tasks();
+    for(var i=0;i<ts.length;i++)if(ts[i].src===key){S().active=ts[i].id;save();return ts[i];}
+    var old=null;try{old=H.oldSteps?H.oldSteps(key):null;}catch(e){}
+    var t=newTask(n.task.title,old&&old.length?old.map(function(x){return x.t||x;}):stepTemplates(n.task.title),key);
+    if(old&&old.length)t.steps.forEach(function(s,k){s.done=!!(old[k]&&old[k].done);});save();return t;}
+
+  /* ================= LOW-ENERGY DAYS ================= */
+  function lowToday(){return on("energy")&&!!((S().low||{})[today()]);}
+  function setLow(v){var s=S();s.low={};if(v)s.low[today()]=true;save();applyAll();refresh();
+    toast(v?T("A low day. Only the essentials are showing. One small thing is enough today.","Un jour à faible énergie. Seul l’essentiel paraît. Une petite chose suffit aujourd’hui."):T("Everything is back.","Tout est revenu."),6000);}
+
+  /* ================= ROUTINES ================= */
+  function defaults(){var d=null;try{d=H.routines?H.routines():null;}catch(e){}if(Array.isArray(d)&&d.length)return d;
+    return [{id:"start",when:"start",icon:"🌅",en:"Start of the day",fr:"Début de la journée",steps:[{en:"Water, and anything you take in the morning",fr:"De l’eau, et ce que vous prenez le matin"},{en:"Look at today’s plan: just look",fr:"Regarder le plan du jour : simplement regarder"},{en:"Choose the first small step",fr:"Choisir la première petite étape"},{en:"Start one focus session",fr:"Lancer une séance de concentration"}]},
+      {id:"end",when:"end",icon:"🌙",en:"End of the day",fr:"Fin de la journée",steps:[{en:"Write where the work stopped, in one line",fr:"Noter où le travail s’est arrêté, en une ligne"},{en:"Empty your head into the Inbox",fr:"Vider sa tête dans la Boîte"},{en:"Choose tomorrow’s first small step",fr:"Choisir la première petite étape de demain"}]}];}
+  function routines(){var s=S();if(!Array.isArray(s.routines)||!s.routines.length)s.routines=JSON.parse(JSON.stringify(defaults()));return s.routines;}
+  function rName(r){return (r.icon?r.icon+" ":"")+(isFr()?(r.fr||r.en):(r.en||r.fr));}
+  function sName(st){return isFr()?(st.fr||st.en||""):(st.en||st.fr||"");}
+  function rDone(r){var d=S().rDone||{};return !!(d[today()]&&d[today()][r.id]);}
+  function suggested(){var hr=new Date().getHours(),want=hr<12?"start":(hr>=17?"end":null);if(!want)return null;return routines().filter(function(r){return r.when===want&&!rDone(r);})[0]||null;}
+
+  /* ================= SHEETS (in the thoughts panel's own dress, so the two read as one family) ================= */
+  var sheetEl=null;
+  function dressTC(n){n.classList.add("tc-el");n.setAttribute("data-tc-app",app);n.setAttribute("data-tc-night",night()?"1":"0");n.setAttribute("data-tc-still",still()?"1":"0");
+    var t=tc();n.setAttribute("data-tc-look",(t&&t.look&&t.look())||"note");return n;}
+  function sheet(title,build,wide){closeSheet();
+    var veil=dressTC(el("div","tc-veil sc-veil",{role:"presentation"})),sh=el("div","tc-sheet sc-sheet",{role:"dialog","aria-modal":"true","aria-label":title,style:"max-width:"+(wide||520)+"px"});
+    veil.appendChild(sh);sheetEl=veil;document.body.appendChild(veil);
+    veil.addEventListener("pointerdown",function(e){if(e.target===veil)closeSheet();});
+    veil.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeSheet();}});
+    sh.appendChild(el("h3",null,{text:title}));
+    sh.appendChild(el("button","tc-key tc-round tc-sheet-x",{type:"button",text:"✕",title:T("Close","Fermer"),"aria-label":T("Close","Fermer"),on:{click:closeSheet}}));
+    var body=el("div","sc-sheet-body");sh.appendChild(body);build(body,closeSheet);
+    if(!still()&&sh.animate)sh.animate([{opacity:0,transform:"translateY(10px) scale(.97)"},{opacity:1,transform:"translateY(-2px) scale(1.005)",offset:.7},{opacity:1,transform:"none"}],{duration:380,easing:"cubic-bezier(.2,.8,.3,1)"});
+    var f=sh.querySelector(".tc-keep")||sh.querySelector(".tc-sheet-x");if(f)setTimeout(function(){try{f.focus();}catch(e){}},30);return veil;}
+  function closeSheet(){if(sheetEl){sheetEl.remove();sheetEl=null;}}
+  function key(label,fn,main,small){return el("button","tc-key"+(main?" tc-keep":"")+(small?" tc-small":""),{type:"button",text:label,on:{click:fn}});}
+  function runRoutine(r){if(typeof r==="string")r=routines().filter(function(x){return x.id===r;})[0];if(!r)r=routines()[0];if(!r)return;var i=0;
+    sheet(rName(r),function(body,close){function draw(){body.innerHTML="";var n=r.steps.length;
+        if(i>=n){var s=S();if(!s.rDone||typeof s.rDone!=="object")s.rDone={};var d={};d[today()]=s.rDone[today()]||{};d[today()][r.id]=true;s.rDone=d;save();refresh();
+          body.appendChild(el("div","sc-rt-done",{text:r.when==="end"?T("The day is put away. Rest well.","La journée est rangée. Reposez-vous bien."):T("Well begun. The day is yours.","Bien commencé. La journée est à vous.")}));
+          body.appendChild(el("div","sc-row-c",null,[key(T("Close","Fermer"),close,true)]));return;}
+        var dots=el("div","sc-rt-dots",{"aria-hidden":"true"});for(var k=0;k<n;k++)dots.appendChild(el("i",k<i?"on":(k===i?"now":"")));
+        body.appendChild(dots);body.appendChild(el("div","sc-rt-count",{text:T("Step ","Étape ")+(i+1)+T(" of "," sur ")+n}));
+        body.appendChild(el("div","sc-rt-step",{text:sName(r.steps[i])}));
+        body.appendChild(el("div","sc-row-c",null,[key("✓ "+T("Done","Fait"),function(){i++;draw();},true),key(T("Skip this one","Passer celle-ci"),function(){i++;draw();})]));
+        if(i<n-1)body.appendChild(el("div","sc-rt-next",{text:T("Then: ","Ensuite : ")+sName(r.steps[i+1])}));}
+      draw();},460);}
+  function editRoutines(){var list=JSON.parse(JSON.stringify(routines()));
+    sheet("🌅 "+T("Your routines","Vos routines"),function(body,close){function draw(){body.innerHTML="";
+        body.appendChild(el("p","tc-lead",{text:T("Each step is yours to rewrite. The start routine is offered before noon, and the end routine after five.","Chaque étape est à réécrire à votre façon. La routine du début est proposée avant midi, celle de la fin après dix-sept heures.")}));
+        list.forEach(function(r){var sec=el("div","sc-ed"),name=el("input","sc-in",{value:isFr()?(r.fr||r.en):(r.en||r.fr),"aria-label":T("Routine name","Nom de la routine")});
+          name.addEventListener("input",function(){if(isFr())r.fr=name.value;else r.en=name.value;});
+          sec.appendChild(el("div","sc-ed-row",null,[el("span","sc-rt-ic",{text:r.icon||"•"}),name,key("▶ "+T("Run","Lancer"),function(){S().routines=list;save();runRoutine(r);},false,true)]));
+          r.steps.forEach(function(st,j){var inp=el("input","sc-in",{value:sName(st),"aria-label":T("Step","Étape")+" "+(j+1)});inp.addEventListener("input",function(){if(isFr())st.fr=inp.value;else st.en=inp.value;});
+            sec.appendChild(el("div","sc-ed-row",null,[el("span","sc-ed-n",{text:String(j+1)}),inp,key("×",function(){r.steps.splice(j,1);draw();},false,true)]));});
+          sec.appendChild(key("+ "+T("Add a step","Ajouter une étape"),function(){r.steps.push(isFr()?{fr:""}:{en:""});draw();},false,true));body.appendChild(sec);});
+        body.appendChild(el("div","sc-row-c",null,[key(T("Keep my routines","Garder mes routines"),function(){list.forEach(function(r){r.steps=r.steps.filter(function(s){return String(sName(s)||"").trim();});});S().routines=list;save();close();refresh();toast(T("Routines kept.","Routines gardées."));},true),
+          key(T("Back to the usual ones","Revenir aux habituelles"),function(){list=JSON.parse(JSON.stringify(defaults()));draw();})]));}
+      draw();},560);}
+
+  /* ================= THE TWO-MINUTE START ================= */
+  var JS={end:0,iv:null};
+  function justStart(){stopJust(true);JS.end=Date.now()+120000;
+    var chip=el("div",null,{id:"sc-just",role:"timer","data-sc-night":night()?"1":"0","data-sc-app":app},[el("span","sc-just-t"),el("span","sc-just-bar",null,[el("i")]),el("button",null,{type:"button",text:T("Stop","Arrêter"),on:{click:function(){stopJust();}}})]);
+    chip.style.setProperty("--sc-j",hv(H.accent)||"#1b6b93");dressLook(chip);document.body.appendChild(chip);
+    var tick=function(){var left=Math.max(0,JS.end-Date.now()),s=Math.ceil(left/1000);chip.querySelector(".sc-just-t").textContent=T("Just start","Juste commencer")+" · "+Math.floor(s/60)+":"+pad(s%60);
+      chip.querySelector(".sc-just-bar i").style.width=(100-left/1200)+"%";
+      if(!left){stopJust(true);toast(T("Two minutes. You started. Carry on, or stop here: both count.","Deux minutes. Vous avez commencé. Continuez, ou arrêtez-vous ici : les deux comptent."),7000,true);}};
+    tick();JS.iv=setInterval(tick,500);}
+  function stopJust(quiet){clearInterval(JS.iv);JS.iv=null;var c=document.getElementById("sc-just");if(c)c.remove();if(!quiet)toast(T("Stopped. Starting at all was the hard part.","Arrêté. Commencer, c’était le plus dur."));}
+
+  /* ================= THE QUIET SCREEN ================= */
+  function quiet(){if(H.quietOpen){try{H.quietOpen();return;}catch(e){}}closeQuiet();
+    var q=el("div",null,{id:"sc-quiet",role:"dialog","aria-label":T("Quiet","Calme"),"data-sc-still":still()?"1":"0"},[
+      el("div","sc-q-ring",{"aria-hidden":"true"}),el("div","sc-q-w",{text:T("Nothing needs you for a moment. Breathe with the ring, if you like.","Rien n’a besoin de vous pour un moment. Respirez avec le cercle, si vous voulez.")}),
+      el("button",null,{type:"button",text:T("I am ready","Je suis prêt·e"),on:{click:closeQuiet}}),el("div","sc-q-s",{text:T("Esc also brings the page back.","Échap ramène aussi la page.")})]);
+    document.body.appendChild(q);setTimeout(function(){try{q.querySelector("button").focus();}catch(e){}},40);}
+  function closeQuiet(){var q=document.getElementById("sc-quiet");if(q)q.remove();}
+
+  /* ================= THE FOCUS ROOM ================= */
+  var FR_IV=null;
+  function openFocus(taskText){if(!on("focus"))return;closeFocus();var s=S(),t=cur(),i=nextIdx(t),n=nextTask();
+    var task=el("input","sc-fr-task",{value:taskText||(t&&i>=0?t.title:(n?n.task.title:"")),placeholder:T("The one thing, for now","La seule chose, pour l’instant"),"aria-label":T("The one thing","La seule chose")});
+    var clock=el("div","sc-fr-clock",{role:"timer"}),ring=el("div","sc-fr-ring",null,[clock]),run=el("button","sc-fr-go",{type:"button"});
+    run.addEventListener("click",function(){try{H.timer&&H.timer.toggle&&H.timer.toggle();}catch(e){}paint();});
+    var snd=el("div","sc-fr-snd"),vol=el("input",null,{type:"range",min:"0",max:"100",value:String(Math.round((s.focusVol==null?0.35:s.focusVol)*100)),"aria-label":T("Volume","Volume")});
+    [["off",T("Silence","Silence")],["brown",T("Low hum","Souffle grave")],["pink",T("Soft rain","Pluie douce")]].forEach(function(k){
+      snd.appendChild(el("button",(s.focusSound||"off")===k[0]?"on":"",{type:"button",text:k[1],on:{click:function(e){s.focusSound=k[0];save();[].forEach.call(snd.querySelectorAll("button"),function(b){b.classList.remove("on");});e.currentTarget.classList.add("on");noise(k[0],(+vol.value)/100*0.6);}}}));});
+    vol.addEventListener("input",function(){s.focusVol=(+vol.value)/100;try{if(AU.gain)AU.gain.gain.value=s.focusVol*0.6;}catch(e){}});vol.addEventListener("change",save);snd.appendChild(vol);
+    var room=el("div",null,{id:"sc-focus-room",role:"dialog","aria-label":T("Focus room","Salle de concentration"),"data-sc-app":app,"data-sc-night":night()?"1":"0"},[el("div","sc-fr-in",null,[
+      el("div","sc-fr-k",{text:"🎧 "+T("Focus room","Salle de concentration")}),task,
+      t&&i>=0?el("div","sc-fr-now",null,[el("b",null,{text:T("Now","Maintenant")+" · "}),t.steps[i].t]):null,ring,
+      el("div","sc-fr-row",null,[run,on("inbox")&&tc()?el("button",null,{type:"button",text:"💭 "+T("A thought came in","Une pensée arrive"),on:{click:function(){try{tc().open();}catch(e){}}}}):null,
+        el("button",null,{type:"button",text:T("Leave the room","Quitter la salle"),on:{click:closeFocus}})]),snd,
+      el("div","sc-fr-hint",{text:T("The sound is made on this device, so it works offline. Esc leaves the room.","Le son est fait sur cet appareil, il fonctionne donc hors ligne. Échap quitte la salle.")})])]);
+    document.body.appendChild(room);document.body.classList.add("sc-focus-open");
+    function paint(){var m=tm();if(!m){clock.textContent="";run.textContent=T("No timer here","Pas de minuteur ici");return;}
+      clock.textContent=fmt(m.remaining);ring.style.setProperty("--p",(100-m.remaining/Math.max(1,m.total)*100).toFixed(1));
+      run.textContent=m.running?"⏸ "+T("Pause","Pause"):"▶ "+(m.phase==="focus"?T("Start the session","Lancer la séance"):T("Start the break","Lancer la pause"));}
+    paint();FR_IV=setInterval(paint,500);
+    if((s.focusSound||"off")!=="off"&&!on("calm"))noise(s.focusSound,(s.focusVol==null?0.35:s.focusVol)*0.6);
+    setTimeout(function(){try{run.focus();}catch(e){}},50);}
+  function closeFocus(){clearInterval(FR_IV);FR_IV=null;stopNoise();var r=document.getElementById("sc-focus-room");if(r)r.remove();document.body.classList.remove("sc-focus-open");}
+  document.addEventListener("keydown",function(e){if(e.key!=="Escape")return;var c=tc();if(c&&c.isOpen&&c.isOpen())return;
+    if(document.getElementById("sc-quiet")){e.preventDefault();closeQuiet();return;}
+    if(document.getElementById("sc-focus-room")&&!sheetEl){e.preventDefault();closeFocus();}});
+
+  /* ================= THE FOCUS PAGE ================= */
+  var root=null;
+  function card(id,title,wide,right){var c=el("div",(C("card")||"")+" sc-card"+(wide?" sc-wide":""),{"data-sc-card":id});var hd=el("div","sc-head",null,[el("h3","sc-h",{text:title}),right||null]);c.appendChild(hd);return c;}
+  function rowsInto(box,list){list.forEach(function(r){var d=el("div","sc-row");d.appendChild(el("span","sc-ico",{text:r.ico||"→"}));d.appendChild(el("span","sc-txt",{text:r.text}));
+      if(r.acts&&r.acts.length){var a=el("span","sc-acts");r.acts.forEach(function(x){a.appendChild(btn(x[0],x[2]?"primary":"ghost",x[1]));});d.appendChild(a);}box.appendChild(d);});}
+  function seg(k,fn){var g=el("div",(C("seg")||"")+" sc-seg");[[true,T("On","Activé")],[false,T("Off","Désactivé")]].forEach(function(o){
+      var b=el("button",(C("segBtn")||"")+(on(k)===o[0]?" "+C("segOn"):""),{type:"button",text:o[1],"aria-pressed":on(k)===o[0]?"true":"false",on:{click:function(e){e.stopPropagation();setOn(k,o[0]);if(fn)fn();}}});g.appendChild(b);});return g;}
+  /* Now */
+  function cardNow(){var ck=el("span","sc-clock",{"data-sc-clock":"1",text:hhmm()}),c=card("now",T("Now","Maintenant"),true,ck),box=el("div");c.appendChild(box);var rs=[];
+    var t=cur(),i=nextIdx(t);
+    if(on("tiny")&&t&&i>=0)rs.push({ico:"→",text:T("Step "+(i+1)+" of "+t.steps.length+" in “"+t.title+"”: ","Étape "+(i+1)+" sur "+t.steps.length+" de « "+t.title+" » : ")+t.steps[i].t,acts:[[T("Done","Fait"),function(){t.steps[i].done=true;delete t.steps[i].skip;save();refresh();},1]]});
+    else if(on("tiny")&&t&&t.steps.length)rs.push({ico:"✓",text:T("All steps of “"+t.title+"” are done.","Toutes les étapes de « "+t.title+" » sont faites.")});
+    var n=nextTask();
+    if(n)rs.push({ico:"◷",text:T("Next in your day: ","Ensuite dans votre journée : ")+n.task.title+(n.task.at!=null?" · "+clockOf(n.task.at):""),acts:on("tiny")?[[T("Smaller steps","Petites étapes"),function(){fromPlan(n);S().view="one";save();refresh();scrollTo("steps");}]]:null});
+    var m=tm();if(m&&(m.running||m.remaining<m.total))rs.push({ico:"⏱",text:(m.phase==="focus"?T("Focus","Concentration"):T("Break","Pause"))+": "+fmt(m.remaining)+T(" left"," restantes")+(m.running?"":T(", paused",", en pause")),acts:[[m.running?T("Pause","Pause"):T("Carry on","Reprendre"),function(){try{H.timer.toggle();}catch(e){}refresh();}]]});
+    var x=tc();if(on("inbox")&&x){var np=x.list().length,dr=x.draft&&x.draft();
+      if(dr)rs.push({ico:"💭",text:T("A thought you put away is waiting: “","Une pensée mise de côté attend : « ")+trunc(dr.t,80)+T("”"," »"),acts:[[T("Bring it back","La reprendre"),function(){x.open();}]]});
+      if(np)rs.push({ico:"◌",text:np===1?T("One thought waits in the Inbox.","Une pensée attend dans la Boîte."):T(np+" thoughts wait in the Inbox.",np+" pensées attendent dans la Boîte."),acts:[[T("See them","Les voir"),function(){scrollTo("inbox");}]]});}
+    var r=on("routines")?suggested():null;if(r)rs.push({ico:r.icon||"🌅",text:T("A good moment for your routine: ","Un bon moment pour votre routine : ")+rName(r).replace(/^\S+\s/,""),acts:[[T("Begin","Commencer"),function(){runRoutine(r);}]]});
+    try{var extra=H.nowRows?H.nowRows():null;if(extra&&extra.length)rs=rs.concat(extra);}catch(e){}
+    rs.push({ico:"◷",text:T("You opened "+appName()+" at "+hhmm(new Date(started))+", "+span(Date.now()-started)+" ago.","Vous avez ouvert "+appName()+" à "+hhmm(new Date(started))+", il y a "+span(Date.now()-started)+".")});
+    rowsInto(box,rs);return c;}
+  /* Steps */
+  var busy=null;
+  function cardSteps(){var sg=el("div",(C("seg")||"")+" sc-seg");
+    [["one",T("One at a time","Une à la fois")],["all",T("All steps","Toutes les étapes")]].forEach(function(v){sg.appendChild(el("button",(C("segBtn")||"")+(view()===v[0]?" "+C("segOn"):""),{type:"button",text:v[1],"aria-pressed":view()===v[0]?"true":"false",on:{click:function(){S().view=v[0];save();refresh();}}}));});
+    var c=card("steps",T("Steps","Étapes"),true,sg),h=el("div");c.appendChild(h);
+    if(busy){h.appendChild(el("p","sc-note",{text:T("Breaking down “","Découpage de « ")+busy+T("”…"," »…")}));return c;}
+    var ts=tasks(),t=cur();
+    if(!t){var lab=el("label","sc-label",{text:T("What do you need to do?","Que devez-vous faire ?")}),ta=el("input","sc-in",{type:"text",maxlength:"200",placeholder:hv(H.taskExample)||T("For example: write the first page","Par exemple : écrire la première page")});
+      h.appendChild(lab);h.appendChild(ta);
+      var go=function(){var v=ta.value.trim();if(!v){ta.focus();return;}busy=v;refresh();breakDown(v).then(function(list){busy=null;if(!list||list.length<2)list=stepTemplates(v);newTask(v,list);S().view="one";save();refresh();},function(){busy=null;newTask(v,stepTemplates(v));refresh();});};
+      ta.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();go();}});
+      var r=el("div","sc-acts sc-gap");r.appendChild(btn(T("Break it down","Découper"),"primary",go));
+      r.appendChild(btn(T("Write the steps myself","Écrire les étapes moi-même"),"ghost",function(){var v=ta.value.trim();if(!v){ta.focus();return;}newTask(v,[]);S().view="all";save();refresh();}));
+      var n=nextTask();if(n)r.appendChild(btn(T("Use my next item: ","Mon prochain moment : ")+trunc(n.task.title,34),"ghost",function(){fromPlan(n);S().view="one";save();refresh();}));
+      if(ts.length)r.appendChild(btn(T("Back to my tasks","Retour à mes tâches"),"ghost",function(){S().active=ts[0].id;save();refresh();}));
+      r.appendChild(btn("⏱ "+T("Just start · 2 min","Juste commencer · 2 min"),"ghost",justStart,null,"just"));
+      h.appendChild(r);h.appendChild(el("p","sc-note",{style:"margin-top:10px",text:hv(H.breakNote)||T("Break it down reads the task: each part, its doing word and what it is about, and offers 3 to 6 small steps that name it. Each is yours to rewrite. The first is meant to take less than five minutes.","Découper lit la tâche : chaque partie, son verbe et ce qu’elle concerne, et propose 3 à 6 petites étapes qui la nomment. Chacune est à réécrire. La première doit prendre moins de cinq minutes.")}));return c;}
+    var top=el("div","sc-task-top");
+    if(ts.length>1){var sel=el("select",C("select")||"",{"aria-label":T("Your tasks","Vos tâches")});ts.forEach(function(x){var o=el("option",null,{text:x.title+" ("+x.steps.filter(function(s){return s.done;}).length+T(" of "," sur ")+x.steps.length+")",value:x.id});if(x.id===t.id)o.selected=true;sel.appendChild(o);});
+      sel.onchange=function(){S().active=sel.value;save();refresh();};top.appendChild(sel);}else top.appendChild(el("b","sc-task-title",{text:t.title}));
+    var ta2=el("span","sc-acts");ta2.appendChild(btn(T("New task","Nouvelle tâche"),"ghost",function(){S().active="__new";save();refresh();var i0=root&&root.querySelector('[data-sc-card="steps"] input');if(i0)i0.focus();}));
+    ta2.appendChild(btn(T("Remove","Retirer"),"ghost",function(){S().tasks=tasks().filter(function(x){return x.id!==t.id;});S().active=S().tasks[0]?S().tasks[0].id:null;save();refresh();}));top.appendChild(ta2);h.appendChild(top);
+    var done=t.steps.filter(function(s){return s.done;}).length,i=nextIdx(t),dots=el("div","sc-dots",{"aria-hidden":"true"});
+    t.steps.forEach(function(s,k){dots.appendChild(el("span",(s.done?"done":"")+(k===i?" cur":"")));});
+    if(view()==="one"){
+      if(i<0){h.appendChild(dots);h.appendChild(el("div","sc-done-big",{text:t.steps.length?T("All "+t.steps.length+" steps are done.","Les "+t.steps.length+" étapes sont faites."):T("This task has no steps yet.","Cette tâche n’a pas encore d’étapes.")}));
+        var ra=el("div","sc-acts");ra.appendChild(btn(t.steps.length?T("Start a new task","Commencer une nouvelle tâche"):T("Add steps","Ajouter des étapes"),"primary",function(){if(t.steps.length){S().active="__new";}else S().view="all";save();refresh();}));
+        if(t.steps.length)ra.appendChild(btn(T("Remove this task","Retirer cette tâche"),"ghost",function(){S().tasks=tasks().filter(function(x){return x.id!==t.id;});S().active=S().tasks[0]?S().tasks[0].id:null;save();refresh();}));
+        h.appendChild(ra);return c;}
+      h.appendChild(el("div","sc-count",{text:T("Step "+(i+1)+" of "+t.steps.length,"Étape "+(i+1)+" sur "+t.steps.length)+(done?T(" · "+done+" done"," · "+done+" faite"+(done>1?"s":"")):"")}));h.appendChild(dots);
+      var plate=el("div","sc-step",{"aria-live":"polite",text:t.steps[i].t});h.appendChild(plate);
+      var acts=el("div","sc-acts");
+      acts.appendChild(btn(T("Done","Fait"),"primary",function(){t.steps[i].done=true;delete t.steps[i].skip;save();refresh();}));
+      acts.appendChild(btn(T("Too big? Break it down","Trop grand ? Découper"),"ghost",function(){breakStep(t,i);}));
+      acts.appendChild(btn(T("Skip for now","Passer pour l’instant"),"ghost",function(){t.steps[i].skip=true;t.steps.push(t.steps.splice(i,1)[0]);save();refresh();}));
+      if(done)acts.appendChild(btn(T("Undo the last","Annuler la dernière"),"ghost",function(){for(var k=t.steps.length-1;k>=0;k--)if(t.steps[k].done){t.steps[k].done=false;break;}save();refresh();}));
+      acts.appendChild(btn("⏱ "+T("Just start · 2 min","Juste commencer · 2 min"),"ghost",justStart,null,"just"));
+      if(on("focus"))acts.appendChild(btn("🎧 "+T("Focus room","Salle de concentration"),"ghost",function(){openFocus(t.title);},null,"focusroom"));
+      h.appendChild(acts);return c;}
+    h.appendChild(dots);var list=el("div","sc-list");
+    t.steps.forEach(function(s,k){var r=el("div","sc-li"+(s.done?" done":"")),cb=el("input",null,{type:"checkbox","aria-label":T("Step "+(k+1)+" done","Étape "+(k+1)+" faite")});cb.checked=!!s.done;
+      cb.onchange=function(){s.done=cb.checked;save();r.classList.toggle("done",s.done);};
+      var tx=el("input","sc-in",{type:"text",maxlength:"240",value:s.t});tx.oninput=function(){s.t=tx.value;save();};
+      var del=el("button","sc-x",{type:"button",text:"✕",title:T("Remove this step","Retirer cette étape"),on:{click:function(){t.steps.splice(k,1);save();refresh();}}});
+      r.appendChild(cb);r.appendChild(tx);r.appendChild(del);list.appendChild(r);});
+    h.appendChild(list);var add=el("div","sc-acts");add.appendChild(btn("+ "+T("Add a step","Ajouter une étape"),"ghost",function(){t.steps.push({t:"",done:false});save();refresh();var ins=root&&root.querySelectorAll('[data-sc-card="steps"] .sc-li input[type=text]');if(ins&&ins.length)ins[ins.length-1].focus();}));
+    add.appendChild(btn("⏱ "+T("Just start · 2 min","Juste commencer · 2 min"),"ghost",justStart,null,"just"));h.appendChild(add);return c;}
+  /* Time */
+  function cardTime(){var c=card("time",T("Time","Le temps")),h=el("div");c.appendChild(h);
+    h.appendChild(el("div","sc-bigclock",{"data-sc-clock":"1",text:hhmm()}));
+    try{h.appendChild(el("div","sc-note",{style:"margin:0",text:new Date().toLocaleDateString(isFr()?"fr-FR":undefined,{weekday:"long",day:"numeric",month:"long"})+" · "+T(appName()+" open for "+span(Date.now()-started),appName()+" ouvert depuis "+span(Date.now()-started))}));}catch(e){}
+    if(on("time")){var b=timeBar();if(b)h.appendChild(b);}
+    var m=tm();if(m){var box=el("div","sc-timer");
+      if(m.running||m.remaining<m.total){box.appendChild(el("div","sc-timer-now",{text:(m.phase==="focus"?T("Focus","Concentration"):T("Break","Pause"))+" · "+fmt(m.remaining)+(m.running?T(" left"," restantes"):T(" left, paused"," restantes, en pause"))}));
+        var a=el("div","sc-acts");a.appendChild(btn(m.running?T("Pause","Pause"):T("Carry on","Reprendre"),"primary",function(){try{H.timer.toggle();}catch(e){}refresh();}));a.appendChild(btn(T("Stop","Arrêter"),"ghost",function(){try{H.timer.stop();}catch(e){}refresh();}));box.appendChild(a);}
+      else{box.appendChild(el("div","sc-note",{style:"margin:0",text:T("A focus session of:","Une séance de concentration de :")}));var a2=el("div","sc-acts");
+        [10,15,25,45].forEach(function(n){a2.appendChild(btn(n+" min",n===m.focusLen?"primary":"ghost",function(){try{H.timer.start(n);}catch(e){}refresh();}));});box.appendChild(a2);}
+      if(H.timer.open)box.appendChild(btn(hv(H.timerName)||T("The full focus clock","L’horloge complète"),"ghost",function(){try{H.timer.open();}catch(e){}}));h.appendChild(box);}
+    return c;}
+  /* the Inbox */
+  function cardInbox(){var c=card("inbox","💭 "+T("The Inbox","La Boîte")),x=tc();
+    c.appendChild(el("p","sc-note",{text:T("Something popped into your head? Catch it and carry on: Ctrl and the full stop anywhere, or the 💭 at the side. It waits here until you send it where it belongs.","Une idée vous traverse ? Saisissez-la et continuez : Ctrl et le point n’importe où, ou le 💭 sur le côté. Elle attend ici que vous l’envoyiez à sa place.")}));
+    if(!x){c.appendChild(el("p","sc-empty",{text:T("The Inbox is switched off.","La Boîte est désactivée.")}));return c;}
+    var inp=el("input","sc-in",{type:"text",maxlength:"2000",placeholder:T("Catch a thought, then press Enter","Saisissez une pensée, puis Entrée"),"aria-label":T("Catch a thought","Saisir une pensée")});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();var v=inp.value.trim();if(!v)return;x.add(v);inp.value="";toast(T("Kept in the Inbox.","Gardée dans la Boîte."));refresh();var i2=root&&root.querySelector('[data-sc-card="inbox"] input');if(i2)i2.focus();}});
+    c.appendChild(inp);var L=el("div",null,{style:"margin-top:8px"}),items=x.list();c.appendChild(L);
+    if(!items.length)L.appendChild(el("div","sc-empty",{text:T("Nothing is waiting. A clear head.","Rien n’attend. Une tête dégagée.")}));
+    items.slice(0,8).forEach(function(it){var r=el("div","sc-park"),sp=x.spheres[it.sphere||x.guess(it.t)]||{icon:""};
+      r.appendChild(el("div","sc-park-t",{text:it.t}));r.appendChild(el("div","sc-park-m",{text:(sp.icon?sp.icon+" "+(x.sphereLabel?x.sphereLabel(it.sphere||x.guess(it.t)):sp.label)+" · ":"")+x.ago(it.at)}));
+      /* the places a thought can go wear the app's own keys on the page */
+      var ac=x.actsFor(it,function(){refresh();});[].forEach.call(ac.querySelectorAll("button"),function(bt){bt.className=(C("chip")||C("ghost")||"")+" sc-chip";});
+      r.appendChild(ac);L.appendChild(r);});
+    var a=el("div","sc-acts sc-gap");if(items.length>8)a.appendChild(el("span","sc-note",{style:"margin:0",text:T("And "+(items.length-8)+" more.","Et "+(items.length-8)+" de plus.")}));
+    a.appendChild(btn(T("Open the Inbox","Ouvrir la Boîte"),"ghost",function(){x.inbox();}));c.appendChild(a);return c;}
+  /* Calm */
+  function cardCalm(){var c=card("calm",T("Calm","Calme")),h=el("div");c.appendChild(h);
+    h.appendChild(btn(T("I need quiet","J’ai besoin de calme"),"primary",quiet,null,"quiet"));
+    h.appendChild(el("p","sc-note",{style:"margin:8px 0 4px",text:T("Clears the screen to a still, dim page until you are ready.","Remplace l’écran par une page immobile et douce, jusqu’à ce que vous soyez prêt·e.")}));
+    var list=[["calm","🌿",T("Calm mode","Mode calme"),T("Still, silent and softer. The raised look stays.","Immobile, silencieux et adouci. Le relief reste.")]];
+    if(on("energy"))list.push(["__low","🔋",T("A low-energy day","Un jour à faible énergie"),T("Only what is essential today. Tomorrow starts afresh.","Seul l’essentiel aujourd’hui. Demain repart à neuf.")]);
+    list.forEach(function(r){var row=el("div","sc-sw",{"data-sc-key":r[0]==="__low"?"low":r[0]});row.appendChild(el("span","sc-sw-ic",{text:r[1]}));row.appendChild(el("span","sc-sw-t",null,[el("span","sc-sw-l",{text:r[2]}),el("span","sc-sw-h",{text:r[3]})]));
+      if(r[0]==="__low"){var g=el("div",(C("seg")||"")+" sc-seg");[[true,T("On","Activé")],[false,T("Off","Désactivé")]].forEach(function(o){g.appendChild(el("button",(C("segBtn")||"")+(lowToday()===o[0]?" "+C("segOn"):""),{type:"button",text:o[1],"aria-pressed":lowToday()===o[0]?"true":"false",on:{click:function(){setLow(o[0]);}}}));});row.appendChild(g);}
+      else row.appendChild(seg(r[0]));h.appendChild(row);});
+    try{if(H.calmRows)H.calmRows(h,{T:T,btn:btn});}catch(e){}
+    if(on("focus")){var a=el("div","sc-acts sc-gap");a.appendChild(btn("🎧 "+T("Open the Focus room","Ouvrir la salle de concentration"),"ghost",function(){openFocus();},null,"focusroom"));h.appendChild(a);}
+    return c;}
+  /* Routines */
+  function cardRoutines(){var c=card("routines","🌅 "+T("Routines","Routines")),h=el("div");c.appendChild(h);var sug=suggested();
+    routines().forEach(function(r){var d=rDone(r),now=sug&&sug.id===r.id;var row=el("div","sc-rt"+(now?" sc-now":""));
+      row.appendChild(el("span","sc-rt-ic",{text:r.icon||"•"}));
+      row.appendChild(el("span","sc-rt-t",null,[el("div","sc-rt-n",{text:rName(r).replace(/^\S+\s/,"")}),el("div","sc-rt-s",{text:r.steps.length+T(" steps"," étapes")+(d?T(" · done today ✓"," · faite aujourd’hui ✓"):(now?T(" · a good moment now"," · c’est le bon moment"):""))})]));
+      row.appendChild(btn(d?T("Again","Encore"):T("Begin","Commencer"),now?"primary":"ghost",function(){runRoutine(r);}));h.appendChild(row);});
+    var a=el("div","sc-acts sc-gap");a.appendChild(btn(T("Edit routines","Modifier les routines"),"ghost",editRoutines));h.appendChild(a);return c;}
+  /* Today asks of you */
+  function cardToday(){var c=card("today",hv(H.todayTitle)||T("Today asks of you","Ce que la journée vous demande"),true),h=el("div");c.appendChild(h);var rs=[];
+    try{rs=(H.todayRows?H.todayRows():[])||[];}catch(e){rs=[];}
+    if(lowToday())rs=rs.filter(function(r){return r.essential;});
+    if(!rs.length)h.appendChild(el("div","sc-empty",{text:lowToday()?T("Nothing more is asked of you today. Rest counts.","Rien de plus ne vous est demandé aujourd’hui. Le repos compte."):T("Nothing is asked of you right now.","Rien ne vous est demandé pour l’instant.")}));else rowsInto(h,rs);return c;}
+  /* the switches */
+  function myRows(){var r=rows(dayWord());try{if(H.rows){var x=H.rows(r);if(Array.isArray(x))r=x;}}catch(e){}return r;}
+  function cardSwitches(){var c=card("supports",T("Your supports","Vos aides"),true),h=el("div");c.appendChild(h);
+    h.appendChild(el("p","sc-note",{text:T("Each support has its own switch. Off, it leaves the page and the side buttons alone.","Chaque aide a son propre interrupteur. Désactivée, elle laisse la page et les boutons latéraux tranquilles.")}));
+    myRows().forEach(function(r){var row=el("div","sc-sw");row.appendChild(el("span","sc-sw-ic",{text:r[1]}));row.appendChild(el("span","sc-sw-t",null,[el("span","sc-sw-l",{text:r[2]}),el("span","sc-sw-h",{text:r[3]})]));row.appendChild(seg(r[0]));h.appendChild(row);});return c;}
+  var CARDS={now:cardNow,steps:cardSteps,time:cardTime,inbox:cardInbox,calm:cardCalm,routines:cardRoutines,today:cardToday,supports:cardSwitches};
+  function scrollTo(id){var n=null;hosts().some(function(h){n=h.querySelector('[data-sc-card="'+id+'"]');return !!n;});if(n)try{n.scrollIntoView({behavior:still()?"auto":"smooth",block:"center"});}catch(e){}}
+  function layout(){var l=hv(H.cards)||["now","steps","time","inbox","calm","routines","today","supports"];
+    return l.filter(function(k){if(k==="steps"&&!on("tiny"))return false;if(k==="inbox"&&!on("inbox"))return false;if(k==="routines"&&!on("routines"))return false;if(lowToday()&&(k==="routines"||k==="time"))return false;return true;});}
+  function render(into){if(into)root=into;if(!root)return;var keepY=null;
+    var pg=el("div","sc-page",{"data-sc-app":app,"data-sc-night":night()?"1":"0","data-sc-still":still()?"1":"0",lang:isFr()?"fr":"en"});
+    if(!H.noHead){var top=el("div","sc-top");top.appendChild(el("h2",(C("title")||"")+" sc-title",{text:hv(H.pageTitle)||T("Focus","Concentration")}));
+      top.appendChild(el("div",(C("lede")||"")+" sc-lede",{text:hv(H.lede)||T("Support that fits how you work: one step at a time, time you can see, a calm screen when you need it, and a place for every stray thought. Change any of it, or switch it off, here.","Une aide qui suit votre façon de travailler : une étape à la fois, le temps visible, un écran calme quand il le faut, et une place pour chaque pensée qui passe. Changez-la, ou désactivez-la, ici.")}));pg.appendChild(top);}
+    var grid=el("div","sc-grid");
+    var lc=cardLow();if(lc)grid.appendChild(lc);
+    layout().forEach(function(k){var n=build(k);if(n)grid.appendChild(n);});
+    pg.appendChild(grid);
+    var old=root.firstChild;if(old&&old.classList&&old.classList.contains("sc-page")){keepY=null;root.replaceChild(pg,old);}else{root.innerHTML="";root.appendChild(pg);}}
+  function cardLow(){if(!lowToday())return null;var lc=card("low","🔋 "+T("A low-energy day","Un jour à faible énergie"),true);lc.classList.add("sc-low");
+    lc.appendChild(el("p","sc-note",{text:T("Only what is essential is showing. Do one small thing, or rest: both are part of the work.","Seul l’essentiel paraît. Faites une petite chose, ou reposez-vous : les deux font partie du travail.")}));
+    var la=el("div","sc-acts");try{if(H.lowActs)H.lowActs(la,{T:T,btn:btn,refresh:refresh});}catch(e){}la.appendChild(btn(T("Show everything again","Tout montrer à nouveau"),"ghost",function(){setLow(false);}));lc.appendChild(la);return lc;}
+  function build(k){if(k==="low")return cardLow();var f=CARDS[k],extra=(hv(H.extraCards)||{})[k];
+    try{return extra?extra({T:T,btn:btn,card:card,rowsInto:rowsInto,refresh:refresh}):(f?f():null);}catch(e){try{console.warn("support card",k,e);}catch(x){}return null;}}
+  /* v2: an app that keeps its own Focus page can take single cards into places of its own: mount({routines:el,...}).
+     Each card is drawn inside its own small page (so it wears the same dress), and is drawn again with the rest. */
+  var mounts=null;
+  function mount(map){mounts=map||null;drawMounts();}
+  function hosts(){var out=root?[root]:[];if(mounts)Object.keys(mounts).forEach(function(k){if(mounts[k])out.push(mounts[k]);});return out;}
+  function drawMounts(){if(!mounts)return;Object.keys(mounts).forEach(function(k){var hst=mounts[k];if(!hst)return;
+      var shown=k==="low"||layout().indexOf(k)>=0,n=shown?build(k):null;
+      if(!n){if(hst.firstChild)hst.innerHTML="";hst.hidden=true;return;}
+      var pg=el("div","sc-page sc-solo",{"data-sc-app":app,"data-sc-night":night()?"1":"0","data-sc-still":still()?"1":"0",lang:isFr()?"fr":"en"});pg.appendChild(n);
+      hst.hidden=false;var old=hst.firstChild;if(old&&old.classList&&old.classList.contains("sc-page"))hst.replaceChild(pg,old);else{hst.innerHTML="";hst.appendChild(pg);}});}
+  /* drawn again after each press; the clock alone ticks between, so a half-typed word is never lost */
+  function busyTyping(){var a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="checkbox"&&hosts().some(function(h){return h.contains(a);}));}
+  function visible(){return hosts().some(function(h){return h.offsetParent!==null&&h.getClientRects().length;});}
+  function refresh(){if(!root&&!mounts)return;if(busyTyping()){paintClocks();return;}if(root)render();drawMounts();}
+  function paintClocks(){hosts().forEach(function(h){[].forEach.call(h.querySelectorAll('[data-sc-clock]'),function(n){var t=hhmm();if(n.textContent!==t)n.textContent=t;});});}
+  var lastSig="";
+  /* what is open over the page (a sheet, the Focus room, the two-minute chip) follows day and night at once too */
+  var lastNight=null,nightQ=0;
+  function nightSync(){nightQ=0;var n=night();if(n===lastNight)return;lastNight=n;var v=n?"1":"0";
+    try{if(sheetEl)sheetEl.setAttribute("data-tc-night",v);}catch(e){}
+    ["sc-focus-room","sc-just"].forEach(function(id){var x=document.getElementById(id);if(x)x.setAttribute("data-sc-night",v);});
+    if(LOOK){dressLook(document.getElementById("sc-toast"));dressLook(document.getElementById("sc-just"));}
+    try{refresh();}catch(e){}}
+  function nightSoon(){if(!nightQ)nightQ=setTimeout(nightSync,30);}
+  try{var mo=new MutationObserver(nightSoon);mo.observe(document.documentElement,{attributes:true});
+    if(document.body)mo.observe(document.body,{attributes:true});}catch(e){}
+  function tick(){try{applyAll();}catch(e){}try{nightSync();}catch(e){}
+    if(visible()){var m=tm(),sig=hhmm()+"|"+(m?(m.running?Math.floor(m.remaining/30):"p"+m.remaining):"")+"|"+(tc()?tc().list().length+(tc().draft()?"d":""):"")+"|"+isFr()+"|"+night();
+      if(sig!==lastSig){lastSig=sig;refresh();}}}
+  function applyAll(){var c=on("calm");try{document.documentElement.toggleAttribute("data-sc-calm",c);}catch(e){}try{H.applyCalm&&H.applyCalm(c);}catch(e){}
+    var l=lowToday();try{document.body.toggleAttribute("data-sc-low",l);}catch(e){}try{H.applyLow&&H.applyLow(l);}catch(e){}}
+  setInterval(tick,5000);setInterval(warnSoon,30000);setTimeout(warnSoon,4000);setTimeout(applyAll,0);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(tick,300);});
+
+  return {render:render,refresh:refresh,mount:mount,card:build,tick:tick,on:on,set:setOn,rows:myRows,lowToday:lowToday,setLow:setLow,
+    routines:routines,runRoutine:runRoutine,editRoutines:editRoutines,suggestedRoutine:suggested,rName:rName,openFocus:openFocus,closeFocus:closeFocus,
+    justStart:justStart,stopJust:stopJust,quiet:quiet,closeQuiet:closeQuiet,timeBar:timeBar,timeModel:timeModel,nextTask:nextTask,plan:plan,
+    tasks:tasks,current:cur,newTask:newTask,fromPlan:fromPlan,steps:stepTemplates,applyAll:applyAll,sheet:sheet,closeSheet:closeSheet,T:T,store:S,toast:toast,
+    reminders:reminders};}
+
+window.SupportCore={create:create,v:2,steps:function(title){return stepTemplates(title);}};
+})();
+</script>

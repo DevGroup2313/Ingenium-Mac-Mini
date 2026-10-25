@@ -1,0 +1,229 @@
+<style id="permit-core-css">
+/* PermitCore: the owner's licence and the owner's permissions, shared by Ingenium and The Forge (each draws it in its own card) */
+.pc-card .pc-sub{margin:14px 0 4px;font-weight:700;font-size:13px;letter-spacing:.01em}
+.pc-card .pc-line{margin:4px 0;line-height:1.5}
+.pc-card .pc-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.pc-card details.pc-text{margin:8px 0}
+.pc-card details.pc-text>summary{cursor:pointer;font-weight:600}
+.pc-card .pc-licence{white-space:pre-wrap;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:420px;overflow:auto;
+  padding:10px 12px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:8px;margin:8px 0}
+.pc-card .pc-list{display:grid;gap:8px;margin:8px 0}
+.pc-card .pc-item{padding:9px 11px;border:1px solid color-mix(in srgb,currentColor 16%,transparent);border-radius:9px;line-height:1.45}
+.pc-card .pc-item b{font-weight:700}
+.pc-card .pc-state{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;
+  border:1px solid currentColor}
+.pc-card .pc-state.ok{color:#1d7a46}.pc-card .pc-state.bad{color:#b3261e}.pc-card .pc-state.old{color:#8a5a00}
+.pc-card .pc-form{display:grid;gap:8px;margin:8px 0;max-width:560px}
+.pc-card .pc-form label{display:grid;gap:3px;font-size:12.5px}
+.pc-card .pc-form input[type=text],.pc-card .pc-form input[type=password],.pc-card .pc-form input[type=date]{font:inherit;padding:6px 8px;border-radius:7px;
+  border:1px solid color-mix(in srgb,currentColor 30%,transparent);background:transparent;color:inherit}
+.pc-card .pc-checks{display:flex;gap:6px 14px;flex-wrap:wrap}
+.pc-card .pc-checks label{display:flex;gap:5px;align-items:center;font-size:12.5px}
+.pc-card .pc-say{min-height:1.4em;margin:6px 0}
+.pc-card .pc-say.bad{color:#b3261e}
+.pc-card .pc-fp{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all}
+</style>
+<script>
+/* ============ PermitCore · the owner's licence and permissions (Ingenium 6.2 and The Forge 644, 23 October 2026) ============
+   The owner's words: "The app is my sole original work and only I am able to do distribute, sell, edit, remove or basically do
+   anything with it, no one else has that right and should not ever have access unless I grant them limited persmission that I
+   can discontinue at any time. I want that made explicit for all of my apps."
+   What each app carries:
+   - its licence (version 2), whole, with a key to save it, and the edition and build of this copy;
+   - the owner's public keys, written in when the app is built (security/owner_keys.json). A permission is a small file signed
+     with the owner's key: it names one person, the apps, what it allows, the day it begins and the day it ends, and its own
+     number. The app checks the signature and the dates, and the owner's list of withdrawn permissions, which travels the same
+     way (a file the owner signs, and each build carries the latest). A copy that is not the owner's, or a permission changed by
+     one letter, does not check;
+   - in the owner's own edition, the owner's key: made on the owner's device, kept there only under the owner's password
+     (PBKDF2, 600,000 rounds, with AES-GCM), with a backup file the owner keeps; it gives a permission, and withdraws one.
+   The apps never call out to check a permission: they work with no connection. So a permission ends by its own date (give short
+   ones, and renew them), or when the holder's app is given the owner's newer list of withdrawn permissions.
+   ECDSA P-256 with SHA-256 (WebCrypto); a signature is over the permission's fields written in a fixed order. */
+(function(W){"use strict";
+var D=W.document,TE=new TextEncoder(),TD=new TextDecoder();
+var EC={name:"ECDSA",namedCurve:"P-256"},SIG={name:"ECDSA",hash:"SHA-256"};
+var KIND={permit:"offline-project-permission",withdrawn:"offline-project-withdrawals",key:"offline-project-owner-key"};
+var APPS={ingenium:"Ingenium",forge:"The Forge",cd:"Carpe Diem",inkwell:"Inkwell"};
+var ALLOWS=[["use","use it"],["install","install it on their own devices"],["edit","change it, for their own use"],
+  ["package","make install packages of it"],["share","give a copy to someone named in a permission of their own"],["sell","sell it"]];
+function subtle(){var c=W.crypto&&W.crypto.subtle;if(!c)throw new Error("this browser cannot check signatures (no Web Crypto)");return c;}
+function b64u(u8){var s="",i;u8=u8 instanceof Uint8Array?u8:new Uint8Array(u8);for(i=0;i<u8.length;i+=32768)s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function unb64u(s){s=String(s||"").replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+/* the fields in a fixed order: keys sorted at every level, no spaces */
+function canon(v){if(v===null||typeof v!=="object")return JSON.stringify(v);if(Array.isArray(v))return "["+v.map(canon).join(",")+"]";
+  return "{"+Object.keys(v).sort().filter(function(k){return v[k]!==undefined;}).map(function(k){return JSON.stringify(k)+":"+canon(v[k]);}).join(",")+"}";}
+function pubOf(jwk){return {crv:jwk.crv,kty:jwk.kty,x:jwk.x,y:jwk.y};}
+function kidOf(jwk){return subtle().digest("SHA-256",TE.encode(canon(pubOf(jwk)))).then(function(h){return b64u(new Uint8Array(h)).slice(0,22);});}
+function day(d){d=d||new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function said(iso){var m=/^(\d{4})-(\d\d)-(\d\d)/.exec(iso||"");return m?(+m[3])+" "+MONTHS[+m[2]-1]+" "+m[1]:"";}
+
+/* ---------- checking ---------- */
+function importPub(jwk){return subtle().importKey("jwk",Object.assign(pubOf(jwk),{ext:true}),EC,false,["verify"]);}
+function verifySig(body,sig,jwk){return importPub(jwk).then(function(k){return subtle().verify(SIG,k,unb64u(sig),TE.encode(canon(body)));});}
+function findKey(keys,kid){return (keys||[]).filter(function(k){return k&&k.kid===kid&&k.jwk;})[0]||null;}
+/* a withdrawal list: {kind, v, list:{at, withdrawn:[numbers]}, kid, sig} */
+function checkWithdrawn(file,keys){try{if(!file||file.kind!==KIND.withdrawn||!file.list||!Array.isArray(file.list.withdrawn))return Promise.resolve(null);
+  var k=findKey(keys,file.kid);if(!k)return Promise.resolve(null);
+  return verifySig(file.list,file.sig,k.jwk).then(function(ok){return ok?file.list:null;},function(){return null;});}catch(e){return Promise.resolve(null);}}
+/* a permission: {kind, v, permit:{n, holder, contact, apps, allows, from, until, issued, note}, kid, sig}. Its state:
+   valid, not yet, ended, withdrawn, not the owner's (a key the owner did not make, or a field changed), unreadable */
+function checkPermit(file,keys,withdrawn,app,today){today=today||day();
+  try{if(!file||file.kind!==KIND.permit||!file.permit||typeof file.sig!=="string")return Promise.resolve({state:"unreadable",why:"This is not a permission file."});}catch(e){return Promise.resolve({state:"unreadable",why:"This is not a permission file."});}
+  var p=file.permit,k=findKey(keys,file.kid);
+  if(!k)return Promise.resolve({state:"foreign",permit:p,why:(keys&&keys.length)?"It is not signed with the owner's key.":"This copy carries no key of the owner's yet, so it cannot check a permission."});
+  return verifySig(p,file.sig,k.jwk).then(function(ok){
+    if(!ok)return {state:"foreign",permit:p,why:"Its signature does not match: it was changed, or it is not the owner's."};
+    if((withdrawn||[]).indexOf(p.n)>=0)return {state:"withdrawn",permit:p,why:"The owner has withdrawn it."};
+    if(p.from&&today<p.from)return {state:"notyet",permit:p,why:"It begins on "+said(p.from)+"."};
+    if(p.until&&today>p.until)return {state:"ended",permit:p,why:"It ended on "+said(p.until)+"."};
+    if(app&&Array.isArray(p.apps)&&p.apps.indexOf(app)<0)return {state:"otherapp",permit:p,why:"It is for "+p.apps.map(function(a){return APPS[a]||a;}).join(", ")+", not for this app."};
+    return {state:"valid",permit:p,why:p.until?"Valid until "+said(p.until)+".":"Valid."};},
+    function(){return {state:"foreign",permit:p,why:"Its signature cannot be read."};});}
+
+/* ---------- the owner's key: made here, kept only under the owner's password ---------- */
+function deriveWrap(pw,salt,iter){var s=subtle();return s.importKey("raw",TE.encode(pw),"PBKDF2",false,["deriveKey"]).then(function(base){
+  return s.deriveKey({name:"PBKDF2",hash:"SHA-256",salt:salt,iterations:iter},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);});}
+function sealKey(privJwk,pubJwk,kid,pw){var salt=W.crypto.getRandomValues(new Uint8Array(16)),iv=W.crypto.getRandomValues(new Uint8Array(12)),iter=600000;
+  return deriveWrap(pw,salt,iter).then(function(k){return subtle().encrypt({name:"AES-GCM",iv:iv},k,TE.encode(JSON.stringify(privJwk)));}).then(function(ct){
+    return {kind:KIND.key,v:1,kid:kid,pub:pubOf(pubJwk),made:new Date().toISOString(),enc:{kdf:"PBKDF2-SHA-256",iter:iter,salt:b64u(salt),iv:b64u(iv),cipher:"AES-256-GCM",ct:b64u(new Uint8Array(ct))}};});}
+function openKey(sealed,pw){if(!sealed||sealed.kind!==KIND.key||!sealed.enc)return Promise.reject(new Error("This is not the owner's key file."));
+  var e=sealed.enc;return deriveWrap(pw,unb64u(e.salt),e.iter).then(function(k){return subtle().decrypt({name:"AES-GCM",iv:unb64u(e.iv)},k,unb64u(e.ct));})
+    .then(function(pt){return subtle().importKey("jwk",JSON.parse(TD.decode(pt)),EC,false,["sign"]);},function(){throw new Error("That password does not open the key.");});}
+function makeKey(pw){var s=subtle();return s.generateKey(EC,true,["sign","verify"]).then(function(kp){
+  return Promise.all([s.exportKey("jwk",kp.privateKey),s.exportKey("jwk",kp.publicKey)]).then(function(j){return kidOf(j[1]).then(function(kid){return sealKey(j[0],j[1],kid,pw);});});});}
+function signWith(key,body){return subtle().sign(SIG,key,TE.encode(canon(body))).then(function(sig){return b64u(new Uint8Array(sig));});}
+
+/* the owner's key and book of permissions are kept in a store of their own, never in the desk's ordinary state */
+var DB="offline_owner";
+function idb(){return new Promise(function(res,rej){var rq=indexedDB.open(DB,1);rq.onupgradeneeded=function(){rq.result.createObjectStore("o");};rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};});}
+function iget(k){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("o","readonly"),r=t.objectStore("o").get(k);r.onsuccess=function(){res(r.result||null);};t.oncomplete=function(){d.close();};t.onerror=function(){d.close();rej(t.error);};});});}
+function iput(k,v){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("o","readwrite");t.objectStore("o").put(v,k);t.oncomplete=function(){d.close();res(true);};t.onerror=t.onabort=function(){d.close();rej(t.error);};});});}
+
+/* ---------- the card ---------- */
+function el(tag,cls,text){var e=D.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function create(o){
+  var C=Object.assign({card:"card",h:"",btn:"btn",pri:"btn primary",note:"small muted"},o.cls||{});
+  var keys=(o.keys||[]).filter(function(k){return k&&k.kid&&k.jwk;}),withdrawn=[],READY=null,LAST=[];
+  function store(){var s=null;try{s=o.load&&o.load();}catch(e){}if(!s||typeof s!=="object")s={};if(!Array.isArray(s.files))s.files=[];if(!Array.isArray(s.lists))s.lists=[];return s;}
+  function keep(s){try{o.save&&o.save(s);}catch(e){}}
+  function say(t){try{(o.toast||function(){})(t);}catch(e){}}
+  function save(name,mime,text){var r=o.saveFile?o.saveFile(name,mime,text):null;if(r)return Promise.resolve(r);var a=D.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;D.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},4000);return Promise.resolve();}
+  /* the withdrawn numbers: from the list this build carries and every list brought in, each checked */
+  function lists(){var s=store(),all=[o.withdrawn].concat(s.lists).filter(Boolean);
+    return Promise.all(all.map(function(f){return checkWithdrawn(f,keys);})).then(function(ok){var n={};ok.forEach(function(l){if(l)l.withdrawn.forEach(function(x){n[x]=1;});});withdrawn=Object.keys(n);return withdrawn;});}
+  function states(){var s=store(),files=(o.given?[o.given]:[]).concat(s.files);
+    return lists().then(function(){return Promise.all(files.map(function(f){return checkPermit(f,keys,withdrawn,o.app);}));}).then(function(r){LAST=r;try{if(o.onChange)o.onChange(r);}catch(e){}return r;});}
+  function ready(){return READY||(READY=states());}
+  function allows(what){if(o.owner)return true;return LAST.some(function(r){return r.state==="valid"&&r.permit&&Array.isArray(r.permit.allows)&&r.permit.allows.indexOf(what)>=0;});}
+  function holder(){var v=LAST.filter(function(r){return r.state==="valid";})[0];return v?v.permit:null;}
+  function pick(accept){return new Promise(function(res){var i=D.createElement("input");i.type="file";i.accept=accept;i.onchange=function(){var f=i.files&&i.files[0];if(!f){res(null);return;}
+    f.text().then(function(t){try{res(JSON.parse(t));}catch(e){res({__bad:f.name});}},function(){res(null);});};i.click();});}
+  function bring(){return pick(".ingperm,.json,application/json").then(function(f){if(!f)return;if(f.__bad){paintSay("“"+f.__bad+"” is not a permission file.",true);return;}
+    if(f.kind===KIND.withdrawn)return bringList(f);
+    return checkPermit(f,keys,withdrawn,o.app).then(function(r){if(r.state==="unreadable"){paintSay(r.why,true);return;}
+      var s=store(),cf=canon(f);if(!s.files.some(function(x){return canon(x)===cf;}))s.files.push(f);  /* the same file, not merely the same signature */keep(s);READY=null;
+      paintSay(r.state==="valid"?"The permission is the owner's and is valid: "+(r.permit.holder||"")+", number "+r.permit.n+".":"Kept, but it does not allow anything: "+r.why,r.state!=="valid");return paint();});});}
+  function bringList(f){return checkWithdrawn(f,keys).then(function(l){if(!l){paintSay("That list of withdrawn permissions is not the owner's.",true);return;}
+    var s=store(),cf=canon(f);if(!s.lists.some(function(x){return canon(x)===cf;}))s.lists.push(f);keep(s);READY=null;paintSay("The owner's list of withdrawn permissions is kept ("+l.withdrawn.length+" withdrawn).");return paint();});}
+  var R={};
+  function paintSay(t,bad){R.msg={t:t,bad:!!bad};if(R.say){R.say.textContent=t;R.say.classList.toggle("bad",!!bad);}}
+  function ask(label,twice){return new Promise(function(res){var f=el("div","pc-form");f.setAttribute("role","group");f.setAttribute("aria-label",label);
+    var l1=el("label",null,label),p1=el("input");p1.type="password";p1.autocomplete="current-password";l1.appendChild(p1);f.appendChild(l1);
+    var p2=null;if(twice){var l2=el("label",null,"The same password again"),q=el("input");q.type="password";q.autocomplete="new-password";l2.appendChild(q);f.appendChild(l2);p2=q;}
+    var row=el("div","pc-row"),okb=el("button",C.pri,"Go on"),no=el("button",C.btn,"Not now");okb.type=no.type="button";row.appendChild(okb);row.appendChild(no);f.appendChild(row);
+    var bad=el("div","pc-say bad");f.appendChild(bad);R.ask.innerHTML="";R.ask.appendChild(f);p1.focus();
+    function done(v){R.ask.innerHTML="";res(v);}
+    okb.onclick=function(){var v=p1.value;if(twice&&v.length<12){bad.textContent="At least twelve characters, please.";return;}if(twice&&v!==p2.value){bad.textContent="The two passwords are not the same.";return;}done(v);};
+    no.onclick=function(){done(null);};f.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();okb.click();}if(e.key==="Escape"){e.preventDefault();done(null);}});});}
+  /* the owner's part */
+  function ownerKey(){return iget("key");}
+  function ownerBook(){return iget("book").then(function(b){b=b||{};if(!Array.isArray(b.given))b.given=[];if(!Array.isArray(b.withdrawn))b.withdrawn=[];return b;});}
+  function makeOwner(){return ask("A password for your owner key (at least twelve characters). Keep it safe: no one can give it back to you.",true).then(function(pw){if(!pw)return;
+    paintSay("Making your key…");return makeKey(pw).then(function(sealed){return iput("key",sealed).then(function(){
+      var name=o.app+"-owner-key-"+day()+".ingkey";return save(name,"application/json",JSON.stringify(sealed,null,1)).then(function(){
+        paintSay("Your owner key is made, kept here under your password, and its backup is saved ("+name+"). Keep that file somewhere safe, away from this device.");return paint();});});});});}
+  function restoreOwner(){return pick(".ingkey,.json").then(function(f){if(!f||f.kind!==KIND.key){if(f)paintSay("That is not an owner key file.",true);return;}
+    return ask("The password of this key").then(function(pw){if(!pw)return;return openKey(f,pw).then(function(){return iput("key",f).then(function(){paintSay("Your owner key is back on this device.");return paint();});},function(e){paintSay(e.message,true);});});});}
+  function pubFile(sealed){return JSON.stringify({kind:"offline-project-owner-public-key",v:1,keys:[{kid:sealed.kid,jwk:sealed.pub,name:o.ownerName||"",made:(sealed.made||"").slice(0,10)}]},null,1);}
+  function give(form){var g=function(n){return form.querySelector('[name="'+n+'"]');};
+    var holder=g("holder").value.trim(),contact=g("contact").value.trim(),until=g("until").value,from=g("from").value||day(),note=g("note").value.trim();
+    var apps=[].slice.call(form.querySelectorAll('input[name="app"]:checked')).map(function(x){return x.value;}),allow=[].slice.call(form.querySelectorAll('input[name="allow"]:checked')).map(function(x){return x.value;});
+    if(!holder){paintSay("Name the person the permission is for.",true);return Promise.resolve();}if(!apps.length||!allow.length){paintSay("Choose the apps, and what it allows.",true);return Promise.resolve();}
+    if(until&&until<from){paintSay("It cannot end before it begins.",true);return Promise.resolve();}
+    return Promise.all([ownerKey(),ownerBook()]).then(function(x){var sealed=x[0],book=x[1];if(!sealed){paintSay("Make your owner key first.",true);return;}
+      return ask("The password of your owner key").then(function(pw){if(!pw)return;return openKey(sealed,pw).then(function(key){
+        var yr=new Date().getFullYear(),seq=book.given.filter(function(p){return String(p.n).indexOf("P-"+yr+"-")===0;}).length+1;
+        var permit={n:"P-"+yr+"-"+("000"+seq).slice(-4),holder:holder,contact:contact||undefined,apps:apps,allows:allow,from:from,until:until||undefined,issued:new Date().toISOString(),note:note||undefined};
+        return signWith(key,permit).then(function(sig){var file={kind:KIND.permit,v:1,permit:permit,kid:sealed.kid,sig:sig};book.given.push(permit);
+          return iput("book",book).then(function(){var name="permission-"+permit.n+"-"+holder.replace(/[^\w.-]+/g,"_").slice(0,40)+".ingperm";
+            return save(name,"application/json",JSON.stringify(file,null,1)).then(function(){paintSay("Permission "+permit.n+" for "+holder+" is signed and saved ("+name+"). Give that file to "+holder+".");form.reset();return paint();});});});},
+        function(e){paintSay(e.message,true);});});});}
+  function withdraw(n){return ownerBook().then(function(book){if(book.withdrawn.indexOf(n)<0)book.withdrawn.push(n);return iput("book",book);}).then(function(){paintSay("Permission "+n+" is withdrawn in your book. Save the list of withdrawn permissions and give it to its holder; the next build of each app carries it too.");return paint();});}
+  function saveList(){return Promise.all([ownerKey(),ownerBook()]).then(function(x){var sealed=x[0],book=x[1];if(!sealed){paintSay("Make your owner key first.",true);return;}
+    return ask("The password of your owner key").then(function(pw){if(!pw)return;return openKey(sealed,pw).then(function(key){var list={at:new Date().toISOString(),withdrawn:book.withdrawn.slice().sort()};
+      return signWith(key,list).then(function(sig){var f={kind:KIND.withdrawn,v:1,list:list,kid:sealed.kid,sig:sig},name="withdrawn-permissions-"+day()+".ingwithdraw";
+        return save(name,"application/json",JSON.stringify(f,null,1)).then(function(){paintSay("The list of withdrawn permissions is signed and saved ("+name+"): "+list.withdrawn.length+" withdrawn.");});});},function(e){paintSay(e.message,true);});});});}
+
+  function card(host){if(!host)return null;var c=D.getElementById(o.id||"pcCard");
+    if(!c){c=el("div",C.card+" pc-card");c.id=o.id||"pcCard";c.setAttribute("role","region");c.setAttribute("aria-labelledby",c.id+"H");host.appendChild(c);}
+    c.innerHTML="";var h=el("h2",C.h,"Ownership, licence and permissions");h.id=c.id+"H";c.appendChild(h);
+    c.appendChild(el("p","pc-line",o.appName+" is the sole original work of "+(o.ownerName||"its owner")+", its owner. Every right in it is the owner's: only the owner may use, copy, install, give, publish, sell, change or remove it, or let anyone else do any of these, and only by a permission the owner signs."));
+    c.appendChild(el("p","pc-line "+C.note,"A permission names one person and the apps it covers, says what it allows, and has its own number. It cannot be passed on. It ends on its end date, and the owner can withdraw it at any time. "+o.appName+" works with no connection and never calls out to check, so a permission ends by its date, or when this copy is given the owner's newer list of withdrawn permissions."));
+    c.appendChild(el("p","pc-line "+C.note,"This copy: "+o.appName+(o.version?" "+o.version:"")+(o.edition?", the "+o.edition+" edition":"")+(o.stamp?", build "+o.stamp:"")+". A copy that did not come from the owner, or that has been changed, is not the owner's."));
+    var dt=el("details","pc-text"),sm=el("summary",null,"Read the whole licence (version 2)");dt.appendChild(sm);dt.appendChild(el("div","pc-licence",o.licence||""));c.appendChild(dt);
+    var r0=el("div","pc-row"),sv=el("button",C.btn,"Save the licence");sv.type="button";sv.onclick=function(){save("LICENCE.txt","text/plain",o.licence||"");};r0.appendChild(sv);c.appendChild(r0);
+    /* permissions on this device */
+    c.appendChild(el("h3","pc-sub","Permissions on this device"));
+    if(!keys.length)c.appendChild(el("p","pc-line "+C.note,"This copy carries no key of the owner's yet, so it cannot check a permission."));
+    var lst=el("div","pc-list");lst.setAttribute("aria-live","polite");c.appendChild(lst);
+    var r1=el("div","pc-row"),bb=el("button",C.btn,"Bring in a permission…");bb.type="button";bb.onclick=bring;r1.appendChild(bb);c.appendChild(r1);
+    R.say=el("div","pc-say");R.say.setAttribute("role","status");c.appendChild(R.say);R.ask=el("div");c.appendChild(R.ask);
+    if(R.msg){R.say.textContent=R.msg.t;R.say.classList.toggle("bad",R.msg.bad);}  /* the last word stays when the card is drawn again */
+    states().then(function(rs){lst.innerHTML="";if(!rs.length){lst.appendChild(el("p","pc-line "+C.note,o.owner?"You are the owner: this edition needs no permission.":"No permission is kept here yet."));return;}
+      rs.forEach(function(r){var p=r.permit||{},it=el("div","pc-item"),t=el("div");t.appendChild(el("b",null,(p.holder||"A permission")+(p.n?" · "+p.n:"")));
+        var cls=r.state==="valid"?"ok":r.state==="ended"||r.state==="notyet"?"old":"bad",w={valid:"valid",ended:"ended",notyet:"not yet begun",withdrawn:"withdrawn",foreign:"not the owner's",otherapp:"for another app",unreadable:"unreadable"}[r.state]||r.state;
+        t.appendChild(D.createTextNode(" "));t.appendChild(el("span","pc-state "+cls,w));it.appendChild(t);
+        if(p.allows)it.appendChild(el("div",C.note,"Allows: "+p.allows.map(function(a){var x=ALLOWS.filter(function(y){return y[0]===a;})[0];return x?x[1]:a;}).join("; ")+(p.apps?". For "+p.apps.map(function(a){return APPS[a]||a;}).join(", "):"")+"."));
+        it.appendChild(el("div",C.note,r.why));lst.appendChild(it);});});
+    if(o.owner)ownerPart(c);
+    return c;}
+  function ownerPart(c){c.appendChild(el("h3","pc-sub","Your owner key"));var box=el("div");c.appendChild(box);
+    Promise.all([ownerKey(),ownerBook()]).then(function(x){var sealed=x[0],book=x[1];box.innerHTML="";
+      if(!sealed){box.appendChild(el("p","pc-line "+C.note,"Make your owner key here, on your own device. It signs the permissions you give. It is kept here only under your password, and a backup file is saved for you to keep somewhere safe. Its public half goes into each build of your apps, so they can check what you sign."));
+        var r=el("div","pc-row"),mk=el("button",C.pri,"Make my owner key");mk.type="button";mk.onclick=makeOwner;var rb=el("button",C.btn,"Bring back my key from its backup…");rb.type="button";rb.onclick=restoreOwner;r.appendChild(mk);r.appendChild(rb);box.appendChild(r);return;}
+      var known=keys.some(function(k){return k.kid===sealed.kid;});
+      box.appendChild(el("p","pc-line","Your key: "));box.lastChild.appendChild(el("span","pc-fp",sealed.kid));
+      box.appendChild(el("p","pc-line "+C.note,known?"This build carries its public half: the apps built with it check what you sign.":"This build does not carry its public half yet. Save the public key and put it into the next build (security/owner_keys.json)."));
+      var r2=el("div","pc-row"),pk=el("button",C.btn,"Save the public key"),bk=el("button",C.btn,"Save a backup of my key");pk.type=bk.type="button";
+      pk.onclick=function(){save("owner_keys.json","application/json",pubFile(sealed));};bk.onclick=function(){save(o.app+"-owner-key-"+day()+".ingkey","application/json",JSON.stringify(sealed,null,1));};
+      r2.appendChild(pk);r2.appendChild(bk);box.appendChild(r2);
+      /* give a permission */
+      box.appendChild(el("h3","pc-sub","Give a permission"));var f=el("form","pc-form");f.noValidate=true;
+      function field(lbl,name,type,val){var l=el("label",null,lbl),i=el("input");i.type=type;i.name=name;if(val)i.value=val;l.appendChild(i);f.appendChild(l);return i;}
+      field("The person it is for","holder","text");field("How to reach them (optional)","contact","text");
+      var ap=el("div","pc-checks");ap.setAttribute("role","group");ap.setAttribute("aria-label","The apps it covers");Object.keys(APPS).forEach(function(k){var l=el("label"),i=el("input");i.type="checkbox";i.name="app";i.value=k;if(k===o.app)i.checked=true;l.appendChild(i);l.appendChild(D.createTextNode(APPS[k]));ap.appendChild(l);});
+      f.appendChild(el("div",C.note,"The apps it covers"));f.appendChild(ap);
+      var al=el("div","pc-checks");al.setAttribute("role","group");al.setAttribute("aria-label","What it allows");ALLOWS.forEach(function(a){var l=el("label"),i=el("input");i.type="checkbox";i.name="allow";i.value=a[0];if(a[0]==="use"||a[0]==="install")i.checked=true;l.appendChild(i);l.appendChild(D.createTextNode(a[1]));al.appendChild(l);});
+      f.appendChild(el("div",C.note,"What it allows"));f.appendChild(al);
+      var later=new Date(Date.now()+90*864e5);field("It begins on","from","date",day());field("It ends on (empty: it ends only when you withdraw it)","until","date",day(later));field("A note (optional)","note","text");
+      var r3=el("div","pc-row"),sg=el("button",C.pri,"Sign and save the permission");sg.type="button";sg.onclick=function(){give(f);};r3.appendChild(sg);f.appendChild(r3);box.appendChild(f);
+      /* the book */
+      box.appendChild(el("h3","pc-sub","Permissions you have given"));
+      if(!book.given.length)box.appendChild(el("p","pc-line "+C.note,"None yet."));
+      var bl=el("div","pc-list");book.given.slice().reverse().forEach(function(p){var it=el("div","pc-item"),gone=book.withdrawn.indexOf(p.n)>=0,ended=p.until&&day()>p.until;
+        var t=el("div");t.appendChild(el("b",null,p.holder+" · "+p.n));t.appendChild(D.createTextNode(" "));t.appendChild(el("span","pc-state "+(gone?"bad":ended?"old":"ok"),gone?"withdrawn":ended?"ended":"in force"));it.appendChild(t);
+        it.appendChild(el("div",C.note,(p.until?"Until "+said(p.until):"No end date")+". Allows: "+p.allows.join(", ")+"."));
+        if(!gone){var wb=el("button",C.btn,"Withdraw it");wb.type="button";wb.onclick=function(){withdraw(p.n);};var rr=el("div","pc-row");rr.appendChild(wb);it.appendChild(rr);}bl.appendChild(it);});
+      box.appendChild(bl);
+      if(book.withdrawn.length){var r4=el("div","pc-row"),sl=el("button",C.btn,"Save the list of withdrawn permissions");sl.type="button";sl.onclick=saveList;r4.appendChild(sl);box.appendChild(r4);}});}
+  function paint(){var c=D.getElementById(o.id||"pcCard");if(c&&c.parentNode)card(c.parentNode);return ready();}
+  ready();
+  return {card:card,paint:paint,ready:ready,allows:allows,holder:holder,states:function(){return states();},keys:keys,
+    check:function(f){return lists().then(function(){return checkPermit(f,keys,withdrawn,o.app);});}};}
+W.PermitCore={create:create,checkPermit:checkPermit,checkWithdrawn:checkWithdrawn,canon:canon,kidOf:kidOf,makeKey:makeKey,openKey:openKey,signWith:signWith,KIND:KIND,APPS:APPS,ALLOWS:ALLOWS};
+})(window);
+</script>

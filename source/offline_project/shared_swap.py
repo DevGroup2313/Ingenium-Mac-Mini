@@ -10,8 +10,9 @@ PREV = os.path.join(HERE, "shared_prev_61")
 NAMES = ("support_core.html", "thought_cloud.html")
 
 
-PREVS = (PREV, os.path.join(HERE, "shared_prev_62"), os.path.join(HERE, "shared_prev_63"))   # a page built by 6.2 (The Forge 644)
-# carries 6.2's text, one built by 6.3 (The Forge 645) 6.3's, without its comments
+PREVS = (PREV, os.path.join(HERE, "shared_prev_62"), os.path.join(HERE, "shared_prev_63"), os.path.join(HERE, "shared_prev_64"))
+# a page built by 6.2 (The Forge 644) carries 6.2's text, one built by 6.3 (The Forge 645) 6.3's, without its comments, and
+# one built by 6.4 (The Forge 646) 6.4's
 
 
 def swap(s, label="page", names=NAMES):

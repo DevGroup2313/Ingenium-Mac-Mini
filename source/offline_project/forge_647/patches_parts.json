@@ -1,0 +1,8 @@
+[
+ {
+  "old": "function choose(i,range){ if(!S) return; S.sel=i; paint(); var ta=el('feText'); if(ta){ try{ ta.focus(); if(range){ ta.setSelectionRange(range[0],range[1]); var before=ta.value.slice(0,range[0]).split('\\n').length; ta.scrollTop=Math.max(0,(before-4)*20); } }catch(e){} } }",
+  "new": "function choose(i,range){ if(!S) return; S.sel=i; paint(); setTimeout(function(){ var ta=el('feText'); if(ta){ try{ ta.focus(); if(range){ ta.setSelectionRange(range[0],range[1]); var before=ta.value.slice(0,range[0]).split('\\n').length; ta.scrollTop=Math.max(0,(before-4)*20); } }catch(e){} } },0); }",
+  "count": 1,
+  "why": "the part's box is made again by paint(); the code editor (645) takes it over a moment later and starts at the top, so the word found is chosen after that"
+ }
+]

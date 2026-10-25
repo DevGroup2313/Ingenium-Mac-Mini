@@ -1,0 +1,129 @@
+<style id="fabrica-parts-css">
+/* ============ FABRICA, PART BY PART: EACH CHANGE LOOKED OVER AND KEPT OR PUT BACK ON ITS OWN (Ingenium 6.4, The Forge 646) ============
+   The owner's words (23 October 2026): "I want to be able to go through all of my apps line by line on both Ingenium and the Forge
+   and be able to make surgical edits", and both apps to be "great platforms and workbench to do serious coding [...] both with AI
+   and without AI". A change to a file, made by hand or by a model in Chat or Code, used to be kept or put back whole. In Changes,
+   each part of a file that changed (a hunk: the lines that changed, with three lines either side) now has its own key, Put this
+   part back: that part alone returns to the version kept, and every other change stays, ready to be kept. A line over the parts
+   says how.
+   Find and replace, across every file of the app (a key in Code, beside its search): the words found are shown file by file,
+   each line as it is and as it would be, every file chosen until it is left out; nothing changes until Replace in the chosen
+   files is pressed. The replacements land in Changes, where each part can still be put back, and one key undoes them all.
+   Capitals matched or not, whole words or any match; the words replaced are taken as they are written (no patterns), so
+   nothing surprising happens. Text files only, each up to Fabrica's search size.
+   Shared by both apps (build/thoughts/fabrica_parts.html), drawn with Fabrica's own tokens. */
+#fb .fp-hint{margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--f-wellbg);box-shadow:var(--f-well);font-size:12.5px;line-height:1.45;color:var(--f-ink2)}
+#fb .f-dl.hunk{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#fb .fp-back{margin-left:auto;font-family:var(--f-sans);white-space:nowrap}
+#fb .fp-n{font:600 11px var(--f-sans);color:var(--f-ink2)}
+#fb .fr-repk{margin-left:auto}
+#fb .fx-form{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center;margin:8px 0}
+#fb .fx-form label{font:600 12.5px var(--f-sans);color:var(--f-ink2)}
+#fb .fx-form input[type="text"]{border-radius:10px;border:1px solid var(--f-hair);background:var(--f-wellbg);box-shadow:var(--f-well);color:var(--f-ink1);font:13px/1.4 var(--f-mono);padding:7px 11px;min-width:0}
+#fb .fx-opts{display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 8px;font-size:12.5px;color:var(--f-ink2)}
+#fb .fx-opts label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+#fb .fx-sum{font:600 12.5px var(--f-sans);color:var(--f-ink1);margin:8px 0 6px}
+#fb .fx-list{max-height:min(46vh,420px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px}
+#fb .fx-file{border:1px solid var(--f-hair);border-radius:12px;padding:8px 10px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pill)}
+#fb .fx-file > label{display:flex;align-items:center;gap:8px;font:600 12.5px var(--f-mono);color:var(--f-ink1);cursor:pointer}
+#fb .fx-file > label small{font:500 11.5px var(--f-sans);color:var(--f-ink3);margin-left:auto}
+#fb .fx-line{font:12px/1.5 var(--f-mono);margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+#fb .fx-line .was{color:var(--f-del)} #fb .fx-line .now{color:var(--f-add)}
+#fb .fx-line mark{background:var(--f-golds);color:inherit;border-radius:3px;padding:0 1px}
+#fb .fx-undo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px;padding:8px 12px;border-radius:10px;border:1px solid var(--f-ring);background:var(--f-accs);font-size:12.5px;color:var(--f-ink1)}
+</style>
+<script>
+(function fabricaParts(){"use strict";if(window.fbParts)return;
+function $(id){return document.getElementById(id);}
+function X(){return window.fbHubHost||null;}
+function core(){return (window.IngRepo&&IngRepo.core)||null;}
+/* the text with one part of its change undone: the part's lines as they were in the version kept, every other line as it is now */
+function undoPart(work,kept,part){var C=core();if(!C||!C.splitLines||!C.hunks)throw new Error("this copy of Fabrica cannot read changes part by part");
+  var a=C.splitLines(kept||""),b=C.splitLines(work||""),hs=C.hunks(a,b,3);
+  var h=hs.filter(function(x){return x.a0===part.a0&&x.b0===part.b0&&x.aN===part.aN&&x.bN===part.bN;})[0];
+  if(!h)throw new Error("this part has changed since it was shown; look at the changes again");
+  var was=h.lines.filter(function(l){return l[0]!=="+";}).map(function(l){return l[1];});
+  var lines=b.slice(0,h.b0).concat(was,b.slice(h.b0+h.bN));
+  if(!lines.length)return "";
+  var nl=work?/\n$/.test(work):/\n$/.test(kept||"");
+  return lines.join("\n")+(nl?"\n":"");}
+function putBack(r,path,part){
+  return Promise.all([IngRepo.readText(r.id,path),r.head?IngRepo.readText(r.id,path,"HEAD"):Promise.resolve(null)]).then(function(t){
+    var work=t[0]==null?"":t[0],kept=t[1];var text=undoPart(work,kept==null?"":kept,part);
+    /* a new file with nothing left of it, or a file back as it was kept: put back whole, so no change is left behind */
+    if((kept==null&&text==="")||(kept!=null&&text===kept))return IngRepo.discard(r.id,[path]).then(function(){return "whole";});
+    return IngRepo.put(r.id,path,text).then(function(){return "part";});});}
+function decorate(){var x=X(),w=$("fbWorkBody");if(!x||!w||!x.S||x.S.view!=="changes"||x.S.cmp)return;var r=null;try{r=x.cur();}catch(e){}if(!r)return;
+  var key=r.id+"|"+(r.head?"HEAD":"empty")+"|work",have=x.C&&x.C.diff&&x.C.diff[key];if(!have||!have.length)return;
+  var c=have[x.S.file]||have[0];if(!c||c.binary||!c.hunks||!c.hunks.length)return;
+  var dv=w.querySelector(".f-diff");if(!dv||dv.__fp===c)return;dv.__fp=c;
+  if(!w.querySelector(".fp-hint")){var hint=document.createElement("p");hint.className="fp-hint";hint.id="fbPartsHint";
+    hint.textContent=c.hunks.length>1||have.length>1?"Look over each part. Put back any part you do not want, as it was in the version kept; the other changes stay, ready to keep.":"Put back this part if you do not want it; it returns to the version kept.";
+    dv.parentNode.insertBefore(hint,dv);}
+  var heads=dv.querySelectorAll(".f-dl.hunk");if(heads.length!==c.hunks.length)return;
+  [].forEach.call(heads,function(hd,i){if(hd.querySelector(".fp-back"))return;var part=c.hunks[i];
+    var n=document.createElement("span");n.className="fp-n";n.textContent="part "+(i+1)+" of "+c.hunks.length;hd.appendChild(n);
+    var b=x.btn("sm fp-back","Put this part back",function(ev){if(ev)ev.stopPropagation();b.disabled=true;
+      putBack(r,c.path,part).then(function(how){x.toast(how==="whole"?c.path+" is put back as it was in the version kept.":"Part "+(i+1)+" of "+c.path+" is put back as it was in the version kept. The other changes stay.");
+        delete x.C.diff[key];return x.refresh();}).then(function(){x.paint();},function(e){b.disabled=false;x.fail(e);});});
+    b.setAttribute("aria-label","Put back part "+(i+1)+" of "+c.hunks.length+" of "+c.path+", lines "+(part.b0+1)+" to "+(part.b0+part.bN));hd.appendChild(b);});}
+var T=0;function soon(){clearTimeout(T);T=setTimeout(function(){decorate();undoKey();replaceKey();},60);}
+var W=null;function watch(){var w=$("fbWorkBody");if(!w||W===w)return;W=w;try{new MutationObserver(soon).observe(w,{childList:true});}catch(e){}soon();}
+/* ---------- find and replace, across the app's files ---------- */
+var SKIP=/\.(png|jpe?g|gif|webp|bmp|ico|icns|avif|woff2?|ttf|otf|eot|mp3|m4a|wav|ogg|mp4|webm|mov|zip|gz|bundle|pdf|wasm|gguf|bin|jks|keystore|p12)$/i;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function pattern(find,o){var e=find.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  if(o.words){var w=/[\w$]/;e=(w.test(find[0])?"(?<![\\w$])":"")+e+(w.test(find[find.length-1])?"(?![\\w$])":"");}
+  return new RegExp(e,o.cs?"g":"gi");}
+/* every text file of the app as it is now, with where the words are found and what each would become */
+function look(r,find,with_,o){var re=pattern(find,o),maxB=((window.ingFabMB&&ingFabMB.search)||8)*1048576,out=[];
+  return IngRepo.files(r.id).then(function(fs){var q=Promise.resolve();
+    fs.forEach(function(f){if(SKIP.test(f.path)||f.size>maxB)return;q=q.then(function(){return IngRepo.readText(r.id,f.path).then(function(t){
+      if(t==null||t.indexOf("\u0000")>=0)return;re.lastIndex=0;var n=(t.match(re)||[]).length;if(!n)return;
+      var lines=t.split(/\r?\n/),ex=[],nl=0;for(var i=0;i<lines.length;i++){re.lastIndex=0;if(re.test(lines[i])){nl++;re.lastIndex=0;if(ex.length<3)ex.push({n:i+1,was:lines[i],now:lines[i].replace(re,function(){return with_;})});}}
+      re.lastIndex=0;out.push({path:f.path,n:n,lines:nl,ex:ex,before:t,after:t.replace(re,function(){return with_;})});});});});
+    return q.then(function(){return out;});});}
+var LAST=null;
+function hi(line,re,cls){re.lastIndex=0;var o="",at=0,m;while((m=re.exec(line))){o+=esc(line.slice(at,m.index))+"<mark>"+esc(m[0])+"</mark>";at=m.index+m[0].length;if(!m[0].length)re.lastIndex++;}return o+esc(line.slice(at));}
+function sheetReplace(r){var x=X();if(!x||!r)return;var sh=x.sheet("Find and replace","In every file of "+r.name+" as it is now. Nothing changes until you press Replace; then each change waits under Changes, where any part can be put back.");
+  var form=document.createElement("div");form.className="fx-form";
+  form.innerHTML='<label for="fxFind">Find</label><input type="text" id="fxFind" autocomplete="off" spellcheck="false"><label for="fxWith">Replace with</label><input type="text" id="fxWith" autocomplete="off" spellcheck="false">';
+  sh.box.appendChild(form);var opts=document.createElement("div");opts.className="fx-opts";
+  opts.innerHTML='<label><input type="checkbox" id="fxCase"> Match capitals exactly</label><label><input type="checkbox" id="fxWords"> Whole words only</label>';sh.box.appendChild(opts);
+  var sum=document.createElement("div");sum.className="fx-sum";sum.id="fxSum";sum.setAttribute("aria-live","polite");sh.box.appendChild(sum);
+  var list=document.createElement("div");list.className="fx-list";list.id="fxList";sh.box.appendChild(list);
+  var end=document.createElement("div");end.className="end";var found=[];
+  var lk=x.btn("","Show what would change",function(){var f=$("fxFind").value,wv=$("fxWith").value,o={cs:$("fxCase").checked,words:$("fxWords").checked};
+    if(!f){$("fxFind").focus();return;}lk.disabled=true;sum.textContent="Looking in every file…";list.innerHTML="";go.disabled=true;
+    look(r,f,wv,o).then(function(res){found=res;lk.disabled=false;var total=res.reduce(function(a,b){return a+b.n;},0);
+      if(!res.length){sum.textContent="“"+f+"” is in none of the files.";return;}
+      var re=pattern(f,o);
+      res.forEach(function(it,i){var d=document.createElement("div");d.className="fx-file";
+        d.innerHTML='<label><input type="checkbox" checked data-i="'+i+'"> '+esc(it.path)+'<small>'+it.n+" change"+(it.n===1?"":"s")+"</small></label>"+
+          it.ex.map(function(e){return '<div class="fx-line"><span class="was">'+e.n+" − "+hi(e.was,re)+'</span><br><span class="now">'+e.n+" + "+esc(e.now)+"</span></div>";}).join("")+(it.lines>it.ex.length?'<div class="fx-line" style="color:var(--f-ink3)">and '+(it.lines-it.ex.length)+" more line"+(it.lines-it.ex.length===1?"":"s")+" in this file</div>":"");
+        list.appendChild(d);});
+      function count(){var ch=[].slice.call(list.querySelectorAll("input[data-i]")).filter(function(c){return c.checked;}).map(function(c){return found[+c.getAttribute("data-i")];});
+        var t=ch.reduce(function(a,b){return a+b.n;},0);sum.textContent=t+" change"+(t===1?"":"s")+" in "+ch.length+" file"+(ch.length===1?"":"s")+" chosen (of "+total+" in "+res.length+").";go.disabled=!ch.length;return ch;}
+      list.onchange=count;count();go.__ch=count;},function(e){lk.disabled=false;sum.textContent="";x.fail(e);});});
+  var go=x.btn("pri","Replace in the chosen files",function(){var ch=go.__ch?go.__ch():[];if(!ch.length)return;go.disabled=true;
+    IngRepo.putMany(r.id,ch.map(function(it){return {path:it.path,data:it.after};})).then(function(){
+      LAST={id:r.id,find:$("fxFind").value,files:ch.map(function(it){return {path:it.path,before:it.before,after:it.after};})};
+      var t=ch.reduce(function(a,b){return a+b.n;},0);sh.close();x.toast("Replaced "+t+" in "+ch.length+" file"+(ch.length===1?"":"s")+". Each change is under Changes, where any part can be put back.");
+      x.S.view="changes";x.S.cmp=null;x.S.file=0;x.C.diff={};return x.refresh();}).then(function(){x.paint();},function(e){go.disabled=false;x.fail(e);});});
+  go.disabled=true;end.appendChild(x.btn("","Close",sh.close));end.appendChild(lk);end.appendChild(go);sh.box.appendChild(end);
+  [$("fxFind"),$("fxWith")].forEach(function(i){i.onkeydown=function(e){if(e.key==="Enter")lk.click();};});setTimeout(function(){$("fxFind").focus();},60);}
+/* the replacement just made, undone in one press, while its files are as it left them */
+function undoKey(){var x=X(),w=$("fbWorkBody");if(!x||!w||!LAST||x.S.view!=="changes"||x.S.cmp)return;var r=null;try{r=x.cur();}catch(e){}if(!r||r.id!==LAST.id||w.querySelector(".fx-undo"))return;
+  var bar=document.createElement("div");bar.className="fx-undo";bar.id="fbReplaceUndo";bar.appendChild(document.createTextNode("The replacement of “"+LAST.find+"” in "+LAST.files.length+" file"+(LAST.files.length===1?"":"s")+"."));
+  var k=x.btn("sm","Undo the replacement",function(){var L=LAST;k.disabled=true;Promise.all(L.files.map(function(f){return IngRepo.readText(L.id,f.path).then(function(t){return t===f.after?f:null;});})).then(function(fs){
+      var back=fs.filter(Boolean);return IngRepo.putMany(L.id,back.map(function(f){return {path:f.path,data:f.before};})).then(function(){LAST=null;
+        x.toast(back.length===L.files.length?"The replacement is undone.":"Undone in "+back.length+" file"+(back.length===1?"":"s")+"; the others had changed since, and stay as they are.");x.C.diff={};return x.refresh();});}).then(function(){x.paint();},function(e){k.disabled=false;x.fail(e);});});
+  bar.appendChild(k);w.insertBefore(bar,w.firstChild);}
+/* the key, in Code beside its search */
+function replaceKey(){var x=X(),w=$("fbWorkBody");if(!x||!w||x.S.view!=="code")return;var bar=w.querySelector(".h-bar");if(!bar||bar.querySelector(".fr-repk"))return;var r=null;try{r=x.cur();}catch(e){}if(!r)return;
+  var k=x.btn("sm fr-repk","Find and replace…",function(){sheetReplace(x.cur());});k.title="Replace words in every file of the app, after seeing each change";bar.appendChild(k);}
+window.fbParts={undoPart:undoPart,putBack:putBack,look:look,replace:sheetReplace};
+var Q=0;try{new MutationObserver(function(){if(!Q)Q=setTimeout(function(){Q=0;watch();},250);}).observe(document.body,{childList:true,subtree:true});}catch(e){}
+watch();
+})();
+</script>

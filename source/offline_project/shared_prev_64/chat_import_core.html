@@ -1,0 +1,253 @@
+<script id="chat-import-core">
+/* THE SHARED IMPORT OF CHATS FROM OTHER ASSISTANTS, written once for Ingenium (modules/r160.js, which brings them into its
+   conversations) and the Forge (its chat archive, without AI: blocks/forge_chats.html). The owner's words (23 October 2026):
+   "I want to be able to import my exported data from other chats into the app and continue working on my projects
+   smoothly. It needs to be a smooth handoff from any frontier provider", and "I want the Forge to be just as capable and
+   functional as Ingenium with the same increased capabilities. I just want to do it all without AI."
+   It reads the export each assistant gives (the zip as it comes, or the file inside it), on the device, a piece at a time:
+   ChatGPT (the branch that was followed, its code, its attached text files, its projects), Claude (its projects with their
+   instructions and documents), Gemini (Google Takeout), Grok, DeepSeek, Le Chat, Microsoft Copilot (CSV) and any transcript
+   (Markdown, text, JSON messages, JSON lines). ChatImportCore.read(files, progress) gives {source, conversations:[{id,
+   title, created, updated, model, project, source, messages:[{role, text, think, at, files}]}], projects, skipped};
+   ChatImportCore.brief(conversation) the handoff brief, written from the conversation itself. */
+(function(){"use strict";
+if(window.ChatImportCore)return;
+var W=window;
+var tick=typeof MessageChannel==="function"?(function(){var ch=new MessageChannel(),q=[];ch.port1.onmessage=function(){var f=q.shift();if(f)f();};return function(f){q.push(f);ch.port2.postMessage(0);};})():function(f){setTimeout(f,0);};
+function breathe(){return new Promise(function(r){tick(r);});}
+/* ---------- 1. a zip read from the disk a piece at a time ---------- */
+function slice(file,a,b){return file.slice(a,b).arrayBuffer().then(function(x){return new Uint8Array(x);});}
+function u16(b,o){return b[o]|(b[o+1]<<8);}
+function u32(b,o){return (b[o]|(b[o+1]<<8)|(b[o+2]<<16))+b[o+3]*16777216;}
+function u64(b,o){return u32(b,o)+u32(b,o+4)*4294967296;}
+var UTF8=new TextDecoder("utf-8");
+function Zip(file){this.file=file;}
+Zip.prototype.open=function(){var self=this,f=this.file,n=f.size,tail=Math.min(n,65557+22);
+  return slice(f,n-tail,n).then(function(b){var at=-1;for(var i=b.length-22;i>=0;i--)if(b[i]===0x50&&b[i+1]===0x4b&&b[i+2]===5&&b[i+3]===6){at=i;break;}
+    if(at<0)throw new Error("this is not a zip Ingenium can read");
+    var cnt=u16(b,at+10),cdSize=u32(b,at+12),cdOff=u32(b,at+16),base=n-tail;
+    var z64=(cnt===0xFFFF||cdSize===0xFFFFFFFF||cdOff===0xFFFFFFFF)&&at>=20&&u32(b,at-20)===0x07064b50;
+    return (z64?slice(f,u64(b,at-20+8),u64(b,at-20+8)+56).then(function(e){return {cnt:u64(e,32),size:u64(e,40),off:u64(e,48)};}):Promise.resolve({cnt:cnt,size:cdSize,off:cdOff}))
+      .then(function(d){return slice(f,d.off,d.off+d.size).then(function(cd){var out=[],p=0;
+        while(p+46<=cd.length&&u32(cd,p)===0x02014b50){var method=u16(cd,p+10),cs=u32(cd,p+20),us=u32(cd,p+24),nl=u16(cd,p+28),xl=u16(cd,p+30),cl=u16(cd,p+32),lo=u32(cd,p+42);
+          var name=UTF8.decode(cd.subarray(p+46,p+46+nl)),x=p+46+nl,xe=x+xl;
+          while(x+4<=xe){var id=u16(cd,x),sz=u16(cd,x+2),q=x+4;if(id===1){if(us===0xFFFFFFFF){us=u64(cd,q);q+=8;}if(cs===0xFFFFFFFF){cs=u64(cd,q);q+=8;}if(lo===0xFFFFFFFF){lo=u64(cd,q);}}x+=4+sz;}
+          if(!/\/$/.test(name))out.push({name:name,method:method,csize:cs,size:us,local:lo});p=xe+cl;}
+        self.entries=out;return out;});});});};
+Zip.prototype.dataStart=function(e){return slice(this.file,e.local,e.local+30).then(function(h){if(u32(h,0)!==0x04034b50)throw new Error("a part of the zip is damaged ("+e.name+")");return e.local+30+u16(h,26)+u16(h,28);});};
+/* the bytes of one entry, as a stream of pieces where the browser can inflate as it reads */
+Zip.prototype.stream=function(e){var f=this.file;return this.dataStart(e).then(function(s){var raw=f.slice(s,s+e.csize);
+  if(e.method===0)return raw.stream();
+  if(e.method!==8)throw new Error(e.name+" is packed in a way Ingenium cannot unpack");
+  try{if(typeof DecompressionStream==="function")return raw.stream().pipeThrough(new DecompressionStream("deflate-raw"));}catch(x){}
+  return raw.arrayBuffer().then(function(b){var u=W.IngRepo&&IngRepo.core&&IngRepo.core.inflateRaw?IngRepo.core.inflateRaw(new Uint8Array(b),0,e.size):null;
+    var d=u&&u.data?u.data:u;if(!d)throw new Error("this browser cannot unpack "+e.name);return new Blob([d]).stream();});});};
+Zip.prototype.text=function(e){return this.stream(e).then(function(st){return new Response(st).text();});};
+/* a file or an entry, read as text a piece at a time */
+function pieces(stream,onText){var rd=stream.getReader(),dec=new TextDecoder("utf-8");
+  return (function pump(){return rd.read().then(function(x){if(x.done){var t=dec.decode();if(t)onText(t);return;}var t2=dec.decode(x.value,{stream:true});if(t2)onText(t2);return breathe().then(pump);});})();}
+
+/* ---------- 2. a JSON array of conversations, each parsed on its own as it is read ---------- */
+function ArrayItems(onItem){var depth=0,inStr=false,esc=false,buf=[],start=-1,top=null,cur="";
+  return {feed:function(t){for(var i=0;i<t.length;i++){var ch=t.charCodeAt(i);
+      if(top===null){if(ch===91){top="[";continue;}if(ch===123){top="{";}else continue;}
+      if(inStr){if(esc)esc=false;else if(ch===92)esc=true;else if(ch===34)inStr=false;continue;}
+      if(ch===34){inStr=true;continue;}
+      if(ch===123||ch===91){depth++;if(depth===1&&top==="["&&ch===123)start=i;}
+      else if(ch===125||ch===93){depth--;if(depth===0&&top==="["&&start>=0){buf.push(t.slice(start,i+1));onItem(JSON.parse(buf.join("")));buf=[];start=-1;}}}
+    if(start>=0){buf.push(t.slice(start));start=0;}
+    if(top==="{")cur+=t;},
+    whole:function(){return top==="{"?cur:null;}};}
+/* the parse that reads a whole JSON file without holding more than one conversation at a time */
+function readJSON(stream,onItem){var items=0,A=ArrayItems(function(o){items++;onItem(o);});
+  return pieces(stream,function(t){A.feed(t);}).then(function(){var w=A.whole();if(w!=null){var o=JSON.parse(w);onItem(o,true);}return items;});}
+
+/* ---------- 3. the formats ---------- */
+function ms(t){if(t==null||t==="")return 0;if(typeof t==="number")return t<1e12?Math.round(t*1000):t;if(t&&t.$date)return ms(t.$date.$numberLong?+t.$date.$numberLong:t.$date);var d=Date.parse(t);return isNaN(d)?0:d;}
+function htmlText(h){try{var d=new DOMParser().parseFromString("<div>"+String(h||"")+"</div>","text/html");
+  d.querySelectorAll("pre").forEach(function(p){p.textContent="\n```\n"+p.textContent.replace(/\n$/,"")+"\n```\n";});
+  d.querySelectorAll("br").forEach(function(b){b.replaceWith("\n");});d.querySelectorAll("p,div,li,h1,h2,h3,h4,tr").forEach(function(b){b.append("\n");});
+  return (d.body.textContent||"").replace(/\n{3,}/g,"\n\n").trim();}catch(e){return String(h||"").replace(/<[^>]+>/g," ");}}
+function conv(o){return {id:String(o.id||""),title:String(o.title||"").trim()||"Untitled conversation",created:o.created||0,updated:o.updated||o.created||0,model:o.model||"",
+  project:o.project||"",messages:o.messages||[],notes:o.notes||[]};}
+function merge(msgs){var out=[];msgs.forEach(function(m){if(!m||(!String(m.text||"").trim()&&!(m.files&&m.files.length)&&!m.think))return;var last=out[out.length-1];
+    if(last&&last.role===m.role&&m.role==="assistant"&&!(m.files&&m.files.length)){last.text=(last.text&&m.text?last.text+"\n\n":last.text||"")+(m.text||"");if(m.think)last.think=(last.think?last.think+"\n\n":"")+m.think;return;}
+    out.push(m);});return out;}
+/* ChatGPT: the conversation is a tree (every edit and every regenerated reply is a branch); the branch being followed is
+   read from its last node back to the root */
+function chatgpt(o,zipNames){var map=o.mapping||{},cur=o.current_node;
+  if(!cur||!map[cur]){var best=null,bt=-1;Object.keys(map).forEach(function(k){var n=map[k];if(n&&(!n.children||!n.children.length)){var t=(n.message&&n.message.create_time)||0;if(t>bt){bt=t;best=k;}}});cur=best;}
+  var path=[],seen={};while(cur&&map[cur]&&!seen[cur]){seen[cur]=1;path.push(map[cur]);cur=map[cur].parent;}path.reverse();
+  var out=[],model="",notes=[];
+  path.forEach(function(n){var m=n.message;if(!m||!m.author)return;var role=m.author.role,c=m.content||{},md=m.metadata||{};if(md.is_visually_hidden_from_conversation)return;
+    if(md.model_slug)model=md.model_slug;var text="",think="",files=[];
+    switch(c.content_type){
+      case "text":text=(c.parts||[]).filter(function(p){return typeof p==="string";}).join("\n");break;
+      case "multimodal_text":text=(c.parts||[]).map(function(p){if(typeof p==="string")return p;if(p&&p.content_type==="image_asset_pointer")return "[a picture]";if(p&&p.content_type==="audio_transcription")return p.text||"";return p&&p.text?p.text:"";}).filter(Boolean).join("\n");break;
+      case "code":text="```"+(c.language&&c.language!=="unknown"?c.language:"")+"\n"+(c.text||"")+"\n```";break;
+      case "execution_output":text="[the code's output]\n```\n"+String(c.text||"").slice(0,4000)+"\n```";role="assistant";break;
+      case "thoughts":think=(c.thoughts||[]).map(function(t){return (t.summary?t.summary+": ":"")+(t.content||"");}).join("\n");break;
+      case "reasoning_recap":return;
+      case "tether_quote":text="[quoted from "+(c.title||c.domain||"the web")+"] "+(c.text||"");break;
+      case "user_editable_context":if(c.user_profile||c.user_instructions)notes.push("Custom instructions: "+[c.user_profile,c.user_instructions].filter(Boolean).join(" / "));return;
+      case "model_editable_context":if(c.model_set_context)notes.push("What ChatGPT remembered: "+c.model_set_context);return;
+      default:text=c.text||((c.parts||[]).filter(function(p){return typeof p==="string";}).join("\n"))||"";}
+    if(role==="tool"){if(!text)return;role="assistant";text="[a tool answered"+(m.author.name?" ("+m.author.name+")":"")+"]\n"+text.slice(0,4000);}
+    if(role==="system"){if(text&&text.trim())notes.push(text.trim().slice(0,2000));return;}
+    (md.attachments||[]).forEach(function(a){files.push({name:a.name||a.id||"file",id:a.id||"",mime:a.mime_type||"",size:a.size||0});});
+    out.push({role:role==="user"?"user":"assistant",text:text,think:think,at:ms(m.create_time),files:files});});
+  var gz=o.gizmo_id||"";
+  return conv({id:o.conversation_id||o.id,title:o.title,created:ms(o.create_time),updated:ms(o.update_time),model:o.default_model_slug||model,
+    project:/^g-p-/.test(gz)?gz:"",messages:merge(out),notes:notes.concat(gz&&!/^g-p-/.test(gz)?["Written with the custom GPT "+gz+"."]:[])});}
+/* Claude: messages in order, each with its text, its thinking, and the text of the files attached to it */
+function claude(o){var out=(o.chat_messages||[]).map(function(m){var text="",think="",files=[];
+    if(Array.isArray(m.content)&&m.content.length){m.content.forEach(function(p){if(!p)return;if(p.type==="text")text+=(text?"\n\n":"")+(p.text||"");else if(p.type==="thinking")think+=(p.thinking||"");
+        else if(p.type==="tool_use")text+=(text?"\n":"")+"[used "+(p.name||"a tool")+"]";else if(p.type==="tool_result"){var r=Array.isArray(p.content)?p.content.map(function(x){return x.text||"";}).join("\n"):String(p.content||"");if(r)text+=(text?"\n":"")+"[the tool answered]\n"+r.slice(0,3000);}});}
+    if(!text)text=m.text||"";
+    (m.attachments||[]).forEach(function(a){files.push({name:a.file_name||"attachment",text:a.extracted_content||"",size:a.file_size||0});});
+    (m.files||[]).forEach(function(a){if(a&&a.file_name&&!files.some(function(f){return f.name===a.file_name;}))files.push({name:a.file_name});});
+    return {role:m.sender==="human"?"user":"assistant",text:text,think:think,at:ms(m.created_at),files:files};});
+  return conv({id:o.uuid,title:o.name||o.summary,created:ms(o.created_at),updated:ms(o.updated_at),model:o.model||"",project:o.project_uuid||(o.project&&o.project.uuid)||"",messages:merge(out)});}
+function claudeProjects(arr){return (arr||[]).map(function(p){return {key:p.uuid,name:p.name||"A Claude project",instructions:[p.prompt_template,p.description?"About this project: "+p.description:""].filter(Boolean).join("\n\n"),
+  files:(p.docs||[]).map(function(d){return {name:d.filename||"document.md",text:String(d.content||"")};})};});}
+/* DeepSeek: a tree like ChatGPT's; each message is made of fragments (the request, the thinking, the reply) */
+function deepseek(o){var map=o.mapping||{},root=map.root||map[Object.keys(map)[0]],node=root,out=[],seen={};
+  while(node&&!seen[node.id]){seen[node.id]=1;var m=node.message;if(m&&m.fragments){var t="",th="",role="assistant";
+      m.fragments.forEach(function(f){if(f.type==="REQUEST"){role="user";t+=f.content||"";}else if(f.type==="RESPONSE")t+=f.content||"";else if(f.type==="THINK")th+=f.content||"";});
+      out.push({role:role,text:t,think:th,at:ms(m.inserted_at),files:(m.files||[]).map(function(x){return {name:x.file_name||x.name||"file"};})});}
+    var kids=node.children||[];node=kids.length?map[kids[kids.length-1]]:null;}
+  return conv({id:o.id,title:o.title,created:ms(o.inserted_at),updated:ms(o.updated_at),messages:merge(out)});}
+/* Grok */
+function grok(o){var c=o.conversation||{},out=(o.responses||[]).map(function(r){r=r.response||r;var s=String(r.sender||"").toLowerCase();
+    return {role:s==="human"||s==="user"?"user":"assistant",text:r.message||"",at:ms(r.create_time),files:[]};});
+  var model="";(o.responses||[]).forEach(function(r){r=r.response||r;if(r&&r.model)model=r.model;});
+  return conv({id:c.id||c.conversation_id,title:c.title,created:ms(c.create_time),updated:ms(c.modify_time||c.create_time),model:model,messages:merge(out)});}
+/* any list of messages: {role, content} as OpenAI's interface, Le Chat and most tools write them */
+function roleOf(r){r=String(r||"").toLowerCase();return /^(user|human|me|you|person|prompt|question)$/.test(r)?"user":/^(assistant|ai|model|bot|chatgpt|gpt|claude|gemini|bard|grok|copilot|bing|mistral|le chat|deepseek|answer|response)$/.test(r)?"assistant":r==="system"?"system":"";}
+function contentText(c){if(typeof c==="string")return c;if(Array.isArray(c))return c.map(function(p){return typeof p==="string"?p:(p&&(p.text||p.content))||"";}).join("\n");if(c&&c.parts)return contentText(c.parts);return c&&c.text?String(c.text):"";}
+function generic(o,name){var msgs=o.messages||o.chat_messages||o.turns||o.conversation||null;if(!Array.isArray(msgs))return null;
+  var out=[],notes=[];msgs.forEach(function(m){var r=roleOf(m.role||m.author||m.sender||m.from||(m.author&&m.author.role));var t=contentText(m.content!=null?m.content:(m.text!=null?m.text:m.message));
+    if(r==="system"){if(t)notes.push(t);return;}if(!r)return;out.push({role:r,text:t,at:ms(m.createdAt||m.created_at||m.timestamp||m.time||m.date),files:[]});});
+  if(!out.length)return null;
+  return conv({id:o.id||o.uuid||name,title:o.title||o.name||o.subject||"",created:ms(o.createdAt||o.created_at||o.created||o.create_time)||(out[0]&&out[0].at),updated:ms(o.updatedAt||o.updated_at||o.updated||o.update_time)||(out[out.length-1]&&out[out.length-1].at),model:o.model||"",messages:merge(out),notes:notes});}
+/* Gemini, from Google Takeout (My Activity): one record for each prompt and its reply, gathered into conversations by when
+   they were written (an hour apart or more starts a new one) */
+function geminiRecords(arr){var recs=[];(arr||[]).forEach(function(r){if(!r||!/gemini|bard/i.test((r.header||"")+(r.products||[]).join(" ")))return;
+    var t=String(r.title||""),m=/^(Prompted|Asked|Said)\s+([\s\S]*)$/i.exec(t);if(!m)return;
+    recs.push({at:ms(r.time),q:m[2].trim(),a:(r.safeHtmlItem||[]).map(function(h){return htmlText(h.html);}).join("\n\n"),files:(r.attachedFiles||[]).map(function(f){return {name:String(f)};})});});
+  return gatherByTime(recs,"Gemini");}
+function gatherByTime(recs,src){recs.sort(function(a,b){return a.at-b.at;});var out=[],cur=null;
+  recs.forEach(function(r){if(!cur||r.at-cur.updated>3600000){cur={id:src.toLowerCase()+"-"+r.at,title:r.q.replace(/\s+/g," ").slice(0,70),created:r.at,updated:r.at,messages:[]};out.push(cur);}
+    cur.messages.push({role:"user",text:r.q,at:r.at,files:r.files||[]});if(r.a)cur.messages.push({role:"assistant",text:r.a,at:r.at,files:[]});cur.updated=r.at;});
+  return out.map(conv);}
+function geminiHtml(text){var d=new DOMParser().parseFromString(text,"text/html"),recs=[];
+  d.querySelectorAll(".outer-cell, .mdl-grid > .outer-cell").forEach(function(c){var cell=c.querySelector(".content-cell");if(!cell)return;var raw=cell.innerText||cell.textContent||"";
+    var m=/^(Prompted|Asked)\s+([\s\S]*?)\n([A-Z][a-z]{2} \d{1,2}, \d{4},? [^\n]*)\n([\s\S]*)$/.exec(raw.trim());if(!m)return;recs.push({at:ms(m[3].replace(/ /g," ")),q:m[2].trim(),a:m[4].trim()});});
+  return gatherByTime(recs,"Gemini");}
+/* a transcript in words: speakers named at the head of a line ("User:", "## Assistant", "**Claude**", "You said:") */
+var SPEAK=/^\s*(?:#{1,4}\s*)?(?:\*\*)?\s*(user|you|human|me|question|prompt|assistant|ai|chatgpt|gpt-?[\w.]*|claude|gemini|bard|grok|copilot|bing|perplexity|deepseek|mistral|le chat|answer|response)(?:\s+said)?\s*(?:\*\*)?\s*[:：]?\s*(?:\*\*)?\s*(.*)$/i;
+function transcript(text,name){var lines=String(text).replace(/\r/g,"").split("\n"),out=[],cur=null,title="";
+  lines.forEach(function(l,i){if(!title&&/^#\s+\S/.test(l)&&!SPEAK.test(l)){title=l.replace(/^#\s+/,"").trim();return;}
+    var m=SPEAK.exec(l);var head=m&&(m[2].length<400)&&(/[:：]|said|^\s*#|\*\*/i.test(l));
+    if(head){var r=roleOf(m[1].replace(/\s+said$/i,""));if(!r&&/^gpt/i.test(m[1]))r="assistant";if(r){cur={role:r,text:m[2]||"",at:0,files:[]};out.push(cur);return;}}
+    if(cur)cur.text+=(cur.text?"\n":"")+l;});
+  out.forEach(function(m){m.text=m.text.trim();});
+  if(out.length<2)return null;
+  return conv({id:name,title:title||String(name).replace(/\.[^.]+$/,""),messages:merge(out)});}
+/* Microsoft Copilot's export, and any table of messages */
+function csvRows(text){var rows=[],row=[],f="",q=false;for(var i=0;i<text.length;i++){var ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=ch;continue;}
+    if(ch==='"')q=true;else if(ch===","){row.push(f);f="";}else if(ch==="\n"){row.push(f.replace(/\r$/,""));rows.push(row);row=[];f="";}else f+=ch;}
+  if(f||row.length){row.push(f);rows.push(row);}return rows;}
+function csv(text,name){var rows=csvRows(text);if(rows.length<2)return [];var h=rows[0].map(function(x){return x.trim().toLowerCase();});
+  function col(re){for(var i=0;i<h.length;i++)if(re.test(h[i]))return i;return -1;}
+  var cc=col(/conversation|thread|chat|session|title/),rc=col(/role|author|sender|from|speaker/),tc=col(/message|content|text|body|prompt/),dc=col(/time|date/);
+  if(tc<0)return [];var by={},order=[];
+  rows.slice(1).forEach(function(r){if(!r[tc])return;var k=cc>=0?r[cc]:name;if(!by[k]){by[k]={id:k,title:cc>=0?k:name,messages:[]};order.push(k);}
+    by[k].messages.push({role:roleOf(rc>=0?r[rc]:"")||(by[k].messages.length%2?"assistant":"user"),text:r[tc],at:dc>=0?ms(r[dc]):0,files:[]});});
+  return order.map(function(k){var c=by[k];c.created=c.messages[0].at;c.updated=c.messages[c.messages.length-1].at;c.messages=merge(c.messages);return conv(c);});}
+
+/* ---------- 4. reading what was chosen ---------- */
+function Found(){this.source="";this.conversations=[];this.projects=[];this.notes=[];this.files={};this.skipped=[];}
+Found.prototype.add=function(c,src){if(!c||!c.messages||!c.messages.length)return;c.source=c.source||src||this.source;this.conversations.push(c);};
+function kindOfItem(o){if(!o||typeof o!=="object")return "";if(o.mapping&&("current_node" in o||o.conversation_id||o.create_time))return "chatgpt";
+  if(o.mapping&&o.inserted_at!=null)return "deepseek";if(o.chat_messages)return "claude";if(o.responses&&o.conversation)return "grok";
+  if(o.header&&o.title&&o.time)return "gemini";if(o.messages||o.turns)return "generic";return "";}
+var NAMES={chatgpt:"ChatGPT",claude:"Claude",deepseek:"DeepSeek",grok:"Grok",gemini:"Gemini",generic:"",copilot:"Copilot"};
+function srcFromName(n){n=String(n||"").toLowerCase();return /chatgpt|openai/.test(n)?"ChatGPT":/claude|anthropic/.test(n)?"Claude":/gemini|bard|takeout/.test(n)?"Gemini":/grok|x\.ai|xai/.test(n)?"Grok":/deepseek/.test(n)?"DeepSeek":/le.?chat|mistral/.test(n)?"Le Chat":/copilot|bing/.test(n)?"Copilot":/perplexity/.test(n)?"Perplexity":"";}
+/* one JSON stream: the conversations it holds, whatever assistant wrote them */
+function readJsonInto(found,stream,name,progress){var gem=[];
+  return readJSON(stream,function(o,whole){
+    if(whole){/* a JSON object that is not a list: Grok's {conversations:[...]}, Claude's or ChatGPT's single conversation, a list of messages */
+      if(Array.isArray(o.conversations)){o.conversations.forEach(function(x){var k=kindOfItem(x);one(found,x,k,name,gem);});return;}
+      var k0=kindOfItem(o);if(k0){one(found,o,k0,name,gem);return;}
+      if(Array.isArray(o.chats))o.chats.forEach(function(x){one(found,x,kindOfItem(x)||"generic",name,gem);});return;}
+    var k=kindOfItem(o);
+    if(!k&&o&&(o.role||o.author)&&(o.content!=null||o.text!=null)){(found.__loose=found.__loose||[]).push(o);return;}
+    one(found,o,k,name,gem);if(progress&&found.conversations.length%25===0)progress(found);})
+  .then(function(){if(gem.length)gatherByTime(gem,"Gemini").forEach(function(c){found.add(c,"Gemini");});
+    if(found.__loose){var g=generic({messages:found.__loose},name);if(g)found.add(g,srcFromName(name));delete found.__loose;}});}
+function one(found,o,k,name,gem){try{
+  if(k==="chatgpt")found.add(chatgpt(o),"ChatGPT");else if(k==="claude")found.add(claude(o),"Claude");else if(k==="deepseek")found.add(deepseek(o),"DeepSeek");
+  else if(k==="grok")found.add(grok(o),"Grok");
+  else if(k==="gemini"){var t=String(o.title||""),m=/^(Prompted|Asked|Said)\s+([\s\S]*)$/i.exec(t);if(m&&/gemini|bard/i.test((o.header||"")+(o.products||[]).join(" ")))gem.push({at:ms(o.time),q:m[2].trim(),a:(o.safeHtmlItem||[]).map(function(h){return htmlText(h.html);}).join("\n\n"),files:[]});}
+  else if(k==="generic"){var g=generic(o,name);if(g)found.add(g,srcFromName(name)||"another assistant");}
+  else if(o&&o.uuid&&o.docs){found.projects=found.projects.concat(claudeProjects([o]));}}catch(e){found.skipped.push((o&&(o.title||o.name))||"a conversation");}}
+function fileStream(f){return f.stream?f.stream():new Response(f).body;}
+/* the text files a ChatGPT export keeps beside its conversations (named by the attachment's id), read when small */
+var TEXTY=/\.(txt|md|markdown|csv|tsv|json|js|mjs|ts|tsx|jsx|py|html?|css|java|kt|swift|c|cc|cpp|h|go|rs|rb|php|sh|yml|yaml|xml|sql|toml|ini)$/i;
+function readFiles(files,progress){var found=new Found(),list=[].slice.call(files||[]);
+  return list.reduce(function(p,f){return p.then(function(){var n=f.name||"file";
+      if(/\.zip$/i.test(n)||f.type==="application/zip"){var z=new Zip(f);return z.open().then(function(es){
+          found.source=found.source||srcFromName(n);
+          var conv1=es.filter(function(e){return /(^|\/)conversations?\.json$/i.test(e.name)||/(^|\/)prod-grok-backend\.json$/i.test(e.name);});
+          var gem=es.filter(function(e){return /Gemini Apps\/MyActivity\.(json|html)$/i.test(e.name)||/Bard\/MyActivity\.(json|html)$/i.test(e.name);});
+          var proj=es.filter(function(e){return /(^|\/)projects\.json$/i.test(e.name);});
+          var other=!conv1.length&&!gem.length?es.filter(function(e){return /\.(json|jsonl|md|markdown|txt|csv|html?)$/i.test(e.name)&&e.size<480*1048576&&!/(^|\/)(users?|message_feedback|shared_conversations|model_comparisons)\.json$/i.test(e.name);}):[];
+          found.zip=z;found.zipEntries=es;
+          var seq=Promise.resolve();
+          conv1.forEach(function(e){seq=seq.then(function(){return z.stream(e).then(function(st){return readJsonInto(found,st,e.name,progress);});});});
+          gem.forEach(function(e){seq=seq.then(function(){return /\.json$/i.test(e.name)?z.stream(e).then(function(st){return readJsonInto(found,st,e.name,progress);}):z.text(e).then(function(t){geminiHtml(t).forEach(function(c){found.add(c,"Gemini");});});});});
+          proj.forEach(function(e){seq=seq.then(function(){return z.text(e).then(function(t){try{found.projects=found.projects.concat(claudeProjects(JSON.parse(t)));}catch(x){}});});});
+          other.forEach(function(e){seq=seq.then(function(){return z.stream(e).then(function(st){return readOne(found,st,e.name,progress);});});});
+          return seq;});}
+      return readOne(found,fileStream(f),n,progress);});},Promise.resolve())
+    .then(function(){return attachFromZip(found);}).then(function(){found.conversations.sort(function(a,b){return (b.updated||0)-(a.updated||0);});
+      if(!found.source){var c={};found.conversations.forEach(function(x){c[x.source]=(c[x.source]||0)+1;});found.source=Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]||"another assistant";}
+      return found;});}
+function readOne(found,stream,n,progress){
+  if(/\.json$/i.test(n))return readJsonInto(found,stream,n,progress);
+  return new Response(stream).text().then(function(t){
+    if(/\.jsonl$/i.test(n)){var loose=[];t.split(/\r?\n/).forEach(function(l){if(!l.trim())return;try{var o=JSON.parse(l);var k=kindOfItem(o);if(k)one(found,o,k,n,[]);else if(o.role||o.author)loose.push(o);}catch(e){}});
+      if(loose.length){var g=generic({messages:loose},n);if(g)found.add(g,srcFromName(n)||"another assistant");}return;}
+    if(/\.csv$/i.test(n)){csv(t,n).forEach(function(c){found.add(c,srcFromName(n)||"Copilot");});return;}
+    if(/\.html?$/i.test(n)){var m=/var\s+jsonData\s*=\s*(\[[\s\S]*?\]);\s*\n/.exec(t);if(m){try{JSON.parse(m[1]).forEach(function(o){one(found,o,kindOfItem(o),n,[]);});return;}catch(e){}}
+      var gs=geminiHtml(t);if(gs.length){gs.forEach(function(c){found.add(c,"Gemini");});return;}
+      var tr=transcript(htmlText(t),n);if(tr)found.add(tr,srcFromName(n)||"another assistant");return;}
+    var x=transcript(t,n);if(x)found.add(x,srcFromName(n)||srcFromName(t.slice(0,4000))||"another assistant");else found.skipped.push(n);});}
+function attachFromZip(found){if(!found.zip)return Promise.resolve();var es=found.zipEntries,want=[];
+  found.conversations.forEach(function(c){c.messages.forEach(function(m){(m.files||[]).forEach(function(f){if(f.text||!f.id)return;
+      var e=es.filter(function(x){var b=x.name.split("/").pop();return b.indexOf(f.id)===0;})[0];if(e&&e.size<2*1048576&&(TEXTY.test(f.name)||TEXTY.test(e.name)))want.push({f:f,e:e});});});});
+  return want.reduce(function(p,w){return p.then(function(){return found.zip.text(w.e).then(function(t){w.f.text=t;},function(){});});},Promise.resolve());}
+
+function day(t){if(!t)return "";try{return new Date(t).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}catch(e){return "";}}
+var FILE_RE=/\b[\w.-]+\.(?:html?|css|js|mjs|ts|tsx|jsx|py|java|kt|swift|c|cc|cpp|h|go|rs|rb|php|json|md|sql|ya?ml|sh)\b/g;
+/* the handoff brief: written here, from the conversation itself */
+function brief(c){var me=c.messages.filter(function(m){return m.role==="user"&&String(m.text||"").trim();}),ai=c.messages.filter(function(m){return m.role==="assistant"&&String(m.text||"").trim();});
+  function cut(t,n){t=String(t||"").replace(/\s+/g," ").trim();return t.length>n?t.slice(0,n-1)+"…":t;}
+  var files={},langs={};c.messages.forEach(function(m){var t=String(m.text||"");(t.match(FILE_RE)||[]).forEach(function(f){files[f]=(files[f]||0)+1;});
+    var re=/```([\w+#.-]*)\n/g,x;while((x=re.exec(t)))if(x[1])langs[x[1].toLowerCase()]=(langs[x[1].toLowerCase()]||0)+1;
+    (m.files||[]).forEach(function(f){files[f.name]=(files[f.name]||0)+1;});});
+  var L=[];
+  L.push(c.messages.length+" messages"+(c.created?", "+day(c.created)+(c.updated&&day(c.updated)!==day(c.created)?" to "+day(c.updated):""):"")+(c.model?", with "+c.model:"")+".");
+  if(me.length)L.push("It began: \""+cut(me[0].text,320)+"\"");
+  if(me.length>1)L.push("The last request: \""+cut(me[me.length-1].text,420)+"\"");
+  if(ai.length)L.push("The last reply began: \""+cut(ai[ai.length-1].text,420)+"\"");
+  var fl=Object.keys(files).sort(function(a,b){return files[b]-files[a];}).slice(0,12);if(fl.length)L.push("Files it worked on: "+fl.join(", ")+".");
+  var lg=Object.keys(langs).sort(function(a,b){return langs[b]-langs[a];}).slice(0,6);if(lg.length)L.push("Code in it: "+lg.join(", ")+".");
+  if(c.notes&&c.notes.length)L.push(c.notes.slice(0,3).map(function(n){return cut(n,400);}).join("\n"));
+  return L.join("\n");}
+window.ChatImportCore={read:readFiles,brief:brief,day:day,Zip:Zip,srcFromName:srcFromName,
+  parsers:{chatgpt:chatgpt,claude:claude,claudeProjects:claudeProjects,deepseek:deepseek,grok:grok,generic:generic,transcript:transcript,csv:csv,gemini:geminiRecords,geminiHtml:geminiHtml}};
+})();
+</script>
