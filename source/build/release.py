@@ -91,7 +91,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_guard_62", "_ing_host_ok", ("mini", "intel", "win")), ("app_ctx_63", "_ING_CTX_MAX", ("mini", "intel", "win")),
            ("app_win_64", "_another_copy_is_open", ("mini", "intel", "win")), ("app_train_65", "TRAIN_LR_MORE", ("mini", "intel", "win")),
            ("app_studio_65", "_gguf_to_f32", ("mini", "intel", "win")),
-           ("app_frames_67", "_guard_bridge_frames", ("mini", "intel", "win")), ("app_relay_67", "_IngSafeRedirect", ("mini", "intel", "win"))]
+           ("app_frames_67", "_guard_bridge_frames", ("mini", "intel", "win")), ("app_relay_67", "_IngSafeRedirect", ("mini", "intel", "win")),
+           ("app_care_671", "_care_attach", ("mini", "intel", "win"))]
 
 
 def desktop():

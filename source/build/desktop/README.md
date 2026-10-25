@@ -19,3 +19,9 @@ Test the quicker start: `node rig/t_62_quick.js <repo>/ingenium_app.py <ingenium
 Test the guard: `python3 -I rig/t_62_app_guard.py <repo>/ingenium_app.py` (13 checks, Mac and Windows alike): a request that
 names the app's own address (127.0.0.1 or localhost at its port) is answered; one that names anything else, as a page that has
 pointed its own name at 127.0.0.1 would, is refused (421) before any file, model or relay is touched.
+
+6.7.1, `app_care_671.py` (Mac and Windows): the stored work is moved aside only when the page did not come up at two starts in
+a row, under a name of its own, never deleted, and the person is told; on Windows a page whose process stops is loaded again
+by itself, and Windows ending the session counts as a run that finished.
+Test: `python3 -I rig/t_671_app_care.py <repo>/ingenium_app.py` (8 checks, Mac and Windows alike; the Windows web view's
+side is checked on Windows by Ingenium-HPWindows .github/workflows/windows-home-check.yml).
