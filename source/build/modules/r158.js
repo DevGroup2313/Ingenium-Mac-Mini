@@ -30,7 +30,7 @@ var SMALL=(typeof INB!=="undefined"&&INB)||(navigator.deviceMemory&&navigator.de
 try{if(typeof CHAT_FILE_MAX_MB==="number")CHAT_FILE_MAX_MB=Math.max(CHAT_FILE_MAX_MB,SMALL?200:400);}catch(e){}
 
 /* ---------- 2. embedded data, left out of what a model reads ---------- */
-var B64=/[^A-Za-z0-9+\/=]/g,B64N=/[^A-Za-z0-9+\/=\r\n]/g;
+var B64N=/[^A-Za-z0-9+\/=\r\n]/g;
 function endOf(re,t,i){re.lastIndex=i;var m=re.exec(t);return m?m.index:t.length;}
 function size(n){try{return fmtBytes(n);}catch(e){return Math.round(n/1048576)+" MB";}}
 /* a run of encoded data that is the whole content of an element (a script block of plain text, a template, a text area),

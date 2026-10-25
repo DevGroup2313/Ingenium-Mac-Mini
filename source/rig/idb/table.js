@@ -1,9 +1,11 @@
 // The table of the library tests: each test on each implementation, from the JSON results the runners write.
-//   node rig/idb/table.js chromium.json webkit.json reference.json [--md table.md]
-// Exits 1 when any test failed on any implementation, or did not run on one where it ran on another.
+//   node rig/idb/table.js chromium.json webkit.json reference.json [--md table.md] [--url page]
+// Exits 1 when any test failed on any implementation, or did not run on one where it ran on another, or when a result is
+// missing or (with --url) was made on another page.
 const fs = require('fs');
 const args = process.argv.slice(2), mdAt = args.indexOf('--md'), md = mdAt >= 0 ? args.splice(mdAt, 2)[1] : null;
-const runs = args.map(f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return { impl: f, missing: true, results: [] }; } });
+const urlAt = args.indexOf('--url'), URL_ = urlAt >= 0 ? args.splice(urlAt, 2)[1] : null;
+const runs = args.map(f => { try { const r = JSON.parse(fs.readFileSync(f, 'utf8')); return URL_ && r.url !== URL_ ? { impl: r.impl || f, missing: true, results: [] } : r; } catch (e) { return { impl: f, missing: true, results: [] }; } });
 const names = []; runs.forEach(r => r.results.forEach(x => { if (names.indexOf(x.name) < 0) names.push(x.name); }));
 const cell = (r, n) => { if (r.missing) return 'no result'; const x = r.results.find(y => y.name === n); return !x ? 'not run' : x.ok ? 'PASS' : 'FAIL'; };
 const head = ['test'].concat(runs.map(r => r.impl + (r.engine ? ' (' + r.engine + (r.reference ? ', fake-indexeddb ' + r.reference['fake-indexeddb'] : '') + ')' : '')));

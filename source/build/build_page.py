@@ -810,11 +810,9 @@ edit('tx.oncomplete=function(){res(true);};tx.onerror=function(){res(false);};}c
      'tx.oncomplete=function(){res(true);};tx.onerror=tx.onabort=function(){res(false);};}catch(e){res(false);}});});}',
      "6.7 idb: the model store answers an aborted write")
 
-# ---- 6.7 (rig/idb): Reset everything waits until the model store is deleted before it starts the page again. It reloaded at
-#      once, while its own connection, and every other tab's, still held the store: Chromium kept the delete waiting behind
-#      them and the page, started again, waited behind the delete (its models never loaded); WebKit dropped the delete when the
-#      page went, so the models were not reset at all. Every connection now closes when asked (modules/r181.js), the delete
-#      goes through, and the page starts again once it has (or after a few seconds, whatever happens). ----
+# ---- 6.7 (rig/idb): Reset everything waits until the model store is deleted before it starts the page again (or a few
+#      seconds, whatever happens). What made the delete go through is modules/r181.js (every connection closes when asked);
+#      a review found no engine that needs this wait as well, but it lets the delete's success arrive before the page goes. ----
 edit('    try{indexedDB.deleteDatabase("ingenium_files");indexedDB.deleteDatabase("the_foundry_files");}catch(e){}\n'
      '    location.reload();};openModal();};',
      '    var gone=function(n){return new Promise(function(res){try{var q=indexedDB.deleteDatabase(n);q.onsuccess=q.onerror=function(){res();};}catch(e){res();}});};\n'

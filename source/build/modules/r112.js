@@ -797,7 +797,6 @@ function makeChosen(){var r=cur();if(!r||!r.head)return;var list=shipPrefs(r).ch
   list.forEach(function(w){q=q.then(function(){return makeOne(r,w,{quiet:true}).then(function(){done.push(w);},function(e){bad.push([w,e&&e.message||String(e)]);});});});
   q.then(function(){var nm=function(w){return TARGETS.filter(function(t){return t[0]===w;})[0][1];};
     toast(bad.length?(done.length?done.map(nm).join(", ")+" made; ":"")+nm(bad[0][0])+" was not: "+bad[0][1]:done.length+" made and saved: "+done.map(nm).join(", ")+". Each is kept under Releases too.");});}
-function makeAll(){makeChosen();}
 /* the build kits: the devices chosen, one zip each, saved one after another */
 function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds everything needed to build the app for one device, with a guide to every step: the Fire tablet, iPhone and iPad apps are built online from theirs, and the Mac and Windows kits build on the computer itself. Choose the devices.");
   var picked=pref.kits.slice();

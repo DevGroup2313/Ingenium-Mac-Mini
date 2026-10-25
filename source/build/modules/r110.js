@@ -124,7 +124,7 @@ function isBinary(u8){var n=Math.min(u8.length,8000);for(var i=0;i<n;i++)if(u8[i
 function varint(n){var o=[];do{var b=n&127;n=Math.floor(n/128);if(n)b|=128;o.push(b);}while(n);return o;}
 var WIN=16,RB=0x01000193,RBW=(function(){var x=1;for(var i=0;i<WIN-1;i++)x=Math.imul(x,RB);return x>>>0;})();
 function makeDelta(base,target){
-  var parts=[new Uint8Array(varint(base.length).concat(varint(target.length)))],ins=[],insN=0,total=parts[0].length;
+  var parts=[new Uint8Array(varint(base.length).concat(varint(target.length)))],ins=[],total=parts[0].length;
   function flushIns(from,to){while(from<to){var k=Math.min(127,to-from);parts.push(new Uint8Array([k]),target.subarray(from,from+k));total+=k+1;from+=k;}}
   function copy(off,len){while(len>0){var k=Math.min(len,0xffffff),b=[0x80],x;
       for(x=0;x<4;x++){var v=(off>>>(8*x))&255;if(v){b[0]|=1<<x;b.push(v);}}

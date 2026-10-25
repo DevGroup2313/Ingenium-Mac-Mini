@@ -299,6 +299,8 @@ function create(o){
   ready();
   return {card:card,paint:paint,ready:ready,allows:allows,holder:holder,states:function(){return states();},keys:keys,
     check:function(f){return lists().then(function(){return checkPermit(f,keys,withdrawn,o.app);});}};}
-W.PermitCore={create:create,checkPermit:checkPermit,checkWithdrawn:checkWithdrawn,canon:canon,kidOf:kidOf,makeKey:makeKey,openKey:openKey,signWith:signWith,KIND:KIND,APPS:APPS,ALLOWS:ALLOWS};
+W.PermitCore={create:create,checkPermit:checkPermit,checkWithdrawn:checkWithdrawn,canon:canon,kidOf:kidOf,makeKey:makeKey,openKey:openKey,signWith:signWith,KIND:KIND,APPS:APPS,ALLOWS:ALLOWS,
+  /* the owner key's own store, for the library tests (rig/idb) */
+  _:{get:iget,put:iput}};
 })(window);
 </script>

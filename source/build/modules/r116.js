@@ -49,7 +49,6 @@ var LU_QUANTS=/*R116_QUANTS*/null;
 var LU_Q=[{id:"Q4_K_M",label:"Fast",line:"The smallest file and the quickest replies; the usual choice."},
   {id:"Q5_K_M",label:"Balanced",line:"A little larger and slower, a little closer to the original."},
   {id:"Q8_0",label:"Best",line:"Nearly the original quality; about twice the size of Fast, and slower."}];
-function qLabel(q){for(var i=0;i<LU_Q.length;i++)if(LU_Q[i].id===q)return LU_Q[i].label;return q;}
 function quality(){if(!state.lineupQuality||typeof state.lineupQuality!=="object")state.lineupQuality={};return state.lineupQuality;}
 function luVariants(key){var v=LU_QUANTS&&LU_QUANTS[key];if(!v)return null;var out=[];LU_Q.forEach(function(Q){if(v[Q.id])out.push(Object.assign({id:Q.id,label:Q.label,line:Q.line},v[Q.id]));});return out.length>1?out:null;}
 function luChosen(key){var q=quality()[key]||"Q4_K_M";var v=LU_QUANTS&&LU_QUANTS[key];return v&&v[q]?q:"Q4_K_M";}

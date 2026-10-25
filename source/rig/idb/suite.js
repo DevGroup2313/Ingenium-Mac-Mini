@@ -712,7 +712,7 @@
       await probe('app library', function () { return libPut(IngBig.newId(), TE.encode(pad), pad); });
       await probe('Fabrica', function () { return IngRepo.fromFiles([{ path: 'big.txt', data: pad }], { name: 'Full', msg: 'x' }); });
       await probe('signing keys', ktxProbe);
-      await probe('owner key', function () { return PermitCore.makeKey('a long enough password').then(function (k) { return rawPut('offline_owner', 'o', 'probe', Object.assign(k, { pad: pad })); }); });
+      await probe('owner key', function () { return PermitCore.makeKey('a long enough password').then(function (k) { return PermitCore._.put('probe', Object.assign(k, { pad: pad })); }); });
       await probe('model store', function () { return idbPut('files', 'idb_full', new Blob([TE.encode(pad)])); });
       c(Object.keys(answers).every(function (k) { return answers[k] !== 'no answer'; }), 'every store answers a write (kept, or refused), none waits for ever', answers);
       c(Object.keys(answers).every(function (k) { return !/^refused: (null|undefined)/.test(answers[k]); }), 'a store that refuses a write says why (never with nothing)', answers);

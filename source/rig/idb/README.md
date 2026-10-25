@@ -95,9 +95,10 @@ model store) is asked to write while full and must answer, and say why when it r
   transaction before the transaction aborts, and `transaction.error` is still empty then, as the standard says.
 - The reference implementation keeps no quota (its stores are in memory), so its quota phase checks that nothing is said to be
   full and nothing is removed.
-- `navigator.storage.estimate()`: WebKitGTK has no `navigator.storage` at all, and in the reference the browser's count never
-  includes fake-indexeddb's memory. Ingenium now measures its stores itself whenever the browser gives no count, or counts
-  nothing (modules/r142.js, `counted`), at most once a minute; the tests set their limits from what Ingenium counts.
+- `navigator.storage.estimate()`: WebKitGTK has no `navigator.storage` at all, and Ingenium falls back on its own measure of
+  its stores there. In the reference the browser's count exists but never includes fake-indexeddb's memory, which comes from
+  this set-up, not from an engine; so the reference runner hides `navigator.storage` (rig/idb/run_node.js), as WebKitGTK has
+  none, and Ingenium falls back on its own measure there too. The tests set their limits from what Ingenium counts.
 
 The simulated full store (in `main`) is the same on all three: the next write to the named store is taken, then its transaction
 is aborted before it commits with a `QuotaExceededError` as its error (Chromium's shape), using only the standard API.
@@ -146,8 +147,12 @@ Run against the combined 6.7 page before the fixes, and again after (`rig/idb` r
    the page, started again, waited behind it, so its models never loaded; in WebKit the delete was dropped when the page went,
    so the models were not reset at all. Fixed: modules/r181.js closes every connection when another tab asks for its store,
    opens a fresh one at once for Ingenium's own stores (with the same stores) and lets a transaction asked of the closed
-   connection be taken by the fresh one, so nothing written afterwards is lost; Reset everything waits for the delete before it
-   starts the page again (build_page.py, "6.7 idb: Reset everything waits for the model store to go").
+   connection be taken by the fresh one, so nothing written afterwards is lost. Without r181 the Reset test fails on all three.
+   Reset everything now also waits for the delete before it starts the page again (build_page.py, "6.7 idb: Reset everything
+   waits for the model store to go"). A review found that no engine needs this second change: with r181 alone WebKit and the
+   reference pass every two-tab check, and Chromium fails only the suite's own record of the delete's success event (the page
+   reloads before it is recorded), while the store is still emptied, reopened and written. It is kept because it lets that
+   event arrive before the page goes, and costs nothing.
 2. A write refused at commit left two stores waiting for ever: the signing key store (modules/r136.js `ktx`) and the model
    store (`idbPut` in the base) listened for `error` only, and a refusal at commit (Chromium's shape when its quota is reached
    as a transaction commits) fires only `abort`. The simulated full store showed it on all three implementations (each waited
@@ -159,10 +164,12 @@ Run against the combined 6.7 page before the fixes, and again after (`rig/idb` r
 4. A copy in the app library whose bytes were lost was reported as kept again but was not written (all three): modules/r142.js
    replaced the library's keep with one that answered "same" on a matching fingerprint without looking for the bytes. Fixed in
    place: the same fingerprint is the same copy only while its bytes are in the store.
-5. Storage believed a count of nothing. In the reference the browser's count exists but never includes the stores (they are
-   in memory), so limits, warnings and freeing room on its own never acted there; WebKitGTK gives no count at all, and Ingenium
-   fell back on its last measure, which exists only once Settings, Storage has measured. Fixed in modules/r142.js (`counted`,
-   above): the stores are measured whenever the browser gives no count, or counts nothing.
+5. In the reference, storage saw a count of nothing: the browser's count exists but never includes the stores (they are in
+   memory), so limits, warnings and freeing room on its own never acted there. A first fix in modules/r142.js measured the
+   stores whenever the browser gave no count, or counted nothing. A review showed that it answered no real engine (Chromium and
+   WebKitGTK pass every storage and quota test without it) and that it cost a full walk of the stores, about a second for a
+   93 MB library, up to once a minute on WebKitGTK, which has no count of its own. It was taken out again; the reference runner
+   hides the browser's count instead (above).
 
 In the reference, a delete made by a tab that then goes away stays pending for ever (the tab's realm, which ran it, is gone);
 before the fixes this made the reference behave as Chromium did (the restarted tab waited behind the delete), and its first tab

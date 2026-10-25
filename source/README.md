@@ -94,7 +94,7 @@ night and the Clepsydra's settings, and only the main window writes the saved de
   reports of the emulator and simulator checks (`shells/out/checks/`).
 
     node rig/t_v6.js http://127.0.0.1:8150/ingenium.html <out> <tools>       # 6.0, 28 checks: the folding rail, the wide window, the five ship cards, an APK checked by apksig and androguard, an IPA, Releases, removing an app from Fabrica and Code, Build with a 13 MB page
-    node rig/t_67_kits.js <url> <out> [ingenium_app.py]   # 6.7, 160 checks: another app shipped as itself (modules/r178.js): The Forge from the app library by every path (Fabrica's Build kits and cards, Download as an app from Fabrica, Chat and Build, the old Build page's rows) gives the Forge's own packages, entry for entry as its own packager makes them; a plain app's generic kits carry its icon, name and id; the Windows app's own saving writes exactly the bytes made (rig/kit_check.py, rig/t_67_winsave.py)
+    node rig/t_67_kits.js <url> <out> [ingenium_app.py]   # 6.7, 166 checks: another app shipped as itself (modules/r178.js): The Forge from the app library by every path (Fabrica's Build kits and cards, Download as an app from Fabrica, Chat and Build, the old Build page's rows) gives the Forge's own packages, entry for entry as its own packager makes them; a plain app's generic kits carry its icon, name and id; the Windows app's own saving writes exactly the bytes made (rig/kit_check.py, rig/t_67_winsave.py)
 
 `offline_project/forge_639/forge_fabrica.py` carries the new Fabrica into the Forge (without the APK and IPA cards, which need
 Ingenium's shells), and its saves now go one after another there too: `rig/t_forge_fabrica.js`, 45 checks.
@@ -154,7 +154,7 @@ By night the list is an opaque plum card; on a phone it rises from the foot of t
 A choice sets the select and sends input and change, so every handler runs as before; a value or options set by code show
 at once. A list of several lines is left as the system draws it, with readable colours by day and by night.
 
-    node rig/t_67_select.js <url> <out> [axe.min.js]   # 77 checks: every select dressed, contrast open and closed by day and night, keys, code, phone sheet, axe-core
+    node rig/t_67_select.js <url> <out> [axe.min.js]   # 79 checks: every select dressed, contrast open and closed by day and night, keys, code, phone sheet, axe-core
 
 6.7 adds `modules/r176.js`: the analogue sounds of the owner's other two apps, ported voice for voice from their sound
 module (pass 675) and made on the device as they play, placed a little left or right by where they happen and given a small
@@ -171,5 +171,15 @@ fixed in `modules/r181.js` (every store lets another tab in and comes back; a re
 `modules/r136.js` and `modules/r142.js`; `rig/idb/README.md` has the details and the table.
 
     rig/idb/run_all.sh http://127.0.0.1:8150/ingenium.html <out>   # 20 tests on each of the three implementations, and the table
+
+6.7 also adds three tools for checking a whole build. `rig/regress_67.py` serves a built page, makes every fixture and runs
+the regression, each test with its own arguments, then writes a table of passed and failed checks. `rig/make_big.js` makes
+the pages the capacity test edits (a small working app, its code in parts, and embedded data, 12 MB or more), which it needs
+and which were never kept before. `rig/t_67_app_sec.py` checks the computer app's two 6.7 security patches with real
+redirects between two local servers.
+
+    EYES_PHOTOS=<folder of image1.jpg and image2.jpg> python3 rig/regress_67.py <folder of ingenium.html> <out> [port] [tests]
+    node rig/make_big.js <out.html> <size in MB, 12 or more>
+    python3 -I rig/t_67_app_sec.py <repo>/ingenium_app.py   # 11 checks: keys never follow a redirect elsewhere; the frame guard
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.
