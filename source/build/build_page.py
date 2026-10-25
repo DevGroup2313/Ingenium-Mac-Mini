@@ -802,6 +802,25 @@ edit('vetted by Ingenium on "+when+". Retracted work has been left out. Each sou
      'gathered by Ingenium on "+when+". Work the indexes mark as retracted has been left out. Each source says what was checked: a scholarly record against its index, a web page by its address only.',
      "6.7 claims: what the model is told of its sources")
 
+# ---- 6.7 (rig/idb, the library tests across IndexedDB implementations): a model file the store refuses is said to be refused.
+#      Chromium, when the quota is reached as a transaction commits, aborts it with no request failing, so only abort fires; the
+#      model store waited for an error that never came, and a model added on a full device was never marked as kept or as for
+#      this session only. WebKit fails the request, which reaches onerror. Both now answer false. ----
+edit('tx.oncomplete=function(){res(true);};tx.onerror=function(){res(false);};}catch(e){res(false);}});});}',
+     'tx.oncomplete=function(){res(true);};tx.onerror=tx.onabort=function(){res(false);};}catch(e){res(false);}});});}',
+     "6.7 idb: the model store answers an aborted write")
+
+# ---- 6.7 (rig/idb): Reset everything waits until the model store is deleted before it starts the page again. It reloaded at
+#      once, while its own connection, and every other tab's, still held the store: Chromium kept the delete waiting behind
+#      them and the page, started again, waited behind the delete (its models never loaded); WebKit dropped the delete when the
+#      page went, so the models were not reset at all. Every connection now closes when asked (modules/r181.js), the delete
+#      goes through, and the page starts again once it has (or after a few seconds, whatever happens). ----
+edit('    try{indexedDB.deleteDatabase("ingenium_files");indexedDB.deleteDatabase("the_foundry_files");}catch(e){}\n'
+     '    location.reload();};openModal();};',
+     '    var gone=function(n){return new Promise(function(res){try{var q=indexedDB.deleteDatabase(n);q.onsuccess=q.onerror=function(){res();};}catch(e){res();}});};\n'
+     '    Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files")]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});};openModal();};',
+     "6.7 idb: Reset everything waits for the model store to go")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
