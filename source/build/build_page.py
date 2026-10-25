@@ -243,7 +243,7 @@ edit('      wb.sort(schRank);var all=sc.concat(wb.slice(0,deep?4:3));',
 edit('Retracted work is left out, preprints are named as such, and each source shows what was checked.</div></div></div>',
      'Work that OpenAlex, Crossref or Europe PMC marks as retracted is left out (arXiv is not checked for withdrawals), preprints are named as such, and each source shows what was checked.</div></div></div>\n'
      '        <div class="sch-set"><label class="eswitch"><input type="checkbox" id="srchPeer"><span class="etrack"></span></label>\n'
-     '          <div><b>Journal articles and scholarly books only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no editorials or letters, no encyclopaedias, no web pages. Peer review is confirmed only for a journal listed in DOAJ; for other journals and for books it is not checked.</div></div></div>',
+     '          <div><b>Journal articles and scholarly books only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no encyclopaedias, no web pages. Editorials and letters are left out when the index names them or the title begins with Editorial or Letter, so a few may still come through. Peer review is confirmed only for a journal listed in DOAJ; for other journals and for books it is not checked.</div></div></div>',
      "R115 peer-reviewed switch")
 
 # ---- R119 (17 October 2026): the Inbox, Carpe Diem's 💭; its words on the Focus page, in the guide and on the button ----
@@ -653,6 +653,10 @@ edit('  var n=m&&m.layers;\n  return "Offload: none of it is or can be on a GPU,
 edit('line:"The most capable model this device can hold. Slower; for hard questions and long work."},',
      'line:"Ingenium\'s larger general model for this device, chosen to suit its memory and speed. Slower; for hard questions and long work. More models has larger ones."},',
      "6.7 claims: Magister's line")
+# the tag on Magister's tile and in the chat's model chooser ("Magister · strongest") said the same; "deep" is the word the
+# houses card already gives Magister, and it claims no rank
+edit('{id:"magister",name:"Magister",role:"strongest",',
+     '{id:"magister",name:"Magister",role:"deep",', "6.7 claims: Magister's tag")
 edit('line:"Made for writing, reading and fixing code. It reasons through a problem before it writes."}],',
      'line:"Made for writing, reading and fixing code."}],', "6.7 claims: Faber's line")
 edit('Magister (the strongest this device holds) and Faber (the coding model).',
@@ -674,7 +678,7 @@ edit('  if(!out.length)out.push(["ok","All is well: the models here fit this dev
      "6.7 claims: the health card's calm line")
 # the Guide, the tour and Settings
 edit('Each model answers with the settings its own makers recommend.</div></div>',
-     'Most of Ingenium\'s own models answer with the settings their makers recommend; the others, and every model you bring, use Ingenium\'s general settings, which Effort in Controls changes.</div></div>',
+     'Models from the families Ingenium knows (LFM2.5, Qwen3.5, Gemma 4, Mellum and Qwen3-Coder) answer with the settings their makers recommend, whether they are Ingenium\'s own or ones you bring (known by the file\'s name); other models use Ingenium\'s general settings. Effort in Controls adjusts both.</div></div>',
      "6.7 claims: the Guide, each model's settings")
 edit('<p>Ingenium is built around how attention, time and the senses can work for autistic people and people with ADHD. The Focus page holds the tools;',
      '<p>Ingenium\'s supports were designed with autistic people and people with ADHD in mind: small steps, time you can see, calm and clear words. They have not been tested with a group of users, so what helps one person may not help another. The Focus page holds the tools;',
@@ -728,7 +732,7 @@ edit('<h2 class="sec">Train a small model from zero</h2>\n        <p class="smal
      '<h2 class="sec">Train a small model</h2>\n        <p class="small muted" style="margin-bottom:10px">Make a tiny model of your own from random numbers, or train a small model you have further on your own text, here on this computer. A model made from zero learns your text\'s words and patterns; it is far weaker than the models above and does not hold a conversation. A model you train further starts from what it already knew.</p>',
      "6.7 claims: the train card")
 edit('var why=box.querySelector("#trWhy");why.textContent=TRAIN_STEPS[step].why;',
-     'var why=box.querySelector("#trWhy");why.textContent=(step===4&&w.base&&!w.fromModel)?"Begin a sentence and the model continues it in the manner of your text. It started from what it already knew, so it still answers as before; in Ingenium\'s own test, SmolLM2 135M Instruct still answered in chat after one pass at the usual setting.":TRAIN_STEPS[step].why;',
+     'var why=box.querySelector("#trWhy");why.textContent=(step===4&&w.base&&!w.fromModel)?"Begin a sentence and the model continues it in the manner of your text. It started from what it already knew, so it should still answer much as before; in Ingenium\'s own test, SmolLM2 135M Instruct still answered in chat after one pass at the usual setting. More passes have not been measured.":TRAIN_STEPS[step].why;',
      "6.7 claims: Try it, for a model trained further")
 # Blend: the largest model, not a measured strength
 edit('desc:"Every model answers on its own; then the strongest of them writes one answer that keeps the best of each."},',
@@ -746,6 +750,23 @@ edit('    var notice=Array.isArray(w["update-to"])&&w["update-to"].some(function
 edit('preprint:w.type==="posted-content",doaj:false,issn:(w.ISSN&&w.ISSN[0])||"",oa:false,oaUrl:"",cites:w["is-referenced-by-count"]||0,retracted:false,notice:notice,',
      'preprint:w.type==="posted-content",doaj:false,issn:(w.ISSN&&w.ISSN[0])||"",oa:false,oaUrl:"",cites:w["is-referenced-by-count"]||0,retracted:gone,notice:notice,',
      "6.7 claims: Crossref, marked retracted")
+# Crossref calls an editorial or a letter in a journal a "journal-article", and OpenAlex often calls one an "article": where the
+# index does not name it, a record whose title begins "Editorial", "Letter", "Erratum" or "Corrigendum" is taken as one (a check
+# on the title only, and the switch's words say so)
+edit('function schOpenAlex(q,n){',
+     '/* 6.7: the kind of record its title gives, where the index does not say: an editorial, a letter or an erratum */\n'
+     'function schTitleKind(t){t=String(t||"").replace(/^\\s+/,"");\n'
+     '  if(/^(guest )?editorial\\s*([:.,\\-\\u2013\\u2014]|$)/i.test(t))return "editorial";\n'
+     '  if(/^(letters?|correspondence)\\s*([:.,\\-\\u2013\\u2014]|$)/i.test(t)||/^letter to the editor\\b/i.test(t))return "letter";\n'
+     '  if(/^(erratum|corrigendum)\\b/i.test(t))return "erratum";\n'
+     '  return "";}\n'
+     'function schOpenAlex(q,n){', "6.7 claims: the kind of record by its title")
+edit('venue:src.display_name||"",venueType:src.type||"",type:type,preprint:preprint',
+     'venue:src.display_name||"",venueType:src.type||"",type:(type==="article"&&schTitleKind(w.display_name))||type,preprint:preprint',
+     "6.7 claims: OpenAlex, an editorial by its title")
+edit('venueType:/journal/.test(w.type||"")?"journal":"",type:w.type==="journal-article"?"article":(w.type||""),',
+     'venueType:/journal/.test(w.type||"")?"journal":"",type:w.type==="journal-article"?(schTitleKind(w.title&&w.title[0])||"article"):(w.type||""),',
+     "6.7 claims: Crossref, an editorial or a letter by its title")
 edit('}).filter(function(x){return !x.notice;});});}',
      '}).filter(function(x){return !x.notice&&!x.retracted;});});}', "6.7 claims: Crossref, left out")
 # Europe PMC: an editorial, a letter, a comment or a news item is not a journal article; patents and theses are not either
@@ -756,7 +777,7 @@ edit('    var retracted=/retract/.test(types),preprint=w.source==="PPR"||/prepri
      '    if(w.source==="PAT")minor="patent";else if(w.source==="ETH")minor="thesis";',
      "6.7 claims: Europe PMC, the kind of record")
 edit('      type:preprint?"preprint":"article",preprint:preprint,doaj:false,issn:"",oa:w.isOpenAccess==="Y",',
-     '      type:preprint?"preprint":(minor||"article"),preprint:preprint,doaj:false,issn:"",oa:w.isOpenAccess==="Y",',
+     '      type:preprint?"preprint":(minor||schTitleKind(w.title)||"article"),preprint:preprint,doaj:false,issn:"",oa:w.isOpenAccess==="Y",',
      "6.7 claims: Europe PMC, its type")
 edit('venue:jt,venueType:jt?"journal":"",\n      type:',
      'venue:jt,venueType:jt&&!/patent|thesis/.test(minor)?"journal":"",\n      type:', "6.7 claims: Europe PMC, no journal for a patent")
