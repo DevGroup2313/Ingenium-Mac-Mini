@@ -768,7 +768,7 @@ function say(r,what,t){if(S.making&&S.making.id===r.id){S.making.say[what]=t;pai
 function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();making(r,what,5);
   var p;
   if(what==="page")p=IngShip.onePage(r.id).then(function(x){var name=x.name||(r.slug+".html");return saveBytes(name,"text/html",x.bytes).then(function(){return keepMade(r,x.commit,what,name,"text/html",x.bytes);}).then(function(){return x.bytes.length;});});
-  else if(what==="web")p=IngShip.webApp(r.id).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
+  else if(what==="web")p=IngShip.webApp(r.id,{pkg:pkgOf(r)}).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="apk"||what==="ipa"||what==="mac"||what==="win")p=makeDevice(r,what);
   else p=makeKits(r,opt.kits||shipPrefs(r).kits);
   return p.then(function(){making(r,what,100);return refresh();}).then(function(){making(r,what,null);paint();if(!opt.quiet)toast(TARGETS.filter(function(t){return t[0]===what;})[0][1]+" made and saved. It is kept under Releases too.");},
@@ -806,10 +806,11 @@ function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds e
   var end=h("div","end"),go2=btn("pri","Make "+picked.length+" kit"+(picked.length===1?"":"s"),function(){pref.kits=picked.slice();saveSoon();sh.close();makeOne(r,"kits",{kits:picked.slice()}).catch(function(){});});
   go2.disabled=!picked.length;end.appendChild(btn("","Close",sh.close));end.appendChild(go2);sh.box.appendChild(end);}
 function makeKits(r,ids){ids=(ids&&ids.length?ids:KITS.map(function(k){return k[0];})).filter(function(i){return KITS.some(function(k){return k[0]===i;});});
-  return IngShip.onePage(r.id,{quiet:true}).then(function(x){var name=r.name.replace(/[^\w .-]+/g,"").trim()||"App",file=name.replace(/\s+/g,""),who={isNew:true,name:name,id:pkgOf(r).id.slice(0,60),file:file},page=x.html;
-    return kitStore().then(function(store){var total=0,chain=Promise.resolve(),made=[];
-      ids.forEach(function(id,i){chain=chain.then(function(){say(r,"kits","The "+KITS.filter(function(k){return k[0]===id;})[0][1]+" kit…");var k=kitAssemble(store,id,who,page),bytes=makeZip(k.entries);total+=bytes.length;made.push({name:k.zip,size:bytes.length,kit:id});
-        return saveBytes(k.zip,"application/zip",bytes).then(function(){return keepMade(r,x.commit,"kits",k.zip,"application/zip",bytes);}).then(function(){if(S.making){S.making.prog.kits=Math.round(10+85*(i+1)/ids.length);paintShip();}});});});
+  return IngShip.onePage(r.id,{quiet:true}).then(function(x){var P=pkgOf(r),name=r.name.replace(/[^\w .-]+/g,"").trim()||"App",file=name.replace(/\s+/g,""),who={isNew:true,name:name,id:P.id.slice(0,60),file:file,title:P.title,version:P.version,app:P.app,colour:colorOf(r)},page=x.html;
+    return kitStore().then(function(store){var total=0,chain=Promise.resolve(),made=[],seen={};
+      /* 6.7 (R178): a kit may be drawn before it is ready (the app's own icons, or its own templates); two devices that share one package (iPhone and iPad, from an app's own templates) save it once */
+      ids.forEach(function(id,i){chain=chain.then(function(){say(r,"kits","The "+KITS.filter(function(k){return k[0]===id;})[0][1]+" kit…");return Promise.resolve(kitAssemble(store,id,who,page)).then(function(k){if(seen[k.zip])return;seen[k.zip]=1;var bytes=k.bytes||makeZip(k.entries);total+=bytes.length;made.push({name:k.zip,size:bytes.length,kit:id});
+        return saveBytes(k.zip,"application/zip",bytes).then(function(){return keepMade(r,x.commit,"kits",k.zip,"application/zip",bytes);});}).then(function(){if(S.making){S.making.prog.kits=Math.round(10+85*(i+1)/ids.length);paintShip();}});});});
       return chain.then(function(){return IngRepo.setNote(r.id,x.commit,"kits",{at:Date.now(),size:total,made:made});}).then(function(){return total;});});});}
 /* what was made, kept on this device beside its version (IndexedDB fabrica_made): Releases shows it, and saves it again with no
    making; the packages of an app's three newest versions are kept */
