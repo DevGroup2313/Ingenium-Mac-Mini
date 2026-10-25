@@ -211,8 +211,9 @@ function entry(txt,start){ if(!txt) return null; for(var i=0;i<TC.length;i++){ i
   if(!start) return null; var e={txt:txt,ok:false,wait:true}; TC.unshift(e); if(TC.length>4) TC.length=4;
   sha(txt).then(function(h){ e.wait=false; e.ok=!!h&&trustedSha(h); reshow(e); },function(){ e.wait=false; reshow(e); }); return e; }
 function own(txt){ var e=entry(txt,false); return !!(e&&!e.wait&&e.ok); }
-/* held blank while its fingerprint was read (a few tenths of a second): then shown, as the owner's own or apart */
-function reshow(e){ if(!LAST||(LAST.kind!=="shell"&&LAST.kind!=="bake")||baseOf(LAST.kind)!==e.txt) return;
+/* held blank while its fingerprint was read (a few tenths of a second): then shown, as the owner's own or apart; only while the
+   page it was made from is still the one the Editor or the bakery holds (a bake of an earlier file is never shown as this one's) */
+function reshow(e){ if(!LAST||(LAST.kind!=="shell"&&LAST.kind!=="bake")||LAST.base!==e.txt||baseOf(LAST.kind)!==e.txt) return;
   var f=D.getElementById("frame"), st=f&&f.getAttribute("data-forge-apart");
   if(st==="wait"||(e.ok&&st==="1")){ try{ W.FORGE.showDoc.apply(W.FORGE,LAST.args); }catch(x){} } }
 W.__forgeShellSeen=function(txt){ entry(txt,true); };
@@ -224,7 +225,7 @@ function noteEl(){ if(NOTE&&NOTE.isConnected) return NOTE; var st=D.getElementBy
   var t=D.createElement("span"); t.className="fg-an-t"; t.textContent="Shown apart: it cannot reach what the Forge keeps.";
   var b=D.createElement("button"); b.type="button"; b.className="fg-an-b"; b.textContent="This is my own app";
   b.addEventListener("click",function(){ if(!ARMED){ ARMED=setTimeout(function(){ ARMED=0; b.textContent="This is my own app"; },6000); b.textContent="Press again to let it use the Forge\u2019s storage"; return; }
-    clearTimeout(ARMED); ARMED=0; b.textContent="This is my own app"; var base=LAST&&baseOf(LAST.kind), e=base&&entry(base,false); if(!e||e.wait) return;
+    clearTimeout(ARMED); ARMED=0; b.textContent="This is my own app"; var base=LAST&&LAST.base, e=base&&base===baseOf(LAST.kind)?entry(base,false):null; if(!e||e.wait) return;
     sha(base).then(function(h){ if(!h) return; note(h); e.ok=true; n.hidden=true; reshow(e); }); });
   n.appendChild(t); n.appendChild(b); st.appendChild(n); NOTE=n; return n; }
 /* over the preview's own lower edge, never over the keys beneath it */
@@ -240,8 +241,9 @@ W.__forgePreviewDress=function(fr,view,kind){ var base=(kind==="shell"||kind==="
   fr.setAttribute("data-forge-apart",mine?"0":"1");
   return mine?view:withMem(view); };
 /* the boot check before shipping or baking: with the Forge's origin only when every page it could be checking is the owner's
-   own (the Editor's app, and the bakery's when it holds one) */
-function bootOwn(){ var a=edShell(), b=bakeShell(); if(b) entry(b,true); return !!(a&&own(a)&&(!b||own(b))); }
+   own (the Editor's app, the bakery's when it holds one, and the page a build handed to shipping was baked from) */
+function shipFrom(){ var S=null; try{ S=(W.__forgeSec&&W.__forgeSec.ship)?W.__forgeSec.ship():null; }catch(e){} return S?(typeof S.from==="string"?S.from:""):null; }
+function bootOwn(){ var a=edShell(), b=bakeShell(), s=shipFrom(); if(b) entry(b,true); if(s) entry(s,true); return !!(a&&own(a)&&(!b||own(b))&&(s===null||own(s))); }
 W.__forgeBootSandbox=function(){ return bootOwn()?"allow-scripts allow-same-origin":"allow-scripts"; };
 W.__forgeBootMem=function(P){ return bootOwn()?"":bootMem(P); };
 /* the bakery's page is read as soon as it is chosen, so its first preview or bake need not wait */
@@ -260,7 +262,7 @@ W.addEventListener("message",function(ev){ var d=ev.data; if(!d||typeof d!=="obj
       if(isInfo&&INFO){ try{ var q=d.__fgBootInfo; INFO.set(ev.source,{title:String(q.title||"").slice(0,300),kids:q.kids>>>0,registry:!!q.registry,seeded:!!q.seeded,vars:(q.vars&&typeof q.vars==="object")?q.vars:{}}); }catch(e){} }
       return; } } });
 /* a build baked from the owner's own app is the owner's own too */
-W.__forgeShowSeen=function(doc,name,text,kind){ LAST={kind:kind,args:[doc,name,text,kind]};
+W.__forgeShowSeen=function(doc,name,text,kind){ LAST={kind:kind,base:baseOf(kind),args:[doc,name,text,kind]};
   if(kind==="bake"&&own(bakeShell())) sha(doc).then(function(h){ if(h) note(h); }); };
 /* saving and printing for a frame: only the apps the Forge carries, in their own rooms and windows */
 W.__forgeFromCarried=function(ev){ try{ var src=ev&&ev.source; if(!src) return false;

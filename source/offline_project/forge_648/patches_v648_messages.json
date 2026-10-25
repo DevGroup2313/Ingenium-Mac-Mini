@@ -1,0 +1,32 @@
+[
+ {
+  "old": "window.addEventListener('message',function(ev){var d=ev&&ev.data;if(!d||d.kind!=='carpe-open')return;",
+  "new": "window.addEventListener('message',function(ev){var d=ev&&ev.data;if(!d||d.kind!=='carpe-open')return;if(window.__forgeFromCarried&&!window.__forgeFromCarried(ev))return;",
+  "count": 1,
+  "why": "648 (review, finding 6): a room is opened at a frame's word only for the apps the Forge carries (never the preview)"
+ },
+ {
+  "old": "window.addEventListener('message',function(ev){var q=ev&&ev.data;if(q&&q.kind==='cd-window-close'",
+  "new": "window.addEventListener('message',function(ev){if(window.__forgeFromCarried&&!window.__forgeFromCarried(ev))return;var q=ev&&ev.data;if(q&&q.kind==='cd-window-close'",
+  "count": 1,
+  "why": "648 (review, finding 6): closing a room or a window, and a new window, at a frame's word only for the apps the Forge carries"
+ },
+ {
+  "old": "window.addEventListener('message',function(ev){var d=ev&&ev.data;if(!d||d.kind!=='scriba-live')return;",
+  "new": "window.addEventListener('message',function(ev){var d=ev&&ev.data;if(!d||d.kind!=='scriba-live')return;if(window.__forgeFromCarried&&!window.__forgeFromCarried(ev))return;",
+  "count": 1,
+  "why": "648 (review, finding 6): Scriba's live mark only from Scriba's own room"
+ },
+ {
+  "old": "function cleanHtml(h){ var d=document.createElement('div'); d.innerHTML=String(h||'');",
+  "new": "function cleanHtml(h){ var d=document.implementation.createHTMLDocument('').createElement('div'); d.innerHTML=(window.IngSafe&&IngSafe.html)?IngSafe.html(String(h||'')):String(h||'');",
+  "count": 1,
+  "why": "648 (review, finding 4): a part copied in the Studio, and a block of the owner's own, go through the strict cleaner (no script, no javascript: however spelt, no overlay), read in a page with no window so nothing in it loads while it is cleaned"
+ },
+ {
+  "old": "write: fn(cn, 'writeClipboard') ? function (a, b) { return cn.writeClipboard(a, b); }",
+  "new": "write: fn(cn, 'writeClipboard') ? function (a, b) { var k = ''; try { k = String(window.__cnTok || ''); } catch (e) {} if (k) { try { return cn.writeClipboard(a == null ? '' : String(a), b == null ? '' : String(b), k); } catch (e) {} } return cn.writeClipboard(a, b); }",
+  "count": 1,
+  "why": "648 (review, finding 8): the Fire tablet: writing to the clipboard carries the key the app gave the Forge's own page, as reading does (647)"
+ }
+]
