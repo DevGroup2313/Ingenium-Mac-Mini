@@ -7,6 +7,41 @@
 .pc-card details.pc-text>summary{cursor:pointer;font-weight:600}
 .pc-card .pc-licence{white-space:pre-wrap;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:420px;overflow:auto;
   padding:10px 12px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:8px;margin:8px 0}
+/* 6.7: the licence laid out as a document (licenceDoc below): its contents, the plain words in a box, serif headings, numbered clauses */
+.pc-card .pc-doc{max-height:min(70vh,640px);overflow:auto;padding:16px 18px 18px;margin:8px 0;border-radius:12px;
+  border:1px solid var(--hairline,color-mix(in srgb,currentColor 16%,transparent));background:var(--card-hi,transparent);
+  font:14.5px/1.62 var(--sans,system-ui,sans-serif);color:var(--ink-body,inherit)}
+.pc-card .pc-doc:focus-visible{outline:3px solid var(--accent,currentColor);outline-offset:2px}
+.pc-card .pc-doc .pcd-app{font:600 12px/1.3 var(--sans,system-ui,sans-serif);letter-spacing:.24em;text-transform:uppercase;color:var(--accent,inherit);margin:0}
+.pc-card .pc-doc .pcd-title{font:700 21px/1.25 var(--serif,Georgia,serif);margin:4px 0 2px;color:var(--ink-1,inherit)}
+.pc-card .pc-doc .pcd-meta{margin:0 0 2px;color:var(--ink-3,inherit);font-size:13px}
+.pc-card .pc-doc .pcd-plain{margin:14px 0 6px;padding:12px 16px 10px;border-radius:12px;background:var(--accent-softer,transparent);
+  border:1px solid var(--accent-soft,color-mix(in srgb,currentColor 14%,transparent))}
+.pc-card .pc-doc .pcd-plain h4{margin:0 0 6px;font:700 15px/1.3 var(--serif,Georgia,serif);color:var(--ink-1,inherit)}
+.pc-card .pc-doc .pcd-plain ul{margin:0;padding-left:20px}
+.pc-card .pc-doc .pcd-plain li{margin:3px 0}
+.pc-card .pc-doc .pcd-note{font-size:13px;color:var(--ink-3,inherit);font-style:italic;margin:6px 0 0}
+.pc-card .pc-doc .pcd-toc{margin:12px 0 4px}
+.pc-card .pc-doc .pcd-toc>summary{cursor:pointer;font-weight:700;padding:4px 0}
+.pc-card .pc-doc .pcd-toc ol{margin:6px 0 0;padding-left:0;list-style:none;columns:2 260px;column-gap:24px}
+.pc-card .pc-doc .pcd-toc li{margin:0 0 4px;break-inside:avoid}
+.pc-card .pc-doc .pcd-toc button{all:unset;cursor:pointer;color:var(--accent,inherit);text-decoration:underline;text-underline-offset:2px;line-height:1.4;padding:2px 0}
+.pc-card .pc-doc .pcd-toc button:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:2px;border-radius:3px}
+.pc-card .pc-doc .pcd-part{margin:22px 0 6px;padding-top:10px;border-top:1px solid var(--gold-ring,color-mix(in srgb,currentColor 20%,transparent));
+  font:700 12px/1.3 var(--sans,system-ui,sans-serif);letter-spacing:.16em;text-transform:uppercase;color:#76570f}
+body[data-theme="night"] .pc-card .pc-doc .pcd-part{color:var(--gold-ink,#caa24a)}
+.pc-card .pc-doc .pcd-h{margin:16px 0 6px;font:700 16px/1.3 var(--serif,Georgia,serif);color:var(--ink-1,inherit);scroll-margin-top:8px}
+.pc-card .pc-doc .pcd-h:focus{outline:none}
+.pc-card .pc-doc .pcd-h:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:3px;border-radius:3px}
+.pc-card .pc-doc p{margin:6px 0}
+.pc-card .pc-doc .pcd-cl{display:grid;grid-template-columns:3.2em 1fr;gap:0 4px;margin:7px 0}
+.pc-card .pc-doc .pcd-cl>b{font-variant-numeric:tabular-nums;color:var(--ink-2,inherit)}
+.pc-card .pc-doc ol.pcd-list{list-style:none;margin:4px 0 8px;padding-left:3.2em}
+.pc-card .pc-doc ol.pcd-list>li{display:grid;grid-template-columns:2.2em 1fr;margin:3px 0}
+.pc-card .pc-doc ol.pcd-list>li>span{color:var(--ink-2,inherit)}
+.pc-card .pc-doc .pcd-foot{margin:22px 0 0;padding-top:10px;border-top:1px solid var(--hairline,color-mix(in srgb,currentColor 16%,transparent));font-weight:600}
+@media (max-width:520px){.pc-card .pc-doc{padding:12px 12px 14px;font-size:15px}.pc-card .pc-doc .pcd-cl{grid-template-columns:2.8em 1fr}
+  .pc-card .pc-doc ol.pcd-list{padding-left:1.2em}}
 .pc-card .pc-list{display:grid;gap:8px;margin:8px 0}
 .pc-card .pc-item{padding:9px 11px;border:1px solid color-mix(in srgb,currentColor 16%,transparent);border-radius:9px;line-height:1.45}
 .pc-card .pc-item b{font-weight:700}
@@ -29,7 +64,7 @@
    anything with it, no one else has that right and should not ever have access unless I grant them limited persmission that I
    can discontinue at any time. I want that made explicit for all of my apps."
    What each app carries:
-   - its licence (version 2), whole, with a key to save it, and the edition and build of this copy;
+   - its licence (version 3 from 6.7), whole and laid out as a document, with a key to save it, and the edition and build of this copy;
    - the owner's public keys, written in when the app is built (security/owner_keys.json). A permission is a small file signed
      with the owner's key: it names one person, the apps, what it allows, the day it begins and the day it ends, and its own
      number. The app checks the signature and the dates, and the owner's list of withdrawn permissions, which travels the same
@@ -104,6 +139,45 @@ function iput(k,v){return idb().then(function(d){return new Promise(function(res
 
 /* ---------- the card ---------- */
 function el(tag,cls,text){var e=D.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+/* 6.7: the licence as a document. The text stays plain (the repositories carry the same file, and Save keeps it as it is); its
+   regular shape (licence/make_licence.py) is read here: the title block, IN PLAIN WORDS with its bullets, PART headings between
+   rules, numbered section headings in capitals, clauses "4.1", lists "(a)", wrapped lines indented under their first line. */
+function licenceDoc(text,appName){var box=el("div","pc-doc"),lines=String(text||"").replace(/\r/g,"").split("\n"),i=0,n=lines.length,toc=[],secN=0;
+  box.setAttribute("role","region");box.setAttribute("tabindex","0");
+  var ver=(/Version (\d+)[^\n]*/.exec(text)||[])[0]||"";box.setAttribute("aria-label","The licence"+(ver?", "+ver.split(".")[0].toLowerCase():""));
+  var rule=function(l){return /^={10,}$/.test(l);},blank=function(l){return !/\S/.test(l);};
+  /* a block: the first line and the indented lines that continue it */
+  function take(first,indent){var t=first.trim();while(i<n&&!blank(lines[i])&&/^\s/.test(lines[i])&&lines[i].length-lines[i].replace(/^\s+/,"").length>=indent&&!/^\s*(\u2022|\([a-z]\))\s/.test(lines[i])){t+=" "+lines[i].trim();i++;}return t;}
+  /* a plain paragraph: its wrapped lines are not indented, so it runs to the next blank line or the next structural line */
+  function para(first){var t=first.trim();while(i<n&&!blank(lines[i])&&!rule(lines[i])&&!/^\s*(\u2022|\([a-z]\))\s/.test(lines[i])&&!/^\d+\.\d+ /.test(lines[i])&&!/^\d+\. [^a-z]+$/.test(lines[i].trim())){t+=" "+lines[i].trim();i++;}return t;}
+  var head=el("div","pcd-head"),app=el("p","pcd-app",(lines[0]||appName||"").trim());head.appendChild(app);i=1;
+  while(i<n&&!rule(lines[i])){if(!blank(lines[i]))head.appendChild(el("p","pcd-meta",lines[i].trim()));i++;}
+  if(rule(lines[i]||"")){i++;var tt=(lines[i]||"").trim(),t=el("h3","pcd-title",tt.charAt(0)+tt.slice(1).toLowerCase());head.insertBefore(t,app.nextSibling);i++;
+    while(i<n&&!rule(lines[i])){if(!blank(lines[i]))head.appendChild(el("p","pcd-meta",lines[i].trim()));i++;}i++;}
+  box.appendChild(head);
+  var tocBox=el("details","pcd-toc"),tocSum=el("summary",null,"Contents"),tocList=el("ol");tocBox.appendChild(tocSum);tocBox.appendChild(tocList);
+  var plain=null,list=null,body=box;
+  while(i<n){var l=lines[i];
+    if(blank(l)){i++;list=null;continue;}
+    if(rule(l)){i++;var nx=(lines[i]||"").trim();
+      var last=true;for(var q=i+2;q<n;q++)if(!blank(lines[q])){last=false;break;}
+      if(nx&&rule(lines[i+1]||"")&&last){i+=2;box.appendChild(el("p","pcd-foot",nx));continue;}
+      if(nx&&rule(lines[i+1]||"")){i+=2;if(plain){plain=null;box.appendChild(tocBox);}var pt=el("h4","pcd-part",nx);box.appendChild(pt);continue;}
+      if(nx){i++;var ft=take(nx,0);while(i<n&&!rule(lines[i])){if(!blank(lines[i]))ft+=" "+lines[i].trim();i++;}i++;box.appendChild(el("p","pcd-foot",ft));}continue;}
+    if(/^IN PLAIN WORDS$/.test(l.trim())){plain=el("div","pcd-plain");plain.appendChild(el("h4",null,"In plain words"));plain.appendChild(el("ul"));box.appendChild(plain);i++;continue;}
+    if(plain&&/^\s*\u2022\s/.test(l)){i++;plain.lastChild.appendChild(el("li",null,take(l.replace(/^\s*\u2022\s/,""),4)));continue;}
+    if(plain){i++;plain.appendChild(el("p","pcd-note",para(l)));continue;}
+    var mh=/^(\d+)\. ([^a-z]+)$/.exec(l.trim());
+    if(mh){i++;secN++;var h=el("h4","pcd-h",mh[1]+". "+mh[2].charAt(0)+mh[2].slice(1).toLowerCase().replace(/\b(ingenium|the forge|the offline project)\b/g,function(w){return w.replace(/\b\w/g,function(c){return c.toUpperCase();});}));
+      h.id="pcd-s"+secN+"-"+Math.random().toString(36).slice(2,7);h.setAttribute("tabindex","-1");box.appendChild(h);toc.push(h);list=null;continue;}
+    var mc=/^(\d+\.\d+) (.*)$/.exec(l);
+    if(mc){i++;var cl=el("div","pcd-cl");cl.appendChild(el("b",null,mc[1]));cl.appendChild(el("span",null,take(mc[2],mc[1].length+1)));box.appendChild(cl);list=null;continue;}
+    var ml=/^\s*\(([a-z])\) (.*)$/.exec(l);
+    if(ml){i++;if(!list){list=el("ol","pcd-list");box.appendChild(list);}var li=el("li");li.appendChild(el("span",null,"("+ml[1]+")"));li.appendChild(el("span",null,take(ml[2],6)));list.appendChild(li);continue;}
+    i++;box.appendChild(el("p",null,para(l)));list=null;}
+  toc.forEach(function(h){var li=el("li"),b=el("button",null,h.textContent);b.type="button";b.onclick=function(){try{h.scrollIntoView({block:"start",behavior:"auto"});}catch(e){}h.focus({preventScroll:true});};li.appendChild(b);tocList.appendChild(li);});
+  if(!tocBox.parentNode)box.insertBefore(tocBox,box.children[1]||null);
+  return box;}
 function create(o){
   var C=Object.assign({card:"card",h:"",btn:"btn",pri:"btn primary",note:"small muted"},o.cls||{});
   var keys=(o.keys||[]).filter(function(k){return k&&k.kid&&k.jwk;}),withdrawn=[],READY=null,LAST=[];
@@ -174,7 +248,7 @@ function create(o){
     c.appendChild(el("p","pc-line",o.appName+" is the sole original work of "+(o.ownerName||"its owner")+", its owner. Every right in it is the owner's: only the owner may use, copy, install, give, publish, sell, change or remove it, or let anyone else do any of these, and only by a permission the owner signs."));
     c.appendChild(el("p","pc-line "+C.note,"A permission names one person and the apps it covers, says what it allows, and has its own number. It cannot be passed on. It ends on its end date, and the owner can withdraw it at any time. "+o.appName+" works with no connection and never calls out to check, so a permission ends by its date, or when this copy is given the owner's newer list of withdrawn permissions."));
     c.appendChild(el("p","pc-line "+C.note,"This copy: "+o.appName+(o.version?" "+o.version:"")+(o.edition?", the "+o.edition+" edition":"")+(o.stamp?", build "+o.stamp:"")+". A copy that did not come from the owner, or that has been changed, is not the owner's."));
-    var dt=el("details","pc-text"),sm=el("summary",null,"Read the whole licence (version 2)");dt.appendChild(sm);dt.appendChild(el("div","pc-licence",o.licence||""));c.appendChild(dt);
+    var lv=(/Version (\d+)/.exec(o.licence||"")||[])[1],dt=el("details","pc-text"),sm=el("summary",null,"Read the whole licence"+(lv?" (version "+lv+")":""));dt.appendChild(sm);dt.appendChild(licenceDoc(o.licence||"",o.appName));c.appendChild(dt);
     var r0=el("div","pc-row"),sv=el("button",C.btn,"Save the licence");sv.type="button";sv.onclick=function(){save("LICENCE.txt","text/plain",o.licence||"");};r0.appendChild(sv);c.appendChild(r0);
     /* permissions on this device */
     c.appendChild(el("h3","pc-sub","Permissions on this device"));

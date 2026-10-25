@@ -44,3 +44,18 @@ keys must be treated as known to others, so both are being replaced.
    and whoever the owner adds can read them. The old keys also remain in the repositories' history. Taking them out of it
    means rewriting the history (a force push), which is the owner's call; once the keys are replaced, the old ones are of
    no use to anyone against an app that has updated.
+
+## 25 October 2026 (Ingenium 6.7): the new key is made, and the change needs one secret
+
+- A new Ingenium key was made (RSA 4096, valid 30 years, "CN=Yannie D. Forest, O=The Offline Project"), with the lineage in
+  which the old key vouches for it (`signing/lineage-2026.bin` in Ingenium-Android-fire; the old key keeps no right to roll the
+  app back). Both keys ride in `signing/ingenium-signing-2026.gpg` (gpg, AES-256, a passphrase of about 150 bits), which opens
+  only with the secret `ANDROID_SIGNING_PASSPHRASE`.
+- build-android.yml opens it when that secret is there, and the Gradle task signs with the old key for Android 7 and 8 and the
+  new key, through the lineage, for Android 9 and newer (`--rotation-min-sdk-version 28`), as the emulator checks proved.
+  Checked here with Android's apksigner (build-tools 35): an APK made by the page's own maker, signed this way, verifies for
+  Android 7 (old key, v2) and Android 9 and newer (new key, v3), and stays aligned to 4096 bytes. The workflow's step was run
+  here with the real passphrase (it opens the file and masks both passwords) and with a wrong one (it stops with a clear error).
+- What the owner does: add the one secret (signing/SIGNING.txt has the steps), then run the build. After the first build
+  signed with the new key, `signing/ingenium-release.keystore` can be deleted from Ingenium-Android-fire.
+- The Forge's Fire key (Forge-Fire) is not in this session's repositories, so it is still to be changed the same way.
