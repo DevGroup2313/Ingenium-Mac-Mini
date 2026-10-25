@@ -51,6 +51,19 @@ edit('var d=document.createElement("div");d.innerHTML=n.text||"";return (d.inner
      'return IngSafe.text(n.text||"").trim();', "6.7 notes handed on as words")
 edit('function stripTags(h){var d=document.createElement("div");d.innerHTML=String(h||"");return (d.textContent||"").replace(/\\s+/g," ").trim();}',
      'function stripTags(h){return IngSafe.text(String(h||"")).replace(/\\s+/g," ").trim();}', "6.7 search snippets read as words")
+# 6.7 (page-injection 3): the stage keys a page's store by where it comes from (modules/r179.js). The places that open a
+# Code app's file say so here: the app's id and the file's name (sid), and when the app was made (born), so every edit and
+# version of the app keeps its data and a file of the same name elsewhere cannot reach it.
+edit('if(h)csShow({kind:"file",html:h,name:(m?m.name:pr.name)},{user:true});',
+     'if(h)csShow({kind:"file",html:h,name:(m?m.name:pr.name),sid:"code:"+pr.id+":"+String(m?m.name:"").slice(0,120),born:pr.made||0},{user:true});',
+     "6.7 a Code app's preview keeps its store by the app")
+edit('if(/\\.html?$/i.test(f.name))csShow({kind:"file",html:t||"",name:f.name},{user:true});',
+     'if(/\\.html?$/i.test(f.name))csShow({kind:"file",html:t||"",name:f.name,sid:"code:"+pr.id+":"+String(f.name).slice(0,120),born:pr.made||0},{user:true});',
+     "6.7 a Code app's page keeps its store by the app")
+edit('if(e.kind==="page")csShow({kind:"file",html:t,name:e.file},{user:true});',
+     'if(e.kind==="page"){var __pr=(typeof ccProj==="function")?ccProj():null;'
+     'csShow({kind:"file",html:t,name:e.file,sid:__pr?"code:"+__pr.id+":"+String(e.file).slice(0,120):"chat:"+String(curChat().id).slice(0,40)+":file:"+String(e.file).slice(0,120),born:__pr?(__pr.made||0):0},{user:true});}',
+     "6.7 a changed file keeps the store of its app or conversation")
 
 # ---- R123: a window of its own (#ingapp=...) shows one app and never writes Ingenium's own desk, so it can never
 #      put an older copy of the desk over the newer one the main window keeps ----
@@ -617,6 +630,12 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tr = _ilu.spec_from_file_location("tabula_room_patch", os.path.join(HERE, "apps", "tabula_room_patch.py"))
         _trm = _ilu.module_from_spec(_tr); _tr.loader.exec_module(_trm)
         _html = _trm.patch(_html)
+    # 6.7 (security audit): what each app takes in from a file, a stored or restored document or another window goes
+    # through the strict sanitiser the frame carries (apps/safe_import_patch.py)
+    import importlib.util as _ilu
+    _sip = _ilu.spec_from_file_location("safe_import_patch", os.path.join(HERE, "apps", "safe_import_patch.py"))
+    _sipm = _ilu.module_from_spec(_sip); _sip.loader.exec_module(_sipm)
+    _html = _sipm.patch(_name, _html)
     _apps += '<script type="text/plain" id="ing-app-' + _name + '">' + _b64.b64encode(_html.encode("utf-8")).decode("ascii") + '</script>\n'
 # ---- R120 (17 October 2026): The Forge and Inkwell, carried inside the page (apps/builtin, from apps/update_builtin.py);
 #      each is checked here against its own size and fingerprint before it rides along ----

