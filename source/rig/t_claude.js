@@ -107,7 +107,8 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,zipfile,os\nd,z=sys.argv[1],
   ok(re.r.fresh === 0 && re.r.updated === 3 && re.r.projAdded === 0 && re.pj === 1, 'the same export again updates what is there, with no second project', JSON.stringify(re));
 
   // R132: Settings shows the room; a desk the small store refuses goes to the larger one and comes back on the next start
-  await p.evaluate(() => go('settings')); await p.waitForTimeout(900);
+  // 6.7: Settings is in rooms (r173); Data on this device is in Your data, so that room is opened first, as a person would
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForTimeout(900);
   const room = await p.evaluate(() => ({ t: (document.getElementById('r132Sum') || {}).textContent || '', key: !!document.getElementById('clSetKey'), w: (document.getElementById('r132Fill') || {}).style ? document.getElementById('r132Fill').style.width : '' }));
   ok(/Ingenium uses .* here; the browser offers it about/.test(room.t) && /small store/.test(room.t) && room.key, 'Settings, Data on this device, says how much room Ingenium uses and offers, and has the key to bring in Claude data', JSON.stringify(room));
   await p.locator('#r132Room').scrollIntoViewIfNeeded(); await p.screenshot({ path: path.join(OUT, 'settings_room.png') });

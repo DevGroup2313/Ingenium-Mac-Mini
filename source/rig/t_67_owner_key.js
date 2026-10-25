@@ -13,7 +13,8 @@ async function open(b, url) {
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true }); const p = await ctx.newPage(); p.__errs = []; p.__dl = [];
   p.on('pageerror', e => p.__errs.push(e.message)); p.on('download', d => p.__dl.push(d));
   await p.goto(url); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 180000 }); await p.waitForTimeout(1200);
-  await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('settings'); });
+  // 6.7: Settings is in rooms (r173); the licence card is in Ownership, so that room is opened, as a person would
+  await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('settings'); if (window.IngRooms) IngRooms.open('settings', 'own'); });
   await p.waitForSelector('#ingPermitCard', { timeout: 20000 }); await p.waitForTimeout(600); return { ctx, p };
 }
 const press = (p, text) => p.evaluate(t => { const b = [...document.querySelectorAll('#ingPermitCard button')].find(x => x.textContent.trim() === t || x.textContent.trim().indexOf(t) === 0); if (!b) return false; b.click(); return true; }, text);

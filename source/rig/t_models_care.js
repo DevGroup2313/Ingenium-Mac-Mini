@@ -74,6 +74,8 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.screenshot({ path: OUT + '/models-health.png' });
 
   // 5. the catalogue: 34 models, grouped by what fits, with filters and a search
+  // 6.7: the catalogue has a room of its own on the Models page (r173); its tab is pressed first, as a person would
+  await p.evaluate(() => { const t = document.getElementById('rmT-models-catalogue'); if (t) t.click(); }); await p.waitForTimeout(300);
   const cat = await p.evaluate(() => { const box = document.getElementById('catBox'); const groups = [...box.querySelectorAll('.cat-group')].map(g => g.textContent); return { n: ING_CATALOG.length, rows: box.querySelectorAll('.cat-row').length, groups, eyes: ING_CATALOG.filter(e => e.eyes).length, code: ING_CATALOG.filter(e => e.code).length, vision: ING_CATALOG.filter(e => e.vision).every(e => e.vision.repos.length && e.vision.prefer.length), more: !!box.querySelector('.cat-more'), filters: [...box.querySelectorAll('.cat-tools .seg-btn')].map(b => b.textContent) }; });
   ok(cat.n === 34 && cat.eyes >= 10 && cat.code >= 3 && cat.vision, 'the catalogue holds 34 models; those that read pictures carry a projector listing, and the coders are marked', JSON.stringify({ n: cat.n, eyes: cat.eyes, code: cat.code }));
   ok(cat.groups.length === 2 && /^Fits this device · \d+/.test(cat.groups[0]) && /^Too large for this device · \d+/.test(cat.groups[1]) && cat.more, 'on a 16 GB device the list is grouped into what fits and what is too large, the large ones folded away', JSON.stringify(cat.groups));
