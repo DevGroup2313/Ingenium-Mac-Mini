@@ -1,7 +1,7 @@
 # Ingenium and The Forge: the manual screen reader protocol
 
-The automated half of the audit runs on every build (see "Before you start"). This protocol is the half that needs a
-person and a real screen reader on each device the apps ship to. It takes about 40 minutes for one app on one device.
+The automated half of the audit is run by hand before a release (see "Before you start"); it is not part of the GitHub
+builds. This protocol is the half that needs a person and a real screen reader on each device the apps ship to. It takes about 40 minutes for one app on one device.
 Run it for Ingenium and for The Forge on at least one Mac, one Windows PC, the Fire tablet and an iPhone or iPad before a
 release that changes how pages are drawn.
 
@@ -13,8 +13,10 @@ Run these first on the build you will test; a manual pass is only worth doing on
     node rig/a11y/ax_tree.js  <page url> <out folder> [the_forge]                # the accessibility tree a screen reader is given: names, roles, pictures
     node rig/a11y/orca_walk.js <page url> <out folder>                           # Orca (Linux) walks each page key by key (inside orca_env.sh)
 
-6.2 results, the build these words were written for: axe-core, 0 rules broken on 11 pages x day/night x desk/phone;
-the accessibility tree, 0 problems in 44 page views (it found 16 to 27 nameless icons a page, now hidden as decoration).
+6.2 results (22 October 2026), the last full run and the build these words were written for: axe-core, 0 rules broken on
+11 pages x day/night x desk/phone; the accessibility tree, 0 problems in 44 page views (it found 16 to 27 nameless icons a
+page, now hidden as decoration). Parts added since (the code editor, the model studio, Break it down and others) have not
+had a full run yet, and no manual pass with a screen reader has been recorded in the table at the end yet.
 Known and left for this protocol to judge: some keys repeat their words in one region with nothing to tell them apart
 (for example "Use this blend" on each ready blend, "Open Lector" on each recent document). Listen for whether the card
 around each one makes clear which it is.

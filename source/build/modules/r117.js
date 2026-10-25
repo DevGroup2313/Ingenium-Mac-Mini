@@ -28,7 +28,7 @@ function nameOf(m){return m?(m.customName||m.name||"Model"):"";}
 
 /* ---------- 1. Blend: a judge scores every answer before the final one is written ---------- */
 if(Array.isArray(STRATS)&&!STRATS.some(function(s){return s.id==="judge";}))
-  STRATS.push({id:"judge",name:"Judge and decide",desc:"Every model answers on its own. Then a judge (the model you weight highest, or the strongest) scores each answer for accuracy, completeness and clarity, says why, and writes the final answer from what held up."});
+  STRATS.push({id:"judge",name:"Judge and decide",desc:"Every model answers on its own. Then a judge (the model you weight highest, or else the largest) rates each answer for accuracy, completeness and clarity, says why, and writes the final answer from what held up. The ratings are the judge model's own opinion; they are not checked against sources."});
 function judgePrompt(r,good,task){var parts=good.map(function(a,k){return "Answer "+(k+1)+" (from "+a.name+"):\n"+a.text;}).join("\n\n---\n\n");
   return "You are the judge of several answers to the same question. First score each answer, one line per answer, in exactly this form and nothing else on the line:\n"
     +"Answer 1: accuracy 4/5, completeness 3/5, clarity 5/5. Reason: one sentence saying what is right, missing or wrong.\n"
@@ -74,7 +74,7 @@ blendRun=function(){var b=blState();
           r.scores={};good.forEach(function(a,k){var ix=r.answers.indexOf(a);if(pj.scores[k])r.scores[ix]=pj.scores[k];});
           var tot=function(s){return s.acc+s.comp+s.clar;},best=-1,bi=-1;Object.keys(r.scores).forEach(function(ix){var v=tot(r.scores[ix]);if(v>best){best=v;bi=+ix;}});if(bi>=0)r.scores[bi].best=true;
           r.combineText=pj.final;r.final={text:pj.final||t,by:r.combineBy,judged:true,sheet:t};});}
-      /* compare and combine: the strongest chosen model writes the one answer */
+      /* compare and combine: the largest chosen model writes the one answer */
       return blAsk(r,fa,judge,blMsgs(blCombinePrompt(r,good,task)),into).then(function(t){r.final={text:t,by:r.combineBy};});})
     .then(function(){r.status="done";},function(e){r.status=BL.stop?"stopped":"done";if(!BL.stop&&!r.final&&r.strategy!=="vote")r.error=String(e&&e.message||e);})
     .then(function(){r.done=Date.now();r.combining=false;BL.run=null;BL.stop=false;
@@ -93,8 +93,8 @@ window.blendRun=blendRun;(function rebind(){var k=$("blendRun");if(k)k.onclick=b
 
 /* ---------- 2. ready-made blends from the houses on this device ---------- */
 var PRESETS=[
-  {id:"second",name:"Second opinion",tiers:["scriba","magister"],strategy:"judge",think:false,line:"Two models answer; the stronger judges both, scores them, and writes the answer that held up."},
-  {id:"scholar",name:"Scholar's desk",tiers:["magister","scriba"],weights:{magister:3,scriba:1},strategy:"synth",think:true,line:"For essays and arguments: both think first, the stronger counts for three, and one careful answer is written."},
+  {id:"second",name:"Second opinion",tiers:["scriba","magister"],strategy:"judge",think:false,line:"Two models answer; the larger judges both, rates them, and writes the answer that held up."},
+  {id:"scholar",name:"Scholar's desk",tiers:["magister","scriba"],weights:{magister:3,scriba:1},strategy:"synth",think:true,line:"For essays and arguments: both think first, the larger counts for three, and one careful answer is written."},
   {id:"code",name:"Careful code",tiers:["faber","magister"],strategy:"refine",think:true,line:"Faber drafts the code; Magister reads it and improves it. The improved draft is the answer."},
   {id:"quick",name:"Quick draft, careful edit",tiers:["velox","magister"],strategy:"refine",think:false,line:"Velox drafts at once; Magister improves the draft."},
   {id:"three",name:"Best of three",tiers:["velox","scriba","magister"],strategy:"vote",think:false,line:"Three answers side by side; you keep the one you like best."}];
@@ -126,14 +126,14 @@ window.IngBlendPresets={list:PRESETS,recs:presetRecs,paint:paintPresets,parse:pa
      t:"🩺 Health",b:"The Health card shows the memory this device has for a model, what is loaded, and a line for each installed model: whether its file is the size its listing gives, whether it fits, and how fast it has been answering, with the engine's own count where the engine gives one.",
      tip:"A pace under two tokens a second tires. The card says which smaller house or quality answers sooner."},
     {chap:"Models",go:function(){go("models");},ring:["#catBox"],
-     t:"📚 More models",b:"Thirty-four strong, open models, grouped by what fits this device, with filters for those that answer at once, think first, write code or read pictures. Any installed one can serve a house or join a Blend."}];
+     t:"📚 More models",b:"Open models you can add, grouped by what fits this device, with filters for those that answer at once, think first, write code or read pictures. Any installed one can serve a house or join a Blend."}];
   var lector=[
     {chap:"Lector",sub:"The brief",go:function(){go("lector");},ring:["#l7Bf","#l7Brief"],
-     t:"📖 Lector",b:"Lector reads one of your apps or a long document from end to end, thinks aloud as it goes, and writes the documents you need from it: a dossier, a portfolio piece, a cover letter, an appendix. Everything stays on this device.",
+     t:"📖 Lector",b:"Lector reads one of your apps or a long document from end to end, thinks aloud as it goes, and writes the documents you need from it: a dossier, a portfolio piece, a cover letter, an appendix. It works on this device, or with your other computer's model when you have linked one.",
      tip:"Give it the whole app or the whole document. It reads part by part, so nothing is skipped."},
     {chap:"Lector",sub:"The right model",go:function(){go("lector");},ring:["#l7Model"],
-     t:"🎓 The best model for the work",b:"Lector names the model it will use and says when a stronger one is ready on this device; one press takes it. Examine each section is on by default: an examiner's pass holds every figure to the measures and every claim to the material, and Ingenium's own check sets spelling to British and strikes promotional words.",
-     tip:"For a doctoral standard, use the strongest model this device holds and leave the examiner on."},
+     t:"🎓 The model for the work",b:"Lector names the model it will use and says when a larger one is ready on this device; one press takes it. Examine each section is on by default: a second pass, by the same kind of model, strikes or marks what the material does not support, and Ingenium's own check sets spelling to British and strikes promotional words.",
+     tip:"For the most careful writing, use the largest model ready on this device and leave the examiner on. Read every document before you send it."},
     {chap:"Lector",go:function(){go("lector");},ring:["#l7Cite","#l7Bf"],
      t:"📑 Your sources, cited",b:"With Cite my sources on, Lector gives the writer the sources kept in Fontes, numbered, with your notes. A document that cites them ends with a References list in your chosen style, and no source that is not yours is ever invented."}];
   var fabrica=[
@@ -145,14 +145,14 @@ window.IngBlendPresets={list:PRESETS,recs:presetRecs,paint:paintPresets,parse:pa
     {chap:"Fabrica",sub:"GitHub inside",go:function(){go("fabrica");try{if(window.fbRooms)fbRooms.part("copies");}catch(e){}},ring:["#fbShip","#fbPanels"],
      t:"🌐 GitHub, when you want it",b:"Sign in with a token and each repository can be sent to GitHub and brought back, version for version, with the same identities. Releases, builds and their installers are reached from here. Without a token, Fabrica works entirely on this device."}];
   var scholar=[
-    {chap:"Scholarship",sub:"Every search vetted",go:function(){go("settings");},ring:["#srchPeer + .etrack","#srchScholar + .etrack"],/* R125: the switches' own inputs are drawn 0 by 0; their tracks are what shows */
-     t:"🔍 Searches you can trust",b:"Web search and Research look in the scholarly indexes first (OpenAlex, Crossref, Europe PMC, arXiv) and vet every source: a journal article with peer review confirmed, a preprint named as such, an encyclopaedia, a university page or an unvetted website. Peer-reviewed only keeps replies to journal articles, reviews and scholarly books.",
-     tip:"Retracted work is left out. Each source under a reply says what was checked."},
+    {chap:"Scholarship",sub:"Every source labelled",go:function(){go("settings");},ring:["#srchPeer + .etrack","#srchScholar + .etrack"],/* R125: the switches' own inputs are drawn 0 by 0; their tracks are what shows */
+     t:"🔍 Searches, labelled",b:"Web search and Research look in the scholarly indexes first (OpenAlex, Crossref, Europe PMC, arXiv) and label every source by what was checked: a journal article, with peer review confirmed when its journal is listed in DOAJ; a preprint, an editorial or a letter, named as such; a web page by its address only (an encyclopaedia, a university, or an unvetted website). Journal articles and scholarly books only keeps replies to those.",
+     tip:"Work the indexes mark as retracted is left out. Each source under a reply says what was checked."},
     {chap:"Scholarship",sub:"Fontes",go:function(){go("chat");},ring:["#chatImgBtn"],
      t:"📚 Fontes, your reference database",b:"My sources, in the + menu, keeps your references on this device: add one by its DOI or ISBN, paste BibTeX or RIS, or bring in a whole .bib, .ris or CSL-JSON file from Zotero. Find within it, sort it into collections, write a note on each, and send the sources with your message to write from and to cite."}];
   function insertAfterChap(chap,steps){var at=-1;ING_TOUR.forEach(function(s,i){if(s.chap===chap)at=i;});if(at<0)at=ING_TOUR.length-1;Array.prototype.splice.apply(ING_TOUR,[at+1,0].concat(steps));}
   insertAfterChap("Models",models);insertAfterChap("Making things",fabrica);insertAfterChap("Making things",lector);insertAfterChap("Fabrica",scholar);
-  try{if(typeof ING_TOUR_TEASERS==="object"){ING_TOUR_TEASERS.Lector=ING_TOUR_TEASERS.Lector||"the reader that writes your documents.";ING_TOUR_TEASERS.Fabrica=ING_TOUR_TEASERS.Fabrica||"your apps as repositories, tested and shipped.";ING_TOUR_TEASERS.Scholarship=ING_TOUR_TEASERS.Scholarship||"searches vetted, and your own reference database.";}}catch(e){}})();
+  try{if(typeof ING_TOUR_TEASERS==="object"){ING_TOUR_TEASERS.Lector=ING_TOUR_TEASERS.Lector||"the reader that writes your documents.";ING_TOUR_TEASERS.Fabrica=ING_TOUR_TEASERS.Fabrica||"your apps as repositories, with the checks you run and the packages you make.";ING_TOUR_TEASERS.Scholarship=ING_TOUR_TEASERS.Scholarship||"searches labelled by their sources, and your own reference database.";}}catch(e){}})();
 
 /* ---------- 4. the export carries Lector's documents and Fabrica's repositories ---------- */
 function exLectorDocs(){var out=[];try{var sets=(lxState().sets)||{};Object.keys(sets).forEach(function(k){var S=sets[k]||{},docs=S.docs||{};Object.keys(docs).forEach(function(kind){var d=docs[kind];if(d&&d.ref)out.push({ref:d.ref,title:d.title||kind,kind:kind,made:d.made});});});}catch(e){}

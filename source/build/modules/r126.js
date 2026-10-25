@@ -9,12 +9,13 @@
    The recipe is the process the owner's documents of 18 October 2026 were made by, kept here as code (recipe/recipe.json, written
    by gen_recipe.py) and as memory (state.recipe, and the owner's documents in Ingenium's own store on this device):
    1. Measure. Each app is opened from the copy kept on this device, in a hidden frame that has no storage of Ingenium's
-      and a policy that lets nothing leave the device: every request it tries is refused and written down. Its figures
+      and a policy that refuses every request it makes to another address (and, from 6.7, its moving the page to another
+      address, which an outer frame's own policy refuses): what it tries is refused and written down. Its figures
       are read from the app itself (build, tour, tutor, models...), with the size, lines and fingerprint of the copy.
       Each measurement is kept beside the ones before it, so that what a new build changed can be named.
    2. Keep. The owner's documents (Word, PDF, text) are kept on this device, the Word file itself too, never sent anywhere.
-   3. Check. Every figure a new build has made untrue is found where it stands in the owner's words, with the figure that
-      replaces it; and every sentence that breaks one of the owner's rules is marked (Lector in an academic document; Ingenium
+   3. Check. The figures the recipe knows that a new build has made untrue are found where the owner's words give them in
+      their usual forms, with the figure that replaces each; and sentences that break six of the owner's rules are marked (Lector in an academic document; Ingenium
       or Inkwell in a sociology one; "no request" where the app checks its own helper; a dash; an unverified source).
    4. Update. The figures the owner ticks are changed in the Word file itself, run by run, so the owner's layout and
       words stay as they were; the version before is kept. A sentence that needs new words can be offered to the model, with the rules
@@ -53,6 +54,7 @@ var PROBE=String(function(TOK){var REQ=[],sent=0;
   ["localStorage","sessionStorage"].forEach(function(n){try{window[n].getItem("x");}catch(e){try{Object.defineProperty(window,n,{value:S,configurable:true});}catch(e2){}}});
   try{indexedDB.open("x");}catch(e){try{Object.defineProperty(window,"indexedDB",{value:undefined,configurable:true});}catch(e2){}}
   try{navigator.serviceWorker;}catch(e){try{Object.defineProperty(navigator,"serviceWorker",{value:{register:function(){return Promise.reject(new Error("sandboxed"));},getRegistrations:function(){return Promise.resolve([]);},getRegistration:function(){return Promise.resolve(undefined);},addEventListener:function(){},removeEventListener:function(){},controller:null,ready:new Promise(function(){})},configurable:true});}catch(e2){}}
+  ["RTCPeerConnection","webkitRTCPeerConnection","RTCDataChannel"].forEach(function(n){try{Object.defineProperty(window,n,{value:undefined,configurable:true});}catch(e){}});
   var ERR=0;window.addEventListener("error",function(e){ERR++;try{e.preventDefault();}catch(x){}},true);window.addEventListener("unhandledrejection",function(e){ERR++;try{e.preventDefault();}catch(x){}});
   function measure(){var o={};function sh(k,f){try{var v=f();if(v!==undefined&&v!==null)o[k]=v;}catch(e){}}
     /* Carpe Diem */
@@ -78,16 +80,35 @@ var PROBE=String(function(TOK){var REQ=[],sent=0;
     sh("inkBuild",function(){return BUILD;});sh("inkTour",function(){return TOUR.length;});
     sh("title",function(){return document.title;});return o;}
   function send(){if(sent)return;sent=1;var f={};try{f=measure();}catch(e){}try{parent.postMessage({recipe:TOK,facts:f,req:REQ,errors:ERR},"*");}catch(e){}}
-  window.addEventListener("load",function(){setTimeout(send,6500);});setTimeout(send,32000);});
+  window.addEventListener("load",function(){setTimeout(send,6500);});window.addEventListener("pagehide",send);setTimeout(send,32000);});
 function inject(html,tok){var r='<meta http-equiv="Content-Security-Policy" content="'+CSP+'"><script>('+PROBE+')("'+tok+'");<\/script>';
   var m=/<head[^>]*>/i.exec(html.slice(0,20000));return m?html.slice(0,m.index+m[0].length)+r+html.slice(m.index+m[0].length):r+html;}
-function frameMeasure(text){return new Promise(function(res){var tok="rx"+Date.now().toString(36)+Math.random().toString(36).slice(2),done=false;
+/* 6.7: the app's frame is held inside a small outer frame whose own policy lets the frame it holds open nothing but this
+   device's own blob:, data: and about: pages. A page that moves itself to another address (location.href=...) is then
+   refused as well, and the outer frame says so; before, the move went out with whatever the address carried. The outer
+   frame makes the app's page from the text it is given and passes the probe's message on; it reaches nothing else. */
+var OUTER=String(function(){var T=null,f=null,loads=0;
+  function tell(o){try{parent.postMessage(o,"*");}catch(e){}}
+  document.addEventListener("securitypolicyviolation",function(e){if(T&&/^(frame|child)-src/.test(String(e.violatedDirective||e.effectiveDirective||"")))tell({recipe:T,moved:String(e.blockedURI||"another address")});},true);
+  window.addEventListener("message",function(e){var d=e.data;
+    if(e.source===parent&&d&&d.recipeOpen&&!f){T=d.recipeOpen;f=document.createElement("iframe");f.setAttribute("sandbox","allow-scripts");
+      f.style.cssText="position:fixed;left:0;top:0;width:1280px;height:820px;border:0";f.onload=function(){loads++;if(loads>1)tell({recipe:T,moved:"another page"});};
+      f.src=URL.createObjectURL(d.blob);document.body.appendChild(f);return;}
+    if(f&&e.source===f.contentWindow&&d&&d.recipe===T)tell(d);});});
+function frameMeasure(text){return new Promise(function(res){var tok="rx"+Date.now().toString(36)+Math.random().toString(36).slice(2),done=false,moved=[],late=null;
   var fr=document.createElement("iframe");fr.setAttribute("sandbox","allow-scripts");fr.setAttribute("aria-hidden","true");fr.tabIndex=-1;
   fr.style.cssText="position:fixed;left:-12000px;top:0;width:1280px;height:820px;border:0;pointer-events:none";
-  var url=URL.createObjectURL(new Blob([inject(text,tok)],{type:"text/html"}));
-  function fin(r){if(done)return;done=true;window.removeEventListener("message",on);try{fr.remove();}catch(e){}setTimeout(function(){URL.revokeObjectURL(url);},1000);res(r);}
-  function on(e){if(e.source===fr.contentWindow&&e.data&&e.data.recipe===tok)fin(e.data);}
-  window.addEventListener("message",on);setTimeout(function(){fin(null);},45000);fr.src=url;document.body.appendChild(fr);});}
+  var url=URL.createObjectURL(new Blob(['<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="'+CSP+'"><script>('+OUTER+')();<\/script></head><body></body></html>'],{type:"text/html"}));
+  function fin(r){if(done)return;done=true;window.removeEventListener("message",on);if(late)clearTimeout(late);try{fr.remove();}catch(e){}setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    if(moved.length){r=r||{recipe:tok,facts:{},req:[],errors:0};r.req=(r.req||[]).slice();
+      moved.forEach(function(u){if(!/^[a-z][\w+.-]*:\/\//i.test(u))return;if(/^https?:\/\/[^\/]+$/i.test(u))u+="/";if(!r.req.some(function(x){return x.u===u;}))r.req.push({u:u,how:"moving the page to another address"});});r.moved=true;}
+    res(r);}
+  function on(e){if(e.source!==fr.contentWindow||!e.data||e.data.recipe!==tok)return;
+    if(e.data.moved!=null){var u=String(e.data.moved);if(moved.indexOf(u)<0&&!(u==="another page"&&moved.length))moved.push(u);if(!late)late=setTimeout(function(){fin(null);},1500);return;}
+    fin(e.data);}
+  window.addEventListener("message",on);setTimeout(function(){fin(null);},45000);
+  fr.onload=function(){fr.onload=null;try{fr.contentWindow.postMessage({recipeOpen:tok,blob:new Blob([inject(text,tok)],{type:"text/html"})},"*");}catch(e){fin(null);}};
+  fr.src=url;document.body.appendChild(fr);});}
 function sha(u8){if(window.crypto&&crypto.subtle&&crypto.subtle.digest)return crypto.subtle.digest("SHA-256",u8).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0");}).join("");});
   return Promise.resolve(typeof libShaJS==="function"?libShaJS(u8):"");}
 function sortReq(req,base){var out={outside:[],loopback:[],own:[]};(req||[]).forEach(function(r){var u=r.u;
@@ -97,11 +118,11 @@ function factsOf(key,text,r,label){var u8=new TextEncoder().encode(text),f=(r&&r
   v.bytes=u8.length;v.mb=(u8.length/1e6).toFixed(1);v.lines=text.split("\n").length;
   if(key==="cd"&&f.cdBuild){v.pass=String(f.cdBuild.pass||"");v.stamp=String(f.cdBuild.stamp||"");v.date=String(f.cdBuild.date||"");v.edition=String(f.cdBuild.edition||"");}
   if(key==="cd"){["Tour","Tutor","Concepts","ConceptsDescribed","Guiding","Quizzes","Courses","Guide","Styles","Apps"].forEach(function(k){if(f["cd"+k]!=null)v[k.charAt(0).toLowerCase()+k.slice(1)]=f["cd"+k];});}
-  if(key==="forge"){/* its own build record first; else its About line, which shows "Build 641 · 9s73" since the dates left the apps (19 October), and showed a date before it until then */var r=f.forgeRec,b=/(?:(\d{4}-\d{2}-\d{2})\s*·\s*)?(\d+)\s*·\s*(\S+)/.exec(f.forgeBuild||"");if(r){v.pass=r.pass;v.stamp=r.stamp;if(r.date)v.date=r.date;}else if(b){if(b[1])v.date=b[1];v.pass=b[2];v.stamp=b[3];}if(f.forgeTour!=null)v.tour=f.forgeTour;if(f.forgeCarried)v.carried=f.forgeCarried;}
+  if(key==="forge"){/* its own build record first; else its About line, which shows "Build 641 · 9s73" since the dates left the apps (19 October), and showed a date before it until then *//* 6.7: its own name, so the frame's result (r, with the requests) is not overwritten */var rec=f.forgeRec,b=/(?:(\d{4}-\d{2}-\d{2})\s*·\s*)?(\d+)\s*·\s*(\S+)/.exec(f.forgeBuild||"");if(rec){v.pass=rec.pass;v.stamp=rec.stamp;if(rec.date)v.date=rec.date;}else if(b){if(b[1])v.date=b[1];v.pass=b[2];v.stamp=b[3];}if(f.forgeTour!=null)v.tour=f.forgeTour;if(f.forgeCarried)v.carried=f.forgeCarried;}
   if(key==="ingenium"){if(f.ingVersion)v.version=String(f.ingVersion);if(f.ingTour!=null)v.tour=f.ingTour;if(f.ingPages)v.pages=f.ingPages;
     var L=f.ingLineup;if(L){v.house=L.house;v.pinned=L.pinned;v.catalog=L.catalog;v.models=L.models;v.makers=L.makers;v.houseMakers=L.houseMakers;v.pmin=L.pmin;v.pmax=L.pmax;}}
   if(key==="inkwell"){var ib=/^([\d.]+)/.exec(String(f.inkBuild||""));if(ib)v.version=ib[1];if(f.inkTour!=null)v.tour=f.inkTour;}
-  v.requests=r?sortReq(r.req):null;v.read=!!(r&&r.facts&&Object.keys(r.facts).length>1);v.title=f.title||"";
+  v.requests=r?sortReq(r.req):null;v.read=!!(r&&r.facts&&Object.keys(r.facts).length>1);v.title=f.title||"";v.moved=!!(r&&r.moved);
   return sha(u8).then(function(h){v.sha=h;return v;});}
 var BUSY=null;
 function keptKeys(){var L={};try{L=libState().apps||{};}catch(e){}return KEYS.filter(function(k){return L[k]&&L[k].ref;});}
@@ -357,7 +378,7 @@ function suggest(d,f){var para=f.ctx,facts=factsText(),rule=(RX.rules.filter(fun
     var ok=figuresIn(para).concat(figuresIn(facts)),bad=figuresIn(t).filter(function(x){return ok.indexOf(x)<0&&+x>12;});
     if(bad.length)throw new Error("The model wrote figures that are not in the paragraph or the measures ("+bad.slice(0,4).join(", ")+"), so its version was set aside.");
     if(/—/.test(t))t=t.replace(/\s*—\s*/g,", ");
-    return {kind:"figure",app:f.app||"",fact:"words",label:"New words for: "+f.label,p:f.p,at:0,len:para.length,from:para,to:t,on:true,why:"Written by the model under your rules and checked: every figure in it is in the paragraph or the measures.",ctx:para};});}
+    return {kind:"figure",app:f.app||"",fact:"words",label:"New words for: "+f.label,p:f.p,at:0,len:para.length,from:para,to:t,on:true,why:"Written by the model under your rules and checked: every figure above twelve in it is in the paragraph or the measures.",ctx:para};});}
 
 /* ================= 5. WRITE BY THE RECIPE ================= */
 function factsText(){var out=[];KEYS.forEach(function(k){var L=latest(k);if(!L)return;var v=L.v,bits=[];
@@ -366,7 +387,7 @@ function factsText(){var out=[];KEYS.forEach(function(k){var L=latest(k);if(!L)r
     if(k==="ingenium")bits.push("version "+v.version,"guided tour of "+v.tour+" cards",v.house+" house models from "+v.houseMakers+" makers, "+v.pinned+" pinned by SHA-256",v.catalog+" catalogue models",v.models+" models in all from "+v.makers+" makers",v.pages+" pages");
     if(k==="inkwell")bits.push("version "+v.version,"guided tour of "+v.tour+" cards");
     bits.push(v.mb+" MB ("+nf(v.bytes)+" bytes) and "+nf(v.lines)+" lines in "+L.copy);
-    var R=v.requests;if(R)bits.push("requests on opening in Ingenium’s measuring frame, where none can leave the device: "+(R.outside.length?R.outside.length+" to outside services ("+R.outside.slice(0,3).join(", ")+")":"none to outside services")+(R.loopback.length?"; "+R.loopback.length+" to the device’s own loopback address":"")+(R.own.length?"; "+R.own.length+" to a file in its own folder":""));
+    var R=v.requests;if(R)bits.push("requests on opening in Ingenium’s measuring frame, whose policy refuses every request to another address: "+(v.moved?"it tried to move the page to another address, which was refused; ":"")+(R.outside.length?R.outside.length+" to outside services ("+R.outside.slice(0,3).join(", ")+")":"none to outside services")+(R.loopback.length?"; "+R.loopback.length+" to the device’s own loopback address":"")+(R.own.length?"; "+R.own.length+" to a file in its own folder":""));
     out.push("- "+NAME[k]+" (measured "+day(L.at)+"): "+bits.filter(Boolean).join("; ")+".");
     EDITIONS.forEach(function(E){var xc=edCopy(k,E.id);if(!xc)return;var XL=latest("x:"+xc.id),xv=XL.v,xb=[];
       if(xv.pass)xb.push("build "+xv.pass+(xv.date?", dated "+isoDay(xv.date):""));if(xv.tour!=null)xb.push("guided tour of "+xv.tour+" cards");if(xv.tutor!=null)xb.push("tutor of "+xv.tutor+" entries");
@@ -387,7 +408,7 @@ function sourcesToFontes(){if(typeof fontesAdd!=="function"){toast("My sources i
   return fontesAdd(RX.refs.map(function(r){return Object.assign(JSON.parse(JSON.stringify(r.csl)),{ingNote:"Verified for the recipe: "+r.supports+(r.caution?" Caution: "+r.caution:""),ingRecipe:r.key});}));}
 function recipeMd(){var L=["# The recipe","","Kept in Ingenium, "+RX.date+". The process your documents are made and kept true by.","","## Your rules",""];
   RX.rules.forEach(function(r,i){L.push((i+1)+". **"+you(r.title)+".** "+you(r.text));});
-  L.push("","## The steps","","1. Measure each app from the copy kept on the device, in a frame from which nothing can leave; keep each measurement beside the ones before.","2. Keep your documents on the device, the Word file itself too.","3. Check every figure a new build has changed, and every rule a sentence breaks.","4. Update your Word file in place, run by run; keep the version before.","5. Write by the rules, with the measures and only verified sources.","","## Your kinds of document","");
+  L.push("","## The steps","","1. Measure each app from the copy kept on the device, in a frame that refuses every request to another address; keep each measurement beside the ones before.","2. Keep your documents on the device, the Word file itself too.","3. Check the figures the recipe knows that a new build has changed, and the sentences that break the rules it checks.","4. Update your Word file in place, run by run; keep the version before.","5. Write by the rules, with the measures and only verified sources.","","## Your kinds of document","");
   RX.docs.forEach(function(t){L.push("### "+t.title,"For: "+t.audience+(t.academic?" (academic: no Lector)":"")+(t.sociology?" (sociology: Carpe Diem and The Forge only)":""),"Outline: "+t.outline.join("; ")+".",t.refs.length?"Cites: "+t.refs.join(", ")+".":"","");});
   L.push("## Verified sources","");RX.refs.forEach(function(r){L.push("- "+r.cite.replace(/\[([^\]]+)\]\([^)]+\)/g,"$1"),"  Supports: "+r.supports+(r.caution?" Caution: "+r.caution:""));});
   return L.join("\n");}
@@ -398,7 +419,7 @@ function rowsFor(key,slot){var H=st().facts[slot||key]||[],cur=H[0],prev=H[1];if
   return FIG[key].filter(function(fd){return cur.v[fd.k]!=null;}).map(function(fd){var was=prev?prev.v[fd.k]:B[fd.k];
     return {label:fd.label,now:String(cur.v[fd.k]),was:was!=null&&String(was)!==String(cur.v[fd.k])?String(was):"",how:fd.how};});}
 function sec(){var s=el("div","l-sec rx-sec");s.id="lxRxSec";s.appendChild(el("h3",null,"The recipe"));
-  s.appendChild(el("p","rx-lead","Keeps your documents true to each new build: it measures your apps here, finds every figure an update has changed in your own words, and updates your Word files in place, keeping each version. Lector writes by the same rules."));
+  s.appendChild(el("p","rx-lead","Keeps your documents true to each new build: it measures your apps here, finds the figures it knows that an update has changed, where your words give them in the usual forms, and updates your Word files in place, keeping each version. Lector writes by the same rules."));
   var S=st(),line=el("div","rx-status");var bits=KEYS.map(function(k){var L=latest(k);return L?NAME[k]+" "+(L.v.pass||L.v.version||"?"):null;}).filter(Boolean);
   line.textContent=bits.length?"Measured "+day(S.measured||latest(keptKeys()[0]||"cd")&&latest(keptKeys()[0]||"cd").at)+": "+bits.join(" · "):"Not measured yet on this device.";s.appendChild(line);
   var due=S.docs.filter(function(d){return (d.found||[]).some(function(f){return f.on&&f.to!=null;});}).length;
@@ -430,7 +451,7 @@ function paintSheet(){var sh=document.getElementById("lxRx");if(!sh)return;var k
   if(SHEET.tab==="facts")paintFacts(body);else if(SHEET.tab==="docs")paintDocs(body);else paintRecipe(body);body.scrollTop=keepScroll;}
 function btnq(label,on,cls){var b=el("button","l-btn"+(cls?" "+cls:""),label);b.type="button";b.onclick=on;return b;}
 function paintFacts(body){var S=st();
-  body.appendChild(el("p","rx-note","Each app is opened from the copy kept on this device, in a hidden frame with no access to Ingenium’s storage and a policy that refuses every request: what it tries is written down, and nothing leaves the device. Its figures are read from the app itself; size, lines and the SHA-256 fingerprint from the copy."));
+  body.appendChild(el("p","rx-note","Each app is opened from the copy kept on this device, in a hidden frame with no access to Ingenium’s storage. Its policy refuses every request the page makes to another address, for data, pictures, scripts, styles or forms, and refuses its moving to another address; what it tries is written down. Its figures are read from the app itself; size, lines and the SHA-256 fingerprint from the copy."));
   var keys=el("div","rx-keys");var mb=btnq(BUSY?"Measuring…":"Measure now",function(){runMeasure(mb);},"pri");mb.disabled=!!BUSY;keys.appendChild(mb);
   keys.appendChild(btnq("Measure another copy…",function(){var i=document.createElement("input");i.type="file";i.accept=".html,.htm";i.onchange=function(){var f=i.files&&i.files[0];if(!f)return;
       var form=el("div","rx-app rx-form");form.appendChild(el("h3",null,"Another copy: "+f.name));form.appendChild(el("div","rx-sub","An edition you keep outside Ingenium, such as a committee demonstration or a full edition. It is measured the same way and kept beside the others; measured again after an update, it keeps its history, and the figures your documents give to that edition are checked against it alone."));
@@ -458,11 +479,11 @@ function paintFacts(body){var S=st();
     if(key==="forge"&&L.v.carried){var row2=el("tr");row2.appendChild(el("td",null,"Carries"));row2.appendChild(el("td","n",L.v.carried.length+" apps"));row2.appendChild(el("td","w",""));
       row2.appendChild(el("td","h",L.v.carried.map(function(a){return a.title+" "+a.version+" ("+nf(a.size)+" bytes)";}).join("; ")));tb.appendChild(row2);}
     box.appendChild(tb);body.appendChild(box);});
-  if(!any)body.appendChild(el("p","rx-note","Nothing is measured yet. Measure now reads each app kept on this device; it takes about ten seconds an app."));
+  if(!any)body.appendChild(el("p","rx-note","Nothing is measured yet. Measure now reads each app kept on this device. In Ingenium’s own tests it took between ten and twenty seconds an app; a slower device takes longer."));
   var D=RX.devrec||{};Object.keys(D).forEach(function(k){var b=el("div","rx-app");b.appendChild(el("h3",null,NAME[k]+": figures from elsewhere"));b.appendChild(el("div","rx-sub","Not measured on this device: from "+D[k].source+". Documents attribute them so."));
     var tb=el("table","rx-t");D[k].items.forEach(function(x){var r=el("tr");r.appendChild(el("td",null,x[0]));r.appendChild(el("td","n",x[1]));tb.appendChild(r);});b.appendChild(tb);body.appendChild(b);});}
 function paintDocs(body){var S=st();
-  body.appendChild(el("p","rx-note","Your documents stay on this device: the Word file itself, and its text. Check finds every figure an update has changed, where it stands in your words, and every sentence that breaks one of your rules. Update changes only what you tick, in the Word file itself, so your layout and your words stay yours; the version before is kept."));
+  body.appendChild(el("p","rx-note","Your documents stay on this device: the Word file itself, and its text. Check finds the figures the recipe knows (builds, tour cards, tutor entries, sizes, lines and the like) where your words give them in the usual forms, and marks sentences that break six of your rules: Lector named in an academic document, the wrong apps in a sociology one, “no request”, a dash, a claim of parity and a pronoun. It also marks a source that is not verified. The rest is yours to read. Update changes only what you tick, in the Word file itself, so your layout and your words stay yours; the version before is kept."));
   var keys=el("div","rx-keys");keys.appendChild(btnq("Add your documents…",function(){var i=document.createElement("input");i.type="file";i.multiple=true;i.accept=".docx,.pdf,.txt,.md";
       i.onchange=function(){addDocs(i.files).then(function(ds){return Promise.all(ds.map(function(d){return check(d).catch(function(){});}));}).then(function(){paintSheet();place(true);});};i.click();},"pri"));
   if(S.docs.length)keys.appendChild(btnq("Check them all",function(){Promise.all(S.docs.map(function(d){return check(d).catch(function(e){toast(d.name+": "+(e&&e.message||e));});})).then(function(){paintSheet();place(true);});}));
@@ -491,7 +512,7 @@ function paintDocs(body){var S=st();
         if(f.kind==="rule"&&f.rule!=="sources"){var sg=btnq("Suggest new words",function(){sg.disabled=true;sg.textContent="The model is writing…";
             suggest(d,f).then(function(nf2){F.splice(fi+1,0,nf2);save();paintSheet();},function(e){sg.disabled=false;sg.textContent="Suggest new words";toast(String(e&&e.message||e));});},"quiet");tx.appendChild(sg);}
         r.appendChild(tx);list.appendChild(r);});box.appendChild(list);}
-    else if(F)box.appendChild(el("div","rx-ok","Nothing to change: every figure the recipe knows matches the latest measures, and no rule is broken."));
+    else if(F)box.appendChild(el("div","rx-ok","Nothing to change: the figures the recipe knows match the latest measures, and none of the rules it checks is broken."));
     body.appendChild(box);});}
 function paintRecipe(body){body.appendChild(el("p","rx-note","The recipe is kept in Ingenium’s own code (written "+RX.date+") and in its memory on this device. It is the process your documents are made and kept true by. Lector follows it when it writes"+(st().on!==false?" (on)":" (off: switch it on in Lector’s brief)")+"."));
   var keys=el("div","rx-keys");keys.appendChild(btnq("Put the verified sources in My sources",function(){var n=sourcesToFontes();if(n!==0)paintSheet();},"pri"));
@@ -512,11 +533,11 @@ function paintRecipe(body){body.appendChild(el("p","rx-note","The recipe is kept
 try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR)&&!ING_TOUR.some(function(c){return c&&c.r126;})){var at=-1;ING_TOUR.forEach(function(c,i){if(c&&c.chap==="Lector"&&c.sub==="Your apps")at=i;});
   if(at<0)ING_TOUR.forEach(function(c,i){if(c&&c.chap==="Lector")at=i;});
   if(at>=0)ING_TOUR.splice(at+1,0,{r126:1,chap:"Lector",sub:"The recipe",go:function(){go("lector");},ring:["#lxRxSec"],t:"🧾 The recipe",
-    b:"The recipe keeps your documents true to each new build. Measure now opens each of your apps in a frame from which nothing can leave this device and reads its figures. Then, in Your documents, Check finds every figure an update has changed in your own words, and every sentence that breaks one of your rules, and Update changes your Word file itself, keeping the version before.",
+    b:"The recipe keeps your documents true to each new build. Measure now opens each of your apps in a frame that refuses every request to another address, and reads its figures. Then, in Your documents, Check finds the figures it knows that an update has changed in your own words, and the sentences that break the rules it checks, and Update changes your Word file itself, keeping the version before.",
     tip:"After an update arrives, press Measure now, then Check. Your dossiers, CVs and kit catch up in a minute."});}}catch(e){}
 /* the tour: the apps card says Tabula holds a thesis (5.3, R127: apps/tabula_big_patch.py) */
 try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR))ING_TOUR.forEach(function(c){if(c&&c.sub==="Tabula and Abacus"&&typeof c.b==="string"&&c.b.indexOf("100,000")<0)
-  c.b+=" Tabula holds a thesis of 100,000 words: a keystroke is answered at once, because only the pages an edit moves are laid out again, and a long document is kept in the browser's larger store, so it is not lost.";});}catch(e){}
+  c.b+=" Tabula holds a thesis of 100,000 words. In Ingenium’s tests a keystroke reaches the screen in under 150 milliseconds (the median), because only the pages an edit moves are laid out again, and a long document is kept in the browser's larger store, so it is not lost.";});}catch(e){}
 /* the tour: a paragraph runs on across pages, and a footnote is placed in a moment (5.5, R128: apps/tabula_flow_patch.py) */
 try{if(typeof ING_TOUR!=="undefined"&&Array.isArray(ING_TOUR))ING_TOUR.forEach(function(c){if(c&&c.sub==="Tabula and Abacus"&&typeof c.b==="string"&&c.b.indexOf("runs on")<0)
   c.b+=" A paragraph runs on to the next page, as in Word, so no page ends in a blank gap, and a footnote is placed in a moment, even in a thesis.";});}catch(e){}

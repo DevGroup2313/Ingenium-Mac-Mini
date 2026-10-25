@@ -137,7 +137,7 @@ edit('  g.addEventListener("keydown",function(e){if(e.key!=="ArrowUp"&&e.key!=="
 
 # ---- R105: coding models for every device ----
 edit('reasons before it writes code."}},\n  /* per device:',
-     'reasons before it writes code."},\n    /* R105 (16 October 2026): coding models for every device, her word: "build into Ingenium some really strong, fast and\n       accurate and really powerful local models for coding ... the best models per devices ... for me to choose from".\n       Each file\'s name, size and SHA-256 were read from Hugging Face by .github/workflows/lineup-sources.yml on the day,\n       and each downloads without signing in. Scores are the makers\' own, from their model cards. */\n    "mellum2.1-12b-thinking":{name:"Mellum2.1 12B Thinking",maker:"JetBrains",params:12,thinks:true,\n      file:"Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf",size:8071295264,sha256:"ecc4d5b8107fc219e23c494b2d107552137637b6c6002ee713e0ba8af7fa2755",\n      url:"https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking-GGUF/resolve/main/Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf",\n      page:"https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"JetBrains\' coding model, updated on 7 October 2026. In its maker\'s tests it scores 82 on LiveCodeBench v6, 91.5 on HumanEval+ and 47 on SWE-bench Verified, well ahead of Mellum2. Only about 2.5B of its 12B parameters work on each word, so it writes quickly, and it reasons before it writes code."},\n    "gemma-4-12b":{name:"Gemma 4 12B",maker:"Google",params:12,thinks:true,\n      file:"gemma-4-12b-it-qat-q4_0.gguf",size:6975879296,sha256:"93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b",\n      url:"https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf",\n      page:"https://huggingface.co/google/gemma-4-12B-it",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s model of May 2026, in Google\'s own 4-bit form: 72% on LiveCodeBench v6 in its maker\'s tests, with broad knowledge besides code and a long memory (256K tokens). It can also read pictures.",\n      vision:{repos:["google/gemma-4-12B-it-qat-q4_0-gguf"],prefer:["mmproj-gemma-4-12b-it-qat-q4_0.gguf"]}},\n    "gemma-4-26b-a4b":{name:"Gemma 4 26B A4B",maker:"Google",params:26,thinks:true,\n      file:"gemma-4-26B_q4_0-it.gguf",size:14439363584,sha256:"3eca3b8f6d7baf218a7dd6bba5fb59a56ee25fe2d567b6f5f589b4f697eca51d",\n      url:"https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/main/gemma-4-26B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s mixture-of-experts Gemma 4: 77.1% on LiveCodeBench v6 in its maker\'s tests, and only about 3.8B of its 25B parameters work on each word, so it answers almost as fast as a 4B model. For computers with about 24 GB of memory or more."},\n    "gemma-4-e4b":{name:"Gemma 4 E4B",maker:"Google",params:4,thinks:true,\n      file:"gemma-4-E4B_q4_0-it.gguf",size:5154941280,sha256:"676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",\n      url:"https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/main/gemma-4-E4B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s Gemma 4 for phones and tablets: 4.5B parameters at work (52% on LiveCodeBench v6 in its maker\'s tests). For devices with about 12 GB of memory or more."},\n    "gemma-4-e2b":{name:"Gemma 4 E2B",maker:"Google",params:2,thinks:true,\n      file:"gemma-4-E2B_q4_0-it.gguf",size:3349516256,sha256:"fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",\n      url:"https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"The smallest Gemma 4: 2.3B parameters at work, and 44% on LiveCodeBench v6 in its maker\'s tests, a large step for its size. For phones and tablets with about 8 GB of memory."},\n    "lfm2.5-8b-a1b":{name:"LFM2.5 8B-A1B",maker:"Liquid AI",params:8,thinks:true,\n      file:"LFM2.5-8B-A1B-Q4_K_M.gguf",size:5155564768,sha256:"4923ec14f06b968b74d663e5949867d2d9c3bf13a20b8be1a9f9af39989b2bb0",\n      url:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-GGUF/resolve/main/LFM2.5-8B-A1B-Q4_K_M.gguf",\n      page:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B",licence:"LFM Open License v1.0",licenceUrl:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B/raw/main/LICENSE",\n      why:"Liquid AI\'s mixture-of-experts model: of its 8.3B parameters only 1.5B work on each word, so it answers quickly even on a processor alone, and it reasons before it answers."},\n    "lfm2.5-24b-a2b":{name:"LFM2.5 24B-A2B",maker:"Liquid AI",params:24,thinks:true,\n      file:"LFM2.5-24B-A2B-Q4_K_M.gguf",size:14526258464,sha256:"d3334405b96228eb9908cdebb5c6194908f2da64282bda852afc3a3910c64e7d",\n      url:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF/resolve/main/LFM2.5-24B-A2B-Q4_K_M.gguf",\n      page:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B",licence:"LFM Open License v1.0",licenceUrl:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B/raw/main/LICENSE",\n      why:"Liquid AI\'s largest model (9 October 2026), made for agents and tool use: about 2.4B of its 24B parameters work on each word, and in its maker\'s tests it beats Qwen3.6 35B-A3B on agentic work. For computers with about 24 GB of memory or more."},\n    "granite-4.2-3b":{name:"Granite 4.2 3B",maker:"IBM",params:3,thinks:false,\n      file:"granite-4.2-3b-Q4_K_M.gguf",size:2244011552,sha256:"e0406663965846ae22a403456eb826ccce5f450840491f71952f18a7cb78e7d5",\n      url:"https://huggingface.co/ibm-granite/granite-4.2-3b-GGUF/resolve/main/granite-4.2-3b-Q4_K_M.gguf",\n      page:"https://huggingface.co/ibm-granite/granite-4.2-3b",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"IBM\'s small model of August 2026, made for work and code, with a 128K memory. For tablets and phones with about 6 GB of memory or more."},\n    "qwen3-coder-30b-a3b":{name:"Qwen3-Coder 30B-A3B",maker:"Qwen (Alibaba)",params:30,thinks:false,\n      file:"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",size:18556689568,sha256:"fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",\n      url:"https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",\n      page:"https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct",licence:"Apache 2.0",licenceUrl:"https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/raw/main/LICENSE",\n      why:"Qwen\'s coding model for whole programs and whole code bases: 30.5B parameters with 3.3B at work on each word, and a 256K memory. It answers without stopping to think. For computers with about 32 GB of memory or more."},\n    "qwen2.5-coder-1.5b":{name:"Qwen2.5-Coder 1.5B",maker:"Qwen (Alibaba)",params:1.5,thinks:false,\n      file:"qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",size:1117320768,sha256:"cc324af070c2ecbfd324a30884d2f951a7ff756aba85cb811a6ec436933bb046",\n      url:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",\n      page:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct",licence:"Apache 2.0",licenceUrl:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/raw/main/LICENSE",\n      why:"Qwen\'s small coding model: quick on a tablet with little memory, for short pieces of code, checking and explaining. It knows far less than the larger models."}},\n  /* per device:',
+     'reasons before it writes code."},\n    /* R105 (16 October 2026): coding models for every device, her word: "build into Ingenium some really strong, fast and\n       accurate and really powerful local models for coding ... the best models per devices ... for me to choose from".\n       Each file\'s name, size and SHA-256 were read from Hugging Face by .github/workflows/lineup-sources.yml on the day,\n       and each downloads without signing in. Scores are the makers\' own, from their model cards. */\n    "mellum2.1-12b-thinking":{name:"Mellum2.1 12B Thinking",maker:"JetBrains",params:12,thinks:true,\n      file:"Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf",size:8071295264,sha256:"ecc4d5b8107fc219e23c494b2d107552137637b6c6002ee713e0ba8af7fa2755",\n      url:"https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking-GGUF/resolve/main/Mellum2.1-12B-A2.5B-Thinking-Q4_K_M.gguf",\n      page:"https://huggingface.co/JetBrains/Mellum2.1-12B-A2.5B-Thinking",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"JetBrains\' coding model, updated on 7 October 2026. In its maker\'s tests it scores 82 on LiveCodeBench v6, 91.5 on HumanEval+ and 47 on SWE-bench Verified, well ahead of Mellum2. Only about 2.5B of its 12B parameters work on each word, so it writes quickly, and it reasons before it writes code."},\n    "gemma-4-12b":{name:"Gemma 4 12B",maker:"Google",params:12,thinks:true,\n      file:"gemma-4-12b-it-qat-q4_0.gguf",size:6975879296,sha256:"93567e57a8fe10b23569b9d9ec38cd005deedf71e29477c421a4b83f418a538b",\n      url:"https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf",\n      page:"https://huggingface.co/google/gemma-4-12B-it",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s model of May 2026, in Google\'s own 4-bit form: 72% on LiveCodeBench v6 in its maker\'s tests, with broad knowledge besides code and a long memory (256K tokens). It can also read pictures.",\n      vision:{repos:["google/gemma-4-12B-it-qat-q4_0-gguf"],prefer:["mmproj-gemma-4-12b-it-qat-q4_0.gguf"]}},\n    "gemma-4-26b-a4b":{name:"Gemma 4 26B A4B",maker:"Google",params:26,thinks:true,\n      file:"gemma-4-26B_q4_0-it.gguf",size:14439363584,sha256:"3eca3b8f6d7baf218a7dd6bba5fb59a56ee25fe2d567b6f5f589b4f697eca51d",\n      url:"https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf/resolve/main/gemma-4-26B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s mixture-of-experts Gemma 4: 77.1% on LiveCodeBench v6 in its maker\'s tests, and only about 3.8B of its 25B parameters work on each word, so it answers almost as fast as a 4B model. For computers with about 24 GB of memory or more."},\n    "gemma-4-e4b":{name:"Gemma 4 E4B",maker:"Google",params:4,thinks:true,\n      file:"gemma-4-E4B_q4_0-it.gguf",size:5154941280,sha256:"676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",\n      url:"https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf/resolve/main/gemma-4-E4B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-E4B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"Google\'s Gemma 4 for phones and tablets: 4.5B parameters at work (52% on LiveCodeBench v6 in its maker\'s tests). For devices with about 12 GB of memory or more."},\n    "gemma-4-e2b":{name:"Gemma 4 E2B",maker:"Google",params:2,thinks:true,\n      file:"gemma-4-E2B_q4_0-it.gguf",size:3349516256,sha256:"fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",\n      url:"https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf",\n      page:"https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"The smallest Gemma 4: 2.3B parameters at work, and 44% on LiveCodeBench v6 in its maker\'s tests, a large step for its size. For phones and tablets with about 8 GB of memory."},\n    "lfm2.5-8b-a1b":{name:"LFM2.5 8B-A1B",maker:"Liquid AI",params:8,thinks:true,\n      file:"LFM2.5-8B-A1B-Q4_K_M.gguf",size:5155564768,sha256:"4923ec14f06b968b74d663e5949867d2d9c3bf13a20b8be1a9f9af39989b2bb0",\n      url:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-GGUF/resolve/main/LFM2.5-8B-A1B-Q4_K_M.gguf",\n      page:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B",licence:"LFM Open License v1.0",licenceUrl:"https://huggingface.co/LiquidAI/LFM2.5-8B-A1B/raw/main/LICENSE",\n      why:"Liquid AI\'s mixture-of-experts model: of its 8.3B parameters only 1.5B work on each word, so it answers quickly even on a processor alone, and it reasons before it answers."},\n    "lfm2.5-24b-a2b":{name:"LFM2.5 24B-A2B",maker:"Liquid AI",params:24,thinks:true,\n      file:"LFM2.5-24B-A2B-Q4_K_M.gguf",size:14526258464,sha256:"d3334405b96228eb9908cdebb5c6194908f2da64282bda852afc3a3910c64e7d",\n      url:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF/resolve/main/LFM2.5-24B-A2B-Q4_K_M.gguf",\n      page:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B",licence:"LFM Open License v1.0",licenceUrl:"https://huggingface.co/LiquidAI/LFM2.5-24B-A2B/raw/main/LICENSE",\n      why:"Liquid AI\'s largest model (9 October 2026), made for agents and tool use: about 2.4B of its 24B parameters work on each word, and its maker calls it competitive with Qwen3.6 35B-A3B on agent and tool tasks. In the maker\'s tests it is ahead on some of these and behind on others, and well behind on SWE-bench Verified, a coding test (51 against 66). For computers with about 24 GB of memory or more."},\n    "granite-4.2-3b":{name:"Granite 4.2 3B",maker:"IBM",params:3,thinks:false,\n      file:"granite-4.2-3b-Q4_K_M.gguf",size:2244011552,sha256:"e0406663965846ae22a403456eb826ccce5f450840491f71952f18a7cb78e7d5",\n      url:"https://huggingface.co/ibm-granite/granite-4.2-3b-GGUF/resolve/main/granite-4.2-3b-Q4_K_M.gguf",\n      page:"https://huggingface.co/ibm-granite/granite-4.2-3b",licence:"Apache 2.0",licenceUrl:"https://www.apache.org/licenses/LICENSE-2.0",\n      why:"IBM\'s small model of August 2026, made for work and code, with a 128K memory. For tablets and phones with about 6 GB of memory or more."},\n    "qwen3-coder-30b-a3b":{name:"Qwen3-Coder 30B-A3B",maker:"Qwen (Alibaba)",params:30,thinks:false,\n      file:"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",size:18556689568,sha256:"fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",\n      url:"https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/main/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",\n      page:"https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct",licence:"Apache 2.0",licenceUrl:"https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/raw/main/LICENSE",\n      why:"Qwen\'s coding model for whole programs and whole code bases: 30.5B parameters with 3.3B at work on each word, and a 256K memory. It answers without stopping to think. For computers with about 32 GB of memory or more."},\n    "qwen2.5-coder-1.5b":{name:"Qwen2.5-Coder 1.5B",maker:"Qwen (Alibaba)",params:1.5,thinks:false,\n      file:"qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",size:1117320768,sha256:"cc324af070c2ecbfd324a30884d2f951a7ff756aba85cb811a6ec436933bb046",\n      url:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-1.5b-instruct-q4_k_m.gguf",\n      page:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct",licence:"Apache 2.0",licenceUrl:"https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct/raw/main/LICENSE",\n      why:"Qwen\'s small coding model: quick on a tablet with little memory, for short pieces of code, checking and explaining. It knows far less than the larger models."}},\n  /* per device:',
      'R105 coding models')
 edit('faber:["lfm2.5-2.6b","qwen3.5-2b","lfm2.5-1.2b-thinking"]}},',
      'faber:["gemma-4-e4b","gemma-4-e2b","lfm2.5-2.6b","granite-4.2-3b","qwen3.5-2b","qwen2.5-coder-1.5b","lfm2.5-1.2b-thinking"]}},',
@@ -235,15 +235,15 @@ edit("""  if(note)body.push(lxhPara(lxhInline(note,{i:1,sz:10.5,color:"454549"})
 edit('    if(!sch&&!(w.web&&w.research))return orig.apply(this,arguments);\n',
      '    /* R115: every search is vetted the same way, with or without the scholarly indexes */\n', "R115 vet every search")
 edit('"🎓 Searching scholarly sources and the web…"',
-     '(sch?"🎓 Searching scholarly sources and the web…":"🌐 Searching the web; each source is checked…")', "R115 status")
+     '(sch?"🎓 Searching scholarly sources and the web…":"🌐 Searching the web; each source is labelled by its kind…")', "R115 status")
 edit('      wb.sort(schRank);var all=sc.concat(wb.slice(0,deep?4:3));',
      '      wb.sort(schRank);var all=(typeof schPeerOnly==="function"&&schPeerOnly())?sc.filter(schIsPeer):sc.concat(wb.slice(0,deep?4:3));\n'
-     '      if(!all.length&&typeof schPeerOnly==="function"&&schPeerOnly())throw new Error("no peer-reviewed source was found for this; switch Peer-reviewed only off in Settings to allow preprints, books and web pages");',
+     '      if(!all.length&&typeof schPeerOnly==="function"&&schPeerOnly())throw new Error("no journal article or scholarly book was found for this; switch Journal articles and scholarly books only off in Settings to allow preprints and web pages");',
      "R115 peer-reviewed only")
 edit('Retracted work is left out, preprints are named as such, and each source shows what was checked.</div></div></div>',
-     'Retracted work is left out, preprints are named as such, and each source shows what was checked.</div></div></div>\n'
+     'Work that OpenAlex, Crossref or Europe PMC marks as retracted is left out (arXiv is not checked for withdrawals), preprints are named as such, and each source shows what was checked.</div></div></div>\n'
      '        <div class="sch-set"><label class="eswitch"><input type="checkbox" id="srchPeer"><span class="etrack"></span></label>\n'
-     '          <div><b>Peer-reviewed only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no encyclopaedias, no web pages. A journal listed in DOAJ is marked as peer review confirmed; others as journal articles whose review is not independently confirmed.</div></div></div>',
+     '          <div><b>Journal articles and scholarly books only</b><div class="small muted">Replies rest on journal articles, reviews and scholarly books alone: no preprints, no editorials or letters, no encyclopaedias, no web pages. Peer review is confirmed only for a journal listed in DOAJ; for other journals and for books it is not checked.</div></div></div>',
      "R115 peer-reviewed switch")
 
 # ---- R119 (17 October 2026): the Inbox, Carpe Diem's 💭; its words on the Focus page, in the guide and on the button ----
@@ -497,33 +497,35 @@ edit('windows:"DevGroup2313/Ingenium-Windows"}', 'windows:"DevGroup2313/Ingenium
 #      (1.3 million numbers) and Small (6 million), Medium (16 million) and Large (41 million), for a strong computer and much
 #      more text, each saying how much text it wants. The trainer now trains every weight (desktop/app_train_65.py: llama.cpp
 #      left the K and V projections untrained when its batch was smaller than the context), which takes about half as long
-#      again; the estimate follows the times measured for each size (source/rig/train_sizes.txt) ----
+#      again; the estimate is cautious, about half as long again as the times measured for each size (source/rig/train_sizes.txt).
+#      6.7: the paces and the words now follow those measurements; what was not measured is said to be so ----
 edit('function trainEstimate(chars,size,passes,cores){var perPass=18*(chars/144000)*(3/Math.max(1,(cores||4)-1))*(size==="small"?3.4:1);return Math.max(10,Math.round(perPass*passes+3));}',
-     'var TRAIN_PACE={tiny:1,small:3,medium:6,large:16},TRAIN_BASE_PACE=0.5;'
+     'var TRAIN_PACE={tiny:1,small:2.5,medium:6,large:14.5},TRAIN_BASE_PACE=0.5;'
      'function trainEstimate(chars,size,passes,cores){var pace=/^base:/.test(String(size))?TRAIN_BASE_PACE*(+String(size).slice(5)||135000000)/1328256:(TRAIN_PACE[size]||1);'
      'var perPass=26*(chars/144000)*(3/Math.max(1,(cores||4)-1))*pace;return Math.max(10,Math.round(perPass*passes+3));}',
      "6.5 the trainer's estimate for each size")
 edit('[["tiny","Tiny","About 1.3 million numbers: the fastest"],["small","Small","About 6 million numbers: learns more, about three and a half times slower"]]',
      '[["tiny","Tiny","About 1.3 million numbers: the fastest. A few pages of text are enough."],'
-     '["small","Small","About 6 million numbers: learns more from 50,000 characters or more; about "+TRAIN_PACE.small+" times slower than Tiny."],'
-     '["medium","Medium","About 16 million numbers: for a long book\'s worth of text (500,000 characters or more) and a strong computer; about "+TRAIN_PACE.medium+" times slower than Tiny."],'
-     '["large","Large","About 41 million numbers: for 2 million characters or more, on a strong computer; about "+TRAIN_PACE.large+" times slower than Tiny, often hours."]]',
+     '["small","Small","About 6 million numbers: learns more from 50,000 characters or more; about 2.5 times slower than Tiny."],'
+     '["medium","Medium","About 16 million numbers: meant for much more text than Small, perhaps 500,000 characters or more (not yet measured), and a strong computer; about 5 to 7 times slower than Tiny."],'
+     '["large","Large","About 41 million numbers: meant for still more text, perhaps 2 million characters or more (not yet measured), on a strong computer; about 14 to 15 times slower than Tiny, often hours."]]',
      "6.5 four sizes")
 edit('sg.appendChild(seg);b.appendChild(sg);}',
      'sg.appendChild(seg);b.appendChild(sg);'
      'var SZ={tiny:["About 1.3 million numbers",2000],small:["About 6 million numbers",50000],medium:["About 16 million numbers",500000],large:["About 41 million numbers",2000000]}[w.size]||["",0];'
      'var nl=w.text.length,hint=el("div","small muted tr-size");'
-     'hint.textContent=SZ[0]+". "+(nl&&nl<SZ[1]?"It wants "+SZ[1].toLocaleString()+" characters or more; with "+nl.toLocaleString()+", a smaller size learns about as much and sooner, and a larger one only learns this text by heart.":"Its text: "+SZ[1].toLocaleString()+" characters or more.");'
+     'hint.textContent=SZ[0]+". "+(nl&&nl<SZ[1]?"It is meant for about "+SZ[1].toLocaleString()+" characters or more; you have "+nl.toLocaleString()+"."+(w.size==="medium"||w.size==="large"?" On 150,000 characters, Small learned as much as Medium and Large in three passes, and sooner. A larger size is worth trying with much more text.":""):"It is meant for about "+SZ[1].toLocaleString()+" characters or more.");'
      'b.appendChild(hint);}',
      "6.5 what each size wants")
 edit("The tiny model here has about 1.3 million of them; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
-     "The tiny model here has about 1.3 million of them and the large one about 41 million; the models in Ingenium\\'s lineup have from about one billion to twelve billion.</li>",
+     "The tiny model here has about 1.3 million of them and the large one about 41 million; the models in Ingenium\\'s lineup have from about 350 million to about 30 billion. In the largest, only about 3 billion of them work on each word.</li>",
      "6.5 the lesson names the large size")
 
 # ---- 6.6 (24 October 2026): a model you have, trained further on your own text (desktop/app_studio_65.py has the trainer's
 #      side). The size step asks where to start: a new model (random numbers, as before) or one of the person's models that
 #      llama.cpp's trainer can take (Llama-shaped, in 32, 16 or 8 bits), each with the memory its training needs; one it
-#      cannot take says why. A model started from one already trained keeps what it knew, so one or two passes are enough,
+#      cannot take says why. A model started from one already trained starts from what it knew (one pass was enough in the one
+#      model measured, source/rig/train_sizes.txt part 4),
 #      and the chart's line for guessing at random belongs to a model trained from zero only ----
 edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null}',
      'var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelId||null,base:"",bases:null}', "6.6 the wizard remembers where it starts")
@@ -533,7 +535,7 @@ edit('Promise.resolve(a.train_available()).then(function(av){cores=(av&&av.cores
      "6.6 the models it could start from")
 edit('      else{var sg=el("div","field");sg.appendChild(el("span",null,"Size"));var seg=el("div","seg");',
      '      else{var fr=el("div","field");fr.appendChild(el("span",null,"Start from"));var fseg=el("div","seg");'
-     '[["zero","A new model","It starts as random numbers and learns only from your text"],["model","A model you have","It keeps what it already knew and learns your text\'s way of writing"]].forEach(function(o){'
+     '[["zero","A new model","It starts as random numbers and learns only from your text"],["model","A model you have","It starts from what it already knows and learns your text\'s way of writing"]].forEach(function(o){'
      'var bt=el("button","seg-btn"+((w.base?"model":"zero")===o[0]?" active":""),o[1]);bt.type="button";bt.title=o[2];'
      'bt.onclick=function(){if(o[0]==="zero"){if(w.base){w.base="";w.passes=8;}}else if(!w.base){var c=(w.bases||[]).filter(function(m){return m.trainable&&m.fits;})[0];w.base=c?c.id:"none";w.passes=1;}paint();};fseg.appendChild(bt);});'
      'fr.appendChild(fseg);b.appendChild(fr);}\n'
@@ -543,7 +545,7 @@ edit('      else{var sg=el("div","field");sg.appendChild(el("span",null,"Size"))
      'else{var bsel=el("select","tr-base");bsel.setAttribute("aria-label","The model to start from");okm.forEach(function(m){var o=el("option",null,m.name+" · "+Math.round((m.params||0)/1e6)+" million numbers · needs about "+m.needGB+" GB"+(m.fits?"":" (more than this computer has)"));o.value=m.id;o.disabled=!m.fits;bsel.appendChild(o);});'
      'if(!okm.some(function(m){return m.id===w.base&&m.fits;}))w.base=(okm.filter(function(m){return m.fits;})[0]||{}).id||"none";bsel.value=w.base;bsel.onchange=function(){w.base=bsel.value;paint();};bf.appendChild(bsel);}'
      'b.appendChild(bf);var nok=(bl||[]).filter(function(m){return !m.trainable;});if(nok.length)b.appendChild(el("div","small muted tr-why",nok.length+" of your models cannot be trained here. "+nok[0].name+": "+nok[0].why));'
-     'b.appendChild(el("div","small muted tr-size","It keeps what it already knew and learns your text\'s way of writing. One pass is enough (it reads each part twice); a second can help with much text; more can make it forget what it knew."));}\n'
+     'b.appendChild(el("div","small muted tr-size","It learns your text\'s way of writing and should keep most of what it knew. A pass reads each part twice. In Ingenium\'s own test, one pass was enough: SmolLM2 135M, trained on part of a novel, read the rest of the novel better and still answered in chat. More passes have not been measured, and training too hard can make a model forget what it knew."));}\n'
      '      else if(!w.fromModel){var sg=el("div","field");sg.appendChild(el("span",null,"Size"));var seg=el("div","seg");',
      "6.6 start from a new model or one you have")
 edit('var pl=el("label","field");pl.appendChild(el("span",null,"Passes: "+w.passes));var rg=el("input");rg.type="range";rg.min=2;rg.max=30;rg.value=w.passes;',
@@ -572,6 +574,202 @@ edit("""+'<line x1="'+L+'" y1="'+y(RAND).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(RA
      "6.6 the random line drawn for a new model only")
 edit('var c=trainChart(st.history);', 'var c=trainChart(st.history,!!(st.nvocab&&st.nvocab!==2048));', "6.6 the live chart")
 edit('var ch=trainChart(done.history);', 'var ch=trainChart(done.history,!!(done.nvocab&&done.nvocab!==2048));', "6.6 the result's chart")
+
+# ---- 6.7 (claims audit, 25 October 2026): what the page says about itself, made true. Each sentence below was checked
+#      against the code; where the code was wrong, the code is fixed (the Crossref retractions, the health card's empty
+#      state), and where the words said more than the code does, the words now say what it does. The owner's rule: a true,
+#      qualified statement, never an inflated one ----
+# going online: Ingenium makes no request by itself, and goes online only when the person asks for something that needs it
+edit('Nothing here asks for a connection, and nothing leaves it.</p>',
+     'Your work stays here. It goes online only when you ask for something that needs it: a cloud model, a search, a download, GitHub or Dictate.</p>',
+     "6.7 claims: the door says when Ingenium goes online")
+edit('<b>How full offline works here.</b> Two things need to live inside the app: your model (you upload it) and the engine that runs it (about 1 to 2 MB of compiled code, dropped in once on the Models page, or baked into a single copy of this file). After that one-time step, the app never requests anything. No connection, no services, no exceptions.',
+     '<b>How offline works here.</b> The engine that runs your models is kept on this device: built into this page or into the app, or added once on the Models page. Each model is a file kept here too. Ingenium makes no request by itself. It goes online only when you ask for something that needs it: a model download, a cloud model, a web search, GitHub, a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.',
+     "6.7 claims: Home's note on working offline")
+edit('<b>One-time step, honestly scoped.</b> The engine is wllama (llama.cpp compiled to WebAssembly): one small download, added once with "Get the engine for me" above or dropped in as files, then kept on this device for good. Apps made with the build scripts carry it already baked in. It runs single-threaded, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B will crawl; the fit warnings below are the guide. The app itself never requests anything.',
+     '<b>About the engine.</b> In a web browser the engine is wllama (llama.cpp compiled to WebAssembly), kept on this device: built into this page, or added once with "Get the engine for me" above or as files. It runs on one processor thread, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B is slow; the fit warnings below are the guide. The Mac and Windows apps run their own engine instead. The engine makes no request by itself.',
+     "6.7 claims: the engine note")
+edit('     Everything runs on this device with no connection:\n', '     Everything runs on this device, and goes online only when the person asks for something that needs it:\n',
+     "6.7 claims: the page's opening note")
+edit('       - after that one-time step the app never requests anything.\n', '       - after that one-time step the engine makes no request by itself.\n',
+     "6.7 claims: the page's opening note, the engine")
+edit('Everything runs on this device and asks for nothing outside it.</p>',
+     'Everything runs on this device, and goes online only when you ask for something that needs it.</p>', "6.7 claims: the old Home's line")
+edit('note.textContent="Engine installed. It stays on this device; nothing else will be asked for.";',
+     'note.textContent="Engine installed. It stays on this device.";', "6.7 claims: the engine, installed")
+edit('note.textContent="Step 3 of 4 · one press. The engine is single-threaded: small models settle in soon, large ones take patience.";',
+     'note.textContent="Step 3 of 4 · one press. Small models settle in soon; large ones take patience.";', "6.7 claims: Home's step 3")
+edit('note.textContent="Step 4 of 4 · everything is running. Nothing here leaves this device.";',
+     'note.textContent="Step 4 of 4 · everything is running, and its answers are written on this device.";', "6.7 claims: Home's step 4")
+edit('<p class="small muted" style="margin-bottom:8px">Optional and off by default: the app stays fully offline until you turn a connection on.</p>',
+     '<p class="small muted" style="margin-bottom:8px">Optional and off by default. Without one, Chat\'s answers are written on this device.</p>',
+     "6.7 claims: Settings, a connection")
+edit('Off until you switch on Web search or Research with the + key beside the message box. Then only your question goes to the search service, and the pages found are read by this device.',
+     'Off until you switch on Web search or Research with the + key beside the message box. Then the start of your message, up to about 220 characters, goes to search services: DuckDuckGo, or Brave with your key, and Wikipedia; with Scholarly sources first, also OpenAlex, Crossref, Europe PMC and arXiv. Research then opens up to three of the pages found, so those sites see a visit from this device. An email given below goes to OpenAlex and Crossref with each search.',
+     "6.7 claims: Settings, what a web search sends")
+edit('are stored in this browser only. Nothing leaves the device.</p>',
+     'are kept on this device: in this browser, and in the Mac and Windows apps in the app\'s own files too. They leave it only when you send something yourself: to a cloud model, a search or GitHub.</p>',
+     "6.7 claims: Settings, the data on this device")
+edit('the stronger models of, for example, a Mac mini in another room. Nothing leaves your home network.</p>',
+     'the larger models of, for example, a Mac mini in another room. Questions and replies go only to the computer you pair with, on the same network. They are not encrypted, so share only on a network you trust, such as your home Wi-Fi.</p>',
+     "6.7 claims: Settings, sharing models")
+edit('tip:"Nothing leaves your home network, and only devices with the code are answered."},',
+     'tip:"Questions and replies go only to the computer you pair with, on the same network, and only devices with the code are answered. They are not encrypted, so share on a network you trust."},',
+     "6.7 claims: the tour, sharing models")
+# Dictate uses the browser's speech service: in Chrome, Edge and Safari it may send the sound away to be written down
+edit('id="chatMicBtn" title="Dictate instead of typing (listens on this device only; nothing is sent away)"',
+     'id="chatMicBtn" title="Dictate instead of typing. Your browser\'s speech service writes it down, and in Chrome, Edge and Safari it may send the sound to Google, Microsoft or Apple to do so."',
+     "6.7 claims: Dictate's key")
+edit('mb.title="Dictate instead of typing (listens on this device only; nothing is sent away)";}',
+     'mb.title="Dictate instead of typing. Your browser\'s speech service writes it down, and in Chrome, Edge and Safari it may send the sound to Google, Microsoft or Apple to do so.";}',
+     "6.7 claims: Dictate's key, again")
+edit('/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the device\'s own speech, nothing uploaded. Hidden\n   where the device offers no speech recognition at all. */',
+     '/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the browser\'s own speech service (which in Chrome, Edge\n   and Safari may send the sound away; 6.7 says so). Hidden where the device\n   offers no speech recognition at all. */',
+     "6.7 claims: Dictate's note")
+# the houses, as they are now
+edit('<p class="small muted" id="housesNote">Every model in the app belongs to a house, set from its size when it arrives. A model\'s card shows its house, whether it fits this device, how fast it is likely to write, and exactly how the work is shared, all honestly: this engine is a single processor thread with no GPU path, so big houses are slow by nature, not by fault. Change any model\'s house in its own Settings.</p>',
+     '<p class="small muted" id="housesNote">Ingenium\'s own models come in four houses: Velox answers at once, Scriba thinks first, Magister is a larger model for hard questions, and Faber writes code. Each kind of device has its own model for each house, shown at the top of this page. A model you add is given a house by its size, as below; Faber is a house by purpose, not size. Change any model\'s house in its own Settings.</p>',
+     "6.7 claims: the houses, their note")
+edit('<span class="v">Up to about 2.5B parameters. Fast replies, light memory. The Fire tablet\'s comfortable home.</span>',
+     '<span class="v">A model you add of up to about 2.5B parameters. Fast replies, light memory.</span>', "6.7 claims: the houses, Velox")
+edit('<span class="v">About 3B to 9B. The daily writer; a good desktop pace, too heavy for the tablet.</span>',
+     '<span class="v">About 2.6B to 9B. The daily writer.</span>', "6.7 claims: the houses, Scriba")
+edit('<span class="v">About 9B to 35B. Considered answers, wants memory and minutes; desktops only.</span>',
+     '<span class="v">About 9B to 35B. Considered answers; wants memory and time.</span>', "6.7 claims: the houses, Magister")
+edit('<span class="v">Above 35B. The most capable and the slowest; here for completeness, expect a crawl on this engine.</span>',
+     '<span class="v">Above 35B, for a model you add. The most demanding: it needs a great deal of memory, and in a web browser it is very slow.</span>', "6.7 claims: the houses, Oracle")
+edit('<b>About the numbers.</b> Memory needs and pace on every card are careful estimates from the file\'s size and this device\'s reported memory. The engine always runs every layer on the processor; there is no GPU offload in a standalone page, and pretending otherwise would be lying to you.',
+     '<b>About the numbers.</b> Memory needs and pace on every card are estimates from the file\'s size and this device\'s reported memory, until a reply has been timed here. In a web browser the engine runs every layer on one processor thread, with no graphics chip, so large models are slow there. The Mac and Windows apps run their own engine on several processor cores, and use the graphics chip where the engine can.',
+     "6.7 claims: the houses, about the numbers")
+edit('var hn=$("housesNote");if(hn)hn.textContent="Every model belongs to a house, set from its size when it arrives. A model\'s card shows its house,',
+     'var hn=$("housesNote");if(hn)hn.textContent="Ingenium\'s own models come in four houses, each with its model for this device, shown at the top of this page. A model you add is given a house by its size. A model\'s card shows its house,',
+     "6.7 claims: the houses, in the phone and tablet apps")
+edit('  var n=m&&m.layers;\n  return "Offload: none of it is or can be on a GPU, so "+(n?("all "+n+" layers run"):"everything runs")+" on the processor, single thread.";}',
+     '  var n=m&&m.layers;\n'
+     '  /* 6.7: in the Mac and Windows apps a model their own engine runs is said to run where that engine runs it */\n'
+     '  try{if(DeskAdapter.accepts(m))return "Offload: this app\'s own engine runs it on this computer\'s "+deskWhere(deskEngine)+".";}catch(e){}\n'
+     '  return "Offload: in a web browser none of it can be on a graphics chip, so "+(n?("all "+n+" layers run"):"everything runs")+" on the processor, single thread.";}',
+     "6.7 claims: where a model runs, in the Mac and Windows apps")
+edit('line:"The most capable model this device can hold. Slower; for hard questions and long work."},',
+     'line:"Ingenium\'s larger general model for this device, chosen to suit its memory and speed. Slower; for hard questions and long work. More models has larger ones."},',
+     "6.7 claims: Magister's line")
+edit('line:"Made for writing, reading and fixing code. It reasons through a problem before it writes."}],',
+     'line:"Made for writing, reading and fixing code."}],', "6.7 claims: Faber's line")
+edit('Magister (the strongest this device holds) and Faber (the coding model).',
+     'Magister (a larger model, for hard questions) and Faber (the coding model).', "6.7 claims: the Guide, Magister")
+edit('Magister is the strongest this device can hold, and Faber writes computer code."},',
+     'Magister is a larger model for hard questions, and Faber writes computer code."},', "6.7 claims: the tour, Magister")
+edit('Magister is the strongest this device holds, and Faber writes code.',
+     'Magister is a larger model for hard questions, and Faber writes code.', "6.7 claims: the short tour, Magister")
+# the health card says what it checked
+edit('  if(!out.length)out.push(["ok","All is well: the models here fit this device, and their replies come at a comfortable pace."]);return out;}',
+     '  /* 6.7: the calm line says only what was checked */\n'
+     '  if(!out.length){var ps=perfSummary();\n'
+     '    if(!state.models.length)out.push(["ok","No model is here yet, so there is nothing to check."]);\n'
+     '    else if(!mem)out.push(["ok","This browser does not say how much memory the device has, so whether the models fit could not be checked."]);\n'
+     '    else if(!ps.length)out.push(["ok","No model file here is too large for this device\'s memory. No reply has been timed yet."]);\n'
+     '    else{var lo=Math.min.apply(null,ps.map(function(s){return s.avg;})),hi=Math.max.apply(null,ps.map(function(s){return s.avg;}));\n'
+     '      out.push(["ok","No model file here is too large for this device\'s memory. Timed replies averaged "+(ps.length>1&&hi-lo>=0.1?"from "+lo.toFixed(1)+" to "+hi.toFixed(1):hi.toFixed(1))+" tokens a second."]);}}\n'
+     '  return out;}',
+     "6.7 claims: the health card's calm line")
+# the Guide, the tour and Settings
+edit('Each model answers with the settings its own makers recommend.</div></div>',
+     'Most of Ingenium\'s own models answer with the settings their makers recommend; the others, and every model you bring, use Ingenium\'s general settings, which Effort in Controls changes.</div></div>',
+     "6.7 claims: the Guide, each model's settings")
+edit('<p>Ingenium is built around how attention, time and the senses can work for autistic people and people with ADHD. The Focus page holds the tools;',
+     '<p>Ingenium\'s supports were designed with autistic people and people with ADHD in mind: small steps, time you can see, calm and clear words. They have not been tested with a group of users, so what helps one person may not help another. The Focus page holds the tools;',
+     "6.7 claims: the Guide, the supports")
+edit('<b>One step at a time.</b> Write a task and press Break it down: the model on this device makes 3 to 8 small steps, the first under five minutes. Only the current step shows.',
+     '<b>One step at a time.</b> Write a task and press Break it down. The model is asked for 3 to 8 small steps, the first under five minutes. If no model is ready, or it gives no list, the steps are made from the words of your task, and a note says so. Only the current step shows.',
+     "6.7 claims: the Guide, Break it down")
+edit('<b>Tabula</b> is the writing tablet: a page for drafts and notes, exporting as a page you can keep. <b>Abacus</b> is the reckoning grid: rows, columns, small formulas, and CSV in and out.',
+     '<b>Tabula</b> is the writing tablet, with documents, footnotes, letterheads, signatures and exports. <b>Abacus</b> is the reckoning grid: workbooks, formulas, formats, and CSV in and out. With <b>Imago</b> for slides, <b>Scriba</b> for recordings and <b>Fontes</b> for sources, they are apps of their own, carried whole.',
+     "6.7 claims: the Guide, the apps")
+edit('<div>Tabula and Abacus are pages in the side navigation. Their tools and content are the same as before, now laid out as full pages rather than floating windows.</div>',
+     '<div>Each opens on the Desk inside Ingenium, full width, from the side list or Home. It can also float in a window over the page, or open in a window of its own.</div>',
+     "6.7 claims: the Guide, where the apps open")
+edit('Ingenium is built around how attention, time and the senses can work for autistic people and people with ADHD. Each part below can be changed or switched off.',
+     'Ingenium\'s supports were designed with autistic people and people with ADHD in mind. They have not been tested with a group of users, so what helps one person may not help another. Each part below can be changed or switched off.',
+     "6.7 claims: Settings, the supports")
+edit('<summary>Ingenium\'s ten rules <span class="small muted">· every model follows them, here and connected</span></summary>',
+     '<summary>Ingenium\'s ten rules <span class="small muted">· given to every model in a chat, here and connected</span></summary>',
+     "6.7 claims: Settings, the ten rules")
+edit('<div class="small muted">They come before every other instruction, yours included, and they cannot be switched off. They also reach connected models (Claude, Ollama, your other computer).</div>',
+     '<div class="small muted">They come before every other instruction in a chat, yours included, and they cannot be switched off. They also reach connected models (Claude, Ollama, your other computer). They tell a model how to behave; a small model does not always keep to them.</div>',
+     "6.7 claims: Settings, the ten rules, how far they reach")
+edit('help:"Every model starts with the answer, says exactly what it means, and puts steps in a numbered list."},',
+     'help:"Every model is asked to start with the answer, say exactly what it means, and put steps in a numbered list. A small model does not always manage it."},',
+     "6.7 claims: Settings, clear answers")
+edit('how you like answers: short or detailed, warm or plain. Every model follows it, in every chat."},',
+     'how you like answers: short or detailed, warm or plain. Every model is given it at the start of each chat, unless you switch it off."},',
+     "6.7 claims: the tour, Your Ingenium")
+edit('t:"🎯 Focus: your support room",b:"Focus is built for minds that work in their own way, including autistic people and people with ADHD.',
+     't:"🎯 Focus: your support room",b:"Focus holds supports for attention, time and calm, designed with autistic people and people with ADHD in mind.',
+     "6.7 claims: the tour, Focus")
+edit('Without that switch, nothing goes online."},', 'Without that switch, the web is not searched."},', "6.7 claims: the tour, the + key")
+edit('b:"Everything you make stays on this device. Export a backup keeps a copy in one file; Recover an earlier moment brings your desk back from a few minutes ago."}];',
+     'b:"What you make is kept on this device, and leaves it only when you send it somewhere. Export a backup keeps a copy in one file. Recover an earlier moment keeps the last three saved moments of your desk, at least 45 seconds apart; a very large desk is not kept that way."}];',
+     "6.7 claims: the tour, your data")
+edit('t:"🌱 Train a small model from zero",b:"On a Mac or Windows computer, a guided lesson makes a tiny model of your own and trains it on your text, so you can watch an AI learn: the loss falls as it reads. It learns your text\'s words and patterns, and it is far weaker than the models above."},',
+     't:"🌱 Train a small model",b:"On a Mac or Windows computer, a guided lesson makes a tiny model of your own from zero and trains it on your text, so you can watch an AI learn: the loss falls as it reads. It learns your text\'s words and patterns, and it is far weaker than the models above. The same lesson can train a small model you have further on your text."},',
+     "6.7 claims: the tour, training")
+# the recovery shelf: three saved moments, at least 45 seconds apart, and none for a very large desk
+edit("+'<p class=\"small muted\">The studio keeps the three most recent moments of'\n    +' everything (your notes, documents, sheets, builds, model list and'\n    +' settings), in case of a crash or a bad edit. Pick one to return to.'",
+     "+'<p class=\"small muted\">The studio keeps the three latest saved moments of'\n    +' your desk (your notes, documents, sheets, builds, model list and'\n    +' settings), at least 45 seconds apart; a very large desk is not kept this way. Pick one to return to.'",
+     "6.7 claims: the recovery shelf (3.12)")
+edit('<h3>Recover an earlier moment</h3><p class="small muted">The studio keeps the three most recent moments of everything.',
+     '<h3>Recover an earlier moment</h3><p class="small muted">The studio keeps the three latest saved moments of your desk, at least 45 seconds apart. A desk of more than about a million characters is too large to keep this way: export a backup instead, in Settings.',
+     "6.7 claims: the recovery shelf")
+edit('"Nothing on the shelf yet. The shelf starts filling as you work; come back after a few minutes."',
+     '"Nothing on the shelf yet. A moment is kept as you work, at most one every 45 seconds. A very large desk is not kept here, so export a backup now and then."',
+     "6.7 claims: the empty recovery shelf", times=2)
+# the train card says both things it does
+edit('<h2 class="sec">Train a small model from zero</h2>\n        <p class="small muted" style="margin-bottom:10px">See how AI learns by making a tiny model of your own: it starts as random numbers and learns from text you give it, here on this computer. It learns your text\'s words and patterns; it is far weaker than the models above and does not hold a conversation.</p>',
+     '<h2 class="sec">Train a small model</h2>\n        <p class="small muted" style="margin-bottom:10px">Make a tiny model of your own from random numbers, or train a small model you have further on your own text, here on this computer. A model made from zero learns your text\'s words and patterns; it is far weaker than the models above and does not hold a conversation. A model you train further starts from what it already knew.</p>',
+     "6.7 claims: the train card")
+edit('var why=box.querySelector("#trWhy");why.textContent=TRAIN_STEPS[step].why;',
+     'var why=box.querySelector("#trWhy");why.textContent=(step===4&&w.base&&!w.fromModel)?"Begin a sentence and the model continues it in the manner of your text. It started from what it already knew, so it still answers as before; in Ingenium\'s own test, SmolLM2 135M Instruct still answered in chat after one pass at the usual setting.":TRAIN_STEPS[step].why;',
+     "6.7 claims: Try it, for a model trained further")
+# Blend: the largest model, not a measured strength
+edit('desc:"Every model answers on its own; then the strongest of them writes one answer that keeps the best of each."},',
+     'desc:"Every model answers on its own; then the largest of them writes one answer that keeps the best of each."},',
+     "6.7 claims: Blend, compare and combine")
+# the scholarly indexes: a retracted paper is left out, not only its notice (Crossref marks the paper "updated-by" a retraction)
+edit('+"&select=DOI,title,author,issued,container-title,type,is-referenced-by-count,ISSN,update-to"+schMail();',
+     '+"&select=DOI,title,author,issued,container-title,type,is-referenced-by-count,ISSN,update-to,updated-by"+schMail();',
+     "6.7 claims: Crossref, ask for the retractions")
+edit('    var notice=Array.isArray(w["update-to"])&&w["update-to"].some(function(u){return /retract/i.test(u&&u.type||"");});',
+     '    var notice=Array.isArray(w["update-to"])&&w["update-to"].some(function(u){return /retract/i.test(u&&u.type||"");});\n'
+     '    /* 6.7: the retracted paper itself carries "updated-by" (from Retraction Watch); its title may also say so */\n'
+     '    var gone=(Array.isArray(w["updated-by"])&&w["updated-by"].some(function(u){return /retract|withdraw|remov/i.test(u&&u.type||"");}))||/^\\s*retracted\\b/i.test((w.title&&w.title[0])||"");',
+     "6.7 claims: Crossref, a retracted paper")
+edit('preprint:w.type==="posted-content",doaj:false,issn:(w.ISSN&&w.ISSN[0])||"",oa:false,oaUrl:"",cites:w["is-referenced-by-count"]||0,retracted:false,notice:notice,',
+     'preprint:w.type==="posted-content",doaj:false,issn:(w.ISSN&&w.ISSN[0])||"",oa:false,oaUrl:"",cites:w["is-referenced-by-count"]||0,retracted:gone,notice:notice,',
+     "6.7 claims: Crossref, marked retracted")
+edit('}).filter(function(x){return !x.notice;});});}',
+     '}).filter(function(x){return !x.notice&&!x.retracted;});});}', "6.7 claims: Crossref, left out")
+# Europe PMC: an editorial, a letter, a comment or a news item is not a journal article; patents and theses are not either
+edit('    var retracted=/retract/.test(types),preprint=w.source==="PPR"||/preprint/.test(types);',
+     '    var retracted=/retract/.test(types),preprint=w.source==="PPR"||/preprint/.test(types);\n'
+     '    var minor=((types.match(/editorial|letter|news|published erratum/)||[""])[0]).replace("published ","");\n'
+     '    if(!minor&&/comment/.test(types)&&!/journal article|research-article|review/.test(types))minor="comment";\n'
+     '    if(w.source==="PAT")minor="patent";else if(w.source==="ETH")minor="thesis";',
+     "6.7 claims: Europe PMC, the kind of record")
+edit('      type:preprint?"preprint":"article",preprint:preprint,doaj:false,issn:"",oa:w.isOpenAccess==="Y",',
+     '      type:preprint?"preprint":(minor||"article"),preprint:preprint,doaj:false,issn:"",oa:w.isOpenAccess==="Y",',
+     "6.7 claims: Europe PMC, its type")
+edit('venue:jt,venueType:jt?"journal":"",\n      type:',
+     'venue:jt,venueType:jt&&!/patent|thesis/.test(minor)?"journal":"",\n      type:', "6.7 claims: Europe PMC, no journal for a patent")
+edit('    else if(x.venueType==="journal"||x.type==="article"||x.type==="review"){',
+     '    else if(/^(editorial|letter|comment|news|erratum|correction|patent|thesis|paratext)$/.test(String(x.type||""))){checks.push((x.type.charAt(0).toUpperCase()+x.type.slice(1))+(x.venue&&x.venueType==="journal"?" in "+x.venue:"")+": not a research article");trust="low";}\n'
+     '    else if(x.venueType==="journal"||x.type==="article"||x.type==="review"){',
+     "6.7 claims: vetting, a letter or an editorial named as such")
+edit('    checks.push("Not retracted ("+x.index+")");',
+     '    checks.push(x.index==="arXiv"?"Withdrawal not checked (arXiv)":"No retraction listed ("+x.index+")");',
+     "6.7 claims: vetting, what the index says of retraction")
+edit('vetted by Ingenium on "+when+". Retracted work has been left out. Each source says what was checked.',
+     'gathered by Ingenium on "+when+". Work the indexes mark as retracted has been left out. Each source says what was checked: a scholarly record against its index, a web page by its address only.',
+     "6.7 claims: what the model is told of its sources")
 
 for old, new, label, times in EDITS:
     n = out.count(old)

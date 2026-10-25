@@ -19,7 +19,7 @@ This kit builds **{APP_NAME}** (app id `{APP_ID}`) as a Mac app: the page you ma
 This kit holds the Mac version of Ingenium and everything needed to build it. The app carries its own engine (llama.cpp, compiled for the Mac) and two built-in models ({MODEL_NAME}, about {MODEL_MB} MB together), so it is useful the moment it opens. The first answers quickly; the second thinks before it answers, and the chat shows its thinking. The engine runs models many times faster than the engine inside the page, and it opens model files of any size.
 [[if ARM]]
 
-This kit's guide is written for a Mac with Apple silicon, such as a Mac mini. That app's engine runs the models on the Mac's graphics chip (Metal), which is normally much faster than the processor alone. Its larger memory also lets it hold Ingenium's stronger models: with 16 GB, the Models page offers **Magister** (Qwen3.5 9B, about 5.7 GB) and **Faber**, the coding model (Mellum2 12B-A2.5B Thinking, about 8.1 GB), each installed with one click. The models fit by an estimate of the memory each one needs; the Models page shows the estimate for this Mac.
+This kit's guide is written for a Mac with Apple silicon, such as a Mac mini. That app's engine runs the models on the Mac's graphics chip (Metal), which is normally much faster than the processor alone. Its larger memory also lets it hold larger models from Ingenium's list: with 16 GB, the Models page offers **Magister** (Qwen3.5 9B, about 5.7 GB) and **Faber**, the coding model (Mellum2.1 12B Thinking, about 8.1 GB), each installed with one click. With about 24 GB, Faber is Gemma 4 26B A4B (about 14.4 GB); with about 32 GB or more, it is Qwen3-Coder 30B-A3B (about 18.6 GB). The models fit by an estimate of the memory each one needs; the Models page shows the estimate for this Mac.
 [[end]]
 [[if !ARM]]
 
@@ -108,7 +108,7 @@ To take screenshots from the app's + menu, macOS asks once for **Screen Recordin
 ## 6. Adding models
 
 [[if !NEW]]
-**Ingenium's models.** At the top of the Models page, the card "Ingenium's models" shows four houses: **Velox** (the fastest), **Scriba** (balanced; it thinks), **Magister** (the strongest this Mac can hold) and **Faber** (the coding model). The two built-in models are ready at once. Click **Install** on another, and the app downloads it from Hugging Face, checks it against its fixed fingerprint (its SHA-256 value), and keeps it. A download that stops resumes where it stopped. The figures shown for each model are its makers' own published results.
+**Ingenium's models.** At the top of the Models page, the card "Ingenium's models" shows four houses: **Velox** (the fastest), **Scriba** (balanced; it thinks), **Magister** (a larger model for hard questions, chosen to suit this Mac) and **Faber** (the coding model). The two built-in models are ready at once. Click **Install** on another, and the app downloads it from Hugging Face, checks it against its fixed fingerprint (its SHA-256 value), and keeps it. A download that stops resumes where it stopped. The figures shown for each model are its makers' own published results.
 
 [[end]]
 [[if !NEW]]
@@ -123,7 +123,7 @@ As a rough guide (an estimate), a model needs about its file size in memory plus
 
 The Fire, iPhone and iPad apps are built on GitHub from their own kits. This Mac helps with uploading those kits (show the hidden `.github` folder as in section 3) and with installing the iPhone and iPad app with Sideloadly.
 
-**Lending this Mac's models to your other devices.** In {APP_NAME}, Settings, **Your models on every device**, switch on **Share this computer's models**. It shows an address and a pairing code; enter them on the laptop, tablet or phone in the same card, under **Use another computer's models**, and press **Connect**. That device's chat then uses this Mac's models over your home Wi-Fi, from another room. Keep {APP_NAME} open here; while sharing is on, the Mac does not go to sleep by itself. If the Mac asks whether {APP_NAME} may accept incoming connections or find devices on your local network, allow it. Nothing leaves your home network, and only devices with the code are answered.
+**Lending this Mac's models to your other devices.** In {APP_NAME}, Settings, **Your models on every device**, switch on **Share this computer's models**. It shows an address and a pairing code; enter them on the laptop, tablet or phone in the same card, under **Use another computer's models**, and press **Connect**. That device's chat then uses this Mac's models over your home Wi-Fi, from another room. Keep {APP_NAME} open here; while sharing is on, the Mac does not go to sleep by itself. If the Mac asks whether {APP_NAME} may accept incoming connections or find devices on your local network, allow it. Questions and replies go only to the computer you pair with, on the same network, and only devices with the code are answered. They are not encrypted, so share only on a network you trust, such as your home Wi-Fi. A short hello, with no code, tells devices on the network this computer's name and how many models it lends.
 
 [[if !NEW]]
 ## 8. Your copy on GitHub

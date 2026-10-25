@@ -25,7 +25,7 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     python3 rig/ghmock.py 8170 &                                              # a stand-in GitHub API, hashing objects as git does
     node rig/t_fabrica_github.js http://127.0.0.1:8150/ingenium.html <out>    # GitHub inside Fabrica, 20 checks
     node rig/t_lector_doctoral.js http://127.0.0.1:8150/ingenium.html <out>   # Lector's charter, examiner's pass and model guidance, 11 checks
-    node rig/t_academic.js http://127.0.0.1:8150/ingenium.html <out>          # every search vetted, Peer-reviewed only, Fontes as a database, Lector citing, 24 checks
+    node rig/t_academic.js http://127.0.0.1:8150/ingenium.html <out>          # every source labelled, Journal articles and scholarly books only, Fontes as a database, Lector citing, 24 checks
     node rig/t_models_care.js http://127.0.0.1:8150/ingenium.html <out>       # quality tiers on the houses, the pace measured, health by model, the catalogue, 24 checks
     node rig/t_studio_care.js http://127.0.0.1:8150/ingenium.html <out>       # Blend's judge and ready-made blends, the tour's chapters, the export, the shelf, 22 checks
     node rig/t_apps_whole.js http://127.0.0.1:8150/ingenium.html <out>        # the whole Tabula and Abacus on the Desk, prepared as Carpe Diem prepares them: handovers, theme, saving, opening one another, 20 checks
@@ -35,7 +35,7 @@ server (`python3 -m http.server 8150` in the folder that holds it), with Playwri
     node rig/t_desk.js http://127.0.0.1:8150/ingenium.html <out>              # the five apps as Carpe Diem opens them: the Desk bar and its tabs, the float key, floating windows, a second document, a window of its own with every side button and the shared desk, the thought panel's day and night, 48 checks
     node rig/t_fabrica_narrow.js http://127.0.0.1:8150/ingenium.html <out>    # on a phone and an upright tablet Fabrica always opens on Your apps, 4 checks
     node rig/t_tour_walk.js http://127.0.0.1:8150/ingenium.html <out>    # every card of the chaptered tour rings a visible element; the door opens it (5.1), 57 checks
-    node rig/t_recipe.js http://127.0.0.1:8150/ingenium.html <out>       # Lector's recipe (5.2): the apps measured in a frame from which nothing leaves, a Word file kept, its stale figures and broken rules found, updated run by run, the version before kept, the rules and measures sent with Lector's sections, 39 checks
+    node rig/t_recipe.js http://127.0.0.1:8150/ingenium.html <out>       # Lector's recipe (5.2): the apps measured in a frame that refuses every request to another address, a Word file kept, its stale figures and broken rules found, updated run by run, the version before kept, the rules and measures sent with Lector's sections, 47 checks (run it on a page whose version is stamped, as release.py stamps it)
 
 `build/recipe/recipe.json` is Lector's recipe (5.2): the owner's rules, the 32 verified sources as CSL-JSON with the claim each
 supports, the owner's kinds of document with their outlines, and the identity of the builds those documents describe. It is written
@@ -87,8 +87,9 @@ night and the Clepsydra's settings, and only the main window writes the saved de
   Sideloadly or AltStore signs it with an Apple ID as it installs it.
 - `modules/r137.js`: every page takes the whole width of a wide window, the Apps group of the rail folds, saves go one at a
   time, Code opens as Chat opens and lets its app be closed or removed, and the dividers show their grips.
-- `modules/r138.js`: Build holds a page of any size part by part (each script, style and block of markup), with a search
-  across the whole page, and runs and saves the whole app.
+- `modules/r138.js`: Build holds a large page part by part (each script, style and block of markup; 6.7: up to 480 MB on a
+  computer and 128 MB on a tablet or phone, the editor's limit), with a search across the whole page, and runs and saves the
+  whole app.
 - `shells/`: the sources of the two shells, their build (`.github/workflows/build-shells.yml` in this repository) and the
   reports of the emulator and simulator checks (`shells/out/checks/`).
 
@@ -120,7 +121,7 @@ Ingenium's shells), and its saves now go one after another there too: `rig/t_for
     node rig/t_61_hub.js <url> <out>         # 93: Fabrica's GitHub views, also inside the Forge's Fabrica
     node rig/t_61_home.js <url> <out>        # 61: the new Home
     node rig/t_61_seals.js <url> <out>       # 53: The Offline Project's crests
-    node rig/a11y/axe_walk.js <url> <axe.min.js> <out>   # axe-core on every page, day and night, desk and phone: 0 rules broken
+    node rig/a11y/axe_walk.js <url> <axe.min.js> <out>   # axe-core on every page, day and night, desk and phone; run by hand, not by the GitHub builds; its last full run, on 6.2 (22 October 2026), found 0 rules broken
 
 6.2 (23 October 2026) builds four editions from the same sources. `ING_EDITION` picks one (`build/editions.py`):
 

@@ -1,5 +1,5 @@
 <style id="r158-css">
-/* ============ R158 · ROOM TO GROW: APPS OF ANY SIZE, QUICK WITH THE MODELS ============
+/* ============ R158 · ROOM TO GROW: LARGE APPS, QUICK WITH THE MODELS ============
    The owner's words (22 and 23 October 2026): edit apps twice Ingenium's size, and the Offline Project and its demos, in
    Chat, Code and Build; "I want for Ingenium's capacity to be more than 120 MB. It needs to work smoothly, efficiently and
    fast with the models without crashing." Measured on 6.2 before this part, with an app of 107 MB (rig/t_62_capacity.js):

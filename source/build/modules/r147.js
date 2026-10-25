@@ -277,7 +277,7 @@ var KEYS=[
   {k:"chat",t:"Chat",d:"Talk with your model. Ask, write, and make documents and pages."},
   {k:"code",t:"Code",d:"Build an app with the model, and watch it run beside you."},
   {k:"build",t:"Build",d:"A page that runs as you type, ready to save as an app."},
-  {k:"fabrica",t:"Fabrica",d:"Your apps, kept with every version, tested and shipped."},
+  {k:"fabrica",t:"Fabrica",d:"Your apps as repositories: every version you keep, its checks and its packages."},
   {k:"lector",t:"Lector",d:"Reads your apps and writes the documents you need from them."},
   {k:"focus",t:"Focus",d:"One step at a time, time you can see, calm when you need it.",id:"homeFocusQuick",line:"homeFocusLine"}];
 var APPS=[
@@ -302,7 +302,7 @@ function build(){
   var h1=old.title||mk("h1");h1.id="homeTitle";h1.className="";if(!h1.textContent)h1.textContent=(state.appName||"Ingenium");eb.appendChild(h1);
   var dt=mk("span","hx-date",latinDate());dt.id="hxDate";dt.setAttribute("aria-hidden","true");eb.appendChild(dt);ht.appendChild(eb);
   var hi=mk("p","hx-hello",hello());hi.id="hxHello";ht.appendChild(hi);
-  ht.appendChild(mk("p","hx-lede","Your own room, on this device. Pick up where you left off, or start something new. Nothing here leaves this device."));
+  ht.appendChild(mk("p","hx-lede","Your own room, on this device. Pick up where you left off, or start something new. Your work stays here, and goes online only when you ask for something that needs it."));
   head.appendChild(ht);
   var nx=mk("div","hx-next");nx.setAttribute("role","group");nx.setAttribute("aria-labelledby","hxNextH");
   var nh=mk("span","hx-next-h","Your next step");nh.id="hxNextH";nx.appendChild(nh);
@@ -508,7 +508,7 @@ function paintModels(){var dl=R.facts;if(!dl)return;dl.innerHTML="";
   else if(eb.present)fact(dl,"The engine",(eb.embedded?"Built into this copy":"Kept in this browser")+(eb.bytes?" · "+fmtB(eb.bytes):""),"It runs the model here, on this device, with no connection.","ok");
   else fact(dl,"The engine","Not added yet","One drop on the Models page, once. After that it runs here.","warn");
   var cl=state.cloud||{},on=!!(cl.on&&cl.provider);
-  fact(dl,"Connection",on?"Set up, and used only when you choose it":"None",on?"Chat's Controls say which one answers: this device, or the connection.":"Nothing you write leaves this device.",on?"acc":"ok");
+  fact(dl,"Connection",on?"Set up, and used only when you choose it":"None",on?"Chat's Controls say which one answers: this device, or the connection.":"No cloud model is set up, so Chat's answers are written on this device. A web search, when you switch it on, sends your question to search services.",on?"acc":"ok");
   var mk2=R.modelsKey&&R.modelsKey.querySelector("span");if(mk2)mk2.textContent=ms.length?"Your models":"Bring in a model";
   if(R.modelsKey)R.modelsKey.setAttribute("aria-label",ms.length?"Open the Models page":"Bring in a model on the Models page");}
 function fmtB(n){try{return fmtBytes(n);}catch(e){return Math.round(n/1048576)+" MB";}}

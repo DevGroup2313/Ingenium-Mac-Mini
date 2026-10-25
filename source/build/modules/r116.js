@@ -6,7 +6,8 @@
    What R99 began (a Health card, a pace counted from characters, a catalogue with Fast/Balanced/Best) goes the whole way:
    every house offers the qualities its maker published, each with the size and SHA-256 Hugging Face listed on
    17 October 2026 (source/build/lineup_quants.json); the pace is the engine's own count where the engine gives one;
-   each installed model has a health line; and the catalogue, now 34 models, is grouped by what fits this device. */
+   each installed model has a health line; and the catalogue, 34 models at this stage (36 since 6.6, with the two models to train that r171 adds), is grouped by
+   what fits this device. */
 .lu-q{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0}
 .lu-q .seg{margin:0;gap:4px}.lu-q .seg-btn{padding:4px 10px;font-size:11.5px}
 .lu-q .seg-btn.have::after{content:" ●";font-size:9px;vertical-align:1px;color:#2f7a55}

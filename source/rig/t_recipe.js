@@ -1,9 +1,11 @@
-// R126: Lector's recipe. Measures the apps kept on this device in a frame from which nothing can leave, keeps a document,
+// R126: Lector's recipe. Measures the apps kept on this device in a frame that refuses every request to another address, keeps a document,
 // finds the figures an update changed and the rules a sentence breaks, and updates the Word file in place, run by run.
 // The Word file is made here, in the page, so no personal document is needed.   node t_recipe.js <url> <outdir>
 const pw = require('/opt/node-tools/node_modules/playwright');
 const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
+// 6.7: the builds Ingenium carries are read from builtin.json, not written here, so a new copy of an app does not leave a stale figure
+const BI = JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'build', 'apps', 'builtin', 'builtin.json'), 'utf8'));
 let pass = 0, fail = 0;
 const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(d).slice(0, 400) : '')); c ? pass++ : fail++; };
 (async () => {
@@ -35,9 +37,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const m = await p.evaluate(() => IngRecipe.measureAll().then(r => { const o = {}; Object.keys(r).forEach(k => { const v = r[k].v || {}; o[k] = r[k].error ? { error: r[k].error } : { pass: v.pass, version: v.version, tour: v.tour, read: v.read, sha: (v.sha || '').slice(0, 12), bytes: v.bytes, req: v.requests, tutor: v.tutor, house: v.house, catalog: v.catalog, carried: (v.carried || []).length, stamp: v.stamp }; }); return o; }), null);
   const ms = Date.now() - t0;
   ok(m.cd && m.cd.pass === '1058' && m.cd.tour === 201 && m.cd.tutor === 323 && m.cd.read, 'Carpe Diem is measured from its kept copy: build 1058, 201 tour cards, 323 tutor entries', JSON.stringify(m.cd));
-  ok(m.forge && /^\d{3}$/.test(m.forge.pass || '') && /^9s\d+$/.test(m.forge.stamp || '') && m.forge.tour === 32, 'The Forge is measured: its pass and stamp from its About panel, 32 tour cards (639: a card for Fabrica) (its lean copy carries no apps)', JSON.stringify(m.forge));
-  ok(m.inkwell && m.inkwell.version === '7.49' && m.inkwell.tour === 49, 'Inkwell is measured: 7.49, 49 tour cards', JSON.stringify(m.inkwell));
-  ok(m.ingenium && /^[5-9]\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 34, 'Ingenium is measured: its version, 18 house models, 34 in the catalogue', JSON.stringify(m.ingenium));
+  ok(m.forge && m.forge.pass === BI.forge.version && m.forge.stamp === BI.forge.build && (m.forge.tour === 33 || m.forge.tour === 32) && m.forge.read === true && m.forge.req && Array.isArray(m.forge.req.outside), 'The Forge is measured: its pass and stamp as builtin.json gives them, 33 tour cards (32 if read before the Forge adds its quiet screen\'s card, a moment after it starts), its figures read and its requests written down (6.7: the build record no longer wipes the frame\'s result)', JSON.stringify(m.forge));
+  ok(m.inkwell && m.inkwell.version === BI.inkwell.version && m.inkwell.tour === 49 && m.inkwell.read === true, 'Inkwell is measured: ' + BI.inkwell.version + ', 49 tour cards', JSON.stringify(m.inkwell));
+  ok(m.ingenium && /^[5-9]\.\d+$/.test(m.ingenium.version || '') && m.ingenium.house === 18 && m.ingenium.catalog === 36, 'Ingenium is measured: its version, 18 house models, 36 in the catalogue', JSON.stringify(m.ingenium));
   ok(m.inkwell && m.inkwell.req && m.inkwell.req.loopback.length === 1 && m.inkwell.req.outside.length === 0, 'what an app tries is written down: Inkwell\'s check of its loopback helper, refused in the frame', JSON.stringify(m.inkwell && m.inkwell.req));
   ok(left.length === 0, 'nothing left the page while the apps were measured', JSON.stringify(left.slice(0, 5)) + ' in ' + ms + ' ms');
   const isolated = await p.evaluate(() => ({ v: ING_VERSION, kept: Object.keys(libState().apps).length, rx: !!state.recipe.facts.cd }));

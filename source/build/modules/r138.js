@@ -5,7 +5,7 @@
    of Ingenium MUST be strong and capable to properly edit and curate and customise all of my apps even Ingenium and be able
    to recreate them or make new apps"; "I need it to be able to edit the full apps no matter their sizes and features".
    Build was one text box that ran the page again at every key pressed, so it refused any page over 3 MB ("too large for the
-   Build editor to stay quick"); the owner's apps are 3 to 41 MB. Now a page of any size opens part by part: each script, each style
+   Build editor to stay quick"); the owner's apps are 3 to 41 MB. Now a large page (6.7: up to the editor's limit, 480 MB on a computer and 128 MB on a tablet or phone) opens part by part: each script, each style
    and each stretch of markup is a part of its own, written in a box of its own (quick, whatever the whole), embedded data
    (pictures, the apps an app carries) stands aside as data, a search finds a word anywhere in the whole page, and the whole
    app runs in the preview when asked. A small page opens in the one box, as before. */
@@ -157,7 +157,9 @@ function paintLink(){var bar=$("runBtn")&&$("runBtn").parentNode;if(!bar)return;
   else if(k)k.hidden=true;}
 
 /* ---------- opening an app: your apps, Ingenium itself, Fabrica, a file ---------- */
-function openPicker(){var box=modalOpen('<h3>Open an app in Build</h3><p class="small muted" style="margin-top:0">Any size: a large page opens part by part, and runs whole in the preview.</p><div class="bd-open-list" id="bdOpenList"><div class="small muted">Reading what is here…</div></div><div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn ghost" id="bdOpenX" type="button">Close</button></div>');
+/* 6.7: the largest page Build takes, the same as the editor's (r164: a little under what a browser holds as one text) */
+function maxMB(){return window.ingEditMaxMB||480;}
+function openPicker(){var box=modalOpen('<h3>Open an app in Build</h3><p class="small muted" style="margin-top:0">A page of up to '+maxMB()+' MB on this device. A large page opens part by part, and runs whole in the preview.</p><div class="bd-open-list" id="bdOpenList"><div class="small muted">Reading what is here…</div></div><div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn ghost" id="bdOpenX" type="button">Close</button></div>');
   box.querySelector("#bdOpenX").onclick=closeModal;var host=box.querySelector("#bdOpenList");
   function row(title,sub,fn){var b=E("button","cc-prow");b.type="button";b.appendChild(E("b",null,title));b.appendChild(E("span","small muted",sub));b.onclick=function(){b.disabled=true;Promise.resolve().then(fn).then(function(){closeModal();},function(e){b.disabled=false;toast(title+": "+(e&&e.message||e));});};host.appendChild(b);}
   var lib=[];try{lib=window.IngApps?IngApps.list():[];}catch(e){}
@@ -166,9 +168,12 @@ function openPicker(){var box=modalOpen('<h3>Open an app in Build</h3><p class="
     lib.forEach(function(a){row(a.name,(a.version?a.version+" · ":"")+"your app library",function(){var p=a.key==="ingenium-self"?selfPageText():AppLib.text(a.key);return Promise.resolve(p).then(function(t){if(!t)throw new Error("its page could not be read from this device");closeModal();open({name:(a.key==="ingenium-self"?"ingenium":a.key)+".html",text:t,title:a.name.replace(/ \(this copy\)$/,"")});});});});
     rs.forEach(function(r){row(r.name,"Fabrica · its working copy, with a way back as changes to keep",function(){return IngRepo.files(r.id).then(function(list){var p=(list.filter(function(f){return /\.html?$/i.test(f.path)&&f.path.indexOf("/")<0;})[0]||list.filter(function(f){return /\.html?$/i.test(f.path);})[0]||{}).path;
         if(!p)throw new Error("there is no page in it");return IngRepo.readText(r.id,p).then(function(t){closeModal();open({name:p.split("/").pop(),text:t||"",repo:r.id,path:p,title:r.name});});});});});
-    row("A page from this device","An .html file of any size",function(){return new Promise(function(res){var i=E("input");i.type="file";i.accept=".html,.htm,text/html";i.onchange=function(){var f=i.files&&i.files[0];if(!f){res();return;}f.text().then(function(t){closeModal();open({name:f.name,text:t,title:f.name.replace(/\.html?$/i,"")});res();});};i.click();});});
+    row("A page from this device","An .html file of up to "+maxMB()+" MB",function(){return new Promise(function(res,rej){var i=E("input");i.type="file";i.accept=".html,.htm,text/html";i.onchange=function(){var f=i.files&&i.files[0];if(!f){res();return;}
+      /* 6.7: a file larger than this device can hold whole is refused before it is read, and a read that fails says so */
+      if(f.size>maxMB()*1048576){rej(new Error("it is "+Math.round(f.size/1048576)+" MB; Build opens a page of up to "+maxMB()+" MB on this device"));return;}
+      f.text().then(function(t){closeModal();open({name:f.name,text:t,title:f.name.replace(/\.html?$/i,"")});res();},function(e){rej(new Error("it could not be read on this device ("+(e&&e.message||e)+")"));});};i.click();});});
     if(!lib.length&&!rs.length)host.insertBefore(E("div","small muted","No app is kept on this device yet: add yours in Lector (Add your apps) or bring one into Fabrica."),host.firstChild);});}
-(function(){var s=$("sampleBtn");if(!s||$("bdOpenBtn"))return;var b=E("button","btn small","Open an app…");b.id="bdOpenBtn";b.type="button";b.title="Your apps, Ingenium itself, an app in Fabrica, or a page from this device: any size";b.onclick=openPicker;s.parentNode.insertBefore(b,s);})();
+(function(){var s=$("sampleBtn");if(!s||$("bdOpenBtn"))return;var b=E("button","btn small","Open an app…");b.id="bdOpenBtn";b.type="button";b.title="Your apps, Ingenium itself, an app in Fabrica, or a page from this device";b.onclick=openPicker;s.parentNode.insertBefore(b,s);})();
 
 /* ---------- Edit in Build, from the stage: no page is too large now ---------- */
 (function(){var b=$("csEdit");if(!b)return;b.onclick=function(){try{csMenu(false);}catch(e){}if(typeof csCur==="undefined"||!csCur)return;open({name:csCur.name||"page.html",text:csCur.html||"",title:(csCur.name||"").replace(/\.html?$/i,"")});};})();

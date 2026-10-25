@@ -14,7 +14,10 @@
    - writing: every box of words holds ten times as much (a remembered item, a parked thought, a task and its steps, About you,
      the rules every answer follows, a message to answer); 2,000 thoughts parked, 400 tasks (200 and 40);
    - and in the parts beside this one: a model trained for it may be given up to 1,048,576 tokens of memory (262,144), a reply
-     131,072 (65,536); a page's own store 480 MB (256 MB); a backup restored, a chat export read, up to 480 MB a file. */
+     131,072 (65,536); a page's own store 480 MB (256 MB); a backup restored, a chat export read, up to 480 MB a file.
+   6.7 (the claims audit): these are the limits set, not all measured. What was measured: Chat, Code and Build with apps of
+   107 and 240 MB (rig/t_62_capacity.js, with a stand-in model that answers at once) and Fabrica with a 400 MB file, all in
+   Chromium on Linux; not yet in the Mac app's WebKit view, on a tablet or a phone, or with a real model answering. */
 (function r165(){
 "use strict";
 var SMALL=(typeof INB!=="undefined"&&INB)||(navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Silk|Kindle/i.test(navigator.userAgent||"");
