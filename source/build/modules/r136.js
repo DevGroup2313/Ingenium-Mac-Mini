@@ -231,7 +231,7 @@ function writeP12(key,password,alias){var s=subtle(),rnd=function(n){var x=new U
 /* the keys kept on this device: IndexedDB, and on the computer apps a copy on disk beside the desk */
 var KDB=null;function kdb(){if(KDB)return KDB;KDB=new Promise(function(res,rej){try{var rq=indexedDB.open("ingenium_keys",1);rq.onupgradeneeded=function(){try{rq.result.createObjectStore("k");}catch(e){}};
   rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error||new Error("this device will not keep a signing key"));};}catch(e){rej(e);}});KDB.catch(function(){KDB=null;});return KDB;}
-function ktx(mode,fn){return kdb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("k",mode),r=fn(t.objectStore("k"));t.oncomplete=function(){res(r&&"result" in r?r.result:undefined);};t.onerror=function(){rej(t.error);};});});}
+function ktx(mode,fn){return kdb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("k",mode),r=fn(t.objectStore("k"));t.oncomplete=function(){res(r&&"result" in r?r.result:undefined);};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store refused the key (it may be full)"));};});});}
 var MEMK={};
 function kget(id){if(typeof indexedDB==="undefined")return Promise.resolve(MEMK[id]||null);return ktx("readonly",function(s){return s.get(id);}).then(function(r){return r||diskGet(id);});}
 function kput(rec){if(typeof indexedDB==="undefined"){MEMK[rec.id]=rec;return Promise.resolve(rec);}return ktx("readwrite",function(s){return s.put(rec,rec.id);}).then(function(){diskPut(rec);return rec;});}

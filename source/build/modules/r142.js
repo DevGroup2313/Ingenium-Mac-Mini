@@ -411,7 +411,12 @@ function measure(){if(M.busy)return M.busy;
     .then(function(r){M.busy=null;return r;},function(e){M.busy=null;throw e;});
   return M.busy;}
 function effLimit(quota){var L=+S().limit>0?+S().limit:0;if(L&&quota)return Math.min(L,quota);return L||quota||0;}
-function status(){return estimate().then(function(est){var usage=est?est.usage:(M.last?M.last.total:null),quota=est?est.quota:0,lim=effLimit(quota);
+/* 6.7 (rig/idb): a browser that gives no count of its own (WebKitGTK has no navigator.storage), or one that counts nothing of
+   what the stores hold (the reference implementation of IndexedDB keeps them in memory), is not believed to hold nothing:
+   the stores are measured (at most once a minute) and that measure counts */
+function counted(est){if(est&&est.usage>0)return Promise.resolve(est.usage);var m=M.last;if(m&&Date.now()-m.at<60000)return Promise.resolve(m.total);
+  if(!storeOk())return Promise.resolve(est?est.usage:(m?m.total:null));return measure().then(function(r){return r.total;},function(){return est?est.usage:(m?m.total:null);});}
+function status(){return estimate().then(function(est){return counted(est).then(function(usage){return [est,usage];});}).then(function(x){var est=x[0],usage=x[1],quota=est?est.quota:0,lim=effLimit(quota);
   var pct=(usage!=null&&lim>0)?usage/lim:null,level=pct==null?0:(pct>=WARN2?2:(pct>=WARN1?1:0));
   return {usage:usage,quota:quota,limit:+S().limit>0?+S().limit:null,eff:lim,pct:pct,level:level,mine:+S().limit>0&&(!quota||+S().limit<=quota)};});}
 function persisted(){try{if(navigator.storage&&navigator.storage.persisted)return navigator.storage.persisted().then(function(p){return !!p;},function(){return null;});}catch(e){}return Promise.resolve(null);}
@@ -432,7 +437,10 @@ function verLabel(app,v){return app.name+(v.version?" "+v.version:"")+(v.version
    only when room runs short, or when she cleans the library. The same bytes are never kept twice. */
 function wireLibrary(){if(typeof W.libKeep!=="function"||typeof W.libState!=="function"||typeof W.libPut!=="function"||W.libKeep.__r142)return;
   var nk=function(key,meta,u8,text){var L=W.libState(),cur=L.apps[key];
-    if(cur&&cur.sha256===meta.sha256)return Promise.resolve("same");
+    /* 6.7 (rig/idb): the same fingerprint is the same copy only while its bytes are still in the store; when they were lost
+       (IngBuiltin.seed finds a copy so), they are written again under the same name */
+    if(cur&&cur.sha256===meta.sha256)return (typeof W.libTx==="function"?W.libTx("readonly",function(s){return s.count(cur.ref);}).then(function(n){return n>0;},function(){return true;}):Promise.resolve(true)).then(function(here){
+      if(here)return "same";return W.libPut(cur.ref,u8,text).catch(function(e){throw plainErr(e);}).then(function(){paintSoon();return "kept";});});
     var id=W.IngBig.newId();
     return W.libPut(id,u8,text).catch(function(e){throw plainErr(e);}).then(function(){var m=Object.assign({},meta,{ref:id,at:Date.now()});
       if(cur){var ch=chainOf(cur),dup=ch.filter(function(v){return v.sha256&&v.sha256===meta.sha256;});
