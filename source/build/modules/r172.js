@@ -104,6 +104,8 @@ body[data-theme="night"] select option,body[data-theme="night"] select optgroup{
 body[data-theme="night"] select:not(.r172-native){background-color:var(--cl-solid,#241d31)}
 html.r172-dark{color-scheme:dark}
 @supports selector(:has(a)){html:has(> body[data-theme="night"]){color-scheme:dark}}
+@media (forced-colors:active){.r172-cb{border:1px solid ButtonText}.r172-opt.r172-act{outline:2px solid Highlight;outline-offset:-2px;forced-color-adjust:none;background:Highlight;color:HighlightText}
+  .r172-cb:focus-visible,.r172-cb.r172-kb:focus{outline:2px solid Highlight}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p93"]="started";}catch(_){}
 /* R172 · every drop-down in Ingenium's own dress: see the note at the top of its styles.
@@ -157,6 +159,9 @@ function nameOf(inst){var s=inst.sel,lb=s.getAttribute("aria-labelledby");
   if(txt.length)return {text:clean(ids.map(function(i){var e=D.getElementById(i);return e?e.textContent:"";}).concat(txt).join(" "))};
   if(s.title)return {text:clean(s.title)};
   return {text:"Choose one"};}
+/* the sheet's title: the label's first idea, never its whole help note (a label that wraps its select can hold a long note) */
+function shortName(t){t=String(t||"").trim();if(t.length<=48)return t;var m=/^(.{6,60}?)(?:\s*[(.:;\u2014\u2013]|\s+-\s)/.exec(t);
+  if(m)return m[1].trim();var w=t.slice(0,48);return w.slice(0,Math.max(w.lastIndexOf(" "),24)).trim();}
 function nameText(nm){if(nm.text)return nm.text;return clean(nm.ids.split(/\s+/).map(function(i){var e=D.getElementById(i);return e?e.textContent:"";}).join(" "))||"Choose one";}
 function putName(el,nm){if(nm.ids){if(el.getAttribute("aria-labelledby")!==nm.ids)el.setAttribute("aria-labelledby",nm.ids);if(el.hasAttribute("aria-label"))el.removeAttribute("aria-label");}
   else{if(el.getAttribute("aria-label")!==nm.text)el.setAttribute("aria-label",nm.text);if(el.hasAttribute("aria-labelledby"))el.removeAttribute("aria-labelledby");}}
@@ -343,7 +348,7 @@ function open(inst,how){if(OPEN)close(false);try{inst.sync();}catch(e){warn(e);}
   var sheet=narrow(),o={inst:inst,sheet:sheet,act:-1,items:[]},nm=inst.nm||nameOf(inst),lid=inst.id+"-lb",anim=motion()!=="minimal";
   if(sheet){var scrim=mk("div","r172-scrim",{"aria-hidden":"true"}),tid=inst.id+"-st";
     var dlg=mk("div","r172-sheet",{role:"dialog","aria-modal":"true","aria-labelledby":tid});
-    var grip=mk("r172-grip","r172-grip",{"aria-hidden":"true"}),head=mk("div","r172-head"),title=mk("div","r172-title",{id:tid});title.textContent=nameText(nm);
+    var grip=mk("r172-grip","r172-grip",{"aria-hidden":"true"}),head=mk("div","r172-head"),title=mk("div","r172-title",{id:tid});title.textContent=shortName(nameText(nm));
     var cl=mk("button","r172-close",{type:"button"});cl.textContent="Close";head.appendChild(title);head.appendChild(cl);
     var list=mk("div","r172-list",{role:"listbox",id:lid,tabindex:"0","aria-labelledby":tid});
     dlg.appendChild(grip);dlg.appendChild(head);dlg.appendChild(list);
@@ -368,7 +373,7 @@ function open(inst,how){if(OPEN)close(false);try{inst.sync();}catch(e){warn(e);}
   W.addEventListener("keydown",openKey,true);
   D.addEventListener(HAS_PTR?"pointerdown":"mousedown",outside,true);if(!HAS_PTR)D.addEventListener("touchstart",outside,true);
   D.addEventListener("focusin",trap,true);
-  W.addEventListener("scroll",onScroll,true);W.addEventListener("resize",onResize);
+  W.addEventListener("scroll",onScroll,true);W.addEventListener("resize",onResize);try{W.addEventListener("orientationchange",function(){setTimeout(onResize,350);});}catch(_){}
   o.iv=setInterval(watch,250);}
 function close(refocus){var o=OPEN;if(!o)return;OPEN=null;TA.s="";
   W.removeEventListener("keydown",openKey,true);D.removeEventListener(HAS_PTR?"pointerdown":"mousedown",outside,true);if(!HAS_PTR)D.removeEventListener("touchstart",outside,true);
@@ -418,7 +423,9 @@ function trap(e){var o=OPEN;if(!o||!o.sheet)return;var t=e.target;if(o.box.conta
 var rq=0;
 function onScroll(e){var o=OPEN;if(!o||o.sheet)return;if(e&&e.target&&o.box.contains&&(e.target===o.box||o.box.contains(e.target)))return;
   if(!rq)rq=(W.requestAnimationFrame||setTimeout)(function(){rq=0;place();});}
-function onResize(){var o=OPEN;if(!o)return;if(narrow()!==o.sheet){var inst=o.inst,keep=o.items[o.act]?o.items[o.act].o:null;close(true);open(inst,null);
+var rzLate=0;
+function onResize(){if(rzLate)clearTimeout(rzLate);rzLate=setTimeout(function(){rzLate=0;onResizeNow();},320);onResizeNow();}
+function onResizeNow(){var o=OPEN;if(!o)return;if(narrow()!==o.sheet){var inst=o.inst,keep=o.items[o.act]?o.items[o.act].o:null;close(true);open(inst,null);
     if(OPEN&&keep)OPEN.items.forEach(function(it,i){if(it.o===keep)setActive(i);});return;}
   if(!o.sheet)place();}
 /* the list follows its select: gone (a part of the page drawn again), hidden, or turned off, it closes, or opens again on the new one */

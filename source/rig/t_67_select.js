@@ -415,6 +415,30 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     ok(p.__errs.length === 0, 'no page errors on the other pages', p.__errs.slice(0, 5));
     await ctx.close();
 
+    // ================= "What is this?" from the keyboard gives each select's own help (review, 25 October 2026) =================
+    ({ ctx, p } = await open(b));
+    await p.evaluate(() => go('settings')); await p.waitForTimeout(800);
+    const helpBy = {};
+    for (const [id, want] of [['setTheme', /Day, night, or follow the system/], ['setMotion', /How much things move/], ['cxProvider', /cloud or server model/i]]) {
+      await p.evaluate(() => { const k = document.getElementById('ingHelpKey'); if (k) k.click(); }); await p.waitForTimeout(400);
+      await p.evaluate(() => { const x = [...document.querySelectorAll('button')].find(q => /^What is this\?$/.test(q.textContent.trim()) && q.offsetParent); if (x) x.click(); }); await p.waitForTimeout(300);
+      const focused = await p.evaluate(id => { const s = document.getElementById(id); if (!s) return null; const t = (s.__r172 && s.__r172.combo) || s; t.focus(); return document.activeElement.className; }, id);
+      await p.keyboard.press('Enter'); await p.waitForTimeout(400);
+      const bub = await p.evaluate(() => { const q = document.getElementById('ihBubble'); return q && !q.hidden ? q.innerText.replace(/\s+/g, ' ') : ''; });
+      helpBy[id] = { focused, ok: want.test(bub), bub: bub.slice(0, 120) };
+      await p.keyboard.press('Escape'); await p.waitForTimeout(200); await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+    }
+    ok(Object.values(helpBy).every(x => x.ok && /r172-cb/.test(x.focused || '')), '"What is this?" from the keyboard, on the drop-down itself, gives the help\'s own words for Theme, Motion and Provider', helpBy);
+    // forced colours (Windows High Contrast): the active line stays visible
+    const fc = await b.newContext({ viewport: { width: 1440, height: 900 }, forcedColors: 'active' }); const pf = await fc.newPage();
+    await pf.goto(URL_); await pf.waitForFunction(() => window.__ingReady === true, null, { timeout: 240000 });
+    await pf.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('settings'); }); await pf.waitForTimeout(800);
+    await pf.evaluate(() => { const s = document.getElementById('psLength'); const c = s && s.__r172 && s.__r172.combo; if (c) { c.scrollIntoView({ block: 'center' }); c.focus(); } });
+    await pf.keyboard.press('ArrowDown'); await pf.waitForTimeout(250); await pf.keyboard.press('ArrowDown'); await pf.waitForTimeout(250);
+    const act = await pf.evaluate(() => { const a = document.querySelector('.r172-opt.r172-act'); if (!a) return null; const cs = getComputedStyle(a); return { outline: cs.outlineStyle + ' ' + cs.outlineWidth, bg: cs.backgroundColor }; });
+    ok(!!act && /solid/.test(act.outline), 'in forced colours (Windows High Contrast) the active line of an open list is outlined', act);
+    await fc.close(); await ctx.close();
+
     if (AXE) {
       const where = [...new Set(allAxe.map(v => v.where))];
       fs.writeFileSync(path.join(OUT, 'axe_67.json'), JSON.stringify(allAxe, null, 1));
