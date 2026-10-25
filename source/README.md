@@ -145,4 +145,13 @@ Ingenium's shells), and its saves now go one after another there too: `rig/t_for
 
     node rig/t_62_editions.js <out> master=<url> full=<url> gift=<url> demo=<url>   # 61 checks: what each edition holds and shows
 
+6.7 (25 October 2026) dresses every drop-down in Ingenium's own colours (`modules/r172.js`). Each select keeps its place in
+the page, unseen and laid over its field, and still holds the value; beside it stands a field with the role combobox that
+opens Ingenium's own list (the WAI-ARIA select-only combobox: the arrows, Home, End, letters, Enter, Space, Escape and Tab).
+By night the list is an opaque plum card; on a phone it rises from the foot of the screen as a sheet, inside the safe areas.
+A choice sets the select and sends input and change, so every handler runs as before; a value or options set by code show
+at once. A list of several lines is left as the system draws it, with readable colours by day and by night.
+
+    node rig/t_67_select.js <url> <out> [axe.min.js]   # 77 checks: every select dressed, contrast open and closed by day and night, keys, code, phone sheet, axe-core
+
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.
