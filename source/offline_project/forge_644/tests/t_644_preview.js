@@ -148,7 +148,8 @@ const wheelSmall = async (p, q) => { await p.mouse.move(q.x, q.y); for (let i = 
     // the preview follows an edit (the code, then Run)
     await p.evaluate(() => { const t = document.getElementById('fsCode'); t.value = t.value.replace('<h1>Small app</h1>', '<h1>Small app probe 644</h1>'); t.dispatchEvent(new Event('input', { bubbles: true })); document.getElementById('fsRun').click(); });
     await p.waitForTimeout(2500);
-    ok(await p.evaluate(() => { try { return /Small app probe 644/.test(document.getElementById('frame').contentDocument.body.innerText); } catch (e) { return false; } }), 'the preview follows an edit');
+    // (since 647 the Studio's stage is shown apart, in no origin of the Forge's, so it is read through the browser, not from the page)
+    ok(await (async () => { try { const f = await (await p.$('#frame')).contentFrame(); return /Small app probe 644/.test(await f.evaluate(() => document.body.innerText)); } catch (e) { return false; } })(), 'the preview follows an edit');
     // the divider: the split moves, and the preview still holds its seat after
     await top0(p); g = await geo(p);
     const hd = await p.evaluate(() => { const h = document.getElementById('handle').getBoundingClientRect(); return { x: h.left + h.width / 2, y: Math.min(innerHeight - 80, Math.max(0, h.top) + 200), w: document.getElementById('thread').getBoundingClientRect().width }; });

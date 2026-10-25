@@ -62,7 +62,8 @@ async function cut(ctx, out) {
       ok(Object.keys(opened).length >= 6 && Object.values(opened).every(v => v === true), 'each room opens: ' + Object.keys(opened).join(', '), opened);
       await p.evaluate(() => FORGE.openRoom('editor')); await p.waitForTimeout(500);
       await p.setInputFiles('#edShell', { name: 'small_app.html', mimeType: 'text/html', buffer: Buffer.from('<!doctype html><title>Small</title><h1>Small offline app</h1><script>document.title="ran";</script>') }); await p.waitForTimeout(2500);
-      const ran = await p.evaluate(() => { try { return document.getElementById('frame').contentDocument.body.innerText; } catch (e) { return ''; } });
+      // (since the Forge 647 a page from outside is shown apart, in no origin of the Forge's, so it is read through the browser)
+      const ran = await (async () => { try { const f = await (await p.$('#frame')).contentFrame(); return await f.evaluate(() => document.body.innerText); } catch (e) { return ''; } })();
       ok(/Small offline app/.test(ran), 'a small app opened in the Editor runs on the stage', ran.slice(0, 80));
       await p.evaluate(() => FORGE.openRoom('files')); await p.waitForTimeout(500);
       const ed = await p.evaluate(() => !!window.IngEditor);

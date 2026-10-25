@@ -72,7 +72,8 @@ async function editAsText(p, name) {
     await p.evaluate(() => { const t = document.getElementById('fsCode'); t.focus(); t.setSelectionRange(t.selectionEnd, t.selectionEnd); });
     await p.keyboard.type(' and more');
     await p.evaluate(() => document.getElementById('fsRun').click()); await p.waitForTimeout(2500);
-    const ran = await p.evaluate(() => { try { return document.getElementById('frame').contentDocument.body.innerText; } catch (e) { return ''; } });
+    // (since 647 the Studio's stage is shown apart, in no origin of the Forge's, so it is read through the browser, not from the page)
+    const ran = await (async () => { try { const f = await (await p.$('#frame')).contentFrame(); return await f.evaluate(() => document.body.innerText); } catch (e) { return ''; } })();
     ok(/Words to find and more/.test(ran), 'an edit typed in the editor runs on the stage', ran.slice(0, 120));
     await p.screenshot({ path: path.join(OUT, 'studio.png') });
     // the preview's Code view: the whole file, in a read-only editor (it showed the first 400,000 characters)
