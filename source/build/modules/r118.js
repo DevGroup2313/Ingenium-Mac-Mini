@@ -46,7 +46,14 @@ function prep(which,opts){opts=opts||{};var html=decode("ing-app-"+which);if(!ht
   if(which==="abacus"){
     html=html.replace("function importCSV(text){","window.__ingImportCSV=function(t){importCSV(t);};window.__ingBook=function(){return {data:data,COLS:COLS,ROWS:ROWS,title:(document.getElementById(\"docTitle\")||{}).value||\"\"};};window.__ingSaveFile=function(n,m,c){saveFile(n,m,c);};function importCSV(text){");
     html=html.replace("function saveFile(name,mime,content){","function saveFile(name,mime,content){try{if(window.parent&&window.parent!==window){var __p=(content instanceof Uint8Array)?content.buffer.slice(content.byteOffset,content.byteOffset+content.byteLength):(content instanceof ArrayBuffer?content:new TextEncoder().encode(String(content)).buffer);window.parent.postMessage({kind:\"carpe-save\",name:name,mime:mime,bytes:__p},\"*\");return;}}catch(e){}");}
-  html=html.replace("<head>","<head>"+head);
+  /* 6.7 (security audit): the shared sanitiser (build/safe_html.js) goes first in the frame, before any of the app's own
+     scripts. The apps run at Ingenium's own origin, so markup that reaches them from a file, the clipboard or a backup
+     could otherwise run as Ingenium: here no way of turning text into markup can bring in a script, an event attribute,
+     a frame or a javascript: address, HTML from the clipboard keeps its formatting only, and a link to another site opens
+     in a new window. Without it the app does not open. */
+  var guard="";try{if(window.IngSafe&&IngSafe.src)guard='<script id="ing-safe">'+IngSafe.src+';(function(){var S=ingSafeMake(window);window.IngSafe=S;S.install({sinks:1,clipboard:1,links:1});})();<\/script>';}catch(e){}
+  if(!guard){try{console.warn("Ingenium: the sanitiser is missing, so "+which+" was not opened");}catch(e){}return null;}
+  html=html.replace("<head>",function(){return "<head>"+guard+head;});
   /* Carpe Diem's dress, in the places and the order Carpe Diem gives it */
   try{var items=(INJECT&&INJECT.apps&&INJECT.apps[which])||[],hs="",bs="";items.forEach(function(it){var t=INJECT.texts[it[3]];if(t==null)return;t=String(t).replace(/<\/(script|style)/gi,"<\\/$1");
       var tag=it[0]==="script"?'<script id="'+it[1]+'">'+t+'<\/script>':'<style id="'+it[1]+'">'+t+'</style>';if(it[2]==="head")hs+=tag;else bs+=tag;});

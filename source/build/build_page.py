@@ -27,6 +27,31 @@ edit('<head>\n<meta charset="utf-8">\n<script>/* R100',
      'args:{name:String(n),mime:String(t),b64:String(b)},callId:""}));return true;}};}catch(e){}})();</script>\n<script>/* R100',
      "6.7 the Android bridge as a message listener, in the page's own frame only")
 
+# ---- 6.7 (security audit, 25 October 2026): one sanitiser for markup that comes from outside Ingenium's own code
+#      (safe_html.js). It takes the place of the 3.12 page's sanitizeHtml, which nothing called. Ingenium's page keeps it as
+#      IngSafe (its link guard on: a link to another site opens in a new window, never in Ingenium's own); modules/r118.js puts
+#      the same source first in each carried app's frame. Sticky notes are drawn through it, their previews and search
+#      snippets are read as words in a document with no window, so no markup in them can load or run. ----
+_SAFE = open(os.path.join(HERE, "safe_html.js"), encoding="utf-8").read().strip()
+if "</script" in _SAFE.lower() or "<!--" in _SAFE:
+    sys.exit("safe_html.js: it must not hold </script or <!-- (it is written into a script)")
+edit('function sanitizeHtml(html){var t=document.createElement("template");t.innerHTML=html||"";\n'
+     '  t.content.querySelectorAll("script,style,iframe,object,embed,link,meta,form").forEach(function(n){n.remove();});\n'
+     '  t.content.querySelectorAll("*").forEach(function(n){Array.prototype.slice.call(n.attributes).forEach(function(a){\n'
+     '    var nm=a.name.toLowerCase(),v=String(a.value||"").replace(/\\s+/g,"").toLowerCase();\n'
+     '    if(nm.indexOf("on")===0||((nm==="href"||nm==="src")&&v.indexOf("javascript:")===0)||(nm==="xlink:href"&&v.indexOf("javascript:")===0))n.removeAttribute(a.name);});});\n'
+     '  return t.innerHTML;}',
+     _SAFE + '\nvar IngSafe=ingSafeMake(window);IngSafe.src=String(ingSafeMake);IngSafe.install({links:1});\n'
+     'function sanitizeHtml(html){return IngSafe.html(html);}',
+     "6.7 one sanitiser, and the link guard")
+edit('function stickyPreview(n){try{var d=document.createElement("div");d.innerHTML=(n&&n.text)||"";var t=(d.textContent||"").trim();',
+     'function stickyPreview(n){try{var t=IngSafe.text((n&&n.text)||"").trim();', "6.7 a note's preview read as words")
+edit('body.innerHTML=n.text||"";', 'body.innerHTML=sanitizeHtml(n.text||"");', "6.7 a note drawn as formatting only")
+edit('var d=document.createElement("div");d.innerHTML=n.text||"";return (d.innerText||d.textContent||"").trim();',
+     'return IngSafe.text(n.text||"").trim();', "6.7 notes handed on as words")
+edit('function stripTags(h){var d=document.createElement("div");d.innerHTML=String(h||"");return (d.textContent||"").replace(/\\s+/g," ").trim();}',
+     'function stripTags(h){return IngSafe.text(String(h||"")).replace(/\\s+/g," ").trim();}', "6.7 search snippets read as words")
+
 # ---- R123: a window of its own (#ingapp=...) shows one app and never writes Ingenium's own desk, so it can never
 #      put an older copy of the desk over the newer one the main window keeps ----
 edit('function saveState(){try{\n  state.__deskAt=Date.now();',

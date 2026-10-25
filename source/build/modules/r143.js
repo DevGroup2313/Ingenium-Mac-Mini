@@ -196,6 +196,12 @@ var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app l
 /* what belongs to one device and stays with it: its models and how they ran here */
 var DEVICE_KEYS=["models","activeModelId","perf"];
 var NOTHING=" Nothing was changed.";
+/* 6.7 (security audit): the fields of a connection that say where its key or token is sent. A key belongs to the one
+   address it was saved with; when a restore would change the address, the key is not carried over to it. */
+var ENDP=["base","api","endpoint","host","url","addr","provider","computer","via","model","owner","repo"];
+function connOf(root,path){return path.length>1?getPath(root,path.slice(0,-1)):root;}
+function sameEndpoint(a,b){if(a===b)return true;if(!a||!b||typeof a!=="object"||typeof b!=="object")return false;
+  for(var i=0;i<ENDP.length;i++){var k=ENDP[i];if((k in a)||(k in b)){if(String(a[k]==null?"":a[k])!==String(b[k]==null?"":b[k]))return false;}}return true;}
 
 /* ---------- small helpers ---------- */
 function V(){try{if(!state.v61||typeof state.v61!=="object")state.v61={};if(!state.v61.backup||typeof state.v61.backup!=="object")state.v61.backup={};return state.v61.backup;}catch(e){return {};}}
@@ -618,9 +624,29 @@ function buildState(bst,mode,sec,m){var here=JSON.parse(deskNow()),mine=secrets(
      (the apps are written there again once restored), so an app replaced here is not brought back from the old copy */
   try{var hm=here.yard&&here.yard.mir;if(out.yard&&typeof out.yard==="object"){out.yard=Object.assign({},out.yard);delete out.yard.mir;}
     if(hm){if(!out.yard||typeof out.yard!=="object")out.yard={};out.yard.mir=mode==="merge"?hm:{segs:(hm.segs||[]).slice(),recs:{}};}}catch(e){}
-  if(sec&&Array.isArray(sec.conn))sec.conn.forEach(function(p){if(Array.isArray(p[0]))setPath(out,p[0],p[1]);});
-  mine.forEach(function(p){var cur=getPath(out,p[0]);if(cur===undefined||cur==="")setPath(out,p[0],p[1]);});
+  /* 6.7 (security audit): a connection's key belongs to the one address it was saved with. A backup chooses the addresses
+     in its desk, so a key must never land on an address the backup chose.
+     - the backup's own keys (sec.conn, opened from secrets.enc) go back only where the restored desk keeps the very address
+       they were saved with (the backup's desk, bst); if the restore changed that address, the key is left out;
+     - this device's keys (mine) fill a blank only where the restored connection's address is still this device's own; if the
+       restore would move that connection to another address or provider, the key is left empty, not carried across. */
+  var dropped=[],bsec={};try{secrets(JSON.parse(JSON.stringify(bst)),false).forEach(function(p){bsec[p[0].join(".")]=connOf(bst,p[0]);});}catch(e){}
+  if(sec&&Array.isArray(sec.conn))sec.conn.forEach(function(p){if(!Array.isArray(p[0]))return;var saved=bsec[p[0].join(".")],nowC=connOf(out,p[0]);
+    if(saved&&!sameEndpoint(saved,nowC)){dropped.push(p[0]);return;}setPath(out,p[0],p[1]);});
+  mine.forEach(function(p){var cur=getPath(out,p[0]);if(cur!==undefined&&cur!=="")return;var hc=connOf(here,p[0]),nowC=connOf(out,p[0]);
+    if(!sameEndpoint(hc,nowC)){if(dropped.indexOf(p[0])<0)dropped.push(p[0]);return;}setPath(out,p[0],p[1]);});
+  try{if(m&&typeof m==="object")m.__droppedKeys=dropped.map(function(p){return p.join(".");});}catch(e){}
+  /* every piece of HTML a restore brings in is cut down to safe formatting, so a note or Tabula page from a backup cannot run
+     as Ingenium when it is later drawn into the page */
+  restoreSafeHtml(out);
   return out;}
+/* the HTML a restore carries: notes, parked thoughts, reminders and the Tabula page, each kept as formatting only */
+function cleanMarkup(s){if(typeof s!=="string"||!s)return s;try{if(window.IngSafe&&typeof IngSafe.html==="function")return IngSafe.html(s);}catch(e){}
+  try{var t=document.createElement("template");t.innerHTML=s;t.content.querySelectorAll("script,style,iframe,object,embed,link,meta,base,form,svg").forEach(function(n){n.remove();});
+    t.content.querySelectorAll("*").forEach(function(n){for(var i=n.attributes.length-1;i>=0;i--){var a=n.attributes[i],nm=a.name.toLowerCase(),v=String(a.value||"").replace(/\s+/g,"").toLowerCase();
+      if(nm.indexOf("on")===0||((nm==="href"||nm==="src"||nm==="xlink:href")&&(v.indexOf("javascript:")===0||v.indexOf("vbscript:")===0||(v.indexOf("data:")===0&&nm!=="src"))))n.removeAttribute(a.name);}});return t.innerHTML;}catch(e){return "";}}
+function restoreSafeHtml(st){try{["notes","parked","reminders"].forEach(function(k){if(Array.isArray(st[k]))st[k].forEach(function(n){if(n&&typeof n.text==="string")n.text=cleanMarkup(n.text);});});
+    if(st.tabulaDoc&&typeof st.tabulaDoc.body==="string")st.tabulaDoc.body=cleanMarkup(st.tabulaDoc.body);}catch(e){}}
 
 /* ---------- what a backup holds, and what it would change here ---------- */
 function rowsFor(bc,hc,mc,mode,b,withKeys){var R=[],rep=mode!=="merge";
@@ -652,6 +678,10 @@ function describe(b,mode,withKeys){mode=mode==="merge"?"merge":"replace";var m=b
     lines.push("Your models stay as they are here"+((m.models||[]).length?"; the backup names "+plural(m.models.length,"model")+" to fetch again (below).":"."));
     if(m.secrets){lines.push(withKeys?"The signing keys and connection keys are opened with their password and put back.":"The signing keys and connection keys stay locked in the backup; the ones here stay.");}
     else if(b.kind==="zip")lines.push("This backup holds no signing keys or connection keys: the ones here stay.");
+    /* 6.7: a plain word when a connection's address changes, so a key is not carried onto an address the backup chose */
+    var cc=connChange(bst,mode,m,withKeys);
+    if(cc.device)lines.push("A connection here (its cloud model, GitHub or search) is set to a different address or provider in this backup. Its key or token is left empty, not moved to the new address. Connect again and enter the key when you need it.");
+    if(cc.backup)lines.push("This backup carries a key for a connection whose address it also changed. That key is not put back: a key is only ever used with the address it was saved with.");
     if(b.kind==="desk")lines.push("This is a desk backup from an earlier Ingenium: it holds the desk only (conversations, notes, projects and settings). Fabrica's apps, Lector's documents and the stores here are left as they are.");
     if(m.options&&!m.options.packages&&hc.packages)lines.push("Fabrica's packages are not in this backup: the ones here stay.");
     lines.push("Your desk as it is now goes onto the recovery shelf first"+(api0()&&typeof api0().desk_keep_now==="function"?", and this computer keeps a copy of it":"")+" (Settings, Recover an earlier moment).");
@@ -660,6 +690,12 @@ function describe(b,mode,withKeys){mode=mode==="merge"?"merge":"replace";var m=b
     return room.then(function(){return {rows:rows,lines:lines,here:hc,backup:bc,models:m.models||[],secrets:m.secrets||null,fresh:isFresh(hc)};});});}
 /* a new device: no work of the owner's yet (the apps Ingenium carries are put in the library at first start, so the library does not count) */
 function isFresh(hc){return hc.chats<=1&&hc.messages<=2&&!(hc.fabrica||[]).length&&!hc.lector&&!hc.projects&&!hc.notes&&!(hc.issues||0)&&!(hc.big||0);}
+/* 6.7: would restoring change a connection's address so that a key is not carried onto it? device: a key here; backup: a key the backup holds */
+function connChange(bst,mode,m,withKeys){var here=JSON.parse(deskNow()),out=mode==="merge"?mergeVal(JSON.parse(JSON.stringify(here)),JSON.parse(JSON.stringify(bst))):JSON.parse(JSON.stringify(bst));
+  var r={device:false,backup:false};
+  try{secrets(here,false).forEach(function(p){var cur=getPath(out,p[0]);if(cur!==undefined&&cur!=="")return;if(!sameEndpoint(connOf(here,p[0]),connOf(out,p[0])))r.device=true;});}catch(e){}
+  try{if(withKeys&&m&&Array.isArray(m.secretPaths))m.secretPaths.forEach(function(path){if(!Array.isArray(path))return;if(!sameEndpoint(connOf(bst,path),connOf(out,path)))r.backup=true;});}catch(e){}
+  return r;}
 
 /* ======================= restoring ======================= */
 function shelve(){var cur=deskNow();try{_snapAt=0;}catch(e){}try{if(typeof ingNoteSnapshot==="function")ingNoteSnapshot(cur);}catch(e){}
@@ -672,6 +708,7 @@ function apply(b,o){o=o||{};var mode=o.mode==="merge"?"merge":"replace",say=o.on
   return secP.then(function(s){sec=s;return readDesk(b);}).then(function(x){bst=x;prog(0.01,"Keeping your desk as it is now");return shelve();})
     .then(function(){/* 1. the desk, first: from here on, everything the stores hold is named by it */
       var ns=buildState(bst,mode,sec,m);Object.keys(state).forEach(function(k){delete state[k];});Object.keys(ns).forEach(function(k){state[k]=ns[k];});
+      if(m.__droppedKeys&&m.__droppedKeys.length)report.problems.push("A connection's address changed in this backup, so its key or token was left empty, not carried onto the new address. Open that connection and enter the key when you need it.");
       V().restored={at:Date.now(),made:m.madeAt||0,from:(m.platform&&m.platform.label)||"",version:m.version||"",mode:mode,models:(m.models||[]).map(function(x){return x.name;}),told:false};
       keep();prog(0.04,"Your desk");
       if(b.kind!=="zip")return;

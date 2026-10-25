@@ -13,6 +13,18 @@
 (function(){"use strict";
 if(window.ChatImportCore)return;
 var W=window;
+/* 6.7 (security audit): a chat export is read a piece at a time, so a crafted zip (a "zip bomb": a few kilobytes that
+   unpack to many gigabytes) could fill memory before anything stopped it. The amount unpacked is counted and capped, both
+   for one entry and for the whole import, and an entry that claims to unpack to far more than its packed size is refused
+   outright. A real export, even a large one, stays well under these. */
+var CAP_ENTRY=512*1048576,CAP_TOTAL=1024*1048576,CAP_RATIO=2000;
+function Budget(){this.total=0;}
+Budget.prototype.spend=function(n,label){this.total+=n;if(this.total>CAP_TOTAL)throw new Error("This import is larger than Ingenium reads at once (over "+Math.round(CAP_TOTAL/1048576)+" MB once unpacked). It may be damaged or made to fill memory. Split it into smaller exports and bring them in one at a time.");};
+/* a stream whose unpacked bytes are counted; it stops with a clear error past the cap for this entry or the whole import */
+function capStream(stream,budget,label,entryCap){var seen=0,cap=entryCap||CAP_ENTRY;
+  return stream.pipeThrough(new TransformStream({transform:function(chunk,ctrl){seen+=chunk.length||chunk.byteLength||0;
+      if(seen>cap)throw new Error((label||"A part of the export")+" is larger than Ingenium reads (over "+Math.round(cap/1048576)+" MB once unpacked), so it was not read. The file may be damaged or made to fill memory.");
+      if(budget)budget.spend(chunk.length||chunk.byteLength||0,label);ctrl.enqueue(chunk);}}));}
 var tick=typeof MessageChannel==="function"?(function(){var ch=new MessageChannel(),q=[];ch.port1.onmessage=function(){var f=q.shift();if(f)f();};return function(f){q.push(f);ch.port2.postMessage(0);};})():function(f){setTimeout(f,0);};
 function breathe(){return new Promise(function(r){tick(r);});}
 /* ---------- 1. a zip read from the disk a piece at a time ---------- */
@@ -36,12 +48,16 @@ Zip.prototype.open=function(){var self=this,f=this.file,n=f.size,tail=Math.min(n
         self.entries=out;return out;});});});};
 Zip.prototype.dataStart=function(e){return slice(this.file,e.local,e.local+30).then(function(h){if(u32(h,0)!==0x04034b50)throw new Error("a part of the zip is damaged ("+e.name+")");return e.local+30+u16(h,26)+u16(h,28);});};
 /* the bytes of one entry, as a stream of pieces where the browser can inflate as it reads */
-Zip.prototype.stream=function(e){var f=this.file;return this.dataStart(e).then(function(s){var raw=f.slice(s,s+e.csize);
-  if(e.method===0)return raw.stream();
+Zip.prototype.stream=function(e){var f=this.file,budget=this.budget;
+  /* an entry that says it unpacks to far more than it is packed, and to a great deal, is a bomb: refuse it before reading */
+  if(e.method===8&&e.csize>0&&e.size>CAP_ENTRY&&e.size>CAP_RATIO*e.csize)return Promise.reject(new Error((e.name||"A part of the export")+" claims to unpack to "+Math.round(e.size/1048576)+" MB from "+Math.round(e.csize/1024)+" KB. That is a sign of a file made to fill memory, so it was not read."));
+  return this.dataStart(e).then(function(s){var raw=f.slice(s,s+e.csize);
+  if(e.method===0)return capStream(raw.stream(),budget,e.name);
   if(e.method!==8)throw new Error(e.name+" is packed in a way Ingenium cannot unpack");
-  try{if(typeof DecompressionStream==="function")return raw.stream().pipeThrough(new DecompressionStream("deflate-raw"));}catch(x){}
+  try{if(typeof DecompressionStream==="function")return capStream(raw.stream().pipeThrough(new DecompressionStream("deflate-raw")),budget,e.name);}catch(x){}
+  if(e.size>CAP_ENTRY)throw new Error((e.name||"A part of the export")+" is too large to unpack here (over "+Math.round(CAP_ENTRY/1048576)+" MB).");
   return raw.arrayBuffer().then(function(b){var u=W.IngRepo&&IngRepo.core&&IngRepo.core.inflateRaw?IngRepo.core.inflateRaw(new Uint8Array(b),0,e.size):null;
-    var d=u&&u.data?u.data:u;if(!d)throw new Error("this browser cannot unpack "+e.name);return new Blob([d]).stream();});});};
+    var d=u&&u.data?u.data:u;if(!d)throw new Error("this browser cannot unpack "+e.name);if(budget)budget.spend(d.length||d.byteLength||0,e.name);return new Blob([d]).stream();});});};
 Zip.prototype.text=function(e){return this.stream(e).then(function(st){return new Response(st).text();});};
 /* a file or an entry, read as text a piece at a time */
 function pieces(stream,onText){var rd=stream.getReader(),dec=new TextDecoder("utf-8");
@@ -193,12 +209,12 @@ function one(found,o,k,name,gem){try{
   else if(k==="gemini"){var t=String(o.title||""),m=/^(Prompted|Asked|Said)\s+([\s\S]*)$/i.exec(t);if(m&&/gemini|bard/i.test((o.header||"")+(o.products||[]).join(" ")))gem.push({at:ms(o.time),q:m[2].trim(),a:(o.safeHtmlItem||[]).map(function(h){return htmlText(h.html);}).join("\n\n"),files:[]});}
   else if(k==="generic"){var g=generic(o,name);if(g)found.add(g,srcFromName(name)||"another assistant");}
   else if(o&&o.uuid&&o.docs){found.projects=found.projects.concat(claudeProjects([o]));}}catch(e){found.skipped.push((o&&(o.title||o.name))||"a conversation");}}
-function fileStream(f){return f.stream?f.stream():new Response(f).body;}
+function fileStream(f,budget){var st=f.stream?f.stream():new Response(f).body;return capStream(st,budget,f&&f.name);}
 /* the text files a ChatGPT export keeps beside its conversations (named by the attachment's id), read when small */
 var TEXTY=/\.(txt|md|markdown|csv|tsv|json|js|mjs|ts|tsx|jsx|py|html?|css|java|kt|swift|c|cc|cpp|h|go|rs|rb|php|sh|yml|yaml|xml|sql|toml|ini)$/i;
-function readFiles(files,progress){var found=new Found(),list=[].slice.call(files||[]);
+function readFiles(files,progress){var found=new Found(),list=[].slice.call(files||[]),budget=new Budget();
   return list.reduce(function(p,f){return p.then(function(){var n=f.name||"file";
-      if(/\.zip$/i.test(n)||f.type==="application/zip"){var z=new Zip(f);return z.open().then(function(es){
+      if(/\.zip$/i.test(n)||f.type==="application/zip"){var z=new Zip(f);z.budget=budget;return z.open().then(function(es){
           found.source=found.source||srcFromName(n);
           var conv1=es.filter(function(e){return /(^|\/)conversations?\.json$/i.test(e.name)||/(^|\/)prod-grok-backend\.json$/i.test(e.name);});
           var gem=es.filter(function(e){return /Gemini Apps\/MyActivity\.(json|html)$/i.test(e.name)||/Bard\/MyActivity\.(json|html)$/i.test(e.name);});
@@ -211,7 +227,7 @@ function readFiles(files,progress){var found=new Found(),list=[].slice.call(file
           proj.forEach(function(e){seq=seq.then(function(){return z.text(e).then(function(t){try{found.projects=found.projects.concat(claudeProjects(JSON.parse(t)));}catch(x){}});});});
           other.forEach(function(e){seq=seq.then(function(){return z.stream(e).then(function(st){return readOne(found,st,e.name,progress);});});});
           return seq;});}
-      return readOne(found,fileStream(f),n,progress);});},Promise.resolve())
+      return readOne(found,fileStream(f,budget),n,progress);});},Promise.resolve())
     .then(function(){return attachFromZip(found);}).then(function(){found.conversations.sort(function(a,b){return (b.updated||0)-(a.updated||0);});
       if(!found.source){var c={};found.conversations.forEach(function(x){c[x.source]=(c[x.source]||0)+1;});found.source=Object.keys(c).sort(function(a,b){return c[b]-c[a];})[0]||"another assistant";}
       return found;});}
