@@ -1,7 +1,7 @@
 // Ingenium 6.7 · the analogue sounds (module r176, part p97), in Chromium: the sounds of the owner's other two apps, ported
 // voice for voice and made on the device as they play; placed left or right by where they happened, in a small room; where
 // they sound (the welcome door, a page chosen from the main menu, a notice, a reminder, the seal on Home) and where they
-// never do (the quiet screen, Calm mode, a reply being written, Off); the 60 ms rule; the keys in the Display panel and in
+// never do (the quiet screen, the calm look, a reply being written, Off); the 60 ms rule; the keys in the Display panel and in
 // Settings, the panel of choices, each kept across a reload; axe-core by day and night on a desk and a phone; each of the
 // thirteen voices rendered away from the speakers: not silent, never clipping.
 //   node rig/t_67_sound.js http://127.0.0.1:8163/ingenium.html <out folder> [axe.min.js]
@@ -104,12 +104,22 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   ok(api.started === 0, 'nothing sounds before the first touch (a browser allows none, and nothing is started)', api.started);
 
   // ---------------- 2 · the thirteen voices, rendered away from the speakers ----------------
-  const rend = await p.evaluate(async () => { const out = {}; for (const v of Object.keys(IngSound.names)) { const d = await IngSound.render(v, {}); const mx = await IngSound.render(v, { level: 1.5, pan: 0.35 }); const dry = await IngSound.render(v, { dry: true });
-    out[v] = d && mx && dry ? { peak: +d.peak.toFixed(4), rms: +d.rms.toFixed(6), max: +mx.peak.toFixed(3), maxL: +mx.peakL.toFixed(3), maxR: +mx.peakR.toFixed(3), eL: mx.energyL, eR: mx.energyR, dryRms: +dry.rms.toFixed(6) } : null; } return out; });
+  // the voices' own grains draw on Math.random: it is seeded for these renders, so each run hears the same thing
+  const rend = await p.evaluate(async () => { const keep = Math.random; let s = 0x5EED67; Math.random = () => { let t = s = (s + 0x6D2B79F5) | 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const out = {}; try { for (const v of Object.keys(IngSound.names)) { const d = await IngSound.render(v, {}); const mx = await IngSound.render(v, { level: 1.5, pan: 0.35 }); const dry = await IngSound.render(v, { dry: true }); const dp = await IngSound.render(v, { dry: true, pan: 0.35 }); const wp = await IngSound.render(v, { pan: 0.35 });
+      out[v] = d && mx && dry && dp && wp ? { peak: +d.peak.toFixed(4), rms: +d.rms.toFixed(6), max: +mx.peak.toFixed(3), cL: d.energyL, cR: d.energyR, dpL: dp.energyL, dpR: dp.energyR, wpL: wp.energyL, wpR: wp.energyR, dryRms: +dry.rms.toFixed(6) } : null; } } finally { Math.random = keep; } return out; });
   const vs = Object.keys(rend);
   ok(vs.length === 13 && vs.every(v => rend[v] && rend[v].peak > 0.005 && rend[v].rms > 0.0001), 'each of the thirteen voices renders, and none is silent', vs.map(v => v + ' ' + (rend[v] && rend[v].peak)));
   ok(vs.every(v => rend[v] && rend[v].peak < 1 && rend[v].max < 1), 'none clips: every peak stays below 1.0, at the default level and at the very loudest (volume full, its own level at 150%, placed to one side)', vs.map(v => v + ' ' + (rend[v] && rend[v].max)));
-  ok(vs.every(v => rend[v] && rend[v].eR > rend[v].eL * 2), 'placed to the right, each carries well over twice the energy in the right ear as in the left', vs.map(v => v + ' ' + (rend[v] && (rend[v].eR / rend[v].eL).toFixed(2))));
+  ok(vs.every(v => rend[v] && rend[v].dpR > rend[v].dpL * 2), 'placed to the right (dry, the panner alone), each carries well over twice the energy in the right ear as in the left', vs.map(v => v + ' ' + (rend[v] && (rend[v].dpR / rend[v].dpL).toFixed(2))));
+  ok(vs.every(v => rend[v] && rend[v].wpR > rend[v].wpL * 2), 'and with its room around it, still well over twice in the right ear', vs.map(v => v + ' ' + (rend[v] && (rend[v].wpR / rend[v].wpL).toFixed(2))));
+  const bal = vs.map(v => rend[v] ? Math.abs(10 * Math.log10(rend[v].cL / rend[v].cR)) : 99);
+  ok(bal.every(d => d <= 0.3), 'a sound for the middle stays in the middle with its room: left and right within 0.3 dB for every voice', vs.map((v, i) => v + ' ' + bal[i].toFixed(3)));
+  // the same to a millionth (the renderer itself may differ in the last bits of a float; a room drawn afresh each time
+  // differed by whole per cents)
+  const same = await p.evaluate(async () => { const a = await IngSound.render('deskChime', {}), b = await IngSound.render('deskChime', {}); const d = (x, y) => Math.abs(x - y) / Math.max(1e-12, Math.abs(x));
+    return { aL: a.energyL, bL: b.energyL, aR: a.energyR, bR: b.energyR, rel: Math.max(d(a.energyL, b.energyL), d(a.energyR, b.energyR)) }; });
+  ok(same.rel < 1e-6, 'the room is the same every time (made from a fixed seed): a voice with no chance in it renders the same twice', same);
   const roomT = await p.evaluate(async () => { const w = await IngSound.render('keepMark', { tailFrom: 0.4, seconds: 2 }), d = await IngSound.render('keepMark', { dry: true, tailFrom: 0.4, seconds: 2 }); return { wet: w.tail, dry: d.tail, db: 20 * Math.log10(w.tail / d.rms) }; });
   ok(roomT.dry === 0 && roomT.wet > 0 && roomT.db < -15 && roomT.db > -60, 'a small room around each sound: after Keep mark ends, its room rings on a little, well under the sound itself', roomT);
 
@@ -143,6 +153,15 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   h = await heard(p, () => p.evaluate(() => ingToast('The file could not be saved: the disk is full.')), 400);
   ok(h.sounds === 0 || (h.last && h.last.role === 'notify'), 'a notice that something could not be saved is not taken for a keeping (it may chime, never Keep mark)', h);
   await p.waitForTimeout(1600);
+  h = await heard(p, () => p.evaluate(() => ingToast("This window's own store is full, so your desk is kept in the app's copy on disk. Nothing is lost.")), 400);
+  ok(h.sounds === 1 && h.last && h.last.role === 'notify', 'the app\'s own warning that its store is full chimes as a notice, never as a keeping (though it says "is kept")', h);
+  await p.waitForTimeout(1600);
+  h = await heard(p, () => p.evaluate(() => { ingToast('No posting was added, so the letter is written for any reader.'); }), 400);
+  ok(h.sounds === 0 || (h.last && h.last.role === 'notify'), 'a notice that opens with No ("No posting was added") is not taken for a keeping', h);
+  await p.waitForTimeout(1600);
+  h = await heard(p, () => p.evaluate(() => ingToast('Reading notes.txt (2 KB)…')), 400);
+  ok(h.sounds === 0 && h.started === 0, 'a progress line ending in an ellipsis ("Reading notes.txt…") is work going on, not a notice: silent', h);
+  await p.waitForTimeout(1600);
   h = await heard(p, () => p.evaluate(() => supNotice('A reminder for the test: time to stretch.', [], { timeout: 5000 })), 400);
   ok(h.sounds === 1 && h.last && h.last.role === 'notify', 'a reminder card (the support module\'s notice) plays the chime', h);
   ok(h.last && h.last.pan < 0, 'the reminder card stands at the bottom left, and its chime leans left', h.last && h.last.pan);
@@ -153,6 +172,19 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   h = await heard(p, () => p.evaluate(() => { state.clep.sound = true; pomoChime(); supNotice('A session ended.', [], { timeout: 3000 }); }), 500);
   ok(h.sounds === 0 && h.started === 2, 'when the Clepsydra rings its own chime, the notice beside it stays silent (only its two tones play)', h);
   await p.waitForTimeout(2200);
+  // Fabrica's own corner: its progress line ("Opening ... in Build…") is silent, its notice that follows sounds
+  await p.evaluate(() => go('fabrica'));
+  const hasFb = await p.waitForFunction(() => !!document.getElementById('fb'), null, { timeout: 8000 }).then(() => true, () => false);
+  if (hasFb) {
+    await p.waitForTimeout(1800);
+    h = await heard(p, () => p.evaluate(() => { const t = document.createElement('div'); t.className = 'f-toast'; t.id = 't67busy'; t.textContent = 'Opening My app in Build…'; document.getElementById('fb').appendChild(t); }), 400);
+    ok(h.sounds === 0 && h.started === 0, 'Fabrica\'s progress line (Opening My app in Build…) plays nothing', h);
+    await p.waitForTimeout(1600);
+    h = await heard(p, () => p.evaluate(() => { const b = document.getElementById('t67busy'); if (b) b.remove(); const t = document.createElement('div'); t.className = 'f-toast'; t.id = 't67fbt'; t.textContent = 'My app is in Build. Check its name, then choose a device.'; document.getElementById('fb').appendChild(t); }), 400);
+    ok(h.sounds === 1 && h.last && h.last.role === 'notify', 'and the notice that follows it chimes once', h);
+    await p.evaluate(() => { const t = document.getElementById('t67fbt'); if (t) t.remove(); });
+  } else console.log('NOTE no Fabrica in this edition: its corner is not checked');
+  await p.evaluate(() => go('home')); await p.waitForTimeout(1700);
 
   // ---------------- 6 · the 60 ms rule, and where a sound is placed ----------------
   const burst = await p.evaluate(() => { const a = IngSound.count(); const r = []; for (let i = 0; i < 10; i++) r.push(IngSound.play('confirm')); return { played: IngSound.count() - a, r }; });
@@ -161,8 +193,18 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   const after = await p.evaluate(() => IngSound.play('paper'));
   ok(after === true, 'past 60 ms another kind sounds again at once', after);
   await testKeys(p); await p.waitForTimeout(300);
-  h = await heard(p, async () => { for (let i = 0; i < 8; i++) await p.click('#t67C', { delay: 0 }); }, 300);
-  ok(h.sounds >= 1 && h.sounds <= 3, 'eight quick presses on one key do not chatter', h);
+  // eight presses as fast as the machine allows; each press and each sound is timed in the page, so the check holds
+  // however long the presses take: no two sounds closer than a keeping's pause (150 ms), so never more than one for
+  // each 150 ms the presses spanned. A press is timed on the window, before the module hears it; a sound is timed just
+  // after it is made, so a few milliseconds are allowed for making it (10 between two sounds, 20 over the whole run)
+  // (on a quick machine the eight take some 25 ms and one sound plays; on a loaded one they may take over a second, and
+  // then one sound for each 150 ms is still the rule, not one for each press)
+  const kb = await p.locator('#t67C').boundingBox(); const kx = kb.x + kb.width / 2, ky = kb.y + kb.height / 2;
+  const t0 = await p.evaluate(() => { window.__t67c = []; if (!window.__t67w) { window.__t67w = 1; window.addEventListener('click', e => { if (e.isTrusted && e.target && e.target.id === 't67C') window.__t67c.push(Date.now()); }, true); } return Date.now(); });
+  for (let i = 0; i < 8; i++) await p.mouse.click(kx, ky);
+  await p.waitForTimeout(300);
+  const chat = await p.evaluate((t0) => { const c = window.__t67c, hs = IngSound.history().filter(x => x.at >= t0); return { presses: c.length, span: c.length ? c[c.length - 1] - c[0] : 0, sounds: hs.length, roles: [...new Set(hs.map(x => x.role))], gaps: hs.slice(1).map((x, i) => x.at - hs[i].at) }; }, t0);
+  ok(chat.presses === 8 && chat.sounds >= 1 && chat.roles.join() === 'confirm' && chat.gaps.every(g => g >= 140) && chat.sounds <= 1 + Math.floor((chat.span + 20) / 150), 'eight quick presses on one key do not chatter: no two sounds within 150 ms, at most one for each 150 ms the presses took', chat);
   await p.waitForTimeout(400);
   h = await heard(p, () => p.click('#t67R'), 300); const pr = await lastPan(p);
   ok(h.sounds === 1 && h.last.pan > 0.25 && h.last.pan <= 0.35 && pr > 0.25, 'a key on the right of the window sounds from the right (a stereo place above zero, at most 0.35)', [h.last && h.last.pan, pr]);
@@ -182,9 +224,10 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
     ok(h.sounds === 0 && h.started === 0, 'nothing plays while the quiet screen is open (a notice, a reminder, a page, the test)', h);
     await p.evaluate(() => IngQuiet.close()); await p.waitForTimeout(500);
   } else ok(false, 'the quiet screen is there to test');
-  h = await heard(p, async () => { await p.evaluate(() => { document.documentElement.setAttribute('data-sc-calm', ''); ingToast('A notice in Calm mode.'); IngSound.play('paper'); }); }, 400);
-  await p.evaluate(() => document.documentElement.removeAttribute('data-sc-calm'));
-  ok(h.sounds === 0 && h.started === 0, 'nothing plays in Calm mode, which promises "no motion, no sounds"', h);
+  const calmWas = await p.evaluate(() => !!sup('calm'));
+  h = await heard(p, async () => { await p.evaluate(() => { supSet('calm', true); ingToast('A notice in the calm look.'); IngSound.play('paper'); }); }, 400);
+  await p.evaluate((w) => supSet('calm', w), calmWas);
+  ok(!calmWas && h.sounds === 0 && h.started === 0, 'nothing plays in the calm look (Settings, Support), in which the focus timer\'s chime is always off too', h);
   h = await heard(p, async () => { await p.evaluate(() => { const m = document.createElement('div'); m.className = 'msg msg-live'; m.id = 't67live'; document.body.appendChild(m); IngSound.play('confirm'); ingToast('A notice while a reply is written.'); }); }, 400);
   await p.evaluate(() => { const m = document.getElementById('t67live'); if (m) m.remove(); });
   ok(h.sounds === 0 && h.started === 0, 'nothing plays while a reply is being written word by word', h);
@@ -224,6 +267,9 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   ok(h.sounds === 0 && h.started === 0, 'with sounds off nothing plays at all: a page, a notice, a reminder, a key, the test', h);
   const offNote = await p.evaluate(() => document.getElementById('dpSndNote').textContent);
   ok(/Turn them on/.test(offNote), 'Test the sounds says, calmly, that sounds are off', offNote);
+  await p.waitForTimeout(5300);
+  const offIdle = await p.evaluate(() => [document.getElementById('dpSndNote').textContent, (document.getElementById('setSndNote') || {}).textContent]);
+  ok(/^Sounds are off\. The focus timer's chime has its own switch\.$/.test(offIdle[0]) && !/silent/i.test(offIdle.join(' ')), 'with sounds off, the note promises no more than Off gives: the focus timer\'s chime has its own switch', offIdle);
   await p.evaluate(() => go('home')); await p.waitForTimeout(300);
   await reload(p);
   const kept = await p.evaluate(() => ({ cfg: IngSound.config(), started: window.__snd.started }));
@@ -239,6 +285,16 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   await p.waitForTimeout(300);
   h = await heard(p, () => p.click('#dpSndTest'), 3600);
   ok(h.sounds === 4 && h.started > 30, 'turned on, Test the sounds plays again', h);
+  // the volume at Silent: Test says so, instead of claiming to play
+  await p.focus('#dpSndVol'); await p.keyboard.press('Home'); await p.waitForTimeout(250);
+  h = await heard(p, () => p.click('#dpSndTest'), 1600);
+  const sil = await p.evaluate(() => ({ vol: IngSound.config().vol, vt: document.getElementById('dpSndVol').getAttribute('aria-valuetext'), on: document.querySelector('#dpSound [data-snd-on="1"]').getAttribute('aria-pressed'), note: document.getElementById('dpSndNote').textContent }));
+  ok(sil.vol === 0 && sil.on === 'true' && h.sounds === 0 && h.started === 0 && sil.note === 'The volume is at Silent. Turn it up to hear the sounds.', 'with the volume at Silent, Test the sounds says so and plays nothing', [sil, h.sounds]);
+  // the volume turned up again from the keyboard: that word gives way at once, so the note never contradicts the slider
+  await p.focus('#dpSndVol'); for (let i = 0; i < 8; i++) await p.keyboard.press('ArrowRight'); await p.waitForTimeout(250);
+  const up = await p.evaluate(() => ({ vol: IngSound.config().vol, vt: document.getElementById('dpSndVol').getAttribute('aria-valuetext'), note: document.getElementById('dpSndNote').textContent }));
+  ok(up.vol === 0.4 && up.note === 'Soft sounds, made on this device.', 'turned up again, the note says so at once, not the Silent word of a moment ago', up);
+  await p.waitForTimeout(400);
 
   // ---------------- 9 · More sound choices ----------------
   await p.click('#dpSndMore'); await p.waitForTimeout(500);
@@ -248,12 +304,24 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
   ok(dlg.open && dlg.modal === 'true' && dlg.title === 'Sound choices' && dlg.focus, 'More sound choices opens a dialog of its own, named, with the focus inside', dlg);
   ok(dlg.legends.join('|') === 'Notices and reminders|Keeping something|Entering Ingenium|Moving between pages' && dlg.radios === 13 && dlg.listen === 13, 'each role in plain words, its sounds as choices, a Listen key for each of the thirteen', dlg.legends);
   ok(dlg.checked.join() === 'deskChime,keepMark,dayTurn,deskSet' && dlg.panelOpen, 'the chosen four are marked, and the Display panel stays open under it', dlg.checked);
+  const LV = ['notices and reminders', 'keeping something', 'entering Ingenium', 'moving between pages'];
   const nm = { listen: await p.locator('#ingSoundChoices').getByRole('button', { name: 'Listen to Water drop' }).count(), radio: await p.locator('#ingSoundChoices').getByRole('radio', { name: 'Small bell' }).count(),
-    lvl: await p.locator('#ingSoundChoices').getByRole('slider', { name: 'Its level' }).count(), close: await p.locator('#ingSoundChoices').getByRole('button', { name: 'Close sound choices' }).count() };
-  ok(nm.listen === 1 && nm.radio === 1 && nm.lvl === 4 && nm.close === 1, 'named for a screen reader: Listen to Water drop, the Small bell choice, a level for each role, Close', nm);
+    lvl: await p.locator('#ingSoundChoices').getByRole('slider').count(), close: await p.locator('#ingSoundChoices').getByRole('button', { name: 'Close sound choices' }).count() };
+  for (const r of LV) nm[r] = await p.locator('#ingSoundChoices').getByRole('slider', { name: 'Its level for ' + r, exact: true }).count();
+  ok(nm.listen === 1 && nm.radio === 1 && nm.lvl === 4 && nm.close === 1 && LV.every(r => nm[r] === 1), 'named for a screen reader: Listen to Water drop, the Small bell choice, Close, and four levels each named for its role (Its level for notices and reminders, and so on)', nm);
+  // what the eye reads: the label's own words, its role's words held in a box of one pixel, clipped (for the ear only)
+  const lvShown = await p.evaluate(() => [...document.querySelectorAll('#ingSoundChoices .isc-lvl label')].map(l => { const sr = l.querySelector('.isc-sr'), r = sr ? sr.getBoundingClientRect() : null;
+    return { seen: [...l.childNodes].filter(n => n !== sr).map(n => n.textContent).join('').trim(), hid: !!r && r.width <= 1 && r.height <= 1 && getComputedStyle(sr).overflow === 'hidden' }; }));
+  ok(lvShown.length === 4 && lvShown.every(t => t.seen === 'Its level' && t.hid), 'the eye still reads the short words, Its level (the role\'s words are for the ear)', lvShown);
   await p.screenshot({ path: path.join(OUT, 's67-choices-desk-day.png') });
   h = await heard(p, () => p.click('#ingSoundChoices [data-listen="waterDrop"]'), 400);
   ok(h.sounds === 1 && h.last && h.last.voice === 'waterDrop' && h.started === 1, 'Listen plays that sound (Water drop), and only that', h);
+  await p.waitForTimeout(200);
+  await p.evaluate(() => IngSound.set({ trim: { notify: 0 } })); await p.waitForTimeout(100);
+  h = await heard(p, () => p.click('#ingSoundChoices [data-listen="waterDrop"]'), 400);
+  const lsil = await p.evaluate(() => document.querySelector('#ingSoundChoices .isc-status').textContent);
+  await p.evaluate(() => IngSound.set({ trim: { notify: 1 } }));
+  ok(h.sounds === 0 && h.started === 0 && lsil === 'This kind of sound is set to Silent. Turn its level up to hear it.', 'with its level at Silent, Listen says so and plays nothing', [h.sounds, lsil]);
   await p.waitForTimeout(200);
   h = await heard(p, () => p.click('#ingSoundChoices [data-listen="shelfPass"]'), 600);
   ok(h.sounds === 1 && h.last && h.last.voice === 'shelfPass', 'Listen to Shelf pass plays Shelf pass', h);
