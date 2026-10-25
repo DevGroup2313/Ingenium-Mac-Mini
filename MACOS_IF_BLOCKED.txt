@@ -107,15 +107,11 @@ The simplest alternative (no build at all)
 ------------------------------------------
 Ingenium is one self-contained file. You do not need the built app.
 
-  Option A - immediate:
-    Double-click ingenium.html. It opens in your browser and works fully
-    offline. This always works.
+  Option A, at once:
+    Double-click ingenium.html. It opens in your browser and works with no
+    connection. This always works.
 
-  Option B - a real app window with the Ingenium seal in your Dock:
-    1. Put ingenium.html online with any free static host
-       (e.g. drag the folder onto app.netlify.com/drop, or GitHub Pages).
-    2. Open that address in Safari.
-    3. File > Add to Dock.
-    It then behaves like a native app, with its own window and the seal as
-    its icon, and works offline afterwards. No Python, no build, no security
-    prompts.
+  Option B, a window of its own with the Ingenium seal in your Dock:
+    Use Ingenium.app (section 2 or 3 of README.md). Do not put ingenium.html
+    online to make one: the licence does not allow it to be hosted or shared
+    without the owner's permission (LICENCE.txt, section 5).
