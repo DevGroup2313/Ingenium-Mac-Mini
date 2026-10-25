@@ -47,7 +47,7 @@ function judgeOf(r,models){return (typeof blJudge==="function")?blJudge(r,models
 blendRun=function(){var b=blState();
   if(BL.run&&BL.run.status==="running"){blPaintNote("A blend is running: its answers are on the right. Stop it first to start another.","bad");return;}
   var task=($("blendTask").value||"").trim(),chosen=blChosen(),ready=chosen.filter(blCanRun);
-  if(chosen.length<2){blPaintNote("Choose two or more models above.","bad");return;}
+  if(chosen.length<2){blPaintNote("Choose two or more models in step 1.","bad");return;}
   if(ready.length<2){blPaintNote("At least two of the chosen models must be ready on this device (see the Models page).","bad");return;}
   if(!task){blPaintNote("Write the question first.","bad");$("blendTask").focus();return;}
   if(liveBot||Engine.status==="busy"||Engine.status==="loading"){blPaintNote("The engine is busy (a chat reply or Lector). Let it finish, then run the blend.","bad");return;}

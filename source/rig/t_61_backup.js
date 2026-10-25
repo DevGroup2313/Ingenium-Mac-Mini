@@ -86,6 +86,9 @@ async function boot(p, url) {
   await p.waitForTimeout(700);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
   await p.waitForTimeout(500);
+  // the apps Ingenium carries are kept a few seconds after every start (R120): kept now, so that on a busy machine they never
+  // land between the test's two looks at the stores
+  await p.evaluate(() => window.IngBuiltin ? IngBuiltin.seed().catch(() => null) : null);
   return ms;
 }
 async function fresh(b, vp) { const ctx = await b.newContext({ viewport: vp || { width: 1440, height: 900 }, acceptDownloads: true }); const p = await ctx.newPage(); p.__errs = [];

@@ -253,6 +253,8 @@ function ownKit(store,kitId,who,page){
   var ingName=ing.name||"Ingenium",ingFile=ing.file_name||ingName,ingId=ing.app_id||"",ingLow=ingFile.toLowerCase();
   var N=who.name,F=who.file,low=String(F).toLowerCase().replace(/[^a-z0-9]/g,"");if(!/^[a-z]/.test(low))low="app"+low;
   var desk=kitId==="windows"||kitId==="mac"||kitId==="macarm";
+  /* the name Xcode gives the iPhone and iPad app's target and program: letters, digits and _ only */
+  var XN=String(F).replace(/[^A-Za-z0-9_]/g,"");if(!/^[A-Za-z]/.test(XN))XN="App"+XN;
   /* the files that carry the app's identity, renamed for it: [old path, new path]; every text naming them is changed to match */
   var RN=[[ingLow+".html",low+".html"],[ingLow+"_app.py",low+"_app.py"],[ingLow+"_win.spec",low+"_win.spec"],[ingLow+".spec",low+".spec"],
     [ingLow+".ico",low+".ico"],[ingLow+".png",low+".png"],[ingLow+".icns",low+".icns"],["icons/"+ingLow+".png","icons/"+low+".png"],
@@ -262,7 +264,8 @@ function ownKit(store,kitId,who,page){
   var TOK=[[ingLow+"_app",low+"_app"],[ingLow+"_win.spec",low+"_win.spec"],[ingLow+".spec",low+".spec"],[ingLow+".html",low+".html"],[ingLow+".iconset",low+".iconset"],
     [ingLow+".icns",low+".icns"],[ingLow+".ico",low+".ico"],[ingLow+".png",low+".png"],[ingLow+"_seal.svg",low+"_seal.svg"],["make_"+ingLow+"_icon","make_"+low+"_icon"],
     [ingFile+".iss",F+".iss"],["Build "+ingName+" (Windows)","Build "+N+" (Windows)"],["Run "+ingName+" (Windows)","Run "+N+" (Windows)"],
-    [ingFile+"-Setup",F+"-Setup"],[ingFile+"-Windows-with-models",F+"-Windows-with-models"],[ingFile+".exe",F+".exe"]];
+    [ingFile+"-Setup",F+"-Setup"],[ingFile+"-Windows-with-models",F+"-Windows-with-models"],[ingFile+".exe",F+".exe"],
+    [ingLow+"_crash.log",low+"_crash.log"],[ingLow+"_diag.txt",low+"_diag.txt"],[ingLow+"_session.flag",low+"_session.flag"],["."+ingLow+"_write_test","."+low+"_write_test"]];
   if(desk)TOK.push([ingFile+".app",F+".app"]);
   if(!desk){TOK.push([ingLow+"_android_project",low+"_android_project"],[ingLow+"_ios_project",low+"_ios_project"]);}
   if(ingId)TOK.push([ingId,who.id]);
@@ -288,6 +291,13 @@ function ownKit(store,kitId,who,page){
       .replace(new RegExp("\\|\\| echo "+esc(ingFile)+"\\)","g"),"|| echo "+F+")")
       .replace(new RegExp("(<key>CFBundleDisplayName</key>\\s*<string>)"+esc(ingName)+"(</string>)"),"$1"+N+"$2")
       .replace(new RegExp(esc(ingName)+" uses (your|the) home network","g"),N+" uses $1 home network");
+    /* the iPhone and iPad project: its target, product and program take the app's name, and the cloud build that makes it
+       looks for them by that name (the app's bundle was Ingenium.app inside an IPA named for the app) */
+    if(!desk&&(/(^|\/)project\.yml$/.test(rel)||/(^|\/)\.github\/workflows\/[^\/]*ios[^\/]*\.ya?ml$/.test(rel))){var I0=esc(ingName);
+      s=s.replace(new RegExp("^name: "+I0+"$","m"),"name: "+XN).replace(new RegExp("^(  )"+I0+":$","m"),"$1"+XN+":")
+        .replace(new RegExp("^(\\s+PRODUCT_NAME: )"+I0+"$","m"),"$1"+XN)
+        .replace(new RegExp("\\b"+I0+"\\.xcodeproj\\b","g"),XN+".xcodeproj").replace(new RegExp("(-scheme )"+I0+"\\b","g"),"$1"+XN)
+        .replace(new RegExp("/"+I0+"\\.app\\b","g"),"/"+XN+".app");}
     if(publisher)s=s.replace(/^(AppPublisher=).*$/m,"$1"+publisher).replace(/^(AppCopyright=Copyright \(c\) \d{4} ).*$/m,"$1"+publisher);
     /* what the build and run files say while they work, and the build recipes' own notes, name the app they build */
     var says=/\.(bat|command|spec|iss)$/i.test(rel),notes=/(^|\/)make_[^\/]*_icon\.py$/.test(rel);

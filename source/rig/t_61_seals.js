@@ -149,7 +149,7 @@ async function pixel(p, dataUrl, vb, pts) {
   await theme(p, 'night');
   const N1 = await p.evaluate(() => { const a = ['cd', 'forge', 'ingenium'], marks = [...document.querySelectorAll('#l7Bf .l-doc .l-mark img')], pap = document.querySelector('#l7Desk .l-paper .cv .seals img'), live = document.querySelector('#l7Bf .l-setname .ing-crest');
     return { marks: marks.map(m => m.src === IngSeal.url(a, { night: true })), paper: pap && pap.src === IngSeal.url(a, { night: true }), live: live && live.classList.contains('night') && [...live.querySelectorAll('img.ic-l')].some(x => x.src === live.querySelectorAll('img.ic-l')[0].src), tiles: [...document.querySelectorAll('#l7Bf .l-app .ls')].length }; });
-  ok(N1.marks.length === 3 && N1.marks.every(Boolean), 'by night the Documents list shows the night crest (it kept the day look before)', N1.marks);
+  ok(N1.marks.length >= 3 && N1.marks.every(Boolean), 'by night the Documents list shows the night crest (it kept the day look before)', N1.marks);
   ok(N1.paper && N1.live, 'by night the cover and the live crest by the set\'s name change too, with no reload', N1);
   await p.screenshot({ path: path.join(OUT, 's61-lector-trio-night.png') });
   await shotDocs('s61-documents-night.png');

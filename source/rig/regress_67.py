@@ -4,10 +4,12 @@ own arguments, and writes a summary (a table of passed and failed checks per tes
     python3 rig/regress_67.py <folder holding ingenium.html> <out folder> [port] [test,test,...]
 
 Fixtures it makes in the served folder: imp/ (chat exports of other assistants, rig/import_fixtures.js), apps/ (small, large
-and very large pages for the stage), forge.html (The Forge's lean page Ingenium carries, from build/apps/builtin). axe-core
-comes from AXE or rig/a11y/axe.min.js. Tests that need tools this machine may not have (apksig for t_v6, the desktop back end
-for t_62_quick) are skipped and named in the summary."""
-import os, sys, json, gzip, time, subprocess, shutil, signal
+and very large pages for the stage; pages of 12 and 64 MB for the capacity test, rig/make_big.js), forge.html (The Forge's lean
+page Ingenium carries, from build/apps/builtin). axe-core comes from AXE or rig/a11y/axe.min.js. Tests that need tools this
+machine may not have (apksig for t_v6, the desktop back end for t_62_quick) are skipped and named in the summary. t_62_eyes
+reads the owner's two photos from the folder EYES_PHOTOS names (image1.jpg, a beach; image2.jpg, beagles), and is skipped
+without it."""
+import os, re, sys, json, gzip, time, subprocess, shutil, signal
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.dirname(HERE)
@@ -31,20 +33,25 @@ def prep():
         if not os.path.exists(p):
             open(p, "w").write('<!doctype html><html><head><meta charset="utf-8"><title>%s</title></head><body><h1>%s</h1>'
                                '<script>try{localStorage.setItem("k","v")}catch(e){}</script>%s</body></html>' % (n, n, body * max(1, kb * 1024 // len(body))))
+    for n, mb in (("cap12", 12), ("cap64", 64)):  # the capacity test's own pages (rig/make_big.js)
+        p = os.path.join(apps, n + ".html")
+        if not os.path.exists(p):
+            subprocess.run(["node", os.path.join(HERE, "make_big.js"), p, str(mb)], check=True, capture_output=True)
     fg = os.path.join(SERVE, "forge.html")
     if not os.path.exists(fg):
         open(fg, "wb").write(gzip.open(os.path.join(SRC, "build", "apps", "builtin", "forge.html.gz")).read())
 
 
 A = lambda name: os.path.join(SERVE, "apps", name + ".html")
+PHOTOS = os.environ.get("EYES_PHOTOS", "")  # the owner's two photos (image1.jpg, a beach; image2.jpg, beagles) for t_62_eyes
 CORE = os.path.join(SRC, "build", "thoughts", "code_editor_core.html")
 TESTS = [  # name, extra arguments after <page url> <out>, or a function giving the whole argument list
     ("t_67_select", [AXE]), ("t_67_phone", ["all"]), ("t_67_seal", [AXE]), ("t_67_sound", [AXE]), ("t_67_rooms", [AXE]),
     ("t_67_kits", []), ("t_67_security", []), ("t_67_claims", []),
     ("t_61_home", []), ("t_61_ask", []), ("t_61_backup", []), ("t_61_hub", ["forge=" + U + "/forge.html"]), ("t_61_refresh", []),
     ("t_61_seals", []), ("t_61_storage", []),
-    ("t_62_apart", []), ("t_62_desk", []), ("t_62_eyes", []), ("t_62_import", [U + "/imp"]), ("t_62_lector", []), ("t_62_tour", []),
-    ("t_62_stage", [A("small"), A("large"), A("huge")]), ("t_62_capacity", [A("large"), A("huge")]),
+    ("t_62_apart", []), ("t_62_desk", []), ("t_62_eyes", [PHOTOS]), ("t_62_import", [U + "/imp"]), ("t_62_lector", []), ("t_62_tour", []),
+    ("t_62_stage", [A("small"), A("large"), A("huge")]), ("t_62_capacity", [A("cap12"), A("cap64")]),
     ("t_63_capacity", []), ("t_63_code_editor_app", []), ("t_63_look", []),
     ("t_62_code_editor", lambda o: [CORE, o]), ("t_63_learn", lambda o: [CORE, o]),
     ("t_63_offline", lambda o: ["ingenium=" + PAGE, "forge=" + U + "/forge.html", o]),
@@ -71,6 +78,9 @@ def run_one(name, extra):
     p, f = text.count("\nPASS "), text.count("\nFAIL ")
     if text.startswith("PASS "): p += 1
     if text.startswith("FAIL "): f += 1
+    if not p and not f:  # a test that prints only its count
+        m = re.findall(r"(\d+) passed, (\d+) failed", text)
+        if m: p, f = int(m[-1][0]), int(m[-1][1])
     fails = [l[5:200] for l in text.split("\n") if l.startswith("FAIL ")]
     return {"test": name, "passed": p, "failed": f, "exit": code, "s": round(time.time() - t0), "fails": fails[:8]}
 
@@ -86,6 +96,9 @@ def main():
                 continue
             if not os.path.exists(os.path.join(HERE, name + ".js")):
                 res.append({"test": name, "passed": 0, "failed": 0, "exit": "missing", "s": 0, "fails": []}); continue
+            if name == "t_62_eyes" and not (PHOTOS and os.path.exists(os.path.join(PHOTOS, "image1.jpg"))):
+                res.append({"test": name, "passed": 0, "failed": 0, "exit": "skipped", "s": 0, "fails": ["EYES_PHOTOS names no folder with image1.jpg and image2.jpg"]})
+                print("%-24s skipped: set EYES_PHOTOS to the folder of the two photos" % name, flush=True); continue
             r = run_one(name, extra); res.append(r)
             print("%-24s %4d passed %3d failed  exit %-7s %5ds" % (name, r["passed"], r["failed"], r["exit"], r["s"]), flush=True)
             json.dump(res, open(os.path.join(OUT, "summary.json"), "w"), indent=1)

@@ -133,7 +133,7 @@ function signWith(key,body){return subtle().sign(SIG,key,TE.encode(canon(body)))
 
 /* the owner's key and book of permissions are kept in a store of their own, never in the desk's ordinary state */
 var DB="offline_owner";
-function idb(){return new Promise(function(res,rej){var rq=indexedDB.open(DB,1);rq.onupgradeneeded=function(){rq.result.createObjectStore("o");};rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};});}
+function idb(){return new Promise(function(res,rej){if(!window.indexedDB){rej(new Error("This browser keeps no store here (it may be a private window)."));return;}var rq=indexedDB.open(DB,1);rq.onupgradeneeded=function(){rq.result.createObjectStore("o");};rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};});}
 function iget(k){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("o","readonly"),r=t.objectStore("o").get(k);r.onsuccess=function(){res(r.result||null);};t.oncomplete=function(){d.close();};t.onerror=function(){d.close();rej(t.error);};});});}
 function iput(k,v){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("o","readwrite");t.objectStore("o").put(v,k);t.oncomplete=function(){d.close();res(true);};t.onerror=t.onabort=function(){d.close();rej(t.error);};});});}
 
@@ -293,7 +293,8 @@ function create(o){
         it.appendChild(el("div",C.note,(p.until?"Until "+said(p.until):"No end date")+". Allows: "+p.allows.join(", ")+"."));
         if(!gone){var wb=el("button",C.btn,"Withdraw it");wb.type="button";wb.onclick=function(){withdraw(p.n);};var rr=el("div","pc-row");rr.appendChild(wb);it.appendChild(rr);}bl.appendChild(it);});
       box.appendChild(bl);
-      if(book.withdrawn.length){var r4=el("div","pc-row"),sl=el("button",C.btn,"Save the list of withdrawn permissions");sl.type="button";sl.onclick=saveList;r4.appendChild(sl);box.appendChild(r4);}});}
+      if(book.withdrawn.length){var r4=el("div","pc-row"),sl=el("button",C.btn,"Save the list of withdrawn permissions");sl.type="button";sl.onclick=saveList;r4.appendChild(sl);box.appendChild(r4);}},
+      function(){box.innerHTML="";box.appendChild(el("p","pc-line "+C.note,"Your owner key cannot be kept or read in this window: the browser keeps no store here (it may be a private window). Open this app in an ordinary window to make, bring back or use your key."));});}
   function paint(){var c=D.getElementById(o.id||"pcCard");if(c&&c.parentNode)card(c.parentNode);return ready();}
   ready();
   return {card:card,paint:paint,ready:ready,allows:allows,holder:holder,states:function(){return states();},keys:keys,

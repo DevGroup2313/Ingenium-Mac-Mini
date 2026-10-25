@@ -152,7 +152,7 @@ body[data-theme="night"] #bkCard .bk-sw:checked{background:#7a56c8;border-color:
 @media (max-width:560px){#bkCard .bk-pane{padding:13px}#bkCard .bk-seg{display:flex;width:100%}#bkCard .bk-seg button{flex:1 1 0;padding:7px 6px}
   #bkCard .bk-pw{grid-template-columns:minmax(0,1fr);margin-left:0}#bkCard .bk-pair{grid-template-columns:minmax(0,1fr)}#bkCard .bk-pair .bk-key{justify-self:start}
   #bkCard .bk-row .bk-key{flex:1 1 auto}#bkCard .bk-last{margin-left:0}
-  #bkCard .bk-tab{font-size:12.5px}#bkCard .bk-tab th,#bkCard .bk-tab td{padding:7px 6px}
+  #bkCard .bk-tab{font-size:12.5px}#bkCard .bk-tab th,#bkCard .bk-tab td{padding:7px 6px}#bkCard .bk-tab td.num{white-space:normal}
   #bkCard .bk-tab .bk-long{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}#bkCard .bk-tab .bk-short{display:inline}}
 @media (prefers-reduced-motion:reduce){#bkCard *,#bkCard *::before,#bkCard *::after{transition-duration:.01ms !important;animation:none !important}}
 body[data-motion="minimal"] #bkCard *,body[data-motion="minimal"] #bkCard *::before{transition-duration:.01ms !important;animation:none !important}
