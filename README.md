@@ -161,9 +161,12 @@ Things to know:
 * One model runs at a time on the Mac mini. A device that asks for another
   model loads that one, and the Mac mini's own chat loads its model again
   when it is next used.
-* Nothing leaves your home network, and only devices with the pairing code
-  are answered. After eight wrong codes in ten minutes, that device waits ten
-  minutes. **Make a new pairing code** shuts out every device that had the
+* Questions and replies go only to the computer you pair with, on the same
+  network, and only devices with the pairing code are answered. They are not
+  encrypted, so share only on a network you trust, such as your home Wi-Fi. A
+  short hello, with no code, tells devices on the network this computer's name
+  and how many models it lends. After eight wrong codes in ten minutes, that
+  device waits ten minutes. **Make a new pairing code** shuts out every device that had the
   old one.
 * If the name does not work on a device, use the number address. Your router
   may change that number now and then; giving the Mac mini a fixed address in
@@ -217,10 +220,15 @@ Two things to know:
 | `make_ingenium_icon.py` | Draws the Ingenium seal as the app icon. Plain Python. |
 | `ingenium.icns`, `ingenium.png` | Ingenium seal, drawn by the step above. |
 
-The app makes no connection by itself. It connects only when you turn a
-connection on in Settings (Ollama on another computer, or a cloud provider
-such as Claude). You can confirm it: open `ingenium.html`, open your browser's
-network tab, reload, and watch nothing be requested. The build step is
+The app makes no connection by itself. It goes online only when you ask for
+something that needs it: a connection you turn on in Settings (Ollama on
+another computer, or a cloud provider such as Claude), a model you install, a
+web search, GitHub, a look-up of a reference in Fontes, Dictate in browsers
+whose speech service is online, or Scriba's speech model the first time you
+record. You can confirm the first part: open `ingenium.html`, open your
+browser's network tab, reload, and see that no request goes to any other
+address (the page's own file, data and blob entries are all on this device).
+The build step is
 different: it downloads its tools, the engine's source and the built-in model
 once, then keeps them.
 
