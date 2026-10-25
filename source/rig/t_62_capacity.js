@@ -8,7 +8,8 @@
 //   Code:  the app is a project; it runs; a change is made to it and the app runs again with it; Undo puts it back;
 //   Build: the app opens part by part; a part written in is part of the whole; the whole app runs (from a file of its own,
 //          never as one giant attribute) and is saved whole;
-//   all along: Ingenium answers (the page's own thread is never held for long), memory is let go, no page errors.
+//   all along: Ingenium answers (the page's own thread is never held for long), memory is let go (measured once the
+//          browser has collected what nothing holds), no page errors.
 //   node rig/t_62_capacity.js http://127.0.0.1:8150/ingenium.html <out folder> <app.html> [<app.html> ...]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT, ...APPS] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -39,7 +40,11 @@ async function boot(b) {
 }
 // the page's own thread: the longest wait for an answer over a few tries
 async function ping(p, n = 6) { let worst = 0; for (let i = 0; i < n; i++) { const t = Date.now(); await p.evaluate(() => 1); worst = Math.max(worst, Date.now() - t); await p.waitForTimeout(120); } return worst; }
-const heap = p => p.evaluate(() => (performance.memory ? performance.memory.usedJSHeapSize : 0));
+// memory in use once the browser has let go of what nothing holds (it collects when it likes, so a reading taken without
+// asking counts copies already dropped: 1.3 GB before and 0.3 GB after, at 130 MB, 25 October 2026); both are written down
+const heap = async p => { const m = () => p.evaluate(() => (performance.memory ? performance.memory.usedJSHeapSize : 0)); const a = await m();
+  const c = await p.context().newCDPSession(p); for (let i = 0; i < 2; i++) { await c.send('HeapProfiler.collectGarbage'); await p.waitForTimeout(800); }
+  const z = await m(); console.log('NOTE memory before collecting ' + MB(a) + ', after ' + MB(z)); return z; };
 const edit = (file, from, to) => `<edit file="${file}">\n<<<<<<< FIND\n<h1 id="capHead">${from}</h1>\n=======\n<h1 id="capHead">${to}</h1>\n>>>>>>> REPLACE\n</edit>\n\nThe heading now says "${to}".`;
 async function frameReady(p, sel, ms = 120000, want) {
   // the frames are sandboxed (their own opaque origin): the page cannot look inside them, so the test looks through the browser
