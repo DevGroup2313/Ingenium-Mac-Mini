@@ -158,7 +158,10 @@ const PAGE_HELPERS = () => {
   ok(seed.forge.chain.length === 2 + builtin.forge.length && seed.forge.chain[0].v === '900' && seed.forge.chain[1].v === '901' && seed.forge.f1gone, 'the same bytes added again are not kept twice: the copy before goes, the newest stays', seed.forge);
 
   // what takes the room, measured again: real sizes
-  await p.evaluate(() => document.getElementById('stxMeasure').click()); await p.waitForTimeout(1800);
+  // (the new measurement is waited for, not a fixed time: a busy machine may take longer than the 1.8 s once allowed)
+  await p.evaluate(() => { window.__m0 = IngStore._.last().measure; document.getElementById('stxMeasure').click(); });
+  await p.waitForFunction(() => { const m = IngStore._.last().measure; return !!m && m !== window.__m0; }, null, { timeout: 60000 }).catch(() => { });
+  await p.waitForTimeout(300);
   const s2 = await p.evaluate(() => { const rows = {}; document.querySelectorAll('#stxKinds li').forEach(l => rows[l.getAttribute('data-db')] = { t: l.textContent }); return { rows, last: IngStore._.last().measure.dbs }; });
   const libRow = s2.last.find(x => x.db === 'ingenium_apps'), madeRow = s2.last.find(x => x.db === 'fabrica_made'), bigRow = s2.last.find(x => x.db === 'ingenium_big');
   const libBytes = seed.libSum;

@@ -57,7 +57,6 @@ var R1_ASKING=/^\s*(how|what|why|when|where|who|which|whose|is|are|was|were|does
 var R1_IMPER=/\b(can you|could you|would you|will you|please|i want|i need|i'd like|make me|build me|write me|create me|give me)\b/i;
 var R1_FMT=[["pdf",/\bpdf\b/i],["docx",/\b(word|docx|\.doc|ms word)\b/i],["html",/\b(html|web ?page|website)\b/i],["md",/\b(markdown|\.md)\b/i],["txt",/\b(plain text|\.txt|text file)\b/i]];
 function r1Fmt(t){for(var i=0;i<R1_FMT.length;i++)if(R1_FMT[i][1].test(t))return R1_FMT[i][0];return null;}
-function r1DocLike(n){return /\.(docx|doc|odt|rtf|md|markdown|txt|text)$/i.test(String(n||""));}
 /* the file a change is for: one attached to this message, else the newest in the conversation */
 function r1FileFor(rec){var fs=(rec&&rec.files)||[];if(fs.length)return fs[fs.length-1].name;
   var names=edChatFiles();return names.length?names[names.length-1]:null;}
@@ -78,8 +77,6 @@ function r1Want(rec){var t=String((rec&&rec.text)||""),mode=rec&&rec.makeMode,fm
   if(MK_WANT_APP.test(t)&&make&&!/\b(app|application)s? (store|settings)\b/i.test(t))return {kind:"page",fmt:"html"};
   if((MK_WANT_DOC.test(t)&&make)||((fmt==="pdf"||fmt==="docx")&&make))return {kind:"doc",fmt:fmt};
   return null;}
-/* the source of a change, as it is now (the newest version made in this conversation, else hers as attached) */
-function r1Size(name,before){return edSource(name,before).then(function(s){return s;});}
 function r1WholeOK(src,budget){return !!src&&src.text.length<=Math.min(30000,Math.floor((budget||40000)*0.42));}
 /* the note at the end of her message: how to write what she asked for */
 function r1Note(rec,src){var w=rec.want;if(!w)return "";var strong=rec.r1Strong?" The person asked for this plainly, and it is possible here: write it now.":"";

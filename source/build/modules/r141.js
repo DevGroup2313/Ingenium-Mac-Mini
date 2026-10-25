@@ -455,7 +455,7 @@ function gk(r,k){return r.id+"|"+(r.changed||0)+"|"+(r.head||"")+"|"+k;}
 function isErr(x){return !!(x&&typeof x==="object"&&x.__err);}
 function waitBox(w,text){var e=h("div","f-empty h-blk",esc(text));w.appendChild(e);return e;}
 function errBox(w,msg,key){var e=h("div","f-empty h-blk","<b>That did not work</b>"+esc(cap(msg)));var k=btn("sm","Try again",function(){delete DONE[key];repaint(true);});k.style.marginTop="10px";e.appendChild(h("br"));e.appendChild(k);w.appendChild(e);}
-var RP=0,SIG="",SCROLL={};
+var RP=0,SIG="";
 function mine(v){return !!(HUB.views[v]);}
 /* painted again: the view's place in its scroll is kept when it is the same page of the same view */
 function repaint(now){if(RP&&!now)return;var run=function(){RP=0;var x=X();if(!x||!$("fb"))return;if(!mine(x.S.view)){decorate();return;}var r=x.cur();if(!r)return;

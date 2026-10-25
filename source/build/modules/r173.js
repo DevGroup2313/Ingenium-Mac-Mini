@@ -260,24 +260,28 @@ function pick(R){var k=pref(R.pk).room;return k&&R.tabs[k]&&!R.tabs[k].hidden?k:
 /* 6.7 (review): when a room opens for Help's Show me, the tour or any scroll to a card, the cards measure themselves at once
    (not a frame later), and the card that was scrolled to is followed for a moment, so a card above it that grows as it
    measures cannot push it out of the window. A person's own scroll, wheel, touch or key ends the following at once. */
-var OPENED=0;
-function settleNow(){try{cancelAnimationFrame(NT);W.dispatchEvent(new Event("resize"));}catch(e){}}
+/* (a room opened: how many times, when last, and whether its resize is still to come) */
+var OPENED=0,LASTOPEN=0,PENDING=false;
+function settleNow(){try{cancelAnimationFrame(NT);PENDING=false;W.dispatchEvent(new Event("resize"));}catch(e){}}
 /* after Help's Show me or the tour opens a room and scrolls to a key, the cards above it may still grow (Storage measures itself
    for a second or more, longer on a phone with a large library): the key is brought back into view while the page keeps
    changing, until it has been still for 1.5 s (6 s at most), and at once no more when the person scrolls, touches or types */
 function follow(el,args){if(!W.ResizeObserver||!el||!el.isConnected)return;var stop=false,raf=0,ro=null,t0=Date.now(),idle=0;
   var end=function(){if(stop)return;stop=true;clearTimeout(idle);try{ro&&ro.disconnect();}catch(e){}["wheel","touchstart","keydown","pointerdown"].forEach(function(ev){W.removeEventListener(ev,end,true);});};
   ["wheel","touchstart","keydown","pointerdown"].forEach(function(ev){W.addEventListener(ev,end,true);});
+  /* where the caller asked for it (Help asks for the middle, a room's own reveal for the top): brought back when it strays far */
+  var a0=args&&args[0],blk=a0&&typeof a0==="object"?a0.block||"start":a0===false?"end":"start";
   var again=function(){raf=0;if(stop||!el.isConnected)return;if(Date.now()-t0>6000){end();return;}
     var r=el.getBoundingClientRect(),h=W.innerHeight||D.documentElement.clientHeight;
-    if(r.top<0||r.bottom>h-8)try{oSIV.apply(el,args);}catch(e){}};
+    var off=blk==="center"?Math.abs((r.top+r.bottom)/2-h/2)>h*0.25:blk==="end"?r.bottom<h*0.6:blk==="start"?r.top>h*0.4:false;
+    if(r.top<0||r.bottom>h-8||off)try{oSIV.apply(el,args);}catch(e){}};
   var still=function(){clearTimeout(idle);idle=setTimeout(end,1500);};
   try{ro=new ResizeObserver(function(){still();if(!raf)raf=requestAnimationFrame(again);});ro.observe(D.body);
     var sec=el.closest&&el.closest("section.section");if(sec)ro.observe(sec);}catch(e){end();return;}
   still();setTimeout(end,6050);}
 var NT=0;function nudge(R){if(!R.sec.classList.contains("active"))return;cancelAnimationFrame(NT);
   /* the parts that measure themselves (a sliding thumb, a meter) measure again now that they are seen */
-  NT=requestAnimationFrame(function(){try{W.dispatchEvent(new Event("resize"));}catch(e){}});}
+  PENDING=true;NT=requestAnimationFrame(function(){PENDING=false;try{W.dispatchEvent(new Event("resize"));}catch(e){}});}
 
 /* ---------- cards: which room each belongs to ---------- */
 /* the rooms' own parts (a card lit for a moment, class rm-flash, is still a card) */
@@ -316,7 +320,7 @@ function show(R,k,o){o=o||{};if(!k||!R.tabs[k]||R.tabs[k].hidden)k=first(R);if(!
   if(R.view)blendShow(R,k);
   if(o.keep){pref(R.pk).room=k;keep();}
   if(o.focus){try{R.tabs[k].focus();}catch(e){}}
-  if(was!==k){OPENED++;nudge(R);}}
+  if(was!==k){OPENED++;LASTOPEN=Date.now();nudge(R);}}
 function tabKeys(R,e){var k=e.key;if(k!=="ArrowLeft"&&k!=="ArrowRight"&&k!=="Home"&&k!=="End")return;
   var bs=R.rooms.map(function(rm){return R.tabs[rm.k];}).filter(function(b){return !b.hidden;}),i=bs.indexOf(D.activeElement);if(i<0)return;
   e.preventDefault();var j=k==="Home"?0:k==="End"?bs.length-1:(i+(k==="ArrowRight"?1:-1)+bs.length)%bs.length;
@@ -512,7 +516,8 @@ function revealSel(sel){String(sel||"").split(/\s*,\s*/).some(function(q){var n=
 /* the browser's own scrollIntoView and focus, and Chromium's scrollIntoViewIfNeeded: a card in a closed room opens its
    room first. Only elements inside these three pages are looked at (one closest() each), so it costs next to nothing. */
 (function wrap(){try{var EP=Element.prototype;if(!EP.scrollIntoView.__r173){var nS=function(){var n0=OPENED;try{autoReveal(this);}catch(e){}
-    var opened=OPENED!==n0;if(opened)settleNow();var r=oSIV.apply(this,arguments);if(opened)follow(this,arguments);return r;};nS.__r173=1;EP.scrollIntoView=nS;}
+    /* Help's Show me opens the room first (on its click, above) and scrolls a moment later, in the same click */
+    var opened=OPENED!==n0,recent=opened||Date.now()-LASTOPEN<2000;if(opened||PENDING)settleNow();var r=oSIV.apply(this,arguments);if(recent)follow(this,arguments);return r;};nS.__r173=1;EP.scrollIntoView=nS;}
   var oIf=EP.scrollIntoViewIfNeeded;if(typeof oIf==="function"&&!oIf.__r173){var nI=function(){try{autoReveal(this);}catch(e){}return oIf.apply(this,arguments);};nI.__r173=1;EP.scrollIntoViewIfNeeded=nI;}
   var HP=HTMLElement.prototype;if(!HP.focus.__r173){var nF=function(){try{if(this.isConnected)autoReveal(this);}catch(e){}return oFocus.apply(this,arguments);};nF.__r173=1;HP.focus=nF;}}catch(e){warn(e);}})();
 /* the guided tour rings an element: its room opens before the ring looks for it */

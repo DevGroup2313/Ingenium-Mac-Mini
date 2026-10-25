@@ -50,6 +50,9 @@ async function run(impl, url, outFile, opts) {
   if (impl === 'reference') {
     const { build, FAKE, ESBUILD } = require('./build_reference.js');
     const bundle = build(); init.push(fs.readFileSync(bundle, 'utf8'));
+    // its stores live in this page's memory, where Chromium's own count (navigator.storage.estimate) cannot see them: the
+    // browser's count is hidden, as WebKitGTK has none, and Ingenium falls back on its own measure, as it does there
+    init.push('try{Object.defineProperty(Navigator.prototype,"storage",{get:function(){return undefined;},configurable:true});}catch(e){}');
     res.reference = { 'fake-indexeddb': FAKE, esbuild: ESBUILD, bundle };
   }
   const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox'] });
