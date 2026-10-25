@@ -1,6 +1,6 @@
-"""Writes The Forge 647 into its repositories: the page, BUILD_INFO.txt, the README's opening, and the Fire app's version.
-usage: forge_repo_647.py THE_FORGE.html FORGE_WINDOWS_REPO FORGE_IOS_REPO FORGE_MAC_REPO FORGE_FIRE_REPO
-What is new in 647 is read from notes_647.txt beside this script (plain words, one paragraph), followed by the versions of
+"""Writes The Forge 648 into its repositories: the page, BUILD_INFO.txt, the README's opening, and the Fire app's version.
+usage: forge_repo_648.py THE_FORGE.html FORGE_WINDOWS_REPO FORGE_IOS_REPO FORGE_MAC_REPO FORGE_FIRE_REPO
+What is new in 648 is read from notes_648.txt beside this script (plain words, one paragraph), followed by the versions of
 the apps the full page carries. (Refresh in the Mac app's menu, and the question when a page stops answering on the Fire
 tablet, the iPhone and the iPad, are written in those repositories' own sources, since pass 643.) The Mac project gets the
 quick page and its parts (forge_644/forge_quick_split.py) and its spec takes the parts folder (since 644); every other copy is
@@ -12,16 +12,16 @@ import json, os, re, shutil, subprocess, sys, textwrap
 page, win, ios, mac, fire = sys.argv[1:6]
 HERE = os.path.dirname(os.path.abspath(__file__))
 t = open(page, encoding="utf-8").read()
-if 'pass:"647"' not in t or 'id="forge-bi-meta"' not in t:
-    raise SystemExit("give the full 647 page (the_forge.html, carrying its apps)")
+if 'pass:"648"' not in t or 'id="forge-bi-meta"' not in t:
+    raise SystemExit("give the full 648 page (the_forge.html, carrying its apps)")
 meta = json.loads(re.search(r'<script type="application/json" id="forge-bi-meta">(.*?)</script>', t, re.S).group(1))
 V = {a["key"]: a["version"] for a in meta["apps"]}
-notes = " ".join(open(os.path.join(HERE, "notes_647.txt"), encoding="utf-8").read().split())
+notes = " ".join(open(os.path.join(HERE, "notes_648.txt"), encoding="utf-8").read().split())
 if not notes or "TODO" in notes:
-    raise SystemExit("notes_647.txt: say what is new in 647 first")
+    raise SystemExit("notes_648.txt: say what is new in 648 first")
 NEW = "\n".join(textwrap.wrap(
-    "New in 647. " + notes + " The full page carries Ingenium %s, Carpe Diem %s and Inkwell %s." % (V["ingenium"], V["cd"], V["inkwell"]),
-    72)) + "\n\nNew in 646, the build before."
+    "New in 648. " + notes + " The full page carries Ingenium %s, Carpe Diem %s and Inkwell %s." % (V["ingenium"], V["cd"], V["inkwell"]),
+    72)) + "\n\nNew in 647, the build before."
 
 
 def edit(path, pairs):
@@ -36,7 +36,7 @@ def edit(path, pairs):
 
 
 def build_info(path):
-    edit(path, [("Pass: 646", "Pass: 647"), ("Stamp: 9s78", "Stamp: 9s79")])
+    edit(path, [("Pass: 647", "Pass: 648"), ("Stamp: 9s79", "Stamp: 9s80")])
     t = open(path, encoding="utf-8").read()
     t, n = re.subn(r"^Build: \d{4}-\d{2}-\d{2}$", "Build: 2026-10-25", t, count=1, flags=re.M)
     if n != 1:
@@ -44,11 +44,11 @@ def build_info(path):
     open(path, "w", encoding="utf-8", newline="").write(t)
 
 
-HEAD = ("Build 646 (9s78), 2026-10-24. Made by The Forge, 24 October 2026.", "Build 647 (9s79), 2026-10-25. Made by The Forge, 25 October 2026.")
+HEAD = ("Build 647 (9s79), 2026-10-25. Made by The Forge, 25 October 2026.", "Build 648 (9s80), 2026-10-25. Made by The Forge, 25 October 2026.")
 
 
 def readme(path):
-    edit(path, [HEAD, ("New in 645, the build before.", "New in 645."), ("New in 646.", NEW)])
+    edit(path, [HEAD, ("New in 646, the build before.", "New in 646."), ("New in 647.", NEW)])
 
 
 shutil.copyfile(page, os.path.join(win, "the_forge.html"))
@@ -73,7 +73,7 @@ for rel in ("the_forge.html", "app/src/main/assets/the_forge.html"):
     shutil.copyfile(page, os.path.join(fire, rel))
 build_info(os.path.join(fire, "BUILD_INFO.txt"))
 edit(os.path.join(fire, "README.txt"), [HEAD])
-edit(os.path.join(fire, "app", "build.gradle"), [("versionName '646'", "versionName '647'")])
+edit(os.path.join(fire, "app", "build.gradle"), [("versionName '647'", "versionName '648'")])
 # 644: the open-source software, word lists and fonts the Forge's page carries (inside the apps it carries), and the Mac and
 # Windows apps' packaging, named with their licences beside each copy of the Forge
 for d in (win, os.path.join(ios, "iphone-ipad"), os.path.join(mac, "Mac project"), fire):
@@ -94,4 +94,7 @@ subprocess.check_call([sys.executable, os.path.join(HERE, "forge_shell_647.py"),
 # 647: a new build always shows itself (forge_shell_647b.py: the page is never kept, and a new build empties the web view's cache of pages)
 subprocess.check_call([sys.executable, os.path.join(HERE, "forge_shell_647b.py"), os.path.join(win, "the_forge_app.py"),
                        os.path.join(mac, "Mac project", "the_forge_app.py")])
-print("The Forge 647 written into", win, ios, mac, "and", fire)
+# 648: only web addresses (http, https) are handed to the system (forge_shell_648.py)
+subprocess.check_call([sys.executable, os.path.join(HERE, "forge_shell_648.py"), os.path.join(win, "the_forge_app.py"),
+                       os.path.join(mac, "Mac project", "the_forge_app.py")])
+print("The Forge 648 written into", win, ios, mac, "and", fire)

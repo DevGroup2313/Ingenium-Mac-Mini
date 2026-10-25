@@ -1,0 +1,74 @@
+[
+ {
+  "old": "<iframe id=\"frame\" title=\"Live preview\" sandbox=\"allow-scripts allow-same-origin allow-forms allow-modals allow-popups\">",
+  "new": "<iframe id=\"frame\" title=\"Live preview\" sandbox=\"allow-scripts allow-forms allow-modals allow-popups allow-downloads\" data-forge-apart=\"1\">",
+  "count": 1,
+  "why": "the live preview: apart (no origin) until the security block dresses it, so any page put in it another way gets no origin"
+ },
+ {
+  "old": "function show(f){\n  current=f;\n  if(document.body.getAttribute('data-view')==='code') el('codeView').textContent=f.text||f.doc; el('curName').textContent=f.name+'  ·  '+f.doc.length.toLocaleString()+' bytes';\n  el('frame').srcdoc=f.doc;\n}\n",
+  "new": "",
+  "count": 1,
+  "why": "the first show(f), shadowed by the later one (showDoc, dressed): it wrote the preview directly, so it goes"
+ },
+ {
+  "old": "    function show(name, kind, data){\n      var f=document.getElementById('frame'); if(!f) return;\n      var body;\n      if(kind==='image') body='<body style=\"margin:0;display:grid;place-items:center;background:#141416\"><img alt=\"'+name+'\" src=\"'+data+'\" style=\"max-width:100%;max-height:100vh\"></body>';\n      else if(kind==='svg') body='<body style=\"margin:0;display:grid;place-items:center;background:#fff\">'+data+'</body>';\n      else body='<body style=\"margin:0;padding:18px;font:13px ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;background:#fff;color:#16181d\">'+String(data).replace(/[&]/g,'&amp;').replace(/</g,'&lt;')+'</body>';\n      f.srcdoc='<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>'+name+'</title></head>'+body+'</html>';\n",
+  "new": "    function esc(t){ return String(t==null?'':t).replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]; }); }\n    function show(name, kind, data){\n      var f=document.getElementById('frame'); if(!f) return;\n      var body;\n      if(kind==='svg'){ try{ data='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(String(data)))); }catch(e){ kind='text'; } }\n      if(kind==='image'||kind==='svg') body='<body style=\"margin:0;display:grid;place-items:center;background:'+(kind==='svg'?'#fff':'#141416')+'\"><img alt=\"'+esc(name)+'\" src=\"'+esc(data)+'\" style=\"max-width:100%;max-height:100vh\"></body>';\n      else body='<body style=\"margin:0;padding:18px;font:13px ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;background:#fff;color:#16181d\">'+String(data).replace(/[&]/g,'&amp;').replace(/</g,'&lt;')+'</body>';\n      var doc='<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>'+esc(name)+'</title></head>'+body+'</html>';\n      try{ if(window.__forgeShowSeen) window.__forgeShowSeen(doc, name, doc, 'asset'); }catch(e){}\n      try{ if(f.__cdBlobUrl){ URL.revokeObjectURL(f.__cdBlobUrl); f.__cdBlobUrl=null; } }catch(e){}\n      try{ if(window.__forgePreviewDress) doc=window.__forgePreviewDress(f, doc, 'asset'); }catch(e){}\n      try{ f.removeAttribute('src'); }catch(e){} f.srcdoc=doc;\n",
+  "count": 1,
+  "why": "Keep a picture or a file: shown apart like every view of a file (dressed, kind asset), an SVG drawn as a picture so its scripts never run, its name escaped"
+ },
+ {
+  "old": "var shipSrcDoc=null, shipSrcName='',",
+  "new": "var shipSrcDoc=null, shipSrcName='', shipSrcFrom=null,",
+  "count": 1,
+  "why": "the build handed to shipping: the page it was baked from, kept with it"
+ },
+ {
+  "old": "function clearShipDoc(){ shipSrcDoc=null; shipSrcName='';",
+  "new": "function clearShipDoc(){ shipSrcDoc=null; shipSrcName=''; shipSrcFrom=null;",
+  "count": 1,
+  "why": "the same, forgotten with the build"
+ },
+ {
+  "old": "shipSrcDoc=window.__lastBake;",
+  "new": "shipSrcDoc=window.__lastBake; shipSrcFrom=lastBakeFrom;",
+  "count": 1,
+  "why": "Download for a device: the baked build goes with the page it was baked from"
+ },
+ {
+  "old": "window.__lastBake=bakeShipped(out);",
+  "new": "window.__lastBake=bakeShipped(out); lastBakeFrom=bakery.shell;",
+  "count": 1,
+  "why": "a bake: the page it was baked from noted with it"
+ },
+ {
+  "old": "var bakery={shell:null,shellName:'',seed:null,seedName:''};",
+  "new": "var bakery={shell:null,shellName:'',seed:null,seedName:''}, lastBakeFrom=null;",
+  "count": 1,
+  "why": "the page the last bake was made from"
+ },
+ {
+  "old": "pushEdits:function(){ return pushEdits(); }};",
+  "new": "pushEdits:function(){ return pushEdits(); }, ship:function(){ return shipSrcDoc?{from:shipSrcFrom}:null; }};",
+  "count": 1,
+  "why": "the boot check reads the page the build handed to shipping was baked from (blocks/forge_security_647.html)"
+ },
+ {
+  "old": "function bakeState(t,kind){ state('bakeState',t,kind); }",
+  "new": "function bakeState(t,kind){ state('bakeState',t,kind); }\nfunction bakeForget(){ window.__lastBake=null; lastBakeFrom=null; clearShipDoc(); try{ el('bakeShipBtn').style.display='none'; }catch(e){} }",
+  "count": 1,
+  "why": "the bakery's file changed or removed: its last bake, and the build handed to shipping from it, are forgotten"
+ },
+ {
+  "old": "el('bakeShell').onchange=function(){ readAs(el('bakeShell'),'html',function(txt,name){\n  if(!txt){ bakeState('That file could not be read.','warn'); return; }\n",
+  "new": "el('bakeShell').onchange=function(){ readAs(el('bakeShell'),'html',function(txt,name){\n  if(!txt){ bakeState('That file could not be read.','warn'); return; }\n  bakeForget();\n",
+  "count": 1,
+  "why": "the same, when another file is chosen"
+ },
+ {
+  "old": "el('bakeShellRemove').onclick=function(){\n  bakery.shell=null; bakery.shellName='';",
+  "new": "el('bakeShellRemove').onclick=function(){\n  bakery.shell=null; bakery.shellName=''; bakeForget();",
+  "count": 1,
+  "why": "the same, when the file is removed"
+ }
+]

@@ -311,6 +311,11 @@ edit('var w={name:"My first model",text:"",size:"tiny",passes:8,fromModel:modelI
 #      build, and no longer "page of 19 October 2026" when it was not. The date stays in ING_PAGE_DATE, unshown. ----
 edit('function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:" · page of "+ING_PAGE_DATE);}',
      'function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION+(n?" · build "+n:"");}', "R134 the version line names no date")
+# 6.7.3 (the owner's words, 25 October 2026: "there are two \"Take the tour\" buttons on the Guide page, please remove the
+#        redundant one"): the key the 3.12 page put under the Guide's heading goes; the guided tour's own card keeps its key
+edit('(function tourWire(){var g=$("page-guide");if(g&&!$("tourGo")){var b=el("button","btn primary","Take the tour");b.id="tourGo";b.type="button";b.onclick=function(){tourStart(0);};\n'
+     '    var h=g.querySelector(".lede")||g.querySelector("h1,h2");if(h)h.after(b);else g.prepend(b);}})();\n', '',
+     "6.7.3 one Take the tour key on the Guide page (the guided tour card's own)")
 
 # ---- 6.1 (20 October 2026): no watermarks. The owner's words: "I don't want any watermarks on its documents or hidden in
 #      its texts." Lector's notes and analysis no longer close with a line naming the model, Ingenium and the date; a Word file

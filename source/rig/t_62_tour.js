@@ -144,8 +144,11 @@ async function raised(p, sel) {
     // popped out and as wide as their words; the tour's own list of chapters stays flat
     const gw = await p.evaluate(() => { const b = document.querySelector('#guideTour .tour-entry-chap'), r = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(b); return { w: r.width, need: rg.getBoundingClientRect().width + 40 }; });
     ok(g.found && g.below && g.lift && gw.w <= gw.need + 20, 'the Guide\'s chapters are keys: a shadow beneath, they lift, and each as wide as its words', { g, gw });
-    const go = await raised(p, '#tourGo');
+    // 6.7.3: one Take the tour key on the Guide page, the guided tour card's own (the one under the heading is gone)
+    const go = await raised(p, '#guideTour .tour-entry-row .btn.primary');
     ok(go.found && go.below && go.lift, 'and its Take the tour key', go);
+    const keys = await p.evaluate(() => [...document.querySelectorAll('#page-guide button')].filter(b => /take the (guided )?tour|carry on the tour/i.test(b.textContent) && b.offsetParent).length);
+    ok(keys === 1, 'the Guide page has one Take the tour key, not two', keys);
 
     // ---------------- 5 · help on every page ----------------
     const pages = await p.evaluate(() => [...document.querySelectorAll('.nav-btn[data-page]')].map(b => b.getAttribute('data-page')).filter(x => !/^(tabula|abacus|slides|scriba|fontes)$/.test(x)));

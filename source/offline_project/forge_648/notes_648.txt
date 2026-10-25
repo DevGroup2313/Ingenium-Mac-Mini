@@ -1,0 +1,8 @@
+The second security review of 25 October 2026 is answered. A picture or file kept in the Editor is shown apart from the Forge
+(an SVG drawn as a picture, so nothing in it runs), and the preview starts apart until it knows the page. A build baked from an
+outside page is never checked with the Forge's origin, even after the bakery's file is changed. Imported edits in the Changes
+view, sticky notes from a restored backup, names given to the lessons, the kind of a restored file and Fontes' sources are drawn as
+text or through the strict cleaner. A part copied in the Studio goes through that cleaner too. Rooms open, close and take Scriba's
+live mark only at the word of the apps the Forge carries. On the Fire tablet writing to the clipboard needs the same key as
+reading. On Windows and on a Mac only web addresses (http, https) are handed to the system from a page. A new build always shows
+itself on a computer: the page is never kept from an earlier build.
