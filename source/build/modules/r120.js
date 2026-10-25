@@ -31,7 +31,11 @@ function cmp(a,b){var x=parts(a),y=parts(b);if(!x||!y||x.t!==y.t)return null;
 function standing(k){var b=BI[k],m=libState().apps[k];if(!b)return "absent";if(!m||!m.ref)return "none";
   if(String(m.sha256||"").toLowerCase()===b.sha256)return "same";
   var pairs=[[b.version,m.version],[b.build,m.version],[b.version,m.build],[b.build,m.build]];
-  for(var i=0;i<pairs.length;i++){var c=cmp(pairs[i][0],pairs[i][1]);if(c!==null)return c>0?"older":(c<0?"newer":"other");}
+  /* 6.7.2: a copy of the same version that Ingenium itself kept from an earlier build (the owner's words: "only the demo
+     version ... should have the Demo edition of Carpe Diem loaded on it"; 6.7.1 carried the committee demo of Carpe Diem 1058,
+     6.7.2 its full edition, also 1058) gives way to the one this build carries, and stays one step back; a copy of the same
+     version that she added herself stays as it is */
+  for(var i=0;i<pairs.length;i++){var c=cmp(pairs[i][0],pairs[i][1]);if(c!==null){if(c===0&&m.source==="built in")return "older";return c>0?"older":(c<0?"newer":"other");}}
   return "other";}
 
 /* ---------- the built-in page: decoded, inflated, and checked before it is kept ---------- */
