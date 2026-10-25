@@ -176,7 +176,7 @@ def page():
 
 def info():
     """6.2: each release names its build and lists its fingerprint (SHA-256) in BUILD_INFO.txt, as the licence says
-    (LICENCE.txt, version 2), in each of the four repositories (../security/fingerprint.py)."""
+    (LICENCE.txt, version 3 from 6.7), in each of the four repositories (../security/fingerprint.py)."""
     sys.path.insert(0, os.path.join(H, "..", "security"))
     import fingerprint
     vj = json.load(open(os.path.join(H, "version.json")))

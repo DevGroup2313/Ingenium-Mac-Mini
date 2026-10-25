@@ -1,0 +1,17 @@
+{
+ "kind": "offline-project-owner-public-key",
+ "v": 1,
+ "keys": [
+  {
+   "kid": "CdbXeLQDHJ63NSC4cT0xnK",
+   "jwk": {
+    "crv": "P-256",
+    "kty": "EC",
+    "x": "p5utS3RZvzR8S_P4kuweAB7GMgpgtBWnI-8Eeb4YQBk",
+    "y": "83hP2W7P9SnUssIEnIyJdUipkr_DHS6SE-dnKoEgVgo"
+   },
+   "name": "Yannie D. Forest",
+   "made": "2026-10-25"
+  }
+ ]
+}

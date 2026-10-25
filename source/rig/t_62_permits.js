@@ -1,7 +1,7 @@
 // Ingenium 6.2 · ownership, licence and permissions (thoughts/permit_core.html, modules/r162.js), in Chromium. The owner's words:
 // "only I am able to do distribute, sell, edit, remove or basically do anything with it, no one else has that right and should
 // not ever have access unless I grant them limited persmission that I can discontinue at any time."
-//   master: the card holds the licence (version 2) whole, and saves it; the owner's key is made here under a password (too short
+//   master: the card holds the licence (version 3 from 6.7) whole, laid out as a document, and saves it; the owner's key is made here under a password (too short
 //           or two different ones refused) and its backup saved; its public half saved; a permission given (signed, saved), a
 //           wrong password refused; a second one given and withdrawn, and the list of withdrawn permissions saved, signed;
 //   then a full edition and a gift edition are built carrying that public key (and the gift one carrying the first permission):
@@ -52,8 +52,15 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
   try {
     // ---------------- the master edition: the licence, the owner's key, permissions given and withdrawn ----------------
     let { ctx, p } = await open(b, URL_M);
-    const lic = await p.evaluate(() => ({ text: document.querySelector('#ingPermitCard .pc-licence').textContent, head: document.querySelector('#ingPermitCard h2').textContent, line: document.querySelector('#ingPermitCard .pc-line').textContent }));
-    ok(lic.text === LIC && /Version 2, 22 October 2026/.test(lic.text) && /sole original work of Yannie D\. Forest/.test(lic.line), 'Settings holds the licence (version 2) whole, and says plainly whose work it is and that every right is the owner\'s', lic.line);
+    // 6.7: the licence (version 3) is laid out as a document: its contents, the plain words, every section and clause of the text
+    const lic = await p.evaluate(() => { const d = document.querySelector('#ingPermitCard .pc-doc'); const norm = t => String(t || '').replace(/\s+/g, ' ').trim();
+      return { text: d ? norm(d.textContent) : '', sections: d ? d.querySelectorAll('.pcd-h').length : 0, toc: d ? d.querySelectorAll('.pcd-toc button').length : 0, plain: d ? d.querySelectorAll('.pcd-plain li').length : 0,
+        summary: (document.querySelector('#ingPermitCard details.pc-text > summary') || {}).textContent, head: document.querySelector('#ingPermitCard h2').textContent, line: document.querySelector('#ingPermitCard .pc-line').textContent }; });
+    const words = LIC.replace(/=+/g, ' ').replace(/\u2022/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(w => w.length > 3);
+    const low = lic.text.toLowerCase(), missing = words.filter(w => low.indexOf(w.toLowerCase()) < 0);  // headings are shown in sentence case
+    const nSec = (LIC.match(/^\d+\. [^a-z\n]+$/gm) || []).length, nPlain = (LIC.match(/^  \u2022 /gm) || []).length;
+    ok(missing.length === 0 && /Version 3, 25 October 2026/.test(lic.text) && lic.sections === nSec && lic.toc === nSec && lic.plain === nPlain && /version 3/.test(lic.summary) && /sole original work of Yannie D\. Forest/.test(lic.line),
+      'Settings holds the licence (version 3) whole, laid out with its contents and plain words, and says plainly whose work it is', { missing: missing.slice(0, 5), sections: lic.sections, nSec, toc: lic.toc, plain: lic.plain, nPlain, summary: lic.summary });
     let n0 = p.__dl.length; await press(p, 'Save the licence'); const lf = await nextDownload(p, n0);
     ok(lf && fs.readFileSync(lf, 'utf8') === LIC, 'Save the licence gives LICENCE.txt, the same text');
     // the key: a short password, two different ones, then made
