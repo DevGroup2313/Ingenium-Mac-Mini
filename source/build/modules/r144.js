@@ -727,7 +727,10 @@ function labelOf(n){if(!n)return "";var t=n.getAttribute("aria-label")||n.getAtt
   if(!t&&n.closest("label"))t=n.closest("label").textContent;if(!t)t=n.textContent||"";return String(t).replace(/\s+/g," ").trim().slice(0,70);}
 function wordsOf(e,lv){var t=e[2];if(lv==="expert")return firstSentence(t)+(e[4]?" "+e[4]:"");if(lv==="new"&&e[3])return t+" "+e[3];return t;}
 /* the deepest control with an explanation; a control without one inside an explained part says what part it sits in */
-function match(target){var ctl=target&&target.closest?target.closest(INTERACTIVE):null,n=target,e;
+function match(target){
+  /* 6.7: a drop-down drawn by modules/r172.js stands for its select, whose help this is */
+  try{var cb=target&&target.closest?target.closest(".r172-cb"):null;if(cb&&cb.__r172i&&cb.__r172i.sel)target=cb.__r172i.sel;}catch(_){}
+  var ctl=target&&target.closest?target.closest(INTERACTIVE):null,n=target,e;
   while(n&&n!==D.body&&n.nodeType===1){e=entryOf(n);if(e){
       if(ctl&&ctl!==n&&n.contains(ctl)&&!entryOf(ctl)){var lb=labelOf(ctl);if(lb)return {el:ctl,e:[null,lb,"Part of "+e[1]+". "+e[2]]};}
       return {el:n,e:e};}
