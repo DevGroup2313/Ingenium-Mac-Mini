@@ -1,10 +1,10 @@
 // The Forge 647 · the apps the master Forge carries, as the owner asked (25 October 2026): "I need to be able to edit the latest
 // versions of all of my apps on my master version of the Forge, not just the demos." In Chromium, one browser and one address:
 //   - the 646 page is opened first (it carried Carpe Diem 1058's committee demo, Ingenium 6.4 and Inkwell 7.51) and keeps them;
-//   - then the 647 page: what it carries says Ingenium 6.7.1 (the master edition), Carpe Diem 1058 (the full edition, not the
+//   - then the 647 page: what it carries says Ingenium 6.7.2 (the master edition), Carpe Diem 1058 (the full edition, not the
 //     demo), Inkwell 7.52 and The Forge 647; it keeps them on the device, the full Carpe Diem in place of the demo (the demo
 //     kept as the earlier copy), each copy the very bytes the page carries;
-//   - in the Editor, the Carpe Diem opened is the full edition (its build says no demo), Ingenium is 6.7.1 master, Inkwell 7.52;
+//   - in the Editor, the Carpe Diem opened is the full edition (its build says no demo), Ingenium is 6.7.2 master, Inkwell 7.52;
 //   - no page errors.
 //   node tests/t_647_carried.js <url of the 646 full page> <url of the 647 full page> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
@@ -27,8 +27,8 @@ const meta = p => p.evaluate(() => JSON.parse(document.getElementById('forge-bi-
   await p.close(); p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
   await p.goto(U647); await ready(p);
   const M = await meta(p); const by = Object.fromEntries(M.map(a => [a.key, a]));
-  ok(by.ingenium && by.ingenium.version === '6.7.1' && by.cd && by.cd.version === '1058' && by.inkwell && by.inkwell.version === '7.52' && by.forge && by.forge.version === '647',
-    'the 647 page carries Ingenium 6.7.1, Carpe Diem 1058, Inkwell 7.52 and The Forge 647', M.map(a => a.key + ' ' + a.version));
+  ok(by.ingenium && by.ingenium.version === '6.7.2' && by.cd && by.cd.version === '1058' && by.inkwell && by.inkwell.version === '7.52' && by.forge && by.forge.version === '647',
+    'the 647 page carries Ingenium 6.7.2, Carpe Diem 1058, Inkwell 7.52 and The Forge 647', M.map(a => a.key + ' ' + a.version));
   await p.evaluate(() => { try { const k = [...document.querySelectorAll('[data-lib="seed"]')][0]; if (k) k.click(); } catch (e) { } });
   let L1 = {}; for (let i = 0; i < 240; i++) { L1 = await lib(p); if (['cd', 'ingenium', 'inkwell', 'forge'].every(k => L1[k + ':newest'] && L1[k + ':newest'].sha256 === by[k].sha256)) break; await p.waitForTimeout(1000); }
   ok(['cd', 'ingenium', 'inkwell', 'forge'].every(k => L1[k + ':newest'] && L1[k + ':newest'].sha256 === by[k].sha256 && L1[k + ':newest'].size === by[k].size), 'each app it carries is kept on the device as the very bytes the page carries', Object.fromEntries(Object.entries(L1).map(([k, v]) => [k, v.version + ' ' + String(v.sha256).slice(0, 8)])));
@@ -39,7 +39,7 @@ const meta = p => p.evaluate(() => JSON.parse(document.getElementById('forge-bi-
       const cd = /window\.CD_BUILD=\{([^}]*)\}/.exec(t), ing = /var ING_VERSION="([0-9.]+)"/.exec(t), ed = /ING_EDITION="([a-z]+)"/.exec(t), ink = /<!-- BUILD='([\d.]+)'/.exec(t.slice(0, 4000)), ti = /<title>([^<]*)<\/title>/.exec(t.slice(0, 600000));
       out[id] = { cd: cd && cd[1], ing: ing && ing[1], edition: ed && ed[1], ink: ink && ink[1], title: ti && ti[1] }; if (++n === 3) res(out); }; }); }; }));
   ok(said['cd:newest'] && !/demo/i.test(said['cd:newest'].cd + ' ' + said['cd:newest'].title) && /pass:"1058"/.test(said['cd:newest'].cd), 'the Carpe Diem kept is the full edition (its build names no demo edition, nor does its title)', said['cd:newest']);
-  ok(said['ingenium:newest'] && said['ingenium:newest'].ing === '6.7.1' && said['ingenium:newest'].edition === 'master', 'the Ingenium kept is 6.7.1, the master edition', said['ingenium:newest']);
+  ok(said['ingenium:newest'] && said['ingenium:newest'].ing === '6.7.2' && said['ingenium:newest'].edition === 'master', 'the Ingenium kept is 6.7.2, the master edition', said['ingenium:newest']);
   ok(said['inkwell:newest'] && said['inkwell:newest'].ink === '7.52', 'the Inkwell kept is 7.52', said['inkwell:newest']);
   ok(!errs.length, 'no page errors', errs.slice(0, 4));
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);
