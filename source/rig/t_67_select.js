@@ -291,7 +291,9 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     await p.evaluate(() => { const c = document.getElementById('setMotion-dd'), r = c.getBoundingClientRect(); window.scrollBy(0, r.bottom - innerHeight + 8); const sc = document.querySelector('.main') || document.scrollingElement; if (c.getBoundingClientRect().bottom < innerHeight - 60) { let e = c.parentElement; while (e && e.scrollHeight <= e.clientHeight) e = e.parentElement; if (e) e.scrollTop += c.getBoundingClientRect().bottom - innerHeight + 8; } });
     await p.waitForTimeout(250); await p.click('#setMotion-dd'); await p.waitForTimeout(250);
     const flip = await p.evaluate(() => { const L = document.querySelector('.r172-list').getBoundingClientRect(), c = document.getElementById('setMotion-dd').getBoundingClientRect(); return { lt: L.top, lb: L.bottom, ct: c.top, cb: c.bottom, vh: innerHeight }; });
-    ok(flip.cb > flip.vh - 120 ? (flip.lb <= flip.ct + 1 && flip.lt >= 0) : (flip.lt >= flip.cb - 1 && flip.lb <= flip.vh), 'at the foot of the window the list opens above its field, inside the window', flip);
+    // (the list goes above when it would not fit below with r172's gap of 6 and edge of 8; since 6.7 the Settings rooms are
+    // shorter, so the field may stop a little above the foot, and the room left below decides)
+    ok(flip.vh - flip.cb < (flip.lb - flip.lt) + 14 ? (flip.lb <= flip.ct + 1 && flip.lt >= 0) : (flip.lt >= flip.cb - 1 && flip.lb <= flip.vh), 'at the foot of the window the list opens above its field, inside the window', flip);
     await p.keyboard.press('Escape');
 
     // ---- Lector's model chooser ----

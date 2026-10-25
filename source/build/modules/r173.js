@@ -257,6 +257,24 @@ function activePage(){var s=D.querySelector(".section.active");return s&&s.id?s.
 function roomDef(R,k){for(var i=0;i<R.rooms.length;i++)if(R.rooms[i].k===k)return R.rooms[i];return null;}
 function first(R){for(var i=0;i<R.rooms.length;i++){var t=R.tabs[R.rooms[i].k];if(t&&!t.hidden)return R.rooms[i].k;}return null;}
 function pick(R){var k=pref(R.pk).room;return k&&R.tabs[k]&&!R.tabs[k].hidden?k:first(R);}
+/* 6.7 (review): when a room opens for Help's Show me, the tour or any scroll to a card, the cards measure themselves at once
+   (not a frame later), and the card that was scrolled to is followed for a moment, so a card above it that grows as it
+   measures cannot push it out of the window. A person's own scroll, wheel, touch or key ends the following at once. */
+var OPENED=0;
+function settleNow(){try{cancelAnimationFrame(NT);W.dispatchEvent(new Event("resize"));}catch(e){}}
+/* after Help's Show me or the tour opens a room and scrolls to a key, the cards above it may still grow (Storage measures itself
+   for a second or more, longer on a phone with a large library): the key is brought back into view while the page keeps
+   changing, until it has been still for 1.5 s (6 s at most), and at once no more when the person scrolls, touches or types */
+function follow(el,args){if(!W.ResizeObserver||!el||!el.isConnected)return;var stop=false,raf=0,ro=null,t0=Date.now(),idle=0;
+  var end=function(){if(stop)return;stop=true;clearTimeout(idle);try{ro&&ro.disconnect();}catch(e){}["wheel","touchstart","keydown","pointerdown"].forEach(function(ev){W.removeEventListener(ev,end,true);});};
+  ["wheel","touchstart","keydown","pointerdown"].forEach(function(ev){W.addEventListener(ev,end,true);});
+  var again=function(){raf=0;if(stop||!el.isConnected)return;if(Date.now()-t0>6000){end();return;}
+    var r=el.getBoundingClientRect(),h=W.innerHeight||D.documentElement.clientHeight;
+    if(r.top<0||r.bottom>h-8)try{oSIV.apply(el,args);}catch(e){}};
+  var still=function(){clearTimeout(idle);idle=setTimeout(end,1500);};
+  try{ro=new ResizeObserver(function(){still();if(!raf)raf=requestAnimationFrame(again);});ro.observe(D.body);
+    var sec=el.closest&&el.closest("section.section");if(sec)ro.observe(sec);}catch(e){end();return;}
+  still();setTimeout(end,6050);}
 var NT=0;function nudge(R){if(!R.sec.classList.contains("active"))return;cancelAnimationFrame(NT);
   /* the parts that measure themselves (a sliding thumb, a meter) measure again now that they are seen */
   NT=requestAnimationFrame(function(){try{W.dispatchEvent(new Event("resize"));}catch(e){}});}
@@ -298,7 +316,7 @@ function show(R,k,o){o=o||{};if(!k||!R.tabs[k]||R.tabs[k].hidden)k=first(R);if(!
   if(R.view)blendShow(R,k);
   if(o.keep){pref(R.pk).room=k;keep();}
   if(o.focus){try{R.tabs[k].focus();}catch(e){}}
-  if(was!==k)nudge(R);}
+  if(was!==k){OPENED++;nudge(R);}}
 function tabKeys(R,e){var k=e.key;if(k!=="ArrowLeft"&&k!=="ArrowRight"&&k!=="Home"&&k!=="End")return;
   var bs=R.rooms.map(function(rm){return R.tabs[rm.k];}).filter(function(b){return !b.hidden;}),i=bs.indexOf(D.activeElement);if(i<0)return;
   e.preventDefault();var j=k==="Home"?0:k==="End"?bs.length-1:(i+(k==="ArrowRight"?1:-1)+bs.length)%bs.length;
@@ -354,7 +372,7 @@ function studioHint(R){var sec=R.sec,l=sec.querySelector(":scope > .lede");if(!l
 function findBox(R){var w=att(mk("div","rm-find"),{role:"search"});
   var lab=att(mk("label","rm-find-lab","Find a setting"),{"for":"rmFind"});w.appendChild(lab);
   var box=mk("div","rm-find-box");box.innerHTML=IC.find;
-  var inp=att(mk("input"),{type:"search",id:"rmFind",autocomplete:"off",spellcheck:"false",placeholder:"For example: backup or theme","aria-controls":"rmFindOut","enterkeyhint":"search"});
+  var inp=att(mk("input"),{type:"search",id:"rmFind",autocomplete:"off",spellcheck:"false",placeholder:"backup, theme, sound","aria-controls":"rmFindOut","enterkeyhint":"search"});
   box.appendChild(inp);w.appendChild(box);
   var say=att(mk("p","rm-sr"),{id:"rmFindSay",role:"status","aria-live":"polite"});w.appendChild(say);
   var out=mk("div","rm-out");out.id="rmFindOut";out.hidden=true;var list=att(mk("ul","rm-hits"),{"aria-label":"Settings found"});out.appendChild(list);w.appendChild(out);
@@ -488,12 +506,13 @@ function autoReveal(el){var w=where(el);if(!w)return null;var R=w.R;
 function reveal(el,o){o=o||{};var w=where(el);if(!w)return null;var R=w.R;
   if(activePage()!==R.pk){try{W.go(R.pk);}catch(e){}}
   if(!R.all&&w.k!==R.cur)show(R,w.k,{keep:!!o.keep});if(R.view&&w.k==="new"&&w.step&&w.step!==R.step)stepGo(R,w.step,"");
-  openFolds(el,true);if(o.scroll!==false)scrollTo_(el,o.block||"start");if(o.flash)flash(el);return w.k;}
+  openFolds(el,true);if(o.scroll!==false){settleNow();scrollTo_(el,o.block||"start");follow(el,[{block:o.block||"start"}]);}if(o.flash)flash(el);return w.k;}
 function revealSel(sel){String(sel||"").split(/\s*,\s*/).some(function(q){var n=null;try{n=D.querySelector(q);}catch(e){}if(n&&where(n)){autoReveal(n);return true;}return false;});}
 
 /* the browser's own scrollIntoView and focus, and Chromium's scrollIntoViewIfNeeded: a card in a closed room opens its
    room first. Only elements inside these three pages are looked at (one closest() each), so it costs next to nothing. */
-(function wrap(){try{var EP=Element.prototype;if(!EP.scrollIntoView.__r173){var nS=function(){try{autoReveal(this);}catch(e){}return oSIV.apply(this,arguments);};nS.__r173=1;EP.scrollIntoView=nS;}
+(function wrap(){try{var EP=Element.prototype;if(!EP.scrollIntoView.__r173){var nS=function(){var n0=OPENED;try{autoReveal(this);}catch(e){}
+    var opened=OPENED!==n0;if(opened)settleNow();var r=oSIV.apply(this,arguments);if(opened)follow(this,arguments);return r;};nS.__r173=1;EP.scrollIntoView=nS;}
   var oIf=EP.scrollIntoViewIfNeeded;if(typeof oIf==="function"&&!oIf.__r173){var nI=function(){try{autoReveal(this);}catch(e){}return oIf.apply(this,arguments);};nI.__r173=1;EP.scrollIntoViewIfNeeded=nI;}
   var HP=HTMLElement.prototype;if(!HP.focus.__r173){var nF=function(){try{if(this.isConnected)autoReveal(this);}catch(e){}return oFocus.apply(this,arguments);};nF.__r173=1;HP.focus=nF;}}catch(e){warn(e);}})();
 /* the guided tour rings an element: its room opens before the ring looks for it */
@@ -521,7 +540,14 @@ function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r173)return;
   var ng=function(p){var was=activePage(),r=og.apply(this,arguments);try{if(CONF[p]&&p!==was)arrive(p);}catch(e){warn(e);}return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r173=true;W.go=ng;}
 
-function boot(){["settings","models","blend"].forEach(build);watchSup();wrapGo();wrapTour();wrapSteps();helpHooks();
+/* Run blend or Save as a house pressed with fewer than two models chosen: the note names step 1, and step 1 opens, where the
+   models are chosen and its own line says what is missing */
+function wrapNote(){var on=W.blPaintNote;if(typeof on!=="function"||on.__r173)return;
+  var nn=function(msg){try{var R=P.blend;if(R&&R.view&&typeof msg==="string"&&/^Choose two or more models/.test(msg)&&R.step!==1)stepGo(R,1,"nav");}catch(e){warn(e);}
+    return on.apply(this,arguments);};
+  nn.__r173=true;W.blPaintNote=nn;}
+
+function boot(){["settings","models","blend"].forEach(build);watchSup();wrapGo();wrapTour();wrapSteps();helpHooks();wrapNote();
   var a=activePage();if(CONF[a])arrive(a);}
 try{boot();}catch(e){warn(e);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){try{boot();}catch(e){warn(e);}});

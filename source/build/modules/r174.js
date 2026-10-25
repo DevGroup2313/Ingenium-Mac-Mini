@@ -20,8 +20,9 @@
       row rather than leave the window.
    3. Every panel of the top bar (status, Display, Help) and the panels of the side keys open whole inside the window and
       clear of the notch and the home bar, under the top bar, and scroll inside themselves when they are taller.
-   4. With a finger (a touch screen, on a phone or a phone held sideways), every key, box, list and fold is at least 44
-      pixels high; a box to tick is larger and its whole line answers the finger.
+   4. With a finger (a touch screen: a phone upright or sideways, the iPad, the Fire tablet), every key, box, list and fold
+      is at least 44 pixels high (the lines of Ingenium's own drop-down lists keep their 48, r172); a box to tick is larger
+      and its whole line answers the finger.
    5. The row of pages under the top bar scrolls sideways on a phone: a soft fade at its edge says there is more, and the
       page that is open is always brought into view.
    And the status list, a menu, names each of its keys as one (axe-core found its time report key a plain button there). */
@@ -50,17 +51,17 @@ html.ing-tb-icons body .topbar .cl-key .kl,html.ing-tb-icons body .topbar #ingHe
 html.ing-tb-icons body .topbar .cl-key .kico{display:block !important}
 html.ing-tb-icons body .topbar :is(#statusPill,#enginePill,#displayBtn,#aboutBtn,#ingHelpKey){padding:0 !important;width:30px;justify-content:center}
 
-/* ---- 4. with a finger: 44 pixels ---- */
-@media (pointer:coarse) and (max-width:760px),(pointer:coarse) and (max-height:520px){
+/* ---- 4. with a finger: 44 pixels, on a phone and on a tablet (the iPad and the Fire tablet measured 21 to 34 pixel keys) ---- */
+@media (pointer:coarse){
   html body .topbar{gap:4px}
   html body .topbar .topbar-tools{gap:4px;flex:0 0 auto;padding:2px 0}
   html body .topbar .cl-key,html body .topbar #ingHelpKey{height:44px !important;min-height:44px;min-width:44px;border-radius:22px;box-sizing:border-box;padding:0 12px}
   html body .topbar .cl-key .kico{width:18px;height:18px}
   html body .topbar .cl-key .pdot,html body .topbar .cl-key .dot,html body .topbar .cl-key .swatch{width:11px;height:11px}
   html body .topbar #brandSealBtn{min-height:44px;min-width:44px;flex:0 1 auto}
-  html body #navChevron{width:44px;height:44px;min-width:44px}
+  html body #navChevron,html body #topChevron{width:44px;height:44px;min-width:44px}
   html body .dock .grp-label.ing-fold{min-height:44px;align-items:center}
-  html body :is(button,[role="button"],[role="tab"],[role="menuitem"],[role="menuitemradio"],[role="menuitemcheckbox"],[role="switch"],[role="option"],a.btn,select,
+  html body :is(button,[role="button"],[role="tab"],[role="menuitem"],[role="menuitemradio"],[role="menuitemcheckbox"],[role="switch"],[role="option"]:not(.r172-opt),a.btn,select,
     input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]):not([type="file"]):not([type="color"]):not([type="image"]),textarea){min-height:44px !important}
   html body :is(button,[role="button"],[role="tab"],[role="switch"],a.btn,select){min-width:44px !important}
   html body a.btn{display:inline-flex;align-items:center;justify-content:center}
@@ -69,6 +70,8 @@ html.ing-tb-icons body .topbar :is(#statusPill,#enginePill,#displayBtn,#aboutBtn
   html body label:has(> input[type="checkbox"]),html body label:has(> input[type="radio"]){min-height:44px}
   /* a link that is a key of its own (not words linked inside a sentence) */
   html body :is(a.small,a.lu-lic,a.btn.xs){display:inline-flex;align-items:center;min-height:44px}
+}
+@media (pointer:coarse) and (max-width:760px),(pointer:coarse) and (max-height:520px){
   /* the chat's head: its keys on one row, the conversation's name on its own row beneath them, whole */
   html body #page-chat .chat-top.chat-top{flex-wrap:wrap !important;row-gap:6px}
   html body #page-chat .chat-top #ccTitle{order:9;flex:1 0 100%;max-width:100%;text-align:left}

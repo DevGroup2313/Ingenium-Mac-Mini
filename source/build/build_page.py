@@ -715,7 +715,7 @@ edit('b:"Everything you make stays on this device. Export a backup keeps a copy 
      'b:"What you make is kept on this device, and leaves it only when you send it somewhere. Export a backup keeps a copy in one file. Recover an earlier moment keeps the last three saved moments of your desk, at least 45 seconds apart; a very large desk is not kept that way."}];',
      "6.7 claims: the tour, your data")
 edit('t:"🌱 Train a small model from zero",b:"On a Mac or Windows computer, a guided lesson makes a tiny model of your own and trains it on your text, so you can watch an AI learn: the loss falls as it reads. It learns your text\'s words and patterns, and it is far weaker than the models above."},',
-     't:"🌱 Train a small model",b:"On a Mac or Windows computer, a guided lesson makes a tiny model of your own from zero and trains it on your text, so you can watch an AI learn: the loss falls as it reads. It learns your text\'s words and patterns, and it is far weaker than the models above. The same lesson can train a small model you have further on your text."},',
+     't:"🌱 Train a small model",b:"On a Mac or Windows computer, a guided lesson makes a tiny model of your own from zero and trains it on your text, so you can watch an AI learn: the loss falls as it reads. It learns your text\'s words and patterns, and it is far weaker than the models you install to chat with. The same lesson can train a small model you have further on your text."},',
      "6.7 claims: the tour, training")
 # the recovery shelf: three saved moments, at least 45 seconds apart, and none for a very large desk
 edit("+'<p class=\"small muted\">The studio keeps the three most recent moments of'\n    +' everything (your notes, documents, sheets, builds, model list and'\n    +' settings), in case of a crash or a bad edit. Pick one to return to.'",
@@ -729,8 +729,18 @@ edit('"Nothing on the shelf yet. The shelf starts filling as you work; come back
      "6.7 claims: the empty recovery shelf", times=2)
 # the train card says both things it does
 edit('<h2 class="sec">Train a small model from zero</h2>\n        <p class="small muted" style="margin-bottom:10px">See how AI learns by making a tiny model of your own: it starts as random numbers and learns from text you give it, here on this computer. It learns your text\'s words and patterns; it is far weaker than the models above and does not hold a conversation.</p>',
-     '<h2 class="sec">Train a small model</h2>\n        <p class="small muted" style="margin-bottom:10px">Make a tiny model of your own from random numbers, or train a small model you have further on your own text, here on this computer. A model made from zero learns your text\'s words and patterns; it is far weaker than the models above and does not hold a conversation. A model you train further starts from what it already knew.</p>',
+     '<h2 class="sec">Train a small model</h2>\n        <p class="small muted" style="margin-bottom:10px">Make a tiny model of your own from random numbers, or train a small model you have further on your own text, here on this computer. A model made from zero learns your text\'s words and patterns; it is far weaker than the models you install to chat with, and does not hold a conversation. A model you train further starts from what it already knew.</p>',
      "6.7 claims: the train card")
+# 6.7: Models and Blend stand in rooms, so nothing is "above" any more
+edit('No model is ready on this device yet. Install one from Ingenium\'s models above, or add your own, then come back.',
+     'No model is ready on this device yet. Get one in the Ingenium\'s models room, or add your own in Your models, then come back.',
+     "6.7 rooms: your own AIs say where the models are")
+edit('if(!h&&ch.length<2){blPaintNote("Choose two or more models above, then save them as a house.","bad");return;}',
+     'if(!h&&ch.length<2){blPaintNote("Choose two or more models in step 1, then save them as a house.","bad");return;}',
+     "6.7 rooms: Blend's houses say where the models are chosen")
+edit('if(chosen.length<2){blPaintNote("Choose two or more models above.","bad");return;}',
+     'if(chosen.length<2){blPaintNote("Choose two or more models in step 1.","bad");return;}',
+     "6.7 rooms: Blend says where the models are chosen")
 edit('var why=box.querySelector("#trWhy");why.textContent=TRAIN_STEPS[step].why;',
      'var why=box.querySelector("#trWhy");why.textContent=(step===4&&w.base&&!w.fromModel)?"Begin a sentence and the model continues it in the manner of your text. It started from what it already knew, so it should still answer much as before; in Ingenium\'s own test, SmolLM2 135M Instruct still answered in chat after one pass at the usual setting. More passes have not been measured.":TRAIN_STEPS[step].why;',
      "6.7 claims: Try it, for a model trained further")

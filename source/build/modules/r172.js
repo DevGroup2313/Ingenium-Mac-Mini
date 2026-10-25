@@ -226,8 +226,16 @@ Inst.prototype.apply=function(sp){var c=this.combo,st=c.style;this.spec=sp;
   st.display=/^(block|flex|grid|table|list-item)$/.test(sp.display)?"flex":"";
   this.sizeFor=sp.width==="auto";};
 /* the unseen select lies exactly over its field: what measures it (the help's list, its rings, What is this?) finds the field */
+/* it is placed from the nearest positioned box; when that box stands outside a panel that scrolls or clips the field, the select
+   stood outside the panel too and lengthened the page (Lector at 1440 by 900 scrolled by 262 pixels). The field's own parent is
+   then made that box. Looked at again when the box changes or the window is resized */
+Inst.prototype.anchor=function(){var s=this.sel,p=s.parentElement,op=s.offsetParent;if(!p||!op||op===this.opSeen)return;this.opSeen=op;
+  if(p===D.body||p===op||getComputedStyle(p).position!=="static")return;
+  for(var a=p;a&&a!==op&&a!==D.body;a=a.parentElement){var cs=getComputedStyle(a);
+    if(cs.overflowX!=="visible"||cs.overflowY!=="visible"){p.style.position="relative";this.opSeen=null;return;}}};
 Inst.prototype.fitRead=function(){var s=this.sel,c=this.combo;try{
   if(c.hidden||!c.isConnected||!s.classList.contains(NATIVE))return null;var cr=c.getBoundingClientRect();if(!cr.width||!cr.height)return null;
+  this.anchor();
   var sr=s.getBoundingClientRect(),cs=getComputedStyle(s),l=parseFloat(cs.left)||0,t=parseFloat(cs.top)||0;
   var nl=Math.round((l+cr.left-sr.left)*10)/10,nt=Math.round((t+cr.top-sr.top)*10)/10,w=Math.round(cr.width*10)/10,h=Math.round(cr.height*10)/10;
   if(Math.abs(cr.left-sr.left)<0.6&&Math.abs(cr.top-sr.top)<0.6&&Math.abs(sr.width-w)<0.6&&Math.abs(sr.height-h)<0.6)return null;
@@ -474,7 +482,7 @@ function tick(){if(D.hidden)return;tickN++;try{prune();scan();
   var want=[],seen=[];for(var i=0;i<ALL.length;i++){var I=ALL[i];if(!I.sel.isConnected)continue;var vis=I.combo.offsetParent!==null;if(tickN%5===0||vis)want.push(I);if(vis)seen.push(I);}
   syncAll(want);fitAll(seen);}catch(e){warn(e);}}
 var rz=0;
-function remeasure(){rz=0;var live=ALL.filter(function(I){return I.sel.isConnected;});if(live.length)try{measure(live);}catch(e){warn(e);}}
+function remeasure(){rz=0;var live=ALL.filter(function(I){I.opSeen=null;return I.sel.isConnected;});if(live.length)try{measure(live);}catch(e){warn(e);}}
 
 /* the page told it is dark by night, for any list the system still draws (engines without :has) */
 function darkRoot(){try{D.documentElement.classList.toggle("r172-dark",D.body.getAttribute("data-theme")==="night");}catch(_){}}

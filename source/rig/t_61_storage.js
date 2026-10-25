@@ -93,7 +93,9 @@ const PAGE_HELPERS = () => {
 
   // ================= 1 · Settings, Storage =================
   await p.evaluate(() => go('settings')); await p.waitForTimeout(500);
-  await p.evaluate(() => document.getElementById('stxCard').scrollIntoView()); await p.waitForTimeout(1600);
+  await p.evaluate(() => document.getElementById('stxCard').scrollIntoView()); await p.waitForTimeout(400);
+  // measuring 88 MB of stores takes about a second; a busy machine may take longer, so the test waits for it to be done
+  await p.waitForFunction(() => { const m = document.getElementById('stxMeasured'); return !!(m && m.textContent.trim()); }, null, { timeout: 30000 }).catch(() => { });
   const s1 = await p.evaluate(async () => { const c = document.getElementById('stxCard'); const dbs = (await indexedDB.databases()).map(x => x.name);
     return { place: c.nextElementSibling && c.nextElementSibling.querySelector('h2').textContent, h: c.querySelector('h2').textContent, role: c.getAttribute('aria-labelledby'),
       used: document.getElementById('stxUsed').textContent, of: document.getElementById('stxOf').textContent, rows: [...document.querySelectorAll('#stxKinds li')].map(l => l.getAttribute('data-db')),

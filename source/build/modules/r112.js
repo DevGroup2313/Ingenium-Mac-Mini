@@ -771,7 +771,7 @@ function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();mak
   else if(what==="web")p=IngShip.webApp(r.id,{pkg:pkgOf(r)}).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="apk"||what==="ipa"||what==="mac"||what==="win")p=makeDevice(r,what);
   else p=makeKits(r,opt.kits||shipPrefs(r).kits);
-  return p.then(function(){making(r,what,100);return refresh();}).then(function(){making(r,what,null);paint();if(!opt.quiet)toast(TARGETS.filter(function(t){return t[0]===what;})[0][1]+" made and saved. It is kept under Releases too.");},
+  return p.then(function(){making(r,what,100);return refresh();}).then(function(){making(r,what,null);paint();if(!opt.quiet)toast(what==="kits"&&S.kitsSaid?S.kitsSaid:TARGETS.filter(function(t){return t[0]===what;})[0][1]+" made and saved. It is kept under Releases too.");S.kitsSaid=null;},
     function(e){making(r,what,null);if(!opt.quiet)fail(e);throw e;});}
 /* the APK, the IPA, the Mac app or the Windows app: the version kept, made into one page, in the shell Ingenium carries
    (R136; the Mac and Windows shells from 6.5, R170) */
@@ -801,17 +801,22 @@ function makeAll(){makeChosen();}
 /* the build kits: the devices chosen, one zip each, saved one after another */
 function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds everything needed to build the app for one device, with a guide to every step: the Fire tablet, iPhone and iPad apps are built online from theirs, and the Mac and Windows kits build on the computer itself. Choose the devices.");
   var picked=pref.kits.slice();
-  KITS.forEach(function(k){var o=opt("✓",k[1],k[0]==="fire"?"An Android project and its build recipe (Fabrica's APK needs none)":k[0]==="iphone"||k[0]==="ipad"?"An Xcode project and its build recipe (Fabrica's IPA needs none)":"The app for this computer, built on it",function(){var i=picked.indexOf(k[0]);if(i>=0)picked.splice(i,1);else picked.push(k[0]);o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");go2.textContent="Make "+picked.length+" kit"+(picked.length===1?"":"s");go2.disabled=!picked.length;});
+  KITS.forEach(function(k){var o=opt("✓",k[1],k[0]==="fire"?"An Android project and its build recipe (Fabrica's APK needs none)":k[0]==="iphone"||k[0]==="ipad"?"An Xcode project and its build recipe (Fabrica's IPA needs none)":"The app for this computer, built on it",function(){var i=picked.indexOf(k[0]);if(i>=0)picked.splice(i,1);else picked.push(k[0]);o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");go2.textContent=kitsKey(picked.length);go2.disabled=!picked.length;});
     o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");sh.box.appendChild(o);});
-  var end=h("div","end"),go2=btn("pri","Make "+picked.length+" kit"+(picked.length===1?"":"s"),function(){pref.kits=picked.slice();saveSoon();sh.close();makeOne(r,"kits",{kits:picked.slice()}).catch(function(){});});
+  var end=h("div","end"),go2=btn("pri",kitsKey(picked.length),function(){pref.kits=picked.slice();saveSoon();sh.close();makeOne(r,"kits",{kits:picked.slice()}).catch(function(){});});
   go2.disabled=!picked.length;end.appendChild(btn("","Close",sh.close));end.appendChild(go2);sh.box.appendChild(end);}
+/* the key counts the devices: an app with its own kit templates makes one package for the iPhone and the iPad, which the notice
+   after says */
+function kitsKey(n){return "Make kits for "+n+" device"+(n===1?"":"s");}
 function makeKits(r,ids){ids=(ids&&ids.length?ids:KITS.map(function(k){return k[0];})).filter(function(i){return KITS.some(function(k){return k[0]===i;});});
   return IngShip.onePage(r.id,{quiet:true}).then(function(x){var P=pkgOf(r),name=r.name.replace(/[^\w .-]+/g,"").trim()||"App",file=name.replace(/\s+/g,""),who={isNew:true,name:name,id:P.id.slice(0,60),file:file,title:P.title,version:P.version,app:P.app,colour:colorOf(r)},page=x.html;
     return kitStore().then(function(store){var total=0,chain=Promise.resolve(),made=[],seen={};
       /* 6.7 (R178): a kit may be drawn before it is ready (the app's own icons, or its own templates); two devices that share one package (iPhone and iPad, from an app's own templates) save it once */
-      ids.forEach(function(id,i){chain=chain.then(function(){say(r,"kits","The "+KITS.filter(function(k){return k[0]===id;})[0][1]+" kit…");return Promise.resolve(kitAssemble(store,id,who,page)).then(function(k){if(seen[k.zip])return;seen[k.zip]=1;var bytes=k.bytes||makeZip(k.entries);total+=bytes.length;made.push({name:k.zip,size:bytes.length,kit:id});
+      ids.forEach(function(id,i){chain=chain.then(function(){say(r,"kits","The "+KITS.filter(function(k){return k[0]===id;})[0][1]+" kit…");return Promise.resolve(kitAssemble(store,id,who,page)).then(function(k){if(seen[k.zip]){seen[k.zip].push(id);return;}seen[k.zip]=[id];var bytes=k.bytes||makeZip(k.entries);total+=bytes.length;made.push({name:k.zip,size:bytes.length,kit:id});
         return saveBytes(k.zip,"application/zip",bytes).then(function(){return keepMade(r,x.commit,"kits",k.zip,"application/zip",bytes);});}).then(function(){if(S.making){S.making.prog.kits=Math.round(10+85*(i+1)/ids.length);paintShip();}});});});
-      return chain.then(function(){return IngRepo.setNote(r.id,x.commit,"kits",{at:Date.now(),size:total,made:made});}).then(function(){return total;});});});}
+      return chain.then(function(){var both=made.filter(function(m){return seen[m.name].length>1;})[0];
+        S.kitsSaid=made.length+" build kit"+(made.length===1?"":"s")+" made and saved, one .zip each"+(both?"; the iPhone and iPad kits come as one package, "+both.name:"")+". "+(made.length===1?"It is":"They are")+" kept under Releases too.";
+        return IngRepo.setNote(r.id,x.commit,"kits",{at:Date.now(),size:total,made:made});}).then(function(){return total;});});});}
 /* what was made, kept on this device beside its version (IndexedDB fabrica_made): Releases shows it, and saves it again with no
    making; the packages of an app's three newest versions are kept */
 var MADE=(function(){var dbp=null;

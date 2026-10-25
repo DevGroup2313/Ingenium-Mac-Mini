@@ -117,10 +117,14 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     // ---------- 2. Fabrica's Build kits, every device ----------
     const fk = await collect('fabrica_kits', async () => { await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="kits"]'); eval(kf)(e).click(); }, keyOf); await p.waitForTimeout(600);
       const sh = await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); return s ? { opts: [...s.querySelectorAll('.f-opt')].map(o => o.textContent.trim().slice(0, 30) + '=' + o.getAttribute('aria-pressed')), go: [...s.querySelectorAll('button')].map(x => x.textContent) } : null; });
-      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make \d+ kits?$/.test(x.textContent)).click(); });
+      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); });
       console.log('  (the Build kits sheet: ' + JSON.stringify(sh) + ')'); }, 5, 300000);
     ok(fk.map(f => path.basename(f)).sort().join() === ['the_forge_fire_9s78.zip', 'the_forge_ios_9s78.zip', 'the_forge_mac_9s78.zip', 'the_forge_mac_mini_9s78.zip', 'the_forge_windows_9s78.zip'].join(),
       'Fabrica\'s Build kits, with all six devices chosen, saves the Forge\'s five packages, each once, under the Forge\'s own names', fk.map(f => path.basename(f)));
+    // (6.7, after review: the key counts the devices; the notice after counts the packages and names the one iPhone and iPad share)
+    const fkSaid = await p.waitForFunction(() => { const t = document.querySelector('#fb .f-toast'); return t && /build kits? made and saved/.test(t.textContent) ? t.textContent : null; }, null, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => '');
+    ok(fkSaid === '5 build kits made and saved, one .zip each; the iPhone and iPad kits come as one package, the_forge_ios_9s78.zip. They are kept under Releases too.',
+      'the notice counts the five packages and says that the iPhone and iPad kits are one', fkSaid);
     for (const f of fk) forgePackage(f, 'Fabrica, Build kits');
     await p.waitForTimeout(1500);
 
@@ -239,7 +243,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     await p.evaluate(() => { go('fabrica'); }); await p.waitForTimeout(1200);
     await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Tide Clock/.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(1500);
     const tk = await collect('tide_kits', async () => { await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="kits"]'); eval(kf)(e).click(); }, keyOf); await p.waitForTimeout(600);
-      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make \d+ kits?$/.test(x.textContent)).click(); }); }, 6);
+      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); }); }, 6);
     const tnames = tk.map(x => path.basename(x)).sort();
     ok(tnames.join() === ['TideClock-Fire-Tablet-Kit.zip', 'TideClock-Mac-Apple-Silicon-Kit.zip', 'TideClock-Mac-Kit.zip', 'TideClock-Windows-Kit.zip', 'TideClock-iPad-Kit.zip', 'TideClock-iPhone-Kit.zip'].join(), 'a plain app\'s Build kits: six kits, named for the app', tnames);
     const KITID = { 'TideClock-Windows-Kit.zip': 'windows', 'TideClock-Mac-Kit.zip': 'mac', 'TideClock-Mac-Apple-Silicon-Kit.zip': 'macarm', 'TideClock-Fire-Tablet-Kit.zip': 'fire', 'TideClock-iPhone-Kit.zip': 'iphone', 'TideClock-iPad-Kit.zip': 'ipad' };
@@ -250,7 +254,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       const origNames = tide.orig[id].names.map(n => n.split('/').slice(2).join('/')).filter(Boolean);
       const r = kc(f, { app_ref: TIDE, ing_refs: ING, ing_icon_sha256: ING_SHA, orig_names: origNames, old_names: OLD,
         build_globs: ['\\.github/workflows/', '\\.spec$', '\\.iss$', '\\.bat$', '\\.command$', '\\.gradle$', 'project\\.yml$', 'make_[^/]*_icon\\.py$', 'tools/app_name\\.py$'],
-        read: ['/app\\.json$', '\\.iss$', '_win\\.spec$', '[^/]\\.spec$', '\\.github/workflows/build-[^/]*\\.yml$', '/START_HERE\\.txt$', 'Info\\.plist$', 'WINDOWS_README\\.txt$'], read_max: 60000 });
+        read: ['/app\\.json$', '\\.iss$', '_win\\.spec$', '[^/]\\.spec$', '\\.github/workflows/build-[^/]*\\.yml$', '/START_HERE\\.txt$', 'Info\\.plist$', 'WINDOWS_README\\.txt$', 'project\\.yml$', '_app\\.py$'], read_max: 60000 });
       checked.push(['plain app', path.basename(f), r]);
       const rd = k => ((r.read || {})[k] || {}).text || '';
       let aj = {}; try { aj = JSON.parse(rd('/app\\.json$')); } catch (e) {}
@@ -271,6 +275,14 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
         ok(/'tideclock\.icns'/.test(spec) && /\['tideclock_app\.py'\]/.test(spec) && /Tide Clock uses the home network/.test(spec) && /^name: Build Tide Clock for Mac$/m.test(wf) && ((r.read || {})['[^/]\\.spec$'] || {}).name.endsWith('/tideclock.spec'),
           'the Mac kit: its build recipe (tideclock.spec) names the app\'s icon and shell, and what macOS shows names the app', /NSLocalNetworkUsageDescription'?: '[^']{0,40}/.exec(spec)); }
       if (id === 'iphone') ok(/<key>CFBundleDisplayName<\/key>\s*<string>Tide Clock<\/string>/.test(rd('Info\\.plist$')) && /Tide Clock uses your home network/.test(rd('Info\\.plist$')), 'the iPhone kit: the name under its icon is the app\'s', /CFBundleDisplayName<\/key>\s*<string>[^<]*/.exec(rd('Info\\.plist$')));
+      // (6.7, after review: the iPhone and iPad app's target, product and program, and the cloud build that makes it, take the app's
+      // name; the Windows and Mac shells write their crash report and diagnosis under the app's name)
+      if (id === 'iphone' || id === 'ipad') { const yml = rd('project\\.yml$'), wf = rd('\\.github/workflows/build-[^/]*\\.yml$');
+        ok(/^name: TideClock$/m.test(yml) && /^  TideClock:$/m.test(yml) && /^\s+PRODUCT_NAME: TideClock$/m.test(yml) && /-project TideClock\.xcodeproj -scheme TideClock\b/.test(wf) && /Release-iphoneos\/TideClock\.app Payload\//.test(wf) && !/Ingenium\.app|Ingenium\.xcodeproj|-scheme Ingenium|PRODUCT_NAME: Ingenium|^name: Ingenium$/m.test(yml + '\n' + wf),
+          path.basename(f) + ': the Xcode project, its target, its program and the cloud build that makes them are named for the app', { yml: (yml.match(/^(name|  [A-Za-z]+:$|\s+PRODUCT_NAME:).*$/mg) || []).slice(0, 4), wf: (wf.match(/xcodebuild[^\n]*|cp -R [^\n]*/g) || []).slice(0, 2) }); }
+      if (desk) { const app = rd('_app\\.py$'), guide = rd('/START_HERE\\.txt$');
+        ok(/tideclock_crash\.log/.test(app) && /tideclock_diag\.txt/.test(app) && !/ingenium_crash\.log|ingenium_diag\.txt/.test(app + guide),
+          path.basename(f) + ': the shell writes its crash report and diagnosis under the app\'s name, and the guide names them so', (app.match(/[a-z_]+_(crash\.log|diag\.txt)/g) || []).slice(0, 4)); }
     }
 
     // ---------- 8b. a kit Fabrica kept from before this version is let go, once ----------
@@ -304,13 +316,13 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       await p.evaluate(() => { go('fabrica'); }); await p.waitForTimeout(1000);
       await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /The Forge/.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(1500);
       await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="kits"]'); eval(kf)(e).click(); }, keyOf); await p.waitForTimeout(600);
-      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make \d+ kits?$/.test(x.textContent)).click(); });
+      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); });
       await p.waitForFunction(() => window.__winSaves.length >= 5, null, { timeout: 300000 }).catch(() => {}); await p.waitForTimeout(1500);
       await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="win"]'); eval(kf)(e).click(); }, keyOf);
       await p.waitForFunction(() => window.__winSaves.length >= 6, null, { timeout: 300000 }).catch(() => {}); await p.waitForTimeout(1500);
       await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Tide Clock/.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(1500);
       await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="kits"]'); eval(kf)(e).click(); }, keyOf); await p.waitForTimeout(600);
-      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { const w = /Windows/.test(o.textContent); if ((o.getAttribute('aria-pressed') === 'true') !== w) o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make \d+ kits?$/.test(x.textContent)).click(); });
+      await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { const w = /Windows/.test(o.textContent); if ((o.getAttribute('aria-pressed') === 'true') !== w) o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); });
       await p.waitForFunction(() => window.__winSaves.length >= 7, null, { timeout: 300000 }).catch(() => {}); await p.waitForTimeout(1500);
       const ws = await p.evaluate(() => window.__winSaves.map(s => ({ name: s.name, made: s.made, size: s.size, path: s.saved.path, offered: s.saved.offered, onDisk: s.saved.sha256, diskSize: s.saved.size })));
       const want = ['the_forge_fire_9s78.zip', 'the_forge_ios_9s78.zip', 'the_forge_mac_9s78.zip', 'the_forge_mac_mini_9s78.zip', 'the_forge_windows_9s78.zip'];

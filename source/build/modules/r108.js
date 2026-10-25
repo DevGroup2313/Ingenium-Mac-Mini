@@ -414,7 +414,7 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
     c.onchange=function(){B.docs[d[0]]=c.checked;saveSoon();paintTabs();paintDoc();paintModel();};row.appendChild(c);
     var t=h("span","t");t.textContent=docLabel(d[0],B.apps,B.purpose);t.appendChild(h("small",null,esc(d[0]==="cover"&&B.purpose==="portfolio"?"A letter of introduction, for any reader":d[2])));row.appendChild(t);
     row.appendChild(sealMark(d[0],B.apps));dl.appendChild(row);});
-  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"?"The master seal goes on the master dossier, the master appendix and the portfolio piece.":ck?crestWords(ck)+" goes on the dossier, the appendix and the portfolio piece.":B.apps.length===4?"The master seal goes on the master dossier, the master appendix and the portfolio piece.":"Seals go on dossiers, appendices and portfolio pieces.")+" Your CV and cover letters stay plain."));
+  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"||!ck&&B.apps.length===4?"The master seal goes on the master dossier, the master appendix, the portfolio piece and Every function.":ck?crestWords(ck)+" goes on the dossier, the appendix, the portfolio piece and Every function.":"Seals go on dossiers, appendices, portfolio pieces and Every function.")+" Your CV and cover letters stay plain."));
   box.appendChild(s3);
   /* facts and voice */
   box.appendChild(meCard());

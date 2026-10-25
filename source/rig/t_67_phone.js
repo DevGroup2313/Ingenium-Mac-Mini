@@ -6,8 +6,8 @@
 //   edges      a box that runs past the left or right edge of the window (not one inside a box that scrolls or clips it)
 //   covered    words that a floating element (the side column of keys, a bubble) lies over, now or once the page scrolls
 //   panels     a panel or popover cut by the window or the safe areas, or taller than the window without scrolling itself
-//   keys       on a phone, a key smaller than 44 pixels either way (words linked inside a sentence are allowed), on the pages
-//              and in the top bar's panels
+//   keys       with a finger (a phone or a tablet), a key smaller than 44 pixels either way (words linked inside a sentence
+//              are allowed), on the pages and in the top bar's panels
 //   side keys  what each side key opens (reminders, the quiet screen, a thought, the Clepsydra, the notes), inside the
 //              window and the safe areas, upright and sideways; the column itself between the top bar and the foot, no key
 //              over another, 44 pixels upright, and sideways one column of 38 pixels or more (r155) or two of 44
@@ -349,10 +349,11 @@ async function panels(p, label, shotPrefix) {
       for (const pg of PAGES) {
         await goTo(p, pg);
         const where = `${vp[0]}x${vp[1]} ${th} ${pg}:`;
-        const r = await p.evaluate(inPage, { keys: false });
+        const r = await p.evaluate(inPage, { keys: true });
         if (th === 'day' || pg === 'home' || pg === 'settings') await p.screenshot({ path: path.join(OUT, `tb_${vp[0]}_${th}_${pg}.png`) });
         ok(!r.overflow && r.edges.length === 0, `${where} nothing wider than the window, no box past an edge`, { overflow: r.overflow, edges: r.edges });
         ok(r.covered.length === 0, `${where} no words lie under a floating key`, r.covered);
+        ok(r.keys.length === 0, `${where} every key is at least 44 pixels (a finger on a tablet, since 6.7)`, r.keys);
       }
       await panels(p, `${vp[0]}x${vp[1]} ${th}:`, th === 'day' ? path.join(OUT, `tp_${vp[0]}`) : null);
     }

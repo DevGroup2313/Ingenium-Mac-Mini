@@ -7,7 +7,7 @@ let pass = 0, fail = 0;
 // 6.1: the versions the page carries, read from the build's own record (apps/builtin/builtin.json), so the test follows a new
 // Forge without its numbers being written in here; the "newer" Forge and stamp are one past the one carried
 const BI = JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'build', 'apps', 'builtin', 'builtin.json'), 'utf8'));
-const FV = BI.forge.version, FB = BI.forge.build, FSHA = BI.forge.sha256;
+const FV = BI.forge.version, FB = BI.forge.build, FSHA = BI.forge.sha256, IV = BI.inkwell.version, ID = BI.inkwell.date;
 const NEWV = String(+FV + 1), NEWS = '9s' + (+FB.slice(2) + 1);
 const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(d).slice(0, 300) : '')); c ? pass++ : fail++; };
 (async () => {
@@ -21,15 +21,15 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const parts = await p.evaluate(() => window.__ingParts);
   ok(parts.p51 === 'running', 'the built-in copies part (p51) runs', parts.p51);
   const meta = await p.evaluate(() => { const m = IngBuiltin.meta; return { f: [m.forge.version, m.forge.build, m.forge.date, m.forge.size], i: [m.inkwell.version, m.inkwell.date, m.inkwell.size] }; });
-  ok(meta.f[0] === FV && meta.f[1] === FB && meta.i[0] === '7.49' && meta.i[1] === '2026-10-19', 'Ingenium carries The Forge ' + FV + ' (' + FB + ') and Inkwell 7.49', JSON.stringify(meta));
+  ok(meta.f[0] === FV && meta.f[1] === FB && meta.i[0] === IV && meta.i[1] === ID, 'Ingenium carries The Forge ' + FV + ' (' + FB + ') and Inkwell ' + IV, JSON.stringify(meta));
 
   // 1. on its own, soon after it opens, the library is given both
   await p.waitForFunction(() => window.__ingBuiltin && window.__ingBuiltin.states, null, { timeout: 90000 });
   const auto = await p.evaluate(() => ({ st: window.__ingBuiltin.states, ms: window.__ingBuiltin.ms, f: libState().apps.forge, i: libState().apps.inkwell }));
   ok(auto.st.forge === 'kept' && auto.st.inkwell === 'kept', 'soon after it opens, both are unpacked, checked and kept', JSON.stringify(auto.st) + ' in ' + auto.ms + ' ms');
-  ok(auto.f.version === FV && auto.f.source === 'built in' && auto.f.sha256 === FSHA && auto.i.version === '7.49',
+  ok(auto.f.version === FV && auto.f.source === 'built in' && auto.f.sha256 === FSHA && auto.i.version === IV,
     'the library names them as their own builds name them, with their fingerprints', JSON.stringify({ f: [auto.f.version, auto.f.build, auto.f.source, auto.f.size], i: [auto.i.version, auto.i.source, auto.i.size] }));
-  const txt = await p.evaluate((FV) => Promise.all([libText('forge'), libText('inkwell')]).then(([f, i]) => ({ f: f && f.indexOf('pass:"' + FV + '"') >= 0 && /id="section-forge"/.test(f), fl: f && f.length, i: i && /const BUILD='7\.49/.test(i), il: i && i.length })), FV);
+  const txt = await p.evaluate(([FV, IV]) => Promise.all([libText('forge'), libText('inkwell')]).then(([f, i]) => ({ f: f && f.indexOf('pass:"' + FV + '"') >= 0 && /id="section-forge"/.test(f), fl: f && f.length, i: i && i.indexOf("const BUILD='" + IV) >= 0, il: i && i.length })), [FV, IV]);
   ok(txt.f && txt.i, 'their pages read back whole from this device', JSON.stringify(txt));
 
   const cd = await p.evaluate(() => { const m = IngBuiltin.meta.cd, a = libState().apps.cd; return libText('cd').then(t => ({ st: window.__ingBuiltin.states.cd, mv: m && m.version, mb: m && m.build, v: a && a.version, src: a && a.source, sha: a && a.sha256 === m.sha256, pass: /pass:"1058"/.test(t || ''), det: libDetect(t), ver: libVersionOf('cd', t), len: (t || '').length, claude: /claude\.ai/.test((t || '').slice(0, 4000)) })); });
@@ -41,7 +41,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
 
   // 3. an older copy the owner had: replaced, the older one one step back
   const older = await p.evaluate(() => { const A = libState().apps; A.inkwell = Object.assign({}, A.inkwell, { version: '7.30', sha256: 'aaaa', source: 'file' }); return IngBuiltin.seed().then(s => ({ s: s.inkwell, v: libState().apps.inkwell.version, e: libState().apps.inkwell.earlier && libState().apps.inkwell.earlier.version })); });
-  ok(older.s === 'kept' && older.v === '7.49' && older.e === '7.30', 'an older Inkwell (7.30) is replaced by 7.49, and 7.30 stays one step back', JSON.stringify(older));
+  ok(older.s === 'kept' && older.v === IV && older.e === '7.30', 'an older Inkwell (7.30) is replaced by ' + IV + ', and 7.30 stays one step back', JSON.stringify(older));
 
   // 4. a Forge stamp older than the one carried counts as older; a later stamp as newer
   const cmp = await p.evaluate((NEWS) => { const A = libState().apps, keep = Object.assign({}, A.forge), r = {};
@@ -58,7 +58,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(newer.s === 'newer' && newer.v === NEWV, 'a newer Forge (' + NEWV + ') the owner added is never replaced', JSON.stringify(newer));
   await p.evaluate(() => go('lector')); await p.waitForTimeout(1200);
   const card = await p.evaluate(() => { const c = document.getElementById('libBuiltin'); return c ? { line: c.textContent, keys: [...c.querySelectorAll('[data-bi-use]')].map(b => b.textContent), apps: [...document.querySelectorAll('#l7Bf .l-app')].map(a => a.textContent) } : null; });
-  ok(card && card.line.indexOf('Built into this Ingenium: Carpe Diem 1058, The Forge ' + FV + ' and Inkwell 7.49.') >= 0 && card.keys.length === 1 && card.keys[0].indexOf('Use the built-in The Forge ' + FV) >= 0,
+  ok(card && card.line.indexOf('Built into this Ingenium: Carpe Diem 1058, The Forge ' + FV + ' and Inkwell ' + IV + '.') >= 0 && card.keys.length === 1 && card.keys[0].indexOf('Use the built-in The Forge ' + FV) >= 0,
     'the Your apps card says what Ingenium carries, and offers the built-in Forge beside the owner\'s newer one', JSON.stringify(card));
   await p.evaluate(() => document.getElementById('libBuiltin').scrollIntoView({ block: 'center' })); await p.waitForTimeout(300);
   await p.screenshot({ path: OUT + '/builtin-card-offer.png' });
@@ -79,7 +79,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.evaluate(() => { const c = document.getElementById('libBuiltin'); if (c) c.scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + '/builtin-card.png' });
   const seen = await p.evaluate(() => ({ tiles: [...document.querySelectorAll('#l7Bf .l-app:not(.none)')].map(b => b.getAttribute('data-k') + ': ' + b.textContent), lib: libApps().map(a => a.key + ' ' + a.version) }));
-  ok(seen.tiles.some(t => /^forge: /.test(t) && t.indexOf(FV) >= 0) && seen.tiles.some(t => /^inkwell: .*7\.49/.test(t)), 'Lector shows both among your apps, ready to read', JSON.stringify(seen));
+  ok(seen.tiles.some(t => /^forge: /.test(t) && t.indexOf(FV) >= 0) && seen.tiles.some(t => /^inkwell: /.test(t) && t.indexOf(IV) >= 0), 'Lector shows both among your apps, ready to read', JSON.stringify(seen));
   // 9. Lector: a reading of an earlier Forge is not passed off as a reading of the one carried
   await p.evaluate(() => { const s = lxState(); s.runs = s.runs.filter(r => r.id !== 'lx_old628');
     s.runs.unshift({ id: 'lx_old628', name: 'The Forge', app: 'forge', sha: 'old628sha', version: '628', file: 'the_forge.html', kind: 'app', depth: 'overview', status: 'done', created: Date.now() - 2 * 864e5, updated: Date.now() - 864e5, finished: Date.now() - 864e5, done: 12, total: 12, writings: {} });
@@ -109,7 +109,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
   await p.evaluate(() => document.getElementById('fbBring').click()); await p.waitForTimeout(400);
   const fab = await p.evaluate(() => { const o = [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /From your app library/.test(x.textContent)); return o ? o.querySelector('small').textContent : ''; });
-  ok(fab.indexOf('The Forge ' + FV) >= 0 && /Inkwell 7\.49/.test(fab) && /Carpe Diem 1058/.test(fab), 'Fabrica can bring them in from the app library', fab);
+  ok(fab.indexOf('The Forge ' + FV) >= 0 && fab.indexOf('Inkwell ' + IV) >= 0 && /Carpe Diem 1058/.test(fab), 'Fabrica can bring them in from the app library', fab);
   await p.screenshot({ path: OUT + '/builtin-fabrica.png' });
   ok(errs.length === 0, 'no page errors', errs.join(' | '));
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
