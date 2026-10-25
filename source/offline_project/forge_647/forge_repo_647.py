@@ -91,4 +91,7 @@ fingerprint.write(os.path.join(ios, "iphone-ipad", "BUILD_INFO.txt"), ["TheForge
 # 647: the programs' own changes (forge_shell_647.py), in the Windows and Mac sources
 subprocess.check_call([sys.executable, os.path.join(HERE, "forge_shell_647.py"), os.path.join(win, "the_forge_app.py"),
                        os.path.join(mac, "Mac project", "the_forge_app.py")])
+# 647: a new build always shows itself (forge_shell_647b.py: the page is never kept, and a new build empties the web view's cache of pages)
+subprocess.check_call([sys.executable, os.path.join(HERE, "forge_shell_647b.py"), os.path.join(win, "the_forge_app.py"),
+                       os.path.join(mac, "Mac project", "the_forge_app.py")])
 print("The Forge 647 written into", win, ios, mac, "and", fire)
