@@ -257,3 +257,11 @@ pages, each room its own (a vellum page, a card drawer, a ledger's tap, a pen, a
 
     node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it stays quiet, it is over in 1.6 s; Ingenium's defaults, none of the old names, 51 checks
 
+One type scale (her words: "I want the text fonts and sizes to be consitent and not be random ... particularly on the
+Settings page with the different size and font of the Ownership texts"): `modules/r185.js`. The original cards set their own
+sizes (a card's title 16.5 in the serif, its words 13 on 1.55, its notes and labels 12); text added since that set none fell
+to the page's 16. Now a card gives its size to anything that names none, a heading inside a card is 13 and bold in the sans,
+the licence's title is a card's title, and a model's name is 14.5.
+
+    node rig/t_681_type.js <url> <out>                                          # every page and room: no text in a card at the page's 16px; Settings pictured
+
