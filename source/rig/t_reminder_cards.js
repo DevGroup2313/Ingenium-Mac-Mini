@@ -41,7 +41,10 @@ function lab(c) { const r = lin(c[0]), g = lin(c[1]), b = lin(c[2]);
   return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))]; }
 const dE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
 const nearBlack = c => { const l = lab(c); return { L: +l[0].toFixed(1), C: +Math.hypot(l[1], l[2]).toFixed(1), black: l[0] < 20 && Math.hypot(l[1], l[2]) < 12 }; };
-const nearest = c => Object.keys(PAL).map(h => ({ h, name: PAL[h], d: dE(c, unhex(h)) })).sort((a, b) => a.d - b.d)[0];
+const nearest = (c, more) => { const P = Object.assign({}, PAL, more || {}); return Object.keys(P).map(h => ({ h, name: P[h], d: dE(c, unhex(h)) })).sort((a, b) => a.d - b.d)[0]; };
+// 6.8, the owner's words: a thought that comes back has "full parity with Carpe Diem's 'Thoughts' reminder cloud popups", in Ingenium's
+// colours: by day the raised paper card it shares with Carpe Diem (white, as Carpe Diem's); by night it stays amethyst
+const PAPER = { '#ffffff': 'paper (a thought by day, the raised card shared with Carpe Diem)', '#fbfafd': 'paper, low' };
 const over = (fg, bg) => fg[3] >= 1 ? fg.slice(0, 3) : [0, 1, 2].map(i => fg[i] * fg[3] + bg[i] * (1 - fg[3]));
 
 /* ---------- the app ---------- */
@@ -234,7 +237,7 @@ async function axeOn(p, root) {
           const ax = await axeOn(p, cs.root);
           const m = await measure(p, dec, cs);
           if (!m || !m.face) { ok(false, where + ': its card was found and measured'); continue; }
-          const nb = nearBlack(m.face), nr = nearest(m.face), low = m.words.slice().sort((a, b) => a.ratio - b.ratio)[0];
+          const nb = nearBlack(m.face), nr = nearest(m.face, APP === 'ingenium' && cs.id === 'thought' && !night ? PAPER : null), low = m.words.slice().sort((a, b) => a.ratio - b.ratio)[0];
           const row = { engine: ename, app: APP, reminder: cs.id, theme: night ? 'night' : 'day', themeAttr: th, view: vp.n, card: hex(m.face), pixels: m.n, L: nb.L, C: nb.C, luminance: +lum(m.face).toFixed(4), nearBlack: nb.black,
             nearest: nr.h, nearestName: nr.name, dE: +nr.d.toFixed(1), minContrast: low ? low.ratio : null, minText: low ? low.text : null, minPair: low ? low.fg + ' on ' + low.bg : null, words: m.words,
             rect: m.info.rect, coversKeys: m.info.keys, coversArea: m.info.cover, css: m.info.css, shot };

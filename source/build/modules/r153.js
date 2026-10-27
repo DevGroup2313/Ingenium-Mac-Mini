@@ -10,7 +10,20 @@
    app is which. So each reminder now comes in Ingenium's jewel: its deep amethyst (#4e2c8a to #43277a, the fill its
    violet keys are made of, "deep in both themes so white text passes"), its antique gold rim (#caa24a) and its
    lilac-white ink (#f3eefb), by day and by night, in the same place and at the same size as before. The shared modules
-   draw their part (SupportCore and ThoughtCloud, .reminders(look)); the notices and Custodia are dressed here. */
+   draw their part (SupportCore and ThoughtCloud, .reminders(look)); the notices and Custodia are dressed here.
+   6.8 (27 October 2026), the owner's words: "The little 'Thoughts' reminders from Ingenium look 2D and almost childlike and
+   does not match the look of the rest of the app. I want full parity with Carpe Diem's 'Thoughts' reminder cloud popups [...]
+   but match it to Ingenium's look and colour palette." A thought that comes back is no longer laid in the flat amethyst card:
+   it is the raised card the thoughts share with Carpe Diem and the Forge (its paper with a lit edge and a wall beneath, the
+   small clouds trailing to the 💭, keys that stand up and press down), in Ingenium's colours: by day Ingenium's paper with its
+   violet key, by night Ingenium's amethyst with the gold edge, never a plum that reads as black. The other timed reminders
+   keep the amethyst card. */
+/* a thought that comes back, by night: the shared raised card, its face Ingenium's amethyst */
+.tc-el.tc-nudge[data-tc-app="ingenium"][data-tc-night="1"]{--tc-face-a:#4e2c8a;--tc-face-b:#43277a;--tc-wall:#24123f;--tc-lip:rgba(255,255,255,.16);
+  --tc-rim:rgba(202,162,74,.75);--tc-ink:#f3eefb;--tc-soft:rgba(243,238,251,.82);--tc-acc:#f3eefb;--tc-acc-hi:#ffffff;--tc-acc-lo:#e3d8f6;
+  --tc-acc-edge:#8f78c4;--tc-on-acc:#3a2168}
+/* and by day its close mark in Ingenium's second ink (the shared faint grey read at 2.65 to 1 on the paper) */
+.tc-el.tc-nudge[data-tc-app="ingenium"]:not([data-tc-night="1"]) .tc-nudge-x{color:#6c6579}
 #supNotice .sup-note,body:not([data-depth="flat"]) #supNotice .sup-note{background:linear-gradient(180deg,#4e2c8a,#43277a);color:#f3eefb;
   border-color:#caa24a;box-shadow:0 2px 0 rgba(20,8,40,.30),0 10px 26px rgba(20,8,40,.30)}
 #supNotice .sup-note .sup-note-title,#supNotice .sup-note .sup-note-body{color:#f3eefb}
@@ -38,12 +51,11 @@ if(window.__r153)return;window.__r153=1;
 /* Ingenium's jewel, the same by day and by night */
 var LOOK={face:"linear-gradient(180deg,#4e2c8a,#43277a)",ink:"#f3eefb",soft:"rgba(243,238,251,.82)",rim:"#caa24a",line:"rgba(243,238,251,.48)",
   key:"#f3eefb",keyInk:"#43277a",track:"rgba(243,238,251,.22)"};
-/* the support module (R121) and the thoughts panel (R119): each takes the card once it is there */
-function give(n){var s=window.IngSupport&&window.IngSupport.sc,t=window.IngInbox&&window.IngInbox.tc,done=0;
+/* the support module (R121) takes the card once it is there; a thought that comes back (R119) keeps the raised card it
+   shares with Carpe Diem and the Forge (6.8) */
+function give(n){var s=window.IngSupport&&window.IngSupport.sc;
   if(s&&typeof s.reminders==="function"&&!s.__r153){s.reminders(LOOK);s.__r153=1;}
-  if(t&&typeof t.reminders==="function"&&!t.__r153){t.reminders(LOOK);t.__r153=1;}
-  if(s&&s.__r153)done++;if(t&&t.__r153)done++;
-  if(done<2&&n<150)setTimeout(function(){give(n+1);},200);}
+  if(!(s&&s.__r153)&&n<150)setTimeout(function(){give(n+1);},200);}
 give(0);
 /* the end of the two minutes and Ingenium's own note share the foot of the page: the newer one is shown, as in 6.1,
    when both were the one note */

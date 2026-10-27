@@ -87,6 +87,24 @@ body[data-theme="night"] .ing-fw-keys button{background:#2c2440;color:#e4dcf3;bo
 body[data-theme="night"] .ing-fw-body{background:#141210}
 .ing-fw-veil{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.86);font:600 14px/1.4 var(--serif,Georgia,serif);color:var(--accent-deep,#4f3a7a);z-index:5}
 body[data-theme="night"] .ing-fw-veil{background:rgba(20,16,25,.88);color:#e4dcf3}
+/* 6.8: the window's ↗ asks where the app goes, as Carpe Diem 1059's does (the owner's words, 27 October 2026: "I want exported
+   floating windows parity with Carpe Diem's 1059 build"): a window of its own where the device allows one, the whole screen
+   where it does not (and why), back into the desk, or closed */
+#ing-export-choice{position:fixed;z-index:2147483600;width:min(360px,94vw);box-sizing:border-box;display:flex;flex-direction:column;gap:6px;padding:8px;
+  background:var(--card,#fff);color:var(--ink-1,#221a2e);border:1px solid rgba(202,162,74,.55);border-radius:12px;
+  box-shadow:0 3px 0 rgba(40,22,68,.14),0 12px 28px rgba(40,22,68,.22);font:500 13px/1.4 var(--sans,-apple-system,system-ui,sans-serif)}
+#ing-export-choice .ing-xo{display:block;width:100%;box-sizing:border-box;margin:0;padding:9px 12px;text-align:left;cursor:pointer;font:inherit;line-height:1.35;color:inherit;
+  background:#f8f5fd;border:1px solid rgba(106,63,181,.28);border-radius:9px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 1px 0 rgba(40,22,68,.10)}
+#ing-export-choice .ing-xo:hover,#ing-export-choice .ing-xo:focus-visible{background:#efe9fa;border-color:rgba(106,63,181,.55);outline:none}
+#ing-export-choice .ing-xo:focus-visible{box-shadow:0 0 0 2px var(--accent,#6a3fb5)}
+#ing-export-choice .ing-xo.x{background:transparent;border-color:rgba(106,63,181,.18);box-shadow:none}
+#ing-export-choice .ing-xl{display:block;font-weight:650}
+#ing-export-choice .ing-xs{display:block;margin-top:2px;font-size:11.5px;color:var(--ink-2,#4a4358)}
+body[data-theme="night"] #ing-export-choice{background:#241c33;color:#f3eefb;border-color:rgba(227,189,105,.45);box-shadow:0 3px 0 rgba(0,0,0,.5),0 12px 28px rgba(0,0,0,.55)}
+body[data-theme="night"] #ing-export-choice .ing-xo{background:#2e2542;border-color:rgba(205,184,240,.30);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.4)}
+body[data-theme="night"] #ing-export-choice .ing-xo:hover,body[data-theme="night"] #ing-export-choice .ing-xo:focus-visible{background:#382d50}
+body[data-theme="night"] #ing-export-choice .ing-xo.x{background:transparent}
+body[data-theme="night"] #ing-export-choice .ing-xs{color:#d3c9e3}
 /* the Desk bar does the Apps dock's work (the owner's word: the dock's key was out of place on the page): each floating
    window keeps its tab, − folds a window away into its tab, the tab brings it back and its ✕ closes it */
 #ing-deskbar button.folded{opacity:.62;font-style:italic}
@@ -205,7 +223,7 @@ function makeWin(which,n){var id=which+(n>1?"-"+n:"");if(wins[id]){surface(wins[
   var keys=document.createElement("span");keys.className="ing-fw-keys";barEl.appendChild(keys);
   function key(txt,title,fn){var b=document.createElement("button");b.type="button";b.textContent=txt;b.title=title;b.setAttribute("aria-label",title);
     b.addEventListener("pointerdown",function(e){e.stopPropagation();});b.onclick=function(e){e.preventDefault();e.stopPropagation();fn(b);};keys.appendChild(b);return b;}
-  if(n===1&&canExport())key("↗","Export this window: the same app, in a window of its own",function(){exportWin(id);}).setAttribute("data-ing-export","1");
+  key("↗","Its own window, the whole screen, or close",function(b){exportMenu(id,b);}).setAttribute("data-ing-export","1");
   /* 6.2: back into the desk, full width, the work carried across (the owner's words, 22 October 2026: "The exported floating
      windows have no way back into Ingenium's main desk") */
   if(n===1)key("","Back into the desk, full width",function(){dockWin(id);}).innerHTML=DOCK_SVG;
@@ -252,6 +270,33 @@ function surface(win){try{win.classList.remove("folded");front=(win.id||"").repl
 function dockWin(id){var w=wins[id];if(!w)return;var which=baseOf(id),f=w.querySelector("iframe");if(f)capture(f,which);delete A.frames["fw:"+id];
   w.remove();delete wins[id];if(front===id)front=null;openApp(which);}
 function closeWin(id){var w=wins[id];if(!w)return;var f=w.querySelector("iframe");if(f)capture(f,id.split("-")[0]);delete A.frames["fw:"+id];w.remove();delete wins[id];if(front===id)front=null;paint();}
+
+/* ---------- where the window goes: the ↗ menu (6.8, as Carpe Diem 1059) ---------- */
+function host(){var a=shell();if(a&&typeof a.open_lite==="function")return "desktop";if(canExport())return "browser";return "device";}
+function fillWin(win){if(win.getAttribute("data-full")==="1")return;var b=[].slice.call(win.querySelectorAll(".ing-fw-keys button")).filter(function(x){return x.textContent==="□";})[0];if(b)b.click();}
+function exportMenu(id,anchor){var win=wins[id];if(!win)return null;var which=baseOf(id),main=id===which,name=N[which],h=host();
+  var old=document.getElementById("ing-export-choice");if(old){var was=old.__for;old.__close();if(was===id)return null;}
+  var m=document.createElement("div");m.id="ing-export-choice";m.setAttribute("role","menu");m.setAttribute("aria-label","Where "+name+" goes");m.__for=id;
+  var r=(anchor||win).getBoundingClientRect();
+  m.style.top=Math.round(Math.max(8,Math.min(r.bottom+6,window.innerHeight-300)))+"px";m.style.left=Math.round(Math.max(8,Math.min(r.right-360,window.innerWidth-368)))+"px";
+  function close(){try{m.remove();}catch(e){}document.removeEventListener("pointerdown",away,true);document.removeEventListener("keydown",keys,true);}
+  function away(e){if(!m.contains(e.target)&&e.target!==anchor)close();}
+  function keys(e){var it=[].slice.call(m.querySelectorAll(".ing-xo")),i=it.indexOf(document.activeElement);
+    if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close();try{anchor&&anchor.focus();}catch(x){}}
+    else if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();var k=e.key==="ArrowDown"?i+1:i-1;it[(k+it.length)%it.length].focus();}}
+  m.__close=close;
+  function opt(label,sub,fn,act,cls){var b=document.createElement("button");b.type="button";b.className="ing-xo"+(cls?" "+cls:"");b.setAttribute("role","menuitem");b.setAttribute("data-ing-act",act);
+    var l=document.createElement("span");l.className="ing-xl";l.textContent=label;b.appendChild(l);
+    if(sub){var t=document.createElement("span");t.className="ing-xs";t.textContent=sub;b.appendChild(t);}
+    b.onclick=function(e){e.stopPropagation();close();fn();};m.appendChild(b);return b;}
+  if(main&&h!=="device")opt("⧉ Open in its own window on this device",name+" in a window "+(h==="desktop"?"of the app":"of the browser")+", with the same work, the side keys, the notes and the Clepsydra.",function(){exportWin(id);},"own-window");
+  else opt("⛶ Fill the screen",!main?"A second document stays in Ingenium's window: this window fills it.":"This device offers no second window: "+name+" fills this one, with the same work.",function(){fillWin(win);},"fill");
+  if(main)opt("↙ Back into the desk, full width","",function(){dockWin(id);},"dock");
+  opt("✕ Close the window","",function(){closeWin(id);},"close","x");
+  document.body.appendChild(m);
+  setTimeout(function(){document.addEventListener("pointerdown",away,true);document.addEventListener("keydown",keys,true);},0);
+  try{m.querySelector(".ing-xo").focus();}catch(e){}
+  return m;}
 
 /* ---------- a window of its own ---------- */
 function shell(){try{if(typeof shellApi==="function"){var a=shellApi();if(a)return a;}}catch(e){}try{return (window.pywebview&&window.pywebview.api)||null;}catch(e){return null;}}
@@ -435,7 +480,7 @@ window.openApp=function(w){if(APPS.indexOf(w)>=0)return openApp(w);};
     s.b="Tabula (writing), Abacus (tables), Imago (slides), Scriba (recordings and notes) and Fontes (sources) are Carpe Diem's own apps, whole. Each opens full width with the Desk bar at the top; Desk brings Ingenium back. The ↗ on the side column floats the app into a window you can move, size from any edge or fill the screen with. Every floating window keeps a tab on the Desk bar: − folds the window away into its tab, the tab brings it back and its ✕ closes it. A window's ↗ sends the app to a window of its own where the device allows one, and that window carries every side button too: the bell, the leaf, the 💭, day and night, the Clepsydra and the notes.";}});/* R125: the chapter's own words name the five apps */if(typeof ING_TOUR_TEASERS==="object")ING_TOUR_TEASERS["Making things"]="Build, Blend, and Carpe Diem's five apps.";if(typeof ING_TOUR_CLOSERS==="object")ING_TOUR_CLOSERS["Making things"]="Build, Blend and Carpe Diem's five apps turn answers into things you keep.";}catch(e){}})();
 window.addEventListener("resize",function(){Object.keys(wins).forEach(function(id){var w=wins[id];if(w.getAttribute("data-full")==="1"){w.style.width=Math.max(260,window.innerWidth-12)+"px";w.style.height=Math.max(180,window.innerHeight-52)+"px";}});});
 
-window.IngDesk={open:openApp,close:closeApp,float:floatApp,window:makeWin,closeWindow:closeWin,exportWindow:exportWin,canExport:canExport,show:show,onMessage:onMessage,
+window.IngDesk={open:openApp,close:closeApp,float:floatApp,window:makeWin,closeWindow:closeWin,exportWindow:exportWin,exportMenu:exportMenu,canExport:canExport,show:show,onMessage:onMessage,
   dock:dockWin,lites:function(){return JSON.parse(JSON.stringify(lites));},liteForward:liteForward,liteHome:liteHome,goHome:goHome,
   fold:function(id,on){fold(wins[id],on!==false);},surface:function(id){if(wins[id])surface(wins[id]);},
   state:function(){return {open:open.slice(),active:active,shown:shown,windows:Object.keys(wins),folded:Object.keys(wins).filter(function(k){return wins[k].classList.contains("folded");}),front:front,lite:LITE};}};

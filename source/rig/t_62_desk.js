@@ -70,7 +70,7 @@ const tabFrame = (p, sel) => p.waitForSelector(sel, { timeout: 30000 }).then(h =
     await write(fr, ' And sent out to a window of its own.'); await p.waitForTimeout(400);
     await p.click('#fabFloat'); await p.waitForTimeout(3000);
     const n0 = pops.length;
-    await p.evaluate(() => document.querySelector('.ing-fw [data-ing-export]').click());
+    await p.evaluate(() => { document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); });
     for (let i = 0; i < 60 && pops.length === n0; i++) await p.waitForTimeout(500);
     let pop = pops[pops.length - 1];
     if (pop) { await pop.setViewportSize({ width: 1180, height: 840 }); }
@@ -97,7 +97,7 @@ const tabFrame = (p, sel) => p.waitForSelector(sel, { timeout: 30000 }).then(h =
     // the window's own key home
     await p.click('#fabFloat'); await p.waitForTimeout(3000);
     const n1 = pops.length;
-    await p.evaluate(() => document.querySelector('.ing-fw [data-ing-export]').click());
+    await p.evaluate(() => { document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); });
     for (let i = 0; i < 60 && pops.length === n1; i++) await p.waitForTimeout(500);
     pop = pops[pops.length - 1];
     if (pop && pops.length > n1) {
@@ -111,7 +111,7 @@ const tabFrame = (p, sel) => p.waitForSelector(sel, { timeout: 30000 }).then(h =
     // a window closed by hand loses its tab
     await p.click('#fabFloat'); await p.waitForTimeout(3000);
     const n2 = pops.length;
-    await p.evaluate(() => document.querySelector('.ing-fw [data-ing-export]').click());
+    await p.evaluate(() => { document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); });
     for (let i = 0; i < 60 && pops.length === n2; i++) await p.waitForTimeout(500);
     pop = pops[pops.length - 1];
     for (let i = 0; i < 120; i++) { const l = await p.evaluate(() => Object.keys(IngDesk.lites()).length); if (l) break; await p.waitForTimeout(500); }
@@ -121,7 +121,7 @@ const tabFrame = (p, sel) => p.waitForSelector(sel, { timeout: 30000 }).then(h =
     // a refused pop-up is said at once
     await p.evaluate(() => go('abacus')); await p.waitForTimeout(3000); await p.click('#fabFloat'); await p.waitForTimeout(3000);
     const t0 = Date.now();
-    await p.evaluate(() => { window.__openWas = window.open; window.open = () => null; document.querySelector('.ing-fw [data-ing-export]').click(); }); await p.waitForTimeout(800);
+    await p.evaluate(() => { window.__openWas = window.open; window.open = () => null; document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); }); await p.waitForTimeout(800);
     const t5 = await p.evaluate(() => ({ w: IngDesk.state().windows, t: (document.getElementById('ingToast') || {}).textContent || '' }));
     await p.evaluate(() => { window.open = window.__openWas; });
     ok(t5.w.join() === 'abacus' && /kept no new window/.test(t5.t) && Date.now() - t0 < 3000, 'a refused pop-up leaves Abacus where it was and says so at once', t5);
