@@ -299,6 +299,14 @@ by the browser as moving the text, so the range came out as one cell; a drag acr
     node rig/t_681_abacus.js <Ingenium url>                         # Chromium: 36 checks (the old Abacus failed 10)
     xvfb-run -a python3 rig/t_681_abacus_wk.py <Ingenium url>        # Safari's engine: 15 checks (the old Abacus failed 8)
 
+Imago's ribbon, the same way: `apps/imago_ribbon_patch.py`. Everything on its Home ribbon landed and stayed (across slides,
+and when Imago is opened again) but the size list, which made words 48 pixels high whatever was chosen, on selected words
+and on the words typed after it: the same cause as Tabula's (the browser's largest size written as a style, which Imago did
+not look for), mended the same way.
+
+    node rig/t_681_imago.js <Ingenium url>                          # Chromium: 37 checks (the old Imago failed 6)
+    xvfb-run -a python3 rig/t_681_imago_wk.py <Ingenium url>         # Safari's engine: 20 checks (the old Imago failed 6)
+
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
 MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit

@@ -906,6 +906,11 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tr2 = _ilu.spec_from_file_location("tabula_ribbon_patch", os.path.join(HERE, "apps", "tabula_ribbon_patch.py"))
         _tr2m = _ilu.module_from_spec(_tr2); _tr2.loader.exec_module(_tr2m)
         _html = _tr2m.patch(_html)
+    if _name == "slides":  # 6.8.1: Imago's size list sets the size chosen, on selected words and on those typed next (apps/imago_ribbon_patch.py)
+        import importlib.util as _ilu
+        _ir = _ilu.spec_from_file_location("imago_ribbon_patch", os.path.join(HERE, "apps", "imago_ribbon_patch.py"))
+        _irm = _ilu.module_from_spec(_ir); _ir.loader.exec_module(_irm)
+        _html = _irm.patch(_html)
     if _name == "abacus":  # 6.8.1: its ribbon on every cell selected, its decimals one place at a time, kept at once (apps/abacus_ribbon_patch.py)
         import importlib.util as _ilu
         _ar = _ilu.spec_from_file_location("abacus_ribbon_patch", os.path.join(HERE, "apps", "abacus_ribbon_patch.py"))
