@@ -108,6 +108,17 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
    the volume or a level is at Silent instead of claiming to play; the four level sliders carry their role in their names;
    the words for Off no longer promise more silence than Off gives; the calm look is named as Settings names it; and a word
    said a moment ago gives way as soon as the volume, a level or On and Off change, so the note never contradicts the keys. */
+/* 6.8.1 (27 October 2026): her words, "I also want for Ingenium's introduction door sound and other app sounds to be
+   different from Carpe Diem and the Forge. I want Ingenium to have its own identity and its own sounds." The engine above
+   stays (made on the device, placed left or right, a small room around each, the same quiet levels and the same rules for
+   when a sound may play); the voices are Ingenium's own, the things of a college study (see "Ingenium's own" below):
+     notify   Tuning fork   (Orrery bell, Margin note)
+     confirm  Wax seal      (Escapement, Brass stamp)
+     room     Library door  (Study lamp, Archive key)
+     paper    Each room its own: a page turned in Lector, Guide and the apps, a card drawer in Fabrica and Models, a pen in
+              Chat, a typebar in Code and Build, a brass gear in Focus and Blend, a ledger's tap at Home and in Settings
+              (or one of those six for every page)
+   A choice kept from before (one of Carpe Diem's names) gives way to Ingenium's own at the next start. */
 (function r176(){
 "use strict";
 if(window.__r176)return;window.__r176=1;
@@ -120,17 +131,17 @@ var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150};
 var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
 var PAN_MAX=0.35,ROOM_SEND=0.16,ROOM_LEN=0.8,ROOM_SEED=0x1C67;
 
-/* ---------- the four roles and the thirteen names, in plain words ---------- */
-var NAMES={deskChime:"Desk chime",smallBell:"Small bell",waterDrop:"Water drop",
-  keepMark:"Keep mark",softClick:"Soft click",feltPress:"Felt press",
-  dayTurn:"Day turn",lampLit:"Lamp lit",duskFall:"Dusk fall",
-  deskSet:"Desk set",bookClose:"Book close",boardLift:"Board lift",shelfPass:"Shelf pass"};
+/* ---------- the four roles and Ingenium's sixteen names, in plain words (6.8.1) ---------- */
+var NAMES={tuningFork:"Tuning fork",orreryBell:"Orrery bell",marginNote:"Margin note",
+  waxSeal:"Wax seal",escapement:"Escapement",brassStamp:"Brass stamp",
+  libraryDoor:"Library door",studyLamp:"Study lamp",archiveKey:"Archive key",
+  byRoom:"Each room its own",vellumTurn:"Vellum turn",cardDrawer:"Card drawer",ledgerTap:"Ledger tap",nibStroke:"Pen on paper",typebar:"Typebar",gearTurn:"Brass gear"};
 var ROLES=[
-  ["notify","Notices and reminders","When a reminder or a notice appears.",["deskChime","smallBell","waterDrop"],"for notices and reminders"],
-  ["confirm","Keeping something","When something is saved, kept or copied.",["keepMark","softClick","feltPress"],"for keeping something"],
-  ["room","Entering Ingenium","When you go through the welcome door.",["dayTurn","lampLit","duskFall"],"for entering Ingenium"],
-  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["deskSet","bookClose","boardLift","shelfPass"],"for moving between pages"]];
-var DEF={on:true,vol:0.25,notify:"deskChime",confirm:"keepMark",room:"dayTurn",paper:"deskSet",trim:{notify:1,confirm:1,room:1,paper:1}};
+  ["notify","Notices and reminders","When a reminder or a notice appears.",["tuningFork","orreryBell","marginNote"],"for notices and reminders"],
+  ["confirm","Keeping something","When something is saved, kept or copied.",["waxSeal","escapement","brassStamp"],"for keeping something"],
+  ["room","Entering Ingenium","When you go through the welcome door.",["libraryDoor","studyLamp","archiveKey"],"for entering Ingenium"],
+  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home. At first, each room has its own.",["byRoom","vellumTurn","cardDrawer","ledgerTap","nibStroke","typebar","gearTurn"],"for moving between pages"]];
+var DEF={on:true,vol:0.25,notify:"tuningFork",confirm:"waxSeal",room:"libraryDoor",paper:"byRoom",trim:{notify:1,confirm:1,room:1,paper:1}};
 
 function copy(o){return JSON.parse(JSON.stringify(o));}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -212,44 +223,61 @@ function grain(t,dur,peak,freq,q){var c=E&&E.c;if(!c||!OUT)return;
   g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+dur*0.3);
   g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
   s.connect(f);f.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur+0.02);}
+function sweep(t,dur,f0,f1,peak,q){var c=E&&E.c;if(!c||!OUT)return;
+  var n=Math.max(2,Math.floor(c.sampleRate*dur));
+  var buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0),last=0;
+  for(var i=0;i<n;i++){var w=Math.random()*2-1;last=last*0.5+w*0.5;d[i]=last;}
+  var s=c.createBufferSource();s.buffer=buf;
+  var f=c.createBiquadFilter();f.type="bandpass";
+  f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);f.Q.setValueAtTime(q||1,t);
+  var g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+dur*0.35);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur+0.02);}
+function click(t,freq,peak){grain(t,0.006,peak,freq,4);tone(t,freq*0.8,0.0005,0.014,peak*0.45,"triangle");}
 function cloud(t,len,count,fLo,fHi,peak,shape){
   for(var i=0;i<count;i++){
     var u=Math.random(),at=t+Math.pow(u,shape||1)*len+rnd(-0.005,0.005);
     var env=Math.sin(Math.PI*Math.min(1,Math.max(0,(at-t)/len)));
     grain(at,rnd(0.008,0.026),peak*rnd(0.35,1)*(0.35+0.65*env),rnd(fLo,fHi),rnd(1.2,4));}}
 
-/* ---------- the thirteen, as she chose them ---------- */
+/* ---------- Ingenium's own (6.8.1) ----------
+   Her words (27 October 2026): "I want Ingenium to have its own identity and its own sounds, I want them curated and customised
+   specifically to Ingenium and its rooms and identity. I want to play on the theme and keep things light and subtle. I want
+   the sounds to match the look and feel of the app and preserve the mechanical analogue 3D look and feel of the app without
+   making it feel childlike and amateurish. Ingenium must above all maintain Oxbridge DPhil standards and remain scholarly at
+   its core." So none of Carpe Diem's or The Forge's: the things of a college study. A tuning fork, an orrery's small bell, a
+   note in the margin; a wax seal pressed, a clock's escapement, a brass stamp; a library door on its latch, a study lamp, an
+   archive key; and for the rooms, a vellum page, a card-catalogue drawer, a ledger's tap, a pen, a typebar, a brass gear.
+   Made of the same two things as before (a tone, a grain of filtered noise), at the same quiet levels, short, never a tune. */
+var ROOMV={home:"ledgerTap",settings:"ledgerTap",guide:"vellumTurn",lector:"vellumTurn",career:"vellumTurn",tabula:"vellumTurn",abacus:"vellumTurn",
+  slides:"vellumTurn",imago:"vellumTurn",scriba:"vellumTurn",fontes:"vellumTurn",fabrica:"cardDrawer",models:"cardDrawer",chat:"nibStroke",
+  code:"typebar",build:"typebar",focus:"gearTurn",blend:"gearTurn"};
+var goingTo="";
 var V={
-  deskChime:function(t,L){[880,1108,1320].forEach(function(f,i){tone(t+i*0.07,f,0.004,0.9,0.16*L);});},
-  smallBell:function(t,L){tone(t,1320,0.003,0.85,0.20*L);tone(t,1980,0.003,0.55,0.09*L);tone(t,2640,0.003,0.35,0.05*L);},
-  waterDrop:function(t,L){tone(t,1500,0.003,0.16,0.20*L,"sine",0.4);},
+  tuningFork:function(t,L){tone(t,880,0.006,1.5,0.090*L);tone(t,882.6,0.006,1.5,0.040*L);tone(t,1760,0.004,0.30,0.010*L);grain(t,0.008,0.020*L,3200,3);},
+  orreryBell:function(t,L){click(t,4200,0.020*L);tone(t,1175,0.003,1.10,0.085*L);tone(t,2350,0.003,0.70,0.030*L);tone(t,3243,0.003,0.45,0.022*L);tone(t,6345,0.002,0.18,0.008*L);},
+  marginNote:function(t,L){tone(t,784,0.006,0.55,0.080*L);tone(t+0.14,1047,0.006,0.70,0.070*L);tone(t+0.14,2094,0.004,0.20,0.008*L);},
 
-  keepMark:function(t,L){tone(t,660,0.003,0.10,0.16*L);tone(t+0.075,990,0.003,0.16,0.14*L);},
-  softClick:function(t,L){grain(t,0.022,0.09*L,1600,2.5);tone(t,1200,0.001,0.02,0.07*L);},
-  feltPress:function(t,L){grain(t,0.07,0.10*L,420,1);tone(t,240,0.004,0.07,0.14*L);},
+  waxSeal:function(t,L){grain(t,0.06,0.085*L,380,0.9);tone(t,170,0.004,0.13,0.120*L,"sine",0.85);click(t+0.004,2900,0.016*L);},
+  escapement:function(t,L){click(t,2600,0.075*L);tone(t,2200,0.001,0.035,0.040*L);click(t+0.115,1900,0.068*L);tone(t+0.115,1650,0.001,0.04,0.036*L);},
+  brassStamp:function(t,L){click(t,3400,0.030*L);tone(t+0.002,95,0.004,0.20,0.110*L,"sine",0.9);grain(t+0.002,0.04,0.040*L,900,1.4);tone(t+0.004,1568,0.002,0.22,0.014*L);},
 
-  dayTurn:function(t,L){[523,659,784,1047].forEach(function(f,i){tone(t+i*0.11,f,0.006,1.0,0.13*L);});},
-  lampLit:function(t,L){tone(t,160,0.02,0.7,0.16*L);grain(t,0.5,0.05*L,300,0.7);tone(t+0.08,640,0.01,0.5,0.07*L);},
-  duskFall:function(t,L){[784,659,523,392].forEach(function(f,i){tone(t+i*0.13,f,0.006,1.1,0.13*L);});},
+  libraryDoor:function(t,L){click(t,3200,0.045*L);tone(t+0.004,2093,0.002,0.28,0.022*L);click(t+0.085,2500,0.035*L);
+    tone(t+0.13,58,0.030,0.95,0.120*L,"sine",0.93);tone(t+0.13,87,0.030,0.62,0.050*L,"sine",0.94);
+    cloud(t+0.12,0.40,26,180,700,0.020*L,1.2);sweep(t+0.10,0.55,300,900,0.014*L,0.8);},
+  studyLamp:function(t,L){click(t,2400,0.040*L);click(t+0.02,1800,0.022*L);tone(t+0.04,110,0.28,0.85,0.050*L);tone(t+0.04,220,0.28,0.60,0.018*L);tone(t+0.06,880,0.05,0.5,0.010*L);},
+  archiveKey:function(t,L){[0,0.05,0.10].forEach(function(d,i){click(t+d,2000+i*260,0.034*L);});
+    tone(t+0.16,70,0.006,0.32,0.110*L,"sine",0.9);grain(t+0.16,0.05,0.030*L,600,1.2);},
 
-  deskSet:function(t,L){cloud(t,0.09,30,400,1500,0.050*L,0.5);
-    tone(t,64,0.010,0.40,0.120*L,"sine",0.90);
-    tone(t,101,0.010,0.26,0.050*L,"sine",0.92);
-    tone(t+0.01,152,0.008,0.13,0.020*L,"sine",0.92);},
-  bookClose:function(t,L){cloud(t,0.16,44,700,2600,0.055*L,0.6);
-    tone(t+0.05,72,0.012,0.46,0.115*L,"sine",0.88);
-    tone(t+0.05,138,0.012,0.30,0.055*L,"sine",0.90);
-    tone(t+0.06,196,0.010,0.16,0.022*L,"sine",0.92);},
-  boardLift:function(t,L){cloud(t,0.07,14,500,1400,0.026*L,0.6);
-    tone(t,88,0.014,0.30,0.105*L,"sine",0.90);
-    tone(t,133,0.012,0.20,0.044*L,"sine",0.91);
-    tone(t+0.01,178,0.008,0.10,0.016*L,"sine",0.92);},
-  shelfPass:function(t,L){var at=t;
-    for(var i=0;i<3;i++){
-      cloud(at,0.06,11,380,1250,0.024*L,0.6);
-      tone(at,rnd(66,92),0.012,rnd(0.20,0.30),0.062*L,"sine",0.89);
-      tone(at+0.01,rnd(120,150),0.008,0.12,0.020*L,"sine",0.91);
-      at+=rnd(0.105,0.150);}}
+  byRoom:function(t,L){var v=ROOMV[goingTo||current()]||"ledgerTap";V[v](t,L);},
+  vellumTurn:function(t,L){sweep(t,0.24,800,2600,0.090*L,1.1);cloud(t,0.20,22,1200,3800,0.030*L,0.8);tone(t+0.19,90,0.010,0.18,0.045*L,"sine",0.92);},
+  cardDrawer:function(t,L){cloud(t,0.17,30,250,900,0.030*L,1.0);tone(t+0.16,75,0.010,0.30,0.090*L,"sine",0.9);click(t+0.16,1400,0.016*L);},
+  ledgerTap:function(t,L){tone(t,95,0.004,0.22,0.100*L,"sine",0.9);tone(t,190,0.004,0.10,0.030*L,"sine",0.92);grain(t,0.03,0.040*L,700,1.5);},
+  nibStroke:function(t,L){sweep(t,0.11,3600,2600,0.20*L,1.6);sweep(t+0.12,0.07,3000,3800,0.14*L,1.6);click(t+0.20,5200,0.025*L);tone(t,180,0.004,0.06,0.025*L,"sine",0.9);},
+  typebar:function(t,L){click(t,3000,0.030*L);tone(t+0.006,120,0.003,0.12,0.085*L,"sine",0.88);grain(t+0.006,0.025,0.035*L,1100,1.8);},
+  gearTurn:function(t,L){click(t,2300,0.050*L);click(t+0.06,2100,0.040*L);tone(t+0.065,1318,0.002,0.18,0.012*L);tone(t+0.07,82,0.006,0.18,0.040*L,"sine",0.9);}
 };
 
 /* ---------- when a sound may play at all ---------- */
@@ -286,7 +314,8 @@ function play(role,o){o=o||{};if(!isRole(role)||!allowed())return false;
   if(now-lastAt<GAP)return false;
   if(now-(lastRole[role]||0)<(ROLE_GAP[role]||0))return false;
   var L=lvl(role);if(!(L>0))return false;
-  var ok=sound(cfg[role]||DEF[role],L,panOf(o));
+  goingTo=o.page||"";
+  var ok=sound(cfg[role]||DEF[role],L,panOf(o));goingTo="";
   if(ok){lastAt=now;lastRole[role]=now;if(role==="room")roomAt=now;}
   return ok;}
 function voice(name,o){o=o||{};if(!V[name]||!allowed())return false;var now=Date.now();if(now-lastAt<GAP)return false;
@@ -501,7 +530,7 @@ D.addEventListener("click",function(e){if(!e.isTrusted)return;var t=e.target;if(
     var door=$("introDoor");
     if(door&&!door.hidden&&t.closest("#introEnter,#introSeal")){if(play("room",{event:e}))doorAt=Date.now();return;}
     var nb=t.closest(".nav-btn");
-    if(nb&&nb.closest(".dock")){var pg=nb.getAttribute("data-page");if(pg&&pg!==current())play("paper",{event:e});return;}
+    if(nb&&nb.closest(".dock")){var pg=nb.getAttribute("data-page");if(pg&&pg!==current())play("paper",{event:e,page:pg});return;}
     if(t.closest("#hxSeal,[data-ing-seal]"))play("paper",{event:e});
   }catch(x){}},true);
 /* the seal on Home, pressed from the keyboard while it holds the focus (a button gives a click of its own) */

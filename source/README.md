@@ -241,3 +241,19 @@ app's frame; the master edition stores as before.
 
     node rig/t_681_own_store.js <master url> <other edition url> <out>         # the other edition, at the same address, finds nothing of the owner's, 9 checks
 
+The popup cards (her words: "the purple colour is too bight and harsh on both light and dark mode ... the popup cards are too
+flat, I want them to gain that weighted animated popped out 3D look"): `modules/r184.js` builds every popup as the thought
+card is built (a face lit from above, a darker wall at its right and foot, a fine rim, a falling shadow) and brings it in with
+a small spring (still when motion is minimal): the note at the foot, the support notes, the tour card, the status menu,
+About and the dialogs, the Help and Display panels, a window's menu, the sound and storage dialogs, Lector's recipe. Their
+keys are a quieter amethyst by day, a soft lavender by night; the night faces are a deep, greyed amethyst (the reminder card
+too, `r153.js`). Contrast checked with axe on the cards by day and by night: no failures.
+
+Ingenium's own sounds (her words: "I want Ingenium to have its own identity and its own sounds ... light and subtle ... the
+mechanical analogue 3D look and feel ... Oxbridge DPhil standards"): `modules/r176.js` keeps its engine and replaces Carpe
+Diem's thirteen voices with Ingenium's sixteen, the things of a college study: Tuning fork, Orrery bell, Margin note (notices);
+Wax seal, Escapement, Brass stamp (keeping); Library door, Study lamp, Archive key (the welcome door); and for moving between
+pages, each room its own (a vellum page, a card drawer, a ledger's tap, a pen, a typebar, a brass gear).
+
+    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it stays quiet, it is over in 1.6 s; Ingenium's defaults, none of the old names, 51 checks
+

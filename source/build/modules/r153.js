@@ -18,10 +18,13 @@
    small clouds trailing to the 💭, keys that stand up and press down), in Ingenium's colours: by day Ingenium's paper with its
    violet key, by night Ingenium's amethyst with the gold edge, never a plum that reads as black. The other timed reminders
    keep the amethyst card. */
-/* a thought that comes back, by night: the shared raised card, its face Ingenium's amethyst */
-.tc-el.tc-nudge[data-tc-app="ingenium"][data-tc-night="1"]{--tc-face-a:#4e2c8a;--tc-face-b:#43277a;--tc-wall:#24123f;--tc-lip:rgba(255,255,255,.16);
-  --tc-rim:rgba(202,162,74,.75);--tc-ink:#f3eefb;--tc-soft:rgba(243,238,251,.82);--tc-acc:#f3eefb;--tc-acc-hi:#ffffff;--tc-acc-lo:#e3d8f6;
-  --tc-acc-edge:#8f78c4;--tc-on-acc:#3a2168}
+/* a thought that comes back, by night: the shared raised card, its face Ingenium's amethyst, greyed and deepened (6.8.1: her
+   words, "the purple colour is too bight and harsh on both light and dark mode"), still purple, never a plum that reads as
+   black; its keys a soft lavender. By day the keys take the same quieter amethyst as every popup card (r184). */
+.tc-el.tc-nudge[data-tc-app="ingenium"][data-tc-night="1"]{--tc-face-a:#3a2e55;--tc-face-b:#32274a;--tc-wall:#18111f;--tc-lip:rgba(255,255,255,.09);
+  --tc-rim:rgba(202,162,74,.42);--tc-ink:#ece6f6;--tc-soft:rgba(236,230,246,.76);--tc-acc:#7867a3;--tc-acc-hi:#8574b0;--tc-acc-lo:#6a5994;
+  --tc-acc-edge:#2f2547;--tc-on-acc:#ffffff}
+.tc-el[data-tc-app="ingenium"]:not([data-tc-night="1"]){--tc-acc:#5b4690;--tc-acc-hi:#6a56a0;--tc-acc-lo:#4c3a7c;--tc-acc-edge:#352858}
 /* and by day its close mark in Ingenium's second ink (the shared faint grey read at 2.65 to 1 on the paper) */
 .tc-el.tc-nudge[data-tc-app="ingenium"]:not([data-tc-night="1"]) .tc-nudge-x{color:#6c6579}
 #supNotice .sup-note,body:not([data-depth="flat"]) #supNotice .sup-note{background:linear-gradient(180deg,#4e2c8a,#43277a);color:#f3eefb;
