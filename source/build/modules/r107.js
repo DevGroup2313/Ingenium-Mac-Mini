@@ -350,14 +350,9 @@ body[data-motion="minimal"] #lx7 .l-pn:hover{transform:none}
 #lx7.l-one .l-fold{display:none}
 #lx7.l-one .l-pn{display:none}
 #lx7.l-one .l-pn.show{display:flex}
-#lx7.l-one .l-paper{padding:30px 26px 34px}
 #lx7.l-phone .l-head h1{font-size:22px}
 #lx7.l-phone .l-steps{display:none}
-#lx7.l-phone .l-paper{padding:22px 16px 26px;font-size:14px}
 #lx7.l-phone .l-desk{padding:12px 8px 20px}
-#lx7.l-phone .l-paper .cv .seals img,#lx7.l-phone .l-paper .cv .seals .sn{width:62px;height:62px}
-#lx7.l-phone .l-paper .cv .seals img.crest{width:92px;height:auto}
-#lx7.l-phone .l-paper .cv .seals img.crest.c-duo{width:180px}
 @media (prefers-reduced-motion:reduce){#lx7 *,#lx7 *::before,#lx7 *::after{animation:none !important;transition:none !important}}
 #lx7 .l-desk:focus-visible{outline:2px solid var(--l-ring);outline-offset:-3px}
 /* 6.1 · Ask Lector: the owner's own requests, written and sent from the foot of the document. The owner's words (20 October

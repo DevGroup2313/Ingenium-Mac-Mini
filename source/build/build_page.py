@@ -888,6 +888,19 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tr = _ilu.spec_from_file_location("tabula_room_patch", os.path.join(HERE, "apps", "tabula_room_patch.py"))
         _trm = _ilu.module_from_spec(_tr); _tr.loader.exec_module(_trm)
         _html = _trm.patch(_html)
+        # 6.8.1: its PDF and Word files carry no "Header" and "Footer" labels (apps/tabula_hf_patch.py)
+        _th = _ilu.spec_from_file_location("tabula_hf_patch", os.path.join(HERE, "apps", "tabula_hf_patch.py"))
+        _thm = _ilu.module_from_spec(_th); _th.loader.exec_module(_thm)
+        _html = _thm.patch(_html)
+    # 6.8.1: the seal studio, the watermark and the Word files take the house they are carried in: Ingenium's seal, name and
+    # colour in the master edition only; in every other edition no seal, and "Your own" (apps/house_patch.py)
+    if _name in ("tabula", "abacus", "slides"):
+        import importlib.util as _ilu
+        _hp = _ilu.spec_from_file_location("house_patch", os.path.join(HERE, "apps", "house_patch.py"))
+        _hpm = _ilu.module_from_spec(_hp); _hp.loader.exec_module(_hpm)
+        _house = {"name": "Ingenium", "word": "INGENIUM" if ED == "master" else "", "accent": "#4E2C8A", "tag": "",
+                  "png": ("data:image/png;base64," + _seals["ingenium"]["b64"]) if ED == "master" else None}
+        _html = _hpm.patch(_name, _html, _house)
     # 6.7 (security audit): what each app takes in from a file, a stored or restored document or another window goes
     # through the strict sanitiser the frame carries (apps/safe_import_patch.py)
     import importlib.util as _ilu
@@ -1011,6 +1024,11 @@ if "/*R109_WIDTHS*/null" in blob:
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R108_FONTS*/null" in blob:
     blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
+if "/*R183_FONTS*/null" in blob:  # 6.8.1: the typefaces a document is set in, shown, saved as PDF and as Word (docfont/docfont.py)
+    import importlib.util as _ilu
+    _df = _ilu.spec_from_file_location("docfont", os.path.join(HERE, "docfont", "docfont.py"))
+    _dfm = _ilu.module_from_spec(_df); _df.loader.exec_module(_dfm)
+    blob = blob.replace("/*R183_FONTS*/null", json.dumps(_dfm.data(), separators=(",", ":")))
 if "/*R118_CDPREP*/" in blob:
     blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:
