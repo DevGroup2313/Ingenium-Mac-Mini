@@ -19,6 +19,9 @@
 //   - no page errors.
 //   node rig/t_67_kits.js <url of Ingenium> <out folder> [path/to/the Windows app's ingenium_app.py]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process'); const crypto = require('crypto');
+// the Forge Ingenium carries (build/apps/builtin/builtin.json): its kits are named with its own stamp
+const BIF = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'build', 'apps', 'builtin', 'builtin.json'), 'utf8')).forge;
+const FS = BIF.build, FP = BIF.version, FD = BIF.date;
 const [URL_, OUT, WINAPP_ARG] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 const REF = path.join(OUT, 'kits_ref'), ZIPS = path.join(OUT, 'kits_made'); fs.rmSync(REF, { recursive: true, force: true }); fs.rmSync(ZIPS, { recursive: true, force: true });
 fs.mkdirSync(REF, { recursive: true }); fs.mkdirSync(ZIPS, { recursive: true });
@@ -93,7 +96,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       ok(rf.compared > 0 && rf.same === rf.compared && !rf.missing.length && !(kind !== 'web' && rf.extra.length) && rf.order_same,
         label + ': ' + name + (kind === 'web' ? ': its Home Screen files are, byte for byte, those of the Forge\'s own iPhone and iPad package' : ': entry for entry (names, bytes, modes, order) what the Forge\'s own packager makes'), rf);
       ok(iconsOk(r, kind === 'web' ? 10 : kind === 'ios' ? 10 : kind === 'fire' ? 6 : 3), label + ': ' + name + ': every picture in its icons (' + (r.icons || []).length + ') is the Forge\'s seal, not Ingenium\'s, and no icon file is one of Ingenium\'s', iconSay(r));
-      if (kind === 'web') ok(/window\.CD_BUILD=\{date:"2026-10-24",pass:"646",stamp:"9s78"\}/.test(rd('/index\\.html$')) || (r.entries || []).some(e => /\/index\.html$/.test(e[0]) && e[1] > R.page.length), label + ': ' + name + ': the Forge\'s page is inside as its index.html', (r.entries || []).filter(e => /index\.html$/.test(e[0])).map(e => e[0] + ' ' + e[1]));
+      if (kind === 'web') ok(new RegExp('window\\.CD_BUILD=\\{date:"' + FD + '",pass:"' + FP + '",stamp:"' + FS + '"\\}').test(rd('/index\\.html$')) || (r.entries || []).some(e => /\/index\.html$/.test(e[0]) && e[1] > R.page.length), label + ': ' + name + ': the Forge\'s page is inside as its index.html', (r.entries || []).filter(e => /index\.html$/.test(e[0])).map(e => e[0] + ' ' + e[1]));
       else ok((r.page_entries || []).length >= 1 && r.page_entries.slice().sort().join('|') === (OWN_PAGES[kind] || []).join('|'), label + ': ' + name + ': the Forge\'s page is inside, whole (its fingerprint), where the Forge\'s own package has it', r.page_entries);
       if (kind === 'windows') ok(/#define AppName "The Forge"|AppName=The Forge|The Forge/.test(rd('\\.iss$')) && !/Ingenium\.iss|AppName "Ingenium"/.test(rd('\\.iss$')) && /the_forge/.test(rd('\\.spec$')) && /Name: the_forge|The Forge/.test(rd('BUILD_INFO\\.txt$')),
         label + ': ' + name + ': its installer script (the_forge.iss) and build recipe (the_forge.spec) name The Forge', { iss: ((r.read || {})['\\.iss$'] || {}).name, spec: ((r.read || {})['\\.spec$'] || {}).name, info: rd('BUILD_INFO\\.txt$').slice(0, 80) });
@@ -119,18 +122,18 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       const sh = await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); return s ? { opts: [...s.querySelectorAll('.f-opt')].map(o => o.textContent.trim().slice(0, 30) + '=' + o.getAttribute('aria-pressed')), go: [...s.querySelectorAll('button')].map(x => x.textContent) } : null; });
       await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); });
       console.log('  (the Build kits sheet: ' + JSON.stringify(sh) + ')'); }, 5, 300000);
-    ok(fk.map(f => path.basename(f)).sort().join() === ['the_forge_fire_9s78.zip', 'the_forge_ios_9s78.zip', 'the_forge_mac_9s78.zip', 'the_forge_mac_mini_9s78.zip', 'the_forge_windows_9s78.zip'].join(),
+    ok(fk.map(f => path.basename(f)).sort().join() === ['the_forge_fire_' + FS + '.zip', 'the_forge_ios_' + FS + '.zip', 'the_forge_mac_' + FS + '.zip', 'the_forge_mac_mini_' + FS + '.zip', 'the_forge_windows_' + FS + '.zip'].join(),
       'Fabrica\'s Build kits, with all six devices chosen, saves the Forge\'s five packages, each once, under the Forge\'s own names', fk.map(f => path.basename(f)));
     // (6.7, after review: the key counts the devices; the notice after counts the packages and names the one iPhone and iPad share)
     const fkSaid = await p.waitForFunction(() => { const t = document.querySelector('#fb .f-toast'); return t && /build kits? made and saved/.test(t.textContent) ? t.textContent : null; }, null, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => '');
-    ok(fkSaid === '5 build kits made and saved, one .zip each; the iPhone and iPad kits come as one package, the_forge_ios_9s78.zip. They are kept under Releases too.',
+    ok(fkSaid === '5 build kits made and saved, one .zip each; the iPhone and iPad kits come as one package, the_forge_ios_' + FS + '.zip. They are kept under Releases too.',
       'the notice counts the five packages and says that the iPhone and iPad kits are one', fkSaid);
     for (const f of fk) forgePackage(f, 'Fabrica, Build kits');
     await p.waitForTimeout(1500);
 
     // ---------- 3. Fabrica's web app card ----------
     const fw = await collect('fabrica_web', () => p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="web"]'); eval(kf)(e).click(); }, keyOf), 1);
-    ok(fw.length === 1 && path.basename(fw[0]) === 'the_forge_web_9s78.zip', 'Fabrica\'s web app card saves the Forge\'s own web package', fw.map(f => path.basename(f)));
+    ok(fw.length === 1 && path.basename(fw[0]) === 'the_forge_web_' + FS + '.zip', 'Fabrica\'s web app card saves the Forge\'s own web package', fw.map(f => path.basename(f)));
     if (fw[0]) forgePackage(fw[0], 'Fabrica, web app');
     await p.waitForTimeout(1500);
 
@@ -154,26 +157,26 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     await p.evaluate(() => [...document.querySelectorAll('#fbPkg button')].find(x => /Download as an app/.test(x.textContent)).click());
     await p.waitForSelector('.dl-app .dl-dev', { timeout: 120000 }); await p.waitForTimeout(800);
     const rows = await p.evaluate(() => [...document.querySelectorAll('.dl-app .dl-dev')].map(r => ({ t: r.querySelector('.dl-t b').textContent, file: r.querySelector('.dl-file').textContent, keys: [...r.querySelectorAll('.dl-row button')].map(x => x.textContent) })));
-    ok(rows.find(r => r.t === 'Web').file === 'the_forge_web_9s78.zip' && rows.find(r => r.t === 'Windows').keys.includes('Or the Windows project'), 'Download as an app, from Fabrica: the web row names the Forge\'s own web package, and each device still offers its project', rows.map(r => r.t + ': ' + r.file));
+    ok(rows.find(r => r.t === 'Web').file === 'the_forge_web_' + FS + '.zip' && rows.find(r => r.t === 'Windows').keys.includes('Or the Windows project'), 'Download as an app, from Fabrica: the web row names the Forge\'s own web package, and each device still offers its project', rows.map(r => r.t + ': ' + r.file));
     await p.screenshot({ path: path.join(OUT, 'kits_download_as_app.png') });
     const pressDl = async (label, row, key, n) => { const f = await collect(label, () => p.evaluate(([row, key]) => { const r = [...document.querySelectorAll('.dl-app .dl-dev')].find(x => x.querySelector('.dl-t b').textContent.startsWith(row));
       [...r.querySelectorAll('.dl-row button')].find(x => x.textContent === key).click(); }, [row, key]), n);
       const st = await p.evaluate(row => { const r = [...document.querySelectorAll('.dl-app .dl-dev')].find(x => x.querySelector('.dl-t b').textContent.startsWith(row)); return r.querySelector('.dl-st').textContent; }, row);
       return { f, st }; };
     const dlw = await pressDl('dl_windows_project', 'Windows', 'Or the Windows project', 1);
-    ok(dlw.f.length === 1 && path.basename(dlw.f[0]) === 'the_forge_windows_9s78.zip' && /^Saved: the_forge_windows_9s78\.zip/.test(dlw.st), 'Download as an app: "Or the Windows project" saves the Forge\'s Windows package', { f: dlw.f.map(x => path.basename(x)), st: dlw.st });
+    ok(dlw.f.length === 1 && path.basename(dlw.f[0]) === 'the_forge_windows_' + FS + '.zip' && new RegExp('^Saved: the_forge_windows_' + FS + '\\.zip').test(dlw.st), 'Download as an app: "Or the Windows project" saves the Forge\'s Windows package', { f: dlw.f.map(x => path.basename(x)), st: dlw.st });
     if (dlw.f[0]) forgePackage(dlw.f[0], 'Download as an app, Windows project');
     const dlm = await pressDl('dl_mac_projects', 'Mac', 'Or the Mac projects', 2);
-    ok(dlm.f.map(x => path.basename(x)).sort().join() === 'the_forge_mac_9s78.zip,the_forge_mac_mini_9s78.zip', 'Download as an app: "Or the Mac projects" saves the Forge\'s Mac and Mac mini packages', dlm.f.map(x => path.basename(x)));
+    ok(dlm.f.map(x => path.basename(x)).sort().join() === 'the_forge_mac_' + FS + '.zip,the_forge_mac_mini_' + FS + '.zip', 'Download as an app: "Or the Mac projects" saves the Forge\'s Mac and Mac mini packages', dlm.f.map(x => path.basename(x)));
     for (const f of dlm.f) forgePackage(f, 'Download as an app, Mac projects');
     const dli = await pressDl('dl_xcode_projects', 'iPhone', 'Or the Xcode projects', 1);
-    ok(dli.f.length === 1 && path.basename(dli.f[0]) === 'the_forge_ios_9s78.zip', 'Download as an app: "Or the Xcode projects" saves the Forge\'s iPhone and iPad package, once', dli.f.map(x => path.basename(x)));
+    ok(dli.f.length === 1 && path.basename(dli.f[0]) === 'the_forge_ios_' + FS + '.zip', 'Download as an app: "Or the Xcode projects" saves the Forge\'s iPhone and iPad package, once', dli.f.map(x => path.basename(x)));
     if (dli.f[0]) forgePackage(dli.f[0], 'Download as an app, Xcode projects');
     const dla = await pressDl('dl_android_project', 'Fire', 'Or the Android project', 1);
-    ok(dla.f.length === 1 && path.basename(dla.f[0]) === 'the_forge_fire_9s78.zip', 'Download as an app: "Or the Android project" saves the Forge\'s Fire tablet package', dla.f.map(x => path.basename(x)));
+    ok(dla.f.length === 1 && path.basename(dla.f[0]) === 'the_forge_fire_' + FS + '.zip', 'Download as an app: "Or the Android project" saves the Forge\'s Fire tablet package', dla.f.map(x => path.basename(x)));
     if (dla.f[0]) forgePackage(dla.f[0], 'Download as an app, Android project');
     const dlweb = await pressDl('dl_web', 'Web', 'Make and save', 1);
-    ok(dlweb.f.length === 1 && path.basename(dlweb.f[0]) === 'the_forge_web_9s78.zip', 'Download as an app: the web row saves the Forge\'s own web package', dlweb.f.map(x => path.basename(x)));
+    ok(dlweb.f.length === 1 && path.basename(dlweb.f[0]) === 'the_forge_web_' + FS + '.zip', 'Download as an app: the web row saves the Forge\'s own web package', dlweb.f.map(x => path.basename(x)));
     if (dlweb.f[0]) forgePackage(dlweb.f[0], 'Download as an app, web');
     const dlx = await pressDl('dl_windows_app', 'Windows', 'Make and save', 1);
     const vdx = dlx.f[0] ? verify('win', dlx.f[0], R.id, 'The Forge') : { faults: ['nothing saved'] }, kdx = dlx.f[0] ? kc(dlx.f[0], { app_ref: SEAL, ing_refs: ING, ing_icon_sha256: ING_SHA, page_sha256: PAGE_SHA }) : {};
@@ -198,7 +201,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     await p.evaluate(h => IngDownload.open({ html: h, name: 'the_forge_646_lean.html' }), R.page);
     await p.waitForSelector('.dl-app .dl-dev', { timeout: 120000 }); await p.waitForTimeout(800);
     const cw = await pressDl('chat_windows_project', 'Windows', 'Or the Windows project', 1);
-    ok(cw.f.length === 1 && path.basename(cw.f[0]) === 'the_forge_windows_9s78.zip', 'from Chat or Code (the page alone): "Or the Windows project" saves the Forge\'s Windows package', cw.f.map(x => path.basename(x)));
+    ok(cw.f.length === 1 && path.basename(cw.f[0]) === 'the_forge_windows_' + FS + '.zip', 'from Chat or Code (the page alone): "Or the Windows project" saves the Forge\'s Windows package', cw.f.map(x => path.basename(x)));
     if (cw.f[0]) forgePackage(cw.f[0], 'Chat and Code, Windows project');
     await p.evaluate(() => { try { closeModal(); } catch (e) {} }); await p.waitForTimeout(500);
 
@@ -206,7 +209,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     await p.evaluate(h => IngDownload.open({ getHtml: () => Promise.resolve(h), name: 'index.html' }), R.page);
     await p.waitForSelector('.dl-app .dl-dev', { timeout: 120000 }); await p.waitForTimeout(800);
     const bm = await pressDl('build_mac_projects', 'Mac', 'Or the Mac projects', 2);
-    ok(bm.f.map(x => path.basename(x)).sort().join() === 'the_forge_mac_9s78.zip,the_forge_mac_mini_9s78.zip', 'from Build (the page it holds): "Or the Mac projects" saves the Forge\'s Mac and Mac mini packages', bm.f.map(x => path.basename(x)));
+    ok(bm.f.map(x => path.basename(x)).sort().join() === 'the_forge_mac_' + FS + '.zip,the_forge_mac_mini_' + FS + '.zip', 'from Build (the page it holds): "Or the Mac projects" saves the Forge\'s Mac and Mac mini packages', bm.f.map(x => path.basename(x)));
     for (const f of bm.f) forgePackage(f, 'Build, Mac projects');
     await p.evaluate(() => { try { closeModal(); } catch (e) {} }); await p.waitForTimeout(500);
 
@@ -218,13 +221,13 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     await p.waitForTimeout(800);
     const bnm = await p.evaluate(() => ({ large: IngBuild.large(), editor: document.getElementById('codeEditor').value.length, name: document.getElementById('kitName').value }));
     const brows = await p.evaluate(() => [...document.querySelectorAll('#shipList .ship-row')].map(r => r.querySelector('.ship-zip').textContent));
-    ok(bnm.large && bnm.name === 'The Forge' && brows.includes('the_forge_windows_9s78.zip') && brows.includes('the_forge_web_9s78.zip'), 'the old Build page, holding the Forge\'s page part by part, names the app from it and its rows name the Forge\'s own packages', { held: bnm, rows: brows });
+    ok(bnm.large && bnm.name === 'The Forge' && brows.includes('the_forge_windows_' + FS + '.zip') && brows.includes('the_forge_web_' + FS + '.zip'), 'the old Build page, holding the Forge\'s page part by part, names the app from it and its rows name the Forge\'s own packages', { held: bnm, rows: brows });
     const bw = await collect('build_rows', () => p.evaluate(async () => { const ids = KIT_ROWS.map(d => d[0]), note = document.getElementById('shipNote');
       for (const id of ['windows', 'mac', 'macarm', 'fire', 'iphone', 'web']) { note.textContent = ''; document.querySelectorAll('#shipList .ship-row')[ids.indexOf(id)].click(); const t0 = Date.now();
         while (!/offered|Could not/.test(note.textContent) && Date.now() - t0 < 180000) await new Promise(r => setTimeout(r, 200));
         if (/Could not/.test(note.textContent)) return; await new Promise(r => setTimeout(r, 300)); } }), 6);
     const bnote = await p.evaluate(() => (document.getElementById('shipNote') || {}).textContent);
-    ok(bw.map(x => path.basename(x)).sort().join() === ['the_forge_fire_9s78.zip', 'the_forge_ios_9s78.zip', 'the_forge_mac_9s78.zip', 'the_forge_mac_mini_9s78.zip', 'the_forge_web_9s78.zip', 'the_forge_windows_9s78.zip'].join() && /READ ME FIRST\.txt/.test(bnote),
+    ok(bw.map(x => path.basename(x)).sort().join() === ['the_forge_fire_' + FS + '.zip', 'the_forge_ios_' + FS + '.zip', 'the_forge_mac_' + FS + '.zip', 'the_forge_mac_mini_' + FS + '.zip', 'the_forge_web_' + FS + '.zip', 'the_forge_windows_' + FS + '.zip'].join() && /READ ME FIRST\.txt/.test(bnote),
       'the old Build page\'s rows save the Forge\'s six packages, and point to its READ ME FIRST', { files: bw.map(x => path.basename(x)), note: bnote });
     for (const f of bw) forgePackage(f, 'Build page');
 
@@ -325,13 +328,13 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { const w = /Windows/.test(o.textContent); if ((o.getAttribute('aria-pressed') === 'true') !== w) o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); });
       await p.waitForFunction(() => window.__winSaves.length >= 7, null, { timeout: 300000 }).catch(() => {}); await p.waitForTimeout(1500);
       const ws = await p.evaluate(() => window.__winSaves.map(s => ({ name: s.name, made: s.made, size: s.size, path: s.saved.path, offered: s.saved.offered, onDisk: s.saved.sha256, diskSize: s.saved.size })));
-      const want = ['the_forge_fire_9s78.zip', 'the_forge_ios_9s78.zip', 'the_forge_mac_9s78.zip', 'the_forge_mac_mini_9s78.zip', 'the_forge_windows_9s78.zip'];
+      const want = ['the_forge_fire_' + FS + '.zip', 'the_forge_ios_' + FS + '.zip', 'the_forge_mac_' + FS + '.zip', 'the_forge_mac_mini_' + FS + '.zip', 'the_forge_windows_' + FS + '.zip'];
       ok(ws.length === 7 && want.every(n => ws.some(s => s.name === n)) && /^The-Forge-windows-.*\.zip$/.test(ws[5].name) && ws[6].name === 'TideClock-Windows-Kit.zip',
         'through the Windows app\'s saving: the Forge\'s five packages, its Windows app and the plain app\'s Windows kit are each saved', ws.map(s => s.name));
       ok(ws.length && ws.every(s => s.offered === s.name && path.basename(s.path || '') === s.name && s.made === s.onDisk && s.size === s.diskSize),
         'each lands under its own name (the name the save dialog was offered), with exactly the bytes made (SHA-256 on disk = SHA-256 made)', ws.map(s => s.name + ' ' + (s.made === s.onDisk ? 'same' : 'DIFFERENT') + ' ' + s.size));
       ok(new Set(ws.map(s => s.made)).size === ws.length, 'no file stands in for another: seven saves, seven different packages', ws.map(s => s.made.slice(0, 12)));
-      const sw = ws.find(s => s.name === 'the_forge_windows_9s78.zip'), swr = sw && sw.path ? forgePackage(sw.path, 'Windows app\'s saving') : null;
+      const sw = ws.find(s => s.name === 'the_forge_windows_' + FS + '.zip'), swr = sw && sw.path ? forgePackage(sw.path, 'Windows app\'s saving') : null;
       const sx = ws[5] && ws[5].path ? kc(ws[5].path, { app_ref: SEAL, ing_refs: ING, ing_icon_sha256: ING_SHA, page_sha256: PAGE_SHA }) : {};
       ok(iconsOk(sx, 6) && (sx.page_entries || []).length === 1, 'the Forge\'s Windows app, saved by the Windows app, carries the Forge\'s seal and page', iconSay(sx));
       await p.evaluate(() => { delete window.pywebview; });

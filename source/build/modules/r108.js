@@ -986,7 +986,7 @@ function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to s
   /* 6.8.1: a PDF and a Word file are read off the paper itself (r183), as the page shows it: its faces, sizes, colours, spacing,
      seals and crest, at its own measure, its pages breaking where the paper's marks show */
   if((fmt==="pdf"||fmt==="docx")&&window.IngDoc&&IngDoc.make){var what=fmt==="pdf"?"PDF":"Word file";ingToast("Making the "+what+", as the page shows it…");
-    crestFor(sealed(d.kind)?crestKind(apps):"",apps,"html").then(function(cr){var s0=d.kind==="analysis"?null:stored(d.kind);
+    (IngDoc.ready?IngDoc.ready():Promise.resolve()).then(function(){return crestFor(sealed(d.kind)?crestKind(apps):"",apps,"html");}).then(function(cr){var s0=d.kind==="analysis"?null:stored(d.kind);
       return IngDoc.make(fmt,paperPage(d.kind,d.md,{apps:apps,name:name,label:label,forText:meta.forText,title:title,crestPng:cr&&cr.html,made:s0&&s0.made}),paperOpts(d.kind,apps,title));})
     .then(function(r){saveFileNative(file+"."+fmt,fmt==="pdf"?"application/pdf":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",r.bytes);},
       function(e){ingToast("The "+what+" could not be made: "+(e&&e.message||e));});

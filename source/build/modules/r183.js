@@ -21,16 +21,22 @@
    - Nothing in any of them names a program: no producer, no creator, no generator; a title, and that is all. */
 (function(){"use strict";
 if(window.IngDoc)return;
-var FD=/*R183_FONTS*/null;if(!FD||!FD.faces)return;
+if(!document.getElementById("ing-docfonts"))return;
 var D=document,PX=0.75,PW=595.28,PH=841.89,ML=68,MT=72,MB=72,PGW=PW/PX,PGH=PH/PX,PADX=ML/PX,PADY=MT/PX,AREA=(PH-MT-MB)/PX,CW=PGW-2*PADX;
 var FOOT={size:12,lh:16,bottom:40,color:"#8a8494"};
 var SERIF='"Gelasio","Liberation Serif","Doc Symbols",Georgia,serif',MONO='"Liberation Mono","Doc Symbols","Courier New",monospace';
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 
 /* ---------- the typefaces: each file's measures, read from the file itself ---------- */
-var FACES=FD.faces,FAM={};
-FACES.forEach(function(f,i){f.id=i;var k=f.family.toLowerCase();(FAM[k]=FAM[k]||[]).push(f);});
-function faceCss(list){return (list||FACES).map(function(f){return '@font-face{font-family:"'+f.family+'";src:url(data:font/ttf;base64,'+f.ttf+') format("truetype");font-weight:'+f.weight+';font-style:'+f.style+';font-display:block}';}).join("\n");}
+/* 6.8.1: the typefaces travel as a block of their own at the end of the page (build/tail.py), read the first time they are
+   wanted, so the page need not read them before it can be used */
+var FACES=[],FAM={},FD=null;
+function load(){if(FD)return true;var e=typeof ingTake==="function"?ingTake("ing-docfonts"):D.getElementById("ing-docfonts");
+  if(!e||e.getAttribute("data-defer"))return false;try{FD=JSON.parse(e.textContent);}catch(x){FD=null;}if(!FD||!FD.faces){FD=null;return false;}
+  FACES=FD.faces;FACES.forEach(function(f,i){f.id=i;var k=f.family.toLowerCase();(FAM[k]=FAM[k]||[]).push(f);});return true;}
+function fontsReady(){if(load())return Promise.resolve();return (typeof ingFill==="function"?ingFill("ing-docfonts"):Promise.resolve()).then(function(){
+  if(!load())throw new Error("the typefaces of a document are not in this copy of Ingenium");});}
+function faceCss(list){load();return (list||FACES).map(function(f){return '@font-face{font-family:"'+f.family+'";src:url(data:font/ttf;base64,'+f.ttf+') format("truetype");font-weight:'+f.weight+';font-style:'+f.style+';font-display:block}';}).join("\n");}
 function bytes(f){if(!f.u8){var b=atob(f.ttf),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);f.u8=u;}return f.u8;}
 function u16(u,o){return (u[o]<<8)|u[o+1];}
 function i16(u,o){var v=u16(u,o);return v&0x8000?v-0x10000:v;}
@@ -70,7 +76,7 @@ function chain(cs){var w=parseInt(cs.fontWeight,10)||400,it=cs.fontStyle!=="norm
 function faceFor(cp,cs){var c=chain(cs);for(var i=0;i<c.length;i++){if(cmap(c[i]).has(cp))return c[i];}return null;}
 /* the faces a text needs: every face of the families it is set in, and of the fallback families the first that holds each
    character those lack */
-function facesFor(text,prim,fb){var out=[],has={};function addFam(n){if(has[n])return;has[n]=1;(FAM[n.toLowerCase()]||[]).forEach(function(f){out.push(f);});}
+function facesFor(text,prim,fb){load();var out=[],has={};function addFam(n){if(has[n])return;has[n]=1;(FAM[n.toLowerCase()]||[]).forEach(function(f){out.push(f);});}
   prim.forEach(addFam);var base=out.slice(),cps=new Set();for(var ch of String(text||""))cps.add(ch.codePointAt(0));
   cps.forEach(function(cp){if(cp<=32||base.some(function(f){return cmap(f).has(cp);}))return;
     for(var i=0;i<(fb||[]).length;i++){var L=FAM[fb[i].toLowerCase()]||[];if(L.some(function(f){return cmap(f).has(cp);})){addFam(fb[i]);return;}}});
@@ -462,7 +468,7 @@ function beforeFrame(d,root,G){var W=d.defaultView,ps=W.getComputedStyle(root,":
   var F=frameOf(d,root),r=root.getBoundingClientRect(),pl=F.x-r.left-pf(ps.left),pr=r.right-(F.x+F.w)-pf(ps.right),pt=F.y-r.top-pf(ps.top),pb=r.bottom-(F.y+F.h)-pf(ps.bottom);
   return {x:G.ml-(pl-w/2)*PX,y:G.mt-(pt-w/2)*PX,w:(F.w+pl+pr-w)*PX,h:(G.ph-G.mt-G.mb)+(pt+pb-w)*PX,c:over(c,over(col(F.cs.backgroundColor),[1,1,1])||[1,1,1]),lw:w*PX};}
 /* the one road to a file: the HTML, the element that is the document, its page; then the PDF or the Word file */
-function make(kind,html,o){return laid(html,o.width).then(function(f){var d=f.contentDocument,out;
+function make(kind,html,o){return fontsReady().then(function(){return laid(html,o.width);}).then(function(f){var d=f.contentDocument,out;
   try{var root=d.querySelector(o.root);if(!root)throw new Error("the document could not be found");if(o.prepare)o.prepare(d,root);
     var Fm=frameOf(d,root),area=(PH-o.mt-o.mb)/PX,R=rangesOf(breaksOf(atomsOf(d,root,o.atoms||""),area),Fm.h),ml=o.ml!=null?o.ml:(PW-Fm.w*PX)/2;
     var G={pw:PW,ph:PH,ml:ml,mt:o.mt,mb:o.mb,ranges:R,pages:R.length,title:o.title,foot:footFor(d,o.footFamily||"Gelasio")};
@@ -537,12 +543,14 @@ function page(title,md,measure){var b=body(md),plain=b.replace(/<[^>]+>/g," ").r
   return '<!doctype html>\n<html lang="en"'+(measure?' class="measure"':"")+'><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>'+esc(title)+'</title><style>'+
   faceCss(need)+"\n"+CSS+'</style></head><body><div id="wrap"><div id="sheet"><div class="page" id="flow"><div class="doc" id="doc">'+b+'</div></div><div id="pages"></div></div></div>'+pageScript()+'</body></html>';}
 var CHAT={root:"#doc",width:PGW+40,ml:ML,mt:MT,mb:MB,footFamily:"Gelasio"};
-function chatPdf(title,md){return make("pdf",page(title,md,true),Object.assign({title:title},CHAT));}
-function chatDocx(title,md){return make("docx",page(title,md,true),Object.assign({title:title},CHAT));}
+function chatPdf(title,md){return fontsReady().then(function(){return make("pdf",page(title,md,true),Object.assign({title:title},CHAT));});}
+function chatDocx(title,md){return fontsReady().then(function(){return make("docx",page(title,md,true),Object.assign({title:title},CHAT));});}
 
 /* ---------- where the chat's documents go ---------- */
-window.IngDoc={faces:FACES,faceCss:faceCss,facesFor:facesFor,make:make,beforeFrame:beforeFrame,laid:laid,read:read,materialise:materialise,atomsOf:atomsOf,breaksOf:breaksOf,rangesOf:rangesOf,
+window.IngDoc={ready:fontsReady,faceCss:faceCss,facesFor:facesFor,make:make,beforeFrame:beforeFrame,laid:laid,read:read,materialise:materialise,atomsOf:atomsOf,breaksOf:breaksOf,rangesOf:rangesOf,
   page:page,pdf:chatPdf,docx:chatDocx,PW:PW,PH:PH,MT:MT,MB:MB,PX:PX};
+Object.defineProperty(window.IngDoc,"faces",{enumerable:true,get:function(){load();return FACES;}});
+(function soon(n){if(window.__ingReady===true){setTimeout(function(){fontsReady().catch(function(){});},2500);return;}if(n<240)setTimeout(function(){soon(n+1);},500);})(0);
 window.mkDocPage=function(title,md){return page(title,md,false);};
 window.mkSavePdf=function(doc){var name=mkDocFileName(doc.title)+".pdf";ingToast("Making the PDF, as the page shows it…");
   return chatPdf(doc.title,doc.md).then(function(r){return saveFileNative(name,"application/pdf",r.bytes);},function(e){ingToast("The PDF could not be made: "+(e&&e.message||e));});};

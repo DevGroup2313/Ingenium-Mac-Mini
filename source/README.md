@@ -286,3 +286,30 @@ still there seconds later.
 `rig/wk.py` needs WebKitGTK's driver and browser and a display: `apt-get install webkit2gtk-driver libwebkit2gtk-4.1-0`, run
 under `xvfb-run`.
 
+A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
+improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
+MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit
+store, and the document typefaces, which were written inside the document engine's code). They sat between the page's
+parts, so the browser read all of them before the page could be used; the code itself starts in well under a second.
+`build/tail.py` now leaves each in its place as an empty block naming where it is, and carries it after the page's last
+part; `ingFill` (and `ingTake`, for what cannot wait) takes it the first time it is wanted. The typefaces travel as a block
+of their own (`r183.js` reads them on first use; Lector and the chat's files wait for them). Then each app stops reading
+them at all: the computer apps serve the page without them and hand each over when asked
+(`desktop/app_quick_681.py`, with the release's other desktop patches), and the phone and tablet apps carry them beside
+the page as files of their own (the Fire repository's `tools/app_page.py`, used by its Android and iOS builds).
+
+| what is read when the page opens | before | now |
+| --- | --- | --- |
+| the page in a browser | 74.3 MB | 74.3 MB, 13 MB of it before it is ready |
+| the Mac and Windows apps | 18.1 MB | 13.1 MB |
+| the Fire tablet, iPhone and iPad apps | 61.7 MB | 12.6 MB |
+
+Measured on this build machine (no graphics card; a real device is faster, the ratios hold): Chromium, the page in a
+browser, ready in 1.67 s rather than 2.23 s, its first paint at 136 ms rather than 244 ms, the loading page lifted at 2.1 s
+rather than 2.6 s; WebKit (the iPhone and iPad's engine), the phone and tablet apps' page ready in 2.2 s rather than 4.4 s
+and drawn in 3.3 s rather than 5.1 s. In a browser, WebKit draws nothing until it has read the whole page, so there the
+page in a browser is drawn no sooner; the apps are where it counts.
+
+    node rig/t_perf.js <url> [runs] [--profile out.cpuprofile]        # time to first paint, to ready, memory, long tasks, each room's opening
+    node rig/t_681_tail.js <url>                                       # each block carried for later arrives whole when wanted, 9 checks
+

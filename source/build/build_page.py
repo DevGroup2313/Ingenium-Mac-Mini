@@ -336,13 +336,22 @@ edit('" /Producer (Ingenium) /Creator (Ingenium) >>"', '" >>"', "6.1 a PDF names
 #      carried for later may arrive empty, naming where it is (data-defer); it is fetched from the app, once, before it is
 #      read. Defined here, ahead of everything that reads one: the page's own engine and the kit store wait for theirs. ----
 edit('function ingSlot(id){var e=document.getElementById(id);return (e&&e.textContent.trim().length>100)?e:null;}',
-     'var ING_FILL={};\nfunction ingFill(id){var e=document.getElementById(id);if(!e||!e.getAttribute("data-defer"))return Promise.resolve(e);if(ING_FILL[id])return ING_FILL[id];\n'
-     '  ING_FILL[id]=fetch(e.getAttribute("data-defer"),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("Ingenium could not fetch its "+id+" (HTTP "+r.status+")");return r.text();})\n'
-     '    .then(function(t){e.textContent=t;e.removeAttribute("data-defer");return e;},function(err){delete ING_FILL[id];throw err;});return ING_FILL[id];}\n'
+     'var ING_FILL={};\nfunction ingParsed(){return document.readyState!=="loading"?Promise.resolve():new Promise(function(r){document.addEventListener("DOMContentLoaded",function(){r();},{once:true});});}\n'
+     # 6.8.1: or it waits at the end of the page itself (tail.py), read whole once the browser has passed it
+     'function ingTake(id){var e=document.getElementById(id);if(!e)return null;var d=e.getAttribute("data-defer");if(!d)return e;if(d.charAt(0)!=="#")return null;\n'
+     '  var t=document.getElementById(d.slice(1));if(!t||(document.readyState==="loading"&&!t.nextSibling))return null;\n'
+     '  e.textContent=t.textContent;t.parentNode.removeChild(t);e.removeAttribute("data-defer");e.removeAttribute("data-defer-bytes");return e;}\n'
+     'function ingFill(id){var e=document.getElementById(id);if(!e||!e.getAttribute("data-defer"))return Promise.resolve(e);if(ING_FILL[id])return ING_FILL[id];var src=e.getAttribute("data-defer");\n'
+     '  ING_FILL[id]=(src.charAt(0)==="#"?ingParsed().then(function(){if(!ingTake(id))throw new Error("Ingenium could not find its "+id);return null;})\n'
+     '    :fetch(src,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("Ingenium could not fetch its "+id+" (HTTP "+r.status+")");return r.text();}))\n'
+     '    .then(function(t){if(t!==null)e.textContent=t;e.removeAttribute("data-defer");e.removeAttribute("data-defer-bytes");return e;},function(err){delete ING_FILL[id];throw err;});return ING_FILL[id];}\n'
      'function ingFillAll(){return Promise.all([].slice.call(document.querySelectorAll("script[data-defer]")).map(function(e){return ingFill(e.id);}));}\n'
      'function ingDeferredLeft(){return document.querySelectorAll("script[data-defer]").length;}\n'
      'function ingSlot(id){var e=document.getElementById(id);return (e&&(e.getAttribute("data-defer")||e.textContent.trim().length>100))?e:null;}',
      "R161 a block carried for later, fetched before it is read")
+# 6.8.1: a copy of the page saved with its engine leaves out the engine's old blocks wherever they are, at the end too (tail.py)
+edit('html=html.replace(/<script id="ingenium-engine-(?:js|wasm|compat-worker|compat-wasm)"[\\s\\S]*?<\\/script>/gi,"");',
+     'html=html.replace(/<script id="(?:ing-tail:)?ingenium-engine-(?:js|wasm|compat-worker|compat-wasm)"[\\s\\S]*?<\\/script>/gi,"");', "6.8.1 the engine's old blocks, at the end too")
 edit('function ingSlotBlob(e,type){\n', 'function ingSlotBlob(e,type){\n  if(e&&e.getAttribute("data-defer"))return ingFill(e.id).then(function(){return ingSlotBlob(e,type);});\n', "R161 the page's own engine waits for its blocks")
 edit('  var s=document.getElementById("ingenium-kit-bundle");\n',
      '  var s=document.getElementById("ingenium-kit-bundle");\n  if(s&&s.getAttribute("data-defer"))return ingFill("ingenium-kit-bundle").then(function(){return kitStore();});\n', "R161 the kit store waits for its block")
@@ -1037,11 +1046,13 @@ if "/*R109_WIDTHS*/null" in blob:
     blob = blob.replace("/*R109_WIDTHS*/null", json.dumps({k: v[32:] for k, v in _w.items()}, separators=(",", ":")))
 if "/*R108_FONTS*/null" in blob:
     blob = blob.replace("/*R108_FONTS*/null", open(os.path.join(HERE, "lx_fonts.json")).read())
-if "/*R183_FONTS*/null" in blob:  # 6.8.1: the typefaces a document is set in, shown, saved as PDF and as Word (docfont/docfont.py)
+if '"ing-docfonts"' in blob:  # 6.8.1: the typefaces a document is set in, shown, saved as PDF and as Word (docfont/docfont.py),
+    # carried as a block of their own and read the first time they are wanted (r183.js, tail.py)
     import importlib.util as _ilu
     _df = _ilu.spec_from_file_location("docfont", os.path.join(HERE, "docfont", "docfont.py"))
     _dfm = _ilu.module_from_spec(_df); _df.loader.exec_module(_dfm)
-    blob = blob.replace("/*R183_FONTS*/null", json.dumps(_dfm.data(), separators=(",", ":")))
+    blob = ('<script type="application/json" id="ing-docfonts">' + json.dumps(_dfm.data(), separators=(",", ":")).replace("</", "<\\/")
+            + "</script>\n" + blob)
 if "/*R118_CDPREP*/" in blob:
     blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:
@@ -1091,7 +1102,13 @@ def _script_map(text):
         if j < 0:
             break
         pos = j + 8
-    return [min(999, int(m * 1000 / len(text))) for m in marks]
+    end = text.find('<script id="' + _tail.PRE)
+    end = end if end > 0 else len(text)
+    return [min(999, int(m * 1000 / end)) for m in marks]
+# 6.8.1: what is carried for later goes to the end of the page, after its last part (tail.py); the bar measures the page
+# up to there
+import tail as _tail
+out = _tail.tail(out)
 _bm = "/*ING_BOOT_MAP*/[]"
 if out.count(_bm) != 1:
     sys.exit("the loading page's map: its place was not found once")
