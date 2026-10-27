@@ -316,6 +316,9 @@ edit('function ingVersionLine(){var n=ingBuildNo();return "Version "+ING_VERSION
 edit('(function tourWire(){var g=$("page-guide");if(g&&!$("tourGo")){var b=el("button","btn primary","Take the tour");b.id="tourGo";b.type="button";b.onclick=function(){tourStart(0);};\n'
      '    var h=g.querySelector(".lede")||g.querySelector("h1,h2");if(h)h.after(b);else g.prepend(b);}})();\n', '',
      "6.7.3 one Take the tour key on the Guide page (the guided tour card's own)")
+# 6.8: since 6.7 the houses are in a room of their own (Ingenium's models), not above the list of models
+edit('No models yet. Add one below, or install one of the houses above, to get started.',
+     'No models yet. Add one below, or install one from Ingenium\'s models, to get started.', "6.8 Your models: where the houses are now")
 
 # ---- 6.1 (20 October 2026): no watermarks. The owner's words: "I don't want any watermarks on its documents or hidden in
 #      its texts." Lector's notes and analysis no longer close with a line naming the model, Ingenium and the date; a Word file

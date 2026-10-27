@@ -142,7 +142,7 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
   await p.evaluate(() => { if (IngDesk.state().windows.includes('tabula-2')) IngDesk.closeWindow('tabula-2'); });
 
   // 5. ↗ a window of its own, the work carried across
-  await p.evaluate(() => document.querySelector('.ing-fw [data-ing-export]').click()); await p.waitForTimeout(9000);
+  await p.evaluate(() => { document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); }); await p.waitForTimeout(9000);
   const pop = pops[pops.length - 1];
   ok(!!pop && /#ingapp=tabula&tok=/.test(pop.url()), '↗ opens Tabula in a window of its own', pop && pop.url().replace(/^.*#/, '#'));
   if (pop) {
@@ -222,7 +222,7 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
 
   // 6. where the browser keeps no window, the app stays and the reason is given
   await p.evaluate(() => { go('abacus'); }); await p.waitForTimeout(3000); await p.click('#fabFloat'); await p.waitForTimeout(3000);
-  await p.evaluate(() => { window.__openWas = window.open; window.open = () => null; document.querySelector('.ing-fw [data-ing-export]').click(); }); await p.waitForTimeout(11000);
+  await p.evaluate(() => { window.__openWas = window.open; window.open = () => null; document.querySelector('.ing-fw [data-ing-export]').click(); document.querySelector('#ing-export-choice [data-ing-act="own-window"]').click(); }); await p.waitForTimeout(11000);
   const t6 = await p.evaluate(() => ({ w: IngDesk.state().windows, t: (document.getElementById('ingToast') || document.querySelector('.toast') || {}).textContent || '' }));
   await p.evaluate(() => { window.open = window.__openWas; });
   ok(t6.w.join() === 'abacus' && /kept no new window/.test(t6.t), 'a blocked window leaves Abacus where it was, and says why', JSON.stringify(t6));
@@ -239,7 +239,7 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
     IngDesk.exportWindow('fontes'); setTimeout(() => res({ w: IngDesk.state().windows, t: (document.getElementById('ingToast') || {}).textContent || '' }), 800); }));
   ok(t7b.w.join() === 'fontes' && /closed unexpectedly last time/.test(t7b.t), 'after a bad ending the app keeps Fontes here, and says why', JSON.stringify(t7b));
   const t7c = await p.evaluate(() => { window.pywebview = { api: { big_put: () => 1 } }; const can = IngDesk.canExport(); delete window.pywebview; return can; });
-  ok(t7c === false, 'a desktop app without the window call offers no ↗ at all, rather than a key that fails', t7c);
+  ok(t7c === false, 'a desktop app without the window call does not offer a window of its own (its ↗ offers the whole screen instead), rather than a key that fails', t7c);
   await p.evaluate(() => { IngDesk.closeWindow('fontes'); });
 
   // 8. the thought panel follows day and night while it is open
@@ -259,7 +259,14 @@ const stones = (fc) => fc.evaluate(() => [...document.querySelectorAll('button')
   const q = await ctx2.newPage(); await q.goto(URL_); await enter(q);
   await q.evaluate(() => go('tabula')); await q.waitForTimeout(4000); await q.click('#fabFloat'); await q.waitForTimeout(3000);
   const t9 = await q.evaluate(() => [...document.querySelectorAll('.ing-fw-keys button')].map(b => b.textContent).join(' '));
-  ok(t9 === ' ＋ − □ ✕', 'in the Fire app the floating window has no ↗, since a second window cannot be had there (the way back into the desk stays)', t9);
+  // 6.8, as Carpe Diem 1059: the ↗ is there, and says the device offers no second window, so the app fills this one
+  const t9m = await q.evaluate(() => { document.querySelector('.ing-fw [data-ing-export]').click(); const m = document.getElementById('ing-export-choice');
+    return m ? { acts: [...m.querySelectorAll('[data-ing-act]')].map(x => x.getAttribute('data-ing-act')).join(','), says: m.textContent, focus: document.activeElement && document.activeElement.getAttribute('data-ing-act') } : null; });
+  ok(t9 === '↗  ＋ − □ ✕' && t9m && t9m.acts === 'fill,dock,close' && /offers no second window/.test(t9m.says) && t9m.focus === 'fill',
+    'in the Fire app the ↗ offers the whole screen (saying why: no second window there), the way back into the desk and Close, as Carpe Diem 1059 does', JSON.stringify({ t9, t9m }));
+  await q.evaluate(() => document.querySelector('#ing-export-choice [data-ing-act="fill"]').click()); await q.waitForTimeout(400);
+  const t9f = await q.evaluate(() => document.querySelector('.ing-fw').getAttribute('data-full'));
+  ok(t9f === '1', 'Fill the screen fills it', t9f);
   await q.screenshot({ path: OUT + '/fire-float.png' });
   await ctx2.close();
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
