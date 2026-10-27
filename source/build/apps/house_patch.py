@@ -82,6 +82,10 @@ def patch(name, html, house):
     mod = _one(mod, "  function openPicker(anchor) {\n",
                "  function openPicker(anchor) {\n    if (!(window.__ingHouse && window.__ingHouse.png)) { try { if (typeof cdAddOwnMark === 'function') cdAddOwnMark(function () { remountGallery(); }); } catch (e) {} return; }\n",
                name + " picker")
+    # the panel opens under its group: its caret is hidden on these ribbons, and a hidden button's box is the window's
+    # corner, so the panel used to open there, at the top left of the ribbon
+    mod = _one(mod, "    var r = anchor.getBoundingClientRect();\n",
+               "    var r = anchor.getBoundingClientRect();\n    if (!(r.width || r.height)) { var gp = document.getElementById('cd-seal-group'); if (gp) r = gp.getBoundingClientRect(); }\n", name + " panel place")
     html = html[:start] + mod + html[end:]
     cfg = ('<script id="ing-house">/* ' + MARK + ' · the app these studios are carried in */window.__ingHouse='
            + json.dumps(house, separators=(",", ":")).replace("</", "<\\/") + ';</script>\n')
