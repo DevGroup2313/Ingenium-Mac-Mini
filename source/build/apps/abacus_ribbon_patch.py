@@ -14,6 +14,8 @@ And "Add a decimal place" always gave two places and "Remove a decimal place" no
   - what is done is kept at once. The workbook (its sheets) was written every four seconds, and opening Abacus again
     takes the workbook before the cell-by-cell autosave, so whatever was done in the last four seconds before Abacus
     was closed came back undone. It is now written with every change, and when the page is hidden or closed;
+  - its dialogs (a rule for highlighting, a PivotTable, a validation rule) close with Escape and apply with Enter, as
+    Excel's do; they could be closed only with their own keys;
   - a drag across cells always selects them: it left their text selected, and the next drag that began on that text was
     taken by the browser as moving the text, so the range came out as one cell.
 
@@ -91,6 +93,12 @@ window.addEventListener('mousedown',function(e){var n=e.target;if(n&&n.nodeType=
 window.addEventListener('mouseover',function(e){if(!downTd||!(e.buttons&1))return;var n=e.target;if(n&&n.nodeType===3)n=n.parentElement;var td=n&&n.closest?n.closest('#grid td[data-ref]'):null;
   if(td&&td!==downTd){try{var s=getSelection();if(s&&s.rangeCount&&!s.isCollapsed)s.removeAllRanges();}catch(x){}}},true);
 window.addEventListener('mouseup',function(){downTd=null;},true);
+/* Abacus's own dialogs (a rule for highlighting, a PivotTable, a validation rule) answer the keys Excel's do: Escape cancels,
+   Enter applies */
+window.addEventListener('keydown',function(e){var d=document.querySelectorAll('.ab-dlg');if(!d.length)return;var top=d[d.length-1];
+  if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();top.remove();}
+  else if(e.key==='Enter'&&!e.shiftKey&&!(e.target&&e.target.tagName==='TEXTAREA')){var ok=[].slice.call(top.querySelectorAll('button')).reverse().filter(function(b){return /^(Apply|OK|Insert|Make|Add|Save|Done|Create)$/i.test(b.textContent.trim());})[0];
+    if(ok){e.preventDefault();e.stopImmediatePropagation();ok.click();}}},true);
 window.addEventListener('change',function(e){var t=e.target;if(!t||t.id!=='numFmt'||!ax())return;var R=refs();if(!R.length)return;var F=ax().fmt();
   R.forEach(function(r){if(t.value)F[r]=t.value;else delete F[r];});e.stopImmediatePropagation();ax().refresh();},true);
 })();</script>
