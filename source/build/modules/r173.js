@@ -140,18 +140,20 @@ body:not([data-theme="night"]) .bl-score span.best{color:#236b49}
 /* and its answers' state by night (a model done, failed or stopped): the day's greens and reds read at 2 to 1 on a night card */
 body[data-theme="night"] .bl-st-done{background:rgba(92,200,130,.16);color:#8fdcaa}
 body[data-theme="night"] :is(.bl-st-failed,.bl-st-stopped){background:rgba(224,120,106,.16);color:#f0a89e}
-/* a phone, or any narrow window: the tabs in two columns, every one in reach and whole */
+/* a phone, or any narrow window (6.8): the tabs as small pills that wrap, every one in sight, in the sizes of 6.6's keys */
 @media (max-width:600px){
   .rm-bar{display:flex;flex-direction:column}
   .rm-row{display:contents}
   .rm-find{order:0}.rm-tabs{order:1}.rm-says{order:2}
-  .rm-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .rm-tab{min-height:44px;padding:8px 10px;white-space:normal;line-height:1.2}
-  .rm-allkey{order:3;align-self:flex-start;margin:12px 0 0;min-height:44px}
-  .rm-find{max-width:none}
+  .rm-tabs{gap:6px}
+  .rm-tab{min-height:32px;gap:6px;padding:5px 11px 5px 9px;border-radius:10px;font-size:13px;white-space:nowrap;line-height:1.2}
+  .rm-tab svg{width:15px;height:15px}
+  .rm-allkey{order:3;align-self:flex-start;margin:10px 0 0;min-height:32px;padding:5px 12px 5px 9px;border-radius:10px;font-size:13px}
+  .rm-find{max-width:none;margin-bottom:10px}
+  .rm-find-box input{min-height:36px;padding-top:6px;padding-bottom:6px}
+  .rm-says{margin-top:8px;font-size:13px}
   .rm-hint{margin-bottom:10px}
 }
-@media (pointer:coarse){.rm-tab,.rm-key,.rm-allkey,.rm-hit,.rm-find-box input,.rm-stepnav .btn{min-height:44px}.rm-step{min-height:48px}#supRows .sup-group-title > .rm-fold{min-height:44px}}
 @media (max-width:360px){.rm-step{padding:6px 2px;font-size:11.5px}}
 @media (prefers-reduced-motion:reduce){.rm-tab,.rm-key,.rm-allkey,.rm-step,#supRows .rm-fold > i,#supRows .rm-fold > i svg{transition:none !important}.rm-panel.rm-in,.rm-flash{animation:none !important}}
 body[data-motion="minimal"] .rm-tab,body[data-motion="minimal"] .rm-key,body[data-motion="minimal"] .rm-allkey,body[data-motion="minimal"] .rm-step{transition:none !important}

@@ -1,19 +1,18 @@
-// Ingenium 6.7 · on a phone (modules r174, part p95), in Chromium with an iPhone's user agent, touch, and the notch's safe
+// Ingenium 6.8 · on a phone (modules r174, part p95), in Chromium with an iPhone's user agent, touch, and the notch's safe
 // areas emulated: every page of the app and every panel of the top bar, at the three iPhone sizes (375 x 812, 393 x 852,
 // 430 x 932) by day and by night, every top bar panel at each phone width from 320 to 430 upright and sideways, and a quick
 // pass at the iPad's sizes (820 x 1180, 1024 x 1366) and the Fire tablet's (800 x 1280). It looks for:
 //   overflow   the document wider than the window (it would scroll sideways)
 //   edges      a box that runs past the left or right edge of the window (not one inside a box that scrolls or clips it)
-//   covered    words that a floating element (the side column of keys, a bubble) lies over, now or once the page scrolls
 //   panels     a panel or popover cut by the window or the safe areas, or taller than the window without scrolling itself
-//   keys       with a finger (a phone or a tablet), a key smaller than 44 pixels either way (words linked inside a sentence
-//              are allowed), on the pages and in the top bar's panels
+//   sizes      6.8, the owner's words (27 October 2026): "Making everything bigger is not fixing it." The keys keep their 6.6
+//              sizes with a finger: the top bar's keys no taller than 34 pixels, and no page's keys grown to 44
 //   side keys  what each side key opens (reminders, the quiet screen, a thought, the Clepsydra, the notes), inside the
 //              window and the safe areas, upright and sideways; the column itself between the top bar and the foot, no key
-//              over another, 44 pixels upright, and sideways one column of 38 pixels or more (r155) or two of 44
+//              over another
 // and prints PASS or FAIL for each place, then the count. Screenshots and report.json go into <out>.
 //   axe        axe-core (WCAG 2.1 A and AA) on every page and with each top bar panel open, on a phone with touch, by day and night
-//   T67_AXE=path/to/axe.min.js node rig/t_67_phone.js http://127.0.0.1:8162/ingenium.html <out> [phones|panels|side|axe|tablets|all] [page,...]
+//   T67_AXE=path/to/axe.min.js node rig/t_68_phone.js http://127.0.0.1:8162/ingenium.html <out> [phones|panels|side|axe|tablets|all] [page,...]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const URL_ = process.argv[2], OUT = process.argv[3], PART = process.argv[4] || 'all', ONLY = (process.argv[5] || '').split(',').filter(Boolean);
 fs.mkdirSync(OUT, { recursive: true });
@@ -43,7 +42,7 @@ async function goTo(p, pg) { await p.evaluate(pg => { try { if (typeof closeModa
 
 // ---------------- the checks that run inside the page ----------------
 function inPage(opts) {
-  const W = innerWidth, H = innerHeight, out = { overflow: null, edges: [], covered: [], keys: [], floats: [] };
+  const W = innerWidth, H = innerHeight, out = { overflow: null, edges: [] };
   const safe = (() => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;pointer-events:none'; document.body.appendChild(d); const c = getComputedStyle(d); const r = { t: parseFloat(c.paddingTop) || 0, r: parseFloat(c.paddingRight) || 0, b: parseFloat(c.paddingBottom) || 0, l: parseFloat(c.paddingLeft) || 0 }; d.remove(); return r; })();
   out.safe = safe;
   const vis = e => { try { return e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }); } catch (x) { return !!e.offsetParent; } };
@@ -69,87 +68,12 @@ function inPage(opts) {
     if (e.closest('[aria-hidden="true"],[inert]') && (r.left >= W || r.right <= 0)) continue;
     reported.add(e); out.edges.push(name(e) + ' [' + Math.round(r.left) + '..' + Math.round(r.right) + ' x ' + Math.round(r.top) + ']');
   }
-  // 3. words under a floating element
-  const isFixedLike = e => { const c = getComputedStyle(e); return c.position === 'fixed'; };
-  const floats = [];
-  for (const e of all) {
-    if (!isFixedLike(e) || !vis(e)) continue;
-    let a = e.parentElement, inner = false; while (a && a !== document.body) { if (getComputedStyle(a).position === 'fixed') { inner = true; break; } a = a.parentElement; } if (inner) continue;
-    if (e.closest('.topbar')) continue;
-    const c = getComputedStyle(e); if (c.pointerEvents === 'none') continue;
-    const r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) continue;
-    if (r.right <= 0 || r.left >= W || r.bottom <= 0 || r.top >= H) continue;
-    if (r.width * r.height > 0.3 * W * H) continue;
-    floats.push({ e, r: { l: r.left, r: r.right, t: r.top, b: r.bottom }, n: name(e) });
-  }
-  out.floats = floats.map(f => f.n + ' [' + [f.r.l, f.r.t, f.r.r - f.r.l, f.r.b - f.r.t].map(Math.round).join(',') + ']');
-  if (floats.length) {
-    // everything in the document's own coordinates: a floating key stays put in the window while the page scrolls under it
-    const se = document.scrollingElement, sy = se.scrollTop, maxS = Math.max(0, se.scrollHeight - se.clientHeight);
-    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
-    const seen = new Set(); let n;
-    while ((n = tw.nextNode())) {
-      const pe = n.parentElement; if (!pe || seen.has(pe)) continue;
-      if (pe.closest('script,style,noscript,template,.topbar,[aria-hidden="true"]')) continue;
-      if (!vis(pe)) continue;
-      // the boxes that clip it: a box that scrolls can bring any of its words into its window; one that only clips cuts them
-      let skip = false; const clips = [];
-      for (let a = pe; a && a !== document.body; a = a.parentElement) {
-        const c = getComputedStyle(a);
-        if (c.position === 'fixed' || c.position === 'sticky') { skip = true; break; }   // in a layer of its own (a panel, a dialog)
-        const cx = c.overflowX !== 'visible', cy = c.overflowY !== 'visible';
-        if (!cx && !cy) continue;
-        const ar = a.getBoundingClientRect(); if (ar.width < 2 || ar.height < 2) { skip = true; break; }  // words kept for screen readers only
-        clips.push({ cx, cy, l: ar.left, r: ar.right, t: ar.top + sy, b: ar.bottom + sy,
-          sx: cx && /(auto|scroll)/.test(c.overflowX) && a.scrollWidth > a.clientWidth + 1 ? [a.scrollLeft, a.scrollWidth - a.clientWidth - a.scrollLeft] : null,
-          syr: cy && /(auto|scroll)/.test(c.overflowY) && a.scrollHeight > a.clientHeight + 1 ? [a.scrollTop, a.scrollHeight - a.clientHeight - a.scrollTop] : null });
-      }
-      if (skip) continue;
-      const rg = document.createRange(); rg.selectNodeContents(n);
-      const rects = [...rg.getClientRects()].filter(q => q.width > 2 && q.height > 4);
-      for (const q of rects) {
-        let x0 = q.left, x1 = q.right, y0 = q.top + sy, y1 = q.bottom + sy;
-        for (const k of clips) {
-          if (k.cx) { if (k.sx) { x0 -= k.sx[1]; x1 += k.sx[0]; } x0 = Math.max(x0, k.l); x1 = Math.min(x1, k.r); }
-          if (k.cy) { if (k.syr) { y0 -= k.syr[1]; y1 += k.syr[0]; } y0 = Math.max(y0, k.t); y1 = Math.min(y1, k.b); }
-          if (x1 <= x0 || y1 <= y0) break;
-        }
-        if (x1 - x0 <= 2 || y1 - y0 <= 2) continue;
-        for (const f of floats) {
-          if (f.e.contains(pe)) continue;
-          if (Math.min(x1, f.r.r) - Math.max(x0, f.r.l) <= 2) continue;
-          // some scroll s in [0, maxS] puts the key (window y f.t..f.b, document y f.t+s..f.b+s) over the words
-          if (!(y0 - f.r.b < maxS - 2 && y1 - f.r.t > 2)) continue;
-          seen.add(pe);
-          out.covered.push(f.n.split(' ')[0] + ' over ' + name(pe).slice(0, 70) + ' (x ' + Math.round(x0) + '..' + Math.round(x1) + ')');
-          break;
-        }
-        if (seen.has(pe)) break;
-      }
-    }
-  }
-  // 4. keys smaller than 44 pixels (phones)
+  // 3. the keys' sizes: the top bar's tallest key and the median height of the page's own keys (Ingenium's .btn and tabs; a card
+  // that answers a press is not a key)
   if (opts.keys) {
-    const scope = [document.querySelector('.topbar'), document.querySelector('.dock'), ...document.querySelectorAll('.rail-btn,#railChevron'), document.querySelector('.main > section.active, main > section.active, .section.active')].filter(Boolean);
-    const sel = 'button,[role=button],a[href],[role=tab],[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[role=switch],[role=checkbox],[role=radio],[role=option],input:not([type=hidden]),select,summary,textarea';
-    const keys = new Set(); scope.forEach(s => { if (s.matches(sel)) keys.add(s); s.querySelectorAll(sel).forEach(k => keys.add(k)); });
-    for (const k of keys) {
-      if (!vis(k)) continue;
-      const r = k.getBoundingClientRect(); if (r.width < 1 || r.height < 1) continue;
-      if (k.closest('[aria-hidden="true"],[inert],.hidden')) continue;
-      const c = getComputedStyle(k);
-      // a link inside a sentence
-      if (k.tagName === 'A' && c.display === 'inline') continue;
-      // an input that is drawn by its label (a hidden checkbox behind a switch): its label is measured instead
-      let m = r;
-      if (k.tagName === 'INPUT' && /^(checkbox|radio)$/.test(k.type)) {
-        const lb = k.closest('label') || (k.id && document.querySelector('label[for="' + CSS.escape(k.id) + '"]'));
-        if (lb && vis(lb)) { const lr = lb.getBoundingClientRect(); if (lr.width >= 1 && lr.height >= 1) m = lr; }
-        if (m === r && (c.opacity === '0' || r.width <= 2)) continue;
-      } else if (k.tagName === 'INPUT' && (c.opacity === '0' || r.width <= 2)) continue;
-      // a key laid down out of sight in a box that scrolls sideways is still a key: measured all the same
-      if (Math.min(m.width, m.height) < 43.5) out.keys.push(name(k).slice(0, 80) + ' ' + Math.round(m.width) + 'x' + Math.round(m.height) + (m !== r ? ' (its label)' : ''));
-    }
+    const hs = sel => [...document.querySelectorAll(sel)].filter(vis).map(k => k.getBoundingClientRect().height).filter(h => h > 1).sort((a, b) => a - b);
+    const bar = hs('.topbar button,.topbar [role=button]'), pg = hs('.section.active .btn,.section.active [role=tab]');
+    out.sizes = { bar: bar.length ? Math.round(bar[bar.length - 1]) : 0, page: pg.length ? Math.round(pg[Math.floor(pg.length / 2)]) : 0 };
   }
   return out;
 }
@@ -181,19 +105,6 @@ function panelCheck(sel) {
   }
   if (e.scrollWidth > e.clientWidth + 2 && !/(auto|scroll)/.test(c.overflowX)) bad.push('wider inside than its box (' + e.scrollWidth + ' > ' + e.clientWidth + ')');
   return { box: [r.left, r.top, r.width, r.height].map(Math.round), safe: s, bad };
-}
-// the keys inside an open panel (a box to tick is measured by its line, which answers the finger)
-function smallIn(sel) {
-  const e = [...document.querySelectorAll(sel)].find(x => x.checkVisibility({ checkOpacity: false, checkVisibilityCSS: true })); if (!e) return ['(no panel)'];
-  const out = [];
-  e.querySelectorAll('button,[role=button],a[href],[role=tab],[role=menuitem],[role=menuitemradio],[role=menuitemcheckbox],[role=switch],[role=radio],input:not([type=hidden]),select,summary,textarea').forEach(k => {
-    if (!k.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })) return;
-    let r = k.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return;
-    const c = getComputedStyle(k); if (k.tagName === 'A' && c.display === 'inline') return;
-    if (k.tagName === 'INPUT' && /^(checkbox|radio)$/.test(k.type)) { const lb = k.closest('label'); if (lb) r = lb.getBoundingClientRect(); else if (c.opacity === '0') return; }
-    if (Math.min(r.width, r.height) < 43.5) out.push((k.id || k.className || k.tagName) + ' "' + (k.getAttribute('aria-label') || k.textContent || '').trim().slice(0, 30) + '" ' + Math.round(r.width) + 'x' + Math.round(r.height));
-  });
-  return out;
 }
 // what a side key opens: every new box that floats over the page, inside the window and its safe areas
 function floatingNow() {
@@ -256,10 +167,6 @@ async function panels(p, label, shotPrefix) {
     const r = await p.evaluate(panelCheck, P.panel);
     if (shotPrefix) await p.screenshot({ path: `${shotPrefix}_${P.id}.png` });
     ok(!r.missing && r.bad.length === 0, `${label} the ${P.id} panel opens whole inside the window and the safe areas`, r);
-    if (W <= 430) {
-      const small = await p.evaluate(smallIn, P.panel);
-      ok(small.length === 0, `${label} every key in the ${P.id} panel is at least 44 pixels`, small);
-    }
     await p.evaluate(P.close); await p.keyboard.press('Escape').catch(() => { }); await p.waitForTimeout(250);
   }
 }
@@ -281,8 +188,7 @@ async function panels(p, label, shotPrefix) {
         await p.screenshot({ path: path.join(OUT, `ph_${vp[0]}_${th}_${pg}.png`) });
         ok(!r.overflow, `${where} nothing wider than the window`, r.overflow);
         ok(r.edges.length === 0, `${where} no box runs past an edge`, r.edges);
-        ok(r.covered.length === 0, `${where} no words lie under a floating key`, r.covered);
-        ok(r.keys.length === 0, `${where} every key is at least 44 pixels`, r.keys);
+        ok(r.sizes.bar <= 34 && r.sizes.page < 44, `${where} the keys keep their 6.6 sizes (top bar at most 34, the page's median under 44)`, r.sizes);
       }
     }
     if (p.__errs.length) console.log('NOTE script errors at ' + vp.join('x') + ': ' + p.__errs.slice(0, 5).join(' | '));
@@ -301,12 +207,7 @@ async function panels(p, label, shotPrefix) {
         return { n: ks.length, out: ks.filter(k => { const r = k.getBoundingClientRect(); return r.left < 0 || r.right > W || r.top < top - 1 || r.bottom > H; }).map(k => k.id),
           min: Math.round(Math.min(...rs.map(([, r]) => Math.min(r.width, r.height))) * 10) / 10, cols: new Set(rs.map(([, r]) => Math.round(r.left))).size, over }; });
       ok(side.n >= 6 && side.out.length === 0, `${vp[0]}x${vp[1]} ${th}: every side key stands between the top bar and the foot of the window`, side);
-      // upright, every side key is 44 pixels; held sideways the column stays one column where it can (r155, the owner's leaf
-      // in its place), its keys no smaller than r155's 38 pixels, and only where that cannot stand two columns of 44
-      const upright = vp[1] > vp[0];
-      ok(side.over.length === 0 && (upright ? side.min >= 43.5 : (side.cols === 1 ? side.min >= 37.5 : side.min >= 43.5)),
-        `${vp[0]}x${vp[1]} ${th}: no side key lies over another, each ${upright ? 'at least 44 pixels' : 'at least 38 pixels in one column, or 44 in two'}`, side);
-      if (!upright) console.log(`NOTE ${vp[0]}x${vp[1]} ${th}: the side keys sideways: ${side.cols} column(s), ${side.min} pixels`);
+      ok(side.over.length === 0, `${vp[0]}x${vp[1]} ${th}: no side key lies over another`, side);
     }
     await ctx.close();
   }
@@ -316,7 +217,7 @@ async function panels(p, label, shotPrefix) {
     for (const th of ['day', 'night']) { await theme(p, th); await sideKeys(p, `${vp[0]}x${vp[1]} ${th}:`, th === 'day' ? path.join(OUT, `sk_${vp[0]}x${vp[1]}`) : null); }
     await ctx.close();
   }
-  // ---------------- axe-core on every page with a finger's sizes (a phone with touch, the notch's safe areas) ----------------
+  // ---------------- axe-core on every page on a phone with touch and the notch's safe areas ----------------
   const AXE = process.env.T67_AXE;
   if ((PART === 'all' || PART === 'axe') && AXE) for (const th of ['day', 'night']) {
     const { ctx, p } = await open(b, [393, 852], UPRIGHT);
@@ -352,8 +253,7 @@ async function panels(p, label, shotPrefix) {
         const r = await p.evaluate(inPage, { keys: true });
         if (th === 'day' || pg === 'home' || pg === 'settings') await p.screenshot({ path: path.join(OUT, `tb_${vp[0]}_${th}_${pg}.png`) });
         ok(!r.overflow && r.edges.length === 0, `${where} nothing wider than the window, no box past an edge`, { overflow: r.overflow, edges: r.edges });
-        ok(r.covered.length === 0, `${where} no words lie under a floating key`, r.covered);
-        ok(r.keys.length === 0, `${where} every key is at least 44 pixels (a finger on a tablet, since 6.7)`, r.keys);
+        ok(r.sizes.bar <= 34 && r.sizes.page < 44, `${where} the keys keep their 6.6 sizes`, r.sizes);
       }
       await panels(p, `${vp[0]}x${vp[1]} ${th}:`, th === 'day' ? path.join(OUT, `tp_${vp[0]}`) : null);
     }

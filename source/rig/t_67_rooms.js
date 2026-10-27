@@ -281,14 +281,14 @@ async function axeRun(p) {
     for (const th of ['day', 'night']) { await theme(p, th);
       for (const pg of PAGES) { await go(p, pg, 1000);
         const m = await p.evaluate(pg => { const tabs = [...document.querySelectorAll('#rmTabs-' + pg + ' [role=tab]')].filter(t => !t.hidden);
-          return { n: tabs.length, small: tabs.filter(t => t.getBoundingClientRect().height < 44).length, out: tabs.filter(t => { const r = t.getBoundingClientRect(); return r.left < 0 || r.right > innerWidth; }).length,
+          return { n: tabs.length, small: tabs.filter(t => { const h = t.getBoundingClientRect().height; return h < 28 || h >= 44; }).length, out: tabs.filter(t => { const r = t.getBoundingClientRect(); return r.left < 0 || r.right > innerWidth; }).length,
             cut: tabs.filter(t => t.scrollWidth > t.clientWidth + 1).length, sw: document.documentElement.scrollWidth, vw: innerWidth,
-            keys: [...document.querySelectorAll('#page-' + pg + ' :is(.rm-key, .rm-allkey, .rm-step, .rm-stepnav button)')].filter(k => { const h = k.getBoundingClientRect().height; return h > 0 && h < 44; }).map(k => k.textContent.trim().slice(0, 30)) }; }, pg);
+            keys: [...document.querySelectorAll('#page-' + pg + ' :is(.rm-key, .rm-allkey, .rm-step, .rm-stepnav button)')].filter(k => { const h = k.getBoundingClientRect().height; return h > 0 && h < 28; }).map(k => k.textContent.trim().slice(0, 30)) }; }, pg);
         ph[th + '/' + pg] = m;
         await shot(p, 'rooms-' + pg + '-phone-' + th);
         if (AXE) for (const r of await p.evaluate(pg => IngRooms.rooms(pg).filter(x => x.shown).map(x => x.key), pg)) { await room(p, pg, r);
           const v = await axeRun(p); if (v && v.length) found.push({ at: 'phone/' + th + '/' + pg + '/' + r, v }); } } }
-    ok(Object.entries(ph).every(([k, m]) => m.n >= (/blend/.test(k) ? 2 : 4) && m.small === 0 && m.out === 0 && m.cut === 0 && m.keys.length === 0), 'on a phone every tab is whole, inside the screen and at least 44 pixels high, and so is every other key of the rooms (Open the Studio, every setting at once, the steps, Back and Next)', ph);
+    ok(Object.entries(ph).every(([k, m]) => m.n >= (/blend/.test(k) ? 2 : 4) && m.small === 0 && m.out === 0 && m.cut === 0 && m.keys.length === 0), 'on a phone every tab is whole, inside the screen, and keeps the size of 6.6\'s keys (6.8, the owner: not bigger; 28 to 44 pixels), and every other key of the rooms is at least 28 pixels (Open the Studio, every setting at once, the steps, Back and Next)', ph);
     if (AXE) ok(found.length === 0, 'axe-core finds nothing on any room of the three pages on a phone, by day and night', found);
     await go(p, 'settings'); await room(p, 'settings', 'everyday');
     await p.fill('#rmFind', 'backup'); await p.waitForTimeout(400); await shot(p, 'rooms-settings-phone-find');
