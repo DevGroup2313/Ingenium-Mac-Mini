@@ -231,3 +231,13 @@ tracked change's author "Author").
 
     node rig/t_681_house.js <url> <out> [master|other]                        # the three apps' seal studio, letterheads and watermark menu, by edition, 14 checks
 
+The group's panel opens under the group (its caret is hidden on these ribbons, and it used to open at the window's corner).
+Her words: "Please make sure that all of my handdrawn signatures samples and personal informations are also removed from the
+apps ribbons of Ingenium and the Forge's demos." Nothing of hers is written into those editions; but a browser keeps one store
+for every page of one address (every GitHub Pages site of an account shares one), so a demo opened on her device read her
+own copy's signatures, marks, letterheads, Tabula documents and state. `storage_shim.py` makes every edition but master keep
+its storage under its own name ("ing-demo:", "ing-gift:", "ing-full:"), in localStorage and IndexedDB, in the page and in each
+app's frame; the master edition stores as before.
+
+    node rig/t_681_own_store.js <master url> <other edition url> <out>         # the other edition, at the same address, finds nothing of the owner's, 9 checks
+

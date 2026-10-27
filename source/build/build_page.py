@@ -901,6 +901,14 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _house = {"name": "Ingenium", "word": "INGENIUM" if ED == "master" else "", "accent": "#4E2C8A", "tag": "",
                   "png": ("data:image/png;base64," + _seals["ingenium"]["b64"]) if ED == "master" else None}
         _html = _hpm.patch(_name, _html, _house)
+    # 6.8.1: in an edition other than the owner's, the app stores under its own name, so it never reads her signatures,
+    # marks, letterheads or documents kept by her own copy at the same address (storage_shim.py)
+    if ED != "master":
+        import storage_shim as _ss
+        _hi = _html.find("<head>")  # before every script of the app: several come before its character set line
+        if _hi < 0 or _hi > 4000:
+            sys.exit(_name + ": its <head> was not found near its start")
+        _html = _html[:_hi + 6] + _ss.shim(ED) + _html[_hi + 6:]
     # 6.7 (security audit): what each app takes in from a file, a stored or restored document or another window goes
     # through the strict sanitiser the frame carries (apps/safe_import_patch.py)
     import importlib.util as _ilu
@@ -1058,6 +1066,12 @@ blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' l
 out = out.replace(MARK, blob + MARK)
 out = editions.apply(out, ED)  # 6.2: the edition's own changes (editions.py)
 out = editions.strip(out, ED)  # 6.3: every edition without the code's comments (6.2: and, without Lector, nothing of it left)
+if ED != "master":  # 6.8.1: and stores under its own name, first of all its scripts (storage_shim.py)
+    import storage_shim as _ss
+    _hi = out.lower().find('<meta charset="utf-8">')
+    if _hi < 0 or _hi > 4000:
+        sys.exit("the page's character set line was not found near its start")
+    out = out[:_hi + 22] + _ss.shim(ED) + out[_hi + 22:]
 # ---- R151: where each of the page's scripts begins, in thousandths of the page, for the loading page's bar. The page is
 #      walked as the browser reads it: a script ends at the first "</script" after it opens, so text inside a script that
 #      only looks like a tag is not counted ----
