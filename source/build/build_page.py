@@ -906,6 +906,11 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _tr2 = _ilu.spec_from_file_location("tabula_ribbon_patch", os.path.join(HERE, "apps", "tabula_ribbon_patch.py"))
         _tr2m = _ilu.module_from_spec(_tr2); _tr2.loader.exec_module(_tr2m)
         _html = _tr2m.patch(_html)
+    if _name == "abacus":  # 6.8.1: its ribbon on every cell selected, its decimals one place at a time, kept at once (apps/abacus_ribbon_patch.py)
+        import importlib.util as _ilu
+        _ar = _ilu.spec_from_file_location("abacus_ribbon_patch", os.path.join(HERE, "apps", "abacus_ribbon_patch.py"))
+        _arm = _ilu.module_from_spec(_ar); _ar.loader.exec_module(_arm)
+        _html = _arm.patch(_html)
     # 6.8.1: the seal studio, the watermark and the Word files take the house they are carried in: Ingenium's seal, name and
     # colour in the master edition only; in every other edition no seal, and "Your own" (apps/house_patch.py)
     if _name in ("tabula", "abacus", "slides"):

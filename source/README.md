@@ -286,6 +286,19 @@ still there seconds later.
 `rig/wk.py` needs WebKitGTK's driver and browser and a display: `apt-get install webkit2gtk-driver libwebkit2gtk-4.1-0`, run
 under `xvfb-run`.
 
+Abacus's ribbon, audited the same way (her words: "I want Tabula, Abacus, and Imago to have a full audit for bugs and
+functionality and then I want them all fixed"): `apps/abacus_ribbon_patch.py`. With a range selected, Wrap, the number
+format list, the Borders and the Cell styles (and their previews) reached the active cell only; the borders now follow
+Excel (All on every cell; Top, Bottom, Left and Right on the selection's own edge; Thick round its outline; None from every
+cell). "Add a decimal place" always gave two places and "Remove" none, dropping a currency or a percentage; each now adds
+or takes one place and keeps what the number is. The workbook was written every four seconds and is what Abacus opens
+with, so a change made in the last four seconds before it was closed came back undone; it is now written with every
+change and when the page is put away. And a second drag across cells that the first had left selected as text was taken
+by the browser as moving the text, so the range came out as one cell; a drag across cells now always selects them.
+
+    node rig/t_681_abacus.js <Ingenium url>                         # Chromium: 36 checks (the old Abacus failed 10)
+    xvfb-run -a python3 rig/t_681_abacus_wk.py <Ingenium url>        # Safari's engine: 15 checks (the old Abacus failed 8)
+
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
 MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit
