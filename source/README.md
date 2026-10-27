@@ -244,10 +244,14 @@ app's frame; the master edition stores as before.
 The popup cards (her words: "the purple colour is too bight and harsh on both light and dark mode ... the popup cards are too
 flat, I want them to gain that weighted animated popped out 3D look"): `modules/r184.js` builds every popup as the thought
 card is built (a face lit from above, a darker wall at its right and foot, a fine rim, a falling shadow) and brings it in with
-a small spring (still when motion is minimal): the note at the foot, the support notes, the tour card, the status menu,
-About and the dialogs, the Help and Display panels, a window's menu, the sound and storage dialogs, Lector's recipe. Their
-keys are a quieter amethyst by day, a soft lavender by night; the night faces are a deep, greyed amethyst (the reminder card
-too, `r153.js`). Contrast checked with axe on the cards by day and by night: no failures.
+a small spring (still when motion is minimal): the support notes, the tour card, the status menu, About and the dialogs,
+the Help and Display panels, a window's menu, the sound and storage dialogs, Lector's recipe. Their keys are a quieter
+amethyst by day, a soft lavender by night; the night faces are a deep, greyed amethyst (the reminder card too, `r153.js`).
+Contrast checked with axe on the cards by day and by night: no failures. The note at the foot of the page ("Saved", and the
+other short notes) stays flat, as it was (her words: "The "Saved. Your documents is kept on this device." cards can be
+exempted from the 3D look and remain flat").
+
+    node rig/t_681_cards.js <url> <out>                                         # the foot note flat by day and by night, a dialog raised
 
 Ingenium's own sounds (her words: "I want Ingenium to have its own identity and its own sounds ... light and subtle ... the
 mechanical analogue 3D look and feel ... Oxbridge DPhil standards"): `modules/r176.js` keeps its engine and replaces Carpe
@@ -264,4 +268,21 @@ to the page's 16. Now a card gives its size to anything that names none, a headi
 the licence's title is a card's title, and a model's name is 14.5.
 
     node rig/t_681_type.js <url> <out>                                          # every page and room: no text in a card at the page's 16px; Settings pictured
+
+Tabula's ribbon, at the first press (her words: "The text colours and other functions on Tabula's ribbons do not work well. I
+have to keep trying multiple times for it to stick and work"): `apps/tabula_ribbon_patch.py`. Pressed as a person presses it,
+with real presses of the pointer and keys, in Safari's engine (WebKitGTK, driven by `rig/wk.py`) and in Chromium's, the
+ribbon failed in four ways, in both: a colour or a highlight from its palette, chosen with nothing selected, never reached the
+words typed next (the palette put the selection back as it closed, and that forgets a waiting colour); Automatic and No colour
+left the next words in the colour around the caret; a size made words 48 pixels high (in Safari's engine always, in
+Chromium's when nothing was selected: Tabula turned the browser's largest size into the size chosen only in one spelling and
+only at the moment of choosing); and Grow Font and Shrink Font worked once, then let the words go. Each now lands at the
+first press, on selected words and on the words typed next, keeps the words' other formatting, leaves Undo as it was, and is
+still there seconds later.
+
+    xvfb-run -a python3 rig/t_681_ribbon_wk.py <Ingenium or Tabula url> [--trace]   # Safari's engine: 42 checks (the old Tabula failed 22)
+    node rig/t_681_ribbon.js <Ingenium or Tabula url>                              # Chromium's engine: the same 42 (the old Tabula failed 22)
+
+`rig/wk.py` needs WebKitGTK's driver and browser and a display: `apt-get install webkit2gtk-driver libwebkit2gtk-4.1-0`, run
+under `xvfb-run`.
 

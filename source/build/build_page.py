@@ -892,6 +892,11 @@ for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago 
         _th = _ilu.spec_from_file_location("tabula_hf_patch", os.path.join(HERE, "apps", "tabula_hf_patch.py"))
         _thm = _ilu.module_from_spec(_th); _th.loader.exec_module(_thm)
         _html = _thm.patch(_html)
+        # 6.8.1: its colours, sizes and Grow and Shrink land at the first press, on selected words and on the words typed
+        # next (apps/tabula_ribbon_patch.py)
+        _tr2 = _ilu.spec_from_file_location("tabula_ribbon_patch", os.path.join(HERE, "apps", "tabula_ribbon_patch.py"))
+        _tr2m = _ilu.module_from_spec(_tr2); _tr2.loader.exec_module(_tr2m)
+        _html = _tr2m.patch(_html)
     # 6.8.1: the seal studio, the watermark and the Word files take the house they are carried in: Ingenium's seal, name and
     # colour in the master edition only; in every other edition no seal, and "Your own" (apps/house_patch.py)
     if _name in ("tabula", "abacus", "slides"):

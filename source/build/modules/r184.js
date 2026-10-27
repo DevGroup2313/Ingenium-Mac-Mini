@@ -9,12 +9,13 @@
    the thought card does, rising a little and settling with a small spring (still, when motion is set to minimal or the
    device asks for less). Its purple is quieter: by day a deep, greyed amethyst for its keys, by night a deep, greyed amethyst face (still
    purple, never a plum that reads as black) with soft lavender keys, never the bright violet.
-   The cards: the note at the foot of the page, the support notes, the tour's card, the status menu, About and the other
-   dialogs, the Help and Display panels, a window's menu, the storage and sound dialogs, Lector's recipe, and the reminder
-   card's night face (r153). */
+   The cards: the support notes, the tour's card, the status menu, About and the other dialogs, the Help and Display panels,
+   a window's menu, the storage and sound dialogs, Lector's recipe, and the reminder card's night face (r153).
+   The note at the foot of the page ("Saved", and the other short notes) stays flat, as it was. The owner's words (27 October
+   2026): "The "Saved. Your documents is kept on this device." cards can be exempted from the 3D look and remain flat." */
 (function(){"use strict";
 if(window.__r184)return;window.__r184=1;
-var CARDS="#ingToast,#sc-toast,.tour-card,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card";
+var CARDS="#sc-toast,.tour-card,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card";
 function sel(suffix,pre){return CARDS.split(",").map(function(s){return (pre||"")+s+suffix;}).join(",");}
 var css=[
  ':root{--rc-face-a:#ffffff;--rc-face-b:#f7f5fa;--rc-wall:#d3cbe0;--rc-rim:rgba(40,22,68,.10);--rc-fam:40,22,68;--rc-ink:#221a2e;--rc-soft:rgba(70,58,92,.74);',
@@ -31,7 +32,7 @@ var css=[
  '--rc-seat:inset 0 2px 5px rgba(0,0,0,.55),0 1px 1px rgba(0,0,0,.40)}',
  /* the slab */
  CARDS+'{background:linear-gradient(180deg,var(--rc-face-a),var(--rc-face-b) 62%,color-mix(in srgb,var(--rc-face-b) 93%,var(--rc-wall))) !important;box-shadow:var(--rc-slab) !important;border-color:transparent !important;color:var(--rc-ink) !important}',
- '#ingToast,#sc-toast{border-radius:14px !important}',
+ '#sc-toast{border-radius:14px !important}',
  /* their keys: the quiet amethyst, raised, pressed in */
  sel(' .btn.primary')+'{background:linear-gradient(180deg,var(--rc-acc-hi),var(--rc-acc-lo)) !important;border:0 !important;color:var(--rc-on-acc) !important;box-shadow:var(--rc-key) !important;transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}',
  sel(' .btn.primary:hover')+'{transform:translateY(-1.5px);box-shadow:var(--rc-key-hi) !important}',
@@ -42,15 +43,10 @@ var css=[
  sel(' a')+'{color:var(--rc-acc)}'+sel(' a','body[data-theme="night"] ')+'{color:#c9b8ee}',
  /* their arrival: up a little, and settled with a small spring */
  '@keyframes rcIn{0%{opacity:0;translate:0 12px;scale:.955}62%{opacity:1;translate:0 -2px;scale:1.008}100%{opacity:1;translate:0 0;scale:1}}',
- '.tour-card,.tour-card.lively,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card,#ingToast.rc-in{animation:rcIn .46s cubic-bezier(.22,.8,.3,1) both !important}',
- 'body[data-motion="minimal"] .tour-card,body[data-motion="minimal"] .pres-menu,body[data-motion="minimal"] #modalBox,body[data-motion="minimal"] #ihPanel,body[data-motion="minimal"] #displayPanel,body[data-motion="minimal"] #ing-export-choice,body[data-motion="minimal"] .isc-box,body[data-motion="minimal"] #lxRx .rx-card,body[data-motion="minimal"] #ingToast{animation:none !important}',
- '@media (prefers-reduced-motion:reduce){.tour-card,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card,#ingToast{animation:none !important}}'].join("\n");
+ '.tour-card,.tour-card.lively,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card{animation:rcIn .46s cubic-bezier(.22,.8,.3,1) both !important}',
+ 'body[data-motion="minimal"] .tour-card,body[data-motion="minimal"] .pres-menu,body[data-motion="minimal"] #modalBox,body[data-motion="minimal"] #ihPanel,body[data-motion="minimal"] #displayPanel,body[data-motion="minimal"] #ing-export-choice,body[data-motion="minimal"] .isc-box,body[data-motion="minimal"] #lxRx .rx-card{animation:none !important}',
+ '@media (prefers-reduced-motion:reduce){.tour-card,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card{animation:none !important}}'].join("\n");
 var st=document.createElement("style");st.id="r184-css";st.textContent=css;(document.head||document.documentElement).appendChild(st);
-/* the note at the foot of the page arrives afresh with each new note */
-function wrapToast(){var o=window.ingToast;if(typeof o!=="function"||o.__r184)return false;
-  var w=function(){var r=o.apply(this,arguments);try{var n=document.getElementById("ingToast");if(n){n.classList.remove("rc-in");void n.offsetWidth;n.classList.add("rc-in");}}catch(e){}return r;};
-  Object.keys(o).forEach(function(p){try{w[p]=o[p];}catch(e){}});w.__r184=1;window.ingToast=w;return true;}
-(function wait(n){if(!wrapToast()&&n<60)setTimeout(function(){wait(n+1);},250);})(0);
 })();
 ;try{window.__ingParts["p105"]="running";}catch(_){}
 </script>
