@@ -37,9 +37,13 @@ with Session() as s:
     st = lambda w: s.js(STYLE, w)
 
     def pick(w):
-        p = s.js(FIND, w)
-        s.click_at(p[0], p[1], count=2)
-        time.sleep(.3)
+        for attempt in range(3):   # the text may still be settling after the last key; a person would look and choose again
+            p = s.js(FIND, w)
+            s.click_at(p[0], p[1], count=2)
+            time.sleep(.3)
+            if s.js("return String(getSelection()).trim()") == w:
+                return
+            time.sleep(.4)
 
     def key(title):
         p = s.js("var t=arguments[0],e=[...document.querySelectorAll('#ribHome button')].find(function(e){return e.offsetParent&&(e.title===t||e.title.indexOf(t)===0);});if(!e)return null;var b=e.getBoundingClientRect();return [b.left+b.width/2,b.top+b.height/2];", title)
@@ -80,6 +84,11 @@ with Session() as s:
     pick("zeta"); choose("Default", "Serif (Georgia)"); check("the font list sets the selected word", "zeta", lambda v: v["family"] == "Georgia")
     pick("theta"); key("Grow the selected text"); key("Grow the selected text")
     check("Grow, pressed twice, grows the word twice", "theta", lambda v: v["size"] > base["size"] * 1.3)
+    pick("Alpha"); cs = []
+    for k in range(3):
+        key("Change the case")
+        cs.append(s.js("return document.querySelector('#slide .s-sub').textContent.match(/\\b(alpha|Alpha|ALPHA)\\b/)[0]"))
+    ok(cs == ["ALPHA", "alpha", "Alpha"], "Change case, pressed three times, goes through CAPITALS, small letters and Title on the same word", cs)
     s.press("")
     key("#2F4F3A"); typed("green"); check("a colour chosen with nothing selected reaches the words typed next", "green", lambda v: v["color"] == "rgb(47, 79, 58)")
     choose("Size", "24 pt"); typed("large"); typed("larger")

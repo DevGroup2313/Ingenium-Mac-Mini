@@ -307,6 +307,28 @@ not look for), mended the same way.
     node rig/t_681_imago.js <Ingenium url>                          # Chromium: 37 checks (the old Imago failed 6)
     xvfb-run -a python3 rig/t_681_imago_wk.py <Ingenium url>         # Safari's engine: 20 checks (the old Imago failed 6)
 
+Imago's Change case worked once: the words were no longer selected after it, so a second press did nothing. They stay
+selected now, and each press goes on to the next case, as in Word (both tests press it three times on one word).
+
+Then every key on every tab of the three ribbons, pressed once with something selected (`rig/t_681_sweep.js`). A key that
+throws an error fails; a key that cannot be pressed (something covers it, or it is gone) fails; a key after which nothing
+changes at all is listed as silent, to be looked at by hand. What it found, and what was mended:
+  - Tabula's Styles pane and Comments pane ran the whole height of the window, over the right end of the ribbon and over
+    Tabula's own Guide and Close. Each now sits below the ribbon and the row of Write, Documents and the rest (following
+    them as the page scrolls) and above the status bar, so its Hide bar key stays in reach; the page makes room for the
+    Styles pane as it did for the comments; and inside Ingenium each pane keeps its rows clear of the side keys along the
+    window's right edge (`apps/tabula_ribbon_patch.py`).
+  - Tabula's Read mode had one way out, its own Exit reading key; Escape now leaves it too, as in Word.
+  - Imago's theme and layout galleries (Design) closed only with a press outside them, and an open one covered the keys
+    beside it; Escape now closes them too, as PowerPoint's (`apps/imago_ribbon_patch.py`).
+  - The letterhead builder, opened from the ribbon in any of the three, could only be closed with its own key; it now
+    closes with Escape (`apps/house_patch.py`).
+  - Abacus's dialogs (conditional formatting, a rule for what may be typed, a PivotTable and the rest) closed only with
+    their own keys; Escape now closes the top one and Enter presses its Apply, OK or Create, as in Excel
+    (`apps/abacus_ribbon_patch.py`).
+
+    node rig/t_681_sweep.js <Ingenium url> [tabula|abacus|slides ...]   # TABS='^(Home|View)$' to sweep some tabs only
+
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
 MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit

@@ -14,8 +14,8 @@ CARPE DIEM and Carpe Diem's blue. Here each takes the house it is carried in, wr
     name in capitals as the wordmark, its colour;
   - every other edition: no seal and no wordmark. The group keeps "Your own" (a seal, logo or letterhead from a picture
     on the device, kept on it), and the key that opened the house's letterheads opens that instead.
-And what the files say: a Word file's watermark is named "Watermark", a tracked change's author "Author" (Carpe Diem was
-named in both); Tabula's warning names the app it is in.
+The letterhead builder closes with Escape. And what the files say: a Word file's watermark is named "Watermark", a
+tracked change's author "Author" (Carpe Diem was named in both); Tabula's warning names the app it is in.
 
 patch(name, html, house) -> html; house = {"name", "word", "png" (a data: URL or None), "accent"}."""
 import json
@@ -90,6 +90,13 @@ def patch(name, html, house):
     cfg = ('<script id="ing-house">/* ' + MARK + ' · the app these studios are carried in */window.__ingHouse='
            + json.dumps(house, separators=(",", ":")).replace("</", "<\\/") + ';</script>\n')
     html = html[:start] + cfg + html[start:]
+    # the letterhead builder closes with Escape, as a dialog does (it closed only with its key or a press outside it)
+    esc = ("<script>window.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var o=document.getElementById('cd-lh-builder');"
+           "if(o){e.preventDefault();e.stopImmediatePropagation();o.remove();}},true);</script>\n")
+    i = html.rfind("</body>")
+    if i < 0:
+        raise SystemExit("house_patch: %s has no </body>" % name)
+    html = html[:i] + esc + html[i:]
     # what the files say, and the house's name where Carpe Diem was named
     html = html.replace("['#1B6B93', 'Carpe Diem blue']", "['#1B6B93', 'Deep blue']")
     if name == "tabula":

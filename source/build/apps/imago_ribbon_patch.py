@@ -9,6 +9,9 @@ and the words typed after choosing it. Imago, like Tabula, asks the browser for 
 size chosen; it looked for the largest written one way only, and Imago has the browser write styles, which writes it the
 other way, so nothing was turned. Now both ways are turned, in place, and the words typed after choosing a size are turned
 as they come (as Tabula's, apps/tabula_ribbon_patch.py).
+And Change case worked once: the words were no longer selected after it, so a second press did nothing. They stay selected
+now, and each press goes on to the next case (Title, CAPITALS, small letters), as in Word.
+And the theme and layout galleries (Design) closed only with a press outside them; Escape closes them too, as PowerPoint's.
 
 patch(text) -> text."""
 
@@ -34,10 +37,21 @@ NEW = """var imSizeNext=null;
   document.addEventListener('keydown',function(e){if(/^(Arrow|Home|End|Page)/.test(e.key))imSizeNext=null;},true);"""
 
 
+CASE_OLD = "    document.execCommand('insertText',false,out);hist();\n   });\n  });"
+CASE_NEW = ("    document.execCommand('insertText',false,out);\n"
+            "    try{var s2=window.getSelection();for(var k=0;k<out.length;k++)s2.modify('extend','backward','character');}catch(e){}hist();\n   });\n  });")
+
+# the theme and layout galleries close with Escape, as PowerPoint's do
+GAL_OLD = "function closeGal(){var g=document.querySelector('.im-gal');if(g)g.remove();}"
+GAL_NEW = (GAL_OLD + " document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.querySelector('.im-gal')){e.preventDefault();closeGal();}},true);")
+
+
 def patch(text):
     if "function imSizeTurn(" in text:
         return text
-    n = text.count(OLD)
-    if n != 1:
-        raise SystemExit("imago_ribbon_patch: the size list's function: expected one, found %d" % n)
-    return text.replace(OLD, NEW)
+    for old, new, what in ((OLD, NEW, "the size list's function"), (CASE_OLD, CASE_NEW, "change case"), (GAL_OLD, GAL_NEW, "the galleries")):
+        n = text.count(old)
+        if n != 1:
+            raise SystemExit("imago_ribbon_patch: %s: expected one, found %d" % (what, n))
+        text = text.replace(old, new)
+    return text
