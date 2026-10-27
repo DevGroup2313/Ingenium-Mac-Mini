@@ -3,6 +3,17 @@
  "v": 1,
  "keys": [
   {
+   "kid": "iej1hHjzk8YQm5BBv-52cR",
+   "jwk": {
+    "crv": "P-256",
+    "kty": "EC",
+    "x": "jLimQPq8WiSfRge_iu7Qe7-fE-lBn7z6kfyHF7ehzco",
+    "y": "fwgCio0OxurUKmdZPXbMT9Hp8wXzcz4p3G5GlS7AUUA"
+   },
+   "name": "Yannie D. Forest",
+   "made": "2026-10-27"
+  },
+  {
    "kid": "CdbXeLQDHJ63NSC4cT0xnK",
    "jwk": {
     "crv": "P-256",
