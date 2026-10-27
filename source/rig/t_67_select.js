@@ -342,7 +342,7 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     const ins = await p.evaluate(() => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)'; document.body.appendChild(d); const c = getComputedStyle(d), r = { t: c.paddingTop, b: c.paddingBottom }; d.remove(); return r; });
     ok(ins.t === '59px' && ins.b === '34px', 'the phone is set with a notch: safe areas of 59 pixels above and 34 below', ins);
     const ph = await p.evaluate(() => [...document.querySelectorAll('.r172-cb')].filter(c => { const pg = c.closest('section[id^="page-"]'); return c.offsetParent && (!pg || pg.classList.contains('active')); }).map(c => Math.round(c.getBoundingClientRect().height)));
-    ok(ph.length >= 8 && ph.every(h => h >= 44), 'on a phone every field is at least 44 pixels tall, for a finger', ph);
+    ok(ph.length >= 8 && ph.every(h => h >= 30 && h < 44), 'on a phone every field keeps its 6.6 size (6.8, the owner: not bigger), at least 30 pixels tall', ph);
     await shown(p, '#setTheme-dd'); await p.tap('#setTheme-dd'); await p.waitForTimeout(450);
     const sh = await p.evaluate(() => { const s = document.querySelector('.r172-sheet'); if (!s) return null; const r = s.getBoundingClientRect(), L = s.querySelector('.r172-list'), opts = [...L.querySelectorAll('[role=option]')], last = opts[opts.length - 1].getBoundingClientRect(), cl = s.querySelector('.r172-close').getBoundingClientRect(), scrim = document.querySelector('.r172-scrim');
       return { role: s.getAttribute('role'), modal: s.getAttribute('aria-modal'), title: s.querySelector('.r172-title').textContent, named: document.getElementById(s.getAttribute('aria-labelledby')) === s.querySelector('.r172-title'),
@@ -382,8 +382,8 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     await shown(p, '#setTheme-dd'); await p.tap('#setTheme-dd'); await p.waitForTimeout(400);
     const land = await p.evaluate(() => { const L = document.querySelector('.r172-list'); if (!L) return null; const r = L.getBoundingClientRect();
       return { sheet: !!L.closest('.r172-sheet'), rows: [...L.querySelectorAll('[role=option]')].map(o => Math.round(o.getBoundingClientRect().height)), top: Math.round(r.top), bottom: Math.round(r.bottom), left: Math.round(r.left), right: Math.round(r.right), vw: innerWidth, vh: innerHeight }; });
-    ok(land && !land.sheet && land.rows.length === 3 && land.rows.every(h => h >= 48) && land.top >= 0 && land.bottom <= land.vh && land.left >= 0 && land.right <= land.vw,
-      'a phone on its side (wider than 520 pixels) opens the list under or above its field, inside the screen, its lines at least 48 pixels tall', land);
+    ok(land && !land.sheet && land.rows.length === 3 && land.rows.every(h => h >= 40) && land.top >= 0 && land.bottom <= land.vh && land.left >= 0 && land.right <= land.vw,
+      'a phone on its side (wider than 520 pixels) opens the list under or above its field, inside the screen, its lines at least 40 pixels tall', land);
     await p.keyboard.press('Escape'); await p.waitForTimeout(150);
     await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(500);
     if (LX) {

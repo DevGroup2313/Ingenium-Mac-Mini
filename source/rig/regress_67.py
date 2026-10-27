@@ -46,7 +46,7 @@ A = lambda name: os.path.join(SERVE, "apps", name + ".html")
 PHOTOS = os.environ.get("EYES_PHOTOS", "")  # the owner's two photos (image1.jpg, a beach; image2.jpg, beagles) for t_62_eyes
 CORE = os.path.join(SRC, "build", "thoughts", "code_editor_core.html")
 TESTS = [  # name, extra arguments after <page url> <out>, or a function giving the whole argument list
-    ("t_67_select", [AXE]), ("t_67_phone", ["all"]), ("t_67_seal", [AXE]), ("t_67_sound", [AXE]), ("t_67_rooms", [AXE]),
+    ("t_67_select", [AXE]), ("t_68_phone", ["all"]), ("t_67_seal", [AXE]), ("t_67_sound", [AXE]), ("t_67_rooms", [AXE]),
     ("t_67_kits", []), ("t_67_security", []), ("t_67_claims", []),
     ("t_61_home", []), ("t_61_ask", []), ("t_61_backup", []), ("t_61_hub", ["forge=" + U + "/forge.html"]), ("t_61_refresh", []),
     ("t_61_seals", []), ("t_61_storage", []),

@@ -182,4 +182,18 @@ redirects between two local servers.
     node rig/make_big.js <out.html> <size in MB, 12 or more>
     python3 -I rig/t_67_app_sec.py <repo>/ingenium_app.py   # 11 checks: keys never follow a redirect elsewhere; the frame guard
 
+
+6.8 (27 October 2026). The owner's words: "I want the old display back but I want it fixed. Making everything bigger is not
+fixing it." On a phone and a tablet the keys, fields, lists and the side column keep their 6.6 sizes and places: 6.7's rule
+that made everything 44 pixels with a finger (`modules/r174.js` points 1 and 4, and the same rule in `r172.js`, `r173.js` and
+`r176.js`) is gone. What stays is what kept things whole: every panel of the top bar and of the side keys opens inside the
+window and its safe areas (`r174.js`; a panel held by its top and its foot, such as Help, keeps its height when it is moved,
+and scrolls inside itself), and the top bar shows the seal alone when the name would be cut. On a very short screen (a small
+phone held sideways) the side keys come just small enough to fit (`r155.js`, never under 26 pixels). Settings, Models and Blend
+keep their rooms, as small pills that wrap on a phone. `desktop/app_id_68.py` gives the computer app its own identity on
+Windows (AppUserModelID, from app.json), and `installer/Ingenium.iss` gives its shortcuts the same, so its taskbar button and
+pins are never shared with the owner's other apps when it runs from the kit's script.
+
+    node rig/t_68_phone.js <url> <out> [phones|panels|side|axe|tablets|all]   # 752 checks (axe with T67_AXE=axe.min.js): no overflow, no box past an edge, every panel whole, the keys in their 6.6 sizes, at the iPhone, iPad and Fire sizes
+
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.

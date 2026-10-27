@@ -2,7 +2,7 @@
 /* ============ R176 · SOUND: THE ANALOGUE SOUNDS, AND THE KEYS TO GOVERN THEM (Ingenium 6.7, 25 October 2026) ============
    The controls: a Sound section at the foot of the Display panel, the same in a Sound card in Settings, and a small panel
    of choices. Everything here is drawn in Ingenium's own colours (its variables), by day and by night, raised like the
-   panel's other keys, with targets of 44 pixels where a finger presses. */
+   panel's other keys, in the sizes of the panel's other keys. */
 #dpSound .dp-row{margin-bottom:8px}
 #dpSound label.dp-label{display:block}
 .snd-vol{display:flex;align-items:center;gap:10px;min-width:0}
@@ -50,12 +50,9 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
 .isc-lvl{display:flex;align-items:center;gap:10px;margin-top:10px}
 .isc-lvl label{position:relative;flex:0 0 auto;min-width:64px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .isc-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.isc-box .isc-x{min-width:30px;min-height:30px}
 .isc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--hairline);padding-top:12px;margin-top:2px}
-@media (pointer:coarse),(max-width:600px){
-  #dpSound .seg-btn,#ingSoundCard .seg-btn,#ingSoundCard .btn,.isc-box .seg-btn,.isc-box .isc-pill.seg-btn,.isc-box .isc-listen.seg-btn,.isc-box .btn{min-height:44px}
-  .isc-box .isc-x{min-width:44px;min-height:44px}
-  #dpSound [data-snd-on],#ingSoundCard [data-snd-on]{min-width:64px}
-  .snd-vol input[type=range],.isc-lvl input[type=range]{height:44px}
+@media (max-width:600px){
   .isc-opts{grid-template-columns:1fr}
   .isc-box{padding:16px 14px 14px;border-radius:14px}
 }
