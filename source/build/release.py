@@ -8,6 +8,8 @@
   python3 release.py edition full|gift|demo OUT    -> that edition's release page (stamped, with the kit store), into OUT only
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tail  # 6.8.1 (tail.py)
 H = os.path.dirname(os.path.abspath(__file__))
 R = {"mini": "/home/user/Ingenium-Mac-Mini", "intel": "/home/user/Ingenium-Mac-Intel",
      "win": "/home/user/Ingenium-HPWindows", "fire": "/home/user/Ingenium-Android-fire"}
@@ -92,7 +94,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_win_64", "_another_copy_is_open", ("mini", "intel", "win")), ("app_train_65", "TRAIN_LR_MORE", ("mini", "intel", "win")),
            ("app_studio_65", "_gguf_to_f32", ("mini", "intel", "win")),
            ("app_frames_67", "_guard_bridge_frames", ("mini", "intel", "win")), ("app_relay_67", "_IngSafeRedirect", ("mini", "intel", "win")),
-           ("app_care_671", "_care_attach", ("mini", "intel", "win")), ("app_id_68", "_own_taskbar_identity", ("mini", "intel", "win"))]
+           ("app_care_671", "_care_attach", ("mini", "intel", "win")), ("app_id_68", "_own_taskbar_identity", ("mini", "intel", "win")),
+           ("app_quick_681", "_quick_take_tails", ("mini", "intel", "win"))]
 
 
 def desktop():
@@ -111,7 +114,7 @@ def build(out, edition="master"):
     desktop()
     subprocess.run([sys.executable, os.path.join(H, "build_page.py"), out], check=True,
                    env=dict(os.environ, ING_RELEASE="1", ING_EDITION=edition))  # 6.1: modules held.json names stay out of a release
-    pg = open(out, encoding="utf-8").read()
+    pg = tail.untail(open(out, encoding="utf-8").read())  # 6.8.1: the blocks carried for later back in their places
     pg, n = re.subn(r'var ING_VERSION="[0-9.]+",ING_PAGE_DATE="[^"]*";', 'var ING_VERSION="%s",ING_PAGE_DATE="%s";' % (vj["v"], vj["date"]), pg)
     assert n == 1, "ING_VERSION"
     ob = old_bundle(pg)
@@ -162,6 +165,7 @@ def build(out, edition="master"):
     block = '<script id="%s" type="ingenium/kit-bundle-gz" data-bytes="%d">%s</script>' % (SLOT, len(raw), b64)
     pg, n = re.subn(r'<script id="%s"[^>]*>[^<]*</script>' % SLOT, lambda m: block, pg, count=1)
     assert n == 1 and pg.rstrip().endswith("</html>")
+    pg = tail.tail(pg)  # 6.8.1: and at the end of the page again, after its last part
     open(out, "w", encoding="utf-8").write(pg)
     print("%s edition: page %d bytes; kit store %d files (%.0f KB) from %s" % (edition, len(pg), len(files), total / 1024, commits))
     return pg
