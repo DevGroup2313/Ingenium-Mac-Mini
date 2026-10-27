@@ -329,6 +329,17 @@ changes at all is listed as silent, to be looked at by hand. What it found, and 
 
     node rig/t_681_sweep.js <Ingenium url> [tabula|abacus|slides ...]   # TABS='^(Home|View)$' to sweep some tabs only
 
+Abacus's grid, against Excel's keys (`apps/abacus_ribbon_patch.py`). What was typed in a cell chosen was added to what it
+held ("Item" and 1 made "Item1"); the arrows moved the caret, never from cell to cell; Ctrl+X, Ctrl+C and Ctrl+V were kept
+from the browser, so nothing went to the clipboard or came from it, and Cut, Copy and Paste took one cell only. Now what is
+typed takes the cell's place; a double press or F2 edits it in place, and Escape gives back what was there; the arrows go
+from cell to cell and, with Shift, widen the selection; Shift+Enter goes up; Cut, Copy and Paste take every cell selected,
+with its look, its number format and its formulas (their references following them, as in Excel), and pass columns to and
+from other programs.
+
+    node rig/t_681_abacus_keys.js <Ingenium url>                      # Chromium: 28 checks (the old Abacus failed 23)
+    xvfb-run -a python3 rig/t_681_abacus_keys_wk.py <Ingenium url>     # Safari's engine: 11 checks
+
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
 MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit

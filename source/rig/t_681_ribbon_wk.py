@@ -48,9 +48,15 @@ with Session() as s:
     base = st("Alpha")
 
     def pick(w):
-        r = s.js(FIND, w)
-        s.click_at(r[0], r[1], count=2)
-        time.sleep(.3)
+        for attempt in range(3):   # the text may still be settling after the last key; a person would look and choose again
+            r = s.js(FIND, w)
+            s.click_at(r[0], r[1], count=2)
+            time.sleep(.3)
+            got = s.js("return String(getSelection()).trim()")
+            if got == w:
+                return
+            print("  (the press for %r chose %r; chosen again)" % (w, got), flush=True)
+            time.sleep(.6)
 
     def press(css, i=0):
         r = s.js("var e=document.querySelectorAll(arguments[0])[arguments[1]];if(!e)return null;var b=e.getBoundingClientRect();return [b.left+b.width/2,b.top+b.height/2];", css, i)
