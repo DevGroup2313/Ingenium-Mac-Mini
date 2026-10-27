@@ -59,3 +59,17 @@ keys must be treated as known to others, so both are being replaced.
 - What the owner does: add the one secret (signing/SIGNING.txt has the steps), then run the build. After the first build
   signed with the new key, `signing/ingenium-release.keystore` can be deleted from Ingenium-Android-fire.
 - The Forge's Fire key (Forge-Fire) is not in this session's repositories, so it is still to be changed the same way.
+
+## 27 October 2026 (Ingenium 6.8, The Forge 649): both keys made again, with a passphrase the owner holds
+
+- The bundles of 25 October opened with a passphrase that never reached the owner: the session that made it ended first, and
+  nothing kept it. So the Forge's 647 and 648 stopped at signing, and a build from another branch (641) stood on the Forge-Fire
+  Releases page until 27 October.
+- New keys for Ingenium and the Forge (RSA 4096, 30 years, "CN=Yannie D. Forest, O=The Offline Project"), each with a new lineage
+  from its old key (no right to roll back), in `signing/ingenium-signing-2026.gpg` and `signing/the-forge-signing-2026.gpg`. One
+  passphrase opens both (about 103 bits, eight words); the owner was given it in the session of 27 October and sets it as the secret
+  ANDROID_SIGNING_PASSPHRASE in Ingenium-Android-fire and in Forge-Fire. `signing_bundle.py` made them and checked each against a
+  real APK: the bundle opens as the workflow opens it, and an APK signed through the lineage verifies with apksigner, the old key
+  for Android 7 and 8 and the new key for Android 9 and newer.
+- Until the secret is set, Forge-Fire signs with the old key, read from the repository's history at build time (the APK on the
+  tablet already has it), and Ingenium-Android-fire with the old key in its signing folder, as before.
