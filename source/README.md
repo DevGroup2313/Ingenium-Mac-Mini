@@ -197,3 +197,37 @@ pins are never shared with the owner's other apps when it runs from the kit's sc
     node rig/t_68_phone.js <url> <out> [phones|panels|side|axe|tablets|all]   # 752 checks (axe with T67_AXE=axe.min.js): no overflow, no box past an edge, every panel whole, the keys in their 6.6 sizes, at the iPhone, iPad and Fire sizes
 
 The scripts name Playwright at /opt/node-tools/node_modules/playwright; change the path to where yours is.
+
+6.8.1 (27 October 2026). The owner's words: "Adjust it so that any document prepared keeps the exact same formatting when it
+is downloaded. The formatting shown must always match the document that is downloaded. It also writes out the words "header"
+and "footer" in the repective words positions when downloading a PDF, please remove that requirement." A document is drawn
+once, by the browser, and its PDF and Word file are read off that drawing (`modules/r183.js`, `IngDoc`):
+- `build/docfont/`: the typefaces a document is set in, carried in the page (Gelasio, Georgia's measures; Liberation Serif,
+  Sans and Mono, Times New Roman's, Arial's and Courier New's; Doc Symbols, the signs of DejaVu Sans renamed; Cormorant and
+  Cinzel for Lector's Inkwell and Offline Project papers, renamed Doc Garamond and Doc Capitals), with their licences.
+  `docfont.py` lists them; `build_page.py` writes them where r183 says `/*R183_FONTS*/null`.
+- A chat's document is shown as its A4 pages, made smaller whole on a narrow panel. Its PDF writes every word where the
+  browser put it, in the face the browser used (the part of each font it needs, embedded), with every fill, rule, picture
+  and link, and breaks its pages where the page shows them; a character no font here has is drawn as a picture of the
+  browser's own drawing. Its Word file is read off the same drawing: Georgia, Times New Roman, Arial and Courier New (whose
+  measures the page's faces share), the page's sizes, colours, spacing, indents, tables at the page's column widths.
+- Lector's paper (`modules/r108.js`) keeps its 640-pixel measure on every panel and phone (zoomed whole, never re-set;
+  `r107.js` no longer narrows it), is set in the carried faces, unkerned, and shows a dashed mark where each PDF page
+  begins. Its PDF and Word file are made from the paper itself (`paperPage`, `paperOpts`), with its seals, crest, frame
+  (a page border in Word), Inkwell's laid lines, and its faces embedded in Word where no copy of Word has them.
+- `apps/tabula_hf_patch.py`: Tabula's PDF and Word file read the header's and footer's own words, not their labels.
+- No file names a program: a PDF's information is its title; a Word file's properties, its title.
+
+    node rig/t_681_docs.js <url> <out> && python3 -I rig/t_681_docs.py <out>   # a long document: the shown pages against the PDF's, pixel by pixel; the PDF and the Word file written
+    node rig/t_681_lector.js <url> <out>                                      # Lector's paper in six papers: every word in the same place on the page and in the frame its files are made in
+
+Also in 6.8.1 (her words: "Carpe Diem's seal logo should not be inside of Ingenium's seal section on the apps ribbons ... only
+the master (owner's version) has the seal or app logo in the apps ribbons, the demos and gift builds should not have them"):
+`apps/house_patch.py` gives Tabula, Abacus and Imago the house they are carried in (`window.__ingHouse`). In the master
+edition their Seals & letterheads group, its letterheads, the watermark and a signed page show Ingenium's seal, the name
+INGENIUM and Ingenium's purple; in every other edition no seal and no wordmark, and the key beside the group opens Your own
+(a seal or logo from a picture on the device). Their Word files no longer name Carpe Diem (a watermark is "Watermark", a
+tracked change's author "Author").
+
+    node rig/t_681_house.js <url> <out> [master|other]                        # the three apps' seal studio, letterheads and watermark menu, by edition, 14 checks
+

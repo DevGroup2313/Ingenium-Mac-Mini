@@ -88,8 +88,11 @@ function appOfText(t){try{var a=IngHouseDocs.apps(t);return a.length===1?a[0]:nu
 var LX7_FONTS=/*R108_FONTS*/null;
 /* 6.1: the fonts are shared with the new Home page (r147), so the page carries them once */
 try{window.LX7_FONTS=LX7_FONTS;}catch(e){}
-var SANS='-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif',TIMES='"Times New Roman",Times,serif',GEORGIA='Georgia,"Iowan Old Style","Times New Roman",serif',
-  CORM='"Lector Cormorant","Cormorant Garamond",Cormorant,Garamond,Georgia,serif',CINZEL='"Lector Cinzel",Cinzel,"Trajan Pro",Optima,Georgia,serif',IOWAN='"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif';
+/* 6.8.1: each face first in its list is one the page carries (build/docfont, r183): Liberation Serif and Sans are drawn to Times
+   New Roman's and Arial's measures, Gelasio to Georgia's; so the paper, its PDF and its Word file are set alike */
+var FB='"Liberation Serif","Doc Symbols"',SANS='"Liberation Sans","Doc Symbols",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif',TIMES='"Liberation Serif","Doc Symbols","Times New Roman",Times,serif',
+  GEORGIA='"Gelasio",'+FB+',Georgia,"Times New Roman",serif',CORM='"Cormorant","Gelasio",'+FB+',"Cormorant Garamond",Garamond,Georgia,serif',CINZEL='"Cinzel","Gelasio",'+FB+',"Trajan Pro",Optima,Georgia,serif',
+  IOWAN='"Gelasio",'+FB+',"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif',MONO='"Liberation Mono","Doc Symbols",ui-monospace,"SF Mono",Menlo,Consolas,monospace';
 var PT={
   neutral:{body:TIMES,disp:TIMES,caps:TIMES,h2:TIMES,fs:15,h1:24,h1w:700,h1ls:"0",capsw:600,capsls:".18em",capsfs:11.5,h2w:700,h2ls:"0",h2fs:16,
     day:{desk:"#efeaf4",bg:"#ffffff",tex:"none",ink:"#1e1828",ink2:"#454549",acc:"#2b2b33",title:"#1e1828",sub:"#454549",gold:"#8a7650",caps:"#8a7650",tint:"#f2f2f4",hair:"rgba(30,24,40,.14)",line:"rgba(30,24,40,.14)",rule:"#4a405a",code:"#f4f2f6",fill:"#8a6526",chk:"#b0302f",frame:"transparent",qbg:"transparent",qink:"#454549"},
@@ -117,16 +120,16 @@ var LATIN=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVG
 function romanDate(d){d=d||new Date();return roman(d.getDate())+"\u00b7"+LATIN[d.getMonth()]+"\u00b7"+roman(d.getFullYear());}
 function themeOf(kind,apps){if(kind==="cover"||kind==="cv")return "neutral";apps=apps||[];if(apps.length>1)return "family";return PT[apps[0]]?apps[0]:"neutral";}
 /* the paper's rules, for the page (night follows Ingenium's own switch) or for a saved web page (night follows the reader's device; printed, always day) */
-function paperCss(forPage){var S=forPage?"#lx7 ":"",out=[];
+function paperCss(forPage,dayOnly){var S=forPage?"#lx7 ":"",out=[];
   function vars(v){return "--p-frame:"+v.frame+";--p-qbg:"+v.qbg+";--p-qink:"+v.qink+";--p-desk:"+v.desk+";--p-bg:"+v.bg+";--p-tex:"+v.tex+";--p-ink:"+v.ink+";--p-ink2:"+v.ink2+";--p-acc:"+v.acc+";--p-title:"+v.title+";--p-sub:"+v.sub+";--p-gold:"+v.gold+";--p-caps:"+v.caps+";--p-tint:"+v.tint+";--p-hair:"+v.hair+";--p-line:"+v.line+";--p-rule:"+v.rule+";--p-code:"+v.code+";--p-fill:"+v.fill+";--p-chk:"+v.chk;}
   function own(m){return Object.keys(OWN[m]).map(function(k){return "--c-"+k+":"+OWN[m][k];}).join(";");}
   var DAYSH="0 1px 0 rgba(40,22,68,.06),0 3px 8px rgba(40,22,68,.08),0 18px 40px rgba(40,22,68,.12)",NIGHTSH="0 0 0 1px rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.38),0 20px 44px rgba(0,0,0,.5)";
   Object.keys(PT).forEach(function(k){var t=PT[k];
     out.push(S+".th-"+k+"{--p-body:"+t.body+";--p-disp:"+t.disp+";--p-capsf:"+t.caps+";--p-h2f:"+t.h2+";--p-fs:"+t.fs+"px;--p-h1:"+t.h1+"px;--p-h1w:"+t.h1w+";--p-h1ls:"+t.h1ls+";--p-capsw:"+t.capsw+";--p-capsls:"+t.capsls+";--p-capsfs:"+t.capsfs+"px;--p-h2w:"+t.h2w+";--p-h2ls:"+t.h2ls+";--p-h2fs:"+t.h2fs+"px;"+vars(t.day)+";"+own("day")+";--p-sh:"+DAYSH+"}");
     var nightRule=".th-"+k+"{"+vars(t.night)+";"+own("night")+";--p-sh:"+NIGHTSH+"}";
-    if(forPage)out.push('body[data-theme="night"] #lx7 '+nightRule);else out.push("@media screen and (prefers-color-scheme:dark){"+nightRule+"}");});
+    if(forPage)out.push('body[data-theme="night"] #lx7 '+nightRule);else if(!dayOnly)out.push("@media screen and (prefers-color-scheme:dark){"+nightRule+"}");});
   var P=S+".l-paper";
-  out.push(P+"{max-width:640px;margin:0 auto;background-color:var(--p-bg);background-image:var(--p-tex);color:var(--p-ink);border-radius:3px;box-shadow:var(--p-sh);padding:46px 52px 52px;font:var(--p-fs)/1.62 var(--p-body);text-align:left}",
+  out.push(P+"{width:640px;max-width:none;box-sizing:border-box;margin:0 auto;background-color:var(--p-bg);background-image:var(--p-tex);color:var(--p-ink);border-radius:3px;box-shadow:var(--p-sh);padding:46px 52px 52px;font:var(--p-fs)/1.62 var(--p-body);text-align:left}",
     P+" + .l-paper{margin-top:16px}",
     P+" .cv{display:flex;flex-direction:column;align-items:center;gap:9px;padding:10px 0 18px;border-bottom:1px solid var(--p-line);margin-bottom:24px;text-align:center}",
     P+" .cv .seals{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:2px}",
@@ -144,10 +147,10 @@ function paperCss(forPage){var S=forPage?"#lx7 ":"",out=[];
     P+" h2{font:var(--p-h2w) var(--p-h2fs)/1.3 var(--p-h2f);letter-spacing:var(--p-h2ls);margin:24px 0 9px;color:var(--p-acc)}",
     P+" h2.own-cd{color:var(--c-cd)}"+P+" h2.own-forge{color:var(--c-forge)}"+P+" h2.own-ingenium{color:var(--c-ingenium)}"+P+" h2.own-inkwell{color:var(--c-inkwell)}",
     P+" h3{font:italic 700 calc(var(--p-fs) + .5px)/1.3 var(--p-body);margin:16px 0 6px;color:var(--p-sub)}",
-    P+" p{margin:0 0 10px}",P+" ul,"+P+" ol{margin:0 0 10px;padding-left:22px}",P+" li{margin:0 0 4px}",P+" li::marker{color:var(--p-acc)}",
+    P+" p{margin:0 0 10px}",P+" ul,"+P+" ol{margin:0 0 10px;padding-left:22px}",P+" li{margin:0 0 4px;list-style:none;position:relative}",P+" li .mk{position:absolute;left:-22px;width:16px;text-align:right;color:var(--p-acc)}",
     P+" hr{border:0;border-top:1px solid var(--p-line);margin:18px 0}",
     P+" blockquote{margin:0 0 10px 18px;padding-left:12px;border-left:2px solid var(--p-line);font-style:italic;color:var(--p-ink2)}",
-    P+" pre{background:var(--p-code);color:var(--p-ink);padding:8px 10px;border-radius:4px;border:1px solid var(--p-hair);font:12px/1.5 ui-monospace,\"SF Mono\",Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}",
+    P+" pre{background:var(--p-code);color:var(--p-ink);padding:8px 10px;border-radius:4px;border:1px solid var(--p-hair);font:12px/18px "+MONO+";white-space:pre-wrap;word-break:break-word}",
     P+" table{width:100%;border-collapse:collapse;font:calc(var(--p-fs) - 2px)/1.45 var(--p-body);margin:8px 0 14px;display:block;overflow-x:auto}",
     P+" th,"+P+" td{border-bottom:1px solid var(--p-hair);padding:5px 6px;text-align:left;vertical-align:top}",
     P+" th{font-weight:700;color:var(--p-acc);border-top:1.5px solid var(--p-rule);border-bottom:1.5px solid var(--p-rule);background:var(--p-tint)}",
@@ -162,7 +165,6 @@ function paperCss(forPage){var S=forPage?"#lx7 ":"",out=[];
     P+"{position:relative}",P+"::before{content:\"\";position:absolute;inset:12px;border:1px solid var(--p-frame);border-radius:2px;pointer-events:none}",
     P+" blockquote{background:var(--p-qbg);color:var(--p-qink);padding:8px 12px;border-radius:0 6px 6px 0}",
     P+" .cv .tag{font:italic calc(var(--p-fs) + 1.5px)/1.4 var(--p-disp);color:var(--p-acc);margin-top:-2px}",
-    P+" h2 .no{font-variant-numeric:lining-nums}",
     /* Carpe Diem: its small headings in its own spaced blue capitals */
     S+".th-cd h3{font:700 11.5px/1.4 "+SANS+";letter-spacing:.14em;text-transform:uppercase;color:var(--p-acc);margin:18px 0 7px}",
     /* Ingenium: the title in spaced capitals, as its wordmark; a four-pointed star set in the rule under the cover; each section's number on a small lilac key */
@@ -173,16 +175,24 @@ function paperCss(forPage){var S=forPage?"#lx7 ":"",out=[];
     S+".th-ingenium h2{display:flex;align-items:baseline;gap:9px}",
     S+".th-ingenium h2 .no{flex:0 0 auto;display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:6px;background:var(--p-tint);border:1px solid var(--p-line);font:700 12px/1 "+SANS+";color:var(--p-acc);transform:translateY(-2px)}",
     S+".th-ingenium h2 .dot{display:none}");
-  if(forPage)out.push("#lx7 .l-desk[class*=\"th-\"]{background:var(--p-desk)}");
-  else out.push("body{margin:0;background:var(--p-desk)}",".l-paper{max-width:720px;margin:28px auto;padding:56px 64px 64px}",
+  /* 6.8.1: set as its PDF sets it, every element of it: no kerning, no ligatures, no bold or italic made up (a face's own "font"
+     rule would put them back, so this comes last and holds) */
+  out.push(P+" *,"+P+" *::before,"+P+" *::after{box-sizing:border-box}");
+  out.push(P+","+P+" *{font-kerning:none !important;font-variant-ligatures:none !important;font-synthesis:none !important;font-feature-settings:\"kern\" 0,\"liga\" 0,\"clig\" 0,\"calt\" 0 !important}");
+  if(forPage)out.push("#lx7 .l-desk[class*=\"th-\"]{background:var(--p-desk)}",
+    /* 6.8.1: where its PDF starts each new page */
+    "#lx7 .l-paper .l-pbrk{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--p-line);pointer-events:none;z-index:1}",
+    "#lx7 .l-paper .l-pbrk span{position:absolute;right:16px;top:-9px;padding:0 6px;background-color:var(--p-bg);font:600 10px/16px "+SANS+";letter-spacing:.08em;text-transform:uppercase;color:var(--p-ink2)}");
+  else out.push("body{margin:0;background:var(--p-desk)}",".l-paper{width:auto;max-width:720px;margin:28px auto;padding:56px 64px 64px}",
     "@media (max-width:760px){.l-paper{margin:0;padding:28px 20px;border-radius:0}}",
     "@media print{body{background:#fff}.l-paper{box-shadow:none;margin:0;max-width:none;padding:0;background-image:none}}","@page{size:A4;margin:25mm 25mm 22mm}");
   return out.join("\n");}
-/* the faces the papers are set in (Inkwell's Cormorant, Cinzel for The Offline Project), both under the SIL Open Font Licence */
-function fontCss(which){var F=LX7_FONTS||{},out=[];function face(fam,key,w,st){if(F[key])out.push('@font-face{font-family:"'+fam+'";font-style:'+st+';font-weight:'+w+';font-display:swap;src:url('+F[key]+') format("woff2")}');}
-  if(!which||which==="inkwell"){face("Lector Cormorant","cormorant-500-normal",500,"normal");face("Lector Cormorant","cormorant-600-normal",600,"normal");face("Lector Cormorant","cormorant-700-normal",700,"normal");face("Lector Cormorant","cormorant-500-italic",500,"italic");}
-  if(!which||which==="family")face("Lector Cinzel","cinzel-600-normal",600,"normal");
-  return out.join("\n");}
+/* the faces the papers are set in: the page's own (r183, build/docfont, each under an open licence), all of them for Lector's page,
+   and for a page saved to a file or laid out for its PDF those its theme and its words need */
+function fontCss(th,text){var D=window.IngDoc;if(!D||!D.faceCss)return "";if(!th)return D.faceCss();
+  var T=PT[th]||PT.neutral,fams=[T.body,T.disp,T.caps,T.h2].concat(th==="cd"||th==="ingenium"?[SANS]:[]).concat(/```|~~~/.test(text||"")?[MONO]:[])
+    .map(function(x){var m=/^"([^"]+)"/.exec(x);return m?m[1]:"";}).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+  return D.faceCss(D.facesFor(String(text||"")+"\u2726\u2022\u00b70123456789",fams,["Gelasio","Liberation Serif","Doc Symbols"]));}
 function paperStyle(){if(document.getElementById("l7PaperCss"))return;var st=document.createElement("style");st.id="l7PaperCss";st.textContent=fontCss()+"\n"+paperCss(true);document.head.appendChild(st);}
 /* a seal on the paper, flat: by day its picture; by night the app's own night seal, its layers laid one on another */
 function paperSeal(k,mode){var L=LX7_LAYERS||{};
@@ -668,7 +678,7 @@ function inl(t,chk){var s=lxInline(t,esc);s=s.replace(/\[((?:your|to fill|the re
     s=s.replace(re,'$1<span class="chk" title="'+why+'">$2</span>');});}
   if(chk){mark(chk.unmatched,"Not found in the measures, your CV or the posting: check it");mark(chk.fromNotes,"Found only in Lector\'s own reading notes, not in the material: check it");}
   return s;}
-function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":(night()?"night":"day");
+function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv",a=o.apps||[],th=themeOf(kind,a),mode=o.both?"both":o.day?"day":(night()?"night":"day");
   var open='<div class="l-paper th-'+th+'">';
   var out=[],blocks=lxBlocks(md);if(blocks.length&&blocks[0].k==="h"&&blocks[0].lv===1)blocks.shift();
   var note=null;if(blocks.length>1&&blocks[blocks.length-2].k==="hr"&&blocks[blocks.length-1].k==="p"){note=blocks.pop().t;blocks.pop();}
@@ -685,8 +695,8 @@ function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv"
   if(kind==="cover")out.push('<div class="lhead"><b>'+esc(author()||"")+'</b>'+esc(today())+'</div>');
   if(o.wait){out.push('<p class="wait">'+(job()?"Written after the reading, section by section, as you watch.":"Written after the reading. Press Start reading in the brief.")+'</p>');return open+out.join("")+'</div>';}
   var n=0,hi=0,refs=false,lettered=blocks.some(function(b){return b.k==="h"&&b.lv===2&&/^[A-H][.)]\s/.test(b.t);}),list=null;
-  function flush(){if(list){out.push("<"+list.t+">"+list.items.join("")+"</"+list.t+">");list=null;}}
-  blocks.forEach(function(b){if(b.k==="ul"||b.k==="ol"){var t=b.k;if(!list||list.t!==t){flush();list={t:t,items:[]};}list.items.push("<li>"+inl(b.t,o.chk)+"</li>");return;}flush();
+  function flush(){if(list){out.push("<"+list.t+">"+list.items.map(function(x,i){return '<li><span class="mk" aria-hidden="true">'+(list.t==="ol"?(i+1)+".":"\u2022")+"</span>"+x+"</li>";}).join("")+"</"+list.t+">");list=null;}}
+  blocks.forEach(function(b){if(b.k==="ul"||b.k==="ol"){var t=b.k;if(!list||list.t!==t){flush();list={t:t,items:[]};}list.items.push(inl(b.t,o.chk));return;}flush();
     if(b.k==="h"){var t2=b.t.trim();if(b.lv<=2){refs=/^(works cited|references|bibliography|sources)$/i.test(t2);if(!refs&&!lettered&&!/^(\d+|[A-H])[.)]\s/.test(t2)&&kind!=="analysis")t2=(++n)+". "+t2;
         var own=a.length>1?(IngHouseDocs.apps(t2).filter(function(k){return a.indexOf(k)>=0;})):[],nm2=/^(\d+|[A-H])([.)])\s+([\s\S]*)$/.exec(t2);
         out.push('<h2 data-h="'+(hi++)+'"'+(own.length===1?' class="own-'+own[0]+'"':'')+'>'+(nm2?'<span class="no">'+nm2[1]+'</span><span class="dot">'+nm2[2]+' </span><span>'+inl(nm2[3])+'</span>':inl(t2))+'</h2>');}
@@ -973,6 +983,14 @@ function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to s
   var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title),fmt=L7().brief.fmt||"docx";
   var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
   if(d.kind==="cover"||d.kind==="cv")meta.name=undefined;
+  /* 6.8.1: a PDF and a Word file are read off the paper itself (r183), as the page shows it: its faces, sizes, colours, spacing,
+     seals and crest, at its own measure, its pages breaking where the paper's marks show */
+  if((fmt==="pdf"||fmt==="docx")&&window.IngDoc&&IngDoc.make){var what=fmt==="pdf"?"PDF":"Word file";ingToast("Making the "+what+", as the page shows it…");
+    crestFor(sealed(d.kind)?crestKind(apps):"",apps,"html").then(function(cr){var s0=d.kind==="analysis"?null:stored(d.kind);
+      return IngDoc.make(fmt,paperPage(d.kind,d.md,{apps:apps,name:name,label:label,forText:meta.forText,title:title,crestPng:cr&&cr.html,made:s0&&s0.made}),paperOpts(d.kind,apps,title));})
+    .then(function(r){saveFileNative(file+"."+fmt,fmt==="pdf"?"application/pdf":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",r.bytes);},
+      function(e){ingToast("The "+what+" could not be made: "+(e&&e.message||e));});
+    return;}
   /* 6.1: the crest of the set is drawn first (a picture made on this device, by day for Word and PDF, by day and by night
      for a web page), then the file is made with it on its cover */
   crestFor(sealed(d.kind)?crestKind(apps):"",apps,fmt).then(function(cr){
@@ -988,7 +1006,14 @@ function crestFor(ck,apps,fmt){if(!ck||!window.IngSeal||fmt==="md")return Promis
   var p=fmt==="html"?Promise.all([IngSeal.png(apps,{night:false,width:ck==="duo"?520:300}),IngSeal.png(apps,{night:true,width:ck==="duo"?520:300})]).then(function(x){return {html:{day:x[0],night:x[1]}};})
     :IngSeal.docPicture(apps).then(function(dp){return dp?{doc:dp}:null;});
   return p.catch(function(e){ingToast("The set’s seal could not be drawn on this device, so the document carries each app’s own seal. "+(e&&e.message||""));return null;});}
-function htmlDoc(kind,md,o){var th=themeOf(kind,o.apps),css=fontCss(th==="inkwell"?"inkwell":th==="family"?"family":"none")+"\n"+paperCss(false)+
+/* the paper as its PDF and its Word file are read off: by day, at its measure, in the faces it needs, nothing around it */
+function paperPage(kind,md,o){var th=themeOf(kind,o.apps);
+  return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="color-scheme" content="light"><title>'+esc(o.title||"")+'</title><style>'+fontCss(th,md)+"\n"+paperCss(false,true)+
+    "\nhtml,body{margin:0;background:#fff}.l-paper{width:640px !important;max-width:none !important;margin:0 !important;padding:46px 52px 52px !important;box-shadow:none !important;border-radius:0 !important}"+
+    '</style></head><body class="th-'+th+'">'+paper(kind,md,Object.assign({},o,{day:true}))+'</body></html>';}
+function paperOpts(kind,apps,title){var T=PT[themeOf(kind,apps)]||PT.neutral,ff=/^"([^"]+)"/.exec(T.body);
+  return {root:".l-paper",width:900,mt:72,mb:72,title:title,footFamily:ff?ff[1]:"Gelasio",prepare:function(d,root){IngDoc.materialise(d,root);},frame:IngDoc.beforeFrame};}
+function htmlDoc(kind,md,o){var th=themeOf(kind,o.apps),css=fontCss(th,md)+"\n"+paperCss(false)+
   "\n.l-paper .cv .seals .sn{display:none}@media screen and (prefers-color-scheme:dark){.l-paper .cv .seals .sd{display:none}.l-paper .cv .seals .sn{display:inline-block}}@media print{.l-paper .cv .seals .sn{display:none !important}.l-paper .cv .seals .sd{display:inline-block !important}}";
   return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>'+esc(o.title)+'</title><style>'+css+'</style></head><body class="th-'+th+'">'+paper(kind,md,Object.assign({},o,{both:true}))+'</body></html>';}
 
@@ -1176,7 +1201,22 @@ function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis
     if(e.offerKeep&&e.status==="error")acts.appendChild(btn("quiet","Keep it for the writing",function(){e.offerKeep=false;askSend(e.text,"all");}));
     if(acts.childNodes.length)lx.appendChild(acts);thb.appendChild(lx);});
   thb.scrollTop=thb.scrollHeight;}
-(function(){var pd=paintDoc;paintDoc=function(){var r=pd.apply(this,arguments);try{paintAsk();}catch(e){try{console.warn("Lector: the request box could not be drawn",e);}catch(_){}}return r;};})();
+/* 6.8.1 · where the pages will break: a dashed line across the paper at each place its PDF begins a new page, read the same way
+   (r183: whole lines, whole table rows and pictures, a heading kept with what follows, on A4 with margins of an inch), so the
+   paper shown is the document saved, page by page. Drawn again, a moment after the paper changes. */
+var marksT=0;
+function paperMarks(){marksT=0;var desk=$("l7Desk"),pp=desk&&desk.querySelector(".l-paper");if(!pp||!window.IngDoc||!IngDoc.atomsOf)return;
+  [].forEach.call(pp.querySelectorAll(".l-pbrk"),function(x){x.remove();});var r=pp.getBoundingClientRect();if(!r.width)return;
+  var cs=getComputedStyle(pp),pt=parseFloat(cs.paddingTop)||0,k=r.width/640,area=(IngDoc.PH-IngDoc.MT-IngDoc.MB)/IngDoc.PX;
+  var at=IngDoc.atomsOf(document,pp,"").map(function(a){return {t:(a.t+pt*(1-k))/k,b:(a.b+pt*(1-k))/k,h:a.h};}),st=IngDoc.breaksOf(at,area);
+  st.slice(1).forEach(function(y,i){var prev=at.filter(function(a){return a.b<=y+0.5;}).pop(),mid=prev?(prev.b+y)/2:y-4,m=document.createElement("div");
+    m.className="l-pbrk";m.setAttribute("aria-hidden","true");m.style.top=(pt+mid)+"px";var t=document.createElement("span");t.textContent="Page "+(i+2);m.appendChild(t);pp.appendChild(m);});}
+function marksSoon(){if(marksT)return;marksT=setTimeout(paperMarks,R7.live?700:120);}
+function watchMarks(){var desk=$("l7Desk");if(!desk||desk.__mo||typeof MutationObserver==="undefined")return;
+  desk.__mo=new MutationObserver(function(ms){if(ms.every(function(m){return [].every.call(m.addedNodes,function(n){return n.classList&&n.classList.contains("l-pbrk");})&&[].every.call(m.removedNodes,function(n){return n.classList&&n.classList.contains("l-pbrk");});}))return;marksSoon();});
+  desk.__mo.observe(desk,{childList:true,subtree:true,characterData:true});}
+try{window.IngLectorPaper={page:function(k,md,o){return paperPage(k,md,o||{});},opts:paperOpts,marks:paperMarks};}catch(e){}
+(function(){var pd=paintDoc;paintDoc=function(){var r=pd.apply(this,arguments);try{watchMarks();marksSoon();}catch(e){}try{paintAsk();}catch(e){try{console.warn("Lector: the request box could not be drawn",e);}catch(_){}}return r;};})();
 /* the document is loaded after paintDoc returns: the list of its sections follows once it is there */
 (function(){var last=null;setInterval(function(){try{if(!$("l7Ask"))return;var c=R7.cur&&(R7.cur.kind+":"+(R7.cur.md||"").length);if(c!==last){last=c;paintAsk();}}catch(e){}},700);})();
 
@@ -1188,18 +1228,19 @@ function setPanel(p){R7.panel=p;var tabs=$("l7Tabs");if(tabs)[].forEach.call(tab
    my large desktop screen when I try to expand it to fill the screen, especially on the Lector page, the document remains
    the same size in the middle even though the Document panel itself is spread out to fill the screen."
    The page keeps its own measure (640 points wide, as printed) and is zoomed as a whole, so it keeps its proportions and its
-   type is set again at the larger size, sharp. Fit makes it as wide as the panel, never smaller than its own size (a phone
-   or a narrow panel reads it as before, the page narrowing to fit) and never more than three times it; the keys beside Fit
-   make it smaller or larger, in steps.
+   type is set again at the larger size, sharp. Fit makes it as wide as the panel, and never more than three times it; the
+   keys beside Fit make it smaller or larger, in steps. 6.8.1: on a narrow panel or a phone it is made smaller whole, no longer
+   re-set to the panel's width, so its lines are always the lines of its PDF and its Word file (her words, 27 October 2026:
+   "The formatting shown must always match the document that is downloaded"); the + key makes it larger to read.
    The choice is kept with her other settings (state.v61.seals.zoom: "fit" or a number). */
-var ZSTEPS=[.5,.6,.7,.8,.9,1,1.1,1.25,1.5,1.75,2,2.25,2.5,3,3.5,4,5,6];
+var ZSTEPS=[.4,.5,.6,.7,.8,.9,1,1.1,1.25,1.5,1.75,2,2.25,2.5,3,3.5,4,5,6];
 /* Fit stops at three times the page's own size: past that (a panel more than 1,900 points wide, the others folded away) a page
    becomes a poster, a heading to a screen; the + key still takes it further for whoever wants it */
 var FITMAX=3;
 function zoomPref(){try{var S=state.v61&&state.v61.seals;var z=S&&S.zoom;return z==null||z==="fit"?"fit":clamp(+z||1,ZSTEPS[0],ZSTEPS[ZSTEPS.length-1]);}catch(e){return "fit";}}
 function setZoomPref(z){try{var V=state.v61=state.v61||{},S=V.seals=V.seals||{};S.zoom=z;saveSoon();}catch(e){}applyZoom();}
 function fitZoom(){var desk=$("l7Desk");if(!desk||!desk.clientWidth)return 1;var cs=getComputedStyle(desk),w=desk.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
-  return clamp(Math.floor(w/640*100)/100,1,FITMAX);}
+  return clamp(Math.floor(w/640*100)/100,ZSTEPS[0],FITMAX);}
 function curZoom(){var p=zoomPref();return p==="fit"?fitZoom():p;}
 function applyZoom(){var desk=$("l7Desk");if(!desk)return;var p=zoomPref(),z=curZoom(),was=parseFloat(desk.style.getPropertyValue("--l-zoom"))||1;
   if(Math.abs(was-z)>.001){var r=desk.scrollHeight>desk.clientHeight?desk.scrollTop/desk.scrollHeight:0;desk.style.setProperty("--l-zoom",String(z));if(r)desk.scrollTop=r*desk.scrollHeight;}
