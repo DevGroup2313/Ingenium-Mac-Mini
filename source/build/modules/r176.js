@@ -108,33 +108,26 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
    the volume or a level is at Silent instead of claiming to play; the four level sliders carry their role in their names;
    the words for Off no longer promise more silence than Off gives; the calm look is named as Settings names it; and a word
    said a moment ago gives way as soon as the volume, a level or On and Off change, so the note never contradicts the keys. */
-/* 6.8.1 (27 October 2026): her words, "I also want for Ingenium's introduction door sound and other app sounds to be
-   different from Carpe Diem and the Forge. I want Ingenium to have its own identity and its own sounds." The engine above
-   stays (made on the device, placed left or right, a small room around each, the same quiet levels and the same rules for
-   when a sound may play); the voices are Ingenium's own, the things of a college study (see "Ingenium's own" below):
-     notify   Tuning fork   (Orrery bell, Margin note)
-     confirm  Wax seal      (Escapement, Brass stamp)
-     room     Library door  (Study lamp, Archive key)
-     paper    Each room its own: a page turned in Lector, Guide and the apps, a card drawer in Fabrica and Models, a pen in
-              Chat, a typebar in Code and Build, a brass gear in Focus and Blend, a ledger's tap at Home and in Settings
-              (or one of those six for every page)
-   A choice kept from before (one of Carpe Diem's names) gives way to Ingenium's own at the next start. */
-/* 6.8.2 (28 October 2026): her words, "I don't like Ingenium's new sound systems, it sounds weak and mild. Its not creative
-   enough, I want the entire app and software to feel alive and realistic hence the 3D animated look, right now it all
-   sounds dead and weak and I HATE IT." Measured, the voices of 6.8.1 peaked at 0.006 to 0.042 of full scale at the default
-   level (44 to 28 dB below it), and each was a few pure tones that died away the same way every time. Now:
-     - each voice is built as the thing itself sounds: a strike or a touch first (a click of metal, the felt of a key, the
-       contact of a seal), then the thing's own resonances, uneven as real ones are (a bell's partials, a fork's clang and
-       its twin tine beating, the modes of oak, boxwood and brass), friction where something slides or turns (a hinge, a
-       key in a lock, a drawer on its runners), paper moving through the air from one side to the other, and air;
-     - no two plays are the same: every pitch, strength and decay moves a little each time, as a struck thing does;
-     - fuller and nearer: the default level is 0.6 (it was 0.25; a level she set herself is kept), a warmth and presence
-       shelf, a gentle compressor, a limiter and a soft edge bring the sounds forward and keep every peak below 0.95, the
-       room is larger (1.3 seconds, a panelled study's early reflections), paper and air move from one side to the other
-       as they cross, and a sound is placed further to the side it happened on (0.6 of the way, it was 0.35);
-     - and the app's keys and cards sound as they move: a key that goes down under the finger has its own small mechanical
-       press (felt, brass or boxwood), and a dialog, a panel or a card that rises onto the screen is lifted onto the desk.
-       Both are among the choices, each with its own level, and Off still silences everything. */
+/* 6.8.3 (28 October 2026): her words, "I still hate the new sounds system for Ingenium, it sounds like crap. I wanted a
+   soothing, warm introductory sounds to welcome you into the app like Carpe Diem without sounding exactly like Carpe Diem
+   and the Forge but you just keep on regressing the sound and it is getting worse and I am getting annoyed." Before that
+   she had found the quiet voices of 6.8.1 "weak and mild", and the struck, mechanical voices of 6.8.2 (latches, clicks,
+   thumps, scraped noise) were worse. Carpe Diem's welcome, the one she likes, is a few soft pure tones rising one after
+   another; a note in Carpe Diem records that she called a wooden key sound "horrible". So every voice is now tonal and
+   soft-edged: no clicks, no noise, nothing struck hard. Each note rises over a few hundredths of a second, as a felt
+   hammer or a breath does, and fades slowly; its few overtones are quiet and fade first, so it is round; a second voice a
+   hair sharp beside it makes it warm, as two strings tuned together do. Ingenium's own, and neither Carpe Diem's nor the
+   Forge's (theirs is a quick bright chime in C):
+     room     Evening light: a low F and C swelling in the room, and over them F, C, A and E, note by note, slowly
+              (or Chapel organ, a soft flute-stop chord in B flat; Glass harmonica, slow glass notes over a low bowl)
+     notify   Vesper chime: two soft bell notes a sixth apart (or Singing bowl; Hand bell)
+     confirm  Two warm notes, a third apart (or Soft chord; Ink drop)
+     paper    Each room its own note, a felt piano's, the notes of one calm scale (or Felt piano; Soft harp; Soft flute)
+     keys     Soft tap (or Glass tap; No sound)
+     cards    Soft rise (or Airy bloom; No sound)
+   The way out is warmer too: no compressor and no lift in the treble (both made 6.8.2 bright and hard), a gentle cut
+   above 7 kHz, a little warmth below, a smooth room without the hard early echoes, and only a light limiter and a soft
+   edge, so nothing reaches the speakers' limit. */
 (function r176(){
 "use strict";
 if(window.__r176)return;window.__r176=1;
@@ -145,22 +138,22 @@ var OAC=W.OfflineAudioContext||W.webkitOfflineAudioContext;
 var GAP=60;
 var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150,keys:35,cards:300};
 var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
-var PAN_MAX=0.6,ROOM_SEND=0.22,ROOM_LEN=1.3,ROOM_SEED=0x1C67;
+var PAN_MAX=0.4,ROOM_SEND=0.17,ROOM_LEN=1.9,ROOM_SEED=0x1C67;
 
-/* ---------- the six roles and Ingenium's names, in plain words (6.8.1; the keys and the cards, 6.8.2) ---------- */
-var NAMES={tuningFork:"Tuning fork",orreryBell:"Orrery bell",marginNote:"Margin note",
-  waxSeal:"Wax seal",escapement:"Escapement",brassStamp:"Brass stamp",
-  libraryDoor:"Library door",studyLamp:"Study lamp",archiveKey:"Archive key",
-  byRoom:"Each room its own",vellumTurn:"Vellum turn",cardDrawer:"Card drawer",ledgerTap:"Ledger tap",nibStroke:"Pen on paper",typebar:"Typebar",gearTurn:"Brass gear",
-  feltKey:"Felt key",brassButton:"Brass button",boxwoodKey:"Boxwood key",cardLift:"Card lifted",folioOpen:"Leather folio",slateSlide:"Slate slid"};
+/* ---------- the six roles and Ingenium's names, in plain words (6.8.3) ---------- */
+var NAMES={eveningLight:"Evening light",chapelOrgan:"Chapel organ",glassHarmonica:"Glass harmonica",
+  vesperChime:"Vesper chime",singingBowl:"Singing bowl",handBell:"Hand bell",
+  twoNotes:"Two warm notes",softChord:"Soft chord",inkDrop:"Ink drop",
+  byRoom:"Each room its own note",feltPiano:"Felt piano",softHarp:"Soft harp",softFlute:"Soft flute",
+  softTap:"Soft tap",glassTap:"Glass tap",keysOff:"No sound",softRise:"Soft rise",airyBloom:"Airy bloom",cardsOff:"No sound"};
 var ROLES=[
-  ["notify","Notices and reminders","When a reminder or a notice appears.",["tuningFork","orreryBell","marginNote"],"for notices and reminders"],
-  ["confirm","Keeping something","When something is saved, kept or copied.",["waxSeal","escapement","brassStamp"],"for keeping something"],
-  ["room","Entering Ingenium","When you go through the welcome door.",["libraryDoor","studyLamp","archiveKey"],"for entering Ingenium"],
-  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home. At first, each room has its own.",["byRoom","vellumTurn","cardDrawer","ledgerTap","nibStroke","typebar","gearTurn"],"for moving between pages"],
-  ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["feltKey","brassButton","boxwoodKey"],"for pressing a key"],
-  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["cardLift","folioOpen","slateSlide"],"for a card opening"]];
-var DEF={ver:2,on:true,vol:0.6,notify:"tuningFork",confirm:"waxSeal",room:"libraryDoor",paper:"byRoom",keys:"feltKey",cards:"cardLift",
+  ["notify","Notices and reminders","When a reminder or a notice appears.",["vesperChime","singingBowl","handBell"],"for notices and reminders"],
+  ["confirm","Keeping something","When something is saved, kept or copied.",["twoNotes","softChord","inkDrop"],"for keeping something"],
+  ["room","Entering Ingenium","When you go through the welcome door.",["eveningLight","chapelOrgan","glassHarmonica"],"for entering Ingenium"],
+  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home. At first, each room has its own note.",["byRoom","feltPiano","softHarp","softFlute"],"for moving between pages"],
+  ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["softTap","glassTap","keysOff"],"for pressing a key"],
+  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["softRise","airyBloom","cardsOff"],"for a card opening"]];
+var DEF={ver:3,on:true,vol:0.6,notify:"vesperChime",confirm:"twoNotes",room:"eveningLight",paper:"byRoom",keys:"softTap",cards:"softRise",
   trim:{notify:1,confirm:1,room:1,paper:1,keys:1,cards:1}};
 
 function copy(o){return JSON.parse(JSON.stringify(o));}
@@ -190,15 +183,13 @@ function seeded(a){a=a|0;return function(){var t=a=(a+0x6D2B79F5)|0;t=Math.imul(
    chance and for the whole session: by up to 2 or 3 dB on the tonal sounds, because each ear heard the sound and its
    room meet differently (a copy of one room delayed a little for the other ear leaned as much). So the room is one, the
    same on both sides, a centred sound stays exactly in the middle, and placing a sound is left to the panner alone. */
-function impulse(c){var sr=c.sampleRate,n=Math.max(2,Math.floor(sr*ROOM_LEN)),b=c.createBuffer(2,n,sr),pre=Math.floor(sr*0.009),R=seeded(ROOM_SEED),d=new Float32Array(n),lp=0;
-  for(var i=pre;i<n;i++){var t=(i-pre)/sr,k=0.30+0.55*Math.min(1,t/ROOM_LEN);lp=lp*k+(R()*2-1)*(1-k);d[i]=lp*Math.exp(-t*4.6);}
-  /* early reflections: a panelled study's walls, its shelves and the desk */
-  [[0.004,0.60],[0.007,0.45],[0.011,0.36],[0.017,0.28],[0.023,0.22],[0.031,0.17],[0.043,0.12]].forEach(function(r){var at=pre+Math.floor(sr*r[0]);if(at<n)d[at]+=r[1];});
+function impulse(c){var sr=c.sampleRate,n=Math.max(2,Math.floor(sr*ROOM_LEN)),b=c.createBuffer(2,n,sr),pre=Math.floor(sr*0.012),R=seeded(ROOM_SEED),d=new Float32Array(n),lp=0;
+  /* a tail that darkens as it fades, as a room with books and curtains does (6.8.3: the panelled study's hard early echoes of
+     6.8.2 are gone) */
+  for(var i=pre;i<n;i++){var t=(i-pre)/sr,k=0.5+0.43*Math.min(1,t/ROOM_LEN);lp=lp*k+(R()*2-1)*(1-k);d[i]=lp*Math.exp(-t*3.6)*Math.min(1,t/0.03);}
   /* levelled to carry the sound's own energy, so ROOM_SEND alone says how much room is heard */
   var en=0;for(var j=0;j<n;j++)en+=d[j]*d[j];var sc=en>0?1/Math.sqrt(en):0;for(var q=0;q<n;q++)d[q]*=sc;
-  /* one room for both ears, as the second look of 6.7 found: a room drawn apart for each ear (even through all-pass
-     sections, tried in 6.8.2) makes a held note lean to one side, by up to 5 dB on the tuning fork; the space comes from
-     the room's size and from the sounds that move and are placed */
+  /* one room for both ears: a room drawn apart for each ear made a centred sound lean to one side (6.7, 6.8.2) */
   for(var ch=0;ch<2;ch++)b.getChannelData(ch).set(d);
   return b;}
 var EDGE=null;
@@ -206,17 +197,13 @@ function softEdge(){if(EDGE)return EDGE;var n=2049,k=new Float32Array(n);
   for(var i=0;i<n;i++){var x=i*2/(n-1)-1,a=Math.abs(x);k[i]=a<=0.8?x:(x<0?-1:1)*(0.8+0.17*Math.tanh((a-0.8)/0.17));}
   return (EDGE=k);}
 function engine(c,noRoom){var e={c:c};e.master=c.createGain();e.master.gain.value=1;e.room=null;
-  /* 6.8.2: warmth and presence, then a gentle compressor: the sounds come forward and full, and none passes the speakers' limit */
-  try{var lo=c.createBiquadFilter();lo.type="lowshelf";lo.frequency.value=150;lo.gain.value=3;
-    var hi=c.createBiquadFilter();hi.type="highshelf";hi.frequency.value=5200;hi.gain.value=2;
-    var cp=c.createDynamicsCompressor();cp.threshold.value=-18;cp.knee.value=14;cp.ratio.value=3.2;cp.attack.value=0.002;cp.release.value=0.16;
-    var up=c.createGain();up.gain.value=1.25;
-    /* and a limiter last: nothing ever reaches the speakers' limit, at any volume or level */
-    var lim=c.createDynamicsCompressor();lim.threshold.value=-3;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=0.001;lim.release.value=0.06;
-    /* and after it a soft edge: what the limiter lets through in its first instant (up to 0.99 of the range, measured at
-       the loudest) is rounded off above 0.8, so no peak passes 0.95; below 0.8 nothing is touched */
-    var edge=c.createWaveShaper();edge.curve=softEdge();edge.oversample="none";   /* "2x" filters its own output and overshot to 0.956 */
-    e.master.connect(lo);lo.connect(hi);hi.connect(cp);cp.connect(up);up.connect(lim);lim.connect(edge);edge.connect(c.destination);}
+  /* 6.8.3: a gentle cut above 7 kHz and a little warmth below; then only a light limiter, and a soft edge after it, so no
+     peak passes 0.95 (the compressor and the lift in the treble of 6.8.2 made the sounds bright and hard) */
+  try{var lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=7000;lp.Q.value=0.5;
+    var lo=c.createBiquadFilter();lo.type="lowshelf";lo.frequency.value=220;lo.gain.value=1.5;
+    var lim=c.createDynamicsCompressor();lim.threshold.value=-4;lim.knee.value=8;lim.ratio.value=8;lim.attack.value=0.004;lim.release.value=0.25;
+    var edge=c.createWaveShaper();edge.curve=softEdge();edge.oversample="none";   /* "2x" filters its own output and overshot */
+    e.master.connect(lp);lp.connect(lo);lo.connect(lim);lim.connect(edge);edge.connect(c.destination);}
   catch(x){e.master.connect(c.destination);}
   if(!noRoom){try{var cv=c.createConvolver();cv.normalize=false;cv.buffer=impulse(c);var wet=c.createGain();wet.gain.value=ROOM_SEND;cv.connect(wet);wet.connect(e.master);e.room=cv;}catch(x){e.room=null;}}
   return e;}
@@ -241,197 +228,77 @@ function ctxLive(){if(!AC)return null;
 function restore(e){if(!faded)return;faded=false;try{var t=e.c.currentTime;e.master.gain.cancelScheduledValues(t);e.master.gain.setValueAtTime(1,t);}catch(x){}}
 function hush(){stopTest();var e=live;if(!e)return;faded=true;try{var t=e.c.currentTime,g=e.master.gain;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(0,t+0.08);}catch(x){}}
 
-/* ---------- the two primitives everything is built from (the template's, exactly; only the way out is Ingenium's) ---------- */
-function rnd(a,b){return a+Math.random()*(b-a);}
-function tone(t,freq,a,d,peak,type,drift){var c=E&&E.c;if(!c||!OUT)return;
-  var o=c.createOscillator(),g=c.createGain();
-  o.type=type||"sine";
-  o.frequency.setValueAtTime(freq,t);
-  if(drift)o.frequency.exponentialRampToValueAtTime(freq*drift,t+a+d);
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+a);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);
-  o.connect(g);g.connect(OUT);o.start(t);o.stop(t+a+d+0.05);}
-function grain(t,dur,peak,freq,q){var c=E&&E.c;if(!c||!OUT)return;
-  var n=Math.max(2,Math.floor(c.sampleRate*dur));
-  var buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0),last=0;
-  for(var i=0;i<n;i++){var w=Math.random()*2-1;last=last*0.55+w*0.45;d[i]=last;}
-  var s=c.createBufferSource();s.buffer=buf;
-  var f=c.createBiquadFilter();f.type="bandpass";
-  f.frequency.setValueAtTime(freq,t);f.Q.setValueAtTime(q,t);
-  var g=c.createGain();
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+dur*0.3);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  s.connect(f);f.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur+0.02);}
-function sweep(t,dur,f0,f1,peak,q){var c=E&&E.c;if(!c||!OUT)return;
-  var n=Math.max(2,Math.floor(c.sampleRate*dur));
-  var buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0),last=0;
-  for(var i=0;i<n;i++){var w=Math.random()*2-1;last=last*0.5+w*0.5;d[i]=last;}
-  var s=c.createBufferSource();s.buffer=buf;
-  var f=c.createBiquadFilter();f.type="bandpass";
-  f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);f.Q.setValueAtTime(q||1,t);
-  var g=c.createGain();
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+dur*0.35);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  s.connect(f);f.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur+0.02);}
-function click(t,freq,peak){grain(t,0.006,peak,freq,4);tone(t,freq*0.8,0.0005,0.014,peak*0.45,"triangle");}
-function cloud(t,len,count,fLo,fHi,peak,shape){
-  for(var i=0;i<count;i++){
-    var u=Math.random(),at=t+Math.pow(u,shape||1)*len+rnd(-0.005,0.005);
-    var env=Math.sin(Math.PI*Math.min(1,Math.max(0,(at-t)/len)));
-    grain(at,rnd(0.008,0.026),peak*rnd(0.35,1)*(0.35+0.65*env),rnd(fLo,fHi),rnd(1.2,4));}}
 
-/* ---------- Ingenium's own (6.8.1) ----------
-   Her words (27 October 2026): "I want Ingenium to have its own identity and its own sounds, I want them curated and customised
-   specifically to Ingenium and its rooms and identity. I want to play on the theme and keep things light and subtle. I want
-   the sounds to match the look and feel of the app and preserve the mechanical analogue 3D look and feel of the app without
-   making it feel childlike and amateurish. Ingenium must above all maintain Oxbridge DPhil standards and remain scholarly at
-   its core." So none of Carpe Diem's or The Forge's: the things of a college study. A tuning fork, an orrery's small bell, a
-   note in the margin; a wax seal pressed, a clock's escapement, a brass stamp; a library door on its latch, a study lamp, an
-   archive key; and for the rooms, a vellum page, a card-catalogue drawer, a ledger's tap, a pen, a typebar, a brass gear.
-   Made of the same two things as before (a tone, a grain of filtered noise), at the same quiet levels, short, never a tune. */
-var ROOMV={home:"ledgerTap",settings:"ledgerTap",guide:"vellumTurn",lector:"vellumTurn",career:"vellumTurn",tabula:"vellumTurn",abacus:"vellumTurn",
-  slides:"vellumTurn",imago:"vellumTurn",scriba:"vellumTurn",fontes:"vellumTurn",fabrica:"cardDrawer",models:"cardDrawer",chat:"nibStroke",
-  code:"typebar",build:"typebar",focus:"gearTurn",blend:"gearTurn"};
+/* ---------- each room its own note (6.8.3): the notes of F major's pentatonic scale, so going from room to room is
+   never out of tune with itself ---------- */
+var ROOMF={home:349.23,settings:349.23,guide:440,lector:523.25,career:587.33,tabula:440,abacus:392,slides:523.25,imago:587.33,
+  scriba:440,fontes:523.25,fabrica:293.66,models:261.63,chat:392,code:349.23,build:349.23,focus:261.63,blend:293.66};
 var goingTo="";
-/* ---------- 6.8.2: the parts the living voices are made of ----------
-   A struck thing is a touch and then its own resonances, each dying away at its own pace (t60: the time to fall 60 dB);
-   paper and air are noise shaped by a filter; friction is noise that sticks and slips. Every part moves a little at every
-   play. The noise is one buffer per audio context, read from a different place each time. */
-var NZ=null;
-function nz(c){if(NZ&&NZ.c===c)return NZ.b;var n=Math.floor(c.sampleRate*3),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
-  for(var i=0;i<n;i++)d[i]=Math.random()*2-1;NZ={c:c,b:b};return b;}
+/* ---------- the parts the warm voices are made of (6.8.3) ----------
+   Tones only, and never a click: each partial rises over a few hundredths of a second and dies away at its own pace (t60:
+   the time to fall 60 dB). A chord moves a little in pitch, all together, from one play to the next. */
 function vary(x,a){return x*(1+(Math.random()*2-1)*(a==null?0.02:a));}
 function decay(g,t,a,peak,t60){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(Math.max(0,peak),t+a);g.gain.setTargetAtTime(0,t+a,Math.max(0.001,t60/6.9));}
-function noiseSrc(c,t,len){var s=c.createBufferSource(),b=nz(c);s.buffer=b;s.start(t,Math.random()*Math.max(0,b.duration-len-0.1),len+0.05);return s;}
-/* a partial that rings and dies away as a struck thing does */
-function ring(t,f,peak,t60,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};var a=o.a||0.0015,end=t+a+t60*1.25+0.05;
-  var os=c.createOscillator(),g=c.createGain();os.type=o.type||"sine";os.frequency.setValueAtTime(f,t);
+/* one partial, rising softly and dying away; a slow tremolo when asked */
+function ring(t,f,peak,t60,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};var a=o.a||0.01,end=t+a+t60*1.25+0.05;
+  var os=c.createOscillator(),g=c.createGain();os.type="sine";os.frequency.setValueAtTime(f,t);
   if(o.glide)os.frequency.exponentialRampToValueAtTime(f*o.glide,t+(o.glideT||t60*0.5));
   decay(g,t,a,peak,t60);os.connect(g);var out=g;
   if(o.trem){var tg=c.createGain(),lf=c.createOscillator(),lg=c.createGain();tg.gain.value=1-o.trem[1];lf.frequency.value=o.trem[0];lg.gain.value=o.trem[1];
     lf.connect(lg);lg.connect(tg.gain);g.connect(tg);out=tg;lf.start(t);lf.stop(end);}
   out.connect(OUT);os.start(t);os.stop(end);}
-/* a struck thing's modes, [ratio, share, t60]: none sounds twice the same */
-function modes(t,f0,list,peak,o){o=o||{};var j=o.jit==null?0.01:o.jit;
-  list.forEach(function(m){ring(t+Math.random()*0.0012,vary(f0*m[0],j),peak*m[1]*vary(1,0.15),vary(m[2],0.12),{a:o.a||0.0012});});}
-/* noise through a filter: a contact, a puff of air, a scrape */
-function hiss(t,dur,peak,type,f,q,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};
-  var s=noiseSrc(c,t,dur*1.6+0.02),fl=c.createBiquadFilter();fl.type=type||"bandpass";fl.frequency.setValueAtTime(f,t);fl.Q.setValueAtTime(q==null?0.8:q,t);
-  if(o.to)fl.frequency.exponentialRampToValueAtTime(o.to,t+dur);
-  var g=c.createGain();
-  if(o.swell){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+dur*o.swell);g.gain.setTargetAtTime(0,t+dur*o.swell,Math.max(0.002,dur*(1-o.swell)/3));}
-  else decay(g,t,o.a||0.0008,peak,dur);
-  s.connect(fl);fl.connect(g);g.connect(OUT);}
-/* a low knock with weight: wood or leather meeting the desk */
-function thump(t,f,peak,t60,o){o=o||{};ring(t,vary(f,0.03),peak,t60,{a:0.002,glide:o.drop||0.82,glideT:t60*0.7});
-  ring(t,vary(f*2.31,0.03),peak*0.32,t60*0.45,{a:0.0015});
-  hiss(t,Math.min(0.05,t60*0.4),peak*0.55,"lowpass",vary(f*6,0.1),0.7);}
-/* paper through the air, from one side to the other */
-function rustle(t,dur,peak,f0,f1,p0,p1){var c=E&&E.c;if(!c||!OUT)return;
-  var s=noiseSrc(c,t,dur+0.05),hp=c.createBiquadFilter();hp.type="highpass";hp.frequency.value=500;
-  var fl=c.createBiquadFilter();fl.type="bandpass";fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+dur);fl.Q.value=0.9;
-  var g=c.createGain(),n=48,cv=new Float32Array(n);
-  for(var i=0;i<n;i++){var x=i/(n-1),e=Math.sin(Math.PI*Math.pow(x,0.8));cv[i]=peak*e*(0.35+0.65*Math.pow(Math.random(),1.6));}
-  cv[0]=0;cv[n-1]=0;g.gain.setValueAtTime(0,t);
-  try{g.gain.setValueCurveAtTime(cv,t+0.001,dur);}catch(x){g.gain.linearRampToValueAtTime(peak,t+dur/2);g.gain.linearRampToValueAtTime(0,t+dur);}
-  s.connect(hp);hp.connect(fl);fl.connect(g);var pn=null;
-  try{if(typeof c.createStereoPanner==="function"&&(p0||p1)){pn=c.createStereoPanner();pn.pan.setValueAtTime(p0||0,t);pn.pan.linearRampToValueAtTime(p1||0,t+dur);}}catch(x){pn=null;}
-  if(pn){g.connect(pn);pn.connect(OUT);}else g.connect(OUT);}
-/* friction that sticks and slips: a hinge, a key in its lock, a drawer on its runners */
-function creak(t,dur,peak,f,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};
-  var s=noiseSrc(c,t,dur+0.05),fl=c.createBiquadFilter();fl.type="bandpass";fl.Q.value=o.q||22;
-  var n=Math.max(8,Math.round(dur*90)),fc=new Float32Array(n),gc=new Float32Array(n),w=0,rate=o.rate||38;
-  for(var i=0;i<n;i++){var x=i/(n-1);w+=(Math.random()*2-1)*0.05;w*=0.9;fc[i]=Math.max(40,f*(1+(o.rise==null?0.18:o.rise)*x+w));
-    var pu=0.5+0.5*Math.sin(2*Math.PI*rate*x*dur+Math.random()*0.6);gc[i]=peak*Math.sin(Math.PI*Math.min(1,x*1.15))*(0.25+0.75*pu*pu);}
-  gc[0]=0;gc[n-1]=0;try{fl.frequency.setValueCurveAtTime(fc,t,dur);}catch(x){fl.frequency.value=f;}
-  var g=c.createGain();g.gain.setValueAtTime(0,t);
-  try{g.gain.setValueCurveAtTime(gc,t+0.001,dur);}catch(x){g.gain.linearRampToValueAtTime(peak,t+dur/2);g.gain.linearRampToValueAtTime(0,t+dur);}
-  s.connect(fl);fl.connect(g);g.connect(OUT);}
-/* small hard ticks scattered in time: wax cracking, a lamp's chain, cards settling */
-function crackle(t,dur,count,peak,fLo,fHi){for(var i=0;i<count;i++)hiss(t+Math.random()*dur,vary(0.0025,0.5),peak*vary(0.7,0.4),"bandpass",fLo+Math.random()*(fHi-fLo),2.5);}
-/* a small metal part: a latch, a key's bit, a clock's pallet (the modes of a small bar) */
-function tick(t,f,peak,t60){hiss(t,0.004,peak*0.9,"highpass",vary(f*0.8,0.1),0.7);
-  modes(t,f,[[1,1,t60],[2.76,0.55,t60*0.6],[5.4,0.3,t60*0.35],[8.93,0.15,t60*0.2]],peak*0.6,{jit:0.02});}
-/* air moving: the room as a door opens, a lamp's warmth, a card lifted */
-function air(t,dur,peak,f){hiss(t,dur,peak,"lowpass",f||700,0.5,{swell:0.45});}
-
-/* ---------- the voices (6.8.2: each built as the thing itself sounds) ---------- */
-var BELL=[[0.5,0.35,1.6],[1,1,1.9],[1.183,0.55,1.4],[1.506,0.45,1.0],[2,0.62,0.9],[2.514,0.32,0.6],[2.662,0.28,0.55],[3.011,0.18,0.4]];
-var BOXWOOD=[[1,1,0.55],[3.93,0.36,0.12],[9.24,0.12,0.05]];
+/* a warm note: its fundamental and a few quiet overtones, the higher fading first, and a second voice a hair sharp */
+function warm(t,f,peak,dur,o){o=o||{};var P=o.parts||[[1,1],[2,0.16],[3,0.05]],a=o.a==null?0.018:o.a;
+  P.forEach(function(p,i){ring(t,f*p[0],peak*p[1],dur/(1+0.7*i),{a:a*(1+0.3*i),trem:i===0?o.trem:null});});
+  if(o.chorus!==false)ring(t,f*1.0018,peak*0.32,dur*0.9,{a:a*1.4});}
+/* a held chord that swells and fades, as a soft organ stop does: each note with its octave, each a slowly beating pair */
+function swell(t,fs,peak,att,hold,rel,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};var end=t+att+hold+rel*1.3+0.05;
+  var g=c.createGain(),lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=o.cut||1800;lp.Q.value=0.4;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+att);g.gain.setValueAtTime(peak,t+att+hold);g.gain.setTargetAtTime(0,t+att+hold,Math.max(0.01,rel/5));
+  lp.connect(g);var out=g;
+  if(o.trem){var tg=c.createGain(),lf=c.createOscillator(),lg=c.createGain();tg.gain.value=1-o.trem[1];lf.frequency.value=o.trem[0];lg.gain.value=o.trem[1];
+    lf.connect(lg);lg.connect(tg.gain);g.connect(tg);out=tg;lf.start(t);lf.stop(end);}
+  out.connect(OUT);
+  fs.forEach(function(f){(o.parts||[[1,1],[2,0.22]]).forEach(function(p){[1,1.0024].forEach(function(dt,k){var os=c.createOscillator(),og=c.createGain();os.type="sine";
+    os.frequency.setValueAtTime(f*p[0]*dt,t);og.gain.value=p[1]*(k?0.45:1)/fs.length;os.connect(og);og.connect(lp);os.start(t);os.stop(end);});});});}
+/* a bowl or a bell touched softly: its partials, each a slowly beating pair */
+function bowl(t,f,peak,dur,o){o=o||{};var a=o.a||0.012;
+  (o.parts||[[1,1,1],[2.76,0.32,0.6],[5.4,0.1,0.35]]).forEach(function(p){ring(t,f*p[0],peak*p[1],dur*p[2],{a:a});ring(t,f*p[0]*1.0035,peak*p[1]*0.6,dur*p[2]*0.95,{a:a*1.3});});}
+function paperNote(t,f,L){warm(t,f,0.38*L,0.9,{a:0.012,parts:[[1,1],[2,0.2],[3,0.06]]});}
 var V={
-  /* notices: a fork struck and held over the desk, an orrery's small bell, a note on a boxwood bar */
-  tuningFork:function(t,L){var f=vary(440,0.004);
-    tick(t,vary(2750,0.02),0.18*L,0.10);                                        /* the strike on the tine: the fork's clang */
-    ring(t,f,0.42*L,2.4,{a:0.004,trem:[vary(3.1,0.1),0.10]});                     /* its note, beating a little with the desk */
-    ring(t+0.0007,f*1.0026,0.16*L,2.2,{a:0.004});                                /* the twin tine */
-    ring(t,f*2,0.05*L,0.9,{a:0.003});ring(t,f*3,0.018*L,0.4,{a:0.003});         /* what the desk adds to it */
-    thump(t+0.012,vary(210,0.05),0.16*L,0.12);},                                  /* and the desk answering the touch */
-  orreryBell:function(t,L){var f=vary(1240,0.01);
-    hiss(t,0.003,0.35*L,"highpass",3500,0.7);modes(t,f,BELL,0.30*L,{jit:0.004});
-    hiss(t+0.17,0.002,0.12*L,"highpass",3500,0.7);modes(t+0.17,f,BELL,0.09*L,{jit:0.004});},   /* the clapper falls back once */
-  marginNote:function(t,L){hiss(t,0.004,0.22*L,"lowpass",2600,0.7);modes(t,vary(784,0.004),BOXWOOD,0.40*L);
-    hiss(t+0.15,0.004,0.24*L,"lowpass",2800,0.7);modes(t+0.15,vary(1047,0.004),BOXWOOD,0.42*L);},
-  /* keeping something: a brass seal into warm wax, a clock's escapement, a brass stamp */
-  waxSeal:function(t,L){hiss(t,0.10,0.42*L,"lowpass",1400,0.9,{to:260});                 /* the seal sinks into the wax */
-    thump(t+0.012,vary(118,0.04),0.50*L,0.20);                                           /* the desk under the paper */
-    modes(t+0.012,vary(240,0.04),[[1,1,0.09],[2.3,0.5,0.06],[4.1,0.3,0.04]],0.20*L);     /* its wood */
-    tick(t+0.014,vary(2900,0.03),0.12*L,0.14);                                           /* the brass handle */
-    crackle(t+0.03,0.09,7,0.10*L,1800,5200);},                                           /* the wax cracks as it sets */
-  escapement:function(t,L){var C=[[1,1,0.05],[1.53,0.6,0.04],[2.18,0.4,0.03]];
-    tick(t,vary(2500,0.02),0.38*L,0.07);modes(t,vary(460,0.02),C,0.14*L);                 /* tick: the pallet, the case answers */
-    tick(t+0.12,vary(2050,0.02),0.34*L,0.08);modes(t+0.12,vary(410,0.02),C,0.13*L);},     /* tock */
-  brassStamp:function(t,L){tick(t,vary(3300,0.02),0.12*L,0.08);                          /* the mount's spring */
-    thump(t+0.006,vary(96,0.04),0.55*L,0.22);hiss(t+0.006,0.035,0.30*L,"bandpass",1500,0.8);   /* onto paper and desk */
-    modes(t+0.008,vary(1568,0.01),[[1,1,0.35],[2.76,0.5,0.2],[5.4,0.25,0.1]],0.07*L);},        /* its brass rings */
-  /* entering Ingenium */
-  libraryDoor:function(t,L){tick(t,vary(3200,0.02),0.30*L,0.10);                         /* the thumb latch lifts */
-    tick(t+0.07,vary(2300,0.02),0.36*L,0.14);                                              /* the bolt leaves its keeper */
-    creak(t+0.11,0.42,0.16*L,vary(430,0.05),{rise:0.35,rate:34,q:20});                    /* the hinge turns */
-    air(t+0.12,0.75,0.20*L,520);                                                           /* the library's air moves */
-    thump(t+0.62,vary(72,0.04),0.50*L,0.40,{drop:0.85});                                   /* the door rests on its stop */
-    modes(t+0.62,vary(150,0.04),[[1,1,0.25],[1.9,0.45,0.15],[3.3,0.25,0.09]],0.20*L);},     /* and the oak hums */
-  studyLamp:function(t,L){crackle(t,0.05,5,0.14*L,3000,6500);                             /* the pull chain's beads */
-    tick(t+0.06,vary(2300,0.02),0.36*L,0.12);thump(t+0.06,vary(180,0.04),0.18*L,0.08);     /* the switch in its brass */
-    ring(t+0.09,vary(100,0.01),0.12*L,1.4,{a:0.25,trem:[vary(5.2,0.1),0.18]});ring(t+0.09,200,0.04*L,1.0,{a:0.25});   /* the filament warms */
-    air(t+0.08,0.9,0.10*L,1600);},                                                          /* and the light fills the room */
-  archiveKey:function(t,L){creak(t,0.20,0.10*L,vary(2600,0.05),{rise:0.1,rate:55,q:9});   /* the key slides into the lock */
-    [0.22,0.29,0.35].forEach(function(d,i){tick(t+d,vary(2100+i*240,0.02),0.30*L,0.09);}); /* three tumblers lift */
-    thump(t+0.44,vary(78,0.04),0.48*L,0.30);tick(t+0.44,vary(1400,0.02),0.26*L,0.20);     /* the bolt is thrown */
-    air(t+0.46,0.5,0.10*L,420);},                                                           /* the archive opens */
-  /* moving between pages: each room its own */
-  byRoom:function(t,L){var v=ROOMV[goingTo||current()]||"ledgerTap";V[v](t,L*(GAIN[v]||1));},
-  vellumTurn:function(t,L){var side=Math.random()<0.5?-1:1;
-    rustle(t,0.30,0.30*L,900,3200,-0.45*side,0.45*side);                                    /* the page lifts and crosses */
-    crackle(t+0.03,0.22,6,0.06*L,2500,6000);
-    hiss(t+0.29,0.06,0.20*L,"lowpass",900,0.7);thump(t+0.30,vary(140,0.05),0.10*L,0.08);},   /* and settles */
-  cardDrawer:function(t,L){creak(t,0.20,0.20*L,vary(260,0.05),{rise:0.25,rate:60,q:5});      /* the drawer on its runners */
-    thump(t+0.21,vary(110,0.04),0.48*L,0.18);modes(t+0.21,vary(300,0.04),[[1,1,0.10],[2.2,0.5,0.06],[3.9,0.25,0.04]],0.22*L);   /* stops */
-    crackle(t+0.22,0.08,8,0.07*L,1500,4500);},                                               /* its cards settle */
-  ledgerTap:function(t,L){hiss(t,0.05,0.30*L,"lowpass",700,0.7);thump(t,vary(92,0.04),0.52*L,0.20);   /* the leather boards meet */
-    rustle(t,0.09,0.10*L,1500,2600,0,0);},                                                     /* its pages breathe out */
-  nibStroke:function(t,L){var pn=Math.random()<0.5?-0.15:0.15;
-    rustle(t,0.13,0.20*L,3200,4200,-pn,pn);rustle(t+0.15,0.09,0.16*L,3600,3000,pn,-pn);       /* two strokes of the nib */
-    tick(t+0.25,vary(4800,0.03),0.10*L,0.03);thump(t+0.25,vary(200,0.05),0.06*L,0.05);},      /* its tap */
-  typebar:function(t,L){thump(t,vary(160,0.05),0.14*L,0.05);                                  /* the key goes down */
-    tick(t+0.035,vary(2700,0.03),0.36*L,0.08);thump(t+0.035,vary(120,0.05),0.42*L,0.14);     /* the typebar meets the platen */
-    hiss(t+0.035,0.03,0.18*L,"bandpass",1100,1.2);tick(t+0.09,vary(3900,0.03),0.08*L,0.04);},  /* the carriage steps on */
-  gearTurn:function(t,L){[0,0.055,0.10].forEach(function(d,i){tick(t+d,vary(2200-i*90,0.02),0.26*L,0.10);});   /* the ratchet's pawl */
-    ring(t+0.10,vary(1318,0.01),0.06*L,0.35);thump(t+0.12,vary(84,0.05),0.26*L,0.18);},       /* the gear's own weight */
-  /* pressing a key */
-  feltKey:function(t,L){thump(t,vary(170,0.06),0.30*L,0.06);hiss(t,0.012,0.16*L,"lowpass",1800,0.8);tick(t+0.004,vary(3800,0.05),0.05*L,0.02);},
-  brassButton:function(t,L){tick(t,vary(3300,0.04),0.24*L,0.06);thump(t,vary(220,0.06),0.14*L,0.04);},
-  boxwoodKey:function(t,L){hiss(t,0.005,0.18*L,"lowpass",2600,0.7);modes(t,vary(520,0.03),[[1,1,0.07],[2.8,0.5,0.04],[5.6,0.2,0.02]],0.26*L);},
-  /* a card opening: lifted onto the desk, a leather folio opened, a slate slid across */
-  cardLift:function(t,L){var pn=Math.random()<0.5?-0.2:0.2;air(t,0.16,0.18*L,1400);rustle(t+0.02,0.12,0.12*L,1600,2800,-pn,pn);
-    thump(t+0.15,vary(150,0.05),0.20*L,0.07);hiss(t+0.15,0.03,0.08*L,"lowpass",1200,0.7);},
-  folioOpen:function(t,L){creak(t,0.10,0.06*L,vary(700,0.05),{rise:0.2,rate:40,q:6});air(t+0.02,0.20,0.16*L,900);thump(t+0.18,vary(110,0.05),0.24*L,0.10);},
-  slateSlide:function(t,L){creak(t,0.14,0.10*L,vary(1300,0.05),{rise:-0.1,rate:70,q:4});thump(t+0.14,vary(130,0.05),0.22*L,0.09);tick(t+0.14,vary(2600,0.04),0.06*L,0.04);}
+  /* entering Ingenium: a welcome that blooms */
+  eveningLight:function(t,L){var k=vary(1,0.002);
+    swell(t,[87.31*k,130.81*k,174.61*k],0.30*L,0.55,0.7,1.6,{cut:900});                     /* a low F and C, swelling in the room */
+    [[0.18,174.61,0.40],[0.46,261.63,0.34],[0.74,440,0.28],[1.02,659.26,0.22]].forEach(function(n){warm(t+n[0],n[1]*k,n[2]*L,2.6,{a:0.03});});},   /* F, C, A, E, slowly */
+  chapelOrgan:function(t,L){var k=vary(1,0.002);
+    swell(t,[116.54*k,174.61*k,233.08*k,293.66*k,349.23*k],0.42*L,0.6,0.9,1.5,{cut:1500,parts:[[1,1],[2,0.38],[4,0.1]],trem:[4.6,0.05]});},   /* B flat major, on a soft flute stop */
+  glassHarmonica:function(t,L){var k=vary(1,0.002);bowl(t,146.83*k,0.18*L,3.0,{a:0.08});
+    [[0.05,293.66,0.30],[0.38,440,0.26],[0.72,739.99,0.20]].forEach(function(n){warm(t+n[0],n[1]*k,n[2]*L,2.4,{a:0.14,parts:[[1,1],[2,0.05]]});});},   /* D, A, F sharp over a low D */
+  /* notices and reminders */
+  vesperChime:function(t,L){var k=vary(1,0.002),P=[[1,1],[2,0.22],[3.98,0.06]];
+    warm(t,392*k,0.42*L,2.2,{a:0.008,parts:P,trem:[5.4,0.12]});warm(t+0.32,659.26*k,0.36*L,2.4,{a:0.008,parts:P,trem:[5.4,0.12]});},   /* G, then E above it */
+  singingBowl:function(t,L){bowl(t,vary(220,0.004),0.42*L,3.2,{a:0.03});},
+  handBell:function(t,L){bowl(t,vary(523.25,0.003),0.36*L,1.8,{a:0.006,parts:[[1,1,1],[2,0.3,0.6],[2.97,0.12,0.4],[4.2,0.05,0.25]]});},
+  /* keeping something */
+  twoNotes:function(t,L){var k=vary(1,0.003);warm(t,261.63*k,0.40*L,1.0,{a:0.01});warm(t+0.13,329.63*k,0.36*L,1.2,{a:0.01});},
+  softChord:function(t,L){var k=vary(1,0.003);[261.63,392,523.25].forEach(function(f,i){warm(t+i*0.02,f*k,(0.30-0.05*i)*L,1.2,{a:0.02});});},
+  inkDrop:function(t,L){var f=vary(220,0.004);ring(t,f,0.45*L,0.9,{a:0.006,glide:0.985,glideT:0.4});ring(t,f*2,0.08*L,0.4,{a:0.006});ring(t,f/2,0.12*L,0.7,{a:0.012});},
+  /* moving between pages: each room its own note */
+  byRoom:function(t,L){paperNote(t,ROOMF[goingTo||current()]||392,L*(GAIN.feltPiano||1));},
+  feltPiano:function(t,L){paperNote(t,vary(392,0.003),L);},
+  softHarp:function(t,L){warm(t,vary(523.25,0.003),0.36*L,1.1,{a:0.004,parts:[[1,1],[2,0.3],[3,0.12]]});},
+  softFlute:function(t,L){swell(t,[vary(587.33,0.003)],0.30*L,0.06,0.10,0.35,{cut:2400,parts:[[1,1],[2,0.08]],trem:[5.2,0.06]});},
+  /* pressing a key: a touch, never a click */
+  softTap:function(t,L){warm(t,vary(196,0.01),0.40*L,0.10,{a:0.004,parts:[[1,1],[2,0.25]],chorus:false});},
+  glassTap:function(t,L){warm(t,vary(880,0.004),0.22*L,0.22,{a:0.004,parts:[[1,1]],chorus:false});},
+  keysOff:function(){},
+  /* a card opening */
+  softRise:function(t,L){var k=vary(1,0.003);warm(t,392*k,0.26*L,0.45,{a:0.02});warm(t+0.07,587.33*k,0.22*L,0.55,{a:0.02});},
+  airyBloom:function(t,L){warm(t,vary(440,0.003),0.28*L,0.7,{a:0.07,parts:[[1,1],[2,0.06]]});},
+  cardsOff:function(){}
 };
 /* each voice's own level, set by measuring them all (rig/t_682_sounds.js) so that each kind has the presence it needs */
-var GAIN={"tuningFork":0.353,"orreryBell":0.426,"marginNote":0.336,"waxSeal":0.442,"escapement":1.052,"brassStamp":0.456,"libraryDoor":0.271,"studyLamp":0.919,"archiveKey":0.325,"vellumTurn":1.644,"cardDrawer":0.215,"ledgerTap":0.453,"nibStroke":2.559,"typebar":0.363,"gearTurn":0.403,"feltKey":0.905,"brassButton":1.489,"boxwoodKey":0.817,"cardLift":0.549,"folioOpen":0.36,"slateSlide":0.453};
+var GAIN={"vesperChime":0.618,"singingBowl":0.512,"handBell":0.906,"twoNotes":0.523,"softChord":0.568,"inkDrop":0.882,"eveningLight":0.599,"chapelOrgan":1.091,"glassHarmonica":0.782,"feltPiano":0.503,"softHarp":0.57,"softFlute":0.438,"softTap":0.687,"glassTap":0.919,"softRise":0.402,"airyBloom":0.357};
 
 /* ---------- when a sound may play at all ---------- */
 var gestured=false,gestureAt=0,lastPointer=null,lastKeyAt=0;
@@ -502,7 +369,7 @@ function render(name,o){o=o||{};return new Promise(function(res){
   try{c=new OAC(2,len,sr);}catch(x){res(null);return;}
   var e=engine(c,!!o.dry),L=num(o.level)?o.level:lvl(roleOf(name));
   try{E=e;OUT=route(e,num(o.pan)?o.pan:0);V[name](0.02,L*(GAIN[name]||1));}catch(x){E=null;OUT=null;res(null);return;}finally{E=null;OUT=null;}
-  function done(buf){var r={length:buf.length,sampleRate:buf.sampleRate,peak:0,peakL:0,peakR:0,rms:0,tail:0},s=0,n=0,ts=0,tn=0,from=Math.floor(sr*(num(o.tailFrom)?o.tailFrom:1.4));
+  function done(buf){var r={buf:o.keep?buf:undefined,length:buf.length,sampleRate:buf.sampleRate,peak:0,peakL:0,peakR:0,rms:0,tail:0},s=0,n=0,ts=0,tn=0,from=Math.floor(sr*(num(o.tailFrom)?o.tailFrom:1.4));
     for(var ch=0;ch<buf.numberOfChannels;ch++){var d=buf.getChannelData(ch),pk=0,es=0;
       for(var i=0;i<d.length;i++){var a=d[i]<0?-d[i]:d[i];if(a>pk)pk=a;es+=d[i]*d[i];if(i>=from){ts+=d[i]*d[i];tn++;}}
       s+=es;n+=d.length;if(ch===0){r.peakL=pk;r.energyL=es;}else{r.peakR=pk;r.energyR=es;}if(pk>r.peak)r.peak=pk;}
@@ -582,7 +449,7 @@ function ensureDisplay(){var p=$("displayPanel");if(!p||$("dpSound"))return;
 function ensureCard(){var pg=$("page-settings");if(!pg||$("ingSoundCard"))return;
   var card=mk("div","card");card.id="ingSoundCard";
   card.innerHTML='<h2 class="sec" id="ingSoundH">Sound</h2>'
-    +'<p class="snd-lede">Sounds that make the app feel alive: entering, moving between pages, pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
+    +'<p class="snd-lede">Warm, soft sounds: entering Ingenium, moving between pages, pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
     +'<div class="snd-row"><span class="snd-lab" id="setSndOnL">Sounds</span><div class="seg" role="group" aria-labelledby="setSndOnL" id="setSndOn">'
     +'<button type="button" class="seg-btn" data-snd-on="1" aria-pressed="false">On</button><button type="button" class="seg-btn" data-snd-on="0" aria-pressed="false">Off</button></div></div>'
     +'<div class="snd-row"><label class="snd-lab" for="setSndVol">Volume</label><div class="snd-vol"><input type="range" id="setSndVol" data-snd-vol min="0" max="100" step="5" value="60">'
