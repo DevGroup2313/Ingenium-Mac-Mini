@@ -371,6 +371,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.6 and The Forge 650 (28 October 2026; her words: "The Forge needs to carry the latests version of Ingenium and
+vice versa"). Each carries the other's lean copy, a page that carries no apps, so the two are made together: Ingenium 6.8.6's
+release page is built, its lean copy made (`offline_project/forge_649/lean_ingenium.py`), The Forge 650 built carrying it
+(`offline_project/forge_650/forge650.py`, from the 649 page as released), and Ingenium 6.8.6 built again carrying The Forge
+650's lean page. Only the carried copy and its line in the list of carried apps depend on which Forge Ingenium carries, and
+making the lean copy takes both out, so the lean copy of the release is byte for byte the copy The Forge 650 carries (checked
+before release). Nothing else changes from 6.8.5 and 649.
+
+    node offline_project/forge_650/tests/t_650.js <the Forge url> <out>   # 21 checks, as 649's, on 650 carrying Ingenium 6.8.6
+
 Ingenium 6.8.5 (28 October 2026; her words: "I want the cards on the 'How the Studio Works' on the Career page to be
 clickable and animated", "I want it operating and writing really well with all of its features", "I want the text colour
 of the selected tabs to be white instead of black", "I want the 'Your apps' section to actually show the brick jewelled
@@ -399,7 +409,7 @@ over the buttons inside of Ingenium the same way they are inside of Carpe Diem a
   the pointer comes onto it (Carpe Diem's own tick, at its level: 0.0046 measured there), never twice in a row on the same
   key, never with a finger; Key touch, Light touch or No sound. The Career Studio's keys, Home's stones and the Inbox's keys
   sound when pressed too.
-- Ingenium carries The Forge 649.
+- Ingenium carries The Forge 649 (6.8.6: The Forge 650).
 
     node rig/t_685_career.js <Ingenium url> <out>                     # 25 checks: the white room key, the cards, limits, criteria, Improve it, the version before
     node rig/t_685_home.js <Ingenium url> <out>                       # 14 checks: the stones, their sparks and lift, the Inbox's keys, the hover tick
