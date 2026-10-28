@@ -598,8 +598,8 @@ edit('var ch=trainChart(done.history);', 'var ch=trainChart(done.history,!!(done
 #      qualified statement, never an inflated one ----
 # going online: Ingenium makes no request by itself, and goes online only when the person asks for something that needs it
 edit('Nothing here asks for a connection, and nothing leaves it.</p>',
-     'Your work stays here. It goes online only when you ask for something that needs it: a cloud model, a search, a download, GitHub or Dictate.</p>',
-     "6.7 claims: the door says when Ingenium goes online")
+     'Your work stays here. It goes online only when you ask for something that needs it: a cloud model, a search, a download or Dictate.</p>',
+     "6.7 claims: the door says when Ingenium goes online (6.8.4: GitHub no longer named on the door, her request)")
 edit('<b>How full offline works here.</b> Two things need to live inside the app: your model (you upload it) and the engine that runs it (about 1 to 2 MB of compiled code, dropped in once on the Models page, or baked into a single copy of this file). After that one-time step, the app never requests anything. No connection, no services, no exceptions.',
      '<b>How offline works here.</b> The engine that runs your models is kept on this device: built into this page or into the app, or added once on the Models page. Each model is a file kept here too. Ingenium makes no request by itself. It goes online only when you ask for something that needs it: a model download, a cloud model, a web search, GitHub, a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.',
      "6.7 claims: Home's note on working offline")
