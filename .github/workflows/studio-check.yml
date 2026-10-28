@@ -76,7 +76,7 @@ jobs:
 
       - name: Keep the report with this run
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: studio-check
           path: ${{ runner.temp }}/studio/studio.txt
