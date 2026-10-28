@@ -259,7 +259,7 @@ Diem's thirteen voices with Ingenium's sixteen, the things of a college study: T
 Wax seal, Escapement, Brass stamp (keeping); Library door, Study lamp, Archive key (the welcome door); and for moving between
 pages, each room its own (a vellum page, a card drawer, a ledger's tap, a pen, a typebar, a brass gear).
 
-    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it never reaches the speakers' limit, it is over in 2.4 s (6.8.2); Ingenium's defaults, none of the old names, 69 checks
+    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it never reaches the speakers' limit, it is over in 4.6 s (6.8.3); Ingenium's defaults, none of the old names, 54 checks
 
 One type scale (her words: "I want the text fonts and sizes to be consitent and not be random ... particularly on the
 Settings page with the different size and font of the Ownership texts"): `modules/r185.js`. The original cards set their own
@@ -371,23 +371,64 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium's sounds, alive (6.8.2; her words: "I don't like Ingenium's new sound systems, it sounds weak and mild. Its not
-creative enough, I want the entire app and software to feel alive and realistic hence the 3D animated look, right now it all
-sounds dead and weak and I HATE IT"). Measured before (`IngSound.render`, away from the speakers): the voices peaked between
-0.006 and 0.042 of the speakers' range at the default volume of 0.25, each a single tone or a short noise. `modules/r176.js`
-now builds each thing from its parts: a struck tine with its partials and a slow beat, a bell's inharmonic modes, a key's
-felt and its click, a door's latch, bolt and hinge and the door coming to rest on its stop, a page lifting on one side and
-landing on the other. They ring in a small
-panelled room (1.3 seconds, the same in both ears, so a sound in the middle stays there) and pass through a gentle
-compressor, a limiter and a soft edge, so no peak passes 0.95 of the speakers' range at any volume. Each kind has its own presence, set by
-measuring every voice: a notice the loudest, a key the lightest. No two plays are the same: each varies a little in pitch,
-weight and place. Two kinds are new: a key pressed (Felt key, Brass button, Boxwood key) and a card rising onto the screen
-(Card lift, Folio open, Slate slide), each chosen and levelled in Settings or the Display panel like the others. The
-default volume is 0.6; a level kept from 6.8.1's default (0.25) becomes 0.6, a level chosen otherwise stays. Typing in a
-field makes no sound; the calm look, the quiet screen and Off keep all of it silent.
+Ingenium's sounds, warm (6.8.3; her words: "I still hate the new sounds system for Ingenium, it sounds like crap. I wanted
+a soothing, warm introductory sounds to welcome you into the app like Carpe Diem without sounding exactly like Carpe Diem
+and the Forge"). 6.8.1's voices were too quiet ("weak and mild"); 6.8.2 made them loud and built them as struck, mechanical
+things (latches, clicks, thumps, scraped noise), and that was worse. Carpe Diem's welcome, the one she likes, is a few soft
+pure tones rising one after another; a note in Carpe Diem records that she called a wooden key sound "horrible". So
+`modules/r176.js` now makes every voice tonal and soft-edged: each note rises over a few hundredths of a second, as a felt
+hammer or a breath does, and fades slowly; its few overtones are quiet and fade first; a second voice a hair sharp beside it
+makes it warm. The welcome is Evening light (a low F and C swelling in the room, and over them F, C, A and E, note by note),
+or Chapel organ, or Glass harmonica; notices, Vesper chime, Singing bowl or Hand bell; keeping, Two warm notes, Soft chord or
+Ink drop; between pages, each room its own felt-piano note from one calm scale; keys, Soft tap, Glass tap or No sound;
+cards, Soft rise, Airy bloom or No sound. Theirs is a quick bright chime in C; none of their names or notes is used. The
+way out lost the compressor and the lift in the treble (both made 6.8.2 bright and hard): a gentle cut above 7 kHz, a little
+warmth below, a smooth room without hard early echoes, a light limiter and a soft edge, so no peak passes 0.95 of the
+speakers' range. Each voice is levelled by measurement (a welcome and a notice fullest, a key lightest). Measured against
+6.8.2: the welcome's sharpest onset, a step between two samples, was 1.09 of its peak (a click) and is now 0.057; every
+voice has under 2% of its energy above 3 kHz but the Glass tap (a high note, on purpose). A sound kept from 6.8.2 gives way
+to the warm ones; a level she chose stays. Typing in a field makes no sound; the calm look, the quiet screen and Off keep
+all of it silent.
 
-    node rig/t_682_sounds.js <Ingenium url> <out>                     # 116 checks: each voice's presence, limit, length, middle, variety; the keys, the cards, Off
-    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 24 checks
+    node rig/t_682_sounds.js <Ingenium url> <out>                     # 125 checks: each voice's presence, limit, length, middle, variety, soft edge and warmth; the keys, the cards, Off
+    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 19 checks
+
+The Career Studio (6.8.3; her words: "I want Ingenium to gain the function and full capabilities to work like my own
+Linkedin premium with its full functionality and ressources. I want it curated entirely to my in-app profile, resume, cover
+letter and portfolio", "a reviewer/assistant/career counselor/recruitor/mentor all in one inside of Ingenium that will not
+sugarcoat anything, that will not invent skills or experiences that I do not possess", "Tell me and I forget. Teach me and
+I remember. Involve me and I learn.", "I don't want job postings generated or provided, instead, I want an area where I can
+bring jobs, academic programmes, or grants, etc. that I am interested in applying to and help me analyse, review, curate,
+rewrite, and track my applications"; and of its look, "I don't want to be endlessly scrolling on this new page").
+`modules/r188.js`, its own page after Lector, in Lector's panels: the page never scrolls, only its panels do. Four rooms:
+
+- Applications. A posting, a programme's call or a grant, pasted, from a file, or fetched from its address (only when she
+  presses for it). Each in five numbered steps, one on the screen at a time: The posting; How you fit (first how it matches
+  what she is looking for, then each criterion judged shown, partly shown or not shown with its evidence, and a band,
+  Strong fit, Possible fit, A stretch or Not a fit as the profile stands, that follows from those judgements by a rule shown
+  beside it: never a percentage; advice, the case for and against, next steps); What you send (a CV, a cover letter, a
+  supporting statement, a personal statement, an outline for a research proposal and emails to a supervisor, a referee, a
+  mentor, a hiring manager or a recruiter; each written from her profile and the posting, read a second time against her
+  profile, set to British spelling, checked for figures her profile does not give, and shown on the paper it is saved on, as
+  Word or PDF; or her own draft, looked at with her and never rewritten); Practise (her evidence for each criterion and her
+  answers to interview questions, looked at with her; what she writes can be kept in her profile); Track (where it stands,
+  the closing date and the days left, her notes).
+- Your profile. What she is looking for; her name and contact line; what the studio may use, each switched on or off (her
+  CV, the one Lector keeps; her LinkedIn export, the .zip LinkedIn sends; her documents, such as her proposal; Lector's
+  readings of her apps; her writing and past letters, for her voice only; her sources in Fontes); her entries, kept up to
+  date as she goes. Entries and skills can be found in her sources, each skill with its evidence and where it counts
+  (academic, professional or both), for her to keep or drop. The profile is the only source of facts the studio uses.
+- Goals and plan. Her goals with dated steps; steps suggested for a goal; the kinds of role and programme that suit her
+  profile and what she is looking for, with why, what is missing and a first step (never postings).
+- Learn. How each piece is built, one lesson at a time.
+
+It writes with the model Lector uses, on this device (or her other computer's, over her own network). Lector's brief, asked
+for a CV or a cover letter with no apps chosen, hands the posting to the studio, which writes them. The demo and the gift
+editions leave it out, as they leave out Lector. In passing: a file's name keeps its words in a browser (a middle dot made
+Chromium save it as "download"), and the short note at the foot of the screen no longer takes a tap meant for the key
+beneath it on a phone.
+
+    node rig/t_683_career.js <Ingenium url> <out> [phone]             # with a stand-in model: 48 checks (50 on a phone), the page never scrolling in 12 places
 
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56

@@ -692,12 +692,14 @@ function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv"
       '<div class="caps"><i></i><span>'+esc(T.roman?romanDate(o.made?new Date(o.made):null):(o.label||""))+'</span><i></i></div>'+(T.roman&&o.label?'<div class="tag">'+esc(o.label)+'</div>':'')+
       (o.forText?'<div class="sub">Prepared for '+esc(o.forText)+'</div>':'')+(author()?'<div class="by">'+esc(author()+"  ·  "+month())+'</div>':'')+'</div>');}
   else if(kind==="analysis")out.push('<div class="cv"><h1>'+esc(o.name||"")+'</h1><div class="caps"><i></i><span>Notes and analysis</span><i></i></div></div>');
-  if(kind==="cover")out.push('<div class="lhead"><b>'+esc(author()||"")+'</b>'+esc(today())+'</div>');
+  /* 6.8.3: the Career Studio's CV and statements carry their own heading (her name and contact line, or the document's name) */
+  if(personal&&o.head)out.push('<div class="cv"><h1>'+esc(o.head)+'</h1>'+(o.headSub?'<div class="sub">'+esc(o.headSub)+'</div>':'')+'</div>');
+  if(kind==="cover")out.push('<div class="lhead"><b>'+esc(o.from||author()||"")+'</b>'+esc(today())+'</div>');
   if(o.wait){out.push('<p class="wait">'+(job()?"Written after the reading, section by section, as you watch.":"Written after the reading. Press Start reading in the brief.")+'</p>');return open+out.join("")+'</div>';}
   var n=0,hi=0,refs=false,lettered=blocks.some(function(b){return b.k==="h"&&b.lv===2&&/^[A-H][.)]\s/.test(b.t);}),list=null;
   function flush(){if(list){out.push("<"+list.t+">"+list.items.map(function(x,i){return '<li><span class="mk" aria-hidden="true">'+(list.t==="ol"?(i+1)+".":"\u2022")+"</span>"+x+"</li>";}).join("")+"</"+list.t+">");list=null;}}
   blocks.forEach(function(b){if(b.k==="ul"||b.k==="ol"){var t=b.k;if(!list||list.t!==t){flush();list={t:t,items:[]};}list.items.push(inl(b.t,o.chk));return;}flush();
-    if(b.k==="h"){var t2=b.t.trim();if(b.lv<=2){refs=/^(works cited|references|bibliography|sources)$/i.test(t2);if(!refs&&!lettered&&!/^(\d+|[A-H])[.)]\s/.test(t2)&&kind!=="analysis")t2=(++n)+". "+t2;
+    if(b.k==="h"){var t2=b.t.trim();if(b.lv<=2){refs=/^(works cited|references|bibliography|sources)$/i.test(t2);if(!refs&&!lettered&&!/^(\d+|[A-H])[.)]\s/.test(t2)&&kind!=="analysis"&&!o.plain)t2=(++n)+". "+t2;
         var own=a.length>1?(IngHouseDocs.apps(t2).filter(function(k){return a.indexOf(k)>=0;})):[],nm2=/^(\d+|[A-H])([.)])\s+([\s\S]*)$/.exec(t2);
         out.push('<h2 data-h="'+(hi++)+'"'+(own.length===1?' class="own-'+own[0]+'"':'')+'>'+(nm2?'<span class="no">'+nm2[1]+'</span><span class="dot">'+nm2[2]+' </span><span>'+inl(nm2[3])+'</span>':inl(t2))+'</h2>');}
       else out.push('<h3>'+inl(t2)+'</h3>');return;}
@@ -712,7 +714,7 @@ function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv"
 /* ---------------- reading a set ---------------- */
 function r7Go(){if(R7.running||LX.busy){ingToast("Lector is busy. Wait for it, or pause it first.");return;}
   var B=L7().brief,apps=sorted(B.apps);
-  if(!apps.length){ingToast("Choose at least one of your apps first.");return;}
+  if(!apps.length){try{if(window.IngCareer&&IngCareer.fromLector(B))return;}catch(e){}ingToast("Choose at least one of your apps first.");return;}
   var missing=apps.filter(function(k){return !kept(k);});if(missing.length){ingToast(listNames(missing)+(missing.length>1?" are":" is")+" not on this device yet. Add your apps first.");return;}
   var kinds=KINDS.map(function(d){return d[0];}).filter(function(k){return B.docs[k];});
   if(!kinds.length){ingToast("Choose at least one document in the brief.");return;}
@@ -1325,6 +1327,9 @@ var oRP=lxReadParts;lxReadParts=function(run,parts,notes){try{R7.parts[run.id]=p
     addEv({k:"step",app:appOf(run),label:"Reading",text:"Reading "+run.name+(run.kind==="app"?(run.depth==="thorough"?", every line of its code":", an overview"):"")+": "+parts.length+" parts"+(have?", "+have+" read before":"")+". A note is kept after every part."});
     showCurrentPart();}catch(e){}return oRP.apply(this,arguments);};
 window.lxReadParts=lxReadParts;
+/* 6.8.3: a middle dot in a file's name makes the browser save it as "download", with no name and no extension (measured
+   in Chromium with "Carpe Diem · Project dossier.docx"): in a file's name, the dots between its parts become dashes */
+try{var oFN=lxFileName;lxFileName=function(s){return oFN(String(s==null?"":s).replace(/\s*\u00b7\s*/g," - "));};window.lxFileName=lxFileName;}catch(e){}
 var oPJ=lxPutJSON;lxPutJSON=function(ref,v){try{if(Array.isArray(v)){var run=lxState().runs.filter(function(r){return r.notesRef===ref;})[0];
     if(run){var seen=R7.seen[run.id]||[];v.forEach(function(x,i){if(x&&!seen[i]){seen[i]=true;var ps=R7.parts[run.id];
       addEv({k:"note",app:appOf(run),label:"Part "+(i+1)+" of "+v.length+(ps&&ps[i]?" · "+ps[i].t+(ps[i].of>1?" ("+ps[i].k+" of "+ps[i].of+")":""):""),text:x,runId:run.id,part:i});}});R7.seen[run.id]=seen;R7.notes[run.id]=v;}}}catch(e){}
@@ -1340,7 +1345,9 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.cl
 /* a set left under way when the app closed waits, paused, for Go on */
 (function(){try{var j=L7().job;if(j&&(j.status==="reading"||j.status==="writing"))j.status=j.status==="writing"?"writing":"paused";}catch(e){}})();
 ORDER.forEach(function(k){if(L7().brief.apps.indexOf(k)>=0)prepare(k);});
-window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost};
+window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost,
+  /* 6.8.3: for the Career Studio (r188), which writes with Lector's model, to Lector's standard */
+  plan:modelPlan,styleFix:styleFix,charter:CHARTER,banned:BANNED};
 /* 6.2: for the tests */
 try{window.IngLector.atlasOf=atlasOf;window.IngLector.atlasMd=atlasMd;window.IngLector.atlasDoc=atlasDoc;window.IngLector.midTab=midTab;window.IngLector.askWritten=askWritten;window.IngLector.askSend=askSend;}catch(e){}
 try{if($("page-lector").classList.contains("active")){document.body.classList.add("lx7-on");render();}}catch(e){}

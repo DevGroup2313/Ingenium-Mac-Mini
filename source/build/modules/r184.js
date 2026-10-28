@@ -42,6 +42,9 @@ var css=[
  sel(' :focus-visible')+'{outline:2px solid var(--rc-acc) !important;outline-offset:2px}',
  sel(' a')+'{color:var(--rc-acc)}'+sel(' a','body[data-theme="night"] ')+'{color:#c9b8ee}',
  /* their arrival: up a little, and settled with a small spring */
+ /* 6.8.3: the short note at the foot of the screen has nothing to press: a tap on it reaches the key beneath (on a phone it
+    sat over the keys for six and a half seconds and took the tap) */
+ '#ingToast{pointer-events:none}',
  '@keyframes rcIn{0%{opacity:0;translate:0 12px;scale:.955}62%{opacity:1;translate:0 -2px;scale:1.008}100%{opacity:1;translate:0 0;scale:1}}',
  '.tour-card,.tour-card.lively,.pres-menu,#modalBox,#ihPanel,#displayPanel,#ing-export-choice,.isc-box,#lxRx .rx-card{animation:rcIn .46s cubic-bezier(.22,.8,.3,1) both !important}',
  'body[data-motion="minimal"] .tour-card,body[data-motion="minimal"] .pres-menu,body[data-motion="minimal"] #modalBox,body[data-motion="minimal"] #ihPanel,body[data-motion="minimal"] #displayPanel,body[data-motion="minimal"] #ing-export-choice,body[data-motion="minimal"] .isc-box,body[data-motion="minimal"] #lxRx .rx-card{animation:none !important}',
