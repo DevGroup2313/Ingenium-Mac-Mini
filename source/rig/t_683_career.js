@@ -80,7 +80,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   if (phone) await p.evaluate(() => go('career')); else { const bb = await p.evaluate(() => { const r = document.querySelector('.nav-btn[data-page="career"]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); await p.mouse.click(bb[0], bb[1]); }
   await p.waitForTimeout(700);
   const rooms = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(x => x.textContent.trim()));
-  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Applications|Your profile|Goals and plan|Learn', 'pressed, it opens on its four rooms, in the keys Settings uses for its rooms', rooms.join('|'));
+  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Applications|Your profile|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12), in the keys Settings uses for its rooms', rooms.join('|'));
   ok(await p.evaluate(() => /not a job board/.test(document.querySelector('#cs .c-list').innerText) && (innerWidth < 900 || /Tell me and I forget\. Teach me and I remember\. Involve me and I learn\./.test(document.querySelector('#cs .c-work').innerText))), 'with nothing brought yet: how it works, her words at its head, and that it is not a job board');
   await fitCheck('Applications, nothing yet'); await shot('intro');
   // 2. the profile: who, what she is looking for, her CV (shared with Lector), an entry, LinkedIn
@@ -120,7 +120,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   await p.waitForFunction(() => IngCareer.state().opps.length === 1, null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(400);
   let opp = await p.evaluate(() => { const o = IngCareer.state().opps[0]; return o && { title: o.title, org: o.org, closes: o.closes, due: o.due, open: IngCareer.state().ui.open === o.id, steps: [...document.querySelectorAll('#cs .c-steps li:not(.sep) span')].map(x => x.textContent.trim()), now: (document.querySelector('#cs .c-steps li.now') || {}).textContent }; });
   ok(opp && opp.title === 'Lecturer in Digital History' && opp.org === 'University of Oxbridge' && /30 November 2026/.test(opp.closes) && opp.due === '2026-11-30' && opp.open, 'a pasted posting is kept and opened, its title, organisation and closing date read from it (the date set for the tracker)', JSON.stringify(opp));
-  ok(opp.steps.join('|') === 'The posting|How you fit|What you send|Practise|Track' && /The posting/.test(opp.now), 'an application is taken in five numbered steps, one on the screen at a time: it opens on The posting', JSON.stringify(opp.steps));
+  ok(opp.steps.join('|') === 'The posting|How you fit|Checklist|What you send|Practise|Track' && /The posting/.test(opp.now), 'an application is taken in numbered steps (six since 6.8.12, with its Checklist), one on the screen at a time: it opens on The posting', JSON.stringify(opp.steps));
   await fitCheck('An application: the posting'); await shot('posting');
   await press('Read it against my profile'); await idle(); await p.waitForTimeout(400);
   const rd = await p.evaluate(() => { const w = document.querySelector('#cs .c-work'), t = w.innerText, band = w.querySelector('.c-bandcard'); return { band: band && band.getAttribute('data-band'), word: band && band.querySelector('h3').textContent, text: t, now: (w.querySelector('.c-steps li.now') || {}).textContent,
@@ -135,7 +135,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
     'the model is given her profile, her wants, her CV and her LinkedIn entries, and the rule never to invent; with the model Lector uses', rd.ask && rd.ask.u.slice(0, 200));
   await fitCheck('An application: how you fit'); await shot('fit');
   // 4. what she sends: a CV, a letter, an email, and the files
-  await press('Next: what you send'); await press('Write the tailored CV'); await idle(); await p.waitForTimeout(1500);
+  await press('Next: its checklist'); await press('Next: what you send'); await p.evaluate(() => { const o = IngCareer.state().opps[0]; o.way = 'auto'; IngCareer.render(); }); await press('Write the tailored CV'); await idle(); await p.waitForTimeout(1500);
   const cv = await p.evaluate(() => { const f = document.querySelector('#cs iframe.c-paper'); const d = f && f.contentDocument; const o = IngCareer.state().opps[0]; return { text: d ? d.body.innerText : '', head: d && d.querySelector('.cv h1') && d.querySelector('.cv h1').textContent, sub: d && d.querySelector('.cv .sub') && d.querySelector('.cv .sub').textContent,
     h2: d ? [...d.querySelectorAll('h2')].map(x => x.textContent) : [], chk: o.docs.cv && o.docs.cv.chk, stage: o.stage, foot: [...document.querySelectorAll('#cs .c-work .c-pn-f button')].map(x => x.textContent) }; });
   ok(cv.head === 'Ada Lovelace' && cv.sub === 'ada@example.org · Oxford' && cv.h2.join('|') === 'Education|Teaching|Skills', 'the CV is shown on its paper: her name and contact line at its head, its sections unnumbered', JSON.stringify({ head: cv.head, sub: cv.sub, h2: cv.h2 }));
@@ -205,7 +205,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   await press('Make it a goal'); ok(await p.evaluate(() => IngCareer.state().goals.length === 2 && IngCareer.state().goals[0].steps[0].text === 'write to supervisors'), 'a kind of role made a goal, with its first step');
   // 9. learn: one lesson at a time
   await press('Learn', '#cs .rm-tabs'); const ls = await p.evaluate(() => [...document.querySelectorAll('#cs .c-list .c-item b')].map(x => x.textContent));
-  ok(ls.length === 9 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews'), 'Learn: nine lessons, listed', ls.join(', '));
+  ok(ls.length === 14 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews') && ls.includes('A statement of purpose') && ls.includes('A checklist from a posting'), 'Learn: its lessons, listed (fourteen since 6.8.12)', ls.join(', '));
   if (phone) await press('Reading a posting'); const l1 = await p.evaluate(() => ({ h: document.querySelector('#cs .c-work h2').textContent, n: document.querySelectorAll('#cs .c-lesson li').length }));
   await press('A CV for an application ›'); const l2 = await p.evaluate(() => document.querySelector('#cs .c-work h2').textContent);
   ok(l1.h === 'Reading a posting' && l1.n === 5 && l2 === 'A CV for an application', 'one lesson at a time, in numbered steps, the next one a press away', JSON.stringify([l1, l2]));
