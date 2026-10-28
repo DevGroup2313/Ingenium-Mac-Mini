@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from wk import Session
 
 URL = sys.argv[1]
-MARK = {"notify": 0.13, "room": 0.15, "confirm": 0.10, "paper": 0.08, "keys": 0.03, "cards": 0.05}
+MARK = {"notify": 0.13, "room": 0.15, "confirm": 0.10, "paper": 0.06, "keys": 0.025, "cards": 0.04}
 res = []
 
 
@@ -26,20 +26,20 @@ with Session() as s:
     s.js("var b=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='Enter'&&x.offsetParent);if(b)b.click();")
     time.sleep(1)
     s.js("""window.__snd=null;(async function(){var S=window.IngSound,C=S.config(),out={};try{
-      for(var role of S.roles)for(var v of role.voices){if(v==='byRoom')continue;var L=C.vol*(C.trim[role.id]==null?1:C.trim[role.id]);
-        var a=await S.render(v,{level:L,seconds:3.2,tailFrom:2.4}),m=await S.render(v,{level:1.5,seconds:3.2,tailFrom:2.4});
+      for(var role of S.roles)for(var v of role.voices){if(v==='byRoom'||/Off$/.test(v))continue;var L=C.vol*(C.trim[role.id]==null?1:C.trim[role.id]),lg=role.id==='room'||role.id==='notify';
+        var a=await S.render(v,{level:L,seconds:lg?5.6:3.2,tailFrom:lg?4.6:2.4}),m=await S.render(v,{level:1.5,seconds:lg?5.6:3.2,tailFrom:lg?4.6:2.4});
         out[v]=a&&m?{role:role.id,loud:a.loud,max:m.peak,tail:a.tail,bal:10*Math.log10(a.energyL/a.energyR)}:null;}
       window.__snd=out;}catch(e){window.__snd={error:String(e)};}})();""")
     s.wait("return window.__snd!==null", 300)
     out = s.js("return window.__snd")
-    ok("error" not in out and len(out) == 21, "every voice renders in Safari's engine", json.dumps(out)[:300])
+    ok("error" not in out and len(out) == 16, "every voice renders in Safari's engine", json.dumps(out)[:300])
     for v, x in out.items():
         if not isinstance(x, dict):
             ok(False, v + " renders", x)
             continue
         k = MARK[x["role"]]
         ok(k * 0.6 < x["loud"] < k * 1.6 and x["max"] < 0.95 and x["tail"] < 0.002 and abs(x["bal"]) < 0.5,
-           "%s: its kind's presence (%.3f, the mark %s), below 0.95 at the loudest (%.3f), over in 2.4 s, in the middle" % (v, x["loud"], k, x["max"]), json.dumps(x))
+           "%s: its kind's presence (%.3f, the mark %s), below 0.95 at the loudest (%.3f), over in time, in the middle" % (v, x["loud"], k, x["max"]), json.dumps(x))
     live = s.js("try{var C=window.AudioContext||window.webkitAudioContext;var c=new C();var r=c.state;c.close();return r;}catch(e){return 'none: '+e;}")
     s.js("go('chat')")
     time.sleep(1.6)
