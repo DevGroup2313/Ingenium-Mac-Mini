@@ -1,4 +1,4 @@
-// node rig/t_681_abacus_keys.js <Ingenium page url>
+// node rig/t_681_abacus_keys.js <Ingenium page url, or a Forge page url>
 // 6.8.1: Abacus's grid answers the keys Excel's does, pressed as a person presses them (real presses of the pointer and keys,
 // in Chromium): a cell chosen is replaced by what is typed, even after a second press; a double press or F2 edits it in place; Escape
 // gives back what was there; the arrows go from cell to cell and, with Shift, widen the selection; Shift+Enter goes up;
@@ -13,6 +13,8 @@ let pass = 0, fail = 0; function ok(c, what, info) { if (c) pass++; else fail++;
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
   let fr, fb;
   async function open() {
+    if (/forge/i.test(URL)) { const o = await require('./in_forge.js')(p, URL, 'abacus', '#grid td[data-ref="A1"]'); fr = o.fr; fb = await o.fh.boundingBox();
+      await fr.evaluate(() => { window.__fe = []; window.addEventListener('error', e => window.__fe.push(String(e.message))); }); return; }
     await p.goto(URL); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
     await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
     await p.waitForTimeout(800); await p.evaluate(() => go('abacus'));

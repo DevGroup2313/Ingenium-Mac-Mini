@@ -1,4 +1,4 @@
-// node rig/t_681_imago.js <Ingenium page url> [screenshot.png]
+// node rig/t_681_imago.js <Ingenium page url, or a Forge page url> [screenshot.png]
 // 6.8.1: Imago's ribbon inside Ingenium, pressed as a person presses it (real presses of the pointer and keys, in Chromium;
 // rig/t_681_imago_wk.py runs the same in Safari's engine): words chosen with a double-click in a slide's text, each key and
 // list once; the words typed after choosing a colour, a size or bold with nothing selected; Grow and Shrink twice; and all
@@ -12,6 +12,8 @@ const WORD = (W) => { const f = document.querySelector('#slide .s-sub'); const t
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
   let fr, fb;
   async function open() {
+    if (/forge/i.test(URL)) { const o = await require('./in_forge.js')(p, URL, 'slides', '#slide .s-sub'); fr = o.fr; fb = await o.fh.boundingBox();
+      await fr.evaluate(() => { window.__fe = []; window.addEventListener('error', e => window.__fe.push(String(e.message))); }); return; }
     await p.goto(URL); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
     await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
     await p.waitForTimeout(800); await p.evaluate(() => go('slides'));
