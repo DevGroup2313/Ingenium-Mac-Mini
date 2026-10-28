@@ -1,4 +1,4 @@
-// node rig/t_681_ribbon.js <Ingenium page url, or a Tabula page url> [screenshot.png]
+// node rig/t_681_ribbon.js <Ingenium page url, a Forge page url, or a Tabula page url> [screenshot.png]
 // 6.8.1: Tabula's ribbon in Chromium's engine (Windows, the Fire tablet), pressed as a person presses it: the same cases as
 // rig/t_681_ribbon_wk.py runs in Safari's. Each thing the ribbon gives must land at the first press, on selected words and on
 // the words typed next, and still be there a few seconds later. apps/tabula_ribbon_patch.py.
@@ -9,13 +9,14 @@ const WORD = (W) => { const ed = document.getElementById('editor'), tw = documen
 (async () => {
   const b = await pw.chromium.launch(); const p = await (await b.newContext({ viewport: { width: 1440, height: 950 } })).newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto(URL); let fr = p;
-  if (/ingenium/i.test(URL)) {
+  let fr = p, FH = null;
+  if (/forge/i.test(URL)) { ({ fr, fh: FH } = await require('./in_forge.js')(p, URL, 'tabula', '#editor')); }
+  else if ((await p.goto(URL), /ingenium/i.test(URL))) {
     await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
     await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
     await p.waitForTimeout(800); await p.evaluate(() => go('tabula'));
     await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); try { return !!f.contentWindow.document.getElementById('editor') && f.contentWindow.document.readyState === 'complete'; } catch (e) { return false; } }, null, { timeout: 120000 });
-    await p.waitForTimeout(2000); fr = await (await p.$('#ing-desk iframe[data-app="tabula"]')).contentFrame();
+    await p.waitForTimeout(2000); FH = await p.$('#ing-desk iframe[data-app="tabula"]'); fr = await FH.contentFrame();
   } else { await p.waitForSelector('#editor'); await p.waitForTimeout(1500); }
   await fr.evaluate(() => { window.__fe = []; window.addEventListener('error', e => window.__fe.push(String(e.message))); });
   await fr.click('#editor'); await p.keyboard.type('Alpha beta gamma delta epsilon zeta theta iota kappa lambda omicron sigma. ');
@@ -25,7 +26,7 @@ const WORD = (W) => { const ed = document.getElementById('editor'), tw = documen
     return { color: c.color, size: c.fontSize, weight: c.fontWeight, style: c.fontStyle, family: c.fontFamily.split(',')[0].replace(/"/g, ''), bg }; }, [w, '(' + WORD + ')']);
   const base = await st('Alpha'); const px = v => parseFloat(v.size);
   const pick = async w => { await fr.evaluate(([W, src]) => { const [ed, n, m] = eval(src)(W); const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + W.length); const b = r.getBoundingClientRect(); window.__pt = [b.left + b.width / 2, b.top + b.height / 2]; }, [w, '(' + WORD + ')']);
-    const fb = /ingenium/i.test(URL) ? await (await p.$('#ing-desk iframe[data-app="tabula"]')).boundingBox() : { x: 0, y: 0 }; const pt = await fr.evaluate(() => window.__pt);
+    const fb = FH ? await FH.boundingBox() : { x: 0, y: 0 }; const pt = await fr.evaluate(() => window.__pt);
     await p.mouse.dblclick(fb.x + pt[0], fb.y + pt[1]); await p.waitForTimeout(250); };
   const press = async (css, i = 0) => { await (await fr.$$(css))[i].click(); await p.waitForTimeout(300); };
   const choose = async (sel, value) => { await fr.click(sel); await p.keyboard.press('Escape'); await p.waitForTimeout(150);

@@ -1,4 +1,4 @@
-// node rig/t_681_abacus.js <Abacus page url, or an Ingenium page url> [screenshot.png]
+// node rig/t_681_abacus.js <Abacus page url, an Ingenium page url, or a Forge page url> [screenshot.png]
 // 6.8.1: Abacus's ribbon, pressed as a person presses it (real presses of the pointer and keys, in Chromium; the same cases
 // run in Safari's engine through rig/t_681_abacus_wk.py): each control on a cell and on a range chosen by dragging, as Excel
 // does; numbers formatted; rows inserted and deleted with their formatting; Undo and Redo; all of it still there after the
@@ -9,10 +9,12 @@ let pass = 0, fail = 0; function ok(c, what, info) { if (c) pass++; else fail++;
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 950 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
-  let fr = p; const IN_ING = /ingenium/i.test(URL);
+  let fr = p, FH = null; const IN_ING = /ingenium/i.test(URL), IN_FORGE = /forge/i.test(URL);
   async function open() {
-    await p.goto(URL);
-    if (IN_ING) {
+    if (IN_FORGE) ({ fr, fh: FH } = await require('./in_forge.js')(p, URL, 'abacus', '#grid td[data-ref]'));
+    else await p.goto(URL);
+    if (IN_FORGE) {}
+    else if (IN_ING) {
       await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
       await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
       await p.waitForTimeout(800); await p.evaluate(() => go('abacus'));
@@ -23,8 +25,9 @@ let pass = 0, fail = 0; function ok(c, what, info) { if (c) pass++; else fail++;
     await fr.evaluate(() => { window.__fe = []; window.addEventListener('error', e => window.__fe.push(String(e.message))); });
   }
   await open();
-  const off = async () => { if (!IN_ING) return { x: 0, y: 0 }; const bb = await (await p.$('#ing-desk iframe[data-app="abacus"]')).boundingBox(); return { x: bb.x, y: bb.y }; };
-  const at = async r => { const o = await off(); const bb = await (await fr.$('#grid td[data-ref="' + r + '"]')).boundingBox(); return [o.x + bb.x + bb.width / 2, o.y + bb.y + bb.height / 2]; };
+  // a cell's box from Playwright is already measured on the whole window, through the frame (653: adding the frame's place
+  // again put every drag one row low inside the Forge, whose frame stands 42 pixels down)
+  const at = async r => { const bb = await (await fr.$('#grid td[data-ref="' + r + '"]')).boundingBox(); return [bb.x + bb.width / 2, bb.y + bb.height / 2]; };
   const cell = async r => { const a = await at(r); await p.mouse.click(a[0], a[1]); await p.waitForTimeout(150); };
   const range = async (a, z) => { const A = await at(a), Z = await at(z); await p.mouse.move(A[0], A[1]); await p.mouse.down(); await p.mouse.move(Z[0], Z[1], { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(200); };
   const press = async sel => { await fr.click(sel); await p.waitForTimeout(250); };

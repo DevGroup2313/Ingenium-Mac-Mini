@@ -371,6 +371,22 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.9 and The Forge 653 (28 October 2026; her words: "I want the Forge to be just as capable and functional as
+Ingenium with the same increased capabilities. I just want to do it all without AI", and of Tabula, Abacus and Imago, "I
+want them all fixed"). The Forge's own copies of the three apps had none of Ingenium 6.8.1's fixes. Pressed as a person
+presses them inside The Forge 652, Tabula's ribbon passed 20 of 42 checks, Abacus's 26 of 36 and Imago's 31 of 38. The
+Forge 653 applies the same four patches Ingenium's build applies (`build/apps/tabula_hf_patch.py`, `tabula_ribbon_patch.py`,
+`abacus_ribbon_patch.py`, `imago_ribbon_patch.py`) to the Forge's copies (`offline_project/forge_653/forge653.py`); inside
+The Forge 653 every check passes. The four tests now take a Forge page too (`rig/in_forge.js` opens the app by its key in
+the Forge's side column). `rig/t_681_abacus.js` no longer adds the frame's place to a cell's box Playwright already measures
+on the whole window (inside the Forge, whose frame stands 42 pixels down, every drag landed a row low). Ingenium 6.8.9
+carries The Forge 653, and The Forge 653 carries it.
+
+    node rig/t_681_ribbon.js <the Forge url>       # 42 checks inside The Forge (652: 20)
+    node rig/t_681_abacus.js <the Forge url>       # 36 (652: 26)
+    node rig/t_681_abacus_keys.js <the Forge url>  # 28
+    node rig/t_681_imago.js <the Forge url>        # 38 (652: 31)
+
 Ingenium 6.8.8 and The Forge 652 (28 October 2026; her words: "You broke something on the Forge it has the wrong Magister
 dock. Why is the French tutor button amongst the other buttons inside of the Forge?"). The Forge makes its Magister card by
 copying Carpe Diem's Magister dock and rewriting it; it found the key and the row of tutors by marks Carpe Diem's script puts
