@@ -340,6 +340,23 @@ from other programs.
     node rig/t_681_abacus_keys.js <Ingenium url>                      # Chromium: 28 checks (the old Abacus failed 23)
     xvfb-run -a python3 rig/t_681_abacus_keys_wk.py <Ingenium url>     # Safari's engine: 11 checks
 
+The support notes, the time guard and the timed reminders, quieter (6.8.2; her words: "The continue where you left off popup
+card when I first opened the app after install is still that bright ugly purple colour that I requested changed"). "Where
+you were", the break offered, Custodia's card and the two-minute word kept the bright amethyst face they were given in 6.1:
+the raised cards of r184 never named them. They take its faces now (`modules/r153.js`): the paper by day, the deep greyed
+amethyst by night, the quiet amethyst key; the loading screen's Refresh key too (`boot/splash.html`). And by night the
+thought card's plain keys (Later, Done) are soft lavender: their words read at 2.6 to 1 on the night card.
+
+    node rig/t_reminder_cards.js <Ingenium url> <out> ingenium        # 79 checks: each card in the quieter faces, words at 4.5 to 1
+
+Comparing two versions of an app in the library (6.8.2; from her list of next steps: "Implement a version comparison tool
+to help users understand changes between app versions"). Fabrica compares the versions of a project; the library, which keeps
+several versions of each app, now does too (`modules/r187.js`, Settings, Your data, Storage, Compare versions): a plain
+summary (places changed, lines added and taken away, how the size moved), then each changed place by its name, its lines
+shown when opened; a block of megabytes on one line (an app carried in another) compared by its fingerprint.
+
+    node rig/t_682_compare.js <Ingenium url>                           # 11 checks
+
 Models on an external drive (6.8.2; her words: "models should be allowed to use storage from external hard drives as well as
 the machine they are working on"). A model file chosen with the computer's dialog was already linked where it lay, on any
 drive, but what Ingenium wrote itself (a lineup model, a copy kept from the page) always went to the computer's own folder,

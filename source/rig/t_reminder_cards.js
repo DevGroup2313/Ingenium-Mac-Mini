@@ -26,7 +26,10 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
 /* ---------- each app's own reminder colours ---------- */
 const PAL = {
   forge: { '#0c3c52': 'its toast, cdToast', '#17577a': 'its anvil blue', '#124866': 'anvil blue, low', '#0a3049': 'anvil blue, edge', '#145671': 'deep ocean', '#1b6b93': 'ocean blue' },
-  ingenium: { '#4e2c8a': 'amethyst, deep (fill low)', '#43277a': 'amethyst jewel, low', '#472b7f': 'amethyst, night fill low', '#5d37a1': 'violet key, low', '#6a3fb5': 'amethyst accent', '#6b4fa0': 'violet accent', '#603ca6': 'violet, night fill' }
+  // 6.8.2, the owner's words (28 October 2026): "still that bright ugly purple colour that I requested changed": every reminder
+  // takes the raised card's faces (r184): the paper by day, the deep greyed amethyst by night, the quiet amethyst keys
+  ingenium: { '#ffffff': 'paper (the raised card, by day)', '#f7f5fa': 'paper, low', '#342a4c': 'deep greyed amethyst (the raised card, by night)',
+    '#2c2341': 'deep greyed amethyst, low', '#5b4690': 'quiet amethyst key', '#4c3a7c': 'quiet amethyst key, low', '#6b5a96': 'quiet amethyst key, by night' }
 }[APP];
 
 /* ---------- colour ---------- */
@@ -43,7 +46,7 @@ const dE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[
 const nearBlack = c => { const l = lab(c); return { L: +l[0].toFixed(1), C: +Math.hypot(l[1], l[2]).toFixed(1), black: l[0] < 20 && Math.hypot(l[1], l[2]) < 12 }; };
 const nearest = (c, more) => { const P = Object.assign({}, PAL, more || {}); return Object.keys(P).map(h => ({ h, name: P[h], d: dE(c, unhex(h)) })).sort((a, b) => a.d - b.d)[0]; };
 // 6.8, the owner's words: a thought that comes back has "full parity with Carpe Diem's 'Thoughts' reminder cloud popups", in Ingenium's
-// colours: by day the raised paper card it shares with Carpe Diem (white, as Carpe Diem's); by night it stays amethyst
+// colours: by day the raised paper card it shares with Carpe Diem (white, as Carpe Diem's); by night the deep greyed amethyst
 const PAPER = { '#ffffff': 'paper (a thought by day, the raised card shared with Carpe Diem)', '#fbfafd': 'paper, low' };
 const over = (fg, bg) => fg[3] >= 1 ? fg.slice(0, 3) : [0, 1, 2].map(i => fg[i] * fg[3] + bg[i] * (1 - fg[3]));
 
