@@ -1,4 +1,4 @@
-// node rig/t_685_home.js <Ingenium page url> <out dir>
+// node rig/t_685_home.js <Ingenium page url> <out dir> [<Carpe Diem 1059 page url>]
 // 6.8.5, in Chromium. The owner's words (28 October 2026): "I want the 'Your apps' section to actually show the brick
 // jewelled sparkling pill look of the apps original button designs from Carpe Diem and the Forge"; of the Focus page's
 // Inbox, "They are supposed to be button and look 3D and popped out and animated. I want them matching the rest of the
@@ -10,8 +10,12 @@
 //     the pointer;
 //   - the pointer coming onto either ticks (Touching a key), and pressing sounds as a key goes down;
 //   - no errors.
+// 6.8.7, her words: "Why are they so big and bulky? ... I want them back to their actual sizes like they are on Magister's
+// dock." So the stones are measured against Carpe Diem 1059's keys on Magister's dock, in this same browser: 26px high,
+// 6px by 14px around the name, Georgia 600 at 12px, as wide as the name, one row 6px apart; what each does is told when
+// the pointer rests on it (and to a screen reader), not written beneath.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
-const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
+const URL_ = process.argv[2], OUT = process.argv[3], CD_URL = process.argv[4] || 'http://127.0.0.1:8150/cd/cd1059.html'; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(d).slice(0, 500))); c ? pass++ : fail++; };
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 950 } });
@@ -22,12 +26,24 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => document.getElementById('hxAppsH').scrollIntoView({ block: 'center' })); await p.waitForTimeout(500);
   const apps = await p.evaluate(() => [...document.querySelectorAll('.hx-apps .hx-app')].map(a => { const s = a.querySelector('.hx-stone'), cs = getComputedStyle(s), bf = getComputedStyle(s, '::before');
     return { app: a.getAttribute('data-app'), name: s.textContent.trim(), stone: /^url\("data:image\/svg\+xml;base64,/.test(cs.backgroundImage), edge: cs.borderTopColor, r: cs.borderTopLeftRadius, color: cs.color, font: cs.fontFamily.split(',')[0],
-      spark: bf.animationName, clock: bf.animationDuration, star: /data:image\/svg\+xml/.test(bf.backgroundImage), caption: (a.querySelector('.hx-ad') || {}).textContent }; }));
+      spark: bf.animationName, clock: bf.animationDuration, star: /data:image\/svg\+xml/.test(bf.backgroundImage), title: a.title, label: a.getAttribute('aria-label'), beneath: a.querySelectorAll('.hx-ad').length,
+      h: Math.round(s.getBoundingClientRect().height * 10) / 10, w: Math.round(s.getBoundingClientRect().width * 10) / 10, top: Math.round(s.getBoundingClientRect().top), pad: cs.padding, fs: cs.fontSize, fw: cs.fontWeight, ff: cs.fontFamily, gap: getComputedStyle(a.parentElement).columnGap }; }));
   ok(apps.length === 7 && apps.map(a => a.name).join() === 'Tabula,Abacus,Imago,Scriba,Fontes,Schedae,Clepsydra', 'seven apps, by name', apps.map(a => a.name).join());
   ok(apps.every(a => a.stone && a.edge === 'rgb(189, 154, 82)' && a.r === '8px'), "each is Carpe Diem's cut stone: its stone picture, the gilt edge, the 8px cut corners", JSON.stringify(apps.map(a => [a.app, a.stone, a.edge, a.r])));
   ok(apps.every(a => a.spark === 'hxGlitter' && a.star) && new Set(apps.map(a => a.clock)).size === 7, 'each has sparks at its corners, on a clock of its own', JSON.stringify(apps.map(a => [a.app, a.spark, a.clock])));
-  ok(apps.filter(a => a.app !== 'fontes').every(a => a.color === 'rgb(255, 255, 255)') && apps.find(a => a.app === 'fontes').color === 'rgb(20, 86, 113)', 'lettered white, and Fontes in its dark blue on ivory, as in Carpe Diem', JSON.stringify(apps.map(a => [a.app, a.color])));
-  ok(apps.every(a => a.caption && a.caption.length > 3), 'what each does is written beneath it', JSON.stringify(apps.map(a => a.caption)));
+  ok(apps.filter(a => a.app !== 'fontes').every(a => a.color === 'rgb(255, 255, 255)') && apps.find(a => a.app === 'fontes').color === 'rgb(15, 75, 102)', "lettered white, and Fontes in its dark blue on ivory, as on Magister's dock", JSON.stringify(apps.map(a => [a.app, a.color])));
+  ok(apps.every(a => /^\w+: .{4,}/.test(a.title) && /^Open \w+: /.test(a.label) && a.beneath === 0), 'what each does is told when the pointer rests on it and to a screen reader, not written beneath', JSON.stringify(apps.map(a => [a.title, a.beneath])));
+  // the size of Carpe Diem's keys on Magister's dock, measured in Carpe Diem 1059 in this same browser
+  const cd = await (async () => { const q = await ctx.newPage(); await q.goto(CD_URL); await q.waitForTimeout(12000);
+    const r = await q.evaluate(() => [...document.querySelectorAll('.tabula-btn,.abacus-btn,.imago-btn')].filter(e => e.offsetParent).map(e => { const c = getComputedStyle(e), b = e.getBoundingClientRect();
+      return { t: e.textContent.trim(), h: Math.round(b.height * 10) / 10, w: Math.round(b.width * 10) / 10, pad: c.padding, fs: c.fontSize, fw: c.fontWeight, ff: c.fontFamily, gap: getComputedStyle(e.parentElement).columnGap }; }));
+    await q.close(); return r; })();
+  ok(cd.length === 3, "Carpe Diem's dock keys were found to measure against", JSON.stringify(cd));
+  const near = (a, b, d) => Math.abs(a - b) <= d;
+  ok(apps.every(a => near(a.h, cd[0].h, 1) && a.pad === cd[0].pad && a.fs === cd[0].fs && a.fw === cd[0].fw && a.ff === cd[0].ff), "each stone is the height of Carpe Diem's dock key, with its padding and its lettering (" + cd[0].h + 'px, ' + cd[0].pad + ', ' + cd[0].fw + ' ' + cd[0].fs + ')',
+    JSON.stringify(apps.map(a => [a.app, a.h, a.pad, a.fw, a.fs, a.ff.split(',')[0]])));
+  ok(cd.every(k => { const a = apps.find(x => x.name === k.t); return a && near(a.w, k.w, 1.5); }), 'Tabula, Abacus and Imago are as wide as on the dock', JSON.stringify(cd.map(k => [k.t, k.w, (apps.find(x => x.name === k.t) || {}).w])));
+  ok(new Set(apps.map(a => a.top)).size === 1 && apps.every(a => a.gap === cd[0].gap), 'they stand in one row, as far apart as on the dock (' + cd[0].gap + ')', JSON.stringify(apps.map(a => [a.app, a.top, a.gap])));
   const stones = await p.evaluate(() => new Set([...document.querySelectorAll('.hx-apps .hx-stone')].map(s => getComputedStyle(s).backgroundImage)).size);
   ok(stones === 7, 'seven stones, one for each app (Schedae amethyst, Clepsydra gold)', stones);
   await p.screenshot({ path: OUT + '/apps.png', clip: await p.evaluate(() => { const r = document.querySelector('.hx-appsec').getBoundingClientRect(); return { x: Math.max(0, r.left - 10), y: Math.max(0, r.top - 10), width: Math.min(1430, r.width + 20), height: r.height + 30 }; }) });

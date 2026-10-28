@@ -126,7 +126,6 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-key:hover .hx-arrow{transform:translateX(3px);color:var(--x-acc)}
 @container hxm (min-width:1500px){.hx-key{min-height:196px;padding:22px 22px 20px;gap:14px;border-radius:20px}.hx-jewel{width:56px;height:56px;border-radius:16px}.hx-jewel svg{width:27px;height:27px}
   .hx-kh{font-size:21px}.hx-kd{font-size:14px}.hx-km{font-size:12.5px}.hx-arrow{top:22px;right:22px}
-  .hx-app .hx-stone{min-height:54px;font-size:18px}.hx-ad{font-size:12.5px}
   .hx-recent{padding:22px 22px 20px}.hx-item{min-height:58px}}
 @container hxm (max-width:559px){.hx-key{min-height:0;padding:13px 12px 12px;gap:8px;border-radius:16px}.hx-jewel{width:38px;height:38px;border-radius:12px}.hx-jewel svg{width:20px;height:20px}
   .hx-kh{font-size:16px}.hx-kd{font-size:12.5px}.hx-arrow{top:13px;right:12px}}
@@ -161,22 +160,25 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-empty{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:6px 6px 4px;color:var(--x-ink3);font-size:13px}
 .hx-wait{height:52px;border-radius:12px;background:linear-gradient(90deg,var(--x-hair2),var(--x-sunk),var(--x-hair2));background-size:200% 100%;animation:hxShim 1.4s linear infinite}
 /* ---- the apps ---- */
-.hx-apps{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
-@container hxm (min-width:860px){.hx-apps{grid-template-columns:repeat(7,minmax(0,1fr));gap:14px}}
+.hx-apps{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}
 /* 6.8.5: the apps as Carpe Diem's and the Forge's cut stones, her words: "the brick jewelled sparkling pill look of the apps
    original button designs from Carpe Diem and the Forge". Each is the stone Carpe Diem paints on its own key (the table
    cut: a flat top, facets only at the edges, a thin gilt edge), lettered as Carpe Diem letters it, cut into the stone; a
    few white sparks catch at its corners, each stone on its own slow clock. It lifts under the pointer and bottoms out when
-   pressed, as Carpe Diem's keys do. What it does is written beneath it. The stones: jewels/make_jewels.py. */
-.hx-apps .hx-app{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:0 0 2px;border:0;border-radius:10px;cursor:pointer;text-align:center;
+   pressed, as Carpe Diem's keys do. The stones: jewels/make_jewels.py.
+   6.8.7, her words: "Why are they so big and bulky? ... I want them back to their actual sizes like they are on Magister's
+   dock." So each is now the size of Carpe Diem's key on Magister's dock, as measured in Carpe Diem 1059: 26px high, as
+   wide as its name, 14px either side of it, Georgia 600 at 12px (Fontes in the dock's #0f4b66), in a row 6px apart. What each does is told when the pointer rests on
+   it, and to a screen reader, as the dock does not write it beneath. */
+.hx-apps .hx-app{position:relative;display:inline-flex;padding:0;border:0;border-radius:8px;cursor:pointer;text-align:center;
   background:none;box-shadow:none;color:inherit;font:inherit;-webkit-tap-highlight-color:transparent;animation:hxRise .55s var(--x-spring) backwards}
-.hx-app .hx-stone{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:48px;padding:8px 12px;box-sizing:border-box;
+.hx-app .hx-stone{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;height:26px;padding:6px 14px;box-sizing:border-box;
   border:1px solid #bd9a52;border-radius:8px;background-color:#27272a;background-size:100% 100%;background-repeat:no-repeat;
-  font:600 16.5px/1.1 var(--x-serif);letter-spacing:.02em;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.14),0 2px 3px rgba(0,0,0,.4);
+  font:600 12px/normal Georgia,"Iowan Old Style","Times New Roman",serif;letter-spacing:.02em;white-space:nowrap;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.14),0 2px 3px rgba(0,0,0,.4);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 rgba(12,18,26,.55),0 3px 4px rgba(12,18,26,.4),0 7px 11px rgba(12,18,26,.28),0 13px 20px rgba(12,18,26,.2),0 22px 34px rgba(12,18,26,.12);
   transition:transform .09s cubic-bezier(.34,1.3,.64,1),box-shadow .09s ease,filter .12s ease}
 .hx-app .hx-stone .hx-an{position:relative;z-index:3;font:inherit;color:inherit;letter-spacing:inherit}
-.hx-app[data-app="fontes"] .hx-stone{color:#145671;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.7),0 -1px 0 rgba(0,0,0,.22),0 1px 2px rgba(120,96,52,.3)}
+.hx-app[data-app="fontes"] .hx-stone{color:#0f4b66;text-shadow:0 1px 0 rgba(255,255,255,.55),0 1px 1px rgba(120,90,40,.2)}
 .hx-app:hover .hx-stone{transform:translateY(-4px);filter:brightness(1.06);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 3px rgba(12,18,26,.4),0 6px 12px rgba(12,18,26,.28),0 12px 22px rgba(12,18,26,.18)}
 .hx-app:active .hx-stone{transform:translateY(1px);transition-duration:.04s;
@@ -199,8 +201,6 @@ body[data-motion="minimal"] .hx-app .hx-stone::before,body[data-calm="1"] .hx-ap
 body[data-motion="minimal"] .hx-app .hx-stone{transition:none}
 @media (prefers-reduced-motion:reduce){.hx-app .hx-stone::before{animation:none}.hx-app .hx-stone{transition:none}}
 /*R147_JEWELS*/
-.hx-ad{font-size:11.5px;line-height:1.3;color:var(--x-ink3)}
-@container hxm (max-width:559px){.hx-apps{gap:9px}.hx-app .hx-stone{min-height:40px;padding:6px 6px;font-size:13.5px}.hx-ad{display:none}}
 /* ---- the side: the plaque, the models ---- */
 .hx-cols{display:flex;flex-direction:column;gap:20px}
 .hx-side{display:flex;flex-direction:column;gap:20px;min-width:0}
@@ -378,8 +378,8 @@ function build(){
   var ah=mk("div","hx-sech");var ah2=mk("h2",null,"Your apps");ah2.id="hxAppsH";ah.appendChild(ah2);ah.appendChild(mk("p",null,"Carpe Diem's own apps open on the Desk; the instruments open over this page."));as.appendChild(ah);
   var ag=mk("div","hx-apps");
   APPS.forEach(function(A,i){var b=mk("button","hx-app");b.type="button";b.setAttribute("data-app",A.k);b.style.setProperty("--c",A.c);b.style.animationDelay=(i*.035).toFixed(3)+"s";
-    b.innerHTML='<span class="hx-stone"><span class="hx-an"></span></span><span class="hx-ad"></span>';
-    b.querySelector(".hx-an").textContent=A.t;b.querySelector(".hx-ad").textContent=A.d;b.setAttribute("aria-label","Open "+A.t+": "+A.d);
+    b.innerHTML='<span class="hx-stone"><span class="hx-an"></span></span>';
+    b.querySelector(".hx-an").textContent=A.t;b.title=A.t+": "+A.d;b.setAttribute("aria-label","Open "+A.t+": "+A.d);
     b.onclick=function(){if(A.go){go(A.go);return;}try{var f=window[A.fn];if(typeof f==="function")f();else toast(A.t+" is not part of this copy of Ingenium.");}catch(e){toast(A.t+" could not be opened: "+(e&&e.message||e));}};
     ag.appendChild(b);});
   as.appendChild(ag);main.appendChild(as);
