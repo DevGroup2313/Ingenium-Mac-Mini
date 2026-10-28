@@ -371,6 +371,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.7 and The Forge 651 (28 October 2026; her words: "I hate the look of the apps buttons. Why are they so big and
+bulky? ... I want them back to their actual sizes like they are on Magister's dock"). The apps on Home are the size of
+Carpe Diem's keys on Magister's dock, as measured in Carpe Diem 1059: 26px high, as wide as the name with 14px either side,
+Georgia 600 at 12px, one row 6px apart, Fontes lettered #0f4b66 (`build/modules/r147.js`). What each app does is told when
+the pointer rests on it and to a screen reader. The Forge 651 carries Ingenium 6.8.7 and Ingenium 6.8.7 carries The Forge
+651, made together as 6.8.6 and 650 were (`offline_project/forge_651/`).
+
+    node rig/t_685_home.js <url> <out> [<Carpe Diem 1059 url>]           # 18 checks: the stones against the dock's keys
+    node offline_project/forge_651/tests/t_651.js <the Forge url> <out>   # 21 checks, as 650's, on 651 carrying Ingenium 6.8.7
+
 Ingenium 6.8.6 and The Forge 650 (28 October 2026; her words: "The Forge needs to carry the latests version of Ingenium and
 vice versa"). Each carries the other's lean copy, a page that carries no apps, so the two are made together: Ingenium 6.8.6's
 release page is built, its lean copy made (`offline_project/forge_649/lean_ingenium.py`), The Forge 650 built carrying it
