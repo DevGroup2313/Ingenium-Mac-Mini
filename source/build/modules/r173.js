@@ -211,7 +211,7 @@ var CONF={
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
   models:{label:"Models, in rooms",rooms:[
-    {k:"yours",t:"Your models",i:"yours",says:"The models on this device and how well they run. Add a model file you already have.",ids:["healthBox","yourModelsCard",/^add a model/]},
+    {k:"yours",t:"Your models",i:"yours",says:"The models on this device and how well they run. Add a model file you already have.",ids:["healthBox","yourModelsCard","mdPlaceCard",/^add a model/]},
     {k:"get",t:"Ingenium's models",i:"get",says:"Ingenium's own models, in four houses. Choose a size and get one.",ids:["lineupCard",/^the four houses/]},
     {k:"catalogue",t:"More models",i:"cat",says:"A wider choice of strong, open models. They are sorted by what fits this device.",ids:["catBox"]},
     {k:"studio",t:"Studio",i:"studio",star:true,says:"The Studio: make and train your own models. Give a model its own name and instructions, or convert a model's file.",
@@ -228,6 +228,7 @@ var STEPS=[{t:"Choose",next:"Next: how they work together"},{t:"Combine",next:"N
 /* the words a person might use for each setting, besides the words on the card */
 var KEYS=[
   ["ing-refresh-card","refresh reload restart glitch glitches frozen stuck stops answering start again"],
+  ["mdPlaceCard","drive drives external hard disk usb ssd storage folder where kept move space room free"],
   [/^name$/,"name app name title called rename"],
   [/^look and feel/,"look theme dark night day light mode colour color colours appearance motion animation movement"],
   ["ingSoundCard","sound sounds audio volume chime click clicks quiet mute noise"],
