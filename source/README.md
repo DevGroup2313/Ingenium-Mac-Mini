@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.12 and The Forge 656 (28 October 2026; her words: "I want the Career Studio and the Lector page to be made even
+more capabale and proficient in their functions [...] I want to be able to automate where I want and also meticulously review
+and do on my own at my own pace", and "I want the Career Studio to be able to hold multiple profiles"; asked, she chose a switch
+on each task, a calm Today view, requirement checklists, more PhD documents and changes accepted one by one, and profiles for
+other sides of her and for other people she helps, each with its own applications). `build/modules/r188.js`: Today, a room of
+its own (only the next small step of each application, its closing date, Do this now, Not today); a Checklist step (what the
+posting asks to send and do, read from its own sentences, each item with its quotation; Find anything missed keeps only what
+the model quotes word for word and the list does not hold); a statement of purpose, a teaching statement, a funding application
+and the choice of a writing sample, with their lessons and limits; each task's way (Do it for me; Step by step with me: a plan
+first, then each change she asks for waits, one by one, with Why this change?; Guide me, I do it: a guide to write it herself);
+several profiles (state.career becomes {people, cur}; what was kept before is the first; Another side of me copies a profile
+without its applications; Someone else is empty and never uses her CV, her writing or Lector's readings), with a switcher
+beside the studio's name.
+
+    node rig/t_6812_career.js <url> <out>                                      # 25 checks
+    node rig/t_683_career.js <url> <out>                                       # 48 checks (six steps, five rooms since 6.8.12)
+    node rig/t_685_career.js <url> <out>                                       # 25 checks
+    node offline_project/forge_656/tests/t_656.js <the Forge url> <out>        # on 656 carrying Ingenium 6.8.12
+
 Ingenium 6.8.11 and The Forge 655 (28 October 2026; her words: "I want the models to be aware of what I need them to do and
 make surgical edits and help me improve my apps", on the code chat, the main chat page and the Build page, with Claude's
 models, Ollama's and Kimi; and "I want to be able to automate where I want and also meticulously review and do on my own at

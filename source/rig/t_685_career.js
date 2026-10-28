@@ -48,7 +48,8 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
     if (!bb) throw new Error('no key: ' + text); await p.mouse.click(bb[0], bb[1]); await p.waitForTimeout(400); };
   const idle = () => p.waitForFunction(() => !IngCareer.run.busy, null, { timeout: 60000 });
   const still = () => p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); return (se.scrollHeight - se.clientHeight) + (m ? m.scrollHeight - m.clientHeight : 0); });
-  await p.evaluate(() => go('career')); await p.waitForTimeout(900);
+  // 6.8.12: each task has its way; these checks are of Do it for me
+  await p.evaluate(() => { IngCareer.state().ui.way = 'auto'; go('career'); }); await p.waitForTimeout(900);
 
   // 1. the room key in hand: white on amethyst, still white under the pointer
   const tab = await p.evaluate(() => { const t = document.querySelector('#cs .rm-tab[aria-selected="true"]'); const r = t.getBoundingClientRect(); return { c: getComputedStyle(t).color, sp: getComputedStyle(t.querySelector('span')).color, svg: getComputedStyle(t.querySelector('svg')).color, x: r.left + r.width / 2, y: r.top + r.height / 2, t: t.textContent.trim() }; });

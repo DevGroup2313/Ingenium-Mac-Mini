@@ -252,6 +252,61 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs.c-phone .c-head h1{font-size:22px}#cs.c-phone .c-head p{display:none}
 #cs.c-phone .c-addstep{grid-template-columns:minmax(0,1fr)}
 #cs.c-phone .c-head .rm-tab{padding:6px 10px;min-height:34px;font-size:12.5px}
+
+/* 6.8.12 · at her pace: the way of working, the checklist, Today, changes one by one, and several profiles */
+#cs .c-keyrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:flex-start}
+#cs .c-way{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px}
+#cs .c-way .c-label{margin:0}
+#cs .c-way .c-note{flex:1 1 260px;margin:0}
+#cs .c-hrow{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px}
+/* five rooms beside the title, on one line, as the four were */
+#cs .c-head .rm-tab{padding:7px 11px 7px 9px}
+#cs .c-head .rm-tabs{gap:6px}
+#cs .c-who{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:12.5px;font-weight:600;color:var(--c-ink2)}
+#cs .c-who select{font:600 12.5px var(--c-sans);color:var(--c-ink1);background:linear-gradient(var(--c-a),var(--c-b));border:1px solid var(--c-hair);border-radius:9px;padding:3px 8px;height:28px;box-shadow:var(--c-pill);max-width:min(230px,60vw);text-overflow:ellipsis}
+#cs .c-who select:focus-visible{outline:2px solid var(--c-ring);outline-offset:1px}
+#cs .c-people{display:flex;flex-direction:column;gap:8px;padding:0 14px}
+#cs .c-person{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
+#cs .c-person.c-cur{border-color:var(--c-ring);box-shadow:var(--c-pill),inset 3px 0 0 var(--c-acc)}
+#cs .c-person .tx{flex:1 1 220px;display:flex;flex-direction:column;gap:2px}
+#cs .c-person .tx b{font:600 14.5px/1.3 var(--c-serif)}
+#cs .c-person .tx small{color:var(--c-ink3);font-size:12px}
+#cs .c-newp{margin-top:14px;gap:10px}
+#cs .c-newrow{align-items:center;flex-wrap:wrap;gap:8px 10px}
+#cs .c-newrow .c-note{flex:1 1 240px;margin:0}
+#cs .c-newrow input{max-width:240px}
+#cs .c-ck{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#cs .c-ck li{display:flex;align-items:flex-start;gap:10px;padding:9px 11px;border:1px solid var(--c-hair);border-radius:11px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
+#cs .c-ck li input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-color:var(--c-acc)}
+#cs .c-ck li label{flex:1 1 auto;display:flex;flex-direction:column;gap:3px;cursor:pointer}
+#cs .c-ck li .c-ck-t{font-weight:600;color:var(--c-ink1)}
+#cs .c-ck li small{color:var(--c-ink3);font-size:12px;line-height:1.45}
+#cs .c-ck li.c-ck-done .c-ck-t{color:var(--c-ink3);text-decoration:line-through;text-decoration-thickness:1px}
+#cs .c-ck-acts{display:flex;gap:6px;flex:0 0 auto}
+#cs .c-ck-sug{padding:12px 14px;border:1px solid var(--c-ring);border-radius:12px;background:linear-gradient(var(--c-accs),transparent),linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pop);display:flex;flex-direction:column;gap:6px}
+#cs .c-ck-sug small{color:var(--c-ink3);font-size:12px}
+#cs .c-ck-sug b{font:600 15px/1.35 var(--c-serif)}
+#cs .c-ck-sug blockquote,#cs .c-today-q{margin:0;padding:6px 10px;border-left:2px solid var(--c-acc);color:var(--c-ink2);font-size:13px;background:var(--c-wellbg);border-radius:0 8px 8px 0}
+#cs .c-today{gap:10px;padding:6px 4px}
+#cs .c-today-step{font:600 20px/1.35 var(--c-serif);color:var(--c-ink1);margin:2px 0}
+#cs .c-item.c-soon-i small{color:var(--c-warn)}
+#cs .c-rv{gap:10px}
+#cs .c-rv-card{border:1px solid var(--c-hair);border-radius:12px;padding:10px 12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);display:flex;flex-direction:column;gap:8px}
+#cs .c-rv-card.c-rv-new{border-color:var(--c-ok)}
+#cs .c-rv-card.c-rv-old{border-color:var(--c-ring)}
+#cs .c-rv-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#cs .c-rv-old,#cs .c-rv-new{border-radius:8px;padding:6px 10px}
+#cs .c-rv-card > .c-rv-old{background:var(--c-bads)}
+#cs .c-rv-card > .c-rv-new{background:var(--c-oks)}
+#cs .c-rv-card small{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-ink3);margin-bottom:2px}
+#cs .c-rv-card p{margin:0 0 6px;white-space:pre-wrap}
+#cs .c-rv-gone p{font-style:italic;color:var(--c-ink3)}
+#cs .c-rv-same{text-align:center;margin:0}
+#cs .c-chip.c-ok{color:var(--c-ok);border-color:var(--c-ok)}
+#cs .c-plan{min-height:220px;font:13.5px/1.6 var(--c-sans)}
+#cs .c-guide{font-size:13.5px;line-height:1.55;max-height:46vh;overflow:auto}
+#cs .c-guide h2{font:600 15px/1.3 var(--c-serif);margin:12px 0 4px}
+#cs .c-guide h2:first-child{margin-top:0}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p188"]="started";}catch(_){}
 /* R188 · THE CAREER STUDIO (6.8.3, 28 October 2026)
@@ -319,7 +374,13 @@ var STAGES=[["considering","Considering"],["preparing","Preparing"],["applied","
 var FINISHED={accepted:1,unsuccessful:1,withdrawn:1,not:1};
 var OKINDS=[["job","A job"],["phd","A PhD or DPhil"],["grant","A grant or fellowship"],["other","Something else"]];
 var SECTS=[["education","Education"],["post","Posts and work"],["research","Research and publications"],["teaching","Teaching"],["project","Projects"],["skill","Skills, with evidence"],["language","Languages"],["award","Awards and funding"],["referee","Referees"],["other","Other"]];
-function CS(){var s=state.career;if(!s||typeof s!=="object")s=state.career={};
+/* 6.8.12: several profiles. state.career holds {people:[...], cur}; each person keeps its own profile, applications, goals,
+   suggested roles and place in the studio, and CS() is the one open now. What was kept before becomes the first. */
+function ROOT(){var r=state.career;if(!r||typeof r!=="object")r=state.career={};
+  if(!Array.isArray(r.people)){var p0={id:uid("pp")};Object.keys(r).forEach(function(k){p0[k]=r[k];delete r[k];});r.v=2;r.people=[p0];r.cur=p0.id;}
+  if(!r.people.length){var p1={id:uid("pp")};r.people.push(p1);r.cur=p1.id;}
+  if(!r.people.some(function(p){return p&&p.id===r.cur;}))r.cur=r.people[0].id;return r;}
+function CS(){var r=ROOT(),s=r.people.filter(function(p){return p.id===r.cur;})[0];
   if(!s.profile||typeof s.profile!=="object")s.profile={};var P=s.profile;
   if(!Array.isArray(P.items))P.items=[];if(!Array.isArray(P.files))P.files=[];
   if(!P.use||typeof P.use!=="object")P.use={cv:true,linkedin:true,writing:true,letters:true,fontes:false,apps:{}};if(!P.use.apps||typeof P.use.apps!=="object")P.use.apps={};
@@ -333,8 +394,10 @@ function american(){return CS().profile.prefs.spelling==="american";}
 function english(){return american()?"American English":"British English";}
 function wantsText(){var W0=CS().profile.wants,L=[["What I am looking for",W0.looking],["What I need",W0.need],["What I would rather avoid",W0.avoid],["Where",W0.where],["By when",W0.when]].filter(function(x){return String(x[1]||"").trim();});
   return L.length?"WHAT I AM LOOKING FOR (my wants, needs and timeline):\n"+L.map(function(x){return "- "+x[0]+": "+String(x[1]).trim();}).join("\n"):"";}
-function myName(){var n=CS().profile.name;if(n)return n;try{return lxhAuthor()||"";}catch(e){return "";}}
-function lectorMe(){try{return LXR().state().me;}catch(e){return {cv:null,writing:[],letters:[]};}}
+function myName(){var P=CS().profile,n=P.name;if(n)return n;if(P.isMe===false)return "";try{return lxhAuthor()||"";}catch(e){return "";}}
+function isMe(){return CS().profile.isMe!==false;}
+function lectorMe(){var P=CS().profile;if(P.isMe===false){if(!P.own||typeof P.own!=="object")P.own={cv:null,writing:[],letters:[]};if(!Array.isArray(P.own.writing))P.own.writing=[];if(!Array.isArray(P.own.letters))P.own.letters=[];return P.own;}
+  try{return LXR().state().me;}catch(e){return {cv:null,writing:[],letters:[]};}}
 
 /* ---------------- the model: Lector's choice for this device ---------------- */
 function plan(){try{return LXR().plan();}catch(e){return null;}}
@@ -369,7 +432,7 @@ function itemLine(it){var when=[it.from,it.to].filter(Boolean).join(" to ");retu
 function itemsText(){var P=CS().profile,out=[];
   SECTS.forEach(function(s){var its=P.items.filter(function(it){return it.sec===s[0]&&(it.src!=="linkedin"||P.use.linkedin);});if(its.length)out.push("## "+s[1]+"\n"+its.map(itemLine).join("\n"));});
   return out.join("\n\n");}
-function appsWanted(){var P=CS().profile,out=[];try{lxState().runs.forEach(function(r){if(r.kind==="app"&&r.status==="done"&&P.use.apps[r.app||r.name]!==false&&out.every(function(x){return x.name!==r.name;}))out.push(r);});}catch(e){}return out;}
+function appsWanted(){var P=CS().profile,out=[];if(P.isMe===false)return out;try{lxState().runs.forEach(function(r){if(r.kind==="app"&&r.status==="done"&&P.use.apps[r.app||r.name]!==false&&out.every(function(x){return x.name!==r.name;}))out.push(r);});}catch(e){}return out;}
 function loadText(ref){try{return ref?Promise.resolve(IngBig.load(ref)).then(function(t){return String(t||"");},function(){return "";}):Promise.resolve("");}catch(e){return Promise.resolve("");}}
 /* everything the profile holds, read once for a piece of writing: {items, cv, linkedin, files[], apps[], writing, letters, sources[]} */
 function gatherProfile(o){o=o||{};var P=CS().profile,M=lectorMe(),runs=appsWanted();
@@ -379,7 +442,7 @@ function gatherProfile(o){o=o||{};var P=CS().profile,M=lectorMe(),runs=appsWante
       o.voice&&P.use.writing&&M.writing?Promise.all(M.writing.map(function(x){return loadText(x.ref);})):[],o.voice&&P.use.letters&&M.letters?Promise.all(M.letters.map(function(x){return loadText(x.ref);})):[]])
     .then(function(r){var G={items:itemsText(),cv:r[0],linkedin:r[1],files:r[2],apps:r[3].map(function(x){var keys=Object.keys(x.an).filter(function(k){return /brief|does|skill|made|built|research|purpose/i.test(k);});
         return {name:x.name,text:keys.map(function(k){return "("+k+") "+x.an[k];}).join("\n")};}).filter(function(x){return x.text;}),writing:(r[4]||[]).filter(Boolean),letters:(r[5]||[]).filter(Boolean),sources:[]};
-      if(!o.cite||!P.use.fontes||typeof fontesItems!=="function")return G;var items=[];try{items=fontesItems().slice(0,30);}catch(e){}
+      if(!o.cite||!P.use.fontes||P.isMe===false||typeof fontesItems!=="function")return G;var items=[];try{items=fontesItems().slice(0,30);}catch(e){}
       G.sources=items.map(function(c,i){var t="";try{t=fontesPlain(c);}catch(e){t=String(c.title||"");}return {n:i+1,text:t};});return G;});}
 function profileBlock(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.push(wt);
   parts.push("THE PROFILE (the only source of facts about me):"+(nm?"\nName: "+nm:"")+(G.items?"\n\n"+cut(G.items,Math.floor(R*0.34)):""));
@@ -441,8 +504,12 @@ var DOCS={cv:["Tailored CV","A CV in the order this application asks for, from y
   cover:["Cover letter","A letter of four or five paragraphs: what you apply for, the evidence, why here, the close."],
   supporting:["Supporting statement","Each criterion in turn, with your evidence under it; what your profile does not show is left for you."],
   statement:["Personal statement","Why this programme, your preparation, your research and what you bring."],
-  proposal:["Research proposal outline","An outline in the usual parts, with what your documents already give and the questions still open."]};
-var FOR={job:["cv","cover","supporting"],phd:["statement","proposal","cv","cover"],grant:["proposal","statement","cv","cover"],other:["cv","cover","supporting","statement","proposal"]};
+  proposal:["Research proposal outline","An outline in the usual parts, with what your documents already give and the questions still open."],
+  purpose:["Statement of purpose","The research you mean to do, how you are prepared for it, why this programme and its people, and where it leads."],
+  teaching:["Teaching statement","How you teach and why, shown through moments from your own teaching, and how you would teach here."],
+  funding:["Funding application","The case for funding you: the project, why it matters, what you have done, and what the funding makes possible."],
+  sample:["Writing sample: which to send","Which of your own writings to send as the writing sample, why, and how to bring it within the limit, without rewriting it."]};
+var FOR={job:["cv","cover","supporting"],phd:["statement","purpose","proposal","sample","cv","cover","funding"],grant:["proposal","funding","statement","cv","cover"],other:["cv","cover","supporting","statement","purpose","proposal","teaching","funding","sample"]};
 var ROLES=[["supervisor","A prospective supervisor"],["pastsup","A past or present supervisor"],["referee","A referee"],["mentor","A mentor"],["manager","A hiring manager"],["recruiter","A recruiter"],["contact","The contact named in the posting"]];
 var PURPOSES=[["enquire","To ask about the post or programme"],["advice","To ask for advice on my application"],["introduce","To introduce myself and my research"],["reference","To ask for a reference"],["followup","To follow up on my application"],["thanks","To thank them after an interview"],["accept","To accept an offer"],["decline","To decline an offer"]];
 function critBlock(o){var r=o.read&&o.read.r;if(!r||!r.crit.length)return "";return "THE CRITERIA, AS READ AGAINST MY PROFILE:\n"+r.crit.map(function(c){return "- "+c.text+" ("+(c.ess?"essential":"desirable")+"; "+{met:"shown",partly:"partly shown",none:"NOT SHOWN: do not claim it"}[c.st]+(c.ev?"; evidence: "+c.ev:"")+")";}).join("\n");}
@@ -453,7 +520,7 @@ function sourcesBlock(G){if(!G.sources.length)return "";return "MY SOURCES (cite
 var NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
 function limitsIn(post){var out={};
   function kindOf(s){return /cover(?:ing)? letter|letter of (?:application|motivation)|motivation(?:al)? letter/.test(s)?"cover":/supporting statement|statement in support/.test(s)?"supporting":
-      /personal statement|statement of (?:purpose|intent)|purpose statement|research statement/.test(s)?"statement":/proposal/.test(s)?"proposal":/\bcvs?\b|curriculum vitae|r[eé]sum[eé]/.test(s)?"cv":"";}
+      /statement of (?:purpose|intent)|purpose statement/.test(s)?"purpose":/teaching (?:statement|philosophy)/.test(s)?"teaching":/writing sample|sample of (?:your )?(?:written|academic) work/.test(s)?"sample":/funding (?:application|statement)|scholarship (?:application|statement)|case for support/.test(s)?"funding":/personal statement|research statement/.test(s)?"statement":/proposal/.test(s)?"proposal":/\bcvs?\b|curriculum vitae|r[eé]sum[eé]/.test(s)?"cv":"";}
   String(post||"").replace(/\r/g,"").split(/\n+|[.;!?](?:\s+|$)/).forEach(function(s0){var last="";
     /* each clause on its own, so "a CV of two pages and a statement of 1,000 words" gives each its own; a clause that names
        no document takes the one named before it in the sentence */
@@ -463,7 +530,7 @@ function limitsIn(post){var out={};
       k=k||"any";
       if(w){var n=parseInt(w[1].replace(/,/g,""),10);if(n>=50&&n<=20000&&!(out[k]&&out[k].words))out[k]={words:n};}
       else if(pg){var m=NUMW[pg[1]]||parseInt(pg[1],10);if(m>=1&&m<=40&&!out[k])out[k]={pages:m};}});});return out;}
-function limitFor(post,kind){var L=limitsIn(post);return L[kind]||(/^(supporting|statement|proposal)$/.test(kind)?L.any:null)||null;}
+function limitFor(post,kind){var L=limitsIn(post);return L[kind]||(/^(supporting|statement|proposal|purpose|teaching|funding)$/.test(kind)?L.any:null)||null;}
 function limitLine(l){return l.words?"THE POSTING SETS A LIMIT of "+l.words+" words: stay within it, at about "+Math.round(l.words*0.92)+" words.":"THE POSTING SETS A LIMIT of "+l.pages+" page"+(l.pages>1?"s":"")+": stay within it.";}
 function wordCount(md){return (String(md||"").replace(/^#{1,6}\s+/gm,"").match(/[A-Za-zÀ-ÿ0-9][^\s]*/g)||[]).length;}
 /* which criteria a draft speaks to: a match of their own words in it, a guide and not a judgement */
@@ -481,15 +548,23 @@ function docAsk(kind,o,G,post,em){
     supporting:"Write my supporting statement for "+to(o)+". Take each criterion in turn, the essential ones first, as a level-two heading (##) in the posting's own words. Under each, one or two paragraphs giving my evidence from the profile: what I did, how I did it and what came of it. Where the criteria list says NOT SHOWN, write under that heading only: [Not shown in your profile: add your evidence here, or leave this criterion out.] Never invent evidence.",
     statement:"Write my personal statement for "+to(o)+", in about 750 words, in paragraphs, without headings: why this programme and why now; how my studies and work have prepared me, with concrete evidence from the profile; the research I want to do and how it meets what the programme offers, as the call describes it; what I would bring. Name no supervisor, method or source that the profile and the call do not name.",
     proposal:"Write an outline of my research proposal for "+to(o)+": an outline to work from, not a finished proposal. Use these level-two headings (##): Working title; The question; Why it matters; What is already known; Approach and methods; Sources and materials; Timetable; Fit with the programme. Under each, first what my profile and documents already give, in my own words, as short paragraphs; then, as a short list in square brackets, the questions I must still answer for that part. Never invent a finding, a source, a method or a date I have not named.",
+    purpose:"Write my statement of purpose for "+to(o)+", in about 1,000 words, in paragraphs, without headings: the research I mean to do and the question at its centre, said plainly and early; how my studies, my work and my writing have prepared me for it, with concrete evidence from the profile; which parts of this programme, as the call describes them, my work needs, and why; and what I mean to do with the degree afterwards. Name no supervisor, method, source or outcome that the profile and the call do not name.",
+    teaching:"Write my teaching statement for "+to(o)+", in about 700 words, in paragraphs, without headings: what I believe helps students learn, shown through concrete moments from my own teaching in the profile (what I taught, to whom, what I did, and what came of it); how I would teach what this post asks for, from what the posting says; and how I keep improving my teaching. Where the profile gives no teaching at all, write only: [Your profile holds no teaching yet: add an entry under Teaching, then write this again.]",
+    funding:"Write my funding application for "+to(o)+": the case for funding me. Use these level-two headings (##), unless the call names its own sections, in which case use those, in its order: The project; Why it matters; What I have done so far; What the funding makes possible; Fit with the funder. Under each, short paragraphs from the profile and my documents. Where the profile is silent, leave a place in square brackets saying what is needed. Never invent a figure, a cost, a date or an outcome.",
+    sample:"Choose, from MY OWN WRITING below, the piece best suited to send as the writing sample for "+to(o)+". Answer in plain words, under three level-two headings (##): Which to send (its number and first words, and why it suits what the call asks); How to bring it within the limit (which parts to keep and which to cut, naming them, without rewriting a sentence); What to say about it (one or two sentences introducing it, only if the call asks for a note). If MY OWN WRITING holds nothing, write only: [No writing of yours is kept yet: add your writing to your profile's sources, then ask again.]",
     email:""}[kind];
   if(kind==="email"){var role=(ROLES.filter(function(x){return x[0]===em.role;})[0]||ROLES[5])[1].toLowerCase(),pur=(PURPOSES.filter(function(x){return x[0]===em.purpose;})[0]||PURPOSES[0])[1].toLowerCase();
     what="Write an email from me to "+role+", "+pur+", about "+to(o)+". Begin with a line \"Subject: \" and the subject, then a blank line, then the email. Courteous, direct and specific, with one clear request; "+(em.purpose==="introduce"?"no more than 300 words":"no more than 180 words")+". Greet the person by name only if the profile or the posting names them; otherwise write [their name]. Sign it with my name."+(em.extra?" Also: "+em.extra:"");}
   var lim=kind==="email"?null:limitFor(post,kind);
   if(lim&&lim.words&&kind==="statement")what=what.replace("in about 750 words","in no more than "+lim.words+" words");
+  if(lim&&lim.words&&kind==="purpose")what=what.replace("in about 1,000 words","in no more than "+lim.words+" words");
+  if(lim&&lim.words&&kind==="teaching")what=what.replace("in about 700 words","in no more than "+lim.words+" words");
+  /* Step by step: the plan she approved, part by part */
+  var pl=kind!=="email"&&o.plan&&o.plan[kind]&&o.plan[kind].use?o.plan[kind].text:"";
   if(lim)what+=" "+limitLine(lim);
   var prose=kind!=="cv";
-  return function(sc){var R=room()*sc;var u=what+"\n\n"+(post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.2))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.6)+
-      (prose?"\n\n"+voiceBlock(G,R):"")+(kind==="statement"||kind==="proposal"?"\n\n"+sourcesBlock(G):"");
+  return function(sc){var R=room()*sc;var u=what+(pl?"\n\nFOLLOW THIS PLAN, WHICH I APPROVED, PART BY PART AND IN ITS ORDER (a part I struck out stays out):\n"+pl:"")+"\n\n"+(post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.2))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*(kind==="sample"?0.3:0.6))+
+      (kind==="sample"?"\n\nMY OWN WRITING (choose among these only):\n"+(G.writing.length?G.writing.map(function(w,i){return "["+(i+1)+"] "+cut(w,Math.floor(R*0.45/G.writing.length));}).join("\n\n"):"(nothing kept)"):prose?"\n\n"+voiceBlock(G,R):"")+(kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"?"\n\n"+sourcesBlock(G):"");
     return [{role:"system",content:sys(kind==="cv"?"You are now writing a CV: plain, factual lines, nothing promotional.":"",prose&&kind!=="email")},{role:"user",content:u}];};}
 /* the second reading: every claim held to the profile, every figure to what it gives; the placeholders kept */
 function examine(kind,body,G,post,o){if(!body||body.length<80)return Promise.resolve(body);RUN.what="Examining it against your profile";render();
@@ -501,10 +576,10 @@ function clean(t){t=String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim()
 function checks(md,mat){var miss=[],seen={};(String(md).match(/\b\d[\d,.]*\d\b|\b\d{2,}\b/g)||[]).forEach(function(n){var k=n.replace(/[.,]+$/,"");if(seen[k]||k.replace(/\D/g,"").length<2)return;seen[k]=1;if(mat.indexOf(k)<0&&mat.indexOf(k.replace(/,/g,""))<0)miss.push(k);});
   return {figures:miss.slice(0,20),fills:(String(md).match(/\[[^\]\n]{2,160}\]/g)||[]).length};}
 function writeDoc(o,kind,em){if(busyNow()||needModel())return Promise.resolve(false);begin(o,"Writing the "+(kind==="email"?"email":DOCS[kind][0].toLowerCase()));
-  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"})]).then(function(x){var post=x[0],G=x[1];
+  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"})]).then(function(x){var post=x[0],G=x[1];
     if(!G.items&&!G.cv&&!G.files.length&&!G.apps.length)throw new Error("your profile is empty. Add your CV or a few entries in Your profile first: the studio writes only from what it holds");
-    return ask(docAsk(kind,o,G,post,em),kind==="cv"||kind==="proposal"||kind==="supporting"?2200:kind==="statement"?1800:kind==="email"?700:1300,kind==="cv"?0.35:0.5)
-      .then(function(t){return examine(kind,clean(t),G,post,o);}).then(function(md){var sf={md:md,line:""};try{if(kind!=="email"&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;
+    return ask(docAsk(kind,o,G,post,em),kind==="cv"||kind==="proposal"||kind==="supporting"||kind==="funding"?2200:kind==="statement"||kind==="purpose"?2000:kind==="teaching"?1500:kind==="sample"?900:kind==="email"?700:1300,kind==="cv"?0.35:0.5)
+      .then(function(t){return kind==="sample"?clean(t):examine(kind,clean(t),G,post,o);}).then(function(md){var sf={md:md,line:""};try{if(kind!=="email"&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;
         var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
         return Promise.resolve(IngBig.put(ref,md)).then(function(){var rec={ref:ref,made:Date.now(),model:modelName(),chk:ck};
           if(kind==="email"){rec.id=uid("em");rec.role=em.role;rec.purpose=em.purpose;o.emails.unshift(rec);o.sv={kind:"email",id:rec.id};}
@@ -519,7 +594,7 @@ var TUNE=[["Shorter","Make it about a fifth shorter: keep every point that matte
   ["Essential criteria first","Put the evidence for the essential criteria first."]];
 function reviseDoc(o,v,rec,note){if(busyNow()||needModel())return Promise.resolve(false);note=String(note||"").trim();if(note.length<4){say("Say what should change first.");return Promise.resolve(false);}
   var kind=v.kind,isMail=kind==="email",label=isMail?"email":DOCS[kind][0].toLowerCase().replace(/^tailored cv$/,"tailored CV");begin(o,"Improving the "+label);
-  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"}),loadText(rec.ref)]).then(function(x){var post=x[0],G=x[1],cur=x[2],lim=isMail?null:limitFor(post,kind);
+  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"}),loadText(rec.ref)]).then(function(x){var post=x[0],G=x[1],cur=x[2],lim=isMail?null:limitFor(post,kind);
     if(!cur||cur.length<40)throw new Error("the draft could not be read");
     return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now revising a draft of mine as I ask. You return the whole revised text and nothing else.",!isMail&&kind!=="cv")},
       {role:"user",content:"Revise my "+label+" as I ask below, and change nothing else.\nWHAT I ASK: "+note+"\n"+(lim?limitLine(lim)+"\n":"")+
@@ -527,11 +602,12 @@ function reviseDoc(o,v,rec,note){if(busyNow()||needModel())return Promise.resolv
         (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.15))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.5)+"\n\nTHE DRAFT:\n"+cur}];},Math.round(cur.length/3)+600,0.4)
     .then(function(t){var r=clean(t);if(!r||r.length<Math.min(80,cur.length*0.3))throw new Error("the model gave back too little, so the draft stays as it was");return examine(kind,r,G,post,o);})
     .then(function(md){var sf={md:md,line:""};try{if(!isMail&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
+      if(!isMail&&wayOf(o)==="step")return Promise.resolve(IngBig.put(ref,md)).then(function(){dropReview(o);o.review={kind:kind,base:rec.ref,ref:ref,note:note,at:Date.now(),dec:{},why:{},chk:ck};o.improve=false;o.edit=false;o.tab="doc";save();return "review";});
       return Promise.resolve(IngBig.put(ref,md)).then(function(){var made={ref:ref,made:Date.now(),model:modelName(),chk:ck,note:note};
         if(isMail){rec.older=[{ref:rec.ref,made:rec.made,model:rec.model,chk:rec.chk,note:rec.note||""}].concat(rec.older||[]);while(rec.older.length>2){var z=rec.older.pop();try{IngBig.del(z.ref);}catch(e){}}Object.assign(rec,made);}
         else{keepOlder(o,kind);o.docs[kind]=made;}
         o.improve=false;o.edit=false;o.tab="doc";save();return true;});});})
-  .then(function(r){end();if(r)say("Improved. The version before is kept: The version before brings it back.");return r;},function(e){failed(e);return false;});}
+  .then(function(r){end();if(r==="review")say("Each change waits for you: keep it, or keep your own words.");else if(r)say("Improved. The version before is kept: The version before brings it back.");return r;},function(e){failed(e);return false;});}
 function olderOf(o,v,rec){return v.kind==="email"?(rec.older||[]):((o.older||{})[v.kind]||[]);}
 function earlier(o,v,rec){if(v.kind==="email"){if(!rec.older||!rec.older.length)return;var p=rec.older.shift(),cur={ref:rec.ref,made:rec.made,model:rec.model,chk:rec.chk,note:rec.note||""};Object.assign(rec,p);rec.older.unshift(cur);}
   else{var list=(o.older||{})[v.kind];if(!list||!list.length)return;var prev=list.shift();list.unshift(o.docs[v.kind]);o.docs[v.kind]=prev;}o.improve=false;save();render();say("The version before is back. The other is kept, one press away.");}
@@ -566,7 +642,7 @@ function keepEvidence(o,crit,answer){var P=CS().profile;P.items.push({id:uid("it
 function pickFile(accept,multi,fn){var i=D.createElement("input");i.type="file";i.accept=accept;if(multi)i.multiple=true;i.onchange=function(){var fs=[].slice.call(i.files||[]);if(fs.length)fn(fs);};i.click();}
 function readFile(f){return Promise.resolve(readAsText(f)).then(function(t){t=String(t||"");if(/\.html?$/i.test(f.name)){try{t=lxUnTag(t);}catch(e){}}return t.replace(/\r/g,"").trim();});}
 function addCv(){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",false,function(fs){readFile(fs[0]).then(function(t){if(t.length<80){say("That is too short to be a CV.");return;}var M=lectorMe(),ref=IngBig.newId();
-  return Promise.resolve(IngBig.put(ref,t)).then(function(){if(M.cv&&M.cv.ref){try{IngBig.del(M.cv.ref);}catch(e){}}M.cv={ref:ref,name:fs[0].name,chars:t.length,at:Date.now()};CS().profile.at=Date.now();save();render();say("Your CV is kept. Lector uses the same one.");});},function(e){say("It could not be read: "+(e&&e.message||e));});});}
+  return Promise.resolve(IngBig.put(ref,t)).then(function(){if(M.cv&&M.cv.ref){try{IngBig.del(M.cv.ref);}catch(e){}}M.cv={ref:ref,name:fs[0].name,chars:t.length,at:Date.now()};CS().profile.at=Date.now();save();render();say(isMe()?"Your CV is kept. Lector uses the same one.":"The CV is kept in this profile.");});},function(e){say("It could not be read: "+(e&&e.message||e));});});}
 function addDocs(){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",true,function(fs){var P=CS().profile,q=Promise.resolve(),n=0;
   fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){if(t.length<40)return;var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){P.files.push({id:uid("f"),name:f.name,ref:ref,chars:t.length,at:Date.now(),use:true});n++;});},function(e){say(f.name+" could not be read: "+(e&&e.message||e));});});});
   q.then(function(){if(n){P.at=Date.now();save();render();say(n+" document"+(n>1?"s are":" is")+" kept in your profile.");}});});}
@@ -671,7 +747,12 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
   ["A research proposal",["A working title, then the question, in one or two sentences.","Why it matters: what is not yet known, and to whom it matters.","What is known: the main work your question answers to, honestly cited.","Approach and methods, and the sources or materials you will use, and whether you can reach them.","A timetable that fits the funding, and why this programme and supervisor suit it. It is a plan: it may change, and examiners know that."]],
   ["Writing to a prospective supervisor",["Read their recent work first, and say briefly which part bears on your project.","In a few lines: who you are, what you want to research, and why with them.","Attach or offer a short outline and your CV. Ask one clear question: whether they would consider supervising it.","Keep it short. If there is no answer in two or three weeks, one polite follow-up is usual."]],
   ["Asking for a reference",["Ask early, and ask whether they can write a good reference, not just a reference.","Send the posting, your CV and the date it is due, and remind them of the work they know you for.","Thank them, and tell them the outcome."]],
-  ["Interviews",["Prepare an example for each essential criterion: the situation, what you did yourself, and the result.","Say \"I\" for what you did. Be exact about figures and dates.","When you do not know, say so, and say how you would find out.","Prepare two or three questions of your own about the work itself."]]];
+  ["Interviews",["Prepare an example for each essential criterion: the situation, what you did yourself, and the result.","Say \"I\" for what you did. Be exact about figures and dates.","When you do not know, say so, and say how you would find out.","Prepare two or three questions of your own about the work itself."]],
+  ["A checklist from a posting",["Read the posting once through without writing anything.","Then read it again, slowly, and mark each thing it asks you to send: a CV, a letter, a statement, a proposal, a sample, transcripts, references.","Mark how to send it (a portal, an email address, a form) and the closing date and time.","Mark every limit: words, pages, the number of references.","Write each as one short line, and tick it only when it is ready to send."]],
+  ["A statement of purpose",["Many programmes, in North America above all, ask for a statement of purpose: it is about the work you mean to do, more than about your life.","Open with the research question or the field, plainly, in the first paragraph.","Show how your studies, work and writing prepared you for it, with concrete examples.","Say which parts of this programme, and which of its people, your work needs, from what the programme itself publishes.","Close with what you mean to do with the degree.","Keep within the limit, and follow the programme's own instructions first."]],
+  ["A teaching statement",["Say what you believe helps students learn, in a sentence or two.","Show it through moments from your own teaching: what you taught, to whom, what you did and what came of it.","Say how you would teach what this post asks for.","Say how you keep improving your teaching: feedback, observation, training.","Concrete examples count for more than general claims."]],
+  ["A funding application",["Follow the funder's own sections and limits first.","Say what the project is and why it matters, plainly, at the start.","Show what you have already done that makes it likely to succeed.","Say exactly what the money makes possible, and leave every figure and cost for you to check.","Show why this funder: from what the funder itself says it supports."]],
+  ["Choosing a writing sample",["Choose the piece closest to the field and the kind of work the programme asks for.","Prefer a piece you wrote alone, and your most recent strong work.","Keep within the limit by cutting whole sections, not by rewriting; say in a short note where it was cut, if the call allows a note.","Check the call for its format: length, file type, and whether references count."]]];
 
 /* ---------------- painting: Lector's own panels (6.8.3) ----------------
    Her words (28 October 2026): "The Career Studio needs to be redesigned to match the rest of the app and its sleek elegant
@@ -680,7 +761,7 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
    fill the window (a list, and the work), each scrolling inside itself; an application is taken in five numbered steps,
    one step on the screen at a time, its next action always at the foot of the panel. On a narrow screen one panel shows at
    a time, with a key back to the list. */
-var ICON={apps:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17"/>',
+var ICON={today:'<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6"/>',apps:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17"/>',
   profile:'<circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 19.5c1.2-3.6 4-5.2 7.2-5.2s6 1.6 7.2 5.2"/>',
   goals:'<path d="M6 21V4M6 4.8h10.5l-2.2 3.6 2.2 3.6H6"/>',
   learn:'<path d="M3.5 6.2c2.9-1.3 5.8-1.3 8.5.3 2.7-1.6 5.6-1.6 8.5-.3v12.6c-2.9-1.3-5.8-1.3-8.5.3-2.7-1.6-5.6-1.6-8.5-.3z"/><path d="M12 6.5v12.6"/>'};
@@ -712,7 +793,8 @@ function render(){var root=$("cs");if(!root)return;var S=CS(),room0=S.ui.room||"
   [].forEach.call(root.querySelectorAll(".c-head [data-room]"),function(b){var on=b.getAttribute("data-room")===room0;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   var host=$("csHost"),keepL=null,keepR=null,ol=host.querySelector(".c-list .c-pn-b"),or=host.querySelector(".c-work .c-pn-b");if(ol)keepL=ol.scrollTop;if(or)keepR=or.scrollTop;
   host.innerHTML="";var two=h("div","c-panels"+(LAST_ROOM!==room0?" c-rise":""));host.appendChild(two);var same=LAST_ROOM===room0;LAST_ROOM=room0;
-  if(room0==="profile")paintProfile(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  if(room0==="today")paintToday(two);else if(room0==="profile")paintProfile(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  paintWho();
   root.setAttribute("data-show",S.ui.show==="work"?"work":"list");
   if(same){var nl=host.querySelector(".c-list .c-pn-b"),nr=host.querySelector(".c-work .c-pn-b");if(nl&&keepL!=null)nl.scrollTop=keepL;if(nr&&keepR!=null&&!host.__jump)nr.scrollTop=keepR;}host.__jump=false;
   /* the item in hand stays in sight in its own list (moving only that list, never the page) */
@@ -743,8 +825,8 @@ function fbBox(fb){var d=h("div","c-fb");if(fb.RAW){d.textContent=fb.RAW;return 
   d.innerHTML=(fb.MEETS?"<div><b>Meets it:</b> "+esc({YES:"yes",PARTLY:"partly",NO:"not yet"}[String(fb.MEETS).toUpperCase().split(/\W/)[0]]||fb.MEETS)+"</div>":"")+(fb.WORKS?"<div><b>What works:</b> "+esc(fb.WORKS)+"</div>":"")+(fb.MISSING?"<div><b>What is missing:</b> "+esc(fb.MISSING)+"</div>":"")+(fb["ASK YOURSELF"]?"<div><b>Ask yourself:</b> "+esc(fb["ASK YOURSELF"])+"</div>":"");return d;}
 
 /* ---- Applications: the list, and one application in five steps ---- */
-var STEPS=[["post","The posting"],["fit","How you fit"],["send","What you send"],["practise","Practise"],["track","Track"]];
-function stepDone(o,k){if(k==="post")return true;if(k==="fit")return !!o.read;if(k==="send")return Object.keys(o.docs).length+o.emails.length>0;
+var STEPS=[["post","The posting"],["fit","How you fit"],["check","Checklist"],["send","What you send"],["practise","Practise"],["track","Track"]];
+function stepDone(o,k){if(k==="post")return true;if(k==="fit")return !!o.read;if(k==="check")return !!(o.check&&o.check.items.length&&o.check.items.every(function(x){return x.done;})&&!(o.check.pending||[]).length);if(k==="send")return Object.keys(o.docs).length+o.emails.length>0;
   if(k==="practise")return Object.keys(o.practice.crit).some(function(x){return o.practice.crit[x].fb;})||o.practice.qs.some(function(q){return q.fb;});
   return ["applied","interview","offer","accepted","unsuccessful","withdrawn","not"].indexOf(o.stage)>=0;}
 function goStep(o,k){o.step=k;save();jump();render();}
@@ -777,7 +859,7 @@ var HOW=[["Your profile","What you are looking for, your CV, your entries and do
     ["Bring a posting",function(){CS().ui.open="new";show("work");save();render();}]],
   ["Decide, then write","A plain band with its reasons, and advice on whether to apply. Then the CV, the letter, the statements and the emails, or your own drafts, looked at with you.",
     ["The band follows a fixed rule, never a percentage: Strong fit, Possible fit, A stretch, or Not a fit as your profile stands, from how many essential criteria your profile shows.",
-     "Then what this kind of application asks for: a tailored CV, a cover letter, a supporting statement, a personal statement, a research proposal outline, and emails to a supervisor, a referee, a mentor or a recruiter.",
+     "Then what this kind of application asks for: a tailored CV, a cover letter, a supporting statement, a personal statement, a statement of purpose, a research proposal outline, a teaching statement, a funding application, the choice of a writing sample, and emails to a supervisor, a referee, a mentor or a recruiter.",
      "Each is written from your profile and read a second time against it. A word limit the posting sets is kept, and you see which of its criteria the draft speaks to.",
      "Improve it with a note of your own, such as shorter or warmer, or go back to the version before. Or write it yourself and have it looked at with you.",
      "Save it as Word or as a PDF, exactly as it is shown."],
@@ -785,6 +867,8 @@ var HOW=[["Your profile","What you are looking for, your CV, your entries and do
   ["Practise and track","Your evidence and your answers, looked at with you; each application followed to its end; your goals and their steps.",
     ["Your evidence: for each criterion, a moment that shows it (the situation, what you did yourself, what came of it), looked at with you and kept in your profile if you wish.",
      "Interview questions: eight that a panel would be likely to ask, and your answers, as you would say them, looked at with you.",
+     "Today: only the next small step of each application, with its closing date. Not today lets one rest until tomorrow.",
+     "Checklist: what each posting asks you to send and do, from its own sentences, ticked at your pace.",
      "Track: where each application stands, its closing date and the days left, and your notes. Finished applications fold away.",
      "Goals and plan: your goals and their steps, and the kinds of role and programme that suit your profile."],
     ["Goals and plan",function(){CS().ui.room="goals";save();render();}]]];
@@ -821,7 +905,7 @@ function oppPanel(o){var S=CS(),step=o.step||(o.read?"fit":"post"),band=o.read&&
   STEPS.forEach(function(s,i){if(i)bar.appendChild(h("li","sep"));var li=h("li"),b=h("button");b.type="button";b.innerHTML="<i>"+(stepDone(o,s[0])&&s[0]!==step?"✓":i+1)+"</i><span>"+esc(s[1])+"</span>";
     if(s[0]===step){li.className="now";b.setAttribute("aria-current","step");}else if(stepDone(o,s[0]))li.className="done";b.addEventListener("click",function(){goStep(o,s[0]);});li.appendChild(b);bar.appendChild(li);});
   P.el.insertBefore(bar,P.body);
-  ({post:stepPost,fit:stepFit,send:stepSend,practise:stepPractise,track:stepTrack}[step]||stepPost)(o,P);return P;}
+  ({post:stepPost,fit:stepFit,check:stepCheck,send:stepSend,practise:stepPractise,track:stepTrack}[step]||stepPost)(o,P);return P;}
 function stepPost(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),ti=input("text",o.title),or=input("text",o.org),kd=select(OKINDS,o.kind);
   ti.addEventListener("change",function(){o.title=ti.value.trim();o.titleSet=true;save();render();});or.addEventListener("change",function(){o.org=or.value.trim();o.orgSet=true;save();});kd.addEventListener("change",function(){o.kind=kd.value;o.kindSet=true;save();});
   g.appendChild(field("Title",ti));g.appendChild(field("Organisation",or));g.appendChild(field("What it is",kd));box.appendChild(g);
@@ -849,7 +933,7 @@ function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
   r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td><span class=\"c-st\" data-st=\""+x.st+"\">"+{met:"Shown",partly:"Partly shown",none:"Not shown"}[x.st]+"</span></td><td>"+esc(x.ev||"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
   z.appendChild(h("p","c-note",esc("Read on "+dayStr(o.read.at)+" with "+(o.read.model||"your model")+". The band follows from these judgements, made from your profile alone; it is not a probability.")));
   cols.appendChild(a);cols.appendChild(z);P.body.appendChild(cols);
-  P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: what you send",function(){goStep(o,"send");}));}
+  P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: its checklist",function(){goStep(o,"check");}));}
 /* what you send: the documents on the left, the one chosen on the right, its keys at the foot */
 function sendView(o){var v=o.sv;if(v&&v.kind==="email"&&!o.emails.some(function(e){return e.id===v.id;}))v=null;if(v)return v;var k0=(FOR[o.kind]||FOR.other).filter(function(k){return o.docs[k];})[0];return {kind:k0||(FOR[o.kind]||FOR.other)[0]};}
 function setView(o,v){o.sv=v;o.edit=false;o.improve=false;o.tab="doc";save();render();}
@@ -857,7 +941,7 @@ function stepSend(o,P){var v=sendView(o),split=h("div","c-split"),nav=h("div","c
   nav.appendChild(h("div","c-label",esc("Documents")));
   var kinds=(FOR[o.kind]||FOR.other).slice();Object.keys(o.docs).forEach(function(k){if(kinds.indexOf(k)<0)kinds.push(k);});
   kinds.forEach(function(k){var d=o.docs[k];nav.appendChild(item(DOCS[k][0],d?(d.mine?"Your version":"Written")+", "+dayStr(d.made):"Not written yet",v.kind===k,function(){setView(o,{kind:k});},d?"c-has":""));});
-  var more=["cv","cover","supporting","statement","proposal"].filter(function(x){return kinds.indexOf(x)<0;});
+  var more=Object.keys(DOCS).filter(function(x){return kinds.indexOf(x)<0;});
   if(more.length){var sel=select([["","Another document…"]].concat(more.map(function(x){return [x,DOCS[x][0]];})),"");sel.setAttribute("aria-label","Another document");sel.className="c-sel";sel.addEventListener("change",function(){if(sel.value)setView(o,{kind:sel.value});});nav.appendChild(sel);}
   nav.appendChild(h("div","c-label",esc("Emails")));
   o.emails.forEach(function(e){var rl=(ROLES.filter(function(x){return x[0]===e.role;})[0]||["",""])[1],pu=(PURPOSES.filter(function(x){return x[0]===e.purpose;})[0]||["",""])[1].replace(/^To /,"");
@@ -866,16 +950,27 @@ function stepSend(o,P){var v=sendView(o),split=h("div","c-split"),nav=h("div","c
   nav.appendChild(h("div","c-label",esc("Your own")));nav.appendChild(item("Write it yourself","Your draft, looked at with you",v.kind==="mine",function(){setView(o,{kind:"mine"});}));
   split.appendChild(nav);split.appendChild(pane);P.body.appendChild(split);
   if(v.kind==="emailnew")return newEmail(o,pane,P);if(v.kind==="mine")return mineView(o,pane,P);
-  var rec=docRec(o,v);if(!rec)return unwritten(o,v.kind,pane,P);return docPane(o,v,rec,pane,P);}
-function unwritten(o,kind,pane,P){var e=empty(DOCS[kind][0],DOCS[kind][1]+" Written from your profile and the posting, then read a second time against your profile; what your profile does not give is left in square brackets for you.");pane.appendChild(e);
+  var rec=docRec(o,v);if(!rec)return unwritten(o,v.kind,pane,P);if(o.review&&o.review.kind===v.kind&&v.kind!=="email")return reviewPane(o,v,rec,pane,P);return docPane(o,v,rec,pane,P);}
+function unwritten(o,kind,pane,P){var w=wayOf(o),pl=o.plan&&o.plan[kind],gd=o.guide&&o.guide[kind];
+  var e=empty(DOCS[kind][0],DOCS[kind][1]+(w==="guide"?" You write it yourself, with a guide to its parts and what your profile holds for each.":" Written from your profile and the posting, then read a second time against your profile; what your profile does not give is left in square brackets for you."));pane.appendChild(e);
   var how=lessonFor(kind,null);if(how){var d=fold("how:"+how[0],"How it is built");var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});d.appendChild(ol);pane.appendChild(d);}
+  wayBar(o,pane);
+  if(w==="step"&&pl){pane.appendChild(h("h3","c-h3",esc("The plan, part by part")));pane.appendChild(h("p","c-note",esc("Change any line, take one out, or add one. The writing follows this plan, in its order.")));
+    var ta=h("textarea","c-ta c-plan");ta.value=pl.text;ta.setAttribute("aria-label","The plan, one part to a line");ta.addEventListener("change",function(){pl.text=ta.value.trim();save();});pane.appendChild(ta);
+    P.foot.appendChild(cbtn("","Plan it again",function(){planDoc(o,kind);}));P.foot.appendChild(h("span","c-grow"));
+    P.foot.appendChild(cbtn("pri","Write it from this plan",function(){var t=ta.value.trim();if(t.length<10){say("The plan is empty: write a part to a line, or plan it again.");return;}pl.text=t;pl.use=true;save();writeDoc(o,kind);}));return;}
+  if(w==="guide"){P.foot.appendChild(h("span","c-grow"));
+    if(gd)P.foot.appendChild(cbtn("","Make a new guide",function(){guideDoc(o,kind);}));
+    P.foot.appendChild(cbtn("pri",gd?"Open my guide and write":"Guide me to write it",function(){if(gd){o.mineKind=kind;setView(o,{kind:"mine"});}else guideDoc(o,kind);}));return;}
   P.foot.appendChild(cbtn("","Write it yourself",function(){o.mineKind=kind;setView(o,{kind:"mine"});}));P.foot.appendChild(h("span","c-grow"));
-  P.foot.appendChild(cbtn("pri","Write the "+DOCS[kind][0].replace(/^./,function(m){return m.toLowerCase();}).replace(/^tailored cv$/,"tailored CV"),function(){writeDoc(o,kind);}));}
-function lessonFor(kind,rec){var lk=kind==="email"?(rec&&rec.role==="supervisor"?"Writing to a prospective supervisor":rec&&rec.purpose==="reference"?"Asking for a reference":""):{cv:"A CV for an application",cover:"A cover letter",supporting:"A supporting statement",statement:"A personal statement for a PhD or DPhil",proposal:"A research proposal"}[kind];
+  if(w==="step")P.foot.appendChild(cbtn("pri","Plan it with me",function(){planDoc(o,kind);},"A plan first, part by part, for you to approve or change"));
+  else P.foot.appendChild(cbtn("pri","Write the "+docWord(kind),function(){writeDoc(o,kind);}));}
+function lessonFor(kind,rec){var lk=kind==="email"?(rec&&rec.role==="supervisor"?"Writing to a prospective supervisor":rec&&rec.purpose==="reference"?"Asking for a reference":""):{cv:"A CV for an application",cover:"A cover letter",supporting:"A supporting statement",statement:"A personal statement for a PhD or DPhil",proposal:"A research proposal",purpose:"A statement of purpose",teaching:"A teaching statement",funding:"A funding application",sample:"Choosing a writing sample"}[kind];
   return LESSONS.filter(function(L){return L[0]===lk;})[0]||null;}
 function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lessonFor(kind,rec),tab=o.tab==="how"&&how?"how":"doc";
   var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc(isMail?"The email":DOCS[kind][0])));
   if(how)top.appendChild(seg([["doc",isMail?"The email":"The document"],["how","How it is built"]],tab,function(x){o.tab=x;save();render();},"Show"));pane.appendChild(top);
+  if(!isMail&&!rec.mine)wayBar(o,pane);
   var ck=rec.chk||{},notes=[];if(ck.figures&&ck.figures.length)notes.push("Figures to check, not found in your profile or the posting: "+ck.figures.join(", ")+".");
   if(ck.fills)notes.push(ck.fills+" place"+(ck.fills>1?"s are":" is")+" left for you to fill, in square brackets.");if(ck.style)notes.push(ck.style.trim());
   notes.push(rec.mine?"Your own version, kept on "+dayStr(rec.made)+".":"Written on "+dayStr(rec.made)+" with "+(rec.model||"your model")+".");pane.appendChild(h("p","c-note c-checks",esc(notes.join(" "))));
@@ -888,7 +983,7 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
     cnt.innerHTML="<b>"+n+" words</b>"+(lim?(lim.words?(over?", <span class=\"c-over\">"+(n-lim.words)+" over the posting's limit of "+lim.words+"</span>":", within the posting's limit of "+lim.words):", and the posting allows "+lim.pages+" page"+(lim.pages>1?"s":"")):"")+(rec.note?". Last improved: “"+esc(rec.note.length>90?rec.note.slice(0,87)+"…":rec.note)+"”":"")+".";
     if(old.length){var ob=cbtn("quiet","The version before",function(){earlier(o,v,rec);},"Bring back the version before this one; this one is kept");ob.classList.add("sm");cnt.appendChild(document.createTextNode(" "));cnt.appendChild(ob);}
     info.appendChild(cnt);
-    var cov=(!isMail&&kind!=="proposal"&&o.read&&o.read.r)?coverage(md,o.read.r.crit):null;
+    var cov=(!isMail&&kind!=="proposal"&&kind!=="sample"&&o.read&&o.read.r)?coverage(md,o.read.r.crit):null;
     if(cov){var cv=h("div","c-cover");cv.innerHTML="<span>It speaks to <b>"+cov.n+" of "+cov.of+"</b> criteria, by their own words: a guide, not a judgement.</span>"+(cov.missEss.length?"<span>Essential, not found in it: "+esc(cov.missEss.join("; "))+".</span>":"");info.appendChild(cv);}
     if(o.improve&&!o.edit){var box=h("div","c-improve"),ta=h("textarea","c-ta");ta.setAttribute("aria-label","What should change");ta.placeholder="What should change? For example: shorter, warmer, lead with my teaching, make the second paragraph about the archive project.";
       var tunes=h("div","c-tunes");tunes.setAttribute("role","group");tunes.setAttribute("aria-label","Quick choices");
@@ -896,7 +991,7 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
       TUNE.forEach(function(t){tunes.appendChild(cbtn("sm",t[0],function(){add(t[1]);}));});
       if(over)tunes.appendChild(cbtn("sm","Within the limit",function(){add("Bring it within the posting's limit of "+lim.words+" words.");}));
       if(cov&&cov.missEss.length)tunes.appendChild(cbtn("sm","The missing criteria",function(){add("Speak to these essential criteria, with evidence from my profile only, or leave a place in square brackets where my profile is silent: "+cov.missEss.join("; ")+".");}));
-      box.appendChild(h("p","c-note",esc("Say what should change, or press the quick choices. It is rewritten from your profile and read a second time against it; the version before is kept.")));box.appendChild(tunes);box.appendChild(ta);info.appendChild(box);
+      box.appendChild(h("p","c-note",esc("Say what should change, or press the quick choices. It is rewritten from your profile and read a second time against it; the version before is kept."+(!isMail&&wayOf(o)==="step"?" Each change then waits for you, one by one.":""))));box.appendChild(tunes);box.appendChild(ta);info.appendChild(box);
       P.foot.innerHTML="";P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Cancel",function(){o.improve=false;save();render();}));
       P.foot.appendChild(cbtn("pri","Improve it",function(){reviseDoc(o,v,rec,ta.value);}));setTimeout(function(){try{ta.focus({preventScroll:true});}catch(e){}},0);}
     if(o.edit){var ta=h("textarea","c-ta c-mono c-grow");ta.value=md;ta.setAttribute("aria-label","The text, to change");area.innerHTML="";area.appendChild(ta);P.foot.innerHTML="";P.foot.appendChild(h("span","c-grow"));
@@ -905,7 +1000,8 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
       else{var pp=paperOf(o,kind,md),f=h("iframe","c-paper");f.title=DOCS[kind][0];f.setAttribute("sandbox","allow-same-origin");f.srcdoc=W.IngLectorPaper?IngLectorPaper.page(pp.kind,md,pp.o):"<pre>"+esc(md)+"</pre>";area.appendChild(f);}}
     if(o.improve&&!o.edit)return;
     /* her own version is never rewritten for her: it is looked at with her (Write it yourself) */
-    if(!rec.mine)P.foot.appendChild(cbtn("","Improve it",function(){o.improve=true;o.edit=false;save();render();},"Say what should change, and it is rewritten"));
+    if(!rec.mine&&!isMail&&wayOf(o)==="guide")P.foot.appendChild(cbtn("","Look at it with me",function(){lookWithMe(o,kind,md);},"It is looked at with you, and you change it yourself"));
+    else if(!rec.mine)P.foot.appendChild(cbtn("","Improve it",function(){o.improve=true;o.edit=false;save();render();},wayOf(o)==="step"&&!isMail?"Say what should change; each change then waits for you":"Say what should change, and it is rewritten"));
     P.foot.appendChild(cbtn("","Change it",function(){o.edit=true;o.improve=false;render();}));P.foot.appendChild(cbtn("","Copy the text",function(){copyText(md);}));
     P.foot.appendChild(cbtn("","Write it again",function(){if(isMail)writeDoc(o,"email",{role:rec.role,purpose:rec.purpose});else writeDoc(o,kind);}));P.foot.appendChild(h("span","c-grow"));
     if(!isMail){P.foot.appendChild(cbtn("","Save as PDF",function(){savePaper(o,kind,"pdf");}));P.foot.appendChild(cbtn("pri","Save as Word",function(){savePaper(o,kind,"docx");}));}});}
@@ -917,6 +1013,7 @@ function mineView(o,pane,P){var kinds=Object.keys(DOCS),ks=o.mineKind&&DOCS[o.mi
   var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc("Your own draft")));var sel=select(kinds.map(function(k){return [k,DOCS[k][0]];}),ks);sel.className="c-sel";sel.setAttribute("aria-label","Which document");
   sel.addEventListener("change",function(){o.mineKind=sel.value;save();render();});top.appendChild(sel);pane.appendChild(top);
   pane.appendChild(h("p","c-note",esc("Write it yourself, or paste a draft you have written. It is looked at with you: what works, what is missing, what your profile does not support. It is never rewritten for you.")));
+  if(o.guide&&o.guide[ks]){var gf=fold("guide:"+o.id+":"+ks,"Your guide to writing it",true),gw=h("div","c-well c-guide");try{gw.innerHTML=typeof W.chatMd==="function"?W.chatMd(o.guide[ks].text):esc(o.guide[ks].text);}catch(e){gw.textContent=o.guide[ks].text;}gf.appendChild(gw);pane.appendChild(gf);}
   var row=h("div","c-mine c-grow"),ta=h("textarea","c-ta c-grow");ta.setAttribute("aria-label","Your draft");ta.placeholder="Your draft.";ta.value=m?m.text:"";row.appendChild(ta);
   if(m&&m.fb){var b=h("div","c-fb c-fbside"),Lb={WORKS:"What works",MISSING:"What is missing",UNSUPPORTED:"Not supported by your profile",WORDING:"Wording to look at",NEXT:"First, do this",RAW:"What it said"};
     Object.keys(Lb).forEach(function(k){if(m.fb[k])m.fb[k].forEach(function(x){b.appendChild(h("div",null,"<b>"+esc(Lb[k])+":</b> "+esc(x)));});});row.appendChild(b);}
@@ -947,17 +1044,260 @@ function stepTrack(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),st=
   var nt=h("textarea","c-ta c-grow");nt.placeholder="Your notes: who to ask, what to do next, what was said.";nt.value=o.notes||"";nt.setAttribute("aria-label","Your notes");nt.addEventListener("change",function(){o.notes=nt.value;save();});box.appendChild(field("Notes",nt));
   P.body.appendChild(box);P.foot.appendChild(cbtn("quiet c-danger","Remove this application",function(){if(!confirm("Remove "+(o.title||"this application")+" and what was written for it?"))return;removeOpp(o);}));}
 
+/* ---------------- 6.8.12: at her pace (her words, 28 October 2026: "I want to be able to automate where I want and also
+   meticulously review and do on my own at my own pace"; asked how, she chose a switch on each task, a calm Today view,
+   requirement checklists, more PhD documents, and changes accepted one by one) ---------------- */
+var WAYS2=[["auto","Do it for me"],["step","Step by step with me"],["guide","Guide me, I do it"]];
+var WAYSAY={auto:"The studio writes it from your profile; you read it, improve it or change it.",
+  step:"First a plan, for you to approve or change; then the writing. Each change you ask for afterwards waits for you, one by one.",
+  guide:"A guide to write it yourself: its parts, questions to answer and what your profile holds for each. Nothing is written for you."};
+function wayOf(o){var w=o&&o.way;if(WAYSAY[w])return w;w=CS().ui.way;return WAYSAY[w]?w:"step";}
+function setWay(o,w){o.way=w;CS().ui.way=w;save();render();}
+function wayBar(o,pane){var w=wayOf(o),r=h("div","c-way");r.appendChild(h("span","c-label",esc("How")));
+  r.appendChild(seg(WAYS2,w,function(x){setWay(o,x);},"How the studio works on this"));r.appendChild(h("p","c-note",esc(WAYSAY[w])));pane.insertBefore(r,pane.firstChild);}
+function docWord(kind){return DOCS[kind][0].replace(/^./,function(m){return m.toLowerCase();}).replace(/^tailored cv$/,"tailored CV");}
+/* Step by step: a plan first, for her to approve or change; the writing then follows it */
+function planDoc(o,kind){if(busyNow()||needModel())return;begin(o,"Planning the "+docWord(kind)+" with you");
+  Promise.all([postText(o),gatherProfile({})]).then(function(x){var post=x[0],G=x[1];
+    return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now planning a document with me, part by part, before it is written. You return the plan and nothing else.")},
+      {role:"user",content:"Plan my "+docWord(kind)+" for "+to(o)+". Give its parts in order, one per line, each as: the part's name, a colon, then one plain sentence saying what it will say and which entries of THE PROFILE it will draw on. Five to nine parts. Where the profile is silent on something a part needs, say so in square brackets. Write nothing else.\n\n"+
+        (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.25))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.55)}];},700,0.3);})
+  .then(function(t){var plan=clean(t).split("\n").map(function(l){return l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/,"").trim();}).filter(Boolean).join("\n");
+      if(plan.length<20)throw new Error("the model gave back no plan");o.plan=o.plan||{};o.plan[kind]={text:plan,at:Date.now(),model:modelName()};o.sv={kind:kind};save();end();},failed);}
+/* Guide me: the parts, questions for her to answer, and what her profile holds for each; nothing is written for her */
+function guideDoc(o,kind){if(busyNow()||needModel())return;begin(o,"Making your guide to the "+docWord(kind));
+  Promise.all([postText(o),gatherProfile({})]).then(function(x){var post=x[0],G=x[1];
+    return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now a teacher. You never write the document, nor any sentence of it: you help me write it myself.")},
+      {role:"user",content:"I will write my "+docWord(kind)+" for "+to(o)+" myself, to learn. Guide me. Give its parts in order, each as a level-two heading (##). Under each: one plain sentence on what the part is for; then two or three questions for me to answer in my own words, as a list; then a line beginning \"From your profile:\" naming the entries of THE PROFILE I could draw on, as they stand there, or \"nothing yet\" where it is silent. Write no part of the document itself.\n\n"+
+        (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.25))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.55)}];},1100,0.3);})
+  .then(function(t){var g=clean(t);if(g.length<40)throw new Error("the model gave back no guide");o.guide=o.guide||{};o.guide[kind]={text:g,at:Date.now(),model:modelName()};o.mineKind=kind;o.sv={kind:"mine"};save();end();},failed);}
+/* Guide me, on a draft already written: it is looked at with her, and she changes it herself */
+function lookWithMe(o,kind,md){o.mine=o.mine||{};o.mine[kind]={text:md,at:Date.now()};o.mineKind=kind;o.sv={kind:"mine"};save();reviewMine(o,kind,md);}
+
+/* ---- changes accepted one by one: the revised text is laid against the draft, paragraph by paragraph ---- */
+function blocksOf(t){return String(t||"").replace(/\r/g,"").split(/\n[ \t]*\n+/).map(function(b){return b.trim();}).filter(Boolean);}
+function diffUnits(a,b){var A=blocksOf(a),B=blocksOf(b),n=A.length,m=B.length,L=[],i,j;
+  for(i=0;i<=n;i++){L.push([]);for(j=0;j<=m;j++)L[i].push(0);}
+  for(i=n-1;i>=0;i--)for(j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  var units=[],cur=null;i=0;j=0;
+  while(i<n||j<m){if(i<n&&j<m&&A[i]===B[j]){if(cur){units.push(cur);cur=null;}units.push({same:true,old:[A[i]],nw:[B[j]]});i++;j++;continue;}
+    if(!cur)cur={same:false,old:[],nw:[]};if(j<m&&(i>=n||L[i][j+1]>=L[i+1][j])){cur.nw.push(B[j]);j++;}else{cur.old.push(A[i]);i++;}}
+  if(cur)units.push(cur);return units;}
+function joinUnits(units,dec){var out=[];units.forEach(function(u,k){out=out.concat(u.same||dec[k]!=="new"?u.old:u.nw);});return out.join("\n\n");}
+function reviewPane(o,v,rec,pane,P){var rv=o.review;rv.dec=rv.dec||{};rv.why=rv.why||{};
+  var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc("The changes to your "+docWord(v.kind)+", one by one")));pane.appendChild(top);
+  pane.appendChild(h("p","c-note",esc("You asked: “"+(rv.note.length>160?rv.note.slice(0,157)+"…":rv.note)+"”. Each change waits for you: keep it, or keep your own words. Nothing is changed until you press Done.")));
+  var list=h("div","c-col c-rv");pane.appendChild(list);
+  Promise.all([loadText(rv.base),loadText(rv.ref)]).then(function(x){var units=diffUnits(x[0],x[1]),ch=[];units.forEach(function(u,k){if(!u.same)ch.push(k);});
+    if(!ch.length){list.appendChild(empty("No change","The model gave back the same text."));}
+    var same=0;
+    function flushSame(){if(same){list.appendChild(h("p","c-note c-rv-same",esc("⋯ "+same+" paragraph"+(same===1?"":"s")+" as they were")));same=0;}}
+    units.forEach(function(u,k){if(u.same){same++;return;}flushSame();var no=ch.indexOf(k)+1,d=rv.dec[k],card=h("div","c-rv-card"+(d?" c-rv-"+d:""));
+      card.appendChild(h("div","c-rv-h","<b>Change "+no+" of "+ch.length+"</b>"+(d==="new"?"<span class=\"c-chip c-ok\">The change is kept</span>":d==="old"?"<span class=\"c-chip\">Your words are kept</span>":"")));
+      if(u.old.length){var a=h("div","c-rv-old");a.appendChild(h("small",null,"Before"));u.old.forEach(function(p){a.appendChild(h("p",null,esc(p)));});card.appendChild(a);}
+      if(u.nw.length){var b=h("div","c-rv-new");b.appendChild(h("small",null,u.old.length?"After":"Added"));u.nw.forEach(function(p){b.appendChild(h("p",null,esc(p)));});card.appendChild(b);}
+      else card.appendChild(h("div","c-rv-new c-rv-gone","<small>After</small><p>(taken out)</p>"));
+      if(rv.why[k])card.appendChild(h("p","c-note c-rv-why","<b>Why:</b> "+esc(rv.why[k])));
+      var keys=h("div","c-keyrow");
+      var kn=cbtn(d==="new"?"pri sm":"sm","Keep the change",function(){rv.dec[k]="new";save();render();});kn.setAttribute("aria-pressed",d==="new"?"true":"false");keys.appendChild(kn);
+      var ko=cbtn(d==="old"?"pri sm":"sm","Keep my words",function(){rv.dec[k]="old";save();render();});ko.setAttribute("aria-pressed",d==="old"?"true":"false");keys.appendChild(ko);
+      if(!rv.why[k])keys.appendChild(cbtn("quiet sm","Why this change?",function(){whyChange(o,rv,k,u);},"Asks the model for one sentence on why"));
+      card.appendChild(keys);list.appendChild(card);});flushSame();
+    var nd=ch.filter(function(k){return rv.dec[k];}).length,nk=ch.filter(function(k){return rv.dec[k]==="new";}).length;
+    P.foot.appendChild(h("span","c-note",esc(nd+" of "+ch.length+" decided")));P.foot.appendChild(cbtn("","Keep all changes",function(){ch.forEach(function(k){rv.dec[k]="new";});save();render();}));
+    P.foot.appendChild(cbtn("","Keep none",function(){ch.forEach(function(k){rv.dec[k]="old";});save();render();}));P.foot.appendChild(h("span","c-grow"));
+    P.foot.appendChild(cbtn("quiet","Cancel",function(){dropReview(o);render();say("Nothing was changed.");}));
+    P.foot.appendChild(cbtn("pri","Done",function(){finishReview(o,v,rec,units,ch);},nd<ch.length?"Changes you have not decided keep your own words":"Keep what you chose"));});}
+function whyChange(o,rv,k,u){if(busyNow()||needModel())return;RUN.busy=true;RUN.what="Asking why";render();
+  ask(function(){return [{role:"system",content:sys("You explain a change in one plain sentence. You never rewrite anything.")},{role:"user",content:"I asked for this: “"+rv.note+"”.\nIn one plain sentence, say why the change below serves what I asked, or say plainly if it does not.\n\nBEFORE:\n"+(u.old.join("\n\n")||"(nothing)")+"\n\nAFTER:\n"+(u.nw.join("\n\n")||"(taken out)")}];},160,0.2)
+    .then(function(t){rv.why[k]=clean(t).split("\n")[0].slice(0,400);save();end();},failed);}
+function dropReview(o){var rv=o.review;if(!rv)return;try{IngBig.del(rv.ref);}catch(e){}delete o.review;save();}
+function finishReview(o,v,rec,units,ch){var rv=o.review,kept=ch.filter(function(k){return rv.dec[k]==="new";}).length;
+  loadText(rv.base).then(function(){var md=joinUnits(units,rv.dec),kind=v.kind;
+    if(!kept){dropReview(o);render();say("Your words are kept: nothing was changed.");return;}
+    var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,md)).then(function(){var c0=rv.chk||rec.chk||{},chk={figures:(c0.figures||[]).filter(function(f){return md.indexOf(f)>=0;}),fills:(md.match(/\[[^\]\n]{2,160}\]/g)||[]).length,style:""};
+      keepOlder(o,kind);o.docs[kind]={ref:ref,made:Date.now(),model:rec.model,chk:chk,note:rv.note+" ("+kept+" of "+ch.length+" changes kept, one by one)"};
+      dropReview(o);o.improve=false;o.edit=false;o.tab="doc";save();render();say(kept+" of "+ch.length+" changes kept. The version before is one press away.");});});}
+
+/* ---- the checklist: what the posting asks her to send and do, from its own sentences ---- */
+var CHECK_RULES=[
+  [/\b(?:cvs?|curriculum vitae|r[eé]sum[eé])\b/i,"Your CV","cv"],
+  [/cover(?:ing)? letter|letter of (?:application|motivation)|motivation(?:al)? letter/i,"A cover letter","cover"],
+  [/supporting statement|statement in support/i,"A supporting statement","supporting"],
+  [/statement of (?:purpose|intent)|purpose statement/i,"A statement of purpose","purpose"],
+  [/personal statement/i,"A personal statement","statement"],
+  [/research proposal|project proposal|research outline|outline of (?:the |your )?(?:proposed )?research/i,"A research proposal","proposal"],
+  [/teaching (?:statement|philosophy)/i,"A teaching statement","teaching"],
+  [/writing sample|sample of (?:your )?(?:written|academic) work|piece of (?:written|academic) work/i,"A writing sample","sample"],
+  [/funding (?:application|statement|form)|scholarship (?:application|form|statement)|case for support/i,"A funding or scholarship application","funding"],
+  [/\btranscripts?\b|academic records?\b/i,"Transcripts of your degrees",""],
+  [/degree certificates?|certificates? (?:of|for) (?:your )?degrees?/i,"Degree certificates",""],
+  [/\breferees?\b|\breferences\b|letters? of (?:recommendation|reference)|recommendation letters?/i,"References","ref"],
+  [/\bielts\b|\btoefl\b|english language (?:test|requirement|proficiency|qualification)|pte academic/i,"Proof of your English (IELTS, TOEFL or the like)",""],
+  [/(?:list of|full list of) (?:your )?publications|publication list/i,"A list of your publications",""],
+  [/\bportfolio\b/i,"A portfolio",""],
+  [/application form/i,"The application form",""],
+  [/right to work|\bvisa\b|\bpassport\b/i,"Proof of your right to work or study",""]];
+var NUMWORD={two:2,three:3,four:4,five:5,"2":2,"3":3,"4":4,"5":5};
+function sentencesOf(t){return String(t||"").replace(/\r/g,"").replace(/([.;!?])\s+/g,"$1\n").split(/\n+/).map(function(s){return s.replace(/\s+/g," ").trim();}).filter(function(s){return s.length>6;});}
+function checkFind(post,o){var S=sentencesOf(post),items=[],lim=limitsIn(post),seen={};
+  function add(text,quote,doc){var k=text.toLowerCase();if(seen[k])return;seen[k]=1;items.push({id:uid("ck"),text:text,quote:String(quote||"").slice(0,240),doc:doc||"",done:false,src:"posting"});}
+  CHECK_RULES.forEach(function(r){var q=S.filter(function(s){return r[0].test(s);})[0];if(!q)return;var t=r[1],d=r[2];
+    if(d==="ref"){var m=/\b(two|three|four|five|[2-5])\s+(?:academic\s+|professional\s+|confidential\s+)?(?:referees?|references?|letters)/i.exec(q);t=m?(NUMWORD[m[1].toLowerCase()]+" references"):"References";d="";
+      add(t,q,"");add("Ask your referees, and give them the posting and the date it is due",q,"");return;}
+    var L=d&&lim[d];if(L)t+=L.words?" (no more than "+L.words.toLocaleString("en-GB")+" words)":" (no more than "+L.pages+" page"+(L.pages>1?"s":"")+")";add(t,q,d);});
+  var how=S.filter(function(s){return /apply (?:online|through|via|at|using)|application (?:portal|system)|submit (?:your |an |the )?applications?|send (?:your |an |the )?applications?|applications? (?:should|must) be (?:submitted|sent|made)/i.test(s);})[0];
+  if(how)add("Send it the way it asks: "+(how.length>140?how.slice(0,137)+"…":how),how,"");
+  if(o&&(o.due||o.closes))add("Send it before it closes"+(o.due?": "+dayStr(o.due+"T12:00:00"):"")+(o.closes&&!o.due?": "+o.closes:""),o.closes||"","");
+  var iv=S.filter(function(s){return /interviews? (?:will|are|is) (?:be )?(?:held|expected|planned|take place)|shortlisted (?:candidates|applicants) will/i.test(s);})[0];
+  if(iv)add("Keep the interview dates free",iv,"");
+  return items;}
+/* what the rules missed: the model lists what the posting asks, each with the sentence that asks it; only a sentence found
+   word for word in the posting is kept, so nothing can be invented */
+function checkSuggest(o,asPending){if(busyNow()||needModel())return;begin(o,"Reading the posting for anything the checklist missed");
+  postText(o).then(function(post){return ask(function(sc){var R=room()*sc;return [{role:"system",content:"You read a posting and list what it asks applicants to send or do. You quote it exactly. You add nothing it does not ask."},
+      {role:"user",content:"List what this "+kindWord(o.kind)+" asks applicants to send or to do, one item per line, each as: the item in a few plain words, then \" :: \", then the sentence of the posting that asks for it, copied exactly. Only what the text below asks; nothing else.\n\n"+cut(post,Math.floor(R*0.8))}];},700,0.2)
+    .then(function(t){var flat=post.replace(/\s+/g," ").toLowerCase(),C=o.check,have={},quoted={},added=0,qk=function(q){return String(q||"").replace(/\s+/g," ").trim().toLowerCase().replace(/[.;:!?]+$/,"");};
+      (C.items.concat(C.pending||[]).concat(C.hidden||[])).forEach(function(x){have[x.text.toLowerCase().replace(/\s*\(.*\)$/,"")]=1;if(x.quote)quoted[qk(x.quote)]=1;});
+      clean(t).split("\n").forEach(function(l){var m=/^\s*(?:[-*•]|\d+[.)])?\s*(.{3,120}?)\s*::\s*["“]?(.{12,400}?)["”]?\s*$/.exec(l);if(!m)return;var q=m[2].replace(/\s+/g," ").trim(),txt=m[1].trim();
+        /* a sentence already on the list is not offered again, under another name */
+        if(flat.indexOf(q.toLowerCase().replace(/[.;]$/,""))<0||have[txt.toLowerCase()]||quoted[qk(q)])return;have[txt.toLowerCase()]=1;quoted[qk(q)]=1;added++;
+        var it={id:uid("ck"),text:txt.charAt(0).toUpperCase()+txt.slice(1),quote:q.slice(0,240),doc:"",done:false,src:"model"};if(asPending)(C.pending=C.pending||[]).push(it);else C.items.push(it);});
+      C.asked=Date.now();save();end();say(added?added+" more found in its own sentences"+(asPending?": keep or drop each.":"."):"Nothing more: the checklist has all it asks.");});},failed);}
+function makeCheck(o){var w=wayOf(o);postText(o).then(function(post){var found=checkFind(post,o);
+  o.check={items:w==="auto"?found:[],pending:w==="step"?found:[],hidden:w==="guide"?found:[],at:Date.now(),way:w};save();render();
+  if(w==="auto"&&modelReady())checkSuggest(o,false);});}
+function stepCheck(o,P){var C=o.check,w=wayOf(o),box=h("div","c-col c-fill");P.body.appendChild(box);
+  var ways=h("div","c-way");ways.appendChild(h("span","c-label",esc("How")));ways.appendChild(seg(WAYS2,w,function(x){setWay(o,x);},"How the checklist is made"));
+  ways.appendChild(h("p","c-note",esc({auto:"Ingenium makes the list from the posting's own sentences; you tick each item at your pace.",step:"Ingenium finds each item in the posting and shows it to you: keep it or drop it, one by one.",guide:"You make the list yourself, with the posting beside you; Ingenium's list waits until you ask for it."}[w])));box.appendChild(ways);
+  if(!C){box.appendChild(empty("What it asks you to send","A checklist of what this "+kindWord(o.kind)+" asks for: the documents, the references, how and when to send it. Each item shows the sentence of the posting it comes from, so you can check it yourself."));
+    if(w==="guide"){var how=LESSONS.filter(function(L){return L[0]==="A checklist from a posting";})[0];if(how){var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});box.appendChild(ol);}}
+    P.foot.appendChild(cbtn("","Next: what you send",function(){goStep(o,"send");},"Go on without a checklist"));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri",w==="guide"?"Start my own list":w==="step"?"Find what it asks for":"Make the checklist",function(){makeCheck(o);}));return;}
+  var pend=C.pending||[];
+  if(pend.length){var x=pend[0],card=h("div","c-ck-sug");card.appendChild(h("small",null,esc((x.src==="model"?"Found by the model":"Found in the posting")+" · "+pend.length+" to look at")));
+    card.appendChild(h("b",null,esc(x.text)));if(x.quote)card.appendChild(h("blockquote",null,esc("“"+x.quote+"”")));
+    var kr=h("div","c-keyrow");kr.appendChild(cbtn("pri sm","Keep it",function(){C.items.push(pend.shift());save();render();}));kr.appendChild(cbtn("sm","Drop it",function(){pend.shift();save();render();}));
+    if(pend.length>1)kr.appendChild(cbtn("quiet sm","Keep all "+pend.length,function(){C.items=C.items.concat(pend.splice(0));save();render();}));card.appendChild(kr);box.appendChild(card);}
+  var n=C.items.length,d=C.items.filter(function(x){return x.done;}).length;
+  if(n)box.appendChild(h("p","c-note c-ck-count","<b>"+d+" of "+n+" done</b>"+(d===n?" · everything on the list is done":"")));
+  else if(!pend.length)box.appendChild(h("p","c-note",esc("Nothing on the list yet: add an item below.")));
+  var ul=h("ul","c-ck");C.items.forEach(function(x){var li=h("li",x.done?"c-ck-done":null),cb=h("input");cb.type="checkbox";cb.checked=!!x.done;cb.id="ck_"+x.id;
+    cb.addEventListener("change",function(){x.done=cb.checked;x.at=Date.now();save();render();});var lb=h("label");lb.setAttribute("for",cb.id);lb.appendChild(h("span","c-ck-t",esc(x.text)));
+    if(x.quote)lb.appendChild(h("small",null,esc("From the posting: “"+x.quote+"”")));else if(x.src==="you")lb.appendChild(h("small",null,esc("Added by you")));
+    li.appendChild(cb);li.appendChild(lb);var acts=h("span","c-ck-acts");
+    if(x.doc&&DOCS[x.doc])acts.appendChild(cbtn("sm",o.docs[x.doc]?"Open it":"Write it",function(){o.step="send";setView(o,{kind:x.doc});}));
+    acts.appendChild(cbtn("quiet sm","✕",function(){C.items=C.items.filter(function(y){return y!==x;});save();render();},"Take it off the list"));li.appendChild(acts);ul.appendChild(li);});
+  box.appendChild(ul);
+  var ar=h("div","c-row"),ai=input("text","","Add an item of your own");ai.setAttribute("aria-label","Add an item of your own");
+  var addIt=function(){var t=ai.value.trim();if(!t)return;C.items.push({id:uid("ck"),text:t,quote:"",doc:"",done:false,src:"you"});save();render();};
+  ai.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();addIt();}});ar.appendChild(ai);ar.appendChild(cbtn("sm","Add",addIt));box.appendChild(ar);
+  if(C.hidden&&C.hidden.length)P.foot.appendChild(cbtn("","Show what Ingenium found ("+C.hidden.length+")",function(){C.pending=(C.pending||[]).concat(C.hidden.splice(0));save();render();},"Compare your list with the one found in the posting: keep or drop each"));
+  P.foot.appendChild(cbtn("","Find anything missed",function(){checkSuggest(o,wayOf(o)!=="auto");},"The model reads the posting again; only what it can quote word for word is offered"));
+  P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: what you send",function(){goStep(o,"send");}));}
+
+/* ---- Today: only the next small step of each application, with its closing date ---- */
+function todayStr(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function tomorrowStr(){var d=new Date();d.setDate(d.getDate()+1);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function nextOf(o){if(FINISHED[o.stage])return null;
+  if(!o.read)return {step:"fit",text:"Read it against your profile",why:"The reading shows how it matches what you are looking for, and each thing it asks for, judged from your profile."+(modelReady()?"":" A model is needed for it (Models page).")};
+  if(!o.check)return {step:"check",text:"Make its checklist",why:"What it asks you to send and do, from its own sentences, to tick at your pace."};
+  var C=o.check;if(C.pending&&C.pending.length)return {step:"check",text:"Look at "+C.pending.length+" item"+(C.pending.length===1?"":"s")+" found in the posting",why:"Keep or drop each, one at a time."};
+  var und=C.items.filter(function(x){return !x.done;});
+  if(und.length){var x=und[0];
+    if(x.doc&&DOCS[x.doc]){var dr=o.docs[x.doc];if(!dr)return {step:"send",kind:x.doc,text:"Write your "+docWord(x.doc),why:"Its checklist asks for it.",quote:x.quote};
+      var fills=dr.chk&&dr.chk.fills||0;if(fills)return {step:"send",kind:x.doc,text:"Fill the "+fills+" place"+(fills===1?"":"s")+" in square brackets in your "+docWord(x.doc),why:"Your profile did not give what goes there; you do."};
+      return {step:"check",text:"Read your "+docWord(x.doc)+" once more, then tick it off",why:"It is written; only you can say it is ready."};}
+    return {step:"check",text:x.text,why:"From its checklist ("+(C.items.length-und.length)+" of "+C.items.length+" done).",quote:x.quote};}
+  if(o.stage==="considering"||o.stage==="preparing")return {step:"track",text:"Send it, then mark it Applied in Track",why:"Everything on its checklist is done."};
+  if(o.stage==="interview")return {step:"practise",text:"Practise your answers for the interview",why:"One criterion or one question at a time."};
+  if(o.stage==="offer")return {step:"track",text:"Decide on the offer, and note what you decide in Track",why:""};
+  return null;}
+function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[];
+  sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}if(o.rest&&o.rest>t)rest.push({o:o,n:n});else act.push({o:o,n:n});});
+  var L=panel("csList","Today",{key:cbtn("sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
+  var sel=act.filter(function(x){return x.o.id===S.ui.today;})[0]||null,SHOWN=3;
+  if(!act.length&&!rest.length)L.body.appendChild(empty(S.opps.length?"Nothing for today":"Nothing here yet",S.opps.length?"Every open application is waiting on someone else, or has no step left.":"Bring a posting, a programme's call or a grant: its next step will be here each day."));
+  function row(x){var dw=dueWords(x.o),n=daysLeft(x.o),b=item(x.n.text,(x.o.title||"Untitled")+(dw?" · "+dw:""),sel===x,function(){S.ui.today=x.o.id;show("work");save();render();},n!=null&&n>=0&&n<=7?"c-soon-i":"");return b;}
+  act.slice(0,SHOWN).forEach(function(x){L.body.appendChild(row(x));});
+  if(act.length>SHOWN){var f=fold("today-later","Later ("+(act.length-SHOWN)+")");act.slice(SHOWN).forEach(function(x){f.appendChild(row(x));});L.body.appendChild(f);}
+  if(rest.length){var fr=fold("today-rest","Resting today ("+rest.length+")");rest.forEach(function(x){var b=item(x.o.title||"Untitled","Back tomorrow: "+x.n.text,false,function(){delete x.o.rest;save();render();},"");b.title="Bring it back today";fr.appendChild(b);});L.body.appendChild(fr);}
+  if(wait.length){var fw=fold("today-wait","Waiting to hear ("+wait.length+")");wait.forEach(function(o){fw.appendChild(item(o.title||"Untitled",stageWord(o.stage),false,function(){S.ui.room="apps";S.ui.open=o.id;o.step="track";show("work");save();render();}));});L.body.appendChild(fw);}
+  L.foot.appendChild(h("span","c-note",esc(act.length?act.length+" step"+(act.length===1?"":"s")+" for today, one per application":"Nothing pressing")));
+  var R;
+  if(sel){var o=sel.o,nx=sel.n,dw=dueWords(o);R=panel("csWork",o.title||"Untitled",{back:"Today",onBack:function(){S.ui.today=null;show("list");save();render();}});
+    var c=h("div","c-col c-today");c.appendChild(h("p","c-note",esc([o.org,dw].filter(Boolean).join(" · "))));c.appendChild(h("h3","c-today-step",esc(nx.text)));
+    if(nx.why)c.appendChild(h("p",null,esc(nx.why)));if(nx.quote)c.appendChild(h("blockquote","c-today-q",esc("From the posting: “"+nx.quote+"”")));
+    c.appendChild(h("p","c-note",esc("One step at a time. When it is done, the next one takes its place here.")));R.body.appendChild(c);
+    R.foot.appendChild(cbtn("quiet","Not today",function(){o.rest=tomorrowStr();S.ui.today=null;save();render();say("It rests until tomorrow.");},"It comes back tomorrow"));
+    R.foot.appendChild(cbtn("","Open the application",function(){S.ui.room="apps";S.ui.open=o.id;show("work");save();render();}));R.foot.appendChild(h("span","c-grow"));
+    R.foot.appendChild(cbtn("pri","Do this now",function(){S.ui.room="apps";S.ui.open=o.id;o.step=nx.step;if(nx.kind){o.sv={kind:nx.kind};o.tab="doc";}show("work");save();render();}));}
+  else{R=panel("csWork","Today");var near=act.concat(rest).map(function(x){return x.o;}).filter(function(o){var n=daysLeft(o);return n!=null&&n>=0;}).sort(function(a,b){return daysLeft(a)-daysLeft(b);})[0];
+    var c2=h("div","c-col c-today");c2.appendChild(h("h3","c-today-step",esc(act.length?(act.length===1?"One step for today.":act.length+" steps for today, one for each application."):"Nothing is asked of you today.")));
+    if(near){var nd=daysLeft(near);c2.appendChild(h("p",null,esc("The nearest closing date is "+(nd===0?"today":nd===1?"tomorrow":"in "+nd+" days")+", "+dayStr(near.due+"T12:00:00")+": "+String(near.title||"an application").replace(/[.\s]+$/,"")+".")));}
+    c2.appendChild(h("p","c-note",esc("Choose one on the left. Each says what to do and why; Do this now takes you straight to it, and Not today lets it rest until tomorrow.")));R.body.appendChild(c2);}
+  two(L,R,par);}
+
+/* ---- several profiles (her words, 28 October 2026: "I want the Career Studio to be able to hold multiple profiles"; asked,
+   she chose both: other sides of her, and other people she helps, each with its own applications and nothing mixed) ---- */
+function personName(p){var P=p.profile||{},n=String(P.name||"").trim();if(!n&&P.isMe!==false){try{n=lxhAuthor()||"";}catch(e){}}return n||(P.isMe===false?"Someone else":"You");}
+function personLabel(p){var n=personName(p),l=String(p.label||"").trim();return l?n+" · "+l:n;}
+function switchTo(id){var r=ROOT();if(!r.people.some(function(p){return p.id===id;}))return;if(RUN.busy){say("Wait for the studio to finish, or press Stop, before you change profile.");paintWho();return;}
+  r.cur=id;save();render();say("This is now the profile of "+personLabel(CS())+".");}
+function meFirst(){var r=ROOT();if(CS().profile.isMe!==false)return;var m=r.people.filter(function(p){return !p.profile||p.profile.isMe!==false;})[0];if(m){r.cur=m.id;save();}}
+function copyRef(ref){return loadText(ref).then(function(t){if(!t)return null;var n=IngBig.newId();return Promise.resolve(IngBig.put(n,t)).then(function(){return n;});});}
+function newPerson(kind,name,label){var r=ROOT(),cur=CS(),p={id:uid("pp"),label:String(label||"").trim().slice(0,40),ui:{room:"profile",open:null,ppart:"about"},opps:[],goals:[]};
+  if(kind==="me"){var P=JSON.parse(JSON.stringify(cur.profile));P.isMe=true;delete P.suggested;delete P.own;P.at=Date.now();p.profile=P;
+    /* its documents and LinkedIn export are copied, so each profile can change or remove its own */
+    var q=Promise.all((P.files||[]).map(function(f){return copyRef(f.ref).then(function(n){f.ref=n;f.id=uid("f");});}));
+    if(P.linkedin&&P.linkedin.ref)q=q.then(function(){return copyRef(P.linkedin.ref).then(function(n){P.linkedin.ref=n;});});
+    return q.then(function(){P.files=(P.files||[]).filter(function(f){return f.ref;});r.people.push(p);r.cur=p.id;save();render();return p;});}
+  p.profile={isMe:false,name:String(name||"").trim(),contact:"",items:[],files:[],use:{cv:true,linkedin:true,writing:true,letters:true,fontes:false,apps:{}},
+    wants:{looking:"",need:"",avoid:"",where:"",when:""},prefs:{spelling:(cur.profile.prefs&&cur.profile.prefs.spelling)||"british"},own:{cv:null,writing:[],letters:[]},at:Date.now()};
+  r.people.push(p);r.cur=p.id;save();render();return Promise.resolve(p);}
+function refsOfPerson(p){var out=[],P=p.profile||{};
+  (p.opps||[]).forEach(function(o){out.push(o.ref);Object.keys(o.docs||{}).forEach(function(k){out.push(o.docs[k].ref);((o.older||{})[k]||[]).forEach(function(x){out.push(x.ref);});});
+    (o.emails||[]).forEach(function(x){out.push(x.ref);(x.older||[]).forEach(function(y){out.push(y.ref);});});if(o.review)out.push(o.review.ref);});
+  (P.files||[]).forEach(function(f){out.push(f.ref);});if(P.linkedin)out.push(P.linkedin.ref);
+  if(P.own){if(P.own.cv)out.push(P.own.cv.ref);(P.own.writing||[]).concat(P.own.letters||[]).forEach(function(x){out.push(x.ref);});}
+  return out.filter(Boolean);}
+function removePerson(p){var r=ROOT();if(r.people.length<2){say("This is the only profile: it stays.");return;}
+  var n=(p.opps||[]).length;if(!confirm("Remove the profile of "+personLabel(p)+", its "+n+" application"+(n===1?"":"s")+" and everything written for them? This cannot be undone."))return;
+  refsOfPerson(p).forEach(function(ref){try{IngBig.del(ref);}catch(e){}});r.people=r.people.filter(function(x){return x!==p;});if(r.cur===p.id)r.cur=r.people[0].id;save();render();say("The profile is removed.");}
+function addOwnText(list,what){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",true,function(fs){var q=Promise.resolve(),n=0;
+  fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){if(t.length<40)return;var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){list.push({ref:ref,name:f.name,chars:t.length,at:Date.now()});n++;});});});});
+  q.then(function(){if(n){CS().profile.at=Date.now();save();render();say(n+" "+what+(n>1?"s are":" is")+" kept in this profile.");}});});}
+function profPeople(){var r=ROOT(),cur=CS(),R=panel("csWork","Profiles");
+  R.body.appendChild(h("p","c-note c-pad",esc("Each profile keeps its own entries, sources, applications and Today, and nothing passes between them. A profile for someone else never uses your CV, your writing, or Lector's readings of your apps.")));
+  var ul=h("div","c-people");
+  r.people.forEach(function(p){var row=h("div","c-person"+(p===cur?" c-cur":"")),tx=h("div","tx"),n=(p.opps||[]).length;tx.appendChild(h("b",null,esc(personLabel(p))));
+    tx.appendChild(h("small",null,esc((p.profile&&p.profile.isMe===false?"Someone else":"You")+" · "+n+" application"+(n===1?"":"s")+(p===cur?" · open now":""))));row.appendChild(tx);
+    var k=h("div","c-keys");if(p!==cur)k.appendChild(cbtn("sm","Open this profile",function(){switchTo(p.id);}));
+    k.appendChild(cbtn("sm quiet","Name it",function(){var v=prompt("A short name for this profile, shown beside the person's name (for example Academic, or Museums). Leave it empty for none.",p.label||"");if(v===null)return;p.label=v.trim().slice(0,40);save();render();}));
+    if(r.people.length>1)k.appendChild(cbtn("sm quiet c-danger","Remove",function(){removePerson(p);}));row.appendChild(k);ul.appendChild(row);});
+  R.body.appendChild(ul);
+  var nw=h("div","c-col c-pad c-newp");nw.appendChild(h("h3","c-h3",esc("A new profile")));
+  var a=h("div","c-row c-newrow");a.appendChild(cbtn("","Another side of me",function(){var v=prompt("What should this side of you be called? For example Academic, Industry, or Museums.","");if(v===null)return;
+      newPerson("me","",v).then(function(){say("A new side of you, copied from "+personLabel(cur)+". Change what you wish: its applications start empty.");});},"A copy of this profile, to change: its own entries and applications"));
+  a.appendChild(h("span","c-note",esc("A copy of this profile (its entries, wishes and documents) with no applications yet, to change as you wish.")));nw.appendChild(a);
+  var b=h("div","c-row c-newrow"),nm=input("text","","Their name");nm.setAttribute("aria-label","Their name");b.appendChild(nm);
+  b.appendChild(cbtn("","Someone else",function(){var v=nm.value.trim();if(!v){nm.focus();say("Give their name first.");return;}newPerson("other",v,"").then(function(){say("A profile for "+v+". Add their CV and their entries first.");});},"An empty profile for someone you help"));
+  b.appendChild(h("span","c-note",esc("An empty profile for someone you help, with their own CV and documents.")));nw.appendChild(b);R.body.appendChild(nw);
+  return R;}
+function paintWho(){var sel=$("csWho");if(!sel)return;var r=ROOT(),cur=CS();sel.innerHTML="";
+  r.people.forEach(function(p){var o=h("option");o.value=p.id;o.textContent=personLabel(p);if(p===cur)o.selected=true;sel.appendChild(o);});
+  var n=h("option");n.value="+manage";n.textContent="Add or manage profiles…";sel.appendChild(n);}
+
 /* ---- Your profile: its parts on the left, one part at a time on the right ---- */
 function paintProfile(par){var S=CS(),P=S.profile,M=lectorMe(),part=S.ui.ppart||"about",n=P.items.length,sg=(P.suggested||[]).length,filled=Object.keys(P.wants).filter(function(k){return String(P.wants[k]||"").trim();}).length;
   var srcN=(M.cv?1:0)+(P.linkedin?1:0)+P.files.length;
   var L=panel("csList","Your profile");
   [["about","About you",[P.name||myName()||"Your name",P.contact].filter(Boolean).join(" · ")||"Your name and how to reach you"],["looking","What you are looking for",filled?filled+" of 5 said":"Not said yet"],
    ["sources","What the studio may use",srcN?srcN+" source"+(srcN===1?"":"s")+": "+[M.cv?"your CV":"",P.linkedin?"LinkedIn":"",P.files.length?P.files.length+" document"+(P.files.length===1?"":"s"):""].filter(Boolean).join(", "):"Your CV, LinkedIn, your documents"],
-   ["entries","Your entries",n?n+" entr"+(n===1?"y":"ies"):"None yet"]].concat(sg?[["found","Found in your sources",sg+" to keep or drop"]]:[]).forEach(function(x){
+   ["entries","Your entries",n?n+" entr"+(n===1?"y":"ies"):"None yet"]].concat(sg?[["found","Found in your sources",sg+" to keep or drop"]]:[]).concat([["people","Profiles",ROOT().people.length+" kept · open, add or remove one"]]).forEach(function(x){
     L.body.appendChild(item(x[1],x[2],part===x[0],function(){S.ui.ppart=x[0];S.ui.editing=null;show("work");save();jump();render();},x[0]==="found"?"c-new":""));});
   L.foot.appendChild(h("span","c-note",esc(P.at?"Last changed "+dayStr(P.at):"Kept on this device only")));
   if(RUN.busy){two(L,livePanel(),par);return;}
-  var R=({about:profAbout,looking:profLooking,sources:profSources,entries:profEntries,found:profFound}[part]||profAbout)();
+  var R=({about:profAbout,looking:profLooking,sources:profSources,entries:profEntries,found:profFound,people:profPeople}[part]||profAbout)();
   R.head.insertBefore(cbtn("quiet c-back","‹ Your profile",function(){show("list");save();render();}),R.head.firstChild);two(L,R,par);}
 function profAbout(){var P=CS().profile,R=panel("csWork","About you"),g=h("div","c-col c-pad");
   var nm=input("text",P.name,myName()||"Your name"),ct=input("text",P.contact,"Email · telephone · town"),sp=select([["british","British English"],["american","American English"]],P.prefs.spelling);
@@ -971,13 +1311,18 @@ function profLooking(){var P=CS().profile,R=panel("csWork","What you are looking
 function profSources(){var S=CS(),P=S.profile,M=lectorMe(),R=panel("csWork","What the studio may use"),list=h("div","c-srcs");
   function src(title,sub,on,set,keys,inner){var row=h("div","c-src"+(inner?" sub":""));if(set){var sw=h("label","c-sw"),cb=h("input");cb.type="checkbox";cb.checked=!!on;cb.setAttribute("aria-label","Use "+title);cb.addEventListener("change",function(){set(cb.checked);save();});sw.appendChild(cb);row.appendChild(sw);}else row.appendChild(h("span","c-sw-pad"));
     var tx=h("div","tx");tx.appendChild(h("b",null,esc(title)));tx.appendChild(h("small",null,esc(sub)));row.appendChild(tx);if(keys&&keys.length){var k=h("div","c-keys");keys.forEach(function(x){k.appendChild(x);});row.appendChild(k);}list.appendChild(row);}
-  src("Your CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+". Lector uses the same one.":"Not added yet. Lector and the studio share it.",P.use.cv,function(v){P.use.cv=v;},
-    [cbtn("sm",M.cv?"Replace":"Add your CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){if(!confirm("Remove your CV from Lector and the studio?"))return;try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();})]:[]));
+  var me=P.isMe!==false;
+  src("Your CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+(me?". Lector uses the same one.":". Kept in this profile only."):(me?"Not added yet. Lector and the studio share it.":"Not added yet. Kept in this profile only."),P.use.cv,function(v){P.use.cv=v;},
+    [cbtn("sm",M.cv?"Replace":me?"Add your CV":"Add their CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){if(!confirm(me?"Remove your CV from Lector and the studio?":"Remove this CV from this profile?"))return;try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();})]:[]));
   src("Your LinkedIn export",P.linkedin?P.linkedin.n+" entr"+(P.linkedin.n===1?"y":"ies")+" from it, "+dayStr(P.linkedin.at)+(P.linkedin.others&&P.linkedin.others.length?". Not read: "+P.linkedin.others.slice(0,4).join(", "):"")+".":"The .zip LinkedIn sends when you ask for a copy of your data, or its .csv files.",P.use.linkedin,function(v){P.use.linkedin=v;},
     [cbtn("sm",P.linkedin?"Add it again":"Add the export",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});})]);
   src("Your documents",P.files.length?P.files.length+" kept: a proposal, a statement, a publication.":"A research proposal, a statement, a publication or anything else about your work.",null,null,[cbtn("sm","Add documents",addDocs)]);
   P.files.forEach(function(f){src(f.name,Math.round(f.chars/1000)+" thousand characters, kept "+dayStr(f.at)+".",f.use!==false,function(v){f.use=v;},[cbtn("sm quiet","Remove",function(){try{IngBig.del(f.ref);}catch(e){}P.files=P.files.filter(function(x){return x.id!==f.id;});save();render();})],true);});
-  var runs=[];try{lxState().runs.forEach(function(x){if(x.kind==="app"&&x.status==="done"&&runs.every(function(y){return y.name!==x.name;}))runs.push(x);});}catch(e){}
+  var runs=[];if(me)try{lxState().runs.forEach(function(x){if(x.kind==="app"&&x.status==="done"&&runs.every(function(y){return y.name!==x.name;}))runs.push(x);});}catch(e){}
+  if(!me){src("Writing and past letters",M.writing.length+" piece"+(M.writing.length===1?"":"s")+" of writing and "+M.letters.length+" letter"+(M.letters.length===1?"":"s")+", kept in this profile: for the voice only, never for facts.",P.use.writing,function(v){P.use.writing=v;P.use.letters=v;},
+      [cbtn("sm","Add writing",function(){addOwnText(M.writing,"piece of writing");}),cbtn("sm","Add a letter",function(){addOwnText(M.letters,"letter");})]);
+    M.writing.concat(M.letters).forEach(function(x){src(x.name,Math.round(x.chars/1000)+" thousand characters, kept "+dayStr(x.at)+".",null,null,[cbtn("sm quiet","Remove",function(){try{IngBig.del(x.ref);}catch(e){}M.writing=M.writing.filter(function(y){return y!==x;});M.letters=M.letters.filter(function(y){return y!==x;});save();render();})],true);});
+    R.body.appendChild(list);R.foot.appendChild(h("span","c-note",esc("This profile uses only what is switched on here, and nothing of yours: not your CV, your writing, nor Lector's readings of your apps.")));return R;}
   src("Lector's readings of your apps",runs.length?runs.length+" read in full: what each does, how it was built, the skills it shows.":"None yet. Read your apps in Lector, and what it found can be used here.",null,null,runs.length?[]:[cbtn("sm","Open Lector",function(){go("lector");})]);
   runs.forEach(function(x){var k=x.app||x.name;src(x.name,"Read "+dayStr(x.finished||x.updated)+".",P.use.apps[k]!==false,function(v){P.use.apps[k]=v;},null,true);});
   src("Your writing and past letters",(M.writing||[]).length+" piece"+((M.writing||[]).length===1?"":"s")+" of writing and "+(M.letters||[]).length+" letter"+((M.letters||[]).length===1?"":"s")+", kept in Lector: for your voice only, never for facts.",P.use.writing,function(v){P.use.writing=v;P.use.letters=v;},[cbtn("sm","Manage them in Lector",function(){go("lector");})]);
@@ -1065,7 +1410,7 @@ function paintLearn(par){var S=CS(),i=Math.max(0,Math.min(LESSONS.length-1,S.ui.
   else R.foot.appendChild(cbtn("pri","Try it: bring a posting",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();}));two(L,R,par);}
 
 /* ---------------- from Lector: a CV or a cover letter needs no apps (her request) ---------------- */
-function fromLector(B){var kinds=Object.keys(B&&B.docs||{}).filter(function(k){return B.docs[k];}),want=kinds.filter(function(k){return k==="cv"||k==="cover";});if(!want.length)return false;
+function fromLector(B){meFirst();var kinds=Object.keys(B&&B.docs||{}).filter(function(k){return B.docs[k];}),want=kinds.filter(function(k){return k==="cv"||k==="cover";});if(!want.length)return false;
   var P=null;try{P=B.purpose!=="portfolio"&&LXR().state().posts[B.purpose];}catch(e){}
   var go1=function(o){CS().ui.room="apps";CS().ui.open=o?o.id:"new";CS().ui.show="work";if(o)o.step="send";save();go("career");
     if(!o){say("A CV or a cover letter needs no apps: bring the posting here, and the Career Studio writes them from your profile.");return;}
@@ -1079,10 +1424,11 @@ function fromLector(B){var kinds=Object.keys(B&&B.docs||{}).filter(function(k){r
 /* ---------------- its place: the page, the menu, go() ---------------- */
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
-  sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><h1>Career Studio</h1><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
-    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["apps","Applications"],["profile","Your profile"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
+  sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Career Studio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
+    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["profile","Your profile"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
+  var who=sec.querySelector("#csWho");if(who)who.addEventListener("change",function(){var v=who.value;if(v==="+manage"){var S=CS();S.ui.room="profile";S.ui.ppart="people";show("work");save();render();return;}switchTo(v);});
   var tabs=[].slice.call(sec.querySelectorAll(".rm-tabs [data-room]"));
   tabs.forEach(function(b,i){b.addEventListener("click",function(){var S=CS();S.ui.room=b.getAttribute("data-room");S.ui.show="list";if(S.ui.room==="apps"&&S.ui.open==="new")S.ui.open=null;save();render();});
     /* the arrow keys go from room to room, as in Settings */
@@ -1094,7 +1440,8 @@ function install(){if($("page-career"))return;
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
-window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW};
+window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
+  root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR};
 })();
 ;try{window.__ingParts["p188"]="running";}catch(_){}
 </script>
