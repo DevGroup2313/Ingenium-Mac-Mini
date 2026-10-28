@@ -259,7 +259,7 @@ Diem's thirteen voices with Ingenium's sixteen, the things of a college study: T
 Wax seal, Escapement, Brass stamp (keeping); Library door, Study lamp, Archive key (the welcome door); and for moving between
 pages, each room its own (a vellum page, a card drawer, a ledger's tap, a pen, a typebar, a brass gear).
 
-    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it stays quiet, it is over in 1.6 s; Ingenium's defaults, none of the old names, 51 checks
+    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it never reaches the speakers' limit, it is over in 2.4 s (6.8.2); Ingenium's defaults, none of the old names, 69 checks
 
 One type scale (her words: "I want the text fonts and sizes to be consitent and not be random ... particularly on the
 Settings page with the different size and font of the Ownership texts"): `modules/r185.js`. The original cards set their own
@@ -370,6 +370,24 @@ storage and do not show the card.
 
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
+
+Ingenium's sounds, alive (6.8.2; her words: "I don't like Ingenium's new sound systems, it sounds weak and mild. Its not
+creative enough, I want the entire app and software to feel alive and realistic hence the 3D animated look, right now it all
+sounds dead and weak and I HATE IT"). Measured before (`IngSound.render`, away from the speakers): the voices peaked between
+0.006 and 0.042 of the speakers' range at the default volume of 0.25, each a single tone or a short noise. `modules/r176.js`
+now builds each thing from its parts: a struck tine with its partials and a slow beat, a bell's inharmonic modes, a key's
+felt and its click, a door's latch, bolt and hinge and the door coming to rest on its stop, a page lifting on one side and
+landing on the other. They ring in a small
+panelled room (1.3 seconds, the same in both ears, so a sound in the middle stays there) and pass through a gentle
+compressor, a limiter and a soft edge, so no peak passes 0.95 of the speakers' range at any volume. Each kind has its own presence, set by
+measuring every voice: a notice the loudest, a key the lightest. No two plays are the same: each varies a little in pitch,
+weight and place. Two kinds are new: a key pressed (Felt key, Brass button, Boxwood key) and a card rising onto the screen
+(Card lift, Folio open, Slate slide), each chosen and levelled in Settings or the Display panel like the others. The
+default volume is 0.6; a level kept from 6.8.1's default (0.25) becomes 0.6, a level chosen otherwise stays. Typing in a
+field makes no sound; the calm look, the quiet screen and Off keep all of it silent.
+
+    node rig/t_682_sounds.js <Ingenium url> <out>                     # 116 checks: each voice's presence, limit, length, middle, variety; the keys, the cards, Off
+    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 24 checks
 
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
