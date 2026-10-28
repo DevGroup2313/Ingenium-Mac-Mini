@@ -76,7 +76,7 @@ jobs:
           tail -n 60 "$KIT/build_log.txt" || true
           mkdir -p "$RUNNER_TEMP/out" && cp "$KIT/build_log.txt" "$RUNNER_TEMP/out/" 2>/dev/null || true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: kit-build-log

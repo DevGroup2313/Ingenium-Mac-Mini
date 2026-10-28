@@ -200,7 +200,7 @@ jobs:
 
       - name: Keep the picture and the log with this run
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: shell-check
           path: |
@@ -299,7 +299,7 @@ jobs:
 
       - name: Hand the shell and what was seen to the next jobs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mac-shell
           path: |
@@ -317,7 +317,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: The shell the job before built
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: mac-shell
           path: ${{ runner.temp }}/got
@@ -333,7 +333,7 @@ jobs:
 
       - name: Hand what was seen to the next job
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mac-intel-checks
           path: ${{ runner.temp }}/checks/mac-*
@@ -349,7 +349,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: The shell and what both Macs saw
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: ${{ runner.temp }}/got
 
@@ -437,7 +437,7 @@ jobs:
 
       - name: Keep the pictures and logs with this run
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-shell-check
           path: |
