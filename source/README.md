@@ -371,6 +371,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.11 and The Forge 655 (28 October 2026; her words: "I want the models to be aware of what I need them to do and
+make surgical edits and help me improve my apps", on the code chat, the main chat page and the Build page, with Claude's
+models, Ollama's and Kimi; and "I want to be able to automate where I want and also meticulously review and do on my own at
+my own pace"; asked how, she chose a switch on each task). `build/modules/r190.js`, the working loop: a model no longer has one
+attempt with passages Ingenium guessed for it; it searches, reads the exact lines, edits, runs the app, reads its errors
+and mends them, with six tools (list_files, search, read, edit, write_file, run_app), each step shown under the reply in
+plain words. Connected models take the tools in their service's own form (Anthropic's Messages API for Claude, thinking
+blocks passed back unchanged and the history only appended to; the OpenAI form for Kimi, OpenRouter, OpenAI, LM Studio and
+Gemini; Ollama's own); the models on the device take them as written `<tool_call>` tags, with short results. Each task has
+its way, on a key beside the model's name: Do it for me; Step by step with me (each change waits on a card, lines before and
+after: Make this change, Skip it with a note the model is told, Make all the rest, Stop here); Guide me, I do it (the model
+only reads and shows where and what to change, and why). Code keeps every change as a version, Chat as a changed file, and
+Build has Ask a model to change this page, with Undo. A model that refuses tools answers as before. `build/modules/r191.js`:
+every connection set up is kept on the device, the model menu lists the models of all of them by service (Claude Fable,
+Opus, Sonnet and Haiku by name), choosing one switches service at once, and each conversation keeps the model that last
+answered it; Settings lists them with Use and Forget. The Forge 655 carries Ingenium 6.8.11, and Ingenium 6.8.11 carries it.
+
+    python3 rig/mock_agent_server.py 8191                                      # Anthropic, OpenAI and Ollama forms, checked
+    node rig/t_690_agent.js <url> http://127.0.0.1:8191 <out>                  # 44 checks
+    node rig/t_6811_connections.js <url> http://127.0.0.1:8191 <out>           # 11 checks
+    node offline_project/forge_655/tests/t_655.js <the Forge url> <out>        # on 655 carrying Ingenium 6.8.11
+
 Ingenium 6.8.10 and The Forge 654 (28 October 2026; her words: "I want the copyrights and authorship line of "Designed and
 built by Yannie D. Forest · © 2026 Yannie D. Forest" placed at the bottom of the app's display page as well as the About panel
 like it is done on Carpe Diem. I want the app's page to not just abruptly end."). `build/modules/r189.js`: under the last card
