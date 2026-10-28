@@ -371,6 +371,18 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.10 and The Forge 654 (28 October 2026; her words: "I want the copyrights and authorship line of "Designed and
+built by Yannie D. Forest · © 2026 Yannie D. Forest" placed at the bottom of the app's display page as well as the About panel
+like it is done on Carpe Diem. I want the app's page to not just abruptly end."). `build/modules/r189.js`: under the last card
+of each page that scrolls (Home, Focus, Models, Blend, Build, Schedae's notes, the Guide, Settings), a colophon as Carpe
+Diem's: the seal (drawn by `drawIngeniumSeal`, by day and by night), the app's name, a fine rule with LOCAL MODEL STUDIO, and
+the line in her words; the rooms that fill the window keep it. About ends with "Designed and built by Yannie D. Forest" over
+"© 2026 Yannie D. Forest", under a fine rule, as Carpe Diem's About does. The Forge 654 carries Ingenium 6.8.10, and
+Ingenium 6.8.10 carries it.
+
+    node rig/t_6810_colophon.js <url> <out>                                    # 10 checks
+    node offline_project/forge_654/tests/t_654.js <the Forge url> <out>        # 21 checks, on 654 carrying Ingenium 6.8.10
+
 Ingenium 6.8.9 and The Forge 653 (28 October 2026; her words: "I want the Forge to be just as capable and functional as
 Ingenium with the same increased capabilities. I just want to do it all without AI", and of Tabula, Abacus and Imago, "I
 want them all fixed"). The Forge's own copies of the three apps had none of Ingenium 6.8.1's fixes. Pressed as a person
