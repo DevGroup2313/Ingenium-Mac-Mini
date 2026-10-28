@@ -15,7 +15,8 @@ CARPE DIEM and Carpe Diem's blue. Here each takes the house it is carried in, wr
   - every other edition: no seal and no wordmark. The group keeps "Your own" (a seal, logo or letterhead from a picture
     on the device, kept on it), and the key that opened the house's letterheads opens that instead.
 The letterhead builder closes with Escape. And what the files say: a Word file's watermark is named "Watermark", a
-tracked change's author "Author" (Carpe Diem was named in both); Tabula's warning names the app it is in.
+tracked change's author and a comment's author "Author" (Carpe Diem was named in each); Tabula's warning names the app it
+is in.
 
 patch(name, html, house) -> html; house = {"name", "word", "png" (a data: URL or None), "accent"}."""
 import json
@@ -120,6 +121,8 @@ def patch(name, html, house):
         html = _one(html, 'descr="Carpe Diem watermark"', 'descr="Watermark"', "tabula watermark description")
         html = _one(html, "author:ch.getAttribute('data-author')||'Carpe Diem'", "author:ch.getAttribute('data-author')||'Author'", "tabula change author")
         html = _all(html, 'w:author="Carpe Diem"', 'w:author="Author"', "tabula Word author", 2)
+        # a comment's author, kept on the comment and written into the Word file (6.8.5)
+        html = _all(html, "sp.setAttribute('data-author','Carpe Diem')", "sp.setAttribute('data-author','Author')", "tabula comment author", 2)
         html = _one(html, "if the Carpe Diem application is closed", "if the " + house["name"] + " application is closed", "tabula warning")
         html = _one(html, "a cream style in the Carpe Diem palette", "a cream style in the house palette", "tabula help, tables")
         html = _one(html, "The palettes are Carpe Diem\\'s own: the theme row", "The palettes: the theme row", "tabula help, colours")

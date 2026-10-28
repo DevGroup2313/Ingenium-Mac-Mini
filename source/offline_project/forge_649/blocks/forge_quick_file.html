@@ -1,0 +1,35 @@
+<script id="forge-649-quick-file">
+/* PASS 649 · A QUICKER START IN THE WINDOWS APP, AT THE SAME ADDRESS. The owner's words (27 October 2026): the Windows apps'
+   "slow load" and "Not responding". The Windows app opens its page from the disk, and that address is where her work is
+   kept, so it must not change. A page opened from the disk may not read another file there, but it may run one, so in the
+   Windows app each app the Forge carries is a script beside the page (the_forge_parts/<id>.js, forge_quick_split_js.py)
+   that hands its text over when it is run, and forgeFill (pass 644) runs it the first time the app is wanted. A part named
+   any other way is fetched as before; a page that carries everything does nothing here. */
+(function () {
+  'use strict';
+  if (window.__forgeQuickFile) return;
+  var f0 = window.forgeFill;
+  if (typeof f0 !== 'function') return;
+  window.__forgeQuickFile = 1;
+  var WAIT = {}, FILL = {};
+  window.__forgePart = function (id, text) { var w = WAIT[id]; if (!w) return; delete WAIT[id]; w(String(text)); };
+  function run(id, url) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script');
+      WAIT[id] = res;
+      s.onload = function () { s.remove(); if (WAIT[id]) { delete WAIT[id]; rej(new Error('the part handed nothing over')); } };
+      s.onerror = function () { s.remove(); delete WAIT[id]; rej(new Error('not reachable')); };
+      s.src = url;
+      (document.head || document.documentElement).appendChild(s);
+    });
+  }
+  window.forgeFill = function (id) {
+    var e = document.getElementById(id), u = e && e.getAttribute('data-defer');
+    if (!u || !/\.js$/i.test(u)) return f0(id);
+    if (FILL[id]) return FILL[id];
+    FILL[id] = run(id, u).then(function (t) { delete FILL[id]; e.textContent = t; e.removeAttribute('data-defer'); return e; },
+      function (err) { delete FILL[id]; var x = new Error('the Forge could not read its ' + id + ' (' + (err && err.message || err) + ')'); x.code = 'gone'; throw x; });
+    return FILL[id];
+  };
+})();
+</script>
