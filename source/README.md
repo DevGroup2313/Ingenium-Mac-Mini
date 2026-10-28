@@ -259,7 +259,7 @@ Diem's thirteen voices with Ingenium's sixteen, the things of a college study: T
 Wax seal, Escapement, Brass stamp (keeping); Library door, Study lamp, Archive key (the welcome door); and for moving between
 pages, each room its own (a vellum page, a card drawer, a ledger's tap, a pen, a typebar, a brass gear).
 
-    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it never reaches the speakers' limit, it is over in 4.6 s (6.8.3); Ingenium's defaults, none of the old names, 54 checks
+    node rig/t_681_sounds.js <url> <out>                                       # every voice rendered offline: it sounds, it never reaches the speakers' limit, it is over in 2.4 s (6.8.4); Ingenium's defaults, none of the old names, 54 checks
 
 One type scale (her words: "I want the text fonts and sizes to be consitent and not be random ... particularly on the
 Settings page with the different size and font of the Ownership texts"): `modules/r185.js`. The original cards set their own
@@ -371,27 +371,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium's sounds, warm (6.8.3; her words: "I still hate the new sounds system for Ingenium, it sounds like crap. I wanted
-a soothing, warm introductory sounds to welcome you into the app like Carpe Diem without sounding exactly like Carpe Diem
-and the Forge"). 6.8.1's voices were too quiet ("weak and mild"); 6.8.2 made them loud and built them as struck, mechanical
-things (latches, clicks, thumps, scraped noise), and that was worse. Carpe Diem's welcome, the one she likes, is a few soft
-pure tones rising one after another; a note in Carpe Diem records that she called a wooden key sound "horrible". So
-`modules/r176.js` now makes every voice tonal and soft-edged: each note rises over a few hundredths of a second, as a felt
-hammer or a breath does, and fades slowly; its few overtones are quiet and fade first; a second voice a hair sharp beside it
-makes it warm. The welcome is Evening light (a low F and C swelling in the room, and over them F, C, A and E, note by note),
-or Chapel organ, or Glass harmonica; notices, Vesper chime, Singing bowl or Hand bell; keeping, Two warm notes, Soft chord or
-Ink drop; between pages, each room its own felt-piano note from one calm scale; keys, Soft tap, Glass tap or No sound;
-cards, Soft rise, Airy bloom or No sound. Theirs is a quick bright chime in C; none of their names or notes is used. The
-way out lost the compressor and the lift in the treble (both made 6.8.2 bright and hard): a gentle cut above 7 kHz, a little
-warmth below, a smooth room without hard early echoes, a light limiter and a soft edge, so no peak passes 0.95 of the
-speakers' range. Each voice is levelled by measurement (a welcome and a notice fullest, a key lightest). Measured against
-6.8.2: the welcome's sharpest onset, a step between two samples, was 1.09 of its peak (a click) and is now 0.057; every
-voice has under 2% of its energy above 3 kHz but the Glass tap (a high note, on purpose). A sound kept from 6.8.2 gives way
-to the warm ones; a level she chose stays. Typing in a field makes no sound; the calm look, the quiet screen and Off keep
-all of it silent.
+Ingenium's sounds, in Carpe Diem's family (6.8.4; her words: "I actually do want the same warm upbeat welcoming sounds from
+Carpe Diem on Ingenium, I just don't want them identical but I do want them closely related, I want them very similar to
+Carpe Diem's in every way to stay in the family and keep the same feel. The sound is slightly better now but still too slow
+and sounds off"). Before this, 6.8.1's own voices were too quiet ("weak and mild"), 6.8.2's struck, mechanical ones harsh,
+and 6.8.3's slow warm swells "too slow" and "off". `modules/r176.js` now takes Carpe Diem's own recipe whole: its two parts
+(a tone that rises in a few thousandths of a second and dies away, and a grain of filtered noise), its granular wood clouds
+over a low falling body, its key tap, its pace, its levels (0.55 by default), and its way out, straight to the speakers
+(the room, the filters, the compressor and the placement left and right of 6.8.2 and 6.8.3 are gone, and their code with
+them). Ingenium's voices are close relatives under Ingenium's own names: the welcome, First light, is Carpe Diem's four
+rising notes at its pace, in A instead of C, with a fifth above the last (or Study lamp; Evensong); notices, Study chime
+(or Hand bell; Ink drop); keeping, Seal mark (or Press click; Felt seal); pages, Page set (or Book shut; Lectern lift;
+Stacks pass); keys, Key press (or Soft key; No sound); cards, Card lift (or Card chime; No sound). Measured against Carpe
+Diem's module as it ships, each voice is as loud as its relative there (the welcome 0.0495 against 0.0486, the key press
+0.0236 against 0.0236), and the welcome is over in about 1.3 seconds, as Carpe Diem's is. A sound or a default level kept
+from an earlier version gives way to these; a level she chose stays.
 
-    node rig/t_682_sounds.js <Ingenium url> <out>                     # 125 checks: each voice's presence, limit, length, middle, variety, soft edge and warmth; the keys, the cards, Off
-    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 19 checks
+    node rig/t_682_sounds.js <Ingenium url> <out>                     # 99 checks: each voice against its relative in Carpe Diem (loudness), brisk, in the middle, never at the limit; the keys, the cards, Off
+    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 20 checks
 
 The Career Studio (6.8.3; her words: "I want Ingenium to gain the function and full capabilities to work like my own
 Linkedin premium with its full functionality and ressources. I want it curated entirely to my in-app profile, resume, cover

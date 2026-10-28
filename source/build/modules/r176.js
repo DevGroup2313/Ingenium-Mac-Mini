@@ -58,76 +58,41 @@ body[data-theme="night"] .isc-box{background:#221b2e;border-color:rgba(255,255,2
 }
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p97"]="started";}catch(_){}
-/* ============ R176 · THE ANALOGUE SOUNDS, FROM THE OWNER'S OWN TEMPLATE (Ingenium 6.7, 25 October 2026) ============
+/* ============ R176 · INGENIUM'S SOUNDS (6.7, 25 October 2026; their voices, 6.8.4, 28 October 2026) ============
    The owner's words (25 October 2026): "Ingenium is missing the analogue sounds that Carpe Diem and the Forge has, I want it
-   added to Ingenium as well to further enhance the analogue and 3D sound of the app without it being too distracting. I want
-   you adopt Carpe Diem's template and also have the accessible controls in the display panel to turn the sounds off."
-   WHERE IT COMES FROM. The template is Carpe Diem's sound module as it ships (its pass 675, "the sounds she chose", with
-   passes 678, 702, 710, 711, 713, 718 and 765 after it; The Forge carries the same block). The thirteen voices are ported
-   here exactly: the same two primitives (a tone, and a grain of filtered noise), the same granular wood clouds over a low
-   body that drifts down as it fades, the same numbers, so each sounds as it does in her other two apps. Every sound is made
-   on the device at the moment it plays: no audio files, no bytes added for sound, nothing needed from a connection. Four
-   roles, with the alternates she chose after four rounds of listening:
-     notify   Desk chime   (Small bell, Water drop)
-     confirm  Keep mark    (Soft click, Felt press)
-     room     Day turn     (Lamp lit, Dusk fall)
-     paper    Desk set     (Book close, Board lift, Shelf pass)
-   WHAT CHANGED, AND WHY.
-   - Its own name and its own drawer: window.IngSound, stored under ing_sound_67. It never reads or writes the other apps'
-     keys, and none of their names is in its code (the gift and demo editions name none of her apps).
-   - Gentler by default: the template's level was 0.55; Ingenium starts at 0.25, about 0.45 of it, so the sounds sit
-     under the work rather than on it. The volume can go up to the template's full range.
-   - The "3D": each sound is placed a little to the left or right by where it happened on the screen (at most 0.35 of the
-     way to either side; the middle for the keyboard and for anything with no place), and a small room is around every
-     sound: a short reverberation made on the device (a 0.8-second impulse of darkening noise with a few early
-     reflections, from a fixed seed so the room is the same every session), mixed low, and the same in both ears, so a
-     sound meant for the middle stays in the middle. Where the browser has no stereo panner (older Safari) an equal-power panner does the same,
-     and where it has neither the sound plays in the middle. A sound placed to one side keeps its loudness (equal power,
-     levelled to the middle), so nothing is louder or softer than in her other apps, only placed.
-   - Where they sound, only where they cannot be mistaken for something else: crossing the welcome door (room); choosing a
-     page from the side bar or, on a phone, the strip at the top (paper); a notice that something was saved, kept or copied
-     (confirm); a reminder, a timed note or any other notice appearing (notify); and pressing the seal on Home (paper: a
-     seal set down on a wooden desk). Any element can also ask for one with data-ing-sound="notify|confirm|room|paper".
-   - Never two in the same breath (the template's 60 ms), and no chatter: the same kind waits a moment before it sounds
-     again (a page change 150 ms, a notice 1.5 s), a notice that arrives as the door chime rings or just after a press
-     stays silent, and nothing doubles the Clepsydra's own chime when a session ends.
-   - Silence when it matters: never while the quiet screen is open, never while a reply is being written word by word,
-     never for typing, and never in the calm look (Settings, Support), in which the focus timer's chime is already always
-     off. Minimal motion leaves the sounds as they are: motion and sound are different senses, the Sound keys turn them
-     off in one press, and the calm look is the switch that quiets everything at once. Off means these sounds are off:
-     nothing of them plays at all, the Listen and Test keys included. The focus timer's chime keeps its own switch, and
-     the words on screen say so rather than promise a silence Off does not give.
-   - A browser lets no page sound before it has been touched (iPhone, iPad and Fire tablets most of all), so the sound is
-     woken at the first touch or key and never before; it shares the Clepsydra's own audio, so the page holds one.
-   - The controls are Ingenium's: a Sound section in the Display panel and a Sound card in Settings (On and Off, a volume
-     named in words, More sound choices, Test the sounds), and a panel of choices with each role in plain words, a Listen
-     key for each sound and a level for each role.
-   THE SECOND LOOK (the same day), after an independent review: the room is one for both ears (it had made centred sounds
-   lean to one side by chance) and comes from a fixed seed; a progress line ending in an ellipsis, Fabrica's included, no
-   longer chimes; a full store or a notice that opens with No is no longer taken for a keeping; Test and Listen say when
-   the volume or a level is at Silent instead of claiming to play; the four level sliders carry their role in their names;
-   the words for Off no longer promise more silence than Off gives; the calm look is named as Settings names it; and a word
-   said a moment ago gives way as soon as the volume, a level or On and Off change, so the note never contradicts the keys. */
-/* 6.8.3 (28 October 2026): her words, "I still hate the new sounds system for Ingenium, it sounds like crap. I wanted a
-   soothing, warm introductory sounds to welcome you into the app like Carpe Diem without sounding exactly like Carpe Diem
-   and the Forge but you just keep on regressing the sound and it is getting worse and I am getting annoyed." Before that
-   she had found the quiet voices of 6.8.1 "weak and mild", and the struck, mechanical voices of 6.8.2 (latches, clicks,
-   thumps, scraped noise) were worse. Carpe Diem's welcome, the one she likes, is a few soft pure tones rising one after
-   another; a note in Carpe Diem records that she called a wooden key sound "horrible". So every voice is now tonal and
-   soft-edged: no clicks, no noise, nothing struck hard. Each note rises over a few hundredths of a second, as a felt
-   hammer or a breath does, and fades slowly; its few overtones are quiet and fade first, so it is round; a second voice a
-   hair sharp beside it makes it warm, as two strings tuned together do. Ingenium's own, and neither Carpe Diem's nor the
-   Forge's (theirs is a quick bright chime in C):
-     room     Evening light: a low F and C swelling in the room, and over them F, C, A and E, note by note, slowly
-              (or Chapel organ, a soft flute-stop chord in B flat; Glass harmonica, slow glass notes over a low bowl)
-     notify   Vesper chime: two soft bell notes a sixth apart (or Singing bowl; Hand bell)
-     confirm  Two warm notes, a third apart (or Soft chord; Ink drop)
-     paper    Each room its own note, a felt piano's, the notes of one calm scale (or Felt piano; Soft harp; Soft flute)
-     keys     Soft tap (or Glass tap; No sound)
-     cards    Soft rise (or Airy bloom; No sound)
-   The way out is warmer too: no compressor and no lift in the treble (both made 6.8.2 bright and hard), a gentle cut
-   above 7 kHz, a little warmth below, a smooth room without the hard early echoes, and only a light limiter and a soft
-   edge, so nothing reaches the speakers' limit. */
+   added to Ingenium as well to further enhance the analogue and 3D sound of the app without it being too distracting." And
+   (28 October 2026): "I actually do want the same warm upbeat welcoming sounds from Carpe Diem on Ingenium, I just don't
+   want them identical but I do want them closely related, I want them very similar to Carpe Diem's in every way to stay in
+   the family and keep the same feel. The sound is slightly better now but still too slow and sounds off."
+   THE FAMILY. Carpe Diem's sound module (its pass 675, "the sounds she chose", and the passes after it; The Forge carries
+   the same) is the recipe: the same two parts (a tone that rises in a few thousandths of a second and dies away, and a
+   grain of filtered noise), the same granular wood clouds over a low body that drifts down as it fades, Carpe Diem's key
+   tap, the same pace, the same levels (0.55 by default), straight to the speakers with nothing in the way. Ingenium's
+   voices are its close relatives, in other keys and with small turns of their own, under Ingenium's own names (none of
+   Carpe Diem's or The Forge's):
+     room     First light: Carpe Diem's four rising notes at its pace, in A (A, C sharp, E, A), a fifth above the last
+              (or Study lamp; Evensong, four notes falling)
+     notify   Study chime: three notes rising, in G (or Hand bell; Ink drop)
+     confirm  Seal mark: a fifth rising, in D (or Press click; Felt seal)
+     paper    Page set: wood and paper set down (or Book shut; Lectern lift; Stacks pass)
+     keys     Key press: Carpe Diem's key, a little lower (or Soft key; No sound)
+     cards    Card lift: a board lifted, lighter (or Card chime; No sound)
+   On the way, 6.8.2 tried struck, mechanical voices and 6.8.3 slow warm swells, with a room, filters, a compressor and
+   placement to the left and right; she found the first harsh and the second slow and off. They are gone, and the code
+   that served them with them.
+   WHERE THEY SOUND, only where they cannot be mistaken for something else: crossing the welcome door (room); choosing a
+   page, or the seal on Home (paper); a notice that something was saved, kept or copied (confirm); a reminder, a timed note
+   or any other notice (notify); a raised key pressed (keys); a dialog, a panel or a card rising onto the screen (cards).
+   Any element can ask for one with data-ing-sound="notify|confirm|room|paper". Never two in the same breath (60 ms); the
+   same kind waits a moment before it sounds again; a notice that arrives as the door chime rings or just after a press
+   stays silent; nothing doubles the Clepsydra's own chime.
+   SILENCE WHEN IT MATTERS: never while the quiet screen is open, while a reply is being written word by word, for typing,
+   or in the calm look. Off means off, the Listen and Test keys included; the focus timer's chime keeps its own switch. A
+   browser lets no page sound before it has been touched, so the sound wakes at the first touch or key; it shares the
+   Clepsydra's audio, so the page holds one.
+   THE CONTROLS: a Sound section in the Display panel and a Sound card in Settings (On and Off, a volume named in words, More
+   sound choices, Test the sounds), and a panel of choices with each kind in plain words, a Listen key for each sound and a
+   level for each kind. Stored under ing_sound_67; it never reads or writes the other apps' keys. */
 (function r176(){
 "use strict";
 if(window.__r176)return;window.__r176=1;
@@ -138,22 +103,21 @@ var OAC=W.OfflineAudioContext||W.webkitOfflineAudioContext;
 var GAP=60;
 var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150,keys:35,cards:300};
 var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
-var PAN_MAX=0.4,ROOM_SEND=0.17,ROOM_LEN=1.9,ROOM_SEED=0x1C67;
 
-/* ---------- the six roles and Ingenium's names, in plain words (6.8.3) ---------- */
-var NAMES={eveningLight:"Evening light",chapelOrgan:"Chapel organ",glassHarmonica:"Glass harmonica",
-  vesperChime:"Vesper chime",singingBowl:"Singing bowl",handBell:"Hand bell",
-  twoNotes:"Two warm notes",softChord:"Soft chord",inkDrop:"Ink drop",
-  byRoom:"Each room its own note",feltPiano:"Felt piano",softHarp:"Soft harp",softFlute:"Soft flute",
-  softTap:"Soft tap",glassTap:"Glass tap",keysOff:"No sound",softRise:"Soft rise",airyBloom:"Airy bloom",cardsOff:"No sound"};
+/* ---------- the six kinds and Ingenium's names, in plain words (6.8.4) ---------- */
+var NAMES={firstLight:"First light",studyLamp:"Study lamp",evensong:"Evensong",
+  studyChime:"Study chime",handBell:"Hand bell",inkDrop:"Ink drop",
+  sealMark:"Seal mark",pressClick:"Press click",feltSeal:"Felt seal",
+  pageSet:"Page set",bookShut:"Book shut",lecternLift:"Lectern lift",stacksPass:"Stacks pass",
+  keyPress:"Key press",softKey:"Soft key",keysOff:"No sound",cardLift:"Card lift",cardChime:"Card chime",cardsOff:"No sound"};
 var ROLES=[
-  ["notify","Notices and reminders","When a reminder or a notice appears.",["vesperChime","singingBowl","handBell"],"for notices and reminders"],
-  ["confirm","Keeping something","When something is saved, kept or copied.",["twoNotes","softChord","inkDrop"],"for keeping something"],
-  ["room","Entering Ingenium","When you go through the welcome door.",["eveningLight","chapelOrgan","glassHarmonica"],"for entering Ingenium"],
-  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home. At first, each room has its own note.",["byRoom","feltPiano","softHarp","softFlute"],"for moving between pages"],
-  ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["softTap","glassTap","keysOff"],"for pressing a key"],
-  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["softRise","airyBloom","cardsOff"],"for a card opening"]];
-var DEF={ver:3,on:true,vol:0.6,notify:"vesperChime",confirm:"twoNotes",room:"eveningLight",paper:"byRoom",keys:"softTap",cards:"softRise",
+  ["notify","Notices and reminders","When a reminder or a notice appears.",["studyChime","handBell","inkDrop"],"for notices and reminders"],
+  ["confirm","Keeping something","When something is saved, kept or copied.",["sealMark","pressClick","feltSeal"],"for keeping something"],
+  ["room","Entering Ingenium","When you go through the welcome door.",["firstLight","studyLamp","evensong"],"for entering Ingenium"],
+  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["pageSet","bookShut","lecternLift","stacksPass"],"for moving between pages"],
+  ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["keyPress","softKey","keysOff"],"for pressing a key"],
+  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["cardLift","cardChime","cardsOff"],"for a card opening"]];
+var DEF={ver:4,on:true,vol:0.55,notify:"studyChime",confirm:"sealMark",room:"firstLight",paper:"pageSet",keys:"keyPress",cards:"cardLift",
   trim:{notify:1,confirm:1,room:1,paper:1,keys:1,cards:1}};
 
 function copy(o){return JSON.parse(JSON.stringify(o));}
@@ -166,8 +130,9 @@ function isRole(r){for(var i=0;i<ROLES.length;i++)if(ROLES[i][0]===r)return true
 var cfg=load();
 function load(){var o=copy(DEF);try{var raw=localStorage.getItem(KEY);if(!raw)return o;var v=JSON.parse(raw);if(!v||typeof v!=="object")return o;
   if(typeof v.on==="boolean")o.on=v.on;if(num(v.vol))o.vol=clamp(v.vol,0,1);
-  /* 6.8.2: the default of 6.8.1 (0.25) was too quiet; kept unchanged it becomes the new default, a level she chose stays */
-  if(v.ver!==2&&num(v.vol)&&Math.abs(v.vol-0.25)<0.001)o.vol=DEF.vol;
+  /* a level kept from an earlier default (0.25 in 6.8.1, 0.6 in 6.8.2 and 6.8.3) becomes Carpe Diem's 0.55; a level she
+     chose herself stays; a sound kept from before that is no longer offered gives way to the default */
+  if(v.ver!==4&&num(v.vol)&&(Math.abs(v.vol-0.25)<0.001||Math.abs(v.vol-0.6)<0.001))o.vol=DEF.vol;
   ROLES.forEach(function(r){var k=r[0];if(typeof v[k]==="string"&&r[3].indexOf(v[k])>=0)o[k]=v[k];
     if(v.trim&&num(v.trim[k]))o.trim[k]=clamp(v.trim[k],0,1.5);});
   }catch(e){}return o;}
@@ -176,49 +141,16 @@ function lvl(role){return cfg.vol*(cfg.trim[role]==null?1:cfg.trim[role]);}
 
 /* ---------- the audio: one context (the Clepsydra's own when it has one), a room, and a place for each sound ---------- */
 var live=null,E=null,OUT=null,faded=false;
-/* the room's noise comes from a fixed seed (a small mulberry32), so the room is the same in every session and takes no
-   numbers from Math.random, which the voices' own grains use */
-function seeded(a){a=a|0;return function(){var t=a=(a+0x6D2B79F5)|0;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
-/* The same room in both ears. A room drawn apart for each ear made a sound meant for the middle lean to one side, by
-   chance and for the whole session: by up to 2 or 3 dB on the tonal sounds, because each ear heard the sound and its
-   room meet differently (a copy of one room delayed a little for the other ear leaned as much). So the room is one, the
-   same on both sides, a centred sound stays exactly in the middle, and placing a sound is left to the panner alone. */
-function impulse(c){var sr=c.sampleRate,n=Math.max(2,Math.floor(sr*ROOM_LEN)),b=c.createBuffer(2,n,sr),pre=Math.floor(sr*0.012),R=seeded(ROOM_SEED),d=new Float32Array(n),lp=0;
-  /* a tail that darkens as it fades, as a room with books and curtains does (6.8.3: the panelled study's hard early echoes of
-     6.8.2 are gone) */
-  for(var i=pre;i<n;i++){var t=(i-pre)/sr,k=0.5+0.43*Math.min(1,t/ROOM_LEN);lp=lp*k+(R()*2-1)*(1-k);d[i]=lp*Math.exp(-t*3.6)*Math.min(1,t/0.03);}
-  /* levelled to carry the sound's own energy, so ROOM_SEND alone says how much room is heard */
-  var en=0;for(var j=0;j<n;j++)en+=d[j]*d[j];var sc=en>0?1/Math.sqrt(en):0;for(var q=0;q<n;q++)d[q]*=sc;
-  /* one room for both ears: a room drawn apart for each ear made a centred sound lean to one side (6.7, 6.8.2) */
-  for(var ch=0;ch<2;ch++)b.getChannelData(ch).set(d);
-  return b;}
 var EDGE=null;
 function softEdge(){if(EDGE)return EDGE;var n=2049,k=new Float32Array(n);
   for(var i=0;i<n;i++){var x=i*2/(n-1)-1,a=Math.abs(x);k[i]=a<=0.8?x:(x<0?-1:1)*(0.8+0.17*Math.tanh((a-0.8)/0.17));}
   return (EDGE=k);}
-function engine(c,noRoom){var e={c:c};e.master=c.createGain();e.master.gain.value=1;e.room=null;
-  /* 6.8.3: a gentle cut above 7 kHz and a little warmth below; then only a light limiter, and a soft edge after it, so no
-     peak passes 0.95 (the compressor and the lift in the treble of 6.8.2 made the sounds bright and hard) */
-  try{var lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=7000;lp.Q.value=0.5;
-    var lo=c.createBiquadFilter();lo.type="lowshelf";lo.frequency.value=220;lo.gain.value=1.5;
-    var lim=c.createDynamicsCompressor();lim.threshold.value=-4;lim.knee.value=8;lim.ratio.value=8;lim.attack.value=0.004;lim.release.value=0.25;
-    var edge=c.createWaveShaper();edge.curve=softEdge();edge.oversample="none";   /* "2x" filters its own output and overshot */
-    e.master.connect(lp);lp.connect(lo);lo.connect(lim);lim.connect(edge);edge.connect(c.destination);}
+/* as Carpe Diem's: straight to the speakers, nothing in the way, but a soft edge that touches nothing below 0.8 of their
+   range, so a level turned all the way up can never reach their limit */
+function engine(c){var e={c:c};e.master=c.createGain();e.master.gain.value=1;
+  try{var edge=c.createWaveShaper();edge.curve=softEdge();edge.oversample="none";e.master.connect(edge);edge.connect(c.destination);}
   catch(x){e.master.connect(c.destination);}
-  if(!noRoom){try{var cv=c.createConvolver();cv.normalize=false;cv.buffer=impulse(c);var wet=c.createGain();wet.gain.value=ROOM_SEND;cv.connect(wet);wet.connect(e.master);e.room=cv;}catch(x){e.room=null;}}
   return e;}
-function panner(c,pan){
-  try{if(typeof c.createStereoPanner==="function"){var s=c.createStereoPanner();s.pan.value=pan;return s;}}catch(e){}
-  try{if(typeof c.createPanner==="function"){var p=c.createPanner();p.panningModel="equalpower";p.distanceModel="linear";p.refDistance=1;p.maxDistance=10000;p.rolloffFactor=0;
-    var x=Math.sin(pan*Math.PI/2),z=-Math.cos(pan*Math.PI/2);
-    if(p.positionX){p.positionX.value=x;p.positionY.value=0;p.positionZ.value=z;}else if(typeof p.setPosition==="function")p.setPosition(x,0,z);
-    return p;}}catch(e){}
-  return null;}
-/* each sound's own way out: placed (equal power, levelled to the middle), and a little of it into the room */
-function route(e,pan){var c=e.c,inp=c.createGain();inp.gain.value=1;var p=pan?panner(c,pan):null;
-  if(p){var lev=c.createGain();lev.gain.value=Math.SQRT2;inp.connect(p);p.connect(lev);lev.connect(e.master);}else inp.connect(e.master);
-  if(e.room)inp.connect(e.room);
-  return inp;}
 function ctxLive(){if(!AC)return null;
   if(!live){var c=null;try{if(typeof W.fdAudioCtx==="function")c=W.fdAudioCtx();}catch(x){c=null;}
     if(!c){try{c=new AC();}catch(x){return null;}}
@@ -229,79 +161,57 @@ function restore(e){if(!faded)return;faded=false;try{var t=e.c.currentTime;e.mas
 function hush(){stopTest();var e=live;if(!e)return;faded=true;try{var t=e.c.currentTime,g=e.master.gain;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(0,t+0.08);}catch(x){}}
 
 
-/* ---------- each room its own note (6.8.3): the notes of F major's pentatonic scale, so going from room to room is
-   never out of tune with itself ---------- */
-var ROOMF={home:349.23,settings:349.23,guide:440,lector:523.25,career:587.33,tabula:440,abacus:392,slides:523.25,imago:587.33,
-  scriba:440,fontes:523.25,fabrica:293.66,models:261.63,chat:392,code:349.23,build:349.23,focus:261.63,blend:293.66};
-var goingTo="";
-/* ---------- the parts the warm voices are made of (6.8.3) ----------
-   Tones only, and never a click: each partial rises over a few hundredths of a second and dies away at its own pace (t60:
-   the time to fall 60 dB). A chord moves a little in pitch, all together, from one play to the next. */
-function vary(x,a){return x*(1+(Math.random()*2-1)*(a==null?0.02:a));}
-function decay(g,t,a,peak,t60){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(Math.max(0,peak),t+a);g.gain.setTargetAtTime(0,t+a,Math.max(0.001,t60/6.9));}
-/* one partial, rising softly and dying away; a slow tremolo when asked */
-function ring(t,f,peak,t60,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};var a=o.a||0.01,end=t+a+t60*1.25+0.05;
-  var os=c.createOscillator(),g=c.createGain();os.type="sine";os.frequency.setValueAtTime(f,t);
-  if(o.glide)os.frequency.exponentialRampToValueAtTime(f*o.glide,t+(o.glideT||t60*0.5));
-  decay(g,t,a,peak,t60);os.connect(g);var out=g;
-  if(o.trem){var tg=c.createGain(),lf=c.createOscillator(),lg=c.createGain();tg.gain.value=1-o.trem[1];lf.frequency.value=o.trem[0];lg.gain.value=o.trem[1];
-    lf.connect(lg);lg.connect(tg.gain);g.connect(tg);out=tg;lf.start(t);lf.stop(end);}
-  out.connect(OUT);os.start(t);os.stop(end);}
-/* a warm note: its fundamental and a few quiet overtones, the higher fading first, and a second voice a hair sharp */
-function warm(t,f,peak,dur,o){o=o||{};var P=o.parts||[[1,1],[2,0.16],[3,0.05]],a=o.a==null?0.018:o.a;
-  P.forEach(function(p,i){ring(t,f*p[0],peak*p[1],dur/(1+0.7*i),{a:a*(1+0.3*i),trem:i===0?o.trem:null});});
-  if(o.chorus!==false)ring(t,f*1.0018,peak*0.32,dur*0.9,{a:a*1.4});}
-/* a held chord that swells and fades, as a soft organ stop does: each note with its octave, each a slowly beating pair */
-function swell(t,fs,peak,att,hold,rel,o){var c=E&&E.c;if(!c||!OUT)return;o=o||{};var end=t+att+hold+rel*1.3+0.05;
-  var g=c.createGain(),lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=o.cut||1800;lp.Q.value=0.4;
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+att);g.gain.setValueAtTime(peak,t+att+hold);g.gain.setTargetAtTime(0,t+att+hold,Math.max(0.01,rel/5));
-  lp.connect(g);var out=g;
-  if(o.trem){var tg=c.createGain(),lf=c.createOscillator(),lg=c.createGain();tg.gain.value=1-o.trem[1];lf.frequency.value=o.trem[0];lg.gain.value=o.trem[1];
-    lf.connect(lg);lg.connect(tg.gain);g.connect(tg);out=tg;lf.start(t);lf.stop(end);}
-  out.connect(OUT);
-  fs.forEach(function(f){(o.parts||[[1,1],[2,0.22]]).forEach(function(p){[1,1.0024].forEach(function(dt,k){var os=c.createOscillator(),og=c.createGain();os.type="sine";
-    os.frequency.setValueAtTime(f*p[0]*dt,t);og.gain.value=p[1]*(k?0.45:1)/fs.length;os.connect(og);og.connect(lp);os.start(t);os.stop(end);});});});}
-/* a bowl or a bell touched softly: its partials, each a slowly beating pair */
-function bowl(t,f,peak,dur,o){o=o||{};var a=o.a||0.012;
-  (o.parts||[[1,1,1],[2.76,0.32,0.6],[5.4,0.1,0.35]]).forEach(function(p){ring(t,f*p[0],peak*p[1],dur*p[2],{a:a});ring(t,f*p[0]*1.0035,peak*p[1]*0.6,dur*p[2]*0.95,{a:a*1.3});});}
-function paperNote(t,f,L){warm(t,f,0.38*L,0.9,{a:0.012,parts:[[1,1],[2,0.2],[3,0.06]]});}
+/* ---------- the parts: Carpe Diem's own (6.8.4) ----------
+   A tone rises in a few thousandths of a second and dies away; a grain is a breath of filtered noise; a cloud is many
+   grains scattered over a moment, wood and paper; a tap is a key's noise over its own low note. */
+function rnd(a,b){return a+Math.random()*(b-a);}
+function tone(t,freq,a,d,peak,type,drift){var c=E&&E.c;if(!c||!OUT)return;var o=c.createOscillator(),g=c.createGain();o.type=type||"sine";
+  o.frequency.setValueAtTime(freq,t);if(drift)o.frequency.exponentialRampToValueAtTime(freq*drift,t+a+d);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);
+  o.connect(g);g.connect(OUT);o.start(t);o.stop(t+a+d+0.05);}
+function grain(t,dur,peak,freq,q){var c=E&&E.c;if(!c||!OUT)return;var n=Math.max(2,Math.floor(c.sampleRate*dur)),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0),last=0;
+  for(var i=0;i<n;i++){var w=Math.random()*2-1;last=last*0.55+w*0.45;d[i]=last;}
+  var s=c.createBufferSource();s.buffer=buf;var f=c.createBiquadFilter();f.type="bandpass";f.frequency.setValueAtTime(freq,t);f.Q.setValueAtTime(q,t);
+  var g=c.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(0.0002,peak),t+dur*0.3);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(OUT);s.start(t);s.stop(t+dur+0.02);}
+function cloud(t,len,count,fLo,fHi,peak,shape){for(var i=0;i<count;i++){var u=Math.random(),at=t+Math.pow(u,shape||1)*len+rnd(-0.005,0.005);
+  var env=Math.sin(Math.PI*Math.min(1,Math.max(0,(at-t)/len)));grain(at,rnd(0.008,0.026),peak*rnd(0.35,1)*(0.35+0.65*env),rnd(fLo,fHi),rnd(1.2,4));}}
+function tap(t,peak,cut,dur){var c=E&&E.c;if(!c||!OUT)return;var n=Math.floor(c.sampleRate*dur),buf=c.createBuffer(1,n,c.sampleRate),d=buf.getChannelData(0);
+  for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+  var s=c.createBufferSource();s.buffer=buf;var bp=c.createBiquadFilter();bp.type="bandpass";bp.frequency.value=cut;bp.Q.value=0.9;var g=c.createGain();g.gain.value=peak;
+  s.connect(bp);bp.connect(g);g.connect(OUT);s.start(t);
+  var o=c.createOscillator();o.type="sine";o.frequency.value=cut*0.35;var og=c.createGain();og.gain.setValueAtTime(peak*0.7,t);og.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(og);og.connect(OUT);o.start(t);o.stop(t+dur+0.01);}
 var V={
-  /* entering Ingenium: a welcome that blooms */
-  eveningLight:function(t,L){var k=vary(1,0.002);
-    swell(t,[87.31*k,130.81*k,174.61*k],0.30*L,0.55,0.7,1.6,{cut:900});                     /* a low F and C, swelling in the room */
-    [[0.18,174.61,0.40],[0.46,261.63,0.34],[0.74,440,0.28],[1.02,659.26,0.22]].forEach(function(n){warm(t+n[0],n[1]*k,n[2]*L,2.6,{a:0.03});});},   /* F, C, A, E, slowly */
-  chapelOrgan:function(t,L){var k=vary(1,0.002);
-    swell(t,[116.54*k,174.61*k,233.08*k,293.66*k,349.23*k],0.42*L,0.6,0.9,1.5,{cut:1500,parts:[[1,1],[2,0.38],[4,0.1]],trem:[4.6,0.05]});},   /* B flat major, on a soft flute stop */
-  glassHarmonica:function(t,L){var k=vary(1,0.002);bowl(t,146.83*k,0.18*L,3.0,{a:0.08});
-    [[0.05,293.66,0.30],[0.38,440,0.26],[0.72,739.99,0.20]].forEach(function(n){warm(t+n[0],n[1]*k,n[2]*L,2.4,{a:0.14,parts:[[1,1],[2,0.05]]});});},   /* D, A, F sharp over a low D */
+  /* entering Ingenium: Carpe Diem's four rising notes at its pace, in A, with a fifth above the last */
+  firstLight:function(t,L){[440,554.37,659.25,880].forEach(function(f,i){tone(t+i*0.11,f,0.006,1.0,0.13*L);});tone(t+0.33,1318.51,0.006,0.8,0.035*L);},
+  studyLamp:function(t,L){tone(t,180,0.02,0.7,0.16*L);grain(t,0.5,0.05*L,330,0.7);tone(t+0.08,720,0.01,0.5,0.07*L);},
+  evensong:function(t,L){[659.25,554.37,440,329.63].forEach(function(f,i){tone(t+i*0.13,f,0.006,1.1,0.13*L);});},
   /* notices and reminders */
-  vesperChime:function(t,L){var k=vary(1,0.002),P=[[1,1],[2,0.22],[3.98,0.06]];
-    warm(t,392*k,0.42*L,2.2,{a:0.008,parts:P,trem:[5.4,0.12]});warm(t+0.32,659.26*k,0.36*L,2.4,{a:0.008,parts:P,trem:[5.4,0.12]});},   /* G, then E above it */
-  singingBowl:function(t,L){bowl(t,vary(220,0.004),0.42*L,3.2,{a:0.03});},
-  handBell:function(t,L){bowl(t,vary(523.25,0.003),0.36*L,1.8,{a:0.006,parts:[[1,1,1],[2,0.3,0.6],[2.97,0.12,0.4],[4.2,0.05,0.25]]});},
+  studyChime:function(t,L){[784,987.77,1174.66].forEach(function(f,i){tone(t+i*0.07,f,0.004,0.9,0.16*L);});},
+  handBell:function(t,L){tone(t,1174.66,0.003,0.85,0.20*L);tone(t,1762,0.003,0.55,0.09*L);tone(t,2349.32,0.003,0.35,0.05*L);},
+  inkDrop:function(t,L){tone(t,1350,0.003,0.16,0.20*L,"sine",0.42);},
   /* keeping something */
-  twoNotes:function(t,L){var k=vary(1,0.003);warm(t,261.63*k,0.40*L,1.0,{a:0.01});warm(t+0.13,329.63*k,0.36*L,1.2,{a:0.01});},
-  softChord:function(t,L){var k=vary(1,0.003);[261.63,392,523.25].forEach(function(f,i){warm(t+i*0.02,f*k,(0.30-0.05*i)*L,1.2,{a:0.02});});},
-  inkDrop:function(t,L){var f=vary(220,0.004);ring(t,f,0.45*L,0.9,{a:0.006,glide:0.985,glideT:0.4});ring(t,f*2,0.08*L,0.4,{a:0.006});ring(t,f/2,0.12*L,0.7,{a:0.012});},
-  /* moving between pages: each room its own note */
-  byRoom:function(t,L){paperNote(t,ROOMF[goingTo||current()]||392,L*(GAIN.feltPiano||1));},
-  feltPiano:function(t,L){paperNote(t,vary(392,0.003),L);},
-  softHarp:function(t,L){warm(t,vary(523.25,0.003),0.36*L,1.1,{a:0.004,parts:[[1,1],[2,0.3],[3,0.12]]});},
-  softFlute:function(t,L){swell(t,[vary(587.33,0.003)],0.30*L,0.06,0.10,0.35,{cut:2400,parts:[[1,1],[2,0.08]],trem:[5.2,0.06]});},
-  /* pressing a key: a touch, never a click */
-  softTap:function(t,L){warm(t,vary(196,0.01),0.40*L,0.10,{a:0.004,parts:[[1,1],[2,0.25]],chorus:false});},
-  glassTap:function(t,L){warm(t,vary(880,0.004),0.22*L,0.22,{a:0.004,parts:[[1,1]],chorus:false});},
+  sealMark:function(t,L){tone(t,587.33,0.003,0.10,0.16*L);tone(t+0.075,880,0.003,0.16,0.14*L);},
+  pressClick:function(t,L){grain(t,0.022,0.09*L,1750,2.5);tone(t,1300,0.001,0.02,0.07*L);},
+  feltSeal:function(t,L){grain(t,0.07,0.10*L,460,1);tone(t,262,0.004,0.07,0.14*L);},
+  /* moving between pages: wood and paper */
+  pageSet:function(t,L){cloud(t,0.09,30,440,1600,0.050*L,0.5);tone(t,70,0.010,0.40,0.120*L,"sine",0.90);tone(t,110,0.010,0.26,0.050*L,"sine",0.92);tone(t+0.01,165,0.008,0.13,0.020*L,"sine",0.92);},
+  bookShut:function(t,L){cloud(t,0.16,44,760,2700,0.055*L,0.6);tone(t+0.05,78,0.012,0.46,0.115*L,"sine",0.88);tone(t+0.05,150,0.012,0.30,0.055*L,"sine",0.90);tone(t+0.06,212,0.010,0.16,0.022*L,"sine",0.92);},
+  lecternLift:function(t,L){cloud(t,0.07,14,540,1500,0.026*L,0.6);tone(t,95,0.014,0.30,0.105*L,"sine",0.90);tone(t,144,0.012,0.20,0.044*L,"sine",0.91);tone(t+0.01,192,0.008,0.10,0.016*L,"sine",0.92);},
+  stacksPass:function(t,L){var at=t;for(var i=0;i<3;i++){cloud(at,0.06,11,410,1350,0.024*L,0.6);tone(at,rnd(72,98),0.012,rnd(0.20,0.30),0.062*L,"sine",0.89);tone(at+0.01,rnd(128,160),0.008,0.12,0.020*L,"sine",0.91);at+=rnd(0.105,0.150);}},
+  /* pressing a key: Carpe Diem's key, a little lower */
+  keyPress:function(t,L){tap(t,0.29*L,740,0.055);},
+  softKey:function(t,L){tap(t,0.20*L,600,0.06);},
   keysOff:function(){},
-  /* a card opening */
-  softRise:function(t,L){var k=vary(1,0.003);warm(t,392*k,0.26*L,0.45,{a:0.02});warm(t+0.07,587.33*k,0.22*L,0.55,{a:0.02});},
-  airyBloom:function(t,L){warm(t,vary(440,0.003),0.28*L,0.7,{a:0.07,parts:[[1,1],[2,0.06]]});},
+  /* a card opening: a board lifted, lighter; or two small notes */
+  cardLift:function(t,L){cloud(t,0.07,12,560,1500,0.022*L,0.6);tone(t,100,0.014,0.26,0.090*L,"sine",0.90);tone(t,150,0.012,0.18,0.038*L,"sine",0.91);},
+  cardChime:function(t,L){tone(t,659.25,0.003,0.12,0.10*L);tone(t+0.06,987.77,0.003,0.18,0.08*L);},
   cardsOff:function(){}
 };
-/* each voice's own level, set by measuring them all (rig/t_682_sounds.js) so that each kind has the presence it needs */
-var GAIN={"vesperChime":0.618,"singingBowl":0.512,"handBell":0.906,"twoNotes":0.523,"softChord":0.568,"inkDrop":0.882,"eveningLight":0.599,"chapelOrgan":1.091,"glassHarmonica":0.782,"feltPiano":0.503,"softHarp":0.57,"softFlute":0.438,"softTap":0.687,"glassTap":0.919,"softRise":0.402,"airyBloom":0.357};
 
 /* ---------- when a sound may play at all ---------- */
-var gestured=false,gestureAt=0,lastPointer=null,lastKeyAt=0;
+var gestured=false,gestureAt=0;
 function woke(){if(gestured)return true;try{return !!(navigator.userActivation&&navigator.userActivation.hasBeenActive);}catch(e){return false;}}
 /* the calm look (Settings, Support): "No moving parts, fewer things on screen", and the focus timer's chime is always off
    in it, so these rest too */
@@ -314,33 +224,23 @@ function writing(){try{return !!D.querySelector(".msg.msg-live");}catch(e){retur
 function allowed(){return cfg.on&&woke()&&!calm()&&!quiet()&&!writing();}
 function recent(ms){return gestureAt&&Date.now()-gestureAt<ms;}
 
-/* where on the screen it happened: left is below zero, right above, the middle for the keyboard */
-function panOf(o){o=o||{};if(num(o.pan))return clamp(o.pan,-PAN_MAX,PAN_MAX);
-  var w=W.innerWidth||D.documentElement.clientWidth||0,x=null,ev=o.event;
-  if(ev&&ev.detail!==0&&num(ev.clientX)&&!(ev.clientX===0&&ev.clientY===0))x=ev.clientX;
-  else if(!ev&&o.recent&&lastPointer&&Date.now()-lastPointer.at<900&&lastPointer.at>lastKeyAt)x=lastPointer.x;
-  else if(!ev&&o.el&&o.el.getBoundingClientRect){var r=o.el.getBoundingClientRect();if(r.width||r.height)x=r.left+r.width/2;}
-  if(x==null||!w)return 0;
-  return Math.round(clamp((x/w)*2-1,-1,1)*PAN_MAX*1000)/1000;}
-
 /* ---------- playing ---------- */
 var lastAt=0,lastRole={},roomAt=0,chimeAt=0,last=null,played=0,hist=[];
-function sound(voice,L,pan){var e=ctxLive();if(!e||!V[voice])return false;
-  try{restore(e);E=e;OUT=route(e,pan||0);V[voice](e.c.currentTime+0.02,(L==null?1:L)*(GAIN[voice]||1));}catch(x){return false;}finally{E=null;OUT=null;}
-  played++;last={voice:voice,role:roleOf(voice),pan:pan||0,level:L,at:Date.now()};hist.push(last);if(hist.length>24)hist.shift();return true;}
+function sound(voice,L){var e=ctxLive();if(!e||!V[voice])return false;
+  try{restore(e);E=e;OUT=e.master;V[voice](e.c.currentTime+0.02,L==null?1:L);}catch(x){return false;}finally{E=null;OUT=null;}
+  played++;last={voice:voice,role:roleOf(voice),level:L,at:Date.now()};hist.push(last);if(hist.length>24)hist.shift();return true;}
 function play(role,o){o=o||{};if(!isRole(role)||!allowed())return false;
   var now=Date.now();
   if(o.auto&&(now-lastAt<AFTER_ANY||now-roomAt<AFTER_ROOM||now-chimeAt<AFTER_CHIME))return false;
   if(now-lastAt<GAP)return false;
   if(now-(lastRole[role]||0)<(ROLE_GAP[role]||0))return false;
   var L=lvl(role);if(!(L>0))return false;
-  goingTo=o.page||"";
-  var ok=sound(cfg[role]||DEF[role],L,panOf(o));goingTo="";
+  var ok=sound(cfg[role]||DEF[role],L);
   if(ok){lastAt=now;lastRole[role]=now;if(role==="room")roomAt=now;}
   return ok;}
 function voice(name,o){o=o||{};if(!V[name]||!allowed())return false;var now=Date.now();if(now-lastAt<GAP)return false;
   var L=num(o.level)?o.level:lvl(roleOf(name));if(!(L>0))return false;
-  var ok=sound(name,L,panOf(o));if(ok)lastAt=now;return ok;}
+  var ok=sound(name,L);if(ok)lastAt=now;return ok;}
 
 /* Test the sounds: the four, one after another, from a little left to a little right */
 var testT=[];
@@ -355,10 +255,10 @@ function why(role){if(!cfg.on)return "Sounds are off. Turn them on to hear them.
 function test(){stopTest();
   var r=why(null);if(r){say(r);return false;}
   if(quiet()||writing())return false;
-  var all=[["keys",-0.5],["paper",-0.3],["cards",-0.1],["confirm",0.1],["notify",0.3],["room",0.5]],seq=all.filter(function(s){return lvl(s[0])>0;}),N=all.length;
+  var all=["keys","paper","cards","confirm","notify","room"],seq=all.filter(function(s){return lvl(s)>0;}),N=all.length;
   if(!seq.length){say("Each kind of sound is set to Silent. Turn a level up in More sound choices.");return false;}
   say(seq.length===N?"Playing the "+WORDS[N]+" sounds, one after another.":"Playing "+WORDS[seq.length]+" of the "+WORDS[N]+" sounds. The "+(N-seq.length===1?"other is":"others are")+" set to Silent.");
-  seq.forEach(function(s,i){testT.push(setTimeout(function(){if(!allowed())return;var L=lvl(s[0]);if(L>0&&sound(cfg[s[0]],L,s[1]))lastAt=Date.now();},i*750));});
+  seq.forEach(function(s,i){testT.push(setTimeout(function(){if(!allowed())return;var L=lvl(s);if(L>0&&sound(cfg[s],L))lastAt=Date.now();},i*750));});
   testT.push(setTimeout(function(){say(null);},seq.length*750+900));
   return true;}
 
@@ -367,8 +267,8 @@ function render(name,o){o=o||{};return new Promise(function(res){
   if(!OAC||!V[name]){res(null);return;}
   var sr=44100,len=Math.ceil(sr*(num(o.seconds)?o.seconds:2.6)),c;
   try{c=new OAC(2,len,sr);}catch(x){res(null);return;}
-  var e=engine(c,!!o.dry),L=num(o.level)?o.level:lvl(roleOf(name));
-  try{E=e;OUT=route(e,num(o.pan)?o.pan:0);V[name](0.02,L*(GAIN[name]||1));}catch(x){E=null;OUT=null;res(null);return;}finally{E=null;OUT=null;}
+  var e=engine(c),L=num(o.level)?o.level:lvl(roleOf(name));
+  try{E=e;OUT=e.master;V[name](0.02,L);}catch(x){E=null;OUT=null;res(null);return;}finally{E=null;OUT=null;}
   function done(buf){var r={buf:o.keep?buf:undefined,length:buf.length,sampleRate:buf.sampleRate,peak:0,peakL:0,peakR:0,rms:0,tail:0},s=0,n=0,ts=0,tn=0,from=Math.floor(sr*(num(o.tailFrom)?o.tailFrom:1.4));
     for(var ch=0;ch<buf.numberOfChannels;ch++){var d=buf.getChannelData(ch),pk=0,es=0;
       for(var i=0;i<d.length;i++){var a=d[i]<0?-d[i]:d[i];if(a>pk)pk=a;es+=d[i]*d[i];if(i>=from){ts+=d[i]*d[i];tn++;}}
@@ -449,7 +349,7 @@ function ensureDisplay(){var p=$("displayPanel");if(!p||$("dpSound"))return;
 function ensureCard(){var pg=$("page-settings");if(!pg||$("ingSoundCard"))return;
   var card=mk("div","card");card.id="ingSoundCard";
   card.innerHTML='<h2 class="sec" id="ingSoundH">Sound</h2>'
-    +'<p class="snd-lede">Warm, soft sounds: entering Ingenium, moving between pages, pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
+    +'<p class="snd-lede">Small, warm sounds: entering Ingenium, moving between pages, pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
     +'<div class="snd-row"><span class="snd-lab" id="setSndOnL">Sounds</span><div class="seg" role="group" aria-labelledby="setSndOnL" id="setSndOn">'
     +'<button type="button" class="seg-btn" data-snd-on="1" aria-pressed="false">On</button><button type="button" class="seg-btn" data-snd-on="0" aria-pressed="false">Off</button></div></div>'
     +'<div class="snd-row"><label class="snd-lab" for="setSndVol">Volume</label><div class="snd-vol"><input type="range" id="setSndVol" data-snd-vol min="0" max="100" step="5" value="60">'
@@ -535,8 +435,6 @@ function current(){var s=D.querySelector(".main > section.active, main > section
   var b=D.querySelector(".dock .nav-btn.active");return b?(b.getAttribute("data-page")||""):"";}
 
 function wake(e){if(e&&e.isTrusted===false)return;gestured=true;gestureAt=Date.now();
-  if(e&&e.type==="pointerdown"&&num(e.clientX))lastPointer={x:e.clientX,y:e.clientY,at:gestureAt};
-  if(e&&e.type==="keydown")lastKeyAt=gestureAt;
   if(!cfg.on)return;
   var lv=ctxLive();
   /* older Safari wakes only for a sound actually started inside the touch: one silent sample, once */
@@ -568,7 +466,7 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
 function keyDown(k,e){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
   if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
   var now=Date.now();if(now-keyAt<(ROLE_GAP.keys||35))return false;var L=lvl("keys");if(!(L>0))return false;keyAt=now;
-  return sound(cfg.keys||DEF.keys,L,panOf(e?{event:e}:{el:k}));}
+  return sound(cfg.keys||DEF.keys,L);}
 D.addEventListener("pointerdown",function(e){if(!e.isTrusted||(e.button!=null&&e.button!==0))return;var t=e.target;if(!t||!t.closest)return;
   try{keyDown(t.closest(KEYSEL),e);}catch(x){}},true);
 D.addEventListener("keydown",function(e){if(!e.isTrusted||e.repeat||(e.key!=="Enter"&&e.key!==" "))return;var t=e.target;
@@ -577,7 +475,7 @@ D.addEventListener("keydown",function(e){if(!e.isTrusted||e.repeat||(e.key!=="En
    their own sound) */
 var cardAt=0;
 function cardUp(el){if(!allowed())return false;var now=Date.now();if(now-cardAt<(ROLE_GAP.cards||300)||now-roomAt<1200)return false;
-  var L=lvl("cards");if(!(L>0))return false;cardAt=now;return sound(cfg.cards||DEF.cards,L,panOf({el:el}));}
+  var L=lvl("cards");if(!(L>0))return false;cardAt=now;return sound(cfg.cards||DEF.cards,L);}
 /* the cards that are kept in the page and only shown (the Display panel, the help, the reminders, the bell, the
    presentation menu): heard as they rise, whether shown with hidden taken away or with their arrival drawn (r184's rcIn) */
 var CARDSEL="#displayPanel,#ihPanel,#remPanel,#bellPanel,#schedaePanel,#tourMenu,.pres-menu,.tour-card,#ing-export-choice,.isc-box";
