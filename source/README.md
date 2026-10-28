@@ -340,6 +340,20 @@ from other programs.
     node rig/t_681_abacus_keys.js <Ingenium url>                      # Chromium: 28 checks (the old Abacus failed 23)
     xvfb-run -a python3 rig/t_681_abacus_keys_wk.py <Ingenium url>     # Safari's engine: 11 checks
 
+Models on an external drive (6.8.2; her words: "models should be allowed to use storage from external hard drives as well as
+the machine they are working on"). A model file chosen with the computer's dialog was already linked where it lay, on any
+drive, but what Ingenium wrote itself (a lineup model, a copy kept from the page) always went to the computer's own folder,
+nothing could be moved, and a model whose drive was not connected when the app started was dropped from the list kept on disk.
+Now, in the Mac and Windows apps (`desktop/app_drives_682.py`, the card in `modules/r186.js`, in Models, Your models): a
+folder on a drive can be chosen for what Ingenium writes (it makes an "Ingenium models" folder there after checking it can
+write to it), each model it wrote can be moved either way with its progress shown, a linked file is never moved or deleted,
+and a model on a drive that is not connected (at start, or unplugged while the app is open) stays listed as not connected
+and comes back with the drive. The list itself stays on the computer. The phone and tablet apps keep models in their own
+storage and do not show the card.
+
+    python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
+    node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
+
 A quicker start (her words: "I want Ingenium and the Forge to be working efficiently with no bugs and have its performance
 improved immensely as an app"). Measured first (`rig/t_perf.js`, and WebKit through `rig/wk.py`): the page is 74 MB, and 56
 MB of it are carried for later (the library's Carpe Diem, the Forge and Inkwell, the engine, the picture reader, the kit
