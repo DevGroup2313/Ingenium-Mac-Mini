@@ -1,0 +1,5 @@
+The Forge carries Ingenium 6.8.11, in which a model works on her apps the way a careful engineer does: it searches, reads the
+exact lines, changes them, runs the app and mends its errors, in Code, in a chat with files and on the Build page, with
+Claude, Kimi, Ollama and the models on the device; each task has its way (Do it for me, Step by step with me, Guide me, I do
+it); and every connection she sets up is kept, so the model menu offers all their models. Ingenium 6.8.11 carries this build
+of the Forge. Everything else is as in 654.
