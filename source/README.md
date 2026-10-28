@@ -371,6 +371,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.8 and The Forge 652 (28 October 2026; her words: "You broke something on the Forge it has the wrong Magister
+dock. Why is the French tutor button amongst the other buttons inside of the Forge?"). The Forge makes its Magister card by
+copying Carpe Diem's Magister dock and rewriting it; it found the key and the row of tutors by marks Carpe Diem's script puts
+on them every so often, so a copy made before the marks came kept Carpe Diem's row and "Open Magister", for good. The same
+code is in every Forge from 647 to 651. Now the key and the row are also found by their words, and a card made wrong is made
+again (`offline_project/forge_652/forge652.py`). Ingenium 6.8.8 carries The Forge 652, and The Forge 652 carries it.
+
+    node offline_project/forge_652/tests/t_652_magister.js <the Forge url>  # 6 checks; on 651, 3 of them fail as on her computer
+    node offline_project/forge_652/tests/t_652.js <the Forge url> <out>     # 21 checks, as 651's, on 652 carrying Ingenium 6.8.8
+
 Ingenium 6.8.7 and The Forge 651 (28 October 2026; her words: "I hate the look of the apps buttons. Why are they so big and
 bulky? ... I want them back to their actual sizes like they are on Magister's dock"). The apps on Home are the size of
 Carpe Diem's keys on Magister's dock, as measured in Carpe Diem 1059: 26px high, as wide as the name with 14px either side,
