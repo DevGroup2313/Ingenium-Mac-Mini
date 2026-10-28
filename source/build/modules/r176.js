@@ -101,24 +101,26 @@ var KEY="ing_sound_67";
 var AC=W.AudioContext||W.webkitAudioContext;
 var OAC=W.OfflineAudioContext||W.webkitOfflineAudioContext;
 var GAP=60;
-var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150,keys:35,cards:300};
+var ROLE_GAP={notify:1500,confirm:150,room:600,paper:150,keys:35,cards:300,hover:40};
 var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
 
-/* ---------- the six kinds and Ingenium's names, in plain words (6.8.4) ---------- */
+/* ---------- the seven kinds and Ingenium's names, in plain words (6.8.4; touching a key, 6.8.5) ---------- */
 var NAMES={firstLight:"First light",studyLamp:"Study lamp",evensong:"Evensong",
   studyChime:"Study chime",handBell:"Hand bell",inkDrop:"Ink drop",
   sealMark:"Seal mark",pressClick:"Press click",feltSeal:"Felt seal",
   pageSet:"Page set",bookShut:"Book shut",lecternLift:"Lectern lift",stacksPass:"Stacks pass",
-  keyPress:"Key press",softKey:"Soft key",keysOff:"No sound",cardLift:"Card lift",cardChime:"Card chime",cardsOff:"No sound"};
+  keyPress:"Key press",softKey:"Soft key",keysOff:"No sound",cardLift:"Card lift",cardChime:"Card chime",cardsOff:"No sound",
+  keyTouch:"Key touch",lightTouch:"Light touch",touchOff:"No sound"};
 var ROLES=[
   ["notify","Notices and reminders","When a reminder or a notice appears.",["studyChime","handBell","inkDrop"],"for notices and reminders"],
   ["confirm","Keeping something","When something is saved, kept or copied.",["sealMark","pressClick","feltSeal"],"for keeping something"],
   ["room","Entering Ingenium","When you go through the welcome door.",["firstLight","studyLamp","evensong"],"for entering Ingenium"],
   ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["pageSet","bookShut","lecternLift","stacksPass"],"for moving between pages"],
   ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["keyPress","softKey","keysOff"],"for pressing a key"],
-  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["cardLift","cardChime","cardsOff"],"for a card opening"]];
-var DEF={ver:4,on:true,vol:0.55,notify:"studyChime",confirm:"sealMark",room:"firstLight",paper:"pageSet",keys:"keyPress",cards:"cardLift",
-  trim:{notify:1,confirm:1,room:1,paper:1,keys:1,cards:1}};
+  ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["cardLift","cardChime","cardsOff"],"for a card opening"],
+  ["hover","Touching a key","When the pointer comes onto a raised key, as in Carpe Diem and the Forge. A finger does not touch a key without pressing it, so a touch screen has only the press.",["keyTouch","lightTouch","touchOff"],"for touching a key"]];
+var DEF={ver:4,on:true,vol:0.55,notify:"studyChime",confirm:"sealMark",room:"firstLight",paper:"pageSet",keys:"keyPress",cards:"cardLift",hover:"keyTouch",
+  trim:{notify:1,confirm:1,room:1,paper:1,keys:1,cards:1,hover:1}};
 
 function copy(o){return JSON.parse(JSON.stringify(o));}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -207,7 +209,11 @@ var V={
   /* a card opening: a board lifted, lighter; or two small notes */
   cardLift:function(t,L){cloud(t,0.07,12,560,1500,0.022*L,0.6);tone(t,100,0.014,0.26,0.090*L,"sine",0.90);tone(t,150,0.012,0.18,0.038*L,"sine",0.91);},
   cardChime:function(t,L){tone(t,659.25,0.003,0.12,0.10*L);tone(t+0.06,987.77,0.003,0.18,0.08*L);},
-  cardsOff:function(){}
+  cardsOff:function(){},
+  /* touching a key: Carpe Diem's own tick as the pointer arrives (its clack at 0.045, 1500 Hz, 20 ms), at its level */
+  keyTouch:function(t,L){tap(t,0.082*L,1500,0.02);},
+  lightTouch:function(t,L){tap(t,0.059*L,1500,0.02);},
+  touchOff:function(){}
 };
 
 /* ---------- when a sound may play at all ---------- */
@@ -349,7 +355,7 @@ function ensureDisplay(){var p=$("displayPanel");if(!p||$("dpSound"))return;
 function ensureCard(){var pg=$("page-settings");if(!pg||$("ingSoundCard"))return;
   var card=mk("div","card");card.id="ingSoundCard";
   card.innerHTML='<h2 class="sec" id="ingSoundH">Sound</h2>'
-    +'<p class="snd-lede">Small, warm sounds: entering Ingenium, moving between pages, pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
+    +'<p class="snd-lede">Small, warm sounds: entering Ingenium, moving between pages, touching and pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
     +'<div class="snd-row"><span class="snd-lab" id="setSndOnL">Sounds</span><div class="seg" role="group" aria-labelledby="setSndOnL" id="setSndOn">'
     +'<button type="button" class="seg-btn" data-snd-on="1" aria-pressed="false">On</button><button type="button" class="seg-btn" data-snd-on="0" aria-pressed="false">Off</button></div></div>'
     +'<div class="snd-row"><label class="snd-lab" for="setSndVol">Volume</label><div class="snd-vol"><input type="range" id="setSndVol" data-snd-vol min="0" max="100" step="5" value="60">'
@@ -462,7 +468,8 @@ D.addEventListener("keydown",function(e){if(!e.isTrusted||(e.key!=="Enter"&&e.ke
 /* 6.8.2: a raised key going down sounds as it moves (pointer or Enter and Space on it); never for typing, never inside the
    sound choices (Listen must be heard alone), never at the welcome door (it has its own). It never holds back the other
    sounds: a key's press is not counted as the last sound. */
-var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role="tab"],.ib-key,.chip,.menu-btn,.rail-btn,.chat-top-key,.effort-opt,.bk-key,.l-btn,.cs-key,.quick,.src-btn,.cplus-btn,.stage-pill,.fo-k,.rc-k',keyAt=0;
+var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role="tab"],.ib-key,.chip,.menu-btn,.rail-btn,.chat-top-key,.effort-opt,.bk-key,.l-btn,.cs-key,.quick,.src-btn,.cplus-btn,.stage-pill,.fo-k,.rc-k,'+
+  '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
 function keyDown(k,e){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
   if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
   var now=Date.now();if(now-keyAt<(ROLE_GAP.keys||35))return false;var L=lvl("keys");if(!(L>0))return false;keyAt=now;
@@ -471,6 +478,15 @@ D.addEventListener("pointerdown",function(e){if(!e.isTrusted||(e.button!=null&&e
   try{keyDown(t.closest(KEYSEL),e);}catch(x){}},true);
 D.addEventListener("keydown",function(e){if(!e.isTrusted||e.repeat||(e.key!=="Enter"&&e.key!==" "))return;var t=e.target;
   try{if(t&&t.matches&&t.tagName==="BUTTON"&&t.matches(KEYSEL))keyDown(t,null);}catch(x){}},true);
+/* 6.8.5: as in Carpe Diem and the Forge, a raised key ticks faintly as the pointer comes onto it (a mouse or a pen; a touch
+   is a press). The same key does not tick twice in a row, as in Carpe Diem; never inside the sound choices or at the door. */
+var HOVERSEL=KEYSEL+',.tabula-btn,.abacus-btn,.imago-btn,.scriba-btn,.scriba-app-btn,.fontes-btn',hoverAt=0,lastHover=null;
+function hoverOn(k){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
+  if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
+  var now=Date.now();if(now-hoverAt<(ROLE_GAP.hover||40))return false;var L=lvl("hover");if(!(L>0))return false;hoverAt=now;
+  return sound(cfg.hover||DEF.hover,L);}
+D.addEventListener("pointerover",function(e){if(!e.isTrusted||e.pointerType==="touch")return;var t=e.target;if(!t||!t.closest)return;
+  try{var k=t.closest(HOVERSEL);if(!k||k===lastHover)return;lastHover=k;hoverOn(k);}catch(x){}},true);
 /* 6.8.2: a dialog, a panel or the tour's card rising onto the screen is lifted onto the desk (the notices and reminders keep
    their own sound) */
 var cardAt=0;

@@ -126,7 +126,7 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-key:hover .hx-arrow{transform:translateX(3px);color:var(--x-acc)}
 @container hxm (min-width:1500px){.hx-key{min-height:196px;padding:22px 22px 20px;gap:14px;border-radius:20px}.hx-jewel{width:56px;height:56px;border-radius:16px}.hx-jewel svg{width:27px;height:27px}
   .hx-kh{font-size:21px}.hx-kd{font-size:14px}.hx-km{font-size:12.5px}.hx-arrow{top:22px;right:22px}
-  .hx-app{padding:20px 10px 16px}.hx-app .hx-jewel{width:50px;height:50px;border-radius:14px}.hx-app .hx-jewel svg{width:24px;height:24px}.hx-an{font-size:16px}.hx-ad{font-size:12.5px}
+  .hx-app .hx-stone{min-height:54px;font-size:18px}.hx-ad{font-size:12.5px}
   .hx-recent{padding:22px 22px 20px}.hx-item{min-height:58px}}
 @container hxm (max-width:559px){.hx-key{min-height:0;padding:13px 12px 12px;gap:8px;border-radius:16px}.hx-jewel{width:38px;height:38px;border-radius:12px}.hx-jewel svg{width:20px;height:20px}
   .hx-kh{font-size:16px}.hx-kd{font-size:12.5px}.hx-arrow{top:13px;right:12px}}
@@ -163,16 +163,44 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 /* ---- the apps ---- */
 .hx-apps{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
 @container hxm (min-width:860px){.hx-apps{grid-template-columns:repeat(7,minmax(0,1fr));gap:14px}}
-.hx-app{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:16px;border:1px solid var(--x-hair);cursor:pointer;text-align:center;
-  background:linear-gradient(175deg,var(--x-a),var(--x-b));box-shadow:var(--x-key);transition:transform .45s var(--x-spring),box-shadow .3s ease,border-color .25s;animation:hxRise .55s var(--x-spring) backwards}
-.hx-app:hover{transform:translateY(-3px);box-shadow:var(--x-keyhi);border-color:var(--x-ring)}
-.hx-app:active{transform:translateY(2px) scale(.985);box-shadow:var(--x-press);transition-duration:.07s}
-.hx-app .hx-jewel{width:40px;height:40px;border-radius:12px;background:var(--c);background:linear-gradient(150deg,color-mix(in srgb,var(--c) 72%,#fff) 0%,var(--c) 60%,color-mix(in srgb,var(--c) 78%,#000) 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.2),0 2px 0 color-mix(in srgb,var(--c) 55%,#000),0 4px 8px rgba(40,22,68,.2)}
-.hx-app .hx-jewel svg{width:20px;height:20px}
-.hx-an{font:600 14.5px/1.15 var(--x-serif);letter-spacing:.03em;color:var(--x-ink1)}
+/* 6.8.5: the apps as Carpe Diem's and the Forge's cut stones, her words: "the brick jewelled sparkling pill look of the apps
+   original button designs from Carpe Diem and the Forge". Each is the stone Carpe Diem paints on its own key (the table
+   cut: a flat top, facets only at the edges, a thin gilt edge), lettered as Carpe Diem letters it, cut into the stone; a
+   few white sparks catch at its corners, each stone on its own slow clock. It lifts under the pointer and bottoms out when
+   pressed, as Carpe Diem's keys do. What it does is written beneath it. The stones: jewels/make_jewels.py. */
+.hx-apps .hx-app{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:0 0 2px;border:0;border-radius:10px;cursor:pointer;text-align:center;
+  background:none;box-shadow:none;color:inherit;font:inherit;-webkit-tap-highlight-color:transparent;animation:hxRise .55s var(--x-spring) backwards}
+.hx-app .hx-stone{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:48px;padding:8px 12px;box-sizing:border-box;
+  border:1px solid #bd9a52;border-radius:8px;background-color:#27272a;background-size:100% 100%;background-repeat:no-repeat;
+  font:600 16.5px/1.1 var(--x-serif);letter-spacing:.02em;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.14),0 2px 3px rgba(0,0,0,.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 rgba(12,18,26,.55),0 3px 4px rgba(12,18,26,.4),0 7px 11px rgba(12,18,26,.28),0 13px 20px rgba(12,18,26,.2),0 22px 34px rgba(12,18,26,.12);
+  transition:transform .09s cubic-bezier(.34,1.3,.64,1),box-shadow .09s ease,filter .12s ease}
+.hx-app .hx-stone .hx-an{position:relative;z-index:3;font:inherit;color:inherit;letter-spacing:inherit}
+.hx-app[data-app="fontes"] .hx-stone{color:#145671;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.7),0 -1px 0 rgba(0,0,0,.22),0 1px 2px rgba(120,96,52,.3)}
+.hx-app:hover .hx-stone{transform:translateY(-4px);filter:brightness(1.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 3px rgba(12,18,26,.4),0 6px 12px rgba(12,18,26,.28),0 12px 22px rgba(12,18,26,.18)}
+.hx-app:active .hx-stone{transform:translateY(1px);transition-duration:.04s;
+  box-shadow:inset 0 0 0 1px rgba(198,166,104,.5),inset 0 3px 8px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.12),0 1px 1px rgba(12,18,26,.4)}
+.hx-app:focus{outline:none}
+.hx-app:focus-visible .hx-stone{box-shadow:inset 0 0 0 1px rgba(198,166,104,.5),inset 0 1px 0 rgba(255,255,255,.30),0 0 0 3px rgba(198,166,104,.72),0 0 0 6px var(--x-ring)}
+body[data-theme="night"] .hx-app .hx-stone{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,0,0,.7),0 2px 3px rgba(0,0,0,.55),0 5px 8px rgba(0,0,0,.45),0 10px 16px rgba(0,0,0,.32)}
+/* the sparks: white four-pointed stars at the corners, with a gilt glow, one at a time */
+.hx-app .hx-stone::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit;background-repeat:no-repeat;
+  background-position:7% 16%,93% 16%,7% 84%,93% 84%,50% 4%,50% 96%;background-size:0 0,0 0,0 0,0 0,0 0,0 0;
+  filter:drop-shadow(0 0 2px rgba(255,255,255,1)) drop-shadow(0 0 6px rgba(255,255,255,.95)) drop-shadow(0 0 12px rgba(255,250,232,.8)) drop-shadow(0 0 24px rgba(226,190,112,.7));
+  animation:hxGlitter 9.2s linear infinite}
+@keyframes hxGlitter{0%,4%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}8%{background-size:17px 17px,0 0,0 0,0 0,0 0,0 0}12%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+  16%{background-size:0 0,0 0,0 0,0 0,13px 13px,0 0}19%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}24%{background-size:0 0,0 0,0 0,15px 15px,0 0,0 0}28%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+  34%{background-size:0 0,0 0,0 0,0 0,0 0,12px 12px}37%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}41%{background-size:0 0,16px 16px,0 0,0 0,0 0,0 0}45%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+  52%{background-size:0 0,0 0,0 0,0 0,11px 11px,0 0}55%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}58%{background-size:0 0,0 0,15px 15px,0 0,0 0,0 0}62%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+  68%{background-size:0 0,0 0,0 0,0 0,15px 15px,0 0}71%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}75%{background-size:17px 17px,0 0,0 0,0 0,0 0,0 0}79%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+  84%{background-size:0 0,0 0,0 0,0 0,0 0,13px 13px}87%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}90%{background-size:0 0,0 0,0 0,16px 16px,0 0,0 0}94%,100%{background-size:0 0,0 0,0 0,0 0,0 0,0 0}}
+body[data-motion="minimal"] .hx-app .hx-stone::before,body[data-calm="1"] .hx-app .hx-stone::before{animation:none;background-size:0 0,0 0,0 0,0 0,0 0,0 0}
+body[data-motion="minimal"] .hx-app .hx-stone{transition:none}
+@media (prefers-reduced-motion:reduce){.hx-app .hx-stone::before{animation:none}.hx-app .hx-stone{transition:none}}
+/*R147_JEWELS*/
 .hx-ad{font-size:11.5px;line-height:1.3;color:var(--x-ink3)}
-@container hxm (max-width:559px){.hx-apps{gap:9px}.hx-app{padding:11px 4px 10px;border-radius:14px}.hx-app .hx-jewel{width:34px;height:34px;border-radius:10px}.hx-an{font-size:12.5px}.hx-ad{display:none}}
+@container hxm (max-width:559px){.hx-apps{gap:9px}.hx-app .hx-stone{min-height:40px;padding:6px 6px;font-size:13.5px}.hx-ad{display:none}}
 /* ---- the side: the plaque, the models ---- */
 .hx-cols{display:flex;flex-direction:column;gap:20px}
 .hx-side{display:flex;flex-direction:column;gap:20px;min-width:0}
@@ -350,7 +378,7 @@ function build(){
   var ah=mk("div","hx-sech");var ah2=mk("h2",null,"Your apps");ah2.id="hxAppsH";ah.appendChild(ah2);ah.appendChild(mk("p",null,"Carpe Diem's own apps open on the Desk; the instruments open over this page."));as.appendChild(ah);
   var ag=mk("div","hx-apps");
   APPS.forEach(function(A,i){var b=mk("button","hx-app");b.type="button";b.setAttribute("data-app",A.k);b.style.setProperty("--c",A.c);b.style.animationDelay=(i*.035).toFixed(3)+"s";
-    b.innerHTML='<span class="hx-jewel">'+icon(A.k)+'</span><span class="hx-an"></span><span class="hx-ad"></span>';
+    b.innerHTML='<span class="hx-stone"><span class="hx-an"></span></span><span class="hx-ad"></span>';
     b.querySelector(".hx-an").textContent=A.t;b.querySelector(".hx-ad").textContent=A.d;b.setAttribute("aria-label","Open "+A.t+": "+A.d);
     b.onclick=function(){if(A.go){go(A.go);return;}try{var f=window[A.fn];if(typeof f==="function")f();else toast(A.t+" is not part of this copy of Ingenium.");}catch(e){toast(A.t+" could not be opened: "+(e&&e.message||e));}};
     ag.appendChild(b);});

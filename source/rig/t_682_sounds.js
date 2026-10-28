@@ -11,7 +11,9 @@ let pass = 0, fail = 0; function ok(c, what, info) { if (c) pass++; else fail++;
 // each voice's relative in Carpe Diem, and that relative's loudness there at its default level (0.55)
 const REL = { firstLight: ['Day turn', 0.0486], studyLamp: ['Lamp lit', 0.0459], evensong: ['Dusk fall', 0.0478], studyChime: ['Desk chime', 0.061], handBell: ['Small bell', 0.0696], inkDrop: ['Water drop', 0.0357],
   sealMark: ['Keep mark', 0.0255], pressClick: ['Soft click', 0.0052], feltSeal: ['Felt press', 0.0181], pageSet: ['Desk set', 0.0324], bookShut: ['Book close', 0.0359], lecternLift: ['Board lift', 0.0286], stacksPass: ['Shelf pass', 0.0164],
-  keyPress: ['its key press', 0.0236], softKey: ['its key press, softer', 0.0236 * 0.72], cardLift: ['Board lift, lighter', 0.0286 * 0.82], cardChime: ['Keep mark, smaller', 0.0255 * 0.65] };
+  keyPress: ['its key press', 0.0236], softKey: ['its key press, softer', 0.0236 * 0.72], cardLift: ['Board lift, lighter', 0.0286 * 0.82], cardChime: ['Keep mark, smaller', 0.0255 * 0.65],
+  // 6.8.5: its tick as the pointer comes onto a key (cd-jewel-js, __cdHover: its clack at 0.045, 1500 Hz, 20 ms), measured as above
+  keyTouch: ['its hover tick', 0.0046], lightTouch: ['its hover tick, lighter', 0.0046 * 0.72] };
 const TONAL = ['firstLight', 'evensong', 'studyChime', 'handBell', 'inkDrop', 'sealMark', 'cardChime'];
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 950 } }); const p = await ctx.newPage();
@@ -38,9 +40,9 @@ const TONAL = ['firstLight', 'evensong', 'studyChime', 'handBell', 'inkDrop', 's
       out[v] = { role: role.id, loud: a.loud, peak: a.peak, max: m.peak, tail: a.tail, bal: 10 * Math.log10(a.energyL / a.energyR), same: Math.abs(a.rms - a2.rms) <= 1e-6 * a.rms && Math.abs(a.peak - a2.peak) <= 1e-6 * a.peak }; }   // the same, but for the renderer's own rounding (a part in a billion)
     return { defaults: S.defaults, roles: S.roles.map(x => [x.id, x.voices]), names: S.names, out }; });
   fs.writeFileSync(OUT + '/sounds.json', JSON.stringify(r, null, 1));
-  ok(r.roles.map(x => x[0]).join() === 'notify,confirm,room,paper,keys,cards', 'six kinds of sound: notices, keeping, entering, pages, keys, cards', r.roles.map(x => x[0]).join());
-  ok(r.defaults.vol === 0.55 && r.defaults.room === 'firstLight' && r.defaults.notify === 'studyChime' && r.defaults.confirm === 'sealMark' && r.defaults.paper === 'pageSet' && r.defaults.keys === 'keyPress' && r.defaults.cards === 'cardLift', "Ingenium's defaults, at Carpe Diem's level of 0.55 (First light to enter)", JSON.stringify(r.defaults));
-  ok(r.roles.find(x => x[0] === 'keys')[1].includes('keysOff') && r.roles.find(x => x[0] === 'cards')[1].includes('cardsOff'), 'the keys and the cards each offer No sound');
+  ok(r.roles.map(x => x[0]).join() === 'notify,confirm,room,paper,keys,cards,hover', 'seven kinds of sound: notices, keeping, entering, pages, keys, cards, and touching a key', r.roles.map(x => x[0]).join());
+  ok(r.defaults.vol === 0.55 && r.defaults.room === 'firstLight' && r.defaults.notify === 'studyChime' && r.defaults.confirm === 'sealMark' && r.defaults.paper === 'pageSet' && r.defaults.keys === 'keyPress' && r.defaults.cards === 'cardLift' && r.defaults.hover === 'keyTouch', "Ingenium's defaults, at Carpe Diem's level of 0.55 (First light to enter)", JSON.stringify(r.defaults));
+  ok(r.roles.find(x => x[0] === 'keys')[1].includes('keysOff') && r.roles.find(x => x[0] === 'cards')[1].includes('cardsOff') && r.roles.find(x => x[0] === 'hover')[1].includes('touchOff'), 'the keys, the cards and touching a key each offer No sound');
   const old = ['deskChime', 'smallBell', 'waterDrop', 'keepMark', 'softClick', 'feltPress', 'dayTurn', 'lampLit', 'duskFall', 'deskSet', 'bookClose', 'boardLift', 'shelfPass'];
   ok(!Object.keys(r.names).some(n => old.includes(n)), "none of Carpe Diem's or The Forge's voices is offered");
   ok(Object.keys(r.out).sort().join() === Object.keys(REL).sort().join(), 'every voice has its relative in Carpe Diem', Object.keys(r.out).join());
@@ -54,12 +56,23 @@ const TONAL = ['firstLight', 'evensong', 'studyChime', 'handBell', 'inkDrop', 's
   }
   // in the page: a raised key, a field, a card, Off
   const pressed = async sel => { const bb = await p.evaluate(s => { const e = [...document.querySelectorAll(s)].find(x => x.offsetParent); if (!e) return null; const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, sel);
-    if (!bb) return null; const n0 = await p.evaluate(() => IngSound.count()); await p.mouse.move(bb[0], bb[1]); await p.mouse.down(); await p.waitForTimeout(60);
+    if (!bb) return null; await p.mouse.move(bb[0], bb[1]); await p.waitForTimeout(120); const n0 = await p.evaluate(() => IngSound.count()); await p.mouse.down(); await p.waitForTimeout(60);
     const n1 = await p.evaluate(() => IngSound.count()); const l = await p.evaluate(() => IngSound.last());
     await p.mouse.move(4, 600); await p.mouse.up(); await p.waitForTimeout(400); return { n: n1 - n0, last: l }; };   // let go away from the key: it sounds, nothing is done
   await p.evaluate(() => go('settings')); await p.waitForTimeout(900);
   let k = await pressed('#page-settings .btn, #page-settings .seg-btn');
   ok(k && k.n === 1 && k.last && k.last.role === 'keys' && k.last.voice === 'keyPress', 'a raised key pressed with the pointer sounds as a key goes down (the key press)', JSON.stringify(k));
+  // 6.8.5: the pointer coming onto a key ticks, as in Carpe Diem and the Forge; the same key does not tick twice in a row (as in
+  // Carpe Diem, a key ticks again only after the pointer has been on another): first onto a key of the main menu, then onto
+  // the first key of Settings
+  const hv = await p.evaluate(() => [document.querySelector('.nav-btn[data-page="chat"]'), [...document.querySelectorAll('#page-settings .btn, #page-settings .seg-btn')].find(x => x.offsetParent && !x.closest('[data-snd-on],[data-snd-test],#ingSoundChoices'))]
+    .map(k => { const r = k.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }));
+  await p.mouse.move(hv[0][0], hv[0][1]); await p.waitForTimeout(150); const h0 = await p.evaluate(() => IngSound.count());
+  await p.mouse.move(hv[1][0], hv[1][1]); await p.waitForTimeout(150); const h1 = await p.evaluate(() => ({ n: IngSound.count(), last: IngSound.last() }));
+  await p.mouse.move(hv[1][0] + 2, hv[1][1] + 1); await p.waitForTimeout(150); const h2 = await p.evaluate(() => IngSound.count());
+  ok(h1.n - h0 === 1 && h1.last && h1.last.role === 'hover' && h1.last.voice === 'keyTouch', 'the pointer coming onto a key ticks once, as in Carpe Diem and the Forge (Key touch)', JSON.stringify({ d: h1.n - h0, last: h1.last }));
+  ok(h2 === h1.n, 'moving on the same key does not tick again', h2 - h1.n);
+  await p.mouse.move(4, 600); await p.waitForTimeout(100);
   const t0 = await p.evaluate(() => IngSound.count());
   await p.evaluate(() => go('chat')); await p.waitForTimeout(700);
   await p.evaluate(() => { const f = document.querySelector('textarea, input[type=text]'); if (f) f.focus(); }); await p.keyboard.type('a few words'); await p.waitForTimeout(300);

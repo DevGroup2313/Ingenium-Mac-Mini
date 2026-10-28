@@ -12,12 +12,12 @@
  "forge": {
   "key": "forge",
   "title": "The Forge",
-  "version": "648",
-  "build": "9s80",
-  "date": "2026-10-25",
-  "size": 14204600,
-  "sha256": "d5800d34e06dbfe36f4635baf8067abdbff867daa7044deabd4455270f3b1baa",
-  "name": "the_forge_648_lean.html"
+  "version": "649",
+  "build": "9s81",
+  "date": "2026-10-28",
+  "size": 14315830,
+  "sha256": "9cd3f45c96a3d3805b67e9db3859bf6337debe678824a84a5cc6ea4aa274216f",
+  "name": "the_forge_649_lean.html"
  },
  "inkwell": {
   "key": "inkwell",
@@ -27,6 +27,6 @@
   "date": "2026-10-24",
   "size": 4135326,
   "sha256": "0b9d2835b283dad8e40d736e4ec314fd9055d313308ad8b8cacb532b5f323db9",
-  "name": "Inkwell.html"
+  "name": "inkwell_752.html"
  }
 }

@@ -35,7 +35,7 @@ body[data-theme="night"] #cs{--c-card:#201a2b;--c-a:#2a2239;--c-b:#251e33;--c-in
   --c-psh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--c-pledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
   --c-pshhi:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--c-pledge),0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4)}
 #cs *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--c-hair) transparent}
-#cs button{font:inherit;color:inherit;margin:0}
+#cs button:not(.rm-tab){font:inherit;color:inherit;margin:0}
 #cs :focus-visible{outline:2px solid var(--c-acc);outline-offset:2px}
 /* the head: the name and a line, and the rooms */
 #cs .c-head{display:flex;align-items:flex-end;gap:12px 18px;flex-wrap:wrap;flex:0 0 auto}
@@ -140,10 +140,48 @@ body[data-theme="night"] #cs input[type=date]{color-scheme:dark}
 /* how the studio works, and the lessons */
 #cs .c-motto{margin:18px 18px 6px;padding:12px 16px;border-left:3px solid var(--c-acc);font:italic 16px/1.5 var(--c-serif);color:var(--c-ink2);background:var(--c-accs);border-radius:0 10px 10px 0}
 #cs .c-motto.c-small{font-size:13.5px;margin:0 0 4px;padding:10px 12px}
-#cs .c-how{list-style:none;margin:10px 18px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#cs .c-how li{border:1px solid var(--c-hair);border-radius:12px;padding:12px 14px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+/* 6.8.5: each card is a key, her words (28 October 2026): "I want the cards on the 'How the Studio Works' on the Career page
+   to be clickable and animated. I want to be able to click on them for additional details or just because it would feel
+   nice to be able to click on those cards." They rise into place, lift under the pointer, sink when pressed; pressed, a
+   card stays where it is, raised and ringed, and beneath the four opens what that part of the studio does, with a key into
+   it; pressed again, it closes. Nothing on the panel moves out from under the pointer. */
+#cs .c-how{list-style:none;margin:10px 18px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+#cs .c-how > li{position:relative;min-width:0;border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);
+  transition:transform .3s var(--c-spring),box-shadow .25s ease,border-color .2s ease;animation:cHowRise .5s var(--c-spring) backwards}
+#cs .c-how > li:nth-child(2){animation-delay:.05s}#cs .c-how > li:nth-child(3){animation-delay:.1s}#cs .c-how > li:nth-child(4){animation-delay:.15s}
+#cs .c-how > li:hover{transform:translateY(-3px);box-shadow:var(--c-pophi);border-color:var(--c-ring)}
+#cs .c-how > li:has(> .c-howk:active){transform:translateY(1px) scale(.992);box-shadow:var(--c-press);transition-duration:.06s}
+#cs .c-how > li.c-open{border-color:var(--c-acc);box-shadow:var(--c-pophi),0 0 0 1.5px var(--c-ring);transform:translateY(-2px);animation:cHowOpen .45s var(--c-spring)}
+#cs .c-howk{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;width:100%;margin:0;padding:12px 14px;border:0;border-radius:12px;background:none;text-align:left;cursor:pointer;color:var(--c-ink1);font:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#cs .c-howk:focus{outline:none}#cs .c-howk:focus-visible{outline:2.5px solid var(--c-ring);outline-offset:3px}
+#cs .c-howk b{grid-column:2}
+#cs .c-howk .c-howm{grid-column:3;grid-row:1;align-self:start;display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:12px;font-weight:600;color:var(--c-acc);white-space:nowrap;padding-top:2px}
+#cs .c-howk .c-howm::after{content:"";width:6px;height:6px;border-right:1.7px solid currentColor;border-bottom:1.7px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .3s var(--c-spring)}
+#cs .c-howk[aria-expanded="true"] .c-howm::after{transform:translateY(2px) rotate(-135deg)}
+#cs .c-howk .c-howt{grid-column:2/-1}
+#cs .c-howk[aria-expanded="true"] i{animation:cHowPulse .55s var(--c-spring)}
+#cs .c-howd{margin:2px 18px 10px;padding:14px 18px 16px;border:1px solid var(--c-ring);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pophi);animation:cHowIn .4s var(--c-spring) both}
+#cs .c-howd h3{margin:0 0 8px;font:600 15.5px/1.3 var(--c-serif);color:var(--c-ink1)}
+#cs .c-howd[hidden]{display:none}
+#cs .c-howd ul{margin:2px 0 0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;max-width:78ch}
+#cs .c-howd ul li{font-size:13.5px;line-height:1.55;color:var(--c-ink1)}#cs .c-howd ul li::marker{color:var(--c-acc)}
+#cs .c-howd .c-btn{margin-top:12px}
+@keyframes cHowRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes cHowOpen{0%{transform:scale(.985)}60%{transform:scale(1.006)}100%{transform:none}}
+@keyframes cHowIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes cHowPulse{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+body[data-motion="minimal"] #cs .c-how > li,body[data-calm="1"] #cs .c-how > li,body[data-motion="minimal"] #cs .c-howd,body[data-calm="1"] #cs .c-howd,body[data-motion="minimal"] #cs .c-howk i,body[data-calm="1"] #cs .c-howk i{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){#cs .c-how > li,#cs .c-howd,#cs .c-howk i,#cs .c-howk .c-howm::after{animation:none !important;transition:none !important}}
+/* what a draft speaks to, and the improving of it */
+#cs .c-count{margin:0}#cs .c-count b{color:var(--c-ink1);font-weight:600}#cs .c-count .c-over{color:var(--c-bad);font-weight:600}
+#cs .c-cover{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 12px;border-radius:10px;background:var(--c-wellbg);box-shadow:var(--c-well);font-size:12.5px;color:var(--c-ink2);line-height:1.5}
+#cs .c-cover b{color:var(--c-ink1)}
+#cs .c-improve{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--c-ring);background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);animation:cHowIn .35s var(--c-spring) both}
+#cs .c-improve .c-tunes{display:flex;flex-wrap:wrap;gap:6px}
+#cs .c-improve .c-ta{min-height:72px}
+body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{animation:none}
 #cs .c-how li i,#cs .c-lesson li i{font-style:normal;grid-row:span 2;width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(var(--c-pa),var(--c-pb));box-shadow:0 1px 0 var(--c-pledge)}
-#cs .c-how li b{font:600 14.5px/1.3 var(--c-serif)}#cs .c-how li span{font-size:13px;color:var(--c-ink2);line-height:1.5}
+#cs .c-howk b{font:600 14.5px/1.3 var(--c-serif)}#cs .c-howk .c-howt{font-size:13px;color:var(--c-ink2);line-height:1.5}
 #cs .c-lesson{list-style:none;margin:0;padding:18px 22px;display:flex;flex-direction:column;gap:12px;max-width:72ch}
 #cs .c-lesson li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;font-size:15px;line-height:1.6;color:var(--c-ink1)}
 #cs .c-lesson-ol{margin:0 0 0 20px;padding:0;font-size:13.5px;line-height:1.6;color:var(--c-ink2)}#cs .c-lesson-ol li{margin:4px 0}
@@ -411,6 +449,31 @@ function critBlock(o){var r=o.read&&o.read.r;if(!r||!r.crit.length)return "";ret
 function voiceBlock(G,R){var out=[];if(G.writing.length)out.push("MY OWN WRITING (match its voice and rhythm; do not copy its content):\n"+cut(G.writing.join("\n\n---\n\n"),Math.floor(R*0.06)));
   if(G.letters.length)out.push("MY PAST LETTERS (for their shape and tone only; their facts may be out of date):\n"+cut(G.letters.join("\n\n---\n\n"),Math.floor(R*0.06)));return out.join("\n\n");}
 function sourcesBlock(G){if(!G.sources.length)return "";return "MY SOURCES (cite one by its number in square brackets, like [2], only where it supports the sentence; invent none and use none that is not here):\n"+G.sources.map(function(s){return "["+s.n+"] "+s.text;}).join("\n");}
+/* 6.8.5: a limit the posting sets for a document (words or pages), read from its own sentences */
+var NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10};
+function limitsIn(post){var out={};
+  function kindOf(s){return /cover(?:ing)? letter|letter of (?:application|motivation)|motivation(?:al)? letter/.test(s)?"cover":/supporting statement|statement in support/.test(s)?"supporting":
+      /personal statement|statement of (?:purpose|intent)|purpose statement|research statement/.test(s)?"statement":/proposal/.test(s)?"proposal":/\bcvs?\b|curriculum vitae|r[eé]sum[eé]/.test(s)?"cv":"";}
+  String(post||"").replace(/\r/g,"").split(/\n+|[.;!?](?:\s+|$)/).forEach(function(s0){var last="";
+    /* each clause on its own, so "a CV of two pages and a statement of 1,000 words" gives each its own; a clause that names
+       no document takes the one named before it in the sentence */
+    s0.toLowerCase().replace(/[\u2010-\u2015]/g,"-").split(/,\s+|\s+and\s+|\s*[()]\s*/).forEach(function(s){var k=kindOf(s)||last;if(kindOf(s))last=kindOf(s);
+      var w=/(?:no more than|not (?:to )?exceed(?:ing)?|maximum(?: of)?|max\.?|up to|at most|(?:word )?limit(?:ed)?(?:\s+(?:of|to)|:)?|not longer than|no longer than)\s*(\d[\d,]*)\s*words?/.exec(s)||/(\d[\d,]*)\s*words?\s*(?:maximum|max\b|or (?:less|fewer)|at most|in length)/.exec(s)||/(\d[\d,]*)[- ]word (?:limit|maximum|max\b)/.exec(s);
+      var pg=/(?:no more than|not (?:to )?exceed(?:ing)?|maximum(?: of)?|max\.?|up to|at most|not longer than|no longer than)\s*(\d+|one|two|three|four|five|six)\s*(?:a4\s*)?(?:pages?|sides?)/.exec(s)||/(\d+|one|two|three|four)[- ](?:a4[- ])?(?:page|side)s? (?:maximum|limit|max\b)/.exec(s);
+      k=k||"any";
+      if(w){var n=parseInt(w[1].replace(/,/g,""),10);if(n>=50&&n<=20000&&!(out[k]&&out[k].words))out[k]={words:n};}
+      else if(pg){var m=NUMW[pg[1]]||parseInt(pg[1],10);if(m>=1&&m<=40&&!out[k])out[k]={pages:m};}});});return out;}
+function limitFor(post,kind){var L=limitsIn(post);return L[kind]||(/^(supporting|statement|proposal)$/.test(kind)?L.any:null)||null;}
+function limitLine(l){return l.words?"THE POSTING SETS A LIMIT of "+l.words+" words: stay within it, at about "+Math.round(l.words*0.92)+" words.":"THE POSTING SETS A LIMIT of "+l.pages+" page"+(l.pages>1?"s":"")+": stay within it.";}
+function wordCount(md){return (String(md||"").replace(/^#{1,6}\s+/gm,"").match(/[A-Za-zÀ-ÿ0-9][^\s]*/g)||[]).length;}
+/* which criteria a draft speaks to: a match of their own words in it, a guide and not a judgement */
+var STOPW={};("with that this from have been will your their which into such other more most some able ability experience demonstrable demonstrated demonstrate evidence knowledge understanding skills skill excellent strong good proven relevant related field fields including within work working must should would could also both each well high level levels range wide areas area across through using used able essential desirable degree").split(" ").forEach(function(w){STOPW[w]=1;});
+function stemsOf(t){var out={};String(t||"").replace(/\[[^\]]*\]/g," ").split(/[^A-Za-zÀ-ÿ0-9]+/).forEach(function(w0){var w=w0.toLowerCase();
+    /* short words count only when they are names such as PhD, MSc or GIS */
+    if((w.length<4&&!/[A-Z].*[A-Z]/.test(w0))||STOPW[w])return;out[w.slice(0,5)]=1;});return out;}
+function coverage(md,crit){if(!crit||!crit.length)return null;var S=stemsOf(String(md||"").replace(/^#{1,6}\s.*$/gm," "));
+  var res=crit.map(function(c){var k=Object.keys(stemsOf(c.text));if(!k.length)return {c:c,ok:true};var hit=k.filter(function(x){return S[x];}).length;return {c:c,ok:hit>=Math.min(2,k.length)&&hit/k.length>=0.5};});
+  return {n:res.filter(function(x){return x.ok;}).length,of:res.length,missEss:res.filter(function(x){return !x.ok&&x.c.ess;}).map(function(x){return x.c.text;}),miss:res.filter(function(x){return !x.ok;}).map(function(x){return x.c.text;})};}
 function to(o){var t=[o.title,o.org].filter(Boolean).join(", ");return t||"this "+({job:"post",phd:"programme",grant:"grant"}[o.kind]||"opportunity");}
 function docAsk(kind,o,G,post,em){
   var what={cv:"Write my CV for my application to "+to(o)+", in Markdown. Use level-two headings (##) for its sections, in the order that serves this application best, from these: Education, Posts held, Research and publications, Teaching, Projects, Skills, Languages, Awards and funding, Referees. Leave out a section the profile has nothing for. Each entry: one line in bold giving what and where, then the dates after a comma; then up to four bullet points, each beginning with a verb, naming concrete work and exact figures from the profile. Put first what the posting asks for most. Do not write my name or my contact details: they are set above the CV. Write no introduction and no closing note.",
@@ -421,6 +484,9 @@ function docAsk(kind,o,G,post,em){
     email:""}[kind];
   if(kind==="email"){var role=(ROLES.filter(function(x){return x[0]===em.role;})[0]||ROLES[5])[1].toLowerCase(),pur=(PURPOSES.filter(function(x){return x[0]===em.purpose;})[0]||PURPOSES[0])[1].toLowerCase();
     what="Write an email from me to "+role+", "+pur+", about "+to(o)+". Begin with a line \"Subject: \" and the subject, then a blank line, then the email. Courteous, direct and specific, with one clear request; "+(em.purpose==="introduce"?"no more than 300 words":"no more than 180 words")+". Greet the person by name only if the profile or the posting names them; otherwise write [their name]. Sign it with my name."+(em.extra?" Also: "+em.extra:"");}
+  var lim=kind==="email"?null:limitFor(post,kind);
+  if(lim&&lim.words&&kind==="statement")what=what.replace("in about 750 words","in no more than "+lim.words+" words");
+  if(lim)what+=" "+limitLine(lim);
   var prose=kind!=="cv";
   return function(sc){var R=room()*sc;var u=what+"\n\n"+(post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.2))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.6)+
       (prose?"\n\n"+voiceBlock(G,R):"")+(kind==="statement"||kind==="proposal"?"\n\n"+sourcesBlock(G):"");
@@ -442,8 +508,33 @@ function writeDoc(o,kind,em){if(busyNow()||needModel())return Promise.resolve(fa
         var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
         return Promise.resolve(IngBig.put(ref,md)).then(function(){var rec={ref:ref,made:Date.now(),model:modelName(),chk:ck};
           if(kind==="email"){rec.id=uid("em");rec.role=em.role;rec.purpose=em.purpose;o.emails.unshift(rec);o.sv={kind:"email",id:rec.id};}
-          else{var old=o.docs[kind];if(old){o.older[kind]=[old].concat(o.older[kind]||[]);while(o.older[kind].length>2){var z=o.older[kind].pop();try{IngBig.del(z.ref);}catch(e){}}}o.docs[kind]=rec;o.sv={kind:kind};}
+          else{keepOlder(o,kind);o.docs[kind]=rec;o.sv={kind:kind};}
           if(o.stage==="considering")o.stage="preparing";o.step="send";o.edit=false;o.tab="doc";save();return true;});});}).then(function(r){end();return r;},function(e){failed(e);return false;});}
+function keepOlder(o,kind){o.older=o.older||{};var old=o.docs[kind];if(!old)return;o.older[kind]=[old].concat(o.older[kind]||[]);while(o.older[kind].length>2){var z=o.older[kind].pop();try{IngBig.del(z.ref);}catch(e){}}}
+/* 6.8.5: improve a draft with a note of her own; the version before is kept, and comes back with one press */
+var TUNE=[["Shorter","Make it about a fifth shorter: keep every point that matters, and cut repetition and padding."],
+  ["Warmer","Make the tone warmer and more personal, still professional, with no flattery."],
+  ["More formal","Make the tone more formal and measured."],
+  ["Plainer words","Use plainer, shorter words and shorter sentences."],
+  ["Essential criteria first","Put the evidence for the essential criteria first."]];
+function reviseDoc(o,v,rec,note){if(busyNow()||needModel())return Promise.resolve(false);note=String(note||"").trim();if(note.length<4){say("Say what should change first.");return Promise.resolve(false);}
+  var kind=v.kind,isMail=kind==="email",label=isMail?"email":DOCS[kind][0].toLowerCase().replace(/^tailored cv$/,"tailored CV");begin(o,"Improving the "+label);
+  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"}),loadText(rec.ref)]).then(function(x){var post=x[0],G=x[1],cur=x[2],lim=isMail?null:limitFor(post,kind);
+    if(!cur||cur.length<40)throw new Error("the draft could not be read");
+    return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now revising a draft of mine as I ask. You return the whole revised text and nothing else.",!isMail&&kind!=="cv")},
+      {role:"user",content:"Revise my "+label+" as I ask below, and change nothing else.\nWHAT I ASK: "+note+"\n"+(lim?limitLine(lim)+"\n":"")+
+        "Keep its form: the headings, their order and every placeholder in square brackets, unless what I ask changes them. Add no claim, skill, post, date, figure, name or source that THE PROFILE does not give. "+english()+"; no contractions; no promotional words.\nReturn only the revised text: no notes on what you changed.\n\n"+
+        (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.15))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.5)+"\n\nTHE DRAFT:\n"+cur}];},Math.round(cur.length/3)+600,0.4)
+    .then(function(t){var r=clean(t);if(!r||r.length<Math.min(80,cur.length*0.3))throw new Error("the model gave back too little, so the draft stays as it was");return examine(kind,r,G,post,o);})
+    .then(function(md){var sf={md:md,line:""};try{if(!isMail&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
+      return Promise.resolve(IngBig.put(ref,md)).then(function(){var made={ref:ref,made:Date.now(),model:modelName(),chk:ck,note:note};
+        if(isMail){rec.older=[{ref:rec.ref,made:rec.made,model:rec.model,chk:rec.chk,note:rec.note||""}].concat(rec.older||[]);while(rec.older.length>2){var z=rec.older.pop();try{IngBig.del(z.ref);}catch(e){}}Object.assign(rec,made);}
+        else{keepOlder(o,kind);o.docs[kind]=made;}
+        o.improve=false;o.edit=false;o.tab="doc";save();return true;});});})
+  .then(function(r){end();if(r)say("Improved. The version before is kept: The version before brings it back.");return r;},function(e){failed(e);return false;});}
+function olderOf(o,v,rec){return v.kind==="email"?(rec.older||[]):((o.older||{})[v.kind]||[]);}
+function earlier(o,v,rec){if(v.kind==="email"){if(!rec.older||!rec.older.length)return;var p=rec.older.shift(),cur={ref:rec.ref,made:rec.made,model:rec.model,chk:rec.chk,note:rec.note||""};Object.assign(rec,p);rec.older.unshift(cur);}
+  else{var list=(o.older||{})[v.kind];if(!list||!list.length)return;var prev=list.shift();list.unshift(o.docs[v.kind]);o.docs[v.kind]=prev;}o.improve=false;save();render();say("The version before is back. The other is kept, one press away.");}
 function docRec(o,v){if(!v)return null;if(v.kind==="email")return o.emails.filter(function(e){return e.id===v.id;})[0]||null;return o.docs[v.kind]||null;}
 function paperKind(kind){return kind==="cover"?"cover":"cv";}
 function paperOf(o,kind,md){var P=CS().profile,title=kind==="cv"?myName()||"Curriculum vitae":DOCS[kind][0],sub=kind==="cv"?P.contact:[myName(),to(o)].filter(Boolean).join(" · ");
@@ -647,7 +738,7 @@ function stageWord(k){return (STAGES.filter(function(x){return x[0]===k;})[0]||S
 function sortedOpps(){return CS().opps.slice().sort(function(a,b){var fa=FINISHED[a.stage]?1:0,fb=FINISHED[b.stage]?1:0;if(fa!==fb)return fa-fb;var da=daysLeft(a),db=daysLeft(b);
   if(da!=null&&db!=null&&da!==db)return da-db;if(da!=null&&db==null)return -1;if(db!=null&&da==null)return 1;return b.at-a.at;});}
 function removeOpp(o){var S=CS();try{IngBig.del(o.ref);}catch(e){}Object.keys(o.docs).forEach(function(k){try{IngBig.del(o.docs[k].ref);}catch(e){}(o.older[k]||[]).forEach(function(x){try{IngBig.del(x.ref);}catch(e){}});});
-  o.emails.forEach(function(x){try{IngBig.del(x.ref);}catch(e){}});S.opps=S.opps.filter(function(x){return x.id!==o.id;});S.ui.open=null;show("list");save();render();}
+  o.emails.forEach(function(x){try{IngBig.del(x.ref);}catch(e){}(x.older||[]).forEach(function(y){try{IngBig.del(y.ref);}catch(e){}});});S.opps=S.opps.filter(function(x){return x.id!==o.id;});S.ui.open=null;show("list");save();render();}
 function fbBox(fb){var d=h("div","c-fb");if(fb.RAW){d.textContent=fb.RAW;return d;}
   d.innerHTML=(fb.MEETS?"<div><b>Meets it:</b> "+esc({YES:"yes",PARTLY:"partly",NO:"not yet"}[String(fb.MEETS).toUpperCase().split(/\W/)[0]]||fb.MEETS)+"</div>":"")+(fb.WORKS?"<div><b>What works:</b> "+esc(fb.WORKS)+"</div>":"")+(fb.MISSING?"<div><b>What is missing:</b> "+esc(fb.MISSING)+"</div>":"")+(fb["ASK YOURSELF"]?"<div><b>Ask yourself:</b> "+esc(fb["ASK YOURSELF"])+"</div>":"");return d;}
 
@@ -669,12 +760,51 @@ function paintApps(par){var S=CS(),open=S.ui.open==="new"?"new":oppById(S.ui.ope
   if(fin.length){var f=fold("finished","Finished ("+fin.length+")");fin.forEach(function(b){f.appendChild(b);});L.body.appendChild(f);}
   var open0=list.length-fin.length;L.foot.appendChild(h("span","c-note",esc(list.length?open0+" open"+(soon?" · "+soon+" closing within a week":"")+(fin.length?" · "+fin.length+" finished":""):"Your applications will be listed here.")));
   var R=RUN.busy?livePanel():open==="new"?newPanel():open?oppPanel(open):introPanel();two(L,R,par);}
+/* 6.8.5: each of the four parts opens to what it does, with a key into it */
+var HOW=[["Your profile","What you are looking for, your CV, your entries and documents, and Lector's readings of your apps: the only facts the studio uses.",
+    ["About you: your name and how to reach you, set above your CV and your letters.",
+     "What you are looking for: what you want, what you need and what you would rather avoid. Every reading weighs a posting against it first.",
+     "Your sources: your CV, your documents, a LinkedIn export, and Lector's readings of your apps. You choose which of them the studio may use.",
+     "Your entries: posts, education, research, teaching, projects, skills and languages. Find your skills reads your sources for more, and you keep only what is right.",
+     "Nothing outside your profile is ever claimed for you. Where it is silent, a place is left in square brackets for you to fill."],
+    ["Open your profile",function(){CS().ui.room="profile";save();render();}]],
+  ["Bring an opportunity","A posting, a programme's call or a grant. It is read against your profile: what matches what you want, and each criterion, shown or not.",
+    ["Paste its text, choose a file, or fetch it from its address. Fetching is the only step that uses the internet, and only when you press it.",
+     "The reading names the post, who offers it and when it closes, and lists what it asks for, each criterion essential or desirable.",
+     "Each criterion is judged from your profile alone: shown, partly shown or not shown, with the evidence named.",
+     "Then your strengths for it, its concerns said plainly, your next steps, and the questions worth asking the contact.",
+     "Look it up online when you wish to know more about who offers it; nothing is searched unless you press for it."],
+    ["Bring a posting",function(){CS().ui.open="new";show("work");save();render();}]],
+  ["Decide, then write","A plain band with its reasons, and advice on whether to apply. Then the CV, the letter, the statements and the emails, or your own drafts, looked at with you.",
+    ["The band follows a fixed rule, never a percentage: Strong fit, Possible fit, A stretch, or Not a fit as your profile stands, from how many essential criteria your profile shows.",
+     "Then what this kind of application asks for: a tailored CV, a cover letter, a supporting statement, a personal statement, a research proposal outline, and emails to a supervisor, a referee, a mentor or a recruiter.",
+     "Each is written from your profile and read a second time against it. A word limit the posting sets is kept, and you see which of its criteria the draft speaks to.",
+     "Improve it with a note of your own, such as shorter or warmer, or go back to the version before. Or write it yourself and have it looked at with you.",
+     "Save it as Word or as a PDF, exactly as it is shown."],
+    ["How each is built",function(){CS().ui.room="learn";save();render();}]],
+  ["Practise and track","Your evidence and your answers, looked at with you; each application followed to its end; your goals and their steps.",
+    ["Your evidence: for each criterion, a moment that shows it (the situation, what you did yourself, what came of it), looked at with you and kept in your profile if you wish.",
+     "Interview questions: eight that a panel would be likely to ask, and your answers, as you would say them, looked at with you.",
+     "Track: where each application stands, its closing date and the days left, and your notes. Finished applications fold away.",
+     "Goals and plan: your goals and their steps, and the kinds of role and programme that suit your profile."],
+    ["Goals and plan",function(){CS().ui.room="goals";save();render();}]]];
+var HOWOPEN=-1;
+function howCards(ol){var d=ol.nextSibling;ol.innerHTML="";
+  HOW.forEach(function(x,i){var open=HOWOPEN===i,li=h("li",open?"c-open":null),b=h("button","c-howk");b.type="button";b.id="csHowK"+i;
+    b.setAttribute("aria-expanded",open?"true":"false");b.setAttribute("aria-controls","csHowD");
+    b.innerHTML="<i>"+(i+1)+"</i><b>"+esc(x[0])+"</b><em class=\"c-howm\">"+(open?"Less":"More")+"</em><span class=\"c-howt\">"+esc(x[1])+"</span>";
+    b.addEventListener("click",function(){HOWOPEN=HOWOPEN===i?-1:i;howCards(ol);var k=$("csHowK"+i);if(k){try{k.focus({preventScroll:true});}catch(e){}}
+      /* what opened, in sight in its own panel; the page itself never moves */
+      var dd=$("csHowD"),pb=dd&&dd.closest(".c-pn-b");if(HOWOPEN===i&&pb&&!dd.hidden){var r=dd.getBoundingClientRect(),q=pb.getBoundingClientRect(),cr=ol.getBoundingClientRect();if(r.bottom>q.bottom)pb.scrollTop+=Math.max(0,Math.min(r.bottom-q.bottom+12,cr.top-q.top-8));}});
+    li.appendChild(b);ol.appendChild(li);});
+  /* the one place the details open, beneath the four cards */
+  d.innerHTML="";var x=HOW[HOWOPEN];
+  if(x){d.hidden=false;d.setAttribute("aria-labelledby","csHowK"+HOWOPEN);d.appendChild(h("h3",null,esc(x[0])));var ul=h("ul");x[2].forEach(function(t){ul.appendChild(h("li",null,esc(t)));});d.appendChild(ul);d.appendChild(cbtn("",x[3][0],x[3][1]));
+    d.style.animation="none";void d.offsetWidth;d.style.animation="";}
+  else{d.hidden=true;d.removeAttribute("aria-labelledby");}}
 function introPanel(){var P=panel("csWork","How the studio works");var q=h("blockquote","c-motto","“Tell me and I forget. Teach me and I remember. Involve me and I learn.”");P.body.appendChild(q);
-  var g=h("ol","c-how");[["Your profile","What you are looking for, your CV, your entries and documents, and Lector's readings of your apps: the only facts the studio uses."],
-    ["Bring an opportunity","A posting, a programme's call or a grant. It is read against your profile: what matches what you want, and each criterion, shown or not."],
-    ["Decide, then write","A plain band with its reasons, and advice on whether to apply. Then the CV, the letter, the statements and the emails, or your own drafts, looked at with you."],
-    ["Practise and track","Your evidence and your answers, looked at with you; each application followed to its end; your goals and their steps."]].forEach(function(x,i){var li=h("li");li.innerHTML="<i>"+(i+1)+"</i><b>"+esc(x[0])+"</b><span>"+esc(x[1])+"</span>";g.appendChild(li);});
-  P.body.appendChild(g);P.body.appendChild(h("p","c-note c-pad",esc(modelReady()?"Writing with "+modelName()+", the model Lector uses on this device. Nothing is searched online unless you press for it.":"No model is ready on this device yet: the studio keeps and tracks without one, and reads and writes once one is ready (Models page). Nothing is searched online unless you press for it.")));
+  var g=h("ol","c-how"),dt=h("div","c-howd");g.setAttribute("aria-label","The four parts of the studio: press one for more");dt.id="csHowD";dt.setAttribute("role","region");
+  P.body.appendChild(g);P.body.appendChild(dt);howCards(g);P.body.appendChild(h("p","c-note c-pad",esc(modelReady()?"Writing with "+modelName()+", the model Lector uses on this device. Nothing is searched online unless you press for it.":"No model is ready on this device yet: the studio keeps and tracks without one, and reads and writes once one is ready (Models page). Nothing is searched online unless you press for it.")));
   P.foot.appendChild(cbtn("","Open your profile",function(){CS().ui.room="profile";save();render();}));P.foot.appendChild(h("span","c-grow"));
   P.foot.appendChild(cbtn("pri","Bring a posting",function(){CS().ui.open="new";show("work");save();render();}));return P;}
 function newPanel(){var S=CS(),kind="job",P=panel("csWork","Bring a posting, programme or grant",{back:"Applications",onBack:function(){S.ui.open=null;show("list");save();render();}});
@@ -722,7 +852,7 @@ function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
   P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: what you send",function(){goStep(o,"send");}));}
 /* what you send: the documents on the left, the one chosen on the right, its keys at the foot */
 function sendView(o){var v=o.sv;if(v&&v.kind==="email"&&!o.emails.some(function(e){return e.id===v.id;}))v=null;if(v)return v;var k0=(FOR[o.kind]||FOR.other).filter(function(k){return o.docs[k];})[0];return {kind:k0||(FOR[o.kind]||FOR.other)[0]};}
-function setView(o,v){o.sv=v;o.edit=false;o.tab="doc";save();render();}
+function setView(o,v){o.sv=v;o.edit=false;o.improve=false;o.tab="doc";save();render();}
 function stepSend(o,P){var v=sendView(o),split=h("div","c-split"),nav=h("div","c-nav"),pane=h("div","c-pane");
   nav.appendChild(h("div","c-label",esc("Documents")));
   var kinds=(FOR[o.kind]||FOR.other).slice();Object.keys(o.docs).forEach(function(k){if(kinds.indexOf(k)<0)kinds.push(k);});
@@ -749,14 +879,34 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
   var ck=rec.chk||{},notes=[];if(ck.figures&&ck.figures.length)notes.push("Figures to check, not found in your profile or the posting: "+ck.figures.join(", ")+".");
   if(ck.fills)notes.push(ck.fills+" place"+(ck.fills>1?"s are":" is")+" left for you to fill, in square brackets.");if(ck.style)notes.push(ck.style.trim());
   notes.push(rec.mine?"Your own version, kept on "+dayStr(rec.made)+".":"Written on "+dayStr(rec.made)+" with "+(rec.model||"your model")+".");pane.appendChild(h("p","c-note c-checks",esc(notes.join(" "))));
+  var info=h("div","c-col");info.style.gap="6px";pane.appendChild(info);
   var area=h("div","c-area c-grow");pane.appendChild(area);
   if(tab==="how"){var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});area.appendChild(ol);}
-  loadText(rec.ref).then(function(md){
+  Promise.all([loadText(rec.ref),postText(o)]).then(function(xx){var md=xx[0],post=xx[1];
+    /* 6.8.5: its length against any limit the posting sets, and the criteria it speaks to */
+    var n=wordCount(md),lim=isMail?null:limitFor(post,kind),over=lim&&lim.words&&n>lim.words,cnt=h("p","c-note c-count"),old=olderOf(o,v,rec);
+    cnt.innerHTML="<b>"+n+" words</b>"+(lim?(lim.words?(over?", <span class=\"c-over\">"+(n-lim.words)+" over the posting's limit of "+lim.words+"</span>":", within the posting's limit of "+lim.words):", and the posting allows "+lim.pages+" page"+(lim.pages>1?"s":"")):"")+(rec.note?". Last improved: “"+esc(rec.note.length>90?rec.note.slice(0,87)+"…":rec.note)+"”":"")+".";
+    if(old.length){var ob=cbtn("quiet","The version before",function(){earlier(o,v,rec);},"Bring back the version before this one; this one is kept");ob.classList.add("sm");cnt.appendChild(document.createTextNode(" "));cnt.appendChild(ob);}
+    info.appendChild(cnt);
+    var cov=(!isMail&&kind!=="proposal"&&o.read&&o.read.r)?coverage(md,o.read.r.crit):null;
+    if(cov){var cv=h("div","c-cover");cv.innerHTML="<span>It speaks to <b>"+cov.n+" of "+cov.of+"</b> criteria, by their own words: a guide, not a judgement.</span>"+(cov.missEss.length?"<span>Essential, not found in it: "+esc(cov.missEss.join("; "))+".</span>":"");info.appendChild(cv);}
+    if(o.improve&&!o.edit){var box=h("div","c-improve"),ta=h("textarea","c-ta");ta.setAttribute("aria-label","What should change");ta.placeholder="What should change? For example: shorter, warmer, lead with my teaching, make the second paragraph about the archive project.";
+      var tunes=h("div","c-tunes");tunes.setAttribute("role","group");tunes.setAttribute("aria-label","Quick choices");
+      var add=function(t){ta.value=(ta.value.trim()?ta.value.trim()+" ":"")+t;ta.focus();};
+      TUNE.forEach(function(t){tunes.appendChild(cbtn("sm",t[0],function(){add(t[1]);}));});
+      if(over)tunes.appendChild(cbtn("sm","Within the limit",function(){add("Bring it within the posting's limit of "+lim.words+" words.");}));
+      if(cov&&cov.missEss.length)tunes.appendChild(cbtn("sm","The missing criteria",function(){add("Speak to these essential criteria, with evidence from my profile only, or leave a place in square brackets where my profile is silent: "+cov.missEss.join("; ")+".");}));
+      box.appendChild(h("p","c-note",esc("Say what should change, or press the quick choices. It is rewritten from your profile and read a second time against it; the version before is kept.")));box.appendChild(tunes);box.appendChild(ta);info.appendChild(box);
+      P.foot.innerHTML="";P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Cancel",function(){o.improve=false;save();render();}));
+      P.foot.appendChild(cbtn("pri","Improve it",function(){reviseDoc(o,v,rec,ta.value);}));setTimeout(function(){try{ta.focus({preventScroll:true});}catch(e){}},0);}
     if(o.edit){var ta=h("textarea","c-ta c-mono c-grow");ta.value=md;ta.setAttribute("aria-label","The text, to change");area.innerHTML="";area.appendChild(ta);P.foot.innerHTML="";P.foot.appendChild(h("span","c-grow"));
       P.foot.appendChild(cbtn("","Cancel",function(){o.edit=false;render();}));P.foot.appendChild(cbtn("pri","Keep my changes",function(){var t=ta.value.trim();if(!t)return;var ref=IngBig.newId();Promise.resolve(IngBig.put(ref,t)).then(function(){try{IngBig.del(rec.ref);}catch(e){}rec.ref=ref;rec.edited=Date.now();o.edit=false;save();render();say("Your changes are kept.");});}));ta.focus();return;}
     if(tab==="doc"){if(isMail){var m=h("div","c-well c-mail");m.textContent=md;area.appendChild(m);}
       else{var pp=paperOf(o,kind,md),f=h("iframe","c-paper");f.title=DOCS[kind][0];f.setAttribute("sandbox","allow-same-origin");f.srcdoc=W.IngLectorPaper?IngLectorPaper.page(pp.kind,md,pp.o):"<pre>"+esc(md)+"</pre>";area.appendChild(f);}}
-    P.foot.appendChild(cbtn("","Change it",function(){o.edit=true;render();}));P.foot.appendChild(cbtn("","Copy the text",function(){copyText(md);}));
+    if(o.improve&&!o.edit)return;
+    /* her own version is never rewritten for her: it is looked at with her (Write it yourself) */
+    if(!rec.mine)P.foot.appendChild(cbtn("","Improve it",function(){o.improve=true;o.edit=false;save();render();},"Say what should change, and it is rewritten"));
+    P.foot.appendChild(cbtn("","Change it",function(){o.edit=true;o.improve=false;render();}));P.foot.appendChild(cbtn("","Copy the text",function(){copyText(md);}));
     P.foot.appendChild(cbtn("","Write it again",function(){if(isMail)writeDoc(o,"email",{role:rec.role,purpose:rec.purpose});else writeDoc(o,kind);}));P.foot.appendChild(h("span","c-grow"));
     if(!isMail){P.foot.appendChild(cbtn("","Save as PDF",function(){savePaper(o,kind,"pdf");}));P.foot.appendChild(cbtn("pri","Save as Word",function(){savePaper(o,kind,"docx");}));}});}
 function newEmail(o,pane,P){pane.appendChild(h("h3","c-h3",esc("A new email")));var g=h("div","c-grid2"),rs=select(ROLES,o.kind==="phd"?"supervisor":"contact"),ps=select(PURPOSES,o.kind==="phd"?"introduce":"enquire"),ex=h("textarea","c-ta");
@@ -944,7 +1094,7 @@ function install(){if($("page-career"))return;
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
-window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow};
+window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW};
 })();
 ;try{window.__ingParts["p188"]="running";}catch(_){}
 </script>

@@ -17,6 +17,24 @@
 .ib-foot .btn{white-space:nowrap}
 .ib-empty{padding:16px 4px;text-align:center;font-family:var(--serif,Georgia,serif);font-size:17px;color:var(--ink-2)}
 .qs-cap{margin-top:12px}
+/* 6.8.5: on the Focus page the Inbox's keys stand out of the card as Ingenium's other keys do, her words (28 October 2026):
+   "They are supposed to be button and look 3D and popped out and animated. I want them matching the rest of the apps look
+   and design." They rise into place one after another, lift under the pointer and go down when pressed. (Inside the
+   cloud's own Inbox they are the cloud's keys.) */
+#fxParkList .ib-acts{gap:8px;margin-top:10px}
+#fxParkList .ib-acts .tc-chip{appearance:none;position:relative;display:inline-flex;align-items:center;gap:7px;min-height:36px;margin:0;padding:7px 14px 7px 11px;border-radius:11px;
+  border:1px solid var(--hairline);background:linear-gradient(180deg,var(--card-hi),var(--card-lo,var(--card)));box-shadow:var(--pop);color:var(--ink-1);font:600 13px/1.2 var(--sans);
+  letter-spacing:.005em;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:transform .32s cubic-bezier(.34,1.35,.64,1),box-shadow .22s ease,border-color .2s ease;animation:ibKeyIn .42s cubic-bezier(.34,1.35,.64,1) backwards}
+#fxParkList .ib-acts .tc-chip:nth-child(2){animation-delay:.035s}#fxParkList .ib-acts .tc-chip:nth-child(3){animation-delay:.07s}
+#fxParkList .ib-acts .tc-chip:nth-child(4){animation-delay:.105s}#fxParkList .ib-acts .tc-chip:nth-child(5){animation-delay:.14s}#fxParkList .ib-acts .tc-chip:nth-child(n+6){animation-delay:.175s}
+#fxParkList .ib-acts .tc-chip:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,var(--pop));border-color:color-mix(in srgb,var(--accent) 45%,var(--hairline))}
+#fxParkList .ib-acts .tc-chip:active{transform:translateY(1px) scale(.985);box-shadow:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);transition-duration:.06s}
+body[data-theme="night"] #fxParkList .ib-acts .tc-chip:active{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
+#fxParkList .ib-acts .tc-chip:focus-visible{outline:2.5px solid var(--accent);outline-offset:3px}
+@keyframes ibKeyIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+body[data-motion="minimal"] #fxParkList .ib-acts .tc-chip,body[data-calm="1"] #fxParkList .ib-acts .tc-chip{animation:none;transition:none}
+@media (prefers-reduced-motion:reduce){#fxParkList .ib-acts .tc-chip{animation:none;transition:none}}
 /* the side column in Carpe Diem's order, her word (17 October): "the bell emoji button to be placed above the leaf
    emoji button to match Carpe Diem since the Alerts bell is not always present ... so that there isn't a weird gap".
    From the top: the bell, the leaf (Ingenium's own), the 💭, day or night, the Clepsydra, the notes. */
@@ -89,7 +107,7 @@ fxRenderPark=function(){var hst=$("fxParkList");if(!hst)return;hst.innerHTML="";
   if(!ps.length){hst.appendChild(h("div",{class:"small muted",text:"The Inbox is empty. A clear head."}));return;}
   ps.slice(0,30).forEach(function(it){var s=TC.spheres[it.sphere||TC.guess(it.t)]||TC.spheres.personal;
     var r=h("div",{class:"ib-item"},[h("div",{class:"ib-t",text:it.t}),h("div",{class:"ib-w"},[h("span",{text:TC.ago(it.at)}),h("span",{text:s.icon+" "+s.label}),it.remindAt?h("span",{text:"⏰ "+TC.when(it.remindAt)}):null])]);
-    var a=TC.actsFor(it,refresh);a.classList.add("ib-acts");r.appendChild(a);hst.appendChild(r);});
+    var a=TC.actsFor(it,refresh);a.classList.add("ib-acts");[].forEach.call(a.children,function(b){b.classList.add("ib-act");});r.appendChild(a);hst.appendChild(r);});
   if(ps.length>30)hst.appendChild(h("div",{class:"small muted",text:"And "+(ps.length-30)+" more in the Inbox."}));};
 window.fxRenderPark=fxRenderPark;
 function quietKey(){var q=$("quietScreen");if(!q||q.querySelector(".qs-cap"))return;var inner=q.querySelector(".qs-inner")||q;

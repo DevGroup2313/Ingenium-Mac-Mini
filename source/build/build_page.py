@@ -1063,6 +1063,9 @@ if '"ing-docfonts"' in blob:  # 6.8.1: the typefaces a document is set in, shown
     _dfm = _ilu.module_from_spec(_df); _df.loader.exec_module(_dfm)
     blob = ('<script type="application/json" id="ing-docfonts">' + json.dumps(_dfm.data(), separators=(",", ":")).replace("</", "<\\/")
             + "</script>\n" + blob)
+# 6.8.5: the apps on Home as Carpe Diem's cut stones (jewels/make_jewels.py writes jewels.css from Carpe Diem's own stones)
+if "/*R147_JEWELS*/" in blob:
+    blob = blob.replace("/*R147_JEWELS*/", open(os.path.join(HERE, "jewels", "jewels.css"), encoding="utf-8").read().strip(), 1)
 if "/*R118_CDPREP*/" in blob:
     blob = blob.replace("/*R118_CDPREP*/", open(os.path.join(HERE, "apps", "cd_prep.js"), encoding="utf-8").read().strip())
 if "/*R118_DARK*/null" in blob:

@@ -11,7 +11,8 @@ from wk import Session
 
 URL = sys.argv[1]
 REL = {"firstLight": 0.0486, "studyLamp": 0.0459, "evensong": 0.0478, "studyChime": 0.061, "handBell": 0.0696, "inkDrop": 0.0357, "sealMark": 0.0255, "pressClick": 0.0052, "feltSeal": 0.0181,
-       "pageSet": 0.0324, "bookShut": 0.0359, "lecternLift": 0.0286, "stacksPass": 0.0164, "keyPress": 0.0236, "softKey": 0.0236 * 0.72, "cardLift": 0.0286 * 0.82, "cardChime": 0.0255 * 0.65}   # each relative in Carpe Diem, as loud there
+       "pageSet": 0.0324, "bookShut": 0.0359, "lecternLift": 0.0286, "stacksPass": 0.0164, "keyPress": 0.0236, "softKey": 0.0236 * 0.72, "cardLift": 0.0286 * 0.82, "cardChime": 0.0255 * 0.65,
+       "keyTouch": 0.0046, "lightTouch": 0.0046 * 0.72}   # each relative in Carpe Diem, as loud there (6.8.5: its hover tick)
 res = []
 
 
@@ -33,7 +34,7 @@ with Session() as s:
       window.__snd=out;}catch(e){window.__snd={error:String(e)};}})();""")
     s.wait("return window.__snd!==null", 300)
     out = s.js("return window.__snd")
-    ok("error" not in out and len(out) == 17, "every voice renders in Safari's engine", json.dumps(out)[:300])
+    ok("error" not in out and len(out) == 19, "every voice renders in Safari's engine", json.dumps(out)[:300])
     for v, x in out.items():
         if not isinstance(x, dict):
             ok(False, v + " renders", x)

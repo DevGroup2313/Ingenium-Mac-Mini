@@ -371,6 +371,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.8.5 (28 October 2026; her words: "I want the cards on the 'How the Studio Works' on the Career page to be
+clickable and animated", "I want it operating and writing really well with all of its features", "I want the text colour
+of the selected tabs to be white instead of black", "I want the 'Your apps' section to actually show the brick jewelled
+sparkling pill look of the apps original button designs from Carpe Diem and the Forge", of the Focus page's Inbox, "They
+are supposed to be button and look 3D and popped out and animated", and "I want them to have similar sounds when I hover
+over the buttons inside of Ingenium the same way they are inside of Carpe Diem and the Forge").
+
+- The Career Studio (`modules/r188.js`). The room key in hand reads white on its amethyst: the studio's own reset of its
+  buttons no longer reaches the room keys, which now look exactly as Lector's and Settings' do. The four cards of How the
+  studio works are keys: they rise into place, lift under the pointer and sink when pressed; pressed, a card stays where it
+  is, raised and ringed, and beneath the four opens what that part of the studio does, with a key into it (Enter does the
+  same; pressed again, it closes; nothing moves out from under the pointer). A limit the posting sets for a document, in
+  words or pages, is read from its own sentences (each clause with the document it names), written into the request, and
+  the draft's length is shown against it. Which of the posting's criteria a draft speaks to is shown, by their own words (a
+  guide, not a judgement), with the essential ones it does not. Improve it rewrites a draft from a note of her own or from
+  quick choices (Shorter, Warmer, More formal, Plainer words, Essential criteria first, and when they apply, Within the limit
+  and The missing criteria), from her profile alone, read a second time against it; the version before is kept, and The
+  version before brings it back. Her own version is never rewritten.
+- Home (`modules/r147.js`, `jewels/`). Your apps are Carpe Diem's cut stones: the stone Carpe Diem paints on each app key
+  (its table cut, the gilt edge, the 8px cut corners), lettered as Carpe Diem letters it, with white sparks at the corners on
+  a clock of their own; Schedae takes Scriba's stone turned to amethyst and Clepsydra Carpe Diem's gold. `jewels/make_jewels.py`
+  writes `jewels/jewels.css` from Carpe Diem's own stones (`cd_stones.json`) and its spark (`cd_star.json`).
+- The Inbox on the Focus page (`modules/r119.js`): its keys (To a note, To Tabula, Steps, To the chat, A reminder, Done) are
+  raised keys, rising into place one after another, lifting under the pointer and going down when pressed.
+- Sounds (`modules/r176.js`): a seventh kind, Touching a key: as in Carpe Diem and the Forge, a raised key ticks faintly as
+  the pointer comes onto it (Carpe Diem's own tick, at its level: 0.0046 measured there), never twice in a row on the same
+  key, never with a finger; Key touch, Light touch or No sound. The Career Studio's keys, Home's stones and the Inbox's keys
+  sound when pressed too.
+- Ingenium carries The Forge 649.
+
+    node rig/t_685_career.js <Ingenium url> <out>                     # 25 checks: the white room key, the cards, limits, criteria, Improve it, the version before
+    node rig/t_685_home.js <Ingenium url> <out>                       # 14 checks: the stones, their sparks and lift, the Inbox's keys, the hover tick
+
 Ingenium's sounds, in Carpe Diem's family (6.8.4; her words: "I actually do want the same warm upbeat welcoming sounds from
 Carpe Diem on Ingenium, I just don't want them identical but I do want them closely related, I want them very similar to
 Carpe Diem's in every way to stay in the family and keep the same feel. The sound is slightly better now but still too slow
@@ -387,8 +420,8 @@ Diem's module as it ships, each voice is as loud as its relative there (the welc
 0.0236 against 0.0236), and the welcome is over in about 1.3 seconds, as Carpe Diem's is. A sound or a default level kept
 from an earlier version gives way to these; a level she chose stays.
 
-    node rig/t_682_sounds.js <Ingenium url> <out>                     # 99 checks: each voice against its relative in Carpe Diem (loudness), brisk, in the middle, never at the limit; the keys, the cards, Off
-    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 20 checks
+    node rig/t_682_sounds.js <Ingenium url> <out>                     # 111 checks (6.8.5): each voice against its relative in Carpe Diem (loudness), brisk, in the middle, never at the limit; the keys, the cards, touching a key, Off
+    xvfb-run -a python3 rig/t_682_sounds_wk.py <Ingenium url>         # Safari's engine (the iPhone and iPad): 22 checks
 
 The Career Studio (6.8.3; her words: "I want Ingenium to gain the function and full capabilities to work like my own
 Linkedin premium with its full functionality and ressources. I want it curated entirely to my in-app profile, resume, cover
