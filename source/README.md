@@ -371,6 +371,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9 (30 October 2026; her words: "The "On" button for the Sounds feature and the "Ingenium" button on the Chat panel
+look really flat compared to the rest of the buttons on the display panel, please make the fix so that they match the rest of
+the other pressed buttons inside of the Display panel", "I want a better example for Ingenium's chat tour because the current
+one kind of reads a little weird when it shows the "Thinking" box", and "I also want the apps buttons to match the Forge and
+have the little coloured circles that show their colours and I also want them reflected on the desktab circle").
+- `build/modules/r192.js`: in the Display panel (and the other raised cards of r184), a segmented key that says
+  aria-pressed="true" (the Sound keys of r176, the Chat look keys) is the same raised amethyst key as one that says only the
+  class "on" (Day, Raised, Side bar, Calm...), by day and by night. r184 had given anything pressed in a card a flat ring.
+- The tour's example conversation (`build_page.py`, the R192 edits of TOUR_Q, TOUR_A and TOUR_THINK): the packing list, whose
+  thinking spoke of the person in the third person, gives way to a question she might ask (planning the writing of a research
+  proposal in three weeks), with the model's thinking in its own first person and a short reply in three dated steps.
+- `build/modules/r193.js`: the five apps in the side rail are Carpe Diem's cut stones, as in the Forge's rail (the stone Home
+  already wears for each, read off a probe of r147's jewels, 26px high, lettered in Georgia, Fontes in the dock's blue-black);
+  folded, the APPS key (r137) wears a row of five circles in the stones' colours, as the Forge's does; each Desk tab's
+  circle (r123) is the same colour as the stone; and while the Desk is up the rail lights the stone of the app in hand
+  (r123's go() never reached the rail, so Home stayed lit while Tabula was open).
+
+    node rig/t_692_keys.js <url> <out>       # 19 checks: the chosen keys in the Display panel and in Settings, by day and by night; the tour's example
+    node rig/t_693_stones.js <url> <out>     # 16 checks: the stones, the circles folded and not, the Desk tab's circle, the app in hand lit, night, a phone
+
 Ingenium 6.8.12 and The Forge 656 (28 October 2026; her words: "I want the Career Studio and the Lector page to be made even
 more capabale and proficient in their functions [...] I want to be able to automate where I want and also meticulously review
 and do on my own at my own pace", and "I want the Career Studio to be able to hold multiple profiles"; asked, she chose a switch

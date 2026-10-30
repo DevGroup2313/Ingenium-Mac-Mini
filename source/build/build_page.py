@@ -97,6 +97,21 @@ edit('.tour-ring{position:fixed;border-radius:14px;box-shadow:0 0 0 4px var(--ac
 edit('  state.activeChat=c.id;go("chat");\n  if(done&&!c.messages.length){',
      '  go("chat");state.activeChat=c.id;\n  if(done&&!c.messages.length){', "R125 tour example chat")
 
+# ---- R192 (Ingenium 6.9, 30 October 2026): the tour's example conversation, read again. The owner's words: "I want a
+#      better example for Ingenium's chat tour because the current one kind of reads a little weird when it shows the
+#      "Thinking" box." The packing list's thinking spoke of the person in the third person ("They are walking in hills"),
+#      as a note about someone else; the reply was a list of socks. The example is now one she might ask: planning the
+#      writing of a research proposal, the thinking in the model's own first person, weighing the weeks before it answers,
+#      and a reply that is short, dated and kind. The three texts are the tour's alone (tourDemoChat, tourDemoRun). ----
+edit('var TOUR_Q="What should I pack for a weekend walking trip in the hills?";',
+     'var TOUR_Q="My PhD application is due in three weeks. How should I plan the writing of my research proposal?";', "R192 the tour's question")
+edit('var TOUR_A="Here is a light list for two days:\\n\\n1. **Layers**: a warm top and a waterproof jacket.\\n2. **Feet**: comfortable boots and two pairs of thick socks.\\n3. **Food and water**: about 2 litres of water, lunch and snacks.\\n4. **Safety**: a map, a charged phone and a small first-aid kit.\\n\\nCheck the weather forecast the evening before you leave.";',
+     'var TOUR_A="Three weeks is enough if each week has one job:\\n\\n1. **Week one, the ground**: reread your key sources and write a one-page outline: the question, why it matters, and how you will answer it.\\n2. **Week two, the draft**: write the full proposal from that outline, one section a day. Do not polish yet.\\n3. **Week three, the readers**: give the draft to your supervisor or a trusted reader on the Monday, then revise with their notes and check the programme\\u2019s word limit and formatting.\\n\\nKeep one day a week free. A proposal written at a steady pace reads better than one written in a rush.";',
+     "R192 the tour's reply")
+edit('var TOUR_THINK="They are walking in hills for a weekend. Weather in hills changes quickly, so layers and a waterproof come first. Two days means food and water for each day. Safety: a map in case the phone has no signal. Keep the list short and practical.";',
+     'var TOUR_THINK="Three weeks is enough for a proposal if the weeks have different jobs. If the draft starts before the outline has settled, it will be rewritten, so the first week should go to reading and a one-page outline. The second week is the full draft. The third week has to stay free for a reader\\u2019s notes, because a supervisor needs a few days to read it. I will keep the plan to three steps and leave room for rest.";',
+     "R192 the tour's thinking")
+
 # ---- R101: the reply keeps at most half the memory; her request is never the part cut ----
 edit('  return Math.max(1500,(ctx-replyTokens()-256)*3);}',
      '  /* R101: the reply keeps at most half of the memory, so a document or a change never leaves 1,500 characters for everything else */\n'
