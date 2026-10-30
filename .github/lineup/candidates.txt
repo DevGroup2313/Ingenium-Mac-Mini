@@ -7,3 +7,8 @@ repo HuggingFaceTB/SmolLM2-360M-Instruct-GGUF
 repo bartowski/SmolLM2-135M-Instruct-GGUF
 repo bartowski/SmolLM2-360M-Instruct-GGUF
 head https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/raw/main/README.md
+# round 6 (6.9, 30 October 2026): the built-in models' current files and fingerprints, read again from Hugging Face. The Fire
+# build of 6.9 refused LFM2.5 1.2B Thinking: the file it downloaded no longer matched the fingerprint pinned on 12 October.
+repo LiquidAI/LFM2.5-1.2B-Thinking-GGUF
+repo LiquidAI/LFM2.5-1.2B-Instruct-GGUF
+repo unsloth/Qwen3.5-2B-GGUF
