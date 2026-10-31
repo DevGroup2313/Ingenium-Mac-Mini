@@ -35,15 +35,15 @@ export const VENDOR_BASE = new URL('./vendor/', import.meta.url).href;
 export const MODEL_TIERS = Object.freeze([
   Object.freeze({
     tier: 'small', modelId: 'Xenova/bge-small-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 384, maxTokens: 512,
-    fileMB: 34, fileMBMeasured: true, minSpareGB: 1, speed: 1, shipped: true, verified: true,
+    fileMB: 34, fileMBMeasured: true, minSpareGB: 1.5, speed: 1, shipped: true, verified: true,
   }),
   Object.freeze({
     tier: 'base', modelId: 'Xenova/bge-base-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 768, maxTokens: 512,
-    fileMB: 110, fileMBMeasured: false, minSpareGB: 2.5, speed: 1 / 3.3, shipped: false, verified: false,
+    fileMB: 110, fileMBMeasured: false, minSpareGB: 6, speed: 1 / 3.3, shipped: false, verified: false,
   }),
   Object.freeze({
     tier: 'large', modelId: 'Xenova/bge-large-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 1024, maxTokens: 512,
-    fileMB: 335, fileMBMeasured: false, minSpareGB: 5, speed: 1 / 10, shipped: false, verified: false,
+    fileMB: 335, fileMBMeasured: false, minSpareGB: 10, speed: 1 / 10, shipped: false, verified: false,
   }),
 ]);
 

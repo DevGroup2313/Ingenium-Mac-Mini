@@ -22,6 +22,20 @@ export const DEFAULT_DIMS = 384;
 export const STORE_WORKER_URL = new URL('./store.worker.js', import.meta.url).href;
 export const VENDOR_BASE = new URL('./vendor/', import.meta.url).href;
 
+// What an index takes on the computer's disk, for the settings page and for choosing a model. Measured on 31 October 2026
+// (SQLite 3.45.3 in OPFS, 4,096 chunks of 1,800 characters of English each, with their FTS5 rows, vectors and cache entries;
+// the growth from 2,048 to 4,096 chunks): 8,650 bytes a chunk with 384-value vectors, 12,700 with 768, 17,800 with 1024. The
+// vectors count twice (the vec table and the cache), and a cache row of more than half a database page (8 KB) leaves most of
+// that page empty, which is why 1024 costs more than twice 384. Each folder also leaves about half a block of 1,024 vectors
+// unused. The index lives in the browser's private storage on the computer's own disk, not on a drive the folders are on.
+const PER_CHUNK = [[384, 8650], [768, 12700], [1024, 17800]];
+export function estimateIndexBytes({ chunks, dims = DEFAULT_DIMS, folders = 1 }) {
+  let lo = PER_CHUNK[0], hi = PER_CHUNK[1];
+  if (dims > PER_CHUNK[1][0]) { lo = PER_CHUNK[1]; hi = PER_CHUNK[2]; }
+  const per = lo[1] + ((dims - lo[0]) * (hi[1] - lo[1])) / (hi[0] - lo[0]);
+  return Math.round(chunks * per + folders * dims * 4 * 512);
+}
+
 // ------------------------------------------------------------------------------------------------ the request/reply core
 function remoteError(info, op) {
   const e = new Error(info && info.message ? info.message : 'the store failed');
@@ -103,8 +117,19 @@ export class Store {
     };
     this.debug = { rows: r('debug.rows'), sql: r('debug.sql'), fail: r('debug.fail'), migrate: r('debug.migrate'), wipe: r('debug.wipe') };
   }
-  /** Opens the database. Args: {dbName = 'rag.sqlite3', vfs = 'opfs-sahpool' | 'memory', dims = 384, lockWaitMs = 8000}. */
-  open(args = {}) { return this.rpc.request('open', Object.assign({ vendorBase: this.vendorBase }, args)); }
+  /**
+   * Opens the database. Args: {dbName = 'rag.sqlite3', vfs = 'opfs-sahpool' | 'memory', dims = 384, lockWaitMs = 8000}.
+   * For the private file system the page first asks the browser to keep this origin's storage (persist() exists only on the
+   * page, not in workers); the answer is info().persisted.
+   */
+  async open(args = {}) {
+    if (args.vfs !== 'memory' && typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.persist === 'function') {
+      try { await navigator.storage.persist(); } catch (_) { /* a refusal changes nothing here */ }
+    }
+    return this.rpc.request('open', Object.assign({ vendorBase: this.vendorBase }, args));
+  }
+  /** Gives the space of deleted rows back to the file system (after removing a big folder). -> {before, after, mode} in bytes. */
+  compact() { return this.rpc.request('compact'); }
   close() { return this.rpc.request('close'); }
   info() { return this.rpc.request('info'); }
   stats() { return this.rpc.request('stats'); }

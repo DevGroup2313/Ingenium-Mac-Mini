@@ -10,8 +10,8 @@
 // Requests run one at a time, in the order they arrive; every op is synchronous SQLite, so a file.replace is never
 // interleaved with another request.
 //
-// Ops: open close info ops | principal.ensure | folder.add folder.list folder.remove folder.touch | acl.grant acl.revoke
-// acl.allowed | file.list file.get file.replace file.delete | emb.lookup emb.put emb.prune | stats |
+// Ops: open close info ops compact | principal.ensure | folder.add folder.list folder.remove folder.touch | acl.grant
+// acl.revoke acl.allowed | file.list file.get file.replace file.delete | emb.lookup emb.put emb.prune | stats |
 // debug.rows debug.sql debug.fail debug.migrate debug.wipe (tests only).
 //
 // Three details that the vendored file system does not do for us:
@@ -21,6 +21,9 @@
 //    OPFS_LOCKED and never call the installer.
 //  - the build does not bind a Float32Array: vectors are bound as the bytes of one (new Uint8Array(f32.buffer)).
 //  - vec0 and FTS5 tables are not reached by foreign keys, so every delete of chunks removes their rows by rowid itself.
+//  - a database file does not shrink when rows are deleted. A new database is made with auto_vacuum = incremental (a setting of
+//    the file, not a table; it can only be chosen before the first table exists), and compact() gives the freed pages back
+//    (and the empty vector blocks that sqlite-vec leaves behind, see reclaimEmptyVecBlocks).
 
 const DEFAULT_DIMS = 384;
 const POOL_NAME = 'ingenium-rag';       // the VFS name, and the OPFS directory '.ingenium-rag' that holds the database files
@@ -177,6 +180,38 @@ function vecDimsOf(d) {
   return m ? parseInt(m[1], 10) : null;
 }
 
+// sqlite-vec 0.1.6 keeps the block of 1,024 vectors of a folder whose vectors are all deleted (1.5 MB for 384 values) and gives
+// it to no other folder, so removing a folder would leave its vector storage allocated for good. compact() deletes such empty
+// blocks from vec0's own tables. That is touching another library's tables, so it is done only for the pinned version, only if
+// the three tables have exactly the columns of 0.1.6, and only if the vector table answers the same count afterwards.
+// vec0 numbers a new block with an AUTOINCREMENT in chunks_vec_chunks but gives its vector row "highest rowid + 1" in
+// chunks_vec_vector_chunks00; the two agree only while the block with the highest number exists. So the highest block is never
+// deleted (if it is empty it waits for the next compact, after a newer block exists), and the two tables are compared afterwards.
+const VEC_SHADOWS = {
+  chunks_vec_chunks: 'chunk_id,size,sequence_id,partition00,validity,rowids',
+  chunks_vec_rowids: 'rowid,id,chunk_id,chunk_offset',
+  chunks_vec_vector_chunks00: 'rowid,vectors',
+};
+function reclaimEmptyVecBlocks() {
+  if (db.selectValue('select vec_version()') !== 'v0.1.6') return 0;
+  for (const [t, cols] of Object.entries(VEC_SHADOWS)) {
+    if (db.selectValues("select name from pragma_table_info('" + t + "') order by cid").join(',') !== cols) return 0;
+  }
+  return tx(() => {
+    const ids = db.selectValues('select chunk_id from chunks_vec_chunks where validity = zeroblob(length(validity)) and chunk_id not in (select chunk_id from chunks_vec_rowids) and chunk_id < (select max(chunk_id) from chunks_vec_chunks)');
+    if (!ids.length) return 0;
+    const before = num(db.selectValue('select count(*) from chunks_vec'));
+    const set = JSON.stringify(ids);
+    db.exec({ sql: 'delete from chunks_vec_vector_chunks00 where rowid in (select value from json_each(?))', bind: [set] });
+    db.exec({ sql: 'delete from chunks_vec_chunks where chunk_id in (select value from json_each(?))', bind: [set] });
+    const apart = num(db.selectValue('select (select count(*) from chunks_vec_chunks where chunk_id not in (select rowid from chunks_vec_vector_chunks00)) + (select count(*) from chunks_vec_vector_chunks00 where rowid not in (select chunk_id from chunks_vec_chunks))'));
+    if (apart !== 0 || num(db.selectValue('select count(*) from chunks_vec')) !== before) {
+      throw new StoreError('COMPACT_CHECK', 'compact: the vector table changed while empty blocks were released; nothing was changed');
+    }
+    return ids.length;
+  });
+}
+
 function collectTransfer(result) {
   const seen = new Set(), list = [];
   const visit = (v) => {
@@ -268,25 +303,33 @@ async function open(a) {
   }
   try {
     d.exec('pragma foreign_keys = on');
-    const existing = currentVersion(d) > 0 ? vecDimsOf(d) : null;
+    const fresh = currentVersion(d) === 0;
+    if (fresh) d.exec('pragma auto_vacuum = 2');   // incremental; has an effect only while the file has no table
+    const existing = fresh ? null : vecDimsOf(d);
     if (existing != null && wantDims != null && existing !== wantDims) {
       throw new StoreError('DIMS_MISMATCH', 'this index holds vectors of ' + existing + ' values; a model of ' + wantDims + ' needs a new index', { have: existing, want: wantDims });
     }
     migrate(d, MIGRATIONS, { dims: wantDims == null ? DEFAULT_DIMS : wantDims });
     db = d;
-    conn = { dbName, vfs, dims: vecDimsOf(d) || DEFAULT_DIMS, persisted: null };
+    conn = { dbName, vfs, dims: vecDimsOf(d) || DEFAULT_DIMS };
   } catch (e) {
     try { d.close(); } catch (_) { /* nothing more to do */ }
     throw e;
   }
-  if (vfs === 'opfs-sahpool' && navigator.storage && typeof navigator.storage.persist === 'function') {
-    try { conn.persisted = await navigator.storage.persist(); } catch (_) { conn.persisted = null; }
-  }
   return info();
 }
 
-function info() {
+const sizeNow = () => num(db.selectValue('select page_count * page_size from pragma_page_count, pragma_page_size'));
+
+// persisted: whether the browser has promised not to clear this origin's storage (the page asks for that: persist() is not
+// available in workers); storage: how much the browser will let this origin keep, and how much it holds now.
+async function info() {
   needOpen();
+  let persisted = null, storage = null;
+  if (conn.vfs === 'opfs-sahpool' && typeof navigator !== 'undefined' && navigator.storage) {
+    try { persisted = await navigator.storage.persisted(); } catch (_) { persisted = null; }
+    try { const e = await navigator.storage.estimate(); storage = { quota: e.quota, usage: e.usage }; } catch (_) { storage = null; }
+  }
   return {
     schemaVersion: currentVersion(db),
     vfs: conn.vfs,
@@ -294,8 +337,9 @@ function info() {
     vec: db.selectValue('select vec_version()'),
     dims: conn.dims,
     dbName: conn.dbName,
-    bytes: num(db.selectValue('select page_count * page_size from pragma_page_count, pragma_page_size')),
-    persisted: conn.persisted,
+    bytes: sizeNow(),
+    persisted,
+    storage,
   };
 }
 
@@ -304,6 +348,23 @@ const OPS = {
   open,
   info: () => info(),
   ops: () => Object.keys(OPS),
+
+  // Gives back the space of deleted rows: the empty vector blocks of removed folders are deleted, the pages on the free list are
+  // released and the file gets smaller. (An index made by an older build without auto_vacuum is rewritten instead, which needs
+  // room for a second copy while it runs.)
+  compact() {
+    needOpen();
+    const before = sizeNow(), mode = num(db.selectValue('pragma auto_vacuum')) === 2 ? 'incremental' : 'vacuum';
+    const blocks = reclaimEmptyVecBlocks();
+    if (mode === 'vacuum') db.exec('vacuum');
+    else {
+      // one page is given back for each step of the statement, and db.exec steps a statement that returns rows only when
+      // it is given a callback: so it is stepped here until it is done
+      const st = db.prepare('pragma incremental_vacuum');
+      try { while (st.step()) { /* a page released */ } } finally { st.finalize(); }
+    }
+    return { before, after: sizeNow(), mode, blocks };
+  },
   close() { if (db) { try { db.close(); } finally { db = null; conn = null; } } return { closed: true }; },
 
   'principal.ensure'(a) {
