@@ -51,7 +51,7 @@ PH.loadFacts = async () => { PH.facts = (await (await fetch(FIX + 'FACTS.json'))
 
 // parse bytes the way the indexer sends them: in pieces
 PH.parseBytes = async (bytes, ext, o = {}) => PH.client.parse(PH.pieces(bytes, o.pieceSize || 1048576),
-  { ext, path: o.path || 'test.' + ext, size: bytes.length, maxTokens: o.maxTokens || 512, modelKey: o.modelKey || 'bge', slim: !!o.slim, timeoutMs: 0, maxBytes: o.maxBytes, onStage: o.onStage });
+  { ext, path: o.path || 'test.' + ext, size: bytes.length, maxTokens: o.maxTokens || 512, modelKey: o.modelKey || 'bge', slim: !!o.slim, timeoutMs: 0, maxBytes: o.maxBytes, overlap: o.overlap, onStage: o.onStage });
 PH.parseString = (s, ext, o) => PH.parseBytes(new TextEncoder().encode(s), ext, o);
 
 // the overlap of the chunks of one section (same heading path and page): how many pairs, and which are outside 10 to 15% of the earlier chunk
@@ -231,6 +231,57 @@ PH.oracleHeadings = async (path) => {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   doc.querySelectorAll('script,style,nav,noscript,template,svg').forEach((n) => n.remove());
   return [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')].filter((h) => !h.closest('[hidden]')).map((h) => [h.classList.contains('ing-title') ? 0 : +h.tagName[1], h.textContent.replace(/\s+/g, ' ').trim()]).filter((x) => x[1]);
+};
+
+// mutated copies of corpus files (cut, cropped, lines shuffled, markup and odd characters put in): none may throw, hang, or break a chunk
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+PH.fuzz = async (paths, iterations, seed0) => {
+  const NASTY = ['<', '>', '"', "'", '`', '```', '|', '\n\n\n', '\r', '\t', '&', '&#x;', '&amp', '<!--', '-->', '<script>', '</p>', '<table>', '<td>', '{', '}', '[', ']', '#', '=====', '---', '* * *', '‮', ' ', ' '.repeat(50), '.'.repeat(30), 'x'.repeat(3000), '汉字'.repeat(40)];
+  const texts = {}; for (const f of paths) texts[f] = await (await fetch(FIX + f)).text();
+  const failures = []; let runs = 0, maxMs = 0, pairs = 0; const fail = (m, d) => { if (failures.length < 12) failures.push([m, d]); };
+  for (let it = 0; it < iterations; it++) {
+    const r = rng(seed0 + it), f = paths[Math.floor(r() * paths.length)], ext = f.split('.').pop(); let t = texts[f];
+    for (let m = 0, n = 1 + Math.floor(r() * 5); m < n; m++) {
+      const op = Math.floor(r() * 7), pos = Math.floor(r() * t.length);
+      if (op === 0) t = t.slice(0, pos); else if (op === 1) t = t.slice(0, pos) + t.slice(pos + Math.floor(r() * 400));
+      else if (op === 2) t = t.slice(0, pos) + NASTY[Math.floor(r() * NASTY.length)] + t.slice(pos);
+      else if (op === 3) { const ls = t.split('\n'); for (let i = ls.length - 1; i > 0; i--) if (r() < 0.2) { const j = Math.floor(r() * (i + 1)); [ls[i], ls[j]] = [ls[j], ls[i]]; } t = ls.join('\n'); }
+      else if (op === 4) t = t + t.slice(Math.floor(r() * t.length)); else if (op === 5) t = t.replace(/\n/g, r() < 0.5 ? '\r\n' : '\n\n'); else t = t.slice(pos) + t.slice(0, pos);
+    }
+    const t0 = performance.now();
+    try {
+      const doc = PH.chunker.parseTextFile(ext, t);
+      for (const b of doc.blocks) {
+        if (!(b.char_start >= 0 && b.char_end >= b.char_start && b.char_end <= doc.text.length)) fail('block range', [f, b.kind]);
+        if (b.kind !== 'heading' && ['txt', 'md', 'csv'].includes(ext) && doc.text.slice(b.char_start, b.char_end) !== b.text) fail('block text', [f, b.kind]);
+      }
+      const { chunks } = await PH.chunker.chunkDocument(doc, { count: async (x) => PH.count(x), maxTokens: 512 });
+      chunks.forEach((c, i) => {
+        if (doc.text.slice(c.char_start, c.char_end) !== c.text) fail('chunk text', [f, ext, i]);
+        if (c.tokens > 512 || c.tokens !== PH.tok.encode(c.input).length) fail('chunk tokens', [f, ext, i, c.tokens]);
+      });
+      const ov = PH.overlapReport(chunks, () => doc.text); pairs += ov.ovl;
+      if (ov.outsideCount || ov.disjoint) fail('overlap', [f, ext, ov.outside.slice(0, 2), ov.disjoint]);
+      runs++;
+    } catch (e) { fail('exception', [f, ext, String(e && e.stack || e).slice(0, 300)]); }
+    maxMs = Math.max(maxMs, performance.now() - t0);
+  }
+  return { runs, failures, maxMs: Math.round(maxMs), pairs };
+};
+// damaged PDF and Word files: each must settle (a result or a clean error), and the worker must go on afterwards
+PH.fuzzBinary = async (paths, seed0) => {
+  const out = []; let settled = 0;
+  for (let k = 0; k < paths.length; k++) {
+    const f = paths[k], ext = f.split('.').pop(), bytes = await PH.fetchBytes(FIX + f), r = rng(seed0 + k);
+    const variants = [bytes.slice(0, Math.floor(bytes.length * (0.3 + 0.5 * r()))), (() => { const b = bytes.slice(); for (let i = 0; i < 40; i++) b[Math.floor(r() * b.length)] = Math.floor(r() * 256); return b; })(), bytes.slice(Math.floor(bytes.length * 0.1))];
+    for (const v of variants) {
+      const t0 = performance.now();
+      const res = await Promise.race([PH.parseBytes(v, ext, { path: f }).then((x) => 'ok:' + x.chunks.length, (e) => 'error:' + String(e.message).slice(0, 60)), new Promise((rs) => setTimeout(() => rs('HANG'), 30000))]);
+      out.push([f.split('/').pop(), res, Math.round(performance.now() - t0)]); if (res !== 'HANG') settled++;
+    }
+  }
+  const after = await PH.parseString('Still working after the damaged files.', 'txt');
+  return { out, settled, total: out.length, after: after.chunks.length };
 };
 
 PH.memory = () => { const m = performance.memory; return m ? { used: m.usedJSHeapSize, total: m.totalJSHeapSize, limit: m.jsHeapSizeLimit } : null; };

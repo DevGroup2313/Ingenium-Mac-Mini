@@ -462,7 +462,6 @@ def norm(s):
 # =========================================================================================================== THE REGISTRY
 FILES = {}   # "folder/rel" -> {"data": bytes, "plain": str}
 PDFS = {}    # "folder/rel" -> the PdfBuilder that wrote it (to find a fact's page)
-DAY = {"Jan": "January", "Feb": "February"}
 
 
 def _put(folder, rel, data, plain):

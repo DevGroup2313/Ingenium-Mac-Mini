@@ -181,10 +181,10 @@ async function ensureServer() {
       PH.bridge.folders.clear();
       const { path } = await PH.loadCorpusFolder('household_papers');
       PH.setFile(path, 'bad/not_a.pdf', 'this is not a pdf', 5); PH.setFile(path, 'bad/unreadable.txt', 'cannot be read', 6); PH.setFile(path, 'bad/refused.md', '# Refused\n\nThe store will not take this file.', 7);
-      PH.setFile(path, 'bad/poison.txt', 'POISON text that the embedder will not take. ' + 'More words follow here. '.repeat(10), 8); PH.setFile(path, 'bad/huge.txt', 'x', 9); PH.bridge.folders.get(path).get('bad/huge.txt').bytes = new Uint8Array(2000);
+      PH.setFile(path, 'bad/poison.txt', 'POISON text that the embedder will not take. ' + 'More words follow here. '.repeat(10), 8); PH.setFile(path, 'bad/huge.txt', 'x', 9); PH.bridge.folders.get(path).get('bad/huge.txt').bytes = new Uint8Array(20000);
       PH.bridge.failRead.add('bad/unreadable.txt');
       const store = PH.fakeStore(), emb = PH.fakeEmbedder({ failOn: (t) => t.includes('POISON') }); store.failReplace.add('bad/refused.md');
-      const folder = await store.folder.add({ name: 'household_papers', path }); const ix = PH.createIndexer({ store, embedder: emb, maxFileBytes: 1500 }); const events = [];
+      const folder = await store.folder.add({ name: 'household_papers', path }); const ix = PH.createIndexer({ store, embedder: emb, maxFileBytes: 15000 }); const events = [];
       const sum = await ix.indexFolder(folder.id, { onProgress: (e) => events.push(e) }); const list = (await store.file.list({ folderId: folder.id })).map((f) => f.path);
       window.SC3 = { store, emb, ix, folder, path };
       // the next run tries the failed files again (and fails again), and the others are left alone
@@ -194,7 +194,7 @@ async function ensureServer() {
     });
     ok(r.sum.files.failed === 5 && r.sum.failures.length === 5 && r.sum.files.indexed === r.nGood && r.nGood === 20, 'five files fail (not a PDF, unreadable, refused by the store, refused by the embedder, too large) and are reported; the other ' + r.nGood + ' go in', r.errors);
     ok(r.errors.some(([p, m]) => p === 'bad/not_a.pdf' && /PDF/.test(m)) && r.errors.some(([p, m]) => p === 'bad/unreadable.txt' && /could not read/.test(m)) && r.errors.some(([p, m]) => p === 'bad/refused.md' && /store failed/.test(m)) &&
-      r.errors.some(([p, m]) => p === 'bad/poison.txt' && /embedder failed/.test(m)) && r.errors.some(([p, m]) => p === 'bad/huge.txt' && /too large/.test(m)), 'each failure says why, with the file\'s path (file-error events)');
+      r.errors.some(([p, m]) => p === 'bad/poison.txt' && /embedder failed/.test(m)) && r.errors.some(([p, m]) => p === 'bad/huge.txt' && /too large \(20 kB; the limit is 15 kB\)/.test(m)), 'each failure says why, with the file\'s path (file-error events)');
     ok(r.list.every((x) => !x.startsWith('bad/')), 'a file that failed leaves nothing in the index');
     ok(r.sum2.files.failed === 5 && r.sum2.files.indexed === 0 && r.sum2.files.skipped === 20, 'the next run tries the five again and leaves the twenty alone');
     const fatal = await ev(async () => {
@@ -217,12 +217,14 @@ async function ensureServer() {
       const s2 = await ix.indexFolder(folder.id, { confirmEmpty: true }); out.deleted2 = s2.files.deleted; out.afterConfirm = store.files.size; out.n0 = n0;
       PH.bridge.folders.set(path, saved);
       let err2 = null; try { await ix.indexFolder(9999); } catch (e) { err2 = e.code; } out.noFolder = err2;
+      const a = ix.indexFolder(folder.id); let err3 = null; try { await ix.indexFolder(folder.id); } catch (e) { err3 = e.code; } const first = await a; out.twice = [err3, first.files.total];
       return out;
     });
     ok(r.unavailable && r.unavailable[0] === 'FOLDER_UNAVAILABLE' && /drive/.test(r.unavailable[1]) && r.afterUnavailable === r.n0, 'a folder the app cannot list (a drive that is unplugged) stops the run with a plain reason and takes nothing out of the index', r.unavailable);
     ok(r.deleted1 === 0 && r.afterEmpty === r.n0 && r.emptyNotes.length === 1 && /not connected/.test(r.emptyNotes[0]), 'a folder that suddenly lists no files while files are indexed is taken for a drive that is not there: nothing is deleted, and the run says so', r.emptyNotes);
     ok(r.deleted2 === r.n0 && r.afterConfirm === 0, 'with confirmEmpty the files are taken out (' + r.deleted2 + ')');
     ok(r.noFolder === 'NO_SUCH_FOLDER', 'a folder that is not in the index is refused');
+    ok(r.twice[0] === 'ALREADY_RUNNING' && r.twice[1] === 20, 'a folder that is being read cannot be started a second time (ALREADY_RUNNING); the first run goes on and ends', r.twice);
   });
 
   // ------------------------------------------------------------------------------------------------------ stopping

@@ -59,7 +59,7 @@ function rssMB(pid) { try { const m = /VmRSS:\s+(\d+) kB/.exec(fs.readFileSync('
   await p.goto(HARNESS); await p.waitForFunction(() => window.PH && window.PH.ready === true, null, { timeout: 30000 });
   const tk = await ev(() => PH.loadTokenizer()); await ev(() => PH.loadFacts());
 
-  const SECTIONS = ['corpus', 'types', 'headings', 'offsets', 'pages', 'limits', 'overlap', 'metadata', 'facts', 'edge cases', 'hashing', 'big file', 'protocol'];
+  const SECTIONS = ['corpus', 'types', 'headings', 'offsets', 'pages', 'limits', 'overlap', 'metadata', 'facts', 'edge cases', 'robustness', 'hashing', 'big file', 'protocol'];
   const ran = [];
   const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e)); } ran.push(name); };
   const R = {};   // the report of each file (all folders): path -> analysis made in the page
@@ -323,18 +323,30 @@ function rssMB(pid) { try { const m = /VmRSS:\s+(\d+) kB/.exec(fs.readFileSync('
       const sent = (n) => { const w = []; for (let i = 0; i < n; i++) w.push(W[Math.floor(rnd() * W.length)]); return w.join(' ').replace(/^./, (c) => c.toUpperCase()) + '.'; };
       const long = Array.from({ length: 30 }, () => Array.from({ length: 3 }, () => sent(55 + Math.floor(rnd() * 60))).join(' ')).join('\n\n');
       const r = await PH.parseString(long, 'txt'); const ov = PH.overlapReport(r.chunks, () => r.text);
+      const r20 = await PH.parseString(long, 'txt', { overlap: 0.2 }); const ov20 = PH.overlapReport(r20.chunks, () => r20.text);
       const mini = await PH.parseString(Array.from({ length: 20 }, () => sent(20 + Math.floor(rnd() * 15))).join(' '), 'txt', { maxTokens: 256 });
       const word = await PH.parseString('\u6c49\u5b57'.repeat(1500) + '\n\nShort tail paragraph here.', 'txt');
       const head = '# ' + 'Very long heading about the sugar trade of Bristol in the eighteenth century '.repeat(9) + '\n\nBody text that follows the heading. '.repeat(3);
       const hr = await PH.parseString(head, 'md');
-      return { n: r.chunks.length, ov, frag: r.stats.fragments, maxLong: Math.max(...r.chunks.map((c) => PH.tok.encode(c.input).length)), miniMax: Math.max(...mini.chunks.map((c) => PH.tok.encode(c.input).length)), miniN: mini.chunks.length,
+      return { n: r.chunks.length, ov, ov20, frag: r.stats.fragments, maxLong: Math.max(...r.chunks.map((c) => PH.tok.encode(c.input).length)), miniMax: Math.max(...mini.chunks.map((c) => PH.tok.encode(c.input).length)), miniN: mini.chunks.length,
         wordMax: Math.max(...word.chunks.map((c) => PH.tok.encode(c.input).length)), wordN: word.chunks.length, hp: hr.chunks[0].heading_path.length, hin: PH.tok.encode(hr.chunks[0].input).length, hsplit: hr.chunks[0].input.split('\n\n')[0].length };
     });
     ok(e8.ov.outsideCount === 0 && e8.ov.ovl >= 20 && e8.frag >= 5, 'long sentences of 55 to 115 words: ' + e8.n + ' chunks, ' + e8.ov.ovl + ' overlaps all 10 to 15% (' + e8.ov.minR.toFixed(3) + ' to ' + e8.ov.maxR.toFixed(3) + '), the end of a sentence carried ' + e8.frag + ' times', e8.ov);
     ok(e8.maxLong <= 475, 'and none of those chunks is over 475 tokens (' + e8.maxLong + ')');
+    ok(e8.ov20.ovl >= 20 && e8.ov20.minR >= 0.16 - 1e-9 && e8.ov20.maxR <= 0.24 + 1e-9, 'the overlap can be asked for: 0.2 gives 16 to 24% (' + e8.ov20.minR.toFixed(3) + ' to ' + e8.ov20.maxR.toFixed(3) + ' in ' + e8.ov20.ovl + ' pairs)', e8.ov20);
     ok(e8.miniMax <= 256 && e8.miniN > 1, "for a model whose limit is 256 tokens the chunks are cut to fit (" + e8.miniN + " chunks, the largest " + e8.miniMax + ")", e8);
     ok(e8.wordMax <= 512 && e8.wordN >= 7, 'a text of 3,000 Chinese characters with no space and no full stop is cut by characters to fit (' + e8.wordN + ' chunks, the largest ' + e8.wordMax + ' tokens)', e8);
     ok(e8.hin <= 512 && e8.hp > 300 && e8.hsplit < e8.hp, "a heading path of " + e8.hp + " characters is shortened in the embedded input (" + e8.hin + " tokens) but kept whole as the chunk's heading_path", e8);
+  });
+
+  // ------------------------------------------------------------------------------------------------------ robustness
+  await section('robustness', async () => {
+    const paths = manifest.map((m) => m.path).filter((x) => /\.(txt|md|html|json|csv)$/.test(x) && !/logbook/.test(x));
+    const z = await ev((a) => PH.fuzz(a[0], a[1], a[2]), [paths, 700, 5000]);
+    ok(z.failures.length === 0 && z.runs === 700, z.runs + ' mutated copies of ' + paths.length + ' corpus files (cut, cropped, lines shuffled and doubled, stray markup, quotes, rules and odd characters put in) parse and chunk without an error; every chunk is exactly its slice and within the limit, and ' + z.pairs + ' overlaps are all 10 to 15% (slowest ' + z.maxMs + ' ms)', z.failures);
+    const bins = manifest.map((m) => m.path).filter((x) => /\.(pdf|docx)$/.test(x)).filter((_, i) => i % 3 === 0);
+    const z2 = await ev((a) => PH.fuzzBinary(a[0], a[1]), [bins, 77]);
+    ok(z2.settled === z2.total && z2.after === 1, z2.total + ' damaged PDF and Word files (cut short, bytes changed, start cut off) each end with a result or a plain error, none hangs, and the worker parses on afterwards', z2.out.filter((x) => x[1] === 'HANG' || x[2] > 5000));
   });
 
   // ------------------------------------------------------------------------------------------------------ hashing

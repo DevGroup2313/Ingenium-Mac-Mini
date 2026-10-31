@@ -5,7 +5,7 @@
 //
 //   import { createStore } from './store.js';
 //   const store = createStore();                       // starts the worker on the first call
-//   await store.open();                                // {schemaVersion, vfs, sqlite, vec, dims, dbName, bytes, persisted}
+//   await store.open();                                // {schemaVersion, vfs, sqlite, vec, dims, dbName, bytes, persisted, storage}
 //   const { id } = await store.principal.ensure({ name: 'me' });
 //   const folder = await store.folder.add({ name: 'Letters', path: '/Users/me/Letters' });
 //   await store.acl.grant({ folderId: folder.id, principalId: id });
