@@ -883,6 +883,12 @@ edit('Token <span class="muted small">(only for private repositories; kept on th
      'Token <span class="muted small">(optional: filled in once you sign in through Fabrica; kept on this device)</span>',
      "R114 the chat modal's token field, after the sign-in on GitHub's own page")
 
+# ---- R116 (Ingenium 6.9.1, 31 October 2026): LFM2.5 1.2B Thinking's file was replaced upstream (Hugging Face); the lineup's
+# entry in the base carries the new size and fingerprint, as build/lineup_quants.json and the Fire app's mobile_models.json do.
+edit('file:"LFM2.5-1.2B-Thinking-Q4_K_M.gguf",size:730895360,sha256:"7223a2202405b02e8e1e6c5baa543c43dc98c1d9741a5c2a0ee1583212e1231b"',
+     'file:"LFM2.5-1.2B-Thinking-Q4_K_M.gguf",size:730899072,sha256:"4a1e1824f71091f368137b6966094461019f6af3a5aadd96033bee59fc9eaeea"',
+     "R116 LFM2.5 1.2B Thinking's new file in the lineup")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
