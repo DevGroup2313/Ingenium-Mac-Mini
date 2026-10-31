@@ -23,6 +23,14 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
 .lu-cd-more[open] summary::before{content:"▾ ";}
 .lu-cd-more .lu-cd-why{margin-top:4px}
 .lu-big{display:grid;gap:8px}
+/* 6.9.2: the way back to Ingenium's choice, as text only */
+#page-models .lu-coders > button.lu-cd-back{justify-self:start;display:inline-flex;align-items:center;gap:6px;width:auto;max-width:100%;min-height:0;margin:2px 0 0;padding:4px 2px;
+  border:0;border-radius:6px;background:none;box-shadow:none;transform:none;color:var(--accent);font:600 12.5px/1.35 var(--sans);letter-spacing:0;text-align:left;
+  text-decoration:underline;text-decoration-color:rgba(var(--accent-line-rgb,106,63,181),.35);text-underline-offset:3px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#page-models .lu-coders > button.lu-cd-back::before{content:"\21BA";font-weight:400;font-size:14px;line-height:1;text-decoration:none;display:inline-block}
+#page-models .lu-coders > button.lu-cd-back:hover{text-decoration-color:currentColor;background:none;box-shadow:none;transform:none}
+#page-models .lu-coders > button.lu-cd-back:active{opacity:.75;transform:none;box-shadow:none}
+#page-models .lu-coders > button.lu-cd-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lu-big>summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:6px 2px;list-style:none}
 .lu-big>summary::-webkit-details-marker{display:none}
 .lu-big>summary::before{content:"▸ ";color:var(--accent)}
@@ -85,7 +93,9 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
         big.appendChild(row);}
       else box.appendChild(row);});
     if(big)box.appendChild(big);
-    if(picked&&!web){var bk=el("button","btn xs ghost","Back to Ingenium's choice for "+label());bk.type="button";bk.onclick=back;box.appendChild(bk);}
+    /* 6.9.2 (her words, 31 October 2026: "limit the button [...] to only the text, I don't like the long raised line look"): the way
+       back is a line of text with a small mark, as wide as its words, not a raised bar across the card */
+    if(picked&&!web){var bk=el("button","lu-cd-back","Back to Ingenium's choice for "+label());bk.type="button";bk.onclick=back;box.appendChild(bk);}
     tile.appendChild(box);tile.classList.add("lu-has-coders");
     ks.forEach(function(k){if(lineupJobs[k]&&lineupJobs[k].state==="running")paintJob(k);});}
   function paintJob(k){var job=lineupJobs[k],row=document.querySelector('.lu-cd[data-cd="'+k+'"]');if(!job||!row)return;
