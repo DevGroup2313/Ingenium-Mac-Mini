@@ -79,10 +79,10 @@ def card(name):
         return
     n = 0
     for ln in text.splitlines():
-        if re.search(r"(?i)livecodebench|humaneval|swe-?bench|aider|mbpp|bigcodebench|terminal-?bench|codeforces|parameters|context length|active", ln) and len(ln) < 600:
+        if re.search(r"(?i)livecodebench|humaneval|swe-?bench|aider|mbpp|bigcodebench|terminal-?bench|codeforces|parameters|context length|active|temperature|top_p|top_k|min_p|presence_penalty|enable_thinking|reasoning_effort|thinking_budget|licen[cs]e|mmlu|gpqa|ifeval|aime|arena", ln) and len(ln) < 600:
             print("C %s | %s" % (name, ln.strip()))
             n += 1
-            if n >= 40:
+            if n >= 80:
                 break
 
 
