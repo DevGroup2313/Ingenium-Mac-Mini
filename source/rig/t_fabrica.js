@@ -44,7 +44,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(hist.view === 'history' && hist.cards.length === 2 && /Changes to app\.js/.test(hist.cards[0]) && hist.cards[1] === 'First version' && hist.here && /Kept/.test(hist.chip), 'kept: the history shows both versions, newest first', JSON.stringify(hist));
   // the history card opens with its files and keys
   await p.click('#fbWorkBody .f-cm'); await p.waitForTimeout(700);
-  const card = await p.evaluate(() => { const c = document.querySelector('#fbWorkBody .f-cm'); return { open: c.getAttribute('aria-expanded'), files: [...c.querySelectorAll('.fl li')].map(x => x.textContent), keys: [...c.querySelectorAll('.f-acts .f-btn')].map(x => x.textContent) }; });
+  const card = await p.evaluate(() => { const c = document.querySelector('#fbWorkBody .f-cm'); return { open: c.getAttribute('aria-expanded') || c.getAttribute('data-open') /* 6.9.2: the rooms pass (fabrica_rooms) moves the state to data-open and a button inside */, files: [...c.querySelectorAll('.fl li')].map(x => x.textContent), keys: [...c.querySelectorAll('.f-acts .f-btn')].map(x => x.textContent) }; });
   ok(card.open === 'true' && card.files.join(',') === 'app.js,readme.md (added)' && /^See the changes\|Undo it\|Mark a release(\|Compare\|Browse the files)?$/.test(card.keys.join('|')), 'a version opens to its files and its keys', JSON.stringify(card));
   // mark a release through the sheet
   await p.evaluate(() => { [...document.querySelectorAll('#fbWorkBody .f-cm .f-acts .f-btn')].find(x => x.textContent === 'Mark a release').click(); }); await p.waitForTimeout(300);
