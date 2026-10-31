@@ -371,6 +371,94 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.1 (31 October 2026; her words: "I want Ingenium and all of its mini apps to work as one ecosystem the same way
+that Carpe Diem does [...] I want the Word documents created on the Chats page, Lector Page or Career studio to be able to be
+sent and opened in Tabula or the Excel spreadsheets to be able to be opened in Abacus, and the powerpoint slides in Imago and
+so forth [...] I want every page and feature to be aware of each other and the rest of the app", and "I want to be able to
+import my exported data from other chats into the app and continue working on my projects smoothly. It needs to be a smooth
+handoff from any frontier provider").
+- `build/modules/r194.js` (IngOpenIn): a document made anywhere opens in its app as the very file a Save key gives. The
+  chat's document card's Tabula key hands the Word file (r183, as the page shows it) to Tabula's own opener (__cdOpenFile),
+  the sheet card's Abacus key hands the workbook (formulas kept) and the slides card has a new Imago key for the deck; the
+  reading page (r108, Open in Tabula beside Save) and the Career Studio (r188, Open in Tabula beside Save as Word) hand their
+  own Word files; an app holding work is asked (Replace it, or A second window, the safe way out) and the document opens in a
+  second window of that app; inside each app a From Ingenium key (Tabula's File menu, beside Abacus's Open .xlsx and Imago's
+  Open .pptx) lists what the chat, the reading page and the studio have made and opens one there; the file Imago asks the host
+  to download (carpe-download) is saved. The old routes (web text through a storage line, CSV) are no longer used for documents.
+- The chats carried over from other assistants (`build/thoughts/chat_import_core.html`, `build/modules/r160.js`): Claude Code's
+  session files (.jsonl: one conversation a session, named by its summary, thinking kept, the tools it used and what they
+  answered under the reply, its folder in a note); transcripts headed by Perplexity, Kimi, Poe, Meta AI and others, and by
+  "Q:" and "A:"; a conversation pasted in (Settings, Paste a transcript; the list's Paste a conversation; a file dropped on
+  the Settings card); what was left aside is named, and a dialog that found nothing offers the paste; a transcript is known by
+  its words (two pasted conversations are two); the card names the model the conversation was written with; and the first
+  reply after a conversation is carried over tells the model where it came from, with the brief, once (it stays on that
+  message as its context).
+- Her words (31 October 2026): "Scriba and Fontes are missing their apps symbols from their buttons. The close button from the
+  About panel is a different shade of purple from the rest of the app, please fix it. Also, I don't love the look of the
+  "Where you were" card, please fix it." `build/modules/r193.js`: Scriba's and Fontes's stones in the rail carry the Forge's
+  own marks before their names (the Forge's drawings, in its colours). `build/modules/r196.js`: the primary key of every raised
+  card (About's Close, Help, Display, the tour, the dialogs, the support notes) is the page's own primary key again (its
+  gradient, its gold ring, its lift), by day and by night; r184 had given them a quieter, greyed amethyst. "Where you were":
+  each line carries a drawn mark on an amethyst disc (a step, a conversation, a timer, a parked thought) in place of a type
+  glyph (the dotted circle read as an empty hole), its title sits on a fine rule, Not now is a raised ghost key, the card is
+  no wider than its words, and it arrives with the raised cards' spring.
+
+    node rig/t_696_cards.js <url> <out>                                        # 13 checks: About's Close against the page's own key by day and by night, the card's marks, keys, width and arrival
+    node rig/t_693_stones.js <url> <out>                                       # 17 checks since 6.9.1 (the marks on Scriba and Fontes)
+
+- GitHub's own sign-in page (her words, 30 October 2026: "I want Ingenium to be load up the GitHub sign-in page instead of
+  prompting me to create a code or key in order to gain access to GitHub and my account's repositories"). `build/modules/r114.js`:
+  Fabrica's GitHub signs in through GitHub's device flow: Sign in with GitHub asks GitHub for a short code, opens GitHub's own
+  sign-in page (the computer app's browser through the new `open_url` of `desktop/app_open_691.py`; the Fire and iPhone apps
+  through the new `openUrl` of their bridges), shows the code to type there with Copy, waits (never asking GitHub faster
+  than it allows), and keeps the sign-in on the device as the token was kept (`state.github.token`, `via:"device"`), with
+  Paste a token instead beside it. GitHub's sign-in endpoints refuse a page in a browser, so the asking goes through
+  `netFetch` (the relay, the bridges); in a plain browser the token stays the way in, and the row says so. The app id (an
+  OAuth App's public client id) is the owner's: GitHub, Settings, Developer settings, OAuth Apps, New OAuth App, with
+  Enable Device Flow ticked; it goes in once under Another app id (or Add the app id), and is kept in `state.github.client`.
+  The sign-in asks for the scopes repo and workflow (a kit's workflow files cannot be sent without the second).
+  `rig/ghmock.py` answers the device flow; `rig/t_fabrica_github.js` signs in on the page first, then with a token.
+
+- The Fire tablet's second built-in model: LFM2.5 1.2B Thinking's file on Hugging Face was replaced upstream (730,899,072
+  bytes, fingerprint 4a1e1824…), so the 6.9 Fire build refused it; `lineup_quants.json` and the Fire repository's
+  `mobile_models.json` pin the new fingerprint, read from Hugging Face by `.github/workflows/lineup-sources.yml` (round 6).
+
+    node rig/t_695_openin.js <url> <out>                                       # 16 checks: the three cards, Tabula holding work, From Ingenium inside each app, the studio's and the reading page's keys, Imago's download
+    node rig/import_fixtures.js <served>/imp && node rig/t_694_import.js <url> <out> <url>/imp   # 18 checks: Claude Code sessions, other heads, Q and A, what is left aside, the paste, the model told once
+    (rig/t_62_import.js's check "Ollama is told how much to keep (num_ctx)" has failed since r190 wrapped cloudChat; it reads the function's source)
+
+Ingenium 6.9.1 (30 October 2026; her words: "I want for context and tokens to be massively increased inside of Ingenium").
+`build/modules/r195.js`, a longer memory, seen, with the R195 edits in `build_page.py`:
+- The page's own engine says what memory it really loaded (it loaded 8,192 whatever the slider said, and the slider reached
+  32,768, so the engine refused long conversations instead of the page trimming them); the history is fitted to that, and
+  the slider reaches 32,768 only where the fast engine runs on a computer with 8 GB or more.
+- A document, an app or a change asked of a server on this computer or in the home (Ollama, LM Studio) keeps its room with
+  Thinking off too (it was cut at the slider's 1,024 tokens); a personal AI's length is a floor, never a cut below that room;
+  on the computer engine a thinking budget comes on top of the reply (the slider, the budget and 512 more).
+- A connected model's window and longest reply are read from the service's own list of models when it gives them (Settings'
+  List models, or the first reply), kept by id in `state.cloud.info`; without a list, a current model of Anthropic's (a
+  version of 4.6 or later in its id) is given a million tokens (it was 200,000), and its reply up to 128,000 (32,000 stays
+  the floor when the list is not read); a remote server's reply reaches the cap its list names; the Longest reply slider
+  reaches the model's own cap on a connection; a reply of more than 32,000 tokens is given 1,800 seconds through the apps'
+  relay (120 or 900 before); the reading page's parts follow a lender's window when it is known, up to 262,144.
+- A memory meter: under the Context window slider, "Memory in use: 41,200 of 131,072 tokens (31%) · 212 messages in the
+  window · 88 recalled" from the engines' own counts (the computer engine's usage and the tokens its cache reused, the
+  services' counts in their streams, Ollama's), or an estimate; the fit of the chosen window on this device beside the
+  slider, before it is loaded; and a small pill beside the model key that says the same in short and opens Controls.
+- A rolling summary: when a conversation's oldest messages are put away (r103) or recalled (r159), one background job asks
+  the model (Thinking off, 600 tokens, chunks that fit 40% of the memory, at most four rounds a run; never while a reply is
+  live or a model is loading, only a model already loaded on the device, or the connection) for a summary of at most 250
+  words (names, decisions, open tasks, file names), kept as `c.summary` (at most 4,000 characters) and `c.summaryN`; the
+  brief of what came before gives it 60% of its room, and the room recalled scales with the memory (about 48,000
+  characters at 200,000 tokens; it was 16,000 whatever the memory).
+- The computer app's automatic memory reaches 262,144 and 196,608 by the same 70% rule, for a model trained for them, and
+  reads a model's header for its trained length before choosing when it is not yet known.
+Not in this stage: the lender's own window sent and reported (`ingenium_ctx`, `_share_models`) and the phones' and tablets'
+engine (their caps, eight-bit memory and thinking budget), which touch the Python and native apps.
+
+    python3 rig/mockcloud.py 18795 <out>/mock_req.json &  # started by the test itself; its lists now carry each model's window and longest reply
+    node rig/t_695_memory.js <url> <out>                  # 30 checks
+
 Ingenium 6.9 (30 October 2026; her words: "The "On" button for the Sounds feature and the "Ingenium" button on the Chat panel
 look really flat compared to the rest of the buttons on the display panel, please make the fix so that they match the rest of
 the other pressed buttons inside of the Display panel", "I want a better example for Ingenium's chat tour because the current

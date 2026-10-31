@@ -34,10 +34,12 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // 3. Lector's document goes the same way, each time
   /* R123: Tabula is already open on the Desk, so Lector's document goes into it as Carpe Diem sends one to a running
      Tabula: added to the page under its title, and no second Tabula is built on the old hidden page */
-  await p.evaluate(() => { state.tabulaDoc = { title: '', body: '' }; saveState(); lxToTabula('From Lector', '## Dossier\n\nA paragraph written by Lector.'); });
+  /* 6.9.1 (r194): the document goes to Tabula as the Word file its key saves, through Tabula's own opener; Tabula holds
+     words from the step before, so it asks (Replace it, or A second window): here the answer is Replace it */
+  await p.evaluate(() => { state.tabulaDoc = { title: '', body: '' }; saveState(); window.ingAsk = function () { return Promise.resolve(true); }; lxToTabula('From Lector', '## Dossier\n\nA paragraph written by Lector.'); });
   await p.waitForFunction(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); try { return /paragraph written by Lector/.test(f.contentWindow.document.getElementById('editor').innerText); } catch (e) { return false; } }, null, { timeout: 30000 }).then(() => ok(true, 'a document opened from Lector arrives in the whole Tabula'), () => ok(false, 'a document opened from Lector arrives in the whole Tabula'));
-  const t2 = await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const hs = [...f.contentWindow.document.querySelectorAll('#editor h2')].map(h => h.textContent); return { hs, hidden: !!document.getElementById('ingApp-tabula'), frames: document.querySelectorAll('iframe[data-app="tabula"]').length, page: IngDesk.state().active }; });
-  ok(t2.hs.includes('From Lector') && !t2.hidden && t2.frames === 1 && t2.page === 'tabula', 'with its title, in the one Tabula on the Desk (none built on the hidden page)', JSON.stringify(t2));
+  const t2 = await p.evaluate(() => { const f = document.querySelector('#ing-desk iframe[data-app="tabula"]'); const d = f.contentWindow.document; return { title: (d.getElementById('docTitle') || {}).value, dossier: /Dossier/.test(d.getElementById('editor').innerText), hidden: !!document.getElementById('ingApp-tabula'), frames: document.querySelectorAll('iframe[data-app="tabula"]').length, page: IngDesk.state().active }; });
+  ok(t2.title === 'From Lector' && t2.dossier && !t2.hidden && t2.frames === 1 && t2.page === 'tabula', 'with its title and its heading, in the one Tabula on the Desk (none built on the hidden page)', JSON.stringify(t2));
 
   // 4. Abacus: the small grid's cells go over once (formulas as their values), and a table sent from elsewhere replaces the book
   await p.evaluate(() => go('abacus'));

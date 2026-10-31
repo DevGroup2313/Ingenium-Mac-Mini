@@ -57,7 +57,16 @@ class H(http.server.BaseHTTPRequestHandler):
         if self.path.endswith("/api/tags"):
             return self._send(200, "application/json", json.dumps({"models": [{"name": "llama3.2:3b"}, {"name": "qwen3:8b"}]}).encode())
         if self.path.endswith("/models"):
-            return self._send(200, "application/json", json.dumps({"data": [{"id": "stand-in-a"}, {"id": "stand-in-b"}]}).encode())
+            # 6.9.1: the lists carry each model's window and longest reply, as the services' own lists do: Anthropic's shape
+            # (max_input_tokens, max_tokens) when the request carries its key header, OpenRouter's (context_length,
+            # top_provider.max_completion_tokens) otherwise
+            if self.headers.get("x-api-key"):
+                return self._send(200, "application/json", json.dumps({"data": [
+                    {"type": "model", "id": "claude-opus-5-5", "display_name": "Stand-in Opus", "max_input_tokens": 1000000, "max_tokens": 128000},
+                    {"type": "model", "id": "claude-haiku-4-5", "display_name": "Stand-in Haiku", "max_input_tokens": 200000, "max_tokens": 64000}],
+                    "has_more": False}).encode())
+            return self._send(200, "application/json", json.dumps({"data": [
+                {"id": "stand-in-a", "context_length": 131072, "top_provider": {"max_completion_tokens": 32768}}, {"id": "stand-in-b"}]}).encode())
         return self._send(404, "application/json", b'{"error":{"message":"not found"}}')
 
     def do_POST(self):
@@ -100,13 +109,15 @@ class H(http.server.BaseHTTPRequestHandler):
             ch.append("data: %s\n\n" % json.dumps({"choices": [{"delta": {"reasoning_content": "Thinking briefly."}}]}))
             for w in REPLY.split(" "):
                 ch.append("data: %s\n\n" % json.dumps({"choices": [{"delta": {"content": w + " "}}]}))
+            if (body.get("stream_options") or {}).get("include_usage"):  # 6.9.1: the count, in a last chunk, as OpenAI sends it
+                ch.append("data: %s\n\n" % json.dumps({"choices": [], "usage": {"prompt_tokens": 12, "completion_tokens": 7, "total_tokens": 19}}))
             ch.append("data: [DONE]\n\n")
             return self._stream("text/event-stream", ch)
         if self.path.endswith("/api/chat"):
             ch = [json.dumps({"message": {"role": "assistant", "thinking": "Hmm."}, "done": False}) + "\n"]
             for w in REPLY.split(" "):
                 ch.append(json.dumps({"message": {"role": "assistant", "content": w + " "}, "done": False}) + "\n")
-            ch.append(json.dumps({"done": True}) + "\n")
+            ch.append(json.dumps({"done": True, "prompt_eval_count": 12, "eval_count": 7}) + "\n")  # 6.9.1: Ollama's own count
             return self._stream("application/x-ndjson", ch)
         return self._send(404, "application/json", b'{"error":{"message":"not found"}}')
 

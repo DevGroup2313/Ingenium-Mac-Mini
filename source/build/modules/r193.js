@@ -16,6 +16,9 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 rgba(12,18,26,.55),0 3px 4px rgba(12,18,26,.4),0 7px 11px rgba(12,18,26,.28);
   transition:transform .09s cubic-bezier(.34,1.3,.64,1),box-shadow .09s ease,filter .12s ease}
 .dock .nav-btn.ing-stone svg{display:none}
+/* Scriba and Fontes carry their own mark before the name, as the Forge's stones do (its own drawings and colours) */
+.dock .nav-btn.ing-stone svg.ing-stone-sym{display:inline-block;width:12px;height:12px;flex:none;margin:0 5px 0 -2px}
+.dock .nav-btn.ing-stone[data-page="scriba"] svg.ing-stone-sym{width:13px;height:13px}
 .dock .nav-btn.ing-stone[data-page="fontes"]{color:#0f4b66;text-shadow:0 1px 0 rgba(255,255,255,.55),0 1px 1px rgba(120,90,40,.2)}
 .dock .nav-btn.ing-stone:hover{transform:translateY(-2px);filter:brightness(1.06);color:#fff;background-color:#27272a;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 3px rgba(12,18,26,.4),0 6px 12px rgba(12,18,26,.28),0 12px 22px rgba(12,18,26,.18)}
@@ -52,6 +55,8 @@ body.nav-collapsed .dock .nav-btn.ing-stone{max-width:44px;padding:0 6px;justify
 (function(){"use strict";
 if(window.__r193)return;window.__r193=1;
 var APPS=["tabula","abacus","slides","scriba","fontes"];
+var SYM={fontes:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#145671" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19h14"></path><path d="M8.2 19c0-2.9 1.5-4.9 3.8-6.2 2.3 1.3 3.8 3.3 3.8 6.2"></path><path d="M12 12.8V5"></path><path d="M9.5 7.5C10.1 6.4 11 5.5 12 5c1 .5 1.9 1.4 2.5 2.5"></path></svg>',
+  scriba:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f0dca6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.5c2.9 2.2 4.3 4.6 4.3 7.2L13.5 20l-4.3-9.3c0-2.6 1.4-5 4.3-7.2z"></path><path d="M13.5 11.6V20"></path><circle cx="13.5" cy="10.4" r="1"></circle><path d="M6 9c-.8.9-1.2 1.9-1.2 3s.4 2.1 1.2 3"></path><path d="M3.6 7.2C2.6 8.6 2 10.4 2 12s.6 3.4 1.6 4.8"></path></svg>'};
 /* the stone each app wears on Home (jewels.css, written into r147): read off a probe, so the picture is kept in one place */
 var probe=null,cache={};
 function stoneImage(k){if(cache[k])return cache[k];
@@ -63,7 +68,10 @@ function stoneImage(k){if(cache[k])return cache[k];
 function dress(){var dock=document.querySelector(".dock");if(!dock)return;
   APPS.forEach(function(k){var b=dock.querySelector('.nav-btn[data-page="'+k+'"]');if(!b||b.classList.contains("ing-stone"))return;
     var img=stoneImage(k);if(!img)return;b.classList.add("ing-stone");b.style.backgroundImage=img;
-    if(!b.title)b.title=(b.textContent||"").trim();});
+    if(!b.title)b.title=(b.textContent||"").trim();
+    /* the Forge's own marks on Scriba and Fontes (the owner's words, 31 October 2026: "Scriba and Fontes are missing their apps symbols from their buttons") */
+    if(SYM[k]&&!b.querySelector("svg.ing-stone-sym")){var t=document.createElement("template");t.innerHTML=SYM[k];var sv=t.content.firstElementChild;if(sv){sv.classList.add("ing-stone-sym");sv.setAttribute("aria-hidden","true");sv.setAttribute("focusable","false");
+        var tx=null;for(var i=0;i<b.childNodes.length;i++){if(b.childNodes[i].nodeType===3&&b.childNodes[i].nodeValue.trim()){tx=b.childNodes[i];break;}}b.insertBefore(sv,tx||null);}}});
   var lab=dock.querySelector(".grp-label.ing-fold");
   if(lab&&!lab.querySelector(".ing-fak-dots")){var d=document.createElement("span");d.className="ing-fak-dots";d.setAttribute("aria-hidden","true");
     APPS.forEach(function(k){var i=document.createElement("i");i.setAttribute("data-app",k);d.appendChild(i);});lab.appendChild(d);}}

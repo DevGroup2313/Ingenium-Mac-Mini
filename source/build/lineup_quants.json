@@ -54,8 +54,8 @@
 "lfm2.5-1.2b-thinking":{
 "Q4_K_M":{
 "file":"LFM2.5-1.2B-Thinking-Q4_K_M.gguf",
-"size":730895360,
-"sha256":"7223a2202405b02e8e1e6c5baa543c43dc98c1d9741a5c2a0ee1583212e1231b",
+"size":730899072,
+"sha256":"4a1e1824f71091f368137b6966094461019f6af3a5aadd96033bee59fc9eaeea",
 "url":"https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking-GGUF/resolve/main/LFM2.5-1.2B-Thinking-Q4_K_M.gguf"
 },
 "Q5_K_M":{

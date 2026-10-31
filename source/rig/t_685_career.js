@@ -101,7 +101,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   const pane = await p.evaluate(() => ({ count: (document.querySelector('#cs .c-count') || {}).textContent || '', cover: (document.querySelector('#cs .c-cover') || {}).textContent || '', keys: [...document.querySelectorAll('#cs .c-work .c-pn-f .c-btn')].map(x => x.textContent) }));
   ok(/^\d+ words, \d+ over the posting's limit of 120\./.test(pane.count), "the letter's length is shown against the posting's limit", pane.count);
   ok(/It speaks to 2 of 6 criteria/.test(pane.cover) && /Essential, not found in it: A PhD in history or a related field; Experience of building digital tools\./.test(pane.cover), 'which criteria it speaks to is shown, and the essential ones it does not', pane.cover);
-  ok(pane.keys.join('|') === 'Improve it|Change it|Copy the text|Write it again|Save as PDF|Save as Word', 'its keys: Improve it first, then as before', pane.keys.join('|'));
+  ok(pane.keys.join('|') === 'Improve it|Change it|Copy the text|Write it again|Open in Tabula|Save as PDF|Save as Word', 'its keys: Improve it first, then as before', pane.keys.join('|'));
   ok(await still() === 0, 'the page does not scroll with the letter open');
   await p.screenshot({ path: OUT + '/letter.png' });
 

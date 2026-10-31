@@ -10,13 +10,30 @@ const mock = async (p, init) => { const r = await fetch(API + p, Object.assign({
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200))); p.on('console', m => { if (m.type() === 'warning' || m.type() === 'error') console.log('  [console]', m.text().slice(0, 300)); });
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 120000 }); await p.waitForTimeout(1000);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); });
-  const id = await p.evaluate(async (API) => { state.github = { api: API }; const rs = await IngRepo.list(); for (const r of rs) await IngRepo.remove(r.id);
+  const id = await p.evaluate(async (API) => { state.github = { api: API, web: API, client: 'Ov23liTEST' }; const rs = await IngRepo.list(); for (const r of rs) await IngRepo.remove(r.id);
     const x = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><meta charset="utf-8"><meta name="ingenium-build" content="1.0.0"><title>Notes</title><h1>Notes</h1><script src="app.js"></script>' }, { path: 'style.css', data: 'body{font:16px serif}' }, { path: 'app.js', data: 'document.title="Notes";' }], { name: 'My Notes', msg: 'First version' });
     state.fabrica = state.fabrica || {}; state.fabrica.sel = x.id; state.fabrica.gh = true; saveState(); go('fabrica'); return x.id; }, API);
   await p.waitForTimeout(1200);
   const rows = () => p.evaluate(() => [...document.querySelectorAll('#fbCopies .f-cp .t')].map(t => t.firstChild.textContent.trim()));
   ok((await rows()).includes('Sign in to GitHub'), 'with GitHub on and no token, the panel offers to sign in', (await rows()).join(' | '));
-  await p.evaluate(() => { [...document.querySelectorAll('#fbCopies .f-btn')].find(x => x.textContent === 'Sign in').click(); }); await p.waitForTimeout(300);
+  // 6.9.1: GitHub's own sign-in page (the device flow), then the token as the other way in
+  const keys0 = await p.evaluate(() => [...document.querySelectorAll('#fbCopies .f-btn')].map(x => x.textContent));
+  ok(keys0.includes('Sign in with GitHub') && keys0.includes('Paste a token instead'), "the keys: Sign in with GitHub (its own page), or paste a token", keys0.join('|'));
+  const popups = []; p.context().on('page', pg => { popups.push(pg); pg.waitForLoadState().catch(() => {}); });
+  await p.evaluate(() => { [...document.querySelectorAll('#fbCopies .f-btn')].find(x => x.textContent === 'Sign in with GitHub').click(); });
+  await p.waitForFunction(() => /ABCD-1234/.test((document.querySelector('#fb .f-sheet .f-gh-code') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => {});
+  await p.waitForTimeout(800);
+  const sheet = await p.evaluate(() => ({ code: (document.querySelector('#fb .f-sheet .f-gh-code') || {}).textContent, wait: (document.querySelector('#fb .f-sheet .f-gh-wait') || {}).textContent }));
+  sheet.opened = popups.map(pg => pg.url()); for (const pg of popups) { try { await pg.close(); } catch (e) { } }
+  ok(sheet.code === 'ABCD-1234' && /Waiting for you on GitHub/.test(sheet.wait) && sheet.opened.some(u => /\/login\/device$/.test(u)), "GitHub's code is shown, its sign-in page opened in a window of its own, and the app waits", JSON.stringify(sheet));
+  await p.waitForTimeout(1500); await mock('/_approve', { method: 'POST' });
+  await p.waitForFunction(() => [...document.querySelectorAll('#fbCopies .f-cp .t')].some(t => /Signed in as testowner/.test(t.textContent)), null, { timeout: 40000 }).catch(() => {});
+  const signed = await p.evaluate(() => ({ token: state.github.token, via: state.github.via, sheet: !!document.querySelector('#fb .f-sheet') }));
+  const oa = await mock('/_oauth');
+  ok(signed.token === 'gho_test' && signed.via === 'device' && !signed.sheet && oa.scope === 'repo workflow' && oa.grant === 'urn:ietf:params:oauth:grant-type:device_code' && oa.polls >= 2, 'once allowed on GitHub, the sign-in arrives (repo and workflow asked for), the sheet closes', JSON.stringify({ signed, oa }));
+  ok((await rows()).some(t => /Signed in as testowner/.test(t)), "signed in as testowner, on GitHub's own page", (await rows()).join(' | '));
+  await p.evaluate(() => { [...document.querySelectorAll('#fbCopies .f-btn')].find(x => x.textContent === 'Sign out').click(); }); await p.waitForTimeout(500);
+  await p.evaluate(() => { [...document.querySelectorAll('#fbCopies .f-btn')].find(x => x.textContent === 'Paste a token instead').click(); }); await p.waitForTimeout(300);
   await p.fill('#fb .f-sheet input', 'test-token'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(900);
   ok((await rows()).some(t => /Signed in as testowner/.test(t)), 'the token is checked with GitHub and the account named', (await rows()).join(' | '));
   // link the repository

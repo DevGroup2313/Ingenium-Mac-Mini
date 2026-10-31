@@ -6,7 +6,7 @@
    Carpe Diem closes its page with a colophon (its seal, its name, a fine rule with one word, and the rights) and its About
    with "Designed and built by" over the copyright. Ingenium now does the same, in its own colours: under the last card of
    each page that scrolls (Home, Focus, Models, Blend, Build, Schedae's notes, the Guide, Settings) stand its seal, its name,
-   a fine rule with LOCAL MODEL STUDIO, and the line in her words. The rooms that fill the window (Chat, Code, Lector,
+   a fine rule with LOCAL MODEL STUDIO, and the line in her words. The rooms that fill the window (Chat, Code, the reading page,
    Career, Fabrica, and the apps on the Desk) keep the whole window. About ends with the same two lines as Carpe Diem's. */
 #ingColophon{display:none;max-width:1300px;margin:60px auto 0;padding:34px 20px 30px;border-top:.5px solid var(--hairline);text-align:center}
 #ingColophon[data-on="1"]{display:block}
