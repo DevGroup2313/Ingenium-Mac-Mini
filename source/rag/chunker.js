@@ -696,13 +696,17 @@ export async function chunkDocument(doc, opts) {
       else { spans = lineSpans(g.src, b.char_start, b.char_end); kind = 'line'; }
       spans.forEach(([s, e], i) => { if (e > s) g.units.push({ s, e, t: 0, para: i === 0, kind }); });
     }
+    for (let i = 1; i < g.units.length; i++) { // text between two units that is not white space (a table's separator line, a rule) still belongs to a chunk that holds both
+      const a = g.units[i - 1].e, b = g.units[i].s;
+      if (b > a && /\S/.test(g.src.slice(a, b))) g.units[i].gap = g.src.slice(a, b);
+    }
     stats.units += g.units.length;
   }
   stage('counting');
-  { // tokens of every unit and of every heading path
-    const texts = []; for (const g of groups) for (const u of g.units) texts.push(g.src.slice(u.s, u.e));
+  { // tokens of every unit, of the gaps between them, and of every heading path
+    const texts = []; for (const g of groups) for (const u of g.units) { texts.push(g.src.slice(u.s, u.e)); if (u.gap) texts.push(u.gap); }
     const cs = await countAll(opts.count, texts, cache, stats); let k = 0;
-    for (const g of groups) for (const u of g.units) u.t = Math.max(1, cs[k++] - ctx.overhead);
+    for (const g of groups) for (const u of g.units) { u.t = Math.max(1, cs[k++] - ctx.overhead); u.g = u.gap ? Math.max(0, cs[k++] - ctx.overhead) : 0; delete u.gap; }
   }
   // the heading path as it is embedded: a path longer than a fifth of the input drops its first parts, then cuts at words
   const maxPrefix = Math.max(8, Math.floor(0.2 * L.max));
@@ -734,7 +738,7 @@ export async function chunkDocument(doc, opts) {
         if (u.kind === 'line') { const ss = splitSentences(g.src, u.s, u.e); parts = ss.length > 1 ? ss : null; }
         if (!parts) parts = await cutSpan(g.src, u.s, u.e, cap, ctx);
         const cs = await countAll(opts.count, parts.map(([a, b]) => g.src.slice(a, b)), cache, stats);
-        parts.forEach(([a, b], i) => next.push({ s: a, e: b, t: Math.max(1, cs[i] - ctx.overhead), para: i === 0 ? u.para : false, kind: pass >= 1 || u.kind === 'sentence' ? 'sentence' : 'sentence' }));
+        parts.forEach(([a, b], i) => next.push({ s: a, e: b, t: Math.max(1, cs[i] - ctx.overhead), g: i === 0 ? u.g : 0, para: i === 0 ? u.para : false, kind: 'sentence' }));
       }
       g.units = next; if (!changed) break;
     }
@@ -786,7 +790,8 @@ export async function chunkDocument(doc, opts) {
   return { chunks, stats };
 }
 
-/** Packs one group's units into chunks (drafts {s, e, ovTok, ovChars}). */
+/** Packs one group's units into chunks (drafts {s, e, ovTok, ovChars}). Token counts of a run of units include the text between them
+ *  that is not white space (u.g, the gap before unit u), so a chunk's size and its overlap are those of the text it really holds. */
 async function packGroup(g, ctx) {
   const L = ctx.L, U = g.units, n = U.length, out = [];
   if (!n) return out;
@@ -794,32 +799,33 @@ async function packGroup(g, ctx) {
   const hard = L.limit - ctx.overhead - g.prefixTok - 4 - g.shrink;
   const minBody = Math.max(1, L.min - ctx.overhead - g.prefixTok);
   const absorbMax = Math.floor(0.12 * budget);
-  const t = U.map((u) => u.t), P = new Array(n + 1); P[0] = 0; for (let i = 0; i < n; i++) P[i + 1] = P[i] + t[i];
+  const t = U.map((u) => u.t), gp = U.map((u) => u.g || 0), Q = new Array(n + 1); Q[0] = 0;
+  for (let i = 0; i < n; i++) Q[i + 1] = Q[i] + t[i] + gp[i];
+  const run = (a, b) => (b > a ? Q[b] - Q[a] - gp[a] : 0);   // tokens of the text from unit a to unit b - 1, the gaps between them included
   let i = 0, carry = null;
-  const startOf = (c, k0) => (c && c.fragStart != null ? c.fragStart : U[k0].s);
   while (i < n) {
-    const k0 = carry ? carry.k : i, fragTok = carry ? carry.fragTok : 0;
-    const base = fragTok + (P[i] - P[k0]);
-    let j = i, used = base;
-    while (j < n && used + t[j] <= budget) { used += t[j]; j++; }
+    const k0 = carry ? carry.k : i, fragTok = carry ? carry.fragTok : 0, hasFrag = fragTok > 0;
+    const tokAt = (b) => fragTok + (hasFrag && b > k0 ? gp[k0] : 0) + run(k0, b);   // a chunk from the carried text to unit b - 1
+    const step = (j) => ((j > k0 || hasFrag) ? gp[j] : 0) + t[j];
+    let j = i, used = tokAt(i);
+    while (j < n && used + step(j) <= budget) { used += step(j); j++; }
     if (j === i) {
       if (carry) { carry = null; continue; } // the carried text and the next unit do not fit together: carry nothing
-      j = i + 1; used = t[i]; // a unit that fills the chunk by itself (cut earlier; here only if the budget was shrunk to nothing)
+      j = i + 1; // a unit that fills the chunk by itself (cut earlier; here only if the budget was shrunk to nothing)
     }
-    const startChar = startOf(carry, k0), ovTok = fragTok + (P[i] - P[k0]);
+    const startChar = carry && carry.fragStart != null ? carry.fragStart : U[k0].s, ovTok = tokAt(i);
     const draftOf = (b) => ({ s: startChar, e: U[b - 1].e, ovTok, ovChars: 0 });
     if (j === n) { out.push(draftOf(n)); break; }
-    const tokAt = (b) => base + P[b] - P[i];
     let bmin = i + 1; while (bmin < j && tokAt(bmin) < minBody) bmin++;
     // the overlap with the next chunk, as whole units, for a chunk that ends before unit b
     const whole = (b, tA) => {
-      const lo = L.overlapLo * tA, hi = L.overlapHi * tA; let acc = 0;
-      for (let k = b - 1; k >= k0; k--) { acc += t[k]; if (acc >= lo) return acc <= hi ? k : -1; }
+      const lo = L.overlapLo * tA, hi = L.overlapHi * tA;
+      for (let k = b - 1; k >= k0; k--) { const acc = run(k, b); if (acc >= lo) return acc <= hi ? k : -1; }
       return -1;
     };
     let pick = null, firstValid = null;
     for (let b = j; b >= bmin; b--) {
-      const tA = tokAt(b), kk = whole(b, tA);
+      const kk = whole(b, tokAt(b));
       if (kk < 0) continue;
       if (U[b].para) { pick = { b, k: kk }; break; }
       if (!firstValid) firstValid = { b, k: kk };
@@ -829,9 +835,9 @@ async function packGroup(g, ctx) {
     if (pick) { b = pick.b; nextCarry = { k: pick.k, fragStart: null, fragTok: 0 }; }
     else { // no whole-sentence overlap in the window: end at a paragraph boundary if there is one, and carry the end of a sentence
       b = j; for (let q = j; q >= bmin; q--) if (U[q].para) { b = q; break; }
-      nextCarry = await fragmentOverlap(g, U, t, k0, b, tokAt(b), ctx);
+      nextCarry = await fragmentOverlap(g, U, run, gp, k0, b, tokAt(b), ctx);
     }
-    if (b < n && P[n] - P[b] <= absorbMax && base + P[n] - P[i] <= Math.min(hard, Math.floor(budget * 1.05))) { b = n; nextCarry = null; } // a small tail joins this chunk instead of making a runt
+    if (b < n && run(b, n) <= absorbMax && tokAt(n) <= Math.min(hard, Math.floor(budget * 1.05))) { b = n; nextCarry = null; } // a small tail joins this chunk instead of making a runt
     out.push(draftOf(b));
     if (b >= n) break;
     carry = nextCarry; i = b;
@@ -843,29 +849,32 @@ async function packGroup(g, ctx) {
 }
 
 /** The overlap for a chunk that ends before unit b when no run of whole units is 10 to 15% of it: whole units from the end, then
- *  the end of the sentence before them from a clause start or a word, so that the tokens carried are inside the window. */
-async function fragmentOverlap(g, U, t, k0, b, tA, ctx) {
+ *  the end of the unit before them (a sentence, a list item, a row), from a sentence start, a clause start or a word, so that the tokens
+ *  carried are inside the window. */
+async function fragmentOverlap(g, U, run, gp, k0, b, tA, ctx) {
   const L = ctx.L, lo = L.overlapLo * tA, hi = L.overlapHi * tA, mid = (lo + hi) / 2;
-  let acc = 0, k = b;
-  while (k > k0 && acc + t[k - 1] <= hi) { acc += t[k - 1]; k--; }
+  let k = b;
+  while (k > k0 && run(k - 1, b) <= hi) k--;
+  const acc = run(k, b);
   if (acc >= lo) return { k, fragStart: null, fragTok: 0 };
   const near = () => { // whole units only: the closer of the two runs that bracket the window
-    const withMore = k > k0 ? acc + t[k - 1] : Infinity;
+    const withMore = k > k0 ? run(k - 1, b) : Infinity;
     return Math.abs(acc - mid) <= Math.abs(withMore - mid) || k <= k0 ? { k, fragStart: null, fragTok: 0 } : { k: k - 1, fragStart: null, fragTok: 0 };
   };
   if (k <= k0) return acc ? { k, fragStart: null, fragTok: 0 } : null;
   const u = U[k - 1];
-  if (u.kind !== 'sentence') return near();
   const words = wordSpans(g.src, u.s, u.e); if (words.length < 2) return near();
   const wc = await countAll(ctx.count, words.map(([a, e]) => g.src.slice(a, e)), ctx.cache, ctx.stats);
+  const fixed = k < b ? gp[k] + acc : 0;   // what follows the fragment: the gap before unit k and the whole units from k
   let ft = 0, best = null;
   for (let w = words.length - 1; w >= 1; w--) { // the fragment starts at word w
     ft += Math.max(1, wc[w] - ctx.overhead);
-    const tot = acc + ft;
+    const tot = fixed + ft;
     if (tot > hi) break;
     if (tot < lo) continue;
-    const clause = /[,;:—)]$/.test(g.src.slice(words[w - 1][0], words[w - 1][1]));
-    const score = Math.abs(tot - mid) - (clause ? 0.25 * (hi - lo) : 0);
+    const before = g.src.slice(words[w - 1][0], words[w - 1][1]);   // the fragment starts after a sentence end if it can, else after a clause end
+    const bonus = /[.!?\u2026]["'\u201d\u2019)\]]*$/.test(before) ? 0.5 : (/[,;:\u2014)]$/.test(before) ? 0.25 : 0);
+    const score = Math.abs(tot - mid) - bonus * (hi - lo);
     if (!best || score < best.score) best = { score, w, ft };
   }
   if (!best) return near();

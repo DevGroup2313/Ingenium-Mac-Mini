@@ -156,8 +156,8 @@ types as the app's server):
 - Both check: every part ran, no script or worker errors, no console errors (except the 404s the browser logs for probes of
   models that are deliberately not installed), nothing requested outside 127.0.0.1.
 - **Speed is not measured.** The build machine was overloaded (load average 8 to 28 on 4 processors) while these ran:
-  one worker took 0.7 to 2.0 s for a 400-token chunk; two workers were 0.92 times and 1.51 times as fast on the same 16 chunks
-  in two runs. That says nothing about her computers; the pool's speed-up could not be shown cleanly here (its correctness is
+  one worker took 0.7 to 2.0 s for a 400-token chunk; two workers were 0.92, 1.51 and 0.50 times as fast on the same 16 chunks
+  in three runs (load average 16 to 27). That says nothing about her computers; the pool's speed-up could not be shown cleanly here (its correctness is
   tested). A single thread of this model does roughly 20
   GFLOP per chunk, so expect hours, not minutes, for a large library on one worker: Phase 3 should use the pool and measure.
 

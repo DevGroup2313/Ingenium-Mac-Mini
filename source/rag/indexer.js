@@ -34,6 +34,7 @@ export const VENDOR_BASE = new URL('./vendor/', import.meta.url).href;
 const MB = 1048576;
 const FATAL = new Set(['WORKER_FAILED', 'WORKER_STOPPED', 'NOT_OPEN', 'OPFS_LOCKED', 'OPFS_UNAVAILABLE', 'NOT_READY', 'MODEL_NOT_INSTALLED', 'MODEL_UNREADABLE']);
 
+const fmtBytes = (n) => (n >= MB ? (n / MB).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' kB');
 const abortError = () => { const e = new Error('stopped'); e.name = 'AbortError'; return e; };
 const extOf = (rel) => { const m = /\.([A-Za-z0-9]+)$/.exec(rel); return m ? m[1].toLowerCase() : ''; };
 
@@ -93,7 +94,7 @@ export class ParseClient {
     stop.catch(() => {});
     this.stageListener = (m) => { if (opts.onStage && (session === null || m.session === session)) opts.onStage(m); };
     const run = async () => {
-      const r = await this._request('open', { ext: opts.ext, path: opts.path, size: opts.size, maxTokens: opts.maxTokens, modelKey: opts.modelKey, slim: opts.slim !== false, maxBytes: opts.maxBytes });
+      const r = await this._request('open', { ext: opts.ext, path: opts.path, size: opts.size, maxTokens: opts.maxTokens, modelKey: opts.modelKey, overlap: opts.overlap, slim: opts.slim !== false, maxBytes: opts.maxBytes });
       session = r.session;
       try {
         for await (const u8 of pieces) {
@@ -110,13 +111,14 @@ export class ParseClient {
 }
 
 // --------------------------------------------------------------------------------------------------------------- the indexer
-/** options: {store, embedder, bridge = rag/folders.js, workerUrl, vendorBase, maxFileBytes = 64 MB, embedBatch = 32, parseTimeoutMs}. */
+/** options: {store, embedder, bridge = rag/folders.js, workerUrl, vendorBase, maxFileBytes = 64 MB, embedBatch = 32, parseTimeoutMs, overlap}. */
 export function createIndexer(options) {
   const { store, embedder } = options;
   if (!store || !embedder) throw new Error('createIndexer needs a store and an embedder');
   const br = options.bridge || bridge;
   const maxFileBytes = options.maxFileBytes || 64 * MB;
   const embedBatch = Math.max(1, options.embedBatch || 32);
+  const running = new Set();
   const parser = new ParseClient({ workerUrl: options.workerUrl, vendorBase: options.vendorBase, count: (texts) => embedder.count({ texts }) });
 
   async function modelInfo() {
@@ -131,7 +133,7 @@ export function createIndexer(options) {
     const t0 = Date.now(), { model, maxTokens, signal } = ctx;
     emit({ event: 'file-stage', path: f.rel, stage: 'reading' });
     const parsed = await parser.parse(br.readPieces(folder.path, f.rel, { signal }), {
-      ext: extOf(f.rel), path: f.rel, size: f.size, maxTokens, modelKey: model, signal, slim: true, maxBytes: maxFileBytes, timeoutMs: options.parseTimeoutMs,
+      ext: extOf(f.rel), path: f.rel, size: f.size, maxTokens, modelKey: model, signal, slim: true, maxBytes: maxFileBytes, timeoutMs: options.parseTimeoutMs, overlap: options.overlap,
       onStage: (m) => emit({ event: 'file-stage', path: f.rel, stage: m.stage, done: m.done, of: m.of }),
     });
     const chunks = parsed.chunks, vecs = new Map();      // content hash -> vector
@@ -184,6 +186,12 @@ export function createIndexer(options) {
   /** Reads a folder into the index. opts: {onProgress, signal, force = false (read every file again), only: [rel] (just these files),
    *  confirmEmpty = false (a folder that lists no files while the index holds some is taken as a drive that is not there, unless this is true)}. */
   async function indexFolder(folderId, opts = {}) {
+    if (running.has(folderId)) { const e = new Error('this folder is being read already'); e.code = 'ALREADY_RUNNING'; throw e; }
+    running.add(folderId);
+    try { return await indexFolderRun(folderId, opts); } finally { running.delete(folderId); }
+  }
+
+  async function indexFolderRun(folderId, opts) {
     const t0 = Date.now(), signal = opts.signal;
     const emit = (e) => { if (opts.onProgress) { try { opts.onProgress(e); } catch (x) { /* the listener's own */ } } };
     const { model, maxTokens } = await modelInfo();
@@ -214,7 +222,7 @@ export function createIndexer(options) {
         if (!changedSet.has(f.rel)) { summary.files.skipped++; emit({ event: 'file-skip', path: f.rel, reason: 'unchanged' }); continue; }
         emit({ event: 'file-start', index: n, total: wanted.length, path: f.rel, size: f.size });
         try {
-          if (f.size > maxFileBytes) throw new Error('file too large (' + (f.size / MB).toFixed(1) + ' MB; the limit is ' + Math.round(maxFileBytes / MB) + ' MB)');
+          if (f.size > maxFileBytes) throw new Error('file too large (' + fmtBytes(f.size) + '; the limit is ' + fmtBytes(maxFileBytes) + ')');
           const r = await indexOne(folder, f, ctx, emit);
           summary.files.indexed++; summary.chunks += r.chunks; summary.embedded += r.embedded; summary.reused += r.reused;
           if (r.warnings.length) summary.warnings.push(...r.warnings.map((w) => f.rel + ': ' + w));
@@ -230,7 +238,7 @@ export function createIndexer(options) {
       // files that have gone from the folder
       if (!only) {
         const now = new Set(listing.map((x) => x.rel)), gone = [...existing.keys()].filter((p) => !now.has(p));
-        if (listing.length >= br.LIST_CAP && gone.length) summary.notes.push('the folder lists ' + listing.length + ' files, the most the app lists: files not listed are not taken out of the index');
+        if (listing.length >= (br.LIST_CAP || bridge.LIST_CAP) && gone.length) summary.notes.push('the folder lists ' + listing.length + ' files, the most the app lists: files not listed are not taken out of the index');
         else if (!listing.length && existing.size && !opts.confirmEmpty) summary.notes.push('the folder lists no files while ' + existing.size + ' are indexed: it is taken as a drive that is not connected, and nothing was taken out (confirmEmpty: true takes them out)');
         else for (const p of gone) {
           if (signal && signal.aborted) throw abortError();
