@@ -54,7 +54,7 @@ def _width(text, size, bold=False, serif=False):
         else:
             c = 556
         w += c
-    k = 1.06 if bold else (0.93 if serif else 1.0)
+    k = 1.12 if bold else (0.93 if serif else 1.0)
     return w * k * size / 1000.0
 
 
@@ -191,7 +191,7 @@ class PdfBuilder:
                 size = ln["size"]
                 if self.mode == "words" and ln["kind"] not in ("bullet",):
                     x = ln["x"]
-                    sp = _width(" ", size, ln["bold"], fname == "F3")
+                    sp = _width(" ", size, ln["bold"], fname == "F3") + 0.12 * size   # a clear gap: a reader works the space out from it
                     for w in ln["text"].split():
                         cs.append("BT /%s %s Tf 1 0 0 1 %.2f %.2f Tm %s Tj ET" % (fname, ("%g" % size), x, ln["y"], _pdf_string(_cp1252(w))))
                         x += _width(w, size, ln["bold"], fname == "F3") + sp
@@ -784,7 +784,7 @@ def diary_hollis_1788():
     out = ["# Journal of Josiah Hollis, 1788", ""]
     for m in ["Spring", "Summer", "Autumn"]:
         out += ["## " + m + " term", ""]
-        out += paras(r, "history", 2, 4, 6) + [""]
+        out += paras(r, "history", 5, 4, 6) + [""]
         out += ["### The accounts", ""] + [para(r, "trade", 3, 5), ""]
         out += ["### The ships", ""] + [para(r, "voyage", 3, 5), ""]
     out += ["Setext heading: the winter", "---------------------------", ""] + paras(r, "history", 2, 3, 5) + [""]
@@ -801,7 +801,7 @@ def diary_pell_1789():
             T("The great storm of 17 August 1789 came in the night with a wind from the south-east such as no one living here had known. By morning it had <<H13>> and carried off the roof of the boiling house; "
               "the negro houses on the lower side were flooded, and the road to the bay was impassable for a week. My overseer, Mr. Marlow, thinks that we shall make scarcely half our usual crop."), "",
             "## The estate", ""]
-    out += paras(r, "history", 3, 3, 5) + [""]
+    out += paras(r, "history", 6, 3, 5) + [""]
     out += ["## Correspondence", ""] + paras(r, "trade", 3, 3, 5) + [""]
     put_text(H, "diaries/dorothea_pell_journal_1789.md", "\n".join(out) + "\n")
 
@@ -865,7 +865,9 @@ def finding_aids():
 <ul><li>The letters were kept by the firm's clerks in bundles tied by year.</li><li>The account books came with the letters from the same house.</li><li>The maps were found rolled in a tin trunk.</li></ul>
 <h2>Related material</h2>
 <p>%s</p>
-</main>""" % (T("The collection comprises <<H06>>"), para(r, "history", 3, 4), para(r, "history", 3, 4), para(r, "history", 2, 3))
+<h2>Administrative history</h2>
+%s
+</main>""" % (T("The collection comprises <<H06>>"), para(r, "history", 3, 4), para(r, "history", 3, 4), para(r, "history", 2, 3), "\n".join("<p>%s</p>" % para(r, "history", 4, 6) for _ in range(6)))
     put_text(H, "finding_aids/wren_collection_guide.html", html_page("The Wren Papers: a guide", inner))
     people = [("Wren, Tobias", "senior partner", "Merchant of Queen Square; retired to Clifton in 1796."),
               ("Hollis, Josiah", "junior partner", "Kept the journals; took over the firm in 1796."),
@@ -886,7 +888,7 @@ def finding_aids():
 <table><thead><tr><th>Name</th><th>Role</th><th>Notes</th></tr></thead><tbody>
 %s
 </tbody></table>
-<h2>How to use this index</h2><p>%s</p>""" % (rows, para(r, "history", 2, 3))
+<h2>How to use this index</h2>%s""" % (rows, "\n".join("<p>%s</p>" % para(r, "history", 4, 6) for _ in range(6)))
     put_text(H, "finding_aids/people_index.html", html_page("People in the Wren Papers", inner))
     ships = [("Mary Ann", "brig", "Bristol", "1779", "Carew, then Kemp"), ("Providence", "snow", "Bristol", "1783", "Ainsley"), ("Hester", "ship", "Hotwells", "1786", "Pryce"),
              ("Betsey", "brig", "Liverpool", "1775", "Lyle (chartered)")]

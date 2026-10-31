@@ -20,6 +20,16 @@
 // else to look). MODEL_TIERS lists the candidates and pickTier() chooses among those installed by the memory that is spare.
 // The index holds vectors of ONE model (its vec table has a fixed length): a different length needs store.open({dims}) on a
 // new index, and every file embedded again. Use `key` from init()/info() ("model|dtype|pooling") to tell indexes apart.
+//
+// MORE WORKERS FOR MORE CORES. One worker runs the model on one thread (the apps send no cross-origin isolation headers, which
+// ONNX Runtime needs for more), so indexing is as fast as one core: with the small model about 0.4 GB of memory and, on a busy
+// 4-processor test machine, 1 to 1.5 chunks a second. createEmbedder({ workers: n }) starts n workers, each with its own copy
+// of the model, and embed() hands the batches of 16 to whichever is free; the answers come back in order. count() goes to the
+// least busy worker. info() adds the counters up and lists them per worker. suggestWorkers() says how many a computer can
+// spare; the default is 1, which is the plain protocol of DESIGN section 3.
+//
+// WHAT AN EMBED COSTS IN MEMORY: measured 31 October 2026 in headless Chromium: the model loaded 0.2 GB, after the first full
+// batch 0.4 GB in all, a second worker 0.37 GB more. The memory of the stronger tiers (workerGB) is scaled from that, not measured.
 
 export const DEFAULT_MODEL_ID = 'Xenova/bge-small-en-v1.5';
 export const QUERY_PREFIX = 'Represent this sentence for searching relevant passages: ';
@@ -31,19 +41,20 @@ export const VENDOR_BASE = new URL('./vendor/', import.meta.url).href;
 // here (31 October 2026, headless Chromium, ONNX Runtime on the processor). The sizes of the others are the parameter counts
 // of their model cards read as bytes (int8 is one byte a value; the small model's file is 34,014,426 bytes for 33.4 million
 // values) - not measured, because huggingface.co cannot be reached from the build machine. minSpareGB is an estimate of the
-// memory the embedder needs beyond what the chat model and the system hold; speed is relative to the small model.
+// memory the embedder needs beyond what the chat model and the system hold; workerGB is what each further worker adds (small:
+// measured, the others scaled); speed is relative to the small model.
 export const MODEL_TIERS = Object.freeze([
   Object.freeze({
     tier: 'small', modelId: 'Xenova/bge-small-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 384, maxTokens: 512,
-    fileMB: 34, fileMBMeasured: true, minSpareGB: 1.5, speed: 1, shipped: true, verified: true,
+    fileMB: 34, fileMBMeasured: true, minSpareGB: 1.5, workerGB: 0.4, speed: 1, shipped: true, verified: true,
   }),
   Object.freeze({
     tier: 'base', modelId: 'Xenova/bge-base-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 768, maxTokens: 512,
-    fileMB: 110, fileMBMeasured: false, minSpareGB: 6, speed: 1 / 3.3, shipped: false, verified: false,
+    fileMB: 110, fileMBMeasured: false, minSpareGB: 6, workerGB: 1, speed: 1 / 3.3, shipped: false, verified: false,
   }),
   Object.freeze({
     tier: 'large', modelId: 'Xenova/bge-large-en-v1.5', dtype: 'q8', pooling: 'mean', dims: 1024, maxTokens: 512,
-    fileMB: 335, fileMBMeasured: false, minSpareGB: 10, speed: 1 / 10, shipped: false, verified: false,
+    fileMB: 335, fileMBMeasured: false, minSpareGB: 10, workerGB: 2, speed: 1 / 10, shipped: false, verified: false,
   }),
 ]);
 
@@ -71,6 +82,18 @@ export function pickTier(want = {}) {
       ? 'small: only ' + spare + ' GB spare, ' + stronger.tier + ' needs about ' + stronger.minSpareGB + ' GB'
       : 'small: no stronger model is installed',
   };
+}
+
+/**
+ * How many embedder workers a computer can spare: half its processors (the page, the parser and the chat engine need the rest),
+ * no more than a fifth of the memory that is spare, and never more than 4. Always at least 1.
+ * @param {{cores?: number, spareGB?: number, tier?: object}} want  cores: navigator.hardwareConcurrency
+ */
+export function suggestWorkers(want = {}) {
+  const tier = want.tier || MODEL_TIERS[0];
+  const byCores = Math.floor((Number.isFinite(want.cores) ? want.cores : 2) / 2);
+  const byMemory = Math.floor(((Number.isFinite(want.spareGB) ? want.spareGB : 0) * 0.2) / tier.workerGB);
+  return Math.max(1, Math.min(4, byCores, byMemory));
 }
 
 const ONNX_SUFFIX = { fp32: '', fp16: '_fp16', int8: '_int8', uint8: '_uint8', q8: '_quantized', q4: '_q4', q4f16: '_q4f16', bnb4: '_bnb4' };
@@ -138,25 +161,68 @@ class Rpc {
 
 // ------------------------------------------------------------------------------------------------ the client
 export class Embedder {
+  /** options: {workers = 1, workerUrl, vendorBase}. */
   constructor(options = {}) {
     this.workerUrl = options.workerUrl || EMBEDDER_WORKER_URL;
     this.vendorBase = options.vendorBase || VENDOR_BASE;
-    this.rpc = new Rpc(this.workerUrl, 'embedder');
+    this.size = Math.max(1, Math.min(8, Math.floor(options.workers) || 1));
+    this.rpcs = Array.from({ length: this.size }, (_, i) => new Rpc(this.workerUrl, this.size > 1 ? 'embedder ' + (i + 1) : 'embedder'));
+    this.rpc = this.rpcs[0];
+    this.batchSize = BATCH_SIZE;   // learned from init()
+    this.userCalls = 0;
   }
-  /** Loads the model (see embedder.worker.js). Args: {modelId, dtype = 'q8', device = 'wasm', pooling = 'mean', batchSize = 16}. */
-  init(args = {}) { return this.rpc.request('init', Object.assign({ vendorBase: this.vendorBase }, args)); }
-  /** Token counts: count({texts}) or count(texts). */
-  count(a, special) { return this.rpc.request('count', Array.isArray(a) ? { texts: a, special } : a); }
-  /** Vectors: embed({texts, kind}) or embed(texts, kind). */
-  embed(a, kind) { return this.rpc.request('embed', Array.isArray(a) ? { texts: a, kind } : a); }
-  info() { return this.rpc.request('info'); }
+  /** Loads the model (see embedder.worker.js) in every worker. Args: {modelId, dtype = 'q8', device = 'wasm', pooling = 'mean', batchSize = 16}. */
+  async init(args = {}) {
+    const a = Object.assign({ vendorBase: this.vendorBase }, args);
+    const rs = await Promise.all(this.rpcs.map((r) => r.request('init', a)));
+    this.batchSize = rs[0].batchSize || BATCH_SIZE;
+    return this.size === 1 ? rs[0] : Object.assign({}, rs[0], { workers: this.size });
+  }
+  /** Token counts: count({texts}) or count(texts). Goes to the least busy worker. */
+  count(a, special) {
+    const busiest = this.rpcs.reduce((best, r) => (r.pending.size < best.pending.size ? r : best));
+    return busiest.request('count', Array.isArray(a) ? { texts: a, special } : a);
+  }
+  /** Vectors: embed({texts, kind}) or embed(texts, kind). With several workers the batches are shared out and the answer is in order. */
+  async embed(a, kind) {
+    const args = Array.isArray(a) ? { texts: a, kind } : a;
+    if (this.size === 1 || !args || !Array.isArray(args.texts) || args.texts.length <= this.batchSize) {
+      const idle = this.rpcs.reduce((best, r) => (r.pending.size < best.pending.size ? r : best));
+      const out = await idle.request('embed', args);
+      if (this.size > 1 && out.length) this.userCalls++;
+      return out;
+    }
+    const parts = [];
+    for (let i = 0; i < args.texts.length; i += this.batchSize) parts.push(args.texts.slice(i, i + this.batchSize));
+    const results = new Array(parts.length);
+    let next = 0, failed = false;
+    await Promise.all(this.rpcs.map(async (r) => {
+      while (!failed && next < parts.length) {
+        const k = next++;
+        try { results[k] = await r.request('embed', { texts: parts[k], kind: args.kind }); } catch (e) { failed = true; throw e; }
+      }
+    }));
+    this.userCalls++;
+    return results.flat();
+  }
+  /** The counters of the worker, or of all of them added up (with .workers and .perWorker). */
+  async info() {
+    const all = await Promise.all(this.rpcs.map((r) => r.request('info')));
+    if (this.size === 1) return all[0];
+    const sum = (k) => all.reduce((n, x) => n + (x[k] || 0), 0);
+    return Object.assign({}, all[0], {
+      calls: this.userCalls, embedded: sum('embedded'), batches: sum('batches'), counted: sum('counted'), atLimit: sum('atLimit'),
+      workers: this.size, perWorker: all.map((x) => ({ embedded: x.embedded, batches: x.batches, loads: x.loads })),
+    });
+  }
   ops() { return this.rpc.request('ops'); }
-  dispose() { return this.rpc.request('dispose'); }
+  async dispose() { await Promise.all(this.rpcs.map((r) => r.request('dispose'))); return { disposed: true }; }
   /** Which of a model's files are on this computer (no download, no worker needed). */
   modelFiles(modelId = DEFAULT_MODEL_ID, dtype = 'q8') { return modelFiles(modelId, dtype, this.vendorBase); }
-  onEvent(fn) { return this.rpc.on(fn); }
-  get errors() { return this.rpc.errors; }
-  terminate() { this.rpc.terminate(); }
+  onEvent(fn) { const offs = this.rpcs.map((r) => r.on(fn)); return () => offs.forEach((off) => off()); }
+  get workers() { return this.size; }
+  get errors() { return this.rpcs.flatMap((r) => r.errors); }
+  terminate() { this.rpcs.forEach((r) => r.terminate()); }
 }
 
 export function createEmbedder(options) { return new Embedder(options); }

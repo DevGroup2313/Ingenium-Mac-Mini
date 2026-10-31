@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Folder search: parse and index harness</title>
+</head>
+<body>
+<!-- INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.  NO LICENCE IS GRANTED. See LICENCE.txt.
+     A bare page for rig/t_rag1_parse.js and rig/t_rag1_index.js. It shows nothing: it loads the parse worker's client and the
+     indexer, the model's own tokenizer (to count tokens the way the embedder does), a stand-in for the app's folder bridge that
+     serves the test corpus (rag/fixtures/), and window.PH with the functions the tests call. Serve it with rag/test/serve.py
+     (/rag/test/parse_harness.html, with /rag/vendor/ = the unpacked vendor tree). -->
+<script type="module">
+import * as chunker from '../chunker.js';
+import * as foldersModule from '../folders.js';
+import { ParseClient, createIndexer } from '../indexer.js';
+import * as storeModule from '../store.js';
+import * as embedderModule from '../embedder.js';
+
+const RAG = new URL('../', import.meta.url).href;       // .../rag/
+const VENDOR = RAG + 'vendor/';
+const FIX = RAG + 'fixtures/';
+const errors = [];
+window.addEventListener('error', (e) => errors.push('error: ' + e.message));
+window.addEventListener('unhandledrejection', (e) => errors.push('unhandledrejection: ' + String((e.reason && e.reason.message) || e.reason)));
+
+const PH = window.PH = { ready: false, errors, chunker, folders: foldersModule, ParseClient, createIndexer, storeModule, embedderModule, RAG, FIX, tok: null, client: null, facts: null, counts: 0 };
+
+// ---- the model's tokenizer, as the embedder counts with it
+PH.loadTokenizer = async () => {
+  const T = await import(VENDOR + 'transformers/transformers.min.js');
+  T.env.allowRemoteModels = false; T.env.allowLocalModels = true; T.env.useBrowserCache = false;
+  T.env.localModelPath = new URL(VENDOR + 'models/').pathname;     // a path: the library looks at local files only for those
+  PH.tok = await T.AutoTokenizer.from_pretrained('Xenova/bge-small-en-v1.5');
+  PH.maxTokens = PH.tok.model_max_length || 512;
+  return { maxTokens: PH.maxTokens };
+};
+PH.count = (texts) => { PH.counts += texts.length; return texts.map((t) => PH.tok.encode(t).length); };       // special tokens included
+PH.bare = (s) => PH.tok.encode(s, { add_special_tokens: false }).length;
+PH.client = new ParseClient({ count: async (texts) => PH.count(texts) });
+
+const norm = (s) => s.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+const hex = (u8) => Array.from(u8, (b) => b.toString(16).padStart(2, '0')).join('');
+const sha = async (data) => hex(new Uint8Array(await crypto.subtle.digest('SHA-256', typeof data === 'string' ? new TextEncoder().encode(data) : data)));
+PH.sha = sha; PH.norm = norm;
+
+PH.fetchBytes = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status); return new Uint8Array(await r.arrayBuffer()); };
+PH.pieces = async function* (bytes, size = 1048576) { for (let o = 0; o < bytes.length; o += size) yield bytes.slice(o, Math.min(bytes.length, o + size)); };
+PH.loadFacts = async () => { PH.facts = (await (await fetch(FIX + 'FACTS.json')).json()); return PH.facts; };
+
+// parse bytes the way the indexer sends them: in pieces
+PH.parseBytes = async (bytes, ext, o = {}) => PH.client.parse(PH.pieces(bytes, o.pieceSize || 1048576),
+  { ext, path: o.path || 'test.' + ext, size: bytes.length, maxTokens: o.maxTokens || 512, modelKey: o.modelKey || 'bge', slim: !!o.slim, timeoutMs: 0, maxBytes: o.maxBytes, onStage: o.onStage });
+PH.parseString = (s, ext, o) => PH.parseBytes(new TextEncoder().encode(s), ext, o);
+
+// the overlap of the chunks of one section (same heading path and page): how many pairs, and which are outside 10 to 15% of the earlier chunk
+PH.overlapReport = (chunks, srcOf) => {
+  let pairs = 0, ovl = 0, disjoint = 0, minR = 9, maxR = 0, splitMin = 1e9; const outside = [];
+  for (let i = 1; i < chunks.length; i++) {
+    const a = chunks[i - 1], b = chunks[i];
+    if (a.heading_path !== b.heading_path || a.page !== b.page) continue;
+    pairs++;
+    if (b.char_start < a.char_end) {
+      const shared = srcOf(b).slice(b.char_start, a.char_end), r = PH.bare(shared) / PH.bare(a.text);
+      ovl++; minR = Math.min(minR, r); maxR = Math.max(maxR, r); splitMin = Math.min(splitMin, PH.tok.encode(a.input).length);
+      if (r < 0.10 - 1e-9 || r > 0.15 + 1e-9) outside.push({ i, r: Math.round(r * 10000) / 10000, chars: shared.length, aTokens: PH.bare(a.text) });
+    } else disjoint++;
+  }
+  return { pairs, ovl, disjoint, minR: ovl ? minR : null, maxR: ovl ? maxR : null, splitMin: ovl ? splitMin : null, outside: outside.slice(0, 10), outsideCount: outside.length };
+};
+
+// everything the parse test asks of one file, checked here where the text, the pages and the tokenizer are
+PH.analyse = async (path) => {
+  const ext = path.split('.').pop().toLowerCase();
+  const bytes = await PH.fetchBytes(FIX + path);
+  const t0 = performance.now();
+  const res = await PH.parseBytes(bytes, ext, { path });
+  const ms = Math.round(performance.now() - t0);
+  const text = res.text, pages = res.pages || null, chunks = res.chunks;
+  const srcOf = (c) => (pages ? pages[c.page - 1] : text);
+  const rep = { path, ext, size: bytes.length, pieces: res.pieces, ms, parseMs: res.parseMs, chunks: chunks.length, blocks: res.blocks.length, warnings: res.warnings, meta: res.meta,
+    stats: res.stats, mem: res.mem || null, numPages: (res.meta && res.meta.numPages) || null, textLength: text.length };
+  rep.hashOk = res.fileHash === await sha(bytes);
+  let verbatimBad = 0, tokBad = 0, over450 = 0, over512 = 0, minTok = 1e9, maxTok = 0, sumTok = 0, hashBad = 0, inputBad = 0; const metaBad = [];
+  const KEYS = { chunk_index: 'number', heading_path: 'string', char_start: 'number', char_end: 'number', content_hash: 'string', text: 'string', input: 'string', tokens: 'number' };
+  const inputs = chunks.map((c) => c.input);
+  const hashes = await Promise.all(inputs.map((s) => sha(s)));
+  chunks.forEach((c, i) => {
+    const src = srcOf(c);
+    if (typeof src !== 'string' || src.slice(c.char_start, c.char_end) !== c.text) verbatimBad++;
+    const tk = PH.tok.encode(c.input).length;
+    if (tk !== c.tokens) tokBad++;
+    if (tk > 512) over512++;
+    if (tk > 450) over450++;
+    minTok = Math.min(minTok, tk); maxTok = Math.max(maxTok, tk); sumTok += tk;
+    if (hashes[i] !== c.content_hash) hashBad++;
+    if (!(c.heading_path ? c.input.endsWith('\n\n' + c.text) && c.input.length > c.text.length + 2 : c.input === c.text)) inputBad++;
+    for (const k in KEYS) if (typeof c[k] !== KEYS[k]) metaBad.push([i, k]);
+    if (!(c.page === null || Number.isInteger(c.page))) metaBad.push([i, 'page']);
+    if (!(c.char_end > c.char_start && c.char_start >= 0 && /^[0-9a-f]{64}$/.test(c.content_hash) && c.chunk_index === i && c.text.trim().length > 0)) metaBad.push([i, 'values']);
+    if (res.fileHash === undefined) metaBad.push([i, 'fileHash']);
+  });
+  Object.assign(rep, { verbatimBad, tokBad, over450, over512, minTok: chunks.length ? minTok : 0, maxTok, meanTok: chunks.length ? Math.round(sumTok / chunks.length) : 0, hashBad, inputBad, metaBad: metaBad.slice(0, 8), metaBadCount: metaBad.length });
+  rep.overlap = PH.overlapReport(chunks, srcOf);
+  // the blocks of a text or Markdown file: offsets point at their words
+  if (ext === 'txt' || ext === 'md') {
+    let bad = 0, n = 0; for (const b of res.blocks) if (b.kind !== 'heading') { n++; if (text.slice(b.char_start, b.char_end) !== b.text) bad++; }
+    rep.blockOffsets = { n, bad };
+  }
+  rep.kinds = res.blocks.reduce((m, b) => { m[b.kind] = (m[b.kind] || 0) + 1; return m; }, {});
+  rep.headings = [...new Set(chunks.map((c) => c.heading_path))].slice(0, 40);
+  rep.headingChunks = chunks.filter((c) => c.heading_path).length;
+  rep.headBlocks = res.blocks.filter((b) => b.kind === 'heading').slice(0, 300).map((b) => [b.level, b.text]);
+  rep.pageNumbers = pages ? [...new Set(chunks.map((c) => c.page))].sort((a, b) => a - b) : null;
+  rep.pageTextLengths = pages ? pages.map((p) => p.length) : null;
+  // the facts: which needle is in this file's text, and in how many of its chunks (and on which pages)
+  const facts = (PH.facts && PH.facts.facts) || [];
+  const hay = norm(pages ? pages.join('\n') : text);
+  if (['txt', 'md', 'csv', 'json', 'html'].includes(ext) && ext !== 'json' && ext !== 'html') {
+    const legacy = (res.warnings || []).some((w) => /Windows-1252/.test(w));
+    rep.decodeEqual = text === new TextDecoder(legacy ? 'windows-1252' : 'utf-8').decode(bytes);
+  }
+  rep.found = {}; rep.factChunks = {};
+  for (const f of facts) {
+    const n = norm(f.needle);
+    if (!hay.includes(n)) continue;
+    const cs = chunks.filter((c) => norm(c.text).includes(n));
+    rep.found[f.id] = { chunks: cs.length, pages: [...new Set(cs.map((c) => c.page))] };
+    rep.factChunks[f.id] = cs.map((c) => [c.char_start, c.char_end, c.page]);
+  }
+  rep.sample = chunks.slice(0, 2).map((c) => ({ i: c.chunk_index, path: c.heading_path, page: c.page, cs: c.char_start, ce: c.char_end, tokens: c.tokens, text: c.text.slice(0, 160) }));
+  return rep;
+};
+
+// ---- a stand-in for the app's folder bridge (window.pywebview.api.rag_*) over files a test supplies
+PH.bridge = { folders: new Map(), calls: [], failList: new Set(), failRead: new Set() };       // folders: path -> Map(rel -> {bytes, mtime})
+const b64 = (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+PH.installBridge = () => {
+  const B = PH.bridge;
+  window.pywebview = { api: {
+    async rag_choose_folder() { B.calls.push(['rag_choose_folder']); return { ok: false, cancelled: true }; },
+    async rag_folders() { B.calls.push(['rag_folders']); return [...B.folders.keys()].map((p) => ({ path: p, name: p.split('/').pop(), added: 0 })); },
+    async rag_forget_folder(path) { B.calls.push(['rag_forget_folder', path]); B.folders.delete(path); return { ok: true }; },
+    async rag_list(path) {
+      B.calls.push(['rag_list', path]);
+      const m = B.folders.get(path); if (!m || B.failList.has(path)) return { ok: false, error: 'the folder is not available: ' + path };
+      return { ok: true, files: [...m.entries()].map(([rel, f]) => ({ rel, size: f.bytes.length, mtime: f.mtime })) };
+    },
+    async rag_read(path, rel, offset, length) {
+      B.calls.push(['rag_read', path, rel, offset, length]);
+      const m = B.folders.get(path), f = m && m.get(rel);
+      if (!f) return { ok: false, error: 'no such file: ' + rel };
+      if (B.failRead.has(rel)) return { ok: false, error: 'could not read ' + rel };
+      if (length > 1048576) return { ok: false, error: 'length at most 1 MB' };
+      const part = f.bytes.subarray(offset, Math.min(f.bytes.length, offset + length));
+      return { ok: true, data: b64(part), size: f.bytes.length, eof: offset + part.length >= f.bytes.length };
+    },
+  } };
+};
+PH.setFile = (folder, rel, bytes, mtime) => { if (!PH.bridge.folders.has(folder)) PH.bridge.folders.set(folder, new Map()); PH.bridge.folders.get(folder).set(rel, { bytes: typeof bytes === 'string' ? new TextEncoder().encode(bytes) : bytes, mtime: mtime || 1000 }); };
+PH.removeFile = (folder, rel) => PH.bridge.folders.get(folder).delete(rel);
+PH.touchFile = (folder, rel, mtime) => { PH.bridge.folders.get(folder).get(rel).mtime = mtime; };
+// loads a folder of the test corpus into the bridge under the path "/corpus/<name>"; opts.only(rel) filters, opts.cut[rel] = bytes cuts a file short
+PH.loadCorpusFolder = async (name, opts = {}) => {
+  const man = await (await fetch(FIX + 'MANIFEST.json')).json(); const path = '/corpus/' + name; let n = 0;
+  for (const f of man.files) {
+    if (!f.path.startsWith(name + '/')) continue;
+    const rel = f.path.slice(name.length + 1);
+    if (opts.only && !opts.only(rel)) continue;
+    let bytes = await PH.fetchBytes(FIX + f.path);
+    if (opts.cut && opts.cut[rel]) bytes = bytes.slice(0, opts.cut[rel]);
+    PH.setFile(path, rel, bytes, 1000 + n++);
+  }
+  return { path, files: n };
+};
+
+// ---- in-memory stand-ins for the store and embedder clients (the same calls, the same shapes), to test the indexer's logic exactly
+PH.fakeEmbedder = (o = {}) => {
+  const E = { calls: [], embedded: 0, counted: 0, info0: { modelId: 'test/fake-model', key: 'test/fake-model|q8|mean', dims: 384, maxTokens: 512 }, failOn: o.failOn || null, delay: o.delay || 0 };
+  E.info = async () => ({ ...E.info0, embedded: E.embedded });
+  E.init = async () => E.info0;
+  E.count = async (a) => { const texts = Array.isArray(a) ? a : a.texts; E.counted += texts.length; return PH.count(texts); };
+  E.embed = async (a, kind) => {
+    const texts = Array.isArray(a) ? a : a.texts; E.calls.push(texts.length);
+    if (E.failOn && texts.some((t) => E.failOn(t))) throw new Error('the embedder failed on purpose');
+    if (E.delay) await new Promise((r) => setTimeout(r, E.delay));
+    E.embedded += texts.length;
+    return texts.map((t) => { const v = new Float32Array(384); let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } let n = 0; for (let i = 0; i < 384; i++) { h = Math.imul(h ^ (h >>> 13), 1274126177) + i; v[i] = ((h >>> 0) % 2000) / 1000 - 1; n += v[i] * v[i]; } n = Math.sqrt(n); for (let i = 0; i < 384; i++) v[i] /= n; return v; });
+  };
+  return E;
+};
+PH.fakeStore = () => {
+  const S = { folders: [], files: new Map(), chunks: new Map(), cache: new Map(), calls: [], nextId: 1, nextFile: 1, failReplace: new Set() };
+  const log = (name, a) => S.calls.push([name, a && a.path !== undefined ? a.path : (a && a.folderId !== undefined ? a.folderId : null)]);
+  const fkey = (folderId, path) => folderId + '\u0000' + path;
+  S.folder = {
+    add: async (a) => { let f = S.folders.find((x) => x.path === a.path); if (!f) { f = { id: S.nextId++, name: a.name, path: a.path, source: 'bridge', manualOnly: false, addedAt: Date.now(), lastIndexedAt: null }; S.folders.push(f); } return { ...f }; },
+    list: async () => S.folders.map((f) => ({ ...f, fileCount: [...S.files.values()].filter((x) => x.folderId === f.id).length, chunkCount: 0 })),
+    touch: async (a) => { log('folder.touch', a); S.folders.find((f) => f.id === a.folderId).lastIndexedAt = a.indexedAt; return {}; },
+  };
+  S.file = {
+    list: async (a) => [...S.files.values()].filter((f) => f.folderId === a.folderId).map((f) => ({ id: f.id, path: f.path, size: f.size, mtime: f.mtime, contentHash: f.contentHash, chunkCount: f.chunkCount, indexedAt: f.indexedAt })),
+    get: async (a) => S.files.get(fkey(a.folderId, a.path)) || null,
+    replace: async (a) => {
+      log('file.replace', a);
+      if (S.failReplace.has(a.path)) throw new Error('the store failed on purpose');
+      const k = fkey(a.folderId, a.path), old = S.files.get(k), id = old ? old.id : S.nextFile++;
+      for (const c of a.chunks) { if (!(c.embedding instanceof Float32Array) || c.embedding.length !== 384) throw new Error('bad embedding'); if (typeof c.text !== 'string' || !c.content_hash) throw new Error('bad chunk'); }
+      S.chunks.set(id, a.chunks.map((c) => ({ chunk_index: c.chunk_index, heading_path: c.heading_path, char_start: c.char_start, char_end: c.char_end, page: c.page, content_hash: c.content_hash, text: c.text, embedding: new Float32Array(c.embedding) })));
+      for (const c of a.chunks) S.cache.set(a.model + '|' + c.content_hash, new Float32Array(c.embedding));
+      S.files.set(k, { id, folderId: a.folderId, path: a.path, size: a.size, mtime: a.mtime, contentHash: a.contentHash, chunkCount: a.chunks.length, indexedAt: Date.now(), model: a.model });
+      return { fileId: id, chunkCount: a.chunks.length };
+    },
+    delete: async (a) => { log('file.delete', a); const k = fkey(a.folderId, a.path), f = S.files.get(k); if (!f) return { deleted: false, chunkCount: 0 }; S.files.delete(k); S.chunks.delete(f.id); return { deleted: true, chunkCount: f.chunkCount }; },
+  };
+  S.emb = {
+    lookup: async (a) => { log('emb.lookup', a); const out = {}; for (const h of a.hashes) { const v = S.cache.get(a.model + '|' + h); if (v) out[h] = new Float32Array(v); } return out; },
+    put: async (a) => { log('emb.put', a); for (const it of a.items) S.cache.set(a.model + '|' + it.hash, new Float32Array(it.embedding)); return { stored: a.items.length }; },
+  };
+  return S;
+};
+
+// the headings of an HTML or Word file as the browser's own parser sees them: [[level, text]] in document order
+PH.oracleHeadings = async (path) => {
+  const bytes = await PH.fetchBytes(FIX + path); let html;
+  if (path.endsWith('.docx')) {
+    if (!window.mammoth) { const src = await (await fetch(VENDOR + 'mammoth/mammoth.browser.min.js')).text(); new Function(src).call(window); }
+    html = (await window.mammoth.convertToHtml({ arrayBuffer: bytes.buffer.slice(0) }, { styleMap: ["p[style-name='Title'] => h1.ing-title:fresh"] })).value;
+  } else html = new TextDecoder().decode(bytes);
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,style,nav,noscript,template,svg').forEach((n) => n.remove());
+  return [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')].filter((h) => !h.closest('[hidden]')).map((h) => [h.classList.contains('ing-title') ? 0 : +h.tagName[1], h.textContent.replace(/\s+/g, ' ').trim()]).filter((x) => x[1]);
+};
+
+PH.memory = () => { const m = performance.memory; return m ? { used: m.usedJSHeapSize, total: m.totalJSHeapSize, limit: m.jsHeapSizeLimit } : null; };
+PH.ready = true;
+</script>
+</body>
+</html>

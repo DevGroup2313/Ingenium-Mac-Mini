@@ -522,8 +522,8 @@ export function blocksFromPdfPages(pages) {
     const keys = new Set(); for (const l of p.lines) if (edge(p, l)) keys.add(l.text.replace(/\d+/g, '#'));
     for (const k of keys) seen.set(k, (seen.get(k) || 0) + 1);
   }
-  const rep = Math.max(2, Math.ceil(per.length * 0.4));
-  for (const p of per) p.lines = p.lines.filter((l) => !(edge(p, l) && (PAGE_NO.test(l.text) || (per.length >= 3 && seen.get(l.text.replace(/\d+/g, '#')) >= rep))));
+  const rep = Math.max(2, Math.ceil(per.length * 0.5)); // a line at the edge of at least half the pages (and two) is a running head or foot
+  for (const p of per) p.lines = p.lines.filter((l) => !(edge(p, l) && (PAGE_NO.test(l.text) || (per.length >= 2 && seen.get(l.text.replace(/\d+/g, '#')) >= rep))));
   // the body type
   const sizes = []; for (const p of per) for (const l of p.lines) for (let i = 0; i < Math.min(l.text.length, 200); i += 10) sizes.push(l.size);
   const body = mode(sizes) || 10;
@@ -831,7 +831,7 @@ async function packGroup(g, ctx) {
       b = j; for (let q = j; q >= bmin; q--) if (U[q].para) { b = q; break; }
       nextCarry = await fragmentOverlap(g, U, t, k0, b, tokAt(b), ctx);
     }
-    if (b < n && P[n] - P[b] <= absorbMax && base + P[n] - P[i] <= hard) { b = n; nextCarry = null; }
+    if (b < n && P[n] - P[b] <= absorbMax && base + P[n] - P[i] <= Math.min(hard, Math.floor(budget * 1.05))) { b = n; nextCarry = null; } // a small tail joins this chunk instead of making a runt
     out.push(draftOf(b));
     if (b >= n) break;
     carry = nextCarry; i = b;

@@ -1,0 +1,262 @@
+{
+ "collection": "Wren Papers, WP/2",
+ "compiled": "2026-10-31",
+ "voyages": [
+  {
+   "id": "V01",
+   "vessel": "Mary Ann",
+   "master": "Carew",
+   "departed": "1781-02-12",
+   "ports": [
+    "Cork",
+    "Port Royal",
+    "Montego Bay"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 329,
+    "rum_puncheons": 21,
+    "other": "cotton"
+   },
+   "crew": 18,
+   "notes": "Spoke a brig bound for Waterford, whose master told us that herring was dear there and the roads full of shipping. Made sail at daylight with a fair wind; the Union came to anchor in Madeira roads in the afternoon."
+  },
+  {
+   "id": "V02",
+   "vessel": "Providence",
+   "master": "Ainsley",
+   "departed": "1782-11-12",
+   "ports": [
+    "Kingston",
+    "Bristol",
+    "Port Royal"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 280,
+    "rum_puncheons": 50,
+    "other": "pimento"
+   },
+   "crew": 14,
+   "notes": "The pumps were worked an hour in every watch, the ship being somewhat leaky in the upper works."
+  },
+  {
+   "id": "V03",
+   "vessel": "Hester",
+   "master": "Pryce",
+   "departed": "1783-01-05",
+   "ports": [
+    "Cork",
+    "Madeira",
+    "Montego Bay"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 293,
+    "rum_puncheons": 45,
+    "other": "ginger"
+   },
+   "crew": 12,
+   "notes": "Spoke a brig bound for Madeira, whose master told us that logwood was dear there and the roads full of shipping."
+  },
+  {
+   "id": "V04",
+   "vessel": "Mary Ann",
+   "master": "Kemp",
+   "departed": "1784-08-14",
+   "ports": [
+    "Bristol",
+    "Cork",
+    "Lisbon"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 437,
+    "rum_puncheons": 43,
+    "other": "logwood"
+   },
+   "crew": 16,
+   "notes": "The mate mustered the people at four bells and found every man present, which had not happened since leaving Bristol. The mate mustered the people at four bells and found every man present, which had not happened since leaving Port Royal."
+  },
+  {
+   "id": "V05",
+   "vessel": "Mary Ann",
+   "master": "Carew",
+   "departed": "1785-05-11",
+   "ports": [
+    "Kingston",
+    "Lisbon",
+    "Madeira"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 512,
+    "rum_puncheons": 34,
+    "other": "ginger"
+   },
+   "crew": 21,
+   "notes": "Spoke a brig bound for Madeira, whose master told us that cotton was dear there and the roads full of shipping."
+  },
+  {
+   "id": "V06",
+   "vessel": "Providence",
+   "master": "Ainsley",
+   "departed": "1786-08-25",
+   "ports": [
+    "Bristol",
+    "Madeira",
+    "Port Royal"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 191,
+    "rum_puncheons": 29,
+    "other": "pimento"
+   },
+   "crew": 19,
+   "notes": "Made sail at daylight with a fair wind; the Industry came to anchor in Liverpool roads in the afternoon."
+  },
+  {
+   "id": "V07",
+   "vessel": "Hester",
+   "master": "Pryce",
+   "departed": "1787-12-21",
+   "ports": [
+    "Madeira",
+    "Port Royal",
+    "Bristol"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 321,
+    "rum_puncheons": 41,
+    "other": "pimento"
+   },
+   "crew": 18,
+   "notes": "The Betsey sailed from Madeira on the 20th with logwood and iron bars, and has not since been heard of. Served the people their allowance of beef and pork, with a pint of rum between four, as is the custom of the voyage."
+  },
+  {
+   "id": "V08",
+   "vessel": "Mary Ann",
+   "master": "Kemp",
+   "departed": "1788-09-27",
+   "ports": [
+    "Lisbon",
+    "Kingston",
+    "Montego Bay"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 279,
+    "rum_puncheons": 14,
+    "other": "cotton"
+   },
+   "crew": 22,
+   "notes": "Captain Carew thought the Amity sailed best with a little weather helm and her topsails reefed. Spoke a brig bound for Montego Bay, whose master told us that linen was dear there and the roads full of shipping."
+  },
+  {
+   "id": "V09",
+   "vessel": "Providence",
+   "master": "Ainsley",
+   "departed": "1789-01-06",
+   "ports": [
+    "Montego Bay",
+    "Cork",
+    "Port Royal"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 295,
+    "rum_puncheons": 36,
+    "other": "cotton"
+   },
+   "crew": 18,
+   "notes": "Paid £86 4s 9d to the Port Officer on 8 May 1790, receipt no. 7731. The vessel was cleared the same afternoon."
+  },
+  {
+   "id": "V10",
+   "vessel": "Providence",
+   "master": "Ainsley",
+   "departed": "1790-06-21",
+   "ports": [
+    "Madeira",
+    "Cork",
+    "Montego Bay"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 401,
+    "rum_puncheons": 46,
+    "other": "logwood"
+   },
+   "crew": 22,
+   "notes": "Her people were employed in scraping the decks, overhauling the rigging and stowing the chests, and none was sick. At noon we observed in latitude 33 degrees north, and the ship was by account 574 leagues from the land."
+  },
+  {
+   "id": "V11",
+   "vessel": "Hester",
+   "master": "Pryce",
+   "departed": "1791-05-10",
+   "ports": [
+    "Madeira",
+    "Lisbon",
+    "Kingston"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 388,
+    "rum_puncheons": 44,
+    "other": "pimento"
+   },
+   "crew": 13,
+   "notes": "Made sail at daylight with a fair wind; the Providence came to anchor in Liverpool roads in the afternoon. The mate mustered the people at four bells and found every man present, which had not happened since leaving Montego Bay."
+  },
+  {
+   "id": "V12",
+   "vessel": "Mary Ann",
+   "master": "Kemp",
+   "departed": "1792-07-09",
+   "ports": [
+    "Madeira",
+    "Lisbon",
+    "Kingston"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 501,
+    "rum_puncheons": 21,
+    "other": "ginger"
+   },
+   "crew": 15,
+   "notes": "Captain Pryce reports a strong gale from the west all the way from the Lizard, and the ship making 4 knots. The pumps were worked an hour in every watch, the ship being somewhat leaky in the upper works."
+  },
+  {
+   "id": "V13",
+   "vessel": "Mary Ann",
+   "master": "Carew",
+   "departed": "1793-08-02",
+   "ports": [
+    "Cork",
+    "Port Royal",
+    "Madeira"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 485,
+    "rum_puncheons": 26,
+    "other": "pimento"
+   },
+   "crew": 21,
+   "notes": "Made sail at daylight with a fair wind; the Charming Sally came to anchor in Montego Bay roads in the afternoon."
+  },
+  {
+   "id": "V14",
+   "vessel": "Providence",
+   "master": "Ainsley",
+   "departed": "1794-09-22",
+   "ports": [
+    "Lisbon",
+    "Port Royal",
+    "Madeira"
+   ],
+   "cargo": {
+    "sugar_hogsheads": 408,
+    "rum_puncheons": 42,
+    "other": "logwood"
+   },
+   "crew": 16,
+   "notes": "The pumps were worked an hour in every watch, the ship being somewhat leaky in the upper works."
+  }
+ ],
+ "totals": {
+  "voyages": 14,
+  "note": "Figures are as the clerks entered them."
+ }
+}

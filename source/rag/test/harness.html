@@ -11,8 +11,10 @@
      store and the embedder and puts them on window.RagHarness for the tests to drive. Serve it with rag/test/serve.py
      (/rag/test/harness.html, with /rag/vendor/ = the unpacked vendor tree). -->
 <script type="module">
-import * as storeModule from '../store.js';
-import * as embedderModule from '../embedder.js';
+// by root-relative address, so the page works wherever it is served from (/rag/test/harness.html or /harness.html): rag/ is
+// beside the page folder in the apps, and the clients find their worker and the vendor folder from their own address
+import * as storeModule from '/rag/store.js';
+import * as embedderModule from '/rag/embedder.js';
 
 const errors = [];
 window.addEventListener('error', (e) => errors.push('error: ' + e.message));
