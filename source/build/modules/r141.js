@@ -1327,7 +1327,7 @@ function counts(r,noScan){var vb=$("fbViews");if(!vb)return;var rec=r?recOf(r):n
   if(rec&&r&&!noScan)scanSoon(r);}
 /* the open issues and pull requests counted on their tabs the moment a record changes, not at the next paint */
 function badges(rec){var x=X(),r=null;if(!x||!$("fbViews"))return;try{r=x.cur();}catch(e){}if(r&&rec&&r.id===rec.id)counts(r,true);}
-function historyKeys(r,x){if(!r||x.S.view!=="history")return;[].forEach.call(document.querySelectorAll('#fbWorkBody .f-cm[aria-expanded="true"] .f-acts'),function(acts){if(acts.querySelector(".h-cmpk"))return;var card=acts.closest(".f-cm"),idEl=card&&card.querySelector(".id");if(!idEl)return;var short=idEl.textContent.trim();
+function historyKeys(r,x){if(!r||x.S.view!=="history")return;[].forEach.call(document.querySelectorAll('#fbWorkBody .f-cm[aria-expanded="true"] .f-acts, #fbWorkBody .f-cm[data-open="true"] .f-acts'),function(acts){if(acts.querySelector(".h-cmpk"))return;var card=acts.closest(".f-cm"),idEl=card&&card.querySelector(".id");if(!idEl)return;var short=idEl.textContent.trim();
   function go2(fn){return function(ev){ev.stopPropagation();IngRepo.resolve(r.id,short).then(function(oid){return IngRepo.log(r.id,{ref:oid,max:1});}).then(function(l){if(l[0])fn(l[0]);},fail);};}
   var k=btn("sm h-cmpk","Compare",go2(function(c){var cv=V(r).cmp;cv.a=c.parents[0]||"empty";cv.b=c.oid;cv.focus=null;show("compare");}));k.title="Set this version beside any other, line by line";acts.appendChild(k);
   acts.appendChild(btn("sm h-brk","Browse the files",go2(function(c){var cd=V(r).code;cd.ref=c.oid;cd.file=null;cd.dir="";cd.res=false;show("code");})));});}

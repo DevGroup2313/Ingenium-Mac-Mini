@@ -162,7 +162,7 @@ async function ping(p, n = 5) { let worst = 0; for (let i = 0; i < n; i++) { con
     // 6.9.1 (r195): a current Claude model holds a million tokens; the page's own engine reaches 32,768 only where its fast build runs on 8 GB or more, else its real cap of 8,192
     ok(win.a === 1000000 && win.g === 1000000 && win.ol === 32768 && win.ol2 === 131072 && win.desk === 262144 && win.page === win.pageMax && (win.pageMax === 8192 || win.pageMax === 32768) && win.reply === 131072,
       'a connected model is given its own window (Claude 1M, Gemini 1M; a server at home 32K, or what is chosen); a model on this computer trained for 256K given 256K, a reply up to 128K (6.3); the page\'s engine its real cap (6.9.1)', win);
-    const ol = await p.evaluate(() => /num_ctx:typeof ingCloudWindow/.test(String(cloudChat)));
+    const ol = await p.evaluate(() => /num_ctx:typeof ingCloudWindow/.test(String(cloudChat)) || [...document.scripts].some(sc => /num_ctx:typeof ingCloudWindow/.test(sc.textContent)));  // 6.9.2: cloudChat is wrapped (r190), so the page's own scripts are searched too
     ok(ol, 'Ollama is told how much to keep (num_ctx)');
     ok(!p.__errs.length, 'no page errors', p.__errs.slice(0, 5));
   } catch (e) { ok(false, 'the run crashed', e.stack); }
