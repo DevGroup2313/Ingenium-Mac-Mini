@@ -1,0 +1,9 @@
+9 March 2026. Batch 17, harvest.
+
+Colony counts were entered into the shared sheet the same day, with the plate identifiers written as on the lids. Absorbance was read at 600 nm after shaking for 23 seconds, and blanks were subtracted before analysis. Marcus repeated the assay on a second day to check that the result did not depend on the batch of medium.
+
+Dry weight after 48 h at 60 °C: Batch 17 yielded 3.82 g of dry mycelium from 2.0 L of potato dextrose broth, which is about 8% better than batch 16.
+
+Absorbance was read at 600 nm after shaking for 5 seconds, and blanks were subtracted before analysis. Negative controls were run with every batch; none showed growth, and the blanks read within the usual range. The beech litter came from three sites, and each site was sampled at 8 points along a transect. Plates were incubated at 28 °C for 96 h before counting, and each count was made by two people.
+
+Marcus wants the same medium for batch 18; Imani prefers to try malt extract. We will run both.

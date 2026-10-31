@@ -1,0 +1,30 @@
+{
+  "experiment": "E-2026-03",
+  "title": "Medium comparison for batch cultures",
+  "investigators": [
+    "Imani Okoye",
+    "Marcus Dlamini"
+  ],
+  "design": {
+    "factors": {
+      "medium": [
+        "PDB",
+        "MEA broth"
+      ],
+      "temperature_c": [
+        25,
+        28
+      ]
+    },
+    "replicates": 6,
+    "duration_h": 48
+  },
+  "status": {
+    "state": "complete",
+    "notes": "All media were autoclaved and poured in the prep room, and the plates were dried for 43 minutes in the cabinet."
+  },
+  "files": [
+    "batch17.csv",
+    "batch18.csv"
+  ]
+}

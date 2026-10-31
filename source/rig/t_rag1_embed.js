@@ -35,12 +35,13 @@ function pageHelpers() {
   const p = await ctx.newPage();
   const pageErrors = [];
   p.on('pageerror', (e) => pageErrors.push(e.message));
-  p.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
+  p.on('console', (m) => { if (m.type() === 'error') consoleErrors.push({ text: m.text(), url: m.location().url }); });
   const ev = (fn, arg) => p.evaluate(fn, arg);
   await p.goto(HARNESS); await p.waitForFunction(() => window.RagHarness && window.RagHarness.ready === true, null, { timeout: 30000 });
 
-  const SECTIONS = ['start', 'files', 'init', 'vectors', 'retrieval', 'prefix', 'batching', 'count', 'counters', 'second init', 'other models', 'pooling', 'tiers', 'speed'];
+  const SECTIONS = ['start', 'files', 'init', 'vectors', 'retrieval', 'prefix', 'batching', 'count', 'counters', 'second init', 'other models', 'pooling', 'tiers', 'speed', 'worker pool'];
   const ran = [];
+  let speed1 = 0;
   const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.message)); } ran.push(name); };
   const seen = () => requests.length;
   const since = (n) => requests.slice(n);
@@ -80,19 +81,21 @@ function pageHelpers() {
       const ms = Math.round(performance.now() - t0);
       const info = await e.info();
       const prog = window.T.events.filter((m) => m.event === 'progress');
-      return { before, init, info, ms, hello: window.T.events.some((m) => m.event === 'hello' && m.worker === 'embedder'), progFiles: [...new Set(prog.map((m) => m.file))], progDone: prog.filter((m) => m.loaded === m.total).map((m) => m.file) };
+      return { before, init, info, ms, hello: window.T.events.some((m) => m.event === 'hello' && m.worker === 'embedder'), stages: prog.map((m) => m.stage), stageModel: [...new Set(prog.map((m) => m.modelId))] };
     });
     initResult = r;
     ok(r.before.ready === false && r.before.modelId === null, 'before init the embedder says it is not ready', r.before);
     ok(r.init.modelId === MODEL && r.init.dims === 384 && r.init.maxTokens === 512, 'init() gives {modelId: Xenova/bge-small-en-v1.5, dims: 384, maxTokens: 512}, the dimensions read from the model itself', { init: r.init, ms: r.ms });
     ok(r.init.dtype === 'q8' && r.init.device === 'wasm' && r.init.pooling === 'mean' && r.init.batchSize === 16 && r.init.loads === 1 && r.init.key === MODEL + '|q8|mean', 'it ran the quantized (q8) model on the processor (wasm) with mean pooling, batches of 16, one load; key is "model|dtype|pooling"', r.init);
     ok(r.info.calls === 0 && r.info.embedded === 0 && r.info.batches === 0 && r.info.counted === 0, 'the warm-up run is not counted: calls, embedded, batches and counted are all 0 after init', r.info);
-    ok(r.hello && r.progDone.includes('onnx/model_quantized.onnx'), 'progress events reach the page while the model loads (the ONNX file reports loaded = total)', { files: r.progFiles, done: r.progDone });
+    ok(r.hello && sameJSON(r.stages, ['library', 'tokenizer', 'model', 'warm-up', 'ready']) && sameJSON(r.stageModel, [MODEL]), 'the page is told how loading goes: library, tokenizer, model, warm-up, ready', { hello: r.hello, stages: r.stages });
 
     const mine = since(nBeforeInit);
     const paths = mine.map((q) => PATH(q.url));
     const want = ['/rag/vendor/transformers/transformers.min.js', '/rag/vendor/models/Xenova/bge-small-en-v1.5/config.json', '/rag/vendor/models/Xenova/bge-small-en-v1.5/tokenizer.json', '/rag/vendor/models/Xenova/bge-small-en-v1.5/tokenizer_config.json', '/rag/vendor/models/Xenova/bge-small-en-v1.5/onnx/model_quantized.onnx', '/rag/vendor/ort/ort-wasm-simd-threaded.mjs', '/rag/vendor/ort/ort-wasm-simd-threaded.wasm', '/rag/embedder.worker.js'];
     ok(want.every((w) => paths.includes(w)), 'loading read the library, the model\'s config, tokenizer and ONNX file, and the runtime\'s two files, all from rag/ and rag/vendor/ on this server', { missing: want.filter((w) => !paths.includes(w)) });
+    const gets = (name) => mine.filter((q) => q.method === 'GET' && PATH(q.url).endsWith(name)).length;
+    ok(gets('/onnx/model_quantized.onnx') === 1 && gets('/config.json') === 1 && gets('/tokenizer.json') === 1 && gets('ort-wasm-simd-threaded.wasm') === 1, 'each big file is read once: the ONNX model, config.json, tokenizer.json and the runtime\'s WebAssembly file', { onnx: gets('/onnx/model_quantized.onnx'), config: gets('/config.json'), tokenizer: gets('/tokenizer.json'), wasm: gets('ort-wasm-simd-threaded.wasm') });
     const outside = requests.filter((q) => !q.url.startsWith(ORIGIN + '/') && !/^(data|blob):/.test(q.url));
     ok(requests.length > 8 && outside.length === 0 && external.length === 0, 'no request left this machine (' + requests.length + ' requests recorded since the page opened, every one to ' + ORIGIN + '; none had to be refused)', { outside, external });
     ok(!paths.some((u) => /huggingface|jsdelivr|\.asyncify|transformers\.web/.test(u)), 'nothing asked for the hub, a CDN, the ".asyncify" runtime or the "web" build of the library', paths.filter((u) => /huggingface|jsdelivr|asyncify|web\.min/.test(u)));
@@ -173,6 +176,8 @@ function pageHelpers() {
       const picks = [0, 7, 15, 16, 31, 39];
       const alone = await Promise.all(picks.map((i) => e.embed({ texts: [texts[i]], kind: 'passage' })));
       out.order = picks.map((i, k) => window.T.cos(all[i], alone[k][0]));
+      // the vector at position i is the one for text i: it is closer to that text's own vector than to the other picks'
+      out.orderMargin = picks.map((i, k) => window.T.cos(all[i], alone[k][0]) - Math.max(...picks.map((j, m) => (m === k ? -1 : window.T.cos(all[i], alone[m][0])))));
       const mixed = ['ok', 'Cluny '.repeat(200), 'a short one'];   // a short, a long and a short text padded together
       const together = await e.embed({ texts: mixed, kind: 'passage' });
       const separately = await Promise.all(mixed.map((m) => e.embed({ texts: [m], kind: 'passage' })));
@@ -181,8 +186,8 @@ function pageHelpers() {
     });
     ok(sameJSON(r.n1, { batches: 1, embedded: 1, calls: 1 }) && sameJSON(r.n16, { batches: 1, embedded: 16, calls: 1 }) && sameJSON(r.n17, { batches: 2, embedded: 17, calls: 1 }), 'batches of 16: 1 text is 1 batch, 16 texts 1 batch, 17 texts 2 batches', { n1: r.n1, n16: r.n16, n17: r.n17 });
     ok(sameJSON(r.n33, { batches: 3, embedded: 33, calls: 1 }) && sameJSON(r.n40, { batches: 3, embedded: 40, calls: 1 }), '33 texts are 3 batches, 40 texts are 3 (16 + 16 + 8), still one call', { n33: r.n33, n40: r.n40 });
-    ok(r.order.every((c) => c > 0.9999), 'the order is kept: texts picked from the first, middle and last batch give the same vector as when embedded alone', r.order.map((c) => +c.toFixed(6)));
-    ok(r.padding.every((c) => c > 0.999), 'padding to the longest text of a batch does not change the others (a short text next to a long one)', r.padding.map((c) => +c.toFixed(6)));
+    ok(r.order.every((c) => c > 0.98) && r.orderMargin.every((m) => m > 0.03), 'the order is kept: for texts picked from the first, middle and last batch the vector in the batch is the vector of that text alone (cosine ' + Math.min(...r.order).toFixed(4) + ' or more) and not another text\'s (those texts are near-duplicates of each other, so the margin is small)', { cos: r.order.map((c) => +c.toFixed(4)), margin: r.orderMargin.map((m) => +m.toFixed(3)) });
+    ok(r.padding.every((c) => c > 0.98), 'a short text padded next to a long one stays close to its vector alone (cosine ' + Math.min(...r.padding).toFixed(4) + ' or more: the q8 model quantizes whole batches, so the same text differs by about 1% between batches)', r.padding.map((c) => +c.toFixed(5)));
   });
 
   // ------------------------------------------------------------------------------------------------------------ count
@@ -313,7 +318,7 @@ function pageHelpers() {
       const pick = (o) => { const x = pickTier(o); return x.tier.tier + ' | ' + x.reason; };
       return {
         tiers: MODEL_TIERS.map((t) => ({ tier: t.tier, id: t.modelId, dims: t.dims, shipped: t.shipped, verified: t.verified, mb: t.fileMB, measured: t.fileMBMeasured, spare: t.minSpareGB })),
-        frozenEntries: MODEL_TIERS.every((t) => Object.isFrozen(t)),
+        frozenEntries: MODEL_TIERS.every((t) => Object.isFrozen(t)), workerGB: MODEL_TIERS.map((t) => t.workerGB),
         macbook: pick({ spareGB: 5.4, installed: [small] }), macbookBase: pick({ spareGB: 5.4, installed: [small, base] }),
         winTight: pick({ spareGB: 7, installed: [small] }), winBase: pick({ spareGB: 7, installed: [small, base] }), winBig: pick({ spareGB: 7, installed: [small, base, large] }),
         miniBusy: pick({ spareGB: 5, installed: [small, base, large] }), miniEasy: pick({ spareGB: 10, installed: [small, base, large] }), miniStrongest: pick({ spareGB: 10, installed: [small, base, large], strongest: true }),
@@ -322,6 +327,7 @@ function pageHelpers() {
       };
     });
     ok(sameJSON(r.tiers.map((t) => [t.tier, t.dims]), [['small', 384], ['base', 768], ['large', 1024]]) && r.frozenEntries, 'three tiers of one family: small (384 values), base (768), large (1024); the list cannot be changed', r.tiers);
+    ok(r.workerGB.every((w, i, a) => w > 0 && (i === 0 || w > a[i - 1])) && r.workerGB[0] === 0.4, 'each tier says what one more worker costs in memory (0.4 GB for the small one, measured; more for the others)', r.workerGB);
     ok(r.tiers[0].shipped && r.tiers[0].verified && r.tiers[0].measured && r.tiers[0].mb === 34 && !r.tiers[1].shipped && !r.tiers[1].verified && !r.tiers[2].shipped && !r.tiers[2].verified, 'only the small model is shipped and verified here; the stronger ones say they are neither, and their sizes say they are not measured', r.tiers.map((t) => [t.tier, t.shipped, t.verified, t.measured]));
     const T = (s) => s.split(' | ')[0];
     ok(T(r.macbook) === 'small' && T(r.macbookBase) === 'small' && /only 5.4 GB spare/.test(r.macbookBase), 'the MacBook Pro (about 5.4 GB to spare) keeps the small model even when a stronger one is installed', { macbook: r.macbook, macbookBase: r.macbookBase });
@@ -335,21 +341,74 @@ function pageHelpers() {
     const r = await ev(async () => {
       const e = window.T.emb; const out = {};
       const sentence = 'The monks of Cluny copied manuscripts in the scriptorium and kept the accounts of the great house. ';
-      const texts = Array.from({ length: 32 }, (_, i) => sentence.repeat(18) + ' no. ' + i);
+      const texts = Array.from({ length: 16 }, (_, i) => sentence.repeat(18) + ' no. ' + i);
+      window.T.speedTexts = texts;
       out.tokens = (await e.count({ texts: texts.slice(0, 1) }))[0];
       const t0 = performance.now(); const v = await e.embed({ texts, kind: 'passage' }); out.ms = Math.round(performance.now() - t0);
-      out.n = v.length; out.hc = navigator.hardwareConcurrency;
+      out.n = v.length; out.hc = navigator.hardwareConcurrency; window.T.speedVec = v;
       return out;
     });
-    ok(r.n === 32 && r.tokens > 300 && r.tokens < 450, '32 passages of about ' + r.tokens + ' tokens (the size the chunker aims for) embed without trouble', { tokens: r.tokens });
-    console.log('INFO  speed: 32 chunks of ' + r.tokens + ' tokens in ' + r.ms + ' ms (' + (r.ms / 32).toFixed(0) + ' ms a chunk, ' + (32000 / r.ms).toFixed(1) + ' chunks a second) with one thread, in headless Chromium on a shared ' + r.hc + '-processor build machine: a guide, not a measurement of the owner\'s computers');
+    speed1 = r.ms;
+    ok(r.n === 16 && r.tokens > 300 && r.tokens < 450, '16 passages of about ' + r.tokens + ' tokens (the size the chunker aims for) embed without trouble', { tokens: r.tokens });
+    console.log('INFO  speed: 16 chunks of ' + r.tokens + ' tokens in ' + r.ms + ' ms (' + (r.ms / 16).toFixed(0) + ' ms a chunk, ' + (16000 / r.ms).toFixed(1) + ' chunks a second) with one thread, in headless Chromium on a shared ' + r.hc + '-processor build machine (load average ' + require('os').loadavg()[0].toFixed(1) + '): a guide, not a measurement of the owner\'s computers');
+  });
+
+  // ------------------------------------------------------------------------------------------------------------ worker pool
+  await section('worker pool', async () => {
+    const sug = await ev(() => {
+      const { suggestWorkers, MODEL_TIERS } = RagHarness.embedder; const [small, base] = MODEL_TIERS;
+      return {
+        macbook: suggestWorkers({ cores: 8, spareGB: 5.4, tier: small }), laptop8: suggestWorkers({ cores: 8, spareGB: 7, tier: small }), laptop4: suggestWorkers({ cores: 4, spareGB: 7, tier: small }),
+        mini: suggestWorkers({ cores: 10, spareGB: 10, tier: small }), miniBase: suggestWorkers({ cores: 10, spareGB: 10, tier: base }),
+        tight: suggestWorkers({ cores: 8, spareGB: 1, tier: small }), unknown: suggestWorkers({}), huge: suggestWorkers({ cores: 64, spareGB: 100 }),
+      };
+    });
+    ok(sug.macbook === 2 && sug.laptop8 === 3 && sug.laptop4 === 2 && sug.mini === 4 && sug.miniBase === 2, 'suggestWorkers: half the cores, at most a fifth of the spare memory, at most 4 (MacBook Pro 5.4 GB: 2; a laptop with 8 cores and 7 GB: 3, with 4 cores: 2; the Mac mini with 10 GB: 4 small or 2 base workers; the cores of these computers are assumed)', sug);
+    ok(sug.tight === 1 && sug.unknown === 1 && sug.huge === 4, 'and never fewer than 1 (little memory, nothing known) nor more than 4', sug);
+
+    const n0 = seen();
+    const r = await ev(async () => {
+      const out = {};
+      const one = window.T.emb;
+      const e = RagHarness.makeEmbedder({ workers: 2 }); window.T.pool = e;
+      out.workersProp = e.workers;
+      out.init = await e.init();
+      const texts = Array.from({ length: 40 }, (_, i) => 'Passage number ' + i + ' about ' + ['abbeys', 'tithes', 'charters', 'saints', 'rents'][i % 5] + (i % 3 === 0 ? ' with a good deal more to say about it than the others have' : '') + '.');
+      const [pooled, plain] = [await e.embed({ texts, kind: 'passage' }), await one.embed({ texts, kind: 'passage' })];
+      out.same = pooled.map((v, i) => window.T.cos(v, plain[i]));
+      out.shape = [pooled.length, pooled.every((v) => v instanceof Float32Array && v.length === 384 && v.buffer.byteLength === 1536)];
+      out.margin = [3, 17, 38].map((i) => window.T.cos(pooled[i], plain[i]) - Math.max(window.T.cos(pooled[i], plain[i - 1]), window.T.cos(pooled[i], plain[i + 1] || plain[0])));
+      const info = await e.info();
+      out.info = { workers: info.workers, calls: info.calls, embedded: info.embedded, batches: info.batches, perWorker: info.perWorker, dims: info.dims, loads: info.loads };
+      out.small = (await e.embed({ texts: texts.slice(0, 5), kind: 'query' })).length;
+      out.empty = (await e.embed({ texts: [] })).length;
+      out.count = await e.count({ texts: ['Hello world.'] });
+      const bad = await e.embed({ texts: texts.slice(0, 20), kind: 'nonsense' }).then(() => null, (x) => x.code);
+      const after = await e.info();
+      out.bad = bad; out.afterBad = [after.calls, after.embedded];
+      // the speed of the same 16 chunks as in the part above
+      const t0 = performance.now(); const v = await e.embed({ texts: window.T.speedTexts, kind: 'passage' }); out.ms = Math.round(performance.now() - t0);
+      out.sameSpeedVecs = v.map((x, i) => window.T.cos(x, window.T.speedVec[i]));
+      out.errors = e.errors.length;
+      return out;
+    });
+    const onnx = since(n0).filter((q) => q.method === 'GET' && /model_quantized\.onnx$/.test(q.url)).length;
+    ok(r.workersProp === 2 && r.init.workers === 2 && r.init.dims === 384 && r.init.loads === 1 && onnx === 2, 'createEmbedder({workers: 2}): init loads the model in both workers (the ONNX file was read twice, once each)', { init: r.init, onnxReads: onnx });
+    ok(r.shape[0] === 40 && r.shape[1] && r.same.every((c) => c > 0.98) && r.margin.every((m) => m > 0.0), 'embed() through two workers gives 40 vectors in the order of the texts, each close to the vector one worker gives (cosine ' + Math.min(...r.same).toFixed(4) + ' or more)', { min: Math.min(...r.same), margin: r.margin });
+    ok(r.info.calls >= 1 && r.info.embedded === 40 && r.info.batches === 3 && r.info.perWorker.length === 2 && r.info.perWorker.every((w) => w.embedded > 0 && w.loads === 1) && r.info.perWorker.reduce((n, w) => n + w.batches, 0) === 3, 'both workers took part (3 batches shared out), and info() adds them up: 40 embedded, 3 batches, 1 call', r.info);
+    ok(r.small === 5 && r.empty === 0 && sameJSON(r.count, [5]) && r.bad === 'BAD_ARGS' && sameJSON(r.afterBad, [2, 45]), 'a call of one batch or less, an empty call, count(), and a bad request all work through the pool; the bad one changes no counter (2 calls and 45 texts so far)', { small: r.small, empty: r.empty, count: r.count, bad: r.bad, afterBad: r.afterBad });
+    ok(r.sameSpeedVecs.every((c) => c > 0.98) && r.errors === 0, '16 long chunks come back the same as from one worker', { min: Math.min(...r.sameSpeedVecs) });
+    console.log('INFO  two workers: the same 16 chunks of about 400 tokens in ' + r.ms + ' ms, one worker took ' + speed1 + ' ms (' + (speed1 / r.ms).toFixed(2) + ' times as fast; the machine is shared and loaded, load average ' + require('os').loadavg()[0].toFixed(1) + ')');
+    await ev(() => { window.T.pool.terminate(); });
   });
 
   // ------------------------------------------------------------------------------------------------------------ the end
   const sc = await ev(() => ({ errors: window.RagHarness.errors, workerErrors: window.RagHarness.workerErrors() }));
   ok(ran.length === SECTIONS.length && SECTIONS.every((s) => ran.includes(s)), 'every part of this test ran to its end (' + ran.length + ' of ' + SECTIONS.length + ')', { missing: SECTIONS.filter((s) => !ran.includes(s)) });
   ok(pageErrors.length === 0 && sc.errors.length === 0 && sc.workerErrors.length === 0, 'no script errors on the page or in the workers', { pageErrors, errors: sc.errors, workerErrors: sc.workerErrors });
-  ok(consoleErrors.length === 0, 'no console errors', consoleErrors);
+  const expected404 = consoleErrors.filter((c) => /status of 404/.test(c.text) && /bge-base-en-v1\.5|\/onnx\/model(_fp16)?\.onnx$/.test(c.url));
+  const unexpected = consoleErrors.filter((c) => !expected404.includes(c));
+  ok(unexpected.length === 0, 'no console errors (but the ' + expected404.length + ' 404 answers the browser logs for the files of the models that are not installed, asked for on purpose)', unexpected);
   const outside = requests.filter((q) => !q.url.startsWith(ORIGIN + '/') && !/^(data|blob):/.test(q.url));
   ok(outside.length === 0 && external.length === 0, 'at the end: ' + requests.length + ' requests in all, none outside this machine', { outside, external });
   fs.writeFileSync(OUT + '/t_rag1_embed.requests.txt', requests.map((q) => q.method + ' ' + q.url).join('\n'));

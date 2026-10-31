@@ -8,7 +8,9 @@
 //
 // Messages: request {id, op, args}; reply {id, ok: true, result} or {id, ok: false, error: {name, message, code, stack}}.
 // Events carry no id: {event: 'hello', worker: 'embedder'}, and while a model loads
-// {event: 'progress', stage: 'model', file, loaded, total}.
+// {event: 'progress', stage: 'library' | 'tokenizer' | 'model' | 'warm-up' | 'ready', modelId, ms}. (There is no byte count: asking
+// Transformers.js for one makes it read config.json and the model file twice, a cost that grows with the model; the files are on
+// this computer, so a stage is enough.)
 //
 // Ops
 //   init({modelId = 'Xenova/bge-small-en-v1.5', dtype = 'q8', device = 'wasm', vendorBase, pooling = 'mean', batchSize = 16,
@@ -137,16 +139,12 @@ async function init(a) {
   if (!T) T = await import(vendorBase + 'transformers/transformers.min.js');
   configure(vendorBase);
 
-  const last = new Map();
-  const progress = (p) => {
-    if (!p || p.status !== 'progress' || !p.file) return;
-    const now = performance.now();
-    if (now - (last.get(p.file) || 0) < 100 && p.loaded < p.total) return;
-    last.set(p.file, now);
-    self.postMessage({ event: 'progress', stage: 'model', modelId, file: p.file, loaded: p.loaded, total: p.total });
-  };
+  const stage = (name) => self.postMessage({ event: 'progress', stage: name, modelId, ms: Math.round(performance.now() - t0) });
+  stage('library');
   const tokenizer = await T.AutoTokenizer.from_pretrained(modelId);
-  const model = await T.AutoModel.from_pretrained(modelId, { dtype, device, progress_callback: progress });
+  stage('tokenizer');
+  const model = await T.AutoModel.from_pretrained(modelId, { dtype, device });
+  stage('model');
   const prefixes = defaultPrefixes(modelId);
   const next = {
     modelId, dtype, device, pooling, batchSize, tokenizer, model,
@@ -159,9 +157,11 @@ async function init(a) {
   const probe = await runBatch(next, ['warm up']);
   next.dims = probe.dims;
   next.loadMs = Math.round(performance.now() - t0);
+  stage('warm-up');
   const old = cur;
   cur = next; loads++;
   if (old) { try { await old.model.dispose(); } catch (_) { /* the old model is gone either way */ } }
+  stage('ready');
   return summary();
 }
 
