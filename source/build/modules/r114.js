@@ -15,6 +15,12 @@
 #fb .f-gh-list{display:flex;flex-direction:column;gap:3px;margin-top:6px;width:100%}
 #fb .f-gh-key{font:600 12px/1.3 var(--f-mono);color:var(--f-ink3)}
 #fb .f-cp .t .f-gh-note{display:block;font-size:11.5px;color:var(--f-warn);margin-top:3px}
+/* 6.9.1: GitHub's own sign-in page: the code to type there, large and plain */
+#fb .f-gh-code{font:700 28px/1.2 var(--f-mono);letter-spacing:.12em;color:var(--f-ink1);text-align:center;padding:12px 10px;margin:10px 0 6px;border:1px dashed var(--f-ring,#b9a8e0);border-radius:10px;-webkit-user-select:all;user-select:all}
+#fb .f-gh-wait{font-size:12.5px;color:var(--f-ink2);text-align:center;min-height:1.4em;margin:4px 0 8px}
+#fb .f-gh-more{margin-top:8px;font-size:12px;color:var(--f-ink2)}
+#fb .f-gh-more summary{cursor:pointer;color:var(--f-acc);font-weight:600}
+#fb .f-gh-more input{width:100%;margin-top:6px;box-sizing:border-box}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p45"]="started";}catch(_){}
 /* R114 · GitHub inside Fabrica: see the note at the top of its styles. Nothing here runs unless the GitHub switch is on. */
@@ -59,7 +65,64 @@ function identLine(p){var m=/^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:\.\d+
 
 /* ---------- the account and the link ---------- */
 function signIn(token){var g=GH();var old=g.token;g.token=String(token||"").trim();return api("/user").then(function(x){g.login=x.data.login||"";g.since=Date.now();save();return g.login;},function(e){g.token=old;save();throw e;});}
-function signOut(){var g=GH();delete g.token;delete g.login;save();}
+function signOut(){var g=GH();delete g.token;delete g.login;delete g.via;save();}
+
+/* ---------- 6.9.1: GitHub's own sign-in page, in place of a pasted token ----------
+   The owner's words (30 October 2026): "I want Ingenium to be load up the GitHub sign-in page instead of prompting me to
+   create a code or key in order to gain access to GitHub and my account's repositories, that process needs to be
+   streamlined and made better." GitHub signs a program in through its device flow: the program asks GitHub for a short
+   code, GitHub's own sign-in page opens in the browser, the person types the code there and allows the app, and the
+   program is handed its sign-in. GitHub's sign-in endpoints refuse a page in a browser (no CORS), so the asking goes
+   through the apps' own door to the internet (netFetch: the computer app's relay, the phone and tablet app's bridge); in
+   a plain browser the token stays the way in. The app id (an OAuth App's public client id, not a secret) is the owner's,
+   made once on GitHub (Settings, Developer settings, OAuth Apps, New OAuth App, with Enable Device Flow ticked). */
+var GH_CLIENT_ID="";
+function web(){return String(GH().web||"https://github.com").replace(/\/$/,"");}
+function clientId(){return String(GH().client||GH_CLIENT_ID||"").trim();}
+function canDevice(){try{if(!clientId()||typeof netFetch!=="function")return false;var m=typeof netMode==="function"?netMode():"web";return m!=="web"||/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/.test(web());}catch(e){return false;}}
+function oauthWords(code){return {expired_token:"The code ran out before GitHub heard from you; start again.",access_denied:"You said no on GitHub's page.",
+  device_flow_disabled:"This app is not allowed to sign in this way yet: on GitHub, in the app's settings, tick Enable Device Flow.",
+  incorrect_client_credentials:"GitHub does not know this app id. Check it under Another app id.",unsupported_grant_type:"GitHub refused the request's form.",
+  incorrect_device_code:"GitHub did not recognise the code; start again."}[code]||("GitHub answered: "+code);}
+function oauth(path,params){var body=Object.keys(params).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(params[k]);}).join("&"),u=web()+path;
+  var hd={"Accept":"application/json","Content-Type":"application/x-www-form-urlencoded"};
+  var p=(typeof netFetch==="function")?netFetch(u,{method:"POST",headers:hd,body:body,timeout:30}).then(function(r){return Promise.resolve(typeof r.text==="function"?r.text():(r.body||"")).then(function(t){return {status:r.status,text:t};});})
+    :fetch(u,{method:"POST",headers:hd,body:body}).then(function(r){return r.text().then(function(t){return {status:r.status,text:t};});});
+  return p.then(function(r){var d={};try{d=JSON.parse(r.text||"{}");}catch(e){d={error:"unsupported_grant_type"};}
+    if(d.error&&!/^(authorization_pending|slow_down)$/.test(d.error)){var e=new Error(oauthWords(d.error));e.code=d.error;throw e;}return d;},
+    function(e){var m=String(e&&e.message||e);throw new Error(/refused or could not reach/.test(m)?"From a browser GitHub's sign-in page cannot be reached from here; the Mac, Windows, tablet and phone apps can. Paste a token instead.":m);});}
+function deviceStart(){return oauth("/login/device/code",{client_id:clientId(),scope:"repo workflow"}).then(function(d){if(!d.device_code||!d.user_code)throw new Error("GitHub gave no code.");return d;});}
+/* asks GitHub every few seconds (never faster than it allows) until the person has allowed the app, or the code runs out */
+function devicePoll(dev,onTick,ctl){ctl=ctl||{};var wait=Math.max(5,+dev.interval||5)*1000,until=Date.now()+Math.max(60,+dev.expires_in||900)*1000;
+  return new Promise(function(res,rej){(function tick(){if(ctl.stop)return rej(Object.assign(new Error("Stopped."),{code:"stopped"}));
+      var left=Math.max(0,until-Date.now());if(!left)return rej(Object.assign(new Error(oauthWords("expired_token")),{code:"expired_token"}));
+      if(onTick)try{onTick(left);}catch(e){}
+      oauth("/login/oauth/access_token",{client_id:clientId(),device_code:dev.device_code,grant_type:"urn:ietf:params:oauth:grant-type:device_code"}).then(function(d){
+        if(ctl.stop)return rej(Object.assign(new Error("Stopped."),{code:"stopped"}));
+        if(d.access_token)return res(d);if(d.error==="slow_down")wait+=5000;ctl.timer=setTimeout(tick,wait);},rej);})();});}
+/* an address opened outside the page: the computer app's browser, the phone's, or a new window */
+function openOut(u){u=String(u||"");if(!/^https:\/\//i.test(u)&&!/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//i.test(u))return false;  /* only https, or this computer's own stand-in while a test runs */
+  try{var a=typeof shellApi==="function"?shellApi():null;if(a&&typeof a.open_url==="function"){Promise.resolve(a.open_url(u)).then(null,function(){});return true;}}catch(e){}
+  try{if(typeof INB!=="undefined"&&INB&&typeof INB.call==="function"&&typeof nativeInfo!=="undefined"&&nativeInfo){INB.call("openUrl",{url:u}).then(null,function(){try{var b=document.createElement("a");b.href=u;b.target="_blank";b.rel="noopener noreferrer";document.body.appendChild(b);b.click();b.remove();}catch(e){}});return true;}}catch(e){}
+  try{var x=document.createElement("a");x.href=u;x.target="_blank";x.rel="noopener noreferrer";document.body.appendChild(x);x.click();x.remove();return true;}catch(e){return false;}}
+function deviceSheet(X,repaint){var h=X.h,sh=X.sheet("Sign in with GitHub","GitHub's own sign-in page opens in your browser. Type this code there, allow Ingenium, and come back here: nothing to paste."),box=sh.box;
+  var code=h("div","f-gh-code"),wait=h("div","f-gh-wait"),end=h("div","end"),ctl={},dev=null;code.textContent="…";wait.textContent="Asking GitHub for a code…";
+  code.setAttribute("aria-live","polite");box.appendChild(code);box.appendChild(wait);
+  var copyK=X.btn("quiet","Copy the code",function(){if(!dev)return;var t=dev.user_code;try{if(typeof csCopyText==="function")return csCopyText(t,copyK);}catch(e){}
+      try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){X.toast("Copied.");});else if(typeof INB!=="undefined"&&INB)INB.call("clipboardWrite",{text:t});}catch(e){}});
+  var openK=X.btn("pri","Open GitHub's page",function(){if(dev)openOut(dev.verification_uri||web()+"/login/device");});
+  copyK.disabled=openK.disabled=true;
+  var more=h("details","f-gh-more"),sum=h("summary");sum.textContent="Another app id";more.appendChild(sum);
+  var note=h("div");note.textContent="The app id is the OAuth App GitHub gave you (Settings, Developer settings, OAuth Apps, New OAuth App, with Enable Device Flow ticked). It is not a secret.";more.appendChild(note);
+  var inp=h("input");inp.type="text";inp.placeholder="Ov23li…";inp.value=clientId();inp.setAttribute("aria-label","The app id");inp.onchange=function(){GH().client=inp.value.trim();save();};more.appendChild(inp);
+  function close(){ctl.stop=true;if(ctl.timer)clearTimeout(ctl.timer);sh.close();}
+  end.appendChild(X.btn("","Close",close));end.appendChild(copyK);end.appendChild(openK);box.appendChild(end);box.appendChild(more);
+  function left(ms){var s=Math.round(ms/1000);return Math.floor(s/60)+":"+String(s%60).replace(/^(\d)$/,"0$1");}
+  deviceStart().then(function(d){dev=d;code.textContent=d.user_code;copyK.disabled=openK.disabled=false;wait.textContent="Waiting for you on GitHub…";openOut(d.verification_uri||web()+"/login/device");
+    return devicePoll(d,function(ms){wait.textContent="Waiting for you on GitHub… "+left(ms)+" left";},ctl);})
+  .then(function(d){var g=GH();return signIn(d.access_token).then(function(login){g.via="device";save();X.toast("Signed in as "+login+".");sh.close();repaint();});})
+  .then(null,function(e){if(e&&e.code==="stopped")return;wait.textContent=String(e&&e.message||e);copyK.disabled=openK.disabled=true;});}
+function tokenSheet(X,repaint){X.sheetName("Sign in to GitHub with a token","Paste a personal access token. Make one at github.com → Settings → Developer settings → Fine-grained tokens, for the repositories you want Fabrica to reach.",function(t){return signIn(t).then(function(login){var g=GH();g.via="token";save();X.toast("Signed in as "+login+".");repaint();});},"github_pat_…");}
 function myRepos(){return api("/user/repos?per_page=100&sort=pushed").then(function(x){return (x.data||[]).map(function(r){return {full:r.full_name,owner:r.owner&&r.owner.login,repo:r.name,branch:r.default_branch||"main",priv:!!r.private};});});}
 function link(r,owner,repo,branch){return api("/repos/"+encodeURIComponent(owner)+"/"+encodeURIComponent(repo)).then(function(x){var d=x.data;
   var L=FB().remote[r.id]=FB().remote[r.id]||{map:{},rmap:{},have:{}};L.owner=d.owner&&d.owner.login||owner;L.repo=d.name||repo;L.branch=branch||r.branch||d.default_branch||"main";L.html=d.html_url||("https://github.com/"+owner+"/"+repo);L.priv=!!d.private;L.push=!!(d.permissions&&d.permissions.push);delete L.check;save();return L;});}
@@ -159,11 +222,15 @@ function raise(L,title,body){return api(path(L)+"/issues",{method:"POST",body:{t
 var cache={};
 function paint(r,cp,X){var g=GH(),L=linkOf(r),h=X.h,btn=X.btn,esc=X.esc;
   function row(title,small,keys){var e=h("div","f-cp");e.innerHTML='<div class="t">'+esc(title)+(small?"<small>"+small+"</small>":"")+"</div>";(keys||[]).forEach(function(k){if(k)e.appendChild(k);});cp.appendChild(e);return e;}
-  function openUrl(u){try{if(!/^https:\/\//i.test(String(u))){X.toast("Open this address: "+u);return;}var a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener noreferrer";document.body.appendChild(a);a.click();a.remove();}catch(e){X.toast(u);}}  /* 6.2: the site opened is told nothing of Ingenium's window */
+  function openUrl(u){if(!/^https:\/\//i.test(String(u))){X.toast("Open this address: "+u);return;}if(!openOut(u))X.toast(u);}  /* 6.2: the site opened is told nothing of Ingenium's window; 6.9.1: the computer and phone apps open it in the browser */
   function repaint(){try{if(window.fbPaintShip)fbPaintShip();}catch(e){}}
-  if(!g.token){row("Sign in to GitHub","A fine-grained token for your repositories, with Contents, Actions and Issues allowed to read and write. It is kept on this device and sent only to GitHub.",[btn("sm","Sign in",function(){
-      X.sheetName("Sign in to GitHub","Paste a personal access token. Make one at github.com → Settings → Developer settings → Fine-grained tokens, for the repositories you want Fabrica to reach.",function(t){return signIn(t).then(function(login){X.toast("Signed in as "+login+".");repaint();});},"github_pat_…");})]);return;}
-  row("Signed in as "+(g.login||"you"),"GitHub answers Fabrica with this token; nothing leaves this device until you press Send.",[btn("quiet sm","Sign out",function(){signOut();X.toast("Signed out of GitHub. The token is gone from this device.");repaint();})]);
+  if(!g.token){
+    if(canDevice()){row("Sign in to GitHub","GitHub's own sign-in page opens; nothing to paste. The sign-in is kept on this device and sent only to GitHub.",[btn("sm pri","Sign in with GitHub",function(){deviceSheet(X,repaint);}),btn("quiet sm","Paste a token instead",function(){tokenSheet(X,repaint);})]);return;}
+    var why=!clientId()?"To sign in on GitHub's own page instead, add the app id GitHub gives you (Settings, Developer settings, OAuth Apps, New OAuth App, with Enable Device Flow ticked)."
+      :"From a browser GitHub's sign-in page cannot be reached from here; the Mac, Windows, tablet and phone apps open it.";
+    row("Sign in to GitHub","A fine-grained token for your repositories, with Contents, Actions and Issues allowed to read and write. It is kept on this device and sent only to GitHub.<span class=\"f-gh-note\" style=\"color:var(--f-ink2)\">"+esc(why)+"</span>",
+      [btn("sm","Sign in",function(){tokenSheet(X,repaint);})].concat(!clientId()?[btn("quiet sm","Add the app id",function(){X.sheetName("The app id","The OAuth App's client id, as GitHub shows it (it is not a secret).",function(v){GH().client=String(v).trim();save();repaint();return Promise.resolve();},"Ov23li…");})]:[]));return;}
+  row("Signed in as "+(g.login||"you"),g.via==="device"?"Signed in on GitHub's own page; GitHub answers Fabrica with that sign-in. Nothing leaves this device until you press Send.":"GitHub answers Fabrica with this token; nothing leaves this device until you press Send.",[btn("quiet sm","Sign out",function(){signOut();X.toast("Signed out of GitHub. The sign-in is gone from this device.");repaint();})]);
   if(!L){row("Its repository on GitHub","Link this app to one of your repositories, and its versions can go there and come back.",[btn("sm","Link",function(){linkSheet(r,X,repaint);})]);return;}
   row(L.owner+"/"+L.repo+" · "+(L.branch||"main"),(L.priv?"A private repository":"A public repository")+(L.push===false?"<span class='f-gh-note'>The token cannot write here.</span>":""),[btn("quiet sm","Open",function(){openUrl(L.html||("https://github.com/"+L.owner+"/"+L.repo));}),btn("quiet sm","Change",function(){linkSheet(r,X,repaint);})]);
   /* the two copies */
@@ -238,7 +305,7 @@ function fixInCode(r,report,X){try{if(typeof window.fbOpenInCode==="function"){w
   X.toast("Code is not in this build; the report is copied below.");try{if(typeof csCopyText==="function")csCopyText(report);}catch(e){}}
 
 function forget(id){["runs","rel","iss"].forEach(function(k){delete cache[id+k];});var L=FB().remote[id];if(L)delete L.check;}
-window.fbGitHub={paint:paint,forget:forget,signIn:signIn,signOut:signOut,link:link,unlink:unlink,compare:compare,send:send,bring:bring,release:release,releases:releases,runs:runs,startBuilds:startBuilds,artifacts:artifacts,issues:issues,raise:raise,api:api,_:{person:person,identLine:identLine}};
+window.fbGitHub={paint:paint,forget:forget,signIn:signIn,signOut:signOut,deviceStart:deviceStart,devicePoll:devicePoll,oauth:oauth,clientId:clientId,canDevice:canDevice,openOut:openOut,link:link,unlink:unlink,compare:compare,send:send,bring:bring,release:release,releases:releases,runs:runs,startBuilds:startBuilds,artifacts:artifacts,issues:issues,raise:raise,api:api,_:{person:person,identLine:identLine}};
 })();
 ;try{window.__ingParts["p45"]="running";}catch(_){}
 </script>

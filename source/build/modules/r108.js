@@ -326,7 +326,7 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
 
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
-     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
+     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn quiet" id="l7Open" title="Open this document in Tabula, as the Word file it saves, to keep writing it there">Open in Tabula</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
    '</div></div>';
   wireFrame();wireMid();return $("lx7");}
 /* 6.2: the middle panel shows the thinking or Ask Lector; the document panel's key opens Ask Lector on the document shown */
@@ -981,6 +981,22 @@ function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{ap
 /* ---------------- saving ---------------- */
 function curDoc(){var kind=R7.doc||"analysis";if(kind==="analysis")return analysisMd(job()).then(function(md){return md?{kind:kind,md:unmark(md)}:null;});
   var s=stored(kind);if(!s)return Promise.resolve(null);return IngBig.load(s.ref).then(function(md){return md?{kind:kind,md:unmark(md),chk:s.chk}:null;});}
+/* 6.9.1: the document as a Word file, the same bytes Save gives, for Tabula to open (modules/r194.js, IngOpenIn) */
+function wordFile(d){var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title);
+  var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
+  if(d.kind==="cover"||d.kind==="cv")meta.name=undefined;
+  if(window.IngDoc&&IngDoc.make){return (IngDoc.ready?IngDoc.ready():Promise.resolve()).then(function(){return crestFor(sealed(d.kind)?crestKind(apps):"",apps,"html");}).then(function(cr){var s0=d.kind==="analysis"?null:stored(d.kind);
+      return IngDoc.make("docx",paperPage(d.kind,d.md,{apps:apps,name:name,label:label,forText:meta.forText,title:title,crestPng:cr&&cr.html,made:s0&&s0.made}),paperOpts(d.kind,apps,title));})
+    .then(function(r){return {title:title,name:file+".docx",bytes:r.bytes};});}
+  return crestFor(sealed(d.kind)?crestKind(apps):"",apps,"docx").then(function(cr){var m2=Object.assign({},meta);if(cr&&cr.doc)m2.crest=cr.doc;return {title:title,name:file+".docx",bytes:IngHouseDocs.docx(title,d.md,m2)};});}
+function openInTabula(){if(!window.IngOpenIn){ingToast("Tabula cannot be reached in this copy of the page.");return;}
+  curDoc().then(function(d){if(!d){ingToast("There is nothing to open yet: this document is written after the reading.");return;}
+    return wordFile(d).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}});});}).then(null,function(e){ingToast("It could not be opened in Tabula: "+(e&&e.message||e));});}
+/* the documents kept here, listed inside Tabula's File menu (From Ingenium) */
+(function(){(window.__ingOpenInProviders=window.__ingOpenInProviders||[]).push({list:function(){var out=[];try{var sets=L7().sets||{};Object.keys(sets).forEach(function(k){var s=sets[k];if(!s||!s.docs)return;
+      Object.keys(s.docs).forEach(function(kind){var rec=s.docs[kind];if(!rec||!rec.ref)return;var apps=sorted(s.apps||[]),label=docLabel(kind,apps,s.purpose||"portfolio"),title=setName(apps)+" · "+label;
+        out.push({id:"lector:"+k+":"+kind,kind:"doc",title:title,from:"Lector",when:rec.made||0,open:function(o){return IngBig.load(rec.ref).then(function(md){if(!md)throw new Error("That document is no longer kept.");
+          var d={kind:kind,md:unmark(md)};return wordFile(d).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}},o);});});}});});});}catch(e){}return out;}});})();
 function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to save yet: this document is written after the reading.");return;}
   var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title),fmt=L7().brief.fmt||"docx";
   var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
@@ -1304,6 +1320,7 @@ function wireFrame(){var U=L7().ui;wireFolds();wireZoom();
   var fmt=$("l7Fmt");[].forEach.call(fmt.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",(L7().brief.fmt||"docx")===b.getAttribute("data-v")?"true":"false");
     b.onclick=function(){L7().brief.fmt=b.getAttribute("data-v");[].forEach.call(fmt.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});segThumbs(fmt.parentNode);saveSoon();};});
   $("l7Save").onclick=save;$("l7Copy").onclick=function(){curDoc().then(function(d){if(d)lxCopy(d.md);else ingToast("There is nothing to copy yet.");});};
+  if($("l7Open"))$("l7Open").onclick=openInTabula;
   /* the mouse wheel moves the rows that scroll sideways, since no bar shows */
   [].forEach.call($("lx7").querySelectorAll(".l-outline,.l-dtabs"),function(box){box.addEventListener("wheel",function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||box.scrollWidth<=box.clientWidth+1)return;box.scrollLeft+=e.deltaY;e.preventDefault();},{passive:false});});
   /* the seals turn toward the pointer, lift, and sink when pressed */

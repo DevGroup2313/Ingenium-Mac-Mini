@@ -26,6 +26,10 @@ const COL = { tabula: 'rgb(58, 58, 64)', abacus: 'rgb(53, 122, 85)', slides: 'rg
   ok(st.every(s => s && s.h >= 25 && s.h <= 28 && !s.svgShown && /^(Tabula|Abacus|Imago|Scriba|Fontes)$/.test(s.text)), '26px high, the name alone on it, no line icon', JSON.stringify(st.map(s => s && [s.k, s.h, s.text, s.svgShown])));
   ok(st.every(s => s && /Georgia/.test(s.font)), 'lettered in Georgia, as the Forge letters its stones', JSON.stringify(st.map(s => s && s.font)));
   ok(st.find(s => s.k === 'fontes').color === 'rgb(15, 75, 102)' && st.find(s => s.k === 'tabula').color === 'rgb(255, 255, 255)', 'Fontes in the dock\'s blue-black, the others in white', JSON.stringify(st.map(s => [s.k, s.color])));
+  const syms = await p.evaluate(() => ['scriba', 'fontes', 'tabula'].map(k => { const e = document.querySelector('.dock .nav-btn[data-page="' + k + '"]'); const s = e && e.querySelector('svg.ing-stone-sym'); const cs = s && getComputedStyle(s);
+    return { k, has: !!s, shown: !!(s && s.getClientRects().length && cs.display !== 'none'), w: cs && cs.width, stroke: s && s.getAttribute('stroke'), before: !!(s && s.nextSibling && s.nextSibling.nodeType === 3) }; }));
+  ok(syms[0].has && syms[0].shown && syms[0].w === '13px' && syms[0].stroke === '#f0dca6' && syms[0].before && syms[1].has && syms[1].shown && syms[1].w === '12px' && syms[1].stroke === '#145671' && syms[1].before && !syms[2].has,
+    "Scriba and Fontes carry the Forge's own marks before their names, in the Forge's colours; Tabula none", JSON.stringify(syms));
   await p.screenshot({ path: OUT + '/rail_day.png', clip: { x: 0, y: 40, width: 240, height: 900 } });
   // the folded APPS key wears the circles
   const dotsAt = () => p.evaluate((APPS) => { const lab = document.querySelector('.dock .grp-label.ing-fold'); const d = lab && lab.querySelector('.ing-fak-dots'); if (!d) return null; const cs = getComputedStyle(d);

@@ -104,3 +104,23 @@ for (let c = 0; c < BIG; c++) {
 }
 zip('chatgpt_big.zip', [['conversations.json', JSON.stringify(big)]]);
 for (const f of fs.readdirSync(OUT)) console.log(f.padEnd(26), fs.statSync(path.join(OUT, f)).size);
+
+// ---- 6.9: a Claude Code session file (two sessions, a summary, thinking, a tool and its answer, a meta line, a system line),
+//      a transcript headed by Perplexity, Q and A, an unlabelled note, and a JSON of another shape
+const ccLine = (o) => JSON.stringify(o);
+const S1 = 'sess-aaaa', S2 = 'sess-bbbb';
+fs.writeFileSync(path.join(OUT, 'claude_code_session.jsonl'), [
+  ccLine({ type: 'summary', summary: 'Footnotes in Tabula fixed', leafUuid: 'u4' }),
+  ccLine({ type: 'user', sessionId: S1, uuid: 'u1', parentUuid: null, timestamp: '2026-10-20T10:00:00Z', cwd: '/home/user/Ingenium', gitBranch: 'main', version: '2.0.12', message: { role: 'user', content: 'The footnotes in Tabula vanish after a save. Find why.' } }),
+  ccLine({ type: 'assistant', sessionId: S1, uuid: 'u2', parentUuid: 'u1', timestamp: '2026-10-20T10:00:05Z', message: { role: 'assistant', model: 'claude-opus-5-5', content: [{ type: 'thinking', thinking: 'The autosave probably writes only the main text.' }, { type: 'text', text: 'Let me read the autosave.' }, { type: 'tool_use', id: 't1', name: 'Read', input: { file_path: 'apps/tabula.html' } }] } }),
+  ccLine({ type: 'user', sessionId: S1, uuid: 'u3', parentUuid: 'u2', timestamp: '2026-10-20T10:00:06Z', message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 't1', content: 'function autosave(){ save(mainText) }' }] } }),
+  ccLine({ type: 'assistant', sessionId: S1, uuid: 'u4', parentUuid: 'u3', timestamp: '2026-10-20T10:00:09Z', message: { role: 'assistant', model: 'claude-opus-5-5', content: [{ type: 'text', text: 'The autosave keeps only the main text; the footnotes are never written. I will add them.' }] } }),
+  ccLine({ type: 'user', sessionId: S1, uuid: 'u5', parentUuid: 'u4', timestamp: '2026-10-20T10:01:00Z', isMeta: true, message: { role: 'user', content: '<command-name>/clear</command-name>' } }),
+  ccLine({ type: 'system', sessionId: S1, uuid: 'u6', parentUuid: 'u5', timestamp: '2026-10-20T10:01:01Z', content: 'a system line' }),
+  ccLine({ type: 'user', sessionId: S2, uuid: 'v1', parentUuid: null, timestamp: '2026-10-21T09:00:00Z', cwd: '/home/user/Forge', version: '2.0.12', message: { role: 'user', content: 'Rename the Workshop room to Atelier.' } }),
+  ccLine({ type: 'assistant', sessionId: S2, uuid: 'v2', parentUuid: 'v1', timestamp: '2026-10-21T09:00:04Z', message: { role: 'assistant', model: 'claude-sonnet-5-5', content: [{ type: 'text', text: 'Done: three places changed.' }] } }),
+].join('\n'));
+fs.writeFileSync(path.join(OUT, 'perplexity_headed.md'), '# Best telescope\n\n## User\nWhich telescope should a beginner buy?\n\n## Perplexity\nA 130 mm Dobsonian is a good start.\n\n## User\nAnd for photographs?\n\n## Perplexity\nAn equatorial mount helps.\n');
+fs.writeFileSync(path.join(OUT, 'qa.txt'), 'Q: What is a sonnet?\nA: A poem of fourteen lines.\nQ: And a villanelle?\nA: Nineteen lines, with two refrains.\n');
+fs.writeFileSync(path.join(OUT, 'unlabelled.txt'), 'Some notes I took on Tuesday.\nNothing here is a conversation.\nA quick note: the kettle is broken.\n');
+fs.writeFileSync(path.join(OUT, 'unknown_shape.json'), JSON.stringify({ settings: { theme: 'night' }, version: 3 }));

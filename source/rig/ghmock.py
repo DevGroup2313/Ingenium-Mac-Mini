@@ -83,6 +83,21 @@ class H(BaseHTTPRequestHandler):
             o = S["objects"].get(q["sha"][0]); return self.send(200, {"type": o[0], "body": base64.b64encode(o[1]).decode()} if o else None) if o else self.send(404, {"message": "no"})
         if p == "/_runs" and m == "POST":
             S["runs"] = self.jbody(); return self.send(200, {"ok": True})
+        # 6.9.1: GitHub's device sign-in (the page opens github.com/login/device; the app polls for the token)
+        if p == "/login/device/code" and m == "POST":
+            f = parse_qs(self.body().decode("utf-8", "replace")); S["oauth"] = {"client_id": f.get("client_id", [""])[0], "scope": f.get("scope", [""])[0], "polls": 0, "approved": False}
+            if not S["oauth"]["client_id"]: return self.send(200, {"error": "incorrect_client_credentials"})
+            return self.send(200, {"device_code": "dev-1", "user_code": "ABCD-1234", "verification_uri": "http://127.0.0.1:%d/login/device" % PORT, "expires_in": 900, "interval": 1})
+        if p == "/login/device" and m == "GET": return self.send(200, raw=b"<!doctype html><title>Device Activation</title><p>Enter the code shown in the app.</p>", ctype="text/html")
+        if p == "/login/oauth/access_token" and m == "POST":
+            f = parse_qs(self.body().decode("utf-8", "replace")); o = S.setdefault("oauth", {"polls": 0, "approved": False}); o["polls"] += 1
+            o["grant"] = f.get("grant_type", [""])[0]; o["poll_client"] = f.get("client_id", [""])[0]; o["device"] = f.get("device_code", [""])[0]
+            if o["grant"] != "urn:ietf:params:oauth:grant-type:device_code" or o["device"] != "dev-1": return self.send(200, {"error": "incorrect_device_code"})
+            if o["polls"] == 1: return self.send(200, {"error": "slow_down", "interval": 2})
+            if not o["approved"]: return self.send(200, {"error": "authorization_pending"})
+            return self.send(200, {"access_token": "gho_test", "token_type": "bearer", "scope": "repo workflow"})
+        if p == "/_approve" and m == "POST": S.setdefault("oauth", {})["approved"] = True; return self.send(200, {"ok": True})
+        if p == "/_oauth" and m == "GET": return self.send(200, S.get("oauth") or {})
         if not self.auth(): return self.send(401, {"message": "Requires authentication"})
         if p == "/user": return self.send(200, {"login": "testowner", "name": "Test Owner"})
         if p == "/user/repos": return self.send(200, [{"full_name": "testowner/notes", "name": "notes", "owner": {"login": "testowner"}, "default_branch": "main", "private": False, "pushed_at": "2026-10-17T10:00:00Z"}, {"full_name": "testowner/other", "name": "other", "owner": {"login": "testowner"}, "default_branch": "main", "private": True, "pushed_at": "2026-10-16T10:00:00Z"}])

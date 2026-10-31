@@ -158,9 +158,10 @@ async function ping(p, n = 5) { let worst = 0; for (let i = 0; i < n; i++) { con
     // ---- the memory a model is given ----
     const win = await p.evaluate(() => { const o = JSON.stringify(state.cloud || {}); state.cloud = { provider: 'anthropic', model: 'claude-opus-5-5', on: true }; const a = ingCloudWindow();
       state.cloud.provider = 'gemini'; state.cloud.model = 'gemini-3-pro'; const g = ingCloudWindow(); state.cloud.provider = 'ollama-local'; state.cloud.model = 'qwen3'; const ol = ingCloudWindow(); state.cloud.window = 131072; const ol2 = ingCloudWindow();
-      state.cloud = JSON.parse(o); const m = { id: 'x', fileState: 'ready', shellStored: true, ctxLen: 262144 }; return { a, g, ol, ol2, desk: ingCtxMax(m), page: ingCtxMax({ id: 'y' }), reply: ingReplyMax(m) }; });
-    ok(win.a === 200000 && win.g === 1000000 && win.ol === 32768 && win.ol2 === 131072 && win.desk === 262144 && win.page === 32768 && win.reply === 131072,
-      'a connected model is given its own window (Claude 200K, Gemini 1M; a server at home 32K, or what is chosen); a model on this computer trained for 256K given 256K, a reply up to 128K (6.3)', win);
+      state.cloud = JSON.parse(o); const m = { id: 'x', fileState: 'ready', shellStored: true, ctxLen: 262144 }; return { a, g, ol, ol2, desk: ingCtxMax(m), page: ingCtxMax({ id: 'y' }), pageMax: typeof ingPageCtxMax === 'function' ? ingPageCtxMax() : 32768, reply: ingReplyMax(m) }; });
+    // 6.9.1 (r195): a current Claude model holds a million tokens; the page's own engine reaches 32,768 only where its fast build runs on 8 GB or more, else its real cap of 8,192
+    ok(win.a === 1000000 && win.g === 1000000 && win.ol === 32768 && win.ol2 === 131072 && win.desk === 262144 && win.page === win.pageMax && (win.pageMax === 8192 || win.pageMax === 32768) && win.reply === 131072,
+      'a connected model is given its own window (Claude 1M, Gemini 1M; a server at home 32K, or what is chosen); a model on this computer trained for 256K given 256K, a reply up to 128K (6.3); the page\'s engine its real cap (6.9.1)', win);
     const ol = await p.evaluate(() => /num_ctx:typeof ingCloudWindow/.test(String(cloudChat)));
     ok(ol, 'Ollama is told how much to keep (num_ctx)');
     ok(!p.__errs.length, 'no page errors', p.__errs.slice(0, 5));

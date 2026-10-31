@@ -620,6 +620,15 @@ function savePaper(o,kind,fmt){var rec=o.docs[kind];if(!rec)return;loadText(rec.
   (IngDoc.ready?IngDoc.ready():Promise.resolve()).then(function(){return IngDoc.make(fmt,IngLectorPaper.page(pp.kind,md,pp.o),IngLectorPaper.opts(pp.kind,[],pp.title));})
     .then(function(r){var name=lxFileName(pp.title);saveFileNative(name+"."+fmt,fmt==="pdf"?"application/pdf":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",r.bytes);},
       function(e){say("The "+what+" could not be made: "+(e&&e.message||e));});});}
+/* 6.9.1: the document as the Word file Save as Word gives, handed to Tabula to keep writing it there (modules/r194.js) */
+function paperFile(o,kind){var rec=o.docs[kind];if(!rec)return Promise.reject(new Error("There is no such document yet."));
+  return loadText(rec.ref).then(function(md){var pp=paperOf(o,kind,md);if(!W.IngDoc||!IngDoc.make||!W.IngLectorPaper)throw new Error("this device cannot make the Word file");
+    return (IngDoc.ready?IngDoc.ready():Promise.resolve()).then(function(){return IngDoc.make("docx",IngLectorPaper.page(pp.kind,md,pp.o),IngLectorPaper.opts(pp.kind,[],pp.title));})
+      .then(function(r){return {title:pp.title,name:lxFileName(pp.title)+".docx",bytes:r.bytes};});});}
+function openInTabula(o,kind){if(!W.IngOpenIn){say("Tabula cannot be reached in this copy of the page.");return;}say("Making the Word file for Tabula…");
+  paperFile(o,kind).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}});}).then(null,function(e){say("It could not be opened in Tabula: "+(e&&e.message||e));});}
+(function(){(W.__ingOpenInProviders=W.__ingOpenInProviders||[]).push({list:function(){var out=[];try{(ROOT().people||[]).forEach(function(p){(p.opps||[]).forEach(function(o){Object.keys(o.docs||{}).forEach(function(kind){var rec=o.docs[kind];if(!rec||!rec.ref||!DOCS[kind])return;
+      out.push({id:"career:"+o.id+":"+kind,kind:"doc",title:[DOCS[kind][0],to(o)].filter(Boolean).join(" · "),from:"Career Studio",when:rec.made||0,open:function(x){return paperFile(o,kind).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}},x);});}});});});});}catch(e){}return out;}});})();
 function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){say("Copied.");},function(){say("It could not be copied here: select the text and copy it.");});return;}}catch(e){}say("It could not be copied here: select the text and copy it.");}
 
 /* ---------------- practise: her own evidence and her own answers, looked at with her, never rewritten ---------------- */
@@ -1004,7 +1013,7 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
     else if(!rec.mine)P.foot.appendChild(cbtn("","Improve it",function(){o.improve=true;o.edit=false;save();render();},wayOf(o)==="step"&&!isMail?"Say what should change; each change then waits for you":"Say what should change, and it is rewritten"));
     P.foot.appendChild(cbtn("","Change it",function(){o.edit=true;o.improve=false;render();}));P.foot.appendChild(cbtn("","Copy the text",function(){copyText(md);}));
     P.foot.appendChild(cbtn("","Write it again",function(){if(isMail)writeDoc(o,"email",{role:rec.role,purpose:rec.purpose});else writeDoc(o,kind);}));P.foot.appendChild(h("span","c-grow"));
-    if(!isMail){P.foot.appendChild(cbtn("","Save as PDF",function(){savePaper(o,kind,"pdf");}));P.foot.appendChild(cbtn("pri","Save as Word",function(){savePaper(o,kind,"docx");}));}});}
+    if(!isMail){P.foot.appendChild(cbtn("","Open in Tabula",function(){openInTabula(o,kind);},"Open it in Tabula, as the Word file Save as Word gives, to keep writing it there"));P.foot.appendChild(cbtn("","Save as PDF",function(){savePaper(o,kind,"pdf");}));P.foot.appendChild(cbtn("pri","Save as Word",function(){savePaper(o,kind,"docx");}));}});}
 function newEmail(o,pane,P){pane.appendChild(h("h3","c-h3",esc("A new email")));var g=h("div","c-grid2"),rs=select(ROLES,o.kind==="phd"?"supervisor":"contact"),ps=select(PURPOSES,o.kind==="phd"?"introduce":"enquire"),ex=h("textarea","c-ta");
   ex.placeholder="Anything to add (optional): a name, a date, something they said.";ex.style.minHeight="90px";g.appendChild(field("To",rs));g.appendChild(field("What for",ps));pane.appendChild(g);pane.appendChild(field("Also",ex));
   var how=lessonFor("email",{role:rs.value,purpose:ps.value});var note=h("p","c-note",esc("Written from your profile and the posting: courteous, direct and specific, with one clear request."));pane.appendChild(note);

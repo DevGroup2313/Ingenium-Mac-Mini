@@ -101,10 +101,20 @@ function paintBrief(c){var sc=$("chatScroll")||document.querySelector(".chat-scr
   if(!c||!c.imported){if(old)old.remove();return;}
   if(old&&old.getAttribute("data-c")===c.id)return;if(old)old.remove();
   var d=el("div","imp-card");d.setAttribute("data-c",c.id);d.setAttribute("role","note");
-  var h=el("div","imp-h");h.appendChild(el("span","imp-tag","Carried over"));h.appendChild(el("span",null,"From "+c.imported.from+(c.imported.created?" · "+day(c.imported.created):"")));d.appendChild(h);
+  var h=el("div","imp-h");h.appendChild(el("span","imp-tag","Carried over"));h.appendChild(el("span",null,"From "+c.imported.from+(c.imported.created?" · "+day(c.imported.created):"")+(c.imported.model?" · written with "+c.imported.model:"")));d.appendChild(h);
   d.appendChild(el("div","imp-b",c.imported.brief||""));
   d.appendChild(el("div","small muted",(c.__hyd||c.imported.adopted)?"Write below to carry on here: the model reads as much of this conversation as its memory holds, with this brief and the earlier passages that matter.":"Opening its "+c.imported.count+" messages…"));
   sc.insertBefore(d,sc.firstChild);}
+
+/* 6.9: the first reply after a conversation is carried over: the model is told where it came from, with the brief, once
+   (the long memory, r159, carries the same brief when the conversation overflows the window, so it is never told twice) */
+(function(){if(typeof W.chatPrepare!=="function"||W.chatPrepare.__r160)return;var op=W.chatPrepare;
+  W.chatPrepare=chatPrepare=function(rec,bot){var self=this,args=arguments;return op.apply(self,args).then(function(prep){try{
+    var c=curChat();if(!c||!c.imported||!c.imported.brief)return prep;var n=(c.messages||[]).length;
+    if(c.imported.told!=null&&n>c.imported.told+1)return prep;
+    var line="[This conversation was carried over from "+c.imported.from+(c.imported.created?", "+day(c.imported.created):"")+". "+String(c.imported.brief).replace(/\s+/g," ").slice(0,1200)+"]";
+    var p={};for(var k in (prep||{}))p[k]=prep[k];if(String(p.context||"").indexOf("carried over from")<0)p.context=(p.context?p.context+"\n\n":"")+line;
+    c.imported.told=n;return p;}catch(e){return prep;}});};W.chatPrepare.__r160=1;})();
 
 /* ---------- 7. where to bring them in: Settings, and the list of conversations ---------- */
 function chooseFiles(){var inp=el("input");inp.type="file";inp.multiple=true;inp.accept=".zip,.json,.jsonl,.md,.markdown,.txt,.csv,.html,.htm";inp.style.display="none";document.body.appendChild(inp);
@@ -117,7 +127,9 @@ function openDlg(title){try{var box=$("modalBox");box.innerHTML="";var w=el("div
 function showFound(dlg,found){dlg.querySelector("h3").textContent="Bring your chats from "+found.source;var n=found.conversations.length,m=0;found.conversations.forEach(function(c){m+=c.messages.length;});
   var first=found.conversations.reduce(function(a,c){return Math.min(a,c.created||a);},Date.now()),last=found.conversations.reduce(function(a,c){return Math.max(a,c.updated||0);},0);
   dlg.querySelector(".imp-sum").textContent=n?(n+" conversation"+(n===1?"":"s")+", "+m.toLocaleString()+" messages"+(found.projects.length?", "+found.projects.length+" project"+(found.projects.length===1?"":"s"):"")+(last?", "+day(first)+" to "+day(last):"")+"."):"Nothing that looks like a conversation was found in it.";
-  if(!n)return;
+  if(found.skipped&&found.skipped.length){var sk=el("div","small muted imp-skipped","Left aside, not read as conversations: "+found.skipped.slice(0,8).join(", ")+(found.skipped.length>8?" and "+(found.skipped.length-8)+" more":"")+".");dlg.appendChild(sk);}
+  if(!n){var a0=el("div","imp-acts"),cl0=el("button","btn ghost","Close"),pk0=el("button","btn","Paste a transcript instead");cl0.type="button";pk0.type="button";
+    cl0.onclick=function(){try{closeModal();}catch(e){}};pk0.onclick=function(){pasteBox();};a0.appendChild(cl0);a0.appendChild(pk0);dlg.appendChild(a0);return;}
   var list=el("div","imp-convs");var picks=[];
   found.conversations.slice(0,1500).forEach(function(c){var r=el("label","imp-c"),cb=el("input");cb.type="checkbox";cb.checked=true;cb.setAttribute("aria-label",c.title);r.appendChild(cb);
     var t=el("span");t.appendChild(el("b",null,c.title));t.appendChild(el("br"));t.appendChild(el("small",null,c.messages.length+" messages"+(c.updated?" · "+day(c.updated):"")+(c.source&&c.source!==found.source?" · "+c.source:"")));r.appendChild(t);list.appendChild(r);picks.push([cb,c]);});
@@ -134,11 +146,25 @@ function showFound(dlg,found){dlg.querySelector("h3").textContent="Bring your ch
       try{go_chat();}catch(e){}},function(e){dlg.querySelector(".imp-sum").textContent="They could not all be brought in: "+(e&&e.message||e);});}
   some.onclick=function(){go(picks.filter(function(p){return p[0].checked;}).map(function(p){return p[1];}));};all.onclick=function(){go(null);};}
 function go_chat(){if(typeof go==="function")go("chat");}
+/* 6.9: a conversation pasted in, as it was copied from any assistant's page */
+function sniff(t){var s=String(t||"").replace(/^\uFEFF/,"").trim();if(/^[\[{]/.test(s)){var ls=s.split(/\r?\n/).filter(function(l){return l.trim();});if(ls.length>1&&ls.every(function(l){return /^\s*\{/.test(l);}))return ".jsonl";return ".json";}return ".md";}
+function pasteBox(){var dlg=openDlg("Paste a conversation");
+  dlg.querySelector(".imp-sum").textContent="Paste the conversation as it was copied: lines headed User: and Assistant: (or ChatGPT:, Claude:, Q: and A:), Markdown as a site exports it, JSON, or JSON lines. It is read here, on this device.";
+  var ta=el("textarea","imp-paste");ta.setAttribute("aria-label","The conversation, pasted");ta.placeholder="User: \u2026\nAssistant: \u2026";ta.rows=12;ta.style.cssText="width:100%;box-sizing:border-box;margin:10px 0;min-height:180px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace";dlg.appendChild(ta);
+  var acts=el("div","imp-acts"),no=el("button","btn ghost","Cancel"),rd=el("button","btn primary","Read it");no.type="button";rd.type="button";acts.appendChild(no);acts.appendChild(rd);dlg.appendChild(acts);
+  no.onclick=function(){try{closeModal();}catch(e){}};
+  rd.onclick=function(){var t=ta.value||"";if(!t.trim()){ta.focus();return;}var nm="pasted-transcript"+sniff(t),f;try{f=new File([t],nm,{type:"text/plain"});}catch(e){f=new Blob([t],{type:"text/plain"});f.name=nm;}start([f]);};
+  setTimeout(function(){try{ta.focus();}catch(e){}},60);}
+W.ingImportPaste=pasteBox;
 function settingsCard(){var pg=$("page-settings");if(!pg||$("ingImportCard"))return;
   var c=el("div","card");c.id="ingImportCard";c.setAttribute("role","region");c.setAttribute("aria-labelledby","ingImportH");
   var h=el("h2","sec","Bring your chats from other assistants");h.id="ingImportH";c.appendChild(h);
-  c.appendChild(el("p","small muted","Choose the export your assistant gave you, as it came (the zip, or a file inside it). Ingenium reads exports from ChatGPT and Claude (with its projects), Gemini's Google Takeout, Grok, DeepSeek, Le Chat and Copilot laid out as they were in October 2026, and plain transcripts. Each layout was tested on sample files made in that layout, not on real exports. It is read here, on this device; nothing is sent anywhere. Each conversation joins your list with its own date (Gemini's are gathered from the times of its prompts), and carries on here where it ended."));
-  var row=el("div","imp-row"),b=el("button","btn","Choose your export…");b.type="button";b.onclick=chooseFiles;row.appendChild(b);c.appendChild(row);
+  c.appendChild(el("p","small muted","Choose the export your assistant gave you, as it came (the zip, or a file inside it). Ingenium reads exports from ChatGPT and Claude (with its projects), Claude Code's session files, Gemini's Google Takeout, Grok, DeepSeek, Le Chat and Copilot laid out as they were in October 2026, plain transcripts (User: and Assistant:, Q: and A:, or Kimi, Poe, Perplexity and the others named at the head of each line), and a conversation pasted in. Each layout was tested on sample files made in that layout, not on real exports. It is read here, on this device; nothing is sent anywhere. Each conversation joins your list with its own date (Gemini's are gathered from the times of its prompts), and carries on here where it ended."));
+  var row=el("div","imp-row"),b=el("button","btn","Choose your export…");b.type="button";b.onclick=chooseFiles;row.appendChild(b);
+  var pb=el("button","btn ghost","Paste a transcript…");pb.type="button";pb.onclick=pasteBox;row.appendChild(pb);c.appendChild(row);
+  /* a file dropped on the card is read as one chosen */
+  c.addEventListener("dragover",function(e){e.preventDefault();c.classList.add("imp-drop");});c.addEventListener("dragleave",function(){c.classList.remove("imp-drop");});
+  c.addEventListener("drop",function(e){e.preventDefault();c.classList.remove("imp-drop");var fs=[].slice.call((e.dataTransfer&&e.dataTransfer.files)||[]);if(fs.length)start(fs);});
   var lst=el("div","imp-list");c.appendChild(lst);
   function paint(){lst.innerHTML="";var by={};(state.chats||[]).forEach(function(x){if(x.imported){by[x.imported.from]=(by[x.imported.from]||0)+1;}});
     Object.keys(by).forEach(function(k){var it=el("div","imp-item");it.appendChild(el("b",null,k));it.appendChild(el("span","small muted",by[k]+" conversation"+(by[k]===1?"":"s")+" carried over"));lst.appendChild(it);});}
@@ -148,7 +174,8 @@ function settingsCard(){var pg=$("page-settings");if(!pg||$("ingImportCard"))ret
 if(typeof W.ccPaintSide==="function"){var oSide=W.ccPaintSide;W.ccPaintSide=ccPaintSide=function(){var r=oSide.apply(this,arguments);try{sideKey();}catch(e){}return r;};}
 function sideKey(){var list=document.querySelector(".cc-list");if(!list||CC.mode!=="chat")return;var h=list.parentNode;if(!h||h.querySelector(".cc-import"))return;
   var b=el("button","cc-mini cc-import","⇪ Bring chats from another assistant");b.type="button";b.title="Import the export of ChatGPT, Claude, Gemini, Grok, DeepSeek, Le Chat, Copilot or a transcript";b.onclick=chooseFiles;
-  b.style.cssText="width:100%;margin:6px 0 2px;text-align:left";h.appendChild(b);}
+  b.style.cssText="width:100%;margin:6px 0 2px;text-align:left";h.appendChild(b);
+  var b2=el("button","cc-mini cc-import-paste","⇪ Paste a conversation");b2.type="button";b2.title="Paste a conversation copied from any assistant's page";b2.onclick=pasteBox;b2.style.cssText="width:100%;margin:0 0 2px;text-align:left";h.appendChild(b2);}
 if(typeof W.ccRow==="function"){var oRow=W.ccRow;W.ccRow=ccRow=function(c){var r=oRow.apply(this,arguments);try{if(c&&c.imported&&r&&!r.querySelector(".cc-imp")){var m=el("span","cc-imp",c.imported.from);r.appendChild(m);}}catch(e){}return r;};}
 
 /* imported conversations not yet opened keep an empty list of messages that the desk does not write */

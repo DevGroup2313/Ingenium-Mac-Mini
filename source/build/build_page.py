@@ -851,6 +851,38 @@ edit('    try{indexedDB.deleteDatabase("ingenium_files");indexedDB.deleteDatabas
      '    Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files")]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});};openModal();};',
      "6.7 idb: Reset everything waits for the model store to go")
 
+# ---- R195 (Ingenium 6.9.1, 30 October 2026): a longer memory, seen (modules/r195.js has the rest). The owner's words:
+#      "I want for context and tokens to be massively increased inside of Ingenium." These are the lines a wrapper cannot
+#      reach: the page's own engine says what memory it loaded and may be given up to its real cap (ingCtxMax); a document
+#      asked of a server with Thinking off keeps its room (replyTokens, as with Thinking on); a connected reply reaches the
+#      model's own longest reply (ingReplyCap, ingRemoteCap) and the services that count tokens are asked to (ingUsageAsk);
+#      the computer engine's own count of the prompt (usage in its last chunk, and the tokens its cache reused) is kept. ----
+edit('var lopts={n_ctx:Math.min(model.ctx||4096,8192),n_threads:1,n_gpu_layers:0};',
+     'var lopts={n_ctx:Math.min(model.ctx||4096,typeof ingCtxMax==="function"?ingCtxMax(model):8192),n_threads:1,n_gpu_layers:0};WllamaAdapter.loaded={ctx:lopts.n_ctx};',
+     "R195 the page's own engine says what memory it loaded")
+edit('options:{num_predict:withThink?replyTokens():maxTok,num_ctx:typeof ingCloudWindow==="function"?ingCloudWindow():32768}};',
+     'options:{num_predict:replyTokens(),num_ctx:typeof ingCloudWindow==="function"?ingCloudWindow():32768}};',
+     "R195 a document asked of Ollama keeps its room with Thinking off")
+edit('var ocb={model:model,messages:msgs,stream:true},cap=think?replyTokens():maxTok;',
+     'var ocb={model:model,messages:msgs,stream:true},cap=replyTokens();',
+     "R195 a document asked of a server keeps its room with Thinking off")
+edit('max_tokens:modern?Math.max(maxTok,32000):Math.max(maxTok,4096),messages:msgs,stream:true}',
+     'max_tokens:(typeof ingReplyCap==="function"?ingReplyCap(maxTok,modern):(modern?Math.max(maxTok,32000):Math.max(maxTok,4096))),messages:msgs,stream:true}',
+     "R195 a connected reply reaches the model's own longest reply")
+edit('if(!cxLocal(c.provider,ob))cap=Math.max(cap,16000);',
+     'if(!cxLocal(c.provider,ob))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);if(typeof ingUsageAsk==="function")ingUsageAsk(ocb,c.provider);',
+     "R195 a remote server's reply floor, and its count of tokens asked for")
+edit('        prompt_tokens:tm.prompt_n,prompt_per_second:tm.prompt_per_second};}}',
+     '        prompt_tokens:tm.prompt_n,prompt_per_second:tm.prompt_per_second};if(tm.cache_n!=null)stats.cache_tokens=tm.cache_n;}\n'
+     '      if(ch.usage)stats.usage=ch.usage;}',
+     "R195 the computer engine's own count of the prompt is kept")
+
+# ---- R114 (Ingenium 6.9.1, 31 October 2026): the chat's GitHub modal shares Fabrica's sign-in (the same state.github.token),
+# so its token field is named as what it is now: optional, and filled once she has signed in on GitHub's own page.
+edit('Token <span class="muted small">(only for private repositories; kept on this device)</span>',
+     'Token <span class="muted small">(optional: filled in once you sign in through Fabrica; kept on this device)</span>',
+     "R114 the chat modal's token field, after the sign-in on GitHub's own page")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
