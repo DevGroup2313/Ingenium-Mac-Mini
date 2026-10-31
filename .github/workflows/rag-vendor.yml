@@ -1,0 +1,37 @@
+# The folder search's third-party files (source/rag/vendor.json): fetched on GitHub's machines (which reach Hugging Face),
+# each checked against its pinned integrity or SHA-256, listed in the run's summary, and kept on the release "rag-vendor"
+# (rag-vendor.zip), from which the build machines and the tests take them.
+name: Folder search files
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/rag/vendor.json'
+      - 'source/rag/tools/fetch_vendor.py'
+      - '.github/workflows/rag-vendor.yml'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: rag-vendor-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Fetch and check every file
+        run: |
+          python3 source/rag/tools/fetch_vendor.py rag-vendor --list-hf | tee fetch.log
+          { echo '### Folder search files'; echo '```'; cat fetch.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep them on the release "rag-vendor"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd rag-vendor && zip -qr ../rag-vendor.zip .)
+          sha256sum rag-vendor.zip | tee -a "$GITHUB_STEP_SUMMARY"
+          gh release view rag-vendor > /dev/null 2>&1 || gh release create rag-vendor --title "Folder search files" --notes "Third-party files for Ingenium's folder search, fetched by .github/workflows/rag-vendor.yml from source/rag/vendor.json." --latest=false
+          gh release upload rag-vendor rag-vendor.zip fetch.log --clobber
