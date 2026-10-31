@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Folder search: unit-test harness</title>
+</head>
+<body>
+<!-- INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.  NO LICENCE IS GRANTED. See LICENCE.txt.
+     A bare page for the browser tests of the folder search (rig/t_rag1_*.js). It shows nothing: it imports the clients of the
+     store and the embedder and puts them on window.RagHarness for the tests to drive. Serve it with rag/test/serve.py
+     (/rag/test/harness.html, with /rag/vendor/ = the unpacked vendor tree). -->
+<script type="module">
+import * as storeModule from '../store.js';
+import * as embedderModule from '../embedder.js';
+
+const errors = [];
+window.addEventListener('error', (e) => errors.push('error: ' + e.message));
+window.addEventListener('unhandledrejection', (e) => errors.push('unhandledrejection: ' + String((e.reason && e.reason.message) || e.reason)));
+
+window.RagHarness = {
+  store: storeModule,        // createStore, Store, DEFAULT_DIMS, ...
+  embedder: embedderModule,  // createEmbedder, Embedder, MODEL_TIERS, pickTier, ...
+  errors,                    // script errors of this page
+  created: [],               // every client a test makes through make*(), so a test can look at their worker errors
+  makeStore(options) { const s = storeModule.createStore(options); this.created.push(s); return s; },
+  makeEmbedder(options) { const e = embedderModule.createEmbedder(options); this.created.push(e); return e; },
+  workerErrors() { return this.created.flatMap((c) => c.errors); },
+  ready: true,
+};
+</script>
+</body>
+</html>
