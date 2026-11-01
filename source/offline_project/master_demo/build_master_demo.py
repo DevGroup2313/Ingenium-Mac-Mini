@@ -262,8 +262,20 @@ window.addEventListener("load",put);setInterval(put,1500);})();</script>"""
 # 3b'. NO SCROLL BARS IN THE APPS EITHER (the owner's words, 25 October and 1 November 2026: "I asked for the scroll bars to be
 #      hidden from view all over the app and the website so that I can scroll but not see the ugly scroll bars"): every app's
 #      page, in the hall's frame or opened on its own, scrolls with its bars out of sight
-NOBARS = ('<style id="op-no-bars">*{scrollbar-width:none!important;-ms-overflow-style:none!important}'
-          '*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}</style>')
+NOBARS_CSS = ('*{scrollbar-width:none!important;-ms-overflow-style:none!important}'
+              '*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}')
+#      and in the frames an app opens inside itself (the Forge's preview of the app it carries, an app's own readers): each
+#      frame the page can reach is given the same rule as it loads, and watched in turn for frames of its own
+NOBARS = ('<style id="op-no-bars">' + NOBARS_CSS + '</style><script id="op-no-bars-frames">(function(){var CSS='
+          + json.dumps(NOBARS_CSS) + ';function dress(d){try{if(!d||!d.documentElement||d.getElementById("op-no-bars"))return;'
+          'var s=d.createElement("style");s.id="op-no-bars";s.textContent=CSS;(d.head||d.documentElement).appendChild(s);}catch(e){}}'
+          'function hook(f){if(f.__opNb)return;f.__opNb=1;var go=function(){try{if(f.contentWindow)watch(f.contentWindow);}catch(e){}};'
+          'f.addEventListener("load",go);go();}'
+          'function watch(w){try{var d=w.document;if(!d||!d.documentElement)return;dress(d);if(d.__opNbW)return;d.__opNbW=1;'
+          'var all=d.getElementsByTagName("iframe"),each=function(){for(var i=0;i<all.length;i++)hook(all[i]);};each();'
+          'new w.MutationObserver(each).observe(d.documentElement,{childList:true,subtree:true});}catch(e){}}'
+          'if(document.documentElement)watch(window);else document.addEventListener("DOMContentLoaded",function(){watch(window);});'
+          '})();</script>')
 
 LOADER = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

@@ -183,10 +183,16 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 .switch a:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
 .switch a[aria-current="page"]{color:var(--ink);border-color:color-mix(in srgb,var(--gilt) 60%,transparent);background:var(--gilt-wash)}
 .room-grid{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:22px;margin-top:16px;align-items:start}
-.room-info{display:grid;gap:12px;position:sticky;top:76px;min-width:0}
-.room-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
-.room-head .medal{width:96px;height:96px}
-.room-head h1{font-size:30px;letter-spacing:.1em}
+.room-info{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px 26px;margin-top:22px;min-width:0;align-items:start}
+.room-about{display:grid;gap:10px;min-width:0}
+.room-bar{display:flex;align-items:center;justify-content:space-between;gap:12px 18px;flex-wrap:wrap;margin-top:14px}
+.room-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;min-width:0}
+.room-head .medal{width:64px;height:64px}
+.room-head h1{font-size:26px;letter-spacing:.1em}
+.room-line{font-size:14.5px;color:var(--ink-2);margin-top:3px}
+.room-keys{align-items:center}
+.room .stage{margin-top:6px}
+main.wrap.wide{max-width:1560px}
 .room-head .date{font:500 12px/1.3 var(--display);letter-spacing:.2em;color:var(--gilt)}
 .room-info p{margin:0;color:var(--ink-2)}
 .medal svg{display:block;width:100%;height:100%}
@@ -218,7 +224,7 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 .veil span{font-size:14px;color:var(--ink-3);max-width:40ch}
 .room-in{animation:roomIn .55s cubic-bezier(.2,.8,.2,1) both}
 @keyframes roomIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@media (max-width:900px){.room-grid{grid-template-columns:minmax(0,1fr)}.room-info{position:static}.well{height:76vh;min-height:480px;padding:6px}.stage .seg.widths{display:none}}
+@media (max-width:900px){.room-grid{grid-template-columns:minmax(0,1fr)}.room-info{grid-template-columns:minmax(0,1fr)}.well{height:76vh;min-height:480px;padding:6px}.stage .seg.widths{display:none}}
 @media (prefers-reduced-motion:reduce){.room-in,.veil .medal{animation:none}.frame{transition:none}}
 
 /* a page that is put away stays away, whichever host draws this page (the preview host adds the same rule) */
@@ -354,21 +360,18 @@ if(fr){document.getElementById("oplLine").textContent="La page est encore en tra
     <a class="key back" href="#" data-i18n="back">← The crest</a>
     <nav class="switch" id="switch" aria-label="The apps"></nav>
   </div>
-  <div class="room-grid">
-    <aside class="room-info">
-      <div class="room-head"><div class="medal" id="roomMedal"></div><div><h1 id="roomTitle">Carpe Diem</h1><div class="date" id="roomDate"></div></div></div>
-      <p id="roomAbout"></p>
+  <!-- 1 November 2026: the app's name and keys above, the live demonstration across the page at a real screen's size, and
+       what it is, what to try and where it runs below it -->
+  <div class="room-bar">
+    <div class="room-head"><div class="medal" id="roomMedal"></div><div><h1 id="roomTitle">Carpe Diem</h1><div class="date" id="roomDate"></div><div class="room-line" id="roomLine"></div></div></div>
+    <div class="room-keys">
       <div id="variantBox" hidden><div class="seg" role="group" id="variants" aria-label="Demonstration"></div></div>
-      <div class="tryb"><p class="try-h" id="tryH">Try this</p><ol class="try" id="roomTry" aria-labelledby="tryH"></ol></div>
-      <div class="room-keys">
-        <button type="button" class="key gilt" id="tourKey" disabled data-i18n="tour">Start the guided tour</button>
-        <a class="key" id="aloneKey" href="#" target="_blank" rel="noopener" data-i18n="alone">Open on its own ↗</a>
-      </div>
-      <div class="note" id="roomNote" aria-live="polite"></div>
-      <div class="runs-line" id="roomBuild"></div>
-      <div class="runs-line" id="roomRuns"></div>
-    </aside>
-    <div class="stage" id="stage" data-w="computer">
+      <button type="button" class="key gilt" id="tourKey" disabled data-i18n="tour">Start the guided tour</button>
+      <a class="key" id="aloneKey" href="#" target="_blank" rel="noopener" data-i18n="alone">Open on its own ↗</a>
+    </div>
+  </div>
+  <div class="note" id="roomNote" aria-live="polite"></div>
+  <div class="stage" id="stage" data-w="computer">
       <div class="stage-bar">
         <div class="seg widths" role="group" aria-label="Screen"><button type="button" data-w="computer" aria-pressed="true" data-i18n="computer">Computer</button><button type="button" data-w="tablet" aria-pressed="false" data-i18n="tablet">Tablet</button><button type="button" data-w="phone" aria-pressed="false" data-i18n="phone">Phone</button></div>
         <span class="status" id="stageStatus"></span>
@@ -378,6 +381,9 @@ if(fr){document.getElementById("oplLine").textContent="La page est encore en tra
         <div class="veil" id="veil"><div class="medal" id="veilMedal"></div><b id="veilTitle"></b><span id="veilLine"></span></div>
       </div></div>
     </div>
+  <div class="room-info">
+    <div class="room-about"><p id="roomAbout"></p><div class="runs-line" id="roomBuild"></div><div class="runs-line" id="roomRuns"></div></div>
+    <div class="tryb"><p class="try-h" id="tryH">Try this</p><ol class="try" id="roomTry" aria-labelledby="tryH"></ol></div>
   </div>
 </section>
 
@@ -689,7 +695,7 @@ function paintSwitch() { var s = $("switch"); s.innerHTML = "";
     l.textContent = a.name[lang]; s.appendChild(l); }); }
 function paintRoom() {
   if (!cur) return; var a = cur, nt = night();
-  $("roomMedal").innerHTML = sealButton(a.k, nt, 84); $("veilMedal").innerHTML = lone(a.k, nt);
+  $("roomMedal").innerHTML = sealButton(a.k, nt, 60); $("roomLine").textContent = a.line[lang]; $("veilMedal").innerHTML = lone(a.k, nt);
   $("roomTitle").textContent = a.name[lang]; $("roomDate").textContent = a.date; $("roomAbout").textContent = a.about[lang];
   $("tryH").textContent = t("tryH"); $("roomTry").innerHTML = a.tries[lang].map(function (x) { return "<li>" + x + "</li>"; }).join("");
   $("roomRuns").textContent = t("runs") + colon() + a.runs[lang];
@@ -819,7 +825,7 @@ $("tourKey").addEventListener("click", function () {
 });
 document.querySelectorAll(".seg.widths button").forEach(function (b) { b.addEventListener("click", function () { var w = b.getAttribute("data-w"); $("stage").setAttribute("data-w", w);
   document.querySelectorAll(".seg.widths button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); fitStage(); }); });
-/* each app is drawn at a real screen's size and scaled, whole, into the well: a computer at least 1280 by 720 (as wide as
+/* each app is drawn at a real screen's size and scaled, whole, into the well: a computer at least 1280 by 800 (as wide as
    the well allows, as tall as the well's shape gives), a tablet 1180 by 820, a phone 390 by 844. On a narrow window the
    app fills the well at its own size, as it would on that device. */
 var SCREENS = { tablet: [1180, 820], phone: [390, 844] };
@@ -828,9 +834,12 @@ function fitStage() {
   var cs = getComputedStyle(well), W = well.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), H = well.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
   if (W < 50 || H < 50) return;
   var w = st.getAttribute("data-w") || "computer";
-  if (innerWidth <= 900) { fr.classList.remove("fit"); fr.style.width = fr.style.height = ""; frameEl.style.width = frameEl.style.height = frameEl.style.transform = ""; return; }
+  /* a phone or an upright tablet: the app at the device's own size, in a well as tall as the screen, as it opens there */
+  if (innerWidth <= 900) { well.style.height = Math.max(420, Math.round(innerHeight - 64)) + "px"; fr.classList.remove("fit"); fr.style.width = fr.style.height = ""; frameEl.style.width = frameEl.style.height = frameEl.style.transform = ""; return; }
+  var top = well.getBoundingClientRect().top + (window.scrollY || 0), want = Math.max(420, Math.round(innerHeight - top - 16));
+  if (Math.abs(well.offsetHeight - want) > 2) { well.style.height = want + "px"; cs = getComputedStyle(well); H = well.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom); }
   var b = w === "computer" ? 0 : 10, vw, vh, s;
-  if (w === "computer") { vw = 1280; s = Math.min(1, W / vw); vh = H / s; if (vh < 720) { vh = 720; s = H / vh; vw = W / s; } }
+  if (w === "computer") { s = Math.min(1, W / 1280); vw = W / s; vh = H / s; if (vh < 800) { vh = 800; s = H / vh; vw = W / s; } }
   else { vw = SCREENS[w][0]; vh = SCREENS[w][1]; s = Math.min(1, (W - 2 * b) / vw, (H - 2 * b) / vh); }
   fr.classList.add("fit"); fr.style.width = Math.floor(vw * s + 2 * b) + "px"; fr.style.height = Math.floor(vh * s + 2 * b) + "px";
   frameEl.style.width = Math.round(vw) + "px"; frameEl.style.height = Math.round(vh) + "px"; frameEl.style.transform = s < 1 ? "scale(" + s.toFixed(4) + ")" : "";
@@ -843,12 +852,12 @@ function route() {
   var h = (location.hash || "").replace(/^#/, ""), a = BYSLUG[h];
   if (a) {
     var changed = !cur || cur.slug !== a.slug; if (changed) curVar = 0; cur = a;
-    $("hall").hidden = true; $("room").hidden = false; paintRoom();
+    $("hall").hidden = true; $("room").hidden = false; document.querySelector("main").classList.add("wide"); paintRoom();
     var r = $("room"); r.classList.remove("room-in"); void r.offsetWidth; if (!reduced) r.classList.add("room-in");
-    window.scrollTo(0, 0); fitStage(); loadDemo();
+    window.scrollTo(0, 0); fitStage(); setTimeout(fitStage, 400); loadDemo();
   } else {
     var wasRoom = !$("room").hidden; cur = null;
-    $("room").hidden = true; $("hall").hidden = false; document.title = "The Offline Project";
+    $("room").hidden = true; $("hall").hidden = false; document.querySelector("main").classList.remove("wide"); document.title = "The Offline Project";
     if (wasRoom) { paintCrest(true); window.scrollTo(0, 0); }
     if (h === "four" || h === "devices") { var t0 = $(h); if (t0) setTimeout(function () { t0.scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); }, 30); }
     paintSwitch();
