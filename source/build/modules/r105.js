@@ -23,18 +23,23 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
 .lu-cd-more[open] summary::before{content:"▾ ";}
 .lu-cd-more .lu-cd-why{margin-top:4px}
 .lu-big{display:grid;gap:8px}
-/* 6.9.2: the way back to Ingenium's choice, as text only */
-#page-models .lu-coders > button.lu-cd-back{justify-self:start;display:inline-flex;align-items:center;gap:6px;width:auto;max-width:100%;min-height:0;margin:2px 0 0;padding:4px 2px;
-  border:0;border-radius:6px;background:none;box-shadow:none;transform:none;color:var(--accent);font:600 12.5px/1.35 var(--sans);letter-spacing:0;text-align:left;
+/* 6.9.2: the way back to Ingenium's choice, as text only; 6.9.3: purple and bold, in every list of the page (her words, 1 November 2026:
+   "I want the same for the 'Back to Ingenium's models' line as well") */
+#page-models .lu-coders button.lu-cd-back{justify-self:start;display:inline-flex;align-items:center;gap:6px;width:auto;max-width:100%;min-height:0;margin:2px 0 0;padding:4px 2px;
+  border:0;border-radius:6px;background:none;box-shadow:none;transform:none;color:var(--accent);font:700 13px/1.35 var(--sans);letter-spacing:0;text-align:left;
   text-decoration:underline;text-decoration-color:rgba(var(--accent-line-rgb,106,63,181),.35);text-underline-offset:3px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#page-models .lu-coders > button.lu-cd-back::before{content:"\21BA";font-weight:400;font-size:14px;line-height:1;text-decoration:none;display:inline-block}
-#page-models .lu-coders > button.lu-cd-back:hover{text-decoration-color:currentColor;background:none;box-shadow:none;transform:none}
-#page-models .lu-coders > button.lu-cd-back:active{opacity:.75;transform:none;box-shadow:none}
-#page-models .lu-coders > button.lu-cd-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.lu-big>summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:6px 2px;list-style:none}
+#page-models .lu-coders button.lu-cd-back::before{content:"\21BA";font-weight:400;font-size:14px;line-height:1;text-decoration:none;display:inline-block}
+#page-models .lu-coders button.lu-cd-back:hover{text-decoration-color:currentColor;background:none;box-shadow:none;transform:none}
+#page-models .lu-coders button.lu-cd-back:active{opacity:.75;transform:none;box-shadow:none}
+#page-models .lu-coders button.lu-cd-back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 6.9.3: "The '11 larger models, for computers with more memory' line needs to be made purple and bolded so that it looks clickable" */
+.lu-big>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent);padding:6px 2px;list-style:none;width:fit-content;border-radius:6px;
+  text-decoration:underline;text-decoration-color:rgba(var(--accent-line-rgb,106,63,181),.35);text-underline-offset:3px}
+.lu-big>summary:hover{text-decoration-color:currentColor}
+.lu-big>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lu-big>summary::-webkit-details-marker{display:none}
-.lu-big>summary::before{content:"▸ ";color:var(--accent)}
-.lu-big[open]>summary::before{content:"▾ ";}
+.lu-big>summary::before{content:"▸";color:var(--accent);display:inline-block;text-decoration:none;margin-right:5px}
+.lu-big[open]>summary::before{content:"▾";}
 /* the list says what the old note under Faber said ("its stronger model … try it anyway"), so the note steps aside */
 .lu-tile[data-tier="faber"].lu-has-coders .lu-share{display:none}
 @media (max-width:560px){.lu-cd{grid-template-columns:1fr}.lu-cd-acts{justify-content:flex-start}}

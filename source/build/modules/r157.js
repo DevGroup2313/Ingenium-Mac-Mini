@@ -72,9 +72,14 @@ function script(name){if(RAN[name])return RAN[name];
   return RAN[name];}
 
 /* ---------- what it may show: MobileNet v2 ---------- */
+/* 6.9.x: TensorFlow.js alone, for the learning workbench (modules/r201.js), which trains on the same copy */
+var TFP=null;
+function tfReady(){if(TFP)return TFP;
+  TFP=script("tf").then(function(){TF=W.tf;if(!TF)throw new Error("TensorFlow.js did not start");try{TF.enableProdMode();}catch(e){}return TF.ready();}).then(function(){return TF;}).catch(function(e){TFP=null;throw e;});
+  return TFP;}
 function net(){if(NET)return NET;
   /* the graphics card where there is one (TensorFlow.js falls back to the processor by itself when it cannot start it) */
-  NET=script("tf").then(function(){TF=W.tf;if(!TF)throw new Error("TensorFlow.js did not start");try{TF.enableProdMode();}catch(e){}return TF.ready();})
+  NET=tfReady()
     .then(function(){return Promise.all([part("mnv2.json"),part("mnv2.bin"),part("labels")]);})
     .then(function(r){var m=JSON.parse(new TextDecoder().decode(r[0])),w=r[1];LABELS=JSON.parse(new TextDecoder().decode(r[2]));
       return TF.loadGraphModel(TF.io.fromMemory({modelTopology:m.modelTopology,weightSpecs:m.weightSpecs,weightData:w.buffer.slice(w.byteOffset,w.byteOffset+w.byteLength)}));})
@@ -321,6 +326,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 document.addEventListener("click",function(e){var t=e.target&&e.target.closest&&e.target.closest('.nav-btn[data-page="settings"]');if(t)setTimeout(settingsCard,0);},true);
 W.IngEyes={available:have,on:on,look:look,note:note,card:card,line:line,sleep:sleep,
   warm:warm,
+  tf:tfReady,net:net,hold:function(){busy++;clearTimeout(nap);},release:function(){busy=Math.max(0,busy-1);if(!busy)later();},
   status:function(){return {pack:have(),classifier:!!NET,reader:!!TESS,backend:TF&&TF.getBackend?TF.getBackend():null};}};
 })();
 ;try{window.__ingParts["p78"]="running";}catch(_){}

@@ -962,6 +962,61 @@ edit('    try{if(HAS_LS){localStorage.removeItem(KEY);OLDKEYS.forEach(function(k
      '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}',
      "R197 Reset everything removes the lock")
 
+# ---- R205 (Ingenium 6.9.3, 1 November 2026): models lent between her devices (modules/r205.js has the rest; the computer apps' side is
+#      desktop/app_lend_693.py). The owner's words (31 October 2026): "I have two 16 GB RAM HP laptops, I want to be able to use it as a
+#      server of sorts for my macbook pro and run its stronger models on the macbook pro or my fire tablet." These are the lines a wrapper
+#      cannot reach, in the borrower's own functions: the window and longest reply a lender offers are kept with each model (lkInfoOf, in
+#      the three places that kept lineup, file and size); the default pick follows the lender's advice (lkBestAdvised); a refusal's reason
+#      reaches the Fire and iPhone (the body of a streamed request is kept when its status is 400 or more); the chat reads the lender's
+#      status lines, an error inside the stream (with its code), where the stream ended and why, and waits ten minutes for a lender's
+#      first word; a failure is said in one sentence, without a doubled full stop. ----
+edit(r"""function lkBest(list){for(var i=0;i<LK_PREFER.length;i++){var f=list.filter(function(m){return m.lineup===LK_PREFER[i];})[0];if(f)return f.name;}""",
+     r"""function lkBest(list){var adv=typeof lkBestAdvised==="function"?lkBestAdvised(list):"";if(adv)return adv;for(var i=0;i<LK_PREFER.length;i++){var f=list.filter(function(m){return m.lineup===LK_PREFER[i];})[0];if(f)return f.name;}""",
+     "R205 the default pick follows the lender's advice")
+edit(r"""info[m.name]={lineup:m.lineup||"",file:m.file||"",size:m.size||0};});
+      var keep=state.cloud&&state.cloud.provider==="ingenium"&&info[state.cloud.model]?state.cloud.model:lkBest(list);""",
+     r"""info[m.name]=(typeof lkInfoOf==="function"?lkInfoOf(m):{lineup:m.lineup||"",file:m.file||"",size:m.size||0});});
+      var keep=state.cloud&&state.cloud.provider==="ingenium"&&info[state.cloud.model]?state.cloud.model:lkBest(list);""",
+     "R205 Connect keeps each lent model's window and longest reply")
+edit(r"""info[m.name]={lineup:m.lineup||"",file:m.file||"",size:m.size||0};});
+  var keep=state.cloud&&state.cloud.provider==="ingenium"&&state.cloud.via===x.id&&info[state.cloud.model]?""",
+     r"""info[m.name]=(typeof lkInfoOf==="function"?lkInfoOf(m):{lineup:m.lineup||"",file:m.file||"",size:m.size||0});});
+  var keep=state.cloud&&state.cloud.provider==="ingenium"&&state.cloud.via===x.id&&info[state.cloud.model]?""",
+     "R205 Use its models keeps each lent model's window and longest reply")
+edit(r"""state.cloud.info={};list.forEach(function(m){state.cloud.info[m.name]={lineup:m.lineup||"",file:m.file||"",size:m.size||0};});""",
+     r"""state.cloud.info={};list.forEach(function(m){state.cloud.info[m.name]=(typeof lkInfoOf==="function"?lkInfoOf(m):{lineup:m.lineup||"",file:m.file||"",size:m.size||0});});""",
+     "R205 a model list read on the first chat keeps each window")
+edit(r"""return netResult(r.status,o.onChunk?"":(r.body||""),r.contentType);""",
+     r"""return netResult(r.status,(o.onChunk&&r.status<400)?"":(r.body||""),r.contentType);""",
+     "R205 the Fire and iPhone keep a refusal's reason when the reply was to stream")
+edit(r"""  var feedA=lineFeeder(function(line){if(line.indexOf("data:")!==0)return;var t=line.slice(5).trim();if(!t||t==="[DONE]")return;var d;try{d=JSON.parse(t);}catch(_){return;}
+    if(d.error){err=d.error.message||"the connection reported an error";return;}
+    var dl=d.choices&&d.choices[0]&&d.choices[0].delta;if(!dl)return;""",
+     r"""  var lkSeen={done:false,fin:""};   /* R205: whether the stream ended with [DONE] or a finish_reason */
+  var feedA=lineFeeder(function(line){if(line.indexOf("data:")!==0)return;var t=line.slice(5).trim();if(!t)return;if(t==="[DONE]"){lkSeen.done=true;return;}var d;try{d=JSON.parse(t);}catch(_){return;}
+    if(d.ingenium){try{lkStatus(d.ingenium);}catch(_){}return;}
+    if(d.error){err=(c.provider==="ingenium"&&typeof lkInband==="function")?lkInband(d.error):(d.error.message||"the connection reported an error");return;}
+    var lkc=d.choices&&d.choices[0];if(lkc&&lkc.finish_reason)lkSeen.fin=lkc.finish_reason;
+    var dl=lkc&&lkc.delta;if(!dl)return;""",
+     "R205 the chat reads a lender's status lines, an error inside the stream, and how the stream ended")
+edit(r"""  return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){fail(r,t);});
+    if(err)throw new Error(err);return got;});}""",
+     r"""  return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA,timeout:c.provider==="ingenium"?600:undefined}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){fail(r,t);});
+    if(err)throw new Error(err);
+    if(c.provider==="ingenium"&&typeof lkTail==="function"&&!(ab&&ab.aborted)){var lkT=lkTail(lkSeen,got);if(lkT){got+=lkT;onToken(lkT);}}
+    return got;});}""",
+     "R205 a lender is given ten minutes for its first word, and a reply that ended early or at its limit says so")
+edit(r"""bot.text=(bot.text?bot.text+"\n\n":"")+"(The connection failed: "+(err&&err.message?err.message:"unknown")+"."+how+")";""",
+     r"""var lkE=(state.cloud&&state.cloud.provider==="ingenium"&&typeof lkChatError==="function")?lkChatError(err):null;
+      bot.text=(bot.text?bot.text+"\n\n":"")+(lkE&&lkE.whole?"("+lkE.whole+")":"(The connection failed: "+String(lkE?lkE.text:(err&&err.message?err.message:"unknown")).replace(/[.\s]+$/,"")+"."+how+")");""",
+     "R205 a failure is said in one sentence, a too-long conversation in plain words")
+
+edit(r"""    ocb.chat_template_kwargs={enable_thinking:!!think};}""",
+     r"""    ocb.chat_template_kwargs={enable_thinking:!!think};ocb.ingenium_status=true;}   /* R205: a lender then says how it is doing: waiting, loading, reading */""",
+     "R205 a lender is asked to say how it is doing while it makes the first word")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

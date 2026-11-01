@@ -225,6 +225,14 @@ devices with the code are answered. They are not encrypted, so share only on a
 network you trust, such as your home Wi-Fi. A short hello, with no code, tells
 devices on the network this computer's name and how many models it lends.
 
+Using another computer's models on this Mac (for example a Windows laptop's,
+6.9.3): Settings, Your models on every device, Use another computer's models,
+Find my other computers (or type the address and the code), Connect. If macOS
+asks to find devices on the local network, say Allow (or later: System
+Settings, Privacy and Security, Local Network, switch Ingenium on, then quit
+and open Ingenium). Choose the model in the model menu beside the send arrow;
+the words beside each model say how quick it is on the computer that lends it.
+
 8. YOUR COPY ON GITHUB
 
 If you uploaded this kit to a repository of your own (section 3), that
