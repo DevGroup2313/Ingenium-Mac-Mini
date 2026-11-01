@@ -46,7 +46,7 @@ The owner's words (25 October 2026), and what each asks of the build:
 
 usage: build_master_demo.py --seal SEAL_PREVIEW.html --images DIR [--cd-sample F] --cd-committee F --forge-demo F
                             --ingenium F [--inkwell F [--inkwell-vendor DIR]] --out DIR [--mode preview|site|app] [--max-file BYTES]"""
-import argparse, base64, gzip, io, json, os, re, shutil
+import argparse, base64, gzip, hashlib, io, json, os, re, shutil
 
 from PIL import Image
 
@@ -502,6 +502,16 @@ if A.mode == "site":
                      {"src": "assets/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}
     open(os.path.join(OUT, "manifest.webmanifest"), "w", encoding="utf-8").write(json.dumps(man, indent=1))
     ver = "-".join([versions["cd"], versions["forge"], versions["ingenium"]] + ([versions["inkwell"]] if A.inkwell else []))
+    # the keep's name also carries a short fingerprint of the site's files: a rebuild of the same versions (a fix to the
+    # hall or to an app's dressing) is then a new build too, and nobody keeps the earlier one
+    fp = hashlib.sha256()
+    for root, _dirs, files in sorted(os.walk(OUT)):
+        for f in sorted(files):
+            if f == "sw.js" and root == OUT:
+                continue
+            fp.update(os.path.relpath(os.path.join(root, f), OUT).encode())
+            fp.update(open(os.path.join(root, f), "rb").read())
+    ver += "-" + fp.hexdigest()[:8]
     # Inkwell reads its word lists and citation styles only when a feature first needs them, so they are kept as soon as
     # Inkwell itself is first opened: its spelling and citations then work with no connection too
     WITH = {"apps/inkwell.html": ["apps/vendor/" + n for n in names if "LICENCE" not in n]} if (A.inkwell and A.inkwell_vendor) else {}
@@ -518,7 +528,10 @@ self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c =>
 /* a new build takes over at once; and a page still showing an older build (kept by an older keeper) is opened again, so
    nobody stays on an old hall whose apps the host no longer has */
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => { const old = ks.filter(k => (k.startsWith(MINE) || /^offline-project-\\d{3,}-/.test(k)) && k !== CACHE);
-  return Promise.all(old.map(k => caches.delete(k))).then(() => self.clients.claim()).then(() => old.length ? self.clients.matchAll({ type: "window" }).then(cs => Promise.all(cs.map(c => c.navigate(c.url).catch(() => {})))) : null); })); });
+  return Promise.all(old.map(k => caches.delete(k))).then(() => self.clients.claim()).then(() => { if (old.length) reopen(); }); })); });
+/* the pages are opened again only once this keeper is active (a page's request waits for that, so the activation must
+   not wait for the page) */
+function reopen() { setTimeout(() => self.clients.matchAll({ type: "window" }).then(cs => cs.forEach(c => { if (c.frameType !== "nested") c.navigate(c.url).catch(() => {}); })), 50); }
 self.addEventListener("fetch", e => {
   const r = e.request; if (r.method !== "GET") return;
   const u = new URL(r.url), home = new URL("./", self.registration.scope).pathname; if (u.origin !== location.origin || !u.pathname.startsWith(home)) return;
