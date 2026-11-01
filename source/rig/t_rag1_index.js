@@ -59,7 +59,7 @@ async function ensureServer() {
       PH.bridge.folders.clear(); PH.setFile('/f', 'dir/big.bin.txt', rnd, 5555); PH.setFile('/f', 'a.txt', 'hello', 1); PH.bridge.calls.length = 0;
       out.list = await F.listFiles('/f'); out.cancelled = await F.chooseFolder(); out.chosen = await F.chosenFolders();
       const pieces = []; let total = 0, same = true;
-      for await (const u8 of F.readPieces('/f', 'dir/big.bin.txt')) { pieces.push(u8.length); for (let i = 0; i < u8.length; i += 4099) if (u8[i] !== rnd[total + i]) same = false; total += u8.length; }
+      for await (const u8 of F.readPieces('/f', 'dir/big.bin.txt')) { pieces.push(u8.length); for (let i = 0; i < u8.length; i += 4099) if (u8[i] !== rnd[total + i]) same = false; total += u8.length; structuredClone(u8, { transfer: [u8.buffer] }); }   // the parse client transfers each piece: its buffer is gone when the generator goes on (1 November 2026: that read 0 bytes and ended the file after one piece)
       out.pieces = pieces; out.total = total; out.same = same;
       out.reads = PH.bridge.calls.filter((c) => c[0] === 'rag_read').map((c) => [c[3], c[4]]);
       out.b64 = Array.from(F.b64ToBytes(btoa('ÿ\u0000abc'))); out.empty = F.b64ToBytes('').length;
@@ -201,7 +201,7 @@ async function ensureServer() {
       const { store, emb, folder, path } = window.SC3; PH.bridge.failRead.clear(); for (const k of ['bad/not_a.pdf', 'bad/unreadable.txt', 'bad/refused.md', 'bad/poison.txt', 'bad/huge.txt']) PH.removeFile(path, k);
       PH.setFile(path, 'zz_new.txt', 'A new file that arrives when the store has failed. ' + 'Words. '.repeat(30), 1234);
       const dead = Object.assign({}, store, { file: { ...store.file, replace: async () => { const e = new Error('store worker failed'); e.code = 'WORKER_FAILED'; throw e; } } });
-      const ix = PH.createIndexer({ store: dead, embedder: emb }); let err = null; try { await ix.indexFolder(folder.id); } catch (e) { err = [e.code, e.message]; } ix.stop(); return err;
+      const ix = PH.createIndexer({ store: dead, embedder: emb }); let err = null; try { await ix.indexFolder(folder.id); } catch (e) { err = [e.code, e.message]; } ix.stop(); PH.removeFile(path, 'zz_new.txt'); return err;
     });
     ok(fatal && fatal[0] === 'WORKER_FAILED', 'a store that has died stops the run (every other file would fail the same way) instead of listing a failure for each', fatal);
   });
@@ -218,12 +218,15 @@ async function ensureServer() {
       PH.bridge.folders.set(path, saved);
       let err2 = null; try { await ix.indexFolder(9999); } catch (e) { err2 = e.code; } out.noFolder = err2;
       const a = ix.indexFolder(folder.id); let err3 = null; try { await ix.indexFolder(folder.id); } catch (e) { err3 = e.code; } const first = await a; out.twice = [err3, first.files.total];
+      const n1 = store.files.size; PH.bridge.cutList = 5; const s3 = await ix.indexFolder(folder.id); PH.bridge.cutList = null;   // the app stopped listing at its limit
+      out.cut = { total: s3.files.total, deleted: s3.files.deleted, kept: store.files.size === n1 && n1 === 20, notes: s3.notes };
       return out;
     });
     ok(r.unavailable && r.unavailable[0] === 'FOLDER_UNAVAILABLE' && /drive/.test(r.unavailable[1]) && r.afterUnavailable === r.n0, 'a folder the app cannot list (a drive that is unplugged) stops the run with a plain reason and takes nothing out of the index', r.unavailable);
     ok(r.deleted1 === 0 && r.afterEmpty === r.n0 && r.emptyNotes.length === 1 && /not connected/.test(r.emptyNotes[0]), 'a folder that suddenly lists no files while files are indexed is taken for a drive that is not there: nothing is deleted, and the run says so', r.emptyNotes);
     ok(r.deleted2 === r.n0 && r.afterConfirm === 0, 'with confirmEmpty the files are taken out (' + r.deleted2 + ')');
     ok(r.noFolder === 'NO_SUCH_FOLDER', 'a folder that is not in the index is refused');
+    ok(r.cut.total === 5 && r.cut.deleted === 0 && r.cut.kept && r.cut.notes.length === 1 && /more files than the app lists/.test(r.cut.notes[0]), 'a listing the app cut short (truncated: true) takes nothing out of the index, and the run says so', r.cut);
     ok(r.twice[0] === 'ALREADY_RUNNING' && r.twice[1] === 20, 'a folder that is being read cannot be started a second time (ALREADY_RUNNING); the first run goes on and ends', r.twice);
   });
 

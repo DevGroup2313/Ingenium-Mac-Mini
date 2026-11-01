@@ -863,9 +863,9 @@ async function fragmentOverlap(g, U, run, gp, k0, b, tA, ctx) {
   };
   if (k <= k0) return acc ? { k, fragStart: null, fragTok: 0 } : null;
   const u = U[k - 1];
-  const words = wordSpans(g.src, u.s, u.e); if (words.length < 2) return near();
-  const wc = await countAll(ctx.count, words.map(([a, e]) => g.src.slice(a, e)), ctx.cache, ctx.stats);
   const fixed = k < b ? gp[k] + acc : 0;   // what follows the fragment: the gap before unit k and the whole units from k
+  const words = wordSpans(g.src, u.s, u.e); if (words.length < 2) return (await charFragment(g, u, k, fixed, lo, hi, ctx)) || near();
+  const wc = await countAll(ctx.count, words.map(([a, e]) => g.src.slice(a, e)), ctx.cache, ctx.stats);
   let ft = 0, best = null;
   for (let w = words.length - 1; w >= 1; w--) { // the fragment starts at word w
     ft += Math.max(1, wc[w] - ctx.overhead);
@@ -877,7 +877,23 @@ async function fragmentOverlap(g, U, run, gp, k0, b, tA, ctx) {
     const score = Math.abs(tot - mid) - bonus * (hi - lo);
     if (!best || score < best.score) best = { score, w, ft };
   }
-  if (!best) return near();
+  if (!best) return (await charFragment(g, u, k, fixed, lo, hi, ctx)) || near();
   ctx.stats.fragments++;
   return { k, fragStart: words[best.w][0], fragTok: best.ft };
+}
+
+/** The last resort for an overlap, when no run of whole units and no run that starts at a word is 10 to 15% of the chunk (one "word" of
+ *  dozens of tokens: a minified line, a long number, a path): the carried text starts inside the last unit, at the character that puts its
+ *  tokens in the window (never between the halves of a surrogate pair). null when no character does. */
+async function charFragment(g, u, k, fixed, lo, hi, ctx) {
+  const src = g.src;
+  const tokOf = async (x) => (await countAll(ctx.count, [src.slice(x, u.e)], ctx.cache, ctx.stats))[0] - ctx.overhead;
+  if (u.e - u.s < 2 || (await tokOf(u.s)) + fixed < lo) return null;
+  let a = u.s, z = u.e - 1;                    // the largest start whose text still holds lo tokens
+  while (a < z) { const m = (a + z + 1) >> 1; if ((await tokOf(m)) + fixed >= lo) a = m; else z = m - 1; }
+  let x = a; if (x > u.s && /[\udc00-\udfff]/.test(src[x])) x--;
+  const ft = await tokOf(x);
+  if (!(ft >= 1 && ft + fixed >= lo && ft + fixed <= hi)) return null;
+  ctx.stats.fragments++;
+  return { k, fragStart: x, fragTok: ft };
 }

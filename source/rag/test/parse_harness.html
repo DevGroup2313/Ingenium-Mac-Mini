@@ -145,7 +145,8 @@ PH.installBridge = () => {
     async rag_list(path) {
       B.calls.push(['rag_list', path]);
       const m = B.folders.get(path); if (!m || B.failList.has(path)) return { ok: false, error: 'the folder is not available: ' + path };
-      return { ok: true, files: [...m.entries()].map(([rel, f]) => ({ rel, size: f.bytes.length, mtime: f.mtime })) };
+      const all = [...m.entries()].map(([rel, f]) => ({ rel, size: f.bytes.length, mtime: f.mtime }));
+      return B.cutList != null ? { ok: true, files: all.slice(0, B.cutList), truncated: true } : { ok: true, files: all };   // cutList: the app stopped at its limit
     },
     async rag_read(path, rel, offset, length) {
       B.calls.push(['rag_read', path, rel, offset, length]);
