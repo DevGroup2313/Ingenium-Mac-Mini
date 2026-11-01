@@ -371,6 +371,158 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.3 (1 November 2026; her words: "I have two 16 GB RAM HP laptops, I want to be able to use it as a server of sorts for my
+macbook pro and run its stronger models on the macbook pro or my fire tablet. The graphics of one of the HP laptop is not the
+greatest so I would really love to be able to still use its stronger RAM and storage but on my macbook pro instead.").
+`build/modules/r205.js`, models lent between her devices, with the R205 edits in `build_page.py` and the computer apps' side in
+`build/desktop/app_lend_693.py` (releases A and B of the lending plan). Lending already worked: the HP thinks in its own memory from
+its own disk, and the MacBook and the Fire only send words and show the reply. What spoiled it was that nobody was told the truth.
+- The memory a lent model really has. The HP starts a lent model with the largest of 32,768, 16,384 or 8,192 tokens that the page's
+  own sum keeps within 70% of its memory (on 16 GB: 32,768 up to the 8B-A1B, 16,384 for the 9B, 8,192 for the 12B); it was always
+  8,192 while the MacBook and the Fire believed 32,768, so a long chat ended in an error the Fire could not even read. The HP now
+  tells each device the window and the longest reply of every model, the page keeps them (`info.ctx`, `info.out`), the chat's window
+  never goes above them, the list is read again when a chat starts and after a refusal, and a conversation that is too long is
+  said in plain words ("This conversation is longer than HP-Name's memory for this model (16,384 tokens). Start a new conversation,
+  or raise Memory for lent models on HP-Name."). The lender may choose the memory by hand (Settings, Memory for lent models).
+- It never goes silent. The HP serves one device at a time, first come first served (four may wait): a second device no longer
+  ends the first one's reply by asking for another model, and a device that goes away is dropped before it reaches the engine. A
+  reply starts at once, a quiet stream gets a ": waiting" line, and the chat shows "Waiting: HP-Name is answering another device
+  first", "HP-Name is loading Qwen3.5 4B (12 seconds so far)…" and "HP-Name is reading your message: 37%…" until the first word; the
+  page waits ten minutes for a lender's first word, not two (the call-in route's 45 seconds are only the time to pick a request
+  up, and its 504 says so). A reply that stopped because the connection ended says so, one that reached its limit says so, an
+  error inside the stream reads like every other ("HTTP 400 …"), the Fire and iPhone now show a refusal's reason (it was
+  "HTTP 400 ."), and a failure no longer ends in a doubled full stop. A browser opened at the HP's address no longer locks the
+  devices out.
+- A weak graphics chip is left alone. Settings, Graphics: Automatic (a real graphics card is used; the small chips that share the
+  computer's memory, such as Intel UHD, Iris and Xe, AMD Radeon Graphics, Vega and GeForce MX, are not), Processor only, or
+  Graphics chip. The processor is started with `--device none -ngl 0 -b 512`; "Right now: the processor only. …" says what is used
+  and why. An engine that stops after it was ready is started again, on the processor if the chip was the reason, the chip is left
+  alone for the rest of the run, and the device that is waiting is told. The default pick on a connected computer is now the
+  strongest model that is quick there (on a 16 GB laptop's processor: the 8B-A1B or the 4B, not the 9B); each lent model carries
+  a word in the model menu (quick, a little slower, slow, too big), "Which models suit this computer" lists the lineup by speed,
+  and the speed of every whole reply is kept and shown instead of the guess.
+- The sharing card says how to lend from a laptop (plug it in, the lid, the Wi-Fi's Private setting, the firewall for private
+  networks only, leave Ingenium open, one model on every device, a fixed address from the router) and shows the number address for
+  the Fire and iPhone; nothing is added to the top bar.
+- Tests: `rig/t_705_lend_gateway.py` (the patched lender with a stand-in engine, `rig/lend705_stub_llama.py`: 110 checks),
+  `rig/t_705_lend_page.js` (the page through the browser's fetch, the computer back-end's relay and an emulation of the Fire app's
+  net call, against a stand-in lender, and the lender's card on the real back-end: 122 checks); `t_695_memory.js` (30), `t_698_lineup.js`
+  (42) and `t_cloud.js` (12 connections) run as before.
+- Not yet seen on her devices: Windows' own firewall question, the Wi-Fi's Private/Public setting, the lid and sleep settings (the app
+  does not change them yet), the real graphics chips, the real speeds, the Fire's behaviour with its screen off. The words in the
+  card are the steps to take by hand until then.
+
+The plain steps, also written into the documents each download carries (WINDOWS_README.txt, the Macs' START_HERE.txt,
+INSTALL_MOBILE.md):
+
+On the computer that lends (a Windows laptop): plug it in; in Settings, System, Power set sleep when plugged in to Never, and in
+Control Panel, Power Options, Choose what closing the lid does, pick Do nothing when plugged in. Use the home Wi-Fi, not a guest one, and
+set its Network profile type to Private network. When Windows asks whether Ingenium may accept connections, tick Private networks only
+and press Allow access (if the question went away: Windows Security, Firewall and network protection, Allow an app through firewall,
+Change settings, tick Private for Ingenium). Switch sharing on in Settings, Your models on every device, leave Ingenium open (minimised
+is fine), and ask the router for a fixed address for the laptop. Use the same model on every device: a different one makes the first
+one wait.
+
+On the MacBook: Settings, Your models on every device, Use another computer's models, Find my other computers (or type the address and the
+code), Connect. If macOS asks to find devices on the local network, say Allow (System Settings, Privacy and Security, Local Network, switch
+Ingenium on, then quit and open Ingenium). Choose the model in the model menu beside the send arrow; the words beside each model say how
+quick it is on the lender.
+
+On the Fire tablet or an iPhone: the same screen, but there is no Find button. Type the lender's number address (for example
+192.168.1.23; the lender's card shows it, with a Copy button) and the code, then Connect. Use the number, not the computer's name. Keep the
+tablet's screen on while a long answer is on its way.
+
+Ingenium 6.9.3 (31 October 2026; her words: "I want to expand on the parameters of what Ingenium can do as a serious coding and
+creating workbench with and without AI. I want to be able to create and train all kinds of AI models, even Frontier level AI
+models inside of the app"). The Studio of the Models page (the room of `build/modules/r173.js` that held Your own AIs, Train a
+small model and Convert a model in one column) becomes a calm workbench of five rooms, shown one at a time as the page's
+rooms are, and it says plainly what can be trained and what cannot. Training at frontier scale cannot happen in Ingenium, on
+any device at home, or on a rented machine at a price a person could reasonably pay, and the Studio now says so with the
+arithmetic and its sources instead of leaving it unsaid. There is no "frontier" key anywhere. What is new is real:
+- The Studio's rooms and its truth card (`build/modules/r199.js`, `window.IngStudio`). Make (Your own AIs, Convert a model),
+  Data, Train, Measure and Elsewhere, each existing card filed by its id (a card that arrives later is filed by its id, then by
+  the words of its heading) and moved, never copied, so every key, id and handler stays. Whatever scrolls to, focuses, rings
+  or shows a card in a closed room opens that room first: the guided tour, Help's Show me, `IngRooms.reveal`. The arrow keys,
+  Home and End move between the rooms and the focus with them; the room chosen last is kept across a reload. "What can be
+  trained here" reads this device's memory and cores (the computer app's own facts through its bridge, a browser's or a
+  phone's hint otherwise) and says, band by band, with the arithmetic and where each figure comes from: Here (small models
+  from zero, as lessons: the tiny model, eight passes over 150,000 characters, 140 seconds, its held-back loss 5.85 against
+  7.62 for guessing at random); On this computer (training further a model she has, up to what the trainer's own memory rule
+  allows, parameters x 16 bytes + 0.6 GB within 70% of the memory: about 660 million numbers at 16 GB, "not measured above
+  135 million", llama.cpp's own note that a 1B model needs about 24 GB); Not yet (LoRA on models of 1 to 8 billion needs a
+  graphics chip or a rented machine, and nothing in Ingenium trains, applies or merges a LoRA yet; no date is promised); Not at
+  home (Meta reports 3.8 x 10^25 operations on 15.6 trillion tokens and up to 16,384 graphics chips for Llama 3.1 405B, which
+  is some 26 million years at this trainer's measured pace and about 6.5 TB of training state; DeepSeek reports about US$5.6
+  million for the final run of V3 alone; Hoffmann et al.'s twenty pieces of text a number make even a well-proportioned
+  135-million model from zero a year and a half here). The words stay kind: it is not a shortcoming of her computer, and what
+  home training teaches is manner and form; what a model should know of her sources is better given to it as sources.
+  Measure says what the figures say and what they do not (a lower loss is not quality); Elsewhere says what needs another
+  machine. Help lists the new cards (Show me opens their room and rings them).
+- Datasets from her own work (`build/modules/r200.js`, `window.IngData`, IndexedDB "ingenium_datasets"). A dataset is the text a
+  model learns from. The Data room makes one in three steps: a name and the sources (her chats, the conversations carried over
+  from other assistants, the conversations brought in from Claude, the reading page's documents, the notes she keeps on her
+  sources in Fontes, the Tabula page, her sticky notes and her project files, each counted); a review of every piece with where
+  it came from, to keep, edit or drop (exact duplicates are removed; emails and phone numbers are counted before she decides and
+  hidden in what goes out when she asks; a tenth or a fifth is held back by the hash of its text, the same pieces every time, so
+  a model can be measured on text it never learns from; the size is said in characters and in pieces of text, an estimate of
+  four characters a piece); and the dataset kept on the device. It goes out as plain text (the training part, the held-back
+  part), as chat lines (JSON Lines, a conversation a line, the shape the Claude panel writes) and as question-and-answer lines
+  that a model drafts from the kept pieces (through the page's own ask path: the connection in use, or the model loaded here)
+  and that she reads, changes or drops one by one before any is kept; the passages sent to the model have the emails and phone
+  numbers hidden first. Train on it hands the training part to Train a small model as its text, or, on a device with no trainer,
+  to the learning workbench. Her chats, notes and documents are never changed or removed by it.
+- The learning workbench (`build/modules/r201.js`, `window.IngLab`): training in the page, on any device, on the TensorFlow.js
+  that Ingenium's eyes already carry (`modules/r157.js` now lends it: `IngEyes.tf`, `IngEyes.net`); nothing new is carried, and
+  it is loaded only when a lesson starts. The graphics chip through WebGL where there is one, the processor otherwise (a switch
+  at the top, and a failing graphics chip puts the next lesson on the processor and says so); WebGPU is probed and said, not
+  used, since this copy carries neither its backend nor a need for it. Four tools, one at a time, each lesson pausable and
+  stoppable, one lesson at a time, small enough for a tablet of two to four gigabytes (Medium and Large are offered only where
+  the memory allows, the text taken is capped, and every tensor is let go when a model is let go): Write like my text (a small
+  transformer reads a text of hers letter by letter; four sizes from 30 thousand to 1.2 million numbers; the loss drawn as it
+  falls with the held-back loss beside it; a sample of what it writes every few steps; a way to write with it afterwards), Sort
+  my notes (a text classifier that learns her labels from lines like "history: The treaty ended the war.", says how it does on
+  the examples held back, which words point to which label, and sorts the lines she has not labelled; six examples give a rough
+  figure and it says so), Sort my pictures (the carried MobileNet v2 reads each picture once, only the last step is learned, in
+  seconds; the pictures themselves are not kept) and Words that sit together (word embeddings by skip-gram with negative
+  sampling: the nearest words of any word, a sum such as king - man + woman, a map of the most used words). What is learned is kept
+  in this browser under a name (TensorFlow.js's own IndexedDB store) and used again after a reload, without loading TensorFlow.js
+  to list it; letting one go asks first. Each knob has a plain line of its own.
+- The computer's side (`build/desktop/app_data_692.py`, registered in `build/release.py`; each method is feature-detected by the
+  page, so it works as before with an app that lacks them): the trainer takes its text as a file, handed over a megabyte at a
+  time (`train_text_put`, then `text_path`), which lifts the 8 MB cap of one string over the bridge to 256 MB; and a run of
+  several passes goes one pass at a time (llama-finetune with `-epochs 1`, the learning rate stepping down from the size's usual
+  start to its usual end, the model saved after each pass), so a training the app's closing cut short keeps the passes it did:
+  the trainer card offers to go on with it (`train_resume`) or to let it go (`train_discard`). Stop training by hand still
+  keeps nothing. Where llama.cpp's llama-perplexity sits beside the trainer, `train_perplexity` measures a model on the held-back
+  part of a dataset, as the build's own check does ("Final estimate: PPL"); no build carries that program yet (the lines that
+  must carry it are written down in `build/desktop/README.md`), so Measure says so until one does.
+
+- The way back to Ingenium's choice under Faber (her words, 31 October 2026: "limit the button of "Back to Ingenium's choice for
+  this computer" to only the text, I don't like the long raised line look, please redesign that button"). The key `build/modules/r105.js`
+  adds to Faber's list of coding models had been stretched across the whole tile by the list's grid; it is now a small flat key the
+  width of its words, with an arrow before them, by a few lines of CSS in `build/modules/r199.js` (`r105.js` is unchanged).
+
+    python3 -I rig/t_692_app_data.py <repo>/ingenium_app.py build/desktop/app_data_692.py  # 34 checks, on a copy, with stand-ins for llama-finetune and llama-perplexity
+    node rig/t_703_studio.js <url> <out>                                                  # 25 checks: the rooms, the truth card's figures, Help, the tour, the keyboard, perplexity, the way-back key
+    node rig/t_703b_datasets.js <url> <out> [port]                                        # 30 checks: the sources, the review, the held-back part, the exports, question-and-answer pairs from a stand-in model (rig/mock_qa.py), the computer's side
+    node rig/t_703c_lab.js <url> <out>                                                    # 40 checks: the four tools, a character model trained on the processor in headless Chromium (24 steps, under two minutes), pausing, keeping and using again, a 2 GB device, a lean copy
+    node rig/t_67_rooms.js <url> <out>                                                    # 59 checks since 6.9.3 (the Studio check now reads its rooms)
+
+Ingenium 6.9.3 (1 November 2026; her words: "The "11 larger models, for computers with more memory" line needs to be made purple
+and bolded so that it looks clickable. I want the same for the "Back to Ingenium"s models line as well."). On the Models page the
+line that opens the larger models of a list ("11 larger models, for computers with more memory") is the app's purple and bold,
+with a soft underline and the pointer of something to press; so is every "Back to Ingenium's choice for this computer", in the
+coding models' list and, now, in each house's own list of models too (6.9.2's text-only look reached only the coding models'
+list; in the houses' lists the line fell back to a plain button). By night both take the night's purple. `modules/r105.js`;
+test `node rig/t_697_back_link.js <page> <out>` (12 checks, day and night).
+
+Ingenium 6.9.3 also carries the folder search's review fixes (its page part stays held, `build/held.json`, until the owner
+approves its first phase): the computer apps' side gains `build/desktop/app_rag_693.py` (a link inside a chosen folder can no longer
+reach a hidden file or folder there; a folder chosen through a link is forgotten by the path it was chosen with), and the shipped
+SQLite is patched for crash safety (`rag/vendor.json`). The whole of the review and the tests are in `rag/notes/review.md`; the
+folder search now also runs on GitHub's Apple silicon and Intel Macs (WKWebView) and Windows PC (WebView2) on every change
+(`.github/workflows/rag-engines.yml`).
+
 Ingenium 6.9.2 (31 October 2026; her words: "I also want you to add better, faster and stronger models to Ingenium for all of
 the houses. I want the app to really be upgraded and be operating up to standards", for her MacBook Pro (8 GB, with a 2 TB
 external drive), Mac mini (16 GB), two HP laptops (16 GB), Fire tablet, iPhone and iPad, and "I still want the strong models

@@ -39,7 +39,17 @@ built (the PyInstaller specs, the Windows installer and the build workflows; abo
 **rag-r-04. Nothing had run in WebKit.** `.github/workflows/rag-engines.yml` now runs `rig/rag_engine_check.py` on GitHub's Apple
 silicon Mac, Intel Mac (WKWebView) and Windows PC (WebView2), through pywebview 6.2.1 as the apps use it: the private file system,
 SQLite with FTS5 and sqlite-vec, the reading model's vectors against Chromium's, the household folder read through the app's own
-bridge code, and a second start of the app that must find the index. Its results are in the workflow's summary.
+bridge code, and a second start of the app that must find the index.
+- First run (1 November 2026, 14:09 UTC): Windows passed everything. On both Macs (macOS 15.8.2) the private file system, SQLite
+  3.45.3 with sqlite-vec 0.1.6 and FTS5, the folder filter, and the reading model (vectors identical to Chromium's: cosine 1.00000,
+  same token counts) all worked, but every PDF failed: pdf.js 6.4 loops over a ReadableStream with "for await", which WebKit's
+  streams do not allow. The parse worker now gives the stream the standard iterator when it lacks one (`rig/t_rag1_webkit_pdf.js`
+  reproduces the failure and the fix in Chromium: 4 passed, 0 failed).
+- Second run (14:29 UTC), all three green. Intel Mac: the household folder (20 files, 50 passages) read through the bridge in
+  31.4 s, the model loaded in 2.6 s, 10 of 10 facts found by words and 10 of 10 by meaning; after the app was started again the
+  index was there and whole. Apple silicon Mac and Windows: the same checks, all passing.
+- So hard constraint 4 holds in the engines the apps have: sqlite-vec loads in WKWebView (macOS 15.8, both chips) and in WebView2.
+  Older macOS versions were not tried (GitHub offers only macOS 15 machines).
 
 ## The nine minor findings
 
@@ -70,3 +80,5 @@ bridge code, and a second start of the app that must find the index. Its results
 | `rig/t_rag1_parse.js` | 116 passed, 0 failed |
 | `rig/t_rag1_bridge.py` | 795 passed, 0 failed |
 | `rig/t_rag1_manual.js --quick` | 72 passed, 0 failed |
+| `rig/t_rag1_webkit_pdf.js` | 4 passed, 0 failed |
+| `rag-engines.yml` (GitHub: Mac Apple silicon, Mac Intel, Windows) | all checks passed on each |

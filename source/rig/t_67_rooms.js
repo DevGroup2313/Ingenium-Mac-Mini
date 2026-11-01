@@ -177,10 +177,13 @@ async function axeRun(p) {
     await go(p, 'models'); await room(p, 'models', 'yours');
     const hint = await p.evaluate(() => { const k = document.getElementById('rmStudioKey'); const r = k && k.getBoundingClientRect(); return { text: k && k.textContent.trim(), line: (document.getElementById('rmStudioHint') || {}).textContent, top: r && Math.round(r.top) }; });
     await p.click('#rmStudioKey'); await p.waitForTimeout(500);
+    // 6.9.x (modules/r199.js): the Studio has rooms of its own, one shown at a time: Make holds Your own AIs and Convert a model, Train holds the trainer
     const studio = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!e && e.getBoundingClientRect().height > 0; };
-      return { room: IngRooms.current('models'), train: vis('trainCard'), ai: vis('aiCard'), conv: vis('convCard'), tab: document.getElementById('rmT-models-studio').textContent.trim(), focus: document.activeElement && document.activeElement.id }; });
+      const here = { room: IngRooms.current('models'), tab: document.getElementById('rmT-models-studio').textContent.trim(), focus: document.activeElement && document.activeElement.id };
+      document.getElementById('stT-make').click(); here.ai = vis('aiCard'); here.conv = vis('convCard'); here.train = vis('trainCard');
+      document.getElementById('stT-train').click(); here.trainInTrain = vis('trainCard'); here.aiInTrain = vis('aiCard'); return here; });
     ok(hint.text === 'Open the Studio' && /Studio/.test(hint.line) && hint.top < 260, 'beside the Models page\'s opening line, a plain line and a raised key: Open the Studio, in the first screen', hint);
-    ok(studio.room === 'studio' && studio.train && studio.ai && studio.conv && studio.tab === 'Studio', 'the key opens the Studio: Train a small model, Your own AIs and Convert a model', studio);
+    ok(studio.room === 'studio' && studio.ai && studio.conv && !studio.train && studio.trainInTrain && !studio.aiInTrain && studio.tab === 'Studio', 'the key opens the Studio: Your own AIs and Convert a model in its Make room, Train a small model in its Train room, one room at a time', studio);
     await shot(p, 'rooms-models-studio-desk-day');
 
     // ---------------- 9 · Support folds, one group open at a time ----------------
