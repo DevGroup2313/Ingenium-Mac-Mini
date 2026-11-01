@@ -220,6 +220,23 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 
 /* a page that is put away stays away, whichever host draws this page (the preview host adds the same rule) */
 [hidden]{display:none !important}
+/* the scroll bars stay out of sight, as in the apps (the owner's words, 25 October 2026); every part still scrolls, by wheel,
+   trackpad, touch and keys */
+*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+/* ---------- THE LOADING PAGE (the owner's words, 25 October 2026: "a loading page telling the user the page is still being
+   painted"): the master shield and a line in the visitor's language, until the whole page has arrived ---------- */
+#opLoading{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--ground);color:var(--ink);padding:16px;transition:opacity .4s ease}
+#opLoading[data-gone="1"]{opacity:0;pointer-events:none}
+.opl-in{display:grid;justify-items:center;gap:12px;text-align:center}
+#oplSeal{width:120px;height:auto;animation:oplBreath 2.6s ease-in-out infinite;filter:drop-shadow(0 8px 14px rgba(40,22,68,.18))}
+.opl-name{font:700 19px/1.2 var(--display);letter-spacing:.16em;text-transform:uppercase}
+.opl-line{font-size:15px;color:var(--ink-2);max-width:32ch}
+.opl-bar{display:block;width:200px;max-width:70vw;height:4px;border-radius:2px;background:var(--hair);overflow:hidden;position:relative}
+.opl-bar i{position:absolute;top:0;bottom:0;left:-40%;width:40%;border-radius:2px;background:linear-gradient(90deg,var(--gilt),var(--gilt-hi));animation:oplRun 1.4s ease-in-out infinite}
+@keyframes oplBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes oplRun{0%{left:-40%}100%{left:100%}}
+@media (prefers-reduced-motion:reduce){#oplSeal,.opl-bar i{animation:none}.opl-bar i{left:30%}}
 /* ---------- THE MINI TOP BAR: the crest's mark, and language and light as small keys, as the apps' own top bars have them ---------- */
 .bar-in{flex-wrap:nowrap;padding-top:7px;padding-bottom:7px}
 .mark b{font-size:13px}
@@ -285,10 +302,22 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 @media (prefers-reduced-motion:reduce){.sb,.sb-idle,.sb-tilt,.sb-cast,.mk,.seg button,.room-card .go{animation:none !important;transition:none !important}}
 </style>
 
+<div id="opLoading" role="status" aria-live="polite"><div class="opl-in">
+  <img id="oplSeal" alt="" width="120" height="147">
+  <b class="opl-name">The Offline Project</b>
+  <span class="opl-line" id="oplLine">The page is still being painted…</span>
+  <span class="opl-bar"><i></i></span>
+</div></div>
+<script>/* the loading page shows in the visitor's language and light at once, before the rest of the page has arrived */
+(function(){try{document.getElementById("oplSeal").src=/*@@LOADSEAL@@*/"";}catch(e){}
+try{var t=localStorage.getItem("op:theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}
+var fr=false;try{var l=localStorage.getItem("op:lang");fr=l?l==="fr":(navigator.language||"").slice(0,2)==="fr";}catch(e){fr=(navigator.language||"").slice(0,2)==="fr";}
+if(fr){document.getElementById("oplLine").textContent="La page est encore en train d\u2019\u00eatre peinte\u2026";document.getElementById("opLoading").setAttribute("lang","fr");}})();</script>
 <div id="app">
 <header class="bar"><div class="bar-in">
   <a class="mark" href="#" id="markLink" aria-label="The Offline Project, the crest"><span id="markSeal"></span><b>THE OFFLINE PROJECT</b></a>
-  <div class="minikeys" role="group" aria-label="Language and light">
+  <div class="minikeys" role="group" aria-label="Refresh, language and light">
+    <button type="button" class="mk" id="refreshKey" data-i18n="refresh" title="Refresh the page if it freezes or looks wrong">↻ Refresh</button>
     <button type="button" class="mk" id="langKey" lang="fr">Français</button>
     <button type="button" class="mk" id="themeKey" aria-pressed="false">☾ Night</button>
   </div>
@@ -369,7 +398,8 @@ var W = {
     all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "Runs on", tryH: "Try this",
     opening: "Opening {app}", sizeLine: "{mb} MB, opened in this page. Nothing is sent anywhere.", ready: "{app} is open. Everything you do stays in this browser.",
     tourGo: "The tour has started in the app.", tourWait: "The app is still opening.", tourNone: "This app keeps its tour in its own menu.",
-    failed: "This demonstration could not be opened here. Try “Open on its own”.", parts: "Opening, {pct}%", door: "Open {app}", book: "The four apps", screen: "Screen" },
+    failed: "This demonstration could not be opened here. Try “Open on its own”.", parts: "Opening, {pct}%", door: "Open {app}", book: "The four apps", screen: "Screen",
+    refresh: "↻ Refresh", refreshTip: "Refresh the page if it freezes or looks wrong" },
   fr: { lede: "Quatre apps qui vivent sur votre appareil. Elles ne demandent ni compte ni connexion, et rien de ce que vous y faites n’en sort.",
     hint: "Touchez un sceau pour ouvrir son app, en direct, dans cette page.", fourTitle: "Les quatre apps", fourSub: "Chacune a son quartier du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée.",
     devTitle: "Sur chaque appareil", devSub: "Le blason tel qu’il se tient sur chaque écran pour lequel les apps sont construites, de jour et de nuit.",
@@ -378,20 +408,21 @@ var W = {
     all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Fonctionne sur", tryH: "À essayer",
     opening: "Ouverture de {app}", sizeLine: "{mb} Mo, ouverte dans cette page. Rien n’est envoyé nulle part.", ready: "{app} est ouverte. Tout ce que vous faites reste dans ce navigateur.",
     tourGo: "La visite a commencé dans l’app.", tourWait: "L’app s’ouvre encore.", tourNone: "Cette app garde sa visite dans son propre menu.",
-    failed: "Cette démonstration n’a pas pu s’ouvrir ici. Essayez « Ouvrir seule ».", parts: "Ouverture, {pct} %", door: "Ouvrir {app}", book: "Les quatre apps", screen: "Écran" }
+    failed: "Cette démonstration n’a pas pu s’ouvrir ici. Essayez « Ouvrir seule ».", parts: "Ouverture, {pct} %", door: "Ouvrir {app}", book: "Les quatre apps", screen: "Écran",
+    refresh: "↻ Actualiser", refreshTip: "Actualiser la page si elle se fige ou s’affiche mal" }
 };
 var APPS = [
   { slug: "carpe-diem", k: "cd", name: { en: "Carpe Diem", fr: "Carpe Diem" }, date: "XVI · AVGVSTI · MMXXVI", tour: "demoStartTour",
     line: { en: "A study for the whole day: focus, readings, lessons and writing.", fr: "Un bureau d’étude pour toute la journée : concentration, lectures, leçons et écriture." },
-    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words.",
-             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots." },
+    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words. The Committee demo here is sealed: it opens with the access code given to each committee.",
+             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots. La démonstration du comité est scellée ici : elle s’ouvre avec le code d’accès remis à chaque comité." },
     tries: { en: ["Open the door and choose the shape of your day.", "On the Focus page, break a task into small steps.", "Catch a passing thought in the 💭 Inbox.", "Open Tabula from the Workspace and write."],
              fr: ["Ouvrez la porte et choisissez la forme de votre journée.", "Sur la page Focus, découpez une tâche en petites étapes.", "Attrapez une pensée au vol dans la boîte 💭.", "Ouvrez Tabula depuis l’Espace de travail et écrivez."] },
     runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
   { slug: "the-forge", k: "forge", name: { en: "The Forge", fr: "La Forge" }, date: "XVI · AVGVSTI · MMXXVI", tour: "forgeStartTour",
     line: { en: "A workshop for changing the apps themselves, without code.", fr: "Un atelier pour modifier les apps elles-mêmes, sans code." },
-    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample and Inkwell to work on, and makes no app or install package.",
-             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem et Inkwell pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
+    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample to work on, and makes no app or install package.",
+             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
     tries: { en: ["Open the Editor and choose Carpe Diem.", "Point at a part of the preview and change its words or its colour.", "Choose how much help you want: First day, Finding my way or At ease.", "Press step 5 to see what the full Forge makes."],
              fr: ["Ouvrez l’Éditeur et choisissez Carpe Diem.", "Désignez une partie de l’aperçu et changez ses mots ou sa couleur.", "Choisissez le niveau d’aide qui vous convient.", "Touchez l’étape 5 pour voir ce que fabrique la Forge complète."] },
     runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
@@ -802,6 +833,8 @@ function go(h) {
   route();
 }
 window.__opGo = go;
+/* an app opened on its own from the one-file app asks for the hall by a message (its window has an address of its own) */
+window.addEventListener("message", function (e) { if (e && e.data && e.data.opHome === 1) go(""); });
 document.addEventListener("click", function (e) {
   if (e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null; if (!a) return;
@@ -815,6 +848,7 @@ document.addEventListener("click", function (e) {
 function paintWords() {
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach(function (e) { var v = t(e.getAttribute("data-i18n")); if (typeof v === "string") e.textContent = v; });
+  $("refreshKey").title = t("refreshTip"); $("refreshKey").setAttribute("aria-label", t("refreshTip"));
   $("langKey").textContent = lang === "fr" ? "English" : "Français"; $("langKey").setAttribute("lang", lang === "fr" ? "en" : "fr");
   var nt = night(); $("themeKey").textContent = (nt ? "☀ " : "☾ ") + t("theme")[nt ? 1 : 0]; $("themeKey").setAttribute("aria-pressed", nt ? "true" : "false");
   $("builds").textContent = BUILD.line || "";
@@ -831,6 +865,13 @@ var saved = store.get("theme", ""); if (saved) document.documentElement.setAttri
 var rt = 0; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (Math.abs(crestSize() - lastW) > 12 && $("room").hidden) paintCrest(false); }, 200); });
 
 paintCrest(true); paintMark(); paintWords(); route();
+/* the refresh key (the owner's words, 25 October 2026: "a refresh button that refreshes the app if it glitches or freezes"):
+   the whole page again, in the room it was in */
+$("refreshKey").addEventListener("click", function () { try { location.reload(); } catch (e) {} });
+/* the loading page goes once the whole page has arrived (in the one-file app, every app inside it too), and the hall is painted */
+function arrived() { var L = $("opLoading"); if (!L || L.getAttribute("data-gone")) return;
+  requestAnimationFrame(function () { requestAnimationFrame(function () { L.setAttribute("data-gone", "1"); setTimeout(function () { L.hidden = true; }, 450); }); }); }
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", arrived); else arrived();
 if (BUILD.site && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
 })();
 </script>

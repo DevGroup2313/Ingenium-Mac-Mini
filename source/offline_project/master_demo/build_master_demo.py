@@ -31,8 +31,18 @@ is a T. Its icons are drawn from that crest (--shield).
                 parts (apps/<slug>.partN.js), which any viewer that runs the page can load, read as files where it can
 --mode site     writes a whole document, for a web host such as GitHub Pages, and never splits a page (--max-file 0); with
                 its manifest and offline keeper (sw.js) it installs as a web app and opens offline once visited
---mode app      writes OUT_DIR/The_Offline_Project.html: one self-contained file, every app (and Inkwell's word lists, styles
+--mode app      writes "OUT_DIR/The Offline Project.html": one self-contained file, every app (and Inkwell's word lists, styles
                 and PDF reader) compressed inside it, that opens on any device with no connection and nothing beside it
+
+The owner's words (25 October 2026), and what each asks of the build:
+  "The app title when installed must be written like the other apps": the one-file app is "The Offline Project.html" (no
+     underscores), and the installed web app, the phone's home screen and the browser all name it The Offline Project.
+  "I want the current shield master seal with the gold book to be the app's icon and not the one with the white book emoji
+     since that is a much earlier design": the icons are drawn from the master seal (../../build/master_seal.json, by day),
+     its shield without the ribbon; the preview's older shield (its REF picture) is no longer used.
+  "There is also no way back to the main page when I click the 'Open on its own'": each app's page carries a small key,
+     shown only when the page is opened on its own (never inside the hall's frame), back to the hall.
+  "Add a loading page telling the user the page is still being painted": the site.html side, with the shield drawn here.
 
 usage: build_master_demo.py --seal SEAL_PREVIEW.html --images DIR [--cd-sample F] --cd-committee F --forge-demo F
                             --ingenium F [--inkwell F [--inkwell-vendor DIR]] --out DIR [--mode preview|site|app] [--max-file BYTES]"""
@@ -83,12 +93,40 @@ for k in ("cd", "cdN", "forge", "forgeN", "ingenium", "ingeniumN", "inkwell", "i
     IMG["seals"][k] = "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
 
 # 1b. THE SITE'S ICON, the master shield (the owner's words, 18 October 2026: "I want for the master shield to be the website
-#     url icon"): the shield of the approved preview (its REF image, the shield without its ribbon, which stays legible at the
-#     size of a browser tab), for the tab, the address bar, bookmarks and a phone's home screen
-mr = re.search(r'var REF = "(data:image/png;base64,[^"]+)"', seal_src)
-if not mr:
-    raise SystemExit("the preview of the master seal does not hold the shield (var REF)")
-SHIELD = Image.open(io.BytesIO(base64.b64decode(mr.group(1).split(",", 1)[1]))).convert("RGBA")
+#     url icon"; 25 October 2026: "the current shield master seal with the gold book"): the master seal by day, as Ingenium
+#     keeps it (build/master_seal.json), its shield without the ribbon, which stays legible at the size of a browser tab, for
+#     the tab, the address bar, bookmarks, a phone's home screen and the loading page
+
+
+def master_shield():
+    d = json.load(open(os.path.join(HERE, "..", "..", "build", "master_seal.json"), encoding="utf-8"))
+    im = Image.open(io.BytesIO(base64.b64decode(d["day"]["b64"]))).convert("RGBA")
+    W, H = im.size
+    px = im.load()
+    # the shield narrows to its tip; the ribbon below it is wider at once: the first row much wider than the one above it
+    span = []
+    for y in range(H):
+        xs = [x for x in range(W) if px[x, y][3] > 40]
+        span.append((min(xs), max(xs)) if xs else None)
+    cut, tip = None, None
+    for y in range(H // 2, H):
+        a, b = span[y - 1], span[y]
+        if a and b and (b[1] - b[0]) > 2 * (a[1] - a[0]) + 20:
+            cut, tip = y, a
+            break
+    if cut is None:
+        raise SystemExit("master_seal.json: the foot of the shield was not found")
+    # below that row only the tip of the shield stays: it narrows by about two pixels a row on each side
+    for y in range(cut, H):
+        k = y - cut + 1
+        lo, hi = tip[0] + 2 * k, tip[1] - 2 * k
+        for x in range(W):
+            if not (lo <= x <= hi and y < cut + 8):
+                px[x, y] = (0, 0, 0, 0)
+    return im.crop(im.getbbox())
+
+
+SHIELD = master_shield()
 if A.shield:
     SHIELD = Image.open(A.shield).convert("RGBA")
     SHIELD = SHIELD.crop(SHIELD.getbbox())
@@ -120,11 +158,15 @@ DEVICES = ("iphone", "ipad", "macbook_pro", "mac_mini_4k", "windows", "fire_hd10
 for dv in DEVICES:
     for t in ("day", "night"):
         p = os.path.join(A.images, "the_offline_project_%s_%s.jpg" % (dv, t))
-        im = Image.open(p).convert("RGB")
-        if im.size[1] > 720:
-            im = im.resize((round(im.size[0] * 720 / im.size[1]), 720), Image.LANCZOS)
+        src = Image.open(p)
         dp = os.path.join(OUT, "assets/devices/%s_%s.jpg" % (dv, t))
-        im.save(dp, quality=84, optimize=True, progressive=True)
+        if src.format == "JPEG" and src.size[1] <= 720:
+            shutil.copyfile(p, dp)  # already the size the site shows: kept as it is, not made again
+        else:
+            im = src.convert("RGB")
+            if im.size[1] > 720:
+                im = im.resize((round(im.size[0] * 720 / im.size[1]), 720), Image.LANCZOS)
+            im.save(dp, quality=84, optimize=True, progressive=True)
         IMG["devices"]["%s_%s" % (dv, t)] = "data:image/jpeg;base64," + base64.b64encode(open(dp, "rb").read()).decode("ascii")
 
 # 3. THE APPS, each with its character set and its own corner of the storage
@@ -155,6 +197,38 @@ if(CW&&CW.get)Object.defineProperty(IP,"contentWindow",{configurable:true,enumer
 if(CD&&CD.get)Object.defineProperty(IP,"contentDocument",{configurable:true,enumerable:CD.enumerable,get:function(){var d=CD.get.call(this);try{if(d&&d.defaultView)install(d.defaultView);}catch(e){}return d;}});}}catch(e){}}
 install(window);
 })("op:__APP__:");</script>"""
+
+# 3a. THE WAY BACK (the owner's words, 25 October 2026: "There is also no way back to the main page when I click the 'Open on its
+#     own'. Please add a path back to the Main Offline project page."): an app opened on its own, and only then, shows a small
+#     key at the top of its window. It brings the hall back: the window that opened it, if there is one (the one-file app opens
+#     each app in a window of its own), or else the hall's page beside the apps (the site and the installed web app).
+HOME_TAG = r"""<script id="op-home">/* THE OFFLINE PROJECT: opened on its own, outside the hall's frame, this app carries a key back to the hall */
+(function(){try{if(window.top!==window)return;}catch(e){return;}var HOME=__HOME__;
+function fr(){try{var d=document.documentElement,b=document.body;return /^fr/.test(d.lang||"")&&!(b&&b.getAttribute("data-lang")==="en")||!!(b&&(b.getAttribute("data-lang")==="fr"||b.classList.contains("lang-fr")));}catch(e){return false;}}
+/* the window that opened this one (the one-file app opens each app in a window of its own, at an address of its own) is
+   asked to show the hall, by a message where it cannot be called, and this window closes; else the hall's page opens here */
+function back(){var o=null;try{o=window.opener;}catch(e){}
+if(o&&!o.closed){try{o.__opGo("");}catch(e){try{o.postMessage({opHome:1},"*");}catch(x){}}try{o.focus();}catch(e){}try{window.close();}catch(e){}
+setTimeout(function(){if(!window.closed){if(HOME)location.href=HOME;else try{history.back();}catch(e){}}},400);return;}
+if(HOME){location.href=HOME;return;}try{history.back();}catch(e){}}
+var CSS="#op-home-key{position:fixed;z-index:2147483647;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);margin:0;"+
+"font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:.02em;white-space:nowrap;padding:7px 13px;border-radius:999px;cursor:pointer;"+
+"color:#3b2f17;background:rgba(251,245,230,.94);border:1px solid rgba(143,107,43,.55);box-shadow:0 2px 0 rgba(40,22,68,.18),0 4px 10px rgba(40,22,68,.14);"+
+"-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s;-webkit-tap-highlight-color:transparent}"+
+"#op-home-key:hover{transform:translateX(-50%) translateY(-1px);box-shadow:0 3px 0 rgba(40,22,68,.18),0 6px 14px rgba(40,22,68,.16)}"+
+"#op-home-key:active{transform:translateX(-50%) translateY(1px);box-shadow:inset 0 2px 4px rgba(40,22,68,.22)}"+
+"#op-home-key:focus-visible{outline:2px solid #8f6b2b;outline-offset:3px}"+
+"@media (prefers-color-scheme:dark){#op-home-key{color:#f3e9cf;background:rgba(31,25,41,.94);border-color:rgba(217,184,102,.5);box-shadow:0 2px 0 rgba(0,0,0,.6),0 4px 10px rgba(0,0,0,.4)}}"+
+"@media print{#op-home-key{display:none}}";
+/* the key sits outside the app's body, after it: an app's door or dialog marks the body's other parts inert and covers them,
+   and the key must stay pressable over any of them */
+function put(){try{var b=document.documentElement;if(!b||!document.body)return;var k=document.getElementById("op-home-key"),f=fr(),w="\u2190 The Offline Project",a=f?"Revenir \u00e0 The Offline Project":"Back to The Offline Project";
+if(!document.getElementById("op-home-style")){var st=document.createElement("style");st.id="op-home-style";st.textContent=CSS;(document.head||b).appendChild(st);}
+if(!k){k=document.createElement("button");k.type="button";k.id="op-home-key";k.addEventListener("click",back);}
+if(k.parentNode!==b||b.lastElementChild!==k)b.appendChild(k);if(k.hasAttribute("inert"))k.removeAttribute("inert");
+if(k.textContent!==w){k.textContent=w;k.title=a;k.setAttribute("aria-label",a);}}catch(e){}}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",put);else put();
+window.addEventListener("load",put);setInterval(put,1500);})();</script>"""
 
 LOADER = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -197,7 +271,17 @@ for slug, key, path, title, label in APPS:
     if not A.cd_sample and slug == "carpe-diem-committee":
         label = None  # the Committee demo alone: no choice to offer
     s = open(path, encoding="utf-8").read()
-    if CHECK[slug] not in s:
+    sealed = None
+    if slug == "carpe-diem-committee" and CHECK[slug] not in s and 'id="cd-lock-data"' in s and "<h1>Carpe Diem</h1>" in s:
+        # Carpe Diem's Committee demo, sealed (1073 on): it opens only with the access code its author gives to each
+        # committee, so its build line is inside the seal; its build is read from the BUILD_INFO.txt published beside it
+        info = os.path.join(os.path.dirname(os.path.abspath(path)), "BUILD_INFO.txt")
+        bi = open(info, encoding="utf-8").read() if os.path.exists(info) else ""
+        mp = re.search(r"^Pass: (\d+)$", bi, re.M)
+        if not mp or "Edition: Committee demo" not in bi:
+            raise SystemExit("carpe-diem-committee: a sealed copy, and no BUILD_INFO.txt beside it that names its pass")
+        sealed = mp.group(1)
+    elif CHECK[slug] not in s:
         raise SystemExit("%s: not the page expected (%s)" % (slug, CHECK[slug]))
     if OUTSIDE.search(s):
         raise SystemExit("%s: carries a script from outside that does not belong" % slug)
@@ -205,9 +289,10 @@ for slug, key, path, title, label in APPS:
         raise SystemExit("%s: already carries the shim" % slug)
     d = re.match(r"\s*<!doctype html>", s, re.I)
     at = d.end() if d else 0
-    s = s[:at] + '\n<meta charset="utf-8">' + SHIM.replace("__APP__", key if slug != "carpe-diem-committee" else "cdc") + s[at:]
+    s = (s[:at] + '\n<meta charset="utf-8">' + SHIM.replace("__APP__", key if slug != "carpe-diem-committee" else "cdc")
+         + HOME_TAG.replace("__HOME__", json.dumps(None if A.mode == "app" else "../index.html")) + s[at:])
     if slug.startswith("carpe-diem"):
-        versions["cd"] = re.search(r'window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"', s).group(1)
+        versions["cd"] = sealed or re.search(r'window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"', s).group(1)
     if slug == "the-forge":
         versions["forge"] = re.search(r'window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"', s).group(1)
     if slug == "ingenium":
@@ -319,6 +404,11 @@ if A.mode == "app":
 if A.mode == "site":
     build["site"] = True
 site = site.replace("/*@@BUILD@@*/{}", json.dumps(build, ensure_ascii=False).replace("</", "<\\/"))
+# the loading page's shield (site.html: "the page is still being painted")
+buf = io.BytesIO(); shield_square(240).save(buf, "WEBP", quality=90, method=6)
+if site.count('/*@@LOADSEAL@@*/""') != 1:
+    raise SystemExit("site.html: the place for the loading page's shield was not found")
+site = site.replace('/*@@LOADSEAL@@*/""', json.dumps("data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode("ascii")))
 if site.count("<title>The Offline Project</title>") != 1:
     raise SystemExit("site.html: the title was not found")
 site = site.replace("<title>The Offline Project</title>", "<title>The Offline Project</title>" + ICON_LINKS, 1)
@@ -329,16 +419,17 @@ if not A.inkwell:
     site = site.replace(d0, 'content="Carpe Diem, The Forge and Ingenium: three apps that live on your own device, each with its live demonstration."')
 if A.mode in ("site", "app"):
     head = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
-            '<meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)">\n<meta name="theme-color" content="#110d18" media="(prefers-color-scheme: dark)">\n')
+            '<meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)">\n<meta name="theme-color" content="#110d18" media="(prefers-color-scheme: dark)">\n'
+            '<meta name="application-name" content="The Offline Project">\n')
     if A.mode == "site":
-        head += '<link rel="manifest" href="manifest.webmanifest">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-title" content="Offline Project">\n'
+        head += '<link rel="manifest" href="manifest.webmanifest">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-title" content="The Offline Project">\n'
     site = head + site.replace("<div id=\"app\">", "</head>\n<body>\n<div id=\"app\">", 1) + "\n" + "\n".join(INSIDE) + "\n</body>\n</html>\n"
 if A.mode == "app":
     # nothing beside it: its icons travel inside it too
     for rel in ("assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/apple-touch-icon.png"):
         mime = "image/x-icon" if rel.endswith(".ico") else "image/png"
         site = site.replace('href="%s"' % rel, 'href="data:%s;base64,%s"' % (mime, base64.b64encode(open(os.path.join(OUT, rel), "rb").read()).decode("ascii")))
-    name = "The_Offline_Project.html" if A.inkwell else "The_Offline_Project_without_Inkwell.html"
+    name = "The Offline Project.html" if A.inkwell else "The Offline Project (without Inkwell).html"
     open(os.path.join(OUT, name), "w", encoding="utf-8").write(site)
     print("app", name, len(site.encode("utf-8")), "bytes;", build["line"])
 else:
@@ -347,7 +438,7 @@ else:
 if A.mode == "site":
     # 5. THE WEB APP: it installs from the browser, and once visited it opens with no connection (each app is kept the first
     #    time it is opened)
-    man = {"name": "The Offline Project", "short_name": "Offline Project", "start_url": "./", "scope": "./", "display": "standalone",
+    man = {"name": "The Offline Project", "short_name": "The Offline Project", "start_url": "./", "scope": "./", "display": "standalone",
            "background_color": "#f5f3f7", "theme_color": "#f5f3f7", "description": "Four apps that live on your own device.",
            "icons": [{"src": "assets/icons/shield-192.png", "sizes": "192x192", "type": "image/png"},
                      {"src": "assets/icons/shield-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
