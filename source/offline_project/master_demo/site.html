@@ -414,15 +414,15 @@ var W = {
 var APPS = [
   { slug: "carpe-diem", k: "cd", name: { en: "Carpe Diem", fr: "Carpe Diem" }, date: "XVI · AVGVSTI · MMXXVI", tour: "demoStartTour",
     line: { en: "A study for the whole day: focus, readings, lessons and writing.", fr: "Un bureau d’étude pour toute la journée : concentration, lectures, leçons et écriture." },
-    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words. The Committee demo here is sealed: it opens with the access code given to each committee.",
-             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots. La démonstration du comité est scellée ici : elle s’ouvre avec le code d’accès remis à chaque comité." },
+    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words.",
+             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots." },
     tries: { en: ["Open the door and choose the shape of your day.", "On the Focus page, break a task into small steps.", "Catch a passing thought in the 💭 Inbox.", "Open Tabula from the Workspace and write."],
              fr: ["Ouvrez la porte et choisissez la forme de votre journée.", "Sur la page Focus, découpez une tâche en petites étapes.", "Attrapez une pensée au vol dans la boîte 💭.", "Ouvrez Tabula depuis l’Espace de travail et écrivez."] },
     runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
   { slug: "the-forge", k: "forge", name: { en: "The Forge", fr: "La Forge" }, date: "XVI · AVGVSTI · MMXXVI", tour: "forgeStartTour",
     line: { en: "A workshop for changing the apps themselves, without code.", fr: "Un atelier pour modifier les apps elles-mêmes, sans code." },
-    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample to work on, and makes no app or install package.",
-             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
+    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample, its own page, Inkwell and Ingenium’s demo edition to work on, and makes no app or install package.",
+             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem, sa propre page, Inkwell et l’édition de démonstration d’Ingenium pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
     tries: { en: ["Open the Editor and choose Carpe Diem.", "Point at a part of the preview and change its words or its colour.", "Choose how much help you want: First day, Finding my way or At ease.", "Press step 5 to see what the full Forge makes."],
              fr: ["Ouvrez l’Éditeur et choisissez Carpe Diem.", "Désignez une partie de l’aperçu et changez ses mots ou sa couleur.", "Choisissez le niveau d’aide qui vous convient.", "Touchez l’étape 5 pour voir ce que fabrique la Forge complète."] },
     runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
@@ -453,6 +453,9 @@ if (TRIO) {
     fourTitle: "Les trois apps", book: "Les trois apps", all: "Carpe Diem · La Forge · Ingenium",
     fourSub: "Chacune a son champ du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée." });
   document.documentElement.classList.add("trio");
+  APPS.forEach(function (a) { if (a.k !== "forge") return;
+    a.about.en = a.about.en.replace(", Inkwell and Ingenium’s demo edition", " and Ingenium’s demo edition");
+    a.about.fr = a.about.fr.replace(", Inkwell et l’édition", " et l’édition"); });
 }
 var BYSLUG = {}, BYK = {}; APPS.forEach(function (a) { BYSLUG[a.slug] = a; BYK[a.k] = a; a.variants = (BUILD.apps && BUILD.apps[a.slug]) || []; });
 var DEVICES = [["iphone", "iPhone", "iPhone"], ["ipad", "iPad", "iPad"], ["macbook_pro", "MacBook Pro", "MacBook Pro"], ["mac_mini_4k", "Mac mini", "Mac mini"], ["windows", "Windows", "Windows"],
@@ -858,13 +861,19 @@ function paintWords() {
 }
 function setLang(l) { lang = l; store.set("lang", l); paintWords(); }
 $("langKey").addEventListener("click", function () { setLang(lang === "fr" ? "en" : "fr"); });
-function repaintTheme() { paintCrest(false); paintMark(); paintWords(); }
+/* the tab's icon (the owner's words, 1 November 2026): the shield, in its night dressing when the page is dark, that is when
+   Night is chosen, or nothing is chosen (Auto) and the device is dark. A browser reads an icon's link once, so the link is
+   put in afresh. */
+function paintIcon() { var I = BUILD.icons; if (!I) return; var set = night() ? I.night : I.day;
+  document.querySelectorAll("link[data-op-icon]").forEach(function (l) { var h = set[l.getAttribute("data-op-icon")]; if (!h || l.getAttribute("href") === h) return;
+    var n = l.cloneNode(false); n.setAttribute("href", h); l.parentNode.replaceChild(n, l); }); }
+function repaintTheme() { paintCrest(false); paintMark(); paintWords(); paintIcon(); }
 $("themeKey").addEventListener("click", function () { var nt = !night(); document.documentElement.setAttribute("data-theme", nt ? "dark" : "light"); store.set("theme", nt ? "dark" : "light"); repaintTheme(); });
 try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { if (!document.documentElement.getAttribute("data-theme")) repaintTheme(); }); } catch (e) {}
 var saved = store.get("theme", ""); if (saved) document.documentElement.setAttribute("data-theme", saved);
 var rt = 0; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (Math.abs(crestSize() - lastW) > 12 && $("room").hidden) paintCrest(false); }, 200); });
 
-paintCrest(true); paintMark(); paintWords(); route();
+paintCrest(true); paintMark(); paintWords(); paintIcon(); route();
 /* the refresh key (the owner's words, 25 October 2026: "a refresh button that refreshes the app if it glitches or freezes"):
    the whole page again, in the room it was in */
 $("refreshKey").addEventListener("click", function () { try { location.reload(); } catch (e) {} });

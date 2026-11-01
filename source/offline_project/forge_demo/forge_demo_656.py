@@ -11,15 +11,22 @@ way Carpe Diem's two demonstrations are made (the Public sample and the Committe
   3. The Forge makes no app and no install package here. The twelve controls that make one (the ten of step 5,
      "Download the app", the Files room's download of an edited app, and Bake) answer with that card instead, and step 5
      says so in its own words. Everything else works: the Editor, the preview, the rooms, the tour, the Guidebook.
-  4. (656) It carries Carpe Diem's demonstration alone. The owner's words (25 October 2026): "The demo version of the
-     Forge inside of the Offline Project's master demo has 'Inkwell' listed on there, I want it removed. It should only
-     list adding another app after Carpe Diem and it should only load Carpe Diem's demo unlike the full Forge app." The
-     Editor's switch offers Carpe Diem, then Another app; Inkwell, Ingenium and the Forge's copy of itself are not
-     carried, and their keys are hidden.
+  4. (656) Which apps it carries depends on where it is shown. The owner's words (1 November 2026): "The Forge's demo
+     inside of the Offline Project can show Carpe Diem, the Forge, Ingenium and Inkwell's demos. The other variation of
+     the Offline Project without Inkwell should have the Forge's demo load up all of the other apps except Inkwell. I
+     only want the standalone Forge's demo that is on its own website and not included in the Offline's Project master
+     demo to only show Carpe Diem, The Forge's public sample demos and 'Another App'". So it always carries Carpe Diem's
+     Public sample and its own page (the demonstration, carrying nothing: its "copy of itself", as the full Forge
+     carries its lean page), and also Ingenium's demo edition (--ingenium) and Inkwell (--inkwell) when they are given:
+       the Offline Project's site of four apps   --ingenium and --inkwell: Carpe Diem, The Forge, Inkwell, Ingenium
+       its site of three, without Inkwell        --ingenium:              Carpe Diem, The Forge, Ingenium
+       the demonstration on its own website      neither:                  Carpe Diem, The Forge
+     The Editor's switch offers those, then Another app; the keys of the apps it does not carry are hidden.
   5. (656) The words that list the apps the full Forge carries (the Guidebook's Editor steps and "Your four apps", the
-     Editor's own help card, the tour's two Editor cards, the Editor's card for an app not kept yet) name Carpe Diem's
-     demonstration alone, in English and French, and the Guidebook's two articles on editing Inkwell and Ingenium are
-     left out.
+     Editor's own help card, the tour's two Editor cards, the Editor's card for an app not kept yet, the DEMO card) name
+     the apps this demonstration carries, in English and French, and the Guidebook's articles on editing Inkwell and
+     Ingenium are left out when it does not carry them. (Before 1 November it carried Carpe Diem's alone, at the owner's
+     words of 25 October.)
   6. (639) Fabrica is there too, the Forge's own GitHub: a visitor keeps versions, branches, merges and tests them. Its
      controls that make an app, a package or a copy (the targets, Make the chosen, the copies' Save, Save a copy, the
      whole history as a git bundle from its key or from the More menu, and Download as an app) answer with the card.
@@ -42,16 +49,20 @@ way Carpe Diem's two demonstrations are made (the Public sample and the Committe
      typed, uploaded or drawn, stays), no longer names itself the owner's personal copy in its checks, and the author's
      name field suggests "Your name" in place of hers.
 
-usage: forge_demo_656.py FORGE656_LEAN.html CARPE_DIEM_DEMO.html OUT_DIR
+usage: forge_demo_656.py FORGE656_LEAN.html CARPE_DIEM_DEMO.html OUT_DIR [--ingenium INGENIUM_DEMO.html] [--inkwell INKWELL.html]
        writes OUT_DIR/the_forge_demo.html
 CARPE_DIEM_DEMO.html is one of Carpe Diem's demonstrations that opens without an access code (its Public sample), and
 carries nothing personal."""
 import base64, gzip, hashlib, json, os, re, sys
 
 STAMP, PASS, DATE = "9s88", "656", "2026-10-28"
-if len(sys.argv) != 4:
-    raise SystemExit(__doc__.split("usage: ")[1])
-lean_p, cd_p, out_dir = sys.argv[1:4]
+import argparse
+ap = argparse.ArgumentParser(usage=__doc__.split("usage: ")[1])
+ap.add_argument("lean"); ap.add_argument("cd"); ap.add_argument("out")
+ap.add_argument("--ingenium", help="Ingenium's demo edition (build_page.py with ING_EDITION=demo), to carry too")
+ap.add_argument("--inkwell", help="Inkwell's page, to carry too")
+A = ap.parse_args()
+lean_p, cd_p, out_dir = A.lean, A.cd, A.out
 s = open(lean_p, encoding="utf-8").read()
 if 'id="forge-bi-meta"' in s or 'id="forge-demo-639"' in s or 'id="room-fabrica"' not in s:
     raise SystemExit("give the Forge 656 lean page (it carries no apps, and is not the demonstration already)")
@@ -202,65 +213,79 @@ html:not(#fd1):not(#fd2):not(#fd3):not(#fd4):not(#fd5):not(#fd6):not(#fd7):not(#
   new MutationObserver(function () { paint(); title(); }).observe(document.body || document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 })();
 </script>"""
-# the demonstration carries Carpe Diem alone: the Editor offers it alone, and the card names it alone
-for a, b in (('button:is([data-app="ingenium"],[data-app="forge"])', 'button:is([data-app="ingenium"],[data-app="forge"],[data-app="inkwell"])'),
-             ("/^(ingenium|forge)$/", "/^(ingenium|forge|inkwell)$/"),
-             ("change a word or a colour in Carpe Diem or Inkwell, and watch", "change a word or a colour in Carpe Diem, and watch"),
-             ("changez un mot ou une couleur dans Carpe Diem ou Inkwell, et regardez", "changez un mot ou une couleur dans Carpe Diem, et regardez"),
-             ("/* the demonstration carries Carpe Diem and Inkwell: the Editor offers those two.", "/* the demonstration carries Carpe Diem alone: the Editor offers it alone.")):
+# 4 and 5 (656). THE APPS IT CARRIES, AND THE WORDS THAT NAME THEM: Carpe Diem and the Forge always; Ingenium and Inkwell
+# when they are given
+CARRY = [k for k in ("cd", "forge", "inkwell", "ingenium") if k in ("cd", "forge") or (k == "inkwell" and A.inkwell) or (k == "ingenium" and A.ingenium)]
+HIDE = [k for k in ("ingenium", "forge", "inkwell") if k not in CARRY]
+EN = {"cd": "Carpe Diem", "forge": "The Forge", "inkwell": "Inkwell", "ingenium": "Ingenium"}
+FR = {"cd": "Carpe Diem", "forge": "La Forge", "inkwell": "Inkwell", "ingenium": "Ingenium"}
+TOUR_EN = dict(EN, forge="the Forge itself")
+TOUR_FR = dict(FR, forge="la Forge elle-même")
+
+
+def join(names, last):
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " " + last + " " + names[-1]
+
+
+or_en, and_en = join([EN[k] for k in CARRY], "or"), join([EN[k] for k in CARRY], "and")
+or_fr, and_fr = join([FR[k] for k in CARRY], "ou"), join([FR[k] for k in CARRY], "et")
+for a, b in (('button:is([data-app="ingenium"],[data-app="forge"])', 'button:is(%s)' % (",".join('[data-app="%s"]' % k for k in HIDE) or '[data-app="-"]')),
+             ("/^(ingenium|forge)$/", "/^(%s)$/" % ("|".join(HIDE) or "-")),
+             ("change a word or a colour in Carpe Diem or Inkwell, and watch", "change a word or a colour in %s, and watch" % or_en),
+             ("changez un mot ou une couleur dans Carpe Diem ou Inkwell, et regardez", "changez un mot ou une couleur dans %s, et regardez" % or_fr),
+             ("/* the demonstration carries Carpe Diem and Inkwell: the Editor offers those two.", "/* the demonstration carries %s: the Editor offers them, then Another app." % and_en)):
     if DEMO.count(a) != 1:
-        raise SystemExit("the demonstration with Carpe Diem alone: %r not found once" % a)
+        raise SystemExit("the demonstration's apps: %r not found once" % a)
     DEMO = DEMO.replace(a, b)
 k = s.rfind("</body>")
 s = s[:k] + DEMO + "\n" + s[k:]
-
-# 5 (656). THE WORDS THAT LIST THE APPS THE FULL FORGE CARRIES name Carpe Diem's demonstration alone
 for a, b in (
         ("<li>Choose the app at the top (Editing): Carpe Diem, The Forge, Inkwell or Ingenium. The Forge carries all four inside it "
          "and keeps them on this device on its first start, so choosing one opens it at once.</li>",
-         "<li>Choose the app at the top (Editing): Carpe Diem, or Another app for a page of your own. The demonstration carries "
-         "Carpe Diem's own demonstration inside it and keeps it on this device on its first start, so choosing it opens it at once.</li>"),
+         "<li>Choose the app at the top (Editing): %s, or Another app for a page of your own. The demonstration carries %s inside it "
+         "and keeps them on this device on its first start, so choosing one opens it at once.</li>" % (or_en, and_en)),
         ("<li>Choisissez l’app en haut (Édition) : Carpe Diem, La Forge, Inkwell ou Ingenium. La Forge les porte toutes les quatre en "
          "elle et les garde sur cet appareil à son premier démarrage : en choisir une l’ouvre aussitôt.</li>",
-         "<li>Choisissez l’app en haut (Édition) : Carpe Diem, ou Une autre app pour une page à vous. La démonstration porte en elle "
-         "la démonstration de Carpe Diem et la garde sur cet appareil à son premier démarrage : la choisir l’ouvre aussitôt.</li>"),
+         "<li>Choisissez l’app en haut (Édition) : %s, ou Une autre app pour une page à vous. La démonstration porte en elle %s et les "
+         "garde sur cet appareil à son premier démarrage : en choisir une l’ouvre aussitôt.</li>" % (or_fr, and_fr)),
         ('["Choose the app at the top (Editing): Carpe Diem, The Forge, Inkwell or Ingenium. The Forge carries all four inside it and '
          'keeps them on this device on its first start, so choosing one opens it at once.", ',
-         '["Choose the app at the top (Editing): Carpe Diem, or Another app for a page of your own. The demonstration carries Carpe '
-         'Diem\'s own demonstration inside it and keeps it on this device on its first start, so choosing it opens it at once.", '),
+         '["Choose the app at the top (Editing): %s, or Another app for a page of your own. The demonstration carries %s inside it and '
+         'keeps them on this device on its first start, so choosing one opens it at once.", ' % (or_en, and_en)),
         ('["Choisissez l’app en haut (Édition) : Carpe Diem, La Forge, Inkwell ou Ingenium. La Forge les porte toutes les quatre en elle '
          'et les garde sur cet appareil à son premier démarrage : en choisir une l’ouvre aussitôt.", ',
-         '["Choisissez l’app en haut (Édition) : Carpe Diem, ou Une autre app pour une page à vous. La démonstration porte en elle la '
-         'démonstration de Carpe Diem et la garde sur cet appareil à son premier démarrage : la choisir l’ouvre aussitôt.", '),
+         '["Choisissez l’app en haut (Édition) : %s, ou Une autre app pour une page à vous. La démonstration porte en elle %s et les '
+         'garde sur cet appareil à son premier démarrage : en choisir une l’ouvre aussitôt.", ' % (or_fr, and_fr)),
         ("<h4>Your four apps</h4><p>The Forge carries Carpe Diem, Inkwell and Ingenium inside it, with a copy of itself. On its first "
          "start on each device it keeps them in the Editor, each checked against its fingerprint. No other file is needed.</p>",
-         "<h4>The app it carries</h4><p>The demonstration carries Carpe Diem's own demonstration inside it. On its first start on each "
-         "device it keeps it in the Editor, checked against its fingerprint. No other file is needed.</p>"),
+         "<h4>The apps it carries</h4><p>The demonstration carries %s inside it. On its first start on each device it keeps them in the "
+         "Editor, each checked against its fingerprint. No other file is needed.</p>" % and_en),
         ("<h4>Vos quatre apps</h4><p>La Forge porte en elle Carpe Diem, Inkwell et Ingenium, avec une copie d’elle-même. À son premier "
          "démarrage sur chaque appareil, elle les garde dans l’Éditeur, chacune vérifiée par son empreinte. Aucun autre fichier n’est nécessaire.</p>",
-         "<h4>L’app qu’elle porte</h4><p>La démonstration porte en elle la démonstration de Carpe Diem. À son premier démarrage sur "
-         "chaque appareil, elle la garde dans l’Éditeur, vérifiée par son empreinte. Aucun autre fichier n’est nécessaire.</p>"),
+         "<h4>Les apps qu’elle porte</h4><p>La démonstration porte en elle %s. À son premier démarrage sur chaque appareil, elle les garde "
+         "dans l’Éditeur, chacune vérifiée par son empreinte. Aucun autre fichier n’est nécessaire.</p>" % and_fr),
         ("It opens one of your apps, Carpe Diem, the Forge itself, Inkwell or Ingenium, or any other page, and lets you",
-         "It opens Carpe Diem, or any other page you bring it, and lets you"),
+         "It opens %s, or any other page you bring it, and lets you" % join([TOUR_EN[k] for k in CARRY], "or")),
         ("Elle ouvre l’une de vos apps, Carpe Diem, la Forge elle-même, Inkwell ou Ingenium, ou toute autre page, et vous laisse",
-         "Elle ouvre Carpe Diem, ou toute autre page que vous lui apportez, et vous laisse"),
+         "Elle ouvre %s, ou toute autre page que vous lui apportez, et vous laisse" % join([TOUR_FR[k] for k in CARRY], "ou")),
         ("The switch comes stocked: the Forge carries Carpe Diem, Inkwell and Ingenium inside its own page, with a copy of itself, and "
          "keeps them on this device on its first start, each checked against its fingerprint, so choosing one opens it at once.",
-         "The switch comes stocked: the demonstration carries Carpe Diem's own demonstration inside its page, and keeps it on this "
-         "device on its first start, checked against its fingerprint, so choosing it opens it at once."),
+         "The switch comes stocked: the demonstration carries %s inside its page, and keeps them on this device on its first start, "
+         "each checked against its fingerprint, so choosing one opens it at once." % and_en),
         ("Le sélecteur arrive garni : la Forge porte Carpe Diem, Inkwell et Ingenium dans sa propre page, avec une copie d’elle-même, "
          "et les garde sur cet appareil à son premier démarrage, chacune vérifiée par son empreinte ; en choisir une l’ouvre aussitôt.",
-         "Le sélecteur arrive garni : la démonstration porte la démonstration de Carpe Diem dans sa page, et la garde sur cet appareil "
-         "à son premier démarrage, vérifiée par son empreinte ; la choisir l’ouvre aussitôt."),
+         "Le sélecteur arrive garni : la démonstration porte %s dans sa page, et les garde sur cet appareil à son premier démarrage, "
+         "chacune vérifiée par son empreinte ; en choisir une l’ouvre aussitôt." % and_fr),
         ("The Forge carries your four apps inside it (Carpe Diem, the Forge, Inkwell and Ingenium) and keeps them on this device on "
          "its first start. Keep them now, and choosing an app above opens it at once.",
-         "The demonstration carries Carpe Diem\u2019s own demonstration inside it and keeps it on this device on its first start. "
-         "Keep it now, and choosing Carpe Diem above opens it at once."),
+         "The demonstration carries %s inside it and keeps them on this device on its first start. Keep them now, and choosing an "
+         "app above opens it at once." % and_en),
         ("La Forge porte en elle vos quatre apps (Carpe Diem, la Forge, Inkwell et Ingenium) et les garde sur cet appareil à son "
          "premier démarrage. Gardez-les maintenant : choisir une app ci-dessus l’ouvrira aussitôt.",
-         "La démonstration porte en elle la démonstration de Carpe Diem et la garde sur cet appareil à son premier démarrage. "
-         "Gardez-la maintenant : choisir Carpe Diem ci-dessus l’ouvrira aussitôt.")):
+         "La démonstration porte en elle %s et les garde sur cet appareil à son premier démarrage. Gardez-les maintenant : choisir "
+         "une app ci-dessus l’ouvrira aussitôt." % and_fr)):
     rep(a, b)
+
 # 9 (656). NO SIGNATURE OF HERS: the owner's seeding script out, and her signatures out of the demonstration's own list
 UNSIGN = r"""<script id="forge-demo-unsign">/* 656: the demonstration carries no hand-drawn signature of the owner's, nor her sample hands. Any
    that an earlier visit kept in the demonstration's own list of signatures is taken out, in the page and in its rooms, by
@@ -282,8 +307,8 @@ rep("nameIn.placeholder = 'e.g. Yannie D. Forest';", "nameIn.placeholder = 'e.g.
 if "sg-owner-hand\", name" in s or 'id: "sg-owner-hand"' in s:
     raise SystemExit("the owner's signature is still seeded somewhere in the page")
 
-# the Guidebook's articles on editing Inkwell and Ingenium, which the demonstration does not carry
-for app in ("inkwell", "ingenium"):
+# the Guidebook's articles on editing Inkwell and Ingenium, when the demonstration does not carry them
+for app in [x for x in ("inkwell", "ingenium") if x not in CARRY]:
     m = list(re.finditer(r'<article data-on="0" data-group="The Forge" data-app="%s">.*?</article>' % app, s, re.S))
     if len(m) != 1:
         raise SystemExit("the Guidebook's article on editing %s: found %d times, 1 expected" % (app, len(m)))
@@ -324,7 +349,8 @@ for key in ("tabula", "abacus", "slides", "scriba", "fontes"):
 print("its own storage (forge-demo:) in the page, its five apps, and the pages it carries; the apps' house without a seal")
 
 
-# 4. THE APP IT CARRIES (one of Carpe Diem's demonstrations that opens without a code), checked as it goes in
+# 4. THE APPS IT CARRIES (one of Carpe Diem's demonstrations that opens without a code; Ingenium's demo edition and Inkwell
+#    when they are given; its own page), each checked as it goes in
 def carpediem(t):
     m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)",edition:"(Public sample|Committee demo)"', t)
     if not m or 'id="section-forge"' in t or 'id="cd-owner-sign"' in t:
@@ -346,14 +372,37 @@ def carry(meta, raw, block_id):
     blocks.append('<script type="forge/b64" id="%s">%s</script>' % (block_id, base64.b64encode(z).decode("ascii")))
 
 
+def ingenium(t):
+    m = re.search(r'var ING_VERSION="([0-9.]+)",ING_PAGE_DATE="([^"]*)";', t)
+    if not m or 'var ING_EDITION="demo"' not in t or re.search(r'id="(ing-tail:)?ing-builtin-', t) or "sg-owner-hand" in t:
+        raise SystemExit("Ingenium: not its demo edition (a version, ING_EDITION demo, no apps carried, no signature of hers)")
+    return {"key": "ingenium", "title": "Ingenium", "version": m.group(1), "build": "", "date": m.group(2), "name": "ingenium.html"}
+
+
+def inkwell(t):
+    m = re.search(r"<!-- BUILD='([\d.]+)'", t[:2000])
+    if not m or "Inkwell" not in t[:4000]:
+        raise SystemExit("Inkwell: not its page")
+    return {"key": "inkwell", "title": "Inkwell", "version": m.group(1), "build": "", "date": DATE, "name": "Inkwell.html"}
+
+
+own_page = s  # the demonstration's own page, carrying nothing: the copy of itself it offers in the Editor
+if A.ingenium:
+    ing_t = open(A.ingenium, encoding="utf-8").read()
+    carry(ingenium(ing_t), own_store(ing_t, "Ingenium"), "forge-bi-ingenium")
 cd_t = open(cd_p, encoding="utf-8").read()
 cd_m = carpediem(cd_t)
 carry(cd_m, own_store(cd_t, "Carpe Diem"), "forge-bi-cd")
+if A.inkwell:
+    ink_t = open(A.inkwell, encoding="utf-8").read()
+    carry(inkwell(ink_t), own_store(ink_t, "Inkwell"), "forge-bi-inkwell")
+carry({"key": "forge", "title": "The Forge", "version": PASS, "build": STAMP, "date": DATE, "name": "the_forge.html"}, own_page, "forge-bi-self")
+metas[-1]["self"] = True
 sig = hashlib.sha256((STAMP + "|" + "|".join(m["sha256"] for m in metas)).encode()).hexdigest()[:24]
 meta_block = '<script type="application/json" id="forge-bi-meta">%s</script>' % json.dumps(
     {"format": "forge-builtin", "stamp": STAMP, "sig": sig, "apps": metas}, separators=(",", ":")).replace("</", "<\\/")
 k = s.rfind("</body>")
-s = s[:k] + "\n<!-- THE FORGE'S DEMONSTRATION · the app it carries (Carpe Diem's " + CD_EDITION + ") -->\n" + meta_block + "\n" + "\n".join(blocks) + "\n" + s[k:]
+s = s[:k] + "\n<!-- THE FORGE'S DEMONSTRATION · the apps it carries (" + and_en.replace("Carpe Diem", "Carpe Diem's " + CD_EDITION) + ") -->\n" + meta_block + "\n" + "\n".join(blocks) + "\n" + s[k:]
 os.makedirs(out_dir, exist_ok=True)
 open(os.path.join(out_dir, "the_forge_demo.html"), "w", encoding="utf-8").write(s)
 print("demo", len(s.encode("utf-8")), hashlib.sha256(s.encode("utf-8")).hexdigest())

@@ -1,4 +1,6 @@
-// The Offline Project's site at Carpe Diem 1080, The Forge 656, Ingenium 6.9.2 (demo edition) and Inkwell 7.52, in Chromium.
+// The Offline Project's site at Carpe Diem 1080, The Forge 656, Ingenium 6.9.3 (demo edition) and Inkwell 7.52, in Chromium.
+// 1 November 2026: Carpe Diem's room shows its Public sample; the Forge's demonstration carries the site's other apps and
+// its own page; the tab's icon wears its night dressing when the page is dark.
 // The owner's words (25 October 2026) and what is checked for each:
 //   - "Hide the scroll bars ... keeping scrolling": no scroll bar is drawn, and the hall still scrolls;
 //   - "no way back to the main page when I click 'Open on its own'": an app opened on its own shows a key back to the hall,
@@ -8,7 +10,7 @@
 //   - "the current shield master seal with the gold book to be the app's icon": the icons are the master seal's shield;
 //   - "a refresh button that refreshes the app if it glitches or freezes": the key reloads the page, in the room it was in;
 //   - "a loading page telling the user the page is still being painted": shown first, gone once the page has arrived;
-//   - every room opens its app (Carpe Diem's Committee demo asks for its access code), with no page errors; a phone.
+//   - every room opens its app (Carpe Diem's Public sample), with no page errors; a phone.
 // node t_site_656.js <site url (index.html)> <one-file app path> <out dir> [trio]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [SITE, APPFILE, OUT, MODE] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true }); const TRIO = MODE === 'trio';
@@ -35,7 +37,7 @@ async function roomReady(p, slug) {
     icons: [...document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]')].map(l => l.getAttribute('href').slice(0, 40)),
     appTitle: (document.querySelector('meta[name="apple-mobile-web-app-title"]') || {}).content, appName: (document.querySelector('meta[name="application-name"]') || {}).content }));
   ok(hall.gone === true, 'the loading page is gone once the page has arrived', hall.gone);
-  ok(hall.line === (TRIO ? 'Carpe Diem 1080 · The Forge 656 · Ingenium 6.9.2' : 'Carpe Diem 1080 · The Forge 656 · Ingenium 6.9.2 · Inkwell 7.52'), 'the builds named at the foot are the newest', hall.line);
+  ok(hall.line === (TRIO ? 'Carpe Diem 1080 · The Forge 656 · Ingenium 6.9.3' : 'Carpe Diem 1080 · The Forge 656 · Ingenium 6.9.3 · Inkwell 7.52'), 'the builds named at the foot are the newest', hall.line);
   ok(hall.sbw === 'none' && hall.sbwShelf === 'none' && hall.sw <= hall.cw, 'no scroll bar is drawn (the page and the devices\' shelf), and nothing scrolls sideways', hall);
   await p.mouse.wheel(0, 900); await p.waitForTimeout(800);
   ok(await p.evaluate(() => scrollY > 100), 'the hall still scrolls', await p.evaluate(() => scrollY));
@@ -56,11 +58,14 @@ async function roomReady(p, slug) {
   await p.waitForFunction(() => document.getElementById('veil').getAttribute('data-gone') === '1', null, { timeout: 240000 }).catch(() => {});
   ok(await p.evaluate(() => { try { return !document.getElementById('demoFrame').contentDocument.getElementById('op-home-key'); } catch (e) { return 'n/a'; } }), 'inside the hall\'s frame there is no key back');
   // every room
-  const rooms = TRIO ? ['carpe-diem-committee', 'ingenium'] : ['carpe-diem-committee', 'ingenium', 'inkwell'];
+  // the Forge's demonstration carries the site's other apps and its own page
+  const fc = await p.evaluate(() => { try { const w = document.getElementById('demoFrame').contentWindow; return w.__forgeLib.carried().map(x => x.key + ' ' + x.version).sort(); } catch (e) { return e.message; } });
+  ok(JSON.stringify(fc) === JSON.stringify((TRIO ? ['cd 1080', 'forge 656', 'ingenium 6.9.3'] : ['cd 1080', 'forge 656', 'ingenium 6.9.3', 'inkwell 7.52']).sort()), 'the Forge\'s demonstration carries ' + (TRIO ? 'Carpe Diem, itself and Ingenium' : 'Carpe Diem, itself, Inkwell and Ingenium'), fc);
+  const rooms = TRIO ? ['carpe-diem', 'ingenium'] : ['carpe-diem', 'ingenium', 'inkwell'];
   for (const slug of rooms) {
-    const r = await roomReady(p, slug === 'carpe-diem-committee' ? 'carpe-diem' : slug);
-    const inside = await p.evaluate(() => { try { const d = document.getElementById('demoFrame').contentDocument; return { code: !!d.getElementById('cd-lock-data'), title: d.title.slice(0, 40) }; } catch (e) { return { err: e.message }; } });
-    ok(r.gone === '1' && (slug !== 'carpe-diem-committee' || inside.code), slug + ': its room opens it' + (slug === 'carpe-diem-committee' ? ' (the sealed copy, at its access code)' : ''), { r, inside });
+    const r = await roomReady(p, slug);
+    const inside = await p.evaluate(() => { try { const w = document.getElementById('demoFrame').contentWindow; return { ed: w.CD_BUILD && w.CD_BUILD.edition, title: w.document.title.slice(0, 40) }; } catch (e) { return { err: e.message }; } });
+    ok(r.gone === '1' && (slug !== 'carpe-diem' || inside.ed === 'Public sample'), slug + ': its room opens it' + (slug === 'carpe-diem' ? ' (the Public sample)' : ''), { r, inside });
     await p.screenshot({ path: path.join(OUT, 'room-' + slug + '.png') });
   }
   // Open on its own: the app alone, with its key back to the hall
@@ -76,6 +81,19 @@ async function roomReady(p, slug) {
   const icon = await p.evaluate(() => new Promise(res => { const i = new Image(); i.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.drawImage(i, 0, 0, 64, 64);
     const d = x.getImageData(0, 0, 64, 64).data; let gold = 0, op = 0; for (let j = 0; j < d.length; j += 4) { if (d[j + 3] > 200) { op++; if (d[j] > 150 && d[j + 1] > 110 && d[j + 2] < 110) gold++; } } res({ op, gold }); }; i.onerror = () => res(null); i.src = 'assets/icons/shield-192.png'; }));
   ok(icon && icon.op > 1500 && icon.gold > 40, 'the icon is the gilt shield', icon);
+  const icons = () => p.evaluate(() => [...document.querySelectorAll('link[data-op-icon]')].map(l => l.getAttribute('href')).join(' '));
+  await p.evaluate(() => window.__opGo('')); await p.waitForTimeout(400);
+  const dayI = await icons();
+  await p.click('#themeKey'); await p.waitForTimeout(500); const nightI = await icons();
+  await p.click('#themeKey'); await p.waitForTimeout(500); const backI = await icons();
+  ok(/favicon\.ico.*shield-32\.png.*shield-192\.png/.test(dayI) && /favicon-dark\.ico.*shield-dark-32\.png.*shield-dark-192\.png/.test(nightI) && backI === dayI, 'the tab\'s icon wears its night dressing when Night is chosen, and its day one again by Day', { dayI, nightI });
+  const dctx = await b.newContext({ viewport: { width: 1280, height: 800 }, colorScheme: 'dark' }); const dp = await dctx.newPage();
+  await dp.goto(SITE); await dp.waitForTimeout(2500);
+  const autoI = await dp.evaluate(() => ({ theme: document.documentElement.getAttribute('data-theme'), h: [...document.querySelectorAll('link[data-op-icon]')].map(l => l.getAttribute('href')).join(' ') }));
+  ok(!autoI.theme && /favicon-dark\.ico/.test(autoI.h), 'on Auto, with the device dark, the tab\'s icon wears its night dressing', autoI);
+  await dctx.close();
+  const man2 = await p.evaluate(() => fetch('manifest.webmanifest').then(r => r.json()));
+  ok(man2.icons.some(i => i.purpose === 'maskable') && man2.icons.filter(i => i.purpose === 'any').length === 2, 'the installed app has the shield alone (any) and a white square for a device that cuts icons to its own shape (maskable)', man2.icons);
   ok(errs.length === 0 && e2.length === 0, 'no page errors in the hall or the app alone', errs.concat(e2).slice(0, 3));
   // a phone
   const ph = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); const q = await ph.newPage();

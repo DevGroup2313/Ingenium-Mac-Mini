@@ -1,9 +1,13 @@
 // The Forge's demonstration from 656: its edition, its DEMO key and card, the lock on making apps and packages (Fabrica's
-// keys and its More menu too), the one app it carries (Carpe Diem's Public sample), the Editor's switch (Carpe Diem, then
-// Another app), no visible word of Inkwell or Ingenium on the Editor page or in the Guidebook, the tour, French, a phone.
-// node t_demo_656.js <url> <outdir>
+// keys and its More menu too), the apps it carries by where it is shown, the Editor's switch (those apps, then Another app),
+// no visible word of an app it does not carry on the Editor page or in the Guidebook, the tour, French, a phone.
+//   standalone: Carpe Diem's Public sample and its own page; trio: and Ingenium's demo edition; four: and Inkwell too.
+// node t_demo_656.js <url> <outdir> [standalone|trio|four]
 const pw = require('/opt/node-tools/node_modules/playwright');
-const [URL_, OUT] = process.argv.slice(2); require('fs').mkdirSync(OUT, { recursive: true });
+const [URL_, OUT, MODE_] = process.argv.slice(2); const MODE = MODE_ || 'standalone';
+const CARRY = { standalone: ['cd', 'forge'], trio: ['cd', 'forge', 'ingenium'], four: ['cd', 'forge', 'inkwell', 'ingenium'] }[MODE];
+const NAMES = { cd: 'Carpe Diem', forge: 'The Forge', inkwell: 'Inkwell', ingenium: 'Ingenium' };
+const NOT = ['inkwell', 'ingenium'].filter(k => !CARRY.includes(k)); require('fs').mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(d).slice(0, 300) : '')); c ? pass++ : fail++; };
 (async () => {
   const b = await pw.chromium.launch();
@@ -13,31 +17,35 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.goto(URL_, { timeout: 180000 }); await p.waitForTimeout(4000);
   const id = await p.evaluate(() => ({ ed: CD_BUILD.edition, edFr: CD_BUILD.editionFr, pass: CD_BUILD.pass, title: document.title, demo: window.FORGE_DEMO === true, locked: typeof cdLocked === 'function' && cdLocked() }));
   ok(id.ed === 'Demo' && id.edFr === 'Démo' && id.pass === '656' && /^The Forge · Demo/.test(id.title) && id.demo && id.locked, 'the page names itself the demonstration of Forge 656', JSON.stringify(id));
-  const carried = await p.evaluate(() => window.__forgeLib && __forgeLib.carried().map(x => x.key + ' ' + x.version).join(', '));
-  ok(carried === 'cd 1080', 'it carries Carpe Diem 1080 (the Public sample) alone', carried);
+  const carried = await p.evaluate(() => window.__forgeLib && __forgeLib.carried().map(x => x.key + ' ' + x.version));
+  ok(carried && carried.length === CARRY.length && CARRY.every(k => carried.some(c => c.startsWith(k + ' '))) && carried.includes('cd 1080') && carried.includes('forge 656'),
+    MODE + ': it carries ' + CARRY.map(k => NAMES[k]).join(', ') + ' (Carpe Diem 1080, the Public sample; its own page, 656)', JSON.stringify(carried));
   await p.waitForFunction(() => !!window.__forgeBiLast, null, { timeout: 120000 }).catch(() => {});
   const last = await p.evaluate(() => window.__forgeBiLast);
-  ok(last && last.kept === 1 && !last.failed, 'on its first start it keeps what it carries on this device', JSON.stringify(last));
+  ok(last && last.kept === CARRY.length && !last.failed, 'on its first start it keeps what it carries on this device', JSON.stringify(last));
   const key = await p.evaluate(() => { const k = document.getElementById('fg-demo-key'); if (!k) return null; const r = k.getBoundingClientRect(); const cs = getComputedStyle(k); return { t: k.textContent, x: Math.round(r.left), b: Math.round(innerHeight - r.bottom), w: Math.round(r.width), shadow: cs.boxShadow !== 'none' }; });
   ok(key && key.t === 'DEMO' && key.x < 30 && key.b < 30 && key.shadow, 'the DEMO key sits in the lower left corner, raised', JSON.stringify(key));
   await p.screenshot({ path: OUT + '/door.png' });
   await p.locator('#cd-door button', { hasText: 'Open the Editor' }).first().click({ timeout: 60000 }).catch(() => {});
   await p.waitForTimeout(3000);
   const seg = await p.evaluate(() => [...document.querySelectorAll('#edAppSeg button[data-app]')].filter(e => getComputedStyle(e).display !== 'none' && e.getAttribute('data-app') !== 'any').map(e => e.getAttribute('data-app') + (e.getAttribute('aria-pressed') === 'true' ? '*' : '')));
-  ok(seg.length === 1 && seg[0] === 'cd*', 'the Editor offers the app it carries, chosen', JSON.stringify(seg));
+  ok(seg.map(x => x.replace('*', '')).join(',') === CARRY.join(',') && seg[0] === 'cd*', 'the Editor offers the apps it carries, Carpe Diem chosen', JSON.stringify(seg));
   const order = await p.evaluate(() => [...document.querySelectorAll('#edAppSeg button[data-app]')].filter(e => getComputedStyle(e).display !== 'none').map(e => e.textContent.trim()));
-  ok(order.length === 2 && /^Carpe Diem/.test(order[0]) && /^Another app/.test(order[1]), 'the Editor lists Carpe Diem, then Another app, and nothing else', JSON.stringify(order));
-  const vis = await p.evaluate(() => document.body.innerText.match(/.{0,50}(Inkwell|Ingenium).{0,50}/g) || []);
-  ok(vis.length === 0, 'no visible word names Inkwell or Ingenium on the Editor page', JSON.stringify(vis.slice(0, 4)));
-  await p.evaluate(() => document.querySelector('#edAppSeg button[data-app="cd"]').click());
-  await p.waitForFunction(() => window.__forgeLibLastOpen && window.__forgeLibLastOpen.app === 'cd', null, { timeout: 60000 }).catch(() => {});
-  const o = await p.evaluate(() => ({ open: window.__forgeLibLastOpen, line: (document.getElementById('edLib') || {}).innerText || '' }));
-  ok(o.open && o.open.app === 'cd' && /carried inside the Forge/.test(o.line), 'choosing Carpe Diem opens the copy the demonstration carries', JSON.stringify(o).slice(0, 200));
+  const want = CARRY.map(k => NAMES[k]).concat(['Another app']);
+  ok(order.length === want.length && want.every((n, i) => order[i].startsWith(n)), 'the Editor lists ' + want.join(', ') + ', and nothing else', JSON.stringify(order));
+  const vis = await p.evaluate((NOT) => { const re = NOT.length ? new RegExp('.{0,50}(' + NOT.map(k => k[0].toUpperCase() + k.slice(1)).join('|') + ').{0,50}', 'g') : null; return re ? (document.body.innerText.match(re) || []) : []; }, NOT);
+  ok(vis.length === 0, 'no visible word names an app it does not carry on the Editor page', JSON.stringify(vis.slice(0, 4)));
+  for (const a of CARRY.slice().reverse()) {
+    await p.evaluate((a) => document.querySelector('#edAppSeg button[data-app="' + a + '"]').click(), a);
+    await p.waitForFunction((a) => window.__forgeLibLastOpen && window.__forgeLibLastOpen.app === a, a, { timeout: 180000 }).catch(() => {});
+    const o = await p.evaluate(() => ({ open: window.__forgeLibLastOpen, line: (document.getElementById('edLib') || {}).innerText || '' }));
+    ok(o.open && o.open.app === a && /carried inside the Forge|the Forge’s own page/.test(o.line), 'choosing ' + NAMES[a] + ' opens the copy the demonstration carries', JSON.stringify(o).slice(0, 200));
+  }
   await p.screenshot({ path: OUT + '/editor.png' });
   // the DEMO key opens its card
   await p.locator('#fg-demo-key').click({ force: true }); await p.waitForTimeout(400);
   const c1 = await p.evaluate(() => { const b = document.getElementById('fg-demo-back'), c = document.getElementById('fg-demo-card'); return { open: b.getAttribute('data-open'), why: c.getAttribute('data-why'), h: c.querySelector('h2').textContent, go: c.querySelector('.fg-demo-go').textContent, p1: c.querySelector('.fg-demo-p1').textContent }; });
-  ok(c1.open === '1' && c1.why === '0' && c1.h === 'The Forge, a demonstration' && c1.go === 'Take the guided tour' && !/Inkwell/.test(c1.p1), 'the DEMO key opens a card that says what the demonstration is', JSON.stringify(c1));
+  ok(c1.open === '1' && c1.why === '0' && c1.h === 'The Forge, a demonstration' && c1.go === 'Take the guided tour' && NOT.every(k => c1.p1.indexOf(NAMES[k]) < 0), 'the DEMO key opens a card that says what the demonstration is', JSON.stringify(c1));
   await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   ok(await p.evaluate(() => document.getElementById('fg-demo-back').getAttribute('data-open')) === '0', 'Escape closes it');
   // the lock: every control that makes an app or a package answers with the card, and nothing is downloaded
@@ -82,8 +90,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => document.getElementById('fg-demo-back').setAttribute('data-open', '0'));
   // the Guidebook
   const gb = await p.evaluate(() => { const arts = [...document.querySelectorAll('article[data-group]')]; const all = arts.map(a => a.textContent).join(' ');
-    return { inkArt: arts.filter(a => /The Editor: (Inkwell|Ingenium)/.test(a.textContent)).length, four: /Your four apps|Vos quatre apps/.test(all), carries: /The app it carries/.test(all) && /L’app qu’elle porte/.test(all), steps: /Carpe Diem, or Another app for a page of your own/.test(all) }; });
-  ok(gb.inkArt === 0 && !gb.four && gb.carries && gb.steps, 'the Guidebook names Carpe Diem\'s demonstration alone, in English and French', JSON.stringify(gb));
+    return { arts: arts.filter(a => /The Editor: (Inkwell|Ingenium)/.test(a.textContent)).map(a => a.getAttribute('data-app')), four: /Your four apps|Vos quatre apps/.test(all), carries: /The apps it carries/.test(all) && /Les apps qu’elle porte/.test(all), steps: /, or Another app for a page of your own/.test(all) }; });
+  ok(gb.arts.sort().join(',') === CARRY.filter(k => k === 'inkwell' || k === 'ingenium').sort().join(',') && !gb.four && gb.carries && gb.steps, 'the Guidebook names the apps it carries, in English and French, and keeps the articles of those alone', JSON.stringify(gb));
   // its own storage: what it keeps is under forge-demo:, and nothing it keeps has a bare name
   const st = await p.evaluate(async () => { const raw = Object.getOwnPropertyDescriptor(Storage.prototype, 'key'); const ks = []; try { const L = window.localStorage; for (let i = 0; i < L.length; i++) ks.push(L.key(i)); } catch (e) {}
     let dbs = []; try { dbs = (await indexedDB.databases()).map(d => d.name); } catch (e) {} return { ls: ks.length, dbs: dbs.length, shim: !!document.getElementById('forge-own-store') }; });

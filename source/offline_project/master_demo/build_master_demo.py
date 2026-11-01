@@ -52,16 +52,21 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ap = argparse.ArgumentParser()
-for a in ("seal", "images", "cd-committee", "forge-demo", "ingenium", "out"):
+for a in ("seal", "images", "forge-demo", "ingenium", "out"):
     ap.add_argument("--" + a, required=True)
+ap.add_argument("--cd-committee", help="Carpe Diem's Committee demo (since 1 November 2026 the site shows its Public sample, --cd-sample)")
 ap.add_argument("--cd-sample", help="Carpe Diem's Public sample, offered beside the Committee demo (left out: the Committee demo alone)")
 ap.add_argument("--inkwell", help="Inkwell's page (left out: the site of three apps)")
 ap.add_argument("--inkwell-vendor", help="Inkwell's vendor folder (its word lists, citation styles and PDF reader), copied to apps/vendor")
 ap.add_argument("--mode", choices=("preview", "site", "app"), default="preview")
+ap.add_argument("--shield-night", help="the same shield as the site shows it by night (shield_shot.js ... night), for the icon a dark "
+                "page or device shows; left out: the master seal by night (build/master_seal.json)")
 ap.add_argument("--shield", help="a picture of the shield for the site's icons, in place of the preview's (the site without Inkwell gives its own,"
                 " three fields, drawn by shield_shot.js from its crest)")
 ap.add_argument("--max-file", type=int, default=None)
 A = ap.parse_args()
+if not (A.cd_sample or A.cd_committee):
+    raise SystemExit("give Carpe Diem's Public sample (--cd-sample), its Committee demo (--cd-committee), or both")
 if A.inkwell_vendor and not A.inkwell:
     raise SystemExit("--inkwell-vendor is for a site that carries Inkwell")
 MAX = A.max_file if A.max_file is not None else (15000000 if A.mode == "preview" else 0)
@@ -98,9 +103,9 @@ for k in ("cd", "cdN", "forge", "forgeN", "ingenium", "ingeniumN", "inkwell", "i
 #     the tab, the address bar, bookmarks, a phone's home screen and the loading page
 
 
-def master_shield():
+def master_shield(when="day"):
     d = json.load(open(os.path.join(HERE, "..", "..", "build", "master_seal.json"), encoding="utf-8"))
-    im = Image.open(io.BytesIO(base64.b64decode(d["day"]["b64"]))).convert("RGBA")
+    im = Image.open(io.BytesIO(base64.b64decode(d[when]["b64"]))).convert("RGBA")
     W, H = im.size
     px = im.load()
     # the shield narrows to its tip; the ribbon below it is wider at once: the first row much wider than the one above it
@@ -126,31 +131,55 @@ def master_shield():
     return im.crop(im.getbbox())
 
 
-SHIELD = master_shield()
-if A.shield:
-    SHIELD = Image.open(A.shield).convert("RGBA")
-    SHIELD = SHIELD.crop(SHIELD.getbbox())
+def picture(path):
+    """a photographed shield (shield_shot.js), cut to what can be seen: its faint shadow, and any speck below its tip that a
+    glow of the crest leaves there (the night crest of four fields has one), left out"""
+    im = Image.open(path).convert("RGBA")
+    seen = im.getchannel("A").point(lambda a: 255 if a > 40 else 0)
+    W, H = seen.size
+    for y in range(H // 2, H):  # the first empty row below the middle is the foot of the shield
+        if seen.crop((0, y, W, y + 1)).getbbox() is None:
+            im, seen = im.crop((0, 0, W, y)), seen.crop((0, 0, W, y))
+            break
+    return im.crop(seen.getbbox())
+
+
+SHIELD = picture(A.shield) if A.shield else master_shield("day")
+SHIELD_NIGHT = picture(A.shield_night) if A.shield_night else master_shield("night")
 os.makedirs(os.path.join(OUT, "assets/icons"), exist_ok=True)
 
 
-def shield_square(n, pad=0.0, bg=None):
+def shield_square(n, pad=0.0, bg=None, night=False):
+    sh = SHIELD_NIGHT if night else SHIELD
     c = Image.new("RGBA", (n, n), bg or (0, 0, 0, 0))
     inner = n * (1 - 2 * pad)
-    k = min(inner / SHIELD.size[0], inner / SHIELD.size[1])
-    im = SHIELD.resize((max(1, round(SHIELD.size[0] * k)), max(1, round(SHIELD.size[1] * k))), Image.LANCZOS)
+    k = min(inner / sh.size[0], inner / sh.size[1])
+    im = sh.resize((max(1, round(sh.size[0] * k)), max(1, round(sh.size[1] * k))), Image.LANCZOS)
     c.alpha_composite(im, ((n - im.size[0]) // 2, (n - im.size[1]) // 2))
     return c
 
 
-shield_square(256).save(os.path.join(OUT, "assets/icons/favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
-shield_square(32).save(os.path.join(OUT, "assets/icons/shield-32.png"), optimize=True)
-shield_square(192, 0.04).save(os.path.join(OUT, "assets/icons/shield-192.png"), optimize=True)
-# a phone's home screen fills a transparent corner with black, so the shield stands on the hall's own ground there
-shield_square(180, 0.1, (245, 243, 247, 255)).convert("RGB").save(os.path.join(OUT, "assets/icons/apple-touch-icon.png"), optimize=True)
-shield_square(512, 0.08, (245, 243, 247, 255)).convert("RGB").save(os.path.join(OUT, "assets/icons/shield-512.png"), optimize=True)
-ICON_LINKS = ('\n<link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48">'
-              '\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/shield-32.png">'
-              '\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/shield-192.png">'
+# The owner's words (1 November 2026): "I want the shield design of the app's icon to be preserved everywhere on the Mac mini,
+# macbook pro and the Ipad/Iphones, where not possible, you may add the white square", and "I want the little icon on the
+# websites browsers ... to have its dark mode dressing when the app is set to Dark mode or on AUTO and the device and website
+# is set to dark mode". So the shield stands alone, on nothing, wherever a transparent picture is kept as it is (the tab, the
+# address bar, bookmarks, an installed web app that keeps its icon's shape), with a night picture the page puts in when it
+# is dark; and on a white square only where the device asks for a square it fills itself (the iPhone's and the iPad's home
+# screen fill a transparent corner with black; Android cuts an icon to its own shape, so it is given one with room to cut).
+WHITE = (255, 255, 255, 255)
+for night, tag in ((False, ""), (True, "-dark")):
+    shield_square(256, night=night).save(os.path.join(OUT, "assets/icons/favicon%s.ico" % tag), sizes=[(16, 16), (32, 32), (48, 48)])
+    shield_square(32, night=night).save(os.path.join(OUT, "assets/icons/shield%s-32.png" % tag), optimize=True)
+    shield_square(192, 0.03, night=night).save(os.path.join(OUT, "assets/icons/shield%s-192.png" % tag), optimize=True)
+shield_square(512, 0.03).save(os.path.join(OUT, "assets/icons/shield-512.png"), optimize=True)
+shield_square(180, 0.1, WHITE).convert("RGB").save(os.path.join(OUT, "assets/icons/apple-touch-icon.png"), optimize=True)
+# Android's mask keeps a circle 80 per cent wide: the shield's corners stay inside it
+shield_square(512, 0.19, WHITE).convert("RGB").save(os.path.join(OUT, "assets/icons/shield-maskable-512.png"), optimize=True)
+ICONS = {"day": {"ico": "assets/icons/favicon.ico", "32": "assets/icons/shield-32.png", "192": "assets/icons/shield-192.png"},
+         "night": {"ico": "assets/icons/favicon-dark.ico", "32": "assets/icons/shield-dark-32.png", "192": "assets/icons/shield-dark-192.png"}}
+ICON_LINKS = ('\n<link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48" data-op-icon="ico">'
+              '\n<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/shield-32.png" data-op-icon="32">'
+              '\n<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/shield-192.png" data-op-icon="192">'
               '\n<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">')
 
 # 2. THE DEVICES, from the owner's images (only the pictures named for a device; the banner stays out)
@@ -268,8 +297,8 @@ if not A.inkwell:
     build["without"] = ["inkwell"]
 versions = {}
 for slug, key, path, title, label in APPS:
-    if not A.cd_sample and slug == "carpe-diem-committee":
-        label = None  # the Committee demo alone: no choice to offer
+    if slug.startswith("carpe-diem") and not (A.cd_sample and A.cd_committee):
+        label = None  # one of Carpe Diem's demonstrations alone: no choice to offer
     s = open(path, encoding="utf-8").read()
     sealed = None
     if slug == "carpe-diem-committee" and CHECK[slug] not in s and 'id="cd-lock-data"' in s and "<h1>Carpe Diem</h1>" in s:
@@ -401,6 +430,13 @@ if A.inkwell_vendor and A.mode != "site":
     build["vendorTag"] = VENDOR_TAG
 if A.mode == "app":
     build["app"] = True
+
+
+def data_url(rel):
+    return "data:%s;base64,%s" % ("image/x-icon" if rel.endswith(".ico") else "image/png", base64.b64encode(open(os.path.join(OUT, rel), "rb").read()).decode("ascii"))
+
+
+build["icons"] = {w: {k: (data_url(v) if A.mode == "app" else v) for k, v in d.items()} for w, d in ICONS.items()}
 if A.mode == "site":
     build["site"] = True
 site = site.replace("/*@@BUILD@@*/{}", json.dumps(build, ensure_ascii=False).replace("</", "<\\/"))
@@ -440,8 +476,9 @@ if A.mode == "site":
     #    time it is opened)
     man = {"name": "The Offline Project", "short_name": "The Offline Project", "start_url": "./", "scope": "./", "display": "standalone",
            "background_color": "#f5f3f7", "theme_color": "#f5f3f7", "description": "Four apps that live on your own device.",
-           "icons": [{"src": "assets/icons/shield-192.png", "sizes": "192x192", "type": "image/png"},
+           "icons": [{"src": "assets/icons/shield-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
                      {"src": "assets/icons/shield-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+                     {"src": "assets/icons/shield-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
                      {"src": "assets/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}]}
     open(os.path.join(OUT, "manifest.webmanifest"), "w", encoding="utf-8").write(json.dumps(man, indent=1))
     ver = "-".join([versions["cd"], versions["forge"], versions["ingenium"]] + ([versions["inkwell"]] if A.inkwell else []))
@@ -455,7 +492,8 @@ if A.mode == "site":
    those of the builds before the names had a number of apps in them. */
 const CACHE = "offline-project-%s-%s", MINE = "offline-project-%s-";
 const WITH = %s;
-const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/shield-512.png", "assets/icons/apple-touch-icon.png"];
+const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/shield-512.png", "assets/icons/apple-touch-icon.png",
+  "assets/icons/favicon-dark.ico", "assets/icons/shield-dark-32.png", "assets/icons/shield-dark-192.png", "assets/icons/shield-maskable-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => (k.startsWith(MINE) || /^offline-project-\\d{3,}-/.test(k)) && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {

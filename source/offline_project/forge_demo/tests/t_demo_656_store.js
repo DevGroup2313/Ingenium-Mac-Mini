@@ -38,7 +38,8 @@ async function tabula(p) {
   const info = await d.evaluate(() => ({ build: window.CD_BUILD, demo: window.FORGE_DEMO === true, key: !!document.getElementById('fg-demo-key'), title: document.title,
     apps: (() => { const n = document.getElementById('forge-bi-meta'); return n ? JSON.parse(n.textContent).apps.map(a => a.key + ' ' + a.version) : null; })() }));
   ok(info.demo && info.key && info.build && info.build.edition === 'Demo' && /Demo/.test(info.title), 'it says it is the demonstration: on its build line, its tab, its DEMO key', JSON.stringify(info));
-  ok(info.apps && info.apps.length === 1 && /^cd /.test(info.apps[0]), 'it carries Carpe Diem alone: not Inkwell, not Ingenium and not itself', JSON.stringify(info.apps));
+  // 1 November 2026: Carpe Diem's demonstration and its own page always; Ingenium's demo edition and Inkwell where it is shown with them
+  ok(info.apps && info.apps.some(a => /^cd /.test(a)) && info.apps.some(a => /^forge /.test(a)) && info.apps.every(a => /^(cd|forge|ingenium|inkwell) /.test(a)), 'it carries Carpe Diem and its own page, and no other app but Ingenium and Inkwell', JSON.stringify(info.apps));
   const locked = await d.evaluate(() => { const el = document.getElementById('shipHtml'); if (!el) return 'no shipHtml'; el.click(); const back = document.getElementById('fg-demo-back'); return back && back.getAttribute('data-open'); });
   ok(locked === '1', 'a control that would make an app answers with the demonstration card', locked);
   await d.evaluate(() => { const back = document.getElementById('fg-demo-back'); if (back) back.setAttribute('data-open', '0'); });
