@@ -26,6 +26,40 @@
 
 import { VERSION, parseTextFile, blocksFromHtml, blocksFromPdfPages, chunkDocument, sha256Hex } from './chunker.js';
 
+// WebKit (the Mac apps' web view; checked on GitHub's macOS 15.8 machines, 1 November 2026) cannot loop over a ReadableStream with
+// "for await", which pdf.js 6.4's getTextContent does: every PDF failed there with "undefined is not a function (near '...t of
+// e...')". When the web view lacks it, the stream is given the standard async iterator (values()), built on its own reader.
+(function streamsCanBeLooped() {
+  if (typeof ReadableStream !== 'function' || typeof Symbol !== 'function' || !Symbol.asyncIterator) return;
+  const proto = ReadableStream.prototype;
+  if (typeof proto[Symbol.asyncIterator] === 'function') return;
+  function values(options) {
+    const preventCancel = !!(options && options.preventCancel);
+    const reader = this.getReader();
+    let finished = false;
+    return {
+      async next() {
+        if (finished) return { done: true, value: undefined };
+        try {
+          const r = await reader.read();
+          if (r.done) { finished = true; reader.releaseLock(); }
+          return r;
+        } catch (e) { finished = true; reader.releaseLock(); throw e; }
+      },
+      async return(value) {
+        if (!finished) {
+          finished = true;
+          if (!preventCancel) { const c = reader.cancel(value); reader.releaseLock(); await c; } else reader.releaseLock();
+        }
+        return { done: true, value };
+      },
+      [Symbol.asyncIterator]() { return this; },
+    };
+  }
+  if (typeof proto.values !== 'function') Object.defineProperty(proto, 'values', { value: values, writable: true, configurable: true });
+  Object.defineProperty(proto, Symbol.asyncIterator, { value: proto.values, writable: true, configurable: true });
+})();
+
 const realPost = self.postMessage.bind(self);
 const post = (m, t) => realPost(m, t || []);
 // pdf.js's worker module announces itself on the global when it is imported ({sourceName: 'worker', targetName: 'main'}); that is not ours
