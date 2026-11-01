@@ -134,7 +134,7 @@ PH.analyse = async (path) => {
 };
 
 // ---- a stand-in for the app's folder bridge (window.pywebview.api.rag_*) over files a test supplies
-PH.bridge = { folders: new Map(), calls: [], failList: new Set(), failRead: new Set() };       // folders: path -> Map(rel -> {bytes, mtime})
+PH.bridge = { folders: new Map(), calls: [], failList: new Set(), failRead: new Set(), notChosen: new Set() };       // folders: path -> Map(rel -> {bytes, mtime})
 const b64 = (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
 PH.installBridge = () => {
   const B = PH.bridge;
@@ -144,6 +144,7 @@ PH.installBridge = () => {
     async rag_forget_folder(path) { B.calls.push(['rag_forget_folder', path]); B.folders.delete(path); return { ok: true }; },
     async rag_list(path) {
       B.calls.push(['rag_list', path]);
+      if (B.notChosen.has(path)) return { ok: false, error: 'That folder was not chosen for the search.', code: 'NOT_CHOSEN' };   // as the app answers
       const m = B.folders.get(path); if (!m || B.failList.has(path)) return { ok: false, error: 'the folder is not available: ' + path };
       const all = [...m.entries()].map(([rel, f]) => ({ rel, size: f.bytes.length, mtime: f.mtime }));
       return B.cutList != null ? { ok: true, files: all.slice(0, B.cutList), truncated: true } : { ok: true, files: all };   // cutList: the app stopped at its limit
@@ -217,7 +218,7 @@ PH.fakeStore = () => {
   };
   S.emb = {
     lookup: async (a) => { log('emb.lookup', a); const out = {}; for (const h of a.hashes) { const v = S.cache.get(a.model + '|' + h); if (v) out[h] = new Float32Array(v); } return out; },
-    put: async (a) => { log('emb.put', a); for (const it of a.items) S.cache.set(a.model + '|' + it.hash, new Float32Array(it.embedding)); return { stored: a.items.length }; },
+    put: async (a) => { log('emb.put', a); S.putItems = (S.putItems || 0) + a.items.length; for (const it of a.items) S.cache.set(a.model + '|' + it.hash, new Float32Array(it.embedding)); return { stored: a.items.length }; },
   };
   return S;
 };

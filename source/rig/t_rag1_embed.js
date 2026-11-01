@@ -42,7 +42,7 @@ function pageHelpers() {
   const SECTIONS = ['start', 'files', 'init', 'vectors', 'retrieval', 'prefix', 'batching', 'count', 'counters', 'second init', 'other models', 'pooling', 'tiers', 'speed', 'worker pool'];
   const ran = [];
   let speed1 = 0;
-  const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.message)); } ran.push(name); };
+  const section = async (name, fn) => { try { await fn(); ran.push(name); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.message)); } };
   const seen = () => requests.length;
   const since = (n) => requests.slice(n);
 

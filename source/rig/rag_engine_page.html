@@ -1,0 +1,125 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Folder search: engine check</title>
+<!-- INGENIUM | Copyright (c) 2026 Yannie D. Forest. All rights reserved. NO LICENCE IS GRANTED. See LICENCE.txt.
+     The folder search in the web view of the Mac and Windows apps (pywebview: WKWebView on a Mac, WebView2 on Windows), run by
+     rig/rag_engine_check.py on GitHub's machines (.github/workflows/rag-engines.yml). Not shipped. The page sits where the apps'
+     page sits (http://127.0.0.1:17953/, rag/ and rag/vendor/ beside it) and reads a folder through the app's own bridge code.
+     ?phase=write: everything from nothing, the index kept; ?phase=check: a second start of the app, the index must still be there. -->
+<style>body{font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:12px;white-space:pre-wrap}</style>
+<div id="log"></div>
+<script type="module">
+const Q = new URLSearchParams(location.search);
+const PHASE = Q.get('phase') || 'write', FOLDER = Q.get('folder') || '';
+const res = { phase: PHASE, ua: navigator.userAgent, platform: navigator.platform, cores: navigator.hardwareConcurrency || null, checks: [], ms: {}, facts: null, error: null };
+const logEl = document.getElementById('log');
+const log = (t) => { logEl.textContent += t + '\n'; };
+const ok = (c, m, d) => { res.checks.push({ ok: !!c, m, d: d === undefined ? null : JSON.stringify(d).slice(0, 600) }); log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 300))); return !!c; };
+const t = () => performance.now();
+const cos = (a, b) => { let d = 0, x = 0, y = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; x += a[i] * a[i]; y += b[i] * b[i]; } return d / Math.sqrt(x * y); };
+const bytes = (f32) => new Uint8Array(f32.buffer, f32.byteOffset, f32.byteLength);
+const unit = (seed) => { let s = (seed * 2654435761) >>> 0; const v = new Float32Array(384); let n = 0; for (let i = 0; i < 384; i++) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; v[i] = s / 4294967296 - 0.5; n += v[i] * v[i]; } n = Math.sqrt(n); for (let i = 0; i < 384; i++) v[i] /= n; return v; };
+const ftsPhrase = (s) => '"' + String(s).replace(/"/g, '""') + '"';
+async function send() {
+  for (let i = 0; i < 200 && !(window.pywebview && window.pywebview.api && window.pywebview.api.report); i++) await new Promise((r) => setTimeout(r, 100));
+  try { await window.pywebview.api.report(res); } catch (e) { log('could not report: ' + e); }
+}
+
+async function write() {
+  // ---- what the engine offers
+  ok(typeof navigator.storage === 'object' && typeof navigator.storage.getDirectory === 'function', 'the web view has a private file system (navigator.storage.getDirectory)');
+  const simd = WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11]));
+  ok(simd, 'WebAssembly SIMD is there (the reading model needs it)');
+  const { createStore } = await import('./rag/store.js');
+  const { createEmbedder } = await import('./rag/embedder.js');
+  const { createIndexer } = await import('./rag/indexer.js');
+  // ---- the store: SQLite with FTS5 and sqlite-vec, in the private file system, in a module worker
+  let t0 = t();
+  const s = createStore({ debug: true });
+  let info = null;
+  try { info = await s.open({}); } catch (e) { ok(false, 'the store opens in the private file system (opfs-sahpool)', { code: e.code, message: e.message }); throw e; }
+  res.ms.storeOpen = Math.round(t() - t0);
+  ok(info.vfs === 'opfs-sahpool' && info.sqlite === '3.45.3' && info.vec === 'v0.1.6' && info.schemaVersion === 2, 'the store opens in the private file system: SQLite 3.45.3, sqlite-vec v0.1.6, schema version 2', info);
+  res.persisted = info.persisted; res.storage = info.storage; log('     the web view keeps this storage for good: ' + info.persisted);
+  const me = (await s.principal.ensure({ name: 'me' })).id;
+  const A = (await s.folder.add({ name: 'probe', path: '/engine/probe' })).id, B = (await s.folder.add({ name: 'other', path: '/engine/other' })).id;
+  await s.acl.grant({ folderId: A, principalId: me });
+  const mk = (n, seed0, folderText) => Array.from({ length: n }, (_, i) => ({ chunk_index: i, heading_path: 'Part ' + i, char_start: i * 10, char_end: i * 10 + 9, page: null, content_hash: folderText + i, text: folderText + ' passage number ' + i + ' about the orchard ledger', embedding: unit(seed0 + i) }));
+  await s.file.replace({ folderId: A, path: 'a.md', size: 1, mtime: 1, contentHash: 'a', model: 'm', chunks: mk(5, 100, 'alpha') });
+  await s.file.replace({ folderId: B, path: 'b.md', size: 1, mtime: 1, contentHash: 'b', model: 'm', chunks: mk(5, 200, 'beta') });
+  const knnA = await s.debug.sql({ sql: 'select rowid, distance from chunks_vec where embedding match ? and k = 3 and folder_id in (select value from json_each(?)) order by distance', bind: [bytes(unit(102)), JSON.stringify([A])] });
+  const ids = await s.debug.sql({ sql: 'select id, folder_id from chunks where content_hash = ?', bind: ['alpha2'] });
+  ok(knnA.length === 3 && knnA[0].rowid === ids[0].id && knnA[0].distance < 1e-5, 'a nearest-neighbour search (vec0) finds the right passage first, only in the folder asked for', { knnA, want: ids[0] });
+  const knnB = await s.debug.sql({ sql: 'select rowid from chunks_vec where embedding match ? and k = 5 and folder_id in (select value from json_each(?))', bind: [bytes(unit(102)), JSON.stringify([B])] });
+  const bIds = (await s.debug.sql({ sql: 'select id from chunks where folder_id = ?', bind: [B] })).map((x) => x.id);
+  ok(knnB.length === 5 && knnB.every((r) => bIds.includes(r.rowid)), 'and the same search in the other folder returns only that folder\'s passages', knnB);
+  const fts = await s.debug.sql({ sql: "select rowid from chunks_fts where chunks_fts match ? and folder_id in (select value from json_each(?)) order by bm25(chunks_fts) limit 5", bind: [ftsPhrase('passage number 3'), JSON.stringify([A])] });
+  ok(fts.length >= 1, 'a word search (FTS5, bm25) finds the passage, in the folder asked for', fts);
+  const rmB = await s.folder.remove({ folderId: B, prune: true });
+  const left = (await s.debug.sql({ sql: 'select count(*) as n from chunks_vec_vector_chunks00 where instr(hex(vectors), ?) > 0', bind: [Array.from(bytes(unit(200)).slice(0, 16)).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()] }))[0].n;
+  ok(rmB.removed && left === 0, 'removing a folder leaves none of its vectors behind', { rmB, left });
+  await s.folder.remove({ folderId: A, prune: true });
+  // ---- the reading model: Transformers.js and ONNX Runtime in a worker
+  const ref = await (await fetch('./rag_engine_ref.json')).json();
+  t0 = t();
+  const e = createEmbedder();
+  let init = null;
+  try { init = await e.init(); } catch (x) { ok(false, 'the reading model loads (Transformers.js, ONNX Runtime, bge-small-en-v1.5)', { code: x.code, message: x.message }); throw x; }
+  res.ms.modelLoad = Math.round(t() - t0);
+  ok(init.dims === 384 && init.modelId === ref.modelId, 'the reading model loads: ' + init.modelId + ', 384 values (' + res.ms.modelLoad + ' ms)', init);
+  t0 = t();
+  const [pv] = await e.embed({ texts: [ref.passage], kind: 'passage' }); const [qv] = await e.embed({ texts: [ref.query], kind: 'query' });
+  res.ms.twoTexts = Math.round(t() - t0);
+  const cp = cos(pv, ref.passageVec), cq = cos(qv, ref.queryVec);
+  ok(cp > 0.999 && cq > 0.999, 'it gives the same vectors as in Chromium (passage ' + cp.toFixed(5) + ', question ' + cq.toFixed(5) + ')', { cp, cq });
+  const counts = await e.count({ texts: [ref.passage, ref.query] });
+  ok(JSON.stringify(counts) === JSON.stringify(ref.tokens), 'and counts the same tokens (' + counts.join(', ') + ')', { counts, want: ref.tokens });
+  // ---- a real folder, read through the app's own bridge code (pywebview's js_api)
+  if (!FOLDER) { ok(false, 'the driver named a folder to read'); return; }
+  const F = (await s.folder.add({ name: 'household_papers', path: FOLDER })).id;
+  await s.acl.grant({ folderId: F, principalId: me });
+  const ix = createIndexer({ store: s, embedder: e });
+  t0 = t();
+  const sum = await ix.indexFolder(F);
+  res.ms.readFolder = Math.round(t() - t0);
+  ok(sum.files.total === 20 && sum.files.indexed === 20 && sum.files.failed === 0 && sum.chunks === 50, 'the household folder is read through the bridge: 20 files (pdf, docx, csv, json, md, html, txt), 50 passages, in ' + (res.ms.readFolder / 1000).toFixed(1) + ' s', { files: sum.files, chunks: sum.chunks, failures: sum.failures });
+  const facts = (await (await fetch('./FACTS.json')).json()).facts.filter((f) => f.folder === 'household_papers');
+  let ftsHit = 0, vecHit = 0; const missed = [];
+  for (const f of facts) {
+    const want = f.path.slice('household_papers/'.length);
+    const fr = await s.debug.sql({ sql: "select c.file_path as p from (select rowid, bm25(chunks_fts) as r from chunks_fts where chunks_fts match ? and folder_id in (select value from json_each(?)) order by r limit 5) x join chunks c on c.id = x.rowid order by x.r", bind: [ftsPhrase(f.needle), JSON.stringify([F])] });
+    if (fr.some((r) => r.p === want)) ftsHit++; else missed.push('words: ' + f.id);
+    const [v] = await e.embed({ texts: [f.question], kind: 'query' });
+    const vr = await s.debug.sql({ sql: 'select c.file_path as p from (select rowid, distance from chunks_vec where embedding match ? and k = 5 and folder_id in (select value from json_each(?))) x join chunks c on c.id = x.rowid order by x.distance', bind: [bytes(v), JSON.stringify([F])] });
+    if (vr.some((r) => r.p === want)) vecHit++; else missed.push('meaning: ' + f.id);
+  }
+  res.facts = { n: facts.length, ftsHit, vecHit, missed };
+  ok(ftsHit === facts.length, 'the word search finds the file of ' + ftsHit + ' of ' + facts.length + ' facts in its first five', missed);
+  ok(vecHit >= facts.length - 2, 'the meaning search finds the file of ' + vecHit + ' of ' + facts.length + ' facts in its first five', missed);
+  ix.stop(); e.terminate();
+  res.stats = await s.stats();
+  s.terminate();
+}
+
+async function check() {
+  // a second start of the app: the index made by the first one must still be there
+  const { createStore } = await import('./rag/store.js');
+  const s = createStore({ debug: true });
+  let info = null;
+  try { info = await s.open({}); } catch (e) { ok(false, 'after the app is started again the store opens (no other copy holds its files)', { code: e.code, message: e.message }); throw e; }
+  const st = await s.stats();
+  res.stats = st;
+  ok(st.folders === 1 && st.files === 20 && st.chunks === 50 && st.chunks_fts === 50 && st.chunks_vec === 50, 'after the app is started again the index is still there: 1 folder, 20 files, 50 passages', st);
+  const integrity = (await s.debug.sql({ sql: 'select integrity_check as v from pragma_integrity_check' })).map((x) => x.v);
+  ok(integrity.length === 1 && integrity[0] === 'ok', 'and it is whole (integrity_check ok)', integrity);
+  const rm = await s.folder.remove({ folderId: 1, prune: true }); const c = await s.compact();
+  ok(rm.removed && (await s.stats()).chunks === 0, 'and the folder can be removed (compact: ' + Math.round(c.before / 1024) + ' kB to ' + Math.round(c.after / 1024) + ' kB)', { rm, c });
+  s.terminate();
+}
+
+(async () => {
+  try { if (PHASE === 'check') await check(); else await write(); }
+  catch (e) { res.error = String((e && (e.stack || e.message)) || e).slice(0, 1500); log('stopped: ' + res.error); }
+  await send();
+})();
+</script>

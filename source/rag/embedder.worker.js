@@ -134,6 +134,10 @@ async function init(a) {
   }
   if (typeof a.vendorBase !== 'string' || !/\/$/.test(a.vendorBase)) throw bad('vendorBase must be the URL of the vendor folder, ending in /');
   const vendorBase = a.vendorBase;
+  // checked before anything is asked of that address (the check in configure() came after the first requests)
+  let vb;
+  try { vb = new URL(vendorBase); } catch (_) { throw bad('vendorBase must be a full address'); }
+  if (vb.origin !== self.location.origin) throw bad('vendorBase must be on the page\'s own address');
   await checkInstalled(vendorBase, modelId, dtype);
   const t0 = performance.now();
   if (!T) T = await import(vendorBase + 'transformers/transformers.min.js');

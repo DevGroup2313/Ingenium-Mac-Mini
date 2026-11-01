@@ -100,7 +100,9 @@ function transferables(vectors, enabled) {
 // ------------------------------------------------------------------------------------------------ the client
 export class Store {
   constructor(options = {}) {
+    // debug: the tests' operations (debug.*) are served only by a worker started with ?debug=1; the app never asks for it
     this.workerUrl = options.workerUrl || STORE_WORKER_URL;
+    if (options.debug) { const u = new URL(this.workerUrl, typeof location !== 'undefined' ? location.href : undefined); u.searchParams.set('debug', '1'); this.workerUrl = u.href; }
     this.vendorBase = options.vendorBase || VENDOR_BASE;
     this.rpc = new Rpc(this.workerUrl, 'store');
     const r = (op, transferOf) => (args, opts) => this.rpc.request(op, args, transferOf ? transferables(transferOf(args || {}), opts && opts.transfer) : undefined);
@@ -130,6 +132,8 @@ export class Store {
   }
   /** Gives the space of deleted rows back to the file system (after removing a big folder). -> {before, after, mode} in bytes. */
   compact() { return this.rpc.request('compact'); }
+  /** Starts the index again from nothing, with the arguments of the last open (after it was found damaged: error code CORRUPT). */
+  reset(args = {}) { return this.rpc.request('reset', Object.assign({ vendorBase: this.vendorBase }, args)); }
   close() { return this.rpc.request('close'); }
   info() { return this.rpc.request('info'); }
   stats() { return this.rpc.request('stats'); }

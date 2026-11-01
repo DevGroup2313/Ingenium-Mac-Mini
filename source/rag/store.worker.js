@@ -10,9 +10,10 @@
 // Requests run one at a time, in the order they arrive; every op is synchronous SQLite, so a file.replace is never
 // interleaved with another request.
 //
-// Ops: open close info ops compact | principal.ensure | folder.add folder.list folder.remove folder.touch | acl.grant
+// Ops: open close info ops compact reset | principal.ensure | folder.add folder.list folder.remove folder.touch | acl.grant
 // acl.revoke acl.allowed | file.list file.get file.replace file.delete | emb.lookup emb.put emb.prune | stats |
-// debug.rows debug.sql debug.fail debug.migrate debug.wipe (tests only).
+// debug.rows debug.sql debug.fail debug.migrate debug.wipe (tests only: served only when the worker was started with ?debug=1
+// in its address, which store.js does for createStore({debug: true}); the app never does).
 //
 // Three details that the vendored file system does not do for us:
 //  - installOpfsSAHPoolVfs() deletes its whole directory (the database) when it fails to start, and it remembers a failure for
@@ -24,6 +25,14 @@
 //  - a database file does not shrink when rows are deleted. A new database is made with auto_vacuum = incremental (a setting of
 //    the file, not a table; it can only be chosen before the first table exists), and compact() gives the freed pages back
 //    (and the empty vector blocks that sqlite-vec leaves behind, see reclaimEmptyVecBlocks).
+//  - crash safety: the vendored file system told SQLite, whatever the truth, that another connection held a lock, so the journal
+//    a crash leaves was never rolled back. vendor.json patches it (as SQLite 3.54.1 answers); open() also checks the database
+//    with quick_check whenever a journal was left behind, and any damaged database is reported as CORRUPT (main.js then offers
+//    to start the folder search again from nothing; the person's files are never touched).
+//  - removing leaves nothing behind: secure_delete is on (SQLite overwrites deleted rows with zeros), FTS5 runs with its
+//    'secure-delete' option (schema version 2), each vector is overwritten with zeros before its row is deleted (sqlite-vec
+//    0.1.6 keeps a deleted vector's bytes in its block), and folder.remove({prune: true}) drops every cached vector no
+//    passage uses any more.
 
 const DEFAULT_DIMS = 384;
 const POOL_NAME = 'ingenium-rag';       // the VFS name, and the OPFS directory '.ingenium-rag' that holds the database files
@@ -41,6 +50,8 @@ let pool = null;      // the opfs-sahpool utility object, once installed
 let db = null;        // the one connection
 let conn = null;      // {dbName, vfs, dims} of the open database
 let faultAfter = null; // debug.fail: throw inside the next file.replace after this many chunks
+let lastOpen = null;   // the arguments of the last successful open, for reset
+const DEBUG = (() => { try { return new URL(self.location.href).searchParams.get('debug') === '1'; } catch (_) { return false; } })();
 
 // ------------------------------------------------------------------------------------------------ schema and migrations
 // Version 1 is DESIGN section 4, word for word; only the vector length is a parameter (384 unless open() is told otherwise).
@@ -68,6 +79,8 @@ create table emb_cache(model text not null, hash text not null, vec blob not nul
 // together with the new meta.schema_version, so a step that fails leaves the database at the version it had.
 const MIGRATIONS = [
   { version: 1, name: 'folder search, version 1', up(d, ctx) { d.exec(schemaV1(ctx.dims)); } },
+  // FTS5 keeps a deleted row's words in its index as tombstones until a merge; with 'secure-delete' they are taken out at once
+  { version: 2, name: 'removing leaves nothing behind', up(d) { d.exec("insert into chunks_fts(chunks_fts, rank) values ('secure-delete', 1)"); } },
 ];
 
 function currentVersion(d) {
@@ -152,12 +165,15 @@ function normChunk(c, i, dims) {
 }
 
 // Removes the chunk rows that match `where`, and their FTS5 and vec0 rows (which no foreign key reaches), by rowid.
+// Each vector is first overwritten with zeros: sqlite-vec 0.1.6 only marks a deleted vector as unused and keeps its bytes.
 function removeChunks(where, bind) {
   const ids = db.selectValues('select id from chunks where ' + where, bind);
   if (!ids.length) return 0;
+  const zeros = new Uint8Array((conn.dims || DEFAULT_DIMS) * 4);
+  const zv = db.prepare('update chunks_vec set embedding = ? where rowid = ?');
   const dv = db.prepare('delete from chunks_vec where rowid = ?'), df = db.prepare('delete from chunks_fts where rowid = ?');
-  try { for (const id of ids) { dv.bind(id).stepReset(); df.bind(id).stepReset(); } }
-  finally { dv.finalize(); df.finalize(); }
+  try { for (const id of ids) { zv.bind([zeros, id]).stepReset(); dv.bind(id).stepReset(); df.bind(id).stepReset(); } }
+  finally { zv.finalize(); dv.finalize(); df.finalize(); }
   db.exec({ sql: 'delete from chunks where ' + where, bind });
   return ids.length;
 }
@@ -224,11 +240,13 @@ function collectTransfer(result) {
   return list;
 }
 
+// SQLITE_CORRUPT (11, with its extended codes such as CORRUPT_VTAB) and SQLITE_NOTADB (26) are reported as CORRUPT.
+const isCorrupt = (e) => !!e && ((e.code === 'CORRUPT') || (Number.isInteger(e.resultCode) && [11, 26].includes(e.resultCode & 0xff)) || /SQLITE_(CORRUPT|NOTADB)/.test(String(e.message)));
 function serializeError(e) {
   return {
     name: (e && e.name) || 'Error',
     message: String((e && e.message) || e),
-    code: (e && e.code) || null,
+    code: isCorrupt(e) ? 'CORRUPT' : ((e && e.code) || null),
     resultCode: e && e.resultCode != null ? e.resultCode : null,
     stack: e && e.stack ? String(e.stack) : null,
   };
@@ -269,6 +287,21 @@ async function waitForFreeFiles(waitMs) {
   }
 }
 
+async function ensurePool(a) {
+  if (pool) return pool;
+  if (!(typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) || typeof sqlite3.installOpfsSAHPoolVfs !== 'function') {
+    throw new StoreError('OPFS_UNAVAILABLE', 'this web view has no private file system (OPFS) for the folder search index');
+  }
+  await waitForFreeFiles(a.lockWaitMs == null ? 8000 : a.lockWaitMs);
+  try {
+    pool = await sqlite3.installOpfsSAHPoolVfs({ name: POOL_NAME, directory: POOL_DIR, initialCapacity: POOL_CAPACITY });
+  } catch (e) {
+    throw new StoreError('OPFS_UNAVAILABLE', 'the private file system of this web view could not be used for the folder search index: ' + String((e && e.message) || e), { cause: e });
+  }
+  await pool.reserveMinimumCapacity(POOL_CAPACITY);
+  return pool;
+}
+
 async function open(a) {
   const dbName = a.dbName == null ? 'rag.sqlite3' : a.dbName;
   const vfs = a.vfs == null ? 'opfs-sahpool' : a.vfs;
@@ -283,26 +316,24 @@ async function open(a) {
   if (typeof a.vendorBase !== 'string' || !/\/$/.test(a.vendorBase)) throw bad('vendorBase must be the URL of the vendor folder, ending in /');
   await loadSqlite(a.vendorBase);
 
-  let d;
+  let d, leftJournal = false;
   if (vfs === 'memory') {
     d = new sqlite3.oo1.DB(':memory:', 'c');
   } else {
-    if (!pool) {
-      if (!(typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) || typeof sqlite3.installOpfsSAHPoolVfs !== 'function') {
-        throw new StoreError('OPFS_UNAVAILABLE', 'this web view has no private file system (OPFS) for the folder search index');
-      }
-      await waitForFreeFiles(a.lockWaitMs == null ? 8000 : a.lockWaitMs);
-      try {
-        pool = await sqlite3.installOpfsSAHPoolVfs({ name: POOL_NAME, directory: POOL_DIR, initialCapacity: POOL_CAPACITY });
-      } catch (e) {
-        throw new StoreError('OPFS_UNAVAILABLE', 'the private file system of this web view could not be used for the folder search index: ' + String((e && e.message) || e), { cause: e });
-      }
-      await pool.reserveMinimumCapacity(POOL_CAPACITY);
-    }
+    await ensurePool(a);
+    leftJournal = pool.getFileNames().includes('/' + dbName + '-journal');
     d = new pool.OpfsSAHPoolDb('/' + dbName);
   }
   try {
     d.exec('pragma foreign_keys = on');
+    d.exec('pragma secure_delete = on');
+    if (leftJournal && currentVersion(d) > 0) {
+      // a journal was left by a crash or a forced quit: SQLite has rolled it back on this first read; check the result
+      const verdict = d.selectValues('pragma quick_check(3)');
+      if (!(verdict.length === 1 && verdict[0] === 'ok')) {
+        throw new StoreError('CORRUPT', 'the folder search index was damaged (' + verdict.join('; ').slice(0, 200) + ')');
+      }
+    }
     const fresh = currentVersion(d) === 0;
     if (fresh) d.exec('pragma auto_vacuum = 2');   // incremental; has an effect only while the file has no table
     const existing = fresh ? null : vecDimsOf(d);
@@ -312,6 +343,7 @@ async function open(a) {
     migrate(d, MIGRATIONS, { dims: wantDims == null ? DEFAULT_DIMS : wantDims });
     db = d;
     conn = { dbName, vfs, dims: vecDimsOf(d) || DEFAULT_DIMS };
+    lastOpen = Object.assign({}, a, { dbName, vfs });
   } catch (e) {
     try { d.close(); } catch (_) { /* nothing more to do */ }
     throw e;
@@ -347,7 +379,7 @@ async function info() {
 const OPS = {
   open,
   info: () => info(),
-  ops: () => Object.keys(OPS),
+  ops: () => Object.keys(OPS).filter((o) => DEBUG || !o.startsWith('debug.')),
 
   // Gives back the space of deleted rows: the empty vector blocks of removed folders are deleted, the pages on the free list are
   // released and the file gets smaller. (An index made by an older build without auto_vacuum is rewritten instead, which needs
@@ -366,6 +398,22 @@ const OPS = {
     return { before, after: sizeNow(), mode, blocks };
   },
   close() { if (db) { try { db.close(); } finally { db = null; conn = null; } } return { closed: true }; },
+
+  // Starts the folder search index again from nothing (after it was found damaged): the database files are deleted and a new,
+  // empty database is opened with the same arguments. The person's own files are never touched.
+  async reset(a) {
+    const args = Object.assign({}, lastOpen || {}, a || {});
+    if (db) { try { db.close(); } catch (_) { /* a damaged file may refuse; it is deleted below */ } db = null; conn = null; }
+    const name = args.dbName == null ? 'rag.sqlite3' : args.dbName;
+    if (typeof name !== 'string' || !/^[A-Za-z0-9._-]{1,64}$/.test(name)) throw bad('dbName must be letters, digits, dot, dash or underscore');
+    if ((args.vfs == null ? 'opfs-sahpool' : args.vfs) === 'opfs-sahpool') {
+      if (typeof args.vendorBase !== 'string' || !/\/$/.test(args.vendorBase)) throw bad('vendorBase must be the URL of the vendor folder, ending in /');
+      await loadSqlite(args.vendorBase);
+      await ensurePool(args);
+      for (const f of ['/' + name, '/' + name + '-journal']) { try { pool.unlink(f); } catch (_) { /* not there */ } }
+    }
+    return open(args);
+  },
 
   'principal.ensure'(a) {
     needOpen();
@@ -411,7 +459,11 @@ const OPS = {
       db.exec({ sql: 'delete from files where folder_id = ?', bind: [folderId] });
       db.exec({ sql: 'delete from folders where id = ?', bind: [folderId] });   // its folder_acl rows go with it
       purgeCache(hashes);
-      return { removed: true, files, chunks };
+      // prune: also every cached vector that no passage uses (those a stopped or failed reading had saved); main.js asks
+      // for it when no reading is running, since a running reading's saved vectors are in the cache only
+      let pruned = 0;
+      if (a.prune) { db.exec('delete from emb_cache where hash not in (select content_hash from chunks)'); pruned = db.changes(); }
+      return { removed: true, files, chunks, pruned };
     });
   },
 
@@ -594,7 +646,7 @@ async function handle(m) {
   const { id, op, args } = m || {};
   try {
     const f = OPS[op];
-    if (!Object.prototype.hasOwnProperty.call(OPS, op) || typeof f !== 'function') throw new StoreError('UNKNOWN_OP', 'unknown op ' + op);
+    if (!Object.prototype.hasOwnProperty.call(OPS, op) || typeof f !== 'function' || (!DEBUG && String(op).startsWith('debug.'))) throw new StoreError('UNKNOWN_OP', 'unknown op ' + op);
     const result = await f(args || {});
     self.postMessage({ id, ok: true, result }, collectTransfer(result));
   } catch (e) {

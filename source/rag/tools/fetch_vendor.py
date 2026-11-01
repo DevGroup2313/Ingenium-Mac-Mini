@@ -5,7 +5,8 @@
     python3 rag/tools/fetch_vendor.py OUT_DIR [--list-hf]
 Each npm package is downloaded from the registry and checked against its sha512 integrity before its listed files are
 taken out; each Hugging Face file is downloaded and checked against the SHA-256 in vendor.json (a file with no SHA-256
-yet is printed as PIN, to be written into vendor.json). OUT_DIR/VENDOR.txt lists every file with its size and SHA-256.
+yet is printed as PIN, to be written into vendor.json). A package's "patches" (vendor.json) are applied after its integrity check,
+each to the published file only, and the result is checked against its own pinned SHA-256. OUT_DIR/VENDOR.txt lists every file with its size and SHA-256.
 --list-hf also prints, for each repository in "hf_list", every file with its size and (for large files) its SHA-256, as
 Hugging Face reports them, so a model's ONNX export can be confirmed before it is chosen."""
 import base64, hashlib, io, json, os, sys, tarfile, urllib.request
@@ -48,8 +49,27 @@ def npm(pkg, out, rows):
             f = t.extractfile(member)
             if f is None:
                 raise SystemExit("%s@%s: no %s inside" % (name, ver, member))
-            sha, size = put(out, dest, f.read())
-            rows.append((dest, size, sha, "%s@%s %s" % (name, ver, member)))
+            body, note = f.read(), ""
+            for fix in pkg.get("patches", []):
+                if fix["file"] == dest:
+                    body, note = patch(body, fix, name, ver), ", patched (vendor.json)"
+            sha, size = put(out, dest, body)
+            rows.append((dest, size, sha, "%s@%s %s%s" % (name, ver, member, note)))
+
+
+def patch(body, fix, name, ver):
+    """Applies one of vendor.json's patches: the file must be the published one (from_sha256), the old text must occur
+    exactly once, and the result must be the pinned patched file (sha256)."""
+    if hashlib.sha256(body).hexdigest() != fix["from_sha256"]:
+        raise SystemExit("%s@%s %s: not the published file, so the patch is not applied" % (name, ver, fix["file"]))
+    text = body.decode("utf-8")
+    old, new = "\n".join(fix["old"]), "\n".join(fix["new"])
+    if text.count(old) != 1:
+        raise SystemExit("%s@%s %s: the patch's old text occurs %d times" % (name, ver, fix["file"], text.count(old)))
+    done = text.replace(old, new).encode("utf-8")
+    if hashlib.sha256(done).hexdigest() != fix["sha256"]:
+        raise SystemExit("%s@%s %s: the patched file does not match its pinned SHA-256" % (name, ver, fix["file"]))
+    return done
 
 
 def hf(entry, out, rows, pins):

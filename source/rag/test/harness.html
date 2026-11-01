@@ -25,7 +25,7 @@ window.RagHarness = {
   embedder: embedderModule,  // createEmbedder, Embedder, MODEL_TIERS, pickTier, ...
   errors,                    // script errors of this page
   created: [],               // every client a test makes through make*(), so a test can look at their worker errors
-  makeStore(options) { const s = storeModule.createStore(options); this.created.push(s); return s; },
+  makeStore(options) { const s = storeModule.createStore(Object.assign({ debug: true }, options)); this.created.push(s); return s; },
   makeEmbedder(options) { const e = embedderModule.createEmbedder(options); this.created.push(e); return e; },
   workerErrors() { return this.created.flatMap((c) => c.errors); },
   ready: true,

@@ -174,7 +174,15 @@ async function finishSession(s) {
 // ------------------------------------------------------------------------------------------------------------------ requests
 async function handle(op, a) {
   switch (op) {
-    case 'init': if (a.vendorBase) S.vendorBase = a.vendorBase.endsWith('/') ? a.vendorBase : a.vendorBase + '/'; return { ready: true, version: VERSION };
+    case 'init':
+      if (a.vendorBase) {
+        // only a folder on the page's own address: nothing is fetched or imported from anywhere else
+        let vb;
+        try { vb = new URL(a.vendorBase, self.location.href); } catch (_) { throw new Error('vendorBase must be an address'); }
+        if (vb.origin !== self.location.origin) throw new Error("vendorBase must be on the page's own address");
+        S.vendorBase = vb.href.endsWith('/') ? vb.href : vb.href + '/';
+      }
+      return { ready: true, version: VERSION };
     case 'open': return { session: openSession(a).id };
     case 'feed': { const s = S.sessions.get(a.session); if (!s) throw new Error('no such session'); return feedSession(s, a.bytes); }
     case 'finish': { const s = S.sessions.get(a.session); if (!s) throw new Error('no such session'); return await finishSession(s); }

@@ -36,6 +36,20 @@ def load_patch():
     return mod
 
 
+def load_upgrade():
+    """app_rag_693.py (6.9.3): exact replacements in app_rag_692's CODE, so the stand-in runs the code the apps will have."""
+    p = os.path.join(os.path.dirname(PATCH), "app_rag_693.py")
+    spec = importlib.util.spec_from_file_location("app_rag_693", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def current_code(patch=None):
+    """app_rag_692's CODE as the apps have it from 6.9.3 on (with app_rag_693's changes)."""
+    return load_upgrade().upgrade_code((patch or load_patch()).CODE, "app_rag_692's CODE")
+
+
 class FakeWindow(object):
     """Stands for the app's main window: create_file_dialog answers from a queue instead of opening a dialog."""
 
@@ -84,7 +98,7 @@ class Bridge(object):
         self.ns = {"__name__": "app_rag_692_code", "os": os, "sys": sys, "json": json, "pathlib": pathlib, "re": re, "base64": base64,
                    "threading": threading, "time": time, "APP_FOLDER": "Ingenium",
                    "log_problem": lambda tag, exc_info=None: self.problems.append(str(tag))}
-        exec(compile(self.patch.CODE, "<app_rag_692 CODE>", "exec"), self.ns)
+        exec(compile(current_code(self.patch), "<app_rag_692 CODE + app_rag_693>", "exec"), self.ns)
         self.set_state(state_dir)
 
     def set_state(self, state_dir=None):

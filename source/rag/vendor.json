@@ -11,7 +11,37 @@
    "files": {
     "package/sqlite3.mjs": "sqlite/sqlite3.mjs",
     "package/sqlite3.wasm": "sqlite/sqlite3.wasm"
-   }
+   },
+   "patches": [
+    {
+     "file": "sqlite/sqlite3.mjs",
+     "why": "Crash safety. This build's opfs-sahpool file system always tells SQLite that another connection holds a RESERVED lock, so a journal left by a crash or a forced quit is never rolled back and the index is left half-written (found in review, 1 November 2026: browser killed during a write, integrity check failing). SQLite 3.54.1 (19 October 2026) answers from the locks actually held; this patch gives the same answer for this build's single connection.",
+     "from_sha256": "4ce1919af1ca2a8e7fd34bf65647ce9eb9e7e5a715b33dfc64153dd861bca4f0",
+     "old": [
+      "      pool.log('xCheckReservedLock');",
+      "      pool.storeErr();",
+      "      wasm.poke32(pOut, 1);",
+      "      return 0;"
+     ],
+     "new": [
+      "      pool.log('xCheckReservedLock');",
+      "      pool.storeErr();",
+      "      /* Ingenium's patch (rag/vendor.json), as SQLite 3.54.1's opfs-sahpool answers: a RESERVED lock is reported only",
+      "         when a file of this pool with the same name holds one. SQLite treats a journal left by a crash as hot, and rolls",
+      "         it back, only when no RESERVED lock is held; answering 1 always left a half-written transaction in place. */",
+      "      const fThis = pool.getOFileForS3File(pFile);",
+      "      let held = 0;",
+      "      if(fThis) for(const p of __mapSqlite3File.keys()){",
+      "        if(__mapSqlite3File.get(p) !== pool) continue;",
+      "        const o = pool.getOFileForS3File(p);",
+      "        if(o && o.path === fThis.path && o.lockType > capi.SQLITE_LOCK_SHARED){ held = 1; break; }",
+      "      }",
+      "      wasm.poke32(pOut, held);",
+      "      return 0;"
+     ],
+     "sha256": "fedb0a610f41ae34b6b5545d09bf3126a49e9093eefbf6751d8b3d7df5b6cb98"
+    }
+   ]
   },
   {
    "name": "@huggingface/transformers",

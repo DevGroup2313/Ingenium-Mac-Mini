@@ -26,6 +26,7 @@ sys.path.insert(0, HERE)
 import rag_bridge  # noqa: E402
 
 PATCH = os.path.join(SRC, "build", "desktop", "app_rag_692.py")
+PATCH693 = os.path.join(SRC, "build", "desktop", "app_rag_693.py")    # 6.9.3: the review's two fixes, on top of 6.9.2's code
 RELEASE = os.path.join(SRC, "build", "release.py")
 FIX = os.path.join(SRC, "rag", "fixtures")
 REPOS = {"mini": "/home/user/Ingenium-Mac-Mini", "intel": "/home/user/Ingenium-Mac-Intel", "win": "/home/user/Ingenium-HPWindows"}
@@ -562,15 +563,20 @@ def section_patch(try_dir):
     LABEL = "patch"
     print("== the patch, on copies of the three ingenium_app.py in " + try_dir)
     P = rag_bridge.load_patch()
+    U = rag_bridge.load_upgrade()
     out = {}
     for k, repo in REPOS.items():
         src = os.path.join(repo, "ingenium_app.py")
         d = os.path.join(try_dir, k)
         os.makedirs(d, exist_ok=True)
         dst = os.path.join(d, "ingenium_app.py")
-        shutil.copyfile(src, dst)
-        before = open(dst, "rb").read().decode("utf-8")
-        ok(P.MARK not in before and "extensions_map" not in before, "%s: the repository's file has none of it yet" % k)
+        # 6.9.2 put the patch into the repositories (release.py); the file as it was before is what is left when it is taken
+        # out again, which works only because the patch is purely additive (checked below on that file)
+        repo_text = open(src, "rb").read().decode("utf-8")
+        ok(P.MARK in repo_text and U.MARK not in repo_text, "%s: the repository's file has 6.9.2's folder search and not yet 6.9.3's changes" % k)
+        before = repo_text.replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)
+        open(dst, "w", encoding="utf-8", newline="\n").write(before)
+        ok(P.MARK not in before and "extensions_map" not in before, "%s: taking 6.9.2's patch out of it leaves none of it" % k)
         r1 = subprocess.run([sys.executable, PATCH, dst], capture_output=True, text=True)
         after = open(dst, "rb").read().decode("utf-8")
         ok(r1.returncode == 0 and "added to" in r1.stdout and after != before and P.MARK in after, "%s: the patch applies to the copy" % k, r1.stdout + r1.stderr)
@@ -589,6 +595,19 @@ def section_patch(try_dir):
         ok(all(funcs.count(f) == 1 for f in ("_rag_choose_folder", "_rag_folders", "_rag_forget_folder", "_rag_list", "_rag_read", "_rag_extensions_map", "_rag_remember", "_rag_walk")),
            "%s: the logic is plain module-level functions, each once" % k)
         ok(after.count("extensions_map = _rag_extensions_map(http.server.SimpleHTTPRequestHandler.extensions_map)") == 1, "%s: the local server's handler takes the explicit types" % k)
+        ok(after == repo_text, "%s: applied to that file, 6.9.2's patch gives the repository's file back byte for byte" % k)
+        # 6.9.3 (app_rag_693.py): on top of it, once
+        r4 = subprocess.run([sys.executable, PATCH693, dst], capture_output=True, text=True)
+        up = open(dst, "rb").read().decode("utf-8")
+        ok(r4.returncode == 0 and "added to" in r4.stdout and U.MARK in up and up.count("def _rag_real_steps_ok(") == 1, "%s: 6.9.3's changes apply on top" % k, r4.stdout + r4.stderr)
+        r5 = subprocess.run([sys.executable, PATCH693, dst], capture_output=True, text=True)
+        ok(r5.returncode == 0 and "already in" in r5.stdout and open(dst, "rb").read().decode("utf-8") == up, "%s: a second run of 6.9.3's changes changes nothing" % k, r5.stdout + r5.stderr)
+        r6 = subprocess.run([sys.executable, "-m", "py_compile", dst], capture_output=True, text=True)
+        ok(r6.returncode == 0, "%s: the copy with 6.9.3's changes compiles" % k, r6.stderr)
+        back = up
+        for old, new in U.REPLACEMENTS:
+            back = back.replace(new, old, 1)
+        ok(back == after, "%s: 6.9.3's changes are only the listed replacements (undoing them gives 6.9.2's file back)" % k)
         out[k] = dst
     # a file that is not the shape the patch knows is refused and left alone
     junk = os.path.join(try_dir, "junk.py")
@@ -598,6 +617,7 @@ def section_patch(try_dir):
     # a file whose second API class has no take_screenshot (the first def is renamed)
     broken = os.path.join(try_dir, "one_class.py")
     orig = open(os.path.join(REPOS["mini"], "ingenium_app.py"), encoding="utf-8").read()
+    orig = orig.replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)   # as before 6.9.2
     open(broken, "w", encoding="utf-8").write(orig.replace("def take_screenshot(self):", "def take_shot(self):", 1))
     r = subprocess.run([sys.executable, PATCH, broken], capture_output=True, text=True)
     ok(r.returncode != 0 and "found 1 times, not 2" in (r.stderr + r.stdout), "a file with only one of the two API classes' take_screenshot is refused (nothing half done)", (r.stderr + r.stdout)[-200:])
@@ -609,8 +629,9 @@ def section_patch(try_dir):
         if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == "DESKTOP" for t in n.targets):
             desk = ast.literal_eval(n.value)
     names = [x[0] for x in desk or []]
-    ok(desk is not None and ("app_rag_692", P.MARK, ("mini", "intel", "win")) in desk and names.index("app_rag_692") == len(names) - 1 and names.index("app_open_691") == len(names) - 2,
-       "release.py lists (\"app_rag_692\", %r, (\"mini\", \"intel\", \"win\")) after app_open_691" % P.MARK, desk[-2:] if desk else None)
+    ok(desk is not None and ("app_rag_692", P.MARK, ("mini", "intel", "win")) in desk and ("app_rag_693", U.MARK, ("mini", "intel", "win")) in desk
+       and names.index("app_open_691") < names.index("app_rag_692") < names.index("app_rag_693"),
+       "release.py lists app_rag_692 after app_open_691, and app_rag_693 (%r) after it" % U.MARK, desk[-3:] if desk else None)
     ok(all(os.path.isfile(os.path.join(SRC, "build", "desktop", n + ".py")) for n in names), "every patch in release.py's DESKTOP list is a file in build/desktop/")
     ok(len(set(names)) == len(names) and len({x[1] for x in desk}) == len(desk), "no patch or mark is listed twice (a mark that is another's would skip it)")
     return out
@@ -755,6 +776,62 @@ def section_shim(work):
     ok(r.get("noSuch") == "threw" and r["errors"] == [], "a method that does not exist is not defined (calling it throws); no script error", r)
 
 
+# ======================================================================================== the review's two cases (1 November 2026)
+def review_fixes(work):
+    """A link inside the chosen folder that points to a hidden file or folder there; a folder chosen through a link that was
+    later pointed elsewhere. The patch's own CODE runs in a namespace, as rig/rag_bridge.py runs it."""
+    global LABEL
+    LABEL = "links"
+    import importlib.util, pathlib as _pl, threading as _th
+    spec = importlib.util.spec_from_file_location("app_rag_692_review", os.path.join(SRC, "build", "desktop", "app_rag_692.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    problems = []
+
+    def namespace():
+        ns = {"__name__": "review", "os": os, "sys": sys, "json": json, "pathlib": _pl, "re": re, "base64": base64,
+              "threading": _th, "time": time, "APP_FOLDER": "Ingenium", "log_problem": lambda tag, exc_info=None: problems.append(str(tag))}
+        exec(compile(rag_bridge.current_code(mod), "<CODE>", "exec"), ns)
+        ns["_RAG_STATE_DIR"] = tempfile.mkdtemp(prefix="rag_links_state_", dir=work)
+        return ns
+
+    root = tempfile.mkdtemp(prefix="rag_links_", dir=work)
+    ns = namespace()
+    P = os.path.join(root, "papers")
+    os.makedirs(os.path.join(P, ".private"))
+    open(os.path.join(P, ".secret.txt"), "w").write("hidden secret text")
+    open(os.path.join(P, ".private", "diary.md"), "w").write("hidden diary")
+    open(os.path.join(P, "plain.txt"), "w").write("plain words")
+    os.symlink(".secret.txt", os.path.join(P, "alias.txt"))
+    os.symlink(".private", os.path.join(P, "notes"))
+    os.symlink("plain.txt", os.path.join(P, "plain-link.txt"))
+    ns["_rag_remember"](P)
+    listed = [f["rel"] for f in ns["_rag_list"](P).get("files", [])]
+    ok(listed == ["plain-link.txt", "plain.txt"], "a link to a hidden file or a hidden folder inside the folder is not listed; a link to a plain file is", listed)
+    r1, r2 = ns["_rag_read"](P, "alias.txt", 0, 100), ns["_rag_read"](P, "notes/diary.md", 0, 100)
+    ok(r1.get("code") == "HIDDEN" and r2.get("code") == "HIDDEN", "nor read through the link (refused as hidden)", [r1, r2])
+    r3 = ns["_rag_read"](P, "plain-link.txt", 0, 100)
+    ok(r3.get("ok") is True and base64.b64decode(r3["data"]) == b"plain words", "a link to a plain file inside the folder is read", r3)
+    # a folder chosen through a link that was then pointed at another folder
+    ns = namespace()
+    Q = os.path.join(root, "drive", "papers2")
+    os.makedirs(Q)
+    open(os.path.join(Q, "x.txt"), "w").write("still readable")
+    L = os.path.join(root, "shortcut")
+    os.symlink(Q, L)
+    ns["_rag_remember"](L)
+    os.remove(L)
+    other = os.path.join(root, "other")
+    os.makedirs(other)
+    os.symlink(other, L)
+    f1 = ns["_rag_forget_folder"](L)
+    ok(f1.get("ok") is True and f1.get("forgot") is True and ns["_rag_folders"]() == [], "a folder chosen through a link is forgotten by the path it was chosen with, after the link changed", f1)
+    rd = ns["_rag_read"](Q, "x.txt", 0, 100)
+    ok(rd.get("code") == "NOT_CHOSEN", "and its old real path can no longer be read", rd)
+    ok(problems == [], "no problem logged", problems)
+    LABEL = ""
+
+
 # ======================================================================================================================== the run
 def main(argv):
     global LABEL
@@ -784,6 +861,7 @@ def main(argv):
     ok(r.get("ok") is True and len(A.call("rag_list", r["path"])["files"]) == 20, "the Mac (Intel) copy imports, chooses a folder and lists its 20 files", r)
     ok(inspect.signature(A.api.rag_read).parameters["length"].default == MB, "rag_read's length defaults to 1 MB")
     direct(work)
+    review_fixes(work)
     section_server(patched["mini"], work)
     section_shim(work)
     LABEL = ""
