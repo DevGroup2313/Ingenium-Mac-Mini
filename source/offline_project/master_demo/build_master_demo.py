@@ -259,6 +259,12 @@ if(k.textContent!==w){k.textContent=w;k.title=a;k.setAttribute("aria-label",a);}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",put);else put();
 window.addEventListener("load",put);setInterval(put,1500);})();</script>"""
 
+# 3b'. NO SCROLL BARS IN THE APPS EITHER (the owner's words, 25 October and 1 November 2026: "I asked for the scroll bars to be
+#      hidden from view all over the app and the website so that I can scroll but not see the ugly scroll bars"): every app's
+#      page, in the hall's frame or opened on its own, scrolls with its bars out of sight
+NOBARS = ('<style id="op-no-bars">*{scrollbar-width:none!important;-ms-overflow-style:none!important}'
+          '*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}</style>')
+
 LOADER = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__TITLE__</title>
@@ -319,7 +325,7 @@ for slug, key, path, title, label in APPS:
     d = re.match(r"\s*<!doctype html>", s, re.I)
     at = d.end() if d else 0
     s = (s[:at] + '\n<meta charset="utf-8">' + SHIM.replace("__APP__", key if slug != "carpe-diem-committee" else "cdc")
-         + HOME_TAG.replace("__HOME__", json.dumps(None if A.mode == "app" else "../index.html")) + s[at:])
+         + HOME_TAG.replace("__HOME__", json.dumps(None if A.mode == "app" else "../index.html")) + NOBARS + s[at:])
     if slug.startswith("carpe-diem"):
         versions["cd"] = sealed or re.search(r'window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"', s).group(1)
     if slug == "the-forge":
@@ -376,6 +382,8 @@ for slug, key, path, title, label in APPS:
     group = "carpe-diem" if slug.startswith("carpe-diem") else slug
     build["apps"].setdefault(group, []).append(entry)
     print("  %-22s %10d bytes, %s" % (slug, len(b), how))
+build["versions"] = versions
+build["cdEdition"] = "Public sample" if A.cd_sample else "Committee demo"
 build["line"] = "Carpe Diem %s · The Forge %s · Ingenium %s" % (versions["cd"], versions["forge"], versions["ingenium"]) + (" · Inkwell %s" % versions["inkwell"] if A.inkwell else "")
 
 # 3b. INKWELL'S VENDOR FILES: its page asks for vendor/<file> beside itself (the dictionary for spelling, the word lists
@@ -495,10 +503,19 @@ const WITH = %s;
 const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/icons/favicon.ico", "assets/icons/shield-32.png", "assets/icons/shield-192.png", "assets/icons/shield-512.png", "assets/icons/apple-touch-icon.png",
   "assets/icons/favicon-dark.ico", "assets/icons/shield-dark-32.png", "assets/icons/shield-dark-192.png", "assets/icons/shield-maskable-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
-self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => (k.startsWith(MINE) || /^offline-project-\\d{3,}-/.test(k)) && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+/* a new build takes over at once; and a page still showing an older build (kept by an older keeper) is opened again, so
+   nobody stays on an old hall whose apps the host no longer has */
+self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => { const old = ks.filter(k => (k.startsWith(MINE) || /^offline-project-\\d{3,}-/.test(k)) && k !== CACHE);
+  return Promise.all(old.map(k => caches.delete(k))).then(() => self.clients.claim()).then(() => old.length ? self.clients.matchAll({ type: "window" }).then(cs => Promise.all(cs.map(c => c.navigate(c.url).catch(() => {})))) : null); })); });
 self.addEventListener("fetch", e => {
   const r = e.request; if (r.method !== "GET") return;
   const u = new URL(r.url), home = new URL("./", self.registration.scope).pathname; if (u.origin !== location.origin || !u.pathname.startsWith(home)) return;
+  // the hall itself (and its manifest) comes from the host first whenever there is a connection, and from the keep without one
+  if (u.pathname === home || u.pathname === home + "index.html" || u.pathname === home + "manifest.webmanifest") {
+    e.respondWith(fetch(r, { cache: "no-cache" }).then(res => { if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(r, copy)); } return res; })
+      .catch(() => caches.open(CACHE).then(c => c.match(r, { ignoreSearch: true }).then(h => h || c.match("index.html")))));
+    return;
+  }
   const also = WITH[u.pathname.slice(home.length)];
   if (also) e.waitUntil(caches.open(CACHE).then(c => Promise.all(also.map(f => c.match(f).then(h => h || c.add(f).catch(() => {}))))));
   e.respondWith(caches.open(CACHE).then(c => c.match(r, { ignoreSearch: true }).then(hit => hit || fetch(r).then(res => { if (res.ok) c.put(r, res.clone()); return res; }).catch(() => c.match("index.html")))));
