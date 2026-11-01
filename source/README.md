@@ -371,6 +371,171 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.2 (31 October 2026; her words: "I also want you to add better, faster and stronger models to Ingenium for all of
+the houses. I want the app to really be upgraded and be operating up to standards", for her MacBook Pro (8 GB, with a 2 TB
+external drive), Mac mini (16 GB), two HP laptops (16 GB), Fire tablet, iPhone and iPad, and "I still want the strong models
+to be provided as options in Ingenium because I am aiming to purchase a bigger mac or macbook with a 64 GB RAM").
+`build/modules/r203.js` with two R203 edits in `build_page.py` and `build/lineup_quants.json`: the houses by device and memory.
+Five new models, every file name, size and SHA-256 read from Hugging Face on GitHub's machines (`.github/lineup/candidates.txt`
+round 7, checked mechanically against that log): MiniCPM5 2B, Qwen3.8 27B, Qwen3.6 35B-A3B, Gemma 4 31B and Granite 4.2 8B,
+and three copies (Granite 4.2 8B and Qwen3.5 9B in a Compact quality, Qwen3.8 27B in Best). Her 8 GB MacBook Pro: Scriba
+MiniCPM5 2B, Magister Qwen3.5 4B, Faber Granite 4.2 8B Compact. Her 16 GB computers: Scriba Gemma 4 E4B (Magister and Faber
+were already the strongest that fit). A 64 GB Mac: Scriba and Faber Qwen3.6 35B-A3B, Magister Qwen3.8 27B Best. The strong
+models are offered on the Models page and in the catalogue with what each needs and what the device has to spare; a computer
+without a graphics chip has its own list; a device that cannot tell its memory takes the smallest model of a list; the
+sampling settings come from each model card. On 8 and 16 GB a plain line says that another computer of hers can lend a larger
+model. Not in this release: the speed-up files beside the new models, and LFM3 and Bonsai 2, which need a newer engine.
+`rig/t_698_lineup.js`, 42 checks.
+
+Ingenium 6.9.2 (31 October 2026; her words: "limit the button of "Back to Ingenium's choice for this computer" to only the
+text, I don't like the long raised line look"). `build/modules/r105.js`: the way back under the coding models is a line of text
+with a small return mark, as wide as its words; `rig/t_697_back_link.js`, 7 checks.
+
+Ingenium 6.9.2 also carries, unused until its own release, the folder search's desktop bridge (`build/desktop/app_rag_692.py`:
+the app's own folder dialog and reading a chosen folder's files on request); its page part (`build/modules/r202.js`, `rag/`)
+is held out of release builds (`build/held.json`) until its first phase is reviewed.
+
+Ingenium 6.9.2 (31 October 2026; her words: "I also want for the data on the app to be protected with encryption so that my
+data is protected on the device. I also want an optional sign-in / login screen with user name and password.").
+`build/modules/r197.js` (`window.IngLock`), with the R197 edits in `build_page.py` and a few lines in `r123.js`, `r131.js`,
+`r132.js`, `r136.js`, `r141.js`, `r143.js` and `r173.js`: a sign-in of her own, and her data sealed on the device. Off until
+she turns it on; with it off the page is what it was (the welcome door gains one quiet line under Enter, and Settings, Your
+data gains a card that says Off), and every earlier test passes unchanged.
+- The lock. Turned on from the welcome door (Protect this copy with a sign-in) or from Settings, Your data, it asks for a
+  user name and a password (eight characters or more), shows a recovery phrase of ten plain words once (drawn without a
+  repeat from 512 words bundled in the module) and asks two of them back before it seals anything. The password goes
+  through PBKDF2-SHA-256 (the rounds are measured once on that device to about three quarters of a second, never under
+  600,000) into a key that wraps one random AES-GCM-256 data key; the phrase wraps the same data key by its own derivation;
+  a check value turns a wrong password away before anything is read. Changing the password wraps the data key again and
+  nothing else (no text is sealed again). The record is `localStorage["ingenium_lock"]`: the name, the salts and the wrapped
+  keys, nothing that opens anything without the password or the phrase. The data key is a non-extractable WebCrypto key held
+  in a closure of the module for the session and never written anywhere (its bytes stay in that closure for one purpose
+  only, the moment the window closes in the middle of a write, below).
+- The desk sealed. The boot gate (`state=migrateFrom(loadState());`) keeps a sealed desk, or a lock set up over a desk still
+  plain, aside for the sign-in and starts from the defaults, and `saveState` returns first while the desk is locked, so a
+  locked page can never write a fresh desk over the sealed one. With the lock on, `saveState` hands the desk to the lock's
+  writer: one sealing at a time, the newest desk always the one written (gzip first where the browser has CompressionStream,
+  then AES-GCM with the place the text belongs to bound as additional data), kept everywhere the base keeps the desk (the
+  browser's store, the recovery shelf, the larger store's overflow copy, the computer app's `desk.json`). What is stored is a
+  small clear header, `{"ing":"locked","v":1,"__deskAt":…,"theme":…,"look":{theme,motion,depth},"n":{chats,messages},
+  "lock":{…},"body":"ING1.<nonce>.<ciphertext>"}`, so the tab's icon, the loading page's theme, `deskAdopt`'s stamp test,
+  R132's newer-desk test and the recovery shelf's counts keep working without the key; the lock record rides in the header
+  too, so a sealed desk whose browser store was lost (the computer app's web view at a new address, a store cleared by hand)
+  still opens with the password. When the window hides or closes, what is still on its way is sealed at once by a
+  pure-JavaScript AES-GCM (proved byte for byte equal to WebCrypto's), so the last change is never lost.
+- The sign-in. On a locked start a card is drawn over the loading page: her user name (kept with the lock, filled in) and
+  her password. A wrong name or password is refused and nothing changes; the right one opens the desk, adopted as R132 and
+  `deskAdopt` adopt (the desk's keys replaced in place, then the whole desk painted again), and lifts the cover. Forgot your
+  password? takes the ten words (any case, any spacing), opens, and asks for a new password; I have neither the password nor
+  the phrase says plainly that nothing sealed can be opened, and only then starts again with an empty desk (the sealed desk
+  and its lock are set aside, not destroyed). Lock now (Settings, Your data) saves and seals first, then starts the page
+  again; the lock after time away is 5 minutes, 15 (the start), an hour or never, and waits while a reply is being written;
+  what was typed in the chat's box and not yet sent is kept inside the sealed desk and put back after the sign-in.
+- Her long texts sealed. R81's store of long texts (IndexedDB `ingenium_big`) seals what it puts and opens what it reads,
+  and the shell's own bridge (`save_state`, `big_put`, `big_get`) seals what reaches the computer app's disk (`desk.json`,
+  `big/*.txt`, the signing keys' copies), so those files are ciphertext too. While the page waits at the sign-in the store
+  waits with it, and the sweep that lets go of texts the desk does not name runs only after the sign-in. A plain record and a
+  sealed one are both read, so nothing is lost when the lock is turned on or off over texts already there.
+- Settings, Your data (`ingLockCard`, in the data room of r173; Find a setting finds it by "encryption" or "password"):
+  Off or On with her name; Protect this copy with a sign-in…; Lock now; Change the password…; Show the recovery phrase… (the
+  password is asked first); Turn protection off… (the password is asked; everything is written back as plain text, with a
+  progress line); the lock after time away; and a fold that says in plain words what is sealed and what is not. Turning
+  protection on seals what is already there in small batches that can stop and carry on (a text is replaced only if the
+  store still holds the very one that was read), with a progress line. Where the browser offers no cryptography (an address
+  that is not https, localhost or the apps' own), the door and the card say so and refuse; the lock never half-works.
+- The other stores, too. The conversations brought in from elsewhere (r131), the signing keys (r136, and their copies on the
+  computer's disk), Fabrica's issues and pages (r141) and the older copies of the desk are sealed record by record
+  (`{ing:"sealed",…}`); r123 no longer keeps a plain shared copy of the notes, reminders and thoughts in the browser's store
+  while the lock is on (so a window of its own opened from an app does not share them with the main window until the lock
+  is turned off). The Backup page (r143) is as it was for her: a backup stays a plain zip, so it can be restored on any
+  copy (its records are opened on their way in and sealed on their way back), and `ingenium_lock` joins the keys it neither
+  carries nor overwrites.
+- Not sealed: backups made from the Backup page, the documents the carried apps keep in their own frames, her model files,
+  the app library, Fabrica's saved versions of her apps, the engine, and on the computer apps the earlier copies of the
+  desk already kept in `desk-backups` before the lock was turned on. In the clear: the header above (when the desk was
+  saved, the look, how many chats and messages), her user name, and the lock record. This keeps what is on the device
+  unreadable while it is locked; it does not hide an open, signed-in page from someone sitting at it. A forgotten password
+  with the phrase lost too cannot be reset by anyone, which is the point.
+
+    node rig/t_700_lock.js <url> <out>                                         # 57 checks: the door's choice, the phrase shown once and two words asked back, the lock record and the sealed desk (clear header, no plain trace anywhere in the store), the sign-in (name, wrong password, right password, the recovery phrase, the lock after time away), change of password, turning protection off, the lock off as before, no cryptography
+    node rig/t_700b_lock_shell.js <url> <out>                                  # 11 checks: with a stand-in of the computer app's bridge: desk.json and big/*.txt sealed, the base's deskAdopt keeping a sealed desk for the sign-in, Lock now, the unsent words kept
+    node rig/t_700c_lock_stores.js <url> <out>                                 # 16 checks: the other stores sealed and read whole, the signing key's bytes the same, turned off plain again, the Backup page's two asks
+    node rig/t_700d_lock_backup.js <url> <out>                                 # 15 checks: a backup made with protection on, restored in a fresh profile (plain, no lock) and over the sealed desk (sealed again), the last words sealed when the window closes, Reset everything taking the lock with it
+
+Ingenium 6.9.2 (31 October 2026; her words: "I want to make the Career Studio and the Lector page more capable. I want to be
+able to use it for PhD applications and for job applications. I want to be able to automate where I want and also
+meticulously review and do on my own at my own pace"). The Career Studio (modules/r188.js) gains, in the order they were
+weighed to matter most:
+- Dates and reminders. Each application keeps its dates: the closing date, the interview, a reference due, a funding
+  deadline, any day she adds; Track lists them with the days left and, on each, Remind me (a week before, three days before,
+  the day before) puts a thought in the Inbox that comes back on that morning (the thought cloud nudges it while the page is
+  open, Focus's "what today asks of you" lists it), and With the bell keeps a line among the bell's reminders; pressed twice,
+  nothing is doubled; a reminder belongs to the day the date had when it was set, so when a date moves the chip is free again
+  and the old thought leaves the Inbox as the new one comes. Reminders stay inside Ingenium, and the studio says so: there
+  are no alarms outside the app. Today's list opens on a This week strip (every date of every open application in the next
+  seven days; a press opens its Track), and the nearest date is said in plain words. An application removed takes its
+  thoughts with it.
+- Referees. Who will speak for her and where each stands (to ask, asked, agreed, sent, thanked), with the day asked, the date
+  due (three days before the closing date, to change), notes, Remind me three days before, and the request, the follow-up or
+  the thanks written for her to send (the prompt carries the referee's name, post and due date). A referee comes from the
+  profile's Referees entries or by name. The checklist's "Ask your referees" line opens them; Today says "Choose your
+  referees" while the posting asks for references and none is chosen, and "Follow up with X" ten days after asking with
+  nothing back.
+- The interview. In Track, the stage Interview (or Add an interview) opens the card: the day, time, how, where, the panel, a
+  list to prepare by that no model writes (the posting once more, an example for each essential criterion, two questions to
+  ask them, prefilled from the reading's ASK lines, the way there, what to bring), notes before and after, and a thank-you
+  email. With the day set, Today says "Prepare: N days to the interview" before anything else. In Practise, Mock run gives
+  one question two minutes on the Clepsydra (its usual length given back at the bell or on Stop, and if the page is closed in
+  the middle, when it is opened again), then her answer is looked at as before. When the day has passed, Today says "Note how
+  the interview went, and write your thanks" until the notes after it and the thank-you are made.
+- Export. Export this application (Track) and Export all (Applications) save one zip through makeZip and saveFileNative: a
+  folder per application with posting.txt, particulars/, reading.md (the band with its rule, the wants and criteria tables),
+  checklist.md (ticked as it stood), each document as the Word file Save as Word gives and as Markdown, emails/, practise.md,
+  notes.md (dates, referees, interview, reading list, notes) and a README that says nothing left the device. Settings' Export
+  your data has a new line, "The Career Studio", through a small hook in modules/r117.js (window.__ingExportProviders: any
+  module may register what it keeps): each profile's applications as readable files under career/, and career/career.json
+  with the studio's records and every text they name, whole (the CV, the writing and the letters the reading page keeps for
+  her among them), so a backup carries them.
+- A reading list. For each application: a supervisor's work, the programme's pages, the call. Keep to read on anything Look
+  it up online found; added by hand; Add to Fontes (a webpage source by title, author and address, remembered on the item);
+  Fetch its text, only on press; Read it with the reading page, which reads it as a document (a run tied to the application;
+  what it found stands under the item, and the item is marked read). The item follows its run: it says how many parts are
+  read, Carry on reading takes up a reading that was paused, one finished in the reading page itself is read here too, and
+  one that stopped is not counted as read (reading it again lets go of the run that stopped). Those findings go to the
+  prompts as MY READING NOTES, beside the profile and never as facts about her; removing the application, or the whole
+  profile, removes the text and the runs.
+- Minutes. Every step on Today says about how long it takes (a reading 10, a checklist tick 5, a draft to fill 15, a document
+  written step by step 25, written herself with a guide 45). The right panel asks "I have: 10 · 15 · 25 · 45 minutes" and
+  lists only the steps that fit, the smallest first; on a low-energy day one step only (on a phone the list has a key, How
+  long do you have?, that opens that panel, with a key back to Today). Start the clock runs the Clepsydra for that long; at
+  the bell the studio offers Not today (the steps rest until tomorrow) or Carry on.
+- The posting checked again. A posting fetched from its address remembers the address and the day; Check it again (The
+  posting) fetches it once more, on her press only, and shows each sentence that changed, before and now, and a changed
+  closing date; Keep the new text makes it the posting (the date and the checklist's "Send it before it closes" follow; her
+  copy of the old text stays kept; the copy before that is let go), Keep my copy leaves it. Add a document keeps further
+  particulars, a handbook or the person specification with the application, read with the posting by the reading, the limits
+  (limitsIn) and the checklist.
+- LinkedIn as a difference. The first import still enters every entry at once; its status says the files and their counts,
+  what was skipped and what was not read, and the headline and summary are shown, with Keep as an entry. Imported again, the
+  export is read against what is there: an unchanged entry is kept, a new or changed one is offered in Found in your sources
+  (a changed one kept replaces the old), one gone from the export is flagged in Your entries with Keep it (it becomes her
+  own) and Drop it, and an entry she changed herself or dropped before is never touched or offered again.
+Every long text these keep (a fetched page, further particulars, the posting before a change) is named in the application's
+record, so IngBig keeps it, a profile copied or removed carries or lets go of it, and removing the application deletes it.
+Lector-side (modules/r108.js): the studio's second reading of a doctoral document (statement, statement of purpose, proposal,
+funding, supporting or teaching statement) is given the reading page's own examiner instructions (a claim inferred marked as
+inferred, one idea to a paragraph, the posting's limit, a citation only where a source supports it), and the document's notes
+say "N% of the words were changed in the examiner's pass" as the reading page does; a cover letter or CV keeps the plainer
+examination. One posting, two pages: the reading page's brief ("What it is for") offers the studio's open applications as the
+posting or the programme's call (kept with from "career:" and the studio's title, organisation and closing date), and a
+posting kept in the brief has Also bring it to the Career Studio, brought once (the studio knows it by the brief's id, as the
+hand-off of a CV or cover letter with no apps already did; that hand-off now also recognises a posting lent by the studio).
+Tests: rig/t_702_career_dates.js (15), t_702_career_refs.js (12), t_702_career_interview.js (17), t_702_career_export.js (the
+zip read back in Node, 15), t_702_career_reading.js (18), t_702_career_minutes.js (11, with the phone),
+t_702_career_snapshot.js (11), t_702_career_linkedin.js (17), t_702_career_lector.js (13): 129 checks; the stand-in model
+answers every request and nothing goes online. The four older tests of the studio and the reading page (t_683, t_685, t_6812,
+t_lector_doctoral: 109 checks) pass unchanged.
+
 Ingenium 6.9.1 (31 October 2026; her words: "I want Ingenium and all of its mini apps to work as one ecosystem the same way
 that Carpe Diem does [...] I want the Word documents created on the Chats page, Lector Page or Career studio to be able to be
 sent and opened in Tabula or the Excel spreadsheets to be able to be opened in Abacus, and the powerpoint slides in Imago and
