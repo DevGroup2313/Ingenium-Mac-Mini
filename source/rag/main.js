@@ -66,9 +66,12 @@ const PLAIN = {
   ALREADY_RUNNING: 'This folder is being read already.',
   NO_SUCH_FOLDER: 'This folder is not in the folder search any more.',
   BUSY: 'A folder window is open already. Finish with it first.',
-  NOT_CHOSEN: 'The app does not have this folder on its list. Add it again.',
+  NOT_CHOSEN: 'Ingenium no longer has this folder on its list. Remove it here, then add it again.',
+  CORRUPT: "The folder search's memory was damaged, perhaps because Ingenium was closed while it was saving. It can start again from nothing: your files are not touched, and your folders are read again.",
 };
-const FATAL_STATUS = { OPFS_LOCKED: 'locked', OPFS_UNAVAILABLE: 'unavailable', SCHEMA_TOO_NEW: 'failed', WORKER_FAILED: 'failed', DIMS_MISMATCH: 'failed' };
+const FATAL_STATUS = { OPFS_LOCKED: 'locked', OPFS_UNAVAILABLE: 'unavailable', SCHEMA_TOO_NEW: 'failed', WORKER_FAILED: 'failed', DIMS_MISMATCH: 'failed', CORRUPT: 'damaged' };
+// The tests' own store operations (debug.*) are switched on only when a test page sets this before loading the folder search.
+const TESTING = () => typeof globalThis !== 'undefined' && globalThis.__ING_RAG_TEST__ === true;
 
 function coded(code, message) { const e = new Error(message || PLAIN[code] || code); e.code = code; e.plain = PLAIN[code] || message || code; return e; }
 function explain(e) {
@@ -77,6 +80,8 @@ function explain(e) {
     if (e.name === 'QuotaExceededError') e.plain = 'There is not enough room on this computer for the folder search.';
     else e.plain = PLAIN[e.code] || (e.message ? String(e.message) : 'Something went wrong.');
   }
+  // a damaged memory, found by any request, shows the card's "Start the folder search again"
+  if (e.code === 'CORRUPT' && S.status !== 'damaged') setStatus('damaged', { code: 'CORRUPT', plain: e.plain });
   return e;
 }
 const abortError = () => { const e = new Error('stopped'); e.name = 'AbortError'; return e; };
@@ -99,7 +104,7 @@ function openStore() {
   const p = (async () => {
     if (!bridge.available()) { setStatus('off'); throw coded('NO_BRIDGE'); }
     setStatus('opening');
-    const store = createStore();
+    const store = createStore({ debug: TESTING() });
     let opened;
     try { opened = await store.open(); }
     catch (e) { try { store.terminate(); } catch (_) { /* gone */ } throw explain(e); }
@@ -223,9 +228,14 @@ async function removeFolder(folderId) {
   if (!f) return { removed: false, files: 0, chunks: 0, forgot: null, compacted: null };
   const job = S.jobs.get(folderId);
   if (job) { stopReading(folderId); try { await job.done; } catch (_) { /* it ended, which is what was wanted */ } }
-  const r = await store.folder.remove({ folderId });
+  // nothing about the folder may stay behind, the vectors a stopped reading had kept included; while another folder is being
+  // read its kept vectors are needed, so the clearing waits for the end of the readings (finish)
+  const idle = S.jobs.size === 0;
+  const r = await store.folder.remove({ folderId, prune: idle });
+  if (!idle) S.prunePending = true;
   let forgot = null;
-  try { const g = await bridge.forgetFolder(f.path); forgot = !g || g.forgot !== false; } catch (_) { forgot = false; }
+  // true: the app forgot it; false: the app did not have it on its list any more; 'error': the app could not be asked
+  try { const g = await bridge.forgetFolder(f.path); forgot = !g || g.forgot !== false; } catch (_) { forgot = 'error'; }
   let compacted = null;
   if (r.removed && r.chunks >= S.config.bigFolderChunks) {
     try { compacted = await store.compact(); } catch (e) { compacted = { error: String((e && e.message) || e) }; }
@@ -296,6 +306,10 @@ async function runJob(job) {
 function finish(job, summary, error) {
   const { folderId } = job;
   S.jobs.delete(folderId);
+  if (S.prunePending && S.jobs.size === 0 && S.store) {
+    S.prunePending = false;
+    S.store.emb.prune().catch(() => { S.prunePending = true; });
+  }
   S.lastRun.set(folderId, error ? { at: Date.now(), error: error.plain } : { at: Date.now(), summary });
   emit({ type: 'done', folderId, summary, error });
   emit({ type: 'folders' });
@@ -338,6 +352,38 @@ function config(opts) {
   return Object.assign({}, S.config);
 }
 
+// The folder search's memory was found damaged (status 'damaged', code CORRUPT): it starts again from nothing, and the folders
+// the app has on its list are put back, to be read again. The person's files are never touched.
+async function rebuild() {
+  Array.from(S.jobs.keys()).forEach((id) => stopReading(id));
+  await Promise.all(Array.from(S.jobs.values()).map((j) => j.done.catch(() => undefined)));
+  if (S.indexer) { try { S.indexer.stop(); } catch (_) { /* gone */ } }
+  if (S.store) { try { S.store.terminate(); } catch (_) { /* gone */ } }
+  S.indexer = S.store = S.opened = null; S.storePromise = S.readyPromise = null; S.principalId = null;
+  if (S.embedder) { try { S.embedder.terminate(); } catch (_) { /* gone */ } S.embedder = S.embedInit = null; }
+  if (!bridge.available()) { setStatus('off'); throw coded('NO_BRIDGE'); }
+  setStatus('opening');
+  const store = createStore({ debug: TESTING() });
+  let opened;
+  try { opened = await store.reset(); S.principalId = (await store.principal.ensure({ name: PRINCIPAL })).id; }
+  catch (e) { try { store.terminate(); } catch (_) { /* gone */ } const x = explain(e); failStatus(x); throw x; }
+  S.store = store; S.opened = opened; S.storePromise = Promise.resolve(store);
+  let kept = [];
+  try { kept = (await bridge.chosenFolders()) || []; } catch (_) { kept = []; }
+  let back = 0;
+  for (const k of kept) {
+    try {
+      const f = await store.folder.add({ name: k.name || String(k.path).split(/[\\/]/).filter(Boolean).pop() || k.path, path: k.path, source: 'bridge', manualOnly: false });
+      await store.acl.grant({ folderId: f.id, principalId: S.principalId });
+      back++;
+    } catch (_) { /* one folder that cannot be put back does not stop the others */ }
+  }
+  S.lastRun.clear(); S.prunePending = false;
+  setStatus('open');
+  emit({ type: 'folders' });
+  return { rebuilt: true, folders: back };
+}
+
 async function shutdown() {
   Array.from(S.jobs.keys()).forEach((id) => stopReading(id));
   await Promise.all(Array.from(S.jobs.values()).map((j) => j.done.catch(() => undefined)));
@@ -354,7 +400,7 @@ export const IngRag = {
   version: 1,
   principal: PRINCIPAL,
   available: () => bridge.available(),
-  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers,
+  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild,
   on(fn) { S.listeners.add(fn); return () => S.listeners.delete(fn); },
   get _store() { return S.store; },
   get _embedder() { return S.embedder; },

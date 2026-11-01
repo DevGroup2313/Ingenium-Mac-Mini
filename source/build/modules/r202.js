@@ -98,6 +98,7 @@ function build(){
   var acts=el("div","rag-acts");
   ui.add=el("button","btn","Add a folder…");ui.add.type="button";ui.add.id="ragAdd";acts.appendChild(ui.add);
   ui.retry=el("button","btn","Try again");ui.retry.type="button";ui.retry.id="ragRetry";ui.retry.hidden=true;acts.appendChild(ui.retry);
+  ui.rebuild=el("button","btn","Start the folder search again");ui.rebuild.type="button";ui.rebuild.id="ragRebuild";ui.rebuild.hidden=true;acts.appendChild(ui.rebuild);
   c.appendChild(acts);
   ui.problem=el("p","small rag-problem");ui.problem.id="ragProblem";ui.problem.setAttribute("role","status");ui.problem.hidden=true;c.appendChild(ui.problem);
   ui.note=el("p","small rag-note");ui.note.id="ragNote";ui.note.setAttribute("role","status");ui.note.setAttribute("aria-live","polite");c.appendChild(ui.note);
@@ -105,6 +106,7 @@ function build(){
   c.appendChild(el("p","small muted rag-foot","These folders are read on this computer only. Nothing is sent anywhere. The chat’s use of them comes next."));
   ui.add.onclick=addClick;
   ui.retry.onclick=function(){setNote("");refresh(true);};
+  ui.rebuild.onclick=rebuildClick;
   return c;
 }
 function setNote(text,bad){ui.note.textContent=text||"";ui.note.className="small rag-note"+(bad?" rag-bad":"");}
@@ -124,10 +126,20 @@ function makeRow(f){
   r.acts.appendChild(r.read);r.acts.appendChild(r.stop);r.acts.appendChild(r.del);
   r.ask=el("div","rag-ask");r.ask.hidden=true;r.ask.setAttribute("role","group");
   r.askText=el("span");r.ask.appendChild(r.askText);
+  r.empty=el("div","rag-ask rag-empty");r.empty.hidden=true;r.empty.setAttribute("role","group");
+  r.emptyText=el("span");r.empty.appendChild(r.emptyText);
+  var ec=el("div","rag-acts");ec.style.marginTop="0";
+  r.emptyYes=el("button","btn small","Yes, take them out");r.emptyYes.type="button";r.emptyNo=el("button","btn small","No, keep them");r.emptyNo.type="button";
+  ec.appendChild(r.emptyYes);ec.appendChild(r.emptyNo);r.empty.appendChild(ec);
   var ac=el("div","rag-acts");ac.style.marginTop="0";
   r.yes=el("button","btn small","Remove it");r.yes.type="button";r.no=el("button","btn small","Keep it");r.no.type="button";
   ac.appendChild(r.yes);ac.appendChild(r.no);r.ask.appendChild(ac);
-  [r.nm,r.pa,r.fa,r.wr,r.nt,r.prog,r.acts,r.ask].forEach(function(n){r.el.appendChild(n);});
+  [r.nm,r.pa,r.fa,r.wr,r.nt,r.prog,r.acts,r.ask,r.empty].forEach(function(n){r.el.appendChild(n);});
+  r.emptyNo.onclick=function(){r.emptyAt=r.emptyFor;r.empty.hidden=true;r.read.focus();};
+  r.emptyYes.onclick=function(){
+    r.emptyAt=r.emptyFor;r.empty.hidden=true;setNote("");
+    R.indexFolder(r.id,{confirmEmpty:true}).then(function(){},function(e){setNote(e&&e.plain||e&&e.message||"The folder could not be read.",true);});
+  };
   r.read.onclick=function(){readClick(r);};
   r.stop.onclick=function(){R.stopReading(r.id);r.stop.setAttribute("aria-disabled","true");setNote("Stopping after the file in hand…");};
   r.del.onclick=function(){r.ask.hidden=false;r.del.setAttribute("aria-expanded","true");r.no.focus();};
@@ -214,6 +226,13 @@ function paint(r,f){
   r.del.setAttribute("aria-label","Remove: "+f.name);
   r.stop.setAttribute("aria-label","Stop reading: "+f.name);
   r.askText.textContent="Remove “"+f.name+"” from the folder search? Its files stay where they are; only what Ingenium remembered about them goes.";
+  // a reading found the folder empty while some of its files are still in the search: she says whether she emptied it
+  var s=f.last&&f.last.summary,emptyN=!f.job&&s&&s.emptyNow?s.emptyNow:0;
+  r.emptyFor=emptyN?(f.last.at||1):0;
+  if(emptyN&&r.emptyAt!==r.emptyFor){
+    r.emptyText.textContent="“"+f.name+"” looks empty now, but "+plural(emptyN,"file")+" from it "+(emptyN===1?"is":"are")+" still in the folder search. Did you empty the folder on purpose? (If it is on a drive that is not connected, choose No.)";
+    r.empty.hidden=false;
+  }else r.empty.hidden=true;
   paintJob(r,f,true);
 }
 function paintJob(r,f,force){
@@ -240,10 +259,20 @@ function sync(list){
   ui.none.textContent="No folder yet. Press “Add a folder…” to choose one.";ui.none.hidden=list.length>0;
 }
 function paintStatus(){
-  var s=R.state(),bad=s.status==="locked"||s.status==="unavailable"||s.status==="failed";
+  var s=R.state(),bad=s.status==="locked"||s.status==="unavailable"||s.status==="failed"||s.status==="damaged";
   ui.problem.hidden=!bad;ui.problem.textContent=bad&&s.problem?s.problem.plain:"";
   ui.retry.hidden=!(s.status==="locked"||s.status==="failed");
-  if(s.status==="unavailable")ui.add.setAttribute("aria-disabled","true");else if(!busy)ui.add.removeAttribute("aria-disabled");
+  ui.rebuild.hidden=s.status!=="damaged";
+  if(s.status==="unavailable"||s.status==="damaged")ui.add.setAttribute("aria-disabled","true");else if(!busy)ui.add.removeAttribute("aria-disabled");
+}
+function rebuildClick(){
+  if(ui.rebuild.getAttribute("aria-disabled")==="true")return;
+  ui.rebuild.setAttribute("aria-disabled","true");setNote("Starting the folder search again…");
+  R.rebuild().then(function(r){
+    setNote("The folder search starts again from nothing. "+(r&&r.folders?"Your "+plural(r.folders,"folder")+" "+(r.folders===1?"is":"are")+" back: press “Read it now” to read "+(r.folders===1?"it":"them")+" again.":"Add your folders again."));
+    return refresh(true);
+  },function(e){setNote(e&&e.plain||e&&e.message||"The folder search could not start again.",true);})
+  .then(function(){ui.rebuild.removeAttribute("aria-disabled");paintStatus();});
 }
 function refresh(now){
   var t=Date.now();
@@ -254,7 +283,7 @@ function refresh(now){
     sync(a[0]);
     var st=a[1];ui.room.hidden=!(st&&st.bytes);if(st&&st.bytes)ui.room.textContent="The folder search takes about "+mb(st.bytes)+" on this computer.";
     ui.problem.hidden=true;ui.retry.hidden=true;paintStatus();
-  },function(e){paintStatus();var s=R.state();if(s.status!=="locked"&&s.status!=="unavailable"&&s.status!=="failed"){ui.problem.hidden=false;ui.problem.textContent=e&&e.plain||e&&e.message||"The folders could not be listed.";}})
+  },function(e){paintStatus();var s=R.state();if(s.status!=="locked"&&s.status!=="unavailable"&&s.status!=="failed"&&s.status!=="damaged"){ui.problem.hidden=false;ui.problem.textContent=e&&e.plain||e&&e.message||"The folders could not be listed.";}})
   .then(function(){refreshing=null;if(again){again=false;refresh(true);}});
   return refreshing;
 }
@@ -284,7 +313,7 @@ function removeClick(r){
   R.removeFolder(r.id).then(function(res){
     var t="Removed “"+nm+"” from the folder search. Its files were not touched.";
     if(res&&res.compacted&&res.compacted.before>res.compacted.after)t+=" Ingenium gave back "+mb(res.compacted.before-res.compacted.after)+" of room.";
-    if(res&&res.forgot===false)t+=" The app still lists the folder as one it may read; add and remove it again to clear that.";
+    if(res&&res.forgot==="error")t+=" The app’s own list of folders could not be updated; this does no harm.";
     setNote(t);
     return refresh(true).then(function(){ui.add.focus();});
   },function(e){r.yes.removeAttribute("aria-disabled");r.ask.hidden=true;setNote(e&&e.plain||e&&e.message||"The folder could not be removed.",true);});

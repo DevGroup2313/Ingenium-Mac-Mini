@@ -160,11 +160,11 @@ export function createIndexer(options) {
         batch.forEach((c, k) => vecs.set(c.content_hash, out[k]));
         embedded += batch.length;
         if (embedded - lastSaved >= 200 && embedded < todo.length) { // a long file: what is done is kept, so a stop or a crash costs little
-          lastSaved = embedded; await saveCache(model, todo.slice(0, embedded), vecs, false);
+          await saveCache(model, todo.slice(lastSaved, embedded), vecs, false); lastSaved = embedded;   // only the new ones
         }
       }
     } catch (e) {
-      if (embedded > lastSaved) { try { await saveCache(model, todo.slice(0, embedded), vecs, false); } catch (x) { /* the original error is the one to report */ } }
+      if (embedded > lastSaved) { try { await saveCache(model, todo.slice(lastSaved, embedded), vecs, false); } catch (x) { /* the original error is the one to report */ } }
       throw e;
     }
     emit({ event: 'file-stage', path: f.rel, stage: 'writing' });
@@ -201,7 +201,10 @@ export function createIndexer(options) {
     // what the app lists now, what the index holds
     let listing;
     try { listing = await br.listFiles(folder.path); } catch (e) {
-      const err = new Error('the folder cannot be read (is its drive connected?): ' + (e && e.message || e)); err.code = 'FOLDER_UNAVAILABLE'; err.cause = e; throw err;
+      // the app no longer has the folder on its list (NOT_CHOSEN) is not the same as a drive that is not connected
+      const code = e && e.code === 'NOT_CHOSEN' ? 'NOT_CHOSEN' : 'FOLDER_UNAVAILABLE';
+      const err = new Error(code === 'NOT_CHOSEN' ? 'the app does not have this folder on its list: ' + (e && e.message || e) : 'the folder cannot be read (is its drive connected?): ' + (e && e.message || e));
+      err.code = code; err.cause = e; throw err;
     }
     const existing = new Map((await store.file.list({ folderId })).map((x) => [x.path, x]));
     const only = opts.only ? new Set(opts.only) : null;
@@ -239,8 +242,12 @@ export function createIndexer(options) {
       if (!only) {
         const now = new Set(listing.map((x) => x.rel)), gone = [...existing.keys()].filter((p) => !now.has(p));
         const cap = br.LIST_CAP || bridge.LIST_CAP, capped = listing.truncated !== undefined ? !!listing.truncated : listing.length >= cap;
-        if (capped) summary.notes.push('the folder has more files than the app lists (' + listing.length + ' were listed, at most ' + cap + '): the others are not searched, and files not listed are not taken out of the index');
-        else if (!listing.length && existing.size && !opts.confirmEmpty) summary.notes.push('the folder lists no files while ' + existing.size + ' are indexed: it is taken as a drive that is not connected, and nothing was taken out (confirmEmpty: true takes them out)');
+        if (capped) summary.notes.push('This folder has more files than Ingenium reads at once (at most ' + cap.toLocaleString('en-GB') + '). The others are left out of the search, and nothing was taken out.');
+        else if (!listing.length && existing.size && !opts.confirmEmpty) {
+          // the card asks the person, in plain words, and reads again with confirmEmpty when she says the folder really is empty
+          summary.emptyNow = existing.size;
+          summary.notes.push('This folder looks empty now, so nothing was taken out of the search, in case its drive is not connected.');
+        }
         else for (const p of gone) {
           if (signal && signal.aborted) throw abortError();
           try { const r = await store.file.delete({ folderId, path: p }); summary.files.deleted++; emit({ event: 'file-deleted', path: p, chunks: r && r.chunkCount || 0 }); }

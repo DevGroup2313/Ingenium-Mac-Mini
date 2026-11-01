@@ -47,7 +47,7 @@ async function ensureServer() {
 
   const SECTIONS = ['bridge', 'first run', 'second run', 'changed file', 'added and removed', 'failures', 'safeguards', 'stopping', 'real store and embedder'];
   const ran = [];
-  const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e)); } ran.push(name); };
+  const section = async (name, fn) => { try { await fn(); ran.push(name); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e)); } };
 
   // ------------------------------------------------------------------------------------------------------- bridge
   await section('bridge', async () => {
@@ -214,9 +214,13 @@ async function ensureServer() {
       out.unavailable = err; out.afterUnavailable = store.files.size;
       const saved = PH.bridge.folders.get(path); PH.bridge.folders.set(path, new Map());
       const s1 = await ix.indexFolder(folder.id); out.emptyNotes = s1.notes; out.deleted1 = s1.files.deleted; out.afterEmpty = store.files.size;
+      out.emptyNow = s1.emptyNow;
       const s2 = await ix.indexFolder(folder.id, { confirmEmpty: true }); out.deleted2 = s2.files.deleted; out.afterConfirm = store.files.size; out.n0 = n0;
       PH.bridge.folders.set(path, saved);
       let err2 = null; try { await ix.indexFolder(9999); } catch (e) { err2 = e.code; } out.noFolder = err2;
+      // the app no longer has the folder on its list: said as such, not as a drive that is not connected
+      PH.bridge.notChosen.add(path);
+      try { await ix.indexFolder(folder.id); out.notChosen = 'resolved'; } catch (e) { out.notChosen = e.code; } finally { PH.bridge.notChosen.delete(path); }
       const a = ix.indexFolder(folder.id); let err3 = null; try { await ix.indexFolder(folder.id); } catch (e) { err3 = e.code; } const first = await a; out.twice = [err3, first.files.total];
       const n1 = store.files.size; PH.bridge.cutList = 5; const s3 = await ix.indexFolder(folder.id); PH.bridge.cutList = null;   // the app stopped listing at its limit
       out.cut = { total: s3.files.total, deleted: s3.files.deleted, kept: store.files.size === n1 && n1 === 20, notes: s3.notes };
@@ -224,9 +228,11 @@ async function ensureServer() {
     });
     ok(r.unavailable && r.unavailable[0] === 'FOLDER_UNAVAILABLE' && /drive/.test(r.unavailable[1]) && r.afterUnavailable === r.n0, 'a folder the app cannot list (a drive that is unplugged) stops the run with a plain reason and takes nothing out of the index', r.unavailable);
     ok(r.deleted1 === 0 && r.afterEmpty === r.n0 && r.emptyNotes.length === 1 && /not connected/.test(r.emptyNotes[0]), 'a folder that suddenly lists no files while files are indexed is taken for a drive that is not there: nothing is deleted, and the run says so', r.emptyNotes);
+    ok(r.emptyNow === r.n0, 'the run tells the card how many files are still in the search, so it can ask her in plain words', r.emptyNow);
     ok(r.deleted2 === r.n0 && r.afterConfirm === 0, 'with confirmEmpty the files are taken out (' + r.deleted2 + ')');
+    ok(r.notChosen === 'NOT_CHOSEN', 'a folder the app no longer has on its list is reported as NOT_CHOSEN, not as a drive to connect', r.notChosen);
     ok(r.noFolder === 'NO_SUCH_FOLDER', 'a folder that is not in the index is refused');
-    ok(r.cut.total === 5 && r.cut.deleted === 0 && r.cut.kept && r.cut.notes.length === 1 && /more files than the app lists/.test(r.cut.notes[0]), 'a listing the app cut short (truncated: true) takes nothing out of the index, and the run says so', r.cut);
+    ok(r.cut.total === 5 && r.cut.deleted === 0 && r.cut.kept && r.cut.notes.length === 1 && /more files than Ingenium reads at once/.test(r.cut.notes[0]), 'a listing the app cut short (truncated: true) takes nothing out of the index, and the run says so', r.cut);
     ok(r.twice[0] === 'ALREADY_RUNNING' && r.twice[1] === 20, 'a folder that is being read cannot be started a second time (ALREADY_RUNNING); the first run goes on and ends', r.twice);
   });
 
@@ -248,11 +254,17 @@ async function ensureServer() {
       try { await ix2.indexFolder(f2.id, { signal: ac2.signal }); } catch (e) { err2 = e.name; }
       const puts = st2.calls.filter((c) => c[0] === 'emb.put').length, cached = st2.cache.size, written = st2.files.size, e0 = em2.embedded;
       em2.embed = orig; const again = await ix2.indexFolder(f2.id);
-      return { err, kept, done, rerunIndexed: rerun.files.indexed, rerunSkipped: rerun.files.skipped, total: rerun.files.total, last: events[events.length - 1], err2, puts, cached, written, e0, again: { embedded: again.embedded, reused: again.reused, chunks: again.chunks }, tail: events.slice(-1) };
+      // the whole 4 MB log read from nothing: its progress saves (every 200 new vectors) carry each new vector once (review rag-r-05)
+      const whole = new TextDecoder().decode(await PH.fetchBytes(PH.FIX + 'historian_archive/logbook/ship_logbooks_1781-1802.txt'));
+      PH.bridge.folders.clear(); PH.setFile('/whole', 'log.txt', whole, 1); const st3 = PH.fakeStore(), em3 = PH.fakeEmbedder(); const f3 = await st3.folder.add({ name: 'whole', path: '/whole' });
+      const ix3 = PH.createIndexer({ store: st3, embedder: em3, embedBatch: 32 }); const run3 = await ix3.indexFolder(f3.id); ix3.stop();
+      const savedAgain = { calls: st3.calls.filter((c) => c[0] === 'emb.put').length, items: st3.putItems || 0, embedded: run3.embedded };
+      return { err, kept, done, rerunIndexed: rerun.files.indexed, rerunSkipped: rerun.files.skipped, total: rerun.files.total, last: events[events.length - 1], err2, puts, cached, written, e0, savedAgain, again: { embedded: again.embedded, reused: again.reused, chunks: again.chunks }, tail: events.slice(-1) };
     });
     ok(r.err && r.err[0] === 'AbortError' && r.err[1] === true && r.done === 3 && r.kept === 3 && r.last === 'folder-done', 'stopping a run (AbortSignal) ends it after the file in hand: 3 files are in the index, folder-done says it was stopped', r.err);
     ok(r.rerunIndexed === r.total - 3 && r.rerunSkipped === 3, 'the next run does the rest and leaves those 3 alone');
     ok(r.err2 === 'AbortError' && r.written === 0 && r.puts >= 1 && r.cached >= 64, 'stopped in the middle of a long file, nothing of that file is written, but the ' + r.cached + ' vectors already made are kept in the embedding cache (emb.put)', { puts: r.puts, cached: r.cached });
+    ok(r.savedAgain.calls >= 10 && r.savedAgain.items <= r.savedAgain.embedded, 'reading the 4 MB log from nothing, its progress saves carry each new vector once (' + r.savedAgain.items + ' carried in ' + r.savedAgain.calls + ' saves, ' + r.savedAgain.embedded + ' made)', r.savedAgain);
     ok(r.again.reused >= r.cached && r.again.embedded === r.again.chunks - r.again.reused, 'and the run after it reuses them: ' + r.again.reused + ' of ' + r.again.chunks + ' chunks need no embedding', r.again);
   });
 
@@ -263,7 +275,7 @@ async function ensureServer() {
     const t0 = Date.now();
     const r = await ev(async () => {
       const E = PH.embedderModule, S = PH.storeModule; PH.bridge.folders.clear(); PH.installBridge();
-      const store = S.createStore(), embedder = E.createEmbedder(); PH.real = { store, embedder };
+      const store = S.createStore({ debug: true }), embedder = E.createEmbedder(); PH.real = { store, embedder };
       const open = await store.open({ vfs: 'memory' }); const init = await embedder.init(); const me = await store.principal.ensure({ name: 'me' });
       const { path } = await PH.loadCorpusFolder('household_papers'); const folder = await store.folder.add({ name: 'household_papers', path }); await store.acl.grant({ folderId: folder.id, principalId: me.id });
       const ix = PH.createIndexer({ store, embedder }); const events = [];

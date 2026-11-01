@@ -66,9 +66,9 @@ function pageHelpers() {
   const ev = (fn, arg) => p.evaluate(fn, arg);
   const load = async () => { await p.goto(HARNESS); await p.waitForFunction(() => window.RagHarness && window.RagHarness.ready === true, null, { timeout: 30000 }); };
 
-  const SECTIONS = ['start', 'memory', 'schema', 'migrations', 'principals', 'folders and ACL', 'file.replace', 'replace and failure', 'delete and remove', 'embedding cache', 'transfer and arguments', 'dims', 'size estimate', 'OPFS reload', 'second window', 'OPFS volume'];
+  const SECTIONS = ['start', 'memory', 'schema', 'migrations', 'principals', 'folders and ACL', 'file.replace', 'replace and failure', 'delete and remove', 'embedding cache', 'transfer and arguments', 'dims', 'size estimate', 'OPFS reload', 'second window', 'OPFS volume', 'nothing left behind', 'damaged index'];
   const ran = [];
-  const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.message)); } ran.push(name); };
+  const section = async (name, fn) => { try { await fn(); ran.push(name); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.message)); } };
 
   await load();
 
@@ -101,9 +101,9 @@ function pageHelpers() {
       out.unknown = await s.call('no.such.op', {}).then(() => null, (e) => e.code);
       return out;
     });
-    ok(r.open.schemaVersion === 1 && r.open.vfs === 'memory' && r.open.sqlite === '3.45.3' && /^v0\.1\.6$/.test(r.open.vec) && r.open.dims === 384, "open({vfs: 'memory'}) gives {schemaVersion: 1, vfs, sqlite 3.45.3, vec v0.1.6}", r.open);
+    ok(r.open.schemaVersion === 2 && r.open.vfs === 'memory' && r.open.sqlite === '3.45.3' && /^v0\.1\.6$/.test(r.open.vec) && r.open.dims === 384, "open({vfs: 'memory'}) gives {schemaVersion: 1, vfs, sqlite 3.45.3, vec v0.1.6}", r.open);
     ok(r.beforeOpen === 'NOT_OPEN', 'a call before open is refused (NOT_OPEN)', r.beforeOpen);
-    ok(r.again.schemaVersion === 1 && r.again.dbName === r.open.dbName && r.other === 'ALREADY_OPEN', 'open again with the same arguments changes nothing; with another database it says ALREADY_OPEN', { again: r.again, other: r.other });
+    ok(r.again.schemaVersion === 2 && r.again.dbName === r.open.dbName && r.other === 'ALREADY_OPEN', 'open again with the same arguments changes nothing; with another database it says ALREADY_OPEN', { again: r.again, other: r.other });
     ok(r.badVfs === 'BAD_ARGS' && r.unknown === 'UNKNOWN_OP', 'a bad vfs and an unknown op are refused with a code', { badVfs: r.badVfs, unknown: r.unknown });
     ok(sameJSON(r.before, r.after) && !r.after.some((n) => /ingenium|sahpool/i.test(n)), 'memory mode touches no OPFS: the origin\'s private file system has no new entry', { before: r.before, after: r.after });
     ok(r.events.includes('hello:store'), 'the worker announces itself with a hello event', r.events);
@@ -147,7 +147,7 @@ function pageHelpers() {
     ok(sameJSON(r.fk.files, [['folders', 'folder_id', 'id', 'CASCADE']]) && sameJSON(r.fk.folder_acl, [['folders', 'folder_id', 'id', 'CASCADE'], ['principals', 'principal_id', 'id', 'CASCADE']]) && sameJSON(r.fk.chunks, [['files', 'file_id', 'id', 'CASCADE']]) && r.fk.folders.length === 0, 'foreign keys: files, folder_acl and chunks.file_id cascade; chunks.folder_id has none', r.fk);
     ok(r.idx.folders.some((i) => i[0] === 1 && i[1] === 'path') && r.idx.principals.some((i) => i[0] === 1 && i[1] === 'name') && r.idx.files.some((i) => i[0] === 1 && i[1] === 'folder_id+path') && r.idx.chunks.some((i) => i[1] === 'file_id'), 'unique(folders.path), unique(principals.name), unique(files.folder_id, path) and the index chunks_file(file_id)', r.idx);
     ok(/using vec0\(folder_id integer partition key, embedding float\[384\] distance_metric=cosine\)/i.test(r.vecSql) && /using fts5\(text, heading_path, folder_id unindexed, tokenize = 'porter unicode61'\)/i.test(r.ftsSql) && /virtual/i.test(r.vecSql) && /virtual/i.test(r.ftsSql), 'chunks_vec is vec0 with a folder_id partition key and 384 cosine values; chunks_fts is FTS5 (porter unicode61, folder_id unindexed)', { vec: r.vecSql, fts: r.ftsSql });
-    ok(sameJSON(r.meta, [{ key: 'schema_version', value: '1' }]), "meta holds schema_version '1'", r.meta);
+    ok(sameJSON(r.meta, [{ key: 'schema_version', value: '2' }]), "meta holds schema_version '2' (version 2: removing leaves nothing behind)", r.meta);
     ok(r.fkOn === 1, 'pragma foreign_keys is on', r.fkOn);
   });
 
@@ -158,23 +158,23 @@ function pageHelpers() {
       await s.open({ vfs: 'memory' });
       const ver = async () => (await s.debug.sql({ sql: "select value from meta where key = 'schema_version'" }))[0].value;
       const has = async (n) => (await s.debug.sql({ sql: "select count(*) as n from sqlite_master where name = ?", bind: [n] }))[0].n;
-      out.first = await s.debug.migrate({ migrations: [{ version: 2, sql: "create table mig_a(x integer); insert into mig_a values (7)" }] });
+      out.first = await s.debug.migrate({ migrations: [{ version: 3, sql: "create table mig_a(x integer); insert into mig_a values (7)" }] });
       out.v2 = await ver(); out.a = await has('mig_a');
-      out.again = await s.debug.migrate({ migrations: [{ version: 2, sql: "create table mig_a(x integer)" }] });   // would fail if it ran again
+      out.again = await s.debug.migrate({ migrations: [{ version: 3, sql: "create table mig_a(x integer)" }] });   // would fail if it ran again
       out.rows = (await s.debug.sql({ sql: 'select count(*) as n from mig_a' }))[0].n;
-      out.fail = await s.debug.migrate({ migrations: [{ version: 2, sql: 'x' }, { version: 3, sql: 'create table mig_b(x); create table mig_b(y)' }] }).then(() => null, (e) => e.message);
+      out.fail = await s.debug.migrate({ migrations: [{ version: 3, sql: 'x' }, { version: 4, sql: 'create table mig_b(x); create table mig_b(y)' }] }).then(() => null, (e) => e.message);
       out.v2after = await ver(); out.b = await has('mig_b');
-      out.fixed = await s.debug.migrate({ migrations: [{ version: 2, sql: 'x' }, { version: 3, sql: 'create table mig_b(x)' }] });
+      out.fixed = await s.debug.migrate({ migrations: [{ version: 3, sql: 'x' }, { version: 4, sql: 'create table mig_b(x)' }] });
       out.v3 = await ver(); out.b2 = await has('mig_b');
-      out.order = await s.debug.migrate({ migrations: [{ version: 2, sql: 'x' }, { version: 3, sql: 'x' }, { version: 9, sql: 'create table mig_c(x)' }] }).then(() => null, (e) => e.code);
+      out.order = await s.debug.migrate({ migrations: [{ version: 3, sql: 'x' }, { version: 4, sql: 'x' }, { version: 10, sql: 'create table mig_c(x)' }] }).then(() => null, (e) => e.code);
       out.c = await has('mig_c');
       out.stats = await s.stats();
       return out;
     });
-    ok(sameJSON(r.first, { from: 1, to: 2, applied: [2] }) && r.v2 === '2' && r.a === 1, 'a later version adds a step: version 2 is applied once and meta.schema_version follows', r.first);
-    ok(sameJSON(r.again, { from: 2, to: 2, applied: [] }) && r.rows === 1, 'the same list run again applies nothing (the step that would fail is not run twice)', { again: r.again, rows: r.rows });
-    ok(typeof r.fail === 'string' && r.v2after === '2' && r.b === 0, 'a step that fails leaves the version where it was and none of its changes', { fail: r.fail, version: r.v2after, table: r.b });
-    ok(sameJSON(r.fixed, { from: 2, to: 3, applied: [3] }) && r.v3 === '3' && r.b2 === 1, 'the corrected step then applies', r.fixed);
+    ok(sameJSON(r.first, { from: 2, to: 3, applied: [3] }) && r.v2 === '3' && r.a === 1, 'a later version adds a step: version 3 is applied once and meta.schema_version follows', r.first);
+    ok(sameJSON(r.again, { from: 3, to: 3, applied: [] }) && r.rows === 1, 'the same list run again applies nothing (the step that would fail is not run twice)', { again: r.again, rows: r.rows });
+    ok(typeof r.fail === 'string' && r.v2after === '3' && r.b === 0, 'a step that fails leaves the version where it was and none of its changes', { fail: r.fail, version: r.v2after, table: r.b });
+    ok(sameJSON(r.fixed, { from: 3, to: 4, applied: [4] }) && r.v3 === '4' && r.b2 === 1, 'the corrected step then applies', r.fixed);
     ok(r.order === 'BAD_MIGRATIONS' && r.c === 0, 'a list with a missing version is refused before anything runs', { order: r.order, c: r.c });
     ok(r.stats.meta === 1, 'the migrations left one meta row', r.stats);
   });
@@ -554,10 +554,10 @@ function pageHelpers() {
       return out;
     });
     ok(!r1.before.some((n) => /ingenium/i.test(n)) && r1.after.some((n) => n === '.ingenium-rag'), 'opening in OPFS creates the pool directory .ingenium-rag (and memory mode had not)', { before: r1.before, after: r1.after });
-    ok(r1.open.schemaVersion === 1 && r1.open.vfs === 'opfs-sahpool' && r1.open.sqlite === '3.45.3' && r1.open.dbName === 'rag.sqlite3' && r1.rep.chunkCount === 40, 'open() in OPFS: {schemaVersion: 1, vfs: opfs-sahpool}; 40 chunks written', { open: r1.open, openMs: r1.openMs });
+    ok(r1.open.schemaVersion === 2 && r1.open.vfs === 'opfs-sahpool' && r1.open.sqlite === '3.45.3' && r1.open.dbName === 'rag.sqlite3' && r1.rep.chunkCount === 40, 'open() in OPFS: {schemaVersion: 1, vfs: opfs-sahpool}; 40 chunks written', { open: r1.open, openMs: r1.openMs });
     ok(typeof r1.persisted === 'boolean' && r1.storage && r1.storage.quota > 1e8 && r1.storage.usage >= 0, 'info() tells whether the browser keeps this origin\'s storage (persisted) and how much it will allow (storage.quota)', { persisted: r1.persisted, storage: r1.storage });
     ok(r1.snapSame && sameJSON(r1.stats2, r1.stats) && r1.stats2.chunks === 40 && sameJSON(r1.knn2, r1.knn) && r1.knn[0] === 18, 'a new worker on the same database (the first one stopped) finds every row again: same snapshot of all tables, same nearest neighbours', { reopenMs: r1.reopenMs, stats: r1.stats2, knn: r1.knn2 });
-    ok(r1.open2.schemaVersion === 1 && sameJSON(r1.meta, [{ key: 'schema_version', value: '1' }]) && r1.integrity.length === 1 && r1.integrity[0] === 'ok' && r1.fk === 1, 'migrations re-run safely: the reopened database is still version 1 with one meta row, passes integrity_check, and has foreign keys on again', { meta: r1.meta, integrity: r1.integrity, fk: r1.fk });
+    ok(r1.open2.schemaVersion === 2 && sameJSON(r1.meta, [{ key: 'schema_version', value: '2' }]) && r1.integrity.length === 1 && r1.integrity[0] === 'ok' && r1.fk === 1, 'migrations re-run safely: the reopened database is still version 1 with one meta row, passes integrity_check, and has foreign keys on again', { meta: r1.meta, integrity: r1.integrity, fk: r1.fk });
     ok(r1.folders.length === 1 && r1.folders[0].lastIndexedAt === 1730400100000 && r1.folders[0].fileCount === 1 && r1.folders[0].chunkCount === 40, 'folders, the ACL row, last_indexed_at and the counts survive', r1.folders);
 
     // a reload of the page: everything starts again, the data stays
@@ -575,7 +575,7 @@ function pageHelpers() {
       out.stats2 = await s.stats();
       return out;
     }, { snap: r1.snap, F: r1.F });
-    ok(r2.open.schemaVersion === 1 && r2.snapSame && r2.stats.chunks === 40 && r2.me === r1.me && sameJSON(r2.allowed, [r1.F]), 'after page.reload() the database is there: the same snapshot of all tables, the same user and ACL', { open: r2.open, ms: r2.ms, stats: r2.stats });
+    ok(r2.open.schemaVersion === 2 && r2.snapSame && r2.stats.chunks === 40 && r2.me === r1.me && sameJSON(r2.allowed, [r1.F]), 'after page.reload() the database is there: the same snapshot of all tables, the same user and ACL', { open: r2.open, ms: r2.ms, stats: r2.stats });
     await load();
     const r3 = await ev(async () => {
       const s = RagHarness.makeStore(); await s.open({});
@@ -675,6 +675,93 @@ function pageHelpers() {
 
   // ------------------------------------------------------------------------------------------------------------ the end
   const sc = await ev(() => ({ errors: window.RagHarness.errors, workerErrors: window.RagHarness.workerErrors() }));
+  // ------------------------------------------------------------------------------------------------------------ nothing left behind (review, 1 November 2026)
+  await section('nothing left behind', async () => {
+    await load();
+    const r = await ev(async () => {
+      const out = {};
+      const s = RagHarness.makeStore(); await s.open({ vfs: 'memory', dbName: 'left.sqlite3' });
+      out.secure = (await s.debug.sql({ sql: 'select secure_delete as v from pragma_secure_delete' }))[0].v;
+      out.ftsSecure = (await s.debug.sql({ sql: "select v from chunks_fts_config where k = 'secure-delete'" })).map((x) => x.v);
+      const A = (await s.folder.add({ name: 'A', path: '/left/a' })).id, B = (await s.folder.add({ name: 'B', path: '/left/b' })).id;
+      await s.file.replace({ folderId: A, path: 'a.md', size: 1, mtime: 1, contentHash: 'a', model: 'm', chunks: window.T.chunks(3, { prefix: 'la', seed0: 700, texts: ['secret words one', 'secret words two', 'secret words three'] }) });
+      await s.file.replace({ folderId: B, path: 'b.md', size: 1, mtime: 1, contentHash: 'b', model: 'm', chunks: window.T.chunks(2, { prefix: 'lb', seed0: 900 }) });
+      // what a stopped reading of A had kept: vectors in the cache that no passage uses yet
+      await s.emb.put({ model: 'm', items: [0, 1, 2, 3].map((i) => ({ hash: 'kept' + i, embedding: window.T.mk(800 + i) })) });
+      const hex16 = (seed) => Array.from(window.T.bytes(window.T.mk(seed)).slice(0, 16)).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      const blobs = async () => (await s.debug.sql({ sql: 'select hex(vectors) as h from chunks_vec_vector_chunks00' })).map((x) => x.h);
+      out.beforeHas = (await blobs()).some((h) => h.includes(hex16(700)));
+      out.rm = await s.folder.remove({ folderId: A, prune: true });
+      const after = await blobs();
+      out.afterHas = [700, 701, 702].map((sd) => after.some((h) => h.includes(hex16(sd))));
+      out.bStill = [900, 901].map((sd) => after.some((h) => h.includes(hex16(sd))));
+      out.cache = (await s.debug.sql({ sql: 'select hash from emb_cache order by hash' })).map((x) => x.hash);
+      out.fts = (await s.debug.sql({ sql: "select count(*) as n from chunks_fts where chunks_fts match 'secret'" }))[0].n;
+      out.cons = await window.T.consistent(s);
+      // without prune (another folder was being read): the kept vectors stay until the end of the readings
+      await s.emb.put({ model: 'm', items: [{ hash: 'kept-b', embedding: window.T.mk(990) }] });
+      out.rmB = await s.folder.remove({ folderId: B });
+      out.cacheB = (await s.debug.sql({ sql: 'select hash from emb_cache order by hash' })).map((x) => x.hash);
+      out.prune = await s.emb.prune();
+      out.final = await s.stats();
+      // the tests' own operations are not there for the app (a store made without debug)
+      const app = RagHarness.makeStore({ debug: false }); await app.open({ vfs: 'memory', dbName: 'app.sqlite3' });
+      out.appOps = (await app.ops()).filter((o) => o.startsWith('debug.'));
+      out.appSql = await app.call('debug.sql', { sql: 'select 1' }).then(() => 'answered', (e) => e.code);
+      out.appWipe = await app.call('debug.wipe', {}).then(() => 'answered', (e) => e.code);
+      out.testOps = (await s.ops()).filter((o) => o.startsWith('debug.')).length;
+      app.terminate(); s.terminate();
+      return out;
+    });
+    ok(r.secure === 1 && JSON.stringify(r.ftsSecure) === '[1]', "SQLite overwrites deleted rows (secure_delete on) and FTS5 runs with 'secure-delete' (schema version 2)", { secure: r.secure, fts: r.ftsSecure });
+    ok(r.beforeHas === true && r.afterHas.every((x) => x === false) && r.bStill.every((x) => x === true), "a removed folder's vectors are gone from sqlite-vec's own storage (overwritten with zeros first); the other folder's are kept", { before: r.beforeHas, after: r.afterHas, b: r.bStill });
+    ok(r.rm.removed === true && r.rm.pruned === 4 && sameJSON(r.cache, ['lb0', 'lb1']), "folder.remove({prune: true}) also drops the cached vectors a stopped reading had kept; the other folder's stay", { rm: r.rm, cache: r.cache });
+    ok(r.fts === 0 && r.cons.sameFts && r.cons.sameVec, 'the removed words cannot be found, and the three tables still agree', { fts: r.fts, cons: r.cons });
+    ok(r.rmB.pruned === 0 && r.cacheB.includes('kept-b') && r.prune.removed === 1 && r.final.emb_cache === 0 && r.final.chunks === 0, 'without prune the kept vectors wait, and emb.prune clears them after the readings end', { rmB: r.rmB, cacheB: r.cacheB, prune: r.prune, final: r.final });
+    ok(r.appOps.length === 0 && r.appSql === 'UNKNOWN_OP' && r.appWipe === 'UNKNOWN_OP' && r.testOps === 5, "the tests' own operations (debug.*) are not served to the app; the harness has them", { appOps: r.appOps, sql: r.appSql, wipe: r.appWipe, testOps: r.testOps });
+  });
+
+  // ------------------------------------------------------------------------------------------------------------ a damaged index (review, 1 November 2026)
+  await section('damaged index', async () => {
+    await load();
+    const r = await ev(async () => {
+      const out = {}, name = 'dmg-' + Date.now() + '.sqlite3';
+      const s = RagHarness.makeStore(); await s.open({ dbName: name });
+      const F = (await s.folder.add({ name: 'D', path: '/dmg' })).id;
+      await s.file.replace({ folderId: F, path: 'd.md', size: 1, mtime: 1, contentHash: 'd', model: 'm', chunks: window.T.chunks(60, { prefix: 'dm', seed0: 3000 }) });
+      out.before = await s.stats();
+      s.terminate(); await new Promise((res) => setTimeout(res, 600));
+      // overwrite three pages of the database file in the private file system, as a failing disk or a stray program might
+      let dir = await navigator.storage.getDirectory();
+      dir = await (await dir.getDirectoryHandle('.ingenium-rag')).getDirectoryHandle('.opaque');
+      let hit = null;
+      for await (const [, h] of dir) {
+        if (h.kind !== 'file') continue;
+        const head = new TextDecoder().decode(new Uint8Array(await (await h.getFile()).slice(0, 512).arrayBuffer())).split('\0')[0];
+        if (head === '/' + name) { hit = h; break; }
+      }
+      out.found = !!hit;
+      if (hit) {
+        const w = await hit.createWritable({ keepExistingData: true });
+        await w.seek(4096 + 4096 * 2); await w.write(new Uint8Array(4096 * 3).fill(0xAB)); await w.close();
+      }
+      const s2 = RagHarness.makeStore();
+      const tryIt = async (f) => { try { await f(); return 'answered'; } catch (e) { return e.code || e.message; } };
+      out.open = await tryIt(() => s2.open({ dbName: name }));
+      out.use = out.open === 'answered' ? await tryIt(async () => { await s2.stats(); await s2.file.list({ folderId: F }); await s2.debug.sql({ sql: 'select count(*) as n from pragma_integrity_check' }); }) : out.open;
+      out.reset = await s2.reset({ dbName: name }).then((x) => ({ schemaVersion: x.schemaVersion, vfs: x.vfs }), (e) => e.code || e.message);
+      out.after = await s2.stats().catch((e) => e.code);
+      out.integrity = (await s2.debug.sql({ sql: 'select integrity_check as v from pragma_integrity_check' })).map((x) => x.v);
+      out.write = await s2.file.replace({ folderId: (await s2.folder.add({ name: 'D', path: '/dmg' })).id, path: 'd.md', size: 1, mtime: 1, contentHash: 'd', model: 'm', chunks: window.T.chunks(5, { prefix: 'dn', seed0: 3100 }) }).then((x) => x.chunkCount, (e) => e.code);
+      s2.terminate();
+      return out;
+    });
+    ok(r.before.chunks === 60 && r.found, 'an index on disk, and its file found in the private file system', { before: r.before, found: r.found });
+    ok(r.open === 'CORRUPT' || r.use === 'CORRUPT', 'a damaged index is reported as CORRUPT (the card then offers to start again)', { open: r.open, use: r.use });
+    ok(r.reset && r.reset.schemaVersion === 2 && r.after && r.after.chunks === 0 && r.after.folders === 0 && JSON.stringify(r.integrity) === '["ok"]', 'reset starts it again from nothing: an empty index of the current version, integrity ok', { reset: r.reset, after: r.after, integrity: r.integrity });
+    ok(r.write === 5, 'and it can be written at once', r.write);
+  });
+
   ok(ran.length === SECTIONS.length && SECTIONS.every((s) => ran.includes(s)), 'every part of this test ran to its end (' + ran.length + ' of ' + SECTIONS.length + ')', { missing: SECTIONS.filter((s) => !ran.includes(s)) });
   ok(pageErrors.length === 0 && sc.errors.length === 0 && sc.workerErrors.length === 0, 'no script errors on the page or in the workers', { pageErrors, errors: sc.errors, workerErrors: sc.workerErrors });
   ok(consoleErrors.length === 0, 'no console errors', consoleErrors);

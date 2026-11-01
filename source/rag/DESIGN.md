@@ -43,7 +43,8 @@ Store worker ops (phase 1):
 - `open({dbName = 'rag.sqlite3', vfs = 'opfs-sahpool' | 'memory', vendorBase})` → `{schemaVersion, vfs, sqlite, vec}`
 - `principal.ensure({name})` → `{id}` (the one user now is `"me"`; tests add `"test-b"`)
 - `folder.add({name, path, source = 'bridge', manualOnly = false})` → folder row; `folder.list({principalId?})`;
-  `folder.remove({folderId})` (deletes its files, chunks, FTS rows and vectors in one transaction); `folder.touch({folderId, indexedAt})`
+  `folder.remove({folderId, prune = false})` (deletes its files, chunks, FTS rows and vectors in one transaction; `prune` also drops
+  every cached vector no passage uses, which `main.js` asks for when no reading is running); `folder.touch({folderId, indexedAt})`
 - `acl.grant({folderId, principalId})`, `acl.revoke({folderId, principalId})`, `acl.allowed({principalId})` → `[folderId]`
 - `file.list({folderId})` → `[{id, path, size, mtime, contentHash, chunkCount, indexedAt}]`; `file.get({folderId, path})`
 - `file.replace({folderId, path, size, mtime, contentHash, model, chunks})` → `{fileId, chunkCount}`: ONE transaction
@@ -52,7 +53,11 @@ Store worker ops (phase 1):
   of the model's dimension. Writes the embeddings into `emb_cache` too.
 - `file.delete({folderId, path})` (one transaction)
 - `emb.lookup({model, hashes})` → `{[hash]: Float32Array}` (reuse of unchanged chunks); `emb.put({model, items})`
-- `stats()` → counts per table; `debug.rows({table, limit})` (tests only)
+- `stats()` → counts per table; `reset({dbName?})` (deletes the database files and opens a new, empty index with the arguments
+  of the last open: the way back from a damaged index, error code `CORRUPT`)
+- `debug.rows`, `debug.sql`, `debug.fail`, `debug.migrate`, `debug.wipe`: the tests' own, served only by a worker started with
+  `?debug=1` in its address (`createStore({debug: true})`); the app never starts one so (`main.js` does only when a test page has
+  set `window.__ING_RAG_TEST__ = true`)
 
 Embedder worker ops: `init({modelId = 'Xenova/bge-small-en-v1.5', dtype = 'q8', vendorBase})` → `{modelId, dims, maxTokens}`;
 `count({texts})` → `[tokens]`; `embed({texts, kind: 'passage' | 'query'})` → `[Float32Array]` (normalized; batches of 16;
@@ -67,7 +72,7 @@ Parse worker ops: `parse({bytes, ext, path, maxTokens, overlap})` → `{text, bl
 page for token counts through the embedder (or receive a counting function's results); chunk sizes are measured with the
 model's own tokenizer, never guessed.
 
-## 4. Schema (version 1; `meta.schema_version`; each migration in one transaction)
+## 4. Schema (version 2; `meta.schema_version`; each migration in one transaction)
 
 ```sql
 create table meta(key text primary key, value text);
@@ -89,7 +94,15 @@ create virtual table chunks_vec using vec0(folder_id integer partition key, embe
   -- rowid = chunks.id
 create table emb_cache(model text not null, hash text not null, vec blob not null, primary key(model, hash));
 ```
-`pragma foreign_keys = on`. Vectors are bound as the bytes of a Float32Array (`new Uint8Array(f32.buffer)`): this build of
+Version 2 (1 November 2026): `insert into chunks_fts(chunks_fts, rank) values ('secure-delete', 1)`, so FTS5 takes a deleted row's
+words out of its index at once instead of keeping tombstones.
+
+`pragma foreign_keys = on` and `pragma secure_delete = on` on every connection (SQLite overwrites deleted rows with zeros). Before a
+passage's vector row is deleted its vector is overwritten with zeros (`update chunks_vec set embedding = ?`): sqlite-vec 0.1.6 only
+marks a deleted vector unused and keeps its bytes in its block. Crash safety: the vendored opfs-sahpool file system always told
+SQLite that a RESERVED lock was held, so a journal left by a crash was never rolled back; `vendor.json` patches that answer as SQLite
+3.54.1 gives it (from the locks actually held), and `open()` runs `quick_check` whenever a journal was left behind. A damaged index
+is reported with the code `CORRUPT`. Vectors are bound as the bytes of a Float32Array (`new Uint8Array(f32.buffer)`): this build of
 sqlite-wasm does not bind a Float32Array itself. Checked in headless Chromium (31 October 2026, sqlite-vec-wasm-demo 0.1.6,
 SQLite 3.45.3, vec 0.1.6, opfs-sahpool in a module worker): FTS5 with bm25; a KNN on vec0 with `folder_id = ?` and with
 `folder_id in (select value from json_each(?))` on a partition key or a metadata column returns only the allowed folders;
@@ -122,19 +135,26 @@ rollback works; a reopened database keeps its rows. Phase 2 resolves the allowed
   at most 5,000 files.
 - `rag_read(path, rel, offset, length)` → `{ok, data (base64), size, eof}`; `length` at most 1 MB; `rel` must resolve
   (realpath) inside the chosen folder.
-- Tests use `rig/rag_bridge.py` (an HTTP stand-in that imports the patch's own functions) and `rig/rag_bridge_shim.js`
+- 6.9.3 (`build/desktop/app_rag_693.py`, exact replacements in what `app_rag_692.py` added): what a path really is once its links are
+  resolved is checked step by step below the folder (no hidden step, a searched type), in `rag_list` and `rag_read`, so a link inside
+  the folder cannot reach a hidden file or folder; `rag_forget_folder` also forgets by the path the folder was chosen with.
+- Tests use `rig/rag_bridge.py` (an HTTP stand-in that imports the patch's own functions, with app_rag_693's changes) and `rig/rag_bridge_shim.js`
   (an init script defining `window.pywebview.api.rag_*` over it), so the real Python rules are what the tests exercise.
 
 ## 7. `window.IngRag` (phase 1)
 
 `available()`, `ready()` (opens the store and the embedder), `folders()`, `addFolder()` (the dialog, then
-`folder.add` and an ACL row for "me"), `removeFolder(id)`, `indexFolder(id, {onProgress})` (manual), `stats()`,
+`folder.add` and an ACL row for "me"), `removeFolder(id)`, `indexFolder(id, {onProgress, confirmEmpty})` (manual; a folder that
+lists no files while some are in the search is left alone and its summary has `emptyNow`, so the card can ask; `confirmEmpty`
+takes them out), `rebuild()` (after status `damaged`: a new, empty index, with the folders the app has on its list put back), `stats()`,
 `_store`, `_embedder` (tests). Off unless the page runs in the desktop app; nothing goes online.
 
 ## 8. Tests
 
 Playwright in headless Chromium (`/opt/node-tools/node_modules/playwright`), named `rig/t_rag1_*.js`, run as
-`node rig/t_rag1_x.js <base url> <out>`. A small harness page (`rag/test/harness.html`) loads `rag/main.js` with the
+`node rig/t_rag1_x.js <base url> <out>`. `rig/t_rag1_crash.js` kills the whole browser in the middle of a write, a folder removal
+and a compaction, and checks the index after a restart. `.github/workflows/rag-engines.yml` runs `rig/rag_engine_check.py` (pywebview
+6.2.1: WKWebView on GitHub's Apple silicon and Intel Macs, WebView2 on its Windows PC), so the engines the apps have are checked too. A small harness page (`rag/test/harness.html`) loads `rag/main.js` with the
 stand-in bridge for the unit-level tests; the end-to-end test uses the built page with `rag/` beside it. The vendor tree
 for tests is unpacked from the release "rag-vendor" (see the README); on this build machine it is already unpacked at
 `/tmp/claude-0/-home-user/f70d4091-5e3f-5b2b-9e4a-4f66b5694ecf/scratchpad/rag0/vendor` (the same tree, checked).

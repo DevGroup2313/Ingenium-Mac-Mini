@@ -61,7 +61,7 @@ function rssMB(pid) { try { const m = /VmRSS:\s+(\d+) kB/.exec(fs.readFileSync('
 
   const SECTIONS = ['corpus', 'types', 'headings', 'offsets', 'pages', 'limits', 'overlap', 'metadata', 'facts', 'edge cases', 'robustness', 'hashing', 'big file', 'protocol'];
   const ran = [];
-  const section = async (name, fn) => { try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e)); } ran.push(name); };
+  const section = async (name, fn) => { try { await fn(); ran.push(name); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e)); } };
   const R = {};   // the report of each file (all folders): path -> analysis made in the page
 
   // ----------------------------------------------------------------------------------------------------------- corpus

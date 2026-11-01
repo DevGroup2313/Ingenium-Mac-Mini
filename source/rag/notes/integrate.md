@@ -8,7 +8,7 @@ parts those notes describe were used as they are: nothing in `store*`, `embedder
 ## 1. Things the next parts must know first
 
 1. **The page is 960 MB before anything is read; an embedder worker is 0.6 GB.** All the browser's processes together (ps, RSS) held
-   <<BASE>> MB with the built page open and nothing read; a dedicated worker lives in the renderer's process, so the renderer is where the
+   about 958 MB with the built page open and nothing read; a dedicated worker lives in the renderer's process, so the renderer is where the
    workers show. On the harness page (385 MB idle) an embedder worker added 640 MB (1 worker 1,024 MB, 2 workers 1,645 MB, 3 workers
    2,162 MB peak, passages of 533 tokens; `scratchpad/rag0/bench/bench.log`). **So `main.js` starts ONE embedder worker unless asked
    (`IngRag.config({workers: 2})`)**: two would take the whole past the owner's 2 GB. `IngRag.suggestedWorkers()` still says what
@@ -64,11 +64,29 @@ parts those notes describe were used as they are: nothing in `store*`, `embedder
 
 ## 3. The by-hand test and its numbers
 
-<<TEST>>
+The full run (`node rig/t_rag1_manual.js http://127.0.0.1:8178/ <out>`, 1 November 2026, the combined page of 6.9.2's sources with
+`r202.js` in it, all three fixture folders; log `scratchpad/rag0/manual_int.log`, figures in its `result.json`):
+
+- **102 passed, 0 failed, in 67.7 minutes** on this 4-processor machine (one embedder worker).
+- **72 files, 3,511 passages** (household_papers 20 files and 50 passages; lab_notes 24 and 149; historian_archive 28 and 3,312, the
+  4.27 MB log alone 3,154). By type: txt 3,182, pdf 77, csv 77, md 76, json 42, docx 33, html 24.
+- The three tables of passages agree (3,511 rows each). The text search finds the file of **37 of 37** facts in its first five
+  results (the exact phrase); the vector search finds **35 of 37**; no text-search syntax error.
+- **Memory: peak 1,582 MB**, at minute 67.4 (while reading again), the sum of the resident memory (RSS) of the browser process and all
+  its descendants, sampled every 250 ms (16,130 samples); RSS counts shared pages in every process, so it is an upper bound (the
+  review's PSS peak: 1,256 MB). `performance.measureUserAgentSpecificMemory` needs cross-origin isolation, which the app does not have.
+- Reading again with nothing changed embeds nothing (every file skipped); a reload keeps every row; removing the three folders one by
+  one leaves no row in any table but the version and the one user, and the app forgets the folders too.
+- 253 requests, all to 127.0.0.1; no script or worker error.
+
+After the review's fixes (section 6) the tests were run again; their numbers are in `rag/notes/review.md`.
 
 ## 4. The demo edition
 
-<<DEMO>>
+The gift and demo editions are release builds, and release builds leave `r202.js` out while `build/held.json` names it, so neither
+edition carries the folder search yet. When it is let in: the word "Lector" (which those editions refuse anywhere in the page)
+appears nowhere in `rag/`, `r202.js`, the lines of `r173.js` or the desktop patches (checked in the review of 1 November 2026), and
+`rag/` is not part of the page at all (it is shipped beside it).
 
 ## 5. Left
 

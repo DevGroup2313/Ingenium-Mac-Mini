@@ -118,6 +118,7 @@ async function openBrowser(name, withBridge) {
   const run = { name, ctx, requests: [], external: [], consoleErrors: [], pageErrors: [], workerUrls: [], profile, sampler: null };
   await ctx.route((u) => !ALLOWED(u), (route) => { run.external.push(route.request().url()); route.abort(); });
   ctx.on('request', (r) => run.requests.push(r.url()));
+  await ctx.addInitScript('window.__ING_RAG_TEST__ = true');   // the store's own test operations (debug.*), which the app never has
   if (withBridge) { await ctx.addInitScript('window.__RAG_BRIDGE__ = ' + JSON.stringify(BRIDGE)); await ctx.addInitScript({ path: path.join(SRC, 'rig', 'rag_bridge_shim.js') }); }
   const page = ctx.pages()[0] || await ctx.newPage(); run.page = page;
   page.on('pageerror', (e) => run.pageErrors.push(e.message));
@@ -162,9 +163,9 @@ const ext = (p) => (p.split('.').pop() || '').toLowerCase();
 (async () => {
   await ensureServers();
   const result = { quick: QUICK, startedAt: new Date().toISOString(), cpus: require('os').cpus().length, loadAvg: require('os').loadavg(), sections: [] };
-  const SECTIONS = ['without the bridge', 'loader and card', 'adding folders', 'reading', 'the index', 'reading again', 'reload', 'removing', 'memory and privacy'];
+  const SECTIONS = ['without the bridge', 'loader and card', 'adding folders', 'reading', 'the index', 'reading again', 'plain words', 'reload', 'removing', 'an emptied folder, and starting again', 'memory and privacy'];
   const ran = [];
-  const section = async (name, fn) => { console.log('--- ' + name + ' (' + mins() + ' min)'); try { await fn(); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e).toString().slice(0, 900)); } ran.push(name); };
+  const section = async (name, fn) => { console.log('--- ' + name + ' (' + mins() + ' min)'); try { await fn(); ran.push(name); } catch (e) { ok(false, 'section "' + name + '" stopped: ' + (e && e.stack || e).toString().slice(0, 900)); } };
   const giveUp = () => { if ((Date.now() - T0) / 60000 > MAX_MIN) throw new Error('gave up: more than ' + MAX_MIN + ' minutes'); };
   let base = null;            // the browser without the bridge
   let run = null;             // the browser with the bridge
@@ -452,6 +453,13 @@ const ext = (p) => (p.split('.').pop() || '').toLowerCase();
     ok(busy.jobs === 0 && busy.aria.every((a) => a !== 'true'), 'when all is quiet every "Read it again now" key is usable again', busy);
   });
 
+  // ---- the card's words after the readings, with every note and warning shown (the folder paths left out: they are hers)
+  await section('plain words', async () => {
+    const w = await evalIn(() => { const c = document.getElementById('ragCard').cloneNode(true); c.querySelectorAll('.rag-path').forEach((n) => n.remove()); return { text: c.innerText, notes: c.querySelectorAll('.rag-notes:not([hidden]), .rag-warn:not([hidden])').length }; });
+    const jargon = /\b(embedding|vector|chunk|sqlite|opfs|index(?:er)?|tokeni[sz]|ONNX|RAG|confirmEmpty)\b/i.exec(w.text);
+    ok(!jargon, 'after the readings the whole card, its notes and warnings included (' + w.notes + ' shown), uses plain words', jargon && { word: jargon[0], near: w.text.slice(Math.max(0, jargon.index - 80), jargon.index + 40) });
+  });
+
   await section('reload', async () => {
     phase('reload');
     const before = await evalIn(async () => ({ stats: await IngRag._store.stats(), folders: (await IngRag.folders()).map((f) => [f.id, f.name, f.files, f.passages, f.lastReadAt]), bytes: (await IngRag._store.info()).bytes }));
@@ -508,6 +516,8 @@ const ext = (p) => (p.split('.').pop() || '').toLowerCase();
         if (chunksOfIt >= 200) ok(a.bytes < b.bytes && /gave back/i.test(note1.note), name + ': a big folder (' + chunksOfIt + ' passages) is followed by compact(): the index file went from ' + (b.bytes / 1048576).toFixed(1) + ' to ' + (a.bytes / 1048576).toFixed(1) + ' MB, and the card says Ingenium gave back the room', note1.note);
         else ok(!/gave back/i.test(note1.note), name + ': a small folder (' + chunksOfIt + ' passages) is not compacted', note1.note);
       } else {
+        const vecLeft = await evalIn(async () => (await IngRag._store.debug.sql({ sql: 'select count(*) as n from chunks_vec_vector_chunks00 where vectors <> zeroblob(length(vectors))' }))[0].n);
+        ok(vecLeft === 0, 'and no vector is left in the vector library\'s own storage either (its blocks hold only zeros)', vecLeft);
         ok(Object.entries(a.stats).every(([t, n]) => (t === 'meta' ? n === 1 : t === 'principals' ? n === 1 : n === 0)), 'with every folder removed nothing is left in any table but the settings row and the one user "me"', a.stats);
         if (chunksOfIt >= 200) ok(/gave back/i.test(note1.note), name + ': compact() ran after the last big folder', note1.note);
         note('index file after the last removal: ' + (a.bytes / 1048576).toFixed(2) + ' MB (it was ' + (b.bytes / 1048576).toFixed(2) + ' MB)');
@@ -516,6 +526,47 @@ const ext = (p) => (p.split('.').pop() || '').toLowerCase();
     }
     const none = await evalIn(() => ({ text: document.querySelector('#ragCard .rag-none').textContent, hidden: document.querySelector('#ragCard .rag-none').hidden }));
     ok(!none.hidden && /No folder yet/.test(none.text), 'with no folder left the card says so again', none);
+  });
+
+  // ---- a folder emptied on purpose: the card asks, in plain words, before anything is taken out; and starting the search again
+  await section('an emptied folder, and starting again', async () => {
+    phase('an emptied folder');
+    const T = path.join(OUTA, 'emptied_folder'); fs.rmSync(T, { recursive: true, force: true }); fs.mkdirSync(T, { recursive: true });
+    fs.writeFileSync(path.join(T, 'first.txt'), 'The orchard was planted in the spring of 1911 by the two sisters.\n\nThey kept a ledger of every tree.');
+    fs.writeFileSync(path.join(T, 'second.txt'), 'The well behind the barn was dug again in 1934, after the dry summer.');
+    const name = path.basename(T);
+    await bridgePost('/admin/dialog', { answers: [T] });
+    await P.click('#ragAdd');
+    await P.waitForFunction((n) => [...document.querySelectorAll('#ragCard .rag-item .rag-name')].some((x) => x.textContent === n), name, { timeout: 60000 });
+    ids[name] = await evalIn((n) => +[...document.querySelectorAll('#ragCard .rag-item')].find((r) => r.querySelector('.rag-name').textContent === n).getAttribute('data-id'), name);
+    const s1 = await readFolder(name); await settled(name);
+    ok(s1.files.indexed === 2, name + ': its two files are read', s1.files);
+    fs.unlinkSync(path.join(T, 'first.txt')); fs.unlinkSync(path.join(T, 'second.txt'));
+    const s2 = await readFolder(name); await settled(name);
+    const row = '#ragCard .rag-item[data-id="' + ids[name] + '"]';
+    const q = await evalIn((sel) => { const r = document.querySelector(sel), e = r.querySelector('.rag-empty'); return { shown: !!e && !e.hidden, text: e ? e.textContent : '', facts: r.querySelector('.rag-facts').textContent }; }, row);
+    ok(s2.files.deleted === 0 && s2.emptyNow === 2 && q.shown && /looks empty now, but 2 files from it are still in the folder search/.test(q.text) && /Did you empty the folder on purpose/.test(q.text), name + ': emptied, it is not cleared at once: the card asks whether it was emptied on purpose', q);
+    const jargon = /\b(embedding|vector|chunk|sqlite|index(?:er)?|confirmEmpty)\b/i.exec(q.text);
+    ok(!jargon, name + ': the question is in plain words', jargon && jargon[0]);
+    const before = await evalIn(() => window.__ragLog.done.length);
+    await P.click(row + ' .rag-empty button:has-text("Yes, take them out")');
+    await P.waitForFunction((b) => window.__ragLog.done.length > b, before, { timeout: 120000 });
+    await settled(name);
+    const after = await evalIn(async (sel) => { const r = document.querySelector(sel); const id = +r.getAttribute('data-id'); const f = (await IngRag.folders()).find((x) => x.id === id); return { files: f.files, passages: f.passages, shown: !r.querySelector('.rag-empty').hidden }; }, row);
+    ok(after.files === 0 && after.passages === 0 && !after.shown, name + ': "Yes, take them out" takes its files out of the search, and the question goes', after);
+    // starting the folder search again from nothing (what the card offers when its memory is found damaged)
+    fs.writeFileSync(path.join(T, 'third.txt'), 'A third note, written after the search started again.');
+    const rb = await evalIn(async () => { const r = await IngRag.rebuild(); return { r, state: IngRag.state().status, stats: await IngRag._store.stats(), folders: (await IngRag.folders()).map((f) => ({ name: f.name, files: f.files })) }; });
+    ok(rb.r.rebuilt === true && rb.r.folders === 1 && rb.state === 'open' && rb.stats.folders === 1 && rb.stats.chunks === 0 && rb.folders.length === 1 && rb.folders[0].name === name && rb.folders[0].files === 0,
+      'IngRag.rebuild() starts the search again from nothing and puts back the folders the app has on its list, to be read again', rb);
+    await P.evaluate(() => { const b = document.getElementById('ragRetry'); if (b) b.click(); });
+    await P.waitForFunction((n) => [...document.querySelectorAll('#ragCard .rag-item')].some((r) => r.querySelector('.rag-name').textContent === n && /Not read yet/.test(r.querySelector('.rag-facts').textContent)), name, { timeout: 30000 });
+    ids[name] = await evalIn((n) => +[...document.querySelectorAll('#ragCard .rag-item')].find((r) => r.querySelector('.rag-name').textContent === n).getAttribute('data-id'), name);
+    const s3 = await readFolder(name); await settled(name);
+    ok(s3.files.indexed === 1, 'and the folder can be read again at once (1 file)', s3.files);
+    const rm = await evalIn(async (id) => { const r = await IngRag.removeFolder(id); return { r, stats: await IngRag._store.stats() }; }, ids[name]);
+    ok(rm.r.removed === true && rm.stats.folders === 0 && rm.stats.chunks === 0 && rm.stats.emb_cache === 0, name + ': removed again, nothing of it is left', rm);
+    fs.rmSync(T, { recursive: true, force: true });
   });
 
   await section('memory and privacy', async () => {
