@@ -889,6 +889,21 @@ edit('file:"LFM2.5-1.2B-Thinking-Q4_K_M.gguf",size:730895360,sha256:"7223a220240
      'file:"LFM2.5-1.2B-Thinking-Q4_K_M.gguf",size:730899072,sha256:"4a1e1824f71091f368137b6966094461019f6af3a5aadd96033bee59fc9eaeea"',
      "R116 LFM2.5 1.2B Thinking's new file in the lineup")
 
+# ---- R203 (Ingenium 6.9.2, 31 October 2026): the houses by memory. modules/r203.js holds the lists (new models, compact copies, a list
+# of models for a computer with no graphics chip); these two edits are in the rule that reads them. A cpuOnly entry may be a list
+# (the first model on it that this device holds, as for the normal list), and a device that cannot tell its memory takes the
+# smallest model of a list, which is its last, not its first (a strong model for 32 GB or more would be Scriba's on Safari). ----
+edit('  if(d.cpuOnly&&d.cpuOnly[tier]&&(dev||lineupDevice())===lineupDevice()&&lineupCpuOnly()){var c=ING_LINEUP.models[d.cpuOnly[tier]],u=lineupUsableGB();\n'
+     '    if(c&&(u==null||lineupNeedGB(c)<=u))return d.cpuOnly[tier];}\n',
+     '  /* R203: cpuOnly is a model or a list of models: the first that this device holds; with the memory unknown, the smallest */\n'
+     '  if(d.cpuOnly&&d.cpuOnly[tier]&&(dev||lineupDevice())===lineupDevice()&&lineupCpuOnly()){var cl=[].concat(d.cpuOnly[tier]),u=lineupUsableGB();\n'
+     '    if(u==null){if(ING_LINEUP.models[cl[cl.length-1]])return cl[cl.length-1];}\n'
+     '    else for(var ci=0;ci<cl.length;ci++){var c=ING_LINEUP.models[cl[ci]];if(c&&lineupNeedGB(c)<=u)return cl[ci];}}\n',
+     "R203 cpuOnly is a list: the first model that fits")
+edit('  if(use==null)return v[0];\n',
+     '  if(use==null)return v[v.length-1];  /* R203: memory unknown: the smallest model, the last of the list */\n',
+     "R203 unknown memory takes the smallest model")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
