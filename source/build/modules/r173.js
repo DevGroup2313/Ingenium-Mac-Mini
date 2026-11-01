@@ -206,7 +206,7 @@ var CONF={
     {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search and Ingenium's eyes are here too.",
       ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ragCard"]},
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
-      ids:["ingImportCard","bkCard","stxCard",/^data on this device/]},
+      ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
@@ -243,6 +243,7 @@ var KEYS=[
   ["ingImportCard","import chats bring conversations other assistants transcript history"],
   ["bkCard","backup back up export import restore move moving copy zip file password keys new device carry"],
   ["stxCard","storage space room disk quota limit clean clear library memory full"],
+  ["ingLockCard","sign in sign-in login log in user name password lock locked unlock encryption encrypt encrypted protect protection privacy private secure security recovery phrase seal sealed"],
   [/^data on this device/,"data export import reset erase delete wipe recover earlier moment backup"],
   ["ingPermitCard","licence license licensing permission permissions owner ownership key copyright rights terms legal"]];
 

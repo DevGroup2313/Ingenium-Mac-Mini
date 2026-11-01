@@ -233,15 +233,18 @@ var KDB=null;function kdb(){if(KDB)return KDB;KDB=new Promise(function(res,rej){
   rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error||new Error("this device will not keep a signing key"));};}catch(e){rej(e);}});KDB.catch(function(){KDB=null;});return KDB;}
 function ktx(mode,fn){return kdb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("k",mode),r=fn(t.objectStore("k"));t.oncomplete=function(){res(r&&"result" in r?r.result:undefined);};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store refused the key (it may be full)"));};});});}
 var MEMK={};
-function kget(id){if(typeof indexedDB==="undefined")return Promise.resolve(MEMK[id]||null);return ktx("readonly",function(s){return s.get(id);}).then(function(r){return r||diskGet(id);});}
-function kput(rec){if(typeof indexedDB==="undefined"){MEMK[rec.id]=rec;return Promise.resolve(rec);}return ktx("readwrite",function(s){return s.put(rec,rec.id);}).then(function(){diskPut(rec);return rec;});}
+/* R197: with a sign-in set up (r197), a key kept here is sealed; a plain record and a sealed one are both read (the copy on a computer's disk is sealed by the shell's bridge) */
+function openK(v){var L=typeof window!=="undefined"?window.IngLock:null;return (L&&v&&typeof v==="object"&&v.ing==="sealed")?L.openRec("ingenium_keys","k",v):Promise.resolve(v);}
+function sealK(rec){var L=typeof window!=="undefined"?window.IngLock:null;return (L&&L.on())?L.sealRec("ingenium_keys","k",rec.id,rec):Promise.resolve(rec);}
+function kget(id){if(typeof indexedDB==="undefined")return Promise.resolve(MEMK[id]||null);return ktx("readonly",function(s){return s.get(id);}).then(openK).then(function(r){return r||diskGet(id);});}
+function kput(rec){if(typeof indexedDB==="undefined"){MEMK[rec.id]=rec;return Promise.resolve(rec);}return sealK(rec).then(function(sr){return ktx("readwrite",function(s){return s.put(sr,rec.id);});}).then(function(){diskPut(rec);return rec;});}
 function kdel(id){if(typeof indexedDB==="undefined"){delete MEMK[id];return Promise.resolve();}return ktx("readwrite",function(s){return s.delete(id);}).then(function(){diskDel(id);});}
-function kall(){if(typeof indexedDB==="undefined")return Promise.resolve(Object.keys(MEMK).map(function(k){return MEMK[k];}));return ktx("readonly",function(s){return s.getAll();}).then(function(a){return a||[];});}
+function kall(){if(typeof indexedDB==="undefined")return Promise.resolve(Object.keys(MEMK).map(function(k){return MEMK[k];}));return ktx("readonly",function(s){return s.getAll();}).then(function(a){return Promise.all((a||[]).map(openK));}).then(function(a){return a.filter(Boolean);});}
 function shell(){try{var a=typeof shellApi==="function"?shellApi():null;return a&&typeof a.big_put==="function"&&typeof a.big_get==="function"?a:null;}catch(e){return null;}}
 function diskPut(rec){var a=shell();if(!a)return;try{a.big_put("signing_"+rec.id,JSON.stringify({id:rec.id,label:rec.label,source:rec.source,made:rec.made,pkcs8:b64e(rec.pkcs8),cert:b64e(rec.cert)}));}catch(e){}}
 function diskDel(id){var a=shell();if(a&&typeof a.big_del==="function"){try{a.big_del("signing_"+id);}catch(e){}}}
 function diskGet(id){var a=shell();if(!a)return Promise.resolve(null);return Promise.resolve(a.big_get("signing_"+id)).then(function(r){if(!r||!r.ok)return null;var o=JSON.parse(r.text);
-  var rec={id:o.id,label:o.label,source:o.source,made:o.made,pkcs8:b64d(o.pkcs8),cert:b64d(o.cert)};return ktx("readwrite",function(s){return s.put(rec,rec.id);}).then(function(){return rec;});}).catch(function(){return null;});}
+  var rec={id:o.id,label:o.label,source:o.source,made:o.made,pkcs8:b64d(o.pkcs8),cert:b64d(o.cert)};return sealK(rec).then(function(sr){return ktx("readwrite",function(s){return s.put(sr,rec.id);});}).then(function(){return rec;});}).catch(function(){return null;});}
 function describe(rec){if(!rec)return Promise.resolve(null);var p=certParts(rec.cert);return sha256(rec.cert).then(function(h){return {id:rec.id,label:rec.label,source:rec.source,made:rec.made,cn:p.cn,fingerprint:hex(h)};});}
 var keys={
   /* the device's own key, made the first time it is asked for */

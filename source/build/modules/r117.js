@@ -175,7 +175,9 @@ openExport=function(){var box=modalOpen('<h3>Export your data</h3><p class="smal
     +'<label><input type="checkbox" id="exSources" checked> My sources (BibTeX, RIS and CSL-JSON) and blend houses</label>'
     +'<label><input type="checkbox" id="exSettings" checked> Settings and the list of models (not the model files)</label>'
     +'<label><input type="checkbox" id="exKeys"> Include connection keys and tokens <span class="small muted">(only if the file stays with you)</span></label>'
-    +'<label><input type="checkbox" id="exWhole"> The whole desk, as one backup file (the same as Export a backup)</label></div>'
+    +'<label><input type="checkbox" id="exWhole"> The whole desk, as one backup file (the same as Export a backup)</label>'
+    /* 6.9.2 (R188): a module may register what it keeps, in window.__ingExportProviders ({id,label,files()}): its own line here, its files in the zip */
+    +(window.__ingExportProviders||[]).map(function(p){return '<label><input type="checkbox" id="'+p.id+'" checked> '+p.label+'</label>';}).join('')+'</div>'
     +'<div class="ex-note" id="exNote"></div>'
     +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn ghost" id="exCancel">Cancel</button><button class="btn primary" id="exGo">Make the file</button></div>');
   box.querySelector("#exCancel").onclick=closeModal;var note=box.querySelector("#exNote");
@@ -195,9 +197,11 @@ openExport=function(){var box=modalOpen('<h3>Export your data</h3><p class="smal
     if(on("exWhole"))files.push({name:"ingenium-desk-backup.json",data:JSON.stringify(strip(state))});
     if(on("exApps")){var ap=exAppStores();if(ap.tabula)files.push({name:"apps/tabula-store.json",data:ap.tabula});if(ap.abacus)files.push({name:"apps/abacus-store.json",data:ap.abacus});}
     var wantL=on("exLector"),wantF=on("exFabrica");
-    if(!files.length&&!wantL&&!wantF){ingToast("Tick at least one thing to export.");return;}
+    var prov=(window.__ingExportProviders||[]).filter(function(p){var c=box.querySelector("#"+p.id);return c&&c.checked;});
+    if(!files.length&&!wantL&&!wantF&&!prov.length){ingToast("Tick at least one thing to export.");return;}
     go_.disabled=true;go_.textContent="Gathering…";
-    Promise.all([wantL?exLectorDocs():[],wantF?exFabrica():[]]).then(function(rs){rs[0].forEach(function(f){files.push(f);});rs[1].forEach(function(f){files.push(f);});
+    Promise.all([wantL?exLectorDocs():[],wantF?exFabrica():[]].concat(prov.map(function(p){return Promise.resolve().then(function(){return p.files(strip);}).catch(function(){return [];});}))).then(function(rs){rs[0].forEach(function(f){files.push(f);});rs[1].forEach(function(f){files.push(f);});
+      rs.slice(2).forEach(function(r){(r||[]).forEach(function(f){if(f&&f.name)files.push(f);});});
       if(!files.length){ingToast("Nothing to export yet.");go_.disabled=false;go_.textContent="Make the file";return;}
       files.push({name:"README.txt",data:"Ingenium "+ING_VERSION+", exported "+new Date().toString()+".\nConversations are in Markdown (readable anywhere) and JSON. Sources open in Zotero (BibTeX or RIS). Lector's documents are Word files, with the same text as Markdown beside each. apps/ holds Tabula's and Abacus's own stores as JSON. A Fabrica repository is a git bundle: git clone <name>.bundle opens it with its whole history. The whole-desk backup is read back in Settings, Import a backup.\n"});
       saveFileNative("Ingenium-export-"+day+".zip","application/zip",makeZip(files));closeModal();ingToast(files.length+" files exported.");},

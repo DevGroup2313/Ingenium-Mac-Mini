@@ -303,11 +303,14 @@ function tx(mode,fn){return db().then(function(d){return new Promise(function(re
   t.oncomplete=function(){res(q&&"result" in q?q.result:undefined);};t.onerror=function(){rej(t.error);};t.onabort=function(){rej(t.error||new Error("this device's storage is full"));};});});}
 /* where the device keeps no store at all (a private window), the notes live for this visit only, and the owner is told */
 function useMem(e){if(!MEM){MEM={};setTimeout(function(){toast("This window keeps no store, so issues and pages last only until it closes.");},600);try{console.warn("R141: no store",e);}catch(_){}}}
+/* R197: with a sign-in set up (r197), a record kept here is sealed; a plain record and a sealed one are both read */
+function openH(v){var L=window.IngLock;return (L&&v&&typeof v==="object"&&v.ing==="sealed")?L.openRec(HUBDB,"apps",v):Promise.resolve(v);}
+function sealH(rec){var L=window.IngLock;return (L&&L.on())?L.sealRec(HUBDB,"apps",rec.id,rec):Promise.resolve(rec);}
 function getRec(id){if(MEM)return Promise.resolve(MEM[id]?clone(MEM[id]):null);
-  return tx("readonly",function(s){return s.get(id);}).then(function(x){return x||null;},function(e){useMem(e);return null;});}
-function putRec(rec){if(MEM){MEM[rec.id]=clone(rec);return Promise.resolve();}return tx("readwrite",function(s){return s.put(rec,rec.id);});}
+  return tx("readonly",function(s){return s.get(id);}).then(function(x){return openH(x);}).then(function(x){return x||null;},function(e){useMem(e);return null;});}
+function putRec(rec){if(MEM){MEM[rec.id]=clone(rec);return Promise.resolve();}return sealH(rec).then(function(sr){return tx("readwrite",function(s){return s.put(sr,rec.id);});});}
 function delRec(id){if(MEM){delete MEM[id];return Promise.resolve();}return tx("readwrite",function(s){return s.delete(id);});}
-function allRecs(){if(MEM)return Promise.resolve(Object.keys(MEM).map(function(k){return clone(MEM[k]);}));return tx("readonly",function(s){return s.getAll();}).then(function(a){return a||[];});}
+function allRecs(){if(MEM)return Promise.resolve(Object.keys(MEM).map(function(k){return clone(MEM[k]);}));return tx("readonly",function(s){return s.getAll();}).then(function(a){return Promise.all((a||[]).map(openH));}).then(function(a){return a.filter(Boolean);});}
 
 var LABELS0=[{name:"bug",color:"#d73a4a",desc:"Something does not work"},{name:"enhancement",color:"#a2eeef",desc:"Something new, or something better"},
   {name:"documentation",color:"#0075ca",desc:"The guide, the notes, the README"},{name:"question",color:"#d876e3",desc:"Something to find out"},{name:"idea",color:"#7057ff",desc:"A thought to try one day"}];
