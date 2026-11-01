@@ -69,8 +69,14 @@ body[data-motion="minimal"] #ingLockDoor .ild-card{animation:none}
 #ingLockCard details.ild-more summary{cursor:pointer;font-size:13px;color:var(--ink-3);padding:2px 0}
 #ingLockCard details.ild-more[hidden]{display:none}
 #ingLockCard details.ild-more p{margin:6px 0 0}
-.intro-protect-line{margin:14px auto 0;max-width:36ch;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
-.intro-protect-line .intro-tour{font-size:13.5px;margin-bottom:3px}
+.intro-corner.intro-corner-l{right:auto;left:13px}
+/* 6.9.4, her words (1 November 2026): "The new sign in prompt section looks a bit cluttered on the introduction door and detracts
+   from the look of the app, please adjust it and find an alternate way of placing it." The offer is a small key in the card's
+   top-left corner, the twin of the theme switch in the top-right one; its words are its tooltip and its name for screen readers */
+.intro-lockpill .seg-btn{color:var(--ink-2);cursor:pointer;transition:color .15s ease,background .15s ease}
+.intro-lockpill .seg-btn svg{width:1.05em;height:1.05em;display:block}
+.intro-lockpill .seg-btn:hover{color:var(--accent-deep);background:var(--accent-soft)}
+.intro-lockpill .seg-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p197"]="started";}catch(_){}
 /* R197 · the sign-in and the seal: see the note at the top of its styles. window.IngLock is its door for the other parts:
@@ -547,16 +553,19 @@ function paintCard(){var c=$("ingLockCard");if(!c)return;var say=$("ingLockSay")
   sel.onchange=function(){var m=parseInt(sel.value,10)||0;patchRec(function(r){r.idle=m;});toast(REC.idle?"Ingenium will lock after "+idleWords(REC.idle)+" away.":"Ingenium will lock only when you press Lock now.");};
   more.textContent="Sealed: the desk (chats, notes, settings, projects, documents, Career) in this browser's store and its recovery shelf; the long texts (attachments, pages, documents), the conversations you brought in from elsewhere, the signing keys and Fabrica's issues and pages in the larger store; and on the computer apps the copies on disk written from now on. Not sealed: backups made from the Backup page (plain zips, as before), the carried apps' own documents in their frames, model files, the app library and Fabrica's saved versions of your apps, and on the computer apps the earlier copies of the desk kept in desk-backups. While protection is on, a window of its own opened from an app does not share your notes and reminders with the main window (that shared copy would hold them in plain text).";}
 
-/* ---------- the welcome door: a third choice beside Enter ---------- */
-function doorKey(){var en=$("introEnter");if(!en||$("introProtect")||$("introProtectNote")||REC)return;
-  if(!S()){var p=D.createElement("p");p.className="intro-protect-line";p.id="introProtectNote";p.textContent="A sign-in with a password can be added from Settings when this copy is opened in the Ingenium apps, or at localhost or over https.";en.parentNode.insertBefore(p,en.nextSibling);return;}
-  /* a quiet line under Enter, in the look of the tour's own link, so the door still has one clear key */
-  var b=D.createElement("button");b.type="button";b.className="intro-tour";b.id="introProtect";b.textContent="Protect this copy with a sign-in";
+/* ---------- the welcome door: an optional sign-in, from a small key in the card's top-left corner ---------- */
+var LOCK_SVG='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3" y="7" width="10" height="7.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.3 7V5.1a2.7 2.7 0 0 1 5.4 0V7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.6" r="1.05" fill="currentColor"/></svg>';
+function doorKey(){var en=$("introEnter");if(!en||$("introProtect")||REC)return;
+  /* where no sign-in can be set up (a page that is not secure), the door says nothing: Settings, Your data explains it */
+  if(!S())return;
+  var card=en.closest?en.closest(".intro-card"):null;if(!card)return;
+  var corner=D.createElement("div");corner.className="intro-corner intro-corner-l";
+  var pill=D.createElement("div");pill.className="seg intro-theme intro-lockpill";
+  var b=D.createElement("button");b.type="button";b.className="seg-btn";b.id="introProtect";
+  b.title="Protect this copy with a sign-in";b.setAttribute("aria-label","Protect this copy with a sign-in (optional): a name and a password at the door, and everything Ingenium keeps on this device sealed with them");
+  b.innerHTML=LOCK_SVG;
   b.onclick=function(){setup({onDone:function(){try{W_.hideIntro();}catch(e){}}});};
-  var p2=D.createElement("p");p2.className="intro-protect-line";p2.id="introProtectLine";
-  var sub=D.createElement("span");sub.textContent="Optional: a name and a password at the door, and everything Ingenium keeps on this device sealed with them.";
-  p2.appendChild(b);p2.appendChild(D.createElement("br"));p2.appendChild(sub);
-  en.parentNode.insertBefore(p2,en.nextSibling);}
+  pill.appendChild(b);corner.appendChild(pill);card.appendChild(corner);}
 
 /* ---------- at boot ---------- */
 function noRecord(){var c=view('<h1>Ingenium</h1><p class="ild-sub">This copy\'s desk is sealed, but the lock that opens it is missing from this browser\'s store.</p>'

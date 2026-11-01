@@ -40,8 +40,16 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300)));
   await p.goto(URL_); await waitBoot(p); await p.waitForTimeout(800);
   // 1. the door as before, with the optional third choice
-  const door = await p.evaluate(() => ({ shown: !document.getElementById('introDoor').hasAttribute('hidden'), enter: !!document.getElementById('introEnter'), protect: (document.getElementById('introProtect') || {}).textContent || null, lock: window.IngLock && !window.IngLock.active(), p197: window.__ingParts.p197 }));
-  ok(door.shown && door.enter && /Protect this copy with a sign-in/.test(door.protect || '') && door.lock === true && door.p197 === 'running', 'a fresh profile: the welcome door as before, with the optional "Protect this copy with a sign-in" beside Enter, and no lock set', door);
+  const door = await p.evaluate(() => { const k = document.getElementById('introProtect'), card = document.querySelector('#introDoor .intro-card'), en = document.getElementById('introEnter');
+    const kr = k && k.closest('.intro-lockpill').getBoundingClientRect(), cr = card && card.getBoundingClientRect(), th = document.querySelector('#introDoor .intro-corner:not(.intro-corner-l) .intro-theme'), tr = th && th.getBoundingClientRect();
+    const column = card ? [...card.querySelectorAll('p,button,a,span,div')].filter((x) => !x.closest('.intro-corner') && /sign-in|password/i.test(x.textContent || '')).map((x) => x.textContent.trim().slice(0, 60)) : null;
+    return { shown: !document.getElementById('introDoor').hasAttribute('hidden'), enter: !!en, protect: k ? (k.title + ' | ' + k.getAttribute('aria-label')) : null, text: k ? k.textContent.trim() : null,
+      corner: kr && cr ? { left: Math.round(kr.left - cr.left), top: Math.round(kr.top - cr.top), w: Math.round(kr.width), h: Math.round(kr.height), themeH: tr ? Math.round(tr.height) : null, sameRowAsTheme: tr ? Math.abs(kr.top - tr.top) < 3 && Math.abs(kr.height - tr.height) < 3 : null } : null,
+      column, lock: window.IngLock && !window.IngLock.active(), p197: window.__ingParts.p197 }; });
+  ok(door.shown && door.enter && /Protect this copy with a sign-in/.test(door.protect || '') && door.lock === true && door.p197 === 'running', 'a fresh profile: the welcome door as before, with the optional sign-in offered by a key named "Protect this copy with a sign-in", and no lock set', door);
+  // 6.9.4, her words: "The new sign in prompt section looks a bit cluttered on the introduction door ... find an alternate way of placing it."
+  ok(door.corner && door.corner.left < 40 && door.corner.top < 40 && door.corner.w <= 56 && door.corner.h <= 44 && door.corner.sameRowAsTheme === true && door.text === '' && Array.isArray(door.column) && door.column.length === 0,
+    'the offer is a small lock key in the card\'s top-left corner, the twin of the theme switch (same row, same height), and nothing about a sign-in is left under Enter', door);
   // a long text already on the device, and a theme, before the lock is turned on
   await p.evaluate(async (a) => { const id = IngBig.newId(); window.__t700big = id; state.t700ref = id; state.theme = 'night'; applyTheme(); await IngBig.put(id, a.t); state.t700old = a.oid; await IngBig.put(a.oid, a.o); saveState(); }, { t: BIGTEXT, o: OLDTEXT, oid: OLDID });
   // her notes, a reminder and a parked thought; the page keeps a shared copy of these for a window of its own (R123), in plain text while no lock is set
@@ -221,8 +229,8 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   const insCard = await p3.evaluate(() => ({ say: document.getElementById('ingLockSay').textContent, keys: [...document.querySelectorAll('#ingLockCard button')].map(b => b.textContent) }));
   await p3.evaluate(() => IngLock.setup()); await p3.waitForTimeout(300);
   const insSetup = await p3.evaluate(() => ({ text: (document.querySelector('#ingLockDoor:not([hidden]) p') || {}).textContent || '', form: !!document.querySelector('#ingLockDoor #ildP1'), rec: localStorage.getItem('ingenium_lock') }));
-  ok(!ins.key && /opened in the Ingenium apps, or at localhost or over https/.test(ins.note) && /Off\./.test(insCard.say) && /cannot be turned on/.test(insCard.say) && insCard.keys.length === 0 && /cannot be turned on/.test(insSetup.text) && !insSetup.form && insSetup.rec === null,
-    'where the browser offers no cryptography: no protect key at the door (a note says where it works), the card says it cannot be turned on here, and asking anyway refuses', { ins, insCard, insSetup });
+  ok(!ins.key && ins.note === '' && /Off\./.test(insCard.say) && /cannot be turned on/.test(insCard.say) && insCard.keys.length === 0 && /cannot be turned on/.test(insSetup.text) && !insSetup.form && insSetup.rec === null,
+    'where the browser offers no cryptography: no protect key and no note on the door (Settings says where it works), the card says it cannot be turned on here, and asking anyway refuses', { ins, insCard, insSetup });
   const seed = (a) => { try { if (a.insecure) Object.defineProperty(window, 'isSecureContext', { get: () => false, configurable: true }); if (!sessionStorage.getItem('__t700seeded')) { localStorage.setItem('ingenium_v4', a.env); localStorage.setItem('ingenium_lock', a.rec); sessionStorage.setItem('__t700seeded', '1'); } } catch (e) {} };
   const ctx4 = await b.newContext({ viewport: { width: 1280, height: 900 } }); await ctx4.addInitScript(seed, { env: sealedEnv, rec: sealedRec, insecure: true });
   const p4 = await ctx4.newPage(); const errs4 = []; p4.on('pageerror', e => errs4.push(e.message.slice(0, 300)));
