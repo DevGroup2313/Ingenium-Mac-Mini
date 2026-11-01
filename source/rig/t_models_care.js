@@ -12,9 +12,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const parts = await p.evaluate(() => window.__ingParts);
   ok(parts.p47 === 'running' && parts.p46 === 'running', 'the models part (p47) runs beside the academic part', JSON.stringify({ p46: parts.p46, p47: parts.p47 }));
 
-  // 1. the verified quality table: 13 house models with Fast, Balanced and Best; each variant a file, a size and a 64-hex fingerprint
+  // 1. the verified quality table: 17 house models (13 until 6.9.2) with Fast, Balanced and Best (and a Compact for the 7-9B models, 6.9.2); each variant a file, a size and a 64-hex fingerprint
   const table = await p.evaluate(() => { const T = IngQuality.table; const keys = Object.keys(T); let n = 0, good = 0; keys.forEach(k => Object.keys(T[k]).forEach(q => { n++; const v = T[k][q]; if (/^[0-9a-f]{64}$/.test(v.sha256) && v.size > 1e8 && /\.gguf$/.test(v.file) && v.url.indexOf('https://huggingface.co/') === 0) good++; })); return { keys: keys.length, n, good, gemma: !!T['gemma-4-12b'], q4: T['qwen3.5-4b'].Q4_K_M.sha256 === ING_LINEUP.models['qwen3.5-4b'].sha256 && T['qwen3.5-4b'].Q4_K_M.size === ING_LINEUP.models['qwen3.5-4b'].size }; });
-  ok(table.keys === 13 && table.n === table.good && table.n >= 50 && !table.gemma, 'the table holds 13 house models and every variant has a file, a size and a fingerprint; Gemma 4 (one form) is not in it', JSON.stringify(table));
+  ok(table.keys === 17 && table.n === table.good && table.n >= 50 && !table.gemma, 'the table holds 17 house models (13, and 4 more in 6.9.2: MiniCPM5 2B, Qwen3.8 27B, Qwen3.6 35B-A3B, Granite 4.2 8B) and every variant has a file, a size and a fingerprint; Gemma 4 (one form) is not in it', JSON.stringify(table));
   ok(table.q4, "a house's Fast variant is the very file the lineup already shipped (same size, same fingerprint)", String(table.q4));
 
   // 2. the strip on the tiles, and what choosing Best does
@@ -77,14 +77,14 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // 6.7: the catalogue has a room of its own on the Models page (r173); its tab is pressed first, as a person would
   await p.evaluate(() => { const t = document.getElementById('rmT-models-catalogue'); if (t) t.click(); }); await p.waitForTimeout(300);
   const cat = await p.evaluate(() => { const box = document.getElementById('catBox'); const groups = [...box.querySelectorAll('.cat-group')].map(g => g.textContent); return { n: ING_CATALOG.length, rows: box.querySelectorAll('.cat-row').length, groups, eyes: ING_CATALOG.filter(e => e.eyes).length, code: ING_CATALOG.filter(e => e.code).length, vision: ING_CATALOG.filter(e => e.vision).every(e => e.vision.repos.length && e.vision.prefer.length), more: !!box.querySelector('.cat-more'), filters: [...box.querySelectorAll('.cat-tools .seg-btn')].map(b => b.textContent) }; });
-  ok(cat.n === 36 && cat.eyes >= 10 && cat.code >= 3 && cat.vision, 'the catalogue holds 36 models; those that read pictures carry a projector listing, and the coders are marked', JSON.stringify({ n: cat.n, eyes: cat.eyes, code: cat.code }));
+  ok(cat.n === 42 && cat.eyes >= 10 && cat.code >= 3 && cat.vision, 'the catalogue holds 42 models (36, and 6 strong ones added in 6.9.2); those that read pictures carry a projector listing, and the coders are marked', JSON.stringify({ n: cat.n, eyes: cat.eyes, code: cat.code }));
   ok(cat.groups.length === 2 && /^Fits this device · \d+/.test(cat.groups[0]) && /^Too large for this device · \d+/.test(cat.groups[1]) && cat.more, 'on a 16 GB device the list is grouped into what fits and what is too large, the large ones folded away', JSON.stringify(cat.groups));
   ok(cat.filters.join(',') === 'All,Answers at once,Thinks first,For code,Reads pictures', 'the filters are there', cat.filters.join(','));
   await p.evaluate(() => { [...document.querySelectorAll('#catBox .cat-tools .seg-btn')].find(b => b.textContent === 'Reads pictures').click(); }); await p.waitForTimeout(400);
   const eyes = await p.evaluate(() => { const rows = [...document.querySelectorAll('#catBox .cat-row')]; return { n: rows.length, all: rows.every(r => r.querySelector('.cat-tag.eyes')) }; });
   ok(eyes.n >= 3 && eyes.all, 'Reads pictures shows only the models with eyes', JSON.stringify(eyes));
   await p.evaluate(() => { [...document.querySelectorAll('#catBox .cat-tools .seg-btn')].find(b => b.textContent === 'All').click(); }); await p.waitForTimeout(300);
-  await p.fill('#catBox input[type=search]', 'granite'); await p.waitForTimeout(400);
+  await p.fill('#catBox input[type=search]', 'granite 4.0'); await p.waitForTimeout(400);
   const found = await p.evaluate(() => [...document.querySelectorAll('#catBox .cat-row b')].map(b => b.textContent));
   ok(found.length === 2 && found.every(t => /Granite/.test(t)), 'the search narrows the list to the two Granite 4.0 models', JSON.stringify(found));
   await p.fill('#catBox input[type=search]', ''); await p.waitForTimeout(400);

@@ -213,8 +213,8 @@ async function axeRun(p) {
     ok(late.sound === 'everyday' && late.zebra === 'more' && late.more && !late.moreAfter, 'a card added later is filed by its heading (Sound to Everyday); one nobody named goes to More, shown only while it holds something', late);
 
     // ---------------- 12 · Blend: rooms, the steps, a whole blend with a stand-in model ----------------
-    await p.evaluate(() => { window.__INGENIUM_DEVICE = { ramGB: 16, cores: 8 }; const L = ING_LINEUP.models; state.models = (state.models || []).filter(m => !/^hs_/.test(m.id));
-      [['hs_velox', 'lfm2.5-1.2b-instruct', 'Velox copy'], ['hs_scriba', 'qwen3.5-2b', 'Scriba copy'], ['hs_magister', 'qwen3.5-9b', 'Magister copy'], ['hs_faber', 'mellum2.1-12b-thinking', 'Faber copy']].forEach(x => {
+    await p.evaluate(() => { window.__INGENIUM_DEVICE = { ramGB: 16, cores: 8 }; /* 6.9.2: with 16 GB Scriba is Gemma 4 E4B (it was Qwen3.5 2B) */ const L = ING_LINEUP.models; state.models = (state.models || []).filter(m => !/^hs_/.test(m.id));
+      [['hs_velox', 'lfm2.5-1.2b-instruct', 'Velox copy'], ['hs_scriba', 'gemma-4-e4b', 'Scriba copy'], ['hs_magister', 'qwen3.5-9b', 'Magister copy'], ['hs_faber', 'mellum2.1-12b-thinking', 'Faber copy']].forEach(x => {
         state.models.push({ id: x[0], customName: x[2], fileState: 'ready', fileName: L[x[1]].file, sizeBytes: L[x[1]].size, paramB: L[x[1]].params, stored: true, shellStored: true, type: 'GGUF', color: '#6a3fb5' }); });
       blCanRun = () => true; saveState(); });
     await go(p, 'blend', 1000); await room(p, 'blend', 'new');
