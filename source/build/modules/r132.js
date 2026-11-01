@@ -49,7 +49,9 @@ FILE_MAX_CHARS=1000000;
     pend={raw:raw,ok:ok};if(timer)clearTimeout(timer);timer=setTimeout(flush,ok?0:250);};
   window.addEventListener("pagehide",flush);
   document.addEventListener("visibilitychange",function(){if(document.hidden)flush();});
-  function adopt(raw){var incoming;try{incoming=JSON.parse(raw);}catch(e){return false;}
+  /* R197: a sealed desk (the lock is on) is not read here: it waits for the sign-in, which opens it */
+  function adopt(raw){if(/^\{"ing":"locked"/.test(raw||"")){if(window.IngLock&&window.IngLock.adoptRaw)return window.IngLock.adoptRaw(raw);window.__ingLockedRaw=raw;window.__ingLocked=true;return true;}
+    var incoming;try{incoming=JSON.parse(raw);}catch(e){return false;}
     var migrated=migrateFrom(incoming);
     for(var k in state)delete state[k];
     for(var k2 in migrated)state[k2]=migrated[k2];

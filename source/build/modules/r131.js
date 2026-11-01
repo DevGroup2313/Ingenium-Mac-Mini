@@ -39,9 +39,13 @@
     dbp.catch(function(){dbp=null;});return dbp;}
   function tx(stores,mode,fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction(stores,mode),out={};fn(t,out);
     t.oncomplete=function(){res(out.v);};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store refused it (it may be full)"));};});});}
-  function metaGet(k){return tx(["meta"],"readonly",function(t,o){var r=t.objectStore("meta").get(k);r.onsuccess=function(){o.v=r.result;};}).catch(function(){return null;});}
-  function convGet(id){return tx(["conv"],"readonly",function(t,o){var r=t.objectStore("conv").get(id);r.onsuccess=function(){o.v=r.result||null;};}).catch(function(){return null;});}
-  function convAll(){return tx(["conv"],"readonly",function(t,o){var r=t.objectStore("conv").getAll();r.onsuccess=function(){o.v=r.result||[];};}).catch(function(){return [];});}
+  /* R197: with a sign-in set up (r197), what is kept here is sealed; a plain record and a sealed one are both read */
+  function openV(sn,v){var L=window.IngLock;return (L&&v&&typeof v==="object"&&v.ing==="sealed")?L.openRec(DBN,sn,v):Promise.resolve(v);}
+  function sealV(sn,k,v){var L=window.IngLock;return (L&&L.on())?L.sealRec(DBN,sn,k,v):Promise.resolve(v);}
+  function openAll(sn,a){var out=[],i=0;function next(){if(i>=a.length)return Promise.resolve(out.filter(Boolean));var part=a.slice(i,i+6);i+=6;return Promise.all(part.map(function(v){return openV(sn,v);})).then(function(r){out=out.concat(r);return next();});}return next();}
+  function metaGet(k){return tx(["meta"],"readonly",function(t,o){var r=t.objectStore("meta").get(k);r.onsuccess=function(){o.v=r.result;};}).catch(function(){return null;}).then(function(v){return openV("meta",v);});}
+  function convGet(id){return tx(["conv"],"readonly",function(t,o){var r=t.objectStore("conv").get(id);r.onsuccess=function(){o.v=r.result||null;};}).catch(function(){return null;}).then(function(v){return openV("conv",v);});}
+  function convAll(){return tx(["conv"],"readonly",function(t,o){var r=t.objectStore("conv").getAll();r.onsuccess=function(){o.v=r.result||[];};}).catch(function(){return [];}).then(function(a){return openAll("conv",a);});}
 
   /* ---------- reading an export ---------- */
   function bufOf(f){return (typeof libReadBuf==="function")?libReadBuf(f):f.arrayBuffer();}
@@ -115,14 +119,14 @@
         var stores=[],i=0;
         function batch(){var part=p.convs.slice(i,i+40);if(!part.length)return Promise.resolve();
           say("Keeping the conversations: "+Math.min(i+part.length,p.convs.length)+" of "+p.convs.length+"…");
-          return tx(["conv"],"readwrite",function(t){part.forEach(function(c){t.objectStore("conv").put(c);});}).then(function(){i+=part.length;return batch();});}
+          return Promise.all(part.map(function(c){return sealV("conv",c.id,c);})).then(function(sp){return tx(["conv"],"readwrite",function(t){sp.forEach(function(c){t.objectStore("conv").put(c);});});}).then(function(){i+=part.length;return batch();});}
         return batch().then(function(){
           p.convs.forEach(function(c){if(byId[c.id])upd++;else fresh++;byId[c.id]={id:c.id,title:c.title,created:c.created,updated:c.updated,n:c.n,chars:c.chars,project:c.project};});
           var lst=Object.keys(byId).map(function(k){return byId[k];}).sort(function(a,b){return String(b.updated).localeCompare(String(a.updated));});
           var pk=keepProjects(p.projs);
           var tot=lst.reduce(function(a,x){return a+(x.chars||0);},0),msgs=lst.reduce(function(a,x){return a+(x.n||0);},0);
           var rec={at:Date.now(),convs:lst.length,msgs:msgs,chars:tot,projects:(state.projects||[]).filter(function(x){return x.fromClaude;}).length,other:r.other.slice(0,40),notes:p.notes};
-          return tx(["meta"],"readwrite",function(t){t.objectStore("meta").put(lst,"list");t.objectStore("meta").put(rec,"info");}).then(function(){
+          return Promise.all([sealV("meta","list",lst),sealV("meta","info",rec)]).then(function(sv){return tx(["meta"],"readwrite",function(t){t.objectStore("meta").put(sv[0],"list");t.objectStore("meta").put(sv[1],"info");});}).then(function(){
             var s=st();s.n=lst.length;s.msgs=msgs;s.chars=tot;s.at=rec.at;saveState();IDX=null;
             try{if(navigator.storage&&navigator.storage.persist&&!/Firefox\//.test(navigator.userAgent))navigator.storage.persist().catch(function(){});}catch(e){}
             return {fresh:fresh,updated:upd,convs:lst.length,msgs:msgs,chars:tot,projAdded:pk.added,projDocs:pk.more,notes:p.notes,other:r.other};});});});});};

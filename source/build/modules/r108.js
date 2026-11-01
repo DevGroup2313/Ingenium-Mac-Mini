@@ -463,18 +463,26 @@ function postCard(p){var wrap=h("div");if(p==="portfolio"){wrap.appendChild(h("p
   if(P){var c=h("div","l-card");c.appendChild(h("b",null,esc(P.title||P.name)));if(P.org)c.appendChild(h("span","org",esc(P.org)));
     if(P.asks&&P.asks.length){var as=h("div","l-asks");P.asks.forEach(function(t){as.appendChild(h("span","l-ask",esc(t)));});c.appendChild(as);}
     var r=h("div","l-row");r.appendChild(h("span",null,esc(P.closes||(fmtBytes(P.chars||0)+" of text, kept on this device"))));var ks=h("span");
-    ks.appendChild(btn("quiet","Change",function(){pickPost(p);}));ks.appendChild(btn("quiet","Remove",function(){IngBig.del(P.ref);L7().posts[p]=null;saveSoon();paintBrief();}));r.appendChild(ks);c.appendChild(r);wrap.appendChild(c);return wrap;}
+    ks.appendChild(btn("quiet","Change",function(){pickPost(p);}));ks.appendChild(btn("quiet","Remove",function(){IngBig.del(P.ref);L7().posts[p]=null;saveSoon();paintBrief();}));
+    /* 6.9.2: one posting, two pages: a posting kept here can go to the Career Studio as well, once (it is known there by this id) */
+    if(window.IngCareer&&!/^career:/.test(P.from||""))ks.appendChild(btn("quiet","Also bring it to the Career Studio",function(){try{IngCareer.bringPost(p);}catch(e){}}));
+    r.appendChild(ks);c.appendChild(r);wrap.appendChild(c);return wrap;}
   var c2=h("div","l-card");c2.appendChild(h("b",null,p==="job"?"Add the posting":"Add the programme's call"));
   c2.appendChild(h("span","org",esc("Lector draws out what they ask for and fits every document to it. A file (Word, PDF, text or a saved web page), or the text pasted in.")));
   var ks2=h("div","l-keys");ks2.appendChild(btn("sm","Choose a file",function(){pickPost(p);}));
+  /* 6.9.2: or a posting the Career Studio already keeps */
+  try{var ops=window.IngCareer?IngCareer.openPosts():[];if(ops.length){var cs=document.createElement("select");cs.className="l-sel";cs.setAttribute("aria-label","A posting kept in the Career Studio");
+    var o0=document.createElement("option");o0.value="";o0.textContent="From the Career Studio…";cs.appendChild(o0);ops.forEach(function(x){var op=document.createElement("option");op.value=x.id;op.textContent=x.title+(x.org?" · "+x.org:"");cs.appendChild(op);});
+    cs.onchange=function(){if(!cs.value)return;IngCareer.postFor(cs.value).then(function(x){if(!x||!x.text)return;var ex={from:"career:"+x.id};if(x.title)ex.title=x.title;if(x.org)ex.org=x.org;if(x.closes)ex.closes=x.closes;keepPost(p,x.text,"From the Career Studio",ex);});};ks2.appendChild(cs);}}catch(e){}
   var ta=null;ks2.appendChild(btn("sm","Paste the text",function(){if(ta){ta.focus();return;}ta=document.createElement("textarea");ta.className="l-paste";ta.placeholder="Paste "+what+" here";c2.appendChild(ta);
     var kp=h("div","l-keys");kp.appendChild(btn("sm pri","Keep it",function(){keepPost(p,ta.value,"Pasted text");}));c2.appendChild(kp);ta.focus();}));
   c2.appendChild(ks2);wrap.appendChild(c2);return wrap;}
 function pickPost(p){var i=document.createElement("input");i.type="file";i.accept=".docx,.pdf,.txt,.md,.html,.htm,.rtf";
   i.onchange=function(){var f=i.files&&i.files[0];if(!f)return;readAsText(f).then(function(t){if(/\.html?$/i.test(f.name))t=lxUnTag(t);keepPost(p,t,f.name);},function(e){ingToast("It could not be read: "+(e&&e.message||e));});};i.click();}
-function keepPost(p,text,name){text=String(text||"").replace(/\r/g,"").trim();if(text.length<40){ingToast("That is too short to be "+(p==="job"?"a posting":"a programme's call")+".");return;}
+function keepPost(p,text,name,extra){text=String(text||"").replace(/\r/g,"").trim();if(text.length<40){ingToast("That is too short to be "+(p==="job"?"a posting":"a programme's call")+".");return;}
   var meta=parsePost(text),ref=IngBig.newId(),old=L7().posts[p];
-  IngBig.put(ref,text).then(function(){if(old&&old.ref)IngBig.del(old.ref);L7().posts[p]=Object.assign({id:"p"+Date.now().toString(36),ref:ref,name:name,chars:text.length,at:Date.now()},meta);saveState();paintBrief();});}
+  /* 6.9.2: a posting lent by the Career Studio keeps its title, organisation and closing date, and where it came from */
+  IngBig.put(ref,text).then(function(){if(old&&old.ref)IngBig.del(old.ref);L7().posts[p]=Object.assign({id:"p"+Date.now().toString(36),ref:ref,name:name,chars:text.length,at:Date.now()},meta,extra||{});saveState();paintBrief();});}
 function parsePost(text){var L=text.split("\n").map(function(s){return s.trim();}).filter(Boolean);
   var title=(L[0]||"").replace(/^#+\s*/,"").slice(0,90),org=(L[1]&&L[1].length<110?L[1]:"").replace(/^#+\s*/,"").slice(0,90);
   var asks=L.filter(function(s){return /^([-•*·▪●◦–]|\d+[.)])\s+/.test(s);}).map(function(s){return s.replace(/^([-•*·▪●◦–]|\d+[.)])\s+/,"");}).filter(function(s){return s.length>8;})
@@ -1364,7 +1372,7 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.cl
 ORDER.forEach(function(k){if(L7().brief.apps.indexOf(k)>=0)prepare(k);});
 window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost,
   /* 6.8.3: for the Career Studio (r188), which writes with Lector's model, to Lector's standard */
-  plan:modelPlan,styleFix:styleFix,charter:CHARTER,banned:BANNED};
+  plan:modelPlan,styleFix:styleFix,charter:CHARTER,banned:BANNED,wordsChanged:wordsChanged,keepPost:keepPost};
 /* 6.2: for the tests */
 try{window.IngLector.atlasOf=atlasOf;window.IngLector.atlasMd=atlasMd;window.IngLector.atlasDoc=atlasDoc;window.IngLector.midTab=midTab;window.IngLector.askWritten=askWritten;window.IngLector.askSend=askSend;}catch(e){}
 try{if($("page-lector").classList.contains("active")){document.body.classList.add("lx7-on");render();}}catch(e){}

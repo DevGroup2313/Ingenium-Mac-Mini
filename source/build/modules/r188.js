@@ -307,6 +307,41 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-guide{font-size:13.5px;line-height:1.55;max-height:46vh;overflow:auto}
 #cs .c-guide h2{font:600 15px/1.3 var(--c-serif);margin:12px 0 4px}
 #cs .c-guide h2:first-child{margin-top:0}
+/* 6.9.2 · PhD and job applications at her pace: dates and reminders, referees, the interview, the reading list, minutes, the posting checked again, LinkedIn as a difference */
+#cs .c-week{display:flex;flex-direction:column;gap:6px;padding:2px 2px 8px;border-bottom:1px solid var(--c-hair2);margin-bottom:2px}
+#cs .c-week .c-label{margin:0 2px 2px}#cs .c-week .c-note{padding:0 2px}
+#cs .c-wk{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--c-hair);border-radius:10px;padding:7px 10px;background:linear-gradient(var(--c-accs),transparent),linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);cursor:pointer;color:var(--c-ink1)}
+#cs .c-wk:hover{transform:translateY(-1px);box-shadow:var(--c-pop)}
+#cs .c-wk b{font:600 13px/1.3 var(--c-sans);color:var(--c-warn)}#cs .c-wk span{font-size:12.5px;color:var(--c-ink2)}
+#cs .c-mins{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
+#cs .c-mins .c-label{margin:0}#cs .c-mins p{margin:0;font-size:13.5px;color:var(--c-ink2)}
+#cs .c-fitlist{gap:6px}
+#cs .c-dates,#cs .c-ivcard,#cs .c-mock{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
+#cs .c-mock{gap:6px;padding:10px 12px;align-items:flex-start}#cs .c-mock b{font:600 14px/1.3 var(--c-serif)}
+#cs .c-date{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 0;border-top:1px solid var(--c-hair2)}
+#cs .c-date .tx{flex:1 1 180px;min-width:0}#cs .c-date .tx b{display:block;font-size:14px}#cs .c-date .tx small{display:block;color:var(--c-ink3);font-size:12.5px}
+#cs .c-remind{flex:0 1 auto}#cs .c-remind .c-btn[disabled]{opacity:.45;cursor:default}
+#cs .c-adddate{align-items:flex-end}#cs .c-adddate .field{flex:1 1 140px}
+#cs .c-ref{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
+#cs .c-ref .c-ref-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}#cs .c-ref .c-ref-h b{font:600 14.5px/1.3 var(--c-serif);flex:1 1 auto;min-width:0}
+#cs .c-ref .c-ref-h a{color:var(--c-acc)}
+#cs .c-ref small{color:var(--c-ink3);font-size:12.5px}
+#cs .c-ref .c-ta{min-height:56px}
+#cs .c-prep{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#cs .c-prep li{display:flex;align-items:center;gap:10px}#cs .c-prep li input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:var(--c-acc)}
+#cs .c-prep li label{flex:1 1 auto;cursor:pointer;font-size:13.5px}#cs .c-prep li.c-ck-done label{color:var(--c-ink3);text-decoration:line-through}
+#cs .c-ivdays{font:600 20px/1 var(--c-serif);color:var(--c-ink1)}
+#cs .c-rc{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--c-ring);border-radius:12px;background:linear-gradient(var(--c-accs),transparent),linear-gradient(var(--c-a),var(--c-b))}
+#cs .c-rc .c-rv-old,#cs .c-rc .c-rv-new{border-radius:8px;padding:5px 9px;font-size:13px}#cs .c-rc .c-rv-old{background:var(--c-bads)}#cs .c-rc .c-rv-new{background:var(--c-oks)}
+#cs .c-rc p{margin:0}#cs .c-rc small{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-ink3)}
+#cs .c-more{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#cs .c-more .c-label{margin:0}#cs .c-more .c-chip .c-btn{padding:0 4px;margin-left:2px}
+#cs .c-web li .c-btn,#cs .c-web li .c-chip{margin-left:8px;vertical-align:middle}
+#cs .c-an{font-size:13.5px;line-height:1.55;max-height:40vh;overflow:auto;white-space:normal}#cs .c-an h4{font:600 13.5px/1.3 var(--c-serif);margin:8px 0 2px}#cs .c-an h4:first-child{margin-top:0}#cs .c-an p{margin:0 0 4px;white-space:pre-wrap}
+#cs .c-ligone{color:var(--c-warn) !important;font-weight:600}
+#cs.c-one .c-adddate .field{flex:1 1 100%}
+#cs:not(.c-one) .c-only-one{display:none}
+/* the reading page's brief: a posting kept in the Career Studio, chosen there */
+#lx7 select.l-sel{margin-top:6px;max-width:100%;padding:6px 9px;border-radius:9px;border:1px solid var(--l-hair);background:var(--l-wellbg);box-shadow:var(--l-well);color:var(--l-ink1);font:inherit}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p188"]="started";}catch(_){}
 /* R188 · THE CAREER STUDIO (6.8.3, 28 October 2026)
@@ -350,6 +385,9 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
      - Learn: how each piece is built, in short steps.
    Nothing is searched online unless she presses for it, and what is found is for her to read: the studio does not write
    from it. */
+/* 6.9.2 (31 October 2026): dates and reminders, referees, the interview, an application exported as a folder, a reading
+   list read by the reading page, what she can do in N minutes, the posting checked again, LinkedIn as a difference; her
+   words and the note stand before those functions below (search "6.9.2: PhD and job applications"). */
 (function r188Career(){
 "use strict";
 if(window.__r188)return;window.__r188=1;
@@ -415,7 +453,7 @@ function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
   try{if(W.LX&&LX.busy){say("Lector is using the model. Wait for it, or pause it in Lector.");return true;}}catch(e){}return false;}
 function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses.");return true;}
-function begin(opp,what){RUN.busy=true;RUN.stop=false;RUN.what=what;RUN.live="";RUN.opp=opp?opp.id:null;CS().ui.show="work";render();}
+function begin(opp,what){RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.opp=opp?opp.id:null;CS().ui.show="work";render();}
 function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.opp=null;render();}
 function stopNow(){RUN.stop=true;try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}}
 function failed(e){var m=String(e&&e.message||e);end();if(m!=="stopped")say("It could not be finished: "+m);}
@@ -435,7 +473,8 @@ function itemsText(){var P=CS().profile,out=[];
 function appsWanted(){var P=CS().profile,out=[];if(P.isMe===false)return out;try{lxState().runs.forEach(function(r){if(r.kind==="app"&&r.status==="done"&&P.use.apps[r.app||r.name]!==false&&out.every(function(x){return x.name!==r.name;}))out.push(r);});}catch(e){}return out;}
 function loadText(ref){try{return ref?Promise.resolve(IngBig.load(ref)).then(function(t){return String(t||"");},function(){return "";}):Promise.resolve("");}catch(e){return Promise.resolve("");}}
 /* everything the profile holds, read once for a piece of writing: {items, cv, linkedin, files[], apps[], writing, letters, sources[]} */
-function gatherProfile(o){o=o||{};var P=CS().profile,M=lectorMe(),runs=appsWanted();
+function gatherProfile(o){o=o||{};return gatherProfile0(o).then(function(G){return readingNotes(o.opp).then(function(rn){G.reading=rn;return G;},function(){G.reading=[];return G;});});}
+function gatherProfile0(o){var P=CS().profile,M=lectorMe(),runs=appsWanted();
   return Promise.all([P.use.cv&&M.cv?loadText(M.cv.ref):"",P.use.linkedin&&P.linkedin?loadText(P.linkedin.ref):"",
       Promise.all(P.files.filter(function(f){return f.use!==false;}).map(function(f){return loadText(f.ref).then(function(t){return {name:f.name,text:t};});})),
       Promise.all(runs.map(function(r){return loadText(r.analysisRef).then(function(t){var a={};try{a=JSON.parse(t)||{};}catch(e){}return {name:r.name,an:a};});})),
@@ -450,14 +489,18 @@ function profileBlock(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.p
   if(G.linkedin)parts.push("MY LINKEDIN PROFILE (its headline and summary):\n"+cut(G.linkedin,Math.floor(R*0.05)));
   if(G.files.length){var per=Math.floor(R*0.16/G.files.length);parts.push("MY DOCUMENTS:\n"+G.files.map(function(f){return "### "+f.name+"\n"+cut(f.text,per);}).join("\n\n"));}
   if(G.apps.length){var pa=Math.floor(R*0.12/G.apps.length);parts.push("MY APPS, AS LECTOR READ THEM (what I designed and built):\n"+G.apps.map(function(a){return "### "+a.name+"\n"+cut(a.text,pa);}).join("\n\n"));}
+  if(G.reading&&G.reading.length){var pr=Math.floor(R*0.1/G.reading.length);parts.push("MY READING NOTES (what the reading page found in works I read for this application: take from them only what they say, never as facts about me):\n"+G.reading.map(function(a){return "### "+a.title+"\n"+cut(a.text,pr);}).join("\n\n"));}
   return parts.join("\n\n");}
-function material(G){return [G.items,G.cv,G.linkedin].concat(G.files.map(function(f){return f.text;})).concat(G.apps.map(function(a){return a.text;})).join("\n");}
+function material(G){return [G.items,G.cv,G.linkedin].concat(G.files.map(function(f){return f.text;})).concat(G.apps.map(function(a){return a.text;})).concat((G.reading||[]).map(function(a){return a.text;})).join("\n");}
 
 /* ---------------- an application: its posting, and the reading of it against the profile ---------------- */
 function newOpp(kind,text,from){var o={id:uid("op"),kind:kind||"job",title:"",org:"",closes:"",due:"",stage:"considering",at:Date.now(),from:from||"",ref:null,chars:0,docs:{},older:{},emails:[],practice:{crit:{},qs:[]},notes:""};
   try{var m=LXR().parsePost(text);o.title=m.title||"";o.org=m.org||"";o.closes=m.closes||"";o.due=dateIn(m.closes);}catch(e){}
   o.ref=IngBig.newId();o.chars=text.length;return Promise.resolve(IngBig.put(o.ref,text)).then(function(){CS().opps.unshift(o);CS().ui.open=o.id;CS().ui.show="work";save();return o;});}
-function postText(o){return loadText(o&&o.ref);}
+function postOnly(o){return loadText(o&&o.ref);}
+/* 6.9.2: the posting and the further particulars added to it (a PDF of particulars, a handbook), read together by the model, the limits and the checklist */
+function postText(o){if(!o)return Promise.resolve("");var more=(o.more||[]).filter(function(m){return m.ref;});if(!more.length)return loadText(o.ref);
+  return Promise.all([loadText(o.ref)].concat(more.map(function(m){return loadText(m.ref);}))).then(function(ts){var out=ts[0]||"";more.forEach(function(m,i){if(ts[i+1])out+="\n\nFURTHER PARTICULARS ("+m.name+"):\n"+ts[i+1];});return out;});}
 function kindWord(k){return {job:"posting",phd:"programme's call",grant:"call for applications",other:"posting"}[k]||"posting";}
 /* the reading, line by line: what the model is asked to return, and how it is read back */
 function readMsgs(G,post,o,scale){var R=room()*scale;
@@ -492,7 +535,7 @@ function bandOf(r){var c=r.crit||[];if(!c.length)return null;var E=c.filter(func
     stretch:"Apply only if you can show the missing criteria: add the evidence to your profile and read it again, or ask the contact first whether they would consider you.",poor:"Do not apply as things stand. If the missing criteria are things you have done, add them to your profile and read it again."}[b];
   return {band:b,word:BANDS[b],why:why,advice:adv,rule:"The rule: every essential criterion shown and most desirable ones, a strong fit; every essential shown, a possible fit; one essential not shown (or up to a third), a stretch; more, not a fit. A criterion your profile does not show may still be one you meet: then add it to your profile."};}
 function readOpp(o){if(busyNow()||needModel())return;begin(o,"Reading it against your profile");
-  Promise.all([postText(o),gatherProfile({})]).then(function(x){var post=x[0],G=x[1];if(!post)throw new Error("the posting's text is no longer kept; add it again");
+  Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){var post=x[0],G=x[1];if(!post)throw new Error("the posting's text is no longer kept; add it again");
     return ask(function(sc){return readMsgs(G,post,o,sc);},1500,0.2).then(function(t){var r=parseRead(t);
       if(!r.crit.length)throw new Error("the model's answer could not be read as criteria. Try again, or choose a larger model for Lector");
       if(r.title&&!o.titleSet)o.title=r.title.slice(0,120);if(r.org&&!o.orgSet)o.org=r.org.slice(0,120);if(r.closes&&(!o.closes||o.closes.length>40))o.closes=r.closes.slice(0,80);if(!o.due&&dateIn(o.closes))o.due=dateIn(o.closes);
@@ -567,20 +610,26 @@ function docAsk(kind,o,G,post,em){
       (kind==="sample"?"\n\nMY OWN WRITING (choose among these only):\n"+(G.writing.length?G.writing.map(function(w,i){return "["+(i+1)+"] "+cut(w,Math.floor(R*0.45/G.writing.length));}).join("\n\n"):"(nothing kept)"):prose?"\n\n"+voiceBlock(G,R):"")+(kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"?"\n\n"+sourcesBlock(G):"");
     return [{role:"system",content:sys(kind==="cv"?"You are now writing a CV: plain, factual lines, nothing promotional.":"",prose&&kind!=="email")},{role:"user",content:u}];};}
 /* the second reading: every claim held to the profile, every figure to what it gives; the placeholders kept */
-function examine(kind,body,G,post,o){if(!body||body.length<80)return Promise.resolve(body);RUN.what="Examining it against your profile";render();
-  return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now the examiner of a draft. You return the revised text and nothing else.")},
-    {role:"user",content:"Below is the draft of my "+(kind==="email"?"email":DOCS[kind][0].toLowerCase())+". Examine it against THE PROFILE and return it revised.\n1. Strike every claim about me that the profile does not support, and every skill, post, date, figure or name it does not give.\n2. Make every figure and date exactly what the profile gives.\n3. Keep the shape, the headings and the placeholders in square brackets where they stand.\n4. "+english()+"; no contractions; no promotional words.\nReturn only the revised text: no notes on what you changed.\n\n"+profileBlock(G,R*0.6)+"\n\n"+(critBlock(o)?critBlock(o)+"\n\n":"")+"THE DRAFT:\n"+body}];},Math.round(body.length/3)+400,0.2)
-    .then(function(x){var r=clean(x);if(!r||r.length<body.length*0.45||/^(the draft|here is|revised)/i.test(r.slice(0,24)))return body;return r;},function(e){if(String(e&&e.message)==="stopped")throw e;return body;});}
+/* 6.9.2: for the documents of a doctoral application the examiner is given the reading page's own instructions (a claim inferred
+   marked as inferred, one idea to a paragraph, the limit kept, a citation only where a source supports it), and the share of the
+   words it changed is kept, to be shown with the document as the reading page shows it */
+function examine(kind,body,G,post,o){EXAM.last=null;if(!body||body.length<80)return Promise.resolve(body);RUN.what="Examining it against your profile";render();
+  var doc=/^(statement|purpose|proposal|funding|supporting|teaching)$/.test(kind),lim=doc?limitFor(post,kind):null,k=3;function n(){return (++k)+". ";}
+  return ask(function(sc){var R=room()*sc;k=3;return [{role:"system",content:sys("You are now the examiner of a draft"+(doc?", as an Oxford or Cambridge doctoral examiner would be":"")+". You return the revised text and nothing else.")},
+    {role:"user",content:"Below is the draft of my "+(kind==="email"?"email":DOCS[kind][0].toLowerCase())+". Examine it against THE PROFILE"+(doc?" as an Oxford or Cambridge doctoral examiner would, against the material that follows,":"")+" and return it revised.\n1. Strike every claim about me that the profile does not support, and every skill, post, date, figure or name it does not give.\n2. Make every figure and date exactly what the profile gives.\n3. Keep the shape, the headings and the placeholders in square brackets where they stand.\n"+
+      (doc?n()+"Mark as inferred (\"on this reading\", \"the evidence suggests\") every claim that is inferred rather than shown, and call nothing proven; no superlative without a measure beside it.\n"+n()+"One idea to a paragraph, the topic sentence first; take out filler, repetition and every promotional word; prefer the concrete to the general.\n"+n()+"Keep each citation in square brackets only where the source supports the sentence; take it out where it does not; add none that is not on MY SOURCES.\n"+(lim?n()+limitLine(lim)+"\n":""):"")+
+      n()+english()+"; no contractions; no promotional words.\nReturn only the revised text: no notes on what you changed.\n\n"+profileBlock(G,R*0.6)+"\n\n"+(critBlock(o)?critBlock(o)+"\n\n":"")+"THE DRAFT:\n"+body}];},Math.round(body.length/3)+400,0.2)
+    .then(function(x){var r=clean(x);if(!r||r.length<body.length*0.45||/^(the draft|here is|revised)/i.test(r.slice(0,24))){EXAM.last=0;return body;}EXAM.last=wordsChanged(body,r);return r;},function(e){if(String(e&&e.message)==="stopped")throw e;EXAM.last=0;return body;});}
 function clean(t){t=String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").trim();t=t.replace(/^```(?:markdown|md)?\n([\s\S]*?)\n```$/,"$1");var L=t.split("\n");while(L.length&&/^#\s/.test(L[0]))L.shift();return L.join("\n").trim();}
 /* figures the profile does not give, and the places left for her to fill */
 function checks(md,mat){var miss=[],seen={};(String(md).match(/\b\d[\d,.]*\d\b|\b\d{2,}\b/g)||[]).forEach(function(n){var k=n.replace(/[.,]+$/,"");if(seen[k]||k.replace(/\D/g,"").length<2)return;seen[k]=1;if(mat.indexOf(k)<0&&mat.indexOf(k.replace(/,/g,""))<0)miss.push(k);});
   return {figures:miss.slice(0,20),fills:(String(md).match(/\[[^\]\n]{2,160}\]/g)||[]).length};}
 function writeDoc(o,kind,em){if(busyNow()||needModel())return Promise.resolve(false);begin(o,"Writing the "+(kind==="email"?"email":DOCS[kind][0].toLowerCase()));
-  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"})]).then(function(x){var post=x[0],G=x[1];
+  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding",opp:o})]).then(function(x){var post=x[0],G=x[1];
     if(!G.items&&!G.cv&&!G.files.length&&!G.apps.length)throw new Error("your profile is empty. Add your CV or a few entries in Your profile first: the studio writes only from what it holds");
     return ask(docAsk(kind,o,G,post,em),kind==="cv"||kind==="proposal"||kind==="supporting"||kind==="funding"?2200:kind==="statement"||kind==="purpose"?2000:kind==="teaching"?1500:kind==="sample"?900:kind==="email"?700:1300,kind==="cv"?0.35:0.5)
       .then(function(t){return kind==="sample"?clean(t):examine(kind,clean(t),G,post,o);}).then(function(md){var sf={md:md,line:""};try{if(kind!=="email"&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;
-        var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
+        var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";ck.exam=EXAM.last;var ref=IngBig.newId();
         return Promise.resolve(IngBig.put(ref,md)).then(function(){var rec={ref:ref,made:Date.now(),model:modelName(),chk:ck};
           if(kind==="email"){rec.id=uid("em");rec.role=em.role;rec.purpose=em.purpose;o.emails.unshift(rec);o.sv={kind:"email",id:rec.id};}
           else{keepOlder(o,kind);o.docs[kind]=rec;o.sv={kind:kind};}
@@ -594,14 +643,14 @@ var TUNE=[["Shorter","Make it about a fifth shorter: keep every point that matte
   ["Essential criteria first","Put the evidence for the essential criteria first."]];
 function reviseDoc(o,v,rec,note){if(busyNow()||needModel())return Promise.resolve(false);note=String(note||"").trim();if(note.length<4){say("Say what should change first.");return Promise.resolve(false);}
   var kind=v.kind,isMail=kind==="email",label=isMail?"email":DOCS[kind][0].toLowerCase().replace(/^tailored cv$/,"tailored CV");begin(o,"Improving the "+label);
-  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding"}),loadText(rec.ref)]).then(function(x){var post=x[0],G=x[1],cur=x[2],lim=isMail?null:limitFor(post,kind);
+  return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding",opp:o}),loadText(rec.ref)]).then(function(x){var post=x[0],G=x[1],cur=x[2],lim=isMail?null:limitFor(post,kind);
     if(!cur||cur.length<40)throw new Error("the draft could not be read");
     return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now revising a draft of mine as I ask. You return the whole revised text and nothing else.",!isMail&&kind!=="cv")},
       {role:"user",content:"Revise my "+label+" as I ask below, and change nothing else.\nWHAT I ASK: "+note+"\n"+(lim?limitLine(lim)+"\n":"")+
         "Keep its form: the headings, their order and every placeholder in square brackets, unless what I ask changes them. Add no claim, skill, post, date, figure, name or source that THE PROFILE does not give. "+english()+"; no contractions; no promotional words.\nReturn only the revised text: no notes on what you changed.\n\n"+
         (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.15))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.5)+"\n\nTHE DRAFT:\n"+cur}];},Math.round(cur.length/3)+600,0.4)
     .then(function(t){var r=clean(t);if(!r||r.length<Math.min(80,cur.length*0.3))throw new Error("the model gave back too little, so the draft stays as it was");return examine(kind,r,G,post,o);})
-    .then(function(md){var sf={md:md,line:""};try{if(!isMail&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";var ref=IngBig.newId();
+    .then(function(md){var sf={md:md,line:""};try{if(!isMail&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";ck.exam=EXAM.last;var ref=IngBig.newId();
       if(!isMail&&wayOf(o)==="step")return Promise.resolve(IngBig.put(ref,md)).then(function(){dropReview(o);o.review={kind:kind,base:rec.ref,ref:ref,note:note,at:Date.now(),dec:{},why:{},chk:ck};o.improve=false;o.edit=false;o.tab="doc";save();return "review";});
       return Promise.resolve(IngBig.put(ref,md)).then(function(){var made={ref:ref,made:Date.now(),model:modelName(),chk:ck,note:note};
         if(isMail){rec.older=[{ref:rec.ref,made:rec.made,model:rec.model,chk:rec.chk,note:rec.note||""}].concat(rec.older||[]);while(rec.older.length>2){var z=rec.older.pop();try{IngBig.del(z.ref);}catch(e){}}Object.assign(rec,made);}
@@ -641,7 +690,7 @@ function look(o,key,q,answer,isQ){if(!answer||answer.trim().length<20){say("Writ
   slot.answer=answer;save();begin(o,"Looking at your answer with you");
   gatherProfile({}).then(function(G){return ask(lookMsgs(o,G,q,answer,isQ),600,0.3);}).then(function(t){slot.fb=parseLook(t);slot.fbAt=Date.now();save();end();},failed);}
 function questions(o){if(busyNow()||needModel())return;begin(o,"Choosing questions to practise");
-  Promise.all([postText(o),gatherProfile({})]).then(function(x){return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now an interviewer preparing questions.")},
+  Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now an interviewer preparing questions.")},
     {role:"user",content:"Write eight questions an interview panel for "+to(o)+" would be likely to ask me: from what it asks for, and from the concerns my profile leaves (the criteria not shown or partly shown). One question to a line, each beginning with \"Q: \", and nothing else.\n\nTHE "+kindWord(o.kind).toUpperCase()+":\n"+cut(x[0],Math.floor(R*0.3))+"\n\n"+(critBlock(o)||"")+"\n\n"+profileBlock(x[1],R*0.4)}];},700,0.5);})
     .then(function(t){var qs=String(t).split("\n").map(function(l){var m=/^\s*(?:\d+[.)]\s*)?(?:\*\*)?Q:\s*(.+)$/i.exec(l);return m?m[1].replace(/\*\*/g,"").trim():"";}).filter(Boolean).slice(0,10);
       if(!qs.length)throw new Error("no questions came back. Try again");o.practice.qs=qs.map(function(q){return {id:uid("q"),q:q,answer:"",fb:null};});save();end();},failed);}
@@ -689,17 +738,31 @@ function unzip(buf){var u8=new Uint8Array(buf),dv=new DataView(buf),i=u8.length-
       (dv.getUint16(p+10,true),dv.getUint32(p+20,true),dec.decode(u8.subarray(p+46,p+46+dv.getUint16(p+28,true))),dv.getUint32(p+42,true));
     p+=46+dv.getUint16(p+28,true)+dv.getUint16(p+30,true)+dv.getUint16(p+32,true);}
   return q.then(function(){return out;});}
-function importLinkedIn(files){var P=CS().profile,got=[],others=[],summary=[];
+/* 6.9.2: imported again, the export is read as a difference against what is there: an entry unchanged is kept as it is; one
+   new or changed is offered in Found in your sources; one gone from the export is flagged, for her to keep or drop; an entry
+   she changed herself (it became her own) or dropped before is never touched. The first import still enters every entry at once. */
+function importLinkedIn(files){var P=CS().profile,got=[],others=[],skipped=[],summary=[],perFile=[];
   var read=files.map(function(f){if(/\.zip$/i.test(f.name))return f.arrayBuffer().then(unzip);return (f.text?f.text():readAsText(f)).then(function(t){return [{name:f.name,text:t}];});});
-  return Promise.all(read).then(function(all){[].concat.apply([],all).forEach(function(c){var k=liKind(c.name),rows=csvObjs(c.text);
+  return Promise.all(read).then(function(all){[].concat.apply([],all).forEach(function(c){var k=liKind(c.name),rows=csvObjs(c.text),short=c.name.replace(/^.*\//,"");
       if(k==="profile"){rows.forEach(function(r){var nm=[col(r,["first name"]),col(r,["last name"])].filter(Boolean).join(" ");if(nm&&!P.name)P.name=nm;var hl=col(r,["headline"]),sm=col(r,["summary"]);if(hl)summary.push("Headline: "+hl);if(sm)summary.push("Summary: "+sm);});return;}
-      var M=LI[k];if(!M){if(rows.length&&/\.csv$/i.test(c.name)&&!/connections|messages|invitations|ad_|ads|inferences|logins|security|registration|phone|email|rich_media|receipts|saved|search|learning|endorsement|recommendations_given/i.test(c.name))others.push(c);return;}
-      rows.forEach(function(r){var t=col(r,M.title);if(!t)return;got.push({id:uid("it"),sec:M.sec,title:t.slice(0,200),place:col(r,M.place).slice(0,200),from:col(r,M.from),to:col(r,M.to),text:M.text.map(function(x){return col(r,[x]);}).filter(Boolean).join("\n").slice(0,2000),src:"linkedin",at:Date.now()});});});
+      var M=LI[k];if(!M){if(rows.length&&/\.csv$/i.test(c.name)){if(/connections|messages|invitations|ad_|ads|inferences|logins|security|registration|phone|email|rich_media|receipts|saved|search|learning|endorsement|recommendations_given/i.test(c.name))skipped.push(short.replace(/\.csv$/i,""));else others.push(c);}return;}
+      var n0=got.length;rows.forEach(function(r){var t=col(r,M.title);if(!t)return;got.push({id:uid("it"),sec:M.sec,title:t.slice(0,200),place:col(r,M.place).slice(0,200),from:col(r,M.from),to:col(r,M.to),text:M.text.map(function(x){return col(r,[x]);}).filter(Boolean).join("\n").slice(0,2000),src:"linkedin",at:Date.now()});});
+      perFile.push({name:short,rows:rows.length,kept:got.length-n0,sec:M.sec});});
     if(!got.length&&!summary.length)throw new Error("nothing in it was recognised as LinkedIn's export. Add the .zip LinkedIn sends you, or its Profile, Positions, Education and Skills files");
-    P.items=P.items.filter(function(it){return it.src!=="linkedin";}).concat(got);
+    var first=!P.linkedin,old=P.items.filter(function(it){return it.src==="linkedin";}),oldBy={},dropped=(P.linkedin&&P.linkedin.dropped)||{},added=0,changed=0,kept=0,gone=0,sugg=[];
+    old.forEach(function(it){oldBy[liKey(it)]=it;});
+    if(first)P.items=P.items.concat(got);
+    else got.forEach(function(nw){var k=liKey(nw),ex=oldBy[k];
+      if(ex){delete oldBy[k];if(liSame(ex,nw)){delete ex.gone;kept++;}else{changed++;sugg.push(Object.assign(nw,{src:"linkedin-new",note:"Changed in your export",was:ex.id}));}return;}
+      if(P.items.some(function(it){return it.src!=="linkedin"&&liKey(it)===k;}))return;if(dropped[k])return;
+      added++;sugg.push(Object.assign(nw,{src:"linkedin-new",note:"New in your export"}));});
+    if(!first)Object.keys(oldBy).forEach(function(k){oldBy[k].gone=Date.now();gone++;});
+    P.suggested=(P.suggested||[]).filter(function(x){return x.src!=="linkedin-new";}).concat(sugg);
     var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,summary.join("\n\n"))).then(function(){if(P.linkedin&&P.linkedin.ref){try{IngBig.del(P.linkedin.ref);}catch(e){}}
-      P.linkedin={ref:ref,n:got.length,at:Date.now(),others:others.map(function(c){return c.name.replace(/^.*\//,"");})};P.at=Date.now();save();render();
-      say(got.length+" entr"+(got.length===1?"y":"ies")+" came from your LinkedIn export. Look them over in Your entries: change or remove any.");});});}
+      P.linkedin={ref:ref,n:P.items.filter(function(it){return it.src==="linkedin";}).length,at:Date.now(),others:others.map(function(c){return c.name.replace(/^.*\//,"");}),skipped:skipped,files:perFile,added:first?got.length:added,changed:changed,gone:gone,kept:kept,dropped:dropped};
+      P.at=Date.now();if(sugg.length)CS().ui.ppart="found";save();render();
+      say(first?got.length+" entr"+(got.length===1?"y":"ies")+" came from your LinkedIn export. Look them over in Your entries: change or remove any.":
+        "Read as a difference: "+kept+" unchanged, "+added+" new and "+changed+" changed (offered in Found in your sources), "+gone+" no longer in the export (flagged in Your entries). Your own changes were not touched.");});});}
 /* entries suggested from her CV, LinkedIn and documents: each one she keeps or drops; none enters the profile by itself */
 function suggest(){if(busyNow()||needModel())return;begin(null,"Reading your sources for entries");
   gatherProfile({}).then(function(G){if(!G.cv&&!G.files.length&&!G.linkedin)throw new Error("add your CV or a document first: entries are suggested from them");
@@ -736,14 +799,14 @@ function roles(){if(busyNow()||needModel())return;begin(null,"Weighing the kinds
       CS().roles={at:Date.now(),model:modelName(),list:rs.slice(0,6)};save();end();if(!rs.length)say("Nothing came back. Try again, or say more of what you are looking for in Your profile.");},failed);}
 /* ---------------- her own draft, looked at with her: never rewritten ---------------- */
 function reviewMine(o,kind,text){if(!text||text.trim().length<120){say("Write or paste your draft first: a few paragraphs at least.");return;}o.mine=o.mine||{};o.mine[kind]={text:text,at:Date.now()};save();if(busyNow()||needModel())return;
-  begin(o,"Looking at your draft with you");Promise.all([postText(o),gatherProfile({})]).then(function(x){return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now a frank, kind reviewer. You never rewrite the draft and never write a new one: you help me make my own better.")},
+  begin(o,"Looking at your draft with you");Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now a frank, kind reviewer. You never rewrite the draft and never write a new one: you help me make my own better.")},
     {role:"user",content:"Here is my own draft of my "+DOCS[kind][0].toLowerCase()+" for "+to(o)+". Look at it against the posting, the criteria and my profile. Answer in exactly this form, a few lines of each, and nothing else:\nWORKS: what works, and why\nMISSING: a criterion or a point it does not yet answer\nUNSUPPORTED: a claim my profile does not support, quoted, or none\nWORDING: a phrase of mine, quoted, that could be plainer or stronger, and why (do not rewrite it)\nNEXT: the one thing to do first\n\nMY DRAFT:\n"+text+"\n\nTHE "+kindWord(o.kind).toUpperCase()+":\n"+cut(x[0],Math.floor(R*0.2))+"\n\n"+(critBlock(o)||"")+"\n\n"+profileBlock(x[1],R*0.5)}];},900,0.3);})
     .then(function(t){var fb={};String(t).replace(/<think>[\s\S]*?<\/think>/g,"").split("\n").forEach(function(l){var m=/^\s*(?:[-*]\s*)?(WORKS|MISSING|UNSUPPORTED|WORDING|NEXT):\s*(.*)$/i.exec(l.replace(/\*\*/g,""));if(m&&m[2].trim()){var k=m[1].toUpperCase();(fb[k]=fb[k]||[]).push(m[2].trim());}});
       if(!Object.keys(fb).length)fb.RAW=[String(t).trim().slice(0,1500)];o.mine[kind].fb=fb;save();end();},failed);}
 /* ---------------- online, only when she presses for it ---------------- */
 function fetchPosting(url,kind){url=String(url||"").trim();if(!/^https?:\/\/\S+$/i.test(url)){say("Give the whole address, beginning with https://");return;}
   if(typeof fetchPageText!=="function"){say("This device cannot fetch pages.");return;}say("Fetching the posting from its address…");
-  fetchPageText(url,40000).then(function(t){t=String(t||"").trim();if(t.length<200)throw new Error("too little text came back; paste the posting instead");return newOpp(kind,t,url);}).then(function(){CS().ui.room="apps";render();},function(e){say("It could not be fetched: "+(e&&e.message||e));});}
+  fetchPageText(url,40000).then(function(t){t=String(t||"").trim();if(t.length<200)throw new Error("too little text came back; paste the posting instead");return newOpp(kind,t,url).then(function(o){o.url=url;o.fetchedAt=Date.now();save();return o;});}).then(function(){CS().ui.room="apps";render();},function(e){say("It could not be fetched: "+(e&&e.message||e));});}
 function lookUp(o){if(typeof webSearch!=="function"){say("This device cannot search online.");return;}var q=[o.org,o.title].filter(Boolean).join(" ").trim();if(!q){say("Give it a title or an organisation first.");return;}
   say("Searching online for "+q+"…");webSearch(q,6).then(function(rs){o.web={at:Date.now(),q:q,results:rs.map(function(x){return {title:String(x.title||x.url).slice(0,200),url:x.url,snippet:String(x.snippet||x.text||"").slice(0,400)};})};save();render();},function(e){say("The search did not work: "+(e&&e.message||e));});}
 
@@ -828,8 +891,10 @@ function dueWords(o){var n=daysLeft(o);if(n==null)return o.closes?"Closes: "+o.c
 function stageWord(k){return (STAGES.filter(function(x){return x[0]===k;})[0]||STAGES[0])[1];}
 function sortedOpps(){return CS().opps.slice().sort(function(a,b){var fa=FINISHED[a.stage]?1:0,fb=FINISHED[b.stage]?1:0;if(fa!==fb)return fa-fb;var da=daysLeft(a),db=daysLeft(b);
   if(da!=null&&db!=null&&da!==db)return da-db;if(da!=null&&db==null)return -1;if(db!=null&&da==null)return 1;return b.at-a.at;});}
-function removeOpp(o){var S=CS();try{IngBig.del(o.ref);}catch(e){}Object.keys(o.docs).forEach(function(k){try{IngBig.del(o.docs[k].ref);}catch(e){}(o.older[k]||[]).forEach(function(x){try{IngBig.del(x.ref);}catch(e){}});});
-  o.emails.forEach(function(x){try{IngBig.del(x.ref);}catch(e){}(x.older||[]).forEach(function(y){try{IngBig.del(y.ref);}catch(e){}});});S.opps=S.opps.filter(function(x){return x.id!==o.id;});S.ui.open=null;show("list");save();render();}
+/* the readings the reading page made for an application's reading list go with it */
+function dropRuns(o){(o.reading||[]).forEach(function(it){if(!it.runId)return;try{var run=lxRun(it.runId);if(run&&run.career===o.id&&!(W.LX&&LX.busy&&LX.runId===run.id))lxDelete(run.id);}catch(e){}});}
+function removeOpp(o){var S=CS();oppRefs(o).forEach(function(r){try{IngBig.del(r);}catch(e){}});dropThoughts(o);dropRuns(o);
+  if(CLOCK.ids)CLOCK.ids=CLOCK.ids.filter(function(id){return id!==o.id;});S.opps=S.opps.filter(function(x){return x.id!==o.id;});S.ui.open=null;show("list");save();render();}
 function fbBox(fb){var d=h("div","c-fb");if(fb.RAW){d.textContent=fb.RAW;return d;}
   d.innerHTML=(fb.MEETS?"<div><b>Meets it:</b> "+esc({YES:"yes",PARTLY:"partly",NO:"not yet"}[String(fb.MEETS).toUpperCase().split(/\W/)[0]]||fb.MEETS)+"</div>":"")+(fb.WORKS?"<div><b>What works:</b> "+esc(fb.WORKS)+"</div>":"")+(fb.MISSING?"<div><b>What is missing:</b> "+esc(fb.MISSING)+"</div>":"")+(fb["ASK YOURSELF"]?"<div><b>Ask yourself:</b> "+esc(fb["ASK YOURSELF"])+"</div>":"");return d;}
 
@@ -850,6 +915,7 @@ function paintApps(par){var S=CS(),open=S.ui.open==="new"?"new":oppById(S.ui.ope
     b.addEventListener("click",function(){S.ui.open=o.id;show("work");save();render();});if(FINISHED[o.stage])fin.push(b);else L.body.appendChild(b);});
   if(fin.length){var f=fold("finished","Finished ("+fin.length+")");fin.forEach(function(b){f.appendChild(b);});L.body.appendChild(f);}
   var open0=list.length-fin.length;L.foot.appendChild(h("span","c-note",esc(list.length?open0+" open"+(soon?" · "+soon+" closing within a week":"")+(fin.length?" · "+fin.length+" finished":""):"Your applications will be listed here.")));
+  if(list.length)L.foot.appendChild(cbtn("sm quiet","Export all",function(){exportAll();},"Every application as a folder of files, in one zip"));
   var R=RUN.busy?livePanel():open==="new"?newPanel():open?oppPanel(open):introPanel();two(L,R,par);}
 /* 6.8.5: each of the four parts opens to what it does, with a key into it */
 var HOW=[["Your profile","What you are looking for, your CV, your entries and documents, and Lector's readings of your apps: the only facts the studio uses.",
@@ -879,6 +945,8 @@ var HOW=[["Your profile","What you are looking for, your CV, your entries and do
      "Today: only the next small step of each application, with its closing date. Not today lets one rest until tomorrow.",
      "Checklist: what each posting asks you to send and do, from its own sentences, ticked at your pace.",
      "Track: where each application stands, its closing date and the days left, and your notes. Finished applications fold away.",
+     "Dates and reminders: the closing date, the interview, a reference due; Remind me puts a thought in the Inbox that comes back on its morning, inside Ingenium only. Today's This week strip gathers them.",
+     "Referees, the interview and a reading list sit beside what you send; an application exports as a folder of files; Today says what fits in ten, fifteen, twenty-five or forty-five minutes.",
      "Goals and plan: your goals and their steps, and the kinds of role and programme that suit your profile."],
     ["Goals and plan",function(){CS().ui.room="goals";save();render();}]]];
 var HOWOPEN=-1;
@@ -918,12 +986,20 @@ function oppPanel(o){var S=CS(),step=o.step||(o.read?"fit":"post"),band=o.read&&
 function stepPost(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),ti=input("text",o.title),or=input("text",o.org),kd=select(OKINDS,o.kind);
   ti.addEventListener("change",function(){o.title=ti.value.trim();o.titleSet=true;save();render();});or.addEventListener("change",function(){o.org=or.value.trim();o.orgSet=true;save();});kd.addEventListener("change",function(){o.kind=kd.value;o.kindSet=true;save();});
   g.appendChild(field("Title",ti));g.appendChild(field("Organisation",or));g.appendChild(field("What it is",kd));box.appendChild(g);
-  var meta=[dueWords(o),o.from&&/^https?:/.test(o.from)?"Fetched from its address":o.from&&o.from!=="pasted"&&!/^lector:/.test(o.from)?"From "+o.from:/^lector:/.test(o.from||"")?"From Lector's brief":"Pasted","Added "+dayStr(o.at)].filter(Boolean).join(" · ");
-  box.appendChild(h("p","c-note",esc(meta)));var tx=h("div","c-well c-text c-grow");tx.setAttribute("tabindex","0");tx.setAttribute("aria-label","The posting");tx.textContent="…";postText(o).then(function(t){tx.textContent=t||"(its text is no longer kept)";});box.appendChild(tx);
+  var url=urlOf(o),meta=[dueWords(o),url?"Fetched from its address"+(o.fetchedAt?" on "+dayStr(o.fetchedAt):"")+(o.checkedAt?", checked again "+dayStr(o.checkedAt):""):o.from&&o.from!=="pasted"&&!/^lector:/.test(o.from)?"From "+o.from:/^lector:/.test(o.from||"")?"From Lector's brief":"Pasted","Added "+dayStr(o.at)].filter(Boolean).join(" · ");
+  box.appendChild(h("p","c-note",esc(meta)));
+  /* 6.9.2: the posting fetched again and compared, sentence by sentence; and the further particulars read with it */
+  if(o.recheck)box.appendChild(recheckBox(o));
+  var tx=h("div","c-well c-text c-grow");tx.setAttribute("tabindex","0");tx.setAttribute("aria-label","The posting");tx.textContent="…";postOnly(o).then(function(t){tx.textContent=t||"(its text is no longer kept)";});box.appendChild(tx);
+  box.appendChild(moreBox(o));
   if(o.web&&o.web.results&&o.web.results.length){var wd=fold("web:"+o.id,"Found online for “"+o.web.q+"”, "+dayStr(o.web.at)+" ("+o.web.results.length+")");wd.classList.add("c-web");var ul=h("ul");
-    o.web.results.forEach(function(x){var li=h("li"),a=h("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=x.title;li.appendChild(a);if(x.snippet)li.appendChild(h("div","c-note",esc(x.snippet)));ul.appendChild(li);});
+    o.web.results.forEach(function(x){var li=h("li"),a=h("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=x.title;li.appendChild(a);
+      if((o.reading||[]).some(function(r){return r.url===x.url;}))li.appendChild(chip("On your reading list","c-ok"));else li.appendChild(cbtn("sm","Keep to read",function(){keepToRead(o,{title:x.title,url:x.url,kind:"other"});},"Kept in the reading list of this application (What you send)"));
+      if(x.snippet)li.appendChild(h("div","c-note",esc(x.snippet)));ul.appendChild(li);});
     wd.appendChild(ul);wd.appendChild(h("p","c-note",esc("For you to read. The studio does not write from what was found online.")));box.appendChild(wd);}
   P.body.appendChild(box);
+  P.foot.appendChild(cbtn("","Add a document",function(){pickFile(".docx,.pdf,.txt,.md,.html,.htm,.rtf",true,function(fs){var q=Promise.resolve();fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){return addMore(o,f.name,t);},function(e){say(f.name+" could not be read: "+(e&&e.message||e));});});});});},"Further particulars, a handbook or the person specification, read with the posting by the reading, the limits and the checklist"));
+  if(url)P.foot.appendChild(cbtn("","Check it again",function(){checkAgain(o);},"Fetches the posting again from its address, only now, and shows each sentence that changed"));
   P.foot.appendChild(cbtn("","Look it up online",function(){lookUp(o);},"Searches the internet for the organisation and the post, only now"));P.foot.appendChild(h("span","c-grow"));
   P.foot.appendChild(o.read?cbtn("pri","Next: how you fit",function(){goStep(o,"fit");}):cbtn("pri","Read it against my profile",function(){o.step="fit";readOpp(o);}));}
 function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
@@ -957,8 +1033,12 @@ function stepSend(o,P){var v=sendView(o),split=h("div","c-split"),nav=h("div","c
     nav.appendChild(item(rl,pu.charAt(0).toUpperCase()+pu.slice(1),v.kind==="email"&&v.id===e.id,function(){setView(o,{kind:"email",id:e.id});},"c-has"));});
   nav.appendChild(item("+ A new email","To a supervisor, a referee, a mentor, a hiring manager or a recruiter",v.kind==="emailnew",function(){setView(o,{kind:"emailnew"});}));
   nav.appendChild(h("div","c-label",esc("Your own")));nav.appendChild(item("Write it yourself","Your draft, looked at with you",v.kind==="mine",function(){setView(o,{kind:"mine"});}));
+  /* 6.9.2: who will speak for her, and what to read for it */
+  var rf=o.refs||[],rl=o.reading||[];nav.appendChild(h("div","c-label",esc("With it")));
+  nav.appendChild(item("Your referees",rf.length?rf.length+" · "+rf.filter(function(r){return r.status!=="toask";}).length+" asked":"Who will speak for you",v.kind==="refs",function(){setView(o,{kind:"refs"});},rf.length?"c-has":""));
+  nav.appendChild(item("Your reading list",rl.length?rl.length+" piece"+(rl.length===1?"":"s")+" · "+rl.filter(function(r){return r.status==="read";}).length+" read":"What to read for it",v.kind==="reading",function(){setView(o,{kind:"reading"});},rl.length?"c-has":""));
   split.appendChild(nav);split.appendChild(pane);P.body.appendChild(split);
-  if(v.kind==="emailnew")return newEmail(o,pane,P);if(v.kind==="mine")return mineView(o,pane,P);
+  if(v.kind==="emailnew")return newEmail(o,pane,P);if(v.kind==="mine")return mineView(o,pane,P);if(v.kind==="refs")return refsPane(o,pane,P);if(v.kind==="reading")return readingPane(o,pane,P);
   var rec=docRec(o,v);if(!rec)return unwritten(o,v.kind,pane,P);if(o.review&&o.review.kind===v.kind&&v.kind!=="email")return reviewPane(o,v,rec,pane,P);return docPane(o,v,rec,pane,P);}
 function unwritten(o,kind,pane,P){var w=wayOf(o),pl=o.plan&&o.plan[kind],gd=o.guide&&o.guide[kind];
   var e=empty(DOCS[kind][0],DOCS[kind][1]+(w==="guide"?" You write it yourself, with a guide to its parts and what your profile holds for each.":" Written from your profile and the posting, then read a second time against your profile; what your profile does not give is left in square brackets for you."));pane.appendChild(e);
@@ -982,6 +1062,7 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
   if(!isMail&&!rec.mine)wayBar(o,pane);
   var ck=rec.chk||{},notes=[];if(ck.figures&&ck.figures.length)notes.push("Figures to check, not found in your profile or the posting: "+ck.figures.join(", ")+".");
   if(ck.fills)notes.push(ck.fills+" place"+(ck.fills>1?"s are":" is")+" left for you to fill, in square brackets.");if(ck.style)notes.push(ck.style.trim());
+  if(ck.exam!=null&&!isMail&&!rec.mine)notes.push(ck.exam?Math.round(ck.exam*100)+"% of the words were changed in the examiner's pass, which holds every claim to your profile and every figure to what it gives.":"The examiner's pass left the draft as it was.");
   notes.push(rec.mine?"Your own version, kept on "+dayStr(rec.made)+".":"Written on "+dayStr(rec.made)+" with "+(rec.model||"your model")+".");pane.appendChild(h("p","c-note c-checks",esc(notes.join(" "))));
   var info=h("div","c-col");info.style.gap="6px";pane.appendChild(info);
   var area=h("div","c-area c-grow");pane.appendChild(area);
@@ -1044,14 +1125,21 @@ function stepPractise(o,P){var r=o.read&&o.read.r;
   if(!o.practice.qs.length){pane.appendChild(empty("No questions yet","Eight questions a panel would be likely to ask, from what it asks for and from what your profile leaves open."));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Choose questions to practise",function(){questions(o);}));return;}
   var q=o.practice.qs.filter(function(x){return x.id===o.qsel;})[0]||o.practice.qs[0];
   o.practice.qs.forEach(function(x,i){nav.appendChild(item((i+1)+". "+x.q,x.fb?"Looked at":x.answer?"Answered":"",x===q,function(){o.qsel=x.id;save();render();}));});
-  pane.appendChild(h("h3","c-h3",esc(q.q)));var tq=h("textarea","c-ta c-grow");tq.setAttribute("aria-label","Your answer");tq.placeholder="Your answer, as you would say it.";tq.value=q.answer||"";pane.appendChild(tq);if(q.fb)pane.appendChild(fbBox(q.fb));
+  pane.appendChild(h("h3","c-h3",esc(q.q)));mockBox(o,q,pane);var tq=h("textarea","c-ta c-grow");tq.setAttribute("aria-label","Your answer");tq.placeholder="Your answer, as you would say it.";tq.value=q.answer||"";pane.appendChild(tq);if(q.fb)pane.appendChild(fbBox(q.fb));
   P.foot.appendChild(cbtn("","New questions",function(){questions(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Look at it with me",function(){look(o,q.id,q.q,tq.value,true);}));}
 function stepTrack(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),st=select(STAGES,o.stage),du=input("date",o.due||"");
-  st.addEventListener("change",function(){o.stage=st.value;save();render();});du.addEventListener("change",function(){o.due=du.value;save();render();});
+  st.addEventListener("change",function(){o.stage=st.value;if(st.value==="interview"&&!o.interview)o.interview={};save();render();});du.addEventListener("change",function(){o.due=du.value;save();render();});
   g.appendChild(field("Where it stands",st));g.appendChild(field("Closing date",du));var n=daysLeft(o),big=h("div","c-days");big.innerHTML=n==null?"<b>—</b><span>No closing date set</span>":n<0?"<b>Closed</b><span>"+esc(dayStr(o.due))+"</span>":"<b>"+n+"</b><span>day"+(n===1?"":"s")+" left</span>";g.appendChild(big);box.appendChild(g);
   if(o.closes)box.appendChild(h("p","c-note",esc("The posting says: "+o.closes)));
-  var nt=h("textarea","c-ta c-grow");nt.placeholder="Your notes: who to ask, what to do next, what was said.";nt.value=o.notes||"";nt.setAttribute("aria-label","Your notes");nt.addEventListener("change",function(){o.notes=nt.value;save();});box.appendChild(field("Notes",nt));
-  P.body.appendChild(box);P.foot.appendChild(cbtn("quiet c-danger","Remove this application",function(){if(!confirm("Remove "+(o.title||"this application")+" and what was written for it?"))return;removeOpp(o);}));}
+  /* 6.9.2: its dates and their reminders, the referees in short, and the interview */
+  box.appendChild(datesBox(o));
+  var rf=o.refs||[],line=h("div","c-keyrow");line.appendChild(h("span","c-note c-grow",esc(rf.length?rf.length+" referee"+(rf.length===1?"":"s")+": "+rf.map(function(r){return r.name+" ("+rstat(r.status).toLowerCase()+")";}).join(", ")+".":"No referees yet.")));
+  line.appendChild(cbtn("sm",rf.length?"Your referees":"Choose your referees",function(){o.step="send";setView(o,{kind:"refs"});}));box.appendChild(line);
+  if(o.stage==="interview"||o.interview)box.appendChild(interviewCard(o));
+  else{var ik=h("div","c-keyrow");ik.appendChild(cbtn("sm quiet","Add an interview",function(){o.interview={};save();render();},"Its day, time and place, and a list to prepare by"));box.appendChild(ik);}
+  var nt=h("textarea","c-ta");nt.style.minHeight="110px";nt.placeholder="Your notes: who to ask, what to do next, what was said.";nt.value=o.notes||"";nt.setAttribute("aria-label","Your notes");nt.addEventListener("change",function(){o.notes=nt.value;save();});box.appendChild(field("Notes",nt));
+  P.body.appendChild(box);P.foot.appendChild(cbtn("quiet c-danger","Remove this application",function(){if(!confirm("Remove "+(o.title||"this application")+" and what was written for it?"))return;removeOpp(o);}));
+  P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Export this application",function(){exportOpp(o);},"A folder of files: the posting, the reading, the checklist, each document as Word and as text, the emails, your practise and your notes"));}
 
 /* ---------------- 6.8.12: at her pace (her words, 28 October 2026: "I want to be able to automate where I want and also
    meticulously review and do on my own at my own pace"; asked how, she chose a switch on each task, a calm Today view,
@@ -1067,7 +1155,7 @@ function wayBar(o,pane){var w=wayOf(o),r=h("div","c-way");r.appendChild(h("span"
 function docWord(kind){return DOCS[kind][0].replace(/^./,function(m){return m.toLowerCase();}).replace(/^tailored cv$/,"tailored CV");}
 /* Step by step: a plan first, for her to approve or change; the writing then follows it */
 function planDoc(o,kind){if(busyNow()||needModel())return;begin(o,"Planning the "+docWord(kind)+" with you");
-  Promise.all([postText(o),gatherProfile({})]).then(function(x){var post=x[0],G=x[1];
+  Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){var post=x[0],G=x[1];
     return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now planning a document with me, part by part, before it is written. You return the plan and nothing else.")},
       {role:"user",content:"Plan my "+docWord(kind)+" for "+to(o)+". Give its parts in order, one per line, each as: the part's name, a colon, then one plain sentence saying what it will say and which entries of THE PROFILE it will draw on. Five to nine parts. Where the profile is silent on something a part needs, say so in square brackets. Write nothing else.\n\n"+
         (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.25))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.55)}];},700,0.3);})
@@ -1075,7 +1163,7 @@ function planDoc(o,kind){if(busyNow()||needModel())return;begin(o,"Planning the 
       if(plan.length<20)throw new Error("the model gave back no plan");o.plan=o.plan||{};o.plan[kind]={text:plan,at:Date.now(),model:modelName()};o.sv={kind:kind};save();end();},failed);}
 /* Guide me: the parts, questions for her to answer, and what her profile holds for each; nothing is written for her */
 function guideDoc(o,kind){if(busyNow()||needModel())return;begin(o,"Making your guide to the "+docWord(kind));
-  Promise.all([postText(o),gatherProfile({})]).then(function(x){var post=x[0],G=x[1];
+  Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){var post=x[0],G=x[1];
     return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now a teacher. You never write the document, nor any sentence of it: you help me write it myself.")},
       {role:"user",content:"I will write my "+docWord(kind)+" for "+to(o)+" myself, to learn. Guide me. Give its parts in order, each as a level-two heading (##). Under each: one plain sentence on what the part is for; then two or three questions for me to answer in my own words, as a list; then a line beginning \"From your profile:\" naming the entries of THE PROFILE I could draw on, as they stand there, or \"nothing yet\" where it is silent. Write no part of the document itself.\n\n"+
         (post?"THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.25))+"\n\n":"")+(critBlock(o)?critBlock(o)+"\n\n":"")+profileBlock(G,R*0.55)}];},1100,0.3);})
@@ -1085,13 +1173,7 @@ function lookWithMe(o,kind,md){o.mine=o.mine||{};o.mine[kind]={text:md,at:Date.n
 
 /* ---- changes accepted one by one: the revised text is laid against the draft, paragraph by paragraph ---- */
 function blocksOf(t){return String(t||"").replace(/\r/g,"").split(/\n[ \t]*\n+/).map(function(b){return b.trim();}).filter(Boolean);}
-function diffUnits(a,b){var A=blocksOf(a),B=blocksOf(b),n=A.length,m=B.length,L=[],i,j;
-  for(i=0;i<=n;i++){L.push([]);for(j=0;j<=m;j++)L[i].push(0);}
-  for(i=n-1;i>=0;i--)for(j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
-  var units=[],cur=null;i=0;j=0;
-  while(i<n||j<m){if(i<n&&j<m&&A[i]===B[j]){if(cur){units.push(cur);cur=null;}units.push({same:true,old:[A[i]],nw:[B[j]]});i++;j++;continue;}
-    if(!cur)cur={same:false,old:[],nw:[]};if(j<m&&(i>=n||L[i][j+1]>=L[i+1][j])){cur.nw.push(B[j]);j++;}else{cur.old.push(A[i]);i++;}}
-  if(cur)units.push(cur);return units;}
+function diffUnits(a,b){return lcsUnits(blocksOf(a),blocksOf(b));}
 function joinUnits(units,dec){var out=[];units.forEach(function(u,k){out=out.concat(u.same||dec[k]!=="new"?u.old:u.nw);});return out.join("\n\n");}
 function reviewPane(o,v,rec,pane,P){var rv=o.review;rv.dec=rv.dec||{};rv.why=rv.why||{};
   var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc("The changes to your "+docWord(v.kind)+", one by one")));pane.appendChild(top);
@@ -1153,7 +1235,7 @@ function checkFind(post,o){var S=sentencesOf(post),items=[],lim=limitsIn(post),s
   function add(text,quote,doc){var k=text.toLowerCase();if(seen[k])return;seen[k]=1;items.push({id:uid("ck"),text:text,quote:String(quote||"").slice(0,240),doc:doc||"",done:false,src:"posting"});}
   CHECK_RULES.forEach(function(r){var q=S.filter(function(s){return r[0].test(s);})[0];if(!q)return;var t=r[1],d=r[2];
     if(d==="ref"){var m=/\b(two|three|four|five|[2-5])\s+(?:academic\s+|professional\s+|confidential\s+)?(?:referees?|references?|letters)/i.exec(q);t=m?(NUMWORD[m[1].toLowerCase()]+" references"):"References";d="";
-      add(t,q,"");add("Ask your referees, and give them the posting and the date it is due",q,"");return;}
+      add(t,q,"refs");add("Ask your referees, and give them the posting and the date it is due",q,"refs");return;}
     var L=d&&lim[d];if(L)t+=L.words?" (no more than "+L.words.toLocaleString("en-GB")+" words)":" (no more than "+L.pages+" page"+(L.pages>1?"s":"")+")";add(t,q,d);});
   var how=S.filter(function(s){return /apply (?:online|through|via|at|using)|application (?:portal|system)|submit (?:your |an |the )?applications?|send (?:your |an |the )?applications?|applications? (?:should|must) be (?:submitted|sent|made)/i.test(s);})[0];
   if(how)add("Send it the way it asks: "+(how.length>140?how.slice(0,137)+"…":how),how,"");
@@ -1195,6 +1277,7 @@ function stepCheck(o,P){var C=o.check,w=wayOf(o),box=h("div","c-col c-fill");P.b
     if(x.quote)lb.appendChild(h("small",null,esc("From the posting: “"+x.quote+"”")));else if(x.src==="you")lb.appendChild(h("small",null,esc("Added by you")));
     li.appendChild(cb);li.appendChild(lb);var acts=h("span","c-ck-acts");
     if(x.doc&&DOCS[x.doc])acts.appendChild(cbtn("sm",o.docs[x.doc]?"Open it":"Write it",function(){o.step="send";setView(o,{kind:x.doc});}));
+    else if(x.doc==="refs")acts.appendChild(cbtn("sm",(o.refs||[]).length?"Your referees":"Choose them",function(){o.step="send";setView(o,{kind:"refs"});}));
     acts.appendChild(cbtn("quiet sm","✕",function(){C.items=C.items.filter(function(y){return y!==x;});save();render();},"Take it off the list"));li.appendChild(acts);ul.appendChild(li);});
   box.appendChild(ul);
   var ar=h("div","c-row"),ai=input("text","","Add an item of your own");ai.setAttribute("aria-label","Add an item of your own");
@@ -1208,41 +1291,54 @@ function stepCheck(o,P){var C=o.check,w=wayOf(o),box=h("div","c-col c-fill");P.b
 function todayStr(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
 function tomorrowStr(){var d=new Date();d.setDate(d.getDate()+1);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
 function nextOf(o){if(FINISHED[o.stage])return null;
+  /* 6.9.2: an interview with a day set comes first; then a referee asked ten days ago and not heard from */
+  if(o.interview&&o.interview.at){var nd=daysTo(o.interview.at);if(nd!=null&&nd>=0)return {step:"track",text:"Prepare: "+(nd===0?"the interview is today":nd===1?"the interview is tomorrow":nd+" days to the interview"),why:"Its list to prepare by is in Track: the posting once more, an example for each essential criterion, two questions to ask, the way there and what to bring."};
+    if(nd!=null&&nd>=-7&&!String(o.interview.after||"").trim()&&!(o.emails||[]).some(function(e){return e.purpose==="thanks";}))return {step:"track",text:"Note how the interview went, and write your thanks",why:"While it is fresh: what was asked and what went well, in Notes after the interview; then a short thank-you, written for you to send. Both are in Track."};}
+  var fu=(o.refs||[]).filter(function(r){return r.status==="asked"&&r.asked&&Date.now()-r.asked>10*864e5;})[0];
+  if(fu)return {step:"send",kind:"refs",text:"Follow up with "+fu.name,why:"You asked for the reference on "+dayStr(fu.asked)+" and nothing has come back. One courteous line is usual after ten days."};
   if(!o.read)return {step:"fit",text:"Read it against your profile",why:"The reading shows how it matches what you are looking for, and each thing it asks for, judged from your profile."+(modelReady()?"":" A model is needed for it (Models page).")};
   if(!o.check)return {step:"check",text:"Make its checklist",why:"What it asks you to send and do, from its own sentences, to tick at your pace."};
   var C=o.check;if(C.pending&&C.pending.length)return {step:"check",text:"Look at "+C.pending.length+" item"+(C.pending.length===1?"":"s")+" found in the posting",why:"Keep or drop each, one at a time."};
   var und=C.items.filter(function(x){return !x.done;});
   if(und.length){var x=und[0];
+    /* the references line, in its turn on the list: choose the referees first, then the line itself */
+    if(x.doc==="refs")return (o.refs||[]).length?{step:"send",kind:"refs",text:x.text,why:"From its checklist: "+(o.refs||[]).length+" referee"+((o.refs||[]).length===1?"":"s")+" so far.",quote:x.quote}
+      :{step:"send",kind:"refs",text:"Choose your referees",why:"Its checklist asks for references. Ask early, and give them the posting, your CV and the date it is due.",quote:x.quote};
     if(x.doc&&DOCS[x.doc]){var dr=o.docs[x.doc];if(!dr)return {step:"send",kind:x.doc,text:"Write your "+docWord(x.doc),why:"Its checklist asks for it.",quote:x.quote};
       var fills=dr.chk&&dr.chk.fills||0;if(fills)return {step:"send",kind:x.doc,text:"Fill the "+fills+" place"+(fills===1?"":"s")+" in square brackets in your "+docWord(x.doc),why:"Your profile did not give what goes there; you do."};
       return {step:"check",text:"Read your "+docWord(x.doc)+" once more, then tick it off",why:"It is written; only you can say it is ready."};}
     return {step:"check",text:x.text,why:"From its checklist ("+(C.items.length-und.length)+" of "+C.items.length+" done).",quote:x.quote};}
   if(o.stage==="considering"||o.stage==="preparing")return {step:"track",text:"Send it, then mark it Applied in Track",why:"Everything on its checklist is done."};
-  if(o.stage==="interview")return {step:"practise",text:"Practise your answers for the interview",why:"One criterion or one question at a time."};
+  if(o.stage==="interview"){if(o.interview&&o.interview.at&&daysTo(o.interview.at)<0)return null;return {step:"practise",text:"Practise your answers for the interview",why:"One criterion or one question at a time."};}
   if(o.stage==="offer")return {step:"track",text:"Decide on the offer, and note what you decide in Track",why:""};
   return null;}
-function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[];
-  sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}if(o.rest&&o.rest>t)rest.push({o:o,n:n});else act.push({o:o,n:n});});
+function dateWords(d,o){var t=String(o.title||"an application").replace(/[.\s]+$/,""),l=d.label.charAt(0).toLowerCase()+d.label.slice(1);return d.kind==="closes"?t+" closes":d.kind==="interview"?"the interview for "+t:d.kind==="referee"?l+", for "+t:l+" for "+t;}
+function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowDay();
+  sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}var x={o:o,n:n,mins:estimateOf(o,n)};if(o.rest&&o.rest>t)rest.push(x);else act.push(x);});
   var L=panel("csList","Today",{key:cbtn("sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
   var sel=act.filter(function(x){return x.o.id===S.ui.today;})[0]||null,SHOWN=3;
+  /* 6.9.2: the dates of the week at the head of the list; each step says about how long it takes */
+  if(S.opps.some(function(o){return !FINISHED[o.stage];}))L.body.appendChild(weekStrip(S));
   if(!act.length&&!rest.length)L.body.appendChild(empty(S.opps.length?"Nothing for today":"Nothing here yet",S.opps.length?"Every open application is waiting on someone else, or has no step left.":"Bring a posting, a programme's call or a grant: its next step will be here each day."));
-  function row(x){var dw=dueWords(x.o),n=daysLeft(x.o),b=item(x.n.text,(x.o.title||"Untitled")+(dw?" · "+dw:""),sel===x,function(){S.ui.today=x.o.id;show("work");save();render();},n!=null&&n>=0&&n<=7?"c-soon-i":"");return b;}
+  function row(x){var dw=dueWords(x.o),n=daysLeft(x.o);return item(x.n.text,[(x.o.title||"Untitled"),dw,"about "+x.mins+" min"].filter(Boolean).join(" · "),sel===x,function(){S.ui.today=x.o.id;show("work");save();render();},n!=null&&n>=0&&n<=7?"c-soon-i":"");}
   act.slice(0,SHOWN).forEach(function(x){L.body.appendChild(row(x));});
   if(act.length>SHOWN){var f=fold("today-later","Later ("+(act.length-SHOWN)+")");act.slice(SHOWN).forEach(function(x){f.appendChild(row(x));});L.body.appendChild(f);}
   if(rest.length){var fr=fold("today-rest","Resting today ("+rest.length+")");rest.forEach(function(x){var b=item(x.o.title||"Untitled","Back tomorrow: "+x.n.text,false,function(){delete x.o.rest;save();render();},"");b.title="Bring it back today";fr.appendChild(b);});L.body.appendChild(fr);}
   if(wait.length){var fw=fold("today-wait","Waiting to hear ("+wait.length+")");wait.forEach(function(o){fw.appendChild(item(o.title||"Untitled",stageWord(o.stage),false,function(){S.ui.room="apps";S.ui.open=o.id;o.step="track";show("work");save();render();}));});L.body.appendChild(fw);}
   L.foot.appendChild(h("span","c-note",esc(act.length?act.length+" step"+(act.length===1?"":"s")+" for today, one per application":"Nothing pressing")));
+  if(act.length){var hk=cbtn("sm c-only-one","How long do you have?",function(){S.ui.today=null;show("work");save();render();},"Only the steps that fit in ten, fifteen, twenty-five or forty-five minutes");L.foot.appendChild(hk);}
   var R;
   if(sel){var o=sel.o,nx=sel.n,dw=dueWords(o);R=panel("csWork",o.title||"Untitled",{back:"Today",onBack:function(){S.ui.today=null;show("list");save();render();}});
     var c=h("div","c-col c-today");c.appendChild(h("p","c-note",esc([o.org,dw].filter(Boolean).join(" · "))));c.appendChild(h("h3","c-today-step",esc(nx.text)));
     if(nx.why)c.appendChild(h("p",null,esc(nx.why)));if(nx.quote)c.appendChild(h("blockquote","c-today-q",esc("From the posting: “"+nx.quote+"”")));
-    c.appendChild(h("p","c-note",esc("One step at a time. When it is done, the next one takes its place here.")));R.body.appendChild(c);
+    c.appendChild(h("p","c-note",esc("About "+sel.mins+" minutes."+(low?" A low-energy day: this one step is enough.":"")+" One step at a time. When it is done, the next one takes its place here.")));R.body.appendChild(c);
     R.foot.appendChild(cbtn("quiet","Not today",function(){o.rest=tomorrowStr();S.ui.today=null;save();render();say("It rests until tomorrow.");},"It comes back tomorrow"));
     R.foot.appendChild(cbtn("","Open the application",function(){S.ui.room="apps";S.ui.open=o.id;show("work");save();render();}));R.foot.appendChild(h("span","c-grow"));
     R.foot.appendChild(cbtn("pri","Do this now",function(){S.ui.room="apps";S.ui.open=o.id;o.step=nx.step;if(nx.kind){o.sv={kind:nx.kind};o.tab="doc";}show("work");save();render();}));}
-  else{R=panel("csWork","Today");var near=act.concat(rest).map(function(x){return x.o;}).filter(function(o){var n=daysLeft(o);return n!=null&&n>=0;}).sort(function(a,b){return daysLeft(a)-daysLeft(b);})[0];
+  else{R=panel("csWork","Today",{back:"Today",onBack:function(){show("list");save();render();}});var near=nearestDate(act.concat(rest).map(function(x){return x.o;}));
     var c2=h("div","c-col c-today");c2.appendChild(h("h3","c-today-step",esc(act.length?(act.length===1?"One step for today.":act.length+" steps for today, one for each application."):"Nothing is asked of you today.")));
-    if(near){var nd=daysLeft(near);c2.appendChild(h("p",null,esc("The nearest closing date is "+(nd===0?"today":nd===1?"tomorrow":"in "+nd+" days")+", "+dayStr(near.due+"T12:00:00")+": "+String(near.title||"an application").replace(/[.\s]+$/,"")+".")));}
+    if(near)c2.appendChild(h("p",null,esc("The nearest date is "+(near.n===0?"today":near.n===1?"tomorrow":"in "+near.n+" days")+", "+dayStr(near.d.at+"T12:00:00")+": "+dateWords(near.d,near.o)+".")));
+    if(act.length||CLOCK.ended)c2.appendChild(minutesBox(S,act,low));
     c2.appendChild(h("p","c-note",esc("Choose one on the left. Each says what to do and why; Do this now takes you straight to it, and Not today lets it rest until tomorrow.")));R.body.appendChild(c2);}
   two(L,R,par);}
 
@@ -1264,14 +1360,13 @@ function newPerson(kind,name,label){var r=ROOT(),cur=CS(),p={id:uid("pp"),label:
     wants:{looking:"",need:"",avoid:"",where:"",when:""},prefs:{spelling:(cur.profile.prefs&&cur.profile.prefs.spelling)||"british"},own:{cv:null,writing:[],letters:[]},at:Date.now()};
   r.people.push(p);r.cur=p.id;save();render();return Promise.resolve(p);}
 function refsOfPerson(p){var out=[],P=p.profile||{};
-  (p.opps||[]).forEach(function(o){out.push(o.ref);Object.keys(o.docs||{}).forEach(function(k){out.push(o.docs[k].ref);((o.older||{})[k]||[]).forEach(function(x){out.push(x.ref);});});
-    (o.emails||[]).forEach(function(x){out.push(x.ref);(x.older||[]).forEach(function(y){out.push(y.ref);});});if(o.review)out.push(o.review.ref);});
+  (p.opps||[]).forEach(function(o){out=out.concat(oppRefs(o));});
   (P.files||[]).forEach(function(f){out.push(f.ref);});if(P.linkedin)out.push(P.linkedin.ref);
   if(P.own){if(P.own.cv)out.push(P.own.cv.ref);(P.own.writing||[]).concat(P.own.letters||[]).forEach(function(x){out.push(x.ref);});}
   return out.filter(Boolean);}
 function removePerson(p){var r=ROOT();if(r.people.length<2){say("This is the only profile: it stays.");return;}
   var n=(p.opps||[]).length;if(!confirm("Remove the profile of "+personLabel(p)+", its "+n+" application"+(n===1?"":"s")+" and everything written for them? This cannot be undone."))return;
-  refsOfPerson(p).forEach(function(ref){try{IngBig.del(ref);}catch(e){}});r.people=r.people.filter(function(x){return x!==p;});if(r.cur===p.id)r.cur=r.people[0].id;save();render();say("The profile is removed.");}
+  refsOfPerson(p).forEach(function(ref){try{IngBig.del(ref);}catch(e){}});(p.opps||[]).forEach(function(o){try{dropThoughts(o);dropRuns(o);}catch(e){}});r.people=r.people.filter(function(x){return x!==p;});if(r.cur===p.id)r.cur=r.people[0].id;save();render();say("The profile is removed.");}
 function addOwnText(list,what){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",true,function(fs){var q=Promise.resolve(),n=0;
   fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){if(t.length<40)return;var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){list.push({ref:ref,name:f.name,chars:t.length,at:Date.now()});n++;});});});});
   q.then(function(){if(n){CS().profile.at=Date.now();save();render();say(n+" "+what+(n>1?"s are":" is")+" kept in this profile.");}});});}
@@ -1323,8 +1418,13 @@ function profSources(){var S=CS(),P=S.profile,M=lectorMe(),R=panel("csWork","Wha
   var me=P.isMe!==false;
   src("Your CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+(me?". Lector uses the same one.":". Kept in this profile only."):(me?"Not added yet. Lector and the studio share it.":"Not added yet. Kept in this profile only."),P.use.cv,function(v){P.use.cv=v;},
     [cbtn("sm",M.cv?"Replace":me?"Add your CV":"Add their CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){if(!confirm(me?"Remove your CV from Lector and the studio?":"Remove this CV from this profile?"))return;try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();})]:[]));
-  src("Your LinkedIn export",P.linkedin?P.linkedin.n+" entr"+(P.linkedin.n===1?"y":"ies")+" from it, "+dayStr(P.linkedin.at)+(P.linkedin.others&&P.linkedin.others.length?". Not read: "+P.linkedin.others.slice(0,4).join(", "):"")+".":"The .zip LinkedIn sends when you ask for a copy of your data, or its .csv files.",P.use.linkedin,function(v){P.use.linkedin=v;},
-    [cbtn("sm",P.linkedin?"Add it again":"Add the export",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});})]);
+  var LK=P.linkedin;
+  src("Your LinkedIn export",LK?(LK.files?liStatus(LK):LK.n+" entr"+(LK.n===1?"y":"ies")+" from it, "+dayStr(LK.at)+"."):"The .zip LinkedIn sends when you ask for a copy of your data, or its .csv files. Imported again later, only what is new, changed or gone is shown to you; your own changes are never touched.",P.use.linkedin,function(v){P.use.linkedin=v;},
+    [cbtn("sm",LK?"Import it again":"Add the export",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});})]);
+  /* 6.9.2: the headline and summary it keeps, shown, and kept as an entry on her press */
+  if(LK&&LK.ref){src("Your headline and summary","…",null,null,[cbtn("sm","Keep as an entry",function(){loadText(LK.ref).then(function(t){if(!t){say("Nothing was kept of them.");return;}if(P.items.some(function(it){return it.title==="LinkedIn headline and summary";})){say("It is among your entries already.");return;}
+      P.items.push({id:uid("it"),sec:"other",title:"LinkedIn headline and summary",place:"",from:"",to:"",text:t.slice(0,2000),src:"me",at:Date.now()});P.at=Date.now();save();render();say("Kept in your entries, under Other.");});})],true);
+    var hs=list.lastChild.querySelector(".tx small");loadText(LK.ref).then(function(t){if(hs)hs.textContent=t?t.replace(/\s+/g," ").slice(0,400):"(nothing was kept of them)";});}
   src("Your documents",P.files.length?P.files.length+" kept: a proposal, a statement, a publication.":"A research proposal, a statement, a publication or anything else about your work.",null,null,[cbtn("sm","Add documents",addDocs)]);
   P.files.forEach(function(f){src(f.name,Math.round(f.chars/1000)+" thousand characters, kept "+dayStr(f.at)+".",f.use!==false,function(v){f.use=v;},[cbtn("sm quiet","Remove",function(){try{IngBig.del(f.ref);}catch(e){}P.files=P.files.filter(function(x){return x.id!==f.id;});save();render();})],true);});
   var runs=[];if(me)try{lxState().runs.forEach(function(x){if(x.kind==="app"&&x.status==="done"&&runs.every(function(y){return y.name!==x.name;}))runs.push(x);});}catch(e){}
@@ -1346,8 +1446,10 @@ function profEntries(){var S=CS(),P=S.profile,R=panel("csWork","Your entries");
   else R.body.appendChild(empty("No entries yet","Add them one by one, take them from your LinkedIn export (What the studio may use), or let the studio suggest them from your CV and documents, for you to keep or drop."));
   var grid=h("div","c-entries");P.items.filter(function(it){return fl==="all"||it.sec===fl;}).forEach(function(it){var c=h("div","c-entry");
     c.appendChild(h("span","c-sec",esc((SECTS.filter(function(x){return x[0]===it.sec;})[0]||["",""])[1].replace(/, with evidence$/,""))));c.appendChild(h("b",null,esc(it.title)));
-    var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to "),it.src==="linkedin"?"from LinkedIn":""].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));if(it.text)c.appendChild(h("p",null,esc(it.text)));
-    var k=h("div","c-keys");k.appendChild(cbtn("sm","Change",function(){S.ui.editing=it.id;save();render();}));k.appendChild(cbtn("sm quiet","Remove",function(){P.items=P.items.filter(function(x){return x.id!==it.id;});P.at=Date.now();save();render();}));c.appendChild(k);grid.appendChild(c);});
+    var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to "),it.src==="linkedin"?"from LinkedIn":""].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));
+    if(it.gone)c.appendChild(h("small","c-ligone",esc("No longer in your LinkedIn export ("+dayStr(it.gone)+"): keep it as your own, or drop it.")));if(it.text)c.appendChild(h("p",null,esc(it.text)));
+    var k=h("div","c-keys");if(it.gone){k.appendChild(cbtn("sm pri","Keep it",function(){delete it.gone;it.src="me";P.at=Date.now();save();render();}));k.appendChild(cbtn("sm","Drop it",function(){liDropped(P,liKey(it));P.items=P.items.filter(function(x){return x.id!==it.id;});P.at=Date.now();save();render();}));}
+    k.appendChild(cbtn("sm","Change",function(){S.ui.editing=it.id;save();render();}));k.appendChild(cbtn("sm quiet","Remove",function(){if(it.src==="linkedin")liDropped(P,liKey(it));P.items=P.items.filter(function(x){return x.id!==it.id;});P.at=Date.now();save();render();}));c.appendChild(k);grid.appendChild(c);});
   R.body.appendChild(grid);
   R.foot.appendChild(cbtn("","Find my skills",findSkills,"Your skills, with their evidence, from your sources"));R.foot.appendChild(cbtn("","Suggest entries",suggest,"Entries from your CV and documents, for you to keep or drop"));R.foot.appendChild(h("span","c-grow"));
   R.foot.appendChild(cbtn("pri","Add an entry",function(){S.ui.editing="new";save();render();}));return R;}
@@ -1362,10 +1464,12 @@ function entryForm(R,it){var S=CS(),P=S.profile;R.title.textContent=it?"Change a
 function profFound(){var S=CS(),P=S.profile,R=panel("csWork","Found in your sources"),grid=h("div","c-entries");
   R.body.appendChild(h("p","c-note c-pad",esc("Keep the ones that are right (you can change them after) and drop the rest. Nothing enters your profile by itself.")));
   (P.suggested||[]).forEach(function(it){var c=h("div","c-entry");c.appendChild(h("span","c-sec",esc((SECTS.filter(function(x){return x[0]===it.sec;})[0]||["",""])[1].replace(/, with evidence$/,""))));c.appendChild(h("b",null,esc(it.title)));
-    var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to ")].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));if(it.text)c.appendChild(h("p",null,esc(it.text)));
-    var k=h("div","c-keys");k.appendChild(cbtn("sm pri","Keep",function(){P.items.push(Object.assign({},it,{id:uid("it"),src:"me",at:Date.now()}));P.suggested=P.suggested.filter(function(x){return x.id!==it.id;});P.at=Date.now();if(!P.suggested.length)S.ui.ppart="entries";save();render();}));
-    k.appendChild(cbtn("sm","Drop",function(){P.suggested=P.suggested.filter(function(x){return x.id!==it.id;});if(!P.suggested.length)S.ui.ppart="entries";save();render();}));c.appendChild(k);grid.appendChild(c);});
-  R.body.appendChild(grid);R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("","Drop them all",function(){P.suggested=[];S.ui.ppart="entries";save();render();}));return R;}
+    var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to "),it.src==="linkedin-new"?(it.note||"From your LinkedIn export"):""].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));if(it.text)c.appendChild(h("p",null,esc(it.text)));
+    var k=h("div","c-keys");k.appendChild(cbtn("sm pri","Keep",function(){var li=it.src==="linkedin-new",ex=li&&it.was?P.items.filter(function(x){return x.id===it.was;})[0]:null;
+      if(ex){Object.assign(ex,{title:it.title,place:it.place,from:it.from,to:it.to,text:it.text,at:Date.now()});delete ex.gone;}else{var nw=Object.assign({},it,{id:uid("it"),src:li?"linkedin":"me",at:Date.now()});delete nw.note;delete nw.was;P.items.push(nw);}
+      P.suggested=P.suggested.filter(function(x){return x.id!==it.id;});P.at=Date.now();if(!P.suggested.length)S.ui.ppart="entries";save();render();}));
+    k.appendChild(cbtn("sm","Drop",function(){if(it.src==="linkedin-new")liDropped(P,liKey(it));P.suggested=P.suggested.filter(function(x){return x.id!==it.id;});if(!P.suggested.length)S.ui.ppart="entries";save();render();}));c.appendChild(k);grid.appendChild(c);});
+  R.body.appendChild(grid);R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("","Drop them all",function(){(P.suggested||[]).forEach(function(x){if(x.src==="linkedin-new")liDropped(P,liKey(x));});P.suggested=[];S.ui.ppart="entries";save();render();}));return R;}
 
 /* ---- Goals and plan ---- */
 function whenWords(by){by=String(by||"").trim();if(!by)return "";if(/^\d{4}-\d{2}-\d{2}$/.test(by))return "By "+dayStr(by);if(/^(by|in|within|before|after|next|this|on|at)\b/i.test(by))return by.charAt(0).toUpperCase()+by.slice(1);return "By "+by;}
@@ -1426,9 +1530,327 @@ function fromLector(B){meFirst();var kinds=Object.keys(B&&B.docs||{}).filter(fun
     say("A CV or a cover letter needs no apps: the Career Studio writes them from your profile and the posting.");
     var q=Promise.resolve();want.forEach(function(k){q=q.then(function(){return writeDoc(o,k);});});q.then(function(){render();});};
   if(!P||!P.ref){go1(null);return true;}
-  loadText(P.ref).then(function(t){if(!t||t.length<40){go1(null);return;}var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id;})[0];if(same){go1(same);return;}
+  loadText(P.ref).then(function(t){if(!t||t.length<40){go1(null);return;}var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id||P.from==="career:"+o.id;})[0];if(same){go1(same);return;}
     newOpp(B.purpose==="programme"?"phd":"job",t,"lector:"+P.id).then(go1);});
   return true;}
+
+
+/* ---------------- 6.9.2: PhD and job applications, at her pace (31 October 2026) ----------------
+   Her words: "I want to make the Career Studio and the Lector page more capable. I want to be able to use it for PhD
+   applications and for job applications. I want to be able to automate where I want and also meticulously review and do
+   on my own at my own pace." So, in this order: the dates of an application and reminders through the Inbox and the bell
+   (inside Ingenium only: there are no alarms outside it); a tracker of referees; the interview, with a list to prepare by,
+   a mock run on the Clepsydra and a thank-you; an application exported as a folder of files; a reading list for each
+   programme, read by the reading page; what she can do in ten, fifteen, twenty-five or forty-five minutes; the posting
+   fetched again and compared, and further particulars read with it; and a LinkedIn export imported as a difference. */
+function addDays(s,n){var d=s?new Date(s+"T12:00:00"):new Date();if(isNaN(d))d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function daysTo(s){if(!s)return null;var d=new Date(s+"T12:00:00"),t=new Date();if(isNaN(d))return null;t.setHours(12,0,0,0);return Math.round((d-t)/864e5);}
+function inWords(n){return n==null?"":n<0?"past":n===0?"today":n===1?"tomorrow":"in "+n+" days";}
+function shortDay(s){try{return new Date(s+"T12:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}catch(e){return s;}}
+/* every long text an application names, so that a profile copied, removed or swept keeps or lets go of all of them */
+function oppRefs(o){var out=[o.ref];Object.keys(o.docs||{}).forEach(function(k){out.push(o.docs[k].ref);});Object.keys(o.older||{}).forEach(function(k){(o.older[k]||[]).forEach(function(x){out.push(x.ref);});});
+  (o.emails||[]).forEach(function(x){out.push(x.ref);(x.older||[]).forEach(function(y){out.push(y.ref);});});if(o.review)out.push(o.review.ref);
+  (o.more||[]).forEach(function(m){out.push(m.ref);});(o.reading||[]).forEach(function(r){out.push(r.ref);});if(o.recheck)out.push(o.recheck.ref);return out.filter(Boolean);}
+
+/* ---- 1. dates and reminders: the closing date, the interview, a reference due, a funding deadline, any other day ---- */
+var DKINDS=[["closes","Closing date"],["interview","Interview"],["referee","Reference due"],["funding","Funding deadline"],["other","Another date"]];
+function dkLabel(k){return (DKINDS.filter(function(x){return x[0]===k;})[0]||DKINDS[4])[1];}
+function datesOf(o){var out=[];if(o.due)out.push({id:"due",kind:"closes",at:o.due,label:"Closes",o:o});
+  if(o.interview&&o.interview.at)out.push({id:"iv",kind:"interview",at:o.interview.at,label:"Interview"+(o.interview.time?" at "+o.interview.time:""),o:o});
+  (o.refs||[]).forEach(function(r){if(r.due)out.push({id:"ref:"+r.id,kind:"referee",at:r.due,label:"Reference from "+r.name+" due",o:o});});
+  (o.dates||[]).forEach(function(d){if(d.at)out.push({id:d.id,kind:d.kind,at:d.at,label:d.label||dkLabel(d.kind),o:o,own:true});});
+  return out.sort(function(a,b){return a.at<b.at?-1:a.at>b.at?1:0;});}
+function thoughtAlive(id){try{return (state.parked||[]).some(function(it){return it.id===id;});}catch(e){return false;}}
+function hasReminder(o,dateId,days){var d=datesOf(o).filter(function(x){return x.id===dateId;})[0];return (o.reminders||[]).some(function(r){return r.dateId===dateId&&r.days===days&&thoughtAlive(r.thoughtId)&&(!r.forAt||!d||r.forAt===d.at);});}
+/* a reminder set for a date that has since moved: its thought leaves the Inbox, so the new one does not stand beside it */
+function dropStale(o,dateId,days){var keep=[];(o.reminders||[]).forEach(function(r){if(r.dateId===dateId&&r.days===days){var l=state.parked||[];for(var i=l.length-1;i>=0;i--)if(l[i].id===r.thoughtId)l.splice(i,1);}else keep.push(r);});o.reminders=keep;}
+/* a thought in the Inbox that comes back on its day (the cloud nudges it while the page is open, and Focus lists it) */
+function remindAt(o,dateId,days){var d=datesOf(o).filter(function(x){return x.id===dateId;})[0];if(!d)return null;
+  if(hasReminder(o,dateId,days)){say("That reminder is set already: it waits in the Inbox.");return null;}
+  dropStale(o,dateId,days);var day=addDays(d.at,-days),when=new Date(day+"T09:00:00").getTime(),now=Date.now();if(!(when>now))when=now+5*60000;
+  var n=daysTo(d.at),text=(o.title||"An application")+": "+d.label.charAt(0).toLowerCase()+d.label.slice(1)+" on "+dayStr(d.at+"T12:00:00")+(n>0?", in "+n+" day"+(n===1?"":"s"):n===0?", today":"")+".";
+  var it=null;try{if(W.IngInbox&&IngInbox.tc)it=IngInbox.tc.add(text);}catch(e){it=null;}
+  if(!it){bellFor(o,d);return null;}
+  it.remindAt=when;it.reminded=0;it.career={opp:o.id,date:dateId};(o.reminders=o.reminders||[]).push({id:uid("rm"),dateId:dateId,days:days,at:when,forAt:d.at,thoughtId:it.id});save();
+  try{IngInbox.tc.refresh();}catch(e){}render();say("It comes back to you "+(day<=todayStr()?"today":"on "+dayStr(day+"T12:00:00"))+", in the Inbox and on Focus. Inside Ingenium only: there is no alarm outside it.");return it;}
+function bellFor(o,d){state.reminders=state.reminders||[];var text=(o.title||"An application")+": "+d.label.charAt(0).toLowerCase()+d.label.slice(1)+" on "+dayStr(d.at+"T12:00:00")+".";
+  if(state.reminders.some(function(r){return r.text===text;})){say("It is with the bell already.");return;}state.reminders.push({text:text});save();try{bellRefresh();}catch(e){}say("Kept with your reminders (the bell).");}
+function dropThoughts(o){var l=state.parked;if(!Array.isArray(l))return;(o.reminders||[]).forEach(function(r){for(var i=l.length-1;i>=0;i--)if(l[i].id===r.thoughtId)l.splice(i,1);});try{IngInbox.tc.badge();}catch(e){}}
+function datesBox(o){var box=h("div","c-dates"),head=h("div","c-row c-tight");head.appendChild(h("h3","c-h3",esc("Dates")));box.appendChild(head);
+  var ds=datesOf(o);if(!ds.length)box.appendChild(h("p","c-note",esc("No dates yet: set the closing date above, or add one below.")));
+  ds.forEach(function(d){var n=daysTo(d.at),row=h("div","c-date"),tx=h("div","tx");tx.appendChild(h("b",null,esc(d.label)));tx.appendChild(h("small",null,esc(dayStr(d.at+"T12:00:00")+(n==null?"":" · "+inWords(n)))));row.appendChild(tx);
+    var k=h("div","c-keys c-remind");k.appendChild(h("span","c-note",esc("Remind me")));
+    [[7,"A week before"],[3,"3 days before"],[1,"The day before"]].forEach(function(c){var set=hasReminder(o,d.id,c[0]),b=cbtn("sm"+(set?" pri":""),c[1],function(){remindAt(o,d.id,c[0]);},set?"Set: it waits in the Inbox":"A thought in the Inbox that comes back that morning");b.setAttribute("aria-pressed",set?"true":"false");if(n!=null&&n<c[0])b.disabled=true;k.appendChild(b);});
+    k.appendChild(cbtn("sm quiet","With the bell",function(){bellFor(o,d);},"A line among the bell's reminders"));
+    if(d.own)k.appendChild(cbtn("sm quiet","✕",function(){o.dates=(o.dates||[]).filter(function(z){return z.id!==d.id;});save();render();},"Take the date off"));row.appendChild(k);box.appendChild(row);});
+  var add=h("div","c-row c-adddate"),kd=select(DKINDS.filter(function(k){return k[0]!=="closes"&&k[0]!=="interview";}),"other"),ad=input("date",""),al=input("text","","What it is (optional)");
+  kd.className="c-sel";ad.setAttribute("aria-label","The day");al.setAttribute("aria-label","What it is");add.appendChild(field("A date",kd));add.appendChild(field("Which day",ad));add.appendChild(field("Called",al));
+  add.appendChild(cbtn("sm","Add the date",function(){if(!ad.value){say("Choose the day first.");return;}(o.dates=o.dates||[]).push({id:uid("dt"),kind:kd.value,at:ad.value,label:al.value.trim()||dkLabel(kd.value)});save();render();}));box.appendChild(add);
+  box.appendChild(h("p","c-note",esc("Reminders stay inside Ingenium: a thought in the Inbox comes back on its morning while the page is open, and the bell keeps a line. There are no alarms outside the app. When a date moves, set its reminder again: the old one goes.")));return box;}
+/* Today's strip: every date of every open application in the next seven days */
+function weekStrip(S){var items=[];sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;datesOf(o).forEach(function(d){var n=daysTo(d.at);if(n!=null&&n>=0&&n<=7)items.push({d:d,n:n,o:o});});});
+  items.sort(function(a,b){return a.n-b.n;});var box=h("div","c-week");box.appendChild(h("div","c-label",esc("This week")));
+  if(!items.length){box.appendChild(h("p","c-note",esc("No dates in the next seven days.")));return box;}
+  items.slice(0,6).forEach(function(x){var b=h("button","c-wk");b.type="button";b.innerHTML="<b>"+esc((x.n===0?"Today":x.n===1?"Tomorrow":shortDay(x.d.at)+" · in "+x.n+" days"))+"</b><span>"+esc(x.d.label+" · "+(x.o.title||"Untitled"))+"</span>";
+    b.addEventListener("click",function(){S.ui.room="apps";S.ui.open=x.o.id;x.o.step="track";show("work");save();render();});box.appendChild(b);});return box;}
+function nearestDate(opps){var best=null;opps.forEach(function(o){datesOf(o).forEach(function(d){var n=daysTo(d.at);if(n==null||n<0)return;if(!best||n<best.n)best={d:d,n:n,o:o};});});return best;}
+
+/* ---- 2. referees: who will speak for her, and where each stands ---- */
+var RSTAT=[["toask","To ask"],["asked","Asked"],["agreed","Agreed"],["sent","Sent"],["thanked","Thanked"]];
+function rstat(k){return (RSTAT.filter(function(x){return x[0]===k;})[0]||RSTAT[0])[1];}
+function setRefStatus(o,r,st){r.status=st;if(st==="asked"&&!r.asked)r.asked=Date.now();if(st==="sent")(r.sent=r.sent||[]).push(Date.now());if(st==="thanked")r.thanked=Date.now();save();render();}
+function refsPane(o,pane,P){o.refs=o.refs||[];var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc("Your referees")));pane.appendChild(top);
+  pane.appendChild(h("p","c-note",esc("Who will speak for you, and where each stands: to ask, asked, agreed, sent, thanked. Ask early, and give them the posting, your CV and the date it is due. Nothing is sent from here: the email is written for you to send.")));
+  var how=LESSONS.filter(function(L){return L[0]==="Asking for a reference";})[0];if(how){var d=fold("how:refs","How to ask");var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});d.appendChild(ol);pane.appendChild(d);}
+  if(!o.refs.length)pane.appendChild(empty("No referees yet","Add one from the Referees entries of your profile, or by name. Today then says when to choose them and when to follow up."));
+  o.refs.forEach(function(r){var c=h("div","c-ref"),hd=h("div","c-ref-h");hd.appendChild(h("b",null,esc(r.name)));hd.appendChild(chip(rstat(r.status),r.status==="thanked"||r.status==="sent"?"c-ok":""));
+    var ss=select(RSTAT,r.status);ss.className="c-sel";ss.setAttribute("aria-label","Where it stands with "+r.name);ss.addEventListener("change",function(){setRefStatus(o,r,ss.value);});hd.appendChild(ss);c.appendChild(hd);
+    var meta=[r.role,r.contact,r.asked?"asked "+dayStr(r.asked):"",r.sent&&r.sent.length?"sent "+dayStr(r.sent[r.sent.length-1]):""].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));
+    var g=h("div","c-row"),du=input("date",r.due||"");du.setAttribute("aria-label","When the reference is due");du.addEventListener("change",function(){r.due=du.value;save();render();});g.appendChild(field("Due by",du));
+    var nt=h("textarea","c-ta");nt.placeholder="Notes: what they know you for, what you sent them.";nt.value=r.notes||"";nt.setAttribute("aria-label","Notes on "+r.name);nt.addEventListener("change",function(){r.notes=nt.value;save();});g.appendChild(field("Notes",nt));c.appendChild(g);
+    var k=h("div","c-keyrow"),i=RSTAT.map(function(x){return x[0];}).indexOf(r.status);
+    if(i>=0&&i<RSTAT.length-1)k.appendChild(cbtn("sm pri","Mark "+RSTAT[i+1][1].toLowerCase(),function(){setRefStatus(o,r,RSTAT[i+1][0]);}));
+    var pur=r.status==="toask"||r.status==="asked"?"reference":r.status==="agreed"?"followup":"thanks";
+    k.appendChild(cbtn("sm",pur==="reference"?"Write the request":pur==="followup"?"Write a follow-up":"Write the thanks",function(){writeDoc(o,"email",{role:"referee",purpose:pur,extra:"The referee is "+r.name+(r.role?", "+r.role:"")+"."+(r.due?" The reference is due by "+dayStr(r.due+"T12:00:00")+".":"")+(r.notes?" "+r.notes.slice(0,300):"")});}));
+    if(r.due){var set=hasReminder(o,"ref:"+r.id,3);var rb=cbtn("sm"+(set?" pri":""),"Remind me, 3 days before",function(){remindAt(o,"ref:"+r.id,3);});rb.setAttribute("aria-pressed",set?"true":"false");k.appendChild(rb);}
+    k.appendChild(cbtn("sm quiet","Remove",function(){o.refs=o.refs.filter(function(x){return x!==r;});save();render();}));c.appendChild(k);pane.appendChild(c);});
+  var add=h("div","c-col"),P0=CS().profile,ents=P0.items.filter(function(it){return it.sec==="referee";}),row1=h("div","c-row");
+  add.appendChild(h("h3","c-h3",esc("Add a referee")));
+  if(ents.length){var es=select([["","From your profile…"]].concat(ents.map(function(it){return [it.id,[it.title,it.place].filter(Boolean).join(", ")];})),"");es.className="c-sel";es.setAttribute("aria-label","A referee from your profile");
+    es.addEventListener("change",function(){var it=ents.filter(function(x){return x.id===es.value;})[0];if(!it)return;o.refs.push({id:uid("rf"),name:it.title,role:it.place||"",contact:"",status:"toask",due:o.due?addDays(o.due,-3):"",notes:it.text||"",sent:[]});save();render();});row1.appendChild(es);}
+  var nm=input("text","","Their name"),rl=input("text","","Their post or relation to you"),ct=input("text","","Email (optional)");nm.setAttribute("aria-label","The referee's name");rl.setAttribute("aria-label","Their post");ct.setAttribute("aria-label","Their email");
+  row1.appendChild(nm);row1.appendChild(rl);row1.appendChild(ct);row1.appendChild(cbtn("sm","Add by name",function(){var v=nm.value.trim();if(!v){nm.focus();say("Give their name first.");return;}o.refs.push({id:uid("rf"),name:v,role:rl.value.trim(),contact:ct.value.trim(),status:"toask",due:o.due?addDays(o.due,-3):"",notes:"",sent:[]});save();render();}));
+  add.appendChild(row1);add.appendChild(h("p","c-note",esc("A reference is usually due with the application or soon after it: the due date is set three days before the closing date, for you to change.")));pane.appendChild(add);
+  var asked=o.refs.filter(function(r){return r.status!=="toask";}).length;P.foot.appendChild(h("span","c-note",esc(o.refs.length?o.refs.length+" referee"+(o.refs.length===1?"":"s")+" · "+asked+" asked":"Referees are kept with this application only.")));
+  P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Track",function(){goStep(o,"track");}));}
+
+/* ---- 3. the interview: its day, a list to prepare by (fixed, no model), a mock run, and the thanks after ---- */
+function interviewCard(o){var iv=o.interview=o.interview||{},card=h("div","c-ivcard"),hd=h("div","c-row c-tight");hd.appendChild(h("h3","c-h3",esc("The interview")));
+  var n=daysTo(iv.at);if(n!=null)hd.appendChild(h("span","c-ivdays",esc(n<0?"Held "+dayStr(iv.at+"T12:00:00"):n===0?"Today":n===1?"Tomorrow":"In "+n+" days")));card.appendChild(hd);
+  var g=h("div","c-grid3"),dt=input("date",iv.at||""),tm=input("time",iv.time||""),fm=select([["","Not said"],["person","In person"],["online","Online"],["phone","By telephone"]],iv.format||"");
+  dt.addEventListener("change",function(){iv.at=dt.value;if(iv.at&&o.stage!=="interview"&&!FINISHED[o.stage])o.stage="interview";save();render();});tm.addEventListener("change",function(){iv.time=tm.value;save();render();});fm.addEventListener("change",function(){iv.format=fm.value;save();});
+  g.appendChild(field("Day",dt));g.appendChild(field("Time",tm));g.appendChild(field("How",fm));card.appendChild(g);
+  var g2=h("div","c-grid2"),wh=input("text",iv.where||"","The place, or the link"),pn=input("text",iv.panel||"","Who will be there, if you know");
+  wh.addEventListener("change",function(){iv.where=wh.value.trim();save();});pn.addEventListener("change",function(){iv.panel=pn.value.trim();save();});g2.appendChild(field("Where",wh));g2.appendChild(field("The panel",pn));card.appendChild(g2);
+  card.appendChild(h("p","c-note",esc("To prepare, in this order; nothing here is written by the model.")));var prep=iv.prep=iv.prep||{},ul=h("ul","c-prep");
+  var asks=o.read&&o.read.r&&o.read.r.asks||[];
+  [["post","Read the posting once more, slowly, and the criteria it scores",["The posting",function(){goStep(o,"post");}]],
+   ["evidence","An example for each essential criterion: the situation, what you did yourself, what came of it",["Practise",function(){o.step="practise";o.ptab="evidence";save();jump();render();}]],
+   ["asks","Two questions to ask them, about the work itself (below)",null],["way","The way there, or the link, and the time: leave margin",null],["bring","What to bring: the posting, your CV as you sent it, your notes",null]].forEach(function(x){
+    var li=h("li",prep[x[0]]?"c-ck-done":null),cb=h("input");cb.type="checkbox";cb.id="iv_"+o.id+"_"+x[0];cb.checked=!!prep[x[0]];cb.addEventListener("change",function(){prep[x[0]]=cb.checked;save();render();});
+    var lb=h("label",null,esc(x[1]));lb.setAttribute("for",cb.id);li.appendChild(cb);li.appendChild(lb);if(x[2])li.appendChild(cbtn("sm",x[2][0],x[2][1]));ul.appendChild(li);});card.appendChild(ul);
+  var qa=h("textarea","c-ta");qa.placeholder=asks.length?"":"Two questions about the work itself.";qa.value=iv.asked!=null?iv.asked:asks.slice(0,2).join("\n");qa.setAttribute("aria-label","Your questions to ask");qa.addEventListener("change",function(){iv.asked=qa.value;save();});
+  card.appendChild(field("Your questions to ask"+(asks.length&&iv.asked==null?" (from the reading: change them as you wish)":""),qa));
+  var nb=h("textarea","c-ta");nb.placeholder="Notes before: what to say first, what to remember.";nb.value=iv.notes||"";nb.setAttribute("aria-label","Notes before the interview");nb.addEventListener("change",function(){iv.notes=nb.value;save();});card.appendChild(field("Notes before",nb));
+  var na=h("textarea","c-ta");na.placeholder="After: what was asked, what went well, what to say in the thanks.";na.value=iv.after||"";na.setAttribute("aria-label","Notes after the interview");na.addEventListener("change",function(){iv.after=na.value;save();});card.appendChild(field("Notes after the interview",na));
+  var k=h("div","c-keyrow");k.appendChild(cbtn("sm","Write a thank-you email",function(){writeDoc(o,"email",{role:"contact",purpose:"thanks",extra:"The interview was "+(iv.at?"on "+dayStr(iv.at+"T12:00:00"):"recently")+(iv.panel?", with "+iv.panel:"")+"."+(iv.after?" My notes after it: "+iv.after.slice(0,400):"")});},"To the contact named in the posting; written for you to send"));
+  k.appendChild(cbtn("sm","Practise the questions",function(){o.step="practise";o.ptab="interview";save();jump();render();}));
+  k.appendChild(cbtn("sm quiet","Take the interview off",function(){if(!confirm("Take the interview and its notes off this application?"))return;delete o.interview;if(o.stage==="interview")o.stage="applied";save();render();}));card.appendChild(k);return card;}
+/* the mock run: one question, two minutes on the Clepsydra, then her answer looked at with her */
+var MOCK=null,mockT=0;
+function mockBox(o,q,pane){var box=h("div","c-mock");
+  if(MOCK&&MOCK.opp===o.id&&MOCK.q===q.id){var b=h("b",null,esc("The clock runs: "+clockLeft()+" left"));b.id="csMockLeft";box.appendChild(b);
+    box.appendChild(h("p","c-note",esc("Answer as you would in the room, aloud or in writing. At the bell, write down what you said and press Look at it with me.")));box.appendChild(cbtn("sm","Stop the clock",function(){stopMock();}));}
+  else{box.appendChild(h("p","c-note",esc("A mock run: this one question, two minutes on the Clepsydra, then your answer looked at with you.")));
+    box.appendChild(cbtn("sm","Mock run · 2 minutes",function(){startMock(o,q);},"The Clepsydra runs two minutes; at the bell it is given back its usual length"));}
+  pane.appendChild(box);}
+function clockLeft(){try{return pomoFmt(pomo.remaining);}catch(e){return "";}}
+function startMock(o,q){if(typeof pomoReset!=="function"||typeof pomoStart!=="function"){say("The Clepsydra is not in this copy of the page.");return;}try{if(pomo.running){say("The Clepsydra is running already: still it first.");return;}}catch(e){}
+  MOCK={opp:o.id,q:q.id,prev:state.clep.focusLen,at:Date.now()};try{localStorage.setItem("ing_cs_mock",String(MOCK.prev));}catch(e){}state.clep.focusLen=2;pomoReset();pomoStart();render();
+  clearInterval(mockT);mockT=setInterval(function(){if(!MOCK){clearInterval(mockT);return;}var b=$("csMockLeft");if(b)b.textContent="The clock runs: "+clockLeft()+" left";},1000);}
+function stopMock(){var m=MOCK;MOCK=null;clearInterval(mockT);try{if(m&&m.prev)state.clep.focusLen=m.prev;localStorage.removeItem("ing_cs_mock");pomoReset();}catch(e){}save();render();}
+(function(){try{var mp=+localStorage.getItem("ing_cs_mock");if(!mp)return;localStorage.removeItem("ing_cs_mock");
+  if(state.clep&&state.clep.focusLen===2){state.clep.focusLen=mp;if(typeof pomo!=="undefined"&&!pomo.running&&pomo.phase==="focus")pomo.remaining=mp*60;saveState();}}catch(e){}})();
+/* the bell: when a focus session ends on the Clepsydra, the mock run or the minutes chosen on Today hear of it */
+var CLOCK={on:false,mins:0,ids:[],ended:false};
+function bellRang(){if(MOCK){var m=MOCK;MOCK=null;clearInterval(mockT);try{if(m.prev)state.clep.focusLen=m.prev;localStorage.removeItem("ing_cs_mock");pomoReset();}catch(e){}save();say("Two minutes: now write down what you said, and press Look at it with me.");render();return;}
+  if(CLOCK.on){CLOCK.on=false;CLOCK.ended=true;save();render();}}
+(function(){try{if(typeof W.pomoAdvance!=="function"||W.pomoAdvance.__r188)return;var og=W.pomoAdvance,wrapped=function(auto){var focus=false;try{focus=pomo.phase==="focus";}catch(e){}var r=og.apply(this,arguments);try{if(focus)bellRang();}catch(e){}return r;};
+  wrapped.__r188=1;W.pomoAdvance=wrapped;try{pomoAdvance=wrapped;}catch(e){}}catch(e){}})();
+
+/* ---- 4. an application as a folder of files (one zip), and the Settings export carrying the studio's texts ---- */
+function safeName(s){try{return lxFileName(s);}catch(e){return String(s||"file").replace(/[\\/:*?"<>|]+/g," ").trim()||"file";}}
+function stWord(st,isWant){return isWant?{met:"Matches",partly:"Partly",none:"Does not match",unsaid:"Not said"}[st]||st:{met:"Shown",partly:"Partly shown",none:"Not shown"}[st]||st;}
+function readingMd(o){var r=o.read&&o.read.r;if(!r)return "";var b=bandOf(r),out=["# How you fit: "+to(o),""];
+  if(b){out.push("**"+b.word+"**","");b.why.forEach(function(w){out.push(w);});out.push("","Advice. "+b.advice,"",b.rule,"");}
+  if(r.wants&&r.wants.length){out.push("## Against what you are looking for","","| You are looking for | Here | What it offers |","|---|---|---|");r.wants.forEach(function(x){out.push("| "+x.text+" | "+stWord(x.st,true)+" | "+(x.offer||"")+" |");});out.push("");}
+  if(r.crit.length){out.push("## What it asks","","| Criterion | Essential or desirable | In your profile | Evidence |","|---|---|---|---|");r.crit.forEach(function(x){out.push("| "+x.text+" | "+(x.ess?"Essential":"Desirable")+" | "+stWord(x.st)+" | "+(x.ev||"")+" |");});out.push("");}
+  if(r.strengths.length){out.push("## For","");r.strengths.forEach(function(s){out.push("- "+s);});out.push("");}if(r.concerns.length){out.push("## Against","");r.concerns.forEach(function(s){out.push("- "+s);});out.push("");}
+  if(r.next.length||r.asks.length){out.push("## Next","");r.next.forEach(function(s){out.push("1. "+s);});r.asks.forEach(function(s){out.push("- Ask the contact: "+s);});out.push("");}
+  out.push("Read on "+dayStr(o.read.at)+" with "+(o.read.model||"the model")+", from the profile alone; the band is not a probability.");return out.join("\n");}
+function checklistMd(o){var C=o.check;if(!C)return "";var out=["# Checklist: "+to(o),""];C.items.forEach(function(x){out.push("- ["+(x.done?"x":" ")+"] "+x.text+(x.quote?"  \n  From the posting: “"+x.quote+"”":""));});
+  (C.pending||[]).forEach(function(x){out.push("- [ ] (to look at) "+x.text);});return out.join("\n")+"\n";}
+function practiseMd(o){var r=o.read&&o.read.r,pr=o.practice||{crit:{},qs:[]},out=[];
+  var ck=Object.keys(pr.crit||{}).filter(function(k){return pr.crit[k].answer;});
+  if(ck.length&&r){out.push("# Your evidence","");ck.forEach(function(k){var c=r.crit[+k.slice(1)];if(!c)return;var s=pr.crit[k];out.push("## "+c.text,"",s.answer,"");if(s.fb&&!s.fb.RAW)out.push("Looked at: "+[s.fb.MEETS?"meets it: "+s.fb.MEETS.toLowerCase():"",s.fb.WORKS?"works: "+s.fb.WORKS:"",s.fb.MISSING?"missing: "+s.fb.MISSING:"",s.fb["ASK YOURSELF"]?"ask yourself: "+s.fb["ASK YOURSELF"]:""].filter(Boolean).join("; "),"");});}
+  if((pr.qs||[]).length){out.push("# Interview questions","");pr.qs.forEach(function(q,i){out.push((i+1)+". "+q.q);if(q.answer)out.push("","   "+q.answer.replace(/\n/g,"\n   "));out.push("");});}
+  return out.join("\n");}
+function notesMd(o){var out=["# "+(o.title||"Untitled")+(o.org?" · "+o.org:""),"","Where it stands: "+stageWord(o.stage)+"."+(o.due?" Closing date: "+dayStr(o.due+"T12:00:00")+".":"")+(o.closes?" The posting says: "+o.closes:""),""];
+  var ds=datesOf(o);if(ds.length){out.push("## Dates","");ds.forEach(function(d){out.push("- "+dayStr(d.at+"T12:00:00")+": "+d.label);});out.push("");}
+  if((o.refs||[]).length){out.push("## Referees","");o.refs.forEach(function(r){out.push("- "+r.name+(r.role?", "+r.role:"")+(r.contact?" ("+r.contact+")":"")+": "+rstat(r.status).toLowerCase()+(r.asked?", asked "+dayStr(r.asked):"")+(r.due?", due "+dayStr(r.due+"T12:00:00"):"")+(r.notes?". "+r.notes:""));});out.push("");}
+  if(o.interview){var iv=o.interview;out.push("## The interview","",[iv.at?dayStr(iv.at+"T12:00:00"):"",iv.time,iv.format,iv.where,iv.panel?"with "+iv.panel:""].filter(Boolean).join(" · ")||"(no day set)");if(iv.asked)out.push("","Questions to ask:",iv.asked);if(iv.notes)out.push("","Before: "+iv.notes);if(iv.after)out.push("","After: "+iv.after);out.push("");}
+  if((o.reading||[]).length){out.push("## Reading list","");o.reading.forEach(function(r){out.push("- "+r.title+(r.by?", "+r.by:"")+(r.url?" <"+r.url+">":"")+" · "+rsLabel(r.status)+(r.notes?". "+r.notes:""));});out.push("");}
+  if(o.notes){out.push("## Notes","",o.notes,"");}return out.join("\n");}
+function exportFiles(o,dir,opt){dir=dir?String(dir).replace(/\/?$/,"/"):"";opt=opt||{};var files=[];
+  return Promise.all([postOnly(o),Promise.all((o.more||[]).map(function(m){return loadText(m.ref).then(function(t){return {name:m.name,text:t};});})),
+      Promise.all(Object.keys(o.docs||{}).filter(function(k){return DOCS[k];}).map(function(k){return loadText(o.docs[k].ref).then(function(t){return {kind:k,text:t};});})),
+      Promise.all((o.emails||[]).map(function(e){return loadText(e.ref).then(function(t){return {e:e,text:t};});}))]).then(function(x){
+    if(x[0])files.push({name:dir+"posting.txt",data:x[0]});x[1].forEach(function(m){if(m.text)files.push({name:dir+"particulars/"+safeName(m.name.replace(/\.[a-z0-9]+$/i,""))+".txt",data:m.text});});
+    var rd=readingMd(o);if(rd)files.push({name:dir+"reading.md",data:rd});var ck=checklistMd(o);if(ck)files.push({name:dir+"checklist.md",data:ck});
+    x[2].forEach(function(d){if(d.text)files.push({name:dir+safeName(DOCS[d.kind][0])+".md",data:d.text});});
+    x[3].forEach(function(m,i){if(!m.text)return;var rl=(ROLES.filter(function(z){return z[0]===m.e.role;})[0]||["","Email"])[1],pu=(PURPOSES.filter(function(z){return z[0]===m.e.purpose;})[0]||["",""])[1].replace(/^To /,"");files.push({name:dir+"emails/"+safeName(rl+" - "+pu)+(i?" "+(i+1):"")+".txt",data:m.text});});
+    var pr=practiseMd(o);if(pr)files.push({name:dir+"practise.md",data:pr});files.push({name:dir+"notes.md",data:notesMd(o)});
+    var q=Promise.resolve(),withDocx=!opt.noDocx&&W.IngDoc&&IngDoc.make&&W.IngLectorPaper;
+    if(withDocx)x[2].forEach(function(d){if(!d.text)return;q=q.then(function(){return paperFile(o,d.kind).then(function(f){files.push({name:dir+safeName(DOCS[d.kind][0])+".docx",data:f.bytes});},function(){});});});
+    return q.then(function(){files.push({name:dir+"README.txt",data:"This folder was made by the Career Studio in Ingenium on "+new Date().toString()+", for "+to(o)+".\n\n"+
+      "posting.txt is the posting as it was kept"+(x[1].length?"; particulars/ holds the further documents added to it":"")+".\nreading.md is how it was read against the profile: the band with its rule, each want and each criterion with the evidence.\n"+
+      "checklist.md is what it asks to send and do, ticked as it stood.\nEach document is here as the Word file Save as Word gives (.docx) and as the same text in Markdown (.md).\nemails/ holds each email written; practise.md the evidence and answers practised; notes.md the dates, referees, interview, reading list and notes.\n\nNothing here was sent anywhere: the files were made on the device and saved where you chose.\n"});return files;});});}
+function exportOpp(o){if(typeof makeZip!=="function"||typeof saveFileNative!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}say("Making the folder of files…");
+  return exportFiles(o,safeName(o.title||"application")+"/").then(function(files){return Promise.resolve(saveFileNative(safeName(o.title||"application")+".zip","application/zip",makeZip(files))).then(function(){say(files.length+" files, in one zip folder.");return files;});},function(e){say("It could not be made: "+(e&&e.message||e));return null;});}
+function exportAll(){var S=CS(),opps=S.opps.slice();if(!opps.length){say("Nothing to export yet.");return Promise.resolve(null);}if(typeof makeZip!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}
+  say("Making a folder for each application…");var files=[],q=Promise.resolve();
+  opps.forEach(function(o){q=q.then(function(){return exportFiles(o,safeName(o.title||"application")+"/").then(function(fs){files=files.concat(fs);});});});
+  return q.then(function(){files.push({name:"README.txt",data:"The applications of "+personLabel(S)+", exported from the Career Studio in Ingenium on "+new Date().toString()+": one folder for each, with its posting, its reading, its checklist, its documents (Word and Markdown), its emails, practise and notes.\n"});
+    return Promise.resolve(saveFileNative(safeName("Career Studio - "+personLabel(S))+".zip","application/zip",makeZip(files))).then(function(){say(files.length+" files, one folder for each application.");return files;});},function(e){say("It could not be made: "+(e&&e.message||e));return null;});}
+/* Settings, Export your data: the studio's own line, with each application as readable files and every text kept whole */
+(function(){(W.__ingExportProviders=W.__ingExportProviders||[]).push({id:"exCareer",label:"The Career Studio: each profile's applications as readable files (postings, readings, checklists, documents, notes), and everything it keeps, whole",
+  files:function(){var people=ROOT().people||[],out=[],q=Promise.resolve(),texts={};
+    people.forEach(function(p){var pd="career/"+safeName(personLabel(p))+"/";(p.opps||[]).forEach(function(o){q=q.then(function(){return exportFiles(o,pd+safeName(o.title||"application")+"/",{noDocx:true}).then(function(fs){out=out.concat(fs);},function(){});});});});
+    return q.then(function(){var refs=[];people.forEach(function(p){refs=refs.concat(refsOfPerson(p));});
+        try{var M=LXR().state().me;[M.cv].concat(M.writing||[],M.letters||[]).forEach(function(x){if(x&&x.ref)refs.push(x.ref);});}catch(e){}return Promise.all(refs.map(function(r){return loadText(r).then(function(t){if(t)texts[r]=t;});}));})
+      .then(function(){out.push({name:"career/career.json",data:JSON.stringify({career:state.career,texts:texts},null,1)});return out;});}});})();
+
+/* ---- 5. the reading list of an application: a supervisor's work, the programme's pages, the call; kept, in Fontes, fetched on press, read by the reading page ---- */
+var RKINDS=[["sup","A supervisor's work"],["prog","The programme's page"],["call","The call itself"],["other","Other"]],RSTATUS=[["toread","To read"],["reading","Reading"],["read","Read"]];
+function rsLabel(k){return (RSTATUS.filter(function(x){return x[0]===k;})[0]||RSTATUS[0])[1];}
+function keepToRead(o,x){o.reading=o.reading||[];if(x.url&&o.reading.some(function(r){return r.url===x.url;})){say("It is on the reading list already.");return null;}
+  var it={id:uid("rd"),title:String(x.title||x.url||"Untitled").slice(0,200),by:String(x.by||"").slice(0,120),url:String(x.url||"").slice(0,500),kind:x.kind||"other",status:"toread",notes:"",fontesId:null,ref:null,runId:null,at:Date.now()};
+  o.reading.push(it);save();render();say("Kept in your reading list (What you send).");return it;}
+function toFontes(o,it){if(typeof fontesAdd!=="function"){say("Fontes is not in this copy of the page.");return;}var d=new Date(),c={type:"webpage",title:it.title,accessed:{"date-parts":[[d.getFullYear(),d.getMonth()+1,d.getDate()]]}};
+  if(it.url)c.URL=it.url;if(it.by)c.author=[{literal:it.by}];fontesAdd([c]);var id=c.id;if(!id){try{id=fontesKey(c);}catch(e){id=null;}}it.fontesId=id||null;save();render();}
+function fetchReading(o,it){if(!it.url){say("It has no address to fetch.");return;}if(typeof fetchPageText!=="function"){say("This device cannot fetch pages.");return;}say("Fetching its text…");
+  fetchPageText(it.url,120000).then(function(t){t=String(t||"").trim();if(t.length<200)throw new Error("too little text came back");var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){if(it.ref){try{IngBig.del(it.ref);}catch(e){}}it.ref=ref;it.chars=t.length;it.fetchedAt=Date.now();save();render();say("Its text is kept: "+Math.round(t.length/1000)+" thousand characters.");});},function(e){say("It could not be fetched: "+(e&&e.message||e));});}
+var watchT=0;function watchRuns(){clearInterval(watchT);watchT=setInterval(function(){var busy=false;try{busy=W.LX&&LX.busy;}catch(e){}var seen=false;
+    (ROOT().people||[]).forEach(function(p){(p.opps||[]).forEach(function(o){(o.reading||[]).forEach(function(it){if(!it.runId||it.readAt||it.runErr)return;var run=null;try{run=lxRun(it.runId);}catch(e){}if(!run)return;seen=true;
+      if(run.status==="done"){it.readAt=Date.now();it.status="read";save();render();}else if(run.status==="error"){it.runErr=run.err||"stopped";save();render();}});});});
+    if(!seen&&!busy)clearInterval(watchT);},1500);}
+/* the reading page reads it as a document (its parts, notes and analysis), and what it found stands under the item and beside the profile when the studio writes */
+function readWithLector(o,it){if(!it.ref){say("Fetch its text first.");return Promise.resolve(null);}if(typeof lxPrepare!=="function"||typeof lxStart!=="function"||typeof lxPartsFor!=="function"){say("The reading page is not in this copy of the page.");return Promise.resolve(null);}
+  try{if(W.LX&&LX.busy){say("The reading page is busy: wait for it, or pause it there.");return Promise.resolve(null);}}catch(e){}if(needModel())return Promise.resolve(null);var pl=plan(),m=pl&&pl.chosen;
+  try{var old=it.runId?lxRun(it.runId):null;if(old&&old.career===o.id&&old.status!=="done")lxDelete(old.id);}catch(e){}
+  return loadText(it.ref).then(function(text){if(!text)throw new Error("its text is no longer kept");return lxPrepare(it.title+".txt",text);}).then(function(P){var parts=lxPartsFor(P,"overview",m);
+    var run={id:"lx_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:it.title,file:it.title+".txt",kind:"doc",depth:"overview",modelId:m?m.id:null,created:Date.now(),updated:Date.now(),status:"reading",done:0,total:parts.length,facts:P.facts,
+      partsRef:IngBig.newId(),notesRef:IngBig.newId(),mergeRef:IngBig.newId(),analysisRef:IngBig.newId(),writings:{},career:o.id};
+    return Promise.all([lxPutJSON(run.partsRef,parts),lxPutJSON(run.notesRef,parts.map(function(){return "";}))]).then(function(){var s=lxState();s.runs.unshift(run);it.runId=run.id;delete it.readAt;delete it.runErr;it.status="reading";save();lxStart(run.id);watchRuns();render();return run;});})
+  .then(null,function(e){say("It could not be read: "+(e&&e.message||e));return null;});}
+function analysisOf(it){var run=null;try{run=it.runId?lxRun(it.runId):null;}catch(e){}if(!run||run.status!=="done")return Promise.resolve(null);return lxJSON(run.analysisRef,{}).then(function(a){return a&&Object.keys(a).length?a:null;});}
+/* what the reading page found in the works read for this application, for the prompts */
+function readingNotes(o){if(!o||!(o.reading||[]).length)return Promise.resolve([]);return Promise.all(o.reading.map(function(it){return analysisOf(it).then(function(a){if(!a)return null;var keys=["In brief","Main points","Evidence and sources","Gaps and questions"];
+    var t=keys.map(function(k){return a[k]?"("+k+") "+a[k]:"";}).filter(Boolean).join("\n");return t?{title:it.title+(it.by?", "+it.by:""),text:t}:null;});})).then(function(r){return r.filter(Boolean);});}
+function readingPane(o,pane,P){o.reading=o.reading||[];var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc("Your reading list")));pane.appendChild(top);
+  pane.appendChild(h("p","c-note",esc("What to read for this application: a supervisor's work, the programme's pages, the call itself. Keep what you find online, add a piece to Fontes, fetch its text when you press for it, and have the reading page read it: what it found then stands beside your profile when the studio writes, as MY READING NOTES, and is never claimed as your own.")));
+  if(!o.reading.length)pane.appendChild(empty("Nothing to read yet","Add a piece below, or press Keep to read on anything Look it up online found (The posting)."));
+  o.reading.forEach(function(it){var c=h("div","c-ref"),hd=h("div","c-ref-h"),run=null;try{run=it.runId?lxRun(it.runId):null;}catch(e){}
+    var rst=run?run.status:"",live=!!(run&&W.LX&&LX.busy&&LX.runId===run.id);
+    /* read to its end in the reading page itself (Resume there), it is read here too */
+    if(run&&rst==="done"&&!it.readAt){it.readAt=run.finished||Date.now();it.status="read";delete it.runErr;save();}
+    if(it.url){var a=h("a");a.href=it.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=it.title;var bb=h("b");bb.appendChild(a);hd.appendChild(bb);}else hd.appendChild(h("b",null,esc(it.title)));
+    hd.appendChild(chip((RKINDS.filter(function(k){return k[0]===it.kind;})[0]||RKINDS[3])[1]));hd.appendChild(seg(RSTATUS,it.status,function(v){it.status=v;save();render();},"Where you are with it"));c.appendChild(hd);
+    var meta=[it.by,it.fontesId?"in Fontes":"",it.ref?Math.round((it.chars||0)/1000)+" thousand characters kept":"",!run?(it.runId?"the reading is no longer kept":""):rst==="done"?"read by the reading page "+dayStr(it.readAt||run.finished||Date.now()):rst==="error"?"the reading stopped: "+(run.err||it.runErr||"an error"):live?"the reading page is reading it ("+(run.done||0)+" of "+(run.total||0)+" parts)":"the reading is paused ("+(run.done||0)+" of "+(run.total||0)+" parts)"].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));
+    var nt=h("textarea","c-ta");nt.placeholder="Your notes on it.";nt.value=it.notes||"";nt.setAttribute("aria-label","Your notes on "+it.title);nt.addEventListener("change",function(){it.notes=nt.value;save();});c.appendChild(nt);
+    var k=h("div","c-keyrow");if(!it.fontesId)k.appendChild(cbtn("sm","Add to Fontes",function(){toFontes(o,it);},"Kept among your sources, to cite by number when Fontes is switched on in your profile"));
+    if(it.url)k.appendChild(cbtn("sm",it.ref?"Fetch it again":"Fetch its text",function(){fetchReading(o,it);},"Fetches the page at its address, only now"));
+    if(it.ref&&(!run||rst==="error"))k.appendChild(cbtn("sm pri","Read it with the reading page",function(){readWithLector(o,it);},"The reading page reads it part by part and writes its notes and analysis"));
+    else if(run&&rst!=="done"&&!live)k.appendChild(cbtn("sm pri","Carry on reading",function(){try{if(W.LX&&LX.busy){say("The reading page is busy: wait for it, or pause it there.");return;}lxStart(run.id);}catch(e){}watchRuns();render();},"The reading page carries on from where it stopped"));
+    k.appendChild(cbtn("sm quiet","Remove",function(){if(it.ref){try{IngBig.del(it.ref);}catch(e){}}o.reading=o.reading.filter(function(x){return x!==it;});save();render();}));c.appendChild(k);
+    if(it.runId){var an=fold("an:"+it.id,"What the reading page found",true),aw=h("div","c-well c-an");aw.textContent="…";an.appendChild(aw);c.appendChild(an);
+      analysisOf(it).then(function(a){if(!a){var run=null;try{run=lxRun(it.runId);}catch(e){}aw.textContent=run?(run.status==="done"?"(nothing was written)":"Reading: "+(run.done||0)+" of "+(run.total||0)+" parts."+(run.status==="error"?" It stopped: "+(run.err||""):"")):"(the reading is no longer kept)";return;}
+        aw.innerHTML="";Object.keys(a).forEach(function(kk){aw.appendChild(h("h4",null,esc(kk)));aw.appendChild(h("p",null,esc(a[kk])));});});}
+    pane.appendChild(c);});
+  var add=h("div","c-col");add.appendChild(h("h3","c-h3",esc("Add a piece")));var row=h("div","c-row"),ti=input("text","","Its title"),by=input("text","","Who wrote it (optional)"),ur=input("url","","https:// (optional)"),kd=select(RKINDS,o.kind==="phd"||o.kind==="grant"?"sup":"other");
+  ti.setAttribute("aria-label","Its title");by.setAttribute("aria-label","Who wrote it");ur.setAttribute("aria-label","Its address");kd.className="c-sel";kd.setAttribute("aria-label","What it is");row.appendChild(ti);row.appendChild(by);row.appendChild(ur);row.appendChild(kd);
+  row.appendChild(cbtn("sm","Add it",function(){var t=ti.value.trim();if(!t){ti.focus();say("Give it a title first.");return;}keepToRead(o,{title:t,by:by.value.trim(),url:ur.value.trim(),kind:kd.value});}));add.appendChild(row);pane.appendChild(add);
+  var read=o.reading.filter(function(x){return x.status==="read";}).length;P.foot.appendChild(h("span","c-note",esc(o.reading.length?o.reading.length+" piece"+(o.reading.length===1?"":"s")+" · "+read+" read":"Nothing is fetched or searched unless you press for it.")));P.foot.appendChild(h("span","c-grow"));}
+
+/* ---- 6. what she can do in ten, fifteen, twenty-five or forty-five minutes ---- */
+function estimateOf(o,n){if(!n)return 0;var w=wayOf(o);
+  if(n.step==="fit")return 10;
+  if(n.step==="check")return /^Make its checklist/.test(n.text)?5:/^Look at /.test(n.text)?10:/^Read your /.test(n.text)?10:5;
+  if(n.step==="send"){if(n.kind==="refs")return /^Follow up/.test(n.text)?10:15;if(/^Fill the /.test(n.text))return 15;return w==="guide"?45:w==="step"?25:15;}
+  if(n.step==="practise")return 10;if(n.step==="track")return /^Prepare/.test(n.text)?25:5;return 15;}
+function lowDay(){try{return D.body.hasAttribute("data-sc-low");}catch(e){return false;}}
+function minutesBox(S,act,low){var box=h("div","c-mins"),m=S.ui.mins||0,row=h("div","c-row c-tight");box.id="csMins";
+  row.appendChild(h("span","c-label",esc("I have")));row.appendChild(seg([[10,"10"],[15,"15"],[25,"25"],[45,"45 minutes"]],m,function(v){S.ui.mins=S.ui.mins===v?0:v;save();render();},"How many minutes you have"));box.appendChild(row);
+  if(CLOCK.ended){box.appendChild(h("p",null,esc("The bell has gone. What is left can wait: nothing is lost by stopping here.")));var kr=h("div","c-keyrow");
+    kr.appendChild(cbtn("pri sm","Not today",function(){restClock(S);},"The steps you chose rest until tomorrow"));kr.appendChild(cbtn("sm","Carry on",function(){CLOCK={on:false,mins:0,ids:[],ended:false};render();}));box.appendChild(kr);return box;}
+  if(!m){box.appendChild(h("p","c-note",esc("Say how long you have, and only the steps that fit are listed, the smallest first."+(low?" A low-energy day: one step is enough.":""))));return box;}
+  var fit=act.filter(function(x){return x.mins<=m;}).sort(function(a,b){return a.mins-b.mins;});if(low&&fit.length>1)fit=fit.slice(0,1);
+  if(!fit.length)box.appendChild(h("p",null,esc("Nothing on today's list fits in "+m+" minutes. Choose a longer stretch, or open one step and do its first part only.")));
+  else{box.appendChild(h("p",null,esc("In "+m+" minutes you could"+(low?" (a low-energy day: this one step is enough)":"")+":")));var ul=h("div","c-col c-fitlist");
+    fit.forEach(function(x){ul.appendChild(item(x.n.text,(x.o.title||"Untitled")+" · about "+x.mins+" min",false,function(){S.ui.today=x.o.id;show("work");save();render();}));});box.appendChild(ul);}
+  if(CLOCK.on){box.appendChild(h("p","c-note",esc("The clock runs: "+clockLeft()+" left. Stop at the bell; what is left waits for another day.")));box.appendChild(cbtn("sm","Stop the clock",stopClock));}
+  else if(fit.length&&typeof pomoReset==="function")box.appendChild(cbtn("pri sm","Start the clock · "+m+" minutes",function(){startClock(m,fit.map(function(x){return x.o.id;}));},"The Clepsydra runs "+m+" minutes; at the bell the studio offers Not today or Carry on"));
+  return box;}
+function startClock(m,ids){try{if(pomo.running){say("The Clepsydra is running already: still it first.");return;}}catch(e){}CLOCK={on:true,mins:m,ids:ids||[],ended:false,at:Date.now()};
+  state.clep.focusLen=m;save();pomoReset();pomoStart();render();say("The clock runs for "+m+" minutes. Stop at the bell.");}
+function stopClock(){CLOCK={on:false,mins:0,ids:[],ended:false};try{pomoReset();}catch(e){}render();}
+function restClock(S){var t=tomorrowStr();(CLOCK.ids||[]).forEach(function(id){var o=oppById(id);if(o&&nextOf(o))o.rest=t;});CLOCK={on:false,mins:0,ids:[],ended:false};S.ui.today=null;save();render();say("They rest until tomorrow.");}
+
+/* ---- 7. the posting fetched again and compared, and further particulars read with it ---- */
+function lcsUnits(A,B){var n=A.length,m=B.length,L=[],i,j;
+  for(i=0;i<=n;i++){L.push([]);for(j=0;j<=m;j++)L[i].push(0);}
+  for(i=n-1;i>=0;i--)for(j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  var units=[],cur=null;i=0;j=0;
+  while(i<n||j<m){if(i<n&&j<m&&A[i]===B[j]){if(cur){units.push(cur);cur=null;}units.push({same:true,old:[A[i]],nw:[B[j]]});i++;j++;continue;}
+    if(!cur)cur={same:false,old:[],nw:[]};if(j<m&&(i>=n||L[i][j+1]>=L[i+1][j])){cur.nw.push(B[j]);j++;}else{cur.old.push(A[i]);i++;}}
+  if(cur)units.push(cur);return units;}
+function urlOf(o){return o.url||(/^https?:\/\//.test(o.from||"")?o.from:"");}
+function checkAgain(o){var url=urlOf(o);if(!url){say("This posting was not fetched from an address: paste the new text as a new application, or add it as a document.");return Promise.resolve(null);}
+  if(typeof fetchPageText!=="function"){say("This device cannot fetch pages.");return Promise.resolve(null);}say("Fetching the posting again from its address…");
+  return Promise.all([postOnly(o),fetchPageText(url,40000)]).then(function(x){var old=String(x[0]||""),nw=String(x[1]||"").trim();if(nw.length<200)throw new Error("too little text came back");
+    var A=sentencesOf(old),B=sentencesOf(nw),units=lcsUnits(A,B),ch=units.filter(function(u){return !u.same;}),nS=ch.reduce(function(a,u){return a+Math.max(u.old.length,u.nw.length);},0);o.checkedAt=Date.now();
+    if(!ch.length){if(o.recheck){try{IngBig.del(o.recheck.ref);}catch(e){}delete o.recheck;}save();render();say("Unchanged: the posting reads as it did on "+dayStr(o.fetchedAt||o.at)+".");return null;}
+    var meta={};try{meta=LXR().parsePost(nw)||{};}catch(e){}var nd=dateIn(meta.closes||""),ref=IngBig.newId();
+    return Promise.resolve(IngBig.put(ref,nw)).then(function(){if(o.recheck&&o.recheck.ref){try{IngBig.del(o.recheck.ref);}catch(e){}}
+      o.recheck={at:Date.now(),ref:ref,chars:nw.length,n:nS,changes:ch.slice(0,20).map(function(u){return {old:u.old.slice(0,6),nw:u.nw.slice(0,6)};}),closes:meta.closes||"",due:nd,dueChanged:!!(nd&&nd!==o.due)};
+      save();render();say(nS+" sentence"+(nS===1?"":"s")+" changed since it was fetched. The changes are shown in The posting.");return o.recheck;});})
+  .then(null,function(e){say("It could not be checked: "+(e&&e.message||e));return null;});}
+function keepRecheck(o){var rc=o.recheck;if(!rc)return;o.older=o.older||{};(o.older.post||[]).forEach(function(x){try{IngBig.del(x.ref);}catch(e){}});o.older.post=[{ref:o.ref,made:o.fetchedAt||o.at,chars:o.chars}];
+  o.ref=rc.ref;o.chars=rc.chars;o.fetchedAt=rc.at;if(rc.closes)o.closes=rc.closes;if(rc.due&&rc.due!==o.due){o.due=rc.due;if(o.check)o.check.items.forEach(function(x){if(/^Send it before it closes/.test(x.text))x.text="Send it before it closes: "+dayStr(o.due+"T12:00:00");});}
+  delete o.recheck;save();render();say("The new text is kept; the one before stays kept beside it.");}
+function dropRecheck(o){if(!o.recheck)return;try{IngBig.del(o.recheck.ref);}catch(e){}delete o.recheck;save();render();say("Your copy is kept as it was.");}
+function recheckBox(o){var rc=o.recheck,box=h("div","c-rc");box.appendChild(h("b",null,esc("Checked "+dayStr(rc.at)+": "+rc.n+" sentence"+(rc.n===1?"":"s")+" changed since it was fetched on "+dayStr(o.fetchedAt||o.at)+".")));
+  if(rc.closes&&rc.dueChanged)box.appendChild(h("p",null,"<b>The closing date now reads:</b> "+esc(rc.closes)+(o.due?" (it was "+esc(dayStr(o.due+"T12:00:00"))+")":"")));
+  rc.changes.forEach(function(u){var w=h("div","c-col");w.style.gap="4px";if(u.old.length){var a=h("div","c-rv-old");a.appendChild(h("small",null,"Before"));u.old.forEach(function(s){a.appendChild(h("p",null,esc(s)));});w.appendChild(a);}
+    if(u.nw.length){var b=h("div","c-rv-new");b.appendChild(h("small",null,u.old.length?"Now":"Added"));u.nw.forEach(function(s){b.appendChild(h("p",null,esc(s)));});w.appendChild(b);}else w.appendChild(h("div","c-rv-new","<small>Now</small><p>(taken out)</p>"));box.appendChild(w);});
+  var shown=rc.changes.reduce(function(a,u){return a+Math.max(u.old.length,u.nw.length);},0);if(rc.n>shown)box.appendChild(h("p","c-note",esc("And "+(rc.n-shown)+" more.")));
+  var k=h("div","c-keyrow");k.appendChild(cbtn("sm pri","Keep the new text",function(){keepRecheck(o);},"The posting becomes the new text; your copy of the old one stays kept"));k.appendChild(cbtn("sm","Keep my copy",function(){dropRecheck(o);}));box.appendChild(k);return box;}
+function addMore(o,name,text){text=String(text||"").replace(/\r/g,"").trim();if(text.length<40){say("That holds too little text.");return Promise.resolve(null);}var ref=IngBig.newId();
+  return Promise.resolve(IngBig.put(ref,text)).then(function(){var m={id:uid("mo"),name:String(name||"document"),ref:ref,chars:text.length,at:Date.now()};(o.more=o.more||[]).push(m);save();render();say(m.name+" is kept with this application: its limits and what it asks join the posting's.");return m;});}
+function moreBox(o){var box=h("div","c-more");box.appendChild(h("span","c-label",esc("Further particulars")));
+  (o.more||[]).forEach(function(m){var c=chip(m.name+" · "+Math.round(m.chars/1000)+" thousand characters");var x=cbtn("quiet sm","✕",function(){try{IngBig.del(m.ref);}catch(e){}o.more=o.more.filter(function(z){return z!==m;});save();render();},"Take it off");c.appendChild(x);box.appendChild(c);});
+  box.appendChild(h("span","c-note",esc((o.more||[]).length?"Read with the posting: by the reading, the limits and the checklist.":"A document the posting points to (further particulars, a handbook, the person specification), read with it.")));return box;}
+
+/* ---- 8. a LinkedIn export imported as a difference ---- */
+function liKey(it){return (String(it.title||"")+"|"+String(it.place||"")).toLowerCase().replace(/\s+/g," ").trim();}
+function liSame(a,b){return ["title","place","from","to","text"].every(function(k){return String(a[k]||"").trim()===String(b[k]||"").trim();});}
+function liStatus(L){var files=(L.files||[]).filter(function(f){return f.kept;}),n=files.reduce(function(a,f){return a+f.kept;},0);
+  var s="Imported "+dayStr(L.at)+": "+n+" entr"+(n===1?"y":"ies")+(files.length?" from "+files.map(function(f){return f.name.replace(/\.csv$/i,"")+" ("+f.kept+")";}).join(", "):"");
+  if(L.added)s+=" · "+L.added+" new";if(L.changed)s+=" · "+L.changed+" changed";if(L.gone)s+=" · "+L.gone+" gone";
+  if(L.skipped&&L.skipped.length)s+=" · skipped: "+L.skipped.slice(0,4).join(", ")+(L.skipped.length>4?"…":"");if(L.others&&L.others.length)s+=" · not read: "+L.others.slice(0,4).join(", ");return s+".";}
+function liDropped(P,k){P.linkedin=P.linkedin||{};P.linkedin.dropped=P.linkedin.dropped||{};P.linkedin.dropped[k]=Date.now();}
+
+/* ---- Lector-side: one posting, two pages ---- */
+function openPosts(){return CS().opps.filter(function(o){return !FINISHED[o.stage];}).map(function(o){return {id:o.id,title:o.title||"Untitled",org:o.org||"",closes:o.closes||"",kind:o.kind};});}
+function postFor(id){var o=oppById(id);if(!o)return Promise.resolve(null);return postOnly(o).then(function(t){return {id:o.id,title:o.title||"",org:o.org||"",closes:o.closes||"",kind:o.kind,text:t||""};});}
+function bringPost(p){var P=null;try{P=LXR().state().posts[p];}catch(e){}if(!P||!P.ref){say("Add the posting in the reading page's brief first.");return Promise.resolve(null);}meFirst();
+  var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id;})[0];if(same){CS().ui.room="apps";CS().ui.open=same.id;CS().ui.show="work";save();go("career");say("It is in the Career Studio already.");return Promise.resolve(same);}
+  return loadText(P.ref).then(function(t){if(!t||t.length<40)throw new Error("its text is no longer kept");return newOpp(p==="programme"?"phd":"job",t,"lector:"+P.id);})
+    .then(function(o){o.kindSet=true;if(P.title&&!o.title)o.title=P.title;if(P.org&&!o.org)o.org=P.org;CS().ui.room="apps";save();go("career");say("It is in the Career Studio, under Applications.");return o;},function(e){say("It could not be brought: "+(e&&e.message||e));return null;});}
+/* the share of words that differ between a draft and its revision, as the reading page counts it */
+function wordsChanged(a,b){var A={},n=0,added=0,left=0;String(a).toLowerCase().split(/\W+/).forEach(function(w){if(w){A[w]=(A[w]||0)+1;n++;}});
+  String(b).toLowerCase().split(/\W+/).forEach(function(w){if(!w)return;if(A[w]>0)A[w]--;else added++;});Object.keys(A).forEach(function(w){left+=A[w];});return n?Math.min(1,(added+left)/n):0;}
+var EXAM={last:null};
 
 /* ---------------- its place: the page, the menu, go() ---------------- */
 function install(){if($("page-career"))return;
@@ -1450,7 +1872,10 @@ install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
 window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
-  root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR};
+  root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR,
+  /* 6.9.2 */ datesOf:datesOf,remindAt:remindAt,bellFor:bellFor,estimateOf:estimateOf,exportOpp:exportOpp,exportAll:exportAll,exportFiles:exportFiles,keepToRead:keepToRead,toFontes:toFontes,readWithLector:readWithLector,readingNotes:readingNotes,
+  checkAgain:checkAgain,keepRecheck:keepRecheck,addMore:addMore,postText:postText,postOnly:postOnly,makeCheck:makeCheck,lcsUnits:lcsUnits,startMock:startMock,stopMock:stopMock,startClock:startClock,stopClock:stopClock,clock:function(){return CLOCK;},mock:function(){return MOCK;},
+  bellRang:bellRang,openPosts:openPosts,postFor:postFor,bringPost:bringPost,wordsChanged:wordsChanged,setRefStatus:setRefStatus,removeOpp:removeOpp,liStatus:liStatus,oppRefs:oppRefs,refsOfPerson:refsOfPerson};
 })();
 ;try{window.__ingParts["p188"]="running";}catch(_){}
 </script>

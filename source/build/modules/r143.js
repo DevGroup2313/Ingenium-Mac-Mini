@@ -409,7 +409,8 @@ function readBatch(d,sn,after,started){return new Promise(function(res,rej){var 
   t.oncomplete=function(){res({recs:out,done:done,last:out.length?out[out.length-1].k:after});};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store could not be read"));};});}
 function dumpStore(d,sn,onChunk,check){var after,started=false;
   function step(){if(check)check();return readBatch(d,sn,after,started).then(function(b){started=true;if(!b.recs.length)return;after=b.last;
-    return pack(b.recs).then(function(ch){ch.n=b.recs.length;ch.keys=b.recs.map(function(r){return r.k;});return onChunk(ch);}).then(function(){if(!b.done)return rest().then(step);});});}
+    /* R197: with the lock on, the records are opened first, so a backup stays a plain zip */
+    return (window.IngLock&&window.IngLock.openRecs?window.IngLock.openRecs(d.name,sn,b.recs):Promise.resolve()).then(function(){return pack(b.recs);}).then(function(ch){ch.n=b.recs.length;ch.keys=b.recs.map(function(r){return r.k;});return onChunk(ch);}).then(function(){if(!b.done)return rest().then(step);});});}
   return step();}
 function openUp(name,version,stores){return new Promise(function(res){var rq,settled=false,to=setTimeout(function(){if(!settled){settled=true;res(null);}},8000);
   try{rq=indexedDB.open(name,version);}catch(e){clearTimeout(to);res(null);return;}
@@ -428,7 +429,9 @@ function clearDb(name){return openExisting(name).then(function(d){if(!d)return;r
 function stampOf(x){if(!x||typeof x!=="object")return 0;var ks=["changed","updated","updatedAt","modified","lastModified","at","made","created","ts","time"];
   for(var i=0;i<ks.length;i++){var v=x[ks[i]];if(typeof v==="number"&&v>0)return v;if(typeof v==="string"&&v){var t=Date.parse(v);if(t>0)return t;}}return 0;}
 function stampDeep(x){var s=stampOf(x);try{if(x&&Array.isArray(x.messages)&&x.messages.length){var m=x.messages[x.messages.length-1];s=Math.max(s,stampOf(m),(m&&m.done)||0);}}catch(e){}return s;}
-function writeRecs(d,sn,recs,mode){return new Promise(function(res,rej){var t,bad=0;try{t=d.transaction(sn,"readwrite");var s=t.objectStore(sn),inl=s.keyPath!=null;
+/* R197: with the lock on, what goes back into the store of long texts is sealed first (the disk mirror seals through the shell's bridge) */
+function writeRecs(d,sn,recs,mode){if(window.IngLock&&window.IngLock.sealRecs)return window.IngLock.sealRecs(d.name,sn,recs).then(function(r){return writeRecs0(d,sn,r,mode);});return writeRecs0(d,sn,recs,mode);}
+function writeRecs0(d,sn,recs,mode){return new Promise(function(res,rej){var t,bad=0;try{t=d.transaction(sn,"readwrite");var s=t.objectStore(sn),inl=s.keyPath!=null;
     recs.forEach(function(r){function put(){try{if(inl)s.put(r.v);else s.put(r.v,r.k);}catch(e){bad++;}}
       if(mode==="merge"){try{var g=s.get(r.k);g.onsuccess=function(){var cur=g.result;if(cur!==undefined&&stampDeep(cur)>stampDeep(r.v))return;put();};}catch(e){put();}}else put();});}catch(e){rej(e);return;}
   t.oncomplete=function(){res(bad);};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store refused it (it may be full)"));};});}
@@ -447,7 +450,7 @@ function secrets(o,strip){var out=[];(function walk(x,path,dep){if(!x||typeof x!
 function getPath(o,p){for(var i=0;i<p.length;i++){if(!o||typeof o!=="object")return undefined;o=o[p[i]];}return o;}
 function setPath(o,p,v){for(var i=0;i<p.length-1;i++){if(!o||typeof o!=="object")return false;o=o[p[i]];}if(!o||typeof o!=="object")return false;o[p[p.length-1]]=v;return true;}
 function deskNow(){var raw;try{raw=JSON.stringify(state,typeof deskReplacer==="function"?deskReplacer:undefined);}catch(e){raw="{}";}return raw;}
-function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k);}
+function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||k==="ingenium_lock"||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k)||/\.sealed-\d+$/.test(k);}
 function localPart(){var items={},count=0,bytes=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k==null||protectedKey(k))continue;var v=localStorage.getItem(k);items[k]=v;count++;bytes+=k.length+(v?v.length:0);}}catch(e){}
   return {items:items,count:count,bytes:bytes};}
 function libRefsOf(st){var r={};try{var A=(st.appLib&&st.appLib.apps)||{};Object.keys(A).forEach(function(k){var a=A[k];if(a&&a.ref)r[a.ref]=1;if(a&&a.earlier&&a.earlier.ref)r[a.earlier.ref]=1;});}catch(e){}return r;}
@@ -555,7 +558,7 @@ function make(o){o=o||{};var say=o.onProgress||function(){},sig=o.signal||{},api
       return {blob:blob,name:"Ingenium-backup-"+now.getFullYear()+"-"+pad(now.getMonth()+1,2)+"-"+pad(now.getDate(),2)+".zip",size:blob.size,manifest:m};});}
 function lockKey(pw,salt,iter){var s=subtle();return s.importKey("raw",TE.encode(String(pw)),"PBKDF2",false,["deriveKey"])
   .then(function(b){return s.deriveKey({name:"PBKDF2",salt:salt,iterations:iter||ITER,hash:"SHA-256"},b,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);});}
-function keyRecords(){return openExisting("ingenium_keys").then(function(d){if(!d)return [];if(!d.objectStoreNames.contains("k")){d.close();return [];}return getAll(d,"k").then(function(a){d.close();return a;},function(){d.close();return [];});})
+function keyRecords(){return openExisting("ingenium_keys").then(function(d){if(!d)return [];if(!d.objectStoreNames.contains("k")){d.close();return [];}return getAll(d,"k").then(function(a){d.close();return (window.IngLock&&window.IngLock.openValues)?window.IngLock.openValues("ingenium_keys","k",a):a;},function(){d.close();return [];});})
   .then(function(a){var api=shell();if(!api||a.some(function(r){return r&&r.id==="device";}))return a;
     return Promise.resolve().then(function(){return api.big_get("signing_device");}).then(function(r){if(r&&r.ok){var x=JSON.parse(r.text);a.push({id:x.id,label:x.label,source:x.source,made:x.made,pkcs8:b64d(x.pkcs8),cert:b64d(x.cert)});}return a;},function(){return a;});});}
 

@@ -904,6 +904,64 @@ edit('  if(use==null)return v[0];\n',
      '  if(use==null)return v[v.length-1];  /* R203: memory unknown: the smallest model, the last of the list */\n',
      "R203 unknown memory takes the smallest model")
 
+# ---- R197 (Ingenium 6.9.x, 31 October 2026): a sign-in of her own, and her data sealed on the device (modules/r197.js has the
+#      rest). The owner's words: "I also want for the data on the app to be protected with encryption so that my data is protected
+#      on the device. I also want an optional sign-in / login screen with user name and password." Off until she turns it on. These
+#      edits reach what the base does before any module runs: the desk is read at parse time, and saveState is synchronous. ----
+# 1. the boot gate: a sealed desk is kept aside for the sign-in (modules/r197.js opens it), and the page starts from the defaults
+edit('state=migrateFrom(loadState());\n',
+     'state=(function(){var raw=null,lk=null;try{raw=HAS_LS?localStorage.getItem(KEY):null;lk=HAS_LS?localStorage.getItem("ingenium_lock"):null;}catch(e){}\n'
+     '  if((raw&&raw.length>40&&raw.lastIndexOf(\'{"ing":"locked"\',0)===0)||(lk&&lk.length>40)){window.__ingLockedRaw=raw;window.__ingLocked=true;var d={};for(var k in DEFAULTS)d[k]=DEFAULTS[k];return d;}\n'
+     '  return migrateFrom(loadState());})();\n',
+     "R197 a sealed desk, or a sign-in set up, waits for the sign-in")
+# 2. a locked boot can never write a fresh desk over the sealed one
+edit('function saveState(){if(/[#&]ingapp=/.test(location.hash||""))return;try{',
+     'function saveState(){if(window.__ingLocked)return;if(/[#&]ingapp=/.test(location.hash||""))return;try{',
+     "R197 nothing is saved while the desk is locked")
+# 3. with the lock on, the desk goes to the lock's own writer, which seals it and then keeps it everywhere the base keeps it
+edit('  var lsOk=true;\n  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
+     '  if(window.IngLock&&window.IngLock.on()){window.IngLock.deskWrite(raw);return;}\n  var lsOk=true;\n  if(HAS_LS){try{localStorage.setItem(KEY,raw);ingNoteSnapshot(raw);}',
+     "R197 the desk sealed before it is written")
+# 4. the computer app's desk on disk, when it is a sealed one: kept for the sign-in, never read as a desk
+edit('    var migrated=migrateFrom(incoming);\n    for(var k in state)delete state[k];\n    for(var k2 in migrated)state[k2]=migrated[k2];\n    var wrote=false;',
+     '    if(incoming.ing==="locked"){window.__ingLockedRaw=raw;window.__ingLocked=true;try{if(window.IngLock&&window.IngLock.lockedNow)window.IngLock.lockedNow(raw);}catch(e){}}\n'
+     '    else{var migrated=migrateFrom(incoming);\n    for(var k in state)delete state[k];\n    for(var k2 in migrated)state[k2]=migrated[k2];}\n    var wrote=false;',
+     "R197 a sealed desk from the disk waits for the sign-in")
+#    and R96's care before adopting (a desk here with more in it than the one arriving is kept on disk first) reads a sealed desk's
+#    clear count of messages, since its body cannot be counted
+edit('try{var cnt=function(t){return (String(t||"").match(/"role":"(?:me|bot)"/g)||[]).length;};',
+     'try{var cnt=function(t){t=String(t||"");if(t.lastIndexOf(\'{"ing":"locked"\',0)===0){try{return +((JSON.parse(t).n||{}).messages)||0;}catch(e){return 0;}}return (t.match(/"role":"(?:me|bot)"/g)||[]).length;};',
+     "R197 the count before adopting reads a sealed desk's header")
+# 5. the store of long texts: what it writes is sealed and what it reads is opened, when the lock is on; a plain record and a sealed one are
+#    both taken (the lock may be turned on with texts already there); while the page waits for the sign-in, the store waits with it
+edit('  function shell(){var a=(typeof shellApi==="function")?shellApi():null;return a&&typeof a.big_put==="function"?a:null;}\n  function has(id){return Object.prototype.hasOwnProperty.call(mem,id);}',
+     '  function shell(){var a=(typeof shellApi==="function")?shellApi():null;return a&&typeof a.big_put==="function"?a:null;}\n'
+     '  function lk(){var L=window.IngLock;if(L)return Promise.resolve(L);var has_=false;try{has_=HAS_LS&&!!localStorage.getItem("ingenium_lock");}catch(e){}if(!has_)return Promise.resolve(null);\n'
+     '    return new Promise(function(r){var iv=setInterval(function(){if(window.IngLock){clearInterval(iv);r(window.IngLock);}},50);});}\n'
+     '  function sealT(id,t){return lk().then(function(L){if(!L||!L.active())return t;return L.ready().then(function(){return L.on()?L.sealText(t,"big:"+id):t;});});}\n'
+     '  function openT(id,v){if(typeof v!=="string"||!/^ING1g?\\./.test(v))return Promise.resolve(v);return lk().then(function(L){if(!L)return v;return L.ready().then(function(){return L.openText(v,"big:"+id).catch(function(){return v;});});});}\n'
+     '  function has(id){return Object.prototype.hasOwnProperty.call(mem,id);}',
+     "R197 the large store seals and opens")
+edit('    var p1=tx("readwrite",function(s){return s.put(text,id);}).then(function(){if(mem[id]===text){saved[id]=1;trim();}}).catch(function(){});\n'
+     '    var a=shell(),p2=(a&&text.length<=16*1024*1024)?Promise.resolve().then(function(){return a.big_put(id,text);}).catch(function(){}):Promise.resolve();',
+     '    var sv=sealT(id,text);\n'
+     '    var p1=sv.then(function(v){return tx("readwrite",function(s){return s.put(v,id);});}).then(function(){if(mem[id]===text){saved[id]=1;trim();}}).catch(function(){});\n'
+     '    var a=shell(),p2=(a&&text.length<=16*1024*1024)?sv.then(function(v){return a.big_put(id,v);}).catch(function(){}):Promise.resolve();',
+     "R197 a text put is sealed, for the store and the disk alike")
+edit('return tx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(function(t){\n      if(typeof t==="string"){mem[id]=t;saved[id]=1;used[id]=Date.now();trim();return t;}',
+     'return tx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(function(v){return openT(id,v);}).then(function(t){\n      if(typeof t==="string"){mem[id]=t;saved[id]=1;used[id]=Date.now();trim();return t;}',
+     "R197 a text read back is opened")
+edit('if(r&&r.ok&&typeof r.text==="string"){mem[id]=r.text;tx("readwrite",function(s){return s.put(r.text,id);}).catch(function(){});return r.text;}',
+     'if(r&&r.ok&&typeof r.text==="string"){return openT(id,r.text).then(function(t){mem[id]=t;sealT(id,t).then(function(v){return tx("readwrite",function(s){return s.put(v,id);});}).catch(function(){});return t;});}',
+     "R197 a text from the disk is opened, and kept sealed")
+edit('  function cold(id,text){text=String(text==null?"":text);delete mem[id];return tx("readwrite",function(s){return s.put(text,id);}).then(function(){return id;});}',
+     '  function cold(id,text){text=String(text==null?"":text);delete mem[id];return sealT(id,text).then(function(v){return tx("readwrite",function(s){return s.put(v,id);});}).then(function(){return id;});}',
+     "R197 a text kept cold is sealed")
+# 6. Reset everything takes the lock with it (the sealed texts it leaves are let go by the store's own clearing)
+edit('    try{if(HAS_LS){localStorage.removeItem(KEY);OLDKEYS.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}',
+     '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}',
+     "R197 Reset everything removes the lock")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

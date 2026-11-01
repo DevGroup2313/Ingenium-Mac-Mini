@@ -384,10 +384,13 @@ function hubRead(){var api=hubApi();
   if(api)return Promise.resolve().then(function(){return api.lite_hub_get(hubSeq);}).then(function(t){var o=null;try{o=JSON.parse(t||"null");}catch(e){}
       if(!o||typeof o!=="object")return {};if(typeof o.seq==="number")hubSeq=o.seq;var out={};
       Object.keys(o.keys||{}).forEach(function(k){var e=o.keys[k];try{out[k]={v:JSON.parse(e.v),by:e.by,at:e.at};}catch(x){}});return out;},function(){return {};});
+  /* R197: with a sign-in set up, the shared copy is not kept in this browser's store (it would hold the notes, reminders and thoughts in plain text) */
+  if(window.IngLock&&window.IngLock.active())return Promise.resolve({});
   try{return Promise.resolve(JSON.parse(localStorage.getItem(HUBK)||"{}")||{});}catch(e){return Promise.resolve({});}}
 function hubWrite(keys){var api=hubApi(),at=Date.now();
   if(api){var p={by:ME,at:at,keys:{}};Object.keys(keys).forEach(function(k){p.keys[k]=js(keys[k]);});
     return Promise.resolve().then(function(){return api.lite_hub_put(JSON.stringify(p));}).then(function(){},function(){});}
+  if(window.IngLock&&window.IngLock.active()){try{localStorage.removeItem(HUBK);}catch(e){}return Promise.resolve();}
   try{var h=JSON.parse(localStorage.getItem(HUBK)||"{}")||{};Object.keys(keys).forEach(function(k){h[k]={v:keys[k],by:ME,at:at};});localStorage.setItem(HUBK,JSON.stringify(h));}catch(e){}
   return Promise.resolve();}
 /* a window of its own hands on notes with the main page's places, so its own moves never move them there */
