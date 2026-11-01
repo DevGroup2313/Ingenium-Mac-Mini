@@ -13,19 +13,20 @@ import tail  # 6.8.1 (tail.py)
 H = os.path.dirname(os.path.abspath(__file__))
 R = {"mini": "/home/user/Ingenium-Mac-Mini", "intel": "/home/user/Ingenium-Mac-Intel",
      "win": "/home/user/Ingenium-HPWindows", "fire": "/home/user/Ingenium-Android-fire"}
+# 6.9.2: a version may have two parts (6.9) or three (6.9.1): each pattern takes both, so a bump never leaves 6.9.2.1 behind
 VER_FILES = [
-    ("mini", "Build Mac App.command", r'BUILD_NO="\d+\.\d+\.', 'BUILD_NO="{v}.'),
-    ("mini", ".github/workflows/build-mac.yml", r'V="\d+\.\d+\.\$', 'V="{v}.$'),
-    ("mini", "ingenium.spec", r"'INGENIUM_VERSION', '\d+\.\d+'", "'INGENIUM_VERSION', '{v}'"),
-    ("intel", "Build Mac App.command", r'BUILD_NO="\d+\.\d+\.', 'BUILD_NO="{v}.'),
-    ("intel", ".github/workflows/build-mac.yml", r'V="\d+\.\d+\.\$', 'V="{v}.$'),
-    ("intel", "ingenium.spec", r"'INGENIUM_VERSION', '\d+\.\d+'", "'INGENIUM_VERSION', '{v}'"),
-    ("win", ".github/workflows/build-windows.yml", r'INGENIUM_VERSION=\d+\.\d+\.\$', 'INGENIUM_VERSION={v}.$'),
-    ("win", "installer/Ingenium.iss", r'#define AppVersion "\d+\.\d+"', '#define AppVersion "{v}"'),
-    ("win", "Build Ingenium (Windows).bat", r'set "BUILD_NO=\d+\.\d+\.', 'set "BUILD_NO={v}.'),
-    ("fire", ".github/workflows/build-ios.yml", r'INGENIUM_BUILD=\d+\.\d+\.\$', 'INGENIUM_BUILD={v}.$'),
-    ("fire", ".github/workflows/build-android.yml", r'INGENIUM_BUILD=\d+\.\d+\.\$', 'INGENIUM_BUILD={v}.$'),
-    ("fire", "ingenium_android_project/app/build.gradle", r'\?: "\d+\.\d+\.\$\{buildDay\}', '?: "{v}.${{buildDay}}'),
+    ("mini", "Build Mac App.command", r'BUILD_NO="\d+\.\d+(?:\.\d+)?\.', 'BUILD_NO="{v}.'),
+    ("mini", ".github/workflows/build-mac.yml", r'V="\d+\.\d+(?:\.\d+)?\.\$', 'V="{v}.$'),
+    ("mini", "ingenium.spec", r"'INGENIUM_VERSION', '\d+\.\d+(?:\.\d+)?'", "'INGENIUM_VERSION', '{v}'"),
+    ("intel", "Build Mac App.command", r'BUILD_NO="\d+\.\d+(?:\.\d+)?\.', 'BUILD_NO="{v}.'),
+    ("intel", ".github/workflows/build-mac.yml", r'V="\d+\.\d+(?:\.\d+)?\.\$', 'V="{v}.$'),
+    ("intel", "ingenium.spec", r"'INGENIUM_VERSION', '\d+\.\d+(?:\.\d+)?'", "'INGENIUM_VERSION', '{v}'"),
+    ("win", ".github/workflows/build-windows.yml", r'INGENIUM_VERSION=\d+\.\d+(?:\.\d+)?\.\$', 'INGENIUM_VERSION={v}.$'),
+    ("win", "installer/Ingenium.iss", r'#define AppVersion "\d+\.\d+(?:\.\d+)?"', '#define AppVersion "{v}"'),
+    ("win", "Build Ingenium (Windows).bat", r'set "BUILD_NO=\d+\.\d+(?:\.\d+)?\.', 'set "BUILD_NO={v}.'),
+    ("fire", ".github/workflows/build-ios.yml", r'INGENIUM_BUILD=\d+\.\d+(?:\.\d+)?\.\$', 'INGENIUM_BUILD={v}.$'),
+    ("fire", ".github/workflows/build-android.yml", r'INGENIUM_BUILD=\d+\.\d+(?:\.\d+)?\.\$', 'INGENIUM_BUILD={v}.$'),
+    ("fire", "ingenium_android_project/app/build.gradle", r'\?: "\d+\.\d+(?:\.\d+)?\.\$\{buildDay\}', '?: "{v}.${{buildDay}}'),
 ]
 def bump(v, date):
     for repo, path, pat, rep in VER_FILES:
