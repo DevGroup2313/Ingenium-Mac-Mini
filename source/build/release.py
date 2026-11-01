@@ -97,7 +97,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_care_671", "_care_attach", ("mini", "intel", "win")), ("app_id_68", "_own_taskbar_identity", ("mini", "intel", "win")),
            ("app_quick_681", "_quick_take_tails", ("mini", "intel", "win")),
            ("app_drives_682", "_models_store_dir", ("mini", "intel", "win")),
-           ("app_open_691", "_open_url", ("mini", "intel", "win"))]
+           ("app_open_691", "_open_url", ("mini", "intel", "win")),
+           ("app_rag_692", "_rag_choose_folder", ("mini", "intel", "win"))]
 
 
 def desktop():

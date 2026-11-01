@@ -66,11 +66,14 @@ export async function chosenFolders() {
 /** Makes the app forget a folder (it may no longer be read). -> {ok} */
 export async function forgetFolder(path) { return must(await call('rag_forget_folder', path), 'forgetting a folder'); }
 
-/** The files of a folder: [{rel, size, mtime}]. A folder the app cannot list (an unplugged drive, a folder moved away) rejects. */
+/** The files of a folder: [{rel, size, mtime}] (mtime in milliseconds), with .truncated set when the app says it stopped at its limit
+ *  (5,000 files, or more directory entries than it looks at). A folder the app cannot list (an unplugged drive, a folder moved away) rejects. */
 export async function listFiles(path) {
   const r = must(await call('rag_list', path), 'listing the folder');
   if (!r || !Array.isArray(r.files)) throw bridgeError('the app returned no list of files', 'BRIDGE');
-  return r.files.map((f) => ({ rel: String(f.rel), size: Number(f.size) || 0, mtime: Number(f.mtime) || 0 }));
+  const files = r.files.map((f) => ({ rel: String(f.rel), size: Number(f.size) || 0, mtime: Number(f.mtime) || 0 }));
+  if (r.truncated !== undefined) files.truncated = !!r.truncated;   // the app stopped at its limit: this is not the whole folder
+  return files;
 }
 
 /** Base64 to bytes (a Uint8Array that owns its buffer, so it can be sent on without a copy). */
@@ -91,9 +94,10 @@ export async function* readPieces(path, rel, opts = {}) {
     const r = must(await call('rag_read', path, rel, offset, piece), 'reading ' + rel);
     if (!r) throw bridgeError('the app returned nothing for ' + rel, 'BRIDGE');
     const bytes = b64ToBytes(r.data || '');
+    const n = bytes.length;      // taken before the piece is handed on: the consumer may transfer its buffer, which leaves the array empty
     if (r.size != null) size = Number(r.size);
-    if (bytes.length) { offset += bytes.length; yield bytes; }
-    if (r.eof || !bytes.length) break;
+    if (n) { offset += n; yield bytes; }
+    if (r.eof || !n) break;
   }
   if (size != null && offset !== size) throw bridgeError('the file changed while it was read (' + rel + ')', 'CHANGED');
 }

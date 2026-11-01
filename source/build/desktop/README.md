@@ -25,3 +25,12 @@ a row, under a name of its own, never deleted, and the person is told; on Window
 by itself, and Windows ending the session counts as a run that finished.
 Test: `python3 -I rig/t_671_app_care.py <repo>/ingenium_app.py` (8 checks, Mac and Windows alike; the Windows web view's
 side is checked on Windows by Ingenium-HPWindows .github/workflows/windows-home-check.yml).
+
+6.9.2, `app_rag_692.py` (Mac and Windows): the folder search's side of the app. `rag_choose_folder` (the computer's own folder
+dialog; the folders chosen are remembered in the app's data folder, `rag/folders.json`), `rag_folders`, `rag_forget_folder`,
+`rag_list` (the seven types, hidden entries skipped, links followed only inside the folder, at most 5,000 files) and `rag_read`
+(pieces of at most 1 MB, the real path inside the folder) on both API classes; explicit types for .mjs/.js, .wasm, .onnx and
+.json on the local server. The logic is the plain functions `_rag_*` (text `CODE` in the patch).
+Test: `python3 -I rig/t_rag1_bridge.py [folder for the copies]` (copies the three repositories' ingenium_app.py, patches each twice,
+runs the rules against the stand-in `rig/rag_bridge.py` and against the patched copies' own API classes, the server's types, and
+`rig/rag_bridge_shim.js` in headless Chromium).

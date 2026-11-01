@@ -238,7 +238,8 @@ export function createIndexer(options) {
       // files that have gone from the folder
       if (!only) {
         const now = new Set(listing.map((x) => x.rel)), gone = [...existing.keys()].filter((p) => !now.has(p));
-        if (listing.length >= (br.LIST_CAP || bridge.LIST_CAP) && gone.length) summary.notes.push('the folder lists ' + listing.length + ' files, the most the app lists: files not listed are not taken out of the index');
+        const cap = br.LIST_CAP || bridge.LIST_CAP, capped = listing.truncated !== undefined ? !!listing.truncated : listing.length >= cap;
+        if (capped) summary.notes.push('the folder has more files than the app lists (' + listing.length + ' were listed, at most ' + cap + '): the others are not searched, and files not listed are not taken out of the index');
         else if (!listing.length && existing.size && !opts.confirmEmpty) summary.notes.push('the folder lists no files while ' + existing.size + ' are indexed: it is taken as a drive that is not connected, and nothing was taken out (confirmEmpty: true takes them out)');
         else for (const p of gone) {
           if (signal && signal.aborted) throw abortError();
