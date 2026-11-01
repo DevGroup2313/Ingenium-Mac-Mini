@@ -103,6 +103,9 @@ DEMO = r"""<style id="forge-demo-639">
 #fg-demo-key:focus-visible{outline:2px solid var(--accent,#17577A);outline-offset:3px}
 @keyframes fgDemoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 body[data-motion="minimal"] #fg-demo-key{animation:none}
+/* 656: the key stays out of sight while the welcome door is open (the owner's words, 1 November 2026: "the Demo button is
+   showing next to the introduction door when it should NOT be"); it comes when the door is closed */
+body:has(#cd-door) #fg-demo-key,body:has(#demo-entry) #fg-demo-key,#fg-demo-key[data-door="1"]{display:none !important}
 @media (prefers-reduced-motion:reduce){#fg-demo-key{animation:none;transition:none}}
 #fg-demo-back{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(8,14,20,.38)}
 #fg-demo-back[data-open="1"]{display:flex}
@@ -207,7 +210,9 @@ html:not(#fd1):not(#fd2):not(#fd3):not(#fd4):not(#fd5):not(#fd6):not(#fd7):not(#
   }
   /* the tab says it is the demonstration: the Forge names its tab again as it starts and as its language changes */
   function title() { try { var t = document.title || 'The Forge'; if (!/D[eé]mo/.test(t)) document.title = t + (fr() ? ' · Démo' : ' · Demo'); } catch (e) {} }
-  function start() { build(); noteShip(); pickCarried(); title(); try { var te = document.querySelector('head > title'); if (te) new MutationObserver(title).observe(te, { childList: true, characterData: true, subtree: true }); } catch (e) {} }
+  /* the same, for a browser without :has(): the key is put away while the door is in the page */
+  function doorWatch() { try { var on = !!(document.getElementById('cd-door') || document.getElementById('demo-entry')); if (key) key.setAttribute('data-door', on ? '1' : '0'); } catch (e) {} }
+  function start() { build(); doorWatch(); try { new MutationObserver(doorWatch).observe(document.body, { childList: true }); } catch (e) {} setInterval(doorWatch, 1000); noteShip(); pickCarried(); title(); try { var te = document.querySelector('head > title'); if (te) new MutationObserver(title).observe(te, { childList: true, characterData: true, subtree: true }); } catch (e) {} }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   window.addEventListener('load', function () { noteShip(); title(); setTimeout(pickCarried, 1500); setTimeout(pickCarried, 5000); setTimeout(title, 1500); setTimeout(title, 5000); });
   new MutationObserver(function () { paint(); title(); }).observe(document.body || document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });

@@ -182,7 +182,7 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 .switch a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;padding:5px 11px 5px 6px;border-radius:999px;border:1px solid var(--hair);background:var(--panel);box-shadow:var(--key);font:600 13px/1 var(--text);color:var(--ink-2);transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s}
 .switch a:hover{transform:translateY(-2px);box-shadow:var(--key-up)}
 .switch a[aria-current="page"]{color:var(--ink);border-color:color-mix(in srgb,var(--gilt) 60%,transparent);background:var(--gilt-wash)}
-.room-grid{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:22px;margin-top:16px;align-items:start}
+.room-grid{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:22px;margin-top:16px;align-items:start}
 .room-info{display:grid;gap:12px;position:sticky;top:76px;min-width:0}
 .room-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
 .room-head .medal{width:96px;height:96px}
@@ -201,12 +201,15 @@ footer.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--hair);di
 .stage{display:grid;gap:10px;min-width:0}
 .stage-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
 .stage-bar .status{font-size:13.5px;color:var(--ink-3)}
-.well{position:relative;height:min(80vh,900px);min-height:540px;border-radius:18px;background:var(--ground-2);border:1px solid var(--hair);box-shadow:inset 0 2px 10px rgba(0,0,0,.08);
+.well{position:relative;height:calc(100vh - 150px);min-height:520px;border-radius:18px;background:var(--ground-2);border:1px solid var(--hair);box-shadow:inset 0 2px 10px rgba(0,0,0,.08);
   display:flex;justify-content:center;align-items:stretch;padding:12px;overflow:hidden}
-.frame{position:relative;width:100%;max-width:100%;height:100%;border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:var(--slab);transition:max-width .45s cubic-bezier(.2,.8,.2,1),border-width .3s,border-radius .3s}
-.stage[data-w="tablet"] .frame{max-width:820px;border:10px solid #15121b;border-radius:28px}
-.stage[data-w="phone"] .frame{max-width:390px;border:10px solid #15121b;border-radius:34px}
+.frame{position:relative;width:100%;max-width:100%;height:100%;border-radius:12px;overflow:hidden;background:var(--panel);box-shadow:var(--slab);flex:0 0 auto;align-self:center;transition:border-width .3s,border-radius .3s}
+.stage[data-w="tablet"] .frame{border:10px solid #15121b;border-radius:28px}
+.stage[data-w="phone"] .frame{border:10px solid #15121b;border-radius:34px}
 .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+/* the preview is a real screen, made small (the owner's words, 1 November 2026: the demos must fit the preview): the app is
+   drawn at a computer's, a tablet's or a phone's own size and the whole of it is shown, scaled to the well (fitStage) */
+.frame.fit iframe{right:auto;bottom:auto;transform-origin:0 0}
 .veil{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;background:var(--panel);text-align:center;padding:20px;transition:opacity .4s}
 .veil[data-gone="1"]{opacity:0;pointer-events:none}
 .veil .medal{width:110px;height:110px;animation:veilBreath 2.6s ease-in-out infinite}
@@ -362,6 +365,7 @@ if(fr){document.getElementById("oplLine").textContent="La page est encore en tra
         <a class="key" id="aloneKey" href="#" target="_blank" rel="noopener" data-i18n="alone">Open on its own ↗</a>
       </div>
       <div class="note" id="roomNote" aria-live="polite"></div>
+      <div class="runs-line" id="roomBuild"></div>
       <div class="runs-line" id="roomRuns"></div>
     </aside>
     <div class="stage" id="stage" data-w="computer">
@@ -395,51 +399,51 @@ var W = {
     devTitle: "On every device", devSub: "The crest as it stands on each screen the apps are built for, by day and by night.",
     back: "← The crest", tour: "Start the guided tour", alone: "Open on its own ↗", computer: "Computer", tablet: "Tablet", phone: "Phone",
     rights: "All rights reserved.", theme: ["Night", "Day"],
-    all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "Runs on", tryH: "Try this",
+    all: "Carpe Diem · The Forge · Ingenium · Inkwell", open: "Open the live demo", runs: "On your devices", tryH: "Try this",
     opening: "Opening {app}", sizeLine: "{mb} MB, opened in this page. Nothing is sent anywhere.", ready: "{app} is open. Everything you do stays in this browser.",
     tourGo: "The tour has started in the app.", tourWait: "The app is still opening.", tourNone: "This app keeps its tour in its own menu.",
     failed: "This demonstration could not be opened here. Try “Open on its own”.", parts: "Opening, {pct}%", door: "Open {app}", book: "The four apps", screen: "Screen",
-    refresh: "↻ Refresh", refreshTip: "Refresh the page if it freezes or looks wrong" },
+    refresh: "↻ Refresh", refreshTip: "Refresh the page if it freezes or looks wrong", thisDemo: "Shown here" },
   fr: { lede: "Quatre apps qui vivent sur votre appareil. Elles ne demandent ni compte ni connexion, et rien de ce que vous y faites n’en sort.",
     hint: "Touchez un sceau pour ouvrir son app, en direct, dans cette page.", fourTitle: "Les quatre apps", fourSub: "Chacune a son quartier du blason. Chacune s’ouvre ici telle qu’elle est, avec sa visite guidée.",
     devTitle: "Sur chaque appareil", devSub: "Le blason tel qu’il se tient sur chaque écran pour lequel les apps sont construites, de jour et de nuit.",
     back: "← Le blason", tour: "Lancer la visite guidée", alone: "Ouvrir seule ↗", computer: "Ordinateur", tablet: "Tablette", phone: "Téléphone",
     rights: "Tous droits réservés.", theme: ["Nuit", "Jour"],
-    all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Fonctionne sur", tryH: "À essayer",
+    all: "Carpe Diem · La Forge · Ingenium · Inkwell", open: "Ouvrir la démo en direct", runs: "Sur vos appareils", tryH: "À essayer",
     opening: "Ouverture de {app}", sizeLine: "{mb} Mo, ouverte dans cette page. Rien n’est envoyé nulle part.", ready: "{app} est ouverte. Tout ce que vous faites reste dans ce navigateur.",
     tourGo: "La visite a commencé dans l’app.", tourWait: "L’app s’ouvre encore.", tourNone: "Cette app garde sa visite dans son propre menu.",
     failed: "Cette démonstration n’a pas pu s’ouvrir ici. Essayez « Ouvrir seule ».", parts: "Ouverture, {pct} %", door: "Ouvrir {app}", book: "Les quatre apps", screen: "Écran",
-    refresh: "↻ Actualiser", refreshTip: "Actualiser la page si elle se fige ou s’affiche mal" }
+    refresh: "↻ Actualiser", refreshTip: "Actualiser la page si elle se fige ou s’affiche mal", thisDemo: "Présentée ici" }
 };
 var APPS = [
   { slug: "carpe-diem", k: "cd", name: { en: "Carpe Diem", fr: "Carpe Diem" }, date: "XVI · AVGVSTI · MMXXVI", tour: "demoStartTour",
     line: { en: "A study for the whole day: focus, readings, lessons and writing.", fr: "Un bureau d’étude pour toute la journée : concentration, lectures, leçons et écriture." },
-    about: { en: "Carpe Diem plans and carries a scholar’s day. Its Focus page breaks work into small steps you can start in two minutes, the Agenda gives the day a shape, the Library keeps your readings, and the Curriculum holds lessons and seminars. Tabula, its word processor, holds a thesis of 100,000 words.",
-             fr: "Carpe Diem organise et porte la journée d’un chercheur. Sa page Focus découpe le travail en petites étapes que l’on commence en deux minutes, l’Agenda donne sa forme à la journée, la Bibliothèque garde vos lectures, et le Curriculum réunit leçons et séminaires. Tabula, son traitement de texte, tient une thèse de 100 000 mots." },
-    tries: { en: ["Open the door and choose the shape of your day.", "On the Focus page, break a task into small steps.", "Catch a passing thought in the 💭 Inbox.", "Open Tabula from the Workspace and write."],
-             fr: ["Ouvrez la porte et choisissez la forme de votre journée.", "Sur la page Focus, découpez une tâche en petites étapes.", "Attrapez une pensée au vol dans la boîte 💭.", "Ouvrez Tabula depuis l’Espace de travail et écrivez."] },
-    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
+    about: { en: "Carpe Diem plans and carries a scholar’s day. Home opens on an overview in calm cards: the parts of today, your energy and the next task on the Agenda, your reading, Ascensus and French. Focus breaks work into small steps you can begin in two minutes; the Library keeps your readings; the Curriculum holds lessons and seminars; Assessments and Ascensus keep your records and your progress. Tabula, its word processor, opens Word and PDF documents whole, footnotes included, and holds a thesis of 100,000 words.",
+             fr: "Carpe Diem organise et porte la journée d’un chercheur. L’accueil s’ouvre sur une vue d’ensemble en cartes calmes : les moments du jour, votre énergie et la prochaine tâche de l’Agenda, vos lectures, Ascensus et le français. Focus découpe le travail en petites étapes que l’on commence en deux minutes ; la Bibliothèque garde vos lectures ; le Curriculum réunit leçons et séminaires ; les évaluations et Ascensus gardent vos résultats et vos progrès. Tabula, son traitement de texte, ouvre les documents Word et PDF en entier, notes de bas de page comprises, et tient une thèse de 100 000 mots." },
+    tries: { en: ["At the door, set today’s sky, then choose Take a tour or Build your own.", "Read the Home overview: today, your energy and the next task.", "On the Focus page, break a task into small steps.", "Open Tabula and write, or bring in a Word or PDF file."],
+             fr: ["À la porte, choisissez le temps du jour, puis la visite ou un bureau à remplir.", "Lisez la vue d’ensemble de l’accueil : le jour, votre énergie, la prochaine tâche.", "Sur la page Focus, découpez une tâche en petites étapes.", "Ouvrez Tabula et écrivez, ou apportez un fichier Word ou PDF."] },
+    runs: { en: "Mac (Apple silicon and Intel) · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac (Apple silicon et Intel) · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
   { slug: "the-forge", k: "forge", name: { en: "The Forge", fr: "La Forge" }, date: "XVI · AVGVSTI · MMXXVI", tour: "forgeStartTour",
     line: { en: "A workshop for changing the apps themselves, without code.", fr: "Un atelier pour modifier les apps elles-mêmes, sans code." },
-    about: { en: "The Forge changes the apps themselves, with no code. Choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. This demonstration carries Carpe Diem’s Public sample, its own page, Inkwell and Ingenium’s demo edition to work on, and makes no app or install package.",
-             fr: "La Forge modifie les apps elles-mêmes, sans code. Choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Cette démonstration emporte l’échantillon public de Carpe Diem, sa propre page, Inkwell et l’édition de démonstration d’Ingenium pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
-    tries: { en: ["Open the Editor and choose Carpe Diem.", "Point at a part of the preview and change its words or its colour.", "Choose how much help you want: First day, Finding my way or At ease.", "Press step 5 to see what the full Forge makes."],
-             fr: ["Ouvrez l’Éditeur et choisissez Carpe Diem.", "Désignez une partie de l’aperçu et changez ses mots ou sa couleur.", "Choisissez le niveau d’aide qui vous convient.", "Touchez l’étape 5 pour voir ce que fabrique la Forge complète."] },
-    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
+    about: { en: "The Forge changes the apps themselves, with no code. In the Editor, choose an app, point at a part of it, and change its words, its order or its colour: the preview answers at once. Fabrica keeps every version of an app, with branches, merges and tests, as a small GitHub of its own on this device, and Tabula, Abacus, Imago, Scriba and Fontes sit on its rail. This demonstration carries Carpe Diem’s Public sample, its own page, Inkwell and Ingenium’s demo edition to work on, and makes no app or install package.",
+             fr: "La Forge modifie les apps elles-mêmes, sans code. Dans l’Éditeur, choisissez une app, désignez une de ses parties, et changez ses mots, son ordre ou sa couleur : l’aperçu répond aussitôt. Fabrica garde chaque version d’une app, avec ses branches, ses fusions et ses essais, comme un petit GitHub à elle sur cet appareil, et Tabula, Abacus, Imago, Scriba et Fontes sont sur son rail. Cette démonstration emporte l’échantillon public de Carpe Diem, sa propre page, Inkwell et l’édition de démonstration d’Ingenium pour s’exercer, et ne fabrique ni app ni paquet d’installation." },
+    tries: { en: ["Open the Editor and choose an app at the top: Carpe Diem, the Forge itself, Inkwell or Ingenium.", "Point at a part of the preview and change its words or its colour.", "Open Fabrica and keep a first version of an app.", "Press step 5 to see what the full Forge makes."],
+             fr: ["Ouvrez l’Éditeur et choisissez une app en haut : Carpe Diem, la Forge elle-même, Inkwell ou Ingenium.", "Désignez une partie de l’aperçu et changez ses mots ou sa couleur.", "Ouvrez Fabrica et gardez une première version d’une app.", "Touchez l’étape 5 pour voir ce que fabrique la Forge complète."] },
+    runs: { en: "Mac (Apple silicon and Intel) · Windows · iPhone and iPad · Fire tablet · any browser", fr: "Mac (Apple silicon et Intel) · Windows · iPhone et iPad · tablette Fire · tout navigateur" } },
   { slug: "ingenium", k: "ingenium", name: { en: "Ingenium", fr: "Ingenium" }, date: "", tour: "tourStart",
     line: { en: "Your own AI, kept on your own device.", fr: "Votre propre IA, gardée sur votre appareil." },
-    about: { en: "Ingenium runs an AI model on your own device. You can read its thinking, build an assistant of your own, keep your sources in Fontes, and take one step at a time in its Focus room. To chat, it needs a model file, which stays on your device; everything else works here.",
-             fr: "Ingenium fait tourner un modèle d’IA sur votre appareil. Vous pouvez lire son raisonnement, bâtir votre propre assistant, garder vos sources dans Fontes, et avancer pas à pas dans sa salle Focus. Pour converser, il lui faut un fichier de modèle, qui reste sur votre appareil ; tout le reste fonctionne ici." },
-    tries: { en: ["Take the tour: it begins with what a model is.", "Open Focus, its support room, and take one step at a time.", "Look through your models: Fast, Balanced and Best, for each device.", "Open Fontes and keep a source."],
-             fr: ["Suivez la visite : elle commence par ce qu’est un modèle.", "Ouvrez Focus, sa salle de soutien, et avancez pas à pas.", "Parcourez vos modèles : rapide, équilibré et meilleur, pour chaque appareil.", "Ouvrez Fontes et gardez une source."] },
-    runs: { en: "Mac · Windows · iPhone and iPad · Fire tablet", fr: "Mac · Windows · iPhone et iPad · tablette Fire" } },
+    about: { en: "Ingenium runs AI models on your own device. Chat with a model and read its thinking, work on code with it in Code, blend the answers of several, and build an assistant of your own. Models shows which models suit each device, Fast, Balanced or Best; Focus, its support room, takes one step at a time; Fabrica keeps every version of your apps; Tabula, Abacus, Imago, Scriba and Fontes are its own studios. An optional sign-in seals what it keeps on the device. To chat, it needs a model file, which stays on your device; everything else works here.",
+             fr: "Ingenium fait tourner des modèles d’IA sur votre appareil. Conversez avec un modèle et lisez son raisonnement, travaillez le code avec lui dans Code, mêlez les réponses de plusieurs, et bâtissez votre propre assistant. Models montre les modèles qui conviennent à chaque appareil, rapide, équilibré ou meilleur ; Focus, sa salle de soutien, avance pas à pas ; Fabrica garde chaque version de vos apps ; Tabula, Abacus, Imago, Scriba et Fontes sont ses propres ateliers. Une connexion facultative scelle ce qu’il garde sur l’appareil. Pour converser, il lui faut un fichier de modèle, qui reste sur votre appareil ; tout le reste fonctionne ici." },
+    tries: { en: ["Take the tour: it begins with what a model is.", "Open Models: Fast, Balanced and Best, for each device.", "Open Focus, its support room, and take one step at a time.", "Open Fabrica and keep a first version of an app."],
+             fr: ["Suivez la visite : elle commence par ce qu’est un modèle.", "Ouvrez Models : rapide, équilibré et meilleur, pour chaque appareil.", "Ouvrez Focus, sa salle de soutien, et avancez pas à pas.", "Ouvrez Fabrica et gardez une première version d’une app."] },
+    runs: { en: "Mac mini and MacBook (Apple silicon and Intel) · Windows · iPhone and iPad · Fire tablet and Android", fr: "Mac mini et MacBook (Apple silicon et Intel) · Windows · iPhone et iPad · tablette Fire et Android" } },
   { slug: "inkwell", k: "inkwell", name: { en: "Inkwell", fr: "Inkwell" }, date: "XXIII · SEPTEMBRIS · MMXXVI", tour: "startTour",
     line: { en: "A writing desk that corrects, clarifies and coaches, offline.", fr: "Un pupitre d’écriture qui corrige, éclaircit et conseille, hors ligne." },
-    about: { en: "Inkwell corrects as you write, offline: spelling and grammar, notes on clarity and style, register and form. It keeps one form of a word through a document and learns the words you add to your own dictionary. It can rewrite a sentence, draft with you, grade a page against a rubric, and coach you through an argument with Socrat. Notes pin to the desk, and Tabula and Scriba sit beside the page.",
-             fr: "Inkwell corrige pendant que vous écrivez, hors ligne : orthographe et grammaire, remarques de clarté et de style, registre et forme. Il garde une seule forme d’un mot dans tout le document et retient les mots que vous ajoutez à votre dictionnaire. Il réécrit une phrase, rédige avec vous, note une page selon une grille, et vous accompagne dans un raisonnement avec Socrat. Les notes s’épinglent au pupitre, et Tabula et Scriba se tiennent près de la page." },
-    tries: { en: ["Open the sample page and read the marks.", "Open a suggestion and accept it.", "Rewrite a sentence, offline.", "Pin a note to the desk with Schedae."],
-             fr: ["Ouvrez la page d’exemple et lisez les marques.", "Ouvrez une suggestion et acceptez-la.", "Réécrivez une phrase, hors ligne.", "Épinglez une note au pupitre avec Schedae."] },
-    runs: { en: "Mac · Windows · Fire tablet", fr: "Mac · Windows · tablette Fire" } }
+    about: { en: "Inkwell corrects as you write, offline: spelling and grammar, notes on clarity and style, register and form. It keeps one form of a word through a document and learns the words you add to your own dictionary. Draft writes with you, Rewrite recasts a sentence, and Coach grades a page against a rubric or walks you through an argument with Socrat. Notes pin to the desk, and Scriba, Fontes and Tabula sit beside the page.",
+             fr: "Inkwell corrige pendant que vous écrivez, hors ligne : orthographe et grammaire, remarques de clarté et de style, registre et forme. Il garde une seule forme d’un mot dans tout le document et retient les mots que vous ajoutez à votre dictionnaire. Draft rédige avec vous, Rewrite reformule une phrase, et Coach note une page selon une grille ou vous accompagne dans un raisonnement avec Socrat. Les notes s’épinglent au pupitre, et Scriba, Fontes et Tabula sont à côté de la page." },
+    tries: { en: ["At the door, choose Open the desk, or take the guided tour.", "Read the marks on the Welcome page and accept a suggestion.", "Rewrite a sentence, offline.", "Pin a note to the desk with Schedae."],
+             fr: ["À la porte, ouvrez le pupitre, ou suivez la visite guidée.", "Lisez les marques de la page d’accueil et acceptez une suggestion.", "Réécrivez une phrase, hors ligne.", "Épinglez une note au pupitre avec Schedae."] },
+    runs: { en: "Mac (Apple silicon and Intel) · Windows · Fire tablet", fr: "Mac (Apple silicon et Intel) · Windows · tablette Fire" } }
 ];
 /* a build may leave an app out (BUILD.without): the site without Inkwell has three rooms, and its crest three fields, two above
    (Carpe Diem, The Forge) and one across the foot (Ingenium), with no fourth quarter */
@@ -455,7 +459,8 @@ if (TRIO) {
   document.documentElement.classList.add("trio");
   APPS.forEach(function (a) { if (a.k !== "forge") return;
     a.about.en = a.about.en.replace(", Inkwell and Ingenium’s demo edition", " and Ingenium’s demo edition");
-    a.about.fr = a.about.fr.replace(", Inkwell et l’édition", " et l’édition"); });
+    a.about.fr = a.about.fr.replace(", Inkwell et l’édition", " et l’édition");
+    a.tries.en[0] = a.tries.en[0].replace(", Inkwell or Ingenium", " or Ingenium"); a.tries.fr[0] = a.tries.fr[0].replace(", Inkwell ou Ingenium", " ou Ingenium"); });
 }
 var BYSLUG = {}, BYK = {}; APPS.forEach(function (a) { BYSLUG[a.slug] = a; BYK[a.k] = a; a.variants = (BUILD.apps && BUILD.apps[a.slug]) || []; });
 var DEVICES = [["iphone", "iPhone", "iPhone"], ["ipad", "iPad", "iPad"], ["macbook_pro", "MacBook Pro", "MacBook Pro"], ["mac_mini_4k", "Mac mini", "Mac mini"], ["windows", "Windows", "Windows"],
@@ -688,6 +693,10 @@ function paintRoom() {
   $("roomTitle").textContent = a.name[lang]; $("roomDate").textContent = a.date; $("roomAbout").textContent = a.about[lang];
   $("tryH").textContent = t("tryH"); $("roomTry").innerHTML = a.tries[lang].map(function (x) { return "<li>" + x + "</li>"; }).join("");
   $("roomRuns").textContent = t("runs") + colon() + a.runs[lang];
+  var V = BUILD.versions || {}, B = { cd: ["Carpe Diem " + V.cd + ", " + (lang === "fr" ? (BUILD.cdEdition === "Committee demo" ? "sa démo du comité" : "son échantillon public") : (BUILD.cdEdition === "Committee demo" ? "its Committee demo" : "its Public sample"))],
+    forge: ["The Forge " + V.forge + (lang === "fr" ? ", sa démonstration" : ", its demonstration")], ingenium: ["Ingenium " + V.ingenium + (lang === "fr" ? ", son édition de démonstration" : ", its demo edition")],
+    inkwell: ["Inkwell " + V.inkwell] }[a.k];
+  $("roomBuild").textContent = V[a.k] && B ? t("thisDemo") + colon() + B[0] : "";
   var vb = $("variantBox"), vs = $("variants"); vs.innerHTML = "";
   if (a.variants.length > 1) { vb.hidden = false; a.variants.forEach(function (v, i) { var b = document.createElement("button"); b.type = "button"; b.textContent = v.label[lang]; b.setAttribute("aria-pressed", i === curVar ? "true" : "false");
       b.addEventListener("click", function () { if (curVar === i) return; curVar = i; paintRoom(); loadDemo(); }); vs.appendChild(b); }); } else vb.hidden = true;
@@ -809,7 +818,25 @@ $("tourKey").addEventListener("click", function () {
   } catch (e) { note.textContent = t("tourNone"); }
 });
 document.querySelectorAll(".seg.widths button").forEach(function (b) { b.addEventListener("click", function () { var w = b.getAttribute("data-w"); $("stage").setAttribute("data-w", w);
-  document.querySelectorAll(".seg.widths button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); }); });
+  document.querySelectorAll(".seg.widths button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); fitStage(); }); });
+/* each app is drawn at a real screen's size and scaled, whole, into the well: a computer at least 1280 by 720 (as wide as
+   the well allows, as tall as the well's shape gives), a tablet 1180 by 820, a phone 390 by 844. On a narrow window the
+   app fills the well at its own size, as it would on that device. */
+var SCREENS = { tablet: [1180, 820], phone: [390, 844] };
+function fitStage() {
+  var well = document.querySelector(".well"), fr = $("frameBox"), st = $("stage"); if (!well || !fr || !st || $("room").hidden) return;
+  var cs = getComputedStyle(well), W = well.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), H = well.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  if (W < 50 || H < 50) return;
+  var w = st.getAttribute("data-w") || "computer";
+  if (innerWidth <= 900) { fr.classList.remove("fit"); fr.style.width = fr.style.height = ""; frameEl.style.width = frameEl.style.height = frameEl.style.transform = ""; return; }
+  var b = w === "computer" ? 0 : 10, vw, vh, s;
+  if (w === "computer") { vw = 1280; s = Math.min(1, W / vw); vh = H / s; if (vh < 720) { vh = 720; s = H / vh; vw = W / s; } }
+  else { vw = SCREENS[w][0]; vh = SCREENS[w][1]; s = Math.min(1, (W - 2 * b) / vw, (H - 2 * b) / vh); }
+  fr.classList.add("fit"); fr.style.width = Math.floor(vw * s + 2 * b) + "px"; fr.style.height = Math.floor(vh * s + 2 * b) + "px";
+  frameEl.style.width = Math.round(vw) + "px"; frameEl.style.height = Math.round(vh) + "px"; frameEl.style.transform = s < 1 ? "scale(" + s.toFixed(4) + ")" : "";
+  fr.setAttribute("data-screen", Math.round(vw) + "x" + Math.round(vh) + "@" + s.toFixed(3));
+}
+var fitT = 0; window.addEventListener("resize", function () { clearTimeout(fitT); fitT = setTimeout(fitStage, 120); });
 
 /* ============================== the way between ============================== */
 function route() {
@@ -818,7 +845,7 @@ function route() {
     var changed = !cur || cur.slug !== a.slug; if (changed) curVar = 0; cur = a;
     $("hall").hidden = true; $("room").hidden = false; paintRoom();
     var r = $("room"); r.classList.remove("room-in"); void r.offsetWidth; if (!reduced) r.classList.add("room-in");
-    window.scrollTo(0, 0); loadDemo();
+    window.scrollTo(0, 0); fitStage(); loadDemo();
   } else {
     var wasRoom = !$("room").hidden; cur = null;
     $("room").hidden = true; $("hall").hidden = false; document.title = "The Offline Project";
