@@ -1,0 +1,387 @@
+{
+ "about": "Facts of the folder search's test corpus: each is stated in exactly one file (the needle is an exact phrase of it, as the readers extract the text). The golden questions of phase 5 are drawn from these. The restricted folder's facts exist only in that folder.",
+ "folders": [
+  "historian_archive",
+  "lab_notes",
+  "household_papers"
+ ],
+ "restricted_folder": "household_papers",
+ "facts": [
+  {
+   "id": "H01",
+   "folder": "historian_archive",
+   "file": "letters/1784-03-02_grieve_to_wren.txt",
+   "path": "historian_archive/letters/1784-03-02_grieve_to_wren.txt",
+   "type": "txt",
+   "question": "How many hogsheads of sugar did the Mary Ann carry from Kingston in February 1784?",
+   "answer": "412 hogsheads of sugar (with 38 puncheons of rum)",
+   "needle": "412 hogsheads of sugar"
+  },
+  {
+   "id": "H02",
+   "folder": "historian_archive",
+   "file": "letters/1785-07-19_wren_to_hollis.txt",
+   "path": "historian_archive/letters/1785-07-19_wren_to_hollis.txt",
+   "type": "txt",
+   "question": "At what price did Wren agree to buy staves from the Redcliff Back cooper Ambrose Tilley?",
+   "answer": "Eleven shillings the hundred (six hundred staves)",
+   "needle": "Ambrose Tilley, the cooper of Redcliff Back"
+  },
+  {
+   "id": "H03",
+   "folder": "historian_archive",
+   "file": "diaries/josiah_hollis_diary_1786.md",
+   "path": "historian_archive/diaries/josiah_hollis_diary_1786.md",
+   "type": "md",
+   "question": "What did the ship Hester cost to build?",
+   "answer": "£2,140 (163 tons burthen)",
+   "needle": "she measured 163 tons burthen and cost £2,140 to build"
+  },
+  {
+   "id": "H04",
+   "folder": "historian_archive",
+   "file": "letters/1787-01-11_grieve_to_wren.txt",
+   "path": "historian_archive/letters/1787-01-11_grieve_to_wren.txt",
+   "type": "txt",
+   "question": "Where and when did Captain Carew die, and of what?",
+   "answer": "At Port Royal on 3 December 1786, of the yellow fever",
+   "needle": "Captain Carew died of the yellow fever at Port Royal on the 3rd of December"
+  },
+  {
+   "id": "H05",
+   "folder": "historian_archive",
+   "file": "articles/sugar_duties_1787.pdf",
+   "path": "historian_archive/articles/sugar_duties_1787.pdf",
+   "type": "pdf",
+   "question": "What was the duty on muscovado sugar imported into Bristol in 1787?",
+   "answer": "15 shillings the hundredweight",
+   "needle": "15 shillings the hundredweight",
+   "page": 3
+  },
+  {
+   "id": "H06",
+   "folder": "historian_archive",
+   "file": "finding_aids/wren_collection_guide.html",
+   "path": "historian_archive/finding_aids/wren_collection_guide.html",
+   "type": "html",
+   "question": "What does the Wren collection hold, and who deposited it?",
+   "answer": "214 letters, 9 account books and 31 loose maps, deposited by Eleanor Marsh in 1962",
+   "needle": "214 letters, 9 account books and 31 loose maps"
+  },
+  {
+   "id": "H07",
+   "folder": "historian_archive",
+   "file": "ledgers/wages_roll_hester_1788.csv",
+   "path": "historian_archive/ledgers/wages_roll_hester_1788.csv",
+   "type": "csv",
+   "question": "What monthly wage was the boatswain Silas Pennock paid on the Hester in 1788?",
+   "answer": "£3 15s 0d",
+   "needle": "Silas Pennock,Boatswain,£3 15s 0d"
+  },
+  {
+   "id": "H08",
+   "folder": "historian_archive",
+   "file": "chapters/chapter3_the_cooper_trade.docx",
+   "path": "historian_archive/chapters/chapter3_the_cooper_trade.docx",
+   "type": "docx",
+   "question": "How much did the firm owe the Lisbon wine merchant Joaquim da Cunha by the winter of 1790?",
+   "answer": "£1,386 11s 4d",
+   "needle": "£1,386 11s 4d"
+  },
+  {
+   "id": "H09",
+   "folder": "historian_archive",
+   "file": "logbook/ship_logbooks_1781-1802.txt",
+   "path": "historian_archive/logbook/ship_logbooks_1781-1802.txt",
+   "type": "txt",
+   "question": "Who was the carpenter killed in a fall from the fore-topsail yard?",
+   "answer": "Daniel Roke",
+   "needle": "the carpenter, Daniel Roke, fell from the fore-topsail yard"
+  },
+  {
+   "id": "H10",
+   "folder": "historian_archive",
+   "file": "logbook/ship_logbooks_1781-1802.txt",
+   "path": "historian_archive/logbook/ship_logbooks_1781-1802.txt",
+   "type": "txt",
+   "question": "Which Danish snow did the ship speak off Corvo?",
+   "answer": "The Frederikke of Altona",
+   "needle": "the Frederikke of Altona"
+  },
+  {
+   "id": "H11",
+   "folder": "historian_archive",
+   "file": "ledgers/voyages_1781-1795.json",
+   "path": "historian_archive/ledgers/voyages_1781-1795.json",
+   "type": "json",
+   "question": "What port dues did the Providence pay at Bristol on 8 May 1790?",
+   "answer": "£86 4s 9d (receipt no. 7731)",
+   "needle": "Paid £86 4s 9d to the Port Officer on 8 May 1790, receipt no. 7731"
+  },
+  {
+   "id": "H12",
+   "folder": "historian_archive",
+   "file": "articles/hotwells_shipyards_1780s.pdf",
+   "path": "historian_archive/articles/hotwells_shipyards_1780s.pdf",
+   "type": "pdf",
+   "question": "What was the largest vessel built at Thomas Boyd's Hotwells yard between 1781 and 1790?",
+   "answer": "The 280-ton Africa Packet",
+   "needle": "the 280-ton Africa Packet",
+   "page": 3
+  },
+  {
+   "id": "H13",
+   "folder": "historian_archive",
+   "file": "diaries/dorothea_pell_journal_1789.md",
+   "path": "historian_archive/diaries/dorothea_pell_journal_1789.md",
+   "type": "md",
+   "question": "How much cane was lost at Pell's Rest in the storm of 17 August 1789?",
+   "answer": "40 acres",
+   "needle": "flattened 40 acres of cane at Pell's Rest"
+  },
+  {
+   "id": "H14",
+   "folder": "historian_archive",
+   "file": "finding_aids/people_index.html",
+   "path": "historian_archive/finding_aids/people_index.html",
+   "type": "html",
+   "question": "For how long was Alexander Grieve the firm's factor at Kingston?",
+   "answer": "From 1779 until his death in 1795",
+   "needle": "served as the firm's Kingston factor from 1779 until his death in 1795"
+  },
+  {
+   "id": "L01",
+   "folder": "lab_notes",
+   "file": "protocols/spore_germination_assay.md",
+   "path": "lab_notes/protocols/spore_germination_assay.md",
+   "type": "md",
+   "question": "At what temperature and for how long are the spore germination plates incubated?",
+   "answer": "24.5 °C for 72 hours, in the dark",
+   "needle": "Incubate the plates at 24.5 °C for 72 h in the dark"
+  },
+  {
+   "id": "L02",
+   "folder": "lab_notes",
+   "file": "protocols/autoclave_cycle.md",
+   "path": "lab_notes/protocols/autoclave_cycle.md",
+   "type": "md",
+   "question": "What autoclave cycle is used for liquid volumes over 1 litre?",
+   "answer": "121 °C at 15 psi for 35 minutes",
+   "needle": "121 °C at 15 psi for 35 minutes"
+  },
+  {
+   "id": "L03",
+   "folder": "lab_notes",
+   "file": "notebook/2026-03-09_batch17.txt",
+   "path": "lab_notes/notebook/2026-03-09_batch17.txt",
+   "type": "txt",
+   "question": "What dry mycelium yield did batch 17 give?",
+   "answer": "3.82 g, from 2.0 L of potato dextrose broth",
+   "needle": "Batch 17 yielded 3.82 g of dry mycelium"
+  },
+  {
+   "id": "L04",
+   "folder": "lab_notes",
+   "file": "notebook/2026-04-22_contamination.txt",
+   "path": "lab_notes/notebook/2026-04-22_contamination.txt",
+   "type": "txt",
+   "question": "What contaminant was found on 22 April, in which flask, and how many flasks were thrown away?",
+   "answer": "Trichoderma in flask C-14; 11 flasks",
+   "needle": "contamination by Trichoderma in flask C-14"
+  },
+  {
+   "id": "L05",
+   "folder": "lab_notes",
+   "file": "instruments/incubator_b_log_2026-05.csv",
+   "path": "lab_notes/instruments/incubator_b_log_2026-05.csv",
+   "type": "csv",
+   "question": "What happened to Incubator B on the night of 17 May 2026?",
+   "answer": "It reached 37.8 °C; the night porter M. Dlamini found the door ajar",
+   "needle": "door found ajar (night porter M. Dlamini)"
+  },
+  {
+   "id": "L06",
+   "folder": "lab_notes",
+   "file": "protocols/ph_meter_calibration.md",
+   "path": "lab_notes/protocols/ph_meter_calibration.md",
+   "type": "md",
+   "question": "Which pH electrode was replaced on 3 June 2026?",
+   "answer": "Serial EL-40917",
+   "needle": "Electrode serial EL-40917 was replaced on 3 June 2026"
+  },
+  {
+   "id": "L07",
+   "folder": "lab_notes",
+   "file": "data/strain_registry.json",
+   "path": "lab_notes/data/strain_registry.json",
+   "type": "json",
+   "question": "Where was strain FX-208 isolated from?",
+   "answer": "Beech litter at Hayley Wood (accession 2025-0173)",
+   "needle": "Isolated from beech litter at Hayley Wood, accession 2025-0173"
+  },
+  {
+   "id": "L08",
+   "folder": "lab_notes",
+   "file": "reports/q2_report_2026.pdf",
+   "path": "lab_notes/reports/q2_report_2026.pdf",
+   "type": "pdf",
+   "question": "What did the lab spend on consumables in the second quarter of 2026?",
+   "answer": "£14,206.50 (8% under budget)",
+   "needle": "£14,206.50",
+   "page": 2
+  },
+  {
+   "id": "L09",
+   "folder": "lab_notes",
+   "file": "reports/q2_report_2026.pdf",
+   "path": "lab_notes/reports/q2_report_2026.pdf",
+   "type": "pdf",
+   "question": "How many samples were moved after the G.12 freezer failed on 5 June?",
+   "answer": "214 samples, within 40 minutes, to room G.14",
+   "needle": "214 samples were moved",
+   "page": 3
+  },
+  {
+   "id": "L10",
+   "folder": "lab_notes",
+   "file": "reports/safety_audit_2026.docx",
+   "path": "lab_notes/reports/safety_audit_2026.docx",
+   "type": "docx",
+   "question": "What did the February 2026 safety audit find in the prep room?",
+   "answer": "Three expired fire extinguishers, all replaced by 20 February",
+   "needle": "three expired fire extinguishers"
+  },
+  {
+   "id": "L11",
+   "folder": "lab_notes",
+   "file": "meetings/lab_meeting_2026-06-18.html",
+   "path": "lab_notes/meetings/lab_meeting_2026-06-18.html",
+   "type": "html",
+   "question": "Which second centrifuge did the lab decide to buy on 18 June 2026, and at what price?",
+   "answer": "The Hettich Rotanta 460, £6,480 plus VAT",
+   "needle": "Hettich Rotanta 460"
+  },
+  {
+   "id": "L12",
+   "folder": "lab_notes",
+   "file": "protocols/dna_extraction.md",
+   "path": "lab_notes/protocols/dna_extraction.md",
+   "type": "md",
+   "question": "What volume of buffer EB is used to elute the DNA, and at what temperature?",
+   "answer": "50 µL, prewarmed to 55 °C",
+   "needle": "Elute in 50 µL of buffer EB prewarmed to 55 °C"
+  },
+  {
+   "id": "L13",
+   "folder": "lab_notes",
+   "file": "notebook/2026-07-02_poster_day.txt",
+   "path": "lab_notes/notebook/2026-07-02_poster_day.txt",
+   "type": "txt",
+   "question": "Who presented a dissertation poster on 2 July 2026, and what prize did she win?",
+   "answer": "Priya Venkataraman; second prize",
+   "needle": "Priya Venkataraman presented her dissertation poster"
+  },
+  {
+   "id": "R01",
+   "folder": "household_papers",
+   "file": "insurance/home_policy_schedule.pdf",
+   "path": "household_papers/insurance/home_policy_schedule.pdf",
+   "type": "pdf",
+   "question": "What is the buildings sum insured on the home insurance policy?",
+   "answer": "£385,000",
+   "needle": "Buildings sum insured: £385,000",
+   "page": 1
+  },
+  {
+   "id": "R02",
+   "folder": "household_papers",
+   "file": "finance/utility_bills_2025.csv",
+   "path": "household_papers/finance/utility_bills_2025.csv",
+   "type": "csv",
+   "question": "Why was the March 2025 electricity bill higher than usual?",
+   "answer": "A heat pump trial began on 12 March",
+   "needle": "new heat pump trial from 12 March"
+  },
+  {
+   "id": "R03",
+   "folder": "household_papers",
+   "file": "letters/plumber_quote_2025-11-03.docx",
+   "path": "household_papers/letters/plumber_quote_2025-11-03.docx",
+   "type": "docx",
+   "question": "Who quoted to replace the boiler, and for how much?",
+   "answer": "Halvorsen Plumbing, £3,940",
+   "needle": "Halvorsen Plumbing has quoted £3,940 to replace the boiler"
+  },
+  {
+   "id": "R04",
+   "folder": "household_papers",
+   "file": "letters/school_letter_2025-03.txt",
+   "path": "household_papers/letters/school_letter_2025-03.txt",
+   "type": "txt",
+   "question": "Where and when is the Year 5 parents' evening?",
+   "answer": "Thursday 13 March 2025 at 5.40 pm in Room 14",
+   "needle": "from 5.40 pm in Room 14"
+  },
+  {
+   "id": "R05",
+   "folder": "household_papers",
+   "file": "home/boiler_manual_notes.html",
+   "path": "household_papers/home/boiler_manual_notes.html",
+   "type": "html",
+   "question": "What should the boiler pressure gauge read when the system is cold?",
+   "answer": "Between 1.0 and 1.5 bar",
+   "needle": "between 1.0 and 1.5 bar"
+  },
+  {
+   "id": "R06",
+   "folder": "household_papers",
+   "file": "recipes/cardamom_buns.md",
+   "path": "household_papers/recipes/cardamom_buns.md",
+   "type": "md",
+   "question": "At what temperature and for how long are the cardamom buns baked?",
+   "answer": "200 °C for 9 minutes",
+   "needle": "Bake at 200 °C for 9 minutes"
+  },
+  {
+   "id": "R07",
+   "folder": "household_papers",
+   "file": "finance/mortgage_schedule.json",
+   "path": "household_papers/finance/mortgage_schedule.json",
+   "type": "json",
+   "question": "Until when is the mortgage rate fixed, and at what rate?",
+   "answer": "4.19% until 30 June 2028",
+   "needle": "Fixed at 4.19% until 30 June 2028"
+  },
+  {
+   "id": "R08",
+   "folder": "household_papers",
+   "file": "insurance/car_policy.pdf",
+   "path": "household_papers/insurance/car_policy.pdf",
+   "type": "pdf",
+   "question": "What is the registration number of the insured car?",
+   "answer": "KX19 OPD",
+   "needle": "registration KX19 OPD",
+   "page": 2
+  },
+  {
+   "id": "R09",
+   "folder": "household_papers",
+   "file": "home/warranty_notes.txt",
+   "path": "household_papers/home/warranty_notes.txt",
+   "type": "txt",
+   "question": "Until when does the dishwasher's warranty run?",
+   "answer": "14 August 2027",
+   "needle": "warranty runs until 14 August 2027"
+  },
+  {
+   "id": "R10",
+   "folder": "household_papers",
+   "file": "home/passport_reminders.txt",
+   "path": "household_papers/home/passport_reminders.txt",
+   "type": "txt",
+   "question": "When does Adaeze's passport expire?",
+   "answer": "9 November 2027",
+   "needle": "passport expires on 9 November 2027"
+  }
+ ]
+}

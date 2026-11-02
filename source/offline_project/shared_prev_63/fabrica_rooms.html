@@ -1,0 +1,190 @@
+<style id="fabrica-rooms-css">
+/* ============ FABRICA, CALM: ITS WORK IN FOUR ROOMS, TEST AND SHIP ONE PART AT A TIME (Ingenium 6.3, The Forge 645) ============
+   The owner's words (23 October 2026): "The new GitHub-like features on Fabrica are overwhelming just listed out without any tabs
+   or organising, please arrange them in a manner that won't be triggering to AuDHD users, because I am overwhelmed by the number
+   or rows to scroll through and can't figure out how to properly navigate the page and its sections." And: "The Copies, and
+   GitHub section [...] seems truncated and does not show anything".
+   - The fourteen tabs of an app's work (one row that scrolled sideways) are four rooms: Now, Story, Plans and Care. Only the
+     tabs of the room chosen show (three to five), with a line under them that says what the room holds.
+   - Test and ship shows one part at a time, Test, Ship or Copies, chosen at its top, so nothing sits below the fold: Copies
+     opened in a panel that had already scrolled, under a fixed key, and showed nothing. Make the chosen shows with Ship only.
+   - The settings of an app are cards that fold: the first open, the others closed to their titles.
+   - A device's card in Ship no longer holds its Make and save key inside it (a key inside a key reads badly aloud): the key
+     sits on the card, beside it in the page's order.
+   - A version in History opens from its title line, a key of its own, so the card's keys (See the changes, Undo it...) are
+     not inside another key.
+   Shared by both apps (build/thoughts/fabrica_rooms.html): drawn only with Fabrica's own tokens (--f-*), so it is amethyst in
+   Ingenium and the Forge's blue in the Forge, by day and by night. */
+#fb .fr-rooms{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 9px}
+#fb .fr-room{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 14px 6px 11px;border-radius:12px;border:1px solid var(--f-hair);
+  background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);color:var(--f-ink2);font:600 13px/1.2 var(--f-sans);cursor:pointer;
+  transition:transform .16s var(--f-spring),box-shadow .16s ease,color .15s,border-color .15s}
+#fb .fr-room svg{width:15px;height:15px;flex:0 0 auto;color:var(--f-acc)}
+#fb .fr-room:hover{transform:translateY(-2px);box-shadow:var(--f-pophi);color:var(--f-ink1)}
+#fb .fr-room:active{transform:translateY(1px) scale(.985);box-shadow:var(--f-press);transition-duration:.06s}
+#fb .fr-room[aria-pressed="true"]{color:var(--f-acc);border-color:var(--f-ring);background:linear-gradient(var(--f-b),var(--f-a));box-shadow:var(--f-press),inset 0 0 0 1.5px var(--f-acc);transform:translateY(1px)}
+#fb .fr-room:focus-visible{outline:2px solid var(--f-ring);outline-offset:2px}
+#fb .fr-room .fr-n{min-width:17px;height:17px;padding:0 5px;border-radius:999px;display:inline-grid;place-items:center;font-size:10.5px;background:var(--f-accs);color:var(--f-acc)}
+#fb .fr-room .fr-n[hidden]{display:none}
+#fb #fbViews button[data-v][hidden]{display:none !important}
+#fb .fr-says{margin:7px 2px 0;font-size:12.5px;line-height:1.45;color:var(--f-ink3);max-width:70ch}
+/* Test and ship, one part at a time */
+#fb .fr-parts{display:flex;gap:2px;margin:0 0 12px;border:1px solid var(--f-hair);border-radius:999px;padding:3px;background:var(--f-wellbg);box-shadow:var(--f-well);width:max-content;max-width:100%}
+#fb .fr-part{border:1px solid transparent;background:transparent;border-radius:999px;padding:5px 14px;font:600 12.5px/1.2 var(--f-sans);color:var(--f-ink3);cursor:pointer;white-space:nowrap;
+  transition:color .2s,background .2s,box-shadow .2s,transform .12s var(--f-spring)}
+#fb .fr-part:hover{color:var(--f-ink1)}
+#fb .fr-part[aria-selected="true"]{color:#fff;background:linear-gradient(var(--f-pa),var(--f-pb));border-color:var(--f-pedge);box-shadow:var(--f-psh);text-shadow:0 1px 1px rgba(30,10,60,.3)}
+#fb .fr-part:focus-visible{outline:2px solid var(--f-ring);outline-offset:2px}
+#fbShip.fr-tabbed .f-pn-b > .f-sec.fr-off{display:none}
+#fbShip.fr-tabbed .f-pn-b > .f-sec{border-top:0;margin-top:0;padding-top:0}
+#fbShip.fr-tabbed .f-secfold{display:none}
+#fbShip.fr-tabbed:not(.fr-on-ship) .f-pn-f{display:none}
+/* the key that makes what was chosen is as wide as its words, as every key of the app */
+#fb .f-pn-f{justify-content:center}
+#fb #fbMakeAll{flex:0 1 auto !important;min-width:220px;max-width:100%}
+/* a device's card is one key (chosen or not); its own Make and save key sits on it but is not inside it, so neither key
+   holds the other (each is read as itself) */
+#fb .fr-tgw{position:relative;display:flex;min-width:0}
+#fb .fr-tgw > .f-tg{flex:1 1 auto;min-width:0;padding-bottom:42px}
+#fb .fr-tgw > .fr-mk{position:absolute;right:11px;bottom:10px;z-index:1}
+/* an app's settings: cards that fold */
+#fb .fr-fh{display:flex;align-items:center;gap:10px;width:100%;margin:0;padding:2px 0;border:0;background:transparent;color:var(--f-ink1);cursor:pointer;text-align:left;font:inherit}
+#fb .fr-fh .h-big{margin:0;flex:1 1 auto}
+#fb .fr-fh .fr-chev{flex:0 0 auto;width:28px;height:28px;display:inline-grid;place-items:center;border-radius:9px;border:1px solid var(--f-hair);background:linear-gradient(var(--f-a),var(--f-b));
+  box-shadow:var(--f-pop);color:var(--f-ink2);transition:transform .2s var(--f-spring),box-shadow .16s}
+#fb .fr-fh:hover .fr-chev{transform:translateY(-2px);box-shadow:var(--f-pophi)}
+#fb .fr-fh:active .fr-chev{transform:translateY(1px);box-shadow:var(--f-press)}
+#fb .fr-fh .fr-chev svg{width:13px;height:13px;transition:transform .25s var(--f-spring)}
+#fb .fr-fold.fr-shut .fr-chev svg{transform:rotate(-90deg)}
+#fb .fr-fold.fr-shut .fr-fb{display:none}
+#fb .fr-fold .fr-fb{padding-top:6px}
+#fb .fr-fh:focus-visible{outline:2px solid var(--f-ring);outline-offset:3px;border-radius:8px}
+#fb .f-dcode:focus-visible{outline:2px solid var(--f-ring);outline-offset:-2px}
+/* a version in History: its title line is the key that opens it (the card held its keys inside a card that acted as one) */
+#fb .f-cm .fr-cmh{display:block;width:100%;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+#fb .f-cm .fr-cmh:focus-visible{outline:2px solid var(--f-ring);outline-offset:3px;border-radius:6px}
+#fb .f-cm[data-open="true"]{border-color:var(--f-ring);box-shadow:var(--f-pophi),inset 0 0 0 1px var(--f-ring)}
+#fb .f-cm[data-open="true"] .more{display:block}
+@media (prefers-reduced-motion:reduce){#fb .fr-room,#fb .fr-part,#fb .fr-fh .fr-chev,#fb .fr-fh .fr-chev svg{transition:none}}
+@media (forced-colors:active){#fb .fr-room,#fb .fr-part,#fb .fr-fh .fr-chev{border:1px solid CanvasText}#fb .fr-room[aria-pressed="true"],#fb .fr-part[aria-selected="true"]{outline:2px solid Highlight}}
+</style>
+<script>
+(function fabricaRooms(){"use strict";if(window.fbRooms)return;
+function $(id){return document.getElementById(id);}
+function X(){return window.fbHubHost||null;}
+function svg(d){return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';}
+var ROOMS=[
+  {k:"now",t:"Now",i:svg('<path d="M3 13l1-3.5L11 2.5l2.5 2.5L6.5 12z"/><path d="M9.5 4l2.5 2.5"/>'),v:["changes","files","code"],
+   says:"The app as it is now: what changed since the version you last kept, all its files, and its code to read line by line."},
+  {k:"story",t:"Story",i:svg('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2.2 1.4"/>'),v:["history","compare","releases"],
+   says:"Every version you kept, any two of them side by side, and the packages made from them for your devices."},
+  {k:"plans",t:"Plans",i:svg('<path d="M6 13.5h4M6.5 11.5h3"/><path d="M8 2.5a4 4 0 0 1 2.5 7.1c-.6.5-.9 1.1-1 1.9h-3c-.1-.8-.4-1.4-1-1.9A4 4 0 0 1 8 2.5z"/>'),v:["ideas","issues","pulls","projects","wiki"],
+   says:"Ideas tried on the side, issues to fix or add, changes proposed before they join the main idea, a board for the work, and a wiki of notes."},
+  {k:"care",t:"Care",i:svg('<path d="M8 2l5 2v4c0 3-2.2 5.2-5 6-2.8-.8-5-3-5-6V4z"/><path d="M5.8 8.2l1.6 1.6 3-3.2"/>'),v:["actions","insights","settings"],
+   says:"The checks run on each version and what they found, how the app has grown, and its settings."}];
+/* names of Fabrica's own, where the tab bore another service's: its checks, and an overview of the app */
+var NAMES={actions:"Checks",insights:"Overview"};
+var TIPS={changes:"What changed since the version you kept last",files:"Every file of the app",code:"Any version's code, with line numbers, who changed each line, and a search",
+  history:"Every version kept, newest first",compare:"Two versions side by side, line by line",releases:"The packages made for your devices, kept with their version",
+  ideas:"Ideas tried on the side (branches): the main idea stays as it is until you bring one in",issues:"Things to fix or add, each with its own conversation",
+  pulls:"An idea proposed for the main idea, read and talked over before it is brought in",projects:"A board: the work in columns",wiki:"Pages of notes about the app",
+  actions:"Fabrica's own checks, run on a version and kept with what they found",insights:"How the app has grown: its versions, files and activity",settings:"Its description, star, labels and more"};
+var LAST={},ROOM="now",BUSY=false;
+function roomOf(v){for(var i=0;i<ROOMS.length;i++)if(ROOMS[i].v.indexOf(v)>=0)return ROOMS[i].k;return null;}
+function sel(){var vb=$("fbViews"),b=vb&&vb.querySelector('button[data-v][aria-selected="true"]');return b?b.getAttribute("data-v"):"changes";}
+function build(){var vb=$("fbViews");if(!vb||vb.__fr)return !!vb;var host=vb.parentNode;if(!host)return false;
+  /* the nine views of the other part come a moment later; the rooms wait for them */
+  if(!vb.querySelector('button[data-v="settings"]'))return false;vb.__fr=1;
+  [].forEach.call(vb.querySelectorAll("button[data-v]"),function(b){var v=b.getAttribute("data-v");
+    if(NAMES[v]){var t=b.firstChild;if(t&&t.nodeType===3)t.nodeValue=NAMES[v];}
+    if(TIPS[v])b.title=TIPS[v];});
+  /* the tabs in the order of their rooms, so each room's read left to right as it is listed */
+  ROOMS.forEach(function(R){R.v.forEach(function(v){var b=vb.querySelector('button[data-v="'+v+'"]');if(b)vb.appendChild(b);});});
+  /* the arrow keys move among the tabs shown, in the room chosen */
+  vb.addEventListener("keydown",function(e){if(["ArrowLeft","ArrowRight","Home","End"].indexOf(e.key)<0)return;var bs=[].slice.call(vb.querySelectorAll('button[role="tab"]')).filter(function(b){return !b.hidden;}),i=bs.indexOf(document.activeElement);if(i<0)return;
+    e.preventDefault();e.stopImmediatePropagation();var j=e.key==="Home"?0:e.key==="End"?bs.length-1:(i+(e.key==="ArrowRight"?1:-1)+bs.length)%bs.length;bs[j].focus();},true);
+  var row=document.createElement("div");row.className="fr-rooms";row.setAttribute("role","group");row.setAttribute("aria-label","The rooms of the work");row.id="fbRooms";
+  ROOMS.forEach(function(R){var b=document.createElement("button");b.type="button";b.className="fr-room";b.setAttribute("data-room",R.k);b.setAttribute("aria-pressed","false");
+    b.innerHTML=R.i+'<span>'+R.t+'</span><span class="fr-n" hidden></span>';b.title=R.says;
+    b.onclick=function(){choose(R.k);};row.appendChild(b);});
+  host.insertBefore(row,vb);
+  var says=document.createElement("p");says.className="fr-says";says.id="fbRoomSays";says.setAttribute("aria-live","polite");
+  if(vb.nextSibling)host.insertBefore(says,vb.nextSibling);else host.appendChild(says);
+  vb.setAttribute("aria-describedby","fbRoomSays");
+  try{new MutationObserver(function(){if(!BUSY)follow();}).observe(vb,{attributes:true,subtree:true,attributeFilter:["aria-selected"],childList:true,characterData:true});}catch(e){}
+  follow();return true;}
+/* the room follows the view, however it was chosen (a tab, a key elsewhere that opens Compare, a link in an issue) */
+function follow(){var v=sel(),k=roomOf(v)||ROOM;LAST[k]=v;show(k);}
+function show(k){var vb=$("fbViews");if(!vb)return;ROOM=k;var R=ROOMS.filter(function(x){return x.k===k;})[0]||ROOMS[0];BUSY=true;
+  try{[].forEach.call(vb.querySelectorAll("button[data-v]"),function(b){var on=R.v.indexOf(b.getAttribute("data-v"))>=0;if(b.hidden===on)b.hidden=!on;});
+    [].forEach.call(document.querySelectorAll("#fbRooms .fr-room"),function(b){var on=b.getAttribute("data-room")===k;b.setAttribute("aria-pressed",on?"true":"false");});
+    var s=$("fbRoomSays");if(s&&s.textContent!==R.says)s.textContent=R.says;counts();
+    var x=X();if(x&&typeof x.thumbs==="function"){try{x.thumbs();}catch(e){}}}finally{setTimeout(function(){BUSY=false;},0);}}
+function choose(k){var R=ROOMS.filter(function(x){return x.k===k;})[0];if(!R)return;var v=LAST[k]&&R.v.indexOf(LAST[k])>=0?LAST[k]:R.v[0];show(k);
+  if(sel()!==v){var b=$("fbViews").querySelector('button[data-v="'+v+'"]');if(b)b.click();}}
+/* the open issues and proposed changes, counted on their room too, so a hidden tab's number is not lost */
+function counts(){var vb=$("fbViews");if(!vb)return;ROOMS.forEach(function(R){var n=0;R.v.forEach(function(v){var c=vb.querySelector('button[data-v="'+v+'"] .n');if(c&&!c.hidden)n+=parseInt(c.textContent,10)||0;});
+  var m=document.querySelector('#fbRooms .fr-room[data-room="'+R.k+'"] .fr-n');if(!m)return;var on=n>0&&R.k!==ROOM;m.hidden=!on;m.textContent=on?String(n):"";});}
+
+/* ---------- Test and ship: Test, Ship or Copies, one at a time ---------- */
+var PARTS=[["test","Test"],["ship","Ship"],["copies","Copies"]],PART="test",PICKED=false,LASTSTEP="";
+function shipParts(){var sp=$("fbShip"),body=sp&&sp.querySelector(".f-pn-b");if(!body)return false;var secs=[].slice.call(body.children).filter(function(e){return e.classList.contains("f-sec");});
+  if(secs.length<3)return false;
+  if(!body.querySelector(".fr-parts")){var row=document.createElement("div");row.className="fr-parts";row.setAttribute("role","tablist");row.setAttribute("aria-label","Test and ship, one part at a time");
+    PARTS.forEach(function(p,i){var b=document.createElement("button");b.type="button";b.className="fr-part";b.setAttribute("role","tab");b.setAttribute("data-part",p[0]);b.id="fbPart_"+p[0];
+      b.textContent=p[1];b.setAttribute("aria-controls","fbPartSec_"+p[0]);secs[i].id=secs[i].id||"fbPartSec_"+p[0];secs[i].setAttribute("role","tabpanel");secs[i].setAttribute("aria-labelledby",b.id);
+      b.onclick=function(){PICKED=true;part(p[0]);};row.appendChild(b);});
+    row.addEventListener("keydown",function(e){if(["ArrowLeft","ArrowRight","Home","End"].indexOf(e.key)<0)return;var bs=[].slice.call(row.querySelectorAll(".fr-part")),i=bs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();
+      var j=e.key==="Home"?0:e.key==="End"?bs.length-1:(i+(e.key==="ArrowRight"?1:-1)+bs.length)%bs.length;bs[j].focus();bs[j].click();});
+    body.insertBefore(row,body.firstChild);sp.classList.add("fr-tabbed");part(PART);
+    try{var st=document.querySelector("#fb .f-steps");if(st)new MutationObserver(stepFollow).observe(st,{attributes:true,subtree:true,attributeFilter:["class"]});}catch(e){}}
+  return true;}
+function part(k){var sp=$("fbShip"),body=sp&&sp.querySelector(".f-pn-b");if(!body)return;PART=k;var secs=[].slice.call(body.children).filter(function(e){return e.classList.contains("f-sec");});
+  PARTS.forEach(function(p,i){var on=p[0]===k,s=secs[i],b=$("fbPart_"+p[0]);if(!s)return;s.classList.toggle("fr-off",!on);
+    if(b){b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;}
+    /* a part shown is open: its fold (kept for the old layout) opened with it */
+    if(on&&s.classList.contains("is-shut")){var f=s.querySelector(".f-secfold");if(f)f.click();}});
+  sp.classList.toggle("fr-on-ship",k==="ship");body.scrollTop=0;}
+/* the step the app is at chooses the part, until a part is chosen by hand; a new step asks again */
+function stepFollow(){var now=document.querySelector("#fb .f-steps li.now");var t=now?now.textContent.replace(/\d/g,"").trim().toLowerCase():"";if(t===LASTSTEP)return;LASTSTEP=t;
+  if(t==="test"||t==="ship"){PICKED=false;part(t);}}
+
+/* ---------- a device's card and its Make and save key, side by side in one place ---------- */
+function cards(){var tg=$("fbTargets");if(!tg)return;[].forEach.call(tg.querySelectorAll(":scope > .f-tg"),function(c){var k=c.querySelector(".foot button");
+  var w=document.createElement("div");w.className="fr-tgw";tg.insertBefore(w,c);w.appendChild(c);
+  if(k){k.classList.add("fr-mk");var nm=(c.querySelector("b")||{}).textContent||"";if(nm&&!k.getAttribute("aria-label"))k.setAttribute("aria-label",k.textContent.trim()+": "+nm);w.appendChild(k);}});}
+
+/* ---------- an app's settings: cards that fold, the first open ---------- */
+var OPEN={};
+function folds(){var x=X(),w=$("fbWorkBody");if(!w||!x||!x.S||x.S.view!=="settings")return;
+  var boxes=[].slice.call(w.querySelectorAll(":scope > .h-box, :scope > .h-blk.h-box"));var first=true;
+  boxes.forEach(function(bx){if(bx.__frf)return;var big=bx.querySelector(":scope > .h-big");if(!big)return;bx.__frf=1;
+    var name=big.textContent.trim(),key=name.replace(/^About .*/,"About");
+    var fb=document.createElement("div");fb.className="fr-fb";while(big.nextSibling)fb.appendChild(big.nextSibling);
+    var hd=document.createElement("button");hd.type="button";hd.className="fr-fh";bx.insertBefore(hd,big);hd.appendChild(big);
+    var ch=document.createElement("span");ch.className="fr-chev";ch.setAttribute("aria-hidden","true");ch.innerHTML=svg('<path d="M4 6l4 4 4-4"/>');hd.appendChild(ch);
+    bx.appendChild(fb);bx.classList.add("fr-fold");fb.id=fb.id||("frfb_"+Math.random().toString(36).slice(2,8));hd.setAttribute("aria-controls",fb.id);
+    var open=key in OPEN?OPEN[key]:first;first=false;
+    function set(on){bx.classList.toggle("fr-shut",!on);hd.setAttribute("aria-expanded",on?"true":"false");OPEN[key]=on;}
+    set(open);hd.onclick=function(){set(bx.classList.contains("fr-shut"));};});}
+
+/* the lines of a change scroll sideways when they are long: each such block can be reached with the keyboard, and says what it is */
+function regions(){[].forEach.call(document.querySelectorAll("#fb .f-dcode:not([tabindex])"),function(d){d.tabIndex=0;d.setAttribute("role","region");
+  var f=d.closest(".f-diff,.f-df"),nm=f&&f.querySelector("b,.f-dpath,.p");d.setAttribute("aria-label","The lines that changed"+(nm&&nm.textContent?" in "+nm.textContent.trim().slice(0,80):""));});}
+function versions(){[].forEach.call(document.querySelectorAll("#fbWorkBody .f-cm[aria-expanded]"),function(e){var open=e.getAttribute("aria-expanded"),t=e.querySelector(":scope > b"),m=e.querySelector(":scope > .meta");if(!t)return;
+  var hd=document.createElement("button");hd.type="button";hd.className="fr-cmh";hd.setAttribute("aria-expanded",open);e.insertBefore(hd,t);hd.appendChild(t);if(m)hd.appendChild(m);
+  e.setAttribute("data-open",open);e.removeAttribute("aria-expanded");e.removeAttribute("tabindex");});}
+/* (a version is turned once Fabrica's other part has added its own keys to it, Compare and Browse the files, a moment before) */
+var T=0,TV=0;function soon(){clearTimeout(T);T=setTimeout(function(){build();shipParts();folds();regions();counts();},40);clearTimeout(TV);TV=setTimeout(versions,90);}
+var TW=null;function watchCards(){var tg=$("fbTargets");if(!tg||TW===tg)return;TW=tg;cards();try{new MutationObserver(function(){if(tg.querySelector(":scope > .f-tg"))cards();}).observe(tg,{childList:true});}catch(e){}}
+function watch(){var w=$("fbWorkBody");if(w&&!w.__frw){w.__frw=1;try{new MutationObserver(soon).observe(w,{childList:true});}catch(e){}}
+  var vb=$("fbViews");if(vb&&!vb.__frc){vb.__frc=1;try{new MutationObserver(counts).observe(vb,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden"]});}catch(e){}}}
+function hook(){var ok=build();shipParts();watch();watchCards();folds();return ok&&!!document.querySelector("#fbShip .fr-parts");}
+window.fbRooms={rooms:ROOMS,room:function(){return ROOM;},choose:function(k){choose(k);},part:function(k){if(k){PICKED=true;part(k);}return PART;}};
+/* Fabrica is drawn when its page is first opened, in either app, and may be drawn again: whenever a Fabrica without its rooms
+   is found, they are added (a check every quarter second at most, and only while something on the page changes) */
+var Q=0;function look(){Q=0;var vb=$("fbViews");if(vb&&(!vb.__fr||!document.querySelector("#fbShip .fr-parts")||TW!==$("fbTargets")))hook();}
+try{new MutationObserver(function(){if(!Q)Q=setTimeout(look,250);}).observe(document.body,{childList:true,subtree:true});}catch(e){}
+hook();
+})();
+</script>

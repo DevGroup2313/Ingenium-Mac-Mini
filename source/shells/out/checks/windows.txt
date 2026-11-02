@@ -1,0 +1,16 @@
+
+Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 155.0.4283.62
+{"out":"D:\\a\\_temp\\wintest\\test.zip","size":236628,"sha256":"3f5273e63e8d9dbdd364f0b16f714a95d83eee61b171677740065dbd3747abc5","exe":"Shell Test.exe","exeSize":796579,"exeSha256":"78adcf86c0b18874c02b860c67aa10076bfef2212c014a6d885ce44ef61f7339","id":"com.yannieforest.shelltest.win","icons":6,"ms":772}
+{"out":"D:\\a\\_temp\\wintest\\forge.zip","size":5354337,"sha256":"ea595629a2e4c1ac9ab19be8d5f4643b30f9a9a15d1bddd20eb3665943e6e252","exe":"The Forge.exe","exeSize":15140644,"exeSha256":"acd6f6ceb2de544d93e640e2bd82578c831c8971fddf4c0de634cdc128b84ed2","id":"com.yannieforest.theforge.wintest","icons":6,"ms":505}
+     Shell Test.exe: 0.8 MB, how to open: 1 file
+PASS a test page in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
+PASS a test page in the Windows app Fabrica made: a second start brings the open window forward and ends (one copy running)
+PASS a test page in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+PASS a test page in the Windows app Fabrica made: the clipboard, written and read back
+PASS a test page in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
+PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1793535284710","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+     The Forge.exe: 14.4 MB, how to open: 1 file
+PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
+PASS The Forge (13 MB page) in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"The Forge","text":6173,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/the_forge.html"}
+PASS The Forge (13 MB page) in the Windows app Fabrica made: the clipboard, written and read back
+PASS The Forge (13 MB page) in the Windows app Fabrica made: the page saved a file, and it holds what the page gave

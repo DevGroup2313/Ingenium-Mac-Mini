@@ -1,0 +1,154 @@
+<style id="forge-644-chats-css">
+/* PASS 644 · YOUR CHATS FROM OTHER ASSISTANTS, KEPT AND READ WITHOUT AI: see the note in the script below */
+#fcCard .fc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#fcCard .fc-find{flex:1 1 220px;min-width:160px;padding:6px 10px;border-radius:9px;border:1px solid var(--glass-border,rgba(127,127,127,.3));font:13px var(--cd-sans,system-ui);background:transparent;color:inherit}
+#fcCard .fc-list{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto}
+#fcCard details.fc-c{border:1px solid var(--glass-border,rgba(127,127,127,.25));border-radius:10px;padding:0}
+#fcCard details.fc-c > summary{cursor:pointer;list-style:none;padding:7px 10px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+#fcCard details.fc-c > summary::-webkit-details-marker{display:none}
+#fcCard details.fc-c > summary:focus-visible{outline:2px solid #1B6B93;outline-offset:-2px}
+#fcCard .fc-t{font-weight:600;font-size:13px}
+#fcCard .fc-m{font-size:11.5px;opacity:.75}
+#fcCard .fc-src{font:700 10px/1.6 var(--cd-sans,system-ui);letter-spacing:.05em;text-transform:uppercase;padding:0 7px;border-radius:999px;border:1px solid var(--glass-border,rgba(127,127,127,.3))}
+#fcCard .fc-body{padding:4px 12px 10px;display:flex;flex-direction:column;gap:8px}
+#fcCard .fc-brief{white-space:pre-wrap;font-size:12.5px;opacity:.9;border-left:3px solid var(--glass-border,rgba(127,127,127,.35));padding-left:8px}
+#fcCard .fc-msgs{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
+#fcCard .fc-msg{border-radius:9px;padding:6px 9px;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+#fcCard .fc-msg.me{background:var(--glass,rgba(127,127,127,.10))}
+#fcCard .fc-msg b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+#fcCard .fc-acts{display:flex;gap:6px;flex-wrap:wrap}
+#fcCard .fc-note{font-size:12px;opacity:.8}
+</style>
+<script id="forge-644-chats-js">
+/* PASS 644 · YOUR CHATS FROM OTHER ASSISTANTS, KEPT AND READ WITHOUT AI. The owner's words (23 October 2026): "I want the Forge
+   to be just as capable and functional as Ingenium with the same increased capabilities. I just want to do it all without
+   AI", and, of Ingenium: "I want to be able to import my exported data from other chats into the app and continue working
+   on my projects smoothly." The Forge reads the same exports Ingenium does (the shared thoughts/chat_import_core.html):
+   ChatGPT, Claude (with its projects), Gemini (Google Takeout), Grok, DeepSeek, Le Chat, Copilot and any transcript, the zip
+   as it came, read a piece at a time on the device. They are kept in the Forge's own store (forge-chats), listed with their
+   own dates, found by their words, read in place with the brief of where each began and ended, and the work in them comes
+   with you: the code in a conversation, or a project's documents, are kept as files in the Forge's Files (handed to its own
+   intake, so they are kept exactly as any file brought in), and a conversation is saved as Markdown. Nothing is sent
+   anywhere, and no model is asked anything. */
+(function(){ 'use strict';
+if(window.__forgeChats644) return; window.__forgeChats644=1;
+var C=window.ChatImportCore; if(!C) return;
+var DBN='forge-chats', dbp=null;
+function el(id){ return document.getElementById(id); }
+function mk(tag,cls,txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function fr(){ return document.documentElement.lang==='fr'; }
+function T(en,f){ return fr()?f:en; }
+function day(t){ return C.day(t); }
+
+/* ---------- the store: titles and briefs in one place, each conversation's words in another ---------- */
+function db(){ if(dbp) return dbp; dbp=new Promise(function(res,rej){ try{ var r=indexedDB.open(DBN,1);
+    r.onupgradeneeded=function(){ var d=r.result; if(!d.objectStoreNames.contains('meta')) d.createObjectStore('meta',{keyPath:'id'}); if(!d.objectStoreNames.contains('msgs')) d.createObjectStore('msgs'); };
+    r.onsuccess=function(){ res(r.result); }; r.onerror=function(){ rej(r.error); }; }catch(e){ rej(e); } }); dbp.catch(function(){ dbp=null; }); return dbp; }
+function tx(stores,mode,fn){ return db().then(function(d){ return new Promise(function(res,rej){ var t=d.transaction(stores,mode),out=fn(t); t.oncomplete=function(){ res(out&&out.result!==undefined?out.result:out); }; t.onerror=function(){ rej(t.error); }; t.onabort=function(){ rej(t.error); }; }); }); }
+function allMeta(){ return tx(['meta'],'readonly',function(t){ return t.objectStore('meta').getAll(); }); }
+function msgsOf(id){ return tx(['msgs'],'readonly',function(t){ return t.objectStore('msgs').get(id); }); }
+var META=[];
+
+/* ---------- bringing an export in ---------- */
+function keep(found){ var have={}; META.forEach(function(m){ have[m.src+'|'+m.oid]=1; });
+  var add=[], again=0, projects=found.projects||[];
+  found.conversations.forEach(function(c){ var src=c.source||found.source||'another assistant', key=src+'|'+c.id; if(c.id&&have[key]){ again++; return; }
+    add.push({meta:{id:'fc'+(c.updated||c.created||Date.now()).toString(36)+Math.random().toString(36).slice(2,7),oid:c.id||'',src:src,title:c.title,created:c.created||0,updated:c.updated||0,model:c.model||'',
+      count:c.messages.length,project:c.project||'',preview:String((c.messages.filter(function(m){ return m.role==='user'; })[0]||{}).text||'').replace(/\s+/g,' ').slice(0,240),brief:C.brief(c),kind:'chat'},
+      msgs:c.messages.map(function(m){ return {role:m.role,text:m.text||'',think:m.think||'',at:m.at||0,files:(m.files||[]).map(function(f){ return {name:f.name,text:f.text||''}; })}; })}); });
+  projects.forEach(function(p){ if(META.some(function(m){ return m.kind==='project'&&m.oid===p.key; })) return;
+    add.push({meta:{id:'fp'+Math.random().toString(36).slice(2,10),oid:p.key,src:found.source||'Claude',title:p.name,created:0,updated:Date.now(),count:(p.files||[]).length,kind:'project',preview:String(p.instructions||'').slice(0,240),brief:p.instructions||''},
+      msgs:{files:(p.files||[]).map(function(f){ return {name:f.name,text:f.text||''}; }),instructions:p.instructions||''}}); });
+  var i=0; function next(){ var batch=add.slice(i,i+40); i+=40; if(!batch.length) return Promise.resolve();
+    return tx(['meta','msgs'],'readwrite',function(t){ batch.forEach(function(x){ t.objectStore('meta').put(x.meta); t.objectStore('msgs').put(x.msgs,x.meta.id); }); }).then(next); }
+  return next().then(function(){ return {added:add.length,again:again}; }); }
+function bring(){ var inp=mk('input'); inp.type='file'; inp.multiple=true; inp.accept='.zip,.json,.jsonl,.md,.markdown,.txt,.csv,.html,.htm'; inp.style.display='none'; document.body.appendChild(inp);
+  inp.onchange=function(){ var fs=[].slice.call(inp.files||[]); inp.remove(); if(!fs.length) return; say(T('Reading your export…','Lecture de votre export…'));
+    C.read(fs,function(f){ say(T('Read so far: ','Lu jusqu’ici : ')+f.conversations.length+T(' conversations…',' conversations…')); })
+      .then(function(found){ if(!found.conversations.length&&!(found.projects||[]).length){ say(T('Nothing that looks like a conversation was found in it.','Rien qui ressemble à une conversation.')); return; }
+        return keep(found).then(function(r){ say(r.added+T(' kept from ',' gardés de ')+found.source+(r.again?T(' ('+r.again+' already here)',' ('+r.again+' déjà là)'):'')+'.'); return load(); }); })
+      .catch(function(e){ say(T('It could not be read: ','Lecture impossible : ')+(e&&e.message||e)); }); };
+  inp.click(); }
+function say(t){ var s=el('fcSay'); if(s) s.textContent=t; }
+
+/* ---------- the work in a conversation, kept as the Forge's own files ---------- */
+var EXT={html:'html',javascript:'js',js:'js',typescript:'ts',ts:'ts',python:'py',py:'py',css:'css',json:'json',bash:'sh',sh:'sh',shell:'sh',java:'java',kotlin:'kt',swift:'swift',c:'c',cpp:'cpp','c++':'cpp',go:'go',rust:'rs',ruby:'rb',php:'php',sql:'sql',yaml:'yml',yml:'yml',xml:'xml',markdown:'md',md:'md',jsx:'jsx',tsx:'tsx',csv:'csv'};
+function codeOf(msgs,title){ var out=[], used={}, stem=String(title||'chat').replace(/[^\w-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'chat';
+  var FN=/([\w.-]+\.(?:html?|css|js|mjs|ts|tsx|jsx|py|java|kt|swift|c|cc|cpp|h|go|rs|rb|php|json|md|sql|ya?ml|sh|xml|csv))\b/i;
+  msgs.forEach(function(m){ if(m.role!=='assistant') return; var re=/```([\w+#.-]*)([^\n]*)\n([\s\S]*?)```/g, x, last=0;
+    while((x=re.exec(m.text))){ var name=null, onFence=FN.exec(x[2]||'');
+      /* what a code run printed is not code to keep */
+      if(/\[the code's output\]\s*$/.test(m.text.slice(Math.max(0,x.index-40),x.index))){ last=x.index+x[0].length; continue; }
+      /* the name on the fence itself (```js app.js), else on the last line written before it ("Here is garden.html:") */
+      if(onFence) name=onFence[1];
+      else{ var before=m.text.slice(Math.max(last,x.index-300),x.index).replace(/\s+$/,''), line=before.slice(before.lastIndexOf('\n')+1), fl=FN.exec(line); if(fl) name=fl[1]; }
+      var lang=(x[1]||'').toLowerCase(); if(!name) name=stem+'-'+(out.length+1)+'.'+(EXT[lang]||'txt');
+      if(used[name]){ var n=2, dot=name.lastIndexOf('.'); while(used[name.slice(0,dot)+'-'+n+name.slice(dot)]) n++; name=name.slice(0,dot)+'-'+n+name.slice(dot); }
+      used[name]=1; out.push({name:name,text:x[3]}); last=x.index+x[0].length; } });
+  /* the newest version of each file is the one kept */
+  var by={}; out.forEach(function(f){ by[f.name.replace(/-\d+(\.\w+)$/,'$1')]=f; }); return Object.keys(by).map(function(k){ var f=by[k]; return {name:k,text:f.text}; }); }
+function toFiles(list){ var inp=el('filesIn'); if(!inp||!list.length||typeof DataTransfer!=='function') return false;
+  var dt=new DataTransfer(); list.forEach(function(f){ dt.items.add(new File([f.text],f.name,{type:/\.html?$/i.test(f.name)?'text/html':'text/plain'})); });
+  try{ inp.files=dt.files; inp.dispatchEvent(new Event('change',{bubbles:true})); return true; }catch(e){ return false; } }
+function md(m,msgs){ var L=['# '+m.title,'','*'+m.src+(m.created?' · '+day(m.created):'')+(m.model?' · '+m.model:'')+'*',''];
+  msgs.forEach(function(x){ L.push('## '+(x.role==='user'?T('You','Vous'):m.src),''); L.push(x.text||''); (x.files||[]).forEach(function(f){ L.push('','**'+f.name+'**'); if(f.text) L.push('','```','',f.text,'```'); }); L.push(''); });
+  return L.join('\n'); }
+function save(name,text){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/markdown'})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} },60000); }
+
+/* ---------- the list ---------- */
+function load(){ return allMeta().then(function(list){ META=(list||[]).sort(function(a,b){ return (b.updated||0)-(a.updated||0); }); paint(); },function(){ META=[]; paint(); }); }
+function paint(){ var L=el('fcList'); if(!L) return; L.innerHTML=''; var q=String((el('fcFind')||{}).value||'').trim().toLowerCase();
+  var rows=META.filter(function(m){ return !q||(m.title+' '+m.preview+' '+m.src+' '+(m.brief||'')).toLowerCase().indexOf(q)>=0||(FULL[m.id]); });
+  var st=el('fcState'); if(st) st.textContent=META.length?(META.filter(function(m){ return m.kind==='chat'; }).length+T(' conversations',' conversations')+(META.some(function(m){ return m.kind==='project'; })?', '+META.filter(function(m){ return m.kind==='project'; }).length+T(' projects',' projets'):'')):T('none yet','aucune encore');
+  if(!rows.length){ L.appendChild(mk('div','fc-note',META.length?T('Nothing matches.','Rien ne correspond.'):T('Your conversations from other assistants appear here.','Vos conversations d’autres assistants apparaissent ici.'))); return; }
+  rows.slice(0,400).forEach(function(m){ var d=mk('details','fc-c'), s=mk('summary');
+    s.appendChild(mk('span','fc-src',m.src)); s.appendChild(mk('span','fc-t',m.title)); s.appendChild(mk('span','fc-m',(m.kind==='project'?m.count+T(' documents',' documents'):m.count+T(' messages',' messages'))+(m.updated?' · '+day(m.updated):'')));
+    d.appendChild(s); var body=mk('div','fc-body'); d.appendChild(body);
+    d.addEventListener('toggle',function(){ if(d.open&&!body.childNodes.length) open(m,body); });
+    L.appendChild(d); });
+  if(rows.length>400) L.appendChild(mk('div','fc-note',T('The 400 newest are listed: say more to find the others.','Les 400 plus récentes : précisez pour trouver les autres.'))); }
+function open(m,body){ body.appendChild(mk('div','fc-note',T('Opening…','Ouverture…')));
+  msgsOf(m.id).then(function(x){ body.innerHTML=''; if(m.brief) body.appendChild(mk('div','fc-brief',m.brief));
+    var acts=mk('div','fc-acts');
+    if(m.kind==='project'){ var docs=(x&&x.files)||[];
+      var k1=mk('button','solid',T('Keep its documents as files','Garder ses documents comme fichiers')); k1.type='button'; k1.disabled=!docs.length;
+      k1.onclick=function(){ var ok=toFiles(docs.filter(function(f){ return f.text; })); say(ok?docs.length+T(' documents kept in Files.',' documents gardés dans Fichiers.'):T('They could not be handed to Files.','Impossible de les confier à Fichiers.')); };
+      acts.appendChild(k1); body.appendChild(acts);
+      docs.forEach(function(f){ body.appendChild(mk('div','fc-msg',f.name+' · '+(f.text||'').length.toLocaleString()+T(' characters',' caractères'))); }); return; }
+    var msgs=x||[], code=codeOf(msgs,m.title);
+    var k=mk('button','solid',T('Keep its code as files','Garder son code comme fichiers')+(code.length?' ('+code.length+')':'')); k.type='button'; k.disabled=!code.length;
+    k.onclick=function(){ var ok=toFiles(code); say(ok?code.length+T(' files kept in Files: ',' fichiers gardés dans Fichiers : ')+code.map(function(f){ return f.name; }).join(', '):T('They could not be handed to Files.','Impossible de les confier à Fichiers.')); };
+    var att=[]; msgs.forEach(function(y){ (y.files||[]).forEach(function(f){ if(f.text) att.push(f); }); });
+    var k2=mk('button','solid',T('Keep its attached files','Garder ses pièces jointes')+(att.length?' ('+att.length+')':'')); k2.type='button'; k2.disabled=!att.length; k2.onclick=function(){ toFiles(att); say(att.length+T(' attached files kept in Files.',' pièces jointes gardées dans Fichiers.')); };
+    var dl=mk('button','solid',T('Save it as Markdown','L’enregistrer en Markdown')); dl.type='button'; dl.onclick=function(){ save(String(m.title||'chat').replace(/[^\w.-]+/g,'-').slice(0,60)+'.md',md(m,msgs)); };
+    acts.appendChild(k); acts.appendChild(k2); acts.appendChild(dl); body.appendChild(acts);
+    var box=mk('div','fc-msgs'); box.tabIndex=0; box.setAttribute('role','region'); box.setAttribute('aria-label',T('The conversation','La conversation'));
+    msgs.slice(0,600).forEach(function(y){ var b=mk('div','fc-msg'+(y.role==='user'?' me':'')); b.appendChild(mk('b',null,y.role==='user'?T('You','Vous'):m.src)); b.appendChild(document.createTextNode(y.text||'')); box.appendChild(b); });
+    if(msgs.length>600) box.appendChild(mk('div','fc-note',T('The first 600 messages are shown; Save it as Markdown keeps them all.','Les 600 premiers messages ; l’enregistrement en Markdown les garde tous.')));
+    body.appendChild(box); },function(e){ body.innerHTML=''; body.appendChild(mk('div','fc-note',String(e&&e.message||e))); }); }
+/* a search inside every message, when the titles are not enough */
+var FULL={};
+function deep(){ var q=String((el('fcFind')||{}).value||'').trim().toLowerCase(); FULL={}; if(q.length<2){ paint(); return; } say(T('Looking through every message…','Recherche dans chaque message…'));
+  db().then(function(d){ return new Promise(function(res){ var t=d.transaction(['msgs'],'readonly'),r=t.objectStore('msgs').openCursor(),n=0;
+    r.onsuccess=function(){ var c=r.result; if(!c){ res(n); return; } var v=c.value, s=Array.isArray(v)?v.map(function(m){ return m.text; }).join('\n'):((v&&v.files)||[]).map(function(f){ return f.name+' '+f.text; }).join('\n');
+      if(String(s).toLowerCase().indexOf(q)>=0){ FULL[c.key]=1; n++; } c.continue(); }; r.onerror=function(){ res(n); }; }); })
+  .then(function(n){ say(n+T(' found with those words inside.',' trouvées avec ces mots dedans.')); paint(); }); }
+
+/* ---------- the card, in Files ---------- */
+function card(){ if(el('fcCard')) return; var room=el('room-files'); var page=room&&room.querySelector('.page[data-page="kept"]'); if(!page) return;
+  var c=mk('div','panel card'); c.id='fcCard'; c.setAttribute('role','region'); c.setAttribute('aria-labelledby','fcH');
+  var h=mk('h3',null,T('💬 Your chats from other assistants','💬 Vos conversations d’autres assistants')); h.id='fcH'; h.style.margin='0 0 4px'; c.appendChild(h);
+  c.appendChild(mk('p','muted',T('Bring in the export your assistant gave you, as it came (the zip, or a file inside it): ChatGPT, Claude with its projects, Gemini from Google Takeout, Grok, DeepSeek, Le Chat, Copilot, or any transcript. It is read and kept here; nothing is sent anywhere. Read each conversation where it ended, and keep the code in it, or a project’s documents, as files to carry on with.',
+    'Apportez l’export que votre assistant vous a donné, tel quel (le zip, ou un fichier dedans) : ChatGPT, Claude avec ses projets, Gemini depuis Google Takeout, Grok, DeepSeek, Le Chat, Copilot, ou toute transcription. Il est lu et gardé ici ; rien n’est envoyé. Relisez chaque conversation là où elle s’arrête, et gardez son code, ou les documents d’un projet, comme fichiers pour continuer.')));
+  var r=mk('div','fc-row'), b=mk('button','stone solid',T('📥 Bring your export','📥 Apporter votre export')); b.type='button'; b.onclick=bring; r.appendChild(b);
+  var st=mk('span','s state'); st.id='fcState'; r.appendChild(st); c.appendChild(r);
+  var r2=mk('div','fc-row'), q=mk('input','fc-find'); q.type='search'; q.id='fcFind'; q.placeholder=T('Find a conversation by its words','Trouver une conversation par ses mots'); q.setAttribute('aria-label',q.placeholder);
+  var qt=0; q.oninput=function(){ FULL={}; clearTimeout(qt); qt=setTimeout(paint,200); };
+  var dz=mk('button','solid',T('Look inside every message','Chercher dans chaque message')); dz.type='button'; dz.onclick=deep; r2.appendChild(q); r2.appendChild(dz); c.appendChild(r2);
+  var say0=mk('div','fc-note'); say0.id='fcSay'; say0.setAttribute('role','status'); say0.setAttribute('aria-live','polite'); c.appendChild(say0);
+  var L=mk('div','fc-list'); L.id='fcList'; c.appendChild(L);
+  var first=page.querySelector('.panel.card'); page.insertBefore(c,first?first.nextSibling:page.firstChild); load(); }
+(function wait(n){ if(el('room-files')&&el('room-files').querySelector('.page[data-page="kept"]')){ card(); return; } if(n<80) setTimeout(function(){ wait(n+1); },500); })(0);
+window.forgeChats={load:load,keep:keep,code:codeOf,meta:function(){ return META; },bring:bring};
+})();
+</script>

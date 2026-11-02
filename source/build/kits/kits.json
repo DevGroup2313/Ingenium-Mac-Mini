@@ -1,0 +1,121 @@
+{
+ "_about": "The kits Ingenium's builder makes (in the app, from the kit store tools/embed_kit_bundle.py puts into the page). Each kit takes files from one source (the two Mac kits share the Mac app's files; only their guides differ): 'fire' is this repository's build files, 'mac' and 'windows' are the desktop apps' files. It adds the app's page (ingenium.html), a visible copy of the build file and the guide in kits/guides. Paths ending in '/' are folders.",
+ "shared_mobile": [
+  ".gitignore",
+  "app.json",
+  "INSTALL_MOBILE.md",
+  "LICENCE.txt",
+  "README_FIRE.txt",
+  "THIRD_PARTY_NOTICES.txt",
+  "bake_engine.py",
+  "licences/",
+  "mobile_models.json",
+  "native/",
+  "tools/"
+ ],
+ "generated": [
+  "ingenium_android_project/app/src/main/assets/ingenium.html",
+  "ingenium_android_project/app/src/main/assets/THIRD_PARTY_NOTICES.txt",
+  "ingenium_ios_project/Ingenium/ingenium.html",
+  "ingenium_ios_project/Ingenium/THIRD_PARTY_NOTICES.txt"
+ ],
+ "kits": [
+  {
+   "id": "fire",
+   "label": "Fire tablet",
+   "zip": "{APP_FILE}-Fire-Tablet-Kit",
+   "source": "fire",
+   "inner": "files_for_github",
+   "paths": [
+    ".github/workflows/build-android.yml",
+    "ingenium_android_project/",
+    "signing/"
+   ],
+   "shared": true,
+   "workflow": ".github/workflows/build-android.yml",
+   "guide": "fire.md",
+   "vars": {}
+  },
+  {
+   "id": "iphone",
+   "label": "iPhone",
+   "zip": "{APP_FILE}-iPhone-Kit",
+   "source": "fire",
+   "inner": "files_for_github",
+   "paths": [
+    ".github/workflows/build-ios.yml",
+    "ingenium_ios_project/"
+   ],
+   "shared": true,
+   "workflow": ".github/workflows/build-ios.yml",
+   "guide": "ios.md",
+   "vars": {
+    "DEVICE": "iPhone",
+    "OTHER": "iPad",
+    "OS": "iOS"
+   }
+  },
+  {
+   "id": "ipad",
+   "label": "iPad",
+   "zip": "{APP_FILE}-iPad-Kit",
+   "source": "fire",
+   "inner": "files_for_github",
+   "paths": [
+    ".github/workflows/build-ios.yml",
+    "ingenium_ios_project/"
+   ],
+   "shared": true,
+   "workflow": ".github/workflows/build-ios.yml",
+   "guide": "ios.md",
+   "vars": {
+    "DEVICE": "iPad",
+    "OTHER": "iPhone",
+    "OS": "iPadOS"
+   }
+  },
+  {
+   "id": "mac",
+   "label": "Mac",
+   "zip": "{APP_FILE}-Mac-Kit",
+   "source": "mac",
+   "inner": "{APP_FILE}-for-Mac",
+   "paths": null,
+   "shared": false,
+   "workflow": ".github/workflows/build-mac.yml",
+   "guide": "mac.md",
+   "vars": {
+    "CHIP": "Intel",
+    "ZIP_CHIP": "Mac-Intel"
+   }
+  },
+  {
+   "id": "macarm",
+   "label": "Mac with Apple silicon (Mac mini)",
+   "zip": "{APP_FILE}-Mac-Apple-Silicon-Kit",
+   "source": "mac",
+   "inner": "{APP_FILE}-for-Mac",
+   "paths": null,
+   "shared": false,
+   "workflow": ".github/workflows/build-mac.yml",
+   "guide": "mac.md",
+   "vars": {
+    "CHIP": "Apple silicon",
+    "ZIP_CHIP": "Mac-Apple-Silicon"
+   }
+  },
+  {
+   "id": "windows",
+   "label": "Windows",
+   "zip": "{APP_FILE}-Windows-Kit",
+   "source": "windows",
+   "inner": "{APP_FILE}-for-Windows",
+   "paths": null,
+   "shared": false,
+   "workflow": ".github/workflows/build-windows.yml",
+   "guide": "windows.md",
+   "vars": {},
+   "crlf_txt": true
+  }
+ ]
+}

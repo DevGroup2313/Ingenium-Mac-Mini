@@ -1,0 +1,22 @@
+const { start, send } = require('./lib.js');
+(async () => {
+  const S = process.env.S;
+  const { browser, page, logs } = await start();
+  await page.evaluate(() => go('chat'));
+  await page.setInputFiles('#chatAnyFile', S + '/fixtures/statement.docx');
+  await page.waitForTimeout(2500);
+  const chips = await page.evaluate(() => [...document.querySelectorAll('#chatChips .cchip')].map(c => c.innerText));
+  console.log('CHIPS', JSON.stringify(chips));
+  const r = await send(page, process.env.Q || 'Change the date in the subtitle to 15 October 2026 and rename section 3 to "Research questions".');
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: S + '/shots/edit1.png' });
+  const sent = await page.evaluate(() => window.__sent);
+  const s0 = sent[sent.length - 1];
+  console.log('SECS', r.secs, 'PARAMS', JSON.stringify(s0.params));
+  s0.messages.forEach((m, i) => console.log('MSG', i, m.role, m.content.length, JSON.stringify(m.role==='system'?m.content.slice(0,100):m.content)));
+  console.log('=== REPLY ===\n' + r.text);
+  console.log('EDITS', JSON.stringify(r.edits));
+  const cards = await page.evaluate(() => [...document.querySelectorAll('#chatScroll .mk-card')].map(c => c.innerText.replace(/\s+/g, ' ').slice(0, 200)));
+  console.log('CARDS', JSON.stringify(cards));
+  await browser.close();
+})().catch(e => { console.error('FAIL', e); process.exit(1); });

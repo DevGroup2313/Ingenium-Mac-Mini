@@ -1,0 +1,147 @@
+<style id="forge-support-631-css">
+/* PASS 631 · THE FORGE'S OWN SUPPORTS. The 💭 side button and the thoughts panel, and the support module with its
+   Focus room on the rail, in the Forge's own blue and brass. Everything here lives in this file: the Forge leans on
+   no other app. */
+#room-focus .room-body{padding:2px 2px 30px}
+#room-focus .sc-page{max-width:1120px;margin:0}
+#room-focus .sc-page .glass.sc-card{border-radius:18px}
+#room-focus .sc-page .sc-seg .cd-seg{font:inherit;font-size:12px;cursor:pointer;border-radius:999px;padding:5px 12px;border:1px solid rgba(23,87,122,.22);background:rgba(255,255,255,.7);color:var(--text-secondary,#454549)}
+#room-focus .sc-page .sc-seg .cd-seg.on{background:var(--accent,#17577a);border-color:transparent;color:#fff}
+body[data-theme="night"] #room-focus .sc-page .sc-seg .cd-seg{background:rgba(255,255,255,.05);border-color:rgba(91,174,219,.28);color:#cfe4f2}
+body[data-theme="night"] #room-focus .sc-page .sc-seg .cd-seg.on{background:#5baedb;color:#0e1a22}
+#room-focus .sc-page select{font:inherit;font-size:13px;padding:7px 10px;border-radius:10px;border:1px solid var(--hairline,rgba(0,0,0,.08));background:rgba(255,255,255,.7);color:var(--text-primary,#1d1d1f)}
+body[data-theme="night"] #room-focus .sc-page select{background:rgba(255,255,255,.05);color:#e6eaee}
+/* the 💭 sits under the bell and above the moon, as in Carpe Diem; it wears the moon's dress (copied at run time) */
+#cd-thought-fab{position:fixed;right:16px;width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;z-index:94;display:flex;align-items:center;justify-content:center;background:transparent;padding:0}
+#cd-thought-fab > span.cd-thought-glyph{font-size:28px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+body.cd-dock-collapsed #cd-thought-fab{transform:translateX(150%) !important;opacity:0 !important;pointer-events:none !important}
+html.cd-nested body.cd-in-window #cd-thought-fab{display:none !important}
+body:has(#cd-door) #cd-thought-fab,body:has(#demo-entry) #cd-thought-fab{display:none !important}
+/* a low-energy day: the rail keeps its rooms; the five apps wait below until tomorrow, or until it is switched off */
+body[data-sc-low] .nav-inner[data-forge="1"] .rail-stone,body[data-sc-low] .nav-inner[data-forge="1"] .forge-apps-key,body[data-sc-low] .nav-inner[data-forge="1"] .forge-apps-label{display:none !important}
+/* calm mode: nothing moves, and the rail's sparkle rests */
+html[data-sc-calm] body.forge-app .rail-stone::before,html[data-sc-calm] body.forge-app .rail-stone::after,html[data-sc-calm] body.forge-app .tabula-btn::after,html[data-sc-calm] body.forge-app .abacus-btn::after,html[data-sc-calm] body.forge-app .imago-btn::after,html[data-sc-calm] body.forge-app .scriba-app-btn::after,html[data-sc-calm] body.forge-app .fontes-btn::after{animation:none !important}
+html[data-sc-calm] #cd-thought-fab > *,html[data-sc-calm] #reminders-fab > *,html[data-sc-calm] #cd-theme-fab > *,html[data-sc-calm] #horo-fab > *,html[data-sc-calm] #sticky-fab > *{animation:none !important}
+</style>
+<script id="forge-support-631">
+(function(){
+"use strict";
+if(window.__forgeSupport631)return;window.__forgeSupport631=1;
+function $(id){return document.getElementById(id);}
+function ready(fn,n){n=n||0;if(typeof state!=="undefined"&&state&&window.ThoughtCloud&&window.SupportCore&&document.body)fn();else if(n<300)setTimeout(function(){ready(fn,n+1);},200);}
+ready(function(){
+  function S(){if(!state.support||typeof state.support!=="object")state.support={};return state.support;}
+  function save(){try{saveState();}catch(e){}}
+  function box(){var s=S();if(!Array.isArray(s.box))s.box=[];return s.box;}
+  function night(){return document.body.getAttribute("data-theme")==="night";}
+  function tr(t){try{return typeof trd==="function"?trd(t):t;}catch(e){return t;}}
+  function hm(s){var m=/(\d{1,2}):(\d{2})/.exec(String(s||""));return m?(+m[1])*60+(+m[2]):null;}
+  function go(room){try{showSection("forge");}catch(e){}try{if(window.FORGE)FORGE.openRoom(room);}catch(e){}try{if(window.__forgePaintActive)window.__forgePaintActive();}catch(e){}}
+  var SC=null,TC=null;
+
+  /* ---- the 💭 in the side column ---- */
+  function fab(){var b=$("cd-thought-fab");
+    if(SC&&!SC.on("inbox")){if(b)b.remove();return null;}
+    if(!b){b=document.createElement("button");b.id="cd-thought-fab";b.type="button";b.innerHTML='<span class="cd-thought-glyph" aria-hidden="true">💭</span>';
+      var bell=$("reminders-fab");if(bell&&bell.parentNode===document.body)document.body.insertBefore(b,bell.nextSibling);else document.body.appendChild(b);
+      if(TC)TC.wireFab();try{if(window.__cdFabPack)window.__cdFabPack();}catch(e){}}
+    return b;}
+  /* the moon's dress, rule by rule, so the 💭 is drawn, hidden and folded exactly as its neighbours are */
+  function splitSel(t){var out=[],d=0,cur="";for(var i=0;i<t.length;i++){var c=t[i];if(c==="("||c==="[")d++;else if(c===")"||c==="]")d--;if(c===","&&d===0){out.push(cur);cur="";}else cur+=c;}if(cur.trim())out.push(cur);return out.map(function(x){return x.trim();});}
+  function mirror(){var n=0;[].forEach.call(document.styleSheets,function(sh){var rules;try{rules=sh.cssRules;}catch(e){return;}if(rules)walk(sh,rules);});
+    function walk(parent,rules){var adds=[];
+      for(var i=0;i<rules.length;i++){var r=rules[i];
+        if(!r.selectorText){if(r.cssRules)walk(r,r.cssRules);continue;}
+        if(r.selectorText.indexOf("#cd-theme-fab")<0)continue;
+        var parts=splitSel(r.selectorText).filter(function(p){return p.indexOf("#cd-theme-fab")>=0&&p.indexOf("#cd-thought-fab")<0;});if(!parts.length)continue;
+        /* the moon's rules for its own glyph reach only the 💭's glyph, never the number beside it */
+        var sel=parts.map(function(p){var q=p.split("#cd-theme-fab").join("#cd-thought-fab"),k=q.indexOf("#cd-thought-fab")+15,head=q.slice(0,k),tail=q.slice(k);
+          tail=tail.replace(/>\s*\*/g,"> .cd-thought-glyph").replace(/\bspan\b(?![.\[:#\w-])/g,"span.cd-thought-glyph");return head+tail;}).join(", ");
+        var nx=rules[i+1];if(nx&&nx.selectorText&&nx.selectorText.replace(/\s+/g,"")===sel.replace(/\s+/g,""))continue;
+        if(!r.style||!r.style.cssText)continue;adds.push({at:i+1,text:sel+"{"+r.style.cssText+"}"});}
+      for(var k=adds.length-1;k>=0;k--){try{parent.insertRule(adds[k].text,adds[k].at);n++;}catch(e){}}}
+    return n;}
+
+  /* ---- where a thought can go, in the Forge ---- */
+  var PLACES=[
+    {key:"note",label:"🗒️ To a note",word:"a sticky note",run:function(it){try{var n=newStickyNote();n.text=it.t;saveState();renderStickyPins();}catch(e){}SC.toast("Pinned as a sticky note.");}},
+    {key:"tabula",label:"📝 To Tabula",word:"Tabula",run:function(it){try{openTextInTabula("From the Inbox",it.t);}catch(e){}}},
+    {key:"task",label:"🪜 Make it a task",word:"a task with small steps",run:function(it){SC.newTask(it.t,SC.steps(it.t));go("focus");SC.toast("A task with small steps, on the Focus page.");}},
+    {key:"reminder",label:"⏰ To the bell",word:"a reminder",run:function(it){try{addUserReminder(todayString(),it.t.slice(0,140),"");if(typeof renderReminders==="function")renderReminders();}catch(e){}SC.toast("Added to today’s reminders, under the bell.");}}];
+
+  TC=ThoughtCloud.create({app:"forge",prefix:"forge_tc_",lang:function(){return "en";},fab:function(){return $("cd-thought-fab");},list:box,save:save,
+    toast:function(m){if(SC)SC.toast(m);},night:night,calm:function(){return !!(SC&&SC.on("calm"));},
+    quiet:function(){try{if(pomo.running&&pomo.phase==="focus")return true;}catch(e){}return !!($("sc-quiet")||$("sc-focus-room")||document.querySelector("#cd-door"));},
+    places:PLACES,onChange:function(){if(SC)SC.refresh();},placeholder:"A thought, a task, a bug, a worry: let it go",hotkey:true});
+
+  /* ---- today's plan, read from the Agenda room ---- */
+  function plan(){var ds=todayString(),wd=null;try{if(typeof isWorkday==="function"&&!isWorkday(parseDate(ds)))return null;}catch(e){}try{wd=weekdayFor(ds);}catch(e){return null;}
+    var blocks=[];["pre","morning","afternoon","evening"].forEach(function(k){var b=wd&&wd[k];if(!b)return;var m=/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/.exec(String(b.time||""));
+      blocks.push({id:b.id,title:tr(b.title),from:m?(+m[1])*60+(+m[2]):null,to:m?(+m[3])*60+(+m[4]):null,
+        tasks:(b.tasks||[]).map(function(t){return {id:t.id,title:tr(t.title),at:hm(t.time),done:(function(){try{return isDone(ds,b.id,t.id);}catch(e){return false;}})()};})});});
+    return {ds:ds,blocks:blocks};}
+  function days(a,b){try{return Math.round((parseDate(a)-parseDate(b))/864e5);}catch(e){return null;}}
+  function todayRows(){var rows=[],p=plan();
+    if(p){var all=0,done=0,next=null;p.blocks.forEach(function(b){b.tasks.forEach(function(t){all++;if(t.done)done++;else if(!next)next=t;});});
+      rows.push({ico:"📅",essential:true,text:all?(done+" of "+all+" items in today’s plan are done"+(next?". Next: "+next.title:". The day’s work is in.")):"Today’s plan is empty.",acts:[["Open the Agenda",function(){go("agenda");}]]});}
+    else rows.push({ico:"📅",text:"No plan for today: a day away from the anvil.",acts:[["Open the Agenda",function(){go("agenda");}]]});
+    try{var ED=window.FORGE&&FORGE.ED,nm=ED&&ED.shell?(ED.shellName||"an app"):"";
+      rows.push({ico:"✍️",essential:true,text:nm?"The Editor holds “"+nm+"”. Carry on where you stopped, one small change at a time.":"The Editor is empty: open a file, or start something new.",acts:[["Open the Editor",function(){go("editor");}]]});}catch(e){}
+    try{var ms=((state.candidature&&state.candidature.milestones)||[]).filter(function(m){return !m.done&&m.date;}).sort(function(a,b){return a.date<b.date?-1:1;});
+      if(ms.length){var m=ms[0],d=days(m.date,todayString());rows.push({ico:"🎯",essential:d!=null&&d<=1,text:"Next milestone: "+tr(m.label)+(d==null?"":" · "+(d<0?Math.abs(d)+" day"+(d===-1?"":"s")+" overdue":(d===0?"today":"in "+d+" day"+(d===1?"":"s")))),acts:[["Open Projects",function(){go("projects");}]]});}}catch(e){}
+    try{var rem=(state.userReminders||[]).filter(function(r){return !r.done&&r.date&&r.date<=todayString();});
+      if(rem.length)rows.push({ico:"🔔",essential:true,text:rem.length===1?"One reminder is due: "+rem[0].title:rem.length+" reminders are due. The first: "+rem[0].title,acts:[["Open the bell",function(){try{openReminders();}catch(e){var b=$("reminders-fab");if(b)b.click();}}]]});}catch(e){}
+    try{var q=state.ascent&&state.ascent.quests;if(q&&q.date===todayString()&&q.picks&&q.picks.length){var dn=Object.keys(q.done||{}).filter(function(k){return q.done[k];}).length;
+      rows.push({ico:"🏔",text:dn+" of "+q.picks.length+" of today’s Ascensus labours are done.",acts:[["Open Ascensus",function(){go("ascensus");}]]});}}catch(e){}
+    var n=box().length;if(n)rows.push({ico:"💭",text:n===1?"One thought waits in the Inbox to be sorted.":n+" thoughts wait in the Inbox to be sorted.",acts:[["Sort them",function(){TC.inbox();}]]});
+    return rows;}
+
+  /* ---- calm, as Carpe Diem keeps it: the app's own minimal motion, and no sounds ---- */
+  function applyCalm(c){try{document.body.toggleAttribute("data-cd-calm",c);var want=c?"minimal":((state&&state.motion)||"full");
+      if(document.body.getAttribute("data-motion")!==want&&(c||document.body.__scCalmHeld))document.body.setAttribute("data-motion",want);document.body.__scCalmHeld=c;}catch(e){}
+    ["cdPlay","cdPlayVoice"].forEach(function(n){var f=window[n];if(typeof f!=="function"||f.__scCalm)return;var w=function(){if(SC&&SC.on("calm"))return;return f.apply(this,arguments);};w.__scCalm=1;window[n]=w;});}
+
+  SC=SupportCore.create({app:"forge",lang:function(){return "en";},appName:"the Forge",store:S,save:save,night:night,today:function(){return todayString();},
+    tc:function(){return TC;},dayWord:{en:"building day",fr:"journée de travail"},accent:function(){return night()?"#5baedb":"#17577a";},
+    cls:{card:"glass",btn:"btn btn-soft btn-sm",primary:"btn btn-primary btn-sm",ghost:"btn btn-soft btn-sm",title:"section-title",lede:"section-sub",seg:"",segBtn:"cd-seg",segOn:"on",select:""},
+    noHead:true,plan:plan,oldSteps:function(k){var a=S().steps||{};return a[k]||null;},
+    timer:{state:function(){if(typeof pomo==="undefined")return null;return {running:!!pomo.running,phase:pomo.phase,remaining:pomo.remaining,total:pomoPhaseLen(pomo.phase),focusLen:pomo.focusLen};},
+      start:function(n){pomo.focusLen=n;try{pomoSave();}catch(e){}pomoReset();pomoStart();},toggle:function(){if(!pomo.running&&pomo.phase!=="focus"&&pomo.remaining>=pomoPhaseLen(pomo.phase)){pomo.phase="focus";pomo.remaining=pomoPhaseLen("focus");}pomoToggleRun();},
+      stop:function(){pomoReset();},open:function(){openPomodoro();}},
+    timerName:"The Clepsydra",finishLine:"Finish the line you are writing.",todayTitle:"Today in the Forge",todayRows:todayRows,
+    taskExample:"For example: make the menu work on a phone",
+    breakNote:"Break it down offers 3 to 5 small steps from the words of the task, shaped for building: the file, the smallest piece, a run, a save. Each is yours to rewrite.",
+    routines:function(){return [
+      {id:"start",when:"start",icon:"🌅",en:"Start of the building day",fr:"Début de la journée de travail",steps:[{en:"Water, tea, and anything you take in the morning"},{en:"Look at today’s plan in the Agenda: just look"},{en:"Pick one thing to build or fix"},{en:"Open the file it lives in"},{en:"Start one Clepsydra sprint"}]},
+      {id:"end",when:"end",icon:"🌙",en:"End of the building day",fr:"Fin de la journée de travail",steps:[{en:"Save, and write where the work stopped in one line"},{en:"Empty your head into the Inbox"},{en:"Keep a copy of what changed: a backup, or a commit"},{en:"Choose tomorrow’s first small step"},{en:"Close the rooms, and the lid"}]}];},
+    applyCalm:applyCalm,applyLow:function(){},
+    lowActs:function(row,k){row.appendChild(k.btn("🌿 Calm mode for today","ghost",function(){SC.set("calm",true);}));}});
+
+  /* ---- the Focus room on the rail ---- */
+  window.__forgeFocusMount=function(){var host=$("focusPages");if(host)SC.render(host);};
+  try{if($("room-focus")&&$("room-focus").getAttribute("data-on")==="1")window.__forgeFocusMount();}catch(e){}
+
+  /* ---- the Support group in Display, as in Carpe Diem ---- */
+  function supportGroup(menu){if(!menu||menu.querySelector("#forge-dmg-support"))return;
+    var g=document.createElement("div");g.id="forge-dmg-support";g.className="cd-dm-group";g.textContent="Support";menu.appendChild(g);
+    SC.rows().forEach(function(r){var row=document.createElement("div");row.className="cd-dm-sup";row.style.padding="7px 8px";
+      var lab=document.createElement("div");lab.className="cd-dm-label";lab.textContent=r[1]+" "+r[2];row.appendChild(lab);
+      var segs=document.createElement("div");segs.style.cssText="display:flex;gap:6px;flex-wrap:wrap";
+      [[true,"On"],[false,"Off"]].forEach(function(o){var b=document.createElement("button");b.type="button";b.className="cd-seg"+(SC.on(r[0])===o[0]?" on":"");b.textContent=o[1];
+        b.addEventListener("click",function(){SC.set(r[0],o[0]);[].forEach.call(segs.children,function(x,i){x.className="cd-seg"+((i===0)===o[0]?" on":"");});fab();});segs.appendChild(b);});
+      row.appendChild(segs);var tip=document.createElement("div");tip.className="cd-dm-tip";tip.textContent="💡 "+r[3];row.appendChild(tip);menu.appendChild(row);});}
+  (function hookDisplay(n){if(typeof window.openDisplayMenu!=="function"){if((n||0)<40)setTimeout(function(){hookDisplay((n||0)+1);},500);return;}if(window.openDisplayMenu.__sc)return;
+    var orig=window.openDisplayMenu;var w=function(){var out=orig.apply(this,arguments);var run=function(){supportGroup(document.querySelector(".cd-display-menu"));};run();setTimeout(run,90);setTimeout(run,320);return out;};w.__sc=1;window.openDisplayMenu=w;})();
+
+  /* ---- the light and dark mark: the moon by day, the sun by night ---- */
+  (function themeGlyph(){function paint(){try{var f=$("cd-theme-fab");if(!f)return;var want=night()?"☀️":"🌙";if(f.textContent.indexOf(want)<0&&typeof cdThemeIcon==="function")cdThemeIcon();}catch(e){}}
+    try{new MutationObserver(paint).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}paint();setTimeout(paint,1500);})();
+
+  /* ---- keeping it in place ---- */
+  function keep(){fab();try{TC.badge();}catch(e){}}
+  keep();mirror();[600,2000,6000,15000].forEach(function(ms){setTimeout(function(){mirror();keep();},ms);});
+  setInterval(keep,2000);
+  window.forgeSupport={sc:SC,tc:TC,go:go,mirror:mirror};
+});
+})();
+</script>

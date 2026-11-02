@@ -1,0 +1,286 @@
+{
+  "registry": "Okoye lab strain collection",
+  "updated": "2026-06-30",
+  "strains": [
+    {
+      "strain": "FX-201",
+      "genus": "Aspergillus",
+      "origin": "Isolated from root washings at Hayley Wood, accession 2025-0101",
+      "isolated": "2025-12-01",
+      "frozen": false
+    },
+    {
+      "strain": "FX-202",
+      "genus": "Mucor",
+      "origin": "Isolated from forest soil at Hayley Wood, accession 2025-0102",
+      "isolated": "2025-03-25",
+      "frozen": false
+    },
+    {
+      "strain": "FX-203",
+      "genus": "Penicillium",
+      "origin": "Isolated from compost at Thetford Forest, accession 2025-0103",
+      "isolated": "2025-03-04",
+      "frozen": false
+    },
+    {
+      "strain": "FX-204",
+      "genus": "Mucor",
+      "origin": "Isolated from compost at Wicken Fen, accession 2025-0104",
+      "isolated": "2025-07-20",
+      "frozen": false
+    },
+    {
+      "strain": "FX-205",
+      "genus": "Mucor",
+      "origin": "Isolated from root washings at Thetford Forest, accession 2025-0105",
+      "isolated": "2025-05-22",
+      "frozen": false
+    },
+    {
+      "strain": "FX-206",
+      "genus": "Trichoderma",
+      "origin": "Isolated from leaf litter at Hayley Wood, accession 2025-0106",
+      "isolated": "2025-01-08",
+      "frozen": true
+    },
+    {
+      "strain": "FX-207",
+      "genus": "Fusarium",
+      "origin": "Isolated from peat at Monks Wood, accession 2025-0107",
+      "isolated": "2025-06-12",
+      "frozen": false
+    },
+    {
+      "strain": "FX-208",
+      "genus": "Trichoderma",
+      "origin": "Isolated from beech litter at Hayley Wood, accession 2025-0173",
+      "isolated": "2025-09-18",
+      "frozen": true
+    },
+    {
+      "strain": "FX-209",
+      "genus": "Aspergillus",
+      "origin": "Isolated from peat at Monks Wood, accession 2025-0109",
+      "isolated": "2025-01-21",
+      "frozen": true
+    },
+    {
+      "strain": "FX-210",
+      "genus": "Penicillium",
+      "origin": "Isolated from forest soil at Hayley Wood, accession 2025-0110",
+      "isolated": "2025-05-10",
+      "frozen": false
+    },
+    {
+      "strain": "FX-211",
+      "genus": "Mucor",
+      "origin": "Isolated from peat at Monks Wood, accession 2025-0111",
+      "isolated": "2025-11-10",
+      "frozen": false
+    },
+    {
+      "strain": "FX-212",
+      "genus": "Mucor",
+      "origin": "Isolated from peat at Wicken Fen, accession 2025-0112",
+      "isolated": "2025-01-07",
+      "frozen": false
+    },
+    {
+      "strain": "FX-213",
+      "genus": "Mucor",
+      "origin": "Isolated from compost at Hayley Wood, accession 2025-0113",
+      "isolated": "2025-08-22",
+      "frozen": true
+    },
+    {
+      "strain": "FX-214",
+      "genus": "Aspergillus",
+      "origin": "Isolated from peat at Hayley Wood, accession 2025-0114",
+      "isolated": "2025-12-18",
+      "frozen": false
+    },
+    {
+      "strain": "FX-215",
+      "genus": "Aspergillus",
+      "origin": "Isolated from root washings at Wicken Fen, accession 2025-0115",
+      "isolated": "2025-05-18",
+      "frozen": false
+    },
+    {
+      "strain": "FX-216",
+      "genus": "Trichoderma",
+      "origin": "Isolated from peat at Wicken Fen, accession 2025-0116",
+      "isolated": "2025-01-20",
+      "frozen": false
+    },
+    {
+      "strain": "FX-217",
+      "genus": "Trichoderma",
+      "origin": "Isolated from forest soil at Monks Wood, accession 2025-0117",
+      "isolated": "2025-07-19",
+      "frozen": true
+    },
+    {
+      "strain": "FX-218",
+      "genus": "Aspergillus",
+      "origin": "Isolated from compost at Wicken Fen, accession 2025-0118",
+      "isolated": "2025-07-23",
+      "frozen": true
+    },
+    {
+      "strain": "FX-219",
+      "genus": "Penicillium",
+      "origin": "Isolated from leaf litter at Wicken Fen, accession 2025-0119",
+      "isolated": "2025-03-07",
+      "frozen": false
+    },
+    {
+      "strain": "FX-220",
+      "genus": "Trichoderma",
+      "origin": "Isolated from compost at Hayley Wood, accession 2025-0120",
+      "isolated": "2025-10-02",
+      "frozen": true
+    },
+    {
+      "strain": "FX-221",
+      "genus": "Fusarium",
+      "origin": "Isolated from leaf litter at Hayley Wood, accession 2025-0121",
+      "isolated": "2025-07-04",
+      "frozen": false
+    },
+    {
+      "strain": "FX-222",
+      "genus": "Fusarium",
+      "origin": "Isolated from peat at Monks Wood, accession 2025-0122",
+      "isolated": "2025-03-14",
+      "frozen": true
+    },
+    {
+      "strain": "FX-223",
+      "genus": "Mucor",
+      "origin": "Isolated from compost at Hayley Wood, accession 2025-0123",
+      "isolated": "2025-11-10",
+      "frozen": true
+    },
+    {
+      "strain": "FX-224",
+      "genus": "Penicillium",
+      "origin": "Isolated from forest soil at Monks Wood, accession 2025-0124",
+      "isolated": "2025-09-17",
+      "frozen": true
+    },
+    {
+      "strain": "FX-225",
+      "genus": "Fusarium",
+      "origin": "Isolated from peat at Thetford Forest, accession 2025-0125",
+      "isolated": "2025-03-16",
+      "frozen": false
+    },
+    {
+      "strain": "FX-226",
+      "genus": "Aspergillus",
+      "origin": "Isolated from root washings at Monks Wood, accession 2025-0126",
+      "isolated": "2025-03-27",
+      "frozen": true
+    },
+    {
+      "strain": "FX-227",
+      "genus": "Trichoderma",
+      "origin": "Isolated from leaf litter at Thetford Forest, accession 2025-0127",
+      "isolated": "2025-10-12",
+      "frozen": true
+    },
+    {
+      "strain": "FX-228",
+      "genus": "Fusarium",
+      "origin": "Isolated from leaf litter at Hayley Wood, accession 2025-0128",
+      "isolated": "2025-01-09",
+      "frozen": true
+    },
+    {
+      "strain": "FX-229",
+      "genus": "Trichoderma",
+      "origin": "Isolated from compost at Hayley Wood, accession 2025-0129",
+      "isolated": "2025-12-15",
+      "frozen": false
+    },
+    {
+      "strain": "FX-230",
+      "genus": "Trichoderma",
+      "origin": "Isolated from root washings at Wicken Fen, accession 2025-0130",
+      "isolated": "2025-06-22",
+      "frozen": true
+    },
+    {
+      "strain": "FX-231",
+      "genus": "Trichoderma",
+      "origin": "Isolated from leaf litter at Hayley Wood, accession 2025-0131",
+      "isolated": "2025-05-08",
+      "frozen": true
+    },
+    {
+      "strain": "FX-232",
+      "genus": "Fusarium",
+      "origin": "Isolated from forest soil at Hayley Wood, accession 2025-0132",
+      "isolated": "2025-01-09",
+      "frozen": true
+    },
+    {
+      "strain": "FX-233",
+      "genus": "Mucor",
+      "origin": "Isolated from root washings at Thetford Forest, accession 2025-0133",
+      "isolated": "2025-03-01",
+      "frozen": true
+    },
+    {
+      "strain": "FX-234",
+      "genus": "Trichoderma",
+      "origin": "Isolated from compost at Wicken Fen, accession 2025-0134",
+      "isolated": "2025-04-11",
+      "frozen": true
+    },
+    {
+      "strain": "FX-235",
+      "genus": "Mucor",
+      "origin": "Isolated from forest soil at Wicken Fen, accession 2025-0135",
+      "isolated": "2025-10-10",
+      "frozen": false
+    },
+    {
+      "strain": "FX-236",
+      "genus": "Trichoderma",
+      "origin": "Isolated from forest soil at Wicken Fen, accession 2025-0136",
+      "isolated": "2025-12-19",
+      "frozen": true
+    },
+    {
+      "strain": "FX-237",
+      "genus": "Mucor",
+      "origin": "Isolated from forest soil at Thetford Forest, accession 2025-0137",
+      "isolated": "2025-02-22",
+      "frozen": true
+    },
+    {
+      "strain": "FX-238",
+      "genus": "Aspergillus",
+      "origin": "Isolated from root washings at Thetford Forest, accession 2025-0138",
+      "isolated": "2025-11-18",
+      "frozen": true
+    },
+    {
+      "strain": "FX-239",
+      "genus": "Trichoderma",
+      "origin": "Isolated from compost at Wicken Fen, accession 2025-0139",
+      "isolated": "2025-08-24",
+      "frozen": true
+    },
+    {
+      "strain": "FX-240",
+      "genus": "Aspergillus",
+      "origin": "Isolated from root washings at Hayley Wood, accession 2025-0140",
+      "isolated": "2025-01-06",
+      "frozen": true
+    }
+  ]
+}

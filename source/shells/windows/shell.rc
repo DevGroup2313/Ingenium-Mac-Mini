@@ -1,0 +1,4 @@
+// INGENIUM | Copyright (c) 2026 Yannie D. Forest. All rights reserved. NO LICENCE IS GRANTED.
+// The Windows shell's one resource: its icon (made by make_ico.py, with room kept for each app's own). No version
+// resource, so Task Manager and Windows name each app made from it by its own file name.
+1 ICON "shell.ico"

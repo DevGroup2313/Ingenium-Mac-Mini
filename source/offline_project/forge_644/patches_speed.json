@@ -1,0 +1,17 @@
+[
+ {
+  "why": "the stones' painter (a sweep of the whole page) ran on every frame in which anything changed: during the start it ran almost every frame, and after it on every tick of a clock or key pressed. It now runs at once for the first change, then at most every 300 ms (900 ms while the Forge starts): measured, the start of the page lost about a second of work; a change that adds no element (a clock's new words) asks nothing of it",
+  "old": "    var busy = false, mo = new MutationObserver(function () {",
+  "new": "    /* PASS 644 · the painter, at once for the first change, then at most every 300 ms (900 ms while the Forge starts) */\n    var paintAt = 0, paintPend = null, paintSoon = function () {\n      var fb = document.getElementById('forge-boot'), gap = (fb && !fb.classList.contains('fb-gone')) ? 900 : 300, since = Date.now() - paintAt;\n      if (since >= gap && !paintPend) { paintAt = Date.now(); paint(); return; }\n      if (!paintPend) paintPend = setTimeout(function () { paintPend = null; paintAt = Date.now(); try { paint(); } catch (e) {} }, Math.max(16, gap - since));\n    };\n    /* a change that adds no element (a clock's new words, a count) asks nothing of the painter */\n    var busy = false, mo = new MutationObserver(function (recs) {\n      if (recs && recs.length && !recs.some(function (r) { for (var i = 0; i < r.addedNodes.length; i++) if (r.addedNodes[i].nodeType === 1) return true; return false; })) return;"
+ },
+ {
+  "why": "the frame observer asks the painter through its pace (above)",
+  "old": "          try { paint(); } finally { busy = false; }",
+  "new": "          try { paintSoon(); } finally { busy = false; }"
+ },
+ {
+  "why": "a click paints at once (no blink), and its second paint goes through the painter's pace; the frame observer sees the room's new row anyway",
+  "old": "      requestAnimationFrame(function () { try { paint(); } catch (e) {} });",
+  "new": "      requestAnimationFrame(function () { try { paintSoon(); } catch (e) {} });"
+ }
+]

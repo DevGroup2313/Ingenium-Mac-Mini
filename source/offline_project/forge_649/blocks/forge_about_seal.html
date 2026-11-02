@@ -1,0 +1,56 @@
+<style id="forge-649-about-seal-css">
+#forgeAboutBack .fsl-solo.forge-seal-key{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+</style>
+<script id="forge-649-about-seal">
+/* PASS 649 · THE SEAL IN ABOUT IS A KEY, AS CARPE DIEM'S IS. The owner's words (27 October 2026): "I want the seal inside of
+   the Forge's About panel to be clickable, the same way the one inside of Carpe Diem's About panel is." Carpe Diem 1059 makes
+   the large seal in its panels a button: it lifts under the pointer, sinks while held and knocks when let go. The Forge's
+   live seal in About already lifts and tilts; now it is a key as well: Tab reaches it, it sinks while pressed and knocks
+   (the Forge's own knock), Enter and Space press it too, and it keeps still when movement is reduced. */
+(function () {
+  'use strict';
+  if (window.__forgeAboutSeal) return;
+  window.__forgeAboutSeal = 1;
+  var SEL = '#forgeAboutBack .fsl-solo';
+  function fr() { try { return document.documentElement.lang === 'fr' || (typeof state !== 'undefined' && !!state && state.lang === 'fr'); } catch (e) { return false; } }
+  function still() {
+    try {
+      return document.body.getAttribute('data-motion') === 'minimal' || document.documentElement.hasAttribute('data-cd-calm') ||
+        !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { return false; }
+  }
+  function seal(e) { var t = e && e.target; return (t && t.closest) ? t.closest(SEL) : null; }
+  function arm() {
+    try {
+      var l = fr() ? 'Le sceau de la Forge' : 'The Forge seal';
+      document.querySelectorAll(SEL).forEach(function (s) {
+        if (!s.classList.contains('forge-seal-key')) { s.classList.add('forge-seal-key'); s.setAttribute('role', 'button'); s.setAttribute('tabindex', '0'); }
+        if (s.getAttribute('aria-label') !== l) { s.setAttribute('aria-label', l); s.title = l; }
+      });
+    } catch (e) {}
+  }
+  function up() { try { document.querySelectorAll(SEL + '.down').forEach(function (s) { s.classList.remove('down'); }); } catch (e) {} }
+  function knock(s) {
+    s.classList.remove('down');
+    if (still()) return;
+    s.classList.remove('knock'); void s.offsetWidth; s.classList.add('knock');
+    clearTimeout(s.__forgeKnock); s.__forgeKnock = setTimeout(function () { s.classList.remove('knock'); }, 560);
+  }
+  document.addEventListener('pointerdown', function (e) { var s = seal(e); if (!s) return; s.classList.remove('knock'); if (!still()) s.classList.add('down'); }, true);
+  document.addEventListener('pointerup', up, true);
+  document.addEventListener('pointercancel', up, true);
+  document.addEventListener('click', function (e) { var s = seal(e); if (s) knock(s); }, true);
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var s = seal(e); if (!s || e.target !== s) return;
+    e.preventDefault();
+    if (!e.repeat) s.click();
+  }, true);
+  function watch() {
+    var b = document.getElementById('forgeAboutBack'); if (!b) return;
+    arm();
+    try { new MutationObserver(arm).observe(b, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] }); } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+})();
+</script>

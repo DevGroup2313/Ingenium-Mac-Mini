@@ -1,0 +1,6 @@
+Tabula, Abacus and Imago inside the Forge now have every fix Ingenium's have. Tabula's ribbon gives a colour, a highlight,
+a size, bold, Grow and Shrink at the first press, on selected words and on the words typed next, and they stay; its PDF and
+Word files carry no Header and Footer labels. Abacus's ribbon reaches every cell selected (Wrap, number formats, borders, cell
+styles), adds or takes one decimal place at a time, keeps a change made just before it is closed, and its grid answers
+Excel's keys. Imago's size list sets the size chosen. The Forge carries Ingenium 6.8.9, and Ingenium 6.8.9 carries this
+build of the Forge.

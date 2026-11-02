@@ -1,0 +1,21 @@
+const { start, send } = require('./lib.js');
+(async () => {
+  const S = process.env.S;
+  const { browser, page, logs } = await start();
+  const r = await send(page, process.env.Q || 'Write a short cover letter for a junior librarian position at the Bodleian Libraries, as a Word document.');
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: S + '/shots/' + (process.env.TAG || 'doc1') + '.png' });
+  const sent = await page.evaluate(() => window.__sent);
+  const s0 = sent[sent.length - 1];
+  console.log('SECS', r.secs, 'KEYS', r.keys.join(','));
+  console.log('PARAMS', JSON.stringify(s0.params));
+  console.log('SYSTEM chars', s0.messages[0].content.length);
+  s0.messages.forEach((m, i) => console.log('MSG', i, m.role, m.content.length, JSON.stringify(m.content.slice(-400))));
+  console.log('=== REPLY ===\n' + r.text);
+  console.log('=== THINK ===\n' + r.think.slice(0, 1500));
+  const cards = await page.evaluate(() => [...document.querySelectorAll('#chatScroll .mk-card')].map(c => c.innerText.replace(/\s+/g, ' ').slice(0, 200)));
+  console.log('CARDS', JSON.stringify(cards));
+  require('fs').writeFileSync(S + '/rig/last_sent.json', JSON.stringify(sent, null, 1));
+  console.log(logs.filter(l => /error/i.test(l)).slice(0, 20).join('\n'));
+  await browser.close();
+})().catch(e => { console.error('FAIL', e); process.exit(1); });

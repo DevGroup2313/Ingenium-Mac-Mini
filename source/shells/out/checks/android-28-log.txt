@@ -1,0 +1,8 @@
+--------- beginning of system
+--------- beginning of main
+11-01 12:15:32.195  3246  3246 I IngeniumShell: ERROR Error while parsing the 'sandbox' attribute: 'allow-downloads' is an invalid sandbox flag. (6646)
+11-01 12:15:32.890  3246  3246 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33413)
+11-01 12:15:32.913  3246  3246 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
+11-01 12:15:32.965  3246  3246 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
+11-01 12:15:38.806  3246  3246 I IngeniumShell: WARNING the code editor could not start: Object.fromEntries is not a function (67185)
+11-01 12:15:38.809  3246  3246 I IngeniumShell: WARNING the shared code editor is missing (67377)

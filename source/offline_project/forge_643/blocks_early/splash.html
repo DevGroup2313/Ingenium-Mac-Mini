@@ -1,0 +1,105 @@
+<div id="forge-boot" aria-busy="true">
+<style>
+/* PASS 643 · the loading page. The owner's words, 20 October 2026: "I also want a loading page added to the apps that
+   informs the user that the page is still being painted instead of letting a user think that the app has crashed or is
+   lagging and glitching." It is the first thing in the body, so it is painted before the rest is read; it covers the
+   half-made page until the Forge's door is written, says plainly what is happening and how far the painting has got, and
+   after a long wait offers to start again. It stands below the boot guard's recovery door, which still speaks first when a
+   start truly fails. Its ring turns on the compositor, so it keeps turning while the page's own work holds all else still. */
+#forge-boot{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147482900;display:flex;align-items:center;justify-content:center;
+  padding:16px;box-sizing:border-box;background:#F5F5F7;color:#28303a;
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;transition:opacity .3s ease,visibility .3s}
+#forge-boot.fb-night{background:#121013;color:#e9eef2}
+#forge-boot.fb-done{opacity:0;visibility:hidden;pointer-events:none}
+#forge-boot.fb-gone{display:none}
+#forge-boot .fb-card{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px;text-align:center;opacity:0;animation:fbIn .45s ease .3s forwards}
+@keyframes fbIn{to{opacity:1}}
+#forge-boot .fb-seal{position:relative;width:104px;height:104px;margin-bottom:6px}
+#forge-boot .fb-seal img{display:block;width:104px;height:104px;border-radius:50%;filter:drop-shadow(0 2px 2px rgba(40,30,10,.22)) drop-shadow(0 8px 18px rgba(40,30,10,.18))}
+#forge-boot.fb-night .fb-seal img{filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)) drop-shadow(0 8px 20px rgba(0,0,0,.5))}
+#forge-boot .fb-ring{position:absolute;top:-10px;right:-10px;bottom:-10px;left:-10px;border-radius:50%;border:3px solid rgba(184,138,58,.16);border-top-color:#b88a3a;
+  animation:fbSpin 1.15s linear infinite;will-change:transform}
+#forge-boot.fb-night .fb-ring{border-color:rgba(217,180,90,.16);border-top-color:#d9b45a}
+@keyframes fbSpin{to{transform:rotate(360deg)}}
+#forge-boot .fb-name{margin:0;font:700 24px/1.15 "Cinzel","Trajan Pro","Optima",Georgia,"Times New Roman",serif;letter-spacing:.04em}
+#forge-boot .fb-say{margin:0;font-size:15px;color:#46545f}
+#forge-boot.fb-night .fb-say{color:#c6d4dd}
+#forge-boot .fb-bar{width:100%;max-width:280px;height:7px;border-radius:99px;background:rgba(184,138,58,.15);overflow:hidden;margin-top:4px}
+#forge-boot.fb-night .fb-bar{background:rgba(217,180,90,.14)}
+#forge-boot .fb-bar i{display:block;height:100%;width:3%;border-radius:inherit;background:linear-gradient(90deg,#caa24a,#9c7428);transition:width .35s ease}
+#forge-boot.fb-night .fb-bar i{background:linear-gradient(90deg,#ecc884,#d9b45a)}
+#forge-boot .fb-pct{font-size:12.5px;color:#6e7e8a;font-variant-numeric:tabular-nums;min-height:1.5em}
+#forge-boot.fb-night .fb-pct{color:#9fb2bf}
+#forge-boot .fb-more{margin:4px 0 0;font-size:14px;line-height:1.55;color:#46545f}
+#forge-boot.fb-night .fb-more{color:#c6d4dd}
+#forge-boot .fb-keys{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+#forge-boot .fb-keys[hidden],#forge-boot .fb-more[hidden]{display:none}
+#forge-boot .fb-key{font:600 14px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;padding:11px 18px;border-radius:12px;cursor:pointer;
+  border:1px solid rgba(40,48,58,.14);background:linear-gradient(180deg,#ffffff,#eceef0);color:#28303a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 2px 0 rgba(40,48,58,.18),0 4px 10px rgba(16,24,32,.12);transition:transform .25s cubic-bezier(.34,1.35,.64,1),box-shadow .25s}
+#forge-boot .fb-key.fb-main{border-color:#141110;color:#f3e6c4;background:linear-gradient(180deg,#332f2a 0%,#211d19 60%,#141110 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #000,0 5px 12px rgba(0,0,0,.3),0 0 0 1px rgba(202,162,74,.3)}
+#forge-boot .fb-key:hover{transform:translateY(-1px)}
+#forge-boot .fb-key:active{transform:translateY(1px);box-shadow:inset 0 1px 2px rgba(0,0,0,.14),0 1px 0 rgba(0,0,0,.2)}
+#forge-boot .fb-key:focus-visible{outline:3px solid #d9b45a;outline-offset:2px}
+#forge-boot.fb-night .fb-key:not(.fb-main){background:linear-gradient(180deg,#2a241d,#1a1611);color:#e9eef2;border-color:rgba(255,255,255,.1);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 rgba(0,0,0,.5),0 4px 10px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:reduce){#forge-boot .fb-card{animation:none;opacity:1}#forge-boot .fb-ring{animation-duration:4s}#forge-boot{transition:none}}
+@media print{#forge-boot{display:none}}
+</style>
+<div class="fb-card">
+  <div class="fb-seal"><img alt="" width="104" height="104"><span class="fb-ring" aria-hidden="true"></span></div>
+  <h1 class="fb-name">The Forge</h1>
+  <p class="fb-say" id="fb-say">Getting ready. The page is still being painted; nothing has crashed.</p>
+  <div class="fb-bar" role="progressbar" aria-label="How much of the page is painted" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="fb-bar"></i></div>
+  <div class="fb-pct" id="fb-pct" aria-hidden="true"></div>
+  <p class="fb-more" id="fb-more" role="status" hidden></p>
+  <div class="fb-keys" id="fb-keys" hidden><button type="button" class="fb-key fb-main" id="fb-refresh">Refresh</button><button type="button" class="fb-key" id="fb-wait">Keep waiting</button></div>
+</div>
+</div>
+<script>/* PASS 643: the loading page's own few lines. They run before the boot guard and the large code, and ask nothing of either. */
+(function(){"use strict";var b=document.getElementById("forge-boot");if(!b)return;
+  function $b(id){return document.getElementById(id);}
+  /* where each of the page's scripts begins, in thousandths of the page (written in when the page is built) */
+  var MAP=/*FORGE_BOOT_MAP*/[],T0=Date.now(),night=false,last=-1,lastMove=Date.now(),stage=0,seg=-1,segAt=Date.now(),finished=false,gen=0,loadAt=0;
+  try{var st=JSON.parse(localStorage.getItem("carpe_diem_offline_v1")||"{}");
+    night=st&&st.theme?st.theme==="night":!!(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);}
+  catch(e){try{night=!!matchMedia("(prefers-color-scheme: dark)").matches;}catch(_){}}
+  var img=b.querySelector("img");
+  /* the Forge's own seal, by day and by night: the tab icons the head already holds */
+  function look(n){b.classList.toggle("fb-night",!!n);try{var l=document.getElementById(n?"cd-fav-dark-192":"cd-fav-light-192");if(img&&l&&l.href)img.src=l.href;}catch(e){}}
+  look(night);
+  var again=false;try{again=!!sessionStorage.getItem("forge_refresh_at");sessionStorage.removeItem("forge_refresh_at");}catch(e){}
+  if(again)$b("fb-say").textContent="Starting again after Refresh. The page is being painted; nothing has crashed.";
+  try{window.addEventListener("load",function(){loadAt=Date.now();});}catch(e){}
+  function frac(){var n=document.scripts.length,k=Math.max(0,Math.min(MAP.length-1,n-1));
+    if(!MAP.length)return Math.min(.9,n/200);
+    if(k!==seg){seg=k;segAt=Date.now();}
+    var a=MAP[k]/1000,z=(k+1<MAP.length?MAP[k+1]:1000)/1000,s=(Date.now()-segAt)/1000;
+    return a+(z-a)*0.85*(1-Math.exp(-s/4));}
+  function show(p){var bar=$b("fb-bar");if(bar)bar.style.width=p+"%";var pb=b.querySelector(".fb-bar");if(pb)pb.setAttribute("aria-valuenow",String(p));
+    var pc=$b("fb-pct");if(pc)pc.textContent=p>=100?"Ready":p+"% painted";}
+  function say(t,keys){var m=$b("fb-more");if(m){m.hidden=false;m.textContent=t;}var k=$b("fb-keys");if(k)k.hidden=!keys;}
+  /* open: the Forge's door is written (it is kept hidden until then), or the page has loaded with no door to show; the boot
+     guard's recovery door, when a start fails, is left to speak alone */
+  function opened(){if(document.getElementById("cd-recovery-door"))return true;
+    var d=document.getElementById("cd-door");if(d&&d.getAttribute("data-forge-written")==="1")return true;
+    if(loadAt&&Date.now()-loadAt>1200){if(!d)return true;try{var cs=getComputedStyle(d);if(cs.display==="none")return true;}catch(e){return true;}}
+    return loadAt>0&&Date.now()-loadAt>9000;}
+  function tick(){if(finished)return;if(opened()){done();return;}
+    var p=Math.max(3,Math.min(97,Math.round(frac()*100)));if(p>last){last=p;lastMove=Date.now();show(p);}
+    var s=(Date.now()-T0)/1000;
+    if(stage<1&&s>15){stage=1;say("This is taking longer than usual. A large page paints slowly on a tablet or a phone, and the first start after an update is the slowest. It is still working.",false);}
+    if(stage<2&&s>40&&Date.now()-lastMove>20000){stage=2;say("Nothing has moved for a while. You can keep waiting, or press Refresh to start the Forge again. Your saved work stays where it is.",true);}
+    setTimeout(tick,250);}
+  function done(){if(finished)return;finished=true;show(100);b.setAttribute("aria-busy","false");
+    var raf=window.requestAnimationFrame||function(f){return setTimeout(f,16);},g=gen;
+    raf(function(){raf(function(){if(g!==gen)return;b.classList.add("fb-done");setTimeout(function(){if(g===gen)b.classList.add("fb-gone");},400);});});}
+  $b("fb-refresh").onclick=function(){try{sessionStorage.setItem("forge_refresh_at",String(Date.now()));}catch(e){}try{location.reload();}catch(e){location.href=location.href;}};
+  $b("fb-wait").onclick=function(){stage=1;lastMove=Date.now();say("Still working. Thank you for waiting.",false);};
+  /* the Refresh key (PASS 643 · forge_refresh) shows this page again while the Forge starts over */
+  window.__forgeBoot={el:b,look:look,done:function(){finished=false;done();},again:function(text){finished=true;gen++;b.classList.remove("fb-done","fb-gone");b.setAttribute("aria-busy","true");
+    show(0);var pc=$b("fb-pct");if(pc)pc.textContent="";$b("fb-say").textContent=text||"Starting the Forge again. Your work is saved.";var m=$b("fb-more");if(m)m.hidden=true;var k=$b("fb-keys");if(k)k.hidden=true;}};
+  tick();
+})();
+</script>

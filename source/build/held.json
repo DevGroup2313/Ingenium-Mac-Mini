@@ -1,0 +1,8 @@
+{
+  "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
+  "modules": [
+    "r202.js"
+  ],
+  "released_62": "Storage (r142, t_61_storage 81/81), backup and moving (r143, t_61_backup 57/57) and the tour by level with help on every page (r144, t_62_tour 39/39) passed their checks on 22 October 2026 and ride in 6.2.",
+  "held_692": "r202.js (the folder search's loader and its Settings card) waits for the end-to-end test of phase 1 and its review; the desktop bridge methods (desktop/app_rag_692.py) ride, unused until then."
+}

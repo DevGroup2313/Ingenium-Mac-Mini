@@ -1,0 +1,95 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# The folder search (source/rag/) in the web views of the Mac and Windows apps: WKWebView on GitHub's Apple silicon Mac and Intel
+# Mac, WebView2 on its Windows PC, opened by pywebview 6.2.1 as the apps open their page (source/rig/rag_engine_check.py): the
+# private file system, SQLite with FTS5 and sqlite-vec, the reading model (its vectors compared with Chromium's), a folder read
+# through the app's own bridge code, and a second start of the app that must find the index still there. It builds and publishes
+# nothing. (Review of 1 November 2026, finding rag-r-04: the spec says to stop and report if sqlite-vec cannot load in the target
+# browser, and until now every run was Chromium on Linux.)
+name: Folder search, in the Mac and Windows web views
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/rag/*.js'
+      - 'source/rag/vendor.json'
+      - 'source/rag/tools/fetch_vendor.py'
+      - 'source/rig/rag_engine_*'
+      - 'source/rig/rag_bridge.py'
+      - 'source/build/desktop/app_rag_69*.py'
+      - '.github/workflows/rag-engines.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rag-engines-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  engine:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Mac, Apple silicon (WKWebView)
+            runner: macos-15
+          - name: Mac, Intel (WKWebView)
+            runner: macos-15-intel
+          - name: Windows (WebView2)
+            runner: windows-2025
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: pywebview, as the apps are built with it
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            python -m pip install --disable-pip-version-check pywebview==6.2.1 pythonnet==3.2.0
+          else
+            python -m pip install --disable-pip-version-check pywebview==6.2.1
+          fi
+          sw_vers 2>/dev/null || true
+
+      - name: The folder search's third-party files (each checked against its pin)
+        run: python source/rag/tools/fetch_vendor.py "$RUNNER_TEMP/vendor" | tail -3
+
+      - name: First start of the app, from nothing
+        timeout-minutes: 30
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python source/rig/rag_engine_check.py "$RUNNER_TEMP/vendor" "$RUNNER_TEMP/engine" write
+
+      - name: Second start of the app, on the same storage
+        timeout-minutes: 10
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python source/rig/rag_engine_check.py "$RUNNER_TEMP/vendor" "$RUNNER_TEMP/engine" check
+
+      - name: What was seen
+        if: always()
+        run: |
+          { echo "### Folder search on ${{ matrix.name }}"; echo '```'; cat "$RUNNER_TEMP/engine/write.txt" 2>/dev/null || echo "(no first start)"; echo; cat "$RUNNER_TEMP/engine/check.txt" 2>/dev/null || echo "(no second start)"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: rag-engine-${{ matrix.runner }}
+          path: |
+            ${{ runner.temp }}/engine/*.json
+            ${{ runner.temp }}/engine/*.txt
+          if-no-files-found: ignore

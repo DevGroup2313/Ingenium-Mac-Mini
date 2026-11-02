@@ -1,0 +1,7 @@
+22 April 2026. Contamination.
+
+Imani found contamination by Trichoderma in flask C-14 when she opened the incubator at 09:10, and discarded 11 flasks from the shelf. The affected flasks were autoclaved without opening, and the shelf was wiped down with 70% ethanol.
+
+Imani prepared 11 replicates of corn meal agar and logged the lot numbers in the notebook. Colony counts were entered into the shared sheet the same day, with the plate identifiers written as on the lids. A 10-fold dilution series to 10^-6 was plated in triplicate on potato dextrose broth. Incubator B was checked before the run and showed no drift against the reference.
+
+Cabinet airflow was checked by Tom in the afternoon and was within specification. Visitors to G.12 must sign the book and be accompanied at all times.

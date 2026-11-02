@@ -1,0 +1,20 @@
+const { start } = require('./lib.js');
+const fs = require('fs');
+(async () => {
+  const S = process.env.S;
+  const { browser, page, logs } = await start();
+  await page.evaluate(() => { go('chat'); document.getElementById('chatNew').click(); });
+  await page.waitForTimeout(500);
+  await page.setInputFiles('#chatAnyFile', S + '/fixtures/statement.docx');
+  await page.waitForTimeout(2000);
+  await page.fill('#chatInput', 'Turn this into a PDF please');
+  const t0 = Date.now();
+  await page.evaluate(() => sendChat());
+  await page.waitForTimeout(2500);
+  const r = await page.evaluate(() => { const ms = curMsgs(), m = ms[ms.length - 1]; return { text: m.text, doc: m.doc && { title: m.doc.title, fmt: m.doc.fmt, md: m.doc.md }, sent: window.__sent.length, stage: csCur && csCur.kind, first: (document.querySelector('#chatScroll .msg:last-child .r1-first') || {}).textContent }; });
+  const pdf = await page.evaluate(() => { const ms = curMsgs(), m = ms[ms.length - 1]; const b = mkPdf(m.doc.title, m.doc.md); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); });
+  fs.writeFileSync(S + '/fixtures/conv.pdf', Buffer.from(pdf, 'base64'));
+  await page.screenshot({ path: S + '/shots/r_conv.png' });
+  console.log(JSON.stringify(r, null, 1), 'ms', Date.now() - t0);
+  await browser.close();
+})();

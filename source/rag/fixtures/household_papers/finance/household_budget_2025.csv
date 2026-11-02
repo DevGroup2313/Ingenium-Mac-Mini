@@ -1,0 +1,73 @@
+Category,Month,Planned,Actual
+Groceries,2025-01,525,556
+Groceries,2025-02,391,454
+Groceries,2025-03,279,255
+Groceries,2025-04,490,477
+Groceries,2025-05,301,304
+Groceries,2025-06,183,188
+Groceries,2025-07,278,337
+Groceries,2025-08,555,540
+Groceries,2025-09,421,402
+Groceries,2025-10,283,303
+Groceries,2025-11,220,214
+Groceries,2025-12,329,396
+Transport,2025-01,201,263
+Transport,2025-02,430,439
+Transport,2025-03,226,200
+Transport,2025-04,475,511
+Transport,2025-05,161,205
+Transport,2025-06,477,545
+Transport,2025-07,85,98
+Transport,2025-08,152,218
+Transport,2025-09,524,517
+Transport,2025-10,84,110
+Transport,2025-11,342,313
+Transport,2025-12,441,445
+Insurance,2025-01,206,196
+Insurance,2025-02,546,544
+Insurance,2025-03,578,598
+Insurance,2025-04,492,495
+Insurance,2025-05,106,169
+Insurance,2025-06,580,635
+Insurance,2025-07,436,396
+Insurance,2025-08,89,162
+Insurance,2025-09,446,446
+Insurance,2025-10,337,410
+Insurance,2025-11,177,217
+Insurance,2025-12,516,577
+Children,2025-01,312,277
+Children,2025-02,289,306
+Children,2025-03,563,553
+Children,2025-04,475,486
+Children,2025-05,597,582
+Children,2025-06,256,264
+Children,2025-07,97,104
+Children,2025-08,102,112
+Children,2025-09,331,300
+Children,2025-10,317,379
+Children,2025-11,328,400
+Children,2025-12,264,298
+Home repairs,2025-01,380,387
+Home repairs,2025-02,355,414
+Home repairs,2025-03,494,561
+Home repairs,2025-04,593,617
+Home repairs,2025-05,255,220
+Home repairs,2025-06,336,388
+Home repairs,2025-07,513,573
+Home repairs,2025-08,516,481
+Home repairs,2025-09,375,400
+Home repairs,2025-10,431,435
+Home repairs,2025-11,533,549
+Home repairs,2025-12,292,279
+Savings,2025-01,307,284
+Savings,2025-02,304,317
+Savings,2025-03,168,229
+Savings,2025-04,458,455
+Savings,2025-05,244,222
+Savings,2025-06,455,423
+Savings,2025-07,525,558
+Savings,2025-08,104,170
+Savings,2025-09,252,328
+Savings,2025-10,108,181
+Savings,2025-11,194,172
+Savings,2025-12,293,261

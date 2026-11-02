@@ -1,0 +1,22 @@
+[
+ {
+  "why": "a file larger than about 2.5 MB opens part by part (blocks/forge_bigtext.html): the whole of it in one box of text froze the window, and a box that could not hold it could have been kept over the file",
+  "old": "function fileEditOpen(rec){\n  FEDIT=rec;\n",
+  "new": "function fileEditOpen(rec){\n  if(window.forgeBigText){ if(rec&&rec.blob&&rec.blob.size>window.forgeBigText.at){ FEDIT=rec; window.forgeBigText.open(rec,{put:filesPut,paint:filesPaint,show:filesShow,state:state,diary:diary}); return; } window.forgeBigText.close(); }\n  FEDIT=rec;\n"
+ },
+ {
+  "why": "Keep the change, for a file open part by part, keeps the whole file put together",
+  "old": "  save.onclick=function(){ if(!FEDIT) return; var text=el('fileEditText').value;\n",
+  "new": "  save.onclick=function(){ if(!FEDIT) return; if(window.forgeBigText&&window.forgeBigText.active()){ window.forgeBigText.keep(); return; } var text=el('fileEditText').value;\n"
+ },
+ {
+  "why": "Show it on the right, for a file open part by part, shows the whole file with its changes",
+  "old": "  el('fileEditShow').onclick=function(){ if(FEDIT) filesShow(FEDIT); };\n",
+  "new": "  el('fileEditShow').onclick=function(){ if(window.forgeBigText&&window.forgeBigText.active()){ window.forgeBigText.show(); return; } if(FEDIT) filesShow(FEDIT); };\n"
+ },
+ {
+  "why": "Download it, for a file open part by part, gives the whole file with its changes",
+  "old": "  el('fileEditDown').onclick=function(){ if(!FEDIT) return;",
+  "new": "  el('fileEditDown').onclick=function(){ if(window.forgeBigText&&window.forgeBigText.active()){ window.forgeBigText.download(); return; } if(!FEDIT) return;"
+ }
+]

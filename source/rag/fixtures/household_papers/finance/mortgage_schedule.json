@@ -1,0 +1,153 @@
+{
+ "account": "Mortgage 00481127",
+ "lender": "Fenland Building Society",
+ "balance_start": 268400.0,
+ "rate_note": "Fixed at 4.19% until 30 June 2028, then the lender's standard variable rate.",
+ "term_years": 25,
+ "schedule": [
+  {
+   "payment": 1,
+   "date": "2025-01-01",
+   "interest": 618.82,
+   "capital": 369.54
+  },
+  {
+   "payment": 2,
+   "date": "2025-02-01",
+   "interest": 579.61,
+   "capital": 357.46
+  },
+  {
+   "payment": 3,
+   "date": "2025-03-01",
+   "interest": 597.27,
+   "capital": 322.14
+  },
+  {
+   "payment": 4,
+   "date": "2025-04-01",
+   "interest": 638.73,
+   "capital": 370.33
+  },
+  {
+   "payment": 5,
+   "date": "2025-05-01",
+   "interest": 618.98,
+   "capital": 310.59
+  },
+  {
+   "payment": 6,
+   "date": "2025-06-01",
+   "interest": 594.41,
+   "capital": 364.63
+  },
+  {
+   "payment": 7,
+   "date": "2025-07-01",
+   "interest": 635.55,
+   "capital": 325.53
+  },
+  {
+   "payment": 8,
+   "date": "2025-08-01",
+   "interest": 614.18,
+   "capital": 330.6
+  },
+  {
+   "payment": 9,
+   "date": "2025-09-01",
+   "interest": 576.49,
+   "capital": 372.37
+  },
+  {
+   "payment": 10,
+   "date": "2025-10-01",
+   "interest": 626.56,
+   "capital": 311.7
+  },
+  {
+   "payment": 11,
+   "date": "2025-11-01",
+   "interest": 627.88,
+   "capital": 357.07
+  },
+  {
+   "payment": 12,
+   "date": "2025-12-01",
+   "interest": 563.7,
+   "capital": 352.72
+  },
+  {
+   "payment": 13,
+   "date": "2025-01-01",
+   "interest": 582.48,
+   "capital": 379.82
+  },
+  {
+   "payment": 14,
+   "date": "2025-02-01",
+   "interest": 583.72,
+   "capital": 310.24
+  },
+  {
+   "payment": 15,
+   "date": "2025-03-01",
+   "interest": 614.63,
+   "capital": 359.43
+  },
+  {
+   "payment": 16,
+   "date": "2025-04-01",
+   "interest": 560.3,
+   "capital": 363.8
+  },
+  {
+   "payment": 17,
+   "date": "2025-05-01",
+   "interest": 607.98,
+   "capital": 361.59
+  },
+  {
+   "payment": 18,
+   "date": "2025-06-01",
+   "interest": 597.69,
+   "capital": 375.29
+  },
+  {
+   "payment": 19,
+   "date": "2025-07-01",
+   "interest": 589.67,
+   "capital": 312.77
+  },
+  {
+   "payment": 20,
+   "date": "2025-08-01",
+   "interest": 637.37,
+   "capital": 328.8
+  },
+  {
+   "payment": 21,
+   "date": "2025-09-01",
+   "interest": 614.72,
+   "capital": 332.88
+  },
+  {
+   "payment": 22,
+   "date": "2025-10-01",
+   "interest": 580.97,
+   "capital": 328.22
+  },
+  {
+   "payment": 23,
+   "date": "2025-11-01",
+   "interest": 616.78,
+   "capital": 348.47
+  },
+  {
+   "payment": 24,
+   "date": "2025-12-01",
+   "interest": 637.0,
+   "capital": 364.55
+  }
+ ]
+}

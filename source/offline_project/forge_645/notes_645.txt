@@ -1,0 +1,11 @@
+A real code editor wherever the Forge shows code: line numbers, colours for each language, find and replace, and Undo,
+in Files' Edit as text, the Studio's code and Fabrica's files. A file of up to 40 MB opens whole in Files (8 MB on a
+tablet or a phone), and much larger ones part by part. Three helps for learning sit on the editor's bar: Glossa says in
+plain words where the cursor is, what its line does and what the word under it means; Calm dims what is not being worked
+on; Lima finds notes, empty lines, styles nothing names and functions nothing calls, and takes out only what is chosen,
+with one Undo putting everything back. Fabrica is calmer: an app's work is in four rooms, Now, Story, Plans and Care,
+each showing only its own tabs, and Test and ship shows one part at a time, Test, Ship or Copies, so nothing hides below
+the fold; Fabrica now describes itself in its own words, and the name GitHub stays only where you connect to it. Its
+limits are far higher (a change shown line by line up to 64 MB a file, the app's search 64 MB a file and 20,000 files).
+The Guidebook's newer entries are laid out like the rest, their numbered steps no longer at the panel's edge. The Forge's
+own code no longer carries the notes written while it was built (licence notices kept), and the code is proved the same.

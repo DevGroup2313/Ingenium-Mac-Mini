@@ -1,0 +1,39 @@
+<script>
+/* ============ OPEN APART · AN APP OPENED IN A WINDOW OF ITS OWN KEEPS TO ITSELF (shared by Ingenium and The Forge, 23 October 2026) ============
+   The owner's words: "I want to be protected from someone stealing my code and also hacking into the apps and releasing
+   malicious software or to steal data and information."
+   Found in the security audit: a page made in the chat, in Build or in Fabrica, or brought in from anywhere, was opened in a
+   new window from a blob: address (or written into a blank one), and both belong to the app's own origin. So that page's code
+   ran as Ingenium or as the Forge, and could read everything kept there (the conversations, the connection keys, the large
+   store, the library, the owner's sealed key) and send it away. Now the window holds only a sandboxed frame: scripts, forms,
+   dialogs and popups, but no origin of its own, so no storage of the app's and no way back into it; and the window is told
+   nothing of the one that opened it. A page that keeps things in local storage is given a store of its own in memory, kept
+   while its window is open, so it still runs.
+   window.ingOpenApart(html, title): returns the window, or null when the browser would not open one. */
+(function openApart(){
+var W=window;
+function say(t){try{var f=W.ingToast||W.toast;if(typeof f==="function")f(t);}catch(e){}}   /* an app with no toast of its own says it where it calls */
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+/* the page's own store in memory, written in first, only where the browser refuses it the real one (it always does here) */
+var MEM='<script>(function(){function mem(){var m=new Map();return {get length(){return m.size;},key:function(i){return Array.from(m.keys())[i]||null;},'
+  +'getItem:function(k){k=String(k);return m.has(k)?m.get(k):null;},setItem:function(k,v){m.set(String(k),String(v));},removeItem:function(k){m.delete(String(k));},clear:function(){m.clear();}};}'
+  +'["localStorage","sessionStorage"].forEach(function(n){try{window[n].length;}catch(e){try{Object.defineProperty(window,n,{value:mem(),configurable:true,enumerable:true});}catch(e2){}}});})();<\/script>';
+function withMem(h){var m=/<head\b[^>]*>/i.exec(h);if(m)return h.slice(0,m.index+m[0].length)+MEM+h.slice(m.index+m[0].length);
+  m=/^\s*<!doctype[^>]*>/i.exec(h);if(m)return m[0]+MEM+h.slice(m[0].length);   /* never ahead of the doctype: the page would lose its standards mode */
+  return MEM+h;}
+function apart(html,title){var w=null;try{w=W.open("","_blank");}catch(e){}
+  if(!w){say("The browser did not open a new window. Allow pop-ups for this app, or save the page and open it.");return null;}
+  try{w.opener=null;}catch(e){}
+  var d=w.document;d.open();
+  d.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(title||"App")+'</title>'
+    +'<style>html,body{margin:0;height:100%;background:#fff}iframe{border:0;width:100%;height:100%;display:block}</style></head><body>'
+    +'<iframe sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads" referrerpolicy="no-referrer" title="'+esc(title||"App")+'"></iframe></body></html>');
+  d.close();
+  var f=d.querySelector("iframe");html=withMem(String(html==null?"":html));
+  /* a large page goes by an address of its own (a sandboxed frame keeps it in no origin either way), a small one as written */
+  if(html.length>2000000){var u=URL.createObjectURL(new Blob([html],{type:"text/html"}));f.src=u;setTimeout(function(){try{URL.revokeObjectURL(u);}catch(e){}},120000);}
+  else f.srcdoc=html;
+  return w;}
+W.ingOpenApart=apart;
+})();
+</script>

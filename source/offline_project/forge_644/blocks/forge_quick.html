@@ -1,0 +1,24 @@
+<script id="forge-644-quick-js">
+/* PASS 644 · A QUICKER START IN THE MAC APP. The owner's words (23 October 2026): "I want both Ingenium and the Forge to be
+   expanded to run faster on the mac mini." The full page is about 53 MB, and the web view read all of it at every start;
+   40 MB of it are the four apps the Forge carries (Ingenium, Carpe Diem, Inkwell and its own page), which it reads only to
+   keep them in its library, once for each new build. The Mac app now opens the page without them (forge_quick_split.py):
+   each is an empty block that names its file beside the page (the_forge_parts/<id>.txt, served by the app with the page),
+   fetched the first time it is wanted. A page opened any other way carries everything, and this does nothing. */
+(function(){ 'use strict';
+if(window.forgeFill) return;
+var FILL={};
+function el(id){ return document.getElementById(id); }
+function later(id){ var e=el(id); return e && e.getAttribute('data-defer') ? e : null; }
+/* fetched as text; a page read from the disk itself (file:) is asked the old way, which the Mac app's web view allows */
+function get(url){ return new Promise(function(res,rej){ try{ var x=new XMLHttpRequest(); x.open('GET',url,true); x.responseType='text';
+    x.onload=function(){ if((x.status===200||x.status===0) && x.responseText) res(x.responseText); else rej(new Error('HTTP '+x.status)); };
+    x.onerror=function(){ rej(new Error('not reachable')); }; x.send(); }catch(e){ rej(e); } }); }
+window.forgeFill=function(id){ var e=later(id); if(!e) return Promise.resolve(el(id)); if(FILL[id]) return FILL[id];
+  FILL[id]=get(e.getAttribute('data-defer')).then(function(t){ e.textContent=t; e.removeAttribute('data-defer'); return e; },
+    function(err){ delete FILL[id]; var x=new Error('the Forge could not fetch its '+id+' ('+(err&&err.message||err)+')'); x.code='gone'; throw x; });
+  return FILL[id]; };
+window.forgeFillAll=function(){ return Promise.all([].slice.call(document.querySelectorAll('script[data-defer]')).map(function(e){ return window.forgeFill(e.id); })); };
+window.forgeDeferredLeft=function(){ return document.querySelectorAll('script[data-defer]').length; };
+})();
+</script>

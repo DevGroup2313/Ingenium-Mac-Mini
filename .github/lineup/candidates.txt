@@ -1,0 +1,81 @@
+# round 5 (6.5, the model studio): a small open model to train further on the owner's own text. llama.cpp's trainer takes a
+# model in 32-bit numbers, so the source is a GGUF in 16 bits (or the full model); which exist, and how large
+search HuggingFaceTB
+search * SmolLM2 GGUF
+repo HuggingFaceTB/SmolLM2-135M-Instruct-GGUF
+repo HuggingFaceTB/SmolLM2-360M-Instruct-GGUF
+repo bartowski/SmolLM2-135M-Instruct-GGUF
+repo bartowski/SmolLM2-360M-Instruct-GGUF
+head https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/raw/main/README.md
+# round 6 (6.9, 30 October 2026): the built-in models' current files and fingerprints, read again from Hugging Face. The Fire
+# build of 6.9 refused LFM2.5 1.2B Thinking: the file it downloaded no longer matched the fingerprint pinned on 12 October.
+repo LiquidAI/LFM2.5-1.2B-Thinking-GGUF
+repo LiquidAI/LFM2.5-1.2B-Instruct-GGUF
+repo unsloth/Qwen3.5-2B-GGUF
+# round 7 (6.9.2, 31 October 2026): better, faster and stronger models for every house
+# Written from llama.cpp's repository (tag b11321 = 1 October 2026; newest tag b12022) and the makers' GitHub pages. Hugging Face could not be
+# reached from the research session, so a repository below may be a name that does not exist: an ERROR line means the guess was wrong,
+# and the search lines at the end list what the authors really have.
+# Qwen3.8 27B (14 Aug 2026): Magister and Faber for 32 GB and up. ggml-org's repository is seen in llama.cpp's own tests; the others are guesses
+repo ggml-org/Qwen3.8-27B-GGUF
+repo unsloth/Qwen3.8-27B-GGUF
+repo lmstudio-community/Qwen3.8-27B-GGUF
+repo bartowski/Qwen_Qwen3.8-27B-GGUF
+repo Qwen/Qwen3.8-27B-GGUF
+card Qwen/Qwen3.8-27B
+head https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q4_K_M.gguf
+# Qwen3.6 35B-A3B (16 Apr 2026): the quick Scriba for 48 and 64 GB, and Faber on Windows; Q4_K_M is 20.6 GB, so read the smaller files too
+repo unsloth/Qwen3.6-35B-A3B-GGUF
+repo Qwen/Qwen3.6-35B-A3B-GGUF
+card Qwen/Qwen3.6-35B-A3B
+# MiniCPM5 2B (7 Sep 2026, Apache-2.0, plain Llama architecture): Scriba for phones, tablets and 8 GB computers
+repo openbmb/MiniCPM5-2B-GGUF
+repo unsloth/MiniCPM5-2B-GGUF
+repo bartowski/openbmb_MiniCPM5-2B-GGUF
+card openbmb/MiniCPM5-2B
+# Granite 4.2 (25 Aug 2026): the 3B is already built in and moves to Faber (read the card's code scores); 8B and 30B for the catalogue
+repo ibm-granite/granite-4.2-3b-GGUF
+repo ibm-granite/granite-4.2-8b-GGUF
+repo ibm-granite/granite-4.2-30b-GGUF
+card ibm-granite/granite-4.2-3b
+card ibm-granite/granite-4.2-8b
+head https://huggingface.co/ibm-granite/granite-4.2-30b-GGUF/resolve/main/granite-4.2-30b-Q4_K_M.gguf
+# For the catalogue (no house): Gemma 4 31B, Meta Muse Glimmer 30B, NVIDIA Nemotron 3.5 Lightning 30B-A3B
+repo google/gemma-4-31B-it-qat-q4_0-gguf
+repo unsloth/gemma-4-31B-it-qat-GGUF
+repo ggml-org/gemma-4-31B-it-GGUF
+repo meta-models/Muse-Glimmer-30B-GGUF
+repo lmstudio-community/Muse-Glimmer-30B-GGUF
+repo ggml-org/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF
+repo unsloth/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-GGUF
+# Need an engine newer than b11321 (llama.cpp added them on 27 and 11 October); read now so that sizes are on record
+repo LiquidAI/LFM3-1.7B-GGUF
+repo LiquidAI/LFM3-VL-2B-GGUF
+repo lmstudio-community/Bonsai-27B-GGUF
+# Discovery: the exact names, newest first
+search openbmb MiniCPM5
+search unsloth Qwen3.8
+search bartowski Qwen3.8
+search google gemma-4-31B
+search ibm-granite granite-4.2
+search nvidia Nemotron-3.5
+search PrismML Bonsai
+search Nanbeige Nanbeige4.3
+search bartowski Nanbeige4.3
+search LiquidAI LFM3
+# For her own devices (31 October 2026): a MacBook Pro with 8 GB, a Mac mini with 16 GB, two Windows laptops with 16 GB, a Fire tablet,
+# an iPhone and an iPad. The 16 GB computers keep Qwen3.5 9B and Gemma 4 12B; read their higher qualities and any speed-up (draft, MTP,
+# DFlash) files that sit beside them, and Gemma 4's smaller sizes, by the exact names their makers use
+search ggml-org gemma-4
+search ggml-org Qwen3.5
+search ggml-org Qwen3.6
+search unsloth gemma-4
+search unsloth Qwen3.5
+search google gemma-4
+repo unsloth/Qwen3.5-9B-GGUF
+repo unsloth/Qwen3.5-4B-GGUF
+card Qwen/Qwen3.5-9B
+card google/gemma-4-12b-it
+card google/gemma-4-E4B-it
+card LiquidAI/LFM3-1.7B
+card PrismML/Bonsai-27B

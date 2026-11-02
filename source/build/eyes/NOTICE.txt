@@ -1,0 +1,31 @@
+Ingenium's eyes (modules/r157.js) carries, in eyes.pack, the following third-party components. Each is used under the
+Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0). They are not the owner's work, and the owner's
+licence for Ingenium does not cover them; their own licence applies to them, and its notices are kept here.
+
+TensorFlow.js 4.22.0 (@tensorflow/tfjs, dist/tf.min.js)
+  Copyright 2018-2024 Google LLC. Licensed under the Apache License, Version 2.0.
+  https://github.com/tensorflow/tfjs
+
+MobileNet v2, 1.0, 224 x 224 (as published for @tensorflow-models/mobilenet 2.1.1, with its ImageNet class names)
+  Copyright 2019 Google LLC. Licensed under the Apache License, Version 2.0.
+  https://github.com/tensorflow/tfjs-models/tree/master/mobilenet
+  Changed here: the weights are stored in eight bits each (make_eyes.py); the network itself is unchanged.
+
+Tesseract.js 5.1.1 (tesseract.js, dist/tesseract.min.js and dist/worker.min.js)
+  Copyright 2016 Jerome Wu and the Tesseract.js contributors. Licensed under the Apache License, Version 2.0.
+  https://github.com/naptha/tesseract.js
+
+Tesseract.js-core 5.1.1 (tesseract-core-lstm.js, tesseract-core-lstm.wasm), Tesseract OCR compiled to WebAssembly
+  Tesseract: Copyright 2006 Google Inc. and the Tesseract contributors. Licensed under the Apache License, Version 2.0.
+  https://github.com/naptha/tesseract.js-core  https://github.com/tesseract-ocr/tesseract
+
+English trained data, 4.0.0_best_int (@tesseract.js-data/eng 1.0.0, from tessdata_best)
+  Copyright Google Inc. and the Tesseract contributors. Licensed under the Apache License, Version 2.0.
+  https://github.com/tesseract-ocr/tessdata_best
+
+Bundled inside Tesseract.js's two files (as their own licence notes list them):
+  regenerator-runtime, Copyright (c) 2014-present Facebook, Inc. (MIT License)
+  buffer, by Feross Aboukhadijeh (MIT License); ieee754, by Feross Aboukhadijeh (BSD-3-Clause License)
+  zlib.js, Copyright 2012 imaya (MIT License)
+The MIT and BSD-3-Clause licences ask that their copyright and permission notices be kept with copies: they are kept
+here, and this notice goes with every copy of the pack.
