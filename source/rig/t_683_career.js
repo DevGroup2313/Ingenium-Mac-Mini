@@ -70,10 +70,10 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   const shot = async name => { const sfx = phone ? '-phone' : ''; await p.screenshot({ path: OUT + '/' + name + sfx + '.png' });
     await p.evaluate(() => document.body.setAttribute('data-theme', 'night')); await p.waitForTimeout(250); await p.screenshot({ path: OUT + '/' + name + sfx + '-night.png' });
     await p.evaluate(() => document.body.setAttribute('data-theme', 'day')); await p.waitForTimeout(150); };
-  // the page never scrolls: it fits the window, and only the panels scroll
+  // the page never scrolls: it fits the window, and only the panels scroll (6.10.2: and a short scroll below it shows the colophon, as on every page)
   const fits = [];
   const fitCheck = async where => { const f = await p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); const pn = [...document.querySelectorAll('#cs .c-pn')].filter(x => x.offsetParent).map(x => Math.round(x.getBoundingClientRect().bottom));
-      const cs = document.getElementById('cs'); return { page: se.scrollHeight - se.clientHeight, main: m ? m.scrollHeight - m.clientHeight : 0, bottom: Math.max(...pn), h: innerHeight, ch: cs.style.getPropertyValue('--c-h'), top: Math.round(cs.getBoundingClientRect().top), ms: m ? m.scrollTop : 0, ss: se.scrollTop, csh: Math.round(cs.getBoundingClientRect().height), kids: [...cs.querySelectorAll('.c-pn')].map(x => Math.round(x.getBoundingClientRect().height) + ':' + Math.round(x.scrollHeight)) }; }); fits.push([where, f]); };
+      const cs = document.getElementById('cs'); return { page: se.scrollHeight - se.clientHeight, col: (() => { const c = document.getElementById('ingColophon'); return c && c.getAttribute('data-on') === '1' ? Math.round(c.getBoundingClientRect().top) : 99999; })(), main: m ? m.scrollHeight - m.clientHeight : 0, bottom: Math.max(...pn), h: innerHeight, ch: cs.style.getPropertyValue('--c-h'), top: Math.round(cs.getBoundingClientRect().top), ms: m ? m.scrollTop : 0, ss: se.scrollTop, csh: Math.round(cs.getBoundingClientRect().height), kids: [...cs.querySelectorAll('.c-pn')].map(x => Math.round(x.getBoundingClientRect().height) + ':' + Math.round(x.scrollHeight)) }; }); fits.push([where, f]); };
   // 1. its place in the menu, after Lector
   const nav = await p.evaluate(() => { const ks = [...document.querySelectorAll('.nav-btn')].map(x => x.getAttribute('data-page')); return { has: ks.includes('career'), after: ks[ks.indexOf('career') - 1] }; });
   ok(nav.has && nav.after === 'lector', 'the Career Studio has its own key in the main menu, after Lector', JSON.stringify(nav));
@@ -206,7 +206,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   await press('Make it a goal'); ok(await p.evaluate(() => IngCareer.state().goals.length === 2 && IngCareer.state().goals[0].steps[0].text === 'write to supervisors'), 'a kind of role made a goal, with its first step');
   // 9. learn: one lesson at a time
   await press('Learn', '#cs .rm-tabs'); const ls = await p.evaluate(() => [...document.querySelectorAll('#cs .c-list .c-item b')].map(x => x.textContent));
-  ok(ls.length === 14 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews') && ls.includes('A statement of purpose') && ls.includes('A checklist from a posting'), 'Learn: its lessons, listed (fourteen since 6.8.12)', ls.join(', '));
+  ok(ls.length === 16 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews') && ls.includes('A statement of purpose') && ls.includes('A checklist from a posting') && ls.includes('A portfolio for an application') && ls[15] === 'CV and letter templates', 'Learn: its lessons, listed (fourteen since 6.8.12; since 6.10.2 fifteen, with the portfolio, and the templates last)', ls.join(', '));
   if (phone) await press('Reading a posting'); const l1 = await p.evaluate(() => ({ h: document.querySelector('#cs .c-work h2').textContent, n: document.querySelectorAll('#cs .c-lesson li').length }));
   await press('A CV for an application ›'); const l2 = await p.evaluate(() => document.querySelector('#cs .c-work h2').textContent);
   ok(l1.h === 'Reading a posting' && l1.n === 5 && l2 === 'A CV for an application', 'one lesson at a time, in numbered steps, the next one a press away', JSON.stringify([l1, l2]));
@@ -218,8 +218,9 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   const lx = await p.evaluate(() => { const o = IngCareer.state().opps.find(x => x.from === 'lector:pX'); return { page: document.querySelector('section.active') && document.querySelector('section.active').id, o: o && { title: o.title, docs: Object.keys(o.docs).sort().join(), step: o.step } }; });
   ok(lx.page === 'page-career' && lx.o && lx.o.title === 'Archivist' && lx.o.docs === 'cover,cv' && lx.o.step === 'send', 'in Lector, a CV and a cover letter with no apps chosen: the Career Studio writes both from the posting and her profile, and shows them', JSON.stringify(lx));
   // 11. the page never scrolls; nothing went online; no errors
-  const bad = fits.filter(x => x[1].page > 2 || x[1].main > 2 || x[1].bottom > x[1].h);
-  ok(!bad.length, 'the page never scrolls: in every room and step it fits the window, and only its panels scroll (' + fits.length + ' places)', JSON.stringify(bad.slice(0, 3)));
+  /* measured from the top of the page (a key pressed may have scrolled it a little, now that the colophon lies below) */
+  const bad = fits.filter(x => x[1].page > 420 || x[1].col + x[1].ss < x[1].h - 2 || x[1].main > 2 || x[1].bottom + x[1].ss > x[1].h);
+  ok(!bad.length, 'the page never scrolls through the studio: in every room and step it fits the window, and only its panels scroll; below it, a short scroll shows the colophon (' + fits.length + ' places)', JSON.stringify(bad.slice(0, 3)));
   ok(outside.length === 0, 'nothing was searched or fetched online: nothing was asked for', outside.slice(0, 3).join(' '));
   const asks = await p.evaluate(() => window.__asks.map(a => /Never invent a skill/.test(a.s)));
   ok(asks.length >= 14 && asks.every(Boolean), 'every request to the model carries the rule never to invent (' + asks.length + ' requests)');

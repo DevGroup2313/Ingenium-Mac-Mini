@@ -20,12 +20,24 @@
 .ab-credit .ab-by{font-size:11.5px;font-weight:500;letter-spacing:.03em;color:var(--accent)}
 .ab-credit .ab-rights{margin-top:4px;font-size:10.5px;letter-spacing:.02em;color:var(--ink-3)}
 @media print{#ingColophon{display:none !important}}
+/* 6.10.2, her words (3 November 2026): "I want the app to be more scrollable on the Lector, Career Studio, and Fabrica pages, they
+   feel stiff. I want to be able to scroll and see the Ingenium seal and copyrights declaration at the footer of the app like I do on
+   the other pages of the app. I want it to match the Build page and how it scrolls smoothly and does not feel stuck. It's the same
+   for both chat pages, I like how they look when I open their pages and I don't want anything to change when I go on their pages, I
+   only want to be able to scroll past the chat page and see the Ingenium logo and the local model studio line and the copyrights
+   line at the end." So every page now ends with the colophon. The rooms that fill the window (Chat, Code, Lector, the Career Studio,
+   Fabrica) open exactly as before, at the top, and fit the window; a short scroll past them shows the colophon. A panel scrolled to
+   its end carries the scroll on to the page, as the Build page scrolls, instead of stopping there. */
+#lx7 .l-pn-b,#cs .c-pn-b,#fb .f-pn-b{overscroll-behavior-y:auto}
+#ingColophon[data-room="1"]{margin-top:28px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p189"]="started";}catch(_){}
 (function(){"use strict";
 var BY="Designed and built by Yannie D. Forest",RIGHTS="© 2026 Yannie D. Forest";
 /* the pages that scroll; the others fill the window */
 var SCROLLS={"page-home":1,"page-focus":1,"page-models":1,"page-blend":1,"page-build":1,"page-notes":1,"page-guide":1,"page-settings":1,"page-folders":1};
+/* 6.10.2: the rooms that fill the window end with it too, a short scroll below them */
+var ROOMS={"page-chat":1,"page-lector":1,"page-career":1,"page-fabrica":1};
 var foot=null,seal=null;
 function night(){return document.body.getAttribute("data-theme")==="night";}
 function drawSeal(){try{if(!seal||typeof drawIngeniumSeal!=="function")return;var d=Math.max(1,Math.min(3,window.devicePixelRatio||1)),s=Math.round(46*d);
@@ -39,8 +51,8 @@ function make(){var main=document.querySelector("main.main");if(!main)return nul
   if(foot.parentNode!==main||main.lastElementChild!==foot)main.appendChild(foot);
   seal=foot.querySelector(".icol-seal");return foot;}
 function place(){try{if(!make())return;var a=document.querySelector("main.main > .section.active");
-  var on=!!(a&&SCROLLS[a.id]&&!document.body.classList.contains("ing-desk-on"));
-  foot.setAttribute("data-on",on?"1":"0");var w=foot.querySelector(".icol-word");if(w.textContent!==name())w.textContent=name();
+  var on=!!(a&&(SCROLLS[a.id]||ROOMS[a.id])&&!document.body.classList.contains("ing-desk-on"));
+  foot.setAttribute("data-on",on?"1":"0");foot.setAttribute("data-room",a&&ROOMS[a.id]?"1":"0");var w=foot.querySelector(".icol-word");if(w.textContent!==name())w.textContent=name();
   if(on)drawSeal();}catch(e){}}
 /* About ends with who made it, as Carpe Diem's does */
 function credit(){try{var box=document.getElementById("modalBox");if(!box||!box.querySelector("#abVersion")||box.querySelector(".ab-credit"))return;

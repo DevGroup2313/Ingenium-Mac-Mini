@@ -371,6 +371,60 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.2 (3 November 2026): every page ends with the colophon; templates by field and role; the portfolio. Her words: "I want
+the app to be more scrollable on the Lector, Career Studio, and Fabrica pages, they feel stiff. I want to be able to scroll and see the
+Ingenium seal and copyrights declaration at the footer ... It's the same for both chat pages, I like how they look when I open their
+pages and I don't want anything to change"; "I want for Ingenium and its pages to have resume templates and cover letter templates
+for different industry and different roles within them ... to help any applicant"; "I want the Career Studio to genuinely help me build
+and refine my portfolio for any job application ... phd application or fellowship application, grant, scholarship application".
+
+- The colophon (modules/r189.js) now ends Chat, Code, Lector, the Career Studio and Fabrica too. Each opens exactly as before, at the
+  top, and fits the window (her earlier request, that the Career Studio not be endlessly scrolled, still holds: only its panels scroll
+  through its work); a short scroll past the room shows the seal, Local model studio and the copyright. A panel scrolled to its end
+  carries the scroll on to the page, as the Build page scrolls, instead of stopping there.
+- Templates (modules/r209.js; Learn, CV and letter templates): 26 roles in 8 fields (universities and research; education and learning
+  design; technology, data and AI; digital humanities, libraries, archives and museums; public service, policy and charities; business,
+  sales and operations; writing, publishing and communications; fellowships, grants and scholarships). Each says what its readers look
+  for, the CV's sections in the order that serves it, the cover letter's moves, the length and form, what to avoid, and an example line
+  with square brackets where her own facts go. They describe common practice in the UK and the US; a posting's own instructions come
+  first. Used for an application (from the template, or from What you send, where one is suggested from the posting's words), it shapes
+  the CV, the letter and the portfolio the studio writes; the model is told it gives the shape only, and that every fact comes from
+  her profile.
+- The portfolio, a document of its own in What you send (jobs, doctoral and other applications): two to four pieces of her own work as
+  short case studies (what it is, her part, the problem, what she did, what came of it, what it shows for this application, where to see
+  it), chosen and ordered for the application, drawn from her apps as Lector read them, her documents and her entries; no figure, user
+  number or outcome her profile does not give. A lesson on portfolios joins Learn.
+
+- No ceiling on memory (modules/r210.js; the computer apps' side in desktop/app_parts_6102.py). Her words: "I want Ingenium to be able
+  to run stronger models and be strong enough to run on larger computers with far more RAM than 64GB. I don't want Ingenium to be
+  capped at 64 GB RAM". Until now each house's list stopped at what 48 to 64 GB holds. Seventeen larger models join it, from 96 GB of
+  memory to 3 TB: Qwen3-Next 80B-A3B Thinking, Qwen3-Coder-Next, Nemotron 3.5 Bolt 74B-A9B, Qwen3.5 122B-A10B (and a compact copy),
+  gpt-oss-120b, Qwen3.8 Flash Next, GLM-5.3 Flash (and a compact copy), DeepSeek V4 Flash, Qwen3.5 397B-A17B, MiniMax M3.1 Flash,
+  GLM-5.3, Qwen3.8 2.4T-A95B, DeepSeek V4 Pro and Kimi K3 (two copies). Every file's name, size and SHA-256 was read from Hugging
+  Face (rounds 8 and 8b of the lineup workflow) and checked again file by file, 141 files in all; each model's kind was read from its
+  own file and is one the engine of this release (llama.cpp b11321) lists. The memory rule is unchanged, so each house takes the
+  largest model that fits: Magister the largest general model, Scriba the quickest, Faber the coders; a computer with no graphics chip
+  gets only the mixture-of-experts models with at most 18B parameters at work on each word. Models over 50 GB come in parts (Hugging
+  Face keeps no larger file): the computer apps now install, list, move and delete a model in parts, each part fetched, carried on where
+  it stopped and checked by its fingerprint, kept under the names the engine reads; a file chosen on the computer is added by its first
+  part. Each runs on its card's settings where the card gives them. Not run end to end: no machine within reach has the memory.
+- Home's Scriba and Fontes stones wear their marks, as the side rail's do, 4 pixels from the name (modules/r211.js).
+- Your models on a phone: the card is no longer one row whose three keys squeezed the details into a strip; the name and details take
+  the card's width, and the keys sit beneath them in one row.
+- Build: long lines wrap inside the code panel; the panel's head says so ("Long lines wrap") and one press keeps each line on one row
+  instead; the choice is kept.
+- The Fire and Android app without its models (57 MB): when it has neither its own models nor a built-in one, the Models page offers
+  the same two, in one press, fetched inside the app and checked by fingerprint. The full app (about 1.5 GB) needs room on the
+  tablet's own storage for the download and for the copy Android makes while installing it.
+- The Mac build: the Touch ID helper of 6.10.1 is now built for macOS 13.3 and for the chip of the app itself (it had taken the build
+  Mac's newer macOS, and the check that every part runs on 13.3 rightly stopped the release).
+
+    node rig/t_6102_scroll.js <url> <out>       # 13 checks
+    node rig/t_6102_templates.js <url> <out>    # 12 checks, with a stand-in model
+    node rig/t_6102_large.js <url> <out>        # every band from 96 GB to 3 TB; the install the page sends, checked by the app's own check
+    node rig/t_6102_ui.js <url> <out>           # Home's marks, the cards on an iPhone, Build's long lines, the small Fire app
+    python3 -I rig/t_6102_parts.py              # models in parts: install, resume, fingerprints, move, delete, choose; the patch
+
 Ingenium 6.10.1 (3 November 2026): the computer's own sign-in as a way back in. Her answer: "Yes, my computer's own sign in (Touch
 ID or Windows Hello) also open Ingenium."
 

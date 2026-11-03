@@ -41,11 +41,23 @@ fi
 KEYSRC="$(cd "$(dirname "$0")" && pwd)/IngeniumKey.swift"
 rm -f "$APP/Contents/MacOS/IngeniumKey"
 if [ -f "$KEYSRC" ] && command -v swiftc >/dev/null 2>&1; then
-  if swiftc -O -o "$APP/Contents/MacOS/IngeniumKey" "$KEYSRC"; then
+  # 6.10.2: built for the same oldest macOS the release promises (13.3), and for each chip the app itself is built for; without
+  # the target, Swift used the build Mac's own newer macOS, and the check in the cloud build rightly stopped the release.
+  KMAIN="$APP/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist" 2>/dev/null || true)"
+  KARCHS="$(lipo -archs "$KMAIN" 2>/dev/null || true)"
+  [ -n "$KARCHS" ] || KARCHS="$(uname -m)"
+  KTMP="$(mktemp -d)"
+  KOK=1
+  for KA in $KARCHS; do
+    swiftc -O -target "$KA-apple-macos13.3" -o "$KTMP/IngeniumKey-$KA" "$KEYSRC" || KOK=0
+  done
+  if [ "$KOK" = 1 ] && lipo -create "$KTMP"/IngeniumKey-* -output "$APP/Contents/MacOS/IngeniumKey"; then
+    rm -rf "$KTMP"
     chmod 755 "$APP/Contents/MacOS/IngeniumKey"
     codesign --force --sign - --timestamp=none "$APP/Contents/MacOS/IngeniumKey"
     echo "Touch ID helper: built ($("$APP/Contents/MacOS/IngeniumKey" info || true))."
   else
+    rm -rf "$KTMP"
     rm -f "$APP/Contents/MacOS/IngeniumKey"
     echo "Touch ID helper: NOT built (Swift could not compile it); the app works without it."
   fi

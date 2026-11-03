@@ -374,6 +374,18 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-lead li span{display:block;color:var(--c-ink3);font-size:12.5px}
 #cs .c-svk b:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c-acc);margin-right:7px;vertical-align:1px}
 #cs .c-svnote{padding-top:14px}
+/* 6.10.2 · templates by field and role */
+#cs .c-tplbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 2px;padding:10px 12px;border:1px solid var(--c-hair);border-radius:12px;background:var(--c-wellbg)}
+#cs .c-tplbar .c-label{margin:0}
+#cs .c-tplbar .c-sel{max-width:min(100%,420px)}
+#cs .c-tplsg{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+#cs .c-tplgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;padding:4px 16px 16px}
+#cs .c-tplview{padding:4px 18px 18px;gap:6px;font-size:14px;line-height:1.55;color:var(--c-ink1)}
+#cs .c-tplview p{margin:0 0 6px}
+#cs .c-tplview .c-h3{margin-top:12px}
+#cs .c-tplol,#cs .c-tplul{margin:2px 0 6px;padding-left:22px;display:flex;flex-direction:column;gap:5px}
+#cs .c-tplline{white-space:pre-wrap;font:13px/1.5 var(--c-mono);background:var(--c-wellbg);border:1px solid var(--c-hair);border-radius:10px;padding:10px 12px;margin:2px 0}
+#cs .c-tplk b:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--c-acc);margin-right:7px;vertical-align:1px}
 #cs .c-svcard{border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-slab);padding:12px 14px;margin:12px 16px 4px;display:flex;flex-direction:column;gap:4px}
 #cs .c-svcard b{font-size:14.5px;color:var(--c-ink1)}
 #cs .c-svcard small{color:var(--c-ink3);font-size:12.5px}
@@ -622,8 +634,9 @@ var DOCS={cv:["Tailored CV","A CV in the order this application asks for, from y
   purpose:["Statement of purpose","The research you mean to do, how you are prepared for it, why this programme and its people, and where it leads."],
   teaching:["Teaching statement","How you teach and why, shown through moments from your own teaching, and how you would teach here."],
   funding:["Funding application","The case for funding you: the project, why it matters, what you have done, and what the funding makes possible."],
-  sample:["Writing sample: which to send","Which of your own writings to send as the writing sample, why, and how to bring it within the limit, without rewriting it."]};
-var FOR={job:["cv","cover","supporting"],phd:["statement","purpose","proposal","sample","cv","cover","funding"],grant:["proposal","funding","statement","cv","cover"],other:["cv","cover","supporting","statement","purpose","proposal","teaching","funding","sample"]};
+  sample:["Writing sample: which to send","Which of your own writings to send as the writing sample, why, and how to bring it within the limit, without rewriting it."],
+  portfolio:["Portfolio","Two to four pieces of your own work as short case studies, chosen and ordered for this application."]};
+var FOR={job:["cv","cover","supporting","portfolio"],phd:["statement","purpose","proposal","sample","cv","cover","funding","portfolio"],grant:["proposal","funding","statement","cv","cover"],other:["cv","cover","supporting","statement","purpose","proposal","teaching","funding","sample","portfolio"]};
 var ROLES=[["supervisor","A prospective supervisor"],["pastsup","A past or present supervisor"],["referee","A referee"],["mentor","A mentor"],["manager","A hiring manager"],["recruiter","A recruiter"],["contact","The contact named in the posting"]];
 var PURPOSES=[["enquire","To ask about the post or programme"],["advice","To ask for advice on my application"],["introduce","To introduce myself and my research"],["reference","To ask for a reference"],["followup","To follow up on my application"],["thanks","To thank them after an interview"],["accept","To accept an offer"],["decline","To decline an offer"]];
 function critBlock(o){var r=o.read&&o.read.r;if(!r||!r.crit.length)return "";return "THE CRITERIA, AS READ AGAINST MY PROFILE:\n"+r.crit.map(function(c){return "- "+c.text+" ("+(c.ess?"essential":"desirable")+"; "+{met:"shown",partly:"partly shown",none:"NOT SHOWN: do not claim it"}[c.st]+(c.ev?"; evidence: "+c.ev:"")+")";}).join("\n");}
@@ -665,10 +678,13 @@ function docAsk(kind,o,G,post,em){
     purpose:"Write my statement of purpose for "+to(o)+", in about 1,000 words, in paragraphs, without headings: the research I mean to do and the question at its centre, said plainly and early; how my studies, my work and my writing have prepared me for it, with concrete evidence from the profile; which parts of this programme, as the call describes them, my work needs, and why; and what I mean to do with the degree afterwards. Name no supervisor, method, source or outcome that the profile and the call do not name.",
     teaching:"Write my teaching statement for "+to(o)+", in about 700 words, in paragraphs, without headings: what I believe helps students learn, shown through concrete moments from my own teaching in the profile (what I taught, to whom, what I did, and what came of it); how I would teach what this post asks for, from what the posting says; and how I keep improving my teaching. Where the profile gives no teaching at all, write only: [Your profile holds no teaching yet: add an entry under Teaching, then write this again.]",
     funding:"Write my funding application for "+to(o)+": the case for funding me. Use these level-two headings (##), unless the call names its own sections, in which case use those, in its order: The project; Why it matters; What I have done so far; What the funding makes possible; Fit with the funder. Under each, short paragraphs from the profile and my documents. Where the profile is silent, leave a place in square brackets saying what is needed. Never invent a figure, a cost, a date or an outcome.",
+    portfolio:"Write my portfolio for "+to(o)+", in Markdown: two to four pieces of my own work as short case studies, those that answer the posting's criteria best, the strongest first. For each, a level-two heading (##) with the piece's name; then, in short paragraphs or bullets: What it is; My part; The problem or question; What I did (methods and tools); What came of it (only what THE PROFILE gives: no figure, user number or outcome it does not give); What it shows for this application (the criteria it answers, in the posting's words); Where to see it (a link only if THE PROFILE gives one, otherwise [a link]). Draw on MY APPS, AS LECTOR READ THEM, my documents and my entries. Half a page for each piece at most. No introduction and no closing note.",
     sample:"Choose, from MY OWN WRITING below, the piece best suited to send as the writing sample for "+to(o)+". Answer in plain words, under three level-two headings (##): Which to send (its number and first words, and why it suits what the call asks); How to bring it within the limit (which parts to keep and which to cut, naming them, without rewriting a sentence); What to say about it (one or two sentences introducing it, only if the call asks for a note). If MY OWN WRITING holds nothing, write only: [No writing of yours is kept yet: add your writing to your profile's sources, then ask again.]",
     email:""}[kind];
   if(kind==="email"){var role=(ROLES.filter(function(x){return x[0]===em.role;})[0]||ROLES[5])[1].toLowerCase(),pur=(PURPOSES.filter(function(x){return x[0]===em.purpose;})[0]||PURPOSES[0])[1].toLowerCase();
     what="Write an email from me to "+role+", "+pur+", about "+to(o)+". Begin with a line \"Subject: \" and the subject, then a blank line, then the email. Courteous, direct and specific, with one clear request; "+(em.purpose==="introduce"?"no more than 300 words":"no more than 180 words")+". Greet the person by name only if the profile or the posting names them; otherwise write [their name]. Sign it with my name."+(em.extra?" Also: "+em.extra:"");}
+  /* 6.10.2: the template chosen for this application (modules/r209.js), for its CV, its letter and its portfolio */
+  var tpl=(kind==="cv"||kind==="cover"||kind==="portfolio")?tplOf(o):null;if(tpl)what+="\n\n"+W.IngTemplates.block(tpl,kind);
   var lim=kind==="email"?null:limitFor(post,kind);
   if(lim&&lim.words&&kind==="statement")what=what.replace("in about 750 words","in no more than "+lim.words+" words");
   if(lim&&lim.words&&kind==="purpose")what=what.replace("in about 1,000 words","in no more than "+lim.words+" words");
@@ -698,7 +714,7 @@ function checks(md,mat){var miss=[],seen={};(String(md).match(/\b\d[\d,.]*\d\b|\
 function writeDoc(o,kind,em){if(busyNow()||needModel())return Promise.resolve(false);begin(o,"Writing the "+(kind==="email"?"email":DOCS[kind][0].toLowerCase()));
   return Promise.all([postText(o),gatherProfile({voice:kind!=="cv",cite:kind==="statement"||kind==="proposal"||kind==="purpose"||kind==="funding",opp:o})]).then(function(x){var post=x[0],G=x[1];
     if(!G.items&&!G.cv&&!G.files.length&&!G.apps.length)throw new Error("your profile is empty. Add your CV or a few entries in Your profile first: the studio writes only from what it holds");
-    return ask(docAsk(kind,o,G,post,em),kind==="cv"||kind==="proposal"||kind==="supporting"||kind==="funding"?2200:kind==="statement"||kind==="purpose"?2000:kind==="teaching"?1500:kind==="sample"?900:kind==="email"?700:1300,kind==="cv"?0.35:0.5)
+    return ask(docAsk(kind,o,G,post,em),kind==="cv"||kind==="proposal"||kind==="supporting"||kind==="funding"||kind==="portfolio"?2200:kind==="statement"||kind==="purpose"?2000:kind==="teaching"?1500:kind==="sample"?900:kind==="email"?700:1300,kind==="cv"?0.35:0.5)
       .then(function(t){return kind==="sample"?clean(t):examine(kind,clean(t),G,post,o);}).then(function(md){var sf={md:md,line:""};try{if(kind!=="email"&&!american())sf=LXR().styleFix(md);}catch(e){}md=sf.md;
         var ck=checks(md,material(G)+"\n"+post);ck.style=sf.line||"";ck.exam=EXAM.last;var ref=IngBig.newId();
         return Promise.resolve(IngBig.put(ref,md)).then(function(){var rec={ref:ref,made:Date.now(),model:modelName(),chk:ck};
@@ -1135,6 +1151,7 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
   ["A personal statement for a PhD or DPhil",["Say what you want to research and why it matters, in plain terms, early.","Show how your studies and work prepared you: the methods, the sources and the languages you already have.","Show that you know what this programme and its people offer, from what they publish, and why it fits your project.","Keep to the length asked. Read the department's guidance: some want a research proposal instead, or as well."]],
   ["A research proposal",["A working title, then the question, in one or two sentences.","Why it matters: what is not yet known, and to whom it matters.","What is known: the main work your question answers to, honestly cited.","Approach and methods, and the sources or materials you will use, and whether you can reach them.","A timetable that fits the funding, and why this programme and supervisor suit it. It is a plan: it may change, and examiners know that."]],
   ["Writing to a prospective supervisor",["Read their recent work first, and say briefly which part bears on your project.","In a few lines: who you are, what you want to research, and why with them.","Attach or offer a short outline and your CV. Ask one clear question: whether they would consider supervising it.","Keep it short. If there is no answer in two or three weeks, one polite follow-up is usual."]],
+  ["A portfolio for an application",["Choose two to four pieces of your own work that answer the posting's criteria; put the strongest first.","For each: what it is, your part, the problem, what you did, and what came of it.","Say in a line what each piece shows for this application, in the posting's own words.","Only what you can show: links that work, figures you can stand behind.","Half a page for each piece; a link carries the rest."]],
   ["Asking for a reference",["Ask early, and ask whether they can write a good reference, not just a reference.","Send the posting, your CV and the date it is due, and remind them of the work they know you for.","Thank them, and tell them the outcome."]],
   ["Interviews",["Prepare an example for each essential criterion: the situation, what you did yourself, and the result.","Say \"I\" for what you did. Be exact about figures and dates.","When you do not know, say so, and say how you would find out.","Prepare two or three questions of your own about the work itself."]],
   ["A checklist from a posting",["Read the posting once through without writing anything.","Then read it again, slowly, and mark each thing it asks you to send: a CV, a letter, a statement, a proposal, a sample, transcripts, references.","Mark how to send it (a portal, an email address, a form) and the closing date and time.","Mark every limit: words, pages, the number of references.","Write each as one short line, and tick it only when it is ready to send."]],
@@ -1463,7 +1480,7 @@ function stepSend(o,P){var v=sendView(o),split=h("div","c-split"),nav=h("div","c
 function unwritten(o,kind,pane,P){var w=wayOf(o),pl=o.plan&&o.plan[kind],gd=o.guide&&o.guide[kind];
   var e=empty(DOCS[kind][0],DOCS[kind][1]+(w==="guide"?" You write it yourself, with a guide to its parts and what your profile holds for each.":" Written from your profile and the posting, then read a second time against your profile; what your profile does not give is left in square brackets for you."));pane.appendChild(e);
   var how=lessonFor(kind,null);if(how){var d=fold("how:"+how[0],"How it is built");var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});d.appendChild(ol);pane.appendChild(d);}
-  wayBar(o,pane);
+  wayBar(o,pane);if(kind==="cv"||kind==="cover"||kind==="portfolio")tplBar(o,pane);
   if(w==="step"&&pl){pane.appendChild(h("h3","c-h3",esc("The plan, part by part")));pane.appendChild(h("p","c-note",esc("Change any line, take one out, or add one. The writing follows this plan, in its order.")));
     var ta=h("textarea","c-ta c-plan");ta.value=pl.text;ta.setAttribute("aria-label","The plan, one part to a line");ta.addEventListener("change",function(){pl.text=ta.value.trim();save();});pane.appendChild(ta);
     P.foot.appendChild(cbtn("","Plan it again",function(){planDoc(o,kind);}));P.foot.appendChild(h("span","c-grow"));
@@ -1474,7 +1491,7 @@ function unwritten(o,kind,pane,P){var w=wayOf(o),pl=o.plan&&o.plan[kind],gd=o.gu
   P.foot.appendChild(cbtn("","Write it yourself",function(){o.mineKind=kind;setView(o,{kind:"mine"});}));P.foot.appendChild(h("span","c-grow"));
   if(w==="step")P.foot.appendChild(cbtn("pri","Plan it with me",function(){planDoc(o,kind);},"A plan first, part by part, for you to approve or change"));
   else P.foot.appendChild(cbtn("pri","Write the "+docWord(kind),function(){writeDoc(o,kind);}));}
-function lessonFor(kind,rec){var lk=kind==="email"?(rec&&rec.role==="supervisor"?"Writing to a prospective supervisor":rec&&rec.purpose==="reference"?"Asking for a reference":""):{cv:"A CV for an application",cover:"A cover letter",supporting:"A supporting statement",statement:"A personal statement for a PhD or DPhil",proposal:"A research proposal",purpose:"A statement of purpose",teaching:"A teaching statement",funding:"A funding application",sample:"Choosing a writing sample"}[kind];
+function lessonFor(kind,rec){if(kind==="portfolio")return LESSONS.filter(function(L){return L[0]==="A portfolio for an application";})[0]||null;var lk=kind==="email"?(rec&&rec.role==="supervisor"?"Writing to a prospective supervisor":rec&&rec.purpose==="reference"?"Asking for a reference":""):{cv:"A CV for an application",cover:"A cover letter",supporting:"A supporting statement",statement:"A personal statement for a PhD or DPhil",proposal:"A research proposal",purpose:"A statement of purpose",teaching:"A teaching statement",funding:"A funding application",sample:"Choosing a writing sample"}[kind];
   return LESSONS.filter(function(L){return L[0]===lk;})[0]||null;}
 function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lessonFor(kind,rec),tab=o.tab==="how"&&how?"how":"doc";
   var top=h("div","c-row c-tight");top.appendChild(h("h3","c-h3",esc(isMail?"The email":DOCS[kind][0])));
@@ -1942,15 +1959,57 @@ function rolesPanel(){var S=CS(),R=panel("csWork","Roles and programmes that sui
   R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",S.roles?"Weigh them again":"Weigh what suits me",roles));return R;}
 
 /* ---- Learn: one lesson at a time ---- */
-function paintLearn(par){var S=CS(),i=Math.max(0,Math.min(LESSONS.length-1,S.ui.lesson||0)),L=panel("csList","Learn");
+function paintLearn(par){var S=CS();if(S.ui.learnTpl&&W.IngTemplates)return paintTemplates(par);var i=Math.max(0,Math.min(LESSONS.length-1,S.ui.lesson||0)),L=panel("csList","Learn");
   L.body.appendChild(h("blockquote","c-motto c-small","“Tell me and I forget. Teach me and I remember. Involve me and I learn.”"));
   LESSONS.forEach(function(x,j){L.body.appendChild(item(x[0],x[1].length+" steps",j===i,function(){S.ui.lesson=j;show("work");save();render();}));});
+  if(W.IngTemplates){L.body.appendChild(h("div","c-label c-pad",esc("Templates")));L.body.appendChild(item("CV and letter templates",W.IngTemplates.list.length+" roles in "+W.IngTemplates.industries.length+" fields",false,function(){S.ui.learnTpl=true;show("list");save();render();},"c-tplk"));}
   L.foot.appendChild(h("span","c-note",esc("Common practice in the UK. A posting's own instructions come first.")));
   var Ls=LESSONS[i],R=panel("csWork",Ls[0]);R.head.insertBefore(cbtn("quiet c-back","‹ Learn",function(){show("list");save();render();}),R.head.firstChild);
   var ol=h("ol","c-lesson");Ls[1].forEach(function(s,j){var li=h("li");li.innerHTML="<i>"+(j+1)+"</i><span>"+esc(s)+"</span>";ol.appendChild(li);});R.body.appendChild(ol);
   if(i>0)R.foot.appendChild(cbtn("","‹ "+LESSONS[i-1][0],function(){S.ui.lesson=i-1;save();render();}));R.foot.appendChild(h("span","c-grow"));
   if(i<LESSONS.length-1)R.foot.appendChild(cbtn("pri",LESSONS[i+1][0]+" ›",function(){S.ui.lesson=i+1;save();render();}));
   else R.foot.appendChild(cbtn("pri","Try it: bring a posting",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();}));two(L,R,par);}
+
+/* ---------------- 6.10.2 · templates by field and role (modules/r209.js). Her words (3 November 2026): "I want for Ingenium and its
+   pages to have resume templates and cover letter templates for different industry and different roles within them ... to help any
+   applicant ... curate their experience and education ... and portfolio for their future roles." The studio teaches from them here,
+   and writes from them in What you send: the template chosen for an application shapes its CV, its letter and its portfolio. ---------- */
+function tplOf(o){var T=W.IngTemplates;return T&&o&&o.tpl?T.byId(o.tpl):null;}
+function tplSuggest(o){var T=W.IngTemplates;if(!T||!o)return Promise.resolve(null);return postOnly(o).then(function(t){return T.match(o.title||"",t||"");},function(){return T.match(o.title||"","");});}
+function tplBar(o,pane){var T=W.IngTemplates;if(!T)return;var cur=tplOf(o),box=h("div","c-tplbar");
+  box.appendChild(h("span","c-label",esc("Template")));
+  var sel=select([["","None: the order this application asks for"]].concat(T.list.map(function(t){return [t.id,t.role+" · "+T.indName(t.ind)];})),cur?cur.id:"");sel.setAttribute("aria-label","The template this application follows");sel.className="c-sel";
+  sel.addEventListener("change",function(){o.tpl=sel.value||null;save();render();say(o.tpl?"This application's CV, letter and portfolio will follow the template for "+T.byId(o.tpl).role+".":"No template: the studio follows the order this application asks for.");});box.appendChild(sel);
+  if(cur)box.appendChild(cbtn("sm quiet","See the template",function(){var S=CS();S.ui.learnTpl=true;S.ui.tplInd=cur.ind;S.ui.tpl=cur.id;S.ui.room="learn";show("work");save();render();},"Opens it in Learn"));
+  else{var sg=h("span","c-note c-tplsg");box.appendChild(sg);tplSuggest(o).then(function(t){if(!t||!sg.isConnected)return;sg.textContent="";sg.appendChild(document.createTextNode("Suggested for this posting: "));
+    sg.appendChild(cbtn("sm","Use "+t.role,function(){o.tpl=t.id;save();render();say("This application's CV, letter and portfolio will follow the template for "+t.role+".");}));});}
+  pane.appendChild(box);}
+function paintTemplates(par){var S=CS(),T=W.IngTemplates,ind=S.ui.tplInd||T.industries[0][0],t=S.ui.tpl?T.byId(S.ui.tpl):null;if(t)ind=t.ind;
+  var L=panel("csList","Templates");L.head.insertBefore(cbtn("quiet c-back","‹ Learn",function(){S.ui.learnTpl=false;S.ui.tpl=null;show("list");save();render();}),L.head.firstChild);
+  T.industries.forEach(function(x){L.body.appendChild(item(x[1],T.inInd(x[0]).length+" role"+(T.inInd(x[0]).length===1?"":"s"),x[0]===ind,function(){S.ui.tplInd=x[0];S.ui.tpl=null;show("work");save();render();}));});
+  L.foot.appendChild(h("span","c-note",esc("Common practice in the UK and the US. A posting's own instructions come first.")));
+  var R;
+  if(!t){R=panel("csWork",T.indName(ind));R.head.insertBefore(cbtn("quiet c-back","‹ Fields",function(){show("list");save();render();}),R.head.firstChild);
+    R.body.appendChild(h("p","c-note c-pad c-tplintro",esc("Choose a role: its template says what its readers look for, the CV's sections in the order that serves it, the letter's moves, its length and what to avoid. Used for an application, it shapes the CV, the letter and the portfolio the studio writes; every fact still comes from your profile.")));
+    var g=h("div","c-tplgrid");T.inInd(ind).forEach(function(x){var b=h("button","c-item");b.type="button";b.appendChild(h("b",null,esc(x.role)));b.appendChild(h("small",null,esc((x.look.match(/^[^.:]+[.:]?/)||[x.look])[0])));b.addEventListener("click",function(){S.ui.tpl=x.id;save();render();});g.appendChild(b);});R.body.appendChild(g);}
+  else{R=panel("csWork",t.role);R.head.insertBefore(cbtn("quiet c-back","‹ "+T.indName(t.ind),function(){S.ui.tpl=null;save();render();}),R.head.firstChild);
+    var b=h("div","c-col c-tplview");
+    b.appendChild(h("h3","c-h3",esc("What its readers look for")));b.appendChild(h("p",null,esc(t.look)));
+    b.appendChild(h("h3","c-h3",esc("The CV, in this order")));var ol=h("ol","c-tplol");t.cv.forEach(function(x){var k=x.indexOf(": ");ol.appendChild(h("li",null,k>0?"<b>"+esc(x.slice(0,k))+":</b> "+esc(x.slice(k+2)):"<b>"+esc(x)+"</b>"));});b.appendChild(ol);
+    if(t.tips&&t.tips.length){var ul=h("ul","c-tplul");t.tips.forEach(function(x){ul.appendChild(h("li",null,esc(x)));});b.appendChild(ul);}
+    b.appendChild(h("h3","c-h3",esc(t.id==="civil"?"The statement and the examples":t.id==="narrative"?"The application's own questions":"The cover letter's moves")));var ol2=h("ol","c-tplol");t.cover.forEach(function(x){ol2.appendChild(h("li",null,esc(x)));});b.appendChild(ol2);
+    b.appendChild(h("h3","c-h3",esc("Length and form")));b.appendChild(h("p",null,esc(t.length)));
+    b.appendChild(h("h3","c-h3",esc("Avoid")));var ul2=h("ul","c-tplul");t.avoid.forEach(function(x){ul2.appendChild(h("li",null,esc(x)));});b.appendChild(ul2);
+    b.appendChild(h("h3","c-h3",esc("An example line, to show the shape")));b.appendChild(h("pre","c-tplline",esc(t.line)));
+    b.appendChild(h("p","c-note",esc("Your own facts go where the square brackets are. The studio never writes a fact from a template: it takes every one from your profile.")));
+    R.body.appendChild(b);
+    var open=CS().opps.filter(function(o){return !FINISHED[o.stage];});
+    if(open.length){var sel=select([["","Use it for an application…"]].concat(open.map(function(o){return [o.id,(o.title||"Untitled")+(o.org?", "+o.org:"")+(o.tpl===t.id?" (uses it)":"")];})),"");sel.className="c-sel";sel.setAttribute("aria-label","Use this template for one of your applications");
+      sel.addEventListener("change",function(){var o=oppById(sel.value);if(!o)return;o.tpl=t.id;S.ui.room="apps";S.ui.open=o.id;o.step="send";o.sv={kind:"cv"};show("work");save();render();say((o.title||"This application")+" now follows the template for "+t.role+": its CV, letter and portfolio take its shape.");});
+      R.foot.appendChild(sel);}
+    else R.foot.appendChild(h("span","c-note",esc("Bring a posting, and this template can shape its CV and letter.")));
+    R.foot.appendChild(h("span","c-grow"));var i0=T.list.indexOf(t);if(i0<T.list.length-1){var nx=T.list[i0+1];R.foot.appendChild(cbtn("","Next: "+nx.role+" ›",function(){S.ui.tpl=nx.id;save();render();}));}}
+  two(L,R,par);}
 
 /* ---------------- from Lector: a CV or a cover letter needs no apps (her request) ---------------- */
 function fromLector(B){meFirst();var kinds=Object.keys(B&&B.docs||{}).filter(function(k){return B.docs[k];}),want=kinds.filter(function(k){return k==="cv"||k==="cover";});if(!want.length)return false;

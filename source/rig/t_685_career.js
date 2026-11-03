@@ -47,7 +47,8 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
       if (!k) return null; const r = k.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, [text, within || null]);
     if (!bb) throw new Error('no key: ' + text); await p.mouse.click(bb[0], bb[1]); await p.waitForTimeout(400); };
   const idle = () => p.waitForFunction(() => !IngCareer.run.busy, null, { timeout: 60000 });
-  const still = () => p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); return (se.scrollHeight - se.clientHeight) + (m ? m.scrollHeight - m.clientHeight : 0); });
+  /* 6.10.2: the page may scroll a little below the room, to the colophon; what must hold is that nothing moves when a card opens */
+  const still = () => p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); return (se.scrollTop) + (m ? m.scrollTop : 0); });
   // 6.8.12: each task has its way; these checks are of Do it for me
   await p.evaluate(() => { IngCareer.state().ui.way = 'auto'; go('career'); }); await p.waitForTimeout(900);
 

@@ -92,7 +92,7 @@ function syncActive(){try{var dock=document.querySelector(".dock");if(!dock)retu
   [].forEach.call(dock.querySelectorAll(".nav-btn"),function(b){var me=b.getAttribute("data-page")===w;b.classList.toggle("active",me);b.classList.toggle("ing-open",me);});
   if(!deskWatched){var d=document.getElementById("ing-desk");if(d){deskWatched=true;new MutationObserver(syncActive).observe(d,{attributes:true,subtree:true,attributeFilter:["class"]});}}}catch(e){}}
 try{new MutationObserver(syncActive).observe(document.body,{attributes:true,attributeFilter:["class"]});}catch(e){}
-window.IngStones={dress:dress,image:stoneImage,apps:APPS.slice(),sync:syncActive};
+window.IngStones={dress:dress,image:stoneImage,apps:APPS.slice(),sync:syncActive,sym:SYM};   /* sym: 6.10.2, Home wears the same marks (r211) */
 })();
 ;try{window.__ingParts["p193"]="running";}catch(_){}
 </script>

@@ -240,9 +240,9 @@ async function pixel(p, dataUrl, vb, pts) {
   const w6 = await measure();
   ok(w6.zoom >= 1 && w6.zoom < 1.3 && w6.paper <= w6.desk + 2 && w6.over <= 1, 'at 1440 by 900 the page fits its panel at its own size or a little larger', w6);
   await p.screenshot({ path: path.join(OUT, 's61-1440-fit.png') });
-  const lay = await p.evaluate(() => ({ pageScroll: document.scrollingElement.scrollHeight - innerHeight, shown: ['l7Brief', 'l7Read', 'l7Doc'].filter(id => getComputedStyle(document.getElementById(id)).display !== 'none').length, one: document.getElementById('lx7').classList.contains('l-one'),
+  const lay = await p.evaluate(() => ({ pageScroll: document.scrollingElement.scrollHeight - innerHeight, col: (() => { const c = document.getElementById('ingColophon'); return c && c.getAttribute('data-on') === '1' ? Math.round(c.getBoundingClientRect().top) : 99999; })(), vh: innerHeight, shown: ['l7Brief', 'l7Read', 'l7Doc'].filter(id => getComputedStyle(document.getElementById(id)).display !== 'none').length, one: document.getElementById('lx7').classList.contains('l-one'),
     keysOnRow: (() => { const z = document.getElementById('l7Zoom').getBoundingClientRect(), d = document.getElementById('l7Doc').getBoundingClientRect(); return z.right <= d.right + 1 && z.left >= d.left - 1; })() }));
-  ok(lay.pageScroll <= 1 && lay.shown === 3 && !lay.one && lay.keysOnRow, 'at 1440 by 900 the three panels stand side by side, the page itself does not scroll, and the size keys sit inside the document panel', lay);
+  ok(lay.pageScroll < 420 && lay.col >= lay.vh - 2 && lay.shown === 3 && !lay.one && lay.keysOnRow, 'at 1440 by 900 the three panels stand side by side, the page itself does not scroll, and the size keys sit inside the document panel', lay);
   const sharp = await p.evaluate(() => { const pp = document.querySelector('#l7Desk .l-paper'); return getComputedStyle(pp).transform; });
   ok(sharp === 'none', 'the page is zoomed (laid out again), not scaled as a picture', sharp);
   const mineErrs = p.__errs.filter(e => mine(e, R));

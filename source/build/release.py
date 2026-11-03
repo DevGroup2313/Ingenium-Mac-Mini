@@ -104,7 +104,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_data_692", "_train_text_put", ("mini", "intel", "win")),
            ("app_lend_693", "_share_fit_ctx", ("mini", "intel", "win")),
            ("app_claude_610", "_claude_sessions", ("mini", "intel", "win")),
-           ("app_device_6101", "_device_unlock_info", ("mini", "intel", "win"))]
+           ("app_device_6101", "_device_unlock_info", ("mini", "intel", "win")),
+           ("app_parts_6102", "_gguf_parts_of", ("mini", "intel", "win"))]
 
 
 def desktop():

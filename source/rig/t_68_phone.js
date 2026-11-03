@@ -133,6 +133,8 @@ function sideCheck(tags) {
   return { safe: s, bad: bad.slice(0, 8) };
 }
 async function sideKeys(p, label, shot) {
+  /* Ingenium 6.10.2 (r211): on a phone the side keys start laid down; raise them, as she would with one press */
+  await p.evaluate(() => { if (document.body.classList.contains('rail-collapsed')) document.getElementById('railChevron').click(); }); await p.waitForTimeout(300);
   for (const id of ['fabBell', 'fabQuiet', 'fabPark', 'fabTimer', 'fabNote']) {
     await p.evaluate(() => { window.scrollTo(0, 0); go('home'); }); await p.waitForTimeout(300);
     const before = new Set(await p.evaluate(floatingNow));

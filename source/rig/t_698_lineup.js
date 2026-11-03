@@ -37,8 +37,9 @@ const PICKS = {
   "mac-arm|36|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b","faber":"qwen3.6-35b-a3b"},
   "mac-arm|48|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
   "mac-arm|64|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "mac-arm|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "mac-arm|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
+  /* 6.10.2 (modules/r210.js): no ceiling at 64 GB; from 96 GB each house moves up (t_6102_large.js checks every band to 3 TB) */
+  "mac-arm|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "mac-arm|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "mac-arm|null|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|4|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|6|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"granite-4.2-3b"},
@@ -50,8 +51,8 @@ const PICKS = {
   "desktop|36|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b","faber":"qwen3.6-35b-a3b"},
   "desktop|48|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
   "desktop|64|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "desktop|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "desktop|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
+  "desktop|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "desktop|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "desktop|null|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|4|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|6|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"granite-4.2-3b"},
@@ -63,8 +64,8 @@ const PICKS = {
   "desktop|36|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
   "desktop|48|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
   "desktop|64|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
-  "desktop|96|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
-  "desktop|128|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
+  "desktop|96|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "desktop|128|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "desktop|null|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"}};
 const NEED = {"lfm2.5-1.2b-instruct":1.462,"lfm2.5-350m":0.939,"lfm2.5-1.2b-thinking":1.462,"lfm2.5-2.6b":2.447,"qwen3.5-2b":2.036,"qwen3.5-4b":3.559,"qwen3.5-9b":6.625,"mellum2-12b-thinking":9.119,"mellum2.1-12b-thinking":9.119,"gemma-4-12b":7.976,"gemma-4-26b-a4b":15.761,"gemma-4-e4b":6.077,"gemma-4-e2b":4.194,"lfm2.5-8b-a1b":6.078,"lfm2.5-24b-a2b":15.852,"granite-4.2-3b":3.041,"qwen3-coder-30b-a3b":20.056,"qwen2.5-coder-1.5b":1.865,"minicpm5-2b":2.329,"qwen3.8-27b":20.491,"qwen3.6-35b-a3b":23.788,"granite-4.2-8b":6.278,"gemma-4-31b":19.111,"granite-4.2-8b-compact":5.234,"qwen3.5-9b-compact":5.575,"qwen3.8-27b-best":30.528};
 // the repositories round 7 of the lineup workflow listed (R lines of round7.log), and the file of each quality that More models will take (F lines)
@@ -146,7 +147,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   // ---- 6. every model has size, SHA-256 and address; every list names models that exist; the table of qualities agrees ----
   const data = await p.evaluate(() => { const probs = [], M = ING_LINEUP.models, T = IngQuality.table, hex = /^[0-9a-f]{64}$/, n = Object.keys(M).length;
     const chk = (k, s, what) => { if (!s || typeof s.file !== 'string' || !/^[A-Za-z0-9._-]+\.gguf$/.test(s.file)) probs.push([what, k, 'file']); if (!(Number.isInteger(s.size) && s.size > 1e8)) probs.push([what, k, 'size']);
-      if (!hex.test(s.sha256 || '')) probs.push([what, k, 'sha256']); if (!/^https:\/\/huggingface\.co\/[^/]+\/[^/]+\/resolve\/main\/[^/]+\.gguf$/.test(s.url || '') || !String(s.url).endsWith('/' + s.file)) probs.push([what, k, 'url']); };
+      if (!hex.test(s.sha256 || '')) probs.push([what, k, 'sha256']); if (!/^https:\/\/huggingface\.co\/[^/]+\/[^/]+\/resolve\/main\/([^/]+\/)?[^/]+\.gguf$/.test(s.url || '') || !String(s.url).endsWith('/' + s.file)) probs.push([what, k, 'url']); };
     for (const k in M) { const s = M[k]; chk(k, s, 'model'); ['name', 'maker', 'page', 'licence', 'licenceUrl'].forEach(f => { if (!s[f] || typeof s[f] !== 'string') probs.push(['model', k, f]); });
       if (!(s.params > 0)) probs.push(['model', k, 'params']); if (typeof s.thinks !== 'boolean') probs.push(['model', k, 'thinks']); if (!s.why || s.why.length < 60) probs.push(['model', k, 'why']);
       const a = lineupArgs(k); if (a.url !== s.url || a.sha256 !== s.sha256 || a.size !== s.size || a.file !== s.file) probs.push(['model', k, 'lineupArgs']); }
@@ -156,7 +157,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
     for (const dv in ING_LINEUP.devices) { const d = ING_LINEUP.devices[dv]; for (const t in d.tiers) [].concat(d.tiers[t]).forEach(k => { if (!M[k]) probs.push(['list', dv + ' ' + t, k]); });
       for (const t in (d.cpuOnly || {})) [].concat(d.cpuOnly[t]).forEach(k => { if (!M[k]) probs.push(['cpuOnly', dv + ' ' + t, k]); }); }
     return { n, nq: Object.keys(T).length, probs, keys: Object.keys(M) }; });
-  ok(data.n === 26 && data.probs.length === 0, data.n + ' models in the lineup (18 before, 5 new, 3 copies) and ' + data.nq + ' with a table of qualities: each has a file, a size, a SHA-256 and a Hugging Face address that ends in its file; every house list names a model that exists', data.probs.slice(0, 5));
+  ok(data.n === 43 && data.probs.length === 0, data.n + ' models in the lineup (18 before, 5 new, 3 copies; since 6.10.2 seventeen more for larger computers, whose files may sit in a folder of their repository) and ' + data.nq + ' with a table of qualities: each has a file, a size, a SHA-256 and a Hugging Face address that ends in its file; every house list names a model that exists', data.probs.slice(0, 5));
   ok(['minicpm5-2b', 'qwen3.8-27b', 'qwen3.6-35b-a3b', 'gemma-4-31b', 'granite-4.2-8b', 'granite-4.2-8b-compact', 'qwen3.5-9b-compact', 'qwen3.8-27b-best'].every(k => data.keys.includes(k)), 'the new models and their copies are there', data.keys);
   const flags = await p.evaluate(() => { const M = ING_LINEUP.models, T = IngQuality.table; return { think: ['minicpm5-2b', 'qwen3.8-27b', 'qwen3.6-35b-a3b', 'gemma-4-31b', 'granite-4.2-8b', 'granite-4.2-3b'].map(k => M[k].thinks),
       compact: ['qwen3.5-9b', 'granite-4.2-8b'].map(k => !!(T[k] && T[k].Q3_K_M)), best: !!T['qwen3.8-27b'].Q8_0, noLector: !JSON.stringify(M).includes('Lector') }; });
@@ -225,7 +226,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   const l16 = await lend('mac-arm', 16), l16w = await lend('desktop', 16), l64 = await lend('mac-arm', 64), l8 = await lend('mac-arm', 8), lph = await lend('ios', 8);
   const plain = s => s && /^(Scriba|Magister|Faber) cannot get stronger on this computer: its memory is the limit\. A computer with more memory can lend a stronger model over your home Wi-Fi: Settings, Your models on every device\.$/.test(s);
   ok(['scriba', 'magister', 'faber'].every(t => plain(l16[t]) && plain(l16w[t])) && l16.velox === null, 'a 16 GB Mac and a 16 GB Windows laptop: Scriba, Magister and Faber each say in one plain line that they cannot get stronger for lack of memory, and where a larger computer\'s models can be borrowed', [l16, l16w]);
-  ok(['scriba', 'magister', 'faber'].every(t => l64[t] === null) && ['scriba', 'magister', 'faber'].every(t => plain(l8[t])) && Object.values(lph).every(v => v === null), 'no line on a Mac with 64 GB (nothing stronger is left out); a line for each house on an 8 GB computer; none on a phone (its note speaks of lending already)', [l64, l8, lph]);
+  ok(['scriba', 'magister', 'faber'].every(t => plain(l64[t])) && ['scriba', 'magister', 'faber'].every(t => plain(l8[t])) && Object.values(lph).every(v => v === null), 'since 6.10.2 a Mac with 64 GB is no longer the top: each house says a computer with more memory has a stronger model (as on an 8 GB computer); none on a phone (its note speaks of lending already)', [l64, l8, lph]);
   await p.screenshot({ path: OUT + '/lineup_16gb.png' }).catch(() => {});
   ok(await p.evaluate(() => Object.values(window.__ingParts || {}).every(v => v === 'running') && window.__ingParts.p203 === 'running'), 'every part of the page ran to its end, r203 too');
   ok(errs.length === 0, 'no script errors on the page', errs);
