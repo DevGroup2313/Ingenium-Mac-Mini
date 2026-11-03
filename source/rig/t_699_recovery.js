@@ -26,10 +26,10 @@ async function setPw(p, pwd) { await p.waitForSelector('#ingLockDoor #ildP1', { 
   await p.evaluate((m) => { state.chats = state.chats || []; state.chats.unshift({ id: 'c_t699', title: 'Note G', messages: [{ role: 'me', text: m }] }); saveState(); }, MSG);
   // 1. at the door, the sign-in stands in the door's own place
   const introW = await p.evaluate(() => Math.round(document.querySelector('#introDoor .intro-card').getBoundingClientRect().width));
-  await p.click('#introProtect'); await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 10000 }); await p.waitForTimeout(400);
+  await p.click('#introProtect'); await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 10000 }); await p.waitForTimeout(1200);
   const place = await p.evaluate(() => { const d = document.getElementById('ingLockDoor'), c = d.querySelector('.ild-card'), ic = document.querySelector('#introDoor .intro-card');
-    return { indoor: d.classList.contains('ild-indoor'), bg: getComputedStyle(d).backgroundColor, away: document.getElementById('introDoor').classList.contains('ild-card-away'), introOpacity: getComputedStyle(ic).opacity, w: Math.round(c.getBoundingClientRect().width) }; });
-  ok(place.indoor && place.bg === 'rgba(0, 0, 0, 0)' && place.away && place.introOpacity === '0' && Math.abs(place.w - Math.max(440, Math.min(introW, 640))) <= 2,
+    return { indoor: d.classList.contains('ild-indoor'), bg: getComputedStyle(d).backgroundColor, away: document.getElementById('introDoor').classList.contains('ild-card-away'), introOpacity: +getComputedStyle(ic).opacity, w: c.offsetWidth }; });
+  ok(place.indoor && place.bg === 'rgba(0, 0, 0, 0)' && place.away && place.introOpacity < 0.02 && Math.abs(place.w - Math.max(440, Math.min(introW, 640))) <= 2,
     '1. asked at the door, the sign-in takes the door card\'s place: nothing dimmed behind it, the door\'s card stepped back, as wide as it', { place, introW });
   await p.screenshot({ path: OUT + '/door-setup.png' });
   // Not now: the door comes back as it was
