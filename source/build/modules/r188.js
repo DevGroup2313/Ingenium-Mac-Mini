@@ -710,6 +710,76 @@ function addCv(){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",false,function(f
 function addDocs(){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",true,function(fs){var P=CS().profile,q=Promise.resolve(),n=0;
   fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){if(t.length<40)return;var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){P.files.push({id:uid("f"),name:f.name,ref:ref,chars:t.length,at:Date.now(),use:true});n++;});},function(e){say(f.name+" could not be read: "+(e&&e.message||e));});});});
   q.then(function(){if(n){P.at=Date.now();save();render();say(n+" document"+(n>1?"s are":" is")+" kept in your profile.");}});});}
+/* 6.9.6 · a profile in one file. Her words (3 November 2026): "I don't want to have to input my information for my profile from
+   scratch on my master version, its really tedious to have to go through it all again", and "I want that to be replicable for a
+   second user profile and so forth". A profile file (.json, kind "ingenium-profile", v 1) holds a person's entries (in the studio's
+   sections), documents (their text) and CV. It is made on a device ("Save this profile as a file") or by hand from a person's own
+   documents, kept by its owner, and never sent anywhere by Ingenium. Brought in, it fills this profile, or a new one: entries and
+   documents already there are left as they are and not doubled, and the CV becomes Lector's when none is kept yet. */
+function packNorm(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
+function packKey(it){return (it.sec||"other")+"|"+packNorm(it.title)+"|"+packNorm(it.place);}
+function packEmpty(){var P=CS().profile,M=lectorMe();return !P.items.length&&!P.files.length&&!(M&&M.cv);}
+function packRead(t){var d;try{d=JSON.parse(String(t||"").replace(/^﻿/,""));}catch(e){throw new Error("it could not be read as a profile file");}
+  if(!d||d.kind!=="ingenium-profile"||!(+d.v>=1))throw new Error("it is not an Ingenium profile file");
+  if(+d.v>1)throw new Error("it was made by a newer Ingenium: update this one first");
+  d.person=d.person&&typeof d.person==="object"?d.person:{};
+  d.items=Array.isArray(d.items)?d.items.filter(function(x){return x&&typeof x.title==="string"&&x.title.trim();}):[];
+  d.files=Array.isArray(d.files)?d.files.filter(function(x){return x&&typeof x.name==="string"&&typeof x.text==="string";}):[];
+  if(d.cv&&!(typeof d.cv.text==="string"&&d.cv.text.trim().length>=80))d.cv=null;return d;}
+function packSecs(){var o={};SECTS.forEach(function(x){o[x[0]]=x[1];});return o;}
+function packTally(d){var L=packSecs(),n={};d.items.forEach(function(x){var k=L[x.sec]?x.sec:"other";n[k]=(n[k]||0)+1;});
+  return SECTS.filter(function(x){return n[x[0]];}).map(function(x){return n[x[0]]+" "+x[1];}).join(", ");}
+function packApply(d){var P=CS().profile,M=lectorMe(),L=packSecs(),got={items:0,files:0,cv:false,same:0,keptCv:false};
+  if(!String(P.name||"").trim()&&d.person.name)P.name=String(d.person.name).trim().slice(0,120);
+  if(!String(P.contact||"").trim()&&d.person.contact)P.contact=String(d.person.contact).trim().slice(0,400);
+  if(d.person.spelling==="american"||d.person.spelling==="british")P.prefs.spelling=d.person.spelling;
+  var have={};P.items.forEach(function(it){have[packKey(it)]=1;});
+  d.items.forEach(function(x){var it={id:uid("it"),sec:L[x.sec]?x.sec:"other",title:String(x.title).trim().slice(0,300),place:String(x.place||"").trim().slice(0,300),
+      from:String(x.from||"").trim().slice(0,40),to:String(x.to||"").trim().slice(0,40),text:String(x.text||"").trim().slice(0,8000),src:"file",note:String(x.note||"").trim().slice(0,200),at:Date.now()};
+    var k=packKey(it);if(have[k]){got.same++;return;}have[k]=1;P.items.push(it);got.items++;});
+  var names={};P.files.forEach(function(f){names[packNorm(f.name)]=1;});
+  var q=Promise.resolve();
+  d.files.forEach(function(x){q=q.then(function(){var t=x.text.trim();if(t.length<40)return;if(names[packNorm(x.name)]){got.same++;return;}names[packNorm(x.name)]=1;var ref=IngBig.newId();
+    return Promise.resolve(IngBig.put(ref,t)).then(function(){P.files.push({id:uid("f"),name:x.name.trim().slice(0,200),ref:ref,chars:t.length,at:Date.now(),use:true,kind:String(x.kind||"").slice(0,20)});got.files++;});});});
+  if(d.cv)q=q.then(function(){if(M.cv){got.keptCv=true;return;}var t=d.cv.text.trim(),ref=IngBig.newId();
+    return Promise.resolve(IngBig.put(ref,t)).then(function(){M.cv={ref:ref,name:String(d.cv.name||"CV").slice(0,200),chars:t.length,at:Date.now()};got.cv=true;});});
+  return q.then(function(){P.at=Date.now();save();return got;});}
+function packSay(d,got){var me=CS().profile.isMe!==false,bits=[];
+  if(got.items)bits.push(got.items+" entr"+(got.items===1?"y":"ies"));if(got.files)bits.push(got.files+" document"+(got.files===1?"":"s"));
+  if(got.cv)bits.push(me?"your CV, which Lector now uses too":"the CV");
+  var t=bits.length?"Brought in: "+bits.join(", ")+".":"Nothing new: everything in the file is already here.";
+  if(got.same&&bits.length)t+=" "+got.same+" already here "+(got.same===1?"was":"were")+" left as "+(got.same===1?"it was":"they were")+".";
+  if(got.keptCv)t+=" "+(me?"Your CV was already kept, so it stays; the file's CV is among the documents if it was in them.":"The CV kept here stays.");
+  say(t+(bits.length?" Look them over in Your entries: change or remove anything.":""));}
+/* the file is read, and what it holds is said before anything changes: into this profile, or a new one when this one is not empty */
+function packOpen(d){var empty0=packEmpty(),who=String(d.person.name||"").trim()||"this person",n=d.items.length,f=d.files.length;
+  var html='<h3>Bring in a profile</h3><p class="small">The file is '+esc(who)+"'s"+(d.made?" (made "+esc(String(d.made))+")":"")+'. It holds:</p><ul class="small">'
+    +'<li>'+n+' entr'+(n===1?'y':'ies')+(n?': '+esc(packTally(d)):'')+'</li><li>'+f+' document'+(f===1?'':'s')+'</li>'+(d.cv?'<li>a CV: '+esc(String(d.cv.name||'CV'))+'</li>':'')+'</ul>'
+    +'<p class="small muted">Nothing already in a profile is changed, and nothing is added twice. It stays on this device: Ingenium sends it nowhere.</p>'
+    +'<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px"><button class="btn ghost" id="pkCancel">Cancel</button>'
+    +(empty0?'':'<button class="btn" id="pkNew">Make it a new profile</button>')
+    +'<button class="btn primary" id="pkHere">'+(empty0?'Bring it in':'Add it to '+esc(personLabel(CS())))+'</button></div>';
+  var box=modalOpen(html),busy=false;
+  function go(asNew){if(busy)return;busy=true;closeModal();
+    var p=asNew?newPerson("other",who,""):Promise.resolve(null);   /* a new profile is a person of its own, beside hers */
+    p.then(function(){return packApply(d);}).then(function(got){render();packSay(d,got);},function(e){say("It could not be brought in: "+(e&&e.message||e));});}
+  box.querySelector("#pkCancel").onclick=closeModal;box.querySelector("#pkHere").onclick=function(){go(false);};
+  var nk=box.querySelector("#pkNew");if(nk)nk.onclick=function(){go(true);};}
+function packPick(){pickFile(".json,application/json",false,function(fs){Promise.resolve(readAsText(fs[0])).then(function(t){packOpen(packRead(t));}).then(null,function(e){say(fs[0].name+": "+(e&&e.message||e)+".");});});}
+/* this profile, saved as one file: for another device, for safe keeping, or to begin someone else's */
+function packMake(){var S=CS(),P=S.profile,M=lectorMe();
+  var d={kind:"ingenium-profile",v:1,made:dayStr(Date.now()),about:"A profile from Ingenium's Career Studio: entries, documents and CV. It is its owner's, and Ingenium sends it nowhere.",
+    person:{name:personName(S),contact:P.contact||"",isMe:P.isMe!==false,spelling:(P.prefs&&P.prefs.spelling)||"british"},
+    items:P.items.map(function(it){return {sec:it.sec,title:it.title,place:it.place||"",from:it.from||"",to:it.to||"",text:it.text||"",note:it.note||""};}),files:[]};
+  var q=P.files.reduce(function(q0,f){return q0.then(function(){return loadText(f.ref).then(function(t){if(t)d.files.push({name:f.name,kind:f.kind||"",text:t});});});},Promise.resolve());
+  if(M&&M.cv&&M.cv.ref)q=q.then(function(){return loadText(M.cv.ref).then(function(t){if(t)d.cv={name:M.cv.name,text:t};});});
+  return q.then(function(){return d;});}
+function packSave(){if(typeof saveFileNative!=="function"){say("This copy of the page cannot save files.");return;}
+  packMake().then(function(d){var name=safeName(personLabel(CS())+" - profile")+".ingenium-profile.json";
+    return Promise.resolve(saveFileNative(name,"application/json",new TextEncoder().encode(JSON.stringify(d,null,1)))).then(function(){
+      say("Saved as "+name+": "+d.items.length+" entr"+(d.items.length===1?"y":"ies")+", "+d.files.length+" document"+(d.files.length===1?"":"s")+(d.cv?" and the CV":"")+". Keep it somewhere safe: it is yours, and Ingenium sends it nowhere.");});})
+  .then(null,function(e){say("It could not be saved: "+(e&&e.message||e));});}
+W.IngProfileFile={read:packRead,apply:packApply,make:packMake,open:packOpen};   /* for the tests */
 /* LinkedIn's export: a .zip of .csv files (or the .csv files themselves). Their columns are read by name, loosely, so a
    column renamed or moved is still found; a file that is not recognised is kept as a document of the profile instead. */
 function csvRows(t){var rows=[],row=[],f="",q=false;t=String(t).replace(/^\uFEFF/,"");
@@ -1424,6 +1494,8 @@ function profSources(){var S=CS(),P=S.profile,M=lectorMe(),R=panel("csWork","Wha
   var me=P.isMe!==false;
   src("Your CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+(me?". Lector uses the same one.":". Kept in this profile only."):(me?"Not added yet. Lector and the studio share it.":"Not added yet. Kept in this profile only."),P.use.cv,function(v){P.use.cv=v;},
     [cbtn("sm",M.cv?"Replace":me?"Add your CV":"Add their CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){if(!confirm(me?"Remove your CV from Lector and the studio?":"Remove this CV from this profile?"))return;try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();})]:[]));
+  src("A profile file","Your entries, documents and CV in one file: bring one in, or keep a copy for another device or to begin someone else's. It stays with you: Ingenium sends it nowhere.",null,null,
+    [cbtn("sm","Bring in a profile file",packPick),cbtn("sm quiet","Save this profile as a file",packSave)]);
   var LK=P.linkedin;
   src("Your LinkedIn export",LK?(LK.files?liStatus(LK):LK.n+" entr"+(LK.n===1?"y":"ies")+" from it, "+dayStr(LK.at)+"."):"The .zip LinkedIn sends when you ask for a copy of your data, or its .csv files. Imported again later, only what is new, changed or gone is shown to you; your own changes are never touched.",P.use.linkedin,function(v){P.use.linkedin=v;},
     [cbtn("sm",LK?"Import it again":"Add the export",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});})]);
@@ -1449,7 +1521,8 @@ function profEntries(){var S=CS(),P=S.profile,R=panel("csWork","Your entries");
   var have=SECTS.filter(function(s){return P.items.some(function(it){return it.sec===s[0];});}),fl=have.some(function(s){return s[0]===S.ui.efilter;})?S.ui.efilter:"all";
   if(P.items.length){var bar=h("div","c-filter c-pad");[["all","All ("+P.items.length+")"]].concat(have.map(function(s){return [s[0],s[1].replace(/, with evidence$/,"")+" ("+P.items.filter(function(it){return it.sec===s[0];}).length+")"];})).forEach(function(x){
       var b=h("button","c-pill");b.type="button";b.textContent=x[1];b.setAttribute("aria-pressed",x[0]===fl?"true":"false");b.addEventListener("click",function(){S.ui.efilter=x[0];save();render();});bar.appendChild(b);});R.body.appendChild(bar);}
-  else R.body.appendChild(empty("No entries yet","Add them one by one, take them from your LinkedIn export (What the studio may use), or let the studio suggest them from your CV and documents, for you to keep or drop."));
+  else{R.body.appendChild(empty("No entries yet","Bring in a profile file, add them one by one, take them from your LinkedIn export (What the studio may use), or let the studio suggest them from your CV and documents, for you to keep or drop."));
+    var pk=h("div","c-keys c-pad");pk.appendChild(cbtn("pri","Bring in a profile file",packPick));R.body.appendChild(pk);}
   var grid=h("div","c-entries");P.items.filter(function(it){return fl==="all"||it.sec===fl;}).forEach(function(it){var c=h("div","c-entry");
     c.appendChild(h("span","c-sec",esc((SECTS.filter(function(x){return x[0]===it.sec;})[0]||["",""])[1].replace(/, with evidence$/,""))));c.appendChild(h("b",null,esc(it.title)));
     var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to "),it.src==="linkedin"?"from LinkedIn":""].filter(Boolean).join(" · ");if(meta)c.appendChild(h("small",null,esc(meta)));
