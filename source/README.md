@@ -371,6 +371,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.5 (4 November 2026): a newer engine beside the proven one, on a Mac. Her words: "I don't want to lose my reliable llama
+cpp engine, I want the option of a newer engine where it tested and proven to work and work well but I still want the llama engine
+kept optional or in some cases as a backup or default, depending on what works best. I want you to help me weight it out and decide".
+
+- The decision, as put to her: the proven engine (llama.cpp b11321) stays the default; a newer llama.cpp (b12000, 29 October 2026,
+  the first release that loads LFM3, DeepSeek V4.1 and Mistral Large 4) goes beside it, never instead of it.
+- The Mac builds compile it as they compile the proven one (its commit checked), keep it in the app only when the app's own self-test
+  answers with it, and set its speed beside the proven engine's in the build's summary. A failed compile or self-test leaves the app
+  with the proven engine alone. Each engine carries the list of kinds of model it can load (ARCHS.txt, from its src/llama-arch.cpp).
+- The computer app (desktop/app_engine2_6105.py) reads each model's kind from its file and chooses: automatic (the default) runs every
+  model on the proven engine except a kind only the newer engine can load; "the newer engine where it can"; or "the proven engine
+  only". If the newer engine cannot load a model, the proven engine loads it at once and keeps it for the session.
+- The Models page's Engine room (modules/r214.js) shows both engines, what only the newer one can load, which engine runs the model
+  now, and the three choices.
+- Windows carries the same choice; its builds will carry the newer engine once its installer is made to take it out again when its
+  self-test fails (next). The phone and tablet apps keep the proven engine.
+
+    python3 -I rig/t_6105_engine.py             # 16 checks: the choice per kind, the fall back, the self-test, the patch
+    node rig/t_6105_engine_page.js <url> <out>  # 8 checks: the Engine room's card, with a stand-in computer app
+
 Ingenium 6.10.4 (3 November 2026): the Career Studio's scroll bars hidden; the Build page's code scrolls again. Her words: "I want
 you to hide the scroll bar inside of the Learn panel of the Career studio page, it detracts from the rest of the app. I want
 everything to remain consistent. I only want the scroll bar hidden from view, I want to keep the scrollability of the page intact. I

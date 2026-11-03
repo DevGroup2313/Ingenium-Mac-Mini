@@ -27,8 +27,9 @@ set -euo pipefail
 OUT="$1"
 MODE="${2:-native}"
 WORK="${3:-${TMPDIR:-/tmp}/ingenium-engine-build}"
-TAG="b11321"
-COMMIT="b0aca3c"
+# 6.10.5: the newer engine is built by the same script, its release and commit given by the cloud build
+TAG="${ING_ENGINE_TAG:-b11321}"
+COMMIT="${ING_ENGINE_COMMIT:-b0aca3c}"
 mkdir -p "$WORK" "$OUT"
 OUT="$(cd "$OUT" && pwd)"
 SRC="$WORK/llama.cpp-$TAG"
@@ -105,6 +106,9 @@ case "$MODE" in
     build portable llama-server -DGGML_NATIVE=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=13.3 ;;
 esac
 echo "llama.cpp $TAG" > "$OUT/VERSION.txt"
+# 6.10.5: the kinds of model this engine can load (its src/llama-arch.cpp), for the app's choice between two engines
+grep -oE '\{ *LLM_ARCH_[A-Z0-9_]+ *, *"[^"]+" *\}' "$SRC/src/llama-arch.cpp" | sed -E 's/.*"([^"]+)".*/\1/' | grep -v '^(unknown)$' | tr '\n' ' ' > "$OUT/ARCHS.txt" || true
+echo "  model kinds it lists: $(wc -w < "$OUT/ARCHS.txt" | tr -d ' ')"
 cp "$SRC/LICENSE" "$OUT/LICENSE-llama.cpp.txt"
 "$OUT/llama-server" --version 2>&1 | tail -2
 echo "Engine ready in $OUT"

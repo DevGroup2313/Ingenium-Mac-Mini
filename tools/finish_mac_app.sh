@@ -25,9 +25,22 @@ for f in llama-server llama-finetune; do   # R78: the trainer, when it was compi
     codesign --force --sign - --timestamp=none "$APP/Contents/MacOS/engine/$PLAT/$f"
   fi
 done
-for f in VERSION.txt LICENSE-llama.cpp.txt; do
+for f in VERSION.txt LICENSE-llama.cpp.txt ARCHS.txt; do   # 6.10.5: and the kinds of model it lists
   [ -f "$ENG/$f" ] && cp "$ENG/$f" "$APP/Contents/Resources/engine/$PLAT/$f"
 done
+# 6.10.5: a newer engine beside the proven one, when the build has one (ENGINE_NEXT names its folder); the cloud build keeps it
+# in the app only when the app's own self-test answers with it
+rm -rf "$APP/Contents/MacOS/engine-next" "$APP/Contents/Resources/engine-next"
+if [ -n "${ENGINE_NEXT:-}" ] && [ -f "$ENGINE_NEXT/llama-server" ]; then
+  mkdir -p "$APP/Contents/MacOS/engine-next/$PLAT" "$APP/Contents/Resources/engine-next/$PLAT"
+  cp "$ENGINE_NEXT/llama-server" "$APP/Contents/MacOS/engine-next/$PLAT/llama-server"
+  chmod 755 "$APP/Contents/MacOS/engine-next/$PLAT/llama-server"
+  codesign --force --sign - --timestamp=none "$APP/Contents/MacOS/engine-next/$PLAT/llama-server"
+  for f in VERSION.txt LICENSE-llama.cpp.txt ARCHS.txt; do
+    [ -f "$ENGINE_NEXT/$f" ] && cp "$ENGINE_NEXT/$f" "$APP/Contents/Resources/engine-next/$PLAT/$f"
+  done
+  echo "Newer engine: $(cat "$ENGINE_NEXT/VERSION.txt" 2>/dev/null || echo llama.cpp), beside the proven one."
+fi
 if [ -n "$MOD" ] && [ -f "$MOD/builtin.json" ]; then
   mkdir -p "$APP/Contents/Resources/models"
   cp "$MOD"/* "$APP/Contents/Resources/models/"

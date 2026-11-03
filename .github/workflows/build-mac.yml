@@ -110,6 +110,39 @@ jobs:
           cp engine-trainer/${{ matrix.plat }}/llama-finetune engine/${{ matrix.plat }}/llama-finetune
           chmod 755 engine/${{ matrix.plat }}/llama-finetune
 
+      # 6.10.5: the kinds of model each engine lists (its src/llama-arch.cpp), for the app's choice between two engines; the proven
+      # engine's cached build predates the list, so it is read from the same release's source
+      - name: The proven engine's list of model kinds
+        run: |
+          E=engine/${{ matrix.plat }}
+          if [ ! -s "$E/ARCHS.txt" ]; then
+            curl -fsSL --retry 4 "https://raw.githubusercontent.com/ggml-org/llama.cpp/b11321/src/llama-arch.cpp" \
+              | grep -oE '\{ *LLM_ARCH_[A-Z0-9_]+ *, *"[^"]+" *\}' | sed -E 's/.*"([^"]+)".*/\1/' | grep -v '^(unknown)$' | tr '\n' ' ' > "$E/ARCHS.txt"
+          fi
+          echo "Proven engine: $(cat "$E/VERSION.txt"), $(wc -w < "$E/ARCHS.txt" | tr -d ' ') model kinds"
+
+      # 6.10.5, her words: "I want the option of a newer engine where it tested and proven to work and work well but I still want the
+      # llama engine kept optional or in some cases as a backup or default". A newer llama.cpp (b12000, 29 October 2026), compiled as
+      # the proven one is; it goes into the app only if the app's own self-test answers with it (below), and a failed compile
+      # leaves the app with the proven engine alone
+      - name: The newer engine, from the build cache when it was compiled before
+        id: engine_next
+        uses: actions/cache@v5
+        with:
+          path: engine-next/${{ matrix.plat }}
+          key: engine-next-${{ matrix.plat }}-b12000-portable-v1
+
+      - name: Compile the newer engine (llama.cpp b12000; only when not cached)
+        if: steps.engine_next.outputs.cache-hit != 'true'
+        continue-on-error: true
+        env:
+          ING_ENGINE_TAG: b12000
+          ING_ENGINE_COMMIT: 68d20b8
+        run: |
+          command -v cmake || brew install cmake
+          bash tools/build_engine_mac.sh engine-next/${{ matrix.plat }} portable "$RUNNER_TEMP/engine-build-next" \
+            || { rm -rf engine-next/${{ matrix.plat }}; echo "::warning::the newer engine did not compile; the app carries the proven engine only"; exit 1; }
+
       - name: The built-in models, from the build cache when they were downloaded before
         uses: actions/cache@v5
         with:
@@ -155,7 +188,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.10.4.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.10.5.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -163,7 +196,8 @@ jobs:
 
       - name: Put the engine and the models inside, and seal the app
         run: |
-          bash tools/finish_mac_app.sh "dist/${APP_FILE}.app" engine/${{ matrix.plat }} "$RUNNER_TEMP/models"
+          ENGINE_NEXT="$( [ -f engine-next/${{ matrix.plat }}/llama-server ] && echo engine-next/${{ matrix.plat }} )" \
+            bash tools/finish_mac_app.sh "dist/${APP_FILE}.app" engine/${{ matrix.plat }} "$RUNNER_TEMP/models"
           # 6.10.1: the Touch ID helper (tools/IngeniumKey.swift), said in the summary
           if [ -x "dist/${APP_FILE}.app/Contents/MacOS/IngeniumKey" ]; then echo "* Touch ID helper: built; on this runner it answers $("dist/${APP_FILE}.app/Contents/MacOS/IngeniumKey" info || true)" >> "$GITHUB_STEP_SUMMARY"; else echo "* Touch ID helper: NOT built" >> "$GITHUB_STEP_SUMMARY"; fi
 
@@ -204,6 +238,41 @@ jobs:
           if r.get("error"): print("* Error: %s" % r["error"])
           PY
           if [ "$code" != 0 ]; then cat "$RUNNER_TEMP/selftest.json"; echo "::error::the app's engine did not answer correctly"; exit 1; fi
+
+      # 6.10.5: the same self-test on the newer engine; it stays in the app only when it answers, and the summary sets its speed
+      # beside the proven engine's on this machine
+      - name: Self-test of the newer engine (kept in the app only when it answers)
+        run: |
+          set +e
+          A="dist/${APP_FILE}.app"
+          if [ ! -x "$A/Contents/MacOS/engine-next/${{ matrix.plat }}/llama-server" ]; then
+            echo "### Newer engine: not in this build; the app carries the proven engine only" >> "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          WHICH=none; [ -f "$A/Contents/Resources/models/builtin.json" ] && WHICH=builtin
+          SPD=(); [ -f "$RUNNER_TEMP/speedup.gguf" ] && SPD=(--selftest-drafter "$RUNNER_TEMP/speedup.gguf")
+          "$A/Contents/MacOS/${APP_FILE}" --selftest-model "$WHICH" --selftest-out "$RUNNER_TEMP/selftest-next.json" --selftest-engine newer "${SPD[@]}"
+          code=$?
+          python3 - "$RUNNER_TEMP/selftest-next.json" "$RUNNER_TEMP/selftest.json" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json, os, sys
+          def load(p):
+              try: return json.load(open(p))
+              except Exception: return {}
+          n, o = load(sys.argv[1]), load(sys.argv[2])
+          ps = lambda r: (r.get("timings") or {}).get("predicted_per_second") or 0
+          print("### Mac (%s) newer engine self-test %s" % (os.environ.get("INGENIUM_CHIP", ""), "passed" if n.get("ok") else "FAILED"))
+          print("* Newer engine: %s; proven engine: %s" % ((n.get("engine") or {}).get("version"), (o.get("engine") or {}).get("version")))
+          print("* Reply: `%s` at %.1f tokens a second (the proven engine: %.1f on this machine)" % (n.get("reply"), ps(n), ps(o)))
+          sp = n.get("speedup") or {}
+          if sp: print("* Speed-up file on the newer engine: %s; %.1f tokens a second with it" % ("used" if sp.get("used") else "NOT used", ((sp.get("with") or {}).get("per_second") or 0)))
+          if n.get("error"): print("* Error: %s" % n["error"])
+          PY
+          if [ "$code" != 0 ]; then
+            cat "$RUNNER_TEMP/selftest-next.json" 2>/dev/null
+            echo "::warning::the newer engine did not answer correctly; it is taken out, and the app carries the proven engine only"
+            rm -rf "$A/Contents/MacOS/engine-next" "$A/Contents/Resources/engine-next"
+            codesign --force --sign - --timestamp=none "$A" && codesign --verify --deep --strict "$A" && echo "The app's seal is whole again."
+          fi
+          exit 0
 
       - name: Check the oldest macOS each program file in the app needs
         # R74: the release says "macOS 13.3 or newer"; this proves it file by file
