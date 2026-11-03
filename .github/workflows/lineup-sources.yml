@@ -18,4 +18,5 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Read the candidates from Hugging Face
-        run: python3 .github/lineup/hf_files.py .github/lineup/candidates.txt
+        # 6.10.2: only the newest round is read; candidates.txt keeps every round as a record
+        run: python3 .github/lineup/hf_files.py .github/lineup/candidates.txt "$(grep -o '^# round [^ ]*' .github/lineup/candidates.txt | tail -1 | cut -d' ' -f3)"
