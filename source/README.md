@@ -371,6 +371,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.4 (3 November 2026): the Career Studio's scroll bars hidden; the Build page's code scrolls again. Her words: "I want
+you to hide the scroll bar inside of the Learn panel of the Career studio page, it detracts from the rest of the app. I want
+everything to remain consistent. I only want the scroll bar hidden from view, I want to keep the scrollability of the page intact. I
+also want the scrolling ability of the Build page's 'Your code' panel restored, I don't want it to be stiff and unscrollable."
+
+- The Career Studio's panels (Learn and every other) scroll with no bar showing, as Lector's and Fabrica's do (modules/r213.js);
+  scrolling by wheel, trackpad and touch is as before.
+- Build: the code panel and the preview had no height of their own, so the code grew to its full length (300 lines, wrapped, stood
+  about 17,000 pixels tall) and only the page moved. Now both stand as tall as the window leaves them below the page's head (never
+  less than 480 pixels), the code scrolls inside its panel, and at its end the page carries on to its foot and the colophon. On a
+  phone the code panel stands at most about three quarters of the screen and scrolls inside.
+- A correction: the notes of 6.10.2 gave 26 templates; the page holds 25, in 8 fields.
+
+    node rig/t_6104_fixes.js <url> <out>        # 9 checks; on 6.10.3 the same test fails five of them
+
 Ingenium 6.10.3 (3 November 2026): more models for every device, and quicker replies. Her words: "I want better, stronger and
 faster models and more options for my fire tablet app and for the iphone and iPad apps. I want that for all of my devices, the Mac
 mini, the MacBook Pro, and the windows laptops as well."
@@ -405,7 +420,7 @@ and refine my portfolio for any job application ... phd application or fellowshi
   top, and fits the window (her earlier request, that the Career Studio not be endlessly scrolled, still holds: only its panels scroll
   through its work); a short scroll past the room shows the seal, Local model studio and the copyright. A panel scrolled to its end
   carries the scroll on to the page, as the Build page scrolls, instead of stopping there.
-- Templates (modules/r209.js; Learn, CV and letter templates): 26 roles in 8 fields (universities and research; education and learning
+- Templates (modules/r209.js; Learn, CV and letter templates): 25 roles in 8 fields (written as 26 when released; corrected in 6.10.4) (universities and research; education and learning
   design; technology, data and AI; digital humanities, libraries, archives and museums; public service, policy and charities; business,
   sales and operations; writing, publishing and communications; fellowships, grants and scholarships). Each says what its readers look
   for, the CV's sections in the order that serves it, the cover letter's moves, the length and form, what to avoid, and an example line
