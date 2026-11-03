@@ -371,6 +371,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.3 (3 November 2026): more models for every device, and quicker replies. Her words: "I want better, stronger and
+faster models and more options for my fire tablet app and for the iphone and iPad apps. I want that for all of my devices, the Mac
+mini, the MacBook Pro, and the windows laptops as well."
+
+- Further choices under each house (modules/r212.js), read from Hugging Face on the day: every file's name, size and SHA-256 as its
+  repository lists them, and each model's kind read from its own file (all kinds the engine of this release, llama.cpp b11321, lists).
+  MiniCPM5 1B (OpenBMB, Apache 2.0) for phones and tablets from 3 GB; Ministral 3 3B Instruct (Mistral AI, Apache 2.0) for every
+  device from 6 GB (phones) or 8 GB (computers); Nemotron 3.5 Bolt E4B (NVIDIA, October 2026, post-trained on Gemma 4 E4B; OpenMDW
+  1.1) for computers and iPads from 12 GB; Ministral 3 14B Reasoning (Mistral AI, Apache 2.0) for computers with 16 GB. They sit on a
+  list of their own (a device's "more"): each house's list is also the order in which it picks, so a model added there would quietly
+  replace today's pick on some memory sizes. Today's picks stay as they were, for every device and band (t_698_lineup.js): each
+  maker measures its model against different rivals, so none can be ranked above them on one scale. The Models page lists the
+  further choices under each house (Velox now has a list too), with what each needs; one press installs it, one press makes it the
+  house's model, and Back returns to Ingenium's own choice.
+- Quicker replies on a computer with a graphics chip: speed-up files for MiniCPM5 2B (OpenBMB's DSpark), LFM2.5 8B-A1B and 24B-A2B
+  (Liquid AI's DSpark), Qwen3.8 27B and its Best copy (DFlash, from llama.cpp's own publishers) and Nemotron 3.5 Bolt E4B (DFlash).
+  The engine reads each file's kind itself. As before (R73), a speed-up file is used only on a graphics chip; how much quicker it
+  makes a reply on her own computers was not measured here.
+- Each new model runs on its card's settings: MiniCPM5 1B 0.9 and 0.95 when it thinks, 0.7 when it answers at once; Ministral 3 3B
+  temperature 0.1; Ministral 3 14B Reasoning 1 and 0.95; Nemotron 3.5 Bolt E4B 1.0 and 0.95.
+
+    node rig/t_6103_more.js <url> <out>         # 12 checks: the further choices, choosing one, the speed-up files, the settings
+
 Ingenium 6.10.2 (3 November 2026): every page ends with the colophon; templates by field and role; the portfolio. Her words: "I want
 the app to be more scrollable on the Lector, Career Studio, and Fabrica pages, they feel stiff. I want to be able to scroll and see the
 Ingenium seal and copyrights declaration at the footer ... It's the same for both chat pages, I like how they look when I open their

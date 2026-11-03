@@ -145,8 +145,9 @@ ING_SAMPLING["qwen3.8"]={think:{temperature:1.0,top_p:0.95,top_k:20,min_p:0,pres
 /* ---------- 5. the Models page: the models of Scriba and Magister as options, and the plain line ---------- */
 function kind(){var d=lineupDevice();return d==="web"?"desktop":d;}
 function whose(){var d=kind();return d==="android"?"this tablet":d==="ios"?"this iPhone or iPad":"this computer";}
-function houseList(tier){var d=D[kind()],v=d&&d.tiers&&d.tiers[tier],seen={};
-  return (v?[].concat(v):[]).filter(function(k){if(seen[k]||!M[k])return false;seen[k]=1;return true;});}
+/* 6.10.3 (r212): a device's further choices (d.more) follow its own list: shown and chosen here, never the order a house picks in */
+function houseList(tier){var d=D[kind()],v=d&&d.tiers&&d.tiers[tier],more=d&&d.more&&d.more[tier],seen={};
+  return (v?[].concat(v):[]).concat(more||[]).filter(function(k){if(seen[k]||!M[k])return false;seen[k]=1;return true;});}
 function houseName(id){var t=tierSpec(id);return t?t.name:id;}
 function choose(tier,k){state.tierPick=state.tierPick||{};
   if(k===lineupKeyFor(tier)&&!state.tierPick[tier])return;
