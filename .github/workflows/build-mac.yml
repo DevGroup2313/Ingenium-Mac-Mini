@@ -162,7 +162,10 @@ jobs:
           INGENIUM_VERSION="$V" python3 -m PyInstaller --noconfirm --clean ingenium.spec
 
       - name: Put the engine and the models inside, and seal the app
-        run: bash tools/finish_mac_app.sh "dist/${APP_FILE}.app" engine/${{ matrix.plat }} "$RUNNER_TEMP/models"
+        run: |
+          bash tools/finish_mac_app.sh "dist/${APP_FILE}.app" engine/${{ matrix.plat }} "$RUNNER_TEMP/models"
+          # 6.10.1: the Touch ID helper (tools/IngeniumKey.swift), said in the summary
+          if [ -x "dist/${APP_FILE}.app/Contents/MacOS/IngeniumKey" ]; then echo "* Touch ID helper: built; on this runner it answers $("dist/${APP_FILE}.app/Contents/MacOS/IngeniumKey" info || true)" >> "$GITHUB_STEP_SUMMARY"; else echo "* Touch ID helper: NOT built" >> "$GITHUB_STEP_SUMMARY"; fi
 
       - name: Get Velox's speed-up file for the test (not carried in the app; checked by SHA-256)
         continue-on-error: true

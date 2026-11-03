@@ -35,6 +35,23 @@ if [ -n "$MOD" ] && [ -f "$MOD/builtin.json" ]; then
 else
   echo "No built-in model."
 fi
+# 6.10.1: the Mac's own sign-in as a way back into Ingenium (Touch ID, or the Mac's password): a small helper, compiled here from
+# tools/IngeniumKey.swift when this Mac has Swift (Xcode, or its command line tools); without it the app works as before, and the
+# page says that this copy cannot use Touch ID.
+KEYSRC="$(cd "$(dirname "$0")" && pwd)/IngeniumKey.swift"
+rm -f "$APP/Contents/MacOS/IngeniumKey"
+if [ -f "$KEYSRC" ] && command -v swiftc >/dev/null 2>&1; then
+  if swiftc -O -o "$APP/Contents/MacOS/IngeniumKey" "$KEYSRC"; then
+    chmod 755 "$APP/Contents/MacOS/IngeniumKey"
+    codesign --force --sign - --timestamp=none "$APP/Contents/MacOS/IngeniumKey"
+    echo "Touch ID helper: built ($("$APP/Contents/MacOS/IngeniumKey" info || true))."
+  else
+    rm -f "$APP/Contents/MacOS/IngeniumKey"
+    echo "Touch ID helper: NOT built (Swift could not compile it); the app works without it."
+  fi
+else
+  echo "Touch ID helper: not built (no Swift on this Mac); the app works without it."
+fi
 # the app's seal covers every file inside it, so it is made again last
 codesign --force --sign - --timestamp=none "$APP"
 codesign --verify --deep --strict "$APP" && echo "The app's seal is whole."
