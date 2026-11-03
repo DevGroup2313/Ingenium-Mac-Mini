@@ -16,8 +16,14 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 rgba(12,18,26,.55),0 3px 4px rgba(12,18,26,.4),0 7px 11px rgba(12,18,26,.28);
   transition:transform .09s cubic-bezier(.34,1.3,.64,1),box-shadow .09s ease,filter .12s ease}
 .dock .nav-btn.ing-stone svg{display:none}
-/* Scriba and Fontes carry their own mark before the name, as the Forge's stones do (its own drawings and colours) */
-.dock .nav-btn.ing-stone svg.ing-stone-sym{display:inline-block;width:12px;height:12px;flex:none;margin:0 5px 0 -2px}
+/* Scriba and Fontes carry their own mark before the name, as the Forge's stones do (its own drawings and colours).
+   6.9.7, her words (3 November 2026): "There is a huge gap between the apps names and their symbols for Scriba and Fontes ... I want
+   full parity with Carpe Diem's Magister dock buttons": the mark sat 14 pixels from the name (the dock's own 9-pixel gap and a 5-pixel
+   margin); Carpe Diem's keys (the Forge's .scriba-app-btn and .fontes-btn) put 4 pixels between them, with no margin, and give Scriba
+   12 pixels on its left */
+.dock .nav-btn.ing-stone{gap:4px}
+.dock .nav-btn.ing-stone svg.ing-stone-sym{display:inline-block;width:12px;height:12px;flex:none;margin:0}
+.dock .nav-btn.ing-stone[data-page="scriba"]{padding:0 14px 0 12px}
 .dock .nav-btn.ing-stone[data-page="scriba"] svg.ing-stone-sym{width:13px;height:13px}
 .dock .nav-btn.ing-stone[data-page="fontes"]{color:#0f4b66;text-shadow:0 1px 0 rgba(255,255,255,.55),0 1px 1px rgba(120,90,40,.2)}
 .dock .nav-btn.ing-stone:hover{transform:translateY(-2px);filter:brightness(1.06);color:#fff;background-color:#27272a;

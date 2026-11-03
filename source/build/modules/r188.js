@@ -733,6 +733,7 @@ function packApply(d){var P=CS().profile,M=lectorMe(),L=packSecs(),got={items:0,
   if(!String(P.name||"").trim()&&d.person.name)P.name=String(d.person.name).trim().slice(0,120);
   if(!String(P.contact||"").trim()&&d.person.contact)P.contact=String(d.person.contact).trim().slice(0,400);
   if(d.person.spelling==="american"||d.person.spelling==="british")P.prefs.spelling=d.person.spelling;
+  if(d.wants&&typeof d.wants==="object")["looking","need","avoid","where","when"].forEach(function(k){if(!String(P.wants[k]||"").trim()&&typeof d.wants[k]==="string"&&d.wants[k].trim())P.wants[k]=d.wants[k].trim().slice(0,2000);});
   var have={};P.items.forEach(function(it){have[packKey(it)]=1;});
   d.items.forEach(function(x){var it={id:uid("it"),sec:L[x.sec]?x.sec:"other",title:String(x.title).trim().slice(0,300),place:String(x.place||"").trim().slice(0,300),
       from:String(x.from||"").trim().slice(0,40),to:String(x.to||"").trim().slice(0,40),text:String(x.text||"").trim().slice(0,8000),src:"file",note:String(x.note||"").trim().slice(0,200),at:Date.now()};
@@ -770,6 +771,7 @@ function packPick(){pickFile(".json,application/json",false,function(fs){Promise
 function packMake(){var S=CS(),P=S.profile,M=lectorMe();
   var d={kind:"ingenium-profile",v:1,made:dayStr(Date.now()),about:"A profile from Ingenium's Career Studio: entries, documents and CV. It is its owner's, and Ingenium sends it nowhere.",
     person:{name:personName(S),contact:P.contact||"",isMe:P.isMe!==false,spelling:(P.prefs&&P.prefs.spelling)||"british"},
+    wants:Object.assign({},P.wants),
     items:P.items.map(function(it){return {sec:it.sec,title:it.title,place:it.place||"",from:it.from||"",to:it.to||"",text:it.text||"",note:it.note||""};}),files:[]};
   var q=P.files.reduce(function(q0,f){return q0.then(function(){return loadText(f.ref).then(function(t){if(t)d.files.push({name:f.name,kind:f.kind||"",text:t});});});},Promise.resolve());
   if(M&&M.cv&&M.cv.ref)q=q.then(function(){return loadText(M.cv.ref).then(function(t){if(t)d.cv={name:M.cv.name,text:t};});});
@@ -912,7 +914,8 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
 var ICON={today:'<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6"/>',apps:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17"/>',
   profile:'<circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 19.5c1.2-3.6 4-5.2 7.2-5.2s6 1.6 7.2 5.2"/>',
   goals:'<path d="M6 21V4M6 4.8h10.5l-2.2 3.6 2.2 3.6H6"/>',
-  learn:'<path d="M3.5 6.2c2.9-1.3 5.8-1.3 8.5.3 2.7-1.6 5.6-1.6 8.5-.3v12.6c-2.9-1.3-5.8-1.3-8.5.3-2.7-1.6-5.6-1.6-8.5-.3z"/><path d="M12 6.5v12.6"/>'};
+  learn:'<path d="M3.5 6.2c2.9-1.3 5.8-1.3 8.5.3 2.7-1.6 5.6-1.6 8.5-.3v12.6c-2.9-1.3-5.8-1.3-8.5.3-2.7-1.6-5.6-1.6-8.5-.3z"/><path d="M12 6.5v12.6"/>',
+  people:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.6 14.3c2.4-.3 4.3 1.2 4.9 4.2"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+(ICON[k]||"")+'</svg>';}
 function cbtn(cls,txt,fn,title){var b=h("button","c-btn"+(cls?" "+cls:""));b.type="button";b.textContent=txt;if(title)b.title=title;b.addEventListener("click",function(e){e.preventDefault();fn(b,e);});return b;}
 function chip(txt,cls){return h("span","c-chip"+(cls?" "+cls:""),esc(txt));}
@@ -941,13 +944,90 @@ function render(){var root=$("cs");if(!root)return;var S=CS(),room0=S.ui.room||"
   [].forEach.call(root.querySelectorAll(".c-head [data-room]"),function(b){var on=b.getAttribute("data-room")===room0;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   var host=$("csHost"),keepL=null,keepR=null,ol=host.querySelector(".c-list .c-pn-b"),or=host.querySelector(".c-work .c-pn-b");if(ol)keepL=ol.scrollTop;if(or)keepR=or.scrollTop;
   host.innerHTML="";var two=h("div","c-panels"+(LAST_ROOM!==room0?" c-rise":""));host.appendChild(two);var same=LAST_ROOM===room0;LAST_ROOM=room0;
-  if(room0==="today")paintToday(two);else if(room0==="profile")paintProfile(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  if(room0==="today")paintToday(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
   paintWho();
   root.setAttribute("data-show",S.ui.show==="work"?"work":"list");
   if(same){var nl=host.querySelector(".c-list .c-pn-b"),nr=host.querySelector(".c-work .c-pn-b");if(nl&&keepL!=null)nl.scrollTop=keepL;if(nr&&keepR!=null&&!host.__jump)nr.scrollTop=keepR;}host.__jump=false;
   /* the item in hand stays in sight in its own list (moving only that list, never the page) */
   [].forEach.call(host.querySelectorAll(".c-nav"),function(n){var c=n.querySelector('[aria-current="true"]');if(!c)return;var top=c.offsetTop-n.offsetTop;if(top<n.scrollTop||top+c.offsetHeight>n.scrollTop+n.clientHeight)n.scrollTop=Math.max(0,top-8);});
   fit();}
+/* ---------------- 6.9.7 · People: potential supervisors, referees, recruiters and hiring managers, one list ----------------
+   Her words (3 November 2026): "I will be juggling many job applications, phd applications prep and emailing potential supervisors,
+   reference requests and hiring managers and recruiters. I need a system built-in Ingenium that can help me streamline all of that
+   and manage it all"; of what overwhelms her, "Tracking it all"; and her choices: one step at a time; Ingenium drafts, she reviews
+   all and edits freely. Each person has a status and a date to follow up; their step joins Today in the order of its date; the
+   referees kept with each application are listed here too. A draft uses only what her profile and the notes say: never a name, a
+   work or a date that is not there. Nothing is sent by Ingenium: she copies the email into her own. */
+var PPL_ROLES=[["supervisor","Potential supervisor"],["referee","Referee"],["recruiter","Recruiter"],["manager","Hiring manager"],["other","Someone else"]];
+var PSTAT=[["write","To write to"],["draft","Draft ready"],["sent","Sent, waiting"],["replied","Replied"],["follow","Follow up"],["done","Done"]];
+function roleWord(k){return (PPL_ROLES.filter(function(x){return x[0]===k;})[0]||PPL_ROLES[4])[1];}
+function pstatWord(k){return (PSTAT.filter(function(x){return x[0]===k;})[0]||PSTAT[0])[1];}
+function contacts(){var S=CS();if(!Array.isArray(S.contacts))S.contacts=[];return S.contacts;}
+function waitDays(role){return role==="recruiter"||role==="manager"?7:10;}
+function dayDiff(d){if(!d)return 0;var a=new Date(d+"T12:00:00"),t=new Date();if(isNaN(a))return 0;t.setHours(12,0,0,0);return Math.round((a-t)/864e5);}
+function pplWhen(d){var n=dayDiff(d);return n<0?"overdue by "+(-n)+" day"+(n===-1?"":"s"):n===0?"today":n===1?"tomorrow":"in "+n+" days";}
+/* the step a person asks of her now, or none */
+function personStep(c){var t=todayStr(),nm=c.name||"this person";
+  if(c.status==="done")return null;
+  if(c.status==="write")return {text:"Write to "+nm,due:c.by||t,mins:20};
+  if(c.status==="draft")return {text:"Read the draft to "+nm+", then send it",due:c.by||t,mins:10};
+  if(c.status==="replied")return {text:"Read "+nm+"'s reply and answer it",due:c.follow||t,mins:15};
+  if(c.status==="follow"||(c.status==="sent"&&c.follow&&c.follow<=t))return {text:"Follow up with "+nm,due:c.follow||t,mins:10};
+  return null;}
+function peopleSteps(){var out=[];contacts().forEach(function(c){var st=personStep(c);if(!st)return;out.push({c:c,text:st.text,mins:st.mins,days:dayDiff(st.due),when:pplWhen(st.due)});});
+  out.sort(function(a,b){return a.days-b.days;});return out;}
+function oppTitle(id){var o=CS().opps.filter(function(x){return x.id===id;})[0];return o?(o.title||"Untitled")+(o.org?" · "+o.org:""):"";}
+function paintPeople(par){var S=CS(),C=contacts(),sel=C.filter(function(c){return c.id===S.ui.person;})[0]||null;
+  var L=panel("csList","People",{key:cbtn("sm","+ A person",function(){var c={id:uid("pc"),name:"",role:"supervisor",org:"",email:"",link:"",opp:"",status:"write",by:"",follow:"",notes:"",draft:"",at:Date.now()};
+    C.unshift(c);S.ui.person=c.id;show("work");save();render();setTimeout(function(){var i=$("pcName");if(i)i.focus();},60);},"A potential supervisor, a referee, a recruiter or a hiring manager")});
+  var next=[],wait=[],done=[];C.forEach(function(c){(personStep(c)?next:c.status==="done"?done:wait).push(c);});
+  function prow(c){var st=personStep(c);return item(c.name||"Someone new",[roleWord(c.role),c.org,pstatWord(c.status),st?"next step "+pplWhen(st.due):(c.follow&&c.status==="sent"?"follow up "+pplWhen(c.follow):"")].filter(Boolean).join(" · "),sel===c,function(){S.ui.person=c.id;show("work");save();render();});}
+  if(!C.length)L.body.appendChild(empty("No one yet","Add the people you are writing to: potential supervisors, referees, recruiters and hiring managers. Each one gets a status and a date, and Today tells you when to write or follow up."));
+  if(next.length){L.body.appendChild(h("div","c-label",esc("To do")));next.forEach(function(c){L.body.appendChild(prow(c));});}
+  if(wait.length){var fw=fold("people-wait","Waiting to hear ("+wait.length+")",!next.length);wait.forEach(function(c){fw.appendChild(prow(c));});L.body.appendChild(fw);}
+  if(done.length){var fd=fold("people-done","Done ("+done.length+")");done.forEach(function(c){fd.appendChild(prow(c));});L.body.appendChild(fd);}
+  /* the referees kept with each application, listed here too; they are changed in their application */
+  var refs=[];S.opps.forEach(function(o){(o.refs||[]).forEach(function(r){refs.push({r:r,o:o});});});
+  if(refs.length){var fr=fold("people-refs","Referees in your applications ("+refs.length+")");refs.forEach(function(x){fr.appendChild(item(x.r.name,[x.o.title||"Untitled",rstat(x.r.status)].filter(Boolean).join(" · "),false,function(){S.ui.room="apps";S.ui.open=x.o.id;x.o.step="send";save();render();try{setView(x.o,{kind:"refs"});}catch(e){}}));});L.body.appendChild(fr);}
+  L.foot.appendChild(h("span","c-note",esc(next.length?next.length+" to do, "+wait.length+" waiting":C.length?"Nothing to do now":"Your list of people")));
+  if(RUN.busy){two(L,livePanel(),par);return;}
+  var R=sel?personPanel(sel):peopleHelp();two(L,R,par);}
+function peopleHelp(){var R=panel("csWork","How People works");var c=h("div","c-col c-pad");
+  [["One list","Potential supervisors, referees, recruiters and hiring managers, each with what they are for."],["One step at a time","Each person has a status: to write to, draft ready, sent, replied, follow up, done. Today shows the next step, in the order of its date."],
+   ["Drafts you control","Ingenium drafts the email from your profile and your notes; you read every word and change what you like. It sends nothing: you copy it into your own email."],["Follow-ups","When you mark an email as sent, a date to follow up is set (ten days for a supervisor or a referee, seven for a recruiter or a hiring manager). You can change it."]]
+    .forEach(function(x){var p=h("p");p.appendChild(h("b",null,esc(x[0])));p.appendChild(document.createTextNode(": "+x[1]));c.appendChild(p);});R.body.appendChild(c);return R;}
+function personPanel(c){var S=CS(),R=panel("csWork",c.name||"Someone new",{back:"People",onBack:function(){S.ui.person=null;show("list");save();render();}});var g=h("div","c-grid2 c-pad");
+  function inp(id,label,key,type,ph){var i=h("input","c-in");i.id=id;i.type=type||"text";i.value=c[key]||"";if(ph)i.placeholder=ph;i.addEventListener("change",function(){c[key]=i.value.trim();save();if(key==="name")render();});g.appendChild(field(label,i));return i;}
+  inp("pcName","Name","name","text","Their name");
+  var rs=h("select","c-in");PPL_ROLES.forEach(function(x){var o=document.createElement("option");o.value=x[0];o.textContent=x[1];rs.appendChild(o);});rs.value=c.role;rs.addEventListener("change",function(){c.role=rs.value;save();render();});g.appendChild(field("Who they are",rs));
+  inp("pcOrg","Where","org","text","University, department or company");inp("pcMail","Email","email","text","Their address, to copy into your email").inputMode="email";inp("pcLink","A link","link","url","Their page, the posting or the programme");
+  var os=h("select","c-in"),o0=document.createElement("option");o0.value="";o0.textContent="No application";os.appendChild(o0);S.opps.forEach(function(o){var op=document.createElement("option");op.value=o.id;op.textContent=(o.title||"Untitled")+(o.org?" · "+o.org:"");os.appendChild(op);});
+  os.value=c.opp||"";os.addEventListener("change",function(){c.opp=os.value;save();});g.appendChild(field("For",os));R.body.appendChild(g);
+  var nt=h("textarea","c-ta");nt.id="pcNotes";nt.placeholder="What you know of them, and what you want from them: their research, the posting, where you met. A draft uses only this and your profile.";nt.value=c.notes||"";nt.addEventListener("change",function(){c.notes=nt.value.trim();save();});R.body.appendChild(h("div","c-pad")).appendChild(field("Notes",nt));
+  /* where it stands, and the date to follow up */
+  var st=h("div","c-keys c-pad");st.setAttribute("role","radiogroup");st.setAttribute("aria-label","Where it stands");
+  PSTAT.forEach(function(x){var b=cbtn("sm"+(c.status===x[0]?" pri":""),x[1],function(){c.status=x[0];if(x[0]==="sent"){c.last=Date.now();if(!c.follow||c.follow<=todayStr())c.follow=addDays(todayStr(),waitDays(c.role));}save();render();});b.setAttribute("role","radio");b.setAttribute("aria-checked",c.status===x[0]?"true":"false");st.appendChild(b);});
+  R.body.appendChild(st);
+  var fu=h("input","c-in");fu.type="date";fu.id="pcFollow";fu.value=c.follow||"";fu.addEventListener("change",function(){c.follow=fu.value;save();render();});
+  var fr=h("div","c-pad");fr.appendChild(field("Follow up on",fu));if(c.last)fr.appendChild(h("p","c-note",esc("Last written to on "+dayStr(c.last)+".")));R.body.appendChild(fr);
+  /* the draft: hers to read and change */
+  var dt=h("textarea","c-ta c-draft");dt.id="pcDraft";dt.placeholder="Press Draft an email for me, or write it here.";dt.value=c.draft||"";dt.rows=12;dt.addEventListener("change",function(){c.draft=dt.value;if(c.draft.trim()&&c.status==="write")c.status="draft";save();render();});
+  R.body.appendChild(h("div","c-pad")).appendChild(field("The email",dt));
+  R.foot.appendChild(cbtn("pri","Draft an email for me",function(){draftFor(c);},"Ingenium writes a first draft from your profile and your notes; you read and change it"));
+  R.foot.appendChild(cbtn("","Copy the email",function(){var t=String(c.draft||"").trim();if(!t){say("There is no email to copy yet.");return;}try{csCopyText(t);}catch(e){}say("Copied. Paste it into your own email: Ingenium sends nothing.");}));
+  if(c.status!=="sent")R.foot.appendChild(cbtn("","I sent it",function(){c.status="sent";c.last=Date.now();c.follow=addDays(todayStr(),waitDays(c.role));save();render();say("Marked as sent. Today will remind you to follow up "+pplWhen(c.follow)+" if they have not replied.");}));
+  R.foot.appendChild(h("span","c-grow"));
+  R.foot.appendChild(cbtn("quiet","Remove",function(){if(!confirm("Remove "+(c.name||"this person")+" from your people?"))return;S.contacts=contacts().filter(function(x){return x!==c;});S.ui.person=null;save();render();}));
+  return R;}
+var PURPOSE={supervisor:"to ask, briefly and politely, whether they would consider supervising her doctoral project; name a link between her research interests and their work only where the notes give their work, and otherwise ask openly",
+  referee:"to ask whether they would be willing to write a reference, saying what it is for and its deadline where the notes or the application give them",
+  recruiter:"to introduce herself and the kinds of role she is looking for, briefly",manager:"to say why she is interested in the post and what she would bring, briefly",other:"for the purpose the notes give"};
+function draftFor(c){if(busyNow()||needModel())return;var S=CS(),P=S.profile;begin(null,"Drafting an email to "+(c.name||"them"));
+  var ents=P.items.slice(0,40).map(function(it){return "- "+[it.title,it.place,[it.from,it.to].filter(Boolean).join(" to ")].filter(Boolean).join(", ");}).join("\n");
+  ask(function(){return [{role:"system",content:sys("You write a short email for the applicant to send herself, in "+english()+", plain and warm, with no jargon. Use only facts that her profile below or the notes give: never invent a name, a publication, a project, a date, a figure or a claim; where something is needed and not given, write it in square brackets for her to fill. First line: Subject: ... Then the email, under 200 words, signed with her name.",true)},
+    {role:"user",content:"Write an email from "+(myName()||"me")+" to "+(c.name||"[their name]")+" ("+roleWord(c.role).toLowerCase()+(c.org?", "+c.org:"")+"), "+(PURPOSE[c.role]||PURPOSE.other)+"."+(c.opp?"\nIt concerns: "+oppTitle(c.opp)+".":"")+
+      "\n\nNOTES ABOUT THEM (her own):\n"+(c.notes||"(none)")+"\n\n"+wantsText()+"\n\nHER PROFILE (entries):\n"+(ents||"(none)")}];},900,0.5)
+  .then(function(t){t=String(t||"").trim();end();if(!t){say("Nothing came back. Try again, or add a line to the notes.");return;}c.draft=t;if(c.status==="write")c.status="draft";save();render();say("A first draft is ready: read every line, change what you like, then copy it into your own email.");},failed);}
 function jump(){var host=$("csHost");if(host)host.__jump=true;}
 function two(L,R,par){L.el.classList.add("c-list");R.el.classList.add("c-work");par.appendChild(L.el);par.appendChild(R.el);}
 function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"});var p=h("p","c-note");p.id="csWhat";p.textContent=RUN.what;P.body.appendChild(p);
@@ -1392,16 +1472,23 @@ function dateWords(d,o){var t=String(o.title||"an application").replace(/[.\s]+$
 function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowDay();
   sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}var x={o:o,n:n,mins:estimateOf(o,n)};if(o.rest&&o.rest>t)rest.push(x);else act.push(x);});
   var L=panel("csList","Today",{key:cbtn("sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
-  var sel=act.filter(function(x){return x.o.id===S.ui.today;})[0]||null,SHOWN=3;
+  /* 6.9.7, her choice (3 November 2026): one step at a time. The single most urgent step leads; the rest wait folded. The people she
+     writes to (People) have their steps here too, in the order of their dates. */
+  var sel=act.filter(function(x){return x.o.id===S.ui.today;})[0]||null,SHOWN=S.ui.many?3:1,pp=peopleSteps();
   /* 6.9.2: the dates of the week at the head of the list; each step says about how long it takes */
   if(S.opps.some(function(o){return !FINISHED[o.stage];}))L.body.appendChild(weekStrip(S));
-  if(!act.length&&!rest.length)L.body.appendChild(empty(S.opps.length?"Nothing for today":"Nothing here yet",S.opps.length?"Every open application is waiting on someone else, or has no step left.":"Bring a posting, a programme's call or a grant: its next step will be here each day."));
+  if(!act.length&&!rest.length&&!pp.length)L.body.appendChild(empty(S.opps.length?"Nothing for today":"Nothing here yet",S.opps.length?"Every open application is waiting on someone else, or has no step left.":"Bring a posting, a programme's call or a grant: its next step will be here each day."));
   function row(x){var dw=dueWords(x.o),n=daysLeft(x.o);return item(x.n.text,[(x.o.title||"Untitled"),dw,"about "+x.mins+" min"].filter(Boolean).join(" · "),sel===x,function(){S.ui.today=x.o.id;show("work");save();render();},n!=null&&n>=0&&n<=7?"c-soon-i":"");}
-  act.slice(0,SHOWN).forEach(function(x){L.body.appendChild(row(x));});
-  if(act.length>SHOWN){var f=fold("today-later","Later ("+(act.length-SHOWN)+")");act.slice(SHOWN).forEach(function(x){f.appendChild(row(x));});L.body.appendChild(f);}
+  var all=act.map(function(x){var n=daysLeft(x.o);return {k:n==null?9999:n,x:x};}).concat(pp.map(function(y){return {k:y.days,y:y};}));
+  all.sort(function(a,b){return a.k-b.k;});
+  function prow(y){return item(y.text,[y.c.org,roleWord(y.c.role),y.when,"about "+y.mins+" min"].filter(Boolean).join(" · "),false,function(){S.ui.room="people";S.ui.person=y.c.id;show("work");save();render();},y.days<=2?"c-soon-i":"");}
+  function any(z){return z.x?row(z.x):prow(z.y);}
+  all.slice(0,SHOWN).forEach(function(z){L.body.appendChild(any(z));});
+  if(all.length>SHOWN){var f=fold("today-later",(SHOWN===1?"What else is waiting":"Later")+" ("+(all.length-SHOWN)+")");all.slice(SHOWN).forEach(function(z){f.appendChild(any(z));});L.body.appendChild(f);}
   if(rest.length){var fr=fold("today-rest","Resting today ("+rest.length+")");rest.forEach(function(x){var b=item(x.o.title||"Untitled","Back tomorrow: "+x.n.text,false,function(){delete x.o.rest;save();render();},"");b.title="Bring it back today";fr.appendChild(b);});L.body.appendChild(fr);}
   if(wait.length){var fw=fold("today-wait","Waiting to hear ("+wait.length+")");wait.forEach(function(o){fw.appendChild(item(o.title||"Untitled",stageWord(o.stage),false,function(){S.ui.room="apps";S.ui.open=o.id;o.step="track";show("work");save();render();}));});L.body.appendChild(fw);}
-  L.foot.appendChild(h("span","c-note",esc(act.length?act.length+" step"+(act.length===1?"":"s")+" for today, one per application":"Nothing pressing")));
+  L.foot.appendChild(h("span","c-note",esc(all.length?(SHOWN===1?"One step at a time: "+all.length+" in all":all.length+" step"+(all.length===1?"":"s")+" for today"):"Nothing pressing")));
+  if(all.length>1)L.foot.appendChild(cbtn("sm quiet",SHOWN===1?"Show three at once":"Show one at a time",function(){S.ui.many=!S.ui.many;save();render();},SHOWN===1?"The three most urgent steps, the rest folded":"Only the most urgent step, the rest folded"));
   if(act.length){var hk=cbtn("sm c-only-one","How long do you have?",function(){S.ui.today=null;show("work");save();render();},"Only the steps that fit in ten, fifteen, twenty-five or forty-five minutes");L.foot.appendChild(hk);}
   var R;
   if(sel){var o=sel.o,nx=sel.n,dw=dueWords(o);R=panel("csWork",o.title||"Untitled",{back:"Today",onBack:function(){S.ui.today=null;show("list");save();render();}});
@@ -1935,7 +2022,7 @@ var EXAM={last:null};
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
   sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Career Studio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
-    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["profile","Your profile"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
+    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["people","People"],["profile","Your profile"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
   var who=sec.querySelector("#csWho");if(who)who.addEventListener("change",function(){var v=who.value;if(v==="+manage"){var S=CS();S.ui.room="profile";S.ui.ppart="people";show("work");save();render();return;}switchTo(v);});

@@ -371,6 +371,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.7 (3 November 2026): the Career Studio for an intense season of applications. Her words: "I will be juggling many job
+applications, phd applications prep and emailing potential supervisors, reference requests and hiring managers and recruiters. I need a
+system built-in Ingenium that can help me streamline all of that and manage it all"; her answers: one step at a time; tracking it all;
+Ingenium drafts, she reviews all and edits freely.
+
+- People (a room beside Applications): potential supervisors, referees, recruiters and hiring managers in one list, each with a status
+  (to write to, draft ready, sent, replied, follow up, done), a date to follow up (ten days for a supervisor or a referee, seven for a
+  recruiter or a hiring manager, changeable), notes, and the application it serves. Draft an email for me writes a first draft from her
+  profile and the notes alone, never inventing a name, a work, a date or a claim (what is missing is left in square brackets); she reads
+  it, changes it and copies it into her own email: Ingenium sends nothing. The referees kept with each application are listed there too.
+- Today, one step at a time: the single most urgent step across her applications and her people, the rest folded under What else is
+  waiting; Show three at once on request.
+- A profile file carries what she is looking for (looking, need, avoid, where, when), brought in where those are empty.
+- The Scriba and Fontes keys of the dock: the mark 4 pixels from the name, as on Carpe Diem's keys (it was 14).
+
+    node rig/t_697_people.js <url> <out>        # 14 checks, with invented people and a stand-in model
+    node rig/t_697_stone_gap.js <url> <out>     # 3 checks
+
 Ingenium 6.9.6 (3 November 2026): a profile in one file (her words: "I don't want to have to input my information for my profile
 from scratch on my master version", and "I want that to be replicable for a second user profile and so forth"; her choice: her profile
 reaches the app as a private file, never through GitHub). In the Career Studio, What the studio may use has Bring in a profile file and

@@ -52,7 +52,7 @@ const SOP = ['My research asks how field notebooks shaped method.', 'At Oxford I
   }, [PLAN_LINE, SOP, POST]);
   await p.evaluate(() => go('career')); await p.waitForTimeout(700);
   const tabs = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(b => b.textContent.trim()));
-  ok(JSON.stringify(tabs) === '["Today","Applications","Your profile","Goals and plan","Learn"]', 'Today is a room of its own, the first', JSON.stringify(tabs));
+  ok(JSON.stringify(tabs) === '["Today","Applications","People","Your profile","Goals and plan","Learn"]', 'Today is a room of its own, the first (People beside Applications from 6.9.7)', JSON.stringify(tabs));
   // the profile kept before is the first of several
   const r0 = await p.evaluate(() => { const r = IngCareer.root(); const P = IngCareer.state().profile; P.name = 'Yannie D. Forest'; P.items.push({ id: 'i1', sec: 'education', title: 'MSt in History', place: 'Oxford', from: '2020', to: '2021', text: 'Dissertation on the archives of the Museum.' }); saveState();
     return { n: r.people.length, v: r.v, cur: r.cur, opps: Array.isArray(IngCareer.state().opps), old: Object.keys(r).sort().join(',') }; });
