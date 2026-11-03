@@ -80,7 +80,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   if (phone) await p.evaluate(() => go('career')); else { const bb = await p.evaluate(() => { const r = document.querySelector('.nav-btn[data-page="career"]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); await p.mouse.click(bb[0], bb[1]); }
   await p.waitForTimeout(700);
   const rooms = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(x => x.textContent.trim()));
-  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Applications|Your profile|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12), in the keys Settings uses for its rooms', rooms.join('|'));
+  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Applications|People|Your profile|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12, People since 6.9.7), in the keys Settings uses for its rooms', rooms.join('|'));
   ok(await p.evaluate(() => /not a job board/.test(document.querySelector('#cs .c-list').innerText) && (innerWidth < 900 || /Tell me and I forget\. Teach me and I remember\. Involve me and I learn\./.test(document.querySelector('#cs .c-work').innerText))), 'with nothing brought yet: how it works, her words at its head, and that it is not a job board');
   await fitCheck('Applications, nothing yet'); await shot('intro');
   // 2. the profile: who, what she is looking for, her CV (shared with Lector), an entry, LinkedIn
@@ -116,13 +116,14 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   ok(sk.length === 1 && /^Software design :: Evidence: four offline apps/.test(sk[0]) && /Where it counts: Academic and professional/.test(sk[0]), 'her skills are found with their evidence and where they count; one already kept and one with no evidence are not offered', JSON.stringify(sk));
   await press('Drop them all');
   // 3. an application: pasted, read against her profile
-  await press('Applications', '#cs .rm-tabs'); await press('+ Bring one'); await p.fill('#cs .c-work textarea', POST); await press('Keep it');
-  await p.waitForFunction(() => IngCareer.state().opps.length === 1, null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(400);
+  // 6.9.8: kept, a posting is read against her profile at once ("have the analysis be done and the match profile for me and the job be done from there")
+  await press('Applications', '#cs .rm-tabs'); await press('+ Bring one'); await p.fill('#cs .c-work textarea', POST); await press('Keep and read it');
+  await p.waitForFunction(() => IngCareer.state().opps.length === 1, null, { timeout: 15000 }).catch(() => {}); await idle(); await p.waitForTimeout(400);
   let opp = await p.evaluate(() => { const o = IngCareer.state().opps[0]; return o && { title: o.title, org: o.org, closes: o.closes, due: o.due, open: IngCareer.state().ui.open === o.id, steps: [...document.querySelectorAll('#cs .c-steps li:not(.sep) span')].map(x => x.textContent.trim()), now: (document.querySelector('#cs .c-steps li.now') || {}).textContent }; });
   ok(opp && opp.title === 'Lecturer in Digital History' && opp.org === 'University of Oxbridge' && /30 November 2026/.test(opp.closes) && opp.due === '2026-11-30' && opp.open, 'a pasted posting is kept and opened, its title, organisation and closing date read from it (the date set for the tracker)', JSON.stringify(opp));
-  ok(opp.steps.join('|') === 'The posting|How you fit|Checklist|What you send|Practise|Track' && /The posting/.test(opp.now), 'an application is taken in numbered steps (six since 6.8.12, with its Checklist), one on the screen at a time: it opens on The posting', JSON.stringify(opp.steps));
-  await fitCheck('An application: the posting'); await shot('posting');
-  await press('Read it against my profile'); await idle(); await p.waitForTimeout(400);
+  ok(opp.steps.join('|') === 'The posting|How you fit|Checklist|What you send|Practise|Track' && /How you fit/.test(opp.now), 'an application is taken in numbered steps (six since 6.8.12, with its Checklist), one on the screen at a time: kept, it is read at once and opens on How you fit (6.9.8)', JSON.stringify(opp));
+  await press('The posting', '#cs .c-steps'); await p.waitForTimeout(300); await fitCheck('An application: the posting'); await shot('posting');
+  await press('Next: how you fit'); await p.waitForTimeout(400);
   const rd = await p.evaluate(() => { const w = document.querySelector('#cs .c-work'), t = w.innerText, band = w.querySelector('.c-bandcard'); return { band: band && band.getAttribute('data-band'), word: band && band.querySelector('h3').textContent, text: t, now: (w.querySelector('.c-steps li.now') || {}).textContent,
     rows: w.querySelectorAll('.c-tab tbody tr').length, ask: window.__asks.filter(a => /CRITERION: the criterion/.test(a.u)).pop() }; });
   ok(/How you fit/.test(rd.now) && /Against what you are looking for/i.test(rd.text) && /Does not match/.test(rd.text) && /Full time, in Oxbridge/.test(rd.text), 'read, it moves to How you fit, and says how it matches what she is looking for (London: does not match)', rd.now);

@@ -342,6 +342,46 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs:not(.c-one) .c-only-one{display:none}
 /* the reading page's brief: a posting kept in the Career Studio, chosen there */
 #lx7 select.l-sel{margin-top:6px;max-width:100%;padding:6px 9px;border-radius:9px;border:1px solid var(--l-hair);background:var(--l-wellbg);box-shadow:var(--l-well);color:var(--l-ink1);font:inherit}
+/* 6.9.8 · a posting by its link, the reading vetted against the profile, and the jobs saved on LinkedIn */
+#cs .c-link{display:flex;gap:10px;align-items:flex-end;min-width:0}
+#cs .c-link .field{flex:1 1 auto;min-width:0}
+#cs .c-link>input,#cs .c-link .field input{flex:1 1 auto;min-width:0;font-size:14.5px;min-height:40px}
+#cs .c-link input[type=text]{font:13.5px var(--c-sans);color:var(--c-ink1);padding:7px 10px;border:1px solid var(--c-hair);border-radius:9px;background:var(--c-wellbg);box-shadow:var(--c-well);min-height:34px}
+#cs .c-link .c-btn{flex:0 0 auto;min-height:40px;white-space:nowrap}
+#cs .c-intro .c-pn-b{scrollbar-gutter:stable}
+#cs .c-quick{margin:16px 18px 2px;padding:14px 16px 12px;border:1px solid var(--c-hair);border-radius:14px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-slab);display:flex;flex-direction:column;gap:9px}
+#cs .c-quick .c-h3{margin:0}
+#cs .c-status{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--c-ink2);margin:0}
+#cs .c-spin{flex:0 0 auto;width:14px;height:14px;border-radius:50%;border:2px solid var(--c-accs);border-top-color:var(--c-acc);animation:cSpin698 .9s linear infinite}
+@keyframes cSpin698{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#cs .c-spin{animation:none}}
+#cs .c-alert{border:1px solid var(--c-hair);border-left:3px solid var(--c-warn);background:var(--c-warns);border-radius:10px;padding:10px 14px;color:var(--c-ink1);font-size:13.5px;line-height:1.55;display:flex;flex-direction:column;gap:8px}
+#cs .c-alert p{margin:0}
+#cs .c-found{display:flex;flex-direction:column;gap:6px}
+#cs .c-found ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+#cs .c-found li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:13px;padding:8px 10px;border:1px solid var(--c-hair2);border-radius:10px;background:var(--c-wellbg)}
+#cs .c-found li a{color:var(--c-acc);font-weight:600;flex:1 1 100%}
+#cs .c-found li small{color:var(--c-ink3);flex:1 1 auto}
+#cs .c-or{display:flex;align-items:center;gap:12px;color:var(--c-ink3);font-size:12px;letter-spacing:.04em}
+#cs .c-or:before,#cs .c-or:after{content:"";flex:1;height:1px;background:var(--c-hair)}
+#cs .c-vet{display:block;font-size:11.5px;margin-top:4px;color:var(--c-ink3)}
+#cs .c-vet:before{content:"\2713\00a0";}
+#cs .c-vet[data-v=found]{color:var(--c-ok)}
+#cs .c-vet[data-v=near]:before{content:"\2248\00a0"}
+#cs .c-vet[data-v=missing]{color:var(--c-warn)}
+#cs .c-vet[data-v=missing]:before{content:"!\00a0";font-weight:700}
+#cs .c-lead{margin:4px 0 2px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45;color:var(--c-ink1)}
+#cs .c-lead li span{display:block;color:var(--c-ink3);font-size:12.5px}
+#cs .c-svk b:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c-acc);margin-right:7px;vertical-align:1px}
+#cs .c-svnote{padding-top:14px}
+#cs .c-svcard{border:1px solid var(--c-hair);border-radius:12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-slab);padding:12px 14px;margin:12px 16px 4px;display:flex;flex-direction:column;gap:4px}
+#cs .c-svcard b{font-size:14.5px;color:var(--c-ink1)}
+#cs .c-svcard small{color:var(--c-ink3);font-size:12.5px}
+#cs .c-svcard .c-row{margin-top:8px;align-items:center}
+#cs a.c-btn{text-decoration:none;display:inline-flex;align-items:center}
+#cs .c-svdone{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--c-ink2)}
+#cs .c-svdone li{display:flex;align-items:center;justify-content:space-between;gap:10px}
+@media (max-width:700px){#cs .c-link{flex-wrap:wrap}#cs .c-link .c-btn{flex:1 1 auto}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p188"]="started";}catch(_){}
 /* R188 · THE CAREER STUDIO (6.8.3, 28 October 2026)
@@ -502,6 +542,7 @@ function material(G){return [G.items,G.cv,G.linkedin].concat(G.files.map(functio
 /* ---------------- an application: its posting, and the reading of it against the profile ---------------- */
 function newOpp(kind,text,from){var o={id:uid("op"),kind:kind||"job",title:"",org:"",closes:"",due:"",stage:"considering",at:Date.now(),from:from||"",ref:null,chars:0,docs:{},older:{},emails:[],practice:{crit:{},qs:[]},notes:""};
   try{var m=LXR().parsePost(text);o.title=m.title||"";o.org=m.org||"";o.closes=m.closes||"";o.due=dateIn(m.closes);}catch(e){}
+  if(!o.due){var cl=jlCloses(text);if(cl){o.closes=cl.word;o.due=cl.iso;}}
   o.ref=IngBig.newId();o.chars=text.length;return Promise.resolve(IngBig.put(o.ref,text)).then(function(){CS().opps.unshift(o);CS().ui.open=o.id;CS().ui.show="work";save();return o;});}
 function postOnly(o){return loadText(o&&o.ref);}
 /* 6.9.2: the posting and the further particulars added to it (a PDF of particulars, a handbook), read together by the model, the limits and the checklist */
@@ -519,16 +560,18 @@ function readMsgs(G,post,o,scale){var R=room()*scale;
     "TITLE: the post, programme or grant\nORGANISATION: who offers it\nCLOSES: the closing date as it gives it, or unknown\nKIND: JOB or PHD or GRANT or OTHER\n"+
     (wantsText()?"WANT: what I am looking for or need | MATCHES or PARTLY or DOES NOT MATCH or NOT SAID | what it offers on that point\n(one WANT line for each of my wants and needs it bears on)\n":"")+
     "CRITERION: the criterion | ESSENTIAL or DESIRABLE | MET or PARTLY or NOT SHOWN | the evidence from the profile, or none\n(one CRITERION line for each criterion, at most 14)\n"+
-    "STRENGTH: a strength of this application, from the profile\nCONCERN: a weakness or a risk, said plainly\nNEXT: a concrete next step\nASK: a question worth asking the contact\n\n"+
+    "STRENGTH: a strength of this application, from the profile\nCONCERN: a weakness or a risk, said plainly\nNEXT: a concrete next step\nASK: a question worth asking the contact\n"+
+    "LEAD: an entry of THE PROFILE to put first in this application, named exactly as THE PROFILE names it | the criteria it answers best\n(up to three LEAD lines, the strongest first; name only entries that are in THE PROFILE)\n\n"+
     "THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.3))+"\n\n"+profileBlock(G,R*0.66);
   return [{role:"system",content:sys("You are now reading an opportunity against my profile for me, and you say plainly what it shows, including what it does not show.")},{role:"user",content:u}];}
-function parseRead(t){var r={title:"",org:"",closes:"",kind:"",wants:[],crit:[],strengths:[],concerns:[],next:[],asks:[]};
+function parseRead(t){var r={title:"",org:"",closes:"",kind:"",wants:[],crit:[],strengths:[],concerns:[],next:[],asks:[],lead:[]};
   String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").split("\n").forEach(function(line){var L=line.replace(/\*\*/g,"").replace(/^\s*(?:[-*•]\s*)?/,"").trim(),m=/^([A-Za-z][A-Za-z ]{1,14}):\s*(.*)$/.exec(L);if(!m)return;var k=m[1].trim().toUpperCase(),v=m[2].trim();if(!v)return;
     if(k==="TITLE")r.title=v;else if(k==="ORGANISATION"||k==="ORGANIZATION")r.org=v;else if(k==="CLOSES")r.closes=/^unknown$/i.test(v)?"":v;else if(k==="KIND")r.kind=v.toLowerCase();
     else if(k==="CRITERION"){var p=v.split("|").map(function(x){return x.trim();});if(!p[0])return;var ess=!/^desirable/i.test(p[1]||""),st=/not\s*shown|^no\b/i.test(p[2]||"")?"none":/^partly|^partial/i.test(p[2]||"")?"partly":/^met|^yes/i.test(p[2]||"")?"met":"none";
       var ev=(p[3]||"").replace(/^none\.?$/i,"");if(st!=="none"&&!ev)st="partly";r.crit.push({text:p[0],ess:ess,st:st,ev:ev});}
     else if(k==="WANT"){var w=v.split("|").map(function(x){return x.trim();});if(!w[0])return;var ws=/does\s*not|^no\b/i.test(w[1]||"")?"none":/^partly|^partial/i.test(w[1]||"")?"partly":/not\s*said|unknown|unclear/i.test(w[1]||"")?"unsaid":/^match|^yes/i.test(w[1]||"")?"met":"unsaid";r.wants.push({text:w[0],st:ws,offer:w[2]||""});}
-    else if(k==="STRENGTH")r.strengths.push(v);else if(k==="CONCERN")r.concerns.push(v);else if(k==="NEXT")r.next.push(v);else if(k==="ASK")r.asks.push(v);});
+    else if(k==="STRENGTH")r.strengths.push(v);else if(k==="CONCERN")r.concerns.push(v);else if(k==="NEXT")r.next.push(v);else if(k==="ASK")r.asks.push(v);
+    else if(k==="LEAD"){var ld=v.split("|").map(function(x){return x.trim();});if(ld[0]&&r.lead.length<3)r.lead.push({title:ld[0].replace(/^["“'‘]|["”'’]$/g,""),why:ld[1]||""});}});
   r.crit=r.crit.slice(0,14);return r;}
 /* the band follows from the criteria by a fixed rule, shown with it; it is not a probability */
 var BANDS={strong:"Strong fit",possible:"Possible fit",stretch:"A stretch",poor:"Not a fit as your profile stands"};
@@ -542,11 +585,33 @@ function bandOf(r){var c=r.crit||[];if(!c.length)return null;var E=c.filter(func
   return {band:b,word:BANDS[b],why:why,advice:adv,rule:"The rule: every essential criterion shown and most desirable ones, a strong fit; every essential shown, a possible fit; one essential not shown (or up to a third), a stretch; more, not a fit. A criterion your profile does not show may still be one you meet: then add it to your profile."};}
 function readOpp(o){if(busyNow()||needModel())return;begin(o,"Reading it against your profile");
   Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){var post=x[0],G=x[1];if(!post)throw new Error("the posting's text is no longer kept; add it again");
-    return ask(function(sc){return readMsgs(G,post,o,sc);},1500,0.2).then(function(t){var r=parseRead(t);
+    return ask(function(sc){return readMsgs(G,post,o,sc);},1700,0.2).then(function(t){var r=parseRead(t);
       if(!r.crit.length)throw new Error("the model's answer could not be read as criteria. Try again, or choose a larger model for Lector");
+      vetEvidence(r,G);vetLead(r,G);
       if(r.title&&!o.titleSet)o.title=r.title.slice(0,120);if(r.org&&!o.orgSet)o.org=r.org.slice(0,120);if(r.closes&&(!o.closes||o.closes.length>40))o.closes=r.closes.slice(0,80);if(!o.due&&dateIn(o.closes))o.due=dateIn(o.closes);
       if(/phd|dphil|doctor/i.test(r.kind)&&o.kind==="job"&&!o.kindSet)o.kind="phd";else if(/grant|fellow/i.test(r.kind)&&o.kind==="job"&&!o.kindSet)o.kind="grant";
       o.read={at:Date.now(),model:modelName(),r:r};o.step="fit";save();});}).then(end,failed);}
+
+/* 6.9.8 · the reading vetted against her profile. Each piece of evidence it names is looked for in her profile itself: found in
+   its words, or nearly (most of its words of substance are there), it stands; not found, a "shown" falls to "partly shown" until
+   she checks it, and the table says so. A reading may summarise her profile; it may not bring in what her profile does not hold.
+   The entries it says to lead with are kept only when they are entries of her profile, named as her profile names them. */
+var VET_STOP={"with":1,"that":1,"this":1,"from":1,"have":1,"been":1,"were":1,"which":1,"their":1,"they":1,"them":1,"into":1,"also":1,"more":1,"most":1,"some":1,"such":1,"than":1,"then":1,"there":1,"these":1,"those":1,"what":1,"when":1,"where":1,"while":1,"about":1,"over":1,"under":1,"very":1,"your":1,"yours":1,"other":1,"each":1,"both":1,"only":1,"just":1,"through":1,"across":1,"including":1,"profile":1,"shows":1,"shown":1,"evidence":1,"none":1,"plainly":1,"partly":1,"does":1,"doing":1,"done":1,"being":1,"will":1,"would":1,"could":1,"should":1,"years":1,"year":1};
+function vetPlain(s){return String(s||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ");}
+function vetWords(s){var a=vetPlain(s).split(" ").filter(function(w){return w.length>3&&!VET_STOP[w];});return a.filter(function(w,i){return a.indexOf(w)===i;});}
+function vetEvidence(r,G){var M=" "+vetPlain(material(G))+" ";
+  (r.crit||[]).forEach(function(c){c.vet="";if(!c.ev||c.st==="none")return;var ws=vetWords(c.ev);if(!ws.length){c.vet="found";return;}
+    var hit=ws.filter(function(w){return M.indexOf(" "+w)>=0||(w.length>6&&M.indexOf(" "+w.slice(0,w.length-2))>=0);}).length,share=hit/ws.length;
+    c.vet=share>=0.7?"found":share>=0.45?"near":"missing";if(c.vet==="missing"&&c.st==="met"){c.st="partly";c.was="met";}});
+  return r;}
+function vetLead(r,G){var P=CS().profile,out=[];
+  (r.lead||[]).forEach(function(l){var lw=vetWords(l.title);if(!lw.length)return;var best=null,bs=0;
+    P.items.forEach(function(it){if(it.src==="linkedin"&&!P.use.linkedin)return;var iw=vetWords(it.title+" "+(it.place||""));if(!iw.length)return;var hit=lw.filter(function(w){return iw.some(function(x){return x===w||(x.length>5&&w.length>5&&(x.indexOf(w)===0||w.indexOf(x)===0));});}).length,sc=hit/lw.length;if(sc>bs){bs=sc;best=it;}});
+    var app=(G.apps||[]).filter(function(a){var n=vetPlain(a.name).trim();return n&&(vetPlain(l.title).indexOf(n)>=0);})[0];
+    if(best&&bs>=0.6){if(!out.some(function(x){return x.id===best.id;}))out.push({id:best.id,title:best.title+(best.place?", "+best.place:""),why:l.why});}
+    else if(app){if(!out.some(function(x){return x.app===app.name;}))out.push({app:app.name,title:app.name+" (an app you designed and built)",why:l.why});}
+    else r.leadOff=(r.leadOff||0)+1;});
+  r.lead=out;return r;}
 
 /* ---------------- the documents ---------------- */
 var DOCS={cv:["Tailored CV","A CV in the order this application asks for, from your profile alone."],
@@ -806,7 +871,8 @@ var LI={positions:{sec:"post",title:["title"],place:["company name","company"],f
   courses:{sec:"education",title:["name"],place:[],from:[],to:[],text:["number"]},
   volunteering:{sec:"other",title:["role"],place:["company name","organization"],from:["started on"],to:["finished on"],text:["description","cause"]}};
 function liKind(name){var n=name.toLowerCase().replace(/^.*\//,"").replace(/\.csv$/,"");if(/^positions?$/.test(n))return "positions";if(/^education$/.test(n))return "education";if(/^skills?$/.test(n))return "skills";if(/^languages?$/.test(n))return "languages";
-  if(/^certifications?$/.test(n))return "certifications";if(/^honors?|^honours?/.test(n))return "honors";if(/^publications?$/.test(n))return "publications";if(/^projects?$/.test(n))return "projects";if(/^courses?$/.test(n))return "courses";if(/^volunteer/.test(n))return "volunteering";if(/^profile$/.test(n))return "profile";return "";}
+  if(/^certifications?$/.test(n))return "certifications";if(/^honors?|^honours?/.test(n))return "honors";if(/^publications?$/.test(n))return "publications";if(/^projects?$/.test(n))return "projects";if(/^courses?$/.test(n))return "courses";if(/^volunteer/.test(n))return "volunteering";if(/^profile$/.test(n))return "profile";
+  if(/^saved[ _-]?jobs?(?:[ _-]?\d+)?$/.test(n))return "savedjobs";if(/^job[ _-]?applications?(?:[ _-]?\d+)?$/.test(n))return "jobapps";return "";}
 function unzip(buf){var u8=new Uint8Array(buf),dv=new DataView(buf),i=u8.length-22,dec=new TextDecoder(),out=[];
   while(i>=0&&dv.getUint32(i,true)!==0x06054b50)i--;if(i<0)return Promise.reject(new Error("not a .zip file"));
   if(typeof DecompressionStream==="undefined")return Promise.reject(new Error("this window cannot open .zip files; open the .zip and add its .csv files instead"));
@@ -819,14 +885,20 @@ function unzip(buf){var u8=new Uint8Array(buf),dv=new DataView(buf),i=u8.length-
 /* 6.9.2: imported again, the export is read as a difference against what is there: an entry unchanged is kept as it is; one
    new or changed is offered in Found in your sources; one gone from the export is flagged, for her to keep or drop; an entry
    she changed herself (it became her own) or dropped before is never touched. The first import still enters every entry at once. */
-function importLinkedIn(files){var P=CS().profile,got=[],others=[],skipped=[],summary=[],perFile=[];
+function importLinkedIn(files){var P=CS().profile,got=[],others=[],skipped=[],summary=[],perFile=[],jobs=[];
   var read=files.map(function(f){if(/\.zip$/i.test(f.name))return f.arrayBuffer().then(unzip);return (f.text?f.text():readAsText(f)).then(function(t){return [{name:f.name,text:t}];});});
   return Promise.all(read).then(function(all){[].concat.apply([],all).forEach(function(c){var k=liKind(c.name),rows=csvObjs(c.text),short=c.name.replace(/^.*\//,"");
       if(k==="profile"){rows.forEach(function(r){var nm=[col(r,["first name"]),col(r,["last name"])].filter(Boolean).join(" ");if(nm&&!P.name)P.name=nm;var hl=col(r,["headline"]),sm=col(r,["summary"]);if(hl)summary.push("Headline: "+hl);if(sm)summary.push("Summary: "+sm);});return;}
+      /* 6.9.8: the jobs she saved on LinkedIn, and those she applied to there, wait in Applications to be taken one at a time */
+      if(k==="savedjobs"||k==="jobapps"){rows.forEach(function(r){var url=col(r,["job url","url","link"]),t=col(r,["job title","title"]),org=col(r,["company name","company","organization","organisation"]),dt=col(r,["saved date","application date","applied on","date"]);
+          if(t||url)jobs.push({kind:k==="jobapps"?"applied":"saved",title:t.slice(0,200),org:org.slice(0,200),url:url,date:dt.slice(0,40)});});return;}
       var M=LI[k];if(!M){if(rows.length&&/\.csv$/i.test(c.name)){if(/connections|messages|invitations|ad_|ads|inferences|logins|security|registration|phone|email|rich_media|receipts|saved|search|learning|endorsement|recommendations_given/i.test(c.name))skipped.push(short.replace(/\.csv$/i,""));else others.push(c);}return;}
       var n0=got.length;rows.forEach(function(r){var t=col(r,M.title);if(!t)return;got.push({id:uid("it"),sec:M.sec,title:t.slice(0,200),place:col(r,M.place).slice(0,200),from:col(r,M.from),to:col(r,M.to),text:M.text.map(function(x){return col(r,[x]);}).filter(Boolean).join("\n").slice(0,2000),src:"linkedin",at:Date.now()});});
       perFile.push({name:short,rows:rows.length,kept:got.length-n0,sec:M.sec});});
-    if(!got.length&&!summary.length)throw new Error("nothing in it was recognised as LinkedIn's export. Add the .zip LinkedIn sends you, or its Profile, Positions, Education and Skills files");
+    var svN=jobs.length?svMerge(jobs):0,svMsg=jobs.length?" "+svWords(jobs,svN):"";
+    if(!got.length&&!summary.length){if(jobs.length){CS().savedAt=Date.now();save();render();say(svWords(jobs,svN).trim());return;}
+      throw new Error("nothing in it was recognised as LinkedIn's export. Add the .zip LinkedIn sends you, or its Profile, Positions, Education and Skills files");}
+    if(jobs.length)CS().savedAt=Date.now();
     var first=!P.linkedin,old=P.items.filter(function(it){return it.src==="linkedin";}),oldBy={},dropped=(P.linkedin&&P.linkedin.dropped)||{},added=0,changed=0,kept=0,gone=0,sugg=[];
     old.forEach(function(it){oldBy[liKey(it)]=it;});
     if(first)P.items=P.items.concat(got);
@@ -839,8 +911,8 @@ function importLinkedIn(files){var P=CS().profile,got=[],others=[],skipped=[],su
     var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,summary.join("\n\n"))).then(function(){if(P.linkedin&&P.linkedin.ref){try{IngBig.del(P.linkedin.ref);}catch(e){}}
       P.linkedin={ref:ref,n:P.items.filter(function(it){return it.src==="linkedin";}).length,at:Date.now(),others:others.map(function(c){return c.name.replace(/^.*\//,"");}),skipped:skipped,files:perFile,added:first?got.length:added,changed:changed,gone:gone,kept:kept,dropped:dropped};
       P.at=Date.now();if(sugg.length)CS().ui.ppart="found";save();render();
-      say(first?got.length+" entr"+(got.length===1?"y":"ies")+" came from your LinkedIn export. Look them over in Your entries: change or remove any.":
-        "Read as a difference: "+kept+" unchanged, "+added+" new and "+changed+" changed (offered in Found in your sources), "+gone+" no longer in the export (flagged in Your entries). Your own changes were not touched.");});});}
+      say((first?got.length+" entr"+(got.length===1?"y":"ies")+" came from your LinkedIn export. Look them over in Your entries: change or remove any.":
+        "Read as a difference: "+kept+" unchanged, "+added+" new and "+changed+" changed (offered in Found in your sources), "+gone+" no longer in the export (flagged in Your entries). Your own changes were not touched.")+svMsg);});});}
 /* entries suggested from her CV, LinkedIn and documents: each one she keeps or drops; none enters the profile by itself */
 function suggest(){if(busyNow()||needModel())return;begin(null,"Reading your sources for entries");
   gatherProfile({}).then(function(G){if(!G.cv&&!G.files.length&&!G.linkedin)throw new Error("add your CV or a document first: entries are suggested from them");
@@ -882,9 +954,176 @@ function reviewMine(o,kind,text){if(!text||text.trim().length<120){say("Write or
     .then(function(t){var fb={};String(t).replace(/<think>[\s\S]*?<\/think>/g,"").split("\n").forEach(function(l){var m=/^\s*(?:[-*]\s*)?(WORKS|MISSING|UNSUPPORTED|WORDING|NEXT):\s*(.*)$/i.exec(l.replace(/\*\*/g,""));if(m&&m[2].trim()){var k=m[1].toUpperCase();(fb[k]=fb[k]||[]).push(m[2].trim());}});
       if(!Object.keys(fb).length)fb.RAW=[String(t).trim().slice(0,1500)];o.mine[kind].fb=fb;save();end();},failed);}
 /* ---------------- online, only when she presses for it ---------------- */
-function fetchPosting(url,kind){url=String(url||"").trim();if(!/^https?:\/\/\S+$/i.test(url)){say("Give the whole address, beginning with https://");return;}
-  if(typeof fetchPageText!=="function"){say("This device cannot fetch pages.");return;}say("Fetching the posting from its address…");
-  fetchPageText(url,40000).then(function(t){t=String(t||"").trim();if(t.length<200)throw new Error("too little text came back; paste the posting instead");return newOpp(kind,t,url).then(function(o){o.url=url;o.fetchedAt=Date.now();save();return o;});}).then(function(){CS().ui.room="apps";render();},function(e){say("It could not be fetched: "+(e&&e.message||e));});}
+/* 6.9.8 · a posting from its link, read against her profile at once. Her words (3 November 2026): "I want to be able to paste a
+   link of a job that I am interested in applying to in the Career studio and have the analysis be done and the match profile for
+   me and the job be done from there ... Ingenium can go online to get the information. I want that feature added and I want it to
+   really work." A link pasted (or pressed for) is fetched once. What is read first is what the site publishes for machines: on
+   boards hosted by Greenhouse and by Lever, their public posting APIs, as their documentation gives them (Greenhouse's Job Board
+   API, GET https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}, whose "content" is entity-encoded HTML; Lever's Postings
+   API, GET https://api.lever.co/v0/postings/{site}/{id}, or api.eu.lever.co); on any other site, the schema.org JobPosting that
+   job sites put in their pages for search engines (JSON-LD, or microdata); and failing both, the page's readable text, its lists
+   kept as lists. A page that asks her to sign in, refuses, or has gone is said so plainly, with what to do instead. Then, when a
+   model is ready, the reading against her profile starts by itself. Nothing else is sent anywhere. */
+var JL={busy:false,url:"",err:null,found:null,sv:null,hint:null,kind:"",focus:""};
+function jlHost(u){try{return new URL(u).hostname.replace(/^www\./,"");}catch(e){return "";}}
+function jlNorm(u){u=String(u||"").trim().replace(/^[<"'“‘(\[]+|[>"'”’)\].,;]+$/g,"");if(!u||/\s/.test(u))return "";
+  if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(u)){if(/^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+([\/?#]|$)/i.test(u))u="https://"+u;else return "";}
+  var x;try{x=new URL(u);}catch(e){return "";}if(!/^https?:$/.test(x.protocol)||!x.hostname||x.hostname.indexOf(".")<0)return "";var host=x.hostname.toLowerCase();
+  /* LinkedIn: a job opened from a list or a search carries its number as currentJobId; its own page is /jobs/view/{number}/ */
+  if(/(^|\.)linkedin\.com$/.test(host)){var li=x.searchParams.get("currentJobId")||(/\/jobs\/view\/(?:[^\/]*?-)?(\d{6,})/.exec(x.pathname)||[])[1];if(li&&/^\d+$/.test(li))return "https://www.linkedin.com/jobs/view/"+li+"/";}
+  /* Indeed: a job opened from a search carries its key as vjk; its own page is /viewjob?jk={key} */
+  if(/(^|\.)indeed\.[a-z.]+$/.test(host)){var jk=x.searchParams.get("jk")||x.searchParams.get("vjk");if(jk&&/^[\w-]+$/.test(jk))return "https://"+host+"/viewjob?jk="+jk;}
+  var drop=[];x.searchParams.forEach(function(v,k){if(/^(utm_\w+|fbclid|gclid|mc_cid|mc_eid|_hsenc|_hsmi|trk\w*|refId|trackingId|lipi)$/i.test(k))drop.push(k);});drop.forEach(function(k){x.searchParams.delete(k);});
+  if(!/^#[!\/]/.test(x.hash))x.hash="";return x.href;}
+function jlAts(u){var x;try{x=new URL(u);}catch(e){return null;}var host=x.hostname.toLowerCase(),p=x.pathname.split("/").filter(Boolean);
+  if(/^(boards|job-boards)(\.eu)?\.greenhouse\.io$/.test(host)){
+    if(p[0]==="embed"&&x.searchParams.get("for")&&/^\d+$/.test(x.searchParams.get("token")||""))return {kind:"greenhouse",board:x.searchParams.get("for"),id:x.searchParams.get("token")};
+    if(p.length>=3&&p[1]==="jobs"&&/^\d+$/.test(p[2]))return {kind:"greenhouse",board:p[0],id:p[2]};}
+  if(/^jobs(\.eu)?\.lever\.co$/.test(host)&&p.length>=2&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p[1]))return {kind:"lever",site:p[0],id:p[1],eu:/\.eu\./.test(host)};
+  return null;}
+function jlApi(a){if(a.kind==="greenhouse")return "https://boards-api.greenhouse.io/v1/boards/"+encodeURIComponent(a.board)+"/jobs/"+encodeURIComponent(a.id);
+  return "https://api"+(a.eu?".eu":"")+".lever.co/v0/postings/"+encodeURIComponent(a.site)+"/"+encodeURIComponent(a.id);}
+/* HTML written as entities ("&lt;p&gt;"), as Greenhouse gives it and some pages put it in their data, made HTML again */
+function jlUnent(s){s=String(s||"");for(var i=0;i<2&&/&(?:amp;)*lt;\/?[a-z]/i.test(s);i++){var ta=new DOMParser().parseFromString("<!doctype html><body><textarea>"+s.replace(/<\/textarea/gi,"&lt;/textarea")+"</textarea>","text/html").querySelector("textarea");s=ta?ta.value:s;}return s;}
+/* HTML as plain text that keeps its shape: a paragraph to a paragraph, a list item to a line that begins "- ", headings apart */
+var JL_BLK=/^(P|DIV|SECTION|ARTICLE|HEADER|FOOTER|MAIN|ASIDE|UL|OL|DL|DT|DD|TABLE|THEAD|TBODY|TR|BLOCKQUOTE|PRE|FIGURE|FIGCAPTION|ADDRESS|HR|CENTER|DETAILS|SUMMARY)$/;
+function jlNodeText(root){var out=[];
+  (function walk(n){for(var c=n.firstChild;c;c=c.nextSibling){if(c.nodeType===3){out.push(c.nodeValue.replace(/\s+/g," "));continue;}if(c.nodeType!==1)continue;var t=String(c.tagName).toUpperCase();
+      if(/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|SVG|IFRAME|BUTTON|FORM|INPUT|SELECT|TEXTAREA|NAV|OBJECT|CANVAS)$/.test(t))continue;
+      if(t==="BR"){out.push("\n");continue;}if(t==="LI"){out.push("\n- ");walk(c);continue;}
+      if(/^H[1-6]$/.test(t)){out.push("\n\n");walk(c);out.push("\n");continue;}if(t==="TD"||t==="TH"){walk(c);out.push(" · ");continue;}
+      if(JL_BLK.test(t)){out.push("\n");walk(c);out.push("\n");continue;}walk(c);}})(root);
+  return out.join("").replace(/[ \t ]+/g," ").replace(/ ?· ?\n/g,"\n").replace(/ *\n */g,"\n").replace(/\n- ?(?=\n)/g,"").replace(/\n- (?:- )+/g,"\n- ").replace(/\n{3,}/g,"\n\n").trim();}
+function jlText(html){html=String(html||"");if(!html.trim())return "";var doc=new DOMParser().parseFromString("<!doctype html><body>"+html+"</body>","text/html");
+  if(!/<[a-z!\/]/i.test(html))return String(doc.body.textContent||"").replace(/\r/g,"").replace(/[ \t ]+/g," ").replace(/ *\n */g,"\n").replace(/\n{3,}/g,"\n\n").trim();return jlNodeText(doc.body);}
+/* the structured data of a page: JSON-LD, read leniently (a raw line break inside a string is the commonest fault) */
+function jlJson(t){t=String(t||"").replace(/^\s*<!--/,"").replace(/-->\s*$/,"").replace(/^\s*\/\/\s*<!\[CDATA\[/,"").replace(/\/\/\s*\]\]>\s*$/,"").trim();if(!t)return null;
+  try{return JSON.parse(t);}catch(e){}try{return JSON.parse(t.replace(/[\u0000-\u001f]+/g," "));}catch(e){}return null;}
+function jlFind(x,d){if(!x||d>8)return null;if(Array.isArray(x)){for(var i=0;i<x.length;i++){var r=jlFind(x[i],d+1);if(r)return r;}return null;}if(typeof x!=="object")return null;
+  var ty=x["@type"];if((Array.isArray(ty)?ty:[ty]).some(function(t){return /(^|[\/:#])JobPosting$/i.test(String(t||""));}))return x;
+  var ks=["@graph","mainEntity","mainEntityOfPage","itemListElement","item","about","hasPart"];for(var k=0;k<ks.length;k++){var r2=jlFind(x[ks[k]],d+1);if(r2)return r2;}return null;}
+function jlStr(v){if(v==null||v===false)return "";if(Array.isArray(v)){var a=v.map(jlStr).filter(Boolean);return a.filter(function(s,i){return a.indexOf(s)===i;}).join(", ");}
+  if(typeof v==="object")return jlStr(v.name!=null?v.name:v["@value"]!=null?v["@value"]:(v.value!=null&&typeof v.value!=="object")?v.value:"");return String(v).replace(/\s+/g," ").trim();}
+function jlIso(s){var m=/(\d{4})-(\d{2})-(\d{2})/.exec(String(s||""));return m?m[1]+"-"+m[2]+"-"+m[3]:"";}
+function jlDay(s){var i=jlIso(s);if(!i)return jlStr(s);var p=i.split("-");return dayStr(new Date(+p[0],+p[1]-1,+p[2],12));}
+function jlPlace(v){var out=[];(Array.isArray(v)?v:[v]).filter(Boolean).forEach(function(p){var s="";if(typeof p==="string")s=p;else{var a=p.address||p;if(typeof a==="string")s=a;
+      else{var ps=[a.addressLocality,a.addressRegion,a.addressCountry].map(jlStr).filter(Boolean);s=ps.filter(function(x,i){return ps.indexOf(x)===i;}).join(", ");}if(!s)s=jlStr(p.name);}
+    s=String(s||"").trim();if(s&&out.indexOf(s)<0)out.push(s);});return out.slice(0,4).join("; ");}
+function jlPay(v){if(!v)return "";if(typeof v!=="object")return jlStr(v);if(Array.isArray(v))return jlPay(v[0]);var cur=jlStr(v.currency),q=v.value,unit="",amt="";
+  var f=function(n){var x=+n;return (n===""||isNaN(x))?String(n):x.toLocaleString("en-GB");};
+  if(q&&typeof q==="object"){unit=jlStr(q.unitText);var lo=q.minValue,hi=q.maxValue;amt=lo!=null&&hi!=null&&+lo!==+hi?f(lo)+" to "+f(hi):lo!=null?f(lo):hi!=null?f(hi):q.value!=null?f(q.value):"";}
+  else if(q!=null)amt=f(q);if(!amt)return "";
+  return [cur,amt,{YEAR:"a year",MONTH:"a month",WEEK:"a week",DAY:"a day",HOUR:"an hour"}[String(unit||v.unitText||"").toUpperCase()]||""].filter(Boolean).join(" ");}
+var JL_HOURS={FULL_TIME:"Full time",PART_TIME:"Part time",CONTRACTOR:"Contract",TEMPORARY:"Temporary",INTERN:"Internship",VOLUNTEER:"Volunteer",PER_DIEM:"Per diem",OTHER:"Other"};
+function jlHours(v){var a=(Array.isArray(v)?v:[v]).map(function(x){x=jlStr(x);return JL_HOURS[x.toUpperCase().replace(/[\s-]+/g,"_")]||x;}).filter(Boolean);return a.filter(function(s,i){return a.indexOf(s)===i;}).join(", ");}
+function jlFromLd(j){var desc=jlText(jlUnent(typeof j.description==="string"?j.description:jlStr(j.description)));
+  var more=[["What you will do",j.responsibilities],["What it asks for",j.qualifications],["Experience",j.experienceRequirements],["Education",j.educationRequirements],["Skills",j.skills],["Benefits",j.jobBenefits]].map(function(x){
+    var t=jlText(jlUnent(typeof x[1]==="string"?x[1]:jlStr(x[1])));if(!t||t.length<3||desc.indexOf(t.slice(0,60))>=0)return "";return x[0]+":\n"+t;}).filter(Boolean);
+  var remote=/telecommute/i.test(jlStr(j.jobLocationType)),appl=jlPlace(j.applicantLocationRequirements);
+  return {title:jlStr(j.title)||jlStr(j.name),org:jlStr(j.hiringOrganization),loc:jlPlace(j.jobLocation),where:remote?"Remote"+(appl?" (open to applicants in "+appl+")":""):"",type:jlHours(j.employmentType),
+    pay:jlPay(j.baseSalary)||jlPay(j.estimatedSalary),posted:jlDay(j.datePosted),closesIso:jlIso(j.validThrough),closesWord:jlDay(j.validThrough),body:[desc].concat(more).filter(Boolean).join("\n\n"),url:jlStr(j.url)};}
+/* microdata, which older pages use instead of JSON-LD */
+function jlMicro(doc){var root=null;try{root=doc.querySelector('[itemtype*="schema.org/JobPosting" i]');}catch(e){}if(!root)return null;
+  function el(n,sc){return (sc||root).querySelector('[itemprop~="'+n+'"]');}
+  function val(e){if(!e)return "";if(e.hasAttribute("content"))return e.getAttribute("content");if(e.tagName==="TIME")return e.getAttribute("datetime")||e.textContent;if(/^(A|LINK)$/.test(e.tagName))return e.getAttribute("href")||"";return e.textContent.replace(/\s+/g," ").trim();}
+  var org=el("hiringOrganization"),loc=el("jobLocation"),d=el("description");
+  return {"@type":"JobPosting",title:val(el("title")),description:d?d.innerHTML:"",datePosted:val(el("datePosted")),validThrough:val(el("validThrough")),employmentType:val(el("employmentType")),
+    hiringOrganization:org?(val(el("name",org))||org.textContent.replace(/\s+/g," ").trim()):"",
+    jobLocation:loc?{address:{addressLocality:val(el("addressLocality",loc)),addressRegion:val(el("addressRegion",loc)),addressCountry:val(el("addressCountry",loc))}}:""};}
+/* the readable part of a page: the posting's own box where the page marks one, else its article or main part */
+var JL_SEL=['[itemprop="description"]','[data-automation-id="jobPostingDescription"]','#jobDescriptionText','.show-more-less-html__markup','.description__text','.job-description','#job-description','.jobDescription','.job-details','#job-details','.job-body','.posting-page','.vacancy-description','#vacancy','.vacancy','article','main','[role=main]','#content','#main'];
+function jlReadable(doc){var pick=null;for(var i=0;i<JL_SEL.length&&!pick;i++){var e=null;try{e=doc.querySelector(JL_SEL[i]);}catch(x){}if(e&&String(e.textContent||"").replace(/\s+/g," ").trim().length>=500)pick=e;}
+  var root=pick||doc.body;if(!root)return "";root=root.cloneNode(true);
+  [].forEach.call(root.querySelectorAll('nav,header,footer,aside,form,[role=navigation],[role=banner],[role=contentinfo],[aria-hidden=true],#onetrust-consent-sdk,#onetrust-banner-sdk,#CybotCookiebotDialog,.cc-window'),function(n){n.remove();});
+  return jlNodeText(root);}
+/* Greenhouse's Job Board API and Lever's Postings API, by the fields their documentation names */
+function jlGh(j){if(!j||!j.title)return null;var deps=(j.departments||[]).map(function(x){return x&&x.name;}).filter(Boolean).join(", "),offs=(j.offices||[]).map(function(x){return x&&x.name;}).filter(Boolean).join("; ");
+  return {title:String(j.title).trim(),org:String(j.company_name||"").trim(),loc:(j.location&&j.location.name)||offs||"",team:deps,posted:jlDay(j.first_published||j.updated_at||""),
+    closesIso:jlIso(j.application_deadline),closesWord:j.application_deadline?jlDay(j.application_deadline):"",body:jlText(jlUnent(String(j.content||""))),url:j.absolute_url||""};}
+function jlLever(j){if(!j||!j.text)return null;var c=j.categories||{},parts=[j.descriptionPlain||jlText(j.description||"")];
+  (j.lists||[]).forEach(function(l){if(l&&(l.text||l.content))parts.push(((l.text||"")+"\n"+jlText("<ul>"+String(l.content||"")+"</ul>")).trim());});
+  parts.push(j.additionalPlain||jlText(j.additional||""));if(j.salaryDescriptionPlain)parts.push(j.salaryDescriptionPlain);
+  return {title:String(j.text).trim(),org:"",loc:jlStr(c.allLocations&&c.allLocations.length?c.allLocations:c.location),team:[c.team,c.department].map(jlStr).filter(Boolean).join(", "),type:jlStr(c.commitment),
+    where:{"on-site":"On site",remote:"Remote",hybrid:"Hybrid"}[j.workplaceType]||"",body:parts.filter(function(x){return x&&String(x).trim();}).join("\n\n").trim(),url:j.hostedUrl||""};}
+/* why a page gave no posting: a sign-in, a refusal, a page built only by its scripts, or a page gone */
+function jlWall(st,t,hasData,host){if(st===404||st===410)return "gone";if(st===401||st===407||st===999)return "signin";if(st===403||st===429||st===451)return "refused";if(st>=500)return "down";if(st&&(st<200||st>=300))return "refused";
+  if(hasData)return "";var s=String(t||"").slice(0,4000).toLowerCase(),n=String(t||"").length;
+  if(n<2500&&(/sign in to (view|see|continue|apply)|log ?in to (view|see|continue|apply)|join (now )?to (view|see)|please (sign|log) ?in|you must be (signed|logged) in/.test(s)||(/linkedin\.com$/.test(host||"")&&/sign in|join now|agree & join/.test(s))))return "signin";
+  if(n<1500&&/enable javascript|javascript is (required|disabled|not enabled)|requires javascript|turn on javascript/.test(s))return "script";
+  if(n<3000&&/captcha|are you a robot|verify (that )?you are (a )?human|access denied|unusual traffic|request (was )?blocked|attention required/.test(s))return "refused";return "";}
+function jlErr(kind,host,st,n){var e=new Error(kind);e.jl={kind:kind,host:host,status:st,n:n||0};return e;}
+function jlMsg(e){var j=e&&e.jl,m=String(e&&e.message||e||""),site=(j&&j.host)||"The site",li=/linkedin\.com$/.test(site);
+  if(!j){if(/browser refused or could not reach/i.test(m))return {text:"In a browser, most sites refuse requests from another page. The Ingenium apps fetch postings; here, paste the posting's text below instead.",paste:true};
+    return {text:"It could not be fetched: "+m.replace(/\.$/,"")+". Paste the posting's text below instead.",paste:true};}
+  var st=j.status?" (it answered "+j.status+")":"";
+  return ({signin:{text:(li?"LinkedIn":site)+" shows this posting only to people who are signed in, so Ingenium cannot fetch it. Open it in your browser, select all of its text (Ctrl+A, or Command+A on a Mac), copy it, and paste it below. Or look for the same post on the employer's own site.",paste:true,elsewhere:true},
+    refused:{text:site+" refused the request"+st+". Many job sites refuse anything but a browser. Open it in your browser, copy its text, and paste it below, or look for the same post on the employer's own site.",paste:true,elsewhere:true},
+    script:{text:site+" builds its pages with scripts, so their text cannot be read from here. Open it in your browser, copy its text, and paste it below.",paste:true,elsewhere:true},
+    gone:{text:site+" says the page does not exist"+st+". The posting may have closed, or the link may be cut short: copy it again from the address bar.",paste:false},
+    down:{text:site+" did not answer properly"+st+". Try again in a few minutes, or paste the posting's text below.",paste:true},
+    pdf:{text:"This link opens a PDF. Save it, then add it with Choose a file.",file:true},
+    little:{text:"Too little of the posting came back ("+j.n+" characters): the site may build it with scripts. Open it in your browser, copy its text, and paste it below.",paste:true,elsewhere:true}})[j.kind]||{text:"It could not be fetched. Paste the posting's text below instead.",paste:true};}
+function jlPage(u){var host=jlHost(u);
+  return netFetch(u,{headers:{"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Accept-Language":(navigator.language||"en-GB")+",en;q=0.8"},timeout:30}).then(function(r){
+    return r.text().then(function(t){t=String(t||"");var ct=String(r.contentType||"");
+      if(/application\/pdf/i.test(ct)||/^%PDF-/.test(t.slice(0,8)))throw jlErr("pdf",host,r.status);
+      var w0=jlWall(r.status,"",true,host);if(w0)throw jlErr(w0,host,r.status);
+      if(!/html|xml/i.test(ct)&&!/<html|<body|<div|<p[\s>]/i.test(t.slice(0,4000))){var plain=t.replace(/\r/g,"").trim();if(plain.length<200)throw jlErr("little",host,r.status,plain.length);return {title:"",org:"",body:plain,plain:true,how:"the page's text"};}
+      var doc=new DOMParser().parseFromString(t,"text/html"),jp=null;
+      [].forEach.call(doc.querySelectorAll('script[type*="ld+json"]'),function(s){if(!jp){var f=jlFind(jlJson(s.textContent),0);if(f)jp=f;}});
+      if(!jp)jp=jlMicro(doc);
+      var d=jp?jlFromLd(jp):{title:"",org:"",body:""},rd=jlReadable(doc);if(String(d.body||"").length<300&&rd.length>String(d.body||"").length)d.body=rd;
+      var meta=function(n){var m=doc.querySelector('meta[property="'+n+'"],meta[name="'+n+'"]');return m?String(m.getAttribute("content")||"").trim():"";},h1=doc.querySelector("h1");
+      d.pageTitle=meta("og:title")||(h1?h1.textContent.replace(/\s+/g," ").trim():"")||String(doc.title||"").trim();d.site=meta("og:site_name");
+      /* LinkedIn gives a posting only on its public job page, with the posting's own data or its description box; anything else is its sign-in */
+      if(/(^|\.)linkedin\.com$/.test(host)&&!(jp&&d.title)&&!doc.querySelector(".show-more-less-html__markup,.description__text"))throw jlErr("signin",host,r.status);
+      var w=jlWall(r.status,d.body,!!(jp&&d.title&&String(d.body).length>=200),host);if(w)throw jlErr(w,host,r.status);
+      if(String(d.body).length<200)throw jlErr("little",host,r.status,String(d.body).length);
+      d.data=!!(jp&&d.title);d.how=d.data?"the posting's own data, which the site publishes for search engines":"the page's text";return d;});});}
+function jlFetch(u){var a=jlAts(u);if(!a)return jlPage(u);
+  return netFetch(jlApi(a),{headers:{"Accept":"application/json"},timeout:25}).then(function(r){if(!r.ok)throw new Error("answered "+r.status);return r.json();})
+    .then(function(j){var d=a.kind==="greenhouse"?jlGh(j):jlLever(j);if(!d||!d.title||String(d.body).length<200)throw new Error("too little");d.data=true;d.how=a.kind==="greenhouse"?"Greenhouse's public job board":"Lever's public job postings";return d;})
+    .catch(function(){return jlPage(u);});}
+/* the posting as it is kept: its title and who offers it first (as the reading and Lector's parser expect), then its facts, then its text */
+function jlCompose(d,u){if(d.plain)return String(d.body||"").trim();var head=[d.title||d.pageTitle||"A posting"];if(d.org||d.site)head.push(d.org||d.site);
+  [["Location",d.loc],["Workplace",d.where],["Team",d.team],["Hours",d.type],["Salary",d.pay],["Posted",d.posted],["Closing date",d.closesWord],["Link",u]].forEach(function(x){if(x[1])head.push(x[0]+": "+x[1]);});
+  return head.join("\n")+"\n\n"+String(d.body||"").trim();}
+/* the closing date where the posting gives it in a sentence ("Closing date: 15 December 2026. Interviews ...") */
+function jlCloses(t){var L=String(t||"").split(/\n+/),re=/(clos(es|ing)( date)?|deadline|apply by|applications? (are |must be )?(due|received|submitted)|no later than)/i;
+  for(var i=0;i<L.length;i++){if(!re.test(L[i]))continue;var ss=L[i].split(/[.;]\s+/);for(var j=0;j<ss.length;j++){if(re.test(ss[j])){var iso=dateIn(ss[j]);if(iso)return {iso:iso,word:jlDay(iso)};}}}return null;}
+function jlKind(d,kind){if(kind&&kind!=="job")return kind;var t=(d.title||d.pageTitle||"")+" "+(d.type||"");
+  if(/\b(phd|dphil|doctoral|doctorate|studentship)\b/i.test(t))return "phd";if(/\b(fellowship|grant|scholarship|bursary)\b/i.test(t))return "grant";return "job";}
+/* a saved job from LinkedIn, once it is an application, is marked as brought in */
+function jlLinked(o){if(JL.sv){var x=svList().filter(function(s){return s.id===JL.sv;})[0];if(x){x.st="in";x.opp=o.id;if(x.kind==="applied")o.stage="applied";if(!o.org&&x.org)o.org=x.org;if(!o.title&&x.title)o.title=x.title;}}JL.sv=null;JL.hint=null;}
+function jlClear(){JL.err=null;JL.found=null;JL.sv=null;JL.hint=null;JL.focus="";}
+/* once kept, it is read at once when a model is ready */
+function readNow(o){CS().ui.room="apps";CS().ui.open=o.id;show("work");save();
+  if(modelReady()){readOpp(o);return;}render();say("Kept. A model is needed to read it against your profile: get one on the Models page"+(typeof lxCxReady==="function"&&lxCxReady()?", or choose your connected model on the studio's first page":"")+".");}
+function fetchPosting(url,kind,opt){opt=opt||{};var u=jlNorm(url);
+  if(!u){JL.err={text:"That is not a whole web address. Copy it from the address bar: it begins with https://",paste:true};CS().ui.open="new";show("work");save();render();return Promise.resolve(null);}
+  if(typeof netFetch!=="function"){say("This device cannot fetch pages.");return Promise.resolve(null);}if(JL.busy||busyNow())return Promise.resolve(null);
+  var same=CS().opps.filter(function(o){return urlOf(o)===u;})[0];
+  if(same&&!opt.again){jlLinked(same);jlClear();CS().ui.room="apps";CS().ui.open=same.id;show("work");save();render();say("It is in your applications already: "+(same.title||"Untitled")+".");return Promise.resolve(same);}
+  JL.busy=true;JL.url=u;JL.err=null;JL.found=null;render();
+  return jlFetch(u).then(function(d){if(!d.closesWord){var cl=jlCloses(d.body);if(cl){d.closesWord=cl.word;d.closesIso=cl.iso;}}return newOpp(jlKind(d,kind),jlCompose(d,u),u).then(function(o){o.url=u;o.fetchedAt=Date.now();o.how=d.how;
+      if(d.data&&d.title){o.title=d.title.slice(0,160);o.titleSet=true;}else if(d.pageTitle)o.title=d.pageTitle.slice(0,160);
+      o.org=String(d.org||d.site||"").slice(0,160);if(d.data&&d.org)o.orgSet=true;
+      if(d.closesWord){o.closes=d.closesWord.slice(0,80);o.due=d.closesIso||dateIn(d.closesWord)||o.due;}
+      if(kind&&kind!=="job")o.kindSet=true;jlLinked(o);JL.busy=false;JL.url="";jlClear();save();say("Fetched from "+jlHost(u)+(d.data?", from "+d.how:"")+".");readNow(o);return o;});},
+    function(e){JL.busy=false;JL.url="";JL.err=jlMsg(e);JL.err.url=u;JL.focus=JL.err.paste?"paste":"";JL.kind=kind||JL.kind;CS().ui.room="apps";CS().ui.open="new";show("work");save();render();return null;});}
+/* the same post on the employer's own site, found by its title and who offers it (a search, only when she presses) */
+function jlElsewhere(q){q=String(q||"").replace(/\s+/g," ").trim();if(q.length<4){say("Give its title and who offers it first.");return;}
+  if(typeof webSearch!=="function"){say("This device cannot search online.");return;}JL.found={q:q,busy:true,rs:[]};render();
+  webSearch(q+" job",8).then(function(rs){JL.found={q:q,rs:(rs||[]).filter(function(x){return x&&x.url&&!/linkedin\.com|indeed\.|glassdoor\./i.test(x.url);}).slice(0,6)};render();},
+    function(e){JL.found={q:q,rs:[],err:String(e&&e.message||e)};render();});}
+function linkRow(kind,val,big){var r=h("div","c-link"),u=input("url",val||"","Paste a job link: https://…");u.setAttribute("aria-label","The posting's link");u.setAttribute("autocomplete","off");u.spellcheck=false;
+  var go=cbtn("pri",JL.busy?"Fetching…":"Fetch and read it",function(){fetchPosting(u.value,kind());},"Fetches the posting from its link, only now, and reads it against your profile");if(JL.busy){go.disabled=true;u.disabled=true;}
+  u.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();fetchPosting(u.value,kind());}});
+  /* a whole link pasted is fetched at once: the paste is the press */
+  u.addEventListener("paste",function(){setTimeout(function(){if(jlNorm(u.value)&&!JL.busy)fetchPosting(u.value,kind());},40);});
+  if(big){u.id="csLink";r.appendChild(field("Its link",u));}else r.appendChild(u);r.appendChild(go);return r;}
+function quickLink(){var w=h("div","c-quick");w.appendChild(h("h3","c-h3",esc("Bring a posting by its link")));w.appendChild(linkRow(function(){return "job";},"",false));
+  w.appendChild(JL.busy?h("p","c-status","<i class=\"c-spin\" aria-hidden=\"true\"></i>"+esc("Fetching the posting from "+jlHost(JL.url)+"…")):h("p","c-note",esc("Paste the link: Ingenium fetches the posting, keeps it on this device and reads it against your profile at once. For a PhD, a grant, or a posting to paste as text, use Bring a posting.")));return w;}
 function lookUp(o){if(typeof webSearch!=="function"){say("This device cannot search online.");return;}var q=[o.org,o.title].filter(Boolean).join(" ").trim();if(!q){say("Give it a title or an organisation first.");return;}
   say("Searching online for "+q+"…");webSearch(q,6).then(function(rs){o.web={at:Date.now(),q:q,results:rs.map(function(x){return {title:String(x.title||x.url).slice(0,200),url:x.url,snippet:String(x.snippet||x.text||"").slice(0,400)};})};save();render();},function(e){say("The search did not work: "+(e&&e.message||e));});}
 
@@ -1061,7 +1300,9 @@ function stepDone(o,k){if(k==="post")return true;if(k==="fit")return !!o.read;if
   return ["applied","interview","offer","accepted","unsuccessful","withdrawn","not"].indexOf(o.stage)>=0;}
 function goStep(o,k){o.step=k;save();jump();render();}
 function paintApps(par){var S=CS(),open=S.ui.open==="new"?"new":oppById(S.ui.open),list=sortedOpps();
-  var L=panel("csList","Applications",{key:cbtn("pri sm","+ Bring one",function(){S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
+  var L=panel("csList","Applications",{key:cbtn("pri sm","+ Bring one",function(){jlClear();S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
+  /* 6.9.8: the jobs saved on LinkedIn, waiting to be taken one at a time */
+  var svw=svList().filter(function(x){return x.st==="wait";}).length;if(svw||S.ui.open==="saved"){var sb=item("Saved on LinkedIn",svw?svw+" waiting · one at a time":"Nothing waiting",S.ui.open==="saved",function(){S.ui.open="saved";show("work");save();render();},"c-svk");L.body.appendChild(sb);}
   if(!list.length)L.body.appendChild(empty("Nothing here yet","Bring a posting, a programme's call or a grant you are weighing. The studio reads what you bring; it is not a job board."));
   var fin=[],soon=0;
   list.forEach(function(o){var n=daysLeft(o),dw=dueWords(o),b=h("button","c-opp");b.type="button";if(open&&open.id===o.id)b.setAttribute("aria-current","true");
@@ -1072,7 +1313,7 @@ function paintApps(par){var S=CS(),open=S.ui.open==="new"?"new":oppById(S.ui.ope
   if(fin.length){var f=fold("finished","Finished ("+fin.length+")");fin.forEach(function(b){f.appendChild(b);});L.body.appendChild(f);}
   var open0=list.length-fin.length;L.foot.appendChild(h("span","c-note",esc(list.length?open0+" open"+(soon?" · "+soon+" closing within a week":"")+(fin.length?" · "+fin.length+" finished":""):"Your applications will be listed here.")));
   if(list.length)L.foot.appendChild(cbtn("sm quiet","Export all",function(){exportAll();},"Every application as a folder of files, in one zip"));
-  var R=RUN.busy?livePanel():open==="new"?newPanel():open?oppPanel(open):introPanel();two(L,R,par);}
+  var R=RUN.busy?livePanel():open==="new"?newPanel():S.ui.open==="saved"?savedPanel():open?oppPanel(open):introPanel();two(L,R,par);}
 /* 6.8.5: each of the four parts opens to what it does, with a key into it */
 var HOW=[["Your profile","What you are looking for, your CV, your entries and documents, and Lector's readings of your apps: the only facts the studio uses.",
     ["About you: your name and how to reach you, set above your CV and your letters.",
@@ -1082,7 +1323,8 @@ var HOW=[["Your profile","What you are looking for, your CV, your entries and do
      "Nothing outside your profile is ever claimed for you. Where it is silent, a place is left in square brackets for you to fill."],
     ["Open your profile",function(){CS().ui.room="profile";save();render();}]],
   ["Bring an opportunity","A posting, a programme's call or a grant. It is read against your profile: what matches what you want, and each criterion, shown or not.",
-    ["Paste its text, choose a file, or fetch it from its address. Fetching is the only step that uses the internet, and only when you press it.",
+    ["Paste its link and it is fetched and read against your profile at once; or paste its text, or choose a file. Fetching is the only step that uses the internet, and only when you paste a link or press.",
+     "From LinkedIn: the copy of your data that LinkedIn sends you holds the jobs you saved; they wait in Applications, to be brought in one at a time.",
      "The reading names the post, who offers it and when it closes, and lists what it asks for, each criterion essential or desirable.",
      "Each criterion is judged from your profile alone: shown, partly shown or not shown, with the evidence named.",
      "Then your strengths for it, its concerns said plainly, your next steps, and the questions worth asking the contact.",
@@ -1119,19 +1361,37 @@ function howCards(ol){var d=ol.nextSibling;ol.innerHTML="";
   if(x){d.hidden=false;d.setAttribute("aria-labelledby","csHowK"+HOWOPEN);d.appendChild(h("h3",null,esc(x[0])));var ul=h("ul");x[2].forEach(function(t){ul.appendChild(h("li",null,esc(t)));});d.appendChild(ul);d.appendChild(cbtn("",x[3][0],x[3][1]));
     d.style.animation="none";void d.offsetWidth;d.style.animation="";}
   else{d.hidden=true;d.removeAttribute("aria-labelledby");}}
-function introPanel(){var P=panel("csWork","How the studio works");var q=h("blockquote","c-motto","“Tell me and I forget. Teach me and I remember. Involve me and I learn.”");P.body.appendChild(q);
+function introPanel(){var P=panel("csWork","How the studio works",{cls:"c-intro"});P.body.appendChild(quickLink());var q=h("blockquote","c-motto","“Tell me and I forget. Teach me and I remember. Involve me and I learn.”");P.body.appendChild(q);
   var g=h("ol","c-how"),dt=h("div","c-howd");g.setAttribute("aria-label","The four parts of the studio: press one for more");dt.id="csHowD";dt.setAttribute("role","region");
   P.body.appendChild(g);P.body.appendChild(dt);howCards(g);P.body.appendChild(h("p","c-note c-pad",esc(modelReady()?"Writing with "+modelName()+", the model Lector uses, "+whereLine()+". Nothing is searched online unless you press for it.":"No model is ready on this device yet: the studio keeps and tracks without one, and reads and writes once one is ready (Models page). Nothing is searched online unless you press for it.")));
   P.foot.appendChild(cbtn("","Open your profile",function(){CS().ui.room="profile";save();render();}));var ckey=cloudKey();if(ckey)P.foot.appendChild(ckey);P.foot.appendChild(h("span","c-grow"));
   P.foot.appendChild(cbtn("pri","Bring a posting",function(){CS().ui.open="new";show("work");save();render();}));return P;}
-function newPanel(){var S=CS(),kind="job",P=panel("csWork","Bring a posting, programme or grant",{back:"Applications",onBack:function(){S.ui.open=null;show("list");save();render();}});
-  var k0=seg(OKINDS,kind,function(v){kind=v;[].forEach.call(k0.children,function(b,i){b.setAttribute("aria-pressed",OKINDS[i][0]===v?"true":"false");});},"What it is");
-  var box=h("div","c-col c-fill");box.appendChild(h("p","c-note",esc("Paste its whole text: the title, who offers it, what it asks for, how to apply and when it closes. Or add it as a file, or fetch it from its address.")));
-  box.appendChild(k0);var ta=h("textarea","c-ta c-grow");ta.setAttribute("aria-label","The posting's text");ta.placeholder="Paste the posting or the call here.";box.appendChild(ta);
-  var r=h("div","c-row"),u=input("url","","https://");u.setAttribute("aria-label","Its address");r.appendChild(field("Or its address (only this uses the internet)",u));r.appendChild(cbtn("","Fetch it",function(){fetchPosting(u.value,kind);}));box.appendChild(r);P.body.appendChild(box);
-  P.foot.appendChild(cbtn("","Choose a file",function(){pickFile(".docx,.pdf,.txt,.md,.html,.htm,.rtf",false,function(fs){readFile(fs[0]).then(function(t){if(t.length<120){say("That file holds too little text to be a posting.");return;}return newOpp(kind,t,fs[0].name).then(function(o){o.kindSet=kind!=="job";save();render();});},function(e){say("It could not be read: "+(e&&e.message||e));});});}));
-  P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Cancel",function(){S.ui.open=null;show("list");save();render();}));
-  P.foot.appendChild(cbtn("pri","Keep it",function(){var t=ta.value.replace(/\r/g,"").trim();if(t.length<120){say("That is too short to be a posting. Paste the whole of it.");return;}newOpp(kind,t,"pasted").then(function(o){o.kindSet=kind!=="job";save();render();});}));return P;}
+/* 6.9.8: the link first (one paste fetches it and reads it against her profile); its text, or a file, as the other ways */
+function newPanel(){var S=CS(),kind=JL.kind||"job",P=panel("csWork","Bring a posting, programme or grant",{back:"Applications",onBack:function(){jlClear();S.ui.open=null;show("list");save();render();}});
+  var k0=seg(OKINDS,kind,function(v){kind=JL.kind=v;[].forEach.call(k0.children,function(b,i){b.setAttribute("aria-pressed",OKINDS[i][0]===v?"true":"false");});},"What it is");
+  var box=h("div","c-col c-fill");box.appendChild(k0);
+  box.appendChild(linkRow(function(){return kind;},JL.busy?JL.url:(JL.err&&JL.err.url)||"",true));
+  if(JL.busy)box.appendChild(h("p","c-status","<i class=\"c-spin\" aria-hidden=\"true\"></i>"+esc("Fetching the posting from "+jlHost(JL.url)+"…")));
+  else if(!JL.err)box.appendChild(h("p","c-note",esc("Paste the link and Ingenium fetches the posting, keeps its text on this device, and reads it against your profile at once. Only this uses the internet, and only when you paste or press.")));
+  if(JL.err){var al=h("div","c-alert");al.setAttribute("role","alert");al.appendChild(h("p",null,esc(JL.err.text)));
+    if(JL.err.elsewhere&&typeof webSearch==="function"){var hint=JL.hint||{},q=input("text",[hint.title,hint.org].filter(Boolean).join(" "),"Its title and who offers it");q.setAttribute("aria-label","The post's title and who offers it");
+      var er=h("div","c-link");er.appendChild(q);er.appendChild(cbtn("sm","Look for it elsewhere",function(){jlElsewhere(q.value);},"Searches the internet for the same post on the employer's own site, only now"));
+      q.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();jlElsewhere(q.value);}});al.appendChild(er);}
+    box.appendChild(al);}
+  if(JL.found){var fd=h("div","c-found");fd.appendChild(h("h3","c-h3",esc(JL.found.busy?"Looking for “"+JL.found.q+"”…":"Found for “"+JL.found.q+"”")));
+    if(!JL.found.busy){if(!JL.found.rs.length)fd.appendChild(h("p","c-note",esc(JL.found.err?"The search did not work: "+JL.found.err:"Nothing that looks like it was found. Paste its text below.")));
+      var ul=h("ul");JL.found.rs.forEach(function(x){var li=h("li"),a=h("a");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=String(x.title||x.url).slice(0,160);li.appendChild(a);
+        li.appendChild(h("small",null,esc(jlHost(x.url))));li.appendChild(cbtn("sm","This is it: fetch and read it",function(){fetchPosting(x.url,kind);}));ul.appendChild(li);});fd.appendChild(ul);
+      if(JL.found.rs.length)fd.appendChild(h("p","c-note",esc("Open one to be sure it is the same post before you choose it.")));}
+    box.appendChild(fd);}
+  box.appendChild(h("div","c-or",esc("or paste its text")));
+  var ta=h("textarea","c-ta c-grow");ta.id="csPaste";ta.setAttribute("aria-label","The posting's text");ta.placeholder="Paste the whole posting here: its title, who offers it, what it asks for, how to apply and when it closes.";box.appendChild(ta);P.body.appendChild(box);
+  if(JL.focus==="paste"){JL.focus="";setTimeout(function(){try{ta.focus({preventScroll:true});}catch(e){}},60);}
+  P.foot.appendChild(cbtn("","Choose a file",function(){pickFile(".docx,.pdf,.txt,.md,.html,.htm,.rtf",false,function(fs){readFile(fs[0]).then(function(t){if(t.length<120){say("That file holds too little text to be a posting.");return;}return newOpp(kind,t,fs[0].name).then(function(o){o.kindSet=kind!=="job";jlLinked(o);jlClear();save();readNow(o);});},function(e){say("It could not be read: "+(e&&e.message||e));});});}));
+  P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Cancel",function(){jlClear();S.ui.open=null;show("list");save();render();}));
+  P.foot.appendChild(cbtn("pri","Keep and read it",function(){var t=ta.value.replace(/\r/g,"").trim();if(jlNorm(t)){fetchPosting(t,kind);return;}
+    if(t.length<120){say("That is too short to be a posting. Paste the whole of it, or its link above.");return;}
+    newOpp(kind,t,"pasted").then(function(o){o.kindSet=kind!=="job";jlLinked(o);jlClear();save();readNow(o);});},"Keeps the text on this device and reads it against your profile"));return P;}
 function oppPanel(o){var S=CS(),step=o.step||(o.read?"fit":"post"),band=o.read&&bandOf(o.read.r);
   var P=panel("csWork",o.title||"Untitled",{back:"Applications",onBack:function(){show("list");save();render();},chip:band?chip(band.word,"c-band-"+band.band):null});
   var bar=h("ol","c-steps");bar.setAttribute("aria-label","The steps of this application");
@@ -1164,6 +1424,8 @@ function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
   var cols=h("div","c-cols"),a=h("div","c-col"),z=h("div","c-col");
   var band=h("div","c-bandcard");band.setAttribute("data-band",b.band);band.appendChild(h("h3",null,esc(b.word)));b.why.forEach(function(w){band.appendChild(h("p",null,esc(w)));});
   band.appendChild(h("p","c-advice","<b>Advice.</b> "+esc(b.advice)));a.appendChild(band);
+  if(r.lead&&r.lead.length){a.appendChild(h("h3","c-h3",esc("What to lead with")));var lo=h("ol","c-lead");r.lead.forEach(function(x){lo.appendChild(h("li",null,"<b>"+esc(x.title)+"</b>"+(x.why?"<span>"+esc(x.why)+"</span>":"")));});a.appendChild(lo);
+    a.appendChild(h("p","c-note",esc("Entries of your profile that answer this posting best: put them first in your CV and in your letter for it.")));}
   if(r.strengths.length||r.concerns.length){var ul=h("ul","c-pc");r.strengths.forEach(function(s){ul.appendChild(h("li","for","<b>For</b> "+esc(s)));});r.concerns.forEach(function(s){ul.appendChild(h("li","against","<b>Against</b> "+esc(s)));});a.appendChild(ul);}
   if(r.next.length||r.asks.length){a.appendChild(h("h3","c-h3",esc("Next")));var ol=h("ol","c-next");r.next.forEach(function(s){ol.appendChild(h("li",null,esc(s)));});r.asks.forEach(function(s){ol.appendChild(h("li",null,"Ask the contact: "+esc(s)));});a.appendChild(ol);}
   a.appendChild(h("p","c-note",esc(b.rule)));
@@ -1171,7 +1433,9 @@ function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
     r.wants.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"</td><td><span class=\"c-st\" data-st=\""+(x.st==="unsaid"?"partly":x.st)+"\">"+{met:"Matches",partly:"Partly",none:"Does not match",unsaid:"Not said"}[x.st]+"</span></td><td>"+esc(x.offer||"")+"</td>";wb.appendChild(tr);});wt.appendChild(wb);z.appendChild(wt);}
   else if(!wantsText())z.appendChild(h("p","c-note",esc("Say what you are looking for in Your profile, and the next reading says first how each opportunity matches it.")));
   z.appendChild(h("h3","c-h3",esc("What it asks")));var t=h("table","c-tab");t.innerHTML="<thead><tr><th>Criterion</th><th>In your profile</th><th>Evidence</th></tr></thead>";var tb=h("tbody");
-  r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td><span class=\"c-st\" data-st=\""+x.st+"\">"+{met:"Shown",partly:"Partly shown",none:"Not shown"}[x.st]+"</span></td><td>"+esc(x.ev||"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
+  r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td><span class=\"c-st\" data-st=\""+x.st+"\">"+{met:"Shown",partly:"Partly shown",none:"Not shown"}[x.st]+"</span></td><td>"+esc(x.ev||"")+
+    (x.vet?"<small class=\"c-vet\" data-v=\""+x.vet+"\">"+esc({found:"In your profile",near:"Close to your profile's words",missing:"Not found in your profile"+(x.was?": counted as partly shown until you check it":": check it")}[x.vet])+"</small>":"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
+  if(r.crit.some(function(x){return x.vet;}))z.appendChild(h("p","c-note",esc("Each piece of evidence was looked for in your profile itself. Where it was not found in its words, a \u201cshown\u201d counts only as partly shown until you check it: add the evidence to your profile, or read it again.")));
   z.appendChild(h("p","c-note",esc("Read on "+dayStr(o.read.at)+" with "+(o.read.model||"your model")+". The band follows from these judgements, made from your profile alone; it is not a probability.")));
   cols.appendChild(a);cols.appendChild(z);P.body.appendChild(cols);
   P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: its checklist",function(){goStep(o,"check");}));}
@@ -1973,7 +2237,7 @@ function lcsUnits(A,B){var n=A.length,m=B.length,L=[],i,j;
 function urlOf(o){return o.url||(/^https?:\/\//.test(o.from||"")?o.from:"");}
 function checkAgain(o){var url=urlOf(o);if(!url){say("This posting was not fetched from an address: paste the new text as a new application, or add it as a document.");return Promise.resolve(null);}
   if(typeof fetchPageText!=="function"){say("This device cannot fetch pages.");return Promise.resolve(null);}say("Fetching the posting again from its address…");
-  return Promise.all([postOnly(o),fetchPageText(url,40000)]).then(function(x){var old=String(x[0]||""),nw=String(x[1]||"").trim();if(nw.length<200)throw new Error("too little text came back");
+  return Promise.all([postOnly(o),o.how?jlFetch(url).then(function(d){return jlCompose(d,url);}):fetchPageText(url,40000)]).then(function(x){var old=String(x[0]||""),nw=String(x[1]||"").trim();if(nw.length<200)throw new Error("too little text came back");
     var A=sentencesOf(old),B=sentencesOf(nw),units=lcsUnits(A,B),ch=units.filter(function(u){return !u.same;}),nS=ch.reduce(function(a,u){return a+Math.max(u.old.length,u.nw.length);},0);o.checkedAt=Date.now();
     if(!ch.length){if(o.recheck){try{IngBig.del(o.recheck.ref);}catch(e){}delete o.recheck;}save();render();say("Unchanged: the posting reads as it did on "+dayStr(o.fetchedAt||o.at)+".");return null;}
     var meta={};try{meta=LXR().parsePost(nw)||{};}catch(e){}var nd=dateIn(meta.closes||""),ref=IngBig.newId();
@@ -1996,6 +2260,39 @@ function addMore(o,name,text){text=String(text||"").replace(/\r/g,"").trim();if(
 function moreBox(o){var box=h("div","c-more");box.appendChild(h("span","c-label",esc("Further particulars")));
   (o.more||[]).forEach(function(m){var c=chip(m.name+" · "+Math.round(m.chars/1000)+" thousand characters");var x=cbtn("quiet sm","✕",function(){try{IngBig.del(m.ref);}catch(e){}o.more=o.more.filter(function(z){return z!==m;});save();render();},"Take it off");c.appendChild(x);box.appendChild(c);});
   box.appendChild(h("span","c-note",esc((o.more||[]).length?"Read with the posting: by the reading, the limits and the checklist.":"A document the posting points to (further particulars, a handbook, the person specification), read with it.")));return box;}
+
+/* ---- 6.9.8 · the jobs saved on LinkedIn. Her words (3 November 2026): "I want to be able to link my LinkedIn account to Ingenium
+   so that I can have Ingenium fetch my saved jobs easier ... keep my data and information protected and safely stored on my device
+   ... and always with my permission." LinkedIn's own copy of her data, which she asks LinkedIn for and brings here herself, holds
+   the jobs she saved and those she applied to. They wait here, one at a time: Bring it in fetches that posting, only then, and reads
+   it against her profile; Not this one sets it aside. Imported again later, only the new ones are added. Nothing signs in to
+   LinkedIn and nothing is sent to it. Its columns are read loosely by name, as the rest of the export is. ---- */
+function svList(){var S=CS();if(!Array.isArray(S.saved))S.saved=[];return S.saved;}
+function svKey(j){var u=j.url?(jlNorm(j.url)||String(j.url).trim()):"";return u||("t:"+String(j.title||"").toLowerCase().replace(/\s+/g," ").trim()+"|"+String(j.org||"").toLowerCase().replace(/\s+/g," ").trim());}
+function svMerge(jobs){var L=svList(),n=0,have={};CS().opps.forEach(function(o){var u=urlOf(o);if(u)have[u]=o.id;});
+  jobs.forEach(function(j){var key=svKey(j),ex=L.filter(function(x){return x.key===key;})[0];
+    if(ex){if(j.kind==="applied"&&ex.kind!=="applied"){ex.kind="applied";ex.date=j.date||ex.date;}return;}
+    var it={id:uid("sv"),key:key,kind:j.kind,title:j.title,org:j.org,url:/^https?:/.test(key)?key:"",date:j.date,st:"wait",at:Date.now()};if(it.url&&have[it.url]){it.st="in";it.opp=have[it.url];}L.push(it);if(it.st==="wait")n++;});
+  return n;}
+function svWords(jobs,n){var s=jobs.filter(function(j){return j.kind==="saved";}).length,a=jobs.length-s;
+  return (s?s+" saved job"+(s===1?"":"s"):"")+(s&&a?" and ":"")+(a?a+" application"+(a===1?"":"s")+" sent through LinkedIn":"")+" read: "+(n?n+" new, waiting in Applications under Saved on LinkedIn.":"nothing new.");}
+function svBring(x){JL.sv=x.id;JL.hint={title:x.title,org:x.org};JL.kind="job";
+  if(!x.url){JL.err={text:"This saved job has no link in your LinkedIn data. Look for it on the employer's own site, or paste its text below.",paste:true,elsewhere:true};JL.focus="paste";CS().ui.open="new";show("work");save();render();return;}
+  fetchPosting(x.url,"job");}
+function savedPanel(){var S=CS(),L=svList(),wait=L.filter(function(x){return x.st==="wait";}),many=!!S.ui.svMany,P=panel("csWork","Saved on LinkedIn",{back:"Applications",onBack:function(){S.ui.open=null;show("list");save();render();}});
+  P.body.appendChild(h("p","c-note c-pad c-svnote",esc("From the copy of your LinkedIn data"+(S.savedAt?" you brought in on "+dayStr(S.savedAt):"")+": the jobs you saved there"+(L.some(function(x){return x.kind==="applied";})?", and those you applied to":"")+". Take them one at a time. Bring it in fetches that posting, only then, and reads it against your profile; nothing is sent to LinkedIn.")));
+  if(!wait.length)P.body.appendChild(empty("Nothing waiting","Every saved job has been brought in or set aside. Bring in your LinkedIn data again later, and only the new ones come here."));
+  (many?wait:wait.slice(0,1)).forEach(function(x){var c=h("div","c-svcard");c.appendChild(h("b",null,esc(x.title||"A saved job")));
+    c.appendChild(h("small",null,esc([x.org,(x.kind==="applied"?"Applied":"Saved")+(x.date?" "+x.date:"")].filter(Boolean).join(" · "))));
+    var r=h("div","c-row");r.appendChild(cbtn("pri sm","Bring it in and read it",function(){svBring(x);},"Fetches the posting, only now, and reads it against your profile"));r.appendChild(cbtn("sm","Not this one",function(){x.st="drop";x.dropAt=Date.now();save();render();}));
+    if(x.url){var a=h("a","c-btn sm quiet");a.href=x.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open it";r.appendChild(a);}c.appendChild(r);P.body.appendChild(c);});
+  if(wait.length>1)P.body.appendChild(h("div","c-pad",null)).appendChild(cbtn("quiet sm",many?"Show one at a time":"Show all "+wait.length+" waiting",function(){S.ui.svMany=!many;save();render();}));
+  var done=L.filter(function(x){return x.st!=="wait";});
+  if(done.length){var f=fold("svdone","Brought in or set aside ("+done.length+")"),ul=h("ul","c-svdone");done.forEach(function(x){var li=h("li");li.appendChild(h("span",null,esc((x.title||"A saved job")+(x.org?", "+x.org:""))));
+      if(x.st==="in"&&oppById(x.opp))li.appendChild(cbtn("sm quiet","Open",function(){S.ui.open=x.opp;show("work");save();render();}));else if(x.st==="drop")li.appendChild(cbtn("sm quiet","Put it back",function(){x.st="wait";save();render();}));ul.appendChild(li);});
+    f.appendChild(ul);P.body.appendChild(f);}
+  P.foot.appendChild(cbtn("","Bring in your LinkedIn data again",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});},"The .zip LinkedIn sends when you ask for a copy of your data"));
+  P.foot.appendChild(h("span","c-grow"));return P;}
 
 /* ---- 8. a LinkedIn export imported as a difference ---- */
 function liKey(it){return (String(it.title||"")+"|"+String(it.place||"")).toLowerCase().replace(/\s+/g," ").trim();}
@@ -2037,7 +2334,7 @@ function install(){if($("page-career"))return;
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
-window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
+window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,fetchPosting:fetchPosting,jl:{norm:jlNorm,ats:jlAts,api:jlApi,text:jlText,unent:jlUnent,fromLd:jlFromLd,find:jlFind,json:jlJson,compose:jlCompose,fetch:jlFetch,wall:jlWall},vetEvidence:vetEvidence,vetLead:vetLead,saved:svList,svMerge:svMerge,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
   root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR,
   /* 6.9.2 */ datesOf:datesOf,remindAt:remindAt,bellFor:bellFor,estimateOf:estimateOf,exportOpp:exportOpp,exportAll:exportAll,exportFiles:exportFiles,keepToRead:keepToRead,toFontes:toFontes,readWithLector:readWithLector,readingNotes:readingNotes,
   checkAgain:checkAgain,keepRecheck:keepRecheck,addMore:addMore,postText:postText,postOnly:postOnly,makeCheck:makeCheck,lcsUnits:lcsUnits,startMock:startMock,stopMock:stopMock,startClock:startClock,stopClock:stopClock,clock:function(){return CLOCK;},mock:function(){return MOCK;},

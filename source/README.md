@@ -371,6 +371,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.8 (3 November 2026): a posting from its link, read against her profile at once; and the jobs she saved on LinkedIn.
+Her words: "I want to be able to paste a link of a job that I am interested in applying to in the Career studio and have the analysis
+be done and the match profile for me and the job be done from there ... Ingenium can go online to get the information. I want that
+feature added and I want it to really work", and "I want to be able to link my LinkedIn account to Ingenium so that I can have Ingenium
+fetch my saved jobs easier ... keep my data and information protected and safely stored on my device ... and always with my permission."
+
+- A link pasted (in Applications, or in Bring a posting) is fetched once and read against her profile at once when a model is ready;
+  pasting its text remains, and is read at once too. What is read first is what the site publishes for machines: on boards hosted by
+  Greenhouse and by Lever, their public posting APIs as their documentation gives them (Greenhouse's Job Board API, GET
+  boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}, its content entity-encoded HTML, read from github.com/grnhse/greenhouse-api-docs;
+  Lever's Postings API, GET api.lever.co/v0/postings/{site}/{id} or api.eu.lever.co, read from github.com/lever/postings-api); on other
+  sites, the schema.org JobPosting that job sites put in their pages for search engines (JSON-LD, or microdata); failing both, the
+  page's readable text with its lists kept as lists. The title, who offers it, the place, the hours, the pay and the closing date come
+  from that data where it is given; a closing date written in a sentence is found too. LinkedIn and Indeed links are tidied to the job's
+  own page; tracking is left out. A page behind a sign-in (LinkedIn), one that refuses, one built only by scripts, or one gone is said
+  so plainly, the paste box made ready, with Look for it elsewhere (a search for the same post on the employer's own site, on her press).
+  Not checked here: the schema.org and Google pages on JobPosting could not be opened from where this was built, so its property names
+  are read leniently and anything missing is passed over; the job sites themselves could not be reached from here either, so the
+  stand-ins in the test follow the documented shapes.
+- The reading vetted: each piece of evidence it names is looked for in her profile itself; not found in its words, a "shown" counts as
+  partly shown until she checks it, and the table says so. What to lead with: up to three entries of her profile that answer the
+  posting best, kept only when they are entries of her profile.
+- Saved on LinkedIn: LinkedIn's own copy of her data (the .zip she asks LinkedIn for) brings the jobs she saved and those she applied to
+  into Applications, to be taken one at a time: Bring it in fetches that posting, only then, and reads it; Not this one sets it aside;
+  brought in again later, only the new ones are added. Nothing signs in to LinkedIn and nothing is sent to it. Its columns are read
+  loosely by name (LinkedIn does not document them). A direct link to her LinkedIn account was not built: as far as is known here,
+  LinkedIn's sign-in for other apps gives only a name, an email and a picture, and reading her saved jobs while signed in as her would go
+  against LinkedIn's terms; LinkedIn's developer pages could not be opened from here to check this again.
+
+    node rig/t_698_job_link.js <url> <out>      # 28 checks, with stand-in sites and a stand-in model
+
 Ingenium 6.9.7 (3 November 2026): the Career Studio for an intense season of applications. Her words: "I will be juggling many job
 applications, phd applications prep and emailing potential supervisors, reference requests and hiring managers and recruiters. I need a
 system built-in Ingenium that can help me streamline all of that and manage it all"; her answers: one step at a time; tracking it all;
