@@ -79,7 +79,7 @@ W.ingImportApply=function(found,opt){opt=opt||{};state.chats=state.chats||[];sta
     if(c.project&&pmap[c.project])ch.projectId=pmap[c.project];
     hide(ch,[]);state.chats.push(ch);made.chats++;made.messages+=msgs.length;});
   return writes.reduce(function(p,w,i){return p.then(function(){return cold(w[0],w[1]);}).then(function(){if(i%40===39)return breathe();});},Promise.resolve())
-    .then(function(){saveState();try{ccPaintSide();}catch(e){}try{renderChat();}catch(e){}return made;});};
+    .then(function(){saveState();try{ccPaintSide();}catch(e){}try{renderChat();}catch(e){}try{W.dispatchEvent(new CustomEvent("ing-imported",{detail:made}));}catch(e){}return made;});};
 
 /* ---------- 6. an imported conversation, opened ---------- */
 var LOADING={};
@@ -145,7 +145,7 @@ function showFound(dlg,found){dlg.querySelector("h3").textContent="Bring your ch
       toast(made.chats+" conversation"+(made.chats===1?"":"s")+" from "+found.source+" are in your list"+(made.projects?", and "+made.projects+" project"+(made.projects===1?"":"s"):"")+(made.again?" ("+made.again+" already here were left as they are)":"")+".");
       try{go_chat();}catch(e){}},function(e){dlg.querySelector(".imp-sum").textContent="They could not all be brought in: "+(e&&e.message||e);});}
   some.onclick=function(){go(picks.filter(function(p){return p[0].checked;}).map(function(p){return p[1];}));};all.onclick=function(){go(null);};}
-function go_chat(){if(typeof go==="function")go("chat");}
+function go_chat(){if(W.__ingImportStay){W.__ingImportStay=false;return;}if(typeof go==="function")go("chat");}
 /* 6.9: a conversation pasted in, as it was copied from any assistant's page */
 function sniff(t){var s=String(t||"").replace(/^\uFEFF/,"").trim();if(/^[\[{]/.test(s)){var ls=s.split(/\r?\n/).filter(function(l){return l.trim();});if(ls.length>1&&ls.every(function(l){return /^\s*\{/.test(l);}))return ".jsonl";return ".json";}return ".md";}
 function pasteBox(){var dlg=openDlg("Paste a conversation");
@@ -155,7 +155,7 @@ function pasteBox(){var dlg=openDlg("Paste a conversation");
   no.onclick=function(){try{closeModal();}catch(e){}};
   rd.onclick=function(){var t=ta.value||"";if(!t.trim()){ta.focus();return;}var nm="pasted-transcript"+sniff(t),f;try{f=new File([t],nm,{type:"text/plain"});}catch(e){f=new Blob([t],{type:"text/plain"});f.name=nm;}start([f]);};
   setTimeout(function(){try{ta.focus();}catch(e){}},60);}
-W.ingImportPaste=pasteBox;
+W.ingImportPaste=pasteBox;W.ingImportChoose=chooseFiles;W.ingImportStart=start;
 function settingsCard(){var pg=$("page-settings");if(!pg||$("ingImportCard"))return;
   var c=el("div","card");c.id="ingImportCard";c.setAttribute("role","region");c.setAttribute("aria-labelledby","ingImportH");
   var h=el("h2","sec","Bring your chats from other assistants");h.id="ingImportH";c.appendChild(h);

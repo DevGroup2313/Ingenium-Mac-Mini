@@ -371,6 +371,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.0 (3 November 2026): Folders, a folder for each of her apps; and her work brought in from Claude and Ollama. Her
+words: "I want a safe way to move my data from Claude and Ollama to Ingenium so that I don't lose all of my work ... I want folders
+built in that classifies every app that I have been working on and will build in the future. I want the folders to document how I
+like to work ... so that ... the models don't have to start over from 0 everytime and need to load up everything from memory or
+reread all of the context again and drain tokens." Her answers: start from the apps in her profile; bring in all of it, mainly
+Claude's chats, Claude Code on her Mac (run with Ollama's models) and Claude Code on the web.
+
+- Folders (a page of its own, after Code; modules/r208.js). It starts from the apps her profile names (the Career Studio's entries of
+  projects, and the apps Lector has read): she unticks, adds, and makes them; a folder for a new app can be made at any time.
+- A folder is one of Ingenium's projects (kind "app"), so every conversation in it carries what it keeps: How I work on every app,
+  How I work on it (her own words), Where we left off (a summary), the decisions so far and what is open next. That is a few
+  thousand words at most, instead of every earlier conversation (a test checks that none of their text goes with a new one).
+- Where we left off is brought up to date on her press, with the model Lector uses: only the conversations not read yet are read,
+  each once (a conversation added later is read alone, with the summary so far). The model is told never to invent a version, a
+  date, a decision, a file or a feature. What it sees of how she likes to work is offered for her to keep or drop.
+- Conversations are sorted into the folders by the words that mark each (the app's name and its parts' names, which she can add);
+  one that names no app clearly waits under Not sorted yet; any can be moved by hand.
+- Bring in your work: Claude's .zip (its chats, and its projects as Ingenium projects); Claude Code's sessions on this computer, read
+  on her press through the app's own bridge (desktop/app_claude_610.py: only the .jsonl files under .claude/projects, or under
+  CLAUDE_CONFIG_DIR; nothing else is read; Claude Code's documentation says their format is its own and may change, so the reader
+  is lenient); Claude Code on the web (no export exists yet: a conversation is pasted, or brought down to her Mac with claude
+  --teleport); Ollama (a model's Modelfile, pasted, becomes a way of working; a conversation in Ollama's own app is pasted).
+- Models are not retrained by any of this. What makes a model know her way of working is what it is given to read; a folder gives it
+  that, short. The page ends with the colophon, as the pages that scroll do. The way back from a folder is a quiet path above its
+  name (Folders, then its name), not a raised bar.
+
+    node rig/t_610_folders.js <url> <out>            # 21 checks, with invented apps and a stand-in model and bridge
+    python3 -I rig/t_610_claude_sessions.py          # 15 checks: the app's side, on a stand-in home folder
+
 Ingenium 6.9.9 (3 November 2026): ways back in, the sign-in in the door's own place, and Claude's model names written as Anthropic
 writes them. Her words: "Ingenium's sign in page looks slightly awkward floating over the app's introduction door ... find a better fit";
 "I want a proper and strong and robust recovery system on Ingenium so that a user does not get locked out of their work ... I want a

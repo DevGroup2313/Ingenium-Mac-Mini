@@ -25,7 +25,7 @@
 (function(){"use strict";
 var BY="Designed and built by Yannie D. Forest",RIGHTS="© 2026 Yannie D. Forest";
 /* the pages that scroll; the others fill the window */
-var SCROLLS={"page-home":1,"page-focus":1,"page-models":1,"page-blend":1,"page-build":1,"page-notes":1,"page-guide":1,"page-settings":1};
+var SCROLLS={"page-home":1,"page-focus":1,"page-models":1,"page-blend":1,"page-build":1,"page-notes":1,"page-guide":1,"page-settings":1,"page-folders":1};
 var foot=null,seal=null;
 function night(){return document.body.getAttribute("data-theme")==="night";}
 function drawSeal(){try{if(!seal||typeof drawIngeniumSeal!=="function")return;var d=Math.max(1,Math.min(3,window.devicePixelRatio||1)),s=Math.round(46*d);
