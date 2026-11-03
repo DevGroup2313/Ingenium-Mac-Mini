@@ -256,7 +256,7 @@ var LX_CX_HOME={"ollama-local":1,"ollama-lan":1,lmstudio:1};
 function lxCxReady(){var c=state.cloud||{};if(!c.provider||c.provider==="ingenium")return false;return !!(c.key||LX_CX_HOME[c.provider]||c.provider==="openai-compat");}
 function lxUsesCloud(){try{return !!L7().cloud&&lxCxReady();}catch(e){return false;}}
 function lxCloudWho(){var c=state.cloud||{};return LX_CX_NAMES[c.provider]||"the service";}
-function lxCloudName(){var c=state.cloud||{};return (c.model||"the connected model")+" ("+lxCloudWho()+")";}
+function lxCloudName(){var c=state.cloud||{};return (c.model?(window.ingModelLabel||String)(c.model):"the connected model")+" ("+lxCloudWho()+")";}
 function lxCloudLeaves(){var c=state.cloud||{};return !LX_CX_HOME[c.provider];}
 /* the keys: use the connected model, or go back to this device's own; repaint draws the page again */
 function lxCloudKeys(repaint){var box=h("div","l-keys");
@@ -540,7 +540,7 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
   if(o.cloud){box.appendChild(h("b",null,esc("Your connected model reads and writes")));
     box.appendChild(h("div","need",esc("Lector uses "+lxCloudName()+". "+(lxCloudLeaves()?"While it works, what it reads (your apps, your CV, your own writing and the posting) is sent to "+lxCloudWho()+", which counts the tokens against your key. A whole app can be a great many tokens: the reading can be stopped at any time.":"It runs on your own computer or in your home, so what it reads stays there."))));
     var ck=lxCloudKeys(paintModel);if(ck)box.appendChild(ck);segThumbs(box);return;}
-  if(o.link){box.appendChild(h("b",null,esc("Your other computer reads and writes")));box.appendChild(h("div","need",esc("Lector uses "+(state.cloud&&state.cloud.model||"its model")+" on "+(state.cloud&&state.cloud.computer||"the computer you linked")+", the stronger model, and this device only watches.")));}
+  if(o.link){box.appendChild(h("b",null,esc("Your other computer reads and writes")));box.appendChild(h("div","need",esc("Lector uses "+(state.cloud&&state.cloud.model?(window.ingModelLabel||String)(state.cloud.model):"its model")+" on "+(state.cloud&&state.cloud.computer||"the computer you linked")+", the stronger model, and this device only watches.")));}
   else{var c=o.chosen,isRec=c&&o.rec&&c.id===o.rec.id,name=c?c.customName:(o.spec?o.spec.name:"Magister");
     var reader=o.reader||c,twoModels=reader&&c&&reader.id!==c.id;
     box.appendChild(h("b",null,esc(twoModels?"Reading: "+reader.customName+" · Writing: "+name+(isRec?" (Magister)":""):(isRec?"Ingenium's choice: Magister · ":"Reading and writing: ")+name)));

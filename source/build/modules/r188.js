@@ -1436,7 +1436,7 @@ function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
   r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td><span class=\"c-st\" data-st=\""+x.st+"\">"+{met:"Shown",partly:"Partly shown",none:"Not shown"}[x.st]+"</span></td><td>"+esc(x.ev||"")+
     (x.vet?"<small class=\"c-vet\" data-v=\""+x.vet+"\">"+esc({found:"In your profile",near:"Close to your profile's words",missing:"Not found in your profile"+(x.was?": counted as partly shown until you check it":": check it")}[x.vet])+"</small>":"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
   if(r.crit.some(function(x){return x.vet;}))z.appendChild(h("p","c-note",esc("Each piece of evidence was looked for in your profile itself. Where it was not found in its words, a \u201cshown\u201d counts only as partly shown until you check it: add the evidence to your profile, or read it again.")));
-  z.appendChild(h("p","c-note",esc("Read on "+dayStr(o.read.at)+" with "+(o.read.model||"your model")+". The band follows from these judgements, made from your profile alone; it is not a probability.")));
+  z.appendChild(h("p","c-note",esc("Read on "+dayStr(o.read.at)+" with "+(window.ingPrettyModels||String)(o.read.model||"your model")+". The band follows from these judgements, made from your profile alone; it is not a probability.")));
   cols.appendChild(a);cols.appendChild(z);P.body.appendChild(cols);
   P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: its checklist",function(){goStep(o,"check");}));}
 /* what you send: the documents on the left, the one chosen on the right, its keys at the foot */
@@ -1483,7 +1483,7 @@ function docPane(o,v,rec,pane,P){var kind=v.kind,isMail=kind==="email",how=lesso
   var ck=rec.chk||{},notes=[];if(ck.figures&&ck.figures.length)notes.push("Figures to check, not found in your profile or the posting: "+ck.figures.join(", ")+".");
   if(ck.fills)notes.push(ck.fills+" place"+(ck.fills>1?"s are":" is")+" left for you to fill, in square brackets.");if(ck.style)notes.push(ck.style.trim());
   if(ck.exam!=null&&!isMail&&!rec.mine)notes.push(ck.exam?Math.round(ck.exam*100)+"% of the words were changed in the examiner's pass, which holds every claim to your profile and every figure to what it gives.":"The examiner's pass left the draft as it was.");
-  notes.push(rec.mine?"Your own version, kept on "+dayStr(rec.made)+".":"Written on "+dayStr(rec.made)+" with "+(rec.model||"your model")+".");pane.appendChild(h("p","c-note c-checks",esc(notes.join(" "))));
+  notes.push(rec.mine?"Your own version, kept on "+dayStr(rec.made)+".":"Written on "+dayStr(rec.made)+" with "+(window.ingPrettyModels||String)(rec.model||"your model")+".");pane.appendChild(h("p","c-note c-checks",esc(notes.join(" "))));
   var info=h("div","c-col");info.style.gap="6px";pane.appendChild(info);
   var area=h("div","c-area c-grow");pane.appendChild(area);
   if(tab==="how"){var ol=h("ol","c-lesson-ol");how[1].forEach(function(s){ol.appendChild(h("li",null,esc(s)));});area.appendChild(ol);}
@@ -2107,7 +2107,7 @@ function readingMd(o){var r=o.read&&o.read.r;if(!r)return "";var b=bandOf(r),out
   if(r.crit.length){out.push("## What it asks","","| Criterion | Essential or desirable | In your profile | Evidence |","|---|---|---|---|");r.crit.forEach(function(x){out.push("| "+x.text+" | "+(x.ess?"Essential":"Desirable")+" | "+stWord(x.st)+" | "+(x.ev||"")+" |");});out.push("");}
   if(r.strengths.length){out.push("## For","");r.strengths.forEach(function(s){out.push("- "+s);});out.push("");}if(r.concerns.length){out.push("## Against","");r.concerns.forEach(function(s){out.push("- "+s);});out.push("");}
   if(r.next.length||r.asks.length){out.push("## Next","");r.next.forEach(function(s){out.push("1. "+s);});r.asks.forEach(function(s){out.push("- Ask the contact: "+s);});out.push("");}
-  out.push("Read on "+dayStr(o.read.at)+" with "+(o.read.model||"the model")+", from the profile alone; the band is not a probability.");return out.join("\n");}
+  out.push("Read on "+dayStr(o.read.at)+" with "+(window.ingPrettyModels||String)(o.read.model||"the model")+", from the profile alone; the band is not a probability.");return out.join("\n");}
 function checklistMd(o){var C=o.check;if(!C)return "";var out=["# Checklist: "+to(o),""];C.items.forEach(function(x){out.push("- ["+(x.done?"x":" ")+"] "+x.text+(x.quote?"  \n  From the posting: “"+x.quote+"”":""));});
   (C.pending||[]).forEach(function(x){out.push("- [ ] (to look at) "+x.text);});return out.join("\n")+"\n";}
 function practiseMd(o){var r=o.read&&o.read.r,pr=o.practice||{crit:{},qs:[]},out=[];

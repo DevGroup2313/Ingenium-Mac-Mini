@@ -35,11 +35,11 @@ const err = (status, type, message) => ({ status, contentType: 'application/json
   // 2. a Claude connection set (the chat on this device's models): Lector offers it, saying where the text goes
   await p.evaluate((BASE) => { state.cloud = { on: false, provider: 'anthropic', base: BASE, key: 'sk-test-not-real', model: 'claude-fable-5-1', models: ['claude-fable-5-1'], info: { 'claude-fable-5-1': { ctx: 200000, out: 64000 } } }; state.chatSource = 'local'; saveState(); }, BASE);
   lb = await lectorBox();
-  ok(lb && lb.keys.indexOf('Use claude-fable-5-1 (Anthropic)') >= 0 && /Or let your connected model read and write: claude-fable-5-1 \(Anthropic\)\. What it reads is then sent to Anthropic\./.test(lb.text), '2. with a Claude connection, Lector offers it by name, and says what it reads is then sent to Anthropic', lb);
+  ok(lb && lb.keys.indexOf('Use Claude Fable 5.1 (Anthropic)') >= 0 && /Or let your connected model read and write: Claude Fable 5.1 \(Anthropic\)\. What it reads is then sent to Anthropic\./.test(lb.text), '2. with a Claude connection, Lector offers it by name, and says what it reads is then sent to Anthropic', lb);
   // 3. chosen: the box says so, and how to go back
-  await p.evaluate(() => { const k = [...document.querySelectorAll('#l7Model button')].find((x) => x.textContent.trim() === 'Use claude-fable-5-1 (Anthropic)'); k.click(); });
+  await p.evaluate(() => { const k = [...document.querySelectorAll('#l7Model button')].find((x) => x.textContent.trim() === 'Use Claude Fable 5.1 (Anthropic)'); k.click(); });
   await p.waitForTimeout(300); lb = await lectorBox();
-  ok(lb && /Your connected model reads and writes/.test(lb.text) && /Lector uses claude-fable-5-1 \(Anthropic\)\. While it works, what it reads .* is sent to Anthropic/.test(lb.text) && lb.keys.indexOf("Use this device's model instead") >= 0, '3. chosen, the box says Lector uses claude-fable-5-1 through Anthropic, what is sent, and offers the way back', lb);
+  ok(lb && /Your connected model reads and writes/.test(lb.text) && /Lector uses Claude Fable 5.1 \(Anthropic\)\. While it works, what it reads .* is sent to Anthropic/.test(lb.text) && lb.keys.indexOf("Use this device's model instead") >= 0, '3. chosen, the box says Lector uses claude-fable-5-1 through Anthropic, what is sent, and offers the way back', lb);
   await p.screenshot({ path: OUT + '/lector_cloud.png' }).catch(() => {});
   // 4. Lector asks the connected model (no model on this device)
   log = []; plan = [];
@@ -48,7 +48,7 @@ const err = (status, type, message) => ({ status, contentType: 'application/json
   // 5. the Career Studio writes with it too, and says so
   await p.evaluate(() => { go('career'); }); await p.waitForTimeout(600);
   const cs = await p.evaluate(() => { const pg = document.getElementById('page-career'); const t = pg ? pg.innerText.replace(/\s+/g, ' ') : ''; return { note: (t.match(/Writing with [^.]*\.[^.]*\./) || [''])[0], keys: [...(pg ? pg.querySelectorAll('button') : [])].map((k) => k.textContent.trim()).filter((k) => /^Use /.test(k)) }; });
-  ok(/Writing with claude-fable-5-1 \(Anthropic\), the model Lector uses, through your Anthropic connection: what it reads is sent to Anthropic\./.test(cs.note) && cs.keys.indexOf("Use this device's model instead") >= 0, '5. the Career Studio says it writes with claude-fable-5-1 through Anthropic, and has the key back', cs);
+  ok(/Writing with Claude Fable 5.1 \(Anthropic\), the model Lector uses, through your Anthropic connection: what it reads is sent to Anthropic\./.test(cs.note) && cs.keys.indexOf("Use this device's model instead") >= 0, '5. the Career Studio says it writes with claude-fable-5-1 through Anthropic, and has the key back', cs);
   log = []; plan = [];
   await p.evaluate(() => { const tab = [...document.querySelectorAll('#page-career [role=tab], #page-career button')].find((x) => x.textContent.trim() === 'Goals and plan'); if (tab) tab.click(); });
   await p.waitForTimeout(500);
@@ -67,7 +67,7 @@ const err = (status, type, message) => ({ status, contentType: 'application/json
   await p.evaluate(() => { const k = [...document.querySelectorAll('#page-career button')].find((x) => x.textContent.trim() === "Use this device's model instead"); if (k) k.click(); });
   await p.waitForTimeout(400);
   const back = await p.evaluate(() => ({ uses: lxUsesCloud(), keys: [...document.querySelectorAll('#page-career button')].map((k) => k.textContent.trim()).filter((k) => /^Use /.test(k)) }));
-  ok(back.uses === false && back.keys.indexOf('Use claude-fable-5-1 (Anthropic)') >= 0, '6. the way back works: this device\'s model again, and the key to choose the connected one', back);
+  ok(back.uses === false && back.keys.indexOf('Use Claude Fable 5.1 (Anthropic)') >= 0, '6. the way back works: this device\'s model again, and the key to choose the connected one', back);
   log = [];
   const local = await p.evaluate(async () => { try { await lxAsk({}, [{ role: 'user', content: 'x' }], 100, 0.4, null); return 'answered'; } catch (e) { return e.message; } });
   ok(/Choose a model that is ready on this device first/.test(local) && log.length === 0, '6. not chosen, nothing is sent to the connection', { local, sent: log.length });

@@ -46,7 +46,7 @@ function chars(msgs){return msgs.reduce(function(a,m){return a+sizeOf(m)+12;},0)
 function estTok(msgs){return Math.ceil(chars(msgs)/cpt());}
 function provName(){var p="";try{p=(state.cloud||{}).provider||"";}catch(e){}
   return {anthropic:"Anthropic",openai:"OpenAI",openrouter:"OpenRouter",gemini:"Google",moonshot:"Moonshot","ollama-cloud":"Ollama"}[p]||"The service";}
-function modelName(){try{return (state.cloud||{}).model||"this model";}catch(e){return "this model";}}
+function modelName(){try{var m=(state.cloud||{}).model;return m?(window.ingModelLabel||String)(m):"this model";}catch(e){return "this model";}}
 
 /* ---------- 1. the reply a connected model is asked for, kept inside its window ---------- */
 /* the room kept for the reply: the reply the request will ask for (the model's longest when known, 128,000 for a window of

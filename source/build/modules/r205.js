@@ -135,7 +135,7 @@ function notePaint(){var st=$("lkState");if(!st)return;var n=$("lkLenderNote");
   var c=lender();if(!c||!c.lender){n.textContent="";n.hidden=true;return;}
   var L=c.lender,w=who(),bits=[],inf=(c.info||{})[c.model]||{};
   if(L.ram_gb)bits.push(w+" has "+Math.round(L.ram_gb)+" GB of memory and works with "+(L.cpu_only?"its processor, so a long answer takes a while.":"its graphics chip."));
-  if(inf.ctx)bits.push("With "+c.model+" it holds about "+num(wordsOf(inf.ctx))+" words of this conversation at once.");
+  if(inf.ctx)bits.push("With "+(window.ingModelLabel||String)(c.model)+" it holds about "+num(wordsOf(inf.ctx))+" words of this conversation at once.");
   if(inf.advice)bits.push("That model is "+(inf.advice==="quick"?"quick":inf.advice==="ok"?"a little slower than the quick ones":inf.advice==="slow"?"slow":"too big for it")+" there"+(inf.tps?" (about "+wps(inf.tps)+" words a second"+(inf.tpsM?", measured":"")+")":"")+".");
   if(L.busy||L.queued)bits.push(w+" is answering another device now"+(L.queued?" ("+L.queued+" waiting)":"")+".");
   n.textContent=bits.join(" ");n.hidden=!bits.length;}

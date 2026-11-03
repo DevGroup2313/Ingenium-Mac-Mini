@@ -371,6 +371,31 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.9 (3 November 2026): ways back in, the sign-in in the door's own place, and Claude's model names written as Anthropic
+writes them. Her words: "Ingenium's sign in page looks slightly awkward floating over the app's introduction door ... find a better fit";
+"I want a proper and strong and robust recovery system on Ingenium so that a user does not get locked out of their work ... I want a
+path that protects me and ensures that I can always find a way back into my account"; "I want you to remove the dashes from the Claude
+models name, they should be written normally."
+
+- At the welcome door, the sign-in takes the door card's place, as wide as it, on the door's own ground, nothing dimmed behind it;
+  Not now brings the door's card back. Elsewhere it is asked over the page, as before.
+- Ways back in, each opening the same data key on its own: the password; the ten words; a recovery key file (new: a random 256-bit
+  key she keeps on a stick or a drive; the lock keeps only the data key wrapped by it, and the file's id, so the newest file alone
+  opens it; an older file, one from another lock, or a file that is no key file is refused in plain words); and a hint she writes
+  (kept in plain words in the lock record, since it is shown at the sign-in; a hint that holds the password is refused). Turning the
+  sign-in on now ends with Save it (the key file) and the hint. The sign-in's Can't sign in? lists every way back in; a wrong password
+  shows the hint. Settings, Your data: Your ways back in, with Change the password, See or renew the words (new words replace the old
+  once two are typed back), Save a new key file, and the hint. A short check after the sign-in, a day after it is turned on, then a
+  week, a month, and every three months: are the words and the file where they were left?
+- There is no maker's key and no back door: a copy opens only with what its owner keeps. If every way back in is lost, what is
+  sealed cannot be opened by anyone; the ways are therefore several, kept in different places, and checked now and then.
+- Claude's model names: Claude Fable 5.1, Claude Opus 5.5, Claude 3.5 Sonnet, in the chat's model key and menu, the chat's note,
+  Settings, Lector, the Career Studio and the context and limit notes (window.ingModelLabel); the service is still asked for the model
+  by its own name. Other services' names stay as they write them.
+
+    node rig/t_699_recovery.js <url> <out>      # 24 checks, with an invented person
+    node rig/t_700_lock.js <url> <out>          # 58 checks (Can't sign in?, Your ways back in)
+
 Ingenium 6.9.8 (3 November 2026): a posting from its link, read against her profile at once; and the jobs she saved on LinkedIn.
 Her words: "I want to be able to paste a link of a job that I am interested in applying to in the Career studio and have the analysis
 be done and the match profile for me and the job be done from there ... Ingenium can go online to get the information. I want that
