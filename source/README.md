@@ -371,6 +371,15 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.6 (3 November 2026): a profile in one file (her words: "I don't want to have to input my information for my profile
+from scratch on my master version", and "I want that to be replicable for a second user profile and so forth"; her choice: her profile
+reaches the app as a private file, never through GitHub). In the Career Studio, What the studio may use has Bring in a profile file and
+Save this profile as a file, and an empty list of entries offers the first. A profile file (.json, kind "ingenium-profile", v 1) holds a
+person's entries in the studio's sections, documents with their text, and CV; what it holds is said before anything changes; it fills
+an empty profile, or is added to this one, or becomes a new profile of its own; nothing is doubled, and the CV becomes Lector's when none
+is kept yet (`modules/r188.js`). `node rig/t_696_profile_file.js <url> <out> [a real profile file kept outside the repository]` (14
+checks with invented people).
+
 Ingenium 6.9.5 (3 November 2026):
 
 - A connected model for Lector and the Career Studio (her words: "I also want to be able to load and run a connected Cloud model
