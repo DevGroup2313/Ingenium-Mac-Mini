@@ -129,10 +129,13 @@ function wait(secs,why,ab){return new Promise(function(res,rej){var left=Math.ma
 if(typeof W.cloudChat==="function"){var ORIG=W.cloudChat;
   W.cloudChat=wrap(ORIG,function(messages,onToken,onThink,ab){var self=this,args=arguments,begun=false,tries=0,waits=0,msgs=keepMark(messages,(messages||[]).slice()),told="";
     var w=win();
+    /* 6.9.5: Lector and the Career Studio (lxAsk, which marks its request with LX.cloudAb) read in parts they size themselves: their
+       text is never cut here; a refusal for size goes back to them as a context error, and they read again in smaller parts */
+    var parts=false;try{parts=!!(ab&&typeof LX!=="undefined"&&LX&&LX.cloudAb===ab);}catch(e){}
     function tell(r,why){if(r.dropped||r.cut){var t=r.dropped?("The oldest "+r.dropped+" message"+(r.dropped===1?" was":"s were")+" left out of what "+modelName()+" read for this reply"+why+"."):("Part of a long message was left out of what "+modelName()+" read for this reply"+why+".");
         if(r.dropped&&r.cut)t=t.replace(/\.$/," (and part of a long message).");told=t;}}
     /* before the first send: a request built elsewhere (Lector, the studio, a summary) fitted to the window as well */
-    try{if(w>0){var room=(w-reserveFor(w)-1024)*cpt();if(chars(msgs)>room){var r0=fit(msgs,Math.floor(room),"to fit the model's memory");msgs=r0.msgs;tell(r0,", to fit its memory");}}}catch(e){}
+    try{if(w>0&&!parts){var room=(w-reserveFor(w)-1024)*cpt();if(chars(msgs)>room){var r0=fit(msgs,Math.floor(room),"to fit the model's memory");msgs=r0.msgs;tell(r0,", to fit its memory");}}}catch(e){}
     var oT=function(t){if(!begun){begun=true;if(told)note(told);}return onToken?onToken.apply(this,arguments):undefined;};
     var oK=function(t){begun=true;return onThink?onThink.apply(this,arguments):undefined;};
     function go(){NOW.inTok=estTok(msgs);
@@ -143,6 +146,13 @@ if(typeof W.cloudChat==="function"){var ORIG=W.cloudChat;
       if(!k||begun||(ab&&ab.aborted))throw e;
       if(++tries>4)throw plain(e,k);
       var inf=info();
+      if(k.type==="rate"&&k.perMin>0&&inf&&(!(+inf.perMin>0)||+inf.perMin!==k.perMin)){inf.perMin=k.perMin;try{saveState();}catch(_){}}
+      if(parts){var raw=String(e&&e.message||e||"").replace(/^HTTP /,"");
+        if(k.type==="long"||k.type==="sum"){if(k.type==="sum"&&k.input>0)learnCpt(chars(msgs),k.input);if(k.type==="long"&&k.actual>0)learnCpt(chars(msgs),k.actual);
+          if(k.type==="long"&&inf&&k.limit>0&&(!(+inf.ctx>0)||+inf.ctx>k.limit)){inf.ctx=k.limit;try{saveState();}catch(_){}}
+          if(k.type==="sum"&&k.win-k.input>=6144){NOW.capOnce=k.win-k.input-2048;return go();}
+          throw new Error("the part is too long for the model's context ("+raw+")");}
+        if(k.type==="rate"&&k.perMin>0&&estTok(msgs)>k.perMin*0.9)throw new Error("the part is too long for the context your API key allows each minute ("+raw+")");}
       if(k.type==="sum"){learnCpt(chars(msgs),k.input);
         if(inf&&k.win>0&&(!(+inf.ctx>0)||+inf.ctx>k.win)){inf.ctx=k.win;try{saveState();}catch(_){}}
         if(k.win-k.input>=6144){NOW.capOnce=k.win-k.input-2048;return goKeep();}

@@ -439,8 +439,15 @@ function lectorMe(){var P=CS().profile;if(P.isMe===false){if(!P.own||typeof P.ow
 /* ---------------- the model: Lector's choice for this device ---------------- */
 function plan(){try{return LXR().plan();}catch(e){return null;}}
 function modelReady(){var o=plan();return !!(o&&(o.link||o.chosen));}
-function modelName(){var o=plan();if(!o)return "";if(o.link){try{return supModelName();}catch(e){return "the model on your other computer";}}return o.chosen?o.chosen.customName:"";}
-function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m)ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(90000,(ctx-1800)*3));}
+function modelName(){var o=plan();if(!o)return "";if(o.cloud){try{return lxCloudName();}catch(e){return "your connected model";}}if(o.link){try{return supModelName();}catch(e){return "the model on your other computer";}}return o.chosen?o.chosen.customName:"";}
+/* 6.9.5: the connected model (Settings, Connections) may write for the studio as for Lector: one key to choose it, one to go back */
+function cloudKey(){var o=plan();if(typeof lxCxReady!=="function")return null;
+  if(o&&o.cloud)return cbtn("","Use this device's model instead",function(){lxSetCloud(false);render();});
+  if(lxCxReady()&&!(o&&o.link))return cbtn("","Use "+lxCloudName(),function(){lxSetCloud(true);render();});
+  return null;}
+function whereLine(){var o=plan();if(o&&o.cloud)return lxCloudLeaves()?"through your "+lxCloudWho()+" connection: what it reads is sent to "+lxCloudWho():"through your connection, on your own computer or in your home";
+  if(o&&o.link)return "on your other computer, over your own network";return "on this device";}
+function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(90000,(ctx-1800)*3));}
 var RUN={busy:false,stop:false,what:"",live:"",opp:null};
 function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
   return new Promise(function(res,rej){(function go1(){if(RUN.stop){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";paintLive();
@@ -451,7 +458,7 @@ function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
       if(++tries<=1){setTimeout(go1,1500);return;}rej(e);});})();});}
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
   try{if(W.LX&&LX.busy){say("Lector is using the model. Wait for it, or pause it in Lector.");return true;}}catch(e){}return false;}
-function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses.");return true;}
+function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses."+(typeof lxCxReady==="function"&&lxCxReady()?" Or choose your connected model, "+lxCloudName()+", on the studio's first page.":""));return true;}
 function begin(opp,what){RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.opp=opp?opp.id:null;CS().ui.show="work";render();}
 function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.opp=null;render();}
 function stopNow(){RUN.stop=true;try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}}
@@ -875,7 +882,7 @@ function jump(){var host=$("csHost");if(host)host.__jump=true;}
 function two(L,R,par){L.el.classList.add("c-list");R.el.classList.add("c-work");par.appendChild(L.el);par.appendChild(R.el);}
 function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"});var p=h("p","c-note");p.id="csWhat";p.textContent=RUN.what;P.body.appendChild(p);
   var l=h("div","c-live");l.id="csLive";l.setAttribute("aria-live","polite");l.textContent=RUN.live||"…";P.body.appendChild(l);
-  var pl=plan();P.foot.appendChild(h("span","c-note c-grow",esc(pl&&pl.link?"Written with "+(modelName()||"your model")+", on your other computer, over your own network.":"Written with "+(modelName()||"your model")+" on this device. Nothing leaves it.")));
+  var pl=plan();P.foot.appendChild(h("span","c-note c-grow",esc(pl&&pl.link?"Written with "+(modelName()||"your model")+", "+whereLine()+".":"Written with "+(modelName()||"your model")+" on this device. Nothing leaves it.")));
   P.foot.appendChild(cbtn("","Stop",stopNow));return P;}
 function paintLive(){var l=$("csLive");if(l){l.textContent=RUN.live||"…";l.scrollTop=l.scrollHeight;}var w=$("csWhat");if(w)w.textContent=RUN.what;}
 function daysLeft(o){if(!o.due)return null;var d=new Date(o.due+"T12:00:00"),t=new Date();if(isNaN(d))return null;t.setHours(12,0,0,0);return Math.round((d-t)/864e5);}
@@ -964,8 +971,8 @@ function howCards(ol){var d=ol.nextSibling;ol.innerHTML="";
   else{d.hidden=true;d.removeAttribute("aria-labelledby");}}
 function introPanel(){var P=panel("csWork","How the studio works");var q=h("blockquote","c-motto","“Tell me and I forget. Teach me and I remember. Involve me and I learn.”");P.body.appendChild(q);
   var g=h("ol","c-how"),dt=h("div","c-howd");g.setAttribute("aria-label","The four parts of the studio: press one for more");dt.id="csHowD";dt.setAttribute("role","region");
-  P.body.appendChild(g);P.body.appendChild(dt);howCards(g);P.body.appendChild(h("p","c-note c-pad",esc(modelReady()?"Writing with "+modelName()+", the model Lector uses on this device. Nothing is searched online unless you press for it.":"No model is ready on this device yet: the studio keeps and tracks without one, and reads and writes once one is ready (Models page). Nothing is searched online unless you press for it.")));
-  P.foot.appendChild(cbtn("","Open your profile",function(){CS().ui.room="profile";save();render();}));P.foot.appendChild(h("span","c-grow"));
+  P.body.appendChild(g);P.body.appendChild(dt);howCards(g);P.body.appendChild(h("p","c-note c-pad",esc(modelReady()?"Writing with "+modelName()+", the model Lector uses, "+whereLine()+". Nothing is searched online unless you press for it.":"No model is ready on this device yet: the studio keeps and tracks without one, and reads and writes once one is ready (Models page). Nothing is searched online unless you press for it.")));
+  P.foot.appendChild(cbtn("","Open your profile",function(){CS().ui.room="profile";save();render();}));var ckey=cloudKey();if(ckey)P.foot.appendChild(ckey);P.foot.appendChild(h("span","c-grow"));
   P.foot.appendChild(cbtn("pri","Bring a posting",function(){CS().ui.open="new";show("work");save();render();}));return P;}
 function newPanel(){var S=CS(),kind="job",P=panel("csWork","Bring a posting, programme or grant",{back:"Applications",onBack:function(){S.ui.open=null;show("list");save();render();}});
   var k0=seg(OKINDS,kind,function(v){kind=v;[].forEach.call(k0.children,function(b,i){b.setAttribute("aria-pressed",OKINDS[i][0]===v?"true":"false");});},"What it is");

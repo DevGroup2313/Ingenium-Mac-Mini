@@ -244,8 +244,31 @@ function stopErr(){var e=new Error("paused");e.stopped=true;return e;}
 /* ---------------- the model: Ingenium's choice for this device ---------------- */
 function readyModels(){return (state.models||[]).filter(function(m){return m.fileState==="ready";});}
 function modelById(id){return id?(state.models||[]).filter(function(m){return m.id===id;})[0]||null:null;}
+/* 6.9.5 · a connected model for Lector and the Career Studio. Her words (3 November 2026): "I also want to be able to load and run a
+   connected Cloud model from Claude or GPT and etc, inside of the Career Studio and the Lector page and not just only have the
+   local models as options". The connection is the one set in Settings, Connections (Claude, GPT, Gemini, OpenRouter, Ollama and
+   the others); it is used here only when she chooses it (L7().cloud), since what Lector reads then leaves the device, and the
+   page says so. A computer of hers that lends its models keeps its own way (supUsesLink). The Career Studio writes with the model
+   Lector uses, so the same choice serves both. */
+var LX_CX_NAMES={anthropic:"Anthropic",openai:"OpenAI",openrouter:"OpenRouter",gemini:"Google",moonshot:"Moonshot","ollama-cloud":"Ollama's cloud",
+  "ollama-local":"Ollama on this computer","ollama-lan":"Ollama in your home",lmstudio:"LM Studio","openai-compat":"your own server"};
+var LX_CX_HOME={"ollama-local":1,"ollama-lan":1,lmstudio:1};
+function lxCxReady(){var c=state.cloud||{};if(!c.provider||c.provider==="ingenium")return false;return !!(c.key||LX_CX_HOME[c.provider]||c.provider==="openai-compat");}
+function lxUsesCloud(){try{return !!L7().cloud&&lxCxReady();}catch(e){return false;}}
+function lxCloudWho(){var c=state.cloud||{};return LX_CX_NAMES[c.provider]||"the service";}
+function lxCloudName(){var c=state.cloud||{};return (c.model||"the connected model")+" ("+lxCloudWho()+")";}
+function lxCloudLeaves(){var c=state.cloud||{};return !LX_CX_HOME[c.provider];}
+/* the keys: use the connected model, or go back to this device's own; repaint draws the page again */
+function lxCloudKeys(repaint){var box=h("div","l-keys");
+  if(lxUsesCloud())box.appendChild(btn("quiet sm","Use this device's model instead",function(){L7().cloud=false;saveSoon();repaint();}));
+  else if(lxCxReady()&&!supUsesLink())box.appendChild(btn("quiet sm","Use "+lxCloudName(),function(){L7().cloud=true;saveSoon();repaint();}));
+  return box.childNodes.length?box:null;}
+window.lxUsesCloud=lxUsesCloud;window.lxCloudName=lxCloudName;window.lxCloudWho=lxCloudWho;window.lxCloudLeaves=lxCloudLeaves;window.lxCloudKeys=lxCloudKeys;
+window.lxCxReady=lxCxReady;window.lxSetCloud=function(on){L7().cloud=!!on;saveSoon();try{paintModel();}catch(e){}};
 function modelPlan(){var o={link:false,key:null,spec:null,rec:null,chosen:null,need:null,spare:null,dev:"web"};
   try{o.link=supUsesLink();}catch(e){}
+  /* 6.9.5: a connected model she chose (lxUsesCloud) reads and writes as the linked computer does, through cloudChat */
+  try{if(!o.link&&lxUsesCloud()){o.cloud=true;o.link=true;}}catch(e){}
   try{o.dev=lineupDevice();o.key=lineupKeyFor("magister");o.spec=o.key&&ING_LINEUP.models[o.key]||null;o.rec=o.key?lineupRec(o.key):null;o.spare=lineupUsableGB();}catch(e){}
   var b=L7().brief,c=null;
   if(b.modelId){c=modelById(b.modelId);if(c&&c.fileState!=="ready")c=null;}
@@ -514,6 +537,9 @@ function addMe(which){var i=document.createElement("input");i.type="file";i.acce
 
 /* the model */
 function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7().brief;box.innerHTML="";
+  if(o.cloud){box.appendChild(h("b",null,esc("Your connected model reads and writes")));
+    box.appendChild(h("div","need",esc("Lector uses "+lxCloudName()+". "+(lxCloudLeaves()?"While it works, what it reads (your apps, your CV, your own writing and the posting) is sent to "+lxCloudWho()+", which counts the tokens against your key. A whole app can be a great many tokens: the reading can be stopped at any time.":"It runs on your own computer or in your home, so what it reads stays there."))));
+    var ck=lxCloudKeys(paintModel);if(ck)box.appendChild(ck);segThumbs(box);return;}
   if(o.link){box.appendChild(h("b",null,esc("Your other computer reads and writes")));box.appendChild(h("div","need",esc("Lector uses "+(state.cloud&&state.cloud.model||"its model")+" on "+(state.cloud&&state.cloud.computer||"the computer you linked")+", the stronger model, and this device only watches.")));}
   else{var c=o.chosen,isRec=c&&o.rec&&c.id===o.rec.id,name=c?c.customName:(o.spec?o.spec.name:"Magister");
     var reader=o.reader||c,twoModels=reader&&c&&reader.id!==c.id;
@@ -534,6 +560,7 @@ function paintModel(){var box=$("l7Model");if(!box)return;var o=modelPlan(),B=L7
     /* 6.2: the model, the depth and the two switches stand at the top of the brief now (How Lector reads); this keeps the reasons */
     det.appendChild(h("div","need","A quick reading takes its screens, its words, the notes in its code and how it is built. A deep, thorough analysis takes all of that and every line of its own code, for the deepest documents; this can take hours on a small model."));
     det.appendChild(h("div","need","Ingenium suggests Magister for the writing, and says when a larger model is ready here, as larger models usually write better; the notes may be taken by a quicker model when time matters more than nuance."));
+    var ck2=lxCloudKeys(paintModel);if(ck2){box.appendChild(h("div","need",esc("Or let your connected model read and write: "+lxCloudName()+(lxCloudLeaves()?". What it reads is then sent to "+lxCloudWho()+".":"."))));box.appendChild(ck2);}
     box.appendChild(det);segThumbs(box);}}
 function estimate(m,parts,docs){if(!m)return "";var avg=null;if(LX.times&&LX.times.length)avg=LX.times.reduce(function(a,b){return a+b;},0)/LX.times.length;
   if(avg==null){try{var p=paceEstimate(m);if(p&&p.lo>0){var tps=(p.lo+p.hi)/2,ctx=lxCtx(m),inTok=lxBudget(ctx,700,false)/3.2;avg=700/tps+inTok/(tps*8);}}catch(e){}}

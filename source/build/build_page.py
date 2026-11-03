@@ -109,7 +109,10 @@ edit('var TOUR_A="Here is a light list for two days:\\n\\n1. **Layers**: a warm 
      'var TOUR_A="Three weeks is enough if each week has one job:\\n\\n1. **Week one, the ground**: reread your key sources and write a one-page outline: the question, why it matters, and how you will answer it.\\n2. **Week two, the draft**: write the full proposal from that outline, one section a day. Do not polish yet.\\n3. **Week three, the readers**: give the draft to your supervisor or a trusted reader on the Monday, then revise with their notes and check the programme\\u2019s word limit and formatting.\\n\\nKeep one day a week free. A proposal written at a steady pace reads better than one written in a rush.";',
      "R192 the tour's reply")
 edit('var TOUR_THINK="They are walking in hills for a weekend. Weather in hills changes quickly, so layers and a waterproof come first. Two days means food and water for each day. Safety: a map in case the phone has no signal. Keep the list short and practical.";',
-     'var TOUR_THINK="Three weeks is enough for a proposal if the weeks have different jobs. If the draft starts before the outline has settled, it will be rewritten, so the first week should go to reading and a one-page outline. The second week is the full draft. The third week has to stay free for a reader\\u2019s notes, because a supervisor needs a few days to read it. I will keep the plan to three steps and leave room for rest.";',
+     # 6.9.5 (3 November 2026, her words again: "the current one kind of reads a little weird when it shows the "Thinking" box"): the
+     # thinking began with nearly the reply's own first sentence ("Three weeks is enough…"), so it read as a first draft of the
+     # reply. It now weighs what the reply rests on (what depends on what, the usual trap, a reader's days) and only then decides.
+     'var TOUR_THINK="A research proposal has parts that lean on one another: the method only makes sense once the question is clear. The usual trap is to start drafting too early and then rewrite everything. A supervisor also needs a few days to read a draft, so the last week cannot be for writing. That gives each week one job: the outline, then the draft, then the readers\\u2019 notes. A deadline can feel heavy, so I will keep the plan to three short steps and leave a day free each week.";',
      "R192 the tour's thinking")
 
 # ---- R101: the reply keeps at most half the memory; her request is never the part cut ----
@@ -1055,6 +1058,15 @@ edit(r"""x.rel=schRel(words,x.title+" "+x.abstract);if(x.rel<0.34&&words.length>
      "R207 a scholarly record is kept only when it is about the question")
 # 6.9.4: a document kept on a reply that is only Ingenium's own notice (one made before r1Notice in modules/r101.js) is not shown as a
 # document card: her screenshot of 3 November 2026 showed "(This reply was cut off before it began: …)" as a Word and PDF document
+# ---- 6.9.5 (3 November 2026): a connected model for Lector and the Career Studio (modules/r108.js has the choice and its words).
+#      Her words: "I also want to be able to load and run a connected Cloud model from Claude or GPT and etc, inside of the Career
+#      Studio and the Lector page and not just only have the local models as options". Lector's requests (lxAsk) already went to the
+#      connection when a computer of hers lent its models; a connection she chooses for Lector (lxUsesCloud) goes the same way. ----
+edit(r"""function lxAsk(run,msgs,maxTok,temp,onPiece){
+  if(typeof supUsesLink==="function"&&supUsesLink()){var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     r"""function lxAsk(run,msgs,maxTok,temp,onPiece){
+  if((typeof supUsesLink==="function"&&supUsesLink())||(typeof lxUsesCloud==="function"&&lxUsesCloud())){var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     "6.9.5 Lector reads and writes with the connected model she chose")
 edit(r"""doc=docs[0]||(mm.doc&&!mm.live?mm.doc:null)""",
      r"""doc=docs[0]||(mm.doc&&!mm.live&&!(typeof r1Notice==="function"&&r1Notice(mm.text))?mm.doc:null)""",
      "6.9.4 a notice is never shown as a document card")

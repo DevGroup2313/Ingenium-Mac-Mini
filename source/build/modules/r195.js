@@ -306,6 +306,10 @@ if(typeof W.aiApplyParams==="function"){var oAI=W.aiApplyParams;
 if(typeof W.lxCtx==="function"){var oLx=W.lxCtx;
   W.lxCtx=wrap(oLx,function(m){try{
       if(typeof supUsesLink==="function"&&supUsesLink()){var inf=cloudInfo();if(inf&&+inf.ctx>0)return Math.min(+inf.ctx,262144);return oLx.apply(this,arguments);}
+      /* 6.9.5: a connected model chosen for Lector and the Career Studio: its window, up to 262,144 tokens, and never more than its
+         key may send in a minute when the service has said so (r206 keeps that figure) */
+      if(typeof lxUsesCloud==="function"&&lxUsesCloud()){var ci=cloudInfo()||{},cw=+ci.ctx||(typeof ingCloudWindow==="function"?+ingCloudWindow():0)||32768;
+        var cap=Math.min(cw,262144);if(+ci.perMin>0)cap=Math.min(cap,Math.max(4096,Math.floor(+ci.perMin*0.6)));return cap;}
       var w=wasmCtx();if(w&&m&&Engine.modelId===m.id)return w;}catch(e){}
     return oLx.apply(this,arguments);});}
 

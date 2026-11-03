@@ -44,7 +44,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   // the tour's example
   const texts = await p.evaluate(() => ({ q: TOUR_Q, a: TOUR_A, t: TOUR_THINK }));
   ok(/PhD application is due in three weeks/.test(texts.q), 'the tour asks about planning a research proposal', texts.q);
-  ok(/^Three weeks is enough for a proposal/.test(texts.t) && /\bI will\b/.test(texts.t) && !/\bThey are\b/.test(texts.t), 'its thinking is in the first person, weighing the weeks', texts.t);
+  // 6.9.5: the thinking weighs what the reply rests on, and does not open with the reply's own first sentence
+  ok(/^A research proposal has parts that lean on one another/.test(texts.t) && /\bI will\b/.test(texts.t) && !/\bThey are\b/.test(texts.t) && texts.t.slice(0, 20) !== texts.a.slice(0, 20), 'its thinking is in the first person, weighing what the plan rests on before it decides, not a draft of the reply', texts.t);
   ok(/Week one, the ground/.test(texts.a) && /Week three, the readers/.test(texts.a) && /programme’s word limit/.test(texts.a), 'its reply has three dated steps', texts.a);
   await p.evaluate(() => { tourDemoRun('openThink'); }); await p.waitForTimeout(1600);
   const tb = await p.evaluate(() => { const box = document.querySelector('#chatScroll .think-box'); if (!box) return null; const body = box.querySelector('.think-body');

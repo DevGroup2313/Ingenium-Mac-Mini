@@ -371,6 +371,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.5 (3 November 2026):
+
+- A connected model for Lector and the Career Studio (her words: "I also want to be able to load and run a connected Cloud model
+  from Claude or GPT and etc, inside of the Career Studio and the Lector page and not just only have the local models as
+  options"). The connection set in Settings, Connections (Claude, GPT, Gemini, OpenRouter, Ollama and the others) is offered in
+  Lector's model box and in the Career Studio's "How the studio works", by name ("Use claude-fable-5-1 (Anthropic)"), and used
+  only when chosen, since what Lector reads then goes to that service; both pages say so, and each has the way back. The Career
+  Studio writes with the model Lector uses, so one choice serves both (`modules/r108.js`, `r188.js`; the lxAsk edit in
+  `build_page.py`). Lector's parts follow the connected model's window, up to 262,144 tokens, and never more than the key may
+  send in a minute once the service has said so (`r195.js`); a part refused as too long is never cut: it goes back to Lector as a
+  context error and is read again in smaller parts (`r206.js`). `node rig/t_695_lx_cloud.js <url> <out>` (12 checks).
+- The tour's example (her words again: "the current one kind of reads a little weird when it shows the "Thinking" box"): the
+  thinking opened with nearly the reply's own first sentence, so it read as a first draft of the reply; it now weighs what the
+  plan rests on and only then decides (`rig/t_692_keys.js`, 19 checks, with the raised keys of the Display panel).
+
 Ingenium 6.9.4 (3 November 2026). Four repairs, each found first by a test that failed on 6.9.3:
 
 - The switches in the chat's + menu (her words: "its really hard for the turn the "Research" and the "Web Search" toggles to enable
