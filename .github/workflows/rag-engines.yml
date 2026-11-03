@@ -1,8 +1,8 @@
 # INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
 # NO LICENCE IS GRANTED. See LICENCE.txt.
 #
-# The folder search (source/rag/) in the web views of the Mac and Windows apps: WKWebView on GitHub's Apple silicon Mac and Intel
-# Mac, WebView2 on its Windows PC, opened by pywebview 6.2.1 as the apps open their page (source/rig/rag_engine_check.py): the
+# The folder search (source/rag/) in the web views of the Mac and Windows apps: WKWebView on GitHub's Apple silicon Macs (macOS 15
+# and 26) and Intel Mac, WebView2 on its Windows PC, opened by pywebview 6.2.1 as the apps open their page (source/rig/rag_engine_check.py): the
 # private file system, SQLite with FTS5 and sqlite-vec, the reading model (its vectors compared with Chromium's), a folder read
 # through the app's own bridge code, and a second start of the app that must find the index still there. It builds and publishes
 # nothing. (Review of 1 November 2026, finding rag-r-04: the spec says to stop and report if sqlite-vec cannot load in the target
@@ -44,6 +44,9 @@ jobs:
             runner: macos-15
           - name: Mac, Intel (WKWebView)
             runner: macos-15-intel
+          # the newest macOS GitHub offers (her Mac mini runs macOS 27, which GitHub does not offer yet)
+          - name: Mac, Apple silicon, macOS 26 (WKWebView)
+            runner: macos-26
           - name: Windows (WebView2)
             runner: windows-2025
     runs-on: ${{ matrix.runner }}

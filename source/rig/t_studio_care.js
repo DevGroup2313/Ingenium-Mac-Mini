@@ -14,8 +14,10 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
 
   // house records on a 16 GB stand-in computer, runnable for the test
   await p.evaluate(() => { window.__INGENIUM_DEVICE = { ramGB: 16, cores: 8 }; const L = ING_LINEUP.models; state.models = (state.models || []).filter(m => !/^hs_/.test(m.id));
-    [['hs_velox', 'lfm2.5-1.2b-instruct', 'Velox copy'], ['hs_scriba', 'qwen3.5-2b', 'Scriba copy'], ['hs_magister', 'qwen3.5-9b', 'Magister copy'], ['hs_faber', 'mellum2.1-12b-thinking', 'Faber copy']].forEach(x => {
-      state.models.push({ id: x[0], customName: x[2], fileState: 'ready', fileName: L[x[1]].file, sizeBytes: L[x[1]].size, paramB: L[x[1]].params, stored: true, shellStored: true, type: 'GGUF', color: '#6a3fb5' }); });
+    // each house's own pick on this stand-in computer, whatever the lineup of the day says (6.9.2 changed Scriba's and Faber's)
+    [['hs_velox', 'velox', 'Velox copy'], ['hs_scriba', 'scriba', 'Scriba copy'], ['hs_magister', 'magister', 'Magister copy'], ['hs_faber', 'faber', 'Faber copy']].forEach(x => {
+      const k = lineupKeyFor(x[1]);
+      state.models.push({ id: x[0], customName: x[2], fileState: 'ready', fileName: L[k].file, sizeBytes: L[k].size, paramB: L[k].params, stored: true, shellStored: true, type: 'GGUF', color: '#6a3fb5' }); });
     blCanRun = () => true; saveState(); });
 
   // 1. the Judge strategy and the ready-made blends

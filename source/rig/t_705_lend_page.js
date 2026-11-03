@@ -85,7 +85,10 @@ async function borrower(label, open, hasTimeouts) {
     ok(/16 GB of memory/.test(note || '') && /processor/.test(note || ''), 'under Connect the page says what the lender is: 16 GB, working with its processor', note);
 
     // ---- a long conversation is fitted to the window ----
-    const longChat = () => page.evaluate(() => { const c = curChat(); c.messages = []; for (let i = 0; i < 44; i++) c.messages.push({ role: i % 2 ? 'bot' : 'me', text: ('Line ' + i + ': ' + 'The quick brown fox jumps over the lazy dog and the abbot reads folio twelve. '.repeat(26)).slice(0, 2000) }); saveState(); });
+    // the rolling summary (r195) is written in the background after a send; on a slow machine it can land before the next
+    // send and shorten it, so each measurement waits for it to settle and starts without one: only the window is measured
+    const settleSummary = () => page.waitForFunction(() => { try { const st = IngMem.state; return !st.busy && !st.timer; } catch (e) { return true; } }, null, { timeout: 120000, polling: 250 }).catch(() => {});
+    const longChat = async () => { await settleSummary(); return page.evaluate(() => { const c = curChat(); c.messages = []; delete c.summary; delete c.summaryN; delete c.summaryAt; for (let i = 0; i < 44; i++) c.messages.push({ role: i % 2 ? 'bot' : 'me', text: ('Line ' + i + ': ' + 'The quick brown fox jumps over the lazy dog and the abbot reads folio twelve. '.repeat(26)).slice(0, 2000) }); saveState(); }); };
     await page.evaluate(() => { state.cloud.model = 'Qwen3.5 9B'; saveState(); }); await longChat();
     await chat(page, 'Please summarise our talk so far.'); const p9 = posts().pop();
     await page.evaluate(() => { state.cloud.model = 'Qwen3.5 4B'; saveState(); IngMemory.paint(); }); await longChat();
