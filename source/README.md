@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.10.1 (3 November 2026): the computer's own sign-in as a way back in. Her answer: "Yes, my computer's own sign in (Touch
+ID or Windows Hello) also open Ingenium."
+
+- Settings, Your data, Your ways back in: This computer's own sign-in, turned on with the password first, then the computer itself
+  (Touch ID or the Mac's own password on a Mac; Windows Hello on Windows). It says plainly that anyone who can sign in to the
+  computer as her could open Ingenium this way. Turned off, the computer's key is removed too.
+- At the sign-in, the computer is asked at once (once a session), and Ingenium opens without the password; Open with Touch ID (or
+  Windows Hello) stays under the form if it is cancelled. Opened so, the password can be changed without the old one. Can't sign
+  in? lists it. A computer that does not hold the key says so.
+- How: the data key is kept wrapped with a key of 256 bits that the computer holds in its own protection, never in the lock record.
+  On a Mac, tools/IngeniumKey.swift (built into Contents/MacOS/IngeniumKey by tools/finish_mac_app.sh wherever Swift is present;
+  without it the app works as before and says Touch ID cannot be asked) asks LocalAuthentication, then reads the login keychain. On
+  Windows, desktop/app_device_6101.py asks Windows Hello through Windows PowerShell, then opens the key sealed with DPAPI in the
+  app's own folder. The phone and tablet apps do not offer it yet.
+- Not checked here: Touch ID's sheet and Windows Hello's window cannot be shown where this was built (no Mac, no Windows). The page's
+  side, and the app's side against a stand-in helper, are tested; the Mac build says in its summary whether the helper was built.
+  On a Mac, the keychain may ask once, after an update, whether the new helper may use the key.
+
+    node rig/t_6101_device.js <url> <out>       # 14 checks, with a stand-in bridge
+    python3 -I rig/t_6101_device.py             # 15 checks: the app's side, with a stand-in helper
+
 Ingenium 6.10.0 (3 November 2026): Folders, a folder for each of her apps; and her work brought in from Claude and Ollama. Her
 words: "I want a safe way to move my data from Claude and Ollama to Ingenium so that I don't lose all of my work ... I want folders
 built in that classifies every app that I have been working on and will build in the future. I want the folders to document how I

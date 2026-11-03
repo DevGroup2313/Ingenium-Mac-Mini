@@ -77,7 +77,8 @@ async function setPw(p, pwd) { await p.waitForSelector('#ingLockDoor #ildP1', { 
   await p.evaluate(() => { go('settings'); }); await p.waitForTimeout(700);
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(x => /Your ways back in/.test(x.textContent)).click()); await p.waitForSelector('#ingLockDoor .ild-way', { timeout: 5000 });
   const rows = await p.evaluate(() => [...document.querySelectorAll('#ingLockDoor .ild-way')].map(x => ({ t: x.querySelector('b').textContent, ok: !x.querySelector('i').classList.contains('no'), k: (x.querySelector('button') || {}).textContent || '' })));
-  ok(rows.length === 4 && rows.every(x => x.ok) && rows.map(x => x.t).join('|') === 'Your password|Your ten recovery words|A recovery key file|A hint for your password', '5. Settings, Your ways back in: the password, the words, the key file and the hint, each kept', rows);
+  ok(rows.length === 5 && rows.filter(x => x.t !== "This computer's own sign-in").every(x => x.ok) && rows.map(x => x.t).join('|') === "Your password|Your ten recovery words|A recovery key file|This computer's own sign-in|A hint for your password" && !rows[3].ok && !rows[3].k,
+    '5. Settings, Your ways back in: the password, the words, the key file and the hint, each kept (and, since 6.10.1, the computer\'s own sign-in, which a browser cannot offer)', rows);
   await p.screenshot({ path: OUT + '/ways-settings.png' });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockDoor .ild-way')].find(x => /A recovery key file/.test(x.textContent)).querySelector('button').click());
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', PW2);

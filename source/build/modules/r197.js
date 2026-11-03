@@ -98,6 +98,8 @@ body[data-motion="minimal"] #introDoor.ild-card-away .intro-card{transition:none
 #ingLockDoor .ild-way b{display:block;font-size:14.5px;font-weight:600;color:var(--ild-ink)}
 #ingLockDoor .ild-way small{display:block;font-size:12.5px;color:var(--ild-soft);line-height:1.45;margin-top:2px}
 #ingLockDoor .ild-way .ild-key{flex:0 0 auto;padding:8px 13px;font-size:13px}
+#ingLockDoor .ild-devrow{justify-content:stretch;margin-top:10px}
+#ingLockDoor .ild-devrow .ild-key{flex:1 1 auto}
 #ingLockDoor .ild-hint{margin:-2px 0 14px;padding:9px 12px;border-radius:10px;background:rgba(var(--ild-fam),.05);font-size:13.5px;color:var(--ild-ink)}
 #ingLockDoor .ild-hint b{font-weight:600}
 #ingLockDoor details.ild-fine{margin:4px 0 0;font-size:12.5px;color:var(--ild-soft)}
@@ -202,7 +204,7 @@ function on(){return !!K.key&&!OFF;}
 function canOpen(){return !!K.key;}
 function ready(){if(K.key||!REC)return Promise.resolve();return new Promise(function(res){READY.push(res);});}
 function holdKeys(r){K.raw=r.dekRaw;K.key=r.dek;K.js=jsGcm(r.dekRaw);var w=READY;READY=[];w.forEach(function(f){try{f();}catch(e){}});}
-function dropKeys(){K.raw=null;K.key=null;K.js=null;}
+function dropKeys(){K.raw=null;K.key=null;K.js=null;K.via=null;}
 function makeRecord(user,password,phrase){var dekRaw=rnd(32),salt=rnd(16),rsalt=rnd(16);
   return calibrate().then(function(iter){return Promise.all([kdf(password,salt,iter),kdf(normPhrase(phrase),rsalt,iter)]).then(function(ks){var iv1=rnd(12),iv2=rnd(12);
     return Promise.all([enc(ks[0],iv1,"ingenium-lock dek",dekRaw),enc(ks[1],iv2,"ingenium-lock recovery",dekRaw),importDek(dekRaw)]).then(function(r){var dek=r[2],iv3=rnd(12),iv4=rnd(12);
@@ -427,9 +429,10 @@ function signIn(msg){var name=REC&&REC.user?REC.user:"";
     +'<form id="ildSign" autocomplete="on"><label><span>Your user name</span><input type="text" id="ildName" autocomplete="username" autocapitalize="off" spellcheck="false" value="'+esc(name)+'"></label>'
     +'<label><span>Your password</span><input type="password" id="ildPw" autocomplete="current-password" autocapitalize="off"></label>'
     +'<div class="ild-keys"><button type="button" class="ild-link" id="ildForgot">Can\'t sign in?</button><button type="submit" class="ild-key" id="ildGo">Sign in</button></div></form>'
-    +'<p class="ild-note">Your data on this device is sealed with your password. Nothing in it opens without it.</p>',false);
+    +'<p class="ild-note">'+(hasDev()&&W_.pywebview?'Your data on this device is sealed. It opens with your password, or with '+esc(devLabel())+' on this computer.':'Your data on this device is sealed with your password. Nothing in it opens without it.')+'</p>',false);
   if(msg)err(c,msg);
   c.querySelector("#ildForgot").onclick=function(){ways();};
+  devOffer(c);
   c.querySelector("#ildSign").onsubmit=function(e){e.preventDefault();var pw=c.querySelector("#ildPw").value,nm=c.querySelector("#ildName").value;
     if(name&&!sameName(nm,name)){err(c,"That user name and password do not open this copy. Nothing was changed.");var q=c.querySelector("#ildName");if(q){try{q.focus();q.select();}catch(_){}}return;}
     if(!pw){err(c,"Type your password.");return;}
@@ -526,11 +529,12 @@ function askPassword(title,text,okText,danger,onOk){var c=view('<h2>'+title+'</h
   c.querySelector("#ildCancel").onclick=closeDoor;
   c.querySelector("#ildAsk").onsubmit=function(e){e.preventDefault();var pw=c.querySelector("#ildPw").value;if(!pw){err(c,"Type your password.");return;}busyKeys(c,true);err(c,"");
     openWith(REC,pw,"dek").then(function(r){onOk(pw,r,c);},function(){busyKeys(c,false);err(c,"That is not the password. Nothing was changed.");var i=c.querySelector("#ildPw");if(i){i.value="";try{i.focus();}catch(_){}}});};}
-function changePassword(){askPassword("Change the password","Your present password first.","Next",false,function(){
+function changePassword(){if(K.via==="device"&&K.raw){newPwView();return;}askPassword("Change the password","Your present password first.","Next",false,newPwView);}
+function newPwView(){
   var c=view('<h2>Choose the new password</h2><p>Only the lock changes: nothing is sealed again, and the recovery phrase stays as it is.</p><form id="ildCp" autocomplete="off">'+pwFields("A new password (at least eight characters)","The same password again")
     +'<div class="ild-keys"><button type="button" class="ild-key ild-ghost" id="ildCancel">Cancel</button><button type="submit" class="ild-key">Change it</button></div></form>',true);
   c.querySelector("#ildCancel").onclick=closeDoor;
-  c.querySelector("#ildCp").onsubmit=function(e){e.preventDefault();var pw=pwCheck(c);if(!pw)return;busyKeys(c,true);rewrap(pw).then(function(){closeDoor();toast("The password is changed.");},function(x){busyKeys(c,false);err(c,x&&x.message||"The password could not be changed.");});};});}
+  c.querySelector("#ildCp").onsubmit=function(e){e.preventDefault();var pw=pwCheck(c);if(!pw)return;busyKeys(c,true);rewrap(pw).then(function(){closeDoor();toast("The password is changed.");},function(x){busyKeys(c,false);err(c,x&&x.message||"The password could not be changed.");});};}
 function showRecovery(){askPassword("Show the recovery phrase","Your password first; the phrase is shown to no one without it.","Show it",false,function(pw,r){
   if(!REC.phr){view('<h2>Your recovery phrase</h2><p>This copy keeps no copy of its phrase to show.</p><div class="ild-keys"><button type="button" class="ild-key ild-ghost" id="ildClose">Close</button></div>',true).querySelector("#ildClose").onclick=closeDoor;return;}
   dec(r.dek,b64d(REC.phr.iv),"ingenium-lock phrase",b64d(REC.phr.ct)).then(function(u8){var w=TD.decode(u8).split(" ");
@@ -613,10 +617,12 @@ function ways(){var hint=REC&&REC.hint?String(REC.hint):"";
   var c=view('<h2>Ways back in</h2><p>Each of these opens this copy on its own. Choose one you have; then you choose a new password.</p>'
     +(hint?'<p class="ild-hint"><b>Your hint:</b> '+esc(hint)+'</p>':'')
     +'<div class="ild-ways"><button type="button" class="ild-way" id="ildWayWords"><i>1</i><div><b>Your ten recovery words</b><small>The words you wrote down when you turned the sign-in on'+(REC&&REC.recMade?' (renewed on '+esc(day(REC.recMade))+')':'')+'.</small></div></button>'
-    +(hasFile()?'<button type="button" class="ild-way" id="ildWayFile"><i>2</i><div><b>Your recovery key file</b><small>Saved on '+esc(day(REC.file.made))+'. Its name ends in .ingenium-key.</small></div></button>':'')+'</div>'
+    +(hasFile()?'<button type="button" class="ild-way" id="ildWayFile"><i>2</i><div><b>Your recovery key file</b><small>Saved on '+esc(day(REC.file.made))+'. Its name ends in .ingenium-key.</small></div></button>':'')
+    +(hasDev()&&W_.pywebview?'<button type="button" class="ild-way" id="ildWayDev"><i>'+(hasFile()?3:2)+'</i><div><b>'+esc(cap1(devLabel()))+'</b><small>This computer\'s own sign-in opens Ingenium here, since '+esc(day(REC.dev.made))+'.</small></div></button>':'')+'</div>'
     +'<div class="ild-keys"><button type="button" class="ild-link" id="ildBack">Back to the sign-in</button></div>'
     +'<p class="ild-note"><button type="button" class="ild-link" id="ildNeither">I have none of these</button></p>',false);
   c.querySelector("#ildWayWords").onclick=function(){forgot();};var wf=c.querySelector("#ildWayFile");if(wf)wf.onclick=function(){useFile();};
+  var wd=c.querySelector("#ildWayDev");if(wd)wd.onclick=function(){err(c,"");devUnlock(c,false);};
   c.querySelector("#ildBack").onclick=function(){signIn();};c.querySelector("#ildNeither").onclick=function(){neither();};}
 /* signed in: every way back in, with what each needs */
 function waysPanel(){if(!REC)return;var c=view('<h2>Your ways back in</h2><p>Each opens this copy on its own if the password is ever forgotten. Keep at least two, in different places: the words on paper at home, the key file on a memory stick.</p><div class="ild-ways" id="ildWays"></div>'
@@ -628,6 +634,12 @@ function waysPanel(){if(!REC)return;var c=view('<h2>Your ways back in</h2><p>Eac
   row(hasFile(),"A recovery key file",hasFile()?"Saved "+day(REC.file.made)+". Keep it on a memory stick or another drive, away from this device.":"Not saved yet: a small file that opens this copy on its own.",hasFile()?"Save a new one":"Save one",function(){
     askPassword(hasFile()?"Save a new recovery key file":"Save a recovery key file","Your password first. "+(hasFile()?"The new file replaces the one saved on "+day(REC.file.made)+": that one will no longer open this copy.":"Then choose where the file goes: a memory stick or another drive is best."),"Save it",false,function(){
       saveKeyFile().then(function(){waysPanel();},function(x){closeDoor();toast(x&&x.message||"The file could not be saved.");});});});
+  var a0=devApi();
+  row(hasDev(),"This computer's own sign-in",hasDev()?cap1(devLabel())+" opens Ingenium on this computer, since "+day(REC.dev.made)+". Anyone who can sign in to this computer as you can open it this way.":a0?"Off. Touch ID or Windows Hello can open Ingenium on this computer, without the password.":"Only the Ingenium app on a Mac or a Windows computer can ask the computer itself.",
+    hasDev()?"Turn it off":a0?"Turn it on":"",hasDev()?function(){devTurnOff();waysPanel();toast("Your computer's own sign-in no longer opens Ingenium.");}:function(){devInfo().then(function(inf){
+      if(!inf||inf.kind==="none"){toast(inf&&inf.why||"This computer cannot be asked who you are.");return;}
+      askPassword("Let "+inf.label+" open Ingenium","Your password first. Then your computer asks who you are ("+esc(inf.label)+"). From then on it opens Ingenium on this computer without the password. Anyone who can sign in to this computer as you could open it too, so keep your computer's own sign-in to yourself.","Next",false,function(){
+        devTurnOn().then(function(){waysPanel();toast(cap1(devLabel())+" now opens Ingenium on this computer.");},function(x){closeDoor();toast(x&&x.message||"It could not be turned on.");});});});});
   row(!!REC.hint,"A hint for your password",REC.hint?"\u201c"+REC.hint+"\u201d, shown at the sign-in.":"None: a few words that remind you of the password, never the password itself.",REC.hint?"Change it":"Write one",hintEdit);
   c.querySelector("#ildClose").onclick=closeDoor;}
 function wordsMenu(){var c=view('<h2>Your ten recovery words</h2><p>See them again, or make new ones: new words replace the old, which then open nothing. Make new ones if you think someone else has seen them, or if you cannot find where you wrote them.</p>'
@@ -655,6 +667,43 @@ function hintEdit(){askPassword("A hint for your password","Your password first,
   c.querySelector("#ildHf").onsubmit=function(e){e.preventDefault();var h=c.querySelector("#ildHint").value.trim();if(!h){err(c,"Write a hint, or Remove it.");return;}
     if(hintGivesAway(h,pw)){err(c,"That hint holds your password, or most of it. Write something that only reminds you of it.");return;}
     patchRec(function(r){r.hint=h.slice(0,120);r.changed=Date.now();});waysPanel();toast("The hint is kept.");};});}
+/* ---------- 6.10.1 · the computer's own sign-in (Touch ID or the Mac's password; Windows Hello) as a way back in. Her answer (3 November
+   2026): "Yes, my computer's own sign in (Touch ID or Windows Hello) also open Ingenium." The data key is kept wrapped with a key the
+   computer holds in its own protection (the Mac's keychain; Windows' DPAPI), which it gives the page only after it has confirmed it
+   is her (desktop/app_device_6101.py; tools/IngeniumKey.swift). The lock keeps the wrapped data key and the key's name, never the key.
+   Opened so, no new password is asked, and the password can then be changed without the old one. Anyone who can sign in to the
+   computer as her can open Ingenium this way: that is said when it is turned on. ---------- */
+var DEV_AAD="ingenium-lock device",DEVINFO=null,DEVBUSY=false,AUTODEV=false;
+function devApi(){try{var a=W_.pywebview&&W_.pywebview.api;return a&&typeof a.device_key_get==="function"?a:null;}catch(e){return null;}}
+function hasDev(){return !!(REC&&REC.dev&&REC.dev.ct&&REC.dev.id);}
+function cap1(t){t=String(t||"");return t.charAt(0).toUpperCase()+t.slice(1);}
+function devLabel(){return (REC&&REC.dev&&REC.dev.label)||(DEVINFO&&DEVINFO.label)||"this computer's own sign-in";}
+function devInfo(){var a=devApi();if(!a)return Promise.resolve({kind:"none",label:"",why:"Only the Ingenium app on a Mac or a Windows computer can ask the computer itself."});if(DEVINFO)return Promise.resolve(DEVINFO);
+  return Promise.resolve(a.device_unlock_info()).then(function(r){DEVINFO=r&&r.ok?r:{kind:"none",label:"",why:(r&&r.error)||""};return DEVINFO;},function(){return {kind:"none",label:"",why:"This computer could not be asked."};});}
+function devName(){return "ing-"+b64e(rnd(9)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function devTurnOn(){var a=devApi();if(!a||!K.raw||!REC)return Promise.reject(new Error("Only the Ingenium app on a Mac or a Windows computer can do this."));var name=devName();
+  return devInfo().then(function(){return a.device_key_make(name,"let your computer's own sign-in open Ingenium");}).then(function(r){
+    if(!r||!r.ok)throw new Error((r&&r.error)||"The computer did not confirm it is you.");var key=b64d(r.key);if(key.length!==32)throw new Error("The computer gave a key that is not whole.");var iv=rnd(12);
+    return importDek(key).then(function(k){return enc(k,iv,DEV_AAD,K.raw);}).then(function(ct){var old=REC.dev&&REC.dev.id;
+      if(!patchRec(function(x){x.dev={v:1,id:name,made:Date.now(),label:(DEVINFO&&DEVINFO.label)||"",iv:b64e(iv),ct:b64e(ct)};x.changed=Date.now();}))throw new Error("This browser's store refused the change.");
+      try{W_.saveState();}catch(e){}if(old&&old!==name){try{a.device_key_drop(old);}catch(e){}}paintCard();});});}
+function devTurnOff(){var a=devApi(),id=REC&&REC.dev&&REC.dev.id;patchRec(function(x){delete x.dev;x.changed=Date.now();});try{W_.saveState();}catch(e){}if(a&&id){try{a.device_key_drop(id);}catch(e){}}paintCard();}
+function openWithDevice(rec){var a=devApi();if(!a)return Promise.reject(new Error("noapi"));if(!rec||!rec.dev)return Promise.reject(new Error("nodev"));if(!S())return Promise.reject(new Error("nosubtle"));
+  return Promise.resolve(a.device_key_get(rec.dev.id,"open Ingenium")).then(function(r){if(!r||!r.ok){var e=new Error((r&&r.error)||"not confirmed");e.cancelled=!!(r&&r.cancelled);e.missing=!!(r&&r.missing);e.nohelper=!!(r&&r.nohelper);throw e;}
+      return importDek(b64d(r.key));}).then(function(k){return dec(k,b64d(rec.dev.iv),DEV_AAD,b64d(rec.dev.ct));})
+    .then(function(dekRaw){return importDek(dekRaw).then(function(dek){return dec(dek,b64d(rec.check.iv),"ingenium-lock check",b64d(rec.check.ct)).then(function(c){if(TD.decode(c)!==CHECK)throw new Error("check");return {dekRaw:dekRaw,dek:dek};});});});}
+function devUnlock(c,auto){if(DEVBUSY)return;DEVBUSY=true;var b=c&&c.querySelector("#ildDev");if(b)b.disabled=true;
+  openWithDevice(REC).then(function(r){holdKeys(r);K.via="device";return takeDesk().then(function(){DEVBUSY=false;afterUnlock();toast("Opened with "+devLabel()+".");});},
+    function(x){DEVBUSY=false;dropKeys();if(b)b.disabled=false;if(!c||!doorOpen())return;
+      if(x&&x.cancelled){if(!auto)err(c,"Not confirmed. Try again, or sign in with your password.");return;}
+      err(c,x&&x.missing?"This computer holds no key for this copy of Ingenium: sign in with your password, or another way back in.":x&&x.nohelper?"This copy of the app cannot ask the computer itself: sign in with your password.":x&&x.message==="desk"?"The computer confirmed it is you, but the sealed desk could not be opened; it may have been changed by hand.":"Your computer's own sign-in did not open this copy ("+String(x&&x.message||"").slice(0,120)+"). Sign in with your password, or another way back in.");});}
+/* at the sign-in: the key, and the computer asked at once (once a session), when this computer holds the key; the app's bridge may come a moment later */
+function devOffer(c){if(!hasDev()||!W_.pywebview)return;var form=c.querySelector("#ildSign");if(!form||c.querySelector("#ildDev"))return;
+  var row=D.createElement("div");row.className="ild-keys ild-devrow";row.innerHTML='<button type="button" class="ild-key ild-ghost" id="ildDev">Open with '+esc(devLabel())+'</button>';form.parentNode.insertBefore(row,form.nextSibling);
+  var b=row.querySelector("#ildDev");b.onclick=function(){err(c,"");devUnlock(c,false);};
+  function ready(){if(!devApi()){b.disabled=true;return false;}b.disabled=false;if(!AUTODEV){AUTODEV=true;devUnlock(c,true);}return true;}
+  if(!ready())W_.addEventListener("pywebviewready",function(){setTimeout(function(){if(doorOpen()&&c.querySelector("#ildDev"))ready();},60);},{once:true});}
+
 /* the check now and then: a day after, a week, a month, then every three months */
 function remindSoon(){try{if(!REC)return;var R=REC.remind||{next:(REC.made||Date.now())+864e5,step:0};if(Date.now()<R.next)return;
     setTimeout(function(){if(doorOpen()||!on()||GOING)return;checkIn(R);},2500);}catch(e){warn(e);}}
