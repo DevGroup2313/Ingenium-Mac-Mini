@@ -371,6 +371,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.9.4 (3 November 2026). Four repairs, each found first by a test that failed on 6.9.3:
+
+- The switches in the chat's + menu (her words: "its really hard for the turn the "Research" and the "Web Search" toggles to enable
+  them, they are so hard to select no matter how hard I click"). Each switch was a `<label>` holding a checkbox inside the row's
+  button: a click on the switch reached the button twice, so the setting turned on and straight back off; only a click on the
+  words worked. The switch is now a picture of a switch, so a click anywhere on the row turns it over once, in Chat and in Code;
+  the row tells a screen reader it is a switch and whether it is on, and the keyboard's focus stays on it. The R206 edits in
+  `build_page.py`; `node rig/t_694_plus_switches.js <url> <out>` (54 checks; 18 of them failed on 6.9.3).
+- A connected model's limits (her words: "I tried to run Fable through the API key on Ingenium and the chat kept on crashing
+  because it was exceeding Token limits"). The history of a connected model was fitted to its window less the slider's reply
+  (about 1,000 tokens), but the request asked for the model's whole longest reply (up to 128,000), counted at 3 characters a
+  token; a refusal for size or for the key's tokens a minute ended the reply. Now the history leaves room for the reply really
+  asked for, at 2.5 characters a token (or the service's own count, once a refusal has said it); a refusal for size is answered by
+  leaving out the oldest part and sending again, saying so under the reply; the key's tokens a minute (429) and a busy service
+  are waited out on the reply's status line, twice at most; Stop ends a wait. `modules/r206.js`;
+  `node rig/t_694_cloud_limits.js <url> <out>` (23 checks against a stand-in for the Messages API; 14 failed on 6.9.3).
+- Sources only when they belong to the reply (her words: "The scholarly sources all nonsense and keep on showing up with every
+  reply, I want that removed, I only want real and accurate sources and only when they pertain to the reply do I want them cited
+  and provided"). Scholarly sources first is off until it is switched on; a scholarly record is kept only when half of the
+  question's words are in it and one at least in its title; the list under a reply shows only the sources the reply cites, under
+  its own numbers, and none when it cites none. `modules/r207.js` and the R207 edits;
+  `node rig/t_694_sources.js <url> <out>` (14 checks).
+- A notice is never a document: a reply that is only Ingenium's own notice in brackets ("(This reply was cut off before it began:
+  …)") is no longer made a Word and PDF document when the message asked for one (`r1Notice` in `modules/r101.js`), and one made
+  before is shown as the notice it is.
+
+The welcome door's sign-in offer, moved on 1 November to a small lock key in the card's top-left corner (rig/t_700_lock.js, 58
+checks), ships in this release. Run again on this build: t_cloud.js (12 connections through the app's relay), t_academic.js
+(24), t_695_memory.js (30).
+
 Ingenium 6.9.3 (1 November 2026; her words: "I have two 16 GB RAM HP laptops, I want to be able to use it as a server of sorts for my
 macbook pro and run its stronger models on the macbook pro or my fire tablet. The graphics of one of the HP laptop is not the
 greatest so I would really love to be able to still use its stronger RAM and storage but on my macbook pro instead.").

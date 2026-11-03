@@ -1017,6 +1017,48 @@ edit(r"""    ocb.chat_template_kwargs={enable_thinking:!!think};}""",
      r"""    ocb.chat_template_kwargs={enable_thinking:!!think};ocb.ingenium_status=true;}   /* R205: a lender then says how it is doing: waiting, loading, reading */""",
      "R205 a lender is asked to say how it is doing while it makes the first word")
 
+# ---- R206 (Ingenium 6.9.4, 3 November 2026): the switches in the chat's + menu (Research, Web search, Thinking, Scholarly sources
+#      first), in Chat and in Code. The owner's words (3 November 2026): "its really hard for the turn the "Research" and the "Web
+#      Search" toggles to enable them, they are so hard to select no matter how hard I click". Each switch was a <label> holding a
+#      checkbox, inside the row's button: a click on the switch itself reached the button once, then the label passed a second click
+#      to its checkbox, which reached the button again, so the setting turned on and straight back off. Only a click on the words
+#      worked. The switch is now a plain picture of a switch (a span), so a click anywhere on the row turns it over exactly once; the
+#      row says it is a switch and whether it is on (menuitemcheckbox, aria-checked), carries its key (data-k), and keeps the focus
+#      after the menu is painted again, so the keyboard can go on from it (rig/t_694_plus_switches.js). ----
+edit(r"""function pmItem(menu,icon,label,sub,fn,extra){var b=el("button","pm-item");b.type="button";b.setAttribute("role","menuitem");""",
+     r"""function pmItem(menu,icon,label,sub,fn,extra){var b=el("button","pm-item");b.type="button";
+  var pmSw=/\beswitch\b/.test(extra||"");b.setAttribute("role",pmSw?"menuitemcheckbox":"menuitem");if(icon)b.setAttribute("data-k",icon);   /* R206 */
+  if(pmSw)b.setAttribute("aria-checked",/<input[^>]*\schecked/.test(extra)?"true":"false");""",
+     "R206 a row with a switch says it is one, and whether it is on")
+edit(r"""  b.onclick=function(e){e.stopPropagation();fn(b);};menu.appendChild(b);return b;}
+function pmSwitch(on){return '<label class="eswitch pm-on" aria-hidden="true"><input type="checkbox" tabindex="-1"'+(on?" checked":"")+'><span class="etrack"></span></label>';}""",
+     r"""  b.onclick=function(e){e.stopPropagation();e.preventDefault();var k=pmSw&&b.getAttribute("data-k"),host=b.parentNode||menu;fn(b);
+    /* R206: the menu is painted afresh after a switch turns; the focus goes back to the same row, so the keyboard can go on
+       (host: the menu the row sits in when pressed; a row made apart and then placed, as Scholarly sources first is, was made
+       in a holder of its own) */
+    if(k&&!b.isConnected&&host&&!host.hidden){var pmRf=function(){var nb=host.querySelector('.pm-item[data-k="'+k+'"]');if(nb){try{nb.focus({preventScroll:true});}catch(_){}return true;}return false;};
+      if(!pmRf())setTimeout(function(){if(!host.hidden)pmRf();},0);}};
+  menu.appendChild(b);return b;}
+function pmSwitch(on){return '<span class="eswitch pm-on" aria-hidden="true"><input type="checkbox" tabindex="-1" style="pointer-events:none"'+(on?" checked":"")+'><span class="etrack"></span></span>';}""",
+     "R206 a click on a + menu switch turns it over once (a span, not a label inside a button)")
+
+# ---- R207 (Ingenium 6.9.4, 3 November 2026): sources only when they belong to the reply (modules/r207.js has the rest). The owner's
+#      words (3 November 2026): "The scholarly sources all nonsense and keep on showing up with every reply, I want that removed, I
+#      only want real and accurate sources and only when they pertain to the reply do I want them cited and provided."
+#      Scholarly sources first is off until it is switched on; a scholarly record is kept only when half of the question's words
+#      are in its title and abstract, and one at least in its title. ----
+edit(r"""function schOn(){var s=state.search||{};return s.scholar!==false;}""",
+     r"""function schOn(){var s=state.search||{};return s.scholar===true;}   /* R207: off until it is switched on */""",
+     "R207 Scholarly sources first is off until it is switched on")
+edit(r"""x.rel=schRel(words,x.title+" "+x.abstract);if(x.rel<0.34&&words.length>=2)return;""",
+     r"""x.rel=schRel(words,x.title+" "+x.abstract);if(words.length>=2&&(x.rel<0.5||schRel(words,x.title)===0))return;   /* R207 */""",
+     "R207 a scholarly record is kept only when it is about the question")
+# 6.9.4: a document kept on a reply that is only Ingenium's own notice (one made before r1Notice in modules/r101.js) is not shown as a
+# document card: her screenshot of 3 November 2026 showed "(This reply was cut off before it began: …)" as a Word and PDF document
+edit(r"""doc=docs[0]||(mm.doc&&!mm.live?mm.doc:null)""",
+     r"""doc=docs[0]||(mm.doc&&!mm.live&&!(typeof r1Notice==="function"&&r1Notice(mm.text))?mm.doc:null)""",
+     "6.9.4 a notice is never shown as a document card")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
