@@ -9,6 +9,9 @@
 # lineup in ingenium.html (ING_LINEUP) is written. Lines in candidates.txt:
 #   search <author> [words]   the author's newest models (names and dates)
 #   repo <owner/name>         every .gguf file in it, with size and SHA-256
+#   card <owner/name>         the lines of its model card on scores, settings and licence
+#   head <url>                whether a file downloads without signing in
+#   archs <llama.cpp tag>     the kinds of model the engine of that tag can load (6.10.2)
 import json, re, sys, urllib.request, urllib.parse
 
 API = "https://huggingface.co/api/"
@@ -86,6 +89,19 @@ def card(name):
                 break
 
 
+def archs(tag):
+    """the kinds of model the engine at this llama.cpp tag can load: the names in its src/llama-arch.cpp"""
+    url = "https://raw.githubusercontent.com/ggml-org/llama.cpp/%s/src/llama-arch.cpp" % tag
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "ingenium-lineup/1"})
+        text = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+    except Exception as e:
+        print("A %s ERROR %s" % (tag, e))
+        return
+    names = re.findall(r'\{\s*LLM_ARCH_[A-Z0-9_]+\s*,\s*"([^"]+)"\s*\}', text)
+    print("A %s %d %s" % (tag, len(names), " ".join(names)))
+
+
 for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encoding="utf-8"):
     w = line.split()
     if not w or w[0].startswith("#"):
@@ -98,3 +114,5 @@ for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encodin
         card(w[1])
     elif w[0] == "head":
         head(w[1])
+    elif w[0] == "archs":
+        archs(w[1])
