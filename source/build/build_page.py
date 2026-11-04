@@ -1192,6 +1192,17 @@ edit('{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models at once, we
      '{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models, on this device and connected, choose how hard they work, see how the answer was reached, and save the mix as a house of your own."}',
      "6.12 the tour's Blend step says what Blend does now")
 
+# ---- 6.14 (4 November 2026): connectors (modules/r220.js) speak MCP over HTTP, where a server that keeps a session names it in a
+#      response header (Mcp-Session-Id) and wants it back. netFetch gave its callers the status, the words and the content type only;
+#      it now gives the response's headers too: the browser's own when the page asks directly, and through the computer app's relay
+#      the two it passes back (X-Upstream-..., desktop/app_mcp_614.py). Every caller that did not read them is unchanged. ----
+edit('      return netReadBody(r,o.onChunk,ab).then(function(t){return netResult(st,t,ct);});});',
+     '      return netReadBody(r,o.onChunk,ab).then(function(t){var x=netResult(st,t,ct);x.headers={get:function(n){return r.headers.get("X-Upstream-"+n);}};return x;});});',
+     "6.14 a response's headers through the relay")
+edit('return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type")||"";return netReadBody(r,o.onChunk,ab).then(function(t){return netResult(r.status,t,ct);});},',
+     'return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type")||"";return netReadBody(r,o.onChunk,ab).then(function(t){var x=netResult(r.status,t,ct);x.headers=r.headers;return x;});},',
+     "6.14 a response's headers when the page asks directly")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

@@ -107,7 +107,7 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_device_6101", "_device_unlock_info", ("mini", "intel", "win")),
            ("app_parts_6102", "_gguf_parts_of", ("mini", "intel", "win")),
            ("app_engine2_6105", "_engine_next_dir", ("mini", "intel", "win")),
-           ("app_engine3_6106", "_engine_info_one", ("mini", "intel", "win"))]
+           ("app_engine3_6106", "_engine_info_one", ("mini", "intel", "win")), ("app_mcp_614", "X-Upstream-Mcp-Session-Id", ("mini", "intel", "win"))]
 
 
 def desktop():

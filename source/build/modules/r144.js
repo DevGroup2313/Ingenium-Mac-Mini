@@ -449,7 +449,7 @@ var PG={
       ["Find an older conversation","The list key at the top left shows every conversation.","#ccSideBtn"]],
     tips:{"new":["Be specific: say who it is for and how long it should be.","If no model is loaded yet, the key beside the send arrow helps you choose one."],
       some:["Controls sets the effort, the length of answers and how much of the conversation the model keeps in mind.","Fast answers at once, without thinking first: good for quick questions."],
-      expert:["Enter sends; Shift+Enter starts a new line.","The system prompt and context length are under Controls; a cloud model can be connected in Settings."]}},
+      expert:["Enter sends; Shift+Enter starts a new line.","The system prompt and context length are under Controls; a cloud model can be connected in Settings.","Connectors (the + menu) lend the model tools from outside services; one that changes something asks you first."]}},
   code:{name:"Code",tour:["Chat"],
     what:"Code is where you build an app with the model and watch it run beside the conversation.",
     plain:"Describe what you want in everyday words. The model writes the code, and the preview shows the app working.",

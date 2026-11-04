@@ -151,7 +151,9 @@ var CHECK_TOOL={name:"run_check",description:"Run a check inside the app as it r
   input_schema:{type:"object",properties:{name:{type:"string",description:"What it checks, in a few plain words."},code:{type:"string",description:"The body of an async JavaScript function, run in the app's page; return true when it passes."}},required:["name","code"]}};
 var EXTRA=[PLAN_TOOL,CHECK_TOOL];
 function toolDef(n){if(WHEN[n]&&!safeWhen(n))return null;return TOOLS.concat(EXTRA).filter(function(t){return t.name===n;})[0]||null;}
-function toolsFor(ro,x){x=x||{};var L=TOOLS.filter(function(t){return (!ro||READ_ONLY[t.name])&&(!WHEN[t.name]||safeWhen(t.name));});if(x.plan)L=L.concat([PLAN_TOOL]);if(x.check&&!ro)L=L.concat([CHECK_TOOL]);return L;}
+function toolsFor(ro,x){x=x||{};var L=TOOLS.filter(function(t){return (!ro||READ_ONLY[t.name])&&(!WHEN[t.name]||safeWhen(t.name));});
+  if(x.ws&&x.ws.connectorsOnly)return L.filter(function(t){return !!WHEN[t.name];});
+  if(x.plan)L=L.concat([PLAN_TOOL]);if(x.check&&!ro)L=L.concat([CHECK_TOOL]);return L;}
 /* 6.13: tools another part of Ingenium lends the loop (modules/r219.js: the GitHub repository a Code session works on). Each has its
    definition, its handler, whether it only reads, and when it is offered; a tool not offered now is refused as any unknown one */
 var HANDLERS={},WHEN={};
@@ -166,7 +168,9 @@ function wsFor(bot){var c=curChat();
     return ccLoadAll(pr).then(function(){var mf=ccMain(pr);
       var files=(pr.files||[]).filter(function(f){return typeof f.text==="string";}).map(function(f){return {name:f.name,text:f.text,orig:f.text,kind:edKind(f.name),main:f===mf,edits:[]};});
       return files.length?{code:true,pr:pr,chatId:c.id,files:files,where:"chat"}:null;});}
-  var names=(typeof edChatFiles==="function")?edChatFiles():[];if(!names.length)return Promise.resolve(null);
+  var names=(typeof edChatFiles==="function")?edChatFiles():[];
+  /* 6.14: no files, but a connector switched on for this conversation (modules/r220.js): the loop runs with the connectors' tools only */
+  if(!names.length){var cx=false;try{cx=!!(window.IngConnectors&&IngConnectors.activeFor(c));}catch(e){}return Promise.resolve(cx?{code:false,chatId:c.id,files:[],where:"chat",connectorsOnly:true}:null);}
   return Promise.all(names.map(function(n){return Promise.resolve(edSource(n,bot)).then(function(s){
       return s&&typeof s.text==="string"&&s.kind!=="doc"?{name:s.name,text:s.text,orig:s.text,kind:s.kind,edits:[]}:null;},function(){return null;});}))
     .then(function(L){L=L.filter(Boolean);return L.length?{code:false,chatId:c.id,files:L,where:"chat"}:null;});}
@@ -288,7 +292,11 @@ function exec(ws,name,a,o){var t=toolDef(name);
   return Promise.resolve({text:"Unknown tool.",err:true});}
 
 /* ---------- what the model is told ---------- */
-function note(ws,way,plan,x){x=x||{};var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
+function note(ws,way,plan,x){x=x||{};
+  if(ws.connectorsOnly){var cn="";try{cn=window.IngConnectors?IngConnectors.namesFor(curChat()).join(", "):"";}catch(e){}
+    return ["You can use the person's connectors"+(cn?" ("+cn+")":"")+": tools that reach outside services for them. Use one when it helps to answer, and say which you used and what it returned.",
+      "Never invent what a tool returned. If a tool fails or is not allowed, say so plainly and answer as well as you can without it.",
+      "A tool that changes something (sends, creates, deletes, books) asks the person first; ask in words before you use one when the request is not clear."].join("\n");}var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
   var l=["You are working on the person's "+what+" with tools, the way a careful senior engineer pairs with its author. Use the tools; do not write edit blocks or whole files in your reply, and ignore anything above that asks for edit blocks.",
     "Files: "+nameList(ws)+". Large files are mostly data the app carries; search finds the code in them.",
     "Never guess at code you have not read. Keep the author's names, style and comments. Change only what was asked. Use plain words and explain a technical term the first time you use it. If the request is unclear, ask one short question before changing anything."];
@@ -305,11 +313,12 @@ function note(ws,way,plan,x){x=x||{};var what=ws.where==="build"?"page open in B
     "Justify each decision briefly. When a choice depends on documentation or a source, name it, or say you have no verified source. End with: what was built, each check and its result, and anything left undone."].join("\n"));
   return l.join("\n");}
 /* for a model on this device: the tools as written tags, in the form Qwen's models and most small models learn */
+function schemaSig(sc){try{var p=(sc&&sc.properties)||{},o={};Object.keys(p).slice(0,8).forEach(function(k){var t=p[k]&&p[k].type;o[k]=t==="number"||t==="integer"?0:t==="boolean"?false:t==="array"?[]:t==="object"?{}:(p[k]&&p[k].description?String(p[k].description).slice(0,40):"…");});return JSON.stringify(o);}catch(e){return "{}";}}
 function localNote(tools){var sig={list_files:"{}",search:"{\"pattern\": \"text to find\"}  (optional: \"file\": \"name\")",read:"{\"file\": \"name\", \"start_line\": 1, \"end_line\": 60}",
     edit:"{\"file\": \"name\", \"old_text\": \"exact text now in the file\", \"new_text\": \"what replaces it\"}",write_file:"{\"file\": \"name\", \"content\": \"the whole new file\"}",run_app:"{}",
     update_plan:"{\"tasks\": [{\"task\": \"what to do\", \"status\": \"pending\"}]}",run_check:"{\"name\": \"what it checks\", \"code\": \"return document.title === 'My app';\"}"};
   return ["# Tools","To use a tool, write exactly this, then stop and wait:","<tool_call>","{\"name\": \"search\", \"arguments\": {\"pattern\": \"greet\"}}","</tool_call>",
-    "The result comes back between <tool_response> and </tool_response>. Use one tool at a time. The tools:"].concat(tools.map(function(t){return "- "+t.name+" "+sig[t.name]+": "+t.description.split(". ")[0]+".";}))
+    "The result comes back between <tool_response> and </tool_response>. Use one tool at a time. The tools:"].concat(tools.map(function(t){return "- "+t.name+" "+(sig[t.name]||schemaSig(t.input_schema))+": "+String(t.description||"").split(". ")[0]+".";}))
     .concat(["When you have finished, answer in plain words without a tool call."]).join("\n");}
 
 /* ---------- the services, each in its own request form ---------- */
@@ -498,9 +507,9 @@ function commitChat(ws,bot){var changed=ws.files.filter(function(f){return f.isN
     return made.length;});}
 var ORIG=null;
 function effortFor(cloud,ws){try{return window.IngEffort?IngEffort.forRun({cloud:cloud,provider:cloud?(state.cloud||{}).provider:"",code:!!ws.code,where:ws.where}):null;}catch(e){return null;}}
-function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=family(c.provider),way=wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan);
+function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=family(c.provider),way=ws.connectorsOnly?"auto":wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan);
   var E=effortFor(true,ws),ultra=!!(E&&E.ultra)&&way!=="guide",ro=way==="guide"||plan,chk=ultra&&canRun(ws);
-  var P=plainMsgs(messages),S={tools:toolsFor(ro,{plan:true,check:chk}),think:thinkOn()&&!(E&&E.lv<=1&&fam!=="anthropic"),fallback:true,ab:ab,effort:E};
+  var P=plainMsgs(messages),S={tools:toolsFor(ro,{plan:true,check:chk,ws:ws}),think:thinkOn()&&!(E&&E.lv<=1&&fam!=="anthropic"),fallback:true,ab:ab,effort:E};
   var sys=(P.sys?P.sys+"\n\n":"")+note(ws,way,plan,{plan:true,ultra:ultra,check:chk});
   if(fam==="anthropic"){S.sys=sys;S.msgs=P.msgs;}else{S.msgs=[{role:"system",content:sys}].concat(P.msgs);}
   var stopped=function(){return !!(ab&&ab.aborted);};
@@ -519,7 +528,7 @@ function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=fami
 function slimFiles(text){return String(text||"").replace(/<file name="([^"]*)">\n([\s\S]*?)\n<\/file>/g,function(all,n,body){
   return body.length<1500?all:"<file name=\""+n+"\">\n["+body.split("\n").length+" lines: read them with the tools]\n</file>";});}
 function roomOf(){var room=12000;try{room=Math.max(6000,Math.floor(chatBudget()*0.9));}catch(e){}return room;}
-function localRun(job,bot,ws){var way=wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan),E=effortFor(false,ws),ultra=!!(E&&E.ultra)&&way!=="guide",chk=ultra&&canRun(ws),tools=toolsFor(way==="guide"||plan,{plan:ultra,check:chk});
+function localRun(job,bot,ws){var way=ws.connectorsOnly?"auto":wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan),E=effortFor(false,ws),ultra=!!(E&&E.ultra)&&way!=="guide",chk=ultra&&canRun(ws),tools=toolsFor(way==="guide"||plan,{plan:ultra,check:chk,ws:ws});
   var msgs=job.messages.map(function(m){return {role:m.role,content:typeof m.content==="string"?slimFiles(m.content):(m.content||[]).filter(function(p){return p.type==="text";}).map(function(p){return slimFiles(p.text);}).join("\n")};});
   var add=note(ws,way,plan,{plan:ultra,ultra:ultra,check:chk})+"\n\n"+localNote(tools);
   if(msgs[0]&&msgs[0].role==="system")msgs[0].content+="\n\n"+add;else msgs.unshift({role:"system",content:add});

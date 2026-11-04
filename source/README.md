@@ -371,6 +371,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.14 (4 November 2026): connectors, in Chat and in Code. Her words (3 November 2026): "I want connectors added"; and (4
+November) "I want full parity with Claude's Code chat ... and so much more".
+
+- A connector is a server that speaks MCP (the Model Context Protocol) over HTTP, as Claude's connectors are (modules/r220.js). She adds
+  one by its address, with a token when the server asks for one (kept on this device, sent only to that server; https is required for
+  a server on the internet). Ingenium asks the server what it is and lists its tools, every page of them, each marked as one that only
+  reads or one that changes something.
+- In every conversation where a connector is on (all of them unless she turns it off there: the + menu, Connectors, and the Code
+  session's column each have a switch), the model is offered its tools through the working loop, on a connected model or one on this
+  device; a conversation with no files now uses the loop for them, with instructions of their own and no file tools (modules/r190.js).
+  A tool that only reads runs when asked; one that changes something asks her first (Allow once, Always allow it, Not now), showing
+  what it would send. Each use is a step under the reply.
+- The transport is MCP's Streamable HTTP (JSON-RPC 2.0 over POST, answered as JSON or as server-sent events), with the protocol version
+  agreed at the start and the session a server keeps (Mcp-Session-Id), started again once when the server has forgotten it. netFetch
+  now gives its callers a response's headers (build_page.py, 6.14), and the Mac and Windows apps' relay passes those two headers back
+  (desktop/app_mcp_614.py).
+- Not yet, and said so in the Guide: a server that only takes its provider's own sign-in page (OAuth) needs a token instead; a server
+  run as a program on the computer (stdio) is not started by Ingenium; in a plain browser, a server that refuses pages from elsewhere
+  cannot be reached.
+
+    node rig/t_614_connectors.js <url> <out>   # 24 checks, with two stand-in MCP servers and a stand-in Claude that uses a tool
+
+- Code, closer still to Claude's sessions (modules/r221.js): @ in the message box lists the app's files as she types (arrows, Enter or
+  Tab, Escape) and puts @path in the message; the model is told, for that message, to read the files she pointed at first (an e-mail
+  address or a name that is no file is not taken as pointing). The list of an app's sessions says each one's state: working, waits for
+  you (a change to review), and its pull request. The steps that pushed a commit or opened a pull request carry their links to GitHub.
+
+    node rig/t_614_code_more.js <url> <out>     # 8 checks
+
 Ingenium 6.13 (4 November 2026): Code on a GitHub repository. Her words: "I still want full parity with Claude's Code chat, right now
 its close but not quite there ... I want to be able to connect my Github repositories in the Environment of the Ingenium's Coding chat
 and so much more"; and (3 November) "I want to be able to connect my Github's repositories to the chats and track the changes made during
