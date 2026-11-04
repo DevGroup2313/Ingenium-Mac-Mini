@@ -143,6 +143,9 @@ var S={
   settingsCn:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("settings");},ring:"#cnCard",
     t:"🔌 Connectors",
     b:"Settings, Connectors: add a connector by its address, and a token if it asks for one (kept on this device and sent only to that server). Its tools are listed, each saying whether it only reads or asks you first."},
+  workshop:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("workshop");},ring:'.nav-btn[data-page="workshop"]',
+    t:"🛠 The Workshop",
+    b:"In your master edition, the Workshop, after Settings: check Ingenium in plain words, see every error since it started, and find and fix one with a model on Ingenium's own page in Code. Add pages, sections, scripts and styles of your own, or hide what you do not use; a safe start runs Ingenium without them."},
   settingsLock:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("settings");},ring:"#ingLockCard",
     t:"🔐 Your data, sealed",
     b:"An optional sign-in of your own, a name and a password, seals your data on this device. Several ways back in open it: the password, ten words you keep, a key file on a stick or a drive, and a hint. On a Mac or a Windows computer, its own sign-in (Touch ID or Windows Hello) can be one more.",
@@ -164,7 +167,7 @@ function apply(){if(!Array.isArray(W.ING_TOUR)||ING_TOUR.some(function(s){return
   insertAfter(lastOf("Chat"),[S.code1,S.code2,S.code3,S.code4,S.code5].concat(W.IngEnv?[S.codeEnv]:[]).concat([S.code6]));
   insertAfter(lastOf("Models"),[S.found]);
   var bl=idx(function(s){return s.chap==="Making things"&&/^Blend/.test(bare(s.t));});insertAfter(bl>=0?bl:lastOf("Making things"),[S.blend2]);
-  var st=[];if(W.IngConnectors)st.push(S.settingsCn);if(W.IngLock)st.push(S.settingsLock);insertAfter(lastOf("Settings"),st);
+  var st=[];if(W.IngConnectors)st.push(S.settingsCn);if(W.IngLock)st.push(S.settingsLock);if(W.IngWorkshop)st.push(S.workshop);insertAfter(lastOf("Settings"),st);
   try{Object.keys(TEASE).forEach(function(k){if(!ING_TOUR_TEASERS[k])ING_TOUR_TEASERS[k]=TEASE[k];});}catch(e){}
   try{Object.keys(CLOSE).forEach(function(k){if(!ING_TOUR_CLOSERS[k])ING_TOUR_CLOSERS[k]=CLOSE[k];});}catch(e){}
   /* two chapters' lines say what they now hold, where they still say what they held */
@@ -230,7 +233,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
-var NEW=[["6.17","Effort wherever a model is chosen: Build has its own, with Ultracode; Lector, the Career Studio and Folders share one, with Ultra to check each piece against its material."],
+var NEW=[["6.18","In your master edition, the Workshop: check Ingenium, see its errors, find and fix one with a model, and add pages, sections, scripts and styles of your own.","master"],
+  ["6.18","How I work, on every app now goes with every Code session and every request Build makes."],
+  ["6.17","Effort wherever a model is chosen: Build has its own, with Ultracode; Lector, the Career Studio and Folders share one, with Ultra to check each piece against its material."],
   ["6.16","A Code session's environment, as in Claude: network access, secrets for sites, a setup script and variables, applied to the app as it runs. No scroll bar in sight anywhere, and everything still scrolls."],
   ["6.15","The guided tour and the Guide up to date in every edition; the Code column without a scroll bar; a wider, raised repository picker."],
   ["6.14","Connectors, as in Claude, in Chat and in Code; @ to point the model at a file; each Code session's state in the list."],
@@ -248,7 +253,7 @@ var NEW=[["6.17","Effort wherever a model is chosen: Build has its own, with Ult
   ["6.9.7","The Career Studio's People, and Today: one step at a time.","career"],
   ["6.9.2","An optional sign-in, with your data sealed on this device."],
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
-function newNow(){return NEW.filter(function(x){return x[2]!=="career"||has("page-career");});}
+function newNow(){return NEW.filter(function(x){return (x[2]!=="career"||has("page-career"))&&(x[2]!=="master"||!!W.IngWorkshop);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;

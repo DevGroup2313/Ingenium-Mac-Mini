@@ -371,6 +371,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.18 (4 November 2026): the author's workshop, in the master edition; How I work, on every app in every Code session.
+Her words: "I want to be able to troubleshoot Ingenium inside of the app. I want to be able to run diagnostics and be able to find and fix
+a bug in the app. I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,
+curate, run diagnostics and add or remove new features, pages, sections or different functions in Ingenium as its author and creator. I
+want that capability added to my master version"; her answer on how edits take effect: both, layers first, then the page itself. And:
+"I want the scroll bars kept hidden rule to be applied to all of my apps, please add that to the folders inside Ingenium as well for all
+future apps" (the other apps' repositories, she then said, are to be left as they are).
+
+- The Workshop (modules/r226.js; editions.py leaves it out of every other edition), after Settings in the side bar:
+  - Check Ingenium: every part loaded, every page opened (Chat and Code only when a conversation of that kind exists, so it makes none;
+    not the apps on the Desk, pages of their own), both stores written and read back, the room the browser offers, the engine and the
+    models, the connections (never their keys) and connectors, the sign-in, her layers, the errors since it started, the version. Each
+    line says ok, worth a look or wrong, in plain words; Copy the report.
+  - Errors since it started: every error the page meets (thrown, a file that did not load, a promise not caught, an error written to the
+    console), newest first, with when and where; the same error said twice (as thrown and again by Ingenium's own handler) is kept once;
+    the last 50 are kept across restarts.
+  - Find and fix with a model: Ingenium's own page opens as an app in Code (as Your apps opened it), with the report, or one error, in the
+    message box for her to read before she sends it. The model searches, reads and changes ingenium.html; the preview runs the changed
+    Ingenium; every change is a version she can undo; Download the app keeps the changed page.
+  - Your layers, loaded as Ingenium starts on every device that has her data, the built page unchanged: pages of her own in the side bar
+    (each in a frame of its own, apart from her data; or one of her Code apps), sections added to any page (written text, or HTML in a
+    frame), scripts that run in Ingenium after every part has loaded (with all its power), styles (given the weight of two ids more, so
+    they win over Ingenium's own), and pages or named cards she hides.
+  - A safe start: Start without your layers (and with them again); and on its own when the last start stopped while one of her scripts
+    ran, saying which. A script that fails is marked with its error and listed with the errors.
+  - Next: on her computers, a changed page taking the place of the installed one, and going back to the last working version if it
+    does not start.
+- Folders: her rule (scroll bars hidden in every app, scrolling kept) is added once at the end of How I work, on every app, in the
+  master edition, where she can change or remove it. How I work, on every app now goes with every Code session, not only those in a
+  folder (modules/r208.js), and with every request Build makes (modules/r190.js), so every app she builds follows it.
+- The tour's Settings chapter gains the Workshop (where it is carried); the Guide gains a card for it; What is new gains 6.18.
+- Found by the Workshop while testing: Chromium reported "ResizeObserver loop completed with undelivered notifications" once, as pages
+  were opened. That message is what a layout that reacts to its own size gives, one possible cause of her "glitching back and forth";
+  the Workshop now records it, with its time, on her own device.
+
+    node rig/t_618_workshop.js <url> <mock url> <out>   # 19 checks, with a stand-in for Ingenium's own page and the stand-in Claude
+
 Ingenium 6.17 (4 November 2026): effort wherever a model is chosen. Her words (3 November 2026): "I want to be able to select low to
 Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside of Ingenium."
 

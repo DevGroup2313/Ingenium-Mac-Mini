@@ -15,11 +15,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const career = ED === 'master' || ED === 'full';
 
   /* 1. the new steps, each in its chapter, and the chapters in order */
-  const t = await p.evaluate(() => ({ n: ING_TOUR.length, added: IngTourNow.added(), chaps: tourChapList().map(c => c.chap), env: !!window.IngEnv }));
+  const t = await p.evaluate(() => ({ n: ING_TOUR.length, added: IngTourNow.added(), chaps: tourChapList().map(c => c.chap), env: !!window.IngEnv, ws: !!window.IngWorkshop }));
   const want = ['Chat: Effort, beside the model', 'Chat: Connectors', 'Code: Code: building an app with the model', 'Code: The plan, ticked off', 'Code: The Session column', 'Code: Ultracode',
     'Code: Your GitHub repositories'].concat(t.env ? ['Code: The environment'] : []).concat(['Code: Pointing with @, commands with /', 'Models: Newer models, found online', 'Making things: Ways to blend', 'Folders: Folders', 'Folders: Bringing your work in'])
     .concat(career ? ['Career Studio: The Career Studio', 'Career Studio: A posting from its link', 'Career Studio: Drafts you review'] : [])
-    .concat(['Settings: Connectors', 'Settings: Your data, sealed']);
+    .concat(['Settings: Connectors', 'Settings: Your data, sealed']).concat(t.ws ? ['Settings: The Workshop'] : []);
   ok(want.every(w => t.added.includes(w)) && t.added.length === want.length, 'the tour carries the ' + want.length + ' new steps of this edition, and no others', t.added);
   const ci = c => t.chaps.indexOf(c);
   ok(ci('Code') === ci('Chat') + 1 && ci('Folders') === ci('Making things') + 1 && (career ? ci('Career Studio') === ci('Lector') + 1 : ci('Career Studio') < 0 && ci('Lector') < 0),

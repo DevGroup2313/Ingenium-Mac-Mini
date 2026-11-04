@@ -36,6 +36,7 @@ def skip_modules(ed):
     if ed == "master":
         return set()
     out = {"r126.js"}  # Lector's recipe: the owner's rules, verified sources and kinds of document
+    out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
     if not has_lector(ed):
         out |= {"r107.js", "r108.js", "r148.js"}  # Lector, as approved; how it reads; how it writes
         out |= {"r188.js"}  # 6.8.3: the Career Studio, which writes with Lector ("Please keep the Lector page and the new Career Studio page off the demo and its tour")

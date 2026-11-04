@@ -674,6 +674,8 @@ function buildAsk(){if(BS.busy||!BS.el)return;var inp=BS.el.querySelector(".agb-
   if(E&&(E.auto||E.ultra)){var es0=document.createElement("div");es0.className="eff-says";var L0=(window.IngEffort&&IngEffort.levels&&IngEffort.levels[E.lv])||{name:"High"};
     es0.textContent=E.ultra?"Ultracode, at Max effort.":"Auto chose "+L0.name+" effort"+(E.why?": "+E.why+".":".");out.insertBefore(es0,out.firstChild);}
   var sys=note(ws,way,false,{plan:ultra,ultra:ultra,check:chk}),turns=BS.hist.slice(-6).concat([{role:"user",content:req}]);
+  /* 6.18: How I work, on every app (Folders) goes with Build's requests too */
+  try{var hw=String((state.folders&&state.folders.how)||"").trim();if(hw)sys+="\n\nHow I work, on every app (in my own words):\n"+hw.slice(0,4000);}catch(e){}
   var cfg={ws:ws,way:way,plan:false,stopped:stopped,ui:ui,ultra:ultra,
     commit:function(){var f=ws.files[0];if(f.text===f.orig)return Promise.resolve(0);if(f.text!==buildText())buildSet(f.text);f.orig=f.text;return Promise.resolve(1);}};
   if(mo.kind==="cloud"){var fam=family(state.cloud.provider);cfg.turn=turnFor(state.cloud.provider);cfg.small=false;cfg.limit=E?(fam==="ollama"?Math.ceil(E.steps/2):E.steps):(fam==="ollama"?30:60);

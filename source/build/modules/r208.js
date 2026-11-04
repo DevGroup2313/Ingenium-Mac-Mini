@@ -121,7 +121,10 @@ function contextFor(p){if(!p||p.kind!=="app"||!p.app)return "";var a=p.app,G=F()
   if(a.open&&a.open.length)parts.push("Open next on "+p.name+":\n"+a.open.slice(0,12).map(function(x){return "- "+clip(x,CAP.item);}).join("\n"));
   var out=parts.join("\n\n");return out?clip("THIS CONVERSATION IS IN MY FOLDER FOR "+p.name.toUpperCase()+".\n\n"+out,CAP.ctx):"";}
 function wrapPrompt(){if(typeof W.chatSystemPrompt!=="function"||W.chatSystemPrompt.__r208)return;var o=W.chatSystemPrompt;
-  W.chatSystemPrompt=function(budget){var r=o.apply(this,arguments);try{var p=typeof W.chatProject==="function"?W.chatProject():null,ctx=contextFor(p);if(ctx)r=(r?r+"\n\n":"")+ctx;}catch(e){}return r;};W.chatSystemPrompt.__r208=1;}
+  W.chatSystemPrompt=function(budget){var r=o.apply(this,arguments);try{var p=typeof W.chatProject==="function"?W.chatProject():null,ctx=contextFor(p);if(!ctx)ctx=everyApp();if(ctx)r=(r?r+"\n\n":"")+ctx;}catch(e){}return r;};W.chatSystemPrompt.__r208=1;}
+/* 6.18: How I work, on every app goes with every Code session too, not only those in a folder, so every app she builds follows it (her
+   words, 4 November 2026: "add that to the folders inside Ingenium as well for all future apps") */
+function everyApp(){try{var c=typeof W.curChat==="function"?W.curChat():null;if(!c||typeof W.ccIsCode!=="function"||!W.ccIsCode(c))return "";var h=(F().how||"").trim();return h?"How I work, on every app (in my own words):\n"+clip(h,CAP.how):"";}catch(e){return "";}}
 
 /* ---------- Where we left off: brought up to date from the conversations not read yet, each read once ---------- */
 var RUN={busy:false,what:"",of:null};
@@ -287,7 +290,7 @@ function start(){install();wrapPrompt();
   try{if($("page-folders")&&$("page-folders").classList.contains("active"))paint();}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",start);else start();
 W.addEventListener("load",function(){wrapPrompt();});
-W.IngFolders={folders:folders,make:makeFolder,sortAll:sortAll,contextFor:contextFor,bringUp:bringUp,parseNotes:parseNotes,profileApps:profileApps,readModelfile:readModelfile,paint:paint,unread:unread,run:RUN};
+W.IngFolders={everyApp:everyApp,folders:folders,make:makeFolder,sortAll:sortAll,contextFor:contextFor,bringUp:bringUp,parseNotes:parseNotes,profileApps:profileApps,readModelfile:readModelfile,paint:paint,unread:unread,run:RUN};
 })();
 ;try{window.__ingParts["p208"]="running";}catch(_){}
 </script>
