@@ -371,6 +371,33 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.13 (4 November 2026): Code on a GitHub repository. Her words: "I still want full parity with Claude's Code chat, right now
+its close but not quite there ... I want to be able to connect my Github repositories in the Environment of the Ingenium's Coding chat
+and so much more"; and (3 November) "I want to be able to connect my Github's repositories to the chats and track the changes made during
+the sessions".
+
+- The Session column's Environment (and Code's first choice, From GitHub) connects one of her repositories (modules/r219.js). She signs
+  in once with a token made on GitHub, kept on this device as Fabrica keeps it and sent only to GitHub; her repositories are listed
+  (those she cannot push to say so), then the branches of the one chosen.
+- The branch is read as it is now, in a few requests (its ref, its commit, its tree, then its text files, eight at a time), not its
+  whole history as Fabrica's sync reads it. Left out, each named with its reason: binary files, files over 1 MB, folders of installed
+  packages, files that may hold secrets (.env, keys); what is left out is never fetched. At most 2,000 files or 60 MB a session.
+- Ingenium knows, file by file, what differs from the branch it started from (by each file's git fingerprint, as GitHub counts it), and
+  what waits to be pushed, including the model's edits in the middle of its work. Review and push shows each file with its lines added
+  and removed and its unified difference; the push is one commit, to the session's own branch (ingenium/..., or a name she gives
+  before the first push), never to the branch it started from, and never forced. Where she cannot push, Ingenium offers her own copy
+  (a fork), brings it up to date when it lacks the commit, and pushes there.
+- Create PR opens a pull request from that branch into the branch it started from; the Environment and the session's top row (Push, n
+  / Create PR / PR #n) then follow it: open, merged or closed, and its checks (passed, failed, running). Update from GitHub (before the
+  first push) brings newer work into the files she has not changed and names those she has. Disconnect keeps the files and sends
+  nothing to GitHub.
+- The model is told where it works, and has four tools (modules/r190.js now lends its loop tools from other parts of Ingenium):
+  git_status and git_diff (which only read), commit_and_push (to the session's branch) and open_pull_request (which always waits for her
+  yes). Commands typed after a slash: /status, /diff, /push, /pr, /review (the model reviews the changes without editing), /update.
+- The Guide has a card for it; the Code page's help names it.
+
+    node rig/t_613_github.js <url> <out>     # 42 checks, with a stand-in GitHub whose files carry their real git fingerprints
+
 Ingenium 6.12 (4 November 2026): Blend, deepened. Her words: "Please deepen and expand the 'Blend' page so that it really enhances
 the app and provide great and powerful blend of models with thorough and precise reasoning and outstanding performance ... I want for
 Ingenium to work as an ecosystem"; and (3 November) "I want to be able to select low to Max effort and Ultracode inside of the chats and

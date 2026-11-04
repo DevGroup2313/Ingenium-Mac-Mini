@@ -150,8 +150,15 @@ var PLAN_TOOL={name:"update_plan",description:"Keep the plan of this task: a lis
 var CHECK_TOOL={name:"run_check",description:"Run a check inside the app as it runs now, with every change made so far (the app is run again first if it changed). The code is the body of an async JavaScript function run in the app's own page: it may use document and window, click and type, and await; it must return true when the check passes. Anything else it returns (false, or a sentence saying what is wrong) is a failure, and so is an error it throws. Example: document.getElementById('add').click(); return document.getElementById('n').textContent === '1';",
   input_schema:{type:"object",properties:{name:{type:"string",description:"What it checks, in a few plain words."},code:{type:"string",description:"The body of an async JavaScript function, run in the app's page; return true when it passes."}},required:["name","code"]}};
 var EXTRA=[PLAN_TOOL,CHECK_TOOL];
-function toolDef(n){return TOOLS.concat(EXTRA).filter(function(t){return t.name===n;})[0]||null;}
-function toolsFor(ro,x){x=x||{};var L=TOOLS.filter(function(t){return !ro||READ_ONLY[t.name];});if(x.plan)L=L.concat([PLAN_TOOL]);if(x.check&&!ro)L=L.concat([CHECK_TOOL]);return L;}
+function toolDef(n){if(WHEN[n]&&!safeWhen(n))return null;return TOOLS.concat(EXTRA).filter(function(t){return t.name===n;})[0]||null;}
+function toolsFor(ro,x){x=x||{};var L=TOOLS.filter(function(t){return (!ro||READ_ONLY[t.name])&&(!WHEN[t.name]||safeWhen(t.name));});if(x.plan)L=L.concat([PLAN_TOOL]);if(x.check&&!ro)L=L.concat([CHECK_TOOL]);return L;}
+/* 6.13: tools another part of Ingenium lends the loop (modules/r219.js: the GitHub repository a Code session works on). Each has its
+   definition, its handler, whether it only reads, and when it is offered; a tool not offered now is refused as any unknown one */
+var HANDLERS={},WHEN={};
+function safeWhen(n){try{return !!WHEN[n]();}catch(e){return false;}}
+function addTool(def,handler,o){o=o||{};if(!def||!def.name||typeof handler!=="function")return false;
+  TOOLS=TOOLS.filter(function(t){return t.name!==def.name;});TOOLS.push(def);HANDLERS[def.name]=handler;if(o.ro)READ_ONLY[def.name]=1;else delete READ_ONLY[def.name];
+  if(typeof o.when==="function")WHEN[def.name]=o.when;else delete WHEN[def.name];try{IngAgent.tools=TOOLS;}catch(e){}return true;}
 
 /* ---------- the files worked on ---------- */
 function wsFor(bot){var c=curChat();
@@ -267,6 +274,8 @@ function exec(ws,name,a,o){var t=toolDef(name);
     step:{i:"!",t:o.ro&&t?"Tried to "+name.replace("_"," ")+", which this way does not allow":"Asked for a tool it does not have ("+name+")",bad:true}});
   var why=checkInput(t,a);if(why)return Promise.resolve({text:"The input to "+name+" is not right: "+why+". Send it again.",err:true,step:{i:"!",t:"Sent "+name+" an input it could not use",bad:true}});
   try{
+    if(HANDLERS[name])return Promise.resolve(HANDLERS[name](ws,a,o)).then(function(r){r=r||{};if(typeof r==="string")r={text:r};if(!r.step)r.step={i:"•",t:name.replace(/_/g," ")};return r;},
+      function(e){var m=e&&e.message||String(e);return {text:"That did not work: "+m,err:true,step:{i:"!",t:"Could not "+name.replace(/_/g," ")+": "+m.slice(0,120),bad:true}};});
     if(name==="list_files")return Promise.resolve({text:T_list(ws),step:{i:"≡",t:"Looked at the files"}});
     if(name==="search"){var r=T_search(ws,a,o);return Promise.resolve({text:r.text,step:{i:"⌕",t:"Searched for "+q(a.pattern)+(a.file?" in "+a.file:"")+" · "+(r.n?r.n+" place"+(r.n===1?"":"s"):"not found")}});}
     if(name==="read"){var r2=T_read(ws,a,o);return Promise.resolve({text:r2.text,step:{i:"¶",t:"Read "+r2.file+", lines "+r2.s+"–"+r2.e}});}
@@ -679,7 +688,7 @@ function hook(){
   paintWay();try{buildMake();}catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);else hook();
 window.addEventListener("load",function(){hook();setTimeout(hook,1500);});
-window.IngAgent={tools:TOOLS,extra:EXTRA,toolsFor:toolsFor,unfinished:unfinished,loop:loop,stageCheck:stageCheck,applies:applies,wsFor:wsFor,exec:function(ws,n,a,o){return exec(ws,n,a,o||{});},note:note,parseCalls:parseCalls,visibleOf:visibleOf,
+window.IngAgent={tools:TOOLS,extra:EXTRA,addTool:addTool,toolsFor:toolsFor,unfinished:unfinished,loop:loop,stageCheck:stageCheck,applies:applies,wsFor:wsFor,exec:function(ws,n,a,o){return exec(ws,n,a,o||{});},note:note,parseCalls:parseCalls,visibleOf:visibleOf,
   way:wayOf,setWay:setWay,build:{ask:buildAsk,paint:buildPaint,state:BS},
   setOn:function(v){state.agent=state.agent||{};state.agent.off=!v;saveState();paintWay();},isOn:agentOn};
 })();
