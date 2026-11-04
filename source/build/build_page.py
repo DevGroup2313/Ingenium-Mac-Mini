@@ -1071,6 +1071,75 @@ edit(r"""doc=docs[0]||(mm.doc&&!mm.live?mm.doc:null)""",
      r"""doc=docs[0]||(mm.doc&&!mm.live&&!(typeof r1Notice==="function"&&r1Notice(mm.text))?mm.doc:null)""",
      "6.9.4 a notice is never shown as a document card")
 
+# ---- 6.11 (4 November 2026): effort, Auto and Ultracode (modules/r215.js, IngEffort). Her words (3 November 2026): "I want the 'Auto'
+#      function to be added and for the effort level and Token level to be better regulated", and "I want to be able to select low to
+#      Max effort and Ultracode inside of the chats". Effort now means the same on every kind of model: how much it thinks, how long it may
+#      write and how many steps it may take; it no longer changes how a model on this device chooses its words (its sampling stays at the
+#      maker's settings at every level). Claude is sent the level chosen (before, Thinking off held it at Medium); OpenAI's, OpenRouter's
+#      and Gemini's reasoning models are told the effort where their services take it; Ollama thinks at Medium and above; and Enter while a
+#      reply is being written queues the message instead of stopping the reply (the stop key still stops it). These edits come after
+#      R195's and R205's, which changed the same requests, so they are written against the text those left. ----
+edit(r"""var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";""",
+     r"""var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";""",
+     "6.11 Claude takes the effort chosen (Ultracode: max)")
+edit(r"""if(effOK)body.output_config={effort:withThink?eff:(eff==="low"?"low":"medium")};""",
+     r"""if(effOK)body.output_config={effort:eff};""",
+     "6.11 Claude's effort is the level chosen, Thinking on or off")
+edit(r"""  if(c.provider==="openrouter"){oh["X-Title"]="Ingenium";}
+  /* R74: a model lent by another Ingenium answers with its makers' settings, and Thinking is passed on */""",
+     r"""  if(c.provider==="openrouter"){oh["X-Title"]="Ingenium";}
+  try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model);}catch(_){}
+  /* R74: a model lent by another Ingenium answers with its makers' settings, and Thinking is passed on */""",
+     "6.11 OpenAI's, OpenRouter's and Gemini's reasoning models are told the effort")
+edit(r"""  return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA,timeout:c.provider==="ingenium"?600:undefined}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){fail(r,t);});""",
+     r"""  var sendA=function(){return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA,timeout:c.provider==="ingenium"?600:undefined}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){if((ocb.reasoning_effort||ocb.reasoning)&&!got&&/reason/i.test(t)){delete ocb.reasoning_effort;delete ocb.reasoning;try{IngEffort.refused(c.provider,model);}catch(_){}return sendA();}fail(r,t);});""",
+     "6.11 a service that refuses the effort is asked again without it")
+edit(r"""    if(c.provider==="ingenium"&&typeof lkTail==="function"&&!(ab&&ab.aborted)){var lkT=lkTail(lkSeen,got);if(lkT){got+=lkT;onToken(lkT);}}
+    return got;});}
+function cxFetch(""",
+     r"""    if(c.provider==="ingenium"&&typeof lkTail==="function"&&!(ab&&ab.aborted)){var lkT=lkTail(lkSeen,got);if(lkT){got+=lkT;onToken(lkT);}}
+    return got;});};
+  return sendA();}
+function cxFetch(""",
+     "6.11 the request above, sent through sendA")
+edit(r"""if(withThink)body.think=true;""",
+     r"""if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model):true;""",
+     "6.11 Ollama's gpt-oss is told the effort")
+edit(r"""    return sendO(think).catch(function(e){if(think&&/think/i.test(String(e.message))&&!got)return sendO(false);throw e;});}""",
+     r"""    return sendO(think&&!(window.IngEffort&&IngEffort.levelNow()<=1)).catch(function(e){if(think&&/think/i.test(String(e.message))&&!got)return sendO(false);throw e;});}""",
+     "6.11 at Low effort Ollama answers without thinking")
+edit(r"""EFFORT_TEMP={1:1.3,2:1.15,3:1,4:0.7,5:0.45};""",
+     r"""EFFORT_TEMP={1:1,2:1,3:1,4:1,5:1};""",
+     "6.11 effort leaves the maker's sampling as it is")
+edit(r"""  var p=Object.assign({},ms||EFFORT_MAP[eff]||EFFORT_MAP[3],base||{});""",
+     r"""  var p=Object.assign({},ms||EFFORT_MAP[3],base||{});""",
+     "6.11 a model Ingenium does not know keeps one sampling at every effort")
+edit(r"""            <div class="effort-note">Higher effort means longer, more thorough replies, but they take more time to produce.</div>""",
+     r"""            <div class="effort-note">Effort sets how much the model thinks, how long it may write, and how many steps it may take on a task. Higher effort is more thorough and slower.</div>""",
+     "6.11 what effort does, said truly")
+edit(r"""$("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(Engine.status==="busy")chatStop();else sendChat();}});""",
+     r"""$("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(Engine.status==="busy"){try{if(window.IngR215)IngR215.queueFromInput();}catch(_){}}else sendChat();}});""",
+     "6.11 Enter while a reply is written queues the message")
+
+# ---- 6.11: the Code and Chat pages ask for a name, and before deleting, in Ingenium's own dialog (ingPrompt and ingAsk), not the
+#      browser's grey one. Her picture of 4 November 2026 showed the Mac app's grey "Name this conversation" box over the Code page. ----
+edit(r"""   ["Rename",function(){var t=prompt("Name this conversation",chatTitle(c));if(t&&t.trim()){c.title=t.trim().slice(0,120);saveState();ccPaintSide();ccPaintHead();try{paintChatSwitch();}catch(e){}}}],""",
+     r"""   ["Rename",function(){Promise.resolve(window.ingPrompt?ingPrompt({title:"Name this conversation",value:chatTitle(c),yes:"Rename"}):prompt("Name this conversation",chatTitle(c))).then(function(t){if(t&&t.trim()){c.title=t.trim().slice(0,120);saveState();ccPaintSide();ccPaintHead();try{paintChatSwitch();}catch(e){}}});}],""",
+     "6.11 rename a conversation in Ingenium's own dialog")
+edit(r"""   ["Delete",function(){if(!confirm("Delete \""+chatTitle(c)+"\"? This cannot be undone."))return;state.chats=state.chats.filter(function(x){return x!==c;});
+     if(state.activeChat===c.id){state.activeChat=null;ccEnter(CC.mode||"chat");}else{saveState();ccPaintSide();}}]].forEach(""",
+     r"""   ["Delete",function(){Promise.resolve(window.ingAsk?ingAsk({title:"Delete \u201c"+chatTitle(c)+"\u201d?",text:"This cannot be undone.",yes:"Delete it",danger:true}):confirm("Delete \""+chatTitle(c)+"\"? This cannot be undone.")).then(function(ok){if(!ok)return;state.chats=state.chats.filter(function(x){return x!==c;});
+     if(state.activeChat===c.id){state.activeChat=null;ccEnter(CC.mode||"chat");}else{saveState();ccPaintSide();}});}]].forEach(""",
+     "6.11 delete a conversation after Ingenium's own question")
+edit(r"""t.onclick=function(){var c=curChat();var v=prompt("Name this conversation",chatTitle(c));if(v&&v.trim()){c.title=v.trim().slice(0,120);saveState();ccPaintHead();ccPaintSide();}};""",
+     r"""t.onclick=function(){var c=curChat();Promise.resolve(window.ingPrompt?ingPrompt({title:"Name this conversation",value:chatTitle(c),yes:"Rename"}):prompt("Name this conversation",chatTitle(c))).then(function(v){if(v&&v.trim()){c.title=v.trim().slice(0,120);saveState();ccPaintHead();ccPaintSide();}});};""",
+     "6.11 rename from the title in Ingenium's own dialog")
+edit(r"""if(a==="new"){var nm=prompt("Name your new app","My new app");if(!nm)return;closeModal();ccMakeProject(nm.trim().slice(0,80),[{name:"index.html",text:CC_BLANK.replace(/My new app/g,esc(nm.trim().slice(0,80)))}],"index.html").then(ccNewSession);}""",
+     r"""if(a==="new"){closeModal();Promise.resolve(window.ingPrompt?ingPrompt({title:"Name your new app",value:"My new app",yes:"Make it"}):prompt("Name your new app","My new app")).then(function(nm){if(!nm||!nm.trim())return;ccMakeProject(nm.trim().slice(0,80),[{name:"index.html",text:CC_BLANK.replace(/My new app/g,esc(nm.trim().slice(0,80)))}],"index.html").then(ccNewSession);});}""",
+     "6.11 a new app is named in Ingenium's own dialog")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

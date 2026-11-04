@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.11 (4 November 2026): the Code session as in Claude's, and effort that means what it says. Her words (3 November 2026):
+"I want Ingenium's Coding chat to have full parity with Claude's Coding chat. I want the same layout and behaviour during the sessions.
+I want to see the plan laid out with the completed Tasks checked off the scrollable list"; "I want to be able to select low to Max
+effort and Ultracode inside of the chats ... briefly explained accurately in a preview popup when I hover over it"; "I want Ultracode
+to be at the highest effort, Code plans first, writes the app, runs its checks, reads the errors and fixes them, repeating until the
+checks pass, showing each step"; "I want the 'Auto' function to be added and for the effort level and Token level to be better
+regulated"; and (4 November) "I want the Environment, Context, Outputs, Changes and Background tasks sections added".
+
+- Effort, beside the model's name under the message box (modules/r215.js): Auto, Low, Medium, High, Extra and Max, Ultracode and
+  Thinking, each explained in a card on hover from the same numbers the app uses. Effort now means the same on every model: how much
+  it thinks, how long it may write, how many steps it may take. Claude is sent Anthropic's own effort (low to max; before, Thinking off
+  held it at Medium); OpenAI's and Gemini's reasoning models a reasoning effort, OpenRouter its reasoning object (a service that
+  refuses it is asked again without it); Ollama thinks from Medium up; a model on this device thinks not at all at Low and up to four
+  times its usual budget at Max. Effort no longer changes a local model's sampling: that stays at its maker's settings.
+- Auto reads each message (a short question Low, an everyday one Medium, work or files or code High, a careful or long brief Extra;
+  never Max) and says under the reply what it chose and why. The longest reply follows the effort unless she sets it by hand.
+- Ultracode (Code, and a chat with files): Max effort, plan, build, check, fix. Two new tools in the working loop (modules/r190.js):
+  update_plan (the plan as a checklist) and run_check (a check run inside the app as it runs, passing only when it returns true).
+  When it stops with tasks open, errors at its last run, a change not run, or a failed check, Ingenium sends it back, up to three
+  times, saying what is left.
+- The plan in each reply (folded as Claude folds it) and in a column beside the conversation; the Session column: Environment, Context,
+  Outputs, Changes (lines added and removed this session) and Background tasks (the reply being written, models being installed, the
+  queue), each with its time and a stop key. The column floats over the preview when the window has no room for it.
+- A clock above the message box while it works, with its latest step and Stop. Enter while a reply is written queues the message (it
+  no longer stops the reply); it is sent when the reply ends.
+- The Code page's left column: its two keys as long as their words; rename, delete and a new app's name asked in Ingenium's own dialog.
+- The newer engine's self-test now records the binary that answered (its build and commit); a Mac build keeps the newer engine only
+  when that proves it (desktop/app_engine3_6106.py). 6.10.5's report named the proven engine's version for both.
+- A Guide card: effort, Auto and Ultracode in depth, with their honest limits.
+
+    node rig/t_611_code.js <url> <out>               # 37 checks
+    python3 -I rig/t_611_engine_proof.py             # 8 checks
+    node rig/t_690_agent.js <url> <mock> <out>       # 44 checks (the working loop with every service's form; 7 tools now)
+
 Ingenium 6.10.5 (4 November 2026): a newer engine beside the proven one, on a Mac. Her words: "I don't want to lose my reliable llama
 cpp engine, I want the option of a newer engine where it tested and proven to work and work well but I still want the llama engine
 kept optional or in some cases as a backup or default, depending on what works best. I want you to help me weight it out and decide".

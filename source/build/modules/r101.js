@@ -115,8 +115,12 @@ try{MK_CTX.push("makeNote");}catch(e){}
   replyParams=function(m,base){var p=o.apply(this,arguments);try{
       var ms=curMsgs(),u=null;for(var i=ms.length-1;i>=0;i--)if(ms[i].role==="me"){u=ms[i];break;}
       var w=u&&u.want,pb=+(m&&m.paramB)||0,eff=+$("ctlEffort").value||3,file=!!(w&&w.kind&&w.kind!=="convert");
-      if(p.thinking){var b=pb&&pb<=4.5?(file?768:1536):pb&&pb<=10?(file?1536:3072):(file?3072:6144);if(eff>=4)b*=2;if(eff<=1)b=Math.round(b/2);
-        if(u&&u.r1Strong){p.thinking=false;}else p.thinking_budget=b;}}catch(e){}
+      if(p.thinking){var b=pb&&pb<=4.5?(file?768:1536):pb&&pb<=10?(file?1536:3072):(file?3072:6144);
+        /* 6.11: effort sets how long a model on this device may think: Low not at all, Medium half, High the usual, Extra twice, Max four times,
+           never more than half its memory (modules/r215.js, IngEffort) */
+        var mul=window.IngEffort?IngEffort.thinkMul(eff):(eff>=4?2:eff<=1?0.5:1);
+        if(mul<=0||(u&&u.r1Strong)){p.thinking=false;}
+        else{b=Math.round(b*mul);try{var cx=window.IngEffort?IngEffort.ctxNow():0;if(cx>0)b=Math.min(b,Math.max(512,Math.floor(cx/2)));}catch(_){}p.thinking_budget=b;}}}catch(e){}
     return p;};})();
 
 /* ---------- 4. her Word file, opened whole ---------- */

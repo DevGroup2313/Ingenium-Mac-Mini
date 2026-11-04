@@ -107,7 +107,7 @@ async function handler(route) {
   // 3. a reply asked longer than the model gives (the model's longest reply not known yet): refused once, the longest is kept
   cpt = 2.5; plan = []; log = [];
   await setup(2000, false);
-  await p.evaluate(() => { $('ctlTokens').max = '131072'; $('ctlTokens').value = '100000'; });
+  await p.evaluate(() => { $('ctlTokens').max = '131072'; $('ctlTokens').value = '100000'; state.effort = Object.assign(state.effort || {}, { replyAuto: false }); });   // 6.11: a length set by hand
   r = await send('A short question.');
   const learned = await p.evaluate(() => (state.cloud.info['claude-test-5'] || {}).out);
   ok(r.done && /Hello from the stand-in/.test(r.text) && log.length === 2 && log[1].max <= OUTMAX, '3. a reply asked longer than the model gives is asked again within its limit, and answered', { calls: log });

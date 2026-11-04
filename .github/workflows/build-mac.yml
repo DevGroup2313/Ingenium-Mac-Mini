@@ -188,7 +188,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.10.5.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.11.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -241,7 +241,9 @@ jobs:
 
       # 6.10.5: the same self-test on the newer engine; it stays in the app only when it answers, and the summary sets its speed
       # beside the proven engine's on this machine
-      - name: Self-test of the newer engine (kept in the app only when it answers)
+      - name: Self-test of the newer engine (kept in the app only when it answers, and is proved to be the one that answered)
+        env:
+          NEXT_COMMIT: 68d20b8   # llama.cpp b12000, as compiled above
         run: |
           set +e
           A="dist/${APP_FILE}.app"
@@ -252,23 +254,34 @@ jobs:
           SPD=(); [ -f "$RUNNER_TEMP/speedup.gguf" ] && SPD=(--selftest-drafter "$RUNNER_TEMP/speedup.gguf")
           "$A/Contents/MacOS/${APP_FILE}" --selftest-model "$WHICH" --selftest-out "$RUNNER_TEMP/selftest-next.json" --selftest-engine newer "${SPD[@]}"
           code=$?
-          python3 - "$RUNNER_TEMP/selftest-next.json" "$RUNNER_TEMP/selftest.json" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          python3 - "$RUNNER_TEMP/selftest-next.json" "$RUNNER_TEMP/selftest.json" "$RUNNER_TEMP/next-verdict" >> "$GITHUB_STEP_SUMMARY" <<'PY'
           import json, os, sys
           def load(p):
               try: return json.load(open(p))
               except Exception: return {}
           n, o = load(sys.argv[1]), load(sys.argv[2])
+          ne, oe = n.get("engine") or {}, o.get("engine") or {}
           ps = lambda r: (r.get("timings") or {}).get("predicted_per_second") or 0
-          print("### Mac (%s) newer engine self-test %s" % (os.environ.get("INGENIUM_CHIP", ""), "passed" if n.get("ok") else "FAILED"))
-          print("* Newer engine: %s; proven engine: %s" % ((n.get("engine") or {}).get("version"), (o.get("engine") or {}).get("version")))
-          print("* Reply: `%s` at %.1f tokens a second (the proven engine: %.1f on this machine)" % (n.get("reply"), ps(n), ps(o)))
-          sp = n.get("speedup") or {}
-          if sp: print("* Speed-up file on the newer engine: %s; %.1f tokens a second with it" % ("used" if sp.get("used") else "NOT used", ((sp.get("with") or {}).get("per_second") or 0)))
+          one = lambda t: " ".join(str(t or "").split())
+          # 6.11: the engine that answered must be the newer one, by its own word (the commit it was compiled from)
+          commit = os.environ.get("NEXT_COMMIT", "")
+          proved = ne.get("kind") == "newer" and bool(commit) and commit in str(ne.get("build") or "")
+          good = bool(n.get("ok")) and proved
+          open(sys.argv[3], "w").write("pass" if good else "fail")
+          print("### Mac (%s) newer engine self-test %s" % (os.environ.get("INGENIUM_CHIP", ""), "passed" if good else "FAILED"))
+          print("* The engine that answered: %s (%s); its own word: `%s`" % (ne.get("version"), ne.get("kind"), one(ne.get("build"))))
+          if not proved: print("* It is not proved to be the newer engine (commit %s), so the app keeps the proven engine only." % commit)
+          print("* The proven engine, in the self-test before: %s; its own word: `%s`" % (oe.get("version"), one(oe.get("build"))))
+          print("* Reply: `%s` at %.1f tokens a second (the proven engine: %.1f on this machine; a reply of a few words, so the speeds are rough)" % (n.get("reply"), ps(n), ps(o)))
+          sp, so = n.get("speedup") or {}, o.get("speedup") or {}
+          if sp: print("* Speed-up file on the newer engine: %s; %.1f tokens a second without it, %.1f with it (the proven engine: %.1f and %.1f)" % (
+              "used" if sp.get("used") else "NOT used", ((sp.get("without") or {}).get("per_second") or 0), ((sp.get("with") or {}).get("per_second") or 0),
+              ((so.get("without") or {}).get("per_second") or 0), ((so.get("with") or {}).get("per_second") or 0)))
           if n.get("error"): print("* Error: %s" % n["error"])
           PY
-          if [ "$code" != 0 ]; then
+          if [ "$code" != 0 ] || [ "$(cat "$RUNNER_TEMP/next-verdict" 2>/dev/null)" != pass ]; then
             cat "$RUNNER_TEMP/selftest-next.json" 2>/dev/null
-            echo "::warning::the newer engine did not answer correctly; it is taken out, and the app carries the proven engine only"
+            echo "::warning::the newer engine did not answer correctly, or was not proved to be the engine that answered; it is taken out, and the app carries the proven engine only"
             rm -rf "$A/Contents/MacOS/engine-next" "$A/Contents/Resources/engine-next"
             codesign --force --sign - --timestamp=none "$A" && codesign --verify --deep --strict "$A" && echo "The app's seal is whole again."
           fi

@@ -12,8 +12,8 @@
 //   - the way is chosen on a key beside the model's name, with each way said in plain words, and kept for the task;
 //   - Step by step with me: each change waits on a card with the lines before and after; Make this change goes on;
 //     Skip it (with a note) leaves the file as it was and tells the model, note and all; Stop here ends the work;
-//   - Guide me, I do it: the model may only read, is told to guide, and changes nothing;
-//   - Plan first: it may only read, plans and changes nothing;
+//   - Guide me, I do it: the model may only read (and, since 6.11, keep a plan), is told to guide, and changes nothing;
+//   - Plan first: it may only read (and keep its plan as a checklist, 6.11), plans and changes nothing;
 //   - a chat with the app's files attached: the changed file is kept under the reply;
 //   - a model on this device: the same work through written tool calls (<tool_call>), its thinking kept apart;
 //   - Build: Ask a model to change this page does the same work on the page in the editor, and Undo puts it back;
@@ -65,8 +65,8 @@ const stepsOk = s => s.length === STEPS.length && STEPS.every((re, i) => re.test
   // Do it for me, with Claude (thinking on), Kimi and Ollama
   const A = await codeRun('anthropic', 'claude-opus-5-5', true, 'Claude');
   const rq = A.rep.requests;
-  ok(rq.length === 8 && rq.every(x => x.fam === 'anthropic' && x.thinking && x.thinking.type === 'adaptive' && x.eager.every(e => e === true) && x.max_tokens >= 32000 && x.tools.length === 6),
-    'Claude: adaptive thinking, eager tool input, room to write, all six tools, one request per step', JSON.stringify(rq.map(x => [x.n, x.thinking && x.thinking.type, x.max_tokens, x.tools.length])));
+  ok(rq.length === 8 && rq.every(x => x.fam === 'anthropic' && x.thinking && x.thinking.type === 'adaptive' && x.eager.every(e => e === true) && x.max_tokens >= 32000 && x.tools.length === 7 && x.tools.indexOf('update_plan') === 6),
+    'Claude: adaptive thinking, eager tool input, room to write, all seven tools (the six and, since 6.11, the plan), one request per step', JSON.stringify(rq.map(x => [x.n, x.thinking && x.thinking.type, x.max_tokens, x.tools.length])));
   await p.screenshot({ path: OUT + '/claude-auto.png' });
   const wayKey = await p.evaluate(() => { const k = document.getElementById('agWayBtn'); return { text: k.textContent.trim(), shown: !!k.offsetParent, title: k.title, kept: curChat().way, last: state.agent.way }; });
   ok(wayKey.shown && wayKey.text === 'For me' && wayKey.kept === 'auto' && wayKey.last === 'auto' && /Do it for me/.test(wayKey.title), 'the way is on a key beside the model, said in plain words, and kept for the task', JSON.stringify(wayKey));
@@ -125,7 +125,7 @@ const stepsOk = s => s.length === STEPS.length && STEPS.every((re, i) => re.test
   await send('Make the page greet Yannie instead of the world.');
   await waitDone(); await p.waitForTimeout(400);
   r = await lastBot(); f = await fileOf(pid); rep = await http('GET', '/report');
-  ok(rep.requests.every(x => JSON.stringify(x.tools) === '["list_files","search","read"]') && /make each change themselves, to learn/.test(rep.requests[0].sys || '') && f.text === APP && !r.edits.length && r.way === 'guide',
+  ok(rep.requests.every(x => JSON.stringify(x.tools) === '["list_files","search","read","update_plan"]') && /make each change themselves, to learn/.test(rep.requests[0].sys || '') && f.text === APP && !r.edits.length && r.way === 'guide',
     'Guide me: it may only read, is told to guide her step by step, and changes nothing', JSON.stringify([rep.requests.map(x => x.tools), r.way, f.text === APP]));
 
   // Plan first: read only
@@ -135,7 +135,7 @@ const stepsOk = s => s.length === STEPS.length && STEPS.every((re, i) => re.test
   await send('Make the page greet Yannie.');
   await waitDone(); await p.waitForTimeout(400);
   r = await lastBot(); f = await fileOf(pid); rep = await http('GET', '/report');
-  ok(rep.requests.every(x => JSON.stringify(x.tools) === '["list_files","search","read"]') && f.text === APP && !r.edits.length && /Plan:/.test(r.text), 'Plan first: it may only read; it plans and changes nothing', JSON.stringify([rep.requests.map(x => x.tools), r.text]));
+  ok(rep.requests.every(x => JSON.stringify(x.tools) === '["list_files","search","read","update_plan"]') && f.text === APP && !r.edits.length && /Plan:/.test(r.text), 'Plan first: it may only read; it plans and changes nothing', JSON.stringify([rep.requests.map(x => x.tools), r.text]));
   await p.evaluate(() => { state.cc.plan = false; saveState(); });
 
   // a chat with the app's files attached
@@ -209,7 +209,7 @@ const stepsOk = s => s.length === STEPS.length && STEPS.every((re, i) => re.test
   await send('Make the page greet Yannie.');
   await waitDone(); await p.waitForTimeout(400);
   const rn = await lastBot(), repN = await http('GET', '/report');
-  ok(rn.text === 'A plain reply without tools.' && repN.requests.length === 2 && repN.requests[0].tools.length === 6 && repN.requests[1].tools.length === 0,
+  ok(rn.text === 'A plain reply without tools.' && repN.requests.length === 2 && repN.requests[0].tools.length === 7 && repN.requests[1].tools.length === 0,
     'a model that refuses tools answers as before, in one reply', JSON.stringify([rn.text, repN.requests.map(x => x.tools.length)]));
 
   ok(errs.length === 0, 'no page errors', errs.slice(0, 4).join(' | '));

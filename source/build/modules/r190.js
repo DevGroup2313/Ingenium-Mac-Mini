@@ -142,8 +142,16 @@ var TOOLS=[
     input_schema:{type:"object",properties:{file:{type:"string"},content:{type:"string"}},required:["file","content"]}},
   {name:"run_app",description:"Run the app's page as it is now, with the changes made so far, and report the errors it shows. Use it after changing a page or its scripts, then fix what it reports.",
     input_schema:{type:"object",properties:{},required:[]}}];
-var READ_ONLY={list_files:1,search:1,read:1};
-function toolsFor(ro){return TOOLS.filter(function(t){return !ro||READ_ONLY[t.name];});}
+var READ_ONLY={list_files:1,search:1,read:1,update_plan:1};
+/* 6.11 (4 November 2026): the plan, kept as a list she sees checked off, and a check run inside the app as it runs (Ultracode) */
+var PLAN_TOOL={name:"update_plan",description:"Keep the plan of this task: a list of small tasks in order, each with its status (pending, in_progress or completed). Send the whole list each time a status changes. Make it at the start of any task of more than two steps; mark a task in_progress when you begin it (one at a time) and completed only when it is done and checked. The person sees the list beside the conversation, each completed task checked off.",
+  input_schema:{type:"object",properties:{tasks:{type:"array",description:"The whole plan, in order.",items:{type:"object",properties:{task:{type:"string",description:"What this step does, in a few plain words."},
+    status:{type:"string",enum:["pending","in_progress","completed"]},check:{type:"string",description:"Optional: the name of the run_check that proves it done."}},required:["task","status"]}}},required:["tasks"]}};
+var CHECK_TOOL={name:"run_check",description:"Run a check inside the app as it runs now, with every change made so far (the app is run again first if it changed). The code is the body of an async JavaScript function run in the app's own page: it may use document and window, click and type, and await; it must return true when the check passes. Anything else it returns (false, or a sentence saying what is wrong) is a failure, and so is an error it throws. Example: document.getElementById('add').click(); return document.getElementById('n').textContent === '1';",
+  input_schema:{type:"object",properties:{name:{type:"string",description:"What it checks, in a few plain words."},code:{type:"string",description:"The body of an async JavaScript function, run in the app's page; return true when it passes."}},required:["name","code"]}};
+var EXTRA=[PLAN_TOOL,CHECK_TOOL];
+function toolDef(n){return TOOLS.concat(EXTRA).filter(function(t){return t.name===n;})[0]||null;}
+function toolsFor(ro,x){x=x||{};var L=TOOLS.filter(function(t){return !ro||READ_ONLY[t.name];});if(x.plan)L=L.concat([PLAN_TOOL]);if(x.check&&!ro)L=L.concat([CHECK_TOOL]);return L;}
 
 /* ---------- the files worked on ---------- */
 function wsFor(bot){var c=curChat();
@@ -215,6 +223,31 @@ function pageOf(ws){var m=ws.files.filter(function(f){return f.main;})[0]||ws.fi
   return {html:h,name:m.name};}
 function errorsIn(pane){if(!pane)return [];return [].slice.call(pane.querySelectorAll(".cerr")).map(function(x){return x.textContent.replace(/^✕\s*/,"");}).slice(-12);}
 function ranText(es){return {text:es.length?"The app ran and shows "+es.length+" error"+(es.length===1?"":"s")+":\n"+es.map(function(x){return "- "+x;}).join("\n"):"The app ran and shows no errors.",errs:es.length};}
+function T_plan(ws,a){var L=a.tasks;if(!Array.isArray(L))throw new Error("tasks must be a list");if(!L.length)throw new Error("the plan is empty");if(L.length>80)throw new Error("the plan has more than 80 tasks: group them");
+  var MAP={pending:"todo",in_progress:"doing",completed:"done",done:"done",todo:"todo",doing:"doing"};
+  var tasks=L.map(function(x,i){if(!x||typeof x!=="object")throw new Error("task "+(i+1)+" is not an object");var t=String(x.task||x.title||x.content||"").replace(/\s+/g," ").trim();if(!t)throw new Error("task "+(i+1)+" has no words");
+    var st=MAP[String(x.status||"pending").toLowerCase()];if(!st)throw new Error("task "+(i+1)+" has the status \""+x.status+"\"; use pending, in_progress or completed");
+    var o={t:t.length>200?t.slice(0,197)+"\u2026":t,s:st};if(x.check)o.check=String(x.check).slice(0,120);return o;});
+  var done=tasks.filter(function(x){return x.s==="done";}).length,now=tasks.filter(function(x){return x.s==="doing";})[0];
+  ws.plan={tasks:tasks,at:Date.now()};
+  return {text:"Plan kept: "+done+" of "+tasks.length+" completed."+(now?" Now: "+now.t+".":"")+(tasks.filter(function(x){return x.s==="doing";}).length>1?" (Keep one task in_progress at a time.)":""),
+    say:"Plan: "+done+" of "+tasks.length+" done"+(now?" · now: "+(now.t.length>60?now.t.slice(0,57)+"\u2026":now.t):"")};}
+var CHK={};
+window.addEventListener("message",function(e){var d=e.data;if(!d||typeof d!=="object"||!d.__ingCheckRes)return;var w=CHK[d.__ingCheckRes];if(!w)return;
+  if(w.frame&&e.source!==w.frame.contentWindow)return;delete CHK[d.__ingCheckRes];clearTimeout(w.t);w.res(d);});
+function stageCheck(ws,code){var fr=document.getElementById(ws.where==="build"?"previewFrame":"csFrame");
+  if(!fr||!fr.contentWindow)return Promise.resolve({pass:false,error:"the app is not running in the preview"});
+  var id="k"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  return new Promise(function(res){var w={frame:fr,res:res,t:setTimeout(function(){delete CHK[id];res({pass:false,error:"the check gave no answer within 8 seconds (it may wait for something that never happens, or the page did not load)"});},8000)};CHK[id]=w;
+    try{fr.contentWindow.postMessage({__ingCheck:id,code:String(code)},"*");}catch(e){clearTimeout(w.t);delete CHK[id];res({pass:false,error:String(e&&e.message||e)});}});}
+function T_check(ws,a){var code=String(a.code||"");if(!code.trim())throw new Error("the check's code is empty");
+  var name=String(a.name||"a check").slice(0,120),first=ws.dirty||!ws.ranOnce?T_run(ws):Promise.resolve(null);
+  return first.then(function(rr){if(rr&&rr.errs<0)return {pass:false,text:"The app could not be run here, so the check could not run: "+rr.text};
+    if(rr){ws.dirty=false;ws.ranOnce=true;ws.lastRun={errs:rr.errs};}
+    return stageCheck(ws,code).then(function(r){ws.checks=ws.checks||{};ws.checks[name]=!!r.pass;
+      var said=r.error?"It threw an error: "+r.error:(r.value!==undefined?"It returned: "+r.value:"");
+      return {pass:!!r.pass,text:(r.pass?"PASSED: ":"FAILED: ")+name+(said?"\n"+said:"")+(rr&&rr.errs>0?"\n(The app was run again first and shows "+rr.errs+" error"+(rr.errs===1?"":"s")+": "+rr.text.split("\n").slice(1,4).join(" ")+")":"")};});});}
+function canRun(ws){return !!(ws&&(ws.run||pageOf(ws)));}
 function T_run(ws){
   if(ws.run)return ws.run();
   var p=pageOf(ws);if(!p)return Promise.resolve({text:"There is no page (.html) here to run.",errs:-1});
@@ -229,7 +262,7 @@ function checkInput(t,a){if(!a||typeof a!=="object"||Array.isArray(a))return "th
     if(ty==="integer"&&!(typeof v==="number"&&isFinite(v))&&!(typeof v==="string"&&/^\d+$/.test(v)))return "\""+key+"\" must be a whole number";}
   return "";}
 function q(s){s=String(s||"");return "“"+(s.length>60?s.slice(0,57)+"…":s)+"”";}
-function exec(ws,name,a,o){var t=TOOLS.filter(function(x){return x.name===name;})[0];
+function exec(ws,name,a,o){var t=toolDef(name);
   if(!t||(o.ro&&!READ_ONLY[name]))return Promise.resolve({text:"There is no tool \""+name+"\""+(o.ro&&t?" now: this task only reads (the person "+(o.way==="guide"?"makes the changes":"has asked for a plan first")+")":"")+".",err:true,
     step:{i:"!",t:o.ro&&t?"Tried to "+name.replace("_"," ")+", which this way does not allow":"Asked for a tool it does not have ("+name+")",bad:true}});
   var why=checkInput(t,a);if(why)return Promise.resolve({text:"The input to "+name+" is not right: "+why+". Send it again.",err:true,step:{i:"!",t:"Sent "+name+" an input it could not use",bad:true}});
@@ -239,12 +272,14 @@ function exec(ws,name,a,o){var t=TOOLS.filter(function(x){return x.name===name;}
     if(name==="read"){var r2=T_read(ws,a,o);return Promise.resolve({text:r2.text,step:{i:"¶",t:"Read "+r2.file+", lines "+r2.s+"–"+r2.e}});}
     if(name==="edit"){var r3=T_edit(ws,a);r3.changed=true;r3.step={i:"✎",t:"Changed "+r3.file+" at line "+r3.line+(r3.more?" and "+r3.more+" more places":"")};return Promise.resolve(r3);}
     if(name==="write_file"){var r4=T_write(ws,a);r4.changed=true;r4.step={i:"✎",t:r4.text.replace(/:.*$/,"")};return Promise.resolve(r4);}
-    if(name==="run_app")return T_run(ws).then(function(r5){return {text:r5.text,step:{i:"▶",t:r5.errs<0?"Could not run the app here":"Ran the app · "+(r5.errs?r5.errs+" error"+(r5.errs===1?"":"s"):"no errors"),bad:r5.errs>0}};});
+    if(name==="run_app")return T_run(ws).then(function(r5){ws.lastRun={errs:r5.errs};if(r5.errs>=0){ws.dirty=false;ws.ranOnce=true;}return {text:r5.text,step:{i:"▶",t:r5.errs<0?"Could not run the app here":"Ran the app · "+(r5.errs?r5.errs+" error"+(r5.errs===1?"":"s"):"no errors"),bad:r5.errs>0}};});
+    if(name==="update_plan"){var r6=T_plan(ws,a);return Promise.resolve({text:r6.text,plan:true,step:{i:"☑",t:r6.say}});}
+    if(name==="run_check")return T_check(ws,a).then(function(r7){return {text:r7.text,step:{i:r7.pass?"✓":"✗",t:"Checked "+q(a.name)+" · "+(r7.pass?"passed":"failed"),bad:!r7.pass}};});
   }catch(e){var m=e&&e.message||String(e);return Promise.resolve({text:"That did not work: "+m,err:true,step:{i:"!",t:(name==="edit"?"Could not change "+(a.file||"the file"):"Could not "+name.replace("_"," "))+": "+m.split(". ")[0],bad:true}});}
   return Promise.resolve({text:"Unknown tool.",err:true});}
 
 /* ---------- what the model is told ---------- */
-function note(ws,way,plan){var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
+function note(ws,way,plan,x){x=x||{};var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
   var l=["You are working on the person's "+what+" with tools, the way a careful senior engineer pairs with its author. Use the tools; do not write edit blocks or whole files in your reply, and ignore anything above that asks for edit blocks.",
     "Files: "+nameList(ws)+". Large files are mostly data the app carries; search finds the code in them.",
     "Never guess at code you have not read. Keep the author's names, style and comments. Change only what was asked. Use plain words and explain a technical term the first time you use it. If the request is unclear, ask one short question before changing anything."];
@@ -252,10 +287,18 @@ function note(ws,way,plan){var what=ws.where==="build"?"page open in Build (one 
   else if(plan)l.push("Plan first is on: read only. Find and read the code, then give a short numbered plan (which file, what, why) and ask whether to go ahead. Do not change anything yet.");
   else{l.push("Work in this order: understand the request; find the code with search (and list_files); read the exact lines around it; change only what is needed with edit, copying old_text exactly from what you read (without the line numbers); for a page, run_app and fix any error it reports; then end with two or three plain sentences saying what you changed and how to see it.");
     if(way==="step")l.push("The person reviews every change before it is made, at their own pace. Before each edit, say in one plain sentence what it changes and why. Make one change per edit, so each can be judged on its own. If they skip a change, do not make it again: follow what they said, or ask what they would prefer.");}
+  if(x.plan&&!x.ultra)l.push("For a task of more than two steps, keep a plan with update_plan: small tasks in order, one in_progress at a time, each marked completed when it is done. The person sees it as a checklist. A one-step task needs no plan.");
+  if(x.ultra&&!plan&&way!=="guide")l.push(["Ultracode is on: the person wants this done thoroughly and checked, at the highest effort. Work in four phases, and show each:",
+    "1. Plan. Read what you need first. Then record the plan with update_plan: small tasks in order, each one checkable"+(x.check?", and for each the check that will prove it done (a run_check)":"")+".",
+    "2. Build. Work through the tasks in order. Mark a task in_progress when you begin it, and completed only when its check passes. Before each change, say in one plain sentence what it changes and why.",
+    "3. Check. "+(x.check?"After changing a page or its scripts, run_app and read its errors; then run_check for each task's check. A check is the body of an async JavaScript function run in the app's page, returning true when it passes: make it test what the person asked for (press the button, then read the result), not merely that an element exists.":"Read the changed code again and compare it with what was asked; run_app where there is a page."),
+    "4. Fix. When a check fails or the app shows an error, read the error, find its cause in the code, fix the cause (not the check), and check again. Repeat until every check passes and the app shows no errors. If three different fixes for the same failure do not work, stop and say plainly what fails and why.",
+    "Justify each decision briefly. When a choice depends on documentation or a source, name it, or say you have no verified source. End with: what was built, each check and its result, and anything left undone."].join("\n"));
   return l.join("\n");}
 /* for a model on this device: the tools as written tags, in the form Qwen's models and most small models learn */
 function localNote(tools){var sig={list_files:"{}",search:"{\"pattern\": \"text to find\"}  (optional: \"file\": \"name\")",read:"{\"file\": \"name\", \"start_line\": 1, \"end_line\": 60}",
-    edit:"{\"file\": \"name\", \"old_text\": \"exact text now in the file\", \"new_text\": \"what replaces it\"}",write_file:"{\"file\": \"name\", \"content\": \"the whole new file\"}",run_app:"{}"};
+    edit:"{\"file\": \"name\", \"old_text\": \"exact text now in the file\", \"new_text\": \"what replaces it\"}",write_file:"{\"file\": \"name\", \"content\": \"the whole new file\"}",run_app:"{}",
+    update_plan:"{\"tasks\": [{\"task\": \"what to do\", \"status\": \"pending\"}]}",run_check:"{\"name\": \"what it checks\", \"code\": \"return document.title === 'My app';\"}"};
   return ["# Tools","To use a tool, write exactly this, then stop and wait:","<tool_call>","{\"name\": \"search\", \"arguments\": {\"pattern\": \"greet\"}}","</tool_call>",
     "The result comes back between <tool_response> and </tool_response>. Use one tool at a time. The tools:"].concat(tools.map(function(t){return "- "+t.name+" "+sig[t.name]+": "+t.description.split(". ")[0]+".";}))
     .concat(["When you have finished, answer in plain words without a tool call."]).join("\n");}
@@ -270,11 +313,11 @@ function base(){var c=state.cloud||{};return ((c.base||cloudDefaultBase(c.provid
 /* Claude, through Anthropic's Messages API: tools, streamed; thinking blocks passed back unchanged, history only appended to */
 function anthropicTurn(S,onToken,onThink){var c=state.cloud,mid=String(c.model||"").toLowerCase();
   var modern=/^claude-(fable|mythos|opus-5|sonnet-5|haiku-5|opus-4-[678]|sonnet-4-6)/.test(mid),noXhigh=/^claude-(opus-4-6|sonnet-4-6)/.test(mid),fb=/^claude-(fable-5|opus-5|sonnet-5-5)/.test(mid);
-  var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";
-  var mt=(+$("ctlTokens").value)||0,body={model:c.model,max_tokens:modern?Math.max(mt,32000):Math.max(mt,4096),messages:S.msgs,stream:true,
+  var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=(S.effort&&S.effort.claude)||EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";
+  var mt=(+$("ctlTokens").value)||0,body={model:c.model,max_tokens:modern?Math.max(mt,S.effort&&S.effort.lv>=5?64000:32000):Math.max(mt,4096),messages:S.msgs,stream:true,
     tools:S.tools.map(function(t){return {name:t.name,description:t.description,input_schema:t.input_schema,eager_input_streaming:true};})};
   if(S.sys)body.system=S.sys;
-  if(modern){body.cache_control={type:"ephemeral"};if(S.think)body.thinking={type:"adaptive",display:"summarized"};body.output_config={effort:S.think?eff:(eff==="low"?"low":"medium")};}
+  if(modern){body.cache_control={type:"ephemeral"};if(S.think)body.thinking={type:"adaptive",display:"summarized"};body.output_config={effort:eff};}
   var hd={"content-type":"application/json","x-api-key":c.key||"","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
   if(fb&&S.fallback!==false){body.fallbacks="default";hd["anthropic-beta"]="server-side-fallback-2026-07-01";}
   var B=[],stop="",cat="",err=null,fell=null;
@@ -297,6 +340,7 @@ function anthropicTurn(S,onToken,onThink){var c=state.cloud,mid=String(c.model||
     var calls=[];keep.forEach(function(b){if(b.type!=="tool_use")return;var input=null,bad="";try{input=b._json?JSON.parse(b._json):{};}catch(e){bad=b._json;}b.input=input||{};calls.push({id:b.id,name:b.name,input:input,bad:bad});delete b._json;});
     var content=keep.filter(function(b){return b.type!=="fallback"&&!(b.type==="text"&&!b.text);});
     return {calls:calls,stop:stop,cat:cat,fell:fell,
+      nudge:content.some(function(b){return b.type==="text";})?function(t){S.msgs.push({role:"assistant",content:content});S.msgs.push({role:"user",content:t});}:null,
       push:function(results){S.msgs.push({role:"assistant",content:content});
         S.msgs.push({role:"user",content:results.map(function(r){var o={type:"tool_result",tool_use_id:r.id,content:r.text};if(r.err)o.is_error=true;return o;})});}};});}
 /* OpenAI's chat completions form: Kimi (Moonshot), OpenRouter, OpenAI, LM Studio, Gemini, others */
@@ -304,6 +348,7 @@ function openaiTurn(S,onToken,onThink){var c=state.cloud,ob=base()||cloudDefault
   var h={"content-type":"application/json"};if(c.key)h["Authorization"]="Bearer "+c.key;if(c.provider==="openrouter")h["X-Title"]="Ingenium";
   var body={model:c.model,messages:S.msgs,stream:true,tool_choice:"auto",tools:S.tools.map(function(t){return {type:"function",function:{name:t.name,description:t.description,parameters:t.input_schema}};})};
   var capT=Math.max((+$("ctlTokens").value)||0,cxLocal(c.provider,ob)?8192:16000);if(c.provider==="openai")body.max_completion_tokens=capT;else body.max_tokens=capT;
+  if(S.effort&&!S.noReason){try{if(window.IngEffort)IngEffort.openaiBody(body,c.provider,c.model,S.effort.lv);}catch(_){}}
   var text="",reason="",calls=[],stop="",err=null;
   var feed=lineFeeder(function(line){if(line.indexOf("data:")!==0)return;var t=line.slice(5).trim();if(!t||t==="[DONE]")return;var d;try{d=JSON.parse(t);}catch(_){return;}
     if(d.error){err=d.error.message||"the connection reported an error";return;}
@@ -317,13 +362,14 @@ function openaiTurn(S,onToken,onThink){var c=state.cloud,ob=base()||cloudDefault
     if(err)throw new Error(err);
     calls=calls.filter(Boolean).map(function(k,i){var input=null,bad="";try{input=k.args?JSON.parse(k.args):{};}catch(e){bad=k.args;}return {id:k.id||("call_"+i+"_"+Date.now().toString(36)),name:k.name,input:input,bad:bad,raw:k.args};});
     return {calls:calls,stop:stop==="tool_calls"&&calls.length?"tool_use":stop==="length"?"max_tokens":stop,
+      nudge:function(t){var am={role:"assistant",content:text||""};if(c.provider==="moonshot"&&reason)am.reasoning_content=reason;S.msgs.push(am);S.msgs.push({role:"user",content:t});},
       push:function(results){var am={role:"assistant",content:text||null,tool_calls:calls.map(function(k){return {id:k.id,type:"function",function:{name:k.name,arguments:k.raw||"{}"}};})};
         if(c.provider==="moonshot"&&reason)am.reasoning_content=reason;S.msgs.push(am);
         results.forEach(function(r){S.msgs.push({role:"tool",tool_call_id:r.id,content:r.text});});}};});}
 /* Ollama's own chat form: on this computer, another one on the network, or Ollama's cloud */
 function ollamaTurn(S,onToken,onThink){var c=state.cloud,h={"content-type":"application/json"};if(c.key)h["Authorization"]="Bearer "+c.key;
   var body={model:c.model,messages:S.msgs,stream:true,tools:S.tools.map(function(t){return {type:"function",function:{name:t.name,description:t.description,parameters:t.input_schema}};}),
-    options:{num_predict:Math.max((+$("ctlTokens").value)||0,8192)}};if(S.think)body.think=true;
+    options:{num_predict:Math.max((+$("ctlTokens").value)||0,8192)}};if(S.think)body.think=(S.effort&&window.IngEffort)?IngEffort.ollamaThink(c.model,S.effort.lv):true;
   var text="",think="",calls=[],err=null,done="";
   var feed=lineFeeder(function(line){if(!line.trim())return;var d;try{d=JSON.parse(line);}catch(_){return;}
     if(d.error){err=d.error;return;}var m=d.message||{};
@@ -335,6 +381,7 @@ function ollamaTurn(S,onToken,onThink){var c=state.cloud,h={"content-type":"appl
     if(!r.ok)return r.text().then(function(t){var e=new Error(failText(r,t));e.status=r.status;throw e;});
     if(err)throw new Error(err);
     return {calls:calls,stop:calls.length?"tool_use":done==="length"?"max_tokens":done,
+      nudge:function(t){var am={role:"assistant",content:text};if(think)am.thinking=think;S.msgs.push(am);S.msgs.push({role:"user",content:t});},
       push:function(results){var am={role:"assistant",content:text,tool_calls:calls.map(function(k){return {function:{name:k.name,arguments:k.input||{}}};})};if(think)am.thinking=think;S.msgs.push(am);
         results.forEach(function(r,i){S.msgs.push({role:"tool",content:r.text,tool_name:calls[i]&&calls[i].name});});}};});}
 function family(p){return p==="anthropic"?"anthropic":/^ollama/.test(p)?"ollama":"openai";}
@@ -353,7 +400,7 @@ function parseCalls(body){var calls=[],re=/<tool_call>\s*([\s\S]*?)\s*(?:<\/tool
       calls.push({id:"local_"+calls.length,name:String(nm||""),input:argsOf(fn&&fn.arguments!=null?fn:o),bad:""});}
     else calls.push({id:"local_"+calls.length,name:"",input:null,bad:js});}
   if(!calls.length){var f=/```(?:json)?\s*(\{[\s\S]*?\})\s*```/g,k;while((k=f.exec(body))){var o2=null;try{o2=JSON.parse(k[1]);}catch(e){}
-    if(o2&&o2.name&&TOOLS.some(function(t){return t.name===o2.name;}))calls.push({id:"local_"+calls.length,name:o2.name,input:argsOf(o2),bad:""});}}
+    if(o2&&o2.name&&toolDef(o2.name))calls.push({id:"local_"+calls.length,name:o2.name,input:argsOf(o2),bad:""});}}
   calls.forEach(function(c){if(!c.bad&&c.input===null)c.bad="(the arguments were not JSON)";});
   return calls;}
 function localTurn(S,onToken,onThink){var raw="",shown=0,thought=0;
@@ -367,12 +414,21 @@ function localTurn(S,onToken,onThink){var raw="",shown=0,thought=0;
     var body=raw.replace(/<think>[\s\S]*?<\/think>/gi,"").replace(/^[\s\S]*?<\/think>/i,"").trim(),calls=parseCalls(body);
     if(!calls.length){var tail=visibleOf(body+"\n");if(tail.length>shown)onToken(tail.slice(shown));}
     return {calls:calls,stop:calls.length?"tool_use":"end_turn",
+      nudge:function(t){S.msgs.push({role:"assistant",content:body});S.msgs.push({role:"user",content:t});},
       push:function(results){S.msgs.push({role:"assistant",content:body});
         S.msgs.push({role:"user",content:results.map(function(r){return "<tool_response>\n"+r.text+"\n</tool_response>";}).join("\n")});}};});}
 
+/* what is left, for Ultracode: tasks not completed, errors at the last run, a change not yet run, checks that failed */
+function unfinished(ws){var out=[],p=ws.plan,changed=ws.files.some(function(f){return f.isNew||f.text!==f.orig;});
+  if(!p){if(changed)return {short:"no plan was recorded",long:"there is no plan yet: record it with update_plan, with each task's status, and check each task."};}
+  else{var open=p.tasks.filter(function(t){return t.s!=="done";});if(open.length)out.push(open.length+" task"+(open.length===1?" is":"s are")+" not completed ("+open.slice(0,3).map(function(t){return "“"+t.t+"”";}).join(", ")+(open.length>3?", …":"")+")");}
+  if(ws.lastRun&&ws.lastRun.errs>0)out.push("the app showed "+ws.lastRun.errs+" error"+(ws.lastRun.errs===1?"":"s")+" when it last ran");
+  if(ws.dirty&&changed&&canRun(ws))out.push("the app has not been run since the last change");
+  var bad=Object.keys(ws.checks||{}).filter(function(k){return !ws.checks[k];});if(bad.length)out.push(bad.length+" check"+(bad.length===1?"":"s")+" failed ("+bad.slice(0,3).map(function(k){return "“"+k+"”";}).join(", ")+")");
+  return out.length?{short:out[0],long:out.join("; ")+"."}:null;}
 /* ---------- the loop, the same for every model and every place ----------
    cfg: {turn, S, ws, way, plan, small, limit, stopped(), ui:{token(t), think(t), step(s), ask(info)->Promise<{act,note}>}, commit()->Promise<n>} */
-function loop(cfg){var ws=cfg.ws,ui=cfg.ui,used=0,all="",gap=false,first=true,fellNote="",way=cfg.way,ro=way==="guide"||!!cfg.plan,halt=false,MAX=cfg.small?3500:24000;
+function loop(cfg){var ws=cfg.ws,ui=cfg.ui,used=0,nudges=0,all="",gap=false,first=true,fellNote="",way=cfg.way,ro=way==="guide"||!!cfg.plan,halt=false,MAX=cfg.small?3500:24000;
   var tok=function(t){if(gap&&all){ui.token("\n\n");all+="\n\n";}gap=false;all+=t;ui.token(t);};
   function finish(extra){return cfg.commit().then(function(n){if(extra)tok(extra);if(fellNote){tok(fellNote);fellNote="";}
       if(!all.trim())tok(n?"Done: the changes are kept, and can be undone.":"Done.");return {text:all,changed:n,used:used};});}
@@ -381,6 +437,7 @@ function loop(cfg){var ws=cfg.ws,ui=cfg.ui,used=0,all="",gap=false,first=true,fe
       results.push({id:k.id,text:JSON.stringify({INVALID_JSON:String(k.bad).slice(0,2000)})+" The tool call was not valid JSON. Send it again, as valid JSON.",err:true});return Promise.resolve();}
     var tgt=(k.name==="edit"||k.name==="write_file")&&k.input?wsFile(ws,k.input.file):null,snap=tgt?{text:tgt.text,n:tgt.edits.length}:null,nf=ws.files.length;
     return exec(ws,k.name,k.input||{},{ro:ro,small:cfg.small,way:way}).then(function(r){
+      if(r.changed)ws.dirty=true;if(r.plan&&ws.plan&&ui.plan)ui.plan(ws.plan);
       if(!(r.changed&&way==="step")){if(r.step)ui.step(r.step);results.push({id:k.id,text:cap(r.text,MAX),err:!!r.err});return;}
       return ui.ask({file:r.file,line:r.line,before:r.before,after:r.after,made:!!r.made,more:r.more||0}).then(function(d){
         if(d.act==="make"||d.act==="all"){if(d.act==="all")way="auto";ui.step(r.step);
@@ -394,7 +451,10 @@ function loop(cfg){var ws=cfg.ws,ui=cfg.ui,used=0,all="",gap=false,first=true,fe
     return cfg.turn(cfg.S,tok,ui.think).then(function(T){first=false;gap=true;
       if(T.fell&&T.fell.to&&!fellNote)fellNote="\n\n_"+T.fell.from+" declined part of this request, so Anthropic's "+T.fell.to+" carried on with it._";
       if(T.stop==="refusal")return finish("\n\n_The model declined this request"+(T.cat?" (its safeguards marked it “"+String(T.cat).replace(/_/g," ")+"”)":"")+". Changes made before it stopped are kept. Rephrase it, or choose another model._");
-      if(!T.calls.length){if(T.stop==="max_tokens")return finish("\n\n_The reply reached its length limit and stopped here. Ask it to continue._");return finish("");}
+      if(!T.calls.length){if(T.stop==="max_tokens")return finish("\n\n_The reply reached its length limit and stopped here. Ask it to continue._");
+        if(cfg.ultra&&!ro&&nudges<3&&T.nudge&&!cfg.stopped()&&used<cfg.limit){var why=unfinished(ws);
+          if(why){nudges++;ui.step({i:"↻",t:"Ultracode: "+why.short+", so it carries on"});T.nudge("Ultracode is on, and the work is not finished: "+why.long+" Carry on: fix it and check again. If it truly cannot be done, say plainly what fails and why.");return step();}}
+        return finish("");}
       if(T.stop==="max_tokens"){T.push(T.calls.map(function(k){return {id:k.id,text:"Your reply was cut off at the length limit before this call was complete, so it was not run. Make smaller changes, one at a time.",err:true};}));return step();}
       var results=[],seq=Promise.resolve();
       T.calls.forEach(function(k){seq=seq.then(function(){return oneCall(k,results);});});
@@ -410,6 +470,7 @@ function setHidden(o,k,v){try{Object.defineProperty(o,k,{value:v,enumerable:fals
 function paintLive(bot){try{if(typeof renderChatLive==="function")renderChatLive(bot);else renderChat();}catch(e){}}
 function chatUI(bot,onToken,onThink,stopped){return {token:onToken,think:onThink,
   step:function(s){(bot.steps=bot.steps||[]).push(s);paintLive(bot);},
+  plan:function(p){bot.plan={tasks:p.tasks.map(function(x){return Object.assign({},x);}),at:p.at};paintLive(bot);try{if(window.IngR215)IngR215.planChanged(bot);}catch(e){}},
   ask:function(info){return new Promise(function(res){var a={info:info,note:"",done:false};
     var t=setInterval(function(){if(stopped())fin("stop");},400);
     function fin(act){if(a.done)return;a.done=true;clearInterval(t);setHidden(bot,"ask",null);paintLive(bot);res({act:act,note:String(a.note||"").trim()});}
@@ -427,16 +488,19 @@ function commitChat(ws,bot){var changed=ws.files.filter(function(f){return f.isN
     saveState();if(ws.code&&ws.pr){try{ccPaintSide();ccPaintHead();}catch(e){}setTimeout(function(){try{ccShowPreview(ws.pr);}catch(e){}},40);}
     return made.length;});}
 var ORIG=null;
+function effortFor(cloud,ws){try{return window.IngEffort?IngEffort.forRun({cloud:cloud,provider:cloud?(state.cloud||{}).provider:"",code:!!ws.code,where:ws.where}):null;}catch(e){return null;}}
 function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=family(c.provider),way=wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan);
-  var P=plainMsgs(messages),S={tools:toolsFor(way==="guide"||plan),think:thinkOn(),fallback:true,ab:ab};
-  var sys=(P.sys?P.sys+"\n\n":"")+note(ws,way,plan);
+  var E=effortFor(true,ws),ultra=!!(E&&E.ultra)&&way!=="guide",ro=way==="guide"||plan,chk=ultra&&canRun(ws);
+  var P=plainMsgs(messages),S={tools:toolsFor(ro,{plan:true,check:chk}),think:thinkOn()&&!(E&&E.lv<=1&&fam!=="anthropic"),fallback:true,ab:ab,effort:E};
+  var sys=(P.sys?P.sys+"\n\n":"")+note(ws,way,plan,{plan:true,ultra:ultra,check:chk});
   if(fam==="anthropic"){S.sys=sys;S.msgs=P.msgs;}else{S.msgs=[{role:"system",content:sys}].concat(P.msgs);}
   var stopped=function(){return !!(ab&&ab.aborted);};
   bot.way=way;
-  var cfg={turn:turnFor(c.provider),S:S,ws:ws,way:way,plan:plan,small:false,limit:fam==="ollama"?30:60,stopped:stopped,
+  var cfg={turn:turnFor(c.provider),S:S,ws:ws,way:way,plan:plan,small:false,ultra:ultra,limit:E?(fam==="ollama"?Math.ceil(E.steps/2):E.steps):(fam==="ollama"?30:60),stopped:stopped,
     ui:chatUI(bot,onToken,onThink,stopped),commit:function(){return commitChat(ws,bot);}};
   function go(){return loop(cfg).then(function(r){return r.text;}).catch(function(e){var m=String(e&&e.message||e),fresh=!!(e&&e.fresh);
     if(fresh&&S.think&&/thinking|budget|adaptive|display|\bthink\b/i.test(m)){S.think=false;return go();}
+    if(fresh&&S.effort&&!S.noReason&&/reasoning/i.test(m)&&fam==="openai"){S.noReason=true;try{IngEffort.refused(c.provider,c.model);}catch(_){}return go();}
     /* a service or model without tools: once, at the first request, it answers as before */
     if(fresh&&/\b(tool|tools|function[ _-]?call|tool_choice|does not support)\b/i.test(m)&&!/rate|quota|overload/i.test(m)){NO_TOOLS[c.provider+"|"+c.model]=1;delete bot.way;return ORIG(messages,onToken,onThink,ab);}
     if(fresh&&/fallback/i.test(m)&&fam==="anthropic"&&S.fallback){S.fallback=false;return go();}
@@ -446,14 +510,14 @@ function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=fami
 function slimFiles(text){return String(text||"").replace(/<file name="([^"]*)">\n([\s\S]*?)\n<\/file>/g,function(all,n,body){
   return body.length<1500?all:"<file name=\""+n+"\">\n["+body.split("\n").length+" lines: read them with the tools]\n</file>";});}
 function roomOf(){var room=12000;try{room=Math.max(6000,Math.floor(chatBudget()*0.9));}catch(e){}return room;}
-function localRun(job,bot,ws){var way=wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan),tools=toolsFor(way==="guide"||plan);
+function localRun(job,bot,ws){var way=wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan),E=effortFor(false,ws),ultra=!!(E&&E.ultra)&&way!=="guide",chk=ultra&&canRun(ws),tools=toolsFor(way==="guide"||plan,{plan:ultra,check:chk});
   var msgs=job.messages.map(function(m){return {role:m.role,content:typeof m.content==="string"?slimFiles(m.content):(m.content||[]).filter(function(p){return p.type==="text";}).map(function(p){return slimFiles(p.text);}).join("\n")};});
-  var add=note(ws,way,plan)+"\n\n"+localNote(tools);
+  var add=note(ws,way,plan,{plan:ultra,ultra:ultra,check:chk})+"\n\n"+localNote(tools);
   if(msgs[0]&&msgs[0].role==="system")msgs[0].content+="\n\n"+add;else msgs.unshift({role:"system",content:add});
   var stop0=LSTOP,stopped=function(){return LSTOP!==stop0;};
   var onToken=job.onToken||function(){},onThink=job.onThink||function(){};
   bot.way=way;
-  return loop({turn:localTurn,S:{msgs:msgs,params:job.params,room:roomOf()},ws:ws,way:way,plan:plan,small:true,limit:16,stopped:stopped,
+  return loop({turn:localTurn,S:{msgs:msgs,params:job.params,room:roomOf()},ws:ws,way:way,plan:plan,small:true,ultra:ultra,limit:E?E.lsteps:16,stopped:stopped,
     ui:chatUI(bot,onToken,onThink,stopped),commit:function(){return commitChat(ws,bot);}}).then(function(r){return r.text;})
     .catch(function(e){return commitChat(ws,bot).then(function(){throw e;});});}
 
@@ -615,7 +679,7 @@ function hook(){
   paintWay();try{buildMake();}catch(e){}}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);else hook();
 window.addEventListener("load",function(){hook();setTimeout(hook,1500);});
-window.IngAgent={tools:TOOLS,ways:WAYS,applies:applies,wsFor:wsFor,exec:function(ws,n,a,o){return exec(ws,n,a,o||{});},note:note,parseCalls:parseCalls,visibleOf:visibleOf,
+window.IngAgent={tools:TOOLS,extra:EXTRA,toolsFor:toolsFor,unfinished:unfinished,loop:loop,stageCheck:stageCheck,applies:applies,wsFor:wsFor,exec:function(ws,n,a,o){return exec(ws,n,a,o||{});},note:note,parseCalls:parseCalls,visibleOf:visibleOf,
   way:wayOf,setWay:setWay,build:{ask:buildAsk,paint:buildPaint,state:BS},
   setOn:function(v){state.agent=state.agent||{};state.agent.off=!v;saveState();paintWay();},isOn:agentOn};
 })();
