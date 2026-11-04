@@ -72,7 +72,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(found.rows === 1 && /Grandin/.test(found.text) && /1 shown/.test(found.count), 'find narrows the list to the matching source', JSON.stringify(found));
   await p.fill('#foFind', ''); await p.waitForTimeout(900);
   // a collection, made with the ticked sources going into it
-  await p.evaluate(() => { window.prompt = () => 'DPhil chapter 2'; const cbs = document.querySelectorAll('#foList .fo-row input'); cbs[0].checked = true; cbs[1].checked = true; document.getElementById('foNewColl').click(); }); await p.waitForTimeout(900);
+  await p.evaluate(() => { const cbs = document.querySelectorAll('#foList .fo-row input'); cbs[0].checked = true; cbs[1].checked = true; document.getElementById('foNewColl').click(); }); await p.waitForTimeout(500);
+  /* 6.11.1: the name is asked in Ingenium's own dialog */
+  await p.evaluate(() => { const L = document.querySelector('.ing-dlg-root .ing-dlg-card') || document.getElementById('modalBox'); const i = L.querySelector('input'); if (i) { i.value = 'DPhil chapter 2'; [...L.querySelectorAll('.ing-ask-keys .btn')].pop().click(); } }); await p.waitForTimeout(900);
   const coll = await p.evaluate(() => ({ colls: state.fontes.colls, inColl: fontesItems().filter(c => c.ingColl === 'DPhil chapter 2').length, sel: document.getElementById('foColl').value, rows: document.querySelectorAll('#foList .fo-row').length, options: [...document.getElementById('foColl').options].map(o => o.textContent) }));
   ok(coll.colls.length === 1 && coll.inColl === 2 && coll.sel === 'DPhil chapter 2' && coll.rows === 2, 'a collection is made from the ticked sources and the view moves to it', JSON.stringify(coll));
   // a note on a source

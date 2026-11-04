@@ -1140,6 +1140,16 @@ edit(r"""if(a==="new"){var nm=prompt("Name your new app","My new app");if(!nm)re
      r"""if(a==="new"){closeModal();Promise.resolve(window.ingPrompt?ingPrompt({title:"Name your new app",value:"My new app",yes:"Make it"}):prompt("Name your new app","My new app")).then(function(nm){if(!nm||!nm.trim())return;ccMakeProject(nm.trim().slice(0,80),[{name:"index.html",text:CC_BLANK.replace(/My new app/g,esc(nm.trim().slice(0,80)))}],"index.html").then(ccNewSession);});}""",
      "6.11 a new app is named in Ingenium's own dialog")
 
+# ---- 6.11.1: the last of the browser's grey boxes in the page itself, asked in Ingenium's own dialog (modules/r216.js) ----
+edit(r"""      if(!confirm("Restore the desk from "+(new Date(x.when||0)).toLocaleString()+" ("+x.chats+" conversations)? Your current desk is kept as a copy first."))return;
+      b.disabled=true;b.textContent="Restoring…";""",
+     r"""      ingConfirm("Restore the desk from "+(new Date(x.when||0)).toLocaleString()+" ("+x.chats+" conversations)? Your current desk is kept as a copy first.",function(){
+      b.disabled=true;b.textContent="Restoring…";""",
+     "6.11.1 restoring an earlier desk asks in Ingenium's own dialog")
+edit(r"""        Promise.resolve().then(function(){return a.save_state(raw);}).then(function(){window.name="desk-adopted";location.reload();});});};});},""",
+     r"""        Promise.resolve().then(function(){return a.save_state(raw);}).then(function(){window.name="desk-adopted";location.reload();});});},{yes:"Restore it",danger:false});};});},""",
+     "6.11.1 the restore's end, inside its question")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

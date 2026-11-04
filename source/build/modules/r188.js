@@ -1273,7 +1273,7 @@ function personPanel(c){var S=CS(),R=panel("csWork",c.name||"Someone new",{back:
   R.foot.appendChild(cbtn("","Copy the email",function(){var t=String(c.draft||"").trim();if(!t){say("There is no email to copy yet.");return;}try{csCopyText(t);}catch(e){}say("Copied. Paste it into your own email: Ingenium sends nothing.");}));
   if(c.status!=="sent")R.foot.appendChild(cbtn("","I sent it",function(){c.status="sent";c.last=Date.now();c.follow=addDays(todayStr(),waitDays(c.role));save();render();say("Marked as sent. Today will remind you to follow up "+pplWhen(c.follow)+" if they have not replied.");}));
   R.foot.appendChild(h("span","c-grow"));
-  R.foot.appendChild(cbtn("quiet","Remove",function(){if(!confirm("Remove "+(c.name||"this person")+" from your people?"))return;S.contacts=contacts().filter(function(x){return x!==c;});S.ui.person=null;save();render();}));
+  R.foot.appendChild(cbtn("quiet","Remove",function(){ingConfirm("Remove "+(c.name||"this person")+" from your people?",function(){S.contacts=contacts().filter(function(x){return x!==c;});S.ui.person=null;save();render();},{danger:true});}));
   return R;}
 var PURPOSE={supervisor:"to ask, briefly and politely, whether they would consider supervising her doctoral project; name a link between her research interests and their work only where the notes give their work, and otherwise ask openly",
   referee:"to ask whether they would be willing to write a reference, saying what it is for and its deadline where the notes or the application give them",
@@ -1575,7 +1575,7 @@ function stepTrack(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),st=
   if(o.stage==="interview"||o.interview)box.appendChild(interviewCard(o));
   else{var ik=h("div","c-keyrow");ik.appendChild(cbtn("sm quiet","Add an interview",function(){o.interview={};save();render();},"Its day, time and place, and a list to prepare by"));box.appendChild(ik);}
   var nt=h("textarea","c-ta");nt.style.minHeight="110px";nt.placeholder="Your notes: who to ask, what to do next, what was said.";nt.value=o.notes||"";nt.setAttribute("aria-label","Your notes");nt.addEventListener("change",function(){o.notes=nt.value;save();});box.appendChild(field("Notes",nt));
-  P.body.appendChild(box);P.foot.appendChild(cbtn("quiet c-danger","Remove this application",function(){if(!confirm("Remove "+(o.title||"this application")+" and what was written for it?"))return;removeOpp(o);}));
+  P.body.appendChild(box);P.foot.appendChild(cbtn("quiet c-danger","Remove this application",function(){ingConfirm("Remove "+(o.title||"this application")+" and what was written for it?",function(){removeOpp(o);},{danger:true});}));
   P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("","Export this application",function(){exportOpp(o);},"A folder of files: the posting, the reading, the checklist, each document as Word and as text, the emails, your practise and your notes"));}
 
 /* ---------------- 6.8.12: at her pace (her words, 28 October 2026: "I want to be able to automate where I want and also
@@ -1809,8 +1809,8 @@ function refsOfPerson(p){var out=[],P=p.profile||{};
   if(P.own){if(P.own.cv)out.push(P.own.cv.ref);(P.own.writing||[]).concat(P.own.letters||[]).forEach(function(x){out.push(x.ref);});}
   return out.filter(Boolean);}
 function removePerson(p){var r=ROOT();if(r.people.length<2){say("This is the only profile: it stays.");return;}
-  var n=(p.opps||[]).length;if(!confirm("Remove the profile of "+personLabel(p)+", its "+n+" application"+(n===1?"":"s")+" and everything written for them? This cannot be undone."))return;
-  refsOfPerson(p).forEach(function(ref){try{IngBig.del(ref);}catch(e){}});(p.opps||[]).forEach(function(o){try{dropThoughts(o);dropRuns(o);}catch(e){}});r.people=r.people.filter(function(x){return x!==p;});if(r.cur===p.id)r.cur=r.people[0].id;save();render();say("The profile is removed.");}
+  var n=(p.opps||[]).length;ingConfirm("Remove the profile of "+personLabel(p)+", its "+n+" application"+(n===1?"":"s")+" and everything written for them? This cannot be undone.",function(){
+  refsOfPerson(p).forEach(function(ref){try{IngBig.del(ref);}catch(e){}});(p.opps||[]).forEach(function(o){try{dropThoughts(o);dropRuns(o);}catch(e){}});r.people=r.people.filter(function(x){return x!==p;});if(r.cur===p.id)r.cur=r.people[0].id;save();render();say("The profile is removed.");},{danger:true});}
 function addOwnText(list,what){pickFile(".docx,.pdf,.txt,.md,.rtf,.html,.htm",true,function(fs){var q=Promise.resolve(),n=0;
   fs.forEach(function(f){q=q.then(function(){return readFile(f).then(function(t){if(t.length<40)return;var ref=IngBig.newId();return Promise.resolve(IngBig.put(ref,t)).then(function(){list.push({ref:ref,name:f.name,chars:t.length,at:Date.now()});n++;});});});});
   q.then(function(){if(n){CS().profile.at=Date.now();save();render();say(n+" "+what+(n>1?"s are":" is")+" kept in this profile.");}});});}
@@ -1820,12 +1820,12 @@ function profPeople(){var r=ROOT(),cur=CS(),R=panel("csWork","Profiles");
   r.people.forEach(function(p){var row=h("div","c-person"+(p===cur?" c-cur":"")),tx=h("div","tx"),n=(p.opps||[]).length;tx.appendChild(h("b",null,esc(personLabel(p))));
     tx.appendChild(h("small",null,esc((p.profile&&p.profile.isMe===false?"Someone else":"You")+" · "+n+" application"+(n===1?"":"s")+(p===cur?" · open now":""))));row.appendChild(tx);
     var k=h("div","c-keys");if(p!==cur)k.appendChild(cbtn("sm","Open this profile",function(){switchTo(p.id);}));
-    k.appendChild(cbtn("sm quiet","Name it",function(){var v=prompt("A short name for this profile, shown beside the person's name (for example Academic, or Museums). Leave it empty for none.",p.label||"");if(v===null)return;p.label=v.trim().slice(0,40);save();render();}));
+    k.appendChild(cbtn("sm quiet","Name it",function(){ingPromptThen("A short name for this profile, shown beside the person's name (for example Academic, or Museums). Leave it empty for none.",p.label||"",function(v){p.label=v.trim().slice(0,40);save();render();},{empty:true});}));
     if(r.people.length>1)k.appendChild(cbtn("sm quiet c-danger","Remove",function(){removePerson(p);}));row.appendChild(k);ul.appendChild(row);});
   R.body.appendChild(ul);
   var nw=h("div","c-col c-pad c-newp");nw.appendChild(h("h3","c-h3",esc("A new profile")));
-  var a=h("div","c-row c-newrow");a.appendChild(cbtn("","Another side of me",function(){var v=prompt("What should this side of you be called? For example Academic, Industry, or Museums.","");if(v===null)return;
-      newPerson("me","",v).then(function(){say("A new side of you, copied from "+personLabel(cur)+". Change what you wish: its applications start empty.");});},"A copy of this profile, to change: its own entries and applications"));
+  var a=h("div","c-row c-newrow");a.appendChild(cbtn("","Another side of me",function(){ingPromptThen("What should this side of you be called? For example Academic, Industry, or Museums.","",function(v){
+      newPerson("me","",v).then(function(){say("A new side of you, copied from "+personLabel(cur)+". Change what you wish: its applications start empty.");});},{empty:true});},"A copy of this profile, to change: its own entries and applications"));
   a.appendChild(h("span","c-note",esc("A copy of this profile (its entries, wishes and documents) with no applications yet, to change as you wish.")));nw.appendChild(a);
   var b=h("div","c-row c-newrow"),nm=input("text","","Their name");nm.setAttribute("aria-label","Their name");b.appendChild(nm);
   b.appendChild(cbtn("","Someone else",function(){var v=nm.value.trim();if(!v){nm.focus();say("Give their name first.");return;}newPerson("other",v,"").then(function(){say("A profile for "+v+". Add their CV and their entries first.");});},"An empty profile for someone you help"));
@@ -1861,7 +1861,7 @@ function profSources(){var S=CS(),P=S.profile,M=lectorMe(),R=panel("csWork","Wha
     var tx=h("div","tx");tx.appendChild(h("b",null,esc(title)));tx.appendChild(h("small",null,esc(sub)));row.appendChild(tx);if(keys&&keys.length){var k=h("div","c-keys");keys.forEach(function(x){k.appendChild(x);});row.appendChild(k);}list.appendChild(row);}
   var me=P.isMe!==false;
   src("Your CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+(me?". Lector uses the same one.":". Kept in this profile only."):(me?"Not added yet. Lector and the studio share it.":"Not added yet. Kept in this profile only."),P.use.cv,function(v){P.use.cv=v;},
-    [cbtn("sm",M.cv?"Replace":me?"Add your CV":"Add their CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){if(!confirm(me?"Remove your CV from Lector and the studio?":"Remove this CV from this profile?"))return;try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();})]:[]));
+    [cbtn("sm",M.cv?"Replace":me?"Add your CV":"Add their CV",addCv)].concat(M.cv?[cbtn("sm quiet","Remove",function(){ingConfirm(me?"Remove your CV from Lector and the studio?":"Remove this CV from this profile?",function(){try{IngBig.del(M.cv.ref);}catch(e){}M.cv=null;save();render();},{danger:true});})]:[]));
   src("A profile file","Your entries, documents and CV in one file: bring one in, or keep a copy for another device or to begin someone else's. It stays with you: Ingenium sends it nowhere.",null,null,
     [cbtn("sm","Bring in a profile file",packPick),cbtn("sm quiet","Save this profile as a file",packSave)]);
   var LK=P.linkedin;
@@ -1949,7 +1949,7 @@ function goalPanel(g){var S=CS(),done=g.steps.filter(function(x){return x.done;}
     k.appendChild(cbtn("sm","Drop",function(){g.suggested=g.suggested.filter(function(y){return y.id!==st.id;});save();render();}));row.appendChild(k);R.body.appendChild(row);});}
   var add=h("div","c-addstep c-pad"),stx=input("text","","A step: small enough to begin"),sby=input("date","");stx.setAttribute("aria-label","A new step");sby.setAttribute("aria-label","By when");add.appendChild(stx);add.appendChild(sby);
   add.appendChild(cbtn("","Add the step",function(){if(!stx.value.trim())return;g.steps.push({id:uid("st"),text:stx.value.trim(),by:sby.value,done:false});save();render();}));R.body.appendChild(add);
-  R.foot.appendChild(cbtn("quiet c-danger","Remove the goal",function(){if(!confirm("Remove this goal and its steps?"))return;S.goals=S.goals.filter(function(y){return y.id!==g.id;});S.ui.gsel=null;save();render();}));R.foot.appendChild(h("span","c-grow"));
+  R.foot.appendChild(cbtn("quiet c-danger","Remove the goal",function(){ingConfirm("Remove this goal and its steps?",function(){S.goals=S.goals.filter(function(y){return y.id!==g.id;});S.ui.gsel=null;save();render();},{danger:true});}));R.foot.appendChild(h("span","c-grow"));
   R.foot.appendChild(cbtn("pri","Suggest steps",function(){goalSteps(g);}));return R;}
 function rolesPanel(){var S=CS(),R=panel("csWork","Roles and programmes that suit you");
   if(!S.roles||!S.roles.list||!S.roles.list.length)R.body.appendChild(empty("Not weighed yet","Kinds of role and programme worth an application, from your profile and what you are looking for: why, what is missing, and a first step. Never postings: bring those to Applications yourself."));
@@ -2134,7 +2134,7 @@ function interviewCard(o){var iv=o.interview=o.interview||{},card=h("div","c-ivc
   var na=h("textarea","c-ta");na.placeholder="After: what was asked, what went well, what to say in the thanks.";na.value=iv.after||"";na.setAttribute("aria-label","Notes after the interview");na.addEventListener("change",function(){iv.after=na.value;save();});card.appendChild(field("Notes after the interview",na));
   var k=h("div","c-keyrow");k.appendChild(cbtn("sm","Write a thank-you email",function(){writeDoc(o,"email",{role:"contact",purpose:"thanks",extra:"The interview was "+(iv.at?"on "+dayStr(iv.at+"T12:00:00"):"recently")+(iv.panel?", with "+iv.panel:"")+"."+(iv.after?" My notes after it: "+iv.after.slice(0,400):"")});},"To the contact named in the posting; written for you to send"));
   k.appendChild(cbtn("sm","Practise the questions",function(){o.step="practise";o.ptab="interview";save();jump();render();}));
-  k.appendChild(cbtn("sm quiet","Take the interview off",function(){if(!confirm("Take the interview and its notes off this application?"))return;delete o.interview;if(o.stage==="interview")o.stage="applied";save();render();}));card.appendChild(k);return card;}
+  k.appendChild(cbtn("sm quiet","Take the interview off",function(){ingConfirm("Take the interview and its notes off this application?",function(){delete o.interview;if(o.stage==="interview")o.stage="applied";save();render();},{danger:true});}));card.appendChild(k);return card;}
 /* the mock run: one question, two minutes on the Clepsydra, then her answer looked at with her */
 var MOCK=null,mockT=0;
 function mockBox(o,q,pane){var box=h("div","c-mock");

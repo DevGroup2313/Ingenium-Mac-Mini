@@ -74,7 +74,9 @@ const SOP = ['My research asks how field notebooks shaped method.', 'At Oxford I
   // another side of her
   await p.evaluate(() => { window.prompt = () => 'Museums'; const S = IngCareer.state(); S.ui.room = 'profile'; S.ui.ppart = 'people'; IngCareer.render(); }); await p.waitForTimeout(300);
   await p.screenshot({ path: OUT + '/profiles.png' });
-  await p.click('#cs .c-newp button:has-text("Another side of me")'); await p.waitForTimeout(600);
+  await p.click('#cs .c-newp button:has-text("Another side of me")'); await p.waitForTimeout(500);
+  /* 6.11.1: the name is asked in Ingenium's own dialog, no longer the browser's */
+  await p.evaluate(() => { const i = (document.querySelector('.ing-dlg-root .ing-dlg-card input') || document.querySelector('#modalBox input')); if (i) { i.value = 'Museums'; [...i.closest('.ing-ask').querySelectorAll('.ing-ask-keys .btn')].pop().click(); } }); await p.waitForTimeout(600);
   const side = await p.evaluate(() => { const S = IngCareer.state(), r = IngCareer.root(); return { label: r.people.filter(x => x.id === r.cur)[0].label, items: S.profile.items.length, opps: S.opps.length, me: S.profile.isMe, n: r.people.length,
     sel: document.getElementById('csWho').selectedOptions[0].textContent }; });
   ok(side.label === 'Museums' && side.items === 1 && side.opps === 0 && side.me === true && side.n === 3 && side.sel === 'Yannie D. Forest · Museums', 'Another side of me: a copy of her profile, named, with no applications', JSON.stringify(side));

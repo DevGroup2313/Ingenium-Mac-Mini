@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.11.1 (4 November 2026): Ingenium's own pop-ups everywhere, and documents in a chat that open. Her words: "Ingenium's in app
+popups look weird in this random basic dark gray format and completely detracts from the rest of the app, please redesign these popups
+all over the app that are the same dark grey and match them to Ingenium's colour palette and animated popped out 3D look and animation";
+and "The documents uploaded inside of the chats of Ingenium are not clickable or offer a preview when you hover over it".
+
+- The grey box was the browser's own (alert, confirm, prompt). In the page, every one is now asked in Ingenium's own dialog (the raised
+  amethyst card, with its spring): the Career Studio's removals and names, Fontes's collections, the Claude history, an earlier desk's
+  restore, rename and delete in Chat and Code, and every notice (modules/r216.js; r115, r131, r188). A question asked from inside another
+  dialog (Fontes, the earlier desks) opens over it and leaves it as it was. Training further from the Claude history is now a choice of
+  three (closing it trains nothing); before, Cancel there trained a new model.
+- Inside the five apps Ingenium carries (Tabula, Abacus, Imago, Scriba, Fontes; about 120 questions in their own code), a first layer
+  answers in the same dialog without changing their code: a question stops the app where it asks, and once she answers, puts back the
+  selection she had and repeats her press, so the app receives her answer there (a comment lands on the words she selected; a table that
+  asks Rows, then Columns, is made once). Cancel repeats nothing. By night the dialog takes Ingenium's night colours.
+- A document attached to a message (Word, PDF, text, code) is a key now, as a page was: it opens beside the chat, code as code in its
+  language, and on hover shows its name, size, length and first lines.
+
+    node rig/t_6111_popups.js <url> <out>     # 17 checks; it fails if the browser's own box ever opens
+
 Ingenium 6.11 (4 November 2026): the Code session as in Claude's, and effort that means what it says. Her words (3 November 2026):
 "I want Ingenium's Coding chat to have full parity with Claude's Coding chat. I want the same layout and behaviour during the sessions.
 I want to see the plan laid out with the completed Tasks checked off the scrollable list"; "I want to be able to select low to Max

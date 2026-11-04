@@ -560,7 +560,7 @@ function ingPrompt(o){o=o||{};return new Promise(function(res){var done=false;fu
   box.querySelector("h3").textContent=o.title||"";var pp=box.querySelector("p");if(o.text)pp.textContent=o.text;else pp.remove();
   var inp=box.querySelector("input");inp.value=o.value==null?"":String(o.value);if(o.placeholder)inp.placeholder=o.placeholder;inp.setAttribute("aria-label",o.title||"Name");
   var k=box.querySelector(".ing-ask-keys"),no=mk("button","btn ghost",o.no||"Cancel");no.type="button";no.onclick=function(){end(null);};
-  var yes=mk("button","btn primary",o.yes||"Keep it");yes.type="button";yes.onclick=function(){var v=inp.value.trim();if(!v){try{inp.focus();}catch(e){}return;}end(v);};
+  var yes=mk("button","btn primary",o.yes||"Keep it");yes.type="button";yes.onclick=function(){var v=inp.value.trim();if(!v&&!o.empty){try{inp.focus();}catch(e){}return;}end(v);};
   inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();yes.click();}else if(e.key==="Escape"){e.preventDefault();end(null);}});
   k.appendChild(no);k.appendChild(yes);setTimeout(function(){try{inp.focus();inp.select();}catch(e){}},60);
   try{var root=$id("modalRoot"),mo=new MutationObserver(function(){if(!root.classList.contains("open")||!box.contains(yes)){mo.disconnect();end(null);}});mo.observe(root,{attributes:true,attributeFilter:["class"],childList:true,subtree:true});}catch(e){}});}
