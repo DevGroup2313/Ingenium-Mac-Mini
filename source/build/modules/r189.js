@@ -1,10 +1,10 @@
 <style id="r189-css">
 /* ============ R189 · THE COLOPHON: EVERY PAGE ENDS, AND ABOUT SAYS WHO MADE IT (Ingenium 6.8.10, 28 October 2026) ============
-   The owner's words (28 October 2026): "I want the copyrights and authorship line of "Designed and built by Yannie D. Forest
-   · © 2026 Yannie D. Forest" placed at the bottom of the app's display page as well as the About panel like it is done on
-   Carpe Diem. I want the app's page to not just abruptly end."
+   Her words of 28 October 2026 are in the README (Ingenium 6.8.10): the line of authorship at the foot of the page and in
+   About, as Carpe Diem has it, and a page that does not just end. (Quoted there, not here: a comment that names the rights
+   is kept by tools/strip_comments.js in every edition, and these notes are the master's.)
    Carpe Diem closes its page with a colophon (its seal, its name, a fine rule with one word, and the rights) and its About
-   with "Designed and built by" over the copyright. Ingenium now does the same, in its own colours: under the last card of
+   with "Designed and built by" over the line of rights. Ingenium now does the same, in its own colours: under the last card of
    each page that scrolls (Home, Focus, Models, Blend, Build, Schedae's notes, the Guide, Settings) stand its seal, its name,
    a fine rule with LOCAL MODEL STUDIO, and the line in her words. The rooms that fill the window (Chat, Code, the reading page,
    Career, Fabrica, and the apps on the Desk) keep the whole window. About ends with the same two lines as Carpe Diem's. */
@@ -20,14 +20,10 @@
 .ab-credit .ab-by{font-size:11.5px;font-weight:500;letter-spacing:.03em;color:var(--accent)}
 .ab-credit .ab-rights{margin-top:4px;font-size:10.5px;letter-spacing:.02em;color:var(--ink-3)}
 @media print{#ingColophon{display:none !important}}
-/* 6.10.2, her words (3 November 2026): "I want the app to be more scrollable on the Lector, Career Studio, and Fabrica pages, they
-   feel stiff. I want to be able to scroll and see the Ingenium seal and copyrights declaration at the footer of the app like I do on
-   the other pages of the app. I want it to match the Build page and how it scrolls smoothly and does not feel stuck. It's the same
-   for both chat pages, I like how they look when I open their pages and I don't want anything to change when I go on their pages, I
-   only want to be able to scroll past the chat page and see the Ingenium logo and the local model studio line and the copyrights
-   line at the end." So every page now ends with the colophon. The rooms that fill the window (Chat, Code, Lector, the Career Studio,
-   Fabrica) open exactly as before, at the top, and fit the window; a short scroll past them shows the colophon. A panel scrolled to
-   its end carries the scroll on to the page, as the Build page scrolls, instead of stopping there. */
+/* 6.10.2 (her words of 3 November 2026 are in the README, Ingenium 6.10.2): every page now ends with the colophon. The rooms that
+   fill the window (Chat, Code, Lector, the Career Studio, Fabrica) open exactly as before, at the top, and fit the window; a short
+   scroll past them shows the colophon. A panel scrolled to its end carries the scroll on to the page, as the Build page scrolls,
+   instead of stopping there. */
 #lx7 .l-pn-b,#cs .c-pn-b,#fb .f-pn-b{overscroll-behavior-y:auto}
 #ingColophon[data-room="1"]{margin-top:28px}
 </style>

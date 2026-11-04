@@ -371,6 +371,49 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.15 (4 November 2026): the guided tour, its demonstrations and the Guide, up to date in every edition. Her words: "Please
+make sure that the guided tour and its demonstrations are also updated as well as the Guide page to reflect the latest pages and
+sections as well as updates recently made to Ingenium, they should all be properly updated to reflect the latest version of Ingenium,
+the same for all of the different editions of Ingeniums and its demos."
+
+- Measured on 6.14: the tour had 56 cards in 13 chapters and none for Code, Folders or the Career Studio; Chat's chapter showed neither
+  effort nor connectors; Models showed neither the newer models nor the engines; Making things had one card for Blend; Settings showed
+  neither connectors nor the sign-in. Help had no page for Folders or the Career Studio, and Code's help toured the Chat chapter. The
+  Guide had no card for Folders, the Career Studio or the models, and no list of what is new; its tour card guessed "About ten minutes",
+  and the tour's last card named the rooms of an older tour.
+- The tour (modules/r222.js): 16 chapters and 73 cards in the master and full editions. Chat gains Effort and Connectors, and its model
+  and + key cards say what changed (the connected services' models in the menu; a document that opens beside the chat). A Code chapter
+  of six cards: building an app, the plan, the Session column, Ultracode, GitHub, and pointing with @ and commands with /. The plan card
+  is a demonstration: in a Code session of the tour's own, an example plan is ticked off in the column beside it, one task at a time;
+  when the tour ends, that session is removed and hers is put back, with her column as she left it. A Folders chapter (two cards), a
+  Career Studio chapter (three cards, where the edition carries it), Newer models in Models (and Two engines, only where the computer's
+  app carries the newer engine), Ways to blend in Making things, and Connectors and Your data, sealed in Settings. The expert's shorter
+  tour keeps effort, Ultracode, @ and /, Ways to blend, connectors and the sign-in. A ring stays on a part that draws itself again (the
+  Plan and Session column). The chapters of pages made as the page starts (Folders) join once the page is there: the page can say it is
+  ready a moment before its last parts are made, which first left Folders out.
+- Help: Folders and the Career Studio have help of their own; Code's Tour this page opens the Code chapter.
+- The Guide: What is new (each version from 6.9.1 to 6.14 in one line, newest first), Folders, the Career Studio, and Models (newer ones,
+  and the two engines). The tour card no longer guesses a time; the tour's last card names the chapters this copy's tour has; the
+  Models and Settings chapters' lines say what they now hold.
+- Every edition: the Career Studio's chapter, help, Guide card and lines are left out where the page is not carried (the gift and demo
+  editions), as Lector's are; no new text names Lector or the owner's other apps. Each text was checked against the notes of the version
+  that made the feature (Blend has eight ways and Ingenium chooses; Ultracode is sent back up to three times, saying what is left).
+- The gift and demo editions could not be built since 6.10.2, found while testing this: two notes in modules/r189.js quoted her words
+  about the line of rights, tools/strip_comments.js keeps every comment that names a copyright, and one of them named Lector, so the
+  check that no Lector is left stopped those editions' build. The notes now point to this README, where her words are.
+  rig/t_62_editions.js expected what the page held before 6.8.10: it now counts the colophon's credit (drawn under the pages, and in
+  its code), and the licence's plain words and the owner's keys among the owner's lines, as every edition carries them by design.
+- Code (her words, 4 November 2026: "please hide the scroll bar from the Plan and session panel on the Coding chat page. I want the
+  scrollability kept but I want the scroll bar hidden to match the rest of the app"; "The 'Find a repository' text box area inside of
+  the panel is a little too small ... I also want the Repository option list to be a little bit more 3D animated to match the rest of
+  the app"): the Plan and session column scrolls by wheel, touch and keys with no bar to see (modules/r215.js). In the GitHub
+  repository picker (modules/r219.js), Find a repository is as wide as the list and as tall as the other fields; each repository is a
+  raised key as the app's keys are, lifting under the pointer, pressing in when pressed, the chosen one held up with an amethyst rim;
+  the rows rise in one after another when they arrive (not again at each letter typed), all still when motion is set to minimal.
+
+    node rig/t_615_tour.js <url> <out> [master|full|gift|demo]   # 20 checks, with an invented app and session
+    node rig/t_615_code_look.js <url> <out>                       # 10 checks, with a stand-in GitHub
+
 Ingenium 6.14 (4 November 2026): connectors, in Chat and in Code. Her words (3 November 2026): "I want connectors added"; and (4
 November) "I want full parity with Claude's Code chat ... and so much more".
 
@@ -398,7 +441,7 @@ November) "I want full parity with Claude's Code chat ... and so much more".
   address or a name that is no file is not taken as pointing). The list of an app's sessions says each one's state: working, waits for
   you (a change to review), and its pull request. The steps that pushed a commit or opened a pull request carry their links to GitHub.
 
-    node rig/t_614_code_more.js <url> <out>     # 8 checks
+    node rig/t_614_code_more.js <url> <out>     # 9 checks
 
 Ingenium 6.13 (4 November 2026): Code on a GitHub repository. Her words: "I still want full parity with Claude's Code chat, right now
 its close but not quite there ... I want to be able to connect my Github repositories in the Environment of the Ingenium's Coding chat

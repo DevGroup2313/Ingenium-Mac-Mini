@@ -1,0 +1,283 @@
+<style id="r222-css">
+/* ============ R222 · THE TOUR, ITS DEMONSTRATIONS AND THE GUIDE, UP TO DATE (Ingenium 6.15, 4 November 2026) ============
+   Her words (4 November 2026): "Please make sure that the guided tour and its demonstrations are also updated as well as the Guide page
+   to reflect the latest pages and sections as well as updates recently made to Ingenium, they should all be properly updated to reflect
+   the latest version of Ingenium, the same for all of the different editions of Ingeniums and its demos."
+   Measured on 6.14: the tour had 56 steps in 13 chapters and none for Code, Folders or the Career Studio; Chat's chapter did not show
+   effort or connectors; Models did not show the newer models or the engines; Making things showed one Blend step; Settings did not
+   show connectors or the sign-in. The help by page had nothing for Folders or the Career Studio (Code's pointed to the Chat chapter),
+   and the Guide had no card for Folders, the Career Studio or the models, nor a list of what is new. The tour's last card named the
+   rooms of an older tour.
+   Now: Chat gains Effort and Connectors, and its model and + key steps say what changed; a Code chapter of six steps, one of them a
+   demonstration of a plan ticked off in a Code session of the tour's own (removed when the tour ends, with her own session, column
+   and its keys put back as they were); a Folders chapter; a Career Studio chapter where the edition carries it; Models gains Newer
+   models, and Two engines on a computer whose app carries both; Making things gains Ways to blend; Settings gains Connectors and Your
+   data, sealed. Help gains Folders and the Career Studio, and Code's help tours the Code chapter. The Guide gains What is new, Folders,
+   the Career Studio and Models. The last card names the chapters this copy's tour has.
+   Every edition: a chapter, a card or a line about a page an edition does not carry (Lector and the Career Studio are not in the gift
+   and demo editions; the engine card only in a computer app) is left out of that copy's tour, help and Guide. Every text here was
+   checked against the release notes of the version that made the feature. */
+.wn-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.wn-list li{display:grid;grid-template-columns:64px 1fr;gap:10px;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.wn-list li b{font:700 12.5px/1.5 var(--mono,ui-monospace,monospace);color:var(--accent,#6a3fb5)}
+@media (max-width:640px){.wn-list li{grid-template-columns:1fr;gap:2px}}
+</style>
+<script>try{(window.__ingParts=window.__ingParts||{})["p222"]="started";}catch(_){}
+/* R222 · the tour, its demonstrations and the Guide, up to date: see the note at the top of its styles.
+   window.IngTourNow: added(), whatsNew, codeId */
+(function r222(){"use strict";
+if(window.IngTourNow)return;
+var W=window,D=document;
+function $(id){return D.getElementById(id);}
+function mk(tag,cls,txt){var e=D.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+function has(id){return !!$(id);}
+function goPage(p){try{W.go(p);}catch(e){}}
+function touring(){return D.body.classList.contains("touring");}
+function deskEngine(){try{var a=typeof W.deskApi==="function"?W.deskApi():null;return !!(a&&typeof a.engine_choice==="function");}catch(e){return false;}}
+var ALL=["new","some","expert"];
+
+/* ================= 1. a Code session of the tour's own, for its demonstrations ================= */
+var CODE_ID="c-tour-code",kept=null;
+var CODE_Q="Add a dark mode to my app, with a key that switches it.";
+var CODE_A="I will add a dark colour scheme and a key that switches it. The plan is in the column on the right: each task is ticked as it is done, and the app is run and checked at the end.";
+function freshPlan(){return {tasks:[{t:"Read the page and its styles",s:"done"},{t:"Add a dark colour scheme",s:"doing"},{t:"Add a key that switches it",s:"todo"},{t:"Run the app and check both looks",s:"todo"}],at:Date.now()};}
+function keep(){if(kept)return;var cs={};try{cs=ccState();}catch(e){}
+  kept={code:cs.activeCode||null,panel:cs.panel?JSON.parse(JSON.stringify(cs.panel)):null,
+    P:W.IngR215&&IngR215.PANEL?{plan:!!IngR215.PANEL.plan,session:!!IngR215.PANEL.session}:null};
+  try{if(tourSaved.chat===undefined)tourSaved.chat=state.activeChat||null;}catch(e){}}
+function codeChat(){state.chats=state.chats||[];keep();
+  var c=state.chats.filter(function(x){return x.id===CODE_ID;})[0];
+  if(!c){c={id:CODE_ID,title:"Example from the tour",messages:[],kind:"code",__tourCode:true};state.chats.push(c);}
+  if(!c.messages.length){var now=Date.now();c.messages=[{role:"me",text:CODE_Q,at:now},{role:"bot",text:CODE_A,at:now,done:now,plan:freshPlan()}];}
+  try{ccState().activeCode=c.id;}catch(e){}
+  goPage("code");
+  try{if(state.activeChat!==c.id){state.activeChat=c.id;renderChat();ccPaintSide();ccPaintHead();}}catch(e){}
+  return c;}
+function codeBot(c){var ms=(c&&c.messages)||[];for(var i=ms.length-1;i>=0;i--)if(ms[i].role==="bot")return ms[i];return null;}
+function column(which){try{if(W.IngR215&&IngR215.panel)IngR215.panel(which,true);}catch(e){}}
+function codeGo(open){return function(){codeChat();(open||[]).forEach(column);};}
+function dropCode(){var had=(state.chats||[]).some(function(c){return c.__tourCode;});if(had)state.chats=state.chats.filter(function(c){return !c.__tourCode;});return had;}
+function putBack(){if(!kept)return;try{var cs=ccState(),k=kept;
+    cs.activeCode=k.code&&(state.chats||[]).some(function(c){return c.id===k.code;})?k.code:null;
+    if(k.panel)cs.panel=k.panel;else delete cs.panel;
+    if(W.IngR215&&IngR215.PANEL&&k.P){IngR215.PANEL.plan=k.P.plan;IngR215.PANEL.session=k.P.session;}}catch(e){}kept=null;}
+(function wrapClear(){var o=W.tourDemoClear;if(typeof o!=="function"||o.__r222)return;
+  var n=function(){var wasCode=false;try{wasCode=!!(W.CC&&CC.mode==="code");}catch(e){}
+    var had=dropCode(),r=o.apply(this,arguments);putBack();
+    if(had){try{saveState();}catch(e){}}
+    try{if(wasCode&&!ccIsCode(curChat()))goPage("code");else{renderChat();if(W.IngR215)IngR215.paintPanel();}}catch(e){}
+    try{ccPaintSide();}catch(e){}
+    return r;};
+  n.__r222=1;W.tourDemoClear=tourDemoClear=n;})();
+/* the demonstration: the example plan, ticked off one task at a time */
+function demoPlan(){var c=codeChat(),bot=codeBot(c);if(!bot)return;bot.plan=freshPlan();column("plan");
+  try{renderChat();IngR215.planChanged(bot);}catch(e){}
+  var step=2,live=typeof tourLively==="function"?tourLively():true;
+  var iv=setInterval(function(){var T=bot.plan.tasks;
+    if(step>=T.length){T[T.length-1].s="done";clearInterval(iv);}else{T[step-1].s="done";T[step].s="doing";step++;}
+    bot.plan.at=Date.now();try{renderChat();IngR215.planChanged(bot);}catch(e){}},live?1100:10);
+  try{tourTimers.push(iv);}catch(e){}}
+(function wrapDemo(){var o=W.tourDemoRun;if(typeof o!=="function"||o.__r222)return;
+  var n=function(name){if(name==="r222Plan"){try{demoPlan();}catch(e){}return;}return o.apply(this,arguments);};n.__r222=1;W.tourDemoRun=tourDemoRun=n;})();
+
+/* ================= 2. the new steps ================= */
+var S={
+  effort:{r222:1,levels:ALL,chap:"Chat",go:function(){tourDemoChat(true);},ring:"#effKey",
+    t:"🎚️ Effort, beside the model",
+    b:"The key beside the model's name sets how hard the model works on each message, from Low to Max: how much it thinks, how long it may write, and how many steps it may take. Auto chooses for each message and says under the reply what it chose and why. Point at a level to read what it does with the model you have.",
+    tip:"Not sure? Leave it on Auto. Auto never chooses Max: Max is yours to choose."},
+  connectors:{r222:1,levels:ALL,chap:"Chat",go:function(){tourDemoChat(true);},ring:"#chatImgBtn",
+    t:"🔌 Connectors",
+    b:"The + key, then Connectors: tools from outside services that the model can use while it answers, as in Claude. A tool that only reads runs when the model asks for it; a tool that changes something asks you first. Each use is a step under the reply.",
+    tip:"Add one in Settings, Connectors, by its address. With none added, nothing changes."},
+  code1:{r222:1,chap:"Code",sub:"Building an app",go:codeGo(),ring:"#chatInput",
+    t:"🧩 Code: building an app with the model",
+    b:"Code is where you build an app with the model and watch it run beside the conversation. Choose an app (a new one, a file or a folder of yours, or one of your GitHub repositories) and describe a change: the model reads the code and changes it, and the app runs beside the conversation. Every change is kept as a version you can undo.",
+    tip:"One change at a time works best: look at the app after each."},
+  code2:{r222:1,chap:"Code",sub:"The plan",go:codeGo(["plan"]),ring:'#ccPanel [data-sec="plan"]',demo:"r222Plan",
+    t:"☑️ The plan, ticked off",
+    b:"For a task of more than two steps, the model keeps a plan, and the Plan column shows it as a checklist: each task is ticked as it is done. The tour is ticking an example plan now.",
+    tip:"With Ultracode on, every task has a plan."},
+  code3:{r222:1,chap:"Code",sub:"The session",go:codeGo(["plan","session"]),ring:"#ccPanel",
+    t:"🗂️ The Session column",
+    b:"Session shows the session's Environment (where the files are kept, the app, the model, and a GitHub repository if you connect one), its Context (how much of the model's memory it uses), its Outputs (the files it made), its Changes (the lines added and removed), its Connectors and its Background tasks, each with a stop key."},
+  code4:{r222:1,levels:ALL,chap:"Code",go:codeGo(),ring:"#effKey",
+    t:"🚀 Ultracode",
+    b:"In the effort menu, Ultracode works at Max effort: it plans, builds, runs checks inside the app as it runs, and fixes what fails. If it stops with tasks still open, errors in the app, a change not yet run or a failed check, Ingenium sends it back, up to three times, saying what is left."},
+  code5:{r222:1,chap:"Code",sub:"GitHub",go:codeGo(["session"]),ring:"#ccPanel .ghx",
+    t:"⑂ Your GitHub repositories",
+    b:"In the Session column's Environment, connect one of your repositories and choose its branch. Ingenium reads the branch as it is now and keeps track of what you change. Push sends your changes to a branch of their own, never to the one you started from; Create PR opens a pull request, and the column then follows it and its checks."},
+  code6:{r222:1,levels:ALL,chap:"Code",go:codeGo(),ring:"#chatInput",
+    t:"⌨️ Pointing with @, commands with /",
+    b:"In the message box, @ lists the app's files, to point the model at one: it reads that file before it answers. In a session on a GitHub repository, / lists its commands: /status, /diff, /push, /pr, /review (the model reviews your changes without editing them) and /update."},
+  folders1:{r222:1,chap:"Folders",sub:"A folder for each app",go:function(){goPage("folders");},ring:"#page-folders .card",
+    t:"🗂️ Folders",
+    b:"Folders keeps a folder for each of your apps: how you like to work on it, where you left off, the decisions so far and what is open next. A conversation in a folder starts from those few thousand words, instead of every conversation before it, so nothing has to be explained again.",
+    tip:"How I work, on every app, written once in your own words, goes with every conversation in a folder."},
+  folders2:{r222:1,chap:"Folders",go:function(){goPage("folders");},ring:"#page-folders .fld-ways",
+    t:"📥 Bringing your work in",
+    b:"Bring in Claude's export (its chats and projects), Claude Code's sessions on this computer (in the computer app), a conversation pasted from Claude Code on the web or from Ollama, and an Ollama Modelfile as a way of working. Each is read on this device; each conversation is sorted into the folder of the app it names, and any can be moved."},
+  career1:{r222:1,chap:"Career Studio",sub:"Applications and people",go:function(){goPage("career");},ring:"#page-career .rm-tabs",
+    t:"💼 The Career Studio",
+    b:"The Career Studio helps with applications for jobs, PhD places, fellowships and grants. Applications keeps each one with its documents and dates; People keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Today shows the single most urgent step.",
+    tip:"One step at a time: the rest waits, folded, until you ask for it."},
+  career2:{r222:1,chap:"Career Studio",go:function(){goPage("career");},ring:"#csWork",
+    t:"🔗 A posting from its link",
+    b:"Paste a job posting's link: Ingenium fetches it once and, with a model ready, reads it against your profile at once. A page behind a sign-in is said so plainly, and its text can be pasted instead. The jobs you saved or applied to on LinkedIn come in from LinkedIn's own copy of your data."},
+  career3:{r222:1,chap:"Career Studio",go:function(){goPage("career");},ring:"#csHowK2",
+    t:"✍️ Drafts you review",
+    b:"For each application the studio writes the CV, the cover letter and a portfolio in the shape the role calls for, with every fact taken from your profile. Draft an email for me leaves what it does not know in square brackets. You read, change and send everything yourself: Ingenium sends nothing."},
+  found:{r222:1,chap:"Models",sub:"Newer models",go:function(){goPage("models");},ring:"#foundCard",
+    t:"🔎 Newer models, found online",
+    b:"Check for newer models asks Hugging Face, only when you press it, for the newest model files of twelve publishers. It offers only a kind of model this device's engine can load and a file its memory can hold, with its size and licence, and installs it with the same checked download as Ingenium's own models.",
+    tip:"How well a new model answers cannot be known until you try it. A weekly look is a switch, off until you turn it on."},
+  engines:{r222:1,r222e:1,levels:ALL,chap:"Models",go:function(){goPage("models");},ring:"#engPairCard",
+    t:"⚙️ Two engines",
+    b:"On this computer, a newer engine sits beside the proven one. Automatic, the default, runs every model on the proven engine, except a kind of model only the newer engine can load. If the newer engine cannot load a model, the proven engine loads it at once."},
+  blend2:{r222:1,levels:ALL,chap:"Making things",go:function(){goPage("blend");try{if(W.IngRooms){IngRooms.open("blend","new");IngRooms.step(2);}}catch(e){}},ring:"#blendStrats",
+    t:"⚗️ Ways to blend",
+    b:"Eight ways to bring the answers together, from Pass and refine and Compare and combine to Debate and settle, Check every claim and Divide the work; or Ingenium chooses, and says why. Your connected models answer beside the ones on this device, and under the answer you can read how it was settled, and every check."},
+  settingsCn:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("settings");},ring:"#cnCard",
+    t:"🔌 Connectors",
+    b:"Settings, Connectors: add a connector by its address, and a token if it asks for one (kept on this device and sent only to that server). Its tools are listed, each saying whether it only reads or asks you first."},
+  settingsLock:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("settings");},ring:"#ingLockCard",
+    t:"🔐 Your data, sealed",
+    b:"An optional sign-in of your own, a name and a password, seals your data on this device. Several ways back in open it: the password, ten words you keep, a key file on a stick or a drive, and a hint. On a Mac or a Windows computer, its own sign-in (Touch ID or Windows Hello) can be one more.",
+    tip:"There is no back door: keep the ways back in in different places."}};
+var TEASE={"Code":"Building an app with the model: the plan, the Session column, Ultracode and GitHub.","Folders":"A folder for each app, and your work brought in from Claude and Ollama.","Career Studio":"Applications, the people you write to, and drafts you review."};
+var CLOSE={"Code":"Code plans, builds, checks and fixes, and keeps every change as a version you can undo.","Folders":"Folders keep how you work, so no conversation starts from nothing.","Career Studio":"The Career Studio keeps every application and person in view, one step at a time."};
+
+/* ================= 3. into the tour, where they belong ================= */
+function idx(fn){for(var i=0;i<ING_TOUR.length;i++)if(fn(ING_TOUR[i]))return i;return -1;}
+function lastOf(chap){var k=-1;ING_TOUR.forEach(function(s,i){if(s.chap===chap)k=i;});return k;}
+function insertAfter(i,steps){if(i<0||!steps.length)return false;Array.prototype.splice.apply(ING_TOUR,[i+1,0].concat(steps));return true;}
+function bare(t){return String(t||"").replace(/^[^A-Za-z]+/,"").trim();}
+function apply(){if(!Array.isArray(W.ING_TOUR)||ING_TOUR.some(function(s){return s.r222;}))return;
+  var km=idx(function(s){return s.chap==="Chat"&&/^Choosing the model/.test(bare(s.t));});
+  if(km>=0){if(String(ING_TOUR[km].b).indexOf("by service")<0)ING_TOUR[km].b+=" When you connect Claude, OpenAI, Gemini, Kimi, OpenRouter or Ollama in Settings, their models join this menu, by service, and each conversation keeps the model that last answered it.";
+    insertAfter(km,[S.effort]);}
+  var plus=idx(function(s){return s.chap==="Chat"&&/^The \+ key/.test(bare(s.t));});
+  if(plus>=0){ING_TOUR[plus].b+=" A document you attach opens beside the chat when you press it, and shows its first lines when you point at it.";insertAfter(plus,[S.connectors]);}
+  insertAfter(lastOf("Chat"),[S.code1,S.code2,S.code3,S.code4,S.code5,S.code6]);
+  insertAfter(lastOf("Models"),[S.found]);
+  var bl=idx(function(s){return s.chap==="Making things"&&/^Blend/.test(bare(s.t));});insertAfter(bl>=0?bl:lastOf("Making things"),[S.blend2]);
+  var st=[];if(W.IngConnectors)st.push(S.settingsCn);if(W.IngLock)st.push(S.settingsLock);insertAfter(lastOf("Settings"),st);
+  try{Object.keys(TEASE).forEach(function(k){if(!ING_TOUR_TEASERS[k])ING_TOUR_TEASERS[k]=TEASE[k];});}catch(e){}
+  try{Object.keys(CLOSE).forEach(function(k){if(!ING_TOUR_CLOSERS[k])ING_TOUR_CLOSERS[k]=CLOSE[k];});}catch(e){}
+  /* two chapters' lines say what they now hold, where they still say what they held */
+  try{if(ING_TOUR_TEASERS.Models==="The four houses of models, and bringing your own.")ING_TOUR_TEASERS.Models="The four houses of models, bringing your own, and newer ones found online.";
+    if(ING_TOUR_TEASERS.Settings==="Your own instructions, the support switches, and your data."&&W.IngConnectors&&W.IngLock)ING_TOUR_TEASERS.Settings="Your own instructions, the support switches, your data, connectors and the sign-in.";}catch(e){}
+  try{tourPaintEntry();}catch(e){}}
+/* the Guide's tour card: the tour is a third longer than when it said "About ten minutes", so it no longer guesses a time */
+(function wrapEntry(){var o=W.tourPaintEntry;if(typeof o!=="function"||o.__r222)return;
+  var n=function(){var r=o.apply(this,arguments);try{var p=D.querySelector("#guideTour p");if(p&&p.textContent.indexOf("About ten minutes; stop whenever you like.")>=0)p.textContent=p.textContent.replace("About ten minutes; stop whenever you like.","Stop whenever you like: the tour remembers where you stopped.");}catch(e){}return r;};
+  try{Object.keys(o).forEach(function(k){n[k]=o[k];});}catch(e){}n.__r222=1;W.tourPaintEntry=tourPaintEntry=n;})();
+/* the chapters of pages made as the page starts (Folders is made when the page has loaded, and the page may say it is ready a
+   moment before): each joins once its page is there, and never while the tour runs */
+function optional(){if(touring()||!Array.isArray(W.ING_TOUR)||!ING_TOUR.some(function(s){return s.r222;}))return;var did=false;
+  if(has("page-folders")&&ING_TOUR.indexOf(S.folders1)<0){var mt=lastOf("Making things");if(mt<0)mt=lastOf("Chat");did=insertAfter(mt,[S.folders1,S.folders2])||did;}
+  if(has("page-career")&&ING_TOUR.indexOf(S.career1)<0){var after=lastOf("Lector");if(after<0)after=lastOf(ING_TOUR.indexOf(S.folders1)>=0?"Folders":"Making things");did=insertAfter(after,[S.career1,S.career2,S.career3])||did;}
+  if(did)try{tourPaintEntry();}catch(e){}}
+/* the engines step, only where this computer's app carries both engines: its app is asked, as the Engine room asks it (a copy with
+   the proven engine alone, as Windows has for now, shows the room but gets no step); its key may come a moment after the page */
+var asking=false;
+function engineStep(){if(asking||touring()||!Array.isArray(W.ING_TOUR)||!ING_TOUR.some(function(s){return s.r222;})||ING_TOUR.some(function(s){return s.r222e;})||!deskEngine())return;
+  var a=null;try{a=W.deskApi();}catch(e){return;}asking=true;
+  Promise.resolve().then(function(){return a.engine_choice();}).then(function(r){asking=false;
+    if(!(r&&r.newer&&r.newer.available)||touring()||ING_TOUR.some(function(s){return s.r222e;}))return;
+    var at=ING_TOUR.indexOf(S.found);if(at<0)at=lastOf("Models");if(insertAfter(at,[S.engines]))try{tourPaintEntry();}catch(e){}},function(){asking=false;});}
+/* the last card names the chapters this copy's tour has */
+var WORD={"Your devices":"your other devices","Making things":"the making tools","Career Studio":"the Career Studio","Scholarship":"the scholarly sources","The side buttons":"the side buttons","The top bar":"the top bar"};
+function roomsLine(){var n=[];try{W.tourChapList().forEach(function(c){if(c.chap!=="Welcome")n.push(WORD[c.chap]||c.chap);});}catch(e){return null;}
+  if(n.length<2)return null;return "You have seen every room: "+n.slice(0,-1).join(", ")+" and "+n[n.length-1]+". The best way to learn the rest is to try it. Here are three good first steps:";}
+(function wrapFinale(){var o=W.tourFinale;if(typeof o!=="function"||o.__r222)return;
+  var n=function(){var r=o.apply(this,arguments);try{var b=D.querySelector("#ingTour .finale .tour-body"),t=roomsLine();if(b&&t)b.textContent=t;}catch(e){}return r;};
+  n.__r222=1;W.tourFinale=tourFinale=n;})();
+/* a ring kept on what draws itself again (the Plan and Session column, its GitHub rows): while the tour shows the step, an
+   element the step names wears the ring again once the one it was drawn on is gone */
+var ringIv=null;
+function keepRing(sel){if(ringIv){clearInterval(ringIv);ringIv=null;}var sels=Array.isArray(sel)?sel:[sel],k=0;
+  ringIv=setInterval(function(){if(++k>48||!$("ingTour")){clearInterval(ringIv);ringIv=null;return;}
+    if(D.querySelector(".tour-ring"))return;
+    sels.forEach(function(q){var e=null;try{e=D.querySelector(q);}catch(_){}if(e&&e.getBoundingClientRect().width>2){e.classList.add("tour-ring");try{if(tourLively())e.classList.add("tour-pulse");}catch(_){}}});},250);
+  try{tourTimers.push(ringIv);}catch(e){}}
+(function wrapRing(){var o=W.tourRing;if(typeof o!=="function"||o.__r222)return;
+  var n=function(sel){var r=o.apply(this,arguments);try{keepRing(sel);}catch(e){}return r;};
+  try{Object.keys(o).forEach(function(k){n[k]=o[k];});}catch(e){}n.__r222=1;W.tourRing=tourRing=n;})();
+
+/* ================= 4. help by page: Folders and the Career Studio; Code tours its own chapter ================= */
+function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return;
+  if(P.code&&Array.isArray(P.code.tour)&&P.code.tour[0]==="Chat"&&ING_TOUR.some(function(s){return s.chap==="Code";}))P.code.tour=["Code"];
+  if(has("page-folders")&&!P.folders)P.folders={name:"Folders",tour:["Folders"],
+    what:"Folders keeps a folder for each of your apps: how you like to work on it, where you left off, the decisions so far and what is open next.",
+    plain:"A conversation in a folder starts from what the folder keeps, a few thousand words, instead of every conversation before it.",
+    dos:[["Open a folder","Its conversations, its notes and how you work on it.","#page-folders .card"],
+      ["Bring in your work","Claude's export, Claude Code's sessions on this computer, and what you paste from Claude Code on the web or Ollama.","#page-folders .fld-ways"],
+      ["Say how you work","Once, in your own words, for every app.","#fldHowAll"]],
+    tips:{"new":["Start from the apps your profile names: untick any you do not want."],
+      some:["Where we left off is brought up to date when you press it: only the conversations not read yet are read."],
+      expert:["A conversation that names no app clearly waits under Not sorted yet; move it by hand."]}};
+  if(has("page-career")&&!P.career)P.career={name:"Career Studio",tour:["Career Studio"],
+    what:"The Career Studio helps with applications for jobs, PhD places, fellowships and grants: each application, the people you write to, and Today's step.",
+    plain:"It drafts from your profile and your notes alone; you read, change and send everything yourself.",
+    dos:[["Bring a posting by its link","Paste the link: it is read against your profile at once.","#csWork"],
+      ["Applications","Each application with its documents and dates.","#csList"]],
+    tips:{"new":["One step at a time: Today shows the most urgent one, and the rest waits, folded."],
+      some:["Draft an email for me leaves what it does not know in square brackets, for you to fill in."],
+      expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
+
+/* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
+var NEW=[["6.14","Connectors, as in Claude, in Chat and in Code; @ to point the model at a file; each Code session's state in the list."],
+  ["6.13","Code on your GitHub repositories: a branch read as it is now, your changes pushed to a branch of their own, pull requests and their checks."],
+  ["6.12","Blend with your connected models, effort up to Ultra, three new ways, how each answer was settled, and Check with Blend under any reply."],
+  ["6.11.2","Check for newer models, on the Models page, when you press it."],
+  ["6.11.1","Ingenium's own pop-ups everywhere; a document in a chat opens beside it, with a preview when you point at it."],
+  ["6.11","Code sessions as in Claude: effort, Auto and Ultracode beside the model, the plan ticked off, and the Session column."],
+  ["6.10.5","On a Mac, a newer engine beside the proven one, which stays the default."],
+  ["6.10.3","More models for every device, and quicker replies."],
+  ["6.10.1","The computer's own sign-in (Touch ID or Windows Hello) as a way back in."],
+  ["6.10","Folders, one for each of your apps; your work brought in from Claude and Ollama."],
+  ["6.9.9","More ways back in: a recovery key file and a hint, beside the password and the ten words."],
+  ["6.9.8","A job posting read from its link, and your saved jobs from LinkedIn's copy of your data.","career"],
+  ["6.9.7","The Career Studio's People, and Today: one step at a time.","career"],
+  ["6.9.2","An optional sign-in, with your data sealed on this device."],
+  ["6.9.1","A longer memory: more of each conversation kept in view."]];
+function newNow(){return NEW.filter(function(x){return x[2]!=="career"||has("page-career");});}
+function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
+function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
+function guide(){var page=$("page-guide");if(!page)return;var added=false;
+  if(!$("wnGuide")){var wn=card("wnGuide","What is new","The latest versions, newest first. The cards below explain each part.");var ul=mk("ul","wn-list");
+    newNow().forEach(function(x){var li=mk("li");li.appendChild(mk("b",null,x[0]));li.appendChild(mk("span",null,x[1]));ul.appendChild(li);});wn.appendChild(ul);
+    var first=$("guideTourCard")||page.querySelector(".card");if(first&&first.parentNode)first.parentNode.insertBefore(wn,first.nextSibling);else page.appendChild(wn);}
+  if(has("page-folders")&&!$("fdGuide")){var f=card("fdGuide","Folders","A folder for each of your apps, so no conversation starts from nothing.");
+    f.appendChild(dl([["What a folder keeps","How you like to work on the app, in your own words; where you left off (a summary); the decisions so far; what is open next."],
+      ["Why it helps","A conversation in a folder starts from those few thousand words instead of every conversation before it: fewer words for the model to read, and nothing to explain again."],
+      ["Where we left off","Brought up to date when you press it, by reading only the conversations not read yet, each once. The model is told never to invent a version, a date, a decision or a file."],
+      ["Bringing your work in","Claude's export (its chats and projects); Claude Code's sessions on this computer, in the computer app; a conversation pasted from Claude Code on the web or from Ollama; an Ollama Modelfile as a way of working. Each is read on this device."],
+      ["What it does not do","No model is retrained. A folder gives the model what it should read about your way of working, briefly."]]));page.appendChild(f);added=true;}
+  if(has("page-career")&&!$("csGuide")){var cs=card("csGuide","The Career Studio","Applications for jobs, PhD places, fellowships and grants, one step at a time.");
+    cs.appendChild(dl([["Today","The single most urgent step across your applications and the people you write to; the rest waits, folded."],
+      ["Applications and people","Each application with its documents and dates; supervisors, referees, recruiters and hiring managers, each with a status and a date to follow up."],
+      ["Drafts","The CV, the cover letter and a portfolio for each application, shaped by templates for 25 roles in 8 fields, with every fact from your profile. Draft an email for me leaves what it does not know in square brackets. You send everything yourself."],
+      ["Postings and LinkedIn","A posting's link is fetched once and read against your profile. Your saved jobs come in from LinkedIn's own copy of your data; nothing signs in to LinkedIn."]]));page.appendChild(cs);added=true;}
+  if(!$("mdGuide")){var md=card("mdGuide","Models: newer ones, and two engines","How Ingenium keeps your models current, and runs them.");
+    md.appendChild(dl([["Check for newer models","On the Models page, in Ingenium's models: it asks Hugging Face, only when you press it, for the newest files of twelve publishers, and offers only those this device can load and hold, with their size and licence. A weekly look is a switch, off until you turn it on."],
+      ["Two engines","On a Mac, the proven engine (llama.cpp) stays the default, and a newer one runs the kinds of model only it can load; if the newer one cannot load a model, the proven one does at once. Windows has the same choice, and its builds will carry the newer engine in a later release. Phones and tablets keep the proven engine."],
+      ["What it cannot know","How well a new model answers, until you try it."]]));page.appendChild(md);added=true;}
+  /* in their order after the other cards of the Guide, whichever came first */
+  if(added){var at=$("cnGuide")||$("ghxGuide")||$("blxGuide")||$("guideEffortCard");
+    ["fdGuide","csGuide","mdGuide"].forEach(function(id){var c=$(id);if(!c||!at||!at.parentNode)return;at.parentNode.insertBefore(c,at.nextSibling);at=c;});}}
+
+/* ================= 6. start ================= */
+function leftovers(){if(touring())return;try{if(dropCode()){var cs=ccState();if(cs.activeCode===CODE_ID)cs.activeCode=null;if(state.activeChat===CODE_ID)state.activeChat=((state.chats||[])[0]||{}).id||null;saveState();try{ccPaintSide();}catch(e){}}}catch(e){}}
+function boot(){try{leftovers();}catch(e){}try{apply();}catch(e){try{console.warn("Ingenium tour:",e);}catch(_){}}try{optional();}catch(e){}try{engineStep();}catch(e){}try{help();}catch(e){}try{guide();}catch(e){}}
+if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
+(function later(){var n=0;(function wait(){if(W.__ingReady===true){boot();setTimeout(function(){try{boot();}catch(e){}},2500);return;}if(++n<400)setTimeout(wait,500);})();})();
+W.addEventListener("load",function(){try{boot();}catch(e){}});
+(function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r222)return;
+  var ng=function(p){var r=og.apply(this,arguments);try{optional();if(p==="guide")guide();if(p==="models")engineStep();}catch(e){}return r;};
+  try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r222=true;W.go=go=ng;})();
+W.IngTourNow={added:function(){return (W.ING_TOUR||[]).filter(function(s){return s.r222;}).map(function(s){return s.chap+": "+bare(s.t);});},whatsNew:newNow,codeId:CODE_ID};
+})();
+;try{window.__ingParts["p222"]="running";}catch(_){}
+</script>

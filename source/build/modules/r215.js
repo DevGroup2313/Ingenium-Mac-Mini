@@ -72,7 +72,10 @@ body.ccp-on:not(.cs-on) #page-chat .chat-card{flex:1 1 auto;min-width:0}
 body.ccp-on.cs-on:not(.ccp-over) #page-chat .chat-card{max-width:calc(100% - 352px - var(--ccp-w,300px))}
 #ccPanel .ccp-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 #ccPanel .ccp-top h2{margin:0;flex:1;font:700 13px/1.3 var(--sans,system-ui,sans-serif);color:var(--ink-1)}
-#ccPanel .ccp-body{overflow:auto;flex:1 1 auto;min-height:0;scrollbar-width:thin}
+#ccPanel .ccp-body{overflow:auto;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
+/* 6.15, her words (4 November 2026): "please hide the scroll bar from the Plan and session panel on the Coding chat page. I want the
+   scrollability kept but I want the scroll bar hidden to match the rest of the app." It scrolls as before, by wheel, touch and keys. */
+#ccPanel .ccp-body::-webkit-scrollbar{display:none;width:0;height:0}
 #ccPanel .ccp-sec{margin:0 0 14px}
 #ccPanel .ccp-h{display:flex;align-items:baseline;gap:6px;margin:0 0 6px;font:700 11px/1.2 var(--sans,system-ui,sans-serif);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 #ccPanel .ccp-h span{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:600}

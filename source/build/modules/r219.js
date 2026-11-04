@@ -26,10 +26,29 @@
 #ccPanel .ghx-pill{display:inline-flex;align-items:center;gap:4px;font:600 11px/1 var(--sans);padding:3px 7px;border-radius:999px;background:var(--accent-soft,rgba(106,63,181,.10));color:var(--ink-2);margin-left:4px;vertical-align:1px}
 #ccPanel .ghx-pill.ok{background:rgba(47,122,85,.14);color:#2f7a55}#ccPanel .ghx-pill.bad{background:rgba(180,72,60,.12);color:#b4483c}
 body[data-theme="night"] #ccPanel .ghx-pill.ok{color:#8fd0a9}body[data-theme="night"] #ccPanel .ghx-pill.bad{color:#f0a097}
-.ghx-sheet .ghx-list{display:flex;flex-direction:column;gap:6px;max-height:min(46vh,420px);overflow:auto;margin:8px 0;padding:2px}
-.ghx-sheet .ghx-repo{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%;border:1px solid var(--hairline,rgba(34,26,46,.14));border-radius:12px;padding:9px 12px;background:var(--card,#fff);cursor:pointer;color:var(--ink-1);font:600 13.5px/1.35 var(--sans)}
+/* 6.15, her words (4 November 2026): "The 'Find a repository' text box area inside of the panel is a little too small, please fix that.
+   I also want the Repository option list to be a little bit more 3D animated to match the rest of the app instead of being just still
+   and flat." The box takes the sheet's width, as tall as the other fields; each repository is a raised key as the app's keys are (a lit
+   face, a rim and a shadow under it), lifting under the pointer and pressing in when pressed, the chosen one held up with an amethyst
+   rim; the rows rise in one after another as they arrive (still when motion is set to minimal or the device asks for less). */
+.ghx-sheet #ghxFind{display:block;width:100%;box-sizing:border-box;min-height:44px;margin:10px 0 2px;padding:10px 14px;font:14.5px/1.3 var(--sans);color:var(--ink-1);
+  border:1px solid var(--hairline,rgba(34,26,46,.16));border-radius:12px;background:var(--card,#fff);box-shadow:inset 0 1px 3px rgba(40,22,68,.10);outline:none;transition:border-color .12s ease,box-shadow .12s ease}
+.ghx-sheet #ghxFind:focus{border-color:var(--accent,#6a3fb5);box-shadow:inset 0 1px 3px rgba(40,22,68,.10),0 0 0 3px var(--accent-soft,rgba(106,63,181,.16))}
+.ghx-sheet .ghx-list{display:flex;flex-direction:column;gap:8px;max-height:min(46vh,420px);overflow:auto;margin:8px 0;padding:6px 6px 10px;scrollbar-width:none;-ms-overflow-style:none}
+.ghx-sheet .ghx-list::-webkit-scrollbar{display:none;width:0;height:0}
+.ghx-sheet .ghx-repo{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%;box-sizing:border-box;flex:0 0 auto;border:1px solid var(--hairline,rgba(34,26,46,.14));border-radius:12px;padding:10px 14px;
+  background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f6f2fb));box-shadow:var(--pop,0 1px 0 rgba(255,255,255,.7) inset,0 2px 0 rgba(40,22,68,.10),0 6px 14px rgba(40,22,68,.10));
+  cursor:pointer;color:var(--ink-1);font:600 13.5px/1.35 var(--sans);transition:transform .14s cubic-bezier(.34,1.35,.64,1),box-shadow .14s ease,border-color .14s ease}
+.ghx-sheet .ghx-repo:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,0 1px 0 rgba(255,255,255,.7) inset,0 3px 0 rgba(40,22,68,.12),0 12px 24px rgba(40,22,68,.16))}
+.ghx-sheet .ghx-repo:active{transform:translateY(1px);box-shadow:inset 0 2px 6px rgba(40,20,70,.22)}
+.ghx-sheet .ghx-repo:focus-visible{outline:2px solid var(--accent,#6a3fb5);outline-offset:2px}
 .ghx-sheet .ghx-repo span{font:400 12px/1.4 var(--sans);color:var(--ink-3)}
-.ghx-sheet .ghx-repo[aria-pressed="true"]{border-color:var(--accent,#6a3fb5);box-shadow:inset 0 0 0 1px var(--accent,#6a3fb5);background:var(--accent-softer,rgba(106,63,181,.06))}
+.ghx-sheet .ghx-repo[aria-pressed="true"]{border-color:var(--accent,#6a3fb5);background:linear-gradient(180deg,var(--card-hi,#fff),var(--accent-softer,rgba(106,63,181,.08)));
+  box-shadow:var(--pop-hi,0 3px 0 rgba(40,22,68,.12),0 12px 24px rgba(40,22,68,.16)),inset 0 0 0 1px var(--accent,#6a3fb5);transform:translateY(-1px)}
+@keyframes ghxIn{from{opacity:0;transform:translateY(8px) scale(.985)}60%{opacity:1;transform:translateY(-1px) scale(1)}to{opacity:1;transform:none}}
+.ghx-sheet .ghx-repo.ghx-in{animation:ghxIn .32s cubic-bezier(.34,1.35,.64,1) both}
+body[data-motion="minimal"] .ghx-sheet .ghx-repo{transition:none;animation:none}body[data-motion="minimal"] .ghx-sheet .ghx-repo:hover{transform:none}
+@media (prefers-reduced-motion:reduce){.ghx-sheet .ghx-repo{transition:none;animation:none}.ghx-sheet .ghx-repo:hover{transform:none}}
 .ghx-sheet .ghx-row2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
 .ghx-sheet .ghx-row2 > *{flex:1 1 180px;min-width:0}
 .ghx-sheet .ghx-note{font-size:12.5px;line-height:1.5;color:var(--ink-3);margin:6px 0}
@@ -267,7 +286,7 @@ function connectSheet(){var s;
     +'<label class="field" style="margin:0"><span>Or another repository (owner/name)</span><input type="text" id="ghxOther" placeholder="owner/name"></label></div>'
     +'<div class="ghx-note" id="ghxSay" role="status"></div>'
     +'<div class="ghx-keys"><button class="btn ghost" type="button" id="ghxOut">Sign out of GitHub</button><button class="btn ghost" type="button" id="ghxNo">Cancel</button><button class="btn primary" type="button" id="ghxGo" disabled>Open it in a new session</button></div>');
-  var list=s.querySelector("#ghxList"),find=s.querySelector("#ghxFind"),br=s.querySelector("#ghxBr"),go=s.querySelector("#ghxGo"),say=s.querySelector("#ghxSay"),other=s.querySelector("#ghxOther"),chosen=null,repos=[];
+  var list=s.querySelector("#ghxList"),find=s.querySelector("#ghxFind"),br=s.querySelector("#ghxBr"),go=s.querySelector("#ghxGo"),say=s.querySelector("#ghxSay"),other=s.querySelector("#ghxOther"),chosen=null,repos=[],fresh=true;
   s.querySelector("#ghxNo").onclick=closeModal;
   s.querySelector("#ghxOut").onclick=function(){try{if(W.fbGitHub&&fbGitHub.signOut)fbGitHub.signOut();else{delete GH().token;delete GH().login;save();}}catch(e){}closeModal();paint();toast("Signed out of GitHub on this device.");};
   function pick(r){chosen=r;[].forEach.call(list.querySelectorAll(".ghx-repo"),function(b){b.setAttribute("aria-pressed",String(b.__r===r));});br.disabled=true;br.innerHTML="<option>Reading its branches…</option>";go.disabled=true;
@@ -276,7 +295,8 @@ function connectSheet(){var s;
       function(e){br.innerHTML='<option value="'+escH(r.branch)+'">'+escH(r.branch)+'</option>';br.disabled=false;go.disabled=false;say.textContent=e&&e.message||String(e);});}
   function draw(){var q=find.value.trim().toLowerCase();list.innerHTML="";var L=repos.filter(function(r){return !q||r.full.toLowerCase().indexOf(q)>=0;});
     if(!L.length){list.appendChild(mk("div","ghx-note",repos.length?"No repository matches.":"No repository found for this token."));return;}
-    L.slice(0,200).forEach(function(r){var b=mk("button","ghx-repo");b.type="button";b.__r=r;b.setAttribute("aria-pressed",String(chosen===r));b.appendChild(D.createTextNode(r.full));
+    var rise=fresh&&repos.length>0;if(repos.length)fresh=false;/* the rows rise in when they first arrive, not again at each letter typed in Find */
+    L.slice(0,200).forEach(function(r,i){var up=rise&&i<14,b=mk("button","ghx-repo"+(up?" ghx-in":""));b.type="button";b.__r=r;if(up){b.style.animationDelay=(i*35)+"ms";b.addEventListener("animationend",function(){b.classList.remove("ghx-in");b.style.animationDelay="";});}b.setAttribute("aria-pressed",String(chosen===r));b.appendChild(D.createTextNode(r.full));
       b.appendChild(mk("span",null,(r.priv?"private · ":"")+"default branch "+r.branch+(r.pushed?" · pushed "+ago(Date.parse(r.pushed)):"")+(r.canPush?"":" · you cannot push here (a copy of your own is offered)")));b.onclick=function(){other.value="";pick(r);};list.appendChild(b);});}
   find.oninput=draw;
   other.oninput=function(){var m=/^\s*([\w.-]+)\/([\w.-]+)\s*$/.exec(other.value);if(m){var r={full:m[1]+"/"+m[2],owner:m[1],repo:m[2].replace(/\.git$/,""),branch:"main",canPush:true};
