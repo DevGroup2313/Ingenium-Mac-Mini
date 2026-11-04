@@ -18,7 +18,7 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
   /* 1. the Workshop, beside Settings */
   const nav = await p.evaluate(() => { const st = document.querySelector('.nav-btn[data-page="settings"]'), ws = document.querySelector('.nav-btn[data-page="workshop"]'); go('workshop');
     return { key: !!ws, after: !!(ws && st && st.nextElementSibling === ws), cards: [...document.querySelectorAll('#page-workshop .card > h2')].map(h => h.textContent), edition: ING_EDITION }; });
-  ok(nav.key && nav.after && nav.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Changing Ingenium itself', 'the Workshop is in the side bar after Settings, with its four cards', nav);
+  ok(nav.key && nav.after && nav.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Your page', 'the Workshop is in the side bar after Settings, with its four cards', nav);
 
   /* 2. the check */
   const chats0 = await p.evaluate(() => (state.chats || []).length);

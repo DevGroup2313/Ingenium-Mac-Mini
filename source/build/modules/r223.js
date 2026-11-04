@@ -117,6 +117,13 @@ function plain(e){return e.net==="full"&&!e.vars.length&&!e.secrets.length&&!Str
     var out=o.call(this,h,seed),ad=early(e),mm=/^(﻿?\s*<!doctype[^>]*>)/i.exec(out);
     return mm?mm[1]+ad+out.slice(mm[1].length):ad+out;};
   n.__r223=1;W.ingStageDoc=ingStageDoc=n;})();
+/* 6.19: every preview, first of all: the list of the browser's stores is refused at once in the sealed frame. Chromium, asked for it
+   there, refuses and also reports a rejection with no reason that nothing can catch, which read as an error of the app previewed (Ingenium's
+   own page, in the Workshop, met it twice and once more in its kits). */
+(function wrapGuard(){var o=W.ingStageDoc;if(typeof o!=="function"||o.__r223g)return;
+  var G=sc("try{if(self.origin==='null'&&window.IDBFactory&&IDBFactory.prototype.databases)IDBFactory.prototype.databases=function(){return Promise.reject(new DOMException('IndexedDB is not available in this sealed preview.','SecurityError'));};}catch(_){}");
+  var n=function(html,seed){var out=o.apply(this,arguments);if(typeof out!=="string")return out;var mm=/^(\uFEFF?\s*<!doctype[^>]*>)/i.exec(out);return mm?mm[1]+G+out.slice(mm[1].length):G+out;};
+  n.__r223=1;n.__r223g=1;W.ingStageDoc=ingStageDoc=n;})();
 /* a change runs the app again, if it is the one shown */
 function rerun(){try{var pg=W.csCur;if(pg&&/^code:/.test(String(pg.sid||""))){pg._ran=null;csRender();}}catch(e){}}
 

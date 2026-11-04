@@ -371,6 +371,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.19 (4 November 2026): Your page, in the master edition's Workshop: Ingenium's own page, changed, in place of the built one.
+Her words: "I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,
+curate, run diagnostics and add or remove new features, pages, sections or different functions in Ingenium as its author and creator."
+Her answer on how changes take effect: both, layers first (6.18), then the page itself (here).
+
+- Your page, the Workshop's fourth card (modules/r227.js; editions.py leaves it out of every other edition). On her computers:
+  - Use the page from Code (the Workshop's copy, as the model or she changed it), or Use a page file: Ingenium asks first, hands the
+    page to the computer app in pieces, keeps it as a version of its own and loads it at once, at the same address and with all her
+    work as it is.
+  - A changed page counts as working once its Workshop reports in. One that has not within half a minute, or did not come up at a
+    start, is left: Ingenium goes back to the last page that worked (or the built one) on its own, says so on the card and once as a
+    notice, and keeps her work as it was. A page that worked before is left after two starts in a row that did not come up.
+  - Running, chosen for the next start, and each version kept (works, did not start, or not tried yet), with Use and Remove; Go back
+    to the built page; Download the page running. At most five versions are kept, beside her stored work.
+  - On a Mac, the app menu gains Use the built page, which works whatever a changed page does.
+  - When Ingenium itself is updated, a page made on the earlier build does not start in place of the new one: the new built page
+    starts, her page is kept, and the card says why. Chosen again, it starts on the new build, as she asks.
+  - Reporting in never changes her choice.
+  - In a browser, the card says how to keep a changed page: download it whole and open that file.
+- The computer apps' side: desktop/app_page_619.py (Mac mini, Mac Intel, Windows), added to release.py's patches.
+- The Workshop's copy in Code is lighter: what the page carries at its end (the apps on the Desk, the engine, the kits, the typefaces;
+  about 61 MB of the 76) is left out, so the model reads and searches about 15 MB; it is put back whenever the page is used, and when
+  Download the app is pressed in Code. The copy is used again while the page running is the one it was made from. The message to
+  the model says the empty blocks are filled when the page is used.
+- Found by the new test: Code's preview runs Ingenium's own page in a sealed frame, where Chromium, asked for the list of the
+  browser's stores, refuses and also reports a rejection with no reason that nothing can catch (three times, for Ingenium's page:
+  its saved Lab models and its old kits). Ingenium's own code handled the refusal; the extra report read as an error of the app.
+  Every preview now refuses that list at once, first of all (modules/r223.js), so the model is not sent after errors that are not
+  there.
+- The Guide's Workshop card gains Your page; the tour's Workshop step and What is new gain 6.19.
+- Not tested here: the window itself. The switch was tested with a stand-in for the computer app (the page side) and on the Python
+  side with a stand-in window; the Mac's and Windows' web views do not run here. If a first real switch goes wrong, Ingenium goes
+  back on its own, and on a Mac the app menu's Use the built page is there too.
+
+    node rig/t_619_page.js <url> <out>                      # 27 checks, with a stand-in for the computer app
+    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py  # 34 checks, Mac and Windows alike
+
 Ingenium 6.18 (4 November 2026): the author's workshop, in the master edition; How I work, on every app in every Code session.
 Her words: "I want to be able to troubleshoot Ingenium inside of the app. I want to be able to run diagnostics and be able to find and fix
 a bug in the app. I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,

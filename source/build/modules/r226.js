@@ -177,10 +177,10 @@ function report(){var r="Ingenium's own check, "+when((LAST&&LAST.at)||Date.now(
   var now=ERR.filter(function(e){return !e.before;}).slice(-12);if(now.length)r+="\n\nErrors since it started:\n"+now.map(function(e){return "- "+when(e.at)+" ["+e.kind+"] "+e.msg+(e.where?" ("+e.where+")":"")+(e.n>1?" (x"+e.n+")":"");}).join("\n");return r;}
 function fix(about){if(typeof selfPageText!=="function"||typeof ccMakeProject!=="function"){toast("Ingenium's own page cannot be opened in Code from here.");return Promise.resolve(null);}
   toast("Opening Ingenium's own page in Code…");
-  return selfPageText().then(function(t){if(!t)throw new Error("its page could not be read from this device");
-      return ccMakeProject("Ingenium (workshop)",[{name:"ingenium.html",text:t}],"ingenium.html");})
+  return (W.IngPage&&IngPage.project?IngPage.project():selfPageText().then(function(t){if(!t)throw new Error("its page could not be read from this device");
+      return ccMakeProject("Ingenium (workshop)",[{name:"ingenium.html",text:t}],"ingenium.html");}))
     .then(function(pr){W.go("code");try{closeModal();}catch(e){}ccNewSession(pr);var inp=$("chatInput");
-      if(inp){inp.value="Ingenium's own check, in the workshop, found what is below. Find the cause in ingenium.html (this copy of Ingenium) and fix it, changing as little as you can. Then run the app and check it starts with no errors, and tell me what you changed and why.\n\n"+(about||report());
+      if(inp){inp.value="Ingenium's own check, in the workshop, found what is below. Find the cause in ingenium.html (this copy of Ingenium) and fix it, changing as little as you can. Then run the app and check it starts with no errors, and tell me what you changed and why."+(W.IngPage&&IngPage.hint?" "+IngPage.hint:"")+"\n\n"+(about||report());
         try{inp.dispatchEvent(new Event("input",{bubbles:true}));inp.focus();}catch(e){}}
       toast("Ingenium's own page is open in Code, with the report in the message box: read it, then send it.");return pr;},
       function(e){toast("Ingenium's own page could not be read here: "+(e&&e.message||e)+". In the computer app it can; in a browser, open the page from its address.");return null;});}
@@ -222,7 +222,8 @@ function paint(){var body=$("wsBody");if(!body)return;body.innerHTML="";
   var k3=mk("div","ws-keys");k3.appendChild(key("ghost",SAFE?"Start with your layers again":"Start without your layers",function(){safeStart(!SAFE);},"Reloads Ingenium"));c3.appendChild(k3);
   c3.appendChild(mk("p","ws-note","A script runs inside Ingenium with all its power: it can read and change your data. Keep only scripts you wrote or understand. If a start ever stops while one of them runs, the next start is without your layers, and says which."));
   body.appendChild(c3);
-  /* the next step */
+  /* the page itself (r227, 6.19): Your page; otherwise what comes next */
+  if(W.IngPage&&IngPage.card){IngPage.card(body);return;}
   var c4=card("Changing Ingenium itself","Find and fix with a model opens Ingenium's own page in Code: the model reads and changes ingenium.html, the preview runs the changed Ingenium, and every change is a version you can undo. Download the app keeps the changed page. Next: on your computers, the changed page will take the place of the installed one, and go back to the last working version if it does not start.");body.appendChild(c4);}
 function paintRes(res,lines){res.innerHTML="";var ul=mk("ul","ws-list");lines.forEach(function(l){var li=mk("li",l.st);li.appendChild(mk("span","m",l.st==="ok"?"✓":l.st==="warn"?"!":"✗"));var t=mk("span");t.innerHTML=l.t;li.appendChild(t);ul.appendChild(li);});res.appendChild(ul);
   res.appendChild(mk("p","ws-note","Checked "+when((LAST&&LAST.at)||Date.now())+". Wrong: something does not work. Look: worth a look, it may be fine."));}
@@ -284,7 +285,8 @@ function guideCard(){var page=$("page-guide");if(!page||$("wsGuide"))return;var 
   c.appendChild(mk("h3",null,"The Workshop"));var p0=mk("p","small muted","In your master edition only, after Settings: Ingenium's author's workshop.");p0.style.marginTop="0";c.appendChild(p0);
   var dl=mk("dl");[["Check Ingenium","Every part, every page, both stores, the room, the engine, your connections and connectors, the sign-in and the errors, each in plain words; Copy the report."],
     ["Errors since it started","Every error the page meets, with when and where; the last 50 kept across restarts."],
-    ["Find and fix with a model","Ingenium's own page opens as an app in Code, with the report or one error in the message box: the model finds the cause and changes ingenium.html, the preview runs the changed Ingenium, and every change can be undone. Download the app keeps the changed page."],
+    ["Find and fix with a model","Ingenium's own page opens as an app in Code, with the report or one error in the message box: the model finds the cause and changes ingenium.html, the preview runs the changed Ingenium, and every change can be undone. The copy leaves out what the page carries at its end (the apps on the Desk, the engine, the kits), so it is lighter to read; it is put back whenever the page is used or downloaded."],
+    ["Your page","On your computers, the page changed in Code (or a page file of your own) takes the place of the one Ingenium was built with, at once, with all your work as it is. A changed page that does not start is left: Ingenium goes back to the last page that worked on its own, and says so. Earlier versions can be used again or removed, and the built page is always one choice away (on a Mac, in the app menu too)."],
     ["Your layers","Pages of your own in the side bar (each in a frame of its own, apart from your data), sections added to any page, scripts that run in Ingenium as it starts (with all its power: keep only those you understand), styles that win over Ingenium's own, and pages or cards you hide. Nothing in the built page changes."],
     ["A safe start","Start without your layers, from the Workshop; and on its own, when the last start stopped while one of your scripts ran. Ingenium says which."]].forEach(function(r){dl.appendChild(mk("dt",null,r[0]));dl.appendChild(mk("dd",null,r[1]));});
   c.appendChild(dl);var at=$("envGuide")||$("ghxGuide")||$("cnGuide");if(at&&at.parentNode)at.parentNode.insertBefore(c,at.nextSibling);else page.appendChild(c);}

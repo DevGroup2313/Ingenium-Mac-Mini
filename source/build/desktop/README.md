@@ -74,3 +74,16 @@ it from the same tree as the trainer; the workflows are not changed by this patc
   `cp` of the `.exe` into `engine-trainer/windows-x64/`), lines 102-103 (the `z.write(...)` into the engine pack) and the cache key
   on line 78 (`-v1` becomes `-v2`). The app unpacks the pack by a tag of its size and first megabyte, so a pack with one more
   program is unpacked afresh.
+
+6.19, `app_page_619.py` (Mac and Windows): Ingenium's own page, changed by its author, in place of the built one (the Workshop's
+Your page, modules/r227.js, the master edition). Five calls: `page_state`, `page_put` (a changed page in pieces of text, kept as
+`<the app's folder>/pages/<date-time>/ingenium.html`, beside storage, with what the page carries at its end put back from the
+running page where it names it but lacks it), `page_use` (a version, or "" for the built page; now, in the window, or at the next
+start), `page_drop` and `page_started` (the page's Workshop reports in: that version works). The app's own server serves the chosen
+page at the built page's address, so the stored work and the origin are the same. A changed page that never worked is left when it
+has not reported in within half a minute, when the load watchdog finds it not started, or at the next start after one that did not
+come up; one that worked is left after two such starts in a row. Ingenium then goes back to the last version that worked, or to the
+built page, and keeps why (`pages.json`), for the Workshop to say. At most five versions are kept (the one in use, the one running and
+the last that worked always stay). On a Mac, the app menu gains "Use the built page", which needs nothing from the page.
+Test: `python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py` (34 checks, Mac and Windows alike).
+

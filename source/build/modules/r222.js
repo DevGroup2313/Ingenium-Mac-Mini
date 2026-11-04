@@ -145,7 +145,7 @@ var S={
     b:"Settings, Connectors: add a connector by its address, and a token if it asks for one (kept on this device and sent only to that server). Its tools are listed, each saying whether it only reads or asks you first."},
   workshop:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("workshop");},ring:'.nav-btn[data-page="workshop"]',
     t:"🛠 The Workshop",
-    b:"In your master edition, the Workshop, after Settings: check Ingenium in plain words, see every error since it started, and find and fix one with a model on Ingenium's own page in Code. Add pages, sections, scripts and styles of your own, or hide what you do not use; a safe start runs Ingenium without them."},
+    b:"In your master edition, the Workshop, after Settings: check Ingenium in plain words, see every error since it started, and find and fix one with a model on Ingenium's own page in Code. Add pages, sections, scripts and styles of your own, or hide what you do not use; a safe start runs Ingenium without them. On your computers, Your page puts a page changed in Code in place of the built one, and goes back on its own if it does not start."},
   settingsLock:{r222:1,levels:ALL,chap:"Settings",go:function(){goPage("settings");},ring:"#ingLockCard",
     t:"🔐 Your data, sealed",
     b:"An optional sign-in of your own, a name and a password, seals your data on this device. Several ways back in open it: the password, ten words you keep, a key file on a stick or a drive, and a hint. On a Mac or a Windows computer, its own sign-in (Touch ID or Windows Hello) can be one more.",
@@ -233,7 +233,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
-var NEW=[["6.18","In your master edition, the Workshop: check Ingenium, see its errors, find and fix one with a model, and add pages, sections, scripts and styles of your own.","master"],
+var NEW=[["6.19","In your master edition, Your page, in the Workshop: on your computers, Ingenium's page changed in Code (or a page file) takes the place of the built one at once, with your work as it is; one that does not start is left, and Ingenium goes back to the last page that worked on its own.","master"],
+  ["6.18","In your master edition, the Workshop: check Ingenium, see its errors, find and fix one with a model, and add pages, sections, scripts and styles of your own.","master"],
   ["6.18","How I work, on every app now goes with every Code session and every request Build makes."],
   ["6.17","Effort wherever a model is chosen: Build has its own, with Ultracode; Lector, the Career Studio and Folders share one, with Ultra to check each piece against its material."],
   ["6.16","A Code session's environment, as in Claude: network access, secrets for sites, a setup script and variables, applied to the app as it runs. No scroll bar in sight anywhere, and everything still scrolls."],
