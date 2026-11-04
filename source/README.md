@@ -400,6 +400,32 @@ while keeping the scrolling functionality intact. I don't like seeing them in vi
     node rig/t_616_env.js <url> <out>       # 22 checks, with an invented app and two stand-in sites
     node rig/t_616_scroll.js <url> <out>    # 9 checks, in a browser that draws real scroll bars (Playwright hides them by default)
 
+The working audit of 6.16 (4 November 2026). Her words: "I really want for every new feature and everything else inside of Ingenium
+works and works well, that is really key to me. I need for the chat pages and all of their new features and sections work well in the
+way that they are supposed to. I want the same for the Folders page and the Career Studio. I really want for Ingenium to not just be a
+pretty shell or a pretty purple app". Every pass-or-fail test of those parts was run on the 6.16 release page, with stand-in models,
+sites and services and invented people:
+- Chat: t_open_chat 10/0, t_694_plus_switches 54/0, t_694_sources 14/0, t_695_memory 30/0, t_695_openin 16/0, t_696_cards 11/0,
+  t_claude 27/0, t_6111_popups 17/0, t_694_cloud_limits 23/0, t_6811_connections 11/0, t_690_agent 44/0, t_614_connectors 24/0.
+- Code: t_611_code 37/0, t_613_github 43/0, t_614_code_more 9/0, t_615_code_look 10/0, t_616_env 22/0, t_63_code_editor_app 9/0.
+- Folders: t_610_folders 21/0. The sign-in: t_699_recovery 24/0, t_700_lock 58/0.
+- The Career Studio: t_6812_career 25/0, t_683_career 48/0, t_685_career 25/0, t_696_profile_file 13/0, t_697_people 14/0,
+  t_697_back_link 12/0, t_698_job_link 28/0, t_702_career_dates 15/0, _export 15/0, _interview 17/0, _lector 13/0, _linkedin 17/0,
+  _minutes 11/0, _reading 18/0, _refs 12/0, _snapshot 11/0, t_6102_templates 12/0, t_6102_scroll 13/0, t_6102_ui 17/0,
+  t_6103_more 12/0, t_6104_fixes 9/0.
+- What was found: four tests (t_683_career, t_685_career, t_702_career_lector, t_6102_scroll) failed one check each while four
+  browsers ran at once and passed alone, on 6.16 as on 6.14: their checks read the page before a colour's change or a step had
+  finished under that load. Two tests had not followed the app: t_702_career_minutes read Today before its three steps were shown (Today
+  has shown one step at a time since 6.9.7; the test now presses Show three at once, as she would), and t_claude stopped at a picture
+  of a card folded in its room (the picture is now optional; every check of it passes). No fault of the app was found.
+- Her "the chat inside of the panel keeps on glitching back and forth" (6.11.2's guards): rig/t_617_glitch.js sets up a Code session
+  as in her pictures and the Chat page with a long conversation, and watches every size, place and layout class at 19 window widths
+  and two heights while nothing happens, and the scroll while a reply is written: nothing changes back and forth, in Chromium. What it
+  cannot see: the Mac app shows the page in Safari's engine (WebKit), which this machine does not have; her description of when it
+  happens is still needed to find it there.
+
+    node rig/t_617_glitch.js <url> <out>    # 6 checks
+
 Ingenium 6.15 (4 November 2026): the guided tour, its demonstrations and the Guide, up to date in every edition. Her words: "Please
 make sure that the guided tour and its demonstrations are also updated as well as the Guide page to reflect the latest pages and
 sections as well as updates recently made to Ingenium, they should all be properly updated to reflect the latest version of Ingenium,

@@ -111,7 +111,8 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,zipfile,os\nd,z=sys.argv[1],
   await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForTimeout(900);
   const room = await p.evaluate(() => ({ t: (document.getElementById('r132Sum') || {}).textContent || '', key: !!document.getElementById('clSetKey'), w: (document.getElementById('r132Fill') || {}).style ? document.getElementById('r132Fill').style.width : '' }));
   ok(/Ingenium uses .* here; the browser offers it about/.test(room.t) && /small store/.test(room.t) && room.key, 'Settings, Data on this device, says how much room Ingenium uses and offers, and has the key to bring in Claude data', JSON.stringify(room));
-  await p.locator('#r132Room').scrollIntoViewIfNeeded(); await p.screenshot({ path: path.join(OUT, 'settings_room.png') });
+  // a picture for the record only: the card may sit folded in its room, which is no fault of what is checked
+  await p.locator('#r132Sum').scrollIntoViewIfNeeded({ timeout: 3000 }).catch(() => {}); await p.screenshot({ path: path.join(OUT, 'settings_room.png') });
   const full = await p.evaluate(() => new Promise(res => { const real = Storage.prototype.setItem; window.__realSet = real;
     Storage.prototype.setItem = function (k, v) { if (this === localStorage && k === KEY) { const e = new Error('full'); e.name = 'QuotaExceededError'; throw e; } return real.call(this, k, v); };
     state.appName = 'Overflow test'; saveState(); setTimeout(() => window.__r132.get().then(r => res({ lsOk: r && r.lsOk, has: !!(r && r.raw && /Overflow test/.test(r.raw)), toast: (document.getElementById('ingToast') || {}).textContent || '', ls: /Overflow test/.test(localStorage.getItem(KEY) || '') })), 900); }));
