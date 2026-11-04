@@ -77,9 +77,12 @@ function paintStates(){try{if(!(W.CC&&CC.mode==="code"))return;var c=cur(),sig=[
 setInterval(function(){if(!D.hidden)paintStates();},1200);
 
 /* ================= 3. a step that pushed or opened a pull request carries its link ================= */
-(function wrapFill(){var o=W.fillMsg;if(typeof o!=="function")return;var n=function(d,mm){var r=o.apply(this,arguments);try{if(mm&&mm.role==="bot"&&mm.steps&&mm.steps.some(function(s){return s&&s.url;})){
-      var lis=d.querySelectorAll(".ag-steps li");mm.steps.forEach(function(s,i){var li=lis[i];if(!li||!s||!s.url||li.querySelector("a.stp-link"))return;if(!/^https:\/\/github\.com\//.test(s.url))return;
-        var a=mk("a","stp-link",s.linkText||"open on GitHub");a.href=s.url;a.target="_blank";a.rel="noopener noreferrer";li.appendChild(a);});}}catch(e){}return r;};
+/* the working loop draws its steps after the rest of the reply (modules/r190.js wraps fillMsg when the page has loaded, outside this
+   one), so the links are added just after the reply is drawn */
+function links(d,mm){try{if(!(mm&&mm.role==="bot"&&mm.steps&&mm.steps.some(function(s){return s&&s.url;})))return;
+    var lis=d.querySelectorAll(".ag-steps li");mm.steps.forEach(function(s,i){var li=lis[i];if(!li||!s||!s.url||li.querySelector("a.stp-link"))return;if(!/^https:\/\/github\.com\//.test(s.url))return;
+      var a=mk("a","stp-link",s.linkText||"open on GitHub");a.href=s.url;a.target="_blank";a.rel="noopener noreferrer";li.appendChild(a);});}catch(e){}}
+(function wrapFill(){var o=W.fillMsg;if(typeof o!=="function")return;var n=function(d,mm){var r=o.apply(this,arguments);if(mm&&mm.steps&&mm.steps.length)Promise.resolve().then(function(){links(d,mm);});return r;};
   try{Object.keys(o).forEach(function(k){if(n[k]===undefined)n[k]=o[k];});}catch(e){}n.__r221=1;W.fillMsg=fillMsg=n;})();
 
 W.IngAtMention={files:files,mentioned:mentioned,paintStates:paintStates,stateOf:stateOf,paint:paint};
