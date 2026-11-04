@@ -89,6 +89,11 @@ body[data-theme="night"] .ag-ask textarea{color:#f3eefb;border-color:rgba(205,18
 #agBuild .agb-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:0 0 8px}
 #agBuild .agb-head b{font:700 15px/1.3 var(--serif,"Iowan Old Style",Georgia,serif)}
 #agBuild .agb-who{font-size:12px;color:var(--ink-3,#6c6579)}
+#agBuild .agb-eff{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 10px}
+#agBuild .agb-effl{display:inline-flex;align-items:center;gap:8px;font:600 12.5px/1 var(--sans,system-ui,sans-serif);color:var(--ink-2,#4a4358)}
+#agBuild .agb-effsel{font:600 12.5px/1.2 var(--sans,system-ui,sans-serif);color:var(--ink-1,#221a2e);padding:6px 10px;border-radius:10px;border:1px solid var(--hairline,rgba(34,26,46,.14));background:linear-gradient(var(--card-hi,#fff),var(--card-lo,#f6f2fb));box-shadow:var(--pop,0 1px 2px rgba(40,22,68,.12))}
+#agBuild .agb-effsay{flex:1 1 220px;min-width:0;font-size:12px;line-height:1.45;color:var(--ink-3,#6c6579)}
+#agBuild .eff-says{font-size:12px;color:var(--ink-3,#6c6579);margin:0 0 6px}
 #agBuild .agb-ways{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border-radius:11px;background:rgba(34,26,46,.035);border:1px solid var(--hairline,rgba(34,26,46,.08))}
 #agBuild .agb-ways button{border:0;background:transparent;color:var(--ink-2,#4a4358);font:600 12.5px/1 var(--sans,system-ui,sans-serif);padding:7px 11px;border-radius:8px;cursor:pointer}
 #agBuild .agb-ways button[aria-checked="true"]{background:linear-gradient(#ffffff,#f6f2fb);color:var(--ink-1,#221a2e);box-shadow:inset 0 0 0 1px var(--accent,#6a3fb5),0 1px 2px rgba(40,22,68,.12)}
@@ -598,6 +603,16 @@ function askCard(a){if(a.el)return a.el;var i=a.info,box=document.createElement(
 
 /* ---------- Build: ask a model to change the page ---------- */
 var BS={el:null,busy:false,ab:null,stop:0,before:null,hist:[]};
+var BEFF=[["auto","Auto"],["1","Low"],["2","Medium"],["3","High"],["4","Extra"],["5","Max"],["ultra","Ultracode"]];
+function buildEffOf(){var v=state.agent&&state.agent.buildEff;return v==="auto"||v==="ultra"||/^[1-5]$/.test(String(v))?String(v):"auto";}
+function buildEffSay(v){var L=window.IngEffort&&IngEffort.levels;if(v==="auto")return "Chosen for each request, from what it asks: never Max.";
+  if(v==="ultra")return "Max effort, with a plan: it builds, runs checks in the page as it runs, and fixes what fails, until every check passes.";
+  return L&&L[+v]?L[+v].line:"";}
+function buildEffort(req,mo){var v=buildEffOf(),o={cloud:mo.kind==="cloud",provider:(state.cloud||{}).provider};
+  try{if(!window.IngEffort||!IngEffort.forLevel)return null;
+    if(v==="ultra")return IngEffort.forLevel(5,Object.assign(o,{ultra:true}));
+    if(v==="auto"){var pk=IngEffort.pick(req,{code:true})||{};return IngEffort.forLevel(Math.max(1,Math.min(4,+pk.lv||3)),Object.assign(o,{auto:true,why:pk.why||""}));}
+    return IngEffort.forLevel(+v,o);}catch(e){return null;}}
 function buildWayOf(){var w=state.agent&&state.agent.buildWay;return WAYS[w]?w:lastWay();}
 function buildText(){try{if(window.IngBuild&&typeof IngBuild.text==="function")return IngBuild.text();}catch(e){}var ce=$("codeEditor");return ce?ce.value:"";}
 function buildSet(t){var d=state.buildDoc||{};
@@ -612,11 +627,13 @@ function buildPaint(){if(!BS.el)return;var w=buildWayOf(),mo=buildModel();
   [].forEach.call(BS.el.querySelectorAll(".agb-ways button"),function(b){var on=b.getAttribute("data-way")===w;b.setAttribute("aria-checked",on?"true":"false");b.tabIndex=on?0:-1;});
   BS.el.querySelector(".agb-say").textContent=WAYS[w].say;
   BS.el.querySelector(".agb-who").textContent=mo?"It uses "+mo.name+", as Chat does.":"No model is ready: connect one (Settings) or load one on the Models page. Chat's choice is used here.";
-  BS.el.querySelector(".agb-go").hidden=BS.busy;BS.el.querySelector(".agb-stop").hidden=!BS.busy;}
+  BS.el.querySelector(".agb-go").hidden=BS.busy;BS.el.querySelector(".agb-stop").hidden=!BS.busy;
+  var es=BS.el.querySelector(".agb-effsel"),ev=buildEffOf();if(es){es.value=ev;es.disabled=BS.busy;}var esy=BS.el.querySelector(".agb-effsay");if(esy)esy.textContent=buildEffSay(ev);}
 function buildMake(){if(BS.el)return true;var grid=$("buildGrid");if(!grid||!grid.parentNode)return false;
   var s=document.createElement("section");s.id="agBuild";s.setAttribute("aria-label","Ask a model to change this page");
   s.innerHTML='<div class="agb-head"><b>Ask a model to change this page</b><span class="agb-who"></span></div>'+
     '<div class="agb-ways" role="radiogroup" aria-label="How should it work on this task?"></div><p class="agb-say"></p>'+
+    '<div class="agb-eff"><label class="agb-effl"><span>Effort</span><select class="agb-effsel" aria-label="Effort for Build\'s requests"></select></label><span class="agb-effsay"></span></div>'+
     '<div class="agb-row"><textarea class="agb-in" rows="2" placeholder="Describe a change, a feature or a bug. Enter sends; Shift+Enter breaks a line." aria-label="What should change in this page?"></textarea>'+
     '<button type="button" class="btn primary small agb-go">Ask</button><button type="button" class="btn small agb-stop" hidden>Stop</button></div>'+
     '<div class="agb-out" aria-live="polite"></div><div class="agb-after" hidden><button type="button" class="btn small agb-undo">Undo these changes</button></div>';
@@ -626,6 +643,10 @@ function buildMake(){if(BS.el)return true;var grid=$("buildGrid");if(!grid||!gri
     b.onclick=function(){pick(w);};ways.appendChild(b);});
   ways.addEventListener("keydown",function(e){if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;e.preventDefault();var i=ORDER.indexOf(buildWayOf()),n=ORDER[(i+(e.key==="ArrowRight"?1:2))%3];
     pick(n);var b=ways.querySelector('[data-way="'+n+'"]');if(b)b.focus();});
+  /* 6.17: Build's own effort, as Chat's: Auto, Low to Max, or Ultracode (her words, 3 November 2026: "I want to be able to select low
+     to Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside of Ingenium") */
+  var es=s.querySelector(".agb-effsel");BEFF.forEach(function(o){var op=document.createElement("option");op.value=String(o[0]);op.textContent=o[1];es.appendChild(op);});
+  es.onchange=function(){state.agent=state.agent||{};state.agent.buildEff=es.value;saveState();buildPaint();};
   var inp=s.querySelector(".agb-in");inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();buildAsk();}});
   s.querySelector(".agb-go").onclick=buildAsk;
   s.querySelector(".agb-stop").onclick=function(){BS.stop++;try{if(BS.ab)BS.ab.abort();}catch(e){}try{if(buildModel()&&buildModel().kind==="local")Engine.abort();}catch(e){}};
@@ -649,13 +670,16 @@ function buildAsk(){if(BS.busy||!BS.el)return;var inp=BS.el.querySelector(".agb-
     ask:function(info){return new Promise(function(res){var a={info:info,note:"",done:false};var t=setInterval(function(){if(stopped())a.answer("stop");},400);
       a.answer=function(act){if(a.done)return;a.done=true;clearInterval(t);askEl.innerHTML="";res({act:act,note:String(a.note||"").trim()});};askEl.appendChild(askCard(a));});}};
   BS.before=text;BS.busy=true;buildPaint();inp.value="";
-  var sys=note(ws,way,false),turns=BS.hist.slice(-6).concat([{role:"user",content:req}]);
-  var cfg={ws:ws,way:way,plan:false,stopped:stopped,ui:ui,
+  var E=buildEffort(req,mo),ultra=!!(E&&E.ultra)&&way!=="guide",chk=ultra&&canRun(ws);
+  if(E&&(E.auto||E.ultra)){var es0=document.createElement("div");es0.className="eff-says";var L0=(window.IngEffort&&IngEffort.levels&&IngEffort.levels[E.lv])||{name:"High"};
+    es0.textContent=E.ultra?"Ultracode, at Max effort.":"Auto chose "+L0.name+" effort"+(E.why?": "+E.why+".":".");out.insertBefore(es0,out.firstChild);}
+  var sys=note(ws,way,false,{plan:ultra,ultra:ultra,check:chk}),turns=BS.hist.slice(-6).concat([{role:"user",content:req}]);
+  var cfg={ws:ws,way:way,plan:false,stopped:stopped,ui:ui,ultra:ultra,
     commit:function(){var f=ws.files[0];if(f.text===f.orig)return Promise.resolve(0);if(f.text!==buildText())buildSet(f.text);f.orig=f.text;return Promise.resolve(1);}};
-  if(mo.kind==="cloud"){var fam=family(state.cloud.provider);cfg.turn=turnFor(state.cloud.provider);cfg.small=false;cfg.limit=fam==="ollama"?30:60;
-    cfg.S={tools:toolsFor(way==="guide"),think:thinkOn(),fallback:true,ab:ab};if(fam==="anthropic"){cfg.S.sys=sys;cfg.S.msgs=turns;}else cfg.S.msgs=[{role:"system",content:sys}].concat(turns);}
-  else{var params={};try{params=replyParams(mo.m,{max_tokens:Math.max(replyTokens(),4096),ctx:+$("ctlCtx").value,thinking:false});}catch(e){}
-    cfg.turn=localTurn;cfg.small=true;cfg.limit=16;cfg.S={msgs:[{role:"system",content:sys+"\n\n"+localNote(toolsFor(way==="guide"))}].concat(turns),params:params,room:roomOf()};}
+  if(mo.kind==="cloud"){var fam=family(state.cloud.provider);cfg.turn=turnFor(state.cloud.provider);cfg.small=false;cfg.limit=E?(fam==="ollama"?Math.ceil(E.steps/2):E.steps):(fam==="ollama"?30:60);
+    cfg.S={tools:toolsFor(way==="guide",{plan:ultra,check:chk,ws:ws}),think:thinkOn()&&!(E&&E.lv<=1&&fam!=="anthropic"),fallback:true,ab:ab,effort:E};if(fam==="anthropic"){cfg.S.sys=sys;cfg.S.msgs=turns;}else cfg.S.msgs=[{role:"system",content:sys}].concat(turns);}
+  else{var params={};try{params=replyParams(mo.m,{max_tokens:Math.max(replyTokens(),4096),ctx:+$("ctlCtx").value,thinking:!!(E&&E.lv>=2&&thinkOn())});}catch(e){}
+    cfg.turn=localTurn;cfg.small=true;cfg.limit=E?E.lsteps:16;cfg.S={msgs:[{role:"system",content:sys+"\n\n"+localNote(toolsFor(way==="guide",{plan:ultra,check:chk,ws:ws}))}].concat(turns),params:params,room:roomOf()};}
   if(mo.kind==="local"){try{Engine.setStatus("busy");}catch(e){}}
   var ended=false;
   loop(cfg).then(function(r){BS.hist.push({role:"user",content:req});BS.hist.push({role:"assistant",content:r.text.slice(0,4000)});

@@ -225,6 +225,9 @@ function openaiBody(body,p,m,lv){lv=lv||levelNow();if(REFUSED[p+"|"+m]||!reasoni
 function ollamaThink(m,lv){lv=lv||levelNow();if(/gpt-oss/i.test(String(m||"")))return ["low","low","medium","high","high","high"][lv];return true;}
 function claudeKey(){var lv=levelNow();return CLAUDE[lv]||"high";}
 function thinkMul(eff){var l=LV[+eff]||LV[3];return l.mul;}
+/* 6.17: the same settings for a level chosen elsewhere (Build's own effort, the writing pages'), not the chat's */
+function forLevel(lv,o){o=o||{};var ul=!!o.ultra;lv=ul?5:(+lv>=1&&+lv<=5?+lv:3);var L=LV[lv],sv=o.cloud?(o.provider||provider()):"";
+  return {lv:lv,ultra:ul,auto:!!o.auto,why:o.why||"",steps:ul?ULTRA.steps:L.steps,lsteps:ul?ULTRA.lsteps:L.lsteps,claude:CLAUDE[lv],reason:reasoningModel(sv,o.cloud?modelId():"")?reasonOf(lv):null};}
 function forRun(o){o=o||{};var c=cur(),ul=ultraOn(c),lv=ul?5:levelNow(),L=LV[lv];
   var sv=o.cloud?(o.provider||provider()):"";
   return {lv:lv,ultra:ul,auto:isAuto(),why:(W.IngEffort.last&&W.IngEffort.last.why)||"",steps:ul?ULTRA.steps:L.steps,lsteps:ul?ULTRA.lsteps:L.lsteps,
@@ -597,7 +600,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 window.addEventListener("load",function(){hook();setTimeout(hook,1500);});
 window.addEventListener("resize",function(){try{paintPanel();}catch(e){}});
 
-W.IngEffort={levels:LV,ultra:ULTRA,levelNow:levelNow,isAuto:isAuto,ultraOn:ultraOn,ultraCan:ultraCan,pick:pick,forRun:forRun,claudeKey:claudeKey,openaiBody:openaiBody,
+W.IngEffort={levels:LV,ultra:ULTRA,levelNow:levelNow,isAuto:isAuto,ultraOn:ultraOn,ultraCan:ultraCan,pick:pick,forRun:forRun,forLevel:forLevel,claudeKey:claudeKey,openaiBody:openaiBody,
   ollamaThink:ollamaThink,thinkMul:thinkMul,ctxNow:ctxNow,replyRoom:replyRoom,refused:function(p,m){REFUSED[p+"|"+m]=1;},last:null,beforeSend:beforeSend,popFor:popFor};
 W.IngJobs=IngJobs;
 W.IngR215={planChanged:planChanged,jobs:jobsNow,queueFromInput:queueFromInput,drain:drain,paintKey:paintKey,openMenu:openMenu,closeMenu:closeMenu,panel:panelOpen,paintPanel:paintPanel,

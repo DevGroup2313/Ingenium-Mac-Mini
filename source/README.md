@@ -371,6 +371,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.17 (4 November 2026): effort wherever a model is chosen. Her words (3 November 2026): "I want to be able to select low to
+Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside of Ingenium."
+
+- Measured on 6.16: Chat, Code and Blend had effort (6.11, 6.12). Lector, the Career Studio and Folders, which share one model (the
+  model Lector uses), asked it through lxAsk with thinking always off and the chat's own effort; Build's Ask a model to change this page
+  ran the working loop with a fixed number of steps and the chat's thinking. Fabrica chooses no model: it hands work to Chat and Code.
+- Lector, the Career Studio and Folders now share one writing effort (modules/r225.js), shown beside their model on each page (Lector's
+  Who reads and writes, the studio's How the studio works, a folder's Where we left off), one choice as their model is one: Auto, Low,
+  Medium, High, Extra, Max or Ultra. Auto reads quickly (Low) and writes at High through a connection; on this device it stays quick, to
+  keep long work moving. Through a connection, the request carries its level, its thinking and its room; on this device, its thinking
+  and a thinking room by the model's size, added to the writing room. Ultra writes at Max and then has each piece checked against its
+  own material (every name, date, number, title, place, claim and quotation) and corrected; a correction that loses the form asked for
+  (its JSON, its headings) or most of its length is not taken, and reading is never checked twice. The effort is put on the request
+  where lxAsk makes it (two edits in build_page.py), so the recipe (r126) and the guard against writing that repeats itself (r148)
+  keep working around it.
+- Build has an effort of its own beside How should it work (modules/r190.js; r215.js lends it the settings of a level): Auto, Low to
+  Max, or Ultracode. Its requests carry it as Chat's do: the service's effort or reasoning, the number of steps, and with Ultracode the
+  plan, the checks run in the page and up to three times sent back while something is unfinished. Auto says under the request what it
+  chose and why.
+- The Guide's card on effort says where effort is chosen beyond Chat and Code.
+
+    node rig/t_617_effort.js <url> <mock url> <out>   # 15 checks: a stand-in connection and engine, and the stand-in Claude for Build
+
 Ingenium 6.16 (4 November 2026): a Code session's environment, as in Claude's; and no scroll bar in sight. Her words: "When I click on
 the Settings button for the Environment section on the Coding chat inside of Ingenium, it just opens up the Controls panel, it does not
 open the settings for the editing the Environment unlike Claude's coding chat settings, please make the fix to bridge that gap as well.

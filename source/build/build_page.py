@@ -1203,6 +1203,19 @@ edit('return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type
      'return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type")||"";return netReadBody(r,o.onChunk,ab).then(function(t){var x=netResult(r.status,t,ct);x.headers=r.headers;return x;});},',
      "6.14 a response's headers when the page asks directly")
 
+# ---- 6.17 (4 November 2026): effort wherever a model is chosen (modules/r225.js). Her words (3 November 2026): "I want to be able to
+#      select low to Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside
+#      of Ingenium." Lector, the Career Studio and Folders ask through lxAsk, which r126 (the recipe) and r148 (the guard against writing
+#      that repeats itself) wrap; the effort is put on the request here, at the bottom, so every wrapper keeps working: through a
+#      connection, its level, its thinking and its room; on this device, its thinking and its thinking room. With r225 absent, nothing
+#      changes. ----
+edit(r"""{var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     r"""{var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;try{if(window.IngWriteEffort)IngWriteEffort.onCloud(ab,msgs);}catch(_e){}""",
+     "6.17 Lector's request through a connection carries its effort")
+edit(r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP[3],{max_tokens:maxTok,temperature:temp,thinking:false});""",
+     r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP[3],{max_tokens:maxTok,temperature:temp,thinking:false});try{if(window.IngWriteEffort)IngWriteEffort.onLocal(params,m,msgs);}catch(_e){}""",
+     "6.17 Lector's request on this device carries its effort")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

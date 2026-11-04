@@ -230,7 +230,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
-var NEW=[["6.16","A Code session's environment, as in Claude: network access, secrets for sites, a setup script and variables, applied to the app as it runs. No scroll bar in sight anywhere, and everything still scrolls."],
+var NEW=[["6.17","Effort wherever a model is chosen: Build has its own, with Ultracode; Lector, the Career Studio and Folders share one, with Ultra to check each piece against its material."],
+  ["6.16","A Code session's environment, as in Claude: network access, secrets for sites, a setup script and variables, applied to the app as it runs. No scroll bar in sight anywhere, and everything still scrolls."],
   ["6.15","The guided tour and the Guide up to date in every edition; the Code column without a scroll bar; a wider, raised repository picker."],
   ["6.14","Connectors, as in Claude, in Chat and in Code; @ to point the model at a file; each Code session's state in the list."],
   ["6.13","Code on your GitHub repositories: a branch read as it is now, your changes pushed to a branch of their own, pull requests and their checks."],
