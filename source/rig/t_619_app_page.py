@@ -1,6 +1,6 @@
 """Ingenium 6.19: the computer apps' side of Your page (build/desktop/app_page_619.py), on an ingenium_app.py it has patched.
 A stand-in page and folders made for the test, in a folder of their own that is not the person's; every page here is invented.
-    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py      (34 checks, Mac and Windows alike)"""
+    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py      (34 checks, and 38 with app_page_620.py; Mac and Windows alike)"""
 import importlib.util, os, sys, tempfile, time, json, urllib.request, threading
 app = sys.argv[1]
 tmp = tempfile.mkdtemp(prefix="pg619-")
@@ -99,4 +99,17 @@ m._page_started(); open(built, "w").write(page("built, a newer build, longer tha
 check("after the update: the new built page starts, and why is kept", m._page_choose(built) == built and "earlier build" in (m._pages_read()["back"] or {}).get("why", ""), m._pages_read()["back"])
 m._page_use(v1)
 check("chosen again on the new build, it starts as she asks", m._page_choose(built) == f1)
+# 6.20 (app_page_620.py): downloads written by the app from the file itself
+if hasattr(m, "_page_save"):
+    os.makedirs(os.path.join(tmp, "Downloads"), exist_ok=True)
+    m._set_app_page(f1)
+    r6 = m._page_save("", "ingenium.html")
+    check("6.20: the page running, saved from its own file", isinstance(r6, str) and os.path.isfile(r6) and open(r6, "rb").read() == open(f1, "rb").read(), r6)
+    r7 = m._page_save("20990101-000000")
+    check("6.20: a version not kept is refused", isinstance(r7, dict) and not r7.get("ok"), r7)
+    lean_ = page("exported copy", tails=False); k = len(lean_) // 2
+    m._page_export(lean_[:k], True, False); r8 = m._page_export(lean_[k:], False, True, "my copy.html")
+    out = open(r8, "rb").read().decode() if isinstance(r8, str) and os.path.isfile(r8) else ""
+    check("6.20: the lighter copy, in pieces, saved whole (what it carries put back)", "exported copy" in out and out.count('id="ing-tail:ing-eyes"') == 1, r8)
+    check("6.20: an export keeps no version", not any("exported copy" in open(m._page_file(v["id"])).read() for v in m._page_versions()))
 print("%d passed, %d failed" % (ok, bad))

@@ -144,6 +144,9 @@ body[data-motion="minimal"] .cc-work .cw-dot,body.calm .cc-work .cw-dot{animatio
 /* the left column's two keys (her picture of 4 November): a quiet row of small keys, as long as their words */
 html body .cc-proj-acts{display:flex;gap:6px;margin:-2px 0 10px;flex-wrap:wrap;justify-content:flex-start}
 html body .cc-proj-acts .btn{flex:0 0 auto !important;width:auto !important;min-width:0;padding:3px 9px;font-size:11.5px;min-height:24px}
+/* 6.20: the sessions list is as tall as its sessions (up to 270 px, then it scrolls), so a few sessions leave no empty band above Files;
+   the files take the room that is left */
+html body .cc-side .cc-list.cc-sessions{flex:0 1 auto}
 .ing-ask .ing-ask-in{display:block;width:100%;box-sizing:border-box;margin:0 0 14px;padding:9px 11px;border-radius:10px;border:1px solid var(--hairline-strong,rgba(34,26,46,.22));background:var(--card,#fff);color:var(--ink-1);font:14px/1.4 var(--sans,system-ui,sans-serif);box-shadow:inset 0 1px 2px rgba(40,22,68,.06)}
 .ing-ask .ing-ask-in:focus{outline:none;border-color:var(--accent,#6a3fb5);box-shadow:0 0 0 3px var(--accent-softer,rgba(106,63,181,.14))}
 body[data-theme="night"] .ing-ask .ing-ask-in{background:#1d1728;border-color:rgba(205,184,240,.22);color:#f3eefb}

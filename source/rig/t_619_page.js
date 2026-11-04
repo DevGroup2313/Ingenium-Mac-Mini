@@ -1,4 +1,4 @@
-// Your page (Ingenium 6.19, modules/r227.js, the master edition; the computer apps' side is desktop/app_page_619.py, tested on its
+// Your page (Ingenium 6.19 and 6.20, modules/r227.js, the master edition; the computer apps' side is desktop/app_page_619.py, tested on its
 // own). Her words (4 November 2026): "I want full agency and authorship over Ingenium. I want to be able to make proper edits,
 // customise, troubleshoot, fix, curate, run diagnostics and add or remove new features, pages, sections or different functions in
 // Ingenium as its author and creator"; her answer on how changes take effect: both, layers first, then the page itself.
@@ -100,6 +100,23 @@ const STAND_IN = () => {
   const t9 = await p.evaluate(async () => { window.saveFileNative = (name, mime, text) => { window.__saved = { name, mime, len: text.length, tails: Object.keys(IngPage.tails(text)).length, change: text.indexOf('an invented change') > 0 }; };
     const pr = IngPage.projects()[0]; await ccDownload(pr); for (let i = 0; i < 40 && !window.__saved; i++) await new Promise(r => setTimeout(r, 250)); return window.__saved || null; });
   ok(t9 && t9.name === 'ingenium.html' && t9.tails === t2.n && t9.change && t9.len === changed + (t2.full - t2.lean), 'Download the app gives the changed page whole, with what it carries put back', t9);
+
+  /* 6b. 6.20: on the computer app, the downloads are written by the app itself */
+  step('save');
+  const t9b = await p.evaluate(async () => { const s = window.__pg; s.exp = ''; s.saves = [];
+    window.pywebview.api.page_export = (piece, first, last, name) => { if (first) s.exp = ''; s.exp += piece; s.calls.push(['export', piece.length, !!first, !!last, name]); return Promise.resolve(last ? '/Users/invented/Downloads/' + name : { ok: true, bytes: s.exp.length }); };
+    window.pywebview.api.page_save = (pid, name) => { s.saves.push([pid, name]); return Promise.resolve('/Users/invented/Downloads/' + name); };
+    window.__saved = null; const pr = IngPage.projects()[0]; await ccDownload(pr);
+    for (let i = 0; i < 40 && !s.calls.some(c => c[0] === 'export' && c[3]); i++) await new Promise(r => setTimeout(r, 250));
+    go('workshop'); await new Promise(r => setTimeout(r, 900)); const k = [...document.querySelectorAll('#pgKeys button')].find(x => x.textContent === 'Download the page running'); if (k) k.click();
+    await new Promise(r => setTimeout(r, 800)); const ex = s.calls.filter(c => c[0] === 'export');
+    return { pieces: ex.length, last: ex.length && ex[ex.length - 1][3], name: ex.length && ex[ex.length - 1][4], len: s.exp.length, viaSaveFile: !!window.__saved, saves: s.saves }; });
+  ok(t9b.pieces >= 2 && t9b.last && t9b.name === 'ingenium.html' && t9b.len === changed && !t9b.viaSaveFile, '6.20: on the computer app, the copy goes to the app in pieces and the app writes it whole', t9b);
+  ok(t9b.saves.length === 1 && t9b.saves[0][0] === '' && t9b.saves[0][1] === 'ingenium.html', '6.20: Download the page running asks the app to save from its own file', t9b.saves);
+  /* 6c. 6.20: a page file older than 6.19 is refused at once */
+  const t9c = await p.evaluate(async () => { const n0 = window.__pg.calls.length; const r = await IngPage.use('<!doctype html><html><body><script>window.__INGENIUM_BOOTED=1</' + 'script></body></html>', 'an invented old page');
+    return { r, calls: window.__pg.calls.length - n0 }; });
+  ok(t9c.r === null && t9c.calls === 0, '6.20: a page older than 6.19 (no Your page card) is refused, nothing handed over', t9c);
 
   /* 7. Guide, What is new, tour */
   step('guide');

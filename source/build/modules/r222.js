@@ -233,7 +233,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
-var NEW=[["6.19","In your master edition, Your page, in the Workshop: on your computers, Ingenium's page changed in Code (or a page file) takes the place of the built one at once, with your work as it is; one that does not start is left, and Ingenium goes back to the last page that worked on its own.","master"],
+var NEW=[["6.20","Code's column: the sessions list is as tall as its sessions, so Files sits right under it. The chat's height holds steady when two layouts swing, until the window or the chat's layout changes."],
+  ["6.20","In your master edition, Your page saves the page running, or the copy in Code made whole, straight from the computer app; a page older than 6.19 is refused, with the reason.","master"],
+  ["6.19","In your master edition, Your page, in the Workshop: on your computers, Ingenium's page changed in Code (or a page file) takes the place of the built one at once, with your work as it is; one that does not start is left, and Ingenium goes back to the last page that worked on its own.","master"],
   ["6.18","In your master edition, the Workshop: check Ingenium, see its errors, find and fix one with a model, and add pages, sections, scripts and styles of your own.","master"],
   ["6.18","How I work, on every app now goes with every Code session and every request Build makes."],
   ["6.17","Effort wherever a model is chosen: Build has its own, with Ultracode; Lector, the Career Studio and Folders share one, with Ultra to check each piece against its material."],

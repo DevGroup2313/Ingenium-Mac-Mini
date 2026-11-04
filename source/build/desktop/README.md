@@ -87,3 +87,10 @@ built page, and keeps why (`pages.json`), for the Workshop to say. At most five 
 the last that worked always stay). On a Mac, the app menu gains "Use the built page", which needs nothing from the page.
 Test: `python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py` (34 checks, Mac and Windows alike).
 
+6.20, `app_page_620.py` (Mac and Windows; after `app_page_619.py`): Your page's downloads, written by the app from the file itself.
+A whole page is about 76 MB, and the page's own save call carried it as base64 (about 100 MB) across the bridge in one piece. Now
+`page_save(pid, name)` copies the page running ("") or a version kept where she chooses, in the computer's own save dialog, and
+`page_export(piece, first, last, name)` takes the Workshop's lighter copy in pieces (about 15 MB), puts back what the page carries
+from the running page, and writes it whole where she chooses, keeping no version. Both answer the path written, "cancelled", or an
+error. Test: `python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py` (38 checks with this patch).
+

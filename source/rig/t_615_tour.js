@@ -90,7 +90,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const at = id => g.ids.indexOf(id);
   ok(at('wnGuide') === at('guideTourCard') + 1, 'What is new comes right after the guided tour\'s card', g.ids);
   ok(at('mdGuide') > at('cnGuide') && at('fdGuide') > at('cnGuide') && (career ? at('csGuide') > at('fdGuide') : at('csGuide') < 0), 'Folders, the Career Studio (where carried) and Models follow the other cards', g.ids);
-  ok(/^6\.1[4-9]/.test(g.wn[0]) && g.wn.includes('6.14') && g.wn.includes('6.10') && (career ? g.wn.includes('6.9.7') : !g.wn.includes('6.9.7') && !g.wn.includes('6.9.8')) && g.twice === 1, 'What is new lists the versions newest first, those of this edition only, once', g);
+  ok(/^6\.(1[4-9]|2\d)/.test(g.wn[0]) && g.wn.includes('6.14') && g.wn.includes('6.10') && (career ? g.wn.includes('6.9.7') : !g.wn.includes('6.9.7') && !g.wn.includes('6.9.8')) && g.twice === 1, 'What is new lists the versions newest first, those of this edition only, once', g);
   await p.waitForTimeout(700); await p.screenshot({ path: OUT + '/guide_new.png' });
   const words = await p.evaluate(() => ({ models: ING_TOUR_TEASERS.Models, settings: ING_TOUR_TEASERS.Settings, entry: (document.querySelector('#guideTour p') || {}).textContent || '' }));
   ok(/newer ones found online/.test(words.models) && /connectors and the sign-in/.test(words.settings) && /remembers where you stopped/.test(words.entry) && !/About ten minutes/.test(words.entry) && /in 1[46] short chapters/.test(words.entry),

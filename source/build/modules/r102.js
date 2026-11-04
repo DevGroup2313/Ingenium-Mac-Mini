@@ -140,8 +140,15 @@ function r2Fit(){R2.raf=0;var flow=r2Flow(),up=(window.innerHeight||800)>(window
      between two values within a moment (two layouts, each asking for the other, as a scroll bar that comes and goes can) settles on
      the smaller of the two for a few seconds instead of swinging; a change she makes herself (the grip, a new window size) is not held */
   var now=Date.now(),H=R2.hist=(R2.hist||[]).filter(function(x){return now-x[0]<1500&&x[2]===vh;});
-  if(H.length>=2&&H[H.length-1][1]!==h&&H[H.length-2][1]===h&&Math.abs(H[H.length-1][1]-h)<120){R2.holdTo=Math.min(h,H[H.length-1][1]);R2.holdUntil=now+3000;}
-  if(R2.holdUntil&&now<R2.holdUntil&&!R2.h&&h>R2.holdTo)h=R2.holdTo;
+  /* 6.20: a swing seen once (as a page settles) is held for three seconds, as before; the same swing again, in the same layout (the
+     window's size, the chat's place, the preview and its view), is held until that layout changes, so it cannot come back every few
+     seconds; a change of layout lets go at once */
+  var bd=document.body,sig=[vh,window.innerWidth||0,Math.round(top),flow?1:0,stack?1:0,sheet>0?1:0,bd.classList.contains("cs-on")?1:0,
+    bd.getAttribute("data-csview")||"",bd.getAttribute("data-cschat")||""].join("|");
+  if(R2.holdSig&&R2.holdSig!==sig){R2.holdSig="";R2.holdTo=0;R2.holdUntil=0;R2.holdN=0;}
+  if(H.length>=2&&H[H.length-1][1]!==h&&H[H.length-2][1]===h&&Math.abs(H[H.length-1][1]-h)<120){R2.holdN=(R2.holdSig===sig?(R2.holdN||0):0)+1;R2.holdSig=sig;
+    R2.holdTo=Math.min(h,H[H.length-1][1]);R2.holdUntil=R2.holdN>1?Infinity:now+3000;}
+  if(R2.holdTo&&!R2.h&&h>R2.holdTo&&now<R2.holdUntil)h=R2.holdTo;
   H.push([now,h,vh]);if(H.length>8)H.shift();
   root.style.setProperty("--r2-h",h+"px");
   if(stack)root.style.setProperty("--r2-ph",Math.max(260,avail-h)+"px");

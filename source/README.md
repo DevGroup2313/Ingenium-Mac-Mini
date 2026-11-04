@@ -371,6 +371,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.20 (4 November 2026): the chat's height holds when it swings; Code's column without an empty band; Your page's downloads.
+Her words: "the chat inside of the panel keeps on glitching back and forth"; "Please feel free to make other improvements to the
+Conversation panel of the Coding chat page of Ingenium and its sections"; and "I really want for every new feature and everything
+else inside of Ingenium works and works well".
+
+- The chat's height (modules/r102.js): 6.11.2 held the steadier of two heights that swing within a moment, for three seconds; the
+  same two layouts could then start the swing again, every few seconds. Now a swing seen once (as a page settles) is held for three
+  seconds, as before, and the same swing again in the same layout (the window's size, the chat's place, the preview and its view) is
+  held until that layout changes. A change of layout lets go at once; a height she sets with the grip is never held. Chromium does
+  not swing here, so the test makes the swing by hand: whether this is the swing she sees on her Mac is not yet known.
+- Code's column (modules/r215.js): the sessions list grew to 270 px whatever it held, leaving an empty band above Files with one or
+  two sessions; it is now as tall as its sessions (up to 270 px, then it scrolls), and the files take the room that is left. Its two
+  keys (Close this app, Remove from Code) were already as long as their words (since 6.11; 99 and 126 px measured).
+- Your page (modules/r227.js; desktop/app_page_620.py): on the computer app, Download the page running is saved by the app from its
+  own file, and the copy in Code goes over in pieces and is written whole by the app; before, about 100 MB crossed the page's bridge
+  in one piece. A page file older than 6.19 has no Your page card, so it could not say it has started and Ingenium would go back from
+  it after half a minute: it is now refused at once, with that reason.
+- What is new gains 6.20; rig/t_615_tour.js accepts versions from 6.20 on as the newest.
+
+    node rig/t_620_hold.js <url> <out>                       # 7 checks
+    node rig/t_619_page.js <url> <out>                       # 30 checks now (the downloads and the refusal)
+    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py  # 38 checks with app_page_620.py
+
 Ingenium 6.19 (4 November 2026): Your page, in the master edition's Workshop: Ingenium's own page, changed, in place of the built one.
 Her words: "I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,
 curate, run diagnostics and add or remove new features, pages, sections or different functions in Ingenium as its author and creator."

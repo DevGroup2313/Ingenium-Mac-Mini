@@ -66,14 +66,21 @@ function codeText(pr){return Promise.resolve(typeof ccLoadAll==="function"?ccLoa
 /* ================= 2. handing a page to the computer app ================= */
 var BUSY="",STATE=null;
 function busy(t){BUSY=t||"";var b=$("pgBusy");if(b)b.textContent=BUSY;}
-function send(text,note){var N=2000000,i=0,len=text.length,first=true;
+/* a page in pieces of text (a pair of surrogates is never cut), to page_put (a version) or page_export (6.20: a download) */
+function pieces(fn,text,lastArg){var N=2000000,i=0,len=text.length,first=true;
   function next(){var end=Math.min(len,i+N);if(end<len){var c=text.charCodeAt(end-1);if(c>=0xD800&&c<=0xDBFF)end--;}
-    var last=end>=len;return call("page_put",text.slice(i,end),first,last,last?String(note||""):"").then(function(r){
-      if(!r||!r.ok)throw new Error((r&&r.error)||"a piece was not kept");first=false;i=end;
-      if(!last){busy("Handing the page over: "+Math.round(i*100/len)+"%");return next();}return r;});}
+    var last=end>=len;return call(fn,text.slice(i,end),first,last,last?String(lastArg||""):"").then(function(r){
+      if(last)return r;if(!r||!r.ok)throw new Error((r&&r.error)||"a piece was not kept");first=false;i=end;
+      busy("Handing the page over: "+Math.round(i*100/len)+"%");return next();});}
   return next();}
+function send(text,note){return pieces("page_put",text,note).then(function(r){if(!r||!r.ok)throw new Error((r&&r.error)||"the page was not kept");return r;});}
+/* 6.20: on the computer app, a download is written by the app (from its own file, or from the copy in pieces); nothing large crosses
+   its bridge in one piece */
+function saved(r){busy("");if(typeof r==="string"){if(r!=="cancelled")toast("Saved: "+r);return r;}throw new Error((r&&r.error)||"it was not saved");}
+function can(fn){var a=api();return !!(a&&typeof a[fn]==="function");}
 function useText(text,note){text=String(text||"");
   if(text.indexOf("__INGENIUM_BOOTED")<0){toast("This is not Ingenium's page: it never says it has started.");return Promise.resolve(null);}
+  if(text.indexOf("W.IngPage=")<0){toast("This page is older than Ingenium 6.19: it has no Your page card, so it could not say it has started, and Ingenium would go back from it. Use a page made from this one.");return Promise.resolve(null);}
   return ask("Use this page in place of the one running?\n\nIngenium loads it now, at the same address, with all your work as it is. If it does not start within half a minute, Ingenium goes back to the last page that worked, on its own.",{yes:"Use it now",no:"Not now",danger:false})
     .then(function(ok){if(!ok)return null;busy("Handing the page over…");
       return send(text,note).then(function(r){busy("Kept"+(r.put_back?" (what it carries put back)":"")+". Loading it…");return call("page_use",r.id,true);})
@@ -93,9 +100,11 @@ function dropVersion(v){return ask("Remove your page of "+vw(v.id)+"?\n\nIts fil
   return call("page_drop",v.id).then(function(r){if(!r||!r.ok)throw new Error((r&&r.error)||"it was not removed");fill();},function(e){toast("It could not be removed: "+(e&&e.message||e));});});}
 function save(name,text){if(typeof saveFileNative==="function")return saveFileNative(name,"text/html",text);
   var a=D.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/html"}));a.download=name;D.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},4000);}
-function dlRunning(){busy("Reading the page running…");selfPageText().then(function(t){busy("");save("ingenium.html",t);},function(e){busy("");toast("The page could not be read: "+(e&&e.message||e));});}
-function dlFromCode(){var pr=projects()[0];if(!pr){toast("There is no copy of Ingenium's page in Code yet: press Find and fix with a model first.");return;}
-  busy("Putting back what the page carries…");codeText(pr).then(whole).then(function(t){busy("");save("ingenium.html",t);},function(e){busy("");toast("The page could not be made whole: "+(e&&e.message||e));});}
+function dlRunning(){if(can("page_save")){busy("Saving the page running…");return call("page_save",(STATE&&STATE.running)||"","ingenium.html").then(saved).catch(function(e){busy("");toast("The page could not be saved: "+(e&&e.message||e));});}
+  busy("Reading the page running…");selfPageText().then(function(t){busy("");save("ingenium.html",t);},function(e){busy("");toast("The page could not be read: "+(e&&e.message||e));});}
+function dlCopy(pr){if(can("page_export")){busy("Handing the copy over…");return codeText(pr).then(function(t){return pieces("page_export",t,"ingenium.html");}).then(saved).catch(function(e){busy("");toast("The page could not be saved: "+(e&&e.message||e));});}
+  busy("Putting back what the page carries…");return codeText(pr).then(whole).then(function(t){busy("");save("ingenium.html",t);},function(e){busy("");toast("The page could not be made whole: "+(e&&e.message||e));});}
+function dlFromCode(){var pr=projects()[0];if(!pr){toast("There is no copy of Ingenium's page in Code yet: press Find and fix with a model first.");return;}return dlCopy(pr);}
 
 /* ================= 3. the card, in the Workshop ================= */
 function vw(id){var m=/^(\d{4})(\d\d)(\d\d)-(\d\d)(\d\d)(\d\d)/.exec(String(id||""));return m?when(new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]).getTime()):String(id||"");}
@@ -142,8 +151,7 @@ function reportIn(){if(REPORTED)return;var a=api();if(!a||typeof a.page_started!
 
 /* Download the app in Code: the Workshop's copy is downloaded whole */
 (function wrapDl(){var o=W.ccDownload;if(typeof o!=="function"||o.__r227)return;
-  var n=function(pr){if(!(pr&&pr.ingSelf&&pr.ingSelf.lean))return o.apply(this,arguments);busy("Putting back what the page carries…");toast("Putting back what Ingenium's page carries…");
-    return codeText(pr).then(whole).then(function(t){busy("");save("ingenium.html",t);},function(e){busy("");toast("The page could not be made whole: "+(e&&e.message||e));});};
+  var n=function(pr){if(!(pr&&pr.ingSelf&&pr.ingSelf.lean))return o.apply(this,arguments);toast("Putting back what Ingenium's page carries…");return dlCopy(pr);};
   n.__r227=true;W.ccDownload=n;})();
 
 W.IngPage={card:card,fill:fill,project:project,lean:lean,whole:whole,tails:tailsOf,named:named,mark:mark,hint:HINT,send:send,use:useText,fromCode:fromCode,
