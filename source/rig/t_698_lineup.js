@@ -174,7 +174,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
     o.gr3 = get('gr3', 'granite-4.2-3b-Q4_K_M.gguf', 3, true); o.gr8 = get('gr8', 'granite-4.2-8b-Q3_K_M.gguf', 3, false);
     o.q36 = [get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, true), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, false), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, true, 'faber'), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, false, 'faber')];
     o.q38 = [get('q38', 'Qwen3.8-27B-Q4_K_M.gguf', 3, true), get('q38', 'Qwen3.8-27B-Q8_0.gguf', 3, false), get('q38', 'Qwen3.8-27B-Q4_K_M.gguf', 3, true, 'faber')];
-    o.g31 = get('g31', 'gemma-4-31B_q4_0-it.gguf', 3, true); o.q35 = get('q35', 'Qwen3.5-9B-Q4_K_M.gguf', 3, true); o.cold = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 5, true); o.hot = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 1, true);
+    o.g31 = get('g31', 'gemma-4-31B_q4_0-it.gguf', 3, true); o.q35 = get('q35', 'Qwen3.5-9B-Q4_K_M.gguf', 3, true); o.cold = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 5, true); o.hot = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 1, true); o.mini3 = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 3, true);
     window.activeTierFor = keep; return o; });
   const pick = (o, ks) => Object.fromEntries(ks.map(k => [k, o[k]]));
   const eq = (o, w) => Object.keys(w).every(k => o[k] === w[k]);
@@ -184,7 +184,9 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   ok(S.q36[2].family === 'qwen3.6-code' && eq(S.q36[2], { temperature: 0.6, top_p: 0.95, top_k: 20, min_p: 0, presence_penalty: 0 }) && eq(S.q36[3], { temperature: 0.7, top_p: 0.8, presence_penalty: 0 }), 'under Faber Qwen3.6 thinks with the card\'s set for precise coding (temperature 0.6, no presence penalty); with thinking off, the plain set', S.q36.slice(2));
   ok(S.q38[0].family === 'qwen3.8' && eq(S.q38[0], { temperature: 1, top_p: 0.95, top_k: 20, min_p: 0, presence_penalty: 0 }) && S.q38[1].family === 'qwen3.8' && eq(S.q38[1], { temperature: 0.7, top_p: 0.8, top_k: 20, min_p: 0, presence_penalty: 1.5 }) && eq(S.q38[2], { temperature: 1, top_p: 0.95, presence_penalty: 0 }), 'Qwen3.8 27B (the Best file too): the card\'s thinking set (1.0, 0.95, top-k 20, presence 0) and plain set (0.7, 0.8, top-k 20, presence 1.5)', S.q38);
   ok(S.g31.family === 'gemma4' && eq(S.g31, { temperature: 1, top_k: 64, top_p: 0.95 }) && S.q35.family === 'qwen3.5', 'Gemma 4 31B uses the Gemma 4 settings of its card (1.0, top-k 64, 0.95); the families that were there are as they were', [S.g31, S.q35]);
-  ok(S.cold.temperature === 0.45 && S.hot.temperature === 1.2, 'the effort setting still moves the temperature (a new family follows it too)', [S.cold.temperature, S.hot.temperature]);
+  /* 6.11: effort sets how much a model thinks, how long it writes and how many steps it takes; it no longer moves the sampling, which
+     stays at the maker's settings at every level (Max and Low give MiniCPM5 2B the same temperature as its card) */
+  ok(S.cold.temperature === S.hot.temperature && S.cold.temperature === S.mini3.temperature, 'effort leaves the maker\'s temperature as it is, at Max and at Low (6.11)', [S.cold.temperature, S.hot.temperature, S.mini3.temperature]);
   const plumbing = await p.evaluate(() => { const t = [...document.scripts].map(s => s.textContent || ''); return { sends: t.some(x => x.includes('if(p.thinking!=null)body.chat_template_kwargs={enable_thinking:!!p.thinking};')), key: (() => { state.thinking = false; const off = thinkOn(); state.thinking = true; const on = thinkOn(); return [off, on]; })() }; });
   ok(plumbing.sends && plumbing.key[0] === false && plumbing.key[1] === true, 'the Thinking key reaches every model\'s chat template as enable_thinking (Qwen3.8, Qwen3.6, Granite 4.2 and Gemma 4 take it, their cards say), and switches the sampling set with it', plumbing);
 

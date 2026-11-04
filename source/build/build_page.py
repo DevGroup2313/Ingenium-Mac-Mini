@@ -1150,6 +1150,13 @@ edit(r"""        Promise.resolve().then(function(){return a.save_state(raw);}).t
      r"""        Promise.resolve().then(function(){return a.save_state(raw);}).then(function(){window.name="desk-adopted";location.reload();});});},{yes:"Restore it",danger:false});};});},""",
      "6.11.1 the restore's end, inside its question")
 
+# ---- 6.11.2: one rule for keeping her place in a conversation. While a reply is written, the newest words are followed when she is
+#      within 80 points of the end; a full redraw used 240, so between the two the view could be pulled down by one and left by the
+#      other, back and forth (her report of 4 November 2026: "the chat inside of the panel keeps on glitching back and forth"). ----
+edit(r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>240)sc.scrollTop=top;CP.lastChat=c;CP.lastMe=me;if(CP.place)CP.place();}catch(e){}""",
+     r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>=80)sc.scrollTop=top;CP.lastChat=c;CP.lastMe=me;if(CP.place)CP.place();}catch(e){}""",
+     "6.11.2 one threshold for keeping her place")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

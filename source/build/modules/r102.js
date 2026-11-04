@@ -136,6 +136,13 @@ function r2Fit(){R2.raf=0;var flow=r2Flow(),up=(window.innerHeight||800)>(window
     avail=Math.max(560,Math.floor(vh-top-below-12-pTop));fit=Math.max(240,avail-260);}
   R2.fit=fit;R2.stack=stack;
   var want=stack?(R2.h||Math.round(avail*0.52)):(R2.h||(flow?0:r2Saved())||fit),h=Math.max(240,Math.min(want,fit));
+  /* 6.11.2 (her report of 4 November 2026: "the chat inside of the panel keeps on glitching back and forth"): a height that swings
+     between two values within a moment (two layouts, each asking for the other, as a scroll bar that comes and goes can) settles on
+     the smaller of the two for a few seconds instead of swinging; a change she makes herself (the grip, a new window size) is not held */
+  var now=Date.now(),H=R2.hist=(R2.hist||[]).filter(function(x){return now-x[0]<1500&&x[2]===vh;});
+  if(H.length>=2&&H[H.length-1][1]!==h&&H[H.length-2][1]===h&&Math.abs(H[H.length-1][1]-h)<120){R2.holdTo=Math.min(h,H[H.length-1][1]);R2.holdUntil=now+3000;}
+  if(R2.holdUntil&&now<R2.holdUntil&&!R2.h&&h>R2.holdTo)h=R2.holdTo;
+  H.push([now,h,vh]);if(H.length>8)H.shift();
   root.style.setProperty("--r2-h",h+"px");
   if(stack)root.style.setProperty("--r2-ph",Math.max(260,avail-h)+"px");
   var dock=document.querySelector(".shell > .dock");if(dock)root.style.setProperty("--r2-docktop",Math.max(0,Math.round(dock.getBoundingClientRect().top+sy))+"px");

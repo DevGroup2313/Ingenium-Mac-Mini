@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.11.2 (4 November 2026): newer models, found online when she asks; two guards for the chat. Her words: "I want a path built
+into Ingenium's models page that goes online when I click on the button to check and download and install newer models for Ingenium
+instead of having to continuously do it myself or having you do it on this chat"; and "the chat inside of the panel keeps on glitching
+back and forth".
+
+- Models, Ingenium's models: "Check for newer models" (modules/r217.js) asks Hugging Face, when she presses it, for the newest GGUF
+  repositories of twelve publishers (ggml-org, unsloth, bartowski, lmstudio-community, Qwen, LiquidAI, mistralai, google, ibm-granite,
+  nvidia, openbmb, microsoft). For each it reads Hugging Face's own records: the model's kind and parameters, and each file's size and
+  SHA-256. It offers only a kind this device's engine loads (the 153 kinds of llama.cpp b11321, read from its source; on a computer whose
+  copy carries the newer engine, its 14 more) and a file that fits this device's memory, choosing Q4_K_M first; it says why it offers
+  nothing else. Install uses the same checked download as Ingenium's own models; a found model gets a lineup entry of its own (kept
+  across restarts), can be made a house's model, and says it is not part of the reviewed lineup. What it cannot know before she tries
+  a model is how well it answers. The weekly look is a switch, off until she turns it on: Ingenium reaches the internet only when asked.
+- Chat: one rule keeps her place while a reply is written (80 points from the end, for live and full redraws alike; a full redraw used
+  240, so between the two the view could be pulled down and left, back and forth); and a chat height that swings between two values
+  within a moment settles on the smaller (modules/r102.js). Not reproduced here: her description of the glitch is needed to confirm.
+
+    node rig/t_6112_found.js <url> <out>      # 10 checks, with a stand-in Hugging Face and computer app
+
 Ingenium 6.11.1 (4 November 2026): Ingenium's own pop-ups everywhere, and documents in a chat that open. Her words: "Ingenium's in app
 popups look weird in this random basic dark gray format and completely detracts from the rest of the app, please redesign these popups
 all over the app that are the same dark grey and match them to Ingenium's colour palette and animated popped out 3D look and animation";
