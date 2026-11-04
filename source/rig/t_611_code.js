@@ -178,7 +178,8 @@ const APP = [{ name: 'index.html', text: '<!doctype html>\n<html><head><meta cha
   // ---------- 6. the session column: environment, context, outputs, changes ----------
   await p.evaluate(() => IngR215.panel('session', true)); await p.waitForTimeout(900);
   const sess = await p.evaluate(() => { const col = document.getElementById('ccPanel'); return col ? col.innerText.replace(/\s+/g, ' ') : null; });
-  ok(sess && /Environment ⌂ Ingenium, on this device <\/> Tally · 2 files ◉ Claude: claude-opus-5-5/i.test(sess) && /Context/i.test(sess) && /Outputs/i.test(sess) && /Changes/i.test(sess) && /Background tasks/i.test(sess), 'the Session column, as in her picture: Environment (Ingenium on this device, the app, the model), Context, Outputs, Changes and Background tasks', sess && sess.slice(0, 400));
+  // since 6.16 the Environment names the session's environment first (modules/r223.js), as Claude's names its own
+  ok(sess && /Environment (☁ Default · Full )?⌂ Ingenium, on this device <\/> Tally · 2 files ◉ Claude: claude-opus-5-5/i.test(sess) && /Context/i.test(sess) && /Outputs/i.test(sess) && /Changes/i.test(sess) && /Background tasks/i.test(sess), 'the Session column, as in her picture: Environment (Ingenium on this device, the app, the model), Context, Outputs, Changes and Background tasks', sess && sess.slice(0, 400));
   // background tasks: a reply being written and a model being installed, each with its time and a stop key; the queue's waiting messages
   const bg = await p.evaluate(async () => {
     const bot = { role: 'bot', text: '', live: true, steps: [{ i: '✎', t: 'Changed app.js at line 2' }] }; curChat().messages.push(bot); window.liveBot = bot; Engine.setStatus('busy');
