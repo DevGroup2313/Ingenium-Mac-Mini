@@ -394,10 +394,14 @@ function sec(body,key,title,opts){opts=opts||{};var S=mk("section","ccp-sec");S.
 function row(icon,text,title){var r=mk("div","ccp-row");r.appendChild(mk("span","ccp-ic",icon));var n=mk("span","nm",text);if(title)n.title=title;r.appendChild(n);return r;}
 function paintSession(body,c){var pr=null;try{pr=ccProj();}catch(e){}
   /* Environment: where the files are, and where the model runs; the gear opens Controls (the engine and the connection) */
-  var gear=mk("button","ccp-gear");gear.type="button";gear.title="Where the model runs: the engine and the connection (Controls)";gear.setAttribute("aria-label","Open Controls");
+  var gear=mk("button","ccp-gear");gear.type="button";gear.title=W.IngEnv?"Edit the environment: network access, secrets, the setup script and its variables (6.16)":"Where the model runs: the engine and the connection (Controls)";gear.setAttribute("aria-label",W.IngEnv?"Edit the environment":"Open Controls");
   gear.innerHTML=svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>');
-  gear.onclick=function(){var k=$id("chatCtlBtn");if(k&&k.getAttribute("aria-expanded")!=="true")k.click();};
+  /* 6.16, her words (4 November 2026): "When I click on the Settings button for the Environment section ... it just opens up the
+     Controls panel, it does not open the settings for the editing the Environment unlike Claude's coding chat settings". The gear opens
+     the environment (modules/r223.js); the engine and the connection are that dialog's last row, and still in Controls. */
+  gear.onclick=function(){if(W.IngEnv&&IngEnv.open){IngEnv.open(c&&c.id);return;}var k=$id("chatCtlBtn");if(k&&k.getAttribute("aria-expanded")!=="true")k.click();};
   var env=sec(body,"session","Environment",{gear:gear});
+  try{if(W.IngEnv&&IngEnv.row)env.appendChild(IngEnv.row(c));}catch(e){}
   var cl=!!provider(),mname="";try{if(cl)mname=String(state.cloud.model||"");else{var m=state.models.filter(function(x){return x.id===state.activeModelId;})[0];mname=m?m.customName:"";}}catch(e){}
   env.appendChild(row("⌂","Ingenium, on this device","The app's files are kept here, on this device; every change is kept as a version you can undo."));
   env.appendChild(row("</>",pr?pr.name+" · "+(pr.files||[]).length+" file"+((pr.files||[]).length===1?"":"s"):"No app chosen yet",pr?"The app this session works on":"Choose an app at the top of the left column"));

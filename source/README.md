@@ -371,6 +371,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.16 (4 November 2026): a Code session's environment, as in Claude's; and no scroll bar in sight. Her words: "When I click on
+the Settings button for the Environment section on the Coding chat inside of Ingenium, it just opens up the Controls panel, it does not
+open the settings for the editing the Environment unlike Claude's coding chat settings, please make the fix to bridge that gap as well.
+I want full parity please"; and "Please add this rule to Ingenium, all scroll bars unless explicitly stated are to be hidden from view
+while keeping the scrolling functionality intact. I don't like seeing them in view, they detract from the look of the app."
+
+- The gear beside Environment, in the Code session's column, opens the environment (modules/r223.js), laid out as Claude's Edit cloud
+  environment (her picture): its Name (the Default one cannot be renamed or removed), Network access, Network secrets, Setup script and
+  Environment variables, each a raised row that opens its own page, and Save changes. Its last row, the model and its engine, opens
+  Controls, which is what the gear opened before. One environment can serve many sessions; a session uses the Default until another is
+  chosen; the column names the session's environment and what it holds.
+- Ingenium's apps run in the preview beside the conversation, so the environment is where the app runs, and each setting works there:
+  Network access (Full, as before; Listed sites only; None) is a content security policy put first in the app's page, so the browser
+  itself refuses requests, scripts, styles, pictures, fonts and frames from sites not allowed, and the preview's console says what was
+  refused and why (a window the app opens to another site is not stopped). A network secret is added as a header to the app's requests
+  to its one site, so a key is never written into the code. The setup script runs before the app's own scripts at each load. The
+  variables are read as window.ENV.NAME.
+- The model is told the network rule, the variables' names, the secrets' sites and that a setup script runs, never a value. None of it
+  is written into the app's files, its versions, a download or GitHub. Values are kept on this device (sealed with her data when the
+  sign-in is on); a backup she exports carries them, as it carries her connections' keys.
+- No scroll bar in sight (modules/r224.js): one rule for the whole of Ingenium's own page, the page's last word, so every part scrolls by
+  wheel, trackpad, touch and keys with no bar to see, including parts that drew their own bars. A part she asks to see a bar on can be
+  marked data-scrollbar="shown". Pages shown inside a frame keep their own look: the app being built, in the preview, and the apps on the
+  Desk (Tabula, Abacus, Imago, Scriba, Fontes).
+- The tour's Code chapter gains The environment; the Guide a card for it; Code's help its key.
+
+    node rig/t_616_env.js <url> <out>       # 22 checks, with an invented app and two stand-in sites
+    node rig/t_616_scroll.js <url> <out>    # 9 checks, in a browser that draws real scroll bars (Playwright hides them by default)
+
 Ingenium 6.15 (4 November 2026): the guided tour, its demonstrations and the Guide, up to date in every edition. Her words: "Please
 make sure that the guided tour and its demonstrations are also updated as well as the Guide page to reflect the latest pages and
 sections as well as updates recently made to Ingenium, they should all be properly updated to reflect the latest version of Ingenium,

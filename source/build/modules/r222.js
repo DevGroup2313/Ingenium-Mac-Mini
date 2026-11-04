@@ -107,6 +107,9 @@ var S={
   code5:{r222:1,chap:"Code",sub:"GitHub",go:codeGo(["session"]),ring:"#ccPanel .ghx",
     t:"⑂ Your GitHub repositories",
     b:"In the Session column's Environment, connect one of your repositories and choose its branch. Ingenium reads the branch as it is now and keeps track of what you change. Push sends your changes to a branch of their own, never to the one you started from; Create PR opens a pull request, and the column then follows it and its checks."},
+  codeEnv:{r222:1,levels:ALL,chap:"Code",go:codeGo(["session"]),ring:"#ccPanel .ccp-gear",
+    t:"⚙️ The environment",
+    b:"The gear beside Environment opens the environment the app runs in, as a Claude session has its own: network access (Full, Listed sites only, or None, held to by the browser), secrets added to the app's requests to one site, a setup script run before the app, and variables the app reads as window.ENV. One environment can serve many sessions."},
   code6:{r222:1,levels:ALL,chap:"Code",go:codeGo(),ring:"#chatInput",
     t:"⌨️ Pointing with @, commands with /",
     b:"In the message box, @ lists the app's files, to point the model at one: it reads that file before it answers. In a session on a GitHub repository, / lists its commands: /status, /diff, /push, /pr, /review (the model reviews your changes without editing them) and /update."},
@@ -144,7 +147,7 @@ var S={
     t:"🔐 Your data, sealed",
     b:"An optional sign-in of your own, a name and a password, seals your data on this device. Several ways back in open it: the password, ten words you keep, a key file on a stick or a drive, and a hint. On a Mac or a Windows computer, its own sign-in (Touch ID or Windows Hello) can be one more.",
     tip:"There is no back door: keep the ways back in in different places."}};
-var TEASE={"Code":"Building an app with the model: the plan, the Session column, Ultracode and GitHub.","Folders":"A folder for each app, and your work brought in from Claude and Ollama.","Career Studio":"Applications, the people you write to, and drafts you review."};
+var TEASE={"Code":"Building an app with the model: the plan, the Session column, its environment, Ultracode and GitHub.","Folders":"A folder for each app, and your work brought in from Claude and Ollama.","Career Studio":"Applications, the people you write to, and drafts you review."};
 var CLOSE={"Code":"Code plans, builds, checks and fixes, and keeps every change as a version you can undo.","Folders":"Folders keep how you work, so no conversation starts from nothing.","Career Studio":"The Career Studio keeps every application and person in view, one step at a time."};
 
 /* ================= 3. into the tour, where they belong ================= */
@@ -158,7 +161,7 @@ function apply(){if(!Array.isArray(W.ING_TOUR)||ING_TOUR.some(function(s){return
     insertAfter(km,[S.effort]);}
   var plus=idx(function(s){return s.chap==="Chat"&&/^The \+ key/.test(bare(s.t));});
   if(plus>=0){ING_TOUR[plus].b+=" A document you attach opens beside the chat when you press it, and shows its first lines when you point at it.";insertAfter(plus,[S.connectors]);}
-  insertAfter(lastOf("Chat"),[S.code1,S.code2,S.code3,S.code4,S.code5,S.code6]);
+  insertAfter(lastOf("Chat"),[S.code1,S.code2,S.code3,S.code4,S.code5].concat(W.IngEnv?[S.codeEnv]:[]).concat([S.code6]));
   insertAfter(lastOf("Models"),[S.found]);
   var bl=idx(function(s){return s.chap==="Making things"&&/^Blend/.test(bare(s.t));});insertAfter(bl>=0?bl:lastOf("Making things"),[S.blend2]);
   var st=[];if(W.IngConnectors)st.push(S.settingsCn);if(W.IngLock)st.push(S.settingsLock);insertAfter(lastOf("Settings"),st);
@@ -227,7 +230,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
-var NEW=[["6.14","Connectors, as in Claude, in Chat and in Code; @ to point the model at a file; each Code session's state in the list."],
+var NEW=[["6.16","A Code session's environment, as in Claude: network access, secrets for sites, a setup script and variables, applied to the app as it runs. No scroll bar in sight anywhere, and everything still scrolls."],
+  ["6.15","The guided tour and the Guide up to date in every edition; the Code column without a scroll bar; a wider, raised repository picker."],
+  ["6.14","Connectors, as in Claude, in Chat and in Code; @ to point the model at a file; each Code session's state in the list."],
   ["6.13","Code on your GitHub repositories: a branch read as it is now, your changes pushed to a branch of their own, pull requests and their checks."],
   ["6.12","Blend with your connected models, effort up to Ultra, three new ways, how each answer was settled, and Check with Blend under any reply."],
   ["6.11.2","Check for newer models, on the Models page, when you press it."],
