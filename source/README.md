@@ -371,6 +371,41 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.12 (4 November 2026): Blend, deepened. Her words: "Please deepen and expand the 'Blend' page so that it really enhances
+the app and provide great and powerful blend of models with thorough and precise reasoning and outstanding performance ... I want for
+Ingenium to work as an ecosystem"; and (3 November) "I want to be able to select low to Max effort and Ultracode inside of the chats and
+everywhere a model can be selected to run a task or do work inside of Ingenium."
+
+- Before 6.12, Blend used only the models on this device, one after another, with five ways and replies of at most 1,536 tokens (3,584
+  with thinking); the final answer came with no account of how it was reached.
+- Her connected models (every connection she keeps: Claude, OpenAI, Gemini, Kimi, OpenRouter, Ollama) join a blend beside the models on
+  this device, each with a choice of its service's models and a weight. They answer at the same time; the models on this device answer
+  one after another, the one already loaded first and the writer last, so fewer loads. A request from Blend names its own connection,
+  reply room, thinking and effort on the request itself (`cloudChat`, build_page.py 6.12), so the chat's model is never switched, its key
+  never used by a blend, and the limits Ingenium learned for the chat's model are not applied to another (modules/r206.js, r195.js).
+  Her own details (Settings, Your Ingenium) reach a connected model only when she allows it, as in the chat.
+- Effort as in the chat: Auto (Low to Extra, chosen from the question, never Max), Low, Medium, High, Extra, Max, and Ultra, Blend's
+  Ultracode. Effort sets each model's thinking and room, and how many times the final answer is checked: Extra once, Max up to twice;
+  Ultra writes a plan first (the checklist a complete answer must meet, shown and ticked off), has every answer written against it, then
+  checks and corrects until the check passes (up to three times). Claude is sent its effort ("max" at Max and Ultra); OpenAI, Gemini and
+  OpenRouter their reasoning effort where they take one. Each level is explained on hover, in one line beside the key, and in the Guide.
+- Three new ways: Debate and settle (each model reads the others' answers and revises its own, saying what it changed and why), Check
+  every claim (the writer answers, the others check it claim by claim, the writer accepts or rejects each finding and corrects), Divide
+  the work (the writer divides the task, each part goes to the model named for it, the writer joins them). And Ingenium chooses: Check
+  every claim for code, Debate and settle for a question that weighs options, Divide the work for a long task in parts (three models or
+  more), Compare and combine otherwise; it says what it chose and why, before the run and under the answer.
+- Who writes the final answer can be chosen (Ingenium chooses: the greatest weight; then a connected model of Claude, OpenAI, Gemini, Kimi
+  or OpenRouter before one on this device; then the largest). Under the answer: How it was settled (agreed, differed and what was kept,
+  left out, findings accepted or rejected, in the writing model's own words and marked as not checked against sources); Ingenium's own
+  count of agreement when every answer is short (a name, a number); every check and correction; the time each step took.
+- The answer goes to the chat (a new conversation; the Chat page is told which one, as it opened its last one before, an old fault of
+  Open in the chat, now mended), into a folder (a conversation with the folder's way of working), Notes, Tabula, Word or the clipboard.
+  Under any reply in the chat, Check with Blend sends it to be checked claim by claim by the models she chooses; the corrected answer can
+  go back to that conversation. A blend kept as a house keeps its connected models, effort and writer, and answers in the chat whatever
+  the chat's source.
+
+    node rig/t_612_blend.js <url> <out>      # 44 checks, with stand-ins for Anthropic, OpenRouter, Ollama and the engine on the device
+
 Ingenium 6.11.2 (4 November 2026): newer models, found online when she asks; two guards for the chat. Her words: "I want a path built
 into Ingenium's models page that goes online when I click on the button to check and download and install newer models for Ingenium
 instead of having to continuously do it myself or having you do it on this chat"; and "the chat inside of the panel keeps on glitching

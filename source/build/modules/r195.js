@@ -127,7 +127,7 @@ if(typeof W.netFetch==="function"){var oNet=W.netFetch;
         var o2=Object.assign({},o);
         /* a reply of more than 32,000 tokens can take half an hour to write: the request is given that long (the apps' relay honours it) */
         if(mt>32000&&(+o2.timeout||0)<1800)o2.timeout=1800;
-        if(typeof o2.onChunk==="function")o2.onChunk=reader(/\/v1\/messages/.test(u)?"a":/\/api\/chat/.test(u)?"o":"c",o2.onChunk);
+        if(typeof o2.onChunk==="function"&&!(o.abort&&o.abort.quiet))o2.onChunk=reader(/\/v1\/messages/.test(u)?"a":/\/api\/chat/.test(u)?"o":"c",o2.onChunk);
         o=o2;}}catch(e){}
     return oNet.call(this,url,o);});}
 /* the engines on the device: the computer engine counts (usage in its last chunk, or its timings), the others are estimated */

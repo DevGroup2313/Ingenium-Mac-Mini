@@ -1157,6 +1157,41 @@ edit(r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>240)sc.scrollTop=top
      r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>=80)sc.scrollTop=top;CP.lastChat=c;CP.lastMe=me;if(CP.place)CP.place();}catch(e){}""",
      "6.11.2 one threshold for keeping her place")
 
+# ---- 6.12 (4 November 2026): Blend with her connected models (modules/r218.js). A request from Blend names its own connection and its
+#      own settings on the request itself (ab.conn, ab.maxTok, ab.think, ab.effort), so a blend can ask Claude, GPT and Ollama at the
+#      same time without switching the chat's model, and a chat reply sent meanwhile goes on with the chat's own connection. A request
+#      without them is unchanged. The model's own limits that Ingenium learned for the chat's model are not applied to another model. ----
+edit('function cloudChat(messages,onToken,onThink,ab){\n  var c=state.cloud||{}; var base=',
+     'function cloudChat(messages,onToken,onThink,ab){\n  var c=(ab&&ab.conn)||state.cloud||{}; var base=',
+     "6.12 a request may name its own connection")
+edit('var model=c.model||"", key=c.key||"", maxTok=(+$("ctlTokens").value)||1024, think=thinkOn();',
+     'var model=c.model||"", key=c.key||"", maxTok=(ab&&+ab.maxTok)||(+$("ctlTokens").value)||1024, think=(ab&&typeof ab.think==="boolean")?ab.think:thinkOn();',
+     "6.12 a request may name its own reply room and thinking")
+edit('eff=(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";',
+     'eff=(ab&&ab.effort&&EFF[ab.effort])||(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";',
+     "6.12 a request may name its own effort (Claude)")
+edit('max_tokens:(typeof ingReplyCap==="function"?ingReplyCap(maxTok,modern):(modern?Math.max(maxTok,32000):Math.max(maxTok,4096))),messages:msgs,stream:true}',
+     'max_tokens:(ab&&ab.conn?(modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):(typeof ingReplyCap==="function"?ingReplyCap(maxTok,modern):(modern?Math.max(maxTok,32000):Math.max(maxTok,4096)))),messages:msgs,stream:true}',
+     "6.12 a request on its own connection is not given the chat model's limits (Claude)")
+edit('options:{num_predict:replyTokens(),num_ctx:typeof ingCloudWindow==="function"?ingCloudWindow():32768}};if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model):true;',
+     'options:{num_predict:(ab&&+ab.maxTok)||replyTokens(),num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768)}};if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model,ab&&ab.effort):true;',
+     "6.12 a request may name its own reply room and effort (Ollama)")
+edit('return sendO(think&&!(window.IngEffort&&IngEffort.levelNow()<=1))',
+     'return sendO(think&&!((ab&&ab.effort)?ab.effort<=1:(window.IngEffort&&IngEffort.levelNow()<=1)))',
+     "6.12 Low effort on its own request answers without thinking (Ollama)")
+edit('var ocb={model:model,messages:msgs,stream:true},cap=replyTokens();',
+     'var ocb={model:model,messages:msgs,stream:true},cap=(ab&&+ab.maxTok)||replyTokens();',
+     "6.12 a request may name its own reply room (OpenAI form)")
+edit('if(!cxLocal(c.provider,ob))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     'if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     "6.12 a request on its own connection is not given the chat model's limits (OpenAI form)")
+edit('try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model);}catch(_){}',
+     'try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model,ab&&ab.effort);}catch(_){}',
+     "6.12 a request may name its own effort (OpenAI form)")
+edit('{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models at once, weigh them, and save the mix as a house of your own."}',
+     '{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models, on this device and connected, choose how hard they work, see how the answer was reached, and save the mix as a house of your own."}',
+     "6.12 the tour's Blend step says what Blend does now")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

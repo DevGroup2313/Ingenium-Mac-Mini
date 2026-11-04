@@ -127,7 +127,7 @@ function wait(secs,why,ab){return new Promise(function(res,rej){var left=Math.ma
 
 /* ---------- 5. cloudChat, kept within the model's limits ---------- */
 if(typeof W.cloudChat==="function"){var ORIG=W.cloudChat;
-  W.cloudChat=wrap(ORIG,function(messages,onToken,onThink,ab){var self=this,args=arguments,begun=false,tries=0,waits=0,msgs=keepMark(messages,(messages||[]).slice()),told="";
+  W.cloudChat=wrap(ORIG,function(messages,onToken,onThink,ab){/* 6.12: a request that names its own connection (Blend, modules/r218.js) is fitted and retried by Blend itself, never with the chat model's limits */if(ab&&ab.conn)return ORIG.apply(this,arguments);var self=this,args=arguments,begun=false,tries=0,waits=0,msgs=keepMark(messages,(messages||[]).slice()),told="";
     var w=win();
     /* 6.9.5: Lector and the Career Studio (lxAsk, which marks its request with LX.cloudAb) read in parts they size themselves: their
        text is never cut here; a refusal for size goes back to them as a context error, and they read again in smaller parts */
