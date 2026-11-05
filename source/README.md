@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.26 (5 November 2026): the Guide, in rooms; What's new in a key. Her words: "Please make the "What is new card on the Guide
+collapsible from view and folded inside of a cute popped out animated 3D button rather than this long list that is taking up half the
+page and overwhelming me. In fact, the entire Guide page looks like a very long document that does not match the rest of Ingenium and its
+graphics and designs. I want it rededesigned and reorganised to better fit the app. I want to see sections and animated 3D styling"; and,
+of the first key made for it: "The "What's new" button is way too bulky and looks too bright and odd against the rest of the app on both
+light and dark mode, please fix it."
+
+- Measured on 6.25 at 1440 x 900: the Guide was 6,408 pixels tall, eighteen cards in one column, What is new the second card.
+- Rooms (modules/r173.js, CONF.guide), as Settings and Models have them: Start here, Chat and Code, Models and devices, Making and
+  study, Around the app, each with its line (a room's line may now be a function, so it names only what the edition carries); Find in
+  the guide (r173's find box, its ids and words by page, Settings keeping its own); Show the whole guide at once. Each room is 900 to
+  1,260 pixels tall. r173 gains data-rm-skip (a part of a page that is not a card) and a hook that lets a module open what folds an
+  element (W.__rmRevealHook, called from openFolds, so reveal, autoReveal and Find all reach it).
+- Topics as tiles (modules/r230.js): each card but the tour's gets a head key (its mark on a raised amethyst disc, its title, its first
+  sentence, a chevron); pressed (or Enter), it opens across the room and the one open before folds; the tour's own card stays open,
+  first in Start here. The tiles rise in one after another when a room is shown and lift under the pointer (the rise-in fills
+  backwards only, so it never outweighs the lift); still with motion set to minimal or prefers-reduced-motion. A part inside a folded
+  topic reached from elsewhere (the tour's ring, Help's Show me, Find, the focus) opens the topic and its room. Show the whole guide
+  at once opens every topic; back in rooms they fold.
+- What's new in a key beside the title: one of the page's own raised keys (the face, rim, shadow and corners of "Show the whole guide
+  at once"), a small gold spark that turns now and then, the newest version in a quiet chip, a small gold dot until it is opened on
+  this device (ing.guide.seen.v1). Pressed, a card springs out with the versions grouped, the newest open, each earlier one a line that
+  opens; its foot says which version and build is running (the Guide's old foot line, moved there); Escape, its close key or a press
+  outside folds it and gives the focus back. On a phone it rises from the foot of the screen, above the side keys (z-index 300: above
+  the rail's 130, below the chat drawer's 620 and the dialogs' 800). r222's What is new card is kept, hidden, inside it.
+- The page is titled Guide, with a new opening line; What is new gains 6.26.
+- Tests that read a Guide card's shown words open it first (t_611_code); t_616_scroll shows the whole guide to have a page taller than
+  the window; t_615_tour finds What is new in the key.
+
+    node rig/t_626_guide.js <url> <out> [master|full|gift|demo]   # 27 checks: five rooms and their topics, each room's height, the tiles,
+                                                                  # one open at a time, the keyboard, the rise and the lift, the key in the
+                                                                  # page's family by day and by night, the card and its versions, Escape and a
+                                                                  # press outside, Find, reveal, the whole guide, a phone with the side keys
+
 Ingenium 6.25 (5 November 2026): Ingenium in its own words; the Workshop becomes the Author Studio, a room of Settings. Her words:
 "There is a lot of mention of Claude on the Plan and session panel of the Coding chat, please remove them unless it is referring to a
 function that connects to Claude. I want for Ingenium's pages and chatrooms to have their own identities, please [remove] the Claude,

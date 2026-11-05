@@ -23,7 +23,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(probe.plain === 0, 'the same part, unmarked, shows no bar', probe);
 
   /* 2. the page itself: taller than the window, it scrolls with no bar */
-  const pg = await p.evaluate(async () => { go('guide'); await new Promise(r => setTimeout(r, 500)); const se = document.scrollingElement, m = document.querySelector('.main');
+  // since 6.26 the Guide is in rooms and fits a window: shown whole (Show the whole guide at once), it is a page taller than the window again
+  const pg = await p.evaluate(async () => { go('guide'); try { const k = document.getElementById('rmAll-guide'); if (k && !document.getElementById('page-guide').classList.contains('rm-all')) k.click(); } catch (e) {} await new Promise(r => setTimeout(r, 500)); const se = document.scrollingElement, m = document.querySelector('.main');
     const host = (m && m.scrollHeight > m.clientHeight + 40) ? m : se; const before = host.scrollTop; host.scrollTop = before + 400; await new Promise(r => setTimeout(r, 80));
     return { host: host === se ? 'page' : 'main', tall: host.scrollHeight > host.clientHeight + 40, moved: host.scrollTop > before, gut: host === se ? innerWidth - document.documentElement.clientWidth : __gut(host) }; });
   ok(pg.tall && pg.moved && pg.gut === 0, 'the Guide, taller than the window, scrolls with no bar beside it', pg);

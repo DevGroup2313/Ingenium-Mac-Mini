@@ -229,7 +229,8 @@ const APP = [{ name: 'index.html', text: '<!doctype html>\n<html><head><meta cha
   ok(ren.native === 0 && ren.shown && ren.h === 'Name this conversation' && ren.title === 'Tally, with a take-away key' && ren.closed, 'Rename in the left column asks in Ingenium\'s own dialog (the browser\'s grey box is not used), and Enter keeps the new name', ren);
   await p.evaluate(() => { const c = curChat(); ccRowMenu(c, document.getElementById('ccTitle')); [...document.querySelectorAll('#ccMenu .menu-btn')].find(x => x.textContent === 'Rename').click(); });
   await p.waitForTimeout(400); await p.screenshot({ path: OUT + '/rename-dialog.png' }); await p.evaluate(() => closeModal());
-  const guide = await p.evaluate(() => { go('guide'); const c = document.getElementById('guideEffortCard'); return c ? c.innerText.replace(/\s+/g, ' ') : null; });
+  // since 6.26 each topic of the Guide is a folded tile in a room (modules/r230.js): it is opened, as she would open it, before it is read
+  const guide = await p.evaluate(async () => { go('guide'); if (window.IngGuide) IngGuide.toggle('guideEffortCard', true); await new Promise(r => setTimeout(r, 400)); const c = document.getElementById('guideEffortCard'); return c ? c.innerText.replace(/\s+/g, ' ') : null; });
   ok(guide && /Low to Max/.test(guide) && /Auto/.test(guide) && /Ultracode/.test(guide) && /xhigh for Extra/.test(guide) && /three times/.test(guide) && /Honest limits/.test(guide), 'the Guide explains effort, Auto and Ultracode in depth, with their honest limits', guide && guide.slice(0, 300));
   ok(errs.length === 0, 'no script errors on the page', errs);
   // ---------- 9. a phone ----------

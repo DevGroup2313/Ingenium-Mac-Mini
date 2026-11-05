@@ -86,9 +86,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* 7. the Guide */
   const g = await p.evaluate(() => { go('guide'); const pg = document.getElementById('page-guide'); const ids = [...pg.querySelectorAll('.card')].map(c => c.id).filter(Boolean);
-    return { ids, wn: [...document.querySelectorAll('#wnGuide .wn-list li b')].map(x => x.textContent), twice: (() => { go('home'); go('guide'); return document.querySelectorAll('#wnGuide').length; })() }; });
+    return { ids, inKey: !!document.querySelector('#gdNewPop #wnGuide'), wn: [...document.querySelectorAll('#wnGuide .wn-list li b')].map(x => x.textContent), twice: (() => { go('home'); go('guide'); return document.querySelectorAll('#wnGuide').length; })() }; });
   const at = id => g.ids.indexOf(id);
-  ok(at('wnGuide') === at('guideTourCard') + 1, 'What is new comes right after the guided tour\'s card', g.ids);
+  // since 6.26 What is new lives in the Guide's What's new key (modules/r230.js), not among the cards
+  ok(g.inKey || at('wnGuide') === at('guideTourCard') + 1, 'What is new is in the Guide\'s What\'s new key (before 6.26: right after the guided tour\'s card)', g.ids);
   ok(at('mdGuide') > at('cnGuide') && at('fdGuide') > at('cnGuide') && (career ? at('csGuide') > at('fdGuide') : at('csGuide') < 0), 'Folders, the Career Studio (where carried) and Models follow the other cards', g.ids);
   ok(/^6\.(1[4-9]|2\d)/.test(g.wn[0]) && g.wn.includes('6.14') && g.wn.includes('6.10') && (career ? g.wn.includes('6.9.7') : !g.wn.includes('6.9.7') && !g.wn.includes('6.9.8')) && g.twice === 1, 'What is new lists the versions newest first, those of this edition only, once', g);
   await p.waitForTimeout(700); await p.screenshot({ path: OUT + '/guide_new.png' });
