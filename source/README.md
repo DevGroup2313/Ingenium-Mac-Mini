@@ -371,6 +371,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.29 (5 November 2026): a model's reply length and memory, remembered, and set wherever it works. Her words: the Tokens and
+Context controls "reset", and she wants to set them, and the effort, on every page that runs a model (the Career Studio, Lector and the
+rest).
+
+- Measured on 6.24 (and unchanged on 6.28): a model with no saved limits was shown the sliders' midpoints in Chat's Controls (16,512
+  tokens of reply and 17,408 of memory: a range input falls back to its midpoint when given no number) and then ran with them; the
+  Models page's Settings saved those numbers on the model; and Settings cut a saved memory of 65,536 to 32,768, where its slider stopped.
+  Lector, the Career Studio and Folders had Effort beside their model (r225) but no reply length or memory.
+- modules/r233.js. A missing, zero or broken reply length, memory or effort is mended to the app's own defaults (1,024; 8,192 or the
+  model's trained memory if smaller; 3), on opening, before Chat shows a model, and before Settings opens; a small model's own small
+  memory (a trained 256) is kept. Settings raises its sliders to every saved value, so it shows and keeps them. Beside Effort on Lector,
+  the Career Studio and Folders (a folder's Where we left off card), Reply up to and Memory set the same two numbers for the model that
+  page writes with (Lector's plan), saved on the model and shown at once in Chat's Controls when it is Chat's model too; with a
+  connected model they say they follow it. Lector's ask (outermost of its layers) lets a reply run to the model's own length where the
+  model's memory has room for it beyond the prompt, and never shortens what a task asked for. A new memory takes effect when the model
+  next loads; the strip says so when the loaded model has another.
+- What is new gains 6.29.
+
+    node rig/t_629_limits.js <url> <out>     # 12 checks, with stand-in model cards: defaults not midpoints, zero and broken numbers
+                                             # mended and a trained 256 kept, Settings keeps 6,144 and 65,536, the strip on the three
+                                             # pages, one change seen everywhere and after a reload, the reply length used within room
+
 Ingenium 6.28 (5 November 2026): the Train room, in parts. Her words: "The cards on the Train tab inside of the Models page is really stiff
 and not animated or clickable, please fix that. There is also a lot of scrolling on that page, it should have a redesign that has some
 tabs and sections to better show the page and not have me endlessly scrolling and losing interest in the page's contents. The rest of the
