@@ -371,6 +371,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.23 (5 November 2026): a model installed once. Her words: "there are a lot of duplicate models downloaded on the Models page
+of Ingenium, the app does not seem to register when a model has been installed twice".
+
+- modules/r229.js. lineupInstall never asked whether the model was already here, so Get pressed again (on the Models page, in Getting
+  ready, from Lector or the Career Studio) fetched it again and added a card; a file brought in again (addEntries) became a second card;
+  the other routes matched cards only by their own id. Now a lineup model already here is not fetched again and says so; a file already
+  here (the same name and size) is not added again and says so. Cards that are the same model (the same lineup model, or the same file
+  name and size) are listed at the top of Your models, with one key: Keep one of each. It asks first, then keeps the one in use (or
+  the built-in one, or the first) and removes the others through removeModel, which frees their stored copies and only unlists a
+  linked file (an Ollama blob or a file on a drive), never deleting it.
+- What is new gains 6.23.
+
+    node rig/t_623_dupes.js <url> <out>      # 10 checks, with stand-in model cards: found, listed, Get not repeated, a file not added
+                                             # twice, asked first, the one in use kept, a model installed once untouched
+
 Ingenium 6.22 (5 November 2026): the Career Studio reads a posting as an admissions tutor and a recruiter would, and shows its reasoning.
 Her words: "The Career Studio does not analyse the job postings or uploading applications properly, it is waiting to see everything
 written from my profile to match the roles or applications requirements verbatim and for it to be saying the exact same thing for them to
