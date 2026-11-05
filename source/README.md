@@ -371,6 +371,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.22 (5 November 2026): the Career Studio reads a posting as an admissions tutor and a recruiter would, and shows its reasoning.
+Her words: "The Career Studio does not analyse the job postings or uploading applications properly, it is waiting to see everything
+written from my profile to match the roles or applications requirements verbatim and for it to be saying the exact same thing for them to
+be considered as a match, if not, everything is considered as "Not a good fit" or a "Stretch" I want it to be more nuanced ... I want the
+Career Studio to bridge the gaps from my resume without inventing any experience, skills and education"; "Instead of seeing a blank canvas,
+I want to see the model's thinking on the Applications tab of the Career Studio"; and, of her doctoral choices, "I want the Lector page and
+the Career Studio fully briefed and equipped to help me make the best decision with the right reasoning, analysis and data".
+
+- The reading (modules/r188.js, readMsgs, parseRead): the model was asked to mark a criterion MET only when the profile "shows it plainly",
+  PARTLY when it shows "something close to it, but not it", and to "never count what the profile does not show", as an adviser "who never
+  flatters"; the writing rule added "never stretch what the profile says into more than it says". A model that obeys that marks experience
+  that transfers from another setting as not shown. Now it reads as an admissions tutor and a recruiter: MET, TRANSFERABLE (the same ability
+  shown in another setting), PARTLY or NOT SHOWN; it names the entry of the profile each judgement rests on and says how it answers the
+  criterion; each gap is LEARNABLE, ASK ME (she may have done it) or REQUIRED (a formal requirement); and it says in two or three sentences
+  how a reader would see the application. Never inventing stays the rule: drawing the link from her own record is allowed, claiming beyond
+  it is not.
+- The band (bandOf): a stated, weighted rule (shown 1, transfers 0.85, partly 0.5, not shown but learnable 0.25; desirable criteria a
+  fifth), five bands (Strong, Good, Possible, A stretch, Not a fit), a formal requirement not shown makes it a stretch at best, and what the
+  band would be if the Ask me criteria are hers. A reading made before 6.22 (no transfers, entries or gaps in it) keeps the rule it was made
+  under, and says that reading it again gives the fuller reading.
+- The guard against invention (vetEvidence): each judgement is checked first by the entry it names (it must be in her profile), then by its
+  words; a "shown" or "transfers" found nowhere counts only as partly shown until she checks it, as before.
+- How you fit shows the band with how a reader would see it, what waits on her, the gaps she could close, the formal requirements not
+  shown, and for each criterion the entry it rests on and the link to make; How the model reasoned is kept with the reading.
+- While it reads (livePanel): the model's reasoning as it comes (two edits in build_page.py: lxAsk hands a model's reasoning to LX.onThink,
+  on this device and through a connection), a line saying what it is doing and for how long, and each criterion in a table as it is judged,
+  in place of a blank panel.
+- The writer (critBlock and the shared rule): a CV, a letter or a statement is told which criteria transfer, from which entry, and the link
+  to make, and never to claim what is not shown.
+- A profile file may carry applications (with their particulars, dates and notes) and people (each tied to the application the file
+  names), or be a pack of only those (kind "ingenium-career-pack"); nothing already there is added twice.
+- What is new gains 6.22.
+
+    node rig/t_622_reading.js <url> <out>    # 26 checks, with a stand-in model that streams its reasoning and a reading, an invented
+                                             # applicant and posting: the live panel, the request, the judgements, the guard, the band,
+                                             # How you fit, the letter's request, an earlier reading, and programmes and people from a file
+
 Ingenium 6.21 (5 November 2026): the Career Studio's add keys, chosen cards and back keys; Copy from the right-click panel; the
 preview's own keys. Her words: "I want the "+ Bring one" button to be purple on the Today tab page ... the "+ A person" button of the
 People tab page to also be made purple ... add the light purple colour of the "Roles and programmes that suit you" card to the selected

@@ -1280,6 +1280,21 @@ edit("""    function copyText(txt){var f=clipFn("__ingClipWrite");
       try{var ta0=document.createElement("textarea");ta0.value=txt;ta0.setAttribute("readonly","");ta0.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(ta0);ta0.select();var ok0=document.execCommand("copy");ta0.remove();if(ok0)return;}catch(e){}
       if(f){""", "6.21 the touch panel's Copy whole note copies inside the press too")
 
+
+# ---- 6.22 (5 November 2026): the model's reasoning reaches the Career Studio (modules/r188.js). Her words: "Instead of seeing a blank
+#      canvas, I want to see the model's thinking on the Applications tab of the Career Studio. I want to be able to see the process and
+#      the thought process and rationale of the models when it is reading the postings against my profile". lxAsk (the ask path Lector,
+#      the Career Studio and Folders share) let a model's reasoning go, on this device and through a connection; it now hands it to
+#      LX.onThink when someone has set one (the studio does, for each request, and clears it after). Nothing else changes. ----
+edit("""Engine.setStatus("busy");LX.inFlight=true;
+    return Engine.generate({messages:msgs,params:params,onToken:function(t){out+=t;if(onPiece)onPiece(out);},onThink:function(){}})""",
+     """Engine.setStatus("busy");LX.inFlight=true;
+    return Engine.generate({messages:msgs,params:params,onToken:function(t){out+=t;if(onPiece)onPiece(out);},onThink:function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}}})""",
+     "6.22 lxAsk hands the reasoning on, on this device")
+edit("""return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},function(){},ab);})""",
+     """return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}},ab);})""",
+     "6.22 lxAsk hands the reasoning on, through a connection")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

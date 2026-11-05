@@ -73,8 +73,8 @@ body[data-motion="minimal"] #cs .c-pn,body[data-calm="1"] #cs .c-pn{animation:no
 #cs .c-btn.c-danger{color:var(--c-bad)}
 #cs .c-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:linear-gradient(var(--c-a),var(--c-b));border:1px solid var(--c-hair);color:var(--c-ink2);white-space:nowrap;box-shadow:var(--c-pill)}
 #cs .c-chip i{width:8px;height:8px;border-radius:50%;background:currentColor}
-#cs .c-chip.c-ok,#cs .c-band-strong{color:var(--c-ok)}#cs .c-band-possible{color:#4f73ad}#cs .c-band-stretch{color:var(--c-warn)}#cs .c-band-poor{color:var(--c-bad)}
-body[data-theme="night"] #cs .c-band-possible{color:#9db8e8}
+#cs .c-chip.c-ok,#cs .c-band-strong{color:var(--c-ok)}#cs .c-band-good{color:#3c7f8c}#cs .c-band-possible{color:#4f73ad}#cs .c-band-stretch{color:var(--c-warn)}#cs .c-band-poor{color:var(--c-bad)}
+body[data-theme="night"] #cs .c-band-possible{color:#9db8e8}body[data-theme="night"] #cs .c-band-good{color:#8fd0d8}
 /* a row of choices: the chosen one raised and purple */
 #cs .c-seg{display:inline-flex;gap:2px;border:1px solid var(--c-hair);border-radius:999px;padding:3px;background:var(--c-wellbg);box-shadow:var(--c-well);max-width:100%;overflow-x:auto;flex:0 0 auto;align-self:flex-start}
 #cs .c-seg button{border:1px solid transparent;background:transparent;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--c-ink3);white-space:nowrap}
@@ -188,7 +188,7 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-lesson-ol{margin:0 0 0 20px;padding:0;font-size:13.5px;line-height:1.6;color:var(--c-ink2)}#cs .c-lesson-ol li{margin:4px 0}
 /* how you fit */
 #cs .c-bandcard{border-radius:12px;padding:14px 16px;border:1px solid var(--c-hair);border-left:6px solid var(--c-ink3);background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill)}
-#cs .c-bandcard[data-band="strong"]{border-left-color:var(--c-ok)}#cs .c-bandcard[data-band="possible"]{border-left-color:#5f7fb0}#cs .c-bandcard[data-band="stretch"]{border-left-color:var(--c-warn)}#cs .c-bandcard[data-band="poor"]{border-left-color:var(--c-bad)}
+#cs .c-bandcard[data-band="strong"]{border-left-color:var(--c-ok)}#cs .c-bandcard[data-band="good"]{border-left-color:#3c7f8c}#cs .c-bandcard[data-band="possible"]{border-left-color:#5f7fb0}#cs .c-bandcard[data-band="stretch"]{border-left-color:var(--c-warn)}#cs .c-bandcard[data-band="poor"]{border-left-color:var(--c-bad)}
 #cs .c-bandcard h3{font:600 21px/1.2 var(--c-serif);letter-spacing:.03em;margin:0 0 6px}
 #cs .c-bandcard p{margin:4px 0;font-size:13.5px;line-height:1.55;color:var(--c-ink2)}#cs .c-advice{color:var(--c-ink1) !important}
 #cs .c-pc,#cs .c-next{margin:0 0 0 18px;padding:0;font-size:13.5px;line-height:1.55;color:var(--c-ink2)}#cs .c-pc li{margin:4px 0}
@@ -198,7 +198,16 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-tab th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--c-ink3);font-weight:700;border-top:0}
 #cs .c-tab td:first-child{color:var(--c-ink1)}#cs .c-tab small{display:block;color:var(--c-ink3);font-size:11.5px}
 #cs .c-st{white-space:nowrap;font-weight:700;font-size:12px;padding:2px 8px;border-radius:999px}
-#cs .c-st[data-st="met"]{color:var(--c-ok);background:var(--c-oks)}#cs .c-st[data-st="partly"]{color:var(--c-warn);background:var(--c-warns)}#cs .c-st[data-st="none"]{color:var(--c-bad);background:var(--c-bads)}
+#cs .c-st[data-st="met"]{color:var(--c-ok);background:var(--c-oks)}#cs .c-st[data-st="transfer"]{color:var(--c-acc);background:var(--c-accs)}
+#cs .c-gap{display:inline-block;margin:4px 0 0 4px;white-space:nowrap;font-weight:600;font-size:11.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--c-hair);color:var(--c-ink2)}
+#cs .c-gap[data-g="learn"]{border-color:rgba(184,121,31,.35)}#cs .c-gap[data-g="ask"]{border-color:var(--c-ring);color:var(--c-acc)}#cs .c-gap[data-g="hard"]{border-color:rgba(184,67,63,.4);color:var(--c-bad)}
+#cs .c-from{display:block;font-weight:600;color:var(--c-ink1);margin-bottom:2px}#cs .c-bridge{display:block}#cs .c-bridge i{font-style:normal;font-weight:600;color:var(--c-acc)}
+#cs .c-close{display:block;color:var(--c-ink2);font-size:12px;margin-top:3px}#cs tr.c-tr td{background:linear-gradient(90deg,var(--c-accs),transparent 60%)}
+#cs .c-view{font-size:14px;line-height:1.55;color:var(--c-ink1)}
+#cs .c-gaps{margin:6px 0 10px 18px;padding:0}#cs .c-gaps li{margin:5px 0;font-size:13px;line-height:1.5}#cs .c-gaps li span{display:block;color:var(--c-ink2)}
+#cs .c-think{margin:10px 0 6px;border:1px solid var(--c-hair);border-radius:10px;padding:6px 10px;background:linear-gradient(var(--c-a),var(--c-b))}#cs .c-think summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--c-ink1)}
+#cs .c-think-b{white-space:pre-wrap;font:12.5px/1.55 var(--c-sans,inherit);color:var(--c-ink2);max-height:260px;overflow:auto;margin-top:6px}
+#cs .c-live-state{font-size:13px;color:var(--c-ink2);margin:0 16px 6px}#cs .c-sofar{margin:0 16px}#cs .c-old{color:var(--c-warn)}#cs .c-st[data-st="partly"]{color:var(--c-warn);background:var(--c-warns)}#cs .c-st[data-st="none"]{color:var(--c-bad);background:var(--c-bads)}
 /* practise, and her own draft */
 #cs .c-fb{font-size:13.5px;line-height:1.55;padding:11px 13px;border-radius:10px;background:var(--c-accs);border:1px solid var(--c-hair);color:var(--c-ink1);display:flex;flex-direction:column;gap:4px}
 #cs .c-fb b{color:var(--c-acc)}
@@ -369,7 +378,7 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-vet:before{content:"\2713\00a0";}
 #cs .c-vet[data-v=found]{color:var(--c-ok)}
 #cs .c-vet[data-v=near]:before{content:"\2248\00a0"}
-#cs .c-vet[data-v=missing]{color:var(--c-warn)}
+#cs .c-vet[data-v=missing],#cs .c-vet[data-v=check]{color:var(--c-warn)}
 #cs .c-vet[data-v=missing]:before{content:"!\00a0";font-weight:700}
 #cs .c-lead{margin:4px 0 2px;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45;color:var(--c-ink1)}
 #cs .c-lead li span{display:block;color:var(--c-ink3);font-size:12.5px}
@@ -501,10 +510,11 @@ function cloudKey(){var o=plan();if(typeof lxCxReady!=="function")return null;
 function whereLine(){var o=plan();if(o&&o.cloud)return lxCloudLeaves()?"through your "+lxCloudWho()+" connection: what it reads is sent to "+lxCloudWho():"through your connection, on your own computer or in your home";
   if(o&&o.link)return "on your other computer, over your own network";return "on this device";}
 function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(90000,(ctx-1800)*3));}
-var RUN={busy:false,stop:false,what:"",live:"",opp:null};
+var RUN={busy:false,stop:false,what:"",live:"",think:"",opp:null,t0:0};
 function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
-  return new Promise(function(res,rej){(function go1(){if(RUN.stop){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";paintLive();
-    lxAsk({modelId:o&&o.chosen?o.chosen.id:null},msgs,max,temp,function(t){RUN.live=t;paintLive();}).then(function(t){if(RUN.stop)rej(new Error("stopped"));else res(String(t||""));},function(e){var m=String(e&&e.message||e);
+  return new Promise(function(res,rej){(function go1(){if(RUN.stop){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";RUN.think="";paintLive();
+    try{if(W.LX)LX.onThink=function(t){if(!t)return;RUN.think+=t;paintLive();};}catch(e){}
+    lxAsk({modelId:o&&o.chosen?o.chosen.id:null},msgs,max,temp,function(t){RUN.live=t;paintLive();}).then(function(t){try{if(W.LX)LX.onThink=null;}catch(e){}if(RUN.stop)rej(new Error("stopped"));else res(String(t||""));},function(e){try{if(W.LX)LX.onThink=null;}catch(x){}var m=String(e&&e.message||e);
       if(RUN.stop){rej(new Error("stopped"));return;}
       if(m==="busy"&&waits++<200){RUN.live="Waiting for the model to finish what it is doing…";paintLive();setTimeout(go1,1500);return;}
       var big=false;try{big=lxIsCtxError(e);}catch(x){}if(big&&scale>0.3){scale*=0.7;setTimeout(go1,300);return;}
@@ -512,15 +522,16 @@ function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
   try{if(W.LX&&LX.busy){say("Lector is using the model. Wait for it, or pause it in Lector.");return true;}}catch(e){}return false;}
 function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses."+(typeof lxCxReady==="function"&&lxCxReady()?" Or choose your connected model, "+lxCloudName()+", on the studio's first page.":""));return true;}
-function begin(opp,what){RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.opp=opp?opp.id:null;CS().ui.show="work";render();}
-function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.opp=null;render();}
+function begin(opp,what){RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=opp?opp.id:null;CS().ui.show="work";render();startTick();}
+var TICK=0;function startTick(){if(TICK)return;TICK=setInterval(function(){if(!RUN.busy){clearInterval(TICK);TICK=0;return;}paintLive();},1000);}
+function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.think="";RUN.opp=null;render();}
 function stopNow(){RUN.stop=true;try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}}
 function failed(e){var m=String(e&&e.message||e);end();if(m!=="stopped")say("It could not be finished: "+m);}
 
 /* what the model is told, every time: the profile is the only source of facts about her, and nothing is invented */
 function banned(){try{return (LXR().banned||[]).join(", ");}catch(e){return "";}}
 function sys(extra,prose){var X="";try{if(prose)X=LXR().charter||"";}catch(e){}
-  return "You write on this device for the applicant, in the first person as the applicant, in "+english()+": exact, measured and plain, never promotional. THE RULES. Use only what THE PROFILE shows about me: my posts, studies, dates, skills, results, publications and names. Never invent a skill, a post, a qualification, a date, a figure, a publication, a name, a referee or a quotation, and never stretch what the profile says into more than it says. Where the posting asks for something the profile does not show, do not claim it. Where a fact is needed and the profile does not give it, write a placeholder in square brackets, such as [the dates]. Do not flatter the reader, the organisation or me."+
+  return "You write on this device for the applicant, in the first person as the applicant, in "+english()+": exact, measured and plain, never promotional. THE RULES. Use only what THE PROFILE shows about me: my posts, studies, dates, skills, results, publications and names. Never invent a skill, a post, a qualification, a date, a figure, a publication, a name, a referee or a quotation, and never stretch what the profile says into more than it says. You may show how what the profile does show answers what is asked (experience that transfers from another setting), naming where it comes from; that is drawing the link, not stretching. Where the posting asks for something the profile does not show, do not claim it. Where a fact is needed and the profile does not give it, write a placeholder in square brackets, such as [the dates]. Do not flatter the reader, the organisation or me."+
     (banned()?" Words never to use: "+banned()+".":"")+X+(extra?" "+extra:"");}
 function cut(t,n){t=String(t||"");if(n<=0)return "";if(t.length<=n)return t;var c=t.slice(0,n),p=Math.max(c.lastIndexOf(". "),c.lastIndexOf("\n"));return (p>n*0.6?c.slice(0,p+1):c)+" […]";}
 
@@ -563,39 +574,78 @@ function postText(o){if(!o)return Promise.resolve("");var more=(o.more||[]).filt
   return Promise.all([loadText(o.ref)].concat(more.map(function(m){return loadText(m.ref);}))).then(function(ts){var out=ts[0]||"";more.forEach(function(m,i){if(ts[i+1])out+="\n\nFURTHER PARTICULARS ("+m.name+"):\n"+ts[i+1];});return out;});}
 function kindWord(k){return {job:"posting",phd:"programme's call",grant:"call for applications",other:"posting"}[k]||"posting";}
 /* the reading, line by line: what the model is asked to return, and how it is read back */
-function readMsgs(G,post,o,scale){var R=room()*scale;
-  var u="Read THE "+kindWord(o.kind).toUpperCase()+" against THE PROFILE, as a careful and honest adviser who never flatters.\n"+
-    (wantsText()?"0. First, how it matches WHAT I AM LOOKING FOR: for each of my wants and needs that it bears on, say whether it matches, partly matches or does not, from what it says.\n":"")+
+function readMsgs(G,post,o,scale){var R=room()*scale,wt=wantsText();
+  var u="Read THE "+kindWord(o.kind).toUpperCase()+" against THE PROFILE for me, as an experienced admissions tutor and recruiter reads an application: generously and honestly. "+
+    "Credit what transfers: a criterion may be met by what I have done in another setting, shown by its results, even where THE PROFILE uses other words than the "+kindWord(o.kind)+". Never credit what THE PROFILE does not show, and never invent.\n"+
+    (wt?"0. First, how it matches WHAT I AM LOOKING FOR: for each of my wants and needs that it bears on, say whether it matches, partly matches or does not, from what it says.\n":"")+
     "1. List what it asks of the person, each criterion on its own line, in its own words, shortened. Mark each ESSENTIAL or DESIRABLE as it says; where it does not say, mark ESSENTIAL what it calls required, needed or must, and DESIRABLE the rest.\n"+
-    "2. Judge each from THE PROFILE alone: MET (the profile shows it plainly), PARTLY (the profile shows something close to it, but not it), or NOT SHOWN. Never count what the profile does not show. Name the evidence briefly, in the profile's own words.\n"+
-    "3. Then the strengths of an application from this profile, the concerns, said plainly, the next steps, and any question worth asking the contact.\n"+
+    "2. Judge each from THE PROFILE: MET (THE PROFILE shows it directly), TRANSFERABLE (THE PROFILE shows the same ability or knowledge in another setting, and a reader would accept it once the link is made plain), PARTLY (THE PROFILE shows part of it), or NOT SHOWN (nothing in THE PROFILE bears on it). "+
+    "Name the entry it rests on exactly as THE PROFILE names it (or MY CV, or the name of one of MY DOCUMENTS or MY APPS), and say in one or two plain sentences what that entry shows and how it answers the criterion.\n"+
+    "3. For PARTLY and NOT SHOWN, say what kind of gap it is: LEARNABLE (a tool, a method or a body of knowledge that could be learned or shown before applying or in the post), ASK ME (I may well have done it and THE PROFILE does not say), or REQUIRED (a formal requirement, such as a degree, a licence or a right to work, that no framing can bridge); then what would close it.\n"+
+    "4. Then, in two or three sentences, how an admissions tutor or a hiring manager would see this application from this profile, and why; its strengths and its concerns, said plainly; the next steps; and any question worth asking the contact.\n"+
     "Answer in exactly this form, one item to a line, and nothing else:\n"+
     "TITLE: the post, programme or grant\nORGANISATION: who offers it\nCLOSES: the closing date as it gives it, or unknown\nKIND: JOB or PHD or GRANT or OTHER\n"+
-    (wantsText()?"WANT: what I am looking for or need | MATCHES or PARTLY or DOES NOT MATCH or NOT SAID | what it offers on that point\n(one WANT line for each of my wants and needs it bears on)\n":"")+
-    "CRITERION: the criterion | ESSENTIAL or DESIRABLE | MET or PARTLY or NOT SHOWN | the evidence from the profile, or none\n(one CRITERION line for each criterion, at most 14)\n"+
+    (wt?"WANT: what I am looking for or need | MATCHES or PARTLY or DOES NOT MATCH or NOT SAID | what it offers on that point\n(one WANT line for each of my wants and needs it bears on)\n":"")+
+    "CRITERION: the criterion | ESSENTIAL or DESIRABLE | MET or TRANSFERABLE or PARTLY or NOT SHOWN | the entry it rests on, or none | what that entry shows and how it answers the criterion | for PARTLY or NOT SHOWN only: LEARNABLE or ASK ME or REQUIRED, and what would close the gap\n(one CRITERION line for each criterion, at most 14)\n"+
+    "READING: how an admissions tutor or a hiring manager would see this application, and why, in two or three sentences\n"+
     "STRENGTH: a strength of this application, from the profile\nCONCERN: a weakness or a risk, said plainly\nNEXT: a concrete next step\nASK: a question worth asking the contact\n"+
     "LEAD: an entry of THE PROFILE to put first in this application, named exactly as THE PROFILE names it | the criteria it answers best\n(up to three LEAD lines, the strongest first; name only entries that are in THE PROFILE)\n\n"+
     "THE "+kindWord(o.kind).toUpperCase()+":\n"+cut(post,Math.floor(R*0.3))+"\n\n"+profileBlock(G,R*0.66);
-  return [{role:"system",content:sys("You are now reading an opportunity against my profile for me, and you say plainly what it shows, including what it does not show.")},{role:"user",content:u}];}
-function parseRead(t){var r={title:"",org:"",closes:"",kind:"",wants:[],crit:[],strengths:[],concerns:[],next:[],asks:[],lead:[]};
+  return [{role:"system",content:sys("You are now reading an opportunity against my profile for me, as an experienced admissions tutor and recruiter: you credit what transfers from my own record, you say plainly what is missing, and you never invent.")},{role:"user",content:u}];}
+function parseRead(t){var r={title:"",org:"",closes:"",kind:"",wants:[],crit:[],strengths:[],concerns:[],next:[],asks:[],lead:[],view:""};
   String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").split("\n").forEach(function(line){var L=line.replace(/\*\*/g,"").replace(/^\s*(?:[-*•]\s*)?/,"").trim(),m=/^([A-Za-z][A-Za-z ]{1,14}):\s*(.*)$/.exec(L);if(!m)return;var k=m[1].trim().toUpperCase(),v=m[2].trim();if(!v)return;
     if(k==="TITLE")r.title=v;else if(k==="ORGANISATION"||k==="ORGANIZATION")r.org=v;else if(k==="CLOSES")r.closes=/^unknown$/i.test(v)?"":v;else if(k==="KIND")r.kind=v.toLowerCase();
-    else if(k==="CRITERION"){var p=v.split("|").map(function(x){return x.trim();});if(!p[0])return;var ess=!/^desirable/i.test(p[1]||""),st=/not\s*shown|^no\b/i.test(p[2]||"")?"none":/^partly|^partial/i.test(p[2]||"")?"partly":/^met|^yes/i.test(p[2]||"")?"met":"none";
-      var ev=(p[3]||"").replace(/^none\.?$/i,"");if(st!=="none"&&!ev)st="partly";r.crit.push({text:p[0],ess:ess,st:st,ev:ev});}
+    else if(k==="CRITERION"){var p=v.split("|").map(function(x){return x.trim();});if(!p[0])return;var ess=!/^desirable/i.test(p[1]||""),s2=p[2]||"",
+        st=/transfer/i.test(s2)?"transfer":/not\s*shown|^no\b/i.test(s2)?"none":/^partly|^partial/i.test(s2)?"partly":/^met|^yes|^shown/i.test(s2)?"met":"none";
+      var nw=p.length>=5,src=nw?(p[3]||""):"",ev=nw?(p[4]||""):(p[3]||""),gr=nw?(p[5]||""):"";
+      if(p.length===5&&/^(learnable|ask\s*me|required)\b/i.test(p[4])){src="";ev=p[3]||"";gr=p[4];}
+      src=src.replace(/^(none|n\/a|-|nothing)\.?$/i,"");ev=ev.replace(/^none\.?$/i,"");
+      var gap=/^\s*requir|formal requirement|mandatory/i.test(gr)?"hard":/^\s*ask/i.test(gr)?"ask":/^\s*learn/i.test(gr)?"learn":"";
+      var close=gr.replace(/^\s*(learnable|ask\s*me|ask|required)\s*[:,.;\-–—]?\s*/i,"").trim();
+      if(st!=="none"&&!ev&&!src)st="partly";if(st==="met"||st==="transfer"){gap="";close="";}
+      r.crit.push({text:p[0],ess:ess,st:st,ev:ev,src:src,gap:gap,close:close});}
+    else if(k==="READING"){if(!r.view)r.view=v;}
     else if(k==="WANT"){var w=v.split("|").map(function(x){return x.trim();});if(!w[0])return;var ws=/does\s*not|^no\b/i.test(w[1]||"")?"none":/^partly|^partial/i.test(w[1]||"")?"partly":/not\s*said|unknown|unclear/i.test(w[1]||"")?"unsaid":/^match|^yes/i.test(w[1]||"")?"met":"unsaid";r.wants.push({text:w[0],st:ws,offer:w[2]||""});}
     else if(k==="STRENGTH")r.strengths.push(v);else if(k==="CONCERN")r.concerns.push(v);else if(k==="NEXT")r.next.push(v);else if(k==="ASK")r.asks.push(v);
     else if(k==="LEAD"){var ld=v.split("|").map(function(x){return x.trim();});if(ld[0]&&r.lead.length<3)r.lead.push({title:ld[0].replace(/^["“'‘]|["”'’]$/g,""),why:ld[1]||""});}});
   r.crit=r.crit.slice(0,14);return r;}
 /* the band follows from the criteria by a fixed rule, shown with it; it is not a probability */
-var BANDS={strong:"Strong fit",possible:"Possible fit",stretch:"A stretch",poor:"Not a fit as your profile stands"};
-function bandOf(r){var c=r.crit||[];if(!c.length)return null;var E=c.filter(function(x){return x.ess;});if(!E.length)E=c;var Dz=c.filter(function(x){return E.indexOf(x)<0;});
+var BANDS={strong:"Strong fit",good:"Good fit",possible:"Possible fit",stretch:"A stretch",poor:"Not a fit as your profile stands"};
+var BAND_A={strong:"a strong fit",good:"a good fit",possible:"a possible fit",stretch:"a stretch",poor:"not a fit"};
+/* 6.22: what each judgement counts toward the band (shown with it as the rule) */
+var CWT={met:1,transfer:0.85,partly:0.5,none:0};
+function critPts(x,ifAsk){if(ifAsk&&x.st==="none"&&x.gap==="ask")return 1;var v=CWT[x.st];if(v==null)v=0;if(x.st==="none"&&x.gap==="learn")v=0.25;return v;}
+function bandScore(E,Dz,ifAsk){function avg(a){return a.length?a.reduce(function(t,x){return t+critPts(x,ifAsk);},0)/a.length:1;}var es=avg(E);return Dz.length?es*0.8+avg(Dz)*0.2:es;}
+function bandPick(sc,none,hard,unbr,ne){return hard>=2?"poor":hard===1?(sc>=0.6?"stretch":"poor"):(sc>=0.85&&none===0)?"strong":(sc>=0.7&&unbr===0)?"good":(sc>=0.5&&unbr<=ne/4)?"possible":sc>=0.3?"stretch":"poor";}
+/* a reading made before 6.22 (no transfers, no entries named, no gaps typed) keeps the rule it was made under */
+var BANDS0={strong:"Strong fit",possible:"Possible fit",stretch:"A stretch",poor:"Not a fit as your profile stands"};
+function bandOf0(r){var c=r.crit||[];if(!c.length)return null;var E=c.filter(function(x){return x.ess;});if(!E.length)E=c;var Dz=c.filter(function(x){return E.indexOf(x)<0;});
   var met=E.filter(function(x){return x.st==="met";}).length,part=E.filter(function(x){return x.st==="partly";}).length,none=E.length-met-part,dm=Dz.filter(function(x){return x.st==="met";}).length+0.5*Dz.filter(function(x){return x.st==="partly";}).length;
   var b=none===0&&part<=E.length/4&&(!Dz.length||dm>=Dz.length/2)?"strong":none===0?"possible":(none===1||none<=E.length/3)?"stretch":"poor";
   var why=[];why.push(met+" of "+E.length+" essential criteria "+(E.length===1?"is":"are")+" shown plainly in your profile"+(part?"; "+part+" "+(part===1?"is":"are")+" only partly shown":"")+(none?"; "+none+" "+(none===1?"is":"are")+" not shown":"")+".");
   if(Dz.length){var dmet=Dz.filter(function(x){return x.st==="met";}).length;why.push("Of the "+Dz.length+" desirable, "+dmet+" "+(dmet===1?"is":"are")+" shown plainly.");}
   var adv={strong:"Apply. Lead with the criteria you meet most plainly.",possible:"Apply, and make the partly shown criteria plain in what you send: they are where a reader will hesitate.",
     stretch:"Apply only if you can show the missing criteria: add the evidence to your profile and read it again, or ask the contact first whether they would consider you.",poor:"Do not apply as things stand. If the missing criteria are things you have done, add them to your profile and read it again."}[b];
-  return {band:b,word:BANDS[b],why:why,advice:adv,rule:"The rule: every essential criterion shown and most desirable ones, a strong fit; every essential shown, a possible fit; one essential not shown (or up to a third), a stretch; more, not a fit. A criterion your profile does not show may still be one you meet: then add it to your profile."};}
+  return {band:b,word:BANDS0[b],why:why,advice:adv,rule:"The rule: every essential criterion shown and most desirable ones, a strong fit; every essential shown, a possible fit; one essential not shown (or up to a third), a stretch; more, not a fit. A criterion your profile does not show may still be one you meet: then add it to your profile."};}
+function bandOf(r){var c=r.crit||[];if(!c.length)return null;if(!c.some(function(x){return x.st==="transfer"||x.src||x.gap;}))return bandOf0(r);var E=c.filter(function(x){return x.ess;});if(!E.length)E=c;var Dz=c.filter(function(x){return E.indexOf(x)<0;});
+  function n(a,st){return a.filter(function(x){return x.st===st;}).length;}
+  var met=n(E,"met"),tr=n(E,"transfer"),part=n(E,"partly"),none=n(E,"none");
+  var hard=E.filter(function(x){return x.st!=="met"&&x.st!=="transfer"&&x.gap==="hard";}).length,ask=c.filter(function(x){return x.st==="none"&&x.gap==="ask";}).length;
+  var unbr=E.filter(function(x){return x.st==="none"&&x.gap!=="learn";}).length,unbr2=E.filter(function(x){return x.st==="none"&&x.gap!=="learn"&&x.gap!=="ask";}).length;
+  var sc=bandScore(E,Dz,false),b=bandPick(sc,none,hard,unbr,E.length);
+  var b2=ask?bandPick(bandScore(E,Dz,true),E.filter(function(x){return x.st==="none"&&x.gap!=="ask";}).length,hard,unbr2,E.length):null;if(b2===b)b2=null;
+  var bits=[];if(met)bits.push(met+" shown directly");if(tr)bits.push(tr+" "+(tr===1?"transfers":"transfer")+" from your other work");if(part)bits.push(part+" partly shown");if(none)bits.push(none+" not shown");
+  var why=["Of the "+E.length+" essential criteria, "+bits.join(", ").replace(/, ([^,]*)$/," and $1")+"."];
+  if(Dz.length){var dk=n(Dz,"met")+n(Dz,"transfer");why.push("Of the "+Dz.length+" desirable, "+dk+" "+(dk===1?"is":"are")+" shown or "+(dk===1?"transfers":"transfer")+".");}
+  if(hard)why.push(hard===1?"One is a formal requirement your profile does not show (marked Required).":hard+" are formal requirements your profile does not show (marked Required).");
+  if(b2)why.push((ask===1?"One criterion your profile does not show may be something you have done (marked Ask me). If it is, this would be ":ask+" criteria your profile does not show may be things you have done (marked Ask me). If they are, this would be ")+BAND_A[b2]+".");
+  var adv={strong:"Apply. Lead with the criteria you meet most plainly, and give each transferable one a sentence that makes the link plain.",
+    good:"Apply. Make each transferable criterion plain in your CV and letter, in the posting's own words: the bridges under What it asks say how, from your own record.",
+    possible:"Worth applying if you want it: make the transferable and partly shown criteria plain, and say how you are closing the gaps marked Learnable.",
+    stretch:"Apply only if you want it enough to make the case: close what you can (Learnable), answer the Ask me ones, and consider writing to the contact first.",
+    poor:hard?"Not as things stand: it asks for a formal requirement your profile does not show. If you do hold it, add it to your profile and read it again.":"Not as things stand. If the criteria not shown are things you have done, add them to your profile and read it again."}[b];
+  return {band:b,word:BANDS[b],why:why,advice:adv,score:Math.round(sc*100)/100,ifAsk:b2?{band:b2,word:BANDS[b2]}:null,
+    rule:"The rule: each essential criterion counts 1 when shown directly, 0.85 when it transfers from your other work, 0.5 when partly shown, 0.25 when not shown but learnable, and 0 otherwise; the desirable ones count for a fifth. 0.85 or more, with no essential criterion missing, is a strong fit; 0.7 or more, with every missing essential one learnable, a good fit; 0.5 or more, with no more than a quarter of the essential ones missing and not learnable, a possible fit; 0.3 or more, a stretch; below that, not a fit. A formal requirement that is not shown makes it a stretch at best. It is not a probability, and a criterion your profile does not show may still be one you meet: then add it to your profile."};}
 function readOpp(o){if(busyNow()||needModel())return;begin(o,"Reading it against your profile");
   Promise.all([postText(o),gatherProfile({opp:o})]).then(function(x){var post=x[0],G=x[1];if(!post)throw new Error("the posting's text is no longer kept; add it again");
     return ask(function(sc){return readMsgs(G,post,o,sc);},1700,0.2).then(function(t){var r=parseRead(t);
@@ -603,7 +653,7 @@ function readOpp(o){if(busyNow()||needModel())return;begin(o,"Reading it against
       vetEvidence(r,G);vetLead(r,G);
       if(r.title&&!o.titleSet)o.title=r.title.slice(0,120);if(r.org&&!o.orgSet)o.org=r.org.slice(0,120);if(r.closes&&(!o.closes||o.closes.length>40))o.closes=r.closes.slice(0,80);if(!o.due&&dateIn(o.closes))o.due=dateIn(o.closes);
       if(/phd|dphil|doctor/i.test(r.kind)&&o.kind==="job"&&!o.kindSet)o.kind="phd";else if(/grant|fellow/i.test(r.kind)&&o.kind==="job"&&!o.kindSet)o.kind="grant";
-      o.read={at:Date.now(),model:modelName(),r:r};o.step="fit";save();});}).then(end,failed);}
+      o.read={at:Date.now(),model:modelName(),r:r,think:String(RUN.think||"").slice(0,24000),how:6.22};o.step="fit";save();});}).then(end,failed);}
 
 /* 6.9.8 · the reading vetted against her profile. Each piece of evidence it names is looked for in her profile itself: found in
    its words, or nearly (most of its words of substance are there), it stands; not found, a "shown" falls to "partly shown" until
@@ -612,10 +662,20 @@ function readOpp(o){if(busyNow()||needModel())return;begin(o,"Reading it against
 var VET_STOP={"with":1,"that":1,"this":1,"from":1,"have":1,"been":1,"were":1,"which":1,"their":1,"they":1,"them":1,"into":1,"also":1,"more":1,"most":1,"some":1,"such":1,"than":1,"then":1,"there":1,"these":1,"those":1,"what":1,"when":1,"where":1,"while":1,"about":1,"over":1,"under":1,"very":1,"your":1,"yours":1,"other":1,"each":1,"both":1,"only":1,"just":1,"through":1,"across":1,"including":1,"profile":1,"shows":1,"shown":1,"evidence":1,"none":1,"plainly":1,"partly":1,"does":1,"doing":1,"done":1,"being":1,"will":1,"would":1,"could":1,"should":1,"years":1,"year":1};
 function vetPlain(s){return String(s||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ");}
 function vetWords(s){var a=vetPlain(s).split(" ").filter(function(w){return w.length>3&&!VET_STOP[w];});return a.filter(function(w,i){return a.indexOf(w)===i;});}
+function vetSrc(src,G){var s=vetPlain(src).trim();if(!s)return null;if(/^(my )?cv\b|curriculum vitae|^resume/.test(s))return G.cv?"cv":null;
+  var P=CS().profile,sw=vetWords(src);
+  if(sw.length){var best=0;P.items.forEach(function(x){if(x.src==="linkedin"&&!P.use.linkedin)return;var iw=vetWords(x.title+" "+(x.place||""));if(!iw.length)return;
+      var hit=sw.filter(function(w){return iw.some(function(y){return y===w||(y.length>5&&w.length>5&&(y.indexOf(w)===0||w.indexOf(y)===0));});}).length,sc=hit/Math.min(sw.length,iw.length);if(sc>best)best=sc;});
+    if(best>=0.6)return "entry";}
+  if((G.files||[]).some(function(f){var nm=vetPlain(f.name).replace(/\b(docx|pdf|txt|md|rtf|html?)\b/g," ").trim();return nm&&(s.indexOf(nm)>=0||nm.indexOf(s)>=0);}))return "doc";
+  if((G.apps||[]).some(function(a){var nm=vetPlain(a.name).trim();return nm&&s.indexOf(nm)>=0;}))return "app";
+  return null;}
 function vetEvidence(r,G){var M=" "+vetPlain(material(G))+" ";
-  (r.crit||[]).forEach(function(c){c.vet="";if(!c.ev||c.st==="none")return;var ws=vetWords(c.ev);if(!ws.length){c.vet="found";return;}
-    var hit=ws.filter(function(w){return M.indexOf(" "+w)>=0||(w.length>6&&M.indexOf(" "+w.slice(0,w.length-2))>=0);}).length,share=hit/ws.length;
-    c.vet=share>=0.7?"found":share>=0.45?"near":"missing";if(c.vet==="missing"&&c.st==="met"){c.st="partly";c.was="met";}});
+  (r.crit||[]).forEach(function(c){c.vet="";c.at="";if((!c.ev&&!c.src)||c.st==="none")return;
+    var ws=vetWords(c.ev),share=1;if(ws.length){var hit=ws.filter(function(w){return M.indexOf(" "+w)>=0||(w.length>6&&M.indexOf(" "+w.slice(0,w.length-2))>=0);}).length;share=hit/ws.length;}
+    var at=c.src?vetSrc(c.src,G):null;c.at=at||"";
+    c.vet=(at&&share>=0.2)||share>=0.7?"found":at?"check":share>=0.45?"near":"missing";
+    if(c.vet==="missing"&&(c.st==="met"||c.st==="transfer")){c.was=c.st;c.st="partly";}});
   return r;}
 function vetLead(r,G){var P=CS().profile,out=[];
   (r.lead||[]).forEach(function(l){var lw=vetWords(l.title);if(!lw.length)return;var best=null,bs=0;
@@ -640,7 +700,7 @@ var DOCS={cv:["Tailored CV","A CV in the order this application asks for, from y
 var FOR={job:["cv","cover","supporting","portfolio"],phd:["statement","purpose","proposal","sample","cv","cover","funding","portfolio"],grant:["proposal","funding","statement","cv","cover"],other:["cv","cover","supporting","statement","purpose","proposal","teaching","funding","sample","portfolio"]};
 var ROLES=[["supervisor","A prospective supervisor"],["pastsup","A past or present supervisor"],["referee","A referee"],["mentor","A mentor"],["manager","A hiring manager"],["recruiter","A recruiter"],["contact","The contact named in the posting"]];
 var PURPOSES=[["enquire","To ask about the post or programme"],["advice","To ask for advice on my application"],["introduce","To introduce myself and my research"],["reference","To ask for a reference"],["followup","To follow up on my application"],["thanks","To thank them after an interview"],["accept","To accept an offer"],["decline","To decline an offer"]];
-function critBlock(o){var r=o.read&&o.read.r;if(!r||!r.crit.length)return "";return "THE CRITERIA, AS READ AGAINST MY PROFILE:\n"+r.crit.map(function(c){return "- "+c.text+" ("+(c.ess?"essential":"desirable")+"; "+{met:"shown",partly:"partly shown",none:"NOT SHOWN: do not claim it"}[c.st]+(c.ev?"; evidence: "+c.ev:"")+")";}).join("\n");}
+function critBlock(o){var r=o.read&&o.read.r;if(!r||!r.crit.length)return "";return "THE CRITERIA, AS READ AGAINST MY PROFILE (for TRANSFERS, make the link plain in a sentence drawn from the entry named; never claim what is NOT SHOWN):\n"+r.crit.map(function(c){return "- "+c.text+" ("+(c.ess?"essential":"desirable")+"; "+({met:"shown",transfer:"TRANSFERS",partly:"partly shown: say what I have, do not claim the rest",none:"NOT SHOWN: do not claim it"}[c.st]||"not shown")+(c.src?"; from: "+c.src:"")+(c.ev?"; "+(c.st==="transfer"?"the link: ":"evidence: ")+c.ev:"")+(c.st==="none"&&c.gap==="learn"&&c.close?"; I may say how I am closing it: "+c.close:"")+")";}).join("\n");}
 function voiceBlock(G,R){var out=[];if(G.writing.length)out.push("MY OWN WRITING (match its voice and rhythm; do not copy its content):\n"+cut(G.writing.join("\n\n---\n\n"),Math.floor(R*0.06)));
   if(G.letters.length)out.push("MY PAST LETTERS (for their shape and tone only; their facts may be out of date):\n"+cut(G.letters.join("\n\n---\n\n"),Math.floor(R*0.06)));return out.join("\n\n");}
 function sourcesBlock(G){if(!G.sources.length)return "";return "MY SOURCES (cite one by its number in square brackets, like [2], only where it supports the sentence; invent none and use none that is not here):\n"+G.sources.map(function(s){return "["+s.n+"] "+s.text;}).join("\n");}
@@ -802,12 +862,15 @@ function packNorm(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," 
 function packKey(it){return (it.sec||"other")+"|"+packNorm(it.title)+"|"+packNorm(it.place);}
 function packEmpty(){var P=CS().profile,M=lectorMe();return !P.items.length&&!P.files.length&&!(M&&M.cv);}
 function packRead(t){var d;try{d=JSON.parse(String(t||"").replace(/^﻿/,""));}catch(e){throw new Error("it could not be read as a profile file");}
-  if(!d||d.kind!=="ingenium-profile"||!(+d.v>=1))throw new Error("it is not an Ingenium profile file");
+  if(!d||(d.kind!=="ingenium-profile"&&d.kind!=="ingenium-career-pack")||!(+d.v>=1))throw new Error("it is not an Ingenium profile file");
   if(+d.v>1)throw new Error("it was made by a newer Ingenium: update this one first");
   d.person=d.person&&typeof d.person==="object"?d.person:{};
   d.items=Array.isArray(d.items)?d.items.filter(function(x){return x&&typeof x.title==="string"&&x.title.trim();}):[];
   d.files=Array.isArray(d.files)?d.files.filter(function(x){return x&&typeof x.name==="string"&&typeof x.text==="string";}):[];
-  if(d.cv&&!(typeof d.cv.text==="string"&&d.cv.text.trim().length>=80))d.cv=null;return d;}
+  if(d.cv&&!(typeof d.cv.text==="string"&&d.cv.text.trim().length>=80))d.cv=null;
+  /* 6.22: applications (programmes, posts, grants, with their particulars) and the people to write to, in the same file or a pack of their own */
+  d.opps=Array.isArray(d.opps)?d.opps.filter(function(x){return x&&typeof x.text==="string"&&x.text.trim().length>=40;}):[];
+  d.contacts=Array.isArray(d.contacts)?d.contacts.filter(function(x){return x&&typeof x.name==="string"&&x.name.trim();}):[];return d;}
 function packSecs(){var o={};SECTS.forEach(function(x){o[x[0]]=x[1];});return o;}
 function packTally(d){var L=packSecs(),n={};d.items.forEach(function(x){var k=L[x.sec]?x.sec:"other";n[k]=(n[k]||0)+1;});
   return SECTS.filter(function(x){return n[x[0]];}).map(function(x){return n[x[0]]+" "+x[1];}).join(", ");}
@@ -826,21 +889,39 @@ function packApply(d){var P=CS().profile,M=lectorMe(),L=packSecs(),got={items:0,
     return Promise.resolve(IngBig.put(ref,t)).then(function(){P.files.push({id:uid("f"),name:x.name.trim().slice(0,200),ref:ref,chars:t.length,at:Date.now(),use:true,kind:String(x.kind||"").slice(0,20)});got.files++;});});});
   if(d.cv)q=q.then(function(){if(M.cv){got.keptCv=true;return;}var t=d.cv.text.trim(),ref=IngBig.newId();
     return Promise.resolve(IngBig.put(ref,t)).then(function(){M.cv={ref:ref,name:String(d.cv.name||"CV").slice(0,200),chars:t.length,at:Date.now()};got.cv=true;});});
+  if((d.opps&&d.opps.length)||(d.contacts&&d.contacts.length))q=q.then(function(){return packApplyMore(d,got);});
   return q.then(function(){P.at=Date.now();save();return got;});}
+/* 6.22: applications and people from a file: an application already here (same title and organisation) or a person already here (same
+   name and organisation) is left as it is; a person is tied to the application the file names for them */
+function packApplyMore(d,got){var S=CS(),have={},made={},q=Promise.resolve();got.opps=0;got.contacts=0;
+  S.opps.forEach(function(o){have[packNorm(o.title)+"|"+packNorm(o.org)]=o.id;made[packNorm(o.title)]=o.id;});
+  (d.opps||[]).forEach(function(x){q=q.then(function(){var k=packNorm(x.title)+"|"+packNorm(x.org);if(x.title&&have[k]){got.same++;return;}
+    var kind=/^(job|phd|grant|other)$/.test(x.kind)?x.kind:"other";
+    return newOpp(kind,String(x.text).trim(),"file").then(function(o){if(x.title){o.title=String(x.title).trim().slice(0,120);o.titleSet=true;}if(x.org){o.org=String(x.org).trim().slice(0,120);o.orgSet=true;}
+      if(x.closes)o.closes=String(x.closes).trim().slice(0,80);if(/^\d{4}-\d{2}-\d{2}$/.test(String(x.due||"")))o.due=x.due;if(x.notes)o.notes=String(x.notes).slice(0,6000);o.kindSet=true;
+      have[packNorm(o.title)+"|"+packNorm(o.org)]=o.id;made[packNorm(o.title)]=o.id;got.opps++;});});});
+  return q.then(function(){var C=contacts(),seen={};C.forEach(function(c){seen[packNorm(c.name)+"|"+packNorm(c.org)]=1;});
+    (d.contacts||[]).forEach(function(x){var k=packNorm(x.name)+"|"+packNorm(x.org);if(seen[k]){got.same++;return;}seen[k]=1;
+      var role=PPL_ROLES.some(function(r){return r[0]===x.role;})?x.role:"supervisor";
+      C.push({id:uid("pc"),name:String(x.name).trim().slice(0,120),role:role,org:String(x.org||"").trim().slice(0,200),email:String(x.email||"").trim().slice(0,200),link:String(x.link||"").trim().slice(0,400),
+        opp:made[packNorm(x.opp||"")]||"",status:"write",by:"",follow:"",notes:String(x.notes||"").slice(0,6000),draft:"",at:Date.now()});got.contacts++;});
+    save();});}
 function packSay(d,got){var me=CS().profile.isMe!==false,bits=[];
   if(got.items)bits.push(got.items+" entr"+(got.items===1?"y":"ies"));if(got.files)bits.push(got.files+" document"+(got.files===1?"":"s"));
   if(got.cv)bits.push(me?"your CV, which Lector now uses too":"the CV");
+  if(got.opps)bits.push(got.opps+" application"+(got.opps===1?"":"s")+" (in Applications)");if(got.contacts)bits.push(got.contacts+" "+(got.contacts===1?"person":"people")+" to write to (in People)");
   var t=bits.length?"Brought in: "+bits.join(", ")+".":"Nothing new: everything in the file is already here.";
   if(got.same&&bits.length)t+=" "+got.same+" already here "+(got.same===1?"was":"were")+" left as "+(got.same===1?"it was":"they were")+".";
   if(got.keptCv)t+=" "+(me?"Your CV was already kept, so it stays; the file's CV is among the documents if it was in them.":"The CV kept here stays.");
-  say(t+(bits.length?" Look them over in Your entries: change or remove anything.":""));}
+  say(t+(bits.length?" Look them over"+(got.items||got.files?" in Your entries":"")+": change or remove anything.":""));}
 /* the file is read, and what it holds is said before anything changes: into this profile, or a new one when this one is not empty */
 function packOpen(d){var empty0=packEmpty(),who=String(d.person.name||"").trim()||"this person",n=d.items.length,f=d.files.length;
-  var html='<h3>Bring in a profile</h3><p class="small">The file is '+esc(who)+"'s"+(d.made?" (made "+esc(String(d.made))+")":"")+'. It holds:</p><ul class="small">'
-    +'<li>'+n+' entr'+(n===1?'y':'ies')+(n?': '+esc(packTally(d)):'')+'</li><li>'+f+' document'+(f===1?'':'s')+'</li>'+(d.cv?'<li>a CV: '+esc(String(d.cv.name||'CV'))+'</li>':'')+'</ul>'
+  var only=!(n||f||d.cv);   /* 6.22: a pack of applications and people only, for the profile open now */
+  var html='<h3>'+(only?'Bring in applications and people':'Bring in a profile')+'</h3><p class="small">'+(only?'The file':'The file is '+esc(who)+"'s")+(d.made?" (made "+esc(String(d.made))+")":"")+'. It holds:</p><ul class="small">'
+    +(only?'':'<li>'+n+' entr'+(n===1?'y':'ies')+(n?': '+esc(packTally(d)):'')+'</li><li>'+f+' document'+(f===1?'':'s')+'</li>')+(d.cv?'<li>a CV: '+esc(String(d.cv.name||'CV'))+'</li>':'')+(d.opps&&d.opps.length?'<li>'+d.opps.length+' application'+(d.opps.length===1?'':'s')+' (programmes, posts or grants, with their particulars)</li>':'')+(d.contacts&&d.contacts.length?'<li>'+d.contacts.length+' '+(d.contacts.length===1?'person':'people')+' to write to</li>':'')+'</ul>'
     +'<p class="small muted">Nothing already in a profile is changed, and nothing is added twice. It stays on this device: Ingenium sends it nowhere.</p>'
     +'<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px"><button class="btn ghost" id="pkCancel">Cancel</button>'
-    +(empty0?'':'<button class="btn" id="pkNew">Make it a new profile</button>')
+    +(empty0||only?'':'<button class="btn" id="pkNew">Make it a new profile</button>')
     +'<button class="btn primary" id="pkHere">'+(empty0?'Bring it in':'Add it to '+esc(personLabel(CS())))+'</button></div>';
   var box=modalOpen(html),busy=false;
   function go(asNew){if(busy)return;busy=true;closeModal();
@@ -1288,10 +1369,27 @@ function draftFor(c){if(busyNow()||needModel())return;var S=CS(),P=S.profile;beg
 function jump(){var host=$("csHost");if(host)host.__jump=true;}
 function two(L,R,par){L.el.classList.add("c-list");R.el.classList.add("c-work");par.appendChild(L.el);par.appendChild(R.el);}
 function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"});var p=h("p","c-note");p.id="csWhat";p.textContent=RUN.what;P.body.appendChild(p);
-  var l=h("div","c-live");l.id="csLive";l.setAttribute("aria-live","polite");l.textContent=RUN.live||"…";P.body.appendChild(l);
+  var st=h("p","c-live-state");st.id="csLiveState";st.setAttribute("aria-live","polite");P.body.appendChild(st);
+  var th=h("details","c-think");th.id="csThink";th.open=true;th.appendChild(h("summary",null,esc("How the model is reasoning")));var tb=h("div","c-think-b");tb.id="csThinkB";th.appendChild(tb);P.body.appendChild(th);
+  var sofar=h("div","c-sofar");sofar.id="csSoFar";P.body.appendChild(sofar);
+  var l=h("div","c-live");l.id="csLive";l.textContent=RUN.live||"…";P.body.appendChild(l);
   var pl=plan();P.foot.appendChild(h("span","c-note c-grow",esc(pl&&pl.link?"Written with "+(modelName()||"your model")+", "+whereLine()+".":"Written with "+(modelName()||"your model")+" on this device. Nothing leaves it.")));
-  P.foot.appendChild(cbtn("","Stop",stopNow));return P;}
-function paintLive(){var l=$("csLive");if(l){l.textContent=RUN.live||"…";l.scrollTop=l.scrollHeight;}var w=$("csWhat");if(w)w.textContent=RUN.what;}
+  P.foot.appendChild(cbtn("","Stop",stopNow));setTimeout(paintLive,0);return P;}
+/* 6.22: what is shown while it works: the time, the model's own reasoning when it gives it, and each criterion as it is judged */
+function liveStateText(){var s=Math.max(0,Math.round((Date.now()-(RUN.t0||Date.now()))/1000)),t=s<60?s+" seconds":Math.floor(s/60)+" min "+(s%60)+" s";
+  if(!RUN.live&&!RUN.think)return "The model is reading the posting and your profile before its first word ("+t+" so far). A model on this device can take a minute or more here; a connected one is quicker.";
+  if(RUN.think&&!RUN.live)return "The model is reasoning ("+t+" so far). Its reasoning is shown below as it comes.";
+  var n=(String(RUN.live).match(/^\s*(?:[-*•]\s*)?(?:\*\*)?CRITERION(?:\*\*)?:/gim)||[]).length;return n?n+" criteri"+(n===1?"on":"a")+" judged so far ("+t+")."+(RUN.think?" Its reasoning is above.":""):"Writing ("+t+" so far).";}
+function paintLive(){var w=$("csWhat");if(w)w.textContent=RUN.what;var st=$("csLiveState");if(st)st.textContent=liveStateText();
+  var tb=$("csThinkB"),th=$("csThink");if(tb&&th){th.style.display=RUN.think?"":"none";if(tb.textContent!==RUN.think){tb.textContent=RUN.think;tb.scrollTop=tb.scrollHeight;}}
+  var sf=$("csSoFar"),l=$("csLive"),r=null;if(sf&&RUN.live&&/CRITERION/i.test(RUN.live)){try{r=parseRead(RUN.live);}catch(e){r=null;}}
+  if(sf){sf.innerHTML="";if(r&&r.crit.length){var t=h("table","c-tab c-tab-live");t.innerHTML="<thead><tr><th>Criterion</th><th>Judged</th><th>From your record</th></tr></thead>";var tbd=h("tbody");
+      r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td>"+stChip(x)+"</td><td>"+(x.src?"<b>"+esc(x.src)+"</b> ":"")+esc(x.ev||"")+"</td>";tbd.appendChild(tr);});
+      t.appendChild(tbd);sf.appendChild(t);}}
+  if(l){l.style.display=r&&r.crit.length?"none":"";l.textContent=RUN.live||"…";l.scrollTop=l.scrollHeight;}}
+function stChip(x){var lab={met:"Shown",transfer:"Transfers",partly:"Partly shown",none:"Not shown"}[x.st]||"Not shown";
+  var g=(x.st==="partly"||x.st==="none")&&x.gap?"<span class=\"c-gap\" data-g=\""+x.gap+"\">"+{learn:"Learnable",ask:"Ask me",hard:"Required"}[x.gap]+"</span>":"";
+  return "<span class=\"c-st\" data-st=\""+x.st+"\">"+lab+"</span>"+g;}
 function daysLeft(o){if(!o.due)return null;var d=new Date(o.due+"T12:00:00"),t=new Date();if(isNaN(d))return null;t.setHours(12,0,0,0);return Math.round((d-t)/864e5);}
 /* a closing date in words ("30 November 2026", "November 30, 2026", "2026-11-30"), as a date for the tracker */
 var MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
@@ -1437,23 +1535,35 @@ function stepPost(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),ti=i
   P.foot.appendChild(cbtn("","Look it up online",function(){lookUp(o);},"Searches the internet for the organisation and the post, only now"));P.foot.appendChild(h("span","c-grow"));
   P.foot.appendChild(o.read?cbtn("pri","Next: how you fit",function(){goStep(o,"fit");}):cbtn("pri","Read it against my profile",function(){o.step="fit";readOpp(o);}));}
 function stepFit(o,P){var r=o.read&&o.read.r,b=r&&bandOf(r);
-  if(!b){P.body.appendChild(empty("Not read yet","The studio reads it against your profile: first how it matches what you are looking for; then each criterion it asks for, judged shown, partly shown or not shown, with the evidence named; then a plain band with its reasons, and what to do next."));
+  if(!b){P.body.appendChild(empty("Not read yet","The studio reads it against your profile as an admissions tutor or a recruiter would: how it matches what you are looking for; each criterion it asks for, shown, transferring from your other work, partly shown or not shown, with the entry it rests on and the link to make; what kind each gap is; and a band with its reasons and what to do next. You see the model's reasoning as it works."));
     P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Read it against my profile",function(){readOpp(o);}));return;}
   var cols=h("div","c-cols"),a=h("div","c-col"),z=h("div","c-col");
-  var band=h("div","c-bandcard");band.setAttribute("data-band",b.band);band.appendChild(h("h3",null,esc(b.word)));b.why.forEach(function(w){band.appendChild(h("p",null,esc(w)));});
+  var band=h("div","c-bandcard");band.setAttribute("data-band",b.band);band.appendChild(h("h3",null,esc(b.word)));
+  if(r.view)band.appendChild(h("p","c-view","<b>How a reader would see it.</b> "+esc(r.view)));
+  b.why.forEach(function(w){band.appendChild(h("p",null,esc(w)));});
   band.appendChild(h("p","c-advice","<b>Advice.</b> "+esc(b.advice)));a.appendChild(band);
+  if(o.read.how!==6.22&&!(o.read.r.crit||[]).some(function(x){return x.st==="transfer"||x.src;}))a.appendChild(h("p","c-note c-old",esc("This reading was made before 6.22, which credits experience that transfers from your other work. Read it again for the fuller reading.")));
   if(r.lead&&r.lead.length){a.appendChild(h("h3","c-h3",esc("What to lead with")));var lo=h("ol","c-lead");r.lead.forEach(function(x){lo.appendChild(h("li",null,"<b>"+esc(x.title)+"</b>"+(x.why?"<span>"+esc(x.why)+"</span>":"")));});a.appendChild(lo);
     a.appendChild(h("p","c-note",esc("Entries of your profile that answer this posting best: put them first in your CV and in your letter for it.")));}
+  var asks=r.crit.filter(function(x){return x.st==="none"&&x.gap==="ask";}),learn=r.crit.filter(function(x){return (x.st==="none"||x.st==="partly")&&x.gap==="learn";}),hard=r.crit.filter(function(x){return x.st!=="met"&&x.st!=="transfer"&&x.gap==="hard";});
+  if(asks.length){a.appendChild(h("h3","c-h3",esc("Waiting on you")));a.appendChild(h("p","c-note",esc("Your profile does not say these. If you have done them, add them to Your entries and read it again; the band can only rise.")));
+    var ua=h("ul","c-gaps");asks.forEach(function(x){ua.appendChild(h("li",null,"<b>"+esc(x.text)+"</b>"+(x.close?"<span>"+esc(x.close)+"</span>":"")));});a.appendChild(ua);
+    a.appendChild(cbtn("sm","Add to my profile",function(){var S=CS();S.ui.room="profile";S.ui.ppart="items";show("work");save();render();},"Opens Your entries"));}
+  if(learn.length){a.appendChild(h("h3","c-h3",esc("Gaps you could close")));var ul2=h("ul","c-gaps");learn.forEach(function(x){ul2.appendChild(h("li",null,"<b>"+esc(x.text)+"</b>"+(x.close?"<span>"+esc(x.close)+"</span>":"")));});a.appendChild(ul2);}
+  if(hard.length){a.appendChild(h("h3","c-h3",esc("Formal requirements not shown")));var ul3=h("ul","c-gaps c-hard");hard.forEach(function(x){ul3.appendChild(h("li",null,"<b>"+esc(x.text)+"</b>"+(x.close?"<span>"+esc(x.close)+"</span>":"")));});a.appendChild(ul3);}
   if(r.strengths.length||r.concerns.length){var ul=h("ul","c-pc");r.strengths.forEach(function(s){ul.appendChild(h("li","for","<b>For</b> "+esc(s)));});r.concerns.forEach(function(s){ul.appendChild(h("li","against","<b>Against</b> "+esc(s)));});a.appendChild(ul);}
   if(r.next.length||r.asks.length){a.appendChild(h("h3","c-h3",esc("Next")));var ol=h("ol","c-next");r.next.forEach(function(s){ol.appendChild(h("li",null,esc(s)));});r.asks.forEach(function(s){ol.appendChild(h("li",null,"Ask the contact: "+esc(s)));});a.appendChild(ol);}
+  if(o.read.think){var fr=fold("think-"+o.id,"How the model reasoned");var pre=h("div","c-think-b");pre.textContent=o.read.think;fr.appendChild(pre);fr.classList.add("c-think");a.appendChild(fr);}
   a.appendChild(h("p","c-note",esc(b.rule)));
   if(r.wants&&r.wants.length){z.appendChild(h("h3","c-h3",esc("Against what you are looking for")));var wt=h("table","c-tab");wt.innerHTML="<thead><tr><th>You are looking for</th><th>Here</th><th>What it offers</th></tr></thead>";var wb=h("tbody");
     r.wants.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"</td><td><span class=\"c-st\" data-st=\""+(x.st==="unsaid"?"partly":x.st)+"\">"+{met:"Matches",partly:"Partly",none:"Does not match",unsaid:"Not said"}[x.st]+"</span></td><td>"+esc(x.offer||"")+"</td>";wb.appendChild(tr);});wt.appendChild(wb);z.appendChild(wt);}
   else if(!wantsText())z.appendChild(h("p","c-note",esc("Say what you are looking for in Your profile, and the next reading says first how each opportunity matches it.")));
-  z.appendChild(h("h3","c-h3",esc("What it asks")));var t=h("table","c-tab");t.innerHTML="<thead><tr><th>Criterion</th><th>In your profile</th><th>Evidence</th></tr></thead>";var tb=h("tbody");
-  r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td><span class=\"c-st\" data-st=\""+x.st+"\">"+{met:"Shown",partly:"Partly shown",none:"Not shown"}[x.st]+"</span></td><td>"+esc(x.ev||"")+
-    (x.vet?"<small class=\"c-vet\" data-v=\""+x.vet+"\">"+esc({found:"In your profile",near:"Close to your profile's words",missing:"Not found in your profile"+(x.was?": counted as partly shown until you check it":": check it")}[x.vet])+"</small>":"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
-  if(r.crit.some(function(x){return x.vet;}))z.appendChild(h("p","c-note",esc("Each piece of evidence was looked for in your profile itself. Where it was not found in its words, a \u201cshown\u201d counts only as partly shown until you check it: add the evidence to your profile, or read it again.")));
+  z.appendChild(h("h3","c-h3",esc("What it asks")));var t=h("table","c-tab");t.innerHTML="<thead><tr><th>Criterion</th><th>Judged</th><th>From your record</th></tr></thead>";var tb=h("tbody");
+  r.crit.forEach(function(x){var tr=h("tr");if(x.st==="transfer")tr.className="c-tr";
+    tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td>"+stChip(x)+"</td><td>"+(x.src?"<b class=\"c-from\">"+esc(x.src)+"</b>":"")+(x.st==="transfer"&&x.ev?"<span class=\"c-bridge\"><i>The link to make:</i> "+esc(x.ev)+"</span>":esc(x.ev||""))+
+    ((x.st==="partly"||x.st==="none")&&x.close?"<small class=\"c-close\">"+esc(x.close)+"</small>":"")+
+    (x.vet?"<small class=\"c-vet\" data-v=\""+x.vet+"\">"+esc({found:"In your profile",check:"The entry is in your profile: check that it shows this",near:"Close to your profile's words",missing:"Not found in your profile"+(x.was?": counted as partly shown until you check it":": check it")}[x.vet])+"</small>":"")+"</td>";tb.appendChild(tr);});t.appendChild(tb);z.appendChild(t);
+  if(r.crit.some(function(x){return x.vet;}))z.appendChild(h("p","c-note",esc("Each piece of evidence was looked for in your profile itself: first the entry it names, then its words. Where neither was found, a “shown” or a “transfers” counts only as partly shown until you check it: add the evidence to your profile, or read it again.")));
   z.appendChild(h("p","c-note",esc("Read on "+dayStr(o.read.at)+" with "+(window.ingPrettyModels||String)(o.read.model||"your model")+". The band follows from these judgements, made from your profile alone; it is not a probability.")));
   cols.appendChild(a);cols.appendChild(z);P.body.appendChild(cols);
   P.foot.appendChild(cbtn("","Read it again",function(){readOpp(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Next: its checklist",function(){goStep(o,"check");}));}
@@ -2160,11 +2270,11 @@ function bellRang(){if(MOCK){var m=MOCK;MOCK=null;clearInterval(mockT);try{if(m.
 
 /* ---- 4. an application as a folder of files (one zip), and the Settings export carrying the studio's texts ---- */
 function safeName(s){try{return lxFileName(s);}catch(e){return String(s||"file").replace(/[\\/:*?"<>|]+/g," ").trim()||"file";}}
-function stWord(st,isWant){return isWant?{met:"Matches",partly:"Partly",none:"Does not match",unsaid:"Not said"}[st]||st:{met:"Shown",partly:"Partly shown",none:"Not shown"}[st]||st;}
+function stWord(st,isWant){return isWant?{met:"Matches",partly:"Partly",none:"Does not match",unsaid:"Not said"}[st]||st:{met:"Shown",transfer:"Transfers",partly:"Partly shown",none:"Not shown"}[st]||st;}
 function readingMd(o){var r=o.read&&o.read.r;if(!r)return "";var b=bandOf(r),out=["# How you fit: "+to(o),""];
-  if(b){out.push("**"+b.word+"**","");b.why.forEach(function(w){out.push(w);});out.push("","Advice. "+b.advice,"",b.rule,"");}
+  if(b){out.push("**"+b.word+"**","");if(r.view)out.push("How a reader would see it. "+r.view,"");b.why.forEach(function(w){out.push(w);});out.push("","Advice. "+b.advice,"",b.rule,"");}
   if(r.wants&&r.wants.length){out.push("## Against what you are looking for","","| You are looking for | Here | What it offers |","|---|---|---|");r.wants.forEach(function(x){out.push("| "+x.text+" | "+stWord(x.st,true)+" | "+(x.offer||"")+" |");});out.push("");}
-  if(r.crit.length){out.push("## What it asks","","| Criterion | Essential or desirable | In your profile | Evidence |","|---|---|---|---|");r.crit.forEach(function(x){out.push("| "+x.text+" | "+(x.ess?"Essential":"Desirable")+" | "+stWord(x.st)+" | "+(x.ev||"")+" |");});out.push("");}
+  if(r.crit.length){out.push("## What it asks","","| Criterion | Essential or desirable | In your profile | Evidence |","|---|---|---|---|");r.crit.forEach(function(x){out.push("| "+x.text+" | "+(x.ess?"Essential":"Desirable")+" | "+stWord(x.st)+((x.st==="partly"||x.st==="none")&&x.gap?" ("+{learn:"learnable",ask:"ask me",hard:"required"}[x.gap]+")":"")+" | "+(x.src?x.src+": ":"")+(x.ev||"")+(x.close?" To close it: "+x.close:"")+" |");});out.push("");}
   if(r.strengths.length){out.push("## For","");r.strengths.forEach(function(s){out.push("- "+s);});out.push("");}if(r.concerns.length){out.push("## Against","");r.concerns.forEach(function(s){out.push("- "+s);});out.push("");}
   if(r.next.length||r.asks.length){out.push("## Next","");r.next.forEach(function(s){out.push("1. "+s);});r.asks.forEach(function(s){out.push("- Ask the contact: "+s);});out.push("");}
   out.push("Read on "+dayStr(o.read.at)+" with "+(window.ingPrettyModels||String)(o.read.model||"the model")+", from the profile alone; the band is not a probability.");return out.join("\n");}
