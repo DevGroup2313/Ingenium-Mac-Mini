@@ -371,6 +371,42 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.27 (5 November 2026): the editions, as she set them out. Her words: "The Ingenium edition that will be made available to the
+public and participants and even friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps,
+and the Guide and Settings page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author
+Studio and the rename Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some
+limitations such (no renaming Ingenium, and no Author Studio as well as no Author key generation. The Full edition will be a gift to my
+partner so it will contain the apps and the Lector page, the Career Stuio and Fabrica but it will not have any of the apps from the
+Offline Project built in and it will not have their skills and information or any of my profile information".
+
+- Measured on 6.26 (rig/t_627_editions.js, which opens every page of an edition and reads its words, hidden rooms included, with the
+  tour and the help): the gift and demo editions still had Fabrica and the five apps (Tabula, Abacus, Imago, Scriba, Fontes) and named
+  them about a hundred times; the full edition named Carpe Diem, The Forge and Inkwell on Home's plaque, in Lector's list of apps
+  ("Not added yet") and in the tour, and kept a hidden Author Studio tab.
+- The public editions (gift, demo): Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings. The page carries none
+  of the five apps (build_page.py; editions.carries_desk) and leaves out their modules (r118, r123, r193, r194); Fabrica's code stays,
+  as Build and the chat call it, but its key, page and route go (modules/r231.js, in these editions only, also takes the tour's Fabrica
+  chapter and its step on the five apps, and paints the Guide's tour card again), and editions._public() takes every word of them out
+  of Home (its Fabrica key and column; its apps row keeps the two instruments), the Guide, the tour, the help, the Inbox, the notes,
+  Blend, Folders, the Studio's Data and Train rooms, and Settings (the backup's packages switch, which a backup reads, stays hidden in
+  neutral words). Ingenium's own reference database (the chat's My sources, called Fontes) and its model house Scriba stay. Both public
+  editions now name none of the owner's other apps (_blank, which the gift edition had alone).
+- The full edition: the five apps, Lector, the Career Studio and Fabrica, with no Name card (6.7.1), no owner's key (r162, the master's
+  alone) and no Author Studio (r226 and r227 are the master's, and r173 now makes a room only where its edition has it: CONF's when);
+  and now _blank too, with Lector and the app library knowing Ingenium alone (LIB_KEYS, Lector's ORDER in r108; r140's seals keep all
+  four).
+- ING_HAS(part) in every page (an edit after ING_EDITION) answers author, rename and ownerkey (the master) and fabrica, desk, lector and
+  career (the master and full editions). What is new: the lines about the Career Studio show only where it is carried (6.24, 6.22,
+  and 6.17 split in two); 6.27 shows in the master edition.
+- editions/ in this repository (the Mac mini's) holds each release's full, gift and demo pages with their fingerprints
+  (editions/README.txt); release.py keeps that folder out of every kit.
+- rig/t_62_editions.js expects every edition but the master to name none of the owner's other apps.
+
+    node rig/t_627_editions.js <out> master=<url> full=<url> gift=<url> demo=<url>   # per edition: its side bar, the five apps carried or not,
+                                                                                     # no route to a page it lacks, renaming, the owner's key
+                                                                                     # and the Author Studio, every word of every page, the
+                                                                                     # tour and the help, and no page error (SURVEY=1 lists)
+
 Ingenium 6.26 (5 November 2026): the Guide, in rooms; What's new in a key. Her words: "Please make the "What is new card on the Guide
 collapsible from view and folded inside of a cute popped out animated 3D button rather than this long list that is taking up half the
 page and overwhelming me. In fact, the entire Guide page looks like a very long document that does not match the rest of Ingenium and its

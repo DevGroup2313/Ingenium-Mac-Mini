@@ -214,7 +214,8 @@ var CONF={
       ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
-    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio: check Ingenium, see its errors, fix them with a model, and add, change or hide its parts.",ids:["wsStudio"]}],
+    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio: check Ingenium, see its errors, fix them with a model, and add, change or hide its parts.",ids:["wsStudio"],
+      when:function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}}}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
   models:{label:"Models, in rooms",rooms:[
@@ -388,7 +389,8 @@ function afterLede(sec,el){var at=null,l=sec.querySelector(":scope > .lede")||se
 
 /* ---------- Settings and Models: the cards moved into their rooms ---------- */
 function buildMove(pk){var sec=$("page-"+pk);if(!sec)return null;if(sec.__rm)return sec.__rm;
-  var c=CONF[pk],R={pk:pk,c:c,sec:sec,tabs:{},panels:{},heads:{},rooms:c.rooms.concat([MORE]),cur:null,all:false,view:false};sec.__rm=R;P[pk]=R;
+  /* 6.27: a room an edition does not have (when) is not made at all */
+  var c=CONF[pk],R={pk:pk,c:c,sec:sec,tabs:{},panels:{},heads:{},rooms:c.rooms.filter(function(rm){try{return !rm.when||rm.when();}catch(e){return true;}}).concat([MORE]),cur:null,all:false,view:false};sec.__rm=R;P[pk]=R;
   if(pk==="models")studioHint(R);
   var bar=makeBar(R);afterLede(sec,bar);R.bar=bar;
   var ref=bar.nextSibling;

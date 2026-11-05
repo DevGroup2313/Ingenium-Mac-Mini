@@ -1317,6 +1317,16 @@ edit("""Every model in Ingenium starts each chat with Ingenium's own instruction
      """Every model in Ingenium starts each chat with Ingenium's own instructions and its ten rules. Below them come yours""",
      "6.25 Ingenium's own instructions in its own words")
 
+# ---- 6.27 (5 November 2026): what each edition carries, asked in one place (build/editions.py says it; modules/r231.js and the
+#      cards of Settings ask it). Her words: "The Ingenium edition that will be made available to the public and participants and even
+#      friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps, and the Guide and Settings
+#      page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author Studio and the rename
+#      Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some limitations". ----
+edit('var ING_EDITION="master";\n',
+     'var ING_EDITION="master";\nvar ING_HAS=function(p){var e=ING_EDITION;if(p==="author"||p==="rename"||p==="ownerkey")return e==="master";'
+     'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
+     "6.27 what each edition carries")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
@@ -1350,7 +1360,8 @@ assert out.count(MARK) == 1
 #      ride inside the page as base64 text and open in a frame on their pages ----
 import base64 as _b64
 _apps = ""
-for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago (slides), Scriba and Fontes too
+# 6.27: only the editions with the five apps carry them (the master and full editions; editions.carries_desk)
+for _name in (("tabula", "abacus", "slides", "scriba", "fontes") if editions.carries_desk(ED) else ()):  # R123: Imago (slides), Scriba and Fontes too
     _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
     if _name == "tabula":  # R124: Tabula keeps every part of a document when it autosaves or moves (apps/tabula_patch.py)
         import importlib.util as _ilu

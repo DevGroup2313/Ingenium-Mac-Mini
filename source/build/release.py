@@ -68,6 +68,9 @@ def wanted(path, kits, source, shared, generated):
     # and the workflow that builds the shells Fabrica fills (6.0), which builds from source/ only
     if path.startswith("source/") or path.startswith("brand/") or path.startswith(".github/lineup/") or path in (".github/workflows/lineup-sources.yml", ".github/workflows/build-shells.yml"):
         return False
+    # 6.27: the other editions' pages (editions/, in the Mac mini repository) are hers to give, never part of a kit
+    if path.startswith("editions/"):
+        return False
     # 6.6: and the repositories' own checks, which run from source/ or probe these builds: in a kit they would start on
     # its first push and fail (the model studio's, the signing key change's, the Windows window's)
     if path.startswith(".github/diag/") or path in REPO_CHECKS:

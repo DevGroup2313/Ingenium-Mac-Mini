@@ -25,7 +25,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const b = await pw.chromium.launch({ args: ['--no-sandbox'] });
   for (const { ed, url } of EDS) {
     // Ingenium of its own: the master's; in the full edition only by a permission that allows it (rig/t_62_permits.js)
-    const master = ed === 'master', ownSelf = master, libHere = ed === 'master' || ed === 'full', lector = libHere, blank = ed === 'gift';
+    // 6.27 (her rules of 5 November 2026, rig/t_627_editions.js): no edition but the master names her other apps (blank), and only the
+    // master and full editions carry the five apps and Fabrica
+    const master = ed === 'master', ownSelf = master, libHere = ed === 'master' || ed === 'full', lector = libHere, blank = !master;
     const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); const errs = [];
     p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/favicon|net::ERR|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text()); });
     try {
