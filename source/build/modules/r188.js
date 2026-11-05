@@ -59,7 +59,7 @@ body[data-motion="minimal"] #cs .c-pn,body[data-calm="1"] #cs .c-pn{animation:no
 #cs .c-pn-f{flex:0 0 auto;border-top:1px solid var(--c-hair2);padding:10px 14px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(var(--c-b),var(--c-a));min-height:54px}
 #cs .c-pn-f:empty{display:none}
 #cs .c-grow{flex:1 1 auto}
-#cs .c-back{display:none}
+#cs .c-btn.c-back{display:none}
 /* keys, raised and springing, as Lector's */
 #cs .c-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--c-hair);background:linear-gradient(var(--c-a),var(--c-b));border-radius:10px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:var(--c-pop);color:var(--c-ink1);
   transition:transform .16s var(--c-spring),box-shadow .16s ease}
@@ -100,6 +100,7 @@ body[data-theme="night"] #cs .c-band-possible{color:#9db8e8}
 #cs .c-opp .c-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
 #cs .c-soon{color:var(--c-warn) !important;font-weight:600}#cs .c-gone{opacity:.8}
 #cs .c-item.c-pin{background:linear-gradient(var(--c-accs),transparent),linear-gradient(var(--c-a),var(--c-b))}
+#cs .c-item[aria-current="true"],#cs .c-opp[aria-current="true"]{background:linear-gradient(var(--c-accs),transparent),linear-gradient(var(--c-a),var(--c-b))}
 #cs .c-item.c-new b::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c-acc);margin-left:7px;vertical-align:middle}
 #cs .c-item[class*="c-dot-"] b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle;background:var(--c-ink3)}
 #cs .c-item.c-dot-met b::before{background:var(--c-ok)}#cs .c-item.c-dot-partly b::before{background:var(--c-warn)}#cs .c-item.c-dot-none b::before{background:var(--c-bad)}
@@ -242,7 +243,7 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 /* a narrow screen: one panel at a time, a key back to the list */
 #cs.c-one .c-panels{grid-template-columns:minmax(0,1fr)}
 #cs.c-one[data-show="list"] .c-work,#cs.c-one[data-show="work"] .c-list{display:none}
-#cs.c-one .c-back{display:inline-flex}
+#cs.c-one .c-btn.c-back{display:inline-flex}
 #cs.c-one .c-head .rm-tabs{margin-left:0;justify-content:flex-start}
 #cs.c-one .c-cols,#cs.c-one .c-split{grid-template-columns:minmax(0,1fr)}
 #cs.c-one .c-split{grid-template-rows:auto minmax(0,1fr)}
@@ -1234,7 +1235,7 @@ function peopleSteps(){var out=[];contacts().forEach(function(c){var st=personSt
   out.sort(function(a,b){return a.days-b.days;});return out;}
 function oppTitle(id){var o=CS().opps.filter(function(x){return x.id===id;})[0];return o?(o.title||"Untitled")+(o.org?" · "+o.org:""):"";}
 function paintPeople(par){var S=CS(),C=contacts(),sel=C.filter(function(c){return c.id===S.ui.person;})[0]||null;
-  var L=panel("csList","People",{key:cbtn("sm","+ A person",function(){var c={id:uid("pc"),name:"",role:"supervisor",org:"",email:"",link:"",opp:"",status:"write",by:"",follow:"",notes:"",draft:"",at:Date.now()};
+  var L=panel("csList","People",{key:cbtn("pri sm","+ A person",function(){var c={id:uid("pc"),name:"",role:"supervisor",org:"",email:"",link:"",opp:"",status:"write",by:"",follow:"",notes:"",draft:"",at:Date.now()};
     C.unshift(c);S.ui.person=c.id;show("work");save();render();setTimeout(function(){var i=$("pcName");if(i)i.focus();},60);},"A potential supervisor, a referee, a recruiter or a hiring manager")});
   var next=[],wait=[],done=[];C.forEach(function(c){(personStep(c)?next:c.status==="done"?done:wait).push(c);});
   function prow(c){var st=personStep(c);return item(c.name||"Someone new",[roleWord(c.role),c.org,pstatWord(c.status),st?"next step "+pplWhen(st.due):(c.follow&&c.status==="sent"?"follow up "+pplWhen(c.follow):"")].filter(Boolean).join(" · "),sel===c,function(){S.ui.person=c.id;show("work");save();render();});}
@@ -1752,7 +1753,7 @@ function nextOf(o){if(FINISHED[o.stage])return null;
 function dateWords(d,o){var t=String(o.title||"an application").replace(/[.\s]+$/,""),l=d.label.charAt(0).toLowerCase()+d.label.slice(1);return d.kind==="closes"?t+" closes":d.kind==="interview"?"the interview for "+t:d.kind==="referee"?l+", for "+t:l+" for "+t;}
 function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowDay();
   sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}var x={o:o,n:n,mins:estimateOf(o,n)};if(o.rest&&o.rest>t)rest.push(x);else act.push(x);});
-  var L=panel("csList","Today",{key:cbtn("sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
+  var L=panel("csList","Today",{key:cbtn("pri sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
   /* 6.9.7, her choice (3 November 2026): one step at a time. The single most urgent step leads; the rest wait folded. The people she
      writes to (People) have their steps here too, in the order of their dates. */
   var sel=act.filter(function(x){return x.o.id===S.ui.today;})[0]||null,SHOWN=S.ui.many?3:1,pp=peopleSteps();

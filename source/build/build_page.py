@@ -1216,6 +1216,70 @@ edit(r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP
      r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP[3],{max_tokens:maxTok,temperature:temp,thinking:false});try{if(window.IngWriteEffort)IngWriteEffort.onLocal(params,m,msgs);}catch(_e){}""",
      "6.17 Lector's request on this device carries its effort")
 
+
+# ---- 6.21 (5 November 2026): Copy from the right-click panel reaches other apps. Her words: "I think there is a bug on right click
+#      copy/paste panel because I kept on trying to copy this prompt that I typed in Ingenium's sticky notes to Claude's chat text box
+#      and no matter what I tried it would not work properly, I had to use the keyboard's shortcuts". The panel (ing-editmenu) read the
+#      selection again when Copy was pressed, and a press on a key of the panel can take the selection out of a note first; and its
+#      copy went through the app's bridge after the press had ended, where a web view may refuse the browser's own way back. Now the
+#      words selected are kept as the panel opens, a press on the panel never moves the selection, and Copy (and Cut, and Copy the
+#      whole field) first copies inside the press itself, the way Command+C and Ctrl+C do, which every system clipboard takes; the
+#      bridge and the browser's clipboard stay as the second and third ways. ----
+edit("""  var savedRange=null;
+  function doPaste(){""",
+     """  var savedRange=null, savedText='', openSelText='';
+  function liveSel(){ try{ return String(window.getSelection()||''); }catch(e){ return ''; } }
+  function keepSel(){ try{ if(!target||target.tagName==='TEXTAREA'||target.tagName==='INPUT'||selectionText(target)||!savedRange) return; target.focus(); var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(savedRange); }catch(e){} }
+  function nativeCopy(txt){
+    var ok=false, ae=document.activeElement, sl=null, rg=null, ss=null, se=null;
+    try{ sl=window.getSelection(); if(sl&&sl.rangeCount) rg=sl.getRangeAt(0).cloneRange(); }catch(e){}
+    try{ if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT')&&typeof ae.selectionStart==='number'){ ss=ae.selectionStart; se=ae.selectionEnd; } }catch(e){}
+    var ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.setAttribute('aria-hidden','true'); ta.tabIndex=-1;
+    ta.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+    try{ document.body.appendChild(ta); ta.focus(); ta.select(); try{ ta.setSelectionRange(0,txt.length); }catch(e){} ok=document.execCommand('copy'); }catch(e){ ok=false; }
+    try{ ta.remove(); }catch(e){}
+    try{ if(ae&&ae.focus&&ae!==document.body) ae.focus({preventScroll:true}); if(ss!=null){ ae.setSelectionRange(ss,se); } else if(rg&&sl){ sl.removeAllRanges(); sl.addRange(rg); } }catch(e){}
+    return !!ok;
+  }
+  function doPaste(){""", "6.21 the panel keeps the words selected and copies inside the press")
+edit("""  function copyText(txt, after){
+    var w=clipFn('__ingClipWrite');
+    if(w){""",
+     """  function copyText(txt, after){
+    var w=clipFn('__ingClipWrite');
+    if(nativeCopy(txt)){ try{ window.__ingLastCopy={how:'press',n:txt.length}; }catch(e){} }
+    else if(w){""", "6.21 Copy first inside the press, then through the app")
+edit("""    close(); target=t; savedRange=null;
+    try{ var sl=window.getSelection(); if(sl&&sl.rangeCount&&t&&t.contains&&t.contains(sl.anchorNode)) savedRange=sl.getRangeAt(0).cloneRange(); }catch(e){}""",
+     """    close(); target=t; savedRange=null; savedText='';
+    try{ var sl=window.getSelection(); if(sl&&sl.rangeCount&&t&&t.contains&&t.contains(sl.anchorNode)) savedRange=sl.getRangeAt(0).cloneRange(); }catch(e){}
+    try{ savedText=selectionText(t); }catch(e){}""", "6.21 the words selected, kept as the panel opens")
+edit("""{label:'Cut', hint:key('X'), act:function(){ var t=selectionText(target); if(t) copyText(t,'cut'); }, needSel:true},""",
+     """{label:'Cut', hint:key('X'), act:function(){ keepSel(); var t=selectionText(target)||savedText; if(t) copyText(t,'cut'); }, needSel:true},""",
+     "6.21 Cut takes the words kept")
+edit("""{label:'Copy', hint:key('C'), act:function(){ var t=selectionText(target); if(t) copyText(t); }, needSel:true},""",
+     """{label:'Copy', hint:key('C'), act:function(){ var t=selectionText(target)||savedText; if(t) copyText(t); }, needSel:true},""",
+     "6.21 Copy takes the words kept")
+edit("""var tx=''; try{ tx=String(window.getSelection()||''); }catch(e){} if(tx) copyText(tx);""",
+     """var tx=liveSel()||openSelText; if(tx) copyText(tx);""", "6.21 Copy of a selection outside a field takes the words kept", 2)
+edit("""  function openSel(x,y,t){
+    close(); target=t;""", """  function openSel(x,y,t){
+    close(); target=t; openSelText=liveSel();""", "6.21 the selection kept as the selection panel opens")
+edit("""  function openMsg(x,y,t,mt){
+    close(); target=t;""", """  function openMsg(x,y,t,mt){
+    close(); target=t; openSelText=liveSel();""", "6.21 the selection kept as a message's panel opens")
+edit("""    menu.querySelectorAll('button').forEach(function(b){
+      b.style.cssText='display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;'""",
+     """    menu.querySelectorAll('button').forEach(function(b){
+      b.onmousedown=function(ev){ ev.preventDefault(); };
+      b.style.cssText='display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;'""",
+     "6.21 a press on the panel never moves the selection")
+
+edit("""    function copyText(txt){var f=clipFn("__ingClipWrite");
+      if(f){""", """    function copyText(txt){var f=clipFn("__ingClipWrite");
+      try{var ta0=document.createElement("textarea");ta0.value=txt;ta0.setAttribute("readonly","");ta0.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(ta0);ta0.select();var ok0=document.execCommand("copy");ta0.remove();if(ok0)return;}catch(e){}
+      if(f){""", "6.21 the touch panel's Copy whole note copies inside the press too")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

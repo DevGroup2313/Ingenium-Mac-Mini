@@ -371,6 +371,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.21 (5 November 2026): the Career Studio's add keys, chosen cards and back keys; Copy from the right-click panel; the
+preview's own keys. Her words: "I want the "+ Bring one" button to be purple on the Today tab page ... the "+ A person" button of the
+People tab page to also be made purple ... add the light purple colour of the "Roles and programmes that suit you" card to the selected
+cards of the "Your Profile" tab page"; "The "< Today" button does not do anything when I click on it ... Its the same thing for the "Your
+Profile" button"; "I kept on trying to copy this prompt that I typed in Ingenium's sticky notes to Claude's chat text box and no matter
+what I tried it would not work properly, I had to use the keyboard's shortcuts"; and "Please redesign the Copy/Open/Download buttons that
+is at the bottom of the Build's page live interactive Preview Screen". (The same changes were made in an earlier session and lost before
+they were committed; they are made again here.)
+
+- The Career Studio (modules/r188.js): + Bring one on Today and + A person on People take the studio's purple, as + Bring one on
+  Applications and + A goal already had. The card open in a list (every room) takes the light purple of the pinned card, Roles and
+  programmes that suit you, by day and by night. The back keys (‹ Today, ‹ Your profile, ‹ Goals and plan, ‹ Learn) are for a narrow
+  screen, where the list and the open item are shown one at a time; a rule of the same weight that came later (#cs .c-btn) showed them
+  on a wide window too, where both are shown and there is nothing to go back to. They now show only on a narrow screen, and there they
+  take her back to the list, as before.
+- Copy from the right-click panel (ten edits in build_page.py, on the panel ing-editmenu and the touch panel): the panel read the selection again when
+  Copy was pressed, and a press on a key of the panel can take the selection out of a note first (in Safari's engine, which the Mac app
+  uses; Chromium keeps it, so the test makes that happen by hand); and its copy went through the app's bridge after the press had
+  ended, where a web view may refuse the browser's own way back. Now the words selected are kept as the panel opens, a press on the panel
+  never moves the selection, and Copy, Cut and Copy the whole field first copy inside the press itself, the way Command+C and Ctrl+C do;
+  the bridge and the browser's clipboard stay as the second and third ways. The touch panel's Copy whole note (a held press on the Fire
+  and the iPad) does the same. Not yet seen in the Mac app's own web view, which does not run here: the test runs in Chromium with a
+  bridge that refuses and a selection taken away.
+- The preview's keys (modules/r228.js): Copy, Open and Download under Build's preview, and under Code's, were outlined purple pills in a
+  pale tray, alone of their kind on the page; they are now the page's own raised keys (as Save this page beside them), each with a small
+  line symbol, by day and by night. Their ids, titles and handlers are unchanged. Build's Copy, and csCopyText wherever it copies, copy
+  inside the press first too, and say Copied for a moment.
+- What is new gains 6.21.
+
+    node rig/t_621_studio.js <url> <out>     # 24 checks: the four add keys, the chosen card by day and night, the back keys wide and
+                                             # narrow, Copy, Cut, Copy the whole field and Paste on a sticky note, the preview's keys
+
 Ingenium 6.20 (4 November 2026): the chat's height holds when it swings; Code's column without an empty band; Your page's downloads.
 Her words: "the chat inside of the panel keeps on glitching back and forth"; "Please feel free to make other improvements to the
 Conversation panel of the Coding chat page of Ingenium and its sections"; and "I really want for every new feature and everything

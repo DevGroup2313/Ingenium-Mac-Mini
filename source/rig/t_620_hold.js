@@ -2,7 +2,7 @@
 // panel keeps on glitching back and forth". 6.11.2 held the steadier of two swinging heights for three seconds; the same swing could
 // then come back. Now: a swing seen once is held for three seconds, as before; the same swing again, in the same layout, is held
 // until the layout changes (here, the window's size). The swing is made by hand (two heights in its recent history), as Chromium
-// does not swing on its own here; invented text only.
+// does not swing on its own here; invented text only. (6.21: the hold is read a millisecond or two after the test reads the clock, so up to 3050 ms counts as three seconds.)
 //   node rig/t_620_hold.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -21,7 +21,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const fn = await p.evaluate(() => typeof r2Fit === 'function' && typeof R2 === 'object');
   ok(h0 >= 240 && fn, 'the chat has its height, from the fit that holds it', { h0, fn });
   const s1 = await swing(50); const h1 = await H();
-  ok(h1 === h0 - 50 && s1.holdN === 1 && s1.until > 2000 && s1.until <= 3000, 'a swing seen once: the steadier height, held for three seconds', { h0, h1, s1 });
+  ok(h1 === h0 - 50 && s1.holdN === 1 && s1.until > 2000 && s1.until <= 3050, 'a swing seen once: the steadier height, held for three seconds', { h0, h1, s1 });
   await p.evaluate(() => { R2.holdUntil = Date.now() - 1; }); await settle(); const h2 = await H();
   ok(h2 === h0, 'after those three seconds, the full height again (a swing once, as a page settles, costs nothing)', { h0, h2 });
   const s3 = await swing(50); await settle(); await p.waitForTimeout(3600); await settle(); const h3 = await H();
