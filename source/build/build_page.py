@@ -1305,6 +1305,18 @@ edit("""function lxAsk(run,msgs,maxTok,temp,onPiece){
 """, """function lxAsk(run,msgs,maxTok,temp,onPiece){if(run&&run.__stopped)return Promise.reject(new Error("stopped"));
 """, "6.24 lxAsk refuses a request marked stopped")
 
+# ---- 6.25 (5 November 2026): Ingenium in its own words. Her words: "There is a lot of mention of Claude on the Plan and session panel
+#      of the Coding chat, please remove them unless it is referring to a function that connects to Claude. I want for Ingenium's pages
+#      and chatrooms to have their own identities". Two of the comparisons were in the 3.12 base: the Projects card and the card of
+#      Ingenium's own instructions. The others are in modules r219, r220, r222 and r223. Names stay where Ingenium really connects to
+#      a service or reads its files (a Claude connection, a Claude export, GitHub, Ollama). ----
+edit(r"""every conversation in it shares, the way Claude\'s projects do. They stay on this device.""",
+     r"""every conversation in it shares. They stay on this device.""",
+     "6.25 the Projects card in Ingenium's own words")
+edit("""Every model in Ingenium starts each chat with Ingenium's own instructions and its ten rules, the way Claude has its own. Below them come yours""",
+     """Every model in Ingenium starts each chat with Ingenium's own instructions and its ten rules. Below them come yours""",
+     "6.25 Ingenium's own instructions in its own words")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

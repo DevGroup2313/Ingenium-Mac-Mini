@@ -33,7 +33,7 @@ const STAND_IN = () => {
   /* 1. the card, in the Workshop */
   step('card');
   const c1 = await p.evaluate(async () => { go('workshop'); await new Promise(r => setTimeout(r, 900));
-    return { cards: [...document.querySelectorAll('#page-workshop .card > h2')].map(h => h.textContent), state: (document.getElementById('pgState') || {}).textContent || '',
+    return { cards: [...document.querySelectorAll('#wsStudio .card > h2')].map(h => h.textContent), state: (document.getElementById('pgState') || {}).textContent || '',
       keys: [...document.querySelectorAll('#pgKeys button')].map(x => x.textContent), note: (document.getElementById('pgNote') || {}).textContent || '', started: window.__pg.started }; });
   ok(c1.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Your page', 'the Workshop ends with Your page', c1.cards);
   ok(/Running: the page Ingenium was built with\./.test(c1.state), 'it says the built page is running', c1.state);
@@ -76,11 +76,11 @@ const STAND_IN = () => {
       len: s.last.length, change: s.last.indexOf('an invented change') > 0, use: s.calls.filter(c => c[0] === 'use') }; });
   ok(t5.puts >= 2 && t5.first0 && t5.firsts === 1 && t5.lastN && t5.lasts === 1, 'handed over in pieces, the first and the last marked', t5);
   ok(t5.len === changed && t5.change, 'the computer app received the changed page whole, as written', { got: t5.len, want: changed });
-  ok(/^from Code: Ingenium \(workshop/.test(t5.note), 'with a note of where it came from', t5.note);
+  ok(/^from Code: Ingenium \(Author Studio/.test(t5.note), 'with a note of where it came from', t5.note);
   ok(t5.use.length === 1 && t5.use[0][2] === true && /^20261104-/.test(t5.use[0][1]), 'and chosen at once, in this window', t5.use);
   const c6 = await p.evaluate(() => ({ state: document.getElementById('pgState').textContent, keys: [...document.querySelectorAll('#pgKeys button')].map(x => x.textContent),
     vers: [...document.querySelectorAll('#pgVers .ws-item')].map(x => x.textContent) }));
-  ok(/Running: your page of .*\(from Code: Ingenium \(workshop\)\)\./.test(c6.state), 'the card says her page is running, with its note', c6.state);
+  ok(/Running: your page of .*\(from Code: Ingenium \(Author Studio\)\)\./.test(c6.state), 'the card says her page is running, with its note', c6.state);
   ok(c6.keys.indexOf('Go back to the built page') >= 0, 'with a way back to the built page', c6.keys);
   ok(c6.vers.length === 1 && /not tried yet/.test(c6.vers[0]) && /running/.test(c6.vers[0]) && !/Remove/.test(c6.vers[0]), 'its version is listed, running, and cannot be removed while it runs', c6.vers);
 

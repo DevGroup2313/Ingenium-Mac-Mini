@@ -246,7 +246,7 @@ function rowEl(ic,html){var r=mk("div","ghx-row");r.appendChild(mk("span","ic",i
 var PENDING=null;
 function paint(){var h=$("ccPanel");if(!h)return;var env=h.querySelector('[data-sec="session"] .ccp-in');if(!env)return;var old=env.querySelector(".ghx");if(old)old.remove();
   var pr=curPr(),box=mk("div","ghx");box.setAttribute("data-ghx","1");
-  if(!pr||!pr.gh){box.appendChild(rowEl("⑂","<b>GitHub</b> · work on one of your repositories, as Claude's sessions do: its branch is read, your changes go to a branch of their own, and a pull request brings them in."));
+  if(!pr||!pr.gh){box.appendChild(rowEl("⑂","<b>GitHub</b> · work on one of your repositories: its branch is read, your changes go to a branch of their own, and a pull request brings them in."));
     var k=mk("div","ghx-keys");k.appendChild(key(signedIn()?"Connect a repository":"Sign in and connect a repository",function(){connectSheet();},true));box.appendChild(k);env.appendChild(box);return;}
   var G=pr.gh;
   box.appendChild(rowEl("⑂","<b>"+escH(G.full)+"</b>"+(G.priv?'<span class="ghx-pill">private</span>':"")+(G.fork?'<span class="ghx-pill">pushing to your copy, '+escH(G.fork.owner+"/"+G.fork.repo)+'</span>':"")+' · <a href="'+escH(G.html)+'" target="_blank" rel="noopener noreferrer">open on GitHub</a>'));
@@ -436,7 +436,7 @@ function statusSheet(pr){var G=pr.gh;changes(pr).then(function(c){var s=sheet('<
 
 /* ================= 11b. the Guide: a card that explains it, for a refresher ================= */
 function guideCard(){var page=$("page-guide");if(!page||$("ghxGuide"))return;var c=mk("div","card blx-guide");c.id="ghxGuide";
-  c.innerHTML='<h3>Code on a GitHub repository</h3><p class="small muted" style="margin-top:0">As in Claude\'s coding sessions: a Code session works on one of your repositories, and its changes go to GitHub on a branch of their own, then into a pull request.</p>';
+  c.innerHTML='<h3>Code on a GitHub repository</h3><p class="small muted" style="margin-top:0">A Code session can work on one of your repositories: its changes go to GitHub on a branch of their own, then into a pull request.</p>';
   var dl=mk("dl");function row(t,d){dl.appendChild(mk("dt",null,t));dl.appendChild(mk("dd",null,d));}
   row("Connect","In the Session column's Environment, or Code's first choice, From GitHub. Sign in once with a token made on GitHub (Contents and Pull requests, read and write); it is kept on this device and sent only to GitHub. Choose the repository and its branch.");
   row("What is read","The branch as it is now: its text files. Left out, and named with the reason: pictures and other binary files, files over 1 MB, folders of installed packages, and files that may hold secrets (a .env file, keys). What is left out is never fetched, and a push never changes it.");

@@ -12,11 +12,11 @@
      about 61 MB of 76) is left out, so the model reads and searches about 15 MB; it is put back whenever the page is used or
      downloaded whole. The Workshop's copy in Code is used again while the page running is the one it was made from.
    - In a browser, the card says how to keep the changed page: download it whole, with what it carries put back. */
-#page-workshop .pg-line{font-size:13.5px;line-height:1.55;color:var(--ink-1);margin:4px 0 0}
-#page-workshop .pg-line b{font-weight:700}
-#page-workshop .pg-busy{font-size:12.5px;color:var(--ink-3);margin:8px 0 0;min-height:1em}
-#page-workshop .ws-item .t .good{color:#2f7a55}
-body[data-theme="night"] #page-workshop .ws-item .t .good{color:#8fd0a9}
+#wsStudio .pg-line{font-size:13.5px;line-height:1.55;color:var(--ink-1);margin:4px 0 0}
+#wsStudio .pg-line b{font-weight:700}
+#wsStudio .pg-busy{font-size:12.5px;color:var(--ink-3);margin:8px 0 0;min-height:1em}
+#wsStudio .ws-item .t .good{color:#2f7a55}
+body[data-theme="night"] #wsStudio .ws-item .t .good{color:#8fd0a9}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p227"]="started";}catch(_){}
 /* R227 · Ingenium's own page, changed by its author: see the note at the top of its styles. window.IngPage */
@@ -54,11 +54,11 @@ var HINT="This copy leaves out what the page carries at its end (the apps on the
 
 /* the Workshop's copy in Code: used again while the page running is the one it was made from */
 function projects(){var ps=(W.state&&Array.isArray(W.state.projects))?W.state.projects:[];
-  return ps.filter(function(p){return p&&(p.ingSelf||/^Ingenium \(workshop/.test(String(p.name||"")));}).sort(function(a,b){return (b.updated||b.made||0)-(a.updated||a.made||0);});}
+  return ps.filter(function(p){return p&&(p.ingSelf||/^Ingenium \((workshop|Author Studio)/.test(String(p.name||"")));}).sort(function(a,b){return (b.updated||b.made||0)-(a.updated||a.made||0);});}
 function project(){if(typeof selfPageText!=="function"||typeof ccMakeProject!=="function")return Promise.reject(new Error("Ingenium's own page cannot be opened in Code from here"));
   return selfPageText().then(function(t){if(!t)throw new Error("its page could not be read from this device");var l=lean(t),m=mark(l);
     var pr=projects().filter(function(p){return p.ingSelf&&p.ingSelf.base===m;})[0];if(pr)return pr;
-    return ccMakeProject("Ingenium (workshop)",[{name:"ingenium.html",text:l}],"ingenium.html").then(function(p){p.ingSelf={base:m,at:Date.now(),lean:true,bytes:t.length};try{saveState();}catch(e){}return p;});});}
+    return ccMakeProject("Ingenium (Author Studio)",[{name:"ingenium.html",text:l}],"ingenium.html").then(function(p){p.ingSelf={base:m,at:Date.now(),lean:true,bytes:t.length};try{saveState();}catch(e){}return p;});});}
 function codeText(pr){return Promise.resolve(typeof ccLoadAll==="function"?ccLoadAll(pr):null).then(function(){
   var f=(pr.files||[]).filter(function(x){return /(^|\/)ingenium\.html$/i.test(String(x.name||""))&&typeof x.text==="string";})[0];
   if(!f)throw new Error("the copy in Code has no ingenium.html");return f.text;});}
@@ -84,7 +84,7 @@ function useText(text,note){text=String(text||"");
   return ask("Use this page in place of the one running?\n\nIngenium loads it now, at the same address, with all your work as it is. If it does not start within half a minute, Ingenium goes back to the last page that worked, on its own.",{yes:"Use it now",no:"Not now",danger:false})
     .then(function(ok){if(!ok)return null;busy("Handing the page over…");
       return send(text,note).then(function(r){busy("Kept"+(r.put_back?" (what it carries put back)":"")+". Loading it…");return call("page_use",r.id,true);})
-        .then(function(r){busy("");toast(r&&r.now?"Your page is loading. The Workshop says here whether it started.":"Your page starts the next time Ingenium opens.");fill();return r;});})
+        .then(function(r){busy("");toast(r&&r.now?"Your page is loading. The Author Studio, in Settings, says whether it started.":"Your page starts the next time Ingenium opens.");fill();return r;});})
     .catch(function(e){busy("");toast("The page could not be used: "+(e&&e.message||e));return null;});}
 function fromCode(){var pr=projects()[0];if(!pr){toast("There is no copy of Ingenium's page in Code yet: press Find and fix with a model first.");return Promise.resolve(null);}
   busy("Reading the copy in Code…");
@@ -119,14 +119,14 @@ function fill(){var st=$("pgState"),k=$("pgKeys"),vs=$("pgVers"),nt=$("pgNote");
   if(!api()){st.innerHTML="";k.innerHTML="";vs.innerHTML="";
     line(st,"In the computer app, a changed page takes the place of the one Ingenium was built with, and Ingenium goes back to the last page that worked if it does not start.");
     nt.textContent="Here, in a browser: download the changed page whole (what it carries is put back), and open that file in place of this one.";
-    k.appendChild(key("ghost","Download the page from Code, whole",dlFromCode,"The Workshop's copy in Code, with what the page carries put back"));return Promise.resolve(null);}
+    k.appendChild(key("ghost","Download the page from Code, whole",dlFromCode,"The Author Studio's copy in Code, with what the page carries put back"));return Promise.resolve(null);}
   st.innerHTML="";line(st,"Asking the computer app…");
   return call("page_state").then(function(s){STATE=s;st.innerHTML="";k.innerHTML="";vs.innerHTML="";var by={};(s.versions||[]).forEach(function(v){by[v.id]=v;});
     function nameOf(id){if(!id)return "the page Ingenium was built with";var v=by[id];return "your page of "+esc(vw(id))+(v&&v.note?" ("+esc(v.note)+")":"");}
     line(st,"<b>Running:</b> "+nameOf(s.running)+".");
     if((s.use||"")!==(s.running||""))line(st,"<b>Chosen for the next start:</b> "+nameOf(s.use)+".");
     if(s.back&&s.back.from){var w=mk("div","ws-safe");w.style.marginTop="8px";w.textContent=when((s.back.at||0)*1000)+": your page of "+vw(s.back.from)+" "+(s.back.why||"did not start")+", so Ingenium went back to "+(s.back.to?"your page of "+vw(s.back.to):"the page it was built with")+" on its own. Your work is as it was.";st.appendChild(w);}
-    k.appendChild(key("primary","Use the page from Code",fromCode,"The Workshop's copy of Ingenium's page in Code, as the model or you changed it"));
+    k.appendChild(key("primary","Use the page from Code",fromCode,"The Author Studio's copy of Ingenium's page in Code, as the model or you changed it"));
     k.appendChild(key("ghost","Use a page file…",fromFile,"An ingenium.html of your own"));
     if(s.running||s.use)k.appendChild(key("ghost","Go back to the built page",function(){useVersion("");},"The page Ingenium was built with, now"));
     k.appendChild(key("ghost","Download the page running",dlRunning,"The page running now, whole"));
@@ -146,7 +146,7 @@ var REPORTED=false;
 function reportIn(){if(REPORTED)return;var a=api();if(!a||typeof a.page_started!=="function")return;if(!W.IngWorkshop)return;REPORTED=true;
   call("page_started").then(function(){return call("page_state");}).then(function(s){if(!s||!s.back||!s.back.from)return;var seen=0;try{seen=+localStorage.getItem("ing.page.backSeen")||0;}catch(e){}
     if((s.back.at||0)<=seen)return;try{localStorage.setItem("ing.page.backSeen",String(s.back.at||0));}catch(e){}
-    toast("Your page of "+vw(s.back.from)+" "+(s.back.why||"did not start")+", so Ingenium went back to "+(s.back.to?"your page of "+vw(s.back.to):"the page it was built with")+" on its own. The Workshop says more.");},function(){});}
+    toast("Your page of "+vw(s.back.from)+" "+(s.back.why||"did not start")+", so Ingenium went back to "+(s.back.to?"your page of "+vw(s.back.to):"the page it was built with")+" on its own. The Author Studio, in Settings, says more.");},function(){});}
 (function later(){var n=0;(function wait(){if(W.__ingReady===true){setTimeout(reportIn,1500);return;}if(++n<400)setTimeout(wait,500);})();})();
 
 /* Download the app in Code: the Workshop's copy is downloaded whole */

@@ -19,34 +19,50 @@
    - A safe start: Start without your layers, and on its own when the last start stopped while one of her scripts ran.
    - Folders (her words, 4 November 2026: "I want the scroll bars kept hidden rule to be applied to all of my apps, please add that to
      the folders inside Ingenium as well for all future apps"): her rule is added once to How I work, on every app, in her words' place
-     at its end, where she can change or remove it. */
-#page-workshop .ws-wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-#page-workshop .ws-keys{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0}
-#page-workshop .ws-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
-#page-workshop .ws-list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
-#page-workshop .ws-list li .m{font-weight:800;text-align:center}
-#page-workshop .ws-list li.ok .m{color:#2f7a55}#page-workshop .ws-list li.warn .m{color:#a86b12}#page-workshop .ws-list li.bad .m{color:#b4483c}
-body[data-theme="night"] #page-workshop .ws-list li.ok .m{color:#8fd0a9}body[data-theme="night"] #page-workshop .ws-list li.bad .m{color:#f0a097}
-#page-workshop .ws-list li b{color:var(--ink-1)}
-#page-workshop .ws-errs{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
-#page-workshop .ws-errs li{padding:10px 12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card);font-size:13px;line-height:1.45}
-#page-workshop .ws-errs li code{font:12px/1.45 var(--mono,ui-monospace,monospace);color:var(--ink-1);overflow-wrap:anywhere}
-#page-workshop .ws-errs li .w{color:var(--ink-3);font-size:12px;margin-top:2px}
-#page-workshop .ws-tabs{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border-radius:11px;background:rgba(34,26,46,.035);border:1px solid var(--hairline);margin:6px 0 10px}
-#page-workshop .ws-tabs button{border:0;background:transparent;color:var(--ink-2);font:600 12.5px/1 var(--sans);padding:8px 12px;border-radius:8px;cursor:pointer}
-#page-workshop .ws-tabs button[aria-selected="true"]{background:linear-gradient(var(--card-hi,#fff),var(--card-lo,#f6f2fb));color:var(--ink-1);box-shadow:inset 0 0 0 1px var(--accent),0 1px 2px rgba(40,22,68,.12)}
-#page-workshop .ws-items{display:flex;flex-direction:column;gap:8px}
-#page-workshop .ws-item{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card)}
-#page-workshop .ws-item .t{flex:1 1 220px;min-width:0;font-size:13.5px;line-height:1.4;color:var(--ink-1)}
-#page-workshop .ws-item .t span{display:block;font-size:12px;color:var(--ink-3);overflow-wrap:anywhere}
-#page-workshop .ws-item .t .bad{color:#b4483c}
-#page-workshop .ws-form{display:flex;flex-direction:column;gap:8px;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card)}
-#page-workshop .ws-form textarea{width:100%;box-sizing:border-box;min-height:140px;font:12.5px/1.5 var(--mono,ui-monospace,monospace);padding:10px 12px;border-radius:10px;border:1px solid var(--hairline);background:var(--card-hi,#fff);color:var(--ink-1)}
-#page-workshop .ws-form .row{display:flex;flex-wrap:wrap;gap:8px}
-#page-workshop .ws-form .row > *{flex:1 1 180px;min-width:0}
-#page-workshop .ws-note{font-size:12.5px;line-height:1.5;color:var(--ink-3);margin:8px 0 0}
-#page-workshop .ws-safe{padding:10px 12px;border-radius:12px;background:rgba(168,107,18,.10);color:var(--ink-1);font-size:13px;line-height:1.5}
+     at its end, where she can change or remove it.
+   6.25 (5 November 2026), the Author Studio. Her words: "Please rename the "Workshop" page to the Author Studio. Perhaps it would
+   look better added to the Setting page instead of being a part of Ingenium's side navigation bar." The Workshop is now the Author
+   Studio, a room of Settings (modules/r173.js names the room; its tab shows only where this module runs, the master edition). The side
+   bar no longer has a key for it. Everything it holds is as before (#wsBody, painted by paint()); its styles are kept under #wsStudio,
+   the room's card, in place of the old page's own id. go("workshop") still works everywhere: it opens Settings at the Author Studio.
+   Check Ingenium opens every page in turn; it now comes back to the room it was run from (Settings itself would show the room chosen
+   last). */
+#wsStudio .ws-wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+#wsStudio .ws-keys{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0}
+#wsStudio .ws-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#wsStudio .ws-list li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+#wsStudio .ws-list li .m{font-weight:800;text-align:center}
+#wsStudio .ws-list li.ok .m{color:#2f7a55}#wsStudio .ws-list li.warn .m{color:#a86b12}#wsStudio .ws-list li.bad .m{color:#b4483c}
+body[data-theme="night"] #wsStudio .ws-list li.ok .m{color:#8fd0a9}body[data-theme="night"] #wsStudio .ws-list li.bad .m{color:#f0a097}
+#wsStudio .ws-list li b{color:var(--ink-1)}
+#wsStudio .ws-errs{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+#wsStudio .ws-errs li{padding:10px 12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card);font-size:13px;line-height:1.45}
+#wsStudio .ws-errs li code{font:12px/1.45 var(--mono,ui-monospace,monospace);color:var(--ink-1);overflow-wrap:anywhere}
+#wsStudio .ws-errs li .w{color:var(--ink-3);font-size:12px;margin-top:2px}
+#wsStudio .ws-tabs{display:inline-flex;flex-wrap:wrap;gap:3px;padding:3px;border-radius:11px;background:rgba(34,26,46,.035);border:1px solid var(--hairline);margin:6px 0 10px}
+#wsStudio .ws-tabs button{border:0;background:transparent;color:var(--ink-2);font:600 12.5px/1 var(--sans);padding:8px 12px;border-radius:8px;cursor:pointer}
+#wsStudio .ws-tabs button[aria-selected="true"]{background:linear-gradient(var(--card-hi,#fff),var(--card-lo,#f6f2fb));color:var(--ink-1);box-shadow:inset 0 0 0 1px var(--accent),0 1px 2px rgba(40,22,68,.12)}
+#wsStudio .ws-items{display:flex;flex-direction:column;gap:8px}
+#wsStudio .ws-item{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card)}
+#wsStudio .ws-item .t{flex:1 1 220px;min-width:0;font-size:13.5px;line-height:1.4;color:var(--ink-1)}
+#wsStudio .ws-item .t span{display:block;font-size:12px;color:var(--ink-3);overflow-wrap:anywhere}
+#wsStudio .ws-item .t .bad{color:#b4483c}
+#wsStudio .ws-form{display:flex;flex-direction:column;gap:8px;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--hairline);background:var(--card)}
+#wsStudio .ws-form textarea{width:100%;box-sizing:border-box;min-height:140px;font:12.5px/1.5 var(--mono,ui-monospace,monospace);padding:10px 12px;border-radius:10px;border:1px solid var(--hairline);background:var(--card-hi,#fff);color:var(--ink-1)}
+#wsStudio .ws-form .row{display:flex;flex-wrap:wrap;gap:8px}
+#wsStudio .ws-form .row > *{flex:1 1 180px;min-width:0}
+#wsStudio .ws-note{font-size:12.5px;line-height:1.5;color:var(--ink-3);margin:8px 0 0}
+#wsStudio .ws-safe{padding:10px 12px;border-radius:12px;background:rgba(168,107,18,.10);color:var(--ink-1);font-size:13px;line-height:1.5}
 .ws-lyr-page{display:flex;flex-direction:column;gap:12px;height:100%}
+#wsStudio{display:flex;flex-direction:column;gap:16px;min-width:0}
+#wsStudio .as-banner{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:16px;border:1px solid var(--hairline);
+  background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f6f2fb));box-shadow:var(--pop,0 1px 2px rgba(40,22,68,.12))}
+#wsStudio .as-mark{flex:0 0 auto;display:grid;place-items:center;width:44px;height:44px;border-radius:13px;color:#fff;
+  background:linear-gradient(160deg,#7f5ad0,#4E2C8A);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 2px 0 #3a2070,0 6px 14px rgba(52,24,100,.25)}
+#wsStudio .as-mark svg{width:24px;height:24px}
+#wsStudio .as-title{margin:0;font:600 19px/1.2 var(--serif,Georgia,serif);color:var(--ink-1);letter-spacing:.01em}
+#wsStudio .as-lede{margin:3px 0 0;font-size:13px;line-height:1.5;color:var(--ink-2)}
+#wsStudio .ws-wrap{max-width:none}
 .ws-lyr-page iframe{width:100%;flex:1 1 auto;min-height:70vh;border:1px solid var(--hairline);border-radius:14px;background:#fff}
 .ws-lyr-card iframe{width:100%;min-height:260px;border:1px solid var(--hairline);border-radius:12px;background:#fff}
 </style>
@@ -143,11 +159,11 @@ var CHECKING=false;
 function run(){var out=[],e0=ERR.length;
   var P=W.__ingParts||{},names=Object.keys(P),bad=names.filter(function(k){return P[k]!=="running";});
   out.push(bad.length?line("bad","<b>Parts</b>: "+bad.length+" of "+names.length+" did not finish loading ("+bad.join(", ")+"). Each is a part of the page that stopped with an error as Ingenium started."):line("ok","<b>Parts</b>: all "+names.length+" loaded."));
-  var cur=null;try{var a=D.querySelector(".section.active");cur=a?a.id.replace(/^page-/,""):"workshop";}catch(e){}
-  var failed=[],opened=toOpen();CHECKING=true;opened.forEach(function(p){try{W.go(p);}catch(e){failed.push(p+" ("+(e&&e.message||e)+")");}});try{W.go(cur||"workshop");}catch(e){}CHECKING=false;
+  var cur=null,room=null;try{var a=D.querySelector(".section.active");cur=a?a.id.replace(/^page-/,""):"workshop";if(cur==="settings"&&W.IngRooms)room=IngRooms.current("settings");}catch(e){}
+  var failed=[],opened=toOpen();CHECKING=true;opened.forEach(function(p){try{W.go(p);}catch(e){failed.push(p+" ("+(e&&e.message||e)+")");}});try{W.go(cur||"workshop");if(room&&W.IngRooms)IngRooms.open("settings",room,false);}catch(e){}CHECKING=false;
   return new Promise(function(res){setTimeout(res,300);}).then(function(){var during=ERR.slice(e0);
     out.push(failed.length?line("bad","<b>Pages</b>: "+failed.length+" did not open: "+failed.join("; ")+"."):line(during.length?"warn":"ok","<b>Pages</b>: "+opened.length+" opened"+(during.length?", with "+during.length+" error"+(during.length===1?"":"s")+" meanwhile (listed below).":".")+" The apps on the Desk are pages of their own, and are not opened."));
-    var id="wscheck"+Date.now().toString(36),txt="Workshop check "+Date.now();
+    var id="wscheck"+Date.now().toString(36),txt="Author Studio check "+Date.now();
     return Promise.resolve().then(function(){return IngBig.put(id,txt);}).then(function(){return IngBig.load(id);}).then(function(back){try{IngBig.del(id);}catch(e){}
         out.push(back===txt?line("ok","<b>The large store</b>: writes and reads back."):line("bad","<b>The large store</b>: what was written did not come back."));},
       function(e){out.push(line("bad","<b>The large store</b>: "+(e&&e.message||e)));});})
@@ -178,22 +194,25 @@ function report(){var r="Ingenium's own check, "+when((LAST&&LAST.at)||Date.now(
 function fix(about){if(typeof selfPageText!=="function"||typeof ccMakeProject!=="function"){toast("Ingenium's own page cannot be opened in Code from here.");return Promise.resolve(null);}
   toast("Opening Ingenium's own page in Code…");
   return (W.IngPage&&IngPage.project?IngPage.project():selfPageText().then(function(t){if(!t)throw new Error("its page could not be read from this device");
-      return ccMakeProject("Ingenium (workshop)",[{name:"ingenium.html",text:t}],"ingenium.html");}))
+      return ccMakeProject("Ingenium (Author Studio)",[{name:"ingenium.html",text:t}],"ingenium.html");}))
     .then(function(pr){W.go("code");try{closeModal();}catch(e){}ccNewSession(pr);var inp=$("chatInput");
-      if(inp){inp.value="Ingenium's own check, in the workshop, found what is below. Find the cause in ingenium.html (this copy of Ingenium) and fix it, changing as little as you can. Then run the app and check it starts with no errors, and tell me what you changed and why."+(W.IngPage&&IngPage.hint?" "+IngPage.hint:"")+"\n\n"+(about||report());
+      if(inp){inp.value="Ingenium's own check, in the Author Studio, found what is below. Find the cause in ingenium.html (this copy of Ingenium) and fix it, changing as little as you can. Then run the app and check it starts with no errors, and tell me what you changed and why."+(W.IngPage&&IngPage.hint?" "+IngPage.hint:"")+"\n\n"+(about||report());
         try{inp.dispatchEvent(new Event("input",{bubbles:true}));inp.focus();}catch(e){}}
       toast("Ingenium's own page is open in Code, with the report in the message box: read it, then send it.");return pr;},
       function(e){toast("Ingenium's own page could not be read here: "+(e&&e.message||e)+". In the computer app it can; in a browser, open the page from its address.");return null;});}
 
 /* ================= 4. the page ================= */
 var UI={tab:"pages",form:null};
-function install(){if($("page-workshop"))return;var main=D.querySelector("main.main")||D.querySelector(".main");if(!main)return;
-  var sec=mk("section","section");sec.id="page-workshop";
-  sec.innerHTML='<h1 class="page-title">Workshop</h1><p class="lede">Ingenium\'s author\'s workshop: check how it is, find and fix what is wrong, and add, change or hide its parts. In your master edition only.</p><div class="ws-wrap" id="wsBody"></div>';
-  main.appendChild(sec);
-  var st=D.querySelector('.nav-btn[data-page="settings"]');
-  if(st&&!D.querySelector('.nav-btn[data-page="workshop"]')){var b=mk("button","nav-btn");b.type="button";b.setAttribute("data-page","workshop");b.setAttribute("onclick","go('workshop')");b.title="Workshop";b.innerHTML=ICON+"Workshop";st.parentNode.insertBefore(b,st.nextSibling);}
-  try{if(W.PAGES&&PAGES.indexOf("workshop")<0)PAGES.push("workshop");}catch(e){}}
+var PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>';
+function install(){var st=$("page-settings");if(!st)return;
+  if(!$("wsStudio")){var w=mk("div","ws-host");w.id="wsStudio";
+    w.innerHTML='<div class="as-banner"><span class="as-mark">'+PEN+'</span><div><h2 class="as-title">Author Studio</h2><p class="as-lede">Your master edition\'s own studio: check how Ingenium is, find and fix what is wrong, and add, change or hide its parts.</p></div></div><div class="ws-wrap" id="wsBody"></div>';
+    st.appendChild(w);}
+  var old=D.querySelector('.nav-btn[data-page="workshop"]');if(old)old.remove();
+  try{if(W.PAGES){var i=PAGES.indexOf("workshop");if(i>=0)PAGES.splice(i,1);}}catch(e){}
+  var t=$("rmT-settings-author");if(t&&!t.__as){t.__as=1;t.addEventListener("click",function(){if(!CHECKING)paint();});}}
+/* the room, opened: Settings at the Author Studio (go("workshop") from anywhere comes here) */
+function openStudio(){install();try{if(W.IngRooms)IngRooms.open("settings","author",false);}catch(e){}if(!CHECKING)paint();}
 function card(title,lede){var c=mk("div","card");c.appendChild(mk("h2","sec",title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 var paintT=0;function paintErrsSoon(){clearTimeout(paintT);paintT=setTimeout(function(){try{if($("wsErrs"))paintErrs();}catch(e){}},200);}
 function paintErrs(){var host=$("wsErrs");if(!host)return;host.innerHTML="";var list=ERR.slice(-40).reverse();
@@ -237,7 +256,7 @@ function paintPane(pane){var x=L();if(!x){pane.textContent="Your data is not ope
     var k=mk("div","ws-keys");k.appendChild(key("primary","Keep it",function(){var v={};[].forEach.call(f.querySelectorAll("[data-k]"),function(i){v[i.getAttribute("data-k")]=i.value;});if(onSave(v)!==false){UI.form=null;changed();}}));
     k.appendChild(key("ghost","Cancel",function(){UI.form=null;paint();}));f.appendChild(k);return f;}
   var T=UI.tab;
-  if(T==="pages"){x.pages.forEach(function(p,i){items.appendChild(itemRow((p.icon||"✦")+" "+(p.name||"My page"),(p.on===false?"Off · ":"")+"a page in the side bar, after Workshop · "+Math.round(String(p.html||"").length/1024)+" KB",p.on,
+  if(T==="pages"){x.pages.forEach(function(p,i){items.appendChild(itemRow((p.icon||"✦")+" "+(p.name||"My page"),(p.on===false?"Off · ":"")+"a page in the side bar, after Settings · "+Math.round(String(p.html||"").length/1024)+" KB",p.on,
       [["Open",function(){W.go("lyr-"+p.id);}],["Edit",function(){UI.form={k:"page",i:i};paint();}],[p.on===false?"Turn on":"Turn off",function(){p.on=p.on===false;changed();}],["Remove",function(){x.pages.splice(i,1);changed();}]]));});
     if(UI.form&&UI.form.k==="page"){var p0=UI.form.i!=null?x.pages[UI.form.i]:{};pane.appendChild(form([{k:"name",label:"Its name in the side bar",value:p0.name||"",ph:"My notes board"},{k:"icon",label:"Its sign (an emoji or a letter)",value:p0.icon||"✦"},
         {k:"from",label:"Or take one of your Code apps",type:"select",value:"",opts:[["","(write the page below)"]].concat((typeof ccProjects==="function"?ccProjects():[]).map(function(pr){return [pr.id,pr.name];}))},
@@ -269,7 +288,7 @@ function paintPane(pane){var x=L();if(!x){pane.textContent="Your data is not ope
         if(!String(v.css||"").trim()){toast("Write the style.");return false;}var rec={id:y0.id||uid("y"),name:(v.name.trim()||"A style").slice(0,60),css:String(v.css),on:y0.on!==false};if(UI.form.i!=null)x.styles[UI.form.i]=rec;else x.styles.push(rec);}));}
     else pane.appendChild(key("ghost","Add a style",function(){UI.form={k:"style",i:null};paint();}));}
   if(T==="hide"){var keep={home:1,settings:1,workshop:1};
-    pane.appendChild(mk("p","ws-note","Pages hidden from the side bar (Home, Settings and the Workshop always stay):"));
+    pane.appendChild(mk("p","ws-note","Pages hidden from the side bar (Home and Settings always stay):"));
     var grid=mk("div","ws-items");[].forEach.call(D.querySelectorAll(".nav-btn[data-page]:not([data-lyr])"),function(b){var p=b.getAttribute("data-page");if(keep[p])return;var row=mk("label","ws-item");var cb=D.createElement("input");cb.type="checkbox";cb.checked=x.hide.pages.indexOf(p)>=0;
       cb.onchange=function(){var i=x.hide.pages.indexOf(p);if(cb.checked&&i<0)x.hide.pages.push(p);if(!cb.checked&&i>=0)x.hide.pages.splice(i,1);save();applyStyles();};row.appendChild(cb);row.appendChild(mk("span","t",(b.textContent||p).trim()));grid.appendChild(row);});pane.appendChild(grid);
     pane.appendChild(mk("p","ws-note","Cards hidden on a page (the cards that have a name of their own):"));
@@ -282,13 +301,13 @@ function paintPane(pane){var x=L();if(!x){pane.textContent="Your data is not ope
 
 /* ================= 4b. the Guide ================= */
 function guideCard(){var page=$("page-guide");if(!page||$("wsGuide"))return;var c=mk("div","card blx-guide");c.id="wsGuide";
-  c.appendChild(mk("h3",null,"The Workshop"));var p0=mk("p","small muted","In your master edition only, after Settings: Ingenium's author's workshop.");p0.style.marginTop="0";c.appendChild(p0);
+  c.appendChild(mk("h3",null,"The Author Studio"));var p0=mk("p","small muted","In your master edition only, a room of Settings: Ingenium's own studio for its author.");p0.style.marginTop="0";c.appendChild(p0);
   var dl=mk("dl");[["Check Ingenium","Every part, every page, both stores, the room, the engine, your connections and connectors, the sign-in and the errors, each in plain words; Copy the report."],
     ["Errors since it started","Every error the page meets, with when and where; the last 50 kept across restarts."],
     ["Find and fix with a model","Ingenium's own page opens as an app in Code, with the report or one error in the message box: the model finds the cause and changes ingenium.html, the preview runs the changed Ingenium, and every change can be undone. The copy leaves out what the page carries at its end (the apps on the Desk, the engine, the kits), so it is lighter to read; it is put back whenever the page is used or downloaded."],
     ["Your page","On your computers, the page changed in Code (or a page file of your own) takes the place of the one Ingenium was built with, at once, with all your work as it is. A changed page that does not start is left: Ingenium goes back to the last page that worked on its own, and says so. Earlier versions can be used again or removed, and the built page is always one choice away (on a Mac, in the app menu too)."],
     ["Your layers","Pages of your own in the side bar (each in a frame of its own, apart from your data), sections added to any page, scripts that run in Ingenium as it starts (with all its power: keep only those you understand), styles that win over Ingenium's own, and pages or cards you hide. Nothing in the built page changes."],
-    ["A safe start","Start without your layers, from the Workshop; and on its own, when the last start stopped while one of your scripts ran. Ingenium says which."]].forEach(function(r){dl.appendChild(mk("dt",null,r[0]));dl.appendChild(mk("dd",null,r[1]));});
+    ["A safe start","Start without your layers, from the Author Studio; and on its own, when the last start stopped while one of your scripts ran. Ingenium says which."]].forEach(function(r){dl.appendChild(mk("dt",null,r[0]));dl.appendChild(mk("dd",null,r[1]));});
   c.appendChild(dl);var at=$("envGuide")||$("ghxGuide")||$("cnGuide");if(at&&at.parentNode)at.parentNode.insertBefore(c,at.nextSibling);else page.appendChild(c);}
 
 /* ================= 5. Folders: her rule for every app, added once, where she can change it ================= */
@@ -299,12 +318,13 @@ function addRule(){var s=W.state;if(!s||!Array.isArray(s.chats))return;s.ingRule
   try{if($("page-folders")&&$("page-folders").classList.contains("active")&&W.IngFolders&&IngFolders.paint)IngFolders.paint();}catch(e){}}
 
 /* ================= 6. start ================= */
-function boot(){try{install();}catch(e){}try{applyAll();}catch(e){}}
+function boot(){try{install();}catch(e){}try{if($("wsBody")&&!$("wsBody").firstChild)paint();}catch(e){}try{applyAll();}catch(e){}}
 try{applyStyles();}catch(e){}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 (function later(){var n=0;(function wait(){if(W.__ingReady===true){boot();setTimeout(function(){try{runScripts();}catch(e){}try{applyAll();}catch(e){}},800);return;}if(++n<400)setTimeout(wait,500);})();})();
 (function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r226)return;
-  var ng=function(p){if(p==="workshop")install();var r=og.apply(this,arguments);try{if(p==="workshop"&&!CHECKING)paint();if(p==="guide")guideCard();if(p==="folders"||p==="code"||p==="chat")addRule();if(!SAFE&&L()&&L().sections.some(function(s){return s.page===p&&s.on!==false;})&&!D.querySelector('#page-'+p+' .ws-lyr-card'))applySections();}catch(e){}return r;};
+  var ng=function(p){if(p==="workshop"){var r0=og.call(this,"settings");openStudio();return r0;}
+    var r=og.apply(this,arguments);try{if(p==="settings"){install();if(!CHECKING)paint();}if(p==="guide")guideCard();if(p==="folders"||p==="code"||p==="chat")addRule();if(!SAFE&&L()&&L().sections.some(function(s){return s.page===p&&s.on!==false;})&&!D.querySelector('#page-'+p+' .ws-lyr-card'))applySections();}catch(e){}return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r226=true;W.go=go=ng;})();
 W.IngWorkshop={run:run,report:report,errors:ERR,fix:fix,layers:L,apply:applyAll,runScripts:function(){ran=false;runScripts();},safe:function(){return SAFE;},safeStart:safeStart,paint:paint,rule:RULE,addRule:addRule,
   push:pushErr};

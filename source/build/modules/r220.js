@@ -156,7 +156,7 @@ function toolsList(c,host,editable){host.innerHTML="";(c.tools||[]).forEach(func
     if(c.allow&&c.allow[t.name]&&!t.ro){tx.appendChild(D.createTextNode(" "));tx.appendChild(mk("span","cn-tag","always allowed"));}
     if(t.description)tx.appendChild(mk("div",null,t.description.split(/\n/)[0].slice(0,240)));li.appendChild(tx);host.appendChild(li);});
   if(!(c.tools||[]).length)host.appendChild(mk("li",null,"This connector offers no tools."));if(c.more)host.appendChild(mk("li",null,c.more+" more tools are not offered (at most 128 a connector)."));}
-function addSheet(){var s=sheet('<h3>Add a connector</h3><p class="small muted" style="margin-top:0">A connector is a server that speaks MCP (the Model Context Protocol) over HTTP, as Claude\'s connectors do. Its address is the server\'s MCP endpoint (it often ends in /mcp). A token, when the server asks for one, is kept on this device and sent only to that server.</p>'
+function addSheet(){var s=sheet('<h3>Add a connector</h3><p class="small muted" style="margin-top:0">A connector is a server that speaks MCP (the Model Context Protocol, an open standard for giving a model tools) over HTTP. Its address is the server\'s MCP endpoint (it often ends in /mcp). A token, when the server asks for one, is kept on this device and sent only to that server.</p>'
     +'<label class="field"><span>Name</span><input type="text" id="cnName" maxlength="60" placeholder="My notes"></label>'
     +'<label class="field"><span>Address (URL)</span><input type="url" id="cnUrl" placeholder="https://example.com/mcp" autocomplete="off"></label>'
     +'<label class="field"><span>Token <span class="muted small">(if the server asks for one)</span></span><input type="password" id="cnTok" autocomplete="off"></label>'
@@ -183,7 +183,7 @@ function detailSheet(c){var s=sheet('<h3>'+escH(c.name)+'</h3><p class="small mu
 /* ================= 7. where it shows: Settings, the + menu, the Code session's column ================= */
 function sw(on,label,fn){var b=mk("button","cn-sw");b.type="button";b.setAttribute("role","switch");b.setAttribute("aria-checked",String(!!on));b.setAttribute("aria-label",label);b.onclick=function(e){e.stopPropagation();fn(b);};return b;}
 function paintCard(){var page=$("page-settings");if(!page)return;var card=$("cnCard");
-  if(!card){card=mk("div","card");card.id="cnCard";card.innerHTML='<h2 class="sec">Connectors</h2><p class="small muted" style="margin-top:0">Tools from outside services that the model can use in Chat and in Code, as Claude\'s connectors: servers that speak MCP. Ingenium sends a connector only what the model asks of it, and asks you first before any tool that changes something.</p><div id="cnList"></div><div class="cn-k"><button class="btn primary" type="button" id="cnAddKey">Add a connector</button></div>';
+  if(!card){card=mk("div","card");card.id="cnCard";card.innerHTML='<h2 class="sec">Connectors</h2><p class="small muted" style="margin-top:0">Tools from outside services that the model can use in Chat and in Code: servers that speak MCP, the open standard for tools. Ingenium sends a connector only what the model asks of it, and asks you first before any tool that changes something.</p><div id="cnList"></div><div class="cn-k"><button class="btn primary" type="button" id="cnAddKey">Add a connector</button></div>';
     var cx=$("cxOn"),anchor=cx&&cx.closest(".card");if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(card,anchor.nextSibling);else page.appendChild(card);
     card.querySelector("#cnAddKey").onclick=addSheet;}
   var list=card.querySelector("#cnList");list.innerHTML="";
@@ -207,7 +207,7 @@ function paintPanel(){var h=$("ccPanel");if(!h)return;var envSec=h.querySelector
   var S=mk("section","ccp-sec");S.setAttribute("data-sec","connectors");S.appendChild(mk("div","ccp-hd","Connectors"));var inner=mk("div","ccp-in cnx");S.appendChild(inner);
   var c=cur();L().forEach(function(x){var r=mk("div","cnx-row"),nm=mk("span","nm");nm.innerHTML="<b>"+escH(x.name)+"</b> · "+(x.ok?(x.tools||[]).length+" tools":"not connected");r.appendChild(nm);
     if(x.ok)r.appendChild(sw(enabledFor(c,x),"Use "+x.name+" in this session",function(b){setFor(c,x.id,!enabledFor(c,x));}));inner.appendChild(r);});
-  if(!L().length)inner.appendChild(mk("div","ccp-empty","Tools from outside services (MCP), as Claude's connectors. None yet."));
+  if(!L().length)inner.appendChild(mk("div","ccp-empty","Tools from outside services that the model can use while it works (MCP servers). None yet."));
   var k=mk("div","cnx-keys");var b=mk("button","btn small ghost",L().length?"Add another":"Add a connector");b.type="button";b.onclick=function(){addSheet();};k.appendChild(b);
   if(L().length){var m2=mk("button","btn small ghost","Manage");m2.type="button";m2.onclick=function(){try{go("settings");setTimeout(function(){var cd=$("cnCard");if(cd){try{if(W.IngRooms&&IngRooms.reveal)IngRooms.reveal(cd);}catch(_){}cd.scrollIntoView({block:"start",behavior:"smooth"});}},150);}catch(e){}};k.appendChild(m2);}
   inner.appendChild(k);envSec.parentNode.insertBefore(S,envSec.nextSibling);}
@@ -216,7 +216,7 @@ function paintAll(){try{paintCard();}catch(e){warn(e);}try{paintPanel();}catch(e
 
 /* ================= 7b. the Guide ================= */
 function guideCard(){var page=$("page-guide");if(!page||$("cnGuide"))return;var c=mk("div","card blx-guide");c.id="cnGuide";
-  c.innerHTML='<h3>Connectors</h3><p class="small muted" style="margin-top:0">Tools from outside services that the model can use while it answers, in Chat and in Code, as Claude\'s connectors.</p>';
+  c.innerHTML='<h3>Connectors</h3><p class="small muted" style="margin-top:0">Tools from outside services that the model can use while it answers, in Chat and in Code: servers that speak MCP, the open standard for tools.</p>';
   var dl=mk("dl");function row(t,d){dl.appendChild(mk("dt",null,t));dl.appendChild(mk("dd",null,d));}
   row("What one is","A server that speaks MCP (the Model Context Protocol) over HTTP. It offers tools: search a service, read a record, make one. Many services publish one; its address usually ends in /mcp.");
   row("Adding one","Settings, Connectors, Add a connector (or the + menu, or the Code session's column). Give its name, its address, and a token if it asks for one: the token is kept on this device and sent only to that server.");

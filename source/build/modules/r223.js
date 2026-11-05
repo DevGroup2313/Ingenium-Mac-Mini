@@ -233,7 +233,7 @@ function row(c){var e=forChat(c),b=mk("button","ccp-row env-pick");b.type="butto
 
 /* ================= 6. the Guide, and help ================= */
 function guideCard(){var page=$("page-guide");if(!page||$("envGuide"))return;var c=mk("div","card blx-guide");c.id="envGuide";
-  c.innerHTML='<h3>A Code session\'s environment</h3><p class="small muted" style="margin-top:0">Where the app runs, in the preview beside the conversation, as a Claude session has its environment. The gear beside Environment, in the Session column, opens it.</p>';
+  c.innerHTML='<h3>A Code session\'s environment</h3><p class="small muted" style="margin-top:0">Where the app runs, in the preview beside the conversation. The gear beside Environment, in the Session column, opens it.</p>';
   var dl=mk("dl");[["Network access","Full, Listed sites only, or None. The browser itself refuses what is not allowed, and the preview's console says what was refused. A window the app opens to another site is not stopped."],
     ["Network secrets","A key or a token added as a header to the app's requests to one site, so it is never written into the code. Never shown to the model, never pushed to GitHub."],
     ["Setup script","JavaScript run before the app's own scripts, each time the app loads."],

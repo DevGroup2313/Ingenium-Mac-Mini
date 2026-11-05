@@ -183,6 +183,7 @@ var IC={
   ai:svg('<path d="M10.5 3.5l1.6 4.6 4.6 1.6-4.6 1.6-1.6 4.6-1.6-4.6-4.6-1.6 4.6-1.6z"/><path d="M17.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/>'),
   data:svg('<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/>'),
   own:svg('<circle cx="8" cy="15.5" r="4"/><path d="M11 12.5l8.5-8.5M16.2 7.3l2.4 2.4M13.8 9.7l1.8 1.8"/>'),
+  author:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
   yours:svg('<path d="M12 3.5l8.5 4.3-8.5 4.3-8.5-4.3z"/><path d="M3.5 12.2l8.5 4.3 8.5-4.3"/><path d="M3.5 16.4l8.5 4.3 8.5-4.3"/>'),
   get:svg('<path d="M4 10.8L12 4.3l8 6.5V20H4z"/><path d="M12 9.8v6.4M9.4 13.7l2.6 2.6 2.6-2.6"/>'),
@@ -207,7 +208,9 @@ var CONF={
       ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ragCard"]},
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
       ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
-    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]}],
+    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
+    /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
+    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio: check Ingenium, see its errors, fix them with a model, and add, change or hide its parts.",ids:["wsStudio"]}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
   models:{label:"Models, in rooms",rooms:[
@@ -228,6 +231,7 @@ var STEPS=[{t:"Choose",next:"Next: how they work together"},{t:"Combine",next:"N
 /* the words a person might use for each setting, besides the words on the card */
 var KEYS=[
   ["ing-refresh-card","refresh reload restart glitch glitches frozen stuck stops answering start again"],
+  ["wsStudio","author studio workshop check diagnostics troubleshoot errors bug fix layers pages sections scripts styles hide your page edit ingenium"],
   ["mdPlaceCard","drive drives external hard disk usb ssd storage folder where kept move space room free"],
   [/^name$/,"name app name title called rename"],
   [/^look and feel/,"look theme dark night day light mode colour color colours appearance motion animation movement"],

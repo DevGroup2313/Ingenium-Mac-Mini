@@ -15,18 +15,22 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
     await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(300); };
   await p.goto(URL_); await open();
 
-  /* 1. the Workshop, beside Settings */
-  const nav = await p.evaluate(() => { const st = document.querySelector('.nav-btn[data-page="settings"]'), ws = document.querySelector('.nav-btn[data-page="workshop"]'); go('workshop');
-    return { key: !!ws, after: !!(ws && st && st.nextElementSibling === ws), cards: [...document.querySelectorAll('#page-workshop .card > h2')].map(h => h.textContent), edition: ING_EDITION }; });
-  ok(nav.key && nav.after && nav.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Your page', 'the Workshop is in the side bar after Settings, with its four cards', nav);
+  /* 1. the Author Studio (6.25, the Workshop until 6.24): a room of Settings, with no key of its own in the side bar */
+  const nav = await p.evaluate(() => { const ws = document.querySelector('.nav-btn[data-page="workshop"]'); go('workshop');
+    const tab = document.getElementById('rmT-settings-author'), panel = document.getElementById('rmP-settings-author');
+    return { key: !!ws, page: document.querySelector('.section.active').id, room: IngRooms.current('settings'), tab: tab ? tab.textContent.trim() : '', selected: tab ? tab.getAttribute('aria-selected') : '',
+      inRoom: !!(panel && panel.contains(document.getElementById('wsStudio'))), title: (document.querySelector('#wsStudio .as-title') || {}).textContent || '',
+      cards: [...document.querySelectorAll('#wsStudio .card > h2')].map(h => h.textContent), edition: ING_EDITION }; });
+  ok(!nav.key && nav.page === 'page-settings' && nav.room === 'author' && nav.tab === 'Author Studio' && nav.selected === 'true' && nav.inRoom && nav.title === 'Author Studio'
+    && nav.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Your page', 'the Author Studio is a room of Settings, not a key in the side bar, with its four cards; go("workshop") opens it', nav);
 
   /* 2. the check */
   const chats0 = await p.evaluate(() => (state.chats || []).length);
-  await p.click('#page-workshop .card:first-child .btn.primary'); await p.waitForFunction(() => document.querySelectorAll('#wsRes .ws-list li').length >= 10, null, { timeout: 60000 }).catch(() => {});
+  await p.click('#wsStudio .card:first-child .btn.primary'); await p.waitForFunction(() => document.querySelectorAll('#wsRes .ws-list li').length >= 10, null, { timeout: 60000 }).catch(() => {});
   const ck = await p.evaluate(() => ({ page: document.querySelector('.section.active').id, lines: [...document.querySelectorAll('#wsRes .ws-list li')].map(li => li.className + ':' + li.innerText.replace(/\s+/g, ' ').slice(0, 90)) }));
   const has = (re) => ck.lines.some(l => re.test(l));
-  ok(ck.page === 'page-workshop' && has(/^ok:✓ Parts: all \d+ loaded/) && has(/^ok:✓ Pages: \d+ opened/) && has(/^ok:✓ The large store: writes and reads back/) && has(/^ok:✓ The small store/) && has(/Version: Ingenium \d+\.\d+/),
-    'the check opens every page, writes and reads both stores, and says each in plain words, and comes back to the Workshop', ck);
+  ok(ck.page === 'page-settings' && has(/^ok:✓ Parts: all \d+ loaded/) && has(/^ok:✓ Pages: \d+ opened/) && has(/^ok:✓ The large store: writes and reads back/) && has(/^ok:✓ The small store/) && has(/Version: Ingenium \d+\.\d+/),
+    'the check opens every page, writes and reads both stores, and says each in plain words, and comes back to the Author Studio', ck);
   ok(!ck.lines.some(l => /^bad:/.test(l)), 'on a page that works, no line says wrong', ck.lines.filter(l => /^bad:/.test(l)));
   const chats = await p.evaluate(() => (state.chats || []).length);
   ok(chats === chats0, 'the check makes no new conversation as it opens Chat and Code', { before: chats0, after: chats });
@@ -40,7 +44,7 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
   /* 4. find and fix: Ingenium's own page in Code, the report in the message box */
   const fx = await p.evaluate(async () => { window.selfPageText = () => Promise.resolve('<!doctype html><title>Ingenium, a stand-in</title><p>invented</p>'); await IngWorkshop.fix(); await new Promise(r => setTimeout(r, 600));
     const pr = ccProj(); return { mode: CC.mode, name: pr && pr.name, file: pr && pr.files.map(f => f.name).join(), msg: document.getElementById('chatInput').value.slice(0, 160), sent: curChat().messages.length }; });
-  ok(fx.mode === 'code' && fx.name === 'Ingenium (workshop)' && fx.file === 'ingenium.html' && /^Ingenium's own check, in the workshop, found what is below/.test(fx.msg) && fx.sent === 0,
+  ok(fx.mode === 'code' && fx.name === 'Ingenium (Author Studio)' && fx.file === 'ingenium.html' && /^Ingenium's own check, in the Author Studio, found what is below/.test(fx.msg) && fx.sent === 0,
     'Find and fix opens Ingenium\'s own page as an app in Code, with the report ready to read before it is sent', fx);
 
   /* 5. layers: a page, a section, a style, a hidden page and a script, each kept */
@@ -53,13 +57,13 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
     x.scripts.push({ id: 'cinv', name: 'Invented mark', code: 'window.__invented = (window.__invented || 0) + 1;', on: true });
     x.scripts.push({ id: 'cbad', name: 'Invented broken', code: 'throw new Error("invented script failure");', on: true });
     saveState(); IngWorkshop.apply(); go('home'); await new Promise(r => setTimeout(r, 300));
-    const pb = document.querySelector('.nav-btn[data-lyr="pinv"]'), ws = document.querySelector('.nav-btn[data-page="workshop"]'), home = document.getElementById('page-home');
-    const sec = home.querySelector('.ws-lyr-card'), wt = document.querySelector('#page-workshop .page-title');
+    const pb = document.querySelector('.nav-btn[data-lyr="pinv"]'), ws = document.querySelector('.nav-btn[data-page="settings"]'), home = document.getElementById('page-home');
+    const sec = home.querySelector('.ws-lyr-card'), wt = document.querySelector('#page-settings .page-title');
     const r = { key: !!pb && ws.nextElementSibling === pb, keyText: pb && pb.textContent, section: sec ? sec.innerText.replace(/\s+/g, ' ') : '', top: !!(sec && home.firstElementChild === sec),
       style: getComputedStyle(wt).letterSpacing, hidden: getComputedStyle(document.querySelector('.nav-btn[data-page="fabrica"]')).display };
     go('lyr-pinv'); await new Promise(r => setTimeout(r, 200)); const sp = document.getElementById('page-lyr-pinv'); r.page = !!(sp && sp.classList.contains('active') && sp.querySelector('iframe') && /Ferns and ivy/.test(sp.querySelector('iframe').srcdoc));
     r.sandbox = sp && sp.querySelector('iframe').getAttribute('sandbox'); return r; });
-  ok(ly.key && /Invented board/.test(ly.keyText) && ly.page && !/allow-same-origin/.test(ly.sandbox || ''), 'a page of hers joins the side bar after the Workshop and opens in a frame of its own, apart from her data', ly);
+  ok(ly.key && /Invented board/.test(ly.keyText) && ly.page && !/allow-same-origin/.test(ly.sandbox || ''), 'a page of hers joins the side bar after Settings and opens in a frame of its own, apart from her data', ly);
   ok(/Invented reminders/.test(ly.section) && /Water the ferns on Fridays/.test(ly.section) && ly.top, 'a section of hers stands at the top of Home (Home has no plain title, so first on the page)', ly);
   ok(ly.style === '3px' && ly.hidden === 'none', 'her style applies at once, and a page she hides leaves the side bar', ly);
   await p.screenshot({ path: OUT + '/layers_home.png' });
@@ -69,21 +73,21 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
     return { mark: window.__invented, key: !!document.querySelector('.nav-btn[data-lyr="pinv"]'), sec: !!document.querySelector('#page-home .ws-lyr-card'), err: bad && bad.err, boot: localStorage.getItem('ing.layers.boot'),
       listed: IngWorkshop.errors.some(e => e.kind === 'layer' && /invented script failure/.test(e.msg)) }; });
   ok(rs.mark === 1 && rs.key && rs.sec && /invented script failure/.test(rs.err || '') && rs.listed && rs.boot === null, 'after a restart her layers are back, each script ran once, and the one that failed is marked and listed', rs);
-  await p.evaluate(() => go('workshop')); await p.click('#page-workshop .ws-tabs button:nth-child(3)'); await p.waitForTimeout(200);
-  const sc = await p.evaluate(() => [...document.querySelectorAll('#page-workshop .ws-item .t')].map(t => t.innerText.replace(/\s+/g, ' ')));
+  await p.evaluate(() => go('workshop')); await p.click('#wsStudio .ws-tabs button:nth-child(3)'); await p.waitForTimeout(200);
+  const sc = await p.evaluate(() => [...document.querySelectorAll('#wsStudio .ws-item .t')].map(t => t.innerText.replace(/\s+/g, ' ')));
   ok(sc.some(t => /Invented broken stopped with an error: invented script failure/.test(t)), 'the Scripts list says which script stopped, and why', sc);
   await p.screenshot({ path: OUT + '/workshop.png', fullPage: false });
 
   /* 6. a safe start, asked for; and one on its own, after a start that stopped inside a script */
   await p.evaluate(() => IngWorkshop.safeStart(true)); await p.waitForTimeout(500); await open();
   const sf = await p.evaluate(async () => { await new Promise(r => setTimeout(r, 1200)); go('workshop'); return { safe: IngWorkshop.safe(), mark: window.__invented, key: !!document.querySelector('.nav-btn[data-lyr="pinv"]'),
-    style: getComputedStyle(document.querySelector('#page-workshop .page-title')).letterSpacing, banner: (document.querySelector('#page-workshop .ws-safe') || {}).textContent || '' }; });
+    style: getComputedStyle(document.querySelector('#page-settings .page-title')).letterSpacing, banner: (document.querySelector('#wsStudio .ws-safe') || {}).textContent || '' }; });
   ok(sf.safe && sf.mark === undefined && !sf.key && sf.style !== '3px' && /without your layers, as you asked/.test(sf.banner), 'Start without your layers: none of them is applied, and the Workshop says so', sf);
   await p.evaluate(() => IngWorkshop.safeStart(false)); await p.waitForTimeout(500); await open();
   const back = await p.evaluate(async () => { await new Promise(r => setTimeout(r, 1200)); return { safe: IngWorkshop.safe(), mark: window.__invented, key: !!document.querySelector('.nav-btn[data-lyr="pinv"]') }; });
   ok(!back.safe && back.mark === 1 && back.key, 'Start with your layers again: they are back', back);
   await p.evaluate(() => localStorage.setItem('ing.layers.boot', JSON.stringify({ at: Date.now(), running: 'cinv', name: 'Invented mark' }))); await p.reload(); await open();
-  const auto = await p.evaluate(async () => { await new Promise(r => setTimeout(r, 1200)); go('workshop'); return { safe: IngWorkshop.safe(), mark: window.__invented, banner: (document.querySelector('#page-workshop .ws-safe') || {}).textContent || '' }; });
+  const auto = await p.evaluate(async () => { await new Promise(r => setTimeout(r, 1200)); go('workshop'); return { safe: IngWorkshop.safe(), mark: window.__invented, banner: (document.querySelector('#wsStudio .ws-safe') || {}).textContent || '' }; });
   ok(auto.safe && auto.mark === undefined && /the last start stopped while your script Invented mark ran/.test(auto.banner), 'a start that stopped inside one of her scripts makes the next start safe, and names the script', auto);
   await p.evaluate(() => IngWorkshop.safeStart(false)); await p.waitForTimeout(500); await open();
 

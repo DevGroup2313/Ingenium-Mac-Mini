@@ -371,6 +371,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.25 (5 November 2026): Ingenium in its own words; the Workshop becomes the Author Studio, a room of Settings. Her words:
+"There is a lot of mention of Claude on the Plan and session panel of the Coding chat, please remove them unless it is referring to a
+function that connects to Claude. I want for Ingenium's pages and chatrooms to have their own identities, please [remove] the Claude,
+Ollama and GitHub comparisons and others if there are more scattered around the app. I specifically want you to start with the Plan and
+session panel in the Coding chat page"; and "Please rename the "Workshop" page to the Author Studio. Perhaps it would look better added
+to the Setting page instead of being a part of Ingenium's side navigation bar."
+
+- Measured on 6.24 (every string of the page's own scripts and markup, read with acorn): twelve places described a part of Ingenium by
+  another assistant's way of doing it. In Code's Plan and session column, "as Claude's sessions do" (the GitHub row, r219) and "as
+  Claude's connectors" (r220); the connector sheet and the Connectors card in Settings (r220); the Guide's cards on GitHub (r219),
+  connectors (r220) and the environment (r223); two tour steps and three lines of What is new (r222); and in the 3.12 base, the Projects
+  card ("the way Claude's projects do") and the card of Ingenium's own instructions ("the way Claude has its own"), changed by two edits
+  in build_page.py. Each now says what Ingenium does in its own words. GitHub and Ollama were never compared: each is named only where
+  Ingenium connects to it or reads its files, and so is Claude (a Claude connection, your Claude export, Claude Code's sessions).
+- The Author Studio (modules/r226.js, r227.js, r173.js; the master edition only, as the Workshop was): a sixth room of Settings, after
+  Ownership, with its own pen mark, holding everything the Workshop held (Check Ingenium, Errors since it started, Your layers, Your
+  page) under a banner of its own. The side bar has no key for it; go("workshop") from anywhere (the tour, a notice, the Mac menu's
+  routes) opens Settings at the Author Studio. Find a setting finds it ("diagnostics", "troubleshoot", "layers"). Its styles moved from
+  #page-workshop to #wsStudio, the room's card. Check Ingenium opens every page in turn and comes back to the room it was run from
+  (Settings alone would show the room chosen last: found by rig/t_618_workshop.js and mended before release). Ingenium's copy of its
+  own page in Code is named "Ingenium (Author Studio)"; a copy made before as "Ingenium (workshop)" is still found. A page of her own
+  (her layers) joins the side bar after Settings. The tour's step, the Guide's card and What is new say Author Studio. In every other
+  edition the room has nothing in it, so its tab does not show.
+- What is new gains 6.25.
+
+    node rig/t_625_words.js <url> <out>      # 17 checks: no comparison anywhere in the served page; the Plan and session column; every
+                                             # page's words, hidden rooms, the Projects card and the tour; the names kept where Ingenium
+                                             # connects; the Author Studio in Settings (six rooms, go("workshop"), its cards, the tab,
+                                             # Find a setting, the check coming back to its room, the Guide, the tour's ring, night, phone)
+    node rig/t_618_workshop.js <url> <mock url> <out>   # 19 checks, following the Workshop into Settings
+    node rig/t_619_page.js <url> <out>                  # 30 checks; rig/t_615_tour.js expects "Settings: The Author Studio"
+
 Ingenium 6.24 (5 November 2026): Stop stops. Her words: "there is a bug on the "Stop" button inside of the Career Studio, I keep on
 pressing it over and over again to stop a reading but it does not stop and I have had to close and force quit the app"; "the models
 takes ages running in circles trying to dissect the simple instructions and calls it ambiguous"; "make the "Stop" button on the
