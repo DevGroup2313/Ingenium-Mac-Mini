@@ -1295,6 +1295,16 @@ edit("""return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},fun
      """return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}},ab);})""",
      "6.22 lxAsk hands the reasoning on, through a connection")
 
+
+# ---- 6.24 (5 November 2026): Stop stops. Her words: "there is a bug on the "Stop" button inside of the Career Studio, I keep on pressing
+#      it over and over again to stop a reading but it does not stop and I have had to close and force quit the app". The engines answer a
+#      stop by handing back the words so far, as if the reply had ended, so the layers around lxAsk (Ultra's check, the guard against
+#      repetition) asked again with the same request. A request marked stopped (the studio's Stop marks its own) is refused at once, so
+#      no layer can ask again for it; every other request (Lector, Folders) is untouched. ----
+edit("""function lxAsk(run,msgs,maxTok,temp,onPiece){
+""", """function lxAsk(run,msgs,maxTok,temp,onPiece){if(run&&run.__stopped)return Promise.reject(new Error("stopped"));
+""", "6.24 lxAsk refuses a request marked stopped")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

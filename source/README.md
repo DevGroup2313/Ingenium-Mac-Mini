@@ -371,6 +371,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.24 (5 November 2026): Stop stops. Her words: "there is a bug on the "Stop" button inside of the Career Studio, I keep on
+pressing it over and over again to stop a reading but it does not stop and I have had to close and force quit the app"; "the models
+takes ages running in circles trying to dissect the simple instructions and calls it ambiguous"; "make the "Stop" button on the
+Applications tab page purple".
+
+- The cause. The engines answer a stop by handing back the words written so far, as if the reply had ended (wllama and the desktop
+  adapter resolve with the partial text), so the layers around lxAsk took it for a finished draft and asked again: Ultra's check
+  (r225) asked for a revision, and the repetition guard (r148) could ask again too. A connection's request was never cancelled.
+- build_page.py 6.24: lxAsk refuses at once a request marked stopped. The layers pass the same request object down, so none of them
+  can ask again for it; every other request (Lector, Ask Lector, Folders) is untouched.
+- modules/r188.js. Each ask is its own request object; Stop marks it stopped, aborts the engine, cancels a connection's request,
+  says Stopping at once (the key is disabled) and ends the panel within 2.5 seconds whatever the engine does. A late answer from a
+  stopped request is dropped and never ends a newer run. The Stop key is the studio's purple (pri), as Do this now.
+- modules/r188.js. A reading is asked as a reading: its rule opens "You read and advise on this device for the applicant" instead of
+  telling the model to write in her first person while it judges (the confusion it reported as ambiguity). r225 counts that opening
+  as a reading, so Auto gives it Low effort, without the long thinking that turned in circles; an effort chosen by hand (Medium and
+  above) still thinks, and its thinking is shown in the panel. A model on this device reads at most about 30,000 characters
+  of posting and profile, so its first word comes sooner; a connection keeps its full room.
+- What is new gains 6.24.
+
+    node rig/t_624_stop.js <url> <out>       # 11 checks, with a stand-in engine that answers a stop as the real ones do: the guard
+                                             # in the page and through every layer, the purple key, the reading's own rule, one press,
+                                             # no request after Stop, a new reading after it, and a deaf engine's late answer dropped
+
 Ingenium 6.23 (5 November 2026): a model installed once. Her words: "there are a lot of duplicate models downloaded on the Models page
 of Ingenium, the app does not seem to register when a model has been installed twice".
 

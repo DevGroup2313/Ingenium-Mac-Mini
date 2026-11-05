@@ -511,27 +511,37 @@ function whereLine(){var o=plan();if(o&&o.cloud)return lxCloudLeaves()?"through 
   if(o&&o.link)return "on your other computer, over your own network";return "on this device";}
 function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(90000,(ctx-1800)*3));}
 var RUN={busy:false,stop:false,what:"",live:"",think:"",opp:null,t0:0};
-function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0;
-  return new Promise(function(res,rej){(function go1(){if(RUN.stop){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";RUN.think="";paintLive();
-    try{if(W.LX)LX.onThink=function(t){if(!t)return;RUN.think+=t;paintLive();};}catch(e){}
-    lxAsk({modelId:o&&o.chosen?o.chosen.id:null},msgs,max,temp,function(t){RUN.live=t;paintLive();}).then(function(t){try{if(W.LX)LX.onThink=null;}catch(e){}if(RUN.stop)rej(new Error("stopped"));else res(String(t||""));},function(e){try{if(W.LX)LX.onThink=null;}catch(x){}var m=String(e&&e.message||e);
-      if(RUN.stop){rej(new Error("stopped"));return;}
+function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:o&&o.chosen?o.chosen.id:null};RUN.req=req;
+  function mine(){return RUN.req===req;}
+  return new Promise(function(res,rej){(function go1(){if(!mine())return;if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";RUN.think="";paintLive();
+    try{if(W.LX)LX.onThink=function(t){if(!t||!mine())return;RUN.think+=t;paintLive();};}catch(e){}
+    lxAsk(req,msgs,max,temp,function(t){if(!mine()||req.__stopped)return;RUN.live=t;paintLive();}).then(function(t){if(!mine())return;try{if(W.LX)LX.onThink=null;}catch(e){}if(RUN.stop||req.__stopped)rej(new Error("stopped"));else res(String(t||""));},function(e){if(!mine())return;try{if(W.LX)LX.onThink=null;}catch(x){}var m=String(e&&e.message||e);
+      if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}
       if(m==="busy"&&waits++<200){RUN.live="Waiting for the model to finish what it is doing…";paintLive();setTimeout(go1,1500);return;}
       var big=false;try{big=lxIsCtxError(e);}catch(x){}if(big&&scale>0.3){scale*=0.7;setTimeout(go1,300);return;}
       if(++tries<=1){setTimeout(go1,1500);return;}rej(e);});})();});}
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
   try{if(W.LX&&LX.busy){say("Lector is using the model. Wait for it, or pause it in Lector.");return true;}}catch(e){}return false;}
 function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses."+(typeof lxCxReady==="function"&&lxCxReady()?" Or choose your connected model, "+lxCloudName()+", on the studio's first page.":""));return true;}
-function begin(opp,what){RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=opp?opp.id:null;CS().ui.show="work";render();startTick();}
+function begin(opp,what){RUN.req=null;RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=opp?opp.id:null;CS().ui.show="work";render();startTick();}
 var TICK=0;function startTick(){if(TICK)return;TICK=setInterval(function(){if(!RUN.busy){clearInterval(TICK);TICK=0;return;}paintLive();},1000);}
 function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.think="";RUN.opp=null;render();}
-function stopNow(){RUN.stop=true;try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}}
+/* 6.24: Stop stops. The engines answer a stop by handing back what was written so far, as if the reply had ended, so the layers around
+   the ask (Ultra's check, the guard against repetition) went on to ask again; and a connection's request was never cancelled. Now Stop
+   marks the studio's own request as stopped (lxAsk then refuses it at once, however many layers ask again: build_page.py 6.24, so
+   Lector and Folders are never held up), cancels it on this device and through a connection, and the panel ends within a few seconds
+   whatever the engine does. A late answer from a stopped request is dropped, and never ends a newer run. */
+function stopNow(){if(!RUN.busy)return;RUN.stop=true;try{if(RUN.req)RUN.req.__stopped=true;}catch(e){}
+  try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}
+  try{if(W.LX&&LX.cloudAb){if(typeof cloudAbort==="function")cloudAbort();if(LX.cloudAb&&LX.cloudAb.abort)LX.cloudAb.abort();}}catch(e){}
+  RUN.what="Stopping…";paintLive();var k=$("csStopKey");if(k){k.disabled=true;k.textContent="Stopping…";}
+  setTimeout(function(){if(RUN.busy&&RUN.stop){end();say("Stopped. Nothing from this run was kept.");}},2500);}
 function failed(e){var m=String(e&&e.message||e);end();if(m!=="stopped")say("It could not be finished: "+m);}
 
 /* what the model is told, every time: the profile is the only source of facts about her, and nothing is invented */
 function banned(){try{return (LXR().banned||[]).join(", ");}catch(e){return "";}}
 function sys(extra,prose){var X="";try{if(prose)X=LXR().charter||"";}catch(e){}
-  return "You write on this device for the applicant, in the first person as the applicant, in "+english()+": exact, measured and plain, never promotional. THE RULES. Use only what THE PROFILE shows about me: my posts, studies, dates, skills, results, publications and names. Never invent a skill, a post, a qualification, a date, a figure, a publication, a name, a referee or a quotation, and never stretch what the profile says into more than it says. You may show how what the profile does show answers what is asked (experience that transfers from another setting), naming where it comes from; that is drawing the link, not stretching. Where the posting asks for something the profile does not show, do not claim it. Where a fact is needed and the profile does not give it, write a placeholder in square brackets, such as [the dates]. Do not flatter the reader, the organisation or me."+
+  return (/^You are now /.test(String(extra||""))?"You read and advise on this device for the applicant, in "+english()+": exact, measured and plain, never promotional. ":"You write on this device for the applicant, in the first person as the applicant, in "+english()+": exact, measured and plain, never promotional. ")+"THE RULES. Use only what THE PROFILE shows about me: my posts, studies, dates, skills, results, publications and names. Never invent a skill, a post, a qualification, a date, a figure, a publication, a name, a referee or a quotation, and never stretch what the profile says into more than it says. You may show how what the profile does show answers what is asked (experience that transfers from another setting), naming where it comes from; that is drawing the link, not stretching. Where the posting asks for something the profile does not show, do not claim it. Where a fact is needed and the profile does not give it, write a placeholder in square brackets, such as [the dates]. Do not flatter the reader, the organisation or me."+
     (banned()?" Words never to use: "+banned()+".":"")+X+(extra?" "+extra:"");}
 function cut(t,n){t=String(t||"");if(n<=0)return "";if(t.length<=n)return t;var c=t.slice(0,n),p=Math.max(c.lastIndexOf(". "),c.lastIndexOf("\n"));return (p>n*0.6?c.slice(0,p+1):c)+" […]";}
 
@@ -574,7 +584,9 @@ function postText(o){if(!o)return Promise.resolve("");var more=(o.more||[]).filt
   return Promise.all([loadText(o.ref)].concat(more.map(function(m){return loadText(m.ref);}))).then(function(ts){var out=ts[0]||"";more.forEach(function(m,i){if(ts[i+1])out+="\n\nFURTHER PARTICULARS ("+m.name+"):\n"+ts[i+1];});return out;});}
 function kindWord(k){return {job:"posting",phd:"programme's call",grant:"call for applications",other:"posting"}[k]||"posting";}
 /* the reading, line by line: what the model is asked to return, and how it is read back */
-function readMsgs(G,post,o,scale){var R=room()*scale,wt=wantsText();
+/* 6.24: a model on this device reads at its own pace: the posting and the profile are kept to about 30,000 characters (a connection still gets its full room) */
+function readRoom(){var o=plan(),r=room();if(!(o&&(o.cloud||o.link)))r=Math.min(r,30000);return r;}
+function readMsgs(G,post,o,scale){var R=readRoom()*scale,wt=wantsText();
   var u="Read THE "+kindWord(o.kind).toUpperCase()+" against THE PROFILE for me, as an experienced admissions tutor and recruiter reads an application: generously and honestly. "+
     "Credit what transfers: a criterion may be met by what I have done in another setting, shown by its results, even where THE PROFILE uses other words than the "+kindWord(o.kind)+". Never credit what THE PROFILE does not show, and never invent.\n"+
     (wt?"0. First, how it matches WHAT I AM LOOKING FOR: for each of my wants and needs that it bears on, say whether it matches, partly matches or does not, from what it says.\n":"")+
@@ -1374,7 +1386,7 @@ function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"
   var sofar=h("div","c-sofar");sofar.id="csSoFar";P.body.appendChild(sofar);
   var l=h("div","c-live");l.id="csLive";l.textContent=RUN.live||"…";P.body.appendChild(l);
   var pl=plan();P.foot.appendChild(h("span","c-note c-grow",esc(pl&&pl.link?"Written with "+(modelName()||"your model")+", "+whereLine()+".":"Written with "+(modelName()||"your model")+" on this device. Nothing leaves it.")));
-  P.foot.appendChild(cbtn("","Stop",stopNow));setTimeout(paintLive,0);return P;}
+  var sk=cbtn("pri","Stop",stopNow);sk.id="csStopKey";P.foot.appendChild(sk);setTimeout(paintLive,0);return P;}
 /* 6.22: what is shown while it works: the time, the model's own reasoning when it gives it, and each criterion as it is judged */
 function liveStateText(){var s=Math.max(0,Math.round((Date.now()-(RUN.t0||Date.now()))/1000)),t=s<60?s+" seconds":Math.floor(s/60)+" min "+(s%60)+" s";
   if(!RUN.live&&!RUN.think)return "The model is reading the posting and your profile before its first word ("+t+" so far). A model on this device can take a minute or more here; a connected one is quicker.";

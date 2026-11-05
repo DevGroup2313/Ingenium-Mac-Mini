@@ -36,7 +36,7 @@ function says(v){if(v==="auto")return "Auto: reading quickly (Low); writing at H
   var L=LV()[+v];return (L?L.line+" ":"")+"Shared by Lector, the Career Studio and Folders.";}
 
 /* ================= 1. which effort a request is given ================= */
-var READ=/^You are Lector, a careful reader/;
+var READ=/^You are Lector, a careful reader|^You read and advise on this device for the applicant/;
 function sysOf(msgs){var m=msgs&&msgs[0];return m&&m.role==="system"?String(m.content||""):"";}
 function reading(msgs){return READ.test(sysOf(msgs));}
 function linked(){try{return !!((typeof supUsesLink==="function"&&supUsesLink())||(typeof lxUsesCloud==="function"&&lxUsesCloud()));}catch(e){return false;}}
