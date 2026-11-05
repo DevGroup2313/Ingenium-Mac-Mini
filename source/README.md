@@ -371,6 +371,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.28 (5 November 2026): the Train room, in parts. Her words: "The cards on the Train tab inside of the Models page is really stiff
+and not animated or clickable, please fix that. There is also a lot of scrolling on that page, it should have a redesign that has some
+tabs and sections to better show the page and not have me endlessly scrolling and losing interest in the page's contents. The rest of the
+pages inside of the Models Studio are quite short so the Train exceedingly long page looks off compared to the others."
+
+- Measured on 6.27 at 1440 x 900: the Train room was 3,400 pixels tall (the Studio's other rooms 930 to 1,145): What can be trained here
+  (792), Train a small model (176) and the learning workbench (1,412, its five steps one under another); the four bands of the first card
+  were plain boxes of text.
+- modules/r232.js, inside the Train room (#stP-train, modules/r199.js): three parts, one at a time, under a row of raised keys with their
+  line: Overview (What can be trained here), Workbench (the learning workbench) and Trainer (Train a small model); the part chosen last is
+  kept (ing.train.part.v1). Each part is 990 to 1,600 pixels tall.
+- The Overview's four bands are tiles in two columns: the tag as a chip, the title, the first sentence, a chevron; pressed, Enter or Space
+  opens one across the card with all it says, and the one open before folds; they rise in and lift under the pointer (the rise fills
+  backwards only); The arithmetic is a raised key.
+- Each workbench tool shows one step at a time: a row of numbered steps (Write like my text: Your text, How big, Learn, Try it, Keep it;
+  the other tools' own five), and Back and Next under each step, naming the steps either side. A lesson keeps running whichever step is
+  shown.
+- Anything that opens the workbench (IngLab.open, wrapped), reveals a part of the room (r173's hook, from scrollIntoView, focus, the tour,
+  Help) or moves the focus into it opens the part, the step and the band that hold it. The Trainer's and the Overview's words say "the
+  Workbench tab" and "the Trainer tab" in place of "below" (r201, r199). What is new gains 6.28.
+
+- rig/t_703c_lab.js opens a step before it uses a key or a field in it (as she would, through the step's key); rig/t_703_studio.js reads
+  the truth card's words folded or open, finds the trainer in its own part, and counts the bands' columns on a phone; its rule that no
+  key says "frontier" stands for keys that act, not for the band that explains why frontier training cannot happen at home.
+
+    node rig/t_628_train.js <url> <out>      # 19 checks: three parts and each part's height, the part kept, the tiles (fold, lift, open,
+                                             # keyboard, one at a time), the steps of all four tools, Back and Next, a real lesson trained in
+                                             # the page running while another step is shown, reached from elsewhere, minimal motion, night, phone
+
 Ingenium 6.27 (5 November 2026): the editions, as she set them out. Her words: "The Ingenium edition that will be made available to the
 public and participants and even friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps,
 and the Guide and Settings page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author
