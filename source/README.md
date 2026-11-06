@@ -371,6 +371,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.30 (6 November 2026): a whole backup, sealed with a password of her own. Her words: "I want you to encrypt Ingenium and
+everything inside of it. I want Ingenium to be fully encrypted end-to-end, and to be protected that is very important to me. I don't want
+Ingenium to be at risk and vulnerable to hackers or malicious software. I don't want my data getting lost or being stolen or leaked".
+
+- What was there (modules/r197.js, 6.9): an optional lock with a name and a password seals the desk, the long texts, the conversations
+  brought in, the signing keys and Fabrica's issues and pages on the device (AES-GCM-256 under a data key the password unwraps). A backup
+  from the Backup page stayed a plain zip even with the lock on: the Backup page opens the sealed records so that a backup can be
+  restored anywhere.
+- modules/r143.js. Seal the whole backup, a switch beside the keys' own, shares their password fields (the label says what the password
+  is for) and is on by itself while Ingenium is locked. The finished zip is sealed in parts of 4 MB, each with AES-GCM-256 under one key
+  drawn from the password (PBKDF2-SHA-256, 600,000 rounds, the keys' own figure), each part's nonce counted from a random one and each
+  part bound to the file's head (salt, rounds, size), its place and whether it is the last, so no part can be changed, moved, dropped or
+  added unseen. The file starts with a plain line, INGENIUM SEALED BACKUP 1, and its head; its name ends in .sealed. Restoring a sealed
+  file asks for its password in place (a wrong one is told so and asked again; a changed byte is refused), then opens it as the zip it
+  holds, every fingerprint checked as before; the summary says it was sealed. The file picker takes .sealed files; Save it again keeps
+  the type. IngBackup.seal and IngBackup.unseal for other parts.
+- modules/r197.js: its account of what is sealed and what is not says a backup is sealed when sealed on the Backup page.
+- Still not sealed, as before: the documents the carried apps keep in their own frames, model files (public files, the same for
+  everyone), the app library and Fabrica's saved versions of apps. What is new gains 6.30.
+- Found by the regression run, older than 6.30 (6.29 does the same): since 6.8.11 every connection is also kept in a list on the
+  device (r191, state.cxKept). Restoring a backup without that list, Replace's preview and its report said a connection was "set to a
+  different address", and that its key was left empty, when the backup merely did not hold the list; the keys of the connection in use
+  were carried as before (r191 puts it back in the list). modules/r143.js: a connection the restored desk does not hold at all is not
+  counted as moved, in the preview or the report; where its address does change, the key is still left behind, as in 6.7.
+- rig/t_615_tour.js: What is new may now start at 6.30 or later (its pattern stopped at 6.29).
+
+    node rig/t_630_sealed.js <url> <out>     # 13 checks, with an invented conversation and password: the head and name, nothing
+                                             # readable inside, the cipher and its rounds, asked without a password, a wrong one told,
+                                             # the right one opens, a changed byte refused, the card's switch, the picker, the restore
+
 Ingenium 6.29 (5 November 2026): a model's reply length and memory, remembered, and set wherever it works. Her words: the Tokens and
 Context controls "reset", and she wants to set them, and the effort, on every page that runs a model (the Career Studio, Lector and the
 rest).
