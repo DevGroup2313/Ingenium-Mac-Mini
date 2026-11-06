@@ -506,6 +506,20 @@ def _public(ed):
     ]
 
 
+def _reset_words(ed):
+    """6.38: Reset everything says what it clears (build_page.py); an edition is told only of what it holds. The full edition has
+    no Author Studio; the public editions have no app library, no Fabrica and no Author Studio (Build makes packages there, so
+    the signing keys are named)."""
+    old = ("the long texts, the app library, Fabrica\\'s apps, packages, issues and pages, the conversations you brought in, "
+           "the signing keys and your Author Studio changes. On a computer app")
+    if ed == "full":
+        new = ("the long texts, the app library, Fabrica\\'s apps, packages, issues and pages, the conversations you brought in "
+               "and the signing keys. On a computer app")
+    else:
+        new = "the long texts, the conversations you brought in and the signing keys. On a computer app"
+    return [(old, new, "Reset everything: what it clears, in this edition", 1)]
+
+
 def edits(ed):
     if ed == "master":
         return []
@@ -524,6 +538,7 @@ def edits(ed):
         E += _full_apps()
     if not has_fabrica(ed):  # 6.27: the public editions
         E += _public(ed)
+    E += _reset_words(ed)
     return E
 
 

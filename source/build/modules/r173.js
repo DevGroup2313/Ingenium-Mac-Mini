@@ -35,12 +35,13 @@ body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,bo
 .rm-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;min-width:0}
 .rm-tabs{display:flex;flex-wrap:wrap;gap:8px;min-width:0;flex:1 1 auto}
 .rm-tabs[hidden]{display:none !important}
-.rm-tab{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;margin:0;padding:8px 16px 8px 12px;border-radius:12px;border:1px solid var(--hairline);
-  background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-2);font:600 13.5px/1.25 var(--sans);letter-spacing:.005em;
+/* 6.38 (her note, 6 November 2026: "I want the fonts and sizes of the newly added pages and sections of Ingenium to match the rest of the app ... I don't want big bulky texts or buttons"): the tabs at the height and lettering of the app's keys (.btn: 13px, about 34px high) */
+.rm-tab{position:relative;display:inline-flex;align-items:center;gap:7px;min-height:35px;margin:0;padding:7px 14px 7px 11px;border-radius:11px;border:1px solid var(--hairline);
+  background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-2);font:600 13px/1.25 var(--sans);letter-spacing:.005em;
   cursor:pointer;text-align:left;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
   transition:transform .16s var(--spring),box-shadow .16s ease,color .15s ease,border-color .15s ease}
 .rm-tab[hidden]{display:none !important}
-.rm-tab svg{flex:0 0 auto;width:17px;height:17px;color:var(--accent)}
+.rm-tab svg{flex:0 0 auto;width:16px;height:16px;color:var(--accent)}
 .rm-tab.rm-star svg{color:var(--gold-ink,var(--accent))}
 .rm-tab:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,var(--pop));color:var(--ink-1)}
 .rm-tab:active{transform:translateY(1px);transition-duration:.06s}
@@ -49,7 +50,7 @@ body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,bo
 .rm-tab:focus-visible,.rm-key:focus-visible,.rm-allkey:focus-visible,.rm-step:focus-visible,.rm-fold:focus-visible{outline:2.5px solid var(--rm-focus);outline-offset:3px}
 .rm-says{margin:10px 2px 0;font-size:13.5px;line-height:1.5;color:var(--ink-2);max-width:72ch}
 .rm-says[hidden]{display:none !important}
-.rm-allkey,.rm-key{display:inline-flex;align-items:center;gap:7px;min-height:38px;margin:0;padding:7px 14px 7px 11px;border-radius:12px;border:1px solid var(--hairline);
+.rm-allkey,.rm-key{display:inline-flex;align-items:center;gap:7px;min-height:35px;margin:0;padding:7px 14px 7px 11px;border-radius:11px;border:1px solid var(--hairline);
   background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-1);font:600 13px/1.2 var(--sans);cursor:pointer;
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .16s var(--spring),box-shadow .16s ease}
 .rm-allkey{margin-left:auto;font-weight:500;color:var(--ink-2)}

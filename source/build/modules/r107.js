@@ -250,7 +250,7 @@ body[data-theme="night"] #lx7 .l-mark img.ing-crest-img{filter:drop-shadow(0 1px
 @keyframes l7Blink{50%{opacity:0}}
 #lx7 .l-jump{position:sticky;bottom:4px;align-self:center;z-index:2}
 #lx7 .l-empty{padding:18px 14px;color:var(--l-ink2);font-size:13.5px;line-height:1.6}
-#lx7 .l-empty b{display:block;font:600 17px/1.3 var(--l-serif);color:var(--l-ink1);margin-bottom:6px;letter-spacing:.02em}
+#lx7 .l-empty b{display:block;font:600 16.5px/1.3 var(--l-serif);color:var(--l-ink1);margin-bottom:6px;letter-spacing:.02em}
 #lx7 .l-prog{flex:1 1 200px;min-width:0}
 #lx7 .l-prog .lbl{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--l-ink2);flex-wrap:wrap}
 #lx7 .l-prog .lbl b{color:var(--l-ink1);font-weight:600}

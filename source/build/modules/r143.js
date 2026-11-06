@@ -56,7 +56,9 @@ body[data-theme="night"] #bkCard{
 #bkCard .bk-what .n{min-width:3.4ch;text-align:right;font-weight:700;color:var(--b-acc);font-variant-numeric:tabular-nums}
 #bkCard .bk-what .sub{display:block;font-size:12.5px;color:var(--b-ink3)}
 /* the keys: popped out, they lift on hover and sink when pressed */
-#bkCard .bk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;border:1px solid var(--b-hair);background:linear-gradient(var(--b-a),var(--b-b));border-radius:11px;padding:8px 16px;font:600 13.5px/1.2 var(--sans);color:var(--b-ink1);cursor:pointer;box-shadow:var(--b-pop);white-space:nowrap;
+/* 6.38 (her note, 6 November 2026: the newly added sections' fonts and sizes to match the rest of the app, no big bulky buttons):
+   the backup's keys at the app's key size (.btn: 13px, about 34px high) */
+#bkCard .bk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;border:1px solid var(--b-hair);background:linear-gradient(var(--b-a),var(--b-b));border-radius:11px;padding:8px 14px;font:600 13px/1.2 var(--sans);color:var(--b-ink1);cursor:pointer;box-shadow:var(--b-pop);white-space:nowrap;
   transition:transform .16s var(--b-spring),box-shadow .16s ease,opacity .2s ease}
 #bkCard .bk-key:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--b-pophi)}
 #bkCard .bk-key:active:not(:disabled){transform:translateY(1px) scale(.985);box-shadow:var(--b-press);transition-duration:.06s}

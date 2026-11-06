@@ -1375,6 +1375,27 @@ edit('function flushShellSave(){var q=saveState._q;if(!q||!q.timer)return;',
      'function flushShellSave(){if(window.__ingResetting)return;var q=saveState._q;if(!q||!q.timer)return;',
      "6.33 the window closing during a reset writes nothing to disk")
 
+# ---- 6.38 (6 November 2026): Reset everything clears every store Ingenium keeps, as she answered (6 November 2026), asked whether it
+#      should: "For the second question, the answer is yes." Until now it cleared the desk, the lock record, the recovery shelf, the
+#      engine and file links (ingenium_files) and an older store, and left the long texts, the app library, Fabrica's repositories,
+#      packages, issues and pages, the conversations brought in, the signing keys and the desk's overflow copy, sealed under a key
+#      that was gone when the lock was on. Now those stores go too (each connection the page holds is closed first by modules/r181.js,
+#      so nothing blocks the deletion), with every one of Ingenium's own small preferences in this browser's store (the keys that
+#      begin "ing." "ing:" or "ingenium"; a carried app's own keys stay), the folder search's index in the private file system
+#      (.ingenium-rag), and on a computer app the long texts kept on its disk (each one the desk names, then the app's own sweep).
+#      Kept, as before and as the dialog says: on a computer app the models on its disk and its earlier desks (desk-backups); the
+#      documents a carried app keeps in its own frame. ----
+edit('<h3>Reset everything?</h3><p class="small muted">This clears your models list, notes, reminders, settings, engine bundle, file links, the Build page and the instruments from this device. It cannot be undone.</p>',
+     '<h3>Reset everything?</h3><p class="small muted">This clears everything Ingenium keeps on this device: your chats, notes, reminders and settings, your models list, the engine and file links this page keeps, the long texts, the app library, Fabrica\\\'s apps, packages, issues and pages, the conversations you brought in, the signing keys and your Author Studio changes. On a computer app, the models on its disk and its earlier desks (desk-backups) stay. It cannot be undone.</p>',
+     "6.38 Reset everything says what it clears")
+edit('Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files"),disk]),',
+     'var dkIds=[];try{var dj=JSON.stringify(state);dkIds=(dj.match(/big_[a-z0-9]{7,40}/g)||[]).filter(function(x,i,a){return a.indexOf(x)===i;});}catch(e){}\n'
+     '    try{if(HAS_LS){for(var li=localStorage.length-1;li>=0;li--){var lk=localStorage.key(li);if(lk&&/^(ing[.:]|ingenium)/.test(lk))localStorage.removeItem(lk);}}}catch(e){}\n'
+     '    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=Promise.all(dkIds.map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});})).then(function(){if(typeof sb.big_gc==="function")return Promise.resolve(sb.big_gc([])).catch(function(){});});}catch(e){}\n'
+     '    var opfs=Promise.resolve();try{if(navigator.storage&&navigator.storage.getDirectory)opfs=navigator.storage.getDirectory().then(function(root){return root.removeEntry(".ingenium-rag",{recursive:true});}).catch(function(){});}catch(e){}\n'
+     '    Promise.race([Promise.all(["ingenium_files","the_foundry_files","ingenium_big","ingenium_apps","ingenium_repos","fabrica_made","ingenium_claude","ingenium_keys","ingenium_hub","ingenium_desk"].map(gone).concat([disk,diskBig,opfs])),',
+     "6.38 Reset everything clears every store")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

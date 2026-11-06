@@ -371,6 +371,48 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.38 (6 November 2026): one scale for the whole app, the model list at its key, and Reset everything clears every store.
+Her notes of 6 November: "Everything inside the Author Studio looks big and chunky, very bulky and does not match the rest of the
+app, please fix that." "The models drop down list panel from the chats does not open directly on top of the button, it opens on the
+other side of the chat text, please fix that." "I want the fonts and sizes of the newly added pages and sections of Ingenium to match
+the rest of the app, everything should be consistent and cohesive. I don't want big bulky texts or buttons messing up the look of the
+app." And, asked whether Reset everything should clear the other stores too: "the answer is yes".
+
+- The app's own scale, read from the base page: a page's title 25px serif (Home's 30px), its first line (the lede) 14px, a card's
+  heading (h2.sec) 16.5px serif, text 13.5px, small text 12px, a key (.btn) 13px at about 34px high (8px by 14px inside it), a small
+  key 12px, a field 13.5px. Every page, room and part was measured at 1440 by 900 (47 views on 6.37, with the Author Studio's rooms).
+- What stood out, and why: on Home, in the Career Studio and in their keys, a general rule ("buttons take the page's lettering")
+  outranked the keys' own size, so keys written at 13px or 13.5px were drawn at 14px and up to 46px high (.hx button over .hx-btn,
+  #cs button:not(.rm-tab) over #cs .c-btn). Those rules now give way (:where), and the keys take the app's size. Also brought to the
+  scale: Home's keys (13px, 34px), its card names (16.5px), its first line (14px), its greeting (no larger than the app's Home title,
+  30px), its section heads (16.5px); the rooms' tabs on Settings, Models, Blend, Guide and the Career Studio (13px, 35px, as the
+  app's keys; on a phone they keep 6.8's smaller pills); the Career Studio's empty heading (16.5px) and its link field and key (13.5px
+  and 35px); the backup's keys (13px, 34px); Lector's and Fabrica's empty headings (16.5px).
+- What stays larger, on purpose: page titles; Home's greeting and the Offline Project's plaque; figures (the storage's size, Focus's
+  clock); the chat's greeting when a conversation is empty; Lector's paper and the Ownership notice, which are documents at a reading
+  size. rig/t_638_scale.js names each and fails on anything else above the scale.
+- The Author Studio (modules/r236.js, the master edition): drawn in the app's measures. Its top bar 44px with the app's title (16.5px
+  serif) and pills (24px, 11.5px) instead of keys; its rail lettered as the side bar is (13px, the chosen room in the accent); its
+  cards as the app's cards (16px inside, 14px corners, the app's shadow, 16.5px headings, 12px text); its fields 32px at 13px; docked
+  480px wide. A room's name shows as a tip under the pointer only when the rail is narrowed to its icons.
+- The model list (modules/r237.js, new): it was placed by the rule all the chat's menus share, at the left edge of the composer's
+  bar, while its key stands at the right beside the send arrow. Now, in Chat and in Code, it opens just above its key, its right
+  edge on the key's (as the effort list's is), moved in only as far as the window's edge asks; it follows the key when the window
+  changes size or the list is painted again, and it is placed before the screen is drawn.
+- Reset everything (build_page.py): it cleared the desk and the files store; now it clears everything Ingenium keeps on this device:
+  the long texts, the app library, Fabrica's apps, packages, issues and pages, the conversations brought in, the signing keys, the
+  Author Studio's changes, Ingenium's own preferences, the desk's copy and, on a computer app, the long texts on its disk; the folder
+  search's index in the private file system goes too (the dialog does not name it while the folder search is held out of releases).
+  A carried app's own keys stay; on a computer app the models on its disk and its earlier desks (desk-backups) stay, and the dialog
+  says so. Each edition's dialog names only what that edition holds (editions.py, _reset_words). The apps Ingenium carries are put
+  in the library again as it starts.
+
+    node rig/t_638_reset.js <url> <out>    # 8 checks with invented records in every store: the dialog, each store gone or empty,
+                                           # the preferences, a rewrite and the index gone, a carried app's key kept, every part runs
+    node rig/t_638_menu.js <url> <out>     # 9 checks: the model list above its key in Chat and Code, from the first moment, after a
+                                           # resize, on a phone; the + list and the effort list in their places
+    node rig/t_638_scale.js <url> <out>    # every page, room and part (and the studio's rooms) against the app's scale
+
 Ingenium 6.37 (6 November 2026): the Author Studio, the room behind the rooms (the master edition only). Her words: "The Author
 Studio looks pitiful and does look like it will allow me to make any edits or changes to Ingenium. It does not look like Carpe Diem's
 Author Studio, I want to actually be able to make edits and changes to Ingenium."

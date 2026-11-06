@@ -22,102 +22,116 @@
    - Change log: every change, newest first, each with Undo; Export all writes the studio's changes and the layers to one file,
      Import all reads one back, Reset all returns Ingenium to how it was built (the log keeps the reset).
    Kept in the desk (state.author): on every device that has her data, in her backups, sealed with the lock when it is on. */
-#ingAuthor{position:fixed;inset:0;z-index:785;display:flex;flex-direction:column;background:var(--bg);color:var(--ink-1);font:14px/1.5 var(--sans)}
+#ingAuthor{position:fixed;inset:0;z-index:785;display:flex;flex-direction:column;background:var(--bg);color:var(--ink-1);font:13px/1.55 var(--sans)}
 #ingAuthor[hidden]{display:none}
-#ingAuthor.au-dock{left:auto;width:min(520px,100vw);border-left:1px solid var(--hairline);box-shadow:-18px 0 40px rgba(30,16,60,.16)}
-html.au-docked main.main{margin-right:min(520px,100vw)}
-#ingAuthor .au-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:14px 22px 12px;border-bottom:1px solid var(--hairline);background:linear-gradient(180deg,var(--card-hi),var(--bg))}
-#ingAuthor .au-brand{display:flex;align-items:center;gap:10px;margin-right:auto}
-#ingAuthor .au-seal{display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:11px;color:#fff;background:linear-gradient(180deg,var(--fill-hi),var(--fill-lo));box-shadow:var(--pop)}
-#ingAuthor .au-seal svg{width:21px;height:21px}
-#ingAuthor .au-title{font:700 24px/1.1 var(--serif);letter-spacing:.01em}
-#ingAuthor .au-kept{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px solid rgba(63,143,94,.32);background:rgba(63,143,94,.09);font-size:12.5px;color:var(--ink-2);transition:background .3s ease}
-#ingAuthor .au-kept i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
-#ingAuthor .au-kept.flash{background:rgba(63,143,94,.24)}
-#ingAuthor .au-keys{display:flex;flex-wrap:wrap;gap:8px}
-#ingAuthor .au-keys .btn{min-height:34px}
+#ingAuthor.au-dock{left:auto;width:min(480px,100vw);border-left:1px solid var(--hairline);box-shadow:-12px 0 32px rgba(30,16,60,.12)}
+html.au-docked main.main{margin-right:min(480px,100vw)}
+/* 6.38, her words: "Everything inside the Author Studio looks big and chunky, very bulky and does not match the rest of the app". Its
+   measures are now Ingenium's own, read from the page: the top bar's small pills (11 to 11.5 px, 21 to 24 px tall), the side bar's
+   flat keys (13 px, 8 by 12 px, no shadow; the chosen one in the accent) for the rail, a card's 16 px, 14 px corners and soft shadow,
+   its 16.5 px serif heading and 12 px notes, the 13 px keys */
+#ingAuthor .au-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:44px;padding:8px 18px;border-bottom:1px solid var(--hairline);background:var(--glass-strong,var(--card-hi))}
+#ingAuthor .au-brand{display:flex;align-items:center;gap:9px;margin-right:auto}
+#ingAuthor .au-seal{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:7px;color:#fff;background:linear-gradient(180deg,var(--fill-hi),var(--fill-lo))}
+#ingAuthor .au-seal svg{width:14px;height:14px}
+#ingAuthor .au-title{font:600 16.5px/1.2 var(--serif);letter-spacing:.02em}
+#ingAuthor .au-kept{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;border:1px solid rgba(63,143,94,.28);background:rgba(63,143,94,.07);font:600 11px/1 var(--sans);color:var(--ink-2);transition:background .3s ease}
+#ingAuthor .au-kept i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+#ingAuthor .au-kept span{font-weight:400;color:var(--ink-3)}
+#ingAuthor .au-kept.flash{background:rgba(63,143,94,.2)}
+#ingAuthor .au-top .au-keys{display:flex;flex-wrap:wrap;gap:6px}
+#ingAuthor .au-pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;border:1px solid var(--hairline);background:var(--card-hi);color:var(--ink-2);font:600 11.5px/1 var(--sans);cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1.5px 0 rgba(40,20,70,.08),0 1px 0 rgba(40,20,70,.1);transition:transform .12s ease}
+#ingAuthor .au-pill:hover{color:var(--ink-1);transform:translateY(-1px)}
+#ingAuthor .au-pill:focus-visible,#ingAuthor .au-room:focus-visible,#ingAuthor .au-kind:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#ingAuthor .au-pill.prim{background:var(--fill-mid);border-color:var(--fill-lo);color:#fff}
+#ingAuthor .au-pill.bad{color:var(--bad)}
 #ingAuthor .au-shell{flex:1 1 auto;display:flex;min-height:0}
-#ingAuthor .au-rail{flex:0 0 228px;display:flex;flex-direction:column;gap:9px;padding:18px 14px;overflow:auto;border-right:1px solid var(--hairline)}
-#ingAuthor .au-room{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:9px 12px;border-radius:12px;border:1px solid var(--hairline);background:linear-gradient(180deg,var(--card-hi),var(--card-lo));
-  box-shadow:var(--pop);color:var(--ink-2);font:600 13.5px/1.25 var(--sans);text-align:left;cursor:pointer;transition:transform .16s var(--spring),box-shadow .16s ease}
-#ingAuthor .au-room:hover{transform:translateY(-2px);box-shadow:var(--pop-hi);color:var(--ink-1)}
-#ingAuthor .au-room svg{width:18px;height:18px;flex:0 0 auto;color:var(--accent)}
-#ingAuthor .au-room[aria-selected="true"]{color:#fff;background:linear-gradient(180deg,var(--fill-hi),var(--fill-lo));border-color:var(--fill-lo)}
-#ingAuthor .au-room[aria-selected="true"] svg{color:#fff}
-#ingAuthor .au-room .n{margin-left:auto;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep);font-size:11.5px;text-align:center}
-#ingAuthor .au-room[aria-selected="true"] .n{background:rgba(255,255,255,.22);color:#fff}
+#ingAuthor .au-rail{flex:0 0 200px;display:flex;flex-direction:column;gap:2px;padding:14px 10px;overflow:auto;border-right:1px solid var(--hairline)}
+#ingAuthor .au-room{display:flex;align-items:center;gap:9px;width:100%;padding:8px 12px;border:0;border-radius:9px;background:transparent;color:var(--ink-2);font:500 13px/1.25 var(--sans);text-align:left;cursor:pointer}
+#ingAuthor .au-room:hover{background:var(--accent-softer);color:var(--ink-1)}
+#ingAuthor .au-room svg{width:16px;height:16px;flex:0 0 auto;color:var(--ink-3)}
+#ingAuthor .au-room[aria-selected="true"]{color:var(--accent);font-weight:700;background:var(--accent-softer)}
+#ingAuthor .au-room[aria-selected="true"] svg{color:var(--accent)}
+#ingAuthor .au-room .n{margin-left:auto;min-width:18px;padding:1px 6px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep);font:600 10.5px/1.5 var(--sans);text-align:center}
 #ingAuthor .au-room .n:empty{display:none}
-#ingAuthor .au-pane{flex:1 1 auto;min-width:0;overflow:auto;padding:24px 34px 60px}
-#ingAuthor .au-mast{max-width:980px;margin:0 auto 18px}
-#ingAuthor .au-kick{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
-#ingAuthor .au-h{margin:4px 0 6px;font:700 26px/1.2 var(--serif)}
-#ingAuthor .au-sub{margin:0;max-width:72ch;color:var(--ink-2);font-style:italic}
-#ingAuthor .au-room-body{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-#ingAuthor .au-card{padding:16px 18px;border-radius:14px;border:1px solid var(--hairline);background:var(--card);box-shadow:var(--pop)}
-#ingAuthor .au-card h3{margin:0 0 4px;font:600 16px/1.3 var(--serif)}
-#ingAuthor .au-card p{margin:0 0 8px;color:var(--ink-2)}
-#ingAuthor .au-kinds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#ingAuthor .au-kind{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border-radius:14px;border:1px solid var(--hairline);background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);
-  text-align:left;cursor:pointer;color:var(--ink-1);font:inherit;transition:transform .16s var(--spring),box-shadow .16s ease;animation:auRise .4s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0)*60ms)}
-#ingAuthor .au-kind:hover{transform:translateY(-3px);box-shadow:var(--pop-hi)}
-#ingAuthor .au-kind b{font:600 16px/1.3 var(--serif)}
-#ingAuthor .au-kind span{color:var(--ink-2);font-size:13px}
-#ingAuthor .au-kind em{margin-top:4px;font-style:normal;font-weight:600;font-size:12.5px;color:var(--accent)}
-#ingAuthor .au-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 0;border-top:1px solid var(--hairline-soft)}
+#ingAuthor .au-pane{flex:1 1 auto;min-width:0;overflow:auto;padding:22px 32px 56px}
+#ingAuthor .au-mast{max-width:960px;margin:0 auto 14px}
+#ingAuthor .au-kick{font:700 10.5px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+#ingAuthor .au-h{margin:2px 0 4px;font:600 21px/1.3 var(--serif)}
+#ingAuthor .au-sub{margin:0;max-width:78ch;color:var(--ink-2);font-size:13.5px;line-height:1.55}
+#ingAuthor .au-room-body{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+#ingAuthor .au-card{padding:16px;border-radius:14px;border:1px solid var(--hairline-soft);background:var(--card-hi);box-shadow:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07)}
+#ingAuthor .au-card h3{margin:0 0 2px;font:600 16.5px/1.5 var(--serif)}
+#ingAuthor .au-card > p{margin:0 0 10px;color:var(--ink-3);font-size:12px;line-height:1.55}
+#ingAuthor .au-kinds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#ingAuthor .au-kind{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:11px 13px;border-radius:12px;border:1px solid var(--hairline);background:var(--card-hi);box-shadow:0 1px 0 rgba(40,22,68,.05),0 2px 5px rgba(40,22,68,.05);
+  text-align:left;cursor:pointer;color:var(--ink-1);font:inherit;transition:transform .16s var(--spring),box-shadow .16s ease;animation:auRise .38s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0)*50ms)}
+#ingAuthor .au-kind:hover{transform:translateY(-2px);box-shadow:0 2px 0 rgba(40,22,68,.06),0 8px 18px rgba(40,22,68,.1)}
+#ingAuthor .au-kind b{font:600 14px/1.35 var(--serif)}
+#ingAuthor .au-kind span{color:var(--ink-3);font-size:12px;line-height:1.5}
+#ingAuthor .au-kind em{margin-top:2px;font:600 11.5px/1.4 var(--sans);color:var(--accent)}
+#ingAuthor .au-room-body .au-keys{display:flex;flex-wrap:wrap;gap:8px}
+#ingAuthor .au-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 0;border-top:1px solid var(--hairline-soft);font-size:13px}
 #ingAuthor .au-row:first-of-type{border-top:0}
 #ingAuthor .au-row .w{flex:1 1 260px;min-width:0}
 #ingAuthor .au-row .from{color:var(--ink-3);text-decoration:line-through;text-decoration-color:rgba(184,67,63,.5);word-break:break-word}
 #ingAuthor .au-row .to{color:var(--ink-1);font-weight:600;word-break:break-word}
-#ingAuthor .au-row .where{display:inline-block;margin-right:8px;padding:1px 8px;border-radius:999px;background:var(--accent-softer);color:var(--accent-deep);font-size:11.5px;font-weight:600}
-#ingAuthor .au-row .when{font-size:11.5px;color:var(--ink-3)}
+#ingAuthor .au-row .where{display:inline-block;margin-right:7px;padding:0 7px;border-radius:999px;background:var(--accent-softer);color:var(--accent-deep);font:600 10.5px/1.7 var(--sans)}
+#ingAuthor .au-row .when{font-size:11px;color:var(--ink-3)}
 #ingAuthor .au-row.undone{opacity:.55}
-#ingAuthor .au-field{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px;align-items:center;margin:6px 0}
-#ingAuthor .au-field label{font-size:12.5px;color:var(--ink-2)}
-#ingAuthor .au-field input[type=text],#ingAuthor .au-field select{width:100%;box-sizing:border-box;padding:7px 10px;border-radius:9px;border:1px solid var(--hairline);background:var(--input-bg);color:var(--ink-1);font:inherit}
-#ingAuthor .au-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#ingAuthor .au-search{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:11px;border:1px solid var(--hairline);background:var(--input-bg);color:var(--ink-1);font:inherit}
-#ingAuthor .au-hits{max-height:420px;overflow:auto}
-#ingAuthor .au-presets{display:flex;flex-wrap:wrap;gap:8px}
-#ingAuthor .au-swatch{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid var(--hairline);background:var(--card-hi);box-shadow:var(--pop);cursor:pointer;font:600 12.5px/1 var(--sans);color:var(--ink-1)}
-#ingAuthor .au-swatch i{width:16px;height:16px;border-radius:50%}
-#ingAuthor .au-note{font-size:12.5px;color:var(--ink-3)}
-#ingAuthor.au-dock .au-rail{flex-basis:60px;padding:12px 8px}
-#ingAuthor.au-dock .au-room span:not(.n){display:none}
-#ingAuthor.au-dock .au-room .n{display:none}
-#ingAuthor.au-dock .au-pane{padding:16px 16px 50px}
+#ingAuthor .au-field{display:grid;grid-template-columns:160px minmax(0,1fr);gap:4px 12px;align-items:center;margin:5px 0}
+#ingAuthor .au-field label{font-size:12px;color:var(--ink-2)}
+#ingAuthor .au-field input[type=text],#ingAuthor .au-field select{width:100%;box-sizing:border-box;height:32px;padding:5px 10px;border-radius:9px;border:1px solid var(--hairline);background:var(--input-bg);color:var(--ink-1);font:13px var(--sans)}
+#ingAuthor .au-field input[type=color]{width:46px;height:28px;padding:2px;border-radius:7px;border:1px solid var(--hairline);background:var(--card-hi)}
+#ingAuthor .au-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#ingAuthor .au-names .au-card{box-shadow:none;padding:12px 14px;background:var(--card)}
+#ingAuthor .au-names .au-card h3{font-size:14.5px}
+#ingAuthor .au-search{width:100%;box-sizing:border-box;height:34px;padding:6px 12px;border-radius:10px;border:1px solid var(--hairline);background:var(--input-bg);color:var(--ink-1);font:13px var(--sans)}
+#ingAuthor .au-hits{max-height:420px;overflow:auto;margin-top:6px}
+#ingAuthor .au-presets{display:flex;flex-wrap:wrap;gap:6px}
+#ingAuthor .au-swatch{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:999px;border:1px solid var(--hairline);background:var(--card-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 0 rgba(40,20,70,.1);cursor:pointer;font:600 12px/1 var(--sans);color:var(--ink-1)}
+#ingAuthor .au-swatch:hover{transform:translateY(-1px)}
+#ingAuthor .au-swatch i{width:11px;height:11px;border-radius:50%}
+#ingAuthor .au-note{font-size:12px;color:var(--ink-3);margin:6px 0 0}
+#ingAuthor.au-dock .au-rail{flex-basis:52px;padding:10px 6px}
+#ingAuthor.au-dock .au-room{justify-content:center;padding:8px}
+#ingAuthor.au-dock .au-room span:not(.n),#ingAuthor.au-dock .au-room .n{display:none}
+#ingAuthor.au-dock .au-pane{padding:14px 14px 50px}
 #ingAuthor.au-dock .au-kinds,#ingAuthor.au-dock .au-names{grid-template-columns:minmax(0,1fr)}
 #ingAuthor.au-dock .au-field{grid-template-columns:minmax(0,1fr)}
-#ingAuthor.au-dock .au-title{font-size:19px}
+#ingAuthor.au-dock .au-top{padding:8px 12px}
+#ingAuthor.au-dock .au-kept span{display:none}
 #ingAuthor #wsBody{max-width:none}
-@keyframes auRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes auRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 body[data-motion="minimal"] #ingAuthor *,body[data-calm="1"] #ingAuthor *{animation:none !important;transition:none !important}
 @media (prefers-reduced-motion:reduce){#ingAuthor *{animation:none !important;transition:none !important}}
-@media (max-width:820px){#ingAuthor .au-rail{flex-basis:60px;padding:12px 8px}#ingAuthor .au-room span:not(.n),#ingAuthor .au-room .n{display:none}#ingAuthor .au-kinds,#ingAuthor .au-names{grid-template-columns:minmax(0,1fr)}
-  #ingAuthor .au-field{grid-template-columns:minmax(0,1fr)}#ingAuthor .au-pane{padding:16px 14px 50px}#ingAuthor .au-top{padding:10px 12px}}
+@media (max-width:820px){#ingAuthor .au-rail{flex-basis:52px;padding:10px 6px}#ingAuthor .au-room{justify-content:center;padding:8px}#ingAuthor .au-room span:not(.n),#ingAuthor .au-room .n{display:none}
+  #ingAuthor .au-kinds,#ingAuthor .au-names{grid-template-columns:minmax(0,1fr)}#ingAuthor .au-field{grid-template-columns:minmax(0,1fr)}#ingAuthor .au-pane{padding:14px 12px 50px}#ingAuthor .au-top{padding:8px 10px}}
 /* picking words on the page */
 html.au-picking body *{cursor:text !important}
-#auHi{position:fixed;z-index:784;pointer-events:none;border:2px solid var(--accent);border-radius:6px;background:rgba(106,63,181,.08);box-shadow:0 0 0 4px rgba(106,63,181,.12);display:none}
-#auPickBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:786;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 16px;border-radius:14px;background:var(--fill-lo);color:#fff;box-shadow:0 10px 30px rgba(30,16,60,.35);font:600 13px/1.4 var(--sans)}
+#auHi{position:fixed;z-index:784;pointer-events:none;border:1.5px solid var(--accent);border-radius:5px;background:rgba(106,63,181,.06);display:none}
+#auPickBar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:786;display:flex;align-items:center;gap:10px;padding:7px 8px 7px 14px;border-radius:12px;background:var(--fill-lo);color:#fff;box-shadow:0 8px 24px rgba(30,16,60,.3);font:600 12.5px/1.4 var(--sans)}
 #auPickBar[hidden]{display:none}
-html.au-docked #auPickBar{left:calc((100vw - min(520px,100vw)) / 2)}
-#ingAuthor.au-dock .au-keys .btn{min-height:30px;padding:5px 10px;font-size:12.5px}
-#auPickBar button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.14);color:#fff;border-radius:9px;padding:6px 12px;font:600 12.5px var(--sans);cursor:pointer}
-#auPop{position:fixed;z-index:787;width:min(440px,calc(100vw - 24px));padding:16px;border-radius:14px;border:1px solid var(--hairline);background:var(--card-hi);color:var(--ink-1);box-shadow:0 20px 50px rgba(30,16,60,.28);font:13.5px/1.5 var(--sans)}
+#auPickBar button{height:26px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:0 12px;font:600 11.5px var(--sans);cursor:pointer}
+html.au-docked #auPickBar{left:calc((100vw - min(480px,100vw)) / 2)}
+#auPop{position:fixed;z-index:787;width:min(400px,calc(100vw - 24px));padding:14px;border-radius:14px;border:1px solid var(--hairline);background:var(--card-hi);color:var(--ink-1);box-shadow:0 1px 0 rgba(40,22,68,.06),0 16px 40px rgba(30,16,60,.22);font:13px/1.5 var(--sans)}
 #auPop[hidden]{display:none}
-#auPop h4{margin:0 0 6px;font:600 15px/1.3 var(--serif)}
-#auPop .orig{margin:0 0 8px;padding:7px 9px;border-radius:9px;background:var(--input-bg);color:var(--ink-2);font-size:12.5px;word-break:break-word}
-#auPop textarea{width:100%;box-sizing:border-box;min-height:74px;padding:8px 10px;border-radius:9px;border:1px solid var(--hairline);background:var(--card);color:var(--ink-1);font:inherit;resize:vertical}
-#auPop label{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:12.5px;color:var(--ink-2)}
-#auPop .k{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:6px}
-/* the door, in Settings' Author Studio room */
-#wsStudio .au-door{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px;padding:22px 24px;border-radius:16px;border:1px solid var(--hairline);background:linear-gradient(135deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop)}
+#auPop h4{margin:0 0 2px;font:600 15px/1.35 var(--serif)}
+#auPop .au-note{font-size:11.5px;color:var(--ink-3);margin:0 0 6px}
+#auPop .orig{margin:0 0 8px;padding:6px 9px;border-radius:8px;background:var(--input-bg);color:var(--ink-2);font-size:12px;word-break:break-word}
+#auPop textarea{width:100%;box-sizing:border-box;min-height:64px;padding:7px 9px;border-radius:9px;border:1px solid var(--hairline);background:var(--card);color:var(--ink-1);font:13px/1.5 var(--sans);resize:vertical}
+#auPop label{display:flex;align-items:center;gap:7px;margin:7px 0;font-size:12px;color:var(--ink-2)}
+#auPop .k{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;margin-top:4px}
+/* the door, in Settings' Author Studio room: a card of Settings */
+#wsStudio .au-door{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
 #wsStudio .au-door .t{flex:1 1 380px;min-width:0}
-#wsStudio .au-door h2{margin:0 0 6px;font:700 22px/1.2 var(--serif)}
-#wsStudio .au-door p{margin:0;color:var(--ink-2)}
-#wsStudio .au-door .k{display:flex;flex-wrap:wrap;gap:10px}
+#wsStudio .au-door h2{margin:0 0 2px}
+#wsStudio .au-door p{margin:0}
+#wsStudio .au-door .k{display:flex;flex-wrap:wrap;gap:8px}
 #wsStudio > .as-banner,#wsStudio > .ws-wrap{display:none !important}
-#auTopKey{display:inline-flex;align-items:center;gap:6px}
-#auTopKey svg{width:14px;height:14px}
+#auTopKey{display:inline-flex;align-items:center;gap:5px}
+#auTopKey svg{width:12px;height:12px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p236"]="started";}catch(_){}
 /* R236 · The Author Studio, the room behind the rooms: see the note at the top of its styles. window.IngAuthor */
@@ -127,6 +141,7 @@ var W=window,D=document;
 function $(id){return D.getElementById(id);}
 function mk(tag,cls,txt){var e=D.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 function key(cls,txt,fn,title){var b=mk("button","btn "+(cls||"ghost"),txt);b.type="button";if(title)b.title=title;b.addEventListener("click",function(e){e.preventDefault();fn(b,e);});return b;}
+function pill(cls,txt,fn,title){var b=mk("button","au-pill"+(cls?" "+cls:""),txt);b.type="button";if(title)b.title=title;b.addEventListener("click",function(e){e.preventDefault();fn(b,e);});return b;}
 function svg(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+d+'</svg>';}
 function uid(){return "a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function when(t){try{return new Date(t).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}catch(e){return "";}}
@@ -262,11 +277,11 @@ var CUR="editor";
 function build(){if($("ingAuthor"))return $("ingAuthor");var r=mk("div");r.id="ingAuthor";r.hidden=true;r.setAttribute("role","dialog");r.setAttribute("aria-modal","true");r.setAttribute("aria-label","Author Studio");
   var top=mk("div","au-top"),brand=mk("div","au-brand"),seal=mk("span","au-seal");seal.innerHTML=PEN;brand.appendChild(seal);brand.appendChild(mk("span","au-title","Author Studio"));top.appendChild(brand);
   var kp=mk("span","au-kept");kp.id="auKept";kp.appendChild(mk("i"));kp.appendChild(mk("b",null,"All changes kept"));kp.appendChild(mk("span",null,"· on this device"));top.appendChild(kp);
-  var keys=mk("div","au-keys");var dock=key("ghost","Show Ingenium beside",function(){setDock(!r.classList.contains("au-dock"));});dock.id="auDockKey";keys.appendChild(dock);
-  keys.appendChild(key("ghost","Export all",function(){exportAll();},"Every rewritten word, name and look, and your layers, in one file"));keys.appendChild(key("ghost","Import all",function(){importAll();},"Brings back an export"));
-  var rs=key("ghost","Reset all",function(){resetAll();},"Ingenium as it was built; Undo is in the change log");rs.style.color="var(--bad)";keys.appendChild(rs);keys.appendChild(key("primary","Close",function(){close();}));top.appendChild(keys);r.appendChild(top);
+  var keys=mk("div","au-keys");var dock=pill("","Show Ingenium beside",function(){setDock(!r.classList.contains("au-dock"));});dock.id="auDockKey";keys.appendChild(dock);
+  keys.appendChild(pill("","Export all",function(){exportAll();},"Every rewritten word, name and look, and your layers, in one file"));keys.appendChild(pill("","Import all",function(){importAll();},"Brings back an export"));
+  keys.appendChild(pill("bad","Reset all",function(){resetAll();},"Ingenium as it was built; Undo is in the change log"));keys.appendChild(pill("prim","Close",function(){close();}));top.appendChild(keys);r.appendChild(top);
   var shell=mk("div","au-shell"),rail=mk("nav","au-rail");rail.id="auRail";rail.setAttribute("role","tablist");rail.setAttribute("aria-label","The studio's rooms");rail.setAttribute("aria-orientation","vertical");
-  ROOMS.forEach(function(R){var b=mk("button","au-room");b.type="button";b.id="auR-"+R.k;b.setAttribute("role","tab");b.setAttribute("data-room",R.k);b.innerHTML=R.i;b.appendChild(mk("span",null,R.t));var n=mk("span","n");n.id="auN-"+R.k;b.appendChild(n);b.title=R.t;
+  ROOMS.forEach(function(R){var b=mk("button","au-room");b.type="button";b.id="auR-"+R.k;b.setAttribute("role","tab");b.setAttribute("data-room",R.k);b.innerHTML=R.i;b.appendChild(mk("span",null,R.t));var n=mk("span","n");n.id="auN-"+R.k;b.appendChild(n);b.setAttribute("data-t",R.t);
     b.addEventListener("click",function(){room(R.k);});rail.appendChild(b);});
   rail.addEventListener("keydown",function(e){if(e.key!=="ArrowDown"&&e.key!=="ArrowUp")return;var bs=[].slice.call(rail.querySelectorAll(".au-room")),i=bs.indexOf(D.activeElement);if(i<0)return;e.preventDefault();var j=(i+(e.key==="ArrowDown"?1:-1)+bs.length)%bs.length;room(bs[j].getAttribute("data-room"));bs[j].focus();});
   var pane=mk("div","au-pane");pane.id="auPane";var mast=mk("div","au-mast");mast.appendChild(mk("div","au-kick","Author Studio"));var h=mk("h2","au-h");h.id="auH";mast.appendChild(h);var s=mk("p","au-sub");s.id="auSub";mast.appendChild(s);pane.appendChild(mast);
@@ -279,8 +294,13 @@ function build(){if($("ingAuthor"))return $("ingAuthor");var r=mk("div");r.id="i
   var hi=mk("div");hi.id="auHi";D.body.appendChild(hi);
   var bar=mk("div");bar.id="auPickBar";bar.hidden=true;bar.appendChild(mk("span",null,"Press any words in Ingenium to rewrite them. Esc, or Done, to stop."));var done=mk("button",null,"Done");done.type="button";done.onclick=function(){pickMode(false);};bar.appendChild(done);D.body.appendChild(bar);
   return r;}
-function setDock(on){var r=build();r.classList.toggle("au-dock",!!on);D.documentElement.classList.toggle("au-docked",!!on);var k=$("auDockKey");if(k)k.textContent=on?"The whole studio":"Show Ingenium beside";}
-function open(rm){var r=build();if(rm)CUR=rm;r.hidden=false;D.documentElement.classList.add("au-open");room(CUR);paintKept();try{setTimeout(function(){var b=$("auR-"+CUR);if(b)b.focus();},30);}catch(e){}}
+/* a room's name shows as a tip under the pointer only when the rail is narrowed to its icons (docked, or a narrow window);
+   with the names written beside the icons a tip would only say them again */
+function railTips(){var r=$("ingAuthor");if(!r)return;var narrow=r.classList.contains("au-dock");try{narrow=narrow||W.matchMedia("(max-width:820px)").matches;}catch(e){}
+  [].forEach.call(r.querySelectorAll(".au-room"),function(b){var t=b.getAttribute("data-t")||"";if(narrow&&t)b.title=t;else b.removeAttribute("title");});}
+try{var MQ=W.matchMedia("(max-width:820px)");if(MQ.addEventListener)MQ.addEventListener("change",railTips);else if(MQ.addListener)MQ.addListener(railTips);}catch(e){}
+function setDock(on){var r=build();r.classList.toggle("au-dock",!!on);D.documentElement.classList.toggle("au-docked",!!on);var k=$("auDockKey");if(k)k.textContent=on?"The whole studio":"Show Ingenium beside";railTips();}
+function open(rm){var r=build();if(rm)CUR=rm;r.hidden=false;railTips();D.documentElement.classList.add("au-open");room(CUR);paintKept();try{setTimeout(function(){var b=$("auR-"+CUR);if(b)b.focus();},30);}catch(e){}}
 function close(){pickMode(false);var r=$("ingAuthor");if(!r)return;r.hidden=true;setDock(false);D.documentElement.classList.remove("au-open");popClose();putBack();}
 /* the Workshop's body (modules/r226.js paints it by its id, wherever it is) */
 /* the Workshop's own styles were written under #wsStudio (its room of Settings): the same rules are given to the studio's Checks room */
@@ -361,8 +381,8 @@ function popOpen(from,scope,el,cur){var p=$("auPop")||(build(),$("auPop"));p.inn
 function popClose(){var p=$("auPop");if(p)p.hidden=true;}
 
 /* ---------- the door in Settings, the pen in the top bar, and go("workshop") ---------- */
-function door(){var st=$("wsStudio");if(!st||st.querySelector(".au-door"))return;var d=mk("div","au-door"),t=mk("div","t");t.appendChild(mk("h2",null,"The Author Studio"));
-  t.appendChild(mk("p",null,"The room behind the rooms. Every word Ingenium says, its names, its colour and fonts, its checks, your own pages and scripts, and its own page are yours to change there; every change is kept, listed and undoable."));d.appendChild(t);
+function door(){var st=$("wsStudio");if(!st||st.querySelector(".au-door"))return;var d=mk("div","card au-door"),t=mk("div","t");t.appendChild(mk("h2","sec","The Author Studio"));
+  t.appendChild(mk("p","small muted","The room behind the rooms. Every word Ingenium says, its names, its colour and fonts, its checks, your own pages and scripts, and its own page are yours to change there; every change is kept, listed and undoable."));d.appendChild(t);
   var k=mk("div","k");var o=key("primary","Open the Author Studio",function(){open("editor");});o.id="auOpenKey";k.appendChild(o);k.appendChild(key("ghost","Edit words on the page",function(){open("words");pickMode(true);}));d.appendChild(k);st.insertBefore(d,st.firstChild);}
 function topKey(){if($("auTopKey"))return;var help=null;[].forEach.call(D.querySelectorAll("button"),function(b){if(!help&&/^Help/.test(clean(b.textContent))&&b.offsetParent&&b.getBoundingClientRect().top<60)help=b;});if(!help||!help.parentNode)return;
   var b=mk("button",help.className);b.type="button";b.id="auTopKey";b.title="The Author Studio: change Ingenium's words, names and look";b.innerHTML=PEN;b.appendChild(D.createTextNode("Studio"));b.addEventListener("click",function(){open();});help.parentNode.insertBefore(b,help);}

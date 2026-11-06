@@ -26,7 +26,8 @@
      only given a head key and folded. */
 #page-guide{position:relative}
 #page-guide .gd-newwrap{position:absolute;top:2px;right:0;z-index:300}
-.gd-newkey{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:38px;margin:0;padding:6px 12px 6px 10px;border-radius:12px;
+/* 6.38 (one scale): as tall and as round as the rooms' keys beside it, which now take the app's key size (35px, 11px corners) */
+.gd-newkey{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:35px;margin:0;padding:6px 12px 6px 10px;border-radius:11px;
   border:1px solid var(--hairline);background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f6f2fb));box-shadow:var(--pop);color:var(--ink-1);
   font:600 13px/1.2 var(--sans);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
   transition:transform .16s var(--spring,cubic-bezier(.2,.8,.2,1)),box-shadow .16s ease}

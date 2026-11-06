@@ -35,7 +35,9 @@ body[data-theme="night"] #cs{--c-card:#201a2b;--c-a:#2a2239;--c-b:#251e33;--c-in
   --c-psh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--c-pledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
   --c-pshhi:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--c-pledge),0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4)}
 #cs *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--c-hair) transparent}
-#cs button:not(.rm-tab){font:inherit;color:inherit;margin:0}
+/* 6.38 (her note, 6 November 2026: "I want the fonts and sizes of the newly added pages and sections of Ingenium to match the rest of the app ... I don't want big bulky texts or buttons"): this rule outranked the studio's keys (#cs button:not(.rm-tab) beats #cs .c-btn), drawing them at 14px and 40px high;
+   it now gives way (:where), so they take the 13px they were written with */
+#cs button:where(:not(.rm-tab)){font:inherit;color:inherit;margin:0}
 #cs :focus-visible{outline:2px solid var(--c-acc);outline-offset:2px}
 /* the head: the name and a line, and the rooms */
 #cs .c-head{display:flex;align-items:flex-end;gap:12px 18px;flex-wrap:wrap;flex:0 0 auto}
@@ -136,7 +138,7 @@ body[data-theme="night"] #cs input[type=date]{color-scheme:dark}
 #cs .c-note{font-size:12.5px;color:var(--c-ink3);line-height:1.5;margin:0}
 #cs .c-h3{font:600 15px/1.3 var(--c-serif);letter-spacing:.03em;margin:4px 0 0;color:var(--c-ink1)}
 #cs .c-empty{margin:auto;max-width:46ch;text-align:center;padding:28px 18px}
-#cs .c-empty h3{font:600 19px/1.3 var(--c-serif);letter-spacing:.03em;margin:0 0 8px}
+#cs .c-empty h3{font:600 16.5px/1.3 var(--c-serif);letter-spacing:.03em;margin:0 0 8px}
 #cs .c-empty p{color:var(--c-ink2);font-size:14px;line-height:1.6;margin:0}
 /* how the studio works, and the lessons */
 #cs .c-motto{margin:18px 18px 6px;padding:12px 16px;border-left:3px solid var(--c-acc);font:italic 16px/1.5 var(--c-serif);color:var(--c-ink2);background:var(--c-accs);border-radius:0 10px 10px 0}
@@ -355,9 +357,10 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 /* 6.9.8 · a posting by its link, the reading vetted against the profile, and the jobs saved on LinkedIn */
 #cs .c-link{display:flex;gap:10px;align-items:flex-end;min-width:0}
 #cs .c-link .field{flex:1 1 auto;min-width:0}
-#cs .c-link>input,#cs .c-link .field input{flex:1 1 auto;min-width:0;font-size:14.5px;min-height:40px}
+/* 6.38 (one scale, her note of 6 November 2026): the link's field and its key at the app's sizes (a field 13.5px, a key about 35px high) */
+#cs .c-link>input,#cs .c-link .field input{flex:1 1 auto;min-width:0;font-size:13.5px;min-height:35px}
 #cs .c-link input[type=text]{font:13.5px var(--c-sans);color:var(--c-ink1);padding:7px 10px;border:1px solid var(--c-hair);border-radius:9px;background:var(--c-wellbg);box-shadow:var(--c-well);min-height:34px}
-#cs .c-link .c-btn{flex:0 0 auto;min-height:40px;white-space:nowrap}
+#cs .c-link .c-btn{flex:0 0 auto;min-height:35px;white-space:nowrap}
 #cs .c-intro .c-pn-b{scrollbar-gutter:stable}
 #cs .c-quick{margin:16px 18px 2px;padding:14px 16px 12px;border:1px solid var(--c-hair);border-radius:14px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-slab);display:flex;flex-direction:column;gap:9px}
 #cs .c-quick .c-h3{margin:0}

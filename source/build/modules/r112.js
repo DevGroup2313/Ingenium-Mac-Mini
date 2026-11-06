@@ -204,7 +204,7 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-keep textarea{width:100%;min-height:58px;resize:vertical}
 #fb .f-keep .f-row .f-btn.pri{margin-left:auto}
 #fb .f-empty{padding:22px 16px;color:var(--f-ink2);font-size:13.5px;line-height:1.6;animation:fbRise .4s var(--f-spring)}
-#fb .f-empty b{display:block;font:600 17px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:6px;letter-spacing:.02em}
+#fb .f-empty b{display:block;font:600 16.5px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:6px;letter-spacing:.02em}
 #fb .f-note{margin:10px 12px 0;padding:8px 12px;border-radius:10px;background:var(--f-accs);color:var(--f-acc);font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #fb .f-note .f-btn{margin-left:auto}
 
