@@ -42,7 +42,26 @@ const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f =
       t[k] = { nm: (x.querySelector('.nm') || {}).textContent, st: (x.querySelector('.st') || {}).textContent, layers: x.querySelectorAll('img.ls-l').length, crest: x.querySelector('.ing-crest') ? (x.querySelector('.ing-crest').classList.contains('ic-master') ? 'master' : x.querySelector('.ing-crest').classList.contains('ic-trio') ? 'trio' : 'other') : '', quarters: !!x.querySelector('.ing-crest.ic-quarters') }; }); return t; });
   ok(tiles['app-tide-clock'] && tiles['app-tide-clock'].nm === 'Tide Clock' && /2\.1/.test(tiles['app-tide-clock'].st) && tiles['app-tide-clock'].layers === 3, 'in Lector the app has its tile, named, with its version, and its logo in 3D (its edge, the logo, a sheen)', tiles['app-tide-clock']);
   ok(tiles['app-ledger-lamp'] && tiles['app-ledger-lamp'].layers >= 1, 'an app with no logo wears a seal of its initials, in the same layers', tiles['app-ledger-lamp']);
-  ok(tiles.offline && tiles.offline.crest === 'master' && tiles.offline.quarters && tiles.offline3 && tiles.offline3.crest === 'trio', 'the Offline Project wears its live crest, the master seal and the shield of three', { op: tiles.offline, op3: tiles.offline3 });
+  // 6.43, her words: "I don't want two new Offline project seal logo added to the Lector page, instead I want for when I select all 4
+  // apps of the Offline Project the master shield seal of the app appears and when I select only apps the master shield of the Offline
+  // Project still appears with three quadrants of the selected 3 apps and so forth." No tile of its own (6.42 had two); the set chosen
+  // wears its crest, drawn from the apps Ingenium keeps now
+  ok(!tiles.offline && !tiles.offline3, 'Lector shows no tile of the Offline Project\'s own, though the library holds its page (6.43)', Object.keys(tiles));
+  const crests = await p.evaluate(async () => {
+    const wait = (ms) => new Promise(r => setTimeout(r, ms)); const B = () => lxState().brief.apps.slice();
+    const tile = (k) => document.querySelector('#l7Bf .l-app[data-k="' + k + '"]');
+    const crest = () => { const c = document.querySelector('#l7Bf .l-crest'); return c ? (c.classList.contains('ic-master') ? 'master' : c.classList.contains('ic-trio') ? 'trio' : c.classList.contains('ic-duo') ? 'duo' : 'other') + (c.classList.contains('ic-quarters') ? '+q' : '') : ''; };
+    const choose = async (set) => { for (const k of set) if (B().indexOf(k) < 0 && tile(k)) { tile(k).click(); await wait(250); }
+      for (const k of B()) if (set.indexOf(k) < 0 && tile(k)) { tile(k).click(); await wait(250); } await wait(600); return { set: B(), crest: crest() }; };
+    const four = ['cd', 'forge', 'ingenium', 'inkwell'].filter(k => tile(k) && !tile(k).classList.contains('none'));
+    const out = { four };
+    if (four.length === 4) out.all = await choose(four);
+    if (four.length >= 3) out.three = await choose(four.slice(0, 3));
+    if (four.length >= 2) out.two = await choose(four.slice(0, 2));
+    out.one = await choose(four.slice(0, 1));
+    return out; });
+  ok(crests.four.length >= 3 && (!crests.all || /^master/.test(crests.all.crest)) && /^trio/.test(crests.three.crest) && /^duo/.test(crests.two.crest) && crests.one.crest === '',
+    'choosing her apps gives the set its crest: all four the master seal, three the shield of three, two the duo\'s, one app none', crests);
   await p.screenshot({ path: OUT + '/lector-apps.png', clip: { x: 220, y: 160, width: 320, height: 720 } });
   // 3. the names of a set
   const names = await p.evaluate(() => { const L = IngLector, B = L.state().brief; const out = {};

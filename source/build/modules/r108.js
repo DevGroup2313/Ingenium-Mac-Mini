@@ -72,8 +72,15 @@ function themeFor(c){var d=tint(c,-.3),dd=tint(c,-.5),l=tint(c,.9),ll=tint(c,.95
     day:{desk:"#f1eff4",bg:"#ffffff",tex:"none",ink:"#1e1a24",ink2:"#4a4552",acc:c,title:d,sub:d,gold:"#b88a3a",caps:c,tint:l,hair:"rgba(30,24,40,.12)",line:hexa(c,.28),rule:d,code:ll,fill:"#8a6526",chk:"#b0302f",frame:"transparent",qbg:ll,qink:dd},
     night:{desk:"#111015",bg:"#1d1b22",tex:"none",ink:"#ece9f1",ink2:"#bdb6c8",acc:n1,title:n2,sub:n1,gold:"#d8b46a",caps:n1,tint:hexa(n1,.10),hair:"rgba(255,255,255,.12)",line:hexa(n1,.3),rule:hexa(n1,.5),code:"rgba(255,255,255,.05)",fill:"#e0be78",chk:"#f08f8f",frame:"transparent",qbg:hexa(n1,.08),qink:tint(c,.78)}};}
 function syncApps(){var others=[];try{others=typeof window.libOtherKeys==="function"?libOtherKeys():[];}catch(e){others=[];}
-  /* the Offline Project, in its two variations, after her four (the master edition: modules/r240.js lists them) */
-  var extra=["offline","offline3"].filter(function(k){try{return typeof LIB_KEYS!=="undefined"&&LIB_KEYS.indexOf(k)>=0;}catch(e){return false;}});
+  /* 6.43, her words: "I don't want two new Offline project seal logo added to the Lector page, instead I want for when I select all 4
+     apps of the Offline Project the master shield seal of the app appears and when I select only apps the master shield of the Offline
+     Project still appears with three quadrants of the selected 3 apps and so forth. I don't want them to look like duplicates and also
+     that way, the Offline Project inside of the app can always reflect the 4 latest apps that is kept inside of Ingenium instead of an
+     old saved version of older apps versions." So the Offline Project has no tile of its own here (6.42 gave it two, "offline" and
+     "offline3"): choosing two, three or all four of her apps gives the set its crest, the duo's, the shield of three or the master
+     seal (crestKind, setCrest, since 6.1), drawn from the seals of the apps Ingenium keeps now. The library still knows its page
+     (modules/r240.js), for Fabrica and the other pages. */
+  var extra=[];
   extra.forEach(function(k){if(!APPS[k]){APPS[k]={name:(window.libName?libName(k):k),abbr:"The Offline Project",color:"#8f6b2b",fill:"#f4eedf",sub:"#7a5f2e",offline:true};PT[k]=PT.family;OWN.day[k]="#8f6b2b";OWN.night[k]="#d8b46a";
     var st0=document.getElementById("l7PaperCss");if(st0)st0.remove();}});
   ORDER.length=0;BASE.concat(extra,others).forEach(function(k){ORDER.push(k);});var fresh=false;
@@ -434,6 +441,8 @@ function howCard(busy){var B=L7().brief,o=modelPlan(),c=o.chosen,s=sec("How Lect
 /* the brief */
 function sec(title){var s=h("div","l-sec");s.appendChild(h("h3",null,esc(title)));return s;}
 function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S.brief,busy=R7.running||LX.busy;
+  /* 6.43: a set chosen before keeps only the apps Lector lists (the Offline Project's two tiles of 6.42 are gone) */
+  var kept0=B.apps.filter(function(k){return ORDER.indexOf(k)>=0;});if(kept0.length!==B.apps.length){B.apps=kept0;saveSoon();}
   var keepOpen={};[].forEach.call(box.querySelectorAll("details[open]"),function(d){keepOpen[d.getAttribute("data-k")]=1;});
   var scroll=box.parentNode.scrollTop;box.innerHTML="";
   if(!B.apps.length){var first=ORDER.filter(kept)[0];if(first){B.apps=[first];saveSoon();}}
