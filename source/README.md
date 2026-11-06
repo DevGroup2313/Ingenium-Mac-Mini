@@ -395,6 +395,15 @@ behind, the new location throws me off."
   Look now reaches), the new folder's card at the text's size, and a folder's own title at 21px below the page's 25px.
   rig/t_638_scale.js now puts invented content in before measuring (a folder, an app in Fabrica, a conversation) and measures
   a folder's own view, which is how these were found.
+- Lector (modules/r108.js), her words: "I don't want two new Offline project seal logo added to the Lector page, instead I want for
+  when I select all 4 apps of the Offline Project the master shield seal of the app appears and when I select only apps the master
+  shield of the Offline Project still appears with three quadrants of the selected 3 apps and so forth. I don't want them to look
+  like duplicates and also that way, the Offline Project inside of the app can always reflect the 4 latest apps that is kept inside
+  of Ingenium instead of an old saved version of older apps versions." 6.42 had given the Offline Project two tiles of its own
+  ("offline" and "offline3"); they are gone from Lector. Choosing two, three or all four of her apps gives the set its crest (the
+  duo's, the shield of three, the master seal, as since 6.1), drawn from the seals of the apps Ingenium keeps now; a set chosen
+  before keeps only the apps Lector lists. The library still knows the Offline Project's page (modules/r240.js), for Fabrica and
+  the other pages. rig/t_642_anyapp.js checks the tiles' absence and the crest of four, three, two and one.
 - Her doctoral plans (a university and her proposal's title) were quoted in modules/r188.js's header comment and used as
   sample text in two tests; they are taken out of the current source. Earlier commits still hold them: removing them from
   the history would need the branch rewritten, which is hers to decide.

@@ -49,6 +49,8 @@ const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f =
   ok(!tiles.offline && !tiles.offline3, 'Lector shows no tile of the Offline Project\'s own, though the library holds its page (6.43)', Object.keys(tiles));
   const crests = await p.evaluate(async () => {
     const wait = (ms) => new Promise(r => setTimeout(r, ms)); const B = () => lxState().brief.apps.slice();
+    /* her four in the library: the three carried apps and this copy of Ingenium, as the first start keeps them */
+    try { await IngBuiltin.seed(); } catch (e) {} go('home'); await wait(300); go('lector'); await wait(1500);
     const tile = (k) => document.querySelector('#l7Bf .l-app[data-k="' + k + '"]');
     const crest = () => { const c = document.querySelector('#l7Bf .l-crest'); return c ? (c.classList.contains('ic-master') ? 'master' : c.classList.contains('ic-trio') ? 'trio' : c.classList.contains('ic-duo') ? 'duo' : 'other') + (c.classList.contains('ic-quarters') ? '+q' : '') : ''; };
     const choose = async (set) => { for (const k of set) if (B().indexOf(k) < 0 && tile(k)) { tile(k).click(); await wait(250); }
