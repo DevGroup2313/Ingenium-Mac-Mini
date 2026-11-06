@@ -43,7 +43,7 @@ const HFSTUB = () => { window.__net = []; const now = Date.now(), day = 864e5;
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(900);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); });
   await p.evaluate(HFSTUB); await p.waitForTimeout(300);
-  await p.evaluate(() => { go('models'); if (window.IngRooms) try { IngRooms.open('models', 'lineup'); } catch (e) {} }); await p.waitForTimeout(900);
+  await p.evaluate(() => { go('models'); if (window.IngRooms) try { IngRooms.open('models', 'newer') || IngRooms.open('models', 'get'); } catch (e) {} }); await p.waitForTimeout(900);
   let c = await p.evaluate(() => { const k = document.getElementById('foundCard'); return k ? { text: k.innerText.slice(0, 400), weekly: document.getElementById('foundWeekly').checked, calls: window.__net.length, dev: lineupDevice() } : null; });
   ok(c && /Newer models, found online/.test(c.text) && /Check for newer models/.test(c.text) && c.weekly === false && c.calls === 0 && c.dev === 'mac-arm',
     'the Models page has its key; the weekly look is off until she turns it on, and nothing has gone online', c);
@@ -58,7 +58,8 @@ const HFSTUB = () => { window.__net = []; const now = Date.now(), day = 864e5;
     'not offered, each with its reason: a 245 GB model on 16 GB, a kind only the newer engine loads (this copy has none), a kind its record does not state', { G, L, M });
   ok(!r.list.some(x => /MiniCPM5-1B-GGUF|DFlash/i.test(x.id)), 'a repository already in Ingenium\'s lineup, and a speed-up file, are not listed', r.list.map(x => x.id));
   await p.evaluate(() => { const n = [...document.querySelectorAll('#modalBox .btn')].find(x => x.textContent.trim() === 'Not now'); if (n) n.click(); try { closeModal(); } catch (e) {}
-    const t = [...document.querySelectorAll('button')].find(x => /Ingenium's models/.test(x.textContent) && x.offsetParent); if (t) t.click(); }); await p.waitForTimeout(600);
+    /* 6.35: the card has a room of its own, Newer models (it sat at the foot of Ingenium's models before) */
+    const t = [...document.querySelectorAll('button')].find(x => /^Newer models$/.test(x.textContent.trim()) && x.offsetParent) || [...document.querySelectorAll('button')].find(x => /Ingenium's models/.test(x.textContent) && x.offsetParent); if (t) t.click(); }); await p.waitForTimeout(600);
   await p.evaluate(() => { const k = document.getElementById('foundCard'); if (k) k.scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + '/found.png', fullPage: false });
   // install: the same checked download as Ingenium's own models

@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.35 (6 November 2026): newer models in a room of their own. Her words (4 November 2026): the path to check, download and
+install newer models, with "the existing section to be redesigned and be visible". Since 6.11.2 the card (modules/r217.js) sat at the
+foot of the card of the four houses in Ingenium's models, which is long, so it was out of sight.
+
+- modules/r173.js: the Models page gains a room, Newer models, beside Ingenium's models, with its own icon and line; the words "newer"
+  and "found online" file into it.
+- modules/r217.js: the card stands on its own (a card after the houses' card, which r173 files into the new room), with Check for newer
+  models at its top; before a look a dashed box says what pressing it does (Ingenium asks Hugging Face once, lists only what this
+  device can load and hold, installs nothing until Install is pressed); after one, a line counts what this device can run, and how
+  many are new since the look before. Its rows lift a little under the pointer (not with minimal motion or the system's
+  reduced motion).
+- modules/r222.js: the Guide says where it is now; What is new gains 6.35.
+- rig/t_6112_found.js opens the new room for its picture.
+
+    node rig/t_635_newer.js <url> <out>   # 10 checks: the key in the row of rooms beside Ingenium's models; the card on its own in its
+                                          # room, Check in sight at the top; the empty state and nothing online before a look; the count
+                                          # after one; Install; a ring from the tour or the Guide opens the room; the Guide's words;
+                                          # a phone; no page errors (Hugging Face and the computer app are stand-ins)
+
 Ingenium 6.34 (6 November 2026): documents in a chat reach a model on this device, and are read as documents. Her words (4 November
 2026): "The documents uploaded inside of the chats of Ingenium are not clickable or offer a preview when you hover over it, the HTML
 single file is clickable but not the documents, please fix that." The handoff asked for it to be verified on the device.

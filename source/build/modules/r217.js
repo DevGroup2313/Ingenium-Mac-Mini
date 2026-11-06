@@ -8,7 +8,18 @@
    size in parameters; it offers only what this device's engine can load and what fits this device's memory, and installs it with the
    same checked download as Ingenium's own models. What it cannot know before she tries a model is how well it answers: it says so.
    Ingenium reaches the internet only when she asks: the weekly look is a switch, off until she turns it on. */
+/* 6.35: a card of its own, in the Models page's room "Newer models" (modules/r173.js); until then it sat at the foot of the long card
+   of the four houses, out of sight. Her words (4 November 2026): the path to check, download and install newer models, "the existing
+   section to be redesigned and be visible". */
 #foundCard{margin-top:14px}
+#foundCard .fd-head{padding-bottom:2px}
+#foundCard .fd-head .btn{min-height:38px;padding:8px 16px;font-weight:700}
+#foundCard .fd-sum{margin:2px 0 8px;font:600 13px/1.45 var(--sans,system-ui,sans-serif);color:var(--ink-1)}
+#foundCard .fd-empty{margin:4px 0 6px;padding:12px 14px;border:1px dashed var(--hairline,rgba(34,26,46,.18));border-radius:12px;font:12.8px/1.55 var(--sans,system-ui,sans-serif);color:var(--ink-2)}
+#foundCard .fd-row{box-shadow:var(--pop,0 1px 2px rgba(40,22,68,.08));transition:transform .16s ease,box-shadow .16s ease}
+#foundCard .fd-row:hover{transform:translateY(-1px)}
+body[data-motion="minimal"] #foundCard .fd-row{transition:none}body[data-motion="minimal"] #foundCard .fd-row:hover{transform:none}
+@media (prefers-reduced-motion:reduce){#foundCard .fd-row{transition:none}#foundCard .fd-row:hover{transform:none}}
 #foundCard .fd-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 #foundCard .fd-head h3{margin:0;flex:1 1 auto;font:700 15px/1.3 var(--sans,system-ui,sans-serif);color:var(--ink-1)}
 #foundCard .fd-note{margin:6px 0 10px;font:12.5px/1.55 var(--sans,system-ui,sans-serif);color:var(--ink-3)}
@@ -114,18 +125,23 @@ function makeHouse(row){var key=keyOf(row);state.tierPick=state.tierPick||{};sta
 /* the card */
 var statusLine="";
 function say(t){statusLine=t;var s=$id("foundStatus");if(s)s.textContent=t;}
-function card(){var c=$id("foundCard");if(c)return c;var host=$id("lineupCard");if(!host)return null;
-  c=mk("div");c.id="foundCard";var h=mk("div","fd-head");h.appendChild(mk("h3",null,"Newer models, found online"));
+function card(){var c=$id("foundCard");if(c)return c;var host=$id("lineupCard");if(!host||!host.parentNode)return null;
+  c=mk("div","card");c.id="foundCard";var h=mk("div","fd-head");h.appendChild(mk("h3",null,"Newer models, found online"));
   var go=mk("button","btn small primary","Check for newer models");go.type="button";go.id="foundGo";go.onclick=function(){if(lineupDevice()==="web"){say("A web browser cannot install models: the Ingenium app for this device can.");return;}check(true);};h.appendChild(go);
   c.appendChild(h);
   c.appendChild(mk("p","fd-note","Asks Hugging Face, when you press it, for the newest GGUF files of "+PUBLISHERS.join(", ")+". For each, Ingenium reads from Hugging Face's own records the file's size and fingerprint (SHA-256), the model's kind and its size in parameters, and offers only what this device's engine can load and what fits its memory. It installs with the same checked download as Ingenium's own models. It cannot know before you try a model how well it answers: try a new one before you rely on it."));
   var sw=mk("label","fd-sw"),cb=document.createElement("input");cb.type="checkbox";cb.id="foundWeekly";cb.checked=!!st().weekly;cb.onchange=function(){st().weekly=cb.checked;try{saveState();}catch(e){}};
   sw.appendChild(cb);sw.appendChild(document.createTextNode("Look once a week when Ingenium opens (it only lists; it installs nothing without your press)"));c.appendChild(sw);
   var s=mk("div","fd-status");s.id="foundStatus";s.setAttribute("role","status");s.setAttribute("aria-live","polite");c.appendChild(s);
-  var l=mk("div");l.id="foundList";c.appendChild(l);host.appendChild(c);return c;}
-function paint(){var c=card();if(!c)return;var f=st(),box=$id("foundList");box.innerHTML="";
+  var sm=mk("p","fd-sum");sm.id="foundSum";sm.hidden=true;c.appendChild(sm);
+  var l=mk("div");l.id="foundList";c.appendChild(l);host.parentNode.insertBefore(c,host.nextSibling);return c;}
+function paint(){var c=card();if(!c)return;var f=st(),box=$id("foundList");box.innerHTML="";var sum=$id("foundSum");
   if(!statusLine&&f.at)say("Looked on "+new Date(f.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+".");
   var ok=f.list.filter(function(x){return x.ok;}),no=f.list.filter(function(x){return !x.ok;});
+  /* 6.35: what the last look found, in one line, or what pressing Check does when nothing was looked at yet */
+  if(sum){var nw=ok.filter(function(x){return x.isNew;}).length;sum.hidden=!f.at;
+    sum.textContent=!f.at?"":ok.length?ok.length+" model"+(ok.length===1?"":"s")+" this device can run"+(nw?", "+nw+" new since the look before":"")+".":"Nothing new this device can run was found at the last look.";}
+  if(!f.at&&!f.list.length){box.appendChild(mk("div","fd-empty","Nothing has been looked for yet. Press Check for newer models: Ingenium asks Hugging Face once, and lists only the models this device can load and hold, each with its size, its fingerprint and its licence. Nothing is installed until you press Install."));return;}
   if(ok.length){var L=mk("div","fd-list");ok.forEach(function(row){var r=mk("div","fd-row"),t=mk("b",null,row.name);if(row.isNew)t.appendChild(mk("span","fd-new","new"));r.appendChild(t);
       var key=keyOf(row),have=null;try{have=lineupRec(key);}catch(e){}
       var meta=[row.pub,row.at?new Date(row.at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"",row.params?row.params+"B parameters":"",row.quant+", "+fmtGB(row.size)+(row.files.length>1?" in "+row.files.length+" parts":""),

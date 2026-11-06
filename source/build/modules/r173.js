@@ -187,6 +187,7 @@ var IC={
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
   yours:svg('<path d="M12 3.5l8.5 4.3-8.5 4.3-8.5-4.3z"/><path d="M3.5 12.2l8.5 4.3 8.5-4.3"/><path d="M3.5 16.4l8.5 4.3 8.5-4.3"/>'),
   get:svg('<path d="M4 10.8L12 4.3l8 6.5V20H4z"/><path d="M12 9.8v6.4M9.4 13.7l2.6 2.6 2.6-2.6"/>'),
+  newer:svg('<path d="M11 5.5v9M7.4 11.1l3.6 3.6 3.6-3.6"/><path d="M4.5 18.5h13"/><path d="M18.3 3.4l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
   cat:svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>'),
   studio:svg(STAR),
   engine:svg('<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M5.5 18.5l1.8-1.8M16.7 7.3l1.8-1.8"/>'),
@@ -221,11 +222,13 @@ var CONF={
   models:{label:"Models, in rooms",rooms:[
     {k:"yours",t:"Your models",i:"yours",says:"The models on this device and how well they run. Add a model file you already have.",ids:["healthBox","yourModelsCard","mdPlaceCard",/^add a model/]},
     {k:"get",t:"Ingenium's models",i:"get",says:"Ingenium's own models, in four houses. Choose a size and get one.",ids:["lineupCard",/^the four houses/]},
+    /* 6.35: newer models, found online when she presses Check (modules/r217.js), in a room of their own, so they can be seen */
+    {k:"newer",t:"Newer models",i:"newer",says:"Models newer than Ingenium's own, looked for online only when you press Check: each with its size, its fingerprint and whether this device can run it.",ids:["foundCard"]},
     {k:"catalogue",t:"More models",i:"cat",says:"A wider choice of strong, open models. They are sorted by what fits this device.",ids:["catBox"]},
     {k:"studio",t:"Studio",i:"studio",star:true,says:"The Studio: make and train your own models. Give a model its own name and instructions, or convert a model's file.",
       ids:["trainCard","aiCard","convCard"]},
     {k:"engine",t:"Engine",i:"engine",says:"The engine that runs your models on this device.",ids:[/^the engine/]}],
-    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
+    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/newer|found online/,"newer"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
   /* 6.26: the Guide in rooms (modules/r230.js folds each topic into a tile and puts What is new in a key) */
   guide:{label:"The Guide, in rooms",find:true,all:true,findLabel:"Find in the guide",findHint:"effort, connectors, lend",found:["topic","topics"],
     allLabels:["Show the whole guide at once","Show the guide in rooms","For those who prefer one long page","Back to one room at a time"],rooms:[
