@@ -472,7 +472,16 @@ def _public(ed):
         ('stores:"Fabrica and Ingenium\'s other stores"};', 'stores:"Ingenium\'s other stores"};', "Storage: the other stores", 1),
         ('["package","Older Fabrica packages"]', '["package","Older packages"]', "Storage: older packages", 1),
         ("Fabrica\\'s older packages (they can be made again), ", "", "Storage: what may go", 1),
-        ("the signing keys and Fabrica's issues and pages", "and the signing keys", "the sign-in: what is sealed", 2),
+        ("the signing keys and Fabrica's issues and pages", "and the signing keys", "the sign-in: what is sealed", 1),
+        # 6.32: the lock seals the app library and Fabrica's stores in the editions that keep them; these name neither
+        ("the signing keys, your app library, and Fabrica's apps, packages, issues and pages. A backup is sealed", "and the signing keys. A backup is sealed",
+         "the sign-in: what turning it on seals", 1),
+        ("Sealed too: your app library, and Fabrica\\'s apps with every version and the packages it made. ", "", "the sign-in: no library or Fabrica sealed", 1),
+        ("your app library, and Fabrica's apps with every version and the packages it made (what each holds; the names they are filed under are not); ", "",
+         "the sign-in: no library or Fabrica in what is sealed", 1),
+        ("Sealing your app library, and Fabrica\\'s apps and packages: ", "Sealing the rest of what is kept here: ", "the sign-in: sealing the rest", 1),
+        ("Opening your app library, and Fabrica\\'s apps and packages: ", "Opening the rest of what is kept here: ", "the sign-in: opening the rest", 1),
+        ("from elsewhere, the signing keys and Fabrica\\'s pages: ", "from elsewhere and the signing keys: ", "the sign-in: its progress names no Fabrica", 2),
         # the backup's packages switch is read when a backup is made, so it stays, hidden, in neutral words (none are made here)
         ('<div class="bk-opt"><input type="checkbox" class="bk-sw" role="switch" id="bkOptPk"', '<div class="bk-opt" hidden><input type="checkbox" class="bk-sw" role="switch" id="bkOptPk"',
          "Backup: the packages switch hidden", 1),
