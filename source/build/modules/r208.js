@@ -136,7 +136,7 @@ function msgsOf(c){if(c.imported&&!c.imported.adopted&&c.imported.ref&&W.IngBig)
 function convText(c,ms,room){var lines=[];ms.forEach(function(m){var t=String(m.text||"").trim();if(!t)return;lines.push((m.role==="me"?"Me":"Assistant")+": "+t);});
   var all=lines.join("\n"),head="### "+(c.title||"A conversation")+(c.imported?" (from "+c.imported.from+(c.imported.created?", "+day(c.imported.created):"")+")":c.made?" ("+day(c.made)+")":"");
   if(all.length<=room)return head+"\n"+all;var a=Math.floor(room*0.35),b=room-a;return head+"\n"+all.slice(0,a)+"\n[… the middle of this conversation is left out …]\n"+all.slice(all.length-b);}
-function room(){var ctx=8192;try{var o=W.IngLector&&W.IngLector.plan?W.IngLector.plan():null,m=o&&o.chosen;if(m||(o&&o.cloud))ctx=W.lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(400000,(ctx-3000)*3));}
+function room(){var ctx=8192;try{var o=W.IngLector&&W.IngLector.plan?W.IngLector.plan():null,m=o&&o.chosen;if(m||(o&&o.cloud))ctx=W.lxCtx(m)||ctx;}catch(e){}return Math.max(9000,(ctx-3000)*3);}  /* 6.44: no cap of its own (400,000 characters before): the model's memory is the limit */
 function modelReady(){try{var o=W.IngLector&&W.IngLector.plan?W.IngLector.plan():null;return !!(o&&(o.link||o.chosen||o.cloud));}catch(e){return false;}}
 function modelName(){try{var o=W.IngLector.plan();if(o&&(o.cloud||o.link)&&typeof W.lxCloudName==="function")return W.lxCloudName();if(o&&o.chosen)return o.chosen.customName||o.chosen.name||"your model";}catch(e){}return "your model";}
 function ask(msgs,max){var o=null;try{o=W.IngLector.plan();}catch(e){}if(typeof W.lxAsk!=="function")return Promise.reject(new Error("no model can be asked from here"));
@@ -156,7 +156,7 @@ function bringUp(p){if(RUN.busy){say("Ingenium is already bringing a folder up t
   if(!modelReady()){say("A model is needed to bring the summary up to date: get one on the Models page, or choose your connected model in Lector or the Career Studio.");return Promise.resolve(null);}
   var todo=unread(p);if(!todo.length){say("Nothing new to read: the summary is up to date.");return Promise.resolve(null);}
   RUN.busy=true;RUN.of=p.id;RUN.what="Reading "+todo.length+" conversation"+(todo.length===1?"":"s")+"…";paint();
-  var R=room(),per=Math.max(2400,Math.min(60000,Math.floor(R*0.7/Math.min(todo.length,6)))),batches=[],cur=[],size=0,kept=0;
+  var R=room(),per=Math.max(2400,Math.floor(R*0.7/Math.min(todo.length,6))),batches=[],cur=[],size=0,kept=0;
   return Promise.all(todo.map(function(c){return msgsOf(c).then(function(ms){return {c:c,t:convText(c,ms,per)};});})).then(function(xs){
       xs.forEach(function(x){if(size+x.t.length>R*0.7&&cur.length){batches.push(cur);cur=[];size=0;}cur.push(x);size+=x.t.length;});if(cur.length)batches.push(cur);
       var q=Promise.resolve();batches.forEach(function(b,i){q=q.then(function(){RUN.what="Reading part "+(i+1)+" of "+batches.length+" ("+b.length+" conversation"+(b.length===1?"":"s")+")…";paint();

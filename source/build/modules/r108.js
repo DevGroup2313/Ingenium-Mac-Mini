@@ -392,7 +392,7 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
 
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
-     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn quiet" id="l7Open" title="Open this document in Tabula, as the Word file it saves, to keep writing it there">Open in Tabula</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
+     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Advise" title="Suggestions for this document from the Career Studio: what your record adds, what could go, what a reader will ask">Suggestions</button><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn quiet" id="l7Open" title="Open this document in Tabula, as the Word file it saves, to keep writing it there">Open in Tabula</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
    '</div></div>';
   wireFrame();wireMid();return $("lx7");}
 /* 6.2: the middle panel shows the thinking or Ask Lector; the document panel's key opens Ask Lector on the document shown */
@@ -836,14 +836,20 @@ function r7Run(){var j=job();if(!j||R7.running)return;if(LX.busy){ingToast("Lect
   function nextApp(){if(LX.stop)return Promise.reject(stopErr());if(j.doc){var dr=lxRun(j.doc);return dr?readRun(dr):Promise.reject(new Error("That reading is no longer kept."));}
     if(i>=apps.length)return Promise.resolve();var k=apps[i++];
     return ensureRun(k,j).then(function(run){if(run.status==="done"){if(!R7.ev.some(function(e){return e.k==="step"&&e.app===k;}))addEv({k:"step",app:k,label:"Read before",text:nm(k)+" was read in full on "+lxDate(run.finished||run.updated)+(run.depth==="thorough"?", every line of its code":"")+". Lector uses that reading."+(staleRun(k,j.depth)?" It is the reading of an earlier copy ("+(run.version||"its version was not named")+"), as you chose.":"")});return nextApp();}
-      return readRun(run).then(function(){addEv({k:"done",app:k,label:"Read in full",text:"All "+(run.total||0)+" parts of "+run.name+" are read, the notes joined and the analysis written."});paintBrief();return nextApp();});});}
+      return readRun(run).then(function(){if(!j.fresh)j.fresh=[];if(j.fresh.indexOf(run.id)<0)j.fresh.push(run.id);addEv({k:"done",app:k,label:"Read in full",text:"All "+(run.total||0)+" parts of "+run.name+" are read, the notes joined and the analysis written."});paintBrief();return nextApp();});});}
   var p=j.status==="writing"?Promise.resolve():nextApp();
   p.then(function(){if(LX.stop)throw stopErr();if(j.doc)return;j.status="writing";saveState();paintAll();return writeAll(j);})
    .then(function(){if(LX.stop)throw stopErr();j.status="done";j.finished=Date.now();R7.step="";
      addEv({k:"done",label:"Finished",text:j.doc?"The analysis is written.":"Every document is written and checked: "+j.kinds.map(function(k){return docLabel(k,j.apps,j.purpose);}).join(", ")+". Choose one in the document panel and press Save."});
      ingToast(j.doc?"Lector has finished the analysis.":"Lector has finished. Your documents are ready to save.");if(one())setPanel("doc");})
    .catch(function(e){if(e&&e.stopped||LX.stop)j.status="paused";else{j.status="error";j.err=String(e&&e.message||e);addEv({k:"step",label:"Stopped",text:"Lector stopped: "+j.err+" Press Go on to try again from where it stopped."});}})
-   .then(function(){R7.running=false;R7.live=null;R7.step="";LX.writing=null;if(LX.busy&&!LX.runId)LX.busy=false;saveState();paintAll();paintLive();paintBrief();
+   .then(function(){R7.running=false;R7.live=null;R7.step="";LX.writing=null;if(LX.busy&&!LX.runId)LX.busy=false;
+     /* 6.44: her words (6 November 2026): "I want Lector to read my updated apps and spot additional skills and experience that I can add to
+        my resume ... I want it to be built-in for it." Each app read afresh in this job goes to the Career Studio, which spots what the
+        reading shows that her CV and profile do not show yet; what it finds is told here and kept in its room Your edge */
+     try{if(j.status==="done"&&j.fresh&&j.fresh.length&&window.IngCareer&&IngCareer.spotSkills){var fr=j.fresh.slice();j.fresh=[];
+       IngCareer.spotSkills(fr,function(r,text){try{addEv({k:"done",app:r.app,label:"Skills spotted",text:text});paintStream();}catch(e){}});}}catch(e){}
+     saveState();paintAll();paintLive();paintBrief();
      try{if(R7.pin==null){var last=null;R7.ev.forEach(function(e){if(e.k==="note")last=e;});if(last)showPart(last.runId,last.part,"back");}}catch(e){}});}
 
 /* ---------------- writing for the set ---------------- */
@@ -1401,6 +1407,10 @@ function wireFrame(){var U=L7().ui;wireFolds();wireZoom();
     b.onclick=function(){L7().brief.fmt=b.getAttribute("data-v");[].forEach.call(fmt.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});segThumbs(fmt.parentNode);saveSoon();};});
   $("l7Save").onclick=save;$("l7Copy").onclick=function(){curDoc().then(function(d){if(d)lxCopy(d.md);else ingToast("There is nothing to copy yet.");});};
   if($("l7Open"))$("l7Open").onclick=openInTabula;
+  /* 6.44: the document shown, handed to the Career Studio, which looks at it against her profile with suggestions, never rewriting it */
+  if($("l7Advise"))$("l7Advise").onclick=function(){if(!(window.IngCareer&&IngCareer.adviseDoc)){ingToast("The Career Studio is not part of this copy of Ingenium.");return;}
+    curDoc().then(function(d){if(!d){ingToast("There is nothing to look at yet: this document is written after the reading.");return;}var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps);
+      IngCareer.adviseDoc({name:(name?name+" · ":"")+docLabel(d.kind,apps,curPurpose()),kind:{cv:"cv",cover:"cover",portfolio:"portfolio"}[d.kind]||"",text:d.md,from:"lector"});});};
   /* the mouse wheel moves the rows that scroll sideways, since no bar shows */
   [].forEach.call($("lx7").querySelectorAll(".l-outline,.l-dtabs"),function(box){box.addEventListener("wheel",function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY)||box.scrollWidth<=box.clientWidth+1)return;box.scrollLeft+=e.deltaY;e.preventDefault();},{passive:false});});
   /* the seals turn toward the pointer, lift, and sink when pressed */

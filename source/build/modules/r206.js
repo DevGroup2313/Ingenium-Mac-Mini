@@ -112,6 +112,7 @@ function plain(e,k){var raw=String(e&&e.message||e||"").replace(/[.\s]+$/,""),wh
   if(k.type==="rate")t=k.daily?who+" has reached the daily limit set for your API key. It opens again tomorrow, or a higher limit can be set on "+who+"'s own website":
     who+" refused because your API key reached its limit of tokens a minute, and Ingenium waited and tried twice. Wait a minute and send again; a new conversation sends less each time";
   else if(k.type==="busy")t=who+" is very busy at the moment, and Ingenium tried twice. Send again in a minute";
+  else if(k.type==="maxtok")t=m+" refused the length of reply asked for"+(k.max>0?" (it gives at most "+k.max.toLocaleString()+" tokens)":"")+", and Ingenium asked again within it. Send again; if it happens again, lower Longest reply in Controls";  /* 6.44 */
   else t="This conversation is longer than "+m+" can read at once, even with its oldest part left out. A new conversation, or asking for a summary to carry over, fixes it";
   var x=new Error(t+" (its words: "+raw.replace(/^HTTP /,"")+")");x.r206=1;return x;}
 

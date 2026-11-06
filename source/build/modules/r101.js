@@ -77,7 +77,7 @@ function r1Want(rec){var t=String((rec&&rec.text)||""),mode=rec&&rec.makeMode,fm
   if(MK_WANT_APP.test(t)&&make&&!/\b(app|application)s? (store|settings)\b/i.test(t))return {kind:"page",fmt:"html"};
   if((MK_WANT_DOC.test(t)&&make)||((fmt==="pdf"||fmt==="docx")&&make))return {kind:"doc",fmt:fmt};
   return null;}
-function r1WholeOK(src,budget){return !!src&&src.text.length<=Math.min(30000,Math.floor((budget||40000)*0.42));}
+function r1WholeOK(src,budget){return !!src&&src.text.length<=Math.floor((budget||40000)*0.42);}  /* 6.44: no cap of 30,000 characters: the room the model has decides */
 /* the note at the end of her message: how to write what she asked for */
 function r1Note(rec,src){var w=rec.want;if(!w)return "";var strong=rec.r1Strong?" The person asked for this plainly, and it is possible here: write it now.":"";
   var never=" You can make files here, so never say that you cannot.";

@@ -1403,6 +1403,17 @@ edit('    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function"
      '    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=sgnIds.then(function(sg){return Promise.all(dkIds.concat(sg||[]).map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});}));}).then(function(){',
      "6.39 Reset everything deletes the signing keys' disk copies")
 
+# ---- 6.44 (6 November 2026): a request on its own connection (Blend) asks Claude for no more than that model gives (modules/r195.js
+#      ingOutFor: its list's figure, else Anthropic's published limit for its family). Her words: "Ingenium keeps on failling when I try
+#      to use Claude's Opus model in the chat ... because of max token limits." ----
+edit('max_tokens:(ab&&ab.conn?(modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):',
+     'max_tokens:(ab&&ab.conn?(typeof ingOutFor==="function"?ingOutFor(model,modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):(modern?Math.max(maxTok,16000):Math.max(maxTok,4096))):',
+     "6.44 Blend asks Claude within the model's own ceiling")
+
+edit('else if(withThink){body.max_tokens=Math.max(maxTok,8192);body.thinking={type:"enabled",budget_tokens:Math.max(1024,Math.min(4096,body.max_tokens-1024))};}',
+     'else if(withThink){body.max_tokens=Math.max(body.max_tokens,8192);if(typeof ingOutFor==="function")body.max_tokens=ingOutFor(model,body.max_tokens);if(body.max_tokens>=2048)body.thinking={type:"enabled",budget_tokens:Math.max(1024,Math.min(4096,body.max_tokens-1024))};}',
+     "6.44 an older Claude model's thinking keeps within its ceiling and a refusal's figure")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

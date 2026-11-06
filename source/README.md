@@ -371,6 +371,52 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.44 (6 November 2026): Your edge and Your direction; what Lector's readings add to her record; Claude within each model's
+limits; Ingenium's own caps on how much a model reads taken away.
+
+Her request (6 November 2026), in short: suggestions and recommendations for her CV, portfolio documents and cover letters from Lector and
+the Career Studio; the skills and experience she has, and how each transfers to her documents where it suits; her blind spots; what gives
+her an edge; and direction in choosing a career. And: "I want Lector to read my updated apps and spot additional skills and experience that
+I can add to my resume ... I want it to be built-in for it." (Her own goals stay in her profile, on her device.)
+
+- modules/r188.js (the Career Studio): a room of its own, Your edge, after Your profile. What transfers: each skill or experience her
+  record shows, with its evidence (the entry, document or app it rests on), where it counts (which documents, which of her targets) and a
+  sentence for her documents drawn from that evidence alone; Add to your profile keeps it under Skills with its evidence. Blind spots:
+  what she undersells, what her targets ask that her record does not show yet, habits that weaken her documents, and questions a reader
+  will ask, each with why it matters and a fix, ticked when seen to. What sets you apart, with her positioning in three lines (as a
+  professional, as an academic, and the bridge between the two). Your documents: her CV, the documents in her profile, those written in
+  Applications and those Lector hands over, each looked at with suggestions (what could do more, what her record adds, what could go,
+  wording, what a reader will ask, the first thing to do), never rewritten. From your apps: what each app Lector read shows that her CV
+  and profile do not show yet. In Goals and plan, Your direction: the paths that fit what she is looking for, each with why, the evidence,
+  what is missing, a first step this week, the next three months and how it sits beside her other goals; Make it a goal; and what to
+  find out before choosing, ticked. Her targets (goals, the applications she weighs, the roles she kept) go with every ask. Learn gains
+  Finding your edge. The chat's + menu attaches her career profile to a message. Nothing is invented and nothing is searched online.
+- modules/r108.js (Lector): Suggestions, beside Copy, hands the document shown to the studio, which looks at it there. Built into the
+  reading: each app read afresh in a job is noted, and when the job ends the studio reads that reading against her CV and profile, beside
+  the earlier copy's reading when there is one, and lists what the app shows that they do not yet show, the new marked; Lector says so in
+  its stream. Nothing is added to her CV by itself.
+- Claude within each model's limits. Her words (6 November 2026): "Ingenium keeps on failling when I try to use Claude's Opus model in the
+  chat, it keeps on giving me an error message saying that the connection failed because of max token limits." Measured: the chat's own
+  path (6.9.4, modules/r206.js) kept a model's limits and asked again after a refusal for size, but a chat with files runs the working
+  loop (modules/r190.js), which asked for the slider's reply however long (an older model) or at least 32,000 or 64,000 tokens, and never
+  took the smaller figure a refusal asked for: the same request went four times and the reply failed. A request on its own connection
+  (Blend) had no ceiling either, and a Claude model whose list was never read had none. Now every request to Claude is asked within the
+  model's own ceiling (modules/r195.js: the list's figure, else Anthropic's published limit for its family: 1,000,000 tokens to read and
+  128,000 to write for Opus 4.6 onwards, the 5 family, Fable and Haiku 5.5; 200,000 and 64,000 for Haiku 4.5; 200,000 and 32,000 for an
+  older or unknown model, until its list or a refusal gives the true figures), in the chat, in a chat with files, in Code and in Blend;
+  a refusal for the reply's length is said as what it is.
+- Caps taken away. Her words (6 November 2026): "I don't want any caps inside of Ingenium's pages. I want the cap of the Career studio
+  removed and anywhere else inside of Ingenium that does not harm the app and leave it vulnerable." Removed: the Career Studio's 90,000
+  characters a request (30,000 for a model on this device) and its counts of suggestions; a connected model's window held to 262,144
+  tokens for Lector and the studio (now its whole window, 1,000,000 for the current Claude models); Folders' 400,000 characters a
+  request and 60,000 a conversation; the chat's 30,000 characters for a document written whole. Kept, as each protects the app or is a
+  limit of the model or the service: a model's own longest reply and window (asking beyond them is refused, as Opus was), a key's tokens
+  a minute, a device model's trained memory, the 4,000,000 characters a file in the chat may hold, and the training's limits on steps.
+
+    node rig/t_644_edge.js <master url> <out> [<full url>]   # 30 checks with an invented person, a stand-in model and an invented app
+    node rig/t_644_claude.js <url> <out>                     # checks with a stand-in for Anthropic's API (refusals for length and for
+                                                             # tokens a minute), in the chat and the working loop
+
 Ingenium 6.43 (6 November 2026): Ingenium made as an app by its owner alone, the top bar's order, the Author Studio's side
 bar, and the Folders page at the app's sizes. Her words: "Please remove the option to download Ingenium as an app from the Build
 page and only leave it in the master edition and nowhere else, I should be only person with access to it, I don't want others to

@@ -351,7 +351,10 @@ function base(){var c=state.cloud||{};return ((c.base||cloudDefaultBase(c.provid
 function anthropicTurn(S,onToken,onThink){var c=state.cloud,mid=String(c.model||"").toLowerCase();
   var modern=/^claude-(fable|mythos|opus-5|sonnet-5|haiku-5|opus-4-[678]|sonnet-4-6)/.test(mid),noXhigh=/^claude-(opus-4-6|sonnet-4-6)/.test(mid),fb=/^claude-(fable-5|opus-5|sonnet-5-5)/.test(mid);
   var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=(S.effort&&S.effort.claude)||EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";
-  var mt=(+$("ctlTokens").value)||0,body={model:c.model,max_tokens:modern?Math.max(mt,S.effort&&S.effort.lv>=5?64000:32000):Math.max(mt,4096),messages:S.msgs,stream:true,
+  /* 6.44: the reply asked for follows the model's own ceiling and the smaller one a refusal asked for (modules/r195.js ingReplyCap,
+     r206): before, a refusal for size was sent again unchanged, four times, and the chat with files failed */
+  var mt=(+$("ctlTokens").value)||0,want=modern?Math.max(mt,S.effort&&S.effort.lv>=5?64000:32000):Math.max(mt,4096);if(typeof window.ingReplyCap==="function")want=window.ingReplyCap(want,modern);if(S.capOnce>0)want=Math.min(want,S.capOnce);
+  var body={model:c.model,max_tokens:want,messages:S.msgs,stream:true,
     tools:S.tools.map(function(t){return {name:t.name,description:t.description,input_schema:t.input_schema,eager_input_streaming:true};})};
   if(S.sys)body.system=S.sys;
   if(modern){body.cache_control={type:"ephemeral"};if(S.think)body.thinking={type:"adaptive",display:"summarized"};body.output_config={effort:eff};}
@@ -384,7 +387,7 @@ function anthropicTurn(S,onToken,onThink){var c=state.cloud,mid=String(c.model||
 function openaiTurn(S,onToken,onThink){var c=state.cloud,ob=base()||cloudDefaultBase("openai");
   var h={"content-type":"application/json"};if(c.key)h["Authorization"]="Bearer "+c.key;if(c.provider==="openrouter")h["X-Title"]="Ingenium";
   var body={model:c.model,messages:S.msgs,stream:true,tool_choice:"auto",tools:S.tools.map(function(t){return {type:"function",function:{name:t.name,description:t.description,parameters:t.input_schema}};})};
-  var capT=Math.max((+$("ctlTokens").value)||0,cxLocal(c.provider,ob)?8192:16000);if(c.provider==="openai")body.max_completion_tokens=capT;else body.max_tokens=capT;
+  var capT=Math.max((+$("ctlTokens").value)||0,cxLocal(c.provider,ob)?8192:16000);if(!cxLocal(c.provider,ob)&&typeof window.ingRemoteCap==="function")capT=window.ingRemoteCap(capT);if(S.capOnce>0)capT=Math.min(capT,S.capOnce);  /* 6.44: the model's own longest reply, as the chat asks */if(c.provider==="openai")body.max_completion_tokens=capT;else body.max_tokens=capT;
   if(S.effort&&!S.noReason){try{if(window.IngEffort)IngEffort.openaiBody(body,c.provider,c.model,S.effort.lv);}catch(_){}}
   var text="",reason="",calls=[],stop="",err=null;
   var feed=lineFeeder(function(line){if(line.indexOf("data:")!==0)return;var t=line.slice(5).trim();if(!t||t==="[DONE]")return;var d;try{d=JSON.parse(t);}catch(_){return;}
@@ -422,7 +425,29 @@ function ollamaTurn(S,onToken,onThink){var c=state.cloud,h={"content-type":"appl
       push:function(results){var am={role:"assistant",content:text,tool_calls:calls.map(function(k){return {function:{name:k.name,arguments:k.input||{}}};})};if(think)am.thinking=think;S.msgs.push(am);
         results.forEach(function(r,i){S.msgs.push({role:"tool",content:r.text,tool_name:calls[i]&&calls[i].name});});}};});}
 function family(p){return p==="anthropic"?"anthropic":/^ollama/.test(p)?"ollama":"openai";}
-function turnFor(p){var f=family(p);return f==="anthropic"?anthropicTurn:f==="ollama"?ollamaTurn:openaiTurn;}
+/* 6.44: a refusal answered within the turn, before any word of it has come: a reply asked longer than the model gives (asked again
+   within the figure the service names, kept for the model), a conversation and reply over the window (the reply asked shorter), a key's
+   tokens a minute or a busy service (waited out, twice at most, said on the reply's status line). Before, the whole run failed: the
+   chat's own retries (modules/r206.js) never saw it, as the run had begun to show its steps. */
+function waitTurn(secs,S,why){return new Promise(function(res,rej){var left=Math.max(1,Math.round(secs)),sc=+window.ingLimitWaitScale||1;
+  function tick(){if(S.ab&&S.ab.aborted){rej(new Error("Stopped."));return;}
+    try{if(typeof liveBot!=="undefined"&&liveBot){liveBot.status=left>0?why+" Trying again in "+left+" second"+(left===1?"":"s")+". Stop ends the wait.":"Sending again…";if(typeof renderChatLive==="function")renderChatLive(liveBot);}}catch(e){}
+    if(left<=0){res();return;}left--;setTimeout(tick,1000*sc);}
+  tick();});}
+function withRetry(turn){return function(S,onToken,onThink){var tries=0,waits=0,got=false;
+  var oT=function(t){if(t)got=true;return onToken?onToken.apply(this,arguments):undefined;},oK=function(t){if(t)got=true;return onThink?onThink.apply(this,arguments):undefined;};
+  function go(){got=false;return Promise.resolve().then(function(){return turn(S,oT,oK);}).catch(function(e){
+    var k=null;try{k=typeof window.ingLimitKind==="function"?window.ingLimitKind(e):null;}catch(_){}
+    if(!k||got||(S.ab&&S.ab.aborted)||++tries>5)throw e;
+    var c=state.cloud||{},inf=null;try{if(c.model){c.info=c.info||{};inf=c.info[c.model]=c.info[c.model]||{};}}catch(_){}
+    if(k.type==="maxtok"&&k.max>0){if(inf&&(!(+inf.out>0)||+inf.out>k.max)){inf.out=k.max;try{saveState();}catch(_){}}S.capOnce=k.max;return go();}
+    if(k.type==="sum"&&k.win-k.input>=2048){if(inf&&k.win>0&&(!(+inf.ctx>0)||+inf.ctx>k.win)){inf.ctx=k.win;try{saveState();}catch(_){}}S.capOnce=k.win-k.input-1024;return go();}
+    var who=c.provider==="anthropic"?"Anthropic":"The service";
+    if(k.type==="rate"&&!k.daily&&waits<2){waits++;if(inf&&k.perMin>0){inf.perMin=k.perMin;try{saveState();}catch(_){}}return waitTurn(k.after||60,S,who+" asked Ingenium to slow down: your API key reached its limit of tokens a minute.").then(go);}
+    if(k.type==="busy"&&waits<2){waits++;return waitTurn(waits===1?8:20,S,who+" is busy.").then(go);}
+    throw e;});}
+  return go();};}
+function turnFor(p){var f=family(p);return withRetry(f==="anthropic"?anthropicTurn:f==="ollama"?ollamaTurn:openaiTurn);}
 /* a model on this device: one reply at a time from the engine; its tool calls are read from the tags it writes */
 var EG=null,LSTOP=0;
 var TAGS=["<tool_call>","<think>"];

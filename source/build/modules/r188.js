@@ -236,6 +236,13 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-entry p{margin:3px 0 0;font-size:13px;line-height:1.5;color:var(--c-ink2);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 #cs .c-entry .c-keys{margin-top:auto;padding-top:6px}
 #cs .c-sec{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
+/* 6.44 · Your edge and Your direction */
+#cs .c-entry .c-line{font:italic 13.5px/1.5 var(--c-serif);color:var(--c-ink1);-webkit-line-clamp:6}
+#cs .c-steprow .tx .c-bk{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
+#cs .c-fb{margin:4px 0 8px;padding:0 16px 0 34px;display:flex;flex-direction:column;gap:7px}
+#cs .c-fb li{font-size:13.5px;line-height:1.5;color:var(--c-ink1)}#cs .c-fb li small{display:block;color:var(--c-ink3);font-size:12.5px;line-height:1.45}
+#cs .c-entry.c-pos small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
+#cs .c-entry.c-path.is-kept{border-color:var(--c-ring)}
 #cs .c-k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-acc);margin-right:4px}
 /* goals */
 #cs .c-steplist{display:flex;flex-direction:column;padding:4px 16px}
@@ -512,7 +519,11 @@ function cloudKey(){var o=plan();if(typeof lxCxReady!=="function")return null;
   return null;}
 function whereLine(){var o=plan();if(o&&o.cloud)return lxCloudLeaves()?"through your "+lxCloudWho()+" connection: what it reads is sent to "+lxCloudWho():"through your connection, on your own computer or in your home";
   if(o&&o.link)return "on your other computer, over your own network";return "on this device";}
-function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,Math.min(90000,(ctx-1800)*3));}
+/* 6.44: her words (6 November 2026): "I don't want any caps inside of Ingenium's pages. I want the cap of the Career studio removed and
+   anywhere else inside of Ingenium that does not harm the app and leave it vulnerable." The studio reads as much as the model's own memory
+   holds (it kept to 90,000 characters, and 30,000 for a model on this device); what is larger than the memory is still shortened, or a
+   refusal for size asks again in smaller parts */
+function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,(ctx-1800)*3);}
 var RUN={busy:false,stop:false,what:"",live:"",think:"",opp:null,t0:0};
 function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:o&&o.chosen?o.chosen.id:null};RUN.req=req;
   function mine(){return RUN.req===req;}
@@ -588,7 +599,7 @@ function postText(o){if(!o)return Promise.resolve("");var more=(o.more||[]).filt
 function kindWord(k){return {job:"posting",phd:"programme's call",grant:"call for applications",other:"posting"}[k]||"posting";}
 /* the reading, line by line: what the model is asked to return, and how it is read back */
 /* 6.24: a model on this device reads at its own pace: the posting and the profile are kept to about 30,000 characters (a connection still gets its full room) */
-function readRoom(){var o=plan(),r=room();if(!(o&&(o.cloud||o.link)))r=Math.min(r,30000);return r;}
+function readRoom(){return room();}  /* 6.44: no cap of its own (it was 30,000 characters for a model on this device) */
 function readMsgs(G,post,o,scale){var R=readRoom()*scale,wt=wantsText();
   var u="Read THE "+kindWord(o.kind).toUpperCase()+" against THE PROFILE for me, as an experienced admissions tutor and recruiter reads an application: generously and honestly. "+
     "Credit what transfers: a criterion may be met by what I have done in another setting, shown by its results, even where THE PROFILE uses other words than the "+kindWord(o.kind)+". Never credit what THE PROFILE does not show, and never invent.\n"+
@@ -1035,7 +1046,7 @@ function suggest(){if(busyNow()||needModel())return;begin(null,"Reading your sou
       var s=String(t).split("\n").map(function(l){var m=/^\s*(?:[-*]\s*)?ENTRY:\s*(.+)$/i.exec(l);if(!m)return null;var p=m[1].split("|").map(function(x){return x.trim();});var sec=(p[0]||"").toLowerCase();
         if(!SECTS.some(function(x){return x[0]===sec;}))sec="other";if(!p[1])return null;return {id:uid("sg"),sec:sec,title:p[1],place:p[2]||"",from:p[3]||"",to:p[4]||"",text:p[5]||"",src:"suggested"};})
         .filter(function(x){return x&&!have[(x.title+"|"+x.place).toLowerCase()];});
-      P.suggested=s.slice(0,40);if(s.length)CS().ui.ppart="found";save();end();if(!s.length)say("No new entries were found in your sources.");},failed);}
+      P.suggested=s;if(s.length)CS().ui.ppart="found";save();end();if(!s.length)say("No new entries were found in your sources.");},failed);}
 
 /* her skills: what her sources show she can do (her apps as Lector read them, her proposal, her CV), each with its evidence
    and where it counts, for her to keep or drop; a skill no source shows is not offered */
@@ -1047,7 +1058,7 @@ function findSkills(){if(busyNow()||needModel())return;begin(null,"Finding your 
       var s0=String(t).split("\n").map(function(l){var m=/^\s*(?:[-*]\s*)?(?:\*\*)?SKILL:(?:\*\*)?\s*(.+)$/i.exec(l.replace(/\*\*/g,""));if(!m)return null;var p=m[1].split("|").map(function(x){return x.trim();});if(!p[0]||!p[2]||/^none/i.test(p[2]))return null;
         var where=/^academic/i.test(p[1]||"")?"Academic":/^professional/i.test(p[1]||"")?"Professional":"Academic and professional";
         return {id:uid("sg"),sec:"skill",title:p[0].slice(0,140),place:"",from:"",to:"",text:"Evidence: "+p[2]+"\nWhere it counts: "+where+(p[3]?"; "+p[3]:""),src:"suggested"};}).filter(function(x){return x&&!have[x.title.toLowerCase()];});
-      P.suggested=s0.slice(0,40);if(s0.length)CS().ui.ppart="found";save();end();if(!s0.length)say("No skills with evidence were found that are not already in your profile.");},failed);}
+      P.suggested=s0;if(s0.length)CS().ui.ppart="found";save();end();if(!s0.length)say("No skills with evidence were found that are not already in your profile.");},failed);}
 
 /* ---------------- goals and plan: her goals, dated steps, and the kinds of role that suit her (never postings) ---------------- */
 function goalSteps(g){if(busyNow()||needModel())return;begin(null,"Thinking through steps for your goal");
@@ -1255,6 +1266,7 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
   ["A statement of purpose",["Many programmes, in North America above all, ask for a statement of purpose: it is about the work you mean to do, more than about your life.","Open with the research question or the field, plainly, in the first paragraph.","Show how your studies, work and writing prepared you for it, with concrete examples.","Say which parts of this programme, and which of its people, your work needs, from what the programme itself publishes.","Close with what you mean to do with the degree.","Keep within the limit, and follow the programme's own instructions first."]],
   ["A teaching statement",["Say what you believe helps students learn, in a sentence or two.","Show it through moments from your own teaching: what you taught, to whom, what you did and what came of it.","Say how you would teach what this post asks for.","Say how you keep improving your teaching: feedback, observation, training.","Concrete examples count for more than general claims."]],
   ["A funding application",["Follow the funder's own sections and limits first.","Say what the project is and why it matters, plainly, at the start.","Show what you have already done that makes it likely to succeed.","Say exactly what the money makes possible, and leave every figure and cost for you to check.","Show why this funder: from what the funder itself says it supports."]],
+  /* 6.44 */ ["Finding your edge",["Write down every setting you have worked, studied or made something in, not only posts: projects, teaching, volunteering, things you built.","For each, write what you did yourself and what came of it: a result, a number, a change someone noticed.","Ask of each: what does this show I can do anywhere? Name the ability, not the task: planning a course, not making slides.","Put your abilities beside the words of what you are aiming for. Where they meet, you have a transfer: one sentence that names the setting, what you did and the result.","Look for what you leave out. A strength your record shows that your CV never mentions is a blind spot; so is a question a reader will ask that your documents do not answer.","Find your edge: the combination few others have. Say it in one line, and let every document show it.","Check every sentence against your record: if you could not show it, take it out."]],
   ["Choosing a writing sample",["Choose the piece closest to the field and the kind of work the programme asks for.","Prefer a piece you wrote alone, and your most recent strong work.","Keep within the limit by cutting whole sections, not by rewriting; say in a short note where it was cut, if the call allows a note.","Check the call for its format: length, file type, and whether references count."]]];
 
 /* ---------------- painting: Lector's own panels (6.8.3) ----------------
@@ -1267,6 +1279,8 @@ var LESSONS=[["Reading a posting",["Find the person specification: the essential
 var ICON={today:'<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6"/>',apps:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17"/>',
   profile:'<circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 19.5c1.2-3.6 4-5.2 7.2-5.2s6 1.6 7.2 5.2"/>',
   goals:'<path d="M6 21V4M6 4.8h10.5l-2.2 3.6 2.2 3.6H6"/>',
+  /* 6.44: Your edge, a compass */
+  edge:'<circle cx="12" cy="12" r="8.5"/><path d="m15.3 8.7-2.2 4.4-4.4 2.2 2.2-4.4z"/>',
   learn:'<path d="M3.5 6.2c2.9-1.3 5.8-1.3 8.5.3 2.7-1.6 5.6-1.6 8.5-.3v12.6c-2.9-1.3-5.8-1.3-8.5.3-2.7-1.6-5.6-1.6-8.5-.3z"/><path d="M12 6.5v12.6"/>',
   people:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.6 14.3c2.4-.3 4.3 1.2 4.9 4.2"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+(ICON[k]||"")+'</svg>';}
@@ -1297,7 +1311,7 @@ function render(){var root=$("cs");if(!root)return;var S=CS(),room0=S.ui.room||"
   [].forEach.call(root.querySelectorAll(".c-head [data-room]"),function(b){var on=b.getAttribute("data-room")===room0;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   var host=$("csHost"),keepL=null,keepR=null,ol=host.querySelector(".c-list .c-pn-b"),or=host.querySelector(".c-work .c-pn-b");if(ol)keepL=ol.scrollTop;if(or)keepR=or.scrollTop;
   host.innerHTML="";var two=h("div","c-panels"+(LAST_ROOM!==room0?" c-rise":""));host.appendChild(two);var same=LAST_ROOM===room0;LAST_ROOM=room0;
-  if(room0==="today")paintToday(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  if(room0==="today")paintToday(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="edge")paintEdge(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
   paintWho();
   root.setAttribute("data-show",S.ui.show==="work"?"work":"list");
   if(same){var nl=host.querySelector(".c-list .c-pn-b"),nr=host.querySelector(".c-work .c-pn-b");if(nl&&keepL!=null)nl.scrollTop=keepL;if(nr&&keepR!=null&&!host.__jump)nr.scrollTop=keepR;}host.__jump=false;
@@ -2046,15 +2060,17 @@ function profFound(){var S=CS(),P=S.profile,R=panel("csWork","Found in your sour
 
 /* ---- Goals and plan ---- */
 function whenWords(by){by=String(by||"").trim();if(!by)return "";if(/^\d{4}-\d{2}-\d{2}$/.test(by))return "By "+dayStr(by);if(/^(by|in|within|before|after|next|this|on|at)\b/i.test(by))return by.charAt(0).toUpperCase()+by.slice(1);return "By "+by;}
-function paintGoals(par){var S=CS(),sel=S.ui.gsel||(S.goals[0]?S.goals[0].id:"roles");if(sel!=="roles"&&sel!=="new"&&!S.goals.some(function(g){return g.id===sel;}))sel=S.goals[0]?S.goals[0].id:"roles";
+function paintGoals(par){var S=CS(),sel=S.ui.gsel||(S.goals[0]?S.goals[0].id:"roles");if(sel!=="roles"&&sel!=="paths"&&sel!=="new"&&!S.goals.some(function(g){return g.id===sel;}))sel=S.goals[0]?S.goals[0].id:"roles";
   var L=panel("csList","Goals and plan",{key:cbtn("pri sm","+ A goal",function(){S.ui.gsel="new";show("work");save();render();},"Add a goal")});
+  /* 6.44: Your direction, first */
+  L.body.appendChild(item("Your direction",S.paths&&S.paths.list?"Thought through "+dayStr(S.paths.at)+", "+S.paths.list.length+" path"+(S.paths.list.length===1?"":"s"):"Paths that fit what you want, and what to find out first",sel==="paths",function(){S.ui.gsel="paths";show("work");save();render();},"c-pin"));
   L.body.appendChild(item("Roles and programmes that suit you",S.roles?"Weighed "+dayStr(S.roles.at)+", "+S.roles.list.length+" kinds":"Kinds of role worth an application, never postings",sel==="roles",function(){S.ui.gsel="roles";show("work");save();render();},"c-pin"));
   if(S.goals.length)L.body.appendChild(h("div","c-label c-pad",esc("Your goals")));
   S.goals.forEach(function(g){var done=g.steps.filter(function(x){return x.done;}).length;L.body.appendChild(item(g.text,[g.kind==="career"?"Career":"Academic",g.by?"by "+dayStr(g.by):"",g.steps.length?done+" of "+g.steps.length+" steps done":"No steps yet"].filter(Boolean).join(" · "),sel===g.id,function(){S.ui.gsel=g.id;show("work");save();render();}));});
   if(!S.goals.length)L.body.appendChild(h("p","c-note c-pad",esc("No goals yet. Add one, or make one from a kind of role that suits you.")));
   L.foot.appendChild(h("span","c-note",esc(S.goals.length?S.goals.length+" goal"+(S.goals.length===1?"":"s"):"Your goals, with steps and dates")));
   if(RUN.busy){two(L,livePanel(),par);return;}
-  var R=sel==="roles"?rolesPanel():sel==="new"?goalNew():goalPanel(S.goals.filter(function(g){return g.id===sel;})[0]);
+  var R=sel==="roles"?rolesPanel():sel==="paths"?pathsPanel():sel==="new"?goalNew():goalPanel(S.goals.filter(function(g){return g.id===sel;})[0]);
   R.head.insertBefore(cbtn("quiet c-back","‹ Goals and plan",function(){show("list");save();render();}),R.head.firstChild);two(L,R,par);}
 function goalNew(){var S=CS(),R=panel("csWork","A new goal"),g=h("div","c-col c-pad"),gt=input("text","","For example: a DPhil place for October 2027"),gb=input("date",""),kind="academic";
   var ks=seg([["academic","Academic"],["career","Career"]],kind,function(v){kind=v;[].forEach.call(ks.children,function(b){b.setAttribute("aria-pressed",b.textContent===(v==="career"?"Career":"Academic")?"true":"false");});},"Kind of goal");
@@ -2083,6 +2099,198 @@ function rolesPanel(){var S=CS(),R=panel("csWork","Roles and programmes that sui
       var k=h("div","c-keys");k.appendChild(cbtn("sm","Make it a goal",function(){var id=uid("g");S.goals.unshift({id:id,text:x.role,kind:/phd|dphil|doctor|master|programme|fellow/i.test(x.role)?"academic":"career",by:"",at:Date.now(),steps:x.first?[{id:uid("st"),text:x.first,by:"",done:false}]:[]});save();render();say("It is a goal now, with its first step.");}));c.appendChild(k);grid.appendChild(c);});
     R.body.appendChild(grid);R.body.appendChild(h("p","c-note c-pad",esc("Weighed on "+dayStr(S.roles.at)+" with "+(S.roles.model||"your model")+", from your profile alone.")));}
   R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",S.roles?"Weigh them again":"Weigh what suits me",roles));return R;}
+
+/* ---------------- 6.44 · Your edge, and Your direction ----------------
+   Her request (6 November 2026), in short: suggestions and recommendations for her CV, portfolio documents, cover letters and the
+   rest, from Lector and the Career Studio alike; the skills and experience she has, and how each transfers to her documents where
+   it suits; her blind spots; what gives her an edge as a professional and as an academic; and direction in choosing a career, a
+   clear path from what she wants. A room of its own, Your edge: What transfers, Blind spots, What sets you apart (with her
+   positioning as a professional, as an academic, and the bridge between the two), and Your documents, each looked at with
+   suggestions, never rewritten. In Goals and plan, Your direction: paths that fit what she is looking for, each with why, the
+   evidence, what is missing, a first step this week, the next three months and how it sits beside her other goals, then what to
+   find out before choosing. Every suggestion rests on her profile (her entries, her CV, her documents, her apps as Lector read
+   them), read by the model she chose; nothing is invented, nothing is searched online, and each is hers to keep or drop. Lector's
+   Suggestions key hands its document here, and the chat's + menu attaches her career profile to a message, so any conversation in
+   Ingenium can help with it. */
+function EDGE(){var S=CS();if(!S.edge||typeof S.edge!=="object")S.edge={};var E=S.edge;if(!E.docs||typeof E.docs!=="object")E.docs={};if(!Array.isArray(E.inbox))E.inbox=[];return E;}
+var OKW={job:"a job",phd:"a PhD or DPhil",grant:"a grant or fellowship",other:"an opportunity"};
+function targetsText(){var S=CS(),out=[];
+  S.goals.forEach(function(g){out.push("- My goal ("+(g.kind==="career"?"career":"academic")+"): "+g.text+(g.by?" (by "+g.by+")":""));});
+  S.opps.filter(function(o){return ["unsuccessful","withdrawn","not"].indexOf(o.stage)<0;}).slice(0,8).forEach(function(o){var t=[o.title,o.org].filter(Boolean).join(", ");if(t)out.push("- I am weighing "+(OKW[o.kind]||"an opportunity")+": "+t);});
+  if(S.roles&&S.roles.list)S.roles.list.slice(0,4).forEach(function(r){out.push("- A kind of role that suits me: "+r.role);});
+  if(S.paths&&S.paths.list)S.paths.list.filter(function(p){return p.kept;}).forEach(function(p){out.push("- A path I chose: "+p.path);});
+  return out.length?"MY TARGETS (my goals, and what I am weighing):\n"+out.join("\n"):"";}
+/* lines of the form TAG: a | b | c, read back as {TAG:[[a,b,c],...]} */
+function tagged(t,tags){var out={},re=new RegExp("^\\s*(?:[-*\\d.)]+\\s*)?("+tags.join("|")+")\\s*:\\s*(.+)$","i");
+  String(t||"").replace(/<think>[\s\S]*?<\/think>/g,"").split("\n").forEach(function(l){var m=re.exec(l.replace(/\*\*/g,""));if(!m)return;var p=m[2].split("|").map(function(x){return x.trim();});
+    if(!p[0]||/^none\b/i.test(p[0]))return;var k=m[1].toUpperCase();(out[k]=out[k]||[]).push(p);});return out;}
+function hasSources(G){return !!(G.items||G.cv||G.files.length||G.apps.length);}
+var EDGE_ASK={
+  tr:{what:"Finding what transfers from your record",sys:"You are now an honest careers adviser who finds what transfers from one setting to another, and only what the sources show.",max:1800,temp:0.25,
+    say:function(tt){return "From my profile, my CV, my documents and my apps as Lector read them, find the skills and experience I have that transfer: what I did in one setting that counts in another I am aiming for"+(tt?" (MY TARGETS below, and WHAT I AM LOOKING FOR)":" (WHAT I AM LOOKING FOR)")+". For each: the skill or experience, in plain words; the evidence, naming the entry, document or app it rests on and what in it shows the skill; where it suits: which of my documents (a CV, a cover letter, a portfolio, a personal statement, a research proposal, a supporting statement) and which of my targets or kinds of role; and one sentence I could use in those documents, drawn only from the evidence, with no figure, name or claim the evidence does not give. Every one the sources show, the strongest first. Never list a skill no source shows, and never round one up. One to a line, in exactly this form, and nothing else:\nTRANSFER: the skill or experience | the evidence, with the entry named | where it suits | a sentence for my documents";},
+    read:function(t){return (tagged(t,["TRANSFER"]).TRANSFER||[]).filter(function(p){return p[1];}).map(function(p){return {id:uid("tr"),skill:p[0].slice(0,160),evidence:p[1]||"",suits:p[2]||"",line:p[3]||""};});}},
+  bl:{what:"Looking for your blind spots",sys:"You are now a frank mentor, reading as an admissions tutor and a recruiter would. You do not flatter and you never invent.",max:1500,temp:0.3,
+    say:function(tt){return "Look at my profile, my CV and my documents as a frank mentor, an admissions tutor and a recruiter would"+(tt?", against MY TARGETS and WHAT I AM LOOKING FOR":", against WHAT I AM LOOKING FOR")+". Name my blind spots: UNDERSOLD, a strength my profile shows that my CV or documents leave out or undersell; MISSING, what my targets usually ask for that my profile does not show yet; HABIT, a habit in my documents that weakens them (duties listed without results, jargon, a story a reader cannot follow, a gap left unexplained); QUESTION, a question a reader will ask that my documents do not answer. For each: what it is; why it matters to a reader; and the fix, in one or two plain sentences (where the fix is to add something, name only what my profile already shows, or say what to do or find out). Every one you find, the most important first. One to a line, in exactly this form, and nothing else:\nBLIND: UNDERSOLD or MISSING or HABIT or QUESTION | what it is | why it matters | the fix";},
+    read:function(t){return (tagged(t,["BLIND"]).BLIND||[]).map(function(p){var k=/^under/i.test(p[0])?"undersold":/^miss/i.test(p[0])?"missing":/^habit/i.test(p[0])?"habit":/^quest/i.test(p[0])?"question":"";
+      if(!k)p=[""].concat(p);return {id:uid("bl"),kind:k||"other",what:p[1]||"",why:p[2]||"",fix:p[3]||"",done:false};}).filter(function(x){return x.what;});}},
+  ed:{what:"Finding what sets you apart",sys:"You are now a careers adviser who knows what panels and recruiters see too often, and what they rarely see. You never claim what the profile does not show.",max:1300,temp:0.35,
+    say:function(tt){return "From my profile, find what sets me apart from other applicants"+(tt?" for MY TARGETS":" for what I am looking for")+": combinations of skills and experience few applicants have, results only I can show, and a story that ties my work together. For each: what it is; the evidence, naming the entries it rests on; and how to say it in one sentence in a CV, a letter or an interview, drawn only from the evidence. Every one the profile shows. Then my positioning, one line each: how I present myself as a professional; as an academic; and the bridge, why my two sides strengthen each other. Never claim what the profile does not show. In exactly this form, and nothing else:\nEDGE: what sets me apart | the evidence | how to say it\nPOSITION: PROFESSIONAL | the line\nPOSITION: ACADEMIC | the line\nPOSITION: BRIDGE | the line";},
+    read:function(t){var x=tagged(t,["EDGE","POSITION"]),pos={};(x.POSITION||[]).forEach(function(p){var k=/^prof/i.test(p[0])?"pro":/^acad/i.test(p[0])?"acad":/^bridge/i.test(p[0])?"bridge":"";if(k&&p[1])pos[k]=p[1];});
+      return {list:(x.EDGE||[]).filter(function(p){return p[1];}).map(function(p){return {id:uid("ed"),what:p[0],evidence:p[1]||"",say:p[2]||""};}),pos:pos};}}};
+function edgeRun(k){if(busyNow()||needModel())return;var A=EDGE_ASK[k],E=EDGE();begin(null,A.what);
+  gatherProfile({}).then(function(G){if(!hasSources(G))throw new Error("add your CV, an entry, a document or Lector's readings of your apps to Your profile first: the studio finds these in them");
+    return ask(function(sc){var R=room()*sc,tt=targetsText();return [{role:"system",content:sys(A.sys)},{role:"user",content:A.say(tt)+"\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,R*0.85)}];},A.max,A.temp);})
+    .then(function(t){var r=A.read(t),rec={at:Date.now(),model:modelName()};if(Array.isArray(r))rec.list=r;else{rec.list=r.list;rec.pos=r.pos;}
+      if(!rec.list.length&&!(rec.pos&&Object.keys(rec.pos).length)){end();say("Nothing came back in the form asked. Try again, or add more to Your profile.");return;}
+      E[k]=rec;save();end();},failed);}
+/* her documents, each looked at with suggestions (never rewritten) */
+function docKindOf(name){var n=String(name||"").toLowerCase();return /\bcv\b|résumé|resume|curriculum/.test(n)?"cv":/cover|letter/.test(n)?"cover":/portfolio/.test(n)?"portfolio":/proposal/.test(n)?"proposal":/statement/.test(n)?"statement":"";}
+function edgeDocs(){var S=CS(),P=S.profile,M=lectorMe(),out=[];
+  if(M&&M.cv&&M.cv.ref)out.push({id:"cv",name:isMe()?"Your CV":"Their CV",sub:isMe()?"The CV Lector keeps":"The CV kept in this profile",kind:"cv",ref:M.cv.ref});
+  P.files.forEach(function(f){if(f&&f.ref)out.push({id:"f:"+f.id,name:f.name,sub:"A document in Your profile",kind:docKindOf(f.name),ref:f.ref});});
+  S.opps.forEach(function(o){Object.keys(o.docs||{}).forEach(function(k){var d=o.docs[k];if(d&&d.ref)out.push({id:"o:"+o.id+":"+k,name:(DOCS[k]?DOCS[k][0]:k)+(o.title?": "+o.title:""),sub:d.mine?"Your own draft, in Applications":"Written in Applications"+(o.org?", for "+o.org:""),kind:k,ref:d.ref,opp:o.id});});});
+  EDGE().inbox.forEach(function(x){out.push({id:"i:"+x.id,name:x.name,sub:(x.from==="lector"?"From Lector, ":"Brought here, ")+dayStr(x.at),kind:x.kind||"",ref:x.ref});});
+  return out;}
+var ADV_TAGS=[["STRENGTHEN","Could do more"],["ADD","What your record adds"],["CUT","Could go"],["WORDING","Wording to look at again"],["BLIND","What a reader will ask"],["NEXT","The first thing to do"]];
+function docWordOf(d){return DOCS[d.kind]?"my "+DOCS[d.kind][0].toLowerCase():d.kind==="cover"?"my cover letter":d.kind==="cv"?"my CV":"my document";}
+function docAdvise(d){if(busyNow()||needModel())return;var E=EDGE(),o=d.opp?oppById(d.opp):null;begin(o,"Looking at "+d.name+" with you");
+  Promise.all([loadText(d.ref),gatherProfile({opp:o}),o?postText(o):""]).then(function(x){var text=String(x[0]||"");if(text.trim().length<80)throw new Error("this document is empty, or too short to look at");
+    return ask(function(sc){var R=room()*sc,tt=targetsText();return [{role:"system",content:sys("You are now a frank, kind reviewer and careers adviser. You never rewrite the document and never write a new one: you help me make my own better, and you never suggest a claim my profile does not support.")},
+      {role:"user",content:"Here is "+docWordOf(d)+", \""+d.name+"\". Look at it against my profile"+(tt?", my targets":"")+(x[2]?" and the posting it is for":"")+". Give me suggestions, the most useful first. One suggestion to a line, a few of each kind where there are any, in exactly this form, and nothing else:\nSTRENGTHEN: a part that works but could do more | how\nADD: something my profile shows that suits this document and is missing from it, naming the entry it rests on | where it would go\nCUT: what could go | why\nWORDING: a phrase of mine, quoted exactly | why it could be plainer or stronger (do not rewrite it)\nBLIND: what a reader will notice or ask that the document does not answer | what to do about it\nNEXT: the one thing to do first\n\nMY DOCUMENT:\n"+cut(text,Math.floor(R*0.34))+"\n\n"+(x[2]?"THE POSTING:\n"+cut(x[2],Math.floor(R*0.12))+"\n\n":"")+(tt?tt+"\n\n":"")+profileBlock(x[1],R*0.44)}];},1200,0.3);})
+    .then(function(t){var fb=tagged(t,ADV_TAGS.map(function(a){return a[0];}));if(!Object.keys(fb).length)fb.RAW=[[String(t).replace(/<think>[\s\S]*?<\/think>/g,"").trim().slice(0,1500)]];
+      E.docs[d.id]={at:Date.now(),model:modelName(),name:d.name,fb:fb};save();end();},failed);}
+/* a document handed over by another page (Lector's Suggestions): kept here, then looked at */
+function adviseDoc(o){o=o||{};var text=String(o.text||"");if(text.trim().length<80){say("There is nothing to look at yet: the document is empty or very short.");return Promise.resolve(null);}
+  if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return Promise.resolve(null);}
+  var E=EDGE(),ref=IngBig.newId(),it={id:uid("in"),name:String(o.name||"A document").slice(0,160),kind:o.kind||docKindOf(o.name),ref:ref,from:o.from||"",at:Date.now()};
+  return Promise.resolve(IngBig.put(ref,text)).then(function(){var old=E.inbox.filter(function(x){return x.name===it.name&&x.from===it.from;});
+    old.forEach(function(x){try{IngBig.del(x.ref);}catch(e){}delete E.docs["i:"+x.id];});
+    E.inbox=[it].concat(E.inbox.filter(function(x){return old.indexOf(x)<0;}));var S=CS();S.ui.room="edge";S.ui.esel="d:i:"+it.id;show("work");save();
+    try{go("career");}catch(e){}render();var d=edgeDocs().filter(function(x){return x.id==="i:"+it.id;})[0];if(d)docAdvise(d);return it;});}
+/* the room */
+function paintEdge(par){var S=CS(),E=EDGE(),docs=edgeDocs(),sel=S.ui.esel||"tr";if(/^d:/.test(sel)&&!docs.some(function(d){return "d:"+d.id===sel;}))sel="tr";if(/^a:/.test(sel)&&!appReadings().some(function(r){return "a:"+r.name===sel;}))sel="tr";
+  var L=panel("csList","Your edge");
+  function sub(rec,word,none){return rec&&rec.list&&rec.list.length?(rec.list.length+" "+word+(rec.list.length===1?"":"s")+", "+dayStr(rec.at)):none;}
+  L.body.appendChild(item("What transfers",sub(E.tr,"skill","Your skills and experience, and where each one counts"),sel==="tr",function(){S.ui.esel="tr";show("work");save();render();}));
+  L.body.appendChild(item("Blind spots",sub(E.bl,"blind spot","What you undersell or leave out, and what a reader will ask"),sel==="bl",function(){S.ui.esel="bl";show("work");save();render();}));
+  L.body.appendChild(item("What sets you apart",E.ed&&((E.ed.list||[]).length||Object.keys(E.ed.pos||{}).length)?((E.ed.list||[]).length+" found, with your positioning, "+dayStr(E.ed.at)):"Your edge, and how you present yourself",sel==="ed",function(){S.ui.esel="ed";show("work");save();render();}));
+  /* what each app Lector read adds to her record (Lector spots it by itself after a reading) */
+  var reads=appReadings();if(reads.length){L.body.appendChild(h("div","c-label c-pad",esc("From your apps")));reads.forEach(function(r){var a=(E.apps||{})[r.name],nw=a?a.list.filter(function(z){return z.fresh;}).length:0;
+    L.body.appendChild(item(r.name+(r.version?" "+r.version:""),a?(a.list.length+" to add"+(nw?", "+nw+" new":"")+", "+dayStr(a.at)+(a.version!==(r.version||"")?" (an earlier copy)":"")):"Read by Lector: what it adds to your record",sel==="a:"+r.name,function(){S.ui.esel="a:"+r.name;show("work");save();render();}));});}
+  L.body.appendChild(h("div","c-label c-pad",esc("Your documents")));
+  if(!docs.length)L.body.appendChild(h("p","c-note c-pad",esc("None yet. Add your CV in Lector or a document in Your profile, or write one in Applications; Lector's Suggestions key brings its documents here.")));
+  docs.forEach(function(d){var a=E.docs[d.id];L.body.appendChild(item(d.name,d.sub+(a?" · looked at "+dayStr(a.at):""),sel==="d:"+d.id,function(){S.ui.esel="d:"+d.id;show("work");save();render();}));});
+  L.foot.appendChild(h("span","c-note",esc("Suggestions from your profile alone, for you to keep or drop.")));
+  if(RUN.busy){two(L,livePanel(),par);return;}
+  var ar=/^a:/.test(sel)?reads.filter(function(r){return "a:"+r.name===sel;})[0]:null;
+  var R=sel==="bl"?blindPanel():sel==="ed"?apartPanel():ar?appSkillsPanel(ar):/^d:/.test(sel)?docPanel(docs.filter(function(d){return "d:"+d.id===sel;})[0]):transferPanel();
+  R.head.insertBefore(cbtn("quiet c-back","‹ Your edge",function(){show("list");save();render();}),R.head.firstChild);two(L,R,par);}
+function madeLine(rec){return "Found on "+dayStr(rec.at)+" with "+(rec.model||"your model")+", from your profile alone. Each is a suggestion: check it against your record before you use it.";}
+function transferPanel(){var S=CS(),E=EDGE(),rec=E.tr,R=panel("csWork","What transfers");
+  if(!rec||!rec.list||!rec.list.length)R.body.appendChild(empty("Not looked for yet","The skills and experience your record shows, each with its evidence, where it counts (which documents, which of your targets), and a sentence for your documents drawn from that evidence alone. A skill no source shows is never offered."));
+  else{var grid=h("div","c-entries"),P=S.profile;rec.list.forEach(function(x){var c=h("div","c-entry c-edge");c.appendChild(h("b",null,esc(x.skill)));
+      if(x.evidence)c.appendChild(h("p",null,"<span class=\"c-k\">Evidence</span> "+esc(x.evidence)));if(x.suits)c.appendChild(h("p",null,"<span class=\"c-k\">Where it counts</span> "+esc(x.suits)));if(x.line)c.appendChild(h("p","c-line",esc("“"+x.line+"”")));
+      var have=P.items.some(function(it){return it.sec==="skill"&&String(it.title).toLowerCase()===String(x.skill).toLowerCase();}),k=h("div","c-keys");
+      k.appendChild(cbtn("sm"+(have?"":" pri"),have?"In your profile":"Add to your profile",function(){if(have)return;P.items.push({id:uid("it"),sec:"skill",title:x.skill.slice(0,140),place:"",from:"",to:"",text:"Evidence: "+x.evidence+(x.suits?"\nWhere it counts: "+x.suits:""),src:"edge"});save();render();say("Added to Your profile, under Skills, with its evidence.");}));
+      if(x.line)k.appendChild(cbtn("sm","Copy the sentence",function(){copyText(x.line);}));
+      k.appendChild(cbtn("sm quiet","Drop",function(){rec.list=rec.list.filter(function(y){return y.id!==x.id;});save();render();}));c.appendChild(k);grid.appendChild(c);});
+    R.body.appendChild(grid);R.body.appendChild(h("p","c-note c-pad",esc(madeLine(rec))));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",rec?"Look again":"Find what transfers",function(){edgeRun("tr");}));return R;}
+var BLW={undersold:"Undersold",missing:"Not shown yet",habit:"A habit",question:"A reader will ask",other:"A blind spot"};
+function blindPanel(){var E=EDGE(),rec=E.bl,n=rec&&rec.list?rec.list.length:0,R=panel("csWork","Blind spots",{chip:n?chip(rec.list.filter(function(x){return x.done;}).length+" of "+n+" seen to",""):null});
+  if(!n)R.body.appendChild(empty("Not looked for yet","Read as a frank mentor, an admissions tutor and a recruiter would read you: strengths your documents undersell or leave out, what your targets ask that your record does not show yet, habits that weaken your documents, and questions a reader will ask. Each with why it matters and a fix."));
+  else{var list=h("div","c-steplist");rec.list.forEach(function(x){var row=h("div","c-steprow c-blind"+(x.done?" is-done":"")),sw=h("label","c-check"),cb=h("input");cb.type="checkbox";cb.checked=!!x.done;cb.setAttribute("aria-label","Seen to: "+x.what);
+      cb.addEventListener("change",function(){x.done=cb.checked;save();render();});sw.appendChild(cb);row.appendChild(sw);var tx=h("div","tx");tx.appendChild(h("small","c-bk",esc(BLW[x.kind]||BLW.other)));tx.appendChild(h("b",null,esc(x.what)));
+      if(x.why)tx.appendChild(h("small",null,esc("Why it matters: "+x.why)));if(x.fix)tx.appendChild(h("small",null,esc("The fix: "+x.fix)));row.appendChild(tx);
+      row.appendChild(cbtn("sm quiet","Drop",function(){rec.list=rec.list.filter(function(y){return y.id!==x.id;});save();render();}));list.appendChild(row);});
+    R.body.appendChild(list);R.body.appendChild(h("p","c-note c-pad",esc(madeLine(rec))));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",rec?"Look again":"Find my blind spots",function(){edgeRun("bl");}));return R;}
+function apartPanel(){var E=EDGE(),rec=E.ed,R=panel("csWork","What sets you apart");
+  if(!rec||(!(rec.list||[]).length&&!Object.keys(rec.pos||{}).length))R.body.appendChild(empty("Not looked for yet","What few other applicants can show: the combinations in your record, results only you have, the story that ties your work together; each with its evidence and a sentence to say it. Then your positioning, in a line each: as a professional, as an academic, and the bridge between the two."));
+  else{var P0=rec.pos||{};if(P0.pro||P0.acad||P0.bridge){R.body.appendChild(h("div","c-label c-pad",esc("Your positioning")));var pg=h("div","c-entries");
+      [["pro","As a professional"],["acad","As an academic"],["bridge","The bridge"]].forEach(function(p){if(!P0[p[0]])return;var c=h("div","c-entry c-pos");c.appendChild(h("small",null,esc(p[1])));c.appendChild(h("p","c-line",esc(P0[p[0]])));var k=h("div","c-keys");k.appendChild(cbtn("sm","Copy",function(){copyText(P0[p[0]]);}));c.appendChild(k);pg.appendChild(c);});R.body.appendChild(pg);}
+    if((rec.list||[]).length){R.body.appendChild(h("div","c-label c-pad",esc("What sets you apart")));var grid=h("div","c-entries");rec.list.forEach(function(x){var c=h("div","c-entry c-edge");c.appendChild(h("b",null,esc(x.what)));
+        if(x.evidence)c.appendChild(h("p",null,"<span class=\"c-k\">Evidence</span> "+esc(x.evidence)));if(x.say)c.appendChild(h("p","c-line",esc("“"+x.say+"”")));var k=h("div","c-keys");if(x.say)k.appendChild(cbtn("sm","Copy",function(){copyText(x.say);}));
+        k.appendChild(cbtn("sm quiet","Drop",function(){rec.list=rec.list.filter(function(y){return y.id!==x.id;});save();render();}));c.appendChild(k);grid.appendChild(c);});R.body.appendChild(grid);}
+    R.body.appendChild(h("p","c-note c-pad",esc(madeLine(rec))));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",rec?"Look again":"Find what sets me apart",function(){edgeRun("ed");}));return R;}
+function docPanel(d){var E=EDGE(),a=E.docs[d.id],R=panel("csWork",d.name);R.body.appendChild(h("p","c-note c-pad",esc(d.sub+".")));
+  if(!a)R.body.appendChild(empty("Not looked at yet","Suggestions for this document, from your profile and your targets: what could do more, what your record adds that it leaves out, what could go, wording to look at again, what a reader will ask, and the one thing to do first. It is never rewritten: you make your own better."));
+  else{ADV_TAGS.forEach(function(tg){var rows=a.fb[tg[0]];if(!rows||!rows.length)return;R.body.appendChild(h("div","c-label c-pad",esc(tg[1])));var ul=h("ul","c-fb");
+      rows.forEach(function(p){var li=h("li");li.appendChild(h("span",null,esc(p[0])));if(p[1])li.appendChild(h("small",null,esc(p.slice(1).join(" · "))));ul.appendChild(li);});R.body.appendChild(ul);});
+    if(a.fb.RAW)R.body.appendChild(h("p","c-note c-pad",esc(a.fb.RAW[0][0])));
+    R.body.appendChild(h("p","c-note c-pad",esc("Looked at on "+dayStr(a.at)+" with "+(a.model||"your model")+". Suggestions only: the document is yours, and nothing in it was changed.")));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",a?"Look again":"Suggestions for this document",function(){docAdvise(d);}));return R;}
+/* ---- Your direction (Goals and plan): paths that fit what she wants, and what to find out before choosing ---- */
+function paths(){if(busyNow()||needModel())return;begin(null,"Thinking through paths that fit what you want");
+  gatherProfile({}).then(function(G){if(!wantsText()&&!CS().goals.length)throw new Error("say what you are looking for in Your profile first (the work, what you need, what you would rather avoid): the paths start from it");
+    return ask(function(sc){var R=room()*sc,tt=targetsText();return [{role:"system",content:sys("You are now a careers guide for someone who has little information about which career to choose and wants a clear direction. You are concrete and honest, and you never invent.")},
+      {role:"user",content:"I want a clear direction. From WHAT I AM LOOKING FOR, my goals and my profile, suggest between two and four paths: a kind of work, and the fields or kinds of organisation where it is found, that fits what I want and what my profile shows. A path may combine work with study when my goals include study. For each path: why it fits my wants (name the want); the evidence in my profile that I could do it; what is missing; a first step I can take this week; the next steps over three months; and how it sits beside my other goals. Never name a particular vacancy or person, and give no salary or market figure; where a point about the world needs checking, say so. Then between three and six questions I should answer before choosing, each with how to find out (a person to ask, a small trial, something to read). In exactly this form, and nothing else:\nPATH: the path | why it fits my wants | the evidence | what is missing | a first step this week | the next three months | beside my other goals\nFIND: a question to answer | how to find out\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,R*0.85)}];},1800,0.4);})
+    .then(function(t){var x=tagged(t,["PATH","FIND"]),list=(x.PATH||[]).map(function(p){return {id:uid("pa"),path:p[0].slice(0,200),fits:p[1]||"",evidence:p[2]||"",gap:p[3]||"",first:p[4]||"",months:p[5]||"",beside:p[6]||""};}),
+        find=(x.FIND||[]).map(function(p){return {id:uid("fd"),q:p[0],how:p[1]||"",done:false};});
+      if(!list.length){end();say("No paths came back in the form asked. Try again, or say more of what you are looking for in Your profile.");return;}
+      CS().paths={at:Date.now(),model:modelName(),list:list,find:find};save();end();},failed);}
+function pathsPanel(){var S=CS(),Pa=S.paths,R=panel("csWork","Your direction");
+  if(!Pa||!Pa.list||!Pa.list.length)R.body.appendChild(empty("Not thought through yet","Two to four paths that fit what you say you are looking for and what your record shows: why each fits, the evidence, what is missing, a first step this week, the next three months, and how it sits beside your other goals. Then the questions to answer before you choose, and how to find out. Never postings: bring those to Applications."));
+  else{var grid=h("div","c-entries");Pa.list.forEach(function(x){var c=h("div","c-entry c-path"+(x.kept?" is-kept":""));c.appendChild(h("b",null,esc(x.path)));
+      [["fits","Why it fits"],["evidence","Evidence"],["gap","What is missing"],["first","This week"],["months","The next three months"],["beside","Beside your other goals"]].forEach(function(f){if(x[f[0]])c.appendChild(h("p",null,"<span class=\"c-k\">"+f[1]+"</span> "+esc(x[f[0]])));});
+      var k=h("div","c-keys");k.appendChild(cbtn("sm"+(x.kept?"":" pri"),x.kept?"A goal now":"Make it a goal",function(){if(x.kept)return;var steps=[];if(x.first)steps.push({id:uid("st"),text:x.first,by:"in a week",done:false});
+          String(x.months||"").split(/;\s*|\.\s+(?=[A-Z])/).map(function(s){return s.trim().replace(/\.$/,"");}).filter(function(s){return s.length>3;}).slice(0,4).forEach(function(s){steps.push({id:uid("st"),text:s,by:"in three months",done:false});});
+          S.goals.unshift({id:uid("g"),text:x.path,kind:/phd|dphil|doctor|master|programme|fellow|study/i.test(x.path)?"academic":"career",by:"",at:Date.now(),steps:steps});x.kept=true;save();render();say("It is a goal now, with its steps.");}));
+      k.appendChild(cbtn("sm quiet","Drop",function(){Pa.list=Pa.list.filter(function(y){return y.id!==x.id;});save();render();}));c.appendChild(k);grid.appendChild(c);});R.body.appendChild(grid);
+    if(Pa.find&&Pa.find.length){R.body.appendChild(h("div","c-label c-pad",esc("Before you choose: what to find out")));var fl=h("div","c-steplist");Pa.find.forEach(function(f){var row=h("div","c-steprow"+(f.done?" is-done":"")),sw=h("label","c-check"),cb=h("input");cb.type="checkbox";cb.checked=!!f.done;cb.setAttribute("aria-label","Found out: "+f.q);
+        cb.addEventListener("change",function(){f.done=cb.checked;save();render();});sw.appendChild(cb);row.appendChild(sw);var tx=h("div","tx");tx.appendChild(h("b",null,esc(f.q)));if(f.how)tx.appendChild(h("small",null,esc("How: "+f.how)));row.appendChild(tx);fl.appendChild(row);});R.body.appendChild(fl);}
+    R.body.appendChild(h("p","c-note c-pad",esc("Thought through on "+dayStr(Pa.at)+" with "+(Pa.model||"your model")+", from your profile and what you are looking for. A point about the world (what a field asks for, how it hires) is for you to check.")));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",Pa?"Think it through again":"Show me paths that fit",paths));return R;}
+/* ---- the chat's + menu: her career profile, attached to a message, so any conversation can help with it ---- */
+function profileForChat(){return gatherProfile({}).then(function(G){var tt=targetsText(),nm=myName();
+  return "# "+(nm?nm+": ":"")+"my career profile\n\nKept in Ingenium's Career Studio. Use only what it shows about me; never invent a skill, a post, a date or a figure. When I ask for suggestions, say which entry each rests on.\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,60000);});}
+(function plusHook(){if(typeof W.paintPlus!=="function")return;var orig=W.paintPlus;
+  W.paintPlus=function(view){var r=orig.apply(this,arguments);try{if(!view&&$("page-career")&&typeof pmItem==="function"){var mm=$("chatPlusMenu");if(mm&&!mm.querySelector(".pm-career")){
+      var it=pmItem(mm,"file","Your career profile","Your entries, CV, wants and goals go with your message, for advice on your documents and direction",function(){profileForChat().then(function(t){if(typeof stageText==="function")stageText("Career profile.md",t,false);try{closePlus();}catch(e){}say("Your career profile goes with your next message. Ask for suggestions on your CV, a letter or your direction.");},function(e){say("It could not be gathered: "+(e&&e.message||e));});});
+      it.classList.add("pm-career");var after=[].filter.call(mm.querySelectorAll(".pm-item"),function(b){return /One of your apps/.test(b.textContent);})[0];if(after&&after.nextSibling)mm.insertBefore(it,after.nextSibling);}}}catch(e){}return r;};})();
+/* ---- 6.44 · what a reading of her app adds to her record, built into Lector's reading ----
+   Her words (6 November 2026): "I want Lector to read my updated apps and spot additional skills and experience that I can add to my
+   resume to further enhance as well as all of the other documents where it fits and would enhance it. I want it to be built-in for
+   it." When Lector has read an app in full (a newer copy above all), the studio reads that reading against her CV and her profile,
+   with the earlier reading of the same app when there is one, and lists what the app shows that her CV and profile do not show yet:
+   each with its evidence in the reading, whether it is new since the earlier copy, where it fits (the CV section, and the other
+   documents) and a sentence for them, drawn only from the reading. Lector says so in its stream; the list is kept in Your edge, under
+   From your apps, where any reading can be looked at again. Nothing is added to her CV by itself: she adds what is right. */
+function runAnalysis(r){return loadText(r&&r.analysisRef).then(function(t){var a={};try{a=JSON.parse(t)||{};}catch(e){return String(t||"");}return Object.keys(a).map(function(k){return "("+k+") "+a[k];}).join("\n");});}
+function earlierRun(r){try{var t0=r.finished||r.updated||Date.now();return lxState().runs.filter(function(x){return x&&x.kind==="app"&&x.status==="done"&&x.id!==r.id&&(x.app?x.app===r.app:x.name===r.name)&&(x.finished||x.updated||0)<t0&&(x.sha||"")!==(r.sha||"-");})
+  .sort(function(a,b){return (b.finished||b.updated||0)-(a.finished||a.updated||0);})[0]||null;}catch(e){return null;}}
+function appReadings(){var out=[],seen={};try{lxState().runs.forEach(function(r){if(r&&r.kind==="app"&&r.status==="done"&&!seen[r.name]){seen[r.name]=1;out.push(r);}});}catch(e){}return out;}
+function appSkills(r){var E=EDGE();if(!E.apps||typeof E.apps!=="object")E.apps={};var prev=earlierRun(r),label=r.name+(r.version?" "+r.version:"");
+  return Promise.all([runAnalysis(r),prev?runAnalysis(prev):"",gatherProfile({})]).then(function(x){if(!String(x[0]||"").trim())throw new Error("Lector's reading of "+label+" holds no analysis to read");var two=!!String(x[1]||"").trim();
+    return ask(function(sc){var R=room()*sc;return [{role:"system",content:sys("You are now an honest careers adviser reading what an app I built shows about my skills and experience. You list only what the reading shows.")},
+      {role:"user",content:"Lector has read my app "+label+" in full. From THE READING below, list the skills and experience building it shows that MY CV and THE PROFILE do not show yet, or show less fully than the reading does"+(two?"; mark each NEW when THE EARLIER READING (of an earlier copy"+(prev.version?", "+prev.version:"")+") does not show it, else KNOWN":"")+". For each: the skill or experience, in plain words; the evidence in THE READING (what in the app shows it); "+(two?"NEW or KNOWN; ":"")+"where it fits: the CV section, and which other documents (a cover letter, a portfolio, a personal statement, a supporting statement, a research proposal); and one sentence for those documents, drawn only from the reading, with no figure, name or claim the reading does not give. Every one the reading shows, the strongest first. Never list what the reading does not show, and never round a skill up. One to a line, in exactly this form, and nothing else:\nSKILLFROMAPP: the skill or experience | the evidence in the reading | "+(two?"NEW or KNOWN | ":"")+"where it fits | a sentence for my documents\n\nTHE READING (of "+label+"):\n"+cut(x[0],Math.floor(R*0.4))+(two?"\n\nTHE EARLIER READING:\n"+cut(x[1],Math.floor(R*0.15)):"")+"\n\n"+profileBlock(x[2],R*0.4)}];},1500,0.25)
+      .then(function(t){var list=(tagged(t,["SKILLFROMAPP"]).SKILLFROMAPP||[]).map(function(p){var n="";if(two&&/^(new|known)$/i.test(p[2]||""))n=p.splice(2,1)[0].toLowerCase();
+          return {id:uid("sa"),skill:p[0].slice(0,160),evidence:p[1]||"",fresh:n==="new",known:n==="known",suits:p[2]||"",line:p[3]||""};}).filter(function(z){return z.evidence;});
+        E.apps[r.name]={at:Date.now(),model:modelName(),app:r.app||"",version:r.version||"",runId:r.id,earlier:prev?(prev.version||dayStr(prev.finished||prev.updated)):"",list:list};save();return E.apps[r.name];});});}
+/* from Lector, when a reading ends: each app read afresh, one after another, while nothing else is using the model */
+var SPOT={q:[],on:false};
+function spotSkills(ids,tell){(ids||[]).forEach(function(id){if(SPOT.q.indexOf(id)<0)SPOT.q.push(id);});SPOT.tell=tell||SPOT.tell||null;spotNext(0);}
+function spotNext(tries){if(SPOT.on||!SPOT.q.length)return;if(!modelReady())return;if(RUN.busy||(W.LX&&LX.busy)){if(tries<120)setTimeout(function(){spotNext(tries+1);},5000);return;}
+  var id=SPOT.q.shift(),r=null;try{r=lxRun(id);}catch(e){}if(!r||r.kind!=="app"||r.status!=="done"){spotNext(0);return;}
+  SPOT.on=true;RUN.req=null;RUN.busy=true;RUN.stop=false;RUN.what="Spotting what "+r.name+" adds to your record";RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=null;
+  appSkills(r).then(function(rec){SPOT.on=false;end();var n=rec?rec.list.length:0,nw=rec?rec.list.filter(function(z){return z.fresh;}).length:0;
+      try{if(SPOT.tell)SPOT.tell(r,n?(n+" skill"+(n===1?"":"s")+" or experience in "+r.name+(r.version?" "+r.version:"")+" that your CV and profile do not show yet"+(rec.earlier?" ("+nw+" new since the earlier copy, "+rec.earlier+")":"")+". They are in the Career Studio, Your edge, From your apps: each with its evidence, where it fits and a sentence."):"Nothing in "+r.name+" that your CV and profile do not already show.");}catch(e){}
+      spotNext(0);},
+    function(e){SPOT.on=false;var m=String(e&&e.message||e);end();if(m!=="stopped")try{if(SPOT.tell)SPOT.tell(r,"What "+r.name+" adds to your record could not be read now ("+m+"). Look again in the Career Studio, Your edge.");}catch(x){}spotNext(0);});}
+function spotOne(r){if(busyNow()||needModel())return;begin(null,"Spotting what "+r.name+" adds to your record");appSkills(r).then(function(){end();},failed);}
+function appSkillsPanel(r){var S=CS(),E=EDGE(),rec=(E.apps||{})[r.name],label=r.name+(r.version?" "+r.version:""),R=panel("csWork","From "+label);
+  if(!rec)R.body.appendChild(empty("Not looked at yet","What Lector's reading of "+label+" shows that your CV and profile do not show yet: each skill or experience with its evidence in the reading, where it fits (the CV section, and your other documents) and a sentence for them. Lector does this by itself each time it reads an app afresh."));
+  else{if(rec.version&&r.version&&rec.version!==r.version)R.body.appendChild(h("p","c-note c-pad c-old",esc("This list is from the reading of "+rec.version+". Lector has read "+r.version+" since: look again.")));
+    if(!rec.list.length)R.body.appendChild(empty("Nothing new","Everything this reading shows is already in your CV or your profile."));
+    var grid=h("div","c-entries"),P=S.profile;rec.list.forEach(function(x){var c=h("div","c-entry c-edge"+(x.fresh?" is-new":""));var t=h("b",null,esc(x.skill));c.appendChild(t);if(x.fresh)c.appendChild(chip("New since the earlier copy","c-ok"));
+      if(x.evidence)c.appendChild(h("p",null,"<span class=\"c-k\">Evidence</span> "+esc(x.evidence)));if(x.suits)c.appendChild(h("p",null,"<span class=\"c-k\">Where it fits</span> "+esc(x.suits)));if(x.line)c.appendChild(h("p","c-line",esc("“"+x.line+"”")));
+      var have=P.items.some(function(it){return it.sec==="skill"&&String(it.title).toLowerCase()===String(x.skill).toLowerCase();}),k=h("div","c-keys");
+      k.appendChild(cbtn("sm"+(have?"":" pri"),have?"In your profile":"Add to your profile",function(){if(have)return;P.items.push({id:uid("it"),sec:"skill",title:x.skill.slice(0,140),place:"",from:"",to:"",text:"Evidence (Lector's reading of "+label+"): "+x.evidence+(x.suits?"\nWhere it fits: "+x.suits:""),src:"edge"});save();render();say("Added to Your profile, under Skills, with its evidence.");}));
+      if(x.line)k.appendChild(cbtn("sm","Copy the sentence",function(){copyText(x.line);}));
+      k.appendChild(cbtn("sm quiet","Drop",function(){rec.list=rec.list.filter(function(y){return y.id!==x.id;});save();render();}));c.appendChild(k);grid.appendChild(c);});
+    R.body.appendChild(grid);R.body.appendChild(h("p","c-note c-pad",esc("Read on "+dayStr(rec.at)+" with "+(rec.model||"your model")+(rec.earlier?", beside the earlier copy ("+rec.earlier+")":"")+". Nothing is added to your CV by itself: add what is right, in your own words or with the sentence.")));}
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",rec?"Look again":"Spot what it adds",function(){spotOne(r);}));return R;}
 
 /* ---- Learn: one lesson at a time ---- */
 function paintLearn(par){var S=CS();if(S.ui.learnTpl&&W.IngTemplates)return paintTemplates(par);var i=Math.max(0,Math.min(LESSONS.length-1,S.ui.lesson||0)),L=panel("csList","Learn");
@@ -2504,7 +2712,7 @@ var EXAM={last:null};
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
   sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Career Studio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
-    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["people","People"],["profile","Your profile"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
+    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["people","People"],["profile","Your profile"],["edge","Your edge"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
   var who=sec.querySelector("#csWho");if(who)who.addEventListener("change",function(){var v=who.value;if(v==="+manage"){var S=CS();S.ui.room="profile";S.ui.ppart="people";show("work");save();render();return;}switchTo(v);});
@@ -2519,7 +2727,7 @@ function install(){if($("page-career"))return;
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
-window.IngCareer={state:CS,render:render,newOpp:newOpp,read:readOpp,fetchPosting:fetchPosting,jl:{norm:jlNorm,ats:jlAts,api:jlApi,text:jlText,unent:jlUnent,fromLd:jlFromLd,find:jlFind,json:jlJson,compose:jlCompose,fetch:jlFetch,wall:jlWall},vetEvidence:vetEvidence,vetLead:vetLead,saved:svList,svMerge:svMerge,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
+window.IngCareer={state:CS,render:render,/* 6.44 */ adviseDoc:adviseDoc,spotSkills:spotSkills,appSkills:appSkills,edgeRun:edgeRun,docAdvise:docAdvise,edgeDocs:edgeDocs,paths:paths,tagged:tagged,targetsText:targetsText,profileForChat:profileForChat,newOpp:newOpp,read:readOpp,fetchPosting:fetchPosting,jl:{norm:jlNorm,ats:jlAts,api:jlApi,text:jlText,unent:jlUnent,fromLd:jlFromLd,find:jlFind,json:jlJson,compose:jlCompose,fetch:jlFetch,wall:jlWall},vetEvidence:vetEvidence,vetLead:vetLead,saved:svList,svMerge:svMerge,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
   root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR,
   /* 6.9.2 */ datesOf:datesOf,remindAt:remindAt,bellFor:bellFor,estimateOf:estimateOf,exportOpp:exportOpp,exportAll:exportAll,exportFiles:exportFiles,keepToRead:keepToRead,toFontes:toFontes,readWithLector:readWithLector,readingNotes:readingNotes,
   checkAgain:checkAgain,keepRecheck:keepRecheck,addMore:addMore,postText:postText,postOnly:postOnly,makeCheck:makeCheck,lcsUnits:lcsUnits,startMock:startMock,stopMock:stopMock,startClock:startClock,stopClock:stopClock,clock:function(){return CLOCK;},mock:function(){return MOCK;},

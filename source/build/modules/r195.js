@@ -96,9 +96,24 @@ if(typeof W.ingReplyMax==="function"){var oRep=W.ingReplyMax;
   W.ingReplyMax=wrap(oRep,function(m){var r=oRep.apply(this,arguments);try{if(isCloud()){var inf=cloudInfo();if(inf&&+inf.out>0)return Math.max(16384,Math.min(r,Math.floor(+inf.out/128)*128));}}catch(e){}return r;});}
 /* the room a connected reply is given (the chat's cloudChat asks these two; the R195 edits in build_page.py name them):
    at least the slider, the whole of the model's own longest reply when the list gave it, 32,000 as before when it did not */
+/* 6.44: her words (6 November 2026): "Ingenium keeps on failling when I try to use Claude's Opus model in the chat ... the connection failed
+   because of max token limits." A Claude model whose list was never read was given no ceiling (an older model: the slider's
+   reply, however long), and the working loop of a chat with files (modules/r190.js) and Blend asked without this cap at all.
+   Each Claude model now has a ceiling even before its list is read: Anthropic's published limits (Opus 4.6 onwards, the 5
+   family, Fable and Haiku 5.5: a window of 1,000,000 tokens and replies of up to 128,000; Haiku 4.5: 200,000 and 64,000);
+   an older or unknown Claude model 200,000 and 32,000, until its list or a refusal gives the true figures (r206 keeps them). */
+function claudeFamily(id){id=String(id||"").toLowerCase().replace(/^anthropic\./,"");
+  if(/^claude-(fable|mythos)/.test(id)||/^claude-(opus|sonnet|haiku)-5/.test(id)||/^claude-opus-4-[678]/.test(id)||/^claude-sonnet-4-6/.test(id))return {out:128000,ctx:1000000};
+  if(/^claude-haiku-4-5/.test(id))return {out:64000,ctx:200000};
+  if(/^claude-/.test(id))return {out:32000,ctx:200000};
+  return null;}
+function outFor(id){try{var c=state.cloud||{},i=(c.info||{})[id];if(i&&+i.out>0)return +i.out;}catch(e){}var f=claudeFamily(id);return f?f.out:0;}
+W.ingClaudeFamily=claudeFamily;
+/* any request to a named model (Blend asks its own): never more than that model gives */
+W.ingOutFor=function(id,want){var o=outFor(id);want=+want||4096;return o>0?Math.min(want,o):want;};
 W.ingReplyCap=function(maxTok,modern){maxTok=+maxTok||1024;var inf=cloudInfo(),out=(inf&&+inf.out>0)?+inf.out:0;
   var want=modern?Math.max(maxTok,out||32000):Math.max(maxTok,4096);
-  if(out)want=Math.min(want,out);else if(modern)want=Math.min(want,128000);
+  if(out)want=Math.min(want,out);else{var fo=0;try{fo=outFor((state.cloud||{}).model);}catch(e){}if(fo>0)want=Math.min(want,fo);else if(modern)want=Math.min(want,128000);}
   return want;};
 W.ingRemoteCap=function(cap){cap=+cap||0;var inf=cloudInfo(),out=(inf&&+inf.out>0)?+inf.out:0;return out?out:Math.max(cap,16000);};
 /* the services that count tokens in their stream are asked to (the last chunk then carries usage) */
@@ -305,11 +320,11 @@ if(typeof W.aiApplyParams==="function"){var oAI=W.aiApplyParams;
 /* ---------- 9. the reading page's parts follow the connection's window, when the connection says it ---------- */
 if(typeof W.lxCtx==="function"){var oLx=W.lxCtx;
   W.lxCtx=wrap(oLx,function(m){try{
-      if(typeof supUsesLink==="function"&&supUsesLink()){var inf=cloudInfo();if(inf&&+inf.ctx>0)return Math.min(+inf.ctx,262144);return oLx.apply(this,arguments);}
+      if(typeof supUsesLink==="function"&&supUsesLink()){var inf=cloudInfo();if(inf&&+inf.ctx>0)return +inf.ctx;return oLx.apply(this,arguments);}  /* 6.44: its own window, no cap of Ingenium's (262,144 before) */
       /* 6.9.5: a connected model chosen for Lector and the Career Studio: its window, up to 262,144 tokens, and never more than its
          key may send in a minute when the service has said so (r206 keeps that figure) */
       if(typeof lxUsesCloud==="function"&&lxUsesCloud()){var ci=cloudInfo()||{},cw=+ci.ctx||(typeof ingCloudWindow==="function"?+ingCloudWindow():0)||32768;
-        var cap=Math.min(cw,262144);if(+ci.perMin>0)cap=Math.min(cap,Math.max(4096,Math.floor(+ci.perMin*0.6)));return cap;}
+        var cap=cw;if(+ci.perMin>0)cap=Math.min(cap,Math.max(4096,Math.floor(+ci.perMin*0.6)));return cap;}  /* 6.44: the whole window (262,144 before); a key's tokens a minute still hold, as a request above them is refused */
       var w=wasmCtx();if(w&&m&&Engine.modelId===m.id)return w;}catch(e){}
     return oLx.apply(this,arguments);});}
 
