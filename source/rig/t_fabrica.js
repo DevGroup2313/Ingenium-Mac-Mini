@@ -48,7 +48,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(card.open === 'true' && card.files.join(',') === 'app.js,readme.md (added)' && /^See the changes\|Undo it\|Mark a release(\|Compare\|Browse the files)?$/.test(card.keys.join('|')), 'a version opens to its files and its keys', JSON.stringify(card));
   // mark a release through the sheet
   await p.evaluate(() => { [...document.querySelectorAll('#fbWorkBody .f-cm .f-acts .f-btn')].find(x => x.textContent === 'Mark a release').click(); }); await p.waitForTimeout(300);
-  await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(1000);
+  await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(300);
+  // 6.41: wait for the release to be drawn (a fixed second was too short when the machine was busy), then judge it as before
+  await p.waitForFunction(() => [...document.querySelectorAll('#fbWorkBody .f-tag')].some(x => x.textContent === 'v1.0.2') && !!document.querySelector('#fbRepos .f-repo .nm em'), null, { timeout: 10000 }).catch(() => {});
   const tag = await p.evaluate(() => ({ tags: [...document.querySelectorAll('#fbWorkBody .f-tag')].map(x => x.textContent), ver: document.querySelector('#fbRepos .f-repo .nm em') && document.querySelector('#fbRepos .f-repo .nm em').textContent }));
   ok(tag.tags.join() === 'v1.0.2' && tag.ver === 'v1.0.2', 'a release is marked and named on the tile', JSON.stringify(tag));
   // test this version (IngShip): the five checks, recorded beside the version

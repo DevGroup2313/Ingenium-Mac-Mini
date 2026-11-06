@@ -371,6 +371,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.41 (6 November 2026): every app's own logo, in 3D, in Fabrica. Her words (6 November 2026): "I want Fabrica to automatically
+load the apps' icons and logos with the same animated popped out 3D look and effects. I want that for any app that is made inside of
+Ingenium and its pages, especially Fabrica and Lector. When the app clearly has a logo icon, it should replace Ingenium's placeholder
+empty slot and show the app's actual 3D logo animated and active and swaying back and forth the same way that it does for Carpe Diem,
+The Forge, Ingenium, Inkwell and the Offline Project's app icons inside of Ingenium."
+
+- modules/r239.js (new, window.IngAppIcon): finds an app's logo in its own files and draws its layers. It looks, in order, at the icons
+  the page names (<link rel="icon">, apple-touch-icon; the largest first, a drawing to scale before all), the icons of the manifest the
+  page names (not those only maskable or monochrome), a Windows tile image, then files named as icons are named (icon, logo,
+  apple-touch-icon, favicon, an icons folder). A logo written into the page (a data address) and a file of the app's own are read; a web
+  address is never fetched. A clear logo: it loads, it is square or nearly (a banner is not a logo), and it is an SVG or at least 64 pixels
+  across; otherwise the placeholder stays. Its layers are drawn once on a canvas: on an opaque square it becomes a tile with rounded
+  corners, on a clear ground it keeps its shape; its edge is the same shape darkened behind it, and a sheen the same shape lit from above
+  in front. Kept until the app's files change.
+- modules/r112.js (Fabrica): an app with no seal of its own wears its logo, in its row of Your apps and at the head of its work, in the
+  seals' own classes: the same depth, cast shadow, sway, turn toward the pointer, lift and press. The four seals and the Offline Project's
+  crest are as they were. Fabrica's seals and logos now stand still with minimal motion too (they stopped only for the system's reduced
+  motion), as Lector's seals and the crests do.
+- Lector: its "Your apps" holds the four apps alone (the app library keeps only pages it recognises as Carpe Diem, The Forge, Ingenium or
+  Inkwell: the base page's libDetect), and each already wears its own 3D seal, so there is no empty slot there. Lector taking any app
+  is a larger change, asked of her.
+- rig/t_fabrica.js waited a fixed second after marking a release before judging the tile; on a busy machine that was too short (it
+  failed twice as the first test of a run and passed alone every time). It now waits for the release to be drawn, then judges it as before.
+
+    node rig/t_641_logos.js <url> <out>   # 11 checks with six invented apps (an icon file, a manifest's tile, an SVG in the page, a
+                                          # banner, a tiny favicon, a web address): the three logos in the seals' layers with shadow and
+                                          # sway, the tile's corners and the free shape, the placeholder kept for the other three, nothing
+                                          # fetched, the work head, the pointer's turn, minimal motion, after a reload, no page errors
+
 Ingenium 6.40 (6 November 2026): the Offline Project's crest, as its own icon in Fabrica. Her decision of 5 November: "Fabrica (master
 edition) shows the master seal live, with each quarter moving as its app's seal moves (port the site's quarter motions, site.html lines
 86 to 140 and its medal() drawing, into r140's live crest)." A first reading set the crest at the head of Fabrica, as its logo; she

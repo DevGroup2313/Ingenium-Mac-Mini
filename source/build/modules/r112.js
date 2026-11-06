@@ -419,14 +419,22 @@ function tintOf(r){var k=iconOf(r);return k==="offline"||k==="offline3"?"#9a7a32
 
 /* the seals: each app's own layers (as Lector shows them), else a flat seal, else the mark of a new app */
 function flatSrc(k){try{var s=window.ING_SEALS&&ING_SEALS[k];return s?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
-function sealEl(k,size){var root=h("span","f-ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
+/* 6.41: an app that names its own logo wears it as the seals are worn: in layers at depth, swaying, turning toward the pointer
+   (modules/r239.js finds it in the app's own files and draws its layers; the rows' pointer handling is the seals' own) */
+function logoInto(root,ic,seed){root.className="f-ls logo"+(ic.tile?" tile":"");root.innerHTML="";var tilt=h("span","f-ls-tilt"),idle=h("span","f-ls-idle");
+  var hsh=0,sd=String(seed||"");for(var i=0;i<sd.length;i++)hsh=(hsh*31+sd.charCodeAt(i))>>>0;idle.style.animationDelay=(-(hsh%70)/10)+"s";idle.appendChild(h("i","f-ls-cast"));
+  ic.layers.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.draggable=false;im.className="f-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
+  tilt.appendChild(idle);root.appendChild(tilt);root.title="";}
+function sealEl(k,size,r){var root=h("span","f-ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
   /* 6.40: the Offline Project's crest, live, its quarters moving as its apps' seals move (modules/r140.js), as tall as a seal here */
   if((k==="offline"||k==="offline3")&&window.IngSeal&&typeof IngSeal.el==="function"){var set=k==="offline"?["cd","forge","ingenium","inkwell"]:["cd","forge","ingenium"],ar=1.3333,c=null;
     try{ar=IngSeal.aspect(set)||ar;c=IngSeal.el(set,{live:true,quarters:true,size:Math.max(14,Math.round((size||56)/ar)),alt:""});}catch(e){c=null;}
     if(c){root.className="f-ls crest";c.setAttribute("aria-hidden","true");root.appendChild(c);return root;}}
   var L=window.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=k?L[key]:null;
   if(!ls){if(k&&flatSrc(k)){root.className="f-ls flat";var im=new Image();im.src=flatSrc(k);im.alt="";root.appendChild(im);return root;}
-    root.className="f-ls new";root.appendChild(h("span",null,"✦"));return root;}
+    root.className="f-ls new";root.appendChild(h("span",null,"✦"));
+    if(!k&&r&&window.IngAppIcon){var kn=IngAppIcon.known(r);if(kn)logoInto(root,kn,r.id);else if(kn===undefined)IngAppIcon.forRepo(r).then(function(ic){if(ic)logoInto(root,ic,r.id);},function(){});}
+    return root;}
   var tilt=h("span","f-ls-tilt"),idle=h("span","f-ls-idle");idle.style.animationDelay=(-(DELAY[k]||0))+"s";idle.appendChild(h("i","f-ls-cast"));
   ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="f-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
   tilt.appendChild(idle);root.appendChild(tilt);return root;}
@@ -566,13 +574,13 @@ function paintRepos(){var box=$("fbRepos");box.innerHTML="";var rs=C.repos;$("fb
   box.style.display="";var id=FBS().sel;
   rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",tintOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
     var s=stepOf(r),st='<i class="st'+(s==="keep"?" changed":s==="change"?" new":s==="test"||s==="ship"?" tested":"")+'" title="'+(s==="done"?"Shipped":s==="keep"?"Changes not kept yet":s==="test"?"Kept, not tested":s==="ship"?"Tested":"New")+'"></i>';
-    b.appendChild(sealEl(iconOf(r),56));var v=verOf(r);
+    b.appendChild(sealEl(iconOf(r),56,r));var v=verOf(r);
     b.insertAdjacentHTML("beforeend",'<span class="nm">'+esc(r.name)+(v?" <em>"+esc(v)+"</em>":"")+'</span><span class="stl">'+st+"<span>"+esc(tileLine(r))+"</span></span>");
     b.onclick=function(){FBS().sel=r.id;saveSoon();S.view=statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";S.panel="work";if(one())setPanel("work");paint();syncFromCode(r);};box.appendChild(b);});}
 function views(){var r=cur(),n=r?statusOf(r).changes.length:0;[].forEach.call($("fbViews").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===S.view?"true":"false");});
   $("fbNChanges").textContent=n||"";$("fbNChanges").hidden=!n;}
 function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML="";f.innerHTML="";
-  var ws=$("fbWhSeal"),nw=sealEl(r?iconOf(r):null,34);nw.id="fbWhSeal";ws.replaceWith(nw);
+  var ws=$("fbWhSeal"),nw=sealEl(r?iconOf(r):null,34,r);nw.id="fbWhSeal";ws.replaceWith(nw);
   $("fbWhName").textContent=r?r.name:"No app chosen";$("fbBranchName").textContent=r?(r.detached?"an older version":(r.branch||"main")):"";$("fbBranch").hidden=!r;$("fbRun").hidden=!r;
   var chip=$("fbWorkChip");if(!r){chip.className="f-chip";chip.textContent="";views();w.appendChild(h("div","f-empty","<b>Choose an app on the left</b>Or bring one in, and its work shows here."));return;}
   var s=stepOf(r),n=statusOf(r).changes.length;chip.className="f-chip"+(s==="keep"?" warn":s==="done"?" ok":"");
