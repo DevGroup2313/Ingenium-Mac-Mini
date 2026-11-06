@@ -186,6 +186,39 @@ function seals(P,L,night){var d=['<defs>'];
       '<circle cx="'+m[1]+'" cy="'+m[2]+'" r="'+(m[3]-1.2)+'" fill="none" stroke="url(#sd)" stroke-width="3" filter="url(#sb)"/></g>'+
       '<circle cx="'+m[1]+'" cy="'+m[2]+'" r="'+(m[3]+.15)+'" fill="none" stroke="rgba(30,18,4,.45)" stroke-width=".5"/>');});
   return d.join("");}
+/* 6.40: the same seals, each moving as its own app's seal moves, as in the Offline Project's hall (source/offline_project/master_demo/
+   site.html, its quarter motions and medal()): Carpe Diem's ring breathes round its seal, The Forge's sparks glint in turn over the anvil
+   and a sheen crosses it, Ingenium's star turns a quarter at a time and its heart stone beats, Inkwell's wax glows. For a live crest that
+   asks for it (o.quarters), and only where motion is allowed; a still crest, a document and a picture keep the seals as they are. The
+   motions are written into the layer's own picture, so they run inside it. */
+var QCSS=".q-cd .halo{animation:qHalo 4.5s ease-in-out infinite}@keyframes qHalo{0%,100%{opacity:.16;transform:scale(.97)}50%{opacity:.66;transform:scale(1.09)}}"+
+  ".q-forge .glint{transform-box:fill-box;transform-origin:center;animation:qGlint 3.2s ease-in-out infinite}.q-forge .glint.g2{animation-delay:1.6s}"+
+  "@keyframes qGlint{0%,100%{opacity:.25;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}"+
+  ".q-forge .sheen{animation:qSheen 8s cubic-bezier(.45,0,.25,1) 1.4s infinite}@keyframes qSheen{0%{transform:translateX(-120px)}24%,100%{transform:translateX(120px)}}"+
+  ".q-ingenium .spin{animation:qEngine 9s cubic-bezier(.45,.05,.55,.95) infinite}@keyframes qEngine{0%{transform:rotate(0deg)}22%{transform:rotate(90deg)}44%{transform:rotate(180deg)}66%{transform:rotate(270deg)}88%,100%{transform:rotate(360deg)}}"+
+  ".q-ingenium .beat{animation:qBeat 3.2s ease-in-out infinite}@keyframes qBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1.04)}42%{transform:scale(1.12)}56%{transform:scale(1)}}"+
+  ".q-inkwell .glow{animation:qGlow 6s ease-in-out infinite}@keyframes qGlow{0%,100%{opacity:.08}50%{opacity:.6}}"+
+  "@media (prefers-reduced-motion:reduce){.q *{animation:none !important}}";
+function spark(x,y,r,cls){return '<path class="glint '+cls+'" d="M'+x+','+(y-r)+' Q'+x+','+y+' '+(x+r)+','+y+' Q'+x+','+y+' '+x+','+(y+r)+' Q'+x+','+y+' '+(x-r)+','+y+' Q'+x+','+y+' '+x+','+(y-r)+' Z" fill="#fffbea"/>';}
+function sealsLive(P,L,night){var d=['<defs>'];
+  d.push('<linearGradient id="sd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(20,10,0,'+(night?.6:.45)+')"/><stop offset=".45" stop-color="rgba(20,10,0,0)"/><stop offset="1" stop-color="rgba(255,250,235,'+(night?.12:.25)+')"/></linearGradient>');
+  d.push('<filter id="sb" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation=".7"/></filter>');
+  d.push('<filter id="hb" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8"/></filter><filter id="gw" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6"/></filter>');
+  d.push('<linearGradient id="sn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(255,255,255,0)"/><stop offset=".5" stop-color="rgba(255,255,255,'+(night?.22:.5)+')"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient>');
+  L.med.forEach(function(m,i){var cx=m[1],cy=m[2],r=m[3];d.push('<clipPath id="sc'+i+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'"/></clipPath>');
+    if(m[0]==="ingenium")d.push('<radialGradient id="mg'+i+'" cx="'+cx+'" cy="'+cy+'" r="'+(r*.6)+'" gradientUnits="userSpaceOnUse"><stop offset=".9" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>'+
+      '<mask id="mk'+i+'" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="400"><circle cx="'+cx+'" cy="'+cy+'" r="'+(r*.6)+'" fill="url(#mg'+i+')"/></mask><clipPath id="st'+i+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+(r*.125)+'"/></clipPath>');});
+  d.push('</defs><style>'+QCSS+'</style>');
+  L.med.forEach(function(m,i){var k=m[0],cx=m[1],cy=m[2],r=m[3],f=r/49,o='transform-origin:'+cx+'px '+cy+'px',pc=sealPic(m,i,night),g=['<g class="q q-'+k+'">'];
+    if(k==="cd")g.push('<circle class="halo" style="'+o+'" cx="'+cx+'" cy="'+cy+'" r="'+(r+1.4)+'" fill="none" stroke="'+(night?"rgba(150,205,235,.9)":"rgba(255,255,255,.95)")+'" stroke-width="2.6" filter="url(#hb)"/>');
+    if(k==="inkwell")g.push('<circle class="glow" cx="'+cx+'" cy="'+cy+'" r="'+(r+.8)+'" fill="none" stroke="'+(night?"#7fb4d6":"#a97e2c")+'" stroke-width="3.2" filter="url(#gw)"/>');
+    g.push('<g clip-path="url(#sc'+i+')">'+pc);
+    if(k==="ingenium")g.push('<g class="spin" style="'+o+'"><g mask="url(#mk'+i+')">'+pc+'</g></g><g class="beat" style="'+o+'"><g clip-path="url(#st'+i+')">'+pc+'</g></g>');
+    if(k==="forge")g.push('<g class="sheen"><rect x="'+(cx-9*f)+'" y="'+(cy-r-12*f)+'" width="'+(18*f)+'" height="'+(2*r+24*f)+'" fill="url(#sn)" transform="rotate(22 '+cx+' '+cy+')"/></g>'+
+      spark(cx-.7*f,cy-15.6*f,4.6*f,"g1")+spark(cx+6.6*f,cy-21.5*f,2.6*f,"g2"));
+    g.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+(r-1.2)+'" fill="none" stroke="url(#sd)" stroke-width="3" filter="url(#sb)"/></g>');
+    g.push('<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+.15)+'" fill="none" stroke="rgba(30,18,4,.45)" stroke-width=".5"/></g>');d.push(g.join(""));});
+  return d.join("");}
 /* the pair: a short gilt bar between the two seals, cut and worn as the cross of the shield is */
 function duoBar(P){var y=66.6;
   return '<defs>'+gold("gv",P,"v")+dropShadow("ds")+patina("pt",P)+'<clipPath id="gc"><rect x="100" y="'+y+'" width="100" height="6.8"/></clipPath></defs>'+
@@ -203,8 +236,8 @@ function duoSeals(P,L,night){var d=['<defs><filter id="dz" x="-15%" y="-15%" wid
 function duoBook(P){return '<g transform="translate(150 70) scale(1.45) translate(-150 -178)">'+book(P)+'</g>';}
 /* the layers from back to front, each with its depth (as the master seal's: the shield at the back, the seals struck into
    it, the gold above them, the book on the crossing, the ribbon in front) */
-function layers(n,night){var L=layout(n),P=PAL[night?"night":"day"];
-  if(L.K==="master"||L.K==="trio"){var a=[{z:0,s:back(P,L)},{z:.002,s:seals(P,L,night)},{z:.03,s:frame(P,L)},{z:.031,s:book(P)}];if(L.ribbon)a.push({z:.1,s:ribbon(P)});return a;}
+function layers(n,night,q){var L=layout(n),P=PAL[night?"night":"day"];
+  if(L.K==="master"||L.K==="trio"){var a=[{z:0,s:back(P,L)},{z:.002,s:q?sealsLive(P,L,night):seals(P,L,night),q:!!q},{z:.03,s:frame(P,L)},{z:.031,s:book(P)}];if(L.ribbon)a.push({z:.1,s:ribbon(P)});return a;}
   if(L.K==="duo")return [{z:0,s:duoBar(P)},{z:.02,s:duoSeals(P,L,night)},{z:.045,s:duoBook(P)}];
   return [{z:0,s:'<image href="'+pic(n[0],night)+'" x="0" y="0" width="1600" height="1600"/>'}];}
 function xesc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -223,8 +256,8 @@ function url(apps,o){o=o||{};var n=norm(apps);if(!n)return "";var night=o.night=
 /* the same as a self-contained address, for a page saved to a file (a picture address made here lives only while the page is open) */
 function dataUrl(apps,o){o=o||{};var n=norm(apps);if(!n)return "";var night=o.night==null||o.night==="auto"?isNight():!!o.night;
   return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(stillSvg(n,night,{label:false,doc:o.doc}));}
-function layerUrls(n,night){var L=LX(n,night);if(L)return L;
-  return layers(n,night).map(function(x,i){var v=layout(n).vb;return {z:x.z,u:blobUrl(doc(v,x.s),"l|"+n.join("+")+"|"+(night?"n":"d")+"|"+i)};});}
+function layerUrls(n,night,q){var L=LX(n,night);if(L)return L;
+  return layers(n,night,q).map(function(x,i){var v=layout(n).vb;return {z:x.z,u:blobUrl(doc(v,x.s),"l|"+n.join("+")+"|"+(night?"n":"d")+"|"+i+(x.q?"|q":""))};});}
 /* one app, live: its own layered seal, as Lector's app keys show it (R107's layers), when the page carries them */
 function LX(n,night){if(n.length!==1)return null;try{var A=window.LX7_LAYERS||null,k=n[0],ls=A&&(night&&A[k+"N"]?A[k+"N"]:A[k]);
     if(ls&&ls.length)return ls.map(function(x){return {z:x.z,u:x.src,side:!!x.side};});}catch(e){}return null;}
@@ -268,7 +301,7 @@ function reduced(){try{return window.matchMedia("(prefers-reduced-motion: reduce
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function fillLayers(root,n,night){var idle=root.querySelector(".ic-idle");if(!idle)return;
   [].slice.call(idle.querySelectorAll("img.ic-l")).forEach(function(x){x.remove();});
-  layerUrls(n,night).forEach(function(L1){var im=new Image();im.alt="";im.draggable=false;im.decoding="async";im.className="ic-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));im.src=L1.u;idle.appendChild(im);});}
+  layerUrls(n,night,!!root.__icq&&!reduced()).forEach(function(L1){var im=new Image();im.alt="";im.draggable=false;im.decoding="async";im.className="ic-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));im.src=L1.u;idle.appendChild(im);});}
 function wire(root){root.addEventListener("pointermove",function(e){if(e.pointerType==="touch"||reduced())return;var r=root.getBoundingClientRect();if(!r.width)return;
     var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;root.classList.add("hov");
     root.style.setProperty("--ry",(clamp(px,-.7,.7)*26).toFixed(1)+"deg");root.style.setProperty("--rx",(-clamp(py,-.7,.7)*18).toFixed(1)+"deg");},{passive:true});
@@ -290,6 +323,7 @@ function el(apps,o){o=o||{};var n=norm(apps);if(!n)return null;var auto=o.night=
   /* crests side by side do not sway in step */
   idle.style.animationDelay=(-((SWAY++)*1.7)%7).toFixed(1)+"s";
   var cast=document.createElement("i");cast.className="ic-cast";idle.appendChild(cast);tilt.appendChild(idle);root.appendChild(tilt);
+  if(o.quarters){root.__icq=true;root.classList.add("ic-quarters");}
   fillLayers(root,n,nt);wire(root);root.__ic={n:n,night:nt};if(auto)root.setAttribute("data-ic-auto",n.join("+"));
   return root;}
 /* by night the night pictures, by day the day ones, changed with the page's Display setting, with no reload */
@@ -299,8 +333,11 @@ function repaint(e,force){var n=norm((e.getAttribute("data-ic-auto")||"").split(
   e.classList.toggle("night",nt);if(e.__icAlt==null)e.setAttribute("aria-label",label(n,nt));fillLayers(e,n,nt);}
 function repaintAll(force){[].forEach.call(document.querySelectorAll("[data-ic-auto]"),function(e){try{repaint(e,force);}catch(x){}});}
 try{new MutationObserver(function(){repaintAll(false);}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
+/* 6.40: the live crests that move their quarters follow the Motion setting as it changes */
+try{new MutationObserver(function(){[].forEach.call(document.querySelectorAll(".ing-crest.ic-quarters[data-ic-auto]"),function(e){try{repaint(e,true);}catch(x){}});}).observe(document.body,{attributes:true,attributeFilter:["data-motion"]});}catch(e){}
 
-window.IngSeal={apps:ORDER.slice(),norm:norm,kind:kind,names:names,title:title,label:label,aspect:aspect,svg:svg,url:url,dataUrl:dataUrl,png:png,el:el,
+function medals(apps){var n=norm(apps);if(!n)return null;var L=layout(n);return {vb:L.vb.slice(),med:(L.med||[]).map(function(m){return {k:m[0],cx:m[1],cy:m[2],r:m[3]};})};}
+window.IngSeal={apps:ORDER.slice(),norm:norm,kind:kind,names:names,title:title,label:label,aspect:aspect,svg:svg,url:url,dataUrl:dataUrl,png:png,el:el,medals:medals,
   ready:ready,docPicture:docPicture,docCached:docCached,prepare:prepare,isNight:isNight,repaint:repaintAll};
 
 /* ---------------- Word: the crest on the cover, in place of the seals one by one ----------------

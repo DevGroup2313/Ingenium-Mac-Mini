@@ -371,6 +371,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.40 (6 November 2026): the Offline Project's crest, as its own icon in Fabrica. Her decision of 5 November: "Fabrica (master
+edition) shows the master seal live, with each quarter moving as its app's seal moves (port the site's quarter motions, site.html lines
+86 to 140 and its medal() drawing, into r140's live crest)." A first reading set the crest at the head of Fabrica, as its logo; she
+corrected it (6 November 2026): "I want the Offline Project seal to be shown inside of Fabrica the same way that the other apps icons
+are shown inside of Fabrica, I don't want it to be Fabrica's logo." That reading was never released.
+
+- modules/r140.js: a live crest may ask for its quarters to move (IngSeal.el(apps, {live: true, quarters: true})). Its seals layer is
+  then drawn by sealsLive, ported from the hall's medal() (source/offline_project/master_demo/site.html): Carpe Diem's ring breathes
+  round its seal, The Forge's sparks glint in turn and a sheen crosses it, Ingenium's star turns a quarter at a time and its heart
+  stone beats, Inkwell's wax glows. The motions are written into the layer's own picture (the hall's keyframes), so they run inside it;
+  the spark positions follow the seal's radius. Only where motion is allowed: with minimal motion, or the system's reduced motion, the
+  still seals are drawn, and a change of the Motion setting repaints such a crest at once. A still crest, a document's crest and a
+  picture are unchanged. IngSeal.medals(apps) tells where the seals sit.
+- modules/r112.js (Fabrica): an app's icon is drawn by sealEl, each of the four apps with its own layered seal. A repository is now known
+  as the Offline Project by its name (The Offline Project, Offline-project-forest, offline_project: "offline" and "project" together),
+  and wears the master crest, live with its quarters moving, in its row of Your apps (56 pixels high, as a seal) and at the head of its
+  work (34); one named for the variation without Inkwell wears the trio's crest; its tile takes the crest's gold. The master edition
+  alone (the crest names her own apps); elsewhere such a repository keeps the new app's mark. Only the icon and its tile's colour
+  change: packages, kits and their icons follow the app key as before.
+- Found, older (the same on the published 6.35 page): rig/t_61_seals.js fails 6 checks (a document's crest drawn 300 pixels wide where
+  720 is asked, and Lector's page zoom at 1440 by 900 and on a phone), and rig/t_67_sound.js 8 (it stops on a voice that renders
+  nothing in this headless browser). Left for a later stage.
+
+    node rig/t_640_offline.js <url> <out> [<full edition url>]   # 14 checks with three invented repositories: the master crest in the
+                                                                 # Offline Project's row, live, at a seal's height; the trio for the
+                                                                 # variation without Inkwell; the mark for an ordinary app; the gold
+                                                                 # tile; no seal on Fabrica's head; the work head's crest; the motion
+                                                                 # measured (each quarter pictured twice differs, a crest without
+                                                                 # quarter motions does not); minimal motion; documents unchanged; the
+                                                                 # full edition's mark; no page errors
+
 Ingenium 6.39 (6 November 2026): a GitHub repository in a folder, the signing keys kept on a computer app's disk, and three older
 test failures fixed. Asked what a folder should take from a GitHub repository, she answered: "I want its README, its files, and its
 issues."

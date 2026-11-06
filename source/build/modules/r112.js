@@ -142,6 +142,9 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-ls.flat img{position:absolute;inset:0;width:100%;height:100%;display:block;animation:fbSway 7s ease-in-out infinite}
 #fb .f-ls.new{border-radius:50%;border:1.5px dashed var(--f-ring);display:inline-grid;place-items:center;color:var(--f-acc);font:600 calc(var(--S,56px) * .38)/1 var(--f-serif)}
 #fb .f-ls.new span{display:block;animation:fbSway 7s ease-in-out infinite}
+/* 6.40: the Offline Project's crest (modules/r140.js), standing in its seal's square at a seal's height */
+#fb .f-ls.crest{display:inline-flex;align-items:center;justify-content:center;perspective:none}
+#fb .f-ls.crest > .ing-crest{display:block;flex:0 0 auto}
 
 /* her apps: tiles two by two; the chosen one raised, with its tick */
 #fb .f-repos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 14px}
@@ -404,10 +407,23 @@ var APPS={cd:{name:"Carpe Diem",color:"#1B6B93"},forge:{name:"The Forge",color:"
 var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
 function appOf(r){return r&&r.app&&APPS[r.app]?r.app:null;}
 function colorOf(r){var k=appOf(r);return k?APPS[k].color:"#b88a3a";}
+/* 6.40: the Offline Project wears its own crest here, as each of the four apps wears its seal. Her words (6 November 2026): "I want the
+   Offline Project seal to be shown inside of Fabrica the same way that the other apps icons are shown inside of Fabrica, I don't want it
+   to be Fabrica's logo." A repository is known as the Offline Project by its name (The Offline Project, Offline-project-forest,
+   offline_project); one named for the variation without Inkwell wears the trio's crest. The master edition alone (the crest names her
+   own apps). Only the icon and its tile's colour change: packages, kits and their icons follow the app key as before. */
+function iconOf(r){var k=appOf(r);if(k||!r)return k;try{if(typeof ING_EDITION!=="undefined"&&ING_EDITION!=="master")return null;}catch(e){return null;}
+  var n=String((r.name||"")+" "+(r.slug||"")).toLowerCase();if(!/offline[\s._-]*project/.test(n))return null;
+  return /(without|no|sans)[\s._-]*inkwell/.test(n)?"offline3":"offline";}
+function tintOf(r){var k=iconOf(r);return k==="offline"||k==="offline3"?"#9a7a32":colorOf(r);}
 
 /* the seals: each app's own layers (as Lector shows them), else a flat seal, else the mark of a new app */
 function flatSrc(k){try{var s=window.ING_SEALS&&ING_SEALS[k];return s?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
 function sealEl(k,size){var root=h("span","f-ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
+  /* 6.40: the Offline Project's crest, live, its quarters moving as its apps' seals move (modules/r140.js), as tall as a seal here */
+  if((k==="offline"||k==="offline3")&&window.IngSeal&&typeof IngSeal.el==="function"){var set=k==="offline"?["cd","forge","ingenium","inkwell"]:["cd","forge","ingenium"],ar=1.3333,c=null;
+    try{ar=IngSeal.aspect(set)||ar;c=IngSeal.el(set,{live:true,quarters:true,size:Math.max(14,Math.round((size||56)/ar)),alt:""});}catch(e){c=null;}
+    if(c){root.className="f-ls crest";c.setAttribute("aria-hidden","true");root.appendChild(c);return root;}}
   var L=window.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=k?L[key]:null;
   if(!ls){if(k&&flatSrc(k)){root.className="f-ls flat";var im=new Image();im.src=flatSrc(k);im.alt="";root.appendChild(im);return root;}
     root.className="f-ls new";root.appendChild(h("span",null,"✦"));return root;}
@@ -548,15 +564,15 @@ function paintSteps(){var r=cur(),s=r?stepOf(r):"change",order=["change","keep",
 function paintRepos(){var box=$("fbRepos");box.innerHTML="";var rs=C.repos;$("fbAppsChip").textContent=rs.length?rs.length+" kept here":"None yet";
   if(!rs.length){box.appendChild(h("div","f-empty","<b>No app here yet</b>Bring one in: from your app library, a zip, a git bundle or a folder with its history. Or start a new one."));box.style.display="block";return;}
   box.style.display="";var id=FBS().sel;
-  rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",colorOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
+  rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",tintOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
     var s=stepOf(r),st='<i class="st'+(s==="keep"?" changed":s==="change"?" new":s==="test"||s==="ship"?" tested":"")+'" title="'+(s==="done"?"Shipped":s==="keep"?"Changes not kept yet":s==="test"?"Kept, not tested":s==="ship"?"Tested":"New")+'"></i>';
-    b.appendChild(sealEl(appOf(r),56));var v=verOf(r);
+    b.appendChild(sealEl(iconOf(r),56));var v=verOf(r);
     b.insertAdjacentHTML("beforeend",'<span class="nm">'+esc(r.name)+(v?" <em>"+esc(v)+"</em>":"")+'</span><span class="stl">'+st+"<span>"+esc(tileLine(r))+"</span></span>");
     b.onclick=function(){FBS().sel=r.id;saveSoon();S.view=statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";S.panel="work";if(one())setPanel("work");paint();syncFromCode(r);};box.appendChild(b);});}
 function views(){var r=cur(),n=r?statusOf(r).changes.length:0;[].forEach.call($("fbViews").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===S.view?"true":"false");});
   $("fbNChanges").textContent=n||"";$("fbNChanges").hidden=!n;}
 function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML="";f.innerHTML="";
-  var ws=$("fbWhSeal"),nw=sealEl(r?appOf(r):null,34);nw.id="fbWhSeal";ws.replaceWith(nw);
+  var ws=$("fbWhSeal"),nw=sealEl(r?iconOf(r):null,34);nw.id="fbWhSeal";ws.replaceWith(nw);
   $("fbWhName").textContent=r?r.name:"No app chosen";$("fbBranchName").textContent=r?(r.detached?"an older version":(r.branch||"main")):"";$("fbBranch").hidden=!r;$("fbRun").hidden=!r;
   var chip=$("fbWorkChip");if(!r){chip.className="f-chip";chip.textContent="";views();w.appendChild(h("div","f-empty","<b>Choose an app on the left</b>Or bring one in, and its work shows here."));return;}
   var s=stepOf(r),n=statusOf(r).changes.length;chip.className="f-chip"+(s==="keep"?" warn":s==="done"?" ok":"");
