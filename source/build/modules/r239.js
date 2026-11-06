@@ -108,7 +108,9 @@ function known(r){var k=repoKey(r);return Object.prototype.hasOwnProperty.call(D
 function forPage(html,id){var key="p:"+(id||"")+":"+String(html||"").length;if(CACHE[key])return CACHE[key];
   CACHE[key]=find({html:html}).then(function(ic){DONE[key]=ic||false;return ic;},function(){DONE[key]=false;return null;});return CACHE[key];}
 
-W.IngAppIcon={find:find,forRepo:forRepo,forPage:forPage,known:known,named:named,mainOf:mainOf};
+/* 6.42: the layers of a picture already in hand (a seal of an app's initials, modules/r240.js), drawn as a logo's are */
+function layersFrom(src){return load(src).then(function(im){return im?layersOf(im,src):null;});}
+W.IngAppIcon={find:find,forRepo:forRepo,forPage:forPage,known:known,named:named,mainOf:mainOf,layersFrom:layersFrom};
 })();
 ;try{window.__ingParts["p239"]="running";}catch(_){}
 </script>

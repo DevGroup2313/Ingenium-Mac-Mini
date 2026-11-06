@@ -423,7 +423,7 @@ function libOk(){return typeof W.libState==="function"&&(typeof W.libOn!=="funct
 function strip(v){var x=Object.assign({},v);delete x.earlier;delete x.older;return x;}
 function chainOf(rec){if(!rec||!rec.ref)return [];var out=[rec];if(rec.earlier&&rec.earlier.ref)out.push(rec.earlier);if(Array.isArray(rec.older))rec.older.forEach(function(v){if(v&&v.ref)out.push(v);});return out;}
 function setChain(rec,list){list=list.map(strip);if(list.length)rec.earlier=list[0];else delete rec.earlier;if(list.length>1)rec.older=list.slice(1);else delete rec.older;}
-function appName(k){try{if(W.LIB_NAMES&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}return k;}
+function appName(k){try{if(typeof W.libName==="function")return W.libName(k);if(W.LIB_NAMES&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}return k;}  /* 6.42: any app, by its own name */
 function libApps(){if(!libOk())return [];var A={};try{A=W.libState().apps||{};}catch(e){}
   return Object.keys(A).filter(function(k){return A[k]&&A[k].ref;}).map(function(k){return {key:k,name:appName(k),rec:A[k],chain:chainOf(A[k])};});}
 function verLabel(app,v){return app.name+(v.version?" "+v.version:"")+(v.version?"":" (kept "+day(v.at)+")");}

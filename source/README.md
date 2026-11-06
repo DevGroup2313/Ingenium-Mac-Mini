@@ -371,6 +371,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.42 (6 November 2026): any app, not only her four, in Lector and the app library. Her words (6 November 2026): "I need for
+Lector and every other page inside of Ingenium to be able to take other apps. It should not be limited to only the 4 apps inside of
+Ingenium. Lector should be able to read and analyse and process any app inside of Ingenium." And: "I want the app library to recognise
+other apps and not only be limited to just my 4 apps, it should also recognise the Offline Project and any other apps that I made inside
+of Ingenium or elsewhere."
+
+- modules/r240.js (new): the app library keeps any app's page, not only one it recognises as Carpe Diem, The Forge, Ingenium or Inkwell
+  (the base page's libDetect). Its name is the page's title (or its application name, its first heading, the file's name), without a
+  version written after it; its key is "app-" and that name in plain letters, and a page of the same name again is a newer copy of it,
+  the copy before it kept one step back, as for her apps. Its version comes from a version meta, an APP_VERSION or VERSION in its code,
+  or a number in its title; its colour from its theme-color. A zip with none of her apps in it gives its main page (index.html, or the
+  largest page). libKeys() lists her four first, then the others by name, and libApps() follows it, so the chat's + menu, Fabrica's
+  library and Storage list them; libName(k) names any of them (modules r142 and r187 take it).
+- Each other app has a seal: its own logo when its page names one (found as 6.41 finds it, modules/r239.js), or else a seal of its
+  initials in its colour. It is kept in ING_SEALS beside her apps' seals, so Lector's paper and a Word file's cover carry it.
+- The Offline Project, in the master edition: its one-file app and its site's hall are known by their title, The Offline Project; the
+  variation without Inkwell by its build's "without": ["inkwell"]. They are kept as "offline" and "offline3", listed after her four
+  (in Lector both are always shown, as her four are, "Not added yet" until a copy is kept), and wear their live crests in Lector (r140:
+  the master seal with its quarters moving, and the shield of three).
+- modules/r108.js (Lector): its apps are her four, then the Offline Project's two, then every other app kept, by name. Another app's
+  paper is drawn in its own colour. What stays with her four: the Offline Project's names for a set (all four, a trio, a duo), the
+  crests, the master seal and Choose all four; a set with another app in it is named by its apps ("2 apps together", and so on), each
+  app's own seal on its cover.
+- modules/r112.js (Fabrica): the library sheet names any app by its own name; one brought in becomes a repository under that name, its
+  page under its own file name.
+- The full edition takes any app the person adds. It lists Ingenium alone by key, so a page of one of her apps added there is now kept as
+  any other app, under its own name; before, it was kept under its key and listed nowhere. The public editions have no library and are
+  unchanged.
+- What's new names this twice: for the master and full editions without naming her apps, and for the master alone with the Offline
+  Project.
+
+    node rig/t_642_anyapp.js <master url> <out> [<full url>]   # 20 checks with invented apps (one with a logo, a version and a colour,
+                                                              # one with none) and the Offline Project's page in both variations: names,
+                                                              # versions, colours, keys and their order; Lector's tiles, seals and crests;
+                                                              # the names of a set; a full reading and its documents on the app's own paper
+                                                              # with its logo on the cover; the + menu, the library, Storage; the full
+                                                              # edition; no page errors
+
 Ingenium 6.41 (6 November 2026): every app's own logo, in 3D, in Fabrica. Her words (6 November 2026): "I want Fabrica to automatically
 load the apps' icons and logos with the same animated popped out 3D look and effects. I want that for any app that is made inside of
 Ingenium and its pages, especially Fabrica and Lector. When the app clearly has a logo icon, it should replace Ingenium's placeholder

@@ -398,7 +398,8 @@ def _full_apps():
     "it will not have any of the apps from the Offline Project built in and it will not have their skills and information")."""
     return [
         ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=["ingenium"],', "the app library: Ingenium alone", 1),
-        ('var ORDER=["cd","forge","ingenium","inkwell"];\nvar KINDS=[["dossier","Project dossier",', 'var ORDER=["ingenium"];\nvar KINDS=[["dossier","Project dossier",', "Lector's apps: Ingenium alone (r108; r140's seals keep all four)", 1),
+        # 6.42: any other app the person adds follows Ingenium in Lector (r108's syncApps, modules/r240.js)
+        ('var ORDER=["cd","forge","ingenium","inkwell"];\n/* 6.42: any app, not only her four.', 'var ORDER=["ingenium"];\n/* 6.42: any app, not only her four.', "Lector's apps: Ingenium alone (r108; r140's seals keep all four)", 1),
     ]
 
 

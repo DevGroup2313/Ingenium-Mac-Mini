@@ -57,6 +57,29 @@ if(typeof lxRender!=="function"||!document.getElementById("page-lector"))return;
 var APPS={cd:{name:"Carpe Diem",abbr:"CD",color:"#1B6B93",fill:"#EAF2F7",sub:"#454549"},forge:{name:"The Forge",abbr:"Forge",color:"#17577A",fill:"#F6F0E2",sub:"#8A6A22"},
   ingenium:{name:"Ingenium",abbr:"Ingenium",color:"#6A3FB5",fill:"#F1ECFA",sub:"#4B3A6E"},inkwell:{name:"Inkwell",abbr:"Inkwell",color:"#1F4F68",fill:"#F4EFE3",sub:"#8A6526"}};
 var ORDER=["cd","forge","ingenium","inkwell"];
+/* 6.42: any app, not only her four. Her words (6 November 2026): "I need for Lector and every other page inside of Ingenium to be able to
+   take other apps ... Lector should be able to read and analyse and process any app inside of Ingenium." modules/r240.js keeps any app's
+   page in the library; here ORDER is her four (in the edition's own order), then every other app kept, by name, and APPS, the papers (PT)
+   and the colours of several apps' sections (OWN) gain each other app in its own colour. The Offline Project's names (all four, a trio, a
+   duo), its crests and the master seal stay hers alone (four, ofFour); a set with another app in it is "two apps together", and so on. */
+var BASE=ORDER.slice(),FOUR=["cd","forge","ingenium","inkwell"];
+function four(a){a=a||[];return a.length===4&&FOUR.every(function(k){return a.indexOf(k)>=0;});}
+function ofFour(a){return (a||[]).every(function(k){return FOUR.indexOf(k)>=0;});}
+function tint(hex,f){try{return window.libShade?libShade(hex,f):hex;}catch(e){return hex;}}
+function hexa(hex,a){var n=parseInt(String(hex).slice(1),16);if(isNaN(n))return hex;return "rgba("+(n>>16&255)+","+(n>>8&255)+","+(n&255)+","+a+")";}
+function themeFor(c){var d=tint(c,-.3),dd=tint(c,-.5),l=tint(c,.9),ll=tint(c,.95),n1=tint(c,.45),n2=tint(c,.62);
+  return {body:TIMES,disp:IOWAN,caps:SANS,h2:TIMES,fs:15,h1:26,h1w:600,h1ls:".03em",capsw:700,capsls:".2em",capsfs:10.5,h2w:700,h2ls:"0",h2fs:16,
+    day:{desk:"#f1eff4",bg:"#ffffff",tex:"none",ink:"#1e1a24",ink2:"#4a4552",acc:c,title:d,sub:d,gold:"#b88a3a",caps:c,tint:l,hair:"rgba(30,24,40,.12)",line:hexa(c,.28),rule:d,code:ll,fill:"#8a6526",chk:"#b0302f",frame:"transparent",qbg:ll,qink:dd},
+    night:{desk:"#111015",bg:"#1d1b22",tex:"none",ink:"#ece9f1",ink2:"#bdb6c8",acc:n1,title:n2,sub:n1,gold:"#d8b46a",caps:n1,tint:hexa(n1,.10),hair:"rgba(255,255,255,.12)",line:hexa(n1,.3),rule:hexa(n1,.5),code:"rgba(255,255,255,.05)",fill:"#e0be78",chk:"#f08f8f",frame:"transparent",qbg:hexa(n1,.08),qink:tint(c,.78)}};}
+function syncApps(){var others=[];try{others=typeof window.libOtherKeys==="function"?libOtherKeys():[];}catch(e){others=[];}
+  /* the Offline Project, in its two variations, after her four (the master edition: modules/r240.js lists them) */
+  var extra=["offline","offline3"].filter(function(k){try{return typeof LIB_KEYS!=="undefined"&&LIB_KEYS.indexOf(k)>=0;}catch(e){return false;}});
+  extra.forEach(function(k){if(!APPS[k]){APPS[k]={name:(window.libName?libName(k):k),abbr:"The Offline Project",color:"#8f6b2b",fill:"#f4eedf",sub:"#7a5f2e",offline:true};PT[k]=PT.family;OWN.day[k]="#8f6b2b";OWN.night[k]="#d8b46a";
+    var st0=document.getElementById("l7PaperCss");if(st0)st0.remove();}});
+  ORDER.length=0;BASE.concat(extra,others).forEach(function(k){ORDER.push(k);});var fresh=false;
+  others.forEach(function(k){var c=window.libAppColor?libAppColor(k):"#4a4a8a",n=window.libName?libName(k):k,a=APPS[k];
+    if(!a||a.color!==c||a.name!==n){APPS[k]={name:n,abbr:n,color:c,fill:tint(c,.9),sub:tint(c,-.25),other:true};PT[k]=themeFor(c);OWN.day[k]=c;OWN.night[k]=tint(c,.45);fresh=true;}});
+  if(fresh){var st=document.getElementById("l7PaperCss");if(st)st.remove();}}
 var KINDS=[["dossier","Project dossier","The full account, section by section"],["appendix","Appendix","Measured tables and the evidence"],
   ["portfolio","Portfolio piece","Two pages for your catalogue"],["cover","Cover letter","Fitted to the posting"],["cv","CV entry","Your projects, for your CV"],
   ["functions","Every function","Each app's screens, keys and functions, measured from its own code"]];
@@ -64,10 +87,10 @@ var HOUSE={dossier:"dossier",appendix:"appendix",portfolio:"summary",cover:"cove
 function nm(k){return APPS[k]?APPS[k].name:k;}
 function sorted(a){return ORDER.filter(function(k){return (a||[]).indexOf(k)>=0;});}
 function listNames(ks){var n=ks.map(nm);if(n.length<2)return n[0]||"";if(n.length===2)return n[0]+" and "+n[1];return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
-function setName(a){a=sorted(a);return a.length===4?"The Offline Project":listNames(a);}
+function setName(a){a=sorted(a);return four(a)?"The Offline Project":listNames(a);}
 /* 6.1: the owner's words (20 October 2026): "two apps together is a duo, any trios should be presented as a variation of the offline project" */
-function setKind(a){var n=sorted(a).length;return n===4?"all four":n===3?"a trio of The Offline Project":n===2?"a duo":n===1?"on its own":"";}
-function docLabel(kind,a,purpose){var all=sorted(a).length===4;
+function setKind(a){var n=sorted(a).length;if(!ofFour(a))return n===1?"on its own":n?n+" apps together":"";return n===4?"all four":n===3?"a trio of The Offline Project":n===2?"a duo":n===1?"on its own":"";}
+function docLabel(kind,a,purpose){var all=four(sorted(a));
   return {dossier:all?"Master project dossier":"Project dossier",appendix:all?"Master appendix":"Appendix",portfolio:"Portfolio piece",
     cover:purpose==="programme"?"Cover letter for the programme":"Cover letter",cv:"CV entry",analysis:"Notes and analysis",functions:all?"Every function, all four apps":"Every function"}[kind]||kind;}
 function sealed(kind){return kind==="dossier"||kind==="appendix"||kind==="portfolio"||kind==="functions";}
@@ -118,7 +141,7 @@ function roman(n){var v=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[9
 var LATIN=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVGVSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
 /* the date as Carpe Diem and The Forge write it on their doors: XVII·OCTOBRIS·MMXXVI */
 function romanDate(d){d=d||new Date();return roman(d.getDate())+"\u00b7"+LATIN[d.getMonth()]+"\u00b7"+roman(d.getFullYear());}
-function themeOf(kind,apps){if(kind==="cover"||kind==="cv")return "neutral";apps=apps||[];if(apps.length>1)return "family";return PT[apps[0]]?apps[0]:"neutral";}
+function themeOf(kind,apps){if(kind==="cover"||kind==="cv")return "neutral";apps=apps||[];if(apps.length>1)return ofFour(apps)?"family":"neutral";return PT[apps[0]]?apps[0]:"neutral";}
 /* the paper's rules, for the page (night follows Ingenium's own switch) or for a saved web page (night follows the reader's device; printed, always day) */
 function paperCss(forPage,dayOnly){var S=forPage?"#lx7 ":"",out=[];
   function vars(v){return "--p-frame:"+v.frame+";--p-qbg:"+v.qbg+";--p-qink:"+v.qink+";--p-desk:"+v.desk+";--p-bg:"+v.bg+";--p-tex:"+v.tex+";--p-ink:"+v.ink+";--p-ink2:"+v.ink2+";--p-acc:"+v.acc+";--p-title:"+v.title+";--p-sub:"+v.sub+";--p-gold:"+v.gold+";--p-caps:"+v.caps+";--p-tint:"+v.tint+";--p-hair:"+v.hair+";--p-line:"+v.line+";--p-rule:"+v.rule+";--p-code:"+v.code+";--p-fill:"+v.fill+";--p-chk:"+v.chk;}
@@ -293,13 +316,15 @@ function partsOf(k,depth,m){var p=R7.prep[k];if(!p||!p.P)return null;try{return 
 R7.prep={};
 /* her apps measured once each, in the background, so the brief can say how many parts a reading takes */
 var prepQ=Promise.resolve();
-function prepare(k){var meta=kept(k);if(!meta)return;var p=R7.prep[k];if(p&&p.sha===meta.sha256)return;R7.prep[k]={sha:meta.sha256,P:null};
+function prepare(k){var meta=kept(k);if(!meta)return;try{if(/^app-/.test(k)&&window.libSealFor)libSealFor(k);}catch(e){}var p=R7.prep[k];if(p&&p.sha===meta.sha256)return;R7.prep[k]={sha:meta.sha256,P:null};
   prepQ=prepQ.then(function(){if(LX.busy||R7.running)return;return libText(k).then(function(text){if(!text)return;
       return lxPrepare(meta.name||(nm(k)+".html"),text,function(){}).then(function(P){R7.prep[k]={sha:meta.sha256,P:P};paintModel();});});}).catch(function(){});}
 
 /* ---------------- the seals on the page: each app's own layers, swaying (never on the paper) ---------------- */
 function night(){return document.body.getAttribute("data-theme")==="night";}
-function flatSrc(k){var s=ING_SEALS&&ING_SEALS[k];return s?"data:image/png;base64,"+s.b64:"";}
+function flatSrc(k){var s=ING_SEALS&&ING_SEALS[k];if(!s&&k==="offline"&&ING_SEALS&&ING_SEALS.master)s=ING_SEALS.master;
+  if(!s&&k==="offline3"&&window.IngSeal){try{return IngSeal.url(["cd","forge","ingenium"],{night:false});}catch(e){}}
+  if(!s&&/^app-/.test(k)&&window.libLetterSeal)return libLetterSeal(k);return s?"data:image/png;base64,"+s.b64:"";}
 function masterSrc(n){if(n&&LX7_MASTER&&LX7_MASTER.night)return LX7_MASTER.night;return flatSrc("master");}
 /* 6.1 · a set of two, three or four of her apps wears one crest (window.IngSeal, module r140) in place of its seals one by
    one. The owner's words (20 October 2026): "I want the Offline Project's seal without Inkwell to be added into the Lector
@@ -314,6 +339,17 @@ function setCrest(apps,ck){var key=sorted(apps).join("+"),c=R7.crest;
   return c.el;}
 function crestWords(ck){return {master:"The master seal",trio:"The Offline Project’s seal for these three",duo:"The duo’s seal"}[ck]||"";}
 function sealEl(k){var L=LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key];
+  /* 6.42: the Offline Project wears its crest, live, its quarters moving (modules/r140.js): the master seal, or the shield of three */
+  if(!ls&&(k==="offline"||k==="offline3")&&window.IngSeal){try{var set=k==="offline"?FOUR.slice():["cd","forge","ingenium"],ar=IngSeal.aspect(set)||1.3333;
+    var ce=IngSeal.el(set,{live:true,quarters:true,size:Math.round(56/ar),alt:""});if(ce){ce.classList.add("l-opcrest");ce.setAttribute("aria-hidden","true");return ce;}}catch(e){}}
+  /* 6.42: another app wears its own logo, or a seal of its initials, in the same layers and sway (modules/r240.js, r239.js) */
+  if(!ls&&/^app-/.test(k)){var r0=document.createElement("span");r0.className="ls";r0.setAttribute("aria-hidden","true");var t0=document.createElement("span");t0.className="ls-tilt";
+    var i0=document.createElement("span");i0.className="ls-idle";var hh=0;for(var q=0;q<k.length;q++)hh=(hh*31+k.charCodeAt(q))>>>0;i0.style.animationDelay=(-(hh%70)/10)+"s";
+    var c0=document.createElement("i");c0.className="ls-cast";i0.appendChild(c0);var f0=new Image();f0.src=flatSrc(k);f0.alt="";f0.className="ls-l";f0.style.setProperty("--z","0");i0.appendChild(f0);
+    t0.appendChild(i0);r0.appendChild(t0);
+    try{if(window.libSealFor)libSealFor(k).then(function(sd){if(!sd||!sd.layers)return;[].slice.call(i0.querySelectorAll("img.ls-l")).forEach(function(x){x.remove();});
+      sd.layers.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));i0.appendChild(im);});});}catch(e){}
+    return r0;}
   if(!ls){var im=new Image();im.src=flatSrc(k);im.alt="";im.width=56;im.height=56;return im;}
   var root=document.createElement("span");root.className="ls";root.setAttribute("aria-hidden","true");
   var tilt=document.createElement("span");tilt.className="ls-tilt";var idle=document.createElement("span");idle.className="ls-idle";
@@ -365,7 +401,7 @@ function wireMid(){var m=$("l7Mid");if(!m||m.__w)return;m.__w=1;
   midTab(R7.mid||"rd");}
 
 /* ---------------- painting ---------------- */
-function render(){var root=build();if(!root)return;L7();paintBrief();paintSteps();paintMain();paintProgress();paintTabs();paintDoc();if(!R7.built){R7.built=true;paintStream();showSomething();}
+function render(){var root=build();if(!root)return;syncApps();L7();paintBrief();paintSteps();paintMain();paintProgress();paintTabs();paintDoc();if(!R7.built){R7.built=true;paintStream();showSomething();}
   /* 6.1: the crests of the sets kept here are drawn ahead, when the page is quiet, so a Word file made from any of them
      (here, or in a backup) carries its crest */
   if(!R7.crestsAhead&&window.IngSeal){R7.crestsAhead=true;try{var SS=L7().sets;Object.keys(SS).forEach(function(k){var x=SS[k];if(x&&x.apps&&crestKind(x.apps))IngSeal.prepare(sorted(x.apps));});}catch(e){}}
@@ -397,7 +433,7 @@ function howCard(busy){var B=L7().brief,o=modelPlan(),c=o.chosen,s=sec("How Lect
   return s;}
 /* the brief */
 function sec(title){var s=h("div","l-sec");s.appendChild(h("h3",null,esc(title)));return s;}
-function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy=R7.running||LX.busy;
+function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S.brief,busy=R7.running||LX.busy;
   var keepOpen={};[].forEach.call(box.querySelectorAll("details[open]"),function(d){keepOpen[d.getAttribute("data-k")]=1;});
   var scroll=box.parentNode.scrollTop;box.innerHTML="";
   if(!B.apps.length){var first=ORDER.filter(kept)[0];if(first){B.apps=[first];saveSoon();}}
@@ -416,10 +452,10 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
   s1.appendChild(grid);
   var sn=h("div","l-setname"),ck=crestKind(B.apps);
   if(ck){try{sn.appendChild(setCrest(B.apps,ck));sn.classList.add("has-crest");}catch(e){}}
-  else if(B.apps.length===4&&ING_SEALS.master){var mi=new Image();mi.src=masterSrc(night());mi.alt="";sn.appendChild(mi);}
+  else if(four(B.apps)&&ING_SEALS.master){var mi=new Image();mi.src=masterSrc(night());mi.alt="";sn.appendChild(mi);}
   var sk=setKind(B.apps);sn.appendChild(h("b",null,esc(setName(B.apps)||"Choose at least one app")));
   if(B.apps.length)sn.appendChild(h("span",null,sn.classList.contains("has-crest")?esc(sk.charAt(0).toUpperCase()+sk.slice(1)):"· "+esc(sk)));
-  if(B.apps.length<4&&ORDER.filter(kept).length===4&&!busy)sn.appendChild(btn("quiet","Choose all four",function(){B.apps=ORDER.slice();saveSoon();ORDER.forEach(prepare);paintBrief();paintModel();paintTabs();paintDoc();}));
+  if(!four(B.apps)&&FOUR.filter(kept).length===4&&!busy)sn.appendChild(btn("quiet","Choose all four",function(){B.apps=FOUR.slice();saveSoon();FOUR.forEach(prepare);paintBrief();paintModel();paintTabs();paintDoc();}));
   s1.appendChild(sn);
   var row=h("div","l-keys");row.appendChild(btn("sm"+(ORDER.filter(kept).length?"":" pri"),"＋ Add your apps",function(){try{libPickFiles();}catch(e){}}));
   if(!kept("ingenium")&&location.protocol!=="file:")row.appendChild(btn("quiet","Keep this copy of Ingenium",function(){try{libKeepSelf();}catch(e){}}));
@@ -447,7 +483,7 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;var S=L7(),B=S.brief,busy
     c.onchange=function(){B.docs[d[0]]=c.checked;saveSoon();paintTabs();paintDoc();paintModel();};row.appendChild(c);
     var t=h("span","t");t.textContent=docLabel(d[0],B.apps,B.purpose);t.appendChild(h("small",null,esc(d[0]==="cover"&&B.purpose==="portfolio"?"A letter of introduction, for any reader":d[2])));row.appendChild(t);
     row.appendChild(sealMark(d[0],B.apps));dl.appendChild(row);});
-  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"||!ck&&B.apps.length===4?"The master seal goes on the master dossier, the master appendix, the portfolio piece and Every function.":ck?crestWords(ck)+" goes on the dossier, the appendix, the portfolio piece and Every function.":"Seals go on dossiers, appendices, portfolio pieces and Every function.")+" Your CV and cover letters stay plain."));
+  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"||!ck&&four(B.apps)?"The master seal goes on the master dossier, the master appendix, the portfolio piece and Every function.":ck?crestWords(ck)+" goes on the dossier, the appendix, the portfolio piece and Every function.":"Seals go on dossiers, appendices, portfolio pieces and Every function.")+" Your CV and cover letters stay plain."));
   box.appendChild(s3);
   /* facts and voice */
   box.appendChild(meCard());
@@ -477,7 +513,7 @@ function sealMark(kind,apps){var m=h("span","l-mark");if(!sealed(kind)){m.classN
      2026): "The seals on the "Documents" section of the Lector page still have the Light mode look on Dark mode, please fix that." */
   var a=sorted(apps);
   if(a.length&&window.IngSeal){try{var ck=IngSeal.kind(a),im=IngSeal.el(a,{live:false,alt:""});if(im){im.classList.add("l-mk");im.title=crestWords(ck)||(nm(a[0])+"’s seal");m.classList.add("k-"+ck);m.appendChild(im);return m;}}catch(e){}}
-  if(sorted(apps).length===4&&ING_SEALS.master){var i=new Image();i.src=flatSrc("master");i.className="ms";i.alt="";i.title="The master seal";m.appendChild(i);return m;}
+  if(four(sorted(apps))&&ING_SEALS.master){var i=new Image();i.src=flatSrc("master");i.className="ms";i.alt="";i.title="The master seal";m.appendChild(i);return m;}
   sorted(apps).forEach(function(k){var i=new Image();i.src=flatSrc(k);i.alt="";i.title=nm(k)+"'s seal";m.appendChild(i);});return m;}
 
 /* the posting or the programme */
@@ -721,7 +757,7 @@ function paper(kind,md,o){md=unmark(md);var personal=kind==="cover"||kind==="cv"
   if(!personal&&kind!=="analysis"){var ck=crestKind(a),sh="";
     /* 6.1: two, three or four apps: their crest; one app: its own seal, as before */
     if(ck){try{sh=crestPaper(a,ck,mode,o);}catch(e){sh="";}}
-    if(!sh){var ks=a.length===4&&ING_SEALS.master?["master"]:a;sh=ks.map(seal).join("");}
+    if(!sh){var ks=four(a)&&ING_SEALS.master?["master"]:a;sh=ks.map(seal).join("");}
     var T=PT[th]||{};
     out.push('<div class="cv">'+(sh?'<div class="seals">'+sh+'</div>':'')+'<h1>'+esc(o.name||"")+'</h1>'+
       '<div class="caps"><i></i><span>'+esc(T.roman?romanDate(o.made?new Date(o.made):null):(o.label||""))+'</span><i></i></div>'+(T.roman&&o.label?'<div class="tag">'+esc(o.label)+'</div>':'')+
@@ -880,7 +916,7 @@ function context(G,scale,o){var R=room()*scale,parts=[];var many=G.runs.length>1
   if(o.sources&&G.sources&&G.sources.length)parts.push("HER SOURCES (kept in Fontes; cite one by its number in square brackets, like [2], only where it supports the sentence; use no source that is not on this list and invent none; a source marked [journal article] comes from a journal, but whether it was peer-reviewed was not checked, so do not call any source peer-reviewed unless her note says so):\n"+
     cut(G.sources.map(function(s){return "["+s.n+"] "+s.text+(s.peer?" [journal article]":"")+(s.note?"\n    Her note: "+s.note:"")+(s.abstract?"\n    Abstract: "+s.abstract:"");}).join("\n"),Math.floor(R*(o.srcShare||0.14))));
   return parts.join("\n\n");}
-function about(G){var n=G.runs.length;return n===4?"the four apps of The Offline Project ("+listNames(G.apps)+"), as one body of work":n>1?listNames(G.apps)+", together, as one body of work":G.runs[0].name;}
+function about(G){var n=G.runs.length;return four(G.apps)?"the four apps of The Offline Project ("+listNames(G.apps)+"), as one body of work":n>1?listNames(G.apps)+", together, as one body of work":G.runs[0].name;}
 function forLine(G){if(!G.post)return G.purpose==="programme"?" for a doctoral or academic application":G.purpose==="job"?" for a job application":" for my professional portfolio";
   return " for "+(G.purpose==="programme"?"an application to ":"an application for ")+[G.post.title,G.post.org].filter(Boolean).join(" · ");}
 function sectionMsgs(G,kind,s,scale){var many=G.runs.length>1,t=s[0];if(many&&t==="What it does")t="What the apps do";
@@ -1009,7 +1045,7 @@ function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{ap
   var sf=kind==="functions"?{md:md,line:""}:styleFix(md);md=sf.md;R7.docMd[kind]=md;
   var chk=kind==="functions"?{figures:0,unmatched:[],fills:0}:check(md,G),ref=IngBig.newId();
   addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?((chk.unmatched.length||(chk.fromNotes||[]).length)?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures "+(chk.unmatched.length===1?"matches no figure in the measures, your CV or the posting, and is marked":"match no figure in the measures, your CV or the posting, and are marked")+" for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+". ":"")+((chk.fromNotes||[]).length?chk.fromNotes.length+(chk.fromNotes.length===1?" appears only in Lector's own reading notes, and is marked":" appear only in Lector's own reading notes, and are marked")+" for you to check too: "+chk.fromNotes.slice(0,6).join(", ")+(chk.fromNotes.length>6?"…":"")+". ":""):"Every figure ("+chk.figures+") matches a figure in the measures, your CV or the posting. ")+"Numbers up to twelve, numbers written in words and the rows of tables are not checked.":"No figures to check.")+
-    (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":G.runs.length===4?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
+    (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":four(G.apps)?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
   return IngBig.put(ref,md).then(function(){var old=S.docs[kind];if(old){S.older[kind]=[old].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}}
     S.docs[kind]={ref:ref,made:Date.now(),model:lxModelName({modelId:j.modelId}),title:setName(j.apps)+" · "+docLabel(kind,j.apps,j.purpose),chk:chk};saveState();});}
 
@@ -1018,7 +1054,7 @@ function curDoc(){var kind=R7.doc||"analysis";if(kind==="analysis")return analys
   var s=stored(kind);if(!s)return Promise.resolve(null);return IngBig.load(s.ref).then(function(md){return md?{kind:kind,md:unmark(md),chk:s.chk}:null;});}
 /* 6.9.1: the document as a Word file, the same bytes Save gives, for Tabula to open (modules/r194.js, IngOpenIn) */
 function wordFile(d){var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title);
-  var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
+  var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:four(apps)&&sealed(d.kind)};
   if(d.kind==="cover"||d.kind==="cv")meta.name=undefined;
   if(window.IngDoc&&IngDoc.make){return (IngDoc.ready?IngDoc.ready():Promise.resolve()).then(function(){return crestFor(sealed(d.kind)?crestKind(apps):"",apps,"html");}).then(function(cr){var s0=d.kind==="analysis"?null:stored(d.kind);
       return IngDoc.make("docx",paperPage(d.kind,d.md,{apps:apps,name:name,label:label,forText:meta.forText,title:title,crestPng:cr&&cr.html,made:s0&&s0.made}),paperOpts(d.kind,apps,title));})
@@ -1034,7 +1070,7 @@ function openInTabula(){if(!window.IngOpenIn){ingToast("Tabula cannot be reached
           var d={kind:kind,md:unmark(md)};return wordFile(d).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}},o);});});}});});});}catch(e){}return out;}});})();
 function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to save yet: this document is written after the reading.");return;}
   var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps),label=docLabel(d.kind,apps,curPurpose()),title=name+" · "+label,file=lxFileName(title),fmt=L7().brief.fmt||"docx";
-  var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:apps.length===4&&sealed(d.kind)};
+  var meta={kind:HOUSE[d.kind]||"dossier",apps:apps,subtitle:label,name:sealed(d.kind)||d.kind==="analysis"?name:undefined,forText:d.kind==="analysis"?"":forText(curPurpose()),master:four(apps)&&sealed(d.kind)};
   if(d.kind==="cover"||d.kind==="cv")meta.name=undefined;
   /* 6.8.1: a PDF and a Word file are read off the paper itself (r183), as the page shows it: its faces, sizes, colours, spacing,
      seals and crest, at its own measure, its pages breaking where the paper's marks show */
@@ -1051,7 +1087,7 @@ function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to s
   else if(fmt==="md"){lxSaveMd(title,d.md);}
   else if(fmt==="html"){saveFileNative(file+".html","text/html",htmlDoc(d.kind,d.md,{apps:apps,name:name,label:label,forText:meta.forText,title:title,crestPng:cr&&cr.html}));}
   else if(fmt==="pdf"){if(window.LxPdf&&typeof LxPdf.make==="function"){LxPdf.make(title,d.md,{kind:meta.kind,apps:apps,name:sealed(d.kind)?name:(d.kind==="analysis"?name:""),subtitle:label,forText:meta.forText,author:author(),month:month(),
-      seals:sealed(d.kind)?(cr&&cr.doc?[{key:"master",src:cr.doc.src}]:apps.length===4&&ING_SEALS.master?[{key:"master",src:flatSrc("master")}]:apps.map(function(k){return {key:k,src:flatSrc(k)};})):[]}).then(function(u8){saveFileNative(file+".pdf","application/pdf",u8);},function(e){ingToast("The PDF could not be made: "+(e&&e.message||e));});}
+      seals:sealed(d.kind)?(cr&&cr.doc?[{key:"master",src:cr.doc.src}]:four(apps)&&ING_SEALS.master?[{key:"master",src:flatSrc("master")}]:apps.map(function(k){return {key:k,src:flatSrc(k)};})):[]}).then(function(u8){saveFileNative(file+".pdf","application/pdf",u8);},function(e){ingToast("The PDF could not be made: "+(e&&e.message||e));});}
     else ingToast("PDF is not available in this copy of Ingenium. Save it as Word, and open it in Pages or Word to keep a PDF.");}});});}
 /* the crest for a file: for Word and PDF the day picture at a printer's size (the PDF sets it as tall as the master seal);
    for a web page a picture by day and one by night. If it cannot be drawn here, the file carries each app's own seal, and says so */
