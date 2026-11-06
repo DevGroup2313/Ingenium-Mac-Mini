@@ -371,6 +371,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.34 (6 November 2026): documents in a chat reach a model on this device, and are read as documents. Her words (4 November
+2026): "The documents uploaded inside of the chats of Ingenium are not clickable or offer a preview when you hover over it, the HTML
+single file is clickable but not the documents, please fix that." The handoff asked for it to be verified on the device.
+modules/r216.js (6.11.1) had made each document a key that opens, with its first lines on hover; rig/t_6111_popups.js checks that on a
+message written into the desk. rig/t_634_docs.js takes the whole road instead: real files made by the test (Word documents, a PDF,
+plain text, Markdown, a long transcript), chosen in the chat's own file picker, read by the page, and sent to a model stood in at the
+engine's adapter, under every part that wraps the engine, so the working loop (modules/r190.js) runs as it does for her. The keys and
+previews work; it found two faults, both older than 6.34, in what the model is given:
+
+- for a model on this device, every file of 1,500 characters or more was replaced by a line asking the model to read it with its
+  tools, whatever room its memory had; and the files the tools read left out Word documents (kind "doc"), so a model on this device
+  never saw a Word document longer than about a page. Any other file of that length it saw only if it chose to use its tools, which
+  small models often do not.
+- a conversation whose files were all documents was framed as work on code ("the way a careful senior engineer pairs with its
+  author", "for a page, run_app").
+
+Now (modules/r190.js): a Word document is among the files the tools read, read-only (a change to it is refused plainly, with the way to
+give one: the changed passage, or a new document Ingenium makes a Word file of; the refusal comes before any review card). The page's
+own fitting is kept (each message's files in 40 per cent of the memory: a short file whole, a long one as its opening and passages from
+across it), and files are left to the tools only when the whole request, with the loop's own words, would take more than four fifths
+of the room, the largest first, never one under 1,500 characters (fitFiles). A conversation whose files are all documents (Word, PDF,
+text, Markdown, a table) is told to read them as a careful reader does: answer from what it read, name the document and its lines, quote
+exactly, and say plainly when something is not there (readerNote). A conversation with code keeps the engineer's note. What is new
+gains 6.34.
+
+    node rig/t_634_docs.js <url> <out>   # 17 checks: four documents read and staged; sent whole when they fit (a long Word document
+                                         # to its last paragraph) under the reader's note; a long transcript as the page's overview with
+                                         # room enough, and left to the tools at 8K, the model reading it through them; a Word document
+                                         # read with the tools and never changed; code keeps the engineer's note; each document a key
+                                         # (hover, focus, Enter, press, after a reload, a tap on a phone); no page errors
+
 Ingenium 6.33 (6 November 2026): Settings without the long scroll; Reset everything leaves nothing of the earlier desk. Her words (5 November
 2026): "The "Your data" tab page of the Settings page needs to be redesigned and reorganised because its still a lot of scrolling on all
 of its tabs." Measured on 6.28 (the same on 6.32) at 1440 by 900: Your data 2,792 pixels (3,281 with Backup's Moving open), Models and

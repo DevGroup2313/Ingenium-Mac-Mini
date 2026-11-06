@@ -177,7 +177,7 @@ function wsFor(bot){var c=curChat();
   /* 6.14: no files, but a connector switched on for this conversation (modules/r220.js): the loop runs with the connectors' tools only */
   if(!names.length){var cx=false;try{cx=!!(window.IngConnectors&&IngConnectors.activeFor(c));}catch(e){}return Promise.resolve(cx?{code:false,chatId:c.id,files:[],where:"chat",connectorsOnly:true}:null);}
   return Promise.all(names.map(function(n){return Promise.resolve(edSource(n,bot)).then(function(s){
-      return s&&typeof s.text==="string"&&s.kind!=="doc"?{name:s.name,text:s.text,orig:s.text,kind:s.kind,edits:[]}:null;},function(){return null;});}))
+      return s&&typeof s.text==="string"?{name:s.name,text:s.text,orig:s.text,kind:s.kind,ro:s.kind==="doc",edits:[]}:null;},function(){return null;});}))
     .then(function(L){L=L.filter(Boolean);return L.length?{code:false,chatId:c.id,files:L,where:"chat"}:null;});}
 function wsFile(ws,name){var b=edBase(name);return ws.files.filter(function(f){return edBase(f.name)===b;})[0]||(ws.files.length===1&&!name?ws.files[0]:null);}
 function idx(f){if(f._L&&f._Lt===f.text)return f._L;var t=f.text,a=[0];for(var i=t.indexOf("\n");i>=0;i=t.indexOf("\n",i+1))a.push(i+1);if(a.length>1&&a[a.length-1]===t.length)a.pop();f._L=a;f._Lt=t;f._lo=null;return a;}
@@ -210,7 +210,8 @@ function T_read(ws,a,o){var f=wsFile(ws,a.file);if(!f)throw new Error("there is 
   var out=[];for(var n=s;n<=e;n++)out.push(n+"\t"+shortLine(lineText(f,n)));
   return {text:out.join("\n")+(e<L?"\n…("+f.name+" has "+L+" lines)":""),file:f.name,s:s,e:e};}
 function countAll(t,s){var n=0,i=t.indexOf(s);while(i>=0&&n<1000){n++;i=t.indexOf(s,i+Math.max(1,s.length));}return n;}
-function T_edit(ws,a){var f=wsFile(ws,a.file);if(!f)throw new Error("there is no file \""+a.file+"\" here; the files are "+nameList(ws)+". To make a new file, use write_file");
+var RO_SAY=": a Word document is read here, not changed. Give the changed passage in your reply, or write the whole new document in your reply as a document to keep (in the form for documents given above), and Ingenium makes a Word file of it";
+function T_edit(ws,a){var f=wsFile(ws,a.file);if(!f)throw new Error("there is no file \""+a.file+"\" here; the files are "+nameList(ws)+". To make a new file, use write_file");if(f.ro)throw new Error(f.name+RO_SAY);
   var old=String(a.old_text),nw=String(a.new_text);if(!old)throw new Error("old_text is empty; to make a new file, use write_file");if(old===nw)throw new Error("old_text and new_text are the same");
   var t=f.text,n=countAll(t,old),loose=false,at,len;
   if(n===0){var r=edFind(t,old);if(!r){var first=old.split("\n").map(function(x){return x.trim();}).filter(Boolean)[0]||"",hints=[];
@@ -227,7 +228,7 @@ function T_edit(ws,a){var f=wsFile(ws,a.file);if(!f)throw new Error("there is no
   for(var m=Math.max(1,line-2);m<=Math.min(L,line+nl+1);m++)show.push(m+"\t"+shortLine(lineText(f,m)));
   return {text:"Changed "+f.name+" at line "+line+(a.replace_all&&n>1?" and "+(n-1)+" more places":"")+": "+ol+" line"+(ol===1?"":"s")+" became "+nl+"."+(loose?" (Found after allowing for differences in spacing.)":"")+" It now reads:\n"+show.join("\n"),
     file:f.name,line:line,before:was,after:nw,more:a.replace_all&&n>1?n-1:0};}
-function T_write(ws,a){var name=String(a.file||"").trim();if(!name)throw new Error("the file needs a name");var f=wsFile(ws,name),txt=String(a.content==null?"":a.content);
+function T_write(ws,a){var name=String(a.file||"").trim();if(!name)throw new Error("the file needs a name");var f=wsFile(ws,name),txt=String(a.content==null?"":a.content);if((f&&f.ro)||(!f&&edKind(name)==="doc"))throw new Error(name+RO_SAY);
   if(f&&f.text.length>200*1024)throw new Error(f.name+" is "+Math.round(f.text.length/1024)+" KB: change it with edit, not by writing it whole");
   var made=!f;if(made){f={name:name,text:"",orig:"",kind:edKind(name),edits:[],isNew:true};ws.files.push(f);}
   var before=f.text;f.edits.push({find:before.slice(0,4000),repl:txt.slice(0,4000)});f.text=txt;
@@ -297,11 +298,24 @@ function exec(ws,name,a,o){var t=toolDef(name);
   return Promise.resolve({text:"Unknown tool.",err:true});}
 
 /* ---------- what the model is told ---------- */
+/* 6.34: a conversation whose files are all documents (Word, PDF, text, Markdown, a table) is read, not engineered: until then the model
+   was told it worked on code as a senior engineer, and to run the app, for a question about a chapter or a paper */
+function proseOnly(ws){return !!(ws&&ws.files&&ws.files.length&&!ws.code&&ws.where!=="build"&&ws.files.every(function(f){return f.kind==="doc"||f.kind==="text"||/\.(pdf|csv|tsv|rtf|odt|epub)$/i.test(f.name);}));}
+function readerNote(ws,way,plan,x){var r=["You are reading the person's documents with tools, as a careful reader does. Use the tools to find and read what the question needs; do not write edit blocks or whole files in your reply, and ignore anything above that asks for edit blocks.",
+    "Documents: "+nameList(ws)+"."+(ws.files.some(function(f){return f.ro;})?" A Word document can be read here but not changed.":""),
+    "Answer from what you have read: name the document and the place (its line numbers), and quote exactly when you quote. Never say a document says something you have not read in it; if it is not there, say so plainly. Use plain words."];
+  if(way==="guide")r.push("The person wants to make each change themselves. You may only read (list_files, search, read). Show them where (the document and the line), what to write and why, one step at a time; when they say it is done, read it again and tell them plainly whether it is right. Never say you have changed anything.");
+  else if(plan)r.push("Plan first is on: read only. Read what you need, then give a short numbered plan and ask whether to go ahead. Do not change anything yet.");
+  else{r.push("Work in this order: understand the question; find the passages with search (and list_files); read them; answer from them. If the person asks for a change to a document, change only what was asked with edit, copying old_text exactly from what you read (without the line numbers), and keep their own words everywhere else; then say in one or two plain sentences what you changed.");
+    if(way==="step")r.push("The person reviews every change before it is made, at their own pace. Before each edit, say in one plain sentence what it changes and why. Make one change per edit, so each can be judged on its own. If they skip a change, do not make it again: follow what they said, or ask what they would prefer.");}
+  if(x.plan&&!x.ultra)r.push("For a task of more than two steps, keep a plan with update_plan: small tasks in order, one in_progress at a time, each marked completed when it is done. The person sees it as a checklist. A one-step task needs no plan.");
+  if(x.ultra&&!plan&&way!=="guide")r.push("Ultracode is on: the person wants this done thoroughly, at the highest effort. Read every part that bears on the question before you answer, check each statement against the passage it rests on, and end with what you read and anything you could not find.");
+  return r.join("\n");}
 function note(ws,way,plan,x){x=x||{};
   if(ws.connectorsOnly){var cn="";try{cn=window.IngConnectors?IngConnectors.namesFor(curChat()).join(", "):"";}catch(e){}
     return ["You can use the person's connectors"+(cn?" ("+cn+")":"")+": tools that reach outside services for them. Use one when it helps to answer, and say which you used and what it returned.",
       "Never invent what a tool returned. If a tool fails or is not allowed, say so plainly and answer as well as you can without it.",
-      "A tool that changes something (sends, creates, deletes, books) asks the person first; ask in words before you use one when the request is not clear."].join("\n");}var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
+      "A tool that changes something (sends, creates, deletes, books) asks the person first; ask in words before you use one when the request is not clear."].join("\n");}if(proseOnly(ws))return readerNote(ws,way,plan,x);var what=ws.where==="build"?"page open in Build (one file holding its HTML, CSS and JavaScript)":ws.code?"app":"files";
   var l=["You are working on the person's "+what+" with tools, the way a careful senior engineer pairs with its author. Use the tools; do not write edit blocks or whole files in your reply, and ignore anything above that asks for edit blocks.",
     "Files: "+nameList(ws)+". Large files are mostly data the app carries; search finds the code in them.",
     "Never guess at code you have not read. Keep the author's names, style and comments. Change only what was asked. Use plain words and explain a technical term the first time you use it. If the request is unclear, ask one short question before changing anything."];
@@ -529,14 +543,27 @@ function cloudRun(messages,onToken,onThink,ab,bot,ws){var c=state.cloud,fam=fami
     if(fresh&&/fallback/i.test(m)&&fam==="anthropic"&&S.fallback){S.fallback=false;return go();}
     return commitChat(ws,bot).then(function(n){if(n)e.message=m+" (the "+n+" changed file"+(n===1?" is":"s are")+" kept below)";throw e;});});}
   return go();}
-/* the files a model on this device can read through the tools are not repeated in full: its memory is short */
-function slimFiles(text){return String(text||"").replace(/<file name="([^"]*)">\n([\s\S]*?)\n<\/file>/g,function(all,n,body){
-  return body.length<1500?all:"<file name=\""+n+"\">\n["+body.split("\n").length+" lines: read them with the tools]\n</file>";});}
+/* the files a model on this device can read through the tools are not repeated in full when they would crowd its memory (6.34). The page
+   has already fitted each message's files to its share of the memory (a short file whole, a long one as its opening and passages);
+   once the loop's own words are added, if the whole request would take more than four fifths of the room (the rest is for what the
+   tools give back), the largest files the tools can read are left to them, one at a time, until it fits; a file under 1,500 characters
+   always stays. Until 6.34 every file of 1,500 characters or more was left to the tools, whatever the room, a Word document among them,
+   which the tools could not read, so a model on this device never saw it. */
+function slimBlock(n,body){return "<file name=\""+n+"\">\n["+body.split("\n").length+" lines, "+body.length.toLocaleString("en-GB")+" characters: too long to sit here with the rest, so read them with the tools (search, read)]\n</file>";}
+function fitFiles(msgs,ws,lim){var size=function(){return msgs.reduce(function(a,m){return a+String(m.content||"").length;},0);};
+  if(size()<=lim)return 0;var B=[];
+  msgs.forEach(function(m,mi){if(m.role!=="user"||typeof m.content!=="string")return;var re=/<file name="([^"]*)">\n([\s\S]*?)\n<\/file>/g,x;
+    while((x=re.exec(m.content)))if(x[2].length>=1500&&wsFile(ws,x[1]))B.push({mi:mi,n:x[1],body:x[2],all:x[0]});});
+  B.sort(function(a,b){return b.body.length-a.body.length;});var n=0;
+  for(var i=0;i<B.length&&size()>lim;i++){var b=B[i],m=msgs[b.mi],k=m.content.indexOf(b.all);if(k<0)continue;
+    m.content=m.content.slice(0,k)+slimBlock(b.n,b.body)+m.content.slice(k+b.all.length);n++;}
+  return n;}
 function roomOf(){var room=12000;try{room=Math.max(6000,Math.floor(chatBudget()*0.9));}catch(e){}return room;}
 function localRun(job,bot,ws){var way=ws.connectorsOnly?"auto":wayOf(),plan=!!(ws.code&&state.cc&&state.cc.plan),E=effortFor(false,ws),ultra=!!(E&&E.ultra)&&way!=="guide",chk=ultra&&canRun(ws),tools=toolsFor(way==="guide"||plan,{plan:ultra,check:chk,ws:ws});
-  var msgs=job.messages.map(function(m){return {role:m.role,content:typeof m.content==="string"?slimFiles(m.content):(m.content||[]).filter(function(p){return p.type==="text";}).map(function(p){return slimFiles(p.text);}).join("\n")};});
+  var room=roomOf(),msgs=job.messages.map(function(m){return {role:m.role,content:typeof m.content==="string"?m.content:(m.content||[]).filter(function(p){return p.type==="text";}).map(function(p){return p.text;}).join("\n")};});
   var add=note(ws,way,plan,{plan:ultra,ultra:ultra,check:chk})+"\n\n"+localNote(tools);
   if(msgs[0]&&msgs[0].role==="system")msgs[0].content+="\n\n"+add;else msgs.unshift({role:"system",content:add});
+  fitFiles(msgs,ws,Math.floor(room*0.8));
   var stop0=LSTOP,stopped=function(){return LSTOP!==stop0;};
   var onToken=job.onToken||function(){},onThink=job.onThink||function(){};
   bot.way=way;
