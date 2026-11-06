@@ -1,14 +1,14 @@
 
 Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 156.0.4314.58
-{"out":"D:\\a\\_temp\\wintest\\test.zip","size":236627,"sha256":"9e837e13f0010e1e99cede54636d5863559b420041452028a91ab6dbd5d220c8","exe":"Shell Test.exe","exeSize":796579,"exeSha256":"d2860a04e86699b4bbe38b5dfffa7fd6fa39e009e06df58d88bfc2a230b8af6e","id":"com.yannieforest.shelltest.win","icons":6,"ms":660}
-{"out":"D:\\a\\_temp\\wintest\\forge.zip","size":5354336,"sha256":"316f3eae39a26f51f5b976a056b96e36dc9a63c849302c766a5683ad252437da","exe":"The Forge.exe","exeSize":15140644,"exeSha256":"28ca74f04c944545ff3c7b57fb465c3bffcbfabb489943e7f7bda8f6c445a1e2","id":"com.yannieforest.theforge.wintest","icons":6,"ms":553}
+{"out":"D:\\a\\_temp\\wintest\\test.zip","size":236628,"sha256":"3dc5b5000fbc5612988c23dfd3b4071e4097cc5dedc36d16e5297ed1998b0574","exe":"Shell Test.exe","exeSize":796579,"exeSha256":"13cb82989334e2d4469a4dbf263568e9fa7bb4295921e767fd605b69e4183d97","id":"com.yannieforest.shelltest.win","icons":6,"ms":596}
+{"out":"D:\\a\\_temp\\wintest\\forge.zip","size":5354337,"sha256":"ce1c3e923c3622a9b7ef6a5f6e5cdfdb8a81cd7f476e146a2c1b3408c2fa3c5a","exe":"The Forge.exe","exeSize":15140644,"exeSha256":"964a4818078dc6c38f8ab2da05e9d157fe5c24f071b4bbe271b8daed6934bc6a","id":"com.yannieforest.theforge.wintest","icons":6,"ms":532}
      Shell Test.exe: 0.8 MB, how to open: 1 file
 PASS a test page in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
 PASS a test page in the Windows app Fabrica made: a second start brings the open window forward and ends (one copy running)
 PASS a test page in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS a test page in the Windows app Fabrica made: the clipboard, written and read back
 PASS a test page in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
-PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1793974299837","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1793977405057","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
      The Forge.exe: 14.4 MB, how to open: 1 file
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
 PASS The Forge (13 MB page) in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"The Forge","text":6173,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/the_forge.html"}
