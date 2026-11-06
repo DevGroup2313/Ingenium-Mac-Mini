@@ -15,17 +15,22 @@ shipped inside the desktop apps), are summarised at its top.
 
 **Phase 1 (this) is manual indexing**: the store, the embedder, parsing and chunking, the indexer, the bridge to the app's folder
 dialog and file reads, and the card **"Folders for the chat"** in Settings (Models and AI): add a folder, read it now, read it again,
-remove it. **Not built yet**: retrieval with the permission filter in SQL (phase 2), the chat's toggle, the grounded prompt and the
-citations (3), the 20-minute scheduler (4), the evaluation (5). Nothing in the chat uses the folders yet; the card says so.
+remove it. **Phase 2 is retrieval** (6 November 2026): `IngRag.retrieve(question, userId, opts)` (`retriever.js`) runs the text
+search (FTS5, bm25) and the vector search (vec0, cosine) with the folder permissions inside both SQL statements, fuses their 20 best
+each by Reciprocal Rank Fusion (k = 60) and gives the best 5 with what a citation needs; `ftsquery.js` makes a question's words safe
+for FTS5. **Not built yet**: the chat's toggle, the grounded prompt and the citations (3), the 20-minute scheduler (4), the whole
+evaluation (5). Nothing in the chat uses the folders yet; the card says so.
 
 ## Who can read what
 
-The index has one user now, **"me"**, with a row in `folder_acl` for every folder she adds. The tables, and the SQL filters that will
-use them (`folder_id in (select value from json_each(?))` inside both the text search and the vector search, before they are merged),
-are built and tested with a second test user, ready for the local profiles the owner plans on top of the optional sign-in.
+The index has one user now, **"me"**, with a row in `folder_acl` for every folder she adds. The SQL filter that uses them,
+`folder_id in (select folder_id from folder_acl where principal_id = ?)`, is inside both the text search and the vector search,
+before anything is ranked or merged (`store.worker.js`, `search.fts` and `search.vec`); a passage is read back only for a user who
+may read its folder (`chunk.get`). It is built and tested with a second test user, "test-b" (`rig/t_rag2_retrieve.js`), ready for
+the local profiles the owner plans on top of the optional sign-in.
 
-The permission rules separate the app's users from one another; they do not protect against a person who can open this computer's
-browser storage directly.
+**This client-side ACL separates the app's users. It does not protect against a person with direct access to the browser profile's
+storage**: the index is a file of this computer's browser storage, and whoever can open that storage can read it whole.
 
 The folders themselves are protected by the app, not by the page: the app reads only folders chosen in its dialog, refuses paths that
 leave them, hidden files, other file types and symbolic links that point outside (`build/desktop/app_rag_692.py`).
@@ -82,6 +87,7 @@ All tests run in headless Chromium through Playwright (`/opt/node-tools/node_mod
 | parsing | `node rig/t_rag1_parse.js http://127.0.0.1:8176/ OUT` | 72 files, offsets, headings, limits, overlap, hashes, damaged files |
 | indexer | `node rig/t_rag1_index.js http://127.0.0.1:8176/ OUT` | reading, reuse, failures, stopping, against stand-ins and the real store and embedder |
 | bridge | `python3 -I rig/t_rag1_bridge.py` | the app's folder methods (the patch applied to copies of `ingenium_app.py`), the stand-in `rig/rag_bridge.py` |
+| retrieval | `node rig/t_rag2_retrieve.js http://127.0.0.1:8176/ OUT [--quick]` | the two searches with the folder permissions inside their SQL, a second user, fusion (k = 60), escaping, Recall@5 over the corpus's facts, the restricted folder for the second user, reindex with embedding counts (`--quick` leaves out the 4 MB logbook; `RAG_WORKERS` sets the reading model's workers) |
 | by hand | `node rig/t_rag1_manual.js http://127.0.0.1:8178/ OUT [--quick]` | the built page with the card, from the browser without the bridge to removing the last folder |
 
 The servers: `python3 rag/test/serve.py PORT --vendor <vendor tree>` serves `/rag/` from this checkout (the first four tests start it

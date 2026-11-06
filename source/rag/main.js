@@ -36,6 +36,7 @@ import * as bridge from './folders.js';
 import { createStore } from './store.js';
 import { createEmbedder, suggestWorkers, MODEL_TIERS } from './embedder.js';
 import { createIndexer } from './indexer.js';
+import { retrieve as retrieveFrom } from './retriever.js';
 
 const PRINCIPAL = 'me';
 
@@ -384,6 +385,16 @@ async function rebuild() {
   return { rebuilt: true, folders: back };
 }
 
+// ------------------------------------------------------------------------------------------------------ retrieval (phase 2)
+// IngRag.retrieve(question, userId = 'me', opts): the passages of the folders that user may read that answer the question best
+// (rag/retriever.js: the text and vector searches with the folder permissions inside their SQL, fused by RRF, k = 60, the best 5).
+// The one user now is "me"; another name is the second test user, or a local profile later. It opens the store and the reading
+// model when they are not open yet. Nothing in the chat calls it yet (phase 3).
+async function retrieve(query, userId, opts) {
+  await ready();
+  return retrieveFrom({ store: S.store, embedder: S.embedder }, query, userId == null ? PRINCIPAL : userId, opts || {});
+}
+
 async function shutdown() {
   Array.from(S.jobs.keys()).forEach((id) => stopReading(id));
   await Promise.all(Array.from(S.jobs.values()).map((j) => j.done.catch(() => undefined)));
@@ -400,7 +411,7 @@ export const IngRag = {
   version: 1,
   principal: PRINCIPAL,
   available: () => bridge.available(),
-  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild,
+  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild, retrieve,
   on(fn) { S.listeners.add(fn); return () => S.listeners.delete(fn); },
   get _store() { return S.store; },
   get _embedder() { return S.embedder; },

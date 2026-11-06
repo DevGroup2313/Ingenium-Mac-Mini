@@ -34,6 +34,8 @@
 //    0.1.6 keeps a deleted vector's bytes in its block), and folder.remove({prune: true}) drops every cached vector no
 //    passage uses any more.
 
+import { ftsMatch } from './ftsquery.js';   // phase 2: a question's words, safe for FTS5's MATCH
+
 const DEFAULT_DIMS = 384;
 const POOL_NAME = 'ingenium-rag';       // the VFS name, and the OPFS directory '.ingenium-rag' that holds the database files
 const POOL_DIR = '.ingenium-rag';
@@ -125,6 +127,13 @@ const num = (v) => (typeof v === 'bigint' ? Number(v) : v);
 function str(v, name) { if (typeof v !== 'string' || v === '') throw bad(name + ' must be a non-empty string'); return v; }
 function int(v, name) { if (!Number.isInteger(v)) throw bad(name + ' must be an integer'); return v; }
 function fin(v, name) { if (typeof v !== 'number' || !Number.isFinite(v)) throw bad(name + ' must be a number'); return v; }
+// retrieval's arguments: how many hits a search gives (1 to 200, 20 when not said), and a chosen set of folders as JSON for json_each
+function limitK(v) { if (v == null) return 20; const k = int(v, 'k'); if (k < 1 || k > 200) throw bad('k must be between 1 and 200'); return k; }
+function onlyFolders(v) {
+  if (v == null) return null;
+  if (!Array.isArray(v) || v.length > 10000) throw bad('folderIds must be an array of folder ids');
+  return JSON.stringify(v.map((x, i) => int(x, 'folderIds[' + i + ']')));
+}
 function needOpen() { if (!db) throw new StoreError('NOT_OPEN', 'the store is not open: call open first'); }
 function needFolder(id) { if (db.selectValue('select 1 from folders where id = ?', [id]) == null) throw new StoreError('NO_SUCH_FOLDER', 'there is no folder ' + id); }
 function needPrincipal(id) { if (db.selectValue('select 1 from principals where id = ?', [id]) == null) throw new StoreError('NO_SUCH_PRINCIPAL', 'there is no principal ' + id); }
@@ -493,6 +502,68 @@ const OPS = {
   'acl.allowed'(a) {
     needOpen();
     return db.selectValues('select folder_id from folder_acl where principal_id = ? order by folder_id', [int(a.principalId, 'principalId')]).map(num);
+  },
+
+  // ---- retrieval (phase 2, DESIGN section 9) ----
+  // Who may read what is decided by SQL inside each search: a row counts only when its folder is one the principal has in
+  // folder_acl, found by a subquery of the same statement, so a passage of a folder that is not theirs is never ranked, never
+  // fused and never returned. A chosen set of folders (folderIds: the folders the chat was given) can only narrow that set: it is
+  // a second condition of the same query, never a replacement for the first.
+
+  // A principal by name, without making one (retrieval for a name the index does not know finds nothing)
+  'principal.find'(a) {
+    needOpen();
+    const id = db.selectValue('select id from principals where name = ?', [str(a.name, 'name')]);
+    return id == null ? null : { id: num(id) };
+  },
+
+  // The text search: bm25 over the passages' words and headings (FTS5), best first. The question is never handed to MATCH as it
+  // is: ftsMatch() keeps its words only, each quoted, joined with OR. A question with no word gives no hits.
+  'search.fts'(a) {
+    needOpen();
+    const principalId = int(a.principalId, 'principalId'), k = limitK(a.k), only = onlyFolders(a.folderIds);
+    if (a.query != null && typeof a.query !== 'string') throw bad('query must be text');
+    const match = ftsMatch(a.query || '');
+    if (!match) return { match: null, hits: [] };
+    const sql = 'select rowid as id, folder_id, bm25(chunks_fts) as score from chunks_fts where chunks_fts match ?1' +
+      ' and folder_id in (select folder_id from folder_acl where principal_id = ?2)' +
+      (only ? ' and folder_id in (select value from json_each(?4))' : '') +
+      ' order by score, rowid limit ?3';
+    const hits = db.selectObjects(sql, only ? [match, principalId, k, only] : [match, principalId, k])
+      .map((o, i) => ({ id: num(o.id), folderId: num(o.folder_id), rank: i + 1, score: o.score }));
+    return { match, hits };
+  },
+
+  // The vector search: the k nearest passages by cosine distance (vec0), nearest first. sqlite-vec 0.1.6 runs "folder_id in (...)"
+  // on its partition key once for each folder, giving the k nearest of each, and refuses LIMIT beside "k = ?" (both checked in
+  // rig/t_rag2_retrieve.js): the k nearest of them all are taken here.
+  'search.vec'(a) {
+    needOpen();
+    const principalId = int(a.principalId, 'principalId'), k = limitK(a.k), only = onlyFolders(a.folderIds);
+    const vec = vecBytes(a.embedding, conn.dims, 'the question');
+    const sql = 'select rowid as id, folder_id, distance from chunks_vec where embedding match ?1 and k = ?2' +
+      ' and folder_id in (select folder_id from folder_acl where principal_id = ?3)' +
+      (only ? ' and folder_id in (select value from json_each(?4))' : '');
+    const rows = db.selectObjects(sql, only ? [vec, k, principalId, only] : [vec, k, principalId])
+      .map((o) => ({ id: num(o.id), folderId: num(o.folder_id), distance: o.distance }))
+      .sort((x, y) => x.distance - y.distance || x.id - y.id).slice(0, k);
+    return { hits: rows.map((h, i) => Object.assign(h, { rank: i + 1 })) };
+  },
+
+  // The passages a fused list names, with what a citation needs, for the principal only: a passage outside the folders they may
+  // read is left out here too
+  'chunk.get'(a) {
+    needOpen();
+    const principalId = int(a.principalId, 'principalId');
+    if (!Array.isArray(a.ids) || a.ids.length > 1000) throw bad('ids must be an array of at most 1000 passage ids');
+    const ids = JSON.stringify(a.ids.map((x, i) => int(x, 'ids[' + i + ']')));
+    return db.selectObjects('select c.id, c.folder_id, f.name as folder_name, f.path as folder_path, c.file_id, c.file_path, c.chunk_index,' +
+      ' c.heading_path, c.char_start, c.char_end, c.page, c.text from chunks c join folders f on f.id = c.folder_id' +
+      ' where c.id in (select value from json_each(?1)) and c.folder_id in (select folder_id from folder_acl where principal_id = ?2)',
+    [ids, principalId]).map((o) => ({
+      id: num(o.id), folderId: num(o.folder_id), folderName: o.folder_name, folderPath: o.folder_path, fileId: num(o.file_id),
+      filePath: o.file_path, chunkIndex: num(o.chunk_index), headingPath: o.heading_path, charStart: num(o.char_start),
+      charEnd: num(o.char_end), page: o.page == null ? null : num(o.page), text: o.text }));
   },
 
   'file.list'(a) {

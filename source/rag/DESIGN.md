@@ -32,7 +32,9 @@ browser page, the Fire tablet and the iPhone carry none of it.
 | `rag/chunker.js` | parse worker (pure functions, importable by tests) | blocks to chunks (section 5) |
 | `rag/embedder.worker.js` + `rag/embedder.js` | module worker + page client | Transformers.js, the tokenizer, batched embedding |
 | `rag/store.worker.js` + `rag/store.js` | module worker + page client | THE ONLY SQLite connection (opfs-sahpool); schema and migrations; every read and write |
-| `rag/retriever.js`, `rag/prompt.js`, `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
+| `rag/retriever.js` | page | retrieval (phase 2, section 9): the two searches, Reciprocal Rank Fusion, the best k with what a citation needs |
+| `rag/ftsquery.js` | store worker (pure functions, importable by tests) | a question's words made safe for FTS5's MATCH (section 9) |
+| `rag/prompt.js`, `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
 
 ## 3. Messages
 
@@ -58,6 +60,12 @@ Store worker ops (phase 1):
 - `debug.rows`, `debug.sql`, `debug.fail`, `debug.migrate`, `debug.wipe`: the tests' own, served only by a worker started with
   `?debug=1` in its address (`createStore({debug: true})`); the app never starts one so (`main.js` does only when a test page has
   set `window.__ING_RAG_TEST__ = true`)
+
+Store worker ops (phase 2, section 9): `principal.find({name})` → `{id}` or null (makes no principal);
+`search.fts({query, principalId, k = 20, folderIds?})` → `{match, hits: [{id, folderId, rank, score}]}`;
+`search.vec({embedding, principalId, k = 20, folderIds?})` → `{hits: [{id, folderId, rank, distance}]}`;
+`chunk.get({ids, principalId})` → `[{id, folderId, folderName, folderPath, fileId, filePath, chunkIndex, headingPath, charStart,
+charEnd, page, text}]`, only of folders the principal may read.
 
 Embedder worker ops: `init({modelId = 'Xenova/bge-small-en-v1.5', dtype = 'q8', vendorBase})` → `{modelId, dims, maxTokens}`;
 `count({texts})` → `[tokens]`; `embed({texts, kind: 'passage' | 'query'})` → `[Float32Array]` (normalized; batches of 16;
@@ -148,6 +156,7 @@ rollback works; a reopened database keeps its rows. Phase 2 resolves the allowed
 lists no files while some are in the search is left alone and its summary has `emptyNow`, so the card can ask; `confirmEmpty`
 takes them out), `rebuild()` (after status `damaged`: a new, empty index, with the folders the app has on its list put back), `stats()`,
 `_store`, `_embedder` (tests). Off unless the page runs in the desktop app; nothing goes online.
+Phase 2: `retrieve(question, userId = 'me', opts)` (section 9), which opens the store and the reading model when needed.
 
 ## 8. Tests
 
@@ -158,3 +167,39 @@ and a compaction, and checks the index after a restart. `.github/workflows/rag-e
 stand-in bridge for the unit-level tests; the end-to-end test uses the built page with `rag/` beside it. The vendor tree
 for tests is unpacked from the release "rag-vendor" (see the README); on this build machine it is already unpacked at
 `/tmp/claude-0/-home-user/f70d4091-5e3f-5b2b-9e4a-4f66b5694ecf/scratchpad/rag0/vendor` (the same tree, checked).
+
+## 9. Retrieval (phase 2, 6 November 2026)
+
+`retrieve(ctx, query, userId, opts)` in `rag/retriever.js` (and `IngRag.retrieve(query, userId, opts)`, with `ctx` the app's own
+store and reading model). opts: `k` (the passages given, 5), `perList` (each search's hits, 20), `rrfK` (60), `folderIds` (the folders
+the chat was given; it narrows, never widens). It returns `{passages, principalId, match, fts, vec, ms}`; a passage is the row of
+`chunk.get` with `score` (its fused score), `ftsRank` and `vecRank` (its rank in each search, or null) and `distance`.
+
+1. The user is found by name (`principal.find`); a name the index does not know gives no passages and `reason: 'NO_SUCH_USER'`;
+   an empty question gives `reason: 'EMPTY_QUESTION'`.
+2. The text search starts at once in the store's worker while the question's vector is made in the reading model's worker
+   (`kind: 'query'`), then the vector search runs. Both statements carry the folder rule in their SQL:
+   ```sql
+   select rowid as id, folder_id, bm25(chunks_fts) as score from chunks_fts where chunks_fts match ?1
+     and folder_id in (select folder_id from folder_acl where principal_id = ?2)
+     [and folder_id in (select value from json_each(?4))] order by score, rowid limit ?3
+   select rowid as id, folder_id, distance from chunks_vec where embedding match ?1 and k = ?2
+     and folder_id in (select folder_id from folder_acl where principal_id = ?3)
+     [and folder_id in (select value from json_each(?4))]
+   ```
+   Checked in sqlite-vec 0.1.6 (`rig/t_rag2_retrieve.js`): the partition key's `in (...)` is run once for each allowed folder, giving
+   the k nearest of each, so a folder the user may not read is never searched, even when it holds the nearest passages, and the user
+   still gets their k; LIMIT beside `k = ?` is refused ("Only LIMIT or 'k =?' can be provided, not both"), so the worker keeps the k
+   nearest of all the folders' answers itself (by distance, then id).
+3. The question is never handed to MATCH as it is (`ftsquery.js`): its words (runs of `\p{L}\p{N}_`, any script) are each
+   quoted and joined with OR, at most 32, none longer than 64 characters, each once; a question with no word makes no text search.
+   Inside quotes FTS5 reads no operator, keyword or column filter.
+4. Fusion: Reciprocal Rank Fusion (Cormack, Clarke and Buettcher, SIGIR 2009) with k = 60: a passage scores the sum of
+   1 / (60 + rank) over the lists it is in, ranks from 1; equal scores go to the better single rank, then the lower id.
+5. The best k are read back with `chunk.get`, which applies the folder rule once more.
+
+First results (6 November 2026, headless Chromium, the corpus without the 4 MB logbook: 357 passages, two reading-model workers):
+Recall@5 33 of 35 facts (0.943), 28 found first; for the second user, who may not read `household_papers`, none of its passages in
+either search or the fused five for any question, 5 passages still given for every question; a retrieval takes about 41 ms (median)
+once the reading model is loaded; reading after one file added, one changed and one deleted embedded exactly the 2 new or changed
+passages.
