@@ -207,7 +207,7 @@ var CHEV='<i aria-hidden="true">'+svg('<path d="M6 9l6 6 6-6"/>')+'</i>';
 /* ---------- the rooms of each page ---------- */
 var CONF={
   settings:{label:"Settings, in rooms",find:true,all:true,rooms:[
-    {k:"everyday",t:"Everyday",i:"day",says:"Everyday things: the app's name, day or night, sound, and help. A refresh key is here too, for when the app glitches.",
+    {k:"everyday",t:"Everyday",i:"day",says:"Everyday things: day or night, sound, and help. A refresh key is here too, for when the app glitches.",
       ids:["ing-refresh-card",/^name$/,/^look and feel/,"ingSoundCard",/^sounds?\b/,"ihSetCard"]},
     {k:"calm",t:"Calm and focus",i:"calm",says:"Support for focus, time and a calmer screen. One group opens at a time.",ids:["supCard"]},
     {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search and Ingenium's eyes are here too.",
@@ -252,7 +252,7 @@ var STEPS=[{t:"Choose",next:"Next: how they work together"},{t:"Combine",next:"N
 /* the words a person might use for each setting, besides the words on the card */
 var KEYS=[
   ["ing-refresh-card","refresh reload restart glitch glitches frozen stuck stops answering start again"],
-  ["wsStudio","author studio workshop check diagnostics troubleshoot errors bug fix layers pages sections scripts styles hide your page edit ingenium"],
+  ["wsStudio","author studio workshop check diagnostics troubleshoot errors bug fix layers pages sections scripts styles hide your page edit ingenium rename name app name title called"],
   /* 6.26: the Guide's topics */
   ["guideTourCard","tour guided walk chapters start begin learn how to"],
   [/^what ingenium is/,"about what is ingenium offline local private studio models add install"],
@@ -270,9 +270,8 @@ var KEYS=[
   [/^focus/,"focus support adhd autism autistic calm routines time steps"],
   [/^the right rail/,"rail notes notepad hourglass timer side buttons"],
   [/^the instruments/,"instruments schedae clepsydra notes timer custodia"],
-  ["wsGuide","author studio workshop check errors layers fix troubleshoot"],
+  ["wsGuide","author studio workshop check errors layers fix troubleshoot rename name app name title called"],
   ["mdPlaceCard","drive drives external hard disk usb ssd storage folder where kept move space room free"],
-  [/^name$/,"name app name title called rename"],
   [/^look and feel/,"look theme dark night day light mode colour color colours appearance motion animation movement"],
   ["ingSoundCard","sound sounds audio volume chime click clicks quiet mute noise"],
   ["ihSetCard","help tour guided level beginner expert guide tips explain"],

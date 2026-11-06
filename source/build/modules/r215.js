@@ -132,7 +132,6 @@ body[data-motion="minimal"] .cc-work .cw-dot,body.calm .cc-work .cw-dot{animatio
 .cc-work .cw-what{font-weight:600;color:var(--ink-1);flex:0 0 auto}
 .cc-work .cw-time{font-variant-numeric:tabular-nums;color:var(--ink-3);flex:0 0 auto}
 .cc-work .cw-step{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-3)}
-.cc-work .cw-stop{flex:0 0 auto}
 /* the queue */
 .cc-queue{display:flex;flex-direction:column;gap:4px;margin:0 0 6px}
 .cc-queue[hidden]{display:none}
@@ -504,12 +503,22 @@ var work=null,t0=0,tick=null;
 function ensureWork(){if(work&&document.body.contains(work))return true;var comp=document.querySelector("#page-chat .composer");if(!comp)return false;
   work=mk("div","cc-work");work.id="ccWork";work.hidden=true;work.setAttribute("role","status");work.setAttribute("aria-live","off");
   work.innerHTML='<span class="cw-dot" aria-hidden="true"></span><span class="cw-what">Working</span><span class="cw-time"></span><span class="cw-step"></span>';
-  var st=mk("button","btn xs ghost cw-stop","Stop");st.type="button";st.title="Stop this reply (what it changed so far is kept)";st.onclick=function(){try{chatStop();}catch(e){}};work.appendChild(st);
   comp.insertBefore(work,comp.firstChild);return true;}
 function clock(s){s=Math.max(0,Math.round(s));var m=Math.floor(s/60),r=s%60;return m?m+"m "+(r<10?"0":"")+r+"s":r+"s";}
-function paintWork(){if(!ensureWork())return;var b=W.liveBot,on=busy()&&!!b&&!!cur()&&(cur().messages||[]).indexOf(b)>=0;work.hidden=!on;if(!on)return;
+function paintWork(){try{sendFace();}catch(e){}if(!ensureWork())return;var b=W.liveBot,on=busy()&&!!b&&!!cur()&&(cur().messages||[]).indexOf(b)>=0;work.hidden=!on;if(!on)return;
   var st=b.steps&&b.steps.length?b.steps[b.steps.length-1].t:"",what=b.ask&&!b.ask.done?"Waiting for you":(b.status==="thinking"||(!b.text&&!st))?"Thinking":st?"Working":"Writing";
   work.querySelector(".cw-what").textContent=what;work.querySelector(".cw-time").textContent=clock((Date.now()-t0)/1000);work.querySelector(".cw-step").textContent=st?"· "+st:"";}
+/* 6.45, her words (6 November 2026): "Please remove the "Stop" button from Ingenium's chatboxes, there is already a purple pause
+   button on screen in the text area, the white stop button seems superfluous there." So the clock above the message box has no Stop
+   key of its own (6.11 gave it one): the purple key in the box stops the reply, as it always did (chatStop: what the reply changed
+   so far is kept). It wears its stop face whenever a reply is being written, the model's status or a reply still live, and a press
+   then stops it; a screen reader hears "Stop writing" or "Send", not the shape on it. */
+function sendFace(){var sb=$id("chatSend");if(!sb)return;var on=busy();
+  if(on&&sb.textContent!=="\u25a0"){sb.textContent="\u25a0";sb.title="Stop writing";}
+  else if(!on&&sb.textContent==="\u25a0"){sb.textContent="\u2191";sb.title="Send";}
+  sb.setAttribute("aria-label",on?"Stop writing":"Send");
+  if(!sb.__r215){sb.__r215=1;sb.addEventListener("click",function(e){var eng="";try{eng=Engine.status;}catch(_){}
+    if(busy()&&eng!=="busy"){e.preventDefault();e.stopImmediatePropagation();try{chatStop();}catch(_){}setTimeout(sendFace,0);}},true);}}
 function startWork(){t0=Date.now();clearInterval(tick);tick=setInterval(paintWork,1000);paintWork();}
 function stopWork(){clearInterval(tick);tick=null;paintWork();}
 
@@ -553,7 +562,7 @@ function guideCard(){var g=$id("page-guide");if(!g||$id("guideEffortCard"))retur
     ["4","Ultracode.","For Code, and for a chat with files: Max effort, in four phases you can watch. It plans (the plan appears as a checklist beside the conversation, each task checked off when done), builds, checks, and fixes. Its checks run inside your app as it runs: small scripts that press its buttons and read what they show, each passing only when it returns true; you can read each one in the steps under the reply. It carries on until every check passes and the app shows no errors; if one failure resists three different fixes, it stops and says plainly what fails and why. Ingenium itself checks before it lets it finish: unfinished tasks, errors at the last run, a change not yet run, or a failed check send it back to work, up to three times."],
     ["5","Ultracode with your way of working.","For me: it does all of it and every change is kept as a version you can undo. With me: it shows each change before it is made, and waits. Guide me: you make each change yourself, so Ultracode has nothing to build and stays off. With Plan first on as well, it plans and waits for your go-ahead before building."],
     ["6","Honest limits.","A check is only as good as what it tests: read the checks in the steps. A small model on this device often struggles with Ultracode's long tasks; a connected model (Claude, GPT, Kimi and others) does them far better. Higher effort costs more time, and with a paid service more money."],
-    ["7","The Code session.","Plan shows the tasks, checked off as they are done, in a column beside the conversation; Session shows where the work happens, how much of the model's memory it uses, the files it made and the lines it changed. While a reply is written, a clock above the message box shows how long it has worked and its latest step, with a key to stop it. Enter then queues your next message: it is sent when the reply ends (the ✕ beside it takes it back)."]];
+    ["7","The Code session.","Plan shows the tasks, checked off as they are done, in a column beside the conversation; Session shows where the work happens, how much of the model's memory it uses, the files it made and the lines it changed. While a reply is written, a clock above the message box shows how long it has worked and its latest step; the purple key in the message box stops it. Enter then queues your next message: it is sent when the reply ends (the ✕ beside it takes it back)."]];
   rows.forEach(function(r){var t=mk("div","tip");t.appendChild(mk("span","tip-mark",r[0]));var d=mk("div");d.appendChild(mk("b",null,r[1]+" "));d.appendChild(document.createTextNode(r[2]));t.appendChild(d);card.appendChild(t);});
   var tour=$id("guideTourCard"),next=tour?tour.nextElementSibling:null;if(next&&next.parentNode===g)g.insertBefore(card,next.nextElementSibling);else g.appendChild(card);}
 function openGuide(){try{go("guide");}catch(e){}setTimeout(function(){var c=$id("guideEffortCard");if(c)try{c.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){c.scrollIntoView();}},250);}
@@ -592,7 +601,7 @@ function hook(){
   if(typeof W.renderChat==="function"&&!W.renderChat.__r215){var orc=W.renderChat;W.renderChat=function(){var r=orc.apply(this,arguments);try{paintKey();paintTopKeys();paintQueue();paintWork();soonPanel();}catch(e){}return r;};keepMarks(W.renderChat,orc);W.renderChat.__r215=1;}
   if(typeof W.go==="function"&&!W.go.__r215){var og=W.go;W.go=function(){var r=og.apply(this,arguments);try{closeMenu();paintTopKeys();paintPanel();}catch(e){}return r;};keepMarks(W.go,og);W.go.__r215=1;}
   if(typeof Engine!=="undefined"&&Engine&&typeof Engine.on==="function"&&!Engine.__r215){Engine.__r215=1;var was="";
-    Engine.on("status",function(s){try{if(s==="busy"&&was!=="busy"){afterSend();startWork();}if(s!=="busy"&&was==="busy"){stopWork();settle();drain();}was=s;placeholder();paintKey();soonPanel();}catch(e){}});}
+    Engine.on("status",function(s){try{if(s==="busy"&&was!=="busy"){afterSend();startWork();}if(s!=="busy"&&was==="busy"){stopWork();settle();drain();}was=s;placeholder();paintKey();soonPanel();sendFace();}catch(e){}});}
   var tk=$id("ctlTokens");if(tk&&!tk.__r215){tk.__r215=1;tk.addEventListener("input",function(e){if(e.isTrusted){est().replyAuto=false;try{saveState();}catch(_){}}});}
   var inp=$id("chatInput");if(inp&&!inp.__r215){inp.__r215=1;
     inp.addEventListener("keydown",function(e){if(e.key!=="Enter"||e.shiftKey||e.isComposing)return;if(!(e.metaKey||e.ctrlKey))return;

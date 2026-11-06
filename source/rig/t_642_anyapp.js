@@ -3,12 +3,16 @@
 // for Lector and every other page inside of Ingenium to be able to take other apps ... Lector should be able to read and analyse and process
 // any app inside of Ingenium." And: "Yes, I want Lector to take any app, kept under its own name, read, written about, and shown with its
 // own 3D logo", "it should also recognise the Offline Project". The apps are invented here; the model is a stand-in for Lector's asks.
-// Checks: two invented apps (one with a logo, a version and a colour; one with none) and the Offline Project's page in both variations are
-// kept through Add your apps, each under its own name; the library lists her four, then the Offline Project, then the others by name; in
-// Lector each has its tile, a logo in 3D, a seal of its initials, the Offline Project's live crests; a set with another app in it is not
-// named as the Offline Project; Lector reads the invented app and writes its documents, on a paper in its own colour with its logo on the
-// cover; the chat's + menu, Fabrica's library and Storage name it; the full edition takes other apps but not the Offline Project's keys,
-// and keeps a page of an app it does not list by key as any other app; no page errors.
+// 6.45, her answer (6 November 2026): "Yes, the app library stop keeping saved copies of the Offline Project's page" (so that, in her
+// words, "the Offline Project inside of the app can always reflect the 4 latest apps that is kept inside of Ingenium").
+// Checks: two invented apps (one with a logo, a version and a colour; one with none) are kept through Add your apps, each under its own
+// name; the Offline Project's page is not kept in either variation, nor a zip of its site (the app pages in it are not kept either),
+// and the library says why; a copy kept by 6.42 or 6.43 is let go of at the next start, its bytes with it; the library lists her four,
+// then the others by name; in Lector each has its tile, a logo in 3D, a seal of its initials; choosing her apps gives the set the
+// Offline Project's crest; a set with another app in it is not named as the Offline Project; Lector reads the invented app and writes
+// its documents, on a paper in its own colour with its logo on the cover; the chat's + menu, Fabrica's library and Storage name it, and
+// none of them names the Offline Project; the full edition takes other apps, keeps no copy of the Offline Project either, and keeps a
+// page of an app it does not list by key as any other app; no page errors.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3], FULL = process.argv[4]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 900))); c ? pass++ : fail++; };
@@ -23,19 +27,40 @@ const CDP = '<!doctype html><html><head><meta charset="utf-8"><title>Carpe Diem<
 const boot = async (ctx, url) => { const p = await ctx.newPage(); p.__errs = []; p.on('pageerror', e => p.__errs.push(e.message.slice(0, 200)));
   await p.goto(url); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(800);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(500); return p; };
-const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f => new File([f[1]], f[0], { type: 'text/html' })); await libAddFiles(fs); return window.__libLastAdd; }, files);
+const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f => new File([f[1]], f[0], { type: 'text/html' })); await libAddFiles(fs); return Object.assign({ note: LIB.note }, window.__libLastAdd); }, files);
+// the Offline Project's site as a zip: its hall, and an app's page beside it (a stand-in)
+const addSiteZip = (p) => p.evaluate(async ({ OP4, CDP }) => { const before = JSON.stringify(libState().apps.cd || null);
+  const z = makeZip([{ name: 'index.html', data: OP4 }, { name: 'apps/carpe-diem.html', data: CDP.replace('</body>', '<!--' + 'x'.repeat(2600) + '--></body>') /* over the 2,000 bytes a zip's page needs to be read */ }]);
+  await libAddFiles([new File([z], 'the-offline-project-site.zip', { type: 'application/zip' })]);
+  return { note: LIB.note, last: window.__libLastAdd, cdSame: JSON.stringify(libState().apps.cd || null) === before }; }, { OP4, CDP });
 (async () => {
   const b = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await boot(ctx, URL_);
   // 1. kept through Add your apps
   const added = await add(p, [['tide-clock.html', TIDE], ['ledger.html', LAMP], ['The Offline Project.html', OP4], ['op-three.html', OP3]]);
   const lib = await p.evaluate(() => { const A = libState().apps; const pick = k => A[k] ? { title: A[k].title, version: A[k].version, color: A[k].color || '', other: !!A[k].other } : null;
-    return { tide: pick('app-tide-clock'), lamp: pick('app-ledger-lamp'), op: pick('offline'), op3: pick('offline3'), keys: libKeys().filter(k => A[k] && A[k].ref) }; });
+    return { tide: pick('app-tide-clock'), lamp: pick('app-ledger-lamp'), op: pick('offline'), op3: pick('offline3'), opApp: pick('app-the-offline-project'), keys: libKeys().filter(k => A[k] && A[k].ref) }; });
   ok(lib.tide && lib.tide.title === 'Tide Clock' && lib.tide.version === '2.1' && lib.tide.color === '#1f6f8b' && lib.tide.other, 'an app of her own is kept under its own name, with its version and its colour', { lib: lib.tide, added });
   ok(lib.lamp && lib.lamp.title === 'Ledger Lamp' && lib.lamp.version === '', 'a page with no title is named from its first heading', lib.lamp);
-  ok(lib.op && lib.op.title === 'The Offline Project' && lib.op3 && lib.op3.title === 'The Offline Project without Inkwell', 'the Offline Project is recognised, in both variations', { op: lib.op, op3: lib.op3 });
+  ok(!lib.op && !lib.op3 && !lib.opApp && (added.offline || []).join('|') === 'The Offline Project.html|op-three.html' && /The Offline Project is not kept as a copy: Ingenium makes it from the four apps it holds now/.test(added.note || '') && !/None of your apps was found in[^.]*Offline/.test(added.note || ''),
+    'the Offline Project\'s page is not kept, in either variation, and the library says why (6.45)', { lib: [lib.op, lib.op3, lib.opApp], offline: added.offline, note: added.note });
+  const zip = await addSiteZip(p);
+  ok((zip.last.offline || []).join('|') === 'the-offline-project-site.zip' && zip.cdSame && /not kept as a copy/.test(zip.note || '') && !(zip.last.kept || []).length,
+    'nor a zip of its site: the app\'s page in it is not kept either, and the library says why', zip);
   const order = lib.keys.join(',');
-  ok(/^((cd|forge|inkwell|ingenium),)*offline,offline3,app-ledger-lamp,app-tide-clock$/.test(order), 'the library lists her four first, then the Offline Project, then the others by name', order);
+  ok(/^((cd|forge|inkwell|ingenium),)*app-ledger-lamp,app-tide-clock$/.test(order), 'the library lists her four first, then the others by name (no Offline Project among them)', order);
+  // a copy kept by 6.42 or 6.43: let go of at the next start, with its bytes
+  const seeded = await p.evaluate(async (OP4) => { const u8 = new TextEncoder().encode(OP4), A = libState().apps, ids = ['big_zzoffline4242', 'big_zzoffline4343', 'big_zzofflineearl'];
+    await libPut(ids[0], u8, OP4); await libPut(ids[1], u8, OP4); await libPut(ids[2], u8, OP4);
+    A.offline = { title: 'The Offline Project', version: '', size: u8.length, sha256: 'a'.repeat(64), name: 'The Offline Project.html', source: 'file', ref: ids[0], at: Date.now(), earlier: { title: 'The Offline Project', ref: ids[2], sha256: 'b'.repeat(64) } };
+    A['app-the-offline-project'] = { title: 'The Offline Project', version: '', size: u8.length, sha256: 'c'.repeat(64), name: 'op.html', source: 'file', color: '', other: 1, ref: ids[1], at: Date.now() };
+    saveState(); await new Promise(r => setTimeout(r, 1200)); return ids; }, OP4);
+  await p.reload(); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(3200);
+  await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(500);
+  const gone = await p.evaluate(async (ids) => { const A = libState().apps; const left = [];
+    for (const id of ids) { const b = await libTx('readonly', s => s.get(id)).catch(() => null); if (b) left.push(id); }
+    return { offline: !!A.offline, app: !!A['app-the-offline-project'], left, tide: !!(A['app-tide-clock'] && A['app-tide-clock'].ref) }; }, seeded);
+  ok(!gone.offline && !gone.app && gone.left.length === 0 && gone.tide, 'a copy kept by 6.42 or 6.43 is let go of at the next start, its bytes with it (and the other apps stay)', gone);
   // 2. Lector: a tile for each, with its own seal
   await p.evaluate(() => { go('lector'); }); await p.waitForTimeout(2500);
   const tiles = await p.evaluate(() => { const t = {}; [...document.querySelectorAll('#l7Bf .l-app')].forEach(x => { const k = x.getAttribute('data-k');
@@ -46,7 +71,7 @@ const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f =
   // apps of the Offline Project the master shield seal of the app appears and when I select only apps the master shield of the Offline
   // Project still appears with three quadrants of the selected 3 apps and so forth." No tile of its own (6.42 had two); the set chosen
   // wears its crest, drawn from the apps Ingenium keeps now
-  ok(!tiles.offline && !tiles.offline3, 'Lector shows no tile of the Offline Project\'s own, though the library holds its page (6.43)', Object.keys(tiles));
+  ok(!tiles.offline && !tiles.offline3 && !tiles['app-the-offline-project'], 'Lector shows no tile of the Offline Project\'s own (6.43), and the library keeps no copy of its page (6.45)', Object.keys(tiles));
   const crests = await p.evaluate(async () => {
     const wait = (ms) => new Promise(r => setTimeout(r, ms)); const B = () => lxState().brief.apps.slice();
     /* her four in the library: the three carried apps and this copy of Ingenium, as the first start keeps them */
@@ -95,18 +120,19 @@ const add = (p, files) => p.evaluate(async (files) => { const fs = files.map(f =
   await p.screenshot({ path: OUT + '/lector-paper.png' });
   // 5. the chat's + menu, Fabrica's library, Storage
   const plus = await p.evaluate(() => { go('chat'); try { paintPlus('apps'); } catch (e) {} const t = (document.getElementById('chatPlusMenu') || {}).innerText || ''; try { closePlus(); } catch (e) {} return t; });
-  ok(/Tide Clock 2\.1/.test(plus) && /Ledger Lamp/.test(plus) && /The Offline Project/.test(plus), 'the chat\'s + menu offers them among your apps', plus.slice(0, 300));
+  ok(/Tide Clock 2\.1/.test(plus) && /Ledger Lamp/.test(plus) && !/Offline Project/.test(plus), 'the chat\'s + menu offers them among your apps, and no copy of the Offline Project', plus.slice(0, 300));
   const fab = await p.evaluate(() => (typeof libApps === 'function' ? libApps() : []).map(m => (m.title || m.key) + (m.version ? ' ' + m.version : '')));
-  ok(fab.indexOf('Tide Clock 2.1') >= 0 && fab.indexOf('The Offline Project') >= 0, 'Fabrica\'s library and every page that lists the library list them', fab);
+  ok(fab.indexOf('Tide Clock 2.1') >= 0 && !fab.some(x => /Offline Project/.test(x)), 'Fabrica\'s library and every page that lists the library list them, and no copy of the Offline Project', fab);
   const store = await p.evaluate(async () => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'storage'); await new Promise(r => setTimeout(r, 1500));
     return (document.getElementById('stxApps') || {}).innerText || ''; });
   ok(/Tide Clock/.test(store) && !/app-tide-clock/.test(store), 'Storage names it as itself', store.slice(0, 300));
   // 6. the full edition: other apps, not the Offline Project's keys
   if (FULL) { const ctxF = await b.newContext({ viewport: { width: 1440, height: 900 } }); const f = await boot(ctxF, FULL);
-    await add(f, [['tide-clock.html', TIDE], ['The Offline Project.html', OP4], ['carpe.html', CDP]]);
-    const fl = await f.evaluate(() => { const A = libState().apps; return { tide: !!(A['app-tide-clock'] && A['app-tide-clock'].ref), op: !!(A.offline && A.offline.ref), keys: libKeys(),
+    const fAdded = await add(f, [['tide-clock.html', TIDE], ['The Offline Project.html', OP4], ['carpe.html', CDP]]);
+    const fl = await f.evaluate(() => { const A = libState().apps; return { tide: !!(A['app-tide-clock'] && A['app-tide-clock'].ref), op: !!(A.offline && A.offline.ref), opApp: !!A['app-the-offline-project'], keys: libKeys(),
       cd: !!(A['app-carpe-diem'] && A['app-carpe-diem'].ref), cdHidden: !!(A.cd && A.cd.ref), listed: libApps().map(m => m.key) }; });
-    ok(fl.tide && !fl.op && fl.keys.indexOf('offline') < 0, 'the full edition takes any app of its own, and not the Offline Project (hers alone)', fl);
+    ok(fl.tide && !fl.op && !fl.opApp && fl.keys.indexOf('offline') < 0 && (fAdded.offline || []).join('|') === 'The Offline Project.html' && /This page holds a set of apps, not one app, so the app library does not keep it/.test(fAdded.note || '') && !/Offline Project/.test(fAdded.note || ''),
+      'the full edition takes any app of its own, and keeps no copy of the Offline Project either (6.45), saying why without naming it', { fl, note: fAdded.note });
     ok(fl.cd && !fl.cdHidden && fl.listed.indexOf('app-carpe-diem') >= 0, 'a page of an app the full edition does not list by key is kept as any other app, in sight, never kept out of sight', fl);
     ok(f.__errs.length === 0, 'no script errors in the full edition', f.__errs); }
   ok(p.__errs.length === 0, 'no script errors on the page', p.__errs);

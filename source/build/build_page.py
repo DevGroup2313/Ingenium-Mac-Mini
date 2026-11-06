@@ -1414,6 +1414,44 @@ edit('else if(withThink){body.max_tokens=Math.max(maxTok,8192);body.thinking={ty
      'else if(withThink){body.max_tokens=Math.max(body.max_tokens,8192);if(typeof ingOutFor==="function")body.max_tokens=ingOutFor(model,body.max_tokens);if(body.max_tokens>=2048)body.thinking={type:"enabled",budget_tokens:Math.max(1024,Math.min(4096,body.max_tokens-1024))};}',
      "6.44 an older Claude model's thinking keeps within its ceiling and a refusal's figure")
 
+# ---- 6.45 (6 November 2026): presses made light. Her words: "Everything is moving slower inside of the app and my mouse's cursor is
+#      just delayed on the screen of the app, it feels off". Measured with Chrome's profiler on a computer a quarter as fast, eight
+#      presses between pages: the page's scroll to the top forced a whole layout in the middle of every press (0.5 s in all), and a
+#      visit to Chat or Code drew every message of the conversation again and saved the desk (0.4 s for 120 messages). Now the scroll
+#      waits for the next frame, and happens only when the page is not at its top; a visit draws the messages again only when the
+#      conversation shown changed since it was drawn (its mode, its name, its count, its last four messages), and saves the desk only
+#      when the conversation chosen changed. Every other caller draws the chat as before. ----
+edit('  window.scrollTo({top:0,behavior:state.motion==="minimal"?"auto":"smooth"});}\nwindow.go=go;',
+     '  requestAnimationFrame(function(){if((window.scrollY||document.documentElement.scrollTop||0)>0)window.scrollTo({top:0,behavior:state.motion==="minimal"?"auto":"smooth"});});}\nwindow.go=go;',
+     "6.45 the page's scroll to the top at the next frame, only when it is not there")
+
+edit('function renderChat(){var sc=$("chatScroll");try{detectChatPreview();}catch(e){}sc.innerHTML="";',
+     'var RC_SIG="",RC_KEEP=false;\n'
+     'function rcSig(){try{var c=curChat(),m=curMsgs(),n=m.length;return (document.body.getAttribute("data-chatmode")||"")+"|"+(c&&c.id||"")+"|"+(c&&c.title||"")+"|"+n+"|"+JSON.stringify(m.slice(Math.max(0,n-4)));}catch(e){return "x"+Math.random();}}\n'
+     'function renderChat(){var sc=$("chatScroll");try{detectChatPreview();}catch(e){}\n'
+     '  /* 6.45: a visit to Chat or Code (ccEnter) keeps the messages drawn when nothing in them changed; the rest is painted as always */\n'
+     '  var keep=RC_KEEP;RC_KEEP=false;if(keep&&RC_SIG&&sc.childNodes.length&&rcSig()===RC_SIG){try{paintChips();}catch(e){}paintChatSwitch();return;}\n'
+     '  sc.innerHTML="";',
+     "6.45 the chat's messages kept when a visit finds them unchanged")
+
+edit('  sc.scrollTop=sc.scrollHeight;paintChatSwitch();}\nfunction trimChat(){',
+     '  sc.scrollTop=sc.scrollHeight;paintChatSwitch();RC_SIG=rcSig();}\nfunction trimChat(){',
+     "6.45 the chat remembers what it drew")
+
+edit('  try{renderChat();}catch(e){}ccPaintSide();ccPaintHead();\n  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-page")===mode);});\n  saveState();}',
+     '  RC_KEEP=true;try{renderChat();}catch(e){}RC_KEEP=false;ccPaintSide();ccPaintHead();\n  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-page")===mode);});\n  if(CC.__saved!==mode+"|"+c.id){CC.__saved=mode+"|"+c.id;saveState();}}',
+     "6.45 a visit to Chat or Code draws and saves only what changed")
+
+# ---- 6.45 (6 November 2026): no Name card in Settings. Her words: "since I can rename Ingenium inside of the Author Studio, I don't
+#      think there is a need to keep that function on the Settings page of the page, please remove it." The Author Studio's Names
+#      room (modules/r236.js, master edition) names the app through its own field; the other editions never could (editions.py,
+#      _fixed_name, which now has nothing of the card left to take out). ----
+edit('      <div class="card"><h2 class="sec">Name</h2>\n        <label class="field"><span>What this app is called</span><input type="text" id="setAppName" placeholder="Ingenium"></label>\n        <div class="small muted" style="margin-top:6px">Shows in the top bar and on the Home page.</div>\n      </div>\n',
+     '', "6.45 Settings: no Name card (the Author Studio names the app)")
+edit('$("setAppName").addEventListener("input",function(){state.appName=$("setAppName").value;applyBrand();saveState();});', '',
+     "6.45 nothing listens for the Name card")
+edit('T("appname",function(){$("setAppName").value=state.appName;});', '', "6.45 no Name card to fill in")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

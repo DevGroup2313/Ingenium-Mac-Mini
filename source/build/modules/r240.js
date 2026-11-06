@@ -51,29 +51,43 @@ function rec(k){try{return libState().apps[k]||null;}catch(e){return null;}}
 function keyFor(title){var A=libState().apps,base="app-"+(slug(title)||"app"),k=base,n=2;
   while(A[k]&&A[k].title&&A[k].title!==title)k=base+"-"+(n++);return k;}
 
-/* ---------- the Offline Project, among her apps, in its two variations (the master edition alone) ----------
-   Her words (6 November 2026): "it should also recognise the Offline Project ... I want the Offline Project to be built into Ingenium the
-   same way as the other 4 apps and be listed among them. I want both variations in". Its one-file app (source/offline_project/master_demo/
-   build_master_demo.py --mode app, "The Offline Project.html") and its site's hall are known by their title, The Offline Project; the
-   variation without Inkwell by its build's "without": ["inkwell"]. Kept as "offline" and "offline3", listed after her four; its seal is
-   its crest: the master seal for all four, the shield of three for the variation without Inkwell. */
+/* ---------- the Offline Project: never kept as a copy (6.45) ----------
+   6.42 kept its page in the master edition as two more apps, "offline" and "offline3" (her words then: "I want the Offline Project to be
+   built into Ingenium the same way as the other 4 apps and be listed among them. I want both variations in"). Her words since (6 November
+   2026): "that way, the Offline Project inside of the app can always reflect the 4 latest apps that is kept inside of Ingenium instead of
+   an old saved version of older apps versions"; and, asked whether the app library should stop keeping saved copies of the Offline
+   Project's page altogether: "Yes, the app library stop keeping saved copies of the Offline Project's page". So, in every edition:
+   - a page that is the Offline Project (its one-file app, source/offline_project/master_demo/build_master_demo.py --mode app, or its
+     site's hall; known by its title, with or without Inkwell) is not kept, nor a zip that holds one (the apps' pages in such a zip are
+     the copies it was made with), and the library says why;
+   - a copy kept by 6.42 or 6.43 ("offline", "offline3", or in the full edition an app of that name) is let go of, its bytes with it;
+   - in the master edition Lector shows the Offline Project's crest for the set of her apps chosen, drawn from the apps Ingenium holds
+     now (modules/r108.js, 6.43). */
 function master(){try{return typeof ING_EDITION==="undefined"||ING_EDITION==="master";}catch(e){return false;}}
-var TRIO=["cd","forge","ingenium"];
-if(master()&&typeof LIB_KEYS!=="undefined"&&LIB_KEYS.indexOf("offline")<0){LIB_KEYS.push("offline","offline3");try{LIB_NAMES.offline="The Offline Project";LIB_NAMES.offline3="The Offline Project without Inkwell";}catch(e){}}
-function offlineOf(text){var head=String(text||"").slice(0,400000);if(!master()||!/<title>\s*The Offline Project\s*<\/title>/i.test(head))return null;
+function offlineOf(text){var head=String(text||"").slice(0,400000);if(!/<title>\s*The Offline Project\s*<\/title>/i.test(head))return null;
   return /"without"\s*:\s*\[\s*"inkwell"/.test(String(text||"").slice(0,3000000))?"offline3":"offline";}
+var OFF_SAYS=master()?"The Offline Project is not kept as a copy: Ingenium makes it from the four apps it holds now, so it always has their latest versions. To bring in a newer version of one of them, add that app's own page or the zip you install it from."
+  :"This page holds a set of apps, not one app, so the app library does not keep it. Add each app's own page instead.";  /* the other editions never name it */
+var REFUSED=[];
+function refused(name){name=String(name||"The Offline Project");if(REFUSED.indexOf(name)<0)REFUSED.push(name);return Promise.resolve([]);}
 var oDet=W.libDetect;
-if(typeof oDet==="function")W.libDetect=function(text){return offlineOf(text)||oDet.apply(this,arguments);};
-/* its seal for papers and Word files: the master seal; the shield of three drawn once, as a picture */
-function offlineSeals(){try{if(!master()||!W.ING_SEALS)return;if(ING_SEALS.master&&!ING_SEALS.offline)ING_SEALS.offline=ING_SEALS.master;
-  if(!ING_SEALS.offline3&&W.IngSeal&&typeof IngSeal.png==="function")IngSeal.png(TRIO,{night:false,width:600,as:"info"}).then(function(r){if(r&&r.b64)ING_SEALS.offline3={b64:r.b64,w:r.w,h:r.h};},function(){});}catch(e){}}
-try{setTimeout(offlineSeals,2500);}catch(e){}
-W.libOfflineSeals=offlineSeals;
+/* not one of her apps, whatever it carries inside it (its one-file app holds all four) */
+if(typeof oDet==="function")W.libDetect=function(text){return offlineOf(text)?null:oDet.apply(this,arguments);};
+function isOffTitle(t){return /^The Offline Project( without Inkwell| \(without Inkwell\))?$/i.test(String(t||"").trim());}
+/* what 6.42 and 6.43 kept: let go of, with its bytes here and on the computer app's disk */
+function letGo(){var n=0;try{var A=libState().apps;Object.keys(A).forEach(function(k){var m=A[k];
+      if(!(k==="offline"||k==="offline3"||(/^app-/.test(k)&&m&&isOffTitle(m.title))))return;
+      try{if(m&&m.earlier&&m.earlier.ref)libDel(m.earlier.ref);if(m&&m.ref)libDel(m.ref);}catch(e){}
+      delete A[k];n++;try{if(W.ING_SEALS)delete ING_SEALS[k];}catch(e){}});
+    if(n){try{saveState();}catch(e){}}}catch(e){}return n;}
+letGo();try{setTimeout(letGo,2500);}catch(e){}
+/* a desk adopted from the computer app's disk without a reload */
+var oRep=W.repaintDesk;if(typeof oRep==="function")W.repaintDesk=function(){var r=oRep.apply(this,arguments);letGo();return r;};
 
 /* ---------- the list of the library: her four first, then any other app by name ---------- */
 function otherKeys(){var A=libState().apps;if(!allowed())return [];
   return Object.keys(A).filter(function(k){return /^app-/.test(k)&&A[k]&&A[k].ref;}).sort(function(a,b){return String(A[a].title||a).localeCompare(String(A[b].title||b));});}
-function libKeys(){var base=(typeof LIB_KEYS!=="undefined"&&LIB_KEYS)?LIB_KEYS.slice():[];return base.concat(otherKeys());}
+function libKeys(){letGo();var base=(typeof LIB_KEYS!=="undefined"&&LIB_KEYS)?LIB_KEYS.slice():[];return base.concat(otherKeys());}
 function libName(k){try{if(typeof LIB_NAMES!=="undefined"&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}var m=rec(k);return (m&&m.title)||String(k||"");}
 function appColor(k){var m=rec(k);return (m&&m.color)||tone(k);}
 W.libOtherKeys=otherKeys;W.libKeys=libKeys;W.libName=libName;W.libAppColor=appColor;
@@ -85,7 +99,8 @@ var oFrom=W.libFromPage;
 /* a page of one of her apps that this edition does not list (the full edition lists Ingenium alone) is kept as any other app,
    under its own name, so it is never kept out of sight */
 function listed(k){try{return typeof LIB_KEYS==="undefined"||LIB_KEYS.indexOf(k)>=0;}catch(e){return true;}}
-W.libFromPage=function(u8,name){var text=new TextDecoder().decode(u8),k0=typeof libDetect==="function"?libDetect(text):null;
+W.libFromPage=function(u8,name){var text=new TextDecoder().decode(u8);if(offlineOf(text))return refused(name);
+  var k0=typeof libDetect==="function"?libDetect(text):null;
   if(typeof libDetect!=="function"||(k0&&listed(k0))||!allowed())return oFrom.apply(this,arguments);
   if(!isPage(text))return Promise.resolve([]);
   var title=titleOf(text,name),key=keyFor(title),ver=versionOf(text);
@@ -98,10 +113,33 @@ if(typeof oZip==="function")W.libFromZip=function(u8,name,depth){return oZip.app
   var pages=Object.keys(ents).filter(function(n){return /\.html?$/i.test(n)&&!/(^|\/)(vendor|node_modules|__MACOSX)\//i.test(n);});if(!pages.length)return out||[];
   var main=pages.filter(function(n){return /(^|\/)index\.html?$/i.test(n);}).sort(function(a,b){return a.split("/").length-b.split("/").length;})[0]||pages.sort(function(a,b){return (ents[b].usz||0)-(ents[a].usz||0);})[0];
   return libZipData(u8,ents[main]).then(function(b){return W.libFromPage(b,main.split("/").pop());});});};
+/* a zip that holds the Offline Project's page (its site, or its one-file app) is not kept: the apps' pages in it are the copies it was
+   made with. Its hall is a small page (the apps' pages are large), so only the small pages are opened to look */
+function offZip(u8){var ents=null;try{ents=libZipEntries(u8);}catch(e){}if(!ents)return Promise.resolve(false);
+  var names=Object.keys(ents).filter(function(n){return /\.html?$/i.test(n)&&!/(^|\/)(vendor|node_modules|__MACOSX)\//i.test(n);});
+  if(names.some(function(n){return /(^|\/)The Offline Project( \(without Inkwell\))?\.html?$/i.test(n);}))return Promise.resolve(true);
+  var small=names.filter(function(n){return (ents[n].usz||0)<=8e6;}).sort(function(a,b){return a.split("/").length-b.split("/").length;}).slice(0,6),i=0;
+  function next(){if(i>=small.length)return Promise.resolve(false);var n=small[i++];
+    return libZipData(u8,ents[n]).then(function(b){return offlineOf(new TextDecoder().decode(b.subarray(0,Math.min(b.length,400000))))?true:next();},function(){return next();});}
+  return next();}
+var oZip2=W.libFromZip;
+if(typeof oZip2==="function")W.libFromZip=function(u8,name,depth){var self=this,args=arguments;
+  return offZip(u8).then(function(hit){return hit?refused(name):oZip2.apply(self,args);});};
+/* Add your apps: what was not kept, and why */
+var oAdd=W.libAddFiles;
+if(typeof oAdd==="function")W.libAddFiles=function(list){if(!LIB.busy)REFUSED=[];
+  return Promise.resolve(oAdd.apply(this,arguments)).then(function(v){if(!REFUSED.length||LIB.busy)return v;var last=W.__libLastAdd||{};
+    var none=last.none||[],left=none.filter(function(n){return REFUSED.indexOf(n)<0;}),tail=". Choose an app's own page, or the zip you install it from.";
+    var was=none.length?"None of your apps was found in "+none.join(", ")+tail:"",now=(left.length?"None of your apps was found in "+left.join(", ")+tail+" ":"")+OFF_SAYS;
+    var note=String(LIB.note||"");LIB.note=was&&note.indexOf(was)>=0?note.replace(was,now):(note?note+" ":"")+OFF_SAYS;
+    last.none=left;last.offline=REFUSED.slice();W.__libLastAdd=last;
+    try{libPaint();}catch(e){}
+    try{var c=D.getElementById("libCard");if(c&&typeof libCardHtml==="function"){var x=D.createElement("div");x.innerHTML=libCardHtml();c.replaceWith(x.firstChild);if(typeof libWire==="function")libWire();}}catch(e){}
+    return v;});};
 /* the older card's "Or choose one app's page": any page, not only hers */
-W.libImportPage=function(file){if(LIB.busy)return;LIB.busy="Reading "+file.name+"…";libPaint();
+W.libImportPage=function(file){if(LIB.busy)return;LIB.busy="Reading "+file.name+"…";libPaint();REFUSED=[];
   libReadBuf(file).then(function(buf){return W.libFromPage(new Uint8Array(buf),file.name);})
-    .then(function(rs){if(!rs||!rs.length)throw new Error("This file is not an app's page.");var r=rs[0];LIB.warn=false;LIB.note=(r.state==="same"?"Already kept, unchanged: ":"Kept on this device: ")+r.label+".";})
+    .then(function(rs){if(!rs||!rs.length)throw new Error(REFUSED.length?OFF_SAYS:"This file is not an app's page.");var r=rs[0];LIB.warn=false;LIB.note=(r.state==="same"?"Already kept, unchanged: ":"Kept on this device: ")+r.label+".";})
     .catch(function(e){LIB.warn=true;LIB.note=String(e&&e.message||e);})
     .then(function(){LIB.busy=null;libPaint();try{if(typeof lxRender==="function")lxRender();}catch(e){}});};
 
@@ -127,7 +165,7 @@ function sealFor(k){if(SEAL[k])return SEAL[k];var m=rec(k);if(!m||!/^app-/.test(
 W.libSealFor=sealFor;W.libLetterSeal=letterSeal;W.libShade=shade;
 /* the seals of what is already kept, ready for the papers and the Word files */
 try{setTimeout(function(){otherKeys().forEach(function(k){letterSeal(k);sealFor(k);});},1500);}catch(e){}
-W.IngAnyApp={offlineOf:offlineOf,titleOf:titleOf,versionOf:versionOf,colorOf:colorOf,keyFor:keyFor,keys:libKeys,others:otherKeys,name:libName,color:appColor,seal:sealFor};
+W.IngAnyApp={offlineOf:offlineOf,offSays:OFF_SAYS,refused:function(){return REFUSED.slice();},letGo:letGo,titleOf:titleOf,versionOf:versionOf,colorOf:colorOf,keyFor:keyFor,keys:libKeys,others:otherKeys,name:libName,color:appColor,seal:sealFor};
 })();
 ;try{window.__ingParts["p240"]="running";}catch(_){}
 </script>

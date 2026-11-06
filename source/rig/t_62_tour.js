@@ -139,11 +139,18 @@ async function raised(p, sel) {
 
     // ---------------- 4 · the Guide's chapter keys ----------------
     await p.evaluate(() => go('guide')); await p.waitForTimeout(700);
-    const g = await raised(p, '#guideTour .tour-entry-chap');
-    // 6.3 (the owner's words, 23 October 2026: "I don't like how you made every button wide and flat"): the Guide's chapters are keys,
-    // popped out and as wide as their words; the tour's own list of chapters stays flat
-    const gw = await p.evaluate(() => { const b = document.querySelector('#guideTour .tour-entry-chap'), r = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(b); return { w: r.width, need: rg.getBoundingClientRect().width + 40 }; });
-    ok(g.found && g.below && g.lift && gw.w <= gw.need + 20, 'the Guide\'s chapters are keys: a shadow beneath, they lift, and each as wide as its words', { g, gw });
+    // 6.3 (the owner's words, 23 October 2026: "I don't like how you made every button wide and flat") made the Guide's chapters keys
+    // as wide as their words; 6.45, her words of 6 November 2026 on that very area: "I don't like the look of the Chapters area, it
+    // still has that many clustered 3D buttons look that I said that I didn't like". So the chapters are a quiet contents list now
+    // (modules/r243.js): flat rows of one width, no shadow and no lift, two columns read downwards
+    const gc = await p.evaluate((() => { const bs = [...document.querySelectorAll('#guideTour .tour-entry-chap')]; if (!bs.length) return { n: 0 };
+      const r = bs.map(x => x.getBoundingClientRect()), w = r.map(x => Math.round(x.width)), half = Math.ceil(bs.length / 2);
+      return { n: bs.length, list: !!document.querySelector('#guideTour.gt2 .gt2-chaps .tour-entry-chaps'), shadow: getComputedStyle(bs[0]).boxShadow, same: Math.max(...w) - Math.min(...w) <= 2,
+        down: bs.length > 2 && Math.abs(r[1].left - r[0].left) < 2 && r[1].top > r[0].top && (bs.length <= half || r[half].left > r[0].left + 50) }; }));
+    await p.hover('#guideTour .tour-entry-chap'); await p.waitForTimeout(250);
+    const lift = await p.evaluate(() => getComputedStyle(document.querySelector('#guideTour .tour-entry-chap')).transform);
+    ok(gc.list && gc.n >= 10 && gc.shadow === 'none' && gc.same && gc.down && (lift === 'none' || lift === 'matrix(1, 0, 0, 1, 0, 0)'), 'the Guide\'s chapters are a quiet contents list: flat rows of one width, no shadow and no lift, two columns read downwards (6.45)', { gc, lift });
+    await p.mouse.move(2, 2);
     // 6.7.3: one Take the tour key on the Guide page, the guided tour card's own (the one under the heading is gone)
     const go = await raised(p, '#guideTour .tour-entry-row .btn.primary');
     ok(go.found && go.below && go.lift, 'and its Take the tour key', go);

@@ -1,8 +1,10 @@
 // Ingenium 6.7.1 · only the master edition can rename the app (editions.py, _fixed_name). The owner: "I only want the master
 // version of the app that only I possess on my devices to have that feature and functionality on the Settings page, nowhere
 // else." Checks, in Chromium, by the edition the page says it is:
-//   master   Settings has the Name card; a name typed there shows in the top bar and on Home at once, and comes back to
-//            Ingenium when the field is emptied; Help lists the field;
+//   master   since 6.45 no Name card in Settings either (her words: "since I can rename Ingenium inside of the Author Studio, I
+//            don't think there is a need to keep that function on the Settings page"); the Author Studio's Names room names
+//            the app: a name set there shows in the top bar and on Home at once, and Ingenium comes back when it is emptied;
+//            Find a setting leads "rename" to the Author Studio; Help lists no Name field;
 //   others   (full, gift, demo) Settings has no Name card and no field for it, with every setting shown; Find a setting finds
 //            no way to rename; Help lists no Name field; with a name an older copy kept, the top bar, Home and every part
 //            still say Ingenium, and the kept value is left as it was (shown nowhere);
@@ -29,14 +31,16 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const help = await p.evaluate(() => { try { return JSON.stringify((window.IngHelp && IngHelp.map) || []); } catch (e) { return ''; } });
   if (!help || help.length < 100) ok(false, 'Help\'s list of controls is there to look in', help.length);
   if (ed === 'master') {
-    ok(s1.field && s1.card === 1 && s1.words, 'the master edition: Settings has the Name card and its field', s1);
-    const typed = await p.evaluate(async () => { const f = document.getElementById('setAppName'); f.value = 'Forest Studio'; f.dispatchEvent(new Event('input', { bubbles: true }));
+    ok(!s1.field && !s1.card && !s1.words, 'the master edition: Settings has no Name card since 6.45 (the Author Studio names the app)', s1);
+    const typed = await p.evaluate(async () => { IngAuthor.names.app('Forest Studio');
       await new Promise(r => setTimeout(r, 200)); const a = { bar: document.getElementById('brandName').textContent, home: (document.getElementById('homeTitle') || {}).textContent, kept: state.appName };
-      f.value = ''; f.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 200));
+      IngAuthor.names.app(''); await new Promise(r => setTimeout(r, 200));
       return { a, back: document.getElementById('brandName').textContent }; });
     ok(typed.a.bar === 'FOREST STUDIO' && (!typed.a.home || typed.a.home === 'Forest Studio') && typed.a.kept === 'Forest Studio' && typed.back === 'INGENIUM',
-      'the master edition: a name typed there shows in the top bar and on Home at once, and Ingenium comes back when the field is emptied', typed);
-    ok(/#setAppName/.test(help), 'the master edition: Help lists the Name field', help.length);
+      'the master edition: a name set in the Author Studio shows in the top bar and on Home at once, and Ingenium comes back when it is emptied', typed);
+    const find = await p.evaluate(() => window.IngRooms && IngRooms.find ? IngRooms.find('rename').map(h => h.title) : []);
+    ok(find.some(t => /Author Studio/i.test(t)), 'the master edition: Find a setting leads "rename" to the Author Studio', find);
+    ok(!/#setAppName/.test(help), 'the master edition: Help lists no Name field', help.length);
   } else {
     ok(!s1.field && !s1.card && !s1.words, 'the ' + ed + ' edition: Settings has no Name card and no field to rename the app, with every setting shown', s1);
     const find = await p.evaluate(() => window.IngRooms && IngRooms.find ? IngRooms.find('rename').concat(IngRooms.find('app name')).map(h => h.title) : []);

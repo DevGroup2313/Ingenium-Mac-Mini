@@ -476,9 +476,12 @@ function onBody(recs){var found=[],removed=false;
   if(removed){if(OPEN&&!OPEN.inst.sel.isConnected)reattach();prune();}}
 function scan(){var all=D.getElementsByTagName("select"),list=[];for(var i=0;i<all.length;i++)if(!all[i].__r172&&eligible(all[i]))list.push(all[i]);if(list.length)enhanceAll(list);}
 var tickN=0;
-function tick(){if(D.hidden)return;tickN++;try{prune();scan();
+/* 6.45: the safety net still reads every list a person can see each second (a value or an option chosen by code shows within a
+   second), and measures their widths every other second, the dearer half of its work (her words, 6 November 2026: "Everything is
+   moving slower inside of the app") */
+function tick(force){if(D.hidden)return;tickN++;try{prune();scan();
   var want=[],seen=[];for(var i=0;i<ALL.length;i++){var I=ALL[i];if(!I.sel.isConnected)continue;var vis=I.combo.offsetParent!==null;if(tickN%5===0||vis)want.push(I);if(vis)seen.push(I);}
-  syncAll(want);fitAll(seen);}catch(e){warn(e);}}
+  syncAll(want);if(force===true||tickN%2===0)fitAll(seen);}catch(e){warn(e);}}
 var rz=0;
 function remeasure(){rz=0;var live=ALL.filter(function(I){I.opSeen=null;return I.sel.isConnected;});if(live.length)try{measure(live);}catch(e){warn(e);}}
 
@@ -495,7 +498,7 @@ function start(){
   D.addEventListener(HAS_PTR?"pointerdown":"mousedown",function(){KB=false;},true);
   var hasHas=false;try{hasHas=!!(W.CSS&&CSS.supports&&CSS.supports("selector(:has(a))"));}catch(_){}
   if(!hasHas){darkRoot();try{new MutationObserver(darkRoot).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(_){}}
-  W.IngSelect={version:1,enhance:enhance,of:function(s){return s&&s.__r172||null;},refresh:function(s){if(s&&s.__r172)s.__r172.sync();else tick();},
+  W.IngSelect={version:1,enhance:enhance,of:function(s){return s&&s.__r172||null;},refresh:function(s){if(s&&s.__r172)s.__r172.sync();else tick(true);},
     open:function(s){var I=enhance(s);if(I)open(I,null);return !!OPEN;},close:function(){close(true);},isOpen:function(){return !!OPEN;},count:function(){return ALL.length;}};}
 try{start();}catch(e){warn(e);}
 })();

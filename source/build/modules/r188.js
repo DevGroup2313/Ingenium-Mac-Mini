@@ -308,6 +308,35 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-ck-sug blockquote,#cs .c-today-q{margin:0;padding:6px 10px;border-left:2px solid var(--c-acc);color:var(--c-ink2);font-size:13px;background:var(--c-wellbg);border-radius:0 8px 8px 0}
 #cs .c-today{gap:10px;padding:6px 4px}
 #cs .c-today-step{font:600 20px/1.35 var(--c-serif);color:var(--c-ink1);margin:2px 0}
+/* 6.45, her words (6 November 2026): "The Make its checklist page looks odd and not formatted. It looks very plain and reads poorly,
+   please redesign it to better fit the rest of the Career Studio and the colour palette and design of Ingenium." Today's step, in
+   parts: the application's strip (its organisation, its date and its stage as chips), the step itself on a lilac card with its own
+   mark, where it stands among today's steps and its minutes, the posting's own words when it quotes them, what this application
+   holds so far (its checklist, its documents, its referees), and the pace in a soft band. Only what the studio holds is shown. */
+#cs .c-today2{gap:14px;padding:6px 6px 10px;max-width:780px}
+#cs .c-td-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+#cs .c-td-org{font-weight:600;font-size:13.5px;color:var(--c-ink2);margin-right:2px}
+#cs .c-chip.c-td-closed{background:var(--c-bads);color:var(--c-bad)}
+#cs .c-chip.c-td-soon{background:var(--c-warns);color:var(--c-warn)}
+#cs .c-chip.c-td-ok{background:var(--c-oks);color:var(--c-ok)}
+#cs .c-chip.c-td-stage{background:var(--c-accs);color:var(--c-acc)}
+#cs .c-td-hero{display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:16px;border:1px solid rgba(106,63,181,.16);background:linear-gradient(180deg,var(--c-accs),rgba(106,63,181,0) 88%)}
+#cs .c-td-ic{flex:0 0 50px;width:50px;height:50px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(160deg,#8d63d9,#5b2fa8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 0 rgba(60,25,120,.22),0 6px 14px rgba(90,47,168,.26)}
+#cs .c-td-ic svg{width:25px;height:25px}
+#cs .c-td-hx{min-width:0}
+#cs .c-td-kick{font-weight:700;font-size:11px;line-height:1.35;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
+#cs .c-today2 .c-today-step{margin:4px 0 0}
+#cs .c-td-why{margin:6px 0 0;font-size:15px;line-height:1.6;color:var(--c-ink2);max-width:62ch}
+#cs .c-td-facts{padding:14px 18px 16px;border-radius:14px;background:var(--c-card);border:1px solid rgba(40,20,70,.09);box-shadow:0 1px 0 rgba(40,22,68,.05),0 4px 12px rgba(40,22,68,.05)}
+#cs .c-td-fh{font:600 16px/1.25 var(--c-serif);color:var(--c-ink1);margin:0 0 10px}
+#cs .c-td-grid{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:7px 20px;margin:0}
+#cs .c-td-grid dt{font-weight:600;font-size:12.5px;line-height:1.5;color:var(--c-ink3)}
+#cs .c-td-grid dd{margin:0;font-size:14px;line-height:1.5;color:var(--c-ink1)}
+#cs .c-td-pace{display:flex;gap:10px;align-items:center;padding:11px 14px;border-radius:12px;background:var(--c-accs);color:var(--c-ink2);font-size:13.5px;line-height:1.45}
+#cs .c-td-pace svg{flex:0 0 18px;width:18px;height:18px;color:var(--c-acc)}
+body[data-theme="night"] #cs .c-td-hero{border-color:rgba(183,156,230,.22)}
+body[data-theme="night"] #cs .c-td-facts{border-color:rgba(183,156,230,.16);box-shadow:none}
 #cs .c-item.c-soon-i small{color:var(--c-warn)}
 #cs .c-rv{gap:10px}
 #cs .c-rv-card{border:1px solid var(--c-hair);border-radius:12px;padding:10px 12px;background:linear-gradient(var(--c-a),var(--c-b));box-shadow:var(--c-pill);display:flex;flex-direction:column;gap:8px}
@@ -1890,6 +1919,14 @@ function nextOf(o){if(FINISHED[o.stage])return null;
   if(o.stage==="offer")return {step:"track",text:"Decide on the offer, and note what you decide in Track",why:""};
   return null;}
 function dateWords(d,o){var t=String(o.title||"an application").replace(/[.\s]+$/,""),l=d.label.charAt(0).toLowerCase()+d.label.slice(1);return d.kind==="closes"?t+" closes":d.kind==="interview"?"the interview for "+t:d.kind==="referee"?l+", for "+t:l+" for "+t;}
+/* 6.45: a mark for each kind of step (the line art of Ingenium's other marks) */
+var TD_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
+var TD_IC={check:TD_SVG+'<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.6 1.6L8 4.8"/><path d="M3.5 12l1.6 1.6L8 10.8"/><path d="M3.5 18l1.6 1.6L8 16.8"/></svg>',
+  fit:TD_SVG+'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg>',
+  send:TD_SVG+'<path d="M21 3L10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5z"/></svg>',
+  track:TD_SVG+'<path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></svg>',
+  practise:TD_SVG+'<path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 4v-4H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-3-3"/></svg>',
+  leaf:TD_SVG+'<path d="M5 19c8.5 0 14-5.5 14-14C10.5 5 5 10.5 5 19z"/><path d="M5 19l7.5-7.5"/></svg>'};
 function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowDay();
   sortedOpps().forEach(function(o){if(FINISHED[o.stage])return;var n=nextOf(o);if(!n){wait.push(o);return;}var x={o:o,n:n,mins:estimateOf(o,n)};if(o.rest&&o.rest>t)rest.push(x);else act.push(x);});
   var L=panel("csList","Today",{key:cbtn("pri sm","+ Bring one",function(){S.ui.room="apps";S.ui.open="new";show("work");save();render();},"Bring a posting, a programme's call or a grant")});
@@ -1913,9 +1950,25 @@ function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowD
   if(act.length){var hk=cbtn("sm c-only-one","How long do you have?",function(){S.ui.today=null;show("work");save();render();},"Only the steps that fit in ten, fifteen, twenty-five or forty-five minutes");L.foot.appendChild(hk);}
   var R;
   if(sel){var o=sel.o,nx=sel.n,dw=dueWords(o);R=panel("csWork",o.title||"Untitled",{back:"Today",onBack:function(){S.ui.today=null;show("list");save();render();}});
-    var c=h("div","c-col c-today");c.appendChild(h("p","c-note",esc([o.org,dw].filter(Boolean).join(" · "))));c.appendChild(h("h3","c-today-step",esc(nx.text)));
-    if(nx.why)c.appendChild(h("p",null,esc(nx.why)));if(nx.quote)c.appendChild(h("blockquote","c-today-q",esc("From the posting: “"+nx.quote+"”")));
-    c.appendChild(h("p","c-note",esc("About "+sel.mins+" minutes."+(low?" A low-energy day: this one step is enough.":"")+" One step at a time. When it is done, the next one takes its place here.")));R.body.appendChild(c);
+    /* 6.45: the step in parts (the styles say why) */
+    var c=h("div","c-col c-today c-today2"),nl=daysLeft(o),top=h("div","c-td-top");
+    if(o.org)top.appendChild(h("span","c-td-org",esc(o.org)));
+    if(dw)top.appendChild(chip(dw,nl==null?"c-td-stage":nl<0?"c-td-closed":nl<=7?"c-td-soon":"c-td-ok"));
+    top.appendChild(chip(stageWord(o.stage),"c-td-stage"));c.appendChild(top);
+    var hero=h("div","c-td-hero"),ic=h("div","c-td-ic");ic.setAttribute("aria-hidden","true");ic.innerHTML=TD_IC[nx.step]||TD_IC.check;hero.appendChild(ic);
+    var at=all.map(function(z){return z.x;}).indexOf(sel),hx=h("div","c-td-hx");
+    hx.appendChild(h("div","c-td-kick",esc((all.length>1&&at>=0?"Step "+(at+1)+" of "+all.length+" for today":"The step for today")+" · about "+sel.mins+" minutes")));
+    hx.appendChild(h("h3","c-today-step",esc(nx.text)));if(nx.why)hx.appendChild(h("p","c-td-why",esc(nx.why)));hero.appendChild(hx);c.appendChild(hero);
+    if(nx.quote)c.appendChild(h("blockquote","c-today-q",esc("From the posting: “"+nx.quote+"”")));
+    var F=h("div","c-td-facts"),gr=h("dl","c-td-grid"),C=o.check;F.appendChild(h("h4","c-td-fh",esc("This application")));
+    function fact(k,v){gr.appendChild(h("dt",null,esc(k)));gr.appendChild(h("dd",null,esc(v)));}
+    fact("Stage",stageWord(o.stage));if(dw)fact("Its date",dw);
+    fact("Checklist",!C?"Not made yet":(C.items||[]).length?(C.items.filter(function(x){return x.done;}).length+" of "+C.items.length+" ticked"):(C.pending&&C.pending.length?C.pending.length+" found, waiting for you to keep or drop":"Made, with nothing on it yet"));
+    var dk=Object.keys(o.docs||{}).filter(function(k){return DOCS[k]&&o.docs[k];});fact("Documents",dk.length?dk.map(function(k){return DOCS[k][0];}).join(", "):"None written yet");
+    var nrf=(o.refs||[]).length;if(nrf||(C&&(C.items||[]).some(function(x){return x.doc==="refs";})))fact("Referees",nrf?nrf+" chosen":"None chosen yet");
+    F.appendChild(gr);c.appendChild(F);
+    var pace=h("div","c-td-pace");pace.innerHTML=TD_IC.leaf+"<span>"+esc((low?"A low-energy day: this one step is enough. ":"")+"One step at a time. When it is done, the next one takes its place here.")+"</span>";c.appendChild(pace);
+    R.body.appendChild(c);
     R.foot.appendChild(cbtn("quiet","Not today",function(){o.rest=tomorrowStr();S.ui.today=null;save();render();say("It rests until tomorrow.");},"It comes back tomorrow"));
     R.foot.appendChild(cbtn("","Open the application",function(){S.ui.room="apps";S.ui.open=o.id;show("work");save();render();}));R.foot.appendChild(h("span","c-grow"));
     R.foot.appendChild(cbtn("pri","Do this now",function(){S.ui.room="apps";S.ui.open=o.id;o.step=nx.step;if(nx.kind){o.sv={kind:nx.kind};o.tab="doc";}show("work");save();render();}));}

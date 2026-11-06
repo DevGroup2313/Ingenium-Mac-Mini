@@ -404,7 +404,7 @@ function setChapKey(open){var c=D.querySelector("#ingTour .tour-chap");if(c)c.se
 /* the Guide's start of the tour: the level is shown and changed there too */
 function entryDress(){var g=$i("guideTour");if(!g)return;keyify(g);var go=$i("tourGo");if(go&&!go.classList.contains("ih-k")){go.classList.add("ih-k","pri");}
   if(!g.querySelector(".ih-lv")){var w=mk("div","ih-entrylv");w.appendChild(mk("p","small muted","How much the tour shows: choose your level."));
-    w.appendChild(levelGroup("Tour level"));var row=g.querySelector(".tour-entry-row");if(row)row.after(w);else g.appendChild(w);}
+    w.appendChild(levelGroup("Tour level",true));/* 6.45: each level with its line, stacked in the Guide's Start here (modules/r243.js) */var row=g.querySelector(".tour-entry-row");if(row)row.after(w);else g.appendChild(w);}
   paintLevels();}
 
 /* ---------- asked once, when the tour starts ---------- */
@@ -699,7 +699,6 @@ var WHAT=[
   ["#tourGo","Take the tour","Starts the guided tour, at your level."],
   [".tour-entry-chap","A chapter","Opens the tour at this chapter."],
   [".tip-fold-btn","A short note","Opens a short note; press again to fold it."],
-  ["#setAppName","The app's name","What Ingenium calls itself on this device."],
   ["#ihSetCard","Help and the guided tour","Your level: how much the tour shows and how help is worded."],
   ["#supCard","Support","Switches for the supports: reminders, timers, text size and more."],
   ["#lkConnect","Connect","Connects to another computer's models with its address and code."],

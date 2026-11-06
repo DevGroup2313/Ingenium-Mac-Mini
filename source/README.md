@@ -371,6 +371,84 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.45 (6 November 2026): presses made lighter; no permission opens or packages Ingenium itself outside the master
+edition; the app library keeps no copy of the Offline Project's page; the chat box has one stop key; Check with Blend in
+lavender; no Name card in Settings; the Career Studio's Today step and the Guide's Start here redesigned. Her answers
+(6 November 2026), to whether "edit" should go too: "Yes please remove the
+"edit", it can go too"; and to whether the app library should stop keeping saved copies of the Offline Project's page altogether:
+"Yes, the app library stop keeping saved copies of the Offline Project's page".
+
+- modules/r162.js, build/editions.py (_no_self), build/thoughts/permit_core.html: until 6.43 a permission of the owner's that
+  allowed "edit" still opened Ingenium itself in the full edition's Code and Build. Now no edition but the master lists Ingenium
+  itself (this copy, or the one the library keeps) among the apps Code and Build open, whatever a permission says, and none
+  packages it (6.43). The permission card the owner signs offers only what Ingenium acts on: use, install, share and sell
+  (PermitCore.create takes offer); a permission given before keeps what it says, as a document. rig/t_62_permits.js checks it.
+- modules/r240.js: 6.42 kept the Offline Project's page as two more apps of the master edition ("offline" and "offline3"), and the
+  full edition kept it as any other app. Now, in every edition, a page that is the Offline Project (its one-file app or its
+  site's hall, known by its title, with or without Inkwell) is not kept, nor a zip that holds one (the apps' pages in such a zip
+  are the copies it was made with, so they are not kept either), and the library says why: in the master edition, "The Offline
+  Project is not kept as a copy: Ingenium makes it from the four apps it holds now, so it always has their latest versions."
+  The other editions, which never name it, say "This page holds a set of apps, not one app, so the app library does not keep
+  it."
+  A copy kept by 6.42 or 6.43 is let go of at the next start, its bytes with it, here and on the computer app's disk. Lector
+  shows the set of her apps chosen with the Offline Project's crest (6.43), drawn from the apps Ingenium holds now; Fabrica's
+  work on the Offline Project is to be made from her four current apps in the same way (the next stage of it).
+  rig/t_642_anyapp.js checks the page, the zip, the copies let go of, and that no list names a copy.
+- modules/r215.js, her words (6 November 2026): "Please remove the "Stop" button from Ingenium's chatboxes, there is already a
+  purple pause button on screen in the text area, the white stop button seems superfluous there." The clock above the message
+  box (6.11) has no Stop key of its own now; the purple key in the box stops the reply, as it always did (what the reply changed
+  so far is kept). It wears its stop face whenever a reply is being written, and a screen reader hears it as "Stop writing" or
+  "Send" rather than the shape on it. The Guide's words on the Code session say so. rig/t_611_code.js checks it.
+- Lighter presses. Her words (6 November 2026): "Everything is moving slower inside of the app and my mouse's cursor is just
+  delayed on the screen of the app, it feels off and all of the buttons and the app's entire UI looks flatter and I hate it,
+  please fix this and undo whatever did this to the app." Measured with Chrome's profiler, the processor slowed four times, a
+  chat of 120 messages: on 6.44 the Guide's What's new key read every entry of every version again on each change to the Guide,
+  even hidden (0.8 s over eight presses), the drop-down lists' safety net measured every list each second, the page's scroll to
+  the top forced a whole layout in the middle of each press (0.5 s), and a visit to Chat or Code drew every message again and
+  saved the desk. Now: modules/r230.js reads the newest version from the first entry and does its work only while the Guide is
+  shown; modules/r172.js still reads every list a person can see each second (a value set by code shows within a second) and
+  measures their widths every other second, the dearer half of its work;
+  build_page.py scrolls at the next frame and only when the page is not at its top, and a visit keeps the messages drawn when
+  the conversation is unchanged (its mode, name, count and last four messages), saving the desk only when another one is
+  chosen; modules/r242.js (new) has the top bar's two breathing dots grow and fade on layers of their own, which the graphics
+  chip moves, where a shadow and a glow filter were redrawn by the processor on every frame of every page. Busy time on the same
+  run: a streamed reply 26 percent less, presses between pages 17 percent less. Compared with 6.36 (earlier the same day) and
+  6.44, every key's shadow is the same: no release changed the depth. The depth is set by Display, Depth (Raised or Flat) and
+  by the Author Studio's Look (Soft or Deep); nothing switches it by itself.
+- modules/r218.js, her words: "I want you to make the Check with Blend button inside of the chat pages purple to liven up the
+  look of the page, it needs some light colours so it does not look plain, and match the rest of the page's colours." Under a
+  reply, Check with Blend is a lavender key: a lilac face, the accent's words, a faint violet edge and lift, and Blend's own
+  mark (its two circles); by night a deep plum face with lavender words.
+- build_page.py, modules/r144.js, r173.js, editions.py, her words: "since I can rename Ingenium inside of the Author Studio, I
+  don't think there is a need to keep that function on the Settings page of the page, please remove it." No edition has the Name
+  card now; the Author Studio's Names room (master) names the app, and Find a setting leads "rename" there. rig/t_671_name.js
+  and rig/t_627_editions.js check it.
+- modules/r188.js, her words: "The Make its checklist page looks odd and not formatted. It looks very plain and reads poorly,
+  please redesign it to better fit the rest of the Career Studio and the colour palette and design of Ingenium." Today's step
+  is in parts now: the application's strip (its organisation, its date and its stage as coloured chips), the step on a lilac
+  card with a mark for its kind (a checklist, a reading, a sending, a flag, a conversation), where it stands among today's
+  steps and its minutes, the posting's own words when it quotes them, a card of what the application holds so far (its stage,
+  its date, its checklist, its documents, its referees), and the pace in a soft band. Only what the studio holds is shown.
+- modules/r243.js (new), r144.js, her words: "The guided tour page looks so off as a page especially with all of these buttons
+  just clustered together all in one area, it really bugs me and triggers my sensory issues, please redesign the Guide page to
+  fix this. This request is only for the Start here tab page inside of the Guide page." The tour's card held its sentence, its
+  key, three level keys and sixteen chapter keys of every width in one run (modules/r166.js had them wrap as they came). Now
+  two named parts side by side: Take the tour (the sentence, the key, and the three levels stacked, each with its line) and
+  The chapters (how many are seen, on a slim bar, and the sixteen as a book's contents: flat rows in two columns read
+  downwards, with no raised faces, after her second word: "I don't like the look of the Chapters area, it still has that many
+  clustered 3D buttons look that I said that I didn't like"). The same keys, in the same order for the keyboard and a screen
+  reader; below about 1,050 pixels the parts stand one above the other.
+- rig/t_67_select.js: since 6.36 Focus shows one part at a time and its first part holds no list; the test asked for at least
+  one there (it failed the same way on 6.44). It now asks that every list a person can see is dressed.
+- The history: her doctoral plans, quoted in modules/r188.js's header comment and used as sample text in rig/t_681_lector.js and
+  rig/t_desk.js until 6.43, are taken out of every earlier commit of this repository, on her yes ("Yes, you may proceed"). Only
+  the commits that held them, and the commits after them, were made again (the files otherwise the same, each commit's author,
+  dates and message kept, a commit id named in a message pointing at its new self, and signed again); 55 older commits and five branches that never held them are unchanged. Every blob in
+  every branch was searched afterwards for the words.
+
+    node rig/t_642_anyapp.js <master url> <out> <full edition url>   # the library keeps no copy of the Offline Project
+    node rig/t_611_code.js <url> <out>     # the clock above the message box, with no Stop key of its own
+    node rig/t_62_permits.js <master url> <out> <served folder> <its url>   # what the owner's card offers, and what it opens
 Ingenium 6.44 (6 November 2026): Your edge and Your direction; what Lector's readings add to her record; Claude within each model's
 limits; Ingenium's own caps on how much a model reads taken away.
 

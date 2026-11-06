@@ -71,7 +71,7 @@ async function survey(b, ed, url) {
       ok(r.carried.every(n => !/Carpe Diem|Forge|Inkwell/i.test(n)), 'full: none of the Offline Project\'s apps is carried', r.carried);
       ok(mentions.length === 0, 'full: nothing names the Offline Project\'s apps, the Author Studio or the owner', mentions.slice(0, 40));
     } else {
-      ok(r.nav.indexOf('lector') >= 0 && r.nav.indexOf('fabrica') >= 0 && r.workshop && r.nameCard, 'master: everything, with the Author Studio and the Name card', r.nav);
+      ok(r.nav.indexOf('lector') >= 0 && r.nav.indexOf('fabrica') >= 0 && r.workshop && !r.nameCard, 'master: everything, with the Author Studio (which names the app; no Name card in Settings since 6.45)', r.nav);
     }
     ok(r.errs.length === 0, ed + ': no error on any page', r.errs);
   }

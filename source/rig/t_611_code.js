@@ -202,15 +202,16 @@ const APP = [{ name: 'index.html', text: '<!doctype html>\n<html><head><meta cha
     const bot = { role: 'bot', text: '', live: true, steps: [{ i: '¶', t: 'Read app.js, lines 1–3' }] }; curChat().messages.push(bot); window.liveBot = bot; Engine.setStatus('busy'); renderChat();
     await new Promise(r => setTimeout(r, 1300));
     const w = document.getElementById('ccWork'), clockText = w && !w.hidden ? w.innerText.replace(/\s+/g, ' ') : null;
+    const sk = document.getElementById('chatSend'), face = { text: sk.textContent, label: sk.getAttribute('aria-label'), clockKeys: w ? w.querySelectorAll('button').length : -1 };
     const inp = document.getElementById('chatInput'); inp.value = 'Now make the number larger.'; inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
     const stillBusy = Engine.status === 'busy' && window.liveBot === bot, queued = (curChat().queue || []).map(x => x.text), chip = document.getElementById('ccQueue'), chipText = chip && !chip.hidden ? chip.innerText : null, box = inp.value;
     inp.value = 'And a reset key.'; inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', metaKey: true, bubbles: true, cancelable: true }));
     const queued2 = (curChat().queue || []).length;
     delete bot.live; window.liveBot = null; Engine.setStatus('ready'); renderChat();
     await new Promise(r => setTimeout(r, 1200));
-    const after = { sent: sent.slice(), left: (curChat().queue || []).length, clockHidden: document.getElementById('ccWork').hidden };
-    window.sendChat = realSend; return { clockText, stillBusy, queued, chipText, box, queued2, after }; });
-  ok(q.clockText && /Working/.test(q.clockText) && /\d+s/.test(q.clockText) && /Read app\.js, lines 1–3/.test(q.clockText) && /Stop/.test(q.clockText), 'while a reply is made, a clock above the message box says it is working, for how long, its latest step, with a Stop key', q.clockText);
+    const after = { sent: sent.slice(), left: (curChat().queue || []).length, clockHidden: document.getElementById('ccWork').hidden, label: document.getElementById('chatSend').getAttribute('aria-label') };
+    window.sendChat = realSend; return { clockText, face, stillBusy, queued, chipText, box, queued2, after }; });
+  ok(q.clockText && /Working/.test(q.clockText) && /\d+s/.test(q.clockText) && /Read app\.js, lines 1–3/.test(q.clockText) && !/Stop/.test(q.clockText) && q.face.clockKeys === 0 && q.face.text === '\u25a0' && q.face.label === 'Stop writing' && q.after.label === 'Send', 'while a reply is made, a clock above the message box says it is working, for how long, its latest step; no Stop key of its own (6.45): the purple key in the box wears its stop face and is named Stop writing, then Send', q);
   ok(q.stillBusy && q.queued.join() === 'Now make the number larger.' && /queued/i.test(q.chipText || '') && q.box === '' && q.queued2 === 2,
     'Enter while it works queues the message (it no longer stops the reply); ⌘ Enter queues too; the queue shows above the box', q);
   ok(q.after.sent.join('|') === 'Now make the number larger.' && q.after.left === 1 && q.after.clockHidden, 'when the reply ends, the first queued message is sent, the next waits for that reply; the clock goes', q.after);

@@ -82,6 +82,22 @@ body[data-theme="night"] .blx-ok{color:#8fd0a9}body[data-theme="night"] .blx-bad
 .blx-guide dd{margin:0;color:var(--ink-2)}
 @media (max-width:640px){.blx-guide dl{grid-template-columns:1fr}.blx-guide dd{margin-bottom:6px}#page-blend .bl-model.blx-cx .blx-ms{max-width:140px}}
 .msg-act.blx-chk{white-space:nowrap}
+/* 6.45, her words (6 November 2026): "I want you to make the Check with Blend button inside of the chat pages purple to liven up the
+   look of the page, it needs some light colours so it does not look plain, and match the rest of the page's colours." A lavender
+   key: a lilac face, the accent's words, a faint violet edge and lift, Blend's own mark (its two circles) beside the words; by night
+   a deep plum face with lavender words. It rises and seats as the keys beside it do. */
+.msg-act.blx-chk{display:inline-flex;align-items:center;gap:6px;color:#5b2fa8;border:1px solid rgba(106,63,181,.34);
+  background:linear-gradient(180deg,#f7f1ff 0%,#ebdfff 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(106,63,181,.10),0 1px 0 rgba(106,63,181,.16),0 3px 8px rgba(106,63,181,.13)}
+.msg-act.blx-chk svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;opacity:.9}
+.msg-act.blx-chk:hover{color:#4a2194;border-color:rgba(106,63,181,.55);background:linear-gradient(180deg,#f2e9ff 0%,#e1d0ff 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 2px 0 rgba(106,63,181,.18),0 7px 16px rgba(106,63,181,.20)}
+.msg-act.blx-chk:active{background:linear-gradient(180deg,#e6d8ff 0%,#efe6ff 100%);box-shadow:inset 0 2px 5px rgba(74,33,148,.22)}
+.msg-act.blx-chk:focus-visible{outline:2px solid #6a3fb5;outline-offset:2px}
+body[data-theme="night"] .msg-act.blx-chk{color:#e6dbff;border-color:rgba(183,156,230,.5);background:linear-gradient(180deg,rgba(150,110,220,.34) 0%,rgba(110,72,180,.26) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(0,0,0,.30),0 1px 0 rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.30)}
+body[data-theme="night"] .msg-act.blx-chk:hover{color:#f3edff;border-color:rgba(200,178,240,.7);background:linear-gradient(180deg,rgba(165,125,232,.42) 0%,rgba(120,80,190,.32) 100%)}
+body[data-depth="flat"] .msg-act.blx-chk{box-shadow:0 1px 2px rgba(106,63,181,.14)}
 /* 6.39: a blend's error note by day in a darker amber (#8a5a12 on white: 5.9 to 1; the warning colour #b8791f gave 3.6 to 1, under
    the 4.5 to 1 small text needs; axe-core, rig/t_67_rooms.js); by night the warning colour reads well on the dark card */
 .bl-note.bad{color:#8a5a12}
@@ -709,7 +725,7 @@ function checkReply(chatId,ix){var c=(state.chats||[]).filter(function(x){return
   toast(ps.length>=1?"The reply is set to be checked. Choose the models that check it, then press Run blend.":"Choose the models that check the reply, then press Run blend.");}
 (function wrapFill(){var o=W.fillMsg;if(typeof o!=="function")return;var n=function(d,mm){var r=o.apply(this,arguments);try{
     if(mm&&mm.role==="bot"&&mm.text&&!mm.live&&!mm.preview&&!mm.blendRun){var acts=d.querySelector(".msg-acts");if(acts&&!acts.querySelector(".blx-chk")){
-      var k=mk("button","msg-act blx-chk","Check with Blend");k.type="button";k.title="Send this reply to Blend: the models you choose check it claim by claim, and the corrected answer can come back here";
+      var k=mk("button","msg-act blx-chk");k.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="9" r="5"/><circle cx="16" cy="15" r="5"/></svg><span>Check with Blend</span>';k.type="button";k.title="Send this reply to Blend: the models you choose check it claim by claim, and the corrected answer can come back here";
       k.onclick=function(){var c=curChat();if(!c)return;var ix=c.messages.indexOf(mm);if(ix<0)return;checkReply(c.id,ix);};acts.appendChild(k);}}}catch(e){}return r;};
   try{Object.keys(o).forEach(function(k){if(n[k]===undefined)n[k]=o[k];});}catch(e){}n.__r218=1;W.fillMsg=fillMsg=n;})();
 

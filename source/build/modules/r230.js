@@ -206,7 +206,11 @@ var SEEN="ing.guide.seen.v1";
 function wnItems(){var c=$("wnGuide");if(!c)return [];var out=[];[].forEach.call(c.querySelectorAll(".wn-list li"),function(li){var b=li.querySelector("b");var v=b?String(b.textContent||"").trim():"";
   var t=String(li.textContent||"").replace(/\s+/g," ").trim();if(v&&t.indexOf(v)===0)t=t.slice(v.length).trim();if(t)out.push({v:v||"",t:t});});return out;}
 function groups(){var g=[],at={};wnItems().forEach(function(x){var k=x.v||"·";if(!at[k]){at[k]={v:k,items:[]};g.push(at[k]);}at[k].items.push(x.t);});return g;}
-function newest(){var g=groups();return g.length?g[0].v:(typeof ING_VERSION!=="undefined"?String(ING_VERSION):"");}
+/* 6.45: the newest version is the first entry's; the key no longer reads every entry of every version to learn it (her words, 6 November
+   2026: "Everything is moving slower inside of the app ... please fix this"; measured: 0.6 to 0.8 seconds over eight presses on a
+   computer a quarter as fast, every entry read again on each change) */
+function newest(){var c=$("wnGuide"),b=c?c.querySelector(".wn-list li b"):null,v=b?String(b.textContent||"").trim():"";
+  return v||(typeof ING_VERSION!=="undefined"?String(ING_VERSION):"");}
 function seen(){try{return W.localStorage.getItem(SEEN)||"";}catch(e){return "";}}
 function markSeen(v){try{W.localStorage.setItem(SEEN,v);}catch(e){}}
 var POP=null,KEY=null;
@@ -257,8 +261,11 @@ function close(focusKey){if(!POP||POP.hidden)return;POP.hidden=true;if(KEY){KEY.
 
 /* ---------- start, and later ---------- */
 function apply(){try{build();}catch(e){}try{tileAll();}catch(e){}try{refreshKey();}catch(e){}}
+/* 6.45: changes made to the Guide while it is out of sight are taken in when it is shown (go("guide") runs apply), not as they happen */
+var DIRTY=false;
+function shown(){var s=$("page-guide");return !!(s&&s.classList.contains("active")&&!s.hidden);}
 function watch(){var s=$("page-guide");if(!s||s.__gdWatch)return;s.__gdWatch=1;var T=0;
-  try{new MutationObserver(function(){if(T)return;T=setTimeout(function(){T=0;apply();},0);}).observe(s,{childList:true,subtree:true});}catch(e){}
+  try{new MutationObserver(function(){if(!shown()){DIRTY=true;return;}if(T)return;T=setTimeout(function(){T=0;DIRTY=false;apply();},0);}).observe(s,{childList:true,subtree:true});}catch(e){}
   try{new MutationObserver(function(){syncAll();}).observe(s,{attributes:true,attributeFilter:["class"]});}catch(e){}
   /* the focus moving into a folded topic (a key, Find in the guide) opens it */
   s.addEventListener("focusin",function(e){var t=e.target;if(t&&t.closest&&!t.classList.contains("gd-head"))openFor(t);});}

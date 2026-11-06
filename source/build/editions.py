@@ -148,8 +148,9 @@ def _lector_voice():
 
 
 def _no_self():
-    """No Ingenium of its own in Code's or Build's list of apps (the editions without Lector; in the full edition a permission
-    of the owner's that allows "edit" still opens it, modules/r162.js)."""
+    """No Ingenium of its own in Code's or Build's list of apps, in every edition but the master (until 6.43 the full edition
+    kept it for a permission of the owner's that allowed "edit"; her answer of 6 November 2026: "Yes please remove the \"edit\",
+    it can go too")."""
     return [
         ('    if(!L.some(function(a){return a.key==="ingenium";})&&location.protocol!=="file:")L.push({key:"ingenium-self",name:"Ingenium (this copy)",version:ING_VERSION});return L;},',
          '    return L;},', "no Ingenium (this copy) among the apps", 1),
@@ -423,17 +424,14 @@ def _fixed_name():
     from every build or version of the app that is NOT the master version of the app. I only want the master version of the
     app that only I possess on my devices to have that feature and functionality on the Settings page, nowhere else."
     Settings has no Name card; the top bar, Home, the help and the files it saves always say Ingenium, whatever an older copy
-    or a backup kept as its name (that value is kept as it was, and shown nowhere). The master edition keeps its Name card."""
+    or a backup kept as its name (that value is kept as it was, and shown nowhere). Since 6.45 no edition has a Name card (her
+    words: "since I can rename Ingenium inside of the Author Studio, I don't think there is a need to keep that function on the
+    Settings page"; build_page.py takes it out of the page), so what is left here keeps the name fixed."""
     return [
-        (("CUT", '      <div class="card"><h2 class="sec">Name</h2>', 'Shows in the top bar and on the Home page.</div>\n      </div>\n'), "", "Settings: no Name card", 1),
-        ('$("setAppName").addEventListener("input",function(){state.appName=$("setAppName").value;applyBrand();saveState();});', "",
-         "Settings: nothing listens for a new name", 1),
-        ('T("appname",function(){$("setAppName").value=state.appName;});', "", "start: no name to fill in", 1),
         ('function applyBrand(){var n=state.appName||"Ingenium";', 'function applyBrand(){var n="Ingenium";', "the top bar and Home say Ingenium", 1),
         ('function ingAppName(){return ((state.appName||"").trim())||"Ingenium";}', 'function ingAppName(){return "Ingenium";}', "every part asks for Ingenium", 1),
         ('(state.appName||"Ingenium")', '"Ingenium"', "saved files and the system check are named Ingenium", 6),
         ('(esc(state.appName)||"Ingenium")', '"Ingenium"', "the system check names Ingenium", 1),
-        ('["#setAppName","The app\'s name","What Ingenium calls itself on this device."],', "", "Help: no Name field to show", 1),
     ]
 
 
@@ -576,8 +574,10 @@ def edits(ed):
     if has_lector(ed):
         E += _lector_voice()
     else:
-        E += _no_self() + _no_lector() + _no_lector_words()
-    E += _no_self_kit() + _open_words(ed)  # 6.43: every edition but the master
+        E += _no_lector() + _no_lector_words()
+    # 6.43 and 6.45 (her words: "Yes please remove the \"edit\", it can go too"): every edition but the master has no Ingenium of
+    # its own to open in Code or Build, and none to package; no permission brings either back (modules/r162.js)
+    E += _no_self() + _no_self_kit() + _open_words(ed)
     if ed in ("gift", "demo", "full"):  # 6.27: no edition but the master names the owner's other apps
         E += _blank(ed)
     if ed == "full":

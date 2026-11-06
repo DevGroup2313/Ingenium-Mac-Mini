@@ -93,7 +93,10 @@ async function rooms(p, label) {
       await p.evaluate(() => go('guide')); await p.waitForTimeout(800);
       const lv = await p.evaluate(`[...document.querySelectorAll('#guideTour .ih-lvk')].map(${KEY})`), ch = await p.evaluate(`[...document.querySelectorAll('#guideTour .tour-entry-chap')].map(${KEY})`);
       ok(lv.length === 3 && lv.every(k => k.below && k.fits), 'the Guide: the tour\'s levels are keys, popped out and as wide as their words', lv);
-      ok(ch.length >= 10 && ch.every(k => k.below && k.fits), 'the Guide: its chapters are keys, popped out and as wide as their words', ch.slice(0, 4));
+      // 6.45, her words (6 November 2026): "I don't like the look of the Chapters area, it still has that many clustered 3D buttons
+      // look that I said that I didn't like": a quiet contents list, flat rows of one width (modules/r243.js)
+      const cw = ch.map(k => k.w);
+      ok(ch.length >= 10 && ch.every(k => !k.below) && Math.max(...cw) - Math.min(...cw) <= 2, 'the Guide: its chapters are a quiet contents list, flat rows of one width (6.45)', ch.slice(0, 4));
       await p.screenshot({ path: path.join(OUT, 'guide.png'), clip: { x: 0, y: 0, width: 1600, height: 520 } });
       await p.evaluate(() => document.getElementById('ingHelpKey').click()); await p.waitForTimeout(700);
       const hl = await p.evaluate(`[...document.querySelectorAll('#ihPanel .ih-lvk')].map(${KEY})`);
