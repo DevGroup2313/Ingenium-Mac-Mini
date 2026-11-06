@@ -146,6 +146,22 @@ function generic(o,name){var msgs=o.messages||o.chat_messages||o.turns||o.conver
     if(r==="system"){if(t)notes.push(t);return;}if(!r)return;out.push({role:r,text:t,at:ms(m.createdAt||m.created_at||m.timestamp||m.time||m.date),files:[]});});
   if(!out.length)return null;
   return conv({id:o.id||o.uuid||name,title:o.title||o.name||o.subject||"",created:ms(o.createdAt||o.created_at||o.created||o.create_time)||(out[0]&&out[0].at),updated:ms(o.updatedAt||o.updated_at||o.updated||o.update_time)||(out[out.length-1]&&out[out.length-1].at),model:o.model||"",messages:merge(out),notes:notes});}
+/* 6.31 (6 November 2026): LM Studio keeps each chat as a JSON file in the conversations folder of .lmstudio in the home folder, and
+   advises against relying on the file's layout, which it does not describe (its chat page, lmstudio.ai/docs/app/basics/chat, as a
+   web search reported it on 5 November 2026; the page itself could not be read from here). So this reader asks little of the file:
+   a list of messages, each holding one version or several (a reply made again), of which the one chosen (currentlySelected) is read;
+   a version's words are in its content, or in its steps; its title, dates and model are taken where they are present. It is known by
+   what it holds, not by its name. Tested on files made in that shape, not on real ones. */
+function lmText(v){if(!v)return "";var t=contentText(v.content);if(t)return t;
+  if(Array.isArray(v.steps))return v.steps.map(function(s){return s?contentText(s.content!=null?s.content:s.text):"";}).filter(Boolean).join("\n\n");
+  return v.text?String(v.text):"";}
+function lmstudio(o,name){var msgs=Array.isArray(o.messages)?o.messages:null;if(!msgs)return null;var out=[],notes=[];
+  if(typeof o.systemPrompt==="string"&&o.systemPrompt.trim())notes.push(o.systemPrompt.trim());
+  msgs.forEach(function(m){if(!m)return;var vs=Array.isArray(m.versions)&&m.versions.length?m.versions:[m],i=+m.currentlySelected;if(!(i>=0&&i<vs.length))i=vs.length-1;var v=vs[i]||{};
+    var r=roleOf(v.role||m.role),t=lmText(v);if(r==="system"){if(t)notes.push(t);return;}if(!r)return;out.push({role:r,text:t,at:ms(v.createdAt||m.createdAt),files:[]});});
+  if(!out.length)return null;var lm=o.lastUsedModel||{};
+  return conv({id:o.id||o.createdAt||name,title:o.name||o.title||"",created:ms(o.createdAt)||(out[0]&&out[0].at),updated:ms(o.updatedAt||o.lastUsedAt)||(out[out.length-1]&&out[out.length-1].at),
+    model:(typeof lm==="string"?lm:(lm.identifier||lm.indexedModelIdentifier||""))||o.model||"",messages:merge(out),notes:notes});}
 /* Gemini, from Google Takeout (My Activity): one record for each prompt and its reply, gathered into conversations by when
    they were written (an hour apart or more starts a new one) */
 function geminiRecords(arr){var recs=[];(arr||[]).forEach(function(r){if(!r||!/gemini|bard/i.test((r.header||"")+(r.products||[]).join(" ")))return;
@@ -215,9 +231,11 @@ function Found(){this.source="";this.conversations=[];this.projects=[];this.note
 Found.prototype.add=function(c,src){if(!c||!c.messages||!c.messages.length)return;c.source=c.source||src||this.source;this.conversations.push(c);};
 function kindOfItem(o){if(!o||typeof o!=="object")return "";if(o.mapping&&("current_node" in o||o.conversation_id||o.create_time))return "chatgpt";
   if(o.mapping&&o.inserted_at!=null)return "deepseek";if(o.chat_messages)return "claude";if(o.responses&&o.conversation)return "grok";
-  if(o.header&&o.title&&o.time)return "gemini";if(o.messages||o.turns)return "generic";return "";}
-var NAMES={chatgpt:"ChatGPT",claude:"Claude",claudecode:"Claude Code",deepseek:"DeepSeek",grok:"Grok",gemini:"Gemini",generic:"",copilot:"Copilot"};
-function srcFromName(n){n=String(n||"").toLowerCase();return /chatgpt|openai/.test(n)?"ChatGPT":/claude.?code|\/\.claude\//.test(n)?"Claude Code":/claude|anthropic/.test(n)?"Claude":/gemini|bard|takeout/.test(n)?"Gemini":/grok|x\.ai|xai/.test(n)?"Grok":/deepseek/.test(n)?"DeepSeek":/le.?chat|mistral/.test(n)?"Le Chat":/copilot|bing/.test(n)?"Copilot":/perplexity/.test(n)?"Perplexity":/kimi|moonshot/.test(n)?"Kimi":/\bpoe\b/.test(n)?"Poe":/meta.?ai|llama/.test(n)?"Meta AI":/qwen/.test(n)?"Qwen":/huggingchat/.test(n)?"HuggingChat":"";}
+  if(o.header&&o.title&&o.time)return "gemini";
+  if(Array.isArray(o.messages)&&o.messages.some(function(m){return m&&Array.isArray(m.versions);}))return "lmstudio";
+  if(o.messages||o.turns)return "generic";return "";}
+var NAMES={chatgpt:"ChatGPT",claude:"Claude",claudecode:"Claude Code",deepseek:"DeepSeek",grok:"Grok",gemini:"Gemini",generic:"",copilot:"Copilot",lmstudio:"LM Studio"};
+function srcFromName(n){n=String(n||"").toLowerCase();if(/lm.?studio/.test(n))return "LM Studio";return /chatgpt|openai/.test(n)?"ChatGPT":/claude.?code|\/\.claude\//.test(n)?"Claude Code":/claude|anthropic/.test(n)?"Claude":/gemini|bard|takeout/.test(n)?"Gemini":/grok|x\.ai|xai/.test(n)?"Grok":/deepseek/.test(n)?"DeepSeek":/le.?chat|mistral/.test(n)?"Le Chat":/copilot|bing/.test(n)?"Copilot":/perplexity/.test(n)?"Perplexity":/kimi|moonshot/.test(n)?"Kimi":/\bpoe\b/.test(n)?"Poe":/meta.?ai|llama/.test(n)?"Meta AI":/qwen/.test(n)?"Qwen":/huggingchat/.test(n)?"HuggingChat":"";}
 /* one JSON stream: the conversations it holds, whatever assistant wrote them */
 function readJsonInto(found,stream,name,progress){var gem=[];
   return readJSON(stream,function(o,whole){
@@ -233,6 +251,7 @@ function readJsonInto(found,stream,name,progress){var gem=[];
 function one(found,o,k,name,gem){try{
   if(k==="chatgpt")found.add(chatgpt(o),"ChatGPT");else if(k==="claude")found.add(claude(o),"Claude");else if(k==="deepseek")found.add(deepseek(o),"DeepSeek");
   else if(k==="grok")found.add(grok(o),"Grok");
+  else if(k==="lmstudio")found.add(lmstudio(o,name),"LM Studio");
   else if(k==="gemini"){var t=String(o.title||""),m=/^(Prompted|Asked|Said)\s+([\s\S]*)$/i.exec(t);if(m&&/gemini|bard/i.test((o.header||"")+(o.products||[]).join(" ")))gem.push({at:ms(o.time),q:m[2].trim(),a:(o.safeHtmlItem||[]).map(function(h){return htmlText(h.html);}).join("\n\n"),files:[]});}
   else if(k==="generic"){var g=generic(o,name);if(g)found.add(g,srcFromName(name)||"another assistant");}
   else if(o&&o.uuid&&o.docs){found.projects=found.projects.concat(claudeProjects([o]));}}catch(e){found.skipped.push((o&&(o.title||o.name))||"a conversation");}}
@@ -295,6 +314,6 @@ function brief(c){var me=c.messages.filter(function(m){return m.role==="user"&&S
   if(c.notes&&c.notes.length)L.push(c.notes.slice(0,3).map(function(n){return cut(n,400);}).join("\n"));
   return L.join("\n");}
 window.ChatImportCore={read:readFiles,brief:brief,day:day,Zip:Zip,srcFromName:srcFromName,
-  parsers:{chatgpt:chatgpt,claude:claude,claudeProjects:claudeProjects,claudeCode:claudeCode,deepseek:deepseek,grok:grok,generic:generic,transcript:transcript,csv:csv,gemini:geminiRecords,geminiHtml:geminiHtml}};
+  parsers:{chatgpt:chatgpt,claude:claude,claudeProjects:claudeProjects,claudeCode:claudeCode,deepseek:deepseek,grok:grok,generic:generic,transcript:transcript,csv:csv,gemini:geminiRecords,geminiHtml:geminiHtml,lmstudio:lmstudio}};
 })();
 </script>

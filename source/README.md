@@ -371,6 +371,33 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.31 (6 November 2026): Folders brings in work from the other assistants, LM Studio among them. Her request: Folders should
+bring in work from ChatGPT, DeepSeek, LM Studio and the other assistants, and from GitHub repositories, not only from Claude and Ollama.
+
+- What was there: the shared import (thoughts/chat_import_core.html, used by Settings through r160 and by Folders) already read
+  ChatGPT's .zip, Claude's, Gemini's Google Takeout, Grok, DeepSeek, Le Chat and Copilot as they were laid out in October 2026. Folders'
+  card, Bring in your work, named only Claude, Claude Code and Ollama, so the others were not offered there.
+- modules/r208.js: a way of its own, ChatGPT, Gemini, Grok, DeepSeek, Le Chat, Copilot and LM Studio, says where each export is found
+  and has the key Bring in an export (the same reader as Claude's .zip). What comes in is sorted into the folders as before.
+- thoughts/chat_import_core.html: LM Studio's chat files. LM Studio keeps each chat as a JSON file in the conversations folder of
+  .lmstudio in the home folder and does not describe the file (its chat page, as a web search reported it on 5 November 2026; the page
+  could not be read from here). The reader knows such a file by what it holds (messages that hold versions, a reply made again being a
+  second version), reads the version chosen (else the last), its words from its content or its steps, keeps the system prompt as a
+  note rather than a message, and takes the title, the dates and the model where they are present. It was tested on files invented in
+  that shape, not on real ones: a real file that is not read should be reported, with the file if she is willing.
+- modules/r160.js: Settings' import card names LM Studio's chat files too. What is new gains 6.31.
+- Not yet: a GitHub repository brought into a folder. What a folder should take from a repository (its README, its files, its issues,
+  or its history) is hers to say first.
+- Three older tests had fallen behind the page, each found failing on 6.30 too and brought up to date: rig/t_67_claims.js looked for
+  two sentences as they were before 6.8.4 (no GitHub on the door) and 6.12 (connected models in Blend answer at the same time), and
+  for exactly 36 models in the catalogue (42 since 6.9.2 and 6.10.3; now at least 36, the SmolLM2 sizes still exact);
+  rig/t_62_import.js looked for Ollama's num_ctx in its form before 6.12 (a request on Blend's own connection keeps 16,384). The
+  import tests read their sample files (rig/import_fixtures.js) from the page's own address, as a browser allows.
+
+    node rig/t_631_imports.js <url> <out>   # 8 checks, with invented files: the way and its key, an LM Studio chat read with its title,
+                                            # model, chosen version and steps, the system prompt as a note, ChatGPT's and a plain
+                                            # list still read, brought in and sorted into an invented folder, no page errors
+
 Ingenium 6.30 (6 November 2026): a whole backup, sealed with a password of her own. Her words: "I want you to encrypt Ingenium and
 everything inside of it. I want Ingenium to be fully encrypted end-to-end, and to be protected that is very important to me. I don't want
 Ingenium to be at risk and vulnerable to hackers or malicious software. I don't want my data getting lost or being stolen or leaked".
