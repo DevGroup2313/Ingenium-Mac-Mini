@@ -397,6 +397,10 @@ AI 2,945, Everyday 1,615.
   (desk-backups: the day's first, and one about to shrink), where it can still be chosen. Not changed: the reset still leaves the
   other stores (long texts, the app library, Fabrica, conversations brought in, the signing keys); with the lock on they stay sealed
   under a key that is gone, and the apps Ingenium carries are kept again, plain, at the fresh copy's first start (checked).
+- What's new in the public editions (modules/r222.js): rig/t_627_editions.js found that the entries for 6.29 and 6.32, written
+  after the editions were last built (6.28), named Fabrica, the app library and the Career Studio, which the gift and demo editions
+  do not hold. An entry can now be marked "fabrica" (shown where Fabrica is) or "nocareer" (the same news in the words of an edition
+  without the Career Studio): 6.32 is marked "fabrica", and 6.29 has a second wording that names Folders alone.
 - Tests brought up to date for the sections (each opens the section that holds the card it uses, as she would): t_61_backup,
   t_6101_device, t_62_eyes, t_632_sealed_stores, t_700_lock, t_700b_lock_shell, t_700c_lock_stores, t_700d_lock_backup. Still open,
   older than 6.32: rig/t_61_storage.js's simulated 12 MB device (its last part stops with "storage is full").
