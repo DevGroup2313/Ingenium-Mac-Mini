@@ -126,7 +126,9 @@ function partOf(el){for(var i=0;i<PARTS.length;i++){var c=$(PARTS[i].card);if(c&
 
 /* ---------- the Overview's bands, as tiles ---------- */
 function sentence(t){t=String(t||"").replace(/\s+/g," ").trim();var m=t.match(/^.{12,170}?[.!?](?=\s|$)/);return m?m[0]:(t.length>150?t.slice(0,147).replace(/\s+\S*$/,"")+"…":t);}
-function tiles(){var ul=$("ingTruthBands");if(!ul)return;ul.classList.add("tn-grid");var i=0;
+/* 6.39: the bands become keys (role button), so the list they stood in is a group of keys, with its own label: a list may hold only
+   list items (axe-core's "list" rule, found by rig/t_67_rooms.js) */
+function tiles(){var ul=$("ingTruthBands");if(!ul)return;ul.classList.add("tn-grid");ul.setAttribute("role","group");var i=0;
   [].forEach.call(ul.children,function(li){if(!li.classList.contains("tr-band"))return;li.style.setProperty("--tn-i",String(i++));if(li.__tn)return;li.__tn=1;
     li.classList.add("tn-tile");li.setAttribute("role","button");li.tabIndex=0;li.setAttribute("aria-expanded","false");
     var body=li.querySelector(":scope > div"),p=body&&body.querySelector("p");if(body&&p){var s=mk("span","tn-sum",sentence(p.textContent));body.insertBefore(s,p);}

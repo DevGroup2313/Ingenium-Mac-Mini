@@ -82,6 +82,10 @@ body[data-theme="night"] .blx-ok{color:#8fd0a9}body[data-theme="night"] .blx-bad
 .blx-guide dd{margin:0;color:var(--ink-2)}
 @media (max-width:640px){.blx-guide dl{grid-template-columns:1fr}.blx-guide dd{margin-bottom:6px}#page-blend .bl-model.blx-cx .blx-ms{max-width:140px}}
 .msg-act.blx-chk{white-space:nowrap}
+/* 6.39: a blend's error note by day in a darker amber (#8a5a12 on white: 5.9 to 1; the warning colour #b8791f gave 3.6 to 1, under
+   the 4.5 to 1 small text needs; axe-core, rig/t_67_rooms.js); by night the warning colour reads well on the dark card */
+.bl-note.bad{color:#8a5a12}
+body[data-theme="night"] .bl-note.bad{color:var(--warn)}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p218"]="started";}catch(_){}
 /* R218 · Blend, deepened: see the note at the top of its styles.

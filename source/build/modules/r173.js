@@ -265,7 +265,7 @@ var KEYS=[
   [/^how much model/,"memory ram size device tablet phone lend lending share sharing bigger computer borrow"],
   [/^ingenium as an app/,"install installer app apps mac windows fire android iphone ipad kit kits build number version update"],
   ["blxGuide","blend blending several models one answer judge"],
-  ["fdGuide","folders folder apps projects bring in import claude ollama"],
+  ["fdGuide","folders folder apps projects bring in import claude ollama github repository readme issues"],
   ["csGuide","career studio jobs job applications application cv resume cover letter phd grant"],
   [/^focus/,"focus support adhd autism autistic calm routines time steps"],
   [/^the right rail/,"rail notes notepad hourglass timer side buttons"],

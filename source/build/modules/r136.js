@@ -241,9 +241,22 @@ function kput(rec){if(typeof indexedDB==="undefined"){MEMK[rec.id]=rec;return Pr
 function kdel(id){if(typeof indexedDB==="undefined"){delete MEMK[id];return Promise.resolve();}return ktx("readwrite",function(s){return s.delete(id);}).then(function(){diskDel(id);});}
 function kall(){if(typeof indexedDB==="undefined")return Promise.resolve(Object.keys(MEMK).map(function(k){return MEMK[k];}));return ktx("readonly",function(s){return s.getAll();}).then(function(a){return Promise.all((a||[]).map(openK));}).then(function(a){return a.filter(Boolean);});}
 function shell(){try{var a=typeof shellApi==="function"?shellApi():null;return a&&typeof a.big_put==="function"&&typeof a.big_get==="function"?a:null;}catch(e){return null;}}
-function diskPut(rec){var a=shell();if(!a)return;try{a.big_put("signing_"+rec.id,JSON.stringify({id:rec.id,label:rec.label,source:rec.source,made:rec.made,pkcs8:b64e(rec.pkcs8),cert:b64e(rec.cert)}));}catch(e){}}
-function diskDel(id){var a=shell();if(a&&typeof a.big_del==="function"){try{a.big_del("signing_"+id);}catch(e){}}}
-function diskGet(id){var a=shell();if(!a)return Promise.resolve(null);return Promise.resolve(a.big_get("signing_"+id)).then(function(r){if(!r||!r.ok)return null;var o=JSON.parse(r.text);
+/* 6.39: the copies on a computer app's disk. Until 6.38 they were written as "signing_<id>", a name the app refuses (it keeps only
+   big_ and seven to forty letters or digits: ingenium_app.py, _BIG_ID), so no copy was ever kept and a web view that forgot its
+   store took the keys with it. Now each key's copy is "big_sgn<id>" and a small index, "big_sgnindex", lists the keys copied; the
+   long texts' sweep keeps them (the app lets go of any big_ file the desk does not name, ten minutes after it was written), and
+   Reset everything deletes them (keys.diskIds) so that a key it cleared cannot come back from the disk. */
+var DISK_INDEX="big_sgnindex";
+function diskId(id){return "big_sgn"+String(id).toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,36);}
+function diskIndex(){var a=shell();if(!a)return Promise.resolve([]);return Promise.resolve(a.big_get(DISK_INDEX)).then(function(r){var l=[];try{l=r&&r.ok?JSON.parse(r.text):[];}catch(e){l=[];}
+  return Array.isArray(l)?l.filter(function(x){return typeof x==="string"&&x;}):[];}).catch(function(){return [];});}
+var diskQ=Promise.resolve();
+function indexEdit(fn){diskQ=diskQ.then(function(){return diskIndex().then(function(l){var n=fn(l.slice()),a=shell();if(a&&n)return Promise.resolve(a.big_put(DISK_INDEX,JSON.stringify(n)));});}).catch(function(){});return diskQ;}
+function diskPut(rec){var a=shell();if(!a)return;try{Promise.resolve(a.big_put(diskId(rec.id),JSON.stringify({id:rec.id,label:rec.label,source:rec.source,made:rec.made,pkcs8:b64e(rec.pkcs8),cert:b64e(rec.cert)}))).catch(function(){});
+  indexEdit(function(l){if(l.indexOf(rec.id)<0)l.push(rec.id);return l;});}catch(e){}}
+function diskDel(id){var a=shell();if(a&&typeof a.big_del==="function"){try{Promise.resolve(a.big_del(diskId(id))).catch(function(){});
+  indexEdit(function(l){return l.filter(function(x){return x!==id;});});}catch(e){}}}
+function diskGet(id){var a=shell();if(!a)return Promise.resolve(null);return Promise.resolve(a.big_get(diskId(id))).then(function(r){if(!r||!r.ok)return null;var o=JSON.parse(r.text);
   var rec={id:o.id,label:o.label,source:o.source,made:o.made,pkcs8:b64d(o.pkcs8),cert:b64d(o.cert)};return sealK(rec).then(function(sr){return ktx("readwrite",function(s){return s.put(sr,rec.id);});}).then(function(){return rec;});}).catch(function(){return null;});}
 function describe(rec){if(!rec)return Promise.resolve(null);var p=certParts(rec.cert);return sha256(rec.cert).then(function(h){return {id:rec.id,label:rec.label,source:rec.source,made:rec.made,cn:p.cn,fingerprint:hex(h)};});}
 var keys={
@@ -257,7 +270,13 @@ var keys={
   save:function(id,password){if(!password||password.length<6)return Promise.reject(new Error("choose a password of at least six characters"));
     return keys.get(id).then(function(r){if(!r)throw new Error("there is no such key here");return writeP12(r,password,"app");});},
   remove:function(id){if(id==="device")return Promise.reject(new Error("the device's own key stays: an app signed with it could not be updated without it"));return kdel(id);},
-  describe:function(id){return keys.get(id).then(describe);}};
+  describe:function(id){return keys.get(id).then(describe);},
+  /* 6.39: the names of the copies on a computer app's disk (each key's and the index), for Reset everything to delete */
+  diskIds:function(){return diskIndex().then(function(l){var out=[diskId("device"),DISK_INDEX];l.forEach(function(id){var d=diskId(id);if(out.indexOf(d)<0)out.push(d);});return out;});}};
+/* the long texts' sweep (IngBig.gc, which tells the app what to keep) keeps the keys' copies and their index */
+try{if(window.IngBig&&typeof IngBig.gc==="function"&&!IngBig.gc.__r136){var ogcK=IngBig.gc;var ngcK=function(live){live=live||{};
+    return diskIndex().then(function(l){if(l.length){live[DISK_INDEX]=1;l.forEach(function(id){live[diskId(id)]=1;});}return ogcK.call(IngBig,live);},function(){return ogcK.call(IngBig,live);});};
+  ngcK.__r136=true;IngBig.gc=ngcK;}}catch(e){}
 
 /* ---------- v1, the JAR signature ---------- */
 function mfLine(name,value){var s=utf8(name+": "+value),out=[],first=true,i=0;

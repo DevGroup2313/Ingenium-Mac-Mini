@@ -1395,6 +1395,13 @@ edit('Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files"
      '    var opfs=Promise.resolve();try{if(navigator.storage&&navigator.storage.getDirectory)opfs=navigator.storage.getDirectory().then(function(root){return root.removeEntry(".ingenium-rag",{recursive:true});}).catch(function(){});}catch(e){}\n'
      '    Promise.race([Promise.all(["ingenium_files","the_foundry_files","ingenium_big","ingenium_apps","ingenium_repos","fabrica_made","ingenium_claude","ingenium_keys","ingenium_hub","ingenium_desk"].map(gone).concat([disk,diskBig,opfs])),',
      "6.38 Reset everything clears every store")
+# ---- 6.39 (6 November 2026): the signing keys' copies on a computer app's disk (modules/r136.js names them big_sgn<id>, listed in
+#      big_sgnindex, since the app keeps only big_ names) go with Reset everything too, or a key it cleared would come back from the
+#      disk the next time it is asked for. Their names are read from the disk's own index, not from the keys' store being deleted. ----
+edit('    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=Promise.all(dkIds.map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});})).then(function(){',
+     '    var sgnIds=Promise.resolve([]);try{if(window.IngApk&&IngApk.keys&&typeof IngApk.keys.diskIds==="function")sgnIds=Promise.resolve(IngApk.keys.diskIds()).catch(function(){return ["big_sgndevice","big_sgnindex"];});}catch(e){}\n'
+     '    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=sgnIds.then(function(sg){return Promise.all(dkIds.concat(sg||[]).map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});}));}).then(function(){',
+     "6.39 Reset everything deletes the signing keys' disk copies")
 
 for old, new, label, times in EDITS:
     n = out.count(old)

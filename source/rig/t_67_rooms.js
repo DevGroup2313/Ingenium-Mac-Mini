@@ -52,7 +52,10 @@ async function axeRun(p) {
   const pageText = await (await fetch(URL_)).text();
   ok(/<style id="r173-css">/.test(pageText) && /__ingParts\["p94"\]="running"/.test(pageText), 'the rooms module (r173, part p94) is in the built page');
   const src = fs.readFileSync(path.join(__dirname, '..', 'build', 'modules', 'r173.js'), 'utf8');
-  ok(!/\b(claude|gpt|gemini|llama|qwen|mistral|anthropic|openai|deepseek|phi-?\d)\b/i.test(src), 'no model is named anywhere in the module');
+  // 6.31 gave the Folders guide's search words the names of the assistants whose exports Folders brings in ("claude", "ollama"), so
+  // a search for them finds the import: those words name where conversations come from, not a model, and are left out here
+  const srcNoImportWords = src.replace(/\["fdGuide","[^"]*"\]/, '');
+  ok(srcNoImportWords !== src && !/\b(claude|gpt|gemini|llama|qwen|mistral|anthropic|openai|deepseek|phi-?\d)\b/i.test(srcNoImportWords), 'no model is named anywhere in the module (the Folders guide\'s search words for the assistants it imports from aside)');
   const shown = src.match(/"[^"]{12,}"/g).filter(s => / /.test(s) && !/[{}<>=;]|\\u|^"\s|\.\w+\(/.test(s));
   ok(!shown.some(s => /—|–| - /.test(s)), 'no dash used as punctuation in the words on screen', shown.filter(s => /—|–| - /.test(s)));
   const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox'] });
@@ -236,11 +239,19 @@ async function axeRun(p) {
     await p.evaluate(() => { [...document.querySelectorAll('#blPresets .bl-preset')].find(c => /Second opinion/.test(c.textContent)).querySelector('.btn').click(); }); await p.waitForTimeout(500);
     const used = await p.evaluate(() => ({ room: IngRooms.current('blend'), step: IngRooms.step(), focus: document.activeElement && document.activeElement.id, ids: blState().ids.join(','), strategy: blState().strategy }));
     ok(used.room === 'new' && used.step === 3 && used.focus === 'blendTask' && used.ids === 'hs_scriba,hs_magister' && used.strategy === 'judge', 'Use this blend sets the models and the way, and lands on the question, ready to write', used);
+    // since 6.12 (modules/r218.js) Blend asks a model on this device through Engine.load and Engine.generate, no longer through
+    // the base page's blAsk: the stand-in is the engine itself, as in rig/t_612_blend.js (until 6.38 this test stood in for blAsk,
+    // which nothing called any more, so it counted no question)
     const run = await p.evaluate(async () => { window.__asked = [];
-      blAsk = function (r, a, m, messages, into) { const u = messages[messages.length - 1].content; window.__asked.push({ model: m.customName, judge: /You are the judge/.test(u) });
-        let text; if (/You are the judge/.test(u)) text = 'Answer 1: accuracy 3/5, completeness 2/5, clarity 4/5. Reason: it leaves out the second cause.\nAnswer 2: accuracy 5/5, completeness 4/5, clarity 4/5. Reason: both causes are given and supported.\nTHE ANSWER:\nThe tides rise and fall because of the Moon\'s gravity and, to a lesser degree, the Sun\'s.';
-        else text = m.id === 'hs_scriba' ? 'The tides come from the Moon.' : 'The tides come from the Moon and the Sun together.';
-        a.state = 'done'; a.text = text; a.ms = 900; into.text = text; return Promise.resolve(text); };
+      window.__origCan = window.__origCan || blCanRun; window.blCanRun = function () { return true; };
+      Engine.modelId = null; Engine.status = 'ready';
+      Engine.load = function (m) { Engine.modelId = m.id; Engine.status = 'ready'; return new Promise(r => setTimeout(r, 5)); };
+      Engine.unload = function () { Engine.modelId = null; Engine.status = 'disconnected'; return Promise.resolve(); };
+      Engine.generate = function (job) { const msgs = job.messages || []; let u = ''; for (let i = msgs.length - 1; i >= 0; i--) if (msgs[i].role === 'user') { u = String(msgs[i].content); break; }
+        const judge = /You are the judge/.test(u); window.__asked.push({ model: Engine.modelId, judge });
+        let text; if (judge) text = 'Answer 1: accuracy 3/5, completeness 2/5, clarity 4/5. Reason: it leaves out the second cause.\nAnswer 2: accuracy 5/5, completeness 4/5, clarity 4/5. Reason: both causes are given and supported.\nTHE ANSWER:\nThe tides rise and fall because of the Moon\'s gravity and, to a lesser degree, the Sun\'s.';
+        else text = Engine.modelId === 'hs_scriba' ? 'The tides come from the Moon.' : 'The tides come from the Moon and the Sun together.';
+        return new Promise(res => setTimeout(() => { job.onToken(text); res({}); }, 20)); };
       document.getElementById('blendTask').value = 'Why are there tides?'; document.getElementById('blendRun').click();
       for (let i = 0; i < 100 && BL.run; i++) await new Promise(r => setTimeout(r, 100));
       const o = document.getElementById('blendOut'), r = o.getBoundingClientRect();

@@ -371,6 +371,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.39 (6 November 2026): a GitHub repository in a folder, the signing keys kept on a computer app's disk, and three older
+test failures fixed. Asked what a folder should take from a GitHub repository, she answered: "I want its README, its files, and its
+issues."
+
+- modules/r238.js (new): Bring in a repository (Folders, Bring in your work, and a card in each folder). The link and the folder (a
+  new one named after the repository, or one she has); everything is read before anything is kept: the repository (api.github.com),
+  its file list (git/trees, recursive), its README, its text files (raw.githubusercontent.com; with a token, the contents API), its
+  issues, open and closed, and every comment (issues/comments, a hundred at a time). Pull requests are left out. The README joins
+  the folder's files, so it goes with every conversation in the folder; the files and the issues are kept in the long-text store (on
+  a computer app on its disk too), each listed in the folder's card with Show and Use in a conversation (a new conversation in the
+  folder, the file or the issue added to the next message). Bring it up to date reads it all again and lets the earlier copy go;
+  Remove from this folder lets it all go. Left out for the page's stability, and said: a file over 1 MB, more than 3,000 files or
+  25 MB of text; what is not text. Refusals in plain words: not found (or private: a token is needed), the token refused, GitHub's
+  hourly limit (with the time it opens again, read from the X-RateLimit headers GitHub exposes to pages, or from its message), no
+  connection. A public repository needs no token; a private one uses the token Add from GitHub keeps. modules/r208.js holds the two
+  hooks; the Guide's Folders card and its search words name it (r222.js, r173.js).
+- modules/r136.js and build_page.py: the signing keys' copies on a computer app's disk were written as "signing_<id>", a name the
+  app refuses (it keeps only big_ and seven to forty letters or digits), so none was ever kept. Now "big_sgn<id>", with an index
+  (big_sgnindex); the long texts' sweep keeps them; keys.diskIds() names them and Reset everything deletes them, so a cleared key
+  cannot come back from the disk.
+- Three failures of rig/t_67_rooms.js older than 6.38: its Blend run stood in for blAsk, which Blend has not called since 6.12 (it now
+  stands in for the engine, as rig/t_612_blend.js does); its model-name rule now leaves aside the Folders guide's search words for
+  the assistants it imports from; and two accessibility faults axe-core found are fixed at their source: the Train room's bands, keys
+  inside a list, are now a labelled group (r232.js), and a blend's error note by day is #8a5a12 on white, 5.9 to 1 (r218.js).
+
+    node rig/t_639_repo.js <url> <out>       # 21 checks with an invented repository and a stand-in GitHub: the way and the dialog, the
+                                             # README, five files word for word, two issues with three comments, the card, Show, Use in
+                                             # a conversation, Bring it up to date, refusals, Remove, no token sent, no other host
+    node rig/t_639_keys_disk.js <url> <out>  # 8 checks with a stand-in bridge keeping the app's name rule: the copy and its index, the
+                                             # sweep, the key back from the disk after the web view forgot, Reset deletes the copies
+
 Ingenium 6.38 (6 November 2026): one scale for the whole app, the model list at its key, and Reset everything clears every store.
 Her notes of 6 November: "Everything inside the Author Studio looks big and chunky, very bulky and does not match the rest of the
 app, please fix that." "The models drop down list panel from the chats does not open directly on top of the button, it opens on the
