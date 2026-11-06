@@ -192,7 +192,7 @@ function normPhrase(s){return String(s||"").normalize("NFC").toLowerCase().repla
 var K={raw:null,key:null,js:null},OFF=false,READY=[],REC=null;
 function okRec(o){return !!(o&&o.v===1&&o.dek&&o.kdf&&o.check);}
 function readRec(){try{var r=localStorage.getItem(LSK);if(!r)return null;var o=JSON.parse(r);return okRec(o)?o:null;}catch(e){return null;}}
-function writeRec(r){try{localStorage.setItem(LSK,JSON.stringify(r));REC=r;return true;}catch(e){warn(e);return false;}}
+function writeRec(r){if(W_.__ingResetting)return false;try{localStorage.setItem(LSK,JSON.stringify(r));REC=r;return true;}catch(e){warn(e);return false;}}
 /* a change to the record starts from the newest one kept (another window may have changed the password since) */
 function patchRec(fn){var cur=readRec();if(!cur||!REC||cur.made!==REC.made)cur=REC;if(!cur)return null;var r=JSON.parse(JSON.stringify(cur));fn(r);return writeRec(r)?r:null;}
 /* the sealed desk carries its own lock record in its clear header (the record opens nothing without the password or the phrase),
@@ -253,19 +253,19 @@ function deskWrite(raw){W.pend={raw:raw,seq:++W.seq,st:W_.state};kick();return W
 function afterWrite(seq){if(seq<=W.committed)return Promise.resolve();return new Promise(function(res){W.waiters.push({seq:seq,res:res});});}
 function kick(){if(W.busy||!W.pend)return;var j=W.pend;W.pend=null;W.cur=j;W.busy=true;
   sealDesk(j.raw,j.st).then(function(env){commit(env,j.seq);},function(e){warn(e);}).then(function(){W.busy=false;if(W.cur===j)W.cur=null;kick();});}
-function commit(env,seq){if(seq<=W.committed||OFF)return;W.committed=seq;var lsOk=true;
+function commit(env,seq){if(seq<=W.committed||OFF||W_.__ingResetting)return;W.committed=seq;var lsOk=true;
   if(W_.HAS_LS){try{localStorage.setItem(W_.KEY,env);W_.ingNoteSnapshot(env);}catch(e1){try{W_.SNAPRING.forEach(function(k){localStorage.removeItem(k);});localStorage.setItem(W_.KEY,env);}catch(e2){lsOk=false;try{W_.ingStoreFull();}catch(_){}}}}
   else{try{W_.memStore[W_.KEY]=env;}catch(e){}}
   try{if(W_.__deskOverflow)W_.__deskOverflow(env,W_.HAS_LS&&lsOk);}catch(e){}
   shellSave(env);
   if(W.waiters.length)W.waiters=W.waiters.filter(function(w){if(w.seq<=seq){try{w.res();}catch(e){}return false;}return true;});}
-function flushSync(){var j=W.pend||W.cur;if(j&&j.seq>W.committed&&K.js&&!OFF){W.pend=null;try{commit(sealDeskSync(j.raw,j.st),j.seq);}catch(e){warn(e);}}shellFlush();}
+function flushSync(){if(W_.__ingResetting)return;var j=W.pend||W.cur;if(j&&j.seq>W.committed&&K.js&&!OFF){W.pend=null;try{commit(sealDeskSync(j.raw,j.st),j.seq);}catch(e){warn(e);}}shellFlush();}
 /* the computer apps' copy on disk, half a second after the hands stop, as the base does; never before the desk on disk was looked at (R96) */
 var SH={timer:null,env:null};
 function api0(){try{return typeof W_.shellApi==="function"?W_.shellApi():null;}catch(e){return null;}}
-function shellSave(env){var api=api0();if(!api||typeof api.save_state!=="function")return;if(!W_.DESK_CHECKED){W_.DESK_PENDING=true;return;}
-  SH.env=env;if(SH.timer)clearTimeout(SH.timer);SH.timer=setTimeout(function(){SH.timer=null;var e=SH.env;SH.env=null;try{var a=api0();if(a&&e)a.save_state(e);}catch(x){}},500);}
-function shellFlush(){if(!SH.timer)return;clearTimeout(SH.timer);SH.timer=null;var e=SH.env;SH.env=null;try{var a=api0();if(a&&e&&typeof a.save_state==="function")a.save_state(e);}catch(x){}}
+function shellSave(env){if(W_.__ingResetting)return;var api=api0();if(!api||typeof api.save_state!=="function")return;if(!W_.DESK_CHECKED){W_.DESK_PENDING=true;return;}
+  SH.env=env;if(SH.timer)clearTimeout(SH.timer);SH.timer=setTimeout(function(){SH.timer=null;var e=SH.env;SH.env=null;if(W_.__ingResetting)return;try{var a=api0();if(a&&e)a.save_state(e);}catch(x){}},500);}
+function shellFlush(){if(!SH.timer||W_.__ingResetting)return;clearTimeout(SH.timer);SH.timer=null;var e=SH.env;SH.env=null;try{var a=api0();if(a&&e&&typeof a.save_state==="function")a.save_state(e);}catch(x){}}
 /* the shell's bridge itself seals what reaches the disk and opens what comes back from it, so every path that writes desk.json or a big/*.txt
    (the base, the Backup page's restore, Fabrica's mirror, the signing keys' copies) is covered at once; an envelope passes through unchanged */
 function wrapShell(){var a=api0();if(!a||a.__r197)return;try{a.__r197=1;}catch(e){return;}

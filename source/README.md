@@ -371,6 +371,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.33 (6 November 2026): Settings without the long scroll; Reset everything leaves nothing of the earlier desk. Her words (5 November
+2026): "The "Your data" tab page of the Settings page needs to be redesigned and reorganised because its still a lot of scrolling on all
+of its tabs." Measured on 6.28 (the same on 6.32) at 1440 by 900: Your data 2,792 pixels (3,281 with Backup's Moving open), Models and
+AI 2,945, Everyday 1,615.
+
+- modules/r234.js (new; works inside the rooms of modules/r173.js, and never in "Show every setting at once"): Your data in four
+  sections, one at a time, under a row of raised keys with a line saying what each holds: Bring in, Back up and move, Storage, Sign-in
+  and reset (the sign-in, the older one-file backup and Reset everything). Models and AI in four the same way: Your Ingenium,
+  Connections (online and home models, connectors), Search and eyes, Your devices. Backup's Moving shows its four steps two by two on
+  a wide window; Storage shows the gauge, your limit and old copies beside what takes the room, with the app library under both;
+  Everyday's five small cards stand in two columns from 1,100 pixels. The section chosen last is kept on this device, room by room
+  (ing.settings.parts.v1), only when she chooses it; anything that finds, scrolls to, focuses or rings a setting in another section
+  (Find a setting, Help's Show me, the tour) opens its section first. Measured now: Your data 900 to 1,686 pixels a section (Moving
+  open included), Models and AI 1,004 to 1,506, Everyday 1,321. window.IngSettingsParts: show(room, section, remember), rooms, parts.
+- Reset everything (build_page.py, modules/r197.js). rig/t_700d_lock_backup.js failed once in a full sweep: a seal of the desk still
+  on its way when Reset was pressed was written after the reset had removed the desk, and the lock record came back from the sealed
+  desk's head, so the fresh copy opened to the sign-in. rig/t_633_reset.js makes that moment certain (the seal slowed, the model
+  store held open from a frame so the reset waits its five seconds) and found two more faults, both older than 6.33: the recovery
+  shelf (three earlier moments of the desk, R50) stayed in the store, and on the computer apps the page brought the earlier desk back
+  from the desk on disk (R96 adopts the disk's desk when the view starts with none). Now the reset says it is under way before it
+  removes anything (window.__ingResetting: the page's saves, the lock's writer, its close-of-window seal, its copy to disk and its
+  record writer all stop), takes the recovery shelf with it, and empties the desk on disk through the bridge's own writer (not the
+  lock's, which would seal it) before the page starts again. The computer app keeps the earlier desk among its earlier desks
+  (desk-backups: the day's first, and one about to shrink), where it can still be chosen. Not changed: the reset still leaves the
+  other stores (long texts, the app library, Fabrica, conversations brought in, the signing keys); with the lock on they stay sealed
+  under a key that is gone, and the apps Ingenium carries are kept again, plain, at the fresh copy's first start (checked).
+- Tests brought up to date for the sections (each opens the section that holds the card it uses, as she would): t_61_backup,
+  t_6101_device, t_62_eyes, t_632_sealed_stores, t_700_lock, t_700b_lock_shell, t_700c_lock_stores, t_700d_lock_backup. Still open,
+  older than 6.32: rig/t_61_storage.js's simulated 12 MB device (its last part stops with "storage is full").
+
+    node rig/t_633_settings.js <url> <out>               # 17 checks: the sections, their heights at 1440 by 900, Moving two by two,
+                                                         # Storage's columns, the section kept, Find a setting and a reveal from
+                                                         # elsewhere opening their section, Show every setting at once, a phone
+    python3 rig/run_app.py <app dir> 18999 &             # (optional) the computer app's own back-end, for the third part
+    node rig/t_633_reset.js <url> <out> [18999]          # 17 checks: a plain copy and its recovery shelf; a protected copy with a
+                                                         # seal on its way (finishing during the reset, and still on its way as the
+                                                         # page goes); the carried apps kept again; the desk on disk
+
 Ingenium 6.32 (6 November 2026): the app library and Fabrica sealed with the lock. Her words: "I want you to encrypt Ingenium and
 everything inside of it." Until now the lock (modules/r197.js, 6.9) left three stores plain: the app library (IndexedDB
 ingenium_apps, the pages of her apps), Fabrica's repositories (ingenium_repos: every version's objects and each repository's record)

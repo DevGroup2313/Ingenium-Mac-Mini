@@ -9,6 +9,7 @@
 // pair of devices; the look by day and night from a phone to 3440 pixels; axe-core on all of it; the time to ready.
 //   node rig/t_61_backup.js http://127.0.0.1:8203/ingenium.html <out folder> [page without r143, for the time to ready]
 //   BK_BIG_MB=240 sets the size of the large round trip (0 leaves it out).
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const { spawnSync } = require('child_process');
 const URL_ = process.argv[2], OUT = process.argv[3], URL_BASE = process.argv[4] || null;
@@ -95,7 +96,7 @@ async function fresh(b, vp) { const ctx = await b.newContext({ viewport: vp || {
   p.on('pageerror', e => p.__errs.push(e.message)); return { ctx, p }; }
 async function settings(p, tab) {
   // 6.7: Settings is in rooms (r173); Backup and moving is in Your data, so that room is opened first, as a person would
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#bkCard', { timeout: 15000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'backup'); }); await p.waitForSelector('#bkCard', { timeout: 15000 });
   if (tab) { await p.click('#bkTab-' + tab); await p.waitForTimeout(250); }
   await p.evaluate(() => document.getElementById('bkCard').scrollIntoView({ block: 'start' })); await p.waitForTimeout(250);
 }

@@ -12,6 +12,7 @@
 //   - a copy locked before 6.32 (its lock record says nothing of these stores) seals them at its next sign-in;
 //   - after a reload and the sign-in everything reads whole; protection turned off writes it all back plain;
 //   - every part of the page ran to its end, and no script errors on the page.
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 900))); c ? pass++ : fail++; };
@@ -37,7 +38,7 @@ const raw = (p, db, store) => p.evaluate(([db, store, marks]) => new Promise((re
   rq.onerror = () => res(null); }), [db, store, MARKS.source]);
 const all = async (p) => { const o = {}; for (const [db, st] of STORES) o[db + '/' + st] = await raw(p, db, st); return o; };
 async function protect(p) {
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Protect this copy/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 5000 }); await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW1); await p.fill('#ildP2', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 10000 });
@@ -142,7 +143,7 @@ const readAll = (p, ids) => p.evaluate(async (ids) => { const td = new TextDecod
   const read3 = await readAll(p, ids);
   ok(read3.page === PAGE && read3.file === FILE1 && read3.msgs.some(m => m.includes('COMMIT-MARK-TWO')) && read3.cards === 2 && read3.pkg === PKG, 'after the sign-in the parts read it all whole again', { ...read3, page: read3.page && read3.page.slice(0, 40) });
   // 6. turn protection off: plain again
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Turn protection off/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForFunction(() => /Protection is off/.test((document.querySelector('#ingLockDoor h2') || {}).textContent || ''), null, { timeout: 300000 });

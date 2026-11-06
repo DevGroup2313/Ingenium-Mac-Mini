@@ -6,6 +6,7 @@
 // be changed without the old one; cancelled, nothing changes and the key stays offered; a computer without the key is said so;
 // Can't sign in? lists it; turned off, it is gone, and the computer's key is removed; a page with no bridge offers nothing.
 //   node rig/t_6101_device.js <Ingenium page url> <out folder>
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 700))); c ? pass++ : fail++; };
@@ -25,7 +26,7 @@ const BRIDGE = () => { const st = () => JSON.parse(sessionStorage.getItem('__dev
       const o = st(); return Promise.resolve(o[name] ? { ok: true, key: o[name] } : { ok: false, error: 'This Mac holds no key for this copy of Ingenium.', missing: true }); },
     device_key_drop: (name) => { window.__devCalls.push(['drop', name]); const o = st(); delete o[name]; put(o); return Promise.resolve({ ok: true }); } } }; };
 async function protect(p) {
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Protect this copy/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 5000 }); await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW1); await p.fill('#ildP2', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 10000 });
@@ -37,7 +38,7 @@ async function protect(p) {
   await p.click('#ingLockDoor #ildDone'); await p.waitForTimeout(600);
 }
 const waysRow = (p, re) => p.evaluate((src) => { const r = [...document.querySelectorAll('#ingLockDoor .ild-way')].find((x) => new RegExp(src).test(x.textContent)); return r ? { text: r.textContent.replace(/\s+/g, ' '), on: !r.querySelector('i').classList.contains('no'), key: (r.querySelector('button') || {}).textContent || '' } : null; }, re.source);
-const openWays = async (p) => { await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForTimeout(300);
+const openWays = async (p) => { await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForTimeout(300);
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(x => /Your ways back in/.test(x.textContent)).click()); await p.waitForSelector('#ingLockDoor .ild-way', { timeout: 5000 }); };
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); await ctx.addInitScript(BRIDGE); const p = await ctx.newPage();
@@ -66,7 +67,7 @@ const openWays = async (p) => { await p.evaluate(() => { go('settings'); if (win
   const after = await p.evaluate((m) => ({ open: (state.chats || []).some((c) => (c.messages || []).some((x) => x.text === m)), calls: window.__devCalls.map((c) => c[0]) }), MSG);
   ok(after.open && after.calls.join() === 'get', '2. at the sign-in the computer is asked once, and Ingenium opens without the password', after);
   // 3. the password changed without the old one, since the computer confirmed it is her
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForTimeout(300);
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForTimeout(300);
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(x => /Change the password/.test(x.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildP1', { timeout: 5000 });
   ok(!(await p.$('#ingLockDoor #ildPw')), '3. opened by the computer, the password is changed without the old one');

@@ -1349,6 +1349,32 @@ edit("""var u8=new TextEncoder().encode(r.text);libTx("readwrite",function(s){re
      """var u8=new TextEncoder().encode(r.text);libSeal(id,u8).then(function(v){return libTx("readwrite",function(s){return s.put(v,id);});}).catch(function(){});return r.text;}""",
      "6.32 a page brought back from the disk copy is sealed as it is kept")
 
+# ---- 6.33 (6 November 2026): Reset everything leaves nothing of the earlier desk behind. Found by rig/t_700d_lock_backup.js, which
+#      failed once in a full sweep: a seal of the desk still on its way when Reset was pressed was written after the reset had removed
+#      the desk, and the lock record came back from the sealed desk's head, so the fresh copy opened to the sign-in. rig/t_633_reset.js
+#      makes that moment certain and found two more: the recovery shelf (three earlier moments of the desk, R50) stayed in the store,
+#      and on the computer apps the page brought the earlier desk back from the desk on disk (R96 adopts it when the view starts with
+#      none). Now the reset says it is under way before it removes anything (window.__ingResetting; the page's saves and the lock's
+#      writers stop: modules/r197.js), takes the recovery shelf with it, and empties the desk on disk through the bridge's own writer
+#      (not the lock's, which would seal it) before the page starts again. The computer keeps the earlier desk among its earlier
+#      desks (desk-backups, the day's first and one about to shrink), where it can still be chosen. ----
+edit('box.querySelector("#rGo").onclick=function(){\n'
+     '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}\n',
+     'box.querySelector("#rGo").onclick=function(){\n'
+     '    window.__ingResetting=true;try{var q0=saveState._q;if(q0&&q0.timer){clearTimeout(q0.timer);q0.timer=null;}}catch(e){}\n'
+     '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});SNAPRING.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}\n'
+     '    var disk=Promise.resolve();try{var sa=(typeof shellApi==="function")?shellApi():null,s0=sa&&((sa.__r197raw&&sa.__r197raw.save_state)||sa.save_state);if(typeof s0==="function")disk=Promise.resolve(s0.call(sa,"{}")).catch(function(){});}catch(e){}\n',
+     "6.33 Reset everything: under way first, the recovery shelf and the desk on disk too")
+edit('Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files")]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});',
+     'Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files"),disk]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});',
+     "6.33 Reset everything waits for the desk on disk as well")
+edit('function saveState(){if(window.__ingLocked)return;',
+     'function saveState(){if(window.__ingLocked||window.__ingResetting)return;',
+     "6.33 nothing is saved once a reset is under way")
+edit('function flushShellSave(){var q=saveState._q;if(!q||!q.timer)return;',
+     'function flushShellSave(){if(window.__ingResetting)return;var q=saveState._q;if(!q||!q.timer)return;',
+     "6.33 the window closing during a reset writes nothing to disk")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
