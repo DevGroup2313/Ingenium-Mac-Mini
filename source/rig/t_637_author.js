@@ -36,8 +36,9 @@ const ledeOf = (p, page) => p.evaluate((page) => (document.querySelector('#page-
       rooms: [...r.querySelectorAll('.au-room')].map(x => x.querySelector('span').textContent), h: document.getElementById('auH').textContent, kinds: [...r.querySelectorAll('.au-kind b')].map(x => x.textContent) }; });
   await p.screenshot({ path: OUT + '/637_studio.png' });
   ok(st.open && st.full && st.top.join('|') === 'Show Ingenium beside|Export all|Import all|Reset all|Close' && /^All changes kept/.test(st.kept), 'the studio covers the window with its own top bar: All changes kept, Show Ingenium beside, Export all, Import all, Reset all, Close', st);
-  ok(st.rooms.join('|') === 'The Editor|Words|Names|Look|Checks and additions|Change log' && st.h === 'The Editor' && st.kinds.length === 4, 'its rail of rooms, and the Editor asking what is being changed (four kinds)', { rooms: st.rooms, kinds: st.kinds });
-  await p.click('.au-kind:nth-child(3)'); await p.waitForTimeout(300); const k3 = await p.evaluate(() => document.getElementById('auH').textContent);
+  // 6.43: the Side bar room (the studio's second stage, rig/t_643_side.js) joins the rail after Names, and the Editor's kinds
+  ok(st.rooms.join('|') === 'The Editor|Words|Names|Side bar|Look|Checks and additions|Change log' && st.h === 'The Editor' && st.kinds.length === 5, 'its rail of rooms, and the Editor asking what is being changed (five kinds, with the side bar since 6.43)', { rooms: st.rooms, kinds: st.kinds });
+  /* the fourth kind since 6.43 (Its side bar is the third) */ await p.click('.au-kind:nth-child(4)'); await p.waitForTimeout(300); const k3 = await p.evaluate(() => document.getElementById('auH').textContent);
   ok(k3 === 'Look', 'a kind pressed opens its room (The way it looks: Look)', k3);
   // 3. words: pressed on the page
   await p.evaluate(() => { IngAuthor.close(); go('focus'); }); await p.waitForTimeout(600);

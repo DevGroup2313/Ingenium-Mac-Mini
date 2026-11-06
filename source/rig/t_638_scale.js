@@ -17,7 +17,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
 async function boot(p) { await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(1500);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(500); }
 /* what is meant to stand out, by where it stands */
-const TEXT_OK = [/page-title/, /\bau-h\b/, /div\.l-head > div > h1|div\.f-head > div > h1|div\.c-hrow > h1/, /hx-hello/, /hx-plaque/, /cc-title/, /stx-big/, /fx-bigclock/, /cc-hello/, /l-paper/, /pc-doc|pcd-/];
+const TEXT_OK = [/page-title/, /\bau-h\b/, /fld-h > h2/, /div\.l-head > div > h1|div\.f-head > div > h1|div\.c-hrow > h1/, /hx-hello/, /hx-plaque/, /cc-title/, /stx-big/, /fx-bigclock/, /cc-hello/, /l-paper/, /pc-doc|pcd-/];
 const KEY_OK = [/cplus-btn/, /#chatSend/, /cc-title/, /r175-seal/, /l-fold|f-fold/, /hx-app\b/, /pcd-toc/];
 const MEASURE = (scopeSel) => {
   const W = window, D = document;
@@ -51,6 +51,14 @@ const MEASURE = (scopeSel) => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
   await p.goto(URL_); await boot(p);
+  // 6.39: invented content, so each page is measured as it draws what it holds (a folder's card and its view, an app in Fabrica,
+  // a conversation), not only as it stands empty
+  await p.evaluate(async () => {
+    try { if (window.IngFolders && IngFolders.make) IngFolders.make('Invented Quill', ['notes']); } catch (e) {}
+    try { if (window.IngRepo) { const r = await IngRepo.create({ name: 'An invented app' }); await IngRepo.put(r.id, 'index.html', '<p>invented</p>'); await IngRepo.commit(r.id, 'First'); } } catch (e) {}
+    try { go('chat'); curMsgs().push({ role: 'me', text: 'An invented question about the tides.' }, { role: 'bot', text: 'An invented answer: the Moon, and to a lesser degree the Sun.' }); saveState(); try { renderChat(); } catch (e) {} } catch (e) {}
+    try { saveState(); } catch (e) {} });
+  await p.waitForTimeout(800);
   const views = [];
   const pages = await p.evaluate(() => ['home', 'chat', 'notes', 'folders', 'focus', 'models', 'blend', 'lector', 'career', 'build', 'fabrica', 'guide', 'settings'].filter(pg => document.getElementById('page-' + pg)));
   for (const pg of pages) {
@@ -65,6 +73,8 @@ const MEASURE = (scopeSel) => {
     for (const pp of parts) { const part = [pp.room, pp.part].filter(Boolean).join('.') || null;
       if (part) { await p.evaluate(([pg, pp]) => { try { if (pg === 'focus') IngFocusParts.show(pp.part); else { if (pp.room) IngRooms.open(pg, pp.room); if (pp.part && pg === 'settings') IngSettingsParts.show(pp.room, pp.part); } } catch (e) {} }, [pg, pp]); await p.waitForTimeout(600); }
       views.push({ view: pg + (part ? ':' + part : ''), ...(await p.evaluate(MEASURE, '#page-' + pg)) }); } }
+  const fid = await p.evaluate(() => { try { const f = IngFolders.folders()[0]; if (!f) return null; state.folders.ui.open = f.id; saveState(); go('folders'); IngFolders.paint(); return f.id; } catch (e) { return null; } });
+  if (fid) { await p.waitForTimeout(700); views.push({ view: 'folders:a folder', ...(await p.evaluate(MEASURE, '#page-folders')) }); await p.evaluate(() => { state.folders.ui.open = null; saveState(); IngFolders.paint(); }); }
   await p.evaluate(() => { try { go('chat'); if (window.ccEnter) ccEnter('code'); } catch (e) {} }); await p.waitForTimeout(900);
   views.push({ view: 'code', ...(await p.evaluate(MEASURE, '#page-chat')) });
   await p.evaluate(() => { try { if (window.ccEnter) ccEnter(''); } catch (e) {} });

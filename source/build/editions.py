@@ -148,17 +148,61 @@ def _lector_voice():
 
 
 def _no_self():
-    """No Ingenium of its own: not in Code's or Build's list of apps, and no install package of Ingenium itself (the owner
-    alone publishes Ingenium; a new app of the person's own is still packaged)."""
+    """No Ingenium of its own in Code's or Build's list of apps (the editions without Lector; in the full edition a permission
+    of the owner's that allows "edit" still opens it, modules/r162.js)."""
     return [
         ('    if(!L.some(function(a){return a.key==="ingenium";})&&location.protocol!=="file:")L.push({key:"ingenium-self",name:"Ingenium (this copy)",version:ING_VERSION});return L;},',
          '    return L;},', "no Ingenium (this copy) among the apps", 1),
+    ]
+
+
+OWN_PAGE_JS = r'/\bvar ING_EDITION\s*=/.test(H)&&/__ingParts/.test(H)'
+OWN_PAGE_SAYS = "This is Ingenium's own page. Only its owner makes apps of Ingenium."
+
+
+def _open_words(ed):
+    """6.43: the words of Build's Open key (modules/r138.js) and its help (r144.js) name only what this edition opens: no
+    Ingenium itself outside the master; in the public editions no app library and no Fabrica either."""
+    if ed == "full":
+        a, b, c = ("Your apps, an app in Fabrica, or a page from this device", "Your apps, an app in Fabrica, or a sample.",
+                   "Opens your apps, an app in Fabrica, or a file.")
+    else:
+        a, b, c = ("A page from this device", "A page from this device, or a sample.", "Opens a page from this device, or a sample.")
+    return [
+        ("Your apps, Ingenium itself, an app in Fabrica, or a page from this device", a, "Build: what Open opens", 1),
+        ("Your apps, Ingenium itself, an app in Fabrica, or a sample.", b, "help: what Open opens", 1),
+        ("Opens your apps, Ingenium itself, an app in Fabrica, or a file.", c, "the tour: what Open opens", 1),
+    ]
+
+
+def _no_self_kit():
+    """6.43, the owner's words (6 November 2026): "Please remove the option to download Ingenium as an app from the Build page and
+    only leave it in the master edition and nowhere else, I should be only person with access to it, I don't want others to be
+    able to ship and produce variations of my app without my expressed consent and permission." Every edition but the master
+    (until 6.42 the full edition kept the choice, hidden until a permission allowed "package"): no install kit of Ingenium itself
+    on the Build page, the kits make a new app only, and a kit or a Fabrica package refuses a page that is Ingenium's own (the
+    marks every Ingenium page carries: its edition's variable and the parts' register). A new app of the person's own is still
+    packaged. A copy someone has altered by hand cannot be stopped from inside a page; this closes the ways the page offers."""
+    return [
         ('<label class="kit-opt"><input type="radio" name="kitWhat" value="self" checked><span><b>Ingenium itself</b> <span class="small muted">to rebuild it or publish an update</span></span></label>',
          '', "the install kit: no Ingenium itself", 1),
         ('<input type="radio" name="kitWhat" value="editor">', '<input type="radio" name="kitWhat" value="editor" checked>',
          "the install kit: the app in the editor", 1),
         ('function kitWhat(){var r=document.querySelector(\'input[name="kitWhat"]:checked\');return r?r.value:"self";}',
          'function kitWhat(){return "editor";}', "the install kit: a new app only", 1),
+        ("  if(!who.isNew)return kitOwnPage();",
+         "  if(!who.isNew)return Promise.reject(new Error(\"Only the owner's edition makes Ingenium itself.\"));", "the install kit: never Ingenium's own page", 1),
+        ('  if(!code.trim())return Promise.reject(new Error("The editor above is empty: write or open the app there first."));\n  return Promise.resolve(code);}',
+         '  if(!code.trim())return Promise.reject(new Error("The editor above is empty: write or open the app there first."));\n'
+         '  var H=code;if(' + OWN_PAGE_JS + ')return Promise.reject(new Error("' + OWN_PAGE_SAYS + '"));\n  return Promise.resolve(code);}',
+         "the install kit: not Ingenium's own page from the editor", 1),
+        # Fabrica (modules/r111.js): every package passes through the page it assembles, and the web app reads its page itself
+        ("function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;",
+         "function onePageFrom(id,snap,page,html){var H=String(html||\"\");if(" + OWN_PAGE_JS + ")return Promise.reject(new Error(\"" + OWN_PAGE_SAYS + "\"));var cache={},missing=[],n=0,big=0;",
+         "Fabrica: no package of Ingenium's own page", 1),
+        ("return readText(id,snap.commit,page).then(function(html){var hasMan=",
+         "return readText(id,snap.commit,page).then(function(html){var H=String(html||\"\");if(" + OWN_PAGE_JS + ")throw new Error(\"" + OWN_PAGE_SAYS + "\");var hasMan=",
+         "Fabrica: no web app of Ingenium's own page", 1),
     ]
 
 
@@ -533,6 +577,7 @@ def edits(ed):
         E += _lector_voice()
     else:
         E += _no_self() + _no_lector() + _no_lector_words()
+    E += _no_self_kit() + _open_words(ed)  # 6.43: every edition but the master
     if ed in ("gift", "demo", "full"):  # 6.27: no edition but the master names the owner's other apps
         E += _blank(ed)
     if ed == "full":

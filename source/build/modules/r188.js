@@ -418,7 +418,7 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
    apply or not and clear plan for next steps." "I want it to teach me how to do this so that I can properly learn and be
    able to do this without assistance and continue to get better on my own." "I want to help figure out what skills that I
    have gained and developped from building my 4 apps (Carpe Diem, The Forge, Ingenium and Inkwell) and curating the
-   Offline Project and [her doctoral plans: private, so left out of this public source]." "[a] reviewer/assistant/career counselor/recruitor/mentor all in one inside of Ingenium that will not sugarcoat
+   Offline Project and [her doctoral plans: private, so left out of this public source since 6.43]." "[a] reviewer/assistant/career counselor/recruitor/mentor all in one inside of Ingenium that will not sugarcoat
    anything, that will not invent skills or experiences that I do not possess". "I want this recipe applicable to any user,
    it should be customisable and replicable." "Tell me and I forget. Teach me and I remember. Involve me and I learn." "I
    want it curated and trained to help figure out my career and academic goals and help me create real actionable steps and

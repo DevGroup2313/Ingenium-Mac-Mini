@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.43 (6 November 2026): Ingenium made as an app by its owner alone, the top bar's order, the Author Studio's side
+bar, and the Folders page at the app's sizes. Her words: "Please remove the option to download Ingenium as an app from the Build
+page and only leave it in the master edition and nowhere else, I should be only person with access to it, I don't want others to
+be able to ship and produce variations of my app without my expressed consent and permission." And: "Please move the About
+button back to being in front of the Help button and place the 'Author Studio' button in front of the About button and not
+behind, the new location throws me off."
+
+- build/editions.py (_no_self_kit, _open_words): until 6.42 the gift and demo editions had no install kit of Ingenium itself,
+  but the full edition kept it, hidden until a permission of the owner's allowed "package". Now every edition but the master
+  has none: the choice is not in the page, the kits make a new app only, asking for Ingenium's own kit is refused, and a kit
+  or a Fabrica package refuses a page that is Ingenium's own (the marks every Ingenium page carries: its edition's variable
+  and the parts' register), with "This is Ingenium's own page. Only its owner makes apps of Ingenium." A new app of the
+  person's own is still packaged. Build's Open key and its help name only what each edition opens. A permission allowing
+  "package" no longer opens it in another edition; "edit" still opens Ingenium in the full edition's Code, as before. A copy
+  someone alters by hand cannot be stopped from inside a page; this closes the ways the page offers.
+- modules/r236.js: the top bar reads Display, Studio, About, Help (the Studio key goes before About, not between About and
+  Help). The Author Studio's second stage, as Carpe Diem's has it: a Side bar room (the order of the pages in each group, Up
+  and Down, and which pages the side bar shows; Home and Settings always stay; a hidden page still opens from Home, Help and
+  the tour; each change in the change log with Undo; the built order key; Reset all, Export all and Import all carry it).
+  A group is put in order only when she has given it one, so pages that add their keys as they start keep their places.
+- modules/r208.js: a folder's name in its card at a card heading's size (16.5px, the app's serif, which the Author Studio's
+  Look now reaches), the new folder's card at the text's size, and a folder's own title at 21px below the page's 25px.
+  rig/t_638_scale.js now puts invented content in before measuring (a folder, an app in Fabrica, a conversation) and measures
+  a folder's own view, which is how these were found.
+- Her doctoral plans (a university and her proposal's title) were quoted in modules/r188.js's header comment and used as
+  sample text in two tests; they are taken out of the current source. Earlier commits still hold them: removing them from
+  the history would need the branch rewritten, which is hers to decide.
+
+    node rig/t_643_owner_kits.js <out> master=<url> full=<url> gift=<url> demo=<url>
+                                           # the master keeps Ingenium itself; full, gift and demo have no trace of it, refuse
+                                           # Ingenium's own page in the kits and in Fabrica, and still package an invented app
+    node rig/t_643_side.js <url> <out>     # the top bar's order; the Side bar room: move, hide, reload, Undo, built order,
+                                           # Export, Import, Reset all, the app's scale
+
 Ingenium 6.42 (6 November 2026): any app, not only her four, in Lector and the app library. Her words (6 November 2026): "I need for
 Lector and every other page inside of Ingenium to be able to take other apps. It should not be limited to only the 4 apps inside of
 Ingenium. Lector should be able to read and analyse and process any app inside of Ingenium." And: "I want the app library to recognise

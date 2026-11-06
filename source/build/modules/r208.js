@@ -19,11 +19,12 @@
   box-shadow:0 1px 0 rgba(40,22,68,.06),0 6px 16px rgba(40,22,68,.07);transition:transform .16s ease,box-shadow .16s ease;font:inherit;color:inherit}
 #page-folders .fld-card:hover{transform:translateY(-2px);box-shadow:0 2px 0 rgba(40,22,68,.08),0 10px 22px rgba(40,22,68,.10)}
 #page-folders .fld-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#page-folders .fld-card .fld-name{display:flex;align-items:center;gap:10px;font:700 18px/1.2 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;color:var(--ink-1)}
+/* 6.40 (one scale, her note of 6 November 2026: the newer pages' fonts and sizes to match the rest of the app): a folder's name in its card at a card heading's size (16.5px, the app's serif), the new folder's card at the text's size, a folder's own title below the page's (21px, not 26px above the page title's 25px) */
+#page-folders .fld-card .fld-name{display:flex;align-items:center;gap:10px;font:600 16.5px/1.25 var(--serif);letter-spacing:.03em;color:var(--ink-1)}
 #page-folders .fld-card .fld-name svg{flex:0 0 auto;width:22px;height:22px;color:var(--accent)}
 #page-folders .fld-card .fld-meta{font-size:12.5px;color:var(--ink-3);line-height:1.5}
 #page-folders .fld-card .fld-parts{font-size:12px;color:var(--ink-2)}
-#page-folders .fld-new{border-style:dashed;background:transparent;box-shadow:none;align-items:center;justify-content:center;color:var(--accent);font-weight:600;min-height:96px}
+#page-folders .fld-new{border-style:dashed;background:transparent;box-shadow:none;align-items:center;justify-content:center;color:var(--accent);font-weight:600;font-size:13.5px;min-height:96px}
 #page-folders .fld-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
 #page-folders .fld-ways{display:grid;gap:10px;margin-top:6px}
 #page-folders .fld-way{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:12px 14px;border:1px solid var(--hairline);border-radius:12px;background:var(--bg)}
@@ -54,7 +55,7 @@
 #page-folders .fld-sugg li{background:var(--card)}
 #page-folders .fld-back{margin:0 0 4px}
 #page-folders .fld-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-#page-folders .fld-h h2{margin:0;font:700 26px/1.2 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;color:var(--ink-1)}
+#page-folders .fld-h h2{margin:0;font:600 21px/1.2 var(--serif);letter-spacing:.035em;color:var(--ink-1)}
 #page-folders .fld-crumb{display:flex;align-items:center;gap:8px;margin:0 0 -8px;font-size:13.5px;color:var(--ink-3)}
 #page-folders .fld-crumbk{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:3px 6px 3px 2px;margin:0;font:600 13.5px/1.2 var(--sans);color:var(--accent);cursor:pointer;border-radius:6px}
 #page-folders .fld-crumbk:before{content:"";width:7px;height:7px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);margin-right:1px}

@@ -132,6 +132,14 @@ html.au-docked #auPickBar{left:calc((100vw - min(480px,100vw)) / 2)}
 #wsStudio > .as-banner,#wsStudio > .ws-wrap{display:none !important}
 #auTopKey{display:inline-flex;align-items:center;gap:5px}
 #auTopKey svg{width:12px;height:12px}
+/* 6.40: the Side bar room, and a page the studio hides from the side bar */
+nav.dock .nav-btn.au-hid{display:none !important}
+#ingAuthor .au-sgh{margin:14px 0 4px;font:600 11px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+#ingAuthor .au-side{list-style:none;margin:0;padding:0;border-top:1px solid var(--hairline)}
+#ingAuthor .au-srow{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid var(--hairline);font-size:13px}
+#ingAuthor .au-srow .nm{flex:1 1 auto;min-width:0;color:var(--ink-1)}
+#ingAuthor .au-srow.off .nm{color:var(--ink-3);text-decoration:line-through}
+#ingAuthor .au-show{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);margin-left:4px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p236"]="started";}catch(_){}
 /* R236 · The Author Studio, the room behind the rooms: see the note at the top of its styles. window.IngAuthor */
@@ -151,10 +159,10 @@ var PEN=svg('<path d="M4 20l4.2-1 10.6-10.6a2.1 2.1 0 0 0-3-3L5.2 16 4 20z"/><pa
 
 /* ---------- the store: state.author, in the desk ---------- */
 function A(){var s=W.state;if(!s)return null;var a=s.author;if(!a||typeof a!=="object")a=s.author={};
-  if(!Array.isArray(a.words))a.words=[];if(!a.names||typeof a.names!=="object")a.names={};if(!a.look||typeof a.look!=="object")a.look={};if(!Array.isArray(a.log))a.log=[];a.v=1;return a;}
+  if(!Array.isArray(a.words))a.words=[];if(!a.names||typeof a.names!=="object")a.names={};if(!a.look||typeof a.look!=="object")a.look={};if(!Array.isArray(a.log))a.log=[];if(!a.side||typeof a.side!=="object")a.side={};a.v=1;return a;}
 var kept=0;
 function save(){try{W.saveState();}catch(e){}kept++;var k=$("auKept");if(k){k.classList.add("flash");setTimeout(function(){k.classList.remove("flash");},700);paintKept();}}
-function count(){var a=A();if(!a)return 0;var n=a.words.length+Object.keys(a.look).length;Object.keys(a.names).forEach(function(p){n+=Object.keys(a.names[p]||{}).length;});return n;}
+function count(){var a=A();if(!a)return 0;var n=a.words.length+Object.keys(a.look).length+sideCount(a);Object.keys(a.names).forEach(function(p){n+=Object.keys(a.names[p]||{}).length;});return n;}
 function paintKept(){var k=$("auKept");if(!k)return;var n=count();k.querySelector("b").textContent=n?"All changes kept · "+n+(n===1?" change":" changes"):"All changes kept";}
 /* every change goes into one log, each undoable: {id, at, kind, key, label, before, after, undone} */
 function log(kind,k,label,before,after){var a=A();if(!a)return;a.log.unshift({id:uid(),at:Date.now(),kind:kind,key:k,label:label,before:before===undefined?null:before,after:after===undefined?null:after});if(a.log.length>400)a.log.length=400;}
@@ -247,29 +255,79 @@ function undo(id){var a=A();if(!a)return;var e=a.log.filter(function(x){return x
   else if(e.kind==="appname"){appNameSet(e.before||"",true);}
   else if(e.kind==="look"){lookSet(e.key,e.before||"",true);}
   else if(e.kind==="lookall"){a.look=JSON.parse(JSON.stringify(e.before||{}));applyLook();}
-  else if(e.kind==="reset"||e.kind==="import"){var b=e.before||{};a.words=b.words||[];a.names=b.names||{};a.look=b.look||{};if(W.state&&b.layers)W.state.layers=b.layers;if(b.appName!==undefined)appNameSet(b.appName||"",true);applyAll();}
+  else if(e.kind==="side"){a.side=JSON.parse(JSON.stringify(e.before||{}));applySide();}
+  else if(e.kind==="reset"||e.kind==="import"){var b=e.before||{};a.words=b.words||[];a.names=b.names||{};a.look=b.look||{};a.side=b.side||{};if(W.state&&b.layers)W.state.layers=b.layers;if(b.appName!==undefined)appNameSet(b.appName||"",true);applyAll();}
   e.undone=Date.now();save();paintRoom();toast("Undone: "+e.label);}
-function snapshot(){var a=A();return {words:JSON.parse(JSON.stringify(a.words)),names:JSON.parse(JSON.stringify(a.names)),look:JSON.parse(JSON.stringify(a.look)),layers:W.state&&W.state.layers?JSON.parse(JSON.stringify(W.state.layers)):null,appName:(W.state&&W.state.appName)||""};}
-function exportAll(){var a=A();if(!a)return;var data={kind:"ingenium-author",v:1,made:new Date().toISOString(),version:(function(){try{return W.ING_VERSION||"";}catch(e){return "";}})(),author:{words:a.words,names:a.names,look:a.look},appName:(W.state&&W.state.appName)||"",layers:(W.state&&W.state.layers)||null};
+function snapshot(){var a=A();return {words:JSON.parse(JSON.stringify(a.words)),names:JSON.parse(JSON.stringify(a.names)),look:JSON.parse(JSON.stringify(a.look)),side:JSON.parse(JSON.stringify(a.side||{})),layers:W.state&&W.state.layers?JSON.parse(JSON.stringify(W.state.layers)):null,appName:(W.state&&W.state.appName)||""};}
+function exportAll(){var a=A();if(!a)return;var data={kind:"ingenium-author",v:1,made:new Date().toISOString(),version:(function(){try{return W.ING_VERSION||"";}catch(e){return "";}})(),author:{words:a.words,names:a.names,look:a.look,side:a.side||{}},appName:(W.state&&W.state.appName)||"",layers:(W.state&&W.state.layers)||null};
   var text=JSON.stringify(data,null,1),d=new Date(),name="Ingenium author studio "+d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+".json";
   try{if(typeof W.saveFileNative==="function"){Promise.resolve(W.saveFileNative(name,"application/json",text)).then(function(){toast("Exported: "+name);});return text;}}catch(e){}
   var l=mk("a");l.href=URL.createObjectURL(new Blob([text],{type:"application/json"}));l.download=name;D.body.appendChild(l);l.click();setTimeout(function(){URL.revokeObjectURL(l.href);l.remove();},4000);return text;}
 function importText(text){var d=null;try{d=JSON.parse(text);}catch(e){}if(!d||d.kind!=="ingenium-author"||!d.author){toast("This file is not an Author Studio export.");return false;}
-  var a=A(),before=snapshot();a.words=Array.isArray(d.author.words)?d.author.words.filter(function(w){return w&&w.from&&w.to;}):[];a.names=d.author.names&&typeof d.author.names==="object"?d.author.names:{};a.look=d.author.look&&typeof d.author.look==="object"?d.author.look:{};
+  var a=A(),before=snapshot();a.words=Array.isArray(d.author.words)?d.author.words.filter(function(w){return w&&w.from&&w.to;}):[];a.names=d.author.names&&typeof d.author.names==="object"?d.author.names:{};a.look=d.author.look&&typeof d.author.look==="object"?d.author.look:{};a.side=d.author.side&&typeof d.author.side==="object"?d.author.side:{};
   if(d.layers&&W.state)W.state.layers=d.layers;if(typeof d.appName==="string")appNameSet(d.appName,true);
   log("import","all","Imported the studio's changes from a file ("+a.words.length+" words, "+Object.keys(a.names).length+" pages named, "+Object.keys(a.look).length+" looks)",before,null);applyAll();save();paintRoom();return true;}
 function importAll(){var f=mk("input");f.type="file";f.accept=".json,application/json";f.style.display="none";D.body.appendChild(f);f.addEventListener("change",function(){var file=f.files&&f.files[0];f.remove();if(!file)return;
   var r=new FileReader();r.onload=function(){if(importText(String(r.result||"")))toast("Imported. Every change from the file is in place.");};r.readAsText(file);});f.click();}
-function resetAll(){var a=A();if(!a)return;var go=function(){var before=snapshot();a.words=[];a.names={};a.look={};appNameSet("",true);log("reset","all","Reset all: Ingenium as it was built",before,null);applyAll();save();paintRoom();toast("Ingenium is as it was built. Undo is in the change log.");};
+function resetAll(){var a=A();if(!a)return;var go=function(){var before=snapshot();a.words=[];a.names={};a.look={};a.side={};appNameSet("",true);log("reset","all","Reset all: Ingenium as it was built",before,null);applyAll();save();paintRoom();toast("Ingenium is as it was built. Undo is in the change log.");};
   try{if(W.ingConfirm){Promise.resolve(W.ingConfirm("Reset all of the studio's changes? Every rewritten word, name and look goes back to how Ingenium was built. Your layers stay. The change log keeps the reset, and Undo brings it all back.",null,{yes:"Reset all",no:"Keep them"})).then(function(ok){if(ok)go();});return;}}catch(e){}
   if(W.confirm("Reset all of the studio's changes? Undo in the change log brings them back."))go();}
-function applyAll(){try{applyLook();}catch(e){}try{applyNames();}catch(e){}try{applyWords();}catch(e){}try{if(W.IngWorkshop&&IngWorkshop.apply)IngWorkshop.apply();}catch(e){}}
+function applyAll(){try{applyLook();}catch(e){}try{applyNames();}catch(e){}try{applySide();}catch(e){}try{applyWords();}catch(e){}try{if(W.IngWorkshop&&IngWorkshop.apply)IngWorkshop.apply();}catch(e){}}
 
 /* ---------- the studio ---------- */
+/* ---------- the side bar: the order of the pages in each of its groups, and which pages it shows (6.40, the studio's second stage,
+   as Carpe Diem's Author Studio has it). A hidden page stays: Home's keys, Help and the tour still open it. Home and Settings always
+   stay in the side bar, so the way back is never hidden. Kept in state.author.side: {order: {group: [pages]}, hidden: [pages]}. */
+var KEEP_SHOWN=["home","settings"],BUILT_SIDE=null,TOUCHED={};
+function sideGroups(){var nav=D.querySelector("nav.dock");if(!nav)return [];var out=[],cur=null;
+  [].forEach.call(nav.children,function(el){if(el.classList.contains("grp-label")){var t=el.getAttribute("data-au-grp");if(!t){t=clean(el.textContent).replace(/[▸▾▴◂▶▼]/g,"").trim();el.setAttribute("data-au-grp",t);}cur={name:t,btns:[]};out.push(cur);return;}
+    if(cur&&el.classList.contains("nav-btn")&&el.getAttribute("data-page"))cur.btns.push(el);});
+  out=out.filter(function(g){return g.btns.length&&!/^(apps|your models)$/i.test(g.name);});
+  /* the order each group was built with: read again every time while the studio has not reordered that group (other parts add
+     their keys as they start), kept once it has, and given back when her order is taken away */
+  if(!BUILT_SIDE)BUILT_SIDE={};out.forEach(function(g){var now=g.btns.map(function(x){return x.getAttribute("data-page");});
+    if(!TOUCHED[g.name])BUILT_SIDE[g.name]=now;
+    else{/* a key added after her order was put in (a page that starts late) is placed in the built order where its part put it:
+            just after the key it stands behind now */
+      var b=BUILT_SIDE[g.name]||(BUILT_SIDE[g.name]=[]);now.forEach(function(pg,i){if(b.indexOf(pg)>=0)return;var prev=i>0?now[i-1]:null,at=prev?b.indexOf(prev):-1;b.splice(at+1,0,pg);});}});
+  return out;}
+function sideCount(a){var sd=a&&a.side||{};return (sd.hidden||[]).length+Object.keys(sd.order||{}).length;}
+function applySide(){var a=A();if(!a)return;var sd=a.side||{},hid=(sd.hidden||[]).filter(function(p){return KEEP_SHOWN.indexOf(p)<0;}),ord=sd.order||{};
+  sideGroups().forEach(function(g){var orig=g.btns.slice(),mine=Array.isArray(ord[g.name]);
+    /* a group is put in order only when she has given it one, or to give back the built order once hers is taken away */
+    if(mine||TOUCHED[g.name]){var want=mine?ord[g.name]:BUILT_SIDE[g.name]||[];
+      var pos=function(b){var i=want.indexOf(b.getAttribute("data-page"));return i<0?1000+orig.indexOf(b):i;};
+      var sorted=orig.slice().sort(function(x,y){return pos(x)-pos(y);});
+      if(sorted.some(function(b,i){return b!==orig[i];})){var anchor=orig[0].previousSibling,par=orig[0].parentNode;sorted.forEach(function(b){par.insertBefore(b,anchor?anchor.nextSibling:par.firstChild);anchor=b;});}
+      TOUCHED[g.name]=mine;}
+    g.btns.forEach(function(b){var h=hid.indexOf(b.getAttribute("data-page"))>=0;if(h!==b.classList.contains("au-hid"))b.classList.toggle("au-hid",h);});});}
+function sideSet(next,label){var a=A();if(!a)return;var before=JSON.parse(JSON.stringify(a.side||{}));
+  if(!Object.keys(next.order||{}).length)delete next.order;if(!(next.hidden||[]).length)delete next.hidden;a.side=next;
+  log("side","all",label,before,JSON.parse(JSON.stringify(next)));applySide();save();paintRoom();}
+function navName(pg){var b=D.querySelector('nav.dock .nav-btn[data-page="'+pg+'"]'),t=b&&navText(b);return t?clean(t.nodeValue):pg;}
+function sideMove(gname,pg,dir){var a=A(),g=sideGroups().filter(function(x){return x.name===gname;})[0];if(!g)return;
+  var list=g.btns.map(function(b){return b.getAttribute("data-page");}),i=list.indexOf(pg),j=i+dir;if(i<0||j<0||j>=list.length)return;
+  list.splice(j,0,list.splice(i,1)[0]);var next=JSON.parse(JSON.stringify(a.side||{}));next.order=next.order||{};
+  if(JSON.stringify(list)===JSON.stringify(BUILT_SIDE[gname]||[]))delete next.order[gname];else next.order[gname]=list;
+  sideSet(next,"Moved "+navName(pg)+" "+(dir<0?"up":"down")+" in the side bar ("+gname+")");}
+function sideShow(pg,on){if(KEEP_SHOWN.indexOf(pg)>=0)return;var a=A(),next=JSON.parse(JSON.stringify(a.side||{})),h=(next.hidden||[]).filter(function(x){return x!==pg;});if(!on)h.push(pg);next.hidden=h;
+  sideSet(next,(on?"Showed ":"Hid ")+navName(pg)+" in the side bar");}
+function paintSide(body){var a=A(),sd=a.side||{},hid=sd.hidden||[];
+  var c=card("The side bar","The order of the pages in each group, and which of them the side bar shows. A hidden page stays: Home's keys, Help and the tour still open it. Home and Settings always stay, so the way back is never hidden.");
+  sideGroups().forEach(function(g){c.appendChild(mk("h4","au-sgh",g.name));var ul=mk("ul","au-side");
+    g.btns.forEach(function(b,i){var pg=b.getAttribute("data-page"),li=mk("li","au-srow"+(hid.indexOf(pg)>=0?" off":""));li.setAttribute("data-page",pg);
+      li.appendChild(mk("span","nm",navName(pg)));
+      var up=key("small ghost","Up",function(){sideMove(g.name,pg,-1);},"Move "+navName(pg)+" up");up.setAttribute("aria-label","Move "+navName(pg)+" up");if(i===0)up.disabled=true;li.appendChild(up);
+      var dn=key("small ghost","Down",function(){sideMove(g.name,pg,1);},"Move "+navName(pg)+" down");dn.setAttribute("aria-label","Move "+navName(pg)+" down");if(i===g.btns.length-1)dn.disabled=true;li.appendChild(dn);
+      var lb=mk("label","au-show"),cb=mk("input");cb.type="checkbox";cb.checked=hid.indexOf(pg)<0;cb.setAttribute("aria-label","Show "+navName(pg)+" in the side bar");
+      if(KEEP_SHOWN.indexOf(pg)>=0){cb.disabled=true;cb.checked=true;lb.title="Always shown";}cb.addEventListener("change",function(){sideShow(pg,cb.checked);});lb.appendChild(cb);lb.appendChild(mk("span",null,"Shown"));li.appendChild(lb);
+      ul.appendChild(li);});c.appendChild(ul);});
+  var k=mk("div","au-keys");var rb=key("ghost","The order it was built with, every page shown",function(){sideSet({},"Gave the side bar back its built order, every page shown");});if(!sideCount(a))rb.disabled=true;k.appendChild(rb);c.appendChild(k);body.appendChild(c);}
 var ROOMS=[
   {k:"editor",t:"The Editor",i:svg('<path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="16" r="3"/>'),h:"The Editor",s:"Where to begin: choose what you are changing, and the Editor hands you the room that changes it."},
   {k:"words",t:"Words",i:svg('<path d="M5 6h14M9 6v12M15 10h4M17 10v8"/>'),h:"Words",s:"Every word Ingenium says is yours to change. Press words on the page and rewrite them, or find them here; restoring always brings back the words it was built with."},
   {k:"names",t:"Names",i:svg('<path d="M20 12l-8 8-8-8V4h8z"/><circle cx="8.5" cy="8.5" r="1.5"/>'),h:"Names",s:"Ingenium's own name, and each page's name in the side bar, its title and the line under it."},
+  {k:"side",t:"Side bar",i:svg('<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9 4.5v15M5.8 8.5h1.4M5.8 11.5h1.4M5.8 14.5h1.4"/>'),h:"Side bar",s:"The order of the pages in the side bar, and which of them it shows. Home and Settings always stay."},
   {k:"look",t:"Look",i:svg('<circle cx="12" cy="12" r="8.5"/><circle cx="8.5" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/><path d="M12 20.5a2.5 2.5 0 0 1 0-5h1.5"/>'),h:"Look",s:"The colour that runs through Ingenium, the fonts it writes in, and how deep its keys and cards stand. Everything changes at once, behind the studio."},
   {k:"checks",t:"Checks and additions",i:svg('<path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/>'),h:"Checks and additions",s:"Check Ingenium from end to end, the errors since it started, your own layers (pages, sections, scripts, styles, hidden cards) and Ingenium's own page, changed by you or a model."},
   {k:"log",t:"Change log",i:svg('<path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8.5"/>'),h:"Change log",s:"Every change, newest first. Each one can be undone; nothing here is lost."}];
@@ -312,13 +370,13 @@ function hookChecks(){var b=$("wsBody");if(b&&!b.__au){b.__au=1;b.addEventListen
   try{var I=W.IngWorkshop;if(I&&typeof I.fix==="function"&&!I.fix.__r236){var of=I.fix;I.fix=function(){close();return of.apply(this,arguments);};I.fix.__r236=1;}}catch(e){}}
 function room(k){CUR=k;var R=ROOMS.filter(function(x){return x.k===k;})[0]||ROOMS[0];[].forEach.call(D.querySelectorAll("#auRail .au-room"),function(b){var on=b.getAttribute("data-room")===R.k;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   $("auH").textContent=R.h;$("auSub").textContent=R.s;paintRoom();var p=$("auPane");if(p)p.scrollTop=0;}
-function counts(){var a=A();if(!a)return;var n={words:a.words.length,names:Object.keys(a.names).reduce(function(s,p){return s+Object.keys(a.names[p]).length;},0)+((W.state&&W.state.appName)?1:0),look:Object.keys(a.look).length,log:a.log.filter(function(e){return !e.undone;}).length};
+function counts(){var a=A();if(!a)return;var n={words:a.words.length,names:Object.keys(a.names).reduce(function(s,p){return s+Object.keys(a.names[p]).length;},0)+((W.state&&W.state.appName)?1:0),look:Object.keys(a.look).length,side:sideCount(a),log:a.log.filter(function(e){return !e.undone;}).length};
   Object.keys(n).forEach(function(k){var e=$("auN-"+k);if(e)e.textContent=n[k]?String(n[k]):"";});}
 function paintRoom(){var body=$("auRoom");if(!body)return;putBack();body.innerHTML="";counts();paintKept();
-  if(CUR==="editor")paintEditor(body);else if(CUR==="words")paintWords(body);else if(CUR==="names")paintNames(body);else if(CUR==="look")paintLook(body);else if(CUR==="checks")takeChecks(body);else if(CUR==="log")paintLog(body);}
+  if(CUR==="editor")paintEditor(body);else if(CUR==="words")paintWords(body);else if(CUR==="names")paintNames(body);else if(CUR==="side")paintSide(body);else if(CUR==="look")paintLook(body);else if(CUR==="checks")takeChecks(body);else if(CUR==="log")paintLog(body);}
 function card(title,lede){var c=mk("div","au-card");if(title)c.appendChild(mk("h3",null,title));if(lede)c.appendChild(mk("p",null,lede));return c;}
 function paintEditor(body){var c=card("What are you changing","Choose the kind of change, and the Editor opens the room that makes it. Every room is also in the rail on the left, so when you know where to go, go straight there.");
-  var g=mk("div","au-kinds");[["words","The words it says","Every sentence Ingenium speaks: its pages, its keys, its help. Press them on the page, or find them."],["names","Its names","Ingenium's own name, and the name of each page, its title and its first line."],
+  var g=mk("div","au-kinds");[["words","The words it says","Every sentence Ingenium speaks: its pages, its keys, its help. Press them on the page, or find them."],["names","Its names","Ingenium's own name, and the name of each page, its title and its first line."],["side","Its side bar","The order of its pages in each group, and which of them the side bar shows."],
     ["look","The way it looks","Its colour, its fonts and how deep its keys stand, with ready looks to start from."],["checks","How it works inside","Check it from end to end, read its errors, add your own pages, sections, scripts and styles, or change its own page with a model."]].forEach(function(x,i){
     var b=mk("button","au-kind");b.type="button";b.style.setProperty("--i",i);b.appendChild(mk("b",null,x[1]));b.appendChild(mk("span",null,x[2]));b.appendChild(mk("em",null,"Open "+(ROOMS.filter(function(R){return R.k===x[0];})[0].t)+" ›"));b.addEventListener("click",function(){room(x[0]);});g.appendChild(b);});
   c.appendChild(g);body.appendChild(c);
@@ -385,7 +443,11 @@ function door(){var st=$("wsStudio");if(!st||st.querySelector(".au-door"))return
   t.appendChild(mk("p","small muted","The room behind the rooms. Every word Ingenium says, its names, its colour and fonts, its checks, your own pages and scripts, and its own page are yours to change there; every change is kept, listed and undoable."));d.appendChild(t);
   var k=mk("div","k");var o=key("primary","Open the Author Studio",function(){open("editor");});o.id="auOpenKey";k.appendChild(o);k.appendChild(key("ghost","Edit words on the page",function(){open("words");pickMode(true);}));d.appendChild(k);st.insertBefore(d,st.firstChild);}
 function topKey(){if($("auTopKey"))return;var help=null;[].forEach.call(D.querySelectorAll("button"),function(b){if(!help&&/^Help/.test(clean(b.textContent))&&b.offsetParent&&b.getBoundingClientRect().top<60)help=b;});if(!help||!help.parentNode)return;
-  var b=mk("button",help.className);b.type="button";b.id="auTopKey";b.title="The Author Studio: change Ingenium's words, names and look";b.innerHTML=PEN;b.appendChild(D.createTextNode("Studio"));b.addEventListener("click",function(){open();});help.parentNode.insertBefore(b,help);}
+  var b=mk("button",help.className);b.type="button";b.id="auTopKey";b.title="The Author Studio: change Ingenium's words, names and look";b.innerHTML=PEN;b.appendChild(D.createTextNode("Studio"));b.addEventListener("click",function(){open();});
+  /* 6.43, her note: "Please move the About button back to being in front of the Help button and place the Author Studio button in
+     front of the About button and not behind". So the order is Display, Studio, About, Help: the key goes before About when About
+     stands in the same row as Help, and before Help only where there is no About */
+  var ab=$("aboutBtn"),at=ab&&ab.parentNode===help.parentNode?ab:help;at.parentNode.insertBefore(b,at);}
 function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r236)return;var ng=function(p){if(p==="workshop"||p==="author"){try{var s=og.call(this,"settings");}catch(e){}open(p==="workshop"?"checks":undefined);return s;}var r=og.apply(this,arguments);try{if(p==="settings")door();applyNames();}catch(e){}return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r236=true;W.go=go=ng;}
 function boot(){try{build();}catch(e){}try{door();}catch(e){}try{hookChecks();}catch(e){}try{topKey();}catch(e){}try{wrapGo();}catch(e){}try{var h=$("auChecksHold"),b=$("wsBody"),r=$("ingAuthor");if(h&&b&&r&&b.parentNode!==h&&(r.hidden||CUR!=="checks"))h.appendChild(b);}catch(e){}try{applyAll();}catch(e){}}
