@@ -33,7 +33,7 @@ const STAND_IN = () => {
   /* 1. the card, in the Workshop */
   step('card');
   const c1 = await p.evaluate(async () => { go('workshop'); await new Promise(r => setTimeout(r, 900));
-    return { cards: [...document.querySelectorAll('#wsStudio .card > h2')].map(h => h.textContent), state: (document.getElementById('pgState') || {}).textContent || '',
+    return { cards: [...document.querySelectorAll('#wsBody .card > h2')].map(h => h.textContent), state: (document.getElementById('pgState') || {}).textContent || '',
       keys: [...document.querySelectorAll('#pgKeys button')].map(x => x.textContent), note: (document.getElementById('pgNote') || {}).textContent || '', started: window.__pg.started }; });
   ok(c1.cards.join('|') === 'Check Ingenium|Errors since it started|Your layers|Your page', 'the Workshop ends with Your page', c1.cards);
   ok(/Running: the page Ingenium was built with\./.test(c1.state), 'it says the built page is running', c1.state);

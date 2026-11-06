@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.37 (6 November 2026): the Author Studio, the room behind the rooms (the master edition only). Her words: "The Author
+Studio looks pitiful and does look like it will allow me to make any edits or changes to Ingenium. It does not look like Carpe Diem's
+Author Studio, I want to actually be able to make edits and changes to Ingenium."
+
+- What it was (6.25, modules/r226.js and r227.js): a room of Settings with four cards (Check Ingenium, Errors, Your layers, Your
+  page). Carpe Diem 1058's Author Studio, carried in Ingenium, was studied first: a studio of its own with a top bar (All changes kept,
+  Export all, Import all, Reset all overrides, Close), a rail of 37 rooms, an Editor that asks what is being changed, every word open
+  to rewriting, one change log and every change undoable.
+- modules/r236.js (new): the Author Studio over the whole window, or docked at the right with Ingenium live beside it. Opened from
+  Settings' Author Studio room (now a door), from a Studio key in the top bar, and from go("workshop") or go("author"). Its top bar:
+  All changes kept (with the count, flashing on every save), Show Ingenium beside, Export all, Import all, Reset all, Close. Its rail:
+  The Editor (four kinds of change, each opening its room), Words, Names, Look, Checks and additions, Change log.
+  Words: Edit words on the page (the studio docks; any words pressed open a small editor beside them, and the press does nothing
+  else); the rewrite is made on that page, or everywhere when chosen; Find words searches every sentence of every page; Your words
+  lists each rewrite with its page, Rewrite and Restore. A rewrite is kept as the words it replaces and the words that replace them,
+  and applied as Ingenium starts and whenever a page draws them again (a watcher of the page, only while there are rewrites); never
+  inside what is hers: messages, the chat's list, notes, Tabula, Code's editor, fields, code and editable text. Placeholders too.
+  Names: Ingenium's own name (state.appName, as Ownership sets it), and each page's name in the side bar, its title and its first
+  line. Look: ready looks (Ingenium's own, Carpe Diem blue, Forest, Ink, Rose, Amber), the accent colour with its shades made from
+  it for day and night, the headings' font, the text's font, and the depth of keys and cards. Checks and additions: the Workshop's
+  cards moved into the studio whole (Check Ingenium, Errors, Your layers, Your page). Change log: every change, newest first, each
+  with Undo, and Undo the last change; Export all writes the words, names, look, the app's name and the layers to one file (through
+  the computer's own save dialog where there is one), Import all reads it back, Reset all returns Ingenium to how it was built (the
+  log keeps the reset, and its Undo brings everything back). Kept in the desk (state.author): on every device with her data, in her
+  backups, sealed when the lock is on. editions.py leaves it out of every edition but the master. What is new gains 6.37 (master).
+- Not yet (the next stages, as Carpe Diem's has them): the side bar's order and pages hidden, cards moved and hidden from a picker,
+  the guided tour and the Guide's words, ready-made changes on a shelf, a Learn drawer, and an Installers room.
+- modules/r173.js: the Author Studio room's line says what the studio now holds.
+
+    node rig/t_637_author.js <url> <out>   # 19 checks with invented words and names: the door, the studio and its rail, the Editor,
+                                           # words pressed on a page and kept, on that page or everywhere, never in a message, after a
+                                           # reload, found, restored; names; a ready look, fonts and depth; the change log and Undo;
+                                           # Export all, Reset all, Import all; the Workshop inside; Esc, go("workshop"), the top key
+
 Ingenium 6.36 (6 November 2026): Focus in parts. Her request: the Focus page redesigned the way the Train room was (6.28), with tabs
 and sections, animated and clickable cards, and much less scrolling. Measured on 6.35 at 1440 by 900: the page was 2,351 pixels tall
 (3,856 on a phone 390 wide), its ten cards one under another.

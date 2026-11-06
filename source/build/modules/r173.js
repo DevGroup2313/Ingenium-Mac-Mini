@@ -215,7 +215,7 @@ var CONF={
       ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
-    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio: check Ingenium, see its errors, fix them with a model, and add, change or hide its parts.",ids:["wsStudio"],
+    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
       when:function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}}}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
