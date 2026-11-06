@@ -1,9 +1,9 @@
 {
- "made": "2026-11-06T14:14Z",
- "from": "25462c3",
+ "made": "2026-11-06T15:07Z",
+ "from": "276e63b",
  "file": "mac-shell.zip",
  "bytes": 226618,
- "sha256": "0934bf873bb60b8deb6b717e624e4d9511b874abc5e13ff0e3fdefed498c2537",
+ "sha256": "019c6bbc6d989e972bee7926a1e9bb738a61cfa891d2bfb1d842d48838df0608",
  "bundle": "Shell.app",
  "executable": "Shell",
  "archs": [
