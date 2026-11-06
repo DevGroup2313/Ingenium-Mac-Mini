@@ -479,7 +479,11 @@ function refIndex(){var live={},by={};
   return dbNames().then(function(names){return names.reduce(function(p,name){if(name==="ingenium_big")return p;return p.then(function(){return openExisting(name).then(function(d){if(!d)return;
       var sns=[].slice.call(d.objectStoreNames).filter(function(sn){return !(SKIP[name]&&SKIP[name][sn]);});
       var place=name==="ingenium_desk"?"shelf":"stores";
-      return sns.reduce(function(q,sn){return q.then(function(){return walk(d,sn,function(key,val){visit(val,place,0);});});},Promise.resolve()).then(function(){try{d.close();}catch(e){}});});});},Promise.resolve());})
+      /* 6.32: a record sealed with the lock (modules/r197.js) is opened before it is searched, so a text it names is never taken for one
+         that nothing names */
+      var L=(W.IngLock&&typeof W.IngLock.isRecEnv==="function")?W.IngLock:null;
+      return sns.reduce(function(q,sn){var sealed=[];return q.then(function(){return walk(d,sn,function(key,val){if(L&&L.isRecEnv(val))sealed.push(val);else visit(val,place,0);});})
+        .then(function(){return sealed.reduce(function(r,v){return r.then(function(){return L.openRec(name,sn,v).then(function(o){if(o!=null)visit(o,place,0);});});},Promise.resolve());});},Promise.resolve()).then(function(){try{d.close();}catch(e){}});});});},Promise.resolve());})
     .then(function(){return {live:live,by:by,at:Date.now()};});}
 /* when an id was made: "big_" + the time in base 36 + six random letters; null when it does not say */
 function idTime(id){id=String(id||"");if(!/^big_[a-z0-9]{7,}$/.test(id))return null;var ts=parseInt(id.slice(4,-6),36);
@@ -499,7 +503,10 @@ function plan(){var N=keepN(),items=[],kept={newest:0,pinned:0,inN:0,used:0,pack
       var pl=idx.live[v.ref]||[];if(pl.some(function(x){return DESKCOPY.indexOf(x)<0;})||countIn(jsLib,v.ref)>1||countIn(jsAll,v.ref)>countIn(jsLib,v.ref)){kept.used++;return;}
       items.push({kind:"library",app:app.key,ref:v.ref,sha:v.sha256||"",label:verLabel(app,v),bytes:+v.size||0,at:v.at||0});});});
     /* 2. Fabrica's packages: the newest N versions of each app and kind stay */
-    return openExisting("fabrica_made").then(function(d){if(!d)return [];return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}return a;});}).then(function(meta){
+    return openExisting("fabrica_made").then(function(d){if(!d)return [];return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}return a;});})
+      /* 6.32: a package's card sealed with the lock (modules/r197.js) is opened to be read; one that cannot be opened is left alone */
+      .then(function(a){var L=W.IngLock;if(!L||typeof L.isRecEnv!=="function")return a;return Promise.all((a||[]).map(function(m){return L.isRecEnv(m)?L.openRec("fabrica_made","meta",m):m;})).then(function(x){return x.filter(Boolean);});})
+      .then(function(meta){
       if(!meta.length)return;return repoNames().then(function(names){var groups={};
         meta.forEach(function(m){if(!m||!m.key)return;var g=(m.repo||"")+"|"+(m.kind||"");(groups[g]=groups[g]||[]).push(m);});
         Object.keys(groups).forEach(function(g){var list=groups[g],at={};list.forEach(function(m){at[m.commit]=Math.max(at[m.commit]||0,m.at||0);});

@@ -12,8 +12,9 @@
    conversations brought in from elsewhere ("ingenium_claude"), the signing keys ("ingenium_keys") and Fabrica's issues and pages
    ("ingenium_hub"), and on the computer apps desk.json, big/*.txt and the keys' copies on disk (through the shell's own bridge).
    What is not: backups made by the Backup page (plain zips, as before; from 6.30 sealed whole when Seal the whole backup is chosen
-   there, as it is by itself while this lock is on), the carried apps' documents in their frames, model files, the app library,
-   Fabrica's saved versions of apps, the engine. */
+   there, as it is by itself while this lock is on), the carried apps' documents in their frames, model files, the engine. From 6.32
+   the app library ("ingenium_apps"), Fabrica's repositories ("ingenium_repos") and the packages it made ("fabrica_made") are sealed
+   too, as bytes (see the binary envelope below). */
 #ingLockDoor{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483001;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;
   background:#f5f3f7;color:#221a2e;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --ild-face-a:#ffffff;--ild-face-b:#f7f5fa;--ild-wall:#d3cbe0;--ild-ink:#221a2e;--ild-soft:rgba(70,58,92,.78);--ild-line:rgba(91,70,144,.30);--ild-fam:40,22,68;--ild-field:#ffffff;--ild-acc:#5b4690}
@@ -281,7 +282,7 @@ function rawShell(){var a=api0();return a?(a.__r197raw||{save_state:a.save_state
 
 /* ---------- the Backup page: a backup stays a plain zip, so the records it reads are opened; what it puts back is sealed (r143 asks) ---------- */
 function bigLike(db,sn){return db==="ingenium_big"&&sn==="t";}
-function recLike(db,sn){return RSTORES.some(function(x){return x[0]===db&&x[1]===sn;});}
+function recLike(db,sn){return RSTORES.some(function(x){return x[0]===db&&x[1]===sn;})||binLike(db,sn);}
 function openRecs(db,sn,recs){if(!canOpen()||!recs)return Promise.resolve();
   if(recLike(db,sn))return seq(recs,function(r){if(r&&isRecEnv(r.v))return openRec(db,sn,r.v).then(function(p){if(p!=null)r.v=p;});});
   if(!bigLike(db,sn))return Promise.resolve();
@@ -300,12 +301,52 @@ function openValues(db,sn,arr){arr=arr||[];if(!canOpen())return Promise.resolve(
 function packRec(v){return JSON.stringify(v,function(k,x){if(x instanceof Uint8Array)return {"$u8":b64e(x)};if(x instanceof ArrayBuffer)return {"$u8":b64e(new Uint8Array(x))};return x;});}
 function unpackRec(t){return JSON.parse(t,function(k,x){if(x&&typeof x==="object"&&!Array.isArray(x)&&typeof x.$u8==="string"&&Object.keys(x).length===1)return b64d(x.$u8);return x;});}
 function recAad(db,sn,k){return "rec:"+db+"/"+sn+"/"+String(k);}
-function isRecEnv(v){return !!(v&&typeof v==="object"&&!Array.isArray(v)&&v.ing==="sealed"&&typeof v.env==="string");}
-function sealRec(db,sn,k,v){if(!on()||v==null||isRecEnv(v))return Promise.resolve(v);
+function isRecEnv(v){return !!(v&&typeof v==="object"&&!Array.isArray(v)&&v.ing==="sealed"&&(typeof v.env==="string"||(v.v===2&&v.iv!=null&&v.ct!=null)));}
+function sealRec(db,sn,k,v){if(!on()||v==null||isRecEnv(v))return Promise.resolve(v);if(binLike(db,sn))return sealBin(db,sn,k,v);
   return sealText(packRec(v),recAad(db,sn,k)).then(function(env){return {ing:"sealed",v:1,k:k,id:k,env:env};});}
 /* a plain record passes through; a sealed one is opened (once the keys are in hand) and read as it was; one that cannot be opened is null, as a missing one is */
-function openRec(db,sn,v){if(!isRecEnv(v))return Promise.resolve(v);
+function openRec(db,sn,v){if(!isRecEnv(v))return Promise.resolve(v);if(v.v===2)return openBin(db,sn,v);
   return ready().then(function(){return openText(v.env,recAad(db,sn,v.k));}).then(unpackRec).catch(function(e){warn(e);return null;});}
+/* 6.32 (6 November 2026), her words: "I want you to encrypt Ingenium and everything inside of it." The stores that hold bytes are sealed
+   as bytes, with no text in between: the app library (ingenium_apps: the pages of her apps), Fabrica's repositories (ingenium_repos:
+   every version's objects, and each repository's own record of its branches and working copy) and the packages Fabrica made
+   (fabrica_made). A record there is kept as {ing:"sealed",v:2,k,id,iv,ct}: AES-GCM-256 under the same data key, a fresh nonce each
+   time, its place bound as additional data; its plain form is packed as a small JSON head followed by the byte arrays it holds, so
+   nothing is turned into base64 on the way. Fabrica's objects keep their kind, size, depth and the name of the object they are kept
+   against beside the sealed part, in clear but bound to it as additional data (a change to them is refused): the repository reads
+   them to make room and to copy itself to disk without opening every object. What any record holds is sealed; the names the stores
+   file them under (an object's SHA-1 name, a repository's id, a package's name) are not. */
+var BSTORES=[["ingenium_apps","b"],["ingenium_repos","o"],["ingenium_repos","r"],["fabrica_made","meta"],["fabrica_made","bytes"]];
+var BCLEAR={"ingenium_repos/o":["t","n","d","base","z"]};
+function binLike(db,sn){return BSTORES.some(function(x){return x[0]===db&&x[1]===sn;});}
+function packBin(v){var bins=[];var head=JSON.stringify(v===undefined?null:v,function(k,x){
+    if(x instanceof Uint8Array){bins.push(x);return {"$bin":bins.length-1};}
+    if(x instanceof ArrayBuffer){bins.push(new Uint8Array(x));return {"$bin":bins.length-1,ab:1};}
+    if(typeof Blob!=="undefined"&&x instanceof Blob)throw new Error("a file object is kept as it is");
+    if(ArrayBuffer.isView&&ArrayBuffer.isView(x))throw new Error("a typed array other than bytes is kept as it is");
+    return x;});
+  var hb=TE.encode(head),n=8+hb.length+4*bins.length,i;for(i=0;i<bins.length;i++)n+=bins[i].length;
+  var out=new Uint8Array(n),dv=new DataView(out.buffer),p=0;dv.setUint32(p,hb.length);p+=4;out.set(hb,p);p+=hb.length;dv.setUint32(p,bins.length);p+=4;
+  for(i=0;i<bins.length;i++){dv.setUint32(p,bins[i].length);p+=4;}for(i=0;i<bins.length;i++){out.set(bins[i],p);p+=bins[i].length;}return out;}
+function unpackBin(u8){var dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength),p=0,hl=dv.getUint32(p);p+=4;var head=TD.decode(u8.subarray(p,p+hl));p+=hl;
+  var nb=dv.getUint32(p),lens=[],bins=[],i;p+=4;for(i=0;i<nb;i++){lens.push(dv.getUint32(p));p+=4;}for(i=0;i<nb;i++){bins.push(u8.slice(p,p+lens[i]));p+=lens[i];}
+  return JSON.parse(head,function(k,x){if(x&&typeof x==="object"&&!Array.isArray(x)&&typeof x.$bin==="number"){var b=bins[x.$bin];return x.ab?b.buffer:b;}return x;});}
+function binAad(db,sn,k,o){var keep=BCLEAR[db+"/"+sn];return recAad(db,sn,k)+(keep?"|"+keep.map(function(f){return f+"="+JSON.stringify(o[f]===undefined?null:o[f]);}).join(","):"");}
+function u8v(x){return x instanceof Uint8Array?x:(x instanceof ArrayBuffer?new Uint8Array(x):new Uint8Array(x&&x.buffer?x.buffer:0));}
+function sealBin(db,sn,k,v){if(!on()||v==null||isRecEnv(v))return Promise.resolve(v);var keep=BCLEAR[db+"/"+sn]||null,clear={},body=v;
+  if(keep&&typeof v==="object"&&!Array.isArray(v)&&!(v instanceof Uint8Array)&&!(v instanceof ArrayBuffer)){body={};Object.keys(v).forEach(function(f){if(keep.indexOf(f)>=0){if(v[f]!==undefined)clear[f]=v[f];}else body[f]=v[f];});}
+  var u8;try{u8=packBin(body);}catch(e){warn(e);return Promise.resolve(v);}
+  var iv=rnd(12);return enc(K.key,iv,binAad(db,sn,k,clear),u8).then(function(ct){var o={ing:"sealed",v:2,k:k,id:k,iv:iv,ct:ct};Object.keys(clear).forEach(function(f){o[f]=clear[f];});return o;});}
+function openBin(db,sn,v){return ready().then(function(){return dec(K.key,u8v(v.iv),binAad(db,sn,v.k,v),u8v(v.ct));})
+  .then(function(u8){var body=unpackBin(u8),keep=BCLEAR[db+"/"+sn];if(keep&&body&&typeof body==="object"&&!Array.isArray(body))keep.forEach(function(f){if(v[f]!==undefined)body[f]=v[f];});return body;})
+  .catch(function(e){warn(e);return null;});}
+/* the same comparison as before (a record is replaced only if the store still holds the one that was read), made byte by byte for bytes
+   rather than through text, so a large page is not written out as base64 twice to be compared */
+function sameVal(a,b){if(a===b)return true;if(a instanceof ArrayBuffer)a=new Uint8Array(a);if(b instanceof ArrayBuffer)b=new Uint8Array(b);
+  if(a instanceof Uint8Array||b instanceof Uint8Array){if(!(a instanceof Uint8Array)||!(b instanceof Uint8Array)||a.length!==b.length)return false;for(var i=0;i<a.length;i++)if(a[i]!==b[i])return false;return true;}
+  if(a&&b&&typeof a==="object"&&typeof b==="object"&&!Array.isArray(a)&&!Array.isArray(b)){var ka=Object.keys(a),kb=Object.keys(b);if(ka.length!==kb.length)return false;
+    for(var j=0;j<ka.length;j++){if(!Object.prototype.hasOwnProperty.call(b,ka[j])||!sameVal(a[ka[j]],b[ka[j]]))return false;}return true;}
+  try{return packRec(a)===packRec(b);}catch(e){return false;}}
 var RSTORES=[["ingenium_claude","conv"],["ingenium_claude","meta"],["ingenium_keys","k"],["ingenium_hub","apps"]];
 function existingDb(name){return new Promise(function(res){if(!W_.indexedDB){res(null);return;}var made=false,rq;try{rq=indexedDB.open(name);}catch(e){res(null);return;}
   rq.onupgradeneeded=function(ev){if(ev.oldVersion===0){made=true;try{rq.transaction.abort();}catch(e){}}};
@@ -313,8 +354,8 @@ function existingDb(name){return new Promise(function(res){if(!W_.indexedDB){res
   rq.onerror=function(ev){try{ev.preventDefault();}catch(e){}res(null);};rq.onblocked=function(){res(null);};});}
 function rtx(d,sn,mode,fn){return new Promise(function(res,rej){try{var t=d.transaction(sn,mode),r=fn(t.objectStore(sn));t.oncomplete=function(){res(r&&"result" in r?r.result:undefined);};t.onerror=t.onabort=function(){rej(t.error||new Error("this device's store refused it"));};}catch(e){rej(e);}});}
 /* a record is replaced only if the store still holds the very one that was read (the owning part may have written a newer one meanwhile) */
-function swapRec(d,sn,k,from,to){var hit=false,fp=packRec(from);
-  return rtx(d,sn,"readwrite",function(s){var g=s.get(k);g.onsuccess=function(){if(g.result!==undefined&&packRec(g.result)===fp){if(s.keyPath!==null&&s.keyPath!==undefined)s.put(to);else s.put(to,k);hit=true;}};return g;}).then(function(){return hit;});}
+function swapRec(d,sn,k,from,to){var hit=false;
+  return rtx(d,sn,"readwrite",function(s){var g=s.get(k);g.onsuccess=function(){if(g.result!==undefined&&sameVal(g.result,from)){if(s.keyPath!==null&&s.keyPath!==undefined)s.put(to);else s.put(to,k);hit=true;}};return g;}).then(function(){return hit;});}
 function oneRec(d,db,sn,k,dir){return rtx(d,sn,"readonly",function(s){return s.get(k);}).then(function(v){if(v==null)return false;
   if(dir==="seal"){if(isRecEnv(v))return false;return sealRec(db,sn,k,v).then(function(w){return w===v?false:swapRec(d,sn,k,v,w);});}
   if(!isRecEnv(v))return false;return openRec(db,sn,v).then(function(p){return p==null?false:swapRec(d,sn,k,v,p);});});}
@@ -327,16 +368,16 @@ function diskSigning(dir){var sh=rawShell(),api=api0();if(!sh||!api||typeof sh.b
           if(dir==="seal"){if(sealed(r.text))return;return sealText(r.text,"big:"+id).then(function(env){return sh.big_put.call(api,id,env);}).then(function(){n++;});}
           if(!sealed(r.text))return;return openText(r.text,"big:"+id).then(function(t){return sh.big_put.call(api,id,t);}).then(function(){n++;},function(){});},function(){});}).then(function(){return n;});},
       function(e){try{d.close();}catch(_){}throw e;});});}
-function walkRecs(dir,say){var counts=[],total=0,n=0,done=0;
-  return seq(RSTORES,function(ds,i){return existingDb(ds[0]).then(function(d){if(!d){counts[i]=0;return;}
+function walkRecs(dir,say,list){var counts=[],total=0,n=0,done=0,L=list||RSTORES;
+  return seq(L,function(ds,i){return existingDb(ds[0]).then(function(d){if(!d){counts[i]=0;return;}
       if(!d.objectStoreNames.contains(ds[1])){d.close();counts[i]=0;return;}
       return rtx(d,ds[1],"readonly",function(s){return s.count();}).then(function(c){counts[i]=c||0;total+=counts[i];try{d.close();}catch(e){}},function(){counts[i]=0;try{d.close();}catch(e){}});});})
-    .then(function(){return seq(RSTORES,function(ds,i){if(!counts[i])return;
+    .then(function(){return seq(L,function(ds,i){if(!counts[i])return;
       return existingDb(ds[0]).then(function(d){if(!d)return;
         return rtx(d,ds[1],"readonly",function(s){return s.getAllKeys();}).then(function(keys){
           return seq(keys||[],function(k){n++;if(say){try{say(n,total);}catch(e){}}return oneRec(d,ds[0],ds[1],k,dir).then(function(hit){if(hit)done++;});});})
           .then(function(){try{d.close();}catch(e){}},function(e){try{d.close();}catch(_){}throw e;});});});})
-    .then(function(){return diskSigning(dir).then(function(m){return done+m;});});}
+    .then(function(){if(list)return done;return diskSigning(dir).then(function(m){return done+m;});});}
 
 /* ---------- the long texts already on the device, sealed in place (or opened again), one at a time, so a stop midway leaves nothing lost:
    every reader takes a plain record and a sealed one alike, and an unfinished sealing goes on at the next sign-in ---------- */
@@ -363,12 +404,13 @@ function legacyKeys(){var out=[];try{var old=(W_.OLDKEYS||[]);for(var i=0;i<loca
 function walkLegacy(dir){var n=0;return seq(legacyKeys(),function(k){var v=null;try{v=localStorage.getItem(k);}catch(e){}if(typeof v!=="string"||!v)return;
   if(dir==="seal"){if(isDeskEnv(v))return;return sealDesk(v,null).then(function(env){try{if(localStorage.getItem(k)===v){localStorage.setItem(k,env);n++;}}catch(e){}});}
   if(!isDeskEnv(v))return;return openDesk(v).then(function(t){try{localStorage.setItem(k,t);n++;}catch(e){}},function(){});}).then(function(){return n;});}
-function migrate(sayBig,sayRec){var m=(REC&&REC.mig)||{},n0=0;
+function migrate(sayBig,sayRec,sayMore){var m=(REC&&REC.mig)||{},n0=0;
   return (m.big===1?Promise.resolve(0):walkBig("seal",sayBig).then(function(n){if(REC)patchRec(function(r){r.mig=r.mig||{};r.mig.big=1;});return n;}))
     .then(function(n){n0=n;return m.rec===1?0:walkRecs("seal",sayRec).then(function(k){if(REC)patchRec(function(r){r.mig=r.mig||{};r.mig.rec=1;});return k;});})
+    .then(function(k){n0+=k;return m.more===1?0:walkRecs("seal",sayMore,BSTORES).then(function(j){if(REC)patchRec(function(r){r.mig=r.mig||{};r.mig.more=1;});return j;});})
     .then(function(k){n0+=k;return walkLegacy("seal");})
     .then(function(k){return n0+k;});}
-function migrating(){return !!(REC&&REC.mig&&(REC.mig.big!==1||REC.mig.rec!==1));}
+function migrating(){return !!(REC&&REC.mig&&(REC.mig.big!==1||REC.mig.rec!==1||REC.mig.more!==1));}
 
 /* ---------- the long-text store's sweep (R81, 90 s after the start) lets go of what the desk does not name. While the desk is still
    sealed the page holds only the empty desk it started from, which names nothing: the sweep then waits for the sign-in (a sweep
@@ -508,13 +550,14 @@ function enable(user,pw,phrase,opts){var c=progressView("Turning protection on")
   return makeRecord(user,pw,phrase).then(function(r){if(!writeRec(r.rec))throw new Error("This browser's store refused the lock record, so protection was not turned on. Nothing was changed.");written=true;holdKeys(r);wrapShell();
       prog(c,"Sealing your desk…",0.15);var seq=0;try{W_.saveState();seq=W.seq;}catch(e){}return afterWrite(seq);})
     .then(function(){try{shellFlush();}catch(e){}return migrate(function(n,N){prog(c,"Sealing the long texts on this device: "+n+" of "+N+"…",0.2+0.55*(N?n/N:1));},
-        function(n,N){prog(c,"Sealing what you brought in from elsewhere, the signing keys and Fabrica\'s pages: "+n+" of "+N+"…",0.75+0.2*(N?n/N:1));});})
+        function(n,N){prog(c,"Sealing what you brought in from elsewhere, the signing keys and Fabrica\'s pages: "+n+" of "+N+"…",0.75+0.1*(N?n/N:1));},
+        function(n,N){prog(c,"Sealing your app library, and Fabrica\'s apps and packages: "+n+" of "+N+"…",0.85+0.1*(N?n/N:1));});})
     .then(function(){prog(c,"Done.",1);try{W_.SNAPRING.forEach(function(k){localStorage.removeItem(k);});W_._snapAt=0;}catch(e){}startIdle();
       var c2=view('<h2>Protected</h2><p>'+esc(user)+', this copy now opens to a sign-in, and your data on this device is sealed with your password. It locks on its own after '+idleWords(REC.idle)+' away.</p>'
         +'<p><b>Two ways back in are set:</b> your password and your ten words. One more, kept somewhere else, makes being locked out very unlikely.</p>'
         +'<div class="ild-ways"><div class="ild-way"><i class="no" id="ildFileMark"></i><div><b>A recovery key file</b><small id="ildFileSay">A small file that opens this copy on its own. Save it on a memory stick or another drive, away from this device.</small></div><button type="button" class="ild-key" id="ildSaveKey">Save it</button></div></div>'
         +'<label><span>A hint for your password (optional; shown at the sign-in, so never the password itself)</span><input type="text" id="ildHint" maxlength="120" autocomplete="off"></label>'
-        +'<details class="ild-fine"><summary>What is sealed, and what is not</summary><p>A backup from the Backup page is sealed when you choose Seal the whole backup there (on by itself while Ingenium is locked). Not sealed: the documents the carried apps keep in their own frames, your model files, the app library and Fabrica\'s saved versions of your apps. Settings, Your data, has your ways back in, the password and the time away.</p></details>'
+        +'<details class="ild-fine"><summary>What is sealed, and what is not</summary><p>A backup from the Backup page is sealed when you choose Seal the whole backup there (on by itself while Ingenium is locked). Sealed too: your app library, and Fabrica\'s apps with every version and the packages it made. Not sealed: the documents the carried apps keep in their own frames, and your model files. Settings, Your data, has your ways back in, the password and the time away.</p></details>'
         +'<div class="ild-keys"><button type="button" class="ild-key" id="ildDone">Done</button></div>',true);
       c2.querySelector("#ildSaveKey").onclick=function(){var b=this;b.disabled=true;saveKeyFile().then(function(name){var m=c2.querySelector("#ildFileMark"),t=c2.querySelector("#ildFileSay");if(m){m.className="";m.textContent="\u2713";}
           if(t)t.textContent="Saved as \u201c"+name+"\u201d. Move it to a memory stick or another drive, and keep it as you would a key to your home.";b.textContent="Save it again";b.disabled=false;},function(x){b.disabled=false;err(c2,x&&x.message||"The file could not be saved.");});};
@@ -545,7 +588,8 @@ function disableAsk(){askPassword("Turn protection off","Everything sealed on th
 function disable(){var c=progressView("Turning protection off");prog(c,"Writing your desk back as plain text…",0.1);OFF=true;
   try{W_.saveState();}catch(e){}
   return walkBig("open",function(n,N){prog(c,"Opening the long texts on this device: "+n+" of "+N+"…",0.15+0.55*(N?n/N:1));})
-    .then(function(){return walkRecs("open",function(n,N){prog(c,"Opening what you brought in from elsewhere, the signing keys and Fabrica\'s pages: "+n+" of "+N+"…",0.7+0.25*(N?n/N:1));});})
+    .then(function(){return walkRecs("open",function(n,N){prog(c,"Opening what you brought in from elsewhere, the signing keys and Fabrica\'s pages: "+n+" of "+N+"…",0.7+0.12*(N?n/N:1));});})
+    .then(function(){return walkRecs("open",function(n,N){prog(c,"Opening your app library, and Fabrica\'s apps and packages: "+n+" of "+N+"…",0.82+0.13*(N?n/N:1));},BSTORES);})
     .then(function(){return walkLegacy("open");})
     .then(function(){
       try{localStorage.removeItem(LSK);}catch(e){}REC=null;dropKeys();OFF=false;try{W_.SNAPRING.forEach(function(k){localStorage.removeItem(k);});W_._snapAt=0;}catch(e){}try{W_.saveState();}catch(e){}
@@ -732,7 +776,7 @@ function paintCard(){var c=$("ingLockCard");if(!c)return;var say=$("ingLockSay")
   if(!S()){say.innerHTML='<span class="ild-state">Off.</span> '+esc(CANT);more.textContent="";if(md)md.hidden=true;return;}
   if(!REC){say.innerHTML='<span class="ild-state">Off.</span> Ingenium opens without a sign-in, and what it keeps on this device is plain text, as it always was.';
     key("Protect this copy with a sign-in…","",function(){setup({});});
-    more.textContent="Turning it on asks for a name and a password, shows a recovery phrase of ten words once, then seals what is already on this device: your desk, the long texts, the conversations you brought in from elsewhere, the signing keys and Fabrica's issues and pages. A backup is sealed when you choose Seal the whole backup on the Backup page; the carried apps' own documents in their frames, your model files and the app library are not sealed.";return;}
+    more.textContent="Turning it on asks for a name and a password, shows a recovery phrase of ten words once, then seals what is already on this device: your desk, the long texts, the conversations you brought in from elsewhere, the signing keys, your app library, and Fabrica's apps, packages, issues and pages. A backup is sealed when you choose Seal the whole backup on the Backup page; the carried apps' own documents in their frames and your model files are not sealed.";return;}
   say.innerHTML='<span class="ild-state">On.</span> Signed in as '+esc(REC.user||"")+'. Your desk and the rest of what is listed below are sealed with your password'+(migrating()?" (the rest is still being sealed)":"")+'.';
   key("Lock now","",function(){lockNow("key");});
   key("Change the password…","ghost",changePassword);
@@ -741,7 +785,7 @@ function paintCard(){var c=$("ingLockCard");if(!c)return;var say=$("ingLockSay")
   var lab=D.createElement("label");lab.className="small";lab.style.cssText="display:inline-flex;align-items:center;gap:6px";lab.innerHTML='Lock on its own after <select id="ingLockIdle" aria-label="Lock on its own after"><option value="5">5 minutes</option><option value="15">15 minutes</option><option value="60">an hour</option><option value="0">never</option></select> away';
   keys.appendChild(lab);var sel=lab.querySelector("select");sel.value=String(typeof REC.idle==="number"?REC.idle:15);
   sel.onchange=function(){var m=parseInt(sel.value,10)||0;patchRec(function(r){r.idle=m;});toast(REC.idle?"Ingenium will lock after "+idleWords(REC.idle)+" away.":"Ingenium will lock only when you press Lock now.");};
-  more.textContent="Sealed: the desk (chats, notes, settings, projects, documents, Career) in this browser's store and its recovery shelf; the long texts (attachments, pages, documents), the conversations you brought in from elsewhere, the signing keys and Fabrica's issues and pages in the larger store; and on the computer apps the copies on disk written from now on. A backup from the Backup page is sealed with its own password when you choose Seal the whole backup there (on by itself while Ingenium is locked). Not sealed: the carried apps' own documents in their frames, model files, the app library and Fabrica's saved versions of your apps, and on the computer apps the earlier copies of the desk kept in desk-backups. While protection is on, a window of its own opened from an app does not share your notes and reminders with the main window (that shared copy would hold them in plain text).";}
+  more.textContent="Sealed: the desk (chats, notes, settings, projects, documents, Career) in this browser's store and its recovery shelf; the long texts (attachments, pages, documents), the conversations you brought in from elsewhere, the signing keys and Fabrica's issues and pages in the larger store; your app library, and Fabrica's apps with every version and the packages it made (what each holds; the names they are filed under are not); and on the computer apps the copies on disk written from now on. A backup from the Backup page is sealed with its own password when you choose Seal the whole backup there (on by itself while Ingenium is locked). Not sealed: the carried apps' own documents in their frames, model files, and on the computer apps the earlier copies of the desk kept in desk-backups. While protection is on, a window of its own opened from an app does not share your notes and reminders with the main window (that shared copy would hold them in plain text).";}
 
 /* ---------- the welcome door: an optional sign-in, from a small key in the card's top-left corner ---------- */
 var LOCK_SVG='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3" y="7" width="10" height="7.5" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.3 7V5.1a2.7 2.7 0 0 1 5.4 0V7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.6" r="1.05" fill="currentColor"/></svg>';
@@ -823,7 +867,9 @@ W_.addEventListener("storage",function(e){if(!e||e.key!==LSK)return;
 try{var og=W_.go;if(typeof og==="function"){W_.go=function(p){var r=og.apply(this,arguments);try{if(p==="settings")ensureCard();}catch(e){}return r;};}}catch(e){}
 setTimeout(function(){try{ensureCard();}catch(e){}},600);
 try{doorKey();}catch(e){warn(e);}
-W_.IngLock={active:active,on:on,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,
+W_.IngLock={active:active,on:on,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
+  /* 6.32: what a part writes to a sealed store waits for the keys while the page is locked, so nothing is written there in clear */
+  sealFor:function(db,sn,k,v){return active()?ready().then(function(){return sealRec(db,sn,k,v);}):Promise.resolve(v);},
   deskWrite:deskWrite,isDeskEnvelope:isDeskEnv,openDesk:openDesk,adoptRaw:adoptRaw,lockedNow:adoptRaw,openRecs:openRecs,sealRecs:sealRecs,sealRec:sealRec,openRec:openRec,openValues:openValues,lockNow:lockNow,
   setup:function(){setup({});},user:function(){return REC?REC.user:null;},words:WORDS.slice(),
   _test:{idle:function(ms){IDLE_MS=ms;startIdle();},selfTest:selfTest,record:readRec,flush:flushSync,pending:function(){return W.seq-W.committed;},seal:function(){return W.seq;}}};

@@ -1327,6 +1327,28 @@ edit('var ING_EDITION="master";\n',
      'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
      "6.27 what each edition carries")
 
+# ---- 6.32 (6 November 2026): the app library sealed with the lock. Her words: "I want you to encrypt Ingenium and everything inside
+#      of it." With the lock on (modules/r197.js), a page kept in the library's store (IndexedDB ingenium_apps) is sealed as bytes
+#      before it is written (while the page is locked, the write waits for the sign-in), and opened as it is read; a plain page and a
+#      sealed one are both read, so a library kept before the lock (or before 6.32) reads as it did until the lock seals it. The copy
+#      on a computer app's disk already went through the lock. ----
+edit("""function libPut(id,u8,text){/* a view into the whole zip would store the whole zip: keep only its own bytes */""",
+     """function libSeal(id,u8){try{if(window.IngLock&&typeof IngLock.sealFor==="function")return IngLock.sealFor("ingenium_apps","b",id,u8);}catch(e){}return Promise.resolve(u8);}
+function libOpen(v){try{if(v&&window.IngLock&&typeof IngLock.isRecEnv==="function"&&IngLock.isRecEnv(v))return IngLock.openRec("ingenium_apps","b",v);}catch(e){}return Promise.resolve(v);}
+function libPut(id,u8,text){/* a view into the whole zip would store the whole zip: keep only its own bytes */""",
+     "6.32 the app library seals and opens through the lock")
+edit("""  var p1=libTx("readwrite",function(s){return s.put(u8,id);}).then(function(){return true;},function(){return false;});""",
+     """  var p1=libSeal(id,u8).then(function(v){return libTx("readwrite",function(s){return s.put(v,id);});}).then(function(){return true;},function(){return false;});""",
+     "6.32 a page put in the library is sealed first")
+edit("""  return libTx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(function(b){
+    if(b){return new TextDecoder().decode(b instanceof Uint8Array?b:new Uint8Array(b));}""",
+     """  return libTx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(libOpen).then(function(b){
+    if(b){return new TextDecoder().decode(b instanceof Uint8Array?b:new Uint8Array(b));}""",
+     "6.32 a page read from the library is opened")
+edit("""var u8=new TextEncoder().encode(r.text);libTx("readwrite",function(s){return s.put(u8,id);}).catch(function(){});return r.text;}""",
+     """var u8=new TextEncoder().encode(r.text);libSeal(id,u8).then(function(v){return libTx("readwrite",function(s){return s.put(v,id);});}).catch(function(){});return r.text;}""",
+     "6.32 a page brought back from the disk copy is sealed as it is kept")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

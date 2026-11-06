@@ -371,6 +371,42 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.32 (6 November 2026): the app library and Fabrica sealed with the lock. Her words: "I want you to encrypt Ingenium and
+everything inside of it." Until now the lock (modules/r197.js, 6.9) left three stores plain: the app library (IndexedDB
+ingenium_apps, the pages of her apps), Fabrica's repositories (ingenium_repos: every version's objects and each repository's record)
+and the packages Fabrica made (fabrica_made).
+
+- modules/r197.js: a second kind of sealed record, for bytes: {ing:"sealed",v:2,k,id,iv,ct}, AES-GCM-256 under the same data key, a
+  fresh nonce each time, its place bound as additional data; the plain value is packed as a small JSON head followed by the byte
+  arrays it holds, so a page is never turned into base64 on the way. Fabrica's objects keep their kind, size, depth and base object
+  beside the sealed part (the repository reads them to make room and to copy itself to disk without opening every object); these are
+  bound to it as additional data, so a change to them is refused. What every record holds is sealed; the names the stores file
+  records under (an object's SHA-1 name, a repository's id, a package's name) are not. sealRec and openRec choose the kind by the
+  store; the Backup page's open and seal take the new stores; the walker that seals what is already there takes them as a step of its
+  own (mig.more), so a copy locked before 6.32 seals them at its next sign-in; turning protection off opens them. A record is
+  replaced only if the store still holds the one that was read, now compared byte by byte (sameVal) rather than through text.
+  IngLock.sealFor: what a part writes while the page is locked waits for the sign-in, so nothing is written to a sealed store in
+  clear. Its three accounts of what is sealed say so.
+- build_page.py (base page): libPut seals a page before it is kept, libText opens it, and a page brought back from a computer app's
+  disk copy is sealed as it is kept. modules/r187.js (comparing two versions) opens what it reads.
+- modules/r110.js: Fabrica's repository store seals as it writes and opens as it reads (objects, records, the list of repositories).
+- modules/r112.js: Fabrica's packages and their cards likewise; window.fbMade for the page's tests. modules/r142.js: the storage page
+  opens the packages' cards, and opens any sealed record before it looks in it for the long texts it names (so a text a sealed record
+  names is never offered as one nothing names). modules/r178.js is unchanged: its one-time clean-up of old kits only skips a card it
+  cannot read.
+- Not sealed, as before: the carried apps' own documents in their frames, model files (public files, the same for everyone), the
+  engine, and on the computer apps the earlier copies of the desk in desk-backups. What is new gains 6.32.
+- Found while testing, older than 6.32 (6.31 does the same): rig/t_61_storage.js's simulated small device (12 MB for Ingenium) no
+  longer holds four 1.5 MB versions of an app, so its last part stops with "storage is full" (68 of its other checks pass). Left
+  for a later stage: it may be the test's assumption about how much a new profile keeps, or the page's own use of room.
+
+    node rig/t_632_sealed_stores.js <url> <out>   # 21 checks with an invented page, repository and package: plain before; all five
+                                                  # stores sealed after (no mark readable), read whole, a 40 MB page sealed with no
+                                                  # growth and opened whole, written sealed, Fabrica's clean-up keeping every version
+                                                  # (one kept as the change from another among them), a changed size
+                                                  # refused, the Backup page's asks, a copy locked before 6.32 sealed at its sign-in,
+                                                  # reload and sign-in, protection off writes them back plain
+
 Ingenium 6.31 (6 November 2026): Folders brings in work from the other assistants, LM Studio among them. Her request: Folders should
 bring in work from ChatGPT, DeepSeek, LM Studio and the other assistants, and from GitHub repositories, not only from Claude and Ollama.
 

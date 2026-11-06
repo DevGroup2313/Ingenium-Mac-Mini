@@ -822,15 +822,22 @@ var MADE=(function(){var dbp=null;
   function db(){if(dbp)return dbp;dbp=new Promise(function(res,rej){try{var rq=indexedDB.open("fabrica_made",1);rq.onupgradeneeded=function(){var d=rq.result;try{d.createObjectStore("meta");}catch(e){}try{d.createObjectStore("bytes");}catch(e){}};
     rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};}catch(e){rej(e);}});dbp.catch(function(){dbp=null;});return dbp;}
   function tx(stores,mode,fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction(stores,mode),out=fn(t);t.oncomplete=function(){res(out&&"result" in out?out.result:out);};t.onerror=function(){rej(t.error);};t.onabort=function(){rej(t.error||new Error("this device's storage is full"));};});});}
-  function list(repo){return tx(["meta"],"readonly",function(t){return t.objectStore("meta").getAll();}).then(function(a){return (a||[]).filter(function(m){return !repo||m.repo===repo;}).sort(function(x,y){return y.at-x.at;});}).catch(function(){return [];});}
+  /* 6.32 (6 November 2026): with the lock on (modules/r197.js), a package and its card are sealed as they are kept and opened as they
+     are read; while the page is locked a write waits for the sign-in; a plain one and a sealed one are both read */
+  function lk(){return window.IngLock||null;}
+  function sealIn(st,k,v){var l=lk();return (l&&typeof l.sealFor==="function")?l.sealFor("fabrica_made",st,k,v):Promise.resolve(v);}
+  function openOut(st,v){var l=lk();return (v&&l&&typeof l.isRecEnv==="function"&&l.isRecEnv(v))?l.openRec("fabrica_made",st,v):Promise.resolve(v);}
+  function list(repo){return tx(["meta"],"readonly",function(t){return t.objectStore("meta").getAll();}).then(function(a){return Promise.all((a||[]).map(function(x){return openOut("meta",x);}));})
+    .then(function(a){return a.filter(Boolean).filter(function(m){return !repo||m.repo===repo;}).sort(function(x,y){return y.at-x.at;});}).catch(function(){return [];});}
   function del(keys){if(!keys.length)return Promise.resolve();return tx(["meta","bytes"],"readwrite",function(t){keys.forEach(function(k){t.objectStore("meta").delete(k);t.objectStore("bytes").delete(k);});});}
   return {list:list,del:del,
     keep:function(r,commit,kind,name,mime,bytes){var key=r.id+"|"+commit+"|"+kind+"|"+name,m={key:key,repo:r.id,commit:commit,kind:kind,name:name,mime:mime,size:bytes.length,at:Date.now()};
-      return tx(["meta","bytes"],"readwrite",function(t){t.objectStore("meta").put(m,key);t.objectStore("bytes").put(bytes,key);}).then(function(){return list(r.id);}).then(function(all){var commits=[];all.forEach(function(x){if(commits.indexOf(x.commit)<0)commits.push(x.commit);});
+      return Promise.all([sealIn("meta",key,m),sealIn("bytes",key,bytes)]).then(function(x){return tx(["meta","bytes"],"readwrite",function(t){t.objectStore("meta").put(x[0],key);t.objectStore("bytes").put(x[1],key);});}).then(function(){return list(r.id);}).then(function(all){var commits=[];all.forEach(function(x){if(commits.indexOf(x.commit)<0)commits.push(x.commit);});
         return del(all.filter(function(x){return commits.indexOf(x.commit)>=3;}).map(function(x){return x.key;}));}).catch(function(e){try{console.warn("Fabrica: a package could not be kept here",e);}catch(_){}});},
-    bytes:function(key){return tx(["bytes"],"readonly",function(t){return t.objectStore("bytes").get(key);});},
+    bytes:function(key){return tx(["bytes"],"readonly",function(t){return t.objectStore("bytes").get(key);}).then(function(v){return openOut("bytes",v);});},
     forget:function(repo){return list(repo).then(function(all){return del(all.map(function(x){return x.key;}));});}};})();
 function keepMade(r,commit,kind,name,mime,bytes){return MADE.keep(r,commit,kind,name,mime,bytes).then(function(){delete C.log[r.id+"|rel"];});}
+window.fbMade=MADE;/* 6.32: the packages' store, as the page's tests reach it (rig/t_632_sealed_stores.js) */
 
 /* ---------- running the app ---------- */
 function run(){var r=cur();if(!r)return;if(!r.head){toast("Nothing to run yet: give it a first page.");return;}

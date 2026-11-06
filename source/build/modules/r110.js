@@ -194,15 +194,22 @@ function IdbBackend(){var dbp=null;
     dbp.catch(function(){dbp=null;});return dbp;}
   function tx(st,mode,fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction(st,mode),r=fn(t.objectStore(st));
     t.oncomplete=function(){res(r&&"result" in r?r.result:undefined);};t.onerror=function(){rej(t.error);};t.onabort=function(){rej(t.error||new Error("the device's storage is full"));};});});}
-  return {getRec:function(oid){return tx("o","readonly",function(s){return s.get(oid);}).then(function(r){return r||null;});},
-    putRec:function(oid,rec){return tx("o","readwrite",function(s){return s.put(rec,oid);});},
+  /* 6.32 (6 November 2026): with the lock on (modules/r197.js), what this store keeps is sealed as it is written and opened as it is
+     read: an object's contents (its kind, size, depth and the object it is kept against stay beside it, bound to it), and each
+     repository's own record whole. While the page is locked a write waits for the sign-in. A plain record and a sealed one are both
+     read, so repositories kept before the lock read as they did until the lock seals them. */
+  function lk(){return (typeof window!=="undefined"&&window.IngLock)||null;}
+  function sealIn(st,k,v){var l=lk();return (l&&typeof l.sealFor==="function")?l.sealFor("ingenium_repos",st,k,v):Promise.resolve(v);}
+  function openOut(st,v){var l=lk();return (v&&l&&typeof l.isRecEnv==="function"&&l.isRecEnv(v))?l.openRec("ingenium_repos",st,v):Promise.resolve(v);}
+  return {getRec:function(oid){return tx("o","readonly",function(s){return s.get(oid);}).then(function(r){return openOut("o",r);}).then(function(r){return r||null;});},
+    putRec:function(oid,rec){return sealIn("o",oid,rec).then(function(v){return tx("o","readwrite",function(s){return s.put(v,oid);});});},
     delRec:function(oid){return tx("o","readwrite",function(s){return s.delete(oid);});},
     eachRec:function(fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction("o","readonly"),c=t.objectStore("o").openCursor();
       c.onsuccess=function(){var cur=c.result;if(cur){fn(cur.key,cur.value);cur.continue();}};t.oncomplete=function(){res();};t.onerror=function(){rej(t.error);};});});},
-    getRepo:function(id){return tx("r","readonly",function(s){return s.get(id);}).then(function(r){return r||null;});},
-    putRepo:function(rec){return tx("r","readwrite",function(s){return s.put(rec,rec.id);});},
+    getRepo:function(id){return tx("r","readonly",function(s){return s.get(id);}).then(function(r){return openOut("r",r);}).then(function(r){return r||null;});},
+    putRepo:function(rec){return sealIn("r",rec.id,rec).then(function(v){return tx("r","readwrite",function(s){return s.put(v,rec.id);});});},
     delRepo:function(id){return tx("r","readwrite",function(s){return s.delete(id);});},
-    allRepos:function(){return tx("r","readonly",function(s){return s.getAll();}).then(function(a){return a||[];});}};}
+    allRepos:function(){return tx("r","readonly",function(s){return s.getAll();}).then(function(a){return Promise.all((a||[]).map(function(x){return openOut("r",x);}));}).then(function(a){return a.filter(Boolean);});}};}
 function MemBackend(){var o=new Map(),r=new Map();function cp(x){return x==null?null:JSON.parse(JSON.stringify(x));}
   return {getRec:function(k){return Promise.resolve(o.get(k)||null);},putRec:function(k,v){o.set(k,v);return Promise.resolve();},delRec:function(k){o.delete(k);return Promise.resolve();},
     eachRec:function(fn){o.forEach(function(v,k){fn(k,v);});return Promise.resolve();},
