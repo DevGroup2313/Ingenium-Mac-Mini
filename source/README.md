@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.36 (6 November 2026): Focus in parts. Her request: the Focus page redesigned the way the Train room was (6.28), with tabs
+and sections, animated and clickable cards, and much less scrolling. Measured on 6.35 at 1440 by 900: the page was 2,351 pixels tall
+(3,856 on a phone 390 wide), its ten cards one under another.
+
+- modules/r235.js (new): four parts, one at a time, under four raised cards that are the tabs: Today (Now, what today asks of you,
+  your routines), Work (Steps, Time and the Inbox), Calm (Calm and Clear words) and Supports (each support's switch). Each card-tab
+  says what stands in its part at this moment, read from the page's own state and refreshed each second while Focus is in sight:
+  the step in front of you (or the routine whose hour it is), the focus timer counting or paused, the thoughts waiting in the Inbox,
+  the calm look and the text size, and how many supports are on. The tabs rise in and lift under the pointer; a part's cards rise in
+  one after another; the arrow keys, Home and End move between the tabs; the part chosen last is kept (ing.focus.part.v1), only when
+  she chooses it. A card in another part opens its part when it is scrolled to, focused, or ringed by the guided tour (its Focus pages
+  and the tour's ring), so Help's Show me and the tour still find it. A low-energy day's card stays above the parts. The Calm look,
+  the minimal motion setting and the system's reduced motion stop every movement there.
+- Now, with no task, said "Steps, below": it now says "Steps, in Work" and has a Go to Steps key that opens Work with the cursor in
+  the task's box. Measured now: each part 676 to 905 pixels at 1440 by 900, 971 to 1,567 on a phone. What is new gains 6.36.
+
+    node rig/t_636_focus.js <url> <out>   # 19 checks: the four card-tabs, each part's cards and only those, its line, the keys, the
+                                          # part kept, heights on a computer and a phone, what each tab says (a task, a thought, the
+                                          # timer counting and paused, a support turned off), Now's key to Steps, a hidden card
+                                          # opening its part (scrolled to, focused, a tour page, the tour's ring), the Calm look
+
 Ingenium 6.35 (6 November 2026): newer models in a room of their own. Her words (4 November 2026): the path to check, download and
 install newer models, with "the existing section to be redesigned and be visible". Since 6.11.2 the card (modules/r217.js) sat at the
 foot of the card of the four houses in Ingenium's models, which is long, so it was out of sight.
