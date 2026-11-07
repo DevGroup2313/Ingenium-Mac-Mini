@@ -9,7 +9,8 @@
    name, a hairline between rows, a soft lilac tint under the pointer and a tick at the same edge for each one seen; her second
    word on it: "I don't like the look of the Chapters area, it still has that many clustered 3D buttons look that I said that I
    didn't like", so no raised faces, no lift and no shadow there). Below about 1,050 pixels the two parts stand one above the
-   other, and on a phone the contents are one column. Nothing the card does has changed: the same keys, in the same order for the
+   other, and on a phone the contents are one column. 6.49: the rows at the app's one scale (13.5 px letters, 38 px tall at most;
+   rig/t_638_scale.js), where 6.45 had them at 14 px and 40 px. Nothing the card does has changed: the same keys, in the same order for the
    keyboard and for a screen reader. */
 #page-guide #guideTour.gt2{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px 28px;align-items:start;margin-top:4px}
 @media (max-width:1050px){#page-guide #guideTour.gt2{grid-template-columns:minmax(0,1fr)}}
@@ -33,8 +34,8 @@ body[data-theme="night"] #page-guide #guideTour.gt2 .gt2-chaps{box-shadow:0 1px 
 #page-guide #guideTour.gt2 .tour-entry-chaps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(var(--gt2-rows,8),auto);grid-auto-flow:column;column-gap:30px;row-gap:0;margin:2px 0 0}
 @media (max-width:640px){#page-guide #guideTour.gt2 .tour-entry-chaps{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-auto-flow:row}}
 #page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap,#page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap.ih-k:not(#ih-z){display:flex;align-items:center;justify-content:flex-start;gap:12px;
-  width:100%;min-height:40px;margin:0;padding:8px 10px;border:0;border-bottom:1px solid var(--hairline-soft,rgba(40,20,70,.09));border-radius:0;background:transparent;box-shadow:none;transform:none;
-  text-align:left;font:500 14px/1.35 var(--sans);color:var(--ink-1);text-shadow:none;transition:background-color .15s ease,color .15s ease}
+  width:100%;min-height:38px;margin:0;padding:8px 10px;border:0;border-bottom:1px solid var(--hairline-soft,rgba(40,20,70,.09));border-radius:0;background:transparent;box-shadow:none;transform:none;
+  text-align:left;font:500 13.5px/1.35 var(--sans);color:var(--ink-1);text-shadow:none;transition:background-color .15s ease,color .15s ease}
 #page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap.ih-k:not(#ih-z):hover:not(:disabled),#page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap:hover{transform:none;box-shadow:none;background:var(--accent-softer,rgba(106,63,181,.06));color:var(--accent,#6a3fb5)}
 #page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap.ih-k:not(#ih-z):active:not(:disabled),#page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap.ih-k.is-down:not(#ih-z){transform:none;box-shadow:none;background:var(--accent-soft,rgba(106,63,181,.14))}
 #page-guide #guideTour.gt2 .tour-entry-chaps .tour-entry-chap.ih-k:not(#ih-z):focus-visible{outline:2px solid var(--accent,#6a3fb5);outline-offset:-2px}

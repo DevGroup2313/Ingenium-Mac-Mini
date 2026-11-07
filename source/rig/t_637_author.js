@@ -8,6 +8,7 @@
 //     that page only, or everywhere when chosen; the same words in a chat message are never changed; after a reload still in place;
 //     found by Find words; restored
 //   - Names: Ingenium's name, a page's name in the side bar, its title and its first line
+//   (6.46: the Deep depth is the family's weighted key now, a 2 px edge at 34 %, where it was a 3.5 px edge; modules/r236.js)
 //   - Look: a ready look and an accent colour change Ingenium's colours at once (day and night); fonts and depth
 //   - Change log: every change listed, each undoable; Export all writes them to one file, Import all reads it back, Reset all
 //     returns Ingenium to how it was built and Undo brings it back
@@ -88,7 +89,7 @@ const ledeOf = (p, page) => p.evaluate((page) => (document.querySelector('#page-
   await p.selectOption('#auF-serif', 'garamond'); await p.selectOption('#auDepth', 'deep'); await p.waitForTimeout(300);
   const look2 = await p.evaluate(() => ({ serif: getComputedStyle(document.documentElement).getPropertyValue('--serif').trim(), h1: getComputedStyle(document.querySelector('#page-focus > .page-title')).fontFamily, pop: getComputedStyle(document.documentElement).getPropertyValue('--pop').trim() }));
   await p.screenshot({ path: OUT + '/637_look.png' });
-  ok(look0 === '#6a3fb5' && look1.accent === '#1f5f9e' && look1.deep !== '#4e2c8a' && look1.night && look1.night !== '#b79ce6' && /Garamond/.test(look2.serif) && /Garamond/.test(look2.h1) && /0 3\.5px 0/.test(look2.pop),
+  ok(look0 === '#6a3fb5' && look1.accent === '#1f5f9e' && look1.deep !== '#4e2c8a' && look1.night && look1.night !== '#b79ce6' && /Garamond/.test(look2.serif) && /Garamond/.test(look2.h1) && /0 2px 0 rgba\(40,22,68,\.34\)/.test(look2.pop),
     'Look: a ready look recolours Ingenium at once, day and night; the headings\' font and the depth change too', { look0, look1, look2 });
   // 6. the change log, undo, export, import, reset
   await p.evaluate(() => IngAuthor.room('log')); await p.waitForTimeout(300);
@@ -97,7 +98,7 @@ const ledeOf = (p, page) => p.evaluate((page) => (document.querySelector('#page-
   const u1 = await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--pop').trim());
   await p.evaluate(() => { const r = [...document.querySelectorAll('#auRoom .au-row')].find(x => /side bar name of Focus/.test(x.textContent) && x.querySelector('button')); r.querySelector('button').click(); }); await p.waitForTimeout(300);
   const u2 = await p.evaluate(() => document.querySelector('nav.dock .nav-btn[data-page="focus"]').textContent.trim());
-  ok(lg.length >= 7 && lg.some(t => /Rewrote/.test(t)) && lg.some(t => /Named Ingenium “Lumen”/.test(t)) && lg.some(t => /Chose a look: Carpe Diem blue/.test(t)) && !/0 3\.5px 0/.test(u1) && u2 === 'Focus',
+  ok(lg.length >= 7 && lg.some(t => /Rewrote/.test(t)) && lg.some(t => /Named Ingenium “Lumen”/.test(t)) && lg.some(t => /Chose a look: Carpe Diem blue/.test(t)) && !/0 2px 0 rgba\(40,22,68,\.34\)/.test(u1) && u2 === 'Focus',
     'the change log lists every change; Undo the last takes back the depth, and Undo on an earlier one brings back Focus\'s own name', { lg: lg.slice(0, 10), u1, u2 });
   const exported = await p.evaluate(() => { let got = null; const o = window.saveFileNative; window.saveFileNative = (n, m, t) => { got = { n, m, t }; return Promise.resolve('test'); }; IngAuthor.exportAll(); window.saveFileNative = o; return got; });
   const data = JSON.parse(exported.t);

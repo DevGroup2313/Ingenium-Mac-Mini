@@ -371,6 +371,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.49 (7 November 2026): keys that rise and seat, elevated and refined. Her words (6 November 2026): "I want Ingenium to have
+that analogue look and feel, I want it to have that animated mechanical 3D feeling match Carpe Diem, The Forge and Inkwell's animation
+and vibe to stay cohesive and match the rest of the Offline Project." and "I don't want the buttons to be made bigger or wider. I just
+want them to look more weighted and 3D animated. I want them to look like clickable buttons and not just flat." Then: "Please reduce
+the heavyness of the buttons, it looks a little too intense and take away from the look of the app. I want it to look elevated and
+refined." Built on the other session's 6.48 (claude/blissful-heisenberg-1osldl).
+
+- modules/r247.js (new). Measured in the three apps' own pages (6 November 2026): The Forge's and Carpe Diem's keys rest on a dark
+  edge 2 px deep at 30 % with casts at 20 % and 13 %, drawn by a crisp rim (The Forge's at 26 %); Inkwell's rest on four casts (30,
+  26, 18 and 11 %). Ingenium's had the same shape at 25, 16 and 10 %, but its rim was a 10 % hairline, so on a white card a key read
+  as paper with a shadow under it; its top bar pills were at less than half the family's weight; Chat's + and microphone keys, the
+  ideas on an empty chat, Lector's Copy and Home's See all had no edge at all. A heavier draft at the family's weight (2 px at 34 %,
+  four casts) was set aside after her second message. Now every key has a fine outline (half a pixel at 20 %), a thin edge beneath it
+  (1.5 px at 18 %) and a soft, wide lift (3 px at 10 %, 18 px at 9 %); under the pointer it rises 2 px, its edge grows to 2.5 px and
+  its lift spreads (16 px, then 30 px); pressed, it sinks 1 px, a little smaller, into its seat in 0.05 s and springs back. The top
+  bar's pills have the same outline on a 1 px edge. The rooms' own copies of the key (Lector, Fabrica, the backup card, the Career
+  Studio, the setup card, the tour and help, Home's large keys) follow the one recipe by day; the keys above a chat or a Code session
+  wear the night's recipe by night, where they kept the day's. The keys that were words or bare outlines are raised keys now, each at
+  its own size. No key changes size: the outline is a shadow and takes no room. The recipe is placed in the page's head, ahead of
+  the Author Studio's look, so a depth chosen there still wins; Display's Flat depth, the night theme and reduced motion keep their
+  own faces.
+- modules/r236.js (the master edition): the Author Studio's Look keeps its depths either side of the own keys: Soft is lighter still
+  (a fine outline and a faint lift; it was a raised key with a white glare, softer than the own key); Deep is the heavier key with
+  the family's weight (it was a 3.5 px edge). The ready look Ink keeps Soft.
+
+    node rig/t_649_keys.js <url> <out> [ref=<an earlier page>]   # the recipe on every kind of key; no key bigger or wider than on
+                                                                 # the earlier page; the rise and the seat; the Author Studio's Soft
+                                                                 # and Deep; Flat; night; reduced motion
+    node rig/t_637_author.js <url> <out>                         # its Deep check follows the new recipe (2 px at 34 %)
+
 Ingenium 6.46 (7 November 2026), its second part: who answers, at hand. Her words (6 November 2026): "Switching between providers and connections in
 Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users. I want that process to be
 improved and be more acessible to me, its a bit flawed right now."
