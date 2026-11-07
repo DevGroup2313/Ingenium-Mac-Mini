@@ -371,6 +371,23 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.50 (7 November 2026): the three levels, one card size. Her words (7 November 2026): "The "New to this", "Some
+experience", and "Expert" cards are all different sizes and length and they look really weird on the "Help and the guided tour"
+section of the Settings page, please fix this."
+
+- modules/r166.js. Measured on 6.49 at 1440 by 900: Settings drew the three as wide as their words (340, 260 and 340 pixels) and
+  as tall as their lines (67, 51 and 67); the tour's first card drew them one width but three heights (69, 52 and 52); the Guide's
+  Start here one width and three heights (73, 57 and 73). Now Settings' card and the tour's first card hold them in a grid of one
+  column whose rows share the tallest's height, their words at the left. Her second word, the same day: "The cards are still too
+  wide." So on Settings they are 260 pixels wide, the width Some experience had: the narrowest at which none needs a third line (at
+  250 New to this takes three and all three grow from 67 to 84 pixels tall). The tour's first card keeps them as wide as the card,
+  a dialog's choices. On a narrow screen the column narrows and the three stay alike.
+- modules/r243.js: the Guide's Start here gives the three one height the same way, 270 pixels wide at most (its cards have a
+  little more room inside; at 260 all three would take three lines).
+
+    node rig/t_650_levels.js <url> <out>   # the three, one width and one height, in the three places, at 1440, 900 and 390 pixels
+                                           # wide and by night; 260 pixels on Settings and 270 in the Guide at most; a press and the arrow keys still choose
+
 Ingenium 6.49 (7 November 2026): keys that rise and seat, elevated and refined. Her words (6 November 2026): "I want Ingenium to have
 that analogue look and feel, I want it to have that animated mechanical 3D feeling match Carpe Diem, The Forge and Inkwell's animation
 and vibe to stay cohesive and match the rest of the Offline Project." and "I don't want the buttons to be made bigger or wider. I just

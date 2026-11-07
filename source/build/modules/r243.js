@@ -10,7 +10,9 @@
    word on it: "I don't like the look of the Chapters area, it still has that many clustered 3D buttons look that I said that I
    didn't like", so no raised faces, no lift and no shadow there). Below about 1,050 pixels the two parts stand one above the
    other, and on a phone the contents are one column. 6.49: the rows at the app's one scale (13.5 px letters, 38 px tall at most;
-   rig/t_638_scale.js), where 6.45 had them at 14 px and 40 px. Nothing the card does has changed: the same keys, in the same order for the
+   rig/t_638_scale.js), where 6.45 had them at 14 px and 40 px. 6.50: the three level cards one height too (the tallest's), as on Settings
+   and the tour's first card (modules/r166.js), where a one-line card stood shorter than the two-line ones; and 270 pixels wide at most,
+   the narrowest at which none needs a third line (her word: "The cards are still too wide"). Nothing the card does has changed: the same keys, in the same order for the
    keyboard and for a screen reader. */
 #page-guide #guideTour.gt2{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px 28px;align-items:start;margin-top:4px}
 @media (max-width:1050px){#page-guide #guideTour.gt2{grid-template-columns:minmax(0,1fr)}}
@@ -24,8 +26,8 @@ body[data-theme="night"] #page-guide #guideTour.gt2 .gt2-chaps{box-shadow:0 1px 
 #page-guide #guideTour.gt2 .gt2-start > p:not(.gt2-sub){margin:0;font-size:14px;line-height:1.55;color:var(--ink-2)}
 #page-guide #guideTour.gt2 .tour-entry-row{margin:2px 0 0}
 #page-guide #guideTour.gt2 .ih-entrylv{display:flex;flex-direction:column;gap:10px;margin:4px 0 0;padding-top:14px;border-top:1px solid var(--hairline-soft,rgba(40,20,70,.08))}
-#page-guide #guideTour.gt2 .ih-entrylv .ih-lv{display:flex;flex-direction:column;flex-wrap:nowrap;gap:8px;margin:0}
-#page-guide #guideTour.gt2 .ih-entrylv .ih-lv .ih-lvk:not(#ih-z){flex:0 0 auto;width:100%;max-width:none;justify-content:flex-start;align-items:center;text-align:left;gap:12px;padding:10px 12px}
+#page-guide #guideTour.gt2 .ih-entrylv .ih-lv{display:grid;grid-template-columns:minmax(0,270px);grid-auto-rows:1fr;gap:8px;margin:0}
+#page-guide #guideTour.gt2 .ih-entrylv .ih-lv .ih-lvk:not(#ih-z){flex:0 0 auto;width:100%;max-width:none;height:auto;margin:0;align-self:stretch;justify-content:flex-start;align-items:center;text-align:left;gap:12px;padding:10px 12px}
 #page-guide #guideTour.gt2 .ih-entrylv .ih-lvi{flex:0 0 26px;text-align:center;font-size:19px}
 #page-guide #guideTour.gt2 .gt2-chh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
 #page-guide #guideTour.gt2 .gt2-count{font:600 12.5px/1.3 var(--sans);color:var(--accent,#6a3fb5)}
