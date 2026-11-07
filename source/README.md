@@ -397,6 +397,30 @@ improved and be more acessible to me, its a bit flawed right now."
     node rig/t_646_switch.js <url> <out>   # stand-ins for Anthropic, Ollama on another computer and a service with 41 models: nothing set up;
                                            # the sheet's three steps; the menu's Who answers and Find a model; the top bar; Settings
 
+Ingenium 6.48 (7 November 2026): the Offline Project, made from her apps, in Fabrica (the master edition alone). Her answer
+(7 November 2026), asked how the Offline Project should be built into her master edition: "Fabrica and app lists": in Fabrica she
+chooses all four apps or the variation without Inkwell, and Ingenium builds it fresh from her current apps, to try, edit and package
+it, and both variations are listed with her apps, each built fresh when opened. And her answer of 6 November (6.45): "Yes, the app
+library stop keeping saved copies of the Offline Project's page".
+
+- modules/r246.js (new, the master edition's alone; build/editions.py leaves it out of the others). Measured on 6.47: the Offline
+  Project was made only by source/offline_project/master_demo/build_master_demo.py, a Python program run by hand on a computer with
+  the four apps' demonstrations beside it. Now Fabrica's list of apps opens with The Offline Project, wearing its live crest; its
+  work shows the two variations and each room's copy (the copy the app library keeps now, or its earlier copy where one is kept; what
+  each is is said, and Ingenium's room says when it holds this copy, the master edition), and Make and open or Save the app: the
+  one-file app of build_master_demo.py's app mode, made in the window: the hall (site.html) with the build's table (the apps inside
+  the page, their versions and the line that names them, the seals from the page's own ING_SEALS, the devices' pictures, the icons),
+  and each app's page with the three things that program adds at its top (its own corner of the storage, the key back to the hall,
+  no scroll bars), compressed (CompressionStream) inside the page. It lives in the window's memory until it is saved; nothing is kept
+  in the app library. source/offline_project/master_demo/make_op_data.py writes source/build/op_make.json (the hall compressed, the
+  devices' pictures at most 720 pixels high, the icons drawn from master_seal.json as the Python program draws them, the loading
+  page's shield, and the three additions taken from build_master_demo.py word for word); build_page.py carries it where her apps
+  ride along. Next (6.49): the website (a zip), the hall's words edited in Code, and both variations in Lector's, Code's and the +
+  menu's lists of apps.
+
+    node rig/t_648_offline.js <master url> <out>   # Fabrica's Offline Project: the rooms, Make (four and three apps), the page made
+                                                   # (the hall, its table, the apps inside, each with its shim), opened, and saved
+
 Ingenium 6.47 (7 November 2026): context and compacting, slash commands, connectors in Code's + menu. Her words (6 November 2026): "I want
 for Ingenium's sessions to be automatically compacted like they are on Claude's code chats, the same for the regular chats. I want the
 option to have it compacted automatically or to click and compact it myself if I choose to. Please add that function to Ingenium. I also

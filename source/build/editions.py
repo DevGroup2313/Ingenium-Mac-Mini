@@ -59,6 +59,7 @@ def skip_modules(ed):
     out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
     out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
+    out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
     if not carries_desk(ed):

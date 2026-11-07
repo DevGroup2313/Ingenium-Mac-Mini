@@ -1608,6 +1608,13 @@ for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Di
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
         sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
     _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+# ---- 6.48 (7 November 2026): what the master edition makes the Offline Project from (modules/r246.js): the hall, the devices'
+#      pictures and the icons drawn from the master seal, written by source/offline_project/master_demo/make_op_data.py into
+#      op_make.json. Only where her apps ride along (the master edition, not the lean copy The Forge carries). ----
+if _bi:
+    _op = open(os.path.join(HERE, "op_make.json"), encoding="utf-8").read().strip()
+    json.loads(_op)  # it must read as it is written
+    _apps += '<script type="application/json" id="op-make-data">' + _op.replace("</", "<\\/") + '</script>\n'
 # ---- R136 (Ingenium 6.0, 20 October 2026): the shells Fabrica fills to make an APK and an IPA on the device (source/shells).
 #      The Android shell is compiled by shells/android/build_dex.sh; the iPhone and iPad shell by GitHub's Macs
 #      (.github/workflows/build-shells.yml), checked here against the fingerprint that build wrote beside it ----
