@@ -75,7 +75,7 @@ function augment(){var m=$("chatModelMenu");if(!m||m.querySelector("[data-r191]"
       var t=el("span",null,nice(nm));t.style.cssText="overflow:hidden;text-overflow:ellipsis;white-space:nowrap";r.appendChild(t);
       if(onCloud&&k.id===cur&&nm===pick){var on=el("span","ctx-hint","answering now");on.style.cssText="margin-left:auto;color:var(--ok)";r.appendChild(on);}
       b.appendChild(r);b.onclick=function(){try{closeChatMenus();}catch(e){}use(k,nm);};box.appendChild(b);});
-    if(ms.length>SHOW)box.appendChild(el("div","cxm-more","and "+(ms.length-SHOW)+" more: Settings, Connect, lists them all"));});
+    if(ms.length>SHOW)box.appendChild(el("div","cxm-more","and "+(ms.length-SHOW)+" more: Find a model, at the top, finds each one"));});
   box.appendChild(el("div","ctx-sep"));
   m.insertBefore(box,m.firstChild);}
 /* each conversation keeps the model that last answered it */

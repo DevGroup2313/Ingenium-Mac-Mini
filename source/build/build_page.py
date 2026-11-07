@@ -1482,6 +1482,13 @@ edit('num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWi
      'num_ctx:typeof ingOllamaCtx==="function"?ingOllamaCtx(msgs,ab&&ab.conn):((ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768))}};',
      "6.46 Ollama is given the memory each request needs, up to its model's own window (modules/r206.js)")
 
+# ---- 6.46 (7 November 2026), its second part: who answers, at hand (modules/r244.js). Her words (6 November 2026): "Switching between providers and
+#      connections in Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users." The
+#      tour's step on the top bar says what the model key does now. ----
+edit('These show the engine, the part that runs models, and the model in use. A green dot means ready. Tap either one to open the Models page.',
+     'These show the engine, the part that runs models, and who answers. A green dot means ready. The engine opens the Models page; the second key lets you choose who answers, a model on this device or a service you connected, from any page.',
+     "6.46 the tour's top bar: the key that chooses who answers")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
