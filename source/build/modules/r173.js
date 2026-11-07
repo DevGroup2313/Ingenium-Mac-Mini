@@ -533,9 +533,12 @@ function stepState(R){var s=R.setup,t=$("blendTask");return [false,s.querySelect
   !!(t&&clean(t.value)),!!D.querySelector("#blendOut .bl-card")];}
 function paintSteps(R){if(!R.stepKeys)return;var st=stepState(R);
   R.stepKeys.forEach(function(b,i){var n=i+1,now=n===R.step,done=st[n]&&!now;
-    if(now)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");b.classList.toggle("rm-done",done);
+    if(now){if(b.getAttribute("aria-current")!=="step")b.setAttribute("aria-current","step");}else if(b.hasAttribute("aria-current"))b.removeAttribute("aria-current");b.classList.toggle("rm-done",done);
     var dn=b.querySelector(".rm-dn");if(dn&&dn.textContent!==(done?", done":""))dn.textContent=done?", done":"";});
-  var N=R.nav;if(!N)return;N.back.hidden=R.step<=1;N.next.hidden=R.step>=3;if(R.step<3)N.next.textContent=STEPS[R.step-1].next;
+  /* 6.52: each part is written only when it changes. Written every time, Back's hidden woke the watcher above (it listens for hidden),
+     which painted the steps again 30 ms later, and so on for ever: about 30 rewrites a second on every page, since Blend is built at start */
+  var N=R.nav;if(!N)return;if(N.back.hidden!==(R.step<=1))N.back.hidden=R.step<=1;if(N.next.hidden!==(R.step>=3))N.next.hidden=R.step>=3;
+  if(R.step<3&&N.next.textContent!==STEPS[R.step-1].next)N.next.textContent=STEPS[R.step-1].next;
   /* (with fewer than two models on the device, the list itself says to add them on the Models page) */
   var few=(W.state&&Array.isArray(W.state.models)?W.state.models.length:2)<2,hn=R.step===1&&!st[1]&&!few?"Choose at least two models to blend.":"";
   if(N.hint.textContent!==hn)N.hint.textContent=hn;}

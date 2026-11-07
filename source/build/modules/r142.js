@@ -689,17 +689,20 @@ var PT=0;function paintSoon(){clearTimeout(PT);PT=setTimeout(paintAll,90);}
 function paintAll(){if(!$i("stxCard"))return;paintGauge();paintKinds();paintApps();paintLog();paintParts();paintPersist();
   var n=$i("stxLimitNote");if(n){var st=CK.last,L=+S().limit>0?+S().limit:0;
     n.textContent="Warnings come at 80 % and 95 % of it."+(st&&st.quota?(L>st.quota?" Your limit is more than the browser gives Ingenium here ("+B(st.quota)+"), so the browser's room is the one that counts.":(L?"":" Without one of your own, the limit is the room the browser gives Ingenium here: "+B(st.quota)+".")):"");}}
+/* 6.51: each part is written only when it changes (a write wakes the page's watchers; this is painted after every check) */
+function T_(e,v){if(e&&e.textContent!==v)e.textContent=v;}
+function A_(e,k,v){if(e&&e.getAttribute(k)!==v)e.setAttribute(k,v);}
 function paintGauge(){if(!$i("stxCard"))return;var st=CK.last;
   if(!st){status().then(function(x){CK.last=x;paintGauge();});return;}
   var used=$i("stxUsed"),of=$i("stxOf"),m=$i("stxMeter"),f=$i("stxFill"),t=$i("stxState"),w=$i("stxWarn");
-  if(st.usage==null){used.textContent="Not known";of.textContent="this browser does not say how much room Ingenium takes";m.setAttribute("aria-valuenow","0");m.setAttribute("aria-valuetext","not known");f.style.width="0";t.textContent="";w.hidden=true;return;}
-  used.textContent=B0(st.usage);of.textContent=st.eff?"of "+B(st.eff)+(st.mine?", the limit you set":", the room the browser gives Ingenium here"):"used";
-  var p=st.pct==null?0:Math.max(0,Math.min(1,st.pct));m.setAttribute("data-level",String(st.level));m.setAttribute("aria-valuenow",String(Math.round(p*100)));
-  m.setAttribute("aria-valuetext",pc(p)+" of "+(st.mine?"your limit":"the room the browser gives")+" ("+B(st.usage)+" of "+B(st.eff)+")");f.style.width=Math.max(st.usage>0?1:0,p*100)+"%";
-  t.textContent=st.level===0?"Plenty of room"+(st.pct!=null?": "+pc(st.pct)+" used.":".")+(S().auto?" Old copies go on their own if it runs short.":""):"";
-  w.hidden=st.level===0;w.setAttribute("data-level",String(st.level));
-  if(st.level>0)$i("stxWarnT").innerHTML=st.level===2?"<b>Nearly full: "+pc(st.pct)+".</b> Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit."
-    :"<b>Getting full: "+pc(st.pct)+".</b> Nothing needs doing yet. When you like, Clean the library frees old copies"+(S().auto?", and at 90 % old copies go on their own.":".");}
+  if(st.usage==null){T_(used,"Not known");T_(of,"this browser does not say how much room Ingenium takes");A_(m,"aria-valuenow","0");A_(m,"aria-valuetext","not known");if(f.style.width!=="0px"&&f.style.width!=="0")f.style.width="0";T_(t,"");if(!w.hidden)w.hidden=true;return;}
+  T_(used,B0(st.usage));T_(of,st.eff?"of "+B(st.eff)+(st.mine?", the limit you set":", the room the browser gives Ingenium here"):"used");
+  var p=st.pct==null?0:Math.max(0,Math.min(1,st.pct));A_(m,"data-level",String(st.level));A_(m,"aria-valuenow",String(Math.round(p*100)));
+  A_(m,"aria-valuetext",pc(p)+" of "+(st.mine?"your limit":"the room the browser gives")+" ("+B(st.usage)+" of "+B(st.eff)+")");var fw=Math.max(st.usage>0?1:0,p*100)+"%";if(f.style.width!==fw)f.style.width=fw;
+  T_(t,st.level===0?"Plenty of room"+(st.pct!=null?": "+pc(st.pct)+" used.":".")+(S().auto?" Old copies go on their own if it runs short.":""):"");
+  if(w.hidden!==(st.level===0))w.hidden=st.level===0;A_(w,"data-level",String(st.level));
+  if(st.level>0){var wt=$i("stxWarnT"),wh=st.level===2?"<b>Nearly full: "+pc(st.pct)+".</b> Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit."
+    :"<b>Getting full: "+pc(st.pct)+".</b> Nothing needs doing yet. When you like, Clean the library frees old copies"+(S().auto?", and at 90 % old copies go on their own.":".");if(wt&&wt.innerHTML!==wh)wt.innerHTML=wh;}}
 function paintPersist(){var row=$i("stxPersistRow");if(!row)return;
   persisted().then(function(p){var t=$i("stxPersist"),k=$i("stxPersistAsk"),s=S(),a=s.persist;
     var onDisk=false;try{var api=(typeof W.shellApi==="function")?W.shellApi():null;onDisk=!!(api&&(typeof api.save_state==="function"||typeof api.big_put==="function"));}catch(e){}

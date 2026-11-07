@@ -186,7 +186,7 @@ function tile(c){if(!isTopic(c)||c.__gd)return;
   b.title=title+": press to open";
   b.addEventListener("click",function(){toggle(c);});
   c.insertBefore(b,c.firstChild);if(all())setOpen(c,true);}
-function stagger(){var s=$("page-guide");if(!s)return;[].forEach.call(s.querySelectorAll(".rm-panel"),function(p){var i=0;[].forEach.call(p.children,function(e){if(e.classList&&(e.classList.contains("gd-tile")||e.classList.contains("gd-feature")))e.style.setProperty("--gd-i",String(i++));});});}
+function stagger(){var s=$("page-guide");if(!s)return;[].forEach.call(s.querySelectorAll(".rm-panel"),function(p){var i=0;[].forEach.call(p.children,function(e){if(e.classList&&(e.classList.contains("gd-tile")||e.classList.contains("gd-feature"))){var k=String(i++);if(e.style.getPropertyValue("--gd-i")!==k)e.style.setProperty("--gd-i",k);}});});}
 function all(){var s=$("page-guide");return !!(s&&s.classList.contains("rm-all"));}
 function setOpen(c,on){c.classList.toggle("gd-open",!!on);var b=c.querySelector(":scope > .gd-head");if(b){b.setAttribute("aria-expanded",on?"true":"false");b.title=(b.querySelector(".gd-t")||{}).textContent+(on?": press to fold it away":": press to open");}}
 function toggle(c,on){var open=on==null?!c.classList.contains("gd-open"):!!on;
@@ -232,8 +232,10 @@ function build(){var s=$("page-guide");if(!s)return;
   var h1=s.querySelector(":scope > .page-title");if(h1&&h1.textContent!=="Guide")h1.textContent="Guide";
   var le=s.querySelector(":scope > .lede");var lw="Ingenium, room by room. Each topic opens when you press it, and folds away again; the tour walks you through it all.";if(le&&le.textContent!==lw)le.textContent=lw;
   refreshKey();}
-function refreshKey(){if(!KEY)return;var v=newest();KEY.querySelector(".gd-ver").textContent=v;var dot=KEY.querySelector(".gd-dot");dot.hidden=!v||seen()===v;
-  KEY.setAttribute("aria-label","What’s new"+(v?", version "+v:"")+(v&&seen()!==v?", not opened yet":""));
+/* 6.51: each part is written only when it changes. Its number was written every time, and that change woke the Guide's own watcher,
+   which painted the key again at once, and so on: about 170 rewrites a second while the Guide was open */
+function refreshKey(){if(!KEY)return;var v=newest(),ve=KEY.querySelector(".gd-ver");if(ve.textContent!==v)ve.textContent=v;var dot=KEY.querySelector(".gd-dot"),dh=!v||seen()===v;if(dot.hidden!==dh)dot.hidden=dh;
+  var al="What’s new"+(v?", version "+v:"")+(v&&seen()!==v?", not opened yet":"");if(KEY.getAttribute("aria-label")!==al)KEY.setAttribute("aria-label",al);
   /* What is new lives in the key now: its card leaves the rooms (kept, folded, for anything that still reads it) */
   var c=$("wnGuide");if(c&&POP&&c.parentNode!==POP){c.hidden=true;POP.appendChild(c);}
   var gf=D.querySelector("#page-guide > .guide-foot");if(gf&&POP){gf.hidden=true;POP.appendChild(gf);}}

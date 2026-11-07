@@ -371,6 +371,49 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.51 (7 November 2026), its second part: a page that keeps still, keys that stand up from it, and an empty Chat page
+without ready-made ideas. Her words (7 November 2026): "The buttons inside of Ingenium still feels flat and are missing the popped
+out 3D animated look and effect and everything feels really freaking slow when I move my mouse around inside of the app. I HATE IT
+and I already told you to fix this many times!" and "Please remove the 4 prompt buttons from the Chat's page ... please only keep the
+"Connect a service" and "Get a model" on there, it looks too crowded and cluttered at the moment."
+
+Measured on the 6.51 test page in Chromium with the computer slowed four times (CDP Emulation.setCPUThrottlingRate 4; Performance
+metrics TaskDuration over 5 s with the pointer still, then over a sweep of 122 pointer moves), on the Chat page: the main thread was
+busy 37 % of the time with nothing touched and 56 % while the pointer moved; now 4 % and 27 %. What did it:
+
+- modules/r173.js: Blend's step keys were painted again 30 ms after every change of a hidden attribute inside Blend's card, and the
+  painting itself set Back's hidden (to the same value), so it went on for ever, on every page, from the start (Blend is built at
+  start): about 30 rewrites a second, each waking the page's watchers. Each part is now written only when it changes (idle 37 % to
+  8 %). The same fault, at 170 rewrites a second while the Guide was open, was in the Guide's What's new key (modules/r230.js, its
+  version number); and smaller ones, once or twice a second, in the who-answers key and the top bar's pill (modules/r244.js, every
+  1.5 s), the chat's pace chip (modules/r116.js, every 0.5 s), the thought cloud's number (thoughts/thought_cloud.html, at every
+  save) and the storage gauge (modules/r142.js). All write only what changes now.
+- modules/r248.js (new): the Ingenium seal's star, heart, ring and breath move inside its picture, which the browser cannot hand to
+  the graphics card, so the page was painted again for every frame of them (idle 8 % to 5 %, sweep 48 % to 29 %). They rest now, and
+  move while the pointer is on the seal (or it has the keyboard's focus) and on the welcome door; the seal's sway, which the graphics
+  card draws, goes on. Home's app stones sparkle while the pointer is on them (their sparks, four glows each, grown by the main
+  thread, made Home work out its styles about 55 times a second: 174 times in 3 s, now 31). In the apps' frames (modules/r118.js),
+  Tabula's and Abacus's app keys glow and sparkle while pointed at (Tabula's page: 367 style passes in 3 s, now 72).
+- modules/r140.js: a live crest's quarters (the Offline Project's, in Fabrica, Lector and the lists of apps) move for 6 s each time
+  the crest comes into view and while it or its key is pointed at, then rest; their motion is drawn inside the crest's picture
+  (Fabrica, nothing touched: 26 % with them moving, 5 % at rest). Both pictures are kept, so the change is immediate.
+- modules/r248.js, the keys (measured against Inkwell's, The Forge's and Carpe Diem's own pages: a shaded face, a drawn rim, an edge
+  beneath, a 3 px rise on a spring; Ingenium's face was white to #f9f7fc and its edge 1.5 px at 18 %): by day a key's face shades from
+  white to #ebe4f6, with a bright top line and a soft shade along its foot; beneath it a lavender edge 2.5 px deep (the accent at
+  20 %, a colour rather than a darker shadow, after "Please reduce the heavyness of the buttons", 6 November), and soft casts. Under
+  the pointer it rises 3 px on a spring (0.22 s, a little past and back) and its edge grows to 3.5 px; pressed, it sinks 2 px into
+  its edge in 0.05 s. No key changes size. The recipe sits in the head after 6.49's and ahead of the Author Studio's look, so Soft
+  and Deep still win; Display's Flat depth, the night theme and reduced motion keep their own ways.
+- build_page.py: the empty Chat page keeps its greeting and, while nothing answers, Connect a service and Get a model (modules/r244.js);
+  its four ready-made ideas are gone (Code's four, for an open app, stay).
+
+    node rig/t_651_still_keys.js <url> <out>   # left alone on Chat, Home, Settings, Blend and the Guide nothing is rewritten and
+                                               # styles are worked out only now and then; the seal, Home's sparks and Tabula's keys
+                                               # rest and move when pointed at; Blend's steps, the who-answers key and the thought
+                                               # cloud's number still work; the keys' recipe and motion; night, Flat, reduced motion;
+                                               # the empty Chat page (39 checks)
+    rig/t_649_keys.js follows the new recipe (its token, rise and press checks).
+
 Ingenium 6.51 (7 November 2026): the Offline Project in the lists of her apps, and its hall's words edited in Code (the master edition
 alone; her answer of 7 November: "Fabrica and app lists").
 

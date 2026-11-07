@@ -12,6 +12,9 @@
 //   - the Author Studio's Deep is heavier than the new own look and Soft lighter, and its choice wins over the new recipe;
 //   - Display's Flat depth and the night theme keep their own faces; reduced motion keeps every key still;
 //   - no errors on the page.
+// 6.51 (7 November 2026; her words: "The buttons inside of Ingenium still feels flat and are missing the popped out 3D animated look
+// and effect"): the recipe is modules/r248.js's now (a shaded face, a lavender edge 2.5 px deep, a 3 px rise on a spring and a
+// 2 px press), and the empty Chat page has no ideas any more; the checks below follow it. rig/t_651_still_keys.js tests the rest.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const args = process.argv.slice(2); const REF = (args.find(a => a.startsWith('ref=')) || '').slice(4); const [URL_, OUT] = args.filter(a => !a.startsWith('ref='));
 fs.mkdirSync(OUT, { recursive: true });
@@ -19,7 +22,7 @@ let pass = 0, fail = 0; function ok(c, m, d) { if (c) { pass++; console.log('ok 
 // the keys measured on each page: [page, selector, label]
 const KEYS = [['settings', '#page-settings .btn:not(.primary)', 'a Settings key'], ['settings', '.cl-key#displayBtn', 'the top bar\'s Display'],
   ['settings', '.cl-key#statusPill', 'the top bar\'s status'], ['chat', '.chat-top-key#chatCtlBtn', 'Chat\'s Controls'], ['chat', '#chatImgBtn', 'Chat\'s plus key'],
-  ['chat', '.cc-idea', 'an idea on an empty chat'], ['home', '.hx-key', 'a large Home key'], ['home', '.hx-btn.quiet', 'Home\'s See all'],
+  ['home', '.hx-key', 'a large Home key'], ['home', '.hx-btn.quiet', 'Home\'s See all'],
   ['lector', '#lx7 .l-btn.quiet', 'a quiet Lector key'], ['lector', '#lx7 .l-btn:not(.quiet):not(.pri)', 'a Lector key'], ['career', '#cs .c-btn:not(.pri), #cs button.c-key', 'a Career Studio key']];
 async function open(b, url, opts) {
   const ctx = await b.newContext(Object.assign({ viewport: { width: 1440, height: 900 } }, opts || {})); const p = await ctx.newPage(); const errs = [];
@@ -44,9 +47,9 @@ async function measure(p) { const out = {};
   // 1. the recipe, read from the page
   const tok = await p.evaluate(() => { const r = getComputedStyle(document.documentElement); const t = document.getElementById('r247-tok');
     return { pop: r.getPropertyValue('--pop').trim(), pill: r.getPropertyValue('--pill').trim(), inHead: !!(t && t.parentNode === document.head) }; });
-  ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.20\)/.test(tok.pop) && /0 1\.5px 0 rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.18\)/.test(tok.pop) && /0 8px 18px/.test(tok.pop),
-    'the own key: a fine outline, a thin edge (1.5 px at 18 %) and a soft, wide lift', tok.pop);
-  ok(/0 0 0 \.5px/.test(tok.pill) && /0 1px 0 rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.18\)/.test(tok.pill), 'the top bar\'s pill: the same outline and a 1 px edge', tok.pill);
+  ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.22\)/.test(tok.pop) && /0 2\.5px 0 (?:var\(--key-edge\)|rgba\(93,\s*55,\s*161,\s*\.20?\))/.test(tok.pop) && /0 10px 18px/.test(tok.pop),
+    'the own key (6.51): a fine outline, a lavender edge 2.5 px deep and soft casts', tok.pop);
+  ok(/0 0 0 \.5px/.test(tok.pill) && /0 2px 0 rgba\(93,\s*55,\s*161,\s*\.18\)/.test(tok.pill), 'the top bar\'s pill (6.51): the same outline and a lavender edge 2 px deep', tok.pill);
   ok(tok.inHead, 'the recipe sits in the page\'s head, where the Author Studio\'s look can follow it');
   const now = await measure(p); fs.writeFileSync(OUT + '/keys.json', JSON.stringify(now, null, 1));
   const missing = Object.entries(now).filter(([k, v]) => !v).map(([k]) => k); const absent = Object.entries(now).filter(([k, v]) => v === 'absent').map(([k]) => k);
@@ -55,7 +58,7 @@ async function measure(p) { const out = {};
   ok(missing.length <= 1, 'the keys to measure are on their pages (at most one room shows none yet)', missing);
   const ring = Object.entries(now).filter(([k, v]) => v && !/0px 0px 0px 0\.5px/.test(v.sh)).map(([k, v]) => k + ': ' + v.sh.slice(0, 120));
   ok(ring.length === 0, 'every measured key wears the outline (its own recipe or the room\'s, which follows it)', ring);
-  const flatNow = ['Chat\'s plus key', 'an idea on an empty chat', 'Home\'s See all', 'a quiet Lector key'].filter(k => now[k] && (!now[k].sh || now[k].sh === 'none'));
+  const flatNow = ['Chat\'s plus key', 'Home\'s See all', 'a quiet Lector key'].filter(k => now[k] && (!now[k].sh || now[k].sh === 'none'));
   ok(flatNow.length === 0, 'keys that were words or bare outlines are raised keys now (plus, ideas, See all, Lector\'s quiet keys)', flatNow);
   // 2. no key bigger or wider than on the earlier page
   if (REF) { const R = await open(b, REF); const was = await measure(R.p); await R.ctx.close();
@@ -71,11 +74,11 @@ async function measure(p) { const out = {};
   const key = p.locator('#page-settings .btn:not(.primary)').filter({ hasText: /\S/ }).first(); await key.scrollIntoViewIfNeeded(); const box = await key.boundingBox();
   await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(400);
   const hov = await key.evaluate(e => { const c = getComputedStyle(e); return { tf: c.transform, sh: c.boxShadow }; });
-  ok(/matrix\(1, 0, 0, 1, 0, -2\)/.test(hov.tf) && /0px 2\.5px 0px/.test(hov.sh), 'under the pointer a key rises 2 px and its edge grows (2.5 px)', hov);
+  ok(/matrix\(1, 0, 0, 1, 0, -3\)/.test(hov.tf) && /0px 3\.5px 0px/.test(hov.sh), 'under the pointer a key rises 3 px and its edge grows (3.5 px; 6.51)', hov);
   await p.mouse.down(); await p.waitForTimeout(200);
   const prs = await key.evaluate(e => { const c = getComputedStyle(e); return { tf: c.transform, sh: c.boxShadow, td: c.transitionDuration }; });
   await p.mouse.move(5, 895); await p.mouse.up(); await p.waitForTimeout(300);
-  ok(/matrix\(0\.98, 0, 0, 0\.98, 0, 1\)/.test(prs.tf) && /inset/.test(prs.sh) && /0\.05s/.test(prs.td), 'pressed, it sinks 1 px, a little smaller, into its seat in 0.05 s', prs);
+  ok(/matrix\(0\.985, 0, 0, 0\.985, 0, 2\)/.test(prs.tf) && /inset/.test(prs.sh) && /0\.05s/.test(prs.td), 'pressed, it sinks 2 px into its edge, a little smaller, in 0.05 s (6.51)', prs);
   // 4. the Author Studio's depth (the master edition): Deep heavier, Soft lighter, and its choice wins over the recipe
   const hasAuthor = await p.evaluate(() => typeof IngAuthor === 'object' && !!IngAuthor && typeof IngAuthor.open === 'function');
   if (hasAuthor) {
@@ -89,7 +92,7 @@ async function measure(p) { const out = {};
     const edgeOf = s => { const m = /(?:^|,)\s*0 (1|1\.5|2)px 0 rgba\([^)]*,\s*([.\d]+)\)/.exec(s); return m ? +m[2] : NaN; };
     ok(edgeOf(deepPop) > 0.18 && edgeOf(softPop) < 0.18 && order === 'recipe first',
       'the Author Studio\'s Deep is heavier than the own key and Soft lighter, and its choice wins (its look follows the recipe in the head)', { deep: deepPop.slice(0, 140), soft: softPop.slice(0, 140), order });
-    ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.20\)/.test(ownPop), 'Ingenium\'s own depth again gives the new recipe back', ownPop.slice(0, 140));
+    ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.22\)/.test(ownPop) && /0 2\.5px 0 (?:var\(--key-edge\)|rgba\(93,\s*55,\s*161,\s*\.20?\))/.test(ownPop), 'Ingenium\'s own depth again gives the recipe back', ownPop.slice(0, 140));
     await p.evaluate(() => { try { IngAuthor.close(); } catch (e) {} go('settings'); }); await p.waitForTimeout(500);
   } else console.log('(the Author Studio is not in this edition: Soft and Deep not tried)');
   // 5. Display's Flat depth and the night theme keep their own faces

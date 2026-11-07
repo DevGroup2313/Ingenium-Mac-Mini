@@ -1489,6 +1489,14 @@ edit('These show the engine, the part that runs models, and the model in use. A 
      'These show the engine, the part that runs models, and who answers. A green dot means ready. The engine opens the Models page; the second key lets you choose who answers, a model on this device or a service you connected, from any page.',
      "6.46 the tour's top bar: the key that chooses who answers")
 
+# ---- 6.51 (7 November 2026), its second part: an empty chat shows the greeting and, when nothing answers yet, Connect a service and
+#      Get a model (modules/r244.js), and no ready-made ideas. Her words (7 November 2026): "Please remove the 4 prompt buttons from the
+#      Chat's page ... please only keep the "Connect a service" and "Get a model" on there, it looks too crowded and cluttered at the
+#      moment." (Code's four ideas for an open app are not on the Chat page, and stay.) ----
+edit('  var ex2=el("div","cc-ideas");["Write a cover letter from my CV","Turn these notes into a report","Make a study timer app","Summarise a long document"].forEach(function(t){var k=el("button","cc-idea",t);k.type="button";k.onclick=function(){var ci=$("chatInput");ci.value=t;try{ci.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}ci.focus();};ex2.appendChild(k);});\n  w.appendChild(ex2);return w;}',
+     '  return w;}',
+     "6.51 the empty chat without its four ready-made ideas")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

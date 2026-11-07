@@ -323,18 +323,22 @@ function find(body,res,q){q=String(q||"").trim().toLowerCase();res.innerHTML="";
 function paintKey(){var b=$("chatModelBtn"),nm=$("chatModelName"),sw=$("chatModelSw");if(!b||!nm)return;
   var cloud=onCloud(),lm=localModel(),wh=b.querySelector(".wa-where");
   if(!wh){wh=mk("span","wa-where");var chev=b.querySelector(".chev");b.insertBefore(wh,chev||null);}
-  if(cloud){var c=state.cloud,k=kept().filter(function(x){return x.id===curId();})[0]||c;wh.textContent=short(k);wh.hidden=false;if(sw)sw.style.background="var(--accent)";b.classList.remove("wa-attn");
-    b.title="Answering through "+label(k)+": "+nice(c.model)+". Press to choose another model, another service or this device.";}
-  else{wh.hidden=true;
-    if(!lm){if(nm.textContent!=="Choose who answers")nm.textContent="Choose who answers";b.classList.add("wa-attn");b.title="Nothing answers yet. Press to choose a model for this device, or to connect a service such as Claude, OpenAI, Gemini or Ollama.";}
-    else{b.classList.remove("wa-attn");if(!/Press to choose who answers/.test(b.title||""))b.title=(b.title?b.title+" ":"")+"Press to choose who answers: a model on this device or a service you connected.";}}}
+  /* 6.52: each part is written only when it changes (this is painted every 1.5 s, and each write wakes the page's watchers) */
+  if(cloud){var c=state.cloud,k=kept().filter(function(x){return x.id===curId();})[0]||c;tx(wh,short(k));hid(wh,false);if(sw&&sw.style.background!=="var(--accent)")sw.style.background="var(--accent)";b.classList.toggle("wa-attn",false);
+    sa(b,"title","Answering through "+label(k)+": "+nice(c.model)+". Press to choose another model, another service or this device.");}
+  else{hid(wh,true);
+    if(!lm){tx(nm,"Choose who answers");b.classList.toggle("wa-attn",true);sa(b,"title","Nothing answers yet. Press to choose a model for this device, or to connect a service such as Claude, OpenAI, Gemini or Ollama.");}
+    else{b.classList.toggle("wa-attn",false);if(!/Press to choose who answers/.test(b.title||""))b.title=(b.title?b.title+" ":"")+"Press to choose who answers: a model on this device or a service you connected.";}}}
+function sa(e,k,v){if(e&&e.getAttribute(k)!==v)e.setAttribute(k,v);}
+function hid(e,h){if(e&&e.hidden!==h)e.hidden=h;}
+function tx(e,t){if(e&&e.textContent!==t)e.textContent=t;}
 
 /* ---------- the top bar's key: who answers, from any page ---------- */
 function paintPill(){var p=$("activeModelPill"),nm=$("activeModelName");if(!p||!nm)return;var sw=p.querySelector(".swatch");
-  if(onCloud()){var t=nice(state.cloud.model||state.cloud.provider);if(nm.textContent!==t)nm.textContent=t;if(sw){sw.style.background="var(--accent)";sw.classList.remove("ing-running");}
-    var k=kept().filter(function(x){return x.id===curId();})[0]||state.cloud;p.title="Answering: "+t+", through "+label(k)+". Press to choose who answers.";}
-  else{var lm=localModel();p.title="Answering: "+(lm?lm.customName+", on this device":"nothing yet")+". Press to choose who answers.";}
-  p.setAttribute("aria-haspopup","true");p.setAttribute("aria-expanded",POP&&!POP.hidden?"true":"false");}
+  if(onCloud()){var t=nice(state.cloud.model||state.cloud.provider);tx(nm,t);if(sw){if(sw.style.background!=="var(--accent)")sw.style.background="var(--accent)";sw.classList.toggle("ing-running",false);}
+    var k=kept().filter(function(x){return x.id===curId();})[0]||state.cloud;sa(p,"title","Answering: "+t+", through "+label(k)+". Press to choose who answers.");}
+  else{var lm=localModel();sa(p,"title","Answering: "+(lm?lm.customName+", on this device":"nothing yet")+". Press to choose who answers.");}
+  sa(p,"aria-haspopup","true");sa(p,"aria-expanded",POP&&!POP.hidden?"true":"false");}
 var POP=null;
 function row(name,sub,dev,on,fn){var b=btn("wa-row"+(dev?" dev":""),"",fn);b.setAttribute("role","menuitemradio");b.setAttribute("aria-checked",on?"true":"false");
   b.appendChild(mk("span","wa-dot"));var t=mk("span","wa-txt");t.appendChild(mk("span",null,name));t.appendChild(mk("span","wa-sub",sub));b.appendChild(t);if(on)b.appendChild(mk("span","wa-on","answering"));return b;}

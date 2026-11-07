@@ -301,7 +301,7 @@ function reduced(){try{return window.matchMedia("(prefers-reduced-motion: reduce
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function fillLayers(root,n,night){var idle=root.querySelector(".ic-idle");if(!idle)return;
   [].slice.call(idle.querySelectorAll("img.ic-l")).forEach(function(x){x.remove();});
-  layerUrls(n,night,!!root.__icq&&!reduced()).forEach(function(L1){var im=new Image();im.alt="";im.draggable=false;im.decoding="async";im.className="ic-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));im.src=L1.u;idle.appendChild(im);});}
+  layerUrls(n,night,!!root.__icq&&!!root.__icMove&&!reduced()).forEach(function(L1){var im=new Image();im.alt="";im.draggable=false;im.decoding="async";im.className="ic-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));im.src=L1.u;idle.appendChild(im);});}
 function wire(root){root.addEventListener("pointermove",function(e){if(e.pointerType==="touch"||reduced())return;var r=root.getBoundingClientRect();if(!r.width)return;
     var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;root.classList.add("hov");
     root.style.setProperty("--ry",(clamp(px,-.7,.7)*26).toFixed(1)+"deg");root.style.setProperty("--rx",(-clamp(py,-.7,.7)*18).toFixed(1)+"deg");},{passive:true});
@@ -309,6 +309,24 @@ function wire(root){root.addEventListener("pointermove",function(e){if(e.pointer
   root.addEventListener("pointerdown",function(){root.classList.add("down");},{passive:true});
   ["pointerup","pointercancel"].forEach(function(t){root.addEventListener(t,function(){root.classList.remove("down");},{passive:true});});
   root.addEventListener("animationend",function(e){if(e.animationName==="icRise")root.classList.remove("rise");});}
+/* 6.51 (7 November 2026): a crest's quarters move for a few seconds each time it comes into view and while it is pointed at, and rest
+   between. Her words: "everything feels really freaking slow when I move my mouse around inside of the app". Their motion is drawn
+   inside the crest's picture, which the browser must paint again for every frame: measured on Fabrica (the computer slowed four
+   times), a fifth of its time with nothing touched (26 % with the quarters moving, 5 % with them at rest). The still picture and the
+   moving one are both kept, so a change of picture is immediate; the crest's sway, which the graphics card draws, goes on. */
+function moveQuarters(root,on){on=!!on;if(!root.__icq||!!root.__icMove===on)return;root.__icMove=on;var st=root.__ic||{};if(!st.n)return;
+  var idle=root.querySelector(".ic-idle");if(!idle)return;var want=layerUrls(st.n,st.night,on&&!reduced()),have=[].slice.call(idle.querySelectorAll("img.ic-l"));
+  if(have.length!==want.length){fillLayers(root,st.n,st.night);return;}
+  want.forEach(function(L1,i){var im=have[i];if(im.getAttribute("src")===L1.u)return;var nx=new Image();nx.decoding="async";nx.src=L1.u;
+    var swap=function(){if(!!root.__icMove===on&&im.isConnected)im.src=L1.u;};if(nx.decode)nx.decode().then(swap,swap);else nx.onload=swap;});}
+var QIO=null;
+function restSoon(r,ms){clearTimeout(r.__icT);r.__icT=setTimeout(function(){if(!r.__icHover)moveQuarters(r,false);},ms);}
+function hoverHost(r){if(r.__icHost)return;var h=(r.parentElement&&r.closest("button,a,[role=button],.f-repo,.op-tile,.l-app,.hx-app"))||r;r.__icHost=h;
+  h.addEventListener("pointerenter",function(e){if(e.pointerType==="touch")return;r.__icHover=true;clearTimeout(r.__icT);moveQuarters(r,true);},{passive:true});
+  h.addEventListener("pointerleave",function(){r.__icHover=false;restSoon(r,900);},{passive:true});}
+function watchSeen(root){try{if(!QIO&&window.IntersectionObserver)QIO=new IntersectionObserver(function(es){es.forEach(function(en){var r=en.target;
+      r.__icSeen=en.isIntersecting;if(en.isIntersecting){hoverHost(r);if(!r.__icHover){moveQuarters(r,true);restSoon(r,6000);}}else{clearTimeout(r.__icT);if(!r.__icHover)moveQuarters(r,false);}});});
+    if(QIO)QIO.observe(root);else restSoon(root,6000);}catch(e){}}
 var SWAY=0;
 function el(apps,o){o=o||{};var n=norm(apps);if(!n)return null;var auto=o.night==null||o.night==="auto",nt=auto?isNight():!!o.night,K=kind(n);
   ready();
@@ -323,7 +341,7 @@ function el(apps,o){o=o||{};var n=norm(apps);if(!n)return null;var auto=o.night=
   /* crests side by side do not sway in step */
   idle.style.animationDelay=(-((SWAY++)*1.7)%7).toFixed(1)+"s";
   var cast=document.createElement("i");cast.className="ic-cast";idle.appendChild(cast);tilt.appendChild(idle);root.appendChild(tilt);
-  if(o.quarters){root.__icq=true;root.classList.add("ic-quarters");}
+  if(o.quarters){root.__icq=true;root.__icMove=false;root.classList.add("ic-quarters");watchSeen(root);}
   fillLayers(root,n,nt);wire(root);root.__ic={n:n,night:nt};if(auto)root.setAttribute("data-ic-auto",n.join("+"));
   return root;}
 /* by night the night pictures, by day the day ones, changed with the page's Display setting, with no reload */
@@ -334,7 +352,8 @@ function repaint(e,force){var n=norm((e.getAttribute("data-ic-auto")||"").split(
 function repaintAll(force){[].forEach.call(document.querySelectorAll("[data-ic-auto]"),function(e){try{repaint(e,force);}catch(x){}});}
 try{new MutationObserver(function(){repaintAll(false);}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 /* 6.40: the live crests that move their quarters follow the Motion setting as it changes */
-try{new MutationObserver(function(){[].forEach.call(document.querySelectorAll(".ing-crest.ic-quarters[data-ic-auto]"),function(e){try{repaint(e,true);}catch(x){}});}).observe(document.body,{attributes:true,attributeFilter:["data-motion"]});}catch(e){}
+/* (6.51: with motion allowed again, a crest in view moves its quarters for a few seconds, as when it comes into view) */
+try{new MutationObserver(function(){[].forEach.call(document.querySelectorAll(".ing-crest.ic-quarters[data-ic-auto]"),function(e){try{repaint(e,true);if(e.__icSeen&&!reduced()){if(!e.__icMove)moveQuarters(e,true);restSoon(e,6000);}}catch(x){}});}).observe(document.body,{attributes:true,attributeFilter:["data-motion"]});}catch(e){}
 
 function medals(apps){var n=norm(apps);if(!n)return null;var L=layout(n);return {vb:L.vb.slice(),med:(L.med||[]).map(function(m){return {k:m[0],cx:m[1],cy:m[2],r:m[3]};})};}
 window.IngSeal={apps:ORDER.slice(),norm:norm,kind:kind,names:names,title:title,label:label,aspect:aspect,svg:svg,url:url,dataUrl:dataUrl,png:png,el:el,medals:medals,
