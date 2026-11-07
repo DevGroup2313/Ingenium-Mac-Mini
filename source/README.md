@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.54 (7 November 2026): 6.8.7's motion again, Home's sparks drawn lightly, and the greeting card's keys. Her words (7 November
+2026): "I want the 3D look and animation of build 6.8.7, I want everything else to stay the same in Ingenium. I only want for the buttons
+inside of the "Good morning, ..." card on the Home page to be made slightly smaller but keep the acrylic chunky look"; "I like the white
+colour of the "Take the guided tour" and "Read the short Guide" buttons from 6.53, I want to keep the colour for the buttons but remove
+the glossy, flat effect and animation"; "I also really like the smaller size of 6.53's buttons inside of the app. I want that kept as
+well"; "Keep the colours from 6.53." She saw a preview (the card's keys in each state, and Home moving) before it shipped.
+
+Measured against the 6.8.7 release page from the history (git show 749ea1e:ingenium.html), in Chromium, on the common keys of eleven
+pages at rest, under the pointer and pressed: most have 6.53's faces and shadows; some were made smaller in 6.38 (the greeting card's
+keys, the rooms' tabs, the Career Studio's tabs), which she keeps; a few were redrawn since (Build's Copy, Open and Download, the Guide's
+list of topics), and the side bar's apps were plain rows (Carpe Diem's stones since, kept). What 6.53 lacked was the motion: 14
+animations ran on 6.8.7's Home with the pointer still, none on 6.53's.
+
+- The motion of 6.8.7: modules/r248.js (the seal and Home's sparks at rest) is out of the build; modules/r251.js keeps only the rail
+  arrow's plain face; modules/r118.js no longer rests the apps' key glows in their frames; modules/r140.js moves a crest's quarters
+  whenever it is on the screen (resting them only where they cannot be seen), as before 6.51.
+- modules/r252.js (new): Home's stone sparks were six growing backgrounds of one layer behind four glows, worked out and drawn again
+  for every frame on all seven stones (Home with nothing touched, computer slowed four times: 76 % busy on 6.8.7, 80 % on the 6.54
+  page with them as they were, 11.5 % without them). Each stone now has one picture of the star, as large as the stone, moved to each
+  place while it is nothing and grown there by a transform the graphics chip draws (translate(x%,y%) scale(s) translate(-17x px,-17y
+  px): the star's own x% y% point at the stone's x% y% point, as a background of 17s px at x% y%); its glow is drawn once. Frozen at
+  twelve moments of the beat, the old and new sparks have the same place and size. Home with nothing touched: about 10 %. Under a
+  moving pointer Home is still busier than on 6.53 (about 80 % against 52 %): every moving thing's style is worked out again whenever
+  the pointer changes what it is on; the seal's star, heart and ring (moved inside its picture) are the next largest part.
+- modules/r147.js: the greeting card's keys keep 6.53's size (13px, 34 to 36px) and faces; the white keys' bright top line and thin
+  foot give way to a solid edge 2px deep (#d9d4e0 by day, #120d1c by night) and their casts; no key in the card has a transition,
+  rises or springs; pointed at, a white key's rim darkens and the purple key lightens (brightness 1.06); pressed, a key sits 2px down
+  into its edge at once.
+- rig/t_654_motion.js (new): 6.8.7's animations on Home and Chat (read from the 6.8.7 page with ref=), the sparks' beat, place and
+  size, the crest's quarters on and off the screen, the greeting card's keys at rest, pointed at, pressed and by night (14 checks).
+  rig/t_651_still_keys.js and rig/t_653_look.js expect the motion now.
+
+    node rig/t_654_motion.js <url> <out> ref=<the 6.8.7 page>   # 6.8.7's motion; the sparks; the crest; the greeting card's keys
+
 Ingenium 6.53 (7 November 2026): the keys and surfaces of 6.9.4 again; a page that keeps still; the Offline Project as an ordinary
 app in Fabrica; the tour, the Guide and Help up to date. Her words (7 November 2026): "I honestly just want Ingenium reverted back to how
 it used to look before you started messing it the graphics. I want all of the edits and updates kept but I want my app to look like how
