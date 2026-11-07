@@ -39,7 +39,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => { try { clearStagedImage(); } catch (e) {} stagedFiles.length = 0; try { paintChips(); } catch (e) {} });
   // 3. the hall's words, edited in Code
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1200);
-  await p.click('#fbOpRow .op-tile'); await p.waitForTimeout(300);
+  await p.click('#fbBring'); await p.waitForTimeout(400); await p.evaluate(() => { const b = [...document.querySelectorAll('.f-sheet .op-bring')].find(x => /choose each app/.test(x.textContent)); b.click(); }); await p.waitForTimeout(400);
   const h0 = await p.evaluate(() => { const r = document.querySelector('.op-work .op-hall'); return r ? r.innerText.replace(/\s+/g, ' ') : ''; });
   ok(/The hall As Ingenium carries it/.test(h0) && /Edit its words in Code/.test(h0), 'Fabrica\'s card has a row for the hall, as Ingenium carries it, with Edit its words in Code', h0);
   await p.evaluate(() => IngOffline.editHall());
@@ -49,7 +49,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => { const pr = (state.projects || []).filter(x => x.opHall)[0]; const f = pr.files[0]; const t = f.text.split('Four apps that live on your own device.').join('Four invented apps for this test.'); return ccPut(f, t).then(() => { pr.updated = Date.now(); saveState(); }); });
   const h2 = await p.evaluate(() => IngOffline.make({ four: true }).then(r => r.blob.text()).then(t => ({ mine: t.indexOf('Four invented apps for this test.') >= 0, theirs: t.indexOf('Four apps that live on your own device.') >= 0 })));
   ok(h2.mine && !h2.theirs, 'a word changed in the hall\'s page in Code is in the next making', h2);
-  await p.evaluate(() => go('fabrica')); await p.waitForTimeout(800); await p.click('#fbOpRow .op-tile'); await p.waitForTimeout(300);
+  await p.evaluate(() => go('fabrica')); await p.waitForTimeout(800); await p.click('#fbBring'); await p.waitForTimeout(400); await p.evaluate(() => { const b = [...document.querySelectorAll('.f-sheet .op-bring')].find(x => /choose each app/.test(x.textContent)); b.click(); }); await p.waitForTimeout(400);
   const h3 = await p.evaluate(() => { const r = document.querySelector('.op-work .op-hall'); return r ? r.innerText.replace(/\s+/g, ' ') : ''; });
   await p.screenshot({ path: OUT + '/3_hall_row.png' });
   await p.evaluate(() => { const b = [...document.querySelectorAll('.op-work .op-hall button')].find(x => /Use the hall Ingenium carries/.test(x.textContent)); b.click(); }); await p.waitForTimeout(200);

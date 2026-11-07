@@ -22,10 +22,13 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const keys0 = await p.evaluate(() => Object.keys(libState().apps).sort());
   // 1. Fabrica: The Offline Project at the head of the list
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
-  await p.waitForFunction(() => !!document.querySelector('#fbOpRow .op-tile'), null, { timeout: 30000 }).catch(() => {});
-  const t1 = await p.evaluate(() => { const row = document.getElementById('fbOpRow'), list = document.getElementById('fbRepos'); const first = row && row.firstElementChild; return { first: first ? first.className : '', text: first ? first.innerText.replace(/\s+/g, ' ') : '', above: !!(row && list && row.nextElementSibling === list), inList: !!(list && list.querySelector('.op-tile')) }; });
-  ok(/op-tile/.test(t1.first) && /The Offline Project/.test(t1.text) && /Made from your apps/.test(t1.text) && t1.above && !t1.inList, 'Fabrica\'s apps open with The Offline Project, made from your apps, in a row of its own above the list of her repositories', t1);
-  await p.click('#fbOpRow .op-tile'); await p.waitForTimeout(400);
+  // 6.53: no tile pinned above Your apps; Bring one in offers it, and it is then kept as an app like any other
+  const t1 = await p.evaluate(() => ({ row: !!document.getElementById('fbOpRow'), tile: !!document.querySelector('.op-tile') }));
+  await p.click('#fbBring'); await p.waitForTimeout(400);
+  const t2 = await p.evaluate(() => [...document.querySelectorAll('.f-sheet .op-bring')].map(b => b.innerText.replace(/\s+/g, ' ')));
+  ok(!t1.row && !t1.tile && t2.length === 3 && /The Offline Project, all four apps/.test(t2[0]) && /without Inkwell/.test(t2[1]) && /choose each app's copy/.test(t2[2]),
+    'no tile above Your apps: Bring one in offers The Offline Project (all four apps, without Inkwell, and its own choices)', { t1, t2 });
+  await p.evaluate(() => { const b = [...document.querySelectorAll('.f-sheet .op-bring')].find(x => /choose each app/.test(x.textContent)); b.click(); }); await p.waitForTimeout(400);
   const r1 = await p.evaluate(() => { const w = document.querySelector('.op-work'); return { name: (document.getElementById('fbWhName') || {}).textContent, rooms: w ? [...w.querySelectorAll('.op-room:not(.op-hall) .t')].map(x => x.innerText.replace(/\s+/g, ' ')) : [], seg: w ? [...w.querySelectorAll('.op-seg button')].map(x => x.textContent + (x.getAttribute('aria-pressed') === 'true' ? '*' : '')) : [], make: !!document.getElementById('opMakeOpen') && !document.getElementById('opMakeOpen').disabled, views: getComputedStyle(document.querySelector('#fb .f-views')).display }; });
   await p.screenshot({ path: OUT + '/1_fabrica.png' });
   ok(r1.name === 'The Offline Project' && r1.rooms.length === 4 && /^Carpe Diem Carpe Diem 1058/.test(r1.rooms[0]) && /The Forge 656/.test(r1.rooms[1]) && /Ingenium [0-9.]+ · this copy, the master edition/.test(r1.rooms[2]) && /master edition, with your Author Studio/.test(r1.rooms[2]) && /Inkwell 7\.52/.test(r1.rooms[3]) && r1.seg[0] === 'All four apps*' && r1.make && r1.views === 'none',

@@ -47,17 +47,17 @@ async function measure(p) { const out = {};
   // 1. the recipe, read from the page
   const tok = await p.evaluate(() => { const r = getComputedStyle(document.documentElement); const t = document.getElementById('r247-tok');
     return { pop: r.getPropertyValue('--pop').trim(), pill: r.getPropertyValue('--pill').trim(), inHead: !!(t && t.parentNode === document.head) }; });
-  ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.22\)/.test(tok.pop) && /0 2\.5px 0 (?:var\(--key-edge\)|rgba\(93,\s*55,\s*161,\s*\.20?\))/.test(tok.pop) && /0 10px 18px/.test(tok.pop),
-    'the own key (6.51): a fine outline, a lavender edge 2.5 px deep and soft casts', tok.pop);
-  ok(/0 0 0 \.5px/.test(tok.pill) && /0 2px 0 rgba\(93,\s*55,\s*161,\s*\.18\)/.test(tok.pill), 'the top bar\'s pill (6.51): the same outline and a lavender edge 2 px deep', tok.pill);
+  ok(/inset 0 -1\.5px 0 rgba\(16,\s*42,\s*58,\s*\.16\)/.test(tok.pop) && /0 2px 0 rgba\(16,\s*42,\s*58,\s*\.30?\)/.test(tok.pop) && /0 9px 14px/.test(tok.pop),
+    'the own key (6.53): Carpe Diem\'s slate edge (2 px at 30 %) and casts', tok.pop);
+  ok(/0 1px 0 rgba\(16,\s*42,\s*58,\s*\.32\)/.test(tok.pill) && /0 6px 8px/.test(tok.pill), 'the top bar\'s pill (6.53): Carpe Diem\'s top pill, 1 px at 32 %', tok.pill);
   ok(tok.inHead, 'the recipe sits in the page\'s head, where the Author Studio\'s look can follow it');
   const now = await measure(p); fs.writeFileSync(OUT + '/keys.json', JSON.stringify(now, null, 1));
   const missing = Object.entries(now).filter(([k, v]) => !v).map(([k]) => k); const absent = Object.entries(now).filter(([k, v]) => v === 'absent').map(([k]) => k);
   Object.keys(now).forEach(k => { if (now[k] === 'absent') delete now[k]; });
   if (absent.length) console.log('(not in this edition: ' + absent.join(', ') + ')');
   ok(missing.length <= 1, 'the keys to measure are on their pages (at most one room shows none yet)', missing);
-  const ring = Object.entries(now).filter(([k, v]) => v && !/0px 0px 0px 0\.5px/.test(v.sh)).map(([k, v]) => k + ': ' + v.sh.slice(0, 120));
-  ok(ring.length === 0, 'every measured key wears the outline (its own recipe or the room\'s, which follows it)', ring);
+  const ring = Object.entries(now).filter(([k, v]) => v && (/40, 22, 68|93, 55, 161/.test(v.sh) || v.sh === 'none')).map(([k, v]) => k + ': ' + v.sh.slice(0, 120));
+  ok(ring.length === 0, 'every measured key has a raised shadow with no purple in it (6.53)', ring);
   const flatNow = ['Chat\'s plus key', 'Home\'s See all', 'a quiet Lector key'].filter(k => now[k] && (!now[k].sh || now[k].sh === 'none'));
   ok(flatNow.length === 0, 'keys that were words or bare outlines are raised keys now (plus, ideas, See all, Lector\'s quiet keys)', flatNow);
   // 2. no key bigger or wider than on the earlier page
@@ -74,11 +74,11 @@ async function measure(p) { const out = {};
   const key = p.locator('#page-settings .btn:not(.primary)').filter({ hasText: /\S/ }).first(); await key.scrollIntoViewIfNeeded(); const box = await key.boundingBox();
   await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await p.waitForTimeout(400);
   const hov = await key.evaluate(e => { const c = getComputedStyle(e); return { tf: c.transform, sh: c.boxShadow }; });
-  ok(/matrix\(1, 0, 0, 1, 0, -3\)/.test(hov.tf) && /0px 3\.5px 0px/.test(hov.sh), 'under the pointer a key rises 3 px and its edge grows (3.5 px; 6.51)', hov);
+  ok(/matrix\(1, 0, 0, 1, 0, -2\)/.test(hov.tf) && /0px 3px 0px/.test(hov.sh), 'under the pointer a key rises 2 px and its edge grows to 3 px (6.53, Carpe Diem\'s)', hov);
   await p.mouse.down(); await p.waitForTimeout(200);
   const prs = await key.evaluate(e => { const c = getComputedStyle(e); return { tf: c.transform, sh: c.boxShadow, td: c.transitionDuration }; });
   await p.mouse.move(5, 895); await p.mouse.up(); await p.waitForTimeout(300);
-  ok(/matrix\(0\.985, 0, 0, 0\.985, 0, 2\)/.test(prs.tf) && /inset/.test(prs.sh) && /0\.05s/.test(prs.td), 'pressed, it sinks 2 px into its edge, a little smaller, in 0.05 s (6.51)', prs);
+  ok(/matrix\(1, 0, 0, 1, 0, 1\)/.test(prs.tf) && /inset/.test(prs.sh) && /0\.05s/.test(prs.td), 'pressed, it sits 1 px down in its well, in 0.05 s (6.53, Carpe Diem\'s)', prs);
   // 4. the Author Studio's depth (the master edition): Deep heavier, Soft lighter, and its choice wins over the recipe
   const hasAuthor = await p.evaluate(() => typeof IngAuthor === 'object' && !!IngAuthor && typeof IngAuthor.open === 'function');
   if (hasAuthor) {
@@ -92,7 +92,7 @@ async function measure(p) { const out = {};
     const edgeOf = s => { const m = /(?:^|,)\s*0 (1|1\.5|2)px 0 rgba\([^)]*,\s*([.\d]+)\)/.exec(s); return m ? +m[2] : NaN; };
     ok(edgeOf(deepPop) > 0.18 && edgeOf(softPop) < 0.18 && order === 'recipe first',
       'the Author Studio\'s Deep is heavier than the own key and Soft lighter, and its choice wins (its look follows the recipe in the head)', { deep: deepPop.slice(0, 140), soft: softPop.slice(0, 140), order });
-    ok(/0 0 0 \.5px rgba\((?:var\(--fam-rgb\)|40,\s*22,\s*68),\s*\.22\)/.test(ownPop) && /0 2\.5px 0 (?:var\(--key-edge\)|rgba\(93,\s*55,\s*161,\s*\.20?\))/.test(ownPop), 'Ingenium\'s own depth again gives the recipe back', ownPop.slice(0, 140));
+    ok(/inset 0 -1\.5px 0 rgba\(16,\s*42,\s*58,\s*\.16\)/.test(ownPop) && /0 2px 0 rgba\(16,\s*42,\s*58,\s*\.30?\)/.test(ownPop), 'Ingenium\'s own depth again gives the recipe back', ownPop.slice(0, 140));
     await p.evaluate(() => { try { IngAuthor.close(); } catch (e) {} go('settings'); }); await p.waitForTimeout(500);
   } else console.log('(the Author Studio is not in this edition: Soft and Deep not tried)');
   // 5. Display's Flat depth and the night theme keep their own faces

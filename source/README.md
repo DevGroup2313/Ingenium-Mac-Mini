@@ -371,6 +371,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.53 (7 November 2026): Carpe Diem's keys and surfaces; a page that keeps still; the Offline Project as an ordinary app in
+Fabrica; the tour, the Guide and Help up to date. Her words (7 November 2026): "You keep making it more glossier, more smooth and glass
+like and I HATE THAT. I have told you many times that I want full parity with Carpe Diem's buttons and acrylic surfaces ... I like the
+clicky, acrylic feel and look of the app ... You keep adding this freaking purple glow under every fucking button"; "it is mostly
+slightly faster but still slow on my Macbook pro"; "The Offline Project app looks odd on the Fabrica page ... It should only be there
+only if I was working on it inside of Fabrica and recently shipped a new version like any other app"; and "Please make sure that the
+guided tour and its demonstrations are also updated as well as the Guide page".
+
+- Measured in Carpe Diem's own page (rig: the scratch tool cdstyle.js, Chromium): its keys rest on inset 0 -1.5px 0, 0 2px 0, 0 4px 5px
+  and 0 9px 14px of rgb(16,42,58) at 16, 30, 20 and 13 %, with flat faces; hover rises 2 px (0 3px 0 at 30 %, 0 6px 8px at 22 %, 0 13px
+  20px at 15 %); press 1 px down (inset 0 2px 5px at 24 %, 0 1px 1px at 25 %) in 0.05 s; motion 0.1 s on cubic-bezier(.34,1.35,.64,1);
+  prompt keys 2 px at 34 %; top pills 1 px at 32 %; cards white at 72 % with a rim of the accent at 16 %, inset 0 -1px 0 at 10 %, 0 1px 0
+  at 22 %, 0 3px 4px at 14 %, 0 8px 14px at 9 %; dialogs white, a 4 px halo of the accent at 7 %, 0 16px 48px at 22 %; no glass blur.
+  Ingenium's shadows were tinted with its purple ink, rgb(40,22,68) or rgb(40,20,70): 107 uses through --fam-rgb and 622 written out.
+- modules/r251.js (new): Carpe Diem's recipe in slate, number for number (--pop, --pop-hi, --seat, --pill, --chip, --raise), --fam-rgb
+  set to 16,42,58, flat faces, the primary key and a chosen segment one flat accent on the same edge, acrylic cards and plain
+  dialogs; the recipe sits after 6.49's and 6.51's in the head and before the Author Studio's look, which still wins. build_page.py
+  draws in slate every purple-ink colour that follows a length in its declaration (shadows, edges, borders): 613 of them; 9 other uses
+  (fills and gradients) keep theirs. Night keeps its own faces; Display's Flat depth keeps every key flat.
+- The page keeps still: the rail's icons (the notepad, the hourglass, the bell, the moon), the seal's sway, the crest's sway, the top
+  bar's breathing dots and the Guide's spark animated without end; they move while the pointer is on them (modules/r251.js). With the
+  pointer still on Chat, no CSS animation runs. Only two glass blurs were in use (the welcome door, which Carpe Diem's door has too, and
+  the rail's arrow); the arrow's is gone.
+- modules/r246.js: no tile above Your apps. Bring one in offers The Offline Project, all four apps or without Inkwell (kept as a
+  repository named The Offline Project, or a new version of it when it is already there), and its own card (each app's copy, the hall,
+  Make and open, Save the app). Kept, it is listed in Your apps as any app, with its crest (modules/r112.js, as since 6.40).
+- modules/r250.js (new): the tour gains Who answers, from any page (every level), Connect a service, Context and compacting, How long it
+  thinks and sources when you ask, and (the master edition) The Offline Project, made from your apps, each after the card that shows
+  that part of the page and placed once Ingenium has started; the Guide gains Models and services: who answers, and how; Context and
+  compacting in a chat; Thinking and sources in a chat; and (master) The Offline Project, made in Fabrica; Help gains their lines.
+- The tests that checked 6.49's and 6.51's recipes check Carpe Diem's now (rig/t_649_keys.js, rig/t_651_still_keys.js); the
+  Offline Project's tests open its card through Bring one in (rig/t_648_offline.js, rig/t_651_offline_lists.js); rig/t_62_import.js
+  follows 6.46's Ollama memory and 6.47's compacting.
+
+    node rig/t_653_parity.js <url> <out>                          # keys, shadows, cards, no glass, stillness, the Offline Project
+    node rig/t_653_tour.js <out> master=<url> full=<url> gift=<url> demo=<url>   # the new cards, rings, Guide topics and Help lines
+
 Ingenium 6.52 (7 November 2026): Longest reply, Context and Effort kept for each model and service, and at hand on every page. Her
 words (7 November 2026): "I want the Tokens and Context controls to be fixed inside of Ingenium, the app always resets it to zero with
 the models even though I already moved it to a higher capacity earlier, it never remembers them and they are all out whack all over

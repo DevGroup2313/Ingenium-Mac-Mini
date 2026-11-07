@@ -137,7 +137,7 @@ function tile(){var box=$("fbRepos");if(!box||!data())return;var row=$("fbOpRow"
   var tx=mk("span","tx");tx.appendChild(mk("span","nm","The Offline Project"));var st=mk("span","stl");st.appendChild(mk("span",null,"Made from your apps, fresh each time"));tx.appendChild(st);b.appendChild(tx);
   b.addEventListener("click",function(){openWork();});row.appendChild(b);}
 function openWork(){ON=true;var h=H();try{if(h&&h.one&&h.one())h.setPanel("work");}catch(e){}paintWork();
-  [].forEach.call(D.querySelectorAll("#fbRepos .f-repo"),function(x){x.setAttribute("aria-pressed","false");});var t=D.querySelector("#fbOpRow .op-tile");if(t)t.setAttribute("aria-pressed","true");}
+  [].forEach.call(D.querySelectorAll("#fbRepos .f-repo"),function(x){x.setAttribute("aria-pressed","false");});}
 function room(k,o){var r=mk("div","op-room");var im=mk("img");try{im.src="data:image/png;base64,"+W.ING_SEALS[k].b64;}catch(e){}im.alt="";r.appendChild(im);
   var cur=copyOf(k,""),ear=copyOf(k,"earlier"),pick=o.use[k]==="earlier"&&ear?"earlier":"",m=pick?ear:cur;
   var t=mk("div","t");t.appendChild(mk("b",null,NAME[k]));
@@ -224,14 +224,37 @@ function wrapPlus(){var o=W.paintPlus;if(typeof o!=="function"||o.__r246)return;
   try{Object.keys(o).forEach(function(k){if(!(k in f))f[k]=o[k];});}catch(e){}f.__r246=1;W.paintPlus=f;try{paintPlus=f;}catch(e){}}
 /* Fabrica paints its list and its work afresh: The Offline Project keeps its place at the head, and its work while it is chosen */
 function watch(){var box=$("fbRepos"),wb=$("fbWorkBody");if(!box||box.__op)return;box.__op=1;
-  box.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest(".f-repo");if(b){ON=false;views(true);var t=D.querySelector("#fbOpRow .op-tile");if(t)t.setAttribute("aria-pressed","false");}},true);
+  box.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest(".f-repo");if(b){ON=false;views(true);}},true);
   if(wb)try{new MutationObserver(function(){if(ON&&!wb.querySelector(".op-work"))setTimeout(function(){if(ON&&!wb.querySelector(".op-work"))paintWork();},0);}).observe(wb,{childList:true});}catch(e){}
-  tile();}
+  /* 6.53: no tile pinned above Your apps (her words, 7 November 2026: "I don't want it awkwardly placed at the top of the "Your apps"
+     section ... It should only be there only if I was working on it inside of Fabrica and recently shipped a new version like any
+     other app"). It comes in through Bring one in, and is then a repository like any other, beside Ingenium and the rest. */
+  var old=$("fbOpRow");if(old)old.remove();
+  bringWatch();}
+/* Bring one in: The Offline Project, made from your apps, kept as a repository (a new version of it when it is already here) */
+var OPNAME="The Offline Project";
+function keepAsRepo(four){var H0=H();if(!H0)return;try{H0.busy("Making the Offline Project"+(four?"":" without Inkwell")+" and keeping it in Fabrica…");}catch(e){}
+  return fresh(four).then(function(f){var files=[{path:"the_offline_project.html",data:f.text}],msg="Made from your apps"+(four?" (all four)":" (without Inkwell)");
+      return IngRepo.list().then(function(rs){var mine=(rs||[]).filter(function(r){return r&&r.name===OPNAME;})[0];
+        if(mine)return IngRepo.putMany(mine.id,files).then(function(){return IngRepo.commit(mine.id,msg);}).then(function(){return {id:mine.id,again:true};});
+        return IngRepo.fromFiles(files,{name:OPNAME,msg:msg}).then(function(x){return {id:x.id,again:false};});});})
+    .then(function(x){var h=H();try{h.FBS().sel=x.id;h.saveSoon();h.S.view="history";h.C.diff={};h.C.files={};h.C.log={};}catch(e){}ON=false;views(true);
+      return h.refresh().then(function(){h.unbusy();h.paint();toast(x.again?"The Offline Project has a new version in Fabrica.":"The Offline Project is in Fabrica now, beside your other apps.");return x;});})
+    .catch(function(e){try{H().unbusy();}catch(_){}toast("The Offline Project could not be made: "+String(e&&e.message||e));});}
+function bringOpts(sh){if(!sh||sh.querySelector(".op-bring"))return;var end=sh.querySelector(".end");
+  function opt(ic,t,small,fn){var b=mk("button","f-opt op-bring");b.type="button";var i=mk("span","ic",ic),w=mk("span");w.appendChild(mk("b",null,t));w.appendChild(mk("small",null,small));b.appendChild(i);b.appendChild(w);
+    b.addEventListener("click",function(){var wrap=sh.closest(".f-sheet-wrap");if(wrap)wrap.remove();fn();});if(end)sh.insertBefore(b,end);else sh.appendChild(b);return b;}
+  opt("✠",OPNAME+", all four apps","Made from the apps your library keeps now, and kept here as an app with its versions",function(){keepAsRepo(true);});
+  opt("✠",OPNAME+", without Inkwell","Carpe Diem, The Forge and Ingenium, made and kept the same way",function(){keepAsRepo(false);});
+  opt("✠",OPNAME+": choose each app's copy and its hall","Then make it, open it or save it",function(){openWork();});}
+function bringWatch(){var root=$("fb");if(!root||root.__opBring)return;root.__opBring=1;
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var a=ms[i].addedNodes;for(var j=0;j<a.length;j++){var n=a[j];if(n.nodeType!==1||!n.classList||!n.classList.contains("f-sheet-wrap"))continue;
+      var sh=n.querySelector(".f-sheet"),h3=sh&&sh.querySelector("h3");if(h3&&/^Bring an app in$/.test(h3.textContent))bringOpts(sh);}}}).observe(root,{childList:true});}catch(e){warn(e);}}
 function boot(){if(!data())return;try{wrapApps();wrapPlus();}catch(e){warn(e);}var n=0;(function again(){if($("fbRepos")){watch();return;}if(++n<240)setTimeout(again,500);})();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,1200);});
-try{var og=W.go;if(typeof og==="function"&&!og.__r246){var ng=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(function(){watch();tile();if(ON)paintWork();},60);}catch(e){}return r;};ng.__r246=1;W.go=ng;try{go=ng;}catch(e){}}}catch(e){}
-W.IngOffline={make:make,open:openWork,rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
+try{var og=W.go;if(typeof og==="function"&&!og.__r246){var ng=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(function(){watch();var old=$("fbOpRow");if(old)old.remove();if(ON)paintWork();},60);}catch(e){}return r;};ng.__r246=1;W.go=ng;try{go=ng;}catch(e){}}}catch(e){}
+W.IngOffline={make:make,open:openWork,keep:keepAsRepo,rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
 })();
 ;try{window.__ingParts["p246"]="running";}catch(_){}
 </script>
