@@ -14,7 +14,11 @@
    carried in source/build/op_make.json with the devices' pictures and the icons drawn from the master seal), and each app's page with
    the three things that program adds at its top (its own corner of the storage, the key back to the hall, no scroll bars), compressed
    inside the page. Open tries it in a window of its own; Save keeps the file where she chooses. Only the window's memory holds it while
-   she works: nothing is kept in the app library. */
+   she works: nothing is kept in the app library.
+   6.51 (7 November 2026): both variations in Code's Your apps and the + menu's One of your apps, each made fresh when chosen and handed on
+   as any of her apps is (a Code project of its page; the page with the next message); the hall's words edited in Code (a project of
+   the hall alone, The Offline Project's hall, used by every making until she chooses the hall Ingenium carries again). Lector already
+   gathers the set in her way (6.43: choosing all four apps, or the three, gives it the master seal or the shield of three). */
 /* its own row above her apps (not one of the repositories: their list stays theirs) */
 #fb #fbOpRow{padding-bottom:0}
 #fb .f-repo.op-tile{--app:#9a7a32}
@@ -78,7 +82,12 @@ function prep(k,s){var X=data(),d=/^\s*<!doctype html>/i.exec(s),at=d?d[0].lengt
 function seals(){var S=W.ING_SEALS||{},o={};KEYS4.forEach(function(k){var x=S[k];if(x&&x.b64){var u=(/^iVBOR/.test(x.b64)?"data:image/png;base64,":/^UklG/.test(x.b64)?"data:image/webp;base64,":"data:image/jpeg;base64,")+x.b64;o[k]=u;o[k+"N"]=u;}});return o;}
 function iconLinks(X){return '\n<link rel="icon" href="'+X.icons.day.ico+'" sizes="16x16 32x32 48x48" data-op-icon="ico">'+'\n<link rel="icon" type="image/png" sizes="32x32" href="'+X.icons.day["32"]+'" data-op-icon="32">'+
   '\n<link rel="icon" type="image/png" sizes="192x192" href="'+X.icons.day["192"]+'" data-op-icon="192">'+'\n<link rel="apple-touch-icon" href="'+X.touch+'">';}
-function hall(){return gunzip64(data().site);}
+/* 6.51: the hall's words, edited in Code: a project of the hall alone (marked opHall), used while its page keeps the places the build fills */
+function ownHallProject(){try{return (state.projects||[]).filter(function(p){return p&&p.opHall;})[0]||null;}catch(e){return null;}}
+function fits(t){return !!t&&t.indexOf("/*@@BUILD@@*/{}")>=0&&t.indexOf('/*@@LOADSEAL@@*/""')>=0&&t.indexOf("<title>The Offline Project</title>")>=0&&t.indexOf('<div id="app">')>=0;}
+function hallFrom(){var pr=ownHallProject();if(!pr||opState().ownHall===false||typeof ccLoadAll!=="function")return Promise.resolve(null);
+  return Promise.resolve(ccLoadAll(pr)).then(function(){var fs=pr.files||[],f=fs.filter(function(x){return /^index\.html?$/i.test(x.name);})[0]||fs[0];var t=f&&f.text;return fits(t)?t:null;},function(){return null;});}
+function hall(){return hallFrom().then(function(t){return t||gunzip64(data().site);});}
 
 /* ---------- 3. made: the one-file app (build_master_demo.py --mode app), in this window ---------- */
 function make(opts){opts=opts||{};var four=opts.four!==false,X=data(),say=opts.say||function(){};
@@ -116,7 +125,7 @@ function make(opts){opts=opts||{};var four=opts.four!==false,X=data(),say=opts.s
 function opState(){if(!state.opMake||typeof state.opMake!=="object")state.opMake={four:true,use:{}};if(!state.opMake.use)state.opMake.use={};return state.opMake;}
 function save(){try{saveState();}catch(e){}}
 var LAST=null,BUSY=false,ON=false,STATE={text:"",cls:"",pc:0};
-function sig(){var o=opState(),ks=o.four!==false?KEYS4:KEYS3;return (o.four!==false?"4":"3")+"|"+ks.map(function(k){var m=copyOf(k,o.use[k]);return k+":"+(m?m.sha256||m.ref:"none");}).join(",");}
+function sig(f){var o=opState(),four=f==null?o.four!==false:!!f,ks=four?KEYS4:KEYS3,hp=ownHallProject();return (four?"4":"3")+"|hall:"+(hp&&o.ownHall!==false?hp.id+":"+(hp.updated||hp.made||0):"carried")+"|"+ks.map(function(k){var m=copyOf(k,o.use[k]);return k+":"+(m?m.sha256||m.ref:"none");}).join(",");}
 function H(){return W.fbHubHost||null;}
 function crest(four,size){try{if(W.IngSeal&&IngSeal.el){var set=four?KEYS4.slice():KEYS3.slice(),ar=IngSeal.aspect?IngSeal.aspect(set)||1.3333:1.3333;var ce=IngSeal.el(set,{live:true,quarters:true,size:Math.round(size/ar),alt:""});if(ce){ce.setAttribute("aria-hidden","true");return ce;}}}catch(e){}
   var im=mk("img");try{im.src="data:image/png;base64,"+W.ING_SEALS.master.b64;}catch(e){}im.alt="";im.style.cssText="width:"+size+"px;height:"+size+"px;object-fit:contain";return im;}
@@ -153,6 +162,11 @@ function paintWork(){if(!ON)return;var w=$("fbWorkBody"),f=$("fbWorkFoot");if(!w
   [[true,"All four apps"],[false,"Without Inkwell"]].forEach(function(x){var b=btn("",x[1],function(){o.four=x[0];save();LAST=null;paintWork();});b.setAttribute("aria-pressed",String(four===x[0]));b.setAttribute("data-four",x[0]?"1":"0");seg.appendChild(b);});
   box.appendChild(seg);
   var rooms=mk("div","op-rooms");(four?KEYS4:KEYS3).forEach(function(k){rooms.appendChild(room(k,o));});box.appendChild(rooms);
+  /* 6.51: the hall: as Ingenium carries it, or hers, edited in Code */
+  var hp=ownHallProject(),own=!!hp&&o.ownHall!==false,hr=mk("div","op-room op-hall");var hi=crest(four,34);hr.appendChild(hi);
+  var ht=mk("div","t");ht.appendChild(mk("b",null,"The hall"));ht.appendChild(mk("span",null,own?"Yours, as you edited it in Code (The Offline Project's hall)":"As Ingenium carries it: its words in English and French, its crest and its rooms"));hr.appendChild(ht);
+  var hk=mk("div","op-keys");hk.appendChild(btn("btn small",hp?"Edit it in Code":"Edit its words in Code",function(){editHall();},"Opens the hall's page in Code: its words are in its table of words (W.en and W.fr)"));
+  if(hp)hk.appendChild(btn("btn small ghost",own?"Use the hall Ingenium carries":"Use yours again",function(){o.ownHall=!own;save();LAST=null;paintWork();}));hr.appendChild(hk);rooms.appendChild(hr);
   var missing=(four?KEYS4:KEYS3).filter(function(k){return !copyOf(k,o.use[k]);});
   var keys=mk("div","op-keys");
   var mkB=btn("btn primary",BUSY?"Making…":"Make and open",function(){run("open");},"Makes it now, then opens it in a window of its own");mkB.id="opMakeOpen";
@@ -184,16 +198,40 @@ function saveMade(r){var h=H();Promise.resolve(r.blob.arrayBuffer()).then(functi
     try{if(typeof saveFileNative==="function")return saveFileNative(r.name,"text/html",u8);}catch(e){}
     var u=URL.createObjectURL(r.blob),a=mk("a");a.href=u;a.download=r.name;D.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u);},4000);})
     .then(function(){toast(r.name+" is saved ("+(Math.round(r.size/1e5)/10)+" MB).");},function(e){toast("It could not be saved: "+String(e&&e.message||e));});}
+/* 6.51: the hall's page opened in Code (a project of its own, made once from the hall Ingenium carries) */
+function editHall(){var pr=ownHallProject();try{go("code");}catch(e){}
+  if(pr){setTimeout(function(){var s=(state.chats||[]).filter(function(c){return typeof ccIsCode==="function"&&ccIsCode(c)&&c.projectId===pr.id;})[0];
+      if(s){state.activeChat=s.id;try{ccState().activeCode=s.id;ccState().project=pr.id;}catch(e){}save();try{renderChat();ccPaintSide();ccPaintHead();}catch(e){}try{ccLoadAll(pr).then(function(){ccShowPreview(pr);});}catch(e){}}else ccNewSession(pr);},120);return;}
+  gunzip64(data().site).then(function(t){return ccMakeProject("The Offline Project's hall",[{name:"index.html",text:t}],"index.html");}).then(function(p){p.opHall=true;opState().ownHall=true;save();LAST=null;setTimeout(function(){ccNewSession(p);},120);
+    toast("The hall's page is open in Code. Its words are in its table of words (W.en and W.fr). Make it again in Fabrica to see them in place.");},function(e){toast("The hall could not be opened: "+String(e&&e.message||e));});}
+/* 6.51: made fresh for Code's Your apps and the + menu's One of your apps */
+var FRESH=null;
+function fresh(four){if(FRESH)return FRESH;toast("Making the Offline Project"+(four?"":" without Inkwell")+" from your apps. It takes a little while.");
+  var o=opState(),s=sig(four);
+  FRESH=(LAST&&LAST.sig===s?Promise.resolve(LAST.r):make({four:four,use:o.use}).then(function(r){LAST={sig:s,r:r};return r;}))
+    .then(function(r){return r.blob.text().then(function(t){FRESH=null;return {r:r,text:t};});},function(e){FRESH=null;throw e;});return FRESH;}
+function listRows(){return [{four:true,name:"The Offline Project",sub:"All four apps, made fresh from the copies kept here"},{four:false,name:"The Offline Project, without Inkwell",sub:"Carpe Diem, The Forge and Ingenium, made fresh"}];}
+function wrapApps(){var A=W.IngApps;if(!A||A.__r246||typeof A.choose!=="function")return;var oc=A.choose;A.__r246=1;
+  A.choose=function(){var r=oc.apply(this,arguments);try{var host=$("appsPick");if(host&&!host.querySelector(".op-row")){var cap=mk("div","cc-group op-row","The Offline Project, made from these");cap.style.marginTop="10px";host.appendChild(cap);
+      listRows().forEach(function(x){var b=mk("button","cc-prow op-row");b.type="button";b.setAttribute("data-op",x.four?"4":"3");b.appendChild(mk("b",null,x.name));b.appendChild(mk("span","small muted",x.sub));
+        b.addEventListener("click",function(){b.disabled=true;fresh(x.four).then(function(f){closeModal();return ccMakeProject(f.r.four?"The Offline Project":"The Offline Project (without Inkwell)",[{name:f.r.name,text:f.text}],f.r.name).then(function(pr){ccNewSession(pr);toast("Opened "+pr.name+", made fresh ("+(Math.round(f.r.size/1e5)/10)+" MB): "+f.r.line+".");});})
+          .catch(function(e){b.disabled=false;toast(x.name+": "+String(e&&e.message||e));});});host.appendChild(b);});}}catch(e){warn(e);}return r;};}
+function wrapPlus(){var o=W.paintPlus;if(typeof o!=="function"||o.__r246)return;
+  var f=function(view){var r=o.apply(this,arguments);try{if(view==="apps"){var m=$("chatPlusMenu");if(m&&!m.querySelector(".op-pm")&&typeof pmItem==="function"){var holder=mk("div"),sep=m.querySelector(".pm-sep");
+        listRows().forEach(function(x){var it=pmItem(holder,"file",x.name,x.sub,function(b){if(b)b.disabled=true;fresh(x.four).then(function(fr){stageText(fr.r.name,fr.text,false);try{closePlus();}catch(e){}
+            toast(fr.r.name+", made fresh ("+(Math.round(fr.r.size/1e5)/10)+" MB), goes with your next message.");},function(e){if(b)b.disabled=false;toast(x.name+": "+String(e&&e.message||e));});});it.classList.add("op-pm");
+          if(sep)m.insertBefore(it,sep);else m.appendChild(it);});}}}catch(e){warn(e);}return r;};
+  try{Object.keys(o).forEach(function(k){if(!(k in f))f[k]=o[k];});}catch(e){}f.__r246=1;W.paintPlus=f;try{paintPlus=f;}catch(e){}}
 /* Fabrica paints its list and its work afresh: The Offline Project keeps its place at the head, and its work while it is chosen */
 function watch(){var box=$("fbRepos"),wb=$("fbWorkBody");if(!box||box.__op)return;box.__op=1;
   box.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest(".f-repo");if(b){ON=false;views(true);var t=D.querySelector("#fbOpRow .op-tile");if(t)t.setAttribute("aria-pressed","false");}},true);
   if(wb)try{new MutationObserver(function(){if(ON&&!wb.querySelector(".op-work"))setTimeout(function(){if(ON&&!wb.querySelector(".op-work"))paintWork();},0);}).observe(wb,{childList:true});}catch(e){}
   tile();}
-function boot(){if(!data())return;var n=0;(function again(){if($("fbRepos")){watch();return;}if(++n<240)setTimeout(again,500);})();}
+function boot(){if(!data())return;try{wrapApps();wrapPlus();}catch(e){warn(e);}var n=0;(function again(){if($("fbRepos")){watch();return;}if(++n<240)setTimeout(again,500);})();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,1200);});
 try{var og=W.go;if(typeof og==="function"&&!og.__r246){var ng=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(function(){watch();tile();if(ON)paintWork();},60);}catch(e){}return r;};ng.__r246=1;W.go=ng;try{go=ng;}catch(e){}}}catch(e){}
-W.IngOffline={make:make,open:openWork,rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64};
+W.IngOffline={make:make,open:openWork,rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
 })();
 ;try{window.__ingParts["p246"]="running";}catch(_){}
 </script>

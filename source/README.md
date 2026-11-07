@@ -371,6 +371,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.51 (7 November 2026): the Offline Project in the lists of her apps, and its hall's words edited in Code (the master edition
+alone; her answer of 7 November: "Fabrica and app lists").
+
+- modules/r246.js: Code's Your apps (IngApps.choose) and the + menu's One of your apps (paintPlus("apps")) list both variations; each
+  is made fresh when chosen and handed on as any of her apps is: a Code project of its page, or the page staged with the next message.
+  Fabrica's card has a row for the hall: Edit its words in Code opens the hall's page in a Code project of its own (The Offline
+  Project's hall, marked opHall, made once from the hall Ingenium carries); every making uses it while it keeps the four places the
+  build fills, until she chooses the hall Ingenium carries again (state.opMake.ownHall). Lector is left as she asked in 6.43: choosing all
+  four apps, or the three, gives the set its crest, drawn from the apps kept now.
+
+    node rig/t_651_offline_lists.js <master url> <out>   # both variations in Code's Your apps and the + menu; the hall edited in Code and
+                                                         # used by the making, then the hall Ingenium carries again
+
 Ingenium 6.50 (7 November 2026): the three levels, one card size. Her words (7 November 2026): "The "New to this", "Some
 experience", and "Expert" cards are all different sizes and length and they look really weird on the "Help and the guided tour"
 section of the Settings page, please fix this."
@@ -417,32 +430,6 @@ refined." Built on the other session's 6.48 (claude/blissful-heisenberg-1osldl).
                                                                  # the earlier page; the rise and the seat; the Author Studio's Soft
                                                                  # and Deep; Flat; night; reduced motion
     node rig/t_637_author.js <url> <out>                         # its Deep check follows the new recipe (2 px at 34 %)
-
-Ingenium 6.46 (7 November 2026), its second part: who answers, at hand. Her words (6 November 2026): "Switching between providers and connections in
-Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users. I want that process to be
-improved and be more acessible to me, its a bit flawed right now."
-
-- modules/r244.js (new). Measured on 6.45: connecting a service took Settings, Models and AI, Connections and a form of five fields (the
-  provider, an address, the key, a model's name typed or listed, a switch), and going back to this device took Controls; with nothing set
-  up, the model menu beside the message box said only "No models yet. Add them on the Models page."; the top bar's model key named the
-  model on this device even while a connection answered, and opened the Models page; the key beside the message box showed the device
-  model's colour beside a connection's model and not whose model it was; Controls' A connection, with nothing set up, sent her to
-  Settings; the key field had none of the page's look (its style for fields left out password, email and address fields).
-  Now Connect a service, in three steps (the service; the key or the address, with where to make a key; a model from the list the
-  service gives, the strongest suggested, Find a model for long lists), opens from the model menu, the top bar, Controls, Settings and an
-  empty chat; a refused key (401, 403), a missing address (404), a limit (429), a service down, Ollama or LM Studio not running, Ollama on
-  another computer not letting the network in, or a browser refusing are each said in plain words. The connection is kept as before
-  (r191, the key on this device only) and used at once. The model menu opens on Who answers: This device and each connection kept, one
-  press each (the model last chosen there), the one answering marked, then the models, the place answering first; Find a model searches
-  every model of every connection (r191's menu shows fourteen of each) and of this device; Connect a service at its foot. A model on this
-  device chosen there answers from this device. The top bar's key names who answers and opens Who answers under it, to switch from any
-  page without leaving it (arrows and Escape work). The key beside the message box carries the service's name beside the model, and with
-  nothing to answer says Choose who answers. Settings' Connections card opens on Connect a service and the connections kept, with the
-  form by hand folded under them. Key, email and address fields have the page's look everywhere. Help (r144) and the tour's step on the
-  top bar (build_page.py 6.46) say what the key does.
-
-    node rig/t_646_switch.js <url> <out>   # stand-ins for Anthropic, Ollama on another computer and a service with 41 models: nothing set up;
-                                           # the sheet's three steps; the menu's Who answers and Find a model; the top bar; Settings
 
 Ingenium 6.48 (7 November 2026): the Offline Project, made from her apps, in Fabrica (the master edition alone). Her answer
 (7 November 2026), asked how the Offline Project should be built into her master edition: "Fabrica and app lists": in Fabrica she
@@ -497,6 +484,32 @@ Ingenium's chat pages please."
     node rig/t_647_compact.js <url> <out>   # a stand-in model on this device: Context, Compact now (the summary in the earlier part's
                                             # place, the line, every message kept), Automatic before a send and off, the focus,
                                             # the slash list and commands, the + menus, Code's column
+
+Ingenium 6.46 (7 November 2026), its second part: who answers, at hand. Her words (6 November 2026): "Switching between providers and connections in
+Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users. I want that process to be
+improved and be more acessible to me, its a bit flawed right now."
+
+- modules/r244.js (new). Measured on 6.45: connecting a service took Settings, Models and AI, Connections and a form of five fields (the
+  provider, an address, the key, a model's name typed or listed, a switch), and going back to this device took Controls; with nothing set
+  up, the model menu beside the message box said only "No models yet. Add them on the Models page."; the top bar's model key named the
+  model on this device even while a connection answered, and opened the Models page; the key beside the message box showed the device
+  model's colour beside a connection's model and not whose model it was; Controls' A connection, with nothing set up, sent her to
+  Settings; the key field had none of the page's look (its style for fields left out password, email and address fields).
+  Now Connect a service, in three steps (the service; the key or the address, with where to make a key; a model from the list the
+  service gives, the strongest suggested, Find a model for long lists), opens from the model menu, the top bar, Controls, Settings and an
+  empty chat; a refused key (401, 403), a missing address (404), a limit (429), a service down, Ollama or LM Studio not running, Ollama on
+  another computer not letting the network in, or a browser refusing are each said in plain words. The connection is kept as before
+  (r191, the key on this device only) and used at once. The model menu opens on Who answers: This device and each connection kept, one
+  press each (the model last chosen there), the one answering marked, then the models, the place answering first; Find a model searches
+  every model of every connection (r191's menu shows fourteen of each) and of this device; Connect a service at its foot. A model on this
+  device chosen there answers from this device. The top bar's key names who answers and opens Who answers under it, to switch from any
+  page without leaving it (arrows and Escape work). The key beside the message box carries the service's name beside the model, and with
+  nothing to answer says Choose who answers. Settings' Connections card opens on Connect a service and the connections kept, with the
+  form by hand folded under them. Key, email and address fields have the page's look everywhere. Help (r144) and the tour's step on the
+  top bar (build_page.py 6.46) say what the key does.
+
+    node rig/t_646_switch.js <url> <out>   # stand-ins for Anthropic, Ollama on another computer and a service with 41 models: nothing set up;
+                                           # the sheet's three steps; the menu's Who answers and Find a model; the top bar; Settings
 
 Ingenium 6.46 (7 November 2026): a model thinks briefly and answers; sources when she asks; titles shown twice removed; every
 provider within its model's limits. Built on the other session's 6.45 (claude/dreamy-fermi-9ourlk), whose lighter presses (r230,
