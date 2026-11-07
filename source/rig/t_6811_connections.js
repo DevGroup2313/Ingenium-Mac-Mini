@@ -26,7 +26,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(kept.length === 3 && kept[0][0] === 'anthropic' && kept.some(k => k[0] === 'moonshot' && k[1] === 'kimi-key') && kept.some(k => k[0] === 'ollama-local'), 'each connection she sets up is kept, key and model list', JSON.stringify(kept));
   await p.click('#chatModelBtn'); await p.waitForTimeout(300);
   const menu = await p.evaluate(() => { const m = document.getElementById('chatModelMenu'), box = m.querySelector('[data-r191]');
-    return { heads: [...box.querySelectorAll('.chat-menu-head')].map(h => h.textContent), names: [...box.querySelectorAll('.menu-btn')].map(x => x.innerText.replace(/\s+/g, ' ').trim()), first: m.firstElementChild === box,
+    return { heads: [...box.querySelectorAll('.chat-menu-head')].map(h => h.textContent), names: [...box.querySelectorAll('.menu-btn')].map(x => x.innerText.replace(/\s+/g, ' ').trim()), first: m.firstElementChild === box || (m.firstElementChild && m.firstElementChild.classList.contains('wa-head') && box.parentNode && box.parentNode.firstElementChild === box),  /* 6.46: Who answers above them (r244) */
       dup: [...m.querySelectorAll('.chat-menu-head')].filter(h => /^Connection: /.test(h.textContent)).length }; });
   ok(menu.first && menu.dup === 0 && JSON.stringify(menu.heads) === JSON.stringify(['Claude (Anthropic) · in use', 'Kimi (Moonshot AI)', 'Ollama on this computer']),
     'the model menu lists every connection by service, the one in use first, with no second list of it', JSON.stringify(menu));

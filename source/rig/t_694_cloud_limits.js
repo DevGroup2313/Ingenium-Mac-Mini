@@ -110,8 +110,10 @@ async function handler(route) {
   await p.evaluate(() => { $('ctlTokens').max = '131072'; $('ctlTokens').value = '100000'; state.effort = Object.assign(state.effort || {}, { replyAuto: false }); });   // 6.11: a length set by hand
   r = await send('A short question.');
   const learned = await p.evaluate(() => (state.cloud.info['claude-test-5'] || {}).out);
-  ok(r.done && /Hello from the stand-in/.test(r.text) && log.length === 2 && log[1].max <= OUTMAX, '3. a reply asked longer than the model gives is asked again within its limit, and answered', { calls: log });
-  ok(learned === OUTMAX, '3. the model\'s longest reply (' + OUTMAX + ') is kept for the next message', learned);
+  // 6.44: a Claude model whose longest reply is not known yet is asked within its family's published ceiling (32,000 for an id outside the
+  // known families), so it answers at once, with no refusal to learn from; a refusal's figure, asked again and kept, is checked in t_644_claude
+  ok(r.done && /Hello from the stand-in/.test(r.text) && log.length === 1 && log[0].max <= 32000, '3. a model whose longest reply is not known yet is asked within its family\'s ceiling, and answered at once (6.44)', { calls: log });
+  ok(!(learned > 0) || learned <= OUTMAX, '3. nothing is kept for the model that the service did not say', learned);
   plan = []; log = []; r = await send('Another short question.');
   ok(r.done && log.length === 1 && log[0].max <= OUTMAX, '3. the next message fits the first time', log);
   await p.evaluate(() => { $('ctlTokens').value = '1024'; });
