@@ -105,6 +105,23 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--x-acc);min-height:30px;padding:4px 8px}
 .hx-btn.quiet:hover{transform:none;text-decoration:underline}
 .hx-btn[hidden]{display:none}
+/* 6.54, the greeting card's keys. Her words (7 November 2026): "keep the acrylic chunky look"; "I like the white colour of the "Take the
+   guided tour" and "Read the short Guide" buttons from 6.53, I want to keep the colour for the buttons but remove the glossy, flat effect
+   and animation"; "I also really like the smaller size of 6.53's buttons inside of the app. I want that kept as well." So they keep
+   6.53's size and white face; the white keys lose their bright top line and thin foot (the gloss and the flatness) for a solid edge
+   beneath, 2px deep like the purple key's; no key in the card rises or springs when pointed at, and none animates: pointed at, a white
+   key's rim darkens and the purple key lightens; pressed, a key sits down into its edge at once. */
+.hx-head{--x-wedge:#d9d4e0;--x-wcast:0 4px 6px rgba(40,22,68,.10),0 9px 16px rgba(40,22,68,.07)}
+body[data-theme="night"] .hx-head{--x-wedge:#120d1c;--x-wcast:0 4px 6px rgba(0,0,0,.45),0 9px 16px rgba(0,0,0,.32)}
+.hx-head .hx-btn{transition:none}
+.hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:0 2px 0 var(--x-wedge),var(--x-wcast)}
+.hx-head .hx-btn:hover{transform:none}
+.hx-head .hx-btn:not(.pri):not(.quiet):hover{border-color:rgba(34,26,46,.22);box-shadow:0 2px 0 var(--x-wedge),var(--x-wcast)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):hover{border-color:rgba(205,184,240,.26)}
+.hx-head .hx-btn.pri:hover{box-shadow:var(--x-psh);filter:brightness(1.06)}
+.hx-head .hx-btn:active{transform:translateY(2px);transition:none}
+.hx-head .hx-btn:not(.pri):not(.quiet):active{box-shadow:0 0 0 var(--x-wedge),0 1px 2px rgba(40,22,68,.14)}
+.hx-head .hx-btn.pri:active{box-shadow:0 0 0 var(--x-pledge),0 1px 2px rgba(40,22,68,.2)}
 /* ---- the main work ---- */
 .hx-main{container:hxm/inline-size;display:flex;flex-direction:column;gap:20px;min-width:0}
 .hx-keys{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}

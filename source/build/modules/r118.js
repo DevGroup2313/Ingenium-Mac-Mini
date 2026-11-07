@@ -66,14 +66,6 @@ function prep(which,opts){opts=opts||{};var html=decode("ing-app-"+which);if(!ht
       +'function tag(){try{var b=document.querySelectorAll("button");for(var i=0;i<b.length;i++){var x=b[i],l=(x.textContent||"").trim().replace(/\\s*\\([^)]*\\)\\s*$/,"").trim();'
       +'if(!MAP[l])continue;if(x.getBoundingClientRect().width>220)continue;if(String(x.className).indexOf(MAP[l])<0)x.className+=" "+MAP[l];if(x.getAttribute("data-cd-stonekey")!==MAP[l])x.setAttribute("data-cd-stonekey",MAP[l]);}}catch(e){}}'
       +'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tag);else tag();setInterval(tag,1200);})();<\/script>';
-    /* 6.51: the app keys' glow and their sparks come while the pointer is on them (or a key has the keyboard's focus). Left running, the
-       glow (a shadow that breathes) and the sparks (four glows on each) painted the app's frame again for every frame of them, all the
-       time; her words (7 November 2026): "everything feels really freaking slow when I move my mouse around inside of the app" */
-    bs+='<style id="ing-rest">#goAbacus,#goImago,#goTabula,#scribaBtn,#fontesBtn,#fontesHomeBtn{animation-play-state:paused !important}'
-      +'#goAbacus:hover,#goImago:hover,#goTabula:hover,#scribaBtn:hover,#fontesBtn:hover,#fontesHomeBtn:hover,'
-      +'#goAbacus:focus-visible,#goImago:focus-visible,#goTabula:focus-visible,#scribaBtn:focus-visible,#fontesBtn:focus-visible,#fontesHomeBtn:focus-visible{animation-play-state:running !important}'
-      +'html [data-cd-stonekey][data-cd-stonekey]::before{animation-play-state:paused !important}'
-      +'html [data-cd-stonekey][data-cd-stonekey]:hover::before,html [data-cd-stonekey][data-cd-stonekey]:focus-visible::before{animation-play-state:running !important}</style>';
     bridge=bs+bridge;}catch(e){}
   var bi=html.lastIndexOf("</body>");html=bi>=0?html.slice(0,bi)+bridge+html.slice(bi):html+bridge;return html;}
 function hashOf(s){s=String(s||"");var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return s.length+":"+h;}

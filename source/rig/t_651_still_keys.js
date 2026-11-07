@@ -6,8 +6,8 @@
 // thoughts/thought_cloud.html, build_page.py)
 //   - left alone, the page keeps still: no element is rewritten over three seconds on Chat, Home, Settings or Blend (Blend's step keys
 //     rewrote themselves about 30 times a second on every page), and the browser recalculates its styles only a handful of times;
-//   - the seal's star, heart, ring and breath rest, and move while the pointer is on the seal; no movement inside a picture runs by
-//     itself (each frame of one painted the page again);
+//   - (6.54, her words, 7 November 2026: "I want the 3D look and animation of build 6.8.7") the seal's star, heart, ring and breath,
+//     Home's sparks and the apps' key glows in their frames move by themselves again, as in 6.8.7;
 //   - Blend's steps still move (Next, Back, the current step), the who-answers key still says so, the thought cloud's number still counts;
 //   - the keys: a shaded face by day (white to #ebe4f6), a lavender edge 2.5 px deep and soft casts; under the pointer a key rises 3 px
 //     and its edge grows; pressed, it sinks 2 px; the night theme, Display's Flat depth and reduced motion keep their own ways;
@@ -43,35 +43,23 @@ const inside = () => document.getAnimations().filter(a => { const t = a.effect &
     ok(!c.some(([k]) => /rm-step|rm-stepnav|btn\.ghost|btn\.primary/.test(k)), 'Blend\'s step keys do not rewrite themselves (on ' + pg + ')', c.filter(([k]) => /rm-step|btn/.test(k)));
     ok(styles <= 36, 'on ' + pg + ' the browser works out its styles only now and then, not for every frame (' + styles + ' times in three seconds; a movement drawn by the main thread makes about 180)', styles);
   }
-  // 2. the seal rests, and moves while it is pointed at
+  // 2. (6.54) the seal moves by itself, as in 6.8.7, and Home's stones sparkle by themselves
   await p.evaluate(() => go('chat')); await p.waitForTimeout(1200); await p.mouse.move(700, 450); await p.waitForTimeout(300);
-  ok((await p.evaluate(inside)).length === 0, 'no movement inside a picture runs by itself', await p.evaluate(inside));
   const st = () => p.evaluate(() => [...document.querySelectorAll('#brandSealBtn .seal-spin, #brandSealBtn .seal-heart, #brandSealBtn .seal-counter, #brandSealBtn .s4-breath')]
     .map(e => (e.getAnimations()[0] || {}).playState || 'none'));
   const rest = await st();
-  ok(rest.length >= 3 && rest.every(x => x === 'paused'), 'the seal\'s star, heart and ring rest', rest);
-  const bb = await p.evaluate(() => { const r = document.getElementById('brandSealBtn').querySelector('svg').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  await p.mouse.move(bb.x, bb.y); await p.waitForTimeout(400);
-  const moving = await st();
-  ok(moving.every(x => x === 'running'), 'pointed at, the seal moves', moving);
-  await p.mouse.move(700, 450); await p.waitForTimeout(300);
-  ok((await st()).every(x => x === 'paused'), 'and rests again when the pointer leaves', await st());
-  // Home's app stones: their sparks rest, and come while the pointer is on a stone
+  ok(rest.length >= 3 && rest.every(x => x === 'running'), 'the seal\'s star, heart and ring move by themselves, as in 6.8.7', rest);
   await p.evaluate(() => go('home')); await p.waitForTimeout(1000);
-  const sp = () => p.evaluate(() => [...document.querySelectorAll('.hx-app .hx-stone')].map(e => { const a = e.getAnimations({ subtree: true }).find(x => x.animationName === 'hxGlitter'); return a ? a.playState : 'none'; }));
+  const sp = () => p.evaluate(() => [...document.querySelectorAll('.hx-app .hx-stone')].map(e => { const a = e.getAnimations({ subtree: true }).find(x => x.animationName === 'hxSpark' || x.animationName === 'hxGlitter'); return a ? a.animationName + ' ' + a.playState : 'none'; }));
   const sp0 = await sp();
-  ok(sp0.length > 0 && sp0.every(x => x === 'paused' || x === 'none') && sp0.some(x => x === 'paused'), 'Home\'s app stones keep their sparks still', sp0);
-  const st0 = await p.evaluate(() => { const e = document.querySelector('.hx-app'); e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  await p.waitForTimeout(400); await p.mouse.move(st0.x, st0.y); await p.waitForTimeout(400);
-  const sp1 = await sp();
-  ok(sp1.some(x => x === 'running'), 'pointed at, a stone sparkles', sp1);
+  ok(sp0.length > 0 && sp0.every(x => x === 'hxSpark running'), 'Home\'s app stones sparkle by themselves (modules/r252.js)', sp0);
   await p.mouse.move(700, 120); await p.waitForTimeout(200);
-  // the apps' own pages (in the editions that hold them): their keys' glow and sparks rest in the app's frame
+  // the apps' own pages (in the editions that hold them): their keys' glow and sparks move in the app's frame, as in 6.8.7
   const hasTab = await p.evaluate(() => !!document.getElementById('page-tabula'));
   if (hasTab) {
     await p.evaluate(() => go('tabula')); await p.waitForTimeout(5000); await p.mouse.move(700, 120); await p.waitForTimeout(300);
-    let run = []; for (const f of p.frames()) { if (f === p.mainFrame()) continue; try { run = run.concat(await f.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && /Glow|Glitter/.test(a.animationName || '')).map(a => a.animationName))); } catch (e) {} }
-    ok(run.length === 0, 'in Tabula\'s frame, the app keys\' glow and sparks rest', run);
+    let run = [], rested = 0; for (const f of p.frames()) { if (f === p.mainFrame()) continue; try { run = run.concat(await f.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && /Glow|Glitter/.test(a.animationName || '')).map(a => a.animationName))); rested += await f.evaluate(() => document.querySelectorAll('#ing-rest').length); } catch (e) {} }
+    ok(run.length > 0 && rested === 0, 'in Tabula\'s frame, the app keys\' glow and sparks move by themselves', { run, rested });
   } else console.log('(no Tabula page in this edition)');
   // 3. what the guards keep: Blend's steps still move, the who-answers key still says so, the thought cloud's number still counts
   await p.evaluate(() => go('blend')); await p.waitForTimeout(900);

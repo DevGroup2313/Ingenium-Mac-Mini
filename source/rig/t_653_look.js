@@ -6,7 +6,7 @@
 // only be there only if I was working on it inside of Fabrica and recently shipped a new version like any other app".
 //   - every common key and surface on Chat, Home, Settings, Models and Blend has the 6.9.4 page's shadow, face, border and motion;
 //   - the + key is flat in the message box; the model key has no ring while nothing answers;
-//   - no glass blur once the door is passed; with the pointer still, nothing animates; the rail's bell swings when pointed at;
+//   - no glass blur once the door is passed; (6.54) with the pointer still, the rail, the seal and the dots move, as in 6.8.7;
 //   - Fabrica: no tile above Your apps; Bring one in offers The Offline Project; kept, it is an app in Your apps beside Ingenium,
 //     with its versions (making it again adds one);
 //   - no errors on the page.
@@ -39,17 +39,13 @@ let pass = 0, fail = 0; function ok(c, m, d) { if (c) { pass++; console.log('ok 
   const plus = await p.evaluate(() => { const e = document.getElementById('chatImgBtn'), c = getComputedStyle(e), m = getComputedStyle(document.getElementById('chatModelBtn')); return { sh: c.boxShadow, bg: c.backgroundColor + ' ' + c.backgroundImage, border: c.borderTopWidth + ' ' + c.borderTopStyle, model: m.boxShadow }; });
   ok(plus.sh === 'none' && /rgba\(0, 0, 0, 0\) none/.test(plus.bg) && plus.border === '1px solid', 'the + key is flat in the message box again: an outline, no face, no raised edge', plus);
   ok(!/0px 0px 0px 3px/.test(plus.model), 'the model key has no ring round it while nothing answers', plus.model);
-  // 3. no glass; nothing animates with the pointer still; the bell swings when pointed at
+  // 3. no glass; (6.54) the rail, the seal and the dots move by themselves, as in 6.8.7
   const glass = await p.evaluate(() => { const out = []; for (const e of document.querySelectorAll('*')) for (const pe of [null, '::before', '::after']) { const c = getComputedStyle(e, pe); const v = c.backdropFilter || c.webkitBackdropFilter; const r = e.getBoundingClientRect(); if (v && v !== 'none' && r.width > 0 && r.height > 0) out.push((e.id || e.className) + (pe || '') + ' ' + v); } return out; });
   ok(glass.length === 0, 'no glass blur once the door is passed', glass);
+  // (6.54, her words, 7 November 2026: "I want the 3D look and animation of build 6.8.7") the rail, the seal and the dots move by themselves again
   await p.evaluate(() => go('chat')); await p.waitForTimeout(1200); await p.mouse.move(700, 450); await p.waitForTimeout(400);
   const run = await p.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && a.constructor.name === 'CSSAnimation').map(a => a.animationName));
-  ok(run.length === 0, 'with the pointer still, nothing animates (the rail, the seal, the dots rest)', run);
-  const bell = await p.evaluate(() => { const r = document.getElementById('fabBell').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  await p.mouse.move(bell.x, bell.y); await p.waitForTimeout(400);
-  const swing = await p.evaluate(() => { const e = document.querySelector('#fabBell .bell'); return (e.getAnimations()[0] || {}).playState || 'none'; });
-  await p.mouse.move(700, 450);
-  ok(swing === 'running', 'pointed at, the rail\'s bell swings', swing);
+  ok(['ingBellSoft', 'sealEngine', 'sealBeat', 'sealCounter', 'islSway', 'cdHourTurn', 'forgeBreathe'].every(n => run.indexOf(n) >= 0), 'with the pointer still, the rail, the seal and the dots move, as in 6.8.7', run);
   // 4. Fabrica: the Offline Project as any app
   const hasOp = await p.evaluate(() => !!(window.IngOffline && IngOffline.keep));
   if (hasOp) {
