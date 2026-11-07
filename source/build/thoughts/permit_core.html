@@ -152,7 +152,7 @@ function licenceDoc(text,appName){var box=el("div","pc-doc"),lines=String(text||
   function para(first){var t=first.trim();while(i<n&&!blank(lines[i])&&!rule(lines[i])&&!/^\s*(\u2022|\([a-z]\))\s/.test(lines[i])&&!/^\d+\.\d+ /.test(lines[i])&&!/^\d+\. [^a-z]+$/.test(lines[i].trim())){t+=" "+lines[i].trim();i++;}return t;}
   var head=el("div","pcd-head"),app=el("p","pcd-app",(lines[0]||appName||"").trim());head.appendChild(app);i=1;
   while(i<n&&!rule(lines[i])){if(!blank(lines[i]))head.appendChild(el("p","pcd-meta",lines[i].trim()));i++;}
-  if(rule(lines[i]||"")){i++;var tt=(lines[i]||"").trim(),t=el("h3","pcd-title",tt.charAt(0)+tt.slice(1).toLowerCase());head.insertBefore(t,app.nextSibling);i++;
+  if(rule(lines[i]||"")){i++;var tt=(lines[i]||"").trim(),t=el("h3","pcd-title",tt.charAt(0)+tt.slice(1).toLowerCase());if(!/^ownership,? licen[cs]e and permissions$/i.test(tt))head.insertBefore(t,app.nextSibling);i++;  /* 6.46: not the card's own heading a second time */
     while(i<n&&!rule(lines[i])){if(!blank(lines[i]))head.appendChild(el("p","pcd-meta",lines[i].trim()));i++;}i++;}
   box.appendChild(head);
   var tocBox=el("details","pcd-toc"),tocSum=el("summary",null,"Contents"),tocList=el("ol");tocBox.appendChild(tocSum);tocBox.appendChild(tocList);

@@ -35,12 +35,12 @@ const studioGroup = (o) => o.slice(0, o.indexOf('build') >= 0 ? o.indexOf('build
     return { rail: !!document.getElementById('auR-side'), groups: [...r.querySelectorAll('.au-sgh')].map(h => h.textContent), rows: rows.map(x => x.getAttribute('data-page')),
       homeLocked: (() => { const x = rows.find(y => y.getAttribute('data-page') === 'home'); return !!x && x.querySelector('input').disabled; })(),
       settingsLocked: (() => { const x = rows.find(y => y.getAttribute('data-page') === 'settings'); return !!x && x.querySelector('input').disabled; })(),
-      h3: cs(r.querySelector('.au-card h3')).fontSize, keys: [...r.querySelectorAll('button')].map(k => parseFloat(cs(k).fontSize)), rowFs: cs(rows[0]).fontSize,
+      h3: [...r.querySelectorAll('h1,h2,h3,h4')].filter(h => /side bar/i.test(h.textContent)).length, keys: [...r.querySelectorAll('button')].map(k => parseFloat(cs(k).fontSize)), rowFs: cs(rows[0]).fontSize,
       editor: (() => { IngAuthor.room('editor'); const t = [...document.querySelectorAll('#auRoom .au-kind b')].map(x => x.textContent); IngAuthor.room('side'); return t; })() }; });
   ok(room.rail && room.groups.includes('Studio') && room.groups.includes('Learn') && room.rows.includes('focus') && room.rows.includes('lector') && room.editor.includes('Its side bar'),
     'the rail and the Editor offer the Side bar; the room lists each group with its pages', room);
   ok(room.homeLocked && room.settingsLocked, 'Home and Settings cannot be hidden', [room.homeLocked, room.settingsLocked]);
-  ok(room.h3 === '16.5px' && room.keys.every(f => f <= 13) && room.rowFs === '13px', 'the room is in the app\'s scale (16.5px heading, 13px rows, small keys)', room);
+  ok(room.h3 <= 1 && room.keys.every(f => f <= 13) && room.rowFs === '13px', 'the room is in the app\'s scale (13px rows, small keys), and its name is not repeated by a card under its head (6.46)', room);
   // 2. Focus up, Lector hidden
   const sg0 = studioGroup(o0); const fi = sg0.indexOf('focus');
   await p.evaluate(() => { const li = [...document.querySelectorAll('#auRoom .au-srow')].find(x => x.getAttribute('data-page') === 'focus'); [...li.querySelectorAll('button')].find(k => k.textContent === 'Up').click(); }); await p.waitForTimeout(400);

@@ -1972,7 +1972,7 @@ function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowD
     R.foot.appendChild(cbtn("quiet","Not today",function(){o.rest=tomorrowStr();S.ui.today=null;save();render();say("It rests until tomorrow.");},"It comes back tomorrow"));
     R.foot.appendChild(cbtn("","Open the application",function(){S.ui.room="apps";S.ui.open=o.id;show("work");save();render();}));R.foot.appendChild(h("span","c-grow"));
     R.foot.appendChild(cbtn("pri","Do this now",function(){S.ui.room="apps";S.ui.open=o.id;o.step=nx.step;if(nx.kind){o.sv={kind:nx.kind};o.tab="doc";}show("work");save();render();}));}
-  else{R=panel("csWork","Today",{back:"Today",onBack:function(){show("list");save();render();}});var near=nearestDate(act.concat(rest).map(function(x){return x.o;}));
+  else{R=panel("csWork","Your day",{back:"Today",onBack:function(){show("list");save();render();}});/* 6.46: not Today twice, beside the list of that name */var near=nearestDate(act.concat(rest).map(function(x){return x.o;}));
     var c2=h("div","c-col c-today");c2.appendChild(h("h3","c-today-step",esc(act.length?(act.length===1?"One step for today.":act.length+" steps for today, one for each application."):"Nothing is asked of you today.")));
     if(near)c2.appendChild(h("p",null,esc("The nearest date is "+(near.n===0?"today":near.n===1?"tomorrow":"in "+near.n+" days")+", "+dayStr(near.d.at+"T12:00:00")+": "+dateWords(near.d,near.o)+".")));
     if(act.length||CLOCK.ended)c2.appendChild(minutesBox(S,act,low));

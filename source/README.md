@@ -371,6 +371,52 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.46 (7 November 2026): a model thinks briefly and answers; sources when she asks; titles shown twice removed; every
+provider within its model's limits. Built on the other session's 6.45 (claude/dreamy-fermi-9ourlk), whose lighter presses (r230,
+r172) stand in for the same two fixes made here. Her words (6 November 2026): "The models inside of the chats of Ingenium spend more time debating the prompts and saying "Wait"
+and rechecking everytime and it takes ages for them to stop "Thinking" and reply"; "I also don't want sources and citations provided to
+me with every reply inside of the app, I only want them provided when I ask for them"; "The "Side bar" title is repeated twice inside of
+the Author Studio ... There is a couple more of that occurence around the app".
+
+- modules/r241.js (new). Measured: a model on this device thought as long as it liked: the thinking budget of 6.11 (R101: 1,536 to
+  6,144 tokens by the model's size, twice or four times at Extra or Max effort) was kept only by the computer app's engine, and nothing
+  noticed a model going round in circles; the standing instructions asked every model to "check your work". Now How long it thinks,
+  beside Thinking (Brief, the default, about 700 tokens, 1,400 at Max effort; Standard, the model's own budget; Deep, twice that; No
+  limit), sets the budget; Engine.generate passes through ingThinkBudget (build_page.py 6.46), which watches a reply that thinks (in the
+  engine's reasoning channel or in <think> written into the answer): past the budget, or the same sentence a third time, or "Wait",
+  "Hmm" and "let me check" again and again, it stops the thinking and asks the model once more, without thinking, with its notes, and
+  the answer comes in the same reply; the thoughts say why. The computer app's engine keeps its own budget (llama.cpp ends the thoughts
+  itself) and is watched for circles. Only when it helps (on unless she turns it off): a short, simple message is answered at once,
+  without thinking; a message that needs reasoning (why, explain, compare, plan, code, figures, a file, a long message) still thinks.
+  The standing instructions now ask a model to think a question through once, decide and answer (Your Ingenium's careful thinking,
+  Magister's layer, and a line for a model on this device that thinks).
+- Sources when she asks: the web search and Research tell the model to cite only when her message asks for sources, citations or
+  references (ingCiteRule, in place of "Cite them by number" in both prompts); otherwise the answer carries no numbers or list, and the
+  sources wait under the reply behind a Sources key. When she asks, they are cited and shown as before.
+- Repeated titles (found with an audit that opens every page, room, tab and part): the Author Studio's Side bar room (its head said
+  Side bar and the card under it The side bar, with the same sentence twice); Settings' licence card (the licence document repeated the
+  card's heading as its own title; thoughts/permit_core.html); the Career Studio's Today (its list and the panel beside it were both
+  Today; the panel is now Your day).
+- Every provider within its model's limits. Her words (6 November 2026): "I want the fix to be applied to all Claude models and Ollama's,
+  GPT and every other provider, I want the caps gone and for the fixes to be applied to them as well inside of Ingenium to prevent
+  anything else from crashing." Measured with stand-ins of OpenAI's form and Ollama's: the chat's requests of OpenAI's form (GPT,
+  Gemini, Kimi, OpenRouter, LM Studio, any compatible service) asked their reply through ingRemoteCap, which neither the smaller figure
+  a refusal named nor the room the window leaves reached, so the same request went again and failed; ingRemoteCap now holds both
+  (r206), as the working loop does since 6.44 (r190), and Blend's own requests of that form ask within the figure kept for the model
+  (build_page.py 6.46, ingOutFor). Ollama was given 32,768 tokens of memory whatever its model holds (16,384 in Blend), and the working
+  loop gave none, so Ollama used its own default of a few thousand and silently cut the start of what was sent, Ingenium's
+  instructions and the tools with it; a refusal for the computer's memory (Ollama's 500) was taken for a busy service and sent twice
+  more. Now what the model holds is read from Ollama (/api/show, once a model, two seconds at most); each request is given what it
+  needs (ingOllamaCtx: 32,768 for a short conversation, or the model's own window when smaller, doubled as it grows, up to the model's
+  own), in the chat, the loop and Blend; a refusal for memory halves it, keeps it for the model (memCtx), fits the conversation to it
+  and sends again (Lector reads again in smaller parts). Her own figure, when she sets one, is kept as she set it.
+
+    node rig/t_646_providers.js <url> <out>  # stand-ins of OpenAI's form and Ollama's: refusals for length and tokens a minute,
+                                             # Ollama's memory read, grown, halved and kept; the loop and Blend
+    node rig/t_646_think.js <url> <out>   # a stand-in model that thinks without end: stopped at its length, in circles, or in <think>;
+                                          # answered in the same reply; the simple message unthought; the controls; the instructions;
+                                          # sources folded and cited on request; the three titles
+
 Ingenium 6.45 (6 November 2026): presses made lighter; no permission opens or packages Ingenium itself outside the master
 edition; the app library keeps no copy of the Offline Project's page; the chat box has one stop key; Check with Blend in
 lavender; no Name card in Settings; the Career Studio's Today step and the Guide's Start here redesigned. Her answers

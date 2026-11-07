@@ -407,9 +407,12 @@ function openaiTurn(S,onToken,onThink){var c=state.cloud,ob=base()||cloudDefault
         if(c.provider==="moonshot"&&reason)am.reasoning_content=reason;S.msgs.push(am);
         results.forEach(function(r){S.msgs.push({role:"tool",tool_call_id:r.id,content:r.text});});}};});}
 /* Ollama's own chat form: on this computer, another one on the network, or Ollama's cloud */
-function ollamaTurn(S,onToken,onThink){var c=state.cloud,h={"content-type":"application/json"};if(c.key)h["Authorization"]="Bearer "+c.key;
+/* 6.46: Ollama is told the memory the run needs (before, none: Ollama's own default of a few thousand tokens cut the start of what
+   was sent, the instructions and the tools with it), once it has said what its model holds (modules/r206.js) */
+function ollamaTurn(S,onToken,onThink){return Promise.resolve(window.ingOllamaShow?window.ingOllamaShow():null).then(function(){return ollamaTurn0(S,onToken,onThink);});}
+function ollamaTurn0(S,onToken,onThink){var c=state.cloud,h={"content-type":"application/json"};if(c.key)h["Authorization"]="Bearer "+c.key;
   var body={model:c.model,messages:S.msgs,stream:true,tools:S.tools.map(function(t){return {type:"function",function:{name:t.name,description:t.description,parameters:t.input_schema}};}),
-    options:{num_predict:Math.max((+$("ctlTokens").value)||0,8192)}};if(S.think)body.think=(S.effort&&window.IngEffort)?IngEffort.ollamaThink(c.model,S.effort.lv):true;
+    options:{num_predict:Math.max((+$("ctlTokens").value)||0,8192)}};if(typeof window.ingOllamaCtx==="function")body.options.num_ctx=window.ingOllamaCtx(S.msgs);if(S.think)body.think=(S.effort&&window.IngEffort)?IngEffort.ollamaThink(c.model,S.effort.lv):true;
   var text="",think="",calls=[],err=null,done="";
   var feed=lineFeeder(function(line){if(!line.trim())return;var d;try{d=JSON.parse(line);}catch(_){return;}
     if(d.error){err=d.error;return;}var m=d.message||{};
@@ -445,6 +448,8 @@ function withRetry(turn){return function(S,onToken,onThink){var tries=0,waits=0,
     var who=c.provider==="anthropic"?"Anthropic":"The service";
     if(k.type==="rate"&&!k.daily&&waits<2){waits++;if(inf&&k.perMin>0){inf.perMin=k.perMin;try{saveState();}catch(_){}}return waitTurn(k.after||60,S,who+" asked Ingenium to slow down: your API key reached its limit of tokens a minute.").then(go);}
     if(k.type==="busy"&&waits<2){waits++;return waitTurn(waits===1?8:20,S,who+" is busy.").then(go);}
+    /* 6.46: Ollama short of memory: half the memory, kept for the model, and the turn again */
+    if(k.type==="mem"&&/^ollama/.test(c.provider||"")&&inf&&typeof window.ingOllamaCtx==="function"){var cur=window.ingOllamaCtx(S.msgs);if(cur>2048){inf.memCtx=Math.max(2048,Math.floor(cur/2/1024)*1024);try{saveState();}catch(_){}return go();}}
     throw e;});}
   return go();};}
 function turnFor(p){var f=family(p);return withRetry(f==="anthropic"?anthropicTurn:f==="ollama"?ollamaTurn:openaiTurn);}

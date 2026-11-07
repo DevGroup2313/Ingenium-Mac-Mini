@@ -313,7 +313,8 @@ function sideMove(gname,pg,dir){var a=A(),g=sideGroups().filter(function(x){retu
 function sideShow(pg,on){if(KEEP_SHOWN.indexOf(pg)>=0)return;var a=A(),next=JSON.parse(JSON.stringify(a.side||{})),h=(next.hidden||[]).filter(function(x){return x!==pg;});if(!on)h.push(pg);next.hidden=h;
   sideSet(next,(on?"Showed ":"Hid ")+navName(pg)+" in the side bar");}
 function paintSide(body){var a=A(),sd=a.side||{},hid=sd.hidden||[];
-  var c=card("The side bar","The order of the pages in each group, and which of them the side bar shows. A hidden page stays: Home's keys, Help and the tour still open it. Home and Settings always stay, so the way back is never hidden.");
+  /* 6.46: her words (6 November 2026): "The "Side bar" title is repeated twice inside of the Author Studio, I want the superfluous one to be removed". The room's head names it; the card carries what the head does not say */
+  var c=card(null,"A hidden page stays: Home's keys, Help and the tour still open it. Home and Settings always stay, so the way back is never hidden.");
   sideGroups().forEach(function(g){c.appendChild(mk("h4","au-sgh",g.name));var ul=mk("ul","au-side");
     g.btns.forEach(function(b,i){var pg=b.getAttribute("data-page"),li=mk("li","au-srow"+(hid.indexOf(pg)>=0?" off":""));li.setAttribute("data-page",pg);
       li.appendChild(mk("span","nm",navName(pg)));

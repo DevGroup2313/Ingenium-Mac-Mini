@@ -67,6 +67,57 @@ if(typeof W.ingReplyCap==="function"){var oCap=W.ingReplyCap;
       var w=win();if(w>0&&NOW.inTok>0){var room=w-NOW.inTok-1024;if(room<r)r=Math.max(1024,Math.floor(room/256)*256);}}catch(e){}
     return r;});}
 
+/* 6.46: her words (6 November 2026): "I want the fix to be applied to all Claude models and Ollama's, GPT and every other provider". The
+   requests of OpenAI's form (GPT, OpenRouter, Gemini, Kimi, LM Studio and others) asked their reply through ingRemoteCap, which neither
+   this part's smaller figure after a refusal nor the window's room reached: the same request went again and failed. Now they do. */
+if(typeof W.ingRemoteCap==="function"){var oRc=W.ingRemoteCap;
+  W.ingRemoteCap=wrap(oRc,function(cap){var r=oRc.apply(this,arguments);
+    try{if(NOW.capOnce>0)r=Math.min(r,NOW.capOnce);var w=win();if(w>0&&NOW.inTok>0){var room=w-NOW.inTok-1024;if(room<r)r=Math.max(1024,Math.floor(room/256)*256);}}catch(e){}
+    return r;});}
+/* ---------- 1b. 6.46: Ollama within its model's own window and the memory of the computer that runs it ----------
+   Her words (6 November 2026): "I want the fix to be applied to all Claude models and Ollama's, GPT and every other provider, I want the
+   caps gone and for the fixes to be applied to them as well inside of Ingenium to prevent anything else from crashing."
+   Measured on 6.44: Ollama on a computer was given 32,768 tokens of memory (num_ctx) whatever its model holds, and a longer conversation
+   lost its oldest part; Blend gave it 16,384; the working loop (a chat with files, Code) gave none, so Ollama used its own default of a
+   few thousand tokens and cut the start of what was sent, Ingenium's instructions and the tools with it (Ollama cuts silently); a
+   refusal for the computer's memory was taken for a busy service, and the same request went twice more.
+   Now what the model holds is read from Ollama itself (/api/show, once a model). Each request is given the memory it needs: 32,768 as
+   before for a short conversation (or the model's own window when it is smaller), doubled as the conversation grows, up to the
+   model's own window, so nothing is left out while the model can read it. A refusal for memory halves it, keeps that figure for the
+   model, fits the conversation to it, and sends again. Her own figure, when she sets one, is kept as she set it. */
+function isOllama(p){return p==="ollama-local"||p==="ollama-lan"||p==="ollama-cloud";}
+var SHOWN={};
+function ollamaShow(c){try{c=c||state.cloud||{};if(!isOllama(c.provider)||!c.model||typeof cxFetch!=="function")return Promise.resolve(null);
+  var base=String(c.base||(typeof cloudDefaultBase==="function"?cloudDefaultBase(c.provider):"")).replace(/\/+$/,""),k=c.provider+"|"+base+"|"+c.model,s=SHOWN[k];
+  if(s&&(s.ok||Date.now()-s.at<300000))return s.p;
+  var h={"content-type":"application/json"};if(c.key)h.Authorization="Bearer "+c.key;
+  var rec={at:Date.now(),ok:false};
+  var p=cxFetch(base+"/api/show",{method:"POST",headers:h,body:JSON.stringify({model:c.model})}).then(function(r){return r&&r.ok?r.json():null;}).then(function(d){
+      if(!d)return null;var mi=d.model_info||{},own=0;Object.keys(mi).forEach(function(x){if(/\.context_length$/.test(x)&&+mi[x]>own)own=+mi[x];});
+      if(own>0){rec.ok=true;c.info=c.info||{};var inf=c.info[c.model]=c.info[c.model]||{};if(+inf.own!==own){inf.own=own;try{saveState();}catch(e){}}}
+      return own||null;},function(){return null;});
+  /* an Ollama that does not answer this within two seconds is not waited for: what is known goes on */
+  rec.p=Promise.race([p,new Promise(function(res){setTimeout(function(){res(null);},2000);})]);SHOWN[k]=rec;return rec.p;}catch(e){return Promise.resolve(null);}}
+W.ingOllamaShow=ollamaShow;
+if(typeof W.ingCloudWindow==="function"){var oW45=W.ingCloudWindow;
+  W.ingCloudWindow=wrap(oW45,function(){var w=oW45.apply(this,arguments);
+    try{var c=state.cloud||{};if(isOllama(c.provider)&&!(+c.window>0)&&c.model){var inf=(c.info||{})[c.model]||{};
+        if(+inf.own>0&&!(+inf.ctx>0))w=+inf.own;            /* the model's own window, as Ollama gives it */
+        if(+inf.memCtx>0)w=Math.min(w,+inf.memCtx);}}catch(e){}   /* what the computer's memory took, when it said so */
+    return w;});}
+/* the memory one request is given (Ollama's num_ctx): from 32,768 (16,384 for Blend's own requests) doubled until the conversation and
+   its reply fit, never above the window; a connection of its own (Blend) by what it is known to hold, 32,768 when nothing is known */
+W.ingOllamaCtx=function(msgs,conn){try{var c=conn||state.cloud||{},inf=(c.info||{})[c.model]||{};
+    if(!conn&&+c.window>0)return +c.window;
+    var top=conn?(+inf.ctx||+inf.own||32768):(win()||32768);if(+inf.memCtx>0)top=Math.min(top,+inf.memCtx);
+    var lo=Math.min(conn?16384:32768,top),t=(!conn&&NOW.inTok>0)?NOW.inTok:Math.ceil(chars(msgs||[])/cpt());
+    var rep=4096;try{rep=replyTokens();}catch(e){}
+    var need=t+Math.min(rep,8192,Math.floor(top*0.5))+1024,n=lo;   /* the reply's room: a short chat stays at 32,768, no reload */
+    while(n<need&&n<top)n=Math.min(top,n*2);
+    return Math.max(2048,n);}catch(e){return 32768;}};
+/* the model in use is asked once what it holds, before the first message is fitted to it */
+setInterval(function(){try{var c=state.cloud||{};if(c.on&&isOllama(c.provider)&&c.model)ollamaShow(c);}catch(e){}},5000);
+
 /* ---------- 2. a conversation fitted to a number of characters ---------- */
 function cutText(t,room,why){t=String(t||"");if(t.length<=room)return t;room=Math.max(400,room);
   var head=Math.floor(room*0.6),tail=Math.max(0,room-head-120);
@@ -96,6 +147,8 @@ function kind(e){var m=String(e&&e.message||e||""),code=+((/HTTP (\d{3})/.exec(m
   if(/^Stopped\.?$/.test(m))return null;
   if(code===429||/rate.?limit/i.test(m)){var pm=/([\d,]+)\s+(?:input\s+|output\s+)?tokens?\s+per\s+minute/i.exec(m),af=/(?:retry|try again)[^\d]{0,24}(\d+)\s*(?:s\b|sec)/i.exec(m);
     return {type:"rate",perMin:pm?num(pm[1]):0,after:af?Math.min(120,+af[1]):0,daily:/per day|daily/i.test(m)};}
+  /* 6.46: the computer running the model is short of memory (Ollama says so with a 500, which is not a busy service) */
+  if(/requires more (?:system )?memory|out of memory|insufficient memory|not enough memory|unable to allocate|failed to allocate|cudaMalloc/i.test(m))return {type:"mem"};
   if(code===529||/overloaded/i.test(m)||code===500||code===502||code===503||code===504)return {type:"busy"};
   if((x=/(\d[\d,]*)\s*\+\s*(\d[\d,]*)\s*>\s*(\d[\d,]*)/.exec(m))&&/token|context|limit/i.test(m))return {type:"sum",input:num(x[1]),out:num(x[2]),win:num(x[3])};
   if(/max_tokens|max_completion_tokens|maximum output|output tokens/i.test(m)&&!/prompt|input|context length/i.test(m)){
@@ -112,6 +165,7 @@ function plain(e,k){var raw=String(e&&e.message||e||"").replace(/[.\s]+$/,""),wh
   if(k.type==="rate")t=k.daily?who+" has reached the daily limit set for your API key. It opens again tomorrow, or a higher limit can be set on "+who+"'s own website":
     who+" refused because your API key reached its limit of tokens a minute, and Ingenium waited and tried twice. Wait a minute and send again; a new conversation sends less each time";
   else if(k.type==="busy")t=who+" is very busy at the moment, and Ingenium tried twice. Send again in a minute";
+  else if(k.type==="mem")t="The computer running "+m+" does not have the memory for this conversation, even with less of it read at once. Close other apps on that computer, choose a smaller model, or start a new conversation";  /* 6.46 */
   else if(k.type==="maxtok")t=m+" refused the length of reply asked for"+(k.max>0?" (it gives at most "+k.max.toLocaleString()+" tokens)":"")+", and Ingenium asked again within it. Send again; if it happens again, lower Longest reply in Controls";  /* 6.44 */
   else t="This conversation is longer than "+m+" can read at once, even with its oldest part left out. A new conversation, or asking for a summary to carry over, fixes it";
   var x=new Error(t+" (its words: "+raw.replace(/^HTTP /,"")+")");x.r206=1;return x;}
@@ -136,7 +190,7 @@ if(typeof W.cloudChat==="function"){var ORIG=W.cloudChat;
     function tell(r,why){if(r.dropped||r.cut){var t=r.dropped?("The oldest "+r.dropped+" message"+(r.dropped===1?" was":"s were")+" left out of what "+modelName()+" read for this reply"+why+"."):("Part of a long message was left out of what "+modelName()+" read for this reply"+why+".");
         if(r.dropped&&r.cut)t=t.replace(/\.$/," (and part of a long message).");told=t;}}
     /* before the first send: a request built elsewhere (Lector, the studio, a summary) fitted to the window as well */
-    try{if(w>0&&!parts){var room=(w-reserveFor(w)-1024)*cpt();if(chars(msgs)>room){var r0=fit(msgs,Math.floor(room),"to fit the model's memory");msgs=r0.msgs;tell(r0,", to fit its memory");}}}catch(e){}
+    function first(){w=win();try{if(w>0&&!parts){var room=(w-reserveFor(w)-1024)*cpt();if(chars(msgs)>room){var r0=fit(msgs,Math.floor(room),"to fit the model's memory");msgs=r0.msgs;tell(r0,", to fit its memory");}}}catch(e){}return go();}
     var oT=function(t){if(!begun){begun=true;if(told)note(told);}return onToken?onToken.apply(this,arguments):undefined;};
     var oK=function(t){begun=true;return onThink?onThink.apply(this,arguments):undefined;};
     function go(){NOW.inTok=estTok(msgs);
@@ -171,9 +225,19 @@ if(typeof W.cloudChat==="function"){var ORIG=W.cloudChat;
         return wait(k.after||60,provName()+" asked Ingenium to slow down: your API key reached its limit of tokens a minute.",ab).then(go);}
       if(k.type==="busy"){if(waits>=2)throw plain(e,k);waits++;
         return wait(waits===1?8:20,provName()+" is busy at the moment.",ab).then(go);}
+      /* 6.46: Ollama short of memory: half the window, kept for the model, the conversation fitted to it, sent again */
+      if(k.type==="mem"){if(isOllama((state.cloud||{}).provider)&&inf){var cur=W.ingOllamaCtx(msgs);if(cur<=2048)throw plain(e,k);
+          var half=Math.max(2048,Math.floor(cur/2/1024)*1024);inf.memCtx=half;try{saveState();}catch(_){}
+          /* Lector and the studio read in parts they size themselves: they read again, in parts that fit the smaller window */
+          if(parts)throw new Error("the part is too long for the model's context (the computer running it is short of memory)");
+          var room4=(half-reserveFor(half)-1024)*cpt();if(chars(msgs)>room4){var r4=fit(msgs,Math.floor(room4),"to fit the memory of the computer running the model");msgs=r4.msgs;tell(r4,", to fit the memory of the computer that runs it");}
+          return goKeep();}
+        if(waits>=2)throw plain(e,k);waits++;return wait(waits===1?8:20,provName()+" is short of memory at the moment.",ab).then(go);}
       throw e;}
     function goKeep(){say("Fitting the conversation to "+modelName()+"'s limits and sending again…");return go();}
-    return go();});
+    /* 6.46: what Ollama says of its model (its own window) is read first, once a model, two seconds at most */
+    var pre=null;try{if(isOllama((state.cloud||{}).provider))pre=ollamaShow();}catch(e){}
+    return pre?pre.then(first,first):first();});
   W.cloudChat.__r206=1;}
 })();
 ;try{window.__ingParts["p206"]="running";}catch(_){}

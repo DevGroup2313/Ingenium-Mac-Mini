@@ -1452,6 +1452,36 @@ edit('$("setAppName").addEventListener("input",function(){state.appName=$("setAp
      "6.45 nothing listens for the Name card")
 edit('T("appname",function(){$("setAppName").value=state.appName;});', '', "6.45 no Name card to fill in")
 
+# ---- 6.46 (7 November 2026; her words of 6 November): a model on this device thinks briefly and answers (modules/r241.js), and sources come when she asks.
+#      Her words: "The models inside of the chats of Ingenium spend more time debating the prompts and saying "Wait" and rechecking
+#      everytime and it takes ages for them to stop "Thinking" and reply"; "I also don't want sources and citations provided to me with
+#      every reply inside of the app, I only want them provided when I ask for them." ----
+edit('generate:function(job){if(!this.adapter)return Promise.reject(new Error("NO_ADAPTER"));return this.adapter.generate(job);},',
+     'generate:function(job){if(!this.adapter)return Promise.reject(new Error("NO_ADAPTER"));return typeof ingThinkBudget==="function"?ingThinkBudget(this.adapter,job):this.adapter.generate(job);},',
+     "6.46 a reply that thinks is watched for its length and its circles")
+edit('+"\\n\\nWrite a careful answer from these sources. Cite them by number, like [1], after each claim they support. Where the sources disagree or say nothing, say so plainly. Do not invent anything the sources do not say.";',
+     '+"\\n\\nWrite a careful answer from these sources. "+(typeof ingCiteRule==="function"?ingCiteRule(rec,0):"Cite them by number, like [1], after each claim they support.")+" Where the sources disagree or say nothing, say so plainly. Do not invent anything the sources do not say.";',
+     "6.46 the web's sources cited only when she asks")
+edit('" from these sources. Cite them by number after each claim they support, like [1] or [2, 4]. Prefer the peer-reviewed sources;',
+     '" from these sources. "+(typeof ingCiteRule==="function"?ingCiteRule(rec,1):"Cite them by number after each claim they support, like [1] or [2, 4].")+" Prefer the peer-reviewed sources;',
+     "6.46 the scholarly sources cited only when she asks")
+edit('think:{careful:"When a question needs it, work it through step by step and check your work before you answer.",',
+     'think:{careful:"When a question needs it, think it through once, decide, and answer. Do not go back over what is already settled.",',
+     "6.46 careful thinking: once, decided")
+edit('magister:"Take the time a hard question needs: reason it through, check your work, then give a complete answer.",',
+     'magister:"Take the time a hard question needs: reason it through once, decide, then give a complete answer.",',
+     "6.46 Magister: reason once, decide")
+
+# ---- 6.46: a request on its own connection (Blend) to a service of OpenAI's form asks for no more than the model's figure, when Ingenium
+#      knows it (its list, or a refusal), as Claude's does since 6.44 ----
+edit('if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     'if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);else if(ab&&ab.conn&&typeof ingOutFor==="function")cap=ingOutFor(c.model,cap);',
+     "6.46 Blend asks every service within the model's own figure")
+
+edit('num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768)}};',
+     'num_ctx:typeof ingOllamaCtx==="function"?ingOllamaCtx(msgs,ab&&ab.conn):((ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768))}};',
+     "6.46 Ollama is given the memory each request needs, up to its model's own window (modules/r206.js)")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
