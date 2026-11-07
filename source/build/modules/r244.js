@@ -356,6 +356,8 @@ function openPop(){var p=$("activeModelPill");if(!p)return;
   POP.appendChild(btn("wa-row","Choose another model…",function(){closePop();try{go("chat");}catch(e){}setTimeout(function(){var b=$("chatModelBtn");if(b&&!menuOpen())b.click();},150);}));
   POP.appendChild(btn("wa-row key","＋ Connect a service",function(){closePop();openConnect();}));
   POP.appendChild(btn("wa-row","Models on this device",function(){closePop();try{go("models");}catch(e){}}));
+  /* 6.52: How it answers (Effort, Longest reply, Context), kept for each model and service (modules/r249.js) */
+  try{if(W.IngGen&&typeof W.IngGen.section==="function")W.IngGen.section(POP);}catch(e){}
   POP.hidden=false;place();paintPill();var f=POP.querySelector("button");if(f)try{f.focus({preventScroll:true});}catch(e){}}
 function place(){var p=$("activeModelPill");if(!p||!POP)return;var r=p.getBoundingClientRect(),w=POP.offsetWidth||280;
   POP.style.top=Math.round(r.bottom+6)+"px";POP.style.left=Math.round(Math.max(8,Math.min(W.innerWidth-w-8,r.right-w)))+"px";}

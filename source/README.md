@@ -371,6 +371,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.52 (7 November 2026): Longest reply, Context and Effort kept for each model and service, and at hand on every page. Her
+words (7 November 2026): "I want the Tokens and Context controls to be fixed inside of Ingenium, the app always resets it to zero with
+the models even though I already moved it to a higher capacity earlier, it never remembers them and they are all out whack all over
+the app, I can only regulate it on the chat pages which is not really convenient since that I cannot regulate it on the other pages
+that are running these models and I can't adjust the effort level."
+
+Measured on 6.51 (rig/t_652_gen.js repeats it): the chat's Controls kept Longest reply, Context and Effort only inside a model on
+this device (its tokens, ctx and effort); with a connected service (Claude, OpenAI ...) or with nothing set up, nothing was kept,
+so after a reload Longest reply was 1,024 tokens and Effort Medium again (the service's memory, state.cloud.window, was kept).
+
+- modules/r249.js (new): state.gen keeps {tokens, ctx, effort} for each answerer ("m:<model id>", "c:<provider>|<model>", or
+  "none") and the last chosen; every change she makes (the chat's sliders, the effort menus, the model key's controls) is kept;
+  at start and whenever who answers changes (a saveState after which the answerer differs; refreshChatNote) the answerer's own
+  come back, else a model's own numbers from before 6.52, else the last chosen. The sliders' room is set first from
+  ingReplyMax and ingCtxMax, so a large value is not cut to the page's default room. Changes the effort module makes for one
+  message (Auto, Ultracode, the reply that follows the effort) send no input event and are not kept.
+- modules/r244.js: the top bar's model key (Who answers) holds How it answers: Effort (Auto and the five levels), Longest reply
+  (with Follows the effort, which is the effort module's replyAuto; moving the slider sets it by hand) and Context (a model's
+  window, or a service's memory, mirroring the Controls' ctlCloudCtx); the arrow keys move a slider there, not the menu's focus.
+
+    node rig/t_652_gen.js <url> <out>   # nothing set up, a service, a model: kept over a reload; each keeps its own both ways; a
+                                        # first use starts from the last chosen; How it answers on Settings and Lector, the same
+                                        # values as the Controls, kept (13 checks)
+
 Ingenium 6.51 (7 November 2026), its second part: a page that keeps still, keys that stand up from it, and an empty Chat page
 without ready-made ideas. Her words (7 November 2026): "The buttons inside of Ingenium still feels flat and are missing the popped
 out 3D animated look and effect and everything feels really freaking slow when I move my mouse around inside of the app. I HATE IT
