@@ -1,50 +1,44 @@
-// node rig/t_653_parity.js <Ingenium page url (master)> <out dir>
-// Ingenium 6.53 (7 November 2026), in Chromium. Her words (7 November 2026): "I have told you many times that I want full parity with
-// Carpe Diem's buttons and acrylic surfaces ... You keep adding this freaking purple glow under every fucking button"; "it is mostly
-// slightly faster but still slow on my Macbook pro"; and of the Offline Project in Fabrica: "I don't want it awkwardly placed at the top
-// of the "Your apps" section ... It should only be there only if I was working on it inside of Fabrica and recently shipped a new
-// version like any other app". (modules/r251.js, build_page.py's slate pass, r246.js)
-//   - keys rest on Carpe Diem's slate edge and casts, flat faces (the primary key one flat accent), rise 2 px and press 1 px;
-//   - no shadow on Home, Chat or Settings is drawn in Ingenium's purple ink; cards are acrylic (white at 72 %);
+// node rig/t_653_look.js <Ingenium page url (master)> <out dir> ref=<the 6.9.4 page: git show aa50c44:ingenium.html, served>
+// Ingenium 6.53 (7 November 2026), in Chromium. Her words (7 November 2026): "I honestly just want Ingenium reverted back to how it used
+// to look before you started messing it the graphics. I want all of the edits and updates kept but I want my app to look like how it
+// looked prior to this as far as the buttons. Perhaps how it looked on 6.9.4"; "Th + button and the mic buttons on the chat pages need
+// to be reverted"; "it is mostly slightly faster but still slow on my Macbook pro"; and of the Offline Project in Fabrica: "It should
+// only be there only if I was working on it inside of Fabrica and recently shipped a new version like any other app".
+//   - every common key and surface on Chat, Home, Settings, Models and Blend has the 6.9.4 page's shadow, face, border and motion;
+//   - the + key is flat in the message box; the model key has no ring while nothing answers;
 //   - no glass blur once the door is passed; with the pointer still, nothing animates; the rail's bell swings when pointed at;
 //   - Fabrica: no tile above Your apps; Bring one in offers The Offline Project; kept, it is an app in Your apps beside Ingenium,
 //     with its versions (making it again adds one);
 //   - no errors on the page.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
-const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
+const args = process.argv.slice(2); const REF = (args.find(a => a.startsWith('ref=')) || '').slice(4); const [URL_, OUT] = args.filter(a => !a.startsWith('ref=')); fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; function ok(c, m, d) { if (c) { pass++; console.log('ok   ' + m); } else { fail++; console.log('FAIL ' + m + (d !== undefined ? ' :: ' + JSON.stringify(d).slice(0, 900) : '')); } }
-const PURPLE = /40, 2[02], (?:68|70)|93, 55, 161|106, 63, 181, 0\.2[0-9]?\) 0px [1-9]/;
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(1200);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(900);
   await p.evaluate(() => { try { const k = [...document.querySelectorAll('button')].find(x => /^Not now$/.test(x.textContent.trim()) && x.offsetParent); if (k) k.click(); } catch (e) {} });
-  // 1. keys
-  await p.evaluate(() => go('chat')); await p.waitForTimeout(1200);
-  const k = await p.evaluate(() => { const g = id => { const e = typeof id === 'string' ? document.querySelector(id) : id; if (!e) return null; const c = getComputedStyle(e); return { sh: c.boxShadow, bg: c.backgroundImage + ' ' + c.backgroundColor }; };
-    return { ctl: g('#chatCtlBtn'), get: g('.wa-hello .btn.ghost'), pri: g('.wa-hello .btn.primary'), pill: g('.cl-key#displayBtn') }; });
-  ok(k.ctl && /rgba\(16, 42, 58, 0\.16\) 0px -1\.5px 0px 0px inset/.test(k.ctl.sh) && /rgba\(16, 42, 58, 0\.3\) 0px 2px 0px/.test(k.ctl.sh) && /rgba\(16, 42, 58, 0\.13\) 0px 9px 14px/.test(k.ctl.sh), 'a key rests on Carpe Diem\'s slate edge and casts', k.ctl);
-  ok(k.get && /rgb\(255, 255, 255\), rgb\(255, 255, 255\)|none rgb\(255, 255, 255\)/.test(k.get.bg) && !PURPLE.test(k.get.sh), 'its face is flat white, with no purple in its shadow', k.get);
-  ok(k.pri && /none rgb\(106, 63, 181\)/.test(k.pri.bg) && /rgba\(16, 42, 58, 0\.3\) 0px 2px 0px/.test(k.pri.sh) && !PURPLE.test(k.pri.sh), 'the primary key is one flat accent on the same slate edge', k.pri);
-  ok(k.pill && /rgba\(16, 42, 58, 0\.32\) 0px 1px 0px/.test(k.pill.sh), 'the top bar\'s pills rest on Carpe Diem\'s 1 px edge', k.pill);
-  const box = await p.evaluate(() => { const r = document.querySelector('.wa-hello .btn.ghost').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-  await p.mouse.move(box.x, box.y); await p.waitForTimeout(350);
-  const hv = await p.evaluate(() => { const c = getComputedStyle(document.querySelector('.wa-hello .btn.ghost')); return { tf: c.transform, sh: c.boxShadow }; });
-  await p.mouse.down(); await p.waitForTimeout(150);
-  const pr = await p.evaluate(() => { const c = getComputedStyle(document.querySelector('.wa-hello .btn.ghost')); return { tf: c.transform, sh: c.boxShadow }; });
-  await p.mouse.move(5, 400); await p.mouse.up(); await p.waitForTimeout(250);
-  ok(/matrix\(1, 0, 0, 1, 0, -2\)/.test(hv.tf) && /rgba\(16, 42, 58, 0\.3\) 0px 3px 0px/.test(hv.sh), 'under the pointer it rises 2 px and its edge deepens to 3 px', hv);
-  ok(/matrix\(1, 0, 0, 1, 0, 1\)/.test(pr.tf) && /inset/.test(pr.sh) && /rgba\(16, 42, 58, 0\.24\) 0px 2px 5px 0px inset/.test(pr.sh), 'pressed, it sits 1 px down in Carpe Diem\'s well', pr);
-  // 2. no purple ink in any shadow; acrylic cards
-  for (const pg of ['home', 'chat', 'settings']) {
-    await p.evaluate((pg) => go(pg), pg); await p.waitForTimeout(1000);
-    const bad = await p.evaluate((re) => { const R = new RegExp(re); const out = []; for (const e of document.querySelectorAll('body *')) { const r = e.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight) continue; for (const pe of [null, '::before', '::after']) { const s = getComputedStyle(e, pe).boxShadow; if (s && s !== 'none' && R.test(s)) out.push((e.id ? '#' + e.id : e.tagName.toLowerCase() + '.' + String(e.className).split(' ')[0]) + (pe || '') + ' ' + s.slice(0, 90)); } if (out.length > 8) break; } return out; }, PURPLE.source);
-    ok(bad.length === 0, 'on ' + pg + ', no shadow is drawn in Ingenium\'s purple ink', bad);
-  }
-  await p.evaluate(() => go('home')); await p.waitForTimeout(600);
-  const card = await p.evaluate(() => { const c = document.querySelector('#page-home .card') || document.querySelector('.card'); const s = getComputedStyle(c); return { bg: s.backgroundColor, sh: s.boxShadow }; });
-  ok(/rgba\(255, 255, 255, 0\.72\)/.test(card.bg) && /rgba\(16, 42, 58, 0\.22\) 0px 1px 0px/.test(card.sh), 'cards are acrylic: white at 72 %, a 1 px slate edge and soft casts', card);
+  // 1. every common key and surface as in 6.9.4 (the reference page from the history: git show aa50c44:ingenium.html)
+  const SEL = { chat: ['#chatCtlBtn', '#chatImgBtn', '#chatSend', '.cl-key#displayBtn', '.cl-key#statusPill', '.chat-card', '.composer', '.nav-btn.active'],
+    home: ['.hx-key', '.hx-app .hx-stone'], settings: ['#page-settings .btn:not(.primary)', '#page-settings .card', '#page-settings .seg-btn', '.rm-tab'], models: ['#page-models .card'], blend: ['#page-blend .card'] };
+  const look = async (pg) => { const out = {}; for (const [room, sels] of Object.entries(SEL)) { await pg.evaluate((r) => go(r), room); await pg.waitForTimeout(900);
+      out[room] = await pg.evaluate((sels) => { const o = {}; for (const s of sels) { const e = [...document.querySelectorAll(s)].find(x => x.getBoundingClientRect().width > 0); if (!e) { o[s] = null; continue; } const c = getComputedStyle(e);
+        o[s] = { sh: c.boxShadow, bg: c.backgroundColor + ' ' + c.backgroundImage, bd: c.borderTopWidth + ' ' + c.borderTopStyle + ' ' + c.borderTopColor, tr: c.transition }; } return o; }, sels); } return out; };
+  const now = await look(p);
+  if (REF) {
+    const R = await b.newContext({ viewport: { width: 1440, height: 900 } }); const rp = await R.newPage();
+    await rp.goto(REF); await rp.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await rp.waitForTimeout(1200);
+    await rp.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await rp.waitForTimeout(900);
+    const was = await look(rp); await R.close(); const diff = [], seen = [];
+    for (const room of Object.keys(SEL)) for (const s of SEL[room]) { const x = was[room][s], y = now[room][s]; if (!x || !y) continue; seen.push(s); for (const k of ['sh', 'bg', 'bd', 'tr']) if (x[k] !== y[k]) diff.push(room + ' ' + s + ' ' + k + ': ' + x[k].slice(0, 90) + ' -> ' + y[k].slice(0, 90)); }
+    ok(diff.length === 0 && seen.length >= 12, 'every common key and surface has its 6.9.4 shadow, face, border and motion (' + seen.length + ' compared)', diff);
+  } else console.log('(no 6.9.4 page given: keys not compared)');
+  // her words (7 November 2026): "Th + button and the mic buttons on the chat pages need to be reverted to how they used to look"
+  await p.evaluate(() => go('chat')); await p.waitForTimeout(800);
+  const plus = await p.evaluate(() => { const e = document.getElementById('chatImgBtn'), c = getComputedStyle(e), m = getComputedStyle(document.getElementById('chatModelBtn')); return { sh: c.boxShadow, bg: c.backgroundColor + ' ' + c.backgroundImage, border: c.borderTopWidth + ' ' + c.borderTopStyle, model: m.boxShadow }; });
+  ok(plus.sh === 'none' && /rgba\(0, 0, 0, 0\) none/.test(plus.bg) && plus.border === '1px solid', 'the + key is flat in the message box again: an outline, no face, no raised edge', plus);
+  ok(!/0px 0px 0px 3px/.test(plus.model), 'the model key has no ring round it while nothing answers', plus.model);
   // 3. no glass; nothing animates with the pointer still; the bell swings when pointed at
   const glass = await p.evaluate(() => { const out = []; for (const e of document.querySelectorAll('*')) for (const pe of [null, '::before', '::after']) { const c = getComputedStyle(e, pe); const v = c.backdropFilter || c.webkitBackdropFilter; const r = e.getBoundingClientRect(); if (v && v !== 'none' && r.width > 0 && r.height > 0) out.push((e.id || e.className) + (pe || '') + ' ' + v); } return out; });
   ok(glass.length === 0, 'no glass blur once the door is passed', glass);

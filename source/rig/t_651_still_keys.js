@@ -84,32 +84,7 @@ const inside = () => document.getAnimations().filter(a => { const t = a.effect &
   const badge = await p.evaluate(async () => { const before = (document.querySelector('#fabPark .tc-badge') || {}).textContent || '0'; IngInbox.tc.add('An invented thought for the test'); saveState(); await new Promise(r => setTimeout(r, 200));
     return { before, after: (document.querySelector('#fabPark .tc-badge') || {}).textContent, shown: !(document.querySelector('#fabPark .tc-badge') || {}).hidden }; });
   ok(+badge.after === +badge.before + 1 && badge.shown, 'the thought cloud\'s number still counts', badge);
-  // 4. the keys
-  await p.evaluate(() => go('chat')); await p.waitForTimeout(900);
-  const tok = await p.evaluate(() => { const r = getComputedStyle(document.documentElement), t = document.getElementById('r248-tok'), t7 = document.getElementById('r247-tok');
-    return { pop: r.getPropertyValue('--pop').trim(), edge: r.getPropertyValue('--key-edge').trim(), inHead: !!(t && t.parentNode === document.head), after: !!(t7 && t && (t7.compareDocumentPosition(t) & 4)) }; });
-  // 6.53: Carpe Diem's recipe (modules/r251.js) follows 6.51's
-  ok(/inset 0 -1\.5px 0 rgba\(16,\s*42,\s*58,\s*\.16\)/.test(tok.pop) && /0 2px 0 rgba\(16,\s*42,\s*58,\s*\.30?\)/.test(tok.pop) && /0 9px 14px rgba\(16,\s*42,\s*58,\s*\.13\)/.test(tok.pop) && !/93,\s*55,\s*161|#fff/.test(tok.pop),
-    'the key (6.53): Carpe Diem\'s slate edge and casts, no lavender, no gloss line', tok);
-  ok(tok.inHead && tok.after, 'the recipe sits in the head after 6.49\'s, where the Author Studio\'s look can follow it', tok);
-  const k = await p.evaluate(() => { const b = document.getElementById('chatCtlBtn'); b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(), c = getComputedStyle(b); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, bg: c.backgroundImage, sh: c.boxShadow }; });
-  ok(!/rgb\(235, 228, 246\)/.test(k.bg) && /rgb\(255, 255, 255\), rgb\(255, 255, 255\)|none/.test(k.bg), 'by day a key\'s face is flat white, as Carpe Diem\'s (6.53)', k.bg);
-  ok(/rgba\(16, 42, 58, 0\.3\) 0px 2px 0px/.test(k.sh) && !/93, 55, 161|40, 22, 68/.test(k.sh), 'Controls stands on Carpe Diem\'s slate edge, with no purple in its shadow (6.53)', k.sh);
-  await p.mouse.move(k.x, k.y); await p.waitForTimeout(500);
-  const hov = await p.evaluate(() => { const c = getComputedStyle(document.getElementById('chatCtlBtn')); return { tr: c.transform, sh: c.boxShadow }; });
-  ok(/matrix\(1, 0, 0, 1, 0, -2\)/.test(hov.tr) && /rgba\(16, 42, 58, 0\.3\) 0px 3px 0px/.test(hov.sh), 'under the pointer Controls rises 2 px and its edge grows to 3 px (6.53)', hov);
-  const gm = await p.evaluate(() => { const b = document.querySelector('.wa-hello .btn.ghost'); if (!b) return null; b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; });
-  if (gm) {
-    await p.mouse.move(gm.x, gm.y); await p.waitForTimeout(500);
-    const h2 = await p.evaluate(() => getComputedStyle(document.querySelector('.wa-hello .btn.ghost')).transform);
-    await p.mouse.down(); await p.waitForTimeout(200);
-    const d2 = await p.evaluate(() => getComputedStyle(document.querySelector('.wa-hello .btn.ghost')).transform);
-    await p.mouse.move(5, 300); await p.mouse.up(); await p.waitForTimeout(300);
-    const after = await p.evaluate(() => { const b = document.querySelector('.wa-hello .btn.ghost'), r = b.getBoundingClientRect(); return { w: r.width, h: r.height }; });
-    ok(/matrix\(1, 0, 0, 1, 0, -2\)/.test(h2), 'Get a model rises 2 px under the pointer (6.53)', h2);
-    ok(/matrix\(1, 0, 0, 1, 0, 1\)/.test(d2), 'pressed, it sits 1 px down, as Carpe Diem\'s (6.53)', d2);
-    ok(Math.abs(after.w - gm.w) < .6 && Math.abs(after.h - gm.h) < .6, 'and it keeps its size', { before: gm, after });
-  } else ok(false, 'Get a model is on the empty Chat page');
+  // 4. (the keys' recipe of 6.51 was taken out in 6.53, at her word: rig/t_653_look.js compares the keys with 6.9.4's)
   // 5. the empty Chat page
   const hello = await p.evaluate(() => { go('chat'); try { document.getElementById('chatNew') && document.getElementById('chatNew').click(); } catch (e) {} const h = document.querySelector('#chatScroll .cc-hello');
     return { has: !!h, ideas: document.querySelectorAll('#page-chat .cc-idea').length, keys: h ? [...h.querySelectorAll('.wa-hello button')].map(b => b.textContent.trim()) : [], words: h ? h.textContent.replace(/\s+/g, ' ').slice(0, 300) : '' }; });
@@ -119,12 +94,6 @@ const inside = () => document.getAnimations().filter(a => { const t = a.effect &
   ok(A.errs.length === 0, 'no errors on the page', A.errs);
   await A.ctx.close();
   // 6. night, Flat and reduced motion keep their own ways
-  const N = await open(b); const n = N.p;
-  const night = await n.evaluate(() => { document.body.setAttribute('data-theme', 'night'); go('chat'); const b = document.getElementById('chatCtlBtn'); return getComputedStyle(b).backgroundImage; });
-  ok(!/rgb\(235, 228, 246\)/.test(night), 'at night a key keeps its own face', night);
-  const flat = await n.evaluate(() => { document.body.setAttribute('data-theme', 'day'); document.body.setAttribute('data-depth', 'flat'); const b = document.getElementById('chatCtlBtn'); return { bg: getComputedStyle(b).backgroundImage, pop: getComputedStyle(document.body).getPropertyValue('--pop') }; });
-  ok(!/rgb\(235, 228, 246\)/.test(flat.bg) && !/key-edge|93,\s*55,\s*161/.test(flat.pop), 'Display\'s Flat depth keeps every key flat', flat);
-  await N.ctx.close();
   const R = await open(b, { reducedMotion: 'reduce' }); const r = R.p;
   await r.evaluate(() => go('chat')); await r.waitForTimeout(700);
   const g3 = await r.evaluate(() => { const b = document.querySelector('.wa-hello .btn.ghost'); if (!b) return null; const q = b.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; });

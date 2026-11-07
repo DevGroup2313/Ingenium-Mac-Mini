@@ -49,7 +49,7 @@
 /* the key beside the message box */
 #chatModelBtn .wa-where{font:700 9.5px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:999px;
   background:var(--accent-softer);color:var(--accent-deep,var(--accent));white-space:nowrap}
-#chatModelBtn.wa-attn{border-color:rgba(var(--accent-line-rgb),.75);box-shadow:0 0 0 3px rgba(var(--accent-line-rgb),.14)}
+/* (6.53: no ring round the key while nothing answers, at her word against a purple glow; its words say it) */
 #chatModelBtn.wa-attn .nm{color:var(--accent-deep,var(--accent));font-weight:700}
 
 /* Who answers, under the top bar's key */

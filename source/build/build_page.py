@@ -1787,25 +1787,6 @@ def _script_map(text):
     end = text.find('<script id="' + _tail.PRE)
     end = end if end > 0 else len(text)
     return [min(999, int(m * 1000 / end)) for m in marks]
-# ---- 6.53 (7 November 2026). Her words: "You keep adding this freaking purple glow under every fucking button which is exatcly what I
-#      have repeatedly told you that I DO NOT WANT" and "I want full parity with Carpe Diem's buttons and acrylic surfaces". Every
-#      shadow, edge and rim drawn in Ingenium's purple ink, rgb(40,22,68) or rgb(40,20,70), is drawn in Carpe Diem's slate,
-#      rgb(16,42,58), as modules/r251.js says for the recipes. Only a colour that follows a length in its declaration (a shadow, an
-#      edge, a border) is changed; a text colour, a fill or a gradient keeps its own. ----
-_ink = re.compile(r"rgba\(\s*40\s*,\s*2[02]\s*,\s*(?:68|70)\s*,")
-_inked = [0, 0]
-def _slate(m):
-    s, i = m.string, m.start()
-    k = max(s.rfind(c, max(0, i - 600), i) for c in ";{}\"'")
-    decl = s[k + 1:i]
-    val = decl.split(":", 1)[1] if ":" in decl else decl
-    if re.search(r"\d(?:\.\d+)?px\b", val):
-        _inked[0] += 1
-        return "rgba(16,42,58,"
-    _inked[1] += 1
-    return m.group(0)
-out = _ink.sub(_slate, out)
-print("6.53: %d shadows, edges and rims drawn in slate; %d other uses of the ink kept" % tuple(_inked))
 # 6.8.1: what is carried for later goes to the end of the page, after its last part (tail.py); the bar measures the page
 # up to there
 import tail as _tail
