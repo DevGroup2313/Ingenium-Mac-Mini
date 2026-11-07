@@ -209,10 +209,11 @@ function brief(c,earlier,room){var L=[],me=earlier.filter(function(x){return x.r
   var a=day(earlier[0]&&(earlier[0].at||earlier[0].done)),b=day(earlier[earlier.length-1]&&(earlier[earlier.length-1].at||earlier[earlier.length-1].done));
   if(c&&c.imported)L.push("This conversation was carried over from "+(c.imported.from||"another assistant")+(c.imported.at?" ("+day(c.imported.at)+")":"")+"."+(c.imported.brief?" "+c.imported.brief:""));
   if(c&&c.summary)L.push("A summary of it so far: "+String(c.summary).slice(0,Math.floor(room*0.6)));
-  if(me.length){var first=String(me[0].text).replace(/\s+/g," ").trim();L.push("It began with this request: \""+(first.length>500?first.slice(0,497)+"…":first)+"\"");}
-  if(me.length>2){var k=Math.min(14,me.length-1),pts=[];for(var i=1;i<=k;i++){var j=Math.round(i*(me.length-1)/k);var s=line1(me[j].text);if(s&&pts.indexOf(s)<0)pts.push(s);}
+  var comp=(c&&c.summary&&c.compacts&&c.compacts.length)?c.compacts[c.compacts.length-1]:null;  /* 6.47: compacted (modules/r245.js): the summary takes their place */
+  if(me.length&&!comp){var first=String(me[0].text).replace(/\s+/g," ").trim();L.push("It began with this request: \""+(first.length>500?first.slice(0,497)+"…":first)+"\"");}
+  if(me.length>2&&!comp){var k=Math.min(14,me.length-1),pts=[];for(var i=1;i<=k;i++){var j=Math.round(i*(me.length-1)/k);var s=line1(me[j].text);if(s&&pts.indexOf(s)<0)pts.push(s);}
     L.push("What was asked along the way, in order:\n"+pts.map(function(s){return "- "+s;}).join("\n"));}
-  var out="["+earlier.length+" earlier messages"+(a?", from "+a+(b&&b!==a?" to "+b:""):"")+", are not shown in full: the conversation is longer than the model's memory.]\n"+L.join("\n");
+  var out=(comp?"["+earlier.length+" earlier messages"+(a?", from "+a+(b&&b!==a?" to "+b:""):"")+", were compacted"+(comp.at?" on "+day(comp.at):"")+": the summary below takes their place.]\n":"["+earlier.length+" earlier messages"+(a?", from "+a+(b&&b!==a?" to "+b:""):"")+", are not shown in full: the conversation is longer than the model's memory.]\n")+L.join("\n");
   return out.length>room?out.slice(0,room-1)+"…":out;}
 /* the room recalled: about a quarter of the memory, and no longer 16,000 characters at most whatever the memory (a window
    of 200,000 tokens recalls about 48,000 characters) */

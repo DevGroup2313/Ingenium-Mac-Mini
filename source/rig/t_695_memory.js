@@ -121,7 +121,7 @@ const send = async (p, text) => { const n0 = await p.evaluate(() => curMsgs().le
     const m5 = await p.evaluate(() => ({ line: document.getElementById('ctlMemUse').textContent, pill: document.getElementById('ingMemPill').textContent, title: document.getElementById('ingMemPill').title, use: IngMem.use.last, win: IngMem.window(), fit: document.getElementById('ctlCtxFit').textContent }));
     ok(/^Memory in use: 17 of 1,000,000 tokens \(0%\) · \d+ messages? in the window$/.test(m5.line) && m5.use && m5.use.inTok === 10 && m5.use.outTok === 7 && /service's own count/.test(m5.use.how),
       'the meter under the slider: the service\'s own count (10 in, 7 out) of 1,000,000, and the messages in the window', m5.line);
-    ok(/^17 of 1M$/.test(m5.pill.trim()) && /Memory in use: 17 of 1,000,000/.test(m5.title) && m5.fit === '', 'the pill beside the model key says the same in short, and opens Controls; no fit verdict for a connection', { pill: m5.pill, title: m5.title.slice(0, 80) });
+    ok(/^17 of 1M$/.test(m5.pill.trim()) && /Memory in use: 17 of 1,000,000/.test(m5.title) && m5.fit === '', 'the pill beside the model key says the same in short (it opens Context since 6.47); no fit verdict for a connection', { pill: m5.pill, title: m5.title.slice(0, 80) });
     // a reply of more than 32,000 tokens through the apps' relay is given 1,800 seconds
     const relaySeen = [];
     await p.route('**/_relay', async route => { const j = route.request().postDataJSON(); relaySeen.push({ url: j.url, timeout: j.timeout, max: (() => { try { return JSON.parse(j.body).max_tokens; } catch (e) { return null; } })() });
@@ -181,7 +181,7 @@ const send = async (p, text) => { const n0 = await p.evaluate(() => curMsgs().le
       state.cloud = { provider: 'ingenium', base: 'http://10.0.0.2:17953', key: 'k', model: 'scriba', models: ['scriba'], on: true, info: { scriba: { lineup: '', file: 'scriba.gguf', size: 1 } } }; state.chatSource = 'cloud';
       const m = { id: 'x', fileState: 'ready' }; const unknown = lxCtx(m); state.cloud.info.scriba.ctx = 65536; const known = lxCtx(m); state.cloud.info.scriba.ctx = 1000000; const capped = lxCtx(m);
       state.cloud = JSON.parse(keep); state.chatSource = ks; return { unknown, known, capped }; });
-    ok(w8 === null || (w8.unknown === 8192 && w8.known === 65536 && w8.capped === 262144), 'the reading page keeps 8,192 on a lender whose window is unknown, follows it when known, and stops at 262,144', w8);
+    ok(w8 === null || (w8.unknown === 8192 && w8.known === 65536 && w8.capped === 1000000), 'the reading page keeps 8,192 on a lender whose window is unknown and follows it when known, the whole of it (6.44 took the hold at 262,144 away)', w8);
     ok(!p.__errs.length, 'no page errors', p.__errs.slice(0, 5));
     await p.screenshot({ path: path.join(OUT, 'controls.png') }).catch(() => { });
   } catch (e) { ok(false, 'the run crashed', e.stack); }

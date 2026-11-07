@@ -63,7 +63,8 @@ const sse = (text) => 'data: ' + JSON.stringify({ choices: [{ index: 0, delta: {
   ok(bl === LIM, 'a request on its own connection (Blend) is asked within the figure kept for the model', bl);
   // ---- Ollama ----
   const OB = new URL(URL_).origin + '/mockollama';
-  await p.evaluate((OB) => { state.cloud = { on: true, provider: 'ollama-lan', base: OB, key: '', model: 'invented-local:8b', models: ['invented-local:8b', 'invented-small:1b'] }; state.chatSource = 'cloud'; saveState(); }, OB);
+  // compacting by itself (6.47) is turned off here: these checks are about the memory each request is given, not the summary
+  await p.evaluate((OB) => { state.cloud = { on: true, provider: 'ollama-lan', base: OB, key: '', model: 'invented-local:8b', models: ['invented-local:8b', 'invented-small:1b'] }; state.chatSource = 'cloud'; state.compactAuto = false; saveState(); }, OB);
   const ochat = async (text, history) => { await p.evaluate(() => go('chat')); await p.waitForTimeout(250);
     await p.evaluate(() => { const n = document.getElementById('chatNew'); if (n) n.click(); }); await p.waitForTimeout(250);
     await p.evaluate(() => { const t = document.getElementById('ctlTokens'); t.value = '1024'; });

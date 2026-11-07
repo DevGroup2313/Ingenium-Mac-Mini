@@ -397,6 +397,36 @@ improved and be more acessible to me, its a bit flawed right now."
     node rig/t_646_switch.js <url> <out>   # stand-ins for Anthropic, Ollama on another computer and a service with 41 models: nothing set up;
                                            # the sheet's three steps; the menu's Who answers and Find a model; the top bar; Settings
 
+Ingenium 6.47 (7 November 2026): context and compacting, slash commands, connectors in Code's + menu. Her words (6 November 2026): "I want
+for Ingenium's sessions to be automatically compacted like they are on Claude's code chats, the same for the regular chats. I want the
+option to have it compacted automatically or to click and compact it myself if I choose to. Please add that function to Ingenium. I also
+want the option to add connectors and slash commands in the coding chats in Ingenium. I want full parity with Claude's chat pages for
+Ingenium's chat pages please."
+
+- modules/r245.js (new). Measured on 6.46: a conversation longer than the model's memory lost its oldest messages quietly at each send
+  (the window moved on; once twenty messages had gone, r195 wrote a summary of 250 words in the background and recalled it with the
+  newest message); nothing showed it, nothing could be pressed to do it, and it could not be turned off. The memory key opened
+  Controls; Code's session column showed the share used and nothing to do about it; "/" did nothing except in a Code session on a GitHub
+  repository (r219's six commands); Code's + menu had no Slash commands, and Connectors stood eleventh in it.
+  Now Context opens from the memory key, /context and Code's session column: the share of the model's memory the conversation fills
+  (an estimate at 3 characters a token on this device, 2.5 for a connection, and the model's own count of the last reply when it gave
+  one), part by part (instructions, the earlier part's summary, the conversation, files, the room kept for the reply), when it compacts by
+  itself, Automatic on or off, and Compact now with what to keep in focus. Compacting asks the model in use to summarise everything before
+  the newest messages (a quarter of the memory at most, the last exchange at least, twelve messages at most), in rounds that fit its
+  memory beside the summary so far, building on the summary already written (c.summary, c.summaryN); the boundary message is marked
+  (winStart, compactStart) so the conversation sent starts there, and r159's and r195's recall gives the model the summary in that
+  part's place (r195's brief now says the part was compacted). Every message stays on the page; a line marks the boundary, with the
+  summary to read. Automatic (state.compactAuto, on by default) compacts before a message is sent (sendRec) when the conversation would
+  fill more than 85 percent of the memory and a model is ready to write the summary; Stop ends it. Slash commands: "/" at the start of
+  the message box opens the list (arrows, Enter or Tab, Escape), a command sent runs (the send key too): /compact, /context, /clear, /model,
+  /connect, /connectors, /effort, /think, /fast, /research, /web, /remember, /help; in Code /plan and /session, and on a GitHub repository
+  r219's six in the same list (r219's own list stands aside). The + menu has Slash commands; Code's + menu opens with Add files or
+  photos, Slash commands and Add connectors. Code's session column has Compact now, Automatic and Details beside its Context bar.
+
+    node rig/t_647_compact.js <url> <out>   # a stand-in model on this device: Context, Compact now (the summary in the earlier part's
+                                            # place, the line, every message kept), Automatic before a send and off, the focus,
+                                            # the slash list and commands, the + menus, Code's column
+
 Ingenium 6.46 (7 November 2026): a model thinks briefly and answers; sources when she asks; titles shown twice removed; every
 provider within its model's limits. Built on the other session's 6.45 (claude/dreamy-fermi-9ourlk), whose lighter presses (r230,
 r172) stand in for the same two fixes made here. Her words (6 November 2026): "The models inside of the chats of Ingenium spend more time debating the prompts and saying "Wait"
