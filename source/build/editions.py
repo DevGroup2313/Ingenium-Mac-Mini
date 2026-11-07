@@ -575,6 +575,10 @@ def _no_lakay():
          "no Lakay page known by name", 1),
         ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
          "no Lakay build number read", 1),
+        # its line in What is new (shown in the master edition alone) is not carried either, so its name is nowhere in the page
+        ('  ["6.55","Lakay, your store\'s app, is carried inside Ingenium at its latest build and kept with your other apps on first start: in '
+         'Lector, in Fabrica\'s app library and wherever your apps are listed, with its Spiral in its seven layers.","master"],\n', "",
+         "What is new without Lakay", 1),
     ]
 
 

@@ -13,7 +13,7 @@
 //   - Lakay: carried, kept on first start (checked against its fingerprint), listed with her apps after the four, by name and build, in
 //     Lector (with its mark in seven layers) and in Fabrica's app library; brought into Fabrica, it is an app with its own mark;
 //   - Lector prepares an app in its worker, with the same result as on the page; choosing a tile leaves no long pause on the page;
-//   - in every other edition given: no Lakay anywhere in the page;
+//   - in every other edition given: not Lakay's name, its page, its mark or its build;
 //   - no errors on the page.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const args = process.argv.slice(2); const OTHERS = args.filter(a => a.startsWith('other=')).map(a => a.slice(6)); const [URL_, OUT] = args.filter(a => !a.startsWith('other='));
@@ -88,6 +88,7 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   await A.ctx.close();
   // 7. no Lakay in any other edition
   for (const u of OTHERS) { const html = await (await fetch(u)).text();
-    ok(!/ing-builtin-lakay|lakay-build|"lakay"|lakay:"Lakay"|LX7_LAYERS[^;]{0,200}lakay/i.test(html) && !/\bLakay\b/.test(html), 'no Lakay in ' + u.split('/').pop()); }
+    // (the app's key, lakay, may appear in code as her other apps' keys do; neither its name, its page, its mark nor its build is there)
+    ok(!/ing-builtin-lakay|lakay-build|lakay:"Lakay"|"lakayN"/i.test(html) && !/\bLakay\b/.test(html), 'no Lakay in ' + u.split('/').pop() + ': not its name, its page, its mark or its build'); }
   await b.close(); console.log('\n' + pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
 })().catch(e => { console.log('failed: ' + e.message); process.exit(1); });
