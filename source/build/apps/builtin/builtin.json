@@ -28,5 +28,16 @@
   "size": 4135326,
   "sha256": "0b9d2835b283dad8e40d736e4ec314fd9055d313308ad8b8cacb532b5f323db9",
   "name": "inkwell_752.html"
+ },
+ "lakay": {
+  "key": "lakay",
+  "title": "Lakay",
+  "version": "3",
+  "build": "",
+  "date": "2026-11-07",
+  "color": "#6f78d8",
+  "size": 876096,
+  "sha256": "cbe5ada04484b82708ac48d4925e8d7311951e7f6647f8e431e234859d8568f9",
+  "name": "Lakay.html"
  }
 }

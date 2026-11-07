@@ -86,17 +86,24 @@ body[data-theme="night"] .blx-ok{color:#8fd0a9}body[data-theme="night"] .blx-bad
    look of the page, it needs some light colours so it does not look plain, and match the rest of the page's colours." A lavender
    key: a lilac face, the accent's words, a faint violet edge and lift, Blend's own mark (its two circles) beside the words; by night
    a deep plum face with lavender words. It rises and seats as the keys beside it do. */
+/* 6.55, her words (7 November 2026): "The Check with Blend button looks flat and has that glossy look with the heavy purple shadow. I want
+   fixed to actually look like a clickable 3D button". Its lilac face and Blend's mark stay; the bright line along its top (the gloss) and
+   the violet glow beneath it (the heavy purple shadow) give way to a key's body: a solid edge 2px deep in a deeper lilac, and soft casts
+   in the page's own shade, as every key of Ingenium has; pointed at, it rises 2px and the edge grows to 3px; pressed, it sinks. */
 .msg-act.blx-chk{display:inline-flex;align-items:center;gap:6px;color:#5b2fa8;border:1px solid rgba(106,63,181,.34);
-  background:linear-gradient(180deg,#f7f1ff 0%,#ebdfff 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(106,63,181,.10),0 1px 0 rgba(106,63,181,.16),0 3px 8px rgba(106,63,181,.13)}
+  background:linear-gradient(180deg,#f5eeff 0%,#ebdfff 100%);transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease,background .15s ease;
+  box-shadow:inset 0 -1.5px 0 rgba(91,47,168,.12),0 2px 0 #c9b6ea,0 4px 5px rgba(40,22,68,.14),0 9px 14px rgba(40,22,68,.09)}
 .msg-act.blx-chk svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;opacity:.9}
-.msg-act.blx-chk:hover{color:#4a2194;border-color:rgba(106,63,181,.55);background:linear-gradient(180deg,#f2e9ff 0%,#e1d0ff 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 2px 0 rgba(106,63,181,.18),0 7px 16px rgba(106,63,181,.20)}
-.msg-act.blx-chk:active{background:linear-gradient(180deg,#e6d8ff 0%,#efe6ff 100%);box-shadow:inset 0 2px 5px rgba(74,33,148,.22)}
+.msg-act.blx-chk:hover{color:#4a2194;border-color:rgba(106,63,181,.5);background:linear-gradient(180deg,#f1e8ff 0%,#e4d4ff 100%);transform:translateY(-2px);
+  box-shadow:inset 0 -1.5px 0 rgba(91,47,168,.12),0 3px 0 #c9b6ea,0 6px 8px rgba(40,22,68,.16),0 13px 20px rgba(40,22,68,.11)}
+.msg-act.blx-chk:active{background:linear-gradient(180deg,#e9dcff 0%,#efe6ff 100%);transform:translateY(1px);transition-duration:.06s;
+  box-shadow:inset 0 2px 5px rgba(74,33,148,.22),0 1px 1px rgba(40,22,68,.16)}
 .msg-act.blx-chk:focus-visible{outline:2px solid #6a3fb5;outline-offset:2px}
 body[data-theme="night"] .msg-act.blx-chk{color:#e6dbff;border-color:rgba(183,156,230,.5);background:linear-gradient(180deg,rgba(150,110,220,.34) 0%,rgba(110,72,180,.26) 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(0,0,0,.30),0 1px 0 rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.30)}
-body[data-theme="night"] .msg-act.blx-chk:hover{color:#f3edff;border-color:rgba(200,178,240,.7);background:linear-gradient(180deg,rgba(165,125,232,.42) 0%,rgba(120,80,190,.32) 100%)}
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.35),0 2px 0 rgba(0,0,0,.7),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36)}
+body[data-theme="night"] .msg-act.blx-chk:hover{color:#f3edff;border-color:rgba(200,178,240,.7);background:linear-gradient(180deg,rgba(165,125,232,.42) 0%,rgba(120,80,190,.32) 100%);
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 rgba(0,0,0,.7),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38)}
+body[data-theme="night"] .msg-act.blx-chk:active{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
 body[data-depth="flat"] .msg-act.blx-chk{box-shadow:0 1px 2px rgba(106,63,181,.14)}
 /* 6.39: a blend's error note by day in a darker amber (#8a5a12 on white: 5.9 to 1; the warning colour #b8791f gave 3.6 to 1, under
    the 4.5 to 1 small text needs; axe-core, rig/t_67_rooms.js); by night the warning colour reads well on the dark card */

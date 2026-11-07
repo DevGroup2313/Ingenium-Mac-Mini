@@ -46,6 +46,8 @@ function more(text){var cuts=[],m,s,e,re=/>[\t ]*[A-Za-z0-9+\/=]{4000}/g;
   cuts.forEach(function(c){if(c[0]<last)return;out.push(text.slice(last,c[0]),"[encoded data, "+size(c[1]-c[0])+", left out here]");bytes+=c[1]-c[0];last=c[1];n++;});
   out.push(text.slice(last));return {text:out.join(""),n:n,bytes:bytes};}
 if(typeof W.ingStripMedia==="function"){var oStrip=W.ingStripMedia;
+  /* 6.55: the same two passes, for Lector's preparation in a worker (modules/r253.js) */
+  W.IngStripMore={base:oStrip,src:[endOf,more,size].map(String).join("\n"),b64n:B64N};
   W.ingStripMedia=ingStripMedia=function(text){var r=oStrip.apply(this,arguments);try{var x=more(r.text);if(x)return {text:x.text,n:r.n+x.n,bytes:r.bytes+x.bytes};}catch(e){}return r;};}
 
 /* ---------- 3. texts worked out once: a file's code without its data, its parts, its index ---------- */

@@ -26,6 +26,8 @@ THEMES.cd.roman=1;THEMES.cd.fr="8DB5CA";THEMES.forge.roman=1;THEMES.forge.fr="B4
 function roman(n){var v=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]],r="";v.forEach(function(p){while(n>=p[0]){r+=p[1];n-=p[0];}});return r;}
 var LATIN=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVGVSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
 var NAMES={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"};
+/* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!NAMES.lakay)NAMES.lakay=LIB_NAMES.lakay;}catch(e){}
 var PW=595.28,PH=841.89,ML=72,MR=72,MT=72,MB=64,TW=PW-ML-MR;
 function code(ch){var c=ch.charCodeAt(0);if(c>=32&&c<127)return c;if(c>=160&&c<=255)return c;if(HI[c])return HI[c];if(c===9)return 32;return null;}
 /* text in WinAnsi bytes; anything else becomes its plain equivalent */

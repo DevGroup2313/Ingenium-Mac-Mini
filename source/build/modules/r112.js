@@ -405,6 +405,8 @@ function when(t){if(!t)return "";var d=new Date(t),now=new Date(),same=d.toDateS
   return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+(d.getFullYear()!==now.getFullYear()?" "+d.getFullYear():"")+", "+hm;}
 var APPS={cd:{name:"Carpe Diem",color:"#1B6B93"},forge:{name:"The Forge",color:"#17577A"},ingenium:{name:"Ingenium",color:"#6A3FB5"},inkwell:{name:"Inkwell",color:"#1F4F68"}};
 var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
+/* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!APPS.lakay){APPS.lakay={name:LIB_NAMES.lakay,color:"#5c63c6"};DELAY.lakay=6.8;}}catch(e){}
 function appOf(r){return r&&r.app&&APPS[r.app]?r.app:null;}
 function colorOf(r){var k=appOf(r);return k?APPS[k].color:"#b88a3a";}
 /* 6.40: the Offline Project wears its own crest here, as each of the four apps wears its seal. Her words (6 November 2026): "I want the

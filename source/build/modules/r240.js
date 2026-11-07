@@ -85,9 +85,11 @@ letGo();try{setTimeout(letGo,2500);}catch(e){}
 var oRep=W.repaintDesk;if(typeof oRep==="function")W.repaintDesk=function(){var r=oRep.apply(this,arguments);letGo();return r;};
 
 /* ---------- the list of the library: her four first, then any other app by name ---------- */
+/* 6.55: Lakay, her store's app, is one of her apps by name (LIB_KEYS) and is listed as the others after the four are: by name, in its colour */
+var BEYOND=["lakay"];
 function otherKeys(){var A=libState().apps;if(!allowed())return [];
-  return Object.keys(A).filter(function(k){return /^app-/.test(k)&&A[k]&&A[k].ref;}).sort(function(a,b){return String(A[a].title||a).localeCompare(String(A[b].title||b));});}
-function libKeys(){letGo();var base=(typeof LIB_KEYS!=="undefined"&&LIB_KEYS)?LIB_KEYS.slice():[];return base.concat(otherKeys());}
+  return Object.keys(A).filter(function(k){return (/^app-/.test(k)||BEYOND.indexOf(k)>=0)&&A[k]&&A[k].ref;}).sort(function(a,b){return String(A[a].title||a).localeCompare(String(A[b].title||b));});}
+function libKeys(){letGo();var base=(typeof LIB_KEYS!=="undefined"&&LIB_KEYS)?LIB_KEYS.filter(function(k){return BEYOND.indexOf(k)<0;}):[];return base.concat(otherKeys());}
 function libName(k){try{if(typeof LIB_NAMES!=="undefined"&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}var m=rec(k);return (m&&m.title)||String(k||"");}
 function appColor(k){var m=rec(k);return (m&&m.color)||tone(k);}
 W.libOtherKeys=otherKeys;W.libKeys=libKeys;W.libName=libName;W.libAppColor=appColor;

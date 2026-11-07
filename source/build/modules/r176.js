@@ -469,7 +469,10 @@ D.addEventListener("keydown",function(e){if(!e.isTrusted||(e.key!=="Enter"&&e.ke
    sound choices (Listen must be heard alone), never at the welcome door (it has its own). It never holds back the other
    sounds: a key's press is not counted as the last sound. */
 var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role="tab"],.ib-key,.chip,.menu-btn,.rail-btn,.chat-top-key,.effort-opt,.bk-key,.l-btn,.cs-key,.quick,.src-btn,.cplus-btn,.stage-pill,.fo-k,.rc-k,'+
-  '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
+  '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act,'+
+  /* 6.55: Home's greeting card keys and its rows of recent work, which never had the keys' sound (her words: "I want both the sound and
+     animations restored for those buttons"); and the Check with Blend key under a reply */
+  '.hx-btn,.hx-item,.blx-chk',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
 function keyDown(k,e){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
   if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
   var now=Date.now();if(now-keyAt<(ROLE_GAP.keys||35))return false;var L=lvl("keys");if(!(L>0))return false;keyAt=now;

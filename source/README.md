@@ -371,6 +371,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.55 (7 November 2026): the greeting card's keys as every key, Check with Blend in 3D, the chat greets her by name, Lector
+answers at once, Lakay among her apps, and a Mac start that never opens without her work. Her words (7 November 2026): "The Link your
+file again, take the guided tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no
+sound and just look stuck to the card ... I want both the sound and animations restored for those buttons"; "The Check with Blend button
+looks flat and has that glossy look with the heavy purple shadow"; "Clicking on any of the 4 apps inside of the "Your apps" section of the
+Lector page feels really heaving and slow"; "I want the Chat pages inside of Ingenium to be aware of who I am and actually greet me like
+the Home page does"; and of Lakay: "I want its latest build embedded into Ingenium just like my other apps so that I can continue working
+on it and developing it further." She approved the preview before it shipped.
+
+- modules/r147.js: the greeting card's keys keep 6.53's size and white face and take Ingenium's own keys' edge, casts, rise (2px, the
+  edge to 3px), press (1px, the edge pressed in) and spring, measured from .btn and .btn.primary on Chat and Models, by day and night.
+  modules/r176.js: they, Home's rows of recent work and Check with Blend are among the keys that sound (they never were).
+- modules/r218.js: Check with Blend keeps its lilac face; its bright top line and violet glow give way to a solid edge (#c9b6ea), soft
+  casts in the page's shade, the keys' rise and press.
+- build_page.py: the empty Chat and Code pages find her name as Home does (her profile, else the author's name Lector writes under; its
+  first word); Code's empty page greets her and asks what to build beneath.
+- Her screenshots of the evening showed Chat, Code and Models empty. Measured: the 6.53 and 6.54 pages show the same Chat, Code and Home
+  with the same data (rig: the same text and keys, no errors). The Mac app keeps her work at one address (127.0.0.1:17953, R58); a copy
+  that cannot take that port opens at the next, with a store of its own: empty. Two ways to get there were found and closed in
+  build/desktop/app_port_655.py: another Ingenium still holding the port (this copy now says so and ends; Windows already stopped a
+  second copy), and a copy opened again within the minute the closed one's connections linger (TIME_WAIT; the server now reuses its
+  address on the Mac and Linux, SO_REUSEADDR, which still refuses a port another program listens on). Her work stays at 17953.
+- Lector (modules/r253.js, new; r108.js, r158.js): choosing The Forge read its 14 MB page and prepared it (pictures set aside, code,
+  styles and markup separated, words, notes and inventory gathered) on the page's own thread: about 1.4 s, in pieces of up to half a
+  second (with the computer slowed four times: pauses of 0.7 and 1.9 s; Inkwell 1.8 and 3.8 s). The same preparation now runs in a
+  worker built from the page's own functions (the same result for all five apps, compared whole), from the bytes the library keeps,
+  handed over without a copy; the brief's parts are counted once for each depth and model memory; a tile's seal is made once and moved
+  into the tile drawn again (a click redrew 31 pictures, half a megabyte). Choosing The Forge now leaves no pause above 0.1 s (57 ms).
+- Lakay (apps/builtin, apps/update_builtin.py, apps/lakay_mark.py; build_page.py, editions.py; modules/r120.js, r240.js, r112.js,
+  r109.js, r147.js): its latest page (Build 3 of Lakay-Windows, 7 November 2026, its fingerprint as its repository publishes it) is
+  carried in the master edition, checked and kept on first start; the library knows it by name, its page and its build number; it is
+  listed after the four, by name and in its colour, in Lector, Fabrica's app library and wherever her apps are listed, with its Spiral in
+  seven layers (its own depths) and its seal; brought into Fabrica, it is an app with its mark. update_builtin.py now takes any of the
+  pages it knows, in any order, and keeps the others as they are. No other edition carries or names Lakay.
+
+    node rig/t_655_fixes.js <url> <out> [other=<edition url> ...]   # the keys, Check with Blend, the greeting, Lakay, Lector (23 checks)
+    python3 rig/t_655_port.py <repo>/ingenium_app.py                 # a second copy, a quick restart (6 checks)
+
 Ingenium 6.54 (7 November 2026): 6.8.7's motion again, Home's sparks drawn lightly, and the greeting card's keys. Her words (7 November
 2026): "I want the 3D look and animation of build 6.8.7, I want everything else to stay the same in Ingenium. I only want for the buttons
 inside of the "Good morning, ..." card on the Home page to be made slightly smaller but keep the acrylic chunky look"; "I like the white

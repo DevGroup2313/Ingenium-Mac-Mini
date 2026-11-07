@@ -18,7 +18,7 @@
 (function r120(){
 var BI=/*R120_BUILTIN*/null;
 if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
-var KEYS=["inkwell","forge","cd"].filter(function(k){return BI[k];}),DONE={},RUN=null;
+var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay */
 
 /* ---------- versions: a pass (630), a dotted version (7.42) or a Forge stamp (9s62); unlike kinds are not compared ---------- */
 function parts(v){v=String(v||"").trim();var m;
@@ -51,7 +51,7 @@ function unpack(k){var b=BI[k];
     return libSha(u8).then(function(h){if(h!==b.sha256)throw new Error(LIB_NAMES[k]+" did not unpack whole (its fingerprint differs)");return u8;});});}
 function keep(k){var b=BI[k];
   return unpack(k).then(function(u8){var text=new TextDecoder().decode(u8);
-    return libKeep(k,{title:b.title,version:b.version,build:b.build||"",date:b.date||"",size:b.size,sha256:b.sha256,name:b.name,source:"built in"},u8,text);});}
+    return libKeep(k,Object.assign({title:b.title,version:b.version,build:b.build||"",date:b.date||"",size:b.size,sha256:b.sha256,name:b.name,source:"built in"},b.color?{color:b.color}:{}),u8,text);});}
 /* a kept copy whose bytes are gone from this device is kept again */
 function present(m){if(!m||!m.ref)return Promise.resolve(false);
   return libTx("readonly",function(s){return s.count(m.ref);}).then(function(n){if(n>0)return true;

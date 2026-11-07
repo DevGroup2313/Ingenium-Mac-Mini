@@ -319,13 +319,17 @@ function modelPlan(){var o={link:false,key:null,spec:null,rec:null,chosen:null,n
 function strength(m){if(!m)return 0;try{var k=lineupKeyOfRec(m);if(k&&ING_LINEUP.models[k]&&ING_LINEUP.models[k].params)return ING_LINEUP.models[k].params;}catch(e){}
   var b=m.sizeBytes||m.fileSize||m.bytes||m.size||0;return b>1e6?b/7e8:(m.params||0);}
 function devName(d){return {"mac-arm":"this Mac","desktop":"this computer","android":"this tablet","ios":"this iPhone or iPad"}[d]||"this device";}
-function partsOf(k,depth,m){var p=R7.prep[k];if(!p||!p.P)return null;try{return lxPartsFor(p.P,depth,m).length;}catch(e){return null;}}
+/* 6.55: counted once for each depth and model memory (every paint of the brief counted the parts again) */
+function partsOf(k,depth,m){var p=R7.prep[k];if(!p||!p.P)return null;try{var key=depth+"|"+(typeof lxCtx==="function"?lxCtx(m):"");p.cnt=p.cnt||{};if(p.cnt[key]==null)p.cnt[key]=lxPartsFor(p.P,depth,m).length;return p.cnt[key];}catch(e){return null;}}
 R7.prep={};
 /* her apps measured once each, in the background, so the brief can say how many parts a reading takes */
 var prepQ=Promise.resolve();
 function prepare(k){var meta=kept(k);if(!meta)return;try{if(/^app-/.test(k)&&window.libSealFor)libSealFor(k);}catch(e){}var p=R7.prep[k];if(p&&p.sha===meta.sha256)return;R7.prep[k]={sha:meta.sha256,P:null};
-  prepQ=prepQ.then(function(){if(LX.busy||R7.running)return;return libText(k).then(function(text){if(!text)return;
-      return lxPrepare(meta.name||(nm(k)+".html"),text,function(){}).then(function(P){R7.prep[k]={sha:meta.sha256,P:P};paintModel();});});}).catch(function(){});}
+  /* 6.55: prepared in Lector's worker from the bytes the library keeps (modules/r253.js); else, as before, from its text */
+  prepQ=prepQ.then(function(){if(LX.busy||R7.running)return;var name=meta.name||(nm(k)+".html"),done=function(P){R7.prep[k]={sha:meta.sha256,P:P};paintModel();};
+    var viaKey=window.IngLectorWorker&&IngLectorWorker.prepareKey?IngLectorWorker.prepareKey(k,name):Promise.resolve(null);
+    return viaKey.then(function(P){if(P)return done(P);return libText(k).then(function(text){if(!text)return;
+      return lxPrepare(name,text,function(){}).then(done);});});}).catch(function(){});}
 
 /* ---------------- the seals on the page: each app's own layers, swaying (never on the paper) ---------------- */
 function night(){return document.body.getAttribute("data-theme")==="night";}
@@ -345,6 +349,11 @@ function setCrest(apps,ck){var key=sorted(apps).join("+"),c=R7.crest;
   try{IngSeal.prepare(sorted(apps));}catch(e2){}
   return c.el;}
 function crestWords(ck){return {master:"The master seal",trio:"The Offline Project’s seal for these three",duo:"The duo’s seal"}[ck]||"";}
+/* 6.55: her words (7 November 2026): "Clicking on any of the 4 apps inside of the "Your apps" section of the Lector page feels really
+   heaving and slow". A click drew the brief again, and with it every tile's seal: 31 pictures, half a megabyte of them, decoded anew
+   each time. A tile's seal is now made once (by day and by night) and moved into the tile drawn again, its pictures already decoded. */
+var SEALC={};
+function sealOnce(k){var key=k+"|"+(night()?"n":"d");return SEALC[key]||(SEALC[key]=sealEl(k));}
 function sealEl(k){var L=LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key];
   /* 6.42: the Offline Project wears its crest, live, its quarters moving (modules/r140.js): the master seal, or the shield of three */
   if(!ls&&(k==="offline"||k==="offline3")&&window.IngSeal){try{var set=k==="offline"?FOUR.slice():["cd","forge","ingenium"],ar=IngSeal.aspect(set)||1.3333;
@@ -450,7 +459,7 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S
   var s1=sec("Your apps"),grid=h("div","l-apps");
   ORDER.forEach(function(k){var on=B.apps.indexOf(k)>=0,meta=kept(k),run=runFor(k,B.depth);
     var b=h("button","l-app"+(meta?"":" none"));b.type="button";b.style.setProperty("--app",APPS[k].color);b.setAttribute("aria-pressed",on?"true":"false");b.setAttribute("data-k",k);
-    b.appendChild(sealEl(k));b.appendChild(h("span","nm",esc(nm(k))));
+    b.appendChild(sealOnce(k));b.appendChild(h("span","nm",esc(nm(k))));
     var old=meta?staleRun(k,B.depth):null,fresh=old&&!useEarlier(k)?freshFor(k,B.depth):null;
     var st=!meta?"Not added yet":old&&!useEarlier(k)?(fresh?"Read in part: "+(fresh.done||0)+" of "+(fresh.total||0):"Read from "+(old.version||"an earlier copy")):run&&run.status==="done"?"Read "+lxDate(run.finished||run.updated):run?"Read in part: "+(run.done||0)+" of "+(run.total||0):"Not read yet";
     b.appendChild(h("span","st",esc(st+(meta&&meta.version?" · "+meta.version:""))));

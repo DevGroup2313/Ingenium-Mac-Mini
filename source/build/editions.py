@@ -564,10 +564,24 @@ def _reset_words(ed):
     return [(old, new, "Reset everything: what it clears, in this edition", 1)]
 
 
+def _no_lakay():
+    """6.55: Lakay, her store's app, is carried and named in the master edition alone: every other edition's app library has the list
+    it had before (and the full edition's rule below then leaves Ingenium alone in it), and knows no Lakay page by name."""
+    return [
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+         'var LIB_KEYS=["cd","forge","inkwell","ingenium"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium"};',
+         "the app library without Lakay", 1),
+        ('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n', "",
+         "no Lakay page known by name", 1),
+        ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
+         "no Lakay build number read", 1),
+    ]
+
+
 def edits(ed):
     if ed == "master":
         return []
-    E = _fixed_name()
+    E = _no_lakay() + _fixed_name()
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed

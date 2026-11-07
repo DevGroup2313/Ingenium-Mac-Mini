@@ -1497,6 +1497,37 @@ edit('  var ex2=el("div","cc-ideas");["Write a cover letter from my CV","Turn th
      '  return w;}',
      "6.51 the empty chat without its four ready-made ideas")
 
+# ---- 6.55 (7 November 2026): Lakay, her store's app, among her apps. Her words (7 November 2026): "I also want you to build into the
+#      app and add it to my other apps inside of Ingenium and its pages my latest app "Lakay". ... I want its latest build embedded into
+#      Ingenium just like my other apps so that I can continue working on it and developing it further." The app library knows it by
+#      name (Lakay), knows its page (its lakay-build line, or its title) and reads its build number as its version; the master edition
+#      carries its latest page (apps/builtin, below) and modules/r120.js keeps it on first start, as Carpe Diem, The Forge and Inkwell ----
+edit('var LIB_KEYS=["cd","forge","inkwell","ingenium"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium"};',
+     'var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+     "6.55 Lakay in the app library's list")
+edit('function libDetect(text){var head=String(text||"").slice(0,400000);\n',
+     'function libDetect(text){var head=String(text||"").slice(0,400000);\n'
+     '  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n',
+     "6.55 a Lakay page known as Lakay")
+edit('function libVersionOf(key,text){var s=String(text||""),m;\n',
+     'function libVersionOf(key,text){var s=String(text||""),m;\n'
+     '  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n',
+     "6.55 Lakay's build number as its version")
+
+# ---- 6.55 (7 November 2026): the empty Chat and Code pages greet her by name, as Home does. Her words (7 November 2026): "I want the
+#      Chat pages inside of Ingenium to be aware of who I am and actually greet me like the Home page does". Home finds her name in her
+#      profile, else in the author's name Lector writes under (modules/r147.js, hello), and uses its first word; the chat looked in the
+#      profile alone, so it said "Good evening" to her. Now both look in both. Code's empty page opens with the same greeting, and asks
+#      what to build beneath it. ----
+edit('  var nm="";try{nm=(personaGet().name||"").trim();}catch(e){}\n  if(CC.mode==="code"){var pr=ccProj();',
+     '  var nm="";try{nm=(personaGet().name||"").trim();}catch(e){}\n'
+     '  if(!nm){try{nm=(typeof lxhAuthor==="function"?lxhAuthor():"")||"";}catch(e){}}nm=String(nm||"").trim().split(/\\s+/)[0]||"";\n'
+     '  if(CC.mode==="code"){var pr=ccProj();',
+     "6.55 the chat finds her name as Home does")
+edit('w.appendChild(el("h2",null,"What shall we build?"));\n      w.appendChild(el("p",null,"Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
+     'w.appendChild(el("h2",null,part+(nm?", "+nm:"")));\n      w.appendChild(el("p",null,"What shall we build? Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
+     "6.55 Code's empty page greets her by name")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
@@ -1522,6 +1553,11 @@ if not _m:
     sys.exit("seal data: not found")
 _seals = json.loads(_m.group(2))
 _seals["master"] = _ms["day"]
+# 6.55: Lakay's seal (its Spiral laid flat, apps/lakay_mark.py), where Lakay is carried: the master edition, not the lean copy The Forge carries
+_LAKAY_MARK = None
+if editions.carries_apps(ED) and os.environ.get("ING_LEAN") != "1" and os.path.exists(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")):
+    _LAKAY_MARK = json.load(open(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")))
+    _seals["lakay"] = _LAKAY_MARK["seal"]["day"]
 out = out[:_m.start(2)] + json.dumps(_seals) + out[_m.end(2):]
 
 MARK = '<script>/* R95: every part has now wrapped'
@@ -1610,7 +1646,7 @@ _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
 # cannot hold a full copy of an app that holds a full copy of it back)
 if os.environ.get("ING_LEAN") == "1" or not editions.carries_apps(ED):  # 6.2: only the master edition carries the owner's apps
     _bi = {}
-for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Diem rides along too
+for _k in [k for k in ("forge", "inkwell", "cd", "lakay") if k in _bi]:  # R122: Carpe Diem rides along too; 6.55: and Lakay
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
@@ -1757,7 +1793,10 @@ if "/*R120_BUILTIN*/null" in blob:
 if "/*R116_QUANTS*/null" in blob:
     blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:
-    blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
+    _lay = json.load(open(os.path.join(HERE, "lx_layers.json")))
+    if _LAKAY_MARK and "lakay" in _bi:  # 6.55: Lakay's Spiral in its seven layers, by day and by night, where Lakay is carried
+        _lay.update(_LAKAY_MARK["layers"])
+    blob = blob.replace("/*R107_LAYERS*/null", json.dumps(_lay))
 if "/*R107_MASTER*/null" in blob:
     blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master
 blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' layers and the faces they carried for others

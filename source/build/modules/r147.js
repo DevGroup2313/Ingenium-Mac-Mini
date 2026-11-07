@@ -105,23 +105,28 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--x-acc);min-height:30px;padding:4px 8px}
 .hx-btn.quiet:hover{transform:none;text-decoration:underline}
 .hx-btn[hidden]{display:none}
-/* 6.54, the greeting card's keys. Her words (7 November 2026): "keep the acrylic chunky look"; "I like the white colour of the "Take the
-   guided tour" and "Read the short Guide" buttons from 6.53, I want to keep the colour for the buttons but remove the glossy, flat effect
-   and animation"; "I also really like the smaller size of 6.53's buttons inside of the app. I want that kept as well." So they keep
-   6.53's size and white face; the white keys lose their bright top line and thin foot (the gloss and the flatness) for a solid edge
-   beneath, 2px deep like the purple key's; no key in the card rises or springs when pointed at, and none animates: pointed at, a white
-   key's rim darkens and the purple key lightens; pressed, a key sits down into its edge at once. */
-.hx-head{--x-wedge:#d9d4e0;--x-wcast:0 4px 6px rgba(40,22,68,.10),0 9px 16px rgba(40,22,68,.07)}
-body[data-theme="night"] .hx-head{--x-wedge:#120d1c;--x-wcast:0 4px 6px rgba(0,0,0,.45),0 9px 16px rgba(0,0,0,.32)}
-.hx-head .hx-btn{transition:none}
-.hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:0 2px 0 var(--x-wedge),var(--x-wcast)}
-.hx-head .hx-btn:hover{transform:none}
-.hx-head .hx-btn:not(.pri):not(.quiet):hover{border-color:rgba(34,26,46,.22);box-shadow:0 2px 0 var(--x-wedge),var(--x-wcast)}
-body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):hover{border-color:rgba(205,184,240,.26)}
-.hx-head .hx-btn.pri:hover{box-shadow:var(--x-psh);filter:brightness(1.06)}
-.hx-head .hx-btn:active{transform:translateY(2px);transition:none}
-.hx-head .hx-btn:not(.pri):not(.quiet):active{box-shadow:0 0 0 var(--x-wedge),0 1px 2px rgba(40,22,68,.14)}
-.hx-head .hx-btn.pri:active{box-shadow:0 0 0 var(--x-pledge),0 1px 2px rgba(40,22,68,.2)}
+/* 6.55, the greeting card's keys, as every other key of Ingenium. Her words (7 November 2026): "The Link your file again, take the guided
+   tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no sound and just look stuck to
+   the card in an unnatural manner ... I want them to match the rest of the buttons inside of Ingenium and to lift when I hover over them.
+   I want them to have height and the same weighted look and feel that the rest of the buttons of Ingenium has ... I want both the sound
+   and animations restored for those buttons." (6.54 had taken away their rise at an earlier word of hers, and given the white ones a
+   pale edge.) They keep 6.53's size and the white face she chose; their edge, casts, rise and press are Ingenium's own keys' (.btn and
+   .btn.primary, measured on Chat and Models): an edge 2px deep and two casts; pointed at, they rise 2px on the same spring and the edge
+   grows to 3px; pressed, they sink 1px with the edge pressed in. Their sound is the keys' own (modules/r176.js). */
+.hx-head .hx-btn{transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}
+.hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1)}
+.hx-head .hx-btn:not(.pri):not(.quiet):hover{transform:translateY(-2px);box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12)}
+.hx-head .hx-btn:not(.pri):not(.quiet):active{transform:translateY(1px);transition-duration:.06s;box-shadow:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18)}
+.hx-head .hx-btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #3a2070,0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16)}
+.hx-head .hx-btn.pri:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #3a2070,0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18)}
+.hx-head .hx-btn.pri:active{transform:translateY(1px);transition-duration:.06s;box-shadow:inset 0 2px 6px rgba(20,8,40,.45),0 1px 1px rgba(40,22,68,.2)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):active{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
+body[data-theme="night"] .hx-head .hx-btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36)}
+body[data-theme="night"] .hx-head .hx-btn.pri:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 #170b30,0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.38)}
+body[data-theme="night"] .hx-head .hx-btn.pri:active{box-shadow:inset 0 2px 7px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){.hx-head .hx-btn:hover,.hx-head .hx-btn:active{transform:none}}
 /* ---- the main work ---- */
 .hx-main{container:hxm/inline-size;display:flex;flex-direction:column;gap:20px;min-width:0}
 .hx-keys{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -480,6 +485,8 @@ function lower(s){return s?s.charAt(0).toLowerCase()+s.slice(1):"";}
 
 /* Fabrica: each app with the step it is at, in Fabrica's own words */
 var FAPPS={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"};
+/* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!FAPPS.lakay)FAPPS.lakay=LIB_NAMES.lakay;}catch(e){}
 function repoState(r,st,n){if(!r.head)return ["Started · nothing kept yet","none"];
   if(st&&!st.clean){var k=(st.changes||[]).length;return [plural(k,"change")+" to keep",""];}
   var t=n&&n.test,tested=!!(t&&t.ok&&(t.checks||[]).some(function(c){return c.id==="reads"&&c.state==="ok";}));
@@ -512,6 +519,7 @@ function fillFabrica(){var ul=list("fabrica");if(!ul)return Promise.resolve();va
 
 /* Lector: the documents written for each set of apps, newest first */
 var LNAMES={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"},LORDER=["cd","forge","ingenium","inkwell"];
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!LNAMES.lakay){LNAMES.lakay=LIB_NAMES.lakay;LORDER.push("lakay");}}catch(e){}
 function setName(a){a=LORDER.filter(function(k){return (a||[]).indexOf(k)>=0;});var n=a.map(function(k){return LNAMES[k];});
   if(a.length===4)return "The Offline Project";if(n.length<2)return n[0]||"Your apps";return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
 function docLabel(kind,a,p){var all=(a||[]).filter(function(k){return LNAMES[k];}).length===4;
