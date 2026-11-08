@@ -184,6 +184,25 @@ jobs:
           python3 tools/train_smoke.py | tee -a "$GITHUB_STEP_SUMMARY"
           exit ${PIPESTATUS[0]}
 
+      - name: The speech models dictation writes with (Mini's release speech-vendor, checked by SHA-256)
+        # 6.57: her choice, "Carry them": dictation works offline from the first launch. When the file cannot be fetched or its
+        # fingerprint differs, the app is built without it and fetches the model once, the first time she dictates.
+        continue-on-error: true
+        run: |
+          WANT="$(head -n 1 tools/speech_vendor.sha256 | cut -d' ' -f1)"
+          rm -rf speech
+          if curl -fsSL --retry 4 --max-time 900 -o "$RUNNER_TEMP/speech.zip" "https://github.com/DevGroup2313/Ingenium-Mac-Mini/releases/download/speech-vendor/speech-vendor.zip"; then
+            GOT="$(shasum -a 256 "$RUNNER_TEMP/speech.zip" | cut -d' ' -f1)"
+            if [ "$GOT" = "$WANT" ]; then
+              mkdir speech && unzip -q "$RUNNER_TEMP/speech.zip" -d speech
+              echo "* Speech models carried for dictation: $(du -sh speech | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::The speech files' fingerprint is $GOT, not $WANT: this app fetches its speech model once instead"
+            fi
+          else
+            echo "::warning::The speech files could not be fetched: this app fetches its speech model once instead"
+          fi
+
       - name: Build the app
         run: |
           # the build number: the version, the day and this repository's run number;

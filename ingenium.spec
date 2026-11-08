@@ -43,6 +43,10 @@ for _f in ('app.json', 'THIRD_PARTY_NOTICES.txt', 'LICENCE.txt'):
     if os.path.isfile(os.path.join(SPECPATH, _f)):
         _own.append((_f, '.'))
 
+# 6.57: the speech models dictation writes with (modules/r254.js), beside the page, when the build fetched them (build-mac.yml)
+if os.path.isdir(os.path.join(SPECPATH, 'speech')):
+    _own.append(('speech', 'speech'))
+
 extra_datas = []
 extra_binaries = []
 extra_hidden = []

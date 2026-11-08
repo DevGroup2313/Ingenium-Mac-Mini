@@ -402,6 +402,12 @@ ways: her Mac mini as the home hub, and any two devices directly.
   by a device that is not a computer (a page cannot listen on the network); Bluetooth (a page cannot exchange data with another
   computer over it).
 
+- Her choice for dictation (8 November 2026), "Carry them": the Mac builds (build-mac.yml, ingenium.spec, in Mini and Intel) and the
+  installed Windows app (build-windows.yml, ingenium_win.spec, its folder build only) fetch speech-vendor.zip from Mini's release, check
+  it against tools/speech_vendor.sha256 and carry it as speech/ beside the page, which the app's own server serves (r254 reads it
+  first). The portable Windows program does not (it unpacks itself at every start); a fetch that fails or a fingerprint that differs
+  builds the app without it (continue-on-error), and dictation then fetches its model once.
+
     node rig/t_657_cloud.js <page url> <box address> <pairing code> <the box's cloud folder> <out>   # two devices and a third: 14 checks
     (the box: python3 rig/run_app.py <folder with ingenium_app.py patched and ingenium.html> <api port>, then POST /call/cloud_box_set [true])
 
