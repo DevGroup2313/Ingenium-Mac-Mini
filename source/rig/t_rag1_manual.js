@@ -143,6 +143,9 @@ async function openSettings(p, expectCard) {
   await p.waitForTimeout(400);
   await p.evaluate(() => { try { IngRooms.open('settings', 'ai'); } catch (e) { /* the room tabs may be absent */ } });
   await p.waitForTimeout(300);
+  // 6.33 and later (modules/r234.js): the room is in sections, and the card is in "Search, eyes and ears"
+  await p.evaluate(() => { try { if (window.IngSettingsParts) IngSettingsParts.show('ai', 'search'); } catch (e) { /* no sections */ } });
+  await p.waitForTimeout(300);
   if (expectCard) {            // the card opens the index when it comes into view, as a person scrolling down to it would
     await p.waitForSelector('#ragCard', { state: 'visible', timeout: 60000 });
     await p.locator('#ragCard').scrollIntoViewIfNeeded();
