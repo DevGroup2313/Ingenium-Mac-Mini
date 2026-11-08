@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.61 (8 November 2026): Fabrica's panels rearranged, its library, and each app's own page. Her words (8 November 2026): "The +
+New app button opens a little panel that makes no sense and barely seems to do anything, I want that fixed and streamlined ... either keep
+the Close or Done button both look weird there together. I also want the app library to be redesigned"; she approved the second preview
+(the apps' real 3D seals, Ship and Open on each card), then: "I don't want you to change Fabrica's 3 column view ... I mainly wanted the
+popped out panels rearranged and fixed", "I want the library page ... to be the view that I see when I click on the Your apps", and "I want
+all of these to be kept and added into Ingenium".
+
+- modules/r112.js: the three panels are unchanged. "Your apps" (the left panel's heading, or its count) opens the library page: her own
+  apps (the app library's, kept here or not yet, and the Offline Project's two kinds) and the apps made here, as cards with their seal,
+  version, where they stand and the packages made, Ship and Open (or Bring it in, Make it); filters (All, Your own, Made here, Needs
+  you) and a search; it redraws when the app library fills (a moment after the app opens). Open shows the app's own page: the apps down
+  the left, its seal and name with Run it and Ship, tabs (Overview, Changes, Versions, Plans, Ship, How it was built; the middle four lead
+  into the three panels), and three boxes: where it stands, the next step (one key), how it was built (its folder on the Folders page).
+  "‹ Back to the work" returns to the three panels. A new app: name, colour, how it starts (Describe it: a model writes its first page in
+  Code, linked to Fabrica; A simple first page: index.html, manifest, icon.svg and an offline copy, kept as the first version; Bring its
+  files in; Start in Code) and one key; the new app wears its colour as its seal until it has a drawn one. Bring an app in: the library's
+  apps as seal tiles (one already here opens), the Offline Project as crests, then a page or zip, a git bundle, From Code. Every panel of
+  Fabrica (r112, r141) closes with its ✕, Escape or a press outside, and keeps only its own main key.
+
+    node rig/t_661_fabrica.js <page url> <out>     # 21 checks; rig/t_fabrica.js follows the seal tiles (34 checks)
+
 Ingenium 6.60 (8 November 2026): the folder search keeps itself up to date (phase 4, the scheduler), and the installed Windows
 app really carries the speech models and the folder search. Her task: "Use setInterval in a Worker. Default interval 20 minutes,
 configurable. It runs only while the app is open ... Reconcile each folder: compare mtime and size first, and hash the content only when

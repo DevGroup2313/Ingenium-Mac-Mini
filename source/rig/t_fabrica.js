@@ -120,10 +120,10 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // the app library: Lector's kept copy of an app comes in with its own seal
   await p.evaluate(async () => { const page = '<!doctype html><html><head><meta charset="utf-8"><title>Carpe Diem</title></head><body><h1>Carpe Diem</h1></body></html>'; const u8 = new TextEncoder().encode(page); await libPut('lib-cd-test', u8, page); libState().apps.cd = { ref: 'lib-cd-test', sha256: 'test', version: '1051', title: 'carpe_diem.html', size: u8.length, at: Date.now() }; saveState(); });
   await p.click('#fbBring'); await p.waitForTimeout(400);
-  const sheet1 = await p.evaluate(() => [...document.querySelectorAll('#fb .f-opt b')].map(x => x.textContent));
-  ok(sheet1.join('|') === 'From your app library|A page, or a zip of its files|A git bundle, or a folder with its .git (zipped)|From Code', 'Bring one in offers the library, a file, a bundle and Code', sheet1.join('|'));
-  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-opt')][0].click(); }); await p.waitForTimeout(400);
-  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-opt')].find(x => /Carpe Diem/.test(x.textContent)).click(); }); await p.waitForTimeout(2000);
+  // 6.61: the panel shows the library's apps as seal tiles, then the ways from something she has (her approved preview, 8 November 2026)
+  const sheet1 = await p.evaluate(() => ({ tiles: [...document.querySelectorAll('#fb .f-tile b')].map(x => x.textContent), rows: [...document.querySelectorAll('#fb .f-opt b')].map(x => x.textContent) }));
+  ok(sheet1.tiles.includes('Carpe Diem') && sheet1.rows.join('|') === 'A page or a zip|A git bundle|From Code', 'Bring one in offers the library (as seals), a file, a bundle and Code', JSON.stringify(sheet1));
+  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-tile')].find(x => /Carpe Diem/.test(x.textContent)).click(); }); await p.waitForTimeout(2000);
   const cd = await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Carpe Diem/.test(x.textContent)); return t ? { pressed: t.getAttribute('aria-pressed'), layers: t.querySelectorAll('.f-ls-l').length, ver: t.querySelector('.nm em') && t.querySelector('.nm em').textContent, line: t.querySelector('.stl span').textContent, n: document.querySelectorAll('#fbRepos .f-repo').length } : null; });
   ok(cd && cd.pressed === 'true' && cd.layers >= 3 && /Kept · to test/.test(cd.line) && cd.n === 2, 'Carpe Diem comes in from the library with its layered seal and a first version', JSON.stringify(cd));
   await p.screenshot({ path: OUT + '/fab-library.png' });

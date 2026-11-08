@@ -595,10 +595,10 @@ function composer(opt){opt=opt||{};var wrap=h("div","h-compose"),seg=segBox("Wri
 /* one line, asked for in Fabrica's own sheet, already filled in */
 function askLine(title,lead,value,fn,ph){var x=X();var sh=x.sheet(title,lead),inp=h("input");inp.type="text";inp.value=value||"";inp.placeholder=ph||"";inp.setAttribute("aria-label",title);sh.box.appendChild(inp);
   var end=h("div","end"),ok=btn("pri","Done",function(){var v=inp.value.trim();if(!v){inp.focus();return;}ok.disabled=true;Promise.resolve().then(function(){return fn(v);}).then(sh.close,function(e){ok.disabled=false;fail(e);});});
-  end.appendChild(btn("","Close",sh.close));end.appendChild(ok);sh.box.appendChild(end);inp.onkeydown=function(e){if(e.key==="Enter")ok.click();if(e.key==="Escape")sh.close();};setTimeout(function(){inp.focus();inp.select();},60);return sh;}
+  end.appendChild(ok);sh.box.appendChild(end);inp.onkeydown=function(e){if(e.key==="Enter")ok.click();if(e.key==="Escape")sh.close();};setTimeout(function(){inp.focus();inp.select();},60);return sh;}
 function askText(title,lead,value,fn,r,rec){var x=X();var sh=x.sheet(title,lead),c=composer({value:value,r:r,rec:rec,mdo:mdOpts(r,rec,{breaks:true}),rows:8});c.el.style.padding="0";sh.box.appendChild(c.el);
   var end=h("div","end"),ok=btn("pri","Save",function(){ok.disabled=true;Promise.resolve().then(function(){return fn(c.get());}).then(sh.close,function(e){ok.disabled=false;fail(e);});});
-  end.appendChild(btn("","Close",sh.close));end.appendChild(ok);sh.box.appendChild(end);setTimeout(function(){c.focus();},60);return sh;}
+  end.appendChild(ok);sh.box.appendChild(end);setTimeout(function(){c.focus();},60);return sh;}
 
 /* ======================= CODE: the app at any idea, release or version ======================= */
 function codeRef(r){var c=V(r).code;if(c.ref){var ok=isBranchRef(c.ref)?r.branches.indexOf(c.ref.slice(11))>=0:c.ref.indexOf("refs/tags/")===0?r.tags.indexOf(c.ref.slice(10))>=0:/^[0-9a-f]{40}$/.test(c.ref);if(ok)return c.ref;}
@@ -828,7 +828,7 @@ function issueOne(r,rec,it,v,w,f){sig(r,"issue|"+it.n);backBar(w,"All issues",fu
   var meta=h("div","h-meta h-blk");meta.appendChild(T("span",null,(it.by||who())+" opened it "+when(it.created)+" · "+plural(it.comments.length,"comment")));
   it.labels.forEach(function(l){meta.appendChild(labChip(rec,l));});
   var lk=btn("quiet sm","Labels",function(){var chosen=it.labels.slice(),sh=X().sheet("The labels of #"+it.n,"Press a label to give it, or to take it away.");sh.box.appendChild(labelPick(rec,chosen));
-    var end=h("div","end");end.appendChild(btn("","Close",sh.close));end.appendChild(btn("pri","Done",function(){var add=chosen.filter(function(l){return it.labels.indexOf(l)<0;}),del=it.labels.filter(function(l){return chosen.indexOf(l)<0;});
+    var end=h("div","end");end.appendChild(btn("pri","Done",function(){var add=chosen.filter(function(l){return it.labels.indexOf(l)<0;}),del=it.labels.filter(function(l){return chosen.indexOf(l)<0;});
       if(add.length||del.length){it.events.push({at:Date.now(),kind:"labels",add:add,del:del});it.labels=chosen;it.updated=Date.now();keep(rec).then(function(){repaint(true);});}sh.close();}));sh.box.appendChild(end);});lk.id="hIsLabels";meta.appendChild(lk);w.appendChild(meta);
   var tl=h("div","h-tl h-blk");tl.id="hIsTl";
   var first=cmtCard(r,rec,{by:it.by,at:it.created,body:it.body},"","opened it");var eb=btn("quiet sm","Edit",function(){askText("What #"+it.n+" says",null,it.body,function(val){it.body=val;it.updated=Date.now();return keep(rec).then(function(){repaint(true);});},r,rec);});
@@ -1077,7 +1077,7 @@ function paintProjects(r,w,f){var rec=needRec(r,w,"the board");if(!rec)return;si
     free.forEach(function(k){var ci=cardInfo(rec,k),it=ci.it,o=h("button","f-opt");o.type="button";o.setAttribute("aria-pressed","false");o.setAttribute("data-k",k);o.innerHTML='<span class="ic">'+icOf(it)+"</span><span><b>"+esc(it.title)+"</b><small>"+(k.indexOf("pr:")===0?"Pull request":"Issue")+" #"+it.n+" · "+esc(it.state)+"</small></span>";
       o.onclick=function(){var i=picked.indexOf(k);if(i>=0)picked.splice(i,1);else picked.push(k);o.setAttribute("aria-pressed",i>=0?"false":"true");go.textContent="Add "+picked.length;go.disabled=!picked.length;};sh.box.appendChild(o);});
     var end=h("div","end"),go=btn("pri","Add 0",function(){picked.forEach(function(k){var it=cardInfo(rec,k).it;(it&&it.state!=="open"?rec.board.done:rec.board.todo).push(k);});keep(rec).then(function(){sh.close();toast(plural(picked.length,"card")+" added.");repaint(true);});});go.disabled=true;go.id="hBoardAddGo";
-    end.appendChild(btn("","Close",sh.close));if(free.length)end.appendChild(go);sh.box.appendChild(end);});add.id="hBoardAdd";f.appendChild(add);
+    if(free.length)end.appendChild(go);sh.box.appendChild(end);});add.id="hBoardAdd";f.appendChild(add);
   if(vb.focus){var fk=vb.focus;vb.focus=null;setTimeout(function(){var el=bd.querySelector('.h-card[data-k="'+fk+'"]');if(el)el.focus();},20);}}
 function cardEl(r,rec,k,col,ki){var ci=cardInfo(rec,k),c=h("div","h-card");c.tabIndex=0;c.setAttribute("role","listitem");c.setAttribute("data-k",k);
   var grip=h("span","h-grip","⋮⋮");grip.setAttribute("aria-hidden","true");c.appendChild(grip);var body=h("div","h-cb");
