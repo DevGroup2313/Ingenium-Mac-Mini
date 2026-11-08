@@ -27,6 +27,8 @@ body[data-motion="minimal"] #ragCard .rag-bar > i{transition:none}
 /* 6.59, phase 4: how often the folders are looked at again */
 #ragCard .rag-sched{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 0}
 #ragCard .rag-next{margin:4px 0 0;overflow-wrap:anywhere}
+#ragCard .rag-rr{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+#ragCard .rag-rr input{margin-top:3px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p202"]="started";}catch(_){}
 /* ============ R202 · FOLDERS FOR THE CHAT (Ingenium 6.9.2, 1 November 2026) ============
@@ -116,6 +118,10 @@ function build(){
   ui.every.value=String(everyMin());if(!ui.every.value)ui.every.value="20";
   ui.sched.appendChild(sl);ui.sched.appendChild(ui.every);c.appendChild(ui.sched);
   ui.next=el("p","small muted rag-next");ui.next.id="ragNext";c.appendChild(ui.next);
+  /* 6.62, phase 5, her task: "Reranker. Optional, off by default, loaded on demand" */
+  var rrw=el("label","rag-rr");var rri=el("input");rri.type="checkbox";rri.id="ragRerank";try{rri.checked=!!(state.rag&&state.rag.rerank);}catch(e){}
+  rrw.appendChild(rri);rrw.appendChild(el("span",null,"Reorder what is found with a second reading model: it reads your question and each passage together. Slower; it loads only when you switch it on."));c.appendChild(rrw);
+  rri.onchange=function(){try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.rerank=rri.checked;saveState();}catch(e){}setNote(rri.checked?"The chat's answers now reorder the passages found before choosing five.":"The chat's answers use the search's own order.");};
   ui.every.onchange=function(){var v=+ui.every.value;try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.every=v;saveState();}catch(e){}schedNow(false);};
   ui.problem=el("p","small rag-problem");ui.problem.id="ragProblem";ui.problem.setAttribute("role","status");ui.problem.hidden=true;c.appendChild(ui.problem);
   ui.note=el("p","small rag-note");ui.note.id="ragNote";ui.note.setAttribute("role","status");ui.note.setAttribute("aria-live","polite");c.appendChild(ui.note);

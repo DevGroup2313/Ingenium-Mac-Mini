@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.62 (8 November 2026): the folder search's evaluation and its optional reranker (phase 5). Her task: "Reranker. Optional,
+off by default, loaded on demand. Use a small cross-encoder that has a working ONNX export for Transformers.js. Confirm this on Hugging
+Face before choosing a model", "merge with reciprocal rank fusion (k = 60), then rerank to 5 if enabled, else take the top 5", and her
+five done criteria (rag/DESIGN.md sections 12 and 13).
+
+- rag/reranker.worker.js, rag/reranker.js (new): `Xenova/ms-marco-MiniLM-L-6-v2` (revision a0914435, confirmed on Hugging Face on
+  8 November: tagged transformers.js, onnx and text-classification; quantized, 23.1 MB), loaded the first time a search asks for it.
+  rag/retriever.js reorders the fusion's best 20 by its scores and keeps 5 (the folder rule applies before it reads anything);
+  rag/main.js keeps the fusion's order with a plain note when its files are missing. modules/r202.js: the card's switch (off, per
+  device); modules/r257.js: the chat asks for it when the switch is on. The Mac and Windows build workflows fetch its six files from
+  the pinned revision and check each against tools/rag_reranker.sha256 (written by release.py rag); vendor.json pins them.
+- rag/eval.js, rag/eval/golden.json, rig/t_rag5_eval.js (new): the evaluation; the results are in rag/eval/RESULTS.md.
+- Measured (rig/t_rag5_rerank.js, 15 of 15, the three fixture folders without the 4 MB logbook, so golden item H09 left out): off by
+  default and nothing of it fetched until a search asks; Recall@5 17 of 19 with it and without it; the passage holding the answer first
+  in 17 of the 17 found with it, 14 without; a search took a median of 48 ms without it and 7.4 s with it (four processors shared
+  with the evaluation run), and the first search with it loaded it in about 8 s; test-b got no passage of household_papers with it on;
+  a copy without its files keeps the fusion's order and says so under the reply. Her five criteria: rag/eval/RESULTS.md.
+
+    node rig/t_rag5_rerank.js <page url> <out>    # 15 checks (RAG_E2E, RAG_E2E_BARE, RAG_BRIDGE)
+    node rig/t_rag5_eval.js <page url> <out>      # her five criteria (LLM: an OpenAI-style model server)
+
 Ingenium 6.61 (8 November 2026): Fabrica's panels rearranged, its library, and each app's own page. Her words (8 November 2026): "The +
 New app button opens a little panel that makes no sense and barely seems to do anything, I want that fixed and streamlined ... either keep
 the Close or Done button both look weird there together. I also want the app library to be redesigned"; she approved the second preview

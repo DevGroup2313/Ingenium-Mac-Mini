@@ -107,11 +107,12 @@ function prepareWrap(o){return function(rec,bot){var self=this,args=arguments;
   bot.status="Looking in your folders…";try{renderChatLive(bot);}catch(e){}
   return Promise.resolve(o.apply(self,args)).then(function(){
     if(!bot.live)return null;
-    return r.retrieve(q,USER,{k:5}).then(function(res){
+    var rr=false;try{rr=!!(state.rag&&state.rag.rerank);}catch(e){}
+    return r.retrieve(q,USER,{k:5,rerank:rr}).then(function(res){
       if(!bot.live)return null;
       var g=r.prompt.ground(res,q,budget());
       bot.rag={v:1,q:q,at:Date.now(),found:res.passages.length,given:g.passages.length,dropped:g.dropped,ms:Math.round(res.ms||0),passages:g.passages.map(slim)};
-      if(res.reason)bot.rag.reason=res.reason;
+      if(res.reason)bot.rag.reason=res.reason;if(res.reranked)bot.rag.reranked=true;if(res.rerankNote)bot.rag.rerankNote=res.rerankNote;
       if(g.notFound){bot.status="";bot.text=NOT_FOUND;bot.rag.notFound=true;bot.rag.called=false;delete bot.live;return whyNone(r,bot).then(function(){return null;});}
       bot.rag.called=true;bot.status="";try{renderChatLive(bot);}catch(e){}
       return null;},
@@ -167,6 +168,7 @@ function paint(d,mm){
   if(g.notFound&&!g.called){if(g.why==="none")notes.push("No folder has been added to the folder search yet: Settings, Models and AI, Folders for the chat.");
     else if(g.why==="unread")notes.push("Your folders have not been read yet: Settings, Models and AI, Folders for the chat, Read it now.");
     else notes.push("Nothing in your folders matched, so no model was asked.");}
+  if(g.rerankNote)notes.push(g.rerankNote);
   if(g.dropped>0)notes.push("The model's memory took "+g.given+" of the "+g.found+" passages found; the others were left out.");
   notes.forEach(function(t){beforeActs(d,mk("span","rag-note",t));});
   if(!g.notFound&&g.done&&((g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))){var f=mk("div","msg-unchecked rag-flag");f.setAttribute("role","note");f.appendChild(mk("span","mu-mark","!"));

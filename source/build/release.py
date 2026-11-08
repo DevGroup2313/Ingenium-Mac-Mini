@@ -203,7 +203,8 @@ def page():
 # its own files into each desktop repository's rag/ (the build workflows add rag/vendor/ from Mini's release "rag-vendor", checked
 # against tools/rag_vendor.sha256, and the specs carry rag/ into the app). Not the Fire and iPhone repository: desktop only.
 RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.js", "embedder.js", "embedder.worker.js",
-             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js", "vendor.json")
+             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js",
+             "reranker.js", "reranker.worker.js", "vendor.json")
 RAG_VENDOR_SHA256 = "ecd2f34b95a77c5592dce6ae7f4f56fccca16d72f010410188e3af393971f253"   # rag-vendor.zip, release rag-vendor
 
 
@@ -221,6 +222,10 @@ def ship_rag():
         os.makedirs(os.path.join(R[k], "tools"), exist_ok=True)
         open(os.path.join(R[k], "tools", "rag_vendor.sha256"), "w", encoding="utf-8", newline="\n").write(
             RAG_VENDOR_SHA256 + "  rag-vendor.zip\n")
+        # 6.62: the optional reranker, fetched by the build workflows from its pinned Hugging Face revision, each file checked
+        rr = [e for e in json.load(open(os.path.join(src, "vendor.json"), encoding="utf-8"))["hf"] if "reranker" in e.get("role", "")][0]
+        lines = ["# model " + rr["repo"], "# revision " + rr["revision"]] + [sha + "  " + f for f, sha in sorted(rr["files"].items())]
+        open(os.path.join(R[k], "tools", "rag_reranker.sha256"), "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
     print("rag/ copied to the Mac and Windows repositories")
 
 

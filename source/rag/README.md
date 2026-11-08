@@ -23,7 +23,10 @@ folders and the model reads only her grounding prompt and the question; zero pas
 of the reply is a link that opens the file with the passage marked (`prompt.js`, `IngRag.openSource`, `build/modules/r257.js`; DESIGN
 section 10). **Phase 4 is the scheduler** (8 November 2026): a clock in a worker (`scheduler.worker.js`, `scheduler.js`), every 20 minutes unless
 she chooses otherwise on the card, only while the app is open; each look reads only folders where a size or a time changed, and only
-the new or changed passages are embedded (DESIGN section 11). **Not built yet**: the optional reranker (2), the evaluation (5).
+the new or changed passages are embedded (DESIGN section 11). **Phase 5 is the evaluation and the optional reranker** (8 November
+2026): her done criteria measured on the built page with a real model (`eval.js`, `eval/golden.json`, `rig/t_rag5_eval.js`; the
+results in `eval/RESULTS.md`; DESIGN section 12), and a cross-encoder that reorders the fusion's best 20 before the 5 are kept, off
+until she switches it on in the card and loaded only then (`reranker.js`, `reranker.worker.js`; DESIGN section 13).
 
 ## Who can read what
 
@@ -50,6 +53,8 @@ leave them, hidden files, other file types and symbolic links that point outside
 | `store.js`, `store.worker.js` | page, worker | the only SQLite connection (SQLite 3.45.3 with FTS5 and sqlite-vec 0.1.6, OPFS), schema and migrations, every read and write |
 | `scheduler.js`, `scheduler.worker.js` | page, worker | phase 4: the clock (setInterval in a worker) and its page side; the reconcile is in `main.js` |
 | `prompt.js` | page | phase 3: NOT_FOUND, her grounding prompt, the citation reader and the sentence check (pure functions) |
+| `reranker.js`, `reranker.worker.js` | page, worker | phase 5: the optional reranker (`Xenova/ms-marco-MiniLM-L-6-v2`, q8), off by default, loaded the first time a search asks for it; it reorders the best 20 of the fusion and the best 5 are kept |
+| `eval.js`, `eval/golden.json`, `eval/RESULTS.md` | tests | phase 5: the evaluation's judges (Recall@5, groundedness, ACL), its 20 questions, and the results |
 | `vendor.json`, `tools/fetch_vendor.py` | build machine | the pinned third-party files and the script that fetches and checks them |
 | `fixtures/`, `tools/make_fixtures.py` | tests | the 72-file test corpus (three folders, all seven types, one 4 MB log) and its answers |
 | `test/` | tests | `serve.py` (static server for the tests), `harness.html`, `parse_harness.html` |
@@ -100,6 +105,8 @@ All tests run in headless Chromium through Playwright (`/opt/node-tools/node_mod
 | retrieval | `node rig/t_rag2_retrieve.js http://127.0.0.1:8176/ OUT [--quick]` | the two searches with the folder permissions inside their SQL, a second user, fusion (k = 60), escaping, Recall@5 over the corpus's facts, the restricted folder for the second user, reindex with embedding counts (`--quick` leaves out the 4 MB logbook; `RAG_WORKERS` sets the reading model's workers) |
 | chat | `node rig/t_rag3_chat.js http://127.0.0.1:8188/ OUT` | phase 3 on the built page: the switch, NOT_FOUND without a model, two folders read, grounded turns with her prompt word for word, citations and the viewer (Markdown offsets, a PDF's page), flagged sentences, the second user's NOT_FOUND end to end, a connection, a reload (`RAG_E2E`: the page folder with `rag/` and `rag/vendor`; `RAG_BRIDGE`) |
 | scheduler | `node rig/t_rag4_schedule.js http://127.0.0.1:8188/ OUT` | phase 4: the clock and the card's choice, a look with nothing changed (the model not loaded), her criterion 5 through one tick (add, change, delete; the embedding calls equal the new or changed passages), questions during it, a folder away (`RAG_E2E`, `RAG_BRIDGE`) |
+| evaluation | `node rig/t_rag5_eval.js http://127.0.0.1:8188/ OUT` | phase 5, her done criteria on the built page: memory while the whole corpus is read, Recall@5 on `eval/golden.json`, the ACL test (both halves), groundedness with a real model answering through the chat (`LLM`: an OpenAI-style server such as llama.cpp's `llama-server`; `SKIP_MODEL=1` leaves the model out), reindex (`RAG_E2E`, `RAG_BRIDGE`) |
+| reranker | `node rig/t_rag5_rerank.js http://127.0.0.1:8187/ OUT` | phase 5: off by default, loaded on demand, Recall@5 with and without it, the folder rule with it on, the card's switch and the chat, a copy without its model (`RAG_E2E`, `RAG_E2E_BARE`, `RAG_BRIDGE`) |
 | by hand | `node rig/t_rag1_manual.js http://127.0.0.1:8178/ OUT [--quick]` | the built page with the card, from the browser without the bridge to removing the last folder |
 
 The servers: `python3 rag/test/serve.py PORT --vendor <vendor tree>` serves `/rag/` from this checkout (the first four tests start it

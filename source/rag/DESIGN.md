@@ -262,3 +262,50 @@ queries see a consistent state."
   one found. Periodic Background Sync (an installed web app's) does not apply to the desktop apps and is not used.
 - Test: `rig/t_rag4_schedule.js` (her done criterion 5 through one tick of the clock; questions asked while it runs; a folder away).
 
+
+## 12. The evaluation (phase 5, 8 November 2026)
+
+Her done criteria: Recall@5 of at least 0.8 on 15 to 20 question, answer and source triples; groundedness (every sentence cited, every
+citation to a retrieved chunk, flagged sentences listed, an unsupported claim a blocker); the ACL test (a user without folder X asks
+what only X answers: `retrieve()` gives no chunk of X and the response equals NOT_FOUND); memory under 2 GB while the whole corpus,
+the 4 MB file included, is indexed, with the method reported; reindex (add, modify, delete, one reconcile; the embedding calls equal the
+new or changed chunks only). "Do not claim completion unless tests 3 and 5 pass."
+
+- `rag/eval/golden.json`: 20 items drawn from `fixtures/FACTS.json`, covering the seven file types, the three folders and the 4 MB
+  logbook (H09); `household_papers` is the restricted folder.
+- `rag/eval.js` (pure): `recall(golden, results, k)` (file level, her criterion, and the stricter level where the passage holds the
+  answer), `grounded(answer, passages)` (`checkGrounded`'s rules, then each cited sentence's words looked for in the passages it cites:
+  below 0.6 it is listed for a person to read), `aclClean`, `answerHas` (the answer names the item's numbers, or most of its rarer
+  words), `markdown(report)`.
+- `rig/t_rag5_eval.js`: the built page in headless Chromium with the bridge stand-in; a real model answers through the chat's own
+  connection path (an OpenAI-style server on this computer). It writes `report.json` and `report.md`; the results are kept in
+  `rag/eval/RESULTS.md`.
+
+## 13. The reranker (phase 5, 8 November 2026)
+
+Her task: "Reranker. Optional, off by default, loaded on demand. Use a small cross-encoder that has a working ONNX export for
+Transformers.js. Confirm this on Hugging Face before choosing a model." and, for retrieval, "merge with reciprocal rank fusion (k = 60),
+then rerank to 5 if enabled, else take the top 5".
+
+- The model, confirmed on Hugging Face on 8 November 2026: `Xenova/ms-marco-MiniLM-L-6-v2` (revision a0914435), tagged transformers.js,
+  onnx and text-classification, a conversion of `cross-encoder/ms-marco-MiniLM-L6-v2` (Apache-2.0). Its quantized export
+  `onnx/model_quantized.onnx` is pinned in `vendor.json` with the SHA-256 of each file (`config.json`, `tokenizer.json`,
+  `tokenizer_config.json`, `vocab.txt`, `quantize_config.json`, the model). It reads a question and a passage together and gives one
+  number (a logit): higher is a better answer.
+- `rag/reranker.worker.js`: a module worker. `init({vendorBase, modelId, dtype = 'q8'})` checks that the four files it needs are on the
+  app's own address (else `MODEL_NOT_INSTALLED`), loads Transformers.js as the embedder does (remote models off, local path
+  `vendor/models/`, one thread), `AutoTokenizer` and `AutoModelForSequenceClassification`; `score({query, texts})` reads the pairs in
+  batches of 8, at most 512 tokens a pair, and returns one number per text.
+- `rag/reranker.js`: the page's side, `createReranker()` -> `{init, score, info, terminate}`. Nothing starts until `init`.
+- `rag/retriever.js`: with `opts.rerank` and a reranker, the best 20 of the fusion (`RERANK_FROM`) are read back (the folder rule applies,
+  as for the five), scored with the heading and the text, ordered by score (ties: the fusion's order), and the best 5 kept; each
+  passage carries `fusedRank` and `rerankScore`, and the result `reranked`. The reranker only reorders passages the user may read.
+- `rag/main.js`: `IngRag.retrieve(query, user, {rerank})` loads the reranker the first time a search asks for it (`config.rerank` is
+  false); when its files are not in the app, the search keeps the fusion's order and says so in `rerankNote` (the chat shows it under
+  the reply). `shutdown()` stops its worker.
+- The page: the card's switch "Reorder what is found with a second reading model" (`#ragRerank`, `state.rag.rerank`, per device, off);
+  the chat asks `retrieve(question, 'me', {k: 5, rerank})` and keeps `bot.rag.reranked`.
+- Shipping: the three build workflows fetch the six files from Hugging Face at the pinned revision into
+  `rag/vendor/models/Xenova/ms-marco-MiniLM-L-6-v2/` and check them against `tools/rag_reranker.sha256` (written by `release.py rag`);
+  a fetch or check that fails leaves the reranker out, and the switch then says why in the chat. About 24 MB (the model 23.1 MB).
+- Test: `rig/t_rag5_rerank.js`.
