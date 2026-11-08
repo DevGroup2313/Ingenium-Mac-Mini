@@ -1,0 +1,50 @@
+# Ingenium's ears (modules/r254.js): the speech engine and models Scriba uses, fetched on GitHub's machines (which reach
+# Hugging Face and the npm registry), tried on recordings made here, listed with their SHA-256 fingerprints in the run's
+# summary, and kept on the release "speech-vendor" (speech-vendor.zip), from which the computer apps and the tests take them.
+name: Speech files
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'source/speech/**'
+      - '.github/workflows/speech-vendor.yml'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: speech-vendor-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: source/speech
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Recordings to try the models on
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q espeak-ng ffmpeg > /dev/null
+          mkdir -p clips
+          make() { espeak-ng -v "$1" -s 145 -w "clips/$2.raw.wav" "$3"; ffmpeg -loglevel error -y -i "clips/$2.raw.wav" -ar 16000 -ac 1 -c:a pcm_s16le "clips/$2.wav"; rm "clips/$2.raw.wav"; }
+          make en-us one.en "Please summarise the three chapters of my thesis and list the questions that are still open."
+          make en-us two.en "I would like to write a cover letter for a remote learning designer role."
+          make fr one.fr "Bonjour, je voudrais écrire une lettre de motivation pour un poste à distance."
+          ls -la clips
+      - name: Fetch, try and list every file
+        run: |
+          cd source/speech
+          npm install --no-audit --no-fund --loglevel=error @huggingface/transformers@3.8.1
+          node fetch_speech.mjs "$GITHUB_WORKSPACE/speech-vendor" "$GITHUB_WORKSPACE"/clips/*.wav | tee "$GITHUB_WORKSPACE/fetch.log"
+          { echo '### Speech files'; echo '```'; cat "$GITHUB_WORKSPACE/speech-vendor/SPEECH.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep them on the release "speech-vendor"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd speech-vendor && zip -qr ../speech-vendor.zip .)
+          (cd clips && zip -qr ../speech-clips.zip .)
+          sha256sum speech-vendor.zip speech-clips.zip | tee -a "$GITHUB_STEP_SUMMARY"
+          gh release view speech-vendor > /dev/null 2>&1 || gh release create speech-vendor --title "Speech files" --notes "The speech engine and models of Ingenium's ears (modules/r254.js), the ones Scriba uses, fetched by .github/workflows/speech-vendor.yml (source/speech/fetch_speech.mjs)." --latest=false
+          gh release upload speech-vendor speech-vendor.zip speech-clips.zip fetch.log --clobber
