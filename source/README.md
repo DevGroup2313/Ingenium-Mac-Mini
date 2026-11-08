@@ -371,6 +371,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.58 (8 November 2026): Your mentor in the Career Studio, the screen kept on while Ingenium works, and dictation in the phone and
+tablet apps. Her words (8 November 2026): "I am still unclear on what exactly I am looking for so I would like for Ingenium to provide that
+inside of the app and be my in-app recruiter/mentor/counselor/headhunter"; "I want them to spot skills and experience that I have show me how
+it can be transferred ... spot my blindspots"; the Career Studio "is not really AuDHD accessible"; and "I want for Ingenium to still be able
+to continue running and working in the background even if the screen of the devices go to sleep". She chose the mentor's four sources: her
+CV and documents, Lector's readings of her apps, her LinkedIn export, and a short talk.
+
+- modules/r188.js, Your mentor (a room beside Today; paintMentor and its steps, IngCareer.mentor): measured on 6.57, what a mentor needs was
+  in the studio already, in five rooms and under a dozen keys, with nothing saying which to press first, and Suggest entries and Find my
+  skills each replacing the other's findings. Now seven steps, one on the screen at a time, her place in view: what it may read (CV,
+  documents, LinkedIn export, Lector's readings, a profile file); a short talk (eight questions, one at a time, each skippable, saved as
+  she types; finished, they fill What you are looking for); entries and skills found, kept together, kept or dropped one at a time; what
+  transfers, blind spots and what sets her apart (Your edge's three); paths that fit (Your direction); her CV and documents looked at
+  with her (never rewritten); and a summary (this week, what to add to her CV and letters, what Lector found in her apps, blind spots,
+  where she stands out, paths). Do the rest for me runs the steps that need the model in order; Stop (stopNow, MSTOP) ends the steps
+  after the one running and keeps what was finished; the room opens at the first step not done. Today names the mentor's next step.
+  Each profile has its own mentor (CS().mentor).
+- modules/r256.js (new): the Screen Wake Lock while Ingenium works here (Engine busy, Lector, the Career Studio, Blend, dictation, the
+  Cloud, a model being converted), released as soon as the work ends; a page out of sight cannot hold it, and it is asked for again
+  when seen. Settings, Models and AI, Your devices: Keep working (r234, r173). The computers that lend models or keep the Cloud already
+  stay awake (R74; 6.57).
+- The Fire and Android app (AndroidManifest.xml: RECORD_AUDIO, MODIFY_AUDIO_SETTINGS; MainActivity: onPermissionRequest for the app's
+  own address and for sound only, then Android's own question) and the iPhone and iPad app (Info.plist: NSMicrophoneUsageDescription;
+  WebViewController: requestMediaCapturePermissionFor, the app's own scheme, main frame, microphone only) pass the microphone to the page.
+  Not compiled in the build session: GitHub's Android and iOS builds are the first compile; a device test is still to be done.
+
+- 6.57's Mac runs failed at the last step: the copy with the models, carrying the speech models too, came to 2.18 GB, over GitHub's
+  limit of 2 GB for one release file (HTTP 422). build-mac.yml (Mini and Intel) now makes that copy without speech/ (resealed); the app
+  alone, the main download (about 200 MB), keeps them. 6.57's Windows, Fire and Android, and iPhone and iPad runs succeeded.
+
+    node rig/t_658_mentor.js <page url> <out>    # the mentor with a stand-in model: 17 checks
+
 Ingenium 6.57 (8 November 2026): Ingenium Cloud. Her words (8 November 2026): "I want you to build Ingenium its own local Cloud or local
 network that can store my data and facilitate the transfer of my data across wirelessly across my devices ... I want all of my devices to
 have the same content in real time or be able to be updated over Ingenium's Cloud ... continue working on any app, project, assignment, or

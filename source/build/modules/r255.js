@@ -359,7 +359,7 @@ function init(){hook();afterReload();try{card();}catch(e){}
   D.addEventListener("visibilitychange",function(){if(D.visibilityState==="hidden"&&ready()&&CFG.auto&&dirtyT){clearTimeout(dirtyT);dirtyT=null;autoSend();}});}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",init);else init();
 D.addEventListener("click",function(e){var t=e.target&&e.target.closest&&e.target.closest('.nav-btn[data-page="settings"]');if(t)setTimeout(card,0);},true);
-W.IngCloud={ready:ready,settings:function(){return JSON.parse(JSON.stringify(CFG));},connect:function(b,pass){return connect(b,pass);},send:send,check:check,bring:bring,forget:forget,
+W.IngCloud={busy:function(){return !!BUSY;},ready:ready,settings:function(){return JSON.parse(JSON.stringify(CFG));},connect:function(b,pass){return connect(b,pass);},send:send,check:check,bring:bring,forget:forget,
   lists:lists,goneNow:goneNow,applyGone:applyGone,fileIn:fileIn,seal:function(u8){return theKey().then(function(K){return seal(K,u8);});},last:function(){return LAST;},HERE_KEYS:HERE_KEYS.slice()};
 })();
 ;try{window.__ingParts["p255"]="running";}catch(_){}

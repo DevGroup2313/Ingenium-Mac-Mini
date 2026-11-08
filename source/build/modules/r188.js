@@ -236,6 +236,9 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-entry p{margin:3px 0 0;font-size:13px;line-height:1.5;color:var(--c-ink2);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 #cs .c-entry .c-keys{margin-top:auto;padding-top:6px}
 #cs .c-sec{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
+/* 6.58 · Your mentor: the line on Today, and the talk's question */
+#cs .c-td-mentor{margin:16px 0 6px;font-size:13.5px;font-weight:600;color:var(--c-ink1)}
+#cs #csTalk{width:100%;box-sizing:border-box;margin-top:6px}
 /* 6.44 · Your edge and Your direction */
 #cs .c-entry .c-line{font:italic 13.5px/1.5 var(--c-serif);color:var(--c-ink1);-webkit-line-clamp:6}
 #cs .c-steprow .tx .c-bk{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-acc)}
@@ -574,7 +577,7 @@ function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.think="";RUN.opp=null;
    marks the studio's own request as stopped (lxAsk then refuses it at once, however many layers ask again: build_page.py 6.24, so
    Lector and Folders are never held up), cancels it on this device and through a connection, and the panel ends within a few seconds
    whatever the engine does. A late answer from a stopped request is dropped, and never ends a newer run. */
-function stopNow(){if(!RUN.busy)return;RUN.stop=true;try{if(RUN.req)RUN.req.__stopped=true;}catch(e){}
+function stopNow(){MSTOP=true;/* 6.58: and Your mentor's steps after this one */if(!RUN.busy)return;RUN.stop=true;try{if(RUN.req)RUN.req.__stopped=true;}catch(e){}
   try{if(W.Engine&&Engine.abort)Engine.abort();}catch(e){}
   try{if(W.LX&&LX.cloudAb){if(typeof cloudAbort==="function")cloudAbort();if(LX.cloudAb&&LX.cloudAb.abort)LX.cloudAb.abort();}}catch(e){}
   RUN.what="Stopping…";paintLive();var k=$("csStopKey");if(k){k.disabled=true;k.textContent="Stopping…";}
@@ -1340,7 +1343,7 @@ function render(){var root=$("cs");if(!root)return;var S=CS(),room0=S.ui.room||"
   [].forEach.call(root.querySelectorAll(".c-head [data-room]"),function(b){var on=b.getAttribute("data-room")===room0;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   var host=$("csHost"),keepL=null,keepR=null,ol=host.querySelector(".c-list .c-pn-b"),or=host.querySelector(".c-work .c-pn-b");if(ol)keepL=ol.scrollTop;if(or)keepR=or.scrollTop;
   host.innerHTML="";var two=h("div","c-panels"+(LAST_ROOM!==room0?" c-rise":""));host.appendChild(two);var same=LAST_ROOM===room0;LAST_ROOM=room0;
-  if(room0==="today")paintToday(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="edge")paintEdge(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  if(room0==="today")paintToday(two);else if(room0==="mentor")paintMentor(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="edge")paintEdge(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
   paintWho();
   root.setAttribute("data-show",S.ui.show==="work"?"work":"list");
   if(same){var nl=host.querySelector(".c-list .c-pn-b"),nr=host.querySelector(".c-work .c-pn-b");if(nl&&keepL!=null)nl.scrollTop=keepL;if(nr&&keepR!=null&&!host.__jump)nr.scrollTop=keepR;}host.__jump=false;
@@ -1976,7 +1979,10 @@ function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowD
     var c2=h("div","c-col c-today");c2.appendChild(h("h3","c-today-step",esc(act.length?(act.length===1?"One step for today.":act.length+" steps for today, one for each application."):"Nothing is asked of you today.")));
     if(near)c2.appendChild(h("p",null,esc("The nearest date is "+(near.n===0?"today":near.n===1?"tomorrow":"in "+near.n+" days")+", "+dayStr(near.d.at+"T12:00:00")+": "+dateWords(near.d,near.o)+".")));
     if(act.length||CLOCK.ended)c2.appendChild(minutesBox(S,act,low));
-    c2.appendChild(h("p","c-note",esc("Choose one on the left. Each says what to do and why; Do this now takes you straight to it, and Not today lets it rest until tomorrow.")));R.body.appendChild(c2);}
+    c2.appendChild(h("p","c-note",esc("Choose one on the left. Each says what to do and why; Do this now takes you straight to it, and Not today lets it rest until tomorrow.")));
+    /* 6.58: Your mentor's next step, one line, one key */
+    var mx=nextStep(),mt=(MS.filter(function(x){return x[0]===mx;})[0]||["",""])[1];c2.appendChild(h("p","c-td-mentor",esc(mx==="sum"?"Your mentor's summary is ready.":"Your mentor's next step: "+mt+".")));
+    var mk=h("div","c-keys");mk.appendChild(cbtn("sm","Open your mentor",function(){S.ui.room="mentor";MT().step=mx;show("work");save();render();}));c2.appendChild(mk);R.body.appendChild(c2);}
   two(L,R,par);}
 
 /* ---- several profiles (her words, 28 October 2026: "I want the Career Studio to be able to hold multiple profiles"; asked,
@@ -2761,11 +2767,156 @@ function wordsChanged(a,b){var A={},n=0,added=0,left=0;String(a).toLowerCase().s
   String(b).toLowerCase().split(/\W+/).forEach(function(w){if(!w)return;if(A[w]>0)A[w]--;else added++;});Object.keys(A).forEach(function(w){left+=A[w];});return n?Math.min(1,(added+left)/n):0;}
 var EXAM={last:null};
 
+/* ---------------- 6.58 · YOUR MENTOR: one path through the studio, one step on the screen at a time ----------------
+   Her words (8 November 2026): "Right now, the current set up of the Career and Lector page are still not quite well curated enough
+   and customised for me ... It creates more work and is not really AuDHD accessible ... I am still unclear on what exactly I am
+   looking for so I would like for Ingenium to provide that inside of the app and be my in-app recruiter/mentor/counselor/headhunter";
+   "I want both Lector and the Career Studio to provide me with suggestions and recommendations for my Cv, portfolio documents, cover
+   letter and etc. I want them to spot skills and experience that I have show me how it can be transferred ... spot my blindspots";
+   and "I need guidance and a little direction when it comes to choosing a career". Asked where the mentor should learn about her, she
+   chose all four: her CV and documents, Lector's readings of her apps, her LinkedIn export, and a short talk.
+   Measured on 6.57: what the mentor needs was in the studio already, in five rooms and under a dozen keys (Suggest entries and Find
+   my skills in Your profile; What transfers, Blind spots and What sets you apart in Your edge; Your direction in Goals and plan; a
+   document looked at with her; the skills each new reading of an app shows, sent by Lector). Nothing said which to press first, and
+   Suggest entries and Find my skills each replaced the other's findings.
+   Now Your mentor walks her through them in order, one step on the screen at a time, with her place in the steps always in view:
+   1 what the mentor may read; 2 a short talk (eight questions, one at a time, each skippable; the answers fill What you are looking
+   for); 3 her entries found in her sources, kept or dropped one at a time (both kinds of finding kept together); 4 what transfers,
+   her blind spots and what sets her apart; 5 paths that fit; 6 her CV and her other documents looked at with her; 7 the mentor's
+   summary. Do the rest for me runs every step that needs the model, one after another; Stop stops it, whatever was finished is kept,
+   and the room opens at the first step not done. Each profile has its own mentor, so a second person's is theirs. Nothing of what she
+   says is sent anywhere but to the model she chose for the studio. */
+var MS=[["sources","What I can read about you"],["talk","A short talk"],["read","Your entries, found"],["edge","What transfers, and your blind spots"],["paths","Paths that fit"],["cv","Your CV and documents, looked at with you"],["sum","Your mentor's summary"]];
+var TALK=[
+  ["enjoy","What kind of work makes you lose track of time?","Think of a task rather than a job title: building something, explaining, writing, researching, organising."],
+  ["asked","What do people ask you for help with?","What friends, colleagues or classmates come to you for."],
+  ["drawn","Which roles, fields, programmes or organisations interest you, even a little?","Name as many as you like, however loosely. Nothing here commits you."],
+  ["change","What would you like your work to change for other people?",""],
+  ["need","What must your work give you?","For example pay, security, flexible hours, working from anywhere, time to study."],
+  ["avoid","What would you rather avoid?",""],
+  ["where","Where would you like to work from?","Towns, countries, or remotely from anywhere."],
+  ["when","Any studies, deadlines or dates your mentor should know?","For example a doctorate you plan and its funding deadline, or when you could start."]];
+function MT(){var S=CS();if(!S.mentor||typeof S.mentor!=="object")S.mentor={};var m=S.mentor;if(!m.ans||typeof m.ans!=="object")m.ans={};if(!m.done||typeof m.done!=="object")m.done={};
+  if(typeof m.qi!=="number")m.qi=0;return m;}
+function cvDoc(){return edgeDocs().filter(function(d){return d.kind==="cv"&&d.id==="cv";})[0]||null;}
+function stDone(k){var S=CS(),m=MT(),E=EDGE();
+  if(k==="sources")return m.done.sources||0;if(k==="talk")return m.done.talk||0;if(k==="read")return m.done.read&&!(S.profile.suggested||[]).length?m.done.read:0;
+  if(k==="edge")return E.tr&&E.bl&&E.ed?Math.max(E.tr.at||0,E.bl.at||0,E.ed.at||0):0;if(k==="paths")return S.paths&&S.paths.list&&S.paths.list.length?S.paths.at:0;
+  if(k==="cv"){var d=cvDoc();return d&&E.docs[d.id]?E.docs[d.id].at:0;}return m.done.sum||0;}
+function nextStep(){for(var i=0;i<MS.length-1;i++)if(!stDone(MS[i][0]))return MS[i][0];return "sum";}
+function talkApply(){var P=CS().profile,a=MT().ans,L=[];
+  [["drawn","Interested in"],["enjoy","Work I enjoy"],["asked","What people come to me for"],["change","What I want my work to do for others"]].forEach(function(x){var v=String(a[x[0]]||"").trim();if(v)L.push(x[1]+": "+v);});
+  if(L.length)P.wants.looking=L.join("\n");["need","avoid","where","when"].forEach(function(k){var v=String(a[k]||"").trim();if(v)P.wants[k]=v;});P.at=Date.now();}
+/* the steps that use the model, one after another; each waits for the one before to end */
+var MSTOP=false;
+function waitRun(){return new Promise(function(res){var t=setInterval(function(){if(!RUN.busy){clearInterval(t);res();}},300);});}
+function runOne(fn){if(MSTOP)return Promise.reject(new Error("stopped"));fn();return waitRun().then(function(){if(MSTOP)throw new Error("stopped");});}
+/* both kinds of finding, kept together: entries from her CV and documents, then skills with their evidence */
+function readSources(){var P=CS().profile;
+  return runOne(suggest).then(function(){var first=(P.suggested||[]).slice();
+    return runOne(findSkills).then(function(){var seen={};first.forEach(function(x){seen[(x.sec+"|"+x.title).toLowerCase()]=1;});
+      P.suggested=first.concat((P.suggested||[]).filter(function(x){return !seen[(x.sec+"|"+x.title).toLowerCase()];}));MT().done.read=Date.now();save();});});}
+function edgeAll(force){var E=EDGE(),q=Promise.resolve();["tr","bl","ed"].forEach(function(k){q=q.then(function(){if(E[k]&&!force)return;return runOne(function(){edgeRun(k);});});});return q;}
+function doRest(){if(busyNow()||needModel())return;var S=CS(),m=MT(),E=EDGE(),jobs=[];MSTOP=false;
+  if(!stDone("read"))jobs.push(readSources);
+  if(!stDone("edge"))jobs.push(function(){return edgeAll(false);});
+  if(!stDone("paths"))jobs.push(function(){if(!wantsText()&&!S.goals.length){say("Your mentor needs the short talk first to think through paths: it is step 2.");return;}return runOne(paths);});
+  var cv=cvDoc();if(cv&&!E.docs[cv.id])jobs.push(function(){return runOne(function(){docAdvise(cv);});});
+  if(!jobs.length){m.step="sum";save();render();return;}
+  var i=0;function next(){if(i>=jobs.length)return Promise.resolve();return Promise.resolve(jobs[i++]()).then(next);}
+  m.chain=true;save();next().then(function(){m.chain=false;m.step=nextStep()==="sum"?"sum":nextStep();save();render();say("Your mentor has finished the steps it could do. Your summary is in step 7.");},
+    function(){m.chain=false;save();render();say("Stopped. Whatever was finished is kept; Do the rest for me goes on from there.");});}
+function mLede(R,t){R.body.appendChild(h("p","c-note c-pad",esc(t)));}
+function mNextKey(R,k,label){R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",label,function(){var m=MT();m.step=k;save();jump();render();}));}
+function mSources(){var S=CS(),P=S.profile,M=lectorMe(),me=isMe(),R=panel("csWork","1. What I can read about you"),list=h("div","c-srcs");
+  mLede(R,"Your mentor learns about you from what you give it here, so you never type your profile from scratch. Add what you have; anything can wait.");
+  var runs=[];if(me)try{lxState().runs.forEach(function(x){if(x.kind==="app"&&x.status==="done"&&runs.every(function(y){return y.name!==x.name;}))runs.push(x);});}catch(e){}
+  function row(ok,title,sub,keys){var r=h("div","c-src"),tx=h("div","tx");tx.appendChild(h("b",null,esc((ok?"✓ ":"")+title)));tx.appendChild(h("small",null,esc(sub)));r.appendChild(tx);
+    if(keys&&keys.length){var k=h("div","c-keys");keys.forEach(function(x){k.appendChild(x);});r.appendChild(k);}list.appendChild(r);}
+  row(!!M.cv,me?"Your CV":"Their CV",M.cv?M.cv.name+", kept "+dayStr(M.cv.at||Date.now())+".":"A Word file, a PDF or text.",[cbtn("sm",M.cv?"Replace":"Add",addCv)]);
+  row(P.files.length>0,"Your documents",P.files.length?P.files.length+" kept: cover letters, a portfolio, a statement, a proposal.":"Cover letters, a portfolio, a statement, a proposal: anything about your work.",[cbtn("sm","Add",addDocs)]);
+  row(!!P.linkedin,"Your LinkedIn export",P.linkedin?"Read "+dayStr(P.linkedin.at)+".":"The .zip LinkedIn sends when you ask it for a copy of your data.",[cbtn("sm",P.linkedin?"Read it again":"Add",function(){pickFile(".zip,.csv",true,function(fs){importLinkedIn(fs).catch(function(e){say("It could not be read: "+(e&&e.message||e));});});})]);
+  if(me)row(runs.length>0,"Lector's readings of your apps",runs.length?runs.map(function(x){return x.name+(x.version?" "+x.version:"");}).join(", ")+".":"None yet: read your apps in Lector, and your mentor uses what it finds.",runs.length?[]:[cbtn("sm","Open Lector",function(){go("lector");})]);
+  row(false,"A profile file","Entries, documents and a CV kept in one file, from another device or another time.",[cbtn("sm","Bring one in",packPick)]);
+  R.body.appendChild(list);R.foot.appendChild(h("span","c-grow"));
+  R.foot.appendChild(cbtn("pri","Next: a short talk",function(){var m=MT();m.done.sources=m.done.sources||Date.now();m.step="talk";save();jump();render();}));return R;}
+function mTalk(){var m=MT(),P=CS().profile,R=panel("csWork","2. A short talk");
+  if(!m.talkSeeded){["need","avoid","where","when"].forEach(function(k){if(!m.ans[k]&&String(P.wants[k]||"").trim())m.ans[k]=String(P.wants[k]).trim();});m.talkSeeded=true;}
+  var i=Math.max(0,Math.min(TALK.length-1,m.qi)),q=TALK[i],c=h("div","c-col c-pad");
+  c.appendChild(h("span","c-k",esc("Question "+(i+1)+" of "+TALK.length)));c.appendChild(h("h3","c-today-step",esc(q[1])));if(q[2])c.appendChild(h("p","c-note",esc(q[2])));
+  var t=h("textarea","c-ta");t.id="csTalk";t.value=m.ans[q[0]]||"";t.setAttribute("aria-label",q[1]);t.style.minHeight="120px";var tm=null;
+  t.addEventListener("input",function(){m.ans[q[0]]=t.value;clearTimeout(tm);tm=setTimeout(save,500);});c.appendChild(t);
+  c.appendChild(h("p","c-note",esc("Your words, as you would say them. Saved as you type; you can stop and come back at any time.")));R.body.appendChild(c);
+  if(i>0)R.foot.appendChild(cbtn("quiet","Back",function(){m.ans[q[0]]=t.value;m.qi=i-1;save();render();}));
+  R.foot.appendChild(h("span","c-grow"));
+  if(i<TALK.length-1){R.foot.appendChild(cbtn("","Skip",function(){m.qi=i+1;save();render();}));R.foot.appendChild(cbtn("pri","Next",function(){m.ans[q[0]]=t.value;m.qi=i+1;save();render();}));}
+  else R.foot.appendChild(cbtn("pri","Finish the talk",function(){m.ans[q[0]]=t.value;talkApply();m.done.talk=Date.now();m.step="read";save();render();say("Thank you. Your answers are in Your profile, What you are looking for, where you can change them at any time.");}));
+  setTimeout(function(){try{t.focus();}catch(e){}},30);return R;}
+function mRead(){var S=CS(),P=S.profile,m=MT(),sg=P.suggested||[],R=panel("csWork","3. Your entries, found");
+  if(sg.length){var it=sg[0],c=h("div","c-col c-pad");c.appendChild(h("span","c-k",esc(sg.length===1?"The last one to look at":"1 of "+sg.length+" to look at")));
+    var card=h("div","c-entry");card.appendChild(h("span","c-sec",esc((SECTS.filter(function(x){return x[0]===it.sec;})[0]||["",""])[1].replace(/, with evidence$/,""))));card.appendChild(h("b",null,esc(it.title)));
+    var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to ")].filter(Boolean).join(" · ");if(meta)card.appendChild(h("small",null,esc(meta)));if(it.text)card.appendChild(h("p",null,esc(it.text)));c.appendChild(card);
+    c.appendChild(h("p","c-note",esc("Keep it if it is right (you can change it later in Your profile), or drop it. Nothing enters your profile by itself.")));R.body.appendChild(c);
+    function keepOne(x){var nw=Object.assign({},x,{id:uid("it"),src:x.src==="linkedin-new"?"linkedin":"me",at:Date.now()});delete nw.note;delete nw.was;P.items.push(nw);}
+    R.foot.appendChild(cbtn("quiet","Keep all the rest",function(){sg.forEach(keepOne);P.suggested=[];P.at=Date.now();save();render();say("Kept in your profile.");}));R.foot.appendChild(h("span","c-grow"));
+    R.foot.appendChild(cbtn("","Drop",function(){P.suggested=sg.slice(1);save();render();}));
+    R.foot.appendChild(cbtn("pri","Keep",function(){keepOne(it);P.suggested=sg.slice(1);P.at=Date.now();save();render();}));return R;}
+  if(m.done.read){mLede(R,"Every entry found is looked at. Your profile holds "+P.items.length+" entr"+(P.items.length===1?"y":"ies")+". Read your sources again whenever you add something new.");
+    R.foot.appendChild(cbtn("quiet","Read my sources again",function(){if(busyNow()||needModel())return;MSTOP=false;readSources().then(render,render);}));mNextKey(R,"edge","Next: what transfers");return R;}
+  mLede(R,"Your mentor reads your CV, documents, LinkedIn export and Lector's readings, and finds the entries and skills they show. You keep or drop each one, one at a time.");
+  R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri","Read my sources",function(){if(busyNow()||needModel())return;MSTOP=false;readSources().then(render,render);}));return R;}
+function mList(title,list,f){if(!list||!list.length)return null;var b=h("div","c-col c-pad");b.appendChild(h("div","c-label",esc(title)));var ul=h("ul","c-fb");list.forEach(function(x){var li=h("li");li.innerHTML=f(x);ul.appendChild(li);});b.appendChild(ul);return b;}
+function mEdge(){var E=EDGE(),R=panel("csWork","4. What transfers, and your blind spots"),any=false;
+  mLede(R,"What you did in one place that counts in another, what a reader will miss or ask, and what few others can show. Only what your sources show; nothing invented.");
+  [mList("What transfers",E.tr&&E.tr.list.slice(0,6),function(x){return esc(x.skill)+(x.line?"<small>"+esc(x.line)+"</small>":x.evidence?"<small>"+esc(x.evidence)+"</small>":"");}),
+   mList("Your blind spots",E.bl&&E.bl.list.slice(0,5),function(x){return esc(x.what)+(x.fix?"<small>"+esc("What to do: "+x.fix)+"</small>":"");}),
+   mList("What sets you apart",E.ed&&E.ed.list.slice(0,4),function(x){return esc(x.what)+(x.say?"<small>"+esc(x.say)+"</small>":"");})].forEach(function(b){if(b){R.body.appendChild(b);any=true;}});
+  R.foot.appendChild(cbtn("quiet","See it all in Your edge",function(){CS().ui.room="edge";show("list");save();render();}));
+  if(stDone("edge"))mNextKey(R,"paths","Next: paths that fit");
+  else{R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",any?"Finish this step":"Find them",function(){if(busyNow()||needModel())return;MSTOP=false;edgeAll(false).then(render,render);}));}
+  return R;}
+function mPaths(){var R=pathsPanel();R.title.textContent="5. Paths that fit";
+  if(!wantsText()&&!CS().goals.length){R.body.insertBefore(h("p","c-note c-pad",esc("Your mentor starts from what you said in the short talk: have it first, in step 2.")),R.body.firstChild);}
+  if(stDone("paths")){R.foot.appendChild(cbtn("","Next: your CV",function(){MT().step="cv";save();jump();render();}));}return R;}
+function mCv(){var E=EDGE(),R=panel("csWork","6. Your CV and documents, looked at with you"),docs=edgeDocs().filter(function(d){return !/^o:/.test(d.id);}),cv=cvDoc();
+  mLede(R,"Each document is looked at against your profile and what you are looking for: what could do more, what your record adds that it leaves out, what could go, and what a reader will ask. It is never rewritten for you.");
+  if(!cv){var k=h("div","c-keys c-pad");k.appendChild(cbtn("pri","Add your CV",addCv));R.body.appendChild(k);}
+  var shown=cv&&E.docs[cv.id]?cv:null;if(shown){var fb=E.docs[shown.id].fb||{};ADV_TAGS.forEach(function(a){var L=fb[a[0]];var b=mList(a[1],L&&L.slice(0,4),function(p){return esc(p[0])+(p[1]?"<small>"+esc(p[1])+"</small>":"");});if(b)R.body.appendChild(b);});}
+  if(docs.length){var lst=h("div","c-srcs");docs.forEach(function(d){var r=h("div","c-src"),tx=h("div","tx"),got=E.docs[d.id];tx.appendChild(h("b",null,esc((got?"✓ ":"")+d.name)));tx.appendChild(h("small",null,esc(got?"Looked at "+dayStr(got.at)+" (in Your edge, Your documents).":d.sub)));r.appendChild(tx);
+      var kk=h("div","c-keys");kk.appendChild(cbtn("sm"+(got?"":" pri"),got?"Look again":"Look at it",function(){docAdvise(d);}));r.appendChild(kk);lst.appendChild(r);});R.body.appendChild(lst);}
+  mNextKey(R,"sum","Next: your summary");return R;}
+function mSum(){var S=CS(),E=EDGE(),m=MT(),R=panel("csWork","7. Your mentor's summary"),cv=cvDoc(),fb=cv&&E.docs[cv.id]?E.docs[cv.id].fb||{}:{},lines=[];
+  m.done.sum=Date.now();
+  var week=[];(S.paths&&S.paths.list||[]).slice(0,2).forEach(function(p){if(p.first)week.push(p.first+" (for "+p.path+")");});(E.bl&&E.bl.list||[]).slice(0,2).forEach(function(b){if(b.fix)week.push(b.fix);});
+  (fb.NEXT||[]).slice(0,1).forEach(function(p){week.push(p[0]);});
+  week=week.filter(function(x,i){var k=String(x).toLowerCase().trim();return week.findIndex(function(y){return String(y).toLowerCase().trim()===k;})===i;});
+  var add=[];(fb.ADD||[]).slice(0,4).forEach(function(p){add.push(p[0]+(p[1]?": "+p[1]:""));});(E.tr&&E.tr.list||[]).slice(0,3).forEach(function(x){add.push(x.skill+(x.line?": "+x.line:""));});
+  var fromApps=[];Object.keys(E.apps||{}).forEach(function(k){var a=E.apps[k];(a.list||[]).filter(function(x){return x.fresh||!a.earlier;}).slice(0,3).forEach(function(x){fromApps.push(x.skill+" (from "+k+(a.version?" "+a.version:"")+(x.fresh?", new in this build":"")+")");});});
+  var blocks=[["This week, one at a time",week],["What to add to your CV and letters",add],["New from Lector's readings of your apps",fromApps.slice(0,6)],
+    ["Your blind spots to mend first",(E.bl&&E.bl.list||[]).slice(0,3).map(function(b){return b.what+(b.fix?": "+b.fix:"");})],
+    ["Where you stand out",(E.ed&&E.ed.list||[]).slice(0,3).map(function(x){return x.what;})],
+    ["Paths that fit",(S.paths&&S.paths.list||[]).map(function(p){return p.path+(p.fits?": "+p.fits:"");})]];
+  var any=false;blocks.forEach(function(b){if(!b[1].length)return;any=true;var x=mList(b[0],b[1],function(t){return esc(t);});R.body.appendChild(x);lines.push(b[0]+":");b[1].forEach(function(t){lines.push("- "+t);});lines.push("");});
+  if(!any)mLede(R,"Your summary gathers what the steps before found. None of them has run yet: Do the rest for me runs them for you, one after another.");
+  else R.body.appendChild(h("p","c-note c-pad",esc("Drawn from your sources and what you said, with "+(modelName()||"your model")+". What it says about a field, an employer or a programme is for you to check before you rely on it.")));
+  if(any)R.foot.appendChild(cbtn("","Copy the summary",function(){var t=lines.join("\n");try{navigator.clipboard.writeText(t).then(function(){say("Copied.");},function(){say("It could not be copied here.");});}catch(e){say("It could not be copied here.");}}));
+  R.foot.appendChild(h("span","c-grow"));var nx=nextStep();if(nx!=="sum")R.foot.appendChild(cbtn("pri","Do the rest for me",doRest,"Runs every step still to do, one after another"));
+  else if(S.paths&&S.paths.list&&S.paths.list.length&&!S.paths.list.some(function(p){return p.kept;}))R.foot.appendChild(cbtn("pri","Make paths into goals",function(){CS().ui.room="goals";show("list");save();render();}));
+  save();return R;}
+function paintMentor(par){var S=CS(),m=MT(),nx=nextStep(),cur=m.step||nx;if(cur==="sum"&&!RUN.busy)m.done.sum=Date.now();var L=panel("csList","Your mentor");
+  MS.forEach(function(x,i){var d=stDone(x[0]),sub=d?(x[0]==="sum"?"Read "+dayStr(d):"Done "+dayStr(d)):(x[0]===nx?"Next":x[0]==="sum"?"When the steps are done":"Not yet");
+    L.body.appendChild(item((i+1)+". "+x[1],sub,cur===x[0],function(){m.step=x[0];show("work");save();jump();render();},x[0]===nx&&!d?"c-new":""));});
+  L.foot.appendChild(cbtn("pri","Do the rest for me",doRest,"Runs every step that needs your model, one after another; Stop stops it, and whatever was finished is kept"));
+  if(RUN.busy){two(L,livePanel(),par);return;}
+  var R=({sources:mSources,talk:mTalk,read:mRead,edge:mEdge,paths:mPaths,cv:mCv,sum:mSum}[cur]||mSources)();
+  R.head.insertBefore(cbtn("quiet c-back","‹ Your mentor",function(){show("list");save();render();}),R.head.firstChild);two(L,R,par);}
+ICON.mentor='<circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z"/>';
+
 /* ---------------- its place: the page, the menu, go() ---------------- */
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
   sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Career Studio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
-    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["apps","Applications"],["people","People"],["profile","Your profile"],["edge","Your edge"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
+    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["mentor","Your mentor"],["apps","Applications"],["people","People"],["profile","Your profile"],["edge","Your edge"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
   var who=sec.querySelector("#csWho");if(who)who.addEventListener("change",function(){var v=who.value;if(v==="+manage"){var S=CS();S.ui.room="profile";S.ui.ppart="people";show("work");save();render();return;}switchTo(v);});
@@ -2780,7 +2931,7 @@ function install(){if($("page-career"))return;
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 try{if($("page-career").classList.contains("active"))render();}catch(e){}
-window.IngCareer={state:CS,render:render,/* 6.44 */ adviseDoc:adviseDoc,spotSkills:spotSkills,appSkills:appSkills,edgeRun:edgeRun,docAdvise:docAdvise,edgeDocs:edgeDocs,paths:paths,tagged:tagged,targetsText:targetsText,profileForChat:profileForChat,newOpp:newOpp,read:readOpp,fetchPosting:fetchPosting,jl:{norm:jlNorm,ats:jlAts,api:jlApi,text:jlText,unent:jlUnent,fromLd:jlFromLd,find:jlFind,json:jlJson,compose:jlCompose,fetch:jlFetch,wall:jlWall},vetEvidence:vetEvidence,vetLead:vetLead,saved:svList,svMerge:svMerge,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
+window.IngCareer={state:CS,render:render,/* 6.58 */ mentor:{state:MT,next:nextStep,done:stDone,talk:TALK,steps:MS,apply:talkApply,rest:doRest,readSources:readSources},/* 6.44 */ adviseDoc:adviseDoc,spotSkills:spotSkills,appSkills:appSkills,edgeRun:edgeRun,docAdvise:docAdvise,edgeDocs:edgeDocs,paths:paths,tagged:tagged,targetsText:targetsText,profileForChat:profileForChat,newOpp:newOpp,read:readOpp,fetchPosting:fetchPosting,jl:{norm:jlNorm,ats:jlAts,api:jlApi,text:jlText,unent:jlUnent,fromLd:jlFromLd,find:jlFind,json:jlJson,compose:jlCompose,fetch:jlFetch,wall:jlWall},vetEvidence:vetEvidence,vetLead:vetLead,saved:svList,svMerge:svMerge,write:writeDoc,findSkills:findSkills,roles:roles,goalSteps:goalSteps,reviewMine:reviewMine,parseRead:parseRead,bandOf:bandOf,checks:checks,csvObjs:csvObjs,importLinkedIn:importLinkedIn,unzip:unzip,parseLook:parseLook,fromLector:fromLector,lessons:LESSONS,run:RUN,stop:stopNow,limitsIn:limitsIn,limitFor:limitFor,coverage:coverage,wordCount:wordCount,revise:reviseDoc,earlier:earlier,how:HOW,
   root:ROOT,newPerson:newPerson,switchTo:switchTo,removePerson:removePerson,checkFind:checkFind,diffUnits:diffUnits,joinUnits:joinUnits,nextOf:nextOf,planDoc:planDoc,guideDoc:guideDoc,wayOf:wayOf,docs:DOCS,FOR:FOR,
   /* 6.9.2 */ datesOf:datesOf,remindAt:remindAt,bellFor:bellFor,estimateOf:estimateOf,exportOpp:exportOpp,exportAll:exportAll,exportFiles:exportFiles,keepToRead:keepToRead,toFontes:toFontes,readWithLector:readWithLector,readingNotes:readingNotes,
   checkAgain:checkAgain,keepRecheck:keepRecheck,addMore:addMore,postText:postText,postOnly:postOnly,makeCheck:makeCheck,lcsUnits:lcsUnits,startMock:startMock,stopMock:stopMock,startClock:startClock,stopClock:stopClock,clock:function(){return CLOCK;},mock:function(){return MOCK;},

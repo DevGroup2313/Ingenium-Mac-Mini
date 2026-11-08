@@ -69,7 +69,7 @@ var ROOMS={
     {k:"you",t:"Your Ingenium",i:svg('<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/>'),says:"Who you are and how you want answers: Ingenium's own instructions, then yours, for every chat and every model.",m:["personaCard"]},
     {k:"conn",t:"Connections",i:svg('<path d="M9 3.5v4M15 3.5v4"/><path d="M6.5 7.5h11v3a5.5 5.5 0 0 1-11 0z"/><path d="M12 16v4.5"/>'),says:"Models online or on your other computers, and the connectors that give a model tools.",m:[/^connect a cloud/,"cnCard"]},
     {k:"search",t:"Search, eyes and ears",i:svg('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>'),says:"Web search with scholarly sources, Ingenium's eyes for pictures and scanned pages, and its ears for dictation on this device.",m:[/^web search/,"ingEyesCard","ingEarsCard","ragCard"]},
-    {k:"devices",t:"Your devices",i:svg('<rect x="2.8" y="4.5" width="13" height="9.5" rx="1.6"/><path d="M6 17.5h6.5"/><rect x="16.8" y="8" width="4.4" height="9.5" rx="1.2"/>'),says:"Your models on every device: a stronger computer lending its models to your laptop, tablet and phone.",m:["linkCard"]}]}};
+    {k:"devices",t:"Your devices",i:svg('<rect x="2.8" y="4.5" width="13" height="9.5" rx="1.6"/><path d="M6 17.5h6.5"/><rect x="16.8" y="8" width="4.4" height="9.5" rx="1.2"/>'),says:"Your models on every device: a stronger computer lending its models to your laptop, tablet and phone, and the screen kept on while Ingenium works.",m:["linkCard","awakeCard"]}]}};
 var KEY="ing.settings.parts.v1",PREF={};
 try{PREF=JSON.parse(W.localStorage.getItem(KEY)||"{}")||{};}catch(e){PREF={};}
 function keep(){try{W.localStorage.setItem(KEY,JSON.stringify(PREF));}catch(e){}}
