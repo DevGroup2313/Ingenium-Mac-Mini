@@ -1,7 +1,10 @@
 {
   "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
-  "modules": [],
+  "modules": [
+    "r258.js"
+  ],
   "released_62": "Storage (r142, t_61_storage 81/81), backup and moving (r143, t_61_backup 57/57) and the tour by level with help on every page (r144, t_62_tour 39/39) passed their checks on 22 October 2026 and ride in 6.2.",
   "held_692": "r202.js (the folder search's loader and its Settings card) waits for the end-to-end test of phase 1 and its review; the desktop bridge methods (desktop/app_rag_692.py) ride, unused until then.",
-  "released_659": "r202.js (the folder search's loader and its Settings card) rides from 6.59 (8 November 2026), with r257.js (the chat answers from her folders, phase 3): phase 1's end-to-end test (rig/t_rag1_manual.js, 102 of 102) and its review were done on 1 November 2026, phase 2's retrieval test on 6 November, phase 3's (rig/t_rag3_chat.js) on 8 November; the desktop apps now carry rag/ beside the page."
+  "released_659": "r202.js (the folder search's loader and its Settings card) rides from 6.59 (8 November 2026), with r257.js (the chat answers from her folders, phase 3): phase 1's end-to-end test (rig/t_rag1_manual.js, 102 of 102) and its review were done on 1 November 2026, phase 2's retrieval test on 6 November, phase 3's (rig/t_rag3_chat.js) on 8 November; the desktop apps now carry rag/ beside the page.",
+  "held_665": "r258.js (her build library on the Folders page) waits for her answer to its preview (her rule: a preview before anything new is shown); modules/r208.js calls it only when it is there."
 }

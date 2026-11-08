@@ -97,7 +97,7 @@ export function markdown(r) {
   }
   if (r.grounded) {
     const g = r.grounded;
-    L.push('## 2. Groundedness', '', 'Model: ' + g.model + '. Answers: ' + g.items.length + '; every sentence cited and every citation to a passage given: **' + g.items.filter((x) => x.cited).length + ' of ' + g.items.length + '**; NOT_FOUND answers: ' + g.items.filter((x) => x.notFound).length + '; answers naming the fact: ' + g.items.filter((x) => x.correct).length + '.', '');
+    L.push('## 2. Groundedness', '', 'Model: ' + g.model + '. Answers: ' + g.items.length + '; every sentence cited and every citation to a passage given: **' + g.items.filter((x) => x.cited).length + ' of ' + g.items.length + '**; NOT_FOUND answers: ' + g.items.filter((x) => x.notFound).length + '; answers naming the fact: ' + g.items.filter((x) => x.correct).length + '.' + (g.items.some((x) => x.recheck) ? ' The second pass (6.65) asked again in ' + g.items.filter((x) => x.recheck).length + ' answers and kept the second answer in ' + g.items.filter((x) => x.recheck === 'better' || x.recheck === 'notfound').length + '.' : ''), '');
     g.items.forEach((x) => {
       if (!x.flagged.length && !x.badRefs.length && !x.unsupported.length) return;
       L.push('- ' + x.id + (x.flagged.length ? ': without a citation: ' + x.flagged.map((s) => '"' + s + '"').join('; ') : '') + (x.badRefs.length ? '; cites passages not given: ' + x.badRefs.map((n) => '[' + n + ']').join(', ') : '') + (x.unsupported.length ? '; to read (few of its words in its passage): ' + x.unsupported.map((s) => '"' + s.text + '" (' + s.share + ')').join('; ') : ''));

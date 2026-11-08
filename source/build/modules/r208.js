@@ -229,6 +229,8 @@ function homeView(host){var fs=folders();status(host);
       ar.appendChild(key("primary","Make the folder",mk));ar.appendChild(key("ghost","Cancel",function(){F().ui.adding=false;paint();}));g.appendChild(ar);}
     host.appendChild(g);
     var un=unsorted();if(un.length){var u=card("Not sorted yet ("+un.length+")","Conversations whose words did not clearly name one of your apps. Move each where it belongs, or leave it here.");u.appendChild(convList(un,null));host.appendChild(u);}}
+  /* 6.65: her build library (modules/r258.js), after her apps */
+  try{if(W.IngBuildLib)W.IngBuildLib.home(host,{card:card});}catch(e){}
   host.appendChild(bringCard());
   var hw=card("How I work, on every app","In your own words: how you like to work, what you expect of a model, what you never want. It goes with every conversation in a folder, before the folder's own notes.");
   var ta=h("textarea","fld-ta");ta.id="fldHowAll";ta.value=F().how||"";ta.setAttribute("aria-label","How I work, on every app");ta.placeholder="For example: one step at a time; plan first, then build, then check; plain words, no jargon; never invent a source.";
@@ -272,6 +274,8 @@ function folderView(p,host){var a=p.app;
   /* how I work here */
   var hw=card("How I work on "+p.name,"In your own words. It goes with every conversation in this folder, after How I work on every app.");var ta=h("textarea","fld-ta");ta.value=a.how||"";ta.setAttribute("aria-label","How I work on "+p.name);
   ta.addEventListener("change",function(){a.how=ta.value.slice(0,CAP.how);save();say("Kept for every conversation in "+p.name+".");});hw.appendChild(ta);host.appendChild(hw);
+  /* 6.65: how this app was built, from her build library (modules/r258.js) */
+  try{if(W.IngBuildLib)W.IngBuildLib.folder(p,host,{card:card});}catch(e){}
   /* decisions and what is open */
   var dc=card("Decisions, and what is open","Kept by Ingenium when the summary is brought up to date; change or remove any.");
   [["Decisions so far","decisions"],["Open next","open"]].forEach(function(x){dc.appendChild(h("h3","small",esc(x[0])));var ul=h("ul","fld-list");(a[x[1]]||[]).forEach(function(s,i){var li=h("li");li.appendChild(h("div","fld-t",esc(s)));li.appendChild(key("small ghost","Remove",function(){a[x[1]].splice(i,1);save();paint();}));ul.appendChild(li);});

@@ -108,13 +108,13 @@ function sampler(root) {
       const ask = async (q) => { await p.evaluate(() => { const c = { id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title: 'New conversation', messages: [] }; state.chats.push(c); state.activeChat = c.id; saveState(); renderChat(); });
         await p.fill('#chatInput', q); await p.evaluate(() => sendChat());
         await p.waitForFunction(() => { const m = curMsgs(); const l = m[m.length - 1]; return l && l.role === 'bot' && !l.live && (typeof liveBot === 'undefined' || !liveBot) && (!l.rag || l.rag.done || l.rag.called === false); }, null, { timeout: 900000 });
-        return p.evaluate(() => { const l = curMsgs()[curMsgs().length - 1]; return { text: l.text, rag: l.rag ? { passages: (l.rag.passages || []).map((x) => ({ folder: x.folder, file: x.file, text: x.text })), called: l.rag.called } : null }; }); };
+        return p.evaluate(() => { const l = curMsgs()[curMsgs().length - 1]; return { text: l.text, rag: l.rag ? { passages: (l.rag.passages || []).map((x) => ({ folder: x.folder, file: x.file, text: x.text })), called: l.rag.called, recheck: l.rag.recheck || null, draft: l.rag.draft || null } : null }; }); };
       const items = [];
       for (const it of GOLD.items) {
         const t = Date.now(); const a = await ask(it.question); const ps = (a.rag && a.rag.passages) || [];
         const g = E.grounded(a.text, ps); const correct = E.answerHas(a.text, it);
-        items.push({ id: it.id, text: a.text, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, seconds: Math.round((Date.now() - t) / 1000) });
-        note(it.id + ' (' + Math.round((Date.now() - t) / 1000) + ' s): ' + (g.notFound ? 'NOT_FOUND' : (g.ok ? 'grounded' : 'flagged')) + (correct ? ', names the fact' : '') + ' :: ' + String(a.text).replace(/\s+/g, ' ').slice(0, 160));
+        items.push({ id: it.id, text: a.text, recheck: (a.rag && a.rag.recheck) || null, draft: (a.rag && a.rag.draft) || null, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, seconds: Math.round((Date.now() - t) / 1000) });
+        note(it.id + ' (' + Math.round((Date.now() - t) / 1000) + ' s): ' + (g.notFound ? 'NOT_FOUND' : (g.ok ? 'grounded' : 'flagged')) + (a.rag && a.rag.recheck ? ', checked again: ' + a.rag.recheck : '') + (correct ? ', names the fact' : '') + ' :: ' + String(a.text).replace(/\s+/g, ' ').slice(0, 160));
       }
       R.grounded = { model: LLM_NAME, items };
       const cited = items.filter((x) => x.cited).length, unsup = items.reduce((s, x) => s + x.unsupported.length, 0);

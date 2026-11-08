@@ -6,6 +6,11 @@
 .msg .rag-sources .rag-where{color:var(--ink-3)}
 .msg .rag-note{display:block;margin:7px 0 0;font-size:12px;line-height:1.45;color:var(--ink-3)}
 .msg .rag-flag ul{margin:4px 0 0;padding-left:18px}
+.msg .rag-draft{margin:7px 0 0;font-size:12.5px;color:var(--ink-2)}
+.msg .rag-draft summary{cursor:pointer;color:var(--ink-3);font-size:12px}
+.msg .rag-draft .rag-draft-text{margin:5px 0 0;padding:8px 10px;border:1px dashed var(--hairline);border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.msg .rag-advice{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 0;font-size:12px;line-height:1.45;color:var(--ink-2)}
+.msg .rag-advice span{flex:1 1 260px}
 #modalBox.rag-view{max-width:780px}
 #modalBox .rag-vmeta{margin:0 0 6px;overflow-wrap:anywhere}
 #modalBox .rag-vnote{margin:0 0 8px;min-height:1.4em;color:var(--ink-2)}
@@ -130,13 +135,70 @@ function contextWrap(o){return function(bot){var t=o.apply(this,arguments);
   return t;};}
 
 /* ---------------------------------------------------------------- 3. the reply */
-function finish(m){var g=m.rag;g.done=1;if(g.error||g.called===false)return;
-  var r=R(),P=r&&r.prompt,t=String(m.text||"");if(!P||!t.trim())return;
+/* 6.65, her choice (8 November 2026), after the evaluation: "Keep it as it is. Uncited sentences are already named under each reply.
+   Recommend a larger model for folder answers. Add a second pass that asks the model to cite every sentence." and "I want the very
+   best for the app." A reply with a sentence that names no passage, or a citation to no passage given, is asked for once more, of the
+   same model through the same way (this computer's model or the connection): her system prompt with the same passages, her question,
+   the model's first answer, and RECHECK_ASK. The second answer is kept only when its citations are better (fewer sentences without a
+   passage, no more citations to none, at least one citation); the first stays readable under the reply. What is still unchecked is
+   named under the reply as before; when the model is small, the stronger model of this device is recommended (bigModel). */
+var RECHECK_ASK="Check your answer against the context above. Write it again so that every sentence and every list item ends with the citation [n] of the passage that supports it. Leave out any sentence that no passage supports, and add nothing new. Use only the numbers of the passages above. If the context does not contain the answer, respond exactly: \""+NOT_FOUND+"\"";
+var ACTIVE=typeof WeakSet==="function"?new WeakSet():null;
+function recheckOn(){try{return !(state.rag&&state.rag.recheck===false);}catch(e){return true;}}
+function viaCloud(){try{return chatSource()==="cloud"&&!!(state.cloud&&state.cloud.on&&state.cloud.provider);}catch(e){return false;}}
+function localModel(){try{return state.models.filter(function(x){return x.id===state.activeModelId;})[0]||null;}catch(e){return null;}}
+function canAsk(){try{if(viaCloud())return typeof cloudChat==="function";var m=localModel();return !!(m&&W.Engine&&Engine.modelId===m.id&&typeof Engine.generate==="function");}catch(e){return false;}}
+function idle(){try{return !liveBot&&!(W.Engine&&Engine.status==="busy");}catch(e){return true;}}
+function noThink(t){t=String(t||"");var i=t.lastIndexOf("</think>");return (i>=0?t.slice(i+8):t).replace(/^\s+|\s+$/g,"");}
+function askModel(msgs){
+  if(viaCloud()){var keep=state.thinking,ab=netAbortable(),out="";try{_cloudAb=ab;}catch(e){}state.thinking=false;
+    var done=function(){state.thinking=keep;try{if(_cloudAb===ab)_cloudAb=null;}catch(e){}};
+    return Promise.resolve().then(function(){return typeof ensureCloudModel==="function"?ensureCloudModel():null;})
+      .then(function(){return cloudChat(msgs,function(t){out+=t;},function(){},ab);})
+      .then(function(){done();return noThink(out);},function(e){done();throw e;});}
+  var m=localModel();if(!m||Engine.modelId!==m.id)return Promise.reject(new Error("the model that answered is not loaded"));
+  var params={max_tokens:1024,temperature:0.2,thinking:false};
+  try{params=Object.assign({},replyParams(m,{max_tokens:replyTokens(),ctx:+$("ctlCtx").value,thinking:false}),{temperature:0.2,thinking:false});}catch(e){}
+  var out="";try{Engine.setStatus("busy");}catch(e){}
+  return Promise.resolve(Engine.generate({messages:msgs,params:params,onToken:function(t){out+=t;},onThink:function(){}}))
+    .then(function(res){try{Engine.setStatus("ready");}catch(e){}return noThink(out||(res&&res.text)||"");},function(e){try{Engine.setStatus("ready");}catch(_){}throw e;});}
+function apply(g,c){g.ok=c.ok;g.flagged=c.flagged.slice(0,12);g.badRefs=c.badRefs;g.cited=c.cited;}
+function recheck(m,c1){var g=m.rag,r=R();if(!r)return Promise.resolve("error");
+  var P=r.prompt,ps=g.passages||[],n=ps.length,draft=String(m.text||"");
+  var msgs=[{role:"system",content:P.systemPrompt(ps,g.q)},{role:"user",content:g.q},{role:"assistant",content:draft},{role:"user",content:RECHECK_ASK}];
+  try{Object.defineProperty(msgs,"__ingChat",{value:false,enumerable:false,configurable:false,writable:false});}catch(e){}
+  return askModel(msgs).then(function(t2){
+    if(!t2)return "same";
+    if(typeof P.declaresNotFound==="function"?P.declaresNotFound(t2,n):P.isNotFound(t2)){
+      if(!c1.cited.length){m.text=NOT_FOUND;g.notFound=true;return "notfound";}return "same";}
+    var c2=P.checkGrounded(t2,n);
+    var better=c2.cited.length>0&&c2.badRefs.length<=c1.badRefs.length&&(c2.flagged.length<c1.flagged.length||c2.badRefs.length<c1.badRefs.length);
+    if(!better)return "same";
+    m.text=t2;apply(g,c2);return "better";});}
+function runCheck(m,c1,tries){var g=m.rag;
+  if(!idle()&&(tries||0)<80){setTimeout(function(){runCheck(m,c1,(tries||0)+1);},150);return;}
+  var end=function(res){delete g.checking;g.recheck=res;g.done=1;try{if(ACTIVE)ACTIVE.delete(m);}catch(e){}try{saveState();}catch(e){}try{renderChat();}catch(e){}};
+  if(!idle()||!canAsk()){end("skipped");return;}
+  recheck(m,c1).then(end,function(){end("stopped");});}
+function finish(m){var g=m.rag;if(g.done)return;
+  if(g.checking){if(ACTIVE&&ACTIVE.has(m))return;delete g.checking;g.recheck="stopped";g.done=1;return;}   /* the app was closed while it checked */
+  if(g.error||g.called===false){g.done=1;return;}
+  var r=R(),P=r&&r.prompt,t=String(m.text||"");if(!P||!t.trim()){g.done=1;return;}
   /* 6.63: a reply that says the NOT_FOUND sentence and cites no passage given is exactly NOT_FOUND (her contract: "respond exactly") */
-  if(typeof P.declaresNotFound==="function"?P.declaresNotFound(t,(g.passages||[]).length):P.isNotFound(t)){m.text=NOT_FOUND;g.notFound=true;return;}
-  var c=P.checkGrounded(t,(g.passages||[]).length);g.ok=c.ok;g.flagged=c.flagged.slice(0,12);g.badRefs=c.badRefs;g.cited=c.cited;}
-function finishAll(){var ch=false;try{curMsgs().forEach(function(m){if(m&&m.role==="bot"&&m.rag&&!m.live&&!m.rag.done){finish(m);ch=true;}});}catch(e){}
+  if(typeof P.declaresNotFound==="function"?P.declaresNotFound(t,(g.passages||[]).length):P.isNotFound(t)){m.text=NOT_FOUND;g.notFound=true;g.done=1;return;}
+  var c=P.checkGrounded(t,(g.passages||[]).length);apply(g,c);
+  if(c.ok||!recheckOn()||g.recheck||!canAsk()||!ACTIVE){g.done=1;return;}
+  g.checking=1;g.draft=t;ACTIVE.add(m);
+  setTimeout(function(){runCheck(m,c,0);},0);}
+function finishAll(){var ch=false;try{curMsgs().forEach(function(m){if(m&&m.role==="bot"&&m.rag&&!m.live&&!m.rag.done&&!(m.rag.checking&&ACTIVE&&ACTIVE.has(m))){finish(m);ch=true;}});}catch(e){}
   if(ch){try{saveState();}catch(e){}}}
+/* the stronger model for answers from her folders: this device's Magister when the model that answered is smaller (ING_LINEUP) */
+function bigModel(){try{if(viaCloud())return null;var m=localModel();if(!m||typeof ING_LINEUP==="undefined")return null;
+    var mine=lineupKeyOfRec(m),key=lineupKeyFor("magister");if(!key||key===mine)return null;
+    var a=mine&&ING_LINEUP.models[mine],b=ING_LINEUP.models[key];if(!b)return null;
+    if(a&&!(+a.params<+b.params))return null;
+    if(!a&&+m.sizeBytes>=+b.size)return null;   /* a model outside the lineup at least as large is not told to change */
+    return {key:key,name:b.name,ready:!!lineupRec(key)};}catch(e){return null;}}
 function pathOf(p){return (p.folder?p.folder+"/":"")+(p.file||"");}
 function where(p){var w=[];if(p.heading)w.push(p.heading);if(p.page!=null)w.push("page "+p.page);return w.join(" · ");}
 function citeLink(n,mm,label){var a=mk("a","rag-cite",label);a.href="#";a.setAttribute("data-rag-n",String(n));
@@ -160,7 +222,7 @@ function paint(d,mm){
   if(mm.role==="me"){if(mm.ragAsk===true&&!d.querySelector(":scope > .rag-tag")){var tg=mk("span","web-tag rag-tag","📂 your folders");d.insertBefore(tg,d.firstChild);}return;}
   if(mm.role!=="bot"||!mm.rag||mm.live)return;
   var g=mm.rag,ps=g.passages||[];
-  [].slice.call(d.querySelectorAll(":scope > .rag-sources, :scope > .rag-note, :scope > .rag-flag")).forEach(function(x){x.remove();});
+  [].slice.call(d.querySelectorAll(":scope > .rag-sources, :scope > .rag-note, :scope > .rag-flag, :scope > .rag-draft, :scope > .rag-advice")).forEach(function(x){x.remove();});
   var md=d.querySelector(":scope > .md");if(md&&ps.length)linkify(md,mm);
   if(ps.length){var so=mk("div","msg-sources rag-sources");so.appendChild(mk("b",null,g.notFound?"Looked at in your folders":"From your folders"));var ol=mk("ol");
     ps.forEach(function(p,i){var li=mk("li"),a=mk("a",null,pathOf(p));a.href="#";a.setAttribute("data-rag-n",String(i+1));a.title="Open this passage in its file";
@@ -171,13 +233,27 @@ function paint(d,mm){
     else if(g.why==="unread")notes.push("Your folders have not been read yet: Settings, Models and AI, Folders for the chat, Read it now.");
     else notes.push("Nothing in your folders matched, so no model was asked.");}
   if(g.rerankNote)notes.push(g.rerankNote);
+  /* 6.65: the second pass */
+  if(g.checking)notes.push("Checking that every sentence names its passage: the model is asked once more…");
+  else if(g.recheck==="better")notes.push("Checked again: a sentence named no passage, so the model was asked to cite every sentence. This is its second answer.");
+  else if(g.recheck==="same")notes.push("Checked again: a sentence named no passage, and the model's second answer was not better, so this is its first.");
+  else if(g.recheck==="notfound")notes.push("Checked again: asked to cite every sentence, the model found that your folders do not hold the answer.");
+  else if(g.recheck==="stopped")notes.push("The second check was stopped, so this is the model's first answer.");
   if(g.dropped>0)notes.push("The model's memory took "+g.given+" of the "+g.found+" passages found; the others were left out.");
   notes.forEach(function(t){beforeActs(d,mk("span","rag-note",t));});
   if(!g.notFound&&g.done&&((g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))){var f=mk("div","msg-unchecked rag-flag");f.setAttribute("role","note");f.appendChild(mk("span","mu-mark","!"));
     var body=mk("span");var nf=(g.flagged||[]).length;
     body.appendChild(D.createTextNode((nf?("Check "+(nf===1?"this sentence":"these "+nf+" sentences")+": "+(nf===1?"it names":"they name")+" no passage of your folders."):"")+((g.badRefs||[]).length?(nf?" ":"")+"The reply cites "+g.badRefs.map(function(n){return "["+n+"]";}).join(", ")+", which "+(g.badRefs.length===1?"is":"are")+" not among the passages it was given.":"")));
     if(nf){var ul=mk("ul");g.flagged.forEach(function(s){ul.appendChild(mk("li",null,"“"+(s.length>220?s.slice(0,218)+"…":s)+"”"));});body.appendChild(ul);}
-    f.appendChild(body);beforeActs(d,f);}}
+    f.appendChild(body);beforeActs(d,f);}
+  if(g.draft&&(g.recheck==="better"||g.recheck==="notfound")){var dr=mk("details","rag-draft");dr.appendChild(mk("summary",null,"The first answer"));dr.appendChild(mk("div","rag-draft-text",g.draft));beforeActs(d,dr);}
+  /* 6.65: a larger model, when a small one answered and something is still unchecked or had to be asked again */
+  if(!g.notFound&&g.done&&g.called&&(g.recheck||(g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))){var bm=bigModel();
+    if(bm){var ad=mk("div","rag-advice");ad.setAttribute("role","note");
+      ad.appendChild(mk("span",null,"A larger model cites its sources more carefully: in Ingenium's own test of answers from folders, Qwen3.5 9B cited every sentence in 16 of 20 answers and Qwen3.5 2B in 10 of 20. For answers from your folders, "+bm.name+" is the stronger model for this computer."));
+      var kb=mk("button","btn small",bm.ready?"Use "+bm.name:"Get "+bm.name+" on the Models page");kb.type="button";
+      kb.onclick=function(e){e.stopPropagation();try{if(bm.ready){lineupUse("magister");toast(bm.name+" answers from now on.");}else go("models");}catch(_){}};
+      ad.appendChild(kb);beforeActs(d,ad);}}}
 
 /* ---------------------------------------------------------------- 4. the viewer */
 var opener=null;

@@ -11,7 +11,9 @@
 //   5. grounded turns (Markdown, PDF, HTML and JSON facts): the model reads exactly two messages, her system prompt word for word with the
 //      passages numbered and her question; the reply's [n] are links; the sources are listed; nothing flagged; the viewer marks the
 //      passage at its character offsets (Markdown) or on its page (PDF)
-//   6. a reply with a sentence without a citation and a citation to no passage: both named under the reply
+//   6. a reply with a sentence without a citation and a citation to no passage: both named under the reply; 6b (6.65) the second
+//      pass: asked once more with the first answer, the better answer kept and the first beside it, a larger model recommended, off
+//      when she turns it off
 //   7. a reply that is the NOT_FOUND sentence in quotes: exactly NOT_FOUND; with words around it and no citation: exactly NOT_FOUND
 //      (6.63); with a citation to a passage given: an answer, the sentence flagged
 //   8. ACL end to end: test-b asks what only household_papers answers: retrieve() gives no passage of it, the model is given none of
@@ -103,7 +105,12 @@ const fakeModel = (p) => p.evaluate(() => {
     let reply;
     const blocks = sys.split(/\n\n(?=\[\d+\] )|\nContext:\n/).filter((b) => /^\[\d+\] /.test(b));
     const hit = window.__needle ? blocks.find((b) => b.indexOf(window.__needle) >= 0) : null;
-    if (/^You are answering strictly/.test(sys)) {
+    const last = msgs[msgs.length - 1];
+    if (/^You are answering strictly/.test(sys) && last && last.role === 'user' && /^Check your answer against the context above\./.test(last.content)) {
+      // 6.65, the second pass: 'fix' answers with every sentence cited; otherwise the first answer comes back as it was
+      if (window.__recheck === 'fix' && hit) { const n = /^\[(\d+)\]/.exec(hit)[1]; reply = 'Your folder says: ' + window.__needle + ' [' + n + '].'; }
+      else reply = msgs[msgs.length - 2].content;
+    } else if (/^You are answering strictly/.test(sys)) {
       if (hit) { const n = /^\[(\d+)\]/.exec(hit)[1]; reply = 'Your folder says: ' + window.__needle + ' [' + n + '].'; if (window.__mode === 'loose') reply += ' This part comes from nowhere in particular. It is also in [9].'; if (window.__mode === 'mixed') reply += ' I could not find that in the selected folders.'; }
       else reply = window.__mode === 'explain' ? 'The passages given speak of other things, not of this.\n\nI could not find that in the selected folders.' : '"I could not find that in the selected folders."';
     } else reply = 'An ordinary reply.';
@@ -111,7 +118,7 @@ const fakeModel = (p) => p.evaluate(() => {
     return Promise.resolve({ text: reply, stats: {} });
   };
 });
-const waitReply = (p) => p.waitForFunction(() => { const m = curMsgs(); const l = m[m.length - 1]; return l && l.role === 'bot' && !l.live && !l.wake && (typeof liveBot === 'undefined' || !liveBot); }, null, { timeout: 180000 });
+const waitReply = (p) => p.waitForFunction(() => { const m = curMsgs(); const l = m[m.length - 1]; return l && l.role === 'bot' && !l.live && !l.wake && (typeof liveBot === 'undefined' || !liveBot) && (!l.rag || l.rag.done || l.rag.called === false); }, null, { timeout: 180000 });
 async function send(p, text) {
   const n0 = await p.evaluate(() => curMsgs().length);
   await p.fill('#chatInput', text); await p.evaluate(() => sendChat());
@@ -236,6 +243,27 @@ const plusItems = (p) => p.evaluate(() => { const b = document.getElementById('c
     const fl = await p.evaluate(() => { const d = [...document.querySelectorAll('#chatScroll .msg')].pop(); const f = d.querySelector('.rag-flag'); return f ? f.textContent : null; });
     ok(fl && /Check these 2 sentences/.test(fl) && /comes from nowhere/.test(fl) && /cites \[9\], which is not among the passages/.test(fl), 'both are named under the reply, and [9] is said to be no passage given', fl);
 
+    // ------------------------------------------------------------------------------------------ 6b. the second pass (6.65, her choice)
+    note('6b. the second pass: the model is asked once more to cite every sentence');
+    const n6 = await sentCount(p);
+    ok(r.rag.recheck === 'same' && n6 >= 2 && (await lastSent(p)).length === 4, 'item 6\'s reply was asked for once more (four messages), and the second answer, no better, left the first in place with its flags', { recheck: r.rag.recheck, msgs: (await lastSent(p)).length });
+    await p.evaluate(() => { window.__recheck = 'fix'; });
+    let s0 = await sentCount(p);
+    r = await send(p, fact('R09').question);
+    const two = await p.evaluate(() => window.__sent.slice(-2));
+    const [first, second] = two;
+    ok((await sentCount(p)) === s0 + 2 && second.length === 4 && second[0].content === first[0].content && second[1].role === 'user' && second[1].content === first[1].content && second[2].role === 'assistant' && /comes from nowhere/.test(second[2].content) && /^Check your answer against the context above\./.test(second[3].content),
+      'the second call carries her system prompt and passages unchanged, the question, the first answer, and the request to cite every sentence', second.map((m) => m.role + ':' + m.content.slice(0, 50)));
+    ok(r.rag.recheck === 'better' && r.rag.ok === true && !r.rag.flagged.length && !/comes from nowhere/.test(r.text) && /comes from nowhere/.test(r.rag.draft || '') && /\[1\]|\[2\]|\[3\]|\[4\]|\[5\]/.test(r.text), 'the better second answer is kept, every sentence cited, and the first is kept beside it', { text: r.text, recheck: r.rag.recheck });
+    const ui6 = await p.evaluate(() => { const d = [...document.querySelectorAll('#chatScroll .msg')].pop(); return { note: [...d.querySelectorAll('.rag-note')].map((x) => x.textContent).join(' | '), draft: !!d.querySelector('details.rag-draft'), flag: !!d.querySelector('.rag-flag'), advice: (d.querySelector('.rag-advice') || {}).textContent || '' }; });
+    ok(/Checked again/.test(ui6.note) && ui6.draft && !ui6.flag, 'under the reply: "Checked again", the first answer in a fold, no flags', ui6);
+    ok(/Qwen3\.5 9B cited every sentence in 16 of 20/.test(ui6.advice) && /Models page|Use /.test(ui6.advice), 'a small model is told that a larger one cites more carefully, with a key to it', ui6.advice);
+    await p.evaluate(() => { state.rag.recheck = false; saveState(); window.__recheck = ''; });
+    s0 = await sentCount(p);
+    r = await send(p, fact('R09').question);
+    ok((await sentCount(p)) === s0 + 1 && !r.rag.recheck && r.rag.flagged.length === 2, 'with the check turned off (Settings): one call, the flags named as before', { calls: (await sentCount(p)) - s0, recheck: r.rag.recheck });
+    await p.evaluate(() => { delete state.rag.recheck; saveState(); window.__mode = ''; });
+
     // ------------------------------------------------------------------------------------------ 7. NOT_FOUND from the model
     note('7. the model says NOT_FOUND');
     await p.evaluate(() => { window.__needle = 'a needle in no folder'; window.__mode = ''; });
@@ -285,13 +313,16 @@ const plusItems = (p) => p.evaluate(() => { const b = document.getElementById('c
     note('11. a connection (the Anthropic stand-in)');
     await p.evaluate((M) => { state.cloud = { provider: 'anthropic', base: M, key: 'sk-test-123', model: 'claude-opus-5-5', models: ['claude-opus-5-5'], on: true }; state.chatSource = 'cloud'; state.thinking = false; saveState(); }, MOCK);
     const f11 = fact('L01');
+    const before11 = JSON.parse(fs.readFileSync(MOCKLOG, 'utf8')).filter((x) => x.method === 'POST' && /\/v1\/messages$/.test(x.path)).length;
     r = await send(p, f11.question);
-    const reqs = JSON.parse(fs.readFileSync(MOCKLOG, 'utf8')).filter((x) => x.method === 'POST' && /\/v1\/messages$/.test(x.path));
-    const body = reqs.length ? reqs[reqs.length - 1].body : {};
+    const reqs = JSON.parse(fs.readFileSync(MOCKLOG, 'utf8')).filter((x) => x.method === 'POST' && /\/v1\/messages$/.test(x.path)).slice(before11);
+    const body = reqs.length ? reqs[0].body : {};
     const sysOf = (b) => typeof b.system === 'string' ? b.system : Array.isArray(b.system) ? b.system.map((x) => x.text || '').join('') : '';
     const um = (body.messages || []).map((m) => ({ role: m.role, text: typeof m.content === 'string' ? m.content : (m.content || []).map((c) => c.text || '').join('') }));
     ok(reqs.length >= 1 && sysOf(body).startsWith(HEAD + '[1] ') && sysOf(body).endsWith('\n\nQuestion: ' + f11.question) && um.length === 1 && um[0].role === 'user' && um[0].text === f11.question, 'the connection receives her system prompt and only the question', { n: reqs.length, sys: sysOf(body).slice(0, 80), msgs: um.map((m) => m.role + ':' + m.text.slice(0, 40)) });
     ok(r.text.trim() === 'Hello from the stand-in.' && r.rag.ok === false && r.rag.flagged.length === 1, 'a reply with no citation is flagged under it', r.rag && r.rag.flagged);
+    const b2 = reqs.length > 1 ? reqs[1].body : {}, um2 = (b2.messages || []).map((m) => ({ role: m.role, text: typeof m.content === 'string' ? m.content : (m.content || []).map((c) => c.text || '').join('') }));
+    ok(reqs.length === 2 && sysOf(b2) === sysOf(body) && um2.length === 3 && um2[1].role === 'assistant' && /^Check your answer against the context above\./.test(um2[2].text) && r.rag.recheck === 'same', 'the second pass goes through the same connection, with the first answer and the request to cite every sentence (6.65)', { n: reqs.length, msgs: um2.map((m) => m.role + ':' + m.text.slice(0, 40)), recheck: r.rag.recheck });
     await p.evaluate(() => { state.chatSource = 'local'; state.cloud.on = false; saveState(); });
 
     // ------------------------------------------------------------------------------------------ 12. a reload

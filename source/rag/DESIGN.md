@@ -226,6 +226,17 @@ and, where possible, highlights the section".
   6.64: `sentences` does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others), and
   `citations` does not count a bracket joined to a word or number before it (`strains[7]`); the chat's links follow the same rule.
   Test: `rig/t_rag5_prompt.mjs` (the evaluation's own replies).
+- 6.65, her choice after the evaluation (8 November 2026): "Keep it as it is. Uncited sentences are already named under each reply.
+  Recommend a larger model for folder answers. Add a second pass that asks the model to cite every sentence." (`r257.js`, finish).
+  A reply with a sentence that names no passage given, or a citation to no passage, is asked for once more of the same model through
+  the same way (this computer's model with `Engine.generate`, or the connection with `cloudChat`): her system prompt with the same
+  passages, the question, the first answer, and `RECHECK_ASK` (cite every sentence and list item, leave out what no passage supports,
+  add nothing, or NOT_FOUND). The second answer replaces the first only when its citations are better: at least one citation, no more
+  citations to no passage, and fewer sentences without one; a NOT_FOUND second answer is kept only when the first cited nothing. The
+  first answer stays in `bot.rag.draft` (a fold under the reply); `bot.rag.recheck` is better, same, notfound, stopped or skipped;
+  `bot.rag.done` is set only when the check ends. What is still unchecked is named as before. When a model of the lineup smaller than
+  this device's Magister answered (or a model outside it smaller than Magister's file), a note names Magister with a key to use or get it.
+  The card's switch `#ragRecheck` (`state.rag.recheck`, on unless turned off). Test: `rig/t_rag3_chat.js` 6b and 11 (72 checks).
 - `IngRag.prompt` is that module; `IngRag.openSource(passage, userId = 'me')` reads the cited file again through the bridge (only a folder
   the user may read, checked with `folder.list({principalId})`), asks the parse worker for its text without chunking (`textOnly`: the
   file's text, a PDF's pages), and finds the passage: at its offsets (`exact`), elsewhere (`moved`), or not at all (`changed`); it returns
