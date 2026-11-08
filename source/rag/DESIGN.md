@@ -35,7 +35,8 @@ browser page, the Fire tablet and the iPhone carry none of it.
 | `rag/retriever.js` | page | retrieval (phase 2, section 9): the two searches, Reciprocal Rank Fusion, the best k with what a citation needs |
 | `rag/ftsquery.js` | store worker (pure functions, importable by tests) | a question's words made safe for FTS5's MATCH (section 9) |
 | `rag/prompt.js` | page (pure functions, importable by tests) | phase 3, section 10: NOT_FOUND, her system prompt, the citation reader, the sentence check |
-| `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
+| `rag/scheduler.worker.js` + `rag/scheduler.js` | module worker + page | phase 4, section 11: the clock (setInterval in the worker) and its page side |
+| `rag/eval.js` | later phase | |
 
 ## 3. Messages
 
@@ -237,4 +238,27 @@ and, where possible, highlights the section".
   passage as it was read.
 - Tests: `rig/t_rag3_chat.js` (the built page, two fixture folders read for real, a stand-in model that follows the contract, the
   Anthropic stand-in for a connection).
+
+## 11. The scheduler (phase 4, 8 November 2026)
+
+Her task: "Use setInterval in a Worker. Default interval 20 minutes, configurable. It runs only while the app is open ... Do not use
+continuous file watchers" and "Reconcile each folder: compare mtime and size first, and hash the content only when they differ. Reuse
+stored embeddings for chunks whose content_hash is unchanged. Delete chunks of removed files. Use one transaction per file so concurrent
+queries see a consistent state."
+
+- `rag/scheduler.worker.js`: the clock and nothing else (`start({everyMs, firstMs})`, `stop()`, `state()`; event `tick`). It touches no
+  file and no index; it stops when the page closes.
+- `rag/scheduler.js`: `createScheduler({onTick})` -> `{start(ms, {firstMs}), stop(), tickNow(), state(), terminate()}`; a tick that comes
+  while the last one's work goes on is let pass (counted as skipped), so two runs never overlap.
+- `rag/main.js`: `IngRag.schedule(minutes, {firstMs, everyMs})` (0: off), `IngRag.reconcile(reason)`, `IngRag.scheduleState()`; events
+  `{type: 'scheduled', phase: 'start' | 'done' | 'set', report}`. A reconcile lists each folder through the bridge and compares sizes and
+  modification times with `file.list`: a folder where nothing changed is not read (one listing; the reading model is not loaded for
+  it); otherwise `indexFolder` reads it, which is the indexer's reconcile: size and time first, a changed file hashed and parsed,
+  passages whose hash is in `emb_cache` not embedded again, files gone deleted, each file in one transaction (`file.replace`,
+  `file.delete`). Skipped: a folder being read, a folder marked manual only, a folder whose listing is empty while the index holds files
+  (the card asks about that one). A folder that cannot be listed is noted in the report and tried again at the next tick.
+- The card (`build/modules/r202.js`): "Look for changes and read them by itself": never, 10, 20 (the default), 30 minutes or an hour,
+  kept per device (`state.rag.every`); the first look two minutes after the app opens; a line with the next look and what the last
+  one found. Periodic Background Sync (an installed web app's) does not apply to the desktop apps and is not used.
+- Test: `rig/t_rag4_schedule.js` (her done criterion 5 through one tick of the clock; questions asked while it runs; a folder away).
 

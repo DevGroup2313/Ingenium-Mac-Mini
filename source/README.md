@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.60 (8 November 2026): the folder search keeps itself up to date (phase 4, the scheduler), and the installed Windows
+app really carries the speech models and the folder search. Her task: "Use setInterval in a Worker. Default interval 20 minutes,
+configurable. It runs only while the app is open ... Reconcile each folder: compare mtime and size first, and hash the content only when
+they differ. Reuse stored embeddings for chunks whose content_hash is unchanged. Delete chunks of removed files." She approved phase 4
+on 8 November, and chose to keep her specification's five passages (no threshold for weak matches).
+
+- rag/scheduler.worker.js and rag/scheduler.js (new): the clock in a worker and its page side (ticks never overlap). rag/main.js:
+  IngRag.schedule, IngRag.reconcile, IngRag.scheduleState: each look lists every folder and compares sizes and times with the index; only
+  a folder where something changed is read (the indexer's reconcile: hash, reuse, delete, one transaction per file); where nothing
+  changed the reading model is not even loaded. rag/DESIGN.md section 11.
+- modules/r202.js: "Look for changes and read them by itself" on the card (never, 10, 20, 30 minutes or an hour; 20 by default; kept per
+  device), the first look two minutes after the app opens, and a line with the next look and what the last one found.
+- release.py ships scheduler.js and scheduler.worker.js with the folder search.
+- Windows (build-windows.yml, pushed during 6.59): GNU sha256sum given a path with backslashes starts its line with a backslash, so the
+  fingerprint check had failed since 6.57 and the installed app fetched its speech model instead of carrying it; the fingerprint is now
+  read from standard input.
+
+    node rig/t_rag4_schedule.js http://127.0.0.1:8188/ <out>   # her criterion 5 through one tick of the clock: 19 checks
+
 Ingenium 6.59 (8 November 2026): the chat answers from her folders, with its sources (the folder search, phase 3), and the Mac and
 Windows apps carry the folder search. Her task (31 October 2026, sent again on 8 November): "Add an opt-in RAG mode to the existing chat
 app. When the mode is enabled, every chat turn retrieves context from user-selected local folders ... and the answer cites its sources",

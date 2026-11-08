@@ -203,7 +203,7 @@ def page():
 # its own files into each desktop repository's rag/ (the build workflows add rag/vendor/ from Mini's release "rag-vendor", checked
 # against tools/rag_vendor.sha256, and the specs carry rag/ into the app). Not the Fire and iPhone repository: desktop only.
 RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.js", "embedder.js", "embedder.worker.js",
-             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "vendor.json")
+             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js", "vendor.json")
 RAG_VENDOR_SHA256 = "ecd2f34b95a77c5592dce6ae7f4f56fccca16d72f010410188e3af393971f253"   # rag-vendor.zip, release rag-vendor
 
 
