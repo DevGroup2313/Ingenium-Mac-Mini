@@ -31,7 +31,7 @@ APP_FILE = re.sub(r'[^A-Za-z0-9._-]', '', str(_cfg.get('file_name') or '')) or '
 APP_ID = str(_cfg.get('app_id') or 'com.yannieforest.ingenium')
 if not re.match(r'^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)+$', APP_ID):
     raise SystemExit('app.json: app_id %r is not a valid id (letters and digits, dots between)' % APP_ID)
-APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.55')
+APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.56')
 _own = [('ingenium.html', '.')]
 # R75: the seal is the icon when it is there; a build without it still
 # finishes, with the plain icon
@@ -170,6 +170,9 @@ if sys.platform == 'darwin':
             # shows. Ingenium does so only to use, or lend, models between the
             # person's own computers, and only after they set that up. It never
             # asks for the microphone, the camera, or anything else.
+            # 6.56 (8 November 2026): the one exception is the microphone, for dictation in the message box, which Ingenium
+            # writes down on this Mac with Scriba's speech models (modules/r254.js); macOS asks her once, with these words.
             'NSLocalNetworkUsageDescription': 'Ingenium uses the home network only to lend models to your other devices, or to use the models of your other computer, when you set that up in Settings.',
+            'NSMicrophoneUsageDescription': 'Ingenium listens only while you press the microphone key in the message box, to write down what you say here on this Mac. The sound never leaves it.',
         },
     )
