@@ -207,7 +207,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.57.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.58.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -349,7 +349,14 @@ jobs:
         run: |
           # R74: the app alone is the main download; it fetches its models the
           # first time it opens. The copy with the models is for a Mac without internet.
-          ditto -c -k --sequesterRsrc --keepParent "dist/${APP_FILE}.app" "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip"
+          # 6.58: the copy with the models leaves the speech models out: with them it is over GitHub's limit of 2 GB for one file
+          # (2.18 GB in 6.57's run); there dictation fetches its model once. The app alone, the main download, keeps them.
+          rm -rf "$RUNNER_TEMP/full" && mkdir -p "$RUNNER_TEMP/full"
+          ditto "dist/${APP_FILE}.app" "$RUNNER_TEMP/full/${APP_FILE}.app"
+          rm -rf "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Resources/speech" "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Frameworks/speech"
+          codesign --force --sign - --timestamp=none "$RUNNER_TEMP/full/${APP_FILE}.app"
+          ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/full/${APP_FILE}.app" "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip"
+          rm -rf "$RUNNER_TEMP/full"
           rm -rf "$RUNNER_TEMP/lite" && mkdir -p "$RUNNER_TEMP/lite"
           ditto "dist/${APP_FILE}.app" "$RUNNER_TEMP/lite/${APP_FILE}.app"
           rm -rf "$RUNNER_TEMP/lite/${APP_FILE}.app/Contents/Resources/models"
