@@ -77,10 +77,11 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   // 6. Fabrica: from the app library, Lakay comes in as an app with its own mark
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
   await p.evaluate(() => { const k = [...document.querySelectorAll('#fb button')].find(x => /Bring one in/.test(x.textContent)); if (k) k.click(); }); await p.waitForTimeout(900);
-  const libLine = await p.evaluate(() => { const o = [...document.querySelectorAll('button, div')].filter(x => /From your app library/.test(x.textContent) && x.textContent.length < 300).pop(); return o ? o.textContent.replace(/\s+/g, ' ') : ''; });
-  ok(/Lakay \d+/.test(libLine), 'Fabrica\'s Bring one in offers Lakay from the app library', libLine);
-  const fb = await p.evaluate(async () => { const o = [...document.querySelectorAll('.f-opt')].find(x => /^From your app library/.test((x.querySelector('b') || {}).textContent || '')); if (o) o.click(); await new Promise(r => setTimeout(r, 700));
-    const k = [...document.querySelectorAll('.f-opt')].find(x => /^Lakay\b/.test((x.querySelector('b') || {}).textContent || '') && x.getClientRects().length); if (!k) return { none: [...document.querySelectorAll('.f-opt b')].map(x => x.textContent.trim()) }; k.click();
+  // 6.61: Bring an app in shows the library's apps as seal tiles (her approved preview, 8 November 2026)
+  const libLine = await p.evaluate(() => { const t = [...document.querySelectorAll('#fb .f-tile')].find(x => /^Lakay$/.test((x.querySelector('b') || {}).textContent || '')); return t ? t.textContent.replace(/\s+/g, ' ') : ''; });
+  ok(/Lakay\s*Build \d+/.test(libLine), 'Fabrica\'s Bring one in offers Lakay from the app library', libLine);
+  const fb = await p.evaluate(async () => {
+    const k = [...document.querySelectorAll('#fb .f-tile')].find(x => /^Lakay$/.test((x.querySelector('b') || {}).textContent || '') && x.getClientRects().length); if (!k) return { none: [...document.querySelectorAll('#fb .f-tile b')].map(x => x.textContent.trim()) }; k.click();
     for (let i = 0; i < 40; i++) { await new Promise(r => setTimeout(r, 500)); const rows = [...document.querySelectorAll('#fb .f-repo')]; const r = rows.find(x => /Lakay/.test(x.textContent)); if (r) return { name: r.textContent.replace(/\s+/g, ' ').slice(0, 60), layers: r.querySelectorAll('img.f-ls-l').length }; }
     return { timeout: true }; });
   ok(fb && /Lakay/.test(fb.name || '') && fb.layers === 16, 'brought in, Lakay is an app in Fabrica\'s Your apps, with its own mark in its sixteen planes', fb);
