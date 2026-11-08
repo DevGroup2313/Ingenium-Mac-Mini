@@ -30,7 +30,7 @@ let sent = [];
   const iso = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
   // 1. the room
   const tabs = await p.evaluate(() => [...document.querySelectorAll('#page-career .rm-tabs [role=tab]')].map((t) => t.textContent.trim()));
-  ok(JSON.stringify(tabs) === JSON.stringify(['Today', 'Applications', 'People', 'Your profile', 'Your edge', 'Goals and plan', 'Learn']), '1. a People room sits beside Applications', tabs);
+  ok(JSON.stringify(tabs) === JSON.stringify(['Today', 'Your mentor', 'Applications', 'People', 'Your profile', 'Your edge', 'Goals and plan', 'Learn']), '1. a People room sits beside Applications', tabs);
   await click(/^People$/); await p.waitForTimeout(400);
   let t = await text();
   ok(/No one yet/.test(t) && /How People works/.test(t) && /Ingenium drafts the email .* it sends nothing/i.test(t.replace(/\n/g, ' ')), '1. empty, it says what it is for, and that Ingenium drafts but sends nothing', t.slice(0, 200));

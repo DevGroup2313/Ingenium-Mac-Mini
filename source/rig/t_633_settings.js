@@ -50,7 +50,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const AH = {}, AV = {};
   for (const k of ['you', 'conn', 'search', 'devices']) { await p.click('#dxT-ai-' + k); await p.waitForTimeout(450); AH[k] = await p.evaluate(() => document.scrollingElement.scrollHeight);
     AV[k] = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-ai > .card')].filter(c => c.offsetParent !== null).map(c => c.id || ((c.querySelector('h2') || {}).textContent || '').trim().slice(0, 22))); }
-  ok(AV.you.join() === 'personaCard' && AV.conn.indexOf('cnCard') >= 0 && AV.conn.some(x => /^Connect a cloud/.test(x)) && AV.search.indexOf('ingEyesCard') >= 0 && AV.search.some(x => /^Web search/.test(x)) && AV.devices.join() === 'linkCard',
+  ok(AV.you.join() === 'personaCard' && AV.conn.indexOf('cnCard') >= 0 && AV.conn.some(x => /^Connect a cloud/.test(x)) && AV.search.indexOf('ingEyesCard') >= 0 && AV.search.some(x => /^Web search/.test(x)) && AV.devices.slice().sort().join() === 'awakeCard,linkCard',  /* 6.58: and Keep working */
     'each section holds its own cards', AV);
   ok(Object.values(AH).every(h => h <= 1650), 'each section of Models and AI is at most 1,650 pixels tall', AH);
   const kept = await p.evaluate(() => JSON.parse(localStorage.getItem('ing.settings.parts.v1') || '{}'));
