@@ -67,7 +67,7 @@ if(window.__r255)return;window.__r255=1;
 var W=window,D=document,TE=new TextEncoder(),TD=new TextDecoder();
 var LS="ingenium_cloud",KDB="ingenium_cloudkey",ITER=600000,LEAVE=["ingenium_apps"];
 /* what belongs to this device and stays as it is here when work comes in */
-var HERE_KEYS=["models","activeModelId","perf","cloud","cloudPrev","chatSource","presence","presenceLog","presenceSince","presenceSync","winPos",
+var HERE_KEYS=["models","activeModelId","perf","cloud","cloudPrev","chatSource","rag","presence","presenceLog","presenceSince","presenceSync","winPos",
   "navCollapsed","railCollapsed","topCollapsed","dictate","appLib","__deskAt"];
 var NOTE_KEY="ingenium_cloud_note";
 function $(id){return D.getElementById(id);}

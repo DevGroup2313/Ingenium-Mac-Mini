@@ -19,6 +19,9 @@
 //   await IngRag.stats() / IngRag.state() / IngRag.running() / IngRag.on(fn) / IngRag.config(opts) / await IngRag.shutdown()
 //   IngRag.config({workers, spareGB, bigFolderChunks, embedBatch}); IngRag.suggestedWorkers()  (workers: embedder workers, 1 unless asked for more)
 //   IngRag._store / _embedder / _indexer / _principalId   (the live clients, for tests)
+//   Phase 3 (the chat): IngRag.prompt (rag/prompt.js: NOT_FOUND, the grounding prompt, the citation reader and check) and
+//   await IngRag.openSource(passage, userId = 'me')   the file a citation names, read again through the app's bridge, with the passage
+//                                            found in it -> {status: 'exact' | 'moved' | 'changed', before, mark, after, page, ...}
 //
 // THE USER. One user now, "me": every folder added gets an ACL row for her (folder_acl), and folders() asks the store for the folders
 // she is allowed (the same SQL filter the retriever will use). The permission rules separate the app's users from one another; they
@@ -35,8 +38,9 @@
 import * as bridge from './folders.js';
 import { createStore } from './store.js';
 import { createEmbedder, suggestWorkers, MODEL_TIERS } from './embedder.js';
-import { createIndexer } from './indexer.js';
+import { createIndexer, ParseClient } from './indexer.js';
 import { retrieve as retrieveFrom } from './retriever.js';
+import * as prompt from './prompt.js';
 
 const PRINCIPAL = 'me';
 
@@ -68,6 +72,8 @@ const PLAIN = {
   NO_SUCH_FOLDER: 'This folder is not in the folder search any more.',
   BUSY: 'A folder window is open already. Finish with it first.',
   NOT_CHOSEN: 'Ingenium no longer has this folder on its list. Remove it here, then add it again.',
+  NOT_ALLOWED: 'This passage is in a folder that cannot be opened for you.',
+  CHANGED: 'The file changed while it was being opened. Try again.',
   CORRUPT: "The folder search's memory was damaged, perhaps because Ingenium was closed while it was saving. It can start again from nothing: your files are not touched, and your folders are read again.",
 };
 const FATAL_STATUS = { OPFS_LOCKED: 'locked', OPFS_UNAVAILABLE: 'unavailable', SCHEMA_TOO_NEW: 'failed', WORKER_FAILED: 'failed', DIMS_MISMATCH: 'failed', CORRUPT: 'damaged' };
@@ -389,13 +395,51 @@ async function rebuild() {
 // IngRag.retrieve(question, userId = 'me', opts): the passages of the folders that user may read that answer the question best
 // (rag/retriever.js: the text and vector searches with the folder permissions inside their SQL, fused by RRF, k = 60, the best 5).
 // The one user now is "me"; another name is the second test user, or a local profile later. It opens the store and the reading
-// model when they are not open yet. Nothing in the chat calls it yet (phase 3).
+// model when they are not open yet. The chat calls it for every turn while "Your folders" is on in its + menu (phase 3, r257.js).
 async function retrieve(query, userId, opts) {
   await ready();
   return retrieveFrom({ store: S.store, embedder: S.embedder }, query, userId == null ? PRINCIPAL : userId, opts || {});
 }
 
+// ------------------------------------------------------------------------------------------------------ the source of a citation (phase 3)
+// A citation [n] under a reply opens the file it names: the app reads it again through its bridge (only a folder the user may read,
+// checked in the store as the searches check it), the parse worker gives its text (a PDF's text page by page) without cutting it into
+// passages, and the passage is looked for where it was read: 'exact' (at its character offsets, as for text and Markdown files),
+// 'moved' (the file changed, the same words are elsewhere in it) or 'changed' (the words are not in the file any more; the reply keeps
+// the passage as it was read). A window of the text around the passage is returned, VIEW_SIDE characters each side, so a 4 MB file
+// is not drawn whole.
+const VIEW_SIDE = 20000;
+let viewParser = null;
+const extOfPath = (rel) => { const m = /\.([A-Za-z0-9]+)$/.exec(rel); return m ? m[1].toLowerCase() : ''; };
+async function openSource(passage, userId, opts = {}) {
+  if (!passage || typeof passage !== 'object') throw coded('NO_SUCH_FOLDER');
+  const store = await openStore();
+  const who = userId == null ? PRINCIPAL : String(userId);
+  const found = who === PRINCIPAL ? { id: S.principalId } : await store.principal.find({ name: who });
+  if (!found || found.id == null) throw coded('NOT_ALLOWED');
+  const folderId = passage.folderId != null ? passage.folderId : passage.fid;
+  const f = (await store.folder.list({ principalId: found.id })).find((x) => x.id === folderId);
+  if (!f) throw coded('NOT_ALLOWED');
+  const rel = String(passage.filePath != null ? passage.filePath : passage.file || '');
+  const ext = extOfPath(rel), page = passage.page == null ? null : Number(passage.page);
+  if (!viewParser) viewParser = new ParseClient({ count: () => Promise.reject(new Error('the viewer does not count tokens')) });
+  let parsed;
+  try { parsed = await viewParser.parse(bridge.readPieces(f.path, rel), { ext, path: rel, slim: false, textOnly: true, timeoutMs: 180000 }); }
+  catch (e) { throw explain(e); }
+  const src = ext === 'pdf' ? String((parsed.pages || [])[(page || 1) - 1] || '') : String(parsed.text || '');
+  const want = String(passage.text || '');
+  let start = passage.charStart != null ? passage.charStart : passage.start, end = passage.charEnd != null ? passage.charEnd : passage.end, status = 'changed';
+  if (want && Number.isInteger(start) && Number.isInteger(end) && src.slice(start, end) === want) status = 'exact';
+  else { const i = want ? src.indexOf(want) : -1; if (i >= 0) { start = i; end = i + want.length; status = 'moved'; } else { start = end = null; } }
+  const side = Number.isInteger(opts.side) && opts.side > 0 ? opts.side : VIEW_SIDE;
+  const base = { status, folderId, folderName: f.name, filePath: rel, ext, page, size: parsed.size, length: src.length, pages: parsed.pages ? parsed.pages.length : null, warnings: parsed.warnings || [] };
+  if (status === 'changed') return Object.assign(base, { before: '', mark: '', after: src.slice(0, 2 * side), cutBefore: false, cutAfter: src.length > 2 * side, start: null, end: null });
+  const a = Math.max(0, start - side), b = Math.min(src.length, end + side);
+  return Object.assign(base, { start, end, before: src.slice(a, start), mark: src.slice(start, end), after: src.slice(end, b), cutBefore: a > 0, cutAfter: b < src.length });
+}
+
 async function shutdown() {
+  if (viewParser) { try { viewParser.terminate(); } catch (_) { /* gone */ } viewParser = null; }
   Array.from(S.jobs.keys()).forEach((id) => stopReading(id));
   await Promise.all(Array.from(S.jobs.values()).map((j) => j.done.catch(() => undefined)));
   if (S.indexer) { try { S.indexer.stop(); } catch (_) { /* gone */ } }
@@ -412,6 +456,7 @@ export const IngRag = {
   principal: PRINCIPAL,
   available: () => bridge.available(),
   ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild, retrieve,
+  openSource, prompt,
   on(fn) { S.listeners.add(fn); return () => S.listeners.delete(fn); },
   get _store() { return S.store; },
   get _embedder() { return S.embedder; },

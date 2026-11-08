@@ -194,8 +194,34 @@ def page():
     pg = build(os.path.join(H, "ingenium.html"))
     for k, repo in R.items():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
+    ship_rag()
     info()
     sync_sources()
+
+
+# 6.59: the folder search travels beside the page in the Mac and Windows apps (source/rag/README.md, "How it is built and shipped"):
+# its own files into each desktop repository's rag/ (the build workflows add rag/vendor/ from Mini's release "rag-vendor", checked
+# against tools/rag_vendor.sha256, and the specs carry rag/ into the app). Not the Fire and iPhone repository: desktop only.
+RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.js", "embedder.js", "embedder.worker.js",
+             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "vendor.json")
+RAG_VENDOR_SHA256 = "ecd2f34b95a77c5592dce6ae7f4f56fccca16d72f010410188e3af393971f253"   # rag-vendor.zip, release rag-vendor
+
+
+def ship_rag():
+    import shutil
+    src = os.path.join(H, "..", "rag")
+    for k in ("mini", "intel", "win"):
+        dst = os.path.join(R[k], "rag")
+        os.makedirs(dst, exist_ok=True)
+        for f in os.listdir(dst):
+            if f not in RAG_FILES and os.path.isfile(os.path.join(dst, f)):
+                os.remove(os.path.join(dst, f))
+        for f in RAG_FILES:
+            shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
+        os.makedirs(os.path.join(R[k], "tools"), exist_ok=True)
+        open(os.path.join(R[k], "tools", "rag_vendor.sha256"), "w", encoding="utf-8", newline="\n").write(
+            RAG_VENDOR_SHA256 + "  rag-vendor.zip\n")
+    print("rag/ copied to the Mac and Windows repositories")
 
 
 def info():
@@ -252,5 +278,7 @@ if __name__ == "__main__":
         page()
     elif sys.argv[1] == "info":
         info()
+    elif sys.argv[1] == "rag":
+        ship_rag()
     elif sys.argv[1] == "edition":
         build(sys.argv[3], sys.argv[2])

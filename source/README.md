@@ -371,6 +371,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.59 (8 November 2026): the chat answers from her folders, with its sources (the folder search, phase 3), and the Mac and
+Windows apps carry the folder search. Her task (31 October 2026, sent again on 8 November): "Add an opt-in RAG mode to the existing chat
+app. When the mode is enabled, every chat turn retrieves context from user-selected local folders ... and the answer cites its sources",
+with her grounding contract: "If retrieve() returns zero chunks, do not call the LLM. Return the constant NOT_FOUND", her system prompt,
+and "Render each [n] as a clickable link. It opens the source file ... and, where possible, highlights the section". She asked on
+8 November that the folder search and its phases come first.
+
+- rag/prompt.js (new, pure functions): NOT_FOUND, her system prompt word for word with the passages numbered, ground() (zero passages:
+  NOT_FOUND; otherwise the passages kept, best first, while the prompt fits the model's room), isNotFound(), citations(), sentences()
+  and checkGrounded() (every sentence carries a citation to a passage given; the flagged sentences are named). rag/DESIGN.md section 10.
+- rag/main.js: IngRag.prompt, and IngRag.openSource(passage, user): the cited file read again through the app's bridge (only a folder
+  the user may read), its text from the parse worker without chunking (rag/parse.worker.js and indexer.js: textOnly), and the passage
+  found at its offsets, elsewhere, or not at all (the file changed).
+- modules/r257.js (new): "Your folders" in the chat's + menu, first of the ways of looking things up, and a chip while it is on
+  (turning it on turns Web search and Research off; not in Code; only where the folder search is). A turn: retrieval in the chat's own
+  preparation step (the Stop key and the busy state work as for any reply); zero passages, NOT_FOUND and no model asked (a note names
+  where folders are added when none has been read); otherwise the chat's model, whichever it is, reads exactly her system prompt and
+  the question (chatHistory), nothing else (no earlier turns, memory, web or the working loop's tools). The reply keeps its passages,
+  its [n] are links, its sources are listed, sentences without a citation are named under it, a quoted NOT_FOUND becomes exactly
+  NOT_FOUND. The viewer: the passage as it was read, then the file with the passage marked (a PDF's page named). A message with a file
+  or a picture is answered without the folders, with a note. The switch is kept per device (r255 HERE_KEYS "rag").
+- r202.js: the card's last line says how the chat uses the folders; build/held.json no longer holds r202 back: release builds carry
+  the folder search's card and loader from 6.59.
+- Shipping (release.py ship_rag, RAG_FILES): rag/ into the Mac mini, Mac Intel and Windows repositories with tools/rag_vendor.sha256;
+  build-mac.yml and build-windows.yml fetch rag-vendor.zip from Mini's release, check it and unpack it to rag/vendor; ingenium.spec and
+  ingenium_win.spec (the installed app) carry rag/ beside the page; without the files the app is built as before. A copy with the
+  models over 2,140,000,000 bytes is made again without the folder search (Mac) or not published that time (Windows).
+
+    node rig/t_rag3_chat.js http://127.0.0.1:8188/ <out>     # the built page with rag/ beside it and the bridge stand-in (RAG_E2E)
+
 Ingenium 6.58 (8 November 2026): Your mentor in the Career Studio, the screen kept on while Ingenium works, and dictation in the phone and
 tablet apps. Her words (8 November 2026): "I am still unclear on what exactly I am looking for so I would like for Ingenium to provide that
 inside of the app and be my in-app recruiter/mentor/counselor/headhunter"; "I want them to spot skills and experience that I have show me how

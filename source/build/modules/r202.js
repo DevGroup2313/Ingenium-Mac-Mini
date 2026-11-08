@@ -37,7 +37,8 @@ body[data-motion="minimal"] #ragCard .rag-bar > i{transition:none}
    2. THE CARD "Folders for the chat" in Settings (named in r173.js, room Models and AI): Add a folder..., each folder with its name,
       path, files, passages and when it was last read, Read it again now with a progress line (and Stop), Remove (with a question
       first). The store is opened the first time the card is seen, not when the app starts. Plain words, real buttons, a status line
-      that is read out politely. The folders are read on this computer only; the chat's use of them comes next. */
+      that is read out politely. The folders are read on this computer only; the chat uses them through modules/r257.js (6.59, phase 3:
+      Your folders in the chat's + menu, each reply only from these folders, with its sources). */
 (function(){"use strict";
 if(window.__r202)return;window.__r202=1;
 var W=window,D=document,R=null,card=null,ui={},rows={},booted=false,shown=false,busy=false,again=false,lastPaint=0,paintT=0,lastRefresh=0,refreshT=0,seenDone={};
@@ -103,7 +104,7 @@ function build(){
   ui.problem=el("p","small rag-problem");ui.problem.id="ragProblem";ui.problem.setAttribute("role","status");ui.problem.hidden=true;c.appendChild(ui.problem);
   ui.note=el("p","small rag-note");ui.note.id="ragNote";ui.note.setAttribute("role","status");ui.note.setAttribute("aria-live","polite");c.appendChild(ui.note);
   ui.room=el("p","small muted rag-room");ui.room.id="ragRoom";ui.room.hidden=true;c.appendChild(ui.room);
-  c.appendChild(el("p","small muted rag-foot","These folders are read on this computer only. Nothing is sent anywhere. The chat’s use of them comes next."));
+  c.appendChild(el("p","small muted rag-foot","These folders are read on this computer only. In the chat, switch on Your folders in the + menu: each reply then comes only from these folders, with its sources. The passages found go to the model you chat with, and only to it."));
   ui.add.onclick=addClick;
   ui.retry.onclick=function(){setNote("");refresh(true);};
   ui.rebuild.onclick=rebuildClick;

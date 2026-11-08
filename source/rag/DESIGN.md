@@ -34,7 +34,8 @@ browser page, the Fire tablet and the iPhone carry none of it.
 | `rag/store.worker.js` + `rag/store.js` | module worker + page client | THE ONLY SQLite connection (opfs-sahpool); schema and migrations; every read and write |
 | `rag/retriever.js` | page | retrieval (phase 2, section 9): the two searches, Reciprocal Rank Fusion, the best k with what a citation needs |
 | `rag/ftsquery.js` | store worker (pure functions, importable by tests) | a question's words made safe for FTS5's MATCH (section 9) |
-| `rag/prompt.js`, `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
+| `rag/prompt.js` | page (pure functions, importable by tests) | phase 3, section 10: NOT_FOUND, her system prompt, the citation reader, the sentence check |
+| `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
 
 ## 3. Messages
 
@@ -203,3 +204,37 @@ Recall@5 33 of 35 facts (0.943), 28 found first; for the second user, who may no
 either search or the fused five for any question, 5 passages still given for every question; a retrieval takes about 41 ms (median)
 once the reading model is loaded; reading after one file added, one changed and one deleted embedded exactly the 2 new or changed
 passages.
+
+## 10. The chat (phase 3, 8 November 2026)
+
+Her contract: "If retrieve() returns zero chunks, do not call the LLM. Return the constant NOT_FOUND = \"I could not find that in the
+selected folders.\" Otherwise, use this system prompt" (her four lines, then `Context:`, the passages as `[n] {file_path}#{chunk_index}
+({heading_path})` and their text, then `Question: {user_query}`), and "Render each [n] as a clickable link. It opens the source file ...
+and, where possible, highlights the section".
+
+- `rag/prompt.js` (pure): `NOT_FOUND`; `systemPrompt(passages, question)` (her lines word for word; `file_path` is the folder's name and
+  the file's path in it; the brackets are left out when a passage has neither heading nor page; a PDF's page is added in them);
+  `ground(result, question, budgetChars)` -> `{notFound, passages, dropped, system, messages}` (zero passages: notFound; otherwise the
+  passages are kept best first while the prompt fits the model's room, at least one); `isNotFound(answer)` (quotes, emphasis and a final
+  stop aside); `citations(text)` ([1], [1, 3], [2-4], [1][2]; a Markdown link [1](...) is not one); `sentences(text)` (code blocks,
+  headings and table rules left out, each list line a sentence, marks after a full stop belong to the sentence before);
+  `checkGrounded(answer, count)` -> `{ok, flagged, badRefs, cited}` (every sentence carries a citation to a passage given; a sentence
+  ending with a colon introduces what follows and is not counted).
+- `IngRag.prompt` is that module; `IngRag.openSource(passage, userId = 'me')` reads the cited file again through the bridge (only a folder
+  the user may read, checked with `folder.list({principalId})`), asks the parse worker for its text without chunking (`textOnly`: the
+  file's text, a PDF's pages), and finds the passage: at its offsets (`exact`), elsewhere (`moved`), or not at all (`changed`); it returns
+  a window of 20,000 characters each side.
+- The page (`build/modules/r257.js`): "Your folders" in the chat's + menu before Research and Web search, and a chip while it is on (turning it on
+  turns Web search and Research off; not in Code conversations; not where `window.IngRag` is not). A message sent while it is on is
+  marked (`rec.ragAsk`); in the chat's own preparation (`chatPrepare`) `IngRag.retrieve(question, 'me', {k: 5})` runs; zero passages ->
+  the reply is NOT_FOUND and no model is called; otherwise the chat's model, whichever it is, reads two messages (`chatHistory`): the
+  system prompt and the question, and nothing else (no earlier turns, memory, web or tools; the working loop's mark `__ingChat` is
+  pinned false). The reply keeps a small copy of its passages (`bot.rag.passages`: id, folder id and name, file, chunk, heading, page,
+  offsets, text); when it is written, a NOT_FOUND sentence becomes exactly NOT_FOUND and the others are checked (`bot.rag.flagged`,
+  `badRefs`), named under the reply. Each [n] is a link and the passages are listed ("From your folders"); a link opens the viewer: the
+  passage as it was read, then the file with the passage marked (`openSource`). A message with a file or a picture is answered without
+  the folders, with a note. Elsewhere than the computer that read it, a reply keeps its links and sources, and the viewer shows the
+  passage as it was read.
+- Tests: `rig/t_rag3_chat.js` (the built page, two fixture folders read for real, a stand-in model that follows the contract, the
+  Anthropic stand-in for a connection).
+

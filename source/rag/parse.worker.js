@@ -9,7 +9,9 @@
 // Messages (one protocol, as every worker of the folder search):
 //   request  {id, op, args}            reply {id, ok: true, result} | {id, ok: false, error}
 //   ops      init({vendorBase})        optional: where rag/vendor/ is (default: beside this file)
-//            open({ext, path, size?, maxTokens?, modelKey?, overlap?, slim?, maxBytes?}) -> {session}   overlap: 0.125 or [0.10, 0.15] (the default)
+//            open({ext, path, size?, maxTokens?, modelKey?, overlap?, slim?, maxBytes?, textOnly?}) -> {session}   overlap: 0.125 or [0.10, 0.15] (the default)
+//                                      textOnly (phase 3, the source viewer): finish gives the file's text (and a PDF's pages) without
+//                                      cutting it into chunks, so no token count is asked for
 //            feed({session, bytes})    one piece of the file in order (an ArrayBuffer or Uint8Array; send it in the transfer list);
 //                                      text files are decoded piece by piece with one TextDecoder (stream: true)
 //            finish({session})         -> {fileHash, ext, size, text?, pages?, blocks?, chunks, warnings, meta, stats, mem}
@@ -151,7 +153,7 @@ function openSession(a) {
   if (a.modelKey !== undefined && a.modelKey !== S.modelKey) { S.modelKey = a.modelKey; S.overhead = undefined; } // another model: measure its special tokens again
   const id = S.nextSession++;
   const ov = Array.isArray(a.overlap) ? a.overlap : (typeof a.overlap === 'number' ? [a.overlap * 0.8, a.overlap * 1.2] : null); // 0.125 means 10 to 15%
-  const s = { id, ext, path: a.path || '', maxTokens: a.maxTokens || 512, limits: ov ? { overlapLo: ov[0], overlapHi: ov[1] } : undefined, slim: !!a.slim, maxBytes, pieces: [], total: 0, parts: [], dec: null, legacy: false, utf16: null, t0: Date.now(), count: 0 };
+  const s = { id, ext, path: a.path || '', maxTokens: a.maxTokens || 512, limits: ov ? { overlapLo: ov[0], overlapHi: ov[1] } : undefined, slim: !!a.slim, textOnly: !!a.textOnly, maxBytes, pieces: [], total: 0, parts: [], dec: null, legacy: false, utf16: null, t0: Date.now(), count: 0 };
   S.sessions.set(id, s);
   return s;
 }
@@ -196,6 +198,7 @@ async function finishSession(s) {
     }
     out.meta = { ...doc.meta, blocks: doc.blocks.length };
     if (!doc.blocks.length && !out.warnings.some((w) => /empty|no text/.test(w))) out.warnings.push('no text found');
+    if (s.textOnly) { out.text = doc.text; if (doc.pages) out.pages = doc.pages; out.chunks = []; out.version = VERSION; out.parseMs = Date.now() - s.t0; return out; }
     const { chunks, stats } = await chunkDocument(doc, { count: pageCount, maxTokens: s.maxTokens, limits: s.limits, overhead: S.overhead, onStage: (n) => stage(n) });
     S.overhead = stats.overhead; // the special tokens' cost is the same for every file
     out.chunks = chunks; out.stats = stats; out.version = VERSION; out.parseMs = Date.now() - s.t0;

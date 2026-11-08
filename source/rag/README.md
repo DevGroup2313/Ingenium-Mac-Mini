@@ -18,8 +18,10 @@ dialog and file reads, and the card **"Folders for the chat"** in Settings (Mode
 remove it. **Phase 2 is retrieval** (6 November 2026): `IngRag.retrieve(question, userId, opts)` (`retriever.js`) runs the text
 search (FTS5, bm25) and the vector search (vec0, cosine) with the folder permissions inside both SQL statements, fuses their 20 best
 each by Reciprocal Rank Fusion (k = 60) and gives the best 5 with what a citation needs; `ftsquery.js` makes a question's words safe
-for FTS5. **Not built yet**: the chat's toggle, the grounded prompt and the citations (3), the 20-minute scheduler (4), the whole
-evaluation (5). Nothing in the chat uses the folders yet; the card says so.
+for FTS5. **Phase 3 is the chat** (8 November 2026): "Your folders" in the chat's + menu; while it is on, every turn retrieves from her
+folders and the model reads only her grounding prompt and the question; zero passages give NOT_FOUND with no model called; each [n]
+of the reply is a link that opens the file with the passage marked (`prompt.js`, `IngRag.openSource`, `build/modules/r257.js`; DESIGN
+section 10). **Not built yet**: the optional reranker (2), the 20-minute scheduler (4), the whole evaluation (5).
 
 ## Who can read what
 
@@ -44,12 +46,13 @@ leave them, hidden files, other file types and symbolic links that point outside
 | `indexer.js`, `parse.worker.js`, `chunker.js` | page, worker | walks a folder, parses (txt, md, html, json, csv; pdf with pdf.js; docx with mammoth), cuts into passages of 300 to 450 tokens with 10 to 15% overlap, hashes, embeds, writes each file in one transaction |
 | `embedder.js`, `embedder.worker.js` | page, worker | Transformers.js with `Xenova/bge-small-en-v1.5` (384 values, q8), batches of 16, one or more workers |
 | `store.js`, `store.worker.js` | page, worker | the only SQLite connection (SQLite 3.45.3 with FTS5 and sqlite-vec 0.1.6, OPFS), schema and migrations, every read and write |
+| `prompt.js` | page | phase 3: NOT_FOUND, her grounding prompt, the citation reader and the sentence check (pure functions) |
 | `vendor.json`, `tools/fetch_vendor.py` | build machine | the pinned third-party files and the script that fetches and checks them |
 | `fixtures/`, `tools/make_fixtures.py` | tests | the 72-file test corpus (three folders, all seven types, one 4 MB log) and its answers |
 | `test/` | tests | `serve.py` (static server for the tests), `harness.html`, `parse_harness.html` |
 | `notes/` | | what each part's author found: `core.md`, `index.md`, `desktop.md`, `integrate.md` |
 
-The page itself carries only a small loader and the card: `build/modules/r202.js`. In the desktop app, when the app's folder bridge is
+The page itself carries only a small loader and the card (`build/modules/r202.js`) and the chat's side (`build/modules/r257.js`: the switch, the turn, the citations and the viewer; it shows a reply's sources on any device, and offers the switch only where `window.IngRag` is). In the desktop app, when the app's folder bridge is
 there (`window.pywebview.api.rag_list`), it imports `./rag/main.js` relative to the page. In a browser, on the Fire tablet and on the
 iPhone there is no bridge, so nothing is imported, nothing is fetched and no card is made (tested: `rig/t_rag1_manual.js`). The card
 sits in the Settings room "Models and AI" (named in `build/modules/r173.js`). Nothing starts when `main.js` is imported: the index is
@@ -71,9 +74,13 @@ opened the first time the card scrolls into view, and the reading model is loade
 * **The app.** `build/desktop/app_rag_692.py` is applied by `release.py` (as every `build/desktop/app_*.py`) to the Mac and Windows
   `ingenium_app.py`: the five bridge methods and explicit types for `.mjs`, `.js`, `.wasm`, `.onnx` and `.json` on the loopback server
   (http://127.0.0.1:17953), which serves the page's folder.
-* **Not done yet.** The PyInstaller spec (`ingenium.spec`) and the Windows installer still put only `ingenium.html` in the page folder.
-  Until they also put `rag/` and `rag/vendor/` beside it, the app's import fails quietly (one console line) and no card appears. See
-  `notes/integrate.md`, section 5.
+* **Shipped from 6.59.** `release.py page` (and `release.py rag`) copies the folder search's own files (`RAG_FILES`) into `rag/` of
+  the Mac mini, Mac Intel and Windows repositories and writes `tools/rag_vendor.sha256` (the fingerprint of `rag-vendor.zip`). Their
+  build workflows fetch `rag-vendor.zip` from the release, check it, unpack it to `rag/vendor/`, and the specs (`ingenium.spec`,
+  `ingenium_win.spec` for the installed app) carry `rag/` beside the page; a fetch that fails leaves `rag/` out (no card, no switch).
+  The Windows portable exe does not carry it. A copy with the models that would pass GitHub's 2 GiB limit is made again without it
+  (Mac) or not published that time (Windows); each build's summary gives the sizes. Until 6.58, `build/held.json` held `r202.js` out
+  of release builds; it rides from 6.59.
 
 ## How to test
 
@@ -88,6 +95,7 @@ All tests run in headless Chromium through Playwright (`/opt/node-tools/node_mod
 | indexer | `node rig/t_rag1_index.js http://127.0.0.1:8176/ OUT` | reading, reuse, failures, stopping, against stand-ins and the real store and embedder |
 | bridge | `python3 -I rig/t_rag1_bridge.py` | the app's folder methods (the patch applied to copies of `ingenium_app.py`), the stand-in `rig/rag_bridge.py` |
 | retrieval | `node rig/t_rag2_retrieve.js http://127.0.0.1:8176/ OUT [--quick]` | the two searches with the folder permissions inside their SQL, a second user, fusion (k = 60), escaping, Recall@5 over the corpus's facts, the restricted folder for the second user, reindex with embedding counts (`--quick` leaves out the 4 MB logbook; `RAG_WORKERS` sets the reading model's workers) |
+| chat | `node rig/t_rag3_chat.js http://127.0.0.1:8188/ OUT` | phase 3 on the built page: the switch, NOT_FOUND without a model, two folders read, grounded turns with her prompt word for word, citations and the viewer (Markdown offsets, a PDF's page), flagged sentences, the second user's NOT_FOUND end to end, a connection, a reload (`RAG_E2E`: the page folder with `rag/` and `rag/vendor`; `RAG_BRIDGE`) |
 | by hand | `node rig/t_rag1_manual.js http://127.0.0.1:8178/ OUT [--quick]` | the built page with the card, from the browser without the bridge to removing the last folder |
 
 The servers: `python3 rag/test/serve.py PORT --vendor <vendor tree>` serves `/rag/` from this checkout (the first four tests start it

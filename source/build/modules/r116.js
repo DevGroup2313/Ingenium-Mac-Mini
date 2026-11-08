@@ -14,6 +14,7 @@
 .lu-q .seg-btn[disabled]{opacity:.45;cursor:not-allowed}
 .lu-q-note{font-size:11.5px;color:var(--ink-3);flex:1 1 160px}
 .pace-chip{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--sans);padding:0 10px;height:28px;border-radius:999px;border:.5px solid var(--hairline);color:var(--ink-2);background:var(--card);white-space:nowrap}
+.pace-chip[hidden]{display:none} /* 6.59: its display rule had kept a hidden chip on the screen, empty or with words left from the last reply */
 .pace-chip i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block}
 .pace-chip.live i{background:#2f7a55;animation:paceBlink 1s ease-in-out infinite}
 .pace-chip.approx{color:var(--ink-3)}
