@@ -579,6 +579,9 @@ def _no_lakay():
         ('  ["6.55","Lakay, your store\'s app, is carried inside Ingenium at its latest build and kept with your other apps on first start: in '
          'Lector, in Fabrica\'s app library and wherever your apps are listed, with its Spiral in its seven layers.","master"],\n', "",
          "What is new without Lakay", 1),
+        # 6.56: the master edition's news of Lakay Build 6 and of Carpe Diem 1081 is not carried either
+        ('  ["6.56","Lakay is carried at Build 6, with its new Spiral: a coin in sixteen planes, its edge, enamel plate, shell and pearl each at its own depth, in Lector, Fabrica and wherever your apps are listed.","master"],\n', "", "What is new without Lakay Build 6", 1),
+        ('  ["6.56","Lector and your app library carry Carpe Diem 1081, its full edition, in place of 1058: Lector measures it and quotes build 1081 with its own figures (48.5 MB and 71,186 lines).","master"],\n', "", "What is new without Carpe Diem 1081", 1),
     ]
 
 

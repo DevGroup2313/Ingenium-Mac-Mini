@@ -411,6 +411,17 @@ build 1058 when it should be 1081"; and "The Lakay has been updated to a later b
     node rig/t_656_ears.js <url> <out> <English WAV> [<French WAV>]   # dictation on the device, nothing sent away, Settings: 19 checks
     node rig/t_656_cd1081.js <url> <out>                              # Carpe Diem 1081 carried, kept, named and measured by Lector: 6 checks
 
+On the release page: t_656_ears 19/19 (English word for word through the fake microphone; French by Whisper base on a synthetic voice:
+"Bon, je vous reste à créer une lettre de motivation pour un poste à l'istreuse", for "Bonjour, je voudrais écrire une lettre de
+motivation pour un poste à distance"), t_656_cd1081 6/6, t_633_settings 17/17 (the Dictation card beside the eyes keeps Search, eyes and
+ears under 1,650 pixels; a look into the speech store no longer makes it), t_655_fixes 26/26 with the three other editions (none names
+Lakay or Carpe Diem 1081: editions.py leaves out their two lines of news), t_627_editions 20/20, t_615_tour 20/20, t_651_still_keys 25/25,
+t_695_memory 30/30, t_611_code 37/37, t_6111_popups 17/17, t_616_scroll 9/9, t_700_lock 58/58, t_634_docs 17/17, t_635_newer 10/10,
+t_628_train 19/19, t_703_studio 25/25, t_614_connectors 24/24, t_6112_found 10/10, t_632_sealed_stores 21/21, t_6101_device 14/14,
+t_633_reset 12/12, t_617_effort 15/15 and t_618_workshop 19/19 (with rig/mock_agent_server.py). Failing on 6.55 in the same way, so
+not new: t_626_guide 26/27 (its list of the Guide's rooms predates 6.46's topics), t_613_github 41/43 (its slash-command checks predate
+6.47's commands), t_61_backup 44/45 (the browser closes during its last part).
+
 Ingenium 6.55 (7 November 2026): the greeting card's keys as every key, Check with Blend in 3D, the chat greets her by name, Lector
 answers at once, Lakay among her apps, and a Mac start that never opens without her work. Her words (7 November 2026): "The Link your
 file again, take the guided tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no
