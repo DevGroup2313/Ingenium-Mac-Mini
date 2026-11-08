@@ -483,8 +483,8 @@ def _public(ed):
         ("Notes, Tabula, a Word file, or the clipboard", "Notes, a Word file, or the clipboard", "Guide: where a blend goes", 1),
         ('"Apps made here can be kept in Fabrica, with every version.",', '', "help: Code keeps its own apps", 1),
         ("Chat, Code, Build, Fabrica and Focus each have a card.", "Chat, Code, Build and Focus each have a card.", "help: Home's rooms", 1),
-        ("a look-up of a reference, Dictate in some browsers, or Scriba's speech model the first time you record.",
-         "a look-up of a reference, or Dictate in some browsers.", "Home: what goes online", 1),
+        ("a look-up of a reference, or the speech model the first time you dictate or record (Scriba's, fetched once and kept).",
+         "a look-up of a reference, or the speech model the first time you dictate (fetched once and kept).", "Home: what goes online (6.56)", 1),
         # Folders, the Studio (modules/r208.js, r200.js, r201.js)
         ("Your profile names no apps yet (the Career Studio's entries of projects). Name them here.", "No apps are named yet. Name them here.",
          "Folders: no Career Studio to read", 1),

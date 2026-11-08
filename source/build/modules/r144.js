@@ -619,7 +619,7 @@ var WHAT=[
   ["#cpJump","The newest message","Scrolls down to the newest message."],
   ["#chatInput","The message box","Write your message here, in everyday words.","When you are ready, press Enter or the round arrow to send it.","Enter sends; Shift+Enter starts a new line."],
   ["#chatImgBtn","The + key","Adds more to a message: a file to read, a photo, a screenshot, a project or skills. A web search too, but only when you switch it on."],
-  ["#chatMicBtn","Dictate","Writes what you say into the message box. It uses your browser's own speech service: in Chrome, Edge and Safari the sound may be sent to Google, Microsoft or Apple to be written down. Type instead when your words must stay on this device."],
+  ["#chatMicBtn","Dictate","Writes what you say into the message box, a phrase at a time, with Scriba's speech models on this device: your voice is never sent away. The first time, the speech model is fetched once and kept, so it works offline after that. The language, and getting it ready before you travel, are in Settings, Models and AI, Search, eyes and ears."],
   ["#cpFast","Fast","Answers at once, without thinking first. Good for quick questions."],
   ["#chatModelBtn","Choose the model","Chooses which model answers, and loads it."],
   ["#chatSend","Send","Sends your message to the model.",null,"Enter does the same."],

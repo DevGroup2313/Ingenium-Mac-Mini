@@ -621,6 +621,10 @@ edit('Nothing here asks for a connection, and nothing leaves it.</p>',
 edit('<b>How full offline works here.</b> Two things need to live inside the app: your model (you upload it) and the engine that runs it (about 1 to 2 MB of compiled code, dropped in once on the Models page, or baked into a single copy of this file). After that one-time step, the app never requests anything. No connection, no services, no exceptions.',
      '<b>How offline works here.</b> The engine that runs your models is kept on this device: built into this page or into the app, or added once on the Models page. Each model is a file kept here too. Ingenium makes no request by itself. It goes online only when you ask for something that needs it: a model download, a cloud model, a web search, GitHub, a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.',
      "6.7 claims: Home's note on working offline")
+# 6.56: dictation writes on this device; only its speech model is fetched, once (modules/r254.js)
+edit("a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.",
+     "a look-up of a reference, or the speech model the first time you dictate or record (Scriba\'s, fetched once and kept). Your voice itself never leaves this device.",
+     "6.56 Home's note: dictation on this device")
 edit('<b>One-time step, honestly scoped.</b> The engine is wllama (llama.cpp compiled to WebAssembly): one small download, added once with "Get the engine for me" above or dropped in as files, then kept on this device for good. Apps made with the build scripts carry it already baked in. It runs single-threaded, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B will crawl; the fit warnings below are the guide. The app itself never requests anything.',
      '<b>About the engine.</b> In a web browser the engine is wllama (llama.cpp compiled to WebAssembly), kept on this device: built into this page, or added once with "Get the engine for me" above or as files. It runs on one processor thread, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B is slow; the fit warnings below are the guide. The Mac and Windows apps run their own engine instead. The engine makes no request by itself.',
      "6.7 claims: the engine note")
@@ -661,6 +665,16 @@ edit('mb.title="Dictate instead of typing (listens on this device only; nothing 
 edit('/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the device\'s own speech, nothing uploaded. Hidden\n   where the device offers no speech recognition at all. */',
      '/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the browser\'s own speech service (which in Chrome, Edge\n   and Safari may send the sound away; 6.7 says so). Hidden where the device\n   offers no speech recognition at all. */',
      "6.7 claims: Dictate's note")
+# ---- 6.56 (8 November 2026): the key writes with Scriba's speech models on this device (modules/r254.js has the rest). Her words:
+#      "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead sending it outside of the
+#      app to another provider. I want everything kept in-house where possible." The page's own listener (R50) now acts only when
+#      she has chosen the browser's speech service in Settings; its key's words say what it does now. ----
+edit('id="chatMicBtn" title="Dictate instead of typing. Your browser\'s speech service writes it down, and in Chrome, Edge and Safari it may send the sound to Google, Microsoft or Apple to do so."',
+     'id="chatMicBtn" title="Dictate: Ingenium writes what you say on this device, with Scriba\'s speech models. Your voice is never sent away."',
+     "6.56 the microphone key's words: this device's model")
+edit('  mb.addEventListener("click",function(){\n    if(live){off();return;}',
+     '  mb.addEventListener("click",function(){\n    if(window.IngEarsBrowser&&!window.IngEarsBrowser())return;\n    if(live){off();return;}',
+     "6.56 the browser's speech service only where she chose it")
 # the houses, as they are now
 edit('<p class="small muted" id="housesNote">Every model in the app belongs to a house, set from its size when it arrives. A model\'s card shows its house, whether it fits this device, how fast it is likely to write, and exactly how the work is shared, all honestly: this engine is a single processor thread with no GPU path, so big houses are slow by nature, not by fault. Change any model\'s house in its own Settings.</p>',
      '<p class="small muted" id="housesNote">Ingenium\'s own models come in four houses: Velox answers at once, Scriba thinks first, Magister is a larger model for hard questions, and Faber writes code. Each kind of device has its own model for each house, shown at the top of this page. A model you add is given a house by its size, as below; Faber is a house by purpose, not size. Change any model\'s house in its own Settings.</p>',

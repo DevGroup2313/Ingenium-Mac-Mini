@@ -372,7 +372,9 @@ var LABELS={
   fabrica_made:["Fabrica's packages","Apps and kits Fabrica made, kept to save again"],
   ingenium_hub:["Fabrica's issues and pull requests","What you wrote about your apps in Fabrica"],
   ingenium_desk:["The desk's larger copy","Your desk, when the small store is too full for it"],
-  the_foundry_files:["An older store","Left from an earlier version; carried over and then let go"]};
+  the_foundry_files:["An older store","Left from an earlier version; carried over and then let go"],
+  /* 6.56: the speech engine dictation (modules/r254.js) and Scriba share, kept so both work offline */
+  cd_scriba_store:["The speech engine","What writes down your dictation on this device, kept so it works offline"]};
 function labelOf(name){return LABELS[name]||["Another store: "+name,"Kept by a part of Ingenium or an app it opened"];}
 function utf8Len(s){var n=0,L=s.length,c,i;for(i=0;i<L;i++){c=s.charCodeAt(i);if(c<0x80)n++;else if(c<0x800)n+=2;else if(c>=0xD800&&c<0xDC00&&i+1<L){n+=4;i++;}else n+=3;}return n;}
 function sizeOf(v,d){d=d||0;if(v==null)return 1;var t=typeof v;

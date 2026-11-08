@@ -6,7 +6,9 @@
    Chat's Dictate key uses the browser's own speech service (window.SpeechRecognition). In Chrome and Edge that service sends
    the sound to Google or Microsoft to be written down, and in Safari it may go to Apple. The key's own words now say so; and
    the first time the key is pressed on this device, Ingenium says so plainly before anything is heard, with a choice. After
-   "Use Dictate" the key works as before, and the note does not come back. */
+   "Use Dictate" the key works as before, and the note does not come back.
+   6.56: the key now writes with Scriba's speech models on this device (modules/r254.js); the browser's service, and this note,
+   only where she turns it on in Settings. */
 (function r180Claims(){
 "use strict";
 if(window.__ingR180)return;window.__ingR180=true;
@@ -21,6 +23,8 @@ function ask(mb){var box=null;
   try{box.querySelector("#r180Use").focus();}catch(e){}}
 /* the first press is held here, before the key's own listener hears it */
 document.addEventListener("click",function(e){var t=e.target&&e.target.closest?e.target.closest("#chatMicBtn"):null;if(!t||told())return;
+  /* 6.56: the key writes on this device unless she chose the browser's service (modules/r254.js); only then is this said */
+  if(window.IngEarsBrowser&&!window.IngEarsBrowser())return;
   if(t.classList.contains("rec"))return;e.preventDefault();e.stopPropagation();ask(t);},true);
 window.IngClaims={dictateNote:SAID,dictateTold:told};
 })();

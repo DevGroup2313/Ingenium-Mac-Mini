@@ -46,7 +46,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   /* 3. Models and AI: four sections the same way (6.28: 2,945 pixels) */
   await p.evaluate(() => IngRooms.open('settings', 'ai', false)); await p.waitForTimeout(800);
   const a0 = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-ai .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()));
-  ok(a0.join('|') === 'Your Ingenium|Connections|Search and eyes|Your devices', 'Models and AI has four sections', a0);
+  ok(a0.join('|') === 'Your Ingenium|Connections|Search, eyes and ears|Your devices', 'Models and AI has four sections (6.56: Search, eyes and ears)', a0);
   const AH = {}, AV = {};
   for (const k of ['you', 'conn', 'search', 'devices']) { await p.click('#dxT-ai-' + k); await p.waitForTimeout(450); AH[k] = await p.evaluate(() => document.scrollingElement.scrollHeight);
     AV[k] = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-ai > .card')].filter(c => c.offsetParent !== null).map(c => c.id || ((c.querySelector('h2') || {}).textContent || '').trim().slice(0, 22))); }

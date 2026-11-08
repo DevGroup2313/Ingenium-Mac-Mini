@@ -11,7 +11,7 @@
 //     pointed at it rises 2px;
 //   - the empty Chat and Code pages greet her by name, as Home does (an invented name here);
 //   - Lakay: carried, kept on first start (checked against its fingerprint), listed with her apps after the four, by name and build, in
-//     Lector (with its mark in seven layers) and in Fabrica's app library; brought into Fabrica, it is an app with its own mark;
+//     Lector (with its mark in layers: seven in Build 3, sixteen planes since Build 6, carried from 6.56) and in Fabrica's app library; brought into Fabrica, it is an app with its own mark;
 //   - Lector prepares an app in its worker, with the same result as on the page; choosing a tile leaves no long pause on the page;
 //   - in every other edition given: not Lakay's name, its page, its mark or its build;
 //   - no errors on the page.
@@ -64,10 +64,10 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   ok(lk.st === 'kept' || lk.st === 'same', 'Lakay is kept on first start from inside Ingenium, checked against its fingerprint', lk);
   ok(lk.title === 'Lakay' && /^\d+$/.test(lk.version || '') && lk.source === 'built in' && lk.color === '#6f78d8', 'it is kept as Lakay, by its build number, in its own colour', lk);
   ok(lk.keys.slice(0, 4).join() === 'cd,forge,inkwell,ingenium' && lk.keys.indexOf('lakay') === 4, 'it is listed with her apps, after the four', lk.keys);
-  ok(lk.seal && lk.layers === 7 && lk.night === 7, 'its seal and its mark in seven layers, by day and by night', lk);
+  ok(lk.seal && lk.layers === 16 && lk.night === 16, 'its seal and its mark in its planes (Build 6: sixteen), by day and by night', lk);
   await p.evaluate(() => go('lector')); await p.waitForTimeout(2500);
   const lt = await p.evaluate(() => { const t = [...document.querySelectorAll('#lx7 .l-app')].find(x => /Lakay/.test(x.textContent)); return t ? { text: t.textContent.replace(/\s+/g, ' ').trim(), layers: t.querySelectorAll('img.ls-l').length } : null; });
-  ok(lt && /Lakay/.test(lt.text) && lt.layers === 7, 'Lector shows Lakay among her apps, with its mark in seven layers', lt);
+  ok(lt && /Lakay/.test(lt.text) && lt.layers === 16, 'Lector shows Lakay among her apps, with its mark in its sixteen planes', lt);
   // 5. Lector prepares in its worker, with the same result; choosing a tile leaves no long pause
   const lw = await p.evaluate(async () => { const out = {}; for (const k of ['inkwell', 'lakay']) { const name = libState().apps[k].name || k; const a = await IngLectorWorker.prepareKey(k, name), z = await IngLectorWorker.orig(name, await libText(k), () => {}); out[k] = !!a && JSON.stringify(a) === JSON.stringify(z); } out.on = IngLectorWorker.on(); return out; });
   ok(lw.inkwell && lw.lakay && lw.on, 'Lector prepares an app in its worker, with the same result as on the page', lw);
@@ -83,7 +83,7 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
     const k = [...document.querySelectorAll('.f-opt')].find(x => /^Lakay\b/.test((x.querySelector('b') || {}).textContent || '') && x.getClientRects().length); if (!k) return { none: [...document.querySelectorAll('.f-opt b')].map(x => x.textContent.trim()) }; k.click();
     for (let i = 0; i < 40; i++) { await new Promise(r => setTimeout(r, 500)); const rows = [...document.querySelectorAll('#fb .f-repo')]; const r = rows.find(x => /Lakay/.test(x.textContent)); if (r) return { name: r.textContent.replace(/\s+/g, ' ').slice(0, 60), layers: r.querySelectorAll('img.f-ls-l').length }; }
     return { timeout: true }; });
-  ok(fb && /Lakay/.test(fb.name || '') && fb.layers === 7, 'brought in, Lakay is an app in Fabrica\'s Your apps, with its own mark in seven layers', fb);
+  ok(fb && /Lakay/.test(fb.name || '') && fb.layers === 16, 'brought in, Lakay is an app in Fabrica\'s Your apps, with its own mark in its sixteen planes', fb);
   ok(A.errs.length === 0, 'no errors on the page', A.errs);
   await A.ctx.close();
   // 7. no Lakay in any other edition

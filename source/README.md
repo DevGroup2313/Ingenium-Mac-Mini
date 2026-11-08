@@ -371,6 +371,46 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.56 (8 November 2026): dictation written on the device with Scriba's speech models, Carpe Diem 1081 in Lector, and Lakay
+Build 6. Her words (8 November 2026): "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead
+sending it outside of the app to another provider. I want everything kept in-house where possible. Lector quotes a much older Carpe Diem
+build 1058 when it should be 1081"; and "The Lakay has been updated to a later build, please update Ingenium's copy to bring it up to date."
+
+- modules/r254.js (new): the microphone key in the message box (Chat and Code share it) used the browser's speech service, which in
+  Chrome and Edge sends the sound to Google or Microsoft. It now writes with Scriba's own models in a worker on the device: Moonshine
+  base for English, Whisper base for French, Haitian Creole and Spanish (transformers.js 3.8.1, the version Scriba uses). Each phrase is
+  cut at a pause, resampled to 16 kHz by the browser's own resampler (the plain average Scriba uses wrote "colour letter" for "cover
+  letter" on one test recording; the resampler wrote every word right), and written into the box. The engine and the model come from
+  speech/ beside the page when an app carries it, else from the device's own copy (Scriba's store and transformers.js's cache, so
+  either fills both), else once from the internet, kept from then on. Settings, Models and AI, Search, eyes and ears (r234; r173)
+  holds the Dictation card: the language, Get it ready now (to fetch it before travelling), and the browser's service, off unless she
+  turns it on; r180's note about the sound being sent away now shows only then; build_page.py makes the page's own listener (R50) act
+  only then. The Mac apps' Info.plist asks for the microphone with its reason (NSMicrophoneUsageDescription; ad hoc signed without the
+  hardened runtime, so no entitlement is needed). Not done yet: the Fire and iPhone/iPad apps do not pass the microphone to the page
+  (no RECORD_AUDIO and no onPermissionRequest on Android; no microphone line in the iOS Info.plist), so dictation there waits for a
+  later stage.
+- source/speech/fetch_speech.mjs and .github/workflows/speech-vendor.yml (new): GitHub's machines fetch the engine and both models
+  with transformers.js itself (the files the page asks for, dtype q8), transcribe recordings made there with espeak-ng, list every
+  file with its SHA-256 and keep them on the release "speech-vendor": engine 21.5 MB, Moonshine base 63.8 MB, Whisper base 76.0 MB.
+  On GitHub's machine: "Please summarize the three chapters of my thesis and list the questions that are still open." (6.0 s of speech,
+  0.2 s to write) and "I would like to write a cover letter for a remote learning designer role." (both word for word).
+- Carpe Diem 1081 (2026-11-01, 528171081, the full edition, 48,542,093 bytes, from Carpe-Diem-Gift's newest branch, identical in its
+  Mac, Windows and Fire projects) replaces 1058 in apps/builtin. apps/update_builtin.py now tells The Forge from Carpe Diem by the
+  page's title (both carry a Forge section, and their build stamps lie past the first 400,000 characters, so 6.55's version could
+  read neither). recipe/recipe.json: the full edition's figures Lector quotes are measured from 1081 (48.5 MB and 71,186 lines,
+  split as r126 counts them); the builds the recipe was written for (1058) stay as the old values a document may still carry.
+  The page is 95.5 MB (1058 took 25.7 MB of it; 1081 takes 42.5 MB, most of it Carpe Diem's own compressed source and its film), under
+  GitHub's 100 MiB limit for one file with about 9 MB to spare.
+- Lakay Build 6 (2026-11-07, 1,091,377 bytes, the same page in Lakay-Apps, Lakay-Mac and Lakay-Windows) replaces Build 3. Its Spiral
+  is now a coin in sixteen planes (the edge in four, the plate, the engraving, two shadows, the halo, the shell's sides in three, the
+  shell, the lattice, the pearl, the sparkles); apps/lakay_mark.py reads them from src/js/09-crest.js (PLANES) and keeps each at its
+  own depth (none marked side, which Ingenium's renderers would move to one fixed depth), and lays its still seal flat from the planes
+  of Lakay's own still mark.
+- Verified, no change: the Career Studio's + Bring one on Today is purple by day and by night (6.21's change holds).
+
+    node rig/t_656_ears.js <url> <out> <English WAV> [<French WAV>]   # dictation on the device, nothing sent away, Settings: 19 checks
+    node rig/t_656_cd1081.js <url> <out>                              # Carpe Diem 1081 carried, kept, named and measured by Lector: 6 checks
+
 Ingenium 6.55 (7 November 2026): the greeting card's keys as every key, Check with Blend in 3D, the chat greets her by name, Lector
 answers at once, Lakay among her apps, and a Mac start that never opens without her work. Her words (7 November 2026): "The Link your
 file again, take the guided tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no

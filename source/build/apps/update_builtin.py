@@ -25,16 +25,23 @@ def roman(s):
     return n
 
 
+def title(text):
+    """6.56: the page's own title (The Forge and Carpe Diem both carry a Forge section and their build stamp past the first
+    400,000 characters, so neither says which app a page is: its title does)"""
+    m = re.search(r"<title>([^<]*)</title>", text[:2000000])
+    return m.group(1).strip() if m else ""
+
+
 def forge(text):
     m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)"', text)
-    if not m or 'id="section-forge"' not in text:
-        sys.exit("this does not look like The Forge's page (no build stamp, or no Forge section)")
+    if not m or 'id="section-forge"' not in text or not title(text).startswith("The Forge"):
+        sys.exit("this does not look like The Forge's page (no build stamp, no Forge section, or another title)")
     return {"key": "forge", "title": "The Forge", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
 
 
 def carpediem(text):
     m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)"', text)
-    if not m or not re.search(r"<title>[^<]*Carpe Diem", text[:400000]) or 'id="section-forge"' in text:
+    if not m or not title(text).startswith("Carpe Diem"):
         sys.exit("this does not look like Carpe Diem's page (no build stamp, or no Carpe Diem title)")
     return {"key": "cd", "title": "Carpe Diem", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
 
@@ -64,11 +71,11 @@ def which(text):
     head = text[:400000]
     if re.search(r'<meta name="lakay-build"', head[:40000]):
         return lakay
-    if 'id="section-forge"' in text and "window.CD_BUILD" in head:
-        return forge
     if re.search(r"<title>Inkwell\b", head[:20000]):
         return inkwell
-    if "window.CD_BUILD" in head:
+    if "window.CD_BUILD" in text and title(text).startswith("The Forge"):
+        return forge
+    if "window.CD_BUILD" in text and title(text).startswith("Carpe Diem"):
         return carpediem
     sys.exit("this page is none of The Forge, Inkwell, Carpe Diem or Lakay")
 

@@ -2,11 +2,11 @@
  "cd": {
   "key": "cd",
   "title": "Carpe Diem",
-  "version": "1058",
-  "build": "528171058",
-  "date": "2026-10-19",
-  "size": 31941061,
-  "sha256": "e37c1b85cd6bba339e7bc52dc8411cde90cf6f66d2b1e3d642edcc11aeb94ec8",
+  "version": "1081",
+  "build": "528171081",
+  "date": "2026-11-01",
+  "size": 48542093,
+  "sha256": "7d7bb5488d44c070673519c539d99f08565619adc316dcbc097d0c25267e1148",
   "name": "carpe_diem.html"
  },
  "forge": {
@@ -32,12 +32,12 @@
  "lakay": {
   "key": "lakay",
   "title": "Lakay",
-  "version": "3",
+  "version": "6",
   "build": "",
   "date": "2026-11-07",
   "color": "#6f78d8",
-  "size": 876096,
-  "sha256": "cbe5ada04484b82708ac48d4925e8d7311951e7f6647f8e431e234859d8568f9",
+  "size": 1091377,
+  "sha256": "316e6f74ad3bde35816d2b255698e8de4446c6af388d83be78cf51ba17252f08",
   "name": "Lakay.html"
  }
 }
