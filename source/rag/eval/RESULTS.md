@@ -13,20 +13,23 @@ How it was run, and where it differs from her setting:
   `llama-server`, context 8,192 tokens, thinking off, CPU). Runs 1 and 2: Qwen3.5 2B Q4_K_M, the model the Mac and Windows apps carry
   (Scriba). The evaluation does not use the reranker (off by default).
 - Run 1: the 6.61 page (started 16:46 UTC). Run 2: the 6.63 page, which shows a reply that says the NOT_FOUND sentence and cites no
-  passage given as exactly NOT_FOUND (started 18:02 UTC, after run 1's finding). Other tests ran on the same processors during parts of run 1, so its
-  minutes are slower; the memory figures count only the evaluation's own browser.
+  passage given as exactly NOT_FOUND (started 18:02 UTC, after run 1's finding). Run 3: the 6.64 page (its citation reader no longer
+  ends a sentence at a title or counts strains[7]) with Qwen3.5 9B Q4_K_M, the strongest model of Ingenium's lineup for a computer
+  with 16 GB of memory (installed in the app, not carried; SHA-256 03b74727..., as the lineup pins it), started 20:58 UTC. Other tests
+  ran on the same processors during parts of runs 1 and 3, so their minutes and seconds are slower; the memory figures count only the
+  evaluation's own browser.
 
 ## The five criteria
 
-| criterion | her threshold | run 1 (6.61 page) | run 2 (6.63 page) |
-| --- | --- | --- | --- |
-| 1. Recall@5, file level | at least 0.8 | **18 of 20 (0.90)** | **18 of 20 (0.90)** |
-| 2. groundedness: every sentence cited, every citation to a passage given | every answer | 10 of 20 answers | 10 of 20 answers |
-| 2. unsupported claims (read by a person) | none (a blocker) | 2 | 3 |
-| 3. ACL: retrieve() gives no chunk of the folder test-b may not read | none | **0 of 4 questions** | **0 of 4 questions** |
-| 3. ACL: end-to-end response equals NOT_FOUND | 4 of 4 | 3 of 4 | **4 of 4** |
-| 4. memory, the whole corpus (72 files, 3,511 passages, the 4 MB logbook) | under 2 GB | **1,410 MB** (PSS 1,166 MB) | **1,410 MB** (PSS 1,132 MB) |
-| 5. reindex: one file added, one modified, one deleted, one reconcile | the index reflects each change; embedding calls equal new or changed chunks | **reflects; 3 calls, 3 passages** | **reflects; 3 calls, 3 passages** |
+| criterion | her threshold | run 1 (6.61 page, 2B) | run 2 (6.63 page, 2B) | run 3 (6.64 page, 9B) |
+| --- | --- | --- | --- | --- |
+| 1. Recall@5, file level | at least 0.8 | **18 of 20 (0.90)** | **18 of 20 (0.90)** | **18 of 20 (0.90)** |
+| 2. groundedness: every sentence cited, every citation to a passage given | every answer | 10 of 20 answers | 10 of 20 answers | 16 of 20 answers |
+| 2. unsupported claims (read by a person) | none (a blocker) | 2 | 3 | 1 |
+| 3. ACL: retrieve() gives no chunk of the folder test-b may not read | none | **0 of 4 questions** | **0 of 4 questions** | **0 of 4 questions** |
+| 3. ACL: end-to-end response equals NOT_FOUND | 4 of 4 | 3 of 4 | **4 of 4** | **4 of 4** |
+| 4. memory, the whole corpus (72 files, 3,511 passages, the 4 MB logbook) | under 2 GB | **1,410 MB** (PSS 1,166 MB) | **1,410 MB** (PSS 1,132 MB) | **1,430 MB** (PSS 1,115 MB) |
+| 5. reindex: one file added, one modified, one deleted, one reconcile | the index reflects each change; embedding calls equal new or changed chunks | **reflects; 3 calls, 3 passages** | **reflects; 3 calls, 3 passages** | **reflects; 3 calls, 3 passages** |
 
 Recall@5 misses, both runs: H11 (a JSON ledger; the five passages are letters about the same ship) and L05 (an instrument log in CSV;
 the passages include a notebook entry about the same night, from which the model answered in part). Memory: `ps` every 250 ms, the
@@ -47,11 +50,18 @@ Most flagged answers state the fact in a first sentence without a citation and c
 - Run 2, H09: it gives Friday 28th the weather of Wednesday 26th and says the carpenter was killed on Saturday 29th, citing [2].
 - Run 2, L05: "A porter named Tom came to investigate": the notebook says the porter phoned Tom, who came in.
 
+- Run 3 (9B), H01: among the manifest's sugar shipments it lists "8 on 1784-02-11"; the passages it was given show 8 on 9 February
+  and 31 on 10 February, and cotton on 11 February. Its answer (412 hogsheads, from the letter) is right and cited.
+
+Run 3's other flags are of form, not substance: list lines ("- 214 letters") and an echoed context line or quotation without their
+own citation (H03, H06, L07, R09); each fact is in the passage cited next to it.
+
 Two flags came from the checker, not the model, and are corrected in 6.64 (`rig/t_rag5_prompt.mjs`): a title such as "Mr." ended a
 sentence (run 2, H01's two fragments), and "strain[7]" in a quoted JSON line counted as a citation to passage 7 (L07, both runs).
 
-With the model the apps carry, criterion 2 is not met: half the answers leave a sentence without a citation, and in each run two or
-three claims are wrong in a detail. The page names the uncited sentences and the citations to no passage under each reply.
+With the model the apps carry (2B), criterion 2 is not met: half the answers leave a sentence without a citation, and in each run two
+or three claims are wrong in a detail. With the 9B model, 16 of 20 answers are fully cited and one detail is wrong, so criterion 2 is
+still not met to the letter. The page names the uncited sentences and the citations to no passage under each reply.
 
 ## The reranker (`rig/t_rag5_rerank.js`, 15 checks, on the 6.62 and 6.63 pages)
 
