@@ -371,6 +371,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.64 (8 November 2026): the citation reader made exact, the reranker in the Windows app, and the evaluation's results.
+
+- rag/prompt.js: sentences() does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others);
+  citations() does not count a bracket joined to a word or number before it (strains[7]); modules/r257.js links follow the same rule.
+  Both flags were the checker's, not the model's (the evaluation's second run: H01's two fragments, L07's [7]).
+  rig/t_rag5_prompt.mjs: 15 checks on the evaluation's own replies, no browser.
+- build-windows.yml (and both build-mac.yml): the reranker's list is read without carriage returns. A Windows checkout ends its lines
+  with CR LF, so 6.63's step asked for "config.json\r" and warned "The reranker is left out of this app" (reproduced here with the
+  same list); its clean-up named a path that does not exist, so the files from rag-vendor.zip most likely stayed in that app (not
+  verified inside the installer).
+- rig/t_rag5_eval.js keeps the passages each answer was given in report.json, so a person can check every reading.
+- rag/eval/RESULTS.md: the evaluation's results (two runs with the model the apps carry, one with Qwen3.5 9B).
+
 Ingenium 6.63 (8 November 2026): the folder search back in the Mac and Windows apps, and NOT_FOUND kept exact.
 
 - The 6.62 apps were built without the folder search. vendor.json's new entry made the workflow rag-vendor.yml fetch the files again

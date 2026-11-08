@@ -148,7 +148,8 @@ function linkify(md,mm){if(md.querySelector("a.rag-cite"))return;var count=mm.ra
     return /\[\d/.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_SKIP;}});
   while(tw.nextNode())nodes.push(tw.currentNode);
   nodes.forEach(function(tn){var s=tn.nodeValue,last=0,frag=D.createDocumentFragment(),m,any=false;MARK.lastIndex=0;
-    while((m=MARK.exec(s))){var parts=m[1].split(/(\s*[,;–-]\s*)/),okAll=parts.every(function(x,i){return i%2===1||(+x>=1&&+x<=count);});
+    while((m=MARK.exec(s))){if(m.index>0&&/[A-Za-z0-9_\u00C0-\u024F]/.test(s.charAt(m.index-1)))continue;/* 6.64: strains[7] is an index, not a citation */
+      var parts=m[1].split(/(\s*[,;–-]\s*)/),okAll=parts.every(function(x,i){return i%2===1||(+x>=1&&+x<=count);});
       if(!okAll)continue;any=true;frag.appendChild(D.createTextNode(s.slice(last,m.index)));
       if(parts.length===1)frag.appendChild(citeLink(+parts[0],mm,"["+parts[0]+"]"));
       else{frag.appendChild(D.createTextNode("["));parts.forEach(function(x,i){if(i%2===1)frag.appendChild(D.createTextNode(x));else frag.appendChild(citeLink(+x,mm,x));});frag.appendChild(D.createTextNode("]"));}

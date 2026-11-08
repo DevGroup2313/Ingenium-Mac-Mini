@@ -113,7 +113,7 @@ function sampler(root) {
       for (const it of GOLD.items) {
         const t = Date.now(); const a = await ask(it.question); const ps = (a.rag && a.rag.passages) || [];
         const g = E.grounded(a.text, ps); const correct = E.answerHas(a.text, it);
-        items.push({ id: it.id, text: a.text, notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, seconds: Math.round((Date.now() - t) / 1000) });
+        items.push({ id: it.id, text: a.text, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, seconds: Math.round((Date.now() - t) / 1000) });
         note(it.id + ' (' + Math.round((Date.now() - t) / 1000) + ' s): ' + (g.notFound ? 'NOT_FOUND' : (g.ok ? 'grounded' : 'flagged')) + (correct ? ', names the fact' : '') + ' :: ' + String(a.text).replace(/\s+/g, ' ').slice(0, 160));
       }
       R.grounded = { model: LLM_NAME, items };

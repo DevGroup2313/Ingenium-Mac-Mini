@@ -223,6 +223,9 @@ and, where possible, highlights the section".
   ending with a colon introduces what follows and is not counted).
   6.63: `declaresNotFound(answer, count)`: the reply is the NOT_FOUND sentence, or says it as one of its sentences and cites no
   passage given (the evaluation found a small model adding an explanation around it); the chat then shows exactly NOT_FOUND.
+  6.64: `sentences` does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others), and
+  `citations` does not count a bracket joined to a word or number before it (`strains[7]`); the chat's links follow the same rule.
+  Test: `rig/t_rag5_prompt.mjs` (the evaluation's own replies).
 - `IngRag.prompt` is that module; `IngRag.openSource(passage, userId = 'me')` reads the cited file again through the bridge (only a folder
   the user may read, checked with `folder.list({principalId})`), asks the parse worker for its text without chunking (`textOnly`: the
   file's text, a PDF's pages), and finds the passage: at its offsets (`exact`), elsewhere (`moved`), or not at all (`changed`); it returns

@@ -236,7 +236,9 @@ jobs:
         continue-on-error: true
         run: |
           if [ ! -d rag/vendor ] || [ ! -f tools/rag_reranker.sha256 ]; then echo "::warning::No folder search here, so no reranker"; exit 0; fi
-          M="$(sed -n 's/^# model //p' tools/rag_reranker.sha256)"; REV="$(sed -n 's/^# revision //p' tools/rag_reranker.sha256)"; D="rag/vendor/models/$M"; ok=1
+          # 6.64: the list read without carriage returns (a Windows checkout ends its lines with CR LF; 6.63's Windows app lost the reranker)
+          tr -d '\r' < tools/rag_reranker.sha256 > "$RUNNER_TEMP/rag_reranker.sha256"
+          M="$(sed -n 's/^# model //p' "$RUNNER_TEMP/rag_reranker.sha256")"; REV="$(sed -n 's/^# revision //p' "$RUNNER_TEMP/rag_reranker.sha256")"; D="rag/vendor/models/$M"; ok=1
           while read -r SUM F; do
             case "$SUM" in ''|'#'*) continue;; esac
             mkdir -p "$D/$(dirname "$F")"
@@ -244,7 +246,7 @@ jobs:
             if [ -f "$D/$F" ] && [ "$(shasum -a 256 < "$D/$F" | cut -d' ' -f1)" = "$SUM" ]; then continue; fi
             if ! curl -fsSL --retry 4 -o "$D/$F" "https://huggingface.co/$M/resolve/$REV/$F"; then ok=0; continue; fi
             GOT="$(shasum -a 256 < "$D/$F" | cut -d' ' -f1)"; [ "$GOT" = "$SUM" ] || { echo "::warning::$F has the fingerprint $GOT, not $SUM"; ok=0; }
-          done < tools/rag_reranker.sha256
+          done < "$RUNNER_TEMP/rag_reranker.sha256"
           if [ "$ok" = 1 ]; then echo "* The reranker carried in rag/vendor (off until she switches it on): $(du -sh "$D" | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
           else rm -rf "$D"; echo "::warning::The reranker is left out of this app"; fi
 
@@ -252,7 +254,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.63.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.64.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
