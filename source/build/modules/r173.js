@@ -213,7 +213,7 @@ var CONF={
     {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search, Ingenium's eyes and its ears (dictation) are here too.",
       ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ingEarsCard","ragCard"]},
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
-      ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
+      ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
     {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
@@ -285,6 +285,7 @@ var KEYS=[
   ["ragCard","folders folder papers documents files read reading search look up find chat context passages add remove desktop"],
   ["ingImportCard","import chats bring conversations other assistants transcript history"],
   ["bkCard","backup back up export import restore move moving copy zip file password keys new device carry"],
+  ["cloudCard","cloud sync synchronise synchronize devices every device hub mac mini wifi wi-fi hotspot same work passphrase sealed real time"],
   ["stxCard","storage space room disk quota limit clean clear library memory full"],
   ["ingLockCard","sign in sign-in login log in user name password lock locked unlock encryption encrypt encrypted protect protection privacy private secure security recovery phrase seal sealed"],
   [/^data on this device/,"data export import reset erase delete wipe recover earlier moment backup"],

@@ -17,15 +17,15 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => IngRooms.open('settings', 'data', false)); await p.waitForTimeout(900);
   const d0 = await p.evaluate(() => ({ tabs: [...document.querySelectorAll('#rmP-settings-data .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()), cur: IngSettingsParts.show('data'),
     says: (document.getElementById('dxSays-data') || {}).textContent || '' }));
-  ok(d0.tabs.join('|') === 'Bring in|Back up and move|Storage|Sign-in and reset' && d0.cur === 'in' && /brought in/.test(d0.says), 'Your data has four sections, opening on Bring in, with its line', d0);
+  ok(d0.tabs.join('|') === 'Bring in|Back up and move|Ingenium Cloud|Storage|Sign-in and reset' && d0.cur === 'in' && /brought in/.test(d0.says), 'Your data has five sections (6.57: Ingenium Cloud), opening on Bring in, with its line', d0);
   const DH = {}, DV = {};
-  for (const [k, ids] of [['in', ['ingImportCard']], ['backup', ['bkCard']], ['storage', ['stxCard']], ['lock', ['ingLockCard']]]) {
+  for (const [k, ids] of [['in', ['ingImportCard']], ['backup', ['bkCard']], ['cloud', ['cloudCard']], ['storage', ['stxCard']], ['lock', ['ingLockCard']]]) {
     await p.click('#dxT-data-' + k); await p.waitForTimeout(500);
     if (k === 'backup') { await p.click('#bkTab-move'); await p.waitForTimeout(400); }
     DH[k] = await p.evaluate(() => document.scrollingElement.scrollHeight);
     DV[k] = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-data > .card')].filter(c => c.offsetParent !== null).map(c => c.id || ((c.querySelector('h2') || {}).textContent || '').trim()));
   }
-  ok(DV.in.join() === 'ingImportCard' && DV.backup.join() === 'bkCard' && DV.storage.join() === 'stxCard' && DV.lock.join() === 'ingLockCard,Data on this device', 'each section shows its own cards: Sign-in and reset holds the sign-in and the one-file backup with Reset everything', DV);
+  ok(DV.in.join() === 'ingImportCard' && DV.backup.join() === 'bkCard' && DV.cloud.join() === 'cloudCard' && DV.storage.join() === 'stxCard' && DV.lock.join() === 'ingLockCard,Data on this device', 'each section shows its own cards: Sign-in and reset holds the sign-in and the one-file backup with Reset everything', DV);
   ok(Object.values(DH).every(h => h <= 1750), 'each section of Your data is at most 1,750 pixels tall at 1440 by 900, Moving open included (it was 3,281)', DH);
 
   /* 2. Backup's Moving two by two; Storage in two columns with the library below */

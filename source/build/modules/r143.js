@@ -192,7 +192,7 @@ var KNOWN=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_hub","ingen
 var DATA_DBS=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_claude"];
 /* never in a backup: the model files, file links and the engine (ingenium_files and its older name), and the desk's
    overflow copy (the desk itself goes whole, in desk/state.json) */
-var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1};
+var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1,ingenium_cloudkey:1};  /* 6.57: and Ingenium Cloud's key, which never leaves the device it was made on (modules/r255.js) */
 var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app library",ingenium_repos:"Fabrica's apps, with every version",
   ingenium_hub:"Fabrica's issues, pull requests and pages",ingenium_claude:"Conversations you brought in from elsewhere",ingenium_keys:"Signing keys",fabrica_made:"Fabrica's packages"};
 /* what belongs to one device and stays with it: its models and how they ran here */
@@ -492,7 +492,8 @@ function secrets(o,strip){var out=[];(function walk(x,path,dep){if(!x||typeof x!
 function getPath(o,p){for(var i=0;i<p.length;i++){if(!o||typeof o!=="object")return undefined;o=o[p[i]];}return o;}
 function setPath(o,p,v){for(var i=0;i<p.length-1;i++){if(!o||typeof o!=="object")return false;o=o[p[i]];}if(!o||typeof o!=="object")return false;o[p[p.length-1]]=v;return true;}
 function deskNow(){var raw;try{raw=JSON.stringify(state,typeof deskReplacer==="function"?deskReplacer:undefined);}catch(e){raw="{}";}return raw;}
-function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||k==="ingenium_lock"||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k)||/\.sealed-\d+$/.test(k);}
+/* 6.57: ingenium_cloud is this device's own Cloud settings (its name, the computer that keeps the Cloud): never carried, never replaced */
+function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||k==="ingenium_lock"||k==="ingenium_cloud"||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k)||/\.sealed-\d+$/.test(k);}
 function localPart(){var items={},count=0,bytes=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k==null||protectedKey(k))continue;var v=localStorage.getItem(k);items[k]=v;count++;bytes+=k.length+(v?v.length:0);}}catch(e){}
   return {items:items,count:count,bytes:bytes};}
 function libRefsOf(st){var r={};try{var A=(st.appLib&&st.appLib.apps)||{};Object.keys(A).forEach(function(k){var a=A[k];if(a&&a.ref)r[a.ref]=1;if(a&&a.earlier&&a.earlier.ref)r[a.earlier.ref]=1;});}catch(e){}return r;}
@@ -545,7 +546,9 @@ function make(o){o=o||{};var say=o.onProgress||function(){},sig=o.signal||{},api
       var WHY={ingenium_files:"model files, file links and the engine: models never go in a backup",the_foundry_files:"an older name of the same store",ingenium_desk:"the desk's overflow copy: the desk itself goes whole (desk/state.json)",
         ingenium_keys:o.keys?"locked with the password (secrets.enc)":"not chosen",fabrica_made:"not chosen",ingenium_hub:"read through Fabrica's own export (fabrica/hub.json)"};
       m.excluded=[];
-      names.forEach(function(db){var skip=NEVER[db]||db==="ingenium_keys"||(db==="fabrica_made"&&!o.packages)||(db==="ingenium_hub"&&hubData);
+      /* 6.57: Ingenium Cloud leaves out what each device keeps for itself (o.leave: the app library, whose builds every Ingenium carries) */
+      if(Array.isArray(o.leave))o.leave.forEach(function(db){WHY[db]="kept by each device: Ingenium Cloud leaves it";});
+      names.forEach(function(db){var skip=NEVER[db]||db==="ingenium_keys"||(db==="fabrica_made"&&!o.packages)||(db==="ingenium_hub"&&hubData)||(Array.isArray(o.leave)&&o.leave.indexOf(db)>=0);
         if(skip){m.excluded.push({db:db,why:WHY[db]||""});return;}plan.push(db);});
       return seq(plan,function(db){return openExisting(db).then(function(d){if(!d)return null;var sch=schema(d);
         return seq(sch,function(s){return count(d,s.name).then(function(c){s.count=c;total+=c;},function(){s.count=0;});}).then(function(){d.close();return {db:db,schema:sch};});});});})

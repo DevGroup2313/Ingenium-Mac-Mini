@@ -371,6 +371,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.57 (8 November 2026): Ingenium Cloud. Her words (8 November 2026): "I want you to build Ingenium its own local Cloud or local
+network that can store my data and facilitate the transfer of my data across wirelessly across my devices ... I want all of my devices to
+have the same content in real time or be able to be updated over Ingenium's Cloud ... continue working on any app, project, assignment, or
+chat or anything else inside of Ingenium with great ease as long as I login and connect to the Ingenium's cloud". Asked how, she chose both
+ways: her Mac mini as the home hub, and any two devices directly.
+
+- desktop/app_cloud_657.py (Mac and Windows; release.py's DESKTOP list): the gateway that lends models (port 17860, its pairing code and
+  lockout) also keeps Ingenium Cloud: GET /ingenium/cloud (the snapshots it keeps), GET and POST /ingenium/cloud/part/<id> (one sealed
+  part, its bytes checked against their SHA-256), POST /ingenium/cloud/has, /snap (kept only once every part it names has arrived; the
+  newest five per device; parts no snapshot names go an hour later) and /forget. It keeps sealed parts and each snapshot's device name,
+  time, size and key-drawing salt in the app's data folder (cloud/), and never sees the passphrase or a word of her work. A new switch,
+  cloud_box_set, runs the gateway and keeps the computer awake for the Cloud without lending its models (_share_apply).
+- modules/r255.js (new): the Cloud, page side, the same code on the computers, the Fire tablet, iPhone, iPad and a browser (netFetch).
+  A snapshot is everything a backup holds (r143's make, with a new option, leave, so the app library stays on each device), each part
+  sealed with AES-GCM-256 under a key drawn from her passphrase (PBKDF2-SHA-256, 600,000 rounds, deriveBits: one half seals, the other
+  names each part by HMAC-SHA-256; the nonce is drawn from the part too, so a part always seals the same way and only changed parts
+  travel). The key is kept on the device as a key the page cannot read out (IndexedDB ingenium_cloudkey, never in a backup: r143's
+  NEVER; its settings in localStorage ingenium_cloud, never carried: r143's protectedKey). Bringing in is r143's Merge (each item by
+  its own date, the desk kept on the recovery shelf first), then what belongs to one device is put back as it was (its models, the
+  computer it borrows from and its online connection, its window and side bars, dictation, app library), then what was deleted
+  elsewhere is deleted (each device compares the ids its lists held at its last sync with those they hold now; a change made after a
+  deletion wins), and the conversation open on the device that worked last becomes the open one. By itself (on by default): a send a
+  minute after a change made by her (an unchanged desk is not sent), a look every minute; new work is announced at the foot of the
+  window and brought in when she says, or by itself when she is not typing if she chooses. Away: a sync file sealed with the same
+  passphrase (r143's seal), merged the same way. Settings, Your data, Ingenium Cloud (r234; r173): three numbered steps, the one she
+  needs open.
+- Not in this stage: the app library (each device keeps its own: every Ingenium carries her apps' builds, and a library's entries name
+  pieces kept on that device); connection keys and signing keys (each device keeps its own, as in a backup without them); a Cloud kept
+  by a device that is not a computer (a page cannot listen on the network); Bluetooth (a page cannot exchange data with another
+  computer over it).
+
+    node rig/t_657_cloud.js <page url> <box address> <pairing code> <the box's cloud folder> <out>   # two devices and a third: 14 checks
+    (the box: python3 rig/run_app.py <folder with ingenium_app.py patched and ingenium.html> <api port>, then POST /call/cloud_box_set [true])
+
 Ingenium 6.56 (8 November 2026): dictation written on the device with Scriba's speech models, Carpe Diem 1081 in Lector, and Lakay
 Build 6. Her words (8 November 2026): "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead
 sending it outside of the app to another provider. I want everything kept in-house where possible. Lector quotes a much older Carpe Diem

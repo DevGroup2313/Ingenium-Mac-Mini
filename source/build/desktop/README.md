@@ -94,3 +94,6 @@ A whole page is about 76 MB, and the page's own save call carried it as base64 (
 from the running page, and writes it whole where she chooses, keeping no version. Both answer the path written, "cancelled", or an
 error. Test: `python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py` (38 checks with this patch).
 
+6.57, `app_cloud_657.py` (Mac and Windows): Ingenium Cloud's box on the gateway that lends models, behind its pairing code: sealed parts
+and each device's latest snapshots in the app's data folder (cloud/), and `cloud_box_set` (the gateway runs and the computer stays awake
+for the Cloud, lending or not). Test: `node rig/t_657_cloud.js` against `rig/run_app.py` (see source/README.md).
