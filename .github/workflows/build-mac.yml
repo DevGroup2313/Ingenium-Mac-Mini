@@ -240,6 +240,8 @@ jobs:
           while read -r SUM F; do
             case "$SUM" in ''|'#'*) continue;; esac
             mkdir -p "$D/$(dirname "$F")"
+            # 6.63: rag-vendor.zip carries the reranker since 6.62's vendor.json; a file already there with its fingerprint is kept
+            if [ -f "$D/$F" ] && [ "$(shasum -a 256 < "$D/$F" | cut -d' ' -f1)" = "$SUM" ]; then continue; fi
             if ! curl -fsSL --retry 4 -o "$D/$F" "https://huggingface.co/$M/resolve/$REV/$F"; then ok=0; continue; fi
             GOT="$(shasum -a 256 < "$D/$F" | cut -d' ' -f1)"; [ "$GOT" = "$SUM" ] || { echo "::warning::$F has the fingerprint $GOT, not $SUM"; ok=0; }
           done < tools/rag_reranker.sha256
@@ -250,7 +252,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.62.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.63.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"

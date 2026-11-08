@@ -12,7 +12,8 @@
 //      passages numbered and her question; the reply's [n] are links; the sources are listed; nothing flagged; the viewer marks the
 //      passage at its character offsets (Markdown) or on its page (PDF)
 //   6. a reply with a sentence without a citation and a citation to no passage: both named under the reply
-//   7. a reply that is the NOT_FOUND sentence in quotes: exactly NOT_FOUND
+//   7. a reply that is the NOT_FOUND sentence in quotes: exactly NOT_FOUND; with words around it and no citation: exactly NOT_FOUND
+//      (6.63); with a citation to a passage given: an answer, the sentence flagged
 //   8. ACL end to end: test-b asks what only household_papers answers: retrieve() gives no passage of it, the model is given none of
 //      it, the reply equals NOT_FOUND
 //   9. zero passages (test-c): NOT_FOUND and no model called
@@ -103,8 +104,8 @@ const fakeModel = (p) => p.evaluate(() => {
     const blocks = sys.split(/\n\n(?=\[\d+\] )|\nContext:\n/).filter((b) => /^\[\d+\] /.test(b));
     const hit = window.__needle ? blocks.find((b) => b.indexOf(window.__needle) >= 0) : null;
     if (/^You are answering strictly/.test(sys)) {
-      if (hit) { const n = /^\[(\d+)\]/.exec(hit)[1]; reply = 'Your folder says: ' + window.__needle + ' [' + n + '].'; if (window.__mode === 'loose') reply += ' This part comes from nowhere in particular. It is also in [9].'; }
-      else reply = '"I could not find that in the selected folders."';
+      if (hit) { const n = /^\[(\d+)\]/.exec(hit)[1]; reply = 'Your folder says: ' + window.__needle + ' [' + n + '].'; if (window.__mode === 'loose') reply += ' This part comes from nowhere in particular. It is also in [9].'; if (window.__mode === 'mixed') reply += ' I could not find that in the selected folders.'; }
+      else reply = window.__mode === 'explain' ? 'The passages given speak of other things, not of this.\n\nI could not find that in the selected folders.' : '"I could not find that in the selected folders."';
     } else reply = 'An ordinary reply.';
     try { o.onToken && o.onToken(reply); } catch (e) { }
     return Promise.resolve({ text: reply, stats: {} });
@@ -242,6 +243,14 @@ const plusItems = (p) => p.evaluate(() => { const b = document.getElementById('c
     r = await send(p, 'What colour is the lighthouse at the end of the harbour wall?');
     ok((await sentCount(p)) === n0 + 1 && r.text === NOT_FOUND && r.rag.notFound === true && r.rag.called === true, 'the model was asked and its quoted NOT_FOUND became exactly NOT_FOUND', { text: r.text });
     ok(await p.evaluate(() => (([...document.querySelectorAll('#chatScroll .msg')].pop().querySelector('.rag-sources b')) || {}).textContent === 'Looked at in your folders'), 'its sources are listed as what was looked at');
+    // 6.63 (the evaluation found a small model explaining around it): the sentence with words around it and no citation is NOT_FOUND
+    await p.evaluate(() => { window.__mode = 'explain'; });
+    r = await send(p, 'What colour is the lighthouse at the end of the harbour wall?');
+    ok(r.text === NOT_FOUND && r.rag.notFound === true && r.rag.called === true, 'a reply that explains and then says the NOT_FOUND sentence, citing no passage, became exactly NOT_FOUND', { text: r.text });
+    await p.evaluate((nd) => { window.__needle = nd; window.__mode = 'mixed'; }, fact('R09').needle);
+    r = await send(p, fact('R09').question);
+    ok(r.text !== NOT_FOUND && !r.rag.notFound && (r.rag.flagged || []).length === 1 && /could not find that/.test(r.rag.flagged[0]), 'a reply that cites a passage and also says the NOT_FOUND sentence stays an answer, with that sentence flagged', { text: r.text, flagged: r.rag.flagged });
+    await p.evaluate(() => { window.__mode = ''; });
 
     // ------------------------------------------------------------------------------------------ 8. ACL end to end
     note('8. test-b asks what only household_papers answers');

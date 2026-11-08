@@ -78,7 +78,9 @@ opened the first time the card scrolls into view, and the reading model is loade
   inside the desktop apps, nothing is fetched from the web at run time.
 * **The vendor files.** `python3 rag/tools/fetch_vendor.py OUT_DIR` downloads the npm packages (checked against the registry's sha512)
   and the model (checked against the SHA-256 pinned in `vendor.json`) and writes `OUT_DIR/VENDOR.txt`. The release "rag-vendor" of
-  DevGroup2313/Ingenium-Mac-Mini holds `rag-vendor.zip`, the same tree, for tests and build machines.
+  DevGroup2313/Ingenium-Mac-Mini holds `rag-vendor.zip`, the same tree, for tests and build machines. The workflow
+  `rag-vendor.yml` checks the files on every push that changes `vendor.json` but replaces the zip only when it is run by hand; then
+  `RAG_VENDOR_SHA256` in `build/release.py` must be set to the new zip's fingerprint, or the builds leave the folder search out.
 * **The app.** `build/desktop/app_rag_692.py` is applied by `release.py` (as every `build/desktop/app_*.py`) to the Mac and Windows
   `ingenium_app.py`: the five bridge methods and explicit types for `.mjs`, `.js`, `.wasm`, `.onnx` and `.json` on the loopback server
   (http://127.0.0.1:17953), which serves the page's folder.

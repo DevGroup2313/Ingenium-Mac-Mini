@@ -371,6 +371,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.63 (8 November 2026): the folder search back in the Mac and Windows apps, and NOT_FOUND kept exact.
+
+- The 6.62 apps were built without the folder search. vendor.json's new entry made the workflow rag-vendor.yml fetch the files again
+  and replace rag-vendor.zip on the release; its fingerprint changed (57db28f7... instead of ecd2f34b...), and every Mac and Windows
+  build refused it, as it should, and left rag/ out ("The folder search's files have the fingerprint ..."). The new zip holds the
+  same 22 files as before, byte for byte, and the reranker's six (each compared with its pinned SHA-256); release.py now pins it
+  (tools/rag_vendor.sha256). rag-vendor.yml replaces the zip only when run by hand; a push only checks. The reranker step keeps the
+  files the zip already carries and fetches only a missing one.
+- rag/prompt.js declaresNotFound(answer, count) and modules/r257.js: a reply that says the NOT_FOUND sentence and cites no passage it
+  was given is shown as exactly NOT_FOUND. The evaluation found the model the apps carry (Qwen3.5 2B) refusing correctly but adding an
+  explanation before or after the sentence (one of the four end-to-end ACL answers, and H11). A reply that cites a passage given and
+  also says the sentence stays an answer, with that sentence flagged. rig/t_rag3_chat.js: 65 checks (two new).
+
 Ingenium 6.62 (8 November 2026): the folder search's evaluation and its optional reranker (phase 5). Her task: "Reranker. Optional,
 off by default, loaded on demand. Use a small cross-encoder that has a working ONNX export for Transformers.js. Confirm this on Hugging
 Face before choosing a model", "merge with reciprocal rank fusion (k = 60), then rerank to 5 if enabled, else take the top 5", and her

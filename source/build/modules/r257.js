@@ -132,7 +132,8 @@ function contextWrap(o){return function(bot){var t=o.apply(this,arguments);
 /* ---------------------------------------------------------------- 3. the reply */
 function finish(m){var g=m.rag;g.done=1;if(g.error||g.called===false)return;
   var r=R(),P=r&&r.prompt,t=String(m.text||"");if(!P||!t.trim())return;
-  if(P.isNotFound(t)){m.text=NOT_FOUND;g.notFound=true;return;}
+  /* 6.63: a reply that says the NOT_FOUND sentence and cites no passage given is exactly NOT_FOUND (her contract: "respond exactly") */
+  if(typeof P.declaresNotFound==="function"?P.declaresNotFound(t,(g.passages||[]).length):P.isNotFound(t)){m.text=NOT_FOUND;g.notFound=true;return;}
   var c=P.checkGrounded(t,(g.passages||[]).length);g.ok=c.ok;g.flagged=c.flagged.slice(0,12);g.badRefs=c.badRefs;g.cited=c.cited;}
 function finishAll(){var ch=false;try{curMsgs().forEach(function(m){if(m&&m.role==="bot"&&m.rag&&!m.live&&!m.rag.done){finish(m);ch=true;}});}catch(e){}
   if(ch){try{saveState();}catch(e){}}}

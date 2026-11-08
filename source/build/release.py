@@ -205,7 +205,9 @@ def page():
 RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.js", "embedder.js", "embedder.worker.js",
              "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js",
              "reranker.js", "reranker.worker.js", "vendor.json")
-RAG_VENDOR_SHA256 = "ecd2f34b95a77c5592dce6ae7f4f56fccca16d72f010410188e3af393971f253"   # rag-vendor.zip, release rag-vendor
+# 6.63: the zip the workflow rag-vendor.yml made from 6.62's vendor.json (8 November 2026, 17:48 UTC): the same 22 files as before
+# (ecd2f34b...) and the reranker's six, each identical to its pinned SHA-256 (compared file by file); only VENDOR.txt differs
+RAG_VENDOR_SHA256 = "57db28f7820b1109cf5d75232f61a21fdbf9e5b7b17539148db71e3d2edaa351"   # rag-vendor.zip, release rag-vendor
 
 
 def ship_rag():

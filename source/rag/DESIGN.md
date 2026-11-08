@@ -221,6 +221,8 @@ and, where possible, highlights the section".
   headings and table rules left out, each list line a sentence, marks after a full stop belong to the sentence before);
   `checkGrounded(answer, count)` -> `{ok, flagged, badRefs, cited}` (every sentence carries a citation to a passage given; a sentence
   ending with a colon introduces what follows and is not counted).
+  6.63: `declaresNotFound(answer, count)`: the reply is the NOT_FOUND sentence, or says it as one of its sentences and cites no
+  passage given (the evaluation found a small model adding an explanation around it); the chat then shows exactly NOT_FOUND.
 - `IngRag.prompt` is that module; `IngRag.openSource(passage, userId = 'me')` reads the cited file again through the bridge (only a folder
   the user may read, checked with `folder.list({principalId})`), asks the parse worker for its text without chunking (`textOnly`: the
   file's text, a PDF's pages), and finds the passage: at its offsets (`exact`), elsewhere (`moved`), or not at all (`changed`); it returns
@@ -305,7 +307,10 @@ then rerank to 5 if enabled, else take the top 5".
   the reply). `shutdown()` stops its worker.
 - The page: the card's switch "Reorder what is found with a second reading model" (`#ragRerank`, `state.rag.rerank`, per device, off);
   the chat asks `retrieve(question, 'me', {k: 5, rerank})` and keeps `bot.rag.reranked`.
-- Shipping: the three build workflows fetch the six files from Hugging Face at the pinned revision into
-  `rag/vendor/models/Xenova/ms-marco-MiniLM-L-6-v2/` and check them against `tools/rag_reranker.sha256` (written by `release.py rag`);
-  a fetch or check that fails leaves the reranker out, and the switch then says why in the chat. About 24 MB (the model 23.1 MB).
+- Shipping: the six files are in `rag-vendor.zip` (since 6.63's pin, 57db28f7...), in `rag/vendor/models/Xenova/ms-marco-MiniLM-L-6-v2/`;
+  the three build workflows check each against `tools/rag_reranker.sha256` (written by `release.py rag`) and fetch any that is missing
+  from Hugging Face at the pinned revision; a fetch or check that fails leaves the reranker out, and the switch then says why in the
+  chat. About 24 MB (the model 23.1 MB). 6.62's apps were built without the folder search: the change to `vendor.json` made the
+  workflow `rag-vendor.yml` replace `rag-vendor.zip`, whose new fingerprint the builds refused. Since 6.63 a push only checks the files;
+  the zip is replaced only by running that workflow by hand, and `RAG_VENDOR_SHA256` in `release.py` is then set to its fingerprint.
 - Test: `rig/t_rag5_rerank.js`.
