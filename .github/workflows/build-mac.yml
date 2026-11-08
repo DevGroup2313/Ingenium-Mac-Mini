@@ -203,11 +203,38 @@ jobs:
             echo "::warning::The speech files could not be fetched: this app fetches its speech model once instead"
           fi
 
+      - name: The folder search's files (Mini's release rag-vendor, checked by SHA-256)
+        # 6.59: the chat answers from her folders (modules/r257.js). The folder search's own files are this repository's rag/
+        # (release.py writes them); its third-party files (SQLite with FTS5 and sqlite-vec, Transformers.js, the ONNX runtime, pdf.js,
+        # mammoth and the reading model bge-small-en-v1.5) come from Mini's release rag-vendor, checked against tools/rag_vendor.sha256.
+        # Not fetched, or another fingerprint: rag/ is left out and the app is built without the folder search (no card, no switch).
+        continue-on-error: true
+        run: |
+          rm -rf rag/vendor "$RUNNER_TEMP/ragv"
+          if [ ! -f rag/main.js ] || [ ! -f tools/rag_vendor.sha256 ]; then echo "::warning::No rag/ here: the app is built without the folder search"; rm -rf rag; exit 0; fi
+          WANT="$(head -n 1 tools/rag_vendor.sha256 | cut -d' ' -f1)"
+          if curl -fsSL --retry 4 --max-time 900 -o "$RUNNER_TEMP/rag-vendor.zip" "https://github.com/DevGroup2313/Ingenium-Mac-Mini/releases/download/rag-vendor/rag-vendor.zip"; then
+            GOT="$(shasum -a 256 "$RUNNER_TEMP/rag-vendor.zip" | cut -d' ' -f1)"
+            if [ "$GOT" = "$WANT" ]; then
+              mkdir -p "$RUNNER_TEMP/ragv" && unzip -q "$RUNNER_TEMP/rag-vendor.zip" -d "$RUNNER_TEMP/ragv"
+              if [ -f "$RUNNER_TEMP/ragv/sqlite/sqlite3.wasm" ] && [ -d "$RUNNER_TEMP/ragv/models/Xenova/bge-small-en-v1.5" ]; then
+                mv "$RUNNER_TEMP/ragv" rag/vendor
+                echo "* The folder search carried beside the page: $(du -sh rag | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "::warning::The folder search's files are incomplete: the app is built without the folder search"; rm -rf rag
+              fi
+            else
+              echo "::warning::The folder search's files have the fingerprint $GOT, not $WANT: the app is built without the folder search"; rm -rf rag
+            fi
+          else
+            echo "::warning::The folder search's files could not be fetched: the app is built without the folder search"; rm -rf rag
+          fi
+
       - name: Build the app
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.58.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.59.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -356,6 +383,17 @@ jobs:
           rm -rf "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Resources/speech" "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Frameworks/speech"
           codesign --force --sign - --timestamp=none "$RUNNER_TEMP/full/${APP_FILE}.app"
           ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/full/${APP_FILE}.app" "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip"
+          # 6.59: the folder search adds about 39 MB; should the copy with the models pass 2,140,000,000 bytes (GitHub refuses a file of
+          # 2 GiB), it is made again without the folder search's third-party files, and the summary says so
+          SZ=$(stat -f%z "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip")
+          if [ "$SZ" -gt 2140000000 ]; then
+            echo "::warning::The copy with the models is $SZ bytes: made again without the folder search"
+            rm -f "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip"
+            rm -rf "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Resources/rag" "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Frameworks/rag"
+            codesign --force --sign - --timestamp=none "$RUNNER_TEMP/full/${APP_FILE}.app"
+            ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/full/${APP_FILE}.app" "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip"
+          fi
+          echo "* The copy with the models: $(stat -f%z "$RUNNER_TEMP/${APP_FILE}-${{ matrix.zip }}-with-models.zip") bytes" >> "$GITHUB_STEP_SUMMARY"
           rm -rf "$RUNNER_TEMP/full"
           rm -rf "$RUNNER_TEMP/lite" && mkdir -p "$RUNNER_TEMP/lite"
           ditto "dist/${APP_FILE}.app" "$RUNNER_TEMP/lite/${APP_FILE}.app"
