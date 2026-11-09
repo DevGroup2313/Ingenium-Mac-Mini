@@ -194,7 +194,8 @@ var DATA_DBS=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_claude"]
    overflow copy (the desk itself goes whole, in desk/state.json) */
 var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1,ingenium_cloudkey:1};  /* 6.57: and Ingenium Cloud's key, which never leaves the device it was made on (modules/r255.js) */
 var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app library",ingenium_repos:"Fabrica's apps, with every version",
-  ingenium_hub:"Fabrica's issues, pull requests and pages",ingenium_claude:"Conversations you brought in from elsewhere",ingenium_keys:"Signing keys",fabrica_made:"Fabrica's packages"};
+  ingenium_hub:"Fabrica's issues, pull requests and pages",ingenium_claude:"Conversations you brought in from elsewhere",ingenium_keys:"Signing keys",fabrica_made:"Fabrica's packages",
+  "ingenium-buildlib":"Your build library (the notes on how your apps were built)"};  /* 6.65: modules/r258.js; it goes in a backup and over Ingenium Cloud as any other store does */
 /* what belongs to one device and stays with it: its models and how they ran here */
 var DEVICE_KEYS=["models","activeModelId","perf"];
 var NOTHING=" Nothing was changed.";

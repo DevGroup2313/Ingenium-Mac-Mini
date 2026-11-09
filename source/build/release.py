@@ -6,6 +6,7 @@
                                                       and write each repo's BUILD_INFO.txt with the page's fingerprint
   python3 release.py info                          -> BUILD_INFO.txt alone, from the pages in the repos
   python3 release.py edition full|gift|demo OUT    -> that edition's release page (stamped, with the kit store), into OUT only
+  python3 release.py editions                      -> the three other editions into the Mac mini repository's editions/, with their fingerprints
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -255,6 +256,34 @@ def info():
         fingerprint.write(p, ["ingenium.html"])
         print("BUILD_INFO.txt:", repo, fingerprint.sha(pg)[:16])
 
+def editions():
+    """6.65: the three other editions (full, gift, demo) into the Mac mini repository's editions/, and editions/README.txt brought
+    up to date: its first line names the version, its last lines the fingerprints (until 6.64 this was done by hand)."""
+    sys.path.insert(0, os.path.join(H, "..", "security"))
+    import fingerprint
+    vj = json.load(open(os.path.join(H, "version.json")))
+    d = os.path.join(R["mini"], "editions")
+    names = ["ingenium_%s.html" % e for e in ("full", "gift", "demo")]
+    for e, n in zip(("full", "gift", "demo"), names):
+        build(os.path.join(d, n), e)
+        t = open(os.path.join(d, n), encoding="utf-8").read()
+        m = re.search(r'var ING_VERSION="([0-9.]+)"', t)
+        assert m and m.group(1) == vj["v"], n
+    p = os.path.join(d, "README.txt")
+    s = open(p, encoding="utf-8").read()
+    title = "Ingenium %s (%s): the other editions" % (vj["v"], vj["date"])
+    lines = s.split("\n")
+    assert lines[0].startswith("Ingenium ") and set(lines[1]) == {"="}, "editions/README.txt: its first two lines"
+    lines[0], lines[1] = title, "=" * len(title)
+    s = "\n".join(lines)
+    head = "Fingerprints (SHA-256). A copy whose fingerprint differs is not the owner's release:"
+    k = s.find(head)
+    assert k > 0, "editions/README.txt: its fingerprints"
+    rows = ["  %s  %s (%d bytes)" % (fingerprint.sha(os.path.join(d, n)), n, os.path.getsize(os.path.join(d, n))) for n in names]
+    open(p, "w", encoding="utf-8", newline="").write(s[:k] + head + "\n" + "\n".join(rows) + "\n")
+    print("\n".join(rows))
+
+
 def sync_sources():
     """The page's sources travel with it: the Mac mini repository keeps them under source/ (no build starts from it)."""
     import shutil, glob as _g
@@ -287,5 +316,7 @@ if __name__ == "__main__":
         info()
     elif sys.argv[1] == "rag":
         ship_rag()
+    elif sys.argv[1] == "editions":
+        editions()
     elif sys.argv[1] == "edition":
         build(sys.argv[3], sys.argv[2])

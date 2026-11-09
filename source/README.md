@@ -371,6 +371,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.65 (9 November 2026): answers from her folders checked once more, and her build library on the Folders page.
+
+- Her choice after the evaluation (8 November 2026): keep the flags under each reply, recommend a larger model for folder answers,
+  and add a second pass. modules/r257.js: when a sentence of an answer names no passage, the same model is asked once more, through
+  the same way, to cite every sentence; the better answer is kept and the first is folded under it; what still has no source is
+  named under the reply; when a small model answered, the device's Magister is named. modules/r202.js: the switch (on by default,
+  state.rag.recheck). rag/eval.js and rig/t_rag5_eval.js record the second pass. rig/t_rag3_chat.js: 72 checks.
+- modules/r258.js (new, the master edition alone: editions.py): her build library. A zip of Markdown notes, a top folder for each
+  app, is brought in on the Folders page and kept on the device in a store of its own (IndexedDB "ingenium-buildlib": never in the
+  page, the saved desk or a repository). Each app's notes show in its folder under How it was built (Start here, its parts by name,
+  its versions folded, newest first); an app with no folder gets one. A finder on the card and in each folder looks for a word in
+  the notes (a note named by the word first, then by how often it holds it) and opens the note at that place, marked. The reader
+  joins lines wrapped by hand, so a list item is not cut in two. The store is labelled in Storage (r142) and in backups (r143): a
+  backup, and so Ingenium Cloud, carries it, and a library that arrives that way is seen without opening the page again.
+  modules/r208.js calls it only where it is. Held on 8 November for her preview; she asked for it to be shipped on 9 November.
+  rig/t_665_buildlib.js: 36 checks with an invented library (a second run with "absent" checks another edition carries none of it).
+- release.py editions: the three other editions built into the Mac mini repository's editions/ with their fingerprints, in one step.
+
 Ingenium 6.64 (8 November 2026): the citation reader made exact, the reranker in the Windows app, and the evaluation's results.
 
 - rag/prompt.js: sentences() does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others);
