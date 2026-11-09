@@ -39,7 +39,17 @@ jobs:
           npm install --no-audit --no-fund --loglevel=error @huggingface/transformers@3.8.1
           node fetch_speech.mjs "$GITHUB_WORKSPACE/speech-vendor" "$GITHUB_WORKSPACE"/clips/*.wav | tee "$GITHUB_WORKSPACE/fetch.log"
           { echo '### Speech files'; echo '```'; cat "$GITHUB_WORKSPACE/speech-vendor/SPEECH.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: A push only checks
+        # 6.65: a new zip has a new fingerprint (its files' times differ), and the Mac and Windows builds check the zip against
+        # tools/speech_vendor.sha256 and leave the speech models out when it differs, as 6.62's builds left the folder search out
+        # after rag-vendor.zip was replaced. The zip is replaced only by running this workflow by hand, and then
+        # tools/speech_vendor.sha256 is set to the new fingerprint in the same release.
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          (cd speech-vendor && zip -qr ../speech-vendor.zip .)
+          { echo "Not kept on the release (a push only checks): $(sha256sum speech-vendor.zip)"; } | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep them on the release "speech-vendor"
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
