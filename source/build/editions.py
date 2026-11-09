@@ -503,7 +503,7 @@ def _public(ed):
         ('li(c.lector,c.lector===1?"document from Lector":"documents from Lector");', '', "Backup: no documents row", 1),
         ('ingenium_repos:"Fabrica\'s apps, with every version",', 'ingenium_repos:"Apps, with every version",', "Backup: a store's name", 1),
         ('ingenium_hub:"Fabrica\'s issues, pull requests and pages",', 'ingenium_hub:"Issues, pull requests and pages",', "Backup: a store's name, again", 1),
-        ('fabrica_made:"Fabrica\'s packages"};', 'fabrica_made:"Packages"};', "Backup: the packages' name", 1),
+        ('fabrica_made:"Fabrica\'s packages",', 'fabrica_made:"Packages",', "Backup: the packages' name", 1),  # 6.65: the build library's name follows it
         ('This is a copy of Fabrica\'s issues and pages, not a whole backup. Bring it back in Fabrica: an app\'s Settings, Bring a copy back.',
          "This is a copy of an app\'s issues and pages, not a whole backup.", "Backup: a copy of issues", 1),
         ('row("Fabrica\'s packages",', 'row("Packages",', "Backup: the packages' row", 2),
