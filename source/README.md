@@ -371,7 +371,8 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 6.65 (9 November 2026): answers from her folders checked once more, and her build library on the Folders page.
+Ingenium 6.65 (9 November 2026): answers from her folders checked once more, her build library on the Folders page, and her
+sticky notes above the floating windows.
 
 - Her choice after the evaluation (8 November 2026): keep the flags under each reply, recommend a larger model for folder answers,
   and add a second pass. modules/r257.js: when a sentence of an answer names no passage, the same model is asked once more, through
@@ -387,6 +388,13 @@ Ingenium 6.65 (9 November 2026): answers from her folders checked once more, and
   backup, and so Ingenium Cloud, carries it, and a library that arrives that way is seen without opening the page again.
   modules/r208.js calls it only where it is. Held on 8 November for her preview; she asked for it to be shipped on 9 November.
   rig/t_665_buildlib.js: 36 checks with an invented library (a second run with "absent" checks another edition carries none of it).
+- modules/r123.js: her sticky notes and the side buttons float over a floating window. Her words (9 November 2026): "Schedae's
+  sticky notes open behind the exported floating windows ... they never float over". The cause, reproduced on the 6.64 page: the
+  notes stand on layer 120 and the side buttons on 130, a floating window on 600, and every press on a window took the next
+  number, up to 1800 (after some forty presses it covered Schedae's panel and the Display panel, after two hundred every dialog).
+  Now the windows keep to 600 to 607, the one pressed last on top; while a window is shown (body.ing-fw-up) the notes stand on 608
+  and the side buttons on 609; the chat's drawer, the panels and the dialogs stay above. rig/t_665_windows.js: 21 checks.
+  Not changed, and not verified on a real Mac here: a window of its own (the app's open_lite, a browser's window.open).
 - release.py editions: the three other editions built into the Mac mini repository's editions/ with their fingerprints, in one step.
 
 Ingenium 6.64 (8 November 2026): the citation reader made exact, the reranker in the Windows app, and the evaluation's results.

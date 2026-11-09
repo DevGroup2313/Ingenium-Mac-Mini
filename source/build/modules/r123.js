@@ -77,6 +77,10 @@ body[data-theme="night"] #fabFloat svg{color:#cbb6f0;filter:drop-shadow(0 2px 3p
 .ing-fw-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;z-index:3;touch-action:none}
 @media (pointer:coarse){.ing-fw-grip{width:36px;height:36px}}
 .ing-fw.folded{display:none!important}
+/* 6.65: while a floating window is shown, her sticky notes and the side buttons stand above it (the windows keep to 600 to 607),
+   as they stand above an app open full width; the chat's drawer (610 and up), Schedae's panel and every dialog stay above both */
+html body.ing-fw-up #notesLayer{z-index:608}
+html body.ing-fw-up .rail-btn,html body.ing-fw-up #railChevron{z-index:609}
 .ing-fw.hail{animation:ingFwHail 1s ease}
 @keyframes ingFwHail{0%,100%{box-shadow:0 0 0 1px rgba(40,22,68,.10),0 14px 34px rgba(40,22,68,.20)}35%{box-shadow:0 0 0 3px rgba(107,79,160,.45),0 14px 34px rgba(40,22,68,.24)}}
 body[data-calm="1"] .ing-fw.hail,body[data-motion="minimal"] .ing-fw.hail{animation:none}
@@ -170,6 +174,7 @@ function closeApp(which,quiet){var f=frameOf(which);if(f){capture(f,which);delet
   if(LITE&&!open.length){closeLite();return;}
   show(shown&&!!active);}
 function paint(){ensure();var ids=Object.keys(wins);
+  try{document.body.classList.toggle("ing-fw-up",ids.some(function(k){return wins[k]&&!wins[k].classList.contains("folded");}));}catch(e){}
   var lt=Object.keys(lites),any=open.length+ids.length+lt.length;bar.classList.toggle("on",!!any&&!LITE);
   if(front&&(!wins[front]||wins[front].classList.contains("folded")))front=null;
   var cur=shown?active:front;
@@ -247,8 +252,13 @@ function makeWin(which,n){var id=which+(n>1?"-"+n:"");if(wins[id]){surface(wins[
   win.addEventListener("pointerdown",function(){raise(win);if(front!==id){front=id;paint();}},true);
   wins[id]=win;document.body.appendChild(win);raise(win);front=id;paint();return win;}
 /* the window last brought forward stands on top; the count starts again before it could climb over Ingenium's sheets */
-function raise(win){Z++;if(Z>1800){var all=Object.keys(wins).map(function(k){return wins[k];}).sort(function(a,b){return (+a.style.zIndex||0)-(+b.style.zIndex||0);});
-    Z=600;all.forEach(function(w){if(w!==win){Z++;w.style.zIndex=String(Z);}});Z++;}win.style.zIndex=String(Z);}
+/* 6.65: the floating windows keep to eight layers of their own (600 to 607), the one pressed last on top. Until 6.64 every press
+   on a window took the next number, up to 1800: after a few presses a window stood above the chat's drawer, Schedae's panel and
+   the Display panel, and after two hundred above every dialog (800). Her words (9 November 2026): "Schedae's sticky notes open
+   behind the exported floating windows ... they never float over the exported floating windows". The notes and the side buttons
+   now stand above the windows while one is shown (the styles above, body.ing-fw-up). */
+function raise(win){var all=Object.keys(wins).map(function(k){return wins[k];}).filter(function(w){return w!==win;}).sort(function(a,b){return (+a.style.zIndex||0)-(+b.style.zIndex||0);});
+  all.push(win);var n=all.length;all.forEach(function(w,i){w.style.zIndex=String(600+Math.max(0,i-Math.max(0,n-8)));});Z=600+Math.min(n-1,7);}
 function fold(win,on){if(!win)return;win.classList.toggle("folded",!!on);var id=(win.id||"").replace(/^ing-fw-/,"");if(on&&front===id)front=null;paint();}
 function save(win,id){try{if(win.getAttribute("data-full")==="1"||win.classList.contains("folded"))return;var r=win.getBoundingClientRect();
     localStorage.setItem(geoKey(id),JSON.stringify({x:Math.round(r.left),y:Math.round(r.top),w:Math.round(r.width),h:Math.round(r.height)}));}catch(e){}}
