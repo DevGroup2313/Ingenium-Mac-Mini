@@ -31,7 +31,7 @@ APP_FILE = re.sub(r'[^A-Za-z0-9._-]', '', str(_cfg.get('file_name') or '')) or '
 APP_ID = str(_cfg.get('app_id') or 'com.yannieforest.ingenium')
 if not re.match(r'^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)+$', APP_ID):
     raise SystemExit('app.json: app_id %r is not a valid id (letters and digits, dots between)' % APP_ID)
-APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.9.2')
+APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.64')
 _own = [('ingenium.html', '.')]
 # R75: the seal is the icon when it is there; a build without it still
 # finishes, with the plain icon
@@ -42,6 +42,14 @@ ICON = 'ingenium.icns' if os.path.isfile(os.path.join(SPECPATH, 'ingenium.icns')
 for _f in ('app.json', 'THIRD_PARTY_NOTICES.txt', 'LICENCE.txt'):
     if os.path.isfile(os.path.join(SPECPATH, _f)):
         _own.append((_f, '.'))
+
+# 6.57: the speech models dictation writes with (modules/r254.js), beside the page, when the build fetched them (build-mac.yml)
+if os.path.isdir(os.path.join(SPECPATH, 'speech')):
+    _own.append(('speech', 'speech'))
+# 6.59: the folder search (rag/*.js and rag/vendor/), beside the page, when the build fetched its files (build-mac.yml): the page's
+# loader (modules/r202.js) imports ./rag/main.js from the app's own address, and the chat answers from her folders (modules/r257.js)
+if os.path.isfile(os.path.join(SPECPATH, 'rag', 'main.js')) and os.path.isdir(os.path.join(SPECPATH, 'rag', 'vendor')):
+    _own.append(('rag', 'rag'))
 
 extra_datas = []
 extra_binaries = []
@@ -170,6 +178,9 @@ if sys.platform == 'darwin':
             # shows. Ingenium does so only to use, or lend, models between the
             # person's own computers, and only after they set that up. It never
             # asks for the microphone, the camera, or anything else.
+            # 6.56 (8 November 2026): the one exception is the microphone, for dictation in the message box, which Ingenium
+            # writes down on this Mac with Scriba's speech models (modules/r254.js); macOS asks her once, with these words.
             'NSLocalNetworkUsageDescription': 'Ingenium uses the home network only to lend models to your other devices, or to use the models of your other computer, when you set that up in Settings.',
+            'NSMicrophoneUsageDescription': 'Ingenium listens only while you press the microphone key in the message box, to write down what you say here on this Mac. The sound never leaves it.',
         },
     )

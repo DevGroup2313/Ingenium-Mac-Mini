@@ -47,7 +47,8 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
       if (!k) return null; const r = k.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, [text, within || null]);
     if (!bb) throw new Error('no key: ' + text); await p.mouse.click(bb[0], bb[1]); await p.waitForTimeout(400); };
   const idle = () => p.waitForFunction(() => !IngCareer.run.busy, null, { timeout: 60000 });
-  const still = () => p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); return (se.scrollHeight - se.clientHeight) + (m ? m.scrollHeight - m.clientHeight : 0); });
+  /* 6.10.2: the page may scroll a little below the room, to the colophon; what must hold is that nothing moves when a card opens */
+  const still = () => p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); return (se.scrollTop) + (m ? m.scrollTop : 0); });
   // 6.8.12: each task has its way; these checks are of Do it for me
   await p.evaluate(() => { IngCareer.state().ui.way = 'auto'; go('career'); }); await p.waitForTimeout(900);
 
@@ -73,11 +74,13 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
     return { ex: k.getAttribute('aria-expanded'), ringed: li.classList.contains('c-open'), at: [Math.round(r.left), Math.round(r.width)], below: d && Math.round(d.getBoundingClientRect().top) >= Math.round(g.bottom), wide: d && d.getBoundingClientRect().width > g.width * 0.95,
       head: d && d.querySelector('h3') ? d.querySelector('h3').textContent : '', items: d ? d.querySelectorAll('ul li').length : 0, key: d && d.querySelector('.c-btn') ? d.querySelector('.c-btn').textContent : '', vis: d && !d.hidden && d.offsetHeight > 40, more: k.querySelector('.c-howm').textContent, focus: document.activeElement === k,
       named: d && d.getAttribute('aria-labelledby') === k.id }; });
-  ok(open.ex === 'true' && open.ringed && open.at.join() === at0.join() && open.below && open.wide && open.head === 'Bring an opportunity' && open.items === 5 && open.key === 'Bring a posting' && open.vis && open.more === 'Less' && open.focus && open.named,
-    'pressed, Bring an opportunity stays where it is, ringed; beneath the four cards open five lines on what it does, and a key into it', JSON.stringify({ open, at0 }));
+  ok(open.ex === 'true' && open.ringed && open.at.join() === at0.join() && open.below && open.wide && open.head === 'Bring an opportunity' && open.items === 6 && open.key === 'Bring a posting' && open.vis && open.more === 'Less' && open.focus && open.named,
+    'pressed, Bring an opportunity stays where it is, ringed; beneath the four cards open six lines on what it does (the sixth, since 6.9.8, on LinkedIn), and a key into it', JSON.stringify({ open, at0 }));
   ok(await still() === 0, 'the page does not scroll when a card opens');
   await p.screenshot({ path: OUT + '/card-open.png' });
-  await p.mouse.click(c2[0], c2[1]); await p.waitForTimeout(400);
+  /* pressed again where the card now is (opening may scroll its panel to show what opened) */
+  const c2b = await p.evaluate(() => { const r = document.querySelectorAll('#cs .c-howk')[1].getBoundingClientRect(); return [r.left + r.width / 2, r.top + Math.min(r.height / 2, 20)]; });
+  await p.mouse.click(c2b[0], c2b[1]); await p.waitForTimeout(400);
   ok(await p.evaluate(() => document.querySelectorAll('#cs .c-howk')[1].getAttribute('aria-expanded') === 'false' && !document.querySelector('#cs .c-how > li.c-open')), 'pressed again, it closes');
   await p.evaluate(() => document.querySelectorAll('#cs .c-howk')[2].focus()); await p.keyboard.press('Enter'); await p.waitForTimeout(400);
   const k3 = await p.evaluate(() => ({ ex: document.querySelectorAll('#cs .c-howk')[2].getAttribute('aria-expanded'), key: (document.querySelector('#csHowD .c-btn') || {}).textContent }));

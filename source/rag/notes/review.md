@@ -80,5 +80,6 @@ bridge code, and a second start of the app that must find the index.
 | `rig/t_rag1_parse.js` | 116 passed, 0 failed |
 | `rig/t_rag1_bridge.py` | 795 passed, 0 failed |
 | `rig/t_rag1_manual.js --quick` | 72 passed, 0 failed |
+| `rig/t_rag1_manual.js` (full: 72 files, 3,511 passages, the 4 MB log among them) | 111 passed, 0 failed, 96.1 min on a machine shared with other tests; peak memory 1,586 MB (RSS of all the browser's processes, 22,560 samples; PSS 1,266 MB); words find 37 of 37 facts in the first five, meaning 35 of 37; reading again and after a reload embeds nothing; removing the three folders leaves no row and no vector bytes; 292 requests, all to this computer |
 | `rig/t_rag1_webkit_pdf.js` | 4 passed, 0 failed |
 | `rag-engines.yml` (GitHub: Mac Apple silicon, Mac Intel, Windows) | all checks passed on each |

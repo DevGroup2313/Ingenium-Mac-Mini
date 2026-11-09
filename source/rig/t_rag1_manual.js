@@ -143,6 +143,9 @@ async function openSettings(p, expectCard) {
   await p.waitForTimeout(400);
   await p.evaluate(() => { try { IngRooms.open('settings', 'ai'); } catch (e) { /* the room tabs may be absent */ } });
   await p.waitForTimeout(300);
+  // 6.33 and later (modules/r234.js): the room is in sections, and the card is in "Search, eyes and ears"
+  await p.evaluate(() => { try { if (window.IngSettingsParts) IngSettingsParts.show('ai', 'search'); } catch (e) { /* no sections */ } });
+  await p.waitForTimeout(300);
   if (expectCard) {            // the card opens the index when it comes into view, as a person scrolling down to it would
     await p.waitForSelector('#ragCard', { state: 'visible', timeout: 60000 });
     await p.locator('#ragCard').scrollIntoViewIfNeeded();
@@ -216,7 +219,7 @@ const ext = (p) => (p.split('.').pop() || '').toLowerCase();
     ok(room.room === 'ai', 'and sits in the room "Models and AI" (named in r173.js)', room);
     await P.waitForFunction(() => /No folder yet/.test(document.querySelector('#ragCard .rag-none').textContent), null, { timeout: 60000 });
     const t = await evalIn(() => ({ text: document.getElementById('ragCard').innerText, add: !!document.getElementById('ragAdd'), addText: document.getElementById('ragAdd').textContent, status: IngRag.state().status }));
-    ok(t.addText === 'Add a folder…' && /read on this computer only/i.test(t.text) && /Nothing is sent anywhere/.test(t.text) && /chat.s use of them comes next/.test(t.text), 'the card says the folders are read on this computer only and that the chat\'s use of them comes next, and has "Add a folder…"', t.text.slice(0, 500));
+    ok(t.addText === 'Add a folder…' && /read on this computer only/i.test(t.text) && /switch on Your folders in the \+ menu/.test(t.text) && /go to the model you chat with, and only to it/.test(t.text), 'the card says the folders are read on this computer only, how the chat uses them (6.59) and where the passages go, and has "Add a folder…"', t.text.slice(0, 500));
     ok(t.status === 'open', 'seeing the card opened the store only (status open; the embedder is not loaded for a list)', t.status);
     const jargon = /\b(embedding|vector|chunk|sqlite|opfs|index(?:er)?|tokeni[sz]|ONNX|RAG)\b/i.exec(t.text);
     ok(!jargon, 'the card uses plain words (no embedding, vector, chunk, SQLite, index, RAG)', jargon && jargon[0]);

@@ -15,6 +15,7 @@
 //   node rig/t_62_eyes.js http://127.0.0.1:8150/ingenium.html <out folder> <photos folder>
 // The photos folder holds image1.jpg (the beach) and image2.jpg (the beagles), the demo pictures of TensorFlow.js's
 // coco-ssd model: https://raw.githubusercontent.com/tensorflow/tfjs-models/master/coco-ssd/demo/image1.jpg (and image2.jpg).
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT, PHOTOS] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 const AXE = process.env.AXE_JS;
@@ -142,7 +143,7 @@ const msgs = p => p.evaluate(() => curMsgs().map(m => ({ role: m.role, text: Str
 
     // ---- Settings ----
     // 6.7: Settings is in rooms (r173); Ingenium's eyes is in Models and AI, so that room is opened first, as a person would
-    await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'ai'); }); await p.waitForTimeout(600);
+    await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'ai'); if (window.IngSettingsParts) IngSettingsParts.show('ai', 'search'); }); await p.waitForTimeout(600);
     const st = await p.evaluate(() => { const c = document.getElementById('ingEyesCard'); return c ? { on: document.getElementById('eyesOn').checked, words: document.getElementById('eyesWords').checked, after: c.previousElementSibling && c.previousElementSibling.id } : null; });
     ok(st && st.on && st.words, 'Settings: Ingenium\'s eyes, its two switches on', st);
     const nt = await p.evaluate(() => { const d = document.querySelector('#ingEyesCard .ey-notice pre'); return d ? d.textContent : ''; });

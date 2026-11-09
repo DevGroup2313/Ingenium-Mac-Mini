@@ -19,6 +19,13 @@
 //   await IngRag.stats() / IngRag.state() / IngRag.running() / IngRag.on(fn) / IngRag.config(opts) / await IngRag.shutdown()
 //   IngRag.config({workers, spareGB, bigFolderChunks, embedBatch}); IngRag.suggestedWorkers()  (workers: embedder workers, 1 unless asked for more)
 //   IngRag._store / _embedder / _indexer / _principalId   (the live clients, for tests)
+//   Phase 3 (the chat): IngRag.prompt (rag/prompt.js: NOT_FOUND, the grounding prompt, the citation reader and check) and
+//   await IngRag.openSource(passage, userId = 'me')   the file a citation names, read again through the app's bridge, with the passage
+//                                            found in it -> {status: 'exact' | 'moved' | 'changed', before, mark, after, page, ...}
+//   Phase 4 (the scheduler): IngRag.schedule(minutes, {firstMs})   every so many minutes while the app is open (0: off; her default 20),
+//                                            the folders are reconciled: only what changed is read again (rag/scheduler.js)
+//   await IngRag.reconcile(reason)           one reconcile now -> {at, folders, read, changed, gone, skipped, errors}
+//   IngRag.scheduleState()                   -> {minutes, next, running, last, ...}
 //
 // THE USER. One user now, "me": every folder added gets an ACL row for her (folder_acl), and folders() asks the store for the folders
 // she is allowed (the same SQL filter the retriever will use). The permission rules separate the app's users from one another; they
@@ -35,7 +42,11 @@
 import * as bridge from './folders.js';
 import { createStore } from './store.js';
 import { createEmbedder, suggestWorkers, MODEL_TIERS } from './embedder.js';
-import { createIndexer } from './indexer.js';
+import { createIndexer, ParseClient } from './indexer.js';
+import { retrieve as retrieveFrom } from './retriever.js';
+import * as prompt from './prompt.js';
+import { createScheduler, DEFAULT_MINUTES } from './scheduler.js';
+import { createReranker } from './reranker.js';
 
 const PRINCIPAL = 'me';
 
@@ -48,7 +59,9 @@ const S = {
   lastRun: new Map(),                              // folderId -> {at, summary | error}
   listeners: new Set(),
   adding: false,
-  config: { workers: null, spareGB: null, bigFolderChunks: 200, embedBatch: 32 },
+  config: { workers: null, spareGB: null, bigFolderChunks: 200, embedBatch: 32, rerank: false },
+  reranker: null, rerankReady: null,
+  sched: null, schedLast: null, schedRunning: false,
 };
 
 // ------------------------------------------------------------------------------------------------------ plain words for the failures
@@ -67,6 +80,9 @@ const PLAIN = {
   NO_SUCH_FOLDER: 'This folder is not in the folder search any more.',
   BUSY: 'A folder window is open already. Finish with it first.',
   NOT_CHOSEN: 'Ingenium no longer has this folder on its list. Remove it here, then add it again.',
+  NOT_ALLOWED: 'This passage is in a folder that cannot be opened for you.',
+  CHANGED: 'The file changed while it was being opened. Try again.',
+  RERANK_MISSING: "The reranker's model is not in this copy of the app, so the passages keep the search's own order.",
   CORRUPT: "The folder search's memory was damaged, perhaps because Ingenium was closed while it was saving. It can start again from nothing: your files are not touched, and your folders are read again.",
 };
 const FATAL_STATUS = { OPFS_LOCKED: 'locked', OPFS_UNAVAILABLE: 'unavailable', SCHEMA_TOO_NEW: 'failed', WORKER_FAILED: 'failed', DIMS_MISMATCH: 'failed', CORRUPT: 'damaged' };
@@ -384,7 +400,134 @@ async function rebuild() {
   return { rebuilt: true, folders: back };
 }
 
+// ------------------------------------------------------------------------------------------------------ retrieval (phase 2)
+// IngRag.retrieve(question, userId = 'me', opts): the passages of the folders that user may read that answer the question best
+// (rag/retriever.js: the text and vector searches with the folder permissions inside their SQL, fused by RRF, k = 60, the best 5).
+// The one user now is "me"; another name is the second test user, or a local profile later. It opens the store and the reading
+// model when they are not open yet. The chat calls it for every turn while "Your folders" is on in its + menu (phase 3, r257.js).
+async function retrieve(query, userId, opts) {
+  await ready();
+  const o = Object.assign({}, opts || {});
+  if (o.rerank == null) o.rerank = !!S.config.rerank;
+  let reranker = null, rerankNote = null;
+  if (o.rerank) { try { reranker = await rerankerReady(); } catch (e) { o.rerank = false; rerankNote = e.code === 'MODEL_NOT_INSTALLED' ? PLAIN.RERANK_MISSING : (e.plain || String(e.message || e)); } }
+  const r = await retrieveFrom({ store: S.store, embedder: S.embedder, reranker }, query, userId == null ? PRINCIPAL : userId, o);
+  if (rerankNote) r.rerankNote = rerankNote;
+  return r;
+}
+// phase 5: the optional reranker, loaded the first time a retrieval asks for it (her task: "off by default, loaded on demand")
+function rerankerReady() {
+  if (S.rerankReady) return S.rerankReady;
+  const rr = createReranker();
+  const p = rr.init().then(() => { S.reranker = rr; return rr; }, (e) => { try { rr.terminate(); } catch (_) { /* gone */ } S.rerankReady = null; throw explain(e); });
+  S.rerankReady = p;
+  return p;
+}
+
+// ------------------------------------------------------------------------------------------------------ the source of a citation (phase 3)
+// A citation [n] under a reply opens the file it names: the app reads it again through its bridge (only a folder the user may read,
+// checked in the store as the searches check it), the parse worker gives its text (a PDF's text page by page) without cutting it into
+// passages, and the passage is looked for where it was read: 'exact' (at its character offsets, as for text and Markdown files),
+// 'moved' (the file changed, the same words are elsewhere in it) or 'changed' (the words are not in the file any more; the reply keeps
+// the passage as it was read). A window of the text around the passage is returned, VIEW_SIDE characters each side, so a 4 MB file
+// is not drawn whole.
+const VIEW_SIDE = 20000;
+let viewParser = null;
+const extOfPath = (rel) => { const m = /\.([A-Za-z0-9]+)$/.exec(rel); return m ? m[1].toLowerCase() : ''; };
+async function openSource(passage, userId, opts = {}) {
+  if (!passage || typeof passage !== 'object') throw coded('NO_SUCH_FOLDER');
+  const store = await openStore();
+  const who = userId == null ? PRINCIPAL : String(userId);
+  const found = who === PRINCIPAL ? { id: S.principalId } : await store.principal.find({ name: who });
+  if (!found || found.id == null) throw coded('NOT_ALLOWED');
+  const folderId = passage.folderId != null ? passage.folderId : passage.fid;
+  const f = (await store.folder.list({ principalId: found.id })).find((x) => x.id === folderId);
+  if (!f) throw coded('NOT_ALLOWED');
+  const rel = String(passage.filePath != null ? passage.filePath : passage.file || '');
+  const ext = extOfPath(rel), page = passage.page == null ? null : Number(passage.page);
+  if (!viewParser) viewParser = new ParseClient({ count: () => Promise.reject(new Error('the viewer does not count tokens')) });
+  let parsed;
+  try { parsed = await viewParser.parse(bridge.readPieces(f.path, rel), { ext, path: rel, slim: false, textOnly: true, timeoutMs: 180000 }); }
+  catch (e) { throw explain(e); }
+  const src = ext === 'pdf' ? String((parsed.pages || [])[(page || 1) - 1] || '') : String(parsed.text || '');
+  const want = String(passage.text || '');
+  let start = passage.charStart != null ? passage.charStart : passage.start, end = passage.charEnd != null ? passage.charEnd : passage.end, status = 'changed';
+  if (want && Number.isInteger(start) && Number.isInteger(end) && src.slice(start, end) === want) status = 'exact';
+  else { const i = want ? src.indexOf(want) : -1; if (i >= 0) { start = i; end = i + want.length; status = 'moved'; } else { start = end = null; } }
+  const side = Number.isInteger(opts.side) && opts.side > 0 ? opts.side : VIEW_SIDE;
+  const base = { status, folderId, folderName: f.name, filePath: rel, ext, page, size: parsed.size, length: src.length, pages: parsed.pages ? parsed.pages.length : null, warnings: parsed.warnings || [] };
+  if (status === 'changed') return Object.assign(base, { before: '', mark: '', after: src.slice(0, 2 * side), cutBefore: false, cutAfter: src.length > 2 * side, start: null, end: null });
+  const a = Math.max(0, start - side), b = Math.min(src.length, end + side);
+  return Object.assign(base, { start, end, before: src.slice(a, start), mark: src.slice(start, end), after: src.slice(end, b), cutBefore: a > 0, cutAfter: b < src.length });
+}
+
+// ------------------------------------------------------------------------------------------------------ the scheduler (phase 4)
+// Her task: "Reconcile each folder: compare mtime and size first, and hash the content only when they differ. Reuse stored embeddings
+// for chunks whose content_hash is unchanged. Delete chunks of removed files. Use one transaction per file", on a clock in a worker
+// (rag/scheduler.worker.js), every 20 minutes unless she chooses otherwise, only while the app is open. The reading itself is the
+// indexer's (indexer.js: size and mtime first; a changed file is read and hashed; a passage whose hash is in emb_cache is not embedded
+// again; files gone are deleted; each file is one transaction). Here, before any of that, each folder is listed and compared with the
+// index by size and modification time: a folder where nothing changed is not read at all, so a tick costs one listing per folder and
+// the reading model is not loaded for it. A folder being read is left alone; a folder marked manual only is left alone; a folder that
+// cannot be listed (its drive away) is noted and tried again at the next tick. A listing that comes back empty while the index holds
+// files is the card's question (the folder may be on a drive that is not connected), so the scheduler takes nothing out then.
+async function pendingIn(store, f) {
+  const listing = await bridge.listFiles(f.path);
+  const existing = new Map((await store.file.list({ folderId: f.id })).map((x) => [x.path, x]));
+  let changed = 0, gone = 0;
+  for (const x of listing) { const o = existing.get(x.rel); if (!o || o.size !== x.size || o.mtime !== Math.floor(x.mtime)) changed++; }
+  if (listing.length || !existing.size) { const now = new Set(listing.map((x) => x.rel)); for (const p of existing.keys()) if (!now.has(p)) gone++; }
+  return { changed, gone, listed: listing.length, indexed: existing.size, emptyNow: !listing.length && existing.size > 0 };
+}
+
+async function reconcile(reason) {
+  const report = { at: Date.now(), reason: reason || 'timer', folders: 0, read: 0, changed: 0, gone: 0, skipped: [], errors: [], summaries: [], ms: 0 };
+  if (!bridge.available()) { report.errors.push({ folderId: null, plain: PLAIN.NO_BRIDGE }); return report; }
+  S.schedRunning = true; emit({ type: 'scheduled', phase: 'start', report });
+  try {
+    const store = await openStore();
+    const list = await store.folder.list({ principalId: S.principalId });
+    for (const f of list) {
+      if (f.manualOnly) { report.skipped.push({ folderId: f.id, why: 'manual only' }); continue; }
+      if (S.jobs.has(f.id)) { report.skipped.push({ folderId: f.id, why: 'being read' }); continue; }
+      report.folders++;
+      let p;
+      try { p = await pendingIn(store, f); } catch (e) { report.errors.push({ folderId: f.id, plain: explain(e && e.code ? e : coded('FOLDER_UNAVAILABLE')).plain }); continue; }
+      if (p.emptyNow) { report.skipped.push({ folderId: f.id, why: 'empty now' }); continue; }
+      if (!p.changed && !p.gone) continue;
+      report.changed += p.changed; report.gone += p.gone; report.read++;
+      try { const sum = await indexFolder(f.id, { scheduled: true }); report.summaries.push({ folderId: f.id, files: sum.files, embedded: sum.embedded, reused: sum.reused, chunks: sum.chunks }); }
+      catch (e) { if (e && e.code !== 'ALREADY_RUNNING') report.errors.push({ folderId: f.id, plain: explain(e).plain }); }
+    }
+  } catch (e) { report.errors.push({ folderId: null, plain: explain(e).plain }); }
+  finally {
+    report.ms = Date.now() - report.at; S.schedRunning = false; S.schedLast = report;
+    emit({ type: 'scheduled', phase: 'done', report });
+  }
+  return report;
+}
+
+/** Every `minutes` minutes while the app is open (0 or less: off). opts.firstMs: a first look sooner (the card asks for one two minutes
+ *  after the app opens, so what changed while it was closed is found soon); opts.everyMs: the tests' own short interval. */
+async function schedule(minutes, opts = {}) {
+  const m = Number(minutes);
+  const every = Number.isFinite(opts.everyMs) ? opts.everyMs : (Number.isFinite(m) && m > 0 ? Math.round(m * 60000) : 0);
+  if (!every) { if (S.sched) await S.sched.stop(); return scheduleState(); }
+  if (!S.sched) S.sched = createScheduler({ onTick: () => reconcile('timer') });
+  await S.sched.start(every, { firstMs: opts.firstMs });
+  emit({ type: 'scheduled', phase: 'set' });
+  return scheduleState();
+}
+
+function scheduleState() {
+  const st = S.sched ? S.sched.state() : { everyMs: 0, minutes: 0, next: 0, running: false, ticks: 0, skipped: 0, lastError: null };
+  return Object.assign({}, st, { running: S.schedRunning, last: S.schedLast, defaultMinutes: DEFAULT_MINUTES });
+}
+
 async function shutdown() {
+  if (S.reranker) { try { S.reranker.terminate(); } catch (_) { /* gone */ } S.reranker = null; S.rerankReady = null; }
+  if (S.sched) { try { S.sched.terminate(); } catch (_) { /* gone */ } S.sched = null; }
+  if (viewParser) { try { viewParser.terminate(); } catch (_) { /* gone */ } viewParser = null; }
   Array.from(S.jobs.keys()).forEach((id) => stopReading(id));
   await Promise.all(Array.from(S.jobs.values()).map((j) => j.done.catch(() => undefined)));
   if (S.indexer) { try { S.indexer.stop(); } catch (_) { /* gone */ } }
@@ -400,12 +543,14 @@ export const IngRag = {
   version: 1,
   principal: PRINCIPAL,
   available: () => bridge.available(),
-  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild,
+  ready, folders, addFolder, removeFolder, indexFolder, stopReading, stats, state, running, config, shutdown, suggestedWorkers, rebuild, retrieve,
+  openSource, prompt, schedule, reconcile, scheduleState,
   on(fn) { S.listeners.add(fn); return () => S.listeners.delete(fn); },
   get _store() { return S.store; },
   get _embedder() { return S.embedder; },
   get _indexer() { return S.indexer; },
   get _principalId() { return S.principalId; },
+  get _reranker() { return S.reranker; },
 };
 
 if (typeof window !== 'undefined') window.IngRag = IngRag;

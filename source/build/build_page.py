@@ -109,7 +109,10 @@ edit('var TOUR_A="Here is a light list for two days:\\n\\n1. **Layers**: a warm 
      'var TOUR_A="Three weeks is enough if each week has one job:\\n\\n1. **Week one, the ground**: reread your key sources and write a one-page outline: the question, why it matters, and how you will answer it.\\n2. **Week two, the draft**: write the full proposal from that outline, one section a day. Do not polish yet.\\n3. **Week three, the readers**: give the draft to your supervisor or a trusted reader on the Monday, then revise with their notes and check the programme\\u2019s word limit and formatting.\\n\\nKeep one day a week free. A proposal written at a steady pace reads better than one written in a rush.";',
      "R192 the tour's reply")
 edit('var TOUR_THINK="They are walking in hills for a weekend. Weather in hills changes quickly, so layers and a waterproof come first. Two days means food and water for each day. Safety: a map in case the phone has no signal. Keep the list short and practical.";',
-     'var TOUR_THINK="Three weeks is enough for a proposal if the weeks have different jobs. If the draft starts before the outline has settled, it will be rewritten, so the first week should go to reading and a one-page outline. The second week is the full draft. The third week has to stay free for a reader\\u2019s notes, because a supervisor needs a few days to read it. I will keep the plan to three steps and leave room for rest.";',
+     # 6.9.5 (3 November 2026, her words again: "the current one kind of reads a little weird when it shows the "Thinking" box"): the
+     # thinking began with nearly the reply's own first sentence ("Three weeks is enough…"), so it read as a first draft of the
+     # reply. It now weighs what the reply rests on (what depends on what, the usual trap, a reader's days) and only then decides.
+     'var TOUR_THINK="A research proposal has parts that lean on one another: the method only makes sense once the question is clear. The usual trap is to start drafting too early and then rewrite everything. A supervisor also needs a few days to read a draft, so the last week cannot be for writing. That gives each week one job: the outline, then the draft, then the readers\\u2019 notes. A deadline can feel heavy, so I will keep the plan to three short steps and leave a day free each week.";',
      "R192 the tour's thinking")
 
 # ---- R101: the reply keeps at most half the memory; her request is never the part cut ----
@@ -618,6 +621,10 @@ edit('Nothing here asks for a connection, and nothing leaves it.</p>',
 edit('<b>How full offline works here.</b> Two things need to live inside the app: your model (you upload it) and the engine that runs it (about 1 to 2 MB of compiled code, dropped in once on the Models page, or baked into a single copy of this file). After that one-time step, the app never requests anything. No connection, no services, no exceptions.',
      '<b>How offline works here.</b> The engine that runs your models is kept on this device: built into this page or into the app, or added once on the Models page. Each model is a file kept here too. Ingenium makes no request by itself. It goes online only when you ask for something that needs it: a model download, a cloud model, a web search, GitHub, a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.',
      "6.7 claims: Home's note on working offline")
+# 6.56: dictation writes on this device; only its speech model is fetched, once (modules/r254.js)
+edit("a look-up of a reference, Dictate in some browsers, or Scriba\'s speech model the first time you record.",
+     "a look-up of a reference, or the speech model the first time you dictate or record (Scriba\'s, fetched once and kept). Your voice itself never leaves this device.",
+     "6.56 Home's note: dictation on this device")
 edit('<b>One-time step, honestly scoped.</b> The engine is wllama (llama.cpp compiled to WebAssembly): one small download, added once with "Get the engine for me" above or dropped in as files, then kept on this device for good. Apps made with the build scripts carry it already baked in. It runs single-threaded, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B will crawl; the fit warnings below are the guide. The app itself never requests anything.',
      '<b>About the engine.</b> In a web browser the engine is wllama (llama.cpp compiled to WebAssembly), kept on this device: built into this page, or added once with "Get the engine for me" above or as files. It runs on one processor thread, so small models (1B to 3B at Q4) move at roughly reading speed on a decent machine while 7B is slow; the fit warnings below are the guide. The Mac and Windows apps run their own engine instead. The engine makes no request by itself.',
      "6.7 claims: the engine note")
@@ -658,6 +665,16 @@ edit('mb.title="Dictate instead of typing (listens on this device only; nothing 
 edit('/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the device\'s own speech, nothing uploaded. Hidden\n   where the device offers no speech recognition at all. */',
      '/* R50: dictate into the composer, the Forge\'s Scriba reduced to what a\n   studio needs: one key, the browser\'s own speech service (which in Chrome, Edge\n   and Safari may send the sound away; 6.7 says so). Hidden where the device\n   offers no speech recognition at all. */',
      "6.7 claims: Dictate's note")
+# ---- 6.56 (8 November 2026): the key writes with Scriba's speech models on this device (modules/r254.js has the rest). Her words:
+#      "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead sending it outside of the
+#      app to another provider. I want everything kept in-house where possible." The page's own listener (R50) now acts only when
+#      she has chosen the browser's speech service in Settings; its key's words say what it does now. ----
+edit('id="chatMicBtn" title="Dictate instead of typing. Your browser\'s speech service writes it down, and in Chrome, Edge and Safari it may send the sound to Google, Microsoft or Apple to do so."',
+     'id="chatMicBtn" title="Dictate: Ingenium writes what you say on this device, with Scriba\'s speech models. Your voice is never sent away."',
+     "6.56 the microphone key's words: this device's model")
+edit('  mb.addEventListener("click",function(){\n    if(live){off();return;}',
+     '  mb.addEventListener("click",function(){\n    if(window.IngEarsBrowser&&!window.IngEarsBrowser())return;\n    if(live){off();return;}',
+     "6.56 the browser's speech service only where she chose it")
 # the houses, as they are now
 edit('<p class="small muted" id="housesNote">Every model in the app belongs to a house, set from its size when it arrives. A model\'s card shows its house, whether it fits this device, how fast it is likely to write, and exactly how the work is shared, all honestly: this engine is a single processor thread with no GPU path, so big houses are slow by nature, not by fault. Change any model\'s house in its own Settings.</p>',
      '<p class="small muted" id="housesNote">Ingenium\'s own models come in four houses: Velox answers at once, Scriba thinks first, Magister is a larger model for hard questions, and Faber writes code. Each kind of device has its own model for each house, shown at the top of this page. A model you add is given a house by its size, as below; Faber is a house by purpose, not size. Change any model\'s house in its own Settings.</p>',
@@ -1017,6 +1034,514 @@ edit(r"""    ocb.chat_template_kwargs={enable_thinking:!!think};}""",
      r"""    ocb.chat_template_kwargs={enable_thinking:!!think};ocb.ingenium_status=true;}   /* R205: a lender then says how it is doing: waiting, loading, reading */""",
      "R205 a lender is asked to say how it is doing while it makes the first word")
 
+# ---- R206 (Ingenium 6.9.4, 3 November 2026): the switches in the chat's + menu (Research, Web search, Thinking, Scholarly sources
+#      first), in Chat and in Code. The owner's words (3 November 2026): "its really hard for the turn the "Research" and the "Web
+#      Search" toggles to enable them, they are so hard to select no matter how hard I click". Each switch was a <label> holding a
+#      checkbox, inside the row's button: a click on the switch itself reached the button once, then the label passed a second click
+#      to its checkbox, which reached the button again, so the setting turned on and straight back off. Only a click on the words
+#      worked. The switch is now a plain picture of a switch (a span), so a click anywhere on the row turns it over exactly once; the
+#      row says it is a switch and whether it is on (menuitemcheckbox, aria-checked), carries its key (data-k), and keeps the focus
+#      after the menu is painted again, so the keyboard can go on from it (rig/t_694_plus_switches.js). ----
+edit(r"""function pmItem(menu,icon,label,sub,fn,extra){var b=el("button","pm-item");b.type="button";b.setAttribute("role","menuitem");""",
+     r"""function pmItem(menu,icon,label,sub,fn,extra){var b=el("button","pm-item");b.type="button";
+  var pmSw=/\beswitch\b/.test(extra||"");b.setAttribute("role",pmSw?"menuitemcheckbox":"menuitem");if(icon)b.setAttribute("data-k",icon);   /* R206 */
+  if(pmSw)b.setAttribute("aria-checked",/<input[^>]*\schecked/.test(extra)?"true":"false");""",
+     "R206 a row with a switch says it is one, and whether it is on")
+edit(r"""  b.onclick=function(e){e.stopPropagation();fn(b);};menu.appendChild(b);return b;}
+function pmSwitch(on){return '<label class="eswitch pm-on" aria-hidden="true"><input type="checkbox" tabindex="-1"'+(on?" checked":"")+'><span class="etrack"></span></label>';}""",
+     r"""  b.onclick=function(e){e.stopPropagation();e.preventDefault();var k=pmSw&&b.getAttribute("data-k"),host=b.parentNode||menu;fn(b);
+    /* R206: the menu is painted afresh after a switch turns; the focus goes back to the same row, so the keyboard can go on
+       (host: the menu the row sits in when pressed; a row made apart and then placed, as Scholarly sources first is, was made
+       in a holder of its own) */
+    if(k&&!b.isConnected&&host&&!host.hidden){var pmRf=function(){var nb=host.querySelector('.pm-item[data-k="'+k+'"]');if(nb){try{nb.focus({preventScroll:true});}catch(_){}return true;}return false;};
+      if(!pmRf())setTimeout(function(){if(!host.hidden)pmRf();},0);}};
+  menu.appendChild(b);return b;}
+function pmSwitch(on){return '<span class="eswitch pm-on" aria-hidden="true"><input type="checkbox" tabindex="-1" style="pointer-events:none"'+(on?" checked":"")+'><span class="etrack"></span></span>';}""",
+     "R206 a click on a + menu switch turns it over once (a span, not a label inside a button)")
+
+# ---- R207 (Ingenium 6.9.4, 3 November 2026): sources only when they belong to the reply (modules/r207.js has the rest). The owner's
+#      words (3 November 2026): "The scholarly sources all nonsense and keep on showing up with every reply, I want that removed, I
+#      only want real and accurate sources and only when they pertain to the reply do I want them cited and provided."
+#      Scholarly sources first is off until it is switched on; a scholarly record is kept only when half of the question's words
+#      are in its title and abstract, and one at least in its title. ----
+edit(r"""function schOn(){var s=state.search||{};return s.scholar!==false;}""",
+     r"""function schOn(){var s=state.search||{};return s.scholar===true;}   /* R207: off until it is switched on */""",
+     "R207 Scholarly sources first is off until it is switched on")
+edit(r"""x.rel=schRel(words,x.title+" "+x.abstract);if(x.rel<0.34&&words.length>=2)return;""",
+     r"""x.rel=schRel(words,x.title+" "+x.abstract);if(words.length>=2&&(x.rel<0.5||schRel(words,x.title)===0))return;   /* R207 */""",
+     "R207 a scholarly record is kept only when it is about the question")
+# 6.9.4: a document kept on a reply that is only Ingenium's own notice (one made before r1Notice in modules/r101.js) is not shown as a
+# document card: her screenshot of 3 November 2026 showed "(This reply was cut off before it began: …)" as a Word and PDF document
+# ---- 6.9.5 (3 November 2026): a connected model for Lector and the Career Studio (modules/r108.js has the choice and its words).
+#      Her words: "I also want to be able to load and run a connected Cloud model from Claude or GPT and etc, inside of the Career
+#      Studio and the Lector page and not just only have the local models as options". Lector's requests (lxAsk) already went to the
+#      connection when a computer of hers lent its models; a connection she chooses for Lector (lxUsesCloud) goes the same way. ----
+edit(r"""function lxAsk(run,msgs,maxTok,temp,onPiece){
+  if(typeof supUsesLink==="function"&&supUsesLink()){var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     r"""function lxAsk(run,msgs,maxTok,temp,onPiece){
+  if((typeof supUsesLink==="function"&&supUsesLink())||(typeof lxUsesCloud==="function"&&lxUsesCloud())){var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     "6.9.5 Lector reads and writes with the connected model she chose")
+edit(r"""doc=docs[0]||(mm.doc&&!mm.live?mm.doc:null)""",
+     r"""doc=docs[0]||(mm.doc&&!mm.live&&!(typeof r1Notice==="function"&&r1Notice(mm.text))?mm.doc:null)""",
+     "6.9.4 a notice is never shown as a document card")
+
+# ---- 6.11 (4 November 2026): effort, Auto and Ultracode (modules/r215.js, IngEffort). Her words (3 November 2026): "I want the 'Auto'
+#      function to be added and for the effort level and Token level to be better regulated", and "I want to be able to select low to
+#      Max effort and Ultracode inside of the chats". Effort now means the same on every kind of model: how much it thinks, how long it may
+#      write and how many steps it may take; it no longer changes how a model on this device chooses its words (its sampling stays at the
+#      maker's settings at every level). Claude is sent the level chosen (before, Thinking off held it at Medium); OpenAI's, OpenRouter's
+#      and Gemini's reasoning models are told the effort where their services take it; Ollama thinks at Medium and above; and Enter while a
+#      reply is being written queues the message instead of stopping the reply (the stop key still stops it). These edits come after
+#      R195's and R205's, which changed the same requests, so they are written against the text those left. ----
+edit(r"""var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";""",
+     r"""var EFF={1:"low",2:"medium",3:"high",4:"xhigh",5:"max"},eff=(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";if(noXhigh&&eff==="xhigh")eff="high";""",
+     "6.11 Claude takes the effort chosen (Ultracode: max)")
+edit(r"""if(effOK)body.output_config={effort:withThink?eff:(eff==="low"?"low":"medium")};""",
+     r"""if(effOK)body.output_config={effort:eff};""",
+     "6.11 Claude's effort is the level chosen, Thinking on or off")
+edit(r"""  if(c.provider==="openrouter"){oh["X-Title"]="Ingenium";}
+  /* R74: a model lent by another Ingenium answers with its makers' settings, and Thinking is passed on */""",
+     r"""  if(c.provider==="openrouter"){oh["X-Title"]="Ingenium";}
+  try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model);}catch(_){}
+  /* R74: a model lent by another Ingenium answers with its makers' settings, and Thinking is passed on */""",
+     "6.11 OpenAI's, OpenRouter's and Gemini's reasoning models are told the effort")
+edit(r"""  return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA,timeout:c.provider==="ingenium"?600:undefined}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){fail(r,t);});""",
+     r"""  var sendA=function(){return netFetch(ob+"/chat/completions",{method:"POST",abort:ab,headers:oh,body:JSON.stringify(ocb),onChunk:feedA,timeout:c.provider==="ingenium"?600:undefined}).then(function(r){
+    if(!r.ok)return r.text().then(function(t){if((ocb.reasoning_effort||ocb.reasoning)&&!got&&/reason/i.test(t)){delete ocb.reasoning_effort;delete ocb.reasoning;try{IngEffort.refused(c.provider,model);}catch(_){}return sendA();}fail(r,t);});""",
+     "6.11 a service that refuses the effort is asked again without it")
+edit(r"""    if(c.provider==="ingenium"&&typeof lkTail==="function"&&!(ab&&ab.aborted)){var lkT=lkTail(lkSeen,got);if(lkT){got+=lkT;onToken(lkT);}}
+    return got;});}
+function cxFetch(""",
+     r"""    if(c.provider==="ingenium"&&typeof lkTail==="function"&&!(ab&&ab.aborted)){var lkT=lkTail(lkSeen,got);if(lkT){got+=lkT;onToken(lkT);}}
+    return got;});};
+  return sendA();}
+function cxFetch(""",
+     "6.11 the request above, sent through sendA")
+edit(r"""if(withThink)body.think=true;""",
+     r"""if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model):true;""",
+     "6.11 Ollama's gpt-oss is told the effort")
+edit(r"""    return sendO(think).catch(function(e){if(think&&/think/i.test(String(e.message))&&!got)return sendO(false);throw e;});}""",
+     r"""    return sendO(think&&!(window.IngEffort&&IngEffort.levelNow()<=1)).catch(function(e){if(think&&/think/i.test(String(e.message))&&!got)return sendO(false);throw e;});}""",
+     "6.11 at Low effort Ollama answers without thinking")
+edit(r"""EFFORT_TEMP={1:1.3,2:1.15,3:1,4:0.7,5:0.45};""",
+     r"""EFFORT_TEMP={1:1,2:1,3:1,4:1,5:1};""",
+     "6.11 effort leaves the maker's sampling as it is")
+edit(r"""  var p=Object.assign({},ms||EFFORT_MAP[eff]||EFFORT_MAP[3],base||{});""",
+     r"""  var p=Object.assign({},ms||EFFORT_MAP[3],base||{});""",
+     "6.11 a model Ingenium does not know keeps one sampling at every effort")
+edit(r"""            <div class="effort-note">Higher effort means longer, more thorough replies, but they take more time to produce.</div>""",
+     r"""            <div class="effort-note">Effort sets how much the model thinks, how long it may write, and how many steps it may take on a task. Higher effort is more thorough and slower.</div>""",
+     "6.11 what effort does, said truly")
+edit(r"""$("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(Engine.status==="busy")chatStop();else sendChat();}});""",
+     r"""$("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();if(Engine.status==="busy"){try{if(window.IngR215)IngR215.queueFromInput();}catch(_){}}else sendChat();}});""",
+     "6.11 Enter while a reply is written queues the message")
+
+# ---- 6.11: the Code and Chat pages ask for a name, and before deleting, in Ingenium's own dialog (ingPrompt and ingAsk), not the
+#      browser's grey one. Her picture of 4 November 2026 showed the Mac app's grey "Name this conversation" box over the Code page. ----
+edit(r"""   ["Rename",function(){var t=prompt("Name this conversation",chatTitle(c));if(t&&t.trim()){c.title=t.trim().slice(0,120);saveState();ccPaintSide();ccPaintHead();try{paintChatSwitch();}catch(e){}}}],""",
+     r"""   ["Rename",function(){Promise.resolve(window.ingPrompt?ingPrompt({title:"Name this conversation",value:chatTitle(c),yes:"Rename"}):prompt("Name this conversation",chatTitle(c))).then(function(t){if(t&&t.trim()){c.title=t.trim().slice(0,120);saveState();ccPaintSide();ccPaintHead();try{paintChatSwitch();}catch(e){}}});}],""",
+     "6.11 rename a conversation in Ingenium's own dialog")
+edit(r"""   ["Delete",function(){if(!confirm("Delete \""+chatTitle(c)+"\"? This cannot be undone."))return;state.chats=state.chats.filter(function(x){return x!==c;});
+     if(state.activeChat===c.id){state.activeChat=null;ccEnter(CC.mode||"chat");}else{saveState();ccPaintSide();}}]].forEach(""",
+     r"""   ["Delete",function(){Promise.resolve(window.ingAsk?ingAsk({title:"Delete \u201c"+chatTitle(c)+"\u201d?",text:"This cannot be undone.",yes:"Delete it",danger:true}):confirm("Delete \""+chatTitle(c)+"\"? This cannot be undone.")).then(function(ok){if(!ok)return;state.chats=state.chats.filter(function(x){return x!==c;});
+     if(state.activeChat===c.id){state.activeChat=null;ccEnter(CC.mode||"chat");}else{saveState();ccPaintSide();}});}]].forEach(""",
+     "6.11 delete a conversation after Ingenium's own question")
+edit(r"""t.onclick=function(){var c=curChat();var v=prompt("Name this conversation",chatTitle(c));if(v&&v.trim()){c.title=v.trim().slice(0,120);saveState();ccPaintHead();ccPaintSide();}};""",
+     r"""t.onclick=function(){var c=curChat();Promise.resolve(window.ingPrompt?ingPrompt({title:"Name this conversation",value:chatTitle(c),yes:"Rename"}):prompt("Name this conversation",chatTitle(c))).then(function(v){if(v&&v.trim()){c.title=v.trim().slice(0,120);saveState();ccPaintHead();ccPaintSide();}});};""",
+     "6.11 rename from the title in Ingenium's own dialog")
+edit(r"""if(a==="new"){var nm=prompt("Name your new app","My new app");if(!nm)return;closeModal();ccMakeProject(nm.trim().slice(0,80),[{name:"index.html",text:CC_BLANK.replace(/My new app/g,esc(nm.trim().slice(0,80)))}],"index.html").then(ccNewSession);}""",
+     r"""if(a==="new"){closeModal();Promise.resolve(window.ingPrompt?ingPrompt({title:"Name your new app",value:"My new app",yes:"Make it"}):prompt("Name your new app","My new app")).then(function(nm){if(!nm||!nm.trim())return;ccMakeProject(nm.trim().slice(0,80),[{name:"index.html",text:CC_BLANK.replace(/My new app/g,esc(nm.trim().slice(0,80)))}],"index.html").then(ccNewSession);});}""",
+     "6.11 a new app is named in Ingenium's own dialog")
+
+# ---- 6.11.1: the last of the browser's grey boxes in the page itself, asked in Ingenium's own dialog (modules/r216.js) ----
+edit(r"""      if(!confirm("Restore the desk from "+(new Date(x.when||0)).toLocaleString()+" ("+x.chats+" conversations)? Your current desk is kept as a copy first."))return;
+      b.disabled=true;b.textContent="Restoring…";""",
+     r"""      ingConfirm("Restore the desk from "+(new Date(x.when||0)).toLocaleString()+" ("+x.chats+" conversations)? Your current desk is kept as a copy first.",function(){
+      b.disabled=true;b.textContent="Restoring…";""",
+     "6.11.1 restoring an earlier desk asks in Ingenium's own dialog")
+edit(r"""        Promise.resolve().then(function(){return a.save_state(raw);}).then(function(){window.name="desk-adopted";location.reload();});});};});},""",
+     r"""        Promise.resolve().then(function(){return a.save_state(raw);}).then(function(){window.name="desk-adopted";location.reload();});});},{yes:"Restore it",danger:false});};});},""",
+     "6.11.1 the restore's end, inside its question")
+
+# ---- 6.11.2: one rule for keeping her place in a conversation. While a reply is written, the newest words are followed when she is
+#      within 80 points of the end; a full redraw used 240, so between the two the view could be pulled down by one and left by the
+#      other, back and forth (her report of 4 November 2026: "the chat inside of the panel keeps on glitching back and forth"). ----
+edit(r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>240)sc.scrollTop=top;CP.lastChat=c;CP.lastMe=me;if(CP.place)CP.place();}catch(e){}""",
+     r"""    try{if(c&&c===CP.lastChat&&me===CP.lastMe&&far>=80)sc.scrollTop=top;CP.lastChat=c;CP.lastMe=me;if(CP.place)CP.place();}catch(e){}""",
+     "6.11.2 one threshold for keeping her place")
+
+# ---- 6.12 (4 November 2026): Blend with her connected models (modules/r218.js). A request from Blend names its own connection and its
+#      own settings on the request itself (ab.conn, ab.maxTok, ab.think, ab.effort), so a blend can ask Claude, GPT and Ollama at the
+#      same time without switching the chat's model, and a chat reply sent meanwhile goes on with the chat's own connection. A request
+#      without them is unchanged. The model's own limits that Ingenium learned for the chat's model are not applied to another model. ----
+edit('function cloudChat(messages,onToken,onThink,ab){\n  var c=state.cloud||{}; var base=',
+     'function cloudChat(messages,onToken,onThink,ab){\n  var c=(ab&&ab.conn)||state.cloud||{}; var base=',
+     "6.12 a request may name its own connection")
+edit('var model=c.model||"", key=c.key||"", maxTok=(+$("ctlTokens").value)||1024, think=thinkOn();',
+     'var model=c.model||"", key=c.key||"", maxTok=(ab&&+ab.maxTok)||(+$("ctlTokens").value)||1024, think=(ab&&typeof ab.think==="boolean")?ab.think:thinkOn();',
+     "6.12 a request may name its own reply room and thinking")
+edit('eff=(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";',
+     'eff=(ab&&ab.effort&&EFF[ab.effort])||(window.IngEffort&&IngEffort.claudeKey())||EFF[(+$("ctlEffort").value)||3]||"high";',
+     "6.12 a request may name its own effort (Claude)")
+edit('max_tokens:(typeof ingReplyCap==="function"?ingReplyCap(maxTok,modern):(modern?Math.max(maxTok,32000):Math.max(maxTok,4096))),messages:msgs,stream:true}',
+     'max_tokens:(ab&&ab.conn?(modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):(typeof ingReplyCap==="function"?ingReplyCap(maxTok,modern):(modern?Math.max(maxTok,32000):Math.max(maxTok,4096)))),messages:msgs,stream:true}',
+     "6.12 a request on its own connection is not given the chat model's limits (Claude)")
+edit('options:{num_predict:replyTokens(),num_ctx:typeof ingCloudWindow==="function"?ingCloudWindow():32768}};if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model):true;',
+     'options:{num_predict:(ab&&+ab.maxTok)||replyTokens(),num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768)}};if(withThink)body.think=window.IngEffort?IngEffort.ollamaThink(model,ab&&ab.effort):true;',
+     "6.12 a request may name its own reply room and effort (Ollama)")
+edit('return sendO(think&&!(window.IngEffort&&IngEffort.levelNow()<=1))',
+     'return sendO(think&&!((ab&&ab.effort)?ab.effort<=1:(window.IngEffort&&IngEffort.levelNow()<=1)))',
+     "6.12 Low effort on its own request answers without thinking (Ollama)")
+edit('var ocb={model:model,messages:msgs,stream:true},cap=replyTokens();',
+     'var ocb={model:model,messages:msgs,stream:true},cap=(ab&&+ab.maxTok)||replyTokens();',
+     "6.12 a request may name its own reply room (OpenAI form)")
+edit('if(!cxLocal(c.provider,ob))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     'if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     "6.12 a request on its own connection is not given the chat model's limits (OpenAI form)")
+edit('try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model);}catch(_){}',
+     'try{if(window.IngEffort)IngEffort.openaiBody(ocb,c.provider,model,ab&&ab.effort);}catch(_){}',
+     "6.12 a request may name its own effort (OpenAI form)")
+edit('{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models at once, weigh them, and save the mix as a house of your own."}',
+     '{page:"blend",sel:"#blendPick",t:"Blend",b:"Ask several models, on this device and connected, choose how hard they work, see how the answer was reached, and save the mix as a house of your own."}',
+     "6.12 the tour's Blend step says what Blend does now")
+
+# ---- 6.14 (4 November 2026): connectors (modules/r220.js) speak MCP over HTTP, where a server that keeps a session names it in a
+#      response header (Mcp-Session-Id) and wants it back. netFetch gave its callers the status, the words and the content type only;
+#      it now gives the response's headers too: the browser's own when the page asks directly, and through the computer app's relay
+#      the two it passes back (X-Upstream-..., desktop/app_mcp_614.py). Every caller that did not read them is unchanged. ----
+edit('      return netReadBody(r,o.onChunk,ab).then(function(t){return netResult(st,t,ct);});});',
+     '      return netReadBody(r,o.onChunk,ab).then(function(t){var x=netResult(st,t,ct);x.headers={get:function(n){return r.headers.get("X-Upstream-"+n);}};return x;});});',
+     "6.14 a response's headers through the relay")
+edit('return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type")||"";return netReadBody(r,o.onChunk,ab).then(function(t){return netResult(r.status,t,ct);});},',
+     'return fetch(url,init).then(function(r){var ct=r.headers.get("Content-Type")||"";return netReadBody(r,o.onChunk,ab).then(function(t){var x=netResult(r.status,t,ct);x.headers=r.headers;return x;});},',
+     "6.14 a response's headers when the page asks directly")
+
+# ---- 6.17 (4 November 2026): effort wherever a model is chosen (modules/r225.js). Her words (3 November 2026): "I want to be able to
+#      select low to Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside
+#      of Ingenium." Lector, the Career Studio and Folders ask through lxAsk, which r126 (the recipe) and r148 (the guard against writing
+#      that repeats itself) wrap; the effort is put on the request here, at the bottom, so every wrapper keeps working: through a
+#      connection, its level, its thinking and its room; on this device, its thinking and its thinking room. With r225 absent, nothing
+#      changes. ----
+edit(r"""{var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;""",
+     r"""{var keep=state.thinking,ab=netAbortable(),out0="";_cloudAb=ab;state.thinking=false;LX.cloudAb=ab;try{if(window.IngWriteEffort)IngWriteEffort.onCloud(ab,msgs);}catch(_e){}""",
+     "6.17 Lector's request through a connection carries its effort")
+edit(r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP[3],{max_tokens:maxTok,temperature:temp,thinking:false});""",
+     r"""var out="",params=Object.assign({},modelSampling(m,3,false)||EFFORT_MAP[3],{max_tokens:maxTok,temperature:temp,thinking:false});try{if(window.IngWriteEffort)IngWriteEffort.onLocal(params,m,msgs);}catch(_e){}""",
+     "6.17 Lector's request on this device carries its effort")
+
+
+# ---- 6.21 (5 November 2026): Copy from the right-click panel reaches other apps. Her words: "I think there is a bug on right click
+#      copy/paste panel because I kept on trying to copy this prompt that I typed in Ingenium's sticky notes to Claude's chat text box
+#      and no matter what I tried it would not work properly, I had to use the keyboard's shortcuts". The panel (ing-editmenu) read the
+#      selection again when Copy was pressed, and a press on a key of the panel can take the selection out of a note first; and its
+#      copy went through the app's bridge after the press had ended, where a web view may refuse the browser's own way back. Now the
+#      words selected are kept as the panel opens, a press on the panel never moves the selection, and Copy (and Cut, and Copy the
+#      whole field) first copies inside the press itself, the way Command+C and Ctrl+C do, which every system clipboard takes; the
+#      bridge and the browser's clipboard stay as the second and third ways. ----
+edit("""  var savedRange=null;
+  function doPaste(){""",
+     """  var savedRange=null, savedText='', openSelText='';
+  function liveSel(){ try{ return String(window.getSelection()||''); }catch(e){ return ''; } }
+  function keepSel(){ try{ if(!target||target.tagName==='TEXTAREA'||target.tagName==='INPUT'||selectionText(target)||!savedRange) return; target.focus(); var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(savedRange); }catch(e){} }
+  function nativeCopy(txt){
+    var ok=false, ae=document.activeElement, sl=null, rg=null, ss=null, se=null;
+    try{ sl=window.getSelection(); if(sl&&sl.rangeCount) rg=sl.getRangeAt(0).cloneRange(); }catch(e){}
+    try{ if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT')&&typeof ae.selectionStart==='number'){ ss=ae.selectionStart; se=ae.selectionEnd; } }catch(e){}
+    var ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.setAttribute('aria-hidden','true'); ta.tabIndex=-1;
+    ta.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+    try{ document.body.appendChild(ta); ta.focus(); ta.select(); try{ ta.setSelectionRange(0,txt.length); }catch(e){} ok=document.execCommand('copy'); }catch(e){ ok=false; }
+    try{ ta.remove(); }catch(e){}
+    try{ if(ae&&ae.focus&&ae!==document.body) ae.focus({preventScroll:true}); if(ss!=null){ ae.setSelectionRange(ss,se); } else if(rg&&sl){ sl.removeAllRanges(); sl.addRange(rg); } }catch(e){}
+    return !!ok;
+  }
+  function doPaste(){""", "6.21 the panel keeps the words selected and copies inside the press")
+edit("""  function copyText(txt, after){
+    var w=clipFn('__ingClipWrite');
+    if(w){""",
+     """  function copyText(txt, after){
+    var w=clipFn('__ingClipWrite');
+    if(nativeCopy(txt)){ try{ window.__ingLastCopy={how:'press',n:txt.length}; }catch(e){} }
+    else if(w){""", "6.21 Copy first inside the press, then through the app")
+edit("""    close(); target=t; savedRange=null;
+    try{ var sl=window.getSelection(); if(sl&&sl.rangeCount&&t&&t.contains&&t.contains(sl.anchorNode)) savedRange=sl.getRangeAt(0).cloneRange(); }catch(e){}""",
+     """    close(); target=t; savedRange=null; savedText='';
+    try{ var sl=window.getSelection(); if(sl&&sl.rangeCount&&t&&t.contains&&t.contains(sl.anchorNode)) savedRange=sl.getRangeAt(0).cloneRange(); }catch(e){}
+    try{ savedText=selectionText(t); }catch(e){}""", "6.21 the words selected, kept as the panel opens")
+edit("""{label:'Cut', hint:key('X'), act:function(){ var t=selectionText(target); if(t) copyText(t,'cut'); }, needSel:true},""",
+     """{label:'Cut', hint:key('X'), act:function(){ keepSel(); var t=selectionText(target)||savedText; if(t) copyText(t,'cut'); }, needSel:true},""",
+     "6.21 Cut takes the words kept")
+edit("""{label:'Copy', hint:key('C'), act:function(){ var t=selectionText(target); if(t) copyText(t); }, needSel:true},""",
+     """{label:'Copy', hint:key('C'), act:function(){ var t=selectionText(target)||savedText; if(t) copyText(t); }, needSel:true},""",
+     "6.21 Copy takes the words kept")
+edit("""var tx=''; try{ tx=String(window.getSelection()||''); }catch(e){} if(tx) copyText(tx);""",
+     """var tx=liveSel()||openSelText; if(tx) copyText(tx);""", "6.21 Copy of a selection outside a field takes the words kept", 2)
+edit("""  function openSel(x,y,t){
+    close(); target=t;""", """  function openSel(x,y,t){
+    close(); target=t; openSelText=liveSel();""", "6.21 the selection kept as the selection panel opens")
+edit("""  function openMsg(x,y,t,mt){
+    close(); target=t;""", """  function openMsg(x,y,t,mt){
+    close(); target=t; openSelText=liveSel();""", "6.21 the selection kept as a message's panel opens")
+edit("""    menu.querySelectorAll('button').forEach(function(b){
+      b.style.cssText='display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;'""",
+     """    menu.querySelectorAll('button').forEach(function(b){
+      b.onmousedown=function(ev){ ev.preventDefault(); };
+      b.style.cssText='display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;'""",
+     "6.21 a press on the panel never moves the selection")
+
+edit("""    function copyText(txt){var f=clipFn("__ingClipWrite");
+      if(f){""", """    function copyText(txt){var f=clipFn("__ingClipWrite");
+      try{var ta0=document.createElement("textarea");ta0.value=txt;ta0.setAttribute("readonly","");ta0.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(ta0);ta0.select();var ok0=document.execCommand("copy");ta0.remove();if(ok0)return;}catch(e){}
+      if(f){""", "6.21 the touch panel's Copy whole note copies inside the press too")
+
+
+# ---- 6.22 (5 November 2026): the model's reasoning reaches the Career Studio (modules/r188.js). Her words: "Instead of seeing a blank
+#      canvas, I want to see the model's thinking on the Applications tab of the Career Studio. I want to be able to see the process and
+#      the thought process and rationale of the models when it is reading the postings against my profile". lxAsk (the ask path Lector,
+#      the Career Studio and Folders share) let a model's reasoning go, on this device and through a connection; it now hands it to
+#      LX.onThink when someone has set one (the studio does, for each request, and clears it after). Nothing else changes. ----
+edit("""Engine.setStatus("busy");LX.inFlight=true;
+    return Engine.generate({messages:msgs,params:params,onToken:function(t){out+=t;if(onPiece)onPiece(out);},onThink:function(){}})""",
+     """Engine.setStatus("busy");LX.inFlight=true;
+    return Engine.generate({messages:msgs,params:params,onToken:function(t){out+=t;if(onPiece)onPiece(out);},onThink:function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}}})""",
+     "6.22 lxAsk hands the reasoning on, on this device")
+edit("""return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},function(){},ab);})""",
+     """return cloudChat(msgs,function(t){out0+=t;if(onPiece)onPiece(out0);},function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}},ab);})""",
+     "6.22 lxAsk hands the reasoning on, through a connection")
+
+
+# ---- 6.24 (5 November 2026): Stop stops. Her words: "there is a bug on the "Stop" button inside of the Career Studio, I keep on pressing
+#      it over and over again to stop a reading but it does not stop and I have had to close and force quit the app". The engines answer a
+#      stop by handing back the words so far, as if the reply had ended, so the layers around lxAsk (Ultra's check, the guard against
+#      repetition) asked again with the same request. A request marked stopped (the studio's Stop marks its own) is refused at once, so
+#      no layer can ask again for it; every other request (Lector, Folders) is untouched. ----
+edit("""function lxAsk(run,msgs,maxTok,temp,onPiece){
+""", """function lxAsk(run,msgs,maxTok,temp,onPiece){if(run&&run.__stopped)return Promise.reject(new Error("stopped"));
+""", "6.24 lxAsk refuses a request marked stopped")
+
+# ---- 6.25 (5 November 2026): Ingenium in its own words. Her words: "There is a lot of mention of Claude on the Plan and session panel
+#      of the Coding chat, please remove them unless it is referring to a function that connects to Claude. I want for Ingenium's pages
+#      and chatrooms to have their own identities". Two of the comparisons were in the 3.12 base: the Projects card and the card of
+#      Ingenium's own instructions. The others are in modules r219, r220, r222 and r223. Names stay where Ingenium really connects to
+#      a service or reads its files (a Claude connection, a Claude export, GitHub, Ollama). ----
+edit(r"""every conversation in it shares, the way Claude\'s projects do. They stay on this device.""",
+     r"""every conversation in it shares. They stay on this device.""",
+     "6.25 the Projects card in Ingenium's own words")
+edit("""Every model in Ingenium starts each chat with Ingenium's own instructions and its ten rules, the way Claude has its own. Below them come yours""",
+     """Every model in Ingenium starts each chat with Ingenium's own instructions and its ten rules. Below them come yours""",
+     "6.25 Ingenium's own instructions in its own words")
+
+# ---- 6.27 (5 November 2026): what each edition carries, asked in one place (build/editions.py says it; modules/r231.js and the
+#      cards of Settings ask it). Her words: "The Ingenium edition that will be made available to the public and participants and even
+#      friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps, and the Guide and Settings
+#      page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author Studio and the rename
+#      Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some limitations". ----
+edit('var ING_EDITION="master";\n',
+     'var ING_EDITION="master";\nvar ING_HAS=function(p){var e=ING_EDITION;if(p==="author"||p==="rename"||p==="ownerkey")return e==="master";'
+     'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
+     "6.27 what each edition carries")
+
+# ---- 6.32 (6 November 2026): the app library sealed with the lock. Her words: "I want you to encrypt Ingenium and everything inside
+#      of it." With the lock on (modules/r197.js), a page kept in the library's store (IndexedDB ingenium_apps) is sealed as bytes
+#      before it is written (while the page is locked, the write waits for the sign-in), and opened as it is read; a plain page and a
+#      sealed one are both read, so a library kept before the lock (or before 6.32) reads as it did until the lock seals it. The copy
+#      on a computer app's disk already went through the lock. ----
+edit("""function libPut(id,u8,text){/* a view into the whole zip would store the whole zip: keep only its own bytes */""",
+     """function libSeal(id,u8){try{if(window.IngLock&&typeof IngLock.sealFor==="function")return IngLock.sealFor("ingenium_apps","b",id,u8);}catch(e){}return Promise.resolve(u8);}
+function libOpen(v){try{if(v&&window.IngLock&&typeof IngLock.isRecEnv==="function"&&IngLock.isRecEnv(v))return IngLock.openRec("ingenium_apps","b",v);}catch(e){}return Promise.resolve(v);}
+function libPut(id,u8,text){/* a view into the whole zip would store the whole zip: keep only its own bytes */""",
+     "6.32 the app library seals and opens through the lock")
+edit("""  var p1=libTx("readwrite",function(s){return s.put(u8,id);}).then(function(){return true;},function(){return false;});""",
+     """  var p1=libSeal(id,u8).then(function(v){return libTx("readwrite",function(s){return s.put(v,id);});}).then(function(){return true;},function(){return false;});""",
+     "6.32 a page put in the library is sealed first")
+edit("""  return libTx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(function(b){
+    if(b){return new TextDecoder().decode(b instanceof Uint8Array?b:new Uint8Array(b));}""",
+     """  return libTx("readonly",function(s){return s.get(id);}).catch(function(){return null;}).then(libOpen).then(function(b){
+    if(b){return new TextDecoder().decode(b instanceof Uint8Array?b:new Uint8Array(b));}""",
+     "6.32 a page read from the library is opened")
+edit("""var u8=new TextEncoder().encode(r.text);libTx("readwrite",function(s){return s.put(u8,id);}).catch(function(){});return r.text;}""",
+     """var u8=new TextEncoder().encode(r.text);libSeal(id,u8).then(function(v){return libTx("readwrite",function(s){return s.put(v,id);});}).catch(function(){});return r.text;}""",
+     "6.32 a page brought back from the disk copy is sealed as it is kept")
+
+# ---- 6.33 (6 November 2026): Reset everything leaves nothing of the earlier desk behind. Found by rig/t_700d_lock_backup.js, which
+#      failed once in a full sweep: a seal of the desk still on its way when Reset was pressed was written after the reset had removed
+#      the desk, and the lock record came back from the sealed desk's head, so the fresh copy opened to the sign-in. rig/t_633_reset.js
+#      makes that moment certain and found two more: the recovery shelf (three earlier moments of the desk, R50) stayed in the store,
+#      and on the computer apps the page brought the earlier desk back from the desk on disk (R96 adopts it when the view starts with
+#      none). Now the reset says it is under way before it removes anything (window.__ingResetting; the page's saves and the lock's
+#      writers stop: modules/r197.js), takes the recovery shelf with it, and empties the desk on disk through the bridge's own writer
+#      (not the lock's, which would seal it) before the page starts again. The computer keeps the earlier desk among its earlier
+#      desks (desk-backups, the day's first and one about to shrink), where it can still be chosen. ----
+edit('box.querySelector("#rGo").onclick=function(){\n'
+     '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}\n',
+     'box.querySelector("#rGo").onclick=function(){\n'
+     '    window.__ingResetting=true;try{var q0=saveState._q;if(q0&&q0.timer){clearTimeout(q0.timer);q0.timer=null;}}catch(e){}\n'
+     '    try{if(HAS_LS){localStorage.removeItem(KEY);localStorage.removeItem("ingenium_lock");OLDKEYS.forEach(function(k){localStorage.removeItem(k);});SNAPRING.forEach(function(k){localStorage.removeItem(k);});}else delete memStore[KEY];}catch(e){}\n'
+     '    var disk=Promise.resolve();try{var sa=(typeof shellApi==="function")?shellApi():null,s0=sa&&((sa.__r197raw&&sa.__r197raw.save_state)||sa.save_state);if(typeof s0==="function")disk=Promise.resolve(s0.call(sa,"{}")).catch(function(){});}catch(e){}\n',
+     "6.33 Reset everything: under way first, the recovery shelf and the desk on disk too")
+edit('Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files")]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});',
+     'Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files"),disk]),new Promise(function(res){setTimeout(res,5000);})]).then(function(){location.reload();});',
+     "6.33 Reset everything waits for the desk on disk as well")
+edit('function saveState(){if(window.__ingLocked)return;',
+     'function saveState(){if(window.__ingLocked||window.__ingResetting)return;',
+     "6.33 nothing is saved once a reset is under way")
+edit('function flushShellSave(){var q=saveState._q;if(!q||!q.timer)return;',
+     'function flushShellSave(){if(window.__ingResetting)return;var q=saveState._q;if(!q||!q.timer)return;',
+     "6.33 the window closing during a reset writes nothing to disk")
+
+# ---- 6.38 (6 November 2026): Reset everything clears every store Ingenium keeps, as she answered (6 November 2026), asked whether it
+#      should: "For the second question, the answer is yes." Until now it cleared the desk, the lock record, the recovery shelf, the
+#      engine and file links (ingenium_files) and an older store, and left the long texts, the app library, Fabrica's repositories,
+#      packages, issues and pages, the conversations brought in, the signing keys and the desk's overflow copy, sealed under a key
+#      that was gone when the lock was on. Now those stores go too (each connection the page holds is closed first by modules/r181.js,
+#      so nothing blocks the deletion), with every one of Ingenium's own small preferences in this browser's store (the keys that
+#      begin "ing." "ing:" or "ingenium"; a carried app's own keys stay), the folder search's index in the private file system
+#      (.ingenium-rag), and on a computer app the long texts kept on its disk (each one the desk names, then the app's own sweep).
+#      Kept, as before and as the dialog says: on a computer app the models on its disk and its earlier desks (desk-backups); the
+#      documents a carried app keeps in its own frame. ----
+edit('<h3>Reset everything?</h3><p class="small muted">This clears your models list, notes, reminders, settings, engine bundle, file links, the Build page and the instruments from this device. It cannot be undone.</p>',
+     '<h3>Reset everything?</h3><p class="small muted">This clears everything Ingenium keeps on this device: your chats, notes, reminders and settings, your models list, the engine and file links this page keeps, the long texts, the app library, Fabrica\\\'s apps, packages, issues and pages, the conversations you brought in, the signing keys and your Author Studio changes. On a computer app, the models on its disk and its earlier desks (desk-backups) stay. It cannot be undone.</p>',
+     "6.38 Reset everything says what it clears")
+edit('Promise.race([Promise.all([gone("ingenium_files"),gone("the_foundry_files"),disk]),',
+     'var dkIds=[];try{var dj=JSON.stringify(state);dkIds=(dj.match(/big_[a-z0-9]{7,40}/g)||[]).filter(function(x,i,a){return a.indexOf(x)===i;});}catch(e){}\n'
+     '    try{if(HAS_LS){for(var li=localStorage.length-1;li>=0;li--){var lk=localStorage.key(li);if(lk&&/^(ing[.:]|ingenium)/.test(lk))localStorage.removeItem(lk);}}}catch(e){}\n'
+     '    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=Promise.all(dkIds.map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});})).then(function(){if(typeof sb.big_gc==="function")return Promise.resolve(sb.big_gc([])).catch(function(){});});}catch(e){}\n'
+     '    var opfs=Promise.resolve();try{if(navigator.storage&&navigator.storage.getDirectory)opfs=navigator.storage.getDirectory().then(function(root){return root.removeEntry(".ingenium-rag",{recursive:true});}).catch(function(){});}catch(e){}\n'
+     '    Promise.race([Promise.all(["ingenium_files","the_foundry_files","ingenium_big","ingenium_apps","ingenium_repos","fabrica_made","ingenium_claude","ingenium_keys","ingenium_hub","ingenium_desk"].map(gone).concat([disk,diskBig,opfs])),',
+     "6.38 Reset everything clears every store")
+# ---- 6.39 (6 November 2026): the signing keys' copies on a computer app's disk (modules/r136.js names them big_sgn<id>, listed in
+#      big_sgnindex, since the app keeps only big_ names) go with Reset everything too, or a key it cleared would come back from the
+#      disk the next time it is asked for. Their names are read from the disk's own index, not from the keys' store being deleted. ----
+edit('    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=Promise.all(dkIds.map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});})).then(function(){',
+     '    var sgnIds=Promise.resolve([]);try{if(window.IngApk&&IngApk.keys&&typeof IngApk.keys.diskIds==="function")sgnIds=Promise.resolve(IngApk.keys.diskIds()).catch(function(){return ["big_sgndevice","big_sgnindex"];});}catch(e){}\n'
+     '    var diskBig=Promise.resolve();try{var sb=(typeof shellApi==="function")?shellApi():null;if(sb&&typeof sb.big_del==="function")diskBig=sgnIds.then(function(sg){return Promise.all(dkIds.concat(sg||[]).map(function(id){return Promise.resolve(sb.big_del(id)).catch(function(){});}));}).then(function(){',
+     "6.39 Reset everything deletes the signing keys' disk copies")
+
+# ---- 6.44 (6 November 2026): a request on its own connection (Blend) asks Claude for no more than that model gives (modules/r195.js
+#      ingOutFor: its list's figure, else Anthropic's published limit for its family). Her words: "Ingenium keeps on failling when I try
+#      to use Claude's Opus model in the chat ... because of max token limits." ----
+edit('max_tokens:(ab&&ab.conn?(modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):',
+     'max_tokens:(ab&&ab.conn?(typeof ingOutFor==="function"?ingOutFor(model,modern?Math.max(maxTok,16000):Math.max(maxTok,4096)):(modern?Math.max(maxTok,16000):Math.max(maxTok,4096))):',
+     "6.44 Blend asks Claude within the model's own ceiling")
+
+edit('else if(withThink){body.max_tokens=Math.max(maxTok,8192);body.thinking={type:"enabled",budget_tokens:Math.max(1024,Math.min(4096,body.max_tokens-1024))};}',
+     'else if(withThink){body.max_tokens=Math.max(body.max_tokens,8192);if(typeof ingOutFor==="function")body.max_tokens=ingOutFor(model,body.max_tokens);if(body.max_tokens>=2048)body.thinking={type:"enabled",budget_tokens:Math.max(1024,Math.min(4096,body.max_tokens-1024))};}',
+     "6.44 an older Claude model's thinking keeps within its ceiling and a refusal's figure")
+
+# ---- 6.45 (6 November 2026): presses made light. Her words: "Everything is moving slower inside of the app and my mouse's cursor is
+#      just delayed on the screen of the app, it feels off". Measured with Chrome's profiler on a computer a quarter as fast, eight
+#      presses between pages: the page's scroll to the top forced a whole layout in the middle of every press (0.5 s in all), and a
+#      visit to Chat or Code drew every message of the conversation again and saved the desk (0.4 s for 120 messages). Now the scroll
+#      waits for the next frame, and happens only when the page is not at its top; a visit draws the messages again only when the
+#      conversation shown changed since it was drawn (its mode, its name, its count, its last four messages), and saves the desk only
+#      when the conversation chosen changed. Every other caller draws the chat as before. ----
+edit('  window.scrollTo({top:0,behavior:state.motion==="minimal"?"auto":"smooth"});}\nwindow.go=go;',
+     '  requestAnimationFrame(function(){if((window.scrollY||document.documentElement.scrollTop||0)>0)window.scrollTo({top:0,behavior:state.motion==="minimal"?"auto":"smooth"});});}\nwindow.go=go;',
+     "6.45 the page's scroll to the top at the next frame, only when it is not there")
+
+edit('function renderChat(){var sc=$("chatScroll");try{detectChatPreview();}catch(e){}sc.innerHTML="";',
+     'var RC_SIG="",RC_KEEP=false;\n'
+     'function rcSig(){try{var c=curChat(),m=curMsgs(),n=m.length;return (document.body.getAttribute("data-chatmode")||"")+"|"+(c&&c.id||"")+"|"+(c&&c.title||"")+"|"+n+"|"+JSON.stringify(m.slice(Math.max(0,n-4)));}catch(e){return "x"+Math.random();}}\n'
+     'function renderChat(){var sc=$("chatScroll");try{detectChatPreview();}catch(e){}\n'
+     '  /* 6.45: a visit to Chat or Code (ccEnter) keeps the messages drawn when nothing in them changed; the rest is painted as always */\n'
+     '  var keep=RC_KEEP;RC_KEEP=false;if(keep&&RC_SIG&&sc.childNodes.length&&rcSig()===RC_SIG){try{paintChips();}catch(e){}paintChatSwitch();return;}\n'
+     '  sc.innerHTML="";',
+     "6.45 the chat's messages kept when a visit finds them unchanged")
+
+edit('  sc.scrollTop=sc.scrollHeight;paintChatSwitch();}\nfunction trimChat(){',
+     '  sc.scrollTop=sc.scrollHeight;paintChatSwitch();RC_SIG=rcSig();}\nfunction trimChat(){',
+     "6.45 the chat remembers what it drew")
+
+edit('  try{renderChat();}catch(e){}ccPaintSide();ccPaintHead();\n  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-page")===mode);});\n  saveState();}',
+     '  RC_KEEP=true;try{renderChat();}catch(e){}RC_KEEP=false;ccPaintSide();ccPaintHead();\n  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-page")===mode);});\n  if(CC.__saved!==mode+"|"+c.id){CC.__saved=mode+"|"+c.id;saveState();}}',
+     "6.45 a visit to Chat or Code draws and saves only what changed")
+
+# ---- 6.45 (6 November 2026): no Name card in Settings. Her words: "since I can rename Ingenium inside of the Author Studio, I don't
+#      think there is a need to keep that function on the Settings page of the page, please remove it." The Author Studio's Names
+#      room (modules/r236.js, master edition) names the app through its own field; the other editions never could (editions.py,
+#      _fixed_name, which now has nothing of the card left to take out). ----
+edit('      <div class="card"><h2 class="sec">Name</h2>\n        <label class="field"><span>What this app is called</span><input type="text" id="setAppName" placeholder="Ingenium"></label>\n        <div class="small muted" style="margin-top:6px">Shows in the top bar and on the Home page.</div>\n      </div>\n',
+     '', "6.45 Settings: no Name card (the Author Studio names the app)")
+edit('$("setAppName").addEventListener("input",function(){state.appName=$("setAppName").value;applyBrand();saveState();});', '',
+     "6.45 nothing listens for the Name card")
+edit('T("appname",function(){$("setAppName").value=state.appName;});', '', "6.45 no Name card to fill in")
+
+# ---- 6.46 (7 November 2026; her words of 6 November): a model on this device thinks briefly and answers (modules/r241.js), and sources come when she asks.
+#      Her words: "The models inside of the chats of Ingenium spend more time debating the prompts and saying "Wait" and rechecking
+#      everytime and it takes ages for them to stop "Thinking" and reply"; "I also don't want sources and citations provided to me with
+#      every reply inside of the app, I only want them provided when I ask for them." ----
+edit('generate:function(job){if(!this.adapter)return Promise.reject(new Error("NO_ADAPTER"));return this.adapter.generate(job);},',
+     'generate:function(job){if(!this.adapter)return Promise.reject(new Error("NO_ADAPTER"));return typeof ingThinkBudget==="function"?ingThinkBudget(this.adapter,job):this.adapter.generate(job);},',
+     "6.46 a reply that thinks is watched for its length and its circles")
+edit('+"\\n\\nWrite a careful answer from these sources. Cite them by number, like [1], after each claim they support. Where the sources disagree or say nothing, say so plainly. Do not invent anything the sources do not say.";',
+     '+"\\n\\nWrite a careful answer from these sources. "+(typeof ingCiteRule==="function"?ingCiteRule(rec,0):"Cite them by number, like [1], after each claim they support.")+" Where the sources disagree or say nothing, say so plainly. Do not invent anything the sources do not say.";',
+     "6.46 the web's sources cited only when she asks")
+edit('" from these sources. Cite them by number after each claim they support, like [1] or [2, 4]. Prefer the peer-reviewed sources;',
+     '" from these sources. "+(typeof ingCiteRule==="function"?ingCiteRule(rec,1):"Cite them by number after each claim they support, like [1] or [2, 4].")+" Prefer the peer-reviewed sources;',
+     "6.46 the scholarly sources cited only when she asks")
+edit('think:{careful:"When a question needs it, work it through step by step and check your work before you answer.",',
+     'think:{careful:"When a question needs it, think it through once, decide, and answer. Do not go back over what is already settled.",',
+     "6.46 careful thinking: once, decided")
+edit('magister:"Take the time a hard question needs: reason it through, check your work, then give a complete answer.",',
+     'magister:"Take the time a hard question needs: reason it through once, decide, then give a complete answer.",',
+     "6.46 Magister: reason once, decide")
+
+# ---- 6.46: a request on its own connection (Blend) to a service of OpenAI's form asks for no more than the model's figure, when Ingenium
+#      knows it (its list, or a refusal), as Claude's does since 6.44 ----
+edit('if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);',
+     'if(!cxLocal(c.provider,ob)&&!(ab&&ab.conn))cap=typeof ingRemoteCap==="function"?ingRemoteCap(cap):Math.max(cap,16000);else if(ab&&ab.conn&&typeof ingOutFor==="function")cap=ingOutFor(c.model,cap);',
+     "6.46 Blend asks every service within the model's own figure")
+
+edit('num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768)}};',
+     'num_ctx:typeof ingOllamaCtx==="function"?ingOllamaCtx(msgs,ab&&ab.conn):((ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768))}};',
+     "6.46 Ollama is given the memory each request needs, up to its model's own window (modules/r206.js)")
+
+# ---- 6.46 (7 November 2026), its second part: who answers, at hand (modules/r244.js). Her words (6 November 2026): "Switching between providers and
+#      connections in Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users." The
+#      tour's step on the top bar says what the model key does now. ----
+edit('These show the engine, the part that runs models, and the model in use. A green dot means ready. Tap either one to open the Models page.',
+     'These show the engine, the part that runs models, and who answers. A green dot means ready. The engine opens the Models page; the second key lets you choose who answers, a model on this device or a service you connected, from any page.',
+     "6.46 the tour's top bar: the key that chooses who answers")
+
+# ---- 6.51 (7 November 2026), its second part: an empty chat shows the greeting and, when nothing answers yet, Connect a service and
+#      Get a model (modules/r244.js), and no ready-made ideas. Her words (7 November 2026): "Please remove the 4 prompt buttons from the
+#      Chat's page ... please only keep the "Connect a service" and "Get a model" on there, it looks too crowded and cluttered at the
+#      moment." (Code's four ideas for an open app are not on the Chat page, and stay.) ----
+edit('  var ex2=el("div","cc-ideas");["Write a cover letter from my CV","Turn these notes into a report","Make a study timer app","Summarise a long document"].forEach(function(t){var k=el("button","cc-idea",t);k.type="button";k.onclick=function(){var ci=$("chatInput");ci.value=t;try{ci.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}ci.focus();};ex2.appendChild(k);});\n  w.appendChild(ex2);return w;}',
+     '  return w;}',
+     "6.51 the empty chat without its four ready-made ideas")
+
+# ---- 6.55 (7 November 2026): Lakay, her store's app, among her apps. Her words (7 November 2026): "I also want you to build into the
+#      app and add it to my other apps inside of Ingenium and its pages my latest app "Lakay". ... I want its latest build embedded into
+#      Ingenium just like my other apps so that I can continue working on it and developing it further." The app library knows it by
+#      name (Lakay), knows its page (its lakay-build line, or its title) and reads its build number as its version; the master edition
+#      carries its latest page (apps/builtin, below) and modules/r120.js keeps it on first start, as Carpe Diem, The Forge and Inkwell ----
+edit('var LIB_KEYS=["cd","forge","inkwell","ingenium"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium"};',
+     'var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+     "6.55 Lakay in the app library's list")
+edit('function libDetect(text){var head=String(text||"").slice(0,400000);\n',
+     'function libDetect(text){var head=String(text||"").slice(0,400000);\n'
+     '  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n',
+     "6.55 a Lakay page known as Lakay")
+edit('function libVersionOf(key,text){var s=String(text||""),m;\n',
+     'function libVersionOf(key,text){var s=String(text||""),m;\n'
+     '  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n',
+     "6.55 Lakay's build number as its version")
+
+# ---- 6.55 (7 November 2026): the empty Chat and Code pages greet her by name, as Home does. Her words (7 November 2026): "I want the
+#      Chat pages inside of Ingenium to be aware of who I am and actually greet me like the Home page does". Home finds her name in her
+#      profile, else in the author's name Lector writes under (modules/r147.js, hello), and uses its first word; the chat looked in the
+#      profile alone, so it said "Good evening" to her. Now both look in both. Code's empty page opens with the same greeting, and asks
+#      what to build beneath it. ----
+edit('  var nm="";try{nm=(personaGet().name||"").trim();}catch(e){}\n  if(CC.mode==="code"){var pr=ccProj();',
+     '  var nm="";try{nm=(personaGet().name||"").trim();}catch(e){}\n'
+     '  if(!nm){try{nm=(typeof lxhAuthor==="function"?lxhAuthor():"")||"";}catch(e){}}nm=String(nm||"").trim().split(/\\s+/)[0]||"";\n'
+     '  if(CC.mode==="code"){var pr=ccProj();',
+     "6.55 the chat finds her name as Home does")
+edit('w.appendChild(el("h2",null,"What shall we build?"));\n      w.appendChild(el("p",null,"Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
+     'w.appendChild(el("h2",null,part+(nm?", "+nm:"")));\n      w.appendChild(el("p",null,"What shall we build? Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
+     "6.55 Code's empty page greets her by name")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:
@@ -1042,6 +1567,11 @@ if not _m:
     sys.exit("seal data: not found")
 _seals = json.loads(_m.group(2))
 _seals["master"] = _ms["day"]
+# 6.55: Lakay's seal (its Spiral laid flat, apps/lakay_mark.py), where Lakay is carried: the master edition, not the lean copy The Forge carries
+_LAKAY_MARK = None
+if editions.carries_apps(ED) and os.environ.get("ING_LEAN") != "1" and os.path.exists(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")):
+    _LAKAY_MARK = json.load(open(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")))
+    _seals["lakay"] = _LAKAY_MARK["seal"]["day"]
 out = out[:_m.start(2)] + json.dumps(_seals) + out[_m.end(2):]
 
 MARK = '<script>/* R95: every part has now wrapped'
@@ -1050,7 +1580,8 @@ assert out.count(MARK) == 1
 #      ride inside the page as base64 text and open in a frame on their pages ----
 import base64 as _b64
 _apps = ""
-for _name in ("tabula", "abacus", "slides", "scriba", "fontes"):  # R123: Imago (slides), Scriba and Fontes too
+# 6.27: only the editions with the five apps carry them (the master and full editions; editions.carries_desk)
+for _name in (("tabula", "abacus", "slides", "scriba", "fontes") if editions.carries_desk(ED) else ()):  # R123: Imago (slides), Scriba and Fontes too
     _html = open(os.path.join(HERE, "apps", _name + ".html"), encoding="utf-8").read()
     if _name == "tabula":  # R124: Tabula keeps every part of a document when it autosaves or moves (apps/tabula_patch.py)
         import importlib.util as _ilu
@@ -1129,12 +1660,19 @@ _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
 # cannot hold a full copy of an app that holds a full copy of it back)
 if os.environ.get("ING_LEAN") == "1" or not editions.carries_apps(ED):  # 6.2: only the master edition carries the owner's apps
     _bi = {}
-for _k in [k for k in ("forge", "inkwell", "cd") if k in _bi]:  # R122: Carpe Diem rides along too
+for _k in [k for k in ("forge", "inkwell", "cd", "lakay") if k in _bi]:  # R122: Carpe Diem rides along too; 6.55: and Lakay
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
         sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
     _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+# ---- 6.48 (7 November 2026): what the master edition makes the Offline Project from (modules/r246.js): the hall, the devices'
+#      pictures and the icons drawn from the master seal, written by source/offline_project/master_demo/make_op_data.py into
+#      op_make.json. Only where her apps ride along (the master edition, not the lean copy The Forge carries). ----
+if _bi:
+    _op = open(os.path.join(HERE, "op_make.json"), encoding="utf-8").read().strip()
+    json.loads(_op)  # it must read as it is written
+    _apps += '<script type="application/json" id="op-make-data">' + _op.replace("</", "<\\/") + '</script>\n'
 # ---- R136 (Ingenium 6.0, 20 October 2026): the shells Fabrica fills to make an APK and an IPA on the device (source/shells).
 #      The Android shell is compiled by shells/android/build_dex.sh; the iPhone and iPad shell by GitHub's Macs
 #      (.github/workflows/build-shells.yml), checked here against the fingerprint that build wrote beside it ----
@@ -1269,7 +1807,10 @@ if "/*R120_BUILTIN*/null" in blob:
 if "/*R116_QUANTS*/null" in blob:
     blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:
-    blob = blob.replace("/*R107_LAYERS*/null", open(os.path.join(HERE, "lx_layers.json")).read())
+    _lay = json.load(open(os.path.join(HERE, "lx_layers.json")))
+    if _LAKAY_MARK and "lakay" in _bi:  # 6.55: Lakay's Spiral in its seven layers, by day and by night, where Lakay is carried
+        _lay.update(_LAKAY_MARK["layers"])
+    blob = blob.replace("/*R107_LAYERS*/null", json.dumps(_lay))
 if "/*R107_MASTER*/null" in blob:
     blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master
 blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' layers and the faces they carried for others

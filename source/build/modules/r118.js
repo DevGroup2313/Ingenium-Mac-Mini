@@ -53,7 +53,9 @@ function prep(which,opts){opts=opts||{};var html=decode("ing-app-"+which);if(!ht
      in a new window. Without it the app does not open. */
   var guard="";try{if(window.IngSafe&&IngSafe.src)guard='<script id="ing-safe">'+IngSafe.src+';(function(){var S=ingSafeMake(window);window.IngSafe=S;S.install({sinks:1,clipboard:1,links:1});})();<\/script>';}catch(e){}
   if(!guard){try{console.warn("Ingenium: the sanitiser is missing, so "+which+" was not opened");}catch(e){}return null;}
-  html=html.replace("<head>",function(){return "<head>"+guard+head;});
+  /* 6.11.1: Ingenium's own dialog in place of the browser's grey alert, confirm and prompt (modules/r216.js, IngDialogShim) */
+  var dlg=window.IngDialogShim?'<script id="ing-dialogs">'+String(window.IngDialogShim).replace(/<\/script/gi,"<\\/script")+'<\/script>':"";
+  html=html.replace("<head>",function(){return "<head>"+guard+head+dlg;});
   /* Carpe Diem's dress, in the places and the order Carpe Diem gives it */
   try{var items=(INJECT&&INJECT.apps&&INJECT.apps[which])||[],hs="",bs="";items.forEach(function(it){var t=INJECT.texts[it[3]];if(t==null)return;t=String(t).replace(/<\/(script|style)/gi,"<\\/$1");
       var tag=it[0]==="script"?'<script id="'+it[1]+'">'+t+'<\/script>':'<style id="'+it[1]+'">'+t+'</style>';if(it[2]==="head")hs+=tag;else bs+=tag;});

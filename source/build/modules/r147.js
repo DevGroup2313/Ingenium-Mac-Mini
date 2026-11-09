@@ -48,13 +48,16 @@ body[data-theme="night"] .hx{
   --x-jewel:linear-gradient(150deg,#8d68d4 0%,#6a45b6 55%,#4e2d91 100%);
   --x-jsh:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.35),0 2px 0 #1c0f38,0 4px 8px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.3)}
 .hx *{box-sizing:border-box}
-.hx button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+/* 6.38 (her note, 6 November 2026: "I want the fonts and sizes of the newly added pages and sections of Ingenium to match the rest of the app ... I don't want big bulky texts or buttons"): this rule outranked the keys' own sizes (.hx button beats .hx-btn), so every key on Home was drawn at 14px; it now
+   gives way to them (:where), and the keys, headings and greeting take the app's own scale: keys 13px at 34px high like .btn, card
+   names 16.5px like a card's heading (h2.sec), the lede 14px, the greeting no larger than the Home title of the app (30px) */
+.hx :where(button){font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
 .hx :focus-visible{outline:2.5px solid var(--x-ring);outline-offset:3px}
 .hx-sr{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* ---- slabs ---- */
 .hx-slab{position:relative;background:linear-gradient(var(--x-hi),var(--x-lo));border:1px solid var(--x-hair);border-radius:18px;box-shadow:var(--x-slab)}
 .hx-sech{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;margin:0 2px 12px}
-.hx-sech h2{font:600 17px/1.2 var(--x-serif);letter-spacing:.06em;margin:0;color:var(--x-ink1)}
+.hx-sech h2{font:600 16.5px/1.2 var(--x-serif);letter-spacing:.06em;margin:0;color:var(--x-ink1)}
 .hx-sech p{margin:0;color:var(--x-ink3);font-size:13px}
 /* ---- the head ---- */
 .hx-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px 20px;align-items:center;padding:20px 22px 20px;overflow:hidden}
@@ -67,8 +70,8 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-eyebrow{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin:0 0 4px}
 .hx #homeTitle{font:600 12px/1.2 var(--x-sans);letter-spacing:.28em;text-transform:uppercase;color:var(--x-acc);margin:0}
 .hx-date{font:600 10.5px/1.2 var(--x-sans);letter-spacing:.22em;color:var(--x-gold)}
-.hx-hello{font:600 clamp(24px,2.3vw,34px)/1.12 var(--x-serif);letter-spacing:.02em;margin:0;color:var(--x-ink1)}
-.hx-lede{margin:6px 0 0;color:var(--x-ink2);font-size:14.5px;max-width:62ch}
+.hx-hello{font:600 clamp(23px,2.1vw,30px)/1.12 var(--x-serif);letter-spacing:.02em;margin:0;color:var(--x-ink1)}
+.hx-lede{margin:6px 0 0;color:var(--x-ink2);font-size:14px;max-width:62ch}
 .hx-next{position:relative;grid-column:1/-1;display:flex;flex-direction:column;gap:9px;padding:14px 15px;border-radius:14px;background:var(--x-sunk);border:1px solid var(--x-hair2);box-shadow:inset 0 1px 2.5px rgba(40,22,68,.06)}
 .hx-next-h{font:700 10.5px/1.2 var(--x-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--x-ink3)}
 .hx #heroStepNote{display:block;color:var(--x-ink2);font-size:13px;line-height:1.45}
@@ -78,8 +81,8 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 @container hx (min-width:880px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(340px,500px);padding:24px 26px}.hx-next{grid-column:auto}.hx-seal{width:92px;height:92px}.hx-seal .ing-crest{--W:92px !important}}
 @container hx (min-width:1640px){.hx-head{grid-template-columns:auto minmax(0,1fr) minmax(380px,560px)}}
 /* ---- keys: buttons that stand out of the page ---- */
-.hx-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 15px;border-radius:11px;border:1px solid var(--x-hair);
-  background:linear-gradient(var(--x-a),var(--x-b));color:var(--x-ink1);font-size:13.5px;font-weight:600;line-height:1.25;cursor:pointer;box-shadow:var(--x-pill);
+.hx-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:8px 14px;border-radius:11px;border:1px solid var(--x-hair);
+  background:linear-gradient(var(--x-a),var(--x-b));color:var(--x-ink1);font-size:13px;font-weight:600;line-height:1.25;cursor:pointer;box-shadow:var(--x-pill);
   transition:transform .4s var(--x-spring),box-shadow .25s ease;text-align:center}
 .hx-btn svg{width:16px;height:16px;flex:0 0 auto}
 .hx-btn:hover{transform:translateY(-2px)}
@@ -89,7 +92,7 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-btn.pri:active{box-shadow:var(--x-ppress)}
 /* the next step is as wide as its words, at the left like the keys under it (the owner's words, 22 October 2026: the
    "Bring in your first model" button "is too wide, I don't like how it looks") */
-.hx-btn.wide{align-self:flex-start;width:auto;max-width:100%;min-height:40px;padding:9px 18px;font-size:14px}
+.hx-btn.wide{align-self:flex-start;width:auto;max-width:100%;min-height:34px;padding:8px 16px;font-size:13px}
 /* the tour beside the next step, always (the owner's words, 22 October 2026: "Move the Take the guided tour button up top next
    to the Bring in your first model"; 23 October: it "does not look changed at all", since a longer next step, "Load LFM2.5 2.6B
    into the engine", pushed the tour under it): two keys side by side and of one height, their words wrapping inside them; one
@@ -97,11 +100,33 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-next{container:hxn/inline-size}
 .hx-row-top{display:grid;grid-template-columns:auto auto;justify-content:start;align-items:stretch;gap:8px}
 .hx-row-top .hx-btn{white-space:normal;text-wrap:balance;max-width:100%}
-.hx-row-top .hx-btn.wide{align-self:stretch;min-height:44px}
+.hx-row-top .hx-btn.wide{align-self:stretch;min-height:34px}
 @container hxn (max-width:330px){.hx-row-top{grid-template-columns:minmax(0,1fr)}}
 .hx-btn.quiet{border-color:transparent;background:transparent;box-shadow:none;color:var(--x-acc);min-height:30px;padding:4px 8px}
 .hx-btn.quiet:hover{transform:none;text-decoration:underline}
 .hx-btn[hidden]{display:none}
+/* 6.55, the greeting card's keys, as every other key of Ingenium. Her words (7 November 2026): "The Link your file again, take the guided
+   tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no sound and just look stuck to
+   the card in an unnatural manner ... I want them to match the rest of the buttons inside of Ingenium and to lift when I hover over them.
+   I want them to have height and the same weighted look and feel that the rest of the buttons of Ingenium has ... I want both the sound
+   and animations restored for those buttons." (6.54 had taken away their rise at an earlier word of hers, and given the white ones a
+   pale edge.) They keep 6.53's size and the white face she chose; their edge, casts, rise and press are Ingenium's own keys' (.btn and
+   .btn.primary, measured on Chat and Models): an edge 2px deep and two casts; pointed at, they rise 2px on the same spring and the edge
+   grows to 3px; pressed, they sink 1px with the edge pressed in. Their sound is the keys' own (modules/r176.js). */
+.hx-head .hx-btn{transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}
+.hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1)}
+.hx-head .hx-btn:not(.pri):not(.quiet):hover{transform:translateY(-2px);box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12)}
+.hx-head .hx-btn:not(.pri):not(.quiet):active{transform:translateY(1px);transition-duration:.06s;box-shadow:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18)}
+.hx-head .hx-btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #3a2070,0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16)}
+.hx-head .hx-btn.pri:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #3a2070,0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18)}
+.hx-head .hx-btn.pri:active{transform:translateY(1px);transition-duration:.06s;box-shadow:inset 0 2px 6px rgba(20,8,40,.45),0 1px 1px rgba(40,22,68,.2)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet){box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38)}
+body[data-theme="night"] .hx-head .hx-btn:not(.pri):not(.quiet):active{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
+body[data-theme="night"] .hx-head .hx-btn.pri{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36)}
+body[data-theme="night"] .hx-head .hx-btn.pri:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 #170b30,0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.38)}
+body[data-theme="night"] .hx-head .hx-btn.pri:active{box-shadow:inset 0 2px 7px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){.hx-head .hx-btn:hover,.hx-head .hx-btn:active{transform:none}}
 /* ---- the main work ---- */
 .hx-main{container:hxm/inline-size;display:flex;flex-direction:column;gap:20px;min-width:0}
 .hx-keys{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -117,7 +142,7 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-jewel svg{width:23px;height:23px;stroke-width:1.9}
 .hx-key:hover .hx-jewel{transform:translateY(-1px) rotate(-4deg) scale(1.05)}
 .hx-kt{display:flex;flex-direction:column;gap:3px;min-width:0;width:100%}
-.hx-kh{font:600 18px/1.2 var(--x-serif);letter-spacing:.03em;color:var(--x-ink1)}
+.hx-kh{font:600 16.5px/1.2 var(--x-serif);letter-spacing:.03em;color:var(--x-ink1)}
 .hx-kd{color:var(--x-ink2);font-size:13px;line-height:1.42}
 .hx-km{margin-top:auto;display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:11.5px;font-weight:650;color:var(--x-acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hx-km:empty{display:none}
@@ -125,7 +150,7 @@ body[data-theme="night"] .hx-head::before{background:radial-gradient(520px 260px
 .hx-arrow{position:absolute;top:16px;right:16px;color:var(--x-ink3);font-size:18px;line-height:1;transition:transform .4s var(--x-spring),color .2s}
 .hx-key:hover .hx-arrow{transform:translateX(3px);color:var(--x-acc)}
 @container hxm (min-width:1500px){.hx-key{min-height:196px;padding:22px 22px 20px;gap:14px;border-radius:20px}.hx-jewel{width:56px;height:56px;border-radius:16px}.hx-jewel svg{width:27px;height:27px}
-  .hx-kh{font-size:21px}.hx-kd{font-size:14px}.hx-km{font-size:12.5px}.hx-arrow{top:22px;right:22px}
+  .hx-kh{font-size:17px}.hx-kd{font-size:13.5px}.hx-km{font-size:12.5px}.hx-arrow{top:22px;right:22px}
   .hx-recent{padding:22px 22px 20px}.hx-item{min-height:58px}}
 @container hxm (max-width:559px){.hx-key{min-height:0;padding:13px 12px 12px;gap:8px;border-radius:16px}.hx-jewel{width:38px;height:38px;border-radius:12px}.hx-jewel svg{width:20px;height:20px}
   .hx-kh{font-size:16px}.hx-kd{font-size:12.5px}.hx-arrow{top:13px;right:12px}}
@@ -460,6 +485,8 @@ function lower(s){return s?s.charAt(0).toLowerCase()+s.slice(1):"";}
 
 /* Fabrica: each app with the step it is at, in Fabrica's own words */
 var FAPPS={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"};
+/* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!FAPPS.lakay)FAPPS.lakay=LIB_NAMES.lakay;}catch(e){}
 function repoState(r,st,n){if(!r.head)return ["Started · nothing kept yet","none"];
   if(st&&!st.clean){var k=(st.changes||[]).length;return [plural(k,"change")+" to keep",""];}
   var t=n&&n.test,tested=!!(t&&t.ok&&(t.checks||[]).some(function(c){return c.id==="reads"&&c.state==="ok";}));
@@ -492,6 +519,7 @@ function fillFabrica(){var ul=list("fabrica");if(!ul)return Promise.resolve();va
 
 /* Lector: the documents written for each set of apps, newest first */
 var LNAMES={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"},LORDER=["cd","forge","ingenium","inkwell"];
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!LNAMES.lakay){LNAMES.lakay=LIB_NAMES.lakay;LORDER.push("lakay");}}catch(e){}
 function setName(a){a=LORDER.filter(function(k){return (a||[]).indexOf(k)>=0;});var n=a.map(function(k){return LNAMES[k];});
   if(a.length===4)return "The Offline Project";if(n.length<2)return n[0]||"Your apps";return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
 function docLabel(kind,a,p){var all=(a||[]).filter(function(k){return LNAMES[k];}).length===4;

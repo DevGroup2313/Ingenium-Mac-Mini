@@ -77,7 +77,7 @@ function r1Want(rec){var t=String((rec&&rec.text)||""),mode=rec&&rec.makeMode,fm
   if(MK_WANT_APP.test(t)&&make&&!/\b(app|application)s? (store|settings)\b/i.test(t))return {kind:"page",fmt:"html"};
   if((MK_WANT_DOC.test(t)&&make)||((fmt==="pdf"||fmt==="docx")&&make))return {kind:"doc",fmt:fmt};
   return null;}
-function r1WholeOK(src,budget){return !!src&&src.text.length<=Math.min(30000,Math.floor((budget||40000)*0.42));}
+function r1WholeOK(src,budget){return !!src&&src.text.length<=Math.floor((budget||40000)*0.42);}  /* 6.44: no cap of 30,000 characters: the room the model has decides */
 /* the note at the end of her message: how to write what she asked for */
 function r1Note(rec,src){var w=rec.want;if(!w)return "";var strong=rec.r1Strong?" The person asked for this plainly, and it is possible here: write it now.":"";
   var never=" You can make files here, so never say that you cannot.";
@@ -115,8 +115,12 @@ try{MK_CTX.push("makeNote");}catch(e){}
   replyParams=function(m,base){var p=o.apply(this,arguments);try{
       var ms=curMsgs(),u=null;for(var i=ms.length-1;i>=0;i--)if(ms[i].role==="me"){u=ms[i];break;}
       var w=u&&u.want,pb=+(m&&m.paramB)||0,eff=+$("ctlEffort").value||3,file=!!(w&&w.kind&&w.kind!=="convert");
-      if(p.thinking){var b=pb&&pb<=4.5?(file?768:1536):pb&&pb<=10?(file?1536:3072):(file?3072:6144);if(eff>=4)b*=2;if(eff<=1)b=Math.round(b/2);
-        if(u&&u.r1Strong){p.thinking=false;}else p.thinking_budget=b;}}catch(e){}
+      if(p.thinking){var b=pb&&pb<=4.5?(file?768:1536):pb&&pb<=10?(file?1536:3072):(file?3072:6144);
+        /* 6.11: effort sets how long a model on this device may think: Low not at all, Medium half, High the usual, Extra twice, Max four times,
+           never more than half its memory (modules/r215.js, IngEffort) */
+        var mul=window.IngEffort?IngEffort.thinkMul(eff):(eff>=4?2:eff<=1?0.5:1);
+        if(mul<=0||(u&&u.r1Strong)){p.thinking=false;}
+        else{b=Math.round(b*mul);try{var cx=window.IngEffort?IngEffort.ctxNow():0;if(cx>0)b=Math.min(b,Math.max(512,Math.floor(cx/2)));}catch(_){}p.thinking_budget=b;}}}catch(e){}
     return p;};})();
 
 /* ---------- 4. her Word file, opened whole ---------- */
@@ -367,6 +371,11 @@ function r1Scrub(mm){var t=String(mm.text||"");R1_REFUSE.lastIndex=0;var c=t.rep
   if(c!==t){mm.rawText=t;mm.text=c?c.charAt(0).toUpperCase()+c.slice(1):c;}}
 function r1Made(mm){var t=String(mm.text||"");return !!(mm.doc||mm.edits&&mm.edits.some(function(e){return e.ref;})||mkDocsOf(t,true).length||chatArtifactOf(t)||/```csv/i.test(t)||/<slides\b/i.test(t)||edBlocksOf(t).length);}
 function r1LooseHtml(t){var m=/<!doctype html[\s\S]*<\/html>|<html[\s>][\s\S]*<\/html>/i.exec(String(t||""));return m?m[0]:null;}
+/* 6.9.4: a reply that is only Ingenium's own notice, one paragraph in brackets ("(This reply was cut off before it began: …)",
+   "(The connection failed: …)"), is never made a document, even when the message asked for one (her screenshot, 3 November
+   2026: the notice of a reply cut off by a reload showed as a Word and PDF document) */
+function r1Notice(t){t=String(t||"").trim();return t.length>2&&t.length<1600&&t.charAt(0)==="("&&t.charAt(t.length-1)===")"&&t.indexOf("\n\n")<0;}
+window.r1Notice=r1Notice;
 function r1Finish(mm){var u=mkPrevMe(mm),w=u&&u.want;mm.r1=1;
   /* only a reply to a message sent with this build: an older conversation is left exactly as it was */
   if(!u||u.want===undefined)return Promise.resolve(false);
@@ -374,7 +383,7 @@ function r1Finish(mm){var u=mkPrevMe(mm),w=u&&u.want;mm.r1=1;
   var text=String(mm.text||""),p=Promise.resolve(false);
   if(w&&w.kind==="change"&&!edBlocksOf(text).length)p=r1ChangeFrom(mm,u,w).catch(function(e){try{console.error("R101 change",e);}catch(_){}mm.r1err=String(e&&e.message||e);return false;});
   return p.then(function(changed){
-    if(!changed&&w&&(w.kind==="doc"||(w.kind==="change"&&!mm.edits))&&!mkDocsOf(text,true).length&&!mm.doc&&!chatArtifactOf(text)){var d=r1LooseDoc(text);
+    if(!changed&&w&&(w.kind==="doc"||(w.kind==="change"&&!mm.edits))&&!r1Notice(text)&&!mkDocsOf(text,true).length&&!mm.doc&&!chatArtifactOf(text)){var d=r1LooseDoc(text);
       if(d&&(mkWords(d.md)>=20||w.asked)&&!(r1Refused(d.md)&&mkWords(d.md)<60)){mm.doc={title:d.title,md:d.md,fmt:w.fmt||null};}}
     if(w&&w.kind==="page"&&!chatArtifactOf(text)){var h=r1LooseHtml(text);if(h){var i=text.indexOf(h);mm.text=(text.slice(0,i).trim()+"\n\n```html\n"+h+"\n```\n\n"+text.slice(i+h.length).trim()).trim();}}
     if(mm.doc&&w&&w.fmt&&!mm.doc.fmt)mm.doc.fmt=w.fmt;

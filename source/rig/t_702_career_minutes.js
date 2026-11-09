@@ -25,6 +25,8 @@ const P3 = 'DPhil in History of Science\nUniversity of Exampleton\nSubmit a pers
     const c = await IngCareer.newOpp('phd', P3, 'pasted'); c.read = read; c.way = 'guide'; c.check = { items: [{ id: 'c2', text: 'A personal statement', doc: 'statement', done: false, src: 'posting' }], pending: [], at: Date.now(), way: 'guide' };
     saveState(); const S = IngCareer.state(); S.ui.room = 'today'; S.ui.today = null; S.ui.mins = 0; go('career'); IngCareer.render(); }, [P1, P2, P3]);
   await p.waitForTimeout(500);
+  // since 6.9.7 Today shows one step at a time, the rest folded under What else is waiting: three at once is her choice
+  await press('Show three at once'); await p.waitForTimeout(300);
   const rows = await p.evaluate(() => [...document.querySelectorAll('#cs .c-list .c-item')].map(x => x.innerText.replace(/\s+/g, ' ')));
   ok(rows.length === 3 && rows.some(r => /^Read it against your profile Archivist .* about 10 min$/.test(r)) && rows.some(r => /^Send it, then mark it Applied in Track Lecturer .* about 5 min$/.test(r)) && rows.some(r => /^Write your personal statement DPhil .* about 45 min$/.test(r)), 'each step on Today says about how long it takes: a reading 10, a send 5, a statement written herself 45', rows);
   const seg = await p.evaluate(() => ({ box: !!document.getElementById('csMins'), keys: [...document.querySelectorAll('#csMins .c-seg button')].map(x => x.textContent), note: (document.querySelector('#csMins .c-note') || {}).textContent }));

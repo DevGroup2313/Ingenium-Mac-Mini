@@ -17,6 +17,26 @@ app and Inkwell. I want it to be a blank slate for a new user being gifted the a
           the other apps of the family. Lector's page, its parts and modules, its Home card and its tour cards are not in
           the page at all.
 
+6.27 (5 November 2026). Her words: "The Ingenium edition that will be made available to the public and participants and even friends
+and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps, and the Guide and Settings page without
+the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author Studio and the rename Ingenium and Author
+key function are only reserved for my master edition and the "Full" edition with some limitations such (no renaming Ingenium, and no
+Author Studio as well as no Author key generation. The Full edition will be a gift to my partner so it will contain the apps and the
+Lector page, the Career Studio and Fabrica but it will not have any of the apps from the Offline Project built in and it will not have
+their skills and information or any of my profile information".
+  gift and demo  the public editions: Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings, nothing else. Neither
+          carries the five apps (Tabula, Abacus, Imago, Scriba, Fontes; build_page.py leaves them out, and their modules r118, r123,
+          r193 and r194 are not in the page), nor shows Fabrica (its code stays, as Build and the chat call it; its page, key, route,
+          tour, help and every word of it are gone: modules/r231.js and _public() below). Lector and the Career Studio were already
+          left out. Ingenium's own reference database (the chat's My sources, called Fontes) and its model house Scriba stay: they are
+          not the apps of those names.
+  full    keeps the five apps, Lector, the Career Studio and Fabrica; no Name card, no owner's key (the owner's key is the master's
+          alone: modules/r162.js), no Author Studio; and now none of the owner's other apps by name either: the gift edition's
+          _blank() applies to it too, and Lector and the app library know Ingenium alone (no Carpe Diem, The Forge or Inkwell waiting
+          as "Not added yet").
+ING_HAS(part) in the page answers "author", "rename" and "ownerkey" (the master only), "fabrica", "desk", "lector" and "career"
+(the master and full editions).
+
 Every edition keeps the copyright line and the licence. Each change here must find its text exactly as many times as it
 says, so a change to the page that moves one stops the build instead of leaving it undone."""
 import os, re, sys
@@ -34,8 +54,16 @@ def name():
 # the modules an edition leaves out
 def skip_modules(ed):
     if ed == "master":
-        return set()
+        return {"r231.js"}  # 6.27: the public editions' own pages
     out = {"r126.js"}  # Lector's recipe: the owner's rules, verified sources and kinds of document
+    out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
+    out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
+    out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
+    out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
+    if has_fabrica(ed) and carries_desk(ed):
+        out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
+    if not carries_desk(ed):
+        out |= {"r118.js", "r123.js", "r193.js", "r194.js"}  # 6.27: the five apps, the Desk, their stones, a document opened in its app
     if not has_lector(ed):
         out |= {"r107.js", "r108.js", "r148.js"}  # Lector, as approved; how it reads; how it writes
         out |= {"r188.js"}  # 6.8.3: the Career Studio, which writes with Lector ("Please keep the Lector page and the new Career Studio page off the demo and its tour")
@@ -49,6 +77,16 @@ def has_lector(ed):
 def carries_apps(ed):
     """Whether the page carries Carpe Diem, The Forge and Inkwell inside it."""
     return ed == "master"
+
+
+def carries_desk(ed):
+    """6.27: whether the page carries the five apps of the Desk (Tabula, Abacus, Imago, Scriba, Fontes)."""
+    return ed in ("master", "full")
+
+
+def has_fabrica(ed):
+    """6.27: whether Fabrica is a page of this edition."""
+    return ed in ("master", "full")
 
 
 # ---- the changes, made on the finished page: (old, new, label, times) ----
@@ -111,24 +149,71 @@ def _lector_voice():
 
 
 def _no_self():
-    """No Ingenium of its own: not in Code's or Build's list of apps, and no install package of Ingenium itself (the owner
-    alone publishes Ingenium; a new app of the person's own is still packaged)."""
+    """No Ingenium of its own in Code's or Build's list of apps, in every edition but the master (until 6.43 the full edition
+    kept it for a permission of the owner's that allowed "edit"; her answer of 6 November 2026: "Yes please remove the \"edit\",
+    it can go too")."""
     return [
         ('    if(!L.some(function(a){return a.key==="ingenium";})&&location.protocol!=="file:")L.push({key:"ingenium-self",name:"Ingenium (this copy)",version:ING_VERSION});return L;},',
          '    return L;},', "no Ingenium (this copy) among the apps", 1),
+    ]
+
+
+OWN_PAGE_JS = r'/\bvar ING_EDITION\s*=/.test(H)&&/__ingParts/.test(H)'
+OWN_PAGE_SAYS = "This is Ingenium's own page. Only its owner makes apps of Ingenium."
+
+
+def _open_words(ed):
+    """6.43: the words of Build's Open key (modules/r138.js) and its help (r144.js) name only what this edition opens: no
+    Ingenium itself outside the master; in the public editions no app library and no Fabrica either."""
+    if ed == "full":
+        a, b, c = ("Your apps, an app in Fabrica, or a page from this device", "Your apps, an app in Fabrica, or a sample.",
+                   "Opens your apps, an app in Fabrica, or a file.")
+    else:
+        a, b, c = ("A page from this device", "A page from this device, or a sample.", "Opens a page from this device, or a sample.")
+    return [
+        ("Your apps, Ingenium itself, an app in Fabrica, or a page from this device", a, "Build: what Open opens", 1),
+        ("Your apps, Ingenium itself, an app in Fabrica, or a sample.", b, "help: what Open opens", 1),
+        ("Opens your apps, Ingenium itself, an app in Fabrica, or a file.", c, "the tour: what Open opens", 1),
+    ]
+
+
+def _no_self_kit():
+    """6.43, the owner's words (6 November 2026): "Please remove the option to download Ingenium as an app from the Build page and
+    only leave it in the master edition and nowhere else, I should be only person with access to it, I don't want others to be
+    able to ship and produce variations of my app without my expressed consent and permission." Every edition but the master
+    (until 6.42 the full edition kept the choice, hidden until a permission allowed "package"): no install kit of Ingenium itself
+    on the Build page, the kits make a new app only, and a kit or a Fabrica package refuses a page that is Ingenium's own (the
+    marks every Ingenium page carries: its edition's variable and the parts' register). A new app of the person's own is still
+    packaged. A copy someone has altered by hand cannot be stopped from inside a page; this closes the ways the page offers."""
+    return [
         ('<label class="kit-opt"><input type="radio" name="kitWhat" value="self" checked><span><b>Ingenium itself</b> <span class="small muted">to rebuild it or publish an update</span></span></label>',
          '', "the install kit: no Ingenium itself", 1),
         ('<input type="radio" name="kitWhat" value="editor">', '<input type="radio" name="kitWhat" value="editor" checked>',
          "the install kit: the app in the editor", 1),
         ('function kitWhat(){var r=document.querySelector(\'input[name="kitWhat"]:checked\');return r?r.value:"self";}',
          'function kitWhat(){return "editor";}', "the install kit: a new app only", 1),
+        ("  if(!who.isNew)return kitOwnPage();",
+         "  if(!who.isNew)return Promise.reject(new Error(\"Only the owner's edition makes Ingenium itself.\"));", "the install kit: never Ingenium's own page", 1),
+        ('  if(!code.trim())return Promise.reject(new Error("The editor above is empty: write or open the app there first."));\n  return Promise.resolve(code);}',
+         '  if(!code.trim())return Promise.reject(new Error("The editor above is empty: write or open the app there first."));\n'
+         '  var H=code;if(' + OWN_PAGE_JS + ')return Promise.reject(new Error("' + OWN_PAGE_SAYS + '"));\n  return Promise.resolve(code);}',
+         "the install kit: not Ingenium's own page from the editor", 1),
+        # Fabrica (modules/r111.js): every package passes through the page it assembles, and the web app reads its page itself
+        ("function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;",
+         "function onePageFrom(id,snap,page,html){var H=String(html||\"\");if(" + OWN_PAGE_JS + ")return Promise.reject(new Error(\"" + OWN_PAGE_SAYS + "\"));var cache={},missing=[],n=0,big=0;",
+         "Fabrica: no package of Ingenium's own page", 1),
+        ("return readText(id,snap.commit,page).then(function(html){var hasMan=",
+         "return readText(id,snap.commit,page).then(function(html){var H=String(html||\"\");if(" + OWN_PAGE_JS + ")throw new Error(\"" + OWN_PAGE_SAYS + "\");var hasMan=",
+         "Fabrica: no web app of Ingenium's own page", 1),
     ]
 
 
-def _blank():
+def _blank(ed="gift"):
     """The gift edition names none of the owner's other apps, and Home's plaque shows Ingenium's own seal, not the Offline
-    Project's crest of four apps."""
-    return [
+    Project's crest of four apps. 6.27: the full edition too; the words about the five apps (modules r118 and r123) only where
+    the edition carries them."""
+    desk = carries_desk(ed)
+    E = [
         ('IngSeal.el(["cd","forge","ingenium","inkwell"],{night:"auto",live:true,size:300})',
          'IngSeal.el(["ingenium"],{night:"auto",live:true,size:300})', "Home: Ingenium's seal alone", 1),
         ('["Carpe Diem","The Forge","Ingenium","Inkwell"].forEach(function(n,i){', '["Ingenium"].forEach(function(n,i){', "Home: the plaque's line", 1),
@@ -157,6 +242,11 @@ def _blank():
         ("Build, Blend and Carpe Diem's five apps turn answers", "Build, Blend and the five apps turn answers", "tour: making things, again", 1),
         ("Out of session, as in Carpe Diem. Starting Clepsydra", "Out of session. Starting Clepsydra", "Guide: your status", 1),
     ]
+    if not desk:  # their words left the page with the apps (modules r118 and r123)
+        E = [e for e in E if e[2] not in ("Tabula: what it is", "Abacus: what it is", "Tabula and Abacus: what they are",
+                                          "an app this copy does not hold", "tour: the apps", "tour: the apps, whole",
+                                          "tour: making things", "tour: making things, again")]
+    return E
 
 
 def _no_lector():
@@ -335,24 +425,170 @@ def _fixed_name():
     from every build or version of the app that is NOT the master version of the app. I only want the master version of the
     app that only I possess on my devices to have that feature and functionality on the Settings page, nowhere else."
     Settings has no Name card; the top bar, Home, the help and the files it saves always say Ingenium, whatever an older copy
-    or a backup kept as its name (that value is kept as it was, and shown nowhere). The master edition keeps its Name card."""
+    or a backup kept as its name (that value is kept as it was, and shown nowhere). Since 6.45 no edition has a Name card (her
+    words: "since I can rename Ingenium inside of the Author Studio, I don't think there is a need to keep that function on the
+    Settings page"; build_page.py takes it out of the page), so what is left here keeps the name fixed."""
     return [
-        (("CUT", '      <div class="card"><h2 class="sec">Name</h2>', 'Shows in the top bar and on the Home page.</div>\n      </div>\n'), "", "Settings: no Name card", 1),
-        ('$("setAppName").addEventListener("input",function(){state.appName=$("setAppName").value;applyBrand();saveState();});', "",
-         "Settings: nothing listens for a new name", 1),
-        ('T("appname",function(){$("setAppName").value=state.appName;});', "", "start: no name to fill in", 1),
         ('function applyBrand(){var n=state.appName||"Ingenium";', 'function applyBrand(){var n="Ingenium";', "the top bar and Home say Ingenium", 1),
         ('function ingAppName(){return ((state.appName||"").trim())||"Ingenium";}', 'function ingAppName(){return "Ingenium";}', "every part asks for Ingenium", 1),
         ('(state.appName||"Ingenium")', '"Ingenium"', "saved files and the system check are named Ingenium", 6),
         ('(esc(state.appName)||"Ingenium")', '"Ingenium"', "the system check names Ingenium", 1),
-        ('["#setAppName","The app\'s name","What Ingenium calls itself on this device."],', "", "Help: no Name field to show", 1),
+    ]
+
+
+def _full_apps():
+    """6.27, the full edition: none of the owner's other apps by name. Lector and the app library know Ingenium alone (her words:
+    "it will not have any of the apps from the Offline Project built in and it will not have their skills and information")."""
+    return [
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=["ingenium"],', "the app library: Ingenium alone", 1),
+        # 6.42: any other app the person adds follows Ingenium in Lector (r108's syncApps, modules/r240.js)
+        ('var ORDER=["cd","forge","ingenium","inkwell"];\n/* 6.42: any app, not only her four.', 'var ORDER=["ingenium"];\n/* 6.42: any app, not only her four.', "Lector's apps: Ingenium alone (r108; r140's seals keep all four)", 1),
+    ]
+
+
+def _public(ed):
+    """6.27, the public editions (gift, demo): Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings. No
+    Fabrica and none of the five apps: no key, no route, and no word of them. What is made at run time (Fabrica's key and page, the
+    tour's chapters, the keys that send something to an app) is taken away by modules/r231.js."""
+    blank = True  # Home already says "These apps", by _blank(), in both public editions
+    return [
+        # the side bar and the routes of the base page
+        ('<div class="grp-label">Apps</div>', None, "the side bar: no Apps group", 1),
+        ("""<button class="nav-btn" data-page="tabula" onclick="go('tabula')">""", None, "the side bar: no Tabula", 1),
+        ("""<button class="nav-btn" data-page="abacus" onclick="go('abacus')">""", None, "the side bar: no Abacus", 1),
+        ('"build","notes","tabula","abacus","guide","settings"];', '"build","notes","guide","settings"];', "no route to Tabula or Abacus", 1),
+        # Home (modules/r147.js)
+        ('  {k:"fabrica",t:"Fabrica",d:"Your apps as repositories: every version you keep, its checks and its packages."},\n', '', "Home: no Fabrica key", 1),
+        (',["fabrica","fabrica","In Fabrica","fabrica","Open Fabrica"]', '', "Home: no Fabrica column", 1),
+        ('try{fillFabrica();}catch(e){console.error("R147 fabrica",e);}', '', "Home: nothing of Fabrica's to fill", 1),
+        ('var APPS=[\n  {k:"tabula",t:"Tabula",d:"Writing",c:"#8a8172",go:"tabula"},{k:"abacus",t:"Abacus",d:"Tables",c:"#2d9a52",go:"abacus"},\n'
+         '  {k:"slides",t:"Imago",d:"Slides",c:"#b34a3c",go:"slides"},{k:"scriba",t:"Scriba",d:"Recordings",c:"#2f5f9e",go:"scriba"},\n'
+         '  {k:"fontes",t:"Fontes",d:"Sources",c:"#c9a14a",go:"fontes"},\n', 'var APPS=[\n', "Home: the instruments alone", 1),
+        ('var ah2=mk("h2",null,"Your apps");', 'var ah2=mk("h2",null,"Your instruments");', "Home: the instruments' heading", 1),
+        (("These apps open on the Desk; the instruments open over this page." if blank else "Carpe Diem's own apps open on the Desk; the instruments open over this page."),
+         "The instruments open over this page: loose notes, and sprints of focus.", "Home: what the instruments do", 1),
+        # the words of the Guide, the tour and the help
+        ("Sort it later: to a note, to Tabula, into steps, to the chat, to a reminder, or done.",
+         "Sort it later: to a note, into steps, to the chat, to a reminder, or done.", "Guide: the Inbox", 1),
+        ("goes where it belongs: to a note, to Tabula, into steps, to the chat, to a reminder, or done.",
+         "goes where it belongs: to a note, into steps, to the chat, to a reminder, or done.", "tour: the Inbox", 1),
+        ("pin one to the page, search the rest, and send any of them into Tabula when a thought is ready to become writing.",
+         "pin one to the page, and search the rest.", "Guide: Schedae", 1),
+        ('<div class="tip"><span class="tip-mark">T</span><div><b>Tabula</b> is the writing tablet, with documents, footnotes, letterheads, signatures and exports. '
+         '<b>Abacus</b> is the reckoning grid: workbooks, formulas, formats, and CSV in and out. With <b>Imago</b> for slides, <b>Scriba</b> for recordings and '
+         '<b>Fontes</b> for sources, they are apps of their own, carried whole.</div></div>', '', "Guide: no five apps", 1),
+        ("Fabrica chooses no model: it hands work to Chat and Code.", "", "Guide: effort, no Fabrica", 2),
+        ("Lector, the Career Studio and Folders share one writing effort, beside their model, as they share the model:",
+         "Folders has a writing effort of its own, beside its model:", "Guide: effort, Folders alone", 1),
+        ("Notes, Tabula, a Word file, or the clipboard", "Notes, a Word file, or the clipboard", "Guide: where a blend goes", 1),
+        ('"Apps made here can be kept in Fabrica, with every version.",', '', "help: Code keeps its own apps", 1),
+        ("Chat, Code, Build, Fabrica and Focus each have a card.", "Chat, Code, Build and Focus each have a card.", "help: Home's rooms", 1),
+        ("a look-up of a reference, or the speech model the first time you dictate or record (Scriba's, fetched once and kept).",
+         "a look-up of a reference, or the speech model the first time you dictate (fetched once and kept).", "Home: what goes online (6.56)", 1),
+        # Folders, the Studio (modules/r208.js, r200.js, r201.js)
+        ("Your profile names no apps yet (the Career Studio's entries of projects). Name them here.", "No apps are named yet. Name them here.",
+         "Folders: no Career Studio to read", 1),
+        ("your notes on sources, the Tabula page, your sticky notes and your project files", "your notes on sources, your sticky notes and your project files",
+         "Data: no Tabula page", 1),
+        (("CUT", '  keys.appendChild(btn("My Tabula page",', '||"The Tabula page");},"ghost"));\n'), "", "the workbench: no Tabula page", 1),
+        # Settings, Your data: backup and storage name no Fabrica (modules/r143.js, r142.js, r197.js); their stores stay empty here
+        ("your conversations, notes and settings, Fabrica\\'s apps with every version, their issues and pages, and the large store.",
+         "your conversations, notes and settings, and the large store.", "Backup: what it holds", 1),
+        ("For everything in one file, with Fabrica's apps, use ", "For everything in one file, use ", "Backup: the pointer", 1),
+        ("Open a conversation and an app in Fabrica to see that all is there.", "Open a conversation to see that all is there.", "Backup: check after", 1),
+        ('  stay.push("Fabrica\'s packages, unless you choose them. Each can be made again from its version.");\n', '', "Backup: no packages to keep", 1),
+        (("CUT", '  li((c.fabrica||[]).length,', '+((c.fabrica||[]).length>6?" and more":""));\n'), "", "Backup: no Fabrica apps row", 1),
+        ('  li((c.issues||0)+(c.pulls||0),"issues and pull requests, with Fabrica\'s pages");\n', '', "Backup: no issues row", 1),
+        ('li(c.lector,c.lector===1?"document from Lector":"documents from Lector");', '', "Backup: no documents row", 1),
+        ('ingenium_repos:"Fabrica\'s apps, with every version",', 'ingenium_repos:"Apps, with every version",', "Backup: a store's name", 1),
+        ('ingenium_hub:"Fabrica\'s issues, pull requests and pages",', 'ingenium_hub:"Issues, pull requests and pages",', "Backup: a store's name, again", 1),
+        ('fabrica_made:"Fabrica\'s packages"};', 'fabrica_made:"Packages"};', "Backup: the packages' name", 1),
+        ('This is a copy of Fabrica\'s issues and pages, not a whole backup. Bring it back in Fabrica: an app\'s Settings, Bring a copy back.',
+         "This is a copy of an app\'s issues and pages, not a whole backup.", "Backup: a copy of issues", 1),
+        ('row("Fabrica\'s packages",', 'row("Packages",', "Backup: the packages' row", 2),
+        ('"Fabrica\'s packages are not in this backup: the ones here stay."', '"Packages are not in this backup: the ones here stay."', "Backup: packages left out", 1),
+        ('{what:"Fabrica\'s packages",why:', '{what:"Packages",why:', "Backup: packages, why", 1),
+        ('ingenium_repos:["Fabrica\'s history","Every version of the apps you make in Fabrica"],', 'ingenium_repos:["App history","Every version of the apps you keep"],',
+         "Storage: a store's name", 1),
+        ('fabrica_made:["Fabrica\'s packages","Apps and kits Fabrica made, kept to save again"],', 'fabrica_made:["Packages","Apps and kits made here, kept to save again"],',
+         "Storage: the packages' name", 1),
+        ('ingenium_hub:["Fabrica\'s issues and pull requests","What you wrote about your apps in Fabrica"],', 'ingenium_hub:["Issues and pull requests","What you wrote about your apps"],',
+         "Storage: the issues' name", 1),
+        ('stores:"Fabrica and Ingenium\'s other stores"};', 'stores:"Ingenium\'s other stores"};', "Storage: the other stores", 1),
+        ('["package","Older Fabrica packages"]', '["package","Older packages"]', "Storage: older packages", 1),
+        ("Fabrica\\'s older packages (they can be made again), ", "", "Storage: what may go", 1),
+        ("the signing keys and Fabrica's issues and pages", "and the signing keys", "the sign-in: what is sealed", 1),
+        # 6.32: the lock seals the app library and Fabrica's stores in the editions that keep them; these name neither
+        ("the signing keys, your app library, and Fabrica's apps, packages, issues and pages. A backup is sealed", "and the signing keys. A backup is sealed",
+         "the sign-in: what turning it on seals", 1),
+        ("Sealed too: your app library, and Fabrica\\'s apps with every version and the packages it made. ", "", "the sign-in: no library or Fabrica sealed", 1),
+        ("your app library, and Fabrica's apps with every version and the packages it made (what each holds; the names they are filed under are not); ", "",
+         "the sign-in: no library or Fabrica in what is sealed", 1),
+        ("Sealing your app library, and Fabrica\\'s apps and packages: ", "Sealing the rest of what is kept here: ", "the sign-in: sealing the rest", 1),
+        ("Opening your app library, and Fabrica\\'s apps and packages: ", "Opening the rest of what is kept here: ", "the sign-in: opening the rest", 1),
+        ("from elsewhere, the signing keys and Fabrica\\'s pages: ", "from elsewhere and the signing keys: ", "the sign-in: its progress names no Fabrica", 2),
+        # the backup's packages switch is read when a backup is made, so it stays, hidden, in neutral words (none are made here)
+        ('<div class="bk-opt"><input type="checkbox" class="bk-sw" role="switch" id="bkOptPk"', '<div class="bk-opt" hidden><input type="checkbox" class="bk-sw" role="switch" id="bkOptPk"',
+         "Backup: the packages switch hidden", 1),
+        ('<b id="bkOptPkL">Fabrica\\\'s packages</b><span id="bkOptPkD">The Android, iPhone and other packages Fabrica made.', '<b id="bkOptPkL">Packages</b><span id="bkOptPkD">The packages made here.',
+         "Backup: the packages switch's words", 1),
+        ('pk.textContent="The Android, iPhone and other packages Fabrica made ("', 'pk.textContent="The packages made here ("', "Backup: the packages switch's count", 1),
+        ("Your chats, documents, projects, Fabrica\\\'s history, issues and keys are never removed.", "Your chats, documents, projects and keys are never removed.",
+         "Storage: what never goes", 1),
+        # the notes (the base page), the Inbox (modules/r119.js) and Blend (modules/r218.js): nothing is sent to an app this edition lacks
+        ("and its errands: send it to Tabula when a thought is ready to become writing. The row beneath", "and its errands. The row beneath",
+         "Guide: a note's three dots", 1),
+        ('  menu.appendChild(mkRow("Send to Tabula",function(){sendToTabula(n.id);closeStickyMenus();}));\n', '', "a note's menu: no Send to Tabula", 1),
+        ('No notes yet. A new note floats on every page until you unpin it, and can be sent into Tabula when it is ready to become writing.',
+         'No notes yet. A new note floats on every page until you unpin it.', "Schedae: no Tabula", 1),
+        ('    var sv=el("button","sch-btn","Send to Tabula");\n    sv.onclick=function(){sendToTabula(n.id);sv.textContent="Sent ✓";setTimeout(function(){sv.textContent="To Tabula";},1200);};\n',
+         '', "Schedae: no Send to Tabula key", 1),
+        ('acts.appendChild(pin);acts.appendChild(sv);acts.appendChild(dl);', 'acts.appendChild(pin);acts.appendChild(dl);', "Schedae: its keys", 1),
+        (("CUT", '  {key:"tabula",label:"📝 To Tabula",word:"Tabula",run:function(it,tc){tc.closeInbox();', 'go("tabula");toast("Sent to Tabula.");}},\n'), "",
+         "the Inbox: no To Tabula", 1),
+        ('acts.appendChild(blKey("Tabula",function(){toTabula(r);}));', '', "Blend: no Tabula key", 1),
+    ]
+
+
+def _reset_words(ed):
+    """6.38: Reset everything says what it clears (build_page.py); an edition is told only of what it holds. The full edition has
+    no Author Studio; the public editions have no app library, no Fabrica and no Author Studio (Build makes packages there, so
+    the signing keys are named)."""
+    old = ("the long texts, the app library, Fabrica\\'s apps, packages, issues and pages, the conversations you brought in, "
+           "the signing keys and your Author Studio changes. On a computer app")
+    if ed == "full":
+        new = ("the long texts, the app library, Fabrica\\'s apps, packages, issues and pages, the conversations you brought in "
+               "and the signing keys. On a computer app")
+    else:
+        new = "the long texts, the conversations you brought in and the signing keys. On a computer app"
+    return [(old, new, "Reset everything: what it clears, in this edition", 1)]
+
+
+def _no_lakay():
+    """6.55: Lakay, her store's app, is carried and named in the master edition alone: every other edition's app library has the list
+    it had before (and the full edition's rule below then leaves Ingenium alone in it), and knows no Lakay page by name."""
+    return [
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+         'var LIB_KEYS=["cd","forge","inkwell","ingenium"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium"};',
+         "the app library without Lakay", 1),
+        ('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n', "",
+         "no Lakay page known by name", 1),
+        ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
+         "no Lakay build number read", 1),
+        # its line in What is new (shown in the master edition alone) is not carried either, so its name is nowhere in the page
+        ('  ["6.55","Lakay, your store\'s app, is carried inside Ingenium at its latest build and kept with your other apps on first start: in '
+         'Lector, in Fabrica\'s app library and wherever your apps are listed, with its Spiral in its seven layers.","master"],\n', "",
+         "What is new without Lakay", 1),
+        # 6.56: the master edition's news of Lakay Build 6 and of Carpe Diem 1081 is not carried either
+        ('  ["6.56","Lakay is carried at Build 6, with its new Spiral: a coin in sixteen planes, its edge, enamel plate, shell and pearl each at its own depth, in Lector, Fabrica and wherever your apps are listed.","master"],\n', "", "What is new without Lakay Build 6", 1),
+        ('  ["6.56","Lector and your app library carry Carpe Diem 1081, its full edition, in place of 1058: Lector measures it and quotes build 1081 with its own figures (48.5 MB and 71,186 lines).","master"],\n', "", "What is new without Carpe Diem 1081", 1),
     ]
 
 
 def edits(ed):
     if ed == "master":
         return []
-    E = _fixed_name()
+    E = _no_lakay() + _fixed_name()
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed
@@ -360,9 +596,17 @@ def edits(ed):
     if has_lector(ed):
         E += _lector_voice()
     else:
-        E += _no_self() + _no_lector() + _no_lector_words()
-    if ed == "gift":
-        E += _blank()
+        E += _no_lector() + _no_lector_words()
+    # 6.43 and 6.45 (her words: "Yes please remove the \"edit\", it can go too"): every edition but the master has no Ingenium of
+    # its own to open in Code or Build, and none to package; no permission brings either back (modules/r162.js)
+    E += _no_self() + _no_self_kit() + _open_words(ed)
+    if ed in ("gift", "demo", "full"):  # 6.27: no edition but the master names the owner's other apps
+        E += _blank(ed)
+    if ed == "full":
+        E += _full_apps()
+    if not has_fabrica(ed):  # 6.27: the public editions
+        E += _public(ed)
+    E += _reset_words(ed)
     return E
 
 

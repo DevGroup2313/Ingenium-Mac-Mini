@@ -11,6 +11,7 @@
 //   - what the Backup page asks (records opened for a plain zip, records sealed on their way back) works on these stores;
 //   - protection turned off writes everything back as plain records and plain disk copy, the key's bytes the same;
 //   - every part of the page ran to its end, and no script errors on the page.
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 900))); c ? pass++ : fail++; };
@@ -43,7 +44,7 @@ const raw = (p, db, store) => p.evaluate(([db, store]) => new Promise((res) => {
   rq.onerror = () => res(null); }), [db, store]);
 const sha = `async (u8) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', u8))].map(b => b.toString(16).padStart(2, '0')).join('')`;
 async function protect(p) {
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Protect this copy/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 5000 }); await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW1); await p.fill('#ildP2', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 10000 });
@@ -111,7 +112,7 @@ async function protect(p) {
     return { n: l.length, m0: c && c.msgs[0].t, keyHash: await sha(k.pkcs8), hub1: h.issues[0] && h.issues[0].title, hub2: h2.issues[0] && h2.issues[0].title, exported: ex.apps.length }; }, { sha, title: TITLE });
   ok(read2.n === 2 && read2.m0 === CM1 && read2.keyHash === seeded.keyHash && read2.hub1 === HM1 && read2.hub2 === HM2 && read2.exported === 2, 'after the sign-in the parts read it all whole again: the conversations, the key, both issues, and Fabrica\'s own export of its pages', read2);
   // 6. turn protection off: everything plain again
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Turn protection off/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForFunction(() => /Protection is off/.test((document.querySelector('#ingLockDoor h2') || {}).textContent || ''), null, { timeout: 90000 });

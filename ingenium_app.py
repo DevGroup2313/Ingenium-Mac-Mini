@@ -605,6 +605,14 @@ def _relay_stream(h):
         h.send_header("X-Upstream-Status", str(status))
         ct = resp.headers.get("Content-Type") if getattr(resp, "headers", None) else None
         h.send_header("Content-Type", ct or "application/octet-stream")
+        # 6.14 (app_mcp_614.py): an MCP server's session and protocol version travel back to the page (X-Upstream-Mcp-Session-Id)
+        try:
+            for _hn in ("Mcp-Session-Id", "MCP-Protocol-Version"):
+                _hv = resp.headers.get(_hn) if getattr(resp, "headers", None) else None
+                if _hv and "\n" not in str(_hv) and "\r" not in str(_hv):
+                    h.send_header("X-Upstream-" + _hn, str(_hv)[:200])
+        except Exception:
+            pass
         h.send_header("Cache-Control", "no-store")
         h.send_header("Connection", "close")
         h.end_headers()
@@ -1187,7 +1195,7 @@ def _trainer_path():
 
 
 def _train_available():
-    return {"ok": True, "trainer": bool(_trainer_path()), "cores": os.cpu_count() or 1}
+    return {"ok": True, "trainer": bool(_trainer_path()), "cores": os.cpu_count() or 1, "file": True, "resume": True, "textMax": _TRAIN_TEXT_MAX, "perplexity": bool(_perplexity_path())}
 
 
 def _train_set(**kw):
@@ -1217,7 +1225,9 @@ def _train_cancel():
 def _train_stop_at_exit():
     # the trainer is a separate program: it would go on running after the
     # app closes, so it is stopped with the app
+    _perplexity_cancel()  # 6.9.x (app_data_692.py): a measurement does not outlive the app
     if _TRAIN.get("state") == "running":
+        _train_set(exiting=True)  # 6.9.x (app_data_692.py): the passes already saved stay, for train_resume
         _train_cancel()
 
 
@@ -1229,10 +1239,14 @@ def _train_start(spec):
     exe = _trainer_path()
     if not exe:
         return {"ok": False, "error": "This copy of the app does not carry llama.cpp's trainer (llama-finetune). The installer from GitHub carries it."}
-    text = str(spec.get("text") or "")
-    if len(text) < 2000:
+    # 6.9.x (app_data_692.py): the text may come as the file train_text_put wrote, of any length up to 256 MB
+    text_path, bad = _train_text_path(spec)
+    if bad:
+        return {"ok": False, "error": bad}
+    text = "" if text_path else str(spec.get("text") or "")[:8 * 1024 * 1024]
+    nchars = _train_text_chars(text_path) if text_path else len(text)
+    if nchars < 2000:
         return {"ok": False, "error": "Training needs at least about 2,000 characters of text; more is better (100,000 or more)."}
-    text = text[:8 * 1024 * 1024]
     size = spec.get("size") if spec.get("size") in TRAIN_SIZES else "tiny"
     passes = max(1, min(60, int(spec.get("passes") or 8)))
     name = re.sub(r"[\r\n]+", " ", str(spec.get("name") or "My first model"))[:60]
@@ -1251,6 +1265,11 @@ def _train_start(spec):
     if not md:
         return {"ok": False, "error": "The app's data folder is not writable."}
     tid = time.strftime("%Y%m%d-%H%M%S")
+    # 6.9.x (app_data_692.py): a name no earlier training took, even one begun in the same second
+    k = 1
+    while ("trained-" + tid) in _MODEL_PATHS or (md / ("trained-" + tid + ".gguf")).exists():
+        k += 1
+        tid = time.strftime("%Y%m%d-%H%M%S") + "-%d" % k
     # a training cut short when the app closed leaves its folder; nothing
     # else is running now, so those are cleared
     if (md / "training").is_dir():
@@ -1258,14 +1277,411 @@ def _train_start(spec):
             shutil.rmtree(str(old), ignore_errors=True)
     work = md / "training" / tid
     work.mkdir(parents=True, exist_ok=True)
-    (work / "text.txt").write_text(text, encoding="utf-8")
+    if text_path:
+        shutil.move(str(text_path), str(work / "text.txt"))
+    else:
+        (work / "text.txt").write_text(text, encoding="utf-8")
     with _TRAIN_LOCK:
         _TRAIN.clear()
         _TRAIN.update({"state": "running", "phase": "preparing", "id": tid, "name": name, "size": size, "passes": passes,
                        "pass": 0, "frac": 0.0, "loss": None, "val": None, "acc": None, "history": [], "eta": None,
-                       "started": time.time(), "chars": len(text), "more": bool(more), "error": "", "cancel": False})
-    threading.Thread(target=_train_run, args=(exe, work, size, passes, name, more, base), daemon=True).start()
+                       "started": time.time(), "chars": nchars, "more": bool(more), "error": "", "cancel": False})
+    threading.Thread(target=_train_run_692, args=(exe, work, size, passes, name, more, base), daemon=True).start()
     return {"ok": True, "id": tid}
+
+
+# ---------------------------------------------------------------- 6.9.x: the text as a file, and one pass at a time (app_data_692.py)
+_TRAIN_IN = "training-in"
+_TRAIN_TEXT_MAX = 256 * 1024 * 1024
+_TRAIN_BPE_MAX = 8 * 1024 * 1024
+
+
+def _train_in_file():
+    md = _models_dir()
+    if not md:
+        return None
+    d = md / _TRAIN_IN
+    d.mkdir(parents=True, exist_ok=True)
+    return d / "incoming.txt"
+
+
+def _train_text_put(chunk, first=False):
+    """The page hands the training text over a piece at a time; it is kept as the file train_start's text_path names."""
+    f = _train_in_file()
+    if f is None:
+        return {"ok": False, "error": "The app's data folder is not writable."}
+    data = str(chunk or "").encode("utf-8")
+    try:
+        if first and f.exists():
+            f.unlink()
+        have = f.stat().st_size if f.exists() else 0
+        if have + len(data) > _TRAIN_TEXT_MAX:
+            return {"ok": False, "error": "The text is longer than the trainer takes here (256 MB)."}
+        with open(str(f), "ab") as w:
+            w.write(data)
+        return {"ok": True, "path": str(f), "bytes": have + len(data)}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+def _train_text_path(spec):
+    """The text file train_start may read: only the one train_text_put wrote. Returns (path or None, error or '')."""
+    want = str((spec or {}).get("text_path") or "")
+    if not want:
+        return None, ""
+    f = _train_in_file()
+    if f is None or not f.is_file() or os.path.realpath(want) != os.path.realpath(str(f)):
+        return None, "The text file is not one this app wrote; hand the text over again."
+    return f, ""
+
+
+def _train_text_chars(path):
+    n = 0
+    with open(str(path), "r", encoding="utf-8", errors="replace") as r:
+        while True:
+            part = r.read(1 << 20)
+            if not part:
+                break
+            n += len(part)
+    return n
+
+
+def _train_plan_write(work, plan):
+    tmp = work / "plan.json.tmp"
+    tmp.write_text(json.dumps(plan), encoding="utf-8")
+    os.replace(str(tmp), str(work / "plan.json"))
+
+
+def _train_plan_read(work):
+    try:
+        return json.loads((work / "plan.json").read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _train_prepare_692(work, size, name, more, base):
+    """The model the first pass starts from, as _train_run made it: widened from a model she has, copied from one trained
+    here, or new from random numbers with a vocabulary learned from the text (its first 8 MB)."""
+    start = work / "start.gguf"
+    nvocab = None
+    if base:
+        nvocab = _gguf_summary(_MODEL_PATHS[base]).get("vocab")
+        _train_set(phase="widening", nvocab=nvocab)
+        params = _gguf_to_f32(_MODEL_PATHS[base], str(start), progress=lambda f: _train_set(frac=0.0, widen=round(f, 2)))
+        size = "base"
+        lr0, lr1 = TRAIN_LR["base"]
+    elif more:
+        shutil.copyfile(_MODEL_PATHS[more], start)
+        size = (_MODEL_META.get(more) or {}).get("size") or size
+        lr0, lr1 = TRAIN_LR_MORE.get(size, TRAIN_LR_MORE["tiny"])
+        params = (_MODEL_META.get(more) or {}).get("params")
+    else:
+        _train_set(phase="vocabulary")
+        with open(str(work / "text.txt"), "r", encoding="utf-8", errors="replace") as r:
+            sample = r.read(_TRAIN_BPE_MAX)
+        kv = _train_bpe(sample, TRAIN_VOCAB, progress=lambda f: _train_set(frac=0.0, vocab=round(f, 2)))
+        _train_set(phase="model")
+        params = _new_model(str(start), kv, size, name)
+        lr0, lr1 = TRAIN_LR.get(size, TRAIN_LR["tiny"])
+    return start, params, lr0, lr1, size, nvocab
+
+
+def _train_pass_692(exe, work, start, out, lr, lr_min, passes, pass_no):
+    """One pass of llama-finetune (-epochs 1), its progress read from its error output as _train_run reads it.
+    Returns (exit code, the last training loss, the held-back loss, the last lines)."""
+    threads = max(1, (os.cpu_count() or 2) - 1)
+    args = [exe, "-m", str(start), "--file", str(work / "text.txt"), "-c", str(TRAIN_CTX), "-b", str(TRAIN_CTX), "-ub", str(TRAIN_CTX),
+            "-epochs", "1", "-lr", str(lr), "-lr-min", str(lr_min), "-decay-epochs", "1", "-t", str(threads), "-o", str(out)]
+    kw = {}
+    if sys.platform.startswith("win"):
+        kw["creationflags"] = 0x08000000  # no console window
+    proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, cwd=str(work), **kw)
+    _TRAIN_PROC[0] = proc
+    tail, buf, last_train, val = [], b"", None, None
+    while True:
+        ch = proc.stderr.read(512)
+        if not ch:
+            break
+        buf += ch
+        parts = re.split(rb"[\r\n]", buf)
+        buf = parts.pop()
+        for raw in parts:
+            line = raw.decode("utf-8", "replace").strip()
+            if not line:
+                continue
+            tail = (tail + [line])[-12:]
+            m = _TRAIN_LINE.match(line)
+            if not m:
+                continue
+            kind, k, n = m.group(1), int(m.group(2)), max(1, int(m.group(3)))
+            loss, acc = float(m.group(4)), float(m.group(5))
+            if kind == "train":
+                last_train = loss
+                with _TRAIN_LOCK:
+                    _TRAIN.update(loss=loss, acc=acc, frac=min(1.0, (pass_no - 1 + k / n) / passes))
+                    el = time.time() - _TRAIN["started"]
+                    f = _TRAIN["frac"]
+                    df = f - (_TRAIN.get("frac0") or 0.0)  # a run taken up again counts from where it was taken up
+                    _TRAIN["eta"] = round(el * (1 - f) / df) if df > 0.02 else None
+            elif k >= n:
+                val = loss
+    rc = proc.wait()
+    _TRAIN_PROC[0] = None
+    return rc, last_train, val, tail
+
+
+def _train_run_692(exe, work, size, passes, name, more, base="", resume=None):
+    """The run: prepared (or taken up where it stopped), then one pass at a time, the model saved after each."""
+    try:
+        if resume:
+            plan = resume
+            start = work / ("pass_%d.gguf" % int(plan["done"]))
+            params, lr0, lr1 = plan.get("params"), plan["lr0"], plan["lr1"]
+            size = plan.get("size") or size
+            if plan.get("nvocab"):
+                _train_set(nvocab=plan["nvocab"])
+        else:
+            start, params, lr0, lr1, size, nvocab = _train_prepare_692(work, size, name, more, base)
+            plan = {"id": work.name, "name": name, "size": size, "passes": passes, "done": 0, "more": more, "base": base, "lr0": lr0, "lr1": lr1,
+                    "params": params, "nvocab": nvocab, "chars": _TRAIN.get("chars"), "history": [], "made": time.time()}
+            _train_plan_write(work, plan)
+        _train_set(phase="training", params=params)
+
+        def rate(k):
+            # the learning rate steps down pass by pass from the usual start to the usual end
+            if passes <= 1 or k > passes:
+                return lr1 if k > 1 else lr0
+            return lr0 * (lr1 / lr0) ** ((k - 1) / float(passes - 1))
+
+        for k in range(int(plan["done"]) + 1, passes + 1):
+            out = work / ("pass_%d.gguf" % k)
+            rc, tl, vl, tail = (None, None, None, []) if _TRAIN.get("cancel") else _train_pass_692(exe, work, start, out, rate(k), rate(k + 1), passes, k)
+            if _TRAIN.get("cancel"):
+                _train_set(state="cancelled", phase="")
+                if not (_TRAIN.get("exiting") and int(plan["done"]) >= 1):
+                    shutil.rmtree(str(work), ignore_errors=True)   # stopped by hand, or nothing saved yet: nothing is kept
+                return
+            if rc != 0 or not out.is_file():
+                _train_set(state="error", error="The trainer stopped (code %s): %s" % (rc, " / ".join(tail[-3:])))
+                return
+            plan["done"] = k
+            plan["history"].append({"pass": k, "loss": tl, "val": vl})
+            with _TRAIN_LOCK:
+                _TRAIN["history"] = list(plan["history"])
+                _TRAIN.update(val=vl, **{"pass": k})
+            _train_plan_write(work, plan)
+            if start != out and start.is_file():
+                try:
+                    start.unlink()   # the model before this pass is let go once this pass is saved
+                except Exception:
+                    pass
+            start = out
+        _train_finish_692(work, start, plan)
+    except Exception as e:
+        _TRAIN_PROC[0] = None
+        _train_set(state="error", error=str(e))
+
+
+def _train_finish_692(work, final, plan):
+    """The trained model into its place, as _train_run put it."""
+    md = _models_dir()
+    more, base, name, size, params, passes = plan.get("more") or "", plan.get("base") or "", plan.get("name") or "My first model", plan.get("size"), plan.get("params"), int(plan.get("passes") or 1)
+    mid = more or ("trained-" + work.name)
+    dest = md / (mid + ".gguf")
+    if _ENGINE.get("model_id") == mid:
+        _engine_stop()
+    shutil.move(str(final), str(dest))
+    _MODEL_PATHS[mid] = str(dest)
+    prev = _MODEL_META.get(mid) or {}
+    _MODEL_META[mid] = {"trained": True, "name": name, "size": size, "params": params,
+                        "passes": int(prev.get("passes") or 0) + passes, "chars": plan.get("chars")}
+    if base or prev.get("base"):
+        _MODEL_META[mid]["base"] = prev.get("base") or (_MODEL_META.get(base) or {}).get("name") or os.path.basename(_MODEL_PATHS.get(base, ""))
+    _save_models_index()
+    shutil.rmtree(str(work), ignore_errors=True)
+    _train_set(state="done", phase="", frac=1.0, eta=0, history=list(plan.get("history") or []),
+               model={"id": mid, "fileName": re.sub(r"[^A-Za-z0-9 ._-]", "", name).strip() + ".gguf", "size": os.path.getsize(str(dest)),
+                      "passes": _MODEL_META[mid]["passes"], "params": params})
+
+
+def _train_resumable():
+    """A training the app's closing cut short: its plan, where at least one pass was saved and more remain."""
+    md = _models_dir()
+    if not md or not (md / "training").is_dir():
+        return None
+    best = None
+    for d in (md / "training").iterdir():
+        plan = _train_plan_read(d) if d.is_dir() else None
+        if not plan:
+            continue
+        done, total = int(plan.get("done") or 0), int(plan.get("passes") or 0)
+        if not (1 <= done < total) or not (d / ("pass_%d.gguf" % done)).is_file():
+            continue
+        plan["work"] = str(d)
+        if best is None or (plan.get("made") or 0) > (best.get("made") or 0):
+            best = plan
+    return best
+
+
+def _train_status_692():
+    st = _train_status()
+    if st.get("state") != "running":
+        r = _train_resumable()
+        if r:
+            st["resumable"] = {"id": r.get("id"), "name": r.get("name"), "done": r.get("done"), "passes": r.get("passes"), "chars": r.get("chars"), "size": r.get("size")}
+    return st
+
+
+def _train_resume():
+    with _TRAIN_LOCK:
+        if _TRAIN.get("state") == "running":
+            return {"ok": False, "error": "A training is already running."}
+    exe = _trainer_path()
+    if not exe:
+        return {"ok": False, "error": "This copy of the app does not carry llama.cpp's trainer (llama-finetune). The installer from GitHub carries it."}
+    plan = _train_resumable()
+    if not plan:
+        return {"ok": False, "error": "There is no training to go on with."}
+    work = pathlib.Path(plan.pop("work"))
+    if plan.get("more") and not os.path.isfile(_MODEL_PATHS.get(plan["more"], "")):
+        return {"ok": False, "error": "The model it was training further is no longer on this computer."}
+    passes, done = int(plan["passes"]), int(plan["done"])
+    with _TRAIN_LOCK:
+        _TRAIN.clear()
+        _TRAIN.update({"state": "running", "phase": "training", "id": plan.get("id"), "name": plan.get("name"), "size": plan.get("size"), "passes": passes,
+                       "pass": done, "frac": done / float(passes), "loss": None, "val": None, "acc": None, "history": list(plan.get("history") or []),
+                       "eta": None, "started": time.time(), "chars": plan.get("chars"), "more": bool(plan.get("more")), "error": "", "cancel": False, "resumed": True,
+                       "frac0": done / float(passes)})
+    threading.Thread(target=_train_run_692, args=(exe, work, plan.get("size"), passes, plan.get("name"), plan.get("more") or "", plan.get("base") or "", plan), daemon=True).start()
+    return {"ok": True, "id": plan.get("id"), "done": done, "passes": passes}
+
+
+def _train_discard():
+    plan = _train_resumable()
+    if plan:
+        shutil.rmtree(plan["work"], ignore_errors=True)
+    return {"ok": True, "gone": bool(plan)}
+
+
+# ---- perplexity, when llama-perplexity is carried beside the trainer
+_PPL = {"state": "idle"}
+_PPL_LOCK = threading.Lock()
+_PPL_PROC = [None]
+_PPL_EXE = "llama-perplexity.exe" if sys.platform.startswith("win") else "llama-perplexity"
+_PPL_LINE = re.compile(r"Final estimate: PPL = ([0-9.]+)(?: \+/- ([0-9.]+))?")
+_PPL_MIN_CHARS = 1500
+
+
+def _perplexity_path():
+    d = _engine_dir()
+    if d:
+        p = os.path.join(d, _PPL_EXE)
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+def _ppl_set(**kw):
+    with _PPL_LOCK:
+        _PPL.update(kw)
+
+
+def _perplexity_start(model_id):
+    exe = _perplexity_path()
+    if not exe:
+        return {"ok": False, "error": "This copy of the app does not carry llama.cpp's llama-perplexity, so it cannot measure a model."}
+    path = _MODEL_PATHS.get(str(model_id or ""))
+    if not path or not os.path.isfile(path):
+        return {"ok": False, "error": "That model is not stored by this app."}
+    src = _train_in_file()
+    if src is None or not src.is_file():
+        return {"ok": False, "error": "Hand the text over first."}
+    with _TRAIN_LOCK:
+        busy = _TRAIN.get("state") == "running"
+    if busy:
+        return {"ok": False, "error": "A training is running; measure when it is done."}
+    with _PPL_LOCK:
+        if _PPL.get("state") == "running":
+            return {"ok": False, "error": "A measurement is already running."}
+        _PPL.clear()
+        _PPL.update({"state": "running", "model": str(model_id), "started": time.time(), "ppl": None, "err": None, "chars": 0})
+    mine = src.parent / "measure.txt"
+    try:
+        shutil.move(str(src), str(mine))
+        chars = _train_text_chars(mine)
+    except Exception as e:
+        _ppl_set(state="error", error=str(e))
+        return {"ok": False, "error": str(e)}
+    if chars < _PPL_MIN_CHARS:
+        try:
+            mine.unlink()
+        except Exception:
+            pass
+        msg = "The text is too short to measure on (it needs about %d characters; it has %d)." % (_PPL_MIN_CHARS, chars)
+        _ppl_set(state="error", error=msg)
+        return {"ok": False, "error": msg}
+    _ppl_set(chars=chars)
+    threading.Thread(target=_perplexity_run, args=(exe, path, mine), daemon=True).start()
+    return {"ok": True, "chars": chars}
+
+
+def _perplexity_run(exe, model, text):
+    try:
+        threads = max(1, (os.cpu_count() or 2) - 1)
+        kw = {}
+        if sys.platform.startswith("win"):
+            kw["creationflags"] = 0x08000000  # no console window
+        proc = subprocess.Popen([exe, "-m", str(model), "-f", str(text), "-c", "256", "-b", "256", "-t", str(threads)],
+                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kw)
+        _PPL_PROC[0] = proc
+        tail, found = [], None
+        for raw in iter(proc.stdout.readline, b""):
+            line = raw.decode("utf-8", "replace").rstrip()
+            if not line:
+                continue
+            tail = (tail + [line])[-12:]
+            m = _PPL_LINE.search(line)
+            if m:
+                found = (float(m.group(1)), float(m.group(2)) if m.group(2) else None)
+        rc = proc.wait()
+        _PPL_PROC[0] = None
+        if _PPL.get("state") == "cancelled":
+            return
+        if rc == 0 and found:
+            _ppl_set(state="done", ppl=found[0], err=found[1], seconds=round(time.time() - _PPL.get("started", time.time()), 1))
+        else:
+            _ppl_set(state="error", error="llama-perplexity stopped (code %s): %s" % (rc, " / ".join(tail[-3:])))
+    except Exception as e:
+        _PPL_PROC[0] = None
+        if _PPL.get("state") != "cancelled":
+            _ppl_set(state="error", error=str(e))
+    finally:
+        try:
+            text.unlink()
+        except Exception:
+            pass
+
+
+def _perplexity_status():
+    with _PPL_LOCK:
+        st = dict(_PPL)
+    if st.get("state") == "running":
+        st["elapsed"] = round(time.time() - st.get("started", time.time()), 1)
+    return st
+
+
+def _perplexity_cancel():
+    with _PPL_LOCK:
+        running = _PPL.get("state") == "running"
+        if running:
+            _PPL["state"] = "cancelled"
+    proc = _PPL_PROC[0]
+    if proc is not None:
+        try:
+            proc.kill()
+        except Exception:
+            pass
+    return {"ok": True, "was_running": running}
 
 
 def _train_run(exe, work, size, passes, name, more, base=""):
@@ -1775,6 +2191,27 @@ def _rag_type_ok(name):
     return os.path.splitext(name)[1].lower() in _RAG_TYPES
 
 
+def _rag_real_steps_ok(full, base, want_file):
+    """For what a path really is once its links are resolved: True when it lies inside base, no step of it below base is
+    hidden (by its name or the system's own mark), and (want_file) it is a file of a searched type. So a link inside the
+    folder cannot reach a hidden file or a hidden folder, and neither can another spelling of a name (a Windows short name).
+    (6.9.3, app_rag_693.py)"""
+    try:
+        real, rbase = os.path.realpath(full), os.path.realpath(base)
+        if not _rag_inside(os.path.normcase(real), os.path.normcase(rbase)):
+            return False
+        cur = rbase
+        for part in os.path.relpath(real, rbase).split(os.sep):
+            if part in ("", "."):
+                continue
+            cur = os.path.join(cur, part)
+            if _rag_hidden(part, os.lstat(cur)):
+                return False
+        return _rag_type_ok(os.path.basename(real)) if want_file else True
+    except (OSError, ValueError):
+        return False
+
+
 def _rag_walk(base):
     """The files under base (a real path): ([{rel, size, mtime}] sorted by rel, with / between names; more_were_left). Hidden entries are
     skipped; a symbolic link is followed only when what it points to lies inside base, and never into a folder it is already inside."""
@@ -1815,10 +2252,12 @@ def _rag_walk(base):
                 real = _rag_real(full)
                 if not _rag_inside(real, nbase) or real in chain:
                     continue                                 # it leaves the folder, or loops back into a folder it is already inside
+                if islink and not _rag_real_steps_ok(full, base, False):
+                    continue                                 # a link to a hidden folder inside this one (6.9.3)
                 subdirs.append((full, prefix + name + "/", chain + (real,)))
             elif _rag_stat.S_ISREG(st.st_mode) and _rag_type_ok(name):
-                if islink and not _rag_inside(_rag_real(full), nbase):
-                    continue
+                if islink and not _rag_real_steps_ok(full, base, True):
+                    continue                                 # it leaves the folder, or reaches a hidden file or another type (6.9.3)
                 if len(out) >= _RAG_LIST_CAP:
                     truncated = True
                     break
@@ -1921,9 +2360,11 @@ def _rag_forget_folder(path):
         if not isinstance(path, str) or not path.strip() or "\0" in path or not os.path.isabs(path):
             return _rag_err("That is not a folder path.", "BAD_ARGS")
         want = _rag_real(path)
+        said = os.path.normcase(os.path.abspath(path))
         with _RAG_LOCK:
             rows = _rag_load()
-            keep = [r for r in rows if os.path.normcase(r["real"]) != want]
+            # by its real path, and by the path it was chosen with: a link or a mapped drive may point elsewhere by now (6.9.3)
+            keep = [r for r in rows if os.path.normcase(r["real"]) != want and os.path.normcase(os.path.abspath(r["path"])) != said]
             if len(keep) != len(rows):
                 _rag_save(keep)
         return {"ok": True, "forgot": len(keep) != len(rows)}
@@ -1980,6 +2421,8 @@ def _rag_read(path, rel, offset=0, length=_RAG_PIECE):
             return _rag_err("That path leaves the folder.", "OUTSIDE")
         if not os.path.isfile(full):
             return _rag_err("There is no such file in the folder.", "NO_FILE")
+        if not _rag_real_steps_ok(cur, base, True):            # what a link inside the folder points to is checked too (6.9.3)
+            return _rag_err("Hidden files are not read.", "HIDDEN")
         with open(full, "rb") as fh:
             size = os.fstat(fh.fileno()).st_size
             data = b""
@@ -1992,6 +2435,748 @@ def _rag_read(path, rel, offset=0, length=_RAG_PIECE):
     except Exception:
         log_problem("rag_read failed", sys.exc_info())
         return _rag_err("The file could not be read.", "FAILED")
+
+
+# ---- 6.10: Claude Code's sessions on this computer, read on her press (app_claude_610.py) ----
+_CLAUDE_PIECE = 4 * 1024 * 1024
+_CLAUDE_MAX_FILES = 4000
+
+
+def _claude_root():
+    """Claude Code's projects folder: ~/.claude/projects, or under CLAUDE_CONFIG_DIR when it is set."""
+    base = os.environ.get("CLAUDE_CONFIG_DIR") or os.path.join(os.path.expanduser("~"), ".claude")
+    return os.path.realpath(os.path.join(base, "projects"))
+
+
+def _claude_inside(full, root):
+    a, b = os.path.normcase(full), os.path.normcase(root)
+    return a.startswith(b.rstrip(os.sep) + os.sep)
+
+
+def _claude_sessions():
+    """The .jsonl session files under Claude Code's projects folder, newest first: names, sizes and times only."""
+    try:
+        root = _claude_root()
+        if not os.path.isdir(root):
+            return {"ok": True, "files": [], "root": root}
+        out = []
+        for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+            rel_dir = os.path.relpath(dirpath, root)
+            depth = 0 if rel_dir == "." else rel_dir.count(os.sep) + 1
+            if depth >= 1:                       # <project>/<session>.jsonl only: a session's own folder (its helpers' work) is left
+                dirnames[:] = []
+            if depth != 1:
+                continue
+            for fn in sorted(filenames):
+                if not fn.lower().endswith(".jsonl"):
+                    continue
+                full = os.path.join(dirpath, fn)
+                try:
+                    if os.path.islink(full) or not os.path.isfile(full):
+                        continue
+                    st = os.stat(full)
+                except OSError:
+                    continue
+                rel = os.path.relpath(full, root).replace(os.sep, "/")
+                out.append({"rel": rel, "name": rel.replace("/", " - "), "size": int(st.st_size), "mtime": int(st.st_mtime * 1000)})
+                if len(out) >= _CLAUDE_MAX_FILES:
+                    break
+            if len(out) >= _CLAUDE_MAX_FILES:
+                break
+        out.sort(key=lambda x: -x["mtime"])
+        return {"ok": True, "files": out, "root": root}
+    except Exception:
+        log_problem("claude_sessions failed", sys.exc_info())
+        return {"ok": False, "error": "Claude Code's sessions could not be listed.", "files": []}
+
+
+def _claude_session_read(rel, offset=0, length=_CLAUDE_PIECE):
+    """A piece of one session file, as text, ending at a whole line: only a .jsonl file inside Claude Code's projects folder."""
+    try:
+        root = _claude_root()
+        rel = str(rel or "")
+        if "\x00" in rel or not rel.lower().endswith(".jsonl"):
+            return {"ok": False, "error": "Only Claude Code's session files are read."}
+        parts = [x for x in rel.replace("\\", "/").split("/") if x]
+        if not parts or any(x in (".", "..") or ":" in x for x in parts):
+            return {"ok": False, "error": "That is not a session file."}
+        joined = os.path.join(root, *parts)
+        if os.path.islink(joined):
+            return {"ok": False, "error": "That is not a session file."}
+        full = os.path.realpath(joined)
+        if not _claude_inside(full, root):
+            return {"ok": False, "error": "That path leaves Claude Code's folder."}
+        if not os.path.isfile(full):
+            return {"ok": False, "error": "There is no such session file."}
+        try:
+            offset = max(0, int(offset or 0))
+            length = max(1, min(int(length or _CLAUDE_PIECE), _CLAUDE_PIECE))
+        except (TypeError, ValueError):
+            return {"ok": False, "error": "The offset and the length must be whole numbers."}
+        with open(full, "rb") as fh:
+            size = os.fstat(fh.fileno()).st_size
+            fh.seek(min(offset, size))
+            data = fh.read(length)
+        if offset + len(data) < size:
+            cut = data.rfind(b"\n")
+            if cut >= 0:
+                data = data[:cut + 1]            # a piece ends at a whole line: no character and no line is cut in two
+            else:
+                while data and (data[-1] & 0xC0) == 0x80:
+                    data = data[:-1]             # a line longer than a piece: at least no character is cut in two
+                if data and data[-1] >= 0xC0:
+                    data = data[:-1]
+        return {"ok": True, "text": data.decode("utf-8", "replace"), "length": len(data), "size": size, "more": offset + len(data) < size}
+    except Exception:
+        log_problem("claude_session_read failed", sys.exc_info())
+        return {"ok": False, "error": "The session file could not be read."}
+
+
+# ---- 6.10.1: the computer's own sign-in as a way back into Ingenium (app_device_6101.py) ----
+_DEV_ENTROPY = b"Ingenium device key v1"
+_HELLO_PS = r"""
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Runtime.WindowsRuntime
+$null = [Windows.Security.Credentials.UI.UserConsentVerifier,Windows.Security.Credentials.UI,ContentType=WindowsRuntime]
+$null = [Windows.Security.Credentials.UI.UserConsentVerificationResult,Windows.Security.Credentials.UI,ContentType=WindowsRuntime]
+$null = [Windows.Security.Credentials.UI.UserConsentVerifierAvailability,Windows.Security.Credentials.UI,ContentType=WindowsRuntime]
+$asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1' })[0]
+function Await($op, [Type]$t) { $task = $asTask.MakeGenericMethod($t).Invoke($null, @($op)); $task.Wait(-1) | Out-Null; $task.Result }
+if ('__MODE__' -eq 'check') {
+  $a = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::CheckAvailabilityAsync()) ([Windows.Security.Credentials.UI.UserConsentVerifierAvailability])
+  Write-Output ('AVAIL:' + $a)
+} else {
+  $r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::RequestVerificationAsync('__REASON__')) ([Windows.Security.Credentials.UI.UserConsentVerificationResult])
+  Write-Output ('RESULT:' + $r)
+}
+"""
+
+
+def _dev_name(name):
+    name = str(name or "")
+    return name if re.match(r"^[A-Za-z0-9_-]{4,64}$", name) else None
+
+
+def _dev_reason(reason):
+    r = re.sub(r"[^A-Za-z0-9 ,.:;()?!’-]", " ", str(reason or "open Ingenium"))
+    return re.sub(r"\s+", " ", r).strip()[:140] or "open Ingenium"
+
+
+# -- on a Mac: the helper built from tools/IngeniumKey.swift, beside the app's own program --
+def _dev_mac_helper():
+    exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+    for base in (exe_dir, getattr(sys, "_MEIPASS", None)):
+        if base:
+            p = os.path.join(base, "IngeniumKey")
+            if os.path.isfile(p) and os.access(p, os.X_OK):
+                return p
+    return None
+
+
+def _dev_mac(args, timeout=180):
+    h = _dev_mac_helper()
+    if not h:
+        return {"ok": False, "error": "This copy of the app was built without the Touch ID helper.", "nohelper": True}
+    try:
+        r = subprocess.run([h] + list(args), capture_output=True, text=True, timeout=timeout)
+        lines = [x for x in (r.stdout or "").strip().splitlines() if x.strip().startswith("{")]
+        if not lines:
+            return {"ok": False, "error": ((r.stderr or "").strip() or "The Touch ID helper gave no answer.")[:240]}
+        return json.loads(lines[-1])
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": "The Mac did not answer in time.", "cancelled": True}
+    except Exception as e:
+        return {"ok": False, "error": str(e)[:240]}
+
+
+# -- on Windows: Windows Hello through Windows PowerShell, and the key sealed with DPAPI in the app's own folder --
+def _dev_win_hello(mode, reason=""):
+    script = _HELLO_PS.replace("__MODE__", "check" if mode == "check" else "verify").replace("__REASON__", _dev_reason(reason).replace("'", "’"))
+    r = subprocess.run(["powershell", "-NoProfile", "-STA", "-ExecutionPolicy", "Bypass", "-Command", script],
+                       capture_output=True, text=True, timeout=180, creationflags=0x08000000)
+    return (r.stdout or "") + "\n" + (r.stderr or "")
+
+
+def _dev_dpapi(data, protect):
+    import ctypes
+    from ctypes import wintypes
+
+    class _BLOB(ctypes.Structure):
+        _fields_ = [("cbData", wintypes.DWORD), ("pbData", ctypes.POINTER(ctypes.c_char))]
+
+    def blob(b):
+        buf = ctypes.create_string_buffer(b, len(b))
+        return _BLOB(len(b), ctypes.cast(buf, ctypes.POINTER(ctypes.c_char))), buf
+
+    crypt32, kernel32 = ctypes.windll.crypt32, ctypes.windll.kernel32
+    inp, _k1 = blob(data)
+    ent, _k2 = blob(_DEV_ENTROPY)
+    out = _BLOB()
+    if protect:
+        crypt32.CryptProtectData.argtypes = [ctypes.POINTER(_BLOB), wintypes.LPCWSTR, ctypes.POINTER(_BLOB), ctypes.c_void_p, ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(_BLOB)]
+        ok = crypt32.CryptProtectData(ctypes.byref(inp), "Ingenium device key", ctypes.byref(ent), None, None, 0x01, ctypes.byref(out))
+    else:
+        crypt32.CryptUnprotectData.argtypes = [ctypes.POINTER(_BLOB), ctypes.c_void_p, ctypes.POINTER(_BLOB), ctypes.c_void_p, ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(_BLOB)]
+        ok = crypt32.CryptUnprotectData(ctypes.byref(inp), None, ctypes.byref(ent), None, None, 0x01, ctypes.byref(out))
+    if not ok:
+        raise OSError("Windows could not seal or open the key.")
+    try:
+        return ctypes.string_at(out.pbData, out.cbData)
+    finally:
+        kernel32.LocalFree(out.pbData)
+
+
+def _dev_win_file(name):
+    return os.path.join(str(_rag_app_dir()), "device-keys", name + ".key")
+
+
+def _dev_win_verify(reason):
+    out = _dev_win_hello("verify", reason)
+    if "RESULT:Verified" in out:
+        return None
+    if "RESULT:Canceled" in out:
+        return {"ok": False, "error": "Windows Hello was cancelled.", "cancelled": True}
+    if "RESULT:" in out:
+        return {"ok": False, "error": "Windows Hello did not confirm it is you (" + out.split("RESULT:", 1)[1].split()[0] + ")."}
+    return {"ok": False, "error": "Windows Hello could not be asked on this computer."}
+
+
+def _device_unlock_info():
+    try:
+        if sys.platform == "darwin":
+            r = _dev_mac(["info"], 30)
+            return r if r.get("ok") else {"ok": True, "kind": "none", "label": "", "why": r.get("error", "")}
+        if sys.platform.startswith("win"):
+            out = _dev_win_hello("check")
+            if "AVAIL:Available" in out:
+                return {"ok": True, "kind": "hello", "label": "Windows Hello"}
+            return {"ok": True, "kind": "none", "label": "", "why": "Windows Hello is not set up on this computer (Settings, Accounts, Sign-in options)."}
+        return {"ok": True, "kind": "none", "label": "", "why": "Not on this kind of computer."}
+    except Exception:
+        log_problem("device_unlock_info failed", sys.exc_info())
+        return {"ok": True, "kind": "none", "label": "", "why": "This computer could not be asked."}
+
+
+def _device_key_make(name, reason=""):
+    name = _dev_name(name)
+    if not name:
+        return {"ok": False, "error": "That is not the name of a key."}
+    try:
+        if sys.platform == "darwin":
+            return _dev_mac(["make", name, _dev_reason(reason)])
+        if sys.platform.startswith("win"):
+            no = _dev_win_verify(reason)
+            if no:
+                return no
+            key = os.urandom(32)
+            sealed = _dev_dpapi(key, True)
+            path = _dev_win_file(name)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            tmp = path + ".part"
+            with open(tmp, "wb") as fh:
+                fh.write(sealed)
+            os.replace(tmp, path)
+            return {"ok": True, "key": base64.b64encode(key).decode("ascii")}
+        return {"ok": False, "error": "Not on this kind of computer."}
+    except Exception:
+        log_problem("device_key_make failed", sys.exc_info())
+        return {"ok": False, "error": "The key could not be kept on this computer."}
+
+
+def _device_key_get(name, reason=""):
+    name = _dev_name(name)
+    if not name:
+        return {"ok": False, "error": "That is not the name of a key."}
+    try:
+        if sys.platform == "darwin":
+            return _dev_mac(["get", name, _dev_reason(reason)])
+        if sys.platform.startswith("win"):
+            path = _dev_win_file(name)
+            if not os.path.isfile(path):
+                return {"ok": False, "error": "This computer holds no key for this copy of Ingenium.", "missing": True}
+            no = _dev_win_verify(reason)
+            if no:
+                return no
+            with open(path, "rb") as fh:
+                key = _dev_dpapi(fh.read(), False)
+            if len(key) != 32:
+                return {"ok": False, "error": "The key kept on this computer is not whole."}
+            return {"ok": True, "key": base64.b64encode(key).decode("ascii")}
+        return {"ok": False, "error": "Not on this kind of computer."}
+    except Exception:
+        log_problem("device_key_get failed", sys.exc_info())
+        return {"ok": False, "error": "The key could not be read on this computer."}
+
+
+def _device_key_drop(name):
+    name = _dev_name(name)
+    if not name:
+        return {"ok": False, "error": "That is not the name of a key."}
+    try:
+        if sys.platform == "darwin":
+            return _dev_mac(["drop", name], 30)
+        if sys.platform.startswith("win"):
+            path = _dev_win_file(name)
+            if os.path.isfile(path):
+                os.remove(path)
+            return {"ok": True}
+        return {"ok": True}
+    except Exception:
+        log_problem("device_key_drop failed", sys.exc_info())
+        return {"ok": False, "error": "The key could not be removed."}
+
+
+# 6.19 (app_page_619.py): Ingenium's own page, changed by its author, in place of the built one; back to the last that worked
+_PAGE = {"builtin": None, "serve": None, "running": "", "port": None, "lock": threading.RLock()}
+_PAGE_KEEP = 5  # versions kept; the one in use and the last that worked are never removed
+_PAGE_WAIT = 30  # seconds a changed page has to report in, when chosen in the window
+_PAGE_TAIL_IDS = ("ing-builtin-cd", "ing-builtin-forge", "ing-builtin-inkwell", "ingenium-kit-bundle", "ingenium-engine-wasm",
+                  "ingenium-engine-compat-wasm", "ing-eyes", "ing-docfonts")
+
+
+def _pages_dir():
+    """<the app's folder>/pages, beside storage (so a fresh start that moves the storage aside leaves it in place)."""
+    try:
+        store = storage_dir()
+        if not store:
+            return None
+        d = os.path.join(os.path.dirname(store.rstrip("\\/")), "pages")
+        os.makedirs(d, exist_ok=True)
+        return d
+    except Exception:
+        log_problem("pages: no folder", sys.exc_info())
+        return None
+
+
+def _pages_read():
+    st = {"use": "", "good": {}, "tries": {}, "notes": {}, "base": {}, "back": None}
+    d = _pages_dir()
+    if not d:
+        return st
+    try:
+        with open(os.path.join(d, "pages.json"), encoding="utf-8") as fh:
+            got = json.load(fh)
+        if isinstance(got, dict):
+            if isinstance(got.get("use"), str):
+                st["use"] = got["use"]
+            for k in ("good", "tries", "notes", "base"):
+                if isinstance(got.get(k), dict):
+                    st[k] = got[k]
+            if isinstance(got.get("back"), dict):
+                st["back"] = got["back"]
+    except FileNotFoundError:
+        pass
+    except Exception:
+        log_problem("pages: the record could not be read; the built page", sys.exc_info())
+    return st
+
+
+def _pages_write(st):
+    d = _pages_dir()
+    if not d:
+        return False
+    try:
+        tmp = os.path.join(d, "pages.json.tmp")
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump(st, fh, indent=1)
+        os.replace(tmp, os.path.join(d, "pages.json"))
+        return True
+    except Exception:
+        log_problem("pages: the record could not be written", sys.exc_info())
+        return False
+
+
+def _page_file(pid):
+    d = _pages_dir()
+    if not d or not re.match(r"^[0-9]{8}-[0-9]{6}(-[0-9]{1,3})?$", str(pid or "")):
+        return None
+    return os.path.join(d, str(pid), "ingenium.html")
+
+
+def _page_versions(st=None):
+    st = st or _pages_read()
+    d = _pages_dir()
+    out = []
+    if not d:
+        return out
+    try:
+        names = sorted(os.listdir(d), reverse=True)
+    except Exception:
+        names = []
+    for name in names:
+        f = _page_file(name)
+        if f and os.path.isfile(f):
+            try:
+                tries = int(st["tries"].get(name, 0) or 0)
+            except Exception:
+                tries = 0
+            out.append({"id": name, "bytes": os.path.getsize(f), "when": os.path.getmtime(f), "good": bool(st["good"].get(name)),
+                        "tries": tries, "note": str(st["notes"].get(name, ""))[:300]})
+    return out
+
+
+def _page_back(st, pid, why):
+    """The version pid did not start: the last version that worked (or the built page) is used, and why is kept."""
+    to = ""
+    for v in _page_versions(st):
+        if v["id"] != pid and v["good"]:
+            to = v["id"]
+            break
+    st["use"] = to
+    st["back"] = {"from": pid, "to": to, "why": why, "at": time.time()}
+    if to:
+        st["tries"][to] = 0
+    _pages_write(st)
+    log_problem("pages: %s %s; back to %s" % (pid, why, to or "the built page"))
+    return to
+
+
+def _page_base_id(path):
+    """Which build of the built page this is: its size and a hash of its first and last megabyte."""
+    try:
+        n = os.path.getsize(path)
+        h = hashlib.sha256()
+        with open(path, "rb") as fh:
+            h.update(fh.read(1 << 20))
+            if n > (2 << 20):
+                fh.seek(n - (1 << 20))
+                h.update(fh.read(1 << 20))
+        return "%d:%s" % (n, h.hexdigest()[:16])
+    except Exception:
+        return ""
+
+
+def _set_app_page(path):
+    global _APP_HTML_PATH
+    _APP_HTML_PATH = path
+
+
+def _page_choose(builtin):
+    """The page this start serves: the version chosen by the author, unless it did not start; otherwise the built one."""
+    with _PAGE["lock"]:
+        _PAGE["builtin"] = _PAGE.get("builtin") or builtin
+        builtin = _PAGE["builtin"]
+        try:
+            st = _pages_read()
+            pid = st.get("use") or ""
+            base = _page_base_id(builtin) if builtin else ""
+            if pid and base and st["base"].get(pid) and st["base"][pid] != base:
+                pid = _page_back(st, pid, "was made on an earlier build of Ingenium, and Ingenium has been updated")
+            for _ in range(_PAGE_KEEP + 2):
+                if not pid:
+                    break
+                f = _page_file(pid)
+                if not f or not os.path.isfile(f):
+                    pid = _page_back(st, pid, "was not found")
+                    continue
+                try:
+                    tries = int(st["tries"].get(pid, 0) or 0)
+                except Exception:
+                    tries = 0
+                limit = 2 if st["good"].get(pid) else 1
+                if tries >= limit:
+                    pid = _page_back(st, pid, "did not start" + (" twice in a row" if limit == 2 else ""))
+                    continue
+                st["tries"][pid] = tries + 1
+                _pages_write(st)
+                _PAGE["serve"], _PAGE["running"] = f, pid
+                log_problem("pages: starting with the author's page %s (try %d)" % (pid, tries + 1))
+                return f
+        except Exception:
+            log_problem("pages: choosing the page failed; the built page", sys.exc_info())
+        _PAGE["serve"], _PAGE["running"] = None, ""
+        return builtin
+
+
+def _page_started():
+    """The page's Workshop reports in: the version running works."""
+    pid = _PAGE.get("running") or ""
+    if not pid:
+        return {"ok": True, "running": ""}
+    with _PAGE["lock"]:
+        st = _pages_read()
+        st["good"][pid] = True
+        st["tries"][pid] = 0
+        _pages_write(st)
+    log_problem("pages: the author's page %s reported in" % pid)
+    return {"ok": True, "running": pid}
+
+
+def _page_state():
+    st = _pages_read()
+    b = _PAGE.get("builtin")
+    try:
+        bb = os.path.getsize(b) if b and os.path.isfile(b) else 0
+    except Exception:
+        bb = 0
+    return {"ok": True, "use": st.get("use") or "", "running": _PAGE.get("running") or "", "versions": _page_versions(st),
+            "back": st.get("back"), "builtin": {"bytes": bb}, "folder": _pages_dir() or "", "now": bool(_PAGE.get("port"))}
+
+
+def _page_tails(text):
+    """{id: the whole block}, for the blocks a page carries at its end (build/tail.py)."""
+    out = {}
+    for m in re.finditer(rb'<script id="ing-tail:([^"]+)"[^>]*>[^<]*</script>\n?', text):
+        out[m.group(1).decode("ascii", "replace")] = m.group(0)
+    return out
+
+
+def _page_complete(text):
+    """(page, put back, missing): the blocks the page names but lacks, put back from the running page, before </body>."""
+    for ident in _PAGE_TAIL_IDS:  # a page saved from the window names the app's own address for them (app_quick_681.py)
+        text = text.replace(b'data-defer="/_payload/' + ident.encode() + b'"', b'data-defer="#ing-tail:' + ident.encode() + b'"')
+        text = re.sub(rb'(data-defer="#ing-tail:' + re.escape(ident.encode()) + rb'") data-defer-bytes="\d+"', rb"\1", text)
+    named = [m.decode("ascii", "replace") for m in re.findall(rb'data-defer="#ing-tail:([^"]+)"', text)]
+    have = _page_tails(text)
+    want = [k for k in dict.fromkeys(named) if k not in have]
+    if not want:
+        return text, 0, []
+    try:
+        with open(_APP_HTML_PATH, "rb") as fh:
+            running = _page_tails(fh.read())
+    except Exception:
+        running = {}
+    add = b"".join((running[k] if running[k].endswith(b"\n") else running[k] + b"\n") for k in want if k in running)
+    missing = [k for k in want if k not in running]
+    i = text.rfind(b"</body>")
+    text = (text[:i] + add + text[i:]) if i >= 0 else (text + add)
+    return text, len(want) - len(missing), missing
+
+
+def _page_take(inc, note):
+    raw = open(inc, "rb").read()
+    try:
+        raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return {"ok": False, "error": "the page is not text Ingenium can read (UTF-8)"}
+    low = raw[:4096].lower()
+    if b"<html" not in low and b"<!doctype html" not in low:
+        return {"ok": False, "error": "this is not a web page"}
+    if b"__INGENIUM_BOOTED" not in raw:
+        return {"ok": False, "error": "this is not Ingenium's page: it never says it has started (window.__INGENIUM_BOOTED)"}
+    text, back, missing = _page_complete(raw)
+    d = _pages_dir()
+    pid = time.strftime("%Y%m%d-%H%M%S")
+    k = 2
+    while os.path.exists(os.path.join(d, pid)):
+        pid = time.strftime("%Y%m%d-%H%M%S") + "-%d" % k
+        k += 1
+    os.makedirs(os.path.join(d, pid))
+    with open(os.path.join(d, pid, "ingenium.html"), "wb") as fh:
+        fh.write(text)
+    try:
+        os.remove(inc)
+    except Exception:
+        pass
+    with _PAGE["lock"]:
+        st = _pages_read()
+        if note:
+            st["notes"][pid] = str(note)[:300]
+        if _PAGE.get("builtin"):
+            st["base"][pid] = _page_base_id(_PAGE["builtin"])
+        _pages_write(st)
+        _page_prune(st)
+    log_problem("pages: version %s kept (%d bytes; %d carried blocks put back; missing %r)" % (pid, len(text), back, missing))
+    return {"ok": True, "id": pid, "bytes": len(text), "put_back": back, "missing": missing}
+
+
+def _page_prune(st):
+    """At most _PAGE_KEEP versions; the one in use, the one running and the last that worked stay."""
+    vs = _page_versions(st)
+    keep = set([st.get("use") or "", _PAGE.get("running") or ""])
+    for v in vs:
+        if v["good"]:
+            keep.add(v["id"])
+            break
+    extra = [v for v in vs[_PAGE_KEEP:] if v["id"] not in keep]
+    for v in extra:
+        _page_remove(st, v["id"])
+    if extra:
+        _pages_write(st)
+
+
+def _page_remove(st, pid):
+    f = _page_file(pid)
+    if f:
+        shutil.rmtree(os.path.dirname(f), ignore_errors=True)
+    for k in ("good", "tries", "notes", "base"):
+        st[k].pop(pid, None)
+
+
+def _page_put(piece, first=False, last=False, note=""):
+    """A changed page, in pieces of text (in order); the last piece keeps it as a version of its own."""
+    d = _pages_dir()
+    if not d:
+        return {"ok": False, "error": "this computer has no folder for pages"}
+    inc = os.path.join(d, "incoming.part")
+    try:
+        with _PAGE["lock"]:
+            with open(inc, "wb" if first else "ab") as fh:
+                fh.write(str(piece or "").encode("utf-8"))
+        if not last:
+            return {"ok": True, "bytes": os.path.getsize(inc)}
+        return _page_take(inc, note)
+    except Exception as e:
+        log_problem("pages: a piece could not be kept", sys.exc_info())
+        return {"ok": False, "error": str(e)}
+
+
+def _page_drop(pid):
+    pid = str(pid or "")
+    with _PAGE["lock"]:
+        st = _pages_read()
+        if pid in (st.get("use"), _PAGE.get("running")):
+            return {"ok": False, "error": "that version is in use; choose another first"}
+        if not _page_file(pid) or not os.path.isfile(_page_file(pid)):
+            return {"ok": False, "error": "that version is not kept"}
+        _page_remove(st, pid)
+        _pages_write(st)
+    return {"ok": True}
+
+
+def _page_use(pid, now=False, window=None):
+    """Choose a version ("" for the built page): now, in this window, or at the next start."""
+    pid = str(pid or "")
+    if pid and not (_page_file(pid) and os.path.isfile(_page_file(pid))):
+        return {"ok": False, "error": "that version is not kept"}
+    with _PAGE["lock"]:
+        st = _pages_read()
+        st["use"] = pid
+        if pid:
+            st["tries"][pid] = 0
+            if _PAGE.get("builtin"):
+                st["base"][pid] = _page_base_id(_PAGE["builtin"])  # chosen on the build installed now
+        st["back"] = None
+        _pages_write(st)
+    if now and window is not None and _PAGE.get("port"):
+        return _page_switch(window)
+    return {"ok": True, "use": pid, "restart": True}
+
+
+def _page_switch(window):
+    """In this window, now: the chosen page is served at the same address and loaded afresh. A changed page that has not
+    reported in within half a minute is left, and the last that worked is loaded instead."""
+    f = _page_choose(_PAGE.get("builtin"))
+    _set_app_page(f)
+    pid = _PAGE.get("running") or ""
+    name = os.path.basename(_PAGE.get("builtin") or "ingenium.html")
+    url = "http://127.0.0.1:%d/%s?b=%s" % (_PAGE["port"], name, _page_mark(f))
+    try:
+        if _GFX_SOFT[0]:
+            url += "&softgpu=1"
+    except Exception:
+        pass
+
+    def go():
+        done = False
+        try:
+            if sys.platform == "darwin" and "_restart_page_process" in globals():
+                done = _restart_page_process(window, url)
+            if not done:
+                window.load_url(url)
+            log_problem("pages: the window loads %s" % (pid or "the built page"))
+        except BaseException:
+            log_problem("pages: the window could not load the page", sys.exc_info())
+
+    threading.Thread(target=go, daemon=True).start()
+    if pid and not _pages_read()["good"].get(pid):
+        def watch():
+            time.sleep(_PAGE_WAIT)
+            with _PAGE["lock"]:
+                if _PAGE.get("running") != pid or _pages_read()["good"].get(pid):
+                    return
+                _page_back(_pages_read(), pid, "did not start")
+            _page_switch(window)
+        threading.Thread(target=watch, daemon=True).start()
+    return {"ok": True, "running": pid, "now": True}
+
+
+def _page_not_up(window):
+    """The load watchdog found the page not started: a changed page that never worked is left at once."""
+    pid = _PAGE.get("running") or ""
+    if not pid or not _PAGE.get("port") or _pages_read()["good"].get(pid):
+        return False
+    with _PAGE["lock"]:
+        _page_back(_pages_read(), pid, "did not start")
+    _page_switch(window)
+    return True
+
+
+def _page_save_target(name):
+    """Where she chooses, in the computer's own save dialog: (path, shown)."""
+    keep = " ._-()[]"
+    safe = "".join(c for c in str(name or "ingenium.html") if c.isalnum() or c in keep).strip() or "ingenium.html"
+    try:
+        import webview
+        ws = [x for x in (getattr(webview, "windows", None) or []) if x is not None]
+        if ws:
+            res = ws[0].create_file_dialog(webview.SAVE_DIALOG, save_filename=safe)
+            if not res:
+                return None, True
+            return (res if isinstance(res, str) else res[0]), True
+    except Exception:
+        log_problem("pages: save dialog unavailable", sys.exc_info())
+    try:
+        d = os.path.join(os.path.expanduser("~"), "Downloads")
+        if not os.path.isdir(d):
+            d = os.path.expanduser("~")
+        return os.path.join(d, safe), False
+    except Exception:
+        return None, False
+
+
+def _page_save(pid="", name="ingenium.html"):
+    """6.20 (app_page_620.py): the page running ("") or a version kept, copied where she chooses."""
+    pid = str(pid or "")
+    src = _page_file(pid) if pid else _APP_HTML_PATH
+    if not src or not os.path.isfile(src):
+        return {"ok": False, "error": "that page is not on this computer"}
+    with _SAVE_LOCK:
+        target, shown = _page_save_target(name)
+        if shown and not target:
+            return "cancelled"
+        if not target:
+            return {"ok": False, "error": "no folder to save it in"}
+        try:
+            shutil.copyfile(src, target)
+            log_problem("pages: %s saved to %s" % (pid or "the page running", target))
+            return target
+        except Exception as e:
+            log_problem("pages: saving the page failed", sys.exc_info())
+            return {"ok": False, "error": str(e)}
+
+
+def _page_export(piece, first=False, last=False, name="ingenium.html"):
+    """6.20 (app_page_620.py): the lighter copy, in pieces; on the last, made whole and written where she chooses."""
+    d = _pages_dir()
+    if not d:
+        return {"ok": False, "error": "this computer has no folder for pages"}
+    inc = os.path.join(d, "export.part")
+    try:
+        with _PAGE["lock"]:
+            with open(inc, "wb" if first else "ab") as fh:
+                fh.write(str(piece or "").encode("utf-8"))
+        if not last:
+            return {"ok": True, "bytes": os.path.getsize(inc)}
+        raw = open(inc, "rb").read()
+        try:
+            os.remove(inc)
+        except Exception:
+            pass
+        text, back, missing = _page_complete(raw)
+        with _SAVE_LOCK:
+            target, shown = _page_save_target(name)
+            if shown and not target:
+                return "cancelled"
+            if not target:
+                return {"ok": False, "error": "no folder to save it in"}
+            with open(target, "wb") as fh:
+                fh.write(text)
+        log_problem("pages: the lighter copy saved whole to %s (%d carried blocks put back; missing %r)" % (target, back, missing))
+        return target
+    except Exception as e:
+        log_problem("pages: the copy could not be saved", sys.exc_info())
+        return {"ok": False, "error": str(e)}
 
 
 class IngeniumApi(_LiteWindows):
@@ -2045,6 +3230,28 @@ class IngeniumApi(_LiteWindows):
     def take_screenshot(self):
         return _take_screenshot()
 
+    # 6.19 (app_page_619.py): Ingenium's own page, changed by its author
+    def page_state(self):
+        return _page_state()
+
+    def page_put(self, piece, first=False, last=False, note=""):
+        return _page_put(piece, first, last, note)
+
+    def page_use(self, pid, now=False):
+        return _page_use(pid, now, getattr(self, "_main_window", None))
+
+    def page_drop(self, pid):
+        return _page_drop(pid)
+
+    def page_started(self):
+        return _page_started()
+
+    def page_save(self, pid="", name="ingenium.html"):
+        return _page_save(pid, name)
+
+    def page_export(self, piece, first=False, last=False, name="ingenium.html"):
+        return _page_export(piece, first, last, name)
+
     # 6.9.2: the folder search (app_rag_692.py; rag/DESIGN.md section 6)
     def rag_choose_folder(self):
         return _rag_choose_folder(getattr(self, "_main_window", None))
@@ -2060,6 +3267,26 @@ class IngeniumApi(_LiteWindows):
 
     def rag_read(self, path, rel, offset=0, length=1048576):
         return _rag_read(path, rel, offset, length)
+
+    # 6.10: Claude Code's sessions on this computer, read on her press (app_claude_610.py)
+    def claude_sessions(self):
+        return _claude_sessions()
+
+    def claude_session_read(self, rel, offset=0, length=4194304):
+        return _claude_session_read(rel, offset, length)
+
+    # 6.10.1: the computer's own sign-in as a way back into Ingenium (app_device_6101.py)
+    def device_unlock_info(self):
+        return _device_unlock_info()
+
+    def device_key_make(self, name, reason=""):
+        return _device_key_make(name, reason)
+
+    def device_key_get(self, name, reason=""):
+        return _device_key_get(name, reason)
+
+    def device_key_drop(self, name):
+        return _device_key_drop(name)
 
     def open_url(self, url):
         return _open_url(url)
@@ -2078,10 +3305,29 @@ class IngeniumApi(_LiteWindows):
         return _train_start(spec)
 
     def train_status(self):
-        return _train_status()
+        return _train_status_692()
 
     def train_cancel(self):
         return _train_cancel()
+
+    # 6.9.x (app_data_692.py): the text as a file, a piece at a time; a run cut short goes on, or is let go
+    def train_text_put(self, chunk, first=False):
+        return _train_text_put(chunk, first)
+
+    def train_resume(self):
+        return _train_resume()
+
+    def train_discard(self):
+        return _train_discard()
+
+    def train_perplexity(self, model_id):
+        return _perplexity_start(model_id)
+
+    def train_perplexity_status(self):
+        return _perplexity_status()
+
+    def train_perplexity_cancel(self):
+        return _perplexity_cancel()
 
     def write_clipboard(self, text):
         return _clipboard_write(text)
@@ -2129,6 +3375,13 @@ class IngeniumApi(_LiteWindows):
 
     def engine_status(self):
         return _engine_status()
+
+    # 6.10.5: a newer engine beside the proven one (app_engine2_6105.py)
+    def engine_choice(self):
+        return _engine_choice()
+
+    def engine_choice_set(self, choice):
+        return _engine_choice_set(choice)
 
     def engine_unload(self):
         _engine_stop()
@@ -2186,6 +3439,14 @@ class IngeniumApi(_LiteWindows):
     def share_set(self, on):
         return _share_set(bool(on))
 
+    # 6.57 (app_cloud_657.py): this computer keeps Ingenium Cloud for her other devices (the gateway runs, the computer stays awake)
+    def cloud_box_set(self, on):
+        c = _share_cfg()
+        c["cloud"] = bool(on)
+        _share_cfg_save(c)
+        _share_apply()
+        return _share_status()
+
     def share_renew_code(self):
         return _share_renew_code()
 
@@ -2227,6 +3488,13 @@ class IngeniumApi(_LiteWindows):
 
     def share_firewall_allow(self):
         return _share_firewall_allow()
+
+    # 6.9.3: how this computer lends (app_lend_693.py)
+    def share_option_set(self, key, value):
+        return _share_option_set(str(key), value)
+
+    def share_advise(self, models):
+        return _share_advise(models)
 
     # R81: big texts, kept apart from the desk (see _big_put above).
     def big_put(self, bid, text):
@@ -2333,6 +3601,28 @@ class IngeniumApiSingle(_LiteWindows):
     def take_screenshot(self):
         return _take_screenshot()
 
+    # 6.19 (app_page_619.py): Ingenium's own page, changed by its author
+    def page_state(self):
+        return _page_state()
+
+    def page_put(self, piece, first=False, last=False, note=""):
+        return _page_put(piece, first, last, note)
+
+    def page_use(self, pid, now=False):
+        return _page_use(pid, now, getattr(self, "_main_window", None))
+
+    def page_drop(self, pid):
+        return _page_drop(pid)
+
+    def page_started(self):
+        return _page_started()
+
+    def page_save(self, pid="", name="ingenium.html"):
+        return _page_save(pid, name)
+
+    def page_export(self, piece, first=False, last=False, name="ingenium.html"):
+        return _page_export(piece, first, last, name)
+
     # 6.9.2: the folder search (app_rag_692.py; rag/DESIGN.md section 6)
     def rag_choose_folder(self):
         return _rag_choose_folder(getattr(self, "_main_window", None))
@@ -2348,6 +3638,26 @@ class IngeniumApiSingle(_LiteWindows):
 
     def rag_read(self, path, rel, offset=0, length=1048576):
         return _rag_read(path, rel, offset, length)
+
+    # 6.10: Claude Code's sessions on this computer, read on her press (app_claude_610.py)
+    def claude_sessions(self):
+        return _claude_sessions()
+
+    def claude_session_read(self, rel, offset=0, length=4194304):
+        return _claude_session_read(rel, offset, length)
+
+    # 6.10.1: the computer's own sign-in as a way back into Ingenium (app_device_6101.py)
+    def device_unlock_info(self):
+        return _device_unlock_info()
+
+    def device_key_make(self, name, reason=""):
+        return _device_key_make(name, reason)
+
+    def device_key_get(self, name, reason=""):
+        return _device_key_get(name, reason)
+
+    def device_key_drop(self, name):
+        return _device_key_drop(name)
 
     def open_url(self, url):
         return _open_url(url)
@@ -2366,10 +3676,29 @@ class IngeniumApiSingle(_LiteWindows):
         return _train_start(spec)
 
     def train_status(self):
-        return _train_status()
+        return _train_status_692()
 
     def train_cancel(self):
         return _train_cancel()
+
+    # 6.9.x (app_data_692.py): the text as a file, a piece at a time; a run cut short goes on, or is let go
+    def train_text_put(self, chunk, first=False):
+        return _train_text_put(chunk, first)
+
+    def train_resume(self):
+        return _train_resume()
+
+    def train_discard(self):
+        return _train_discard()
+
+    def train_perplexity(self, model_id):
+        return _perplexity_start(model_id)
+
+    def train_perplexity_status(self):
+        return _perplexity_status()
+
+    def train_perplexity_cancel(self):
+        return _perplexity_cancel()
 
     def write_clipboard(self, text):
         return _clipboard_write(text)
@@ -2412,6 +3741,13 @@ class IngeniumApiSingle(_LiteWindows):
 
     def engine_status(self):
         return _engine_status()
+
+    # 6.10.5: a newer engine beside the proven one (app_engine2_6105.py)
+    def engine_choice(self):
+        return _engine_choice()
+
+    def engine_choice_set(self, choice):
+        return _engine_choice_set(choice)
 
     def engine_unload(self):
         _engine_stop()
@@ -2469,6 +3805,14 @@ class IngeniumApiSingle(_LiteWindows):
     def share_set(self, on):
         return _share_set(bool(on))
 
+    # 6.57 (app_cloud_657.py): this computer keeps Ingenium Cloud for her other devices (the gateway runs, the computer stays awake)
+    def cloud_box_set(self, on):
+        c = _share_cfg()
+        c["cloud"] = bool(on)
+        _share_cfg_save(c)
+        _share_apply()
+        return _share_status()
+
     def share_renew_code(self):
         return _share_renew_code()
 
@@ -2510,6 +3854,13 @@ class IngeniumApiSingle(_LiteWindows):
 
     def share_firewall_allow(self):
         return _share_firewall_allow()
+
+    # 6.9.3: how this computer lends (app_lend_693.py)
+    def share_option_set(self, key, value):
+        return _share_option_set(str(key), value)
+
+    def share_advise(self, models):
+        return _share_advise(models)
 
     # R81: big texts, kept apart from the desk (see _big_put above).
     def big_put(self, bid, text):
@@ -2733,7 +4084,7 @@ def _model_places():
             _MODEL_PATHS.pop(mid, None)
             continue
         try:
-            size = os.path.getsize(mp)
+            size = _gguf_total_size(mp)
         except OSError:
             size = 0
         if mid in _MODEL_EXTERNAL:
@@ -2822,6 +4173,8 @@ def _move_model(mid, to):
         return {"ok": False, "error": "You linked that file where it is, so Ingenium leaves it there."}
     if _ENGINE.get("model_id") == mid and _ENGINE.get("state") in ("loading", "ready"):
         return {"ok": False, "error": "That model is running. Unload it first, then move it."}
+    if len(_gguf_parts_of(src)) > 1:    # 6.10.2: a model in parts moves part by part
+        return _move_parts(mid, src, to)
     if to == "computer":
         dest_dir = _models_dir()
     else:
@@ -3213,14 +4566,10 @@ def _engine_devices(d):
 
 
 def _engine_gpu(d):
-    """The graphics chip the engine can use, or "" for the processor alone."""
-    devs = _engine_devices(d) if d else []
-    if devs:
-        return devs[0]["name"]
-    if devs is None and d and (_engine_platform() == "macos-arm64" or
-                               os.path.isfile(os.path.join(d, "ggml-vulkan.dll"))):
-        return "Metal" if _engine_platform() == "macos-arm64" else "Vulkan"
-    return ""
+    """The graphics chip the engine is to use, or "" for the processor alone. 6.9.3: a small chip that shares the computer's
+    memory is not used, and the sharing settings can say Processor only or Graphics chip (_engine_gpu_pick)."""
+    name, use, _why = _engine_gpu_pick(d, True, wait=False)
+    return name if use else ""
 
 
 def _mac_too_old():
@@ -3381,7 +4730,9 @@ def _engine_launch(path, n_ctx, mmp, use_gpu, drafter=None):
     # With a graphics chip the engine fits as many layers on it as its memory
     # holds (its own --fit, on by default); without one, none are sent there.
     if not use_gpu:
-        args += ["-ngl", "0"]
+        args += ["--device", "none", "-ngl", "0", "-b", "512"]    # 6.9.3: no chip at all; short batches, so the engine reports often
+    elif _LEND_GPU_IDS[0]:
+        args += ["--device", _LEND_GPU_IDS[0]]                    # only the real cards, not the small chip beside them
     if mmp:
         args += ["--mmproj", mmp]
         if not use_gpu:
@@ -3418,14 +4769,13 @@ def _engine_start(model_id, n_ctx=8192, mmproj_id=None, gpu=True):
         n_ctx = max(512, min(int(n_ctx or 8192), _ING_CTX_MAX))
     except Exception:
         n_ctx = 8192
-    gpu_name = _engine_gpu(d)
-    use_gpu = bool(gpu) and bool(gpu_name)
+    gpu_name, use_gpu, gpu_why = _engine_gpu_pick(d, gpu, wait=True)    # 6.9.3
     # R73: measured in the cloud builds, a speed-up file made replies slower
     # where the model runs on the processor alone (about a quarter to a third
     # slower on GitHub's Windows and Intel Mac machines), so it is used only
     # when the engine runs on a graphics chip
     drafter = None if (mmp or not use_gpu) else _drafter_for(str(model_id))
-    key = (path, n_ctx, mmp, drafter)
+    key = (path, n_ctx, mmp, drafter, bool(use_gpu))
     with _ENGINE_LOCK:
         p = _ENGINE["proc"]
         if p is not None and p.poll() is None and _ENGINE["key"] == key:
@@ -3439,7 +4789,8 @@ def _engine_start(model_id, n_ctx=8192, mmproj_id=None, gpu=True):
     with _ENGINE_LOCK:
         _ENGINE.update(proc=proc, port=port, key=key, model_id=str(model_id), args=(path, n_ctx, mmp, drafter),
                        state="loading", error="", note="", log=[], started=time.time(),
-                       gpu=gpu_name if use_gpu else "", draft=bool(drafter), kvq=_engine_kvq(n_ctx))
+                       gpu=gpu_name if use_gpu else "", draft=bool(drafter), kvq=_engine_kvq(n_ctx),
+                       gpu_why=gpu_why, revived=0)
     return {"ok": True, "port": port}
 
 
@@ -3500,6 +4851,8 @@ def _engine_status():
                 args = _ENGINE["args"] if _ENGINE["proc"] is p else None
             if args:
                 try:
+                    if "not enough memory" not in err:
+                        _LEND_GPU_OFF.update(off=True, why=err)       # 6.9.3: a chip that failed is left alone for the rest of the run
                     proc, port2, _a = _engine_launch(args[0], args[1], args[2], False, args[3] if len(args) > 3 else None)
                     with _ENGINE_LOCK:
                         if _ENGINE["proc"] is p:
@@ -3512,6 +4865,27 @@ def _engine_status():
                             "seconds": 0.0, "note": _ENGINE["note"]}
                 except Exception:
                     log_problem("engine: the processor-only retry could not start", sys.exc_info())
+        # 6.9.3: an engine that stops AFTER it was ready (a chip that gave way under a long message, or a crash) is started again
+        # once, on the processor alone if it had been using the chip; the chip is then left alone for the rest of this run
+        if state == "ready":
+            with _ENGINE_LOCK:
+                args = _ENGINE["args"] if _ENGINE["proc"] is p else None
+                revived = int(_ENGINE.get("revived") or 0)
+            if args and revived < 1:
+                if gpu:
+                    _LEND_GPU_OFF.update(off=True, why=err)
+                note = ("The graphics chip stopped, so this computer now uses its processor (slower)." if gpu
+                        else "The engine stopped, so it was started again.")
+                try:
+                    proc, port2, _a = _engine_launch(args[0], args[1], args[2], False, None)
+                    with _ENGINE_LOCK:
+                        if _ENGINE["proc"] is p:
+                            _ENGINE.update(proc=proc, port=port2, state="loading", log=[], gpu="", draft=False, revived=revived + 1,
+                                           args=(args[0], args[1], args[2], None), key=(args[0], args[1], args[2], None, False),
+                                           note=note, gpu_why=note, started=time.time())
+                    return {"state": "loading", "port": port2, "model_id": model_id, "log": [], "seconds": 0.0, "note": note}
+                except Exception:
+                    log_problem("engine: the restart after a stop could not start", sys.exc_info())
         with _ENGINE_LOCK:
             if _ENGINE["proc"] is p:
                 _ENGINE.update(proc=None, port=None, key=None, args=None, state="error", error=err, gpu="")
@@ -3732,7 +5106,7 @@ def _installed_models():
             lk = meta.get("lineup") or ""
             role = "drafter" if lk.endswith("-dspark") else ("projector" if lk.endswith("-mmproj") else "model")
             out.append({"id": mid, "name": meta.get("name") or os.path.basename(p), "file": meta.get("file") or os.path.basename(p),
-                        "size": os.path.getsize(p), "lineup": lk, "role": role})
+                        "size": _gguf_total_size(p), "lineup": lk, "role": role})
     return out
 
 
@@ -3899,6 +5273,579 @@ def _install_worker(job, sp):
         say(state="error", error=str(e) or e.__class__.__name__)
 
 
+
+# ---- 6.10.2: models in parts, for computers with far more memory (app_parts_6102.py) ----
+# llama.cpp names the parts of a model "%s-%05d-of-%05d.gguf" and finds the others from the first (llama_split_prefix and
+# llama_split_path in its llama.h); Hugging Face keeps no file over 50 GB, so every larger model comes this way.
+_SPLIT_RE = re.compile(r"^(.+)-(\d{5})-of-(\d{5})\.gguf$")
+
+
+def _gguf_parts_of(p):
+    """A model in parts: the path of every part, first to last, beside the first. Any other file: itself alone."""
+    p = str(p or "")
+    m = _SPLIT_RE.match(os.path.basename(p))
+    if not m or int(m.group(2)) != 1 or not (2 <= int(m.group(3)) <= 99):
+        return [p]
+    n, d = int(m.group(3)), os.path.dirname(p)
+    return [p] + [os.path.join(d, "%s-%05d-of-%05d.gguf" % (m.group(1), k, n)) for k in range(2, n + 1)]
+
+
+def _gguf_total_size(p):
+    """A model's size on disk: all of its parts together."""
+    t = 0
+    for q in _gguf_parts_of(p):
+        try:
+            t += os.path.getsize(q)
+        except OSError:
+            pass
+    return t
+
+
+_install_check_whole = _install_check
+
+
+def _install_check(spec):
+    """A model in parts names each part; the first part's name, address and fingerprint stand for the model, and its size is all of
+    the parts together. Every part must be the next in order, of the same count, on Hugging Face, and named in its own address."""
+    sp = _install_check_whole(spec)
+    if sp is None or not isinstance(spec, dict) or not isinstance(spec.get("parts"), list) or not spec.get("parts"):
+        return sp
+    raw = spec["parts"]
+    n = len(raw)
+    if not (2 <= n <= 99):
+        return None
+    parts = []
+    for k, x in enumerate(raw, 1):
+        if not isinstance(x, dict):
+            return None
+        try:
+            f, url = str(x.get("file") or ""), str(x.get("url") or "")
+            sha, size = str(x.get("sha256") or "").lower(), int(x.get("size") or 0)
+        except Exception:
+            return None
+        m = _SPLIT_RE.match(f)
+        if not (m and int(m.group(2)) == k and int(m.group(3)) == n and re.match(r"^[A-Za-z0-9._-]{1,200}$", f)
+                and url.startswith("https://huggingface.co/") and url.endswith("/" + f)
+                and re.match(r"^[0-9a-f]{64}$", sha) and size > 0):
+            return None
+        parts.append({"file": f, "url": url, "sha256": sha, "size": size})
+    if parts[0]["file"] != sp["file"] or parts[0]["sha256"] != sp["sha256"] or sum(x["size"] for x in parts) != sp["size"]:
+        return None
+    sp["parts"] = parts
+    return sp
+
+
+def _fetch_part(x, d, job, say, base, k, n):
+    """One part, as a whole model is fetched (R70, R84): carried on from where it stopped, and kept only when its SHA-256 matches.
+    Returns the verified file, still under its download name."""
+    part = d / (x["sha256"][:16] + ".dl.part")
+    have = part.stat().st_size if part.is_file() else 0
+    if have > x["size"]:
+        part.unlink()
+        have = 0
+    h = hashlib.sha256()
+    if have:
+        say(phase="resume", received=base + have)
+        done = 0
+        with open(str(part), "rb") as fh:
+            while done < have:
+                chunk = fh.read(min(4 << 20, have - done))
+                if not chunk:
+                    break
+                h.update(chunk)
+                done += len(chunk)
+                if job["stop"].is_set():
+                    raise _InstallStopped()
+        if done != have:
+            part.unlink()
+            have = 0
+            h = hashlib.sha256()
+    ctx = ssl.create_default_context(cafile=_CERT_FILE) if _CERT_FILE else ssl.create_default_context()
+    last_err = ""
+    cert_fail = False
+    for attempt in range(1, 7):
+        if have >= x["size"]:
+            break
+        if job["stop"].is_set():
+            raise _InstallStopped()
+        try:
+            req = urllib.request.Request(x["url"], headers={"User-Agent": "Ingenium"})
+            if have:
+                req.add_header("Range", "bytes=%d-" % have)
+            with urllib.request.urlopen(req, timeout=60, context=ctx) as r:
+                if r.status == 200 and have:   # the whole file again: start over
+                    have = 0
+                    h = hashlib.sha256()
+                elif r.status == 206:
+                    m = re.match(r"bytes (\d+)-", r.headers.get("Content-Range") or "")
+                    if not m or int(m.group(1)) != have:
+                        raise IOError("the server sent the wrong part of the file")
+                with open(str(part), "r+b" if (have and part.is_file()) else "wb") as out:
+                    out.seek(have)
+                    out.truncate()
+                    last = 0.0
+                    while True:
+                        chunk = r.read(1 << 20)
+                        if not chunk:
+                            break
+                        if have + len(chunk) > x["size"]:
+                            raise IOError("the file is larger than expected")
+                        out.write(chunk)
+                        h.update(chunk)
+                        have += len(chunk)
+                        if job["stop"].is_set():
+                            raise _InstallStopped()
+                        now = time.time()
+                        if now - last > 0.3:
+                            last = now
+                            say(received=base + have, phase="download")
+        except _InstallStopped:
+            raise
+        except urllib.error.HTTPError as e:
+            last_err = "the server answered %d" % e.code
+            if e.code in (401, 403, 404):
+                break
+        except Exception as e:
+            last_err = _relay_reason(e) if "_relay_reason" in globals() else str(e)
+            if _is_cert_error(e):
+                cert_fail = True
+                break
+        if have < x["size"]:
+            if job["stop"].wait(min(16, 2 ** attempt)):
+                raise _InstallStopped()
+    if cert_fail and have < x["size"] and sys.platform == "darwin":
+        log_problem("install of part %d of %d: Python refused the certificate (%s); the Mac's own curl carries it" % (k, n, last_err))
+
+        def say_part(**kw):
+            say(**dict(kw, received=base + int(kw.get("received") or 0)))
+        if _curl_fetch(x["url"], part, job, say_part):
+            have = part.stat().st_size if part.is_file() else 0
+            say(phase="verify", received=base + have)
+            h = hashlib.sha256()
+            with open(str(part), "rb") as fh:
+                while True:
+                    chunk = fh.read(4 << 20)
+                    if not chunk:
+                        break
+                    h.update(chunk)
+                    if job["stop"].is_set():
+                        raise _InstallStopped()
+    if have != x["size"]:
+        raise RuntimeError("the download of part %d of %d stopped part way (%s). Install again to carry on from where it stopped."
+                           % (k, n, last_err or "no reason given"))
+    say(phase="verify", received=base + have)
+    if h.hexdigest() != x["sha256"]:
+        part.unlink()
+        raise RuntimeError("part %d of %d does not match its SHA-256 fingerprint, so it was deleted" % (k, n))
+    return part
+
+
+def _install_parts_worker(job, sp):
+    def say(**kw):
+        with _INSTALLS_LOCK:
+            job.update(kw)
+    try:
+        mid = "lineup-" + _safe_id(sp["key"])
+        d = _models_store_dir()
+        if d is None:
+            raise RuntimeError("the app's models folder could not be made")
+        parts, n = sp["parts"], len(sp["parts"])
+        stem = "l" + sp["sha256"][:12]
+        dests = [d / ("%s-%05d-of-%05d.gguf" % (stem, k, n)) for k in range(1, n + 1)]
+        # a part under its own name was verified before it was given that name
+        whole = [q.is_file() and q.stat().st_size == x["size"] for q, x in zip(dests, parts)]
+        if all(whole) and _MODEL_META.get(mid, {}).get("sha256") == sp["sha256"]:
+            _MODEL_PATHS[mid] = str(dests[0])
+            say(state="done", id=mid, received=sp["size"], phase="verify")
+            return
+        left = 0
+        for x, w in zip(parts, whole):
+            if not w:
+                tmp = d / (x["sha256"][:16] + ".dl.part")
+                got = tmp.stat().st_size if tmp.is_file() else 0
+                left += x["size"] - (got if got <= x["size"] else 0)
+        free = shutil.disk_usage(str(d)).free
+        if free < left + 64 * 1024 * 1024:
+            raise RuntimeError("there is not enough free space %s (%.1f GB needed, %.1f GB free)"
+                               % ("on this computer" if _under(d, _models_dir()) else "on " + _drive_label(d), left / 1e9, free / 1e9))
+        base = 0
+        for k, (q, x, w) in enumerate(zip(dests, parts, whole), 1):
+            if not w:
+                say(phase="download", received=base)
+                got = _fetch_part(x, d, job, say, base, k, n)
+                os.replace(str(got), str(q))
+            base += x["size"]
+            say(received=base)
+        _MODEL_PATHS[mid] = str(dests[0])
+        _MODEL_EXTERNAL.discard(mid)
+        _MODEL_META[mid] = {"lineup": sp["key"], "name": sp["name"], "file": sp["file"], "sha256": sp["sha256"],
+                            "tiers": sp["tiers"], "parts": n}
+        _save_models_index()
+        say(state="done", id=mid)
+    except _InstallStopped:
+        say(state="cancelled", error="Stopped.")
+    except Exception as e:
+        log_problem("install of %s failed" % sp.get("key"), sys.exc_info())
+        say(state="error", error=str(e) or e.__class__.__name__)
+
+
+_install_worker_whole = _install_worker
+
+
+def _install_worker(job, sp):
+    if sp.get("parts"):
+        return _install_parts_worker(job, sp)
+    return _install_worker_whole(job, sp)
+
+
+def _move_parts(mid, src, to):
+    """A model in parts moves part by part, and counts as moved only when every part has arrived."""
+    if to == "computer":
+        dest_dir = _models_dir()
+    else:
+        c = _place_chosen()
+        dest_dir = pathlib.Path(c) if c else None
+        if dest_dir is None:
+            return {"ok": False, "error": "Choose a drive first."}
+    if dest_dir is None or not dest_dir.is_dir():
+        return {"ok": False, "error": "The drive is not connected."}
+    srcs = _gguf_parts_of(src)
+    if not all(os.path.isfile(q) for q in srcs):
+        return {"ok": False, "error": "A part of that model is missing, so it cannot be moved."}
+    dests = [dest_dir / os.path.basename(q) for q in srcs]
+    if os.path.realpath(str(dests[0])) == os.path.realpath(src):
+        return {"ok": True, "same": True}
+    size = sum(os.path.getsize(q) for q in srcs)
+    free = shutil.disk_usage(str(dest_dir)).free
+    if free < size + 64 * 1024 * 1024:
+        return {"ok": False, "error": "There is not enough room there (%.1f GB needed, %.1f GB free)." % (size / 1e9, free / 1e9)}
+    with _MOVES_LOCK:
+        job = _MOVES.get(mid)
+        if job and job["state"] == "running":
+            return {"ok": True, "already": True}
+        job = {"state": "running", "done": 0, "total": size, "error": "", "to": to, "stop": threading.Event()}
+        _MOVES[mid] = job
+
+    def work():
+        made = []
+        try:
+            for q, dst in zip(srcs, dests):
+                part = dst.with_name(dst.name + ".moving")
+                made.append(part)
+                want = os.path.getsize(q)
+                with open(q, "rb") as a, open(str(part), "wb") as b:
+                    while True:
+                        if job["stop"].is_set():
+                            raise _InstallStopped()
+                        chunk = a.read(8 << 20)
+                        if not chunk:
+                            break
+                        b.write(chunk)
+                        job["done"] += len(chunk)
+                    b.flush()
+                    os.fsync(b.fileno())
+                if os.path.getsize(str(part)) != want:
+                    raise RuntimeError("the copy came out a different size")
+            for part, dst in zip(made, dests):
+                os.replace(str(part), str(dst))
+            made = []
+            _MODEL_PATHS[mid] = str(dests[0])
+            _save_models_index()
+            for q in srcs:
+                try:
+                    os.remove(q)
+                except Exception:
+                    log_problem("move_model: the old copy of %r stays at %s" % (mid, q), sys.exc_info())
+            job["state"] = "done"
+        except _InstallStopped:
+            job.update(state="stopped")
+        except Exception as e:
+            log_problem("move_model(%r) failed" % (mid,), sys.exc_info())
+            job.update(state="error", error=str(e) or "the copy stopped")
+        finally:
+            for part in made:
+                try:
+                    if part.exists():
+                        part.unlink()
+                except Exception:
+                    pass
+    threading.Thread(target=work, daemon=True).start()
+    return {"ok": True}
+
+
+_pick_model_files_each = _pick_model_files
+
+
+def _pick_model_files(win):
+    """A model in parts is added by its first part, which reads the others from beside it; its size is all of them."""
+    rows = _pick_model_files_each(win)
+    if not isinstance(rows, list):
+        return rows
+    firsts = set()
+    for r in rows:
+        m = _SPLIT_RE.match(os.path.basename(str(r.get("path") or ""))) if r.get("ok") else None
+        if m and int(m.group(2)) == 1:
+            firsts.add((os.path.dirname(r["path"]), m.group(1), m.group(3)))
+    out = []
+    for r in rows:
+        m = _SPLIT_RE.match(os.path.basename(str(r.get("path") or ""))) if r.get("ok") else None
+        if not m:
+            out.append(r)
+            continue
+        k, n = int(m.group(2)), int(m.group(3))
+        if k != 1:
+            if (os.path.dirname(r["path"]), m.group(1), m.group(3)) not in firsts:
+                out.append({"name": r.get("name"), "ok": False,
+                            "reason": "part %d of %d of a model in parts: choose its first part (%s-00001-of-%05d.gguf), and the "
+                                      "others are read from beside it" % (k, n, m.group(1), n)})
+            continue
+        missing = [os.path.basename(q) for q in _gguf_parts_of(r["path"]) if not os.path.isfile(q)]
+        if missing:
+            out.append({"name": r.get("name"), "ok": False,
+                        "reason": "a model in %d parts, and %s%s %s not beside it" % (n, ", ".join(missing[:3]),
+                                                                                    " and more" if len(missing) > 3 else "",
+                                                                                    "is" if len(missing) == 1 else "are")})
+            continue
+        out.append(dict(r, size=_gguf_total_size(r["path"]), parts=n))
+    return out
+
+
+
+# ---- 6.10.5: a newer engine beside the proven one (app_engine2_6105.py) ----
+_ENGINE_NEXT_DIR_FOUND = []
+_ENGINE_USE = {"next": False, "forced": None}     # forced: "newer" or "proven", for the self-test
+_ENGINE_KIND = ["proven"]                         # which engine the running model was started on
+_ENGINE_NEXT_FAILED = set()                       # model files the newer engine could not load, this session
+_ENGINE_CHOICES = ("auto", "newer", "proven")
+
+
+def _engine_next_dir():
+    """The newer engine's folder (engine-next/<platform>/, or packed as engine-next/<platform>.zip), or None."""
+    if _ENGINE_NEXT_DIR_FOUND and os.path.isfile(os.path.join(_ENGINE_NEXT_DIR_FOUND[0], _ENGINE_EXE)):
+        return _ENGINE_NEXT_DIR_FOUND[0]
+    plat = _engine_platform()
+    found = None
+    for root in _app_roots():
+        d = os.path.join(root, "engine-next", plat)
+        if os.path.isfile(os.path.join(d, _ENGINE_EXE)):
+            found = d
+            break
+    if not found:
+        for root in _app_roots():
+            z = os.path.join(root, "engine-next", plat + ".zip")
+            if os.path.isfile(z):
+                found = _engine_unpack(z, plat)
+                if found:
+                    break
+    if found:
+        del _ENGINE_NEXT_DIR_FOUND[:]
+        _ENGINE_NEXT_DIR_FOUND.append(found)
+    return found
+
+
+_engine_dir_proven = _engine_dir
+
+
+def _engine_dir():
+    if _ENGINE_USE["next"] or _ENGINE_USE["forced"] == "newer":
+        d = _engine_next_dir()
+        if d:
+            return d
+    return _engine_dir_proven()
+
+
+def _engine_meta(d, name):
+    """VERSION.txt or ARCHS.txt beside an engine (or, inside a Mac app, among its resources)."""
+    if not d:
+        return None
+    kind = "engine-next" if os.path.normpath(os.path.dirname(d)).endswith("engine-next") else "engine"
+    for p in [os.path.join(d, name)] + [os.path.join(r, kind, _engine_platform(), name) for r in _app_roots()]:
+        if os.path.isfile(p):
+            try:
+                with open(p, encoding="utf-8") as fh:
+                    return fh.read()
+            except Exception:
+                return None
+    return None
+
+
+def _engine_archs(d):
+    """The kinds of model an engine lists (its llama-arch.cpp, written beside it when it was built), or None when unknown."""
+    t = _engine_meta(d, "ARCHS.txt")
+    if not t:
+        return None
+    names = set(x.strip() for x in t.split() if x.strip() and x.strip() != "(unknown)")
+    return names or None
+
+
+def _gguf_arch(path):
+    """A model file's kind: general.architecture in its first bytes (for a model in parts, the first part's). None if unreadable."""
+    import struct
+    try:
+        with open(path, "rb") as fh:
+            buf = fh.read(1 << 20)
+        if buf[:4] != b"GGUF":
+            return None
+        off = 24
+        n = struct.unpack_from("<Q", buf, 16)[0]
+        sizes = {0: 1, 1: 1, 2: 2, 3: 2, 4: 4, 5: 4, 6: 4, 7: 1, 10: 8, 11: 8, 12: 8}
+
+        def skip(t, off):
+            if t == 8:
+                ln = struct.unpack_from("<Q", buf, off)[0]
+                return off + 8 + ln
+            if t == 9:
+                et = struct.unpack_from("<I", buf, off)[0]
+                cnt = struct.unpack_from("<Q", buf, off + 4)[0]
+                off += 12
+                for _ in range(cnt):
+                    off = skip(et, off)
+                return off
+            return off + sizes[t]
+        for _ in range(min(n, 256)):
+            kl = struct.unpack_from("<Q", buf, off)[0]
+            key = buf[off + 8:off + 8 + kl].decode("utf-8", "replace")
+            off += 8 + kl
+            t = struct.unpack_from("<I", buf, off)[0]
+            off += 4
+            if key == "general.architecture" and t == 8:
+                ln = struct.unpack_from("<Q", buf, off)[0]
+                return buf[off + 8:off + 8 + ln].decode("utf-8", "replace")
+            off = skip(t, off)
+    except Exception:
+        return None
+    return None
+
+
+def _engine_choice_file():
+    return os.path.join(str(_rag_app_dir()), "engine.json")
+
+
+def _engine_choice_get():
+    try:
+        with open(_engine_choice_file(), encoding="utf-8") as fh:
+            c = json.load(fh).get("choice")
+        return c if c in _ENGINE_CHOICES else "auto"
+    except Exception:
+        return "auto"
+
+
+def _engine_choice_set(choice):
+    choice = str(choice or "")
+    if choice not in _ENGINE_CHOICES:
+        return {"ok": False, "error": "That is not one of the engine choices."}
+    try:
+        os.makedirs(os.path.dirname(_engine_choice_file()), exist_ok=True)
+        with open(_engine_choice_file(), "w", encoding="utf-8") as fh:
+            json.dump({"choice": choice}, fh)
+    except Exception:
+        log_problem("engine_choice_set failed", sys.exc_info())
+        return {"ok": False, "error": "The choice could not be kept."}
+    return {"ok": True, "choice": choice}
+
+
+def _engine_pick_next(path):
+    """Whether this model should start on the newer engine."""
+    forced = _ENGINE_USE["forced"]
+    if forced:
+        return forced == "newer" and bool(_engine_next_dir())
+    nd = _engine_next_dir()
+    if not nd or path in _ENGINE_NEXT_FAILED:
+        return False
+    choice = _engine_choice_get()
+    if choice == "proven":
+        return False
+    arch = _gguf_arch(path)
+    nxt, old = _engine_archs(nd), _engine_archs(_engine_dir_proven())
+    if choice == "newer":
+        return not (nxt and arch and arch not in nxt)
+    # automatic: the newer engine only for a kind the proven one does not list and the newer one does
+    return bool(arch and old and nxt and arch not in old and arch in nxt)
+
+
+_engine_launch_one = _engine_launch
+
+
+def _engine_launch(path, n_ctx, mmp, use_gpu, drafter=None):
+    nxt = _engine_pick_next(path)
+    _ENGINE_USE["next"] = nxt
+    try:
+        out = _engine_launch_one(path, n_ctx, mmp, use_gpu, drafter)
+    finally:
+        _ENGINE_USE["next"] = False
+    _ENGINE_KIND[0] = "newer" if (nxt or _ENGINE_USE["forced"] == "newer") else "proven"
+    return out
+
+
+_engine_status_one = _engine_status
+
+
+def _engine_status():
+    """As before; and when the newer engine could not load a model, the proven engine loads it at once."""
+    try:
+        with _ENGINE_LOCK:
+            p, state, args, gpu, mid = _ENGINE["proc"], _ENGINE["state"], _ENGINE["args"], _ENGINE["gpu"], _ENGINE["model_id"]
+        if (p is not None and p.poll() is not None and state == "loading" and _ENGINE_KIND[0] == "newer" and args
+                and not _ENGINE_USE["forced"]):
+            _ENGINE_NEXT_FAILED.add(args[0])
+            log_problem("engine: the newer engine could not load %s; the proven engine loads it" % os.path.basename(args[0]))
+            proc, port2, _a = _engine_launch(args[0], args[1], args[2], bool(gpu), args[3] if len(args) > 3 else None)
+            note = "The newer engine could not load this model, so the proven engine runs it."
+            with _ENGINE_LOCK:
+                if _ENGINE["proc"] is p:
+                    _ENGINE.update(proc=proc, port=port2, state="loading", log=[], note=note, started=time.time())
+            return {"state": "loading", "port": port2, "model_id": mid, "log": [], "seconds": 0.0, "note": note, "engine_kind": "proven"}
+    except Exception:
+        log_problem("engine: the fall back to the proven engine failed", sys.exc_info())
+    r = _engine_status_one()
+    if isinstance(r, dict):
+        r["engine_kind"] = _ENGINE_KIND[0]
+    return r
+
+
+def _engine_choice():
+    nd, od = _engine_next_dir(), _engine_dir_proven()
+    ver = lambda d: ((_engine_meta(d, "VERSION.txt") or "").strip() or ("llama.cpp" if d else ""))
+    a_old, a_new = _engine_archs(od), _engine_archs(nd)
+    with _ENGINE_LOCK:
+        running = _ENGINE["state"] in ("loading", "ready") and _ENGINE["proc"] is not None
+    return {"choice": _engine_choice_get(),
+            "proven": {"available": bool(od), "version": ver(od), "kinds": len(a_old) if a_old else None},
+            "newer": {"available": bool(nd), "version": ver(nd), "kinds": len(a_new) if a_new else None,
+                      "only": sorted(a_new - a_old) if (a_new and a_old) else []},
+            "running": _ENGINE_KIND[0] if running else None}
+
+
+
+# ---- 6.11: which engine answered, proved (app_engine3_6106.py) ----
+_engine_info_one = _engine_info
+
+
+def _engine_info():
+    """As before; the version is the running engine's own, and engine_kind says which of the two it is."""
+    info = _engine_info_one()
+    try:
+        d = _engine_dir()
+        if d and info.get("available"):
+            nd = _engine_next_dir()
+            info["engine_kind"] = "newer" if (nd and os.path.normpath(d) == os.path.normpath(nd)) else "proven"
+            v = (_engine_meta(d, "VERSION.txt") or "").strip()
+            if v:
+                info["version"] = v
+    except Exception:
+        log_problem("engine: reading the running engine's version failed", sys.exc_info())
+    return info
+
+
+def _engine_build_of(d):
+    """The engine binary's own answer to --version (its build number and commit), or a short reason."""
+    try:
+        r = subprocess.run([_engine_exe(d), "--version"], timeout=120, **_engine_popen_kw(d))
+        return (r.stdout or b"").decode("utf-8", "replace").strip()[-300:]
+    except Exception as e:
+        return "unknown (%s: %s)" % (type(e).__name__, e)
+
+
 # ---------------------------------------------------------------------------
 # R74: sharing this computer's models with the person's other devices.
 #
@@ -4042,7 +5989,7 @@ def _share_models():
         if lk.endswith("-dspark") or lk.endswith("-mmproj") or "mmproj" in os.path.basename(p).lower():
             continue
         out.append({"id": mid, "name": re.sub(r"\.gguf$", "", os.path.basename(p), flags=re.I), "file": os.path.basename(p),
-                    "size": os.path.getsize(p), "lineup": (_MODEL_META.get(mid) or {}).get("lineup", "")})
+                    "size": _gguf_total_size(p), "lineup": (_MODEL_META.get(mid) or {}).get("lineup", "")})
         seen.add(mid)
     return out
 
@@ -4094,6 +6041,184 @@ def _share_wait_ready(mid, timeout=1200):
     raise RuntimeError("the model was still loading after 20 minutes")
 
 
+# ---------------------------------------------------------------------------
+# 6.57 (app_cloud_657.py): Ingenium Cloud's box. The page seals every part before it leaves the device; this computer keeps sealed
+# parts it cannot read, and each device's latest snapshots, on the gateway that lends models, behind its pairing code.
+# ---------------------------------------------------------------------------
+_CLOUD_API = 1
+_CLOUD_LOCK = threading.Lock()
+_CLOUD_PART_MAX = 24 << 20
+_CLOUD_KEEP = 5
+_CLOUD_ID = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _cloud_box_dir():
+    d = _models_dir()
+    if d is None:
+        return None
+    c = d.parent / "cloud"
+    try:
+        (c / "parts").mkdir(parents=True, exist_ok=True)
+    except Exception:
+        return None
+    return c
+
+
+def _cloud_index(c):
+    try:
+        idx = json.loads((c / "snaps.json").read_text("utf-8"))
+        if isinstance(idx, dict) and isinstance(idx.get("snaps"), list):
+            return idx
+    except Exception:
+        pass
+    return {"v": 1, "snaps": []}
+
+
+def _cloud_index_save(c, idx):
+    tmp = c / "snaps.json.tmp"
+    tmp.write_text(json.dumps(idx), "utf-8")
+    os.replace(str(tmp), str(c / "snaps.json"))
+
+
+def _cloud_part_path(c, pid):
+    return c / "parts" / pid[:2] / pid
+
+
+def _cloud_census(c):
+    n, b = 0, 0
+    try:
+        for sub in (c / "parts").iterdir():
+            if sub.is_dir():
+                for f in sub.iterdir():
+                    n += 1
+                    b += f.stat().st_size
+    except Exception:
+        pass
+    return n, b
+
+
+def _cloud_gc(c, idx):
+    """parts that no kept snapshot names, and that came more than an hour ago (one arriving now is not taken from under it)"""
+    keep = set()
+    for sn in idx.get("snaps", []):
+        keep.add(sn.get("head"))
+        keep.update(sn.get("parts") or [])
+    now = time.time()
+    try:
+        for sub in (c / "parts").iterdir():
+            if not sub.is_dir():
+                continue
+            for f in sub.iterdir():
+                if f.name not in keep and now - f.stat().st_mtime > 3600:
+                    try:
+                        f.unlink()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+
+def _cloud_body(h, limit):
+    n = int(h.headers.get("Content-Length") or 0)
+    if n <= 0 or n > limit:
+        raise ValueError("size")
+    return json.loads(h.rfile.read(n).decode("utf-8") or "{}")
+
+
+def _cloud_get(h, path):
+    c = _cloud_box_dir()
+    if c is None:
+        return h._err(500, "This computer has no folder for Ingenium Cloud.")
+    if path == "/ingenium/cloud":
+        with _CLOUD_LOCK:
+            idx = _cloud_index(c)
+            n, b = _cloud_census(c)
+        return h._json(200, {"ok": True, "api": _CLOUD_API, "computer": _share_computer_name(), "snaps": idx["snaps"], "parts": n, "bytes": b})
+    if path.startswith("/ingenium/cloud/part/"):
+        pid = path.rsplit("/", 1)[-1]
+        if not _CLOUD_ID.match(pid):
+            return h._err(400, "That is not the name of a part.")
+        f = _cloud_part_path(c, pid)
+        if not f.exists():
+            return h._err(404, "This computer does not keep that part.")
+        data = f.read_bytes()
+        return h._json(200, {"id": pid, "b64": base64.b64encode(data).decode("ascii"), "sha": hashlib.sha256(data).hexdigest()})
+    return h._err(404, "not found")
+
+
+def _cloud_post(h, path):
+    c = _cloud_box_dir()
+    if c is None:
+        return h._err(500, "This computer has no folder for Ingenium Cloud.")
+    try:
+        body = _cloud_body(h, _CLOUD_PART_MAX * 4 // 3 + 65536)
+        if not isinstance(body, dict):
+            raise ValueError("shape")
+    except Exception:
+        return h._err(400, "The request was not readable.")
+    if path == "/ingenium/cloud/has":
+        ids = [i for i in (body.get("ids") or []) if isinstance(i, str) and _CLOUD_ID.match(i)][:50000]
+        return h._json(200, {"missing": [i for i in ids if not _cloud_part_path(c, i).exists()]})
+    if path.startswith("/ingenium/cloud/part/"):
+        pid = path.rsplit("/", 1)[-1]
+        if not _CLOUD_ID.match(pid):
+            return h._err(400, "That is not the name of a part.")
+        try:
+            raw = base64.b64decode(str(body.get("b64") or ""), validate=True)
+        except Exception:
+            return h._err(400, "The part was not readable.")
+        if not raw or len(raw) > _CLOUD_PART_MAX:
+            return h._err(413, "That part is larger than the Cloud keeps.")
+        if hashlib.sha256(raw).hexdigest() != str(body.get("sha") or ""):
+            return h._err(400, "The part arrived damaged. Send it again.")
+        f = _cloud_part_path(c, pid)
+        with _CLOUD_LOCK:
+            f.parent.mkdir(parents=True, exist_ok=True)
+            if not f.exists():
+                tmp = f.with_name(f.name + ".tmp")
+                tmp.write_bytes(raw)
+                os.replace(str(tmp), str(f))
+            else:
+                os.utime(str(f), None)
+        return h._json(200, {"ok": True})
+    if path == "/ingenium/cloud/snap":
+        dev = str(body.get("device") or "")[:64]
+        head = str(body.get("head") or "")
+        parts = body.get("parts") or []
+        if not re.match(r"^[A-Za-z0-9_-]{6,64}$", dev) or not _CLOUD_ID.match(head) or not isinstance(parts, list) or len(parts) > 200000:
+            return h._err(400, "That snapshot is not complete.")
+        parts = [str(x) for x in parts]
+        if any(not _CLOUD_ID.match(x) for x in parts):
+            return h._err(400, "That snapshot names a part wrongly.")
+        missing = [x for x in [head] + parts if not _cloud_part_path(c, x).exists()]
+        if missing:
+            return h._json(409, {"error": {"message": "Some parts have not arrived yet.", "code": 409}, "missing": missing[:2000]})
+        snap = {"device": dev, "name": str(body.get("name") or "")[:120], "at": int(body.get("at") or 0), "head": head, "parts": parts,
+                "bytes": int(body.get("bytes") or 0), "platform": str(body.get("platform") or "")[:60], "version": str(body.get("version") or "")[:20],
+                "got": int(time.time() * 1000)}
+        # how the page draws its key from her passphrase (a salt and a count of rounds: neither is secret), so a device joining
+        # the Cloud draws the same key; a snapshot without it keeps the one its device sent before
+        kdf = body.get("kdf")
+        if isinstance(kdf, dict) and re.match(r"^[A-Za-z0-9+/=]{16,64}$", str(kdf.get("salt") or "")) and 100000 <= int(kdf.get("iter") or 0) <= 10000000:
+            snap["kdf"] = {"salt": str(kdf["salt"]), "iter": int(kdf["iter"]), "name": "PBKDF2-SHA-256"}
+        with _CLOUD_LOCK:
+            idx = _cloud_index(c)
+            mine = [x for x in idx["snaps"] if x.get("device") == dev] + [snap]
+            mine.sort(key=lambda x: x.get("got") or 0)
+            idx["snaps"] = [x for x in idx["snaps"] if x.get("device") != dev] + mine[-_CLOUD_KEEP:]
+            _cloud_index_save(c, idx)
+            _cloud_gc(c, idx)
+        return h._json(200, {"ok": True, "got": snap["got"]})
+    if path == "/ingenium/cloud/forget":
+        dev = str(body.get("device") or "")[:64]
+        with _CLOUD_LOCK:
+            idx = _cloud_index(c)
+            idx["snaps"] = [x for x in idx["snaps"] if x.get("device") != dev]
+            _cloud_index_save(c, idx)
+        return h._json(200, {"ok": True})
+    return h._err(404, "not found")
+
+
 def _share_handler():
     class H(http.server.BaseHTTPRequestHandler):
         server_version = "Ingenium"
@@ -4133,8 +6258,9 @@ def _share_handler():
             got = (self.headers.get("Authorization") or "").replace("Bearer ", "", 1).strip()
             import hmac as _hmac
             if not _hmac.compare_digest(_share_norm(got), _share_norm(_share_code())):
-                with _SHARE_LOCK:
-                    _SHARE["fails"].setdefault(ip, []).append(now)
+                if got:       # 6.9.3: only a code that was sent and was wrong counts (a browser visit sends none)
+                    with _SHARE_LOCK:
+                        _SHARE["fails"].setdefault(ip, []).append(now)
                 self._err(401, "The pairing code is not right. It is shown on the sharing computer, in Settings.")
                 return False
             with _SHARE_LOCK:
@@ -4152,9 +6278,13 @@ def _share_handler():
             if path == "/ingenium/hello":
                 lend = bool(_SHARE.get("lend"))
                 return self._json(200, {"app": "Ingenium", "name": APP_NAME, "computer": _share_computer_name(), "needs_code": True,
-                                        "lends": lend, "models": len(_share_models()) if lend else 0, "callins": True})
+                                        "lends": lend, "models": len(_share_models()) if lend else 0, "callins": True, "api": _LEND_API,
+                                        "cloud": _CLOUD_API})
             if not self._allowed():
                 return
+            # 6.57: Ingenium Cloud's box (app_cloud_657.py), whether or not this computer lends its models
+            if path == "/ingenium/cloud" or path.startswith("/ingenium/cloud/"):
+                return _cloud_get(self, path)
             if path == "/ingenium/callins":
                 return self._json(200, {"callins": _callin_list()})
             if path.startswith("/ingenium/via/"):
@@ -4162,21 +6292,20 @@ def _share_handler():
             if not _SHARE.get("lend"):
                 return self._err(403, "This computer is not lending its models. Switch sharing on there, in Settings, Your models on every device.")
             if path in ("/v1/models", "/models"):
-                ms = _share_models()
+                ms = _share_models_full()
                 return self._json(200, {"object": "list", "data": [dict(m, object="model", owned_by=_share_computer_name() or "ingenium")
                                                                    for m in ms]})
             if path == "/ingenium/info":
-                info = _engine_info()
-                return self._json(200, {"app": APP_NAME, "computer": _share_computer_name(), "models": len(_share_models()),
-                                        "engine": info.get("version") or "", "available": bool(info.get("available")),
-                                        "platform": info.get("platform") or "", "gpu": info.get("gpu") or "",
-                                        "loaded": _ENGINE.get("model_id") if _ENGINE.get("state") == "ready" else None})
+                return self._json(200, _lend_info(_engine_info()))
             return self._err(404, "not found")
 
         def do_POST(self):
             path = self.path.split("?", 1)[0].rstrip("/")
             if not self._allowed():
                 return
+            # 6.57: Ingenium Cloud's box (app_cloud_657.py)
+            if path.startswith("/ingenium/cloud/"):
+                return _cloud_post(self, path)
             # R97: a computer that this one cannot reach calls in, and carries its models over that call
             if path == "/ingenium/callin":
                 return _callin_poll(self)
@@ -4223,12 +6352,795 @@ class _HandlerSink(object):
         pass
 
 
+# ---------------------------------------------------------------------------
+# 6.9.3 (app_lend_693.py): lending that tells the truth and never goes silent. The windows, the advice, the queue, the stream
+# the other device sees, the choice of the processor or the graphics chip, and the speed measured here. Plain functions: the
+# gateway above and the engine functions below call them; rig/t_705_lend_gateway.py runs the whole file.
+# ---------------------------------------------------------------------------
+_LEND_API = 2                                  # what this lender says of itself: 2 = windows, advice, a queue, status lines
+_LEND_CTX_CHOICES = (8192, 16384, 32768, 65536)
+_LEND_QUEUE_MAX = 4                            # devices that may wait behind the one being answered
+_LEND_QUEUE_WAIT = 1800                        # the longest a device waits for its turn, seconds
+_LEND_PICKUP_WAIT = 45.0                       # a lender that called in has this long to pick a request up, seconds
+_LEND_Q = {"cv": threading.Condition(), "line": [], "now": None, "n": 0}
+_LEND_GPU_OFF = {"off": False, "why": ""}      # set when the graphics chip gave way: the processor is used for the rest of the run
+_LEND_GPU_IDS = [""]                           # the engine's names of the cards to use, when only some of its chips are cards
+_LEND_RAM_SEEN = {"at": 0.0, "free": None}
+_LEND_SPEED_LOCK = threading.Lock()
+_LEND_OPT_LOCK = threading.Lock()
+_LEND_SEP = re.compile(rb"\r?\n\r?\n")
+_LEND_FIN = re.compile(rb'"finish_reason"\s*:\s*"')
+
+# models that use only some of their parameters for each word: (all, those working on each word), in billions
+_LEND_ACTIVE_B = {
+    "lfm2.5-8b-a1b": (8.0, 1.0), "mellum2.1-12b-thinking": (12.0, 2.5), "mellum2-12b-thinking": (12.0, 2.5),
+    "gemma-4-26b-a4b": (26.0, 4.0), "lfm2.5-24b-a2b": (24.0, 2.0), "qwen3-coder-30b-a3b": (30.0, 3.0),
+    "qwen3.6-35b-a3b": (35.0, 3.0)}
+
+# the small chips that share the computer's memory, and the software drawers: the processor does the work better
+_LEND_GFX_WEAK = re.compile(r"llvmpipe|swiftshader|lavapipe|microsoft basic|basic render|software|\bvega\s*(?:3|6|8|10|11)\b|"
+                            r"geforce\s+mx|\buhd\b|\bhd graphics\b|\biris\b|\bxe graphics\b|radeon\W*(?:\(tm\)\W*)?graphics|"
+                            r"radeon\s+rx\s+vega\s*(?:3|6|8|10|11)\b", re.I)
+# real graphics cards, by name
+_LEND_GFX_CARD = re.compile(r"geforce\s+(?:gtx|rtx)|nvidia\s+(?:rtx|quadro|titan|tesla|t\d{3,4}\b|a\d{2,3}\b|l\d{2}\b)|quadro|"
+                            r"\brtx\s*(?:a|pro)?\s*\d|titan|tesla|radeon\s+rx\s+\d|radeon\s+rx\s+vega\s*(?:56|64)|radeon\s+pro|"
+                            r"radeon\s+vii|instinct|\barc\W*(?:\(tm\)\W*)?(?:pro\W*)?[ab]\d{3}", re.I)
+
+
+def _lend_tick():
+    """How long a stream may be quiet before it is sent a ": waiting" line (ten seconds; the tests shorten it)."""
+    try:
+        return max(0.05, float(os.environ.get("INGENIUM_LEND_TICK") or 10))
+    except Exception:
+        return 10.0
+
+
+# ---- this computer's memory ----
+def _lend_ram():
+    """(all, free) memory of this computer in GB; either is None when it cannot be read."""
+    total = free = None
+    try:
+        total = _read_device_info().get("ramGB")
+    except Exception:
+        pass
+    now = time.time()
+    if now - _LEND_RAM_SEEN["at"] < 15:
+        return total, _LEND_RAM_SEEN["free"]
+    try:
+        if sys.platform.startswith("win"):
+            import ctypes
+
+            class _MS(ctypes.Structure):
+                _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong),
+                            ("ullTotalPhys", ctypes.c_ulonglong), ("ullAvailPhys", ctypes.c_ulonglong),
+                            ("ullTotalPageFile", ctypes.c_ulonglong), ("ullAvailPageFile", ctypes.c_ulonglong),
+                            ("ullTotalVirtual", ctypes.c_ulonglong), ("ullAvailVirtual", ctypes.c_ulonglong),
+                            ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+            ms = _MS()
+            ms.dwLength = ctypes.sizeof(_MS)
+            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(ms))
+            free = round(ms.ullAvailPhys / 1073741824.0, 1)
+        elif sys.platform.startswith("linux"):
+            with open("/proc/meminfo", encoding="utf-8") as fh:
+                for line in fh:
+                    if line.startswith("MemAvailable:"):
+                        free = round(int(line.split()[1]) / 1048576.0, 1)
+                        break
+        elif sys.platform == "darwin":
+            r = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=5)
+            ps = re.search(r"page size of (\d+) bytes", r.stdout)
+            pages = sum(int(re.search(r"Pages %s:\s+(\d+)" % k, r.stdout).group(1)) for k in ("free", "inactive", "speculative"))
+            free = round(pages * (int(ps.group(1)) if ps else 16384) / 1073741824.0, 1)
+    except Exception:
+        free = None
+    _LEND_RAM_SEEN.update(at=now, free=free)
+    return total, free
+
+
+# ---- how big a model is, what window it can be given, how fast it is ----
+def _lend_params(m):
+    """(all parameters, parameters working on each word) of a model in billions: from its lineup name, else from its own name or file."""
+    lk = str(m.get("lineup") or "").lower()
+    if lk in _LEND_ACTIVE_B:
+        return _LEND_ACTIVE_B[lk]
+    for s in (lk, str(m.get("name") or "").lower(), str(m.get("file") or "").lower()):
+        x = re.search(r"(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*b(?![a-z0-9])(?:[-_ ]a(\d+(?:\.\d+)?)b(?![a-z0-9]))?", s)
+        if x:
+            total = float(x.group(1))
+            return total, (min(float(x.group(2)), total) if x.group(2) else total)
+        x = re.search(r"(?<![a-z0-9.])(\d+)\s*m(?![a-z0-9])", s)
+        if x:
+            total = int(x.group(1)) / 1000.0
+            return total, total
+    gb = (m.get("size") or 0) / 1073741824.0       # a four-bit file holds about 0.55 GB for each billion
+    total = max(0.5, round(gb / 0.55, 1))
+    return total, total
+
+
+def _lend_need_gb(m, ctx):
+    """The page's own sum for the memory a model needs (estimateNeedGB): its file, the working room for ctx tokens, a little more."""
+    file_gb = (m.get("size") or 0) / 1073741824.0
+    ps = max(0.5, _lend_params(m)[0] / 7.0)
+    return file_gb * 1.15 + (ctx / 1024.0) * 0.12 * ps + 0.6
+
+
+def _share_fit_ctx(m, ram_gb):
+    """The largest memory a lent model is given (32,768, 16,384 or 8,192 tokens) whose need stays within 70% of this computer's
+    memory, by the page's own sum. 8,192 when not even that fits (the advice then says too big) or the memory is not known."""
+    try:
+        usable = float(ram_gb) * 0.7
+    except Exception:
+        return 8192
+    for c in (32768, 16384, 8192):
+        if _lend_need_gb(m, c) <= usable:
+            return c
+    return 8192
+
+
+def _lend_est_tps(m, chip):
+    """A guess at words a second. Each word needs the working part of the model read once; a processor reads about 24 GB a
+    second, a graphics chip about 100. A model that uses only some of its parameters costs a third more than that part."""
+    total, act = _lend_params(m)
+    gb = max(0.05, (m.get("size") or 0) / 1e9)
+    work = gb * (act / total if total else 1.0) * (1.35 if act < total * 0.9 else 1.0)
+    return (100.0 if chip else 24.0) / work
+
+
+def _share_advice(m, ram_gb, cpu_only, measured=None):
+    """quick (8 words a second or more), ok (4 to 8), slow, or too big (it needs more than 70% of the memory even at 8,192
+    tokens). By the speed measured on this computer when there is one, else by a guess."""
+    try:
+        if ram_gb and _lend_need_gb(m, 8192) > float(ram_gb) * 0.7:
+            return "too big"
+    except Exception:
+        pass
+    tps = measured if measured else _lend_est_tps(m, not cpu_only)
+    return "quick" if tps >= 8 else ("ok" if tps >= 4 else "slow")
+
+
+def _lend_speed_path():
+    p = _share_cfg_path()
+    return (p.parent / "share_speed.json") if p is not None else None
+
+
+def _lend_speed_all():
+    try:
+        with open(str(_lend_speed_path()), encoding="utf-8") as fh:
+            d = json.load(fh)
+            return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _lend_speed_note(mid, tps, cpu):
+    """Keeps the speed a reply was written at, per model (and for the processor or the chip alone): an average, not the last."""
+    try:
+        tps = float(tps)
+        p = _lend_speed_path()
+        if p is None or not (0.2 < tps < 2000):
+            return
+        with _LEND_SPEED_LOCK:
+            d = _lend_speed_all()
+            cur = d.get(str(mid))
+            if isinstance(cur, dict) and cur.get("cpu") == bool(cpu) and cur.get("tps"):
+                d[str(mid)] = {"tps": round(float(cur["tps"]) * 0.6 + tps * 0.4, 2), "n": int(cur.get("n") or 1) + 1,
+                               "cpu": bool(cpu), "at": int(time.time())}
+            else:
+                d[str(mid)] = {"tps": round(tps, 2), "n": 1, "cpu": bool(cpu), "at": int(time.time())}
+            tmp = str(p) + ".part"
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump(d, fh)
+            os.replace(tmp, str(p))
+    except Exception:
+        log_problem("share: could not keep a measured speed", sys.exc_info())
+
+
+# ---- what the lender has chosen ----
+def _lend_opts():
+    """(memory for lent models: "auto" or 8192...65536, graphics: "auto", "cpu" or "gpu"), from the sharing settings."""
+    c = _share_cfg()
+    try:
+        ctx = int(c.get("ctx"))
+        ctx = ctx if ctx in _LEND_CTX_CHOICES else "auto"
+    except Exception:
+        ctx = "auto"
+    gpu = c.get("gpu") if c.get("gpu") in ("auto", "cpu", "gpu") else "auto"
+    return ctx, gpu
+
+
+def _share_option_set(key, value):
+    """The two choices the lender makes in Settings: ctx (Memory for lent models) and gpu (Graphics). Takes effect when the next
+    model is loaded. Returns the sharing status, or {ok: false, error}."""
+    with _LEND_OPT_LOCK:        # two choices made at once must both be kept
+        c = _share_cfg()
+        if key == "ctx":
+            v = str(value).strip().lower()
+            if v in ("auto", ""):
+                c.pop("ctx", None)
+            else:
+                try:
+                    n = int(float(v))
+                except Exception:
+                    n = 0
+                if n not in _LEND_CTX_CHOICES:
+                    return {"ok": False, "error": "That memory size is not one of the choices."}
+                c["ctx"] = n
+        elif key == "gpu":
+            if value not in ("auto", "cpu", "gpu"):
+                return {"ok": False, "error": "That is not one of the graphics choices."}
+            c["gpu"] = value
+        else:
+            return {"ok": False, "error": "That setting is not known."}
+        _share_cfg_save(c)
+    return _share_status()
+
+
+def _lend_ctx_for(m, client=None):
+    """The memory a lent model is started with: the lender's choice, else the fit to this computer's memory; what the other
+    device asked for (ingenium_ctx) is cut down to it."""
+    chosen = _lend_opts()[0]
+    fit = int(chosen) if chosen != "auto" else _share_fit_ctx(m, _lend_ram()[0])
+    if client:
+        try:
+            fit = max(2048, min(int(client), fit))
+        except Exception:
+            pass
+    return fit
+
+
+def _lend_loaded_ctx(mid):
+    """The memory of the engine that is running this model right now, or None."""
+    with _ENGINE_LOCK:
+        a, p = _ENGINE.get("args"), _ENGINE.get("proc")
+        if a and len(a) > 1 and p is not None and p.poll() is None and str(_ENGINE.get("model_id")) == str(mid):
+            try:
+                return int(a[1])
+            except Exception:
+                return None
+    return None
+
+
+# ---- the processor or the graphics chip ----
+def _lend_gfx_strong(dev):
+    """True for a real graphics card, or Apple's chip; False for a small chip that shares the computer's memory."""
+    n = str(dev.get("name") or "").lower()
+    did = str(dev.get("id") or "").lower()
+    if _LEND_GFX_WEAK.search(n):
+        return False
+    if did.startswith(("mtl", "metal")):
+        return "apple" in n or "radeon" in n or "amd" in n
+    if not _LEND_GFX_CARD.search(n):
+        return False
+    mib = dev.get("mib")
+    return mib is None or mib >= 4000     # a card with less memory than that does not help a model
+
+
+def _engine_gpu_pick(d, want=True, wait=False):
+    """Which graphics chip the engine is to use, if any: (its name, whether to use it, the reason in plain words). With wait,
+    the first listing of the chips (a few seconds, once) is waited for, so a small chip is never used by the first start."""
+    name, use, why, ids = _lend_gpu_choice(d, want, wait)
+    _LEND_GPU_IDS[0] = ids
+    return name, use, why
+
+
+def _lend_gpu_choice(d, want, wait):
+    policy = _lend_opts()[1]
+    if not want:
+        return "", False, "Asked to run on the processor.", ""
+    devs = _engine_devices(d) if d else []
+    if devs is None and wait and policy != "cpu":
+        t0 = time.time()
+        while devs is None and time.time() - t0 < 45:
+            time.sleep(0.25)
+            devs = _engine_devices(d)
+    if devs is None:       # still being listed: the guess this app always made
+        guess = ""
+        if d and (_engine_platform() == "macos-arm64" or os.path.isfile(os.path.join(d, "ggml-vulkan.dll"))):
+            guess = "Metal" if _engine_platform() == "macos-arm64" else "Vulkan"
+        if policy == "cpu":
+            return guess, False, "You chose Processor only in the sharing settings.", ""
+        return guess, bool(guess) and not (policy == "auto" and _LEND_GPU_OFF["off"]), "Still looking at the graphics chip.", ""
+    if not devs:
+        return "", False, "This computer has no graphics chip the engine can use, so the processor does the work.", ""
+    if policy == "cpu":
+        return devs[0]["name"], False, "You chose Processor only in the sharing settings.", ""
+    if policy == "gpu":
+        return devs[0]["name"], True, "Graphics chip, as you chose in the sharing settings (%s)." % devs[0]["name"], ""
+    if _LEND_GPU_OFF["off"]:
+        return devs[0]["name"], False, "The graphics chip stopped during an answer, so the processor does the work until Ingenium is closed.", ""
+    strong = [x for x in devs if _lend_gfx_strong(x)]
+    if strong:
+        ids = ",".join(x["id"] for x in strong) if len(strong) < len(devs) else ""
+        return strong[0]["name"], True, "Using the graphics card (%s)." % strong[0]["name"], ids
+    return devs[0]["name"], False, ("This computer's graphics chip (%s) is a small one that shares the computer's memory, so the "
+                                    "processor does the work. That is usually quicker and steadier." % devs[0]["name"]), ""
+
+
+def _lend_cpu_only():
+    """True when lent models run on the processor alone (as far as can be told before one is loaded)."""
+    d = _engine_dir()
+    if not d:
+        return True
+    return not _engine_gpu_pick(d, True, wait=False)[1]
+
+
+def _lend_options_view():
+    """What the sharing settings show of the choices above, and of the engine right now."""
+    ctx, gpu = _lend_opts()
+    total, free = _lend_ram()
+    d = _engine_dir()
+    name, use, why = _engine_gpu_pick(d, True, wait=False) if d else ("", False, "This copy of the app carries no engine.")
+    with _ENGINE_LOCK:
+        running = _ENGINE.get("proc") is not None and _ENGINE.get("state") in ("loading", "ready")
+        on_chip = bool(_ENGINE.get("gpu"))
+        why_run, note = str(_ENGINE.get("gpu_why") or ""), str(_ENGINE.get("note") or "")
+    if running:
+        if not on_chip and use:
+            why = note or "The graphics chip could not be used, so the processor is working."
+        elif why_run:
+            why = why_run
+    using = ("gpu" if on_chip else "cpu") if running else ("gpu" if use else "cpu")
+    return {"ctx": ctx, "ctx_choices": list(_LEND_CTX_CHOICES), "gpu": gpu,
+            "gpu_now": {"using": using, "name": name, "why": why, "running": running},
+            "ram_gb": total, "ram_free_gb": free, "cpu_only": not use, "api": _LEND_API, "platform": sys.platform,
+            "devices": [{"name": x.get("name"), "mib": x.get("mib")} for x in (_engine_devices(d) or [])] if d else []}
+
+
+# ---- the model list, as the other devices see it ----
+def _share_models_full():
+    """The models this computer can lend, each with its window, longest reply, advice and speed."""
+    total, _free = _lend_ram()
+    cpu_only = _lend_cpu_only()
+    speeds = _lend_speed_all()
+    out = []
+    for m in _share_models():
+        loaded = _lend_loaded_ctx(m["id"])
+        ctx = loaded or _lend_ctx_for(m)
+        rec = speeds.get(str(m["id"]))
+        meas = float(rec["tps"]) if isinstance(rec, dict) and rec.get("cpu") == cpu_only and rec.get("tps") else None
+        tps = meas or _lend_est_tps(m, not cpu_only)
+        out.append(dict(m, context_length=ctx, max_tokens=max(256, ctx - 256), loaded=bool(loaded),
+                        advice=_share_advice(m, total, cpu_only, meas), tps=round(tps, 1), tps_measured=bool(meas)))
+    return out
+
+
+def _share_advise(models):
+    """For the lender's list of what suits this computer: each {name, size, lineup, file, id} given gets back its advice, its
+    window at this memory, the memory it needs, and its speed (measured here if it is one of the models kept here)."""
+    total, _free = _lend_ram()
+    cpu_only = _lend_cpu_only()
+    speeds = _lend_speed_all()
+    out = []
+    for x in (models or [])[:200]:
+        try:
+            m = {"id": str(x.get("id") or ""), "name": str(x.get("name") or ""), "file": str(x.get("file") or ""),
+                 "lineup": str(x.get("lineup") or ""), "size": int(x.get("size") or 0)}
+        except Exception:
+            out.append({})
+            continue
+        rec = speeds.get(m["id"]) if m["id"] else None
+        meas = float(rec["tps"]) if isinstance(rec, dict) and rec.get("cpu") == cpu_only and rec.get("tps") else None
+        ctx = _share_fit_ctx(m, total)
+        out.append({"advice": _share_advice(m, total, cpu_only, meas), "ctx": ctx, "need_gb": round(_lend_need_gb(m, ctx), 1),
+                    "tps": round(meas or _lend_est_tps(m, not cpu_only), 1), "tps_measured": bool(meas)})
+    return out
+
+
+def _lend_info(info):
+    """What /ingenium/info says: the engine, and how this computer is lending."""
+    total, free = _lend_ram()
+    ctx_set = _lend_opts()[0]
+    d = _engine_dir()
+    name, use, why = _engine_gpu_pick(d, True, wait=False) if d else ("", False, "")
+    with _ENGINE_LOCK:
+        ready = _ENGINE.get("state") == "ready" and _ENGINE.get("proc") is not None
+        mid = _ENGINE.get("model_id") if ready else None
+        args = _ENGINE.get("args") or ()
+        on_chip = bool(_ENGINE.get("gpu"))
+    busy, queued = _lend_q_counts()
+    return {"app": APP_NAME, "computer": _share_computer_name(), "models": len(_share_models()),
+            "engine": info.get("version") or "", "available": bool(info.get("available")),
+            "platform": info.get("platform") or "", "gpu": info.get("gpu") or "", "loaded": mid,
+            "ctx": int(args[1]) if ready and len(args) > 1 else None,
+            "ctx_default": int(ctx_set) if ctx_set != "auto" else 32768,
+            "ram_gb": total, "ram_free_gb": free, "cpu_only": not use, "gpu_used": on_chip if ready else bool(use),
+            "gpu_name": name if use else "", "gpu_why": why, "busy": busy, "queued": queued, "version": _LEND_API}
+
+
+# ---- one device at a time, first come first served ----
+def _lend_q_join():
+    """A place in the line, or None when four are waiting already."""
+    with _LEND_Q["cv"]:
+        if len(_LEND_Q["line"]) >= _LEND_QUEUE_MAX:
+            return None
+        _LEND_Q["n"] += 1
+        t = {"n": _LEND_Q["n"], "at": time.time(), "state": "queued", "t_load": time.time(), "note": "", "pick": None}
+        _LEND_Q["line"].append(t)
+        return t
+
+
+def _lend_q_ahead(t):
+    """How many are in front of this one: the one being answered, and those who came first."""
+    with _LEND_Q["cv"]:
+        line = _LEND_Q["line"]
+        return (1 if _LEND_Q["now"] is not None else 0) + (line.index(t) if t in line else 0)
+
+
+def _lend_q_counts():
+    """(being answered, waiting): 0 or 1, and how many."""
+    with _LEND_Q["cv"]:
+        return (1 if _LEND_Q["now"] is not None else 0), len(_LEND_Q["line"])
+
+
+def _lend_q_wait(t, out):
+    """Waits for this request's turn. True when it comes; False when the device went away or waited too long."""
+    cv = _LEND_Q["cv"]
+    with cv:
+        while True:
+            if out.gone:
+                return False
+            if _LEND_Q["now"] is None and _LEND_Q["line"] and _LEND_Q["line"][0] is t:
+                _LEND_Q["line"].pop(0)
+                _LEND_Q["now"] = t
+                t["state"] = "loading"
+                t["t_load"] = time.time()
+                return True
+            if time.time() - t["at"] > _LEND_QUEUE_WAIT:
+                return False
+            cv.wait(0.4)
+
+
+def _lend_q_done(t):
+    cv = _LEND_Q["cv"]
+    with cv:
+        if t in _LEND_Q["line"]:
+            _LEND_Q["line"].remove(t)
+        if _LEND_Q["now"] is t:
+            _LEND_Q["now"] = None
+        cv.notify_all()
+
+
+def _lend_state(t, out):
+    """The status line a quiet stream is sent now, or None when there is nothing to say (the answer has begun)."""
+    if out.answering:
+        return None
+    st = t.get("state")
+    if st == "queued":
+        a = _lend_q_ahead(t)
+        return {"state": "queued", "ahead": a} if a else None
+    s = None
+    if st == "loading":
+        s = {"state": "loading", "seconds": int(time.time() - t.get("t_load", time.time())), "model": (t.get("pick") or {}).get("name", "")}
+    elif st == "reading":
+        s = dict(out.progress or {"state": "reading"})
+    if s is not None and t.get("note"):
+        s["note"] = t["note"]
+    return s
+
+
+# ---- what one lent request says to the device that asked ----
+class _LendGone(Exception):
+    """The device that asked has gone away."""
+
+
+class _LendStream(object):
+    """The answer to one lent request, on its way to the device that asked. Pieces go out one at a time; a stream that has been
+    quiet for a while is sent a ": waiting" line (which also finds out that the device has gone); a device that asked for them
+    gets status lines; the engine's progress lines become "reading" lines. A device that has gone frees the engine at once."""
+
+    def __init__(self, sink, tick, status_on):
+        self.sink, self.tick, self.status_on = sink, float(tick), bool(status_on)
+        self.lock = threading.Lock()
+        self.stop = threading.Event()
+        self.last = time.time()
+        self.opened = self.gone = self.ended = False
+        self.conn = None              # the connection to the engine
+        self.state_fn = None
+        self.thread = None
+        self.buf = b""
+        self.done = self.finished = self.answering = False
+        self.progress = None
+        self.tokens = 0
+        self.t_first = self.t_last = None
+        self.tps = None
+
+    def head(self, code, ctype, model_id=None):
+        with self.lock:
+            if self.opened:
+                return
+            self.sink.head(code, ctype, model_id)
+            self.opened = True
+            self.last = time.time()
+
+    def start(self):
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
+
+    def _run(self):
+        step = min(1.0, max(0.02, self.tick / 4.0))
+        while not self.stop.wait(step):
+            if self.gone or self.ended:
+                return
+            if time.time() - self.last >= self.tick:
+                self.raw(b": waiting\n\n")
+                s = self.state_fn() if (self.status_on and self.state_fn and not self.gone) else None
+                if s:
+                    self._line(s)
+
+    def close(self):
+        self.stop.set()
+        if self.thread is not None and self.thread is not threading.current_thread():
+            self.thread.join(2)
+
+    def _lost(self):
+        self.gone = True
+        c = self.conn
+        try:
+            if c is not None and c.sock is not None:
+                import socket
+                c.sock.shutdown(socket.SHUT_RDWR)
+        except Exception:
+            pass
+
+    def raw(self, b):
+        if self.gone or self.ended:
+            return False
+        try:
+            with self.lock:
+                self.sink.write(b)
+                self.last = time.time()
+            return True
+        except Exception:
+            self._lost()
+            return False
+
+    def _line(self, kw):
+        if self.status_on and self.opened:
+            self.raw(b"data: " + json.dumps({"ingenium": kw}).encode("utf-8") + b"\n\n")
+
+    def status(self, **kw):
+        self._line(kw)
+
+    def error_inband(self, code, msg, extra=None):
+        """An error after the head went out: it goes in the stream, then [DONE], so it can never look like a finished reply."""
+        err = {"message": msg, "code": code}
+        err.update(extra or {})
+        self.raw(b"data: " + json.dumps({"error": err}).encode("utf-8") + b"\n\n")
+        self.raw(b"data: [DONE]\n\n")
+
+    def end(self):
+        if self.ended:
+            return
+        self.ended = True
+        try:
+            with self.lock:
+                self.sink.end()
+        except Exception:
+            pass
+
+    def feed(self, piece):
+        """Pieces of the engine's stream in; whole events out, the engine's progress lines turned into "reading" lines."""
+        self.buf += piece
+        while True:
+            m = _LEND_SEP.search(self.buf)
+            if not m:
+                if len(self.buf) > 1048576:
+                    self.raw(self.buf)
+                    self.buf = b""
+                return
+            ev, self.buf = self.buf[:m.end()], self.buf[m.end():]
+            self._event(ev)
+
+    def _event(self, ev):
+        s = ev.strip()
+        if s.startswith(b"data:"):
+            data = s[5:].strip()
+            if data == b"[DONE]":
+                self.done = True
+            elif b"prompt_progress" in data:
+                p = self._progress(data)
+                if p is not None:
+                    self.progress = p
+                    self.status(**p)
+                    return
+            elif data[:1] == b"{":
+                if not self.answering:
+                    self.answering = True
+                    self.t_first = time.time()
+                    self.status(state="answering")
+                if _LEND_FIN.search(data):
+                    self.finished = True
+                if b'"timings"' in data:
+                    self._timings(data)
+                if b'"content"' in data and b'"content":""' not in data and b'"content":null' not in data:
+                    self.tokens += 1
+                    self.t_last = time.time()
+        self.raw(ev)
+
+    @staticmethod
+    def _progress(data):
+        try:
+            j = json.loads(data.decode("utf-8", "replace"))
+            pp = j.get("prompt_progress") or ((j.get("choices") or [{}])[0] or {}).get("prompt_progress") or {}
+            total, cache, done = int(pp.get("total") or 0), int(pp.get("cache") or 0), int(pp.get("processed") or 0)
+        except Exception:
+            return None
+        pct = 100 if total <= cache else int(max(0, min(100, round(100.0 * (done - cache) / (total - cache)))))
+        return {"state": "reading", "percent": pct, "processed": done, "total": total}
+
+    def _timings(self, data):
+        try:
+            tm = json.loads(data.decode("utf-8", "replace")).get("timings") or {}
+            if int(tm.get("predicted_n") or 0) >= 8 and float(tm.get("predicted_per_second") or 0) > 0:
+                self.tps = float(tm["predicted_per_second"])
+        except Exception:
+            pass
+
+    def speed(self):
+        """Words a second of this reply: the engine's own count, else tokens over the time they took."""
+        if self.tps:
+            return self.tps
+        if self.tokens >= 8 and self.t_first and self.t_last and self.t_last - self.t_first >= 1.0:
+            return (self.tokens - 1) / (self.t_last - self.t_first)
+        return None
+
+
+def _lend_fail(out, sink, code, msg):
+    """An error as the device should see it: a plain answer if nothing was sent yet, else inside the stream."""
+    if out.opened:
+        out.error_inband(code, msg)
+        out.end()
+    else:
+        out.ended = True
+        sink.error(code, msg)
+
+
+def _lend_http_error(out, code, txt):
+    """The engine answered with an error (a message too long for the memory, say): handed on as it came, or inside the stream."""
+    msg, err = txt, {}
+    try:
+        j = json.loads(txt)
+        e = j.get("error") if isinstance(j, dict) else None
+        if isinstance(e, dict):
+            err, msg = e, str(e.get("message") or txt)
+        elif isinstance(e, str):
+            msg = e
+    except Exception:
+        pass
+    if out.opened:
+        out.error_inband(code, msg, {k: v for k, v in err.items() if k not in ("message", "code")})
+    else:
+        out.head(code, "application/json")
+        out.raw(txt.encode("utf-8"))
+    out.end()
+
+
+def _lend_wait_ready(mid, out, ticket, timeout=1200):
+    """Waits until the engine has this model ready, telling the device about any change the engine made (it started again
+    on the processor, say). Raises RuntimeError with the reason when the engine gives up, _LendGone when the device left."""
+    t0 = time.time()
+    seen = ""
+    while time.time() - t0 < timeout:
+        if out.gone:
+            raise _LendGone()
+        st = _engine_status()
+        note = st.get("note") or ""
+        if note and note != seen:
+            seen = note
+            ticket["note"] = note
+            out.status(state="loading", model=(ticket.get("pick") or {}).get("name", ""), note=note)
+        if st.get("state") == "ready" and str(st.get("model_id")) == mid:
+            return st
+        if st.get("state") in ("error", "off"):
+            raise RuntimeError(st.get("error") or "the engine stopped")
+        time.sleep(0.4)
+    raise RuntimeError("the model was still loading after 20 minutes")
+
+
+def _lend_engine_for(pick, want_ctx, proj, out, ticket):
+    """The engine with this model ready, holding at least the memory the lender wants: started (or started again, when it is idle
+    and holds less) if it is not. This request holds the turn, so no other device's reply is in the way."""
+    with _ENGINE_LOCK:
+        p = _ENGINE.get("proc")
+    if p is not None and p.poll() is not None:
+        _engine_status()          # an engine that stopped is started again by its own check (once), or cleared
+    with _ENGINE_LOCK:
+        p, args = _ENGINE.get("proc"), (_ENGINE.get("args") or ())
+        same = str(_ENGINE.get("model_id")) == pick["id"] and p is not None and p.poll() is None
+    if same and proj and not (len(args) > 2 and args[2]):
+        same = False              # running without its picture reader
+    if same and want_ctx and len(args) > 1 and int(args[1]) < int(want_ctx):
+        same = False              # idle, and it holds less than this computer can give it
+    if not same:
+        r = _engine_start(pick["id"], want_ctx, proj)
+        if not r.get("ok"):
+            raise RuntimeError(r.get("error") or "the engine could not start")
+    return _lend_wait_ready(pick["id"], out, ticket)
+
+
+def _lend_engine_dead():
+    """True when the engine process has stopped (a moment is allowed for it to be seen to have stopped)."""
+    for _ in range(10):
+        with _ENGINE_LOCK:
+            p = _ENGINE.get("proc")
+        if p is not None and p.poll() is not None:
+            return True
+        time.sleep(0.05)
+    return False
+
+
+def _lend_pass(out, port, data, pick, stream, ticket):
+    """Asks the engine and hands its answer on, piece by piece. Returns "retry" when the engine stopped before any of the
+    answer went out (the caller then asks the engine again, started again), else None."""
+    import http.client
+    conn = http.client.HTTPConnection("127.0.0.1", port, timeout=1800)
+    out.conn = conn
+    try:
+        try:
+            conn.request("POST", "/v1/chat/completions", body=data,
+                         headers={"content-type": "application/json", "authorization": "Bearer " + _ENGINE_SECRET})
+            resp = conn.getresponse()
+        except Exception as e:
+            if out.gone:
+                return
+            if not ticket.get("retried") and _lend_engine_dead():
+                return "retry"
+            _lend_fail(out, out.sink, 503, "The engine on this computer did not answer: %s" % (str(e) or type(e).__name__))
+            return
+        code = resp.status
+        ctype = resp.getheader("Content-Type") or ""
+        if code >= 400:
+            _lend_http_error(out, code, resp.read(200000).decode("utf-8", "replace"))
+            return
+        sse = stream and "text/event-stream" in ctype
+        if not out.opened:
+            out.head(code, ctype or "application/json", pick["id"])
+        cut = False
+        while not out.gone:
+            try:
+                piece = resp.read1(65536) if hasattr(resp, "read1") else resp.read(4096)
+            except Exception:
+                cut = not out.gone
+                break
+            if not piece:
+                break
+            if sse:
+                out.feed(piece)
+            else:
+                out.raw(piece)
+        if out.gone:
+            return
+        if sse and out.buf:
+            out.raw(out.buf)
+            out.buf = b""
+        if sse and (cut or not (out.done or out.finished)):
+            dead = _lend_engine_dead()
+            if dead and not out.answering and not ticket.get("retried"):
+                return "retry"
+            out.error_inband(503, ("The engine on this computer stopped while it was answering. Ask again: it starts again by itself."
+                                   if dead else "The reply was cut short on this computer. Ask again."),
+                             {"type": "engine_stopped" if dead else "cut_short"})
+        else:
+            tps = out.speed()
+            if tps:
+                _lend_speed_note(pick["id"], tps, not bool(_ENGINE.get("gpu")))
+        out.end()
+    finally:
+        out.conn = None
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+
 def _share_answer(body, sink):
-    """R97: one request in the common chat format, answered by this computer's
-    own engine and streamed to `sink` (a device that asked directly, or one this
-    computer calls). It loads the model asked for when another one is running."""
+    """R97, 6.9.3: one request in the common chat format, answered by this computer's own engine and streamed to `sink` (a device
+    that asked directly, or one this computer calls). Devices are served one at a time, first come first served. A request that
+    streams gets its head at once; a quiet stream gets a ": waiting" line; a device that sent ingenium_status gets status lines.
+    It loads the model asked for when another one is running, but never while another device's reply is being written."""
     want = str(body.pop("model", "") or "")
     ctx = body.pop("ingenium_ctx", None)
+    status_on = bool(body.pop("ingenium_status", False))
     ms = _share_models()
     pick = None
     for m in ms:
@@ -4241,55 +7153,61 @@ def _share_answer(body, sink):
         pick = next((m for m in ms if m["id"] == cur), None) if not want else None
     if pick is None:
         return sink.error(404, "This computer has no model called %r. The model list shows the ones it has." % want)
-    with _SHARE_LOCK:
-        _SHARE["busy"] += 1
+    stream = bool(body.get("stream"))
+    if stream and "return_progress" not in body:
+        body["return_progress"] = True       # the engine then reports how far it has read, after every batch
+    ticket = _lend_q_join()
+    if ticket is None:
+        return sink.error(503, "This computer is answering other devices and %d are already waiting. Try again in a minute." % _LEND_QUEUE_MAX)
+    ticket["pick"] = pick
+    out = _LendStream(sink, _lend_tick(), status_on and stream)
+    out.state_fn = lambda: _lend_state(ticket, out)
     try:
+        if stream:
+            out.head(200, "text/event-stream", pick["id"])
+            out.start()
+            ahead = _lend_q_ahead(ticket)
+            if ahead:
+                out.status(state="queued", ahead=ahead)
+        if not _lend_q_wait(ticket, out):
+            if not out.gone:
+                _lend_fail(out, sink, 503, "Other devices kept this computer busy for half an hour. Try again later.")
+            return
+        out.status(state="loading", model=pick["name"])
         has_pic = any(isinstance(m, dict) and isinstance(m.get("content"), list) and
                       any(isinstance(c, dict) and c.get("type") in ("image_url", "input_image") for c in m["content"])
                       for m in (body.get("messages") or []))
         proj = _mmproj_for(pick["id"]) if has_pic else None
-        with _ENGINE_LOCK:
-            same = _ENGINE.get("model_id") == pick["id"] and _ENGINE.get("proc") is not None
-            args = _ENGINE.get("args")
-            if same and proj and not (args and len(args) > 2 and args[2]):
-                same = False   # running without its picture reader
-        if not same:
-            r = _engine_start(pick["id"], int(ctx) if ctx else 8192, proj)
-            if not r.get("ok"):
-                return sink.error(503, r.get("error") or "the engine could not start")
-        try:
-            st = _share_wait_ready(pick["id"])
-        except Exception as e:
-            return sink.error(503, "The model could not be loaded on the sharing computer: %s" % e)
         data = json.dumps(body).encode("utf-8")
-        req = urllib.request.Request("http://127.0.0.1:%d/v1/chat/completions" % st["port"], data=data,
-                                     headers={"content-type": "application/json", "authorization": "Bearer " + _ENGINE_SECRET})
-        try:
-            up = _NO_PROXY.open(req, timeout=1800)
-        except urllib.error.HTTPError as e:
-            txt = e.read().decode("utf-8", "replace")[:2000]
-            sink.head(e.code, "application/json")
-            sink.write(txt.encode("utf-8"))
-            return sink.end()
-        with up:
-            sink.head(200, up.headers.get("Content-Type") or "application/json", pick["id"])
-            while True:
-                chunk = up.read1(65536) if hasattr(up, "read1") else up.read(4096)
-                if not chunk:
-                    break
-                sink.write(chunk)
-        sink.end()
-    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+        while True:
+            try:
+                st = _lend_engine_for(pick, _lend_ctx_for(pick, ctx), proj, out, ticket)
+            except _LendGone:
+                return
+            except Exception as e:
+                return _lend_fail(out, sink, 503, "The model could not be loaded on the sharing computer: %s" % e)
+            ticket["state"] = "reading"
+            out.status(state="reading")
+            if _lend_pass(out, st["port"], data, pick, stream, ticket) != "retry":
+                break
+            # the engine stopped before any of the answer went out: it is started again (on the processor if the chip was the
+            # reason), the device is told so, and the same message is asked once more
+            ticket["retried"] = True
+            ticket["state"] = "loading"
+            ticket["t_load"] = time.time()
+            out.status(state="loading", model=pick["name"])
+    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, _LendGone):
         pass   # the other device stopped the reply
     except Exception as e:
         log_problem("share: a request failed", sys.exc_info())
         try:
-            sink.error(500, str(e))
+            _lend_fail(out, sink, 500, str(e))
         except Exception:
             pass
     finally:
-        with _SHARE_LOCK:
-            _SHARE["busy"] -= 1
+        out.close()
+        out.end()
+        _lend_q_done(ticket)
 
 
 def _share_start():
@@ -4331,18 +7249,20 @@ def _share_stop():
 
 def _share_status():
     with _SHARE_LOCK:
-        port, busy, err = _SHARE["port"], _SHARE["busy"], _SHARE["error"]
+        port, err = _SHARE["port"], _SHARE["error"]
+        busy, queued = _lend_q_counts()
         now = time.time()
         recent = sorted([(t, ip) for ip, t in _SHARE["last"].items() if now - t < 3600], reverse=True)
     running = port is not None
     cfg = _share_cfg()
     lend = running and bool(cfg.get("on"))
-    return {"ok": True, "on": lend, "running": running, "callins_on": bool(cfg.get("callins")), "port": port,
+    return {"ok": True, "on": lend, "running": running, "callins_on": bool(cfg.get("callins")), "port": port, "cloud_on": bool(cfg.get("cloud")),
             "code": _share_code(), "addresses": _share_addresses(port) if running else [],
             "computer": _share_computer_name(), "busy": busy, "error": err,
             "recent": [{"address": ip, "minutes_ago": int((now - t) // 60)} for t, ip in recent[:6]],
             "models": len(_share_models()) if lend else 0, "awake": _SHARE.get("awake") is not None,
-            "callins": _callin_list(), "callouts": _callout_list(), "firewall": _share_firewall()}
+            "callins": _callin_list(), "callouts": _callout_list(), "firewall": _share_firewall(),
+            "queued": queued, "options": _lend_options_view()}
 
 
 def _share_set(on):
@@ -4358,12 +7278,13 @@ def _share_apply():
     lets the person's other computers call it (to lend it theirs)."""
     c = _share_cfg()
     _SHARE["lend"] = bool(c.get("on"))
-    if c.get("on") or c.get("callins"):
+    # 6.57 (app_cloud_657.py): and while it keeps the Cloud for her other devices
+    if c.get("on") or c.get("callins") or c.get("cloud"):
         _share_start()
     else:
         _share_stop()
-    # only lending keeps the computer awake; a laptop that borrows sleeps as it likes
-    _share_keep_awake(bool(c.get("on")) and _SHARE["server"] is not None)
+    # only lending, or keeping the Cloud, keeps the computer awake; a laptop that borrows sleeps as it likes
+    _share_keep_awake((bool(c.get("on")) or bool(c.get("cloud"))) and _SHARE["server"] is not None)
     _callout_apply()
 
 
@@ -4498,6 +7419,10 @@ def _callin_reply(h, jid):
         if (h.headers.get("Transfer-Encoding") or "").lower() == "chunked":
             for piece in _callin_read_chunked(h.rfile):
                 out.put(("data", piece))
+                with _CALLIN_LOCK:
+                    waiting = jid in _CALLIN_JOBS
+                if not waiting:       # 6.9.3: the device that asked has gone: stop reading, so the lender finds out at its next write
+                    return h._err(410, "Nobody is waiting for this reply any more.")
         else:
             n = int(h.headers.get("Content-Length") or 0)
             if n:
@@ -4553,9 +7478,10 @@ def _callin_via_post(h, path):
     c["jobs"].put({"id": jid, "body": body})
     try:
         try:
-            first = out.get(timeout=45)
+            first = out.get(timeout=_LEND_PICKUP_WAIT)
         except _queue.Empty:
-            return h._err(504, "%s did not pick the request up. Check that Ingenium is open there." % who)
+            return h._err(504, "%s did not pick the request up in %d seconds. Check that Ingenium is open there and still lends to this computer."
+                          % (who, int(_LEND_PICKUP_WAIT)))
         if first[0] != "head":
             return h._err(502, "%s sent no answer." % who)
         h.send_response(first[1])
@@ -4642,7 +7568,7 @@ def _callout_loop(entry):
                 entry["stop"].wait(5)
                 continue
             body = json.dumps({"id": _share_lender_id(), "computer": _share_computer_name(),
-                               "models": _share_models()}).encode("utf-8")
+                               "models": _share_models_full()}).encode("utf-8")
             req = urllib.request.Request("http://%s/ingenium/callin" % entry["addr"], data=body, method="POST",
                                          headers={"Content-Type": "application/json", "Authorization": "Bearer " + entry["code"]})
             with _NO_PROXY.open(req, timeout=40) as r:
@@ -4978,11 +7904,16 @@ def _selftest(argv):
     def arg(name):
         return argv[argv.index(name) + 1] if name in argv and argv.index(name) + 1 < len(argv) else None
     model, out = arg("--selftest-model"), arg("--selftest-out")
+    if arg("--selftest-engine") in ("newer", "proven"):    # 6.10.5: the self-test on the newer engine
+        _ENGINE_USE["forced"] = arg("--selftest-engine")
     res = {"ok": False, "app": APP_NAME}
     t0 = time.time()
     try:
         info = _engine_info()
         res["engine"] = dict((k, info.get(k)) for k in ("available", "platform", "version", "threads"))
+        if info.get("available"):    # 6.11: which engine binary answers, by its own word (its build and commit)
+            res["engine"]["kind"] = info.get("engine_kind")
+            res["engine"]["build"] = _engine_build_of(_engine_dir())
         if not info.get("available"):
             raise RuntimeError("this app carries no engine")
         if model == "none":
@@ -5139,7 +8070,11 @@ def _delete_model_file(mid):
         # only ever delete files that live inside our own models folder, or the one Ingenium made on a drive
         c = _place_chosen()
         if (d and os.path.commonpath([os.path.realpath(p), str(d)]) == str(d)) or (c and _under(p, c)):
-            os.remove(p)
+            for q in _gguf_parts_of(p):    # 6.10.2: every part of a model in parts
+                try:
+                    os.remove(q)
+                except OSError:
+                    pass
     except Exception:
         pass
     return True
@@ -5674,6 +8609,41 @@ def _quick_page(html_path):
         return None, {}
 
 
+def _ingenium_holds_port(port):
+    """True when an Ingenium answers at 127.0.0.1:port (its page, or its guard's refusal, both name it). Anything else, or no
+    answer within a second and a half, is False."""
+    try:
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", port, timeout=1.5)
+        c.request("GET", "/", headers={"Host": "127.0.0.1:%d" % port})
+        r = c.getresponse()
+        body = r.read(200000)
+        c.close()
+        return b"Ingenium" in body or b"INGENIUM" in body
+    except Exception:
+        return False
+
+
+def _another_copy_holds_the_work(port):
+    """Her work lives at port 17953: when another Ingenium holds it, this copy would open on an empty store at another address.
+    It says so and ends instead."""
+    if port != 17953 or not _ingenium_holds_port(port):
+        return
+    log_problem("start: another Ingenium holds 127.0.0.1:17953 (her work's address); this copy ends rather than open empty")
+    tell_user(
+        "Ingenium is already open in another window, perhaps an earlier version that is still running.\n\n"
+        "Your models, conversations and settings are with the copy that opened first, so this one would open without them. "
+        "Quit the other Ingenium (in its menu bar, Ingenium, then Quit Ingenium; or right-click its icon in the Dock and choose Quit), "
+        "then open this one again: it will open on all your work.")
+    os._exit(0)
+
+
+class _IngLocalServer(socketserver.ThreadingTCPServer):
+    """The page's own server: on the Mac and Linux it takes its address again at once after a copy is quit (SO_REUSEADDR, which still
+    refuses a port another program listens on); on Windows that option would let two programs share a port, so it stays off there."""
+    allow_reuse_address = not sys.platform.startswith("win")
+
+
 def _start_local_server(directory, html_name=None):
     """Serve `directory` on 127.0.0.1, quietly, in a daemon thread. Returns the
     port, or raises. Loopback only: nothing is exposed off this machine, and
@@ -5691,7 +8661,7 @@ def _start_local_server(directory, html_name=None):
     which is the "reset every time I open it" you saw. One fixed address means
     the desk remembers from now on.
     """
-    html_path = os.path.join(directory, html_name) if html_name else None
+    html_path0 = os.path.join(directory, html_name) if html_name else None
     engine_cache = {}
 
     class _Quiet(http.server.SimpleHTTPRequestHandler):
@@ -5758,6 +8728,7 @@ def _start_local_server(directory, html_name=None):
         def do_GET(self):
             if not self._ing_host_ok():
                 return
+            html_path = _PAGE.get("serve") or html_path0  # 6.19 (app_page_619.py): the author's page, when chosen
             path = self.path.split("?", 1)[0]
             if path == "/_engine/has" or path.startswith("/_engine/part/"):
                 data = b"0"
@@ -5832,11 +8803,23 @@ def _start_local_server(directory, html_name=None):
                     except Exception:
                         pass
                     return
+            if _PAGE.get("serve") and html_path and path == "/" + os.path.basename(html_path0 or ""):
+                try:  # 6.19: the page itself, read whole (the Workshop, the kits), is the one running
+                    with open(html_path, "rb") as fh:
+                        data = fh.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                except Exception:
+                    log_problem("pages: the page could not be served whole", sys.exc_info())
+                return
             return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
         def _serve_model(self, mid):
             p = _model_path_for(mid)
-            if not p or not os.path.isfile(p):
+            if not p or not os.path.isfile(p) or len(_gguf_parts_of(p)) > 1:    # 6.10.2: the page cannot read a model in parts
                 self.send_response(404)
                 self.send_header("Content-Type", "text/plain")
                 self.end_headers()
@@ -5889,10 +8872,11 @@ def _start_local_server(directory, html_name=None):
     httpd = None
     for port in list(range(17953, 17964)) + [0]:
         try:
-            box = socketserver.ThreadingTCPServer(("127.0.0.1", port), handler)
+            box = _IngLocalServer(("127.0.0.1", port), handler)
             httpd = box
             break
         except OSError:
+            _another_copy_holds_the_work(port)
             continue
     if httpd is None:
         raise RuntimeError("no loopback port was free")
@@ -6026,9 +9010,10 @@ def _make_window(webview, api, app_url, app_html_path):
         directory = os.path.dirname(os.path.abspath(app_html_path))
         name = os.path.basename(app_html_path)
         port = _start_local_server(directory, name)
+        _PAGE["port"] = port  # 6.19 (app_page_619.py)
         # R98: the address carries this build's mark, so a web view that kept an
         # earlier page (before the page was sent as never to be kept) cannot use it
-        local_url = "http://127.0.0.1:%d/%s?b=%s" % (port, name, _page_mark(app_html_path))
+        local_url = "http://127.0.0.1:%d/%s?b=%s" % (port, name, _page_mark(_PAGE.get("serve") or app_html_path))
         if _GFX_SOFT[0]:
             local_url += "&softgpu=1"
         log_problem("serving the page at %s (real origin)" % local_url)
@@ -6482,7 +9467,11 @@ def _refresh_menu(webview, window):
         def refresh_ingenium():
             _refresh_window(window)
 
-        return [Menu("__app__", [MenuAction("Refresh %s" % APP_NAME, refresh_ingenium)])]
+        def built_page():  # 6.19 (app_page_619.py)
+            threading.Thread(target=_page_use, args=("", True, window), daemon=True).start()
+
+        return [Menu("__app__", [MenuAction("Refresh %s" % APP_NAME, refresh_ingenium),
+                                 MenuAction("Use the built page", built_page)])]
     except Exception:
         log_problem("refresh menu: not available", sys.exc_info())
         return None
@@ -6915,7 +9904,7 @@ def main():
     if _another_copy_is_open():
         return
     app_html = find_app_html()
-    _APP_HTML_PATH = app_html
+    _APP_HTML_PATH = _page_choose(app_html) if app_html else app_html  # 6.19 (app_page_619.py)
     try:
         import atexit
         atexit.register(_engine_stop)
@@ -7094,6 +10083,9 @@ def main():
             write_diag(["first check: no answer from the page; nothing touched"])
             return
         log_problem("load: page answered but NOT verified: %r" % (pr1,))
+        if _page_not_up(win):  # 6.19 (app_page_619.py)
+            write_diag(["first check: the author's page did not start; back to the last that worked"] + _probe_lines(pr1))
+            return
         write_diag(["first check: page answered but did not verify"] + _probe_lines(pr1))
 
         # Recovery: hand the window the page text directly. Reset the loaded

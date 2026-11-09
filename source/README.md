@@ -371,6 +371,2115 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.64 (8 November 2026): the citation reader made exact, the reranker in the Windows app, and the evaluation's results.
+
+- rag/prompt.js: sentences() does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others);
+  citations() does not count a bracket joined to a word or number before it (strains[7]); modules/r257.js links follow the same rule.
+  Both flags were the checker's, not the model's (the evaluation's second run: H01's two fragments, L07's [7]).
+  rig/t_rag5_prompt.mjs: 15 checks on the evaluation's own replies, no browser.
+- build-windows.yml (and both build-mac.yml): the reranker's list is read without carriage returns. A Windows checkout ends its lines
+  with CR LF, so 6.63's step asked for "config.json\r" and warned "The reranker is left out of this app" (reproduced here with the
+  same list); its clean-up named a path that does not exist, so the files from rag-vendor.zip most likely stayed in that app (not
+  verified inside the installer).
+- rig/t_rag5_eval.js keeps the passages each answer was given in report.json, so a person can check every reading.
+- rag/eval/RESULTS.md: the evaluation's results (two runs with the model the apps carry, one with Qwen3.5 9B).
+
+Ingenium 6.63 (8 November 2026): the folder search back in the Mac and Windows apps, and NOT_FOUND kept exact.
+
+- The 6.62 apps were built without the folder search. vendor.json's new entry made the workflow rag-vendor.yml fetch the files again
+  and replace rag-vendor.zip on the release; its fingerprint changed (57db28f7... instead of ecd2f34b...), and every Mac and Windows
+  build refused it, as it should, and left rag/ out ("The folder search's files have the fingerprint ..."). The new zip holds the
+  same 22 files as before, byte for byte, and the reranker's six (each compared with its pinned SHA-256); release.py now pins it
+  (tools/rag_vendor.sha256). rag-vendor.yml replaces the zip only when run by hand; a push only checks. The reranker step keeps the
+  files the zip already carries and fetches only a missing one.
+- rag/prompt.js declaresNotFound(answer, count) and modules/r257.js: a reply that says the NOT_FOUND sentence and cites no passage it
+  was given is shown as exactly NOT_FOUND. The evaluation found the model the apps carry (Qwen3.5 2B) refusing correctly but adding an
+  explanation before or after the sentence (one of the four end-to-end ACL answers, and H11). A reply that cites a passage given and
+  also says the sentence stays an answer, with that sentence flagged. rig/t_rag3_chat.js: 65 checks (two new).
+
+Ingenium 6.62 (8 November 2026): the folder search's evaluation and its optional reranker (phase 5). Her task: "Reranker. Optional,
+off by default, loaded on demand. Use a small cross-encoder that has a working ONNX export for Transformers.js. Confirm this on Hugging
+Face before choosing a model", "merge with reciprocal rank fusion (k = 60), then rerank to 5 if enabled, else take the top 5", and her
+five done criteria (rag/DESIGN.md sections 12 and 13).
+
+- rag/reranker.worker.js, rag/reranker.js (new): `Xenova/ms-marco-MiniLM-L-6-v2` (revision a0914435, confirmed on Hugging Face on
+  8 November: tagged transformers.js, onnx and text-classification; quantized, 23.1 MB), loaded the first time a search asks for it.
+  rag/retriever.js reorders the fusion's best 20 by its scores and keeps 5 (the folder rule applies before it reads anything);
+  rag/main.js keeps the fusion's order with a plain note when its files are missing. modules/r202.js: the card's switch (off, per
+  device); modules/r257.js: the chat asks for it when the switch is on. The Mac and Windows build workflows fetch its six files from
+  the pinned revision and check each against tools/rag_reranker.sha256 (written by release.py rag); vendor.json pins them.
+- rag/eval.js, rag/eval/golden.json, rig/t_rag5_eval.js (new): the evaluation; the results are in rag/eval/RESULTS.md.
+- Measured (rig/t_rag5_rerank.js, 15 of 15, the three fixture folders without the 4 MB logbook, so golden item H09 left out): off by
+  default and nothing of it fetched until a search asks; Recall@5 17 of 19 with it and without it; the passage holding the answer first
+  in 17 of the 17 found with it, 14 without; a search took a median of 48 ms without it and 7.4 s with it (four processors shared
+  with the evaluation run), and the first search with it loaded it in about 8 s; test-b got no passage of household_papers with it on;
+  a copy without its files keeps the fusion's order and says so under the reply. Her five criteria: rag/eval/RESULTS.md.
+
+    node rig/t_rag5_rerank.js <page url> <out>    # 15 checks (RAG_E2E, RAG_E2E_BARE, RAG_BRIDGE)
+    node rig/t_rag5_eval.js <page url> <out>      # her five criteria (LLM: an OpenAI-style model server)
+
+Ingenium 6.61 (8 November 2026): Fabrica's panels rearranged, its library, and each app's own page. Her words (8 November 2026): "The +
+New app button opens a little panel that makes no sense and barely seems to do anything, I want that fixed and streamlined ... either keep
+the Close or Done button both look weird there together. I also want the app library to be redesigned"; she approved the second preview
+(the apps' real 3D seals, Ship and Open on each card), then: "I don't want you to change Fabrica's 3 column view ... I mainly wanted the
+popped out panels rearranged and fixed", "I want the library page ... to be the view that I see when I click on the Your apps", and "I want
+all of these to be kept and added into Ingenium".
+
+- modules/r112.js: the three panels are unchanged. "Your apps" (the left panel's heading, or its count) opens the library page: her own
+  apps (the app library's, kept here or not yet, and the Offline Project's two kinds) and the apps made here, as cards with their seal,
+  version, where they stand and the packages made, Ship and Open (or Bring it in, Make it); filters (All, Your own, Made here, Needs
+  you) and a search; it redraws when the app library fills (a moment after the app opens). Open shows the app's own page: the apps down
+  the left, its seal and name with Run it and Ship, tabs (Overview, Changes, Versions, Plans, Ship, How it was built; the middle four lead
+  into the three panels), and three boxes: where it stands, the next step (one key), how it was built (its folder on the Folders page).
+  "‹ Back to the work" returns to the three panels. A new app: name, colour, how it starts (Describe it: a model writes its first page in
+  Code, linked to Fabrica; A simple first page: index.html, manifest, icon.svg and an offline copy, kept as the first version; Bring its
+  files in; Start in Code) and one key; the new app wears its colour as its seal until it has a drawn one. Bring an app in: the library's
+  apps as seal tiles (one already here opens), the Offline Project as crests, then a page or zip, a git bundle, From Code. Every panel of
+  Fabrica (r112, r141) closes with its ✕, Escape or a press outside, and keeps only its own main key.
+
+    node rig/t_661_fabrica.js <page url> <out>     # 21 checks; rig/t_fabrica.js follows the seal tiles (34 checks)
+
+Ingenium 6.60 (8 November 2026): the folder search keeps itself up to date (phase 4, the scheduler), and the installed Windows
+app really carries the speech models and the folder search. Her task: "Use setInterval in a Worker. Default interval 20 minutes,
+configurable. It runs only while the app is open ... Reconcile each folder: compare mtime and size first, and hash the content only when
+they differ. Reuse stored embeddings for chunks whose content_hash is unchanged. Delete chunks of removed files." She approved phase 4
+on 8 November, and chose to keep her specification's five passages (no threshold for weak matches).
+
+- rag/scheduler.worker.js and rag/scheduler.js (new): the clock in a worker and its page side (ticks never overlap). rag/main.js:
+  IngRag.schedule, IngRag.reconcile, IngRag.scheduleState: each look lists every folder and compares sizes and times with the index; only
+  a folder where something changed is read (the indexer's reconcile: hash, reuse, delete, one transaction per file); where nothing
+  changed the reading model is not even loaded. rag/DESIGN.md section 11.
+- modules/r202.js: "Look for changes and read them by itself" on the card (never, 10, 20, 30 minutes or an hour; 20 by default; kept per
+  device), the first look two minutes after the app opens, and a line with the next look and what the last one found.
+- release.py ships scheduler.js and scheduler.worker.js with the folder search.
+- Windows (build-windows.yml, pushed during 6.59): GNU sha256sum given a path with backslashes starts its line with a backslash, so the
+  fingerprint check had failed since 6.57 and the installed app fetched its speech model instead of carrying it; the fingerprint is now
+  read from standard input.
+
+    node rig/t_rag4_schedule.js http://127.0.0.1:8188/ <out>   # her criterion 5 through one tick of the clock: 19 checks
+
+Ingenium 6.59 (8 November 2026): the chat answers from her folders, with its sources (the folder search, phase 3), and the Mac and
+Windows apps carry the folder search. Her task (31 October 2026, sent again on 8 November): "Add an opt-in RAG mode to the existing chat
+app. When the mode is enabled, every chat turn retrieves context from user-selected local folders ... and the answer cites its sources",
+with her grounding contract: "If retrieve() returns zero chunks, do not call the LLM. Return the constant NOT_FOUND", her system prompt,
+and "Render each [n] as a clickable link. It opens the source file ... and, where possible, highlights the section". She asked on
+8 November that the folder search and its phases come first.
+
+- rag/prompt.js (new, pure functions): NOT_FOUND, her system prompt word for word with the passages numbered, ground() (zero passages:
+  NOT_FOUND; otherwise the passages kept, best first, while the prompt fits the model's room), isNotFound(), citations(), sentences()
+  and checkGrounded() (every sentence carries a citation to a passage given; the flagged sentences are named). rag/DESIGN.md section 10.
+- rag/main.js: IngRag.prompt, and IngRag.openSource(passage, user): the cited file read again through the app's bridge (only a folder
+  the user may read), its text from the parse worker without chunking (rag/parse.worker.js and indexer.js: textOnly), and the passage
+  found at its offsets, elsewhere, or not at all (the file changed).
+- modules/r257.js (new): "Your folders" in the chat's + menu, first of the ways of looking things up, and a chip while it is on
+  (turning it on turns Web search and Research off; not in Code; only where the folder search is). A turn: retrieval in the chat's own
+  preparation step (the Stop key and the busy state work as for any reply); zero passages, NOT_FOUND and no model asked (a note names
+  where folders are added when none has been read); otherwise the chat's model, whichever it is, reads exactly her system prompt and
+  the question (chatHistory), nothing else (no earlier turns, memory, web or the working loop's tools). The reply keeps its passages,
+  its [n] are links, its sources are listed, sentences without a citation are named under it, a quoted NOT_FOUND becomes exactly
+  NOT_FOUND. The viewer: the passage as it was read, then the file with the passage marked (a PDF's page named). A message with a file
+  or a picture is answered without the folders, with a note. The switch is kept per device (r255 HERE_KEYS "rag").
+- r202.js: the card's last line says how the chat uses the folders; build/held.json no longer holds r202 back: release builds carry
+  the folder search's card and loader from 6.59.
+- Shipping (release.py ship_rag, RAG_FILES): rag/ into the Mac mini, Mac Intel and Windows repositories with tools/rag_vendor.sha256;
+  build-mac.yml and build-windows.yml fetch rag-vendor.zip from Mini's release, check it and unpack it to rag/vendor; ingenium.spec and
+  ingenium_win.spec (the installed app) carry rag/ beside the page; without the files the app is built as before. A copy with the
+  models over 2,140,000,000 bytes is made again without the folder search (Mac) or not published that time (Windows).
+
+    node rig/t_rag3_chat.js http://127.0.0.1:8188/ <out>     # the built page with rag/ beside it and the bridge stand-in (RAG_E2E)
+
+Ingenium 6.58 (8 November 2026): Your mentor in the Career Studio, the screen kept on while Ingenium works, and dictation in the phone and
+tablet apps. Her words (8 November 2026): "I am still unclear on what exactly I am looking for so I would like for Ingenium to provide that
+inside of the app and be my in-app recruiter/mentor/counselor/headhunter"; "I want them to spot skills and experience that I have show me how
+it can be transferred ... spot my blindspots"; the Career Studio "is not really AuDHD accessible"; and "I want for Ingenium to still be able
+to continue running and working in the background even if the screen of the devices go to sleep". She chose the mentor's four sources: her
+CV and documents, Lector's readings of her apps, her LinkedIn export, and a short talk.
+
+- modules/r188.js, Your mentor (a room beside Today; paintMentor and its steps, IngCareer.mentor): measured on 6.57, what a mentor needs was
+  in the studio already, in five rooms and under a dozen keys, with nothing saying which to press first, and Suggest entries and Find my
+  skills each replacing the other's findings. Now seven steps, one on the screen at a time, her place in view: what it may read (CV,
+  documents, LinkedIn export, Lector's readings, a profile file); a short talk (eight questions, one at a time, each skippable, saved as
+  she types; finished, they fill What you are looking for); entries and skills found, kept together, kept or dropped one at a time; what
+  transfers, blind spots and what sets her apart (Your edge's three); paths that fit (Your direction); her CV and documents looked at
+  with her (never rewritten); and a summary (this week, what to add to her CV and letters, what Lector found in her apps, blind spots,
+  where she stands out, paths). Do the rest for me runs the steps that need the model in order; Stop (stopNow, MSTOP) ends the steps
+  after the one running and keeps what was finished; the room opens at the first step not done. Today names the mentor's next step.
+  Each profile has its own mentor (CS().mentor).
+- modules/r256.js (new): the Screen Wake Lock while Ingenium works here (Engine busy, Lector, the Career Studio, Blend, dictation, the
+  Cloud, a model being converted), released as soon as the work ends; a page out of sight cannot hold it, and it is asked for again
+  when seen. Settings, Models and AI, Your devices: Keep working (r234, r173). The computers that lend models or keep the Cloud already
+  stay awake (R74; 6.57).
+- The Fire and Android app (AndroidManifest.xml: RECORD_AUDIO, MODIFY_AUDIO_SETTINGS; MainActivity: onPermissionRequest for the app's
+  own address and for sound only, then Android's own question) and the iPhone and iPad app (Info.plist: NSMicrophoneUsageDescription;
+  WebViewController: requestMediaCapturePermissionFor, the app's own scheme, main frame, microphone only) pass the microphone to the page.
+  Not compiled in the build session: GitHub's Android and iOS builds are the first compile; a device test is still to be done.
+
+- 6.57's Mac runs failed at the last step: the copy with the models, carrying the speech models too, came to 2.18 GB, over GitHub's
+  limit of 2 GB for one release file (HTTP 422). build-mac.yml (Mini and Intel) now makes that copy without speech/ (resealed); the app
+  alone, the main download (about 200 MB), keeps them. 6.57's Windows, Fire and Android, and iPhone and iPad runs succeeded.
+
+    node rig/t_658_mentor.js <page url> <out>    # the mentor with a stand-in model: 17 checks
+
+Ingenium 6.57 (8 November 2026): Ingenium Cloud. Her words (8 November 2026): "I want you to build Ingenium its own local Cloud or local
+network that can store my data and facilitate the transfer of my data across wirelessly across my devices ... I want all of my devices to
+have the same content in real time or be able to be updated over Ingenium's Cloud ... continue working on any app, project, assignment, or
+chat or anything else inside of Ingenium with great ease as long as I login and connect to the Ingenium's cloud". Asked how, she chose both
+ways: her Mac mini as the home hub, and any two devices directly.
+
+- desktop/app_cloud_657.py (Mac and Windows; release.py's DESKTOP list): the gateway that lends models (port 17860, its pairing code and
+  lockout) also keeps Ingenium Cloud: GET /ingenium/cloud (the snapshots it keeps), GET and POST /ingenium/cloud/part/<id> (one sealed
+  part, its bytes checked against their SHA-256), POST /ingenium/cloud/has, /snap (kept only once every part it names has arrived; the
+  newest five per device; parts no snapshot names go an hour later) and /forget. It keeps sealed parts and each snapshot's device name,
+  time, size and key-drawing salt in the app's data folder (cloud/), and never sees the passphrase or a word of her work. A new switch,
+  cloud_box_set, runs the gateway and keeps the computer awake for the Cloud without lending its models (_share_apply).
+- modules/r255.js (new): the Cloud, page side, the same code on the computers, the Fire tablet, iPhone, iPad and a browser (netFetch).
+  A snapshot is everything a backup holds (r143's make, with a new option, leave, so the app library stays on each device), each part
+  sealed with AES-GCM-256 under a key drawn from her passphrase (PBKDF2-SHA-256, 600,000 rounds, deriveBits: one half seals, the other
+  names each part by HMAC-SHA-256; the nonce is drawn from the part too, so a part always seals the same way and only changed parts
+  travel). The key is kept on the device as a key the page cannot read out (IndexedDB ingenium_cloudkey, never in a backup: r143's
+  NEVER; its settings in localStorage ingenium_cloud, never carried: r143's protectedKey). Bringing in is r143's Merge (each item by
+  its own date, the desk kept on the recovery shelf first), then what belongs to one device is put back as it was (its models, the
+  computer it borrows from and its online connection, its window and side bars, dictation, app library), then what was deleted
+  elsewhere is deleted (each device compares the ids its lists held at its last sync with those they hold now; a change made after a
+  deletion wins), and the conversation open on the device that worked last becomes the open one. By itself (on by default): a send a
+  minute after a change made by her (an unchanged desk is not sent), a look every minute; new work is announced at the foot of the
+  window and brought in when she says, or by itself when she is not typing if she chooses. Away: a sync file sealed with the same
+  passphrase (r143's seal), merged the same way. Settings, Your data, Ingenium Cloud (r234; r173): three numbered steps, the one she
+  needs open.
+- Not in this stage: the app library (each device keeps its own: every Ingenium carries her apps' builds, and a library's entries name
+  pieces kept on that device); connection keys and signing keys (each device keeps its own, as in a backup without them); a Cloud kept
+  by a device that is not a computer (a page cannot listen on the network); Bluetooth (a page cannot exchange data with another
+  computer over it).
+
+- Her choice for dictation (8 November 2026), "Carry them": the Mac builds (build-mac.yml, ingenium.spec, in Mini and Intel) and the
+  installed Windows app (build-windows.yml, ingenium_win.spec, its folder build only) fetch speech-vendor.zip from Mini's release, check
+  it against tools/speech_vendor.sha256 and carry it as speech/ beside the page, which the app's own server serves (r254 reads it
+  first). The portable Windows program does not (it unpacks itself at every start); a fetch that fails or a fingerprint that differs
+  builds the app without it (continue-on-error), and dictation then fetches its model once.
+
+    node rig/t_657_cloud.js <page url> <box address> <pairing code> <the box's cloud folder> <out>   # two devices and a third: 14 checks
+    (the box: python3 rig/run_app.py <folder with ingenium_app.py patched and ingenium.html> <api port>, then POST /call/cloud_box_set [true])
+
+Ingenium 6.56 (8 November 2026): dictation written on the device with Scriba's speech models, Carpe Diem 1081 in Lector, and Lakay
+Build 6. Her words (8 November 2026): "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead
+sending it outside of the app to another provider. I want everything kept in-house where possible. Lector quotes a much older Carpe Diem
+build 1058 when it should be 1081"; and "The Lakay has been updated to a later build, please update Ingenium's copy to bring it up to date."
+
+- modules/r254.js (new): the microphone key in the message box (Chat and Code share it) used the browser's speech service, which in
+  Chrome and Edge sends the sound to Google or Microsoft. It now writes with Scriba's own models in a worker on the device: Moonshine
+  base for English, Whisper base for French, Haitian Creole and Spanish (transformers.js 3.8.1, the version Scriba uses). Each phrase is
+  cut at a pause, resampled to 16 kHz by the browser's own resampler (the plain average Scriba uses wrote "colour letter" for "cover
+  letter" on one test recording; the resampler wrote every word right), and written into the box. The engine and the model come from
+  speech/ beside the page when an app carries it, else from the device's own copy (Scriba's store and transformers.js's cache, so
+  either fills both), else once from the internet, kept from then on. Settings, Models and AI, Search, eyes and ears (r234; r173)
+  holds the Dictation card: the language, Get it ready now (to fetch it before travelling), and the browser's service, off unless she
+  turns it on; r180's note about the sound being sent away now shows only then; build_page.py makes the page's own listener (R50) act
+  only then. The Mac apps' Info.plist asks for the microphone with its reason (NSMicrophoneUsageDescription; ad hoc signed without the
+  hardened runtime, so no entitlement is needed). Not done yet: the Fire and iPhone/iPad apps do not pass the microphone to the page
+  (no RECORD_AUDIO and no onPermissionRequest on Android; no microphone line in the iOS Info.plist), so dictation there waits for a
+  later stage.
+- source/speech/fetch_speech.mjs and .github/workflows/speech-vendor.yml (new): GitHub's machines fetch the engine and both models
+  with transformers.js itself (the files the page asks for, dtype q8), transcribe recordings made there with espeak-ng, list every
+  file with its SHA-256 and keep them on the release "speech-vendor": engine 21.5 MB, Moonshine base 63.8 MB, Whisper base 76.0 MB.
+  On GitHub's machine: "Please summarize the three chapters of my thesis and list the questions that are still open." (6.0 s of speech,
+  0.2 s to write) and "I would like to write a cover letter for a remote learning designer role." (both word for word).
+- Carpe Diem 1081 (2026-11-01, 528171081, the full edition, 48,542,093 bytes, from Carpe-Diem-Gift's newest branch, identical in its
+  Mac, Windows and Fire projects) replaces 1058 in apps/builtin. apps/update_builtin.py now tells The Forge from Carpe Diem by the
+  page's title (both carry a Forge section, and their build stamps lie past the first 400,000 characters, so 6.55's version could
+  read neither). recipe/recipe.json: the full edition's figures Lector quotes are measured from 1081 (48.5 MB and 71,186 lines,
+  split as r126 counts them); the builds the recipe was written for (1058) stay as the old values a document may still carry.
+  The page is 95.5 MB (1058 took 25.7 MB of it; 1081 takes 42.5 MB, most of it Carpe Diem's own compressed source and its film), under
+  GitHub's 100 MiB limit for one file with about 9 MB to spare.
+- Lakay Build 6 (2026-11-07, 1,091,377 bytes, the same page in Lakay-Apps, Lakay-Mac and Lakay-Windows) replaces Build 3. Its Spiral
+  is now a coin in sixteen planes (the edge in four, the plate, the engraving, two shadows, the halo, the shell's sides in three, the
+  shell, the lattice, the pearl, the sparkles); apps/lakay_mark.py reads them from src/js/09-crest.js (PLANES) and keeps each at its
+  own depth (none marked side, which Ingenium's renderers would move to one fixed depth), and lays its still seal flat from the planes
+  of Lakay's own still mark.
+- Verified, no change: the Career Studio's + Bring one on Today is purple by day and by night (6.21's change holds).
+
+    node rig/t_656_ears.js <url> <out> <English WAV> [<French WAV>]   # dictation on the device, nothing sent away, Settings: 19 checks
+    node rig/t_656_cd1081.js <url> <out>                              # Carpe Diem 1081 carried, kept, named and measured by Lector: 6 checks
+
+On the release page: t_656_ears 19/19 (English word for word through the fake microphone; French by Whisper base on a synthetic voice:
+"Bon, je vous reste à créer une lettre de motivation pour un poste à l'istreuse", for "Bonjour, je voudrais écrire une lettre de
+motivation pour un poste à distance"), t_656_cd1081 6/6, t_633_settings 17/17 (the Dictation card beside the eyes keeps Search, eyes and
+ears under 1,650 pixels; a look into the speech store no longer makes it), t_655_fixes 26/26 with the three other editions (none names
+Lakay or Carpe Diem 1081: editions.py leaves out their two lines of news), t_627_editions 20/20, t_615_tour 20/20, t_651_still_keys 25/25,
+t_695_memory 30/30, t_611_code 37/37, t_6111_popups 17/17, t_616_scroll 9/9, t_700_lock 58/58, t_634_docs 17/17, t_635_newer 10/10,
+t_628_train 19/19, t_703_studio 25/25, t_614_connectors 24/24, t_6112_found 10/10, t_632_sealed_stores 21/21, t_6101_device 14/14,
+t_633_reset 12/12, t_617_effort 15/15 and t_618_workshop 19/19 (with rig/mock_agent_server.py). Failing on 6.55 in the same way, so
+not new: t_626_guide 26/27 (its list of the Guide's rooms predates 6.46's topics), t_613_github 41/43 (its slash-command checks predate
+6.47's commands), t_61_backup 44/45 (the browser closes during its last part).
+
+Ingenium 6.55 (7 November 2026): the greeting card's keys as every key, Check with Blend in 3D, the chat greets her by name, Lector
+answers at once, Lakay among her apps, and a Mac start that never opens without her work. Her words (7 November 2026): "The Link your
+file again, take the guided tour, Read the short guide are the ONLY stupid buttons that don't lift when I hover over them and make no
+sound and just look stuck to the card ... I want both the sound and animations restored for those buttons"; "The Check with Blend button
+looks flat and has that glossy look with the heavy purple shadow"; "Clicking on any of the 4 apps inside of the "Your apps" section of the
+Lector page feels really heaving and slow"; "I want the Chat pages inside of Ingenium to be aware of who I am and actually greet me like
+the Home page does"; and of Lakay: "I want its latest build embedded into Ingenium just like my other apps so that I can continue working
+on it and developing it further." She approved the preview before it shipped.
+
+- modules/r147.js: the greeting card's keys keep 6.53's size and white face and take Ingenium's own keys' edge, casts, rise (2px, the
+  edge to 3px), press (1px, the edge pressed in) and spring, measured from .btn and .btn.primary on Chat and Models, by day and night.
+  modules/r176.js: they, Home's rows of recent work and Check with Blend are among the keys that sound (they never were).
+- modules/r218.js: Check with Blend keeps its lilac face; its bright top line and violet glow give way to a solid edge (#c9b6ea), soft
+  casts in the page's shade, the keys' rise and press.
+- build_page.py: the empty Chat and Code pages find her name as Home does (her profile, else the author's name Lector writes under; its
+  first word); Code's empty page greets her and asks what to build beneath.
+- Her screenshots of the evening showed Chat, Code and Models empty. Measured: the 6.53 and 6.54 pages show the same Chat, Code and Home
+  with the same data (rig: the same text and keys, no errors). The Mac app keeps her work at one address (127.0.0.1:17953, R58); a copy
+  that cannot take that port opens at the next, with a store of its own: empty. Two ways to get there were found and closed in
+  build/desktop/app_port_655.py: another Ingenium still holding the port (this copy now says so and ends; Windows already stopped a
+  second copy), and a copy opened again within the minute the closed one's connections linger (TIME_WAIT; the server now reuses its
+  address on the Mac and Linux, SO_REUSEADDR, which still refuses a port another program listens on). Her work stays at 17953.
+- Lector (modules/r253.js, new; r108.js, r158.js): choosing The Forge read its 14 MB page and prepared it (pictures set aside, code,
+  styles and markup separated, words, notes and inventory gathered) on the page's own thread: about 1.4 s, in pieces of up to half a
+  second (with the computer slowed four times: pauses of 0.7 and 1.9 s; Inkwell 1.8 and 3.8 s). The same preparation now runs in a
+  worker built from the page's own functions (the same result for all five apps, compared whole), from the bytes the library keeps,
+  handed over without a copy; the brief's parts are counted once for each depth and model memory; a tile's seal is made once and moved
+  into the tile drawn again (a click redrew 31 pictures, half a megabyte). Choosing The Forge now leaves no pause above 0.1 s (57 ms).
+- Lakay (apps/builtin, apps/update_builtin.py, apps/lakay_mark.py; build_page.py, editions.py; modules/r120.js, r240.js, r112.js,
+  r109.js, r147.js): its latest page (Build 3 of Lakay-Windows, 7 November 2026, its fingerprint as its repository publishes it) is
+  carried in the master edition, checked and kept on first start; the library knows it by name, its page and its build number; it is
+  listed after the four, by name and in its colour, in Lector, Fabrica's app library and wherever her apps are listed, with its Spiral in
+  seven layers (its own depths) and its seal; brought into Fabrica, it is an app with its mark. update_builtin.py now takes any of the
+  pages it knows, in any order, and keeps the others as they are. No other edition carries or names Lakay.
+
+    node rig/t_655_fixes.js <url> <out> [other=<edition url> ...]   # the keys, Check with Blend, the greeting, Lakay, Lector (23 checks)
+    python3 rig/t_655_port.py <repo>/ingenium_app.py                 # a second copy, a quick restart (6 checks)
+
+Ingenium 6.54 (7 November 2026): 6.8.7's motion again, Home's sparks drawn lightly, and the greeting card's keys. Her words (7 November
+2026): "I want the 3D look and animation of build 6.8.7, I want everything else to stay the same in Ingenium. I only want for the buttons
+inside of the "Good morning, ..." card on the Home page to be made slightly smaller but keep the acrylic chunky look"; "I like the white
+colour of the "Take the guided tour" and "Read the short Guide" buttons from 6.53, I want to keep the colour for the buttons but remove
+the glossy, flat effect and animation"; "I also really like the smaller size of 6.53's buttons inside of the app. I want that kept as
+well"; "Keep the colours from 6.53." She saw a preview (the card's keys in each state, and Home moving) before it shipped.
+
+Measured against the 6.8.7 release page from the history (git show 749ea1e:ingenium.html), in Chromium, on the common keys of eleven
+pages at rest, under the pointer and pressed: most have 6.53's faces and shadows; some were made smaller in 6.38 (the greeting card's
+keys, the rooms' tabs, the Career Studio's tabs), which she keeps; a few were redrawn since (Build's Copy, Open and Download, the Guide's
+list of topics), and the side bar's apps were plain rows (Carpe Diem's stones since, kept). What 6.53 lacked was the motion: 14
+animations ran on 6.8.7's Home with the pointer still, none on 6.53's.
+
+- The motion of 6.8.7: modules/r248.js (the seal and Home's sparks at rest) is out of the build; modules/r251.js keeps only the rail
+  arrow's plain face; modules/r118.js no longer rests the apps' key glows in their frames; modules/r140.js moves a crest's quarters
+  whenever it is on the screen (resting them only where they cannot be seen), as before 6.51.
+- modules/r252.js (new): Home's stone sparks were six growing backgrounds of one layer behind four glows, worked out and drawn again
+  for every frame on all seven stones (Home with nothing touched, computer slowed four times: 76 % busy on 6.8.7, 80 % on the 6.54
+  page with them as they were, 11.5 % without them). Each stone now has one picture of the star, as large as the stone, moved to each
+  place while it is nothing and grown there by a transform the graphics chip draws (translate(x%,y%) scale(s) translate(-17x px,-17y
+  px): the star's own x% y% point at the stone's x% y% point, as a background of 17s px at x% y%); its glow is drawn once. Frozen at
+  twelve moments of the beat, the old and new sparks have the same place and size. Home with nothing touched: about 10 %. Under a
+  moving pointer Home is still busier than on 6.53 (about 80 % against 52 %): every moving thing's style is worked out again whenever
+  the pointer changes what it is on; the seal's star, heart and ring (moved inside its picture) are the next largest part.
+- modules/r147.js: the greeting card's keys keep 6.53's size (13px, 34 to 36px) and faces; the white keys' bright top line and thin
+  foot give way to a solid edge 2px deep (#d9d4e0 by day, #120d1c by night) and their casts; no key in the card has a transition,
+  rises or springs; pointed at, a white key's rim darkens and the purple key lightens (brightness 1.06); pressed, a key sits 2px down
+  into its edge at once.
+- rig/t_654_motion.js (new): 6.8.7's animations on Home and Chat (read from the 6.8.7 page with ref=), the sparks' beat, place and
+  size, the crest's quarters on and off the screen, the greeting card's keys at rest, pointed at, pressed and by night (14 checks).
+  rig/t_651_still_keys.js and rig/t_653_look.js expect the motion now.
+
+    node rig/t_654_motion.js <url> <out> ref=<the 6.8.7 page>   # 6.8.7's motion; the sparks; the crest; the greeting card's keys
+
+Ingenium 6.53 (7 November 2026): the keys and surfaces of 6.9.4 again; a page that keeps still; the Offline Project as an ordinary
+app in Fabrica; the tour, the Guide and Help up to date. Her words (7 November 2026): "I honestly just want Ingenium reverted back to how
+it used to look before you started messing it the graphics. I want all of the edits and updates kept but I want my app to look like how
+it looked prior to this as far as the buttons. Perhaps how it looked on 6.9.4 or somewhere around that build"; "Th + button and the mic
+buttons on the chat pages need to be reverted to how they used to look ... They used to look flat and like they are a part of the compose
+box"; "it is mostly slightly faster but still slow on my Macbook pro"; "The Offline Project app looks odd on the Fabrica page ... It
+should only be there only if I was working on it inside of Fabrica and recently shipped a new version like any other app"; and "Please
+make sure that the guided tour and its demonstrations are also updated as well as the Guide page". (A first draft of 6.53 drew Carpe
+Diem's recipe in slate; she asked for 6.9.4's look instead, before it was pushed, and saw a preview before it shipped.)
+
+- The keys: modules/r247.js (6.49's recipe, its rooms' copies and its raised quiet keys) is taken out of the build; the key recipe of
+  modules/r248.js (6.51) is taken out, its seal and Home's sparks at rest kept; modules/r251.js keeps only the page at rest. Chat's +
+  and microphone keys have the base page's plain look (an outline in the message box); the model key's ring while nothing answers
+  (modules/r244.js) is gone. Measured against the 6.9.4 release page from the history (git show aa50c44:ingenium.html; rig/t_653_look.js):
+  every common key and surface on Chat, Home, Settings, Models and Blend has 6.9.4's shadow, face, border and motion.
+- The page keeps still: the rail's icons (the notepad, the hourglass, the bell, the moon), the seal's sway, the crest's sway, the top
+  bar's breathing dots and the Guide's spark animated without end; they move while the pointer is on them (modules/r251.js). With the
+  pointer still on Chat, no CSS animation runs. Only two glass blurs were in use (the welcome door, which Carpe Diem's door has too, and
+  the rail's arrow); the arrow's is gone.
+- modules/r246.js: no tile above Your apps. Bring one in offers The Offline Project, all four apps or without Inkwell (kept as a
+  repository named The Offline Project, or a new version of it when it is already there), and its own card (each app's copy, the hall,
+  Make and open, Save the app). Kept, it is listed in Your apps as any app, with its crest (modules/r112.js, as since 6.40).
+- modules/r250.js (new): the tour gains Who answers, from any page (every level), Connect a service, Context and compacting, How long it
+  thinks and sources when you ask, and (the master edition) The Offline Project, made from your apps, each after the card that shows
+  that part of the page and placed once Ingenium has started; the Guide gains Models and services: who answers, and how; Context and
+  compacting in a chat; Thinking and sources in a chat; and (master) The Offline Project, made in Fabrica; Help gains their lines.
+- rig/t_649_keys.js (6.49's recipe) is retired with that recipe; rig/t_651_still_keys.js keeps its stillness checks and leaves the
+  keys to rig/t_653_look.js; the Offline Project's tests open its card through Bring one in (rig/t_648_offline.js,
+  rig/t_651_offline_lists.js); rig/t_62_import.js follows 6.46's Ollama memory and 6.47's compacting.
+
+    node rig/t_653_look.js <url> <out> ref=<the 6.9.4 page>      # every common key and surface as in 6.9.4; the + key plain; no glass;
+                                                                  # nothing animates untouched; the Offline Project in Fabrica
+    node rig/t_653_tour.js <out> master=<url> full=<url> gift=<url> demo=<url>   # the new cards, rings, Guide topics and Help lines
+
+Ingenium 6.52 (7 November 2026): Longest reply, Context and Effort kept for each model and service, and at hand on every page. Her
+words (7 November 2026): "I want the Tokens and Context controls to be fixed inside of Ingenium, the app always resets it to zero with
+the models even though I already moved it to a higher capacity earlier, it never remembers them and they are all out whack all over
+the app, I can only regulate it on the chat pages which is not really convenient since that I cannot regulate it on the other pages
+that are running these models and I can't adjust the effort level."
+
+Measured on 6.51 (rig/t_652_gen.js repeats it): the chat's Controls kept Longest reply, Context and Effort only inside a model on
+this device (its tokens, ctx and effort); with a connected service (Claude, OpenAI ...) or with nothing set up, nothing was kept,
+so after a reload Longest reply was 1,024 tokens and Effort Medium again (the service's memory, state.cloud.window, was kept).
+
+- modules/r249.js (new): state.gen keeps {tokens, ctx, effort} for each answerer ("m:<model id>", "c:<provider>|<model>", or
+  "none") and the last chosen; every change she makes (the chat's sliders, the effort menus, the model key's controls) is kept;
+  at start and whenever who answers changes (a saveState after which the answerer differs; refreshChatNote) the answerer's own
+  come back, else a model's own numbers from before 6.52, else the last chosen. The sliders' room is set first from
+  ingReplyMax and ingCtxMax, so a large value is not cut to the page's default room. Changes the effort module makes for one
+  message (Auto, Ultracode, the reply that follows the effort) send no input event and are not kept.
+- modules/r244.js: the top bar's model key (Who answers) holds How it answers: Effort (Auto and the five levels), Longest reply
+  (with Follows the effort, which is the effort module's replyAuto; moving the slider sets it by hand) and Context (a model's
+  window, or a service's memory, mirroring the Controls' ctlCloudCtx); the arrow keys move a slider there, not the menu's focus.
+
+    node rig/t_652_gen.js <url> <out>   # nothing set up, a service, a model: kept over a reload; each keeps its own both ways; a
+                                        # first use starts from the last chosen; How it answers on Settings and Lector, the same
+                                        # values as the Controls, kept (13 checks)
+
+Ingenium 6.51 (7 November 2026), its second part: a page that keeps still, keys that stand up from it, and an empty Chat page
+without ready-made ideas. Her words (7 November 2026): "The buttons inside of Ingenium still feels flat and are missing the popped
+out 3D animated look and effect and everything feels really freaking slow when I move my mouse around inside of the app. I HATE IT
+and I already told you to fix this many times!" and "Please remove the 4 prompt buttons from the Chat's page ... please only keep the
+"Connect a service" and "Get a model" on there, it looks too crowded and cluttered at the moment."
+
+Measured on the 6.51 test page in Chromium with the computer slowed four times (CDP Emulation.setCPUThrottlingRate 4; Performance
+metrics TaskDuration over 5 s with the pointer still, then over a sweep of 122 pointer moves), on the Chat page: the main thread was
+busy 37 % of the time with nothing touched and 56 % while the pointer moved; now 4 % and 27 %. What did it:
+
+- modules/r173.js: Blend's step keys were painted again 30 ms after every change of a hidden attribute inside Blend's card, and the
+  painting itself set Back's hidden (to the same value), so it went on for ever, on every page, from the start (Blend is built at
+  start): about 30 rewrites a second, each waking the page's watchers. Each part is now written only when it changes (idle 37 % to
+  8 %). The same fault, at 170 rewrites a second while the Guide was open, was in the Guide's What's new key (modules/r230.js, its
+  version number); and smaller ones, once or twice a second, in the who-answers key and the top bar's pill (modules/r244.js, every
+  1.5 s), the chat's pace chip (modules/r116.js, every 0.5 s), the thought cloud's number (thoughts/thought_cloud.html, at every
+  save) and the storage gauge (modules/r142.js). All write only what changes now.
+- modules/r248.js (new): the Ingenium seal's star, heart, ring and breath move inside its picture, which the browser cannot hand to
+  the graphics card, so the page was painted again for every frame of them (idle 8 % to 5 %, sweep 48 % to 29 %). They rest now, and
+  move while the pointer is on the seal (or it has the keyboard's focus) and on the welcome door; the seal's sway, which the graphics
+  card draws, goes on. Home's app stones sparkle while the pointer is on them (their sparks, four glows each, grown by the main
+  thread, made Home work out its styles about 55 times a second: 174 times in 3 s, now 31). In the apps' frames (modules/r118.js),
+  Tabula's and Abacus's app keys glow and sparkle while pointed at (Tabula's page: 367 style passes in 3 s, now 72).
+- modules/r140.js: a live crest's quarters (the Offline Project's, in Fabrica, Lector and the lists of apps) move for 6 s each time
+  the crest comes into view and while it or its key is pointed at, then rest; their motion is drawn inside the crest's picture
+  (Fabrica, nothing touched: 26 % with them moving, 5 % at rest). Both pictures are kept, so the change is immediate.
+- modules/r248.js, the keys (measured against Inkwell's, The Forge's and Carpe Diem's own pages: a shaded face, a drawn rim, an edge
+  beneath, a 3 px rise on a spring; Ingenium's face was white to #f9f7fc and its edge 1.5 px at 18 %): by day a key's face shades from
+  white to #ebe4f6, with a bright top line and a soft shade along its foot; beneath it a lavender edge 2.5 px deep (the accent at
+  20 %, a colour rather than a darker shadow, after "Please reduce the heavyness of the buttons", 6 November), and soft casts. Under
+  the pointer it rises 3 px on a spring (0.22 s, a little past and back) and its edge grows to 3.5 px; pressed, it sinks 2 px into
+  its edge in 0.05 s. No key changes size. The recipe sits in the head after 6.49's and ahead of the Author Studio's look, so Soft
+  and Deep still win; Display's Flat depth, the night theme and reduced motion keep their own ways.
+- build_page.py: the empty Chat page keeps its greeting and, while nothing answers, Connect a service and Get a model (modules/r244.js);
+  its four ready-made ideas are gone (Code's four, for an open app, stay).
+
+    node rig/t_651_still_keys.js <url> <out>   # left alone on Chat, Home, Settings, Blend and the Guide nothing is rewritten and
+                                               # styles are worked out only now and then; the seal, Home's sparks and Tabula's keys
+                                               # rest and move when pointed at; Blend's steps, the who-answers key and the thought
+                                               # cloud's number still work; the keys' recipe and motion; night, Flat, reduced motion;
+                                               # the empty Chat page (39 checks)
+    rig/t_649_keys.js follows the new recipe (its token, rise and press checks).
+
+Ingenium 6.51 (7 November 2026): the Offline Project in the lists of her apps, and its hall's words edited in Code (the master edition
+alone; her answer of 7 November: "Fabrica and app lists").
+
+- modules/r246.js: Code's Your apps (IngApps.choose) and the + menu's One of your apps (paintPlus("apps")) list both variations; each
+  is made fresh when chosen and handed on as any of her apps is: a Code project of its page, or the page staged with the next message.
+  Fabrica's card has a row for the hall: Edit its words in Code opens the hall's page in a Code project of its own (The Offline
+  Project's hall, marked opHall, made once from the hall Ingenium carries); every making uses it while it keeps the four places the
+  build fills, until she chooses the hall Ingenium carries again (state.opMake.ownHall). Lector is left as she asked in 6.43: choosing all
+  four apps, or the three, gives the set its crest, drawn from the apps kept now.
+
+    node rig/t_651_offline_lists.js <master url> <out>   # both variations in Code's Your apps and the + menu; the hall edited in Code and
+                                                         # used by the making, then the hall Ingenium carries again
+
+Ingenium 6.50 (7 November 2026): the three levels, one card size. Her words (7 November 2026): "The "New to this", "Some
+experience", and "Expert" cards are all different sizes and length and they look really weird on the "Help and the guided tour"
+section of the Settings page, please fix this."
+
+- modules/r166.js. Measured on 6.49 at 1440 by 900: Settings drew the three as wide as their words (340, 260 and 340 pixels) and
+  as tall as their lines (67, 51 and 67); the tour's first card drew them one width but three heights (69, 52 and 52); the Guide's
+  Start here one width and three heights (73, 57 and 73). Now Settings' card and the tour's first card hold them in a grid of one
+  column whose rows share the tallest's height, their words at the left. Her second word, the same day: "The cards are still too
+  wide." So on Settings they are 260 pixels wide, the width Some experience had: the narrowest at which none needs a third line (at
+  250 New to this takes three and all three grow from 67 to 84 pixels tall). The tour's first card keeps them as wide as the card,
+  a dialog's choices. On a narrow screen the column narrows and the three stay alike.
+- modules/r243.js: the Guide's Start here gives the three one height the same way, 270 pixels wide at most (its cards have a
+  little more room inside; at 260 all three would take three lines).
+
+    node rig/t_650_levels.js <url> <out>   # the three, one width and one height, in the three places, at 1440, 900 and 390 pixels
+                                           # wide and by night; 260 pixels on Settings and 270 in the Guide at most; a press and the arrow keys still choose
+
+Ingenium 6.49 (7 November 2026): keys that rise and seat, elevated and refined. Her words (6 November 2026): "I want Ingenium to have
+that analogue look and feel, I want it to have that animated mechanical 3D feeling match Carpe Diem, The Forge and Inkwell's animation
+and vibe to stay cohesive and match the rest of the Offline Project." and "I don't want the buttons to be made bigger or wider. I just
+want them to look more weighted and 3D animated. I want them to look like clickable buttons and not just flat." Then: "Please reduce
+the heavyness of the buttons, it looks a little too intense and take away from the look of the app. I want it to look elevated and
+refined." Built on the other session's 6.48 (claude/blissful-heisenberg-1osldl).
+
+- modules/r247.js (new). Measured in the three apps' own pages (6 November 2026): The Forge's and Carpe Diem's keys rest on a dark
+  edge 2 px deep at 30 % with casts at 20 % and 13 %, drawn by a crisp rim (The Forge's at 26 %); Inkwell's rest on four casts (30,
+  26, 18 and 11 %). Ingenium's had the same shape at 25, 16 and 10 %, but its rim was a 10 % hairline, so on a white card a key read
+  as paper with a shadow under it; its top bar pills were at less than half the family's weight; Chat's + and microphone keys, the
+  ideas on an empty chat, Lector's Copy and Home's See all had no edge at all. A heavier draft at the family's weight (2 px at 34 %,
+  four casts) was set aside after her second message. Now every key has a fine outline (half a pixel at 20 %), a thin edge beneath it
+  (1.5 px at 18 %) and a soft, wide lift (3 px at 10 %, 18 px at 9 %); under the pointer it rises 2 px, its edge grows to 2.5 px and
+  its lift spreads (16 px, then 30 px); pressed, it sinks 1 px, a little smaller, into its seat in 0.05 s and springs back. The top
+  bar's pills have the same outline on a 1 px edge. The rooms' own copies of the key (Lector, Fabrica, the backup card, the Career
+  Studio, the setup card, the tour and help, Home's large keys) follow the one recipe by day; the keys above a chat or a Code session
+  wear the night's recipe by night, where they kept the day's. The keys that were words or bare outlines are raised keys now, each at
+  its own size. No key changes size: the outline is a shadow and takes no room. The recipe is placed in the page's head, ahead of
+  the Author Studio's look, so a depth chosen there still wins; Display's Flat depth, the night theme and reduced motion keep their
+  own faces.
+- modules/r236.js (the master edition): the Author Studio's Look keeps its depths either side of the own keys: Soft is lighter still
+  (a fine outline and a faint lift; it was a raised key with a white glare, softer than the own key); Deep is the heavier key with
+  the family's weight (it was a 3.5 px edge). The ready look Ink keeps Soft.
+
+    node rig/t_649_keys.js <url> <out> [ref=<an earlier page>]   # the recipe on every kind of key; no key bigger or wider than on
+                                                                 # the earlier page; the rise and the seat; the Author Studio's Soft
+                                                                 # and Deep; Flat; night; reduced motion
+    node rig/t_637_author.js <url> <out>                         # its Deep check follows the new recipe (2 px at 34 %)
+
+Ingenium 6.48 (7 November 2026): the Offline Project, made from her apps, in Fabrica (the master edition alone). Her answer
+(7 November 2026), asked how the Offline Project should be built into her master edition: "Fabrica and app lists": in Fabrica she
+chooses all four apps or the variation without Inkwell, and Ingenium builds it fresh from her current apps, to try, edit and package
+it, and both variations are listed with her apps, each built fresh when opened. And her answer of 6 November (6.45): "Yes, the app
+library stop keeping saved copies of the Offline Project's page".
+
+- modules/r246.js (new, the master edition's alone; build/editions.py leaves it out of the others). Measured on 6.47: the Offline
+  Project was made only by source/offline_project/master_demo/build_master_demo.py, a Python program run by hand on a computer with
+  the four apps' demonstrations beside it. Now Fabrica's list of apps opens with The Offline Project, wearing its live crest; its
+  work shows the two variations and each room's copy (the copy the app library keeps now, or its earlier copy where one is kept; what
+  each is is said, and Ingenium's room says when it holds this copy, the master edition), and Make and open or Save the app: the
+  one-file app of build_master_demo.py's app mode, made in the window: the hall (site.html) with the build's table (the apps inside
+  the page, their versions and the line that names them, the seals from the page's own ING_SEALS, the devices' pictures, the icons),
+  and each app's page with the three things that program adds at its top (its own corner of the storage, the key back to the hall,
+  no scroll bars), compressed (CompressionStream) inside the page. It lives in the window's memory until it is saved; nothing is kept
+  in the app library. source/offline_project/master_demo/make_op_data.py writes source/build/op_make.json (the hall compressed, the
+  devices' pictures at most 720 pixels high, the icons drawn from master_seal.json as the Python program draws them, the loading
+  page's shield, and the three additions taken from build_master_demo.py word for word); build_page.py carries it where her apps
+  ride along. Next (6.49): the website (a zip), the hall's words edited in Code, and both variations in Lector's, Code's and the +
+  menu's lists of apps.
+
+    node rig/t_648_offline.js <master url> <out>   # Fabrica's Offline Project: the rooms, Make (four and three apps), the page made
+                                                   # (the hall, its table, the apps inside, each with its shim), opened, and saved
+
+Ingenium 6.47 (7 November 2026): context and compacting, slash commands, connectors in Code's + menu. Her words (6 November 2026): "I want
+for Ingenium's sessions to be automatically compacted like they are on Claude's code chats, the same for the regular chats. I want the
+option to have it compacted automatically or to click and compact it myself if I choose to. Please add that function to Ingenium. I also
+want the option to add connectors and slash commands in the coding chats in Ingenium. I want full parity with Claude's chat pages for
+Ingenium's chat pages please."
+
+- modules/r245.js (new). Measured on 6.46: a conversation longer than the model's memory lost its oldest messages quietly at each send
+  (the window moved on; once twenty messages had gone, r195 wrote a summary of 250 words in the background and recalled it with the
+  newest message); nothing showed it, nothing could be pressed to do it, and it could not be turned off. The memory key opened
+  Controls; Code's session column showed the share used and nothing to do about it; "/" did nothing except in a Code session on a GitHub
+  repository (r219's six commands); Code's + menu had no Slash commands, and Connectors stood eleventh in it.
+  Now Context opens from the memory key, /context and Code's session column: the share of the model's memory the conversation fills
+  (an estimate at 3 characters a token on this device, 2.5 for a connection, and the model's own count of the last reply when it gave
+  one), part by part (instructions, the earlier part's summary, the conversation, files, the room kept for the reply), when it compacts by
+  itself, Automatic on or off, and Compact now with what to keep in focus. Compacting asks the model in use to summarise everything before
+  the newest messages (a quarter of the memory at most, the last exchange at least, twelve messages at most), in rounds that fit its
+  memory beside the summary so far, building on the summary already written (c.summary, c.summaryN); the boundary message is marked
+  (winStart, compactStart) so the conversation sent starts there, and r159's and r195's recall gives the model the summary in that
+  part's place (r195's brief now says the part was compacted). Every message stays on the page; a line marks the boundary, with the
+  summary to read. Automatic (state.compactAuto, on by default) compacts before a message is sent (sendRec) when the conversation would
+  fill more than 85 percent of the memory and a model is ready to write the summary; Stop ends it. Slash commands: "/" at the start of
+  the message box opens the list (arrows, Enter or Tab, Escape), a command sent runs (the send key too): /compact, /context, /clear, /model,
+  /connect, /connectors, /effort, /think, /fast, /research, /web, /remember, /help; in Code /plan and /session, and on a GitHub repository
+  r219's six in the same list (r219's own list stands aside). The + menu has Slash commands; Code's + menu opens with Add files or
+  photos, Slash commands and Add connectors. Code's session column has Compact now, Automatic and Details beside its Context bar.
+
+    node rig/t_647_compact.js <url> <out>   # a stand-in model on this device: Context, Compact now (the summary in the earlier part's
+                                            # place, the line, every message kept), Automatic before a send and off, the focus,
+                                            # the slash list and commands, the + menus, Code's column
+
+Ingenium 6.46 (7 November 2026), its second part: who answers, at hand. Her words (6 November 2026): "Switching between providers and connections in
+Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users. I want that process to be
+improved and be more acessible to me, its a bit flawed right now."
+
+- modules/r244.js (new). Measured on 6.45: connecting a service took Settings, Models and AI, Connections and a form of five fields (the
+  provider, an address, the key, a model's name typed or listed, a switch), and going back to this device took Controls; with nothing set
+  up, the model menu beside the message box said only "No models yet. Add them on the Models page."; the top bar's model key named the
+  model on this device even while a connection answered, and opened the Models page; the key beside the message box showed the device
+  model's colour beside a connection's model and not whose model it was; Controls' A connection, with nothing set up, sent her to
+  Settings; the key field had none of the page's look (its style for fields left out password, email and address fields).
+  Now Connect a service, in three steps (the service; the key or the address, with where to make a key; a model from the list the
+  service gives, the strongest suggested, Find a model for long lists), opens from the model menu, the top bar, Controls, Settings and an
+  empty chat; a refused key (401, 403), a missing address (404), a limit (429), a service down, Ollama or LM Studio not running, Ollama on
+  another computer not letting the network in, or a browser refusing are each said in plain words. The connection is kept as before
+  (r191, the key on this device only) and used at once. The model menu opens on Who answers: This device and each connection kept, one
+  press each (the model last chosen there), the one answering marked, then the models, the place answering first; Find a model searches
+  every model of every connection (r191's menu shows fourteen of each) and of this device; Connect a service at its foot. A model on this
+  device chosen there answers from this device. The top bar's key names who answers and opens Who answers under it, to switch from any
+  page without leaving it (arrows and Escape work). The key beside the message box carries the service's name beside the model, and with
+  nothing to answer says Choose who answers. Settings' Connections card opens on Connect a service and the connections kept, with the
+  form by hand folded under them. Key, email and address fields have the page's look everywhere. Help (r144) and the tour's step on the
+  top bar (build_page.py 6.46) say what the key does.
+
+    node rig/t_646_switch.js <url> <out>   # stand-ins for Anthropic, Ollama on another computer and a service with 41 models: nothing set up;
+                                           # the sheet's three steps; the menu's Who answers and Find a model; the top bar; Settings
+
+Ingenium 6.46 (7 November 2026): a model thinks briefly and answers; sources when she asks; titles shown twice removed; every
+provider within its model's limits. Built on the other session's 6.45 (claude/dreamy-fermi-9ourlk), whose lighter presses (r230,
+r172) stand in for the same two fixes made here. Her words (6 November 2026): "The models inside of the chats of Ingenium spend more time debating the prompts and saying "Wait"
+and rechecking everytime and it takes ages for them to stop "Thinking" and reply"; "I also don't want sources and citations provided to
+me with every reply inside of the app, I only want them provided when I ask for them"; "The "Side bar" title is repeated twice inside of
+the Author Studio ... There is a couple more of that occurence around the app".
+
+- modules/r241.js (new). Measured: a model on this device thought as long as it liked: the thinking budget of 6.11 (R101: 1,536 to
+  6,144 tokens by the model's size, twice or four times at Extra or Max effort) was kept only by the computer app's engine, and nothing
+  noticed a model going round in circles; the standing instructions asked every model to "check your work". Now How long it thinks,
+  beside Thinking (Brief, the default, about 700 tokens, 1,400 at Max effort; Standard, the model's own budget; Deep, twice that; No
+  limit), sets the budget; Engine.generate passes through ingThinkBudget (build_page.py 6.46), which watches a reply that thinks (in the
+  engine's reasoning channel or in <think> written into the answer): past the budget, or the same sentence a third time, or "Wait",
+  "Hmm" and "let me check" again and again, it stops the thinking and asks the model once more, without thinking, with its notes, and
+  the answer comes in the same reply; the thoughts say why. The computer app's engine keeps its own budget (llama.cpp ends the thoughts
+  itself) and is watched for circles. Only when it helps (on unless she turns it off): a short, simple message is answered at once,
+  without thinking; a message that needs reasoning (why, explain, compare, plan, code, figures, a file, a long message) still thinks.
+  The standing instructions now ask a model to think a question through once, decide and answer (Your Ingenium's careful thinking,
+  Magister's layer, and a line for a model on this device that thinks).
+- Sources when she asks: the web search and Research tell the model to cite only when her message asks for sources, citations or
+  references (ingCiteRule, in place of "Cite them by number" in both prompts); otherwise the answer carries no numbers or list, and the
+  sources wait under the reply behind a Sources key. When she asks, they are cited and shown as before.
+- Repeated titles (found with an audit that opens every page, room, tab and part): the Author Studio's Side bar room (its head said
+  Side bar and the card under it The side bar, with the same sentence twice); Settings' licence card (the licence document repeated the
+  card's heading as its own title; thoughts/permit_core.html); the Career Studio's Today (its list and the panel beside it were both
+  Today; the panel is now Your day).
+- Every provider within its model's limits. Her words (6 November 2026): "I want the fix to be applied to all Claude models and Ollama's,
+  GPT and every other provider, I want the caps gone and for the fixes to be applied to them as well inside of Ingenium to prevent
+  anything else from crashing." Measured with stand-ins of OpenAI's form and Ollama's: the chat's requests of OpenAI's form (GPT,
+  Gemini, Kimi, OpenRouter, LM Studio, any compatible service) asked their reply through ingRemoteCap, which neither the smaller figure
+  a refusal named nor the room the window leaves reached, so the same request went again and failed; ingRemoteCap now holds both
+  (r206), as the working loop does since 6.44 (r190), and Blend's own requests of that form ask within the figure kept for the model
+  (build_page.py 6.46, ingOutFor). Ollama was given 32,768 tokens of memory whatever its model holds (16,384 in Blend), and the working
+  loop gave none, so Ollama used its own default of a few thousand and silently cut the start of what was sent, Ingenium's
+  instructions and the tools with it; a refusal for the computer's memory (Ollama's 500) was taken for a busy service and sent twice
+  more. Now what the model holds is read from Ollama (/api/show, once a model, two seconds at most); each request is given what it
+  needs (ingOllamaCtx: 32,768 for a short conversation, or the model's own window when smaller, doubled as it grows, up to the model's
+  own), in the chat, the loop and Blend; a refusal for memory halves it, keeps it for the model (memCtx), fits the conversation to it
+  and sends again (Lector reads again in smaller parts). Her own figure, when she sets one, is kept as she set it.
+
+    node rig/t_646_providers.js <url> <out>  # stand-ins of OpenAI's form and Ollama's: refusals for length and tokens a minute,
+                                             # Ollama's memory read, grown, halved and kept; the loop and Blend
+    node rig/t_646_think.js <url> <out>   # a stand-in model that thinks without end: stopped at its length, in circles, or in <think>;
+                                          # answered in the same reply; the simple message unthought; the controls; the instructions;
+                                          # sources folded and cited on request; the three titles
+
+Ingenium 6.45 (6 November 2026): presses made lighter; no permission opens or packages Ingenium itself outside the master
+edition; the app library keeps no copy of the Offline Project's page; the chat box has one stop key; Check with Blend in
+lavender; no Name card in Settings; the Career Studio's Today step and the Guide's Start here redesigned. Her answers
+(6 November 2026), to whether "edit" should go too: "Yes please remove the
+"edit", it can go too"; and to whether the app library should stop keeping saved copies of the Offline Project's page altogether:
+"Yes, the app library stop keeping saved copies of the Offline Project's page".
+
+- modules/r162.js, build/editions.py (_no_self), build/thoughts/permit_core.html: until 6.43 a permission of the owner's that
+  allowed "edit" still opened Ingenium itself in the full edition's Code and Build. Now no edition but the master lists Ingenium
+  itself (this copy, or the one the library keeps) among the apps Code and Build open, whatever a permission says, and none
+  packages it (6.43). The permission card the owner signs offers only what Ingenium acts on: use, install, share and sell
+  (PermitCore.create takes offer); a permission given before keeps what it says, as a document. rig/t_62_permits.js checks it.
+- modules/r240.js: 6.42 kept the Offline Project's page as two more apps of the master edition ("offline" and "offline3"), and the
+  full edition kept it as any other app. Now, in every edition, a page that is the Offline Project (its one-file app or its
+  site's hall, known by its title, with or without Inkwell) is not kept, nor a zip that holds one (the apps' pages in such a zip
+  are the copies it was made with, so they are not kept either), and the library says why: in the master edition, "The Offline
+  Project is not kept as a copy: Ingenium makes it from the four apps it holds now, so it always has their latest versions."
+  The other editions, which never name it, say "This page holds a set of apps, not one app, so the app library does not keep
+  it."
+  A copy kept by 6.42 or 6.43 is let go of at the next start, its bytes with it, here and on the computer app's disk. Lector
+  shows the set of her apps chosen with the Offline Project's crest (6.43), drawn from the apps Ingenium holds now; Fabrica's
+  work on the Offline Project is to be made from her four current apps in the same way (the next stage of it).
+  rig/t_642_anyapp.js checks the page, the zip, the copies let go of, and that no list names a copy.
+- modules/r215.js, her words (6 November 2026): "Please remove the "Stop" button from Ingenium's chatboxes, there is already a
+  purple pause button on screen in the text area, the white stop button seems superfluous there." The clock above the message
+  box (6.11) has no Stop key of its own now; the purple key in the box stops the reply, as it always did (what the reply changed
+  so far is kept). It wears its stop face whenever a reply is being written, and a screen reader hears it as "Stop writing" or
+  "Send" rather than the shape on it. The Guide's words on the Code session say so. rig/t_611_code.js checks it.
+- Lighter presses. Her words (6 November 2026): "Everything is moving slower inside of the app and my mouse's cursor is just
+  delayed on the screen of the app, it feels off and all of the buttons and the app's entire UI looks flatter and I hate it,
+  please fix this and undo whatever did this to the app." Measured with Chrome's profiler, the processor slowed four times, a
+  chat of 120 messages: on 6.44 the Guide's What's new key read every entry of every version again on each change to the Guide,
+  even hidden (0.8 s over eight presses), the drop-down lists' safety net measured every list each second, the page's scroll to
+  the top forced a whole layout in the middle of each press (0.5 s), and a visit to Chat or Code drew every message again and
+  saved the desk. Now: modules/r230.js reads the newest version from the first entry and does its work only while the Guide is
+  shown; modules/r172.js still reads every list a person can see each second (a value set by code shows within a second) and
+  measures their widths every other second, the dearer half of its work;
+  build_page.py scrolls at the next frame and only when the page is not at its top, and a visit keeps the messages drawn when
+  the conversation is unchanged (its mode, name, count and last four messages), saving the desk only when another one is
+  chosen; modules/r242.js (new) has the top bar's two breathing dots grow and fade on layers of their own, which the graphics
+  chip moves, where a shadow and a glow filter were redrawn by the processor on every frame of every page. Busy time on the same
+  run: a streamed reply 26 percent less, presses between pages 17 percent less. Compared with 6.36 (earlier the same day) and
+  6.44, every key's shadow is the same: no release changed the depth. The depth is set by Display, Depth (Raised or Flat) and
+  by the Author Studio's Look (Soft or Deep); nothing switches it by itself.
+- modules/r218.js, her words: "I want you to make the Check with Blend button inside of the chat pages purple to liven up the
+  look of the page, it needs some light colours so it does not look plain, and match the rest of the page's colours." Under a
+  reply, Check with Blend is a lavender key: a lilac face, the accent's words, a faint violet edge and lift, and Blend's own
+  mark (its two circles); by night a deep plum face with lavender words.
+- build_page.py, modules/r144.js, r173.js, editions.py, her words: "since I can rename Ingenium inside of the Author Studio, I
+  don't think there is a need to keep that function on the Settings page of the page, please remove it." No edition has the Name
+  card now; the Author Studio's Names room (master) names the app, and Find a setting leads "rename" there. rig/t_671_name.js
+  and rig/t_627_editions.js check it.
+- modules/r188.js, her words: "The Make its checklist page looks odd and not formatted. It looks very plain and reads poorly,
+  please redesign it to better fit the rest of the Career Studio and the colour palette and design of Ingenium." Today's step
+  is in parts now: the application's strip (its organisation, its date and its stage as coloured chips), the step on a lilac
+  card with a mark for its kind (a checklist, a reading, a sending, a flag, a conversation), where it stands among today's
+  steps and its minutes, the posting's own words when it quotes them, a card of what the application holds so far (its stage,
+  its date, its checklist, its documents, its referees), and the pace in a soft band. Only what the studio holds is shown.
+- modules/r243.js (new), r144.js, her words: "The guided tour page looks so off as a page especially with all of these buttons
+  just clustered together all in one area, it really bugs me and triggers my sensory issues, please redesign the Guide page to
+  fix this. This request is only for the Start here tab page inside of the Guide page." The tour's card held its sentence, its
+  key, three level keys and sixteen chapter keys of every width in one run (modules/r166.js had them wrap as they came). Now
+  two named parts side by side: Take the tour (the sentence, the key, and the three levels stacked, each with its line) and
+  The chapters (how many are seen, on a slim bar, and the sixteen as a book's contents: flat rows in two columns read
+  downwards, with no raised faces, after her second word: "I don't like the look of the Chapters area, it still has that many
+  clustered 3D buttons look that I said that I didn't like"). The same keys, in the same order for the keyboard and a screen
+  reader; below about 1,050 pixels the parts stand one above the other.
+- rig/t_67_select.js: since 6.36 Focus shows one part at a time and its first part holds no list; the test asked for at least
+  one there (it failed the same way on 6.44). It now asks that every list a person can see is dressed.
+- The history: her doctoral plans, quoted in modules/r188.js's header comment and used as sample text in rig/t_681_lector.js and
+  rig/t_desk.js until 6.43, are taken out of every earlier commit of this repository, on her yes ("Yes, you may proceed"). Only
+  the commits that held them, and the commits after them, were made again (the files otherwise the same, each commit's author,
+  dates and message kept, a commit id named in a message pointing at its new self, and signed again); 55 older commits and five branches that never held them are unchanged. Every blob in
+  every branch was searched afterwards for the words.
+
+    node rig/t_642_anyapp.js <master url> <out> <full edition url>   # the library keeps no copy of the Offline Project
+    node rig/t_611_code.js <url> <out>     # the clock above the message box, with no Stop key of its own
+    node rig/t_62_permits.js <master url> <out> <served folder> <its url>   # what the owner's card offers, and what it opens
+Ingenium 6.44 (6 November 2026): Your edge and Your direction; what Lector's readings add to her record; Claude within each model's
+limits; Ingenium's own caps on how much a model reads taken away.
+
+Her request (6 November 2026), in short: suggestions and recommendations for her CV, portfolio documents and cover letters from Lector and
+the Career Studio; the skills and experience she has, and how each transfers to her documents where it suits; her blind spots; what gives
+her an edge; and direction in choosing a career. And: "I want Lector to read my updated apps and spot additional skills and experience that
+I can add to my resume ... I want it to be built-in for it." (Her own goals stay in her profile, on her device.)
+
+- modules/r188.js (the Career Studio): a room of its own, Your edge, after Your profile. What transfers: each skill or experience her
+  record shows, with its evidence (the entry, document or app it rests on), where it counts (which documents, which of her targets) and a
+  sentence for her documents drawn from that evidence alone; Add to your profile keeps it under Skills with its evidence. Blind spots:
+  what she undersells, what her targets ask that her record does not show yet, habits that weaken her documents, and questions a reader
+  will ask, each with why it matters and a fix, ticked when seen to. What sets you apart, with her positioning in three lines (as a
+  professional, as an academic, and the bridge between the two). Your documents: her CV, the documents in her profile, those written in
+  Applications and those Lector hands over, each looked at with suggestions (what could do more, what her record adds, what could go,
+  wording, what a reader will ask, the first thing to do), never rewritten. From your apps: what each app Lector read shows that her CV
+  and profile do not show yet. In Goals and plan, Your direction: the paths that fit what she is looking for, each with why, the evidence,
+  what is missing, a first step this week, the next three months and how it sits beside her other goals; Make it a goal; and what to
+  find out before choosing, ticked. Her targets (goals, the applications she weighs, the roles she kept) go with every ask. Learn gains
+  Finding your edge. The chat's + menu attaches her career profile to a message. Nothing is invented and nothing is searched online.
+- modules/r108.js (Lector): Suggestions, beside Copy, hands the document shown to the studio, which looks at it there. Built into the
+  reading: each app read afresh in a job is noted, and when the job ends the studio reads that reading against her CV and profile, beside
+  the earlier copy's reading when there is one, and lists what the app shows that they do not yet show, the new marked; Lector says so in
+  its stream. Nothing is added to her CV by itself.
+- Claude within each model's limits. Her words (6 November 2026): "Ingenium keeps on failling when I try to use Claude's Opus model in the
+  chat, it keeps on giving me an error message saying that the connection failed because of max token limits." Measured: the chat's own
+  path (6.9.4, modules/r206.js) kept a model's limits and asked again after a refusal for size, but a chat with files runs the working
+  loop (modules/r190.js), which asked for the slider's reply however long (an older model) or at least 32,000 or 64,000 tokens, and never
+  took the smaller figure a refusal asked for: the same request went four times and the reply failed. A request on its own connection
+  (Blend) had no ceiling either, and a Claude model whose list was never read had none. Now every request to Claude is asked within the
+  model's own ceiling (modules/r195.js: the list's figure, else Anthropic's published limit for its family: 1,000,000 tokens to read and
+  128,000 to write for Opus 4.6 onwards, the 5 family, Fable and Haiku 5.5; 200,000 and 64,000 for Haiku 4.5; 200,000 and 32,000 for an
+  older or unknown model, until its list or a refusal gives the true figures), in the chat, in a chat with files, in Code and in Blend;
+  a refusal for the reply's length is said as what it is.
+- Caps taken away. Her words (6 November 2026): "I don't want any caps inside of Ingenium's pages. I want the cap of the Career studio
+  removed and anywhere else inside of Ingenium that does not harm the app and leave it vulnerable." Removed: the Career Studio's 90,000
+  characters a request (30,000 for a model on this device) and its counts of suggestions; a connected model's window held to 262,144
+  tokens for Lector and the studio (now its whole window, 1,000,000 for the current Claude models); Folders' 400,000 characters a
+  request and 60,000 a conversation; the chat's 30,000 characters for a document written whole. Kept, as each protects the app or is a
+  limit of the model or the service: a model's own longest reply and window (asking beyond them is refused, as Opus was), a key's tokens
+  a minute, a device model's trained memory, the 4,000,000 characters a file in the chat may hold, and the training's limits on steps.
+
+    node rig/t_644_edge.js <master url> <out> [<full url>]   # 30 checks with an invented person, a stand-in model and an invented app
+    node rig/t_644_claude.js <url> <out>                     # checks with a stand-in for Anthropic's API (refusals for length and for
+                                                             # tokens a minute), in the chat and the working loop
+
+Ingenium 6.43 (6 November 2026): Ingenium made as an app by its owner alone, the top bar's order, the Author Studio's side
+bar, and the Folders page at the app's sizes. Her words: "Please remove the option to download Ingenium as an app from the Build
+page and only leave it in the master edition and nowhere else, I should be only person with access to it, I don't want others to
+be able to ship and produce variations of my app without my expressed consent and permission." And: "Please move the About
+button back to being in front of the Help button and place the 'Author Studio' button in front of the About button and not
+behind, the new location throws me off."
+
+- build/editions.py (_no_self_kit, _open_words): until 6.42 the gift and demo editions had no install kit of Ingenium itself,
+  but the full edition kept it, hidden until a permission of the owner's allowed "package". Now every edition but the master
+  has none: the choice is not in the page, the kits make a new app only, asking for Ingenium's own kit is refused, and a kit
+  or a Fabrica package refuses a page that is Ingenium's own (the marks every Ingenium page carries: its edition's variable
+  and the parts' register), with "This is Ingenium's own page. Only its owner makes apps of Ingenium." A new app of the
+  person's own is still packaged. Build's Open key and its help name only what each edition opens. A permission allowing
+  "package" no longer opens it in another edition; "edit" still opens Ingenium in the full edition's Code, as before. A copy
+  someone alters by hand cannot be stopped from inside a page; this closes the ways the page offers.
+- modules/r236.js: the top bar reads Display, Studio, About, Help (the Studio key goes before About, not between About and
+  Help). The Author Studio's second stage, as Carpe Diem's has it: a Side bar room (the order of the pages in each group, Up
+  and Down, and which pages the side bar shows; Home and Settings always stay; a hidden page still opens from Home, Help and
+  the tour; each change in the change log with Undo; the built order key; Reset all, Export all and Import all carry it).
+  A group is put in order only when she has given it one, so pages that add their keys as they start keep their places.
+- modules/r208.js: a folder's name in its card at a card heading's size (16.5px, the app's serif, which the Author Studio's
+  Look now reaches), the new folder's card at the text's size, and a folder's own title at 21px below the page's 25px.
+  rig/t_638_scale.js now puts invented content in before measuring (a folder, an app in Fabrica, a conversation) and measures
+  a folder's own view, which is how these were found.
+- Lector (modules/r108.js), her words: "I don't want two new Offline project seal logo added to the Lector page, instead I want for
+  when I select all 4 apps of the Offline Project the master shield seal of the app appears and when I select only apps the master
+  shield of the Offline Project still appears with three quadrants of the selected 3 apps and so forth. I don't want them to look
+  like duplicates and also that way, the Offline Project inside of the app can always reflect the 4 latest apps that is kept inside
+  of Ingenium instead of an old saved version of older apps versions." 6.42 had given the Offline Project two tiles of its own
+  ("offline" and "offline3"); they are gone from Lector. Choosing two, three or all four of her apps gives the set its crest (the
+  duo's, the shield of three, the master seal, as since 6.1), drawn from the seals of the apps Ingenium keeps now; a set chosen
+  before keeps only the apps Lector lists. The library still knows the Offline Project's page (modules/r240.js), for Fabrica and
+  the other pages. rig/t_642_anyapp.js checks the tiles' absence and the crest of four, three, two and one.
+- Her doctoral plans (a university and her proposal's title) were quoted in modules/r188.js's header comment and used as
+  sample text in two tests; they are taken out of the current source. Earlier commits still hold them: removing them from
+  the history would need the branch rewritten, which is hers to decide.
+
+    node rig/t_643_owner_kits.js <out> master=<url> full=<url> gift=<url> demo=<url>
+                                           # the master keeps Ingenium itself; full, gift and demo have no trace of it, refuse
+                                           # Ingenium's own page in the kits and in Fabrica, and still package an invented app
+    node rig/t_643_side.js <url> <out>     # the top bar's order; the Side bar room: move, hide, reload, Undo, built order,
+                                           # Export, Import, Reset all, the app's scale
+
+Ingenium 6.42 (6 November 2026): any app, not only her four, in Lector and the app library. Her words (6 November 2026): "I need for
+Lector and every other page inside of Ingenium to be able to take other apps. It should not be limited to only the 4 apps inside of
+Ingenium. Lector should be able to read and analyse and process any app inside of Ingenium." And: "I want the app library to recognise
+other apps and not only be limited to just my 4 apps, it should also recognise the Offline Project and any other apps that I made inside
+of Ingenium or elsewhere."
+
+- modules/r240.js (new): the app library keeps any app's page, not only one it recognises as Carpe Diem, The Forge, Ingenium or Inkwell
+  (the base page's libDetect). Its name is the page's title (or its application name, its first heading, the file's name), without a
+  version written after it; its key is "app-" and that name in plain letters, and a page of the same name again is a newer copy of it,
+  the copy before it kept one step back, as for her apps. Its version comes from a version meta, an APP_VERSION or VERSION in its code,
+  or a number in its title; its colour from its theme-color. A zip with none of her apps in it gives its main page (index.html, or the
+  largest page). libKeys() lists her four first, then the others by name, and libApps() follows it, so the chat's + menu, Fabrica's
+  library and Storage list them; libName(k) names any of them (modules r142 and r187 take it).
+- Each other app has a seal: its own logo when its page names one (found as 6.41 finds it, modules/r239.js), or else a seal of its
+  initials in its colour. It is kept in ING_SEALS beside her apps' seals, so Lector's paper and a Word file's cover carry it.
+- The Offline Project, in the master edition: its one-file app and its site's hall are known by their title, The Offline Project; the
+  variation without Inkwell by its build's "without": ["inkwell"]. They are kept as "offline" and "offline3", listed after her four
+  (in Lector both are always shown, as her four are, "Not added yet" until a copy is kept), and wear their live crests in Lector (r140:
+  the master seal with its quarters moving, and the shield of three).
+- modules/r108.js (Lector): its apps are her four, then the Offline Project's two, then every other app kept, by name. Another app's
+  paper is drawn in its own colour. What stays with her four: the Offline Project's names for a set (all four, a trio, a duo), the
+  crests, the master seal and Choose all four; a set with another app in it is named by its apps ("2 apps together", and so on), each
+  app's own seal on its cover.
+- modules/r112.js (Fabrica): the library sheet names any app by its own name; one brought in becomes a repository under that name, its
+  page under its own file name.
+- The full edition takes any app the person adds. It lists Ingenium alone by key, so a page of one of her apps added there is now kept as
+  any other app, under its own name; before, it was kept under its key and listed nowhere. The public editions have no library and are
+  unchanged.
+- What's new names this twice: for the master and full editions without naming her apps, and for the master alone with the Offline
+  Project.
+
+    node rig/t_642_anyapp.js <master url> <out> [<full url>]   # 20 checks with invented apps (one with a logo, a version and a colour,
+                                                              # one with none) and the Offline Project's page in both variations: names,
+                                                              # versions, colours, keys and their order; Lector's tiles, seals and crests;
+                                                              # the names of a set; a full reading and its documents on the app's own paper
+                                                              # with its logo on the cover; the + menu, the library, Storage; the full
+                                                              # edition; no page errors
+
+Ingenium 6.41 (6 November 2026): every app's own logo, in 3D, in Fabrica. Her words (6 November 2026): "I want Fabrica to automatically
+load the apps' icons and logos with the same animated popped out 3D look and effects. I want that for any app that is made inside of
+Ingenium and its pages, especially Fabrica and Lector. When the app clearly has a logo icon, it should replace Ingenium's placeholder
+empty slot and show the app's actual 3D logo animated and active and swaying back and forth the same way that it does for Carpe Diem,
+The Forge, Ingenium, Inkwell and the Offline Project's app icons inside of Ingenium."
+
+- modules/r239.js (new, window.IngAppIcon): finds an app's logo in its own files and draws its layers. It looks, in order, at the icons
+  the page names (<link rel="icon">, apple-touch-icon; the largest first, a drawing to scale before all), the icons of the manifest the
+  page names (not those only maskable or monochrome), a Windows tile image, then files named as icons are named (icon, logo,
+  apple-touch-icon, favicon, an icons folder). A logo written into the page (a data address) and a file of the app's own are read; a web
+  address is never fetched. A clear logo: it loads, it is square or nearly (a banner is not a logo), and it is an SVG or at least 64 pixels
+  across; otherwise the placeholder stays. Its layers are drawn once on a canvas: on an opaque square it becomes a tile with rounded
+  corners, on a clear ground it keeps its shape; its edge is the same shape darkened behind it, and a sheen the same shape lit from above
+  in front. Kept until the app's files change.
+- modules/r112.js (Fabrica): an app with no seal of its own wears its logo, in its row of Your apps and at the head of its work, in the
+  seals' own classes: the same depth, cast shadow, sway, turn toward the pointer, lift and press. The four seals and the Offline Project's
+  crest are as they were. Fabrica's seals and logos now stand still with minimal motion too (they stopped only for the system's reduced
+  motion), as Lector's seals and the crests do.
+- Lector: its "Your apps" holds the four apps alone (the app library keeps only pages it recognises as Carpe Diem, The Forge, Ingenium or
+  Inkwell: the base page's libDetect), and each already wears its own 3D seal, so there is no empty slot there. Lector taking any app
+  is a larger change, asked of her.
+- rig/t_fabrica.js waited a fixed second after marking a release before judging the tile; on a busy machine that was too short (it
+  failed twice as the first test of a run and passed alone every time). It now waits for the release to be drawn, then judges it as before.
+
+    node rig/t_641_logos.js <url> <out>   # 11 checks with six invented apps (an icon file, a manifest's tile, an SVG in the page, a
+                                          # banner, a tiny favicon, a web address): the three logos in the seals' layers with shadow and
+                                          # sway, the tile's corners and the free shape, the placeholder kept for the other three, nothing
+                                          # fetched, the work head, the pointer's turn, minimal motion, after a reload, no page errors
+
+Ingenium 6.40 (6 November 2026): the Offline Project's crest, as its own icon in Fabrica. Her decision of 5 November: "Fabrica (master
+edition) shows the master seal live, with each quarter moving as its app's seal moves (port the site's quarter motions, site.html lines
+86 to 140 and its medal() drawing, into r140's live crest)." A first reading set the crest at the head of Fabrica, as its logo; she
+corrected it (6 November 2026): "I want the Offline Project seal to be shown inside of Fabrica the same way that the other apps icons
+are shown inside of Fabrica, I don't want it to be Fabrica's logo." That reading was never released.
+
+- modules/r140.js: a live crest may ask for its quarters to move (IngSeal.el(apps, {live: true, quarters: true})). Its seals layer is
+  then drawn by sealsLive, ported from the hall's medal() (source/offline_project/master_demo/site.html): Carpe Diem's ring breathes
+  round its seal, The Forge's sparks glint in turn and a sheen crosses it, Ingenium's star turns a quarter at a time and its heart
+  stone beats, Inkwell's wax glows. The motions are written into the layer's own picture (the hall's keyframes), so they run inside it;
+  the spark positions follow the seal's radius. Only where motion is allowed: with minimal motion, or the system's reduced motion, the
+  still seals are drawn, and a change of the Motion setting repaints such a crest at once. A still crest, a document's crest and a
+  picture are unchanged. IngSeal.medals(apps) tells where the seals sit.
+- modules/r112.js (Fabrica): an app's icon is drawn by sealEl, each of the four apps with its own layered seal. A repository is now known
+  as the Offline Project by its name (The Offline Project, Offline-project-forest, offline_project: "offline" and "project" together),
+  and wears the master crest, live with its quarters moving, in its row of Your apps (56 pixels high, as a seal) and at the head of its
+  work (34); one named for the variation without Inkwell wears the trio's crest; its tile takes the crest's gold. The master edition
+  alone (the crest names her own apps); elsewhere such a repository keeps the new app's mark. Only the icon and its tile's colour
+  change: packages, kits and their icons follow the app key as before.
+- Found, older (the same on the published 6.35 page): rig/t_61_seals.js fails 6 checks (a document's crest drawn 300 pixels wide where
+  720 is asked, and Lector's page zoom at 1440 by 900 and on a phone), and rig/t_67_sound.js 8 (it stops on a voice that renders
+  nothing in this headless browser). Left for a later stage.
+
+    node rig/t_640_offline.js <url> <out> [<full edition url>]   # 14 checks with three invented repositories: the master crest in the
+                                                                 # Offline Project's row, live, at a seal's height; the trio for the
+                                                                 # variation without Inkwell; the mark for an ordinary app; the gold
+                                                                 # tile; no seal on Fabrica's head; the work head's crest; the motion
+                                                                 # measured (each quarter pictured twice differs, a crest without
+                                                                 # quarter motions does not); minimal motion; documents unchanged; the
+                                                                 # full edition's mark; no page errors
+
+Ingenium 6.39 (6 November 2026): a GitHub repository in a folder, the signing keys kept on a computer app's disk, and three older
+test failures fixed. Asked what a folder should take from a GitHub repository, she answered: "I want its README, its files, and its
+issues."
+
+- modules/r238.js (new): Bring in a repository (Folders, Bring in your work, and a card in each folder). The link and the folder (a
+  new one named after the repository, or one she has); everything is read before anything is kept: the repository (api.github.com),
+  its file list (git/trees, recursive), its README, its text files (raw.githubusercontent.com; with a token, the contents API), its
+  issues, open and closed, and every comment (issues/comments, a hundred at a time). Pull requests are left out. The README joins
+  the folder's files, so it goes with every conversation in the folder; the files and the issues are kept in the long-text store (on
+  a computer app on its disk too), each listed in the folder's card with Show and Use in a conversation (a new conversation in the
+  folder, the file or the issue added to the next message). Bring it up to date reads it all again and lets the earlier copy go;
+  Remove from this folder lets it all go. Left out for the page's stability, and said: a file over 1 MB, more than 3,000 files or
+  25 MB of text; what is not text. Refusals in plain words: not found (or private: a token is needed), the token refused, GitHub's
+  hourly limit (with the time it opens again, read from the X-RateLimit headers GitHub exposes to pages, or from its message), no
+  connection. A public repository needs no token; a private one uses the token Add from GitHub keeps. modules/r208.js holds the two
+  hooks; the Guide's Folders card and its search words name it (r222.js, r173.js).
+- modules/r136.js and build_page.py: the signing keys' copies on a computer app's disk were written as "signing_<id>", a name the
+  app refuses (it keeps only big_ and seven to forty letters or digits), so none was ever kept. Now "big_sgn<id>", with an index
+  (big_sgnindex); the long texts' sweep keeps them; keys.diskIds() names them and Reset everything deletes them, so a cleared key
+  cannot come back from the disk.
+- Three failures of rig/t_67_rooms.js older than 6.38: its Blend run stood in for blAsk, which Blend has not called since 6.12 (it now
+  stands in for the engine, as rig/t_612_blend.js does); its model-name rule now leaves aside the Folders guide's search words for
+  the assistants it imports from; and two accessibility faults axe-core found are fixed at their source: the Train room's bands, keys
+  inside a list, are now a labelled group (r232.js), and a blend's error note by day is #8a5a12 on white, 5.9 to 1 (r218.js).
+
+    node rig/t_639_repo.js <url> <out>       # 21 checks with an invented repository and a stand-in GitHub: the way and the dialog, the
+                                             # README, five files word for word, two issues with three comments, the card, Show, Use in
+                                             # a conversation, Bring it up to date, refusals, Remove, no token sent, no other host
+    node rig/t_639_keys_disk.js <url> <out>  # 8 checks with a stand-in bridge keeping the app's name rule: the copy and its index, the
+                                             # sweep, the key back from the disk after the web view forgot, Reset deletes the copies
+
+Ingenium 6.38 (6 November 2026): one scale for the whole app, the model list at its key, and Reset everything clears every store.
+Her notes of 6 November: "Everything inside the Author Studio looks big and chunky, very bulky and does not match the rest of the
+app, please fix that." "The models drop down list panel from the chats does not open directly on top of the button, it opens on the
+other side of the chat text, please fix that." "I want the fonts and sizes of the newly added pages and sections of Ingenium to match
+the rest of the app, everything should be consistent and cohesive. I don't want big bulky texts or buttons messing up the look of the
+app." And, asked whether Reset everything should clear the other stores too: "the answer is yes".
+
+- The app's own scale, read from the base page: a page's title 25px serif (Home's 30px), its first line (the lede) 14px, a card's
+  heading (h2.sec) 16.5px serif, text 13.5px, small text 12px, a key (.btn) 13px at about 34px high (8px by 14px inside it), a small
+  key 12px, a field 13.5px. Every page, room and part was measured at 1440 by 900 (47 views on 6.37, with the Author Studio's rooms).
+- What stood out, and why: on Home, in the Career Studio and in their keys, a general rule ("buttons take the page's lettering")
+  outranked the keys' own size, so keys written at 13px or 13.5px were drawn at 14px and up to 46px high (.hx button over .hx-btn,
+  #cs button:not(.rm-tab) over #cs .c-btn). Those rules now give way (:where), and the keys take the app's size. Also brought to the
+  scale: Home's keys (13px, 34px), its card names (16.5px), its first line (14px), its greeting (no larger than the app's Home title,
+  30px), its section heads (16.5px); the rooms' tabs on Settings, Models, Blend, Guide and the Career Studio (13px, 35px, as the
+  app's keys; on a phone they keep 6.8's smaller pills); the Career Studio's empty heading (16.5px) and its link field and key (13.5px
+  and 35px); the backup's keys (13px, 34px); Lector's and Fabrica's empty headings (16.5px).
+- What stays larger, on purpose: page titles; Home's greeting and the Offline Project's plaque; figures (the storage's size, Focus's
+  clock); the chat's greeting when a conversation is empty; Lector's paper and the Ownership notice, which are documents at a reading
+  size. rig/t_638_scale.js names each and fails on anything else above the scale.
+- The Author Studio (modules/r236.js, the master edition): drawn in the app's measures. Its top bar 44px with the app's title (16.5px
+  serif) and pills (24px, 11.5px) instead of keys; its rail lettered as the side bar is (13px, the chosen room in the accent); its
+  cards as the app's cards (16px inside, 14px corners, the app's shadow, 16.5px headings, 12px text); its fields 32px at 13px; docked
+  480px wide. A room's name shows as a tip under the pointer only when the rail is narrowed to its icons.
+- The model list (modules/r237.js, new): it was placed by the rule all the chat's menus share, at the left edge of the composer's
+  bar, while its key stands at the right beside the send arrow. Now, in Chat and in Code, it opens just above its key, its right
+  edge on the key's (as the effort list's is), moved in only as far as the window's edge asks; it follows the key when the window
+  changes size or the list is painted again, and it is placed before the screen is drawn.
+- Reset everything (build_page.py): it cleared the desk and the files store; now it clears everything Ingenium keeps on this device:
+  the long texts, the app library, Fabrica's apps, packages, issues and pages, the conversations brought in, the signing keys, the
+  Author Studio's changes, Ingenium's own preferences, the desk's copy and, on a computer app, the long texts on its disk; the folder
+  search's index in the private file system goes too (the dialog does not name it while the folder search is held out of releases).
+  A carried app's own keys stay; on a computer app the models on its disk and its earlier desks (desk-backups) stay, and the dialog
+  says so. Each edition's dialog names only what that edition holds (editions.py, _reset_words). The apps Ingenium carries are put
+  in the library again as it starts.
+
+    node rig/t_638_reset.js <url> <out>    # 8 checks with invented records in every store: the dialog, each store gone or empty,
+                                           # the preferences, a rewrite and the index gone, a carried app's key kept, every part runs
+    node rig/t_638_menu.js <url> <out>     # 9 checks: the model list above its key in Chat and Code, from the first moment, after a
+                                           # resize, on a phone; the + list and the effort list in their places
+    node rig/t_638_scale.js <url> <out>    # every page, room and part (and the studio's rooms) against the app's scale
+
+Ingenium 6.37 (6 November 2026): the Author Studio, the room behind the rooms (the master edition only). Her words: "The Author
+Studio looks pitiful and does look like it will allow me to make any edits or changes to Ingenium. It does not look like Carpe Diem's
+Author Studio, I want to actually be able to make edits and changes to Ingenium."
+
+- What it was (6.25, modules/r226.js and r227.js): a room of Settings with four cards (Check Ingenium, Errors, Your layers, Your
+  page). Carpe Diem 1058's Author Studio, carried in Ingenium, was studied first: a studio of its own with a top bar (All changes kept,
+  Export all, Import all, Reset all overrides, Close), a rail of 37 rooms, an Editor that asks what is being changed, every word open
+  to rewriting, one change log and every change undoable.
+- modules/r236.js (new): the Author Studio over the whole window, or docked at the right with Ingenium live beside it. Opened from
+  Settings' Author Studio room (now a door), from a Studio key in the top bar, and from go("workshop") or go("author"). Its top bar:
+  All changes kept (with the count, flashing on every save), Show Ingenium beside, Export all, Import all, Reset all, Close. Its rail:
+  The Editor (four kinds of change, each opening its room), Words, Names, Look, Checks and additions, Change log.
+  Words: Edit words on the page (the studio docks; any words pressed open a small editor beside them, and the press does nothing
+  else); the rewrite is made on that page, or everywhere when chosen; Find words searches every sentence of every page; Your words
+  lists each rewrite with its page, Rewrite and Restore. A rewrite is kept as the words it replaces and the words that replace them,
+  and applied as Ingenium starts and whenever a page draws them again (a watcher of the page, only while there are rewrites); never
+  inside what is hers: messages, the chat's list, notes, Tabula, Code's editor, fields, code and editable text. Placeholders too.
+  Names: Ingenium's own name (state.appName, as Ownership sets it), and each page's name in the side bar, its title and its first
+  line. Look: ready looks (Ingenium's own, Carpe Diem blue, Forest, Ink, Rose, Amber), the accent colour with its shades made from
+  it for day and night, the headings' font, the text's font, and the depth of keys and cards. Checks and additions: the Workshop's
+  cards moved into the studio whole (Check Ingenium, Errors, Your layers, Your page). Change log: every change, newest first, each
+  with Undo, and Undo the last change; Export all writes the words, names, look, the app's name and the layers to one file (through
+  the computer's own save dialog where there is one), Import all reads it back, Reset all returns Ingenium to how it was built (the
+  log keeps the reset, and its Undo brings everything back). Kept in the desk (state.author): on every device with her data, in her
+  backups, sealed when the lock is on. editions.py leaves it out of every edition but the master. What is new gains 6.37 (master).
+- Not yet (the next stages, as Carpe Diem's has them): the side bar's order and pages hidden, cards moved and hidden from a picker,
+  the guided tour and the Guide's words, ready-made changes on a shelf, a Learn drawer, and an Installers room.
+- modules/r173.js: the Author Studio room's line says what the studio now holds.
+
+    node rig/t_637_author.js <url> <out>   # 19 checks with invented words and names: the door, the studio and its rail, the Editor,
+                                           # words pressed on a page and kept, on that page or everywhere, never in a message, after a
+                                           # reload, found, restored; names; a ready look, fonts and depth; the change log and Undo;
+                                           # Export all, Reset all, Import all; the Workshop inside; Esc, go("workshop"), the top key
+
+Ingenium 6.36 (6 November 2026): Focus in parts. Her request: the Focus page redesigned the way the Train room was (6.28), with tabs
+and sections, animated and clickable cards, and much less scrolling. Measured on 6.35 at 1440 by 900: the page was 2,351 pixels tall
+(3,856 on a phone 390 wide), its ten cards one under another.
+
+- modules/r235.js (new): four parts, one at a time, under four raised cards that are the tabs: Today (Now, what today asks of you,
+  your routines), Work (Steps, Time and the Inbox), Calm (Calm and Clear words) and Supports (each support's switch). Each card-tab
+  says what stands in its part at this moment, read from the page's own state and refreshed each second while Focus is in sight:
+  the step in front of you (or the routine whose hour it is), the focus timer counting or paused, the thoughts waiting in the Inbox,
+  the calm look and the text size, and how many supports are on. The tabs rise in and lift under the pointer; a part's cards rise in
+  one after another; the arrow keys, Home and End move between the tabs; the part chosen last is kept (ing.focus.part.v1), only when
+  she chooses it. A card in another part opens its part when it is scrolled to, focused, or ringed by the guided tour (its Focus pages
+  and the tour's ring), so Help's Show me and the tour still find it. A low-energy day's card stays above the parts. The Calm look,
+  the minimal motion setting and the system's reduced motion stop every movement there.
+- Now, with no task, said "Steps, below": it now says "Steps, in Work" and has a Go to Steps key that opens Work with the cursor in
+  the task's box. Measured now: each part 676 to 905 pixels at 1440 by 900, 971 to 1,567 on a phone. What is new gains 6.36.
+
+    node rig/t_636_focus.js <url> <out>   # 19 checks: the four card-tabs, each part's cards and only those, its line, the keys, the
+                                          # part kept, heights on a computer and a phone, what each tab says (a task, a thought, the
+                                          # timer counting and paused, a support turned off), Now's key to Steps, a hidden card
+                                          # opening its part (scrolled to, focused, a tour page, the tour's ring), the Calm look
+
+Ingenium 6.35 (6 November 2026): newer models in a room of their own. Her words (4 November 2026): the path to check, download and
+install newer models, with "the existing section to be redesigned and be visible". Since 6.11.2 the card (modules/r217.js) sat at the
+foot of the card of the four houses in Ingenium's models, which is long, so it was out of sight.
+
+- modules/r173.js: the Models page gains a room, Newer models, beside Ingenium's models, with its own icon and line; the words "newer"
+  and "found online" file into it.
+- modules/r217.js: the card stands on its own (a card after the houses' card, which r173 files into the new room), with Check for newer
+  models at its top; before a look a dashed box says what pressing it does (Ingenium asks Hugging Face once, lists only what this
+  device can load and hold, installs nothing until Install is pressed); after one, a line counts what this device can run, and how
+  many are new since the look before. Its rows lift a little under the pointer (not with minimal motion or the system's
+  reduced motion).
+- modules/r222.js: the Guide says where it is now; What is new gains 6.35.
+- rig/t_6112_found.js opens the new room for its picture.
+
+    node rig/t_635_newer.js <url> <out>   # 10 checks: the key in the row of rooms beside Ingenium's models; the card on its own in its
+                                          # room, Check in sight at the top; the empty state and nothing online before a look; the count
+                                          # after one; Install; a ring from the tour or the Guide opens the room; the Guide's words;
+                                          # a phone; no page errors (Hugging Face and the computer app are stand-ins)
+
+Ingenium 6.34 (6 November 2026): documents in a chat reach a model on this device, and are read as documents. Her words (4 November
+2026): "The documents uploaded inside of the chats of Ingenium are not clickable or offer a preview when you hover over it, the HTML
+single file is clickable but not the documents, please fix that." The handoff asked for it to be verified on the device.
+modules/r216.js (6.11.1) had made each document a key that opens, with its first lines on hover; rig/t_6111_popups.js checks that on a
+message written into the desk. rig/t_634_docs.js takes the whole road instead: real files made by the test (Word documents, a PDF,
+plain text, Markdown, a long transcript), chosen in the chat's own file picker, read by the page, and sent to a model stood in at the
+engine's adapter, under every part that wraps the engine, so the working loop (modules/r190.js) runs as it does for her. The keys and
+previews work; it found two faults, both older than 6.34, in what the model is given:
+
+- for a model on this device, every file of 1,500 characters or more was replaced by a line asking the model to read it with its
+  tools, whatever room its memory had; and the files the tools read left out Word documents (kind "doc"), so a model on this device
+  never saw a Word document longer than about a page. Any other file of that length it saw only if it chose to use its tools, which
+  small models often do not.
+- a conversation whose files were all documents was framed as work on code ("the way a careful senior engineer pairs with its
+  author", "for a page, run_app").
+
+Now (modules/r190.js): a Word document is among the files the tools read, read-only (a change to it is refused plainly, with the way to
+give one: the changed passage, or a new document Ingenium makes a Word file of; the refusal comes before any review card). The page's
+own fitting is kept (each message's files in 40 per cent of the memory: a short file whole, a long one as its opening and passages from
+across it), and files are left to the tools only when the whole request, with the loop's own words, would take more than four fifths
+of the room, the largest first, never one under 1,500 characters (fitFiles). A conversation whose files are all documents (Word, PDF,
+text, Markdown, a table) is told to read them as a careful reader does: answer from what it read, name the document and its lines, quote
+exactly, and say plainly when something is not there (readerNote). A conversation with code keeps the engineer's note. What is new
+gains 6.34.
+
+    node rig/t_634_docs.js <url> <out>   # 17 checks: four documents read and staged; sent whole when they fit (a long Word document
+                                         # to its last paragraph) under the reader's note; a long transcript as the page's overview with
+                                         # room enough, and left to the tools at 8K, the model reading it through them; a Word document
+                                         # read with the tools and never changed; code keeps the engineer's note; each document a key
+                                         # (hover, focus, Enter, press, after a reload, a tap on a phone); no page errors
+
+Ingenium 6.33 (6 November 2026): Settings without the long scroll; Reset everything leaves nothing of the earlier desk. Her words (5 November
+2026): "The "Your data" tab page of the Settings page needs to be redesigned and reorganised because its still a lot of scrolling on all
+of its tabs." Measured on 6.28 (the same on 6.32) at 1440 by 900: Your data 2,792 pixels (3,281 with Backup's Moving open), Models and
+AI 2,945, Everyday 1,615.
+
+- modules/r234.js (new; works inside the rooms of modules/r173.js, and never in "Show every setting at once"): Your data in four
+  sections, one at a time, under a row of raised keys with a line saying what each holds: Bring in, Back up and move, Storage, Sign-in
+  and reset (the sign-in, the older one-file backup and Reset everything). Models and AI in four the same way: Your Ingenium,
+  Connections (online and home models, connectors), Search and eyes, Your devices. Backup's Moving shows its four steps two by two on
+  a wide window; Storage shows the gauge, your limit and old copies beside what takes the room, with the app library under both;
+  Everyday's five small cards stand in two columns from 1,100 pixels. The section chosen last is kept on this device, room by room
+  (ing.settings.parts.v1), only when she chooses it; anything that finds, scrolls to, focuses or rings a setting in another section
+  (Find a setting, Help's Show me, the tour) opens its section first. Measured now: Your data 900 to 1,686 pixels a section (Moving
+  open included), Models and AI 1,004 to 1,506, Everyday 1,321. window.IngSettingsParts: show(room, section, remember), rooms, parts.
+- Reset everything (build_page.py, modules/r197.js). rig/t_700d_lock_backup.js failed once in a full sweep: a seal of the desk still
+  on its way when Reset was pressed was written after the reset had removed the desk, and the lock record came back from the sealed
+  desk's head, so the fresh copy opened to the sign-in. rig/t_633_reset.js makes that moment certain (the seal slowed, the model
+  store held open from a frame so the reset waits its five seconds) and found two more faults, both older than 6.33: the recovery
+  shelf (three earlier moments of the desk, R50) stayed in the store, and on the computer apps the page brought the earlier desk back
+  from the desk on disk (R96 adopts the disk's desk when the view starts with none). Now the reset says it is under way before it
+  removes anything (window.__ingResetting: the page's saves, the lock's writer, its close-of-window seal, its copy to disk and its
+  record writer all stop), takes the recovery shelf with it, and empties the desk on disk through the bridge's own writer (not the
+  lock's, which would seal it) before the page starts again. The computer app keeps the earlier desk among its earlier desks
+  (desk-backups: the day's first, and one about to shrink), where it can still be chosen. Not changed: the reset still leaves the
+  other stores (long texts, the app library, Fabrica, conversations brought in, the signing keys); with the lock on they stay sealed
+  under a key that is gone, and the apps Ingenium carries are kept again, plain, at the fresh copy's first start (checked).
+- What's new in the public editions (modules/r222.js): rig/t_627_editions.js found that the entries for 6.29 and 6.32, written
+  after the editions were last built (6.28), named Fabrica, the app library and the Career Studio, which the gift and demo editions
+  do not hold. An entry can now be marked "fabrica" (shown where Fabrica is) or "nocareer" (the same news in the words of an edition
+  without the Career Studio): 6.32 is marked "fabrica", and 6.29 has a second wording that names Folders alone.
+- Tests brought up to date for the sections (each opens the section that holds the card it uses, as she would): t_61_backup,
+  t_6101_device, t_62_eyes, t_632_sealed_stores, t_700_lock, t_700b_lock_shell, t_700c_lock_stores, t_700d_lock_backup. Still open,
+  older than 6.32: rig/t_61_storage.js's simulated 12 MB device (its last part stops with "storage is full").
+
+    node rig/t_633_settings.js <url> <out>               # 17 checks: the sections, their heights at 1440 by 900, Moving two by two,
+                                                         # Storage's columns, the section kept, Find a setting and a reveal from
+                                                         # elsewhere opening their section, Show every setting at once, a phone
+    python3 rig/run_app.py <app dir> 18999 &             # (optional) the computer app's own back-end, for the third part
+    node rig/t_633_reset.js <url> <out> [18999]          # 17 checks: a plain copy and its recovery shelf; a protected copy with a
+                                                         # seal on its way (finishing during the reset, and still on its way as the
+                                                         # page goes); the carried apps kept again; the desk on disk
+
+Ingenium 6.32 (6 November 2026): the app library and Fabrica sealed with the lock. Her words: "I want you to encrypt Ingenium and
+everything inside of it." Until now the lock (modules/r197.js, 6.9) left three stores plain: the app library (IndexedDB
+ingenium_apps, the pages of her apps), Fabrica's repositories (ingenium_repos: every version's objects and each repository's record)
+and the packages Fabrica made (fabrica_made).
+
+- modules/r197.js: a second kind of sealed record, for bytes: {ing:"sealed",v:2,k,id,iv,ct}, AES-GCM-256 under the same data key, a
+  fresh nonce each time, its place bound as additional data; the plain value is packed as a small JSON head followed by the byte
+  arrays it holds, so a page is never turned into base64 on the way. Fabrica's objects keep their kind, size, depth and base object
+  beside the sealed part (the repository reads them to make room and to copy itself to disk without opening every object); these are
+  bound to it as additional data, so a change to them is refused. What every record holds is sealed; the names the stores file
+  records under (an object's SHA-1 name, a repository's id, a package's name) are not. sealRec and openRec choose the kind by the
+  store; the Backup page's open and seal take the new stores; the walker that seals what is already there takes them as a step of its
+  own (mig.more), so a copy locked before 6.32 seals them at its next sign-in; turning protection off opens them. A record is
+  replaced only if the store still holds the one that was read, now compared byte by byte (sameVal) rather than through text.
+  IngLock.sealFor: what a part writes while the page is locked waits for the sign-in, so nothing is written to a sealed store in
+  clear. Its three accounts of what is sealed say so.
+- build_page.py (base page): libPut seals a page before it is kept, libText opens it, and a page brought back from a computer app's
+  disk copy is sealed as it is kept. modules/r187.js (comparing two versions) opens what it reads.
+- modules/r110.js: Fabrica's repository store seals as it writes and opens as it reads (objects, records, the list of repositories).
+- modules/r112.js: Fabrica's packages and their cards likewise; window.fbMade for the page's tests. modules/r142.js: the storage page
+  opens the packages' cards, and opens any sealed record before it looks in it for the long texts it names (so a text a sealed record
+  names is never offered as one nothing names). modules/r178.js is unchanged: its one-time clean-up of old kits only skips a card it
+  cannot read.
+- Not sealed, as before: the carried apps' own documents in their frames, model files (public files, the same for everyone), the
+  engine, and on the computer apps the earlier copies of the desk in desk-backups. What is new gains 6.32.
+- Found while testing, older than 6.32 (6.31 does the same): rig/t_61_storage.js's simulated small device (12 MB for Ingenium) no
+  longer holds four 1.5 MB versions of an app, so its last part stops with "storage is full" (68 of its other checks pass). Left
+  for a later stage: it may be the test's assumption about how much a new profile keeps, or the page's own use of room.
+
+    node rig/t_632_sealed_stores.js <url> <out>   # 21 checks with an invented page, repository and package: plain before; all five
+                                                  # stores sealed after (no mark readable), read whole, a 40 MB page sealed with no
+                                                  # growth and opened whole, written sealed, Fabrica's clean-up keeping every version
+                                                  # (one kept as the change from another among them), a changed size
+                                                  # refused, the Backup page's asks, a copy locked before 6.32 sealed at its sign-in,
+                                                  # reload and sign-in, protection off writes them back plain
+
+Ingenium 6.31 (6 November 2026): Folders brings in work from the other assistants, LM Studio among them. Her request: Folders should
+bring in work from ChatGPT, DeepSeek, LM Studio and the other assistants, and from GitHub repositories, not only from Claude and Ollama.
+
+- What was there: the shared import (thoughts/chat_import_core.html, used by Settings through r160 and by Folders) already read
+  ChatGPT's .zip, Claude's, Gemini's Google Takeout, Grok, DeepSeek, Le Chat and Copilot as they were laid out in October 2026. Folders'
+  card, Bring in your work, named only Claude, Claude Code and Ollama, so the others were not offered there.
+- modules/r208.js: a way of its own, ChatGPT, Gemini, Grok, DeepSeek, Le Chat, Copilot and LM Studio, says where each export is found
+  and has the key Bring in an export (the same reader as Claude's .zip). What comes in is sorted into the folders as before.
+- thoughts/chat_import_core.html: LM Studio's chat files. LM Studio keeps each chat as a JSON file in the conversations folder of
+  .lmstudio in the home folder and does not describe the file (its chat page, as a web search reported it on 5 November 2026; the page
+  could not be read from here). The reader knows such a file by what it holds (messages that hold versions, a reply made again being a
+  second version), reads the version chosen (else the last), its words from its content or its steps, keeps the system prompt as a
+  note rather than a message, and takes the title, the dates and the model where they are present. It was tested on files invented in
+  that shape, not on real ones: a real file that is not read should be reported, with the file if she is willing.
+- modules/r160.js: Settings' import card names LM Studio's chat files too. What is new gains 6.31.
+- Not yet: a GitHub repository brought into a folder. What a folder should take from a repository (its README, its files, its issues,
+  or its history) is hers to say first.
+- Three older tests had fallen behind the page, each found failing on 6.30 too and brought up to date: rig/t_67_claims.js looked for
+  two sentences as they were before 6.8.4 (no GitHub on the door) and 6.12 (connected models in Blend answer at the same time), and
+  for exactly 36 models in the catalogue (42 since 6.9.2 and 6.10.3; now at least 36, the SmolLM2 sizes still exact);
+  rig/t_62_import.js looked for Ollama's num_ctx in its form before 6.12 (a request on Blend's own connection keeps 16,384). The
+  import tests read their sample files (rig/import_fixtures.js) from the page's own address, as a browser allows.
+
+    node rig/t_631_imports.js <url> <out>   # 8 checks, with invented files: the way and its key, an LM Studio chat read with its title,
+                                            # model, chosen version and steps, the system prompt as a note, ChatGPT's and a plain
+                                            # list still read, brought in and sorted into an invented folder, no page errors
+
+Ingenium 6.30 (6 November 2026): a whole backup, sealed with a password of her own. Her words: "I want you to encrypt Ingenium and
+everything inside of it. I want Ingenium to be fully encrypted end-to-end, and to be protected that is very important to me. I don't want
+Ingenium to be at risk and vulnerable to hackers or malicious software. I don't want my data getting lost or being stolen or leaked".
+
+- What was there (modules/r197.js, 6.9): an optional lock with a name and a password seals the desk, the long texts, the conversations
+  brought in, the signing keys and Fabrica's issues and pages on the device (AES-GCM-256 under a data key the password unwraps). A backup
+  from the Backup page stayed a plain zip even with the lock on: the Backup page opens the sealed records so that a backup can be
+  restored anywhere.
+- modules/r143.js. Seal the whole backup, a switch beside the keys' own, shares their password fields (the label says what the password
+  is for) and is on by itself while Ingenium is locked. The finished zip is sealed in parts of 4 MB, each with AES-GCM-256 under one key
+  drawn from the password (PBKDF2-SHA-256, 600,000 rounds, the keys' own figure), each part's nonce counted from a random one and each
+  part bound to the file's head (salt, rounds, size), its place and whether it is the last, so no part can be changed, moved, dropped or
+  added unseen. The file starts with a plain line, INGENIUM SEALED BACKUP 1, and its head; its name ends in .sealed. Restoring a sealed
+  file asks for its password in place (a wrong one is told so and asked again; a changed byte is refused), then opens it as the zip it
+  holds, every fingerprint checked as before; the summary says it was sealed. The file picker takes .sealed files; Save it again keeps
+  the type. IngBackup.seal and IngBackup.unseal for other parts.
+- modules/r197.js: its account of what is sealed and what is not says a backup is sealed when sealed on the Backup page.
+- Still not sealed, as before: the documents the carried apps keep in their own frames, model files (public files, the same for
+  everyone), the app library and Fabrica's saved versions of apps. What is new gains 6.30.
+- Found by the regression run, older than 6.30 (6.29 does the same): since 6.8.11 every connection is also kept in a list on the
+  device (r191, state.cxKept). Restoring a backup without that list, Replace's preview and its report said a connection was "set to a
+  different address", and that its key was left empty, when the backup merely did not hold the list; the keys of the connection in use
+  were carried as before (r191 puts it back in the list). modules/r143.js: a connection the restored desk does not hold at all is not
+  counted as moved, in the preview or the report; where its address does change, the key is still left behind, as in 6.7.
+- rig/t_615_tour.js: What is new may now start at 6.30 or later (its pattern stopped at 6.29).
+
+    node rig/t_630_sealed.js <url> <out>     # 13 checks, with an invented conversation and password: the head and name, nothing
+                                             # readable inside, the cipher and its rounds, asked without a password, a wrong one told,
+                                             # the right one opens, a changed byte refused, the card's switch, the picker, the restore
+
+Ingenium 6.29 (5 November 2026): a model's reply length and memory, remembered, and set wherever it works. Her words: the Tokens and
+Context controls "reset", and she wants to set them, and the effort, on every page that runs a model (the Career Studio, Lector and the
+rest).
+
+- Measured on 6.24 (and unchanged on 6.28): a model with no saved limits was shown the sliders' midpoints in Chat's Controls (16,512
+  tokens of reply and 17,408 of memory: a range input falls back to its midpoint when given no number) and then ran with them; the
+  Models page's Settings saved those numbers on the model; and Settings cut a saved memory of 65,536 to 32,768, where its slider stopped.
+  Lector, the Career Studio and Folders had Effort beside their model (r225) but no reply length or memory.
+- modules/r233.js. A missing, zero or broken reply length, memory or effort is mended to the app's own defaults (1,024; 8,192 or the
+  model's trained memory if smaller; 3), on opening, before Chat shows a model, and before Settings opens; a small model's own small
+  memory (a trained 256) is kept. Settings raises its sliders to every saved value, so it shows and keeps them. Beside Effort on Lector,
+  the Career Studio and Folders (a folder's Where we left off card), Reply up to and Memory set the same two numbers for the model that
+  page writes with (Lector's plan), saved on the model and shown at once in Chat's Controls when it is Chat's model too; with a
+  connected model they say they follow it. Lector's ask (outermost of its layers) lets a reply run to the model's own length where the
+  model's memory has room for it beyond the prompt, and never shortens what a task asked for. A new memory takes effect when the model
+  next loads; the strip says so when the loaded model has another.
+- What is new gains 6.29.
+
+    node rig/t_629_limits.js <url> <out>     # 12 checks, with stand-in model cards: defaults not midpoints, zero and broken numbers
+                                             # mended and a trained 256 kept, Settings keeps 6,144 and 65,536, the strip on the three
+                                             # pages, one change seen everywhere and after a reload, the reply length used within room
+
+Ingenium 6.28 (5 November 2026): the Train room, in parts. Her words: "The cards on the Train tab inside of the Models page is really stiff
+and not animated or clickable, please fix that. There is also a lot of scrolling on that page, it should have a redesign that has some
+tabs and sections to better show the page and not have me endlessly scrolling and losing interest in the page's contents. The rest of the
+pages inside of the Models Studio are quite short so the Train exceedingly long page looks off compared to the others."
+
+- Measured on 6.27 at 1440 x 900: the Train room was 3,400 pixels tall (the Studio's other rooms 930 to 1,145): What can be trained here
+  (792), Train a small model (176) and the learning workbench (1,412, its five steps one under another); the four bands of the first card
+  were plain boxes of text.
+- modules/r232.js, inside the Train room (#stP-train, modules/r199.js): three parts, one at a time, under a row of raised keys with their
+  line: Overview (What can be trained here), Workbench (the learning workbench) and Trainer (Train a small model); the part chosen last is
+  kept (ing.train.part.v1). Each part is 990 to 1,600 pixels tall.
+- The Overview's four bands are tiles in two columns: the tag as a chip, the title, the first sentence, a chevron; pressed, Enter or Space
+  opens one across the card with all it says, and the one open before folds; they rise in and lift under the pointer (the rise fills
+  backwards only); The arithmetic is a raised key.
+- Each workbench tool shows one step at a time: a row of numbered steps (Write like my text: Your text, How big, Learn, Try it, Keep it;
+  the other tools' own five), and Back and Next under each step, naming the steps either side. A lesson keeps running whichever step is
+  shown.
+- Anything that opens the workbench (IngLab.open, wrapped), reveals a part of the room (r173's hook, from scrollIntoView, focus, the tour,
+  Help) or moves the focus into it opens the part, the step and the band that hold it. The Trainer's and the Overview's words say "the
+  Workbench tab" and "the Trainer tab" in place of "below" (r201, r199). What is new gains 6.28.
+
+- rig/t_703c_lab.js opens a step before it uses a key or a field in it (as she would, through the step's key); rig/t_703_studio.js reads
+  the truth card's words folded or open, finds the trainer in its own part, and counts the bands' columns on a phone; its rule that no
+  key says "frontier" stands for keys that act, not for the band that explains why frontier training cannot happen at home.
+
+    node rig/t_628_train.js <url> <out>      # 19 checks: three parts and each part's height, the part kept, the tiles (fold, lift, open,
+                                             # keyboard, one at a time), the steps of all four tools, Back and Next, a real lesson trained in
+                                             # the page running while another step is shown, reached from elsewhere, minimal motion, night, phone
+
+Ingenium 6.27 (5 November 2026): the editions, as she set them out. Her words: "The Ingenium edition that will be made available to the
+public and participants and even friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps,
+and the Guide and Settings page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author
+Studio and the rename Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some
+limitations such (no renaming Ingenium, and no Author Studio as well as no Author key generation. The Full edition will be a gift to my
+partner so it will contain the apps and the Lector page, the Career Stuio and Fabrica but it will not have any of the apps from the
+Offline Project built in and it will not have their skills and information or any of my profile information".
+
+- Measured on 6.26 (rig/t_627_editions.js, which opens every page of an edition and reads its words, hidden rooms included, with the
+  tour and the help): the gift and demo editions still had Fabrica and the five apps (Tabula, Abacus, Imago, Scriba, Fontes) and named
+  them about a hundred times; the full edition named Carpe Diem, The Forge and Inkwell on Home's plaque, in Lector's list of apps
+  ("Not added yet") and in the tour, and kept a hidden Author Studio tab.
+- The public editions (gift, demo): Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings. The page carries none
+  of the five apps (build_page.py; editions.carries_desk) and leaves out their modules (r118, r123, r193, r194); Fabrica's code stays,
+  as Build and the chat call it, but its key, page and route go (modules/r231.js, in these editions only, also takes the tour's Fabrica
+  chapter and its step on the five apps, and paints the Guide's tour card again), and editions._public() takes every word of them out
+  of Home (its Fabrica key and column; its apps row keeps the two instruments), the Guide, the tour, the help, the Inbox, the notes,
+  Blend, Folders, the Studio's Data and Train rooms, and Settings (the backup's packages switch, which a backup reads, stays hidden in
+  neutral words). Ingenium's own reference database (the chat's My sources, called Fontes) and its model house Scriba stay. Both public
+  editions now name none of the owner's other apps (_blank, which the gift edition had alone).
+- The full edition: the five apps, Lector, the Career Studio and Fabrica, with no Name card (6.7.1), no owner's key (r162, the master's
+  alone) and no Author Studio (r226 and r227 are the master's, and r173 now makes a room only where its edition has it: CONF's when);
+  and now _blank too, with Lector and the app library knowing Ingenium alone (LIB_KEYS, Lector's ORDER in r108; r140's seals keep all
+  four).
+- ING_HAS(part) in every page (an edit after ING_EDITION) answers author, rename and ownerkey (the master) and fabrica, desk, lector and
+  career (the master and full editions). What is new: the lines about the Career Studio show only where it is carried (6.24, 6.22,
+  and 6.17 split in two); 6.27 shows in the master edition.
+- editions/ in this repository (the Mac mini's) holds each release's full, gift and demo pages with their fingerprints
+  (editions/README.txt); release.py keeps that folder out of every kit.
+- rig/t_62_editions.js expects every edition but the master to name none of the owner's other apps.
+
+    node rig/t_627_editions.js <out> master=<url> full=<url> gift=<url> demo=<url>   # per edition: its side bar, the five apps carried or not,
+                                                                                     # no route to a page it lacks, renaming, the owner's key
+                                                                                     # and the Author Studio, every word of every page, the
+                                                                                     # tour and the help, and no page error (SURVEY=1 lists)
+
+Ingenium 6.26 (5 November 2026): the Guide, in rooms; What's new in a key. Her words: "Please make the "What is new card on the Guide
+collapsible from view and folded inside of a cute popped out animated 3D button rather than this long list that is taking up half the
+page and overwhelming me. In fact, the entire Guide page looks like a very long document that does not match the rest of Ingenium and its
+graphics and designs. I want it rededesigned and reorganised to better fit the app. I want to see sections and animated 3D styling"; and,
+of the first key made for it: "The "What's new" button is way too bulky and looks too bright and odd against the rest of the app on both
+light and dark mode, please fix it."
+
+- Measured on 6.25 at 1440 x 900: the Guide was 6,408 pixels tall, eighteen cards in one column, What is new the second card.
+- Rooms (modules/r173.js, CONF.guide), as Settings and Models have them: Start here, Chat and Code, Models and devices, Making and
+  study, Around the app, each with its line (a room's line may now be a function, so it names only what the edition carries); Find in
+  the guide (r173's find box, its ids and words by page, Settings keeping its own); Show the whole guide at once. Each room is 900 to
+  1,260 pixels tall. r173 gains data-rm-skip (a part of a page that is not a card) and a hook that lets a module open what folds an
+  element (W.__rmRevealHook, called from openFolds, so reveal, autoReveal and Find all reach it).
+- Topics as tiles (modules/r230.js): each card but the tour's gets a head key (its mark on a raised amethyst disc, its title, its first
+  sentence, a chevron); pressed (or Enter), it opens across the room and the one open before folds; the tour's own card stays open,
+  first in Start here. The tiles rise in one after another when a room is shown and lift under the pointer (the rise-in fills
+  backwards only, so it never outweighs the lift); still with motion set to minimal or prefers-reduced-motion. A part inside a folded
+  topic reached from elsewhere (the tour's ring, Help's Show me, Find, the focus) opens the topic and its room. Show the whole guide
+  at once opens every topic; back in rooms they fold.
+- What's new in a key beside the title: one of the page's own raised keys (the face, rim, shadow and corners of "Show the whole guide
+  at once"), a small gold spark that turns now and then, the newest version in a quiet chip, a small gold dot until it is opened on
+  this device (ing.guide.seen.v1). Pressed, a card springs out with the versions grouped, the newest open, each earlier one a line that
+  opens; its foot says which version and build is running (the Guide's old foot line, moved there); Escape, its close key or a press
+  outside folds it and gives the focus back. On a phone it rises from the foot of the screen, above the side keys (z-index 300: above
+  the rail's 130, below the chat drawer's 620 and the dialogs' 800). r222's What is new card is kept, hidden, inside it.
+- The page is titled Guide, with a new opening line; What is new gains 6.26.
+- Tests that read a Guide card's shown words open it first (t_611_code); t_616_scroll shows the whole guide to have a page taller than
+  the window; t_615_tour finds What is new in the key.
+
+    node rig/t_626_guide.js <url> <out> [master|full|gift|demo]   # 27 checks: five rooms and their topics, each room's height, the tiles,
+                                                                  # one open at a time, the keyboard, the rise and the lift, the key in the
+                                                                  # page's family by day and by night, the card and its versions, Escape and a
+                                                                  # press outside, Find, reveal, the whole guide, a phone with the side keys
+
+Ingenium 6.25 (5 November 2026): Ingenium in its own words; the Workshop becomes the Author Studio, a room of Settings. Her words:
+"There is a lot of mention of Claude on the Plan and session panel of the Coding chat, please remove them unless it is referring to a
+function that connects to Claude. I want for Ingenium's pages and chatrooms to have their own identities, please [remove] the Claude,
+Ollama and GitHub comparisons and others if there are more scattered around the app. I specifically want you to start with the Plan and
+session panel in the Coding chat page"; and "Please rename the "Workshop" page to the Author Studio. Perhaps it would look better added
+to the Setting page instead of being a part of Ingenium's side navigation bar."
+
+- Measured on 6.24 (every string of the page's own scripts and markup, read with acorn): twelve places described a part of Ingenium by
+  another assistant's way of doing it. In Code's Plan and session column, "as Claude's sessions do" (the GitHub row, r219) and "as
+  Claude's connectors" (r220); the connector sheet and the Connectors card in Settings (r220); the Guide's cards on GitHub (r219),
+  connectors (r220) and the environment (r223); two tour steps and three lines of What is new (r222); and in the 3.12 base, the Projects
+  card ("the way Claude's projects do") and the card of Ingenium's own instructions ("the way Claude has its own"), changed by two edits
+  in build_page.py. Each now says what Ingenium does in its own words. GitHub and Ollama were never compared: each is named only where
+  Ingenium connects to it or reads its files, and so is Claude (a Claude connection, your Claude export, Claude Code's sessions).
+- The Author Studio (modules/r226.js, r227.js, r173.js; the master edition only, as the Workshop was): a sixth room of Settings, after
+  Ownership, with its own pen mark, holding everything the Workshop held (Check Ingenium, Errors since it started, Your layers, Your
+  page) under a banner of its own. The side bar has no key for it; go("workshop") from anywhere (the tour, a notice, the Mac menu's
+  routes) opens Settings at the Author Studio. Find a setting finds it ("diagnostics", "troubleshoot", "layers"). Its styles moved from
+  #page-workshop to #wsStudio, the room's card. Check Ingenium opens every page in turn and comes back to the room it was run from
+  (Settings alone would show the room chosen last: found by rig/t_618_workshop.js and mended before release). Ingenium's copy of its
+  own page in Code is named "Ingenium (Author Studio)"; a copy made before as "Ingenium (workshop)" is still found. A page of her own
+  (her layers) joins the side bar after Settings. The tour's step, the Guide's card and What is new say Author Studio. In every other
+  edition the room has nothing in it, so its tab does not show.
+- What is new gains 6.25.
+
+    node rig/t_625_words.js <url> <out>      # 17 checks: no comparison anywhere in the served page; the Plan and session column; every
+                                             # page's words, hidden rooms, the Projects card and the tour; the names kept where Ingenium
+                                             # connects; the Author Studio in Settings (six rooms, go("workshop"), its cards, the tab,
+                                             # Find a setting, the check coming back to its room, the Guide, the tour's ring, night, phone)
+    node rig/t_618_workshop.js <url> <mock url> <out>   # 19 checks, following the Workshop into Settings
+    node rig/t_619_page.js <url> <out>                  # 30 checks; rig/t_615_tour.js expects "Settings: The Author Studio"
+
+Ingenium 6.24 (5 November 2026): Stop stops. Her words: "there is a bug on the "Stop" button inside of the Career Studio, I keep on
+pressing it over and over again to stop a reading but it does not stop and I have had to close and force quit the app"; "the models
+takes ages running in circles trying to dissect the simple instructions and calls it ambiguous"; "make the "Stop" button on the
+Applications tab page purple".
+
+- The cause. The engines answer a stop by handing back the words written so far, as if the reply had ended (wllama and the desktop
+  adapter resolve with the partial text), so the layers around lxAsk took it for a finished draft and asked again: Ultra's check
+  (r225) asked for a revision, and the repetition guard (r148) could ask again too. A connection's request was never cancelled.
+- build_page.py 6.24: lxAsk refuses at once a request marked stopped. The layers pass the same request object down, so none of them
+  can ask again for it; every other request (Lector, Ask Lector, Folders) is untouched.
+- modules/r188.js. Each ask is its own request object; Stop marks it stopped, aborts the engine, cancels a connection's request,
+  says Stopping at once (the key is disabled) and ends the panel within 2.5 seconds whatever the engine does. A late answer from a
+  stopped request is dropped and never ends a newer run. The Stop key is the studio's purple (pri), as Do this now.
+- modules/r188.js. A reading is asked as a reading: its rule opens "You read and advise on this device for the applicant" instead of
+  telling the model to write in her first person while it judges (the confusion it reported as ambiguity). r225 counts that opening
+  as a reading, so Auto gives it Low effort, without the long thinking that turned in circles; an effort chosen by hand (Medium and
+  above) still thinks, and its thinking is shown in the panel. A model on this device reads at most about 30,000 characters
+  of posting and profile, so its first word comes sooner; a connection keeps its full room.
+- What is new gains 6.24.
+
+    node rig/t_624_stop.js <url> <out>       # 11 checks, with a stand-in engine that answers a stop as the real ones do: the guard
+                                             # in the page and through every layer, the purple key, the reading's own rule, one press,
+                                             # no request after Stop, a new reading after it, and a deaf engine's late answer dropped
+
+Ingenium 6.23 (5 November 2026): a model installed once. Her words: "there are a lot of duplicate models downloaded on the Models page
+of Ingenium, the app does not seem to register when a model has been installed twice".
+
+- modules/r229.js. lineupInstall never asked whether the model was already here, so Get pressed again (on the Models page, in Getting
+  ready, from Lector or the Career Studio) fetched it again and added a card; a file brought in again (addEntries) became a second card;
+  the other routes matched cards only by their own id. Now a lineup model already here is not fetched again and says so; a file already
+  here (the same name and size) is not added again and says so. Cards that are the same model (the same lineup model, or the same file
+  name and size) are listed at the top of Your models, with one key: Keep one of each. It asks first, then keeps the one in use (or
+  the built-in one, or the first) and removes the others through removeModel, which frees their stored copies and only unlists a
+  linked file (an Ollama blob or a file on a drive), never deleting it.
+- What is new gains 6.23.
+
+    node rig/t_623_dupes.js <url> <out>      # 10 checks, with stand-in model cards: found, listed, Get not repeated, a file not added
+                                             # twice, asked first, the one in use kept, a model installed once untouched
+
+Ingenium 6.22 (5 November 2026): the Career Studio reads a posting as an admissions tutor and a recruiter would, and shows its reasoning.
+Her words: "The Career Studio does not analyse the job postings or uploading applications properly, it is waiting to see everything
+written from my profile to match the roles or applications requirements verbatim and for it to be saying the exact same thing for them to
+be considered as a match, if not, everything is considered as "Not a good fit" or a "Stretch" I want it to be more nuanced ... I want the
+Career Studio to bridge the gaps from my resume without inventing any experience, skills and education"; "Instead of seeing a blank canvas,
+I want to see the model's thinking on the Applications tab of the Career Studio"; and, of her doctoral choices, "I want the Lector page and
+the Career Studio fully briefed and equipped to help me make the best decision with the right reasoning, analysis and data".
+
+- The reading (modules/r188.js, readMsgs, parseRead): the model was asked to mark a criterion MET only when the profile "shows it plainly",
+  PARTLY when it shows "something close to it, but not it", and to "never count what the profile does not show", as an adviser "who never
+  flatters"; the writing rule added "never stretch what the profile says into more than it says". A model that obeys that marks experience
+  that transfers from another setting as not shown. Now it reads as an admissions tutor and a recruiter: MET, TRANSFERABLE (the same ability
+  shown in another setting), PARTLY or NOT SHOWN; it names the entry of the profile each judgement rests on and says how it answers the
+  criterion; each gap is LEARNABLE, ASK ME (she may have done it) or REQUIRED (a formal requirement); and it says in two or three sentences
+  how a reader would see the application. Never inventing stays the rule: drawing the link from her own record is allowed, claiming beyond
+  it is not.
+- The band (bandOf): a stated, weighted rule (shown 1, transfers 0.85, partly 0.5, not shown but learnable 0.25; desirable criteria a
+  fifth), five bands (Strong, Good, Possible, A stretch, Not a fit), a formal requirement not shown makes it a stretch at best, and what the
+  band would be if the Ask me criteria are hers. A reading made before 6.22 (no transfers, entries or gaps in it) keeps the rule it was made
+  under, and says that reading it again gives the fuller reading.
+- The guard against invention (vetEvidence): each judgement is checked first by the entry it names (it must be in her profile), then by its
+  words; a "shown" or "transfers" found nowhere counts only as partly shown until she checks it, as before.
+- How you fit shows the band with how a reader would see it, what waits on her, the gaps she could close, the formal requirements not
+  shown, and for each criterion the entry it rests on and the link to make; How the model reasoned is kept with the reading.
+- While it reads (livePanel): the model's reasoning as it comes (two edits in build_page.py: lxAsk hands a model's reasoning to LX.onThink,
+  on this device and through a connection), a line saying what it is doing and for how long, and each criterion in a table as it is judged,
+  in place of a blank panel.
+- The writer (critBlock and the shared rule): a CV, a letter or a statement is told which criteria transfer, from which entry, and the link
+  to make, and never to claim what is not shown.
+- A profile file may carry applications (with their particulars, dates and notes) and people (each tied to the application the file
+  names), or be a pack of only those (kind "ingenium-career-pack"); nothing already there is added twice.
+- What is new gains 6.22.
+
+    node rig/t_622_reading.js <url> <out>    # 26 checks, with a stand-in model that streams its reasoning and a reading, an invented
+                                             # applicant and posting: the live panel, the request, the judgements, the guard, the band,
+                                             # How you fit, the letter's request, an earlier reading, and programmes and people from a file
+
+Ingenium 6.21 (5 November 2026): the Career Studio's add keys, chosen cards and back keys; Copy from the right-click panel; the
+preview's own keys. Her words: "I want the "+ Bring one" button to be purple on the Today tab page ... the "+ A person" button of the
+People tab page to also be made purple ... add the light purple colour of the "Roles and programmes that suit you" card to the selected
+cards of the "Your Profile" tab page"; "The "< Today" button does not do anything when I click on it ... Its the same thing for the "Your
+Profile" button"; "I kept on trying to copy this prompt that I typed in Ingenium's sticky notes to Claude's chat text box and no matter
+what I tried it would not work properly, I had to use the keyboard's shortcuts"; and "Please redesign the Copy/Open/Download buttons that
+is at the bottom of the Build's page live interactive Preview Screen". (The same changes were made in an earlier session and lost before
+they were committed; they are made again here.)
+
+- The Career Studio (modules/r188.js): + Bring one on Today and + A person on People take the studio's purple, as + Bring one on
+  Applications and + A goal already had. The card open in a list (every room) takes the light purple of the pinned card, Roles and
+  programmes that suit you, by day and by night. The back keys (‹ Today, ‹ Your profile, ‹ Goals and plan, ‹ Learn) are for a narrow
+  screen, where the list and the open item are shown one at a time; a rule of the same weight that came later (#cs .c-btn) showed them
+  on a wide window too, where both are shown and there is nothing to go back to. They now show only on a narrow screen, and there they
+  take her back to the list, as before.
+- Copy from the right-click panel (ten edits in build_page.py, on the panel ing-editmenu and the touch panel): the panel read the selection again when
+  Copy was pressed, and a press on a key of the panel can take the selection out of a note first (in Safari's engine, which the Mac app
+  uses; Chromium keeps it, so the test makes that happen by hand); and its copy went through the app's bridge after the press had
+  ended, where a web view may refuse the browser's own way back. Now the words selected are kept as the panel opens, a press on the panel
+  never moves the selection, and Copy, Cut and Copy the whole field first copy inside the press itself, the way Command+C and Ctrl+C do;
+  the bridge and the browser's clipboard stay as the second and third ways. The touch panel's Copy whole note (a held press on the Fire
+  and the iPad) does the same. Not yet seen in the Mac app's own web view, which does not run here: the test runs in Chromium with a
+  bridge that refuses and a selection taken away.
+- The preview's keys (modules/r228.js): Copy, Open and Download under Build's preview, and under Code's, were outlined purple pills in a
+  pale tray, alone of their kind on the page; they are now the page's own raised keys (as Save this page beside them), each with a small
+  line symbol, by day and by night. Their ids, titles and handlers are unchanged. Build's Copy, and csCopyText wherever it copies, copy
+  inside the press first too, and say Copied for a moment.
+- What is new gains 6.21.
+
+    node rig/t_621_studio.js <url> <out>     # 24 checks: the four add keys, the chosen card by day and night, the back keys wide and
+                                             # narrow, Copy, Cut, Copy the whole field and Paste on a sticky note, the preview's keys
+
+Ingenium 6.20 (4 November 2026): the chat's height holds when it swings; Code's column without an empty band; Your page's downloads.
+Her words: "the chat inside of the panel keeps on glitching back and forth"; "Please feel free to make other improvements to the
+Conversation panel of the Coding chat page of Ingenium and its sections"; and "I really want for every new feature and everything
+else inside of Ingenium works and works well".
+
+- The chat's height (modules/r102.js): 6.11.2 held the steadier of two heights that swing within a moment, for three seconds; the
+  same two layouts could then start the swing again, every few seconds. Now a swing seen once (as a page settles) is held for three
+  seconds, as before, and the same swing again in the same layout (the window's size, the chat's place, the preview and its view) is
+  held until that layout changes. A change of layout lets go at once; a height she sets with the grip is never held. Chromium does
+  not swing here, so the test makes the swing by hand: whether this is the swing she sees on her Mac is not yet known.
+- Code's column (modules/r215.js): the sessions list grew to 270 px whatever it held, leaving an empty band above Files with one or
+  two sessions; it is now as tall as its sessions (up to 270 px, then it scrolls), and the files take the room that is left. Its two
+  keys (Close this app, Remove from Code) were already as long as their words (since 6.11; 99 and 126 px measured).
+- Your page (modules/r227.js; desktop/app_page_620.py): on the computer app, Download the page running is saved by the app from its
+  own file, and the copy in Code goes over in pieces and is written whole by the app; before, about 100 MB crossed the page's bridge
+  in one piece. A page file older than 6.19 has no Your page card, so it could not say it has started and Ingenium would go back from
+  it after half a minute: it is now refused at once, with that reason.
+- What is new gains 6.20; rig/t_615_tour.js accepts versions from 6.20 on as the newest.
+
+    node rig/t_620_hold.js <url> <out>                       # 7 checks
+    node rig/t_619_page.js <url> <out>                       # 30 checks now (the downloads and the refusal)
+    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py  # 38 checks with app_page_620.py
+
+Ingenium 6.19 (4 November 2026): Your page, in the master edition's Workshop: Ingenium's own page, changed, in place of the built one.
+Her words: "I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,
+curate, run diagnostics and add or remove new features, pages, sections or different functions in Ingenium as its author and creator."
+Her answer on how changes take effect: both, layers first (6.18), then the page itself (here).
+
+- Your page, the Workshop's fourth card (modules/r227.js; editions.py leaves it out of every other edition). On her computers:
+  - Use the page from Code (the Workshop's copy, as the model or she changed it), or Use a page file: Ingenium asks first, hands the
+    page to the computer app in pieces, keeps it as a version of its own and loads it at once, at the same address and with all her
+    work as it is.
+  - A changed page counts as working once its Workshop reports in. One that has not within half a minute, or did not come up at a
+    start, is left: Ingenium goes back to the last page that worked (or the built one) on its own, says so on the card and once as a
+    notice, and keeps her work as it was. A page that worked before is left after two starts in a row that did not come up.
+  - Running, chosen for the next start, and each version kept (works, did not start, or not tried yet), with Use and Remove; Go back
+    to the built page; Download the page running. At most five versions are kept, beside her stored work.
+  - On a Mac, the app menu gains Use the built page, which works whatever a changed page does.
+  - When Ingenium itself is updated, a page made on the earlier build does not start in place of the new one: the new built page
+    starts, her page is kept, and the card says why. Chosen again, it starts on the new build, as she asks.
+  - Reporting in never changes her choice.
+  - In a browser, the card says how to keep a changed page: download it whole and open that file.
+- The computer apps' side: desktop/app_page_619.py (Mac mini, Mac Intel, Windows), added to release.py's patches.
+- The Workshop's copy in Code is lighter: what the page carries at its end (the apps on the Desk, the engine, the kits, the typefaces;
+  about 61 MB of the 76) is left out, so the model reads and searches about 15 MB; it is put back whenever the page is used, and when
+  Download the app is pressed in Code. The copy is used again while the page running is the one it was made from. The message to
+  the model says the empty blocks are filled when the page is used.
+- Found by the new test: Code's preview runs Ingenium's own page in a sealed frame, where Chromium, asked for the list of the
+  browser's stores, refuses and also reports a rejection with no reason that nothing can catch (three times, for Ingenium's page:
+  its saved Lab models and its old kits). Ingenium's own code handled the refusal; the extra report read as an error of the app.
+  Every preview now refuses that list at once, first of all (modules/r223.js), so the model is not sent after errors that are not
+  there.
+- The Guide's Workshop card gains Your page; the tour's Workshop step and What is new gain 6.19.
+- Not tested here: the window itself. The switch was tested with a stand-in for the computer app (the page side) and on the Python
+  side with a stand-in window; the Mac's and Windows' web views do not run here. If a first real switch goes wrong, Ingenium goes
+  back on its own, and on a Mac the app menu's Use the built page is there too.
+
+    node rig/t_619_page.js <url> <out>                      # 27 checks, with a stand-in for the computer app
+    python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py  # 34 checks, Mac and Windows alike
+
+Ingenium 6.18 (4 November 2026): the author's workshop, in the master edition; How I work, on every app in every Code session.
+Her words: "I want to be able to troubleshoot Ingenium inside of the app. I want to be able to run diagnostics and be able to find and fix
+a bug in the app. I want full agency and authorship over Ingenium. I want to be able to make proper edits, customise, troubleshoot, fix,
+curate, run diagnostics and add or remove new features, pages, sections or different functions in Ingenium as its author and creator. I
+want that capability added to my master version"; her answer on how edits take effect: both, layers first, then the page itself. And:
+"I want the scroll bars kept hidden rule to be applied to all of my apps, please add that to the folders inside Ingenium as well for all
+future apps" (the other apps' repositories, she then said, are to be left as they are).
+
+- The Workshop (modules/r226.js; editions.py leaves it out of every other edition), after Settings in the side bar:
+  - Check Ingenium: every part loaded, every page opened (Chat and Code only when a conversation of that kind exists, so it makes none;
+    not the apps on the Desk, pages of their own), both stores written and read back, the room the browser offers, the engine and the
+    models, the connections (never their keys) and connectors, the sign-in, her layers, the errors since it started, the version. Each
+    line says ok, worth a look or wrong, in plain words; Copy the report.
+  - Errors since it started: every error the page meets (thrown, a file that did not load, a promise not caught, an error written to the
+    console), newest first, with when and where; the same error said twice (as thrown and again by Ingenium's own handler) is kept once;
+    the last 50 are kept across restarts.
+  - Find and fix with a model: Ingenium's own page opens as an app in Code (as Your apps opened it), with the report, or one error, in the
+    message box for her to read before she sends it. The model searches, reads and changes ingenium.html; the preview runs the changed
+    Ingenium; every change is a version she can undo; Download the app keeps the changed page.
+  - Your layers, loaded as Ingenium starts on every device that has her data, the built page unchanged: pages of her own in the side bar
+    (each in a frame of its own, apart from her data; or one of her Code apps), sections added to any page (written text, or HTML in a
+    frame), scripts that run in Ingenium after every part has loaded (with all its power), styles (given the weight of two ids more, so
+    they win over Ingenium's own), and pages or named cards she hides.
+  - A safe start: Start without your layers (and with them again); and on its own when the last start stopped while one of her scripts
+    ran, saying which. A script that fails is marked with its error and listed with the errors.
+  - Next: on her computers, a changed page taking the place of the installed one, and going back to the last working version if it
+    does not start.
+- Folders: her rule (scroll bars hidden in every app, scrolling kept) is added once at the end of How I work, on every app, in the
+  master edition, where she can change or remove it. How I work, on every app now goes with every Code session, not only those in a
+  folder (modules/r208.js), and with every request Build makes (modules/r190.js), so every app she builds follows it.
+- The tour's Settings chapter gains the Workshop (where it is carried); the Guide gains a card for it; What is new gains 6.18.
+- Found by the Workshop while testing: Chromium reported "ResizeObserver loop completed with undelivered notifications" once, as pages
+  were opened. That message is what a layout that reacts to its own size gives, one possible cause of her "glitching back and forth";
+  the Workshop now records it, with its time, on her own device.
+
+    node rig/t_618_workshop.js <url> <mock url> <out>   # 19 checks, with a stand-in for Ingenium's own page and the stand-in Claude
+
+Ingenium 6.17 (4 November 2026): effort wherever a model is chosen. Her words (3 November 2026): "I want to be able to select low to
+Max effort and Ultracode inside of the chats and everywhere a model can be selected to run a task or do work inside of Ingenium."
+
+- Measured on 6.16: Chat, Code and Blend had effort (6.11, 6.12). Lector, the Career Studio and Folders, which share one model (the
+  model Lector uses), asked it through lxAsk with thinking always off and the chat's own effort; Build's Ask a model to change this page
+  ran the working loop with a fixed number of steps and the chat's thinking. Fabrica chooses no model: it hands work to Chat and Code.
+- Lector, the Career Studio and Folders now share one writing effort (modules/r225.js), shown beside their model on each page (Lector's
+  Who reads and writes, the studio's How the studio works, a folder's Where we left off), one choice as their model is one: Auto, Low,
+  Medium, High, Extra, Max or Ultra. Auto reads quickly (Low) and writes at High through a connection; on this device it stays quick, to
+  keep long work moving. Through a connection, the request carries its level, its thinking and its room; on this device, its thinking
+  and a thinking room by the model's size, added to the writing room. Ultra writes at Max and then has each piece checked against its
+  own material (every name, date, number, title, place, claim and quotation) and corrected; a correction that loses the form asked for
+  (its JSON, its headings) or most of its length is not taken, and reading is never checked twice. The effort is put on the request
+  where lxAsk makes it (two edits in build_page.py), so the recipe (r126) and the guard against writing that repeats itself (r148)
+  keep working around it.
+- Build has an effort of its own beside How should it work (modules/r190.js; r215.js lends it the settings of a level): Auto, Low to
+  Max, or Ultracode. Its requests carry it as Chat's do: the service's effort or reasoning, the number of steps, and with Ultracode the
+  plan, the checks run in the page and up to three times sent back while something is unfinished. Auto says under the request what it
+  chose and why.
+- The Guide's card on effort says where effort is chosen beyond Chat and Code.
+
+    node rig/t_617_effort.js <url> <mock url> <out>   # 15 checks: a stand-in connection and engine, and the stand-in Claude for Build
+
+Ingenium 6.16 (4 November 2026): a Code session's environment, as in Claude's; and no scroll bar in sight. Her words: "When I click on
+the Settings button for the Environment section on the Coding chat inside of Ingenium, it just opens up the Controls panel, it does not
+open the settings for the editing the Environment unlike Claude's coding chat settings, please make the fix to bridge that gap as well.
+I want full parity please"; and "Please add this rule to Ingenium, all scroll bars unless explicitly stated are to be hidden from view
+while keeping the scrolling functionality intact. I don't like seeing them in view, they detract from the look of the app."
+
+- The gear beside Environment, in the Code session's column, opens the environment (modules/r223.js), laid out as Claude's Edit cloud
+  environment (her picture): its Name (the Default one cannot be renamed or removed), Network access, Network secrets, Setup script and
+  Environment variables, each a raised row that opens its own page, and Save changes. Its last row, the model and its engine, opens
+  Controls, which is what the gear opened before. One environment can serve many sessions; a session uses the Default until another is
+  chosen; the column names the session's environment and what it holds.
+- Ingenium's apps run in the preview beside the conversation, so the environment is where the app runs, and each setting works there:
+  Network access (Full, as before; Listed sites only; None) is a content security policy put first in the app's page, so the browser
+  itself refuses requests, scripts, styles, pictures, fonts and frames from sites not allowed, and the preview's console says what was
+  refused and why (a window the app opens to another site is not stopped). A network secret is added as a header to the app's requests
+  to its one site, so a key is never written into the code. The setup script runs before the app's own scripts at each load. The
+  variables are read as window.ENV.NAME.
+- The model is told the network rule, the variables' names, the secrets' sites and that a setup script runs, never a value. None of it
+  is written into the app's files, its versions, a download or GitHub. Values are kept on this device (sealed with her data when the
+  sign-in is on); a backup she exports carries them, as it carries her connections' keys.
+- No scroll bar in sight (modules/r224.js): one rule for the whole of Ingenium's own page, the page's last word, so every part scrolls by
+  wheel, trackpad, touch and keys with no bar to see, including parts that drew their own bars. A part she asks to see a bar on can be
+  marked data-scrollbar="shown". Pages shown inside a frame keep their own look: the app being built, in the preview, and the apps on the
+  Desk (Tabula, Abacus, Imago, Scriba, Fontes).
+- The tour's Code chapter gains The environment; the Guide a card for it; Code's help its key.
+
+    node rig/t_616_env.js <url> <out>       # 22 checks, with an invented app and two stand-in sites
+    node rig/t_616_scroll.js <url> <out>    # 9 checks, in a browser that draws real scroll bars (Playwright hides them by default)
+
+The working audit of 6.16 (4 November 2026). Her words: "I really want for every new feature and everything else inside of Ingenium
+works and works well, that is really key to me. I need for the chat pages and all of their new features and sections work well in the
+way that they are supposed to. I want the same for the Folders page and the Career Studio. I really want for Ingenium to not just be a
+pretty shell or a pretty purple app". Every pass-or-fail test of those parts was run on the 6.16 release page, with stand-in models,
+sites and services and invented people:
+- Chat: t_open_chat 10/0, t_694_plus_switches 54/0, t_694_sources 14/0, t_695_memory 30/0, t_695_openin 16/0, t_696_cards 11/0,
+  t_claude 27/0, t_6111_popups 17/0, t_694_cloud_limits 23/0, t_6811_connections 11/0, t_690_agent 44/0, t_614_connectors 24/0.
+- Code: t_611_code 37/0, t_613_github 43/0, t_614_code_more 9/0, t_615_code_look 10/0, t_616_env 22/0, t_63_code_editor_app 9/0.
+- Folders: t_610_folders 21/0. The sign-in: t_699_recovery 24/0, t_700_lock 58/0.
+- The Career Studio: t_6812_career 25/0, t_683_career 48/0, t_685_career 25/0, t_696_profile_file 13/0, t_697_people 14/0,
+  t_697_back_link 12/0, t_698_job_link 28/0, t_702_career_dates 15/0, _export 15/0, _interview 17/0, _lector 13/0, _linkedin 17/0,
+  _minutes 11/0, _reading 18/0, _refs 12/0, _snapshot 11/0, t_6102_templates 12/0, t_6102_scroll 13/0, t_6102_ui 17/0,
+  t_6103_more 12/0, t_6104_fixes 9/0.
+- What was found: four tests (t_683_career, t_685_career, t_702_career_lector, t_6102_scroll) failed one check each while four
+  browsers ran at once and passed alone, on 6.16 as on 6.14: their checks read the page before a colour's change or a step had
+  finished under that load. Two tests had not followed the app: t_702_career_minutes read Today before its three steps were shown (Today
+  has shown one step at a time since 6.9.7; the test now presses Show three at once, as she would), and t_claude stopped at a picture
+  of a card folded in its room (the picture is now optional; every check of it passes). No fault of the app was found.
+- Her "the chat inside of the panel keeps on glitching back and forth" (6.11.2's guards): rig/t_617_glitch.js sets up a Code session
+  as in her pictures and the Chat page with a long conversation, and watches every size, place and layout class at 19 window widths
+  and two heights while nothing happens, and the scroll while a reply is written: nothing changes back and forth, in Chromium. What it
+  cannot see: the Mac app shows the page in Safari's engine (WebKit), which this machine does not have; her description of when it
+  happens is still needed to find it there.
+
+    node rig/t_617_glitch.js <url> <out>    # 6 checks
+
+Ingenium 6.15 (4 November 2026): the guided tour, its demonstrations and the Guide, up to date in every edition. Her words: "Please
+make sure that the guided tour and its demonstrations are also updated as well as the Guide page to reflect the latest pages and
+sections as well as updates recently made to Ingenium, they should all be properly updated to reflect the latest version of Ingenium,
+the same for all of the different editions of Ingeniums and its demos."
+
+- Measured on 6.14: the tour had 56 cards in 13 chapters and none for Code, Folders or the Career Studio; Chat's chapter showed neither
+  effort nor connectors; Models showed neither the newer models nor the engines; Making things had one card for Blend; Settings showed
+  neither connectors nor the sign-in. Help had no page for Folders or the Career Studio, and Code's help toured the Chat chapter. The
+  Guide had no card for Folders, the Career Studio or the models, and no list of what is new; its tour card guessed "About ten minutes",
+  and the tour's last card named the rooms of an older tour.
+- The tour (modules/r222.js): 16 chapters and 73 cards in the master and full editions. Chat gains Effort and Connectors, and its model
+  and + key cards say what changed (the connected services' models in the menu; a document that opens beside the chat). A Code chapter
+  of six cards: building an app, the plan, the Session column, Ultracode, GitHub, and pointing with @ and commands with /. The plan card
+  is a demonstration: in a Code session of the tour's own, an example plan is ticked off in the column beside it, one task at a time;
+  when the tour ends, that session is removed and hers is put back, with her column as she left it. A Folders chapter (two cards), a
+  Career Studio chapter (three cards, where the edition carries it), Newer models in Models (and Two engines, only where the computer's
+  app carries the newer engine), Ways to blend in Making things, and Connectors and Your data, sealed in Settings. The expert's shorter
+  tour keeps effort, Ultracode, @ and /, Ways to blend, connectors and the sign-in. A ring stays on a part that draws itself again (the
+  Plan and Session column). The chapters of pages made as the page starts (Folders) join once the page is there: the page can say it is
+  ready a moment before its last parts are made, which first left Folders out.
+- Help: Folders and the Career Studio have help of their own; Code's Tour this page opens the Code chapter.
+- The Guide: What is new (each version from 6.9.1 to 6.14 in one line, newest first), Folders, the Career Studio, and Models (newer ones,
+  and the two engines). The tour card no longer guesses a time; the tour's last card names the chapters this copy's tour has; the
+  Models and Settings chapters' lines say what they now hold.
+- Every edition: the Career Studio's chapter, help, Guide card and lines are left out where the page is not carried (the gift and demo
+  editions), as Lector's are; no new text names Lector or the owner's other apps. Each text was checked against the notes of the version
+  that made the feature (Blend has eight ways and Ingenium chooses; Ultracode is sent back up to three times, saying what is left).
+- The gift and demo editions could not be built since 6.10.2, found while testing this: two notes in modules/r189.js quoted her words
+  about the line of rights, tools/strip_comments.js keeps every comment that names a copyright, and one of them named Lector, so the
+  check that no Lector is left stopped those editions' build. The notes now point to this README, where her words are.
+  rig/t_62_editions.js expected what the page held before 6.8.10: it now counts the colophon's credit (drawn under the pages, and in
+  its code), and the licence's plain words and the owner's keys among the owner's lines, as every edition carries them by design.
+- Code (her words, 4 November 2026: "please hide the scroll bar from the Plan and session panel on the Coding chat page. I want the
+  scrollability kept but I want the scroll bar hidden to match the rest of the app"; "The 'Find a repository' text box area inside of
+  the panel is a little too small ... I also want the Repository option list to be a little bit more 3D animated to match the rest of
+  the app"): the Plan and session column scrolls by wheel, touch and keys with no bar to see (modules/r215.js). In the GitHub
+  repository picker (modules/r219.js), Find a repository is as wide as the list and as tall as the other fields; each repository is a
+  raised key as the app's keys are, lifting under the pointer, pressing in when pressed, the chosen one held up with an amethyst rim;
+  the rows rise in one after another when they arrive (not again at each letter typed), all still when motion is set to minimal.
+
+    node rig/t_615_tour.js <url> <out> [master|full|gift|demo]   # 20 checks, with an invented app and session
+    node rig/t_615_code_look.js <url> <out>                       # 10 checks, with a stand-in GitHub
+
+Ingenium 6.14 (4 November 2026): connectors, in Chat and in Code. Her words (3 November 2026): "I want connectors added"; and (4
+November) "I want full parity with Claude's Code chat ... and so much more".
+
+- A connector is a server that speaks MCP (the Model Context Protocol) over HTTP, as Claude's connectors are (modules/r220.js). She adds
+  one by its address, with a token when the server asks for one (kept on this device, sent only to that server; https is required for
+  a server on the internet). Ingenium asks the server what it is and lists its tools, every page of them, each marked as one that only
+  reads or one that changes something.
+- In every conversation where a connector is on (all of them unless she turns it off there: the + menu, Connectors, and the Code
+  session's column each have a switch), the model is offered its tools through the working loop, on a connected model or one on this
+  device; a conversation with no files now uses the loop for them, with instructions of their own and no file tools (modules/r190.js).
+  A tool that only reads runs when asked; one that changes something asks her first (Allow once, Always allow it, Not now), showing
+  what it would send. Each use is a step under the reply.
+- The transport is MCP's Streamable HTTP (JSON-RPC 2.0 over POST, answered as JSON or as server-sent events), with the protocol version
+  agreed at the start and the session a server keeps (Mcp-Session-Id), started again once when the server has forgotten it. netFetch
+  now gives its callers a response's headers (build_page.py, 6.14), and the Mac and Windows apps' relay passes those two headers back
+  (desktop/app_mcp_614.py).
+- Not yet, and said so in the Guide: a server that only takes its provider's own sign-in page (OAuth) needs a token instead; a server
+  run as a program on the computer (stdio) is not started by Ingenium; in a plain browser, a server that refuses pages from elsewhere
+  cannot be reached.
+
+    node rig/t_614_connectors.js <url> <out>   # 24 checks, with two stand-in MCP servers and a stand-in Claude that uses a tool
+
+- Code, closer still to Claude's sessions (modules/r221.js): @ in the message box lists the app's files as she types (arrows, Enter or
+  Tab, Escape) and puts @path in the message; the model is told, for that message, to read the files she pointed at first (an e-mail
+  address or a name that is no file is not taken as pointing). The list of an app's sessions says each one's state: working, waits for
+  you (a change to review), and its pull request. The steps that pushed a commit or opened a pull request carry their links to GitHub.
+
+    node rig/t_614_code_more.js <url> <out>     # 9 checks
+
+Ingenium 6.13 (4 November 2026): Code on a GitHub repository. Her words: "I still want full parity with Claude's Code chat, right now
+its close but not quite there ... I want to be able to connect my Github repositories in the Environment of the Ingenium's Coding chat
+and so much more"; and (3 November) "I want to be able to connect my Github's repositories to the chats and track the changes made during
+the sessions".
+
+- The Session column's Environment (and Code's first choice, From GitHub) connects one of her repositories (modules/r219.js). She signs
+  in once with a token made on GitHub, kept on this device as Fabrica keeps it and sent only to GitHub; her repositories are listed
+  (those she cannot push to say so), then the branches of the one chosen.
+- The branch is read as it is now, in a few requests (its ref, its commit, its tree, then its text files, eight at a time), not its
+  whole history as Fabrica's sync reads it. Left out, each named with its reason: binary files, files over 1 MB, folders of installed
+  packages, files that may hold secrets (.env, keys); what is left out is never fetched. At most 2,000 files or 60 MB a session.
+- Ingenium knows, file by file, what differs from the branch it started from (by each file's git fingerprint, as GitHub counts it), and
+  what waits to be pushed, including the model's edits in the middle of its work. Review and push shows each file with its lines added
+  and removed and its unified difference; the push is one commit, to the session's own branch (ingenium/..., or a name she gives
+  before the first push), never to the branch it started from, and never forced. Where she cannot push, Ingenium offers her own copy
+  (a fork), brings it up to date when it lacks the commit, and pushes there.
+- Create PR opens a pull request from that branch into the branch it started from; the Environment and the session's top row (Push, n
+  / Create PR / PR #n) then follow it: open, merged or closed, and its checks (passed, failed, running). Update from GitHub (before the
+  first push) brings newer work into the files she has not changed and names those she has. Disconnect keeps the files and sends
+  nothing to GitHub.
+- The model is told where it works, and has four tools (modules/r190.js now lends its loop tools from other parts of Ingenium):
+  git_status and git_diff (which only read), commit_and_push (to the session's branch) and open_pull_request (which always waits for her
+  yes). Commands typed after a slash: /status, /diff, /push, /pr, /review (the model reviews the changes without editing), /update.
+- The Guide has a card for it; the Code page's help names it.
+
+    node rig/t_613_github.js <url> <out>     # 42 checks, with a stand-in GitHub whose files carry their real git fingerprints
+
+Ingenium 6.12 (4 November 2026): Blend, deepened. Her words: "Please deepen and expand the 'Blend' page so that it really enhances
+the app and provide great and powerful blend of models with thorough and precise reasoning and outstanding performance ... I want for
+Ingenium to work as an ecosystem"; and (3 November) "I want to be able to select low to Max effort and Ultracode inside of the chats and
+everywhere a model can be selected to run a task or do work inside of Ingenium."
+
+- Before 6.12, Blend used only the models on this device, one after another, with five ways and replies of at most 1,536 tokens (3,584
+  with thinking); the final answer came with no account of how it was reached.
+- Her connected models (every connection she keeps: Claude, OpenAI, Gemini, Kimi, OpenRouter, Ollama) join a blend beside the models on
+  this device, each with a choice of its service's models and a weight. They answer at the same time; the models on this device answer
+  one after another, the one already loaded first and the writer last, so fewer loads. A request from Blend names its own connection,
+  reply room, thinking and effort on the request itself (`cloudChat`, build_page.py 6.12), so the chat's model is never switched, its key
+  never used by a blend, and the limits Ingenium learned for the chat's model are not applied to another (modules/r206.js, r195.js).
+  Her own details (Settings, Your Ingenium) reach a connected model only when she allows it, as in the chat.
+- Effort as in the chat: Auto (Low to Extra, chosen from the question, never Max), Low, Medium, High, Extra, Max, and Ultra, Blend's
+  Ultracode. Effort sets each model's thinking and room, and how many times the final answer is checked: Extra once, Max up to twice;
+  Ultra writes a plan first (the checklist a complete answer must meet, shown and ticked off), has every answer written against it, then
+  checks and corrects until the check passes (up to three times). Claude is sent its effort ("max" at Max and Ultra); OpenAI, Gemini and
+  OpenRouter their reasoning effort where they take one. Each level is explained on hover, in one line beside the key, and in the Guide.
+- Three new ways: Debate and settle (each model reads the others' answers and revises its own, saying what it changed and why), Check
+  every claim (the writer answers, the others check it claim by claim, the writer accepts or rejects each finding and corrects), Divide
+  the work (the writer divides the task, each part goes to the model named for it, the writer joins them). And Ingenium chooses: Check
+  every claim for code, Debate and settle for a question that weighs options, Divide the work for a long task in parts (three models or
+  more), Compare and combine otherwise; it says what it chose and why, before the run and under the answer.
+- Who writes the final answer can be chosen (Ingenium chooses: the greatest weight; then a connected model of Claude, OpenAI, Gemini, Kimi
+  or OpenRouter before one on this device; then the largest). Under the answer: How it was settled (agreed, differed and what was kept,
+  left out, findings accepted or rejected, in the writing model's own words and marked as not checked against sources); Ingenium's own
+  count of agreement when every answer is short (a name, a number); every check and correction; the time each step took.
+- The answer goes to the chat (a new conversation; the Chat page is told which one, as it opened its last one before, an old fault of
+  Open in the chat, now mended), into a folder (a conversation with the folder's way of working), Notes, Tabula, Word or the clipboard.
+  Under any reply in the chat, Check with Blend sends it to be checked claim by claim by the models she chooses; the corrected answer can
+  go back to that conversation. A blend kept as a house keeps its connected models, effort and writer, and answers in the chat whatever
+  the chat's source.
+
+    node rig/t_612_blend.js <url> <out>      # 44 checks, with stand-ins for Anthropic, OpenRouter, Ollama and the engine on the device
+
+Ingenium 6.11.2 (4 November 2026): newer models, found online when she asks; two guards for the chat. Her words: "I want a path built
+into Ingenium's models page that goes online when I click on the button to check and download and install newer models for Ingenium
+instead of having to continuously do it myself or having you do it on this chat"; and "the chat inside of the panel keeps on glitching
+back and forth".
+
+- Models, Ingenium's models: "Check for newer models" (modules/r217.js) asks Hugging Face, when she presses it, for the newest GGUF
+  repositories of twelve publishers (ggml-org, unsloth, bartowski, lmstudio-community, Qwen, LiquidAI, mistralai, google, ibm-granite,
+  nvidia, openbmb, microsoft). For each it reads Hugging Face's own records: the model's kind and parameters, and each file's size and
+  SHA-256. It offers only a kind this device's engine loads (the 153 kinds of llama.cpp b11321, read from its source; on a computer whose
+  copy carries the newer engine, its 14 more) and a file that fits this device's memory, choosing Q4_K_M first; it says why it offers
+  nothing else. Install uses the same checked download as Ingenium's own models; a found model gets a lineup entry of its own (kept
+  across restarts), can be made a house's model, and says it is not part of the reviewed lineup. What it cannot know before she tries
+  a model is how well it answers. The weekly look is a switch, off until she turns it on: Ingenium reaches the internet only when asked.
+- Chat: one rule keeps her place while a reply is written (80 points from the end, for live and full redraws alike; a full redraw used
+  240, so between the two the view could be pulled down and left, back and forth); and a chat height that swings between two values
+  within a moment settles on the smaller (modules/r102.js). Not reproduced here: her description of the glitch is needed to confirm.
+
+    node rig/t_6112_found.js <url> <out>      # 10 checks, with a stand-in Hugging Face and computer app
+
+Ingenium 6.11.1 (4 November 2026): Ingenium's own pop-ups everywhere, and documents in a chat that open. Her words: "Ingenium's in app
+popups look weird in this random basic dark gray format and completely detracts from the rest of the app, please redesign these popups
+all over the app that are the same dark grey and match them to Ingenium's colour palette and animated popped out 3D look and animation";
+and "The documents uploaded inside of the chats of Ingenium are not clickable or offer a preview when you hover over it".
+
+- The grey box was the browser's own (alert, confirm, prompt). In the page, every one is now asked in Ingenium's own dialog (the raised
+  amethyst card, with its spring): the Career Studio's removals and names, Fontes's collections, the Claude history, an earlier desk's
+  restore, rename and delete in Chat and Code, and every notice (modules/r216.js; r115, r131, r188). A question asked from inside another
+  dialog (Fontes, the earlier desks) opens over it and leaves it as it was. Training further from the Claude history is now a choice of
+  three (closing it trains nothing); before, Cancel there trained a new model.
+- Inside the five apps Ingenium carries (Tabula, Abacus, Imago, Scriba, Fontes; about 120 questions in their own code), a first layer
+  answers in the same dialog without changing their code: a question stops the app where it asks, and once she answers, puts back the
+  selection she had and repeats her press, so the app receives her answer there (a comment lands on the words she selected; a table that
+  asks Rows, then Columns, is made once). Cancel repeats nothing. By night the dialog takes Ingenium's night colours.
+- A document attached to a message (Word, PDF, text, code) is a key now, as a page was: it opens beside the chat, code as code in its
+  language, and on hover shows its name, size, length and first lines.
+
+    node rig/t_6111_popups.js <url> <out>     # 17 checks; it fails if the browser's own box ever opens
+
+Ingenium 6.11 (4 November 2026): the Code session as in Claude's, and effort that means what it says. Her words (3 November 2026):
+"I want Ingenium's Coding chat to have full parity with Claude's Coding chat. I want the same layout and behaviour during the sessions.
+I want to see the plan laid out with the completed Tasks checked off the scrollable list"; "I want to be able to select low to Max
+effort and Ultracode inside of the chats ... briefly explained accurately in a preview popup when I hover over it"; "I want Ultracode
+to be at the highest effort, Code plans first, writes the app, runs its checks, reads the errors and fixes them, repeating until the
+checks pass, showing each step"; "I want the 'Auto' function to be added and for the effort level and Token level to be better
+regulated"; and (4 November) "I want the Environment, Context, Outputs, Changes and Background tasks sections added".
+
+- Effort, beside the model's name under the message box (modules/r215.js): Auto, Low, Medium, High, Extra and Max, Ultracode and
+  Thinking, each explained in a card on hover from the same numbers the app uses. Effort now means the same on every model: how much
+  it thinks, how long it may write, how many steps it may take. Claude is sent Anthropic's own effort (low to max; before, Thinking off
+  held it at Medium); OpenAI's and Gemini's reasoning models a reasoning effort, OpenRouter its reasoning object (a service that
+  refuses it is asked again without it); Ollama thinks from Medium up; a model on this device thinks not at all at Low and up to four
+  times its usual budget at Max. Effort no longer changes a local model's sampling: that stays at its maker's settings.
+- Auto reads each message (a short question Low, an everyday one Medium, work or files or code High, a careful or long brief Extra;
+  never Max) and says under the reply what it chose and why. The longest reply follows the effort unless she sets it by hand.
+- Ultracode (Code, and a chat with files): Max effort, plan, build, check, fix. Two new tools in the working loop (modules/r190.js):
+  update_plan (the plan as a checklist) and run_check (a check run inside the app as it runs, passing only when it returns true).
+  When it stops with tasks open, errors at its last run, a change not run, or a failed check, Ingenium sends it back, up to three
+  times, saying what is left.
+- The plan in each reply (folded as Claude folds it) and in a column beside the conversation; the Session column: Environment, Context,
+  Outputs, Changes (lines added and removed this session) and Background tasks (the reply being written, models being installed, the
+  queue), each with its time and a stop key. The column floats over the preview when the window has no room for it.
+- A clock above the message box while it works, with its latest step and Stop. Enter while a reply is written queues the message (it
+  no longer stops the reply); it is sent when the reply ends.
+- The Code page's left column: its two keys as long as their words; rename, delete and a new app's name asked in Ingenium's own dialog.
+- The newer engine's self-test now records the binary that answered (its build and commit); a Mac build keeps the newer engine only
+  when that proves it (desktop/app_engine3_6106.py). 6.10.5's report named the proven engine's version for both.
+- A Guide card: effort, Auto and Ultracode in depth, with their honest limits.
+
+    node rig/t_611_code.js <url> <out>               # 37 checks
+    python3 -I rig/t_611_engine_proof.py             # 8 checks
+    node rig/t_690_agent.js <url> <mock> <out>       # 44 checks (the working loop with every service's form; 7 tools now)
+
+Ingenium 6.10.5 (4 November 2026): a newer engine beside the proven one, on a Mac. Her words: "I don't want to lose my reliable llama
+cpp engine, I want the option of a newer engine where it tested and proven to work and work well but I still want the llama engine
+kept optional or in some cases as a backup or default, depending on what works best. I want you to help me weight it out and decide".
+
+- The decision, as put to her: the proven engine (llama.cpp b11321) stays the default; a newer llama.cpp (b12000, 29 October 2026,
+  the first release that loads LFM3, DeepSeek V4.1 and Mistral Large 4) goes beside it, never instead of it.
+- The Mac builds compile it as they compile the proven one (its commit checked), keep it in the app only when the app's own self-test
+  answers with it, and set its speed beside the proven engine's in the build's summary. A failed compile or self-test leaves the app
+  with the proven engine alone. Each engine carries the list of kinds of model it can load (ARCHS.txt, from its src/llama-arch.cpp).
+- The computer app (desktop/app_engine2_6105.py) reads each model's kind from its file and chooses: automatic (the default) runs every
+  model on the proven engine except a kind only the newer engine can load; "the newer engine where it can"; or "the proven engine
+  only". If the newer engine cannot load a model, the proven engine loads it at once and keeps it for the session.
+- The Models page's Engine room (modules/r214.js) shows both engines, what only the newer one can load, which engine runs the model
+  now, and the three choices.
+- Windows carries the same choice; its builds will carry the newer engine once its installer is made to take it out again when its
+  self-test fails (next). The phone and tablet apps keep the proven engine.
+
+    python3 -I rig/t_6105_engine.py             # 16 checks: the choice per kind, the fall back, the self-test, the patch
+    node rig/t_6105_engine_page.js <url> <out>  # 8 checks: the Engine room's card, with a stand-in computer app
+
+Ingenium 6.10.4 (3 November 2026): the Career Studio's scroll bars hidden; the Build page's code scrolls again. Her words: "I want
+you to hide the scroll bar inside of the Learn panel of the Career studio page, it detracts from the rest of the app. I want
+everything to remain consistent. I only want the scroll bar hidden from view, I want to keep the scrollability of the page intact. I
+also want the scrolling ability of the Build page's 'Your code' panel restored, I don't want it to be stiff and unscrollable."
+
+- The Career Studio's panels (Learn and every other) scroll with no bar showing, as Lector's and Fabrica's do (modules/r213.js);
+  scrolling by wheel, trackpad and touch is as before.
+- Build: the code panel and the preview had no height of their own, so the code grew to its full length (300 lines, wrapped, stood
+  about 17,000 pixels tall) and only the page moved. Now both stand as tall as the window leaves them below the page's head (never
+  less than 480 pixels), the code scrolls inside its panel, and at its end the page carries on to its foot and the colophon. On a
+  phone the code panel stands at most about three quarters of the screen and scrolls inside.
+- A correction: the notes of 6.10.2 gave 26 templates; the page holds 25, in 8 fields.
+
+    node rig/t_6104_fixes.js <url> <out>        # 9 checks; on 6.10.3 the same test fails five of them
+
+Ingenium 6.10.3 (3 November 2026): more models for every device, and quicker replies. Her words: "I want better, stronger and
+faster models and more options for my fire tablet app and for the iphone and iPad apps. I want that for all of my devices, the Mac
+mini, the MacBook Pro, and the windows laptops as well."
+
+- Further choices under each house (modules/r212.js), read from Hugging Face on the day: every file's name, size and SHA-256 as its
+  repository lists them, and each model's kind read from its own file (all kinds the engine of this release, llama.cpp b11321, lists).
+  MiniCPM5 1B (OpenBMB, Apache 2.0) for phones and tablets from 3 GB; Ministral 3 3B Instruct (Mistral AI, Apache 2.0) for every
+  device from 6 GB (phones) or 8 GB (computers); Nemotron 3.5 Bolt E4B (NVIDIA, October 2026, post-trained on Gemma 4 E4B; OpenMDW
+  1.1) for computers and iPads from 12 GB; Ministral 3 14B Reasoning (Mistral AI, Apache 2.0) for computers with 16 GB. They sit on a
+  list of their own (a device's "more"): each house's list is also the order in which it picks, so a model added there would quietly
+  replace today's pick on some memory sizes. Today's picks stay as they were, for every device and band (t_698_lineup.js): each
+  maker measures its model against different rivals, so none can be ranked above them on one scale. The Models page lists the
+  further choices under each house (Velox now has a list too), with what each needs; one press installs it, one press makes it the
+  house's model, and Back returns to Ingenium's own choice.
+- Quicker replies on a computer with a graphics chip: speed-up files for MiniCPM5 2B (OpenBMB's DSpark), LFM2.5 8B-A1B and 24B-A2B
+  (Liquid AI's DSpark), Qwen3.8 27B and its Best copy (DFlash, from llama.cpp's own publishers) and Nemotron 3.5 Bolt E4B (DFlash).
+  The engine reads each file's kind itself. As before (R73), a speed-up file is used only on a graphics chip; how much quicker it
+  makes a reply on her own computers was not measured here.
+- Each new model runs on its card's settings: MiniCPM5 1B 0.9 and 0.95 when it thinks, 0.7 when it answers at once; Ministral 3 3B
+  temperature 0.1; Ministral 3 14B Reasoning 1 and 0.95; Nemotron 3.5 Bolt E4B 1.0 and 0.95.
+
+    node rig/t_6103_more.js <url> <out>         # 12 checks: the further choices, choosing one, the speed-up files, the settings
+
+Ingenium 6.10.2 (3 November 2026): every page ends with the colophon; templates by field and role; the portfolio. Her words: "I want
+the app to be more scrollable on the Lector, Career Studio, and Fabrica pages, they feel stiff. I want to be able to scroll and see the
+Ingenium seal and copyrights declaration at the footer ... It's the same for both chat pages, I like how they look when I open their
+pages and I don't want anything to change"; "I want for Ingenium and its pages to have resume templates and cover letter templates
+for different industry and different roles within them ... to help any applicant"; "I want the Career Studio to genuinely help me build
+and refine my portfolio for any job application ... phd application or fellowship application, grant, scholarship application".
+
+- The colophon (modules/r189.js) now ends Chat, Code, Lector, the Career Studio and Fabrica too. Each opens exactly as before, at the
+  top, and fits the window (her earlier request, that the Career Studio not be endlessly scrolled, still holds: only its panels scroll
+  through its work); a short scroll past the room shows the seal, Local model studio and the copyright. A panel scrolled to its end
+  carries the scroll on to the page, as the Build page scrolls, instead of stopping there.
+- Templates (modules/r209.js; Learn, CV and letter templates): 25 roles in 8 fields (written as 26 when released; corrected in 6.10.4) (universities and research; education and learning
+  design; technology, data and AI; digital humanities, libraries, archives and museums; public service, policy and charities; business,
+  sales and operations; writing, publishing and communications; fellowships, grants and scholarships). Each says what its readers look
+  for, the CV's sections in the order that serves it, the cover letter's moves, the length and form, what to avoid, and an example line
+  with square brackets where her own facts go. They describe common practice in the UK and the US; a posting's own instructions come
+  first. Used for an application (from the template, or from What you send, where one is suggested from the posting's words), it shapes
+  the CV, the letter and the portfolio the studio writes; the model is told it gives the shape only, and that every fact comes from
+  her profile.
+- The portfolio, a document of its own in What you send (jobs, doctoral and other applications): two to four pieces of her own work as
+  short case studies (what it is, her part, the problem, what she did, what came of it, what it shows for this application, where to see
+  it), chosen and ordered for the application, drawn from her apps as Lector read them, her documents and her entries; no figure, user
+  number or outcome her profile does not give. A lesson on portfolios joins Learn.
+
+- No ceiling on memory (modules/r210.js; the computer apps' side in desktop/app_parts_6102.py). Her words: "I want Ingenium to be able
+  to run stronger models and be strong enough to run on larger computers with far more RAM than 64GB. I don't want Ingenium to be
+  capped at 64 GB RAM". Until now each house's list stopped at what 48 to 64 GB holds. Seventeen larger models join it, from 96 GB of
+  memory to 3 TB: Qwen3-Next 80B-A3B Thinking, Qwen3-Coder-Next, Nemotron 3.5 Bolt 74B-A9B, Qwen3.5 122B-A10B (and a compact copy),
+  gpt-oss-120b, Qwen3.8 Flash Next, GLM-5.3 Flash (and a compact copy), DeepSeek V4 Flash, Qwen3.5 397B-A17B, MiniMax M3.1 Flash,
+  GLM-5.3, Qwen3.8 2.4T-A95B, DeepSeek V4 Pro and Kimi K3 (two copies). Every file's name, size and SHA-256 was read from Hugging
+  Face (rounds 8 and 8b of the lineup workflow) and checked again file by file, 141 files in all; each model's kind was read from its
+  own file and is one the engine of this release (llama.cpp b11321) lists. The memory rule is unchanged, so each house takes the
+  largest model that fits: Magister the largest general model, Scriba the quickest, Faber the coders; a computer with no graphics chip
+  gets only the mixture-of-experts models with at most 18B parameters at work on each word. Models over 50 GB come in parts (Hugging
+  Face keeps no larger file): the computer apps now install, list, move and delete a model in parts, each part fetched, carried on where
+  it stopped and checked by its fingerprint, kept under the names the engine reads; a file chosen on the computer is added by its first
+  part. Each runs on its card's settings where the card gives them. Not run end to end: no machine within reach has the memory.
+- Home's Scriba and Fontes stones wear their marks, as the side rail's do, 4 pixels from the name (modules/r211.js).
+- Your models on a phone: the card is no longer one row whose three keys squeezed the details into a strip; the name and details take
+  the card's width, and the keys sit beneath them in one row.
+- Build: long lines wrap inside the code panel; the panel's head says so ("Long lines wrap") and one press keeps each line on one row
+  instead; the choice is kept.
+- The Fire and Android app without its models (57 MB): when it has neither its own models nor a built-in one, the Models page offers
+  the same two, in one press, fetched inside the app and checked by fingerprint. The full app (about 1.5 GB) needs room on the
+  tablet's own storage for the download and for the copy Android makes while installing it.
+- The Mac build: the Touch ID helper of 6.10.1 is now built for macOS 13.3 and for the chip of the app itself (it had taken the build
+  Mac's newer macOS, and the check that every part runs on 13.3 rightly stopped the release).
+
+    node rig/t_6102_scroll.js <url> <out>       # 13 checks
+    node rig/t_6102_templates.js <url> <out>    # 12 checks, with a stand-in model
+    node rig/t_6102_large.js <url> <out>        # every band from 96 GB to 3 TB; the install the page sends, checked by the app's own check
+    node rig/t_6102_ui.js <url> <out>           # Home's marks, the cards on an iPhone, Build's long lines, the small Fire app
+    python3 -I rig/t_6102_parts.py              # models in parts: install, resume, fingerprints, move, delete, choose; the patch
+
+Ingenium 6.10.1 (3 November 2026): the computer's own sign-in as a way back in. Her answer: "Yes, my computer's own sign in (Touch
+ID or Windows Hello) also open Ingenium."
+
+- Settings, Your data, Your ways back in: This computer's own sign-in, turned on with the password first, then the computer itself
+  (Touch ID or the Mac's own password on a Mac; Windows Hello on Windows). It says plainly that anyone who can sign in to the
+  computer as her could open Ingenium this way. Turned off, the computer's key is removed too.
+- At the sign-in, the computer is asked at once (once a session), and Ingenium opens without the password; Open with Touch ID (or
+  Windows Hello) stays under the form if it is cancelled. Opened so, the password can be changed without the old one. Can't sign
+  in? lists it. A computer that does not hold the key says so.
+- How: the data key is kept wrapped with a key of 256 bits that the computer holds in its own protection, never in the lock record.
+  On a Mac, tools/IngeniumKey.swift (built into Contents/MacOS/IngeniumKey by tools/finish_mac_app.sh wherever Swift is present;
+  without it the app works as before and says Touch ID cannot be asked) asks LocalAuthentication, then reads the login keychain. On
+  Windows, desktop/app_device_6101.py asks Windows Hello through Windows PowerShell, then opens the key sealed with DPAPI in the
+  app's own folder. The phone and tablet apps do not offer it yet.
+- Not checked here: Touch ID's sheet and Windows Hello's window cannot be shown where this was built (no Mac, no Windows). The page's
+  side, and the app's side against a stand-in helper, are tested; the Mac build says in its summary whether the helper was built.
+  On a Mac, the keychain may ask once, after an update, whether the new helper may use the key.
+
+    node rig/t_6101_device.js <url> <out>       # 14 checks, with a stand-in bridge
+    python3 -I rig/t_6101_device.py             # 15 checks: the app's side, with a stand-in helper
+
+Ingenium 6.10.0 (3 November 2026): Folders, a folder for each of her apps; and her work brought in from Claude and Ollama. Her
+words: "I want a safe way to move my data from Claude and Ollama to Ingenium so that I don't lose all of my work ... I want folders
+built in that classifies every app that I have been working on and will build in the future. I want the folders to document how I
+like to work ... so that ... the models don't have to start over from 0 everytime and need to load up everything from memory or
+reread all of the context again and drain tokens." Her answers: start from the apps in her profile; bring in all of it, mainly
+Claude's chats, Claude Code on her Mac (run with Ollama's models) and Claude Code on the web.
+
+- Folders (a page of its own, after Code; modules/r208.js). It starts from the apps her profile names (the Career Studio's entries of
+  projects, and the apps Lector has read): she unticks, adds, and makes them; a folder for a new app can be made at any time.
+- A folder is one of Ingenium's projects (kind "app"), so every conversation in it carries what it keeps: How I work on every app,
+  How I work on it (her own words), Where we left off (a summary), the decisions so far and what is open next. That is a few
+  thousand words at most, instead of every earlier conversation (a test checks that none of their text goes with a new one).
+- Where we left off is brought up to date on her press, with the model Lector uses: only the conversations not read yet are read,
+  each once (a conversation added later is read alone, with the summary so far). The model is told never to invent a version, a
+  date, a decision, a file or a feature. What it sees of how she likes to work is offered for her to keep or drop.
+- Conversations are sorted into the folders by the words that mark each (the app's name and its parts' names, which she can add);
+  one that names no app clearly waits under Not sorted yet; any can be moved by hand.
+- Bring in your work: Claude's .zip (its chats, and its projects as Ingenium projects); Claude Code's sessions on this computer, read
+  on her press through the app's own bridge (desktop/app_claude_610.py: only the .jsonl files under .claude/projects, or under
+  CLAUDE_CONFIG_DIR; nothing else is read; Claude Code's documentation says their format is its own and may change, so the reader
+  is lenient); Claude Code on the web (no export exists yet: a conversation is pasted, or brought down to her Mac with claude
+  --teleport); Ollama (a model's Modelfile, pasted, becomes a way of working; a conversation in Ollama's own app is pasted).
+- Models are not retrained by any of this. What makes a model know her way of working is what it is given to read; a folder gives it
+  that, short. The page ends with the colophon, as the pages that scroll do. The way back from a folder is a quiet path above its
+  name (Folders, then its name), not a raised bar.
+
+    node rig/t_610_folders.js <url> <out>            # 21 checks, with invented apps and a stand-in model and bridge
+    python3 -I rig/t_610_claude_sessions.py          # 15 checks: the app's side, on a stand-in home folder
+
+Ingenium 6.9.9 (3 November 2026): ways back in, the sign-in in the door's own place, and Claude's model names written as Anthropic
+writes them. Her words: "Ingenium's sign in page looks slightly awkward floating over the app's introduction door ... find a better fit";
+"I want a proper and strong and robust recovery system on Ingenium so that a user does not get locked out of their work ... I want a
+path that protects me and ensures that I can always find a way back into my account"; "I want you to remove the dashes from the Claude
+models name, they should be written normally."
+
+- At the welcome door, the sign-in takes the door card's place, as wide as it, on the door's own ground, nothing dimmed behind it;
+  Not now brings the door's card back. Elsewhere it is asked over the page, as before.
+- Ways back in, each opening the same data key on its own: the password; the ten words; a recovery key file (new: a random 256-bit
+  key she keeps on a stick or a drive; the lock keeps only the data key wrapped by it, and the file's id, so the newest file alone
+  opens it; an older file, one from another lock, or a file that is no key file is refused in plain words); and a hint she writes
+  (kept in plain words in the lock record, since it is shown at the sign-in; a hint that holds the password is refused). Turning the
+  sign-in on now ends with Save it (the key file) and the hint. The sign-in's Can't sign in? lists every way back in; a wrong password
+  shows the hint. Settings, Your data: Your ways back in, with Change the password, See or renew the words (new words replace the old
+  once two are typed back), Save a new key file, and the hint. A short check after the sign-in, a day after it is turned on, then a
+  week, a month, and every three months: are the words and the file where they were left?
+- There is no maker's key and no back door: a copy opens only with what its owner keeps. If every way back in is lost, what is
+  sealed cannot be opened by anyone; the ways are therefore several, kept in different places, and checked now and then.
+- Claude's model names: Claude Fable 5.1, Claude Opus 5.5, Claude 3.5 Sonnet, in the chat's model key and menu, the chat's note,
+  Settings, Lector, the Career Studio and the context and limit notes (window.ingModelLabel); the service is still asked for the model
+  by its own name. Other services' names stay as they write them.
+
+    node rig/t_699_recovery.js <url> <out>      # 24 checks, with an invented person
+    node rig/t_700_lock.js <url> <out>          # 58 checks (Can't sign in?, Your ways back in)
+
+Ingenium 6.9.8 (3 November 2026): a posting from its link, read against her profile at once; and the jobs she saved on LinkedIn.
+Her words: "I want to be able to paste a link of a job that I am interested in applying to in the Career studio and have the analysis
+be done and the match profile for me and the job be done from there ... Ingenium can go online to get the information. I want that
+feature added and I want it to really work", and "I want to be able to link my LinkedIn account to Ingenium so that I can have Ingenium
+fetch my saved jobs easier ... keep my data and information protected and safely stored on my device ... and always with my permission."
+
+- A link pasted (in Applications, or in Bring a posting) is fetched once and read against her profile at once when a model is ready;
+  pasting its text remains, and is read at once too. What is read first is what the site publishes for machines: on boards hosted by
+  Greenhouse and by Lever, their public posting APIs as their documentation gives them (Greenhouse's Job Board API, GET
+  boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}, its content entity-encoded HTML, read from github.com/grnhse/greenhouse-api-docs;
+  Lever's Postings API, GET api.lever.co/v0/postings/{site}/{id} or api.eu.lever.co, read from github.com/lever/postings-api); on other
+  sites, the schema.org JobPosting that job sites put in their pages for search engines (JSON-LD, or microdata); failing both, the
+  page's readable text with its lists kept as lists. The title, who offers it, the place, the hours, the pay and the closing date come
+  from that data where it is given; a closing date written in a sentence is found too. LinkedIn and Indeed links are tidied to the job's
+  own page; tracking is left out. A page behind a sign-in (LinkedIn), one that refuses, one built only by scripts, or one gone is said
+  so plainly, the paste box made ready, with Look for it elsewhere (a search for the same post on the employer's own site, on her press).
+  Not checked here: the schema.org and Google pages on JobPosting could not be opened from where this was built, so its property names
+  are read leniently and anything missing is passed over; the job sites themselves could not be reached from here either, so the
+  stand-ins in the test follow the documented shapes.
+- The reading vetted: each piece of evidence it names is looked for in her profile itself; not found in its words, a "shown" counts as
+  partly shown until she checks it, and the table says so. What to lead with: up to three entries of her profile that answer the
+  posting best, kept only when they are entries of her profile.
+- Saved on LinkedIn: LinkedIn's own copy of her data (the .zip she asks LinkedIn for) brings the jobs she saved and those she applied to
+  into Applications, to be taken one at a time: Bring it in fetches that posting, only then, and reads it; Not this one sets it aside;
+  brought in again later, only the new ones are added. Nothing signs in to LinkedIn and nothing is sent to it. Its columns are read
+  loosely by name (LinkedIn does not document them). A direct link to her LinkedIn account was not built: as far as is known here,
+  LinkedIn's sign-in for other apps gives only a name, an email and a picture, and reading her saved jobs while signed in as her would go
+  against LinkedIn's terms; LinkedIn's developer pages could not be opened from here to check this again.
+
+    node rig/t_698_job_link.js <url> <out>      # 28 checks, with stand-in sites and a stand-in model
+
+Ingenium 6.9.7 (3 November 2026): the Career Studio for an intense season of applications. Her words: "I will be juggling many job
+applications, phd applications prep and emailing potential supervisors, reference requests and hiring managers and recruiters. I need a
+system built-in Ingenium that can help me streamline all of that and manage it all"; her answers: one step at a time; tracking it all;
+Ingenium drafts, she reviews all and edits freely.
+
+- People (a room beside Applications): potential supervisors, referees, recruiters and hiring managers in one list, each with a status
+  (to write to, draft ready, sent, replied, follow up, done), a date to follow up (ten days for a supervisor or a referee, seven for a
+  recruiter or a hiring manager, changeable), notes, and the application it serves. Draft an email for me writes a first draft from her
+  profile and the notes alone, never inventing a name, a work, a date or a claim (what is missing is left in square brackets); she reads
+  it, changes it and copies it into her own email: Ingenium sends nothing. The referees kept with each application are listed there too.
+- Today, one step at a time: the single most urgent step across her applications and her people, the rest folded under What else is
+  waiting; Show three at once on request.
+- A profile file carries what she is looking for (looking, need, avoid, where, when), brought in where those are empty.
+- The Scriba and Fontes keys of the dock: the mark 4 pixels from the name, as on Carpe Diem's keys (it was 14).
+
+    node rig/t_697_people.js <url> <out>        # 14 checks, with invented people and a stand-in model
+    node rig/t_697_stone_gap.js <url> <out>     # 3 checks
+
+Ingenium 6.9.6 (3 November 2026): a profile in one file (her words: "I don't want to have to input my information for my profile
+from scratch on my master version", and "I want that to be replicable for a second user profile and so forth"; her choice: her profile
+reaches the app as a private file, never through GitHub). In the Career Studio, What the studio may use has Bring in a profile file and
+Save this profile as a file, and an empty list of entries offers the first. A profile file (.json, kind "ingenium-profile", v 1) holds a
+person's entries in the studio's sections, documents with their text, and CV; what it holds is said before anything changes; it fills
+an empty profile, or is added to this one, or becomes a new profile of its own; nothing is doubled, and the CV becomes Lector's when none
+is kept yet (`modules/r188.js`). `node rig/t_696_profile_file.js <url> <out> [a real profile file kept outside the repository]` (14
+checks with invented people).
+
+Ingenium 6.9.5 (3 November 2026):
+
+- A connected model for Lector and the Career Studio (her words: "I also want to be able to load and run a connected Cloud model
+  from Claude or GPT and etc, inside of the Career Studio and the Lector page and not just only have the local models as
+  options"). The connection set in Settings, Connections (Claude, GPT, Gemini, OpenRouter, Ollama and the others) is offered in
+  Lector's model box and in the Career Studio's "How the studio works", by name ("Use claude-fable-5-1 (Anthropic)"), and used
+  only when chosen, since what Lector reads then goes to that service; both pages say so, and each has the way back. The Career
+  Studio writes with the model Lector uses, so one choice serves both (`modules/r108.js`, `r188.js`; the lxAsk edit in
+  `build_page.py`). Lector's parts follow the connected model's window, up to 262,144 tokens, and never more than the key may
+  send in a minute once the service has said so (`r195.js`); a part refused as too long is never cut: it goes back to Lector as a
+  context error and is read again in smaller parts (`r206.js`). `node rig/t_695_lx_cloud.js <url> <out>` (12 checks).
+- The tour's example (her words again: "the current one kind of reads a little weird when it shows the "Thinking" box"): the
+  thinking opened with nearly the reply's own first sentence, so it read as a first draft of the reply; it now weighs what the
+  plan rests on and only then decides (`rig/t_692_keys.js`, 19 checks, with the raised keys of the Display panel).
+
+Ingenium 6.9.4 (3 November 2026). Four repairs, each found first by a test that failed on 6.9.3:
+
+- The switches in the chat's + menu (her words: "its really hard for the turn the "Research" and the "Web Search" toggles to enable
+  them, they are so hard to select no matter how hard I click"). Each switch was a `<label>` holding a checkbox inside the row's
+  button: a click on the switch reached the button twice, so the setting turned on and straight back off; only a click on the
+  words worked. The switch is now a picture of a switch, so a click anywhere on the row turns it over once, in Chat and in Code;
+  the row tells a screen reader it is a switch and whether it is on, and the keyboard's focus stays on it. The R206 edits in
+  `build_page.py`; `node rig/t_694_plus_switches.js <url> <out>` (54 checks; 18 of them failed on 6.9.3).
+- A connected model's limits (her words: "I tried to run Fable through the API key on Ingenium and the chat kept on crashing
+  because it was exceeding Token limits"). The history of a connected model was fitted to its window less the slider's reply
+  (about 1,000 tokens), but the request asked for the model's whole longest reply (up to 128,000), counted at 3 characters a
+  token; a refusal for size or for the key's tokens a minute ended the reply. Now the history leaves room for the reply really
+  asked for, at 2.5 characters a token (or the service's own count, once a refusal has said it); a refusal for size is answered by
+  leaving out the oldest part and sending again, saying so under the reply; the key's tokens a minute (429) and a busy service
+  are waited out on the reply's status line, twice at most; Stop ends a wait. `modules/r206.js`;
+  `node rig/t_694_cloud_limits.js <url> <out>` (23 checks against a stand-in for the Messages API; 14 failed on 6.9.3).
+- Sources only when they belong to the reply (her words: "The scholarly sources all nonsense and keep on showing up with every
+  reply, I want that removed, I only want real and accurate sources and only when they pertain to the reply do I want them cited
+  and provided"). Scholarly sources first is off until it is switched on; a scholarly record is kept only when half of the
+  question's words are in it and one at least in its title; the list under a reply shows only the sources the reply cites, under
+  its own numbers, and none when it cites none. `modules/r207.js` and the R207 edits;
+  `node rig/t_694_sources.js <url> <out>` (14 checks).
+- A notice is never a document: a reply that is only Ingenium's own notice in brackets ("(This reply was cut off before it began:
+  …)") is no longer made a Word and PDF document when the message asked for one (`r1Notice` in `modules/r101.js`), and one made
+  before is shown as the notice it is.
+
+The welcome door's sign-in offer, moved on 1 November to a small lock key in the card's top-left corner (rig/t_700_lock.js, 58
+checks), ships in this release. Run again on this build: t_cloud.js (12 connections through the app's relay), t_academic.js
+(24), t_695_memory.js (30).
+
 Ingenium 6.9.3 (1 November 2026; her words: "I have two 16 GB RAM HP laptops, I want to be able to use it as a server of sorts for my
 macbook pro and run its stronger models on the macbook pro or my fire tablet. The graphics of one of the HP laptop is not the
 greatest so I would really love to be able to still use its stronger RAM and storage but on my macbook pro instead.").

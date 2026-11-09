@@ -14,9 +14,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const nav = await p.evaluate(() => { const b = document.querySelector('.nav-btn[data-page="fabrica"]'); return b ? { text: b.textContent.trim(), prev: b.previousElementSibling && b.previousElementSibling.getAttribute('data-page') } : null; });
   ok(nav && nav.text === 'Fabrica' && nav.prev === 'build', 'a Fabrica key in the rail, after Build', JSON.stringify(nav));
   await p.evaluate(() => go('fabrica')); await p.waitForTimeout(900);
-  const frame = await p.evaluate(() => { const r = document.getElementById('fb'); const sec = document.getElementById('page-fabrica'); const rc = r.getBoundingClientRect(); return { active: sec.classList.contains('active'), h: rc.height, bottom: Math.round(rc.bottom), vh: innerHeight, panels: [...r.querySelectorAll('.f-pn')].map(x => x.offsetParent ? 1 : 0), scroll: document.documentElement.scrollHeight - innerHeight, hidTitle: getComputedStyle(sec.querySelector('.page-title')).display, foot: getComputedStyle(document.querySelector('.foot')).display }; });
+  const frame = await p.evaluate(() => { const r = document.getElementById('fb'); const sec = document.getElementById('page-fabrica'); const rc = r.getBoundingClientRect(); return { active: sec.classList.contains('active'), h: rc.height, bottom: Math.round(rc.bottom), vh: innerHeight, panels: [...r.querySelectorAll('.f-pn')].map(x => x.offsetParent ? 1 : 0), scroll: document.documentElement.scrollHeight - innerHeight, col: (() => { const c = document.getElementById('ingColophon'); return c && c.getAttribute('data-on') === '1' ? Math.round(c.getBoundingClientRect().top) : 99999; })(), hidTitle: getComputedStyle(sec.querySelector('.page-title')).display, foot: getComputedStyle(document.querySelector('.foot')).display }; });
   ok(frame.active && frame.panels.join() === '1,1,1', 'the frame shows its three panels side by side', JSON.stringify(frame));
-  ok(frame.bottom <= frame.vh + 2 && frame.scroll <= 2 && frame.hidTitle === 'none', 'one frame the height of the window; the page does not scroll', JSON.stringify(frame));
+  ok(frame.bottom <= frame.vh + 2 && frame.scroll < 420 && frame.col >= frame.vh - 2 && frame.hidTitle === 'none', 'one frame the height of the window; below it, only the colophon (6.10.2)', JSON.stringify(frame));
   const empty = await p.evaluate(() => ({ chip: document.getElementById('fbAppsChip').textContent, empty: !!document.querySelector('#fbRepos .f-empty'), work: document.querySelector('#fbWorkBody .f-empty b') && document.querySelector('#fbWorkBody .f-empty b').textContent }));
   ok(empty.chip === 'None yet' && empty.empty && /Choose an app/.test(empty.work), 'with nothing kept yet it says so plainly', JSON.stringify(empty));
   await p.screenshot({ path: OUT + '/fab-empty.png' });
@@ -48,7 +48,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   ok(card.open === 'true' && card.files.join(',') === 'app.js,readme.md (added)' && /^See the changes\|Undo it\|Mark a release(\|Compare\|Browse the files)?$/.test(card.keys.join('|')), 'a version opens to its files and its keys', JSON.stringify(card));
   // mark a release through the sheet
   await p.evaluate(() => { [...document.querySelectorAll('#fbWorkBody .f-cm .f-acts .f-btn')].find(x => x.textContent === 'Mark a release').click(); }); await p.waitForTimeout(300);
-  await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(1000);
+  await p.fill('#fb .f-sheet input', 'v1.0.2'); await p.click('#fb .f-sheet .f-btn.pri'); await p.waitForTimeout(300);
+  // 6.41: wait for the release to be drawn (a fixed second was too short when the machine was busy), then judge it as before
+  await p.waitForFunction(() => [...document.querySelectorAll('#fbWorkBody .f-tag')].some(x => x.textContent === 'v1.0.2') && !!document.querySelector('#fbRepos .f-repo .nm em'), null, { timeout: 10000 }).catch(() => {});
   const tag = await p.evaluate(() => ({ tags: [...document.querySelectorAll('#fbWorkBody .f-tag')].map(x => x.textContent), ver: document.querySelector('#fbRepos .f-repo .nm em') && document.querySelector('#fbRepos .f-repo .nm em').textContent }));
   ok(tag.tags.join() === 'v1.0.2' && tag.ver === 'v1.0.2', 'a release is marked and named on the tile', JSON.stringify(tag));
   // test this version (IngShip): the five checks, recorded beside the version
@@ -94,9 +96,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   await p.screenshot({ path: OUT + '/fab-night.png' });
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); });
   await p.setViewportSize({ width: 800, height: 1280 }); await p.waitForTimeout(500);
-  const fire = await p.evaluate(() => { const r = document.getElementById('fb'); return { one: r.classList.contains('f-one'), tabs: getComputedStyle(document.getElementById('fbTabs')).display, shown: [...r.querySelectorAll('.f-pn')].filter(x => x.offsetParent).map(x => x.id), scroll: document.documentElement.scrollHeight - innerHeight, bottom: Math.round(r.getBoundingClientRect().bottom), vh: innerHeight }; });
+  const fire = await p.evaluate(() => { const r = document.getElementById('fb'); return { one: r.classList.contains('f-one'), tabs: getComputedStyle(document.getElementById('fbTabs')).display, shown: [...r.querySelectorAll('.f-pn')].filter(x => x.offsetParent).map(x => x.id), scroll: document.documentElement.scrollHeight - innerHeight, col: (() => { const c = document.getElementById('ingColophon'); return c && c.getAttribute('data-on') === '1' ? Math.round(c.getBoundingClientRect().top) : 99999; })(), bottom: Math.round(r.getBoundingClientRect().bottom), vh: innerHeight }; });
   /* R123: Fabrica was opened afresh just above (the page loop ends on it), so on a narrow frame it shows Your apps */
-  ok(fire.one && fire.tabs !== 'none' && fire.shown.join() === 'fbApps' && fire.scroll <= 2 && fire.bottom <= fire.vh + 2, 'upright tablet: one panel at a time under tabs; no page scroll', JSON.stringify(fire));
+  ok(fire.one && fire.tabs !== 'none' && fire.shown.join() === 'fbApps' && fire.scroll < 420 && fire.col >= fire.vh - 2 && fire.bottom <= fire.vh + 2, 'upright tablet: one panel at a time under tabs; below it, only the colophon (6.10.2)', JSON.stringify(fire));
   await p.evaluate(() => { [...document.querySelectorAll('#fbTabs button')].find(x => x.dataset.p === 'ship').click(); }); await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + '/fab-fire.png' });
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(500);
@@ -118,10 +120,10 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   // the app library: Lector's kept copy of an app comes in with its own seal
   await p.evaluate(async () => { const page = '<!doctype html><html><head><meta charset="utf-8"><title>Carpe Diem</title></head><body><h1>Carpe Diem</h1></body></html>'; const u8 = new TextEncoder().encode(page); await libPut('lib-cd-test', u8, page); libState().apps.cd = { ref: 'lib-cd-test', sha256: 'test', version: '1051', title: 'carpe_diem.html', size: u8.length, at: Date.now() }; saveState(); });
   await p.click('#fbBring'); await p.waitForTimeout(400);
-  const sheet1 = await p.evaluate(() => [...document.querySelectorAll('#fb .f-opt b')].map(x => x.textContent));
-  ok(sheet1.join('|') === 'From your app library|A page, or a zip of its files|A git bundle, or a folder with its .git (zipped)|From Code', 'Bring one in offers the library, a file, a bundle and Code', sheet1.join('|'));
-  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-opt')][0].click(); }); await p.waitForTimeout(400);
-  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-opt')].find(x => /Carpe Diem/.test(x.textContent)).click(); }); await p.waitForTimeout(2000);
+  // 6.61: the panel shows the library's apps as seal tiles, then the ways from something she has (her approved preview, 8 November 2026)
+  const sheet1 = await p.evaluate(() => ({ tiles: [...document.querySelectorAll('#fb .f-tile b')].map(x => x.textContent), rows: [...document.querySelectorAll('#fb .f-opt b')].map(x => x.textContent) }));
+  ok(sheet1.tiles.includes('Carpe Diem') && sheet1.rows.join('|') === 'A page or a zip|A git bundle|From Code', 'Bring one in offers the library (as seals), a file, a bundle and Code', JSON.stringify(sheet1));
+  await p.evaluate(() => { [...document.querySelectorAll('#fb .f-tile')].find(x => /Carpe Diem/.test(x.textContent)).click(); }); await p.waitForTimeout(2000);
   const cd = await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Carpe Diem/.test(x.textContent)); return t ? { pressed: t.getAttribute('aria-pressed'), layers: t.querySelectorAll('.f-ls-l').length, ver: t.querySelector('.nm em') && t.querySelector('.nm em').textContent, line: t.querySelector('.stl span').textContent, n: document.querySelectorAll('#fbRepos .f-repo').length } : null; });
   ok(cd && cd.pressed === 'true' && cd.layers >= 3 && /Kept · to test/.test(cd.line) && cd.n === 2, 'Carpe Diem comes in from the library with its layered seal and a first version', JSON.stringify(cd));
   await p.screenshot({ path: OUT + '/fab-library.png' });

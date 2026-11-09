@@ -8,7 +8,11 @@
 # machines reach Hugging Face) and printed to the job's log, from which the
 # lineup in ingenium.html (ING_LINEUP) is written. Lines in candidates.txt:
 #   search <author> [words]   the author's newest models (names and dates)
-#   repo <owner/name>         every .gguf file in it, with size and SHA-256
+#   repo <owner/name> [regex] every .gguf file in it (or only those whose path matches), with size and SHA-256
+#   releases                  the engine's newest releases (llama.cpp)
+#   card <owner/name>         the lines of its model card on scores, settings and licence
+#   head <url>                whether a file downloads without signing in
+#   archs <llama.cpp tag>     the kinds of model the engine of that tag can load (6.10.2)
 import json, re, sys, urllib.request, urllib.parse
 
 API = "https://huggingface.co/api/"
@@ -36,7 +40,8 @@ def search(author, words):
         print("S %s ERROR %s" % (author, e))
 
 
-def repo(name):
+def repo(name, only=""):
+    pick = re.compile(only, re.I) if only else None
     try:
         info = get("models/" + name)
     except Exception as e:
@@ -53,7 +58,7 @@ def repo(name):
         return
     for f in files:
         p = f.get("path", "")
-        if not p.endswith(".gguf"):
+        if not p.endswith(".gguf") or (pick and not pick.search(p)):
             continue
         lfs = f.get("lfs") or {}
         print("F %s %s %s %s" % (name, p, lfs.get("size", f.get("size")), lfs.get("oid", "")))
@@ -86,15 +91,56 @@ def card(name):
                 break
 
 
+def releases():
+    """the engine's newest releases (llama.cpp), newest first"""
+    try:
+        req = urllib.request.Request("https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=6", headers={"User-Agent": "ingenium-lineup/1"})
+        for r in json.load(urllib.request.urlopen(req, timeout=60)):
+            print("L %s %s" % (r.get("tag_name"), (r.get("published_at") or "")[:10]))
+    except Exception as e:
+        print("L ERROR %s" % e)
+
+
+def archs(tag):
+    """the kinds of model the engine at this llama.cpp tag can load: the names in its src/llama-arch.cpp"""
+    if tag == "latest":
+        try:
+            req = urllib.request.Request("https://api.github.com/repos/ggml-org/llama.cpp/releases/latest", headers={"User-Agent": "ingenium-lineup/1"})
+            tag = json.load(urllib.request.urlopen(req, timeout=60))["tag_name"]
+        except Exception as e:
+            print("A latest ERROR %s" % e)
+            return
+    url = "https://raw.githubusercontent.com/ggml-org/llama.cpp/%s/src/llama-arch.cpp" % tag
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "ingenium-lineup/1"})
+        text = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+    except Exception as e:
+        print("A %s ERROR %s" % (tag, e))
+        return
+    names = re.findall(r'\{\s*LLM_ARCH_[A-Z0-9_]+\s*,\s*"([^"]+)"\s*\}', text)
+    print("A %s %d %s" % (tag, len(names), " ".join(names)))
+
+
+# 6.10.2: with a round named, only that round's lines are read (the file keeps every round as a record)
+ROUND = sys.argv[2] if len(sys.argv) > 2 else ""
+reading = not ROUND
 for line in open(sys.argv[1] if len(sys.argv) > 1 else "candidates.txt", encoding="utf-8"):
+    if ROUND and line.startswith("# round "):
+        reading = line.split()[2] == ROUND
+    if not reading:
+        continue
     w = line.split()
     if not w or w[0].startswith("#"):
         continue
     if w[0] == "search":
         search(w[1], " ".join(w[2:]))
     elif w[0] == "repo":
-        repo(w[1])
+        repo(w[1], w[2] if len(w) > 2 else "")
+    elif w[0] == "releases":
+        releases()
     elif w[0] == "card":
         card(w[1])
     elif w[0] == "head":
         head(w[1])
+    elif w[0] == "archs":
+        archs(w[1])

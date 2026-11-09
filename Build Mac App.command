@@ -144,6 +144,7 @@ for f in ingenium.html ingenium_app.py ingenium.spec bake_engine.py make_ingeniu
   if [ -f "$f" ]; then mkdir -p "$SRC/$(dirname "$f")"; cp -f "$f" "$SRC/$f"; else say "MISSING from this folder: $f"; MISSING=1; fi
 done
 for f in LICENCE.txt THIRD_PARTY_NOTICES.txt; do [ -f "$f" ] && cp -f "$f" "$SRC/$f"; done
+[ -f tools/IngeniumKey.swift ] && cp -f tools/IngeniumKey.swift "$SRC/tools/IngeniumKey.swift"   # 6.10.1: Touch ID (built when Swift is here)
 mkdir -p "$SRC/licences" && cp -f licences/* "$SRC/licences/" 2>>"$LOG" || true
 # who the app is (app.json): its name and file name
 APP_FILE="$(python3 -c "import json,re;c=json.load(open('app.json'));print(re.sub(r'[^A-Za-z0-9._-]','',str(c.get('file_name') or '')) or 'Ingenium')" 2>/dev/null || echo Ingenium)"
@@ -274,7 +275,7 @@ say "put together on this Mac's disk, not on this folder."
 rm -rf "$WORK/sources/build" "$WORK/sources/dist"
 # R77: this build's own number (the version, the day and the time it was
 # built), shown in About and in Finder's Get Info, as the cloud builds show theirs
-BUILD_NO="6.9.2.$(date +%Y%m%d).$(date +%H%M)"
+BUILD_NO="6.64.$(date +%Y%m%d).$(date +%H%M)"
 if "$VPY" "$SRC/tools/stamp_build.py" "$SRC/ingenium.html" "$BUILD_NO" >>"$LOG" 2>&1; then
   say "Build number: $BUILD_NO"
 else

@@ -120,7 +120,9 @@ async function shown(p, sel) { await p.evaluate(sel => { const e = document.quer
     for (const pg of Object.keys(want)) {
       await page(p, pg, pg === 'lector' ? 1600 : 900);
       const d = await dressed(p), m = await missed(p);
-      ok(d.length >= Math.max(1, want[pg].length) && want[pg].every(id => d.includes(id)) && m.length === 0, `${pg}: every select a person can see is dressed (${d.length} dressed, ${m.length} left as the system draws them)`, { dressed: d, missed: m });
+      // (6.45: Focus has shown its four parts one at a time since 6.36, and its first part holds no list; a page may show none, but
+      // every list a person can see must be dressed)
+      ok(d.length >= want[pg].length && want[pg].every(id => d.includes(id)) && m.length === 0, `${pg}: every select a person can see is dressed (${d.length} dressed, ${m.length} left as the system draws them)`, { dressed: d, missed: m });
     }
     for (const pg of ['home', 'chat', 'code', 'models', 'blend', 'fabrica', 'guide']) await page(p, pg, 700);
     const total = await p.evaluate(() => ({ all: document.querySelectorAll('select').length, dressed: IngSelect.count(), plain: [...document.querySelectorAll('select')].filter(s => !s.__r172).map(s => (s.id || s.className) + (s.multiple ? ' (several lines)' : '')),

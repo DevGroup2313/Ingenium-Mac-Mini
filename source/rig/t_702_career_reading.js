@@ -88,7 +88,9 @@ const PAGE = 'Field Notebooks and the Making of Method\nBy Charles Babbage\n' + 
   const rp = await p.evaluate(async () => { const meId = IngCareer.root().cur; await IngCareer.newPerson('other', 'Alex Rivera', ''); const o = await IngCareer.newOpp('phd', 'A programme\nA university\nApply with a statement.\nThe closing date is 1 December 2026.\n' + 'z'.repeat(60), 'pasted');
     const run = { id: 'lx_fake_career', name: 'A piece', kind: 'doc', status: 'done', done: 1, total: 1, partsRef: null, notesRef: null, mergeRef: null, analysisRef: null, writings: {}, career: o.id, created: Date.now(), updated: Date.now() };
     lxState().runs.unshift(run); o.reading = [{ id: 'rdx', title: 'A piece', status: 'read', runId: run.id }]; saveState();
-    const alex = IngCareer.root().people.find(x => x.profile.name === 'Alex Rivera'); IngCareer.switchTo(meId); window.confirm = () => true; IngCareer.removePerson(alex);
+    const alex = IngCareer.root().people.find(x => x.profile.name === 'Alex Rivera'); IngCareer.switchTo(meId); IngCareer.removePerson(alex);
+    /* 6.11.1: the question is Ingenium's own dialog: its Yes key */
+    await new Promise(r => setTimeout(r, 300)); const yes = [...document.querySelectorAll('.ing-dlg-root .ing-ask-keys .btn, #modalBox .ing-ask-keys .btn')].pop(); if (yes) yes.click(); await new Promise(r => setTimeout(r, 600));
     return { people: IngCareer.root().people.length, run: !!lxRun('lx_fake_career') }; });
   ok(rp.people === 1 && !rp.run, 'a profile removed takes the readings its reading lists made', rp);
   ok(outside.length === 0, 'nothing was searched or fetched online (the stand-ins answered)', outside.slice(0, 3));

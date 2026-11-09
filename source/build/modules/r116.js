@@ -14,6 +14,7 @@
 .lu-q .seg-btn[disabled]{opacity:.45;cursor:not-allowed}
 .lu-q-note{font-size:11.5px;color:var(--ink-3);flex:1 1 160px}
 .pace-chip{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--sans);padding:0 10px;height:28px;border-radius:999px;border:.5px solid var(--hairline);color:var(--ink-2);background:var(--card);white-space:nowrap}
+.pace-chip[hidden]{display:none} /* 6.59: its display rule had kept a hidden chip on the screen, empty or with words left from the last reply */
 .pace-chip i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block}
 .pace-chip.live i{background:#2f7a55;animation:paceBlink 1s ease-in-out infinite}
 .pace-chip.approx{color:var(--ink-3)}
@@ -115,15 +116,17 @@ function perfLast(mid){var L=perfState();for(var i=0;i<L.length;i++)if(!mid||L[i
 /* the live chip in the chat's top bar */
 var paceT=0;
 function paceChip(){var c=$("paceChip");if(!c){var k=$("chatCtlBtn");if(!k||!k.parentNode)return null;c=el("span","pace-chip");c.id="paceChip";c.hidden=true;c.innerHTML="<i></i><span></span>";k.parentNode.insertBefore(c,k);}return c;}
+/* 6.52: painted every half second; each part is written only when it changes (every write woke the page's watchers) */
 function pacePaint(){var c=paceChip();if(!c)return;var lb=(typeof liveBot!=="undefined")?liveBot:null,s=c.querySelector("span");
-  if(lb&&lb.live){c.hidden=false;c.classList.add("live");
+  function H(h){if(c.hidden!==h)c.hidden=h;}function S(t){if(s&&s.textContent!==t)s.textContent=t;}function TI(t){if(c.title!==t)c.title=t;}
+  if(lb&&lb.live){H(false);c.classList.toggle("live",true);
     if(lb.firstAt){var chars=String(lb.text||"").length+String(lb.thinkTag||lb.think||"").length,sec=Math.max(.3,(Date.now()-lb.firstAt)/1000),tps=chars/3.6/sec;
-      c.classList.add("approx");s.textContent="≈ "+paceFmt(tps)+" tokens/s";c.title="Writing now: about "+Math.round(chars/3.6)+" tokens in "+sec.toFixed(0)+" s (counted from characters while it writes; the engine's own count follows).";}
-    else{c.classList.remove("approx");s.textContent=lb.status?"searching…":"reading…";c.title="The model is reading the conversation before its first word.";}
+      c.classList.toggle("approx",true);S("≈ "+paceFmt(tps)+" tokens/s");TI("Writing now: about "+Math.round(chars/3.6)+" tokens in "+sec.toFixed(0)+" s (counted from characters while it writes; the engine's own count follows).");}
+    else{c.classList.toggle("approx",false);S(lb.status?"searching…":"reading…");TI("The model is reading the conversation before its first word.");}
     return;}
-  c.classList.remove("live");var p=perfLast(state.activeModelId);if(!p){c.hidden=true;return;}
-  c.hidden=false;c.classList.toggle("approx",!p.measured);s.textContent=(p.measured?"":"≈ ")+paceFmt(p.tps)+" tokens/s";
-  c.title=(p.measured?"The engine's own count for the last reply: ":"The last reply, counted from characters: ")+p.tok+" tokens"+(p.first!=null?", first word after "+(p.first/1000).toFixed(1)+" s":"")+(p.read?", the question read in "+(p.read/1000).toFixed(1)+" s":"")+". Models, Health, has every reply.";}
+  c.classList.toggle("live",false);var p=perfLast(state.activeModelId);if(!p){H(true);return;}
+  H(false);c.classList.toggle("approx",!p.measured);S((p.measured?"":"≈ ")+paceFmt(p.tps)+" tokens/s");
+  TI((p.measured?"The engine's own count for the last reply: ":"The last reply, counted from characters: ")+p.tok+" tokens"+(p.first!=null?", first word after "+(p.first/1000).toFixed(1)+" s":"")+(p.read?", the question read in "+(p.read/1000).toFixed(1)+" s":"")+". Models, Health, has every reply.");}
 function paceLoop(){if(paceT)return;paceT=setInterval(function(){try{var on=$("page-chat")&&$("page-chat").classList.contains("active"),lb=(typeof liveBot!=="undefined")?liveBot:null;if(on||lb)pacePaint();}catch(e){}},500);}
 paceLoop();
 (function paceTop(){if(typeof paintChatTop!=="function")return;var o=paintChatTop;paintChatTop=function(){var r=o.apply(this,arguments);try{pacePaint();}catch(e){}return r;};window.paintChatTop=paintChatTop;})();

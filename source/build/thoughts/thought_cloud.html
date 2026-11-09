@@ -299,8 +299,10 @@ function create(host){
   function badgeStyle(){return "app";}
   /* two looks to choose between: "note" (the sticky notes' seating and pop) and "layered" (the seal's layered depth) */
   function look(){var v=ls("look")||H.look||"note";return v==="layered"?"layered":"note";}
-  function dress(n){n.classList.add("tc-el");n.setAttribute("data-tc-app",app);n.setAttribute("data-tc-night",night()?"1":"0");
-    n.setAttribute("data-tc-still",still()?"1":"0");n.setAttribute("data-tc-badge",badgeStyle());n.setAttribute("data-tc-look",look());
+  /* written only when they change (Ingenium 6.52: the number is dressed at every save, and each write woke the page's watchers) */
+  function sa(n,k,v){if(n.getAttribute(k)!==v)n.setAttribute(k,v);}
+  function dress(n){n.classList.toggle("tc-el",true);sa(n,"data-tc-app",app);sa(n,"data-tc-night",night()?"1":"0");
+    sa(n,"data-tc-still",still()?"1":"0");sa(n,"data-tc-badge",badgeStyle());sa(n,"data-tc-look",look());
     if(n.classList.contains("tc-nudge"))dressRemind(n);return n;}
   /* the app's reminder card, given after the panel is made: TC.reminders({face,ink,soft,rim,line,key,keyInk,night:{...}}).
      With one, each reminder beside the 💭 comes in it; with none, nothing changes. */
@@ -334,7 +336,7 @@ function create(host){
     if(!dd){dd=dress(el("span","tc-draft",{"aria-hidden":"true"}));f.appendChild(dd);}
     dress(b);dress(dd);
     var n=list().length,dr=draft(),total=n+(dr?1:0),t=today().n;
-    b.textContent=total>99?"99+":String(total);b.hidden=!total;dd.hidden=!dr;
+    var bt=total>99?"99+":String(total);if(b.textContent!==bt)b.textContent=bt;if(b.hidden!==!total)b.hidden=!total;if(dd.hidden!==!dr)dd.hidden=!dr;
     /* a host app may dress every span inside its side buttons (size, font, display, a drop shadow): the number and
        the dot are pinned in place on the element itself, which no rule of the page can outrank */
     pin(b,{position:"absolute",top:"-3px",right:"-5px",left:"auto",bottom:"auto",width:"auto","min-width":"18px",height:"18px","line-height":"18px","font-size":"10px","font-weight":"800",

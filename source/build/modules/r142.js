@@ -372,7 +372,11 @@ var LABELS={
   fabrica_made:["Fabrica's packages","Apps and kits Fabrica made, kept to save again"],
   ingenium_hub:["Fabrica's issues and pull requests","What you wrote about your apps in Fabrica"],
   ingenium_desk:["The desk's larger copy","Your desk, when the small store is too full for it"],
-  the_foundry_files:["An older store","Left from an earlier version; carried over and then let go"]};
+  the_foundry_files:["An older store","Left from an earlier version; carried over and then let go"],
+  /* 6.56: the speech engine dictation (modules/r254.js) and Scriba share, kept so both work offline */
+  cd_scriba_store:["The speech engine","What writes down your dictation on this device, kept so it works offline"],
+  /* 6.57: Ingenium Cloud's key, made from her passphrase on this device and kept here only (modules/r255.js) */
+  ingenium_cloudkey:["Ingenium Cloud's key","Made from your Cloud passphrase on this device; it never leaves it"]};
 function labelOf(name){return LABELS[name]||["Another store: "+name,"Kept by a part of Ingenium or an app it opened"];}
 function utf8Len(s){var n=0,L=s.length,c,i;for(i=0;i<L;i++){c=s.charCodeAt(i);if(c<0x80)n++;else if(c<0x800)n+=2;else if(c>=0xD800&&c<0xDC00&&i+1<L){n+=4;i++;}else n+=3;}return n;}
 function sizeOf(v,d){d=d||0;if(v==null)return 1;var t=typeof v;
@@ -423,7 +427,7 @@ function libOk(){return typeof W.libState==="function"&&(typeof W.libOn!=="funct
 function strip(v){var x=Object.assign({},v);delete x.earlier;delete x.older;return x;}
 function chainOf(rec){if(!rec||!rec.ref)return [];var out=[rec];if(rec.earlier&&rec.earlier.ref)out.push(rec.earlier);if(Array.isArray(rec.older))rec.older.forEach(function(v){if(v&&v.ref)out.push(v);});return out;}
 function setChain(rec,list){list=list.map(strip);if(list.length)rec.earlier=list[0];else delete rec.earlier;if(list.length>1)rec.older=list.slice(1);else delete rec.older;}
-function appName(k){try{if(W.LIB_NAMES&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}return k;}
+function appName(k){try{if(typeof W.libName==="function")return W.libName(k);if(W.LIB_NAMES&&LIB_NAMES[k])return LIB_NAMES[k];}catch(e){}return k;}  /* 6.42: any app, by its own name */
 function libApps(){if(!libOk())return [];var A={};try{A=W.libState().apps||{};}catch(e){}
   return Object.keys(A).filter(function(k){return A[k]&&A[k].ref;}).map(function(k){return {key:k,name:appName(k),rec:A[k],chain:chainOf(A[k])};});}
 function verLabel(app,v){return app.name+(v.version?" "+v.version:"")+(v.version?"":" (kept "+day(v.at)+")");}
@@ -479,7 +483,11 @@ function refIndex(){var live={},by={};
   return dbNames().then(function(names){return names.reduce(function(p,name){if(name==="ingenium_big")return p;return p.then(function(){return openExisting(name).then(function(d){if(!d)return;
       var sns=[].slice.call(d.objectStoreNames).filter(function(sn){return !(SKIP[name]&&SKIP[name][sn]);});
       var place=name==="ingenium_desk"?"shelf":"stores";
-      return sns.reduce(function(q,sn){return q.then(function(){return walk(d,sn,function(key,val){visit(val,place,0);});});},Promise.resolve()).then(function(){try{d.close();}catch(e){}});});});},Promise.resolve());})
+      /* 6.32: a record sealed with the lock (modules/r197.js) is opened before it is searched, so a text it names is never taken for one
+         that nothing names */
+      var L=(W.IngLock&&typeof W.IngLock.isRecEnv==="function")?W.IngLock:null;
+      return sns.reduce(function(q,sn){var sealed=[];return q.then(function(){return walk(d,sn,function(key,val){if(L&&L.isRecEnv(val))sealed.push(val);else visit(val,place,0);});})
+        .then(function(){return sealed.reduce(function(r,v){return r.then(function(){return L.openRec(name,sn,v).then(function(o){if(o!=null)visit(o,place,0);});});},Promise.resolve());});},Promise.resolve()).then(function(){try{d.close();}catch(e){}});});});},Promise.resolve());})
     .then(function(){return {live:live,by:by,at:Date.now()};});}
 /* when an id was made: "big_" + the time in base 36 + six random letters; null when it does not say */
 function idTime(id){id=String(id||"");if(!/^big_[a-z0-9]{7,}$/.test(id))return null;var ts=parseInt(id.slice(4,-6),36);
@@ -499,7 +507,10 @@ function plan(){var N=keepN(),items=[],kept={newest:0,pinned:0,inN:0,used:0,pack
       var pl=idx.live[v.ref]||[];if(pl.some(function(x){return DESKCOPY.indexOf(x)<0;})||countIn(jsLib,v.ref)>1||countIn(jsAll,v.ref)>countIn(jsLib,v.ref)){kept.used++;return;}
       items.push({kind:"library",app:app.key,ref:v.ref,sha:v.sha256||"",label:verLabel(app,v),bytes:+v.size||0,at:v.at||0});});});
     /* 2. Fabrica's packages: the newest N versions of each app and kind stay */
-    return openExisting("fabrica_made").then(function(d){if(!d)return [];return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}return a;});}).then(function(meta){
+    return openExisting("fabrica_made").then(function(d){if(!d)return [];return getAll(d,"meta").then(function(a){try{d.close();}catch(e){}return a;});})
+      /* 6.32: a package's card sealed with the lock (modules/r197.js) is opened to be read; one that cannot be opened is left alone */
+      .then(function(a){var L=W.IngLock;if(!L||typeof L.isRecEnv!=="function")return a;return Promise.all((a||[]).map(function(m){return L.isRecEnv(m)?L.openRec("fabrica_made","meta",m):m;})).then(function(x){return x.filter(Boolean);});})
+      .then(function(meta){
       if(!meta.length)return;return repoNames().then(function(names){var groups={};
         meta.forEach(function(m){if(!m||!m.key)return;var g=(m.repo||"")+"|"+(m.kind||"");(groups[g]=groups[g]||[]).push(m);});
         Object.keys(groups).forEach(function(g){var list=groups[g],at={};list.forEach(function(m){at[m.commit]=Math.max(at[m.commit]||0,m.at||0);});
@@ -682,17 +693,20 @@ var PT=0;function paintSoon(){clearTimeout(PT);PT=setTimeout(paintAll,90);}
 function paintAll(){if(!$i("stxCard"))return;paintGauge();paintKinds();paintApps();paintLog();paintParts();paintPersist();
   var n=$i("stxLimitNote");if(n){var st=CK.last,L=+S().limit>0?+S().limit:0;
     n.textContent="Warnings come at 80 % and 95 % of it."+(st&&st.quota?(L>st.quota?" Your limit is more than the browser gives Ingenium here ("+B(st.quota)+"), so the browser's room is the one that counts.":(L?"":" Without one of your own, the limit is the room the browser gives Ingenium here: "+B(st.quota)+".")):"");}}
+/* 6.51: each part is written only when it changes (a write wakes the page's watchers; this is painted after every check) */
+function T_(e,v){if(e&&e.textContent!==v)e.textContent=v;}
+function A_(e,k,v){if(e&&e.getAttribute(k)!==v)e.setAttribute(k,v);}
 function paintGauge(){if(!$i("stxCard"))return;var st=CK.last;
   if(!st){status().then(function(x){CK.last=x;paintGauge();});return;}
   var used=$i("stxUsed"),of=$i("stxOf"),m=$i("stxMeter"),f=$i("stxFill"),t=$i("stxState"),w=$i("stxWarn");
-  if(st.usage==null){used.textContent="Not known";of.textContent="this browser does not say how much room Ingenium takes";m.setAttribute("aria-valuenow","0");m.setAttribute("aria-valuetext","not known");f.style.width="0";t.textContent="";w.hidden=true;return;}
-  used.textContent=B0(st.usage);of.textContent=st.eff?"of "+B(st.eff)+(st.mine?", the limit you set":", the room the browser gives Ingenium here"):"used";
-  var p=st.pct==null?0:Math.max(0,Math.min(1,st.pct));m.setAttribute("data-level",String(st.level));m.setAttribute("aria-valuenow",String(Math.round(p*100)));
-  m.setAttribute("aria-valuetext",pc(p)+" of "+(st.mine?"your limit":"the room the browser gives")+" ("+B(st.usage)+" of "+B(st.eff)+")");f.style.width=Math.max(st.usage>0?1:0,p*100)+"%";
-  t.textContent=st.level===0?"Plenty of room"+(st.pct!=null?": "+pc(st.pct)+" used.":".")+(S().auto?" Old copies go on their own if it runs short.":""):"";
-  w.hidden=st.level===0;w.setAttribute("data-level",String(st.level));
-  if(st.level>0)$i("stxWarnT").innerHTML=st.level===2?"<b>Nearly full: "+pc(st.pct)+".</b> Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit."
-    :"<b>Getting full: "+pc(st.pct)+".</b> Nothing needs doing yet. When you like, Clean the library frees old copies"+(S().auto?", and at 90 % old copies go on their own.":".");}
+  if(st.usage==null){T_(used,"Not known");T_(of,"this browser does not say how much room Ingenium takes");A_(m,"aria-valuenow","0");A_(m,"aria-valuetext","not known");if(f.style.width!=="0px"&&f.style.width!=="0")f.style.width="0";T_(t,"");if(!w.hidden)w.hidden=true;return;}
+  T_(used,B0(st.usage));T_(of,st.eff?"of "+B(st.eff)+(st.mine?", the limit you set":", the room the browser gives Ingenium here"):"used");
+  var p=st.pct==null?0:Math.max(0,Math.min(1,st.pct));A_(m,"data-level",String(st.level));A_(m,"aria-valuenow",String(Math.round(p*100)));
+  A_(m,"aria-valuetext",pc(p)+" of "+(st.mine?"your limit":"the room the browser gives")+" ("+B(st.usage)+" of "+B(st.eff)+")");var fw=Math.max(st.usage>0?1:0,p*100)+"%";if(f.style.width!==fw)f.style.width=fw;
+  T_(t,st.level===0?"Plenty of room"+(st.pct!=null?": "+pc(st.pct)+" used.":".")+(S().auto?" Old copies go on their own if it runs short.":""):"");
+  if(w.hidden!==(st.level===0))w.hidden=st.level===0;A_(w,"data-level",String(st.level));
+  if(st.level>0){var wt=$i("stxWarnT"),wh=st.level===2?"<b>Nearly full: "+pc(st.pct)+".</b> Soon new things may not be kept. Clean the library frees old copies, or you can raise your limit."
+    :"<b>Getting full: "+pc(st.pct)+".</b> Nothing needs doing yet. When you like, Clean the library frees old copies"+(S().auto?", and at 90 % old copies go on their own.":".");if(wt&&wt.innerHTML!==wh)wt.innerHTML=wh;}}
 function paintPersist(){var row=$i("stxPersistRow");if(!row)return;
   persisted().then(function(p){var t=$i("stxPersist"),k=$i("stxPersistAsk"),s=S(),a=s.persist;
     var onDisk=false;try{var api=(typeof W.shellApi==="function")?W.shellApi():null;onDisk=!!(api&&(typeof api.save_state==="function"||typeof api.big_put==="function"));}catch(e){}

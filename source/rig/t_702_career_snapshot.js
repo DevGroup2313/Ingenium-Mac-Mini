@@ -1,6 +1,6 @@
 // node rig/t_702_career_snapshot.js <Ingenium page url> <out dir>
 // 6.9.2: a posting fetched again and compared, and further particulars read with it (modules/r188.js), in Chromium, with a
-// stand-in for the page fetch (nothing goes online). Her words (31 October 2026): "I want to be able to use it for PhD
+// stand-in for the page fetch (nothing goes online; since 6.9.8 the fetch is netFetch's, as a posting's link is fetched). Her words (31 October 2026): "I want to be able to use it for PhD
 // applications and for job applications." So a posting fetched from its address remembers the day; Check it again fetches it
 // once more, only on her press, and shows each sentence that changed and a changed closing date, with the choice to keep the
 // new text (her copy kept beside it); and a document added to the application (further particulars, a handbook) is read with
@@ -21,11 +21,11 @@ const FP = 'Further particulars for the post of Lecturer in Digital History.\nTh
   const press = async (text, within) => { const hit = await p.evaluate(([text, within]) => { const root = document.querySelector(within || '#cs') || document;
       const k = [...root.querySelectorAll('button')].find(x => x.offsetParent && !x.disabled && (x.textContent.trim() === text || (x.querySelector('b') && x.querySelector('b').textContent.trim() === text)));
       if (!k) return false; k.click(); return true; }, [text, within || null]); if (!hit) throw new Error('no key: ' + text); await p.waitForTimeout(350); };
-  await p.evaluate(([V1, V2]) => { window.__net = []; window.__pages = [V1, V2, V2]; window.fetchPageText = function (url, limit) { window.__net.push(url); return Promise.resolve(window.__pages.shift()); };
+  await p.evaluate(([V1, V2]) => { window.__net = []; window.__pages = [V1, V2, V2]; window.netFetch = function (url, o) { window.__net.push(url); const t = window.__pages.shift(); return Promise.resolve({ ok: true, status: 200, contentType: 'text/plain; charset=utf-8', text: () => Promise.resolve(t), json: () => Promise.resolve(JSON.parse(t)) }); };
     const S = IngCareer.state(); S.ui.room = 'apps'; S.ui.open = 'new'; S.ui.show = 'work'; go('career'); IngCareer.render(); }, [V1, V2]);
   await p.waitForTimeout(500);
   // fetched from its address, on her press
-  await p.fill('#cs .c-work input[type=url]', 'https://jobs.example.ac.uk/lecturer-digital-history'); await press('Fetch it', '#cs .c-work'); await p.waitForFunction(() => IngCareer.state().opps.length === 1 && !!IngCareer.state().opps[0].fetchedAt, null, { timeout: 20000 }); await p.waitForTimeout(400);
+  await p.fill('#cs .c-work input[type=url]', 'https://jobs.example.ac.uk/lecturer-digital-history'); await press('Fetch and read it', '#cs .c-work'); await p.waitForFunction(() => IngCareer.state().opps.length === 1 && !!IngCareer.state().opps[0].fetchedAt, null, { timeout: 20000 }); await p.waitForTimeout(400);
   const o1 = await p.evaluate(() => { const o = IngCareer.state().opps[0]; return o && { url: o.url, from: o.from, fetched: !!o.fetchedAt, due: o.due, closes: o.closes, meta: (document.querySelector('#cs .c-work .c-note') || {}).textContent, keys: [...document.querySelectorAll('#cs .c-work .c-pn-f .c-btn')].map(x => x.textContent), net: window.__net.length }; });
   ok(o1 && o1.url === 'https://jobs.example.ac.uk/lecturer-digital-history' && o1.fetched && o1.due === '2026-11-30' && /Fetched from its address on /.test(o1.meta) && o1.keys.join('|') === 'Add a document|Check it again|Look it up online|Read it against my profile' && o1.net === 1, 'a posting fetched from its address remembers the address and the day; The posting offers Check it again and Add a document', o1);
   // checked again: the sentences that changed, and the closing date

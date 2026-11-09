@@ -1,10 +1,13 @@
-# R120: the copies of The Forge and Inkwell that Ingenium carries inside it; R122 (18 October 2026) adds Carpe Diem.
-# Usage:  python3 -I update_builtin.py path/to/the_forge.html path/to/Inkwell.html [path/to/carpe_diem.html]
-# Writes, beside this file: builtin/forge.html.gz, builtin/inkwell.html.gz and builtin/cd.html.gz (each page exactly
-# as given, compressed), and builtin/builtin.json (for each: its version, build, date, size, SHA-256 fingerprint and
-# file name). Without a third path, the Carpe Diem copy already kept here stays as it is.
-# build_page.py embeds them; modules/r120.js keeps them in the app library on first start, checked against the
-# fingerprint, and never puts them over a newer copy she added herself.
+# R120: the copies of The Forge and Inkwell that Ingenium carries inside it; R122 (18 October 2026) adds Carpe Diem; 6.55 (7 November
+# 2026) adds Lakay, her store's app, at her word: "I want its latest build embedded into Ingenium just like my other apps so that I can
+# continue working on it and developing it further."
+# Usage:  python3 -I update_builtin.py path/to/a_page.html [more pages ...]
+# Each page is recognised as The Forge, Inkwell, Carpe Diem or Lakay (in any order, any of them); for each one given, writes beside this
+# file builtin/<key>.html.gz (the page exactly as given, compressed) and its line in builtin/builtin.json (its version, build, date, size,
+# SHA-256 fingerprint and file name). The copies not given stay as they are. Lakay's latest page is app/Lakay.html in its repositories
+# (Lakay-Windows, Lakay-Mac, Lakay-Apps); its mark's layers come from apps/lakay_mark.py.
+# build_page.py embeds them (the master edition alone); modules/r120.js keeps them in the app library on first start, checked against
+# the fingerprint, and never puts them over a newer copy she added herself.
 import gzip, hashlib, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,16 +25,23 @@ def roman(s):
     return n
 
 
+def title(text):
+    """6.56: the page's own title (The Forge and Carpe Diem both carry a Forge section and their build stamp past the first
+    400,000 characters, so neither says which app a page is: its title does)"""
+    m = re.search(r"<title>([^<]*)</title>", text[:2000000])
+    return m.group(1).strip() if m else ""
+
+
 def forge(text):
     m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)"', text)
-    if not m or 'id="section-forge"' not in text:
-        sys.exit("this does not look like The Forge's page (no build stamp, or no Forge section)")
+    if not m or 'id="section-forge"' not in text or not title(text).startswith("The Forge"):
+        sys.exit("this does not look like The Forge's page (no build stamp, no Forge section, or another title)")
     return {"key": "forge", "title": "The Forge", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
 
 
 def carpediem(text):
     m = re.search(r'window\.CD_BUILD=\{date:"([^"]*)",pass:"(\d+)",stamp:"([^"]*)"', text)
-    if not m or not re.search(r"<title>[^<]*Carpe Diem", text[:400000]) or 'id="section-forge"' in text:
+    if not m or not title(text).startswith("Carpe Diem"):
         sys.exit("this does not look like Carpe Diem's page (no build stamp, or no Carpe Diem title)")
     return {"key": "cd", "title": "Carpe Diem", "version": m.group(2), "build": m.group(3), "date": m.group(1)}
 
@@ -48,15 +58,39 @@ def inkwell(text):
     return {"key": "inkwell", "title": "Inkwell", "version": m.group(1), "build": "", "date": date}
 
 
+def lakay(text):
+    m = re.search(r'<meta name="lakay-build" content="(\d+)"', text[:40000])
+    if not m or not re.search(r"<title>Lakay\b", text[:40000]):
+        sys.exit("this does not look like Lakay's page (no lakay-build line, or no Lakay title)")
+    d = re.search(r"Build \d+ \((\d{4}-\d{2}-\d{2})\)", text[:40000])
+    c = re.search(r"--pri:\s*(#[0-9a-fA-F]{6})", text)
+    return {"key": "lakay", "title": "Lakay", "version": m.group(1), "build": "", "date": d.group(1) if d else "", "color": c.group(1).lower() if c else ""}
+
+
+def which(text):
+    head = text[:400000]
+    if re.search(r'<meta name="lakay-build"', head[:40000]):
+        return lakay
+    if re.search(r"<title>Inkwell\b", head[:20000]):
+        return inkwell
+    if "window.CD_BUILD" in text and title(text).startswith("The Forge"):
+        return forge
+    if "window.CD_BUILD" in text and title(text).startswith("Carpe Diem"):
+        return carpediem
+    sys.exit("this page is none of The Forge, Inkwell, Carpe Diem or Lakay")
+
+
 meta = {}
 try:
-    meta = {k: v for k, v in json.load(open(os.path.join(OUT, "builtin.json"))).items() if k == "cd"}
+    meta = json.load(open(os.path.join(OUT, "builtin.json")))
 except (OSError, ValueError):
     pass
-jobs = [(sys.argv[1], forge), (sys.argv[2], inkwell)] + ([(sys.argv[3], carpediem)] if len(sys.argv) > 3 else [])
-for path, read in jobs:
+if len(sys.argv) < 2:
+    sys.exit("usage: python3 -I update_builtin.py path/to/a_page.html [more pages ...]")
+for path in sys.argv[1:]:
     raw = open(path, "rb").read()
-    info = read(raw.decode("utf-8", errors="replace"))
+    text = raw.decode("utf-8", errors="replace")
+    info = which(text)(text)
     info.update(size=len(raw), sha256=hashlib.sha256(raw).hexdigest(), name=os.path.basename(path))
     gz = gzip.compress(raw, compresslevel=9, mtime=0)
     open(os.path.join(OUT, info["key"] + ".html.gz"), "wb").write(gz)

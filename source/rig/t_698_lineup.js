@@ -37,8 +37,9 @@ const PICKS = {
   "mac-arm|36|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b","faber":"qwen3.6-35b-a3b"},
   "mac-arm|48|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
   "mac-arm|64|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "mac-arm|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "mac-arm|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
+  /* 6.10.2 (modules/r210.js): no ceiling at 64 GB; from 96 GB each house moves up (t_6102_large.js checks every band to 3 TB) */
+  "mac-arm|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "mac-arm|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "mac-arm|null|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|4|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|6|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"granite-4.2-3b"},
@@ -50,8 +51,8 @@ const PICKS = {
   "desktop|36|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b","faber":"qwen3.6-35b-a3b"},
   "desktop|48|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
   "desktop|64|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "desktop|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
-  "desktop|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.8-27b-best","faber":"qwen3.6-35b-a3b"},
+  "desktop|96|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "desktop|128|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "desktop|null|gpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|4|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"},
   "desktop|6|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"minicpm5-2b","magister":"qwen3.5-4b","faber":"granite-4.2-3b"},
@@ -63,8 +64,8 @@ const PICKS = {
   "desktop|36|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
   "desktop|48|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
   "desktop|64|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
-  "desktop|96|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
-  "desktop|128|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.6-35b-a3b","magister":"qwen3.6-35b-a3b","faber":"qwen3.6-35b-a3b"},
+  "desktop|96|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3-next-80b-a3b-thinking","magister":"qwen3.5-122b-a10b-compact","faber":"qwen3-coder-next"},
+  "desktop|128|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"gpt-oss-120b","magister":"qwen3.5-122b-a10b","faber":"qwen3-coder-next"},
   "desktop|null|cpu":{"velox":"lfm2.5-1.2b-instruct","scriba":"qwen3.5-2b","magister":"qwen3.5-4b","faber":"lfm2.5-2.6b"}};
 const NEED = {"lfm2.5-1.2b-instruct":1.462,"lfm2.5-350m":0.939,"lfm2.5-1.2b-thinking":1.462,"lfm2.5-2.6b":2.447,"qwen3.5-2b":2.036,"qwen3.5-4b":3.559,"qwen3.5-9b":6.625,"mellum2-12b-thinking":9.119,"mellum2.1-12b-thinking":9.119,"gemma-4-12b":7.976,"gemma-4-26b-a4b":15.761,"gemma-4-e4b":6.077,"gemma-4-e2b":4.194,"lfm2.5-8b-a1b":6.078,"lfm2.5-24b-a2b":15.852,"granite-4.2-3b":3.041,"qwen3-coder-30b-a3b":20.056,"qwen2.5-coder-1.5b":1.865,"minicpm5-2b":2.329,"qwen3.8-27b":20.491,"qwen3.6-35b-a3b":23.788,"granite-4.2-8b":6.278,"gemma-4-31b":19.111,"granite-4.2-8b-compact":5.234,"qwen3.5-9b-compact":5.575,"qwen3.8-27b-best":30.528};
 // the repositories round 7 of the lineup workflow listed (R lines of round7.log), and the file of each quality that More models will take (F lines)
@@ -146,7 +147,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   // ---- 6. every model has size, SHA-256 and address; every list names models that exist; the table of qualities agrees ----
   const data = await p.evaluate(() => { const probs = [], M = ING_LINEUP.models, T = IngQuality.table, hex = /^[0-9a-f]{64}$/, n = Object.keys(M).length;
     const chk = (k, s, what) => { if (!s || typeof s.file !== 'string' || !/^[A-Za-z0-9._-]+\.gguf$/.test(s.file)) probs.push([what, k, 'file']); if (!(Number.isInteger(s.size) && s.size > 1e8)) probs.push([what, k, 'size']);
-      if (!hex.test(s.sha256 || '')) probs.push([what, k, 'sha256']); if (!/^https:\/\/huggingface\.co\/[^/]+\/[^/]+\/resolve\/main\/[^/]+\.gguf$/.test(s.url || '') || !String(s.url).endsWith('/' + s.file)) probs.push([what, k, 'url']); };
+      if (!hex.test(s.sha256 || '')) probs.push([what, k, 'sha256']); if (!/^https:\/\/huggingface\.co\/[^/]+\/[^/]+\/resolve\/main\/([^/]+\/)?[^/]+\.gguf$/.test(s.url || '') || !String(s.url).endsWith('/' + s.file)) probs.push([what, k, 'url']); };
     for (const k in M) { const s = M[k]; chk(k, s, 'model'); ['name', 'maker', 'page', 'licence', 'licenceUrl'].forEach(f => { if (!s[f] || typeof s[f] !== 'string') probs.push(['model', k, f]); });
       if (!(s.params > 0)) probs.push(['model', k, 'params']); if (typeof s.thinks !== 'boolean') probs.push(['model', k, 'thinks']); if (!s.why || s.why.length < 60) probs.push(['model', k, 'why']);
       const a = lineupArgs(k); if (a.url !== s.url || a.sha256 !== s.sha256 || a.size !== s.size || a.file !== s.file) probs.push(['model', k, 'lineupArgs']); }
@@ -156,7 +157,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
     for (const dv in ING_LINEUP.devices) { const d = ING_LINEUP.devices[dv]; for (const t in d.tiers) [].concat(d.tiers[t]).forEach(k => { if (!M[k]) probs.push(['list', dv + ' ' + t, k]); });
       for (const t in (d.cpuOnly || {})) [].concat(d.cpuOnly[t]).forEach(k => { if (!M[k]) probs.push(['cpuOnly', dv + ' ' + t, k]); }); }
     return { n, nq: Object.keys(T).length, probs, keys: Object.keys(M) }; });
-  ok(data.n === 26 && data.probs.length === 0, data.n + ' models in the lineup (18 before, 5 new, 3 copies) and ' + data.nq + ' with a table of qualities: each has a file, a size, a SHA-256 and a Hugging Face address that ends in its file; every house list names a model that exists', data.probs.slice(0, 5));
+  ok(data.n === 47 && data.probs.length === 0, data.n + ' models in the lineup (18 before, 5 new, 3 copies; since 6.10.2 seventeen more for larger computers, whose files may sit in a folder of their repository; since 6.10.3 four further choices) and ' + data.nq + ' with a table of qualities: each has a file, a size, a SHA-256 and a Hugging Face address that ends in its file; every house list names a model that exists', data.probs.slice(0, 5));
   ok(['minicpm5-2b', 'qwen3.8-27b', 'qwen3.6-35b-a3b', 'gemma-4-31b', 'granite-4.2-8b', 'granite-4.2-8b-compact', 'qwen3.5-9b-compact', 'qwen3.8-27b-best'].every(k => data.keys.includes(k)), 'the new models and their copies are there', data.keys);
   const flags = await p.evaluate(() => { const M = ING_LINEUP.models, T = IngQuality.table; return { think: ['minicpm5-2b', 'qwen3.8-27b', 'qwen3.6-35b-a3b', 'gemma-4-31b', 'granite-4.2-8b', 'granite-4.2-3b'].map(k => M[k].thinks),
       compact: ['qwen3.5-9b', 'granite-4.2-8b'].map(k => !!(T[k] && T[k].Q3_K_M)), best: !!T['qwen3.8-27b'].Q8_0, noLector: !JSON.stringify(M).includes('Lector') }; });
@@ -173,7 +174,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
     o.gr3 = get('gr3', 'granite-4.2-3b-Q4_K_M.gguf', 3, true); o.gr8 = get('gr8', 'granite-4.2-8b-Q3_K_M.gguf', 3, false);
     o.q36 = [get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, true), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, false), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, true, 'faber'), get('q36', 'Qwen3.6-35B-A3B-UD-Q4_K_M.gguf', 3, false, 'faber')];
     o.q38 = [get('q38', 'Qwen3.8-27B-Q4_K_M.gguf', 3, true), get('q38', 'Qwen3.8-27B-Q8_0.gguf', 3, false), get('q38', 'Qwen3.8-27B-Q4_K_M.gguf', 3, true, 'faber')];
-    o.g31 = get('g31', 'gemma-4-31B_q4_0-it.gguf', 3, true); o.q35 = get('q35', 'Qwen3.5-9B-Q4_K_M.gguf', 3, true); o.cold = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 5, true); o.hot = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 1, true);
+    o.g31 = get('g31', 'gemma-4-31B_q4_0-it.gguf', 3, true); o.q35 = get('q35', 'Qwen3.5-9B-Q4_K_M.gguf', 3, true); o.cold = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 5, true); o.hot = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 1, true); o.mini3 = get('mini', 'MiniCPM5-2B-Q4_K_M.gguf', 3, true);
     window.activeTierFor = keep; return o; });
   const pick = (o, ks) => Object.fromEntries(ks.map(k => [k, o[k]]));
   const eq = (o, w) => Object.keys(w).every(k => o[k] === w[k]);
@@ -183,7 +184,9 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   ok(S.q36[2].family === 'qwen3.6-code' && eq(S.q36[2], { temperature: 0.6, top_p: 0.95, top_k: 20, min_p: 0, presence_penalty: 0 }) && eq(S.q36[3], { temperature: 0.7, top_p: 0.8, presence_penalty: 0 }), 'under Faber Qwen3.6 thinks with the card\'s set for precise coding (temperature 0.6, no presence penalty); with thinking off, the plain set', S.q36.slice(2));
   ok(S.q38[0].family === 'qwen3.8' && eq(S.q38[0], { temperature: 1, top_p: 0.95, top_k: 20, min_p: 0, presence_penalty: 0 }) && S.q38[1].family === 'qwen3.8' && eq(S.q38[1], { temperature: 0.7, top_p: 0.8, top_k: 20, min_p: 0, presence_penalty: 1.5 }) && eq(S.q38[2], { temperature: 1, top_p: 0.95, presence_penalty: 0 }), 'Qwen3.8 27B (the Best file too): the card\'s thinking set (1.0, 0.95, top-k 20, presence 0) and plain set (0.7, 0.8, top-k 20, presence 1.5)', S.q38);
   ok(S.g31.family === 'gemma4' && eq(S.g31, { temperature: 1, top_k: 64, top_p: 0.95 }) && S.q35.family === 'qwen3.5', 'Gemma 4 31B uses the Gemma 4 settings of its card (1.0, top-k 64, 0.95); the families that were there are as they were', [S.g31, S.q35]);
-  ok(S.cold.temperature === 0.45 && S.hot.temperature === 1.2, 'the effort setting still moves the temperature (a new family follows it too)', [S.cold.temperature, S.hot.temperature]);
+  /* 6.11: effort sets how much a model thinks, how long it writes and how many steps it takes; it no longer moves the sampling, which
+     stays at the maker's settings at every level (Max and Low give MiniCPM5 2B the same temperature as its card) */
+  ok(S.cold.temperature === S.hot.temperature && S.cold.temperature === S.mini3.temperature, 'effort leaves the maker\'s temperature as it is, at Max and at Low (6.11)', [S.cold.temperature, S.hot.temperature, S.mini3.temperature]);
   const plumbing = await p.evaluate(() => { const t = [...document.scripts].map(s => s.textContent || ''); return { sends: t.some(x => x.includes('if(p.thinking!=null)body.chat_template_kwargs={enable_thinking:!!p.thinking};')), key: (() => { state.thinking = false; const off = thinkOn(); state.thinking = true; const on = thinkOn(); return [off, on]; })() }; });
   ok(plumbing.sends && plumbing.key[0] === false && plumbing.key[1] === true, 'the Thinking key reaches every model\'s chat template as enable_thinking (Qwen3.8, Qwen3.6, Granite 4.2 and Gemma 4 take it, their cards say), and switches the sampling set with it', plumbing);
 
@@ -225,7 +228,7 @@ const KNOWN = {"qwen3.8-27b":{"Q4_K_M":18973870528,"Q5_K_M":19771509664,"Q8_0":2
   const l16 = await lend('mac-arm', 16), l16w = await lend('desktop', 16), l64 = await lend('mac-arm', 64), l8 = await lend('mac-arm', 8), lph = await lend('ios', 8);
   const plain = s => s && /^(Scriba|Magister|Faber) cannot get stronger on this computer: its memory is the limit\. A computer with more memory can lend a stronger model over your home Wi-Fi: Settings, Your models on every device\.$/.test(s);
   ok(['scriba', 'magister', 'faber'].every(t => plain(l16[t]) && plain(l16w[t])) && l16.velox === null, 'a 16 GB Mac and a 16 GB Windows laptop: Scriba, Magister and Faber each say in one plain line that they cannot get stronger for lack of memory, and where a larger computer\'s models can be borrowed', [l16, l16w]);
-  ok(['scriba', 'magister', 'faber'].every(t => l64[t] === null) && ['scriba', 'magister', 'faber'].every(t => plain(l8[t])) && Object.values(lph).every(v => v === null), 'no line on a Mac with 64 GB (nothing stronger is left out); a line for each house on an 8 GB computer; none on a phone (its note speaks of lending already)', [l64, l8, lph]);
+  ok(['scriba', 'magister', 'faber'].every(t => plain(l64[t])) && ['scriba', 'magister', 'faber'].every(t => plain(l8[t])) && Object.values(lph).every(v => v === null), 'since 6.10.2 a Mac with 64 GB is no longer the top: each house says a computer with more memory has a stronger model (as on an 8 GB computer); none on a phone (its note speaks of lending already)', [l64, l8, lph]);
   await p.screenshot({ path: OUT + '/lineup_16gb.png' }).catch(() => {});
   ok(await p.evaluate(() => Object.values(window.__ingParts || {}).every(v => v === 'running') && window.__ingParts.p203 === 'running'), 'every part of the page ran to its end, r203 too');
   ok(errs.length === 0, 'no script errors on the page', errs);

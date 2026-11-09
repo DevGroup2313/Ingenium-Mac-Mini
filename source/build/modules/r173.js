@@ -22,11 +22,11 @@
    words of its heading, or in a last room, More, shown only when it holds something. A room with nothing in it (a card
    absent from an edition) hides its tab. Anything that scrolls to, focuses or rings a card in another room opens that room
    first (IngRooms.reveal, and quietly from scrollIntoView, focus, the tour's ring and Help's Show me). */
-#page-settings,#page-models,#page-blend{--rm-pa:#7348be;--rm-pb:#5d37a1;--rm-pedge:#4b2a86;--rm-pledge:#3a2070;
+#page-settings,#page-models,#page-blend,#page-guide{--rm-pa:#7348be;--rm-pb:#5d37a1;--rm-pedge:#4b2a86;--rm-pledge:#3a2070;
   --rm-psh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 8px 14px rgba(52,24,100,.12);
   --rm-well:inset 0 1px 2.5px rgba(40,22,68,.09);--rm-wellbg:rgba(34,26,46,.035);--rm-ring:rgba(106,63,181,.55);--rm-ok:#2a7444;--rm-oks:rgba(45,154,82,.14);
   --rm-focus:var(--accent,#6a3fb5);--rm-flash:rgba(106,63,181,.42)}
-body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,body[data-theme="night"] #page-blend{--rm-pa:#7a56c8;--rm-pb:#5b3aa1;--rm-pedge:#2c1956;--rm-pledge:#170b30;
+body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,body[data-theme="night"] #page-blend,body[data-theme="night"] #page-guide{--rm-pa:#7a56c8;--rm-pb:#5b3aa1;--rm-pedge:#2c1956;--rm-pledge:#170b30;
   --rm-psh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
   --rm-well:inset 0 1px 3px rgba(0,0,0,.42);--rm-wellbg:rgba(10,6,18,.35);--rm-ring:rgba(201,178,242,.6);--rm-ok:#8fdcaa;--rm-oks:rgba(92,200,130,.16);
   --rm-focus:var(--accent-bright,#c9b2f2);--rm-flash:rgba(201,178,242,.4)}
@@ -35,12 +35,13 @@ body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,bo
 .rm-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;min-width:0}
 .rm-tabs{display:flex;flex-wrap:wrap;gap:8px;min-width:0;flex:1 1 auto}
 .rm-tabs[hidden]{display:none !important}
-.rm-tab{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;margin:0;padding:8px 16px 8px 12px;border-radius:12px;border:1px solid var(--hairline);
-  background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-2);font:600 13.5px/1.25 var(--sans);letter-spacing:.005em;
+/* 6.38 (her note, 6 November 2026: "I want the fonts and sizes of the newly added pages and sections of Ingenium to match the rest of the app ... I don't want big bulky texts or buttons"): the tabs at the height and lettering of the app's keys (.btn: 13px, about 34px high) */
+.rm-tab{position:relative;display:inline-flex;align-items:center;gap:7px;min-height:35px;margin:0;padding:7px 14px 7px 11px;border-radius:11px;border:1px solid var(--hairline);
+  background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-2);font:600 13px/1.25 var(--sans);letter-spacing:.005em;
   cursor:pointer;text-align:left;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
   transition:transform .16s var(--spring),box-shadow .16s ease,color .15s ease,border-color .15s ease}
 .rm-tab[hidden]{display:none !important}
-.rm-tab svg{flex:0 0 auto;width:17px;height:17px;color:var(--accent)}
+.rm-tab svg{flex:0 0 auto;width:16px;height:16px;color:var(--accent)}
 .rm-tab.rm-star svg{color:var(--gold-ink,var(--accent))}
 .rm-tab:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,var(--pop));color:var(--ink-1)}
 .rm-tab:active{transform:translateY(1px);transition-duration:.06s}
@@ -49,7 +50,7 @@ body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,bo
 .rm-tab:focus-visible,.rm-key:focus-visible,.rm-allkey:focus-visible,.rm-step:focus-visible,.rm-fold:focus-visible{outline:2.5px solid var(--rm-focus);outline-offset:3px}
 .rm-says{margin:10px 2px 0;font-size:13.5px;line-height:1.5;color:var(--ink-2);max-width:72ch}
 .rm-says[hidden]{display:none !important}
-.rm-allkey,.rm-key{display:inline-flex;align-items:center;gap:7px;min-height:38px;margin:0;padding:7px 14px 7px 11px;border-radius:12px;border:1px solid var(--hairline);
+.rm-allkey,.rm-key{display:inline-flex;align-items:center;gap:7px;min-height:35px;margin:0;padding:7px 14px 7px 11px;border-radius:11px;border:1px solid var(--hairline);
   background:linear-gradient(180deg,var(--card-hi),var(--card-lo));box-shadow:var(--pop);color:var(--ink-1);font:600 13px/1.2 var(--sans);cursor:pointer;
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .16s var(--spring),box-shadow .16s ease}
 .rm-allkey{margin-left:auto;font-weight:500;color:var(--ink-2)}
@@ -61,8 +62,8 @@ body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,bo
 .rm-panel[hidden]{display:none !important}
 .rm-panel > *{scroll-margin-top:84px}
 .rm-roomh{display:none}
-#page-settings.rm-all .rm-roomh{display:flex;align-items:center;gap:9px;margin:30px 2px 12px;padding-bottom:8px;border-bottom:1px solid var(--hairline);font:600 16px/1.3 var(--serif);color:var(--ink-1)}
-#page-settings.rm-all .rm-panel:first-of-type .rm-roomh{margin-top:6px}
+#page-settings.rm-all .rm-roomh,#page-guide.rm-all .rm-roomh{display:flex;align-items:center;gap:9px;margin:30px 2px 12px;padding-bottom:8px;border-bottom:1px solid var(--hairline);font:600 16px/1.3 var(--serif);color:var(--ink-1)}
+#page-settings.rm-all .rm-panel:first-of-type .rm-roomh,#page-guide.rm-all .rm-panel:first-of-type .rm-roomh{margin-top:6px}
 .rm-roomh svg{width:18px;height:18px;color:var(--accent)}
 body:not([data-motion="minimal"]) .rm-panel.rm-in{animation:rmIn .26s var(--spring) both}
 @keyframes rmIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -183,9 +184,11 @@ var IC={
   ai:svg('<path d="M10.5 3.5l1.6 4.6 4.6 1.6-4.6 1.6-1.6 4.6-1.6-4.6-4.6-1.6 4.6-1.6z"/><path d="M17.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/>'),
   data:svg('<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/>'),
   own:svg('<circle cx="8" cy="15.5" r="4"/><path d="M11 12.5l8.5-8.5M16.2 7.3l2.4 2.4M13.8 9.7l1.8 1.8"/>'),
+  author:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
   yours:svg('<path d="M12 3.5l8.5 4.3-8.5 4.3-8.5-4.3z"/><path d="M3.5 12.2l8.5 4.3 8.5-4.3"/><path d="M3.5 16.4l8.5 4.3 8.5-4.3"/>'),
   get:svg('<path d="M4 10.8L12 4.3l8 6.5V20H4z"/><path d="M12 9.8v6.4M9.4 13.7l2.6 2.6 2.6-2.6"/>'),
+  newer:svg('<path d="M11 5.5v9M7.4 11.1l3.6 3.6 3.6-3.6"/><path d="M4.5 18.5h13"/><path d="M18.3 3.4l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
   cat:svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>'),
   studio:svg(STAR),
   engine:svg('<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M5.5 18.5l1.8-1.8M16.7 7.3l1.8-1.8"/>'),
@@ -194,30 +197,51 @@ var IC={
   houses:svg('<path d="M4 11.2L12 4.6l8 6.6"/><path d="M6 9.6V20h12V9.6"/><path d="M10 20v-5h4v5"/>'),
   earlier:svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
   find:svg('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>'),
+  start:svg('<circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2z"/>'),
+  chat:svg('<path d="M4.5 6.5A2 2 0 0 1 6.5 4.5h11a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H11l-4.5 3.5V16H6.5a2 2 0 0 1-2-2z"/><path d="M9.5 9.2l-1.7 1.6 1.7 1.6M14.5 9.2l1.7 1.6-1.7 1.6"/>'),
+  making:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
+  around:svg('<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M15.5 4v16M17.8 8h.4M17.8 12h.4M17.8 16h.4"/>'),
   rows:svg('<path d="M4 6h16M4 12h16M4 18h16"/>')};
 var CHEV='<i aria-hidden="true">'+svg('<path d="M6 9l6 6 6-6"/>')+'</i>';
 
 /* ---------- the rooms of each page ---------- */
 var CONF={
   settings:{label:"Settings, in rooms",find:true,all:true,rooms:[
-    {k:"everyday",t:"Everyday",i:"day",says:"Everyday things: the app's name, day or night, sound, and help. A refresh key is here too, for when the app glitches.",
+    {k:"everyday",t:"Everyday",i:"day",says:"Everyday things: day or night, sound, and help. A refresh key is here too, for when the app glitches.",
       ids:["ing-refresh-card",/^name$/,/^look and feel/,"ingSoundCard",/^sounds?\b/,"ihSetCard"]},
     {k:"calm",t:"Calm and focus",i:"calm",says:"Support for focus, time and a calmer screen. One group opens at a time.",ids:["supCard"]},
-    {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search and Ingenium's eyes are here too.",
-      ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ragCard"]},
+    {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search, Ingenium's eyes and its ears (dictation) are here too.",
+      ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ingEarsCard","ragCard","awakeCard"]},
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
-      ids:["ingImportCard","bkCard","ingLockCard","stxCard",/^data on this device/]},
-    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]}],
+      ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
+    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
+    /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
+    {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
+      when:function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}}}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
       [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
   models:{label:"Models, in rooms",rooms:[
     {k:"yours",t:"Your models",i:"yours",says:"The models on this device and how well they run. Add a model file you already have.",ids:["healthBox","yourModelsCard","mdPlaceCard",/^add a model/]},
     {k:"get",t:"Ingenium's models",i:"get",says:"Ingenium's own models, in four houses. Choose a size and get one.",ids:["lineupCard",/^the four houses/]},
+    /* 6.35: newer models, found online when she presses Check (modules/r217.js), in a room of their own, so they can be seen */
+    {k:"newer",t:"Newer models",i:"newer",says:"Models newer than Ingenium's own, looked for online only when you press Check: each with its size, its fingerprint and whether this device can run it.",ids:["foundCard"]},
     {k:"catalogue",t:"More models",i:"cat",says:"A wider choice of strong, open models. They are sorted by what fits this device.",ids:["catBox"]},
     {k:"studio",t:"Studio",i:"studio",star:true,says:"The Studio: make and train your own models. Give a model its own name and instructions, or convert a model's file.",
       ids:["trainCard","aiCard","convCard"]},
     {k:"engine",t:"Engine",i:"engine",says:"The engine that runs your models on this device.",ids:[/^the engine/]}],
-    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
+    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/newer|found online/,"newer"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
+  /* 6.26: the Guide in rooms (modules/r230.js folds each topic into a tile and puts What is new in a key) */
+  guide:{label:"The Guide, in rooms",find:true,all:true,findLabel:"Find in the guide",findHint:"effort, connectors, lend",found:["topic","topics"],
+    allLabels:["Show the whole guide at once","Show the guide in rooms","For those who prefer one long page","Back to one room at a time"],rooms:[
+    {k:"start",t:"Start here",i:"start",says:"The guided tour, what Ingenium is, and its honest limits.",ids:["guideTourCard",/^what ingenium is/,/^honest limits/]},
+    {k:"chatcode",t:"Chat and Code",i:"chat",says:"Talking with models and building apps with them: effort and Ultracode, connectors, a session's environment, and GitHub.",
+      ids:["guideEffortCard","cnGuide","envGuide","ghxGuide"]},
+    {k:"models",t:"Models and devices",i:"yours",says:"Your models and the engines that run them, how much each device carries, and Ingenium on every device.",
+      ids:["mdGuide",/^how much model/,/^ingenium as an app/]},
+    {k:"making",t:"Making and study",i:"making",says:function(){return "Blend, Folders, "+($("page-career")?"the Career Studio, ":"")+"and Focus, the support that fits how you work.";},ids:["blxGuide","fdGuide","csGuide",/^focus/]},
+    {k:"around",t:"Around the app",i:"around",says:function(){return "The right rail and the instruments"+(W.IngWorkshop?", and your Author Studio.":".");},ids:[/^the right rail/,/^the instruments/,"wsGuide"]}],
+    words:[[/tour|what ingenium|limit/,"start"],[/chat|code|effort|ultracode|connector|environment|github/,"chatcode"],[/model|engine|device|lend/,"models"],
+      [/blend|folder|career|focus|fabrica|build|study/,"making"],[/rail|instrument|author|workshop|setting/,"around"]]},
   blend:{label:"Blend, in rooms",view:true,rooms:[
     {k:"new",t:"New blend",i:"fresh",says:"Make a blend in four steps: choose the models, choose how they work together, ask, then read the answers."},
     {k:"ready",t:"Ready-made",i:"ready",says:"Blends ready to use. One press sets the models and how they work together."},
@@ -228,8 +252,26 @@ var STEPS=[{t:"Choose",next:"Next: how they work together"},{t:"Combine",next:"N
 /* the words a person might use for each setting, besides the words on the card */
 var KEYS=[
   ["ing-refresh-card","refresh reload restart glitch glitches frozen stuck stops answering start again"],
+  ["wsStudio","author studio workshop check diagnostics troubleshoot errors bug fix layers pages sections scripts styles hide your page edit ingenium rename name app name title called"],
+  /* 6.26: the Guide's topics */
+  ["guideTourCard","tour guided walk chapters start begin learn how to"],
+  [/^what ingenium is/,"about what is ingenium offline local private studio models add install"],
+  [/^honest limits/,"limits limit quality speed slow honest small models battery"],
+  ["guideEffortCard","effort ultracode thinking think low medium high extra max auto"],
+  ["cnGuide","connectors connector mcp tools plug services outside"],
+  ["envGuide","environment network secrets keys setup script variables preview"],
+  ["ghxGuide","github repository repositories repo branch pull request push commit"],
+  ["mdGuide","models newer engine engines download update lineup online"],
+  [/^how much model/,"memory ram size device tablet phone lend lending share sharing bigger computer borrow"],
+  [/^ingenium as an app/,"install installer app apps mac windows fire android iphone ipad kit kits build number version update"],
+  ["blxGuide","blend blending several models one answer judge"],
+  ["fdGuide","folders folder apps projects bring in import claude ollama github repository readme issues"],
+  ["csGuide","career studio jobs job applications application cv resume cover letter phd grant"],
+  [/^focus/,"focus support adhd autism autistic calm routines time steps"],
+  [/^the right rail/,"rail notes notepad hourglass timer side buttons"],
+  [/^the instruments/,"instruments schedae clepsydra notes timer custodia"],
+  ["wsGuide","author studio workshop check errors layers fix troubleshoot rename name app name title called"],
   ["mdPlaceCard","drive drives external hard disk usb ssd storage folder where kept move space room free"],
-  [/^name$/,"name app name title called rename"],
   [/^look and feel/,"look theme dark night day light mode colour color colours appearance motion animation movement"],
   ["ingSoundCard","sound sounds audio volume chime click clicks quiet mute noise"],
   ["ihSetCard","help tour guided level beginner expert guide tips explain"],
@@ -238,10 +280,13 @@ var KEYS=[
   [/^connect a cloud/,"cloud server online remote api key token address connect connection"],
   [/^web search/,"web search internet online sources scholar academic peer reviewed"],
   ["linkCard","devices phone tablet computer share sharing every device link"],
+  ["awakeCard","awake sleep screen keep on wake lock background working tablet phone fire lending borrowing"],
   ["ingEyesCard","eyes pictures picture images photos vision see"],
+  ["ingEarsCard","dictation dictate microphone mic speech voice speak talk ears scriba whisper moonshine transcribe language french creole offline"],
   ["ragCard","folders folder papers documents files read reading search look up find chat context passages add remove desktop"],
   ["ingImportCard","import chats bring conversations other assistants transcript history"],
   ["bkCard","backup back up export import restore move moving copy zip file password keys new device carry"],
+  ["cloudCard","cloud sync synchronise synchronize devices every device hub mac mini wifi wi-fi hotspot same work passphrase sealed real time"],
   ["stxCard","storage space room disk quota limit clean clear library memory full"],
   ["ingLockCard","sign in sign-in login log in user name password lock locked unlock encryption encrypt encrypted protect protection privacy private secure security recovery phrase seal sealed"],
   [/^data on this device/,"data export import reset erase delete wipe recover earlier moment backup"],
@@ -259,6 +304,8 @@ var oSIV=Element.prototype.scrollIntoView,oFocus=HTMLElement.prototype.focus;
 function scrollTo_(el,block){try{oSIV.call(el,{block:block||"start",behavior:lively()?"smooth":"auto"});}catch(e){try{oSIV.call(el);}catch(_){}}}
 function focusQuiet(el){try{oFocus.call(el,{preventScroll:true});}catch(e){}}
 function activePage(){var s=D.querySelector(".section.active");return s&&s.id?s.id.replace(/^page-/,""):"";}
+/* 6.26: a room's line may depend on what this copy carries (a function, read each time it is shown) */
+function sayOf(rm){try{return typeof rm.says==="function"?String(rm.says()):String(rm.says||"");}catch(e){return "";}}
 function roomDef(R,k){for(var i=0;i<R.rooms.length;i++)if(R.rooms[i].k===k)return R.rooms[i];return null;}
 function first(R){for(var i=0;i<R.rooms.length;i++){var t=R.tabs[R.rooms[i].k];if(t&&!t.hidden)return R.rooms[i].k;}return null;}
 function pick(R){var k=pref(R.pk).room;return k&&R.tabs[k]&&!R.tabs[k].hidden?k:first(R);}
@@ -292,6 +339,7 @@ var NT=0;function nudge(R){if(!R.sec.classList.contains("active"))return;cancelA
 /* the rooms' own parts (a card lit for a moment, class rm-flash, is still a card) */
 var MINE=/(^|\s)rm-(bar|panel|hint|roomh|steps|stepnav)(\s|$)/;
 function isCard(e){if(!e||e.nodeType!==1)return false;if(/^(H1|STYLE|SCRIPT|TEMPLATE|LINK|META|INPUT|NOSCRIPT)$/.test(e.tagName))return false;
+  if(e.hasAttribute("data-rm-skip"))return false;  /* 6.26: a part of the page that is not a card (the Guide's What's new key) */
   var c=typeof e.className==="string"?e.className:"";if(MINE.test(c))return false;
   if(e.classList.contains("page-title")||e.classList.contains("lede"))return false;
   return e.classList.contains("card")||!!e.querySelector("h2,h3");}
@@ -321,7 +369,7 @@ function show(R,k,o){o=o||{};if(!k||!R.tabs[k]||R.tabs[k].hidden)k=first(R);if(!
   R.rooms.forEach(function(rm){var on=rm.k===k,t=R.tabs[rm.k];t.setAttribute("aria-selected",on?"true":"false");t.tabIndex=on?0:-1;
     if(!R.view){var p=R.panels[rm.k],vis=R.all?!t.hidden:on;if(p.hidden===vis)p.hidden=!vis;
       if(on&&!R.all&&was&&was!==k&&lively()){p.classList.remove("rm-in");void p.offsetWidth;p.classList.add("rm-in");}}});
-  var rm=roomDef(R,k);if(rm&&R.says.textContent!==rm.says)R.says.textContent=rm.says;
+  var rm=roomDef(R,k),sy=rm?sayOf(rm):"";if(rm&&R.says.textContent!==sy)R.says.textContent=sy;
   if(R.view)blendShow(R,k);
   if(o.keep){pref(R.pk).room=k;keep();}
   if(o.focus){try{R.tabs[k].focus();}catch(e){}}
@@ -335,7 +383,7 @@ function makeBar(R){var pk=R.pk,c=R.c,bar=mk("div","rm-bar");bar.id="rmBar-"+pk;
   var row=mk("div","rm-row"),tl=att(mk("div","rm-tabs"),{role:"tablist","aria-label":c.label});tl.id="rmTabs-"+pk;R.tl=tl;
   var says=att(mk("p","rm-says"),{id:"rmSays-"+pk,"aria-live":"polite"});R.says=says;
   R.rooms.forEach(function(rm){var t=att(mk("button","rm-tab"+(rm.star?" rm-star":"")),{type:"button",role:"tab",id:"rmT-"+pk+"-"+rm.k,"aria-selected":"false","data-room":rm.k});
-    t.tabIndex=-1;t.innerHTML=IC[rm.i]||"";t.appendChild(mk("span",null,rm.t));t.title=rm.says;
+    t.tabIndex=-1;t.innerHTML=IC[rm.i]||"";t.appendChild(mk("span",null,rm.t));t.title=sayOf(rm);
     t.addEventListener("click",function(){show(R,rm.k,{keep:true});});tl.appendChild(t);R.tabs[rm.k]=t;});
   tl.addEventListener("keydown",function(e){tabKeys(R,e);});
   row.appendChild(tl);
@@ -347,7 +395,8 @@ function afterLede(sec,el){var at=null,l=sec.querySelector(":scope > .lede")||se
 
 /* ---------- Settings and Models: the cards moved into their rooms ---------- */
 function buildMove(pk){var sec=$("page-"+pk);if(!sec)return null;if(sec.__rm)return sec.__rm;
-  var c=CONF[pk],R={pk:pk,c:c,sec:sec,tabs:{},panels:{},heads:{},rooms:c.rooms.concat([MORE]),cur:null,all:false,view:false};sec.__rm=R;P[pk]=R;
+  /* 6.27: a room an edition does not have (when) is not made at all */
+  var c=CONF[pk],R={pk:pk,c:c,sec:sec,tabs:{},panels:{},heads:{},rooms:c.rooms.filter(function(rm){try{return !rm.when||rm.when();}catch(e){return true;}}).concat([MORE]),cur:null,all:false,view:false};sec.__rm=R;P[pk]=R;
   if(pk==="models")studioHint(R);
   var bar=makeBar(R);afterLede(sec,bar);R.bar=bar;
   var ref=bar.nextSibling;
@@ -364,8 +413,8 @@ function buildMove(pk){var sec=$("page-"+pk);if(!sec)return null;if(sec.__rm)ret
   try{var mo=new MutationObserver(soon);mo.observe(sec,{childList:true});R.rooms.forEach(function(rm){mo.observe(R.panels[rm.k],{childList:true});});}catch(e){}
   return R;}
 function setAll(R,on,remember){R.all=!!on;R.sec.classList.toggle("rm-all",R.all);R.tl.hidden=R.all;R.says.hidden=R.all;
-  if(R.ak){R.ak.querySelector("span").textContent=R.all?"Show the settings in rooms":"Show every setting at once";
-    R.ak.title=R.all?"Back to one room at a time":"For those who prefer one long page";}
+  if(R.ak){var al=R.c.allLabels||["Show every setting at once","Show the settings in rooms","For those who prefer one long page","Back to one room at a time"];
+    R.ak.querySelector("span").textContent=R.all?al[1]:al[0];R.ak.title=R.all?al[3]:al[2];}
   R.rooms.forEach(function(rm){var p=R.panels[rm.k];
     if(R.all){p.setAttribute("role","region");p.setAttribute("aria-labelledby",R.heads[rm.k].id);p.removeAttribute("aria-describedby");}
     else{p.setAttribute("role","tabpanel");p.setAttribute("aria-labelledby",R.tabs[rm.k].id);p.setAttribute("aria-describedby",R.says.id);}});
@@ -378,13 +427,13 @@ function studioHint(R){var sec=R.sec,l=sec.querySelector(":scope > .lede");if(!l
   h.appendChild(k);l.parentNode.insertBefore(h,l.nextSibling);}
 
 /* ---------- Find a setting ---------- */
-function findBox(R){var w=att(mk("div","rm-find"),{role:"search"});
-  var lab=att(mk("label","rm-find-lab","Find a setting"),{"for":"rmFind"});w.appendChild(lab);
+function findBox(R){var w=att(mk("div","rm-find"),{role:"search"}),sx=R.pk==="settings"?"":"-"+R.pk;
+  var lab=att(mk("label","rm-find-lab",R.c.findLabel||"Find a setting"),{"for":"rmFind"+sx});w.appendChild(lab);
   var box=mk("div","rm-find-box");box.innerHTML=IC.find;
-  var inp=att(mk("input"),{type:"search",id:"rmFind",autocomplete:"off",spellcheck:"false",placeholder:"backup, theme, sound","aria-controls":"rmFindOut","enterkeyhint":"search"});
+  var inp=att(mk("input"),{type:"search",id:"rmFind"+sx,autocomplete:"off",spellcheck:"false",placeholder:R.c.findHint||"backup, theme, sound","aria-controls":"rmFindOut"+sx,"enterkeyhint":"search"});
   box.appendChild(inp);w.appendChild(box);
-  var say=att(mk("p","rm-sr"),{id:"rmFindSay",role:"status","aria-live":"polite"});w.appendChild(say);
-  var out=mk("div","rm-out");out.id="rmFindOut";out.hidden=true;var list=att(mk("ul","rm-hits"),{"aria-label":"Settings found"});out.appendChild(list);w.appendChild(out);
+  var say=att(mk("p","rm-sr"),{id:"rmFindSay"+sx,role:"status","aria-live":"polite"});w.appendChild(say);
+  var out=mk("div","rm-out");out.id="rmFindOut"+sx;out.hidden=true;var list=att(mk("ul","rm-hits"),{"aria-label":R.pk==="settings"?"Settings found":"Found in "+R.pk});out.appendChild(list);w.appendChild(out);
   var F=R.find={inp:inp,say:say,out:out,list:list,hits:[]};var T=0;
   inp.addEventListener("input",function(){clearTimeout(T);T=setTimeout(function(){paintHits(R,inp.value);},110);});
   inp.addEventListener("keydown",function(e){if(e.key==="ArrowDown"){var b=list.querySelector(".rm-hit");if(b){e.preventDefault();b.focus();}}
@@ -423,11 +472,11 @@ function paintHits(R,q){var F=R.find;F.list.innerHTML="";q=clean(q);var hs=q?sea
       else if(e.key==="ArrowUp"){e.preventDefault();if(j>0)bs[j-1].focus();else F.inp.focus();}
       else if(e.key==="Escape"){e.preventDefault();F.out.hidden=true;F.inp.focus();}});
     li.appendChild(b);F.list.appendChild(li);});
-  F.say.textContent=hs.length===1?"One setting found.":hs.length+" settings found.";}
+  var fw=R.c.found||["setting","settings"];F.say.textContent=hs.length===1?"One "+fw[0]+" found.":hs.length+" "+fw[1]+" found.";}
 function goHit(R,h){var F=R.find;if(F)F.out.hidden=true;
   if(!R.all)show(R,h.room,{keep:true});openFolds(h.el,true);
   var tgt=h.head?h.card:h.el;scrollTo_(tgt,h.head?"start":"center");flash(tgt);
-  var f=h.card.querySelector("h2,h3")||headEl(h.card);if(f){if(!f.hasAttribute("tabindex"))f.setAttribute("tabindex","-1");f.classList.add("rm-q");focusQuiet(f);}
+  var f=h.card.querySelector(":scope > .gd-head")||h.card.querySelector("h2,h3")||headEl(h.card);if(f){if(!f.hasAttribute("tabindex"))f.setAttribute("tabindex","-1");f.classList.add("rm-q");focusQuiet(f);}
   if(F)F.say.textContent=h.title+", in "+h.roomName+".";}
 var FT=null,FL=null;function flash(el){if(!el)return;if(FL)FL.classList.remove("rm-flash");clearTimeout(FT);el.classList.add("rm-flash");FL=el;
   FT=setTimeout(function(){el.classList.remove("rm-flash");FL=null;},2600);}
@@ -442,7 +491,7 @@ function foldSup(){var rows=$("supRows");if(!rows)return;var gs=[].filter.call(r
       b.addEventListener("click",function(){var opening=g.classList.contains("rm-shut");pref("settings").sup=opening?gtitle(g):"";keep();foldSup();});}
     var on=gtitle(g)===want;if(g.classList.contains("rm-shut")===on)g.classList.toggle("rm-shut",!on);
     if(b.getAttribute("aria-expanded")!==(on?"true":"false"))b.setAttribute("aria-expanded",on?"true":"false");});}
-function openFolds(el,details){try{var g=el.closest&&el.closest("#supRows .sup-group.rm-shut");if(g){pref("settings").sup=gtitle(g);keep();foldSup();}
+function openFolds(el,details){try{if(typeof W.__rmRevealHook==="function")W.__rmRevealHook(el);}catch(e){}try{var g=el.closest&&el.closest("#supRows .sup-group.rm-shut");if(g){pref("settings").sup=gtitle(g);keep();foldSup();}
   if(details){for(var d=el.closest("details:not([open])");d;d=d.parentElement&&d.parentElement.closest("details:not([open])"))d.open=true;}}catch(e){}}
 function watchSup(){var rows=$("supRows");if(!rows||rows.__rm)return;rows.__rm=1;foldSup();var T=0;
   try{new MutationObserver(function(){if(T)return;T=setTimeout(function(){T=0;foldSup();},0);}).observe(rows,{childList:true});}catch(e){}}
@@ -487,9 +536,12 @@ function stepState(R){var s=R.setup,t=$("blendTask");return [false,s.querySelect
   !!(t&&clean(t.value)),!!D.querySelector("#blendOut .bl-card")];}
 function paintSteps(R){if(!R.stepKeys)return;var st=stepState(R);
   R.stepKeys.forEach(function(b,i){var n=i+1,now=n===R.step,done=st[n]&&!now;
-    if(now)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");b.classList.toggle("rm-done",done);
+    if(now){if(b.getAttribute("aria-current")!=="step")b.setAttribute("aria-current","step");}else if(b.hasAttribute("aria-current"))b.removeAttribute("aria-current");b.classList.toggle("rm-done",done);
     var dn=b.querySelector(".rm-dn");if(dn&&dn.textContent!==(done?", done":""))dn.textContent=done?", done":"";});
-  var N=R.nav;if(!N)return;N.back.hidden=R.step<=1;N.next.hidden=R.step>=3;if(R.step<3)N.next.textContent=STEPS[R.step-1].next;
+  /* 6.52: each part is written only when it changes. Written every time, Back's hidden woke the watcher above (it listens for hidden),
+     which painted the steps again 30 ms later, and so on for ever: about 30 rewrites a second on every page, since Blend is built at start */
+  var N=R.nav;if(!N)return;if(N.back.hidden!==(R.step<=1))N.back.hidden=R.step<=1;if(N.next.hidden!==(R.step>=3))N.next.hidden=R.step>=3;
+  if(R.step<3&&N.next.textContent!==STEPS[R.step-1].next)N.next.textContent=STEPS[R.step-1].next;
   /* (with fewer than two models on the device, the list itself says to add them on the Models page) */
   var few=(W.state&&Array.isArray(W.state.models)?W.state.models.length:2)<2,hn=R.step===1&&!st[1]&&!few?"Choose at least two models to blend.":"";
   if(N.hint.textContent!==hn)N.hint.textContent=hn;}
@@ -504,7 +556,7 @@ function answers(R,how){if(R.cur!=="new"&&R.cur!=="earlier")show(R,"new",{keep:!
 function blendWhere(R,el){if(el.closest("#blPresets"))return {k:"ready"};if(el.closest("#bhBox"))return {k:"houses"};if(el.closest("#blendEarlier"))return {k:"earlier"};
   var s=el.closest("[data-rm-step]");if(s&&s.parentNode===R.setup)return {k:"new",step:+s.getAttribute("data-rm-step")};
   if(el.closest("#blendOut"))return {k:R.cur==="earlier"?"earlier":"new"};return null;}
-function where(el){if(!el||el.nodeType!==1||!el.closest)return null;var sec=el.closest("#page-settings,#page-models,#page-blend");if(!sec||!sec.__rm)return null;var R=sec.__rm,w;
+function where(el){if(!el||el.nodeType!==1||!el.closest)return null;var sec=el.closest("#page-settings,#page-models,#page-blend,#page-guide");if(!sec||!sec.__rm)return null;var R=sec.__rm,w;
   if(R.view)w=blendWhere(R,el);else{var p=el.closest(".rm-panel");w=p&&p.parentNode===sec?{k:p.getAttribute("data-room")}:null;}
   if(w)w.R=R;return w;}
 /* quietly, for scrollIntoView, focus, the tour's ring and Help's Show me: the room opens, and nothing else changes */
@@ -557,11 +609,11 @@ function wrapNote(){var on=W.blPaintNote;if(typeof on!=="function"||on.__r173)re
     return on.apply(this,arguments);};
   nn.__r173=true;W.blPaintNote=nn;}
 
-function boot(){["settings","models","blend"].forEach(build);watchSup();wrapGo();wrapTour();wrapSteps();helpHooks();wrapNote();
+function boot(){["settings","models","blend","guide"].forEach(build);watchSup();wrapGo();wrapTour();wrapSteps();helpHooks();wrapNote();
   var a=activePage();if(CONF[a])arrive(a);}
 try{boot();}catch(e){warn(e);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){try{boot();}catch(e){warn(e);}});
-(function later(){var n=0;(function wait(){if(W.__ingReady===true){try{boot();["settings","models","blend"].forEach(function(pk){var R=P[pk];if(R){if(R.view)shown(R);else fileAll(R);}});}catch(e){warn(e);}return;}
+(function later(){var n=0;(function wait(){if(W.__ingReady===true){try{boot();["settings","models","blend","guide"].forEach(function(pk){var R=P[pk];if(R){if(R.view)shown(R);else fileAll(R);}});}catch(e){warn(e);}return;}
   if(++n<400)setTimeout(wait,500);})();})();
 
 W.IngRooms={version:1,
@@ -572,7 +624,7 @@ W.IngRooms={version:1,
   reveal:function(el,o){return reveal(el,o);},
   roomOf:function(el){var w=where(el);return w?w.k:null;},
   current:function(pk){var R=P[pk];return R?R.cur:null;},
-  rooms:function(pk){var R=P[pk];return R?R.rooms.map(function(rm){return {key:rm.k,name:rm.t,says:rm.says,shown:!R.tabs[rm.k].hidden};}):[];},
+  rooms:function(pk){var R=P[pk];return R?R.rooms.map(function(rm){return {key:rm.k,name:rm.t,says:sayOf(rm),shown:!R.tabs[rm.k].hidden};}):[];},
   cards:function(pk){var R=P[pk];return R?cardsOf(R):[];},
   step:function(n){var R=P.blend;if(!R)return 0;if(n)stepGo(R,n,"api");return R.step;},
   all:function(on){var R=P.settings;if(!R)return false;if(on!=null)setAll(R,!!on,true);return R.all;},

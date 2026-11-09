@@ -272,11 +272,14 @@
       b.querySelector("#clAI").onclick=function(){CL.makeAI().then(function(ai){var c=curChat();c.aiId=ai.id;saveState();try{paintChips();}catch(e){}
         say(ai.name+" is made, with "+ai.examples.length+" examples of how you work and "+ai.files.length+" file"+(ai.files.length===1?"":"s")+", on "+(aiBaseRec(ai)?aiBaseRec(ai).customName:"the model in use")+". It answers in this conversation now; Models, Your AIs holds it.");},function(e){say(String(e&&e.message||e),true);});};
       var tb=b.querySelector("#clTrain");if(tb)tb.onclick=function(){var tm=(state.models||[]).filter(function(m){return m.trained;});
-        var from=null;if(tm.length&&confirm("Train further "+tm[tm.length-1].customName+" (trained here before)? Cancel trains a new small model from zero."))from=tm[tm.length-1].id;
-        CL.train(from).catch(function(e){say(String(e&&e.message||e),true);});};
+        var go=function(from){CL.train(from).catch(function(e){say(String(e&&e.message||e),true);});};
+        if(!tm.length){go(null);return;}
+        /* 6.11.1: a choice of three in Ingenium's own dialog (closing it trains nothing) */
+        ingChoose({title:"Train further "+tm[tm.length-1].customName+"?",text:"It was trained here before. You can train it further, or train a new small model from zero.",
+          choices:[{label:"A new model from zero",value:"new"},{label:"Train it further",value:"more",primary:true}]}).then(function(c){if(c==="more")go(tm[tm.length-1].id);else if(c==="new")go(null);});};
       b.querySelector("#clJsonl").onclick=function(){say("Writing the training data…");CL.jsonl().then(function(t){saveFileNative("claude-history-chat.jsonl","application/jsonl",t);say("Written: one conversation per line, in the chat format (a list of user and assistant messages) that many fine-tuning tools read. Check your tool's own documentation for what it takes.");});};
       b.querySelector("#clText").onclick=function(){CL.plain(64*1024*1024).then(function(t){saveFileNative("claude-history.txt","text/plain",t);});};
-      b.querySelector("#clForget").onclick=function(){if(!confirm("Remove the Claude history from this device? Conversations you opened here, the projects it made and the personal AI stay."))return;CL.forget().then(function(){paintPanel(box);});};
+      b.querySelector("#clForget").onclick=function(){ingConfirm("Remove the Claude history from this device? Conversations you opened here, the projects it made and the personal AI stay.",function(){CL.forget().then(function(){paintPanel(box);});},{danger:true});};
       var q=b.querySelector("#clQ"),L=b.querySelector("#clList");
       function list(){var t=String(q.value||"").toLowerCase().trim(),k=0;L.innerHTML="";
         lst.forEach(function(x){if(t&&String(x.title).toLowerCase().indexOf(t)<0)return;if(++k>300)return;

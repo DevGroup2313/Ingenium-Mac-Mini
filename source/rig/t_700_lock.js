@@ -13,13 +13,14 @@
 //     an hour ago, named only by the sealed desk, is still there after the sweep and opens after the sign-in;
 //   - the lock record lost from the browser's store: the sealed desk carries it in its clear header, so the sign-in still opens;
 //   - Settings: the card is in Your data and Find a setting finds it; the recovery shelf counts what each sealed moment holds;
-//   - the password changed; "Forgot your password?" with the phrase opens and sets a new password;
+//   - the password changed; "Can't sign in?" (6.9.9; "Forgot your password?" before), then the words, opens and sets a new password;
 //   - the lock after time away fires (shortened for the test) and the page comes back to the sign-in;
 //   - protection turned off writes everything back as plain text and removes the lock; the page then behaves as before;
 //   - where the browser offers no cryptography (an insecure address), the door and the card say the lock cannot be turned on
 //     here, and a sealed desk is met with that message, never overwritten;
 //   - "I have neither the password nor the phrase": the page starts again with an empty desk, the sealed one kept aside;
 //   - every part of the page ran to its end, and no script errors on the page.
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 700))); c ? pass++ : fail++; };
@@ -40,8 +41,16 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300)));
   await p.goto(URL_); await waitBoot(p); await p.waitForTimeout(800);
   // 1. the door as before, with the optional third choice
-  const door = await p.evaluate(() => ({ shown: !document.getElementById('introDoor').hasAttribute('hidden'), enter: !!document.getElementById('introEnter'), protect: (document.getElementById('introProtect') || {}).textContent || null, lock: window.IngLock && !window.IngLock.active(), p197: window.__ingParts.p197 }));
-  ok(door.shown && door.enter && /Protect this copy with a sign-in/.test(door.protect || '') && door.lock === true && door.p197 === 'running', 'a fresh profile: the welcome door as before, with the optional "Protect this copy with a sign-in" beside Enter, and no lock set', door);
+  const door = await p.evaluate(() => { const k = document.getElementById('introProtect'), card = document.querySelector('#introDoor .intro-card'), en = document.getElementById('introEnter');
+    const kr = k && k.closest('.intro-lockpill').getBoundingClientRect(), cr = card && card.getBoundingClientRect(), th = document.querySelector('#introDoor .intro-corner:not(.intro-corner-l) .intro-theme'), tr = th && th.getBoundingClientRect();
+    const column = card ? [...card.querySelectorAll('p,button,a,span,div')].filter((x) => !x.closest('.intro-corner') && /sign-in|password/i.test(x.textContent || '')).map((x) => x.textContent.trim().slice(0, 60)) : null;
+    return { shown: !document.getElementById('introDoor').hasAttribute('hidden'), enter: !!en, protect: k ? (k.title + ' | ' + k.getAttribute('aria-label')) : null, text: k ? k.textContent.trim() : null,
+      corner: kr && cr ? { left: Math.round(kr.left - cr.left), top: Math.round(kr.top - cr.top), w: Math.round(kr.width), h: Math.round(kr.height), themeH: tr ? Math.round(tr.height) : null, sameRowAsTheme: tr ? Math.abs(kr.top - tr.top) < 3 && Math.abs(kr.height - tr.height) < 3 : null } : null,
+      column, lock: window.IngLock && !window.IngLock.active(), p197: window.__ingParts.p197 }; });
+  ok(door.shown && door.enter && /Protect this copy with a sign-in/.test(door.protect || '') && door.lock === true && door.p197 === 'running', 'a fresh profile: the welcome door as before, with the optional sign-in offered by a key named "Protect this copy with a sign-in", and no lock set', door);
+  // 6.9.4, her words: "The new sign in prompt section looks a bit cluttered on the introduction door ... find an alternate way of placing it."
+  ok(door.corner && door.corner.left < 40 && door.corner.top < 40 && door.corner.w <= 56 && door.corner.h <= 44 && door.corner.sameRowAsTheme === true && door.text === '' && Array.isArray(door.column) && door.column.length === 0,
+    'the offer is a small lock key in the card\'s top-left corner, the twin of the theme switch (same row, same height), and nothing about a sign-in is left under Enter', door);
   // a long text already on the device, and a theme, before the lock is turned on
   await p.evaluate(async (a) => { const id = IngBig.newId(); window.__t700big = id; state.t700ref = id; state.theme = 'night'; applyTheme(); await IngBig.put(id, a.t); state.t700old = a.oid; await IngBig.put(a.oid, a.o); saveState(); }, { t: BIGTEXT, o: OLDTEXT, oid: OLDID });
   // her notes, a reminder and a parked thought; the page keeps a shared copy of these for a window of its own (R123), in plain text while no lock is set
@@ -138,7 +147,7 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   await signIn(p, PW1); await waitOpen(p);
   ok(await p.evaluate((t) => IngLock.on() && (state.chats || []).some(c => (c.messages || []).some(m => m.text === t)), MSG), 'and the password opens the same desk');
   // 5. change the password (Settings, Your data)
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   const card = await p.evaluate(() => { const c = document.getElementById('ingLockCard'); const room = c.parentNode && c.parentNode.getAttribute('data-room'); return { room, say: document.getElementById('ingLockSay').textContent, keys: [...c.querySelectorAll('button')].map(b => b.textContent), idle: (document.getElementById('ingLockIdle') || {}).value }; });
   const found = await p.evaluate(() => { const r = (window.IngRooms && IngRooms.find('encryption')) || []; const cards = [...document.querySelectorAll('#page-settings .rm-panel[data-room="data"] > *')].map(e => e.id || '').filter(Boolean); return { hits: r.map(h => h.card + '@' + h.room), roomOf: IngRooms.roomOf(document.getElementById('ingLockCard')), cards }; });
   ok(found.hits.indexOf('ingLockCard@data') >= 0 && found.roomOf === 'data', 'Find a setting: "encryption" finds the card, in Your data', found);
@@ -146,7 +155,7 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   const shelf = await p.evaluate(() => [...document.querySelectorAll('#snapList .shelf-card')].map(c => c.textContent.replace(/\s+/g, ' ').slice(0, 220)));
   ok(shelf.length >= 1 && shelf.every(t => !/\b0 conversations, 0 messages/.test(t)) && shelf.some(t => /[1-9]\d* conversations?, [1-9]\d* messages?/.test(t)), 'the recovery shelf opens its sealed moments to count them: conversations and messages, as with the lock off', shelf);
   await p.evaluate(() => { const b = document.getElementById('snapClose'); if (b) b.click(); }); await p.waitForTimeout(300);
-  ok(card.room === 'data' && /On\./.test(card.say) && /Signed in as Yannie/.test(card.say) && card.keys.join('|').includes('Lock now') && card.keys.join('|').includes('Change the password') && card.keys.join('|').includes('Show the recovery phrase') && card.keys.join('|').includes('Turn protection off') && card.idle === '15', 'Settings, Your data: the card in the data room says the lock is on, with Lock now, Change the password, Show the recovery phrase, Turn protection off and the auto-lock choice', card);
+  ok(card.room === 'data' && /On\./.test(card.say) && /Signed in as Yannie/.test(card.say) && card.keys.join('|').includes('Lock now') && card.keys.join('|').includes('Change the password') && card.keys.join('|').includes('Your ways back in') && card.keys.join('|').includes('Turn protection off') && card.idle === '15', 'Settings, Your data: the card in the data room says the lock is on, with Lock now, Change the password, Your ways back in (6.9.9), Turn protection off and the auto-lock choice', card);
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Change the password/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor #ildP1', { timeout: 20000 }); await p.fill('#ildP1', PW2); await p.fill('#ildP2', PW2); await p.click('#ingLockDoor form button[type=submit]');
@@ -154,7 +163,11 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   const rec2 = await p.evaluate(() => JSON.parse(localStorage.getItem('ingenium_lock')));
   ok(rec2.dek.ct !== rec.dek.ct && rec2.kdf.salt !== rec.kdf.salt && rec2.rec.ct === rec.rec.ct && rec2.changed > rec.changed, 'the password changed: only the data key\'s wrap and salt changed; the phrase\'s wrap is the same', { changed: rec2.changed > rec.changed });
   // the recovery phrase shown again, for the password
-  await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Show the recovery phrase/.test(b.textContent)).click());
+  /* 6.9.9: Your ways back in, then the words, then See them */
+  await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Your ways back in/.test(b.textContent)).click());
+  await p.waitForSelector('#ingLockDoor .ild-way', { timeout: 5000 });
+  await p.evaluate(() => [...document.querySelectorAll('#ingLockDoor .ild-way')].find(r => /Your ten recovery words/.test(r.textContent)).querySelector('button').click());
+  await p.waitForSelector('#ingLockDoor #ildSee', { timeout: 5000 }); await p.click('#ingLockDoor #ildSee');
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', PW2); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 20000 });
   const shown = await p.evaluate(() => [...document.querySelectorAll('#ingLockDoor .ild-words div')].map(d => d.textContent.replace(/^\d+/, '').trim()));
@@ -167,7 +180,7 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   await signIn(p, PW2); await waitOpen(p);
   ok(await p.evaluate((t) => (state.chats || []).some(c => (c.messages || []).some(m => m.text === t)), MSG), 'the new password opens the same desk');
   await p.reload(); await waitBoot(p); await p.waitForTimeout(600);
-  await p.click('#ingLockDoor #ildForgot'); await p.waitForSelector('#ingLockDoor #ildPhrase', { timeout: 5000 });
+  await p.click('#ingLockDoor #ildForgot'); await p.waitForSelector('#ingLockDoor #ildWayWords', { timeout: 5000 }); await p.click('#ingLockDoor #ildWayWords'); await p.waitForSelector('#ingLockDoor #ildPhrase', { timeout: 5000 });
   await p.fill('#ildPhrase', 'actor adobe agate agent alarm album alley anchor angle ankle'); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForFunction(() => { const e = document.querySelector('#ingLockDoor .ild-err'); return e && !e.hidden; }, null, { timeout: 20000 });
   ok(await p.evaluate(() => window.__ingLocked === true && /do not open this copy/.test(document.querySelector('#ingLockDoor .ild-err').textContent)), 'ten wrong words are refused, and nothing changed');
@@ -183,7 +196,7 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   await waitBoot(p); await signIn(p, PW3); await waitOpen(p);
   ok(await p.evaluate((t) => (state.chats || []).some(c => (c.messages || []).some(m => m.text === t)), MSG), 'the password set after the phrase opens the desk again after the auto-lock');
   // 8. turn protection off
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Turn protection off/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildPw', { timeout: 5000 }); await p.fill('#ingLockDoor #ildPw', 'wrong-again'); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForFunction(() => { const e = document.querySelector('#ingLockDoor .ild-err'); return e && !e.hidden; }, null, { timeout: 20000 });
@@ -217,12 +230,12 @@ async function waitOpen(p) { await p.waitForFunction(() => window.__ingLocked ==
   await p3.goto(URL_); await waitBoot(p3); await p3.waitForTimeout(800);
   const ins = await p3.evaluate(() => ({ key: !!document.getElementById('introProtect'), note: (document.getElementById('introProtectNote') || {}).textContent || '' }));
   await p3.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); });
-  await p3.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p3.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p3.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p3.waitForSelector('#ingLockCard', { timeout: 10000 });
   const insCard = await p3.evaluate(() => ({ say: document.getElementById('ingLockSay').textContent, keys: [...document.querySelectorAll('#ingLockCard button')].map(b => b.textContent) }));
   await p3.evaluate(() => IngLock.setup()); await p3.waitForTimeout(300);
   const insSetup = await p3.evaluate(() => ({ text: (document.querySelector('#ingLockDoor:not([hidden]) p') || {}).textContent || '', form: !!document.querySelector('#ingLockDoor #ildP1'), rec: localStorage.getItem('ingenium_lock') }));
-  ok(!ins.key && /opened in the Ingenium apps, or at localhost or over https/.test(ins.note) && /Off\./.test(insCard.say) && /cannot be turned on/.test(insCard.say) && insCard.keys.length === 0 && /cannot be turned on/.test(insSetup.text) && !insSetup.form && insSetup.rec === null,
-    'where the browser offers no cryptography: no protect key at the door (a note says where it works), the card says it cannot be turned on here, and asking anyway refuses', { ins, insCard, insSetup });
+  ok(!ins.key && ins.note === '' && /Off\./.test(insCard.say) && /cannot be turned on/.test(insCard.say) && insCard.keys.length === 0 && /cannot be turned on/.test(insSetup.text) && !insSetup.form && insSetup.rec === null,
+    'where the browser offers no cryptography: no protect key and no note on the door (Settings says where it works), the card says it cannot be turned on here, and asking anyway refuses', { ins, insCard, insSetup });
   const seed = (a) => { try { if (a.insecure) Object.defineProperty(window, 'isSecureContext', { get: () => false, configurable: true }); if (!sessionStorage.getItem('__t700seeded')) { localStorage.setItem('ingenium_v4', a.env); localStorage.setItem('ingenium_lock', a.rec); sessionStorage.setItem('__t700seeded', '1'); } } catch (e) {} };
   const ctx4 = await b.newContext({ viewport: { width: 1280, height: 900 } }); await ctx4.addInitScript(seed, { env: sealedEnv, rec: sealedRec, insecure: true });
   const p4 = await ctx4.newPage(); const errs4 = []; p4.on('pageerror', e => errs4.push(e.message.slice(0, 300)));

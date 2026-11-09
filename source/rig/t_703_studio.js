@@ -40,18 +40,19 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(filed.data === 'data' && filed.lab === 'train', 'the datasets card is in Data and the learning workbench in Train', { data: filed.data, lab: filed.lab });
   const one = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!e && e.getBoundingClientRect().height > 0; };
     document.getElementById('stT-make').click(); const a = { cur: IngStudio.current(), ai: vis('aiCard'), train: vis('trainCard'), truth: vis('ingTruthCard') };
-    document.getElementById('stT-train').click(); const t = { cur: IngStudio.current(), ai: vis('aiCard'), train: vis('trainCard'), truth: vis('ingTruthCard'), says: document.getElementById('stSays').textContent };
+    document.getElementById('stT-train').click(); if (window.IngTrain) IngTrain.part('overview'); const t = { cur: IngStudio.current(), ai: vis('aiCard'), truth: vis('ingTruthCard'), says: document.getElementById('stSays').textContent };
+    if (window.IngTrain) IngTrain.part('trainer'); t.train = vis('trainCard'); if (window.IngTrain) IngTrain.part('overview');
     return { a, t }; });
   ok(one.a.cur === 'make' && one.a.ai && !one.a.train && !one.a.truth && one.t.cur === 'train' && one.t.train && one.t.truth && !one.t.ai && /Training here/.test(one.t.says),
     'one room at a time: Make shows Your own AIs and hides the trainer; Train shows the truth card and the trainer and hides Your own AIs; the line says what the room holds', one);
   await p.screenshot({ path: OUT + '/studio_train.png', fullPage: false });
   // the truth card
-  const truth = await p.evaluate(() => { const c = document.getElementById('ingTruthCard'); const t = c.innerText; return { h: c.querySelector('h2').textContent, dev: c.querySelector('#ingTruthDev').textContent,
+  const truth = await p.evaluate(() => { const c = document.getElementById('ingTruthCard'); const d = c.querySelector('details.tr-math'); if (d) d.open = true; const t = c.textContent.replace(/\s+/g, ' '); return { h: c.querySelector('h2').textContent, dev: c.querySelector('#ingTruthDev').textContent,
     bands: [...c.querySelectorAll('.tr-band')].map(x => x.getAttribute('data-band') + ':' + x.querySelector('.tr-tag').textContent), text: t,
     has: { mem: /16 GB of memory/.test(t), cores: /8 processor cores/.test(t), trainer: /trainer \(llama-finetune\) is here/.test(t), rule: /about 660 million numbers/.test(t), notMeasured: /Not measured above 135 million/.test(t), note24: /1B model needs about 24 GB/.test(t),
       years: /about 2\d million years/.test(t), dollars: /US\$5\.6 million/.test(t), gpus: /16,384/.test(t), flops: /3\.8 × 10\^25/.test(t), chinchilla: /20 pieces of text a number/.test(t), tb: /6\.5 TB/.test(t), days: /about 5\d days and 3 GB of text/.test(t), yearhalf: /a year and a half here/.test(t),
       lora: /graphics chip the trainer can use, or a rented machine/.test(t), kind: /not a shortcoming of your computer/.test(t), sources: /Llama 3 Herd of Models/.test(c.textContent) && /DeepSeek-V3 Technical Report/.test(c.textContent) && /Hoffmann/.test(c.textContent) && /train_sizes\.txt/.test(c.textContent) && /examples\/training/.test(c.textContent) },
-    bands4: c.querySelectorAll('.tr-band').length, frontierKey: [...document.querySelectorAll('button, a, [role=button]')].some(x => /frontier/i.test(x.textContent || '')), bandsApi: IngStudio.bands().map(b => b.k), fits: Math.round(IngStudio.fits(16) / 1e7) }; });
+    bands4: c.querySelectorAll('.tr-band').length, frontierKey: [...document.querySelectorAll('button, a, [role=button]')].filter(x => !x.closest('#ingTruthBands')).some(x => /frontier/i.test(x.textContent || '')), bandsApi: IngStudio.bands().map(b => b.k), fits: Math.round(IngStudio.fits(16) / 1e7) }; });
   ok(truth.h === 'What can be trained here' && truth.bands.join() === 'small:Here,further:On this computer,lora:Not yet,frontier:Not at home', 'the truth card names four bands: here, on this computer, not yet, not at home', truth.bands);
   ok(truth.has.mem && truth.has.cores && truth.has.trainer, "it reads the computer's own facts: 16 GB of memory, 8 processor cores, the trainer present", truth.dev);
   ok(truth.has.rule && truth.has.notMeasured && truth.has.note24 && truth.fits === 66, 'the memory rule gives about 660 million numbers for 16 GB, said as not measured above 135 million, with llama.cpp\'s 24 GB note', { rule: truth.has.rule, nm: truth.has.notMeasured, n24: truth.has.note24, fits: truth.fits });
@@ -62,7 +63,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.screenshot({ path: OUT + '/truth_card.png', fullPage: false });
   // a browser without the app's facts: a hint, or nothing reported
   const browser = await p.evaluate(() => { const keep = window.__INGENIUM_DEVICE; delete window.__INGENIUM_DEVICE; const ta = window.trainApi; window.trainApi = () => null; IngStudio.refresh();
-    const t = document.getElementById('ingTruthCard').innerText; const d = IngStudio.device(); window.__INGENIUM_DEVICE = keep; window.trainApi = ta; IngStudio.refresh();
+    const t = document.getElementById('ingTruthCard').textContent.replace(/\s+/g, ' '); const d = IngStudio.device(); window.__INGENIUM_DEVICE = keep; window.trainApi = ta; IngStudio.refresh();
     return { kind: d.kind, mem: d.memGB, text: document.getElementById('ingTruthDev') && t.slice(0, 400), browserWords: /This browser/.test(t) && (/a browser's hint/.test(t) || /memory not reported by this browser/.test(t)), further: /runs in the Ingenium app on a Mac or Windows computer/.test(t), lab: /trains a character model in this very page/.test(t) }; });
   ok(browser.kind === 'browser' && browser.browserWords && browser.further && browser.lab, 'in a browser the card says it reads a hint (or that the browser does not say), that the trainer runs on a computer and that the workbench trains here', browser);
   // a card in a closed room opens its room: scrolled to, focused, revealed, rung by the tour, shown by Help
@@ -140,7 +141,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(ew.r1 === 'make' && ew.r2 === 'train' && ew.words, 'Elsewhere says what needs another machine, promises no date, and its keys open Make (Convert) and Train (the truth card)', ew);
   // a phone's width: nothing overflows
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(500);
-  const narrow = await p.evaluate(() => { document.getElementById('stT-train').click(); return { sw: document.documentElement.scrollWidth, iw: window.innerWidth, tabs: [...document.querySelectorAll('#stTabs .st-tab')].filter(t => !t.hidden && t.getBoundingClientRect().height > 0).length, bandCols: getComputedStyle(document.querySelector('#ingTruthCard .tr-band')).gridTemplateColumns.split(' ').length }; });
+  const narrow = await p.evaluate(() => { document.getElementById('stT-train').click(); return { sw: document.documentElement.scrollWidth, iw: window.innerWidth, tabs: [...document.querySelectorAll('#stTabs .st-tab')].filter(t => !t.hidden && t.getBoundingClientRect().height > 0).length, bandCols: getComputedStyle(document.getElementById('ingTruthBands')).gridTemplateColumns.split(' ').length }; });
   ok(narrow.sw <= narrow.iw + 1 && narrow.tabs >= 4 && narrow.bandCols === 1, "at a phone's width the tabs wrap, the bands stack and nothing overflows", narrow);
   await p.screenshot({ path: OUT + '/studio_phone.png' });
   const parts = await p.evaluate(() => Object.keys(window.__ingParts).filter(k => window.__ingParts[k] !== 'running'));

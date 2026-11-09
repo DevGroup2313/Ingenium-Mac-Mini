@@ -57,7 +57,10 @@ if(!window.IngEditor){try{console.warn("R164: the shared code editor (thoughts/c
 var SMALL=(typeof INB!=="undefined"&&INB)||(navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Silk|Kindle/i.test(navigator.userAgent||"");
 IngEditor.theme={wrap:"ic-ingenium",btn:"btn small",on:"primary"};   /* Ingenium's own buttons, and its colours (above) */
 window.ingEditMaxMB=SMALL?128:480;   /* a text a browser can hold whole stops a little past 512 MB; this leaves it room */
-IngEditor.auto("#codeEditor",{lang:"html",label:"The page's code"});
+/* 6.10.2, her words (3 November 2026): "The code inside of the 'Your code' panel of the Build page does not fit to the panel and needs the
+   panel expanded or for me to scroll to side to see the full line": long lines now wrap inside the panel unless she turns Wrap off
+   (r211 puts the key in the panel's head and remembers her choice, state.buildWrap) */
+IngEditor.auto("#codeEditor",{lang:"html",label:"The page's code",wrap:(function(){try{return !(window.state&&state.buildWrap===false);}catch(e){return true;}})()});
 IngEditor.auto("#bdText",{label:"This part of the page"});
 /* Glossa's "Ask about this line": the question waits in the chat's box, ready to send, never sent by itself */
 IngEditor.ask=function(x){try{go("chat");}catch(e){}

@@ -55,8 +55,9 @@ body[data-theme="night"] .lu-cd-fit.no{color:#f0a097}
    and chosen instead, with what it needs and what this device has to spare. */
 (function r5Coders(){
   function dev(){var d=lineupDevice();return d==="web"?"desktop":d;}
-  function list(){var d=ING_LINEUP.devices[dev()],v=d&&d.tiers&&d.tiers.faber,seen={};
-    return (v?[].concat(v):[]).filter(function(k){if(seen[k]||!ING_LINEUP.models[k])return false;seen[k]=1;return true;});}
+  /* 6.10.3 (r212): the device's further choices for Faber (d.more.faber) follow its own list */
+  function list(){var d=ING_LINEUP.devices[dev()],v=d&&d.tiers&&d.tiers.faber,more=d&&d.more&&d.more.faber,seen={};
+    return (v?[].concat(v):[]).concat(more||[]).filter(function(k){if(seen[k]||!ING_LINEUP.models[k])return false;seen[k]=1;return true;});}
   function label(){var d=dev();return d==="android"?"this tablet":d==="ios"?"this iPhone or iPad":"this computer";}
   function choose(k){state.tierPick=state.tierPick||{};
     if(k===lineupKeyFor("faber")&&!state.tierPick.faber)return;

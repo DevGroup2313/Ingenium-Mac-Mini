@@ -27,7 +27,16 @@ jobs:
         run: |
           python3 source/rag/tools/fetch_vendor.py rag-vendor --list-hf | tee fetch.log
           { echo '### Folder search files'; echo '```'; cat fetch.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: The zip a push would have made (not kept)
+        # 6.63: a push only fetches and checks. Replacing rag-vendor.zip changes its fingerprint, and the Mac and Windows builds then
+        # refuse it and leave the folder search out (6.62's builds did, after vendor.json gained the reranker). It is replaced only by
+        # running this workflow by hand, and then RAG_VENDOR_SHA256 in source/build/release.py is set to the new fingerprint.
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          (cd rag-vendor && zip -qr ../rag-vendor.zip .)
+          { echo "Not kept on the release (a push only checks): $(sha256sum rag-vendor.zip)"; } | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep them on the release "rag-vendor"
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

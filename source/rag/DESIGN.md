@@ -32,7 +32,11 @@ browser page, the Fire tablet and the iPhone carry none of it.
 | `rag/chunker.js` | parse worker (pure functions, importable by tests) | blocks to chunks (section 5) |
 | `rag/embedder.worker.js` + `rag/embedder.js` | module worker + page client | Transformers.js, the tokenizer, batched embedding |
 | `rag/store.worker.js` + `rag/store.js` | module worker + page client | THE ONLY SQLite connection (opfs-sahpool); schema and migrations; every read and write |
-| `rag/retriever.js`, `rag/prompt.js`, `rag/scheduler.worker.js`, `rag/eval.js` | later phases | |
+| `rag/retriever.js` | page | retrieval (phase 2, section 9): the two searches, Reciprocal Rank Fusion, the best k with what a citation needs |
+| `rag/ftsquery.js` | store worker (pure functions, importable by tests) | a question's words made safe for FTS5's MATCH (section 9) |
+| `rag/prompt.js` | page (pure functions, importable by tests) | phase 3, section 10: NOT_FOUND, her system prompt, the citation reader, the sentence check |
+| `rag/scheduler.worker.js` + `rag/scheduler.js` | module worker + page | phase 4, section 11: the clock (setInterval in the worker) and its page side |
+| `rag/eval.js` | later phase | |
 
 ## 3. Messages
 
@@ -58,6 +62,12 @@ Store worker ops (phase 1):
 - `debug.rows`, `debug.sql`, `debug.fail`, `debug.migrate`, `debug.wipe`: the tests' own, served only by a worker started with
   `?debug=1` in its address (`createStore({debug: true})`); the app never starts one so (`main.js` does only when a test page has
   set `window.__ING_RAG_TEST__ = true`)
+
+Store worker ops (phase 2, section 9): `principal.find({name})` → `{id}` or null (makes no principal);
+`search.fts({query, principalId, k = 20, folderIds?})` → `{match, hits: [{id, folderId, rank, score}]}`;
+`search.vec({embedding, principalId, k = 20, folderIds?})` → `{hits: [{id, folderId, rank, distance}]}`;
+`chunk.get({ids, principalId})` → `[{id, folderId, folderName, folderPath, fileId, filePath, chunkIndex, headingPath, charStart,
+charEnd, page, text}]`, only of folders the principal may read.
 
 Embedder worker ops: `init({modelId = 'Xenova/bge-small-en-v1.5', dtype = 'q8', vendorBase})` → `{modelId, dims, maxTokens}`;
 `count({texts})` → `[tokens]`; `embed({texts, kind: 'passage' | 'query'})` → `[Float32Array]` (normalized; batches of 16;
@@ -148,6 +158,7 @@ rollback works; a reopened database keeps its rows. Phase 2 resolves the allowed
 lists no files while some are in the search is left alone and its summary has `emptyNow`, so the card can ask; `confirmEmpty`
 takes them out), `rebuild()` (after status `damaged`: a new, empty index, with the folders the app has on its list put back), `stats()`,
 `_store`, `_embedder` (tests). Off unless the page runs in the desktop app; nothing goes online.
+Phase 2: `retrieve(question, userId = 'me', opts)` (section 9), which opens the store and the reading model when needed.
 
 ## 8. Tests
 
@@ -158,3 +169,162 @@ and a compaction, and checks the index after a restart. `.github/workflows/rag-e
 stand-in bridge for the unit-level tests; the end-to-end test uses the built page with `rag/` beside it. The vendor tree
 for tests is unpacked from the release "rag-vendor" (see the README); on this build machine it is already unpacked at
 `/tmp/claude-0/-home-user/f70d4091-5e3f-5b2b-9e4a-4f66b5694ecf/scratchpad/rag0/vendor` (the same tree, checked).
+
+## 9. Retrieval (phase 2, 6 November 2026)
+
+`retrieve(ctx, query, userId, opts)` in `rag/retriever.js` (and `IngRag.retrieve(query, userId, opts)`, with `ctx` the app's own
+store and reading model). opts: `k` (the passages given, 5), `perList` (each search's hits, 20), `rrfK` (60), `folderIds` (the folders
+the chat was given; it narrows, never widens). It returns `{passages, principalId, match, fts, vec, ms}`; a passage is the row of
+`chunk.get` with `score` (its fused score), `ftsRank` and `vecRank` (its rank in each search, or null) and `distance`.
+
+1. The user is found by name (`principal.find`); a name the index does not know gives no passages and `reason: 'NO_SUCH_USER'`;
+   an empty question gives `reason: 'EMPTY_QUESTION'`.
+2. The text search starts at once in the store's worker while the question's vector is made in the reading model's worker
+   (`kind: 'query'`), then the vector search runs. Both statements carry the folder rule in their SQL:
+   ```sql
+   select rowid as id, folder_id, bm25(chunks_fts) as score from chunks_fts where chunks_fts match ?1
+     and folder_id in (select folder_id from folder_acl where principal_id = ?2)
+     [and folder_id in (select value from json_each(?4))] order by score, rowid limit ?3
+   select rowid as id, folder_id, distance from chunks_vec where embedding match ?1 and k = ?2
+     and folder_id in (select folder_id from folder_acl where principal_id = ?3)
+     [and folder_id in (select value from json_each(?4))]
+   ```
+   Checked in sqlite-vec 0.1.6 (`rig/t_rag2_retrieve.js`): the partition key's `in (...)` is run once for each allowed folder, giving
+   the k nearest of each, so a folder the user may not read is never searched, even when it holds the nearest passages, and the user
+   still gets their k; LIMIT beside `k = ?` is refused ("Only LIMIT or 'k =?' can be provided, not both"), so the worker keeps the k
+   nearest of all the folders' answers itself (by distance, then id).
+3. The question is never handed to MATCH as it is (`ftsquery.js`): its words (runs of `\p{L}\p{N}_`, any script) are each
+   quoted and joined with OR, at most 32, none longer than 64 characters, each once; a question with no word makes no text search.
+   Inside quotes FTS5 reads no operator, keyword or column filter.
+4. Fusion: Reciprocal Rank Fusion (Cormack, Clarke and Buettcher, SIGIR 2009) with k = 60: a passage scores the sum of
+   1 / (60 + rank) over the lists it is in, ranks from 1; equal scores go to the better single rank, then the lower id.
+5. The best k are read back with `chunk.get`, which applies the folder rule once more.
+
+First results (6 November 2026, headless Chromium, the corpus without the 4 MB logbook: 357 passages, two reading-model workers):
+Recall@5 33 of 35 facts (0.943), 28 found first; for the second user, who may not read `household_papers`, none of its passages in
+either search or the fused five for any question, 5 passages still given for every question; a retrieval takes about 41 ms (median)
+once the reading model is loaded; reading after one file added, one changed and one deleted embedded exactly the 2 new or changed
+passages.
+
+## 10. The chat (phase 3, 8 November 2026)
+
+Her contract: "If retrieve() returns zero chunks, do not call the LLM. Return the constant NOT_FOUND = \"I could not find that in the
+selected folders.\" Otherwise, use this system prompt" (her four lines, then `Context:`, the passages as `[n] {file_path}#{chunk_index}
+({heading_path})` and their text, then `Question: {user_query}`), and "Render each [n] as a clickable link. It opens the source file ...
+and, where possible, highlights the section".
+
+- `rag/prompt.js` (pure): `NOT_FOUND`; `systemPrompt(passages, question)` (her lines word for word; `file_path` is the folder's name and
+  the file's path in it; the brackets are left out when a passage has neither heading nor page; a PDF's page is added in them);
+  `ground(result, question, budgetChars)` -> `{notFound, passages, dropped, system, messages}` (zero passages: notFound; otherwise the
+  passages are kept best first while the prompt fits the model's room, at least one); `isNotFound(answer)` (quotes, emphasis and a final
+  stop aside); `citations(text)` ([1], [1, 3], [2-4], [1][2]; a Markdown link [1](...) is not one); `sentences(text)` (code blocks,
+  headings and table rules left out, each list line a sentence, marks after a full stop belong to the sentence before);
+  `checkGrounded(answer, count)` -> `{ok, flagged, badRefs, cited}` (every sentence carries a citation to a passage given; a sentence
+  ending with a colon introduces what follows and is not counted).
+  6.63: `declaresNotFound(answer, count)`: the reply is the NOT_FOUND sentence, or says it as one of its sentences and cites no
+  passage given (the evaluation found a small model adding an explanation around it); the chat then shows exactly NOT_FOUND.
+  6.64: `sentences` does not end a sentence after a title or short form (Mr., Mrs., Dr., St., Capt., No., e.g. and others), and
+  `citations` does not count a bracket joined to a word or number before it (`strains[7]`); the chat's links follow the same rule.
+  Test: `rig/t_rag5_prompt.mjs` (the evaluation's own replies).
+- 6.65, her choice after the evaluation (8 November 2026): "Keep it as it is. Uncited sentences are already named under each reply.
+  Recommend a larger model for folder answers. Add a second pass that asks the model to cite every sentence." (`r257.js`, finish).
+  A reply with a sentence that names no passage given, or a citation to no passage, is asked for once more of the same model through
+  the same way (this computer's model with `Engine.generate`, or the connection with `cloudChat`): her system prompt with the same
+  passages, the question, the first answer, and `RECHECK_ASK` (cite every sentence and list item, leave out what no passage supports,
+  add nothing, or NOT_FOUND). The second answer replaces the first only when its citations are better: at least one citation, no more
+  citations to no passage, and fewer sentences without one; a NOT_FOUND second answer is kept only when the first cited nothing. The
+  first answer stays in `bot.rag.draft` (a fold under the reply); `bot.rag.recheck` is better, same, notfound, stopped or skipped;
+  `bot.rag.done` is set only when the check ends. What is still unchecked is named as before. When a model of the lineup smaller than
+  this device's Magister answered (or a model outside it smaller than Magister's file), a note names Magister with a key to use or get it.
+  The card's switch `#ragRecheck` (`state.rag.recheck`, on unless turned off). Test: `rig/t_rag3_chat.js` 6b and 11 (72 checks).
+- `IngRag.prompt` is that module; `IngRag.openSource(passage, userId = 'me')` reads the cited file again through the bridge (only a folder
+  the user may read, checked with `folder.list({principalId})`), asks the parse worker for its text without chunking (`textOnly`: the
+  file's text, a PDF's pages), and finds the passage: at its offsets (`exact`), elsewhere (`moved`), or not at all (`changed`); it returns
+  a window of 20,000 characters each side.
+- The page (`build/modules/r257.js`): "Your folders" in the chat's + menu before Research and Web search, and a chip while it is on (turning it on
+  turns Web search and Research off; not in Code conversations; not where `window.IngRag` is not). A message sent while it is on is
+  marked (`rec.ragAsk`); in the chat's own preparation (`chatPrepare`) `IngRag.retrieve(question, 'me', {k: 5})` runs; zero passages ->
+  the reply is NOT_FOUND and no model is called; otherwise the chat's model, whichever it is, reads two messages (`chatHistory`): the
+  system prompt and the question, and nothing else (no earlier turns, memory, web or tools; the working loop's mark `__ingChat` is
+  pinned false). The reply keeps a small copy of its passages (`bot.rag.passages`: id, folder id and name, file, chunk, heading, page,
+  offsets, text); when it is written, a NOT_FOUND sentence becomes exactly NOT_FOUND and the others are checked (`bot.rag.flagged`,
+  `badRefs`), named under the reply. Each [n] is a link and the passages are listed ("From your folders"); a link opens the viewer: the
+  passage as it was read, then the file with the passage marked (`openSource`). A message with a file or a picture is answered without
+  the folders, with a note. Elsewhere than the computer that read it, a reply keeps its links and sources, and the viewer shows the
+  passage as it was read.
+- Tests: `rig/t_rag3_chat.js` (the built page, two fixture folders read for real, a stand-in model that follows the contract, the
+  Anthropic stand-in for a connection).
+
+## 11. The scheduler (phase 4, 8 November 2026)
+
+Her task: "Use setInterval in a Worker. Default interval 20 minutes, configurable. It runs only while the app is open ... Do not use
+continuous file watchers" and "Reconcile each folder: compare mtime and size first, and hash the content only when they differ. Reuse
+stored embeddings for chunks whose content_hash is unchanged. Delete chunks of removed files. Use one transaction per file so concurrent
+queries see a consistent state."
+
+- `rag/scheduler.worker.js`: the clock and nothing else (`start({everyMs, firstMs})`, `stop()`, `state()`; event `tick`). It touches no
+  file and no index; it stops when the page closes.
+- `rag/scheduler.js`: `createScheduler({onTick})` -> `{start(ms, {firstMs}), stop(), tickNow(), state(), terminate()}`; a tick that comes
+  while the last one's work goes on is let pass (counted as skipped), so two runs never overlap.
+- `rag/main.js`: `IngRag.schedule(minutes, {firstMs, everyMs})` (0: off), `IngRag.reconcile(reason)`, `IngRag.scheduleState()`; events
+  `{type: 'scheduled', phase: 'start' | 'done' | 'set', report}`. A reconcile lists each folder through the bridge and compares sizes and
+  modification times with `file.list`: a folder where nothing changed is not read (one listing; the reading model is not loaded for
+  it); otherwise `indexFolder` reads it, which is the indexer's reconcile: size and time first, a changed file hashed and parsed,
+  passages whose hash is in `emb_cache` not embedded again, files gone deleted, each file in one transaction (`file.replace`,
+  `file.delete`). Skipped: a folder being read, a folder marked manual only, a folder whose listing is empty while the index holds files
+  (the card asks about that one). A folder that cannot be listed is noted in the report and tried again at the next tick.
+- The card (`build/modules/r202.js`): "Look for changes and read them by itself": never, 10, 20 (the default), 30 minutes or an hour,
+  kept per device (`state.rag.every`); the first look two minutes after the app opens; a line with the next look and what the last
+  one found. Periodic Background Sync (an installed web app's) does not apply to the desktop apps and is not used.
+- Test: `rig/t_rag4_schedule.js` (her done criterion 5 through one tick of the clock; questions asked while it runs; a folder away).
+
+
+## 12. The evaluation (phase 5, 8 November 2026)
+
+Her done criteria: Recall@5 of at least 0.8 on 15 to 20 question, answer and source triples; groundedness (every sentence cited, every
+citation to a retrieved chunk, flagged sentences listed, an unsupported claim a blocker); the ACL test (a user without folder X asks
+what only X answers: `retrieve()` gives no chunk of X and the response equals NOT_FOUND); memory under 2 GB while the whole corpus,
+the 4 MB file included, is indexed, with the method reported; reindex (add, modify, delete, one reconcile; the embedding calls equal the
+new or changed chunks only). "Do not claim completion unless tests 3 and 5 pass."
+
+- `rag/eval/golden.json`: 20 items drawn from `fixtures/FACTS.json`, covering the seven file types, the three folders and the 4 MB
+  logbook (H09); `household_papers` is the restricted folder.
+- `rag/eval.js` (pure): `recall(golden, results, k)` (file level, her criterion, and the stricter level where the passage holds the
+  answer), `grounded(answer, passages)` (`checkGrounded`'s rules, then each cited sentence's words looked for in the passages it cites:
+  below 0.6 it is listed for a person to read), `aclClean`, `answerHas` (the answer names the item's numbers, or most of its rarer
+  words), `markdown(report)`.
+- `rig/t_rag5_eval.js`: the built page in headless Chromium with the bridge stand-in; a real model answers through the chat's own
+  connection path (an OpenAI-style server on this computer). It writes `report.json` and `report.md`; the results are kept in
+  `rag/eval/RESULTS.md`.
+
+## 13. The reranker (phase 5, 8 November 2026)
+
+Her task: "Reranker. Optional, off by default, loaded on demand. Use a small cross-encoder that has a working ONNX export for
+Transformers.js. Confirm this on Hugging Face before choosing a model." and, for retrieval, "merge with reciprocal rank fusion (k = 60),
+then rerank to 5 if enabled, else take the top 5".
+
+- The model, confirmed on Hugging Face on 8 November 2026: `Xenova/ms-marco-MiniLM-L-6-v2` (revision a0914435), tagged transformers.js,
+  onnx and text-classification, a conversion of `cross-encoder/ms-marco-MiniLM-L6-v2` (Apache-2.0). Its quantized export
+  `onnx/model_quantized.onnx` is pinned in `vendor.json` with the SHA-256 of each file (`config.json`, `tokenizer.json`,
+  `tokenizer_config.json`, `vocab.txt`, `quantize_config.json`, the model). It reads a question and a passage together and gives one
+  number (a logit): higher is a better answer.
+- `rag/reranker.worker.js`: a module worker. `init({vendorBase, modelId, dtype = 'q8'})` checks that the four files it needs are on the
+  app's own address (else `MODEL_NOT_INSTALLED`), loads Transformers.js as the embedder does (remote models off, local path
+  `vendor/models/`, one thread), `AutoTokenizer` and `AutoModelForSequenceClassification`; `score({query, texts})` reads the pairs in
+  batches of 8, at most 512 tokens a pair, and returns one number per text.
+- `rag/reranker.js`: the page's side, `createReranker()` -> `{init, score, info, terminate}`. Nothing starts until `init`.
+- `rag/retriever.js`: with `opts.rerank` and a reranker, the best 20 of the fusion (`RERANK_FROM`) are read back (the folder rule applies,
+  as for the five), scored with the heading and the text, ordered by score (ties: the fusion's order), and the best 5 kept; each
+  passage carries `fusedRank` and `rerankScore`, and the result `reranked`. The reranker only reorders passages the user may read.
+- `rag/main.js`: `IngRag.retrieve(query, user, {rerank})` loads the reranker the first time a search asks for it (`config.rerank` is
+  false); when its files are not in the app, the search keeps the fusion's order and says so in `rerankNote` (the chat shows it under
+  the reply). `shutdown()` stops its worker.
+- The page: the card's switch "Reorder what is found with a second reading model" (`#ragRerank`, `state.rag.rerank`, per device, off);
+  the chat asks `retrieve(question, 'me', {k: 5, rerank})` and keeps `bot.rag.reranked`.
+- Shipping: the six files are in `rag-vendor.zip` (since 6.63's pin, 57db28f7...), in `rag/vendor/models/Xenova/ms-marco-MiniLM-L-6-v2/`;
+  the three build workflows check each against `tools/rag_reranker.sha256` (written by `release.py rag`) and fetch any that is missing
+  from Hugging Face at the pinned revision; a fetch or check that fails leaves the reranker out, and the switch then says why in the
+  chat. About 24 MB (the model 23.1 MB). 6.62's apps were built without the folder search: the change to `vendor.json` made the
+  workflow `rag-vendor.yml` replace `rag-vendor.zip`, whose new fingerprint the builds refused. Since 6.63 a push only checks the files;
+  the zip is replaced only by running that workflow by hand, and `RAG_VENDOR_SHA256` in `release.py` is then set to its fingerprint.
+- Test: `rig/t_rag5_rerank.js`.

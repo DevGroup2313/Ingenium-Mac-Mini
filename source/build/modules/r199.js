@@ -196,7 +196,7 @@ function years(s){return s/31557600;}
 function bands(dv){dv=dv||device();var mem=dv.memGB,fit=fitsParams(mem),out=[];
   var small={k:"small",tag:"Here",t:"Small models from zero, as lessons",
     p:["A model of 1.3 to 41 million numbers, trained on your own text from random numbers, learns its words, its punctuation and short phrases. Measured here: the tiny model, eight passes over 150,000 characters, in 140 seconds; its held-back loss ended at 5.85 against 7.62 for guessing at random. It shows how a model learns. It does not converse."+
-      (dv.kind==="computer"?" Train a small model, below, does this with llama.cpp's trainer on this computer; the learning workbench, below it, also trains small models in this page.":" The learning workbench, below, trains a character model in this very page, on this device.")]};
+      (dv.kind==="computer"?" The Trainer tab does this with llama.cpp's trainer on this computer; the Workbench tab also trains small models in this page.":" The Workbench tab trains a character model in this very page, on this device.")]};
   out.push(small);
   var further={k:"further",tag:dv.kind==="computer"?"On this computer":"On a computer",t:"Training further a model you have",
     p:[]};

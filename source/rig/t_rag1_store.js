@@ -79,7 +79,7 @@ function pageHelpers() {
       const keys = (o) => Object.keys(o).sort();
       return { ns: { principal: keys(s.principal), folder: keys(s.folder), acl: keys(s.acl), file: keys(s.file), emb: keys(s.emb) }, hasOpen: typeof s.open === 'function', hasStats: typeof s.stats === 'function' };
     });
-    ok(r.hasOpen && r.hasStats && sameJSON(r.ns.principal, ['ensure']) && sameJSON(r.ns.folder, ['add', 'list', 'remove', 'touch']) && sameJSON(r.ns.acl, ['allowed', 'grant', 'revoke']) && r.ns.file.includes('replace') && r.ns.emb.includes('lookup') && r.ns.emb.includes('put'), 'the client has every call of DESIGN section 3 (principal, folder, acl, file, emb, stats, open)', r.ns);
+    ok(r.hasOpen && r.hasStats && sameJSON(r.ns.principal, ['ensure', 'find']) && sameJSON(r.ns.folder, ['add', 'list', 'remove', 'touch']) && sameJSON(r.ns.acl, ['allowed', 'grant', 'revoke']) && r.ns.file.includes('replace') && r.ns.emb.includes('lookup') && r.ns.emb.includes('put'), 'the client has every call of DESIGN section 3 (principal, folder, acl, file, emb, stats, open; principal.find since phase 2)', r.ns);
   });
 
   // ------------------------------------------------------------------------------------------------------------ memory

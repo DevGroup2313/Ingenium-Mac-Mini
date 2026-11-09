@@ -317,6 +317,9 @@ async function sideKey(p, where) {
   const pc = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
   const pp = await pc.newPage(); pp.on('pageerror', e => errs.push(e.message));
   await pp.goto(URL_, { timeout: 180000 }).catch(() => { }); await A.boot(pp); await A.night(pp, false); await pp.waitForTimeout(500);
+  /* Ingenium 6.10.2 (r211): on a phone the side keys start laid down; raise them, as she would with one press */
+  if (APP !== 'forge') await pp.evaluate(() => { if (document.body.classList.contains('rail-collapsed')) { const c = document.getElementById('railChevron'); if (c) c.click(); } }).catch(() => {});
+  await pp.waitForTimeout(300);
   await sideKey(pp, 'phone');
   const px = await rectOf(pp, A.key);
   await pp.screenshot({ path: path.join(OUT, APP + '-phone-side-day.png') });

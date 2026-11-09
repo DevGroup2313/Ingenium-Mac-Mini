@@ -24,6 +24,11 @@ body[data-theme="night"] #ragCard .rag-note.rag-bad,body[data-theme="night"] #ra
 #ragCard [aria-disabled="true"]{opacity:.55;cursor:default;pointer-events:none}
 @media (prefers-reduced-motion:reduce){#ragCard .rag-bar > i{transition:none}}
 body[data-motion="minimal"] #ragCard .rag-bar > i{transition:none}
+/* 6.59, phase 4: how often the folders are looked at again */
+#ragCard .rag-sched{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 0}
+#ragCard .rag-next{margin:4px 0 0;overflow-wrap:anywhere}
+#ragCard .rag-rr{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+#ragCard .rag-rr input{margin-top:3px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p202"]="started";}catch(_){}
 /* ============ R202 · FOLDERS FOR THE CHAT (Ingenium 6.9.2, 1 November 2026) ============
@@ -37,7 +42,13 @@ body[data-motion="minimal"] #ragCard .rag-bar > i{transition:none}
    2. THE CARD "Folders for the chat" in Settings (named in r173.js, room Models and AI): Add a folder..., each folder with its name,
       path, files, passages and when it was last read, Read it again now with a progress line (and Stop), Remove (with a question
       first). The store is opened the first time the card is seen, not when the app starts. Plain words, real buttons, a status line
-      that is read out politely. The folders are read on this computer only; the chat's use of them comes next. */
+      that is read out politely. The folders are read on this computer only; the chat uses them through modules/r257.js (6.59, phase 3:
+      Your folders in the chat's + menu, each reply only from these folders, with its sources).
+   3. THE SCHEDULER (6.59, phase 4). Her task: "Use setInterval in a Worker. Default interval 20 minutes, configurable. It runs only
+      while the app is open." The card's "Look for changes and read them by itself" (never, 10, 20, 30 minutes or an hour; state.rag.every,
+      kept per device) sets IngRag.schedule; the first look comes two minutes after the app opens, so what changed while it was closed is
+      found soon. A look lists each folder and compares sizes and times with the index: only a folder where something changed is read
+      (rag/main.js reconcile). The card says when the next look comes and what the last one found. */
 (function(){"use strict";
 if(window.__r202)return;window.__r202=1;
 var W=window,D=document,R=null,card=null,ui={},rows={},booted=false,shown=false,busy=false,again=false,lastPaint=0,paintT=0,lastRefresh=0,refreshT=0,seenDone={};
@@ -100,15 +111,48 @@ function build(){
   ui.retry=el("button","btn","Try again");ui.retry.type="button";ui.retry.id="ragRetry";ui.retry.hidden=true;acts.appendChild(ui.retry);
   ui.rebuild=el("button","btn","Start the folder search again");ui.rebuild.type="button";ui.rebuild.id="ragRebuild";ui.rebuild.hidden=true;acts.appendChild(ui.rebuild);
   c.appendChild(acts);
+  /* 6.59, phase 4: her task's scheduler, every 20 minutes unless she chooses otherwise, only while Ingenium is open */
+  ui.sched=el("div","rag-sched");var sl=el("label","small","Look for changes and read them by itself:");sl.htmlFor="ragEvery";
+  ui.every=el("select");ui.every.id="ragEvery";
+  [[0,"Never (only when I press Read)"],[10,"Every 10 minutes"],[20,"Every 20 minutes"],[30,"Every 30 minutes"],[60,"Every hour"]].forEach(function(o){var op=el("option",null,o[1]);op.value=String(o[0]);ui.every.appendChild(op);});
+  ui.every.value=String(everyMin());if(!ui.every.value)ui.every.value="20";
+  ui.sched.appendChild(sl);ui.sched.appendChild(ui.every);c.appendChild(ui.sched);
+  ui.next=el("p","small muted rag-next");ui.next.id="ragNext";c.appendChild(ui.next);
+  /* 6.62, phase 5, her task: "Reranker. Optional, off by default, loaded on demand" */
+  var rrw=el("label","rag-rr");var rri=el("input");rri.type="checkbox";rri.id="ragRerank";try{rri.checked=!!(state.rag&&state.rag.rerank);}catch(e){}
+  rrw.appendChild(rri);rrw.appendChild(el("span",null,"Reorder what is found with a second reading model: it reads your question and each passage together. Slower; it loads only when you switch it on."));c.appendChild(rrw);
+  rri.onchange=function(){try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.rerank=rri.checked;saveState();}catch(e){}setNote(rri.checked?"The chat's answers now reorder the passages found before choosing five.":"The chat's answers use the search's own order.");};
+  /* 6.65, her choice (8 November 2026): a second pass that asks the model to cite every sentence (on unless she turns it off) */
+  var rcw=el("label","rag-rr");var rci=el("input");rci.type="checkbox";rci.id="ragRecheck";try{rci.checked=!(state.rag&&state.rag.recheck===false);}catch(e){rci.checked=true;}
+  rcw.appendChild(rci);rcw.appendChild(el("span",null,"Check every answer: when a sentence names no passage, ask the model once more to cite each one, and keep the better answer. A larger model cites more carefully: in Ingenium's own test, Qwen3.5 9B cited every sentence in 16 of 20 answers and Qwen3.5 2B in 10 of 20 (Models, Magister)."));c.appendChild(rcw);
+  rci.onchange=function(){try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.recheck=rci.checked;saveState();}catch(e){}setNote(rci.checked?"Answers with a sentence that names no passage are now checked once more.":"Answers are no longer checked a second time; sentences that name no passage are still named under the reply.");};
+  ui.every.onchange=function(){var v=+ui.every.value;try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.every=v;saveState();}catch(e){}schedNow(false);};
   ui.problem=el("p","small rag-problem");ui.problem.id="ragProblem";ui.problem.setAttribute("role","status");ui.problem.hidden=true;c.appendChild(ui.problem);
   ui.note=el("p","small rag-note");ui.note.id="ragNote";ui.note.setAttribute("role","status");ui.note.setAttribute("aria-live","polite");c.appendChild(ui.note);
   ui.room=el("p","small muted rag-room");ui.room.id="ragRoom";ui.room.hidden=true;c.appendChild(ui.room);
-  c.appendChild(el("p","small muted rag-foot","These folders are read on this computer only. Nothing is sent anywhere. The chat’s use of them comes next."));
+  c.appendChild(el("p","small muted rag-foot","These folders are read on this computer only. In the chat, switch on Your folders in the + menu: each reply then comes only from these folders, with its sources. The passages found go to the model you chat with, and only to it."));
   ui.add.onclick=addClick;
   ui.retry.onclick=function(){setNote("");refresh(true);};
   ui.rebuild.onclick=rebuildClick;
   return c;
 }
+/* ---------------------------------------------------------------- the scheduler (phase 4) */
+function everyMin(){try{var v=state.rag&&state.rag.every;return (v===0||v>0)?+v:20;}catch(e){return 20;}}
+function schedNow(atStart){if(!R||typeof R.schedule!=="function")return;var m=everyMin();
+  /* when the app opens, a first look after two minutes finds what changed while it was closed */
+  R.schedule(m,atStart&&m>0?{firstMs:120000}:{}).then(paintNext,function(e){try{console.warn("Ingenium folders: the clock",e&&e.message||e);}catch(_){}});}
+function soon(ts){var d=ts-Date.now();if(d<60000)return "in a moment";var m=Math.round(d/60000);return "in about "+m+(m===1?" minute":" minutes");}
+function lastSay(L){var bad=(L.errors||[]).length,t;
+  if(!L.read)t=L.folders?"nothing had changed":"no folder to look at";
+  else{var p=[];if(L.changed)p.push(plural(L.changed,"file")+" new or changed");if(L.gone)p.push(plural(L.gone,"file")+" gone");t=p.join(", ")+", read again";}
+  if(bad)t+="; "+plural(bad,"folder")+" could not be looked at";
+  return t;}
+function paintNext(){if(!ui.next||!R||typeof R.scheduleState!=="function")return;var st=R.scheduleState(),p=[];
+  if(st.running)p.push("Looking for changes now…");
+  else if(st.minutes>0&&st.next)p.push("Next look "+soon(st.next)+".");
+  else if(!st.minutes)p.push("Your folders are read only when you press Read it now.");
+  if(st.last)p.push("Last look "+when(st.last.at)+": "+lastSay(st.last)+".");
+  var t=p.join(" ");if(ui.next.textContent!==t)ui.next.textContent=t;}
 function setNote(text,bad){ui.note.textContent=text||"";ui.note.className="small rag-note"+(bad?" rag-bad":"");}
 
 function makeRow(f){
@@ -333,6 +377,7 @@ function onEvent(ev){
     if(ev.progress.finished!==seenDone[ev.folderId]){seenDone[ev.folderId]=ev.progress.finished;if(shown)refresh();}
     if(n-lastPaint>=1000){lastPaint=n;paintJobs();}else if(!paintT){paintT=setTimeout(function(){paintT=0;lastPaint=Date.now();paintJobs();},1000-(n-lastPaint));}
   }else if(ev.type==="queued"||ev.type==="start"){paintJobs();}
+  else if(ev.type==="scheduled"){paintNext();}
   else if(ev.type==="done"){delete seenDone[ev.folderId];if(/^Stopping/.test(ui.note.textContent))setNote("");if(shown)refresh(true).then(function(){var r=rows[ev.folderId];if(r&&D.activeElement===r.stop||(r&&D.activeElement===D.body))r.read.focus();});}
   else if(ev.type==="folders"){if(shown)refresh();}
   else if(ev.type==="status"){paintStatus();}
@@ -355,6 +400,7 @@ function start(){
   if(!place()){D.addEventListener("DOMContentLoaded",start);return;}
   started=true;
   R.on(onEvent);
+  schedNow(true);setInterval(function(){if(card&&card.offsetParent!==null)paintNext();},30000);
   D.addEventListener("click",function(e){
     var t=e.target&&e.target.closest&&e.target.closest('.nav-btn[data-page="settings"]');
     if(t)setTimeout(function(){place();if(!shown&&card&&card.offsetParent!==null)seen();},50);

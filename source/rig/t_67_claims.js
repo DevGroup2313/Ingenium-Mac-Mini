@@ -51,7 +51,7 @@ const GONE = [
   'and every model you bring, use Ingenium', 'a source marked peer-reviewed may carry more weight', ' [peer-reviewed journal]'];
 // the corrected words, which must be there
 const THERE = [
-  'It goes online only when you ask for something that needs it: a cloud model, a search, a download, GitHub or Dictate.',
+  /* 6.8.4: no GitHub on the door */ 'It goes online only when you ask for something that needs it: a cloud model, a search, a download or Dictate.',
   'Your work stays here, and goes online only when you ask for something that needs it.',
   'No cloud model is set up, so Chat\'s answers are written on this device.',
   '<b>How offline works here.</b> The engine that runs your models is kept on this device',
@@ -73,7 +73,7 @@ const THERE = [
   'refuses every request the page makes to another address', 'between ten and twenty seconds an app',
   'under 150 milliseconds (the median)', 'Lector is told to take facts about you only from your CV',
   'matches a figure in the measures, your CV or the posting', 'Methods written inside objects and classes are not counted',
-  'Blend asks two or more of your models the same question, one after another', 'Everything but GitHub works on this device, with no connection.',
+  /* 6.12: connected models answer at the same time */ 'Blend asks two or more models the same question', 'Everything but GitHub works on this device, with no connection.',
   'Each app keeps its recent versions', 'every version you keep, the checks you run on it, and the packages you make from it',
   'Compares each listed model\'s file size with its listing', 'open on the Desk inside Ingenium. Each can also open in a window of its own.',
   'Build opens a page of up to', 'Your own work stays. Try once more.', 'older ones may be freed when room runs short',
@@ -180,7 +180,7 @@ function sink() { return new Promise(res => { const got = []; const s = http.cre
 
   // 2g. the catalogue: 36 models, and the two files to train show their known sizes
   const cat = await p.evaluate(() => ({ n: ING_CATALOG.length, s135: catEstimate(ING_CATALOG.find(e => e.key === 'smollm2-135m-instruct'), 'F16'), s360: catEstimate(ING_CATALOG.find(e => e.key === 'smollm2-360m-instruct'), 'F16'), q8: catEstimate(ING_CATALOG.find(e => e.key === 'smollm2-135m-instruct'), 'Q8_0') }));
-  ok(cat.n === 36 && cat.s135 === 270885952 && cat.s360 === 725553792 && cat.q8 > 0, 'the catalogue holds 36 models; SmolLM2 135M and 360M show their files\' known sizes (271 MB, 726 MB)', cat);
+  ok(cat.n >= 36 && cat.s135 === 270885952 && cat.s360 === 725553792 && cat.q8 > 0, 'the catalogue holds at least the 36 models of 6.7 (more were added in 6.9.2 and 6.10.3); SmolLM2 135M and 360M show their files\' known sizes (271 MB, 726 MB)', cat);
 
   // 2h. Gemini's Takeout page: entries whose lines are broken by <br> are read
   const gem = await p.evaluate(() => { const h = '<html><body><div class="outer-cell"><div class="content-cell">Prompted&nbsp;Explain recursion simply<br>Oct 3, 2026, 10:00:00 AM PDT<br>Recursion is a function calling itself.</div></div>'

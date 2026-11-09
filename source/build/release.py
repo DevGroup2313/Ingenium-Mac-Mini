@@ -68,6 +68,9 @@ def wanted(path, kits, source, shared, generated):
     # and the workflow that builds the shells Fabrica fills (6.0), which builds from source/ only
     if path.startswith("source/") or path.startswith("brand/") or path.startswith(".github/lineup/") or path in (".github/workflows/lineup-sources.yml", ".github/workflows/build-shells.yml"):
         return False
+    # 6.27: the other editions' pages (editions/, in the Mac mini repository) are hers to give, never part of a kit
+    if path.startswith("editions/"):
+        return False
     # 6.6: and the repositories' own checks, which run from source/ or probe these builds: in a kit they would start on
     # its first push and fail (the model studio's, the signing key change's, the Windows window's)
     if path.startswith(".github/diag/") or path in REPO_CHECKS:
@@ -102,7 +105,15 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_rag_692", "_rag_choose_folder", ("mini", "intel", "win")),
            ("app_rag_693", "_rag_real_steps_ok", ("mini", "intel", "win")),
            ("app_data_692", "_train_text_put", ("mini", "intel", "win")),
-           ("app_lend_693", "_share_fit_ctx", ("mini", "intel", "win"))]
+           ("app_lend_693", "_share_fit_ctx", ("mini", "intel", "win")),
+           ("app_claude_610", "_claude_sessions", ("mini", "intel", "win")),
+           ("app_device_6101", "_device_unlock_info", ("mini", "intel", "win")),
+           ("app_parts_6102", "_gguf_parts_of", ("mini", "intel", "win")),
+           ("app_engine2_6105", "_engine_next_dir", ("mini", "intel", "win")),
+           ("app_engine3_6106", "_engine_info_one", ("mini", "intel", "win")), ("app_mcp_614", "X-Upstream-Mcp-Session-Id", ("mini", "intel", "win")),
+           ("app_page_619", "_page_choose", ("mini", "intel", "win")), ("app_page_620", "_page_save", ("mini", "intel", "win")),
+           ("app_port_655", "_ingenium_holds_port", ("mini", "intel", "win")),
+           ("app_cloud_657", "_cloud_box_dir", ("mini", "intel", "win"))]
 
 
 def desktop():
@@ -183,8 +194,41 @@ def page():
     pg = build(os.path.join(H, "ingenium.html"))
     for k, repo in R.items():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
+    ship_rag()
     info()
     sync_sources()
+
+
+# 6.59: the folder search travels beside the page in the Mac and Windows apps (source/rag/README.md, "How it is built and shipped"):
+# its own files into each desktop repository's rag/ (the build workflows add rag/vendor/ from Mini's release "rag-vendor", checked
+# against tools/rag_vendor.sha256, and the specs carry rag/ into the app). Not the Fire and iPhone repository: desktop only.
+RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.js", "embedder.js", "embedder.worker.js",
+             "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js",
+             "reranker.js", "reranker.worker.js", "vendor.json")
+# 6.63: the zip the workflow rag-vendor.yml made from 6.62's vendor.json (8 November 2026, 17:48 UTC): the same 22 files as before
+# (ecd2f34b...) and the reranker's six, each identical to its pinned SHA-256 (compared file by file); only VENDOR.txt differs
+RAG_VENDOR_SHA256 = "57db28f7820b1109cf5d75232f61a21fdbf9e5b7b17539148db71e3d2edaa351"   # rag-vendor.zip, release rag-vendor
+
+
+def ship_rag():
+    import shutil
+    src = os.path.join(H, "..", "rag")
+    for k in ("mini", "intel", "win"):
+        dst = os.path.join(R[k], "rag")
+        os.makedirs(dst, exist_ok=True)
+        for f in os.listdir(dst):
+            if f not in RAG_FILES and os.path.isfile(os.path.join(dst, f)):
+                os.remove(os.path.join(dst, f))
+        for f in RAG_FILES:
+            shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
+        os.makedirs(os.path.join(R[k], "tools"), exist_ok=True)
+        open(os.path.join(R[k], "tools", "rag_vendor.sha256"), "w", encoding="utf-8", newline="\n").write(
+            RAG_VENDOR_SHA256 + "  rag-vendor.zip\n")
+        # 6.62: the optional reranker, fetched by the build workflows from its pinned Hugging Face revision, each file checked
+        rr = [e for e in json.load(open(os.path.join(src, "vendor.json"), encoding="utf-8"))["hf"] if "reranker" in e.get("role", "")][0]
+        lines = ["# model " + rr["repo"], "# revision " + rr["revision"]] + [sha + "  " + f for f, sha in sorted(rr["files"].items())]
+        open(os.path.join(R[k], "tools", "rag_reranker.sha256"), "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
+    print("rag/ copied to the Mac and Windows repositories")
 
 
 def info():
@@ -241,5 +285,7 @@ if __name__ == "__main__":
         page()
     elif sys.argv[1] == "info":
         info()
+    elif sys.argv[1] == "rag":
+        ship_rag()
     elif sys.argv[1] == "edition":
         build(sys.argv[3], sys.argv[2])

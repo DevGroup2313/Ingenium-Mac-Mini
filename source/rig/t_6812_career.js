@@ -52,7 +52,7 @@ const SOP = ['My research asks how field notebooks shaped method.', 'At Oxford I
   }, [PLAN_LINE, SOP, POST]);
   await p.evaluate(() => go('career')); await p.waitForTimeout(700);
   const tabs = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(b => b.textContent.trim()));
-  ok(JSON.stringify(tabs) === '["Today","Applications","Your profile","Goals and plan","Learn"]', 'Today is a room of its own, the first', JSON.stringify(tabs));
+  ok(JSON.stringify(tabs) === '["Today","Your mentor","Applications","People","Your profile","Your edge","Goals and plan","Learn"]', 'Today is a room of its own, the first (People beside Applications from 6.9.7; Your edge after Your profile from 6.44; Your mentor beside Today from 6.58)', JSON.stringify(tabs));
   // the profile kept before is the first of several
   const r0 = await p.evaluate(() => { const r = IngCareer.root(); const P = IngCareer.state().profile; P.name = 'Yannie D. Forest'; P.items.push({ id: 'i1', sec: 'education', title: 'MSt in History', place: 'Oxford', from: '2020', to: '2021', text: 'Dissertation on the archives of the Museum.' }); saveState();
     return { n: r.people.length, v: r.v, cur: r.cur, opps: Array.isArray(IngCareer.state().opps), old: Object.keys(r).sort().join(',') }; });
@@ -74,7 +74,9 @@ const SOP = ['My research asks how field notebooks shaped method.', 'At Oxford I
   // another side of her
   await p.evaluate(() => { window.prompt = () => 'Museums'; const S = IngCareer.state(); S.ui.room = 'profile'; S.ui.ppart = 'people'; IngCareer.render(); }); await p.waitForTimeout(300);
   await p.screenshot({ path: OUT + '/profiles.png' });
-  await p.click('#cs .c-newp button:has-text("Another side of me")'); await p.waitForTimeout(600);
+  await p.click('#cs .c-newp button:has-text("Another side of me")'); await p.waitForTimeout(500);
+  /* 6.11.1: the name is asked in Ingenium's own dialog, no longer the browser's */
+  await p.evaluate(() => { const i = (document.querySelector('.ing-dlg-root .ing-dlg-card input') || document.querySelector('#modalBox input')); if (i) { i.value = 'Museums'; [...i.closest('.ing-ask').querySelectorAll('.ing-ask-keys .btn')].pop().click(); } }); await p.waitForTimeout(600);
   const side = await p.evaluate(() => { const S = IngCareer.state(), r = IngCareer.root(); return { label: r.people.filter(x => x.id === r.cur)[0].label, items: S.profile.items.length, opps: S.opps.length, me: S.profile.isMe, n: r.people.length,
     sel: document.getElementById('csWho').selectedOptions[0].textContent }; });
   ok(side.label === 'Museums' && side.items === 1 && side.opps === 0 && side.me === true && side.n === 3 && side.sel === 'Yannie D. Forest · Museums', 'Another side of me: a copy of her profile, named, with no applications', JSON.stringify(side));

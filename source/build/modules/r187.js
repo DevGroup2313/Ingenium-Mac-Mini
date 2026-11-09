@@ -31,10 +31,12 @@ function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return
 function B(n){try{return fmtBytes(n);}catch(e){return Math.round(n/1024)+" KB";}}
 function num(n){try{return Number(n).toLocaleString("en-GB");}catch(e){return String(n);}}
 function day(t){try{return new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});}catch(e){return "";}}
-function name(k){try{return (W.LIB_NAMES&&LIB_NAMES[k])||k;}catch(e){return k;}}
+function name(k){try{if(typeof W.libName==="function")return W.libName(k);return (W.LIB_NAMES&&LIB_NAMES[k])||k;}catch(e){return k;}}  /* 6.42: any app, by its own name */
 function label(v){return (v.version?v.version:"Unnamed")+" · kept "+day(v.at);}
 /* a kept version's text, from the store, or from the computer app's copy when the store has lost it (as libText reads) */
-function readVer(ref){return W.libTx("readonly",function(s){return s.get(ref);}).catch(function(){return null;}).then(function(b){
+function readVer(ref){return W.libTx("readonly",function(s){return s.get(ref);}).catch(function(){return null;})
+  /* 6.32: a version sealed with the lock is opened first (the library's own libOpen, build_page.py) */
+  .then(function(b){return (b&&typeof W.libOpen==="function")?W.libOpen(b):b;}).then(function(b){
   if(b)return new TextDecoder().decode(b instanceof Uint8Array?b:new Uint8Array(b));
   var a=typeof W.libShell==="function"?W.libShell():null;if(!a||typeof a.big_get!=="function")return null;
   return Promise.resolve(a.big_get(ref)).then(function(r){return r&&r.ok&&typeof r.text==="string"?r.text:null;},function(){return null;});});}

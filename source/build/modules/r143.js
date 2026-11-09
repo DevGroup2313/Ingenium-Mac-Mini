@@ -56,7 +56,9 @@ body[data-theme="night"] #bkCard{
 #bkCard .bk-what .n{min-width:3.4ch;text-align:right;font-weight:700;color:var(--b-acc);font-variant-numeric:tabular-nums}
 #bkCard .bk-what .sub{display:block;font-size:12.5px;color:var(--b-ink3)}
 /* the keys: popped out, they lift on hover and sink when pressed */
-#bkCard .bk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;border:1px solid var(--b-hair);background:linear-gradient(var(--b-a),var(--b-b));border-radius:11px;padding:8px 16px;font:600 13.5px/1.2 var(--sans);color:var(--b-ink1);cursor:pointer;box-shadow:var(--b-pop);white-space:nowrap;
+/* 6.38 (her note, 6 November 2026: the newly added sections' fonts and sizes to match the rest of the app, no big bulky buttons):
+   the backup's keys at the app's key size (.btn: 13px, about 34px high) */
+#bkCard .bk-key{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;border:1px solid var(--b-hair);background:linear-gradient(var(--b-a),var(--b-b));border-radius:11px;padding:8px 14px;font:600 13px/1.2 var(--sans);color:var(--b-ink1);cursor:pointer;box-shadow:var(--b-pop);white-space:nowrap;
   transition:transform .16s var(--b-spring),box-shadow .16s ease,opacity .2s ease}
 #bkCard .bk-key:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--b-pophi)}
 #bkCard .bk-key:active:not(:disabled){transform:translateY(1px) scale(.985);box-shadow:var(--b-press);transition-duration:.06s}
@@ -190,7 +192,7 @@ var KNOWN=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_hub","ingen
 var DATA_DBS=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_claude"];
 /* never in a backup: the model files, file links and the engine (ingenium_files and its older name), and the desk's
    overflow copy (the desk itself goes whole, in desk/state.json) */
-var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1};
+var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1,ingenium_cloudkey:1};  /* 6.57: and Ingenium Cloud's key, which never leaves the device it was made on (modules/r255.js) */
 var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app library",ingenium_repos:"Fabrica's apps, with every version",
   ingenium_hub:"Fabrica's issues, pull requests and pages",ingenium_claude:"Conversations you brought in from elsewhere",ingenium_keys:"Signing keys",fabrica_made:"Fabrica's packages"};
 /* what belongs to one device and stays with it: its models and how they ran here */
@@ -236,6 +238,46 @@ function fail(code,msg,extra){var e=new Error(msg);e.code=code;if(extra)Object.k
 function foreign(msg){return fail("foreign",(msg||"This file is not an Ingenium backup.")+NOTHING);}
 function damaged(what,extra){return fail("damaged","This backup is damaged: "+what+"."+NOTHING+" If you have another copy of it, try that one.",extra);}
 function isCode(e){return e&&typeof e.code==="string";}
+/* ---------- 6.30 (5 November 2026): a whole backup sealed with a password of her own. Her words: "I want you to encrypt Ingenium and
+   everything inside of it ... I don't want my data getting lost or being stolen or leaked." The finished zip is sealed in parts of 4 MB,
+   each with AES-GCM-256 under one key drawn from the password (PBKDF2-SHA-256, the same 600,000 rounds as the keys): each part's
+   nonce counts from a random one, and each part is bound to the file's head (its salt, rounds and size), to its place and to whether it
+   is the last, so no part can be changed, moved, dropped or added unseen. The file begins with a plain line that says what it is. Its
+   name ends in .sealed. Without the password nothing in it can be read, by her or by anyone. ---------- */
+var SEAL_HEAD="INGENIUM SEALED BACKUP 1\n",SEAL_PART=4*1024*1024;
+function b64e(u){var s="";for(var i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s);}
+function b64d(t){var s=atob(String(t||"")),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
+function sealKey(pw,salt,iter){var s=subtle();return s.importKey("raw",TE.encode(String(pw).normalize("NFC")),"PBKDF2",false,["deriveKey"])
+  .then(function(k){return s.deriveKey({name:"PBKDF2",hash:"SHA-256",salt:salt,iterations:iter},k,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);});}
+function sealIv(base,i){var iv=base.slice();var v=((iv[8]<<24)|(iv[9]<<16)|(iv[10]<<8)|iv[11])>>>0;v=(v^i)>>>0;iv[8]=v>>>24;iv[9]=(v>>>16)&255;iv[10]=(v>>>8)&255;iv[11]=v&255;return iv;}
+function sealAad(hb,i,last){var a=new Uint8Array(hb.length+5);a.set(hb,0);a[hb.length]=i>>>24;a[hb.length+1]=(i>>>16)&255;a[hb.length+2]=(i>>>8)&255;a[hb.length+3]=i&255;a[hb.length+4]=last?1:0;return a;}
+function sealBackup(r,pw){var s=subtle();
+  if(!s)return Promise.reject(fail("crypto","This browser offers no encryption here, so the backup cannot be sealed. Make it without sealing, or on another browser."));
+  if(!pw||String(pw).length<8)return Promise.reject(fail("password","The password needs at least eight characters."));
+  var blob=r.blob,size=blob.size,n=Math.max(1,Math.ceil(size/SEAL_PART)),salt=rnd(16),base=rnd(12);
+  var head={kind:"ingenium-sealed-backup",v:1,cipher:"AES-GCM-256",kdf:"PBKDF2-SHA-256",iter:ITER,salt:b64e(salt),iv:b64e(base),part:SEAL_PART,parts:n,size:size,made:Date.now()};
+  var hb=TE.encode(SEAL_HEAD+JSON.stringify(head)+"\n"),out=[hb];
+  return sealKey(pw,salt,ITER).then(function(k){var i=0;
+    function next(){if(i>=n)return null;var a=i*SEAL_PART,idx=i;i++;
+      return readBlob(blob.slice(a,Math.min(size,a+SEAL_PART))).then(function(u){return s.encrypt({name:"AES-GCM",iv:sealIv(base,idx),additionalData:sealAad(hb,idx,idx===n-1)},k,u);})
+        .then(function(ct){out.push(new Uint8Array(ct));return next();});}
+    return next();}).then(function(){var b=new Blob(out,{type:"application/octet-stream"});
+    return Object.assign({},r,{name:String(r.name||"Ingenium backup.zip").replace(/\.zip$/i,"")+".sealed",blob:b,size:b.size,sealed:true});});}
+function isSealedHead(u){if(!u||u.length<SEAL_HEAD.length)return false;for(var i=0;i<SEAL_HEAD.length;i++)if(u[i]!==SEAL_HEAD.charCodeAt(i))return false;return true;}
+function unseal(file,pw,say){var s=subtle();say=say||function(){};
+  if(!s)return Promise.reject(fail("crypto","This browser offers no encryption here, so a sealed backup cannot be opened. Open it on another browser."));
+  return slice(file,0,Math.min(file.size,65536)).then(function(u){if(!isSealedHead(u))throw foreign();
+    var nl=-1;for(var i=SEAL_HEAD.length;i<u.length;i++)if(u[i]===10){nl=i;break;}if(nl<0)throw damaged("its sealed head cannot be read");
+    var head;try{head=JSON.parse(TD.decode(u.subarray(SEAL_HEAD.length,nl)));}catch(e){throw damaged("its sealed head cannot be read");}
+    if(!head||head.kind!=="ingenium-sealed-backup"||head.v!==1)throw foreign("This sealed file was made by a newer Ingenium, or is not a backup.");
+    var hb=u.slice(0,nl+1),salt=b64d(head.salt),base=b64d(head.iv),P=+head.part||SEAL_PART,n=+head.parts||1,iter=+head.iter||ITER,parts=[],at=hb.length;
+    if(file.size!==hb.length+head.size+16*n)throw damaged("it is not the length its head says");
+    return sealKey(pw,salt,iter).then(function(k){var i=0;
+      function next(){if(i>=n)return null;var idx=i;i++;var plain=Math.min(P,head.size-idx*P),len=plain+16,a=at;at+=len;
+        return slice(file,a,a+len).then(function(c){return s.decrypt({name:"AES-GCM",iv:sealIv(base,idx),additionalData:sealAad(hb,idx,idx===n-1)},k,c);})
+          .then(function(pt){parts.push(new Uint8Array(pt));say({phase:"unseal",frac:i/n});return next();},
+            function(){throw idx===0?fail("sealpw","That password does not open this backup."):damaged("a sealed part has been changed");});}
+      return next();}).then(function(){var b=new Blob(parts,{type:"application/zip"});try{b.name=String(file.name||"").replace(/\.sealed$/i,"")||"backup.zip";}catch(e){}return b;});});}
 function ver(){try{return String(ING_VERSION);}catch(e){return "";}}
 
 /* ---------- where this is ---------- */
@@ -450,7 +492,8 @@ function secrets(o,strip){var out=[];(function walk(x,path,dep){if(!x||typeof x!
 function getPath(o,p){for(var i=0;i<p.length;i++){if(!o||typeof o!=="object")return undefined;o=o[p[i]];}return o;}
 function setPath(o,p,v){for(var i=0;i<p.length-1;i++){if(!o||typeof o!=="object")return false;o=o[p[i]];}if(!o||typeof o!=="object")return false;o[p[p.length-1]]=v;return true;}
 function deskNow(){var raw;try{raw=JSON.stringify(state,typeof deskReplacer==="function"?deskReplacer:undefined);}catch(e){raw="{}";}return raw;}
-function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||k==="ingenium_lock"||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k)||/\.sealed-\d+$/.test(k);}
+/* 6.57: ingenium_cloud is this device's own Cloud settings (its name, the computer that keeps the Cloud): never carried, never replaced */
+function protectedKey(k){var key="ingenium_v4";try{key=KEY;}catch(e){}return k===key||k==="ingenium_lock"||k==="ingenium_cloud"||/^ingenium_v4\.snap\d+$/.test(k)||/\.broken-\d+$/.test(k)||/\.sealed-\d+$/.test(k);}
 function localPart(){var items={},count=0,bytes=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k==null||protectedKey(k))continue;var v=localStorage.getItem(k);items[k]=v;count++;bytes+=k.length+(v?v.length:0);}}catch(e){}
   return {items:items,count:count,bytes:bytes};}
 function libRefsOf(st){var r={};try{var A=(st.appLib&&st.appLib.apps)||{};Object.keys(A).forEach(function(k){var a=A[k];if(a&&a.ref)r[a.ref]=1;if(a&&a.earlier&&a.earlier.ref)r[a.earlier.ref]=1;});}catch(e){}return r;}
@@ -503,7 +546,9 @@ function make(o){o=o||{};var say=o.onProgress||function(){},sig=o.signal||{},api
       var WHY={ingenium_files:"model files, file links and the engine: models never go in a backup",the_foundry_files:"an older name of the same store",ingenium_desk:"the desk's overflow copy: the desk itself goes whole (desk/state.json)",
         ingenium_keys:o.keys?"locked with the password (secrets.enc)":"not chosen",fabrica_made:"not chosen",ingenium_hub:"read through Fabrica's own export (fabrica/hub.json)"};
       m.excluded=[];
-      names.forEach(function(db){var skip=NEVER[db]||db==="ingenium_keys"||(db==="fabrica_made"&&!o.packages)||(db==="ingenium_hub"&&hubData);
+      /* 6.57: Ingenium Cloud leaves out what each device keeps for itself (o.leave: the app library, whose builds every Ingenium carries) */
+      if(Array.isArray(o.leave))o.leave.forEach(function(db){WHY[db]="kept by each device: Ingenium Cloud leaves it";});
+      names.forEach(function(db){var skip=NEVER[db]||db==="ingenium_keys"||(db==="fabrica_made"&&!o.packages)||(db==="ingenium_hub"&&hubData)||(Array.isArray(o.leave)&&o.leave.indexOf(db)>=0);
         if(skip){m.excluded.push({db:db,why:WHY[db]||""});return;}plan.push(db);});
       return seq(plan,function(db){return openExisting(db).then(function(d){if(!d)return null;var sch=schema(d);
         return seq(sch,function(s){return count(d,s.name).then(function(c){s.count=c;total+=c;},function(){s.count=0;});}).then(function(){d.close();return {db:db,schema:sch};});});});})
@@ -566,10 +611,13 @@ function keyRecords(){return openExisting("ingenium_keys").then(function(d){if(!
 function open(file,o){o=o||{};var say=o.onProgress||function(){};
   if(!file||typeof file.size!=="number"||typeof file.slice!=="function")return Promise.reject(foreign());
   if(!file.size)return Promise.reject(foreign("This file is empty, so it is not a backup."));
-  return slice(file,0,Math.min(4,file.size)).then(function(h){
+  return slice(file,0,Math.min(SEAL_HEAD.length,file.size)).then(function(h0){
+    if(isSealedHead(h0)){if(!o.sealPassword)throw fail("sealed","This backup is sealed with a password. Write it to open the backup.");
+      return unseal(file,o.sealPassword,say).then(function(z){return open(z,Object.assign({},o,{sealPassword:null}));}).then(function(b){b.sealed=true;return b;});}
+    return slice(file,0,Math.min(4,file.size)).then(function(h){
     if(h.length>=2&&h[0]===0x50&&h[1]===0x4b)return openZip(file,say);
     if(file.size>480*1024*1024)throw foreign();
-    return readBlob(file).then(function(u){var d;try{d=JSON.parse(TD.decode(u));}catch(e){throw foreign();}return fromJson(d);});});}
+    return readBlob(file).then(function(u){var d;try{d=JSON.parse(TD.decode(u));}catch(e){throw foreign();}return fromJson(d);});});});}
 function fromJson(d){if(!d||typeof d!=="object"||Array.isArray(d))throw foreign();
   if(d.kind==="ingenium-hub")throw foreign("This is a copy of Fabrica's issues and pages, not a whole backup. Bring it back in Fabrica: an app's Settings, Bring a copy back.");
   if(d.kind==="ingenium-backup")throw foreign("This is only the list of contents of a backup. Choose the backup's .zip file itself.");
@@ -639,6 +687,7 @@ function buildState(bst,mode,sec,m){var here=JSON.parse(deskNow()),mine=secrets(
   if(sec&&Array.isArray(sec.conn))sec.conn.forEach(function(p){if(!Array.isArray(p[0]))return;var saved=bsec[p[0].join(".")],nowC=connOf(out,p[0]);
     if(saved&&!sameEndpoint(saved,nowC)){dropped.push(p[0]);return;}setPath(out,p[0],p[1]);});
   mine.forEach(function(p){var cur=getPath(out,p[0]);if(cur!==undefined&&cur!=="")return;var hc=connOf(here,p[0]),nowC=connOf(out,p[0]);
+    if(!nowC||typeof nowC!=="object")return;/* 6.30: the restored desk does not hold this connection: nothing to fill, nothing moved */
     if(!sameEndpoint(hc,nowC)){if(dropped.indexOf(p[0])<0)dropped.push(p[0]);return;}setPath(out,p[0],p[1]);});
   try{if(m&&typeof m==="object")m.__droppedKeys=dropped.map(function(p){return p.join(".");});}catch(e){}
   /* every piece of HTML a restore brings in is cut down to safe formatting, so a note or Tabula page from a backup cannot run
@@ -698,7 +747,9 @@ function isFresh(hc){return hc.chats<=1&&hc.messages<=2&&!(hc.fabrica||[]).lengt
 /* 6.7: would restoring change a connection's address so that a key is not carried onto it? device: a key here; backup: a key the backup holds */
 function connChange(bst,mode,m,withKeys){var here=JSON.parse(deskNow()),out=mode==="merge"?mergeVal(JSON.parse(JSON.stringify(here)),JSON.parse(JSON.stringify(bst))):JSON.parse(JSON.stringify(bst));
   var r={device:false,backup:false};
-  try{secrets(here,false).forEach(function(p){var cur=getPath(out,p[0]);if(cur!==undefined&&cur!=="")return;if(!sameEndpoint(connOf(here,p[0]),connOf(out,p[0])))r.device=true;});}catch(e){}
+  /* 6.30: a connection the restored desk does not hold at all (a backup made before Ingenium kept every connection, 6.8.11, has no
+     list of them) is not "set to a different address": nothing of it is carried, and it is not said to have moved */
+  try{secrets(here,false).forEach(function(p){var cur=getPath(out,p[0]);if(cur!==undefined&&cur!=="")return;var nc=connOf(out,p[0]);if(!nc||typeof nc!=="object")return;if(!sameEndpoint(connOf(here,p[0]),nc))r.device=true;});}catch(e){}
   try{if(withKeys&&m&&Array.isArray(m.secretPaths))m.secretPaths.forEach(function(path){if(!Array.isArray(path))return;if(!sameEndpoint(connOf(bst,path),connOf(out,path)))r.backup=true;});}catch(e){}
   return r;}
 
@@ -841,9 +892,10 @@ var CARD='<div class="bk-head"><h2 class="sec" id="bkH">Backup and moving</h2><s
   +'<div><h3 class="bk-h3">Choose</h3>'
   +'<div class="bk-opt"><input type="checkbox" class="bk-sw" role="switch" id="bkOptPk" aria-labelledby="bkOptPkL" aria-describedby="bkOptPkD"><label for="bkOptPk"><b id="bkOptPkL">Fabrica\'s packages</b><span id="bkOptPkD">The Android, iPhone and other packages Fabrica made. Each can be made again from its version, so they stay out unless you want them.</span></label></div>'
   +'<div class="bk-opt"><input type="checkbox" class="bk-sw" role="switch" id="bkOptKy" aria-labelledby="bkOptKyL" aria-describedby="bkOptKyD"><label for="bkOptKy"><b id="bkOptKyL">Signing keys and connection keys</b><span id="bkOptKyD">Locked with a password of your own. Without them, an app signed here cannot be updated from the other device, and connections ask for their keys again.</span></label></div>'
-  +'<div class="bk-pw" id="bkPw" hidden><label class="bk-field"><span>A password for the keys</span><input type="password" id="bkPw1" autocomplete="new-password" minlength="8"></label>'
+  +'<div class="bk-opt"><input type="checkbox" class="bk-sw" role="switch" id="bkOptSl" aria-labelledby="bkOptSlL" aria-describedby="bkOptSlD"><label for="bkOptSl"><b id="bkOptSlL">Seal the whole backup</b><span id="bkOptSlD">Every part of it encrypted with a password of your own (AES-256, under a key drawn from the password over 600,000 rounds). Without the password nothing in it can be read, by you or by anyone. On by itself when Ingenium is locked with a password.</span></label></div>'
+  +'<div class="bk-pw" id="bkPw" hidden><label class="bk-field"><span id="bkPwLab">A password for the keys</span><input type="password" id="bkPw1" autocomplete="new-password" minlength="8"></label>'
   +'<label class="bk-field"><span>The same password again</span><input type="password" id="bkPw2" autocomplete="new-password" minlength="8"></label>'
-  +'<p class="bk-sm">At least eight characters. Keep it somewhere safe: without it the keys cannot be opened, by you or by anyone.</p></div>'
+  +'<p class="bk-sm" id="bkPwSay">At least eight characters. Keep it somewhere safe: without it the keys cannot be opened, by you or by anyone.</p></div>'
   +'<p class="bk-err" id="bkMakeErr" role="alert"></p>'
   +'<div class="bk-row"><button type="button" class="bk-key pri" id="bkMake">Make the backup</button><button type="button" class="bk-key" id="bkStop" hidden>Stop</button><button type="button" class="bk-key" id="bkAgain" hidden>Save it again</button></div></div></div>'
   +'<div class="bk-progress" id="bkMakeProg" hidden><div class="bk-bar" role="progressbar" aria-label="Making the backup" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><p class="bk-say" id="bkMakeSay"></p></div>'
@@ -851,7 +903,7 @@ var CARD='<div class="bk-head"><h2 class="sec" id="bkH">Backup and moving</h2><s
   /* restore */
   +'<section class="bk-pane" id="bkPane-restore" role="tabpanel" aria-labelledby="bkTab-restore" hidden>'
   +'<div class="bk-drop" id="bkDrop"><p><b>Choose a backup file</b>, or drop it here.</p><p class="bk-sm" style="margin:0">An Ingenium backup (.zip), or a desk backup from an earlier Ingenium (.json). Every part is checked against its fingerprint before anything changes.</p>'
-  +'<button type="button" class="bk-key pri" id="bkPick">Choose a backup file</button><input type="file" id="bkFile" accept=".zip,.json,application/zip,application/json" hidden></div>'
+  +'<button type="button" class="bk-key pri" id="bkPick">Choose a backup file</button><input type="file" id="bkFile" accept=".zip,.json,.sealed,application/zip,application/json,application/octet-stream" hidden></div>'
   +'<div class="bk-progress" id="bkReadProg" hidden><div class="bk-bar" role="progressbar" aria-label="Checking the backup" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><p class="bk-say" id="bkReadSay"></p></div>'
   +'<div id="bkReadOut"></div></section>'
   /* moving */
@@ -888,10 +940,16 @@ function wire(){var c=UI.card;
   [].forEach.call(c.querySelectorAll('.bk-seg [role="tab"]'),function(b){b.onclick=function(){select(b.id.replace("bkTab-",""),false);};});
   c.querySelector(".bk-seg").addEventListener("keydown",function(e){var tabs=["make","restore","move"],cur=tabs.indexOf((document.activeElement&&document.activeElement.id||"").replace("bkTab-",""));if(cur<0)return;
     var nx=e.key==="ArrowRight"?(cur+1)%3:e.key==="ArrowLeft"?(cur+2)%3:e.key==="Home"?0:e.key==="End"?2:-1;if(nx<0)return;e.preventDefault();select(tabs[nx],true);});
-  var ky=q("#bkOptKy"),pw=q("#bkPw");ky.onchange=function(){pw.hidden=!ky.checked;if(ky.checked)setTimeout(function(){if(document.activeElement===ky||document.activeElement===document.body)q("#bkPw1").focus();},30);q("#bkMakeErr").textContent="";};
+  var ky=q("#bkOptKy"),pw=q("#bkPw"),sl=q("#bkOptSl");
+  function pwShow(){var k=ky.checked&&!ky.disabled,z=sl&&sl.checked&&!sl.disabled;pw.hidden=!(k||z);
+    var lab=q("#bkPwLab"),say=q("#bkPwSay");if(lab)lab.textContent=k&&z?"A password for the backup and its keys":z?"A password for the backup":"A password for the keys";
+    if(say)say.textContent="At least eight characters. Keep it somewhere safe: without it "+(z?"the backup":"the keys")+" cannot be opened, by you or by anyone.";}
+  ky.onchange=function(){pwShow();if(ky.checked)setTimeout(function(){if(document.activeElement===ky||document.activeElement===document.body)q("#bkPw1").focus();},30);q("#bkMakeErr").textContent="";};
+  if(sl){sl.onchange=function(){pwShow();if(sl.checked)setTimeout(function(){if(document.activeElement===sl||document.activeElement===document.body)q("#bkPw1").focus();},30);q("#bkMakeErr").textContent="";};
+    try{if(window.IngLock&&IngLock.on&&IngLock.on())sl.checked=true;}catch(e){}if(!subtle()){sl.disabled=true;sl.checked=false;}pwShow();}
   if(!subtle()){ky.disabled=true;q("#bkOptKyD").textContent="This browser offers no encryption here, so the keys cannot be locked and stay out.";}
   q("#bkMake").onclick=doMake;q("#bkStop").onclick=function(){if(UI.stop)UI.stop.stopped=true;q("#bkStop").disabled=true;};
-  q("#bkAgain").onclick=function(){if(UI.made)Promise.resolve(saveFileNative(UI.made.name,"application/zip",UI.made.blob)).catch(function(){});};
+  q("#bkAgain").onclick=function(){if(UI.made)Promise.resolve(saveFileNative(UI.made.name,UI.made.sealed?"application/octet-stream":"application/zip",UI.made.blob)).catch(function(){});};
   var fi=q("#bkFile");q("#bkPick").onclick=function(){if(!UI.busy)fi.click();};fi.onchange=function(){var f=fi.files&&fi.files[0];fi.value="";if(f)doRead(f);};
   var dz=q("#bkDrop");dz.addEventListener("dragover",function(e){e.preventDefault();dz.classList.add("over");});dz.addEventListener("dragleave",function(){dz.classList.remove("over");});
   dz.addEventListener("drop",function(e){e.preventDefault();dz.classList.remove("over");var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&!UI.busy)doRead(f);});
@@ -916,27 +974,33 @@ function fillWhat(c){var host=q("#bkWhat");if(!host)return;host.innerHTML="";
   var pk=q("#bkOptPkD");if(pk&&c.packages!=null)pk.textContent="The Android, iPhone and other packages Fabrica made ("+plural(c.packages,"package")+" here). Each can be made again from its version, so they stay out unless you want them.";
   var kd=q("#bkOptKyD");if(kd&&subtle())kd.textContent="Locked with a password of your own ("+plural(c.keys||0,"signing key")+" and "+plural(c.connections||0,"connection key")+" here). Without them, an app signed here cannot be updated from the other device, and connections ask for their keys again.";}
 function doMake(){if(UI.busy)return;var err=q("#bkMakeErr"),out=q("#bkMakeOut");err.textContent="";out.innerHTML="";
-  var o={packages:q("#bkOptPk").checked,keys:q("#bkOptKy").checked&&!q("#bkOptKy").disabled};
-  if(o.keys){var a=q("#bkPw1").value,b=q("#bkPw2").value;if(a.length<8){err.textContent="The password needs at least eight characters.";q("#bkPw1").focus();return;}
-    if(a!==b){err.textContent="The two passwords are not the same.";q("#bkPw2").focus();return;}o.password=a;}
+  var o={packages:q("#bkOptPk").checked,keys:q("#bkOptKy").checked&&!q("#bkOptKy").disabled},slx=q("#bkOptSl"),seal=!!(slx&&slx.checked&&!slx.disabled),spw=null;
+  if(o.keys||seal){var a=q("#bkPw1").value,b=q("#bkPw2").value;if(a.length<8){err.textContent="The password needs at least eight characters.";q("#bkPw1").focus();return;}
+    if(a!==b){err.textContent="The two passwords are not the same.";q("#bkPw2").focus();return;}if(o.keys)o.password=a;if(seal)spw=a;}
   UI.busy=true;UI.stop={stopped:false};o.signal=UI.stop;var mk=q("#bkMake"),st=q("#bkStop"),ag=q("#bkAgain");mk.disabled=true;st.hidden=false;st.disabled=false;ag.hidden=true;
   var said=0;o.onProgress=function(p){var t=Date.now();if(t-said<120&&p.frac<1)return;said=t;bar("bkMakeProg",p.frac,(p.what?p.what+"… ":"")+size(p.bytes)+" so far");};
   bar("bkMakeProg",0,"Starting…");
-  make(o).then(function(r){UI.made=r;bar("bkMakeProg",1,"Ready: "+size(r.size)+". Saving it now…");
-      return Promise.resolve(saveFileNative(r.name,"application/zip",r.blob)).catch(function(){}).then(function(){return r;});})
+  make(o).then(function(r){if(!seal)return r;bar("bkMakeProg",1,"Sealing it with your password…");return sealBackup(r,spw);})
+    .then(function(r){UI.made=r;bar("bkMakeProg",1,"Ready: "+size(r.size)+". Saving it now…");
+      return Promise.resolve(saveFileNative(r.name,r.sealed?"application/octet-stream":"application/zip",r.blob)).catch(function(){}).then(function(){return r;});})
     .then(function(r){var L=V();L.last={at:Date.now(),name:r.name,size:r.size,parts:Object.keys(r.manifest.files).length+1,keys:!!r.manifest.secrets,packages:!!r.manifest.options.packages};keep();paintLast();
       var box=E("div","bk-msg good");box.appendChild(E("b",null,"Your backup is ready."));
-      box.appendChild(document.createTextNode(" "+r.name+", "+size(r.size)+", in "+plural(Object.keys(r.manifest.files).length+1,"part")+", each with its fingerprint"+(r.manifest.secrets?"; the keys are locked with your password":"")+"."));
+      box.appendChild(document.createTextNode(" "+r.name+", "+size(r.size)+", in "+plural(Object.keys(r.manifest.files).length+1,"part")+", each with its fingerprint"+(r.manifest.secrets?"; the keys are locked with your password":"")+(r.sealed?"; the whole of it is sealed with your password, and cannot be opened without it":"")+"."));
       box.appendChild(E("p",null,saveWhere(hereNow().kind)));
       if((r.manifest.leftOut||[]).length){var p=E("p",null,"Not in it: "+r.manifest.leftOut.map(function(x){return x.what.charAt(0).toLowerCase()+x.what.slice(1);}).join("; ")+".");box.appendChild(p);}
       out.innerHTML="";out.appendChild(box);q("#bkAgain").hidden=false;},
       function(e){var box=E("div","bk-msg "+(e&&e.code==="stopped"?"warn":"bad"));box.appendChild(E("b",null,e&&e.code==="stopped"?"Stopped.":"The backup stopped."));
         box.appendChild(document.createTextNode(" "+(e&&e.code==="stopped"?"Nothing was saved.":(e&&e.message||String(e))+" Nothing was saved; what is here is untouched.")));out.innerHTML="";out.appendChild(box);})
     .then(function(){UI.busy=false;mk.disabled=false;st.hidden=true;q("#bkPw1").value="";q("#bkPw2").value="";setTimeout(function(){var p=q("#bkMakeProg");if(p&&!UI.busy)p.hidden=true;},1600);});}
-function doRead(file){var out=q("#bkReadOut");out.innerHTML="";UI.read=null;UI.busy=true;q("#bkPick").disabled=true;bar("bkReadProg",0,"Reading "+file.name+"…");
-  var said=0;open(file,{onProgress:function(p){var t=Date.now();if(t-said<120&&p.frac<1)return;said=t;bar("bkReadProg",p.frac,"Checking every part against its fingerprint…");}})
+function sealAsk(file,why){var out=q("#bkReadOut");out.innerHTML="";var box=E("div","bk-msg"+(why==="sealpw"?" bad":""));box.setAttribute("role",why==="sealpw"?"alert":"status");
+  box.appendChild(E("b",null,why==="sealpw"?"That password does not open this backup.":"This backup is sealed."));box.appendChild(document.createTextNode(" Write the password it was sealed with."));
+  var lab=E("label","bk-field"),sp=E("span",null,"Its password"),inp=document.createElement("input");inp.type="password";inp.id="bkSealPw";inp.autocomplete="current-password";lab.appendChild(sp);lab.appendChild(inp);box.appendChild(lab);
+  var row=E("div","bk-row"),go=E("button","bk-key pri","Open it");go.type="button";go.id="bkSealGo";row.appendChild(go);box.appendChild(row);out.appendChild(box);
+  var p=q("#bkReadProg");if(p)p.hidden=true;go.onclick=function(){if(!inp.value)return inp.focus();doRead(file,inp.value);};inp.onkeydown=function(e){if(e.key==="Enter")go.onclick();};setTimeout(function(){try{inp.focus();}catch(e){}},30);}
+function doRead(file,spw){var out=q("#bkReadOut");out.innerHTML="";UI.read=null;UI.busy=true;q("#bkPick").disabled=true;bar("bkReadProg",0,(spw?"Opening the seal of ":"Reading ")+file.name+"…");
+  var said=0;open(file,{sealPassword:spw||null,onProgress:function(p){var t=Date.now();if(t-said<120&&p.frac<1)return;said=t;bar("bkReadProg",p.frac,p.phase==="unseal"?"Opening the seal, part by part…":"Checking every part against its fingerprint…");}})
     .then(function(b){UI.read=b;bar("bkReadProg",1,"Every part matches its fingerprint.");return paintSummary(b,true);},
-      function(e){var box=E("div","bk-msg bad");box.setAttribute("role","alert");var msg=(e&&e.message)||String(e);
+      function(e){if(e&&(e.code==="sealed"||e.code==="sealpw")){sealAsk(file,e.code);return;}var box=E("div","bk-msg bad");box.setAttribute("role","alert");var msg=(e&&e.message)||String(e);
         var title=e&&e.code==="damaged"?"This backup is damaged.":e&&e.code==="newer"?"This backup is from a newer Ingenium.":"This file cannot be restored.";
         var more=msg.replace(/^This backup is damaged: /,"").replace(/^This backup was made by a newer Ingenium[^.]*\. /,"");more=more.charAt(0).toUpperCase()+more.slice(1);
         box.appendChild(E("b",null,title));box.appendChild(document.createTextNode(" "+more));
@@ -948,7 +1012,7 @@ function paintSummary(b,first){var out=q("#bkReadOut"),m=b.manifest,mode=UI.mode
     s.appendChild(E("h3","bk-h3","What this backup holds"));
     var p=E("p");p.style.margin="0";var made=m.madeAt?when(m.madeAt):"an unknown day";
     p.textContent=b.kind==="desk"?"A desk backup from an earlier Ingenium"+(m.madeAt?", last changed "+when(m.madeAt):"")+".":"Made "+made+(m.platform&&m.platform.label?" on "+(m.platform.label==="A browser"?"a browser":"a "+m.platform.label):"")+(m.version?", with Ingenium "+m.version:"")+". "+plural(b.parts,"part")+", "+size(b.bytes)+". ";
-    if(b.kind==="zip"){var ok=E("b",null,"✓ Every fingerprint matches.");ok.style.color="var(--b-ok)";p.appendChild(ok);}s.appendChild(p);
+    if(b.kind==="zip"){var ok=E("b",null,"✓ Every fingerprint matches.");ok.style.color="var(--b-ok)";p.appendChild(ok);}if(b.sealed)p.appendChild(document.createTextNode(" It was sealed with a password, and opened with it."));s.appendChild(p);
     var wrap=E("div","bk-tabwrap");wrap.setAttribute("role","region");wrap.setAttribute("aria-label","What changes here");wrap.tabIndex=0;
     var tb=E("table","bk-tab"),cap=E("caption","bk-vh","What changes here, row by row");tb.appendChild(cap);
     /* on a phone the column heads are shortened on screen; a screen reader still hears them whole */
@@ -1018,7 +1082,7 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
   function tell(){var r=peek().restored;if(!r||r.told)return;r.told=true;keep();
     try{ingToast("Restored from the backup of "+(r.made?day(r.made):"an earlier day")+"."+(r.models&&r.models.length?" "+plural(r.models.length,"model")+" to fetch again: see Settings, Backup and moving.":""));}catch(e){}}})();
 
-window.IngBackup={version:FORMAT,make:make,open:open,describe:describe,unlock:unlock,apply:apply,restore:restore,census:censusHere,fingerprints:fingerprints,guide:guide,devices:DEV,here:hereNow,
+window.IngBackup={version:FORMAT,make:make,seal:sealBackup,unseal:unseal,open:open,describe:describe,unlock:unlock,apply:apply,restore:restore,census:censusHere,fingerprints:fingerprints,guide:guide,devices:DEV,here:hereNow,
   show:function(tab){try{go("settings");}catch(e){}var c=ensureCard();if(c){select(tab||"make",true);c.scrollIntoView({block:"start"});}return !!c;},
   _:{enc:enc,dec:dec,pack:pack,unpack:unpack,ZipOut:ZipOut,ZipIn:ZipIn,crc32:crc32,mergeVal:mergeVal,buildState:buildState,secrets:secrets,listDbs:listDbs}};
 })();

@@ -133,6 +133,8 @@ function sideCheck(tags) {
   return { safe: s, bad: bad.slice(0, 8) };
 }
 async function sideKeys(p, label, shot) {
+  /* Ingenium 6.10.2 (r211): on a phone the side keys start laid down; raise them, as she would with one press */
+  await p.evaluate(() => { if (document.body.classList.contains('rail-collapsed')) document.getElementById('railChevron').click(); }); await p.waitForTimeout(300);
   for (const id of ['fabBell', 'fabQuiet', 'fabPark', 'fabTimer', 'fabNote']) {
     await p.evaluate(() => { window.scrollTo(0, 0); go('home'); }); await p.waitForTimeout(300);
     const before = new Set(await p.evaluate(floatingNow));
@@ -200,7 +202,11 @@ async function panels(p, label, shotPrefix) {
     for (const th of ['day', 'night']) {
       await theme(p, th);
       await panels(p, `${vp[0]}x${vp[1]} ${th}:`, path.join(OUT, `pn_${vp[0]}x${vp[1]}_${th}`));
-      // the side keys all reachable inside the window
+      // Ingenium 6.10.2 (r211): on a narrow phone the side keys start laid down (only the key that raises them stands, inside the window)
+      const down = await p.evaluate(() => { const c = document.getElementById('railChevron'), r = c.getBoundingClientRect(); return { narrow: innerWidth <= 640, down: document.body.classList.contains('rail-collapsed'), chosen: !!state.railChosen, inside: r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight }; });
+      if (th === 'day') ok(down.inside && (down.chosen || down.down === down.narrow), `${vp[0]}x${vp[1]} ${th}: the side keys start laid down on a narrow phone (standing when it lies sideways), and the key that raises them is in the window`, down);
+      await p.evaluate(() => { if (document.body.classList.contains('rail-collapsed')) document.getElementById('railChevron').click(); }); await p.waitForTimeout(300);
+      // the side keys all reachable inside the window, once raised
       const side = await p.evaluate(() => { const W = innerWidth, H = innerHeight; const ks = [...document.querySelectorAll('.rail-btn,#railChevron')].filter(k => k.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })); const top = document.querySelector('.topbar').getBoundingClientRect().bottom;
         const rs = ks.map(k => [k.id, k.getBoundingClientRect()]), over = [];
         rs.forEach(([a, p], i) => rs.slice(i + 1).forEach(([b, q]) => { if (Math.min(p.right, q.right) - Math.max(p.left, q.left) > 0.5 && Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top) > 0.5) over.push(a + '/' + b); }));

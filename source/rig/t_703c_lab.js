@@ -22,16 +22,26 @@ async function enter(p) { await p.waitForFunction(() => window.__ingReady === tr
   const b = await pw.chromium.launch({ args: ['--no-sandbox'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 1000 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300))); p.on('dialog', d => d.accept());
   await p.goto(URL_); await enter(p);
-  await p.evaluate(() => { go('models'); IngRooms.open('models', 'studio', true); IngStudio.open('train'); }); await p.waitForTimeout(900);
+  // 6.28 (modules/r232.js): the Train room shows one part at a time, and each workbench tool one step at a time. Before a key or a field
+  // of the workbench is used, its part and its step are opened, as she would open them (its step's key, IngTrain.step)
+  const atStep = sel => p.evaluate(s => { try { const el = document.querySelector(s); if (!el || !window.IngTrain) return; if (IngTrain.part() !== 'workbench' && document.getElementById('ingLabCard').contains(el)) IngTrain.part('workbench');
+    const sec = el.closest('#labPanels .lb-panel > .lb-sec'); if (sec && !sec.classList.contains('tn-on')) { const pn = sec.parentNode; IngTrain.step(pn.id.replace(/^labP-/, ''), [...pn.querySelectorAll(':scope > .lb-sec')].indexOf(sec)); } } catch (e) {} }, sel.split(' >> ')[0].trim());
+  const oClick = p.click.bind(p), oFill = p.fill.bind(p);
+  p.click = async (sel, o) => { if (typeof sel === 'string' && /lab|#labP-/.test(sel)) await atStep(sel); return oClick(sel, o); };
+  p.fill = async (sel, v, o) => { if (typeof sel === 'string' && /lab/.test(sel)) await atStep(sel); return oFill(sel, v, o); };
+  const oFiles = p.setInputFiles.bind(p), oSelect = p.selectOption.bind(p);
+  p.setInputFiles = async (sel, v, o) => { if (typeof sel === 'string' && /lab/.test(sel)) await atStep(sel); return oFiles(sel, v, o); };
+  p.selectOption = async (sel, v, o) => { if (typeof sel === 'string' && /lab/.test(sel)) await atStep(sel); return oSelect(sel, v, o); };
+  await p.evaluate(() => { go('models'); IngRooms.open('models', 'studio', true); IngStudio.open('train'); if (window.IngTrain) IngTrain.part('workbench'); }); await p.waitForTimeout(900);
   // the card
   const a = await p.evaluate(() => { const c = document.getElementById('ingLabCard'); return { room: IngStudio.roomOf(c), h: c.querySelector('h2').textContent, tabs: [...c.querySelectorAll('.lb-tab')].map(t => t.textContent), sel: [...c.querySelectorAll('.lb-tab')].filter(t => t.getAttribute('aria-selected') === 'true').map(t => t.id).join(),
     panels: [...c.querySelectorAll('.lb-panel')].filter(x => !x.hidden).map(x => x.id).join(), tf: typeof window.tf, eng: document.getElementById('labEngine').textContent, saved: document.getElementById('labCharsSaved').innerText.replace(/\s+/g, ' '),
-    order: [...document.getElementById('stP-train').children].map(e => e.id), shown: c.getBoundingClientRect().height > 0, api: Object.keys(IngLab).join(), carried: IngLab.engine.carried() }; });
+    order: [...document.getElementById('stP-train').children].filter(e => e.classList.contains('card')).map(e => e.id), shown: c.getBoundingClientRect().height > 0, api: Object.keys(IngLab).join(), carried: IngLab.engine.carried() }; });
   ok(a.room === 'train' && a.h === 'The learning workbench' && a.order.join() === 'ingTruthCard,trainCard,ingLabCard' && a.shown, 'the learning workbench stands in the Train room, after the truth card and the trainer', a.order);
   ok(a.tabs.join() === 'Write like my text,Sort my notes,Sort my pictures,Words that sit together' && a.sel === 'labT-chars' && a.panels === 'labP-chars', 'four tools, one shown at a time, the character model first', { tabs: a.tabs, sel: a.sel, panels: a.panels });
   ok(a.tf === 'undefined' && /It loads when you start a lesson/.test(a.eng) && /Nothing is sent anywhere/.test(a.eng) && /WebGPU/.test(a.eng) && /Nothing kept yet/.test(a.saved), 'TensorFlow.js is not loaded until a lesson starts; the engine line says where it runs, that nothing is sent, and what it does about WebGPU; the kept list is empty without it', { tf: a.tf, eng: a.eng.slice(0, 260), saved: a.saved });
   const hint = await p.evaluate(() => { const hh = document.querySelector('#trainBody .lb-hint'); return hh ? { text: hh.innerText.replace(/\s+/g, ' '), key: (hh.querySelector('button') || {}).textContent } : null; });
-  ok(hint && /Smaller lessons run in this page, on any device: the learning workbench, below/.test(hint.text) && hint.key === 'Open the learning workbench', "on a device with no trainer the trainer's card points to the workbench", hint);
+  ok(hint && /Smaller lessons run in this page, on any device: the learning workbench, (below|in the Workbench tab)/.test(hint.text) && hint.key === 'Open the learning workbench', "on a device with no trainer the trainer's card points to the workbench", hint);
   await p.screenshot({ path: path.join(OUT, 'lab_top.png') });
   // the ways a text comes in: a file, a dataset from the Data room, the notes (before any lesson)
   const tide = 'The tide comes in twice a day, and the gulls know it before we do. '.repeat(30);

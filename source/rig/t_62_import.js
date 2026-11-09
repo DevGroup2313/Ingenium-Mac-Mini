@@ -146,7 +146,8 @@ async function ping(p, n = 5) { let worst = 0; for (let i = 0; i < n; i++) { con
 
     // ---- a long conversation and a small memory ----
     await fakeModel(p, 8192);
-    await p.evaluate(() => { go('chat'); const c = state.chats.find(c => c.imported && c.imported.id === 'big-0'); state.activeChat = c.id; ccState().activeChat = c.id; renderChat(); });
+    // (6.47: a conversation this long is compacted first, by modules/r245.js, and t_647_compact tests that; here the brief of r195 is tested, so automatic compacting is off)
+    await p.evaluate(() => { state.compactAuto = false; go('chat'); const c = state.chats.find(c => c.imported && c.imported.id === 'big-0'); state.activeChat = c.id; ccState().activeChat = c.id; renderChat(); });
     await p.waitForFunction(() => curMsgs().length === 400, null, { timeout: 30000 }).catch(() => { });
     await p.fill('#chatInput', 'What was the secret harbour code I gave you at the start?'); await p.evaluate(() => sendChat());
     await p.waitForFunction(() => window.__sent.length > 0, null, { timeout: 60000 }).catch(() => { });
@@ -162,7 +163,9 @@ async function ping(p, n = 5) { let worst = 0; for (let i = 0; i < n; i++) { con
     // 6.9.1 (r195): a current Claude model holds a million tokens; the page's own engine reaches 32,768 only where its fast build runs on 8 GB or more, else its real cap of 8,192
     ok(win.a === 1000000 && win.g === 1000000 && win.ol === 32768 && win.ol2 === 131072 && win.desk === 262144 && win.page === win.pageMax && (win.pageMax === 8192 || win.pageMax === 32768) && win.reply === 131072,
       'a connected model is given its own window (Claude 1M, Gemini 1M; a server at home 32K, or what is chosen); a model on this computer trained for 256K given 256K, a reply up to 128K (6.3); the page\'s engine its real cap (6.9.1)', win);
-    const ol = await p.evaluate(() => /num_ctx:typeof ingCloudWindow/.test(String(cloudChat)) || [...document.scripts].some(sc => /num_ctx:typeof ingCloudWindow/.test(sc.textContent)));  // 6.9.2: cloudChat is wrapped (r190), so the page's own scripts are searched too
+    // 6.9.2: cloudChat is wrapped (r190), so the page's own scripts are searched too; 6.12: a request on Blend's own connection keeps 16,384
+    // 6.46: the memory Ollama is given is worked out for each request (ingOllamaCtx, modules/r206.js), with the earlier forms still accepted
+    const ol = await p.evaluate(() => { const re = /num_ctx:(?:typeof ingOllamaCtx==="function"\?ingOllamaCtx\(|(?:\(ab&&ab\.conn\)\?16384:\()?typeof ingCloudWindow)/; return re.test(String(cloudChat)) || [...document.scripts].some(sc => re.test(sc.textContent)); });
     ok(ol, 'Ollama is told how much to keep (num_ctx)');
     ok(!p.__errs.length, 'no page errors', p.__errs.slice(0, 5));
   } catch (e) { ok(false, 'the run crashed', e.stack); }

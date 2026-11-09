@@ -6,7 +6,9 @@
 //           wrong password refused; a second one given and withdrawn, and the list of withdrawn permissions saved, signed;
 //   then a full edition and a gift edition are built carrying that public key (and the gift one carrying the first permission):
 //   full:   no permission kept, so Ingenium itself is neither in Code's list nor in the install kit; the permission brought in is
-//           valid, names its holder and number, and lets Ingenium itself be opened (edit) but not packaged (it does not allow it);
+//           valid and names its holder and number; since 6.45 no permission opens Ingenium itself (edit) or packages it outside the
+//           master edition, and the owner's card offers only use, install, share and sell for Ingenium (her answer: "Yes please
+//           remove the \"edit\", it can go too");
 //           a permission changed by one letter, one signed by another key, one that has ended and one withdrawn (once the list is
 //           brought in) each allow nothing and say why; kept after a reload;
 //   gift:   carries its holder's permission from the start;
@@ -83,7 +85,10 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
     ok(fp && pub.keys && pub.keys.length === 1 && pub.keys[0].kid === fp && pub.keys[0].jwk.crv === 'P-256' && !pub.keys[0].jwk.d && /not carry its public half/.test(await p.evaluate(() => document.getElementById('ingPermitCard').innerText)),
       'its public half is saved (owner_keys.json), and the card says this build does not carry it yet', { kid: fp });
     // a permission, then a wrong password, then one to withdraw, and one that has ended
-    files.ada = await give(p, 'Ada Example', ['use', 'install', 'edit']);
+    // 6.45: the owner's form offers only what Ingenium acts on
+    const offered = await p.evaluate(() => [...document.querySelectorAll('#ingPermitCard form.pc-form input[name=allow]')].map(i => i.value));
+    ok(offered.join() === 'use,install,share,sell', 'the owner\'s card offers use, install, share and sell for Ingenium; no longer edit or package (6.45)', offered);
+    files.ada = await give(p, 'Ada Example', ['use', 'install', 'share']);
     const ada = JSON.parse(fs.readFileSync(files.ada, 'utf8'));
     ok(ada.kind === 'offline-project-permission' && ada.permit.holder === 'Ada Example' && /^P-\d{4}-0001$/.test(ada.permit.n) && ada.permit.until && ada.kid === fp && ada.sig.length > 60,
       'a permission is given: it names its holder, its number, the apps, what it allows and when it ends, and is signed', ada.permit);
@@ -91,7 +96,7 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
     await press(p, 'Sign and save the permission'); await answer(p, 'not the password at all'); const wr = await waitSay(p, /does not open/);
     ok(/That password does not open the key/.test(wr), 'a wrong password signs nothing', wr);
     files.bo = await give(p, 'Bo Tester', ['use']);
-    files.old = await give(p, 'Cy Former', ['use', 'edit'], '2026-01-01', '2026-02-01');
+    files.old = await give(p, 'Cy Former', ['use'], '2026-01-01', '2026-02-01');
     await p.evaluate(() => { const it = [...document.querySelectorAll('#ingPermitCard .pc-item')].find(i => /Bo Tester/.test(i.textContent) && i.querySelector('button')); it.querySelector('button').click(); });
     await waitSay(p, /is withdrawn in your book/);
     n0 = p.__dl.length; await press(p, 'Save the list of withdrawn permissions'); await answer(p, PW); files.wd = await nextDownload(p, n0); await waitSay(p, /signed and saved/);
@@ -103,7 +108,7 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
     await p2.evaluate(() => indexedDB.deleteDatabase('offline_owner')); await p2.reload(); await p2.waitForFunction(() => window.__ingReady === true, null, { timeout: 180000 }); await p2.waitForTimeout(1200); await settings(p2);
     // (a new context has its own store already; the reload above only makes sure)
     let m0 = p2.__dl.length; await press(p2, 'Make my owner key'); await answer(p2, PW); await nextDownload(p2, m0); await waitSay(p2, /Your owner key is made/); await p2.waitForTimeout(500);
-    files.alien = await give(p2, 'Ada Example', ['use', 'install', 'edit', 'package']);
+    files.alien = await give(p2, 'Ada Example', ['use', 'install', 'share', 'sell']);
     await c2.close(); await ctx.close();
     // a changed one: one letter of its holder
     const tam = JSON.parse(JSON.stringify(ada)); tam.permit.holder = 'Ada Exampld'; files.tam = path.join(OUT, 'tampered.ingperm'); fs.writeFileSync(files.tam, JSON.stringify(tam));
@@ -118,8 +123,8 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
       'full, with no permission: Ingenium itself is neither in Code\'s list nor in the install kit; the card says none is kept', { self: st.self, kit: st.kit });
     let s = await bring(p, files.ada); let it = await items(p);
     st = await p.evaluate(() => ({ self: IngApps.list().some(a => a.key === 'ingenium-self' || a.key === 'ingenium'), kit: (() => { const k = document.querySelector('input[name="kitWhat"][value="self"]'); return k ? !k.closest('label').hidden : false; })() }));
-    ok(/is the owner's and is valid: Ada Example, number P-\d{4}-0001/.test(s) && it.some(t => /Ada Example · P-\d{4}-0001 valid \|/.test(t) && /change it, for their own use/.test(t)) && st.self && !st.kit,
-      'the owner\'s permission brought in is valid, names its holder and number, and lets Ingenium itself be opened (edit) but not packaged', { s, it, st });
+    ok(/is the owner's and is valid: Ada Example, number P-\d{4}-0001/.test(s) && it.some(t => /Ada Example · P-\d{4}-0001 valid \|/.test(t) && /give a copy to someone named/.test(t)) && !st.self && !st.kit,
+      'the owner\'s permission brought in is valid and names its holder and number; Ingenium itself is still neither in Code\'s list nor in the install kit (6.45)', { s, it, st });
     s = await bring(p, files.tam); it = await items(p);
     ok(/does not allow anything/.test(s) && it.some(t => /Ada Exampld/.test(t) && /not the owner's/.test(t) && /signature does not match/.test(t)), 'a permission changed by one letter is not the owner\'s', s);
     s = await bring(p, files.alien); it = await items(p);
@@ -131,7 +136,7 @@ function build(ed, out, env) { const r = spawnSync('python3', [BUILD, out], { en
     ok(/P-\d{4}-0002 valid \|/.test(boBefore || '') && /withdrawn/.test(boAfter || '') && /The owner has withdrawn it/.test(boAfter || '') && /list of withdrawn permissions is kept/.test(s), 'a withdrawn one is valid until the owner\'s list reaches this copy, and withdrawn once it does', [boBefore, boAfter]);
     await p.reload(); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 180000 }); await p.waitForTimeout(1500); await settings(p); await p.waitForTimeout(800);
     it = await items(p); st = await p.evaluate(() => ({ self: IngApps.list().some(a => a.key === 'ingenium-self' || a.key === 'ingenium') }));
-    ok(it.length === 5 && it.some(t => /Ada Example · .* valid/.test(t)) && it.some(t => /Bo Tester.*withdrawn/.test(t)) && st.self, 'kept after a reload, each with its state', { n: it.length, st, it });
+    ok(it.length === 5 && it.some(t => /Ada Example · .* valid/.test(t)) && it.some(t => /Bo Tester.*withdrawn/.test(t)) && !st.self, 'kept after a reload, each with its state (and still no Ingenium of its own)', { n: it.length, st, it });
     ok(!p.__errs.length, 'full: no page errors', p.__errs.slice(0, 3));
     await ctx.close();
     // ---------------- a gift edition, made for Ada ----------------

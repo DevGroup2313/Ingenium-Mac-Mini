@@ -29,9 +29,20 @@ function kept(){if(!Array.isArray(state.cxKept))state.cxKept=[];return state.cxK
 function idOf(c){return String(c.provider||"")+"|"+String((c.base||"")).replace(/\/+$/,"").toLowerCase();}
 function host(b){try{return new URL(b).host;}catch(e){return "";}}
 function label(k){var n=NAME[k.provider]||k.provider;if((k.provider==="openai-compat"||k.provider==="ollama-lan")&&host(k.base))n+=" · "+host(k.base);return n;}
-/* Claude's model names as Anthropic writes them: claude-opus-5-5 is Claude Opus 5.5 */
-function nice(id){var m=/^claude-(fable|mythos|opus|sonnet|haiku)-(\d+)(?:-(\d{1,2}))?(?:-\d{8})?$/.exec(String(id||""));
-  if(!m)return String(id||"");return "Claude "+m[1].charAt(0).toUpperCase()+m[1].slice(1)+" "+m[2]+(m[3]?"."+m[3]:"");}
+/* Claude's model names as Anthropic writes them: claude-opus-5-5 is Claude Opus 5.5. 6.9.9, her words (3 November 2026): "I want you to
+   remove the dashes from the Claude models name, they should be written normally": every page now writes them so (window.ingModelLabel),
+   the older names too (claude-3-5-sonnet-20241022 is Claude 3.5 Sonnet), and through OpenRouter or Bedrock (anthropic/claude-...).
+   Only what is shown changes: the service is always asked for the model by its own name. Other services' names stay as they write them. */
+function cap(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}
+function nice(id){var s=String(id||"").trim(),t=s.replace(/^(?:(?:us|eu|apac|global)\.)?anthropic[\/.]/i,"").replace(/\[[^\]]*\]$/,"").replace(/-v\d+(?::\d+)?$/i,"").replace(/-(?:\d{8}|latest)$/i,""),m;
+  if(!/^claude-/i.test(t))return s;
+  if((m=/^claude-([a-z]+)-(\d+)(?:-(\d{1,2}))?$/i.exec(t)))return "Claude "+cap(m[1])+" "+m[2]+(m[3]?"."+m[3]:"");
+  if((m=/^claude-(\d+)(?:-(\d{1,2}))?-([a-z]+)$/i.exec(t)))return "Claude "+m[1]+(m[2]?"."+m[2]:"")+" "+cap(m[3]);
+  if((m=/^claude-(\d+)(?:-(\d{1,2}))?$/i.exec(t)))return "Claude "+m[1]+(m[2]?"."+m[2]:"");
+  return s;}
+/* any Claude model's name inside a sentence, written so */
+function prettyModels(text){return String(text==null?"":text).replace(/(?:\b(?:us|eu|apac|global)\.)?\b(?:anthropic[\/.])?claude-[a-z0-9-]*[a-z0-9](?:\[[^\]\s]*\])?/gi,function(x){return nice(x);});}
+window.ingModelLabel=nice;window.ingPrettyModels=prettyModels;
 /* a connection is kept once it is whole: a service, and a model or a list of them */
 function remember(){try{var c=state.cloud;if(!c||!c.provider||c.provider==="ingenium")return;var models=(c.models&&c.models.length)?c.models.slice(0,200):(c.model?[c.model]:[]);if(!models.length)return;
   var L=kept(),id=idOf(c),k=L.filter(function(x){return x.id===id;})[0];
@@ -46,7 +57,7 @@ function use(k,model,quiet){var c=state.cloud=state.cloud||{};
   c.model=model||k.model||(k.models||[])[0]||"";c.on=true;state.chatSource="cloud";k.model=c.model;
   var cc=curChat();if(cc)cc.cx={id:k.id,model:c.model,source:"cloud"};
   saveState();try{paintChatTop();}catch(e){}try{paintSrc();}catch(e){}try{if(typeof paintCx==="function")paintCx();}catch(e){}paintKept();
-  var st=$("cxState");if(st)st.textContent="Connected · "+c.model;
+  var st=$("cxState");if(st)st.textContent="Connected · "+nice(c.model);
   if(!quiet){try{ingToast(nice(c.model)+" answers now, through "+label(k)+".");}catch(e){}}}
 /* the model menu: every kept connection, by service; the one in use first */
 function augment(){var m=$("chatModelMenu");if(!m||m.querySelector("[data-r191]"))return;var L=kept();if(!L.length)return;
@@ -64,7 +75,7 @@ function augment(){var m=$("chatModelMenu");if(!m||m.querySelector("[data-r191]"
       var t=el("span",null,nice(nm));t.style.cssText="overflow:hidden;text-overflow:ellipsis;white-space:nowrap";r.appendChild(t);
       if(onCloud&&k.id===cur&&nm===pick){var on=el("span","ctx-hint","answering now");on.style.cssText="margin-left:auto;color:var(--ok)";r.appendChild(on);}
       b.appendChild(r);b.onclick=function(){try{closeChatMenus();}catch(e){}use(k,nm);};box.appendChild(b);});
-    if(ms.length>SHOW)box.appendChild(el("div","cxm-more","and "+(ms.length-SHOW)+" more: Settings, Connect, lists them all"));});
+    if(ms.length>SHOW)box.appendChild(el("div","cxm-more","and "+(ms.length-SHOW)+" more: Find a model, at the top, finds each one"));});
   box.appendChild(el("div","ctx-sep"));
   m.insertBefore(box,m.firstChild);}
 /* each conversation keeps the model that last answered it */
@@ -92,14 +103,20 @@ function paintKept(){try{var cxOn=$("cxOn");if(!cxOn)return;var card=cxOn.closes
     box.appendChild(r);});}catch(e){}}
 function hook(){
   if(typeof window.saveState==="function"&&!window.saveState.__r191){var os=window.saveState;window.saveState=function(){remember();return os.apply(this,arguments);};window.saveState.__r191=1;}
-  if(typeof window.paintModelMenu==="function"&&!window.paintModelMenu.__r191){var op=window.paintModelMenu;window.paintModelMenu=function(){var r=op.apply(this,arguments);augment();return r;};window.paintModelMenu.__r191=1;}
+  if(typeof window.paintModelMenu==="function"&&!window.paintModelMenu.__r191){var op=window.paintModelMenu;window.paintModelMenu=function(){var r=op.apply(this,arguments);augment();
+      /* the menu's own list of the connection's models: Claude's written as Anthropic writes them */
+      try{[].forEach.call(document.querySelectorAll("#chatModelMenu span"),function(sp){if(sp.childNodes.length===1&&sp.firstChild.nodeType===3&&/^(?:[a-z.]+[\/.])?claude-/i.test(sp.textContent)){sp.title=sp.textContent;sp.textContent=nice(sp.textContent);}});}catch(e){}return r;};window.paintModelMenu.__r191=1;}
   if(typeof window.renderChat==="function"&&!window.renderChat.__r191){var orc=window.renderChat;window.renderChat=function(){restore();return orc.apply(this,arguments);};window.renderChat.__r191=1;}
   if(typeof window.sendRec==="function"&&!window.sendRec.__r191){var osr=window.sendRec;window.sendRec=function(){noteSend();return osr.apply(this,arguments);};window.sendRec.__r191=1;}
   /* the key beside the send arrow names Claude's models as the menu does */
   if(typeof window.paintChatTop==="function"&&!window.paintChatTop.__r191){var opt=window.paintChatTop;window.paintChatTop=function(){var r=opt.apply(this,arguments);
     try{var nm=$("chatModelName"),c=state.cloud;if(nm&&c&&c.model&&nm.textContent===c.model){nm.textContent=nice(c.model);var k=$("chatModelBtn");if(k)k.setAttribute("data-model-id",c.model);}}catch(e){}return r;};window.paintChatTop.__r191=1;}
-  if(typeof window.paintCx==="function"&&!window.paintCx.__r191){var opc=window.paintCx;window.paintCx=function(){var r=opc.apply(this,arguments);paintKept();return r;};window.paintCx.__r191=1;}
+  if(typeof window.paintSrc==="function"&&!window.paintSrc.__r191){var ops=window.paintSrc;window.paintSrc=function(){var r=ops.apply(this,arguments);prettyState();return r;};window.paintSrc.__r191=1;}
+  if(typeof window.paintCx==="function"&&!window.paintCx.__r191){var opc=window.paintCx;window.paintCx=function(){var r=opc.apply(this,arguments);paintKept();prettyState();return r;};window.paintCx.__r191=1;}
   remember();paintKept();try{lastChat=curChat()&&curChat().id;}catch(e){}try{paintChatTop();}catch(e){}}
+/* the lines that name the model in use, in Settings and in the chat's note, written as Anthropic writes it */
+function prettyState(){try{["cxState","srcNote"].forEach(function(id){var e=$(id);if(e&&e.childNodes.length===1&&e.firstChild.nodeType===3){var t=prettyModels(e.textContent);if(t!==e.textContent)e.textContent=t;}});}catch(e){}}
+setInterval(prettyState,1500);
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);else hook();
 window.addEventListener("load",function(){hook();setTimeout(hook,1500);});
 window.IngConnections={kept:kept,use:use,remember:remember,nice:nice,label:label,paint:paintKept};

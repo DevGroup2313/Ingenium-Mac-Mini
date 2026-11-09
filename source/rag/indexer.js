@@ -84,7 +84,7 @@ export class ParseClient {
   }
   async init() { if (!this.inited) { await this._request('init', { vendorBase: this.vendorBase }); this.inited = true; } }
   /** pieces: async iterable of Uint8Array (each is handed over, its buffer emptied). opts: {ext, path, size, maxTokens, modelKey, onStage, signal,
-   *  timeoutMs = 10 minutes, slim = true, maxBytes}. Resolves with the worker's result. */
+   *  timeoutMs = 10 minutes, slim = true, maxBytes, textOnly}. Resolves with the worker's result. */
   async parse(pieces, opts) {
     await this.init();
     let timer = null, session = null;
@@ -94,7 +94,7 @@ export class ParseClient {
     stop.catch(() => {});
     this.stageListener = (m) => { if (opts.onStage && (session === null || m.session === session)) opts.onStage(m); };
     const run = async () => {
-      const r = await this._request('open', { ext: opts.ext, path: opts.path, size: opts.size, maxTokens: opts.maxTokens, modelKey: opts.modelKey, overlap: opts.overlap, slim: opts.slim !== false, maxBytes: opts.maxBytes });
+      const r = await this._request('open', { ext: opts.ext, path: opts.path, size: opts.size, maxTokens: opts.maxTokens, modelKey: opts.modelKey, overlap: opts.overlap, slim: opts.slim !== false, maxBytes: opts.maxBytes, textOnly: !!opts.textOnly });
       session = r.session;
       try {
         for await (const u8 of pieces) {

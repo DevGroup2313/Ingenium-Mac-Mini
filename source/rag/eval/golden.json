@@ -1,0 +1,228 @@
+{
+ "about": "The folder search's evaluation set (phase 5, her task: '15 to 20 question, answer and source triples drawn from the fixture corpus'). Each item is one of rag/fixtures/FACTS.json, chosen to cover the seven file types, the three folders and the 4 MB logbook (H09). A retrieval finds an item when one of its five passages is from the source file (file level, her criterion) and, stricter, when that passage holds the needle. household_papers is the restricted folder: the second user, test-b, may not read it.",
+ "version": 1,
+ "k": 5,
+ "restricted_folder": "household_papers",
+ "items": [
+  {
+   "id": "H01",
+   "question": "How many hogsheads of sugar did the Mary Ann carry from Kingston in February 1784?",
+   "answer": "412 hogsheads of sugar (with 38 puncheons of rum)",
+   "source": {
+    "folder": "historian_archive",
+    "file": "letters/1784-03-02_grieve_to_wren.txt",
+    "type": "txt"
+   },
+   "needle": "412 hogsheads of sugar"
+  },
+  {
+   "id": "H03",
+   "question": "What did the ship Hester cost to build?",
+   "answer": "£2,140 (163 tons burthen)",
+   "source": {
+    "folder": "historian_archive",
+    "file": "diaries/josiah_hollis_diary_1786.md",
+    "type": "md"
+   },
+   "needle": "she measured 163 tons burthen and cost £2,140 to build"
+  },
+  {
+   "id": "H05",
+   "question": "What was the duty on muscovado sugar imported into Bristol in 1787?",
+   "answer": "15 shillings the hundredweight",
+   "source": {
+    "folder": "historian_archive",
+    "file": "articles/sugar_duties_1787.pdf",
+    "type": "pdf"
+   },
+   "needle": "15 shillings the hundredweight"
+  },
+  {
+   "id": "H06",
+   "question": "What does the Wren collection hold, and who deposited it?",
+   "answer": "214 letters, 9 account books and 31 loose maps, deposited by Eleanor Marsh in 1962",
+   "source": {
+    "folder": "historian_archive",
+    "file": "finding_aids/wren_collection_guide.html",
+    "type": "html"
+   },
+   "needle": "214 letters, 9 account books and 31 loose maps"
+  },
+  {
+   "id": "H07",
+   "question": "What monthly wage was the boatswain Silas Pennock paid on the Hester in 1788?",
+   "answer": "£3 15s 0d",
+   "source": {
+    "folder": "historian_archive",
+    "file": "ledgers/wages_roll_hester_1788.csv",
+    "type": "csv"
+   },
+   "needle": "Silas Pennock,Boatswain,£3 15s 0d"
+  },
+  {
+   "id": "H08",
+   "question": "How much did the firm owe the Lisbon wine merchant Joaquim da Cunha by the winter of 1790?",
+   "answer": "£1,386 11s 4d",
+   "source": {
+    "folder": "historian_archive",
+    "file": "chapters/chapter3_the_cooper_trade.docx",
+    "type": "docx"
+   },
+   "needle": "£1,386 11s 4d"
+  },
+  {
+   "id": "H09",
+   "question": "Who was the carpenter killed in a fall from the fore-topsail yard?",
+   "answer": "Daniel Roke",
+   "source": {
+    "folder": "historian_archive",
+    "file": "logbook/ship_logbooks_1781-1802.txt",
+    "type": "txt"
+   },
+   "needle": "the carpenter, Daniel Roke, fell from the fore-topsail yard"
+  },
+  {
+   "id": "H11",
+   "question": "What port dues did the Providence pay at Bristol on 8 May 1790?",
+   "answer": "£86 4s 9d (receipt no. 7731)",
+   "source": {
+    "folder": "historian_archive",
+    "file": "ledgers/voyages_1781-1795.json",
+    "type": "json"
+   },
+   "needle": "Paid £86 4s 9d to the Port Officer on 8 May 1790, receipt no. 7731"
+  },
+  {
+   "id": "H12",
+   "question": "What was the largest vessel built at Thomas Boyd's Hotwells yard between 1781 and 1790?",
+   "answer": "The 280-ton Africa Packet",
+   "source": {
+    "folder": "historian_archive",
+    "file": "articles/hotwells_shipyards_1780s.pdf",
+    "type": "pdf"
+   },
+   "needle": "the 280-ton Africa Packet"
+  },
+  {
+   "id": "L01",
+   "question": "At what temperature and for how long are the spore germination plates incubated?",
+   "answer": "24.5 °C for 72 hours, in the dark",
+   "source": {
+    "folder": "lab_notes",
+    "file": "protocols/spore_germination_assay.md",
+    "type": "md"
+   },
+   "needle": "Incubate the plates at 24.5 °C for 72 h in the dark"
+  },
+  {
+   "id": "L03",
+   "question": "What dry mycelium yield did batch 17 give?",
+   "answer": "3.82 g, from 2.0 L of potato dextrose broth",
+   "source": {
+    "folder": "lab_notes",
+    "file": "notebook/2026-03-09_batch17.txt",
+    "type": "txt"
+   },
+   "needle": "Batch 17 yielded 3.82 g of dry mycelium"
+  },
+  {
+   "id": "L05",
+   "question": "What happened to Incubator B on the night of 17 May 2026?",
+   "answer": "It reached 37.8 °C; the night porter M. Dlamini found the door ajar",
+   "source": {
+    "folder": "lab_notes",
+    "file": "instruments/incubator_b_log_2026-05.csv",
+    "type": "csv"
+   },
+   "needle": "door found ajar (night porter M. Dlamini)"
+  },
+  {
+   "id": "L07",
+   "question": "Where was strain FX-208 isolated from?",
+   "answer": "Beech litter at Hayley Wood (accession 2025-0173)",
+   "source": {
+    "folder": "lab_notes",
+    "file": "data/strain_registry.json",
+    "type": "json"
+   },
+   "needle": "Isolated from beech litter at Hayley Wood, accession 2025-0173"
+  },
+  {
+   "id": "L08",
+   "question": "What did the lab spend on consumables in the second quarter of 2026?",
+   "answer": "£14,206.50 (8% under budget)",
+   "source": {
+    "folder": "lab_notes",
+    "file": "reports/q2_report_2026.pdf",
+    "type": "pdf"
+   },
+   "needle": "£14,206.50"
+  },
+  {
+   "id": "L10",
+   "question": "What did the February 2026 safety audit find in the prep room?",
+   "answer": "Three expired fire extinguishers, all replaced by 20 February",
+   "source": {
+    "folder": "lab_notes",
+    "file": "reports/safety_audit_2026.docx",
+    "type": "docx"
+   },
+   "needle": "three expired fire extinguishers"
+  },
+  {
+   "id": "L11",
+   "question": "Which second centrifuge did the lab decide to buy on 18 June 2026, and at what price?",
+   "answer": "The Hettich Rotanta 460, £6,480 plus VAT",
+   "source": {
+    "folder": "lab_notes",
+    "file": "meetings/lab_meeting_2026-06-18.html",
+    "type": "html"
+   },
+   "needle": "Hettich Rotanta 460"
+  },
+  {
+   "id": "R01",
+   "question": "What is the buildings sum insured on the home insurance policy?",
+   "answer": "£385,000",
+   "source": {
+    "folder": "household_papers",
+    "file": "insurance/home_policy_schedule.pdf",
+    "type": "pdf"
+   },
+   "needle": "Buildings sum insured: £385,000"
+  },
+  {
+   "id": "R03",
+   "question": "Who quoted to replace the boiler, and for how much?",
+   "answer": "Halvorsen Plumbing, £3,940",
+   "source": {
+    "folder": "household_papers",
+    "file": "letters/plumber_quote_2025-11-03.docx",
+    "type": "docx"
+   },
+   "needle": "Halvorsen Plumbing has quoted £3,940 to replace the boiler"
+  },
+  {
+   "id": "R06",
+   "question": "At what temperature and for how long are the cardamom buns baked?",
+   "answer": "200 °C for 9 minutes",
+   "source": {
+    "folder": "household_papers",
+    "file": "recipes/cardamom_buns.md",
+    "type": "md"
+   },
+   "needle": "Bake at 200 °C for 9 minutes"
+  },
+  {
+   "id": "R09",
+   "question": "Until when does the dishwasher's warranty run?",
+   "answer": "14 August 2027",
+   "source": {
+    "folder": "household_papers",
+    "file": "home/warranty_notes.txt",
+    "type": "txt"
+   },
+   "needle": "warranty runs until 14 August 2027"
+  }
+ ]
+}

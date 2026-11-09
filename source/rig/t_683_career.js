@@ -70,17 +70,17 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   const shot = async name => { const sfx = phone ? '-phone' : ''; await p.screenshot({ path: OUT + '/' + name + sfx + '.png' });
     await p.evaluate(() => document.body.setAttribute('data-theme', 'night')); await p.waitForTimeout(250); await p.screenshot({ path: OUT + '/' + name + sfx + '-night.png' });
     await p.evaluate(() => document.body.setAttribute('data-theme', 'day')); await p.waitForTimeout(150); };
-  // the page never scrolls: it fits the window, and only the panels scroll
+  // the page never scrolls: it fits the window, and only the panels scroll (6.10.2: and a short scroll below it shows the colophon, as on every page)
   const fits = [];
   const fitCheck = async where => { const f = await p.evaluate(() => { const se = document.scrollingElement, m = document.querySelector('.main'); const pn = [...document.querySelectorAll('#cs .c-pn')].filter(x => x.offsetParent).map(x => Math.round(x.getBoundingClientRect().bottom));
-      const cs = document.getElementById('cs'); return { page: se.scrollHeight - se.clientHeight, main: m ? m.scrollHeight - m.clientHeight : 0, bottom: Math.max(...pn), h: innerHeight, ch: cs.style.getPropertyValue('--c-h'), top: Math.round(cs.getBoundingClientRect().top), ms: m ? m.scrollTop : 0, ss: se.scrollTop, csh: Math.round(cs.getBoundingClientRect().height), kids: [...cs.querySelectorAll('.c-pn')].map(x => Math.round(x.getBoundingClientRect().height) + ':' + Math.round(x.scrollHeight)) }; }); fits.push([where, f]); };
+      const cs = document.getElementById('cs'); return { page: se.scrollHeight - se.clientHeight, col: (() => { const c = document.getElementById('ingColophon'); return c && c.getAttribute('data-on') === '1' ? Math.round(c.getBoundingClientRect().top) : 99999; })(), main: m ? m.scrollHeight - m.clientHeight : 0, bottom: Math.max(...pn), h: innerHeight, ch: cs.style.getPropertyValue('--c-h'), top: Math.round(cs.getBoundingClientRect().top), ms: m ? m.scrollTop : 0, ss: se.scrollTop, csh: Math.round(cs.getBoundingClientRect().height), kids: [...cs.querySelectorAll('.c-pn')].map(x => Math.round(x.getBoundingClientRect().height) + ':' + Math.round(x.scrollHeight)) }; }); fits.push([where, f]); };
   // 1. its place in the menu, after Lector
   const nav = await p.evaluate(() => { const ks = [...document.querySelectorAll('.nav-btn')].map(x => x.getAttribute('data-page')); return { has: ks.includes('career'), after: ks[ks.indexOf('career') - 1] }; });
   ok(nav.has && nav.after === 'lector', 'the Career Studio has its own key in the main menu, after Lector', JSON.stringify(nav));
   if (phone) await p.evaluate(() => go('career')); else { const bb = await p.evaluate(() => { const r = document.querySelector('.nav-btn[data-page="career"]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); await p.mouse.click(bb[0], bb[1]); }
   await p.waitForTimeout(700);
   const rooms = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(x => x.textContent.trim()));
-  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Applications|Your profile|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12), in the keys Settings uses for its rooms', rooms.join('|'));
+  ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Your mentor|Applications|People|Your profile|Your edge|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12, People since 6.9.7), in the keys Settings uses for its rooms', rooms.join('|'));
   ok(await p.evaluate(() => /not a job board/.test(document.querySelector('#cs .c-list').innerText) && (innerWidth < 900 || /Tell me and I forget\. Teach me and I remember\. Involve me and I learn\./.test(document.querySelector('#cs .c-work').innerText))), 'with nothing brought yet: how it works, her words at its head, and that it is not a job board');
   await fitCheck('Applications, nothing yet'); await shot('intro');
   // 2. the profile: who, what she is looking for, her CV (shared with Lector), an entry, LinkedIn
@@ -116,13 +116,14 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   ok(sk.length === 1 && /^Software design :: Evidence: four offline apps/.test(sk[0]) && /Where it counts: Academic and professional/.test(sk[0]), 'her skills are found with their evidence and where they count; one already kept and one with no evidence are not offered', JSON.stringify(sk));
   await press('Drop them all');
   // 3. an application: pasted, read against her profile
-  await press('Applications', '#cs .rm-tabs'); await press('+ Bring one'); await p.fill('#cs .c-work textarea', POST); await press('Keep it');
-  await p.waitForFunction(() => IngCareer.state().opps.length === 1, null, { timeout: 15000 }).catch(() => {}); await p.waitForTimeout(400);
+  // 6.9.8: kept, a posting is read against her profile at once ("have the analysis be done and the match profile for me and the job be done from there")
+  await press('Applications', '#cs .rm-tabs'); await press('+ Bring one'); await p.fill('#cs .c-work textarea', POST); await press('Keep and read it');
+  await p.waitForFunction(() => IngCareer.state().opps.length === 1, null, { timeout: 15000 }).catch(() => {}); await idle(); await p.waitForTimeout(400);
   let opp = await p.evaluate(() => { const o = IngCareer.state().opps[0]; return o && { title: o.title, org: o.org, closes: o.closes, due: o.due, open: IngCareer.state().ui.open === o.id, steps: [...document.querySelectorAll('#cs .c-steps li:not(.sep) span')].map(x => x.textContent.trim()), now: (document.querySelector('#cs .c-steps li.now') || {}).textContent }; });
   ok(opp && opp.title === 'Lecturer in Digital History' && opp.org === 'University of Oxbridge' && /30 November 2026/.test(opp.closes) && opp.due === '2026-11-30' && opp.open, 'a pasted posting is kept and opened, its title, organisation and closing date read from it (the date set for the tracker)', JSON.stringify(opp));
-  ok(opp.steps.join('|') === 'The posting|How you fit|Checklist|What you send|Practise|Track' && /The posting/.test(opp.now), 'an application is taken in numbered steps (six since 6.8.12, with its Checklist), one on the screen at a time: it opens on The posting', JSON.stringify(opp.steps));
-  await fitCheck('An application: the posting'); await shot('posting');
-  await press('Read it against my profile'); await idle(); await p.waitForTimeout(400);
+  ok(opp.steps.join('|') === 'The posting|How you fit|Checklist|What you send|Practise|Track' && /How you fit/.test(opp.now), 'an application is taken in numbered steps (six since 6.8.12, with its Checklist), one on the screen at a time: kept, it is read at once and opens on How you fit (6.9.8)', JSON.stringify(opp));
+  await press('The posting', '#cs .c-steps'); await p.waitForTimeout(300); await fitCheck('An application: the posting'); await shot('posting');
+  await press('Next: how you fit'); await p.waitForTimeout(400);
   const rd = await p.evaluate(() => { const w = document.querySelector('#cs .c-work'), t = w.innerText, band = w.querySelector('.c-bandcard'); return { band: band && band.getAttribute('data-band'), word: band && band.querySelector('h3').textContent, text: t, now: (w.querySelector('.c-steps li.now') || {}).textContent,
     rows: w.querySelectorAll('.c-tab tbody tr').length, ask: window.__asks.filter(a => /CRITERION: the criterion/.test(a.u)).pop() }; });
   ok(/How you fit/.test(rd.now) && /Against what you are looking for/i.test(rd.text) && /Does not match/.test(rd.text) && /Full time, in Oxbridge/.test(rd.text), 'read, it moves to How you fit, and says how it matches what she is looking for (London: does not match)', rd.now);
@@ -205,7 +206,7 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   await press('Make it a goal'); ok(await p.evaluate(() => IngCareer.state().goals.length === 2 && IngCareer.state().goals[0].steps[0].text === 'write to supervisors'), 'a kind of role made a goal, with its first step');
   // 9. learn: one lesson at a time
   await press('Learn', '#cs .rm-tabs'); const ls = await p.evaluate(() => [...document.querySelectorAll('#cs .c-list .c-item b')].map(x => x.textContent));
-  ok(ls.length === 14 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews') && ls.includes('A statement of purpose') && ls.includes('A checklist from a posting'), 'Learn: its lessons, listed (fourteen since 6.8.12)', ls.join(', '));
+  ok(ls.length === 17 && ls[0] === 'Reading a posting' && ls.includes('A research proposal') && ls.includes('Interviews') && ls.includes('A statement of purpose') && ls.includes('A checklist from a posting') && ls.includes('A portfolio for an application') && ls.includes('Finding your edge') && ls[16] === 'CV and letter templates', 'Learn: its lessons, listed (fourteen since 6.8.12; since 6.10.2 fifteen, with the portfolio; since 6.44 sixteen, with Finding your edge; the templates last)', ls.join(', '));
   if (phone) await press('Reading a posting'); const l1 = await p.evaluate(() => ({ h: document.querySelector('#cs .c-work h2').textContent, n: document.querySelectorAll('#cs .c-lesson li').length }));
   await press('A CV for an application ›'); const l2 = await p.evaluate(() => document.querySelector('#cs .c-work h2').textContent);
   ok(l1.h === 'Reading a posting' && l1.n === 5 && l2 === 'A CV for an application', 'one lesson at a time, in numbered steps, the next one a press away', JSON.stringify([l1, l2]));
@@ -217,8 +218,9 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   const lx = await p.evaluate(() => { const o = IngCareer.state().opps.find(x => x.from === 'lector:pX'); return { page: document.querySelector('section.active') && document.querySelector('section.active').id, o: o && { title: o.title, docs: Object.keys(o.docs).sort().join(), step: o.step } }; });
   ok(lx.page === 'page-career' && lx.o && lx.o.title === 'Archivist' && lx.o.docs === 'cover,cv' && lx.o.step === 'send', 'in Lector, a CV and a cover letter with no apps chosen: the Career Studio writes both from the posting and her profile, and shows them', JSON.stringify(lx));
   // 11. the page never scrolls; nothing went online; no errors
-  const bad = fits.filter(x => x[1].page > 2 || x[1].main > 2 || x[1].bottom > x[1].h);
-  ok(!bad.length, 'the page never scrolls: in every room and step it fits the window, and only its panels scroll (' + fits.length + ' places)', JSON.stringify(bad.slice(0, 3)));
+  /* measured from the top of the page (a key pressed may have scrolled it a little, now that the colophon lies below) */
+  const bad = fits.filter(x => x[1].page > 420 || x[1].col + x[1].ss < x[1].h - 2 || x[1].main > 2 || x[1].bottom + x[1].ss > x[1].h);
+  ok(!bad.length, 'the page never scrolls through the studio: in every room and step it fits the window, and only its panels scroll; below it, a short scroll shows the colophon (' + fits.length + ' places)', JSON.stringify(bad.slice(0, 3)));
   ok(outside.length === 0, 'nothing was searched or fetched online: nothing was asked for', outside.slice(0, 3).join(' '));
   const asks = await p.evaluate(() => window.__asks.map(a => /Never invent a skill/.test(a.s)));
   ok(asks.length >= 14 && asks.every(Boolean), 'every request to the model carries the rule never to invent (' + asks.length + ' requests)');

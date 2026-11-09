@@ -142,6 +142,9 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-ls.flat img{position:absolute;inset:0;width:100%;height:100%;display:block;animation:fbSway 7s ease-in-out infinite}
 #fb .f-ls.new{border-radius:50%;border:1.5px dashed var(--f-ring);display:inline-grid;place-items:center;color:var(--f-acc);font:600 calc(var(--S,56px) * .38)/1 var(--f-serif)}
 #fb .f-ls.new span{display:block;animation:fbSway 7s ease-in-out infinite}
+/* 6.40: the Offline Project's crest (modules/r140.js), standing in its seal's square at a seal's height */
+#fb .f-ls.crest{display:inline-flex;align-items:center;justify-content:center;perspective:none}
+#fb .f-ls.crest > .ing-crest{display:block;flex:0 0 auto}
 
 /* her apps: tiles two by two; the chosen one raised, with its tick */
 #fb .f-repos{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 14px}
@@ -204,7 +207,7 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-keep textarea{width:100%;min-height:58px;resize:vertical}
 #fb .f-keep .f-row .f-btn.pri{margin-left:auto}
 #fb .f-empty{padding:22px 16px;color:var(--f-ink2);font-size:13.5px;line-height:1.6;animation:fbRise .4s var(--f-spring)}
-#fb .f-empty b{display:block;font:600 17px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:6px;letter-spacing:.02em}
+#fb .f-empty b{display:block;font:600 16.5px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:6px;letter-spacing:.02em}
 #fb .f-note{margin:10px 12px 0;padding:8px 12px;border-radius:10px;background:var(--f-accs);color:var(--f-acc);font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #fb .f-note .f-btn{margin-left:auto}
 
@@ -382,6 +385,95 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb .f-sec.is-shut .f-secfold svg{transform:rotate(-90deg)}
 #fb .f-sec.is-shut > h3{margin-bottom:0}
 body.fb-drag,body.fb-drag *{cursor:col-resize !important;-webkit-user-select:none !important;user-select:none !important}
+/* 6.61 · the library, a new app and bringing one in, redesigned (her preview of 8 November 2026, approved) */
+#fb.f-home .f-panels,#fb.f-home .f-tabs,#fb.f-home .f-steps{display:none !important}
+#fb:not(.f-home) .f-homek{display:none !important}
+#fb .f-libk{all:unset;cursor:pointer;font:inherit;color:inherit;border-radius:6px;border-bottom:1px dashed var(--f-ring)}
+#fb .f-libk:hover{color:var(--f-acc)}
+#fb .f-libk:focus-visible,#fb .f-libk2:focus-visible{outline:2px solid var(--f-ring);outline-offset:2px}
+#fb .f-libk2{cursor:pointer;font:inherit}
+#fb:not(.f-home) .f-lib{display:none !important}
+#fb .f-lib{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;overflow:auto;padding:2px 4px 18px;scrollbar-width:thin}
+#fb .f-lib > *{flex-shrink:0}
+#fb .f-lib-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
+#fb .f-lib-top h2{margin:0 auto 0 0;font:600 24px/1.15 var(--f-serif);color:var(--f-ink1);letter-spacing:.02em}
+#fb .f-find{min-width:220px;padding:8px 12px;border-radius:11px;border:1px solid var(--f-hair);background:var(--f-hi);color:var(--f-ink1);font:inherit;font-size:13.5px}
+#fb .f-find:focus{outline:2px solid var(--f-ring);outline-offset:1px}
+#fb .f-lib > .f-seg{align-self:flex-start;margin:0 0 14px}
+#fb .f-lib-sec{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+#fb .f-lib-sec b{font:700 11px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--f-ink3)}
+#fb .f-lib-sec span{font-size:12.5px;color:var(--f-ink3)}
+#fb .f-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin:0 0 20px}
+#fb .f-lc{display:grid;grid-template-columns:auto 1fr;gap:3px 16px;align-items:center;padding:16px 18px 14px;border-radius:16px;border:1px solid var(--f-hair);background:var(--f-hi);box-shadow:var(--f-slab);cursor:pointer;text-align:left;min-width:0}
+#fb .f-lc:focus-visible{outline:2px solid var(--f-ring);outline-offset:2px}
+#fb .f-lc .sl{grid-row:1 / span 2;align-self:start}
+#fb .f-lc .nm{font:600 18px/1.25 var(--f-serif);color:var(--f-ink1);overflow-wrap:anywhere}
+#fb .f-lc .vr{font-size:12.5px;color:var(--f-ink3);margin-top:2px}
+#fb .f-lc .st{grid-column:1 / -1;display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--f-ink2);margin-top:8px}
+#fb .f-lc .st i{width:8px;height:8px;border-radius:50%;background:#2f7a55;flex:0 0 auto}
+#fb .f-lc .st i.w{background:#c58a1a}
+#fb .f-lc .st i.n{background:var(--f-ink3)}
+#fb .f-lc .dv{grid-column:1 / -1;display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;min-height:21px}
+#fb .f-lc .dv span{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--f-hair);color:var(--f-ink2)}
+#fb .f-lc .ks{grid-column:1 / -1;display:flex;gap:8px;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid var(--f-hair2)}
+#fb .f-lib-none{padding:22px;border-radius:16px;border:1px dashed var(--f-hair);color:var(--f-ink2);font-size:13.5px;line-height:1.55;max-width:70ch}
+#fb .f-lib-none b{display:block;font:600 17px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:4px}
+#fb .f-lib-learn{padding:12px 14px;border-radius:12px;border:1px dashed var(--f-hair);font-size:12.5px;line-height:1.55;color:var(--f-ink2);max-width:92ch}
+#fb .f-lib-learn b{color:var(--f-ink1)}
+/* 6.61 · each app's own page (her approved preview, 8 November 2026: "I want all of these to be kept and added into Ingenium") */
+#fb.f-apppg .f-panels,#fb.f-apppg .f-tabs,#fb.f-apppg .f-steps,#fb.f-apppg .f-lib{display:none !important}
+#fb:not(.f-apppg) .f-apg{display:none !important}
+#fb.f-apppg .f-homek{display:inline-flex !important}
+#fb .f-apg{display:grid;grid-template-columns:220px 1fr;gap:16px;min-height:0;flex:1 1 auto;overflow:auto;padding:2px 4px 18px}
+#fb .f-apg > *{min-width:0}
+#fb .f-rail{display:flex;flex-direction:column;gap:3px;padding:10px;border-radius:16px;border:1px solid var(--f-hair);background:var(--f-hi);box-shadow:var(--f-slab);align-self:start}
+#fb .f-rail button{all:unset;display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;font-size:13.5px;color:var(--f-ink1);cursor:pointer}
+#fb .f-rail button:hover{background:var(--f-accs)}
+#fb .f-rail button[aria-current="true"]{background:var(--f-lo);font-weight:650}
+#fb .f-rail button:focus-visible{outline:2px solid var(--f-ring)}
+#fb .f-rail small{display:block;font-size:11px;color:var(--f-ink3);font-weight:400}
+#fb .f-hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:18px 20px;border-radius:16px;border:1px solid var(--f-hair);background:var(--f-hi);box-shadow:var(--f-slab);margin-bottom:12px}
+#fb .f-hero .nm{font:600 26px/1.15 var(--f-serif);color:var(--f-ink1);overflow-wrap:anywhere}
+#fb .f-hero .vr{font-size:13px;color:var(--f-ink3);margin-top:3px}
+#fb .f-hero .ks{margin-left:auto;display:flex;gap:8px}
+#fb .f-apg .f-seg{margin:0 0 12px}
+#fb .f-three{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+#fb .f-box{padding:14px 16px;border-radius:14px;border:1px solid var(--f-hair);background:var(--f-hi);box-shadow:var(--f-slab);font-size:12.5px;line-height:1.5;color:var(--f-ink2)}
+#fb .f-box h4{margin:0 0 6px;font:700 11px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--f-ink3)}
+#fb .f-box .big{font:600 16px/1.3 var(--f-serif);color:var(--f-ink1);margin-bottom:4px}
+#fb .f-box p{margin:0 0 10px}
+@media (max-width:760px){#fb .f-apg{grid-template-columns:1fr}#fb .f-rail{flex-direction:row;overflow-x:auto}}
+#fb .f-ls.mark{border-radius:50%;display:grid;place-items:center;background:var(--mc,#2f7a8a);color:#fff;font:600 calc(var(--S,56px) * .44)/1 var(--f-serif);box-shadow:inset 0 calc(var(--S,56px) * -.06) 0 rgba(0,0,0,.14),0 4px 10px rgba(40,22,68,.2)}
+#fb .f-sheet{position:relative}
+#fb .f-sheet.wide{width:min(880px,100%)}
+#fb .f-sheet.wide h3{font-size:21px;padding-right:44px}
+#fb .f-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:1px solid var(--f-hair);background:linear-gradient(var(--f-a),var(--f-b));color:var(--f-ink2);display:grid;place-items:center;font-size:14px;cursor:pointer;box-shadow:var(--f-pop)}
+#fb .f-x:active{transform:translateY(1px)}
+#fb .f-lab{display:block;font:700 11px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--f-ink3);margin:2px 0 6px}
+#fb .f-new{display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:start}
+#fb .f-new-prev{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 6px;border-radius:14px;background:var(--f-lo)}
+#fb .f-new-prev small{font-size:11.5px;color:var(--f-ink3);text-align:center;line-height:1.4}
+#fb .f-sheet input.f-in,#fb .f-sheet textarea.f-in{width:100%;box-sizing:border-box;padding:10px 13px;border-radius:12px;border:1px solid var(--f-hair);background:var(--f-hi);color:var(--f-ink1);font:inherit;font-size:14.5px}
+#fb .f-sheet input.f-in:focus,#fb .f-sheet textarea.f-in:focus{outline:2px solid var(--f-ring);outline-offset:1px}
+#fb .f-sheet textarea.f-in{min-height:64px;font-size:13.5px;line-height:1.5;resize:vertical}
+#fb .f-sw{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:2px 0 12px}
+#fb .f-sw button{width:26px;height:26px;border-radius:50%;border:0;padding:0;cursor:pointer}
+#fb .f-sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--f-hi),0 0 0 4px var(--f-ink2)}
+#fb .f-sw span{margin-left:6px;font-size:12.5px;color:var(--f-ink3)}
+#fb .f-ways{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:2px 0 10px}
+#fb .f-way{padding:11px 13px;border-radius:12px;border:1px solid var(--f-hair);background:var(--f-hi);font:inherit;font-size:12.5px;line-height:1.45;color:var(--f-ink2);text-align:left;cursor:pointer}
+#fb .f-way b{display:block;font-size:14px;color:var(--f-ink1);margin-bottom:2px}
+#fb .f-way[aria-pressed="true"]{border:2px solid var(--f-acc);padding:10px 12px}
+#fb .f-new-foot{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-top:8px}
+#fb .f-new-foot small{font-size:12px;color:var(--f-ink3);max-width:58ch;line-height:1.45}
+#fb .f-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:0 0 16px}
+#fb .f-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;border-radius:14px;border:1px solid var(--f-hair);background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);text-align:center;font:inherit;cursor:pointer;color:var(--f-ink1)}
+#fb .f-tile b{font-size:13.5px}
+#fb .f-tile small{font-size:11.5px;color:var(--f-ink3);margin-top:-3px;line-height:1.35}
+#fb .f-tile:active{transform:translateY(1px)}
+#fb .f-rows3{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
+#fb .f-rows3 .f-opt{margin:0}
+@media (max-width:700px){#fb .f-new{grid-template-columns:1fr}#fb .f-ways{grid-template-columns:1fr}}
 /* reduced motion: no animation and no gliding, but a key still answers a press at once (6.0: nothing was left to answer) */
 @media (prefers-reduced-motion:reduce){#fb *,#fb *::before,#fb *::after{animation:none !important;transition-duration:.01ms !important}}
 </style>
@@ -402,15 +494,40 @@ function when(t){if(!t)return "";var d=new Date(t),now=new Date(),same=d.toDateS
   return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+(d.getFullYear()!==now.getFullYear()?" "+d.getFullYear():"")+", "+hm;}
 var APPS={cd:{name:"Carpe Diem",color:"#1B6B93"},forge:{name:"The Forge",color:"#17577A"},ingenium:{name:"Ingenium",color:"#6A3FB5"},inkwell:{name:"Inkwell",color:"#1F4F68"}};
 var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
+/* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
+try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!APPS.lakay){APPS.lakay={name:LIB_NAMES.lakay,color:"#5c63c6"};DELAY.lakay=6.8;}}catch(e){}
 function appOf(r){return r&&r.app&&APPS[r.app]?r.app:null;}
 function colorOf(r){var k=appOf(r);return k?APPS[k].color:"#b88a3a";}
+/* 6.40: the Offline Project wears its own crest here, as each of the four apps wears its seal. Her words (6 November 2026): "I want the
+   Offline Project seal to be shown inside of Fabrica the same way that the other apps icons are shown inside of Fabrica, I don't want it
+   to be Fabrica's logo." A repository is known as the Offline Project by its name (The Offline Project, Offline-project-forest,
+   offline_project); one named for the variation without Inkwell wears the trio's crest. The master edition alone (the crest names her
+   own apps). Only the icon and its tile's colour change: packages, kits and their icons follow the app key as before. */
+function iconOf(r){var k=appOf(r);if(k||!r)return k;try{if(typeof ING_EDITION!=="undefined"&&ING_EDITION!=="master")return null;}catch(e){return null;}
+  var n=String((r.name||"")+" "+(r.slug||"")).toLowerCase();if(!/offline[\s._-]*project/.test(n))return null;
+  return /(without|no|sans)[\s._-]*inkwell/.test(n)?"offline3":"offline";}
+function tintOf(r){var k=iconOf(r);return k==="offline"||k==="offline3"?"#9a7a32":colorOf(r);}
 
 /* the seals: each app's own layers (as Lector shows them), else a flat seal, else the mark of a new app */
 function flatSrc(k){try{var s=window.ING_SEALS&&ING_SEALS[k];return s?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
-function sealEl(k,size){var root=h("span","f-ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
+/* 6.41: an app that names its own logo wears it as the seals are worn: in layers at depth, swaying, turning toward the pointer
+   (modules/r239.js finds it in the app's own files and draws its layers; the rows' pointer handling is the seals' own) */
+function logoInto(root,ic,seed){root.className="f-ls logo"+(ic.tile?" tile":"");root.innerHTML="";var tilt=h("span","f-ls-tilt"),idle=h("span","f-ls-idle");
+  var hsh=0,sd=String(seed||"");for(var i=0;i<sd.length;i++)hsh=(hsh*31+sd.charCodeAt(i))>>>0;idle.style.animationDelay=(-(hsh%70)/10)+"s";idle.appendChild(h("i","f-ls-cast"));
+  ic.layers.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.draggable=false;im.className="f-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
+  tilt.appendChild(idle);root.appendChild(tilt);root.title="";}
+function sealEl(k,size,r){var root=h("span","f-ls");root.setAttribute("aria-hidden","true");if(size)root.style.setProperty("--S",size+"px");
+  /* 6.40: the Offline Project's crest, live, its quarters moving as its apps' seals move (modules/r140.js), as tall as a seal here */
+  if((k==="offline"||k==="offline3")&&window.IngSeal&&typeof IngSeal.el==="function"){var set=k==="offline"?["cd","forge","ingenium","inkwell"]:["cd","forge","ingenium"],ar=1.3333,c=null;
+    try{ar=IngSeal.aspect(set)||ar;c=IngSeal.el(set,{live:true,quarters:true,size:Math.max(14,Math.round((size||56)/ar)),alt:""});}catch(e){c=null;}
+    if(c){root.className="f-ls crest";c.setAttribute("aria-hidden","true");root.appendChild(c);return root;}}
   var L=window.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=k?L[key]:null;
   if(!ls){if(k&&flatSrc(k)){root.className="f-ls flat";var im=new Image();im.src=flatSrc(k);im.alt="";root.appendChild(im);return root;}
-    root.className="f-ls new";root.appendChild(h("span",null,"✦"));return root;}
+    var mk0=!k&&r&&FBS().marks?FBS().marks[r.id]:null;
+    if(mk0){root.className="f-ls mark";root.style.setProperty("--mc",mk0.c);root.appendChild(h("span",null,esc(mk0.ch)));}
+    else{root.className="f-ls new";root.appendChild(h("span",null,"✦"));}
+    if(!k&&r&&window.IngAppIcon){var kn=IngAppIcon.known(r);if(kn)logoInto(root,kn,r.id);else if(kn===undefined)IngAppIcon.forRepo(r).then(function(ic){if(ic)logoInto(root,ic,r.id);},function(){});}
+    return root;}
   var tilt=h("span","f-ls-tilt"),idle=h("span","f-ls-idle");idle.style.animationDelay=(-(DELAY[k]||0))+"s";idle.appendChild(h("i","f-ls-cast"));
   ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="f-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
   tilt.appendChild(idle);root.appendChild(tilt);return root;}
@@ -420,6 +537,8 @@ function FBS(){if(!state.fabrica||typeof state.fabrica!=="object")state.fabrica=
 function saveSoon(){try{saveState();}catch(e){}}
 var S={view:"changes",file:0,panel:"apps",dir:"",cmp:null,testing:null,making:null,busy:false,open:{}};
 var C={repos:[],status:{},notes:{},diff:{},files:{},log:{},tags:{},lastErr:{}};
+/* 6.61: Fabrica shows its three panels; "Your apps" opens the library page (S.home); an app chosen elsewhere while it shows opens its work */
+S.home=false;try{S.seenSel=FBS().sel;}catch(e){}
 function sel(){var id=FBS().sel;return C.repos.filter(function(r){return r.id===id;})[0]||null;}
 function cur(){return sel();}
 
@@ -445,11 +564,15 @@ function verOf(r){return headTag(r);}
 /* ---------- the frame ---------- */
 function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").parentNode===host)return $("fb");
   host.innerHTML='<div id="fb">'+
-   '<div class="f-head"><div><h1>Fabrica</h1><p>Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here.</p></div>'+
+   '<div class="f-head"><button class="f-btn sm f-homek" id="fbHome" type="button" title="Back to the three panels: your apps, the work, test and ship">‹ Back to the work</button><div><h1>Fabrica</h1><p>Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here.</p></div>'+
    '<ol class="f-steps" id="fbSteps" aria-label="Where this app is"><li data-s="change"><i>1</i><span>Change</span></li><li class="sep" aria-hidden="true"></li><li data-s="keep"><i>2</i><span>Keep</span></li><li class="sep" aria-hidden="true"></li><li data-s="test"><i>3</i><span>Test</span></li><li class="sep" aria-hidden="true"></li><li data-s="ship"><i>4</i><span>Ship</span></li></ol></div>'+
    '<div class="f-seg f-tabs" id="fbTabs" role="tablist" aria-label="Fabrica\'s panels"><span class="f-thumb"></span><button type="button" role="tab" data-p="apps">Your apps</button><button type="button" role="tab" data-p="work" aria-selected="true">The work</button><button type="button" role="tab" data-p="ship">Test and ship</button></div>'+
+   '<div class="f-lib" id="fbLib" aria-label="Your apps"><div class="f-lib-top"><h2>Your apps</h2><input class="f-find" id="fbLibFind" type="search" placeholder="Find an app" aria-label="Find an app"><button class="f-btn" id="fbLibBring" type="button">Bring one in</button><button class="f-btn pri" id="fbLibNew" type="button">＋ New app</button></div>'+
+     '<div class="f-seg" id="fbLibSeg" role="tablist" aria-label="Which apps"><span class="f-thumb"></span><button type="button" role="tab" data-l="all" aria-selected="true">All</button><button type="button" role="tab" data-l="own">Your own</button><button type="button" role="tab" data-l="made">Made here</button><button type="button" role="tab" data-l="need">Needs you</button></div>'+
+     '<div id="fbLibBody" role="list"></div></div>'+
+   '<div class="f-apg" id="fbAppPg" aria-label="This app"></div>'+
    '<div class="f-panels" id="fbPanels">'+
-    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2>Your apps</h2><span class="f-chip" id="fbAppsChip"></span><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
+    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2><button class="f-libk" id="fbAppsLib" type="button" title="Open the library of your apps: each with its seal, and where you bring one in">Your apps</button></h2><button class="f-chip f-libk2" id="fbAppsChip" type="button" title="Open the library of your apps"></button><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-pn-b"><div class="f-repos" id="fbRepos"></div><div class="f-sec" style="border-top:1px solid var(--f-hair2)"><p class="f-hint" style="margin:0">Each app keeps every version in git\'s own format, so any git program can open it, and nothing it holds leaves this device unless you send it.</p></div></div>'+
      '<div class="f-pn-f"><button class="f-btn" id="fbNew" type="button">＋ New app</button><button class="f-btn" id="fbBring" type="button">Bring one in</button></div></section>'+
     '<section class="f-pn show" id="fbWork" aria-label="The work"><div class="f-pn-h"><span class="f-ls" id="fbWhSeal"></span><h2 id="fbWhName"></h2>'+
@@ -467,6 +590,12 @@ function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").p
 
 function wire(){
   $("fbNew").onclick=function(){sheetNew();};
+  $("fbHome").onclick=function(){S.home=false;S.appPg=false;S.seenSel=FBS().sel;paint();layoutSoon();};
+  $("fbAppsLib").onclick=function(){goHome();};$("fbAppsChip").onclick=function(){goHome();};
+  $("fbLibNew").onclick=function(){sheetNew();};
+  $("fbLibBring").onclick=function(){sheetBring();};
+  $("fbLibFind").oninput=function(){LIBF.q=this.value;paintLib();};
+  [].forEach.call($("fbLibSeg").querySelectorAll("button"),function(b){b.onclick=function(){LIBF.f=b.getAttribute("data-l");paintLib();thumbs();};});
   $("fbBring").onclick=function(){sheetBring();};
   $("fbRun").onclick=function(){run();};
   $("fbBranch").onclick=function(){S.view="ideas";paintWork();thumbs();};
@@ -542,21 +671,26 @@ var tt=null;function toast(m){var root=$("fb");if(!root)return;var old=root.quer
 function fail(e){var m=e&&e.message?e.message:String(e);toast(m.charAt(0).toUpperCase()+m.slice(1));try{console.warn("Fabrica",e);}catch(_){}}
 
 /* ---------- painting ---------- */
-function paint(){if(!$("fb"))return;paintRepos();paintWork();paintShip();paintSteps();thumbs();}
+function paint(){if(!$("fb"))return;
+  /* another part of Ingenium chose an app while the library was showing: its work is shown */
+  if(S.home&&FBS().sel&&FBS().sel!==S.seenSel)S.home=false;S.seenSel=FBS().sel;
+  if(S.appPg&&FBS().sel!==S.appPg)S.appPg=false;
+  showMode();if(S.appPg){paintAppPg();thumbs();return;}if(S.home){paintLib();thumbs();return;}
+  paintRepos();paintWork();paintShip();paintSteps();thumbs();}
 function paintSteps(){var r=cur(),s=r?stepOf(r):"change",order=["change","keep","test","ship"],i=order.indexOf(s);if(s==="done")i=4;
   [].forEach.call($("fbSteps").querySelectorAll("li[data-s]"),function(li){var j=order.indexOf(li.getAttribute("data-s"));li.className=j<i?"done":j===i?"now":"";});}
 function paintRepos(){var box=$("fbRepos");box.innerHTML="";var rs=C.repos;$("fbAppsChip").textContent=rs.length?rs.length+" kept here":"None yet";
   if(!rs.length){box.appendChild(h("div","f-empty","<b>No app here yet</b>Bring one in: from your app library, a zip, a git bundle or a folder with its history. Or start a new one."));box.style.display="block";return;}
   box.style.display="";var id=FBS().sel;
-  rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",colorOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
+  rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",tintOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
     var s=stepOf(r),st='<i class="st'+(s==="keep"?" changed":s==="change"?" new":s==="test"||s==="ship"?" tested":"")+'" title="'+(s==="done"?"Shipped":s==="keep"?"Changes not kept yet":s==="test"?"Kept, not tested":s==="ship"?"Tested":"New")+'"></i>';
-    b.appendChild(sealEl(appOf(r),56));var v=verOf(r);
+    b.appendChild(sealEl(iconOf(r),56,r));var v=verOf(r);
     b.insertAdjacentHTML("beforeend",'<span class="nm">'+esc(r.name)+(v?" <em>"+esc(v)+"</em>":"")+'</span><span class="stl">'+st+"<span>"+esc(tileLine(r))+"</span></span>");
     b.onclick=function(){FBS().sel=r.id;saveSoon();S.view=statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";S.panel="work";if(one())setPanel("work");paint();syncFromCode(r);};box.appendChild(b);});}
 function views(){var r=cur(),n=r?statusOf(r).changes.length:0;[].forEach.call($("fbViews").querySelectorAll("button"),function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===S.view?"true":"false");});
   $("fbNChanges").textContent=n||"";$("fbNChanges").hidden=!n;}
 function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML="";f.innerHTML="";
-  var ws=$("fbWhSeal"),nw=sealEl(r?appOf(r):null,34);nw.id="fbWhSeal";ws.replaceWith(nw);
+  var ws=$("fbWhSeal"),nw=sealEl(r?iconOf(r):null,34,r);nw.id="fbWhSeal";ws.replaceWith(nw);
   $("fbWhName").textContent=r?r.name:"No app chosen";$("fbBranchName").textContent=r?(r.detached?"an older version":(r.branch||"main")):"";$("fbBranch").hidden=!r;$("fbRun").hidden=!r;
   var chip=$("fbWorkChip");if(!r){chip.className="f-chip";chip.textContent="";views();w.appendChild(h("div","f-empty","<b>Choose an app on the left</b>Or bring one in, and its work shows here."));return;}
   var s=stepOf(r),n=statusOf(r).changes.length;chip.className="f-chip"+(s==="keep"?" warn":s==="done"?" ok":"");
@@ -803,7 +937,7 @@ function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds e
   KITS.forEach(function(k){var o=opt("✓",k[1],k[0]==="fire"?"An Android project and its build recipe (Fabrica's APK needs none)":k[0]==="iphone"||k[0]==="ipad"?"An Xcode project and its build recipe (Fabrica's IPA needs none)":"The app for this computer, built on it",function(){var i=picked.indexOf(k[0]);if(i>=0)picked.splice(i,1);else picked.push(k[0]);o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");go2.textContent=kitsKey(picked.length);go2.disabled=!picked.length;});
     o.setAttribute("aria-pressed",picked.indexOf(k[0])>=0?"true":"false");sh.box.appendChild(o);});
   var end=h("div","end"),go2=btn("pri",kitsKey(picked.length),function(){pref.kits=picked.slice();saveSoon();sh.close();makeOne(r,"kits",{kits:picked.slice()}).catch(function(){});});
-  go2.disabled=!picked.length;end.appendChild(btn("","Close",sh.close));end.appendChild(go2);sh.box.appendChild(end);}
+  go2.disabled=!picked.length;end.appendChild(go2);sh.box.appendChild(end);}
 /* the key counts the devices: an app with its own kit templates makes one package for the iPhone and the iPad, which the notice
    after says */
 function kitsKey(n){return "Make kits for "+n+" device"+(n===1?"":"s");}
@@ -822,15 +956,22 @@ var MADE=(function(){var dbp=null;
   function db(){if(dbp)return dbp;dbp=new Promise(function(res,rej){try{var rq=indexedDB.open("fabrica_made",1);rq.onupgradeneeded=function(){var d=rq.result;try{d.createObjectStore("meta");}catch(e){}try{d.createObjectStore("bytes");}catch(e){}};
     rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};}catch(e){rej(e);}});dbp.catch(function(){dbp=null;});return dbp;}
   function tx(stores,mode,fn){return db().then(function(d){return new Promise(function(res,rej){var t=d.transaction(stores,mode),out=fn(t);t.oncomplete=function(){res(out&&"result" in out?out.result:out);};t.onerror=function(){rej(t.error);};t.onabort=function(){rej(t.error||new Error("this device's storage is full"));};});});}
-  function list(repo){return tx(["meta"],"readonly",function(t){return t.objectStore("meta").getAll();}).then(function(a){return (a||[]).filter(function(m){return !repo||m.repo===repo;}).sort(function(x,y){return y.at-x.at;});}).catch(function(){return [];});}
+  /* 6.32 (6 November 2026): with the lock on (modules/r197.js), a package and its card are sealed as they are kept and opened as they
+     are read; while the page is locked a write waits for the sign-in; a plain one and a sealed one are both read */
+  function lk(){return window.IngLock||null;}
+  function sealIn(st,k,v){var l=lk();return (l&&typeof l.sealFor==="function")?l.sealFor("fabrica_made",st,k,v):Promise.resolve(v);}
+  function openOut(st,v){var l=lk();return (v&&l&&typeof l.isRecEnv==="function"&&l.isRecEnv(v))?l.openRec("fabrica_made",st,v):Promise.resolve(v);}
+  function list(repo){return tx(["meta"],"readonly",function(t){return t.objectStore("meta").getAll();}).then(function(a){return Promise.all((a||[]).map(function(x){return openOut("meta",x);}));})
+    .then(function(a){return a.filter(Boolean).filter(function(m){return !repo||m.repo===repo;}).sort(function(x,y){return y.at-x.at;});}).catch(function(){return [];});}
   function del(keys){if(!keys.length)return Promise.resolve();return tx(["meta","bytes"],"readwrite",function(t){keys.forEach(function(k){t.objectStore("meta").delete(k);t.objectStore("bytes").delete(k);});});}
   return {list:list,del:del,
     keep:function(r,commit,kind,name,mime,bytes){var key=r.id+"|"+commit+"|"+kind+"|"+name,m={key:key,repo:r.id,commit:commit,kind:kind,name:name,mime:mime,size:bytes.length,at:Date.now()};
-      return tx(["meta","bytes"],"readwrite",function(t){t.objectStore("meta").put(m,key);t.objectStore("bytes").put(bytes,key);}).then(function(){return list(r.id);}).then(function(all){var commits=[];all.forEach(function(x){if(commits.indexOf(x.commit)<0)commits.push(x.commit);});
+      return Promise.all([sealIn("meta",key,m),sealIn("bytes",key,bytes)]).then(function(x){return tx(["meta","bytes"],"readwrite",function(t){t.objectStore("meta").put(x[0],key);t.objectStore("bytes").put(x[1],key);});}).then(function(){return list(r.id);}).then(function(all){var commits=[];all.forEach(function(x){if(commits.indexOf(x.commit)<0)commits.push(x.commit);});
         return del(all.filter(function(x){return commits.indexOf(x.commit)>=3;}).map(function(x){return x.key;}));}).catch(function(e){try{console.warn("Fabrica: a package could not be kept here",e);}catch(_){}});},
-    bytes:function(key){return tx(["bytes"],"readonly",function(t){return t.objectStore("bytes").get(key);});},
+    bytes:function(key){return tx(["bytes"],"readonly",function(t){return t.objectStore("bytes").get(key);}).then(function(v){return openOut("bytes",v);});},
     forget:function(repo){return list(repo).then(function(all){return del(all.map(function(x){return x.key;}));});}};})();
 function keepMade(r,commit,kind,name,mime,bytes){return MADE.keep(r,commit,kind,name,mime,bytes).then(function(){delete C.log[r.id+"|rel"];});}
+window.fbMade=MADE;/* 6.32: the packages' store, as the page's tests reach it (rig/t_632_sealed_stores.js) */
 
 /* ---------- running the app ---------- */
 function run(){var r=cur();if(!r)return;if(!r.head){toast("Nothing to run yet: give it a first page.");return;}
@@ -842,37 +983,234 @@ function run(){var r=cur();if(!r)return;if(!r.head){toast("Nothing to run yet: g
 
 /* ---------- bringing apps in ---------- */
 function sheet(title,lead){var root=$("fb"),wrap=h("div","f-sheet-wrap"),s=h("div","f-sheet");wrap.appendChild(s);s.innerHTML="<h3>"+esc(title)+"</h3>"+(lead?"<p>"+esc(lead)+"</p>":"");
-  wrap.onclick=function(e){if(e.target===wrap)wrap.remove();};root.appendChild(wrap);thumbs();return {wrap:wrap,box:s,close:function(){wrap.remove();}};}
+  wrap.onclick=function(e){if(e.target===wrap)sh.close();};root.appendChild(wrap);thumbs();
+  /* 6.61, her words (8 November 2026): "either keep the Close or Done button both look weird there together": every panel closes with its
+     ✕ in the corner, Escape or a press outside it, and keeps only its own main key */
+  var sh={wrap:wrap,box:s,close:function(){wrap.remove();}};closeX(sh);return sh;}
 function opt(ic,title,small,on){var b=h("button","f-opt");b.type="button";b.innerHTML='<span class="ic">'+ic+"</span><span><b>"+esc(title)+"</b><small>"+esc(small)+"</small></span>";b.onclick=on;return b;}
 function libList(){try{return typeof libApps==="function"?libApps():[];}catch(e){return [];}}
-function sheetBring(into){var sh=sheet("Bring an app in","Whatever you bring keeps its history if it has one; if not, it starts with a first version."),lib=libList();
-  sh.box.appendChild(opt("♦","From your app library",lib.length?lib.map(function(m){return (APPS[m.key]?APPS[m.key].name:m.key)+(m.version?" "+m.version:"");}).join(", "):"Nothing is kept there yet: Lector's brief takes your apps' pages",function(){if(!lib.length){toast("Add an app's page in Lector first, or bring a file in here.");return;}sh.close();sheetLibrary(lib,into);}));
+function sheetBringOld(into){var sh=sheet("Bring an app in","Whatever you bring keeps its history if it has one; if not, it starts with a first version."),lib=libList();
+  sh.box.appendChild(opt("♦","From your app library",lib.length?lib.map(function(m){return (APPS[m.key]?APPS[m.key].name:(m.title||m.key))+(m.version?" "+m.version:"");}).join(", "):"Nothing is kept there yet: Lector's brief takes your apps' pages",function(){if(!lib.length){toast("Add an app's page in Lector first, or bring a file in here.");return;}sh.close();sheetLibrary(lib,into);}));
   sh.box.appendChild(opt("⇩","A page, or a zip of its files","Your app's own .html, its install kit, or a zip of its files",function(){sh.close();pickFile(".html,.htm,.zip",function(f){importFile(f,into);});}));
   sh.box.appendChild(opt("⎇","A git bundle, or a folder with its .git (zipped)","Its whole history comes with it, branch for branch",function(){sh.close();pickFile(".bundle,.zip",function(f){importFile(f,into);});}));
   var prs=[];try{prs=typeof ccProjects==="function"?ccProjects():[];}catch(e){}
   sh.box.appendChild(opt("◇","From Code",prs.length?prs.length+" project"+(prs.length===1?"":"s")+" there: "+prs.slice(0,3).map(function(p){return p.name;}).join(", ")+(prs.length>3?"…":""):"No app project in Code yet",function(){if(!prs.length){toast("Make an app in Code first; it will show here.");return;}sh.close();sheetProjects(prs,into);}));
-  var end=h("div","end");end.appendChild(btn("","Close",sh.close));sh.box.appendChild(end);}
+  }
 function sheetLibrary(lib,into){var sh=sheet("From your app library","The copies Lector keeps on this device. Each comes in as a repository with a first version.");
-  lib.forEach(function(m){var k=m.key,nm=(APPS[k]?APPS[k].name:k)+(m.version?" "+m.version:"");
+  /* 6.42: any app kept in the library, named as its page names it (modules/r240.js) */
+  lib.forEach(function(m){var k=m.key,nm=(APPS[k]?APPS[k].name:(m.title||k))+(m.version?" "+m.version:"");
     sh.box.appendChild(opt("♦",nm,(m.title||"")+(m.size?" · "+kb(m.size):""),function(){sh.close();busy("Bringing "+nm+" in…");
-      libText(k).then(function(text){if(!text)throw new Error("its copy could not be read");var page=(m.title&&/\.html?$/i.test(m.title))?m.title.split("/").pop():(APPS[k]?APPS[k].name.replace(/\s+/g,"_"):k)+".html";
+      libText(k).then(function(text){if(!text)throw new Error("its copy could not be read");var page=(m.title&&/\.html?$/i.test(m.title))?m.title.split("/").pop():(m.name&&/\.html?$/i.test(m.name))?m.name.split("/").pop():(APPS[k]?APPS[k].name.replace(/\s+/g,"_"):String(m.title||k).replace(/\s+/g,"_"))+".html";
         var files=[{path:page,data:text}];if(into)return IngRepo.putMany(into.id,files).then(function(){return {id:into.id};});
-        return IngRepo.fromFiles(files,{name:APPS[k]?APPS[k].name:k,app:k,msg:"Brought in from "+nm+" (your app library)"});}).then(function(x){FBS().sel=x.id;saveSoon();S.view=into?"changes":"history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(nm+" is here"+(into?", as changes to keep.":", with its first version."));},function(e){unbusy();fail(e);});}));});
-  var end=h("div","end");end.appendChild(btn("","Close",sh.close));sh.box.appendChild(end);}
+        return IngRepo.fromFiles(files,{name:APPS[k]?APPS[k].name:(m.title||k),app:APPS[k]?k:null,msg:"Brought in from "+nm+" (your app library)"});}).then(function(x){FBS().sel=x.id;S.home=false;saveSoon();S.view=into?"changes":"history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(nm+" is here"+(into?", as changes to keep.":", with its first version."));},function(e){unbusy();fail(e);});}));});
+  }
 function sheetProjects(prs,into){var sh=sheet("From Code","An app project in Code becomes a repository here; its files are the first version, and Code and Fabrica keep the same files from then on.");
   prs.forEach(function(p){sh.box.appendChild(opt("◇",p.name,(p.files||[]).length+" file"+((p.files||[]).length===1?"":"s"),function(){sh.close();busy("Bringing "+p.name+" in…");
     ccLoadAll(p).then(function(){var files=(p.files||[]).filter(function(f){return typeof f.text==="string";}).map(function(f){return {path:f.name,data:f.text};});if(!files.length)throw new Error("the project holds no text files yet");
-      if(into)return IngRepo.putMany(into.id,files).then(function(){return {id:into.id};});return IngRepo.fromFiles(files,{name:p.name,msg:"Brought in from Code"});}).then(function(x){FBS().links[x.id]=p.id;FBS().sel=x.id;saveSoon();S.view=into?"changes":"history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(p.name+" is here.");},function(e){unbusy();fail(e);});}));});
-  var end=h("div","end");end.appendChild(btn("","Close",sh.close));sh.box.appendChild(end);}
-function sheetNew(){sheetName("A new app","Its name. Then give it its first page in Chat or Code, or bring one in.",function(name){return IngRepo.create({name:name}).then(function(s){FBS().sel=s.id;saveSoon();S.view="changes";return refresh();}).then(function(){paint();toast("A new app, "+name+": give it its first page in Chat or Code, or bring one in.");});},"Carpe Diem, My Notes…");}
+      if(into)return IngRepo.putMany(into.id,files).then(function(){return {id:into.id};});return IngRepo.fromFiles(files,{name:p.name,msg:"Brought in from Code"});}).then(function(x){FBS().links[x.id]=p.id;FBS().sel=x.id;S.home=false;saveSoon();S.view=into?"changes":"history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(p.name+" is here.");},function(e){unbusy();fail(e);});}));});
+  }
+function sheetNewOld(){sheetName("A new app","Its name. Then give it its first page in Chat or Code, or bring one in.",function(name){return IngRepo.create({name:name}).then(function(s){FBS().sel=s.id;saveSoon();S.view="changes";return refresh();}).then(function(){paint();toast("A new app, "+name+": give it its first page in Chat or Code, or bring one in.");});},"Carpe Diem, My Notes…");}
+
+/* ---------- 6.61 · the library, a new app and bringing one in (her preview of 8 November 2026, approved) ----------
+   Her words (8 November 2026): "The + New app button opens a little panel that makes no sense and barely seems to do anything, I want
+   that fixed and streamlined ... either keep the Close or Done button both look weird there together. I also want the app library to
+   be redesigned and be streamlined, right now it does not really fit the rest of the app and just looks like a basic list that is not
+   very organised and untidy." Earlier (8 November): "I always want to see the apps 3D logo seal next to them at all times." She chose
+   to keep both Ship and Open on each card. Then (8 November): "I don't want you to change Fabrica's 3 column view, I wanted you to enhance
+   it and build on top of it. I mainly wanted the popped out panels rearranged and fixed", and "I want the library page from Fabrica to be
+   added to the Fabrica page. I want it to be the view that I see when I click on the Your apps". So the three panels stay Fabrica's view,
+   as they were; pressing "Your apps" (the left panel's heading, or its count) opens the library page: her own apps (each app of her app
+   library, kept here or not yet, and the Offline Project's two kinds where the edition has them) and the apps made here, as cards with
+   their seal, version, where they stand and the packages made of the version kept, with Ship and Open (or Bring it in) on each; Open or
+   Ship goes to the three panels on that app, as does "‹ Back to the work"; Open (or the card) shows the app's own page. Then (8 November,
+   with the preview's pictures): "I want all of these to be kept and added into Ingenium". A new app: its name, its colour, how it starts, one key.
+   Bringing one in: her library's apps as seals, the Offline Project as crests, and the ways from something she has. Every panel closes
+   with its ✕, Escape, or a press outside it. */
+var LIBF={f:"all",q:""};
+var MARKC=["#2f7a8a","#3d6e9e","#7a5230","#2f5f4f","#8a3a52","#6a3fb5"];
+function closeX(sh){var x=h("button","f-x","✕");x.type="button";x.title="Close";x.setAttribute("aria-label","Close");x.onclick=function(){sh.close();};sh.box.appendChild(x);
+  sh.wrap.addEventListener("keydown",function(e){if(e.key==="Escape"){e.stopPropagation();sh.close();}});sh.wrap.tabIndex=-1;return x;}
+function goHome(){S.appPg=false;S.home=true;S.seenSel=FBS().sel;paint();try{var f=$("fbLibFind");if(f)f.focus({preventScroll:true});}catch(e){}}
+function showMode(){var root=$("fb");if(!root)return;if(S.appPg&&!C.repos.some(function(r){return r.id===S.appPg;}))S.appPg=false;
+  root.classList.toggle("f-home",!!S.home&&!S.appPg);root.classList.toggle("f-apppg",!!S.appPg);}
+function openApp2(id,panel){FBS().sel=id;S.home=false;S.appPg=false;S.seenSel=id;saveSoon();var r=C.repos.filter(function(x){return x.id===id;})[0];
+  S.view=r&&statusOf(r).clean&&r.head?"history":"changes";S.file=0;S.cmp=null;S.dir="";S.panel=panel||"work";
+  paint();if(one())setPanel(S.panel);else if(panel==="ship"){try{$("fbShip").scrollIntoView({block:"nearest"});}catch(e){}}
+  layoutSoon();if(r)syncFromCode(r);}
+function keyOf(r){return appOf(r)||iconOf(r);}
+function libEntries(){var lib=libList(),keys=[],own=[],made=[],seen={};
+  lib.forEach(function(m){if(APPS[m.key]&&keys.indexOf(m.key)<0)keys.push(m.key);});
+  try{if(window.IngOffline&&typeof IngOffline.data==="function"&&IngOffline.data())keys.push("offline","offline3");}catch(e){}
+  C.repos.forEach(function(r){var k=keyOf(r);if(k){own.push({k:k,r:r});seen[k]=1;}else made.push({k:null,r:r});});
+  keys.forEach(function(k){if(seen[k])return;own.push({k:k,r:null,m:lib.filter(function(x){return x.key===k;})[0]||null});});
+  var order=["cd","forge","inkwell","lakay","ingenium","offline","offline3"];
+  own.sort(function(a,b){var x=order.indexOf(a.k),y=order.indexOf(b.k);return (x<0?99:x)-(y<0?99:y)||String(a.r?a.r.name:"").localeCompare(String(b.r?b.r.name:""));});
+  made.sort(function(a,b){return String(a.r.name).localeCompare(String(b.r.name));});
+  return {own:own,made:made};}
+function devs(r){var n=notesOf(r)||{},o=[];if(n.macApp)o.push("Mac");if(n.winApp)o.push("Windows");if(n.apk)o.push("Fire and Android");if(n.ipa)o.push("iPhone and iPad");if(n.webApp||n.onePage)o.push("Web");if(n.kits)o.push("Build kits");return o;}
+function standing(e){var r=e.r;if(!r)return {c:"n",t:/^offline/.test(e.k||"")?"Not made here yet":"In your app library · not in Fabrica yet"};
+  var s=stepOf(r),n=statusOf(r).changes.length;
+  if(s==="change")return {c:"w",t:"Started · nothing kept yet"};
+  if(s==="keep")return {c:"w",t:n+(n===1?" change":" changes")+" not kept yet"};
+  if(s==="test")return {c:"n",t:testedState(r)==="fail"?"Kept · its test found faults":"Kept · not tested yet"};
+  if(s==="ship")return {c:"ok",t:"Kept and tested · ready to ship"};
+  var d=devs(r);return {c:"ok",t:"Kept, tested and made"+(d.length?" for "+d.length+(d.length===1?" kind of device":" kinds of device"):"")};}
+function needs(e){return !!(e.r&&/^(change|keep)$/.test(stepOf(e.r)));}
+function verWord(k){return k==="inkwell"||k==="ingenium"?"Version":"Build";}
+/* an app brought in from the library carries the library's number until a version of its own is tagged */
+function verFor(r){var v=verOf(r);if(v)return v;var k=keyOf(r);if(!k)return "";try{var m=libList().filter(function(x){return x.key===k;})[0];return m&&m.version?verWord(k)+" "+m.version:"";}catch(e){return "";}}
+function libCard(e){var r=e.r,k=e.k,off=/^offline/.test(k||"");
+  var nm=r?r.name:off?"The Offline Project":(APPS[k]?APPS[k].name:k),v=r?verFor(r):"";
+  var sub=off?(k==="offline"?"All four apps":"Without Inkwell")+(v?" · "+v:""):r?(v?(/^\d/.test(v)&&k?verWord(k)+" ":"")+v:(r.head?"Kept":"New")):(e.m&&e.m.version?verWord(k)+" "+e.m.version:"In your app library");
+  var c=h("div","f-lc");c.setAttribute("role","listitem");c.tabIndex=0;c.setAttribute("aria-label",nm+", "+sub);
+  var sl=h("span","sl");sl.appendChild(sealEl(r?iconOf(r):k,64,r));c.appendChild(sl);
+  var tx=h("div");tx.appendChild(h("div","nm",esc(nm)));tx.appendChild(h("div","vr",esc(sub)));c.appendChild(tx);
+  var st=standing(e),sr=h("div","st");sr.appendChild(h("i",st.c==="ok"?"":st.c));sr.appendChild(document.createTextNode(st.t));c.appendChild(sr);
+  var dv=h("div","dv");(r?devs(r):[]).forEach(function(d){dv.appendChild(h("span",null,esc(d)));});c.appendChild(dv);
+  var ks=h("div","ks");
+  function go2(panel){if(r){if(panel==="work")openPage(r.id);else openApp2(r.id,panel);return;}if(off){try{IngOffline.keep(k==="offline");}catch(x){fail(x);}return;}if(e.m)libBring(e.m,panel==="work"?"page":panel);}
+  ks.appendChild(btn("","Ship",function(ev){ev.stopPropagation();go2("ship");}));
+  ks.appendChild(btn("pri",r?"Open":off?"Make it":"Bring it in",function(ev){ev.stopPropagation();go2("work");}));
+  c.appendChild(ks);
+  c.onclick=function(){go2("work");};c.onkeydown=function(ev){if((ev.key==="Enter"||ev.key===" ")&&ev.target===c){ev.preventDefault();go2("work");}};
+  return c;}
+function paintLib(){var body=$("fbLibBody");if(!body)return;LIBSIG=libSig();var es=libEntries(),q=LIBF.q.trim().toLowerCase();
+  function match(e){var n=(e.r?e.r.name:"")+" "+(e.k&&APPS[e.k]?APPS[e.k].name:"")+(/^offline/.test(e.k||"")?" the offline project":"");return !q||n.toLowerCase().indexOf(q)>=0;}
+  var own=es.own.filter(match),made=es.made.filter(match),all=es.own.concat(es.made),need=all.filter(needs).filter(match);
+  var counts={all:all.length,own:es.own.length,made:es.made.length,need:all.filter(needs).length},names={all:"All",own:"Your own",made:"Made here",need:"Needs you"};
+  [].forEach.call($("fbLibSeg").querySelectorAll("button"),function(b){var f=b.getAttribute("data-l");b.textContent=names[f]+(counts[f]?" "+counts[f]:"");b.setAttribute("aria-selected",f===LIBF.f?"true":"false");b.hidden=f!=="all"&&!counts[f]&&f!==LIBF.f;});
+  body.innerHTML="";
+  function sec(title,line,list){if(!list.length)return;var hd=h("div","f-lib-sec");hd.appendChild(h("b",null,esc(title)));if(line)hd.appendChild(h("span",null,esc(line)));body.appendChild(hd);
+    var g=h("div","f-lib-grid");list.forEach(function(e){g.appendChild(libCard(e));});body.appendChild(g);}
+  if(!all.length){var n=h("div","f-lib-none","<b>No app here yet</b>Start a new one, or bring one in: from your app library, a page, a zip, a git bundle or Code. Each app keeps every version you keep, and nothing leaves this device unless you ship it or send it.");body.appendChild(n);}
+  else if(LIBF.f==="own")sec("Your own apps","",own);
+  else if(LIBF.f==="made")sec("Made here","",made);
+  else if(LIBF.f==="need")sec("Needs you","changes not kept yet, or nothing kept so far",need);
+  else{sec(made.length||own.length?"Your own apps":"","each with its seal, its versions and where it is made for",own);sec("Made here","apps you started or brought in here",made);}
+  if(all.length&&!body.querySelector(".f-lc"))body.appendChild(h("div","f-lib-none","<b>Nothing matches</b>Try another word, or show all your apps."));
+  body.appendChild(h("div","f-lib-learn","<b>Learn as you go.</b> Each app keeps every version you keep, as a repository on GitHub does: you can look back, compare, and return to any one. Nothing leaves this device unless you ship it or send it to GitHub."));}
+/* the app library fills itself a moment after the app opens (modules/r120.js) and grows when a page is kept: the library is drawn again
+   when what it lists changes, while Fabrica shows it */
+var LIBSIG="";function libSig(){try{return libList().map(function(m){return m.key+":"+(m.version||"");}).join(",")+"|"+C.repos.map(function(r){return r.id+":"+(r.head||"");}).join(",");}catch(e){return "";}}
+setInterval(function(){try{var pg=$("page-fabrica");if(!S.home||!$("fb")||!pg||!pg.classList.contains("active"))return;var sg=libSig();if(sg!==LIBSIG){LIBSIG=sg;paintLib();thumbs();}}catch(e){}},4000);
+
+/* ---------- 6.61 · each app's own page (her approved preview of 8 November 2026) ----------
+   Open on a card of the library shows it: the apps down the left, the app's seal and name with Run it and Ship, its tabs, and three
+   boxes: where it stands, the next step, and how it was built (its folder on the Folders page). Changes, Versions, Plans and Ship lead
+   into the three panels, which stay as they were; "‹ Back to the work" goes there too. */
+function openPage(id){FBS().sel=id;S.home=false;S.appPg=id;S.seenSel=id;saveSoon();paint();try{$("fbAppPg").scrollTop=0;}catch(e){}}
+function folderOf(r){try{var n=String(r.name||"").toLowerCase(),k=keyOf(r),an=k&&APPS[k]?APPS[k].name.toLowerCase():"";
+    return (window.IngFolders&&typeof IngFolders.folders==="function"?IngFolders.folders():[]).filter(function(p){var pn=String(p.name||"").toLowerCase();return pn===n||(an&&pn===an);})[0]||null;}catch(e){return null;}}
+function nextStep(r){var s=stepOf(r),n=statusOf(r).changes.length;
+  if(s==="change")return {big:"Its first page",t:"Nothing is kept yet. Give it a first page in Code or Chat, or bring its files in.",k:"Open it in Code",fn:function(){openInCode(r);}};
+  if(s==="keep")return {big:n+(n===1?" change":" changes")+" to keep",t:"Look at what changed, then keep it as a new version: every version stays, and any can come back.",k:"See the changes",fn:function(){S.view="changes";openApp2(r.id,"work");}};
+  if(s==="test")return {big:"Test this version",t:testedState(r)==="fail"?"The last test found faults: open the changes, fix them, keep, and test again.":"Kept, not tested yet. The test reads the page, finds every file it names, runs it, and checks its number moved forward.",k:"Test it now",fn:function(){openApp2(r.id,"ship");setTimeout(function(){try{testNow();}catch(e){}},300);}};
+  if(s==="ship")return {big:"Ready to ship",t:"Tested. Make it for your devices: a Mac app, a Windows installer, the Fire tablet, iPhone and iPad, the web, or build kits.",k:"Ship it",fn:function(){openApp2(r.id,"ship");}};
+  return {big:"Shipped",t:"This version is made for your devices. A change in Code or Chat starts the next one.",k:"Open it in Code",fn:function(){openInCode(r);}};}
+function paintAppPg(){var pg=$("fbAppPg");if(!pg)return;var r=C.repos.filter(function(x){return x.id===S.appPg;})[0];pg.innerHTML="";if(!r)return;
+  var rail=h("nav","f-rail");rail.setAttribute("aria-label","Your apps");
+  C.repos.forEach(function(x){var b=h("button");b.type="button";if(x.id===r.id)b.setAttribute("aria-current","true");b.appendChild(sealEl(iconOf(x),34,x));
+    var t=h("span",null,esc(x.name));var v=verFor(x);t.appendChild(h("small",null,esc(v||(x.head?"Kept":"New"))));b.appendChild(t);b.onclick=function(){openPage(x.id);};rail.appendChild(b);});
+  pg.appendChild(rail);
+  var main=h("div");pg.appendChild(main);
+  var hero=h("div","f-hero");hero.appendChild(sealEl(iconOf(r),96,r));var tx=h("div");tx.appendChild(h("div","nm",esc(r.name)));
+  var st=standing({r:r,k:keyOf(r)}),v=verFor(r),d=devs(r);tx.appendChild(h("div","vr",esc([v,st.t,d.length?"made for "+d.join(", "):""].filter(Boolean).join(" · "))));hero.appendChild(tx);
+  var ks=h("div","ks");ks.appendChild(btn("","Run it",function(){FBS().sel=r.id;run();}));ks.appendChild(btn("pri","Ship",function(){openApp2(r.id,"ship");}));hero.appendChild(ks);main.appendChild(hero);
+  var tabs=h("div","f-seg");tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","This app");tabs.appendChild(h("span","f-thumb"));
+  [["over","Overview"],["changes","Changes"],["history","Versions"],["ideas","Plans"],["ship","Ship"],["built","How it was built"]].forEach(function(t){var b=h("button",null,esc(t[1]));b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",t[0]==="over"?"true":"false");
+    b.onclick=function(){if(t[0]==="over")return;if(t[0]==="ship"){openApp2(r.id,"ship");return;}if(t[0]==="built"){openNotes(r);return;}S.view=t[0];openApp2(r.id,"work");S.view=t[0];paintWork();thumbs();};tabs.appendChild(b);});
+  main.appendChild(tabs);
+  var three=h("div","f-three");main.appendChild(three);
+  function box(head,big,text,key,fn,pri){var b=h("div","f-box");b.appendChild(h("h4",null,esc(head)));b.appendChild(h("div","big",esc(big)));b.appendChild(h("p",null,esc(text)));if(key)b.appendChild(btn(pri?"pri sm":"sm",key,fn));three.appendChild(b);}
+  var n=notesOf(r)||{},t=n.test,ch=t&&t.checks?t.checks.filter(function(c){return c.state==="ok";}).length+" of "+t.checks.length+" checks passed":"not tested yet";
+  box("Where it stands",st.t.split(" · ")[0],(r.head?"Kept"+(v?" as "+v:"")+"; "+ch+".":"Nothing is kept yet.")+(d.length?" Made for "+d.join(", ")+".":""),null);
+  var nx=nextStep(r);box("Next",nx.big,nx.t,nx.k,nx.fn,true);
+  var f=folderOf(r);box("How it was built",f?"Its folder":"Its build notes",f?"Its folder on the Folders page keeps how you work on it, where you left off, its decisions and its conversations.":"Its notes are not filed yet: each app's parts, the way you work on it and its decisions, kept on the Folders page and searchable from the chat.",f?"Open its folder":"Open Folders",function(){openNotes(r);});}
+function openNotes(r){var f=folderOf(r);try{if(f){var s=state;if(!s.folders||typeof s.folders!=="object")s.folders={how:"",ui:{}};if(!s.folders.ui)s.folders.ui={};s.folders.ui.open=f.id;saveSoon();}}catch(e){}
+  go("folders");try{if(window.IngFolders&&IngFolders.paint)IngFolders.paint();}catch(e){}if(!f)toast("No folder for "+r.name+" yet: make one on the Folders page, and its notes stay with it.");}
+function libBring(m,panel){var k=m.key,nm=(APPS[k]?APPS[k].name:(m.title||k))+(m.version?" "+m.version:"");busy("Bringing "+nm+" in…");
+  return Promise.resolve().then(function(){return libText(k);}).then(function(text){if(!text)throw new Error("its copy could not be read");
+      var page=(m.title&&/\.html?$/i.test(m.title))?m.title.split("/").pop():(m.name&&/\.html?$/i.test(m.name))?m.name.split("/").pop():(APPS[k]?APPS[k].name.replace(/\s+/g,"_"):String(m.title||k).replace(/\s+/g,"_"))+".html";
+      return IngRepo.fromFiles([{path:page,data:text}],{name:APPS[k]?APPS[k].name:(m.title||k),app:APPS[k]?k:null,msg:"Brought in from "+nm+" (your app library)"});})
+    .then(function(x){C.diff={};C.files={};C.log={};return refresh().then(function(){return x;});})
+    .then(function(x){unbusy();if(panel==="page")openPage(x.id);else openApp2(x.id,panel||"work");toast(nm+" is here, with a first version.");},function(e){unbusy();fail(e);});}
+/* a new app's first files: a page with its title and colour, its manifest, its icon (the seal it wears) and an offline copy */
+function starterFiles(name,col){var ch=(String(name).trim().charAt(0)||"A").toUpperCase(),xe=function(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");};
+  var html='<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>'+xe(name)+'</title>\n<meta name="theme-color" content="'+col+'">\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="icon" href="icon.svg" type="image/svg+xml">\n'+
+    '<style>\n  :root{--c:'+col+'}\n  body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;color:#221a2e;background:#f7f5fa;display:grid;place-items:center;min-height:100vh}\n  main{max-width:34rem;padding:2rem;text-align:center}\n  h1{font-family:Georgia,serif;font-weight:600;margin:.6rem 0 .3rem;color:var(--c)}\n  p{margin:0;color:#4a4358}\n</style>\n</head>\n<body>\n<main>\n  <img src="icon.svg" alt="" width="96" height="96">\n  <h1>'+xe(name)+'</h1>\n  <p>This is the first page of '+xe(name)+'. Describe what it should do in Chat or Code: every change is kept in Fabrica.</p>\n</main>\n'+
+    '<script>\n  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) { navigator.serviceWorker.register("sw.js").catch(function () {}); }\n</'+'script>\n</body>\n</html>\n';
+  var man=JSON.stringify({name:String(name),short_name:String(name).slice(0,12),start_url:"./index.html",display:"standalone",background_color:"#f7f5fa",theme_color:col,icons:[{src:"icon.svg",sizes:"any",type:"image/svg+xml"}]},null,2)+"\n";
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="240" fill="'+col+'"/><text x="256" y="256" dy=".35em" text-anchor="middle" font-family="Georgia, serif" font-size="260" fill="#ffffff">'+xe(ch)+'</text></svg>\n';
+  var sw='const CACHE = '+JSON.stringify(String(name)+"-v1")+';\nself.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icon.svg"]))));\nself.addEventListener("fetch", (e) => e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request))));\n';
+  return [{path:"index.html",data:html},{path:"manifest.webmanifest",data:man},{path:"icon.svg",data:svg},{path:"sw.js",data:sw}];}
+function sheetNew(){var sh=sheet("A new app","Three choices, then Fabrica makes it: its name and seal, how it starts, and it is ready to change, keep and ship."),N={col:MARKC[0],way:"describe"};
+  sh.box.classList.add("wide");
+  var grid=h("div","f-new"),pv=h("div","f-new-prev"),mk=h("span","f-ls mark");mk.style.setProperty("--S","92px");mk.style.setProperty("--mc",N.col);var mch=h("span",null,"A");mk.appendChild(mch);pv.appendChild(mk);
+  pv.appendChild(h("small",null,"Its seal, wherever it shows: here, its app icon, its installer. It can have a drawn seal later."));grid.appendChild(pv);
+  var col=h("div");grid.appendChild(col);
+  col.appendChild(h("label","f-lab","1 · Its name"));var inp=h("input","f-in");inp.type="text";inp.placeholder="Recipe Box, My Notes…";inp.setAttribute("aria-label","The new app's name");col.appendChild(inp);
+  col.appendChild(h("span","f-lab","Its colour")).style.marginTop="12px";var sw=h("div","f-sw");sw.setAttribute("role","group");sw.setAttribute("aria-label","Its colour");
+  MARKC.forEach(function(c,i){var b=h("button");b.type="button";b.style.background=c;b.setAttribute("aria-label","Colour "+(i+1));b.setAttribute("aria-pressed",i===0?"true":"false");
+    b.onclick=function(){N.col=c;mk.style.setProperty("--mc",c);[].forEach.call(sw.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});};sw.appendChild(b);});
+  col.appendChild(sw);
+  col.appendChild(h("span","f-lab","2 · How it starts"));var ways=h("div","f-ways");ways.setAttribute("role","group");ways.setAttribute("aria-label","How it starts");
+  var desc=h("textarea","f-in");desc.placeholder="What should it do? For example: a box for our family recipes, searched by ingredient, a recipe scaled for more people, a card to print.";desc.setAttribute("aria-label","What the app should do");
+  var canCode=typeof ccMakeProject==="function"&&typeof ccNewSession==="function";
+  [["describe","Describe it","A model writes its first page from your words, in Code, and Fabrica keeps every change."],["page","A simple first page","A ready page with its title, its seal as its icon and an offline copy, to fill in later."],
+   ["files","Bring its files in","A page, a zip or a git bundle you already have."],["code","Start in Code","Its first page, open in Code and linked to this app."]].forEach(function(w){
+    if(!canCode&&(w[0]==="describe"||w[0]==="code"))return;
+    var b=h("button","f-way","<b>"+esc(w[1])+"</b>"+esc(w[2]));b.type="button";b.setAttribute("aria-pressed",w[0]===N.way?"true":"false");
+    b.onclick=function(){N.way=w[0];[].forEach.call(ways.querySelectorAll(".f-way"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});desc.hidden=N.way!=="describe";label();};ways.appendChild(b);});
+  if(!canCode)N.way="page";
+  col.appendChild(ways);col.appendChild(desc);desc.hidden=N.way!=="describe";
+  var foot=h("div","f-new-foot"),note=h("small",null,"3 · Ready: Fabrica keeps its first version and opens it. Nothing leaves this device."),go=btn("pri","Make it",null);foot.appendChild(note);foot.appendChild(go);col.appendChild(foot);
+  sh.box.appendChild(grid);
+  function label(){var v=inp.value.trim();mch.textContent=(v.charAt(0)||"A").toUpperCase();go.textContent=N.way==="files"?(v?"Choose the files for "+v:"Choose its files"):(v?"Make "+v:"Make it");go.disabled=!v&&N.way!=="files";}
+  inp.oninput=label;inp.onkeydown=function(e){if(e.key==="Enter")go.click();};label();
+  go.onclick=function(){var name=inp.value.trim();if(!name&&N.way!=="files"){inp.focus();return;}
+    if(N.way==="describe"&&!desc.value.trim()){desc.focus();toast("Say in a few words what it should do.");return;}
+    go.disabled=true;makeNew(name,N.col,N.way,desc.value.trim()).then(sh.close,function(e){go.disabled=false;fail(e);});};
+  setTimeout(function(){inp.focus();},60);}
+function makeNew(name,col,way,what){
+  if(way==="files")return new Promise(function(res){pickFile(".html,.htm,.zip,.bundle",function(f){importFile(f,null,name||null);res();});setTimeout(res,400);});
+  var files=starterFiles(name,col),ch=(name.charAt(0)||"A").toUpperCase();
+  return IngRepo.fromFiles(files,{name:name,msg:"A first page for "+name}).then(function(x){var id=x.id;FBS().marks=FBS().marks||{};FBS().marks[id]={c:col,ch:ch};saveSoon();
+    C.diff={};C.files={};C.log={};
+    if(way==="page")return refresh().then(function(){openApp2(id,"work");toast(name+" is here, with its first page kept. Run it, or change it in Code.");});
+    return ccMakeProject(name,files.map(function(f){return {name:f.path,text:f.data};}),"index.html").then(function(pr){FBS().links[id]=pr.id;saveSoon();return refresh().then(function(){return pr;});}).then(function(pr){
+      S.home=false;FBS().sel=id;S.seenSel=id;saveSoon();go("code");setTimeout(function(){try{ccNewSession(pr);}catch(e){}
+        if(way==="describe"&&what){var ci=$("chatInput");if(ci){ci.value="Make this app's first page, in index.html (its manifest, icon.svg and sw.js are there already; keep them linked): "+what;try{ci.dispatchEvent(new Event("input",{bubbles:true}));}catch(e){}
+          setTimeout(function(){try{sendChat();}catch(e){}},250);}}
+        toast(way==="describe"?name+" is in Code: the model is writing its first page. Fabrica keeps every change.":name+" is open in Code, linked to Fabrica.");},350);});});}
+function sheetBring(into){if(into)return sheetBringOld(into);
+  var sh=sheet("Bring an app in","Choose one. It comes in with its history if it has one; if not, it starts with a first version."),lib=libList();sh.box.classList.add("wide");
+  function tile(sealK,r,title,small,fn){var b=h("button","f-tile");b.type="button";b.appendChild(sealEl(sealK,58,r));b.appendChild(h("b",null,esc(title)));b.appendChild(h("small",null,esc(small)));b.onclick=function(){sh.close();fn();};return b;}
+  var keys=lib.filter(function(m){return APPS[m.key];});
+  if(keys.length){sh.box.appendChild(h("span","f-lab","From your app library"));var g=h("div","f-tiles");
+    keys.forEach(function(m){var here=C.repos.filter(function(r){return keyOf(r)===m.key;})[0],nm=APPS[m.key].name;
+      g.appendChild(tile(m.key,here||null,nm,here?"Here already: open it":(m.version?verWord(m.key)+" "+m.version:"In your app library"),function(){if(here)openApp2(here.id,"work");else libBring(m,"work");}));});
+    sh.box.appendChild(g);}
+  var off=false;try{off=!!(window.IngOffline&&typeof IngOffline.data==="function"&&IngOffline.data());}catch(e){}
+  if(off){sh.box.appendChild(h("span","f-lab","The Offline Project"));var g2=h("div","f-tiles op-bring");
+    g2.appendChild(tile("offline",null,"All four apps","Made from your apps as they are now",function(){IngOffline.keep(true);}));
+    g2.appendChild(tile("offline3",null,"Without Inkwell","Carpe Diem, The Forge and Ingenium",function(){IngOffline.keep(false);}));
+    var ch=h("button","f-tile");ch.type="button";ch.style.justifyContent="center";ch.appendChild(h("b",null,"Choose each copy"));ch.appendChild(h("small",null,"and its hall, then make it"));ch.onclick=function(){sh.close();IngOffline.open();};g2.appendChild(ch);
+    sh.box.appendChild(g2);}
+  else sh.box.appendChild(h("span","op-bring"));
+  sh.box.appendChild(h("span","f-lab","From something you have"));var rows=h("div","f-rows3");
+  rows.appendChild(opt("⇩","A page or a zip","Its .html, its install kit or its files",function(){sh.close();pickFile(".html,.htm,.zip",function(f){importFile(f);});}));
+  rows.appendChild(opt("⎇","A git bundle","Or a zipped folder with its .git: its whole history comes too",function(){sh.close();pickFile(".bundle,.zip",function(f){importFile(f);});}));
+  var prs=[];try{prs=typeof ccProjects==="function"?ccProjects():[];}catch(e){}
+  rows.appendChild(opt("◇","From Code",prs.length?prs.length+" project"+(prs.length===1?"":"s")+" there":"No app project in Code yet",function(){if(!prs.length){toast("Make an app in Code first; it will show here.");return;}sh.close();sheetProjects(prs);}));
+  sh.box.appendChild(rows);}
 function sheetName(title,lead,fn,ph){var sh=sheet(title,lead),inp=h("input");inp.type="text";inp.placeholder=ph||"";inp.setAttribute("aria-label",title);sh.box.appendChild(inp);
   var end=h("div","end"),ok=btn("pri","Done",function(){var v=inp.value.trim();if(!v){inp.focus();return;}ok.disabled=true;Promise.resolve().then(function(){return fn(v);}).then(sh.close,function(e){ok.disabled=false;fail(e);});});
-  end.appendChild(btn("","Close",sh.close));end.appendChild(ok);sh.box.appendChild(end);inp.onkeydown=function(e){if(e.key==="Enter")ok.click();};setTimeout(function(){inp.focus();},60);}
+  end.appendChild(ok);sh.box.appendChild(end);inp.onkeydown=function(e){if(e.key==="Enter")ok.click();};setTimeout(function(){inp.focus();},60);}
 function pickFile(accept,fn){var i=document.createElement("input");i.type="file";i.accept=accept;i.style.display="none";document.body.appendChild(i);i.onchange=function(){var f=i.files&&i.files[0];i.remove();if(f)fn(f);};i.click();}
-function importFile(file,into){busy("Bringing "+file.name+" in…");file.arrayBuffer().then(function(ab){var u8=new Uint8Array(ab),name=file.name.replace(/\.(zip|bundle|html?)$/i,"");
+function importFile(file,into,want){busy("Bringing "+file.name+" in…");file.arrayBuffer().then(function(ab){var u8=new Uint8Array(ab),name=want||file.name.replace(/\.(zip|bundle|html?)$/i,"");
     if(/\.html?$/i.test(file.name)){var files=[{path:file.name,data:u8}];if(into)return IngRepo.putMany(into.id,files).then(function(){return {id:into.id};});return IngRepo.fromFiles(files,{name:name,msg:"Brought in from "+file.name});}
     if(into&&u8[0]===0x50&&u8[1]===0x4b){return IngRepo.core.unzipData?Promise.reject(new Error("choose the app's own page to add to an app that is here; a zip comes in as an app of its own")):Promise.reject(new Error("a zip comes in as an app of its own"));}
-    return IngRepo.importAny(u8,{name:name});}).then(function(x){var id=x.id||(x.repo&&x.repo.id)||(x.summary&&x.summary.id);if(id){FBS().sel=id;saveSoon();}S.view="history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(file.name+" is here.");},function(e){unbusy();fail(e);});}
+    return IngRepo.importAny(u8,{name:name});}).then(function(x){var id=x.id||(x.repo&&x.repo.id)||(x.summary&&x.summary.id);if(id){FBS().sel=id;S.home=false;saveSoon();}S.view="history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(file.name+" is here.");},function(e){unbusy();fail(e);});}
 var busyEl=null;function busy(m){unbusy();busyEl=h("div","f-toast",esc(m));$("fb").appendChild(busyEl);}
 function unbusy(){if(busyEl){busyEl.remove();busyEl=null;}}
 
@@ -920,7 +1258,7 @@ function sheetPackage(r){var P=pkgOf(r),pref=shipPrefs(r),sh=sheet("Package deta
   kr.appendChild(btn("sm","Save this key (.p12)",function(){var id=ks.value||"device";sheetName("A password for the key's file","At least six characters. Keep the file and its password safe: anyone holding both can sign an app that installs over yours.",function(pw){
       return IngApk.keys.save(id,pw).then(function(u8){return saveBytes((id==="device"?"ingenium-device":"ingenium-"+id)+"-signing.p12","application/x-pkcs12",u8);}).then(function(){toast("Saved. keytool and the online builds open it with the password you chose.");});},"");}));
   sh.box.appendChild(kr);
-  var end=h("div","end");end.appendChild(btn("","Close",sh.close));
+  var end=h("div","end");
   end.appendChild(btn("pri","Keep these",function(){var id=fI.value.trim();if(!IngApk.cleanId(id)){fI.focus();toast("“"+id+"” cannot be an id: letters, digits and dots, such as com.yannieforest.myapp.");return;}
     pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));
   sh.box.appendChild(end);}
@@ -950,7 +1288,7 @@ function sheetEdit(r,texts,path,report){var sh=sheet("Edit "+r.name,null);sh.box
   saveBtn.id="fbEdSave";
   end.appendChild(btn("quiet","Take it away",function(){if(!window.confirm("Take "+path+" away? It goes when you keep the next version; the history keeps it."))return;IngRepo.del(r.id,path).then(function(){sh.close();C.diff={};C.files={};toast(path+" is taken away, as a change to keep.");return refresh();}).then(function(){S.view="changes";paint();},fail);}));
   end.appendChild(btn("quiet","Rename",function(){sheetName("A new name for "+path,"Its new path in the app.",function(p){p=String(p).replace(/^\/+/,"");if(!p||p===path)return;return IngRepo.move(r.id,path,p).then(function(){sh.close();C.diff={};C.files={};toast(path+" is now "+p+", as a change to keep.");return refresh();}).then(function(){S.view="changes";paint();});});}));
-  end.appendChild(btn("","Close",function(){if(dirty&&!window.confirm("Close without saving your change to "+path+"?"))return;sh.close();}));end.appendChild(saveBtn);sh.box.appendChild(end);
+  var close0=sh.close;sh.close=function(){if(dirty&&!window.confirm("Close without saving your change to "+path+"?"))return;close0();};end.appendChild(saveBtn);sh.box.appendChild(end);
   ta.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&(e.key==="s"||e.key==="S")){e.preventDefault();e.stopPropagation();saveBtn.click();return;}
     if(e.key==="Tab"&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();var s0=ta.selectionStart,e0=ta.selectionEnd;ta.value=ta.value.slice(0,s0)+"  "+ta.value.slice(e0);ta.selectionStart=ta.selectionEnd=s0+2;ta.oninput();}});
   load(path);setTimeout(function(){try{ta.focus();}catch(e){}},80);}
@@ -1012,7 +1350,7 @@ function install(){if($("page-fabrica"))return;
 function render(){if(!$("fb")){build();}refresh().then(function(){paint();layoutSoon();var r=cur();if(r)syncFromCode(r);},function(e){paint();fail(e);});}
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.classList.toggle("fb-on",p==="fabrica");/* R123: on a narrow screen Fabrica always opens on Your apps (the owner's word); choosing an app moves to its work */
-    if(p==="fabrica"){S.panel="apps";if(one())setPanel("apps");render();setTimeout(fit,120);}}catch(e){try{console.error("R112",e);}catch(_){}}return r;};window.go=go;}catch(e){}
+    if(p==="fabrica"){S.panel="apps";if(one())setPanel("apps");S.home=false;S.seenSel=FBS().sel;render();setTimeout(fit,120);}}catch(e){try{console.error("R112",e);}catch(_){}}return r;};window.go=go;}catch(e){}
 window.addEventListener("resize",function(){if($("fb"))layoutSoon();});
 try{new MutationObserver(function(){if($("fb")&&$("page-fabrica").classList.contains("active"))paint();}).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 /* the engine's author line: her name on every version */
@@ -1022,7 +1360,9 @@ window.fbRender=render;window.fbSync=syncFromCode;
 /* 6.1 · what R140 (GitHub's own views) works with */
 window.fbHubHost={S:S,C:C,cur:cur,FBS:FBS,saveSoon:saveSoon,h:h,esc:esc,btn:btn,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,busy:busy,unbusy:unbusy,
   refresh:refresh,paint:paint,paintWork:paintWork,thumbs:thumbs,diffList:diffList,openEditor:openEditor,saveBytes:saveBytes,mimeOf:mimeOf,notesOf:notesOf,statusOf:statusOf,setPanel:setPanel,one:one,
-  pkgOf:pkgOf,appOf:appOf,sealEl:sealEl,draftMessage:draftMessage};
+  pkgOf:pkgOf,appOf:appOf,sealEl:sealEl,draftMessage:draftMessage,
+  /* 6.61: the library page and the three panels (the tests, and the parts that open an app) */
+  closeX:closeX,openWork:function(id){if(id)FBS().sel=id;S.home=false;S.seenSel=FBS().sel;paint();},openApp:openApp2,openLibrary:goHome,openPage:openPage,paintLib:paintLib};
 /* R114: Code opened on an app, with something to say once it is open */
 window.fbOpenInCode=function(r,path,after){openInCode(r,path);if(after)setTimeout(after,900);};
 })();

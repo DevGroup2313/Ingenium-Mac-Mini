@@ -9,6 +9,7 @@
 //   - a reload: the sealed desk on the "disk" is adopted by the base's deskAdopt as a sealed one (nothing read as a desk), the
 //     sign-in opens it, and Lock now writes the desk to the bridge before the page starts again;
 //   - no script errors on the page.
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 700))); c ? pass++ : fail++; };
@@ -44,7 +45,7 @@ const settle = async (p) => { for (let i = 0; i < 80; i++) { const n = await p.e
   // a text the disk alone holds (as on a computer whose page store forgot it)
   await p.evaluate((t) => { const id = IngBig.newId(); window.__t700only = id; state.t700only = id; window.__t700disk()['big:' + id] = t + ' ONLY'; saveState(); }, BIG);
   // 2. protection on, from Settings
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Protect this copy/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 5000 });
   await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW1); await p.fill('#ildP2', PW1); await p.click('#ingLockDoor form button[type=submit]');

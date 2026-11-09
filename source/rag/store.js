@@ -106,7 +106,7 @@ export class Store {
     this.vendorBase = options.vendorBase || VENDOR_BASE;
     this.rpc = new Rpc(this.workerUrl, 'store');
     const r = (op, transferOf) => (args, opts) => this.rpc.request(op, args, transferOf ? transferables(transferOf(args || {}), opts && opts.transfer) : undefined);
-    this.principal = { ensure: r('principal.ensure') };
+    this.principal = { ensure: r('principal.ensure'), find: r('principal.find') };
     this.folder = { add: r('folder.add'), list: r('folder.list'), remove: r('folder.remove'), touch: r('folder.touch') };
     this.acl = { grant: r('acl.grant'), revoke: r('acl.revoke'), allowed: r('acl.allowed') };
     this.file = {
@@ -117,6 +117,10 @@ export class Store {
       lookup: r('emb.lookup'), prune: r('emb.prune'),
       put: r('emb.put', (a) => (Array.isArray(a.items) ? a.items.map((i) => i && (i.embedding != null ? i.embedding : i.vec)) : [])),
     };
+    // phase 2: the two searches of retrieval and the passages they name (each answers only within the folders the principal
+    // may read; rag/retriever.js fuses them). The question's vector is transferred to the worker.
+    this.search = { fts: r('search.fts'), vec: r('search.vec', (a) => [a.embedding]) };
+    this.chunk = { get: r('chunk.get') };
     this.debug = { rows: r('debug.rows'), sql: r('debug.sql'), fail: r('debug.fail'), migrate: r('debug.migrate'), wipe: r('debug.wipe') };
   }
   /**

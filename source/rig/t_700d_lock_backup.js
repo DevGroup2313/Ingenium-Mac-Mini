@@ -10,6 +10,7 @@
 //   - after a reload and the sign-in the chat, the long text and the conversation read whole, and the last words are there;
 //   - Reset everything (Settings) takes the lock with it: no lock record, no sign-in, the welcome door, the earlier desk gone;
 //   - every part of the page ran to its end, and no script errors on either page.
+// 6.33 (modules/r234.js): Your data and Models and AI show one section at a time; the section that holds the card is opened, as she would open it
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const URL_ = process.argv[2], OUT = process.argv[3]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 900))); c ? pass++ : fail++; };
@@ -25,7 +26,7 @@ const raw = (p, db, store) => p.evaluate(([db, store]) => new Promise((res) => {
     t.oncomplete = () => { d.close(); res(g.result.map((v) => ({ sealed: (typeof v === 'string') ? /^ING1g?\./.test(v) : !!(v && v.ing === 'sealed'), json: JSON.stringify(v) }))); }; t.onerror = () => { d.close(); res(null); }; };
   rq.onerror = () => res(null); }), [db, store]);
 async function protect(p) {
-  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
+  await p.evaluate(() => { go('settings'); if (window.IngRooms) IngRooms.open('settings', 'data'); if (window.IngSettingsParts) IngSettingsParts.show('data', 'lock'); }); await p.waitForSelector('#ingLockCard', { timeout: 10000 });
   await p.evaluate(() => [...document.querySelectorAll('#ingLockCard button')].find(b => /Protect this copy/.test(b.textContent)).click());
   await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 5000 }); await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW1); await p.fill('#ildP2', PW1); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 10000 });

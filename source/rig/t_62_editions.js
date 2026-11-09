@@ -25,7 +25,9 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
   const b = await pw.chromium.launch({ args: ['--no-sandbox'] });
   for (const { ed, url } of EDS) {
     // Ingenium of its own: the master's; in the full edition only by a permission that allows it (rig/t_62_permits.js)
-    const master = ed === 'master', ownSelf = master, libHere = ed === 'master' || ed === 'full', lector = libHere, blank = ed === 'gift';
+    // 6.27 (her rules of 5 November 2026, rig/t_627_editions.js): no edition but the master names her other apps (blank), and only the
+    // master and full editions carry the five apps and Fabrica
+    const master = ed === 'master', ownSelf = master, libHere = ed === 'master' || ed === 'full', lector = libHere, blank = !master;
     const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); const errs = [];
     p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/favicon|net::ERR|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text()); });
     try {
@@ -45,10 +47,13 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undef
       // the owner's name, account and app ids
       // the owner's name in the credit lines (the page's head, the door, the foot) and, in the master and full editions, in a note in the code
       const names = (src.match(/Yannie D\. Forest/g) || []).length, credit = (src.match(/Designed and built by Yannie D\. Forest/g) || []).length;
-      // (and, since R162, in the licence the page carries whole and in its card: "original work of", the owner's name for the card)
-      const lines = (src.match(/(?:(?:Copyright \(c\) 2026|Designed and built by|(?:&copy;|©) 2026|original work of) |OWNER=")Yannie D\. Forest/g) || []).length, other = names - lines;
+      // (and, since R162, in the licence the page carries whole and in its card: "original work of", the owner's name for the card;
+      // since the licence of 6.7.x, its plain words "belongs to" and "\"The owner\" means", in its text and in its card, and the
+      // owner's keys that check a permission, "name": in every edition, as the licence is)
+      const lines = (src.match(/(?:(?:Copyright \(c\) 2026|Designed and built by|(?:&copy;|©) 2026|original work of|belongs to|owner\\?" means) |OWNER="|"name": ")Yannie D\. Forest/g) || []).length, other = names - lines;
       const ids = (src.match(/com\.yannie/g) || []).length, acct = (src.match(/DevGroup2313/g) || []).length;
-      ok(credit === 2 && lines >= 8 && (master ? other >= 4 : lector ? other === 1 : other === 0) && (master ? ids > 0 && acct > 0 : ids === 0 && acct === 0) && (master ? /^com\.yannieforest\./.test(f.kitPh) : /^app\.ingenium\./.test(f.kitPh)),
+      // the credit: the door, the foot, and since 6.8.10 the colophon under the pages (modules/r189.js), drawn and in its code
+      ok(credit === 4 && lines >= 8 && (master ? other >= 4 : lector ? other === 1 : other === 0) && (master ? ids > 0 && acct > 0 : ids === 0 && acct === 0) && (master ? /^com\.yannieforest\./.test(f.kitPh) : /^app\.ingenium\./.test(f.kitPh)),
         ed + ': the owner\'s copyright line kept; the owner\'s name ' + (master ? 'where the master has it' : 'nowhere else') + ', the owner\'s app ids and account ' + (master ? 'kept' : 'gone'), { names, lines, other, ids, acct, ph: f.kitPh });
       ok((f.recipe === 'object') === master && (master ? f.author === 'Yannie D. Forest' : f.author === ''), ed + ': Lector\'s recipe ' + (master ? 'kept' : 'not in the page') + '; a commit\'s author ' + (master ? 'the owner' : 'unset until the person sets one'), [f.recipe, f.author]);
       // the signing certificate a device makes

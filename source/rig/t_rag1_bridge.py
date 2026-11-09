@@ -558,6 +558,15 @@ def direct(work):
 
 
 # ============================================================================================================================ the patch
+def undo693(text, U):
+    """6.9.3's changes taken out of a file that has them (they are only replacements); a file without them is returned as it is."""
+    if U.MARK not in text:
+        return text
+    for old, new in U.REPLACEMENTS:
+        text = text.replace(new, old, 1)
+    return text
+
+
 def section_patch(try_dir):
     global LABEL
     LABEL = "patch"
@@ -573,8 +582,13 @@ def section_patch(try_dir):
         # 6.9.2 put the patch into the repositories (release.py); the file as it was before is what is left when it is taken
         # out again, which works only because the patch is purely additive (checked below on that file)
         repo_text = open(src, "rb").read().decode("utf-8")
-        ok(P.MARK in repo_text and U.MARK not in repo_text, "%s: the repository's file has 6.9.2's folder search and not yet 6.9.3's changes" % k)
-        before = repo_text.replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)
+        # (7 November 2026) the repositories now carry 6.9.3's changes as well (release.py applies both): they are undone first,
+        # which works because they are only the listed replacements (checked below)
+        has693 = U.MARK in repo_text
+        ok(P.MARK in repo_text, "%s: the repository's file has the folder search (6.9.2%s)" % (k, ", with 6.9.3's changes" if has693 else ", not yet 6.9.3's changes"))
+        base692 = undo693(repo_text, U)
+        ok(U.MARK not in base692, "%s: undoing 6.9.3's listed replacements leaves none of them" % k)
+        before = base692.replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)
         open(dst, "w", encoding="utf-8", newline="\n").write(before)
         ok(P.MARK not in before and "extensions_map" not in before, "%s: taking 6.9.2's patch out of it leaves none of it" % k)
         r1 = subprocess.run([sys.executable, PATCH, dst], capture_output=True, text=True)
@@ -595,7 +609,10 @@ def section_patch(try_dir):
         ok(all(funcs.count(f) == 1 for f in ("_rag_choose_folder", "_rag_folders", "_rag_forget_folder", "_rag_list", "_rag_read", "_rag_extensions_map", "_rag_remember", "_rag_walk")),
            "%s: the logic is plain module-level functions, each once" % k)
         ok(after.count("extensions_map = _rag_extensions_map(http.server.SimpleHTTPRequestHandler.extensions_map)") == 1, "%s: the local server's handler takes the explicit types" % k)
-        ok(after == repo_text, "%s: applied to that file, 6.9.2's patch gives the repository's file back byte for byte" % k)
+        # (the patches added since, such as 6.10's Claude Code sessions, sit at the same anchor, so the patch's block may land on the
+        # other side of theirs: the same lines, the patch's once, in another order of whole blocks)
+        ok(after == base692 or sorted(after.splitlines()) == sorted(base692.splitlines()),
+           "%s: applied to that file, 6.9.2's patch gives the repository's file (as of 6.9.2) back: the same lines, its block once" % k)
         # 6.9.3 (app_rag_693.py): on top of it, once
         r4 = subprocess.run([sys.executable, PATCH693, dst], capture_output=True, text=True)
         up = open(dst, "rb").read().decode("utf-8")
@@ -608,6 +625,7 @@ def section_patch(try_dir):
         for old, new in U.REPLACEMENTS:
             back = back.replace(new, old, 1)
         ok(back == after, "%s: 6.9.3's changes are only the listed replacements (undoing them gives 6.9.2's file back)" % k)
+        ok((not has693) or up == repo_text or sorted(up.splitlines()) == sorted(repo_text.splitlines()), "%s: with 6.9.3's changes the copy has the repository's file's lines" % k)
         out[k] = dst
     # a file that is not the shape the patch knows is refused and left alone
     junk = os.path.join(try_dir, "junk.py")
@@ -617,7 +635,7 @@ def section_patch(try_dir):
     # a file whose second API class has no take_screenshot (the first def is renamed)
     broken = os.path.join(try_dir, "one_class.py")
     orig = open(os.path.join(REPOS["mini"], "ingenium_app.py"), encoding="utf-8").read()
-    orig = orig.replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)   # as before 6.9.2
+    orig = undo693(orig, U).replace(P.CODE, "", 1).replace("\n" + P.METHODS, "").replace(P.SERVER_NEW, P.SERVER_OLD)   # as before 6.9.2
     open(broken, "w", encoding="utf-8").write(orig.replace("def take_screenshot(self):", "def take_shot(self):", 1))
     r = subprocess.run([sys.executable, PATCH, broken], capture_output=True, text=True)
     ok(r.returncode != 0 and "found 1 times, not 2" in (r.stderr + r.stdout), "a file with only one of the two API classes' take_screenshot is refused (nothing half done)", (r.stderr + r.stdout)[-200:])

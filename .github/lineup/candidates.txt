@@ -79,3 +79,124 @@ card google/gemma-4-12b-it
 card google/gemma-4-E4B-it
 card LiquidAI/LFM3-1.7B
 card PrismML/Bonsai-27B
+# round 8 (6.10.2, 3 November 2026): stronger models for computers with far more memory than 64 GB. Her words (3 November 2026): "I also
+# want Ingenium to be able to run stronger models and be strong enough to run on larger computers with far more RAM than 64GB. I don't
+# want Ingenium to be capped at 64 GB RAM in case I get better hardware". Written from memory in a session that cannot reach Hugging
+# Face, so a repository below may be a name that does not exist: an ERROR line means the guess was wrong, and the search lines list what
+# the authors really have. Files over 50 GB come in parts (name-00001-of-0000N.gguf): every part is listed with its size and SHA-256.
+# The engine's own list of the kinds of model it can load (Ingenium's engine is llama.cpp b11321)
+archs b11321
+# OpenAI's gpt-oss-120b (Apache 2.0): a mixture-of-experts, quick for its size
+repo ggml-org/gpt-oss-120b-GGUF
+repo unsloth/gpt-oss-120b-GGUF
+card openai/gpt-oss-120b
+# Qwen3-Next 80B-A3B (Apache 2.0): 80B, of which 3B work on each word
+repo unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF
+repo unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF
+repo Qwen/Qwen3-Next-80B-A3B-Instruct-GGUF
+card Qwen/Qwen3-Next-80B-A3B-Instruct
+# Qwen3.5's larger models (guessed names), Qwen3 235B-A22B and Qwen3-Coder 480B (Apache 2.0)
+repo unsloth/Qwen3.5-122B-A10B-GGUF
+repo unsloth/Qwen3.5-397B-A17B-GGUF
+repo Qwen/Qwen3.5-122B-A10B-GGUF
+card Qwen/Qwen3.5-122B-A10B
+card Qwen/Qwen3.5-397B-A17B
+repo unsloth/Qwen3-235B-A22B-Instruct-2507-GGUF
+repo unsloth/Qwen3-235B-A22B-Thinking-2507-GGUF
+card Qwen/Qwen3-235B-A22B-Instruct-2507
+repo unsloth/Qwen3-Coder-480B-A35B-Instruct-GGUF
+repo unsloth/Qwen3-Coder-Next-GGUF
+# Z.ai's GLM (MIT): 4.5 Air (106B-A12B) and the larger 4.6 and 4.7
+repo unsloth/GLM-4.5-Air-GGUF
+repo ggml-org/GLM-4.5-Air-GGUF
+card zai-org/GLM-4.5-Air
+repo unsloth/GLM-4.6-GGUF
+repo unsloth/GLM-4.7-GGUF
+card zai-org/GLM-4.6
+# MiniMax M2 (230B-A10B), DeepSeek V3.1 and V3.2 (671B), Kimi K2 (1T), Mistral Large 3
+repo unsloth/MiniMax-M2-GGUF
+repo unsloth/MiniMax-M2.1-GGUF
+card MiniMaxAI/MiniMax-M2
+repo unsloth/DeepSeek-V3.1-Terminus-GGUF
+repo unsloth/DeepSeek-V3.2-GGUF
+card deepseek-ai/DeepSeek-V3.1-Terminus
+repo unsloth/Kimi-K2-Thinking-GGUF
+repo unsloth/Mistral-Large-3-675B-Instruct-2512-GGUF
+# Discovery: what the makers and the main GGUF publishers have, newest first
+search unsloth Qwen3.5
+search unsloth Qwen3.6
+search unsloth Qwen3.8
+search unsloth Qwen3-Next
+search unsloth Qwen3-Coder
+search unsloth 235B
+search unsloth GLM
+search unsloth gpt-oss
+search unsloth MiniMax
+search unsloth DeepSeek
+search unsloth Kimi
+search unsloth Nemotron
+search unsloth gemma-4
+search unsloth Mistral
+search ggml-org
+search Qwen GGUF
+search zai-org
+search MiniMaxAI
+search deepseek-ai
+search moonshotai
+search nvidia Nemotron
+search mistralai
+search google gemma-4
+# round 8b (6.10.2, 3 November 2026): round 8's log was longer than could be read back, and its search lines named newer large
+# models of 2026. Only the files Ingenium would use are listed now (the usual quality, the best, and the compact and very compact
+# copies of the largest), with each maker's card, and the engine's newest releases and what each can load.
+releases
+archs b11321
+archs latest
+repo ggml-org/gpt-oss-120b-GGUF
+repo unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo Qwen/Qwen3-Next-80B-A3B-Instruct-GGUF
+repo unsloth/Qwen3-Coder-Next-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo ggml-org/Qwen3.8-Flash-Next-GGUF
+repo unsloth/Qwen3.8-Flash-Next-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/Qwen3.5-122B-A10B-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/Qwen3.5-397B-A17B-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo unsloth/Qwen3.8-2.4T-A95B-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo ggml-org/GLM-5.3-Flash-GGUF
+repo unsloth/GLM-5.3-Flash-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/GLM-5.3-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo ggml-org/GLM-4.5-Air-GGUF
+repo unsloth/MiniMax-M3.1-Flash-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/MiniMax-M3-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo unsloth/MiniMax-M2.7-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo unsloth/DeepSeek-V4.1-Flash-1017-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo ggml-org/DeepSeek-V4-Flash-GGUF
+repo unsloth/DeepSeek-V4-Pro-0813-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo ggml-org/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-GGUF
+repo unsloth/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo unsloth/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-GGUF (Q4_K_M|UD-Q4_K_XL|MXFP4|Q8_0|UD-Q2_K_XL|UD-Q3_K_XL|UD-IQ2_XXS|mmproj-F16)
+repo nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB-GGUF
+repo ggml-org/Mistral-Large-4-1T-A52B-GGUF
+repo unsloth/Mistral-Large-4-1T-A52B-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo unsloth/Kimi-K3-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+repo unsloth/Kimi-K2.6-GGUF (UD-TQ1_0|UD-IQ1_S|UD-IQ1_M|UD-IQ2_XXS|UD-Q2_K_XL|UD-Q3_K_XL|Q4_K_M|UD-Q4_K_XL|mmproj-F16)
+card openai/gpt-oss-120b
+card Qwen/Qwen3-Next-80B-A3B-Instruct
+card Qwen/Qwen3-Coder-Next
+card Qwen/Qwen3.8-Flash-Next
+card Qwen/Qwen3.5-122B-A10B
+card Qwen/Qwen3.5-397B-A17B
+card Qwen/Qwen3.8-2.4T-A95B
+card zai-org/GLM-5.3-Flash
+card zai-org/GLM-5.3
+card MiniMaxAI/MiniMax-M3.1-Flash
+card MiniMaxAI/MiniMax-M3
+card deepseek-ai/DeepSeek-V4.1-Flash-1017
+card deepseek-ai/DeepSeek-V4-Pro-0813
+card nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16
+card nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16
+card mistralai/Mistral-Large-4-1T-A52B
+card moonshotai/Kimi-K3
+search Qwen Qwen3.8
+search deepseek-ai DeepSeek-V4
+search moonshotai Kimi-K3
