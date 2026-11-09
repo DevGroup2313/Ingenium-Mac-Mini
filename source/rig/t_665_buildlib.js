@@ -110,10 +110,13 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loa
   ok(await p.evaluate(() => !document.getElementById('modalRoot').classList.contains('open') && !document.getElementById('modalBox').classList.contains('bl-read')), 'Close closes the reader and leaves the box as it was');
 
   // 6. the app's own folder: How it was built
-  await p.evaluate(() => { const f = IngFolders.folders().find(x => x.name === 'Quill'); state.folders.ui.open = f.id; IngFolders.paint(); }); await p.waitForTimeout(700);
+  await p.evaluate(() => { const f = IngFolders.folders().find(x => x.name === 'Quill'); state.folders.ui.open = f.id; IngFolders.paint(); });
+  // the card is drawn hidden and filled once the notes are read from the device's store (slower when the computer is busy)
+  await p.waitForFunction(() => [...document.querySelectorAll('#page-folders h2')].some(h => /^How it was built \(\d+\)$/.test(h.textContent)), null, { timeout: 20000 }).catch(() => {}); await p.waitForTimeout(300);
   const fv = await p.evaluate(() => { const c = [...document.querySelectorAll('#page-folders h2')].find(h => /^How it was built/.test(h.textContent)); if (!c) return null; const card = c.closest('.card') || c.parentElement;
     return { h: c.textContent, subs: [...card.querySelectorAll('.bl-sub')].map(x => x.textContent), rows: [...card.querySelectorAll(':scope > .bl-list .bl-row b')].map(x => x.textContent), groups: [...card.querySelectorAll('details.bl-group')].map(d => ({ s: d.querySelector('summary').textContent, rows: [...d.querySelectorAll('.bl-row b')].map(x => x.textContent) })), find: !!card.querySelector('.bl-q') }; });
   ok(fv && fv.h === 'How it was built (5)', 'Quill\'s folder shows How it was built, with its five notes', fv);
+  ok(await p.evaluate(() => { const h = [...document.querySelectorAll('#page-folders h2')].find(x => /^How it was built/.test(x.textContent)); const c = h && (h.closest('.card') || h.parentElement); return !!c && !c.hidden && c.offsetHeight > 0; }), 'and the card is shown');
   ok(fv && fv.subs.join('|') === 'Start here|Its parts, each with its history in the build notes' && fv.rows.join('|') === 'Index|Footnotes|Pages', 'Start here holds its index, then its parts by name', fv);
   ok(fv && fv.groups.length === 1 && /^Versions \(2\)$/.test(fv.groups[0].s) && fv.groups[0].rows.join('|') === 'Quill 1.10 handoff|Quill 1.2 handoff', 'its versions are folded together, the newest first (1.10 before 1.2)', fv && fv.groups);
   ok(fv && fv.find, 'and its notes have their own finder');

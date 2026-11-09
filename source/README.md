@@ -387,7 +387,7 @@ sticky notes above the floating windows.
   joins lines wrapped by hand, so a list item is not cut in two. The store is labelled in Storage (r142) and in backups (r143): a
   backup, and so Ingenium Cloud, carries it, and a library that arrives that way is seen without opening the page again.
   modules/r208.js calls it only where it is. Held on 8 November for her preview; she asked for it to be shipped on 9 November.
-  rig/t_665_buildlib.js: 36 checks with an invented library (a second run with "absent" checks another edition carries none of it).
+  rig/t_665_buildlib.js: 37 checks with an invented library (a second run with "absent" checks another edition carries none of it).
 - modules/r123.js: her sticky notes and the side buttons float over a floating window. Her words (9 November 2026): "Schedae's
   sticky notes open behind the exported floating windows ... they never float over". The cause, reproduced on the 6.64 page: the
   notes stand on layer 120 and the side buttons on 130, a floating window on 600, and every press on a window took the next

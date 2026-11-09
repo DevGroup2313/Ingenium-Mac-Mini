@@ -176,6 +176,6 @@ function folder(p,host,U){var c=U.card("How it was built",null);c.hidden=true;ho
     var groups={};mine.forEach(function(n){if(n.group)(groups[n.group]=groups[n.group]||[]).push(n);});
     Object.keys(groups).sort().forEach(function(g){var d=el("details","bl-group");d.appendChild(el("summary",null,g.charAt(0).toUpperCase()+g.slice(1)+" ("+groups[g].length+")"));d.appendChild(list(groups[g]));c.appendChild(d);});});}
 W.IngBuildLib={home:home,folder:folder,bring:bring,load:load,read:read,find:function(q,app){return load().then(function(L){return find(app?L.notes.filter(function(n){return norm(n.app)===norm(app);}):L.notes,q).map(function(h){return {path:h.n.path,app:h.n.app,title:shown(h.n),times:h.c,bit:h.bit};});});},unwrap:unwrap,_reset:function(){LIB=null;}};
-try{window.__ingParts.p258="ok";}catch(_){}
+try{window.__ingParts["p258"]="running";}catch(_){}
 })();
 </script>
