@@ -30,7 +30,8 @@ async function open(b, opts, th, js) {
     await p.waitForTimeout(2600);
     const keys = await p.$$(KEYSEL);
     for (const k of keys.slice(0, 6)) { const bb = await k.boundingBox(); if (!bb) continue; await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2, { steps: 14 }); await p.waitForTimeout(900); }
-    await p.mouse.move(720, 500, { steps: 10 }); await p.waitForTimeout(1500);
+    await p.mouse.move(720, 500, { steps: 10 }); await p.waitForTimeout(1200);
+    if (name.indexOf('orrery') === 0) { await p.mouse.move(560, 640, { steps: 6 }); await p.mouse.down(); await p.mouse.move(980, 640, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(3200); }
     const seal = await p.$('#hxSealKey'); if (seal) { const bb = await seal.boundingBox(); if (bb) { await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2, { steps: 10 }); await p.waitForTimeout(300); await p.mouse.down(); await p.mouse.up(); await p.waitForTimeout(2200); } }
     const v = p.video(); await ctx.close(); const vp = await v.path();
     fs.copyFileSync(vp, path.join(OUT, 'home_' + name + '.webm')); console.log('made', name);
