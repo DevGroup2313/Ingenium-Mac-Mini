@@ -475,7 +475,10 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '.hx-btn,.hx-item,.blx-chk,'+
   /* 6.66: Fabrica's cards, tiles and choices, which lifted no key and made no sound (her words, 10 November 2026: "The newly added
      Fabrica pages are still and not animated and clickable when I hover over them"; modules/r260.js) */
-  '#fb .f-lc,#fb .f-tile,#fb .f-way,#fb .f-x,#fb .f-sw button,#fb .f-rail button,#fb .f-opt,#fb .f-repo',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
+  '#fb .f-lc,#fb .f-tile,#fb .f-way,#fb .f-x,#fb .f-sw button,#fb .f-rail button,#fb .f-opt,#fb .f-repo,'+
+  /* 6.68: Blend in Home's language (modules/r262.js): the models riding the engine, the model rows, the ways, the step coins and the
+     ready-made cards (her words, 10 November 2026: "I want everything made clickable and popped out animated") */
+  '#page-blend .bx-sat,#page-blend .bl-model,#page-blend .blend-strat,#page-blend .rm-step,#page-blend .bl-preset',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
 function keyDown(k,e){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
   if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
   var now=Date.now();if(now-keyAt<(ROLE_GAP.keys||35))return false;var L=lvl("keys");if(!(L>0))return false;keyAt=now;

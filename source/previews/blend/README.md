@@ -4,7 +4,8 @@ Her words: "I like the Blend redesign but I want everything made clickable and p
 and have the Ingenium engine be animated and a clickable button, the same for Scriba and Magister's buttons. I want you give them the
 same effect as the orbs from the Home page. I also want them to be redesigned a bit to better fit the app and its visuals."
 
-What the preview shows (not in any build until she approves it):
+What the preview shows. She approved it the same day ("I approve of the design please push it everywhere"), and it ships in Ingenium 6.68
+as modules/r262.js, built on Blend's own elements (rig/t_668_blend.js):
 - Blend's head as Home's sky: the eyebrow, the title in Cormorant, the lede, New blend and Ready-made as Home's card keys.
 - The engine: Ingenium's own seal key with every flourish of R175 (it tilts to follow a mouse, sinks when pressed, and plays one of its
   flourishes on each press), in Home's deeper layers with a rim behind its face, its star turning counterclockwise.
