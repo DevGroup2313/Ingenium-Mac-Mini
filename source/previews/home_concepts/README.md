@@ -15,15 +15,17 @@ with Blend and Folders in the same direction.
 To see them: `node rig/preview_concepts.js <page url> previews/home_concepts <out folder> orrery,codex,gallery '<keys selector>'`
 (pictures by day and night, and a video of each).
 
-## Live preview (10 November 2026, second round)
+## Live preview of 6.67 (10 November 2026)
 
-Her choice: the Orrery as first shown inside her real Home (the "this version" picture), with only the orbs taken from the
-interactive preview, made rounder and more 3D, and no ring around Fabrica. Her seal key is the engine at the centre, its star
-turning counterclockwise without stopping; the circle that hugged the seal is gone and the larger orbit ring stays, in purple.
-The next-step card is Home's own card, its keys at their own width with their own lift and press, without "Read the short guide".
+What shipped in Ingenium 6.67 (modules/r261.js), shown live: the page runs the app's own Home styles (modules/r147.js), its seal
+key's rules (R104, R175) and the orrery module itself, on Home's real markup; the top bar, side list, side buttons and the rest of
+Home are pictures of the app. Her seal is the engine at the centre, its star turning counterclockwise without stopping; the rooms
+are orbs made as the seal is made (layers at their own depths, its sway, tilt, lift and press), riding an orbit the browser turns
+by itself (CSS 3D, no script redrawing it); by day the orbs wear Ingenium's day violets, by night each room its own purple.
 
-- `live_orrery_template.html`: the page, with places for the pictures and parts taken from the app.
+- `live_orrery_template.html`: the page, with places for the pictures and the parts taken from the app.
 - `tools/capture_v2.js <page url> <folder>`: takes the top bar, side list, side buttons, backdrop and the rest of Home as pictures,
   and the seal key, the card, the room keys and their style rules as they are.
-- `tools/build_live.py <folder> <template> <out>`: puts them together into one page (the pictures are not kept here).
-- `tools/check3.js <page> <out prefix>`: renders it by night and by day and reports any error.
+- `tools/build_live4.py <folder> <template> <out> <modules folder>`: puts them together with modules/r147.js and r261.js into one
+  page (the pictures are not kept here).
+- `tools/check4.js <page> <out prefix>`: renders it by night and by day and reports any error.

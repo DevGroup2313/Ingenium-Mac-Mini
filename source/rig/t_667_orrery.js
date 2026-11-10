@@ -66,11 +66,14 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   // 3. the orbs: no ring, no moon, travelling counterclockwise
   const s4 = await p.evaluate(() => { const o = [...document.querySelectorAll('#hx .hx-key .oxo')]; return { n: o.length,
     rings: o.filter(x => [...x.querySelectorAll('ellipse')].some(e => +e.getAttribute('rx') > 40)).length, moons: document.querySelectorAll('#hx .ox-moon,#hx .ox-moon-front').length,
-    layers: o.every(x => x.querySelector('.oxo-cast') && x.querySelector('.oxo-sph') && x.querySelector('.oxo-glare') && x.querySelector('.oxo-ico svg')) }; });
-  ok(s4.n === 6 && s4.layers, 'each room is an orb in layers: its shadow, the ball, a glare and its mark', s4);
+    layers: o.every(x => x.querySelector('.oxo-cast') && x.querySelector('.oxo-ball svg') && x.querySelector('.oxo-mark .oxo-ico svg')),
+    depth: o.map(x => getComputedStyle(x.querySelector('.oxo-mark')).getPropertyValue('--fz').trim()), glare: document.querySelectorAll('#hx .oxo-glare').length,
+    blur: [...document.querySelectorAll('#hx .oxo-ball svg [filter]')].length, sway: getComputedStyle(o[0].querySelector('.oxo-idle')).animationName }; });
+  ok(s4.n === 6 && s4.layers && s4.depth.every(d => +d > .1), "each room is an orb made as the seal is: its cast, the ball, and its mark standing above it", s4);
+  ok(s4.glare === 0 && s4.blur === 0 && s4.sway === 'oxSway', 'no glare and no glowing edge; at rest it sways as the seal does', s4);
   ok(s4.rings === 0 && s4.moons === 0, 'no orb carries a ring or a moon (Fabrica, Build)', s4);
   const pos = () => p.evaluate(() => { const h = document.querySelector('#hx .hx-head').getBoundingClientRect(), s = document.getElementById('hxSeal').getBoundingClientRect();
-    const cx = s.left + s.width / 2, cy = h.top + h.height * .63; return [...document.querySelectorAll('#hx .hx-key')].map(k => { const r = k.querySelector('.hx-jewel').getBoundingClientRect();
+    const cx = s.left + s.width / 2, cy = h.top + h.height * .61; return [...document.querySelectorAll('#hx .hx-key')].map(k => { const r = k.querySelector('.hx-jewel').getBoundingClientRect();
       return Math.atan2((r.top + r.height / 2 - cy) / Math.cos(70 * Math.PI / 180), r.left + r.width / 2 - cx); }); });
   await p.mouse.move(5, 890); const q0 = await pos(); await p.waitForTimeout(1500); const q1 = await pos();
   const dq = q0.map((a, i) => ((q1[i] - a + 3 * Math.PI) % (2 * Math.PI)) - Math.PI);
@@ -82,11 +85,12 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const s5 = await p.evaluate(() => { const k = document.querySelector('#hx .hx-key[data-go="lector"]'), o = k.querySelector('.oxo'), t = getComputedStyle(o.querySelector('.oxo-tilt')).transform;
     const others = [...document.querySelectorAll('#hx .hx-key')].filter(x => x !== k).map(x => +getComputedStyle(x).opacity);
     const M = new DOMMatrix(t); return { hover: o.classList.contains('hover'), near: k.classList.contains('ox-near'), m: { m13: M.m13, m23: M.m23, m31: M.m31, m42: M.m42 }, ry: o.style.getPropertyValue('--ry'), kd: +getComputedStyle(k.querySelector('.hx-kd')).opacity,
-      dim: others.every(v => v < .7), grey: [...document.querySelectorAll('#hx .hx-key')].filter(x => x !== k).map(x => getComputedStyle(x).filter).filter(f => f !== 'none'), st: IngOrrery.state() }; });
+      dim: others.every(v => v < .75), grey: [...document.querySelectorAll('#hx .hx-key')].filter(x => x !== k).map(x => getComputedStyle(x).filter).filter(f => f !== 'none'), st: IngOrrery.state() }; });
   const m5 = s5.m;
   ok(s5.hover && parseFloat(s5.ry) !== 0 && Math.abs(m5.m13) + Math.abs(m5.m23) + Math.abs(m5.m31) > 0.01, 'under the mouse an orb tilts to follow it', s5);
-  ok(m5.m42 < -2, 'under the mouse an orb lifts', { lift: m5.m42 });
-  ok(s5.near && s5.kd > .9 && s5.dim && s5.st.hold === 'lector' && Math.abs(s5.st.vel) < 1e-5, "the orbit stops, the room comes near with its words, the others step back", s5);
+  ok(m5.m42 < -2, 'under the mouse an orb lifts, as the seal does', { lift: m5.m42 });
+  const held0 = await pos(); await p.waitForTimeout(700); const held1 = await pos();
+  ok(s5.near && s5.kd > .9 && s5.dim && s5.st.hold === 'lector' && !s5.st.turning && held0.every((a, i) => Math.abs(a - held1[i]) < 0.003), "the orbit stops, the room comes near with its words, the others step back", { s5, held0, held1 });
   ok(s5.grey.length === 0, 'by day the rooms that step back keep their colours (no grey)', s5.grey);
   await p.mouse.down(); await p.waitForTimeout(200);
   const s6 = await p.evaluate(() => { const o = document.querySelector('#hx .hx-key[data-go="lector"] .oxo'); return { down: o.classList.contains('down'), m42: new DOMMatrix(getComputedStyle(o.querySelector('.oxo-tilt')).transform).m42 }; });
@@ -95,6 +99,13 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const opened = await p.evaluate(() => { const h = document.getElementById('page-home'); return { home: !!(h && h.offsetParent), lector: !!(document.getElementById('page-lector') && document.getElementById('page-lector').offsetParent) }; });
   ok(!opened.home, 'a press opens the room', opened);
   await p.evaluate(() => go('home')); await p.mouse.move(5, 890); await p.waitForTimeout(1500);
+
+  // 4b. Home stays light: left alone, the orbit turns by itself and nothing on Home is rewritten (her rule of 7 November 2026)
+  await p.mouse.move(5, 890); await p.waitForTimeout(600);
+  const quiet = await p.evaluate(() => new Promise(res => { let n = 0; const seen = {}; const mo = new MutationObserver(l => { l.forEach(m => { n++; const k = m.type + ' ' + (m.attributeName || '') + ' ' + (m.target.id || m.target.className || m.target.nodeName); seen[k] = (seen[k] || 0) + 1; }); });
+    mo.observe(document.getElementById('page-home'), { attributes: true, childList: true, subtree: true, characterData: true }); const a0 = performance.now();
+    setTimeout(() => { mo.disconnect(); res({ n, seen, turning: IngOrrery.state().turning }); }, 2500); }));
+  ok(quiet.n === 0 && quiet.turning, 'left alone, the orbit turns and nothing on Home is rewritten', quiet);
 
   // 5. the card
   const s7 = await p.evaluate(() => { const r = (id) => document.getElementById(id).getBoundingClientRect(), g = document.getElementById('hxGuide');
@@ -106,22 +117,22 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const s8 = await p.evaluate(async () => { try { await document.fonts.ready; } catch (e) {} return { fam: getComputedStyle(document.getElementById('hxHello')).fontFamily,
     loaded: [...document.fonts].some(f => /Home Cormorant/.test(f.family) && f.style === 'normal' && String(f.weight) === '600' && f.status === 'loaded') }; });
   ok(/^"?Home Cormorant/.test(s8.fam) && s8.loaded, "the greeting is in Ingenium's own Cormorant", s8);
-  await p.evaluate(() => document.body.classList.add('touring')); await p.waitForTimeout(1600);
-  const t0 = await p.evaluate(() => IngOrrery.state().turn); await p.waitForTimeout(500); const t1 = await p.evaluate(() => IngOrrery.state().turn);
-  ok(Math.abs(t1 - t0) < 0.002, 'the tour holds the orbit still', { t0, t1 });
-  await p.evaluate(() => { document.body.classList.remove('touring'); document.body.setAttribute('data-motion', 'minimal'); }); await p.waitForTimeout(1800);
-  const s9 = await p.evaluate(() => ({ t: IngOrrery.state().turn, anim: getComputedStyle(document.querySelector('#hxSeal .seal-spin')).animationName,
-    sway: getComputedStyle(document.querySelector('#hx .oxo-idle')).animationName })); await p.waitForTimeout(500);
-  const s9b = await p.evaluate(() => IngOrrery.state().turn);
-  ok(Math.abs(s9b - s9.t) < 0.002 && s9.anim === 'none' && s9.sway === 'none', 'Minimal motion keeps the orbit, the engine and the orbs still', { s9, s9b });
+  await p.evaluate(() => document.body.classList.add('touring')); await p.waitForTimeout(600);
+  const t0 = await pos(); await p.waitForTimeout(700); const t1 = await pos(); const tt = await p.evaluate(() => IngOrrery.state().turning);
+  ok(!tt && t0.every((a, i) => Math.abs(a - t1[i]) < 0.003), 'the tour holds the orbit still', { tt, t0, t1 });
+  await p.evaluate(() => { document.body.classList.remove('touring'); document.body.setAttribute('data-motion', 'minimal'); }); await p.waitForTimeout(800);
+  const s9 = await p.evaluate(() => ({ orbit: getComputedStyle(document.querySelector('#hx .ox-spin')).animationName, anim: getComputedStyle(document.querySelector('#hxSeal .seal-spin')).animationName,
+    sway: getComputedStyle(document.querySelector('#hx .oxo-idle')).animationName })); const m0 = await pos(); await p.waitForTimeout(700); const m1 = await pos();
+  ok(s9.orbit === 'none' && s9.anim === 'none' && s9.sway === 'none' && m0.every((a, i) => Math.abs(a - m1[i]) < 0.003), 'Minimal motion keeps the orbit, the engine and the orbs still', { s9, m0, m1 });
   await p.evaluate(() => document.body.setAttribute('data-motion', 'calm'));
 
   // 7. narrow: Home keeps its grid; wide again: the orrery
   await p.setViewportSize({ width: 1000, height: 900 }); await p.waitForTimeout(2500);
-  const s10 = await p.evaluate(() => { const box = document.querySelector('#hx .hx-keys'), i = document.querySelector('#hx .hx-key .hx-jewel svg:not(.oxo-sph)');
+  const s10 = await p.evaluate(() => { const box = document.querySelector('#hx .hx-keys'), i = document.querySelector('#hx .hx-key .hx-jewel .oxo-ico svg');
     return { on: IngOrrery.state().on, w: document.getElementById('hx').clientWidth, inWork: box.parentElement.classList.contains('hx-work'), grid: getComputedStyle(box).display,
-      icon: i ? Math.round(i.getBoundingClientRect().width) : 0, sph: getComputedStyle(document.querySelector('#hx .oxo-sph')).display, tf: document.querySelector('#hx .hx-key').style.transform }; });
-  ok(!s10.on && s10.inWork && s10.grid === 'grid' && s10.icon >= 18 && s10.sph === 'none' && !s10.tf, 'below 760 pixels Home keeps its grid of rooms, as before', s10);
+      icon: i ? Math.round(i.getBoundingClientRect().width) : 0, sph: getComputedStyle(document.querySelector('#hx .oxo-ball')).display, tf: getComputedStyle(document.querySelector('#hx .hx-key')).transform,
+      world: !!document.querySelector('#hx .ox-world'), kids: [...box.children].every(c => c.classList.contains('hx-key')) }; });
+  ok(!s10.on && s10.inWork && s10.grid === 'grid' && s10.icon >= 18 && s10.sph === 'none' && s10.tf === 'none' && !s10.world && s10.kids, 'below 760 pixels Home keeps its grid of rooms, as before', s10);
   const tourAt = await p.evaluate(() => { const e = document.querySelector('.hx-work, .hx-key'); const r = e && e.getBoundingClientRect(); return !!(r && r.width > 0); });
   await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(2500);
   const s11 = await p.evaluate(() => ({ on: IngOrrery.state().on, inHead: document.querySelector('#hx .hx-keys').parentElement.classList.contains('hx-head') }));
