@@ -81,10 +81,12 @@ async function axe(p, where) {
     return { tag: k.tagName, type: k.type, name: k.getAttribute('aria-label'), inBox: k.parentElement === box, kids: box.children.length, w: r.width, h: r.height,
       layers: isl ? [...isl.querySelectorAll('.isl-layer')].map(l => l.className.replace('isl-layer ', '')) : [], door: !!door, doorLayers: door ? door.querySelectorAll('.isl-layer').length : 0,
       dup: [...new Set(dup)].slice(0, 5), hidden: isl && isl.getAttribute('aria-hidden'), headSeal: !!document.querySelector('#brandSealBtn .isl'),
-      nearHello: Math.abs(r.top - document.getElementById('hxHello').getBoundingClientRect().top) < 120 };
+      nearHello: Math.abs(r.top - document.getElementById('hxHello').getBoundingClientRect().top) < 120,
+      /* 6.67 (r261): where Home is an orrery, the seal is its engine, at the centre of Home's head (her choice, 10 November 2026) */
+      orrery: !!(window.IngOrrery && IngOrrery.state().on), centred: (function () { var h = document.querySelector('#hx .hx-head').getBoundingClientRect(); return Math.abs(r.left + r.width / 2 - (h.left + h.width / 2)) < 6; })() };
   });
   ok(k && k.tag === 'BUTTON' && k.type === 'button' && k.name === NAME, 'the seal beside the greeting is a key named "' + NAME + '"', k);
-  ok(k && k.inBox && k.kids === 1 && k.nearHello, 'it stands in Home\'s head (#hxSeal), alone, beside the greeting', k);
+  ok(k && k.inBox && k.kids === 1 && (k.orrery ? k.centred : k.nearHello), 'it stands in Home\'s head (#hxSeal), alone, beside the greeting (from 6.67, at the centre of the orrery)', k);
   ok(k && k.layers.join(',') === 'isl-back,isl-ring,isl-star,isl-heart' && k.hidden === 'true', 'it is the door\'s layered seal: the face, the ring, the star and the stone, its picture hidden from screen readers', k && k.layers);
   ok(k && k.door && k.doorLayers === 4 && k.headSeal, 'the door\'s seal and the top bar\'s seal are still there, untouched', k);
   ok(k && k.dup.length === 0, 'no id appears twice in the page (the copy\'s gradients are named afresh)', k && k.dup);
@@ -93,8 +95,12 @@ async function axe(p, where) {
   // ---------------- at rest, it moves as the door's seal does ----------------
   const a1 = await idle(p);
   const doorAnims = p.__door;
-  ok(a1 && ['islSway', 'sealEngine', 'sealBeat', 'sealCounter'].every(n => a1.includes(n)), 'at rest it sways, the star turns, the stone beats and the ring turns', a1);
-  ok(a1 && doorAnims.length >= 4 && doorAnims.join() === a1.join(), 'the same movements as the door\'s seal (measured on the door while it stood open)', { door: doorAnims, home: a1 });
+  /* 6.67 (r261): in the orrery the star turns counterclockwise without stopping (oxEngine), at her word: "I want Ingenium's engine to
+     continuously be spinning and have it counterclockwise animation"; the door's seal keeps its own turn */
+  const ORR = await p.evaluate(() => !!(window.IngOrrery && IngOrrery.state().on)); const ENG = ORR ? 'oxEngine' : 'sealEngine';
+  ok(a1 && ['islSway', ENG, 'sealBeat', 'sealCounter'].every(n => a1.includes(n)), 'at rest it sways, the star turns, the stone beats and the ring turns', a1);
+  ok(a1 && doorAnims.length >= 4 && doorAnims.map(n => ORR && n === 'sealEngine' ? 'oxEngine' : n).sort().join() === a1.slice().sort().join(),
+    'the same movements as the door\'s seal (measured on the door while it stood open; in the orrery its star turns counterclockwise)', { door: doorAnims, home: a1 });
   const moving = await p.evaluate(async () => { const e = document.querySelector('#hxSealKey .isl-idle'); const a = getComputedStyle(e).transform; await new Promise(r => setTimeout(r, 700)); return a !== getComputedStyle(e).transform; });
   ok(moving, 'the sway is really running (its turn changes from moment to moment)');
   await p.locator('#hxSeal').screenshot({ path: path.join(OUT, 'seal_day.png') });

@@ -434,7 +434,7 @@ var PG={
     what:"Home is where Ingenium opens. It shows your next useful step, the rooms where you make things, and where you left off.",
     plain:"If you ever feel lost, come back here: the large key at the top always points to one small next step.",
     dos:[["Take your next step","The large key: bring in a model, load it, or start a chat.","#heroNext"],
-      ["Open a room","Chat, Code, Build, Fabrica, Lector and Focus each have a card.",".hx-work, .hx-key"],
+      ["Open a room","Chat, Code, Build, Fabrica, Lector and Focus each have a key.",".hx-work, .hx-key"],
       ["Pick up where you left off","Your latest conversations, apps and documents, one press away.",".hx-recent"],
       ["Open an app","Tabula, Abacus, Imago, Scriba and Fontes open on the Desk inside Ingenium. Each can also open in a window of its own.",".hx-appsec, .hx-app"]],
     tips:{"new":["Not sure what to do? Press the large purple key. It always points to one small step.","The guided tour shows every room in short chapters. Stop whenever you like."],

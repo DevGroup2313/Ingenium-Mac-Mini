@@ -33,7 +33,11 @@ async function open(b, opts) {
 async function home(p, ms = 1400) { await p.evaluate(() => go('home')); await p.waitForTimeout(ms); }
 async function theme(p, t) { await p.evaluate((t) => { state.theme = t; applyTheme(); }, t); await p.waitForTimeout(600); }
 const active = p => p.evaluate(() => { const s = document.querySelector('.main > section.active, main > section.active'); return { page: s ? s.id : null, mode: document.body.getAttribute('data-chatmode') || '' }; });
-async function press(p, sel) { await p.evaluate(() => window.scrollTo(0, 0)); const el = await p.$(sel); if (!el) return false; await el.scrollIntoViewIfNeeded(); await el.click(); await p.waitForTimeout(700); return true; }
+async function press(p, sel) { await p.evaluate(() => window.scrollTo(0, 0)); const el = await p.$(sel); if (!el) return false;
+  /* 6.67 (r261): a room in the orrery is pointed at first, as a person does; the orbit then comes to a stop under the pointer */
+  if (await p.evaluate((s) => !!(window.IngOrrery && IngOrrery.state().on && document.querySelector(s) && document.querySelector(s).closest('.hx-head')), sel)) {
+    const j = await p.$(sel + ' .hx-jewel'); const bb = j && await j.boundingBox(); if (bb) { await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.waitForTimeout(1100); } }
+  await el.scrollIntoViewIfNeeded(); await el.click(); await p.waitForTimeout(700); return true; }
 
 async function seed(p) { return p.evaluate(async () => {
   const now = Date.now();
@@ -175,8 +179,13 @@ async function seed(p) { return p.evaluate(async () => {
   await home(p, 500); await press(p, '#homeTour'); await p.waitForTimeout(500);
   const tour = await p.evaluate(() => { const t = document.getElementById('ingTour'); const on = !!(t && t.getBoundingClientRect().width > 0); try { tourEnd(); } catch (e) {} return on; });
   ok(tour, 'the guided tour still starts from Home', tour);
-  await home(p, 500); await press(p, '#hxGuide'); a = await active(p);
-  ok(a.page === 'page-guide', 'the short guide key opens the Guide', a);
+  /* 6.67 (r261): in the orrery the card leaves out "Read the short guide" at her word (10 November 2026); the Guide stays in the side list */
+  await home(p, 500);
+  if (await p.evaluate(() => !!(window.IngOrrery && IngOrrery.state().on))) {
+    const g = await p.evaluate(() => getComputedStyle(document.getElementById('hxGuide')).display);
+    await p.evaluate(() => { const k = document.querySelector('.nav-btn[data-page="guide"]'); if (k) k.click(); }); await p.waitForTimeout(700); a = await active(p);
+    ok(g === 'none' && a.page === 'page-guide', 'the card has no guide key in the orrery; the side list opens the Guide', { g, a });
+  } else { await press(p, '#hxGuide'); a = await active(p); ok(a.page === 'page-guide', 'the short guide key opens the Guide', a); }
   await home(p, 500); await press(p, '#hxModelsKey'); a = await active(p);
   ok(a.page === 'page-models', 'the models key opens the Models page', a);
   for (const [i, pg] of [[0, 'page-chat'], [1, 'page-fabrica']].concat(LX ? [[2, 'page-lector']] : [])) {
@@ -241,9 +250,11 @@ async function seed(p) { return p.evaluate(async () => {
     ({ ctx, p } = await open(b, Object.assign({ viewport: vp }, nm === 'phone' ? { deviceScaleFactor: 2, isMobile: true, hasTouch: true } : {})));
     await seed(p); await home(p, 3500);
     const m = await p.evaluate(() => { const r = n => document.querySelector(n).getBoundingClientRect(); const keys = [...document.querySelectorAll('#hx .hx-key')].map(k => Math.round(k.getBoundingClientRect().top));
-      return { over: document.scrollingElement.scrollWidth - innerWidth, rows: new Set(keys).size, main: Math.round(r('.hx-main').width), side: Math.round(r('.hx-side').width), sideLeft: Math.round(r('.hx-side').left), mainRight: Math.round(r('.hx-main').right), hx: Math.round(r('#hx').width) }; });
-    if (nm === 'wide') ok(m.over <= 1 && m.rows === 2, 'at 1440 the work keys stand in two rows of three, with no sideways scroll', m);
-    if (nm === 'big') ok(m.over <= 1 && m.rows === 1 && m.sideLeft > m.mainRight && m.main + m.side > m.hx * 0.9, 'at 3440 the whole width is used: the keys in one row, the plaque and the models beside the work', m);
+      return { over: document.scrollingElement.scrollWidth - innerWidth, rows: new Set(keys).size, main: Math.round(r('.hx-main').width), side: Math.round(r('.hx-side').width), sideLeft: Math.round(r('.hx-side').left), mainRight: Math.round(r('.hx-main').right), hx: Math.round(r('#hx').width),
+        /* 6.67 (r261): where Home is wide enough its rooms ride the orrery in its head instead of a grid */
+        orrery: !!(window.IngOrrery && IngOrrery.state().on), inHead: [...document.querySelectorAll('#hx .hx-key')].every(k => !!k.closest('.hx-head')) }; });
+    if (nm === 'wide') ok(m.over <= 1 && (m.orrery ? m.inHead : m.rows === 2), 'at 1440 the work keys stand in two rows of three (from 6.67, around the orrery), with no sideways scroll', m);
+    if (nm === 'big') ok(m.over <= 1 && (m.orrery ? m.inHead : m.rows === 1) && m.sideLeft > m.mainRight && m.main + m.side > m.hx * 0.9, 'at 3440 the whole width is used: the keys in one row, the plaque and the models beside the work', m);
     if (nm === 'phone') ok(m.over <= 1 && m.rows === 3, 'on a phone everything fits the width, the keys two by two', m);
     for (const t of ['day', 'night']) { await theme(p, t); await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(400); await p.screenshot({ path: path.join(OUT, 'h61-' + nm + '-' + t + '.png'), fullPage: true }); }
     for (const e of p.__errs) if (mine(e, R)) ok(false, 'a script error from Home (' + nm + ')', e.slice(0, 300));

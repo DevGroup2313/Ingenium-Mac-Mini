@@ -312,7 +312,7 @@ def _no_lector_words():
         ("For everything in one file, with Fabrica's apps, Lector's documents and your app library, use ", "For everything in one file, with Fabrica's apps, use ",
          "Backup: the pointer", 1),
         # the help beside each page (modules/r144.js)
-        ("Chat, Code, Build, Fabrica, Lector and Focus each have a card.", "Chat, Code, Build, Fabrica and Focus each have a card.", "help: Home's rooms", 1),
+        ("Chat, Code, Build, Fabrica, Lector and Focus each have a key.", "Chat, Code, Build, Fabrica and Focus each have a key.", "help: Home's rooms", 1),
         ('  Lector:"Save gives Word, PDF, a web page or Markdown; the dividers between the panels remember where you leave them.",\n', '',
          "help: no Lector tip", 1),
         (("CUT", '  lector:{name:"Lector",tour:["Lector"],', '"Each panel folds away to give the others room."]}},\n'), "", "help: no Lector page", 1),
@@ -485,7 +485,7 @@ def _public(ed):
          "Folders has a writing effort of its own, beside its model:", "Guide: effort, Folders alone", 1),
         ("Notes, Tabula, a Word file, or the clipboard", "Notes, a Word file, or the clipboard", "Guide: where a blend goes", 1),
         ('"Apps made here can be kept in Fabrica, with every version.",', '', "help: Code keeps its own apps", 1),
-        ("Chat, Code, Build, Fabrica and Focus each have a card.", "Chat, Code, Build and Focus each have a card.", "help: Home's rooms", 1),
+        ("Chat, Code, Build, Fabrica and Focus each have a key.", "Chat, Code, Build and Focus each have a key.", "help: Home's rooms", 1),
         ("a look-up of a reference, or the speech model the first time you dictate or record (Scriba's, fetched once and kept).",
          "a look-up of a reference, or the speech model the first time you dictate (fetched once and kept).", "Home: what goes online (6.56)", 1),
         # Folders, the Studio (modules/r208.js, r200.js, r201.js)
