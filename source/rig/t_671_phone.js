@@ -9,7 +9,8 @@
 //   - on a phone the side buttons start laid down, and they stay laid down when the guided tour closes (they had stood up again
 //     over the page); when she has raised them herself, the tour leaves them raised;
 //   - below 260 pixels each page keeps its former look; no page error.
-// The person and the apps are invented (Ada; Quill and Lantern), with Ingenium itself for its seal.
+// The person and the apps are invented (Ada; Quill and Lantern), with Ingenium itself for its seal. On the public editions (four rooms on
+// Home, no build library) the same checks run without the volume's.
 //   node rig/t_671_phone.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const [URL_, OUT] = process.argv.slice(2);
@@ -56,7 +57,7 @@ const SIZES = [['an iPhone (390 by 844)', { width: 390, height: 844 }], ['the sm
           low = Math.max(low, Math.round(q.bottom)); }); }
       an.forEach(a => a.play());
       return { on, keys: head.querySelectorAll('.hx-key').length, under, at, edge, low, cardTop: Math.round(card.getBoundingClientRect().top), wide: document.documentElement.scrollWidth - innerWidth }; });
-    ok(h.on && h.keys >= 5, label + ': Home is the orrery, in its phone layout', h);
+    ok(h.on && h.keys >= 4, label + ': Home is the orrery, in its phone layout', h);  // the master edition has six rooms, the public editions four
     ok(h.under === 0, label + ": over a whole turn no room's name passes under the seal at the centre", h);
     ok(h.edge <= 0 && h.wide <= 0, label + ': no room leaves the screen and Home is no wider than it', h);
     ok(h.low < h.cardTop, label + ': the next step stands below the rooms', h);
@@ -77,9 +78,11 @@ const SIZES = [['an iPhone (390 by 844)', { width: 390, height: 844 }], ['the sm
       const card = pg.querySelector('.fd-libcard'), book = card && card.querySelector('.fd-book'), words = card ? [...card.children].filter(e => !e.classList.contains('fd-shelf') && e.getBoundingClientRect().height > 0) : [];
       const br = book ? book.getBoundingClientRect() : null, hit = br ? words.filter(e => { const r = e.getBoundingClientRect(); return Math.min(r.right, br.right) - Math.max(r.left, br.left) > 2 && Math.min(r.bottom, br.bottom) - Math.max(r.top, br.top) > 2; }).map(e => e.tagName + ':' + (e.textContent || '').trim().slice(0, 30)) : ['no book'];
       const d = dr ? dr.getBoundingClientRect() : null;
-      return { on: !!(st && st.on && pg.classList.contains('fd-phone')), drawer: d ? [Math.round(d.left), Math.round(d.right)] : null, hit, wide: document.documentElement.scrollWidth - innerWidth }; });
+      return { on: !!(st && st.on && pg.classList.contains('fd-phone')), drawer: d ? [Math.round(d.left), Math.round(d.right)] : null, hit, lib: !!card, wide: document.documentElement.scrollWidth - innerWidth }; });
     ok(fo.on && fo.drawer && fo.drawer[0] >= 0 && fo.drawer[1] <= vp.width && fo.wide <= 0, label + ': Folders is the drawer, inside the screen, the page no wider than it', fo);
-    ok(fo.hit.length === 0, label + ": the build library's volume stands above its words, not over them", fo.hit);
+    // the build library is the master edition's alone (modules/r258.js): where there is none, there is no volume to place
+    if (fo.lib) ok(fo.hit.length === 0, label + ": the build library's volume stands above its words, not over them", fo.hit);
+    else console.log('note ' + label + ': this edition has no build library, so no volume is drawn');
     await p.evaluate(() => { const c = document.querySelector('#page-folders .fd-libcard'); if (c) c.scrollIntoView({ block: 'center' }); }); await p.waitForTimeout(400);
     await p.screenshot({ path: OUT + '/folders_' + vp.width + '.png' });
     ok(errs.length === 0, label + ': no page error', errs);
