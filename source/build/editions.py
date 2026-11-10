@@ -63,6 +63,8 @@ def skip_modules(ed):
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
+    if not has_fabrica(ed):
+        out |= {"r260.js"}  # 6.66: Fabrica's depth and motion, where there is a Fabrica
     if not carries_desk(ed):
         out |= {"r118.js", "r123.js", "r193.js", "r194.js"}  # 6.27: the five apps, the Desk, their stones, a document opened in its app
     if not has_lector(ed):

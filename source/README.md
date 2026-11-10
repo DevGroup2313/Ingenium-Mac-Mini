@@ -371,6 +371,32 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.66 (10 November 2026): Fabrica in Ingenium's own depth, the Offline Project's shield of three, and a model kept for a
+stronger computer (its desktop side; the page's part held for her preview).
+
+- modules/r260.js (new; master and full editions, editions.py): her words (10 November 2026): "The newly added Fabrica pages are still
+  and not animated and clickable when I hover over them", "I also really dislike the weird film over the background in the Fabrica
+  page when a panel is open", "I want the new app panel's surfaces to be animated and have that popped out 3D look and effect".
+  Measured on 6.65: the library's cards, each app's page (side list, head, boxes), the tiles of Bring an app in and the New app
+  panel's ways, colours and close key had no lift and no press; a panel stood on a film (rgba(17,13,24,.35)). Now each lifts and
+  sinks with Fabrica's own depths and spring; the library's cards lean toward the pointer (at most 3.2 degrees); no film, and the
+  panel is a raised plate; the New app's seal is a coin that floats and turns when its letter or colour changes (not while more of
+  the same name is typed). Minimal motion, calm days and reduced motion keep it still. modules/r176.js: those surfaces sound as
+  keys do, and a Fabrica panel rising is heard as the other panels are.
+- modules/r246.js: her words: "The Offline Project without Inkwell app has the wrong seal in Fabrica". Both variations were kept
+  under one name, "The Offline Project", and Fabrica (r112) chooses the crest by the name, so the copy without Inkwell wore the crest
+  of four and its own card said "Not made here yet". Each variation is now an app of its own ("The Offline Project (without
+  Inkwell)" wears the shield of three); a copy kept the old way, every version of it without Inkwell, is renamed once when Fabrica
+  opens; one that holds versions of both keeps its name. r112: the variation is named once on its card.
+- build/desktop/app_keep_666.py (Mac and Windows apps): a download asked for "for later" is kept and checked as any other but marked
+  so; each download's record keeps when it arrived and its size; kept_models, model_later, reveal_model, copy_model_out (to a folder
+  she chooses, the first part checked against the fingerprint, a note beside it on adding it elsewhere; stopped, it leaves nothing
+  half-made), copy_status, copy_cancel. rig/t_666_keep.py: 31 checks on the app's own functions, Mac and Windows.
+- modules/r259.js (new, held in build/held.json for her preview): Downloads, a room of the Models page (r173): keep a model for a
+  stronger computer, the kept models (use it here, copy to a folder, show the file, remove), and what was downloaded lately; a kept
+  model is left out of the model lists. In a browser, Download the file saves to the device's Downloads folder.
+- rig/t_666_fabrica.js: 23 checks.
+
 Ingenium 6.65 (9 November 2026): answers from her folders checked once more, her build library on the Folders page, and her
 sticky notes above the floating windows.
 

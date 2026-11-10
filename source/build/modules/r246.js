@@ -230,17 +230,33 @@ function watch(){var box=$("fbRepos"),wb=$("fbWorkBody");if(!box||box.__op)retur
      section ... It should only be there only if I was working on it inside of Fabrica and recently shipped a new version like any
      other app"). It comes in through Bring one in, and is then a repository like any other, beside Ingenium and the rest. */
   var old=$("fbOpRow");if(old)old.remove();
-  bringWatch();}
+  bringWatch();fixNames();}
 /* Bring one in: The Offline Project, made from your apps, kept as a repository (a new version of it when it is already here) */
-var OPNAME="The Offline Project";
+/* 6.66: each variation is an app of its own, as the library lists them (her words, 10 November 2026: "The Offline Project without
+   Inkwell app has the wrong seal in Fabrica, it still shows the 4 quadrants in the seal with Inkwell in it"). Until 6.65 both were kept
+   under the one name, so the copy without Inkwell wore the crest of four (modules/r112.js chooses the crest by the name) and its own
+   card in the library said "Not made here yet". */
+var OPNAME="The Offline Project",OPNAME3="The Offline Project (without Inkwell)";
 function keepAsRepo(four){var H0=H();if(!H0)return;try{H0.busy("Making the Offline Project"+(four?"":" without Inkwell")+" and keeping it in Fabrica…");}catch(e){}
-  return fresh(four).then(function(f){var files=[{path:"the_offline_project.html",data:f.text}],msg="Made from your apps"+(four?" (all four)":" (without Inkwell)");
-      return IngRepo.list().then(function(rs){var mine=(rs||[]).filter(function(r){return r&&r.name===OPNAME;})[0];
+  var name=four?OPNAME:OPNAME3;
+  return fixNames().then(function(){return fresh(four);}).then(function(f){var files=[{path:"the_offline_project.html",data:f.text}],msg="Made from your apps"+(four?" (all four)":" (without Inkwell)");
+      return IngRepo.list().then(function(rs){var mine=(rs||[]).filter(function(r){return r&&r.name===name;})[0];
         if(mine)return IngRepo.putMany(mine.id,files).then(function(){return IngRepo.commit(mine.id,msg);}).then(function(){return {id:mine.id,again:true};});
-        return IngRepo.fromFiles(files,{name:OPNAME,msg:msg}).then(function(x){return {id:x.id,again:false};});});})
+        return IngRepo.fromFiles(files,{name:name,msg:msg}).then(function(x){return {id:x.id,again:false};});});})
     .then(function(x){var h=H();try{h.FBS().sel=x.id;h.saveSoon();h.S.view="history";h.C.diff={};h.C.files={};h.C.log={};}catch(e){}ON=false;views(true);
-      return h.refresh().then(function(){h.unbusy();h.paint();toast(x.again?"The Offline Project has a new version in Fabrica.":"The Offline Project is in Fabrica now, beside your other apps.");return x;});})
+      return h.refresh().then(function(){h.unbusy();h.paint();toast(x.again?name+" has a new version in Fabrica.":name+" is in Fabrica now, beside your other apps.");return x;});})
     .catch(function(e){try{H().unbusy();}catch(_){}toast("The Offline Project could not be made: "+String(e&&e.message||e));});}
+/* 6.66: a copy kept the old way, under the name of four, whose every version was made without Inkwell, takes the name of three (and so
+   its crest); one that holds versions of both keeps its name. It is looked at once each time the page opens, before anything is kept. */
+var FIXED=null;
+function fixNames(){if(FIXED)return FIXED;
+  FIXED=Promise.resolve().then(function(){if(!W.IngRepo||typeof IngRepo.list!=="function"||typeof IngRepo.rename!=="function")return null;
+    return IngRepo.list().then(function(rs){rs=rs||[];if(rs.some(function(r){return r&&r.name===OPNAME3;}))return null;
+      var old=rs.filter(function(r){return r&&r.name===OPNAME&&r.head;})[0];if(!old)return null;
+      return IngRepo.log(old.id,{max:500}).then(function(l){l=l||[];if(!l.length||!l.every(function(c){return /^Made from your apps \(without Inkwell\)/.test(c.title||"");}))return null;
+        return IngRepo.rename(old.id,OPNAME3).then(function(){try{var h=H();if(h){h.refresh().then(function(){h.paint();},function(){});}}catch(e){}return old.id;});});});})
+    .then(null,function(e){warn(e);return null;});
+  return FIXED;}
 function bringOpts(sh){if(!sh||sh.querySelector(".op-bring"))return;var end=sh.querySelector(".end");
   function opt(ic,t,small,fn){var b=mk("button","f-opt op-bring");b.type="button";var i=mk("span","ic",ic),w=mk("span");w.appendChild(mk("b",null,t));w.appendChild(mk("small",null,small));b.appendChild(i);b.appendChild(w);
     b.addEventListener("click",function(){var wrap=sh.closest(".f-sheet-wrap");if(wrap)wrap.remove();fn();});if(end)sh.insertBefore(b,end);else sh.appendChild(b);return b;}
@@ -254,7 +270,7 @@ function boot(){if(!data())return;try{wrapApps();wrapPlus();}catch(e){warn(e);}v
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,1200);});
 try{var og=W.go;if(typeof og==="function"&&!og.__r246){var ng=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(function(){watch();var old=$("fbOpRow");if(old)old.remove();if(ON)paintWork();},60);}catch(e){}return r;};ng.__r246=1;W.go=ng;try{go=ng;}catch(e){}}}catch(e){}
-W.IngOffline={make:make,open:openWork,keep:keepAsRepo,rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
+W.IngOffline={make:make,open:openWork,keep:keepAsRepo,names:[OPNAME,OPNAME3],fixNames:function(){FIXED=null;return fixNames();},rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
 })();
 ;try{window.__ingParts["p246"]="running";}catch(_){}
 </script>

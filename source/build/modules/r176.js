@@ -472,7 +472,10 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act,'+
   /* 6.55: Home's greeting card keys and its rows of recent work, which never had the keys' sound (her words: "I want both the sound and
      animations restored for those buttons"); and the Check with Blend key under a reply */
-  '.hx-btn,.hx-item,.blx-chk',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
+  '.hx-btn,.hx-item,.blx-chk,'+
+  /* 6.66: Fabrica's cards, tiles and choices, which lifted no key and made no sound (her words, 10 November 2026: "The newly added
+     Fabrica pages are still and not animated and clickable when I hover over them"; modules/r260.js) */
+  '#fb .f-lc,#fb .f-tile,#fb .f-way,#fb .f-x,#fb .f-sw button,#fb .f-rail button,#fb .f-opt,#fb .f-repo',keyAt=0;   /* 6.8.5: the apps on Home, the Career Studio's keys, the Inbox's */
 function keyDown(k,e){if(!k||k.disabled||k.getAttribute("aria-disabled")==="true"||!allowed())return false;
   if(k.closest("#ingSoundChoices,#introDoor,[data-snd-test],[data-snd-on]"))return false;
   var now=Date.now();if(now-keyAt<(ROLE_GAP.keys||35))return false;var L=lvl("keys");if(!(L>0))return false;keyAt=now;
@@ -499,7 +502,9 @@ function cardUp(el){if(!allowed())return false;var now=Date.now();if(now-cardAt<
    presentation menu): heard as they rise, whether shown with hidden taken away or with their arrival drawn (r184's rcIn) */
 var CARDSEL="#displayPanel,#ihPanel,#remPanel,#bellPanel,#schedaePanel,#tourMenu,.pres-menu,.tour-card,#ing-export-choice,.isc-box";
 function isCard(n){try{return !!(n&&n.nodeType===1&&n.matches&&n.matches(CARDSEL));}catch(e){return false;}}
-D.addEventListener("animationstart",function(e){if(e.animationName==="rcIn"&&isCard(e.target))cardUp(e.target);},true);
+D.addEventListener("animationstart",function(e){if(e.animationName==="rcIn"&&isCard(e.target))cardUp(e.target);
+  /* 6.66: a Fabrica panel rising (Bring an app in, A new app, a name) is heard as the other panels are */
+  else if(e.animationName==="fbRise3"&&e.target&&e.target.matches&&e.target.matches("#fb .f-sheet"))cardUp(e.target);},true);
 function watchShown(){try{new MutationObserver(function(ms){ms.forEach(function(m){var n=m.target;if(isCard(n)&&!n.hidden&&m.oldValue!==null)cardUp(n);});})
   .observe(D.body,{attributes:true,attributeFilter:["hidden"],attributeOldValue:true,subtree:true});}catch(e){}}
 function watchModal(){var m=$("modalRoot");if(!m||m.__r176c)return;m.__r176c=1;var was=m.classList.contains("open");

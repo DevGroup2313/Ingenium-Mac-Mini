@@ -1060,7 +1060,7 @@ function verWord(k){return k==="inkwell"||k==="ingenium"?"Version":"Build";}
 /* an app brought in from the library carries the library's number until a version of its own is tagged */
 function verFor(r){var v=verOf(r);if(v)return v;var k=keyOf(r);if(!k)return "";try{var m=libList().filter(function(x){return x.key===k;})[0];return m&&m.version?verWord(k)+" "+m.version:"";}catch(e){return "";}}
 function libCard(e){var r=e.r,k=e.k,off=/^offline/.test(k||"");
-  var nm=r?r.name:off?"The Offline Project":(APPS[k]?APPS[k].name:k),v=r?verFor(r):"";
+  var nm=off?"The Offline Project":r?r.name:(APPS[k]?APPS[k].name:k),v=r?verFor(r):"";  /* 6.66: its variation is named once, on the line below */
   var sub=off?(k==="offline"?"All four apps":"Without Inkwell")+(v?" · "+v:""):r?(v?(/^\d/.test(v)&&k?verWord(k)+" ":"")+v:(r.head?"Kept":"New")):(e.m&&e.m.version?verWord(k)+" "+e.m.version:"In your app library");
   var c=h("div","f-lc");c.setAttribute("role","listitem");c.tabIndex=0;c.setAttribute("aria-label",nm+", "+sub);
   var sl=h("span","sl");sl.appendChild(sealEl(r?iconOf(r):k,64,r));c.appendChild(sl);
