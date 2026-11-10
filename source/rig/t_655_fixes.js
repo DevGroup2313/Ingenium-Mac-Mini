@@ -31,7 +31,9 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   // 1. the greeting card's keys
   await p.evaluate(() => go('home')); await p.mouse.move(1439, 899); await p.waitForTimeout(800);
   const kk = []; for (const s of ['#heroNext', '#homeTour', '#hxGuide']) kk.push(await snap(p, s));
-  ok(kk.every(k => k.h >= 33 && k.h <= 37 && k.fs === '13px' && k.fw === '600'), 'the greeting card\'s keys keep 6.53\'s size (13px, 34 to 36px high)', kk.map(k => [k.h, k.fs, k.fw]));
+  /* 6.67: Read the short Guide left the card at her word ("Remove the Read the short Guide from the card"), so only the keys shown are measured */
+  const shown = kk.filter(k => k.h > 0);
+  ok(shown.length >= 2 && shown.every(k => k.h >= 33 && k.h <= 37 && k.fs === '13px' && k.fw === '600'), 'the greeting card\'s keys keep 6.53\'s size (13px, 34 to 36px high)', kk.map(k => [k.h, k.fs, k.fw]));
   ok(kk[1].bg === 'linear-gradient(rgb(255, 255, 255), rgb(246, 242, 251))' && kk[2].bg === kk[1].bg && /^linear-gradient\(rgb\(122, 80, 198\)/.test(kk[0].bg), 'their faces are 6.53\'s: white, and the purple key purple', kk.map(k => k.bg));
   ok([kk[1], kk[2]].every(k => /rgba\(40, 22, 68, 0\.25\) 0px 2px 0px 0px/.test(k.sh) && /0px 9px 14px/.test(k.sh)) && /rgb\(58, 32, 112\) 0px 2px 0px 0px/.test(kk[0].sh), 'they wear the keys\' own edge, 2px deep, and casts', kk.map(k => k.sh));
   ok(kk.every(k => /transform 0\.16s/.test(k.tr)), 'they move on the keys\' own spring', kk.map(k => k.tr));
