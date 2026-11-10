@@ -6,7 +6,8 @@ maker, so the two can disagree:
        code still has the fingerprint its CodeDirectory gives (the program was not changed); the icon holds each size; the
        program can be run (its mode); the page shell.json names is there.
   win: the icon table names each picture with its true size, and each picture is a PNG of that size; the files after the
-       program read back (shell.txt, shell.json, the page).
+       program read back (shell.txt, shell.json, the page); (6.70) its version resource gives the app's own name as its
+       FileDescription and ProductName and its file as OriginalFilename, so Windows names it by its name, not "Name.exe".
     python verify_desktop_app.py mac|win <made.zip> [id] [title]     -> prints one JSON line; exit 1 when anything is wrong"""
 import hashlib, io, json, plistlib, struct, sys, zipfile
 
@@ -170,6 +171,37 @@ def win(zf, want_id, want_title):
         check(size == nbytes, "the icon table gives the %d-pixel picture its true size" % z)
         check(png_size(b[at:at + size]) == (z, z), "the %d-pixel picture is a PNG of that size" % z)
         seen.append(z)
+    # 6.70: the program's own name, read from its version resource as Windows reads it (VS_VERSIONINFO, StringFileInfo)
+    strings = {}
+    check(16 in types, "the program carries a version resource (its own name)")
+    if 16 in types:
+        v_at, v_size = leaf(types[16])
+        v = b[v_at:v_at + v_size]
+        def node(o):
+            ln, vl, ty = struct.unpack("<HHH", v[o:o + 6]); k = o + 6; key = ""
+            while True:
+                c, = struct.unpack("<H", v[k:k + 2]); k += 2
+                if not c:
+                    break
+                key += chr(c)
+            k = (k + 3) & ~3
+            return ln, vl, ty, key, k
+        ln, vl, ty, key, k = node(0)
+        check(key == "VS_VERSION_INFO" and struct.unpack("<I", v[k:k + 4])[0] == 0xFEEF04BD, "the version resource begins as Windows expects")
+        o = (k + vl + 3) & ~3
+        while o < ln:
+            cl, _, _, ck, co = node(o)
+            if ck == "StringFileInfo":
+                t_o = co; tl, _, _, tk, so = node(t_o)
+                while so < t_o + tl:
+                    sl, svl, _, sk, sv = node(so)
+                    strings[sk] = v[sv:sv + max(0, svl - 1) * 2].decode("utf-16-le")
+                    so = (so + sl + 3) & ~3
+            o = (o + cl + 3) & ~3
+        if want_title:
+            check(strings.get("FileDescription") == want_title, "Windows names the program by the app's name (FileDescription %r)" % strings.get("FileDescription"))
+            check(strings.get("ProductName") == want_title, "its product name is the app's name (%r)" % strings.get("ProductName"))
+        check(strings.get("OriginalFilename") == name, "its original file name is its file's (%r)" % strings.get("OriginalFilename"))
     check(b[-8:] == b"INGWWW01", "the app's files follow the program, with their mark")
     n, = struct.unpack("<Q", b[-16:-8])
     pz = zipfile.ZipFile(io.BytesIO(b[-16 - n:-16]))
@@ -180,7 +212,7 @@ def win(zf, want_id, want_title):
         check(conf.get("title") == want_title, "shell.txt names the app (%s)" % conf.get("title"))
     check(conf.get("page") in pz.namelist(), "the page shell.txt names is there (%s)" % conf.get("page"))
     check(all(i.compress_type == 0 for i in pz.infolist()), "the app's files are stored as they are (the shell reads them so)")
-    return {"program": name, "bytes": len(b), "icons": seen, "id": conf.get("id"), "page": conf.get("page"),
+    return {"program": name, "bytes": len(b), "icons": seen, "id": conf.get("id"), "page": conf.get("page"), "names": strings,
             "page_bytes": len(pz.read(conf["page"])) if conf.get("page") in pz.namelist() else 0, "files": pz.namelist()}
 
 

@@ -822,7 +822,8 @@ var ICONS={apk:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M1
 var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android device: signed here, it installs as it is"],
   ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],
   ["mac","Mac app","For a MacBook or a Mac mini (Apple silicon and Intel in one): drag it to Applications and open it"],
-  ["win","Windows app (.exe)","For a Windows 10 or 11 PC: one file that opens as it is, with nothing to install"],
+  /* 6.70: no "(.exe)" in its name (her words, 10 November 2026: "I want the "exe" to be removed from the app's name") */
+  ["win","Windows app","For a Windows 10 or 11 PC: one file that opens as it is, with nothing to install"],
   ["web","Web app (.zip)","Installs from a browser and works offline; on iPhone and iPad, Add to Home Screen"],
   ["page","One page (.html)","The whole app in one file, for any browser"],
   ["kits","Build kits (.zip)","Projects to build the apps on a computer or online: you choose the devices"]];

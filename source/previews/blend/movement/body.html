@@ -1,0 +1,63 @@
+<div class="bar"><span><b>Ingenium</b> · Blend, the Movement made quiet (a preview)</span><button class="tg" id="themeKey" type="button">Night</button></div>
+<div class="stage" id="stage"><div class="fit" id="fit">
+<div class="win" id="win" data-theme="day">
+<script>(function(){try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.getAttribute("data-theme")!=="light")document.getElementById("win").setAttribute("data-theme","night");}catch(e){}})();</script>
+  <div class="back" aria-hidden="true"><img class="only-day" alt="" src="{{BACK_DAY}}"><img class="only-night" alt="" src="{{BACK_NIGHT}}"></div>
+  <div class="scroll" id="scroll"><div class="page"><div class="bx" id="bx">
+    <section class="bx-head" id="bxHead" aria-labelledby="bxTitle">
+      <div class="bx-words">
+        <div class="bx-eyebrow"><b>Ingenium</b><span id="bxEye">Blend</span></div>
+        <h1 class="bx-title" id="bxTitle">Blend</h1>
+        <p class="bx-lede">Ask two or more of your models the same question and bring their answers together. They answer one after another on this device; each answer appears as it is written, with its thinking, and the blended answer comes last. Send it to the chat, copy it, or save it as a Word file.</p>
+        <div class="bx-tabs" role="tablist" aria-label="Blend"><button class="bx-key" type="button" role="tab" id="tabNew" aria-selected="true">New blend</button><button class="bx-key" type="button" role="tab" id="tabReady" aria-selected="false">Ready-made</button></div>
+      </div>
+      <div class="cx" id="cx"></div>
+      <div class="mv-seal hx-seal" id="mvSeal" hidden>{{SEAL}}</div>
+      <div class="bx-count" id="bxCount" aria-live="polite"></div>
+    </section>
+    <nav class="bx-steps" id="bxSteps" aria-label="The four steps"></nav>
+    <div class="bx-grid" id="bxNewPane">
+      <section class="bx-slab" aria-live="polite">
+        <div class="bx-pane on" data-step="1">
+          <h2 class="bx-h"><span class="n">I</span>Choose the models</h2>
+          <p class="bx-sub">Two or more: on this device, connected, or both. Each one you choose takes its place in the blend above.</p>
+          <div class="bx-grp">On this device</div><div class="bx-models" id="bxLocal"></div>
+          <div class="bx-grp">Your connected models</div><div class="bx-models" id="bxCloud"></div>
+          <div class="bx-nav"><span></span><button class="bx-key pri" type="button" data-go="2">Next: how they work together</button></div>
+        </div>
+        <div class="bx-pane" data-step="2">
+          <h2 class="bx-h"><span class="n">II</span>How they work together</h2>
+          <p class="bx-sub">Each way brings the answers together differently; the blend above shows it.</p>
+          <div class="bx-ways" id="bxWays"></div>
+          <div class="bx-grp">Effort</div><div class="bx-effort" id="bxEffort"></div>
+          <div class="bx-grp">Who writes the final answer</div>
+          <select class="bx-sel" id="bxWriter" aria-label="Who writes the final answer"><option>Ingenium chooses</option></select>
+          <div class="bx-nav"><button class="bx-key" type="button" data-go="1">Back</button><button class="bx-key pri" type="button" data-go="3">Next: your question</button></div>
+        </div>
+        <div class="bx-pane" data-step="3">
+          <h2 class="bx-h"><span class="n">III</span>Your question</h2>
+          <textarea class="bx-task" id="bxTask" aria-label="Your question">Which of my three essay openings is strongest, and how would you join the best of each?</textarea>
+          <div class="bx-acts"><button class="bx-key pri" type="button" id="bxRun">Run blend</button><button class="bx-key" type="button" id="bxSave">Save as a house</button></div>
+          <div class="bx-note" id="bxNote"></div>
+          <div class="bx-nav"><button class="bx-key" type="button" data-go="2">Back</button><span></span></div>
+        </div>
+        <div class="bx-pane" data-step="4">
+          <h2 class="bx-h"><span class="n">IV</span>The answers</h2>
+          <p class="bx-sub">Each model's answer appears on the right as it is written, with its thinking; the blended answer comes last, with how it was reached.</p>
+          <div class="bx-acts"><button class="bx-key" type="button" id="bxAgain">Ask another</button></div>
+          <div class="bx-nav"><button class="bx-key" type="button" data-go="3">Back</button><span></span></div>
+        </div>
+      </section>
+      <section class="bx-slab bx-out" id="bxOut" aria-live="polite">
+        <div class="bx-empty" id="bxEmpty"><div><b>The answers appear here.</b><p>Choose two or more models, how they work together and the effort; then write the question and press Run blend. The models on this device answer one after another; your connected models answer at the same time.</p></div></div>
+      </section>
+    </div>
+    <div class="bx-ready" id="bxReadyPane" hidden></div>
+  </div></div></div>
+  <div class="top" aria-hidden="true"><img class="only-day" alt="" src="{{TOP_DAY}}"><img class="only-night" alt="" src="{{TOP_NIGHT}}"></div>
+  <div class="rail" aria-hidden="true"><img class="only-day" alt="" src="{{RAIL_DAY}}"><img class="only-night" alt="" src="{{RAIL_NIGHT}}"></div>
+  <div class="right" aria-hidden="true"><img class="only-day" alt="" src="{{RIGHT_DAY}}"><img class="only-night" alt="" src="{{RIGHT_NIGHT}}"></div>
+  <div class="pv-toast" id="pvToast" role="status" aria-live="polite"></div>
+</div>
+</div></div>
+<p class="note">A preview of Blend as a movement in 3D, for you to try before anything changes in Ingenium. Each model you choose is a metal wheel in its own violet. The wheels are rendered with rounded, polished edges and holes you can see through, and a light from the top left stays still while they turn. Ingenium's seal sits in a polished setting at the centre of Ingenium's wheel, and its star turns as it does on Home. The movement faces you and sways a little; when you point at a wheel, it comes to rest facing you. Press a wheel to see it in step I; press the seal to wind the movement. No gold and no glow. The answers here are made up for the preview; the top bar, the side list and the side buttons are pictures of the app.</p>

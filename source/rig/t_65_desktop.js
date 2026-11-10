@@ -6,7 +6,8 @@
 //   - pressing each saves a zip that rig/verify_desktop_app.py reads as macOS and Windows read it: the Mac app's seal and
 //     signature agree with every file and the program's code is as GitHub built it; the Windows program's icon table names
 //     each picture with its size, and the app's files follow it;
-//   - Fabrica's Test and ship has a Mac app card and a Windows app card, and each makes and saves the same kind of app;
+//   - Fabrica's Test and ship has a Mac app card and a Windows app card (6.70: named without "(.exe)"), and each makes and saves the
+//     same kind of app; (6.70) the Windows program carries the app's own name, so Windows does not name it by its file, "Name.exe";
 //   - no page errors.
 //   node rig/t_65_desktop.js <url of Ingenium> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process');
@@ -69,7 +70,7 @@ const verify = (kind, file, id, title) => { const r = cp.spawnSync('python3', [V
     const cards = await p.evaluate(kf => { const key = eval(kf); return [...document.querySelectorAll('#fbTargets .f-tg')].map(e => ({ k: e.getAttribute('data-k'), t: e.querySelector('b').textContent, off: e.classList.contains('off'),
       make: !!key(e) })); }, keyOf);
     const cm = cards.find(c => c.k === 'mac'), cw = cards.find(c => c.k === 'win');
-    ok(cm && cw && !cm.off && !cw.off && cm.make && cw.make && cm.t === 'Mac app' && cw.t === 'Windows app (.exe)', 'Fabrica\'s Test and ship has a Mac app card and a Windows app card, ready to make', cards);
+    ok(cm && cw && !cm.off && !cw.off && cm.make && cw.make && cm.t === 'Mac app' && cw.t === 'Windows app', 'Fabrica\'s Test and ship has a Mac app card and a Windows app card, ready to make', cards);
     const viaCard = async k => nextDownload(() => p.evaluate(([k, kf]) => { const e = document.querySelector('#fbTargets .f-tg[data-k="' + k + '"]'); eval(kf)(e).click(); }, [k, keyOf]));
     const fm = await viaCard('mac');
     const vfm = fm ? verify('mac', fm, '', 'Harbour Lights') : { faults: ['nothing saved'] };

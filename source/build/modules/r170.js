@@ -202,6 +202,53 @@ function winIconsInto(exe,icons){var t=peIcons(exe),dv=new DataView(exe.buffer,e
     if(png.length>pic.size)throw new Error("the "+en.size+" pixel icon is larger than the room the shell keeps for it ("+png.length+" of "+pic.size+" bytes)");
     exe.set(png,pic.at);exe.fill(0,pic.at+png.length,pic.at+pic.size);dv.setUint32(pic.sizeAt,png.length,true);dv.setUint32(en.bytesAt,png.length,true);});
   return t.entries.length;}
+/* 6.70: the program carries its own name. Her words (10 November 2026): "I want the "exe" to be removed from the app's name when I
+   build it inside of Ingenium, please fix this." The shell has no version resource (shells/windows/shell.rc), so Windows named each
+   app made here by its file name, "Name.exe" (Task Manager, the taskbar, notifications, Open with, a file's Details). Each app now
+   carries one: its FileDescription and ProductName are the app's own name, its OriginalFilename its file. Windows finds resources
+   through the program's resource directory, so a whole new directory (the shell's icons, icon table and manifest where they already
+   are, and the version beside them) goes in a section of its own after the others; the shell's code is not touched. */
+function verNode(key,val,vlen,type,kids){var o=[],i;function w16(n){o.push(n&255,(n>>8)&255);}
+  w16(0);w16(vlen);w16(type);for(i=0;i<key.length;i++)w16(key.charCodeAt(i));w16(0);while(o.length%4)o.push(0);
+  if(val)for(i=0;i<val.length;i++)o.push(val[i]);
+  (kids||[]).forEach(function(c){while(o.length%4)o.push(0);for(var j=0;j<c.length;j++)o.push(c[j]);});
+  o[0]=o.length&255;o[1]=(o.length>>8)&255;return o;}
+function verStr(key,s){var v=[];s=String(s);for(var i=0;i<s.length;i++)v.push(s.charCodeAt(i)&255,(s.charCodeAt(i)>>8)&255);v.push(0,0);return verNode(key,v,s.length+1,1);}
+function verInfo(o){var n=String(o.version||"1.0").split(/[^0-9]+/).filter(function(x){return x!=="";}).slice(0,4).map(function(x){return Math.min(65535,parseInt(x,10)||0);});while(n.length<4)n.push(0);
+  var fx=new DataView(new ArrayBuffer(52)),w=[0xFEEF04BD,0x00010000,(n[0]<<16|n[1])>>>0,(n[2]<<16|n[3])>>>0,(n[0]<<16|n[1])>>>0,(n[2]<<16|n[3])>>>0,0x3F,0,0x00040004,1,0,0,0];
+  w.forEach(function(v,i){fx.setUint32(i*4,v>>>0,true);});var ver=String(o.version||"1.0");
+  var table=verNode("040904B0",null,0,1,[verStr("CompanyName","Made with Ingenium Fabrica"),verStr("FileDescription",o.title),verStr("FileVersion",ver),verStr("InternalName",o.name),
+    verStr("OriginalFilename",o.name+".exe"),verStr("ProductName",o.title),verStr("ProductVersion",ver)]);
+  var vars=verNode("VarFileInfo",null,0,1,[verNode("Translation",[0x09,0x04,0xB0,0x04],4,0)]);
+  return verNode("VS_VERSION_INFO",[].slice.call(new Uint8Array(fx.buffer)),52,0,[verNode("StringFileInfo",null,0,1,[table]),vars]);}
+function winVersionInto(exe,o){var dv=new DataView(exe.buffer,exe.byteOffset,exe.byteLength),e=dv.getUint32(0x3c,true);if(dv.getUint32(e,true)!==0x4550)throw new Error("the Windows shell is not a program");
+  var nsec=dv.getUint16(e+6,true),optSize=dv.getUint16(e+20,true),opt=e+24,dd=opt+(dv.getUint16(opt,true)===0x20b?112:96),SA=dv.getUint32(opt+32,true),FA=dv.getUint32(opt+36,true),SOH=dv.getUint32(opt+60,true);
+  var st=opt+optSize,secs=[],i;for(i=0;i<nsec;i++){var q=st+i*40;secs.push({va:dv.getUint32(q+12,true),vsize:dv.getUint32(q+8,true),rawSize:dv.getUint32(q+16,true),raw:dv.getUint32(q+20,true)});}
+  var h=st+nsec*40,first=Math.min.apply(null,secs.map(function(s){return s.raw||Infinity;}));
+  if(h+40>Math.min(SOH,first))throw new Error("the Windows shell has no room for its name");for(i=h;i<h+40;i++)if(exe[i])throw new Error("the Windows shell has no room for its name");
+  if(dv.getUint32(dd+32,true))throw new Error("the Windows shell is signed, so its name cannot be added");
+  function off(rva){for(var k=0;k<secs.length;k++){var s=secs[k];if(rva>=s.va&&rva<s.va+Math.max(s.vsize,s.rawSize))return rva-s.va+s.raw;}throw new Error("the Windows shell's resources are out of place");}
+  var base=off(dv.getUint32(dd+16,true));
+  function read(at){var nn=dv.getUint16(base+at+12,true),ni=dv.getUint16(base+at+14,true),out=[];
+    for(var k=0;k<nn+ni;k++){var p=base+at+16+k*8,nm=dv.getUint32(p,true),d=dv.getUint32(p+4,true),x={};
+      if(nm&0x80000000){var so=base+(nm&0x7fffffff),L=dv.getUint16(so,true),s="";for(var c=0;c<L;c++)s+=String.fromCharCode(dv.getUint16(so+2+c*2,true));x.name=s;}else x.id=nm&0xffff;
+      if(d&0x80000000)x.kids=read(d&0x7fffffff);else{x.rva=dv.getUint32(base+d,true);x.size=dv.getUint32(base+d+4,true);x.cp=dv.getUint32(base+d+8,true);}out.push(x);}return out;}
+  var ver=verInfo(o),tree=read(0).filter(function(x){return x.id!==16;});tree.push({id:16,kids:[{id:1,kids:[{id:0x409,mine:true,size:ver.length,cp:0}]}]});
+  (function sort(l){l.sort(function(a,b){if((a.name!=null)!==(b.name!=null))return a.name!=null?-1:1;return a.name!=null?(a.name<b.name?-1:a.name>b.name?1:0):a.id-b.id;});l.forEach(function(x){if(x.kids)sort(x.kids);});})(tree);
+  var dirs=[{l:tree}],leaves=[],names=[],k2=0;while(k2<dirs.length){dirs[k2++].l.forEach(function(x){if(x.name!=null)names.push(x);if(x.kids){x.dir={l:x.kids};dirs.push(x.dir);}else leaves.push(x);});}
+  var at=0;dirs.forEach(function(d){d.at=at;at+=16+8*d.l.length;});leaves.forEach(function(x){x.at=at;at+=16;});names.forEach(function(x){x.nat=at;at+=2+2*x.name.length;});
+  at=(at+7)&~7;var verAt=at,total=at+ver.length,al=function(v,a){return Math.ceil(v/a)*a;};
+  var va=al(Math.max.apply(null,secs.map(function(s){return s.va+Math.max(s.vsize,s.rawSize);})),SA),raw=al(Math.max(exe.length,Math.max.apply(null,secs.map(function(s){return s.raw+s.rawSize;}))),FA),rs=al(total,FA);
+  var out=new Uint8Array(raw+rs),ov=new DataView(out.buffer);out.set(exe,0);
+  dirs.forEach(function(d){var p=raw+d.at,nn=d.l.filter(function(x){return x.name!=null;}).length;ov.setUint16(p+8,4,true);ov.setUint16(p+12,nn,true);ov.setUint16(p+14,d.l.length-nn,true);
+    d.l.forEach(function(x,j){var q=p+16+j*8;ov.setUint32(q,x.name!=null?(0x80000000|x.nat)>>>0:x.id,true);ov.setUint32(q+4,x.kids?(0x80000000|x.dir.at)>>>0:x.at,true);});});
+  leaves.forEach(function(x){var p=raw+x.at;ov.setUint32(p,x.mine?va+verAt:x.rva,true);ov.setUint32(p+4,x.size,true);ov.setUint32(p+8,x.cp||0,true);});
+  names.forEach(function(x){var p=raw+x.nat;ov.setUint16(p,x.name.length,true);for(var c=0;c<x.name.length;c++)ov.setUint16(p+2+c*2,x.name.charCodeAt(c),true);});
+  out.set(ver,raw+verAt);
+  out.set([0x2e,0x69,0x6e,0x67,0x6e,0x61,0x6d,0x65],h);ov.setUint32(h+8,total,true);ov.setUint32(h+12,va,true);ov.setUint32(h+16,rs,true);ov.setUint32(h+20,raw,true);ov.setUint32(h+36,0x40000040,true);
+  ov.setUint16(e+6,nsec+1,true);ov.setUint32(opt+8,(ov.getUint32(opt+8,true)+rs)>>>0,true);ov.setUint32(opt+56,al(va+total,SA),true);ov.setUint32(opt+64,0,true);
+  ov.setUint32(dd+16,va,true);ov.setUint32(dd+20,total,true);
+  return out;}
 function winIcons(src){if(typeof document==="undefined")return Promise.reject(new Error("icons are drawn in a window"));
   return new Promise(function(res,rej){var im=new Image();im.onload=function(){res(im);};im.onerror=function(){rej(new Error("the app's icon could not be read"));};im.src=src;}).then(function(im){
     return Promise.all(WIN_SIZES.map(function(z){var c=document.createElement("canvas");c.width=z;c.height=z;var x=c.getContext("2d");x.imageSmoothingEnabled=true;try{x.imageSmoothingQuality="high";}catch(e){}
@@ -209,7 +256,8 @@ function winIcons(src){if(typeof document==="undefined")return Promise.reject(ne
       var o={};WIN_SIZES.forEach(function(z,i){o[z]=list[i];});return o;});});}
 function winIconsFor(html,title,colour,fallback){var A=root.IngApk;var src=(A&&A.iconSource&&A.iconSource(html))||fallback||letterIcon(title,colour);return winIcons(src);}
 var WIN_HOWTO=function(title,exe){return [title,"","Made with Ingenium Fabrica, for Windows 10 and 11 (64-bit).","",
-  "1. Move "+exe+" where you keep your apps (your Desktop, or a folder of its own).",
+  "1. Move "+title+" where you keep your apps (your Desktop, or a folder of its own).",
+  "   Windows shows it by its name, "+title+". Only where a PC shows the endings of file names does its file read "+exe+".",
   "2. Double-click it. The first time, Windows may say it protected your PC:",
   "   choose More info, then Run anyway.",
   "3. To keep it on the taskbar, right-click its button while it is open and choose Pin to taskbar.",
@@ -225,6 +273,7 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
   step("Opening the shell");
   return (o.shell?Promise.resolve(o.shell):winShellExe()).then(function(shell){var exe=bareShell(shell).slice();
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
+    step("Giving it its name");exe=winVersionInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")});
     step("Putting its files in");
     var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+String(o.versionName||"1.0").replace(/[\r\n]+/g," "),"made=Ingenium Fabrica",""].join("\n")),store:true},
       {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];
@@ -242,7 +291,7 @@ root.IngMac={make:makeMac,iconsFor:iconsFor,sizes:MAC_SIZES,folder:macFolder,exe
   core:{icns:icns,codeResources:codeResources,resign:resign,slices:slices,plistDict:plistDict},
   has:function(){if(root.__ingMacShell)return true;var e=typeof document!=="undefined"&&document.getElementById("ing-mac-shell");return !!(e&&e.textContent.trim());}};
 root.IngWin={make:makeWin,iconsFor:winIconsFor,sizes:WIN_SIZES,fileName:winName,
-  core:{peIcons:peIcons,iconsInto:winIconsInto,bare:bareShell,TRAILER:TRAILER},
+  core:{peIcons:peIcons,iconsInto:winIconsInto,versionInto:winVersionInto,verInfo:verInfo,bare:bareShell,TRAILER:TRAILER},
   has:function(){if(root.__ingWinShell)return true;var e=typeof document!=="undefined"&&document.getElementById("ing-win-shell");return !!(e&&e.textContent.trim());}};
 })(typeof window!=="undefined"?window:globalThis);
 ;try{window.__ingParts["p91"]="running";}catch(_){}

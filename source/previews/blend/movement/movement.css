@@ -1,0 +1,137 @@
+/* ===== Blend: three directions of its own, to choose from (no sky, no orbit, no spinning seal, no threads) =====
+   Her words (10 November 2026): "I don't want the Blend page to just be a repeat of the Home page and its designs and animations. I want
+   that page to have its own look and identity and its own animation, please redesign the spinning logo and orbs for a different
+   design." Of the loom: "I disliked the preview, please try again." Of three directions: "I don't really like how gold and extra these
+   options look, The "Movement" is the least ugly one but its too flashy in its current colours and designs." So: the Movement, quiet. */
+.win{--desk:radial-gradient(ellipse 75% 85% at 72% 42%,#fdfbff 0%,#f4eff9 52%,#e9e1f4 100%);--g0:#f7e8bd;--g1:#dcb769;--g2:#b08638;--g3:#7a5a24;
+  --paper:#fffdfa;--bgpage:#f4f1f8;--velvet0:#efe7fa;--velvet1:#cdbaea;--plate0:#f3eefb;--plate1:#ddd2ef;--guil:rgba(106,63,181,.09);
+  --parch0:#fffaf0;--parch1:#f2e8d2;--staff:rgba(90,60,140,.42);--mark:#fff}
+.win[data-theme="night"]{--desk:radial-gradient(ellipse 75% 85% at 72% 42%,#241a37 0%,#171025 52%,#0d0916 100%);--g0:#f3dfa6;--g1:#cfa65a;--g2:#9c7634;--g3:#5e4318;
+  --paper:#2a2238;--bgpage:#15111d;--velvet0:#3b2c5b;--velvet1:#1e1535;--plate0:#2e2546;--plate1:#1b1530;--guil:rgba(205,184,240,.07);
+  --parch0:#2f2645;--parch1:#221b34;--staff:rgba(216,180,106,.55);--mark:#fff}
+.bx{display:flex;flex-direction:column;gap:22px;color:var(--ink1)}
+.bx-head{position:relative;height:470px;border-radius:30px;overflow:hidden;isolation:isolate;background:var(--desk);
+  box-shadow:inset 0 0 0 1px var(--skyring),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.08)}
+.win[data-theme="night"] .bx-head{box-shadow:inset 0 0 0 1px var(--skyring),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4)}
+.bx-words{position:absolute;left:40px;top:34px;z-index:5;width:470px}
+.bx-count{position:absolute;left:40px;bottom:24px;z-index:6;max-width:470px;font:italic 500 16px/1.4 var(--serif);color:var(--ink3);transition:color .25s ease}
+.bx-count b{font-style:normal;font-weight:600;color:var(--ink1);letter-spacing:.02em}
+.cx{position:absolute;right:36px;top:22px;width:520px;height:424px;z-index:3}
+.cx button{-webkit-tap-highlight-color:transparent}
+.cx button:focus{outline:none}
+.nm{font:600 15px/1.1 var(--serif);letter-spacing:.03em;color:var(--ink1);white-space:nowrap}
+.rl{display:block;margin-top:2px;font-weight:600;font-size:10.5px;line-height:1.2;color:var(--acc);white-space:nowrap}
+.rl:empty{display:none}
+.ghostname{font:italic 500 14px/1.1 var(--serif);color:var(--ink3)}
+.cx.hold .lbl:not(.near){opacity:.5}
+
+/* ---------- the four steps: raised labels with their numerals; the one you are on in Ingenium's violet ---------- */
+.bx-steps{position:relative;display:flex;justify-content:center;gap:16px;padding:6px 0 4px}
+.stg{position:relative;width:172px;min-height:60px;display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--hair);border-radius:16px;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  background:linear-gradient(var(--keyA),var(--keyB));box-shadow:var(--key);transition:transform .3s cubic-bezier(.34,1.35,.64,1),box-shadow .2s ease}
+.stg .rn{min-width:34px;text-align:center;font:600 24px/1 var(--serif);color:var(--gold)}
+.stg .tl b{display:block;font:600 16px/1.1 var(--serif);letter-spacing:.03em}.stg .tl small{display:block;margin-top:2px;color:var(--ink3);font-size:11px;line-height:1.3}
+.stg:hover{transform:translateY(-3px);box-shadow:var(--keyhi)}.stg:active{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}
+.stg:focus{outline:none}.stg:focus-visible{outline:2.5px solid var(--acc);outline-offset:3px}
+.stg[aria-current="step"]{background:linear-gradient(var(--pa),var(--pb));border-color:transparent;color:#fff;transform:translateY(-3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--pedge),0 8px 14px rgba(40,22,68,.22)}
+.stg[aria-current="step"] .rn{color:#fff}.stg[aria-current="step"] .tl small{color:rgba(255,255,255,.82)}
+.stg .tick{position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#fff;display:none;place-items:center;box-shadow:0 2px 4px rgba(40,22,68,.3)}
+.stg.done .tick{display:grid}.stg .tick svg{width:12px;height:12px}
+
+/* ---------- the rows, the answers and the cards carry each direction's piece ---------- */
+.bx-model .gm,.bx-model .md{--S:40px;margin:0 4px 0 2px}.bx-model .gr{--D:46px;margin:-3px 2px -3px 0}
+.bx-ans .gm,.bx-ans .md{--S:38px;margin:2px 2px 0}.bx-ans .gr{--D:44px}
+.bx-ans .gr:not(.turn) .wheel{animation-play-state:paused}
+.bx-ans .gm.turn .stone{animation:gmGlint 1.6s ease-in-out infinite}
+.bx-ans .md.turn .tilt{animation:mdNod 1.2s ease-in-out infinite}
+@keyframes mdNod{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.bx-final h3 .emb{flex:0 0 auto;width:46px;height:46px;position:relative}
+.bx-final h3 .emb svg{position:absolute;inset:0;width:100%;height:100%}.bx-final h3 .emb .seal{position:absolute;left:25%;top:25%;width:50%;height:50%}.bx-final h3 .emb .seal img{width:100%;height:100%}
+.bx-card .pieces{display:flex;gap:8px;margin:4px 0}.bx-card .gm,.bx-card .md{--S:38px}.bx-card .gr{--D:44px}.bx-card .gr .wheel{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.st-sweep,.gr .wheel,.mv-balance,.sc-strip,.st-gem,.mv-gear,.caret::after{animation:none}.tilt{transition:none}}
+
+/* ======================= The Movement in depth: a dish seen at an angle; wheels with thickness under a still light, truly meshing;
+   Ingenium's seal set into the hub of its wheel ======================= */
+.win{--plateA:#fbf9fe;--plateB:#e9e1f5;--plateEdge0:#d8cdee;--plateEdge1:#c4b5e3;--teeth:#ddd2f1;--teethEdge:rgba(74,46,130,.25);--hole:#efe9f8;--hubRing:#f8f5fd;
+  --side0:#a993d8;--side1:#bfaee6;--side2:#cfc2ee;--cside0:#4a2b8a;--cside1:#5b38a3;--cside2:#6a45b6;--ctrTeeth:#d0c2ec;--bezel0:#efe8fb;--bezel1:#b9a5e2;--well:rgba(30,12,60,.42);--ctrA:#8a64d4;--ctrB:#4a2b8a;--cast:rgba(40,22,68,.22)}
+.win[data-theme="night"]{--plateA:#2a2140;--plateB:#17112a;--plateEdge0:#120d20;--plateEdge1:#0c0816;--teeth:#4e406f;--teethEdge:rgba(0,0,0,.5);--hole:#1c162e;--hubRing:#33294d;
+  --side0:#1b1430;--side1:#261d40;--side2:#31264f;--cside0:#1b0e3a;--cside1:#24124b;--cside2:#2e1764;--ctrTeeth:#5c4e82;--bezel0:#4f4270;--bezel1:#1f1833;--well:rgba(0,0,0,.6);--ctrA:#7349c2;--ctrB:#2e1764;--cast:rgba(0,0,0,.55)}
+/* facing her: one movement built in layers at their own depths, rendered as metal and lit from the top left;
+   it sways a little, as the seal does on Home, and settles to face her whenever she points at a wheel */
+.win{--inlay:#f7f3fd}.win[data-theme="night"]{--inlay:#e6ddfa}
+.mv-stage3{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 48%}
+.mv-sway{position:absolute;inset:0;transform-style:preserve-3d}
+.mv-cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block;pointer-events:none}
+.mv-plate{position:absolute;left:90px;top:44px;width:340px;height:340px;transform-style:preserve-3d}
+.mv-plate i{position:absolute;inset:0;border-radius:50%;background:var(--plateEdge1);transform:translateZ(calc(var(--z) * -1px))}
+.mv-plate i:nth-child(3){background:var(--plateEdge0)}
+.mv-under{position:absolute;left:66px;top:62px;width:388px;height:368px;border-radius:50%;transform:translateZ(-26px);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(40,22,68,.2),rgba(40,22,68,.12) 55%,rgba(40,22,68,.04) 82%,rgba(40,22,68,0))}
+.win[data-theme="night"] .mv-under{background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,.36) 55%,rgba(0,0,0,.1) 82%,rgba(0,0,0,0))}
+.mv-w{position:absolute;width:var(--D);height:var(--D);margin:calc(var(--D) / -2) 0 0 calc(var(--D) / -2);transform-style:preserve-3d;transform:translateZ(18px);--rx:0deg;--ry:0deg;--lift:0px;--sc:1}
+.mv-w.enter .mv-tilt{animation:mvIn .7s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes mvIn{from{opacity:0;transform:translateZ(30px) scale(.9)}}
+.mv-cast{position:absolute;inset:0;pointer-events:none;opacity:.36;transform:translateZ(-17px) translate(4px,7px);transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .5s ease}
+.mv-cast .mv-cv{left:-8%;top:-8%;width:116%;height:116%}
+.win[data-theme="night"] .mv-cast{opacity:.66}
+.mv-tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateZ(var(--lift)) scale(var(--sc));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.mv-l{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d}
+.mv-rim.r1{transform:translateZ(-7.5px)}.mv-rim.r2{transform:translateZ(-5px)}.mv-rim.r3{transform:translateZ(-2.5px)}
+.mv-face{transform:translateZ(0)}
+.mv-spin{position:absolute;inset:0;animation:mvSpin var(--p,40s) linear infinite;animation-direction:var(--dir,normal)}
+.mv-spin.mv-unspin{animation-name:mvUnspin}
+@keyframes mvSpin{from{transform:rotate(var(--r0,0deg))}to{transform:rotate(calc(var(--r0,0deg) + 360deg))}}
+@keyframes mvUnspin{from{transform:rotate(calc(var(--r0,0deg) * -1))}to{transform:rotate(calc(var(--r0,0deg) * -1 - 360deg))}}
+.mv-mask{-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.mv-hub{position:absolute;left:27%;top:27%;width:46%;height:46%;pointer-events:none;transform:translateZ(.8px)}
+.mv-hub.mv-chaton{left:18%;top:18%;width:64%;height:64%}
+.mv-mark{position:absolute;left:50%;top:50%;width:calc(var(--D) * .25);height:calc(var(--D) * .25);margin:calc(var(--D) * -.125) 0 0 calc(var(--D) * -.125);color:var(--inlay);pointer-events:none;
+  transform:translateZ(1.4px)}
+.mv-mark svg{display:block;width:100%;height:100%}
+.mv-w.ghost .mv-spin{animation:none}.mv-w.ghost .mv-tilt{opacity:.5}
+.mv-w.ghost::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;font:500 calc(var(--D) * .34)/1 var(--serif);color:var(--ink3);transform:translateZ(8px)}
+.mv-hit{position:absolute;inset:0;border:0;padding:0;border-radius:50%;background:none;cursor:pointer;transform:translateZ(8px)}
+.mv-hit:focus{outline:none}.mv-hit:focus-visible{box-shadow:0 0 0 2.5px var(--acc)}
+.mv-w.hov{--lift:14px;--sc:1.04}.mv-w.hov .mv-cast{opacity:.24;transform:translateZ(-17px) translate(8px,14px) scale(1.05)}
+.win[data-theme="night"] .mv-w.hov .mv-cast{opacity:.48}
+.mv-w.dn{--lift:3px;--sc:.97}.mv-w.dn .mv-tilt{transition-duration:.08s}
+/* Ingenium's wheel holds its seal in a polished setting: the seal's face is an enamel dial sunk inside a collar of the wheel's own metal */
+.mv-seat{position:absolute;left:50%;top:50%;width:70px;height:70px;margin:-35px 0 0 -35px;transform:translateZ(1.4px);transform-style:preserve-3d}
+.mv-label{position:absolute;z-index:7;transform:translate(-50%,-50%);text-align:center;white-space:nowrap;pointer-events:none;transition:opacity .35s ease}
+.cx.hold .mv-label:not(.near){opacity:.45}
+.mv-label.at-r{transform:translate(0,-50%);text-align:left}.mv-label.at-l{transform:translate(-100%,-50%);text-align:right}
+.mv-label.at-t{transform:translate(-50%,-100%)}.mv-label.at-b{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.mv-spin,.mv-w.enter{animation:none}.mv-tilt{transition:none}}
+/* Ingenium's own seal key at the hub of its wheel, alive as on Home: its layers apart, a rim behind its face, its star turning counterclockwise */
+.mv-seal{position:absolute;inset:0}
+.mv-seal .r175-seal{position:absolute;inset:0;width:100%;height:100%}
+.mv-seal .isl{--S:70px !important}
+.mv-seal .isl .isl-ring{--fz:.08;--fk:.98}.mv-seal .isl .isl-star{--fz:.17;--fk:.9575}.mv-seal .isl .isl-heart{--fz:.3;--fk:.925}
+/* the seal has no rim, coin edge, shadow or sway of its own here: its wheel is its face, and it moves with its wheel */
+.mv-seal .isl .isl-cast,.mv-seal .isl .isl-edge,.mv-seal .isl .isl-back{display:none !important}
+.mv-seal .isl .isl-idle{animation:none !important}
+.mv-seal .isl .isl-tilt{transform:none !important}
+.mv-seal .isl .mv-rim{position:absolute;left:2.6%;top:2.6%;width:94.8%;height:94.8%;border-radius:50%;display:block;pointer-events:none;background:linear-gradient(160deg,var(--erim0),var(--erim1));transform:translateZ(calc(var(--S) * -.012 * var(--k)))}
+@keyframes mvEngine{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+.mv-seal .seal-spin{animation:mvEngine 9s linear infinite}
+@media (prefers-reduced-motion:reduce){.mv-seal .seal-spin{animation:none}}
+
+/* Ingenium's own seal key (R104, R175), as the app carries it */
+{{APP_CSS}}
+
+/* the small wheels in the rows, the answers and the cards */
+.gr{position:relative;display:block;flex:0 0 auto;width:var(--D);height:var(--D);--rx:0deg;--ry:0deg;--lift:0px;--sc:1}
+.gr .tilt{position:absolute;inset:0;transform:perspective(520px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--sc));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.gr .wheel{position:absolute;inset:0;animation:mvTurn var(--p,40s) linear infinite;animation-direction:var(--dir,normal)}
+.gr .wheel svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 calc(var(--D) * .035) calc(var(--D) * .045) var(--cast))}
+@keyframes mvTurn{to{transform:rotate(360deg)}}
+.gr .ico{position:absolute;left:50%;top:50%;width:calc(var(--D) * .25);height:calc(var(--D) * .25);margin:calc(var(--D) * -.125) 0 0 calc(var(--D) * -.125);color:#fff;filter:drop-shadow(0 1px 1px rgba(20,8,40,.4))}
+.gr .ico svg{display:block;width:100%;height:100%}
+.gr.hov{--lift:calc(var(--D) * -.06);--sc:1.06}.gr.dn{--lift:calc(var(--D) * .015);--sc:.96}.gr.dn .tilt{transition-duration:.08s}
+.bx-model .gr .wheel{animation:none}
+.mv-w.ghost{--t1:#cbbde8}
+.win[data-theme="night"] .mv-w.ghost{--t1:#3a2f55}
+
+/* no gold in Blend's words either: the line above the title and the numerals of the steps in Ingenium's violets */
+.bx-eyebrow{color:var(--ink3)}
+.stg .rn,.bx-h .n{color:var(--acc)}

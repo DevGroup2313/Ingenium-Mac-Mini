@@ -24,7 +24,12 @@ const TEXT_OK = [/page-title/, /\bau-h\b/, /fld-h > h2/, /div\.l-head > div > h1
      and label in the drawer, the headings of the page and of an opened folder's spread, the index cards' and the opened folder's
      names, the envelopes' and the conversations' names, the book's title; the text under them keeps the app's scale */
   /fd-words > p\.fd-hint/, /fd-tab > span\.fd-tn/, /fd-ft > b/, /fd-label > b/, /fld-wrap > div\.card[^ ]* > h2\.sec/, /fd-(left|right) > div[^ ]* > h2\.sec/,
-  /fld-card > span\.fld-name/, /fd-oh > div > h2/, /fd-env > b/, /li\.fd-conv > div\.fld-t > b/, /fd-cover > b/];
+  /fld-card > span\.fld-name/, /fd-oh > div > h2/, /fd-env > b/, /li\.fd-conv > div\.fld-t > b/, /fd-cover > b/,
+  /* 6.70, Blend as a movement in 3D (modules/r262.js), as she approved it: the line under the words, the steps' numerals and names on
+     their raised labels, the models' names beside the movement, the step's heading on its slab, the line that waits for the answers,
+     the question asked, the blended answer's heading and the ready-made blends' names; the text under them keeps the app's scale */
+  /bx-count/, /button\.rm-step[^ ]* > span/, /bx-label > span\.bx-name/, /bl-setup > h2\.sec/, /bl-empty > b/, /bl-q\b/, /bl-final > div\.bl-card-h > b/,
+  /bl-preset > b/];
 const KEY_OK = [/cplus-btn/, /#chatSend/, /cc-title/, /r175-seal/, /l-fold|f-fold/, /hx-app\b/, /pcd-toc/];
 const MEASURE = (scopeSel) => {
   const W = window, D = document;
