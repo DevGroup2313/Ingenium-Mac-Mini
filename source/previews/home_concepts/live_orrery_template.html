@@ -1,0 +1,321 @@
+<title>Ingenium Orrery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap">
+<style>
+/* the page around the preview window */
+:root{--pg:#e9e6ef;--pgink:#4a4358;--pgink2:#6c6579;--pgline:rgba(34,26,46,.12);--pgkey:#ffffff;--pgacc:#6a3fb5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pg:#0b0910;--pgink:#d3c9e3;--pgink2:#a99cc1;--pgline:rgba(205,184,240,.14);--pgkey:#211a2d;--pgacc:#b79ce6;color-scheme:dark}}
+:root[data-theme="dark"]{--pg:#0b0910;--pgink:#d3c9e3;--pgink2:#a99cc1;--pgline:rgba(205,184,240,.14);--pgkey:#211a2d;--pgacc:#b79ce6;color-scheme:dark}
+body{background:var(--pg);color:var(--pgink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:13px;color:var(--pgink2)}
+.bar b{color:var(--pgink);font-weight:600}
+.tg{min-width:72px;padding:6px 14px;border-radius:999px;border:1px solid var(--pgline);background:var(--pgkey);color:var(--pgink);font:600 12.5px/1.2 inherit;cursor:pointer;
+  box-shadow:0 1px 0 var(--pgline),0 3px 8px rgba(40,22,68,.10);transition:transform .25s cubic-bezier(.34,1.35,.64,1)}
+.tg:hover{transform:translateY(-1px)}.tg:active{transform:translateY(1px)}.tg:focus-visible{outline:2px solid var(--pgacc);outline-offset:2px}
+.stage{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:12px}
+.fit{position:relative;margin:0 auto;overflow:hidden;border-radius:14px;box-shadow:0 0 0 1px var(--pgline),0 18px 48px rgba(20,10,40,.22)}
+.note{max-width:78ch;margin:4px auto 24px;color:var(--pgink2);font-size:12.5px;text-align:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* the app's window: 1440 by 900, scaled to fit, as Ingenium is drawn today */
+.win{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:hidden;transform-origin:0 0;background:#f5f3f7;
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#221a2e;-webkit-font-smoothing:antialiased}
+.win[data-theme="night"]{background:#110d18;color:#f3eefb}
+.win img{display:block;max-width:none;-webkit-user-drag:none;user-select:none}
+.win .only-night{display:none}.win[data-theme="night"] .only-night{display:block}.win[data-theme="night"] .only-day{display:none}
+.win .back{position:absolute;inset:0;z-index:0}.win .back img{width:1440px;height:900px}
+.win .scroll{position:absolute;inset:0;z-index:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.win .scroll::-webkit-scrollbar{display:none}
+.win .page{padding:61px 84px 46px 229px}
+.win .top{position:absolute;left:0;top:0;z-index:5;pointer-events:none}.win .top img{width:1440px;height:{{T}}px}
+.win .rail{position:absolute;left:0;top:{{T}}px;z-index:5;pointer-events:none}.win .rail img{width:{{L}}px;height:{{RH}}px}
+.win .right{position:absolute;left:{{RX}}px;top:{{T}}px;z-index:5;pointer-events:none}.win .right img{width:{{RW}}px;height:{{RH}}px}
+.win .rest{margin:12px -14px 0}.win .rest img{width:{{REST_W}}px;height:{{REST_H}}px}
+
+/* ===== Home's head as an orrery: the version she chose, with her seal as the engine and the rooms as orbs ===== */
+#ox{position:relative;height:700px;border-radius:30px;overflow:hidden;isolation:isolate;touch-action:pan-y;user-select:none;-webkit-user-select:none;
+  background:radial-gradient(ellipse 70% 60% at 50% 64%,#fdfbff 0%,#f4eefb 46%,#e8def5 100%);
+  box-shadow:inset 0 0 0 1px rgba(106,63,181,.10),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.08);
+  --ox-line:rgba(106,63,181,.30);--ox-line2:rgba(106,63,181,.20);--ox-chart:rgba(106,63,181,.20);--ox-star:#8c6ad0;--ox-starop:.35;--ox-disc:rgba(106,63,181,.16);
+  --ox-shade:rgba(40,22,68,.30);--ox-card:rgba(255,255,255,.72);--ox-cardring:rgba(106,63,181,.12);--ox-cardsh:0 2px 4px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.12);
+  --ox-drop:drop-shadow(0 6px 7px rgba(52,26,96,.24)) drop-shadow(0 14px 16px rgba(52,26,96,.16))}
+.win[data-theme="night"] #ox{background:radial-gradient(ellipse 70% 60% at 50% 64%,#241a38 0%,#161024 50%,#0c0915 100%);
+  box-shadow:inset 0 0 0 1px rgba(205,184,240,.10),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4);
+  --ox-line:rgba(196,176,238,.30);--ox-line2:rgba(196,176,238,.18);--ox-chart:rgba(196,176,238,.16);--ox-star:#f3e7c8;--ox-starop:.6;--ox-disc:rgba(150,112,224,.18);
+  --ox-shade:rgba(0,0,0,.62);--ox-card:rgba(33,26,45,.7);--ox-cardring:rgba(205,184,240,.14);--ox-cardsh:0 12px 30px rgba(0,0,0,.5);
+  --ox-drop:drop-shadow(0 6px 8px rgba(0,0,0,.45)) drop-shadow(0 16px 18px rgba(0,0,0,.32))}
+#ox .ox-stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+#ox .ox-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--ox-star);opacity:var(--ox-starop);animation:oxTw 5s ease-in-out infinite}
+@keyframes oxTw{0%,100%{opacity:.15}50%{opacity:.7}}
+#ox .ox-chart{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#ox .ox-chart g{fill:none;stroke:var(--ox-chart);stroke-width:.6}
+#ox .ox-sky{position:absolute;left:40px;top:34px;z-index:5;max-width:520px}
+#ox .ox-eyebrow{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;font:600 11.5px/1 var(--x-sans);letter-spacing:.28em;text-transform:uppercase;color:var(--x-gold)}
+#ox .ox-eyebrow .ox-nm{color:var(--x-acc)}
+#ox .ox-hello{margin:12px 0 10px;font:600 48px/1.04 "Cormorant Garamond","Home Cormorant",Cormorant,var(--x-serif);letter-spacing:.004em;color:var(--x-ink1)}
+#ox .ox-lede{margin:0;color:var(--x-ink2);font:400 14.5px/1.55 var(--x-sans);max-width:44ch}
+#ox .ox-next{position:absolute;right:34px;top:34px;z-index:6;width:500px;padding:16px 18px;border-radius:20px;background:var(--ox-card);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px var(--ox-cardring),var(--ox-cardsh);animation:oxIn .9s cubic-bezier(.22,1,.36,1) .3s backwards}
+#ox .ox-next .hx-next{background:none;border:0;box-shadow:none;padding:0}
+@keyframes oxIn{0%{opacity:0;transform:translate(40px,-10px)}100%{opacity:1;transform:none}}
+#ox .ox-stage{position:absolute;inset:0;z-index:2;pointer-events:none}
+#ox .ox-plane{position:absolute;left:50%;top:63%;width:1000px;height:1000px;margin:-500px 0 0 -500px;transform:rotateX(70deg)}
+#ox .ox-plane svg{width:100%;height:100%;overflow:visible}
+#ox .ox-ring{fill:none;stroke:var(--ox-line);stroke-width:1.3}
+#ox .ox-ring.r2{stroke:var(--ox-line2);stroke-dasharray:5 7}
+#ox .ox-ring.r3{stroke:var(--ox-line2)}
+#ox .ox-disc-a{stop-color:var(--ox-disc)}#ox .ox-disc-b{stop-color:var(--ox-disc);stop-opacity:0}
+/* the engine: her seal key, moved in whole, its star turning counterclockwise without stopping */
+#ox .ox-sun{position:absolute;left:50%;top:63%;z-index:40;transform:translate(-50%,-62%)}
+#ox .ox-sun .hx-seal{position:relative;width:100px;height:100px}
+#ox .ox-sun::after{content:"";position:absolute;left:50%;top:100%;width:124px;height:22px;margin:14px 0 0 -62px;border-radius:50%;
+  background:radial-gradient(closest-side,var(--ox-shade),rgba(0,0,0,0));opacity:.8;pointer-events:none}
+@keyframes oxEngine{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@media (prefers-reduced-motion: no-preference){#ox .ox-sun .seal-spin{animation:oxEngine 9s linear infinite}}
+/* the rooms: six orbs in Ingenium's purples, lit from above and from the seal, floating over the orbit */
+#ox .ox-key{position:absolute;left:0;top:0;z-index:10;width:150px;display:flex;flex-direction:column;align-items:center;gap:0;margin:0;padding:0;border:0;background:none;
+  color:inherit;font:inherit;text-align:center;cursor:pointer;transform-origin:75px 56px;will-change:transform;transition:opacity .35s ease,filter .35s ease;
+  -webkit-tap-highlight-color:transparent;pointer-events:auto}
+#ox .ox-orb{position:relative;display:block;width:112px;height:112px;filter:var(--ox-drop)}
+#ox .ox-ball{position:absolute;inset:0;width:112px;height:112px;overflow:visible}
+#ox .ox-ico{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;color:#fff;
+  filter:drop-shadow(0 1.2px 1px rgba(16,4,40,.55)) drop-shadow(0 0 6px rgba(255,255,255,.18))}
+#ox .ox-ico svg{display:block;width:30px;height:30px}
+#ox .ox-kh{margin-top:-12px;font:600 21px/1.1 "Cormorant Garamond","Home Cormorant",Cormorant,var(--x-serif);letter-spacing:.03em;color:var(--x-ink1)}
+#ox .ox-km{margin-top:5px;font:600 11.5px/1.2 var(--x-sans);color:var(--x-acc);white-space:nowrap}
+#ox .ox-km::before{content:"";display:inline-block;width:5px;height:5px;margin:0 6px 1px 0;border-radius:50%;background:currentColor;vertical-align:middle}
+#ox .ox-kd{position:absolute;left:50%;top:100%;width:230px;margin:10px 0 0 -115px;padding:10px 12px;border-radius:14px;background:var(--x-hi);color:var(--x-ink2);
+  box-shadow:inset 0 0 0 1px var(--x-hair),0 10px 26px rgba(40,22,68,.16);font:400 12.5px/1.45 var(--x-sans);opacity:0;transform:translateY(-6px);
+  transition:opacity .25s ease,transform .3s cubic-bezier(.22,1,.36,1);pointer-events:none}
+#ox .ox-key.ox-on .ox-kd{opacity:1;transform:none}
+#ox.ox-hold .ox-key:not(.ox-on){opacity:.55;filter:saturate(.7)}
+#ox .ox-key:focus{outline:none}
+#ox .ox-key:focus-visible .ox-orb::after{content:"";position:absolute;inset:16px;border-radius:50%;box-shadow:0 0 0 2.5px var(--x-acc)}
+#ox .ox-shadow{position:absolute;left:0;top:0;z-index:3;width:84px;height:20px;margin:-10px 0 0 -42px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,var(--ox-shade),rgba(0,0,0,0))}
+#ox .ox-drift{animation:oxDrift 34s linear infinite}
+@keyframes oxDrift{from{transform:translateX(0)}to{transform:translateX(-80px)}}
+#ox .ox-legend{position:absolute;left:40px;bottom:24px;z-index:5;font:italic 500 16px/1.4 "Cormorant Garamond","Home Cormorant",Cormorant,var(--x-serif);color:var(--x-ink3)}
+#ox .ox-toast{position:absolute;left:50%;bottom:22px;z-index:95;transform:translate(-50%,16px);padding:8px 16px;border-radius:999px;background:var(--x-hi);color:var(--x-ink1);
+  box-shadow:inset 0 0 0 1px var(--x-hair),0 10px 24px rgba(40,22,68,.18);font:600 13px/1.3 var(--x-sans);opacity:0;pointer-events:none;
+  transition:opacity .25s ease,transform .35s cubic-bezier(.22,1,.36,1)}
+#ox .ox-toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){#ox .ox-drift,#ox .ox-stars i,#ox .ox-next{animation:none}}
+
+/* her app's own rules for the seal key and the next-step card, as Ingenium has them */
+{{APP_CSS}}
+</style>
+
+<div class="bar"><span><b>Ingenium</b> · Home, with your rooms in orbit around your seal</span><button class="tg" id="themeKey" type="button">Night</button></div>
+<div class="stage" id="stage"><div class="fit" id="fit">
+<div class="win" id="win" data-theme="day">
+<script>(function(){try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.getAttribute("data-theme")!=="light")document.getElementById("win").setAttribute("data-theme","night");}catch(e){}})();</script>
+  <div class="back" aria-hidden="true"><img class="only-day" alt="" src="{{BACK_DAY}}"><img class="only-night" alt="" src="{{BACK_NIGHT}}"></div>
+  <div class="scroll" id="scroll"><div class="page"><div class="hx">
+    <section id="ox" aria-label="Home: your rooms around Ingenium's seal" tabindex="-1">
+      <div class="ox-stars" id="oxStars" aria-hidden="true"></div>
+      <svg class="ox-chart" viewBox="0 0 1200 660" preserveAspectRatio="none" aria-hidden="true"><g><path d="M80 520 L210 470 L300 500 L420 430"/><path d="M880 140 L960 210 L1060 190 L1120 260"/><circle cx="600" cy="420" r="560" stroke-dasharray="2 10"/></g></svg>
+      <div class="ox-sky">
+        <div class="ox-eyebrow"><span class="ox-nm">Ingenium</span><span>{{DATE}}</span></div>
+        <h2 class="ox-hello">{{HELLO}}</h2>
+        <p class="ox-lede">{{LEDE}}</p>
+      </div>
+      <div class="ox-next hx-head">{{NEXT}}</div>
+      <div class="ox-stage" aria-hidden="true"><div class="ox-plane"><svg viewBox="0 0 1000 1000">
+        <defs><radialGradient id="oxDisc" cx=".5" cy=".5" r=".5"><stop class="ox-disc-a" offset="0"/><stop class="ox-disc-b" offset=".68"/></radialGradient></defs>
+        <circle cx="500" cy="500" r="150" fill="url(#oxDisc)"/>
+        <circle class="ox-ring r1" cx="500" cy="500" r="150"/><circle class="ox-ring r2" cx="500" cy="500" r="280"/><circle class="ox-ring r3" cx="500" cy="500" r="430"/>
+      </svg></div></div>
+      <div class="ox-sun"><div class="hx-seal" id="hxSeal">{{SEAL}}</div></div>
+      <div class="ox-legend">Point at a room to bring it near; press to enter.</div>
+      <div class="ox-toast" id="oxToast" role="status" aria-live="polite"></div>
+    </section>
+    <div class="rest"><img class="only-day" alt="The rest of Home: where you left off, your apps, the Offline Project, models and engine" src="{{REST_DAY}}"><img class="only-night" alt="The rest of Home: where you left off, your apps, the Offline Project, models and engine" src="{{REST_NIGHT}}"></div>
+  </div></div></div>
+  <div class="top" aria-hidden="true"><img class="only-day" alt="" src="{{TOP_DAY}}"><img class="only-night" alt="" src="{{TOP_NIGHT}}"></div>
+  <div class="rail" aria-hidden="true"><img class="only-day" alt="" src="{{RAIL_DAY}}"><img class="only-night" alt="" src="{{RAIL_NIGHT}}"></div>
+  <div class="right" aria-hidden="true"><img class="only-day" alt="" src="{{RIGHT_DAY}}"><img class="only-night" alt="" src="{{RIGHT_NIGHT}}"></div>
+</div>
+</div></div>
+<p class="note">Point at a room, press your seal, or scroll inside the window for the rest of Home. The top bar, the side list, the side buttons and the rest of Home are pictures of Ingenium as it is today.</p>
+
+<script>
+(function(){
+"use strict";
+var D=document,W=window,win=D.getElementById("win"),fitBox=D.getElementById("fit"),stage=D.getElementById("stage"),ox=D.getElementById("ox");
+function still(){try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+
+/* ---------- the window: Ingenium's own size, scaled to the page ---------- */
+function fit(){var cs=getComputedStyle(stage),aw=stage.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  var ah=W.innerHeight-fitBox.getBoundingClientRect().top+W.scrollY-56;
+  var s=Math.min(1,aw/1440,Math.max(ah,520)/900);if(!(s>0))s=.5;
+  win.style.transform="scale("+s+")";fitBox.style.width=Math.floor(1440*s)+"px";fitBox.style.height=Math.floor(900*s)+"px";}
+W.addEventListener("resize",fit);fit();setTimeout(fit,60);
+
+/* ---------- day and night ---------- */
+var key=D.getElementById("themeKey");
+function night(){return win.getAttribute("data-theme")==="night";}
+function label(){key.textContent=night()?"Day":"Night";key.setAttribute("aria-label",night()?"Show Ingenium by day":"Show Ingenium by night");}
+key.addEventListener("click",function(){var n=!night();win.setAttribute("data-theme",n?"night":"day");D.documentElement.setAttribute("data-theme",n?"dark":"light");label();});
+label();
+
+/* ---------- a word when something is pressed (in Ingenium it opens the room) ---------- */
+var tst=D.getElementById("oxToast"),tt=0;function say(t){tst.textContent=t;tst.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){tst.classList.remove("on");},1900);}
+[].forEach.call(ox.querySelectorAll("[data-say]"),function(k){k.addEventListener("click",function(){say(k.getAttribute("data-say"));});});
+
+/* ---------- the sky ---------- */
+var stars=D.getElementById("oxStars");for(var i=0;i<70;i++){var s=D.createElement("i");s.style.left=(Math.random()*100).toFixed(2)+"%";s.style.top=(Math.random()*100).toFixed(2)+"%";
+  s.style.animationDelay=(-Math.random()*5).toFixed(2)+"s";stars.appendChild(s);}
+
+/* ---------- the engine: her seal key, as Ingenium's R175 has it (it tilts to follow a mouse, sinks when pressed, and plays a flourish) ---------- */
+var KEY=D.getElementById("hxSealKey"),busy=false,again=false,last="",count=0,running=[],ends=[];
+function anim(el,frames,o){if(!el||!el.animate)return null;try{var a=el.animate(frames,o);running.push(a);ends.push(a.finished.then(function(){},function(){}));return a;}catch(e){return null;}}
+function parts(){var isl=KEY.querySelector(".isl");return {fx:KEY.querySelector(".r175-fx"),glow:KEY.querySelector(".r175-glow"),ripple:KEY.querySelector(".r175-ripple"),
+  tilt:isl&&isl.querySelector(".isl-tilt"),cast:isl&&isl.querySelector(".isl-cast"),
+  ring:isl&&isl.querySelector(".isl-ring > svg"),star:isl&&isl.querySelector(".isl-star > svg"),heart:isl&&isl.querySelector(".isl-heart > svg"),isl:isl};}
+function glow(P,gold,strong){if(!P.glow)return;P.glow.classList.toggle("gold",!!gold);
+  try{P.glow.getAnimations().forEach(function(a){a.cancel();});}catch(e){}
+  anim(P.glow,[{opacity:0,scale:.82},{opacity:strong?1:.85,scale:1.04,offset:.3},{opacity:0,scale:1.12}],{duration:still()?700:1000,easing:"ease-out"});}
+var SPRING="cubic-bezier(.2,.8,.25,1)";
+var FL={
+  spin:function(P,d){anim(P.star,[{rotate:"0deg"},{rotate:(d*360)+"deg"}],{duration:1150,easing:"cubic-bezier(.25,.9,.3,1)"});
+    anim(P.ring,[{rotate:"0deg"},{rotate:(-d*360)+"deg"}],{duration:1300,easing:"cubic-bezier(.3,.8,.3,1)"});
+    anim(P.heart,[{scale:1},{scale:1.14,offset:.35},{scale:1}],{duration:900,easing:"ease-in-out"});glow(P,false);},
+  pulse:function(P){anim(P.ring,[{scale:1},{scale:1.13,offset:.28},{scale:.97,offset:.6},{scale:1.03,offset:.8},{scale:1}],{duration:950,easing:"ease-out"});
+    anim(P.ripple,[{opacity:.6,scale:.86},{opacity:0,scale:1.55}],{duration:950,easing:"ease-out"});
+    anim(P.ripple,[{opacity:0,scale:.86},{opacity:.4,scale:.9,offset:.25},{opacity:0,scale:1.4}],{duration:950,delay:220,easing:"ease-out"});glow(P,false);},
+  hop:function(P){anim(P.fx,[{transform:"translateY(0) scale(1,1)"},{transform:"translateY(3%) scale(1.06,.92)",offset:.12},{transform:"translateY(-18%) scale(.97,1.04)",offset:.42},
+      {transform:"translateY(0) scale(1.05,.94)",offset:.7},{transform:"translateY(-3%) scale(1,1)",offset:.85},{transform:"translateY(0) scale(1,1)"}],{duration:900,easing:"ease-in-out"});
+    anim(P.cast,[{opacity:1},{opacity:.35,offset:.42},{opacity:1,offset:.7},{opacity:1}],{duration:900,easing:"ease-in-out"});glow(P,false);},
+  wobble:function(P,d){anim(P.tilt,[{rotate:"y 0deg"},{rotate:"y "+(d*30)+"deg",offset:.2},{rotate:"y "+(-d*20)+"deg",offset:.45},{rotate:"y "+(d*11)+"deg",offset:.68},{rotate:"y "+(-d*4)+"deg",offset:.86},{rotate:"y 0deg"}],{duration:1250,easing:"ease-in-out"});
+    glow(P,false);},
+  twirl:function(P,d){anim(P.fx,[{transform:"rotate(0deg) scale(1)"},{transform:"rotate("+(d*180)+"deg) scale(.9)",offset:.45},{transform:"rotate("+(d*360)+"deg) scale(1.04)",offset:.8},{transform:"rotate("+(d*360)+"deg) scale(1)"}],{duration:1100,easing:SPRING});
+    anim(P.star,[{rotate:"0deg"},{rotate:(-d*180)+"deg"}],{duration:1100,easing:SPRING});glow(P,false);},
+  beat:function(P){anim(P.heart,[{scale:1},{scale:1.3,offset:.14},{scale:1.04,offset:.3},{scale:1.24,offset:.46},{scale:1,offset:.7},{scale:1}],{duration:1100,easing:"ease-in-out"});
+    anim(P.ring,[{scale:1},{scale:1.04,offset:.14},{scale:1,offset:.3},{scale:1.03,offset:.46},{scale:1}],{duration:1100,easing:"ease-in-out"});glow(P,true,true);},
+  grand:function(P,d){FL.spin(P,d);FL.hop(P);anim(P.ripple,[{opacity:.65,scale:.86},{opacity:0,scale:1.7}],{duration:1100,easing:"ease-out"});glow(P,true,true);}
+};
+var ORDER=["spin","pulse","hop","wobble","twirl","beat"];
+function pick(){count++;if(count%7===0)return "grand";var c=ORDER.filter(function(n){return n!==last;});return c[Math.floor(Math.random()*c.length)];}
+function play(){var P=parts();if(still()){glow(P,false);return;}
+  busy=true;running=[];ends=[];var name=pick(),d=Math.random()<.5?-1:1;last=name;try{FL[name](P,d);}catch(e){}
+  var mine=ends.slice();function done(){busy=false;if(again){again=false;play();}}
+  if(!mine.length)done();else Promise.all(mine).then(done);}
+function press(){if(busy){again=true;glow(parts(),false);return;}play();}
+if(KEY){
+  var isl=function(){return KEY.querySelector(".isl");};
+  KEY.addEventListener("pointerenter",function(e){var s=isl();if(s&&e.pointerType==="mouse"&&!still())s.classList.add("hover");});
+  KEY.addEventListener("pointermove",function(e){var s=isl();if(!s)return;var r=s.getBoundingClientRect();if(!r.width)return;
+    var x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    s.style.setProperty("--gx",(x*100).toFixed(1)+"%");s.style.setProperty("--gy",(y*100).toFixed(1)+"%");
+    if(e.pointerType==="mouse"&&!still()){x=Math.max(-.25,Math.min(1.25,x));y=Math.max(-.25,Math.min(1.25,y));
+      s.style.setProperty("--ry",((x-.5)*28).toFixed(1)+"deg");s.style.setProperty("--rx",(-(y-.5)*24).toFixed(1)+"deg");}},{passive:true});
+  KEY.addEventListener("pointerleave",function(){var s=isl();if(!s)return;s.classList.remove("hover","down");s.style.setProperty("--rx","0deg");s.style.setProperty("--ry","0deg");});
+  KEY.addEventListener("pointerdown",function(){var s=isl();if(s&&!still())s.classList.add("down");},{passive:true});
+  ["pointerup","pointercancel"].forEach(function(t){KEY.addEventListener(t,function(e){var s=isl();if(!s)return;s.classList.remove("down");if(e.pointerType!=="mouse")s.classList.remove("hover");},{passive:true});});
+  KEY.addEventListener("click",function(e){e.preventDefault();press();});
+}
+
+/* ---------- the rooms: orbs ---------- */
+var ROOMS={{ROOMS}};
+var LOOK={Chat:{tone:["#a57fe8","#6a3fb5","#2e1764"],tex:"bands"},Code:{tone:["#9283f2","#4d3db0","#1e1660"],tex:"storm"},
+  Build:{tone:["#c48ae8","#8641b8","#3e1760"],tex:"moon"},Fabrica:{tone:["#b47ad9","#7637a8","#331455"],tex:"dapple"},
+  Lector:{tone:["#b9a3f2","#7458c6","#33206c"],tex:"swirl"},Focus:{tone:["#9a6be0","#5c31a4","#250f4b"],tex:"aurora"}};
+function hx(c){c=c.replace("#","");return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+function mix(a,b,t){var A=hx(a),B=hx(b);return "#"+A.map(function(v,i){var n=Math.round(v+(B[i]-v)*t);return (n<16?"0":"")+n.toString(16);}).join("");}
+/* a surface that turns slowly with the orb: three tiles of 80, moved by one tile and round again */
+function tiles(f){var o="";for(var k=0;k<3;k++)o+=f(20+k*80);return '<g class="ox-drift">'+o+'</g>';}
+function surface(kind){
+  if(kind==="bands")return tiles(function(x){return [[33,"#fff",.13,3.4],[44,"#1a0840",.15,4.4],[56,"#fff",.10,3],[68,"#1a0840",.13,5],[80,"#fff",.12,3.6],[90,"#1a0840",.12,3]].map(function(b){
+      return '<path d="M'+x+' '+b[0]+' q20 -2.6 40 0 t40 0" fill="none" stroke="'+b[1]+'" stroke-opacity="'+b[2]+'" stroke-width="'+b[3]+'"/>';}).join("");});
+  if(kind==="storm")return tiles(function(x){return '<path d="M'+x+' 48 q20 -5 40 0 t40 0" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/>'+
+      '<path d="M'+x+' 79 q20 5 40 0 t40 0" fill="none" stroke="#1a0840" stroke-opacity=".16" stroke-width="4"/>'+
+      '<ellipse cx="'+(x+52)+'" cy="66" rx="10" ry="5.4" fill="#fff" opacity=".24"/><ellipse cx="'+(x+52)+'" cy="66" rx="4.8" ry="2.4" fill="#1a0840" opacity=".28"/>';});
+  if(kind==="swirl")return tiles(function(x){return '<path d="M'+(x-4)+' 44 c18 -14 34 10 56 -4 s22 4 28 2" fill="none" stroke="#fff" stroke-opacity=".17" stroke-width="4" stroke-linecap="round"/>'+
+      '<path d="M'+x+' 72 c20 14 36 -12 58 4 s16 2 22 0" fill="none" stroke="#fff" stroke-opacity=".11" stroke-width="5" stroke-linecap="round"/>';});
+  if(kind==="aurora")return '<ellipse cx="60" cy="27" rx="22" ry="7.5" fill="#efe3ff" opacity=".24"/><ellipse cx="60" cy="27" rx="12" ry="3.8" fill="#fff" opacity=".24"/>'+
+      tiles(function(x){return '<path d="M'+x+' 38 q20 4 40 0 t40 0" fill="none" stroke="#e6d6ff" stroke-opacity=".14" stroke-width="3"/>';});
+  if(kind==="dapple")return tiles(function(x){return '<circle cx="'+(x+18)+'" cy="44" r="6" fill="#fff" opacity=".08"/><circle cx="'+(x+50)+'" cy="62" r="8" fill="#1a0840" opacity=".12"/>'+
+      '<circle cx="'+(x+30)+'" cy="80" r="5" fill="#fff" opacity=".07"/><circle cx="'+(x+66)+'" cy="36" r="4" fill="#1a0840" opacity=".10"/>';});
+  if(kind==="moon")return tiles(function(x){return '<path d="M'+x+' 52 q20 -3 40 0 t40 0" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="5"/>'+
+      '<path d="M'+x+' 74 q20 3 40 0 t40 0" fill="none" stroke="#1a0840" stroke-opacity=".12" stroke-width="4"/>';});
+  return "";}
+var uid=0;
+function orb(r){var id="ob"+(++uid),T=r.tone,hi=mix(T[0],"#ffffff",.5),deep=mix(T[2],"#000000",.42),moon=r.tex==="moon";
+  var moonDefs=moon?'<radialGradient id="'+id+'m" cx=".34" cy=".3" r=".8"><stop offset="0" stop-color="#fbf7ff"/><stop offset=".55" stop-color="#cdb8f2"/><stop offset="1" stop-color="#5b3a96"/></radialGradient>':"";
+  return '<svg class="ox-ball" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs>'+
+    /* drawn lit from the left; each lit layer is turned to where the light comes from */
+    '<radialGradient id="'+id+'b" cx=".36" cy=".5" r=".74" fx=".2" fy=".5"><stop offset="0" stop-color="'+hi+'"/><stop offset=".16" stop-color="'+T[0]+'"/><stop offset=".52" stop-color="'+T[1]+'"/><stop offset=".86" stop-color="'+T[2]+'"/><stop offset="1" stop-color="'+deep+'"/></radialGradient>'+
+    '<linearGradient id="'+id+'t" x1="0" y1="0" x2="1" y2="0"><stop offset=".4" stop-color="#0b0220" stop-opacity="0"/><stop offset=".76" stop-color="#0b0220" stop-opacity=".32"/><stop offset="1" stop-color="#0b0220" stop-opacity=".6"/></linearGradient>'+
+    '<radialGradient id="'+id+'e" cx=".5" cy=".5" r=".5"><stop offset=".7" stop-color="#0b0220" stop-opacity="0"/><stop offset=".93" stop-color="#0b0220" stop-opacity=".2"/><stop offset="1" stop-color="#0b0220" stop-opacity=".42"/></radialGradient>'+
+    '<radialGradient id="'+id+'s" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".32" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+    '<linearGradient id="'+id+'r" x1="0" y1="0" x2="1" y2="0"><stop offset=".6" stop-color="'+hi+'" stop-opacity="0"/><stop offset="1" stop-color="'+hi+'" stop-opacity=".75"/></linearGradient>'+
+    '<radialGradient id="'+id+'a" cx=".5" cy=".5" r=".5"><stop offset=".76" stop-color="'+T[0]+'" stop-opacity="0"/><stop offset=".84" stop-color="'+T[0]+'" stop-opacity=".34"/><stop offset="1" stop-color="'+T[0]+'" stop-opacity="0"/></radialGradient>'+
+    '<clipPath id="'+id+'c"><circle cx="60" cy="60" r="40"/></clipPath><filter id="'+id+'g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1"/></filter>'+moonDefs+'</defs>'+
+    (moon?'<g class="ox-moon-back"><circle class="ox-moon" r="5.6" fill="url(#'+id+'m)"/></g>':"")+
+    '<g class="ox-lit"><circle cx="60" cy="60" r="40" fill="url(#'+id+'b)"/></g>'+
+    '<g clip-path="url(#'+id+'c)">'+surface(r.tex)+'</g>'+
+    '<g class="ox-lit"><g clip-path="url(#'+id+'c)"><rect x="18" y="18" width="84" height="84" fill="url(#'+id+'t)"/></g>'+
+      '<circle cx="60" cy="60" r="39" fill="none" stroke="url(#'+id+'r)" stroke-width="1.8" filter="url(#'+id+'g)"/></g>'+
+    '<circle cx="60" cy="60" r="40" fill="url(#'+id+'e)"/>'+
+    '<g class="ox-lit"><ellipse cx="40.5" cy="60" rx="10.5" ry="15" fill="url(#'+id+'s)"/><circle cx="36.5" cy="56.5" r="2.8" fill="#fff" opacity=".92" filter="url(#'+id+'g)"/></g>'+
+    (moon?'<g class="ox-moon-front"><circle class="ox-moon" r="5.6" fill="url(#'+id+'m)"/></g>':"")+
+    '</svg>';}
+
+var hold=null,moved=0,orbs=ROOMS.map(function(r,i){var look=LOOK[r.h]||LOOK.Chat;r.tone=look.tone;r.tex=look.tex;
+  var b=D.createElement("button");b.type="button";b.className="ox-key";
+  b.setAttribute("aria-label",r.h+(r.m?". "+r.m:"")+". "+r.d);
+  b.innerHTML='<span class="ox-orb">'+orb(r)+'<span class="ox-ico">'+r.icon+'</span></span><span class="ox-kh">'+r.h+'</span>'+(r.m?'<span class="ox-km">'+r.m+'</span>':"")+'<span class="ox-kd">'+r.d+'</span>';
+  var sh=D.createElement("div");sh.className="ox-shadow";sh.setAttribute("aria-hidden","true");ox.appendChild(sh);ox.appendChild(b);
+  var p={el:b,sh:sh,a:Math.PI/2+i*Math.PI/3,i:i,lit:[].slice.call(b.querySelectorAll(".ox-lit")),h:0,hv:0,pr:0,pv:0,ap:0,av:0,px:0,py:0,down:false,over:false,
+    mb:b.querySelector(".ox-moon-back"),mf:b.querySelector(".ox-moon-front"),mbc:b.querySelector(".ox-moon-back .ox-moon"),mfc:b.querySelector(".ox-moon-front .ox-moon")};
+  function on(){hold=p;p.over=true;ox.classList.add("ox-hold");b.classList.add("ox-on");}
+  function off(){p.over=false;p.down=false;p.px=0;p.py=0;if(hold===p)hold=null;ox.classList.remove("ox-hold");b.classList.remove("ox-on");}
+  b.addEventListener("pointerenter",on);b.addEventListener("pointerleave",off);b.addEventListener("focus",on);b.addEventListener("blur",off);
+  b.addEventListener("pointermove",function(e){var o=b.querySelector(".ox-orb").getBoundingClientRect();if(!o.width)return;
+    p.px=Math.max(-1,Math.min(1,(e.clientX-(o.left+o.width/2))/(o.width/2)));p.py=Math.max(-1,Math.min(1,(e.clientY-(o.top+o.height/2))/(o.height/2)));},{passive:true});
+  b.addEventListener("pointerdown",function(){p.down=true;},{passive:true});
+  ["pointerup","pointercancel"].forEach(function(t){b.addEventListener(t,function(){p.down=false;},{passive:true});});
+  b.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){p.down=true;setTimeout(function(){p.down=false;},140);}});
+  b.addEventListener("click",function(e){if(moved>6){e.preventDefault();return;}say("In Ingenium this opens "+r.h+".");});
+  return p;});
+
+/* ---------- the motion: the orbit's own slow pace; a room held brings it to a stop; a drag spins it ---------- */
+var BASE=.000085,vel=BASE,turn=0,last=performance.now(),born=last,drag=null;
+ox.addEventListener("pointerdown",function(e){if(e.button!==0||e.target.closest(".ox-next,.ox-sun,.ox-key"))return;drag={x:e.clientX,t:performance.now(),v:0};moved=0;});
+W.addEventListener("pointermove",function(e){if(!drag)return;var now=performance.now(),dx=e.clientX-drag.x;moved+=Math.abs(dx);turn+=dx*.0042;drag.v=dx*.0042/Math.max(8,now-drag.t);drag.x=e.clientX;drag.t=now;});
+W.addEventListener("pointerup",function(){if(!drag)return;if(moved>6)vel=Math.max(-.012,Math.min(.012,drag.v));drag=null;setTimeout(function(){moved=0;},0);});
+function spring(x,v,to,k,c,dt){v+=((to-x)*k-v*c)*dt;return [x+v*dt,v];}
+var R0=430,TILT=Math.cos(70*Math.PI/180);
+function frame(now){var dt=Math.min(50,now-last);last=now;var calm=still(),ds=dt/1000;
+  if(!drag){var want=hold||calm?0:BASE;vel+=(want-vel)*Math.min(1,dt/(Math.abs(vel)>BASE*3?900:260));turn+=vel*dt;}
+  var cx=ox.offsetWidth/2,cy=ox.offsetHeight*.63,sy=cy-14;
+  orbs.forEach(function(p){
+    var th=p.a+turn,x=cx+Math.cos(th)*R0,y=cy+Math.sin(th)*R0*TILT,dep=(Math.sin(th)+1)/2;
+    /* it pops into place, one after another, when Home opens */
+    if(calm){p.ap=1;p.av=0;}else if(now-born>380+p.i*110){var a=spring(p.ap,p.av,1,120,11,ds);p.ap=a[0];p.av=a[1];}
+    var h=spring(p.h,p.hv,p.over?1:0,170,18,ds);p.h=h[0];p.hv=h[1];
+    var q=spring(p.pr,p.pv,p.down?1:0,420,32,ds);p.pr=q[0];p.pv=q[1];
+    var bob=calm?0:2.6*Math.sin(now/950+p.i*1.7),ap=Math.max(0,p.ap);
+    var sc=(.74+.34*dep)*ap*(1+.16*p.h-.07*p.pr),lift=(18+bob+9*p.h-4*p.pr)*sc;
+    p.el.style.transform="translate("+(x-75).toFixed(1)+"px,"+(y-56-lift).toFixed(1)+"px) scale("+sc.toFixed(3)+")";
+    p.el.style.zIndex=String(10+Math.round(dep*40)+(p.over?60:0));
+    p.sh.style.transform="translate("+x.toFixed(1)+"px,"+(y+4).toFixed(1)+"px) scale("+(sc*(1-.18*p.h+.06*p.pr)).toFixed(3)+")";
+    p.sh.style.opacity=String(((.42+.5*dep)*Math.min(1,ap)*(1-.3*p.h)).toFixed(3));
+    /* the light comes from above and a little from the seal, and swings toward a pointer resting on the orb */
+    var tx=cx-x,ty=sy-(y-lift),tl=Math.hypot(tx,ty)||1,lx=-.72*.62+.38*tx/tl+.8*p.px*p.h,ly=-.70*.62+.38*ty/tl+.8*p.py*p.h;
+    var ang=Math.atan2(ly,lx)*180/Math.PI-180,tr="rotate("+ang.toFixed(1)+" 60 60)";
+    for(var k=0;k<p.lit.length;k++)p.lit[k].setAttribute("transform",tr);
+    if(p.mbc){var ph=calm?2.2:now/1500,mx=60+52*Math.cos(ph),my=56+13*Math.sin(ph),front=Math.sin(ph)>0;
+      p.mbc.setAttribute("cx",mx.toFixed(1));p.mbc.setAttribute("cy",my.toFixed(1));p.mfc.setAttribute("cx",mx.toFixed(1));p.mfc.setAttribute("cy",my.toFixed(1));
+      p.mb.style.display=front?"none":"";p.mf.style.display=front?"":"none";}
+  });
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+W.IngOrrery={state:function(){return {turn:turn,vel:vel,hold:hold&&hold.el.textContent,scale:win.style.transform};}};
+})();
+</script>
