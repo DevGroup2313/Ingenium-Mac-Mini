@@ -24,7 +24,10 @@
    own purple. Pointing at a room, or reaching it with the Tab key, stops the orbit and brings that room near with what it holds;
    the tour stops it too. The greeting and the rooms' names are in Ingenium's own Cormorant (Lector's, so it looks the same
    offline). The next-step card keeps its keys at their own width with their own lift and press, without "Read the short guide".
-   Where Home is narrower than 760 pixels it keeps its former head and grid of rooms. */
+   Where Home is narrower than 760 pixels (a phone), from 6.71 the same orrery stacks: the greeting, the rooms round the seal, the next
+   step; below 260 pixels Home keeps its former head and grid of rooms (an iPhone set to Larger Text in Display Zoom is 320 pixels wide,
+   its Home 290). On a phone the orbit tilts 44 degrees and the seal at the centre is 58 to 72 pixels: measured over a whole turn at
+   290 and 360 pixels, no room's name passes under the seal (at 58 degrees and 80 pixels, Fabrica's name went 13 pixels under it). */
 #page-home #hx.ox-on .hx-head{display:block;position:relative;height:var(--ox-h,700px);padding:0;gap:0;border:0;border-radius:30px;overflow:hidden;isolation:isolate;
   -webkit-user-select:none;user-select:none;
   background:radial-gradient(ellipse 70% 60% at 50% 64%,#fdfbff 0%,#f4eefb 46%,#e8def5 100%);
@@ -164,6 +167,27 @@ body[data-motion="minimal"] #page-home #hx.ox-on .oxo-tilt{transform:none}
 @media (prefers-reduced-motion:reduce){#page-home #hx.ox-on .oxo-idle,#page-home #hx.ox-on .ox-stars i,#page-home #hx.ox-on .hx-next{animation:none}
   #page-home #hx.ox-on .oxo-tilt{transition:none}}
 @media (forced-colors:active){#page-home #hx.ox-on .hx-head{border:1px solid CanvasText}}
+/* ---------- 6.71: on a phone, narrower than 760 pixels (her words, 10 November 2026: "The Iphone app does not have the new pages designs, I want them visible on the new Ios apps, I hate that they still have the old design and not the new one, I want that fixed now please"): the same orrery,
+   stacked: the greeting, then the rooms turning round the seal at a phone's size on a gentler tilt, then the next step; each part placed
+   where the heights above it say (layout) ---------- */
+#page-home #hx.ox-on.ox-narrow .hx-head{border-radius:24px}
+#page-home #hx.ox-on.ox-narrow .hx-htext{left:20px;right:20px;top:22px;max-width:none}
+#page-home #hx.ox-on.ox-narrow .hx-lede{font-size:14px;max-width:none}
+#page-home #hx.ox-on.ox-narrow .hx-next{left:14px;right:14px;top:var(--ox-ct,640px);width:auto;animation:oxUp .9s cubic-bezier(.22,1,.36,1) .3s backwards}
+@keyframes oxUp{0%{opacity:0;transform:translateY(24px)}100%{opacity:1;transform:none}}
+#page-home #hx.ox-on.ox-narrow .ox-legend{left:20px;right:20px;bottom:18px;font-size:14.5px}
+#page-home #hx.ox-on.ox-narrow .ox-plane{transform:rotateX(44deg) scale(var(--ox-k,1))}
+#page-home #hx.ox-on.ox-narrow .ox-world{transform:rotateX(44deg)}
+#page-home #hx.ox-on.ox-narrow .ox-stand{transform:rotateX(-44deg)}
+#page-home #hx.ox-on.ox-narrow .ox-stand .ox-shadow{left:-30px;top:-7px;width:60px;height:14px}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-key{width:112px;transform-origin:56px 38px;transform:translate(-56px,calc(-38px - var(--ox-lift,12px))) scale(.92)}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-key.ox-near{transform:translate(-56px,calc(-38px - var(--ox-lift,12px))) scale(1)}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-jewel{width:76px;height:76px}
+#page-home #hx.ox-on.ox-narrow .oxo{--S:76px}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-kh{margin-top:-8px;font-size:16px}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-km{display:none}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-kd{width:180px;margin-left:-90px;font-size:12px}
+#page-home #hx.ox-on.ox-narrow .hx-head .hx-key.ox-up .hx-kd{margin-left:-90px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p261"]="started";}catch(_){}
 /* R261 · Home as an orrery: see the note at the top of its styles */
@@ -258,7 +282,13 @@ function row(){var g=$("hxGuide"),r=g&&g.parentNode;if(!r||!r.classList)return;
   var any=[].some.call(r.children,function(c){return c!==g&&!c.hidden;});if(r.classList.contains("ox-empty")===any)r.classList.toggle("ox-empty",!any);}
 function watchRow(){var g=$("hxGuide"),r=g&&g.parentNode;if(!r||r===rowSeen)return;rowSeen=r;
   try{new MutationObserver(function(){row();}).observe(r,{attributes:true,subtree:true,childList:true,attributeFilter:["hidden"]});}catch(e){}}
-function layout(w){var big=w>=980;R0=Math.round(Math.max(220,Math.min(430,w/2-130)));CY=big?.61:.64;
+function layout(w){var big=w>=980,narrow=w<760;if(hx.classList.contains("ox-narrow")!==narrow)hx.classList.toggle("ox-narrow",narrow);
+  /* 6.71: a phone: the orrery under the greeting at a phone's size, the next step under it (writes only what changed) */
+  if(narrow){var ns=head.style,nset=function(n,v){if(ns.getPropertyValue(n)!==v)ns.setProperty(n,v);};R0=Math.round(Math.max(100,Math.min(185,w/2-52)));
+    nset("--ox-k",(R0/430).toFixed(3));nset("--ox-r",R0+"px");nset("--ox-sun",(w<330?58:w<380?66:72)+"px");nset("--ox-hs",(w<380?32:36)+"px");
+    var tx=head.querySelector(".hx-htext"),cd=head.querySelector(".hx-next"),tH=tx?tx.offsetHeight:220,cH=cd?cd.offsetHeight:240,orb=Math.round(R0*1.439+150),top=22+tH+14;
+    nset("--ox-cy",(top+Math.round(orb/2)+18)+"px");nset("--ox-ct",(top+orb+20)+"px");nset("--ox-h",(top+orb+20+cH+58)+"px");return;}
+  R0=Math.round(Math.max(220,Math.min(430,w/2-130)));CY=big?.61:.64;
   var cw=Math.max(360,Math.min(500,w-40-34-24-420)),tw=Math.max(300,Math.min(520,w-40-34-24-cw)),st=head.style,set=function(n,v){if(st.getPropertyValue(n)!==v)st.setProperty(n,v);};
   set("--ox-h",(big?700:760)+"px");set("--ox-cy",Math.round(CY*100)+"%");set("--ox-cw",cw+"px");set("--ox-tw",tw+"px");set("--ox-sun",(big?132:112)+"px");
   set("--ox-hs",(tw<420?40:48)+"px");set("--ox-k",(R0/430).toFixed(3));set("--ox-r",R0+"px");}
@@ -281,19 +311,19 @@ function leave(){on=false;if(hold)near(hold,false);hx.classList.remove("ox-on");
   keys.forEach(function(p){p.el.classList.remove("ox-near","ox-up");if(p.o)p.o.classList.remove("hover","down");box.appendChild(p.el);});
   if(world&&world.parentNode)world.parentNode.removeChild(world);world=null;spin=null;keys.forEach(function(p){p.stand=null;p.arm=null;});
   if(work&&box&&box.parentNode!==work)work.appendChild(box);
-  ["--ox-h","--ox-cy","--ox-cw","--ox-tw","--ox-sun","--ox-hs","--ox-k","--ox-r"].forEach(function(n){if(head)head.style.removeProperty(n);});}
+  ["--ox-h","--ox-cy","--ox-cw","--ox-tw","--ox-sun","--ox-hs","--ox-k","--ox-r","--ox-ct"].forEach(function(n){if(head)head.style.removeProperty(n);});if(hx)hx.classList.remove("ox-narrow");}
 function mount(){try{
   var h=$("hx");if(!h)return;if(h!==hx){if(on)leave();hx=h;}
   head=hx.querySelector(".hx-head");work=hx.querySelector(".hx-work");box=hx.querySelector(".hx-keys");if(!head||!box)return;
   var w=hx.clientWidth;if(!w)return;
-  if(w>=760){layout(w);if(!on||box.parentNode!==head||!hx.classList.contains("ox-on")||!box.querySelector(".ox-world"))enter();else{rim();row();}}
+  if(w>=260){layout(w);if(!on||box.parentNode!==head||!hx.classList.contains("ox-on")||!box.querySelector(".ox-world")){enter();if(w<760)layout(w);}else{rim();row();}}
   else if(on)leave();
 }catch(e){try{console.warn("Ingenium: Home's orrery",e&&e.message||e);}catch(_){}}}
 
 function boot(){mount();var h=$("hx");if(!h){setTimeout(boot,700);return;}
   try{new ResizeObserver(function(){mount();}).observe(h);}catch(e){W.addEventListener("resize",mount);}
   /* Home's parts may be redrawn by other parts later (the seal key, the wallpapers key): looked at again, cheaply, writing nothing when all is in place */
-  setInterval(function(){var x=$("hx");if(!on){if(x&&x.clientWidth>=760)mount();return;}
+  setInterval(function(){var x=$("hx");if(!on){if(x&&x.clientWidth>=300)mount();return;}if(x&&x.clientWidth<760)layout(x.clientWidth);
     if(x!==hx||!head||!head.isConnected||box.parentNode!==head||!box.querySelector(".ox-world")){mount();return;}rim();row();},2000);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.IngOrrery={state:function(){var s=spin?getComputedStyle(spin):null;return {on:on,R:R0,keys:keys.length,hold:hold?hold.el.getAttribute("data-go"):null,motion:motion(),

@@ -11,7 +11,7 @@
 //   - pointing at the seal tilts and lifts Ingenium's wheel; pressing it sinks the wheel, plays a flourish and winds the movement;
 //   - the steps open their panels; a way leans and sinks; out of sight the sway waits; Ready-made hides the steps; left alone,
 //     nothing on Blend is rewritten;
-//     below 760 pixels Blend is as it was; by night it is rendered again in the night's light; with minimal motion it keeps still;
+//     below 760 pixels the movement in its phone layout (6.71), below 260 pixels Blend as it was; by night it is rendered again in the night's light; with minimal motion it keeps still;
 //     no page error.
 //   node rig/t_670_blend.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
@@ -137,9 +137,12 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(quiet.n === 0, 'left alone, nothing on Blend is rewritten', quiet);
   await p.screenshot({ path: path.join(OUT, 'blend_day.png') });
   await p.setViewportSize({ width: 1000, height: 900 }); await p.waitForTimeout(1500);
+  const s11p = await p.evaluate(() => { const pg = document.getElementById('page-blend'); return { on: pg.classList.contains('bx-on'), narrow: pg.classList.contains('bx-narrow'), head: !!pg.querySelector('.bx-head') }; });
+  ok(s11p.on && s11p.narrow && s11p.head, 'below 760 pixels the movement takes its phone layout', s11p);
+  await p.setViewportSize({ width: 250, height: 900 }); await p.waitForTimeout(1500);
   const s11 = await p.evaluate(() => { const pg = document.getElementById('page-blend'); return { on: pg.classList.contains('bx-on'), title: !!pg.querySelector(':scope > .page-title'),
     steps: !!pg.querySelector('.bl-setup > .rm-steps'), head: !!pg.querySelector('.bx-head') }; });
-  ok(!s11.on && s11.title && s11.steps && !s11.head, 'below 760 pixels Blend is as it was', s11);
+  ok(!s11.on && s11.title && s11.steps && !s11.head, 'below 260 pixels Blend is as it was', s11);
   await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(1500);
   ok(await p.evaluate(() => IngBlendLook.state().on && IngBlendLook.state().wheels === 2), 'wide again, the new look comes back with its models');
   await p.evaluate(() => { state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(1200);

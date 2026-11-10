@@ -247,6 +247,20 @@ body[data-motion="minimal"] #page-folders.fd-on .fd-file,body[data-motion="minim
 body[data-motion="minimal"] #page-folders.fd-on .fd-spread.fd-anim .fd-left{animation:none}
 @media (prefers-reduced-motion:reduce){#page-folders.fd-on .fd-idle,#page-folders.fd-on .fd-spread.fd-anim .fd-left{animation:none}
   #page-folders.fd-on .fd-tilt,#page-folders.fd-on .fd-file,#page-folders.fd-on .fd-paper,#page-folders.fd-on .fd-book{transition:none}#page-folders.fd-on .fd-pop{transform:none !important}}
+/* ---------- 6.71: on a phone, narrower than 760 pixels (her words, 10 November 2026: "The Iphone app does not have the new pages designs, I want them visible on the new Ios apps, I hate that they still have the old design and not the new one, I want that fixed now please"): the head stacks, the drawer
+   fills the width (its words drawn larger in the same proportion, so they read at a phone's size), every list keeps one column, and the
+   build library's volume stands on its shelf above its words (measured at 290 and 360 pixels: it had stood over the heading) ---------- */
+#page-folders.fd-on.fd-phone .fd-head{padding:22px 16px 18px;border-radius:24px;min-height:0;gap:10px}
+#page-folders.fd-on.fd-phone .fd-words > .page-title{font-size:38px}
+#page-folders.fd-on.fd-phone .fd-holds ol{columns:1}
+#page-folders.fd-on.fd-phone .fd-drawer{width:560px;max-width:none;transform:scale(var(--fd-k,1));transform-origin:50% 0;justify-self:start;
+  margin:6px 0 calc(410px * (var(--fd-k,1) - 1)) calc(50% - 280px)}
+#page-folders.fd-on.fd-phone .fd-tab{font-size:calc(13px / var(--fd-k,1));height:calc(34px / var(--fd-k,1) * .8)}
+#page-folders.fd-on.fd-phone .fd-ft b{font-size:calc(17px / var(--fd-k,1))}
+#page-folders.fd-on.fd-phone .fd-label b{font-size:calc(13px / var(--fd-k,1))}
+#page-folders.fd-on.fd-phone .fld-ways.fd-tray,#page-folders.fd-on.fd-phone .fld-grid,#page-folders.fd-on.fd-phone #fldBody > .card.fd-libcard{grid-template-columns:minmax(0,1fr)}
+#page-folders.fd-on.fd-phone .fd-libcard > *{grid-column:1}
+#page-folders.fd-on.fd-phone .fd-libcard > .fd-shelf{grid-row:auto;justify-self:center;margin:6px 0 22px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p263"]="started";}catch(_){}
 /* R263 · Folders, a drawer of her apps: see the note at the top of its styles */
@@ -416,11 +430,12 @@ function wirePop(){
 function enter(){build();title=page.querySelector(":scope > .page-title");lede=page.querySelector(":scope > .lede");
   page.insertBefore(head,title||body);if(title)words.insertBefore(title,words.children[1]);if(lede)words.insertBefore(lede,words.children[2]);
   page.classList.add("fd-on");on=true;lastSig="";dress();}
-function leave(){on=false;if(held)lift(held,false);page.classList.remove("fd-on","fd-stack","fd-mid","fd-inside");
+function leave(){on=false;if(held)lift(held,false);page.classList.remove("fd-on","fd-stack","fd-mid","fd-inside","fd-phone");page.style.removeProperty("--fd-k");
   if(title)page.insertBefore(title,head);if(lede)page.insertBefore(lede,head);if(head&&head.parentNode)head.parentNode.removeChild(head);paintFolders();}
-function layout(w){var set=function(c,v){if(page.classList.contains(c)!==v)page.classList.toggle(c,v);};set("fd-stack",w<1060);set("fd-mid",w<980);}
+function layout(w){var set=function(c,v){if(page.classList.contains(c)!==v)page.classList.toggle(c,v);};set("fd-stack",w<1060);set("fd-mid",w<980);set("fd-phone",w<760);
+  var k=w<760?Math.min(1,(w-40)/560).toFixed(3):"";if(page.style.getPropertyValue("--fd-k")!==k){if(k)page.style.setProperty("--fd-k",k);else page.style.removeProperty("--fd-k");}}
 function mount(){try{page=$("page-folders");body=$("fldBody");if(!page||!body)return;var w=page.clientWidth;if(!w)return;
-    if(w>=760){layout(w);if(!on)enter();}else if(on)leave();}catch(e){try{console.warn("Ingenium: Folders' new look",e&&e.message||e);}catch(_){}}}
+    if(w>=260){layout(w);if(!on)enter();}else if(on)leave();}catch(e){try{console.warn("Ingenium: Folders' new look",e&&e.message||e);}catch(_){}}}
 function boot(){page=$("page-folders");body=$("fldBody");if(!page||!body||!W.IngFolders){setTimeout(boot,700);return;}
   wirePop();
   /* only a change of width matters, and it is answered in the next frame, so the drawer's own height never loops the observer */

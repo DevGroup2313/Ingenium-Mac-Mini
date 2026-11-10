@@ -255,7 +255,8 @@ async function seed(p) { return p.evaluate(async () => {
         orrery: !!(window.IngOrrery && IngOrrery.state().on), inHead: [...document.querySelectorAll('#hx .hx-key')].every(k => !!k.closest('.hx-head')) }; });
     if (nm === 'wide') ok(m.over <= 1 && (m.orrery ? m.inHead : m.rows === 2), 'at 1440 the work keys stand in two rows of three (from 6.67, around the orrery), with no sideways scroll', m);
     if (nm === 'big') ok(m.over <= 1 && (m.orrery ? m.inHead : m.rows === 1) && m.sideLeft > m.mainRight && m.main + m.side > m.hx * 0.9, 'at 3440 the whole width is used: the keys in one row, the plaque and the models beside the work', m);
-    if (nm === 'phone') ok(m.over <= 1 && m.rows === 3, 'on a phone everything fits the width, the keys two by two', m);
+    /* 6.71: on a phone the rooms ride the orrery too, in its phone layout (rig/t_671_phone.js measures it) */
+    if (nm === 'phone') ok(m.over <= 1 && (m.orrery ? m.inHead : m.rows === 3), 'on a phone everything fits the width (from 6.71, around the orrery; before, the keys two by two)', m);
     for (const t of ['day', 'night']) { await theme(p, t); await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(400); await p.screenshot({ path: path.join(OUT, 'h61-' + nm + '-' + t + '.png'), fullPage: true }); }
     for (const e of p.__errs) if (mine(e, R)) ok(false, 'a script error from Home (' + nm + ')', e.slice(0, 300));
     await ctx.close();

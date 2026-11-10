@@ -7,7 +7,8 @@
 //   - pointing at a folder lifts it and names it; pressing it opens the folder as a spread (cover on the left, papers on the right);
 //   - in the folder every control still works (rename, decisions, back); the index cards carry their seals; a new folder joins the
 //     drawer; the build library is a book, the ways envelopes with orbs, How I work a ruled sheet that still keeps her words;
-//   - cards lean and lift; left alone nothing is rewritten; below 760 pixels Folders is as it was; no page error.
+//   - cards lean and lift; left alone nothing is rewritten; below 760 pixels the drawer in its phone layout (6.71), below 260 pixels
+//     Folders as it was; no page error.
 // The person and the apps are invented (Ada; Quill, Lantern and Ledger), with Ingenium itself for its seal.
 //   node rig/t_669_folders.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
@@ -118,11 +119,14 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const s9c = await p.evaluate(() => { const im = document.querySelector('#page-folders .fd-oh .fd-seal'); return !!im && im.src === IngSeal.url(['ingenium'], { night: false }); });
   ok(s9c, 'back to day, the seal takes its day look again');
   await p.evaluate(() => document.querySelector('#page-folders .fld-crumbk').click()); await p.waitForTimeout(400);
-  // 10. below 760 pixels Folders is as it was; wide again, the drawer comes back
+  // 10. below 760 pixels the drawer in its phone layout (6.71); below 260 pixels Folders is as it was; wide again, the drawer comes back
   await p.setViewportSize({ width: 700, height: 900 }); await p.waitForTimeout(900);
+  const s10p = await p.evaluate(() => { const pg = document.getElementById('page-folders'); return { on: pg.classList.contains('fd-on'), phone: pg.classList.contains('fd-phone'), files: IngFoldersLook.state().files.length }; });
+  ok(s10p.on && s10p.phone && s10p.files === 4, 'below 760 pixels the drawer takes its phone layout', s10p);
+  await p.setViewportSize({ width: 250, height: 900 }); await p.waitForTimeout(900);
   const s10 = await p.evaluate(() => { const pg = document.getElementById('page-folders'); return { on: pg.classList.contains('fd-on'), head: !!pg.querySelector('.fd-head'), title: !!pg.querySelector(':scope > .page-title'),
     lede: !!pg.querySelector(':scope > .lede'), cards: pg.querySelectorAll('.fld-card').length, seals: pg.querySelectorAll('.fld-card .fd-seal,.fld-card .fd-coin').length }; });
-  ok(!s10.on && !s10.head && s10.title && s10.lede && s10.cards === 5 && s10.seals === 0, 'below 760 pixels Folders is as it was', s10);
+  ok(!s10.on && !s10.head && s10.title && s10.lede && s10.cards === 5 && s10.seals === 0, 'below 260 pixels Folders is as it was', s10);
   await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(900);
   const s10b = await st(); ok(s10b.on && s10b.files.length === 4, 'wide again, the drawer comes back', s10b);
   ok(errs.length === 0, 'no page error', errs);

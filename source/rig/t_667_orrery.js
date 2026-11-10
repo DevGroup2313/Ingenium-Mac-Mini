@@ -11,7 +11,7 @@
 //   - an orb answers the pointer as the seal does: it tilts and lifts, sinks on a press; the orbit stops; the room's words show;
 //     a press opens the room;
 //   - the card keeps its two keys at their own width side by side, without "Read the short guide";
-//   - the greeting is in Ingenium's own Cormorant; Minimal motion and the tour keep it still; below 760 pixels Home keeps its grid;
+//   - the greeting is in Ingenium's own Cormorant; Minimal motion and the tour keep it still; below 760 pixels the orrery in its phone layout (6.71), below 260 pixels Home keeps its grid;
 //   - by night as by day; no page error.
 //   node rig/t_667_orrery.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
@@ -126,13 +126,17 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(s9.orbit === 'none' && s9.anim === 'none' && s9.sway === 'none' && m0.every((a, i) => Math.abs(a - m1[i]) < 0.003), 'Minimal motion keeps the orbit, the engine and the orbs still', { s9, m0, m1 });
   await p.evaluate(() => document.body.setAttribute('data-motion', 'calm'));
 
-  // 7. narrow: Home keeps its grid; wide again: the orrery
+  // 7. narrow: the orrery in its phone layout (6.71); below 260 pixels Home keeps its grid; wide again: the orrery
   await p.setViewportSize({ width: 1000, height: 900 }); await p.waitForTimeout(2500);
+  const s10p = await p.evaluate(() => ({ on: IngOrrery.state().on, narrow: document.getElementById('hx').classList.contains('ox-narrow'), world: !!document.querySelector('#hx .ox-world'),
+    inHead: document.querySelector('#hx .hx-keys').parentElement.classList.contains('hx-head') }));
+  ok(s10p.on && s10p.narrow && s10p.world && s10p.inHead, 'below 760 pixels the orrery takes its phone layout', s10p);
+  await p.setViewportSize({ width: 250, height: 900 }); await p.waitForTimeout(2500);
   const s10 = await p.evaluate(() => { const box = document.querySelector('#hx .hx-keys'), i = document.querySelector('#hx .hx-key .hx-jewel .oxo-ico svg');
     return { on: IngOrrery.state().on, w: document.getElementById('hx').clientWidth, inWork: box.parentElement.classList.contains('hx-work'), grid: getComputedStyle(box).display,
       icon: i ? Math.round(i.getBoundingClientRect().width) : 0, sph: getComputedStyle(document.querySelector('#hx .oxo-ball')).display, tf: getComputedStyle(document.querySelector('#hx .hx-key')).transform,
       world: !!document.querySelector('#hx .ox-world'), kids: [...box.children].every(c => c.classList.contains('hx-key')) }; });
-  ok(!s10.on && s10.inWork && s10.grid === 'grid' && s10.icon >= 18 && s10.sph === 'none' && s10.tf === 'none' && !s10.world && s10.kids, 'below 760 pixels Home keeps its grid of rooms, as before', s10);
+  ok(!s10.on && s10.inWork && s10.grid === 'grid' && s10.icon >= 18 && s10.sph === 'none' && s10.tf === 'none' && !s10.world && s10.kids, 'below 260 pixels Home keeps its grid of rooms, as before', s10);
   const tourAt = await p.evaluate(() => { const e = document.querySelector('.hx-work, .hx-key'); const r = e && e.getBoundingClientRect(); return !!(r && r.width > 0); });
   await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(2500);
   const s11 = await p.evaluate(() => ({ on: IngOrrery.state().on, inHead: document.querySelector('#hx .hx-keys').parentElement.classList.contains('hx-head') }));

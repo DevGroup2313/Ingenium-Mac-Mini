@@ -1541,6 +1541,13 @@ edit('  var nm="";try{nm=(personaGet().name||"").trim();}catch(e){}\n  if(CC.mod
 edit('w.appendChild(el("h2",null,"What shall we build?"));\n      w.appendChild(el("p",null,"Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
      'w.appendChild(el("h2",null,part+(nm?", "+nm:"")));\n      w.appendChild(el("p",null,"What shall we build? Open one of your apps, or start a new one. It runs on the right while you and the model work on it."));',
      "6.55 Code's empty page greets her by name")
+# ---- 6.71 (10 November 2026): on a phone the side buttons (the bell, the theme, the timer, the note, park and quiet) start laid
+#      down so they do not cover the page (modules/r211.js, 6.10.2). Measured on an iPhone's width: when the guided tour closed,
+#      they stood up again over Home, Blend and Folders, because tourDemoClear empties tourSaved before tourEnd reads whether
+#      they had been laid down. tourEnd now reads it first. ----
+edit('function tourEnd(){tourSoftClose();tourDemoClear();var ov=$("ingTour");if(ov)ov.remove();\n  if(tourSaved.rail){document.body.classList.add("rail-collapsed");}',
+     'function tourEnd(){tourSoftClose();var railWas=tourSaved.rail;tourDemoClear();var ov=$("ingTour");if(ov)ov.remove();\n  if(railWas){document.body.classList.add("rail-collapsed");}',
+     "6.71 the tour lays the side buttons down again")
 
 for old, new, label, times in EDITS:
     n = out.count(old)

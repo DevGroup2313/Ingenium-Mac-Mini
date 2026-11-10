@@ -240,6 +240,24 @@ body[data-theme="night"] #page-blend.bx-on .bl-model .bx-rw{filter:drop-shadow(0
 @media (prefers-reduced-motion:reduce){#page-blend.bx-on .bx-pop{transform:none !important}}
 body[data-motion="minimal"] #page-blend.bx-on .bx-pop{transform:none !important}
 @media (forced-colors:active){#page-blend.bx-on .bx-head{border:1px solid CanvasText}}
+/* ---------- 6.71: on a phone, narrower than 760 pixels (her words, 10 November 2026: "The Iphone app does not have the new pages designs, I want them visible on the new Ios apps, I hate that they still have the old design and not the new one, I want that fixed now please"): the same head, stacked:
+   Blend's words, then the movement filling the width, then each model's name and what it does, then the line under it; the steps two by two ---------- */
+#page-blend.bx-on .bx-legend{display:none}
+#page-blend.bx-on.bx-narrow .bx-head{height:auto;display:flex;flex-direction:column;border-radius:24px}
+#page-blend.bx-on.bx-narrow .bx-words{position:relative;left:auto;top:auto;width:auto;padding:22px 20px 0}
+#page-blend.bx-on.bx-narrow .bx-words > .page-title{font-size:38px}
+#page-blend.bx-on.bx-narrow .bx-words .rm-tabs,#page-blend.bx-on.bx-narrow .bx-words .rm-row{flex-wrap:wrap}
+#page-blend.bx-on.bx-narrow .bx-move{position:relative;right:auto;top:auto;flex:0 0 auto;width:520px;height:424px;margin:4px 0 calc(424px * (var(--bx-k,1) - 1)) calc(50% - 260px);
+  transform-origin:50% 0}
+#page-blend.bx-on.bx-narrow .bx-labels{display:none}
+#page-blend.bx-on.bx-narrow .bx-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;padding:2px 18px 8px}
+#page-blend.bx-on.bx-narrow .bx-legend span{font-size:11.5px;font-weight:600;line-height:1.4;color:var(--bx-acc)}
+#page-blend.bx-on.bx-narrow .bx-legend b{margin-right:5px;font:600 15px/1.2 var(--bx-serif);letter-spacing:.03em;color:var(--bx-ink1)}
+#page-blend.bx-on.bx-narrow .bx-count{position:relative;left:auto;bottom:auto;max-width:none;padding:2px 20px 20px;font-size:15px}
+#page-blend.bx-on.bx-narrow .bx-steps .rm-steps{flex-wrap:wrap;gap:10px;padding:0 4px}
+#page-blend.bx-on.bx-narrow .bx-steps .rm-steps > li{flex:0 0 calc(50% - 5px)}
+#page-blend.bx-on.bx-narrow .bx-steps .rm-step{width:100%;min-width:0;padding:9px 10px}
+#page-blend.bx-on.bx-narrow .bx-steps .rm-step .bx-num{min-width:24px;font-size:20px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p262"]="started";}catch(_){}
 /* R262 · Blend as a movement in 3D: see the note at the top of its styles */
@@ -488,7 +506,7 @@ function engine(){var box=mk("div","hx-seal bx-sealbox");box.setAttribute("data-
   return box;}
 
 /* ---------- the page ---------- */
-var page=null,head=null,words=null,moveBox=null,stage=null,labels=null,count=null,stepsNav=null,on=false,held=null,countText="",title=null,lede=null,bar=null,ol=null;
+var page=null,head=null,words=null,moveBox=null,stage=null,labels=null,legend=null,count=null,stepsNav=null,on=false,held=null,countText="",title=null,lede=null,bar=null,ol=null;
 function chosenRows(){var pick=$("blendPick");if(!pick)return [];return [].slice.call(pick.querySelectorAll("label.bl-model")).filter(function(l){var c=l.querySelector('input[type="checkbox"]');return c&&c.checked;});}
 function rowName(l){var n=l.querySelector(".bl-mn");return n?n.textContent.trim():"";}
 function rowSub(l){var s=l.querySelector(".small");return s?s.textContent.trim():"";}
@@ -538,6 +556,8 @@ function movement(force){if(!on||!moveBox)return;var rows=chosenRows(),list=rows
       hit.addEventListener("click",function(){goStep1(x.row);});})(hit,x);}
   if(stage&&stage.parentNode)stage.parentNode.removeChild(stage);if(labels&&labels.parentNode)labels.parentNode.removeChild(labels);
   moveBox.appendChild(st);moveBox.appendChild(lbs);stage=st;labels=lbs;
+  /* on a phone the names stand under the movement, as a line of their own */
+  if(legend){legend.innerHTML="";for(var g=0;g<n;g++){var y=list[g]||null,sp=mk("span",null,y?'<b>'+esc(y.name)+'</b>'+esc(y.role):'<b>a model</b>');legend.appendChild(sp);}}
   syncWheels();swayOn(sw);
   countText=list.length<2?(list.length?"One more model, and the blend can begin.":"Choose two or more models in step I."):list.length+" models in the blend, turning with Ingenium's wheel. Point at one to see what it does.";
   count.textContent=countText;}
@@ -573,24 +593,27 @@ function build(){if(head)return;
   head=mk("section","bx-head");head.setAttribute("aria-label","Blend");
   words=mk("div","bx-words");var eb=mk("div","bx-eyebrow",'<b>Ingenium</b><span>Blend · the movement of your models</span>');eb.setAttribute("aria-hidden","true");words.appendChild(eb);head.appendChild(words);
   moveBox=mk("div","bx-move");head.appendChild(moveBox);SEALBOX=engine();
+  legend=mk("div","bx-legend");legend.setAttribute("aria-hidden","true");head.appendChild(legend);
   try{new IntersectionObserver(function(es){seen(es[es.length-1].isIntersecting);}).observe(moveBox);}catch(e){}
   count=mk("div","bx-count");count.setAttribute("aria-live","polite");head.appendChild(count);
   stepsNav=mk("nav","bx-steps");stepsNav.setAttribute("aria-label","The steps of a new blend");}
-function layout(w){var big=w>=980,ww=big?470:Math.max(320,Math.round(w*.46)),k=Math.max(.6,Math.min(1,(w-ww-70)/520));
+function layout(w){var narrow=w<760;if(page.classList.contains("bx-narrow")!==narrow)page.classList.toggle("bx-narrow",narrow);
+  if(narrow){var k=Math.min(1,(w-24)/350).toFixed(3);if(page.style.getPropertyValue("--bx-k")!==k)page.style.setProperty("--bx-k",k);return;}
+  var big=w>=980,ww=big?470:Math.max(320,Math.round(w*.46)),k=Math.max(.6,Math.min(1,(w-ww-70)/520));
   var set=function(n,v){if(page.style.getPropertyValue(n)!==v)page.style.setProperty(n,v);};set("--bx-ww",ww+"px");set("--bx-k",k.toFixed(3));}
 function enter(){build();title=page.querySelector(":scope > .page-title");lede=page.querySelector(":scope > .lede");bar=$("rmBar-blend");ol=page.querySelector(".bl-setup .rm-steps")||page.querySelector(".rm-steps");
   var grid=$("rmP-blend")||page.querySelector(".bl-grid");if(!grid)return false;
   page.insertBefore(head,title||page.firstChild);if(title)words.appendChild(title);if(lede)words.appendChild(lede);if(bar)words.appendChild(bar);
   if(ol){stepsNav.appendChild(ol);dressSteps();}
   page.insertBefore(stepsNav,grid);page.classList.add("bx-on");on=true;dressRows();markAnswers();movement(true);return true;}
-function leave(){on=false;page.classList.remove("bx-on");if(held)near(held,false);swayOff();
+function leave(){on=false;page.classList.remove("bx-on","bx-narrow");if(held)near(held,false);swayOff();
   var grid=$("rmP-blend")||page.querySelector(".bl-grid"),before=head&&head.parentNode===page?head:grid;
   if(title)page.insertBefore(title,before);if(lede)page.insertBefore(lede,before);if(bar)page.insertBefore(bar,before);
   if(ol){var setup=page.querySelector(".bl-setup");if(setup){var h=setup.querySelector(":scope > h2.sec");setup.insertBefore(ol,h||setup.firstChild);}}
   if(head&&head.parentNode)head.parentNode.removeChild(head);if(stepsNav&&stepsNav.parentNode)stepsNav.parentNode.removeChild(stepsNav);
   ["--bx-ww","--bx-k","--bx-wimg"].forEach(function(n){page.style.removeProperty(n);});wimgTag="";}
 function mount(){try{page=$("page-blend");if(!page)return;var w=page.clientWidth;if(!w)return;
-  if(w>=760){layout(w);if(!on){if(!$("blendPick"))return;enter();}else{dressRows();movement(false);}}else if(on)leave();}catch(e){try{console.warn("Ingenium: Blend's new look",e&&e.message||e);}catch(_){}}}
+  if(w>=260){layout(w);if(!on){if(!$("blendPick"))return;enter();}else{dressRows();movement(false);}}else if(on)leave();}catch(e){try{console.warn("Ingenium: Blend's new look",e&&e.message||e);}catch(_){}}}
 var T=0;function soon(){if(T)return;T=setTimeout(function(){T=0;if(on){dressRows();movement(false);}},60);}
 function boot(){page=$("page-blend");if(!page||!$("blendPick")){setTimeout(boot,700);return;}
   mount();wirePop();
