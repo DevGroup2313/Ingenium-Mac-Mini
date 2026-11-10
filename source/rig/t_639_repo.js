@@ -78,10 +78,11 @@ const COMMENTS = [{ issue_url: iu(1), user: { login: 'another-user' }, created_a
     'its two issues are kept with their labels and their three comments, in order; the pull request is left out', s1.iss);
   // 2. the folder's card
   const card = await p.evaluate(() => { const c = document.getElementById('frpCard'); if (!c) return null; const cs = (e) => e ? getComputedStyle(e) : {};
-    return { h: c.querySelector('h2').textContent, hfs: cs(c.querySelector('h2')).fontSize, tabs: [...c.querySelectorAll('.frp-tab')].map(t => t.textContent), readme: /INVENTED-README-MARK one/.test((c.querySelector('.frp-readme') || {}).textContent || ''),
+    return { h: c.querySelector('h2').textContent, hfs: cs(c.querySelector('h2')).fontSize, spread: !!c.closest('#page-folders.fd-on .fd-spread'), tabs: [...c.querySelectorAll('.frp-tab')].map(t => t.textContent), readme: /INVENTED-README-MARK one/.test((c.querySelector('.frp-readme') || {}).textContent || ''),
       keys: [...c.querySelectorAll('button.btn, a.btn')].map(k => [k.textContent.trim(), cs(k).fontSize, Math.round(k.getBoundingClientRect().height)]) }; });
   ok(card && /example-owner\/quill-notes/.test(card.h) && card.tabs.join('|') === 'README|Files (5)|Issues (2)' && card.readme, 'the folder shows the repository\'s card: README (shown), Files (5) and Issues (2)', card);
-  ok(card && card.hfs === '16.5px' && card.keys.every(k => parseFloat(k[1]) <= 13 && k[2] <= 34), 'the card is in the app\'s scale: its heading 16.5px, its keys small (12px to 13px, no taller than 34px)', card && card.keys);
+  // 6.69: in Folders' drawer look (modules/r263.js) an opened folder is a spread, and every heading on its pages is 20px, as she approved it
+  ok(card && (card.hfs === '16.5px' || (card.spread && card.hfs === '20px')) && card.keys.every(k => parseFloat(k[1]) <= 13 && k[2] <= 34), 'the card is in the app\'s scale: its heading 16.5px (20px on an opened folder\'s spread), its keys small (12px to 13px, no taller than 34px)', card && [card.hfs, card.spread, card.keys]);
   await p.evaluate(() => [...document.querySelectorAll('#frpCard .frp-tab')].find(t => /Files/.test(t.textContent)).click()); await p.waitForTimeout(300);
   await p.evaluate(() => { const li = [...document.querySelectorAll('#frpCard .frp-list > li')].find(l => /src\/app\.js/.test(l.textContent)); [...li.querySelectorAll('button')].find(k => k.textContent === 'Show').click(); }); await p.waitForTimeout(400);
   const shownFile = await p.evaluate(() => { const li = [...document.querySelectorAll('#frpCard .frp-list > li')].find(l => /src\/app\.js/.test(l.textContent)); return (li.querySelector('.frp-text') || {}).textContent || ''; });

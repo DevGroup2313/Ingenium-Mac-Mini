@@ -1,0 +1,476 @@
+<title>Ingenium Folders</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap">
+<style>
+/* the page around the preview window */
+:root{--pg:#e9e6ef;--pgink:#4a4358;--pgink2:#6c6579;--pgline:rgba(34,26,46,.12);--pgkey:#ffffff;--pgacc:#6a3fb5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pg:#0b0910;--pgink:#d3c9e3;--pgink2:#a99cc1;--pgline:rgba(205,184,240,.14);--pgkey:#211a2d;--pgacc:#b79ce6;color-scheme:dark}}
+:root[data-theme="dark"]{--pg:#0b0910;--pgink:#d3c9e3;--pgink2:#a99cc1;--pgline:rgba(205,184,240,.14);--pgkey:#211a2d;--pgacc:#b79ce6;color-scheme:dark}
+body{background:var(--pg);color:var(--pgink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:13px;color:var(--pgink2)}
+.bar b{color:var(--pgink);font-weight:600}
+.tg{min-width:72px;padding:6px 14px;border-radius:999px;border:1px solid var(--pgline);background:var(--pgkey);color:var(--pgink);font-family:inherit;font-weight:600;font-size:12.5px;line-height:1.2;cursor:pointer;
+  box-shadow:0 1px 0 var(--pgline),0 3px 8px rgba(40,22,68,.10);transition:transform .25s cubic-bezier(.34,1.35,.64,1)}
+.tg:hover{transform:translateY(-1px)}.tg:active{transform:translateY(1px)}.tg:focus-visible{outline:2px solid var(--pgacc);outline-offset:2px}
+.stage{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:12px}
+.fit{position:relative;margin:0 auto;overflow:hidden;border-radius:14px;box-shadow:0 0 0 1px var(--pgline),0 18px 48px rgba(20,10,40,.22)}
+.note{max-width:80ch;margin:4px auto 24px;color:var(--pgink2);font-size:12.5px;text-align:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* the app's window: 1440 by 900, scaled to fit */
+.win{position:absolute;left:0;top:0;width:1440px;height:900px;overflow:hidden;transform-origin:0 0;background:#f5f3f7;
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#221a2e;-webkit-font-smoothing:antialiased}
+.win[data-theme="night"]{background:#110d18;color:#f3eefb}
+.win img{display:block;max-width:none;-webkit-user-drag:none;user-select:none}
+.win .only-night{display:none}.win[data-theme="night"] .only-night{display:block}.win[data-theme="night"] .only-day{display:none}
+.win .back{position:absolute;inset:0;z-index:0}.win .back img{width:1440px;height:900px}
+.win .scroll{position:absolute;inset:0;z-index:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.win .scroll::-webkit-scrollbar{display:none}
+.win .page{padding:61px 84px 60px 229px}
+.win .top{position:absolute;left:0;top:0;z-index:5;pointer-events:none}.win .top img{width:1440px;height:{{T}}px}
+.win .rail{position:absolute;left:0;top:{{T}}px;z-index:5;pointer-events:none}.win .rail img{width:{{L}}px;height:{{RH}}px}
+.win .right{position:absolute;left:{{RX}}px;top:{{T}}px;z-index:5;pointer-events:none}.win .right img{width:{{RW}}px;height:{{RH}}px}
+.win .pv-toast{position:absolute;left:50%;bottom:26px;z-index:95;transform:translate(-50%,16px);padding:8px 16px;border-radius:999px;background:#fff;color:#221a2e;
+  box-shadow:inset 0 0 0 1px rgba(34,26,46,.10),0 10px 24px rgba(40,22,68,.18);font-family:inherit;font-weight:600;font-size:13px;line-height:1.3;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .35s cubic-bezier(.22,1,.36,1)}
+.win[data-theme="night"] .pv-toast{background:#211a2d;color:#f3eefb;box-shadow:inset 0 0 0 1px rgba(205,184,240,.12),0 10px 24px rgba(0,0,0,.5)}
+.win .pv-toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== Blend, in Home's language ===== */
+.win{--ink1:#221a2e;--ink2:#4a4358;--ink3:#6c6579;--hair:rgba(34,26,46,.10);--hair2:rgba(34,26,46,.06);--acc:#6a3fb5;--gold:#b88a3a;--hi:#ffffff;--lo:#faf8fc;
+  --slab:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 rgba(40,22,68,.10),0 3px 0 rgba(40,22,68,.05),0 6px 12px rgba(40,22,68,.07),0 18px 36px rgba(40,22,68,.08);
+  --key:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --keyhi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --press:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --pa:#7a50c6;--pb:#5d37a1;--pedge:#3a2070;--keyA:#ffffff;--keyB:#f6f2fb;--sunk:rgba(34,26,46,.035);
+  --sky:radial-gradient(ellipse 70% 80% at 70% 60%,#fdfbff 0%,#f4eefb 46%,#e8def5 100%);--skyring:rgba(106,63,181,.10);--line:rgba(106,63,181,.30);--line2:rgba(106,63,181,.18);
+  --star:#8c6ad0;--starop:.35;--shade:rgba(40,22,68,.30);--coin0:#ffffff;--coin1:#efe8f8;--rim0:#b39bea;--rim1:#6a3fb5;--rim2:#472b7f;--erim0:#ddd2ef;--erim1:#a891d4;--serif:"Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif}
+.win[data-theme="night"]{--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;--hair:rgba(205,184,240,.12);--hair2:rgba(205,184,240,.07);--acc:#b79ce6;--gold:#d8b46a;--hi:#211a2d;--lo:#1b1526;
+  --slab:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
+  --key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --keyhi:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);--pedge:#170b30;--keyA:#2a2239;--keyB:#231c31;--sunk:rgba(10,6,18,.32);
+  --sky:radial-gradient(ellipse 70% 80% at 70% 60%,#241a38 0%,#161024 50%,#0c0915 100%);--skyring:rgba(205,184,240,.10);--line:rgba(196,176,238,.30);--line2:rgba(196,176,238,.16);
+  --star:#f3e7c8;--starop:.6;--shade:rgba(0,0,0,.62);--coin0:#372d4d;--coin1:#1a1524;--rim0:#e2d5fa;--rim1:#9a7ad8;--rim2:#3d2572;--erim0:#43375e;--erim1:#1d1729}
+.bx{display:flex;flex-direction:column;gap:22px;color:var(--ink1)}
+/* the head: Home's sky, the words, the two ways in, and the blend's engine with the chosen models riding round it */
+.bx-head{position:relative;height:430px;border-radius:30px;overflow:hidden;isolation:isolate;background:var(--sky);
+  box-shadow:inset 0 0 0 1px var(--skyring),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.08)}
+.win[data-theme="night"] .bx-head{box-shadow:inset 0 0 0 1px var(--skyring),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4)}
+.bx-stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+.bx-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--star);opacity:var(--starop);animation:bxTw 5s ease-in-out infinite}
+@keyframes bxTw{0%,100%{opacity:.15}50%{opacity:.7}}
+.bx-words{position:absolute;left:40px;top:34px;z-index:5;width:470px}
+.bx-eyebrow{display:flex;gap:14px;font:600 11.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.bx-eyebrow b{color:var(--acc);font-weight:600}
+.bx-title{margin:12px 0 10px;font:600 48px/1.04 var(--serif);letter-spacing:.004em;color:var(--ink1)}
+.bx-lede{margin:0 0 18px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.bx-tabs{display:flex;gap:10px}
+/* keys, as Home's card keys: a raised face that lifts and sinks */
+.bx-key{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:8px 16px;border-radius:12px;border:1px solid var(--hair);
+  background:linear-gradient(var(--keyA),var(--keyB));color:var(--ink1);font-family:inherit;font-weight:600;font-size:13px;line-height:1.2;cursor:pointer;box-shadow:var(--key);
+  transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}
+.bx-key:hover{transform:translateY(-2px);box-shadow:var(--keyhi)}.bx-key:active{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}
+.bx-key:focus-visible{outline:2.5px solid var(--acc);outline-offset:3px}
+.bx-key.pri,.bx-key[aria-selected="true"]{background:linear-gradient(var(--pa),var(--pb));border-color:transparent;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pedge),0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16)}
+.bx-key.pri:hover,.bx-key[aria-selected="true"]:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 var(--pedge),0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18)}
+.bx-key svg{width:16px;height:16px}
+.bx-key[disabled]{opacity:.55;cursor:default;transform:none}
+/* a coin (and an orb): drawn in layers that stand at their own depths, swaying as the seal sways; it tilts to follow a mouse,
+   lifts under it and sinks when pressed (as Ingenium's seal key does) */
+.coin,.orb{position:relative;display:block;--rx:0deg;--ry:0deg;--cdl:0px;--cds:1;perspective:calc(var(--S) * 4)}
+.coin{--S:76px;width:var(--S);height:var(--S)}
+.orb{width:var(--S);height:var(--S)}
+.tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--cdl)) scale(var(--cds));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.idle{position:absolute;inset:0;transform-style:preserve-3d;animation:bxSway 7s ease-in-out infinite;animation-delay:var(--od,0s)}
+@keyframes bxSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
+.cast{position:absolute;left:22%;right:22%;bottom:-4%;height:9%;border-radius:50%;background:rgba(42,20,80,.16);filter:blur(calc(var(--S) * .045));transform:translateZ(calc(var(--S) * -.12));transition:opacity .35s ease,transform .35s ease}
+.win[data-theme="night"] .cast{background:rgba(0,0,0,.4)}
+.lay{position:absolute;left:0;top:0;width:200%;height:200%;transform-origin:0 0;pointer-events:none;
+  transform:translate(calc(var(--S) * .5),calc(var(--S) * .5)) translateZ(calc(var(--S) * var(--fz))) scale(var(--fk)) translate(calc(var(--S) * -.5),calc(var(--S) * -.5)) scale(.5)}
+.lay > svg{display:block;width:100%;height:100%;overflow:visible}
+.l0{--fz:0;--fk:1}.l2{--fz:.16;--fk:.96}.l3{--fz:.14;--fk:.965}
+.coin .l0 > svg{filter:drop-shadow(calc(var(--S) * .004) calc(var(--S) * .014) calc(var(--S) * .01) rgba(42,20,80,.2))}
+.orb .l0 > svg{filter:drop-shadow(calc(var(--S) * .004) calc(var(--S) * .012) calc(var(--S) * .006) rgba(42,20,80,.24)) drop-shadow(calc(var(--S) * .01) calc(var(--S) * .03) calc(var(--S) * .025) rgba(42,20,80,.12))}
+.l2 > .mono{filter:drop-shadow(calc(var(--S) * .012) calc(var(--S) * .04) calc(var(--S) * .03) rgba(42,20,80,.3))}
+.win[data-theme="night"] .coin .l0 > svg{filter:drop-shadow(calc(var(--S) * .004) calc(var(--S) * .014) calc(var(--S) * .012) rgba(0,0,0,.5))}
+.win[data-theme="night"] .orb .l0 > svg{filter:drop-shadow(calc(var(--S) * .004) calc(var(--S) * .012) calc(var(--S) * .008) rgba(0,0,0,.5)) drop-shadow(calc(var(--S) * .01) calc(var(--S) * .03) calc(var(--S) * .03) rgba(0,0,0,.3))}
+.win[data-theme="night"] .l2 > .mono{filter:drop-shadow(calc(var(--S) * .012) calc(var(--S) * .04) calc(var(--S) * .035) rgba(0,0,0,.55))}
+.mono{position:absolute;inset:0;display:grid;place-items:center;font:600 calc(var(--S) * .78)/1 var(--serif);color:#fff;letter-spacing:.02em}
+.coin .mono{color:var(--rim1);font-size:calc(var(--S) * .8)}
+.win[data-theme="night"] .coin .mono{color:var(--rim0)}
+.l3 .ico{position:absolute;left:50%;top:50%;width:calc(var(--S) * .54);height:calc(var(--S) * .54);margin:calc(var(--S) * -.27) 0 0 calc(var(--S) * -.27);color:#fff;
+  filter:drop-shadow(calc(var(--S) * .016) calc(var(--S) * .05) calc(var(--S) * .04) rgba(42,20,80,.3))}
+.win[data-theme="night"] .l3 .ico{filter:drop-shadow(calc(var(--S) * .016) calc(var(--S) * .045) calc(var(--S) * .045) rgba(0,0,0,.5))}
+.l3 .ico svg{display:block;width:100%;height:100%}
+.orb .cast{left:31%;right:31%;bottom:13%;height:8%}
+/* every card, row and plate that can be pressed leans toward the pointer, lifts under it and sinks when pressed, as Fabrica's cards do */
+.pop{transform:perspective(900px) rotateX(var(--ly,0deg)) rotateY(var(--lx,0deg)) translateY(var(--lz,0px));transition:transform .45s cubic-bezier(.34,1.35,.64,1),box-shadow .3s ease,background .2s ease}
+.pop.ph{--lz:-3px}.pop.pd{--lz:1px;transition-duration:.08s}
+.bx-model.pop.ph,.bx-way.pop.ph,.bx-card.pop.ph,.bx-ans.pop.ph,.bx-final.pop.ph{box-shadow:var(--keyhi)}
+.bx-model.pop.pd,.bx-way.pop.pd,.bx-card.pop.pd,.bx-ans.pop.pd{box-shadow:var(--press)}
+.hov{--cdl:calc(var(--S) * -.03)}.hov .idle{animation-play-state:paused}.hov .cast{opacity:.75;transform:translateZ(calc(var(--S) * -.12)) scale(.92)}
+.dn{--cdl:calc(var(--S) * .05);--cds:.96}.dn .tilt{transition-duration:.08s}.dn .cast{opacity:1;transform:translateZ(calc(var(--S) * -.12)) scale(1.04)}
+.bx-step .coin{--S:64px}
+.bx-step[aria-current="step"] .coin{--S:76px}
+.bx-step[aria-current="step"] .coin .tilt{transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(calc(var(--cdl) - 4px)) scale(var(--cds))}
+.bx-step .tick{position:absolute;right:-2px;top:-2px;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#fff;display:none;place-items:center;
+  box-shadow:0 2px 4px rgba(40,22,68,.3);transform:translateZ(0)}
+.bx-step.done .tick{display:grid}.bx-step .tick svg{width:12px;height:12px}
+
+/* ===== Folders: a filing drawer of your apps, its own design in Ingenium's language ===== */
+.win{--paper:#fffdfa;--paper2:#f6f1fb;--rule:rgba(106,63,181,.13);--margin:rgba(106,63,181,.28);--cover0:#f3ecfc;--cover1:#e2d5f5;--coverEdge:rgba(106,63,181,.28);
+  --inside0:#e6dcf3;--inside1:#d4c6ea;--desk:radial-gradient(ellipse 80% 90% at 70% 40%,#fdfbff 0%,#f3eefa 55%,#e9e1f5 100%)}
+.win[data-theme="night"]{--paper:#2a2238;--paper2:#231c31;--rule:rgba(205,184,240,.12);--margin:rgba(205,184,240,.26);--cover0:#3a2f52;--cover1:#2a2140;--coverEdge:rgba(205,184,240,.22);
+  --inside0:#1d1529;--inside1:#120d1c;--desk:radial-gradient(ellipse 80% 90% at 70% 40%,#251b38 0%,#171025 55%,#0e0a16 100%)}
+.fd{display:flex;flex-direction:column;gap:22px;color:var(--ink1)}
+.fd-head{position:relative;height:480px;border-radius:30px;overflow:hidden;isolation:isolate;background:var(--desk);
+  box-shadow:inset 0 0 0 1px var(--skyring),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.08)}
+.win[data-theme="night"] .fd-head{box-shadow:inset 0 0 0 1px var(--skyring),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4)}
+.fd-head::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(106,63,181,.025) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(106,63,181,.02) 0 1px,transparent 1px 5px)}
+.fd-words{position:absolute;left:40px;top:34px;z-index:5;width:460px}
+.fd-eyebrow{display:flex;gap:14px;font:600 11.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.fd-eyebrow b{color:var(--acc);font-weight:600}
+.fd-title{margin:12px 0 10px;font:600 48px/1.04 var(--serif);letter-spacing:.004em;color:var(--ink1)}
+.fd-lede{margin:0 0 18px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.fd-keys{display:flex;gap:10px;flex-wrap:wrap}
+.fd-contents{max-width:460px;margin-top:30px;padding:12px 16px 8px;border-radius:6px;background:var(--paper);
+  box-shadow:inset 0 0 0 1px var(--hair),0 1px 2px rgba(40,22,68,.10),0 6px 14px rgba(40,22,68,.07)}
+.fd-ih{display:block;margin:0 0 6px;font:700 10.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3)}
+.fd-contents ol{margin:0;padding:0;list-style:none;columns:2;column-gap:22px}
+.fd-contents li{display:flex;gap:8px;align-items:baseline;break-inside:avoid;padding:4px 0 5px;border-bottom:1px solid var(--rule);font-size:12.5px;color:var(--ink2)}
+.fd-contents li:last-child{border-bottom:0}
+.fd-contents li i{min-width:12px;font:600 16px/1 var(--serif);font-style:normal;color:var(--acc)}
+.fd-hint{position:absolute;left:40px;bottom:26px;z-index:5;max-width:440px;font:italic 500 16px/1.4 var(--serif);color:var(--ink3)}
+.fd-hint b{font-style:normal;font-weight:600;color:var(--ink1)}
+/* the drawer, pulled open toward you: its folders stand in a row, each with its tab and its app's seal */
+.fd-drawer{position:absolute;right:38px;top:40px;bottom:30px;width:560px;z-index:3}
+.fd-box{position:absolute;left:0;right:0;top:56px;bottom:62px;border-radius:18px 18px 8px 8px;
+  background:linear-gradient(180deg,var(--inside1),var(--inside0));box-shadow:inset 0 12px 24px rgba(30,12,60,.28),inset 0 0 0 1px var(--coverEdge)}
+.win[data-theme="night"] .fd-box{box-shadow:inset 0 14px 28px rgba(0,0,0,.6),inset 0 0 0 1px var(--coverEdge)}
+.fd-file{position:absolute;left:var(--l);width:var(--w);top:var(--t);height:236px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;text-align:left;pointer-events:none;
+  z-index:calc(10 + var(--i));transform-origin:50% 100%;transform:translateY(var(--rise,0px)) scale(calc(var(--sc) + var(--grow,0)));
+  transition:transform .45s cubic-bezier(.34,1.35,.64,1),filter .35s ease,opacity .35s ease,z-index 0s linear .32s;-webkit-tap-highlight-color:transparent}
+.fd-back,.fd-tab,.fd-front{pointer-events:auto}
+.fd-file:focus{outline:none}.fd-file:focus-visible .fd-tab{box-shadow:0 0 0 2.5px var(--acc)}
+.fd-back{position:absolute;left:0;right:0;top:26px;bottom:0;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,var(--cover0),var(--cover1));
+  box-shadow:inset 0 0 0 1px var(--coverEdge),0 -2px 6px rgba(40,22,68,.10)}
+.fd-tab{position:absolute;z-index:2;left:var(--tx);top:0;height:34px;display:flex;align-items:center;gap:7px;padding:0 14px 0 5px;border-radius:10px 10px 0 0;
+  background:linear-gradient(180deg,var(--cover0),var(--cover0));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px var(--coverEdge);font:600 15px/1 var(--serif);letter-spacing:.03em;color:var(--ink1);white-space:nowrap}
+.fd-tab img,.fd-tab .fd-coin{width:26px;height:26px;flex:0 0 auto;border-radius:50%;filter:drop-shadow(0 1px 1.5px rgba(40,22,68,.3))}
+.fd-paper{position:absolute;z-index:1;left:14px;right:14px;top:36px;height:120px;border-radius:4px;background:linear-gradient(var(--paper),var(--paper2));
+  box-shadow:0 1px 2px rgba(40,22,68,.14);transition:transform .45s cubic-bezier(.34,1.35,.64,1)}
+.fd-paper::before{content:"";position:absolute;left:14px;right:40px;top:16px;height:40px;background:repeating-linear-gradient(180deg,var(--rule) 0 1px,transparent 1px 9px)}
+.fd-paper.p2{left:22px;right:8px;top:42px;transform:rotate(.6deg)}
+.fd-front{position:absolute;z-index:3;left:0;right:0;top:58px;bottom:0;display:flex;align-items:center;gap:14px;padding:16px 18px 0;border-radius:6px 6px 6px 6px;
+  background:linear-gradient(180deg,var(--cover0) 0%,var(--cover1) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 0 0 1px var(--coverEdge),0 -3px 8px rgba(40,22,68,.12);align-items:flex-start}
+.win[data-theme="night"] .fd-front{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 0 1px var(--coverEdge),0 -3px 10px rgba(0,0,0,.4)}
+.fd-front img,.fd-front .fd-coin{width:64px;height:64px;flex:0 0 auto;border-radius:50%;filter:drop-shadow(0 3px 4px rgba(40,22,68,.3))}
+.fd-front b{display:block;font:600 24px/1.1 var(--serif);letter-spacing:.02em;color:var(--ink1)}
+.fd-front small{display:block;margin-top:4px;color:var(--ink3);font-size:12.5px;line-height:1.45}
+.fd-front .parts{display:block;margin-top:5px;color:var(--acc);font-size:11.5px;font-weight:600}
+.fd-file.up{--rise:-64px;--grow:.04;z-index:60;transition:transform .45s cubic-bezier(.34,1.35,.64,1),filter .35s ease,opacity .35s ease,z-index 0s}
+.fd-file.up .fd-paper.p1{transform:translateY(-14px) rotate(-1.4deg)}.fd-file.up .fd-paper.p2{transform:translateY(-22px) rotate(1.8deg)}
+.fd-file.fd-dn{--rise:-54px;--grow:.02;transition-duration:.1s}
+.fd-drawer.hold .fd-file:not(.up){opacity:.75;filter:saturate(.85)}
+.fd-dfront{position:absolute;left:-14px;right:-14px;bottom:0;height:110px;z-index:70;border-radius:14px 14px 22px 22px;
+  background:linear-gradient(180deg,var(--keyA),var(--keyB));box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(40,22,68,.08),0 2px 0 rgba(40,22,68,.12),0 10px 22px rgba(40,22,68,.16),0 26px 40px rgba(40,22,68,.12);
+  display:flex;align-items:center;justify-content:center;gap:26px}
+.win[data-theme="night"] .fd-dfront{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -2px 0 rgba(0,0,0,.4),0 2px 0 rgba(0,0,0,.6),0 10px 22px rgba(0,0,0,.45),0 26px 40px rgba(0,0,0,.4)}
+.fd-label{min-width:190px;padding:8px 16px;border-radius:6px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--coverEdge),inset 0 2px 4px rgba(40,22,68,.12);text-align:center}
+.fd-label b{display:block;font:600 17px/1.1 var(--serif);letter-spacing:.06em;color:var(--ink1)}.fd-label small{display:block;margin-top:2px;color:var(--ink3);font-size:11px}
+.fd-handle{width:120px;height:20px;border-radius:999px;background:linear-gradient(180deg,rgba(40,22,68,.22),rgba(40,22,68,.06));box-shadow:inset 0 2px 4px rgba(40,22,68,.35),0 1px 0 rgba(255,255,255,.6)}
+.win[data-theme="night"] .fd-handle{background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.2));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.06)}
+/* a coin for an app with no seal of its own (as Fabrica gives a new app) */
+.fd-coin{display:grid;place-items:center;background:radial-gradient(circle at 36% 30%,#c9b6ee 0%,#9068d6 32%,#6a3fb5 64%,#3d2275 100%);color:#fff;font:600 15px/1 var(--serif);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.fd-front .fd-coin{font-size:30px}
+/* the catalogue: an index card for every folder */
+.fd-sec{position:relative}
+.fd-h{display:flex;align-items:baseline;gap:12px;margin:0 0 6px;font:600 24px/1.15 var(--serif);letter-spacing:.02em;color:var(--ink1)}
+.fd-sub{margin:0 0 14px;color:var(--ink3);font-size:12.5px;line-height:1.5}
+.fd-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.fd-card{position:relative;display:flex;flex-direction:column;justify-content:flex-start;width:100%;min-height:150px;padding:16px 18px 30px;border:0;border-radius:6px;text-align:left;color:inherit;font:inherit;cursor:pointer;
+  background:var(--paper);box-shadow:inset 0 3px 0 var(--acc),inset 0 0 0 1px var(--hair),0 1px 2px rgba(40,22,68,.12),0 8px 18px rgba(40,22,68,.10)}
+.fd-card::before{content:"";position:absolute;left:18px;right:18px;top:62px;bottom:30px;background:repeating-linear-gradient(180deg,transparent 0 21px,var(--rule) 21px 22px);pointer-events:none}
+.fd-card::after{content:"";position:absolute;left:50%;bottom:10px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--bg-hole,#e9e1f5);box-shadow:inset 0 1px 2px rgba(40,22,68,.35)}
+.win[data-theme="night"] .fd-card::after{background:#120d1b}
+.fd-card .fd-ctop{display:flex;align-items:center;gap:12px}
+.fd-card img,.fd-card .fd-coin{width:44px;height:44px;flex:0 0 auto;border-radius:50%;filter:drop-shadow(0 2px 3px rgba(40,22,68,.28))}
+.fd-card b{font:600 20px/1.1 var(--serif);letter-spacing:.02em}
+.fd-card .meta{position:relative;display:block;margin-top:12px;color:var(--ink2);font-size:12.5px;line-height:22px}
+.fd-card .parts{position:relative;display:block;color:var(--acc);font-size:11.5px;font-weight:600;line-height:22px}
+.fd-card.fd-new{display:flex;align-items:center;justify-content:center;background:transparent;box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink2);font-weight:600;min-height:150px}
+.fd-card.fd-new::before,.fd-card.fd-new::after{display:none}
+.fd-add{display:flex;gap:10px;margin-top:14px}
+.fd-input{flex:1;min-height:38px;padding:8px 12px;border-radius:10px;border:1px solid var(--hair);background:var(--paper);color:var(--ink1);font-family:inherit;font-size:14px}
+.fd-input:focus{outline:2px solid var(--acc);outline-offset:1px}
+/* the build library, a bound volume on its shelf */
+.fd-libwrap{display:flex;gap:28px;align-items:center}
+.fd-shelf{position:relative;flex:0 0 auto;width:170px;height:200px;perspective:900px}
+.fd-shelf::after{content:"";position:absolute;left:-10px;right:-10px;bottom:-6px;height:12px;border-radius:4px;background:linear-gradient(var(--keyA),var(--keyB));box-shadow:0 2px 0 rgba(40,22,68,.14),0 8px 14px rgba(40,22,68,.14)}
+.fd-book{position:absolute;left:30px;bottom:6px;width:120px;height:180px;border:0;padding:0;background:none;cursor:pointer;transform-style:preserve-3d;transform-origin:0 100%;
+  transform:rotateY(var(--by,-26deg)) translateZ(0);transition:transform .55s cubic-bezier(.34,1.35,.64,1)}
+.fd-book:hover,.fd-book:focus-visible{--by:-6deg}.fd-book:active{--by:-10deg;transition-duration:.1s}.fd-book:focus{outline:none}
+.fd-cover{position:absolute;inset:0;border-radius:3px 8px 8px 3px;background:linear-gradient(135deg,#7a50c6,#4f2c94);box-shadow:inset 6px 0 0 rgba(0,0,0,.18),inset 0 0 0 1px rgba(255,255,255,.12),6px 10px 18px rgba(40,22,68,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;text-align:center}
+.fd-cover b{font:600 17px/1.15 var(--serif);letter-spacing:.06em}.fd-cover i{display:block;width:60px;height:1px;background:rgba(255,255,255,.5)}
+.fd-cover small{font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.fd-pages{position:absolute;right:-8px;top:5px;bottom:5px;width:8px;border-radius:0 3px 3px 0;background:repeating-linear-gradient(180deg,#fffaf2 0 2px,#e9e1d4 2px 3px);transform:rotateY(90deg);transform-origin:0 50%}
+.fd-spine{position:absolute;left:-26px;top:0;bottom:0;width:26px;border-radius:4px 0 0 4px;background:linear-gradient(90deg,#3c2275,#5d37a1);transform:rotateY(-90deg);transform-origin:100% 50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;font:600 10px/1 var(--serif);letter-spacing:.2em;writing-mode:vertical-rl}
+/* bring in your work: envelopes in a tray */
+.fd-tray{padding:16px;border-radius:20px;background:var(--sunk);box-shadow:inset 0 2px 6px rgba(40,22,68,.12),inset 0 0 0 1px var(--hair2)}
+.fd-envs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.fd-env{position:relative;display:flex;flex-direction:column;gap:6px;padding:52px 16px 16px;border-radius:8px;background:var(--paper);overflow:hidden;
+  box-shadow:inset 0 0 0 1px var(--hair),0 1px 2px rgba(40,22,68,.12),0 8px 16px rgba(40,22,68,.08)}
+.fd-env::before{content:"";position:absolute;left:0;right:0;top:0;height:44px;background:linear-gradient(var(--cover0),var(--cover1));clip-path:polygon(0 0,100% 0,100% 30%,50% 100%,0 30%)}
+.fd-env .orb{--S:50px;position:absolute;left:50%;top:6px;margin-left:-25px}
+.fd-env b{margin-top:14px;font:600 17px/1.2 var(--serif);letter-spacing:.03em}
+.fd-env p{margin:0;color:var(--ink2);font-size:12px;line-height:1.5;flex:1}
+.fd-env .keys{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.fd-env .bx-key{min-height:32px;padding:6px 12px;font-size:12px}
+/* how I work: a ruled sheet with the seal pressed faintly in its corner */
+.fd-sheet{position:relative;padding:22px 26px 24px 58px;border-radius:6px;background:var(--paper);
+  box-shadow:inset 0 0 0 1px var(--hair),0 1px 2px rgba(40,22,68,.12),0 12px 24px rgba(40,22,68,.10)}
+.fd-sheet::before{content:"";position:absolute;left:40px;top:0;bottom:0;width:1px;background:var(--margin)}
+.fd-sheet .fd-ta{display:block;width:100%;min-height:130px;padding:0;border:0;background:repeating-linear-gradient(180deg,transparent 0 25px,var(--rule) 25px 26px);
+  color:var(--ink1);font-family:inherit;font-size:14px;line-height:26px;resize:vertical}
+.fd-sheet .fd-ta:focus{outline:none}
+.fd-sheet .seal{position:absolute;right:22px;top:18px;width:54px;height:54px;opacity:.16;border-radius:50%}
+/* a folder, opened: the inside of its cover on the left, its papers on the right */
+.fd-open{display:flex;flex-direction:column;gap:16px}
+.fd-crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3)}.fd-crumb .bx-key{min-height:30px;padding:5px 12px;font-size:12.5px}
+.fd-spread{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:0;border-radius:18px;overflow:hidden;perspective:1600px;
+  box-shadow:0 2px 0 rgba(40,22,68,.10),0 14px 30px rgba(40,22,68,.14),0 34px 60px rgba(40,22,68,.10)}
+.fd-left{position:relative;padding:22px 24px;background:linear-gradient(180deg,var(--cover0),var(--cover1));box-shadow:inset -10px 0 18px rgba(40,22,68,.10);transform-origin:100% 50%;
+  animation:fdOpen .7s cubic-bezier(.22,1,.36,1)}
+@keyframes fdOpen{0%{transform:rotateY(-70deg);opacity:.2}100%{transform:none;opacity:1}}
+.fd-right{position:relative;padding:22px 26px;background:var(--paper);box-shadow:inset 10px 0 18px rgba(40,22,68,.06)}
+.fd-ohead{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.fd-ohead img,.fd-ohead .fd-coin{width:84px;height:84px;border-radius:50%;filter:drop-shadow(0 4px 6px rgba(40,22,68,.3))}
+.fd-ohead .fd-coin{font-size:38px}
+.fd-ohead h2{margin:0;font:600 38px/1.05 var(--serif);letter-spacing:.01em}.fd-ohead small{display:block;margin-top:5px;color:var(--ink3);font-size:12px}
+.fd-okeys{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
+.fd-blk{margin:0 0 16px}.fd-blk h3{margin:0 0 6px;font:600 20px/1.2 var(--serif);letter-spacing:.02em}
+.fd-brief{padding:12px 14px;border-radius:10px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--hair);font-size:13.5px;line-height:1.6;margin-bottom:10px}
+.fd-blk .fd-ta2{width:100%;min-height:96px;padding:10px 12px;border-radius:10px;border:1px solid var(--hair);background:var(--paper);color:var(--ink1);font-family:inherit;font-size:13.5px;line-height:1.55;resize:vertical}
+.fd-slips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fd-slip{position:relative;display:block;width:100%;padding:16px 14px 12px;border:0;border-radius:4px;background:var(--paper2);color:inherit;font:inherit;text-align:left;cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--hair),0 1px 2px rgba(40,22,68,.10),0 6px 12px rgba(40,22,68,.08)}
+.fd-slip::before{content:"";position:absolute;right:12px;top:-7px;width:44px;height:12px;border-radius:5px 5px 0 0;background:var(--cover1);box-shadow:inset 0 0 0 1px var(--coverEdge)}
+.fd-slip b{display:block;font:600 16px/1.2 var(--serif);letter-spacing:.03em}.fd-slip small{display:block;margin-top:3px;color:var(--ink3);font-size:11.5px}
+.fd-ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fd-li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--paper2);font-size:13px}.fd-li span{flex:1}.fd-li .bx-key{min-height:28px;padding:4px 10px;font-size:12px}
+.fd-small{margin:10px 0 6px;font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3)}
+.fd-conv{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:var(--paper2);color:inherit;font:inherit;text-align:left;cursor:pointer;
+  box-shadow:inset 0 0 0 1px var(--hair2);margin-bottom:8px}
+.fd-conv .orb{--S:42px;flex:0 0 auto;margin:-5px}.fd-conv b{display:block;font:600 16px/1.2 var(--serif)}.fd-conv small{display:block;color:var(--ink3);font-size:11.5px}
+.fd-conv .go{margin-left:auto;color:var(--acc);font-weight:600;font-size:12px;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.fd-file,.fd-paper,.fd-book{transition:none}.fd-left{animation:none}}
+
+</style>
+
+<div class="bar"><span><b>Ingenium</b> · Folders, its own design (a preview)</span><button class="tg" id="themeKey" type="button">Night</button></div>
+<div class="stage" id="stage"><div class="fit" id="fit">
+<div class="win" id="win" data-theme="day">
+<script>(function(){try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.getAttribute("data-theme")!=="light")document.getElementById("win").setAttribute("data-theme","night");}catch(e){}})();</script>
+  <div class="back" aria-hidden="true"><img class="only-day" alt="" src="{{BACK_DAY}}"><img class="only-night" alt="" src="{{BACK_NIGHT}}"></div>
+  <div class="scroll" id="scroll"><div class="page"><div class="fd" id="fd">
+    <section class="fd-head" aria-labelledby="fdTitle">
+      <div class="fd-words">
+        <div class="fd-eyebrow"><b>Ingenium</b><span>Folders · a drawer of your apps</span></div>
+        <h1 class="fd-title" id="fdTitle">Folders</h1>
+        <p class="fd-lede">A folder for each of your apps: how you like to work on it, where you left off, and its conversations. A conversation in a folder starts from these few lines, so a model need not read everything again.</p>
+        <div class="fd-keys"><button class="bx-key pri" type="button" id="fdNewTop">A folder for another app</button><button class="bx-key" type="button" id="fdBringTop">Bring in your work</button></div>
+        <div class="fd-contents"><span class="fd-ih">In every folder</span><ol><li><i>1</i>Where we left off</li><li><i>2</i>How I work</li><li><i>3</i>How it was built</li><li><i>4</i>Decisions, and what is open</li><li><i>5</i>Its conversations</li></ol></div>
+      </div>
+      <div class="fd-hint" id="fdHint" aria-live="polite"></div>
+      <div class="fd-drawer" id="fdDrawer"><div class="fd-box" aria-hidden="true"></div><div id="fdFiles"></div>
+        <div class="fd-dfront" aria-hidden="true"><div class="fd-handle"></div><div class="fd-label"><b>Your apps</b><small id="fdCount"></small></div><div class="fd-handle"></div></div></div>
+    </section>
+    <div id="fdHome" class="fd">
+      <section class="fd-sec" aria-labelledby="fdCatH"><h2 class="fd-h" id="fdCatH">Every folder</h2><p class="fd-sub">An index card for each of your apps. Press one to open its folder.</p>
+        <div class="fd-cards" id="fdCards"></div>
+        <div class="fd-add" id="fdAdd" hidden><input class="fd-input" id="fdAddName" placeholder="The app's name" aria-label="The new app's name"><button class="bx-key pri" type="button" id="fdMake">Make the folder</button><button class="bx-key" type="button" id="fdCancel">Cancel</button></div></section>
+      <section class="fd-sec" aria-labelledby="fdLibH"><div class="fd-libwrap">
+        <div class="fd-shelf"><button class="fd-book" type="button" id="fdBook" aria-label="Your build library"><span class="fd-spine" aria-hidden="true">BUILD LIBRARY</span><span class="fd-cover" aria-hidden="true"><small>Ingenium</small><i></i><b>Your build<br>library</b><i></i><small>By app, by part</small></span><span class="fd-pages" aria-hidden="true"></span></button></div>
+        <div><h2 class="fd-h" id="fdLibH">Your build library</h2><p class="fd-sub" style="margin-bottom:12px">How each of your apps was built, filed by app and by part, kept on this device. Bring in your build library (the zip of notes) and each app's notes appear in its folder, under How it was built.</p>
+          <button class="bx-key pri" type="button" data-say="In Ingenium this opens the file chooser for your build library.">Bring in the build library</button></div></div></section>
+      <section class="fd-sec" id="fdBring" aria-labelledby="fdBringH"><h2 class="fd-h" id="fdBringH">Bring in your work</h2>
+        <p class="fd-sub">Each is read on this device and nothing is sent anywhere. What comes in is sorted into your folders by the words that name your apps, and you can move any of it.</p>
+        <div class="fd-tray"><div class="fd-envs" id="fdEnvs"></div></div></section>
+      <section class="fd-sec" aria-labelledby="fdHowH"><h2 class="fd-h" id="fdHowH">How I work, on every app</h2>
+        <p class="fd-sub">In your own words: how you like to work, what you expect of a model, what you never want. It goes with every conversation in a folder, before the folder's own notes.</p>
+        <div class="fd-sheet"><img class="seal only-day" alt="" src="{{SEAL_INGENIUM}}"><img class="seal only-night" alt="" src="{{SEAL_INGENIUMN}}"><textarea class="fd-ta" aria-label="How I work, on every app">- Show me a live preview before anything changes.
+- One clear step at a time, with every step visible.</textarea></div></section>
+    </div>
+    <div id="fdOpen" class="fd-open" hidden></div>
+  </div></div></div>
+  <div class="top" aria-hidden="true"><img class="only-day" alt="" src="{{TOP_DAY}}"><img class="only-night" alt="" src="{{TOP_NIGHT}}"></div>
+  <div class="rail" aria-hidden="true"><img class="only-day" alt="" src="{{RAIL_DAY}}"><img class="only-night" alt="" src="{{RAIL_NIGHT}}"></div>
+  <div class="right" aria-hidden="true"><img class="only-day" alt="" src="{{RIGHT_DAY}}"><img class="only-night" alt="" src="{{RIGHT_NIGHT}}"></div>
+  <div class="pv-toast" id="pvToast" role="status" aria-live="polite"></div>
+</div>
+</div></div>
+<p class="note">A preview of Folders with its own design, for you to try before anything changes in Ingenium. Your folders stand in a drawer: point at one to lift it out, press it to open it. Each carries its app's own seal. The folders, notes and conversations here are made up for the preview. The top bar, the side list and the side buttons are pictures of the app.</p>
+<script>
+(function(){
+"use strict";
+var D=document,W=window,win=D.getElementById("win"),fitBox=D.getElementById("fit"),stage=D.getElementById("stage");
+function still(){try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+function fit(){var cs=getComputedStyle(stage),aw=stage.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  var ah=W.innerHeight-fitBox.getBoundingClientRect().top+W.scrollY-56;var s=Math.min(1,aw/1440,Math.max(ah,520)/900);if(!(s>0))s=.5;
+  win.style.transform="scale("+s+")";fitBox.style.width=Math.floor(1440*s)+"px";fitBox.style.height=Math.floor(900*s)+"px";}
+W.addEventListener("resize",fit);fit();setTimeout(fit,60);
+var key=D.getElementById("themeKey");function night(){return win.getAttribute("data-theme")==="night";}
+function label(){key.textContent=night()?"Day":"Night";}
+key.addEventListener("click",function(){var n=!night();win.setAttribute("data-theme",n?"night":"day");D.documentElement.setAttribute("data-theme",n?"dark":"light");label();paintOrbs();});label();
+var tst=D.getElementById("pvToast"),tt=0;function say(t){tst.textContent=t;tst.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){tst.classList.remove("on");},2100);}
+function el(t,c,h){var e=D.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+
+/* ---------- the orbs and coins, made as the seal is made ---------- */
+var TONES=[["#a57fe8","#6a3fb5","#2e1764"],["#9283f2","#4d3db0","#1e1660"],["#c48ae8","#8641b8","#3e1760"],["#b47ad9","#7637a8","#331455"],["#b9a3f2","#7458c6","#33206c"],["#9a6be0","#5c31a4","#250f4b"],["#a98ce8","#6648b8","#281a5e"]];
+var DAY=["#c9b6ee","#9068d6","#6a3fb5","#55309a","#3d2275"];
+function hex(c){c=c.replace("#","");return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+function mix(a,b,t){var A=hex(a),B=hex(b);return "#"+A.map(function(v,i){var n=Math.round(v+(B[i]-v)*t);return (n<16?"0":"")+n.toString(16);}).join("");}
+var NS=0;
+/* the ball, as Home's orbs: its body, the side away from the light, its edge, one soft highlight (no glow, no glare) */
+function ballSvg(T){var id="bs"+(++NS),R=' transform="rotate(44 60 60)"',hi=mix(T[0],"#ffffff",.5),deep=mix(T[2],"#000000",.42),nt=night();
+  var c=nt?[hi,T[0],T[1],T[2],deep]:DAY,sh=nt?"#0b0220":"#2a1260",t1=nt?.32:.2,t2=nt?.6:.4,e1=nt?.2:.1,e2=nt?.42:.26;
+  return '<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs><radialGradient id="'+id+'b" cx=".36" cy=".5" r=".74" fx=".2" fy=".5"><stop offset="0" stop-color="'+c[0]+'"/><stop offset=".16" stop-color="'+c[1]+'"/><stop offset=".52" stop-color="'+c[2]+'"/><stop offset=".86" stop-color="'+c[3]+'"/><stop offset="1" stop-color="'+c[4]+'"/></radialGradient>'+
+    '<linearGradient id="'+id+'t" x1="0" y1="0" x2="1" y2="0"><stop offset=".4" stop-color="'+sh+'" stop-opacity="0"/><stop offset=".76" stop-color="'+sh+'" stop-opacity="'+t1+'"/><stop offset="1" stop-color="'+sh+'" stop-opacity="'+t2+'"/></linearGradient>'+
+    '<radialGradient id="'+id+'e" cx=".5" cy=".5" r=".5"><stop offset=".7" stop-color="'+sh+'" stop-opacity="0"/><stop offset=".93" stop-color="'+sh+'" stop-opacity="'+e1+'"/><stop offset="1" stop-color="'+sh+'" stop-opacity="'+e2+'"/></radialGradient>'+
+    '<radialGradient id="'+id+'s" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".4" stop-color="#fff" stop-opacity=".32"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+    '<clipPath id="'+id+'c"><circle cx="60" cy="60" r="40"/></clipPath></defs>'+
+    '<g'+R+'><circle cx="60" cy="60" r="40" fill="url(#'+id+'b)"/></g><g'+R+'><g clip-path="url(#'+id+'c)"><rect x="18" y="18" width="84" height="84" fill="url(#'+id+'t)"/></g></g>'+
+    '<circle cx="60" cy="60" r="40" fill="url(#'+id+'e)"/><g'+R+'><ellipse cx="41" cy="60" rx="9.5" ry="13.5" fill="url(#'+id+'s)"/></g></svg>';}
+function coinSvg(){var id="cs"+(++NS);
+  return '<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs><linearGradient id="'+id+'r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--rim0)"/><stop offset=".5" style="stop-color:var(--rim1)"/><stop offset="1" style="stop-color:var(--rim2)"/></linearGradient>'+
+    '<radialGradient id="'+id+'f" cx=".42" cy=".36" r=".75"><stop offset="0" style="stop-color:var(--coin0)"/><stop offset="1" style="stop-color:var(--coin1)"/></radialGradient></defs>'+
+    '<circle cx="60" cy="60" r="54" fill="url(#'+id+'r)"/><circle cx="60" cy="60" r="46" fill="url(#'+id+'f)"/><circle cx="60" cy="60" r="46" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/></svg>';}
+/* each model's own mark, drawn as Ingenium's room marks are (white lines on the orb) */
+var MARK={velox:'<path d="M4.5 19.5l11-11"/><path d="M9.5 8.5h6v6"/><path d="M3.5 12.5h4M6.5 16.5h3"/>',
+  magister:'<path d="M12 4.5v15M7.5 19.5h9M5 8h14"/><path d="M5 8l-2.6 5.5a2.6 2.6 0 0 0 5.2 0z"/><path d="M19 8l-2.6 5.5a2.6 2.6 0 0 0 5.2 0z"/><circle cx="12" cy="4.5" r="1"/>',
+  scriba:'<path d="M19.5 4.5c-6 .8-10.6 5.2-12.6 11.2l-.9 3.8 3.8-.9c6-2 10.4-6.6 11.2-12.6z"/><path d="M6.9 17.1l5.6-5.6"/>',
+  faber:'<path d="M13.5 6.5l4 4"/><path d="M12 8l-7.5 7.5a1.4 1.4 0 0 0 0 2l2 2a1.4 1.4 0 0 0 2 0L16 12"/><path d="M12 8l2.5-2.5a2.8 2.8 0 0 1 4 4L16 12"/>',
+  cloud:'<path d="M7 18.5h10a4 4 0 0 0 .4-8 5.8 5.8 0 0 0-11.2 1.6A3.3 3.3 0 0 0 7 18.5z"/><path d="M10 14.5h4"/>'};
+function markSvg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+(MARK[k]||MARK.cloud)+'</svg>';}
+/* a thing drawn in layers, as the seal is: its cast, its body, and its mark standing above it */
+function layered(kind,mark,T,od){var w=el("span",kind);w.setAttribute("aria-hidden","true");if(od!=null)w.style.setProperty("--od",od+"s");
+  w.innerHTML='<span class="tilt"><span class="idle"><i class="cast"></i><span class="lay l0">'+(kind==="coin"?coinSvg():ballSvg(T))+'</span>'+
+    (kind==="coin"?'<span class="lay l2"><span class="mono">'+mark+'</span></span>':'<span class="lay l3"><span class="ico">'+markSvg(mark)+'</span></span>')+'</span></span>';
+  w.__T=T;w.__mark=mark;return w;}
+function repaint(o){if(!o.__T)return;var l=o.querySelector(".l0");if(l)l.innerHTML=ballSvg(o.__T);}
+function paintOrbs(){[].forEach.call(D.querySelectorAll(".orb"),repaint);}
+/* it answers the pointer as the seal key does: it tilts to follow a mouse and lifts; pressed, it sinks */
+function wire(host,o){host.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"&&!still())o.classList.add("hov");});
+  host.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=o.getBoundingClientRect();if(!r.width)return;
+    var x=Math.max(-.25,Math.min(1.25,(e.clientX-r.left)/r.width)),y=Math.max(-.25,Math.min(1.25,(e.clientY-r.top)/r.height));
+    o.style.setProperty("--ry",((x-.5)*28).toFixed(1)+"deg");o.style.setProperty("--rx",(-(y-.5)*24).toFixed(1)+"deg");},{passive:true});
+  host.addEventListener("pointerleave",function(){o.classList.remove("hov","dn");o.style.setProperty("--rx","0deg");o.style.setProperty("--ry","0deg");});
+  host.addEventListener("pointerdown",function(){if(!still())o.classList.add("dn");});
+  ["pointerup","pointercancel"].forEach(function(t){host.addEventListener(t,function(){o.classList.remove("dn");});});
+  host.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!still()){o.classList.add("dn");setTimeout(function(){o.classList.remove("dn");},140);}});}
+/* cards, rows and plates lean toward the pointer, lift under it and sink when pressed (as Fabrica's cards do) */
+function pop(elm){elm.classList.add("pop");
+  elm.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"&&!still())elm.classList.add("ph");});
+  elm.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=elm.getBoundingClientRect();if(!r.width)return;
+    var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5,k=Math.min(1,320/Math.max(r.width,r.height));
+    elm.style.setProperty("--lx",(x*7*k).toFixed(2)+"deg");elm.style.setProperty("--ly",(-y*7*k).toFixed(2)+"deg");},{passive:true});
+  elm.addEventListener("pointerleave",function(){elm.classList.remove("ph","pd");elm.style.setProperty("--lx","0deg");elm.style.setProperty("--ly","0deg");});
+  elm.addEventListener("pointerdown",function(){if(!still())elm.classList.add("pd");});
+  ["pointerup","pointercancel"].forEach(function(t){elm.addEventListener(t,function(){elm.classList.remove("pd");});});return elm;}
+
+
+function toEl(elm,where){var s=D.getElementById("scroll");if(!s||!elm)return;var sr=s.getBoundingClientRect(),k=sr.height/(s.offsetHeight||1)||1,er=elm.getBoundingClientRect();
+  var y=(er.top-sr.top)/k+s.scrollTop;y-=where==="center"?Math.max(0,(s.clientHeight-er.height/k)/2):18;
+  try{s.scrollTo({top:Math.max(0,y),behavior:still()?"auto":"smooth"});}catch(e){s.scrollTop=Math.max(0,y);}}
+/* ---------- the apps' own seals (Ingenium's r140), and a coin for any other app ---------- */
+/* each seal by day and by night, as Ingenium keeps them; the window's Display decides which one shows */
+var SEALS={"Carpe Diem":["{{SEAL_CD}}","{{SEAL_CDN}}"],"The Forge":["{{SEAL_FORGE}}","{{SEAL_FORGEN}}"],"Ingenium":["{{SEAL_INGENIUM}}","{{SEAL_INGENIUMN}}"],"Inkwell":["{{SEAL_INKWELL}}","{{SEAL_INKWELLN}}"]};
+function logo(n,cls){var s=SEALS[n];if(s)return '<img class="only-day '+(cls||"")+'" alt="" src="'+s[0]+'"><img class="only-night '+(cls||"")+'" alt="" src="'+s[1]+'">';return '<span class="fd-coin '+(cls||"")+'" aria-hidden="true">'+n.charAt(0).toUpperCase()+'</span>';}
+MARK.archive='<path d="M4.5 8h15v10.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1z"/><path d="M3.5 4.5h17V8h-17z"/><path d="M10 12h4"/>';
+MARK.tray='<path d="M12 3.5v10.5"/><path d="M7.5 9.5L12 14l4.5-4.5"/><path d="M4 15.5v4h16v-4"/>';
+MARK.terminal='<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M7 9.5l3 2.5-3 2.5M12.5 15H17"/>';
+MARK.globe='<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.7 5.4 3.7 8.5s-1.2 5.9-3.7 8.5c-2.5-2.6-3.7-5.4-3.7-8.5s1.2-5.9 3.7-8.5z"/>';
+MARK.branch='<circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M6 7.2v9.6M18 11.2c0 3.6-4.5 3.9-9.9 5.4"/>';
+MARK.file='<path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4"/><path d="M9 12h6M9 15.5h6"/>';
+MARK.chat='<path d="M5 6.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H10l-4 3v-3H5A1.5 1.5 0 0 1 3.5 16V8A1.5 1.5 0 0 1 5 6.5z"/>';
+var FOLDERS=[{n:"Carpe Diem",c:12,s:"9 November",u:2,parts:"the Desk, Tabula, Abacus"},{n:"The Forge",c:7,s:"8 November",u:0,parts:"its bench, its kits"},
+  {n:"Ingenium",c:21,s:"10 November",u:4,parts:"Home, Blend, Folders"},{n:"Inkwell",c:5,s:"",u:0,parts:""}];
+function meta(f){return f.c+" conversation"+(f.c===1?"":"s")+" · "+(f.s?"summary of "+f.s+(f.u?", "+f.u+" not read yet":""):"no summary yet");}
+/* ---------- the drawer ---------- */
+var drawer=D.getElementById("fdDrawer"),files=D.getElementById("fdFiles"),hint=D.getElementById("fdHint"),held=null,hintText="";
+var TABX=["6%","36%","64%"];
+function lift(f,el2,v){if(v){if(held&&held!==el2)lift(held.__f,held,false);held=el2;el2.classList.add("up");drawer.classList.add("hold");
+    hint.innerHTML="<b>"+f.n+"</b>: "+meta(f)+". Press it to open the folder.";}
+  else{el2.classList.remove("up","fd-dn");if(held===el2){held=null;drawer.classList.remove("hold");hint.textContent=hintText;}}}
+function drawerFiles(){files.innerHTML="";var list=FOLDERS.slice(-6),n=list.length,gap=n>1?Math.min(44,110/(n-1)):0;
+  list.forEach(function(f,i){var b=el("button","fd-file");b.type="button";b.__f=f;var depth=n-1-i;
+    b.style.setProperty("--i",String(i));b.style.setProperty("--t",(150-depth*gap).toFixed(1)+"px");b.style.setProperty("--sc",(1-depth*.035).toFixed(3));
+    b.style.setProperty("--l",(26+depth*6)+"px");b.style.setProperty("--w","calc(100% - "+(52+depth*12)+"px)");b.style.setProperty("--tx",TABX[i%3]);
+    b.setAttribute("aria-label",f.n+": "+meta(f)+". Press to open the folder.");
+    b.innerHTML='<span class="fd-back"></span><span class="fd-tab">'+logo(f.n)+'<span>'+f.n+'</span></span><span class="fd-paper p1"></span><span class="fd-paper p2"></span>'+
+      '<span class="fd-front">'+logo(f.n)+'<span><b>'+f.n+'</b><small>'+meta(f)+'</small>'+(f.parts?'<span class="parts">'+f.parts+'</span>':"")+'</span></span>';
+    b.addEventListener("pointerenter",function(){lift(f,b,true);});b.addEventListener("pointerleave",function(){lift(f,b,false);});
+    b.addEventListener("focus",function(){lift(f,b,true);});b.addEventListener("blur",function(){lift(f,b,false);});
+    b.addEventListener("pointerdown",function(){if(!still())b.classList.add("fd-dn");});b.addEventListener("pointerup",function(){b.classList.remove("fd-dn");});
+    b.addEventListener("click",function(){openFolder(f);});files.appendChild(b);});
+  D.getElementById("fdCount").textContent=FOLDERS.length+" folder"+(FOLDERS.length===1?"":"s");
+  hintText="Point at a folder to lift it out of the drawer; press it to open it.";hint.textContent=hintText;}
+/* ---------- the catalogue: an index card for every folder ---------- */
+var cardsBox=D.getElementById("fdCards"),add=D.getElementById("fdAdd"),addName=D.getElementById("fdAddName");
+function cards(){cardsBox.innerHTML="";FOLDERS.forEach(function(f){var c=el("button","fd-card");c.type="button";
+    c.innerHTML='<span class="fd-ctop">'+logo(f.n)+'<b>'+f.n+'</b></span><span class="meta">'+meta(f)+'</span>'+(f.parts?'<span class="parts">'+f.parts+'</span>':"");
+    pop(c);c.addEventListener("click",function(){openFolder(f);});cardsBox.appendChild(c);});
+  var nb=el("button","fd-card fd-new","+ A folder for another app");nb.type="button";pop(nb);nb.addEventListener("click",showAdd);cardsBox.appendChild(nb);}
+function showAdd(){openHome();add.hidden=false;toEl(add,"center");setTimeout(function(){addName.focus();},250);}
+function make(){var v=addName.value.trim();if(!v){addName.focus();return;}FOLDERS.push({n:v.slice(0,40),c:0,s:"",u:0,parts:""});addName.value="";add.hidden=true;cards();drawerFiles();say("Folder made for "+v+". It stands in the drawer now.");}
+D.getElementById("fdMake").addEventListener("click",make);addName.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();make();}if(e.key==="Escape")add.hidden=true;});
+D.getElementById("fdCancel").addEventListener("click",function(){add.hidden=true;});D.getElementById("fdNewTop").addEventListener("click",showAdd);
+D.getElementById("fdBringTop").addEventListener("click",function(){openHome();toEl(D.getElementById("fdBring"));});
+D.getElementById("fdBook").addEventListener("click",function(){say("In Ingenium this opens your build library.");});
+/* ---------- bring in your work: envelopes in a tray (their words as Ingenium has them) ---------- */
+var SRC=[["archive","Claude, on claude.ai","Ask Claude for your data (Settings, Privacy); bring the .zip it sends, as it came. Your chats come in, and your Claude projects become Ingenium projects.",["Bring in the .zip"]],
+  ["tray","ChatGPT, Gemini, Grok and others","Bring the export each one gives you, as it came. Each conversation comes in with its own date and is sorted into your folders.",["Bring in an export"]],
+  ["terminal","Claude Code, on this computer","Each session is a .jsonl file in the .claude/projects folder of your home folder: one press in the app, or choose the files.",["Choose the session files"]],
+  ["globe","Claude Code, on the web","There is no export for these yet: open the session on claude.ai, copy its conversation, and paste it here.",["Paste a conversation"]],
+  ["branch","A GitHub repository","Its README joins a folder's files; its text files and issues are kept in the folder. It uses the internet, on your press only.",["Bring a repository"]],
+  ["file","Ollama","Paste a Modelfile and its instructions become a way of working; a conversation from Ollama's app can be pasted too.",["Paste a Modelfile","Paste a conversation"]]];
+var envs=D.getElementById("fdEnvs");
+SRC.forEach(function(s,i){var c=el("div","fd-env");var o=layered("orb",s[0],TONES[(i+2)%TONES.length],(-i*1.2).toFixed(1));c.appendChild(o);c.appendChild(el("b",null,s[1]));c.appendChild(el("p",null,s[2]));
+  var ks=el("div","keys");s[3].forEach(function(k,j){var b=el("button","bx-key"+(j===0?" pri":""),k);b.type="button";b.addEventListener("click",function(){say("In Ingenium: "+k.toLowerCase()+".");});ks.appendChild(b);});
+  c.appendChild(ks);wire(c,o);pop(c);envs.appendChild(c);});
+/* ---------- a folder, opened: the inside of its cover, and its papers ---------- */
+var home=D.getElementById("fdHome"),open=D.getElementById("fdOpen");
+function openHome(){open.hidden=true;home.hidden=false;}
+function openFolder(f){if(held)lift(held.__f,held,false);home.hidden=true;open.hidden=false;open.innerHTML="";
+  var cr=el("nav","fd-crumb");cr.setAttribute("aria-label","Where you are");var back=el("button","bx-key","Folders");back.type="button";back.addEventListener("click",function(){openHome();D.getElementById("scroll").scrollTop=0;});
+  cr.appendChild(back);cr.appendChild(el("span",null,"›"));cr.appendChild(el("span",null,f.n));open.appendChild(cr);
+  var sp=el("div","fd-spread");var L2=el("div","fd-left"),R=el("div","fd-right");
+  L2.appendChild(el("div","fd-ohead",logo(f.n)+'<div><h2>'+f.n+'</h2><small>'+meta(f)+(f.parts?" · its parts: "+f.parts:"")+'</small></div>'));
+  var ok=el("div","fd-okeys");[["Start a conversation in this folder",1],["Rename",0]].forEach(function(k){var b=el("button","bx-key"+(k[1]?" pri":""),k[0]);b.type="button";b.addEventListener("click",function(){say("In Ingenium: "+k[0].toLowerCase()+".");});ok.appendChild(b);});L2.appendChild(ok);
+  var wl=el("div","fd-blk");wl.appendChild(el("h3",null,"Where we left off"));wl.appendChild(el("p","fd-sub",f.s?"Brought up to date "+f.s+". "+(f.u?f.u+" conversations not read yet.":"Every conversation in this folder is read."):"No summary yet: Ingenium reads the conversations once, and writes where you left off."));
+  if(f.s)wl.appendChild(el("div","fd-brief","Home is an orrery with the seal as its engine, and Blend follows in the same language. Next: Folders, with a design of its own, previewed first."));
+  var up=el("button","bx-key"+(f.u?" pri":""),f.u?"Bring it up to date ("+f.u+")":"Up to date");up.type="button";if(!f.u)up.disabled=true;up.addEventListener("click",function(){f.u=0;up.textContent="Up to date";up.classList.remove("pri");up.disabled=true;cards();drawerFiles();say("Read once; where you left off is up to date.");});wl.appendChild(up);L2.appendChild(wl);
+  var hw=el("div","fd-blk");hw.appendChild(el("h3",null,"How I work on "+f.n));var ta=el("textarea","fd-ta2");ta.setAttribute("aria-label","How I work on "+f.n);ta.value="- Keep its look and its colours as they are.\n- Preview first, then build.";hw.appendChild(ta);L2.appendChild(hw);
+  var bl=el("div","fd-blk");bl.appendChild(el("h3",null,"How it was built"));bl.appendChild(el("p","fd-sub","From your build library: start here, then its parts by name."));var sl=el("div","fd-slips");
+  [["Start here","What it is, and where each part lives"],["Its look","Colours, type and depth"],["Its sounds","The keys, the cards and the room"],["Its versions","Each release, folded together"]].forEach(function(n){var b=el("button","fd-slip","<b>"+n[0]+"</b><small>"+n[1]+"</small>");b.type="button";pop(b);b.addEventListener("click",function(){say("In Ingenium this opens the note "+n[0]+".");});sl.appendChild(b);});
+  bl.appendChild(sl);R.appendChild(bl);
+  var dc=el("div","fd-blk");dc.appendChild(el("h3",null,"Decisions, and what is open"));
+  [["Decisions so far",["Each app keeps its own seal and colours."]],["Open next",["Folders, with a design of its own."]]].forEach(function(x){dc.appendChild(el("div","fd-small",x[0]));var ul=el("ul","fd-ul");
+    x[1].forEach(function(t){var li=el("li","fd-li","<span>"+t+"</span>");var rm=el("button","bx-key","Remove");rm.type="button";rm.addEventListener("click",function(){li.remove();});li.appendChild(rm);ul.appendChild(li);});dc.appendChild(ul);});
+  R.appendChild(dc);
+  var cv=el("div","fd-blk");cv.appendChild(el("h3",null,"Conversations ("+f.c+")"));
+  [["Home as an orrery","today · 42 messages"],["Blend in Home's language","today · 18 messages"],["The depth of the cards","9 November · 25 messages"]].slice(0,Math.max(1,Math.min(3,f.c))).forEach(function(c,i){var b=el("button","fd-conv");b.type="button";var oo=layered("orb","chat",TONES[i%TONES.length],(-i*1.4).toFixed(1));b.appendChild(oo);
+    b.appendChild(el("span","t","<b>"+c[0]+"</b><small>"+c[1]+"</small>"));b.appendChild(el("span","go","Carry on ›"));wire(b,oo);pop(b);b.addEventListener("click",function(){say("In Ingenium this opens the conversation in the chat.");});cv.appendChild(b);});
+  R.appendChild(cv);sp.appendChild(L2);sp.appendChild(R);open.appendChild(sp);
+  toEl(open);}
+[].forEach.call(D.querySelectorAll("[data-say]"),function(k){k.addEventListener("click",function(){say(k.getAttribute("data-say"));});});
+cards();drawerFiles();
+})();
+</script>

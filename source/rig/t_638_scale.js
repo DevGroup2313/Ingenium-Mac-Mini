@@ -17,7 +17,14 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
 async function boot(p) { await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(1500);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await p.waitForTimeout(500); }
 /* what is meant to stand out, by where it stands */
-const TEXT_OK = [/page-title/, /\bau-h\b/, /fld-h > h2/, /div\.l-head > div > h1|div\.f-head > div > h1|div\.c-hrow > h1/, /hx-hello/, /hx-plaque/, /cc-title/, /stx-big/, /fx-bigclock/, /cc-hello/, /l-paper/, /pc-doc|pcd-/];
+const TEXT_OK = [/page-title/, /\bau-h\b/, /fld-h > h2/, /div\.l-head > div > h1|div\.f-head > div > h1|div\.c-hrow > h1/, /hx-hello/, /hx-plaque/, /cc-title/, /stx-big/, /fx-bigclock/, /cc-hello/, /l-paper/, /pc-doc|pcd-/,
+  /* 6.67, Home as the orrery (modules/r261.js): the line under the sky and the rooms' names on their keys, in Cormorant */
+  /ox-legend/, /hx-kh/,
+  /* 6.69, Folders as a drawer of her apps (modules/r263.js), as she approved it: the line under the words, the folders' tabs, names
+     and label in the drawer, the headings of the page and of an opened folder's spread, the index cards' and the opened folder's
+     names, the envelopes' and the conversations' names, the book's title; the text under them keeps the app's scale */
+  /fd-words > p\.fd-hint/, /fd-tab > span\.fd-tn/, /fd-ft > b/, /fd-label > b/, /fld-wrap > div\.card[^ ]* > h2\.sec/, /fd-(left|right) > div[^ ]* > h2\.sec/,
+  /fld-card > span\.fld-name/, /fd-oh > div > h2/, /fd-env > b/, /li\.fd-conv > div\.fld-t > b/, /fd-cover > b/];
 const KEY_OK = [/cplus-btn/, /#chatSend/, /cc-title/, /r175-seal/, /l-fold|f-fold/, /hx-app\b/, /pcd-toc/];
 const MEASURE = (scopeSel) => {
   const W = window, D = document;
