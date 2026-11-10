@@ -21,6 +21,6 @@ ingenium_demo.html   Home, Chat, Code, Folders, Focus, Models, Blend, Build, the
 Every edition keeps the copyright line and the licence (LICENCE.txt).
 
 Fingerprints (SHA-256). A copy whose fingerprint differs is not the owner's release:
-  df6138a891cd7721a2d7a721aa654526f412f10fe77ddc69670e591bcfe17aaf  ingenium_full.html (42256788 bytes)
-  6446d7b99d0e9a228de4dd7ccc03af95a978a89348e22740792351a30729fd67  ingenium_gift.html (38772579 bytes)
-  bdce9211423264fc47cf268e2816579f7c1bd1fc4c4cca0958b657939e5f672e  ingenium_demo.html (38772579 bytes)
+  dbbe1feb345de77139b2cb0729cdc2335d37d93ab6e6d47100074478aa9ab9b5  ingenium_full.html (42256677 bytes)
+  ea3ce574c1eae47b37931327544572cd3bc5f497086be5736949c1a2d64b1466  ingenium_gift.html (38772468 bytes)
+  2ee0f0a84d508a39cf69d5426a8efd79f43ac02c6e52db933932848c611292a9  ingenium_demo.html (38772468 bytes)

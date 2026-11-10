@@ -244,6 +244,12 @@ def _blank(ed="gift"):
         ("Build, Blend, and Carpe Diem's five apps.", "Build, Blend, and the five apps.", "tour: making things", 1),
         ("Build, Blend and Carpe Diem's five apps turn answers", "Build, Blend and the five apps turn answers", "tour: making things, again", 1),
         ("Out of session, as in Carpe Diem. Starting Clepsydra", "Out of session. Starting Clepsydra", "Guide: your status", 1),
+        # 6.69: Folders' drawer (modules/r263.js) names and draws only Ingenium's own seal here; any other app has its coin
+        ("its app's own seal (Carpe Diem, The Forge, Ingenium and Inkwell carry theirs, by day and by night as your Display is; any other app has a coin with its first letter)",
+         "its app's own seal (Ingenium carries its own, by day and by night as your Display is; any other app has a coin with its first letter)",
+         "Guide: the 6.69 news, Ingenium's seal alone", 1),
+        ('return n==="carpe diem"?"cd":/^(the )?forge$/.test(n)?"forge":n==="ingenium"?"ingenium":n==="inkwell"?"inkwell":null;}',
+         'return n==="ingenium"?"ingenium":null;}', "Folders: Ingenium's seal alone", 1),
     ]
     if not desk:  # their words left the page with the apps (modules r118 and r123)
         E = [e for e in E if e[2] not in ("Tabula: what it is", "Abacus: what it is", "Tabula and Abacus: what they are",
