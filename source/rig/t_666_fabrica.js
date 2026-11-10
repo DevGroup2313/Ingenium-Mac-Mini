@@ -71,7 +71,9 @@ const note = (m) => console.log('     ' + m);
 
   // 3. the Offline Project without Inkwell: an app of its own, with the crest of three
   const can = await p.evaluate(() => !!(window.IngOffline && IngOffline.data && IngOffline.data()));
-  if (!can) { ok(false, 'this page carries the Offline Project (the master edition)'); }
+  const edition = await p.evaluate(() => { try { return typeof ING_EDITION !== 'undefined' ? ING_EDITION : 'master'; } catch (e) { return 'master'; } });
+  if (!can && edition !== 'master') { note('(the ' + edition + ' edition carries no Offline Project: its crest checks are for the master edition)'); }
+  else if (!can) { ok(false, 'this page carries the Offline Project (the master edition)'); }
   else {
     await p.evaluate(() => IngOffline.keep(false)); await p.waitForTimeout(500);
     for (let i = 0; i < 120 && !(await p.evaluate(() => IngRepo.list().then(rs => rs.some(r => r.name === 'The Offline Project (without Inkwell)')))); i++) await p.waitForTimeout(1000);

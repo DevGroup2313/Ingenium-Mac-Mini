@@ -41,7 +41,8 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
     await p.evaluate(() => go('home')); await p.waitForTimeout(500);
     ok(hv.tf === 'matrix(1, 0, 0, 1, 0, -2)' && / 0px 3px 0px 0px/.test(hv.sh), s + ': pointed at, it rises 2px and its edge grows to 3px', hv);
     ok(pr.tf === 'matrix(1, 0, 0, 1, 0, 1)' && /inset/.test(pr.sh), s + ': pressed, it sinks 1px with its edge pressed in', pr); }
-  const snd = await p.evaluate(() => [...document.scripts].some(x => /'\.hx-btn,\.hx-item,\.blx-chk',keyAt=0/.test(x.textContent)));
+  /* 6.66: the list goes on after these (Fabrica's keys, modules/r176.js), so the test looks for them in it, not for its end */
+  const snd = await p.evaluate(() => [...document.scripts].some(x => /var KEYSEL=[^;]*'\.hx-btn,\.hx-item,\.blx-chk(',keyAt=0|,'\+)/.test(x.textContent)));
   ok(snd, 'the greeting card\'s keys, Home\'s recent work and Check with Blend are among the keys that sound');
   // 2. Check with Blend, under the tour's example reply
   await p.evaluate(() => { try { tourDemoChat(true); } catch (e) {} }); await p.waitForTimeout(1500); await p.mouse.move(1439, 899);
