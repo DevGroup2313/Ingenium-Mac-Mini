@@ -31,8 +31,11 @@ const z = m => { const v = /matrix3d\(([^)]+)\)/.exec(m || ''); return v ? +v[1]
   const { p, ctx, errs } = await open(b, { width: 1440, height: 900 }, 'day');
 
   // 1. the part and the orbs
-  const s1 = await p.evaluate(() => ({ part: window.__ingParts && window.__ingParts.p264, st: window.IngOrbs && IngOrbs.state() }));
-  ok(s1.part === 'running' && s1.st && s1.st.orbs === 6 && s1.st.solid === 6, 'the part runs and all six orbs are made solid', s1);
+  // Home has six rooms in the master and full editions, four in the gift and demo (Fabrica and Lector are the first two's alone)
+  const s1 = await p.evaluate(() => ({ part: window.__ingParts && window.__ingParts.p264, st: window.IngOrbs && IngOrbs.state(),
+    keys: document.querySelectorAll('#hx .hx-key').length, lector: !!document.querySelector('#hx .hx-key[data-go="lector"]') }));
+  const WANT = s1.lector ? 6 : 4;
+  ok(s1.part === 'running' && s1.st && s1.keys === WANT && s1.st.orbs === WANT && s1.st.solid === WANT, 'the part runs and all ' + WANT + ' orbs of this edition\'s Home are made solid', s1);
 
   // 2. the body
   const s2 = await p.evaluate(() => [...document.querySelectorAll('#hx .hx-key .oxo')].map(o => { const c = getComputedStyle(o);
@@ -66,7 +69,9 @@ const z = m => { const v = /matrix3d\(([^)]+)\)/.exec(m || ''); return v ? +v[1]
   ok(writes === 0, 'left alone for three seconds, nothing on Home is rewritten', writes);
 
   // 6. under the mouse
-  const sel = '#hx .hx-key[data-go="lector"]';
+  const ROOM = await p.evaluate(() => document.querySelector('#hx .hx-key[data-go="lector"]') ? 'lector'
+    : [...document.querySelectorAll('#hx .hx-key')].map(k => k.getAttribute('data-go')).find(r => ['code', 'focus', 'chat'].indexOf(r) < 0));
+  const sel = '#hx .hx-key[data-go="' + ROOM + '"]';
   const rest = await p.evaluate(s => getComputedStyle(document.querySelector(s + ' .oxo-base')).boxShadow, sel);
   let jb = await (await p.$(sel + ' .hx-jewel')).boundingBox();
   await p.mouse.move(jb.x + jb.width * .75, jb.y + jb.height * .3); await p.waitForTimeout(800); jb = await (await p.$(sel + ' .hx-jewel')).boundingBox();
@@ -90,8 +95,8 @@ const z = m => { const v = /matrix3d\(([^)]+)\)/.exec(m || ''); return v ? +v[1]
   ok(s8.knock && s8.tilt === 'oxsKnock' && s8.ripple === 'oxsRipple' && /oxsPop/.test(s8.pop), 'released, it knocks as the seal knocks, with its ripple and the pop of its mark', s8);
   ok(s8.home, 'the room is not opened before the knock is seen', s8);
   await p.waitForTimeout(700);
-  const s8b = await p.evaluate(() => ({ home: !!document.getElementById('page-home').offsetParent, lector: !!(document.getElementById('page-lector') && document.getElementById('page-lector').offsetParent) }));
-  ok(!s8b.home && s8b.lector, 'then the room opens', s8b);
+  const s8b = await p.evaluate(r => ({ room: r, home: !!document.getElementById('page-home').offsetParent, open: !!(document.getElementById('page-' + r) && document.getElementById('page-' + r).offsetParent) }), ROOM);
+  ok(!s8b.home && s8b.open, 'then the room opens', s8b);
 
   // 9. a click that is not a person's (the guided tour's) opens the room at once
   await p.evaluate(() => go('home')); await p.mouse.move(5, 890); await p.waitForTimeout(1500);
@@ -132,7 +137,7 @@ const z = m => { const v = /matrix3d\(([^)]+)\)/.exec(m || ''); return v ? +v[1]
   // 14. on a phone
   const ph = await open(b, { width: 390, height: 844 }, 'day', { hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   const s14 = await ph.p.evaluate(() => ({ narrow: document.getElementById('hx').classList.contains('ox-narrow'), st: IngOrbs.state(), S: [...document.querySelectorAll('#hx .hx-key .oxo')].map(o => getComputedStyle(o).getPropertyValue('--S').trim()) }));
-  ok(s14.narrow && s14.st.solid === 6 && s14.S.every(v => v === '76px'), 'on a phone all six orbs are solid, at 76 pixels', s14);
+  ok(s14.narrow && s14.st.solid === WANT && s14.S.length === WANT && s14.S.every(v => v === '76px'), 'on a phone all ' + WANT + ' orbs are solid, at 76 pixels', s14);
   const t = await ph.p.evaluate(() => { const j = document.querySelector('#hx .hx-key[data-go="chat"] .hx-jewel').getBoundingClientRect(); return { x: j.left + j.width / 2, y: j.top + j.height / 2 }; });
   await ph.p.touchscreen.tap(t.x, t.y); await ph.p.waitForTimeout(80);
   const s14b = await ph.p.evaluate(() => ({ home: !!document.getElementById('page-home').offsetParent, knock: document.querySelector('#hx .hx-key[data-go="chat"] .oxo').classList.contains('knock') }));
