@@ -16,7 +16,8 @@ takes a block from the end of the page the first time it is wanted, as it fetche
 import re
 
 IDS = ("ing-builtin-cd", "ing-builtin-forge", "ing-builtin-inkwell", "ingenium-kit-bundle", "ingenium-engine-wasm",
-       "ingenium-engine-compat-wasm", "ing-eyes", "ing-docfonts")
+       "ingenium-engine-compat-wasm", "ing-eyes", "ing-docfonts",
+       "ing-demo-cd", "ing-demo-forge", "ing-demo-ingenium")  # 6.77: the demonstrations the master edition carries (apps/demos)
 PRE = "ing-tail:"
 
 

@@ -20,7 +20,10 @@
 #page-models .kf-where{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:9px 12px;border-radius:12px;background:var(--rm-wellbg,rgba(34,26,46,.035));box-shadow:var(--rm-well,inset 0 1px 2.5px rgba(40,22,68,.09));font-size:13px;color:var(--ink-2)}
 #page-models .kf-where b{color:var(--ink-1)}
 #page-models .kf-find{display:flex;gap:8px;align-items:center;margin:0 0 10px}
-#page-models .kf-find input{flex:1;min-width:0}
+#page-models .kf-find input{flex:1;min-width:0;min-height:38px;padding:8px 14px;border-radius:12px;border:1px solid var(--hairline);background:var(--rm-wellbg,rgba(34,26,46,.035));
+  box-shadow:var(--rm-well,inset 0 1px 2.5px rgba(40,22,68,.09));color:var(--ink-1);font:inherit;font-size:13.5px}
+#page-models .kf-find input:focus{outline:2px solid var(--accent,#6a3fb5);outline-offset:1px}
+#page-models .kf-acts a.btn,#page-models .kf-partgrid a.btn{text-decoration:none}
 #page-models .kf-list{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 #page-models .kf-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--hairline);
   background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#faf8fd));box-shadow:var(--pop,0 2px 0 rgba(40,22,68,.16),0 6px 12px rgba(40,22,68,.08));transition:transform .2s var(--spring,cubic-bezier(.34,1.35,.64,1)),box-shadow .2s ease}
@@ -44,13 +47,24 @@ body[data-theme="night"] #page-models .kf-fit.no{color:#e6b062}
 body[data-theme="night"] #page-models .kf-fit.yes{color:#7fd1a6}
 body[data-motion="minimal"] #page-models .kf-row:hover{transform:none}
 @media (max-width:620px){#page-models .kf-row{grid-template-columns:1fr}#page-models .kf-acts{justify-content:flex-start}}
+/* 6.71: in a browser, a model in many parts showed every part as a key beside its name and squeezed the name into a column one letter
+   wide (a model in 32 parts made the room 5,077 pixels tall). Its name now keeps its room; one key opens its parts, numbered, in a grid
+   under it, each part marked once it is asked for */
+@media (min-width:621px){#page-models .kf-row{grid-template-columns:minmax(220px,1fr) auto}}
+#page-models .kf-parts{grid-column:1 / -1;margin:6px 0 2px;padding:12px;border-radius:12px;background:var(--rm-wellbg,rgba(34,26,46,.035));box-shadow:var(--rm-well,inset 0 1px 2.5px rgba(40,22,68,.09))}
+#page-models .kf-parts[hidden]{display:none}
+#page-models .kf-parts p{margin:0 0 10px;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+#page-models .kf-partgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:7px}
+#page-models .kf-partgrid .btn{min-width:0;padding:6px 0;justify-content:center;font-variant-numeric:tabular-nums}
+#page-models .kf-partgrid .btn.kf-asked{box-shadow:inset 0 0 0 1.5px var(--accent,#6a3fb5),var(--key-shadow,0 2px 0 rgba(40,22,68,.2))}
+#page-models .kf-partgrid .btn.kf-asked::after{content:" \2713";color:var(--accent,#6a3fb5)}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p259"]="started";}catch(_){}
 (function r259(){
 "use strict";
 if(window.IngKeep)return;
 var W=window,D=document,LATE=60*864e5,SHOW=12;
-var K={kept:[],late:[],jobs:{},copies:{},q:"",all:false,busy:false};
+var K={kept:[],late:[],jobs:{},copies:{},q:"",all:false,busy:false,open:{},asked:{}};
 function $(id){return D.getElementById(id);}
 function el(t,c,x){var e=D.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
 function key(cls,txt,fn){var b=el("button","btn"+(cls?" "+cls:""),txt);b.type="button";b.addEventListener("click",function(e){e.preventDefault();fn(b);});return b;}
@@ -117,7 +131,7 @@ function paintCopy(id){var j=K.copies[id],r=D.querySelector('#kfKeptCard [data-k
 function remove(x){if(!confirm("Remove "+x.name+" from "+(x.where||"this computer")+"? The file is deleted. A copy you made in another folder is not touched."))return;
   var a=api();Promise.resolve().then(function(){return a.delete_model_file(x.id);}).then(reload).then(function(){say(x.name+" was removed.");paint();},function(e){say(String(e&&e.message||e));});}
 /* ---------- the cards ---------- */
-function card(id,title,lede){var c=$(id);if(!c){c=el("div","card");c.id=id;}c.innerHTML="";c.appendChild(el("h2",null,title));if(lede)c.appendChild(el("p","kf-lede",lede));return c;}
+function card(id,title,lede){var c=$(id);if(!c){c=el("div","card");c.id=id;}c.innerHTML="";c.appendChild(el("h2","sec",title));if(lede)c.appendChild(el("p","kf-lede",lede));return c;}
 function prog(r,label){var p=el("div","kf-prog"),b=el("div","kf-bar");b.appendChild(el("i"));p.appendChild(b);p.appendChild(el("small",null,"…"));if(label)p.appendChild(label);r.appendChild(p);}
 function keepCard(){var web=!desk(),c=card("kfCard","Keep a model for a stronger computer",web?
     "Download a model's file to keep, to run later on a computer with more memory. In a web browser the file goes to this device's Downloads folder; in the Ingenium app on a computer, Ingenium keeps it for you and lists it below.":
@@ -135,13 +149,19 @@ function keepCard(){var web=!desk(),c=card("kfCard","Keep a model for a stronger
       var t=el("div");t.appendChild(el("div","kf-name",sp.name));t.appendChild(el("div","kf-meta",[sp.maker,size(sp.size),sp.parts?sp.parts.length+" parts":""].filter(Boolean).join(" · ")));
       var fit=U==null?null:n<=U;t.appendChild(el("div","kf-fit"+(fit===false?" no":fit?" yes":""),"Needs about "+n.toFixed(1)+" GB of memory"+(fit===false?": more than this device has. Keep it for a stronger computer.":fit?": this device has room for it.":".")));li.appendChild(t);
       var acts=el("div","kf-acts"),job=K.jobs[m.k],kept=K.kept.some(function(x){return x.lineup===m.k;});
-      if(web){(sp.parts&&sp.parts.length?sp.parts:[{url:sp.url,file:sp.file}]).forEach(function(p,i,all){var a=el("a","btn",all.length>1?"Part "+(i+1)+" of "+all.length:"Download the file");a.href=p.url;a.rel="noopener";a.setAttribute("download",p.file||"");a.title="Saves "+(p.file||"the file")+" in this device's Downloads folder";
-          a.addEventListener("click",function(){try{var L=state.keptLinks=Array.isArray(state.keptLinks)?state.keptLinks:[];L.unshift({k:m.k,name:sp.name,file:p.file||sp.file,at:Date.now()});state.keptLinks=L.slice(0,40);saveState();}catch(e){}setTimeout(lateCard,50);});acts.appendChild(a);});
+      if(web){var parts=sp.parts&&sp.parts.length?sp.parts:[{url:sp.url,file:sp.file}],box=null,grid=null;
+        if(parts.length>1){box=el("div","kf-parts");box.hidden=!K.open[m.k];box.appendChild(el("p",null,"This model comes in "+parts.length+" parts. Download each one and keep them together in one folder: a model in parts runs only with all of them. In the Ingenium app on a computer, Keep for later downloads and checks every part for you."));
+          grid=el("div","kf-partgrid");grid.setAttribute("role","list");box.appendChild(grid);
+          var tg=key("small","Download its "+parts.length+" parts",function(){box.hidden=!box.hidden;K.open[m.k]=!box.hidden;tg.setAttribute("aria-expanded",String(!box.hidden));});tg.setAttribute("aria-expanded",String(!box.hidden));acts.appendChild(tg);li.__parts=box;}
+        parts.forEach(function(p,i,all){var a=el("a","btn"+(all.length>1?" small":""),all.length>1?String(i+1):"Download the file");a.href=p.url;a.rel="noopener";a.setAttribute("download",p.file||"");
+          a.title="Saves "+(p.file||"the file")+" in this device's Downloads folder";if(all.length>1){a.setAttribute("aria-label","Part "+(i+1)+" of "+all.length);a.setAttribute("role","listitem");if((K.asked[m.k]||{})[i])a.classList.add("kf-asked");}
+          a.addEventListener("click",function(){try{var L=state.keptLinks=Array.isArray(state.keptLinks)?state.keptLinks:[];L.unshift({k:m.k,name:sp.name+(all.length>1?", part "+(i+1)+" of "+all.length:""),file:p.file||sp.file,at:Date.now()});state.keptLinks=L.slice(0,40);saveState();}catch(e){}
+            (K.asked[m.k]=K.asked[m.k]||{})[i]=1;a.classList.add("kf-asked");setTimeout(lateCard,50);});(grid||acts).appendChild(a);});
         if(sp.page){var pg=el("a","btn ghost","Model page");pg.href=sp.page;pg.target="_blank";pg.rel="noopener noreferrer";acts.appendChild(pg);}}
       else if(job&&job.state==="running"){acts.appendChild(key("small ghost","Stop",function(){stop(m.k);}));li.appendChild(acts);prog(li);ul.appendChild(li);bar(m.k);return;}
       else if(kept)acts.appendChild(el("span","kf-badge kept","Kept for later"));
       else acts.appendChild(key("primary small","Keep for later",function(){keep(m.k,li);}));
-      li.appendChild(acts);ul.appendChild(li);});
+      li.appendChild(acts);if(li.__parts)li.appendChild(li.__parts);ul.appendChild(li);});
     if(!K.all&&!s&&list.length>SHOW){var more=key("ghost small kf-more","Show all "+list.length+" models",function(){K.all=true;rows();});var li2=el("li");li2.appendChild(more);ul.appendChild(li2);}}
   q.addEventListener("input",function(){K.q=q.value;rows();});rows();return c;}
 function keptCard(){if(!desk())return null;var c=card("kfKeptCard","Kept for a stronger computer","The models you keep for later. They are left out of the model lists until you choose Use it on this computer.");

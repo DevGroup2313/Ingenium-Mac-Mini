@@ -60,6 +60,7 @@ def skip_modules(ed):
     out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
     out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
+    out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
@@ -224,6 +225,11 @@ def _blank(ed="gift"):
         ('side.setAttribute("aria-label","The Offline Project, your models and this device");',
          'side.setAttribute("aria-label","Ingenium, your models and this device");', "Home: the side column's name", 1),
         ('im.alt="The master logo of The Offline Project";', 'im.alt="The logo of Ingenium";', "Home: the plaque's picture", 1),  # 6.74: logo, not seal
+        # 6.77: the build library is the master edition's alone (modules/r258.js), so the news of Folders does not speak of it here
+        ("Every folder is an index card with its seal, the build library a bound book, the ways of bringing in your work envelopes in a tray",
+         "Every folder is an index card with its seal, the ways of bringing in your work envelopes in a tray", "Guide: the 6.69 news, without the build library", 1),
+        ("with words you can read at that size, and the build library's volume stands above its words. On a wider screen",
+         "with words you can read at that size. On a wider screen", "Guide: the 6.71 news, without the build library", 1),
         # 6.74: the news of logo, not seal, without the Offline Project's master logo, which only the master edition carries
         ('["6.74","The Career Studio\'s documents and Tabula, Abacus and Imago say logo too: the master logo of the Offline Project, each app\'s logo on a document, the logo studio and Tabula\'s watermarks.","career"]',
          '["6.74","The Career Studio\'s documents and Tabula, Abacus and Imago say logo too: each app\'s logo on a document, the logo studio and Tabula\'s watermarks.","career"]',

@@ -1,0 +1,66 @@
+{
+ "cd": {
+  "key": "cd",
+  "title": "Carpe Diem",
+  "version": "1081",
+  "build": "528171081",
+  "date": "2026-11-01",
+  "edition": "Public sample",
+  "size": 11816298,
+  "sha256": "0abfa6a034fe3a20bfaba41b0c8d4e448394820b8c93c1ad5d066c8158f1dd46",
+  "name": "carpe_diem_public_sample.html",
+  "from": "DevGroup2313/Carpe-DIem-Demo, index.html at commit f8b12d58794d1c503dd479f8cf87cb7015d27a27 (1 November 2026)",
+  "base": {
+   "size": 48652801,
+   "sha256": "506ef1f074adaca7b7a27c2bf6750936b2ce8843c73050e222fec1565736b5e1",
+   "version": "1084"
+  },
+  "recipe": {
+   "size": 8332656,
+   "sha256": "cf47edb892f9c667780242429beb383e1eb541015271dee0ce36987756da2c67"
+  }
+ },
+ "forge": {
+  "key": "forge",
+  "title": "The Forge",
+  "version": "656",
+  "build": "9s88",
+  "date": "2026-10-28",
+  "edition": "Demo",
+  "base": {
+   "size": 14344889,
+   "sha256": "dfdbbda2bdd9329f676c19d469dd391cdf558c59911e16323c15c921c1058c7a"
+  },
+  "size": 1258566,
+  "sha256": "e42d823ded9afc5c594167316c1403f96429815e72e332a8eccb6dffb338ba2b",
+  "pages": {
+   "4": {
+    "size": 14122141,
+    "sha256": "c0c5873916c2455ba9f8fdf6b858447cde75f9fc1ac7d65a07275c9e17194c55",
+    "carry": [
+     "ingenium",
+     "cd",
+     "inkwell",
+     "forge"
+    ]
+   },
+   "3": {
+    "size": 14119202,
+    "sha256": "8b95686d0dae838dae1941a1fd1a5a6442bcf129aceaf3f87f158872193aff1f",
+    "carry": [
+     "ingenium",
+     "cd",
+     "forge"
+    ]
+   },
+   "2": {
+    "size": 14115909,
+    "sha256": "abb968647873d605b9d93e34a4937ed74aa50960c0482ca21902a4ef3d06a0e2",
+    "carry": [
+     "cd",
+     "forge"
+    ]
+   }
+  }
+ }
+}

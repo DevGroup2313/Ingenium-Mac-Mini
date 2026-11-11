@@ -1681,6 +1681,40 @@ for _k in [k for k in ("forge", "inkwell", "cd", "lakay") if k in _bi]:  # R122:
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
         sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
     _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+# ---- 6.77 (10 November 2026): the demonstrations the master edition carries (apps/demos, from apps/demos/make_demos.py), so The
+#      Offline Project made in Fabrica holds demonstrations only (modules/r268.js, modules/r246.js). The owner's words: "I want the
+#      Offline Project apps to only contain the apps demos and never the full version." Carpe Diem's Public sample rides along as
+#      it stands; The Forge's demonstration as what differs from the lean Forge carried above; and Ingenium's own demo edition as
+#      a recipe (demo_recipe.py), put into its slot by release.py, which builds the demo edition first (or here, for a test
+#      build, from the page ING_DEMO_PAGE names). Each is checked against its size and fingerprint before it rides along. ----
+_dm = None
+if _bi:
+    import demo_recipe as _dr
+    _dd = os.path.join(HERE, "apps", "demos")
+    _dm = json.load(open(os.path.join(_dd, "demos.json"), encoding="utf-8"))
+    if "inkwell" in _bi:  # Inkwell has one edition: its own page, carried above (ing-builtin-inkwell), is its room's page
+        _dm["inkwell"] = {k: _bi["inkwell"][k] for k in ("key", "title", "version", "date", "size", "sha256", "name") if k in _bi["inkwell"]}
+        _dm["inkwell"]["edition"] = ""
+    # Carpe Diem's Public sample, as what differs from the Carpe Diem carried above (apps/demos/make_cd_demo.py): carried whole it
+    # took 7.6 MB, and the page came to more than GitHub keeps in one file (100 MiB). Put together here once, and checked.
+    _z = open(os.path.join(_dd, "cd_demo.json.gz"), "rb").read()
+    _raw = _gz.decompress(_z)
+    if len(_raw) != _dm["cd"]["recipe"]["size"] or _hl.sha256(_raw).hexdigest() != _dm["cd"]["recipe"]["sha256"]:
+        sys.exit("the Public sample of Carpe Diem: its recipe does not match apps/demos/demos.json")
+    if "cd" not in _bi or _dm["cd"]["base"]["sha256"] != _bi["cd"]["sha256"]:
+        sys.exit("the Public sample of Carpe Diem was made from another Carpe Diem than the one carried: run apps/demos/make_cd_demo.py again")
+    _cdr = json.loads(_raw.decode("utf-8"))
+    if _hl.sha256(_dr.patch(_gz.decompress(open(os.path.join(HERE, "apps", "builtin", "cd.html.gz"), "rb").read()), _cdr["ops"])).hexdigest() != _dm["cd"]["sha256"]:
+        sys.exit("the Public sample of Carpe Diem did not come back whole from its recipe")
+    _apps += '<script type="ingenium/recipe-gz" id="ing-demo-cd" data-bytes="%d">' % len(_raw) + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+    _z = open(os.path.join(_dd, "forge_demo.json.gz"), "rb").read()
+    _raw = _gz.decompress(_z)
+    if len(_raw) != _dm["forge"]["size"] or _hl.sha256(_raw).hexdigest() != _dm["forge"]["sha256"]:
+        sys.exit("The Forge's demonstration: its size or fingerprint does not match apps/demos/demos.json")
+    if _dm["forge"]["base"]["sha256"] != _bi["forge"]["sha256"]:
+        sys.exit("The Forge's demonstration was made from another Forge than the one carried: run apps/demos/make_demos.py again")
+    _apps += '<script type="ingenium/recipe-gz" id="ing-demo-forge" data-bytes="%d">' % len(_raw) + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+    _apps += _dr.slot() + "\n"
 # ---- 6.48 (7 November 2026): what the master edition makes the Offline Project from (modules/r246.js): the hall, the devices'
 #      pictures and the icons drawn from the master seal, written by source/offline_project/master_demo/make_op_data.py into
 #      op_make.json. Only where her apps ride along (the master edition, not the lean copy The Forge carries). ----
@@ -1819,6 +1853,8 @@ if '/*PERMIT_LICENCE*/""' in blob:
     print(_said)
 if "/*R120_BUILTIN*/null" in blob:
     blob = blob.replace("/*R120_BUILTIN*/null", json.dumps(_bi))
+if "/*R268_DEMOS*/null" in blob and _dm:  # 6.77: the demonstrations carried (modules/r268.js)
+    blob = blob.replace("/*R268_DEMOS*/null", json.dumps(_dm))
 if "/*R116_QUANTS*/null" in blob:
     blob = blob.replace("/*R116_QUANTS*/null", open(os.path.join(HERE, "lineup_quants.json")).read().strip())
 if "/*R107_LAYERS*/null" in blob:
@@ -1863,6 +1899,12 @@ _bm = "/*ING_BOOT_MAP*/[]"
 if out.count(_bm) != 1:
     sys.exit("the loading page's map: its place was not found once")
 out = out.replace(_bm, "/*ING_BOOT_MAP*/" + json.dumps(_script_map(out), separators=(",", ":")))
+# 6.77: a test build carries the demo edition a page names (ING_DEMO_PAGE: a demo edition built before it); a release is given
+# its own by release.py, after the kit store is in. The recipe copies from the page's own code, so it is made last, once the
+# loading page's map is written into its script (as release.py makes it, on the finished page)
+if _dm and os.environ.get("ING_DEMO_PAGE"):
+    out, _rec = _dr.embed(_tail.untail(out), open(os.environ["ING_DEMO_PAGE"], encoding="utf-8").read())
+    out = _tail.tail(out)
 dest =sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
 open(dest, "w", encoding="utf-8").write(out)
 print("built", dest, len(out), "bytes;", len(EDITS), "edits;", len(mods), "modules; the", ED, "edition")

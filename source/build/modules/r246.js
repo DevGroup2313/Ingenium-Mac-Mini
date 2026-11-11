@@ -18,7 +18,15 @@
    6.51 (7 November 2026): both variations in Code's Your apps and the + menu's One of your apps, each made fresh when chosen and handed on
    as any of her apps is (a Code project of its page; the page with the next message); the hall's words edited in Code (a project of
    the hall alone, The Offline Project's hall, used by every making until she chooses the hall Ingenium carries again). Lector already
-   gathers the set in her way (6.43: choosing all four apps, or the three, gives it the master seal or the shield of three). */
+   gathers the set in her way (6.43: choosing all four apps, or the three, gives it the master seal or the shield of three).
+   6.77 (10 November 2026): demonstrations only. Her words: "I want the Offline Project apps to only contain the apps demos and never the
+   full version, I just installed the mac app after shipping it inside of Ingenium's Fabrica and it had the full versions of all 4 apps
+   and not the demos, please make the fix." Measured on 6.71: each room took the copy of its app the library holds, and the library
+   holds her full apps (Carpe Diem 1081 whole, the Forge that makes apps, and for Ingenium this very copy, the master edition with her
+   Author Studio). Now no room is taken from the library. Each holds what her own site of The Offline Project holds (1 November 2026):
+   Carpe Diem's Public sample, The Forge's demonstration, Ingenium's demo edition and Inkwell's own page, given whole and checked by
+   window.IngDemos (modules/r268.js) from what this copy carries; a page that is not a demonstration is refused before anything is
+   made. A version kept in Fabrica says so in its history: "Made from the demonstrations". */
 /* its own row above her apps (not one of the repositories: their list stays theirs) */
 #fb #fbOpRow{padding-bottom:0}
 #fb .f-repo.op-tile{--app:#9a7a32}
@@ -67,18 +75,21 @@ function can(){return typeof CompressionStream!=="undefined"&&typeof Decompressi
 function gz(text){var cs=new CompressionStream("gzip"),w=cs.writable.getWriter();w.write(new TextEncoder().encode(text));w.close();return new Response(cs.readable).arrayBuffer().then(function(b){return new Uint8Array(b);});}
 function gunzip64(b64){var ds=new DecompressionStream("gzip"),w=ds.writable.getWriter();w.write(b64bytes(b64));w.close();return new Response(ds.readable).text();}
 
-/* ---------- 2. what each room holds: the copy of its app the library keeps (or the earlier one) ---------- */
-function lib(){try{return libState().apps||{};}catch(e){return {};}}
-function copyOf(k,slot){var m=lib()[k];if(!m)return null;if(slot==="earlier")return m.earlier&&m.earlier.ref?m.earlier:null;return m.ref?m:null;}
-function what(k,m){if(!m)return "";var v=m.version?" "+m.version:"",src=m.source==="this copy"?"this copy, the master edition":m.source==="built in"?"the copy Ingenium carries":m.source==="file"?"a copy you added"+(m.name?" ("+m.name+")":""):"kept in the app library";return NAME[k]+v+" · "+src;}
-function versionOf(k,s,m){var r=null;if(k==="cd"||k==="forge")r=/window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"/.exec(s);else if(k==="ingenium")r=/ING_VERSION="([0-9.]+)"/.exec(s);else r=/<\!-- BUILD='([\d.]+)'/.exec(s);  /* not the four characters that open a comment: inside a script they would swallow its end */
-  return r?r[1]:(m&&m.version)||"";}
+/* ---------- 2. what each room holds: its app's demonstration, never a copy of the app library (6.77; modules/r268.js) ---------- */
+function DX(){return W.IngDemos||null;}
+function plan(four){var d=DX();try{return d?d.plan(four):{};}catch(e){return {};}}
+function whyNot(four){var d=DX();if(!d)return "This copy does not carry the demonstrations The Offline Project is made from.";try{return d.why(four)||"";}catch(e){return String(e&&e.message||e);}}
 /* build_master_demo.py, section 3: the character set, the storage's own corner (op:<app>:), the key back to the hall (none: in the
    one-file app the hall opened it), no scroll bars, all at the top of the page */
-function prep(k,s){var X=data(),d=/^\s*<!doctype html>/i.exec(s),at=d?d[0].length:0;
+function prepTags(k){var X=data();return '\n<meta charset="utf-8">'+X.tags.shim.replace("__APP__",k)+X.tags.home.replace("__HOME__","null")+X.tags.nobars;}
+function prep(k,s){var d=/^\s*<!doctype html>/i.exec(s),at=d?d[0].length:0;
   /* a page taken out of an Offline Project already has the shim at its top (the master edition carries its words further down, in this part) */
   if(/^\s*(<!doctype html>)?\s*<meta charset="utf-8"><script id="op-shim">/i.test(s.slice(0,400)))throw new Error(NAME[k]+": this copy was taken out of an Offline Project (it already carries the shim at its top)");
-  return s.slice(0,at)+'\n<meta charset="utf-8">'+X.tags.shim.replace("__APP__",k)+X.tags.home.replace("__HOME__","null")+X.tags.nobars+s.slice(at);}
+  return s.slice(0,at)+prepTags(k)+s.slice(at);}
+/* the same on a page's bytes (6.77: a demonstration is never read as text whole): what comes before the place, the three things, the rest */
+function prepParts(k,u8){var head=new TextDecoder().decode(u8.subarray(0,400)),d=/^\s*<!doctype html>/i.exec(head),at=d?d[0].length:0;
+  if(/^\s*(<!doctype html>)?\s*<meta charset="utf-8"><script id="op-shim">/i.test(head))throw new Error(NAME[k]+": this page was taken out of an Offline Project (it already carries the shim at its top)");
+  return [u8.subarray(0,at),prepTags(k),u8.subarray(at)];}
 function seals(){var S=W.ING_SEALS||{},o={};KEYS4.forEach(function(k){var x=S[k];if(x&&x.b64){var u=(/^iVBOR/.test(x.b64)?"data:image/png;base64,":/^UklG/.test(x.b64)?"data:image/webp;base64,":"data:image/jpeg;base64,")+x.b64;o[k]=u;o[k+"N"]=u;}});return o;}
 function iconLinks(X){return '\n<link rel="icon" href="'+X.icons.day.ico+'" sizes="16x16 32x32 48x48" data-op-icon="ico">'+'\n<link rel="icon" type="image/png" sizes="32x32" href="'+X.icons.day["32"]+'" data-op-icon="32">'+
   '\n<link rel="icon" type="image/png" sizes="192x192" href="'+X.icons.day["192"]+'" data-op-icon="192">'+'\n<link rel="apple-touch-icon" href="'+X.touch+'">';}
@@ -93,18 +104,19 @@ function hall(){return hallFrom().then(function(t){return t||gunzip64(data().sit
 function make(opts){opts=opts||{};var four=opts.four!==false,X=data(),say=opts.say||function(){};
   if(!X)return Promise.reject(new Error("This copy does not carry what the Offline Project is made from."));
   if(!can())return Promise.reject(new Error("This window cannot compress pages (it lacks CompressionStream): open Ingenium in a newer browser or the computer app."));
-  var ks=four?KEYS4:KEYS3,use=opts.use||{},build={preview:false,apps:{},app:true},versions={},inside=[],total=0,done=0;
+  var dx=DX(),no=whyNot(four);if(no)return Promise.reject(new Error(no));
+  var ks=four?KEYS4:KEYS3,build={preview:false,apps:{},app:true},versions={},inside=[],n=ks.length;
   if(!four)build.without=["inkwell"];
-  ks.forEach(function(k){var m=copyOf(k,use[k]);total+=+(m&&m.size)||1;});
   var p=Promise.resolve();
-  ks.forEach(function(k,i){p=p.then(function(){var slot=use[k]==="earlier"?"earlier":"",m=copyOf(k,slot);
-      if(!m)throw new Error(NAME[k]+" is not kept in the app library here: add it with Add your apps, then make it again.");
-      say("Reading "+NAME[k]+"…",done/total);
-      return Promise.resolve(libText(k,slot)).then(function(s){if(!s)throw new Error(NAME[k]+": its copy could not be read back from the app library.");
-        versions[k]=versionOf(k,s,m);if(k==="cd")build.cdEdition=/edition:"Public sample"/.test(s)?"Public sample":"Committee demo";
-        var page=prep(k,s);s=null;say("Packing "+NAME[k]+" into the page…",(done+0.5*(+m.size||1))/total);
-        return gz(page).then(function(z){var slug=SLUG[k];inside.push('<script type="op/gz64" id="op-app-'+slug+'">'+bytesb64(z)+"<\/script>");
-          build.apps[slug]=[{file:"apps/"+slug+".html",mb:Math.round(page.length/1e5)/10,inside:"op-app-"+slug}];done+=+m.size||1;page=null;});});});});
+  ks.forEach(function(k,i){p=p.then(function(){say("Getting "+NAME[k]+"'s demonstration ready…",0.9*i/n);
+      /* given whole and checked, and refused unless it is a demonstration (IngDemos.page) */
+      return dx.page(k,four,function(t){say(t,0.9*(i+0.35)/n);}).then(function(d){var no2=dx.check(k,d.u8);if(no2)throw new Error(no2);
+        versions[k]=d.version;if(k==="cd")build.cdEdition=d.edition==="Committee demo"?"Committee demo":"Public sample";
+        say("Packing "+NAME[k]+" into the page…",0.9*(i+0.7)/n);var len=d.u8.length;
+        return dx.bytes.gzip(prepParts(k,d.u8)).then(function(z){var slug=SLUG[k];inside.push('<script type="op/gz64" id="op-app-'+slug+'">'+bytesb64(z)+"<\/script>");
+          build.apps[slug]=[{file:"apps/"+slug+".html",mb:Math.round(len/1e5)/10,inside:"op-app-"+slug}];});});});});
+  /* the demonstrations unpacked for this making are let go of, whether it ends well or not */
+  p=p.then(function(){try{dx.release();}catch(e){}},function(e){try{dx.release();}catch(_){}throw e;});
   return p.then(function(){say("Putting the hall together…",0.97);
     build.versions=versions;build.line="Carpe Diem "+versions.cd+" · The Forge "+versions.forge+" · Ingenium "+versions.ingenium+(four?" · Inkwell "+versions.inkwell:"");
     build.img={seals:seals(),devices:X.devices};build.icons={day:X.icons.day,night:X.icons.night};
@@ -125,30 +137,23 @@ function make(opts){opts=opts||{};var four=opts.four!==false,X=data(),say=opts.s
 function opState(){if(!state.opMake||typeof state.opMake!=="object")state.opMake={four:true,use:{}};if(!state.opMake.use)state.opMake.use={};return state.opMake;}
 function save(){try{saveState();}catch(e){}}
 var LAST=null,BUSY=false,ON=false,STATE={text:"",cls:"",pc:0};
-function sig(f){var o=opState(),four=f==null?o.four!==false:!!f,ks=four?KEYS4:KEYS3,hp=ownHallProject();return (four?"4":"3")+"|hall:"+(hp&&o.ownHall!==false?hp.id+":"+(hp.updated||hp.made||0):"carried")+"|"+ks.map(function(k){var m=copyOf(k,o.use[k]);return k+":"+(m?m.sha256||m.ref:"none");}).join(",");}
+function sig(f){var o=opState(),four=f==null?o.four!==false:!!f,hp=ownHallProject(),M=(DX()&&DX().meta)||{},v="";try{v=String(ING_VERSION);}catch(e){}
+  return (four?"4":"3")+"|hall:"+(hp&&o.ownHall!==false?hp.id+":"+(hp.updated||hp.made||0):"carried")+"|cd:"+((M.cd||{}).sha256||"none")+",forge:"+((M.forge||{}).sha256||"none")+",ingenium:demo "+v+(four?",inkwell:"+((M.inkwell||{}).sha256||"none"):"");}
 function H(){return W.fbHubHost||null;}
 function crest(four,size){try{if(W.IngSeal&&IngSeal.el){var set=four?KEYS4.slice():KEYS3.slice(),ar=IngSeal.aspect?IngSeal.aspect(set)||1.3333:1.3333;var ce=IngSeal.el(set,{live:true,quarters:true,size:Math.round(size/ar),alt:""});if(ce){ce.setAttribute("aria-hidden","true");return ce;}}}catch(e){}
   var im=mk("img");try{im.src="data:image/png;base64,"+W.ING_SEALS.master.b64;}catch(e){}im.alt="";im.style.cssText="width:"+size+"px;height:"+size+"px;object-fit:contain";return im;}
 function tile(){var box=$("fbRepos");if(!box||!data())return;var row=$("fbOpRow");
   if(!row){row=mk("div","f-repos op-row");row.id="fbOpRow";box.parentNode.insertBefore(row,box);}
   if(row.querySelector(".op-tile"))return;
-  var b=mk("button","f-repo wide op-tile");b.type="button";b.setAttribute("aria-pressed",ON?"true":"false");b.title="The Offline Project, made fresh from the apps your library holds now";
+  var b=mk("button","f-repo wide op-tile");b.type="button";b.setAttribute("aria-pressed",ON?"true":"false");b.title="The Offline Project, made fresh from your apps' demonstrations";
   b.appendChild(crest(opState().four!==false,42));
-  var tx=mk("span","tx");tx.appendChild(mk("span","nm","The Offline Project"));var st=mk("span","stl");st.appendChild(mk("span",null,"Made from your apps, fresh each time"));tx.appendChild(st);b.appendChild(tx);
+  var tx=mk("span","tx");tx.appendChild(mk("span","nm","The Offline Project"));var st=mk("span","stl");st.appendChild(mk("span",null,"Made from your apps' demonstrations, fresh each time"));tx.appendChild(st);b.appendChild(tx);
   b.addEventListener("click",function(){openWork();});row.appendChild(b);}
 function openWork(){ON=true;var h=H();try{if(h&&h.one&&h.one())h.setPanel("work");}catch(e){}paintWork();
   [].forEach.call(D.querySelectorAll("#fbRepos .f-repo"),function(x){x.setAttribute("aria-pressed","false");});}
-function room(k,o){var r=mk("div","op-room");var im=mk("img");try{im.src="data:image/png;base64,"+W.ING_SEALS[k].b64;}catch(e){}im.alt="";r.appendChild(im);
-  var cur=copyOf(k,""),ear=copyOf(k,"earlier"),pick=o.use[k]==="earlier"&&ear?"earlier":"",m=pick?ear:cur;
-  var t=mk("div","t");t.appendChild(mk("b",null,NAME[k]));
-  if(!m)t.appendChild(mk("span","warn","Not kept in the app library yet: add it with Add your apps (Settings, Your data, or Lector)."));
-  else{t.appendChild(mk("span",null,what(k,m)));
-    if(k==="ingenium"&&m.source==="this copy")t.appendChild(mk("span","warn","This copy is your master edition, with your Author Studio. To make one to share, keep Ingenium's demo edition in the app library: it is used in its place."));}
-  r.appendChild(t);
-  if(cur&&ear){var sel=mk("select");sel.setAttribute("aria-label","The copy of "+NAME[k]+" to use");
-    [["","The copy kept now"+(cur.version?" ("+cur.version+")":"")],["earlier","The earlier copy"+(ear.version?" ("+ear.version+")":"")]].forEach(function(x){var op=mk("option",null,x[1]);op.value=x[0];sel.appendChild(op);});
-    sel.value=pick;sel.addEventListener("change",function(){o.use[k]=sel.value;save();LAST=null;paintWork();});r.appendChild(sel);}
-  return r;}
+function room(k,four){var r=mk("div","op-room");r.setAttribute("data-room",k);var im=mk("img");try{im.src="data:image/png;base64,"+W.ING_SEALS[k].b64;}catch(e){}im.alt="";r.appendChild(im);
+  var t=mk("div","t"),says=plan(four)[k];t.appendChild(mk("b",null,NAME[k]));
+  t.appendChild(mk("span",says?null:"warn",says||"This copy does not carry its demonstration."));r.appendChild(t);return r;}
 function setState(text,cls,pc){STATE={text:text||"",cls:cls||"",pc:pc==null?STATE.pc:pc};var s=D.querySelector(".op-work .op-state"),b=D.querySelector(".op-work .op-bar i");
   if(s){s.textContent=STATE.text;s.className="op-state"+(STATE.cls?" "+STATE.cls:"");}if(b)b.style.width=Math.round(Math.max(0,Math.min(1,STATE.pc||0))*100)+"%";}
 function views(show){var fb=$("fb");if(fb)fb.classList.toggle("op-on",!show);}
@@ -157,34 +162,34 @@ function paintWork(){if(!ON)return;var w=$("fbWorkBody"),f=$("fbWorkFoot");if(!w
     ["fbBranch","fbRun"].forEach(function(id){var x=$(id);if(x)x.hidden=true;});var chip=$("fbWorkChip");if(chip){chip.className="f-chip";chip.textContent="Made fresh";}
     var vs=$("fbViews");if(vs)[].forEach.call(vs.querySelectorAll("button"),function(b){b.setAttribute("aria-selected","false");});}catch(e){}
   var o=opState(),four=o.four!==false,box=mk("div","op-work");box.setAttribute("data-op","work");
-  box.appendChild(mk("p","op-lede","Made here, fresh each time, from the apps your library holds now: the hall with its crest, and each app's live page inside it, in one file that opens on any device with no connection. Nothing of it is kept in the app library."));
+  box.appendChild(mk("p","op-lede","Made here, fresh each time, from your apps' demonstrations: the hall with its crest, and each app's demonstration inside it, in one file that opens on any device with no connection. It never holds a full version of an app, nor this master edition. Nothing of it is kept in the app library."));
   var seg=mk("div","op-seg");seg.setAttribute("role","group");seg.setAttribute("aria-label","The variation");
   [[true,"All four apps"],[false,"Without Inkwell"]].forEach(function(x){var b=btn("",x[1],function(){o.four=x[0];save();LAST=null;paintWork();});b.setAttribute("aria-pressed",String(four===x[0]));b.setAttribute("data-four",x[0]?"1":"0");seg.appendChild(b);});
   box.appendChild(seg);
-  var rooms=mk("div","op-rooms");(four?KEYS4:KEYS3).forEach(function(k){rooms.appendChild(room(k,o));});box.appendChild(rooms);
+  var rooms=mk("div","op-rooms");(four?KEYS4:KEYS3).forEach(function(k){rooms.appendChild(room(k,four));});box.appendChild(rooms);
   /* 6.51: the hall: as Ingenium carries it, or hers, edited in Code */
   var hp=ownHallProject(),own=!!hp&&o.ownHall!==false,hr=mk("div","op-room op-hall");var hi=crest(four,34);hr.appendChild(hi);
   var ht=mk("div","t");ht.appendChild(mk("b",null,"The hall"));ht.appendChild(mk("span",null,own?"Yours, as you edited it in Code (The Offline Project's hall)":"As Ingenium carries it: its words in English and French, its crest and its rooms"));hr.appendChild(ht);
   var hk=mk("div","op-keys");hk.appendChild(btn("btn small",hp?"Edit it in Code":"Edit its words in Code",function(){editHall();},"Opens the hall's page in Code: its words are in its table of words (W.en and W.fr)"));
   if(hp)hk.appendChild(btn("btn small ghost",own?"Use the hall Ingenium carries":"Use yours again",function(){o.ownHall=!own;save();LAST=null;paintWork();}));hr.appendChild(hk);rooms.appendChild(hr);
-  var missing=(four?KEYS4:KEYS3).filter(function(k){return !copyOf(k,o.use[k]);});
+  var cannot=whyNot(four);
   var keys=mk("div","op-keys");
   var mkB=btn("btn primary",BUSY?"Making…":"Make and open",function(){run("open");},"Makes it now, then opens it in a window of its own");mkB.id="opMakeOpen";
   var svB=btn("btn",BUSY?"Making…":"Save the app",function(){run("save");},"Makes it now (or uses the one just made), then saves the file");svB.id="opSave";
-  mkB.disabled=svB.disabled=BUSY||!!missing.length||!can();keys.appendChild(mkB);keys.appendChild(svB);box.appendChild(keys);
+  mkB.disabled=svB.disabled=BUSY||!!cannot||!can();keys.appendChild(mkB);keys.appendChild(svB);box.appendChild(keys);
   var st=mk("div","op-state");box.appendChild(st);var bar=mk("div","op-bar");bar.appendChild(mk("i"));box.appendChild(bar);
   if(!can())STATE={text:"This window cannot compress pages (it lacks CompressionStream): the computer app or a newer browser can make it.",cls:"bad",pc:0};
-  else if(missing.length&&!BUSY)STATE={text:"Missing from the app library: "+missing.map(function(k){return NAME[k];}).join(", ")+".",cls:"bad",pc:0};
+  else if(cannot&&!BUSY)STATE={text:cannot,cls:"bad",pc:0};
   else if(!BUSY&&LAST&&LAST.sig===sig())STATE={text:"Made: "+LAST.r.name+", "+(Math.round(LAST.r.size/1e5)/10)+" MB · "+LAST.r.line+". It lives only in this window until you save it.",cls:"ok",pc:1};
   else if(!BUSY)STATE={text:"",cls:"",pc:0};
   w.appendChild(box);setState(STATE.text,STATE.cls,STATE.pc);}
 function made(){var s=sig();if(LAST&&LAST.sig===s)return Promise.resolve(LAST.r);var o=opState();
-  return make({four:o.four!==false,use:o.use,say:function(t,pc){if(t)setState(t,"",pc);}}).then(function(r){LAST={sig:s,r:r};return r;});}
+  return make({four:o.four!==false,say:function(t,pc){if(t)setState(t,"",pc);}}).then(function(r){LAST={sig:s,r:r};return r;});}
 /* the window is opened at the press itself (a window opened after the making, which takes a while, is refused as a pop-up), says
    that it is being made, and is given the page when it is ready */
 function run(what){if(BUSY)return;var win=null;
   if(what==="open"){try{win=W.open("","_blank");}catch(e){win=null;}
-    if(win)try{win.document.write('<!doctype html><meta charset="utf-8"><title>The Offline Project</title><body style="margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#f5f3f7;color:#221a2e">Making the Offline Project from your apps\u2026</body>');win.document.close();}catch(e){}}
+    if(win)try{win.document.write('<!doctype html><meta charset="utf-8"><title>The Offline Project</title><body style="margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#f5f3f7;color:#221a2e">Making the Offline Project from your apps\u2019 demonstrations\u2026</body>');win.document.close();}catch(e){}}
   BUSY=true;paintWork();setState("Getting ready…","",0.02);
   made().then(function(r){BUSY=false;paintWork();if(what==="open")openMade(r,win);else saveMade(r);return r;},
     function(e){BUSY=false;paintWork();setState(String(e&&e.message||e),"bad",0);warn(e);try{if(win&&!win.closed)win.close();}catch(_){}});}
@@ -206,13 +211,13 @@ function editHall(){var pr=ownHallProject();try{go("code");}catch(e){}
     toast("The hall's page is open in Code. Its words are in its table of words (W.en and W.fr). Make it again in Fabrica to see them in place.");},function(e){toast("The hall could not be opened: "+String(e&&e.message||e));});}
 /* 6.51: made fresh for Code's Your apps and the + menu's One of your apps */
 var FRESH=null;
-function fresh(four){if(FRESH)return FRESH;toast("Making the Offline Project"+(four?"":" without Inkwell")+" from your apps. It takes a little while.");
+function fresh(four){if(FRESH)return FRESH;toast("Making the Offline Project"+(four?"":" without Inkwell")+" from your apps' demonstrations. It takes a little while.");
   var o=opState(),s=sig(four);
-  FRESH=(LAST&&LAST.sig===s?Promise.resolve(LAST.r):make({four:four,use:o.use}).then(function(r){LAST={sig:s,r:r};return r;}))
+  FRESH=(LAST&&LAST.sig===s?Promise.resolve(LAST.r):make({four:four}).then(function(r){LAST={sig:s,r:r};return r;}))
     .then(function(r){return r.blob.text().then(function(t){FRESH=null;return {r:r,text:t};});},function(e){FRESH=null;throw e;});return FRESH;}
-function listRows(){return [{four:true,name:"The Offline Project",sub:"All four apps, made fresh from the copies kept here"},{four:false,name:"The Offline Project, without Inkwell",sub:"Carpe Diem, The Forge and Ingenium, made fresh"}];}
+function listRows(){return [{four:true,name:"The Offline Project",sub:"All four apps' demonstrations, made fresh"},{four:false,name:"The Offline Project, without Inkwell",sub:"The demonstrations of Carpe Diem, The Forge and Ingenium, made fresh"}];}
 function wrapApps(){var A=W.IngApps;if(!A||A.__r246||typeof A.choose!=="function")return;var oc=A.choose;A.__r246=1;
-  A.choose=function(){var r=oc.apply(this,arguments);try{var host=$("appsPick");if(host&&!host.querySelector(".op-row")){var cap=mk("div","cc-group op-row","The Offline Project, made from these");cap.style.marginTop="10px";host.appendChild(cap);
+  A.choose=function(){var r=oc.apply(this,arguments);try{var host=$("appsPick");if(host&&!host.querySelector(".op-row")){var cap=mk("div","cc-group op-row","The Offline Project, made from their demonstrations");cap.style.marginTop="10px";host.appendChild(cap);
       listRows().forEach(function(x){var b=mk("button","cc-prow op-row");b.type="button";b.setAttribute("data-op",x.four?"4":"3");b.appendChild(mk("b",null,x.name));b.appendChild(mk("span","small muted",x.sub));
         b.addEventListener("click",function(){b.disabled=true;fresh(x.four).then(function(f){closeModal();return ccMakeProject(f.r.four?"The Offline Project":"The Offline Project (without Inkwell)",[{name:f.r.name,text:f.text}],f.r.name).then(function(pr){ccNewSession(pr);toast("Opened "+pr.name+", made fresh ("+(Math.round(f.r.size/1e5)/10)+" MB): "+f.r.line+".");});})
           .catch(function(e){b.disabled=false;toast(x.name+": "+String(e&&e.message||e));});});host.appendChild(b);});}}catch(e){warn(e);}return r;};}
@@ -239,7 +244,7 @@ function watch(){var box=$("fbRepos"),wb=$("fbWorkBody");if(!box||box.__op)retur
 var OPNAME="The Offline Project",OPNAME3="The Offline Project (without Inkwell)";
 function keepAsRepo(four){var H0=H();if(!H0)return;try{H0.busy("Making the Offline Project"+(four?"":" without Inkwell")+" and keeping it in Fabrica…");}catch(e){}
   var name=four?OPNAME:OPNAME3;
-  return fixNames().then(function(){return fresh(four);}).then(function(f){var files=[{path:"the_offline_project.html",data:f.text}],msg="Made from your apps"+(four?" (all four)":" (without Inkwell)");
+  return fixNames().then(function(){return fresh(four);}).then(function(f){var files=[{path:"the_offline_project.html",data:f.text}],msg="Made from the demonstrations"+(four?" (all four)":" (without Inkwell)")+": "+f.r.line;
       return IngRepo.list().then(function(rs){var mine=(rs||[]).filter(function(r){return r&&r.name===name;})[0];
         if(mine)return IngRepo.putMany(mine.id,files).then(function(){return IngRepo.commit(mine.id,msg);}).then(function(){return {id:mine.id,again:true};});
         return IngRepo.fromFiles(files,{name:name,msg:msg}).then(function(x){return {id:x.id,again:false};});});})
@@ -253,16 +258,16 @@ function fixNames(){if(FIXED)return FIXED;
   FIXED=Promise.resolve().then(function(){if(!W.IngRepo||typeof IngRepo.list!=="function"||typeof IngRepo.rename!=="function")return null;
     return IngRepo.list().then(function(rs){rs=rs||[];if(rs.some(function(r){return r&&r.name===OPNAME3;}))return null;
       var old=rs.filter(function(r){return r&&r.name===OPNAME&&r.head;})[0];if(!old)return null;
-      return IngRepo.log(old.id,{max:500}).then(function(l){l=l||[];if(!l.length||!l.every(function(c){return /^Made from your apps \(without Inkwell\)/.test(c.title||"");}))return null;
+      return IngRepo.log(old.id,{max:500}).then(function(l){l=l||[];if(!l.length||!l.every(function(c){return /^Made from (your apps|the demonstrations) \(without Inkwell\)/.test(c.title||"");}))return null;
         return IngRepo.rename(old.id,OPNAME3).then(function(){try{var h=H();if(h){h.refresh().then(function(){h.paint();},function(){});}}catch(e){}return old.id;});});});})
     .then(null,function(e){warn(e);return null;});
   return FIXED;}
 function bringOpts(sh){if(!sh||sh.querySelector(".op-bring"))return;var end=sh.querySelector(".end");
   function opt(ic,t,small,fn){var b=mk("button","f-opt op-bring");b.type="button";var i=mk("span","ic",ic),w=mk("span");w.appendChild(mk("b",null,t));w.appendChild(mk("small",null,small));b.appendChild(i);b.appendChild(w);
     b.addEventListener("click",function(){var wrap=sh.closest(".f-sheet-wrap");if(wrap)wrap.remove();fn();});if(end)sh.insertBefore(b,end);else sh.appendChild(b);return b;}
-  opt("✠",OPNAME+", all four apps","Made from the apps your library keeps now, and kept here as an app with its versions",function(){keepAsRepo(true);});
-  opt("✠",OPNAME+", without Inkwell","Carpe Diem, The Forge and Ingenium, made and kept the same way",function(){keepAsRepo(false);});
-  opt("✠",OPNAME+": choose each app's copy and its hall","Then make it, open it or save it",function(){openWork();});}
+  opt("✠",OPNAME+", all four apps","Made from your apps' demonstrations (never their full versions), and kept here as an app with its versions",function(){keepAsRepo(true);});
+  opt("✠",OPNAME+", without Inkwell","The demonstrations of Carpe Diem, The Forge and Ingenium, made and kept the same way",function(){keepAsRepo(false);});
+  opt("✠",OPNAME+": see what each room holds, and its hall","Then make it, open it or save it",function(){openWork();});}
 function bringWatch(){var root=$("fb");if(!root||root.__opBring)return;root.__opBring=1;
   try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var a=ms[i].addedNodes;for(var j=0;j<a.length;j++){var n=a[j];if(n.nodeType!==1||!n.classList||!n.classList.contains("f-sheet-wrap"))continue;
       var sh=n.querySelector(".f-sheet"),h3=sh&&sh.querySelector("h3");if(h3&&/^Bring an app in$/.test(h3.textContent))bringOpts(sh);}}}).observe(root,{childList:true});}catch(e){warn(e);}}
@@ -270,7 +275,7 @@ function boot(){if(!data())return;try{wrapApps();wrapPlus();}catch(e){warn(e);}v
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,1200);});
 try{var og=W.go;if(typeof og==="function"&&!og.__r246){var ng=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(function(){watch();var old=$("fbOpRow");if(old)old.remove();if(ON)paintWork();},60);}catch(e){}return r;};ng.__r246=1;W.go=ng;try{go=ng;}catch(e){}}}catch(e){}
-W.IngOffline={make:make,open:openWork,keep:keepAsRepo,names:[OPNAME,OPNAME3],fixNames:function(){FIXED=null;return fixNames();},rooms:function(four){return (four===false?KEYS3:KEYS4).map(function(k){var o=opState();return {key:k,copy:copyOf(k,o.use[k]),earlier:copyOf(k,"earlier")};});},can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,unpack:gunzip64,editHall:editHall,fresh:fresh};
+W.IngOffline={make:make,open:openWork,keep:keepAsRepo,names:[OPNAME,OPNAME3],fixNames:function(){FIXED=null;return fixNames();},rooms:function(four){var pl=plan(four!==false);return (four===false?KEYS3:KEYS4).map(function(k){return {key:k,holds:pl[k]||""};});},why:whyNot,can:can,data:data,last:function(){return LAST&&LAST.r;},hall:hall,prep:prep,prepParts:prepParts,unpack:gunzip64,editHall:editHall,fresh:fresh};
 })();
 ;try{window.__ingParts["p246"]="running";}catch(_){}
 </script>

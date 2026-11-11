@@ -29,7 +29,13 @@ const TEXT_OK = [/page-title/, /\bau-h\b/, /fld-h > h2/, /div\.l-head > div > h1
      their raised labels, the models' names beside the movement, the step's heading on its slab, the line that waits for the answers,
      the question asked, the blended answer's heading and the ready-made blends' names; the text under them keeps the app's scale */
   /bx-count/, /button\.rm-step[^ ]* > span/, /bx-label > span\.bx-name/, /bl-setup > h2\.sec/, /bl-empty > b/, /bl-q\b/, /bl-final > div\.bl-card-h > b/,
-  /bl-preset > b/];
+  /bl-preset > b/,
+  /* 6.77, Models as a turret of lenses (modules/r269.js), as she chose it: the name of what is in the engine, on the card beside the
+     turret, in Cormorant; the line under it keeps the app's scale */
+  /tr-now > b\.tr-name/,
+  /* 6.76, the Models page's rooms in the turret's design (modules/r267.js), as she asked for it: the cards' headings, the Health
+     gauges' values, her models' names and the houses' names, in Cormorant; the text under them keeps the app's scale */
+  /rmP-models-\w+\.rm-panel.* > div[^ ]*\.card[^ ]* > h2\.sec/, /hl-row[^ ]* > span\.hl-v/, /model-row.*\.mname/, /lu-tile[^ ]* > div\.lu-head > span\.lu-name/];
 const KEY_OK = [/cplus-btn/, /#chatSend/, /cc-title/, /r175-seal/, /l-fold|f-fold/, /hx-app\b/, /pcd-toc/];
 const MEASURE = (scopeSel) => {
   const W = window, D = document;

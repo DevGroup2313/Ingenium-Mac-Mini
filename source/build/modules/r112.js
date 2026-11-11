@@ -1198,9 +1198,9 @@ function sheetBring(into){if(into)return sheetBringOld(into);
     sh.box.appendChild(g);}
   var off=false;try{off=!!(window.IngOffline&&typeof IngOffline.data==="function"&&IngOffline.data());}catch(e){}
   if(off){sh.box.appendChild(h("span","f-lab","The Offline Project"));var g2=h("div","f-tiles op-bring");
-    g2.appendChild(tile("offline",null,"All four apps","Made from your apps as they are now",function(){IngOffline.keep(true);}));
-    g2.appendChild(tile("offline3",null,"Without Inkwell","Carpe Diem, The Forge and Ingenium",function(){IngOffline.keep(false);}));
-    var ch=h("button","f-tile");ch.type="button";ch.style.justifyContent="center";ch.appendChild(h("b",null,"Choose each copy"));ch.appendChild(h("small",null,"and its hall, then make it"));ch.onclick=function(){sh.close();IngOffline.open();};g2.appendChild(ch);
+    g2.appendChild(tile("offline",null,"All four apps","Their demonstrations, never their full versions",function(){IngOffline.keep(true);}));
+    g2.appendChild(tile("offline3",null,"Without Inkwell","The demonstrations of Carpe Diem, The Forge and Ingenium",function(){IngOffline.keep(false);}));
+    var ch=h("button","f-tile");ch.type="button";ch.style.justifyContent="center";ch.appendChild(h("b",null,"See what each room holds"));ch.appendChild(h("small",null,"and its hall, then make it"));ch.onclick=function(){sh.close();IngOffline.open();};g2.appendChild(ch);
     sh.box.appendChild(g2);}
   else sh.box.appendChild(h("span","op-bring"));
   sh.box.appendChild(h("span","f-lab","From something you have"));var rows=h("div","f-rows3");

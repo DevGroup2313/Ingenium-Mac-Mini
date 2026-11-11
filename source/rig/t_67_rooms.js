@@ -178,15 +178,18 @@ async function axeRun(p) {
 
     // ---------------- 8 · the Studio ----------------
     await go(p, 'models'); await room(p, 'models', 'yours');
-    const hint = await p.evaluate(() => { const k = document.getElementById('rmStudioKey'); const r = k && k.getBoundingClientRect(); return { text: k && k.textContent.trim(), line: (document.getElementById('rmStudioHint') || {}).textContent, top: r && Math.round(r.top) }; });
-    await p.click('#rmStudioKey'); await p.waitForTimeout(500);
+    // 6.77 (modules/r269.js): her words (11 November 2026): "I want the "Open the Studio" button to be removed since it seem superfluous from the
+    // new Models page": where the turret stands the line and its key are gone, and the Studio is opened by its own room key
+    const hint = await p.evaluate(() => { const k = document.getElementById('rmStudioKey'), h = document.getElementById('rmStudioHint');
+      return { turret: !!document.querySelector('#page-models.tr-on'), line: !!h && h.getClientRects().length > 0, key: !!k && k.getClientRects().length > 0 }; });
+    await p.click('#rmT-models-studio'); await p.waitForTimeout(500);
     // 6.9.x (modules/r199.js): the Studio has rooms of its own, one shown at a time: Make holds Your own AIs and Convert a model, Train holds the trainer
     const studio = await p.evaluate(() => { const vis = id => { const e = document.getElementById(id); return !!e && e.getBoundingClientRect().height > 0; };
       const here = { room: IngRooms.current('models'), tab: document.getElementById('rmT-models-studio').textContent.trim(), focus: document.activeElement && document.activeElement.id };
       document.getElementById('stT-make').click(); here.ai = vis('aiCard'); here.conv = vis('convCard'); here.train = vis('trainCard');
       document.getElementById('stT-train').click(); here.trainInTrain = vis('trainCard'); here.aiInTrain = vis('aiCard'); return here; });
-    ok(hint.text === 'Open the Studio' && /Studio/.test(hint.line) && hint.top < 260, 'beside the Models page\'s opening line, a plain line and a raised key: Open the Studio, in the first screen', hint);
-    ok(studio.room === 'studio' && studio.ai && studio.conv && !studio.train && studio.trainInTrain && !studio.aiInTrain && studio.tab === 'Studio', 'the key opens the Studio: Your own AIs and Convert a model in its Make room, Train a small model in its Train room, one room at a time', studio);
+    ok(hint.turret && !hint.line && !hint.key, 'where the turret stands, the line and its key Open the Studio are gone', hint);
+    ok(studio.room === 'studio' && studio.ai && studio.conv && !studio.train && studio.trainInTrain && !studio.aiInTrain && studio.tab === 'Studio', 'the Studio\'s room key opens it: Your own AIs and Convert a model in its Make room, Train a small model in its Train room, one room at a time', studio);
     await shot(p, 'rooms-models-studio-desk-day');
 
     // ---------------- 9 · Support folds, one group open at a time ----------------

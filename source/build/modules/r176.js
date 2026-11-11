@@ -478,8 +478,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '#fb .f-lc,#fb .f-tile,#fb .f-way,#fb .f-x,#fb .f-sw button,#fb .f-rail button,#fb .f-opt,#fb .f-repo,'+
   /* 6.74: a new app's logo on Fabrica's A new app panel, a key of its own (modules/r265.js) */
   '#fb .f-new-prev .f-ls.mark.nl-on,'+
-  /* 6.75: the Models page's turret: each model's port and the head's keys (modules/r266.js) */
-  '#page-models .tu-port:not(.blank),#page-models .tu-key,'+
+  /* 6.77: the Models page's turret (modules/r269.js, in place of 6.75's): each model's lens and the empty port are keys (her words, 11
+     November 2026: "I choose the Turret, please push it everywhere"; "I want your turret to replace the other chat's turret design instead") */
+  '#page-models button.tr-port,'+
   /* 6.68: Blend in Home's language (modules/r262.js): the model rows, the ways, the steps and the ready-made cards (her words, 10
      November 2026: "I want everything made clickable and popped out animated"); 6.70: Blend as a movement in 3D, each model's wheel
      a key (her words, 10 November 2026: "I approve of this design, please push it everywhere") */

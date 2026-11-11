@@ -16,3 +16,5 @@ ingenium_diag.txt
 /icons/ingenium.iconset/
 # release.py page writes its working copy of the page here too
 /source/build/ingenium.html
+# release.py page builds the demo edition here first (6.72); release.py editions copies it into editions/
+/source/build/ingenium_demo.html

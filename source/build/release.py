@@ -3,14 +3,17 @@
   python3 release.py desktop                       -> the desktop patches (desktop/) not applied yet, in the Mac and Windows repos
   python3 release.py page                          -> build the page, embed the kit store from the repos' HEADs, copy to all four repos,
                                                       after applying the desktop patches (desktop/) not applied yet (commit them first, then run it again),
-                                                      and write each repo's BUILD_INFO.txt with the page's fingerprint
+                                                      and write each repo's BUILD_INFO.txt with the page's fingerprint. From 6.77 the demo edition is
+                                                      built first (into ingenium_demo.html beside this file) and the master page carries its recipe
   python3 release.py info                          -> BUILD_INFO.txt alone, from the pages in the repos
   python3 release.py edition full|gift|demo OUT    -> that edition's release page (stamped, with the kit store), into OUT only
   python3 release.py editions                      -> the three other editions into the Mac mini repository's editions/, with their fingerprints
+                                                      (from 6.77 the demo edition is the one "page" built, the very one the master page carries)
 """
 import sys, os, re, json, gzip, base64, subprocess, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tail  # 6.8.1 (tail.py)
+import demo_recipe  # 6.77 (demo_recipe.py)
 H = os.path.dirname(os.path.abspath(__file__))
 R = {"mini": "/home/user/Ingenium-Mac-Mini", "intel": "/home/user/Ingenium-Mac-Intel",
      "win": "/home/user/Ingenium-HPWindows", "fire": "/home/user/Ingenium-Android-fire"}
@@ -127,9 +130,14 @@ def desktop():
             subprocess.run([sys.executable, os.path.join(H, "desktop", name + ".py"), p], check=True)
 
 
-def build(out, edition="master"):
+DEMO_PAGE = os.path.join(H, "ingenium_demo.html")  # 6.77: the demo edition of this release, built by page() before the master page
+
+
+def build(out, edition="master", demo=None):
     """The release page of one edition (editions.py: master, full, gift, demo) into out: built, stamped with the version,
-    and given the kit store read from the repositories' last commits. Returns the page."""
+    and given the kit store read from the repositories' last commits. Returns the page.
+    6.77: demo names the demo edition built just before (the same commits, the same day): the master page is given its recipe
+    (demo_recipe.py), so The Offline Project it makes holds Ingenium's demo edition, never the master edition itself."""
     vj = json.load(open(os.path.join(H, "version.json")))
     desktop()
     subprocess.run([sys.executable, os.path.join(H, "build_page.py"), out], check=True,
@@ -185,6 +193,13 @@ def build(out, edition="master"):
     block = '<script id="%s" type="ingenium/kit-bundle-gz" data-bytes="%d">%s</script>' % (SLOT, len(raw), b64)
     pg, n = re.subn(r'<script id="%s"[^>]*>[^<]*</script>' % SLOT, lambda m: block, pg, count=1)
     assert n == 1 and pg.rstrip().endswith("</html>")
+    if demo:  # 6.77: the demo edition's recipe, proved to give it back whole before it travels (demo_recipe.embed)
+        assert edition == "master", "only the master edition carries the demo edition"
+        pg, rec = demo_recipe.embed(pg, open(demo, encoding="utf-8").read())
+        if rec["version"] != vj["v"]:
+            sys.exit("the demo edition given is version %s, not %s" % (rec["version"], vj["v"]))
+        if not any(s.get("id") == SLOT for s in rec["srcs"]):
+            print("NOTE: the demo edition's kit store differs from this page's, so it is carried whole (were both built from the same commits?)")
     pg = tail.tail(pg)  # 6.8.1: and at the end of the page again, after its last part
     open(out, "w", encoding="utf-8").write(pg)
     print("%s edition: page %d bytes; kit store %d files (%.0f KB) from %s" % (edition, len(pg), len(files), total / 1024, commits))
@@ -192,8 +207,10 @@ def build(out, edition="master"):
 
 
 def page():
-    """The master edition into the four repositories (the owner's own apps are built from it)."""
-    pg = build(os.path.join(H, "ingenium.html"))
+    """The master edition into the four repositories (the owner's own apps are built from it).
+    6.77: the demo edition is built first, from the same commits, and the master page carries it as a recipe."""
+    build(DEMO_PAGE, "demo")
+    pg = build(os.path.join(H, "ingenium.html"), demo=DEMO_PAGE)
     for k, repo in R.items():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
     ship_rag()
@@ -265,8 +282,18 @@ def editions():
     vj = json.load(open(os.path.join(H, "version.json")))
     d = os.path.join(R["mini"], "editions")
     names = ["ingenium_%s.html" % e for e in ("full", "gift", "demo")]
+    # 6.77: the demo edition is the very one page() built and the master page carries (its fingerprint is in the page's slot)
+    mp = open(os.path.join(R["mini"], "ingenium.html"), encoding="utf-8").read()
+    slot = re.search(r'<script id="(?:ing-tail:)?%s"[^>]*\bdata-sha256="([0-9a-f]{64})"' % demo_recipe.SLOT, mp)
     for e, n in zip(("full", "gift", "demo"), names):
-        build(os.path.join(d, n), e)
+        if e == "demo" and slot:
+            if not os.path.exists(DEMO_PAGE) or fingerprint.sha(DEMO_PAGE) != slot.group(1):
+                sys.exit("the demo edition the master page carries is not beside release.py: run release.py page again")
+            import shutil
+            shutil.copyfile(DEMO_PAGE, os.path.join(d, n))
+            print("demo edition: the one the master page carries (%s)" % slot.group(1)[:16])
+        else:
+            build(os.path.join(d, n), e)
         t = open(os.path.join(d, n), encoding="utf-8").read()
         m = re.search(r'var ING_VERSION="([0-9.]+)"', t)
         assert m and m.group(1) == vj["v"], n
@@ -291,7 +318,7 @@ def sync_sources():
     dst = os.path.join(R["mini"], "source", "build")
     if not os.path.isdir(dst) or os.path.realpath(dst) == os.path.realpath(H):
         return
-    for f in ("build_page.py", "release.py", "version.json", "held.json", "master_seal.json", "lx_layers.json", "pdf_widths.json", "lx_fonts.json"):
+    for f in ("build_page.py", "release.py", "demo_recipe.py", "version.json", "held.json", "master_seal.json", "lx_layers.json", "pdf_widths.json", "lx_fonts.json"):
         shutil.copy2(os.path.join(H, f), os.path.join(dst, f))
     md = os.path.join(dst, "modules")
     os.makedirs(md, exist_ok=True)
