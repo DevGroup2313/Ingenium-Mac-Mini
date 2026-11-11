@@ -262,7 +262,7 @@ function paintLevels(){[].forEach.call(D.querySelectorAll(".ih-lv[role=radiogrou
    New to this: every card. Some experience: not the basics (what a model is, the doors from Home, a reply arriving, the
    seal, About). Expert: the first card of each part of a chapter and a few that matter to anyone, not the basics and not
    the slow demonstrations. A card may say for itself, with levels:[...]. The last card always shows. */
-var SOME_SKIP=/^(What a model is|The doors from Home|A reply arrives|The seal|About)$/;
+var SOME_SKIP=/^(What a model is|The doors from Home|A reply arrives|The logo|About)$/;
 var EXPERT_SKIP=/^(Home|Writing to the model|Reading its thinking|Notes|Done, and the next|Support|Your Ingenium)$/;
 var EXPERT_KEEP=/^(Choosing the model|Controls|Health|Catch, quiet, and out of the way|What is running|Display|Your sources, cited|Your data stays here|Help, wherever you are)$/;
 function bare(t){return String(t||"").replace(/^[^A-Za-z]+/,"").trim();}
@@ -439,7 +439,7 @@ var PG={
       ["Open an app","Tabula, Abacus, Imago, Scriba and Fontes open on the Desk inside Ingenium. Each can also open in a window of its own.",".hx-appsec, .hx-app"]],
     tips:{"new":["Not sure what to do? Press the large purple key. It always points to one small step.","The guided tour shows every room in short chapters. Stop whenever you like."],
       some:["Each room keeps what you did there, so you can always carry on.","The side buttons on the right follow you to every page: notes, the focus clock, reminders and the quiet screen."],
-      expert:["F1 opens help on any page; Shift+F1 explains the control in focus.","The seal at the top left opens the introduction again."]}},
+      expert:["F1 opens help on any page; Shift+F1 explains the control in focus.","The logo at the top left opens the introduction again."]}},
   chat:{name:"Chat",tour:["Chat"],
     what:"Chat is where you talk with a model: ask, write, and make documents and pages.",
     plain:"Write as you would to a person. The model writes back word by word. With a model on this device, what you write stays here; with a cloud model chosen, or a web search on, it goes to that service.",
@@ -571,7 +571,7 @@ function findIn(sel,scope){var list=String(sel||"").split(/\s*,\s*/),i,n;for(i=0
    [selector, name, what it does, more for someone new, more for an expert] */
 var WHAT=[
   ["#ingHelpKey","Help","Opens help about the page you are on: what it is for, what most people do there, and tips for your level.","Its What is this? key explains the next control you press.","F1 on any page; Shift+F1 explains the control in focus."],
-  ["#brandSealBtn","The seal","Opens the introduction again, the door you saw when Ingenium opened."],
+  ["#brandSealBtn","The logo","Opens the introduction again, the door you saw when Ingenium opened."],
   ["#topChevron","Fold the controls","Folds the keys in the top bar away for a quieter screen, or brings them back. The Help key stays."],
   ["#statusPill","Your status","Says whether you are at the desk, on a break or away. Press it to change it, link it to Clepsydra or see the time report."],
   ["#enginePill","The engine","Shows whether the engine that runs models on this device is ready. Press it to open Models.","The engine is the program that runs a model; it needs no internet."],

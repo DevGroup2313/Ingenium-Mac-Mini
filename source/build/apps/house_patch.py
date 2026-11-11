@@ -74,9 +74,11 @@ def patch(name, html, house):
                "  var BLUE = (window.__ingHouse && window.__ingHouse.accent) || '#1B6B93', GOLD = '#C6A668', GOLDPALE = '#d4c39a', INK = '#1D1D1F';", name + " colour")
     mod = _one(mod, "var pen = function (m) { return (m === 'ink') ? INK : BLUE; };",
                "var pen = function (m) { return (m === 'ink') ? INK : ((window.__ingHouse && window.__ingHouse.accent) || BLUE); };", name + " ink")
-    for old, new in (('alt="Carpe Diem seal"', 'alt="Seal"'), ("'Carpe Diem seal'", "'Seal'"),
-                     ("'All Carpe Diem letterheads, with previews, and the seal to copy'", "'All letterheads, with previews, and the seal to copy'"),
-                     ("'All Carpe Diem letterheads'", "'All letterheads'"), ("'Carpe Diem seal and letterheads'", "'Seal and letterheads'"),
+    # 6.74: inside Ingenium the studio's mark is called a logo (her words, 11 November 2026: "Please change "seal" to "logo" because not
+    # every app will have an seal themed logo"; her choice: "Logo everywhere")
+    for old, new in (('alt="Carpe Diem seal"', 'alt="Logo"'), ("'Carpe Diem seal'", "'Logo'"),
+                     ("'All Carpe Diem letterheads, with previews, and the seal to copy'", "'All letterheads, with previews, and the logo to copy'"),
+                     ("'All Carpe Diem letterheads'", "'All letterheads'"), ("'Carpe Diem seal and letterheads'", "'Logo and letterheads'"),
                      ("'Carpe Diem letterheads'", "'Letterheads'"), ("['blue', 'Carpe Diem blue']", "['blue', 'In colour']")):
         mod = mod.replace(old, new)
     # with no house seal, the key beside the group opens "Your own" (a seal or logo from a picture on this device)
@@ -100,6 +102,14 @@ def patch(name, html, house):
     html = html[:i] + esc + html[i:]
     # what the files say, and the house's name where Carpe Diem was named
     html = html.replace("['#1B6B93', 'Carpe Diem blue']", "['#1B6B93', 'Deep blue']")
+    # 6.74: the studio's words say logo, wherever they stand in the page (Carpe Diem itself keeps its seal: this is Ingenium's copy)
+    for old, new in (("'Seal copied. Paste it anywhere.'", "'Logo copied. Paste it anywhere.'"),
+                     ("'This device would not place the picture, so the seal has been saved instead.'", "'This device would not place the picture, so the logo has been saved instead.'"),
+                     ("'This device would not let me reach the clipboard, so the seal has been saved instead.'", "'This device would not let me reach the clipboard, so the logo has been saved instead.'"),
+                     ("'The seal could not be prepared.'", "'The logo could not be prepared.'"), ("'Could not save the seal.'", "'Could not save the logo.'"),
+                     ("'Seal beside the wordmark, aligned left'", "'Logo beside the wordmark, aligned left'"), ("'Seal above the wordmark, centred'", "'Logo above the wordmark, centred'"),
+                     ("'Include the dated seal'", "'Include the dated logo'"), ("'Copy the seal'", "'Copy the logo'")):
+        html = html.replace(old, new)
     if name == "tabula":
         html = _one(html, "      w.textContent='CARPE DIEM'; d.appendChild(w); }",
                     "      w.style.color=(window.__ingHouse&&window.__ingHouse.accent)||'#1B6B93';w.textContent=(window.__ingHouse&&window.__ingHouse.word)||''; d.appendChild(w); }", "tabula wordmark")
@@ -107,8 +117,8 @@ def patch(name, html, house):
     ['The seal and the wordmark', function(){ put(sealMark(true)); }],
     ['CARPE DIEM, diagonally', function(){ put(words('CARPE DIEM')); }],
 """, """  ].concat((window.__ingHouse&&window.__ingHouse.png)?[
-    ['The seal', function(){ put(sealMark(false)); }],
-    ['The seal and the wordmark', function(){ put(sealMark(true)); }],
+    ['The logo', function(){ put(sealMark(false)); }],
+    ['The logo and the wordmark', function(){ put(sealMark(true)); }],
     [window.__ingHouse.word+', diagonally', function(){ put(words(window.__ingHouse.word)); }]]:[]).concat([
 """, "tabula watermark menu")
         html = _one(html, "  var items=[\n  ].concat(", "  var items=[\n  ].concat(", "tabula watermark menu head")

@@ -485,7 +485,7 @@ function play(){var P=parts();if(still()){glow(P,false);return "glow";}busy=true
   if(!mine.length)fin();else Promise.all(mine).then(fin);return name;}
 function centre(){return moveBox?moveBox.querySelector(".bx-cw"):null;}
 function engine(){var box=mk("div","hx-seal bx-sealbox");box.setAttribute("data-ing-seal","blend");
-  var k=mk("button","r175-seal bxk");k.type="button";k.setAttribute("aria-label","Ingenium's seal, at the heart of the blend. Press it to wind the movement.");
+  var k=mk("button","r175-seal bxk");k.type="button";k.setAttribute("aria-label","Ingenium's logo, at the heart of the blend. Press it to wind the movement.");
   var g=mk("span","r175-glow");g.setAttribute("aria-hidden","true");var rp=mk("span","r175-ripple");rp.setAttribute("aria-hidden","true");var fx=mk("span","r175-fx");
   var seal=copySeal();if(seal)fx.appendChild(seal);
   k.appendChild(g);k.appendChild(fx);k.appendChild(rp);box.appendChild(k);KEY=k;

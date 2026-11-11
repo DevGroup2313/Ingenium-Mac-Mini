@@ -100,10 +100,10 @@ function title(apps){var n=norm(apps);if(!n)return "";if(n.length===4)return "Th
   if(n.length===3)return "The Offline Project without "+NAMES[ORDER.filter(function(k){return n.indexOf(k)<0;})[0]];
   return listed(n.map(function(k){return NAMES[k];}));}
 function label(apps,night){var n=norm(apps);if(!n)return "";var by=night?", by night":"",N=n.map(function(k){return NAMES[k];});
-  if(n.length===4)return "The master seal of The Offline Project: a quartered shield holding the seals of Carpe Diem, The Forge, Ingenium and Inkwell, with the ribbon The Offline Project"+by;
-  if(n.length===3)return "The seal of "+title(n)+": a shield holding the seals of "+N[0]+" and "+N[1]+" above, and "+N[2]+" across the lower half"+by;
-  if(n.length===2)return "The seals of "+N[0]+" and "+N[1]+", side by side, joined by a gold bar with an open book"+by;
-  return N[0]+"’s seal"+by;}
+  if(n.length===4)return "The master logo of The Offline Project: a quartered shield holding the logos of Carpe Diem, The Forge, Ingenium and Inkwell, with the ribbon The Offline Project"+by;
+  if(n.length===3)return "The logo of "+title(n)+": a shield holding the logos of "+N[0]+" and "+N[1]+" above, and "+N[2]+" across the lower half"+by;
+  if(n.length===2)return "The logos of "+N[0]+" and "+N[1]+", side by side, joined by a gold bar with an open book"+by;
+  return N[0]+"’s logo"+by;}
 /* where everything sits. A trio follows the owner's template: the first two apps of the set (in the order Carpe Diem,
    The Forge, Ingenium, Inkwell) in the upper quarters, the third centred in one field across the whole lower half */
 function layout(n){var K=["","one","duo","trio","master"][n.length];

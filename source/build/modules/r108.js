@@ -226,9 +226,9 @@ function fontCss(th,text){var D=window.IngDoc;if(!D||!D.faceCss)return "";if(!th
 function paperStyle(){if(document.getElementById("l7PaperCss"))return;var st=document.createElement("style");st.id="l7PaperCss";st.textContent=fontCss()+"\n"+paperCss(true);document.head.appendChild(st);}
 /* a seal on the paper, flat: by day its picture; by night the app's own night seal, its layers laid one on another */
 function paperSeal(k,mode){var L=LX7_LAYERS||{};
-  if(k==="master"){var src=masterSrc(mode==="night");return '<img class="master'+(mode?" s"+mode.charAt(0):"")+'" src="'+src+'" alt="The master seal of The Offline Project">';}
-  if(mode==="night"&&L[k+"N"])return '<span class="sn" role="img" aria-label="'+esc(nm(k))+'\'s seal">'+L[k+"N"].filter(function(x){return !x.side;}).map(function(x){return '<img src="'+x.src+'" alt="">';}).join("")+'</span>';
-  return '<img'+(mode?' class="sd"':'')+' src="'+flatSrc(k)+'" alt="'+esc(nm(k))+'\'s seal">';}
+  if(k==="master"){var src=masterSrc(mode==="night");return '<img class="master'+(mode?" s"+mode.charAt(0):"")+'" src="'+src+'" alt="The master logo of The Offline Project">';}
+  if(mode==="night"&&L[k+"N"])return '<span class="sn" role="img" aria-label="'+esc(nm(k))+'\'s logo">'+L[k+"N"].filter(function(x){return !x.side;}).map(function(x){return '<img src="'+x.src+'" alt="">';}).join("")+'</span>';
+  return '<img'+(mode?' class="sd"':'')+' src="'+flatSrc(k)+'" alt="'+esc(nm(k))+'\'s logo">';}
 /* 6.1 · the crest of a set on the paper, flat (the paper never moves): the master seal for all four, The Offline Project's
    shield for any three, the pair for two, by day or by night as the page is. A page saved to a file carries both, each
    as a picture of its own (crestPng, drawn before it is saved), and shows the night one on a device set to dark. */
@@ -348,7 +348,7 @@ function setCrest(apps,ck){var key=sorted(apps).join("+"),c=R7.crest;
   if(!c||c.key!==key||!c.el){var e=IngSeal.el(sorted(apps),{live:true,size:ck==="duo"?88:ck==="master"?42:46});e.classList.add("l-crest");R7.crest=c={key:key,el:e};}
   try{IngSeal.prepare(sorted(apps));}catch(e2){}
   return c.el;}
-function crestWords(ck){return {master:"The master seal",trio:"The Offline Project’s seal for these three",duo:"The duo’s seal"}[ck]||"";}
+function crestWords(ck){return {master:"The master logo",trio:"The Offline Project’s logo for these three",duo:"The duo’s logo"}[ck]||"";}
 /* 6.55: her words (7 November 2026): "Clicking on any of the 4 apps inside of the "Your apps" section of the Lector page feels really
    heaving and slow". A click drew the brief again, and with it every tile's seal: 31 pictures, half a megabyte of them, decoded anew
    each time. A tile's seal is now made once (by day and by night) and moved into the tile drawn again, its pictures already decoded. */
@@ -501,7 +501,7 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S
     c.onchange=function(){B.docs[d[0]]=c.checked;saveSoon();paintTabs();paintDoc();paintModel();};row.appendChild(c);
     var t=h("span","t");t.textContent=docLabel(d[0],B.apps,B.purpose);t.appendChild(h("small",null,esc(d[0]==="cover"&&B.purpose==="portfolio"?"A letter of introduction, for any reader":d[2])));row.appendChild(t);
     row.appendChild(sealMark(d[0],B.apps));dl.appendChild(row);});
-  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"||!ck&&four(B.apps)?"The master seal goes on the master dossier, the master appendix, the portfolio piece and Every function.":ck?crestWords(ck)+" goes on the dossier, the appendix, the portfolio piece and Every function.":"Seals go on dossiers, appendices, portfolio pieces and Every function.")+" Your CV and cover letters stay plain."));
+  s3.appendChild(dl);s3.appendChild(h("p","l-hint",(ck==="master"||!ck&&four(B.apps)?"The master logo goes on the master dossier, the master appendix, the portfolio piece and Every function.":ck?crestWords(ck)+" goes on the dossier, the appendix, the portfolio piece and Every function.":"Logos go on dossiers, appendices, portfolio pieces and Every function.")+" Your CV and cover letters stay plain."));
   box.appendChild(s3);
   /* facts and voice */
   box.appendChild(meCard());
@@ -526,13 +526,13 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S
     od.appendChild(pk);}
   s7.appendChild(od);box.appendChild(s7);
   box.parentNode.scrollTop=scroll;segThumbs(box);}
-function sealMark(kind,apps){var m=h("span","l-mark");if(!sealed(kind)){m.className="l-mark none";m.textContent="No seal";return m;}
+function sealMark(kind,apps){var m=h("span","l-mark");if(!sealed(kind)){m.className="l-mark none";m.textContent="No logo";return m;}
   /* 6.1: the set's one picture (its crest, or one app's own seal), by night the night one. The owner's words (20 October
      2026): "The seals on the "Documents" section of the Lector page still have the Light mode look on Dark mode, please fix that." */
   var a=sorted(apps);
-  if(a.length&&window.IngSeal){try{var ck=IngSeal.kind(a),im=IngSeal.el(a,{live:false,alt:""});if(im){im.classList.add("l-mk");im.title=crestWords(ck)||(nm(a[0])+"’s seal");m.classList.add("k-"+ck);m.appendChild(im);return m;}}catch(e){}}
-  if(four(sorted(apps))&&ING_SEALS.master){var i=new Image();i.src=flatSrc("master");i.className="ms";i.alt="";i.title="The master seal";m.appendChild(i);return m;}
-  sorted(apps).forEach(function(k){var i=new Image();i.src=flatSrc(k);i.alt="";i.title=nm(k)+"'s seal";m.appendChild(i);});return m;}
+  if(a.length&&window.IngSeal){try{var ck=IngSeal.kind(a),im=IngSeal.el(a,{live:false,alt:""});if(im){im.classList.add("l-mk");im.title=crestWords(ck)||(nm(a[0])+"’s logo");m.classList.add("k-"+ck);m.appendChild(im);return m;}}catch(e){}}
+  if(four(sorted(apps))&&ING_SEALS.master){var i=new Image();i.src=flatSrc("master");i.className="ms";i.alt="";i.title="The master logo";m.appendChild(i);return m;}
+  sorted(apps).forEach(function(k){var i=new Image();i.src=flatSrc(k);i.alt="";i.title=nm(k)+"'s logo";m.appendChild(i);});return m;}
 
 /* the posting or the programme */
 function postCard(p){var wrap=h("div");if(p==="portfolio"){wrap.appendChild(h("p","l-hint","For your professional catalogue: written for any reader, with no posting in mind."));return wrap;}
@@ -744,7 +744,7 @@ function paintDoc(){var desk=$("l7Desk"),ol=$("l7Outline");if(!desk)return;var k
   if(!s){desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,"",Object.assign({},meta,{wait:true}));outline("",null);return;}
   IngBig.load(s.ref).then(function(md){if(R7.doc!==kind)return;R7.cur={kind:kind,md:md||"",meta:meta,chk:s.chk};desk.innerHTML=(sealed(kind)?"":rule(kind))+paper(kind,md||"",Object.assign({},meta,{chk:s.chk,made:s.made}));outline(md||"",null);desk.scrollTop=keepScroll;
     var nChk=s.chk?(s.chk.unmatched||[]).length+(s.chk.fromNotes||[]).length:0;if(nChk){var dc=$("l7DocChip");if(dc){dc.className="l-chip";dc.textContent=nChk+" figure"+(nChk>1?"s":"")+" to check";}}});}
-function rule(kind){return '<div class="l-rule"><span class="i">○</span>'+(kind==="cover"?"No seal on cover letters: your letters stay plain, as you asked.":kind==="cv"?"No seal on your CV.":"")+'</div>';}
+function rule(kind){return '<div class="l-rule"><span class="i">○</span>'+(kind==="cover"?"No logo on cover letters: your letters stay plain, as you asked.":kind==="cv"?"No logo on your CV.":"")+'</div>';}
 function forText(p){var P=p&&p!=="portfolio"&&L7().posts[p];if(!P)return "";return [P.title,P.org].filter(Boolean).join(" · ");}
 function outline(md,live){var ol=$("l7Outline");if(!ol)return;ol.innerHTML="";var blocks=lxBlocks(md),n=0;if(blocks.length&&blocks[0].k==="h"&&blocks[0].lv===1)blocks.shift();
   var hs=blocks.filter(function(b){return b.k==="h"&&b.lv<=2;});
@@ -1069,7 +1069,7 @@ function keepDoc(j,kind,md,G){var key=j.key,S=L7().sets[key]=L7().sets[key]||{ap
   var sf=kind==="functions"?{md:md,line:""}:styleFix(md);md=sf.md;R7.docMd[kind]=md;
   var chk=kind==="functions"?{figures:0,unmatched:[],fills:0}:check(md,G),ref=IngBig.newId();
   addEv({k:"check",label:docLabel(kind,G.apps,G.purpose),text:(sf.line?sf.line+" ":"")+(chk.figures?((chk.unmatched.length||(chk.fromNotes||[]).length)?(chk.unmatched.length?chk.unmatched.length+" of "+chk.figures+" figures "+(chk.unmatched.length===1?"matches no figure in the measures, your CV or the posting, and is marked":"match no figure in the measures, your CV or the posting, and are marked")+" for you to check: "+chk.unmatched.slice(0,6).join(", ")+(chk.unmatched.length>6?"…":"")+". ":"")+((chk.fromNotes||[]).length?chk.fromNotes.length+(chk.fromNotes.length===1?" appears only in Lector's own reading notes, and is marked":" appear only in Lector's own reading notes, and are marked")+" for you to check too: "+chk.fromNotes.slice(0,6).join(", ")+(chk.fromNotes.length>6?"…":"")+". ":""):"Every figure ("+chk.figures+") matches a figure in the measures, your CV or the posting. ")+"Numbers up to twelve, numbers written in words and the rows of tables are not checked.":"No figures to check.")+
-    (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":four(G.apps)?"The master seal is on its cover.":"Its seal"+(G.runs.length>1?"s are":" is")+" on its cover."):" No seal, as you asked.")});
+    (chk.fills?" "+chk.fills+" place"+(chk.fills>1?"s are":" is")+" left for you to fill, in square brackets.":"")+(sealed(kind)?" "+(crestKind(G.apps)?crestWords(crestKind(G.apps))+" is on its cover.":four(G.apps)?"The master logo is on its cover.":"Its logo"+(G.runs.length>1?"s are":" is")+" on its cover."):" No logo, as you asked.")});
   return IngBig.put(ref,md).then(function(){var old=S.docs[kind];if(old){S.older[kind]=[old].concat(S.older[kind]||[]);while(S.older[kind].length>3){var x=S.older[kind].pop();if(x&&x.ref)IngBig.del(x.ref);}}
     S.docs[kind]={ref:ref,made:Date.now(),model:lxModelName({modelId:j.modelId}),title:setName(j.apps)+" · "+docLabel(kind,j.apps,j.purpose),chk:chk};saveState();});}
 
@@ -1118,7 +1118,7 @@ function save(){curDoc().then(function(d){if(!d){ingToast("There is nothing to s
 function crestFor(ck,apps,fmt){if(!ck||!window.IngSeal||fmt==="md")return Promise.resolve(null);
   var p=fmt==="html"?Promise.all([IngSeal.png(apps,{night:false,width:ck==="duo"?520:300}),IngSeal.png(apps,{night:true,width:ck==="duo"?520:300})]).then(function(x){return {html:{day:x[0],night:x[1]}};})
     :IngSeal.docPicture(apps).then(function(dp){return dp?{doc:dp}:null;});
-  return p.catch(function(e){ingToast("The set’s seal could not be drawn on this device, so the document carries each app’s own seal. "+(e&&e.message||""));return null;});}
+  return p.catch(function(e){ingToast("The set’s logo could not be drawn on this device, so the document carries each app’s own logo. "+(e&&e.message||""));return null;});}
 /* the paper as its PDF and its Word file are read off: by day, at its measure, in the faces it needs, nothing around it */
 function paperPage(kind,md,o){var th=themeOf(kind,o.apps);
   return '<!doctype html>\n<html lang="en-GB"><head><meta charset="utf-8"><meta name="color-scheme" content="light"><title>'+esc(o.title||"")+'</title><style>'+fontCss(th,md)+"\n"+paperCss(false,true)+

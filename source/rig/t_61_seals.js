@@ -136,7 +136,7 @@ async function pixel(p, dataUrl, vb, pts) {
       paper: paper ? [paper.querySelectorAll('img').length, paper.querySelector('img').className, paper.querySelector('img').src === IngSeal.url(['cd', 'forge', 'ingenium'], { night: false })] : null,
       paperW: paper ? Math.round(paper.querySelector('img').getBoundingClientRect().width) : 0 }; });
   ok(L1.setCrest && /a trio of The Offline Project/i.test(L1.setText), 'the brief names the set beside its live crest: a trio of The Offline Project', L1.setText);
-  ok(L1.marks.slice(0, 3).every(m => /ing-crest-img ic-trio.*\|1$/.test(m)) && L1.marks[3] === 'No seal' && L1.markSrc, 'the Documents list shows one crest for the dossier, the appendix and the portfolio piece (not three seals), and No seal on the letter', L1.marks);
+  ok(L1.marks.slice(0, 3).every(m => /ing-crest-img ic-trio.*\|1$/.test(m)) && L1.marks[3] === 'No logo' && L1.markSrc, 'the Documents list shows one crest for the dossier, the appendix and the portfolio piece (not three seals), and No logo on the letter (6.74: logo, not seal)', L1.marks);
   ok(/for these three goes on the dossier/.test(L1.hint || ''), 'and says which seal goes on which documents', L1.hint);
   ok(L1.paper && L1.paper[0] === 1 && /crest c-trio/.test(L1.paper[1]) && L1.paper[2] && L1.paperW >= 100, 'the dossier\'s cover on the page carries the trio\'s crest, alone', L1);
   await p.screenshot({ path: path.join(OUT, 's61-lector-trio-day.png') });

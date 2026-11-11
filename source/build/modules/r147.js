@@ -436,12 +436,12 @@ function build(){
 var fontDone=false;
 function font(){if(fontDone)return;fontDone=true;try{var u=FONTS&&FONTS["cormorant-500-italic"];if(!u)return;var st=mk("style");st.id="r147-font";
   st.textContent='@font-face{font-family:"Home Cormorant";font-style:italic;font-weight:500;font-display:swap;src:url('+u+') format("woff2")}';document.head.appendChild(st);}catch(e){}}
-function drawSeal(){if(!R.seal||R.seal.firstChild||!window.IngSeal)return;try{var e=IngSeal.el(["ingenium"],{live:true,size:92,alt:"The seal of Ingenium"});if(e)R.seal.appendChild(e);}catch(e){}}
+function drawSeal(){if(!R.seal||R.seal.firstChild||!window.IngSeal)return;try{var e=IngSeal.el(["ingenium"],{live:true,size:92,alt:"The logo of Ingenium"});if(e)R.seal.appendChild(e);}catch(e){}}
 function drawCrest(){if(!R.crest||R.crest.firstChild)return;font();
   try{var e=window.IngSeal?IngSeal.el(["cd","forge","ingenium","inkwell"],{night:"auto",live:true,size:300}):null;
     if(e){R.crest.appendChild(e);return;}}catch(x){}
   /* without the seals part: the master seal's own picture, if this copy has it */
-  try{var s=window.ING_SEALS&&ING_SEALS.master;if(s&&s.b64){var im=new Image();im.className="ing-crest-img";im.alt="The master seal of The Offline Project";im.src="data:image/png;base64,"+s.b64;R.crest.appendChild(im);}}catch(x){}}
+  try{var s=window.ING_SEALS&&ING_SEALS.master;if(s&&s.b64){var im=new Image();im.className="ing-crest-img";im.alt="The master logo of The Offline Project";im.src="data:image/png;base64,"+s.b64;R.crest.appendChild(im);}}catch(x){}}
 function watchPlaque(){if(!R.plaque)return;
   /* drawn as soon as it nears the window, or, at the latest, once the page has settled after start */
   function later(){var idle=window.requestIdleCallback||function(f){return setTimeout(f,1);};setTimeout(function(){idle(drawCrest,{timeout:1500});},1800);}

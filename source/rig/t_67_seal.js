@@ -9,7 +9,7 @@ const pw = require('/opt/node-tools/node_modules/playwright'); const fs = requir
 const URL_ = process.argv[2], OUT = process.argv[3], AXE = process.argv[4]; fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0;
 const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d !== undefined ? '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 500) : '')); c ? pass++ : fail++; };
-const NAME = "Ingenium's seal. Press it for fun.";
+const NAME = "Ingenium's logo. Press it for fun.";  // 6.74: logo, not seal (her choice, 11 November 2026)
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
 
 async function open(b, opts) {

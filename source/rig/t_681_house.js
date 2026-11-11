@@ -45,8 +45,8 @@ let pass = 0, fail = 0; function ok(c, what, info) { if (c) pass++; else fail++;
       ok(!r.pop, app + ': the key beside the group opens Your own, not the house letterheads', JSON.stringify(r));
     }
     ok(!r.carpe, app + ': nothing in the group or its picker names Carpe Diem', r.text);
-    if (app === 'tabula') ok(r.wm && !r.wm.some(t => /carpe/i.test(t)) && (ED === 'master' ? r.wm.some(t => /INGENIUM/.test(t)) : !r.wm.some(t => /seal|INGENIUM/i.test(t))),
-      'tabula: the watermark menu offers ' + (ED === 'master' ? "Ingenium's seal and name" : 'no seal and no name'), JSON.stringify(r.wm));
+    if (app === 'tabula') ok(r.wm && !r.wm.some(t => /carpe/i.test(t)) && (ED === 'master' ? r.wm.some(t => /INGENIUM/.test(t)) : !r.wm.some(t => /seal|logo|INGENIUM/i.test(t))),
+      'tabula: the watermark menu offers ' + (ED === 'master' ? "Ingenium's logo and name" : 'no logo and no name'), JSON.stringify(r.wm));
   }
   ok(errs.length === 0, 'no errors on the page', errs.slice(0, 3).join(' | '));
   console.log(pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);

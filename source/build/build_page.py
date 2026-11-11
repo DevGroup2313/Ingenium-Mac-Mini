@@ -1548,6 +1548,14 @@ edit('w.appendChild(el("h2",null,"What shall we build?"));\n      w.appendChild(
 edit('function tourEnd(){tourSoftClose();tourDemoClear();var ov=$("ingTour");if(ov)ov.remove();\n  if(tourSaved.rail){document.body.classList.add("rail-collapsed");}',
      'function tourEnd(){tourSoftClose();var railWas=tourSaved.rail;tourDemoClear();var ov=$("ingTour");if(ov)ov.remove();\n  if(railWas){document.body.classList.add("rail-collapsed");}',
      "6.71 the tour lays the side buttons down again")
+# ---- 6.74 (11 November 2026): "logo", not "seal", wherever Ingenium speaks of an app's logo. Her words: "Please change "seal" to
+#      "logo" because not every app will have an seal themed logo", and her choice of "Logo everywhere", Ingenium's own included.
+#      "Seal" stays where it means locking a backup or signing an app. The modules' sentences are changed in place. ----
+edit('title="The seal opens the introduction"', 'title="The logo opens the introduction"', "6.74 the top bar's logo is called a logo")
+edit('t:"✦ The seal",b:"The seal at the top left opens the introduction again: the door you came in through."',
+     't:"✦ The logo",b:"The logo at the top left opens the introduction again: the door you came in through."', "6.74 the Guide's card on the logo")
+edit('"The top bar":"The seal, what is running, the look, and About."', '"The top bar":"The logo, what is running, the look, and About."',
+     "6.74 the Guide names the logo in the top bar")
 
 for old, new, label, times in EDITS:
     n = out.count(old)

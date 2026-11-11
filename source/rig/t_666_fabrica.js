@@ -56,8 +56,10 @@ const note = (m) => console.log('     ' + m);
   await p.keyboard.type('ecipe Box'); await p.waitForTimeout(150);
   const t3 = await p.evaluate(() => document.querySelector('#fb .f-new-prev .f-ls.mark').classList.contains('turn'));
   ok(!t3, 'typing more of the same name does not turn it again');
-  const coinLook = await p.evaluate(() => { const m = document.querySelector('#fb .f-new-prev .f-ls.mark'); const c = getComputedStyle(m); return { an: c.animationName, sh: (c.boxShadow.match(/rgba?\(/g) || []).length }; });
-  ok(/r260Float/.test(coinLook.an) && coinLook.sh >= 5, 'the coin floats, and stands out in layers', coinLook);
+  // 6.74: where r265 is there, the coin is a solid key (its body of discs, its own sway inside it; rig/t_674_logo.js tests it whole)
+  const coinLook = await p.evaluate(() => { const m = document.querySelector('#fb .f-new-prev .f-ls.mark'); const c = getComputedStyle(m), idle = m.querySelector('.nl-idle');
+    return { an: c.animationName, sh: (c.boxShadow.match(/rgba?\(/g) || []).length, solid: m.classList.contains('nl-on'), idle: idle ? getComputedStyle(idle).animationName : '', discs: m.querySelectorAll('.nl-rim').length }; });
+  ok(coinLook.solid ? (coinLook.idle === 'nlSway' && coinLook.discs === 7) : (/r260Float/.test(coinLook.an) && coinLook.sh >= 5), 'the coin floats, and stands out in layers', coinLook);
   await p.screenshot({ path: path.join(OUT, 'fabrica_new_app_typed.png') });
   await p.evaluate(() => document.querySelector('#fb .f-x').click()); await p.waitForTimeout(400);
   ok(await p.evaluate(() => !document.querySelector('#fb .f-sheet-wrap')), 'the close key closes the panel');

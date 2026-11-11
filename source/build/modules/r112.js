@@ -572,7 +572,7 @@ function build(){var host=$("fbHost");if(!host)return null;if($("fb")&&$("fb").p
      '<div id="fbLibBody" role="list"></div></div>'+
    '<div class="f-apg" id="fbAppPg" aria-label="This app"></div>'+
    '<div class="f-panels" id="fbPanels">'+
-    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2><button class="f-libk" id="fbAppsLib" type="button" title="Open the library of your apps: each with its seal, and where you bring one in">Your apps</button></h2><button class="f-chip f-libk2" id="fbAppsChip" type="button" title="Open the library of your apps"></button><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
+    '<section class="f-pn" id="fbApps" aria-label="Your apps"><div class="f-pn-h"><h2><button class="f-libk" id="fbAppsLib" type="button" title="Open the library of your apps: each with its logo, and where you bring one in">Your apps</button></h2><button class="f-chip f-libk2" id="fbAppsChip" type="button" title="Open the library of your apps"></button><button class="f-fold" type="button" data-f="apps" aria-expanded="true" title="Fold Your apps away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="f-pn-b"><div class="f-repos" id="fbRepos"></div><div class="f-sec" style="border-top:1px solid var(--f-hair2)"><p class="f-hint" style="margin:0">Each app keeps every version in git\'s own format, so any git program can open it, and nothing it holds leaves this device unless you send it.</p></div></div>'+
      '<div class="f-pn-f"><button class="f-btn" id="fbNew" type="button">＋ New app</button><button class="f-btn" id="fbBring" type="button">Bring one in</button></div></section>'+
     '<section class="f-pn show" id="fbWork" aria-label="The work"><div class="f-pn-h"><span class="f-ls" id="fbWhSeal"></span><h2 id="fbWhName"></h2>'+
@@ -1087,7 +1087,7 @@ function paintLib(){var body=$("fbLibBody");if(!body)return;LIBSIG=libSig();var 
   else if(LIBF.f==="own")sec("Your own apps","",own);
   else if(LIBF.f==="made")sec("Made here","",made);
   else if(LIBF.f==="need")sec("Needs you","changes not kept yet, or nothing kept so far",need);
-  else{sec(made.length||own.length?"Your own apps":"","each with its seal, its versions and where it is made for",own);sec("Made here","apps you started or brought in here",made);}
+  else{sec(made.length||own.length?"Your own apps":"","each with its logo, its versions and where it is made for",own);sec("Made here","apps you started or brought in here",made);}
   if(all.length&&!body.querySelector(".f-lc"))body.appendChild(h("div","f-lib-none","<b>Nothing matches</b>Try another word, or show all your apps."));
   body.appendChild(h("div","f-lib-learn","<b>Learn as you go.</b> Each app keeps every version you keep, as a repository on GitHub does: you can look back, compare, and return to any one. Nothing leaves this device unless you ship it or send it to GitHub."));}
 /* the app library fills itself a moment after the app opens (modules/r120.js) and grows when a page is kept: the library is drawn again
@@ -1136,18 +1136,21 @@ function libBring(m,panel){var k=m.key,nm=(APPS[k]?APPS[k].name:(m.title||k))+(m
     .then(function(x){C.diff={};C.files={};C.log={};return refresh().then(function(){return x;});})
     .then(function(x){unbusy();if(panel==="page")openPage(x.id);else openApp2(x.id,panel||"work");toast(nm+" is here, with a first version.");},function(e){unbusy();fail(e);});}
 /* a new app's first files: a page with its title and colour, its manifest, its icon (the seal it wears) and an offline copy */
-function starterFiles(name,col){var ch=(String(name).trim().charAt(0)||"A").toUpperCase(),xe=function(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");};
-  var html='<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>'+xe(name)+'</title>\n<meta name="theme-color" content="'+col+'">\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="icon" href="icon.svg" type="image/svg+xml">\n'+
-    '<style>\n  :root{--c:'+col+'}\n  body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;color:#221a2e;background:#f7f5fa;display:grid;place-items:center;min-height:100vh}\n  main{max-width:34rem;padding:2rem;text-align:center}\n  h1{font-family:Georgia,serif;font-weight:600;margin:.6rem 0 .3rem;color:var(--c)}\n  p{margin:0;color:#4a4358}\n</style>\n</head>\n<body>\n<main>\n  <img src="icon.svg" alt="" width="96" height="96">\n  <h1>'+xe(name)+'</h1>\n  <p>This is the first page of '+xe(name)+'. Describe what it should do in Chat or Code: every change is kept in Fabrica.</p>\n</main>\n'+
+/* 6.74 (modules/r265.js): with a picture of her own, the logo (her picture on a disc of its colour, 512 pixels, PNG) is the page's icon,
+   written into the page itself (the installers read a picture written there, modules/r136.js iconSource) and kept beside it as icon.png */
+function starterFiles(name,col,img){var pic=/^data:image\/png;base64,/.test(img||"")?img:null,ic=pic?"icon.png":"icon.svg",ch=(String(name).trim().charAt(0)||"A").toUpperCase(),xe=function(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");};
+  var html='<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>'+xe(name)+'</title>\n<meta name="theme-color" content="'+col+'">\n<link rel="manifest" href="manifest.webmanifest">\n'+(pic?'<link rel="icon" type="image/png" sizes="512x512" href="'+pic+'">\n<link rel="apple-touch-icon" href="icon.png">\n':'<link rel="icon" href="icon.svg" type="image/svg+xml">\n')+
+    '<style>\n  :root{--c:'+col+'}\n  body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;color:#221a2e;background:#f7f5fa;display:grid;place-items:center;min-height:100vh}\n  main{max-width:34rem;padding:2rem;text-align:center}\n  h1{font-family:Georgia,serif;font-weight:600;margin:.6rem 0 .3rem;color:var(--c)}\n  p{margin:0;color:#4a4358}\n</style>\n</head>\n<body>\n<main>\n  <img src="'+ic+'" alt="" width="96" height="96">\n  <h1>'+xe(name)+'</h1>\n  <p>This is the first page of '+xe(name)+'. Describe what it should do in Chat or Code: every change is kept in Fabrica.</p>\n</main>\n'+
     '<script>\n  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) { navigator.serviceWorker.register("sw.js").catch(function () {}); }\n</'+'script>\n</body>\n</html>\n';
-  var man=JSON.stringify({name:String(name),short_name:String(name).slice(0,12),start_url:"./index.html",display:"standalone",background_color:"#f7f5fa",theme_color:col,icons:[{src:"icon.svg",sizes:"any",type:"image/svg+xml"}]},null,2)+"\n";
+  var man=JSON.stringify({name:String(name),short_name:String(name).slice(0,12),start_url:"./index.html",display:"standalone",background_color:"#f7f5fa",theme_color:col,icons:[pic?{src:"icon.png",sizes:"512x512",type:"image/png"}:{src:"icon.svg",sizes:"any",type:"image/svg+xml"}]},null,2)+"\n";
   var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="240" fill="'+col+'"/><text x="256" y="256" dy=".35em" text-anchor="middle" font-family="Georgia, serif" font-size="260" fill="#ffffff">'+xe(ch)+'</text></svg>\n';
-  var sw='const CACHE = '+JSON.stringify(String(name)+"-v1")+';\nself.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./icon.svg"]))));\nself.addEventListener("fetch", (e) => e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request))));\n';
-  return [{path:"index.html",data:html},{path:"manifest.webmanifest",data:man},{path:"icon.svg",data:svg},{path:"sw.js",data:sw}];}
-function sheetNew(){var sh=sheet("A new app","Three choices, then Fabrica makes it: its name and seal, how it starts, and it is ready to change, keep and ship."),N={col:MARKC[0],way:"describe"};
+  var sw='const CACHE = '+JSON.stringify(String(name)+"-v1")+';\nself.addEventListener("install", (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./'+ic+'"]))));\nself.addEventListener("fetch", (e) => e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request))));\n';
+  var icon=svg;if(pic){var b=atob(pic.slice(pic.indexOf(",")+1));icon=new Uint8Array(b.length);for(var i=0;i<b.length;i++)icon[i]=b.charCodeAt(i);}
+  return [{path:"index.html",data:html},{path:"manifest.webmanifest",data:man},{path:ic,data:icon},{path:"sw.js",data:sw}];}
+function sheetNew(){var sh=sheet("A new app","Three choices, then Fabrica makes it: its name and logo, how it starts, and it is ready to change, keep and ship."),N={col:MARKC[0],way:"describe"};
   sh.box.classList.add("wide");
   var grid=h("div","f-new"),pv=h("div","f-new-prev"),mk=h("span","f-ls mark");mk.style.setProperty("--S","92px");mk.style.setProperty("--mc",N.col);var mch=h("span",null,"A");mk.appendChild(mch);pv.appendChild(mk);
-  pv.appendChild(h("small",null,"Its seal, wherever it shows: here, its app icon, its installer. It can have a drawn seal later."));grid.appendChild(pv);
+  pv.appendChild(h("small",null,"Its logo, wherever it shows: here, its app icon, its installer."));grid.appendChild(pv);grid.setAttribute("data-way",N.way);
   var col=h("div");grid.appendChild(col);
   col.appendChild(h("label","f-lab","1 · Its name"));var inp=h("input","f-in");inp.type="text";inp.placeholder="Recipe Box, My Notes…";inp.setAttribute("aria-label","The new app's name");col.appendChild(inp);
   col.appendChild(h("span","f-lab","Its colour")).style.marginTop="12px";var sw=h("div","f-sw");sw.setAttribute("role","group");sw.setAttribute("aria-label","Its colour");
@@ -1157,12 +1160,12 @@ function sheetNew(){var sh=sheet("A new app","Three choices, then Fabrica makes 
   col.appendChild(h("span","f-lab","2 · How it starts"));var ways=h("div","f-ways");ways.setAttribute("role","group");ways.setAttribute("aria-label","How it starts");
   var desc=h("textarea","f-in");desc.placeholder="What should it do? For example: a box for our family recipes, searched by ingredient, a recipe scaled for more people, a card to print.";desc.setAttribute("aria-label","What the app should do");
   var canCode=typeof ccMakeProject==="function"&&typeof ccNewSession==="function";
-  [["describe","Describe it","A model writes its first page from your words, in Code, and Fabrica keeps every change."],["page","A simple first page","A ready page with its title, its seal as its icon and an offline copy, to fill in later."],
+  [["describe","Describe it","A model writes its first page from your words, in Code, and Fabrica keeps every change."],["page","A simple first page","A ready page with its title, its logo as its icon and an offline copy, to fill in later."],
    ["files","Bring its files in","A page, a zip or a git bundle you already have."],["code","Start in Code","Its first page, open in Code and linked to this app."]].forEach(function(w){
     if(!canCode&&(w[0]==="describe"||w[0]==="code"))return;
     var b=h("button","f-way","<b>"+esc(w[1])+"</b>"+esc(w[2]));b.type="button";b.setAttribute("aria-pressed",w[0]===N.way?"true":"false");
-    b.onclick=function(){N.way=w[0];[].forEach.call(ways.querySelectorAll(".f-way"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});desc.hidden=N.way!=="describe";label();};ways.appendChild(b);});
-  if(!canCode)N.way="page";
+    b.onclick=function(){N.way=w[0];grid.setAttribute("data-way",N.way);[].forEach.call(ways.querySelectorAll(".f-way"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});desc.hidden=N.way!=="describe";label();};ways.appendChild(b);});
+  if(!canCode){N.way="page";grid.setAttribute("data-way",N.way);}
   col.appendChild(ways);col.appendChild(desc);desc.hidden=N.way!=="describe";
   var foot=h("div","f-new-foot"),note=h("small",null,"3 · Ready: Fabrica keeps its first version and opens it. Nothing leaves this device."),go=btn("pri","Make it",null);foot.appendChild(note);foot.appendChild(go);col.appendChild(foot);
   sh.box.appendChild(grid);
@@ -1170,11 +1173,13 @@ function sheetNew(){var sh=sheet("A new app","Three choices, then Fabrica makes 
   inp.oninput=label;inp.onkeydown=function(e){if(e.key==="Enter")go.click();};label();
   go.onclick=function(){var name=inp.value.trim();if(!name&&N.way!=="files"){inp.focus();return;}
     if(N.way==="describe"&&!desc.value.trim()){desc.focus();toast("Say in a few words what it should do.");return;}
-    go.disabled=true;makeNew(name,N.col,N.way,desc.value.trim()).then(sh.close,function(e){go.disabled=false;fail(e);});};
+    go.disabled=true;var L=window.IngNewLogo;
+    Promise.resolve(N.way!=="files"&&L&&typeof L.compose==="function"?L.compose(mk):null).then(function(img){return makeNew(name,N.col,N.way,desc.value.trim(),img);})
+      .then(sh.close,function(e){go.disabled=false;fail(e);});};
   setTimeout(function(){inp.focus();},60);}
-function makeNew(name,col,way,what){
+function makeNew(name,col,way,what,img){
   if(way==="files")return new Promise(function(res){pickFile(".html,.htm,.zip,.bundle",function(f){importFile(f,null,name||null);res();});setTimeout(res,400);});
-  var files=starterFiles(name,col),ch=(name.charAt(0)||"A").toUpperCase();
+  var files=starterFiles(name,col,img),ch=(name.charAt(0)||"A").toUpperCase();
   return IngRepo.fromFiles(files,{name:name,msg:"A first page for "+name}).then(function(x){var id=x.id;FBS().marks=FBS().marks||{};FBS().marks[id]={c:col,ch:ch};saveSoon();
     C.diff={};C.files={};C.log={};
     if(way==="page")return refresh().then(function(){openApp2(id,"work");toast(name+" is here, with its first page kept. Run it, or change it in Code.");});

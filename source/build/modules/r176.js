@@ -107,7 +107,7 @@ var AFTER_ROOM=1500,AFTER_ANY=450,AFTER_CHIME=2000;
 /* ---------- the seven kinds and Ingenium's names, in plain words (6.8.4; touching a key, 6.8.5) ---------- */
 var NAMES={firstLight:"First light",studyLamp:"Study lamp",evensong:"Evensong",
   studyChime:"Study chime",handBell:"Hand bell",inkDrop:"Ink drop",
-  sealMark:"Seal mark",pressClick:"Press click",feltSeal:"Felt seal",
+  sealMark:"Logo mark",pressClick:"Press click",feltSeal:"Felt logo",
   pageSet:"Page set",bookShut:"Book shut",lecternLift:"Lectern lift",stacksPass:"Stacks pass",
   keyPress:"Key press",softKey:"Soft key",keysOff:"No sound",cardLift:"Card lift",cardChime:"Card chime",cardsOff:"No sound",
   keyTouch:"Key touch",lightTouch:"Light touch",touchOff:"No sound"};
@@ -115,7 +115,7 @@ var ROLES=[
   ["notify","Notices and reminders","When a reminder or a notice appears.",["studyChime","handBell","inkDrop"],"for notices and reminders"],
   ["confirm","Keeping something","When something is saved, kept or copied.",["sealMark","pressClick","feltSeal"],"for keeping something"],
   ["room","Entering Ingenium","When you go through the welcome door.",["firstLight","studyLamp","evensong"],"for entering Ingenium"],
-  ["paper","Moving between pages","When you choose a page from the main menu, or press the seal on Home.",["pageSet","bookShut","lecternLift","stacksPass"],"for moving between pages"],
+  ["paper","Moving between pages","When you choose a page from the main menu, or press the logo on Home.",["pageSet","bookShut","lecternLift","stacksPass"],"for moving between pages"],
   ["keys","Pressing a key","When a raised key goes down under your finger or pointer.",["keyPress","softKey","keysOff"],"for pressing a key"],
   ["cards","A card opening","When a dialog, a panel or a card rises onto the screen.",["cardLift","cardChime","cardsOff"],"for a card opening"],
   ["hover","Touching a key","When the pointer comes onto a raised key, as in Carpe Diem and the Forge. A finger does not touch a key without pressing it, so a touch screen has only the press.",["keyTouch","lightTouch","touchOff"],"for touching a key"]];
@@ -476,6 +476,8 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.66: Fabrica's cards, tiles and choices, which lifted no key and made no sound (her words, 10 November 2026: "The newly added
      Fabrica pages are still and not animated and clickable when I hover over them"; modules/r260.js) */
   '#fb .f-lc,#fb .f-tile,#fb .f-way,#fb .f-x,#fb .f-sw button,#fb .f-rail button,#fb .f-opt,#fb .f-repo,'+
+  /* 6.74: a new app's logo on Fabrica's A new app panel, a key of its own (modules/r265.js) */
+  '#fb .f-new-prev .f-ls.mark.nl-on,'+
   /* 6.68: Blend in Home's language (modules/r262.js): the model rows, the ways, the steps and the ready-made cards (her words, 10
      November 2026: "I want everything made clickable and popped out animated"); 6.70: Blend as a movement in 3D, each model's wheel
      a key (her words, 10 November 2026: "I approve of this design, please push it everywhere") */

@@ -34,7 +34,7 @@ body[data-theme="night"] .hx-seal .r175-ripple{border-color:var(--accent-bright,
 (function(){"use strict";
 if(window.__r175)return;window.__r175=1;
 var D=document,N=0,KEY=null,busy=false,again=false,last="",count=0,running=[],ends=[];
-var NAME="Ingenium's seal. Press it for fun.";
+var NAME="Ingenium's logo. Press it for fun.";
 function $(id){return D.getElementById(id);}
 function still(){try{if(D.body.getAttribute("data-motion")==="minimal")return true;}catch(e){}
   try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}

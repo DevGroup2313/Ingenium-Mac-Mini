@@ -195,7 +195,7 @@ window.r2Grip=function(h,keep){h=Math.max(240,Math.min(R2.fit||h,Math.round(h)))
 function r2Straight(){try{return !!(state&&state.doorStraight)||localStorage.getItem("ingenium_door_straight")==="1";}catch(e){return !!(state&&state.doorStraight);}}
 function r2SetStraight(on){try{state.doorStraight=!!on;saveState();}catch(e){}try{localStorage.setItem("ingenium_door_straight",on?"1":"0");}catch(e){}}
 (function r2Door(){var card=document.querySelector("#introDoor .intro-card"),enter=$("introEnter");if(!card||!enter||$("introStraight"))return;
-  var lab=el("label","intro-straight");lab.id="introStraightRow";lab.title="When this is on, Ingenium opens on your desk instead of on this door. The seal in the top bar still opens the door.";
+  var lab=el("label","intro-straight");lab.id="introStraightRow";lab.title="When this is on, Ingenium opens on your desk instead of on this door. The logo in the top bar still opens the door.";
   lab.innerHTML='<span class="eswitch"><input type="checkbox" id="introStraight"'+(r2Straight()?" checked":"")+'><span class="etrack"></span></span><span>Open straight to the app from now on</span>';
   enter.parentNode.insertBefore(lab,enter.nextSibling);
   $("introStraight").addEventListener("change",function(){r2SetStraight(this.checked);});
