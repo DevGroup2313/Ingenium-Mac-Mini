@@ -39,7 +39,8 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   ok(kk.every(k => /transform 0\.16s/.test(k.tr)), 'they move on the keys\' own spring', kk.map(k => k.tr));
   for (const [i, s] of [[1, '#homeTour'], [0, '#heroNext']]) {
     await p.mouse.move(kk[i].x, kk[i].y); await p.waitForTimeout(450); const hv = await snap(p, s);
-    await p.mouse.down(); await p.waitForTimeout(140); const pr = await snap(p, s); await p.mouse.move(1439, 899); await p.mouse.up(); await p.keyboard.press('Escape'); await p.waitForTimeout(400);
+    /* 6.81: read the pressed key once it has settled (its spring overshoots; under load a frame can come late), while it is still held */
+    await p.mouse.down(); let pr; for (let t = 0; t < 8; t++) { await p.waitForTimeout(t ? 60 : 140); pr = await snap(p, s); if (pr.tf === 'matrix(1, 0, 0, 1, 0, 1)') break; } await p.mouse.move(1439, 899); await p.mouse.up(); await p.keyboard.press('Escape'); await p.waitForTimeout(400);
     await p.evaluate(() => go('home')); await p.waitForTimeout(500);
     ok(hv.tf === 'matrix(1, 0, 0, 1, 0, -2)' && / 0px 3px 0px 0px/.test(hv.sh), s + ': pointed at, it rises 2px and its edge grows to 3px', hv);
     ok(pr.tf === 'matrix(1, 0, 0, 1, 0, 1)' && /inset/.test(pr.sh), s + ': pressed, it sinks 1px with its edge pressed in', pr); }
