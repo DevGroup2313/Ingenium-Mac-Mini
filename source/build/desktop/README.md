@@ -97,3 +97,10 @@ error. Test: `python3 -I rig/t_619_app_page.py <repo>/ingenium_app.py` (38 check
 6.57, `app_cloud_657.py` (Mac and Windows): Ingenium Cloud's box on the gateway that lends models, behind its pairing code: sealed parts
 and each device's latest snapshots in the app's data folder (cloud/), and `cloud_box_set` (the gateway runs and the computer stays awake
 for the Cloud, lending or not). Test: `node rig/t_657_cloud.js` against `rig/run_app.py` (see source/README.md).
+
+6.81, `app_lend_681.py` (Mac and Windows): sharing models made simple. `/ingenium/hello` also says the computer's id (kept in
+share.json), its kind (laptop, desktop, or "box" for a computer without its own screen, such as a Mac mini) and every address it can be
+reached at; the search (`_share_find`) carries them. A device names itself (`X-Ingenium-Device: id=...;kind=...;name=...`) and pairs once
+with the code (`POST /ingenium/pair`); `share_status` lists the devices by name and kind and the names of the models lent;
+`share_device_remove(id)` refuses a device (401, removed) until it pairs again with the code.
+Test: `python3 -I rig/t_681_lend_gateway.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (19 checks).

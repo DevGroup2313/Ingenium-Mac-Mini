@@ -371,6 +371,34 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.81 (11 November 2026): sharing models between her devices, made simple, from the preview she approved ("I approve of
+the new design, please push it everywhere"; her words of 9 November: "I want it to be easy to do and for it to work everytime and
+with no issues"), and Carpe Diem 1089.
+- modules/r274.js (new): the card Your models on every device in Settings, Models and AI, Your devices. A device pairs once with the
+  computer's code (typed once; a computer, a Fire tablet, an iPhone or an iPad finds the computer on the Wi-Fi by itself, a web
+  browser types its address); from then on the computer is kept with every address it has, found again by itself when it moves, and
+  the chat follows it. Who answers lists this device, each computer and each kept service side by side, one press each (choosing a
+  computer keeps Claude, and the other way round). The top bar's menu lists the paired computers' models too. Every request names
+  this device (X-Ingenium-Device), so a computer that lends lists the devices using its models by name and kind, each with Remove; a
+  removed device is asked for the code once more. Each device and computer is drawn by its kind (laptop, desktop, Mac mini, tablet,
+  phone, browser). A computer paired before 6.81 is kept as one of hers. Nothing in the card is redrawn while it is left alone.
+- desktop/app_lend_681.py (Mac and Windows): hello says the computer's id, kind and addresses; POST /ingenium/pair; devices kept in
+  share.json; a removed device refused (401, removed) until it pairs again; share_device_remove; CORS allows the device header.
+- The Fire bridge (Bridge.java: findLenders, deviceInfo) and the iPhone bridge (EngineBridge.swift, the same two) look on the Wi-Fi
+  for a lending computer (48 at a time, the /24, ports 17860 to 17862).
+- apps/builtin: Carpe Diem 1089 (2026-11-11, 528171089, 49,367,704 bytes, from Carpe-Diem-Gift) in place of 1084; the sample's
+  recipe made again from it; recipe.json's live record measured from it (49.4 MB, 73,130 lines); its news line the master edition's.
+- modules/r176.js: the card's keys and the menu's rows lift, sink and sound. modules/r222.js: the news.
+- Tests: rig/t_681_lend.js (three paths: a web browser 14, the Fire tablet 4, the computer back-end 4; stand-in rig/lend681_mock.py),
+  rig/t_681_lend_gateway.py (19, the patched Mac and Windows apps), rig/t_681_cd1089.js (6). On the test build: t_681_lend 22/22,
+  t_681_lend_gateway 19/19, t_681_cd1089 6/6, t_680_old_webview 12/12 (r274 emptied by hand, as 6.80 does), t_646_switch 19/19,
+  t_644_claude 8/8, t_679_memory 23/23, t_633_settings 17/17, t_651_still_keys 25/25, t_678_load_anywhere 20/20, t_62_tour 34/34,
+  t_657_cloud 14/14, t_705_lend_page 119/122 (its three 503 checks read a wording the computer back-end has changed since; not of 6.81).
+
+    node rig/t_681_lend.js <page url> <out folder> <patched ingenium_app.py> <page file>
+    python3 -I rig/t_681_lend_gateway.py <Mac ingenium_app.py> <Windows ingenium_app.py>
+    node rig/t_681_cd1089.js <page url> <out folder>
+
 Ingenium 6.80 (11 November 2026): two faults found on the Fire and Android build of 6.79 (GitHub run 43056507079, whose emulator
 self-test ran out of time, so that build was never published and the Fire and Android download stayed at 6.78):
 - modules/r271.js: the Memory room and the tray are emptied by hand (wipe) instead of Element.replaceChildren, which web views older

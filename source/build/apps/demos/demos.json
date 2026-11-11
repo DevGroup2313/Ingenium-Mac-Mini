@@ -11,13 +11,13 @@
   "name": "carpe_diem_public_sample.html",
   "from": "DevGroup2313/Carpe-DIem-Demo, index.html at commit f8b12d58794d1c503dd479f8cf87cb7015d27a27 (1 November 2026)",
   "base": {
-   "size": 48652801,
-   "sha256": "506ef1f074adaca7b7a27c2bf6750936b2ce8843c73050e222fec1565736b5e1",
-   "version": "1084"
+   "size": 49367704,
+   "sha256": "fdca5b021c1ed70af53c9ab814f1120e48d683295fb7ac9ed6200162e85854f6",
+   "version": "1089"
   },
   "recipe": {
-   "size": 8332656,
-   "sha256": "cf47edb892f9c667780242429beb383e1eb541015271dee0ce36987756da2c67"
+   "size": 8413270,
+   "sha256": "85451974a50ae5a938cb76efdd4037eb88f49ca688755b3d440bcbd5945f547f"
   }
  },
  "forge": {

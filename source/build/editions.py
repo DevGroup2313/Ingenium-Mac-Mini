@@ -603,6 +603,8 @@ def _no_lakay():
         ('  ["6.56","Lector and your app library carry Carpe Diem 1081, its full edition, in place of 1058: Lector measures it and quotes build 1081 with its own figures (48.5 MB and 71,186 lines).","master"],\n', "", "What is new without Carpe Diem 1081", 1),
         # 6.72: nor the master edition's news of Carpe Diem 1084
         ('  ["6.72","Lector and your app library carry Carpe Diem 1084, its full edition, in place of 1081: Tabula prints in colour and splits a long list across pages (1082), on a Mac the five rooms can sit in the Dock as apps of their own (1083), and set to French, all five rooms are in French throughout (1084). Lector measures it and quotes build 1084 with its own figures (48.7 MB and 71,421 lines).","master"],\n', "", "What is new without Carpe Diem 1084", 1),
+        # 6.81: nor the master edition's news of Carpe Diem 1089
+        ('  ["6.81","Lector and your app library carry Carpe Diem 1089, its full edition, in place of 1084: Tabula keeps paragraphs and bullet points in good order (1085), a sign-in can protect the copy and seal the work it keeps on the device (1086), each Writing Room has a face of its own (1087), Tabula is offered under Open With for Word, PDF, plain text, web pages and Markdown (1088), and the Guidebook stands in nine sections with a shorter guided tour (1089). Lector measures it and quotes build 1089 with its own figures (49.4 MB and 73,130 lines).","master"],\n', "", "What is new without Carpe Diem 1089", 1),
     ]
 
 

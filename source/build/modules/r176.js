@@ -487,6 +487,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.79: memory from her chats (modules/r271.js): the tray above the conversation, Used N memories under an answer, and the Memory room
      (her words, 11 November 2026: "I approve of the preview, please push it everywhere") */
   '#memTray button,#memRoomCard button,#page-chat .msg-act.mt-used,'+
+  /* 6.81: sharing models between her devices (modules/r274.js): the card's keys, lenses, found computers and switches, and the top bar's rows
+     of her computers' models (her words, 11 November 2026: "I approve of the new design, please push it everywhere") */
+  '#linkCard .ld-root button,#waPop .ld-sec button,'+
   /* 6.68: Blend in Home's language (modules/r262.js): the model rows, the ways, the steps and the ready-made cards (her words, 10
      November 2026: "I want everything made clickable and popped out animated"); 6.70: Blend as a movement in 3D, each model's wheel
      a key (her words, 10 November 2026: "I approve of this design, please push it everywhere") */
