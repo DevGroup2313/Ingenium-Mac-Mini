@@ -1,0 +1,61 @@
+# INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
+# NO LICENCE IS GRANTED. See LICENCE.txt.
+#
+# The look probe (Ingenium 6.80): what a Mac draws.
+# The page's tests run in Chromium and in a Linux build of WebKit. Neither draws layers as a Mac does (Core Animation), so a
+# fault seen only in the Mac app cannot be seen there. This opens Ingenium's page (ingenium.html, as committed) in a Mac web
+# view (WKWebView, the engine of the Mac apps) in a real window on GitHub's Mac, photographs the screen about three times a
+# second for half a minute, and keeps a report and one sheet of the pictures in this branch (source/rig/mac_probe/out/).
+# It runs only when the probe itself changes; it builds and publishes nothing. Invented models; nothing is downloaded.
+name: See a page on a Mac (the look probe)
+
+on:
+  push:
+    paths:
+      - 'source/rig/mac_probe/**'
+      - '!source/rig/mac_probe/out/**'
+      - '.github/workflows/mac-look-probe.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mac-look-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: Open the page in a Mac web view and photograph it
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v5
+
+      - name: Open the page and photograph the screen
+        run: |
+          sw_vers
+          bash source/rig/mac_probe/run.sh "$RUNNER_TEMP/probe" "$GITHUB_WORKSPACE/ingenium.html"
+          RC=$?
+          { echo '```'; head -40 "$RUNNER_TEMP/probe/report.txt" 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+
+      - name: Keep what the Mac showed in this branch
+        if: always()
+        run: |
+          OUT="$GITHUB_WORKSPACE/source/rig/mac_probe/out"
+          mkdir -p "$OUT"
+          for f in report.txt sheet.jpg probe.log; do [ -f "$RUNNER_TEMP/probe/$f" ] && cp "$RUNNER_TEMP/probe/$f" "$OUT/$f"; done
+          if [ -f "$RUNNER_TEMP/probe/first.png" ]; then sips -s format jpeg -s formatOptions 60 "$RUNNER_TEMP/probe/first.png" --out "$OUT/first.jpg" > /dev/null 2>&1 || true; fi
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source/rig/mac_probe/out
+          if git diff --cached --quiet; then echo "nothing new to keep"; exit 0; fi
+          git commit -q -m "What a Mac's web view showed of the page (the look probe) [skip ci]"
+          for i in 1 2 3 4; do
+            git pull -q --rebase origin "$GITHUB_REF_NAME" && git push -q origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            sleep $((i * 10))
+          done
+          echo "::error::what the Mac showed could not be kept in the branch"; exit 1
