@@ -51,7 +51,9 @@ function findLast(u8,word){var n=word.length;outer:for(var i=u8.length-n;i>=0;i-
 function blockText(id,what){var e=el(id);if(!e)return fail(what+" is not in this copy's page.");
   return Promise.resolve(typeof W.ingFill==="function"?W.ingFill(id):null).then(function(){var t=e.textContent;if(!t||!t.trim())throw new Error(what+" is not in this copy's page.");return t;},
     function(x){throw new Error(what+" could not be read from this copy ("+(x&&x.message||x)+").");});}
-function packed(id,what,m){return blockText(id,what).then(function(t){return gunzip(b64bytes(t.trim()));}).then(function(u8){
+function packed(id,what,m){return blockText(id,what).then(function(t){return gunzip(b64bytes(t.trim()));})
+  /* 6.82: an app carried without its own copy of itself (Carpe Diem) has it put back first (modules/r275.js) */
+  .then(function(u8){return typeof W.ingBuiltinWhole==="function"?W.ingBuiltinWhole(id,u8):u8;}).then(function(u8){
     if(m&&u8.length!==m.size)throw new Error(what+" did not unpack whole (its size differs).");
     if(!m)return u8;return sha(u8).then(function(h){if(h!==m.sha256)throw new Error(what+" did not unpack whole (its fingerprint differs).");return u8;});});}
 

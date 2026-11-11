@@ -1681,12 +1681,33 @@ _bi = json.load(open(os.path.join(HERE, "apps", "builtin", "builtin.json")))
 # cannot hold a full copy of an app that holds a full copy of it back)
 if os.environ.get("ING_LEAN") == "1" or not editions.carries_apps(ED):  # 6.2: only the master edition carries the owner's apps
     _bi = {}
+# 6.82 (11 November 2026): an app that carries a copy of itself rides without that copy's text, which the page puts back, letter
+# for letter, when the app is wanted (self_copy.py, self_copy.js, modules/r275.js). Carpe Diem's (cd-self-src-data) was 18.9 MB
+# of its 43.1 MB at 6.81, when the page had 0.85 MB left under 100 MiB. Proved here with the page's own code first; otherwise the
+# app rides whole, as before.
+_SELF_COPY = {"cd": "cd-self-src-data"}
+_self_carried = False
 for _k in [k for k in ("forge", "inkwell", "cd", "lakay") if k in _bi]:  # R122: Carpe Diem rides along too; 6.55: and Lakay
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
         sys.exit("built-in " + _k + ": its size or fingerprint does not match builtin.json")
-    _apps += '<script type="text/plain" id="ing-builtin-' + _k + '">' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+    _attrs = ""
+    if _k in _SELF_COPY and os.environ.get("ING_SELF_WHOLE") != "1":
+        import self_copy as _sc
+        _cdx, _meta = _sc.compact(_raw, _SELF_COPY[_k])
+        if _cdx is None:
+            print("NOTE: built-in %s rides whole: %s" % (_k, _meta))
+        else:
+            _whole = len(_b64.b64encode(_z))
+            _z = _gz.compress(_cdx, compresslevel=9, mtime=0)
+            _attrs = ' data-self="%s"' % _sc.attr(_meta)
+            _self_carried = True
+            print("built-in %s rides without its copy of itself, proved with the page's own code: %d bytes in the page, not %d" % (_k, len(_b64.b64encode(_z)) + len(_attrs), _whole))
+    _apps += '<script type="text/plain" id="ing-builtin-' + _k + '"' + _attrs + '>' + _b64.b64encode(_z).decode("ascii") + '</script>\n'
+if _self_carried:  # the code that puts a copy back (pako's deflate and self_copy.js), read by modules/r275.js
+    import self_copy as _sc
+    _apps += '<script type="text/plain" id="ing-self-copy-src">' + _sc.source() + '</script>\n'
 # ---- 6.77 (10 November 2026): the demonstrations the master edition carries (apps/demos, from apps/demos/make_demos.py), so The
 #      Offline Project made in Fabrica holds demonstrations only (modules/r268.js, modules/r246.js). The owner's words: "I want the
 #      Offline Project apps to only contain the apps demos and never the full version." Carpe Diem's Public sample rides along as

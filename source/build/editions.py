@@ -61,6 +61,7 @@ def skip_modules(ed):
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
     out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
     out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
+    out |= {"r275.js"}  # 6.82: puts back the copy of itself an app carried inside the page leaves out; only the master carries the apps
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
@@ -605,6 +606,8 @@ def _no_lakay():
         ('  ["6.72","Lector and your app library carry Carpe Diem 1084, its full edition, in place of 1081: Tabula prints in colour and splits a long list across pages (1082), on a Mac the five rooms can sit in the Dock as apps of their own (1083), and set to French, all five rooms are in French throughout (1084). Lector measures it and quotes build 1084 with its own figures (48.7 MB and 71,421 lines).","master"],\n', "", "What is new without Carpe Diem 1084", 1),
         # 6.81: nor the master edition's news of Carpe Diem 1089
         ('  ["6.81","Lector and your app library carry Carpe Diem 1089, its full edition, in place of 1084: Tabula keeps paragraphs and bullet points in good order (1085), a sign-in can protect the copy and seal the work it keeps on the device (1086), each Writing Room has a face of its own (1087), Tabula is offered under Open With for Word, PDF, plain text, web pages and Markdown (1088), and the Guidebook stands in nine sections with a shorter guided tour (1089). Lector measures it and quotes build 1089 with its own figures (49.4 MB and 73,130 lines).","master"],\n', "", "What is new without Carpe Diem 1089", 1),
+        # 6.82: nor the master edition's news of Carpe Diem carried without its copy of itself (modules/r275.js)
+        ('  ["6.82","Ingenium\'s page is about 19 MB lighter. Carpe Diem rides inside it without the copy of itself that it carries, and Ingenium puts that copy back, letter for letter, when your app library or Fabrica wants it, checked against Carpe Diem\'s own fingerprint. The page has room again for what comes next.","master"],\n', "", "What is new without 6.82's room in the page", 1),
     ]
 
 

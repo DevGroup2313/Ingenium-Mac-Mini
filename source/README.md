@@ -371,6 +371,34 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.82 (11 November 2026): room in the page. The page must stay under 100 MiB (104,857,600 bytes), the most GitHub keeps in
+one file, and 6.81 had 0.85 MB left (104,004,151 bytes); French and Haitian Creole, the next Carpe Diem or any sizeable module would
+not have fitted. Carpe Diem carries its own page, compressed (gzip, level 9) and written in base64, in its block cd-self-src-data:
+18.9 MB of the 43.1 MB Carpe Diem took in the page, and a part no compressor makes smaller (xz at its strongest saved 0.84 MB on the
+whole of Carpe Diem, measured). Its copy's page is three runs of Carpe Diem's own page and one letter (demo_recipe.delta), and pako's
+deflate (1.0.11, a port of zlib, MIT licence) compresses it again to the very same bytes, as Python's zlib 1.3 does. So:
+- build/self_copy.py (new): an app named in build_page.py's _SELF_COPY (Carpe Diem: cd-self-src-data) rides without that block's text,
+  with a note of how to put it back (data-self: where it stood, its gzip head, its recipe, the app's size and fingerprint); before it
+  rides so, the page's own code is run in Node (build/self_copy_prove.js) and must give the app back byte for byte. Anything else (a
+  copy compressed otherwise, base64 in lines, a gzip head with a name, no Node) and the app rides whole, as before, and the build says
+  why. ING_SELF_WHOLE=1 carries it whole.
+- build/self_copy.js (new) puts it back: the copy's page from its runs, compressed by pako at level 9 in the copy's own gzip head with
+  its CRC-32 and length, in base64, in its place. build/pako/ holds pako_deflate.min.js and its licence; both ride in the block
+  ing-self-copy-src (32 KB), and THIRD_PARTY_NOTICES.txt names pako (10).
+- modules/r275.js (new, master edition only): window.ingBuiltinWhole(id, bytes) does it in a worker (the page keeps answering: its
+  longest pause 35 ms on the test page), in the page itself where no worker can be made, and checks the whole against the app's
+  fingerprint; a mismatch found in the worker is final. modules/r120.js (the app library) and modules/r268.js (Fabrica's
+  demonstrations) call it after they unpack a block, and check size and fingerprint as before.
+- Carpe Diem's block: 24.0 MB in place of 43.1 MB; the test page 84.5 MB in place of 104.0 MB.
+- Tests: rig/t_682_selfcopy_unit.py (12 checks, invented pages: carried without its copy and given back byte for byte; a copy at level
+  6, base64 in lines, a gzip head with a name, a copy not made of the page and a page without the block ride whole, each with its
+  reason; the carried code ends no script early) and rig/t_682_selfcopy.js (10 checks in Chromium: the note and the code carried, the
+  block about 24 MB, the page under 100 MiB by far, Carpe Diem 1089 whole from a worker and from the page, the page answering meanwhile,
+  a note that does not match refused, the app library keeping 1089 by its fingerprint, Fabrica's Public sample whole, no page error).
+
+    python3 -I rig/t_682_selfcopy_unit.py
+    node rig/t_682_selfcopy.js <Ingenium page url> <out folder> [<the page file>]
+
 Ingenium 6.81 (11 November 2026): sharing models between her devices, made simple, from the preview she approved ("I approve of
 the new design, please push it everywhere"; her words of 9 November: "I want it to be easy to do and for it to work everytime and
 with no issues"), and Carpe Diem 1089.

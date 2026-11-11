@@ -45,7 +45,9 @@ function bytesOf(k){var el=document.getElementById("ing-builtin-"+k);if(!el)retu
     .then(function(){return new Promise(function(res){var s=atob(el.textContent.trim()),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);res(u);});})
     .then(function(gz){try{if(typeof DecompressionStream==="function")
         return new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer().then(function(b){return new Uint8Array(b);},function(){return ingInflateGzip(gz);});}catch(e){}
-      return ingInflateGzip(gz);});}
+      return ingInflateGzip(gz);})
+    /* 6.82: an app carried without its own copy of itself (Carpe Diem) has it put back first (modules/r275.js) */
+    .then(function(u8){return typeof window.ingBuiltinWhole==="function"?window.ingBuiltinWhole("ing-builtin-"+k,u8):u8;});}
 function unpack(k){var b=BI[k];
   return bytesOf(k).then(function(u8){if(u8.length!==b.size)throw new Error(LIB_NAMES[k]+" did not unpack whole (its size differs)");
     return libSha(u8).then(function(h){if(h!==b.sha256)throw new Error(LIB_NAMES[k]+" did not unpack whole (its fingerprint differs)");return u8;});});}
