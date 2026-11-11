@@ -220,7 +220,9 @@ function boot(){if(!$id("page-models")||typeof Engine==="undefined"||!W.state){i
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.IngTurret={state:function(){return T?{ports:T.ports,models:T.list.filter(function(p){return p.m;}).map(function(p){return p.m.id;}),empty:T.emptyAt,turn:T.turn,
     at:Math.round(((-T.turn/(360/T.ports))%T.ports+T.ports)%T.ports),loaded:loadedId(),card:T.nowName.textContent,avail:avail()}:null;},
-  rebuild:function(){build();paint();fit();},press:function(id){var r=T&&T.byId[id];if(r)press(r.m);},unload:function(){unload();}};
+  rebuild:function(){build();paint();fit();},press:function(id){var r=T&&T.byId[id];if(r)press(r.m);},unload:function(){unload();},
+  /* 6.76 (modules/r267.js): a model's lens, drawn as the turret draws it, for the rooms below */
+  lens:function(cv,S,m,empty){drawLens(cv,S,paletteOf(m||null),0,0,!!empty);return cv;},loaded:function(){return loadedId();}};
 try{window.__ingParts["p266"]="running";}catch(_){}
 })();
 </script>
