@@ -77,7 +77,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   background:var(--pv-note);color:var(--pv-notefg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;transition:opacity .25s ease;pointer-events:none}
 #pvSay.on{opacity:1}
 </style>
-<div id="pvBar"><span class="pv-say"><b>Preview, Ingenium 6.74 (not released):</b> Fabrica's A new app panel. Point at the logo, press it, or use a picture of your own.</span>
+<div id="pvBar"><span class="pv-say"><b>Ingenium 6.74, as released:</b> Fabrica's A new app panel. Point at the logo, press it, or use a picture of your own.</span>
 <span class="pv-keys"><button type="button" id="pvDay" data-th="day" aria-pressed="true">Day</button><button type="button" id="pvNight" data-th="night" aria-pressed="false">Night</button></span></div>
 <div id="pvFit"><div id="pvStage">''' + ''.join(open_tags) + html + ''.join(close_tags) + '''</div></div>
 <div id="pvSay" role="status" aria-live="polite"></div>
