@@ -99,7 +99,8 @@ const SRC = path.join(__dirname, '..');
   await wait(() => { const t = document.getElementById('fbEdText'); return !!t && !t.disabled && t.value.length > 0; }, null, 10000);
   const edit = await ev(() => [document.getElementById('fbEdFile').value, document.getElementById('fbEdText').value]);
   ok(edit[0] === 'src/app.js' && /var a = 10;/.test(edit[1]), 'on main, Edit opens Fabrica\'s own editor on this file', edit[0]);
-  await ev(() => [...document.querySelectorAll('#fbEdit .f-btn')].find(x => x.textContent === 'Close').click()); await p.waitForTimeout(200);
+  // from 6.61 the editor closes by its ✕ (labelled Close), not by a Close key (her words of 8 November: the Close or Done button looked weird there)
+  await ev(() => (document.querySelector('#fbEdit [aria-label="Close"]') || [...document.querySelectorAll('#fbEdit .f-btn')].find(x => x.textContent === 'Close')).click()); await p.waitForTimeout(200);
   const saved = await nextDownload(() => clickText('#fbWorkFoot .f-btn', 'Save a copy'));
   ok(saved && path.basename(saved) === 'app.js' && fs.readFileSync(saved, 'utf8') === 'var a = 10;\nvar b = 2;\nvar c = 3;\n', 'Save a copy saves the file as it is at that version', saved && path.basename(saved));
   // blame
