@@ -377,7 +377,7 @@ logo animated and clickable on the popped out panel page, it needs to be interac
 she chose "Logo everywhere" (Ingenium's own logo too) and, for a press, both ways offered: it knocks and turns to the next colour, and a
 picture of her own can be the logo. She approved the live preview the same night ("I approve of the preview, push it everywhere"),
 asking that the rest of the panel move too; she then withdrew a remark that the press felt heavy ("I think its my laptop lagging"), so
-the press is as she approved it.
+the press is as she approved it. On the release she asked once more: "the colour of the letter switches too fast and looks off".
 - modules/r265.js (new): the New app panel's logo (r112 draws it; a coin since 6.66, r260) is a key, solid as Home's orbs (r264): a body
   of seven discs in its own colour behind its face, its letter standing up from the face and thick, a cast shadow; at rest it sways,
   its letter lifts and settles and a sheen crosses it; it leans toward the pointer, lifts under it, sinks when pressed; a press
@@ -385,7 +385,9 @@ the press is as she approved it.
   says which colour it wears. "Use a picture" (or a picture dropped on it) puts her picture on its face, cut to a 512 pixel square from
   its middle; "Use its letter" takes it away; "Bring its files in" shows no picture key (her files bring their own logo). The rest of
   the panel moves: the colours bob out of step and the one chosen pops; the ways lean toward the pointer, lift, sink and tick when
-  chosen; the fields rise when written in; Make it pops when it is ready. Its states are nl-hov and nl-down, because r112's pointer
+  chosen; the fields rise when written in; Make it pops when it is ready. When its colour changes, its face, its letter's raised
+  sides, its body and its ripple change together over .6 seconds while it turns (the face faded over .35 seconds and the rest changed
+  at once, so the letter's colour ran ahead of the face). Its states are nl-hov and nl-down, because r112's pointer
   code clears hov and down from every logo but a card's. Minimal motion, the calm days and reduced motion keep it all still.
 - modules/r112.js: the panel says logo; starterFiles writes the logo (her picture on a disc of its colour, PNG) into the page's icon
   link (the installers read only a picture written into the page, r136 iconSource) and as icon.png beside it, in the manifest and the
@@ -395,12 +397,14 @@ the press is as she approved it.
   logo, the sounds' names and where they play, Blend's logo), two titles more in r108, three in the base page (build_page.py, "6.74 ..."),
   and Ingenium's own Tabula, Abacus and Imago (apps/house_patch.py: the logo studio, its notes and Tabula's watermarks). "Seal" stays where
   it means locking a backup (Backup, Cloud, the sign-in) or signing an app (the shells); What is new keeps each past line's words.
-- rig/t_674_logo.js (36 checks): the logo's body, rest, lean, lift, sink, knock and next colour, by pointer and by keyboard; the
+- rig/t_674_logo.js (37 checks): the logo's body, rest, lean, lift, sink, knock and next colour (its parts fading together), by
+  pointer and by keyboard; the
   panel's other motion; a picture (an invented one) on the logo and in the app made with it (index.html, icon.png, the manifest, the
   offline copy, what the installers read, Fabrica's card); minimal motion; and every page's words and labels with no logo called a
   seal. Older tests brought to the new words: t_67_seal, t_61_seals, t_681_house, t_666_fabrica (the coin is solid where r265 is).
-Checked on the test page: t_674_logo 36/36, t_666_fabrica 23/23, t_67_seal 34/34, t_681_house 14/14, t_661_fabrica 21/21; t_61_seals
-47/53 as before (its six failures are older and concern pictures' sizes and the page's fit, not words). In Safari's engine (WebKitGTK)
+Checked on the release page (fingerprint 40e1ca0214b53e9d): t_674_logo 37/37, t_67_seal 34/34, t_666_fabrica 23/23; on the test page:
+t_681_house 14/14, t_661_fabrica 21/21; t_61_seals 47/53 as before (its six failures are older and concern pictures' sizes and the
+page's fit, not words). In Safari's engine (WebKitGTK)
 the logo stands solid, knocks and changes colour.
 
 Ingenium 6.73 (11 November 2026): the Windows apps Fabrica makes open again, and carry their own name. Since 6.70 Windows

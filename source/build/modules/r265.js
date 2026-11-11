@@ -12,8 +12,8 @@
 @keyframes nlSway{0%,100%{transform:rotateY(-9deg) rotateX(3deg) translateY(0)}50%{transform:rotateY(9deg) rotateX(-2deg) translateY(calc(var(--S,92px) * -.04))}}
 /* its body: seven discs in its own colour, deeper and darker toward the back, and its shadow on the well */
 #fb .f-new-prev .nl-rim{position:absolute;inset:0;border-radius:50%;display:block;pointer-events:none;
-  background:linear-gradient(160deg,var(--nl2,#26626e) 0%,var(--nl3,#173d45) 55%,var(--nl4,#0d2226) 100%);
-  transform:translateZ(calc(var(--S,92px) * -.018 * var(--k)));transition:transform .2s ease}
+  background-color:var(--nl2,#26626e);background-image:linear-gradient(160deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.33) 55%,rgba(0,0,0,.61) 100%);
+  transform:translateZ(calc(var(--S,92px) * -.018 * var(--k)));transition:transform .2s ease,background-color .6s ease}
 #fb .f-new-prev .f-ls.mark.nl-on.nl-down .nl-rim{transform:translateZ(calc(var(--S,92px) * -.009 * var(--k)))}
 #fb .f-new-prev .nl-cast{position:absolute;left:10%;right:10%;bottom:-15%;height:16%;border-radius:50%;display:block;pointer-events:none;
   background:radial-gradient(closest-side,rgba(30,16,50,.34),rgba(30,16,50,0));filter:blur(2px);transform:translateZ(calc(var(--S,92px) * -.2))}
@@ -21,14 +21,15 @@ body[data-theme="night"] #fb .f-new-prev .nl-cast{background:radial-gradient(clo
 /* its face, lit from above, and its letter standing up from it, thick */
 #fb .f-new-prev .nl-face{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;transform-style:preserve-3d;
   background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.42),rgba(255,255,255,0) 46%),radial-gradient(circle at 50% 118%,rgba(0,0,0,.26),rgba(0,0,0,0) 62%),var(--mc,#2f7a8a);
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -6px 10px rgba(0,0,0,.22),inset 0 0 0 calc(var(--S,92px) * .045) rgba(255,255,255,.12);transition:background-color .35s ease}
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -6px 10px rgba(0,0,0,.22),inset 0 0 0 calc(var(--S,92px) * .045) rgba(255,255,255,.12);transition:background-color .6s ease}
 #fb .f-new-prev .nl-stand{display:block;transform-style:preserve-3d;transform:translateZ(0);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 #fb .f-new-prev .f-ls.mark.nl-on.nl-hov .nl-stand{transform:translateZ(calc(var(--S,92px) * .07))}
 #fb .f-new-prev .f-ls.mark.nl-on.nl-down .nl-stand{transform:translateZ(calc(var(--S,92px) * -.07));transition-duration:.12s}
 #fb .f-new-prev .nl-lift{display:block;transform-style:preserve-3d;animation:nlLift 7s ease-in-out infinite}
 @keyframes nlLift{0%,100%{transform:translateZ(calc(var(--S,92px) * .1))}50%{transform:translateZ(calc(var(--S,92px) * .15))}}
 #fb .f-new-prev .nl-ch{display:block;line-height:1;color:#fff;
-  text-shadow:0 1px 0 var(--nl2,#26626e),0 2px 0 var(--nl2,#26626e),0 3px 0 var(--nl3,#173d45),0 4px 0 var(--nl3,#173d45),0 7px 10px rgba(0,0,0,.3)}
+  text-shadow:0 1px 0 var(--nl2,#26626e),0 2px 0 var(--nl2,#26626e),0 3px 0 var(--nl3,#173d45),0 4px 0 var(--nl3,#173d45),0 7px 10px rgba(0,0,0,.3);
+  transition:text-shadow .6s ease}
 #fb .f-new-prev .nl-shine{position:absolute;inset:0;border-radius:50%;display:block;pointer-events:none;
   background:linear-gradient(115deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.26) 50%,rgba(255,255,255,0) 62%);background-size:260% 100%;background-position:120% 0;
   transform:translateZ(calc(var(--S,92px) * .02));animation:nlShine 6.5s ease-in-out infinite}
@@ -39,7 +40,7 @@ body[data-theme="night"] #fb .f-new-prev .nl-cast{background:radial-gradient(clo
 #fb .f-new-prev .nl-pic[hidden]{display:none !important}
 #fb .f-new-prev .f-ls.mark.nl-has-pic .nl-stand{display:none}
 /* pressed: it knocks, with a ripple */
-#fb .f-new-prev .nl-ripple{position:absolute;inset:-7%;border-radius:50%;display:block;pointer-events:none;opacity:0;border:2px solid var(--nl1,#58a0ad);transform:translateZ(1px)}
+#fb .f-new-prev .nl-ripple{position:absolute;inset:-7%;border-radius:50%;display:block;pointer-events:none;opacity:0;border:2px solid var(--nl1,#58a0ad);transform:translateZ(1px);transition:border-color .6s ease}
 #fb .f-new-prev .f-ls.mark.nl-on.knock .nl-tilt{animation:nlKnock .55s cubic-bezier(.3,.7,.3,1)}
 #fb .f-new-prev .f-ls.mark.nl-on.knock .nl-ripple{animation:nlRipple .6s ease-out}
 @keyframes nlKnock{0%{translate:0 calc(var(--S,92px) * .03)}45%{translate:0 calc(var(--S,92px) * -.05)}75%{translate:0 calc(var(--S,92px) * .01)}100%{translate:0 0}}
@@ -96,7 +97,10 @@ body[data-motion="minimal"] #fb .f-new .f-way,body[data-calm="1"] #fb .f-new .f-
    - She approved the preview (11 November 2026): "I approve of the preview, push it everywhere but the clicking does feel heavy and not
      everything is fully animated", then: "I think its my laptop lagging, please disregard the request about the heavy clicks." So the
      press is as she approved it, and the rest of the panel moves too: the colours bob out of step and the one chosen pops; the ways
-     lean toward the pointer, lift, sink and tick when chosen; the fields rise when written in; Make it pops when it is ready. */
+     lean toward the pointer, lift, sink and tick when chosen; the fields rise when written in; Make it pops when it is ready.
+   - Her words on the release (11 November 2026): "the colour of the letter switches too fast and looks off". The face faded to its new
+     colour over .35 s while the letter's raised sides and the body changed at once; now the face, the letter's sides, the body and the
+     ripple change together over .6 s, while the coin turns (the body's shading is a fixed shade over its colour, so the colour fades). */
 (function r265(){
 "use strict";
 if(window.IngNewLogo)return;

@@ -65,6 +65,10 @@ fs.writeFileSync(PIC, '<svg xmlns="http://www.w3.org/2000/svg" width="300" heigh
   const s5 = await p.evaluate((sel) => { const mk = document.querySelector(sel); return { mc: mk.style.getPropertyValue('--mc').trim(), pressed: [...document.querySelectorAll('#fb .f-sw button')].map(b => b.getAttribute('aria-pressed')).indexOf('true'),
     label: mk.getAttribute('aria-label'), turned: mk.classList.contains('turn') || getComputedStyle(mk).animationName }; }, MK);
   ok(s5.mc === '#3d6e9e' && s5.pressed === 1 && /in colour 2 of 6/.test(s5.label), 'then it wears the next colour, and the colour row follows', s5);
+  // her words on the release: "the colour of the letter switches too fast and looks off": the face, the letter's raised sides and the body change together, slowly
+  const fade = await p.evaluate((sel) => { const mk = document.querySelector(sel), f = (e, prop) => { const c = getComputedStyle(e); const ps = c.transitionProperty.split(',').map(x => x.trim()), ds = c.transitionDuration.split(',').map(x => parseFloat(x)); const i = ps.indexOf(prop); return i < 0 ? 0 : ds[i] || ds[0]; };
+    return { face: f(mk.querySelector('.nl-face'), 'background-color'), letter: f(mk.querySelector('.nl-ch'), 'text-shadow'), body: f(mk.querySelector('.nl-rim'), 'background-color') }; }, MK);
+  ok(fade.face === 0.6 && fade.letter === 0.6 && fade.body === 0.6, 'its face, its letter\'s raised sides and its body change colour together, over .6 seconds', fade);
   // it sounds as Fabrica's keys do: where this desk plays sounds at all (a calm desk plays none), the press is heard as a key
   const snd = await p.evaluate(() => { try { return { on: IngSound.play('hover', {}) === true, hist: IngSound.history().map(h => h.role) }; } catch (e) { return { on: false, hist: [] }; } });
   if (snd.on) ok(snd.hist.indexOf('keys') >= 0, 'it sounds as Fabrica\'s keys do', snd); else console.log('     (sound is off on this desk, so the key sound is not heard here)');
