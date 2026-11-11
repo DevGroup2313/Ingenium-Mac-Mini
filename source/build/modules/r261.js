@@ -188,6 +188,12 @@ body[data-motion="minimal"] #page-home #hx.ox-on .oxo-tilt{transform:none}
 #page-home #hx.ox-on.ox-narrow .hx-head .hx-km{display:none}
 #page-home #hx.ox-on.ox-narrow .hx-head .hx-kd{width:180px;margin-left:-90px;font-size:12px}
 #page-home #hx.ox-on.ox-narrow .hx-head .hx-key.ox-up .hx-kd{margin-left:-90px}
+/* 6.72: the next step's keys keep the width of their words on a phone too, one under the other, as they keep it on a computer (her words,
+   10 November 2026: "I don't want the "Bring in your first model" and "Take the guided tour" buttons to be this wide and long for no
+   reason, please fix that from the iphone app"; and of the computer, 10 November: "too wide and long for no reason"). Home's own rule
+   (R147, a card narrower than 330 pixels) lays them in one column as wide as the card, and each key filled it. */
+#page-home #hx.ox-on .hx-next .hx-row-top{justify-items:start}
+#page-home #hx.ox-on .hx-next .hx-row-top .hx-btn{justify-self:start;width:auto;max-width:100%}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p261"]="started";}catch(_){}
 /* R261 · Home as an orrery: see the note at the top of its styles */

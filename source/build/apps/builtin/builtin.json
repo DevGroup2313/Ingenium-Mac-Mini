@@ -2,11 +2,11 @@
  "cd": {
   "key": "cd",
   "title": "Carpe Diem",
-  "version": "1081",
-  "build": "528171081",
-  "date": "2026-11-01",
-  "size": 48542093,
-  "sha256": "7d7bb5488d44c070673519c539d99f08565619adc316dcbc097d0c25267e1148",
+  "version": "1084",
+  "build": "528171084",
+  "date": "2026-11-10",
+  "size": 48652801,
+  "sha256": "506ef1f074adaca7b7a27c2bf6750936b2ce8843c73050e222fec1565736b5e1",
   "name": "carpe_diem.html"
  },
  "forge": {

@@ -61,6 +61,12 @@ const SIZES = [['an iPhone (390 by 844)', { width: 390, height: 844 }], ['the sm
     ok(h.under === 0, label + ": over a whole turn no room's name passes under the seal at the centre", h);
     ok(h.edge <= 0 && h.wide <= 0, label + ': no room leaves the screen and Home is no wider than it', h);
     ok(h.low < h.cardTop, label + ': the next step stands below the rooms', h);
+    // 6.72: the next step's keys keep the width of their words, one under the other, not the card's width (her words: "I don't want
+    // the 'Bring in your first model' and 'Take the guided tour' buttons to be this wide and long for no reason")
+    const kw = await p.evaluate(() => { const card = document.querySelector('#hx .hx-next'), row = card && card.querySelector('.hx-row-top'), cs = row && getComputedStyle(row);
+      const inner = row ? row.getBoundingClientRect().width : 0, keys = ['heroNext', 'homeTour'].map(id => document.getElementById(id)).filter(k => k && k.offsetParent);
+      return { inner: Math.round(inner), keys: keys.map(k => { const r = k.getBoundingClientRect(); return { id: k.id, w: Math.round(r.width), left: Math.round(r.left - row.getBoundingClientRect().left), words: Math.round(k.scrollWidth) }; }) }; });
+    ok(kw.keys.length === 2 && kw.keys.every(k => k.w < kw.inner - 12 && k.left <= 1), label + ": the next step's keys keep the width of their words, not the card's", kw);
     await p.screenshot({ path: OUT + '/home_' + vp.width + '.png' });
 
     // 3. Blend: the movement, in its phone layout

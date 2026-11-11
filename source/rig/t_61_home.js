@@ -42,7 +42,9 @@ async function press(p, sel) { await p.evaluate(() => window.scrollTo(0, 0)); co
 async function seed(p) { return p.evaluate(async () => {
   const now = Date.now();
   const c1 = { id: 'c' + (now - 5000).toString(36), title: 'New conversation', messages: [{ role: 'me', text: 'Plan a quiet week of walks by the sea', at: now - 5000 }, { role: 'bot', text: 'Here is a plan.', done: now - 4000 }] };
-  const c2 = { id: 'c' + (now - 90000000).toString(36), title: 'Letter to the library', messages: [{ role: 'me', text: 'Write a short letter', at: now - 90000000 }, { role: 'bot', text: 'Dear library…', done: now - 89990000 }] };
+  // yesterday at noon, so the sample is yesterday at any hour (25 hours ago was two days back between midnight and one)
+  const yday = (() => { const d = new Date(now); d.setDate(d.getDate() - 1); d.setHours(12, 0, 0, 0); return d.getTime(); })();
+  const c2 = { id: 'c' + yday.toString(36), title: 'Letter to the library', messages: [{ role: 'me', text: 'Write a short letter', at: yday }, { role: 'bot', text: 'Dear library…', done: yday + 10000 }] };
   const c3 = { id: 'c' + (now - 1000).toString(36) + 'k', title: 'New session', kind: 'code', messages: [{ role: 'me', text: 'Make the clock hands gold', at: now - 1000 }, { role: 'bot', text: 'Done.', done: now - 900 }] };
   const blank = { id: 'c' + (now - 10).toString(36) + 'z', title: 'New conversation', messages: [] };
   state.chats = (state.chats || []).filter(c => (c.messages || []).length).concat([c2, c1, c3, blank]); saveState();

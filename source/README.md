@@ -371,6 +371,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.72 (11 November 2026): Carpe Diem 1084 carried, the next step's keys at their own width on a phone, and Home's solid orbs
+held for her preview. (6.67 to 6.71 are described in their modules' headers, r261 to r263 and r170, and in their commit messages.)
+
+- Carpe Diem 1084 (2026-11-10, 528171084, the full edition, 48,652,801 bytes, from Carpe-Diem-Gift's branch
+  claude/beautiful-brahmagupta-1gpfih, the same file in its Mac, Windows and Fire projects) replaces 1081 in apps/builtin (her words, 10
+  November 2026: "Carpe Diem has also been updated to build 1084 now, please update Ingenium with the latest build"). Since 1081: Tabula
+  prints in colour and splits a long list across pages (1082); on a Mac the five rooms can sit in the Dock as apps of their own (1083);
+  set to French, all five rooms are in French throughout (1084). recipe/recipe.json's live record (devrec) is measured from 1084: 48.7 MB
+  and 71,421 lines, counted as r126 counts them; its base (the builds her documents were written about, 1058) stays. The news line is
+  the master edition's alone (editions.py). Ingenium's own Tabula and Abacus rooms (apps/) are not taken again from 1084 here.
+- The next step's keys on a phone (her words, 10 November 2026: "I don't want the "Bring in your first model" and "Take the guided tour"
+  buttons to be this wide and long for no reason, please fix that from the iphone app"): Home's own rule (r147) lays the two keys in one
+  column as wide as the card when the card is narrower than 330 pixels, so on an iPhone each key filled the card. In the orrery
+  (modules/r261.js) each now keeps the width of its words, one under the other (185 and 182 pixels at 390), as on a computer.
+- Home's orbs as solid as the seal (modules/r264.js, held in build/held.json until she answers its preview; her words, 10 November 2026:
+  "I want the orbs pages circling around the engine logo to have the same feel and density and animation as the engine logo ... it feels
+  weird seeing them just light up and feel hollow when I click on them or hover over them"). Each orb is made as the seal is: a body of
+  seven discs in its own purples behind its face and a base with the seal's contact shadow; its mark a fifth of its size above the face
+  with two copies under it; at rest its mark lifts and settles as the seal's ring does and its surface drifts under a still light, inside
+  the ball's own round clip (a CSS clip round a moving layer inside the 3D scene was not honoured in Chromium's software path); under the
+  mouse its mark rises and its shadow lengthens; pressed, its mark is pushed down and its body closes up; released, it knocks as the seal
+  knocks before the door opens, and its room opens 280 milliseconds later, as the door does. A click that is not a person's, Minimal
+  motion and reduced motion open the room at once. Its live preview is built by previews/home_orbs/tools/build_live_orbs.py.
+- rig/t_61_home.js dates its "yesterday" chat at noon yesterday: 25 hours ago was two days back between midnight and one o'clock.
+- previews/home_concepts/tools/capture_v2.js takes each room's icon from inside its orb (from 6.67 the first picture in a room's jewel is
+  its ball).
+
+    node rig/t_672_orbs.js <test build url> <out>       # 27 checks (a test build keeps held parts): the body, the face, the mark, at rest,
+                                                       # left alone, under the mouse, pressed, the knock, the tour's click, Minimal motion,
+                                                       # by night, below 260 pixels, no ring or glare, on a phone
+    node rig/t_672_cd1084.js <url> <out>                # 6 checks: Carpe Diem 1084 carried, kept, named and measured by Lector
+    node rig/t_671_phone.js <url> <out>                 # 24 checks since 6.72 (the next step's keys at their own width, at 390 and 320)
+
 Ingenium 6.66 (10 November 2026): Fabrica in Ingenium's own depth, the Offline Project's shield of three, and a model kept for a
 stronger computer (its desktop side; the page's part held for her preview).
 

@@ -591,6 +591,8 @@ def _no_lakay():
         # 6.56: the master edition's news of Lakay Build 6 and of Carpe Diem 1081 is not carried either
         ('  ["6.56","Lakay is carried at Build 6, with its new Spiral: a coin in sixteen planes, its edge, enamel plate, shell and pearl each at its own depth, in Lector, Fabrica and wherever your apps are listed.","master"],\n', "", "What is new without Lakay Build 6", 1),
         ('  ["6.56","Lector and your app library carry Carpe Diem 1081, its full edition, in place of 1058: Lector measures it and quotes build 1081 with its own figures (48.5 MB and 71,186 lines).","master"],\n', "", "What is new without Carpe Diem 1081", 1),
+        # 6.72: nor the master edition's news of Carpe Diem 1084
+        ('  ["6.72","Lector and your app library carry Carpe Diem 1084, its full edition, in place of 1081: Tabula prints in colour and splits a long list across pages (1082), on a Mac the five rooms can sit in the Dock as apps of their own (1083), and set to French, all five rooms are in French throughout (1084). Lector measures it and quotes build 1084 with its own figures (48.7 MB and 71,421 lines).","master"],\n', "", "What is new without Carpe Diem 1084", 1),
     ]
 
 

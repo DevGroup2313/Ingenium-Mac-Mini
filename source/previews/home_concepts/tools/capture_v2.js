@@ -70,7 +70,7 @@ const [URL_, OUT] = process.argv.slice(2);
     const key = document.getElementById('hxSealKey'), nx = document.querySelector('#hx .hx-next');
     const keys = [...document.querySelectorAll('#hx .hx-keys .hx-key')].map(k => ({
       h: (k.querySelector('.hx-kh') || {}).textContent || '', d: (k.querySelector('.hx-kd') || {}).textContent || '', m: (k.querySelector('.hx-km') || {}).textContent || '',
-      icon: (k.querySelector('.hx-jewel svg') || { outerHTML: '' }).outerHTML, id: k.id || '', go: k.getAttribute('data-go') || k.getAttribute('onclick') || '' }));
+      icon: (k.querySelector('.hx-jewel .oxo-ico > svg') || k.querySelector('.hx-jewel svg') || { outerHTML: '' }).outerHTML, id: k.id || '', go: k.getAttribute('data-go') || k.getAttribute('onclick') || '' }));
     const hello = document.getElementById('hxHello'), date = document.getElementById('hxDate'), lede = document.querySelector('#hx .hx-lede');
     return { key: key ? key.outerHTML : '', next: nx ? nx.outerHTML : '', rules, frames: used.map(n => frames[n]), frameNames: used, vars, keys,
       hello: hello && hello.textContent, date: date && date.textContent, lede: lede && lede.textContent };
