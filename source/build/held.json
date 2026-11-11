@@ -1,8 +1,7 @@
 {
   "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
   "modules": [
-    "r259.js",
-    "r267.js"
+    "r259.js"
   ],
   "released_62": "Storage (r142, t_61_storage 81/81), backup and moving (r143, t_61_backup 57/57) and the tour by level with help on every page (r144, t_62_tour 39/39) passed their checks on 22 October 2026 and ride in 6.2.",
   "held_692": "r202.js (the folder search's loader and its Settings card) waits for the end-to-end test of phase 1 and its review; the desktop bridge methods (desktop/app_rag_692.py) ride, unused until then.",
@@ -12,5 +11,5 @@
   "held_666": "r259.js (Downloads on the Models page: a model kept for a stronger computer, the kept ones, what was downloaded lately) waits for her answer to its preview (her rule: a preview before anything new is shown); the room in modules/r173.js hides while it has no card, and the desktop side (desktop/app_keep_666.py) is harmless without it.",
   "released_672": "r264.js (Home's orbs as solid as the seal) rides from 6.72 (11 November 2026): she approved its live preview the same night (\"I approve of the preview, please commit and push it everywhere\"); rig/t_672_orbs.js 27/27.",
   "released_674": "r265.js (a new app's logo, solid and pressable, with a picture of her own) rides from 6.74 (11 November 2026): she approved its live preview the same night (\"I approve of the preview, push it everywhere\", asking that the rest of the panel move too); rig/t_674_logo.js 37/37 on the release page (the logo's colours fade together, at her word on the release).",
-  "held_676": "r267.js (the Models page's rooms in the turret's design) is held until it is tested and released as 6.76."
+  "released_676": "r267.js (the Models page's rooms in the turret's design) rides from 6.76 (11 November 2026), after 6.75's turret; rig/t_676_rooms.js 9/9."
 }

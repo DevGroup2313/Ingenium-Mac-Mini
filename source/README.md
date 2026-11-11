@@ -371,6 +371,17 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.76 (11 November 2026): the Models page's rooms in the turret's design, the second of the two builds she asked for ("I need
+you to push build 6.75 and 6.76 with the models page new turet redesign"), as her preview draws the rooms below the turret:
+- modules/r267.js (new): the rooms' cards in the head's own surfaces and titles in Home's Cormorant; the Health card as gauges (This
+  device, Loaded now, The page itself, Installed models, and the rest it reports); each of her models in Your models a row with its
+  lens, drawn as the turret draws it in the model's own colour (IngTurret.lens, r266), its name in the serif, In the engine beside the
+  one loaded, and Load or Unload, which turns the turret (Set active, Settings and Remove stay); each of Ingenium's houses a card with
+  its lens on a dark stage. The base page draws these lists again whenever the engine or the models change; each is dressed again
+  once it is drawn. Night redraws the lenses; on a phone nothing scrolls sideways.
+- rig/t_676_rooms.js (9 checks), with the turret test's invented models and stand-in engine.
+Checked on the test page: t_676_rooms 9/9.
+
 Ingenium 6.75 (11 November 2026): the Models page as a turret of lenses. Her words (11 November 2026): "The Models page needs a
 redesign and a major makeover to match the rest of the Ingenium's pages, it looks a little basic compared to the rest of the app";
 then "I need you to push build 6.75 and 6.76 with the models page new turet redesign", with her preview Ingenium_Models_Designs.html,
