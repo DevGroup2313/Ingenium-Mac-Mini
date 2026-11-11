@@ -38,6 +38,22 @@ body[data-theme="night"] #page-models{--tu-slab0:#1d1529;--tu-slab1:#120c1b;--tu
    I want the button to stay purple when selected instead of just having the purple outline around the button": the line and its key
    go where the turret stands (the Studio keeps its own room key), and the room shown keeps the rooms' own purple (modules/r173.js) */
 #page-models.tr-on #rmStudioHint{display:none !important}
+/* her words (11 November 2026): "I want you to remove the black squares arounf the little catridges and leave the coloured catridges without
+   them but make them 3D popped out animated and make them react to my mouse when I hover over them and clickable, the same as the the ones
+   from inside the turret": the lenses of the rooms (Your models and Ingenium's models, modules/r267.js) stand on no dark square; each is a
+   raised lens that leans toward the pointer, catches its light, lifts under it, sinks when pressed and loads its model as the turret does */
+#page-models.tu-on .lu-tile .tm-stage,body[data-theme="night"] #page-models.tu-on .lu-tile .tm-stage{background:none !important;box-shadow:none !important}
+#page-models.tu-on .tm-key{border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;
+  transform:perspective(600px) rotateX(var(--ly,0deg)) rotateY(var(--lx,0deg)) translateY(var(--lz,0px)) scale(var(--ls,1));
+  filter:drop-shadow(0 3px 3px rgba(40,22,68,.28)) drop-shadow(0 8px 10px rgba(40,22,68,.16));
+  transition:transform .4s cubic-bezier(.34,1.35,.64,1),filter .3s ease}
+#page-models.tu-on .tm-key:hover,#page-models.tu-on .tm-key.tm-ph{--lz:-4px;--ls:1.06;filter:drop-shadow(0 6px 5px rgba(40,22,68,.30)) drop-shadow(0 14px 18px rgba(40,22,68,.20))}
+#page-models.tu-on .tm-key:active,#page-models.tu-on .tm-key.tm-pd{--lz:1px;--ls:.95;filter:drop-shadow(0 1px 2px rgba(40,22,68,.3));transition-duration:.08s}
+#page-models.tu-on .tm-key:focus-visible{box-shadow:0 0 0 3px var(--accent)}
+body[data-theme="night"] #page-models.tu-on .tm-key{filter:drop-shadow(0 3px 3px rgba(0,0,0,.6)) drop-shadow(0 8px 10px rgba(0,0,0,.4))}
+body[data-theme="night"] #page-models.tu-on .tm-key:hover,body[data-theme="night"] #page-models.tu-on .tm-key.tm-ph{filter:drop-shadow(0 6px 5px rgba(0,0,0,.6)) drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+body[data-motion="minimal"] #page-models.tu-on .tm-key{transition:none;transform:none !important}
+@media (prefers-reduced-motion:reduce){#page-models.tu-on .tm-key{transition:none;transform:none !important}}
 
 /* ---------- the head: the words on the left, the turret on the right ---------- */
 #page-models.tr-on .tr-head{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:24px;align-items:center;max-width:1180px;min-height:500px;
@@ -257,15 +273,21 @@ function room(k,el){try{if(W.IngRooms&&typeof IngRooms.open==="function")IngRoom
 function addFile(){var dz=$("dropzone");if(dz){try{dz.click();return;}catch(e){}}room("yours");}
 function busyNote(){var e=eng();if(st()==="loading")return {name:"The engine is loading a model",says:"Let it finish first; then press the lens you want.",pc:Math.round(prog()*100)};
   return {name:"The engine is writing",says:"Let it finish, or stop it first; then press the lens you want.",pc:100,acts:[["Stop",function(){try{if(e)e.abort();}catch(x){}}]]};}
+/* what stands in the way of loading a model now, if anything (the turret's card and the top bar's menu, modules/r270.js, say the same) */
+function verdict(m){var e=eng(),s=st(),b;
+  if(!e)return {kind:"engine",name:"The engine is not ready yet",says:"Open the Engine room to see why.",acts:[["Show the engine",function(){room("engine");}]]};
+  if(s==="loading"||s==="busy"){b=busyNote();b.kind="busy";return b;}
+  if(m.type==="Ollama index")return {kind:"ollama",name:nm(m)+" is Ollama's list, not a model",says:"Link the real model from Ollama on this computer, in Your models below.",acts:[["Show Your models",function(){room("yours",$("yourModelsCard"));}]]};
+  if(m.fileState!=="ready")return {kind:"relink",name:"The file for "+nm(m)+" is not linked",says:"This session cannot reach its file. Relink it on its card in Your models below, then press its lens again.",acts:[["Show its card",function(){room("yours",$("yourModelsCard"));}]]};
+  if(!engineHere(m))return {kind:"engine",name:"There is no engine here yet",says:"Add the engine once in the Engine room; then press the lens again.",acts:[["Show the engine",function(){room("engine");}]]};
+  var f=fitOf(m);if(f.level==="heavy")return {kind:"heavy",name:nm(m)+" may be too heavy here",says:String(f.text||"It may need more memory than this device has for a model."),
+    acts:[["Load it anyway",function(){var x=byId(m.id);if(x)load(x);}],["Not now",function(){ASK=null;note(null);}]]};
+  return null;}
 function press(m){if(!m)return;var e=eng(),s=st();
-  if(!e){note({name:"The engine is not ready yet",says:"Open the Engine room to see why.",acts:[["Show the engine",function(){room("engine");}]]});return;}
-  if(s==="loading"||s==="busy"){note(busyNote());return;}
-  if(s==="ready"&&e.modelId===m.id){unload();return;}
-  if(m.type==="Ollama index"){note({name:nm(m)+" is Ollama's list, not a model",says:"Link the real model from Ollama on this computer, in Your models below.",acts:[["Show Your models",function(){room("yours",$("yourModelsCard"));}]]});return;}
-  if(m.fileState!=="ready"){note({name:"The file for "+nm(m)+" is not linked",says:"This session cannot reach its file. Relink it on its card in Your models below, then press its lens again.",acts:[["Show its card",function(){room("yours",$("yourModelsCard"));}]]});return;}
-  if(!engineHere(m)){note({name:"There is no engine here yet",says:"Add the engine once in the Engine room; then press the lens again.",acts:[["Show the engine",function(){room("engine");}]]});return;}
-  var f=fitOf(m);if(f.level==="heavy"&&ASK!==m.id){ASK=m.id;
-    note({name:nm(m)+" may be too heavy here",says:String(f.text||"It may need more memory than this device has for a model."),acts:[["Load it anyway",function(){var x=byId(m.id);if(x)load(x);}],["Not now",function(){ASK=null;note(null);}]]});return;}
+  if(e&&s==="ready"&&e.modelId===m.id){unload();return;}
+  var v=verdict(m);
+  if(v&&v.kind==="heavy"){if(ASK===m.id){load(m);return;}ASK=m.id;note(v);return;}
+  if(v){note(v);return;}
   load(m);}
 function load(m){ASK=null;NOTE=null;PRESSED=m.id;PRESSED_AT=Date.now();
   try{setActive(m.id,{fromUser:true});}catch(e){}
@@ -306,7 +328,7 @@ function paint(){if(!on||!head)return;var s=sig();if(s!==SIG){SIG=s;rebuild();}
   if(ak!==ACTS){ACTS=ak;while(acts.firstChild)acts.removeChild(acts.firstChild);
     (c.acts||[]).forEach(function(a,ix){var b=mk("button","btn small"+(ix===0?" primary":""),a[0]);b.type="button";
       b.addEventListener("click",function(ev){ev.preventDefault();var x=CUR&&CUR.acts&&CUR.acts[ix];if(x)x[1]();});acts.appendChild(b);});}
-  labels();drawBase();}
+  labels();drawBase();if(!ARMQ&&page&&page.__tmk)ARMQ=requestAnimationFrame(armRooms);}
 
 /* ---------- the head, mounted on the page ---------- */
 function build(){if(head)return;
@@ -329,7 +351,7 @@ function build(){if(head)return;
   head.appendChild(words);head.appendChild(scene);}
 function enter(){build();title=page.querySelector(":scope > .page-title");lede=page.querySelector(":scope > .lede");
   page.insertBefore(head,title||page.firstChild);var how=words.querySelector(".tr-how");if(title)words.insertBefore(title,how);if(lede)words.insertBefore(lede,how);
-  page.classList.add("tr-on","tu-on");on=true;SIG="";BSIG="";AT=-1;ACTS="\u0002";paint();}
+  page.classList.add("tr-on","tu-on");on=true;wireRooms();SIG="";BSIG="";AT=-1;ACTS="\u0002";paint();}
 function leave(){on=false;page.classList.remove("tr-on","tu-on","tr-stack","tr-phone");page.style.removeProperty("--tr-k");
   if(head&&head.parentNode){if(title)page.insertBefore(title,head);if(lede)page.insertBefore(lede,head);head.parentNode.removeChild(head);}}
 function layout(w){var set=function(c,v){if(page.classList.contains(c)!==v)page.classList.toggle(c,v);};set("tr-stack",w<1060);set("tr-phone",w<760);
@@ -353,10 +375,50 @@ W.IngModelsTurret={state:function(){return {on:on,ports:PORTS.map(function(p){re
     fill:base?base.getAttribute("data-fill"):null,gb:base?base.getAttribute("data-gb"):null,stack:!!(page&&page.classList.contains("tr-stack")),phone:!!(page&&page.classList.contains("tr-phone")),
     k:page?page.style.getPropertyValue("--tr-k"):"",night:night()};},
   refresh:function(){SIG="";BSIG="";paint();},press:function(id){var m=byId(id);if(m)press(m);},empty:function(){pressEmpty();}};
+/* ---------- the lenses of the rooms (modules/r267.js draws them through IngTurret.lens): keys that follow the pointer and load ---------- */
+var HOUSE={velox:"#7458c6",scriba:"#6a3fb5",magister:"#8641b8",faber:"#4d3db0"},ARMQ=0;
+function houseOf(el){var t=el.closest&&el.closest(".lu-tile");if(!t)return "";var m=/\blu-(velox|scriba|magister|faber)\b/.exec(t.className);return m?m[1]:"";}
+function houseRec(h){try{return typeof lineupRec==="function"&&typeof lineupKeyFor==="function"?lineupRec(lineupKeyFor(h)):null;}catch(e){return null;}}
+function armRooms(){ARMQ=0;if(!page)return;
+  [].forEach.call(page.querySelectorAll("#modelList > .model-row > .tm-ic"),function(ic){var rows=[].slice.call(ic.parentNode.parentNode.children).filter(function(x){return x.classList.contains("model-row");}),
+      m=models()[rows.indexOf(ic.parentNode)];if(!m)return;arm(ic,m.id,m.color||"#6a3fb5",nm(m));});
+  [].forEach.call(page.querySelectorAll("#lineupGrid .lu-tile > .tm-stage"),function(st){var h=houseOf(st);if(!h)return;var r=houseRec(h);
+      arm(st,r?r.id:"",HOUSE[h]||"#6a3fb5",(r?nm(r):h.charAt(0).toUpperCase()+h.slice(1)),h);});}
+function arm(el,id,col,name,house){var cv=el.querySelector("canvas");if(!cv)return;
+  if(el.getAttribute("data-model")!==id)el.setAttribute("data-model",id);if(el.getAttribute("data-col")!==col)el.setAttribute("data-col",col);if(house&&el.getAttribute("data-house")!==house)el.setAttribute("data-house",house);
+  if(!el.classList.contains("tm-key")){el.classList.add("tm-key");el.setAttribute("role","button");el.setAttribute("tabindex","0");el.removeAttribute("aria-hidden");}
+  var lab=!id?name+": not on this device yet; press to find its Install key":(id===loadedId()?name+", in the engine: press to unload it":name+": press to load it into the engine");
+  if(el.getAttribute("aria-label")!==lab)el.setAttribute("aria-label",lab);}
+function pressRoom(el){var id=el.getAttribute("data-model");
+  if(!id){/* not on this device yet: its own key gets it, so nothing large starts unasked */var t=el.closest(".lu-tile"),k=t&&(t.querySelector(".btn.primary")||t.querySelector(".btn"));
+    if(k){try{k.scrollIntoView({block:"nearest",behavior:still()?"auto":"smooth"});}catch(e){}try{k.focus();}catch(e){}}
+    try{ingToast((el.getAttribute("aria-label")||"").split(":")[0]+" is not on this device yet. Its key below gets it.");}catch(e){}return;}
+  var m=byId(id);if(!m)return;press(m);
+  /* the turret turns and its card says what the engine does, as the rows' Load key shows it (modules/r267.js) */
+  try{head.scrollIntoView({block:"start",behavior:still()?"auto":"smooth"});}catch(e){}}
+function wireRooms(){if(!page||page.__tmk)return;page.__tmk=1;var cur=null,raf=0,pt={x:0,y:0};
+  function draw(el,tx,ty){var cv=el.querySelector("canvas");if(!cv)return;var S=parseFloat(cv.style.width)||cv.clientWidth||56;drawLens(cv,S,el.getAttribute("data-col")||"#6a3fb5",tx,ty,"lens");}
+  function off(el){if(!el)return;el.classList.remove("tm-ph","tm-pd");el.style.removeProperty("--lx");el.style.removeProperty("--ly");draw(el,0,0);}
+  page.addEventListener("pointerover",function(e){if(e.pointerType==="touch")return;var k=e.target.closest&&e.target.closest(".tm-key");if(k===cur)return;off(cur);cur=k;if(k)k.classList.add("tm-ph");},{passive:true});
+  page.addEventListener("pointermove",function(e){if(!cur||e.pointerType==="touch")return;var r=cur.getBoundingClientRect();if(!r.width)return;
+    pt.x=Math.max(-1,Math.min(1,(e.clientX-r.left)/r.width*2-1));pt.y=Math.max(-1,Math.min(1,(e.clientY-r.top)/r.height*2-1));
+    if(!still()){cur.style.setProperty("--lx",(pt.x*9).toFixed(2)+"deg");cur.style.setProperty("--ly",(-pt.y*9).toFixed(2)+"deg");}
+    if(!raf){var el=cur;raf=requestAnimationFrame(function(){raf=0;if(el===cur)draw(el,pt.x,pt.y);});}},{passive:true});
+  page.addEventListener("pointerout",function(e){if(!cur)return;var to=e.relatedTarget;if(to&&cur.contains(to))return;off(cur);cur=null;},{passive:true});
+  page.addEventListener("pointerdown",function(e){var k=e.target.closest&&e.target.closest(".tm-key");if(k)k.classList.add("tm-pd");},{passive:true});
+  ["pointerup","pointercancel"].forEach(function(n){page.addEventListener(n,function(){[].forEach.call(page.querySelectorAll(".tm-pd"),function(x){x.classList.remove("tm-pd");});},{passive:true});});
+  page.addEventListener("click",function(e){var k=e.target.closest&&e.target.closest(".tm-key");if(!k)return;e.preventDefault();pressRoom(k);});
+  page.addEventListener("keydown",function(e){var k=e.target.closest&&e.target.closest(".tm-key");if(!k||(e.key!=="Enter"&&e.key!==" "))return;e.preventDefault();pressRoom(k);});
+  /* the rooms draw their lists again whenever the engine or the models change: the lenses are made keys again, once, after */
+  try{new MutationObserver(function(){if(!ARMQ)ARMQ=requestAnimationFrame(armRooms);}).observe(page,{childList:true,subtree:true});}catch(x){}
+  armRooms();}
+
 /* what 6.75's turret gave the rooms of 6.76 (modules/r267.js): a model's lens, the model in the engine, load and unload */
 W.IngTurret={state:function(){return {loaded:loadedId(),at:AT,turn:TURN,ports:P,models:PORTS.filter(function(p){return !!p.m;}).map(function(p){return p.m.id;}),card:nowName?nowName.textContent:"",avail:usable()};},
   rebuild:function(){SIG="";BSIG="";paint();},press:function(id){var m=byId(id);if(m)press(m);},unload:function(){unload();},
-  lens:function(cv,S,m,empty){drawLens(cv,S,(m&&m.color)||"#6a3fb5",0,0,empty?"empty":"lens");return cv;},loaded:function(){return loadedId();}};
+  lens:function(cv,S,m,empty,tx,ty){drawLens(cv,S,(m&&m.color)||"#6a3fb5",+tx||0,+ty||0,empty?"empty":"lens");return cv;},loaded:function(){return loadedId();},
+  /* 6.78 (modules/r270.js): what stands in the way of loading a model (null when nothing does), and loading it as the turret does */
+  check:function(id){var m=byId(id);return m?verdict(m):{kind:"none",name:"That model is not on this device",says:""};},load:function(id){var m=byId(id);if(m)load(m);}};
 try{window.__ingParts["p269"]="running";}catch(_){}
 })();
 </script>

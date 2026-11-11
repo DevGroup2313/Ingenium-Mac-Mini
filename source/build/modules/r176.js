@@ -480,7 +480,10 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '#fb .f-new-prev .f-ls.mark.nl-on,'+
   /* 6.77: the Models page's turret (modules/r269.js, in place of 6.75's): each model's lens and the empty port are keys (her words, 11
      November 2026: "I choose the Turret, please push it everywhere"; "I want your turret to replace the other chat's turret design instead") */
-  '#page-models button.tr-port,'+
+  '#page-models button.tr-port,#page-models .tm-key,'+
+  /* 6.78: the top bar's menu, Who answers, and its Load a model rows (modules/r244.js, modules/r270.js): every key there lifts, sinks and
+     sounds as the rest of the app's keys */
+  '#waPop button,'+
   /* 6.68: Blend in Home's language (modules/r262.js): the model rows, the ways, the steps and the ready-made cards (her words, 10
      November 2026: "I want everything made clickable and popped out animated"); 6.70: Blend as a movement in 3D, each model's wheel
      a key (her words, 10 November 2026: "I approve of this design, please push it everywhere") */
