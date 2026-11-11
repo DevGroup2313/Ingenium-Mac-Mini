@@ -1496,6 +1496,12 @@ edit('num_ctx:(ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWi
      'num_ctx:typeof ingOllamaCtx==="function"?ingOllamaCtx(msgs,ab&&ab.conn):((ab&&ab.conn)?16384:(typeof ingCloudWindow==="function"?ingCloudWindow():32768))}};',
      "6.46 Ollama is given the memory each request needs, up to its model's own window (modules/r206.js)")
 
+# ---- 6.80 (11 November 2026): the app's own self-test has 19 minutes, not 14. On GitHub's Android emulator the built-in model's
+#      first reading of the chat's opening has taken 449 s and 468 s (runs 43023671359 and 43056507079), and the whole test 641 s
+#      of the 840 s it had; a slow machine should not fail a good build. emulator_selftest.sh waits 20 minutes with it. ----
+edit('function late(){return Date.now()-t0>840000;}', 'function late(){return Date.now()-t0>1140000;}',
+     "6.80 the self-test's time on a slow test machine")
+
 # ---- 6.46 (7 November 2026), its second part: who answers, at hand (modules/r244.js). Her words (6 November 2026): "Switching between providers and
 #      connections in Ingenium is really tedious and the whole setting is hidden and not very visible or accessible to new users." The
 #      tour's step on the top bar says what the model key does now. ----

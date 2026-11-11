@@ -21,6 +21,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 950 }, deviceScaleFactor: 1 }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300)));
   await p.addInitScript(() => { window.__INGENIUM_DEVICE = { ramGB: 16, cores: 8 }; });
+  // 6.80: ING_OLD_WEBVIEW=1 runs every check on a page without Element.replaceChildren, as the Android 11 web view (Chrome 83)
+  if (process.env.ING_OLD_WEBVIEW) await p.addInitScript(() => { [Element.prototype, Document.prototype, DocumentFragment.prototype].forEach(o => { try { delete o.replaceChildren; } catch (e) {} }); });
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(700);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {}
     state.theme = 'day'; applyTheme();

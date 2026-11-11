@@ -176,6 +176,9 @@ body[data-motion="minimal"] .mr-pop,body[data-motion="minimal"] .mr-key{transfor
 (function(){"use strict";var W=window,D=document;
 if(typeof W.memState!=="function"||typeof W.memAdd!=="function"||W.IngChatMemory){try{W.__ingParts["p271"]="running";}catch(_){}return;}
 function $(id){return D.getElementById(id);}
+/* 6.80: emptied by hand. Element.replaceChildren is missing from web views older than Chrome 86 (the Android 11 system
+   web view is 83), where it stopped this part while it drew the Memory room and the tray. */
+function wipe(n){while(n&&n.firstChild)n.removeChild(n.firstChild);}
 function mk(t,c,x){var e=D.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
 function still(){try{return W.matchMedia("(prefers-reduced-motion: reduce)").matches||D.body.getAttribute("data-motion")==="minimal";}catch(e){return false;}}
 function save(){try{W.saveState();}catch(e){}}
@@ -318,7 +321,7 @@ function paintTray(){var s=M(),sc=$("chatScroll"),t=$("memTray");
   if(t.hidden)t.hidden=false;if(t.__sig===sig)return;t.__sig=sig;
   t.classList.toggle("mt-open",!!s.trayOpen);var h=t.querySelector(".mt-head");h.setAttribute("aria-expanded",String(!!s.trayOpen));
   setCoin(t.querySelector(".mt-coin"),v.count);t.querySelector(".mt-name").textContent=v.name;t.querySelector(".mt-where").textContent=v.where;
-  var l=$("memTrayList");l.replaceChildren();
+  var l=$("memTrayList");wipe(l);
   v.ids.forEach(function(id){var it=byId(id),r=mk("div","mt-tok mr-pop");r.setAttribute("data-mr-k","tok-"+id);r.setAttribute("data-mid",id);
     var tx=mk("div","mr-tx");tx.appendChild(mk("p",null,it.text));tx.appendChild(mk("small",null,fromOf(it)));r.appendChild(orb(gOf(it)));r.appendChild(tx);
     r.appendChild(key("Not for this chat","",function(){leaveOut(it,r);},"Leave out of this chat: "+it.text));l.appendChild(r);});
@@ -428,11 +431,11 @@ function memEl(it,waiting){var r=mk("div","mr-mem mr-pop"+(waiting?" mr-wait":""
     back.appendChild(f);back.appendChild(ba);back.inert=true;flip.appendChild(back);}
   r.appendChild(flip);return r;}
 function paintRoom(first){var c=$("memRoomCard");if(!c)return;var s=M();EDIT=null;
-  if(first||!c.querySelector(".mr-room")){c.replaceChildren();var eye=mk("div","mr-eye");eye.appendChild(mk("b",null,"Ingenium"));eye.appendChild(D.createTextNode("Settings · Your data"));
+  if(first||!c.querySelector(".mr-room")){wipe(c);var eye=mk("div","mr-eye");eye.appendChild(mk("b",null,"Ingenium"));eye.appendChild(D.createTextNode("Settings · Your data"));
     var h=mk("h2","mr-h","Memory");var say=mk("p","mr-say","What Ingenium remembers from your chats. You see every memory, and you choose what stays.");
     var room=mk("div","mr-room"),cols=mk("div","mr-cols"),L=mk("div","mr-col mr-left"),R=mk("div","mr-col mr-right");cols.appendChild(L);cols.appendChild(R);room.appendChild(cols);
     c.appendChild(eye);c.appendChild(h);c.appendChild(say);c.appendChild(room);}
-  var L=c.querySelector(".mr-left"),R=c.querySelector(".mr-right");L.replaceChildren();R.replaceChildren();
+  var L=c.querySelector(".mr-left"),R=c.querySelector(".mr-right");wipe(L);wipe(R);
   /* left: the counts, the switches, adding one, the memory file, how it works */
   var counts=mk("div","mr-counts");counts.setAttribute("data-mr-k","counts");var c1=mk("span","mr-count mr-pop");c1.id="memCountKept";var k1=coin("",s.items.length);k1.id="memCoinKept";c1.appendChild(k1);c1.appendChild(mk("span",null,s.items.length===1?"memory":"memories"));
   var c2=mk("span","mr-count mr-pop");c2.id="memCountWait";var k2=coin("mr-warm",s.waiting.length);k2.id="memCoinWait";c2.appendChild(k2);c2.appendChild(mk("span",null,"waiting for you"));c2.hidden=!s.waiting.length;

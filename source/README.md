@@ -371,6 +371,23 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.80 (11 November 2026): two faults found on the Fire and Android build of 6.79 (GitHub run 43056507079, whose emulator
+self-test ran out of time, so that build was never published and the Fire and Android download stayed at 6.78):
+- modules/r271.js: the Memory room and the tray are emptied by hand (wipe) instead of Element.replaceChildren, which web views older
+  than Chrome 86 lack (the Android 11 emulator's is 83). There the call threw while the room was drawn ("c.replaceChildren is not a
+  function"), and on a page without it the whole memory part stopped as it started.
+- modules/r273.js (new): Engine.unload stops a read-ahead still in progress before it unloads. The page reads the chat's opening ahead
+  0.7 s after a model is ready; the phone and tablet apps do the engine's work one piece at a time (Bridge.java), so a change of model
+  waited for the whole reading: 465 s on that run, about the length of a reading there (468 s).
+- build_page.py: the app's own self-test has 19 minutes, not 14 (it needed 641 s of 840 s on 6.78's run); the Fire repository's
+  emulator_selftest.sh waits 20 minutes with it.
+- Tests: rig/t_680_old_webview.js (12 checks: the modules' sources hold nothing Chrome 83 lacks; on a page without replaceChildren the
+  tray and the Memory room are drawn; an engine that does one thing at a time is free at once). On the 6.79 page its second part fails
+  (the memory part stays "started"). rig/t_679_memory.js takes ING_OLD_WEBVIEW=1 to run its 23 checks on such a page.
+
+    node rig/t_680_old_webview.js <Ingenium page url> <out folder>
+    ING_OLD_WEBVIEW=1 node rig/t_679_memory.js <Ingenium page url> <out folder>
+
 Ingenium 6.76 (11 November 2026): the Models page's rooms in the turret's design, the second of the two builds she asked for ("I need
 you to push build 6.75 and 6.76 with the models page new turet redesign"), as her preview draws the rooms below the turret:
 - modules/r267.js (new): the rooms' cards in the head's own surfaces and titles in Home's Cormorant; the Health card as gauges (This
