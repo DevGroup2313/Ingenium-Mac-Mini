@@ -223,7 +223,11 @@ def _blank(ed="gift"):
         ('var ph=mk("h2","hx-sr","The Offline Project");', 'var ph=mk("h2","hx-sr","Ingenium");', "Home: the plaque's name", 1),
         ('side.setAttribute("aria-label","The Offline Project, your models and this device");',
          'side.setAttribute("aria-label","Ingenium, your models and this device");', "Home: the side column's name", 1),
-        ('im.alt="The master seal of The Offline Project";', 'im.alt="The seal of Ingenium";', "Home: the plaque's picture", 1),
+        ('im.alt="The master logo of The Offline Project";', 'im.alt="The logo of Ingenium";', "Home: the plaque's picture", 1),  # 6.74: logo, not seal
+        # 6.74: the news of logo, not seal, without the Offline Project's master logo, which only the master edition carries
+        ('["6.74","The Career Studio\'s documents and Tabula, Abacus and Imago say logo too: the master logo of the Offline Project, each app\'s logo on a document, the logo studio and Tabula\'s watermarks.","career"]',
+         '["6.74","The Career Studio\'s documents and Tabula, Abacus and Imago say logo too: each app\'s logo on a document, the logo studio and Tabula\'s watermarks.","career"]',
+         "What is new: logo, not seal, without the Offline Project", 1),
         ("Carpe Diem's own apps open on the Desk; the instruments open over this page.", "These apps open on the Desk; the instruments open over this page.",
          "Home: the apps", 1),
         # About, the chat, Fabrica, the apps, Focus, the tour and the Guide
