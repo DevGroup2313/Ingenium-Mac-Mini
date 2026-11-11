@@ -1,4 +1,35 @@
 // INGENIUM | Copyright (c) 2026 Yannie D. Forest. All rights reserved. NO LICENCE IS GRANTED.
-// The Windows shell's one resource: its icon (made by make_ico.py, with room kept for each app's own). No version
-// resource, so Task Manager and Windows name each app made from it by its own file name.
+// The Windows shell's resources: its icon (made by make_ico.py, with room kept for each app's own), and from 6.73 its version
+// resource, with room kept for each app's name, file and version, which Fabrica writes in place (modules/r170.js, winNameInto),
+// so Windows names each app by its own name and not by "Name.exe", and the program's layout never moves. Each room is found by
+// its mark; its length is the most Fabrica writes there (64 for a name, 72 for a file, 24 for a version, each with its last
+// character kept empty).
 1 ICON "shell.ico"
+
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904b0"
+    BEGIN
+      VALUE "CompanyName", "Made with Ingenium Fabrica"
+      VALUE "FileDescription", "@INGFD@........................................................."
+      VALUE "FileVersion", "@INGFV@................."
+      VALUE "InternalName", "@INGIN@........................................................."
+      VALUE "OriginalFilename", "@INGOF@................................................................."
+      VALUE "ProductName", "@INGPN@........................................................."
+      VALUE "ProductVersion", "@INGPV@................."
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END

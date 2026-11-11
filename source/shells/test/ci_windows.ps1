@@ -58,6 +58,11 @@ function One([string]$zip, [string]$what, [string]$title1, [string]$title2, [str
   Expand-Archive -Path $zip -DestinationPath $D -Force
   $exe = Get-ChildItem $D -Filter *.exe | Select-Object -First 1
   $notes = @(Get-ChildItem $D -Filter 'How to open*.txt').Count
+  # 6.73: Windows reads the app's own name, file and version, written in place by Fabrica into the shell's version resource
+  $vi = (Get-Item $exe.FullName).VersionInfo; $want = [IO.Path]::GetFileNameWithoutExtension($exe.Name)
+  if ($vi.FileDescription -eq $want -and $vi.ProductName -eq $want -and $vi.OriginalFilename -eq $exe.Name) {
+    say "PASS ${what}: Windows reads its own name ($($vi.FileDescription), version $($vi.FileVersion)), not its file name" }
+  else { say "FAIL ${what}: its name as Windows reads it: '$($vi.FileDescription)' / '$($vi.ProductName)' / '$($vi.OriginalFilename)'"; $script:fail = 1 }
   say "     $($exe.Name): $([math]::Round($exe.Length / 1MB, 1)) MB, how to open: $notes file"
   try {   # the icon Windows shows for the file: the app's own, written in by Fabrica (the seal's colour beside its letter)
     $ic = [System.Drawing.Icon]::ExtractAssociatedIcon($exe.FullName); $bm = $ic.ToBitmap()

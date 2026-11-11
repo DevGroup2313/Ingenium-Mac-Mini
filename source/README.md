@@ -371,6 +371,23 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.73 (in test, 11 November 2026): the Windows apps Fabrica makes open again, and carry their own name. Since 6.70 Windows
+refused to start every one of them: GitHub's Windows check of 6.70 (run 21 of the shells, the Windows job) failed at Start-Process with
+"The specified executable is not a valid application for this OS platform", for the test app and for The Forge alike, where 6.65 had
+passed; the only change between them was 6.70's naming step (modules/r170.js), which put a new resource directory and a version
+resource in a section of its own after the shell's others. Every rule of the program's layout that can be checked without Windows held
+(section order and alignment, SizeOfImage, the headers' room, pefile reading the name back), so the cause lies in what only Windows'
+loader enforces, and the fix moves nothing:
+- shells/windows/shell.rc: the shell carries its own version resource, with room kept for an app's name (64 characters), its file (72)
+  and its version (24), each found by its mark, as the shell already keeps room for each app's icons.
+- modules/r170.js (winNameInto, in place of winVersionInto): Fabrica writes the name, file and version into that room and empties the
+  rest of it, sets each value's length, and touches nothing past the room; the numbers under Details come from the version. A shell
+  without the room (one built before) is filled as in 6.65, without a name, and the app opens.
+- shells/test/ci_windows.ps1: Windows must read each app's own name, product name and file from it, beside the checks that it opens.
+Checked here: the shell kept in this branch (no room) is filled with exactly its own layout (seven sections, as in 6.65); the writer,
+run on version resources laid out as the resource compiler writes them (with and without each value's ending NUL), writes all six
+values, keeps every structure's size, and leaves the program's own bytes untouched. Windows itself is checked by the shells workflow.
+
 Ingenium 6.72 (11 November 2026): Carpe Diem 1084 carried, the next step's keys at their own width on a phone, and Home's solid orbs,
 approved on their live preview. (6.67 to 6.71 are described in their modules' headers, r261 to r263 and r170, and in their commit messages.)
 
