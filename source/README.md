@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.75 (11 November 2026): the Models page as a turret of lenses. Her words (11 November 2026): "The Models page needs a
+redesign and a major makeover to match the rest of the Ingenium's pages, it looks a little basic compared to the rest of the app";
+then "I need you to push build 6.75 and 6.76 with the models page new turet redesign", with her preview Ingenium_Models_Designs.html,
+design I · The turret ("A turret of lenses, like a microscope's: one turn loads a model, one turn unloads it"). She said another
+session had made 6.75 and 6.76; no branch of the four repositories, no other coding session and none of her published pages held
+them, and her preview is a page of example models, so the turret is built here from her preview's own drawing, on the real page:
+- modules/r266.js (new): the head of the Models page (the page's own title and words give way to it): Ingenium · Models · the
+  turret, Models, the turret's words, Get one of Ingenium's models (it opens that room) and Add a model file (it opens Your models),
+  and the In the engine card, which says what the engine does from its own status (loading, loaded and the memory it takes, empty,
+  or the engine's refusal). The turret, drawn as her preview draws it (canvases of spun metal and coated glass in Ingenium's lavender
+  and violet, each model's glass in its own colour): a port for each of her models on this device (up to seven; any more are named
+  under it) and one empty port, the rest blank. Pressing a model turns it into the engine's light path, with a detent's sound for
+  each step, and loads it by the page's own setActive and loadActiveModel; pressing it again, or the empty port, unloads it
+  (Engine.unload). The scale round the turret is this device's memory for a model (lineupUsableGB), and its arc the memory the
+  loaded model takes (lineupNeedGB). A model likely too heavy says so first, with Load it anyway. The models' names stand in a layer
+  above the lenses. The room shown below is ringed, as the design draws it; the rooms keep everything they did. Night redraws it;
+  minimal and reduced motion turn it at once; on a phone it fits the screen. modules/r176.js: its ports and keys sound as keys.
+- rig/t_675_turret.js (20 checks), with invented models (Lantern 3B, Quill 8B, Atlas 70B) and a stand-in engine that loads at once.
+Checked on the test page: t_675_turret 20/20 (the first run showed two model names hidden under neighbouring lenses and a heavier
+fallback serif; the names now stand in a layer above the lenses and the titles use Home's Cormorant).
+
 Ingenium 6.74 (11 November 2026): "logo", not "seal", and a new app's logo you can press. Her words (11 November 2026), on Fabrica's
 A new app panel: "Please change "seal" to "logo" because not every app will have an seal themed logo. I also want you to make the app's
 logo animated and clickable on the popped out panel page, it needs to be interactive and clickable like the rest of the page." Asked,
