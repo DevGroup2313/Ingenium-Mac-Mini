@@ -61,6 +61,8 @@ function isCard(e){return !!(e&&e.nodeType===1&&(e.classList.contains("card")||e
 var ROOMS={
   data:{label:"Your data, in sections",rest:"lock",parts:[
     {k:"in",t:"Bring in",i:svg('<path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4.5 19.5h15"/>'),says:"Your conversations from other assistants, brought in as they came, read on this device.",m:["ingImportCard"]},
+    /* 6.79: Memory, a room of its own (modules/r271.js; her words, 11 November 2026: "I approve of the preview, please push it everywhere") */
+    {k:"memory",t:"Memory",i:svg('<path d="M12 4.5c-3.6 0-6.5 2.6-6.5 6 0 2.2 1.2 3.9 3 4.9V19h7v-3.6c1.8-1 3-2.7 3-4.9 0-3.4-2.9-6-6.5-6z"/><path d="M9.5 19.5h5"/><path d="M10 10.5h4M12 8.5v4"/>'),says:"What Ingenium remembers from your chats: what waits for you, what is kept, and what goes with each message.",m:["memRoomCard"]},
     {k:"backup",t:"Back up and move",i:svg('<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/>'),says:"Everything in one file, to keep somewhere safe or to carry to another device, and bringing it back.",m:["bkCard"]},
     {k:"cloud",t:"Ingenium Cloud",i:svg('<path d="M7 18.5h10a4 4 0 0 0 .6-7.96A5.5 5.5 0 0 0 7.1 9.6 4.5 4.5 0 0 0 7 18.5z"/><path d="M12 15.5v-4M10 13.5l2-2 2 2"/>'),says:"Your work the same on every device, kept by your home computer or another of yours, sealed with your passphrase.",m:["cloudCard"]},
     {k:"storage",t:"Storage",i:svg('<path d="M4 7.5h16v9H4z"/><path d="M7.5 12h.01M11 12h6"/>'),says:"The room Ingenium takes on this device, the most it may take, and the old copies that can go.",m:["stxCard"]},

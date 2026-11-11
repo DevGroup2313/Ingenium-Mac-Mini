@@ -17,7 +17,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => IngRooms.open('settings', 'data', false)); await p.waitForTimeout(900);
   const d0 = await p.evaluate(() => ({ tabs: [...document.querySelectorAll('#rmP-settings-data .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()), cur: IngSettingsParts.show('data'),
     says: (document.getElementById('dxSays-data') || {}).textContent || '' }));
-  ok(d0.tabs.join('|') === 'Bring in|Back up and move|Ingenium Cloud|Storage|Sign-in and reset' && d0.cur === 'in' && /brought in/.test(d0.says), 'Your data has five sections (6.57: Ingenium Cloud), opening on Bring in, with its line', d0);
+  ok(d0.tabs.join('|') === 'Bring in|Memory|Back up and move|Ingenium Cloud|Storage|Sign-in and reset' && d0.cur === 'in' && /brought in/.test(d0.says), 'Your data has six sections (6.57: Ingenium Cloud; 6.79: Memory, modules/r271.js), opening on Bring in, with its line', d0);
   const DH = {}, DV = {};
   for (const [k, ids] of [['in', ['ingImportCard']], ['backup', ['bkCard']], ['cloud', ['cloudCard']], ['storage', ['stxCard']], ['lock', ['ingLockCard']]]) {
     await p.click('#dxT-data-' + k); await p.waitForTimeout(500);

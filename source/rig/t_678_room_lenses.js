@@ -77,9 +77,11 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.screenshot({ path: OUT + '/2_night.png' });
   // after day and night change, the turret and the Health card are drawn again once; then the page is left alone
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(3000);
-  // the Health card is drawn again every five seconds by an older part of the page (renderHealth's timer): known, and left out here until it is fixed
-  const still = await p.evaluate(() => new Promise(res => { let n = 0; const g = document.getElementById('page-models'), mo = new MutationObserver(ms => { ms.forEach(m => { if (!(m.target.closest && m.target.closest('#healthBox'))) n++; }); }); mo.observe(g, { subtree: true, childList: true, attributes: true, characterData: true }); setTimeout(() => { mo.disconnect(); res(n); }, 3000); }));
-  ok(still === 0, 'left alone, nothing on the page is rewritten (but the Health card, which an older timer draws again)', still);
+  // 6.79 (modules/r272.js): the Health card is no longer built again every five seconds; only its one live reading, the memory the page
+  // itself uses, may change its number in place
+  const still = await p.evaluate(() => new Promise(res => { let n = 0; const g = document.getElementById('page-models'), live = t => { const e = t && (t.nodeType === 1 ? t : t.parentElement); const row = e && e.closest && e.closest('#healthBox .hl-row'); return !!(row && e.closest('.hl-v') && (row.querySelector('.hl-k') || {}).textContent === 'The page itself'); };
+    const mo = new MutationObserver(ms => { ms.forEach(m => { if (!live(m.target)) n++; }); }); mo.observe(g, { subtree: true, childList: true, attributes: true, characterData: true }); setTimeout(() => { mo.disconnect(); res(n); }, 6000); }));
+  ok(still === 0, 'left alone for six seconds, nothing on the page is rewritten (the Health card included; only its live reading of the page\'s memory may change)', still);
   ok(errs.length === 0, 'no page error', errs);
   await b.close(); console.log(pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
 })().catch(e => { console.log('FAIL the test itself: ' + (e && e.message || e)); console.log(pass + ' passed, ' + (fail + 1) + ' failed'); process.exit(1); });

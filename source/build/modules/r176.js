@@ -484,6 +484,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.78: the top bar's menu, Who answers, and its Load a model rows (modules/r244.js, modules/r270.js): every key there lifts, sinks and
      sounds as the rest of the app's keys */
   '#waPop button,'+
+  /* 6.79: memory from her chats (modules/r271.js): the tray above the conversation, Used N memories under an answer, and the Memory room
+     (her words, 11 November 2026: "I approve of the preview, please push it everywhere") */
+  '#memTray button,#memRoomCard button,#page-chat .msg-act.mt-used,'+
   /* 6.68: Blend in Home's language (modules/r262.js): the model rows, the ways, the steps and the ready-made cards (her words, 10
      November 2026: "I want everything made clickable and popped out animated"); 6.70: Blend as a movement in 3D, each model's wheel
      a key (her words, 10 November 2026: "I approve of this design, please push it everywhere") */
