@@ -1,4 +1,4 @@
-// Home's orbs, as solid as the seal (modules/r264.js, held for her preview on 10 November 2026). Her words: "I want the orbs pages
+// Home's orbs, as solid as the seal (modules/r264.js, Ingenium 6.72; she approved its preview on 11 November 2026). Her words: "I want the orbs pages
 // circling around the engine logo to have the same feel and density and animation as the engine logo, I want them to be as animated
 // and thick and 3D feeling as the logo button. I want them to feel like buttons with the same texture when I click on them on the
 // Home page, it feels weird seeing them just light up and feel hollow when I click on them or hover over them."
@@ -12,7 +12,7 @@
 //     opens the room at once; Minimal motion stills it all and opens at once;
 //   - by night its body wears the night's purples; on a phone it is the same at 76 pixels and a tap knocks then opens;
 //   - below 260 pixels nothing of it shows but the room's icon; no ring, moon or glare is added; no page error.
-//   node rig/t_672_orbs.js <Ingenium page url (a test build, which keeps held parts)> <out folder>
+//   node rig/t_672_orbs.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
 const [URL_, OUT] = process.argv.slice(2);
 if (!URL_ || !OUT) { console.log('usage: node rig/t_672_orbs.js <page url> <out folder>'); process.exit(2); }

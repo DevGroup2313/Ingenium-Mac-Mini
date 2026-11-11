@@ -8,7 +8,7 @@ them."
 What the preview shows: Home as Ingenium 6.71 draws it, with modules/r264.js running on it. Each room's orb has a body of seven discs in
 its own purples behind its face, its mark standing higher and thick, its mark lifting and settling and its surface drifting at rest; under
 the mouse it lifts and its mark rises; pressed, it sinks and its body closes up; released, it knocks, and the preview names the room
-Ingenium would open. r264 is held (build/held.json) until she answers.
+Ingenium would open. She approved it on 11 November 2026, and r264 rides from Ingenium 6.72.
 
 To build it, from this folder (absolute paths for the scratch folder):
 

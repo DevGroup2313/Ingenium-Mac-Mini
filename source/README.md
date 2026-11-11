@@ -371,8 +371,8 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 6.72 (11 November 2026): Carpe Diem 1084 carried, the next step's keys at their own width on a phone, and Home's solid orbs
-held for her preview. (6.67 to 6.71 are described in their modules' headers, r261 to r263 and r170, and in their commit messages.)
+Ingenium 6.72 (11 November 2026): Carpe Diem 1084 carried, the next step's keys at their own width on a phone, and Home's solid orbs,
+approved on their live preview. (6.67 to 6.71 are described in their modules' headers, r261 to r263 and r170, and in their commit messages.)
 
 - Carpe Diem 1084 (2026-11-10, 528171084, the full edition, 48,652,801 bytes, from Carpe-Diem-Gift's branch
   claude/beautiful-brahmagupta-1gpfih, the same file in its Mac, Windows and Fire projects) replaces 1081 in apps/builtin (her words, 10
@@ -385,7 +385,8 @@ held for her preview. (6.67 to 6.71 are described in their modules' headers, r26
   buttons to be this wide and long for no reason, please fix that from the iphone app"): Home's own rule (r147) lays the two keys in one
   column as wide as the card when the card is narrower than 330 pixels, so on an iPhone each key filled the card. In the orrery
   (modules/r261.js) each now keeps the width of its words, one under the other (185 and 182 pixels at 390), as on a computer.
-- Home's orbs as solid as the seal (modules/r264.js, held in build/held.json until she answers its preview; her words, 10 November 2026:
+- Home's orbs as solid as the seal (modules/r264.js; held for her preview, which she approved on 11 November: "I approve of the preview,
+  please commit and push it everywhere"; her words, 10 November 2026:
   "I want the orbs pages circling around the engine logo to have the same feel and density and animation as the engine logo ... it feels
   weird seeing them just light up and feel hollow when I click on them or hover over them"). Each orb is made as the seal is: a body of
   seven discs in its own purples behind its face and a base with the seal's contact shadow; its mark a fifth of its size above the face
@@ -398,7 +399,7 @@ held for her preview. (6.67 to 6.71 are described in their modules' headers, r26
 - previews/home_concepts/tools/capture_v2.js takes each room's icon from inside its orb (from 6.67 the first picture in a room's jewel is
   its ball).
 
-    node rig/t_672_orbs.js <test build url> <out>       # 27 checks (a test build keeps held parts): the body, the face, the mark, at rest,
+    node rig/t_672_orbs.js <url> <out>                  # 27 checks: the body, the face, the mark, at rest,
                                                        # left alone, under the mouse, pressed, the knock, the tour's click, Minimal motion,
                                                        # by night, below 260 pixels, no ring or glare, on a phone
     node rig/t_672_cd1084.js <url> <out>                # 6 checks: Carpe Diem 1084 carried, kept, named and measured by Lector
