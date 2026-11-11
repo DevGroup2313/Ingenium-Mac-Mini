@@ -56,7 +56,7 @@ async function open(b, vp, th, extra) {
   await p.waitForTimeout(1600);
   const s3 = await p.evaluate(() => ({ loads: window.__loads, active: state.activeModelId, card: document.querySelector('#page-models .tu-now b').textContent, says: document.querySelector('#page-models .tu-now p').textContent, st: IngTurret.state() }));
   ok(s3.loads.join('|') === 't-quill' && s3.active === 't-quill' && s3.st.loaded === 't-quill', 'the model is set active and loaded by the page\'s own loader', s3);
-  ok(s3.card === 'Quill 8B is loaded and ready' && /Uses about [\d.]+ of 10\.9 GB\. Chat, Blend and Lector use it now\./.test(s3.says), 'the card says it is loaded, and the memory it takes of this device\'s', s3);
+  ok(s3.card === 'Quill 8B is loaded and ready' && /Uses about [\d.]+ of 10\.9 GB\. Chat(, Blend and Lector| and Blend) use it now\./.test(s3.says) && (/Lector/.test(s3.says) === !!(await p.evaluate(() => !!document.getElementById('page-lector')))), 'the card says it is loaded, and the memory it takes of this device\'s', s3);
   await p.screenshot({ path: path.join(OUTA, 'turret_loaded.png') });
   // pressed again: unloaded, the empty port turns in
   await p.evaluate(() => document.querySelectorAll('#page-models .tu-port')[1].click()); await p.waitForTimeout(600);

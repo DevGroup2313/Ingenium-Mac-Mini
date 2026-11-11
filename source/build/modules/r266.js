@@ -175,7 +175,7 @@ function paint(){if(!T)return;var st="",id=loadedId(),AV=avail();try{st=Engine.s
   if(HEAVY){return;}
   if(st==="loading"){var lm=T.byId[Engine.modelId]||T.byId[W.state&&state.activeModelId];card({name:"Loading "+(lm?nameOf(lm.m):"a model"),says:"Reading "+(lm?gbOf(lm.m)+" GB":"it")+" into memory…",busy:true});return;}
   if(id){var r=T.byId[id],m=r?r.m:(state.models||[]).filter(function(x){return x.id===id;})[0];if(m){var need=needOf(m);
-      card({name:nameOf(m)+" is loaded and ready",says:"Uses about "+need.toFixed(1)+(AV?" of "+AV.toFixed(1):"")+" GB. Chat, Blend and Lector use it now.",pc:AV?Math.min(100,need/AV*100):100});return;}}
+      card({name:nameOf(m)+" is loaded and ready",says:"Uses about "+need.toFixed(1)+(AV?" of "+AV.toFixed(1):"")+" GB. "+(D.getElementById("page-lector")?"Chat, Blend and Lector use":"Chat and Blend use")+" it now.",pc:AV?Math.min(100,need/AV*100):100});return;}}
   if(st==="error"){var why="";try{why=String(Engine.lastError||"");}catch(e){}card({name:"The model could not be loaded",says:why||"The engine refused it. The Health card in Your models says more.",warn:true});return;}
   card({name:"Nothing in the engine",says:"Its memory was let go. Press a model to load one.",pc:0});}
 function press(m){if(BUSY)return;if(loadedId()===m.id){unload();return;}
