@@ -14,8 +14,10 @@ c284, j284 = mod("r284.js"); c287, j287 = mod("r287.js"); c289, j289 = mod("r289
 fonts = json.load(open(os.path.join(SRC, "lx_fonts.json"), encoding="utf-8"))
 FONTS = {k: fonts[k] for k in ("cormorant-600-normal", "cormorant-500-italic")}
 SAMPLE = open(os.path.join(HERE, "sample.html"), encoding="utf-8").read()
+SEAL_CSS = open(os.path.join(HERE, "seal.css"), encoding="utf-8").read()
+SEAL_HTML = open(os.path.join(HERE, "seal.html"), encoding="utf-8").read()
 page = open(os.path.join(HERE, "page.html"), encoding="utf-8").read()
-out = (page.replace("/*R284_CSS*/", c284).replace("/*R287_CSS*/", c287).replace("/*R289_CSS*/", c289)
+out = (page.replace("/*SEAL_CSS*/", SEAL_CSS).replace("/*SEAL_HTML*/", SEAL_HTML).replace("/*R284_CSS*/", c284).replace("/*R287_CSS*/", c287).replace("/*R289_CSS*/", c289)
        .replace("/*FONTS*/null", json.dumps(FONTS)).replace("/*R284_JS*/", j284).replace("/*R287_JS*/", j287).replace("/*R289_JS*/", j289)
        .replace("/*SAMPLE*/\"\"", json.dumps(SAMPLE).replace("</", "<\\/")))
 dest = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "out", "heads_693.html")

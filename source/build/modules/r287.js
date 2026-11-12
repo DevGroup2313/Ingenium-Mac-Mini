@@ -9,20 +9,26 @@
    - The fan: the documents of the reading, as Lector names them in The document (Notes and analysis, Project dossier, Appendix, or the
      ones chosen), each a sheet of paper with its tab, its initial, its title, a few lines, its numeral and its ribbon, the one shown in
      front, the others fanned behind it, sealed with Ingenium's seal. Pointed at, a sheet lifts from the fan; pressed, it opens in The
-     document. The fan sways when left alone, the seal's star turns as Home's engine turns, the ribbon stirs and the sheets behind
-     breathe open and closed (the owner's words of 12 November 2026: "I want real movement and animation on all of the pages");
-     minimal motion and the system's reduced motion keep it still. */
+     document. The fan never stops moving (three slow swells on three axes, none in step), leans toward the pointer as Home's orbs do,
+     the ribbon stirs and the sheets behind breathe open and closed; at its foot stands Ingenium's own seal key, to press for the
+     pleasure of it (it opens nothing), with Home's clicks and flourishes (the owner's words of 12 November 2026: "I want real movement
+     and animation on all of the pages"; "I just want to use it as a fidget button"). Minimal motion and reduced motion keep it still. */
 #page-lector.hd-on #lx7{--l-h:var(--hd-room,640px) !important}
 #page-lector.hd-on #lx7 .l-head > div:first-child{display:none}
 #page-lector.hd-on #lx7 .l-head{justify-content:flex-end}
 #page-lector .lf{position:absolute;left:0;top:0;width:520px;height:460px;perspective:1000px;perspective-origin:262px 200px;transform:scale(.86);transform-origin:262px 250px}
 #page-lector .lf-cast{position:absolute;left:96px;top:372px;width:330px;height:84px;border-radius:50%;background:radial-gradient(closest-side,rgba(42,20,80,.20),rgba(42,20,80,.07) 60%,rgba(42,20,80,0));pointer-events:none}
 body[data-theme="night"] #page-lector .lf-cast{background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,.2) 60%,rgba(0,0,0,0))}
-#page-lector .lf-tilt,#page-lector .lf-sway{position:absolute;left:0;top:0;width:520px;height:460px;transform-style:preserve-3d;transform-origin:262px 250px}
-#page-lector .lf-tilt{transform:rotateX(var(--lf-rx,0deg)) rotateY(var(--lf-ry,0deg));transition:transform .7s cubic-bezier(.2,.8,.2,1)}
-#page-lector .lf-sway{animation:lfSway 12s ease-in-out infinite}
-@keyframes lfSway{0%,100%{transform:rotateY(-12deg) rotateX(5deg)}50%{transform:rotateY(12deg) rotateX(-3deg)}}
-#page-lector .lf.lf-hold .lf-sway{animation-play-state:paused}
+#page-lector .lf-tilt,#page-lector .lf-sway,#page-lector .lf-sx,#page-lector .lf-sy{position:absolute;left:0;top:0;width:520px;height:460px;transform-style:preserve-3d;transform-origin:262px 250px}
+/* it leans toward the pointer as Home's orbs do (the same quick, soft settling), and never stops moving: three slow swells on three axes,
+   each eased as a pendulum and none in step with another, so the fan never halts at a turn (the owner's words on the first: "rigid") */
+#page-lector .lf-tilt{transform:rotateX(var(--lf-rx,0deg)) rotateY(var(--lf-ry,0deg));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+#page-lector .lf-sway{animation:lfYaw 10.5s cubic-bezier(.37,0,.63,1) infinite alternate}
+#page-lector .lf-sx{animation:lfPitch 7.3s cubic-bezier(.37,0,.63,1) infinite alternate}
+#page-lector .lf-sy{animation:lfFloat 5.1s cubic-bezier(.37,0,.63,1) infinite alternate}
+@keyframes lfYaw{from{transform:rotateY(-8deg)}to{transform:rotateY(8deg)}}
+@keyframes lfPitch{from{transform:rotateX(3.5deg)}to{transform:rotateX(-2.5deg)}}
+@keyframes lfFloat{from{transform:translateY(2px)}to{transform:translateY(-5px)}}
 /* a sheet: a key that is a document, standing in the fan with its own thickness */
 #page-lector button.lf-card{position:absolute;left:152px;top:58px;width:216px;height:330px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
   -webkit-tap-highlight-color:transparent;transform-style:preserve-3d;transform-origin:50% 100%;
@@ -69,16 +75,11 @@ body[data-theme="night"] #page-lector .lf-lines i{background:rgba(205,184,240,.1
 #page-lector .lf-num{position:absolute;left:22px;bottom:24px;font:600 19px/1 var(--hd-serif);color:var(--accent)}
 #page-lector .lf-card.is-done .lf-num::after{content:"·";margin-left:6px;color:var(--hd-ink3)}
 /* the seal: a coin standing proud of the fan, on discs of its own */
-#page-lector .lf-seal{position:absolute;left:224px;top:352px;width:72px;height:72px;pointer-events:none;transform-style:preserve-3d;transform:translateZ(30px)}
-#page-lector .lf-sidle{position:absolute;left:0;top:0;width:72px;height:72px;transform-style:preserve-3d;animation:lfSeal 7s ease-in-out infinite}
-@keyframes lfSeal{0%,100%{transform:rotateY(-16deg) rotateX(5deg)}50%{transform:rotateY(16deg) rotateX(-5deg)}}
-#page-lector .lf.lf-hold .lf-sidle{animation-play-state:paused}
-#page-lector .lf-srim{position:absolute;left:2px;top:2px;width:68px;height:68px;border-radius:50%;transform:translateZ(var(--z));background:linear-gradient(155deg,#ffffff,#cfc6e2 50%,#9a8fb3)}
-body[data-theme="night"] #page-lector .lf-srim{background:linear-gradient(155deg,#6b5d93,#2f2546 50%,#120d1c)}
-#page-lector .lf-scast{position:absolute;left:12px;top:58px;width:50px;height:12px;border-radius:50%;background:rgba(42,20,80,.3);filter:blur(5px);transform:translateZ(-14px)}
-#page-lector .lf-seal canvas{position:absolute;left:0;top:0;width:72px;height:72px}
-#page-lector .lf-seal canvas.lf-sstar{transform:translateZ(7px);animation:lfStar 26s linear infinite}
-@keyframes lfStar{from{transform:translateZ(7px) rotate(0deg)}to{transform:translateZ(7px) rotate(-360deg)}}
+/* Ingenium's own seal key at the foot of the fan (modules/r284.js IngHeads.sealKey, made as Home's is): for the pleasure of pressing it, as
+   the owner asked ("I just want to use it as a fidget button on the page for my amusement, I like the clicking and the animation that
+   goes with it matching that of the one from the Home page"); it opens nothing */
+#page-lector .lf-seal{position:absolute;left:222px;top:350px;width:78px;height:78px;transform-style:preserve-3d;transform:translateZ(34px)}
+#page-lector .lf-seal .hd-seal{position:absolute;left:0;top:0;width:78px;height:78px}
 /* the ribbon stirs, and the sheets behind breathe open and closed (where the web view knows rotate; elsewhere they stand still) */
 #page-lector .lf-card.lf-f .lf-ribbon{transform-origin:50% 0;animation:lfRib 5.5s ease-in-out infinite}
 @keyframes lfRib{0%,100%{transform:translateZ(3px) rotate(-2deg)}50%{transform:translateZ(3px) rotate(2.6deg)}}
@@ -86,11 +87,10 @@ body[data-theme="night"] #page-lector .lf-srim{background:linear-gradient(155deg
 #page-lector button.lf-card.lf-r{animation:lfOpenR 9s ease-in-out infinite}
 @keyframes lfOpenL{0%,100%{rotate:0deg}50%{rotate:-3deg}}
 @keyframes lfOpenR{0%,100%{rotate:0deg}50%{rotate:3deg}}
-#page-lector .lf.lf-hold button.lf-card,#page-lector .lf.lf-hold .lf-ribbon,#page-lector .lf.lf-hold .lf-sstar{animation-play-state:paused}
-body[data-motion="minimal"] #page-lector .lf-sway,body[data-motion="minimal"] #page-lector .lf-sidle,body[data-motion="minimal"] #page-lector .lf-sstar,
+body[data-motion="minimal"] #page-lector .lf-sway,body[data-motion="minimal"] #page-lector .lf-sx,body[data-motion="minimal"] #page-lector .lf-sy,
 body[data-motion="minimal"] #page-lector .lf-ribbon,body[data-motion="minimal"] #page-lector button.lf-card{animation:none}
 body[data-motion="minimal"] #page-lector button.lf-card,body[data-motion="minimal"] #page-lector .lf-tilt{transition:none}
-@media (prefers-reduced-motion:reduce){#page-lector .lf-sway,#page-lector .lf-sidle,#page-lector .lf-sstar,#page-lector .lf-ribbon,#page-lector button.lf-card{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
+@media (prefers-reduced-motion:reduce){#page-lector .lf-sway,#page-lector .lf-sx,#page-lector .lf-sy,#page-lector .lf-ribbon,#page-lector button.lf-card{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p287"]="started";}catch(_){}
 /* R287 · Lector's head, the documents of your apps: see the note at the top of its styles */
@@ -119,32 +119,20 @@ function fill(b,d,pos){b.__d=d;var cls="lf-card hd-key lf-"+pos+(d&&d.done?" is-
   var n=d.name,cap=(n.replace(/^(Master|The)\s+/i,"").charAt(0)||"·").toUpperCase(),sub=apps()?"from the "+(apps()===1?"app":apps()+" apps")+" you chose":"from the apps you choose";
   set(b.querySelector(".lf-tab"),n);set(b.querySelector(".lf-cap"),cap);set(b.querySelector(".lf-ttl"),n.replace(/^(Master\s+)/,"$1"));set(b.querySelector(".lf-sub"),sub);set(b.querySelector(".lf-num"),ROMAN[d.i]||String(d.i+1));
   var lab=n+(pos==="f"?", shown in The document":"")+". Press to read it.";if(b.getAttribute("aria-label")!==lab)b.setAttribute("aria-label",lab);}
-function drawSeal(){if(!LF.seal)return;var d=H.dpr(),s=72,n=H.night();
-  function sz(cv){if(cv.width!==Math.round(s*d)){cv.width=Math.round(s*d);cv.height=Math.round(s*d);}var g=cv.getContext("2d");g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,s,s);return g;}
-  /* its collar of turned metal and its violet face */
-  var g=sz(LF.seal);var cg=g.createLinearGradient(6,6,66,66);cg.addColorStop(0,n?"#8a78bd":"#ffffff");cg.addColorStop(.5,n?"#4a3c70":"#e4dcf3");cg.addColorStop(1,n?"#1d1530":"#a896cf");
-  g.beginPath();g.arc(36,36,34,0,TAU);g.fillStyle=cg;g.fill();
-  for(var r=27.5;r<34;r+=.8){g.beginPath();g.arc(36,36,r,0,TAU);g.strokeStyle=(r*10%2<1)?(n?"rgba(0,0,0,.12)":"rgba(80,64,120,.06)"):(n?"rgba(220,205,255,.06)":"rgba(255,255,255,.45)");g.lineWidth=.7;g.stroke();}
-  g.beginPath();g.arc(36,36,33.4,Math.PI*.75,Math.PI*1.75);g.strokeStyle=n?"rgba(220,205,255,.35)":"#ffffff";g.lineWidth=1.2;g.stroke();
-  g.beginPath();g.arc(36,36,27.5,0,TAU);g.fillStyle=n?"#120c1c":"#9e8ccc";g.fill();H.orbPaint(g,36,36,26.5,H.pal("lector"),"swirl",.1);
-  /* the star, raised above its face */
-  g=sz(LF.sstar);g.save();g.translate(36,36);[[1.3,1.8,"rgba(20,6,48,.45)"],[.6,.9,"#cdb8ff"],[0,0,"#ffffff"]].forEach(function(l){g.save();g.translate(l[0],l[1]);g.fillStyle=l[2];g.beginPath();
-    for(var i=0;i<4;i++){var a=-Math.PI/2+i*Math.PI/2,R=12,rr=3.5;g.lineTo(Math.cos(a)*R,Math.sin(a)*R);g.lineTo(Math.cos(a+Math.PI/4)*rr,Math.sin(a+Math.PI/4)*rr);}g.closePath();g.fill();g.restore();});g.restore();}
 /* the paper's tooth: a small tile of grain, made once */
 function grainTile(dark){var c=D.createElement("canvas");c.width=c.height=96;var g=c.getContext("2d"),im=g.createImageData(96,96),s=7;
   for(var i=0;i<im.data.length;i+=4){s=(s*1103515245+12345)&2147483647;var v=s/2147483647;im.data[i]=dark?205:90;im.data[i+1]=dark?184:64;im.data[i+2]=dark?240:150;im.data[i+3]=Math.round(v*v*(dark?20:16));}
   g.putImageData(im,0,0);try{return 'url("'+c.toDataURL("image/png")+'")';}catch(e){return "none";}}
-function build(C){var root=mk("div","lf");root.setAttribute("role","group");root.setAttribute("aria-label","The documents of this reading");var tilt=mk("div","lf-tilt"),sway=mk("div","lf-sway");
-  root.appendChild(mk("i","lf-cast"));LF.cards=[card(),card(),card()];sway.appendChild(LF.cards[0]);sway.appendChild(LF.cards[2]);sway.appendChild(LF.cards[1]);
-  var sl=mk("div","lf-seal"),si=mk("div","lf-sidle");si.appendChild(mk("i","lf-scast"));for(var i=3;i>=1;i--){var rr=mk("i","lf-srim");rr.style.setProperty("--z",(-i*2.4).toFixed(1)+"px");si.appendChild(rr);}
-  LF.seal=D.createElement("canvas");LF.sstar=D.createElement("canvas");LF.sstar.className="lf-sstar";si.appendChild(LF.seal);si.appendChild(LF.sstar);sl.appendChild(si);sway.appendChild(sl);
-  tilt.appendChild(sway);root.appendChild(tilt);C.box.appendChild(root);LF.root=root;
+function build(C){var root=mk("div","lf");root.setAttribute("role","group");root.setAttribute("aria-label","The documents of this reading");
+  var tilt=mk("div","lf-tilt"),sway=mk("div","lf-sway"),sx=mk("div","lf-sx"),sy=mk("div","lf-sy");
+  root.appendChild(mk("i","lf-cast"));LF.cards=[card(),card(),card()];sy.appendChild(LF.cards[0]);sy.appendChild(LF.cards[2]);sy.appendChild(LF.cards[1]);
+  var sl=mk("div","lf-seal"),key=H.sealKey({label:"Ingenium's seal. Press it for fun.",size:74,sound:"lector"});sl.appendChild(key.box);sy.appendChild(sl);LF.key=key;
+  sx.appendChild(sy);sway.appendChild(sx);tilt.appendChild(sway);root.appendChild(tilt);C.box.appendChild(root);LF.root=root;
   root.style.setProperty("--lf-grain",grainTile(false));root.style.setProperty("--lf-grain-n",grainTile(true));
   root.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||H.still())return;var r=root.getBoundingClientRect();if(!r.width)return;
-    var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;tilt.style.setProperty("--lf-ry",(x*28).toFixed(1)+"deg");tilt.style.setProperty("--lf-rx",(-y*20).toFixed(1)+"deg");},{passive:true});
-  root.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse")root.classList.add("lf-hold");});root.addEventListener("pointerleave",function(){root.classList.remove("lf-hold");tilt.style.removeProperty("--lf-ry");tilt.style.removeProperty("--lf-rx");});
-  root.addEventListener("focusin",function(){root.classList.add("lf-hold");});root.addEventListener("focusout",function(){root.classList.remove("lf-hold");});
-  C.hintSet(["Point at a document to lift it from the fan; press it to read it."]);drawSeal();}
+    var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;tilt.style.setProperty("--lf-ry",(x*24).toFixed(1)+"deg");tilt.style.setProperty("--lf-rx",(-y*16).toFixed(1)+"deg");},{passive:true});
+  root.addEventListener("pointerleave",function(){tilt.style.removeProperty("--lf-ry");tilt.style.removeProperty("--lf-rx");});
+  C.hintSet(["Point at a document to lift it from the fan; press it to read it."]);}
 function paint(){var C=LF.C;if(!C||!C.on||!LF.cards.length)return;var t=three();fill(LF.cards[0],t[0],"l");fill(LF.cards[1],t[1],"f");fill(LF.cards[2],t[2],"r");
   var go=$("l7BriefF")&&$("l7BriefF").querySelector("button.next"),k=C.keys.start;if(k){H.keyText(k,go&&go.textContent.trim()?go.textContent.trim():"Start reading");}}
 function openDoc(d){if(!d)return;var box=$("l7Dtabs"),tab=null;/* The document draws its tabs again on each change: find this one by its name now */
@@ -161,7 +149,7 @@ function start(){H=W.IngHeads;if(!H||!$("page-lector")){if((LF.tries=(LF.tries||
     keys:[{name:"start",id:"hdLectorStart",text:"Start reading",icon:"book",primary:true,click:startReading},{name:"add",id:"hdLectorAdd",text:"Add your apps",icon:"plus",click:addApps}],
     line:"In four steps: choose your apps, read them part by part, write the documents, then save them as Word, PDF or a web page.",
     scene:function(C){build(C);},
-    paint:function(){paint();},theme:function(){drawSeal();},shown:function(C,sh){if(sh)paint();}});
+    paint:function(){paint();},shown:function(C,sh){if(sh)paint();}});
   /* The document's tabs and the brief painting again (a reading begun, a document chosen or written): the fan follows */
   function watch(){var t=$("l7Dtabs"),f=$("l7BriefF");if(!t||!f){setTimeout(watch,800);return;}
     try{var mo=new MutationObserver(function(){if(LF.C&&LF.C.on){clearTimeout(LF.q);LF.q=setTimeout(paint,60);}});mo.observe(t,{childList:true,subtree:true,attributes:true,attributeFilter:["aria-selected","class"]});mo.observe(f,{childList:true,subtree:true,characterData:true});}catch(e){}paint();}
