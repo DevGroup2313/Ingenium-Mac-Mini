@@ -596,6 +596,16 @@ def _no_lakay():
          "no Lakay page known by name", 1),
         ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
          "no Lakay build number read", 1),
+        # 6.83: the one place an app's logo is found (modules/r277.js) knows Lakay's own pictures in the master edition alone
+        ('  if(n==="lakay")return "lakay";if(/^offline (project|pro)$/.test(n))return "master";return null;}',
+         '  if(/^offline (project|pro)$/.test(n))return "master";return null;}', "app logos without Lakay's name", 1),
+        ('function lakaySrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.lakayN?"lakayN":"lakay");}\n', "", "app logos without Lakay's pictures", 1),
+        ('function src(name){var k=key(name);if(k==="lakay")return lakaySrc();var o=kept()[norm(name)];', 'function src(name){var o=kept()[norm(name)];',
+         "app logos: an app's own logo, kept", 1),
+        ('  if(k&&k!=="lakay"&&W.IngSeal&&typeof IngSeal.el==="function")', '  if(k&&W.IngSeal&&typeof IngSeal.el==="function")', "app logos: the seals", 1),
+        ('  if(k==="lakay"&&lakaySrc())return img(lakaySrc(),size,"lakay");\n', "", "app logos: no Lakay picture", 1),
+        ("function retheme(){[].forEach.call(D.querySelectorAll('img[data-applogo=\"lakay\"]'),function(im){var s=lakaySrc();if(s&&im.src!==s)im.src=s;});}",
+         "function retheme(){}", "app logos: nothing to change by night", 1),
         # its line in What is new (shown in the master edition alone) is not carried either, so its name is nowhere in the page
         ('  ["6.55","Lakay, your store\'s app, is carried inside Ingenium at its latest build and kept with your other apps on first start: in '
          'Lector, in Fabrica\'s app library and wherever your apps are listed, with its Spiral in its seven layers.","master"],\n', "",
