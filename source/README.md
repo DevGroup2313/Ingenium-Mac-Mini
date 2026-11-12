@@ -411,7 +411,9 @@ Please make the fixes and then push this preview everywhere, I approve of the de
   rig/run_app.py). On the release page: t_61_hub 90/90, t_685_folders 37/37, t_62_tour 34/34, t_651_still_keys 25/25 (run alone),
   t_666_fabrica 23/23, t_661_fabrica 21/21, t_684_settings 20/20, t_683_hub 17/17, t_680_old_webview 12/12. t_666's two Offline Project
   checks pass only on a release page (a test build carries no demo edition, and the page says so). t_67_sound fails 8 of its 14 checks
-  on the 6.85 release page too: its expectations predate the sound settings she chose later.
+  on the 6.85 release page too: its expectations predate the sound settings she chose later. Editions: t_627_editions 20/20 (master,
+  full, gift, demo) once the 6.86 line in What is new was split (Fabrica's line is marked "fabrica", as 6.83's, so the gift and demo
+  editions, which have no Fabrica, do not name it). t_626_guide fails one check (every topic in its room) the same way on 6.85.
 
     python3 -I rig/t_686_disk_engine.py <Mac ingenium_app.py> <Windows ingenium_app.py>
     node rig/t_686_repo_unit.js
