@@ -311,14 +311,14 @@ function fxDraw(){var C=FX.C,cv=FX.cv;if(!cv)return;var d=dpr(),Wd=Math.round(FX
   var G=fxGeom(),turn=FX.sw,P=pal("focus"),M=metal(),Mf=metal("fine"),Mb=metal("band"),n=night();
   g.drawImage(fxBase(G),0,0,FX.W,FX.H);
   /* the stem, from the knot under the meridian to the plinth */
-  var s0=fxProj(G,0,1.13,0,0),s1=fxProj(G,0,1.6,0,0);tube(g,s0[0],s0[1],s1[0],s1[1],G.R*.032,M,.8);
+  var s0=fxProj(G,0,1.13,0,0),s1=fxProj(G,0,1.6,0,0);tubePath(g,[s0,s1],G.R*.048,M,.9);
   /* everything that turns, sorted far to near */
   var items=[],ballZ=fxProj(G,0,0,0,turn)[2];
   function addRing(pts,w,Mx,tone){runs(pts,ballZ,true).forEach(function(r){items.push({z:r.z,f:function(){tubePath(g,r.p,w*r.k,Mx,tone);}});});}
-  addRing(fxRing(G,1,Math.PI/2,0,turn,72),G.R*.042,M,1);                              /* the meridian, upright, facing you */
-  addRing(fxRing(G,.085,Math.PI/2,0,turn,20,[0,1.045,0]),G.R*.03,M,.9);             /* the knot that holds it on the stem */
-  var tilt=-7*Math.PI/180;addRing(fxRing(G,1.02,tilt,3*Math.PI/180,turn,72),G.R*.02,Mf,.9);   /* the ring of the hours, nearly level */
-  addRing(fxRing(G,.93,8*Math.PI/180,-26*Math.PI/180,turn,72),G.R*.03,Mb,1);         /* the band that crosses it */
+  addRing(fxRing(G,1,Math.PI/2,0,turn,96),G.R*.062,M,1);                              /* the meridian, upright, facing you */
+  addRing(fxRing(G,.085,Math.PI/2,0,turn,28,[0,1.05,0]),G.R*.04,M,.9);             /* the knot that holds it on the stem */
+  var tilt=-7*Math.PI/180;addRing(fxRing(G,1.02,tilt,3*Math.PI/180,turn,96),G.R*.03,Mf,.95);   /* the ring of the hours, nearly level */
+  addRing(fxRing(G,.93,8*Math.PI/180,-26*Math.PI/180,turn,96),G.R*.046,Mb,1);         /* the band that crosses it */
   /* the moon on the ring of the hours */
   var mu=FX.t/24000*TAU,ca=Math.cos(tilt),sa=Math.sin(tilt),mx=1.02*Math.cos(mu+2.4),mz=1.02*Math.sin(mu+2.4),my=-mz*sa,mz1=mz*ca,cb=Math.cos(3*Math.PI/180),sb=Math.sin(3*Math.PI/180);
   var mp=fxProj(G,mx*cb-my*sb,mx*sb+my*cb,mz1,turn);items.push({z:mp[2],f:function(){var r=G.R*.075*mp[3],im=orb(Math.round(r),P,"faint");g.drawImage(im,mp[0]-im.__s/2,mp[1]-im.__s/2,im.__s,im.__s);}});

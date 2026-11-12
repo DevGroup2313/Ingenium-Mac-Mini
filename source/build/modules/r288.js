@@ -63,7 +63,7 @@ function check(){var s=sigNow();if(s!==T.sig){T.sig=s;read();}}
 var G={cx:250,base:378,e:15*Math.PI/180,F:1150},PR=10.5,STEP=21.5,TW=21,SOCK=14;
 function proj(x,y,z,turn){var c=Math.cos(turn),s=Math.sin(turn),X=x*c+z*s,Z=-x*s+z*c,ce=Math.cos(G.e),se=Math.sin(G.e),Y=y*ce+Z*se,Z2=-y*se+Z*ce,k=G.F/(G.F-Z2);return [G.cx+X*k,G.base+Y*k,Z2,k];}
 /* the pearls stand one on another in the trunk, the newest on top and larger, capping it */
-function pearlY(j,n){var bottom=-SOCK-PR-2;if(j===0)return bottom-(n-2)*STEP-PR-18+1;return bottom-(n-1-j)*STEP;}
+function pearlY(j,n){var bottom=-SOCK-PR-2,st=Math.max(STEP,Math.min(34,206/Math.max(1,n-1.2)));if(j===0)return bottom-(n-2)*st-PR-18+1;return bottom-(n-1-j)*st;}
 var PLINTH={sig:"",cv:null};
 function plinth(name,count){var d=H.dpr(),n=H.night(),sig=[d,n?1:0,name,count].join("|");if(PLINTH.sig===sig)return PLINTH.cv;PLINTH.sig=sig;
   var cv=PLINTH.cv||D.createElement("canvas");cv.width=Math.round(T.W*d);cv.height=Math.round(T.H*d);var g=cv.getContext("2d");g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,T.W,T.H);
