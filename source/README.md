@@ -411,6 +411,8 @@ and milestones, comments on a line, Rules before main, Safety on every version).
   makes into dulwich (porcelain's status, reset_file and clone; stage; do_commit; validate_path) were run inside a bundle frozen as the
   apps are (PyInstaller 6.22.3 and dulwich 0.22.8, as the workflows install them, with the specs' hidden imports), on Linux: PyInstaller
   packs dulwich.porcelain and what it needs although no spec names it. The Mac and Windows builds themselves were not run here.
+  Editions: t_627_editions 20/20 (master, full, gift, demo). t_626_guide fails one check (every topic in its room), word for word as
+  on the 6.86 release page.
 
     python3 -I rig/t_687_disk_write.py <Mac ingenium_app.py> <Windows ingenium_app.py>
     node rig/t_687_fabrica.js <app folder: patched ingenium_app.py and ingenium.html> <out folder>
