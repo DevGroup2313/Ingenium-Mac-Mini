@@ -496,6 +496,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.85: Folders' right-hand pull, which puts the folders in order (modules/r279.js; her words, 12 November 2026: "I approve pf the preview
      with those changes") */
   '#page-folders .fd-order,#page-folders .fd-label.fd-keyed,'+
+  /* 6.86: Fabrica's phase 2 (modules/r280.js): the Ingenium part's cards, its keys, the search's finds and the branch key's own list
+     (her words, 12 November 2026: "I approve, please push it everywhere") */
+  '#fb .r280-tile,#fb .r280-key,#fb .r280-hit,.r280-pop .r172-opt,'+
   /* 6.83: Fabrica brings everything from GitHub (modules/r276.js): the sheet's choices, repositories and drives
      (her words, 11 November 2026: "I like the preview please push it everywhere") */
   '#fb .hb-opt,#fb .hb-pick,#fb .hb-drive,'+

@@ -158,25 +158,30 @@ function applyDelta(base,d){var p=0;function vi(){var r=0,s=1,b;do{b=d[p++];r+=(
 /* ---------- where the objects live: this device's own store; each object once, under its git name ---------- */
 var MAXDEPTH=24;
 function Store(backend){this.be=backend;this.cache=new Map();this.cacheBytes=0;this.pending=new Map();}
+/* 6.86: an object read from a repository on the drive (modules/r280.js) comes marked away: it is lent, not kept. Whether an object is
+   kept here, and what a new one is kept against, is asked of this device's own store only, so nothing of her own is ever left unwritten
+   because a repository on the drive happens to hold the same object */
+function ownRec(be,oid){return be.ownRec?be.ownRec(oid):be.getRec(oid);}
 Store.prototype._remember=function(oid,o){if(o.b.length>48*1048576)return;if(this.cache.has(oid))return;this.cache.set(oid,o);this.cacheBytes+=o.b.length;
   while(this.cacheBytes>96*1048576&&this.cache.size>1){var k=this.cache.keys().next().value;this.cacheBytes-=this.cache.get(k).b.length;this.cache.delete(k);}};
-Store.prototype.has=function(oid){if(this.cache.has(oid)||this.pending.has(oid))return Promise.resolve(true);return this.be.getRec(oid).then(function(r){return !!r;});};
+Store.prototype.has=function(oid){var c=this.cache.get(oid);if((c&&!c.away)||this.pending.has(oid))return Promise.resolve(true);return ownRec(this.be,oid).then(function(r){return !!r;});};
 /* {type, body} or null */
 Store.prototype.get=function(oid){var me=this;if(me.cache.has(oid)){var c=me.cache.get(oid);me.cache.delete(oid);me.cache.set(oid,c);return Promise.resolve({type:c.t,body:c.b});}
   if(me.pending.has(oid))return me.pending.get(oid).then(function(){return me.get(oid);});
-  return me.be.getRec(oid).then(function(r){if(!r)return null;return me._decode(oid,r).then(function(b){me._remember(oid,{t:r.t,b:b});return {type:r.t,body:b};});});};
+  return me.be.getRec(oid).then(function(r){if(!r)return null;return me._decode(oid,r).then(function(b){me._remember(oid,r.away?{t:r.t,b:b,away:1}:{t:r.t,b:b});return {type:r.t,body:b};});});};
 Store.prototype._decode=function(oid,r){var me=this;
   var body=r.z?inflateZB(r.b,r.base?0:r.n):Promise.resolve(r.b);
   if(!r.base)return body;
   return Promise.all([body,me.get(r.base)]).then(function(x){if(!x[1])throw new Error("a version this one is kept against is missing");return applyDelta(x[1].body,x[0]);});};
 Store.prototype.size=function(oid){if(this.cache.has(oid))return Promise.resolve(this.cache.get(oid).b.length);return this.be.getRec(oid).then(function(r){return r?r.n:null;});};
-Store.prototype.depth=function(oid){var me=this;return me.be.getRec(oid).then(function(r){return r?(r.d||0):0;});};
+Store.prototype.depth=function(oid){var me=this;return ownRec(me.be,oid).then(function(r){return r?(r.d||0):0;});};
 /* keep an object; hint: an object it is likely a new version of (kept as the change from it);
    delta: that change already made (a pack's own), taken as it is */
 Store.prototype.put=function(type,body,hint,delta){var me=this;body=u8of(body);
-  return oidOf(type,body).then(function(oid){if(me.cache.has(oid))return oid;if(me.pending.has(oid))return me.pending.get(oid).then(function(){return oid;});
-    var job=me.be.getRec(oid).then(function(r){if(r)return;
-      var try1=(hint&&hint!==oid&&body.length>=512)?me.be.getRec(hint).then(function(hr){if(!hr||hr.t!==type||(hr.d||0)>=MAXDEPTH)return null;
+  return oidOf(type,body).then(function(oid){var c0=me.cache.get(oid);if(c0&&!c0.away)return oid;if(me.pending.has(oid))return me.pending.get(oid).then(function(){return oid;});
+    if(c0){me.cache.delete(oid);me.cacheBytes-=c0.b.length;}
+    var job=ownRec(me.be,oid).then(function(r){if(r)return;
+      var try1=(hint&&hint!==oid&&body.length>=512)?ownRec(me.be,hint).then(function(hr){if(!hr||hr.t!==type||(hr.d||0)>=MAXDEPTH)return null;
           if(delta&&delta.length<=body.length*0.6)return {t:type,n:body.length,base:hint,d:(hr.d||0)+1,b:delta};
           return me.get(hint).then(function(h){if(!h)return null;var d=makeDelta(h.body,body);if(!d||d.length>body.length*0.6)return null;return {t:type,n:body.length,base:hint,d:(hr.d||0)+1,b:d};});}).catch(function(){return null;}):Promise.resolve(null);
       return try1.then(function(rec){if(rec){if(rec.b.length>=4096&&canCS())return deflateZ(rec.b).then(function(z){if(z.length<rec.b.length*0.9){rec.b=z;rec.z=1;}return rec;});return rec;}
@@ -408,6 +413,9 @@ function setAuthor(a){if(a&&a.name)who={name:String(a.name),email:String(a.email
 /* one at a time for each repository: no two changes cross */
 var locks={};
 function locked(id,fn){var prev=locks[id]||Promise.resolve(),job=prev.catch(function(){}).then(fn);locks[id]=job.catch(function(){});return job;}
+/* 6.86: a repository read straight from the computer's drive (modules/r280.js) has an id beginning "disk:": it is on the drive
+   already, so the copy on disk, its clean-up and its recovery leave it alone */
+function isDisk(id){return typeof id==="string"&&id.indexOf("disk:")===0;}
 function load(id){return backend().getRepo(id).then(function(r){if(!r)throw new Error("that repository is no longer on this device");return r;});}
 function save(r){r.changed=Date.now();return backend().putRepo(r).then(function(){mirrorSoon(r.id);return r;});}
 function headOid(r){return r.head&&r.head.ref?(r.refs[r.head.ref]||null):(r.head?r.head.oid:null);}
@@ -434,7 +442,7 @@ function summary(r){return {id:r.id,name:r.name,slug:r.slug,app:r.app||null,desc
   branch:r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):null,detached:!!(r.head&&r.head.oid),head:headOid(r),
   branches:Object.keys(r.refs).filter(function(k){return k.indexOf("refs/heads/")===0;}).map(function(k){return k.slice(11);}),
   tags:Object.keys(r.refs).filter(function(k){return k.indexOf("refs/tags/")===0;}).map(function(k){return k.slice(10);}),
-  files:Object.keys(r.work||{}).length,merging:r.merging?{theirs:r.merging.label,conflicts:r.merging.conflicts.slice()}:null};}
+  files:r.fileCount!=null?r.fileCount:Object.keys(r.work||{}).length,disk:r.disk||null,merging:r.merging?{theirs:r.merging.label,conflicts:r.merging.conflicts.slice()}:null};}
 
 function create(opt){opt=opt||{};var r={id:newId(),name:String(opt.name||"New app").slice(0,80),app:opt.app||null,desc:String(opt.desc||""),created:Date.now(),
     head:{ref:"refs/heads/"+(okRefName(opt.branch)?opt.branch:"main")},refs:{},work:{},sizes:{},log:[],merging:null};r.slug=slug(r.name);
@@ -466,7 +474,9 @@ function readFile(id,path,ref){return load(id).then(function(r){var p=cleanPath(
   return files.then(function(f){var e=f[p];if(!e)return null;return store().need(e[1],"blob").then(function(o){return o.body;});});});}
 function readText(id,path,ref){return readFile(id,path,ref).then(function(b){return b==null?null:dec(b);});}
 function files(id,ref){return load(id).then(function(r){var f=ref?resolve(r,ref).then(treeFiles):Promise.resolve(r.work);
-  return f.then(function(m){var ps=Object.keys(m).sort();return Promise.all(ps.map(function(p){var o=m[p][1];return (r.sizes&&r.sizes[o]!=null)?r.sizes[o]:store().size(o);})).then(function(sz){
+  return f.then(function(m){var ps=Object.keys(m).sort();var be=backend(),away=isDisk(r.id)&&typeof be.diskSizes==="function";/* 6.86: a repository on the drive gives its sizes from the objects' headers, all in one answer */
+  return Promise.resolve(away?be.diskSizes(r.id,ps.map(function(p){return m[p][1];}).filter(function(o){return !(r.sizes&&r.sizes[o]!=null);})):{}).catch(function(){return {};}).then(function(got){got=got||{};
+  return Promise.all(ps.map(function(p){var o=m[p][1];return (r.sizes&&r.sizes[o]!=null)?r.sizes[o]:(got[o]!=null?got[o]:(away?null:store().size(o)));}));}).then(function(sz){
     return ps.map(function(p,i){return {path:p,mode:m[p][0],oid:m[p][1],size:sz[i]};});});});});}
 
 /* what has changed since the last commit */
@@ -488,8 +498,13 @@ function commit(id,msg,opt){opt=opt||{};return locked(id,function(){return load(
       return chk.then(function(empty){if(empty)throw new Error("nothing has changed since the last commit");
         var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d)),parents=parent?[parent]:[];if(r.merging&&r.merging.theirs)parents.push(r.merging.theirs);
         return store().put("commit",commitBody({tree:tree,parents:parents,author:a,msg:msg+"\n"})).then(function(oid){moveHead(r,oid,r.merging?"merge "+r.merging.label:"commit");r.merging=null;return save(r).then(function(){return oid;});});});});}});});}
-function log(id,opt){opt=opt||{};return load(id).then(function(r){var refsAt={};Object.keys(r.refs).forEach(function(k){(refsAt[r.refs[k]]=refsAt[r.refs[k]]||[]).push(k.replace(/^refs\/(heads|tags)\//,""));});
-  return resolve(r,opt.ref).then(function(from){if(!from)return [];return logOf(r,from,opt.max||200).then(function(l){return l.map(function(c){return {oid:c.oid,short:c.oid.slice(0,7),parents:c.parents,tree:c.tree,
+function log(id,opt){opt=opt||{};return load(id).then(function(r){var refsAt={};
+  /* 6.86: a tag kept as an object of its own (an annotated tag, as most repositories brought from GitHub or read from the drive have) names
+     the version it points to, so the history shows it there; before, only a tag naming the version itself was shown */
+  var tk=Object.keys(r.refs).filter(function(k){return k.indexOf("refs/tags/")===0;});
+  return Promise.all(tk.map(function(k){return peel(r.refs[k]).then(function(o){return [k,o];},function(){return [k,r.refs[k]];});})).then(function(pt){var at={};pt.forEach(function(x){at[x[0]]=x[1];});
+  Object.keys(r.refs).forEach(function(k){var o=at[k]||r.refs[k];(refsAt[o]=refsAt[o]||[]).push(k.replace(/^refs\/(heads|tags)\//,""));});
+  return resolve(r,opt.ref);}).then(function(from){if(!from)return [];return logOf(r,from,opt.max||200).then(function(l){return l.map(function(c){return {oid:c.oid,short:c.oid.slice(0,7),parents:c.parents,tree:c.tree,
     author:c.author,when:c.author?c.author.when*1000:0,msg:c.msg,title:c.msg.split("\n")[0],names:refsAt[c.oid]||[]};});});});});}
 
 /* branches and tags */
@@ -558,12 +573,33 @@ function merge(id,other,opt){opt=opt||{};return locked(id,function(){return load
     var ours=headOid(r),theirs=x[1];if(!ours)throw new Error("make a first commit first");if(ours===theirs)return {kind:"same"};
     return mergeBase(ours,theirs).then(function(base){
       if(base===theirs)return {kind:"same"};
-      if(base===ours){return treeFiles(theirs).then(function(f){r.work=f;moveHead(r,theirs,"merge "+other+" (moved forward)");return save(r).then(function(){return {kind:"forward",commit:theirs};});});}
+      if(base===ours){if(opt.squash)return treeFiles(theirs).then(function(f){r.work=f;r.merging={theirs:null,label:other,conflicts:[]};return save(r).then(function(){return null;});});
+        return treeFiles(theirs).then(function(f){r.work=f;moveHead(r,theirs,"merge "+other+" (moved forward)");return save(r).then(function(){return {kind:"forward",commit:theirs};});});}
       return Promise.all([treeFiles(base),Promise.resolve(x[0]),treeFiles(theirs)]).then(function(t){return mergeTrees(t[0],t[1],t[2],{ours:summary(r).branch||ours.slice(0,7),theirs:other});}).then(function(m){
-        r.work=m.files;r.merging={theirs:theirs,label:other,conflicts:m.conflicts};
+        /* 6.86: squashed, the version has one parent (main's), as GitHub's Squash and merge */
+        r.work=m.files;r.merging={theirs:opt.squash?null:theirs,label:other,conflicts:m.conflicts};
         if(m.conflicts.length)return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts};});
         return save(r).then(function(){return null;});});});});});}).then(function(res){
   if(res)return res;return commit(id,opt.msg||("Merge "+other)).then(function(oid){return {kind:"merged",commit:oid};});});}
+/* 6.86: rebase, as GitHub's Rebase and merge: each version of the other idea since the two parted is made again on top of this one,
+   oldest first, with its own words, author and date. Every one is joined first, in memory; if any meets a change on the same lines,
+   nothing is written and it says which (bring it in by merge instead). A version that is itself a merge is not made again one by one. */
+function rebase(id,other,opt){opt=opt||{};return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
+  return Promise.all([treeFiles(headOid(r)),resolve(r,other)]).then(function(x){if(changesBetween(x[0],r.work).length)throw new Error("commit or put aside your changes before bringing versions in");
+    var ours=headOid(r),theirs=x[1];if(!ours)throw new Error("make a first commit first");if(ours===theirs)return {kind:"same"};
+    return mergeBase(ours,theirs).then(function(base){if(base===theirs)return {kind:"same"};var chain=[],seen=0;
+      function back(oid){if(!oid||oid===base)return Promise.resolve();if(++seen>20000)throw new Error("too many versions to make again one by one: bring it in by merge");
+        return commitOf(oid).then(function(c){if(c.parents.length>1)throw new Error("“"+c.msg.split("\n")[0]+"” is itself a merge: bring the idea in by merge instead");chain.unshift(c);return back(c.parents[0]||null);});}
+      return back(theirs).then(function(){var work=x[0],plan=[],i=0;
+        function step(){if(i>=chain.length)return Promise.resolve();var c=chain[i++];
+          return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid)]).then(function(t){return mergeTrees(t[0],work,t[1],{ours:"now",theirs:c.oid.slice(0,7)});}).then(function(m){
+            if(m.conflicts.length)throw new Error("“"+c.msg.split("\n")[0]+"” meets a change on the same lines in "+m.conflicts.slice(0,3).join(", ")+": bring the idea in by merge instead");
+            work=m.files;plan.push({c:c,files:m.files});return step();});}
+        return step().then(function(){var head=ours,j=0;
+          function write(){if(j>=plan.length)return Promise.resolve();var it=plan[j++],a=it.c.author||{};
+            return writeTrees(store(),it.files).then(function(tree){var who2={name:a.name||who.name,email:a.email||""},when=a.when||Math.floor(Date.now()/1000),tz=a.tz||tzOf(new Date());
+              return store().put("commit",commitBody({tree:tree,parents:[head],author:ident(who2,when,tz),msg:it.c.msg.replace(/\n*$/,"\n")}));}).then(function(oid){head=oid;return write();});}
+          return write().then(function(){r.work=work;moveHead(r,head,"rebase "+other);return save(r).then(function(){return {kind:"rebased",commit:head,count:plan.length};});});});});});});});});}
 function stopMerge(id){return locked(id,function(){return load(id).then(function(r){if(!r.merging)return summary(r);return treeFiles(headOid(r)).then(function(h){r.work=h;r.merging=null;return save(r).then(summary);});});});}
 /* undo a commit with a new one (nothing is written over) */
 function revert(id,target){return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
@@ -663,7 +699,7 @@ function importAny(u8,opt){u8=u8of(u8);opt=opt||{};var head=dec(u8.subarray(0,16
   return Promise.reject(new Error("Ingenium reads a zip or a git bundle here"));}
 
 /* what is no longer named by any repository is let go */
-function gc(){var live={},s=store();return backend().allRepos().then(function(rs){var tips=[];rs.forEach(function(r){Object.keys(r.refs).forEach(function(k){tips.push(r.refs[k]);});(r.log||[]).forEach(function(l){if(l.from)tips.push(l.from);if(l.to)tips.push(l.to);});
+function gc(){var live={},s=store();return backend().allRepos().then(function(rs){rs=rs.filter(function(r){return !isDisk(r.id);});var tips=[];rs.forEach(function(r){Object.keys(r.refs).forEach(function(k){tips.push(r.refs[k]);});(r.log||[]).forEach(function(l){if(l.from)tips.push(l.from);if(l.to)tips.push(l.to);});
       if(r.merging&&r.merging.theirs)tips.push(r.merging.theirs);Object.keys(r.work||{}).forEach(function(p){live[r.work[p][1]]=1;});});
     function mark(oid){if(live[oid]===2)return Promise.resolve();live[oid]=2;return s.get(oid).then(function(o){if(!o)return;var ch=Promise.resolve();
       if(o.type==="commit"){var c=parseCommit(o.body);ch=ch.then(function(){return mark(c.tree);});c.parents.forEach(function(p){ch=ch.then(function(){return mark(p);});});}
@@ -685,7 +721,7 @@ function mstate(){try{if(typeof state!=="object"||!state)return null;if(!state.y
 function bigId(){return "big_"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
 function b64(u8){var s="",CH=0x8000;for(var i=0;i<u8.length;i+=CH)s+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));return btoa(s);}
 function unb64(t){var bin=atob(t),o=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)o[i]=bin.charCodeAt(i);return o;}
-function mirrorSoon(id){if(!mshell())return;if(id)MIR.dirty.add(id);clearTimeout(MIR.timer);MIR.timer=setTimeout(function(){mirrorNow().catch(function(e){try{console.warn("repositories: the copy on disk was not written",e);}catch(_){}});},1500);}
+function mirrorSoon(id){if(!mshell()||isDisk(id))return;if(id)MIR.dirty.add(id);clearTimeout(MIR.timer);MIR.timer=setTimeout(function(){mirrorNow().catch(function(e){try{console.warn("repositories: the copy on disk was not written",e);}catch(_){}});},1500);}
 function mirrorNow(){var a=mshell(),m=mstate();if(!a||!m)return Promise.resolve(false);if(MIR.busy)return MIR.busy.then(mirrorNow);
   var oids=Array.from(MIR.fresh),ids=Array.from(MIR.dirty);MIR.fresh.clear();MIR.dirty.clear();
   var job=Promise.resolve().then(function(){var segs=[],cur=[],n=0;
@@ -711,7 +747,7 @@ function recover(){if(recovered)return recovered;var a=mshell(),m=mstate();if(!a
   return recovered;}
 /* after a gc, the disk copy is written again from what is kept, and the old segments let go */
 function remirror(){var a=mshell(),m=mstate();if(!a||!m)return Promise.resolve(false);var old=m.segs.slice();
-  return backend().eachRec(function(k){MIR.fresh.add(k);}).then(function(){return backend().allRepos();}).then(function(rs){rs.forEach(function(r){MIR.dirty.add(r.id);});
+  return backend().eachRec(function(k){MIR.fresh.add(k);}).then(function(){return backend().allRepos();}).then(function(rs){rs.forEach(function(r){if(!isDisk(r.id))MIR.dirty.add(r.id);});
     m.segs=[];return mirrorNow();}).then(function(){old.forEach(function(b){try{a.big_del(b);}catch(e){}});return true;},function(e){m.segs=old.concat(m.segs);throw e;});}
 
 /* R114: a ref moved by a copy brought from outside (GitHub's); when it is the branch in use, the working copy follows,
@@ -735,14 +771,14 @@ function _use(be){BE=be;ST=new Store(be);ST.onPut=function(oid){if(mshell())MIR.
 return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
   status:status,commit:commit,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
-  merge:merge,stopMerge:stopMerge,revert:revert,
+  merge:merge,rebase:rebase,stopMerge:stopMerge,revert:revert,isDisk:isDisk,
   setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,
   /* 6.83: a repository's git folder read piece by piece (Fabrica opens a repository brought from GitHub, modules/r276.js) */
   fromGitDir:fromGitDir,gc:gc,setAuthor:setAuthor,author:function(){return who;},
   core:{sha1:sha1,sha1JS:sha1JS,inflateRaw:inflateRaw,inflateZ:inflateZ,deflateZ:deflateZ,storedZ:storedZ,makeDelta:makeDelta,applyDelta:applyDelta,writePack:writePack,readPack:readPack,
     zip:zip,unzip:unzip,unzipData:unzipData,lineDiff:lineDiff,hunks:hunks,merge3:merge3,unified:unified,splitLines:splitLines,parseTree:parseTree,parseCommit:parseCommit,treeBody:treeBody,
-    okRefName:okRefName,cleanPath:cleanPath,crc32:crc32,MemBackend:MemBackend,use:_use,store:store,mirrorNow:mirrorNow,recover:recover,remirror:remirror}};
+    okRefName:okRefName,cleanPath:cleanPath,crc32:crc32,MemBackend:MemBackend,use:_use,store:store,be:function(){return backend();},mirrorNow:mirrorNow,recover:recover,remirror:remirror}};
 })();
 window.IngRepo=IngRepo;
 ;try{window.__ingParts["p42"]="running";}catch(_){}

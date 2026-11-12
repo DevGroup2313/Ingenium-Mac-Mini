@@ -31,7 +31,7 @@ APP_FILE = re.sub(r'[^A-Za-z0-9._-]', '', str(_cfg.get('file_name') or '')) or '
 APP_ID = str(_cfg.get('app_id') or 'com.yannieforest.ingenium')
 if not re.match(r'^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)+$', APP_ID):
     raise SystemExit('app.json: app_id %r is not a valid id (letters and digits, dots between)' % APP_ID)
-APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.85')
+APP_VERSION = os.environ.get('INGENIUM_VERSION', '6.86')
 _own = [('ingenium.html', '.')]
 # R75: the seal is the icon when it is there; a build without it still
 # finishes, with the plain icon
@@ -83,6 +83,8 @@ a = Analysis(
         'webview.platforms.cocoa',
         # 6.83: Fabrica brings everything from GitHub with git's own protocol (dulwich, a git written in Python; app_hub_683.py)
         'dulwich', 'dulwich.client', 'dulwich.repo', 'dulwich.objects', 'dulwich.pack', 'dulwich.protocol', 'urllib3',
+        # 6.86: Fabrica reads every repository on this computer from the drive (app_disk_686.py)
+        'dulwich.object_store', 'dulwich.index',
         'objc',
         'Foundation',
         'AppKit',

@@ -226,7 +226,7 @@ function paint4(bd){var j=job()||{repos:[]},sc=scan()||{},by={},br={};((sc.repos
     var s=mk("span","s"),bits=[];if(c.refs!=null)bits.push((k.refs_match?"every branch and tag matches GitHub: ":"branches and tags differ: ")+c.branches+" branches, "+c.tags+" tags, "+(c.pull_refs||0)+" pull requests' versions");
     if(c.issues!=null)bits.push((c.issues||0)+" issues and "+(c.pulls||0)+" pull requests");if(c.release_files!=null)bits.push((c.release_files_ok||0)+" of "+c.release_files+" release files checked by fingerprint");
     if(c.wiki_refs)bits.push("the wiki");if(c.runs!=null)bits.push((c.runs||0)+" workflow runs");s.textContent=x.error||bits.join(" · ");e.appendChild(s);ck.appendChild(e);});bd.appendChild(ck);
-  bd.appendChild(mk("p","hb-small","Fabrica opens a repository with up to 500 MB of history on this computer, with its issues, pull requests and comments; a larger one is whole on the drive, and opening it in Fabrica there is the next step."));
+  bd.appendChild(mk("p","hb-small","Every repository brought here opens in Fabrica straight from the drive, at any size, with its issues and pull requests: in Your apps, under On this computer. Open in Fabrica also keeps a copy of one up to 500 MB inside Ingenium itself."));
   if(S.say)bd.appendChild(mk("div","hb-warn",esc(S.say)));
   var row=mk("div","hb-row");row.appendChild(key("f-btn","Bring what changed since",function(){S.seen=false;S.sig="";startScan();paint(true);}));row.appendChild(key("f-btn pri","Done",function(){close();}));bd.appendChild(row);}
 
@@ -250,7 +250,7 @@ function record(full){var a=A();function J(n){return Promise.resolve(a.hub_hub_j
 var APPKEY={cd:"cd",forge:"forge",ingenium:"ingenium",inkwell:"inkwell"};
 function openRepo(full,name,desc,btn){var a=A(),H=X();if(!a||!H||!W.IngRepo)return Promise.resolve(false);if(btn){btn.disabled=true;btn.textContent="Opening…";}S.say="";
   return Promise.resolve(a.hub_git_files(full)).then(function(r){if(!r||!r.ok)throw new Error((r&&r.error)||"That repository is not on the drive now.");
-      if(r.bytes>LIMIT)throw new Error(name+"'s history is "+gb(r.bytes)+". Fabrica opens up to 500 MB on this computer for now; the whole of it is on the drive, and any git program opens it there.");
+      if(r.bytes>LIMIT)throw new Error(name+"'s history is "+gb(r.bytes)+". Ingenium keeps a copy of one up to 500 MB inside itself; this one opens in Fabrica straight from the drive, at any size: in Your apps, under On this computer.");
       var sizes={},names=r.files.map(function(f){sizes[f.name]=f.size;return f.name;});
       function get(n){var size=sizes[n]||0,parts=[],off=0;return (function next(){if(off>=size)return Promise.resolve(join(parts,size));
         return Promise.resolve(a.hub_git_read(full,n,off,8388608)).then(function(x){if(!x||!x.ok)throw new Error((x&&x.error)||"a file could not be read");var u=b64u8(x.b64);if(!u.length)throw new Error("a file ended early");parts.push(u);off+=u.length;return next();});})();}

@@ -20,3 +20,16 @@ To build it (paths absolute; S is a scratch folder; the page served at a local a
     node tools/capture_fabrica.js <page url> <S>/fabcap <S>/fabcap/logos.json
     python3 -I build.py <S> <out.html>      (it reads <S>/preview/fabrica_p2/{add.css,app.js,map.html}: copy these files there)
     node tools/check_p2.js <out.html> <out prefix>
+
+Her approval (12 November 2026), with two screenshots of version 2: "Please fix the formatting issues and also redesign the long wide
+buttons from the "Test and ship" section. Please make the fixes and then push this preview everywhere, I approve of the design." Then, on
+version 3 (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o): "I approve, please push it everywhere." Version 3 fixed: the frame's own
+classes renamed pvf-* (".win .top" had caught the ship cards' ".top" rows); the work's header wraps instead of cutting the name and
+branch; a part opens at its top; the Ingenium part's long keys became cards two to a row (f-tg, as the ship cards).
+These files are version 3 with the other chat's additions on top (commit 9287840, on the same day): the pull request's three tabs, an
+issue opened, people and a milestone, a comment on a line, Rules before main, Safety, and what changed while she was away; and the parity
+map corrected from Fabrica's code (Fork and Use as a template are in Fabrica already). Those additions are for the coming stages.
+Built into Ingenium 6.86 from version 3: modules/r280.js and desktop/app_disk_686.py, with r110, r112 and r141 (source/README.md). Where
+the app says more than the preview did, it says what is true of the app: a drive tile shows its size alone (the narrow tiles cut
+"· kept"), the apps kept inside Ingenium stand under "Kept in Ingenium" (the preview said "In this window"), the drive line adds "read only
+for now", and A second copy says it comes in the next stage.

@@ -371,6 +371,48 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.86 (12 November 2026): Fabrica, phase 2. Every repository on her computer opens in Fabrica straight from its drive, at any size;
+and Ingenium beside her in Test and ship. Her words (12 November 2026): "Please continue working on my requests and deepening and enhancing
+Fabrica and making it my own offline GitHub. I want full and complete parity with GitHub but I want you to go above and beyond that and
+really enhance it and Ingenium as a whole. Also by "filtered", I meant both options." On the preview drawn from Fabrica itself
+(source/previews/fabrica_p2): "Please fix the formatting issues and also redesign the long wide buttons from the "Test and ship" section.
+Please make the fixes and then push this preview everywhere, I approve of the design." Then: "I approve, please push it everywhere."
+- desktop/app_disk_686.py (new; release.py patches the Mac and Windows apps): disk_list, disk_add, disk_choose, disk_forget, disk_repo,
+  disk_objs, disk_part and disk_sizes, read with dulwich (0.22.8, as 6.83). The repositories she adds (any folder that holds a git
+  repository, a working copy or a bare one, on any drive) are kept in disk_repos.json in the app's own folder; every repository brought
+  from GitHub (6.83) is listed too. A record is its refs, its HEAD and the files at HEAD (a submodule named, not held); a file's size is
+  read from its object's header only (in a pack, or a loose object's first bytes), so no file is read whole to be listed; objects come in
+  batches, with the history before a version and a tree's folders in the same answer; one over 8 MB comes in parts; one over 48 MB stays
+  whole on the drive and is opened from there. Read only: nothing on the drive is written. A drive that is not connected is said to be away.
+- modules/r280.js (new): IngRepo's store asks the computer app for a repository whose id begins "disk:", and IndexedDB for the rest. An
+  object read from the drive is lent, marked away: the store never counts it as kept, so an app kept in Ingenium keeps its own copy of
+  the same file (modules/r110.js: Store.has, put and depth ask the device's own store only). What would write on the drive (a commit,
+  an idea, a tag, a merge, a file) is refused in plain words; another branch, a tag or a version can be shown, and notes are kept beside
+  it in Ingenium. Your apps: On this computer (the drive, the room left on it, no size limit) and Kept in Ingenium; each drive tile says
+  its size; Add one from this computer. Under the work's header: From <drive> · <size>, every version · no size limit · read only for
+  now. The branch key opens Ingenium's own list (r172's look): Branches, Tags, All the ideas. Test and ship has a fourth part, Ingenium,
+  its keys cards as the ship cards are, two to a row: Explain, Review, Release notes and A message (through window.lxAsk with the model
+  chosen in Lector, as modules/r208.js asks it; where the model runs is said: on this computer and nothing is sent, online, or on another
+  of her devices); Find in every repository (by their words; at most 6,000 files and 48 MB read in one search, and what was not read is
+  said); Any version, live (a version opened as the app in its own window); A second copy (said plainly: it comes in the next stage);
+  Its folder (in Folders). A pull request has Ask Ingenium to review it beside Ask for changes. A repository brought from GitHub has its
+  issues and pull requests attached once from their records on the drive.
+- modules/r110.js: merge(id, other, {squash}) makes one version with one parent; rebase(id, other) makes each version of the other idea
+  again on top, keeping its author and date, and writes nothing if one meets a change on the same lines; files() asks the drive for
+  sizes in one answer; the history names the version an annotated tag points to (before, only a tag naming the version itself showed).
+- modules/r141.js: a pull request is brought in by Merge, Squash and merge or Rebase and merge (Fabrica's own segmented row).
+- modules/r112.js: the work's header wraps onto a second row instead of cutting the app's name and branch (her Mac's wider fonts cut
+  them); the dialog for a repository on the drive says Forget, not Remove: nothing on the drive is touched.
+- modules/r279.js, r176.js: in Folders, the label between the drawer's pulls is a key: only the folders not read yet (state.folders.ui.filter).
+- modules/r276.js (its note now points to On this computer), r176.js (the new keys sound), r222.js (the news), the specs (dulwich.object_store
+  and dulwich.index inside the apps).
+- Tests: rig/t_686_disk_engine.py (the computer app's own functions against repositories git made), rig/t_686_repo_unit.js (squash, rebase
+  and lent objects, with no page), rig/t_686_fabrica.js (the page with the computer app's back end, rig/run_app.py).
+
+    python3 -I rig/t_686_disk_engine.py <Mac ingenium_app.py> <Windows ingenium_app.py>
+    node rig/t_686_repo_unit.js
+    node rig/t_686_fabrica.js <app folder: patched ingenium_app.py and ingenium.html> <out folder>
+
 Ingenium 6.85 (12 November 2026): Folders' drawer pulls find and order, Your apps' logos move as Lector's, and any app can wear its own
 logo. Her words (12 November 2026): "I want the apps seals on the "your apps" section to be animated and interactive and clickable, I like
 the effect. I also want the 3D folders for the apps at the top of the page to be able to filtered, and reorderd by alphabetical order, and

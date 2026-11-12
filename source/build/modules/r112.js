@@ -303,6 +303,11 @@ body[data-theme="night"] #fb .f-ls-cast{background:radial-gradient(closest-side,
 #fb.f-one .f-steps li.now span{display:inline}
 #fb.f-phone .f-head h1{font-size:22px}
 #fb.f-phone .f-steps{margin-left:0}
+/* 6.86 (her words, 12 November 2026: "Please fix the formatting issues"): at every width the work's header wraps onto a second row
+   when its keys do not fit (the Mac's own fonts are wider), so the app's name and its idea are never cut short */
+#fb #fbWork .f-pn-h{flex-wrap:wrap;row-gap:6px}
+#fb #fbWork .f-pn-h h2{flex:0 1 auto;min-width:0}
+#fb #fbBranch{flex:0 0 auto;max-width:100%}
 #fb.f-phone #fbWork .f-pn-h{flex-wrap:wrap;row-gap:6px}
 #fb.f-phone #fbWork .f-pn-h h2{flex:1 1 auto;min-width:0}
 #fb.f-phone #fbWorkChip{order:5;margin-left:0}
@@ -1239,11 +1244,12 @@ function menuMore(anchor){var r=cur();if(!r){toast("Choose an app on the left fi
   root.appendChild(m);var a=anchor.getBoundingClientRect(),rr=root.getBoundingClientRect();
   m.style.top=Math.round(a.bottom-rr.top+6)+"px";m.style.left=Math.round(Math.max(8,Math.min(a.right-rr.left-m.offsetWidth,rr.width-m.offsetWidth-8)))+"px";
   setTimeout(function(){document.addEventListener("pointerdown",function f(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener("pointerdown",f,true);}},true);},0);}
-function sheetRemove(r){var sh=sheet("Remove "+r.name+" from Fabrica?","Its versions, ideas, releases and the packages kept here leave this device. The app itself is not touched: its page in your app library, in Code and on your devices stays where it is.");
+function sheetRemove(r){/* 6.86: a repository read from the drive (modules/r280.js) is only forgotten: nothing on the drive is touched */
+  var dk=!!(IngRepo.isDisk&&IngRepo.isDisk(r.id)),sh=dk?sheet("Forget "+r.name+" in Fabrica?","Fabrica stops listing it. Nothing on the drive is touched: the repository stays where it is, every version of it, and Add one from this computer brings it back."):sheet("Remove "+r.name+" from Fabrica?","Its versions, ideas, releases and the packages kept here leave this device. The app itself is not touched: its page in your app library, in Code and on your devices stays where it is.");
   var end=h("div","end");
   end.appendChild(btn("","Save its history first",function(){IngRepo.bundle(r.id).then(function(b){return saveBytes(r.slug+".bundle","application/octet-stream",b).then(function(){toast("Saved: "+r.slug+".bundle. Remove it now, or keep it.");});},fail);}));
   end.appendChild(btn("","Keep it",sh.close));
-  var go2=btn("danger","Remove it",function(){go2.disabled=true;IngRepo.remove(r.id).then(function(){var f=FBS();delete f.links[r.id];if(f.ship)delete f.ship[r.id];delete f.drafts[r.id];if(f.sel===r.id)f.sel=null;saveSoon();return MADE.forget(r.id);})
+  var go2=btn("danger",dk?"Forget it":"Remove it",function(){go2.disabled=true;IngRepo.remove(r.id).then(function(){var f=FBS();delete f.links[r.id];if(f.ship)delete f.ship[r.id];delete f.drafts[r.id];if(f.sel===r.id)f.sel=null;saveSoon();return MADE.forget(r.id);})
       .then(function(){sh.close();C.diff={};C.files={};C.log={};return refresh();}).then(function(){paint();toast(r.name+" is no longer in Fabrica.");},function(e){go2.disabled=false;fail(e);});});
   end.appendChild(go2);sh.box.appendChild(end);}
 /* the package: its name, its id, its version, its launcher name, and the key it is signed with */

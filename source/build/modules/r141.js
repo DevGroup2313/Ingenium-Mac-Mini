@@ -971,15 +971,20 @@ function mergeBox(r,rec,p,info){var box=h("div","h-box h-blk");box.id="hPrMergeB
   if(info===undefined||info===null){box.textContent="Looking at both ideas…";return box;}
   if(isErr(info)){box.textContent=cap(info.__err);return box;}
   box.innerHTML='<b class="h-big">'+(info.ahead.length?plural(info.ahead.length,"version")+" to bring in":"Nothing left to bring in")+"</b>"+(info.ahead.length?(info.both.length?esc(plural(info.both.length,"file"))+" changed in both ideas since they parted ("+esc(info.both.slice(0,4).join(", "))+(info.both.length>4?" and more":"")+"). Fabrica joins them line by line; where two changes touch the same lines it keeps both for you to choose.":"Nothing in "+esc(p.to)+" crossed these changes: they come in cleanly."):esc(p.to)+" has every version of "+esc(p.from)+".");
-  var row=h("div","f-row"),mg=btn("pri","Merge into "+p.to,function(){mergePR(r,rec,p,info,mg);});mg.id="hPrMerge";mg.disabled=!info.ahead.length;row.appendChild(mg);box.appendChild(row);return box;}
+  /* 6.86 (her words, 12 November 2026: "I approve of the design"): brought in by merge, by squash (one version) or by rebase (each version
+     made again on top), as on GitHub */
+  var v=V(r).pr,how=v.how||"merge",HOW={merge:"Merge into ",squash:"Squash into ",rebase:"Rebase onto "};
+  if(info.ahead.length){var sg=segOf("How to bring it in",[["merge","Merge"],["squash","Squash and merge"],["rebase","Rebase and merge"]],how,function(k){v.how=k;again();});sg.id="hPrHow";sg.style.margin="10px 0 0";box.appendChild(sg);}
+  var row=h("div","f-row"),mg=btn("pri",HOW[how]+p.to,function(){mergePR(r,rec,p,info,mg);});mg.id="hPrMerge";mg.disabled=!info.ahead.length;row.appendChild(mg);box.appendChild(row);return box;}
 /* the merge: the working copy moves to the target idea, and the other is brought in by Fabrica's three-way merge */
 function mergePR(r,rec,p,info,k){k.disabled=true;var key=r.id+"|"+p.n;INFLIGHT[key]=1;
   IngRepo.status(r.id).then(function(st){if(!st.clean)throw new Error("keep or put back the changes under Changes first: a merge starts from files with nothing waiting");if(st.merging)throw new Error("a merge is already under way: finish it under Changes, or stop it");
     return (!r.detached&&r.branch===p.to)?null:IngRepo.switchTo(r.id,p.to);}).then(function(){return IngRepo.resolve(r.id,"refs/heads/"+p.from);}).then(function(theirs){
-    return IngRepo.merge(r.id,p.from,{msg:"Merge pull request #"+p.n+" from "+p.from+"\n\n"+p.title}).then(function(m){
+    var how=V(r).pr.how||"merge";
+    return (how==="rebase"?IngRepo.rebase(r.id,p.from):IngRepo.merge(r.id,p.from,how==="squash"?{squash:true,msg:p.title+" (#"+p.n+")"}:{msg:"Merge pull request #"+p.n+" from "+p.from+"\n\n"+p.title})).then(function(m){
       if(m.kind==="conflicts"){p.pending={theirs:theirs,base:info.base,at:Date.now(),files:m.conflicts||[]};p.events.push({at:Date.now(),kind:"conflicts",files:m.conflicts||[]});
         return keep(rec).then(function(){toast("Both versions are in "+plural((m.conflicts||[]).length,"file")+": keep one of each under Changes, then keep the version.");});}
-      return IngRepo.resolve(r.id,"refs/heads/"+p.to).then(function(now){markMerged(rec,p,{commit:m.commit||now,head:theirs,base:info.base});syncBoard(rec);return keep(rec);}).then(function(){toast("Merged into "+p.to+". You are working on "+p.to+" now.");});});})
+      return IngRepo.resolve(r.id,"refs/heads/"+p.to).then(function(now){markMerged(rec,p,{commit:m.commit||now,head:theirs,base:info.base});syncBoard(rec);return keep(rec);}).then(function(){toast((how==="squash"?"Squashed into "+p.to+" as one version":how==="rebase"?"Rebased onto "+p.to+": "+(m.count||0)+" version"+(m.count===1?"":"s")+" made again":"Merged into "+p.to)+". You are working on "+p.to+" now.");});});})
   .then(function(){delete INFLIGHT[key];return again();},function(e){delete INFLIGHT[key];k.disabled=false;fail(e);again();});}
 
 /* ======================= COMPARE: any two versions, ideas or releases (the version comparison tool) ======================= */
@@ -1278,6 +1283,8 @@ var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pul
   /* open a view of the chosen app: fbHub.open("issues",{n:3}), fbHub.open("compare",{a:"refs/tags/v1",b:"refs/heads/main"}) */
   open:function(view,o){var x=X();if(!x||!HUB.views[view])return false;var r=x.cur();if(!r)return false;o=o||{};var v=V(r);
     if(view==="compare"){if(o.a)v.cmp.a=o.a;if(o.b)v.cmp.b=o.b;}if(view==="issues"&&o.n!=null)v.iss.open=o.n;if(view==="pulls"&&o.n!=null)v.pr.open=o.n;if(view==="code"){if(o.ref)v.code.ref=o.ref;if(o.file!==undefined)v.code.file=o.file;}show(view);return true;},
+  /* 6.86: what the chosen app's views show now (modules/r280.js asks which pull request is open, to review it) */
+  viewing:function(){var x=X(),r=x&&x.cur();if(!r)return null;var v=V(r);return {view:x.S&&x.S.view,pr:v.pr.open,issue:v.iss.open};},
   scan:function(id){return IngRepo.info(id).then(function(r){return recP(id).then(function(){return scan(r,true);});});},run:function(id,ref){return IngRepo.info(id).then(function(r){return runChecks(r,ref||r.head,"hand");});},
   _:{md:md,refsIn:refsIn,blame:function(id,ref,path){return IngRepo.info(id).then(function(r){return blame(r,ref,path);});},fileHistory:function(id,ref,path){return IngRepo.info(id).then(function(r){return fileHistory(r,ref,path);});},db:HUBDB}};
 
