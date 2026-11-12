@@ -1,4 +1,5 @@
 // node rig/t_685_folders.js <Ingenium page url (master)> <out folder>
+// 6.86: and the drawer's label as a key (her words: "Also by "filtered", I meant both options"): only the folders not read yet.
 // Ingenium 6.85 (12 November 2026), in Chromium: Folders' drawer pulls, Your apps' logos as Lector's, and any app's logo (modules/r279.js,
 // with modules/r263.js and r277.js). Her words: "I want the apps seals on the "your apps" section to be animated and interactive and
 // clickable ... I also want the 3D folders for the apps at the top of the page to be able to filtered, and reorderd by alphabetical
@@ -40,6 +41,9 @@ const SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle
     Object.keys(D).forEach(n => { const f = IngFolders.make(n, n === 'Lakay' ? ['its Spiral'] : []); f.app.made = +new Date(D[n][0] + 'T12:00:00Z'); f.app.briefAt = +new Date('2026-11-01T00:00:00Z') + D[n][1] * 3600e3; f.app.brief = 'Where things stand in ' + n + '.'; });
     const html = '<!doctype html><html><head><meta charset="utf-8"><link rel="icon" type="image/png" sizes="96x96" href="data:image/png;base64,' + PNG + '"><title>Harbour Garden</title></head><body>A garden</body></html>';
     await IngRepo.fromFiles([{ path: 'index.html', data: new TextEncoder().encode(html) }], { name: 'Harbour Garden' });
+    // 6.86: conversations not read yet in Carpe Diem (two) and Lakay (one); none elsewhere
+    const byName = n => IngFolders.folders().find(f => f.name === n); state.chats = state.chats || [];
+    [['Carpe Diem', 'The Desk, again'], ['Carpe Diem', 'Tabula prints'], ['Lakay', 'The Spiral at night']].forEach(([n, t], i) => state.chats.push({ id: 'c685' + i, projectId: byName(n).id, title: t, made: +new Date('2026-10-20T12:00:00Z') - i * 1000, messages: [{ role: 'user', content: t, at: +new Date('2026-10-20T12:00:00Z') - i * 1000 }] }));  // older than every folder's last use, so the order checks stand
     try { saveState(); } catch (e) {} go('folders'); }, { PNG: PNG96.toString('base64') });
   await sleep(3500);
   const st = () => p.evaluate(() => { const s = IngFoldersLook.state(), f = document.querySelector('#page-folders .fd-dfront'), inp = document.getElementById('fdFindIn'), ob = document.getElementById('fdOrderKey');
@@ -64,6 +68,17 @@ const SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle
     ok(s.kept === k && s.orderText === t && s.front === fr && s.label.indexOf(t.toLowerCase()) > 0, 'the right pull turns to ' + t + ', ' + fr + ' in front, and the order is kept', s); }
   await p.keyboard.down('Shift'); await p.click('#fdOrderKey'); await p.keyboard.up('Shift'); await sleep(400); s = await st(); ok(s.kept === 'old', 'with Shift it turns back (Oldest)', s);
   await p.click('#fdOrderKey'); await sleep(300);
+  // 1b. the label as a key (6.86): only the folders with conversations not read yet
+  const lab = () => p.evaluate(() => { const l = document.querySelector('#page-folders .fd-dfront .fd-label'); return { keyed: l.classList.contains('fd-keyed'), role: l.getAttribute('role'), pressed: l.getAttribute('aria-pressed'), title: (l.querySelector('b') || {}).textContent, kept: state.folders.ui.filter || null }; });
+  let lb = await lab(); ok(lb.keyed && lb.role === 'button' && lb.pressed === 'false' && lb.title === 'Your apps', 'the drawer\'s label is a key, showing every folder', lb);
+  await p.click('#page-folders .fd-dfront .fd-label'); await sleep(500); s = await st(); lb = await lab();
+  ok(lb.pressed === 'true' && lb.title === 'Not read yet' && lb.kept === 'unread' && s.files.slice().sort().join() === 'Carpe Diem,Lakay' && /^2 of 8 not read yet, used last$/.test(s.label), 'pressed, the drawer holds only the folders not read yet (Carpe Diem and Lakay), says so, and keeps the choice', { lb, s });
+  await (await p.$('#page-folders .fd-head')).screenshot({ path: OUT + '/unread.png' });
+  await p.fill('#fdFindIn', 'car'); await sleep(400); s = await st(); ok(s.files.join() === 'Carpe Diem' && /^1 of 2 not read yet match .car.$/.test(s.label), 'it works with the left pull\'s word', s);
+  await p.fill('#fdFindIn', 'forge'); await sleep(400); s = await st(); ok(s.files.length === 0 && /Clear the left pull, or press the label/.test(s.hint), 'a word that matches none not read yet says how to see every folder', s);
+  await p.press('#fdFindIn', 'Escape'); await sleep(300);
+  await p.focus('#page-folders .fd-dfront .fd-label'); await p.keyboard.press('Enter'); await sleep(500); s = await st(); lb = await lab();
+  ok(lb.pressed === 'false' && lb.kept === 'all' && s.files.length === 6, 'pressed again (by the keyboard too), every folder stands again', { lb, files: s.files });
   // 2. Your apps: the logos as Lector's
   const cards = () => p.evaluate(() => { const out = {}; document.querySelectorAll('#page-folders .fld-card:not(.fld-new)').forEach(c => { const nm = c.querySelector('.fld-name'), e = nm && nm.firstElementChild;
       const idle = e && e.querySelector('.ls-idle'), ims = e ? [...e.querySelectorAll('.ls-idle > img.ls-l')] : [];

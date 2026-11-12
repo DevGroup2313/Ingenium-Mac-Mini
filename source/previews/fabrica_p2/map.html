@@ -1,0 +1,62 @@
+<section class="map" aria-labelledby="mapH">
+  <h2 id="mapH">Parity with GitHub, and beyond it</h2>
+  <p>What GitHub does, what Fabrica does today, and when the rest comes. Fabrica's column is read from its own code on 12 November 2026. GitHub's column is from my own knowledge of GitHub, which may have changed since; GitHub's own pages hold its current limits. Each phase gets a preview of its own first.</p>
+  <div class="mk" id="mapKeys" role="group" aria-label="Show"></div>
+  <div id="mapRows"></div>
+  <div class="order" id="mapOrder"></div>
+</section>
+<script>
+(function(){
+var NOW="In Fabrica now",P2="Phase 2",P3="Phase 3",P4="Phase 4",BEY="Beyond GitHub";
+var MAP=[["Code and versions"],
+ ["Browse the code at any version, with its README","Yes","Yes, for repositories kept in this window",NOW],
+ ["Blame, a file's history, Compare","Yes","Yes",NOW],
+ ["Branches and tags","Yes","Yes",NOW],
+ ["Repositories of any size, on your own drive","Within GitHub's size guidance","Brought onto the drive since 6.83; opened in Fabrica up to 500 MB",P2],
+ ["Large files kept whole in the history","Files over 100 MB only through Git LFS, within its limits","Kept on the drive",P2],
+ ["Search in the code","Yes","In one repository",NOW],
+ ["Search every repository at once, by words or by meaning","By words","",BEY],
+ ["A copy to work on apart (a fork)","Yes","",P2],
+ ["Issues and pull requests"],
+ ["Issues with labels and comments","Yes","Yes, and every issue brought from GitHub",NOW],
+ ["Milestones, people to assign, templates","Yes","",P2],
+ ["Pull requests: conversation, versions, files changed","Yes","Yes",NOW],
+ ["Reviews: approve or ask for changes","Yes","Yes",NOW],
+ ["Comments on a line of the changes","Yes","",P2],
+ ["Merge, squash or rebase","Yes","Merge",P2],
+ ["Rules before main (a review, the checks)","Yes","",P2],
+ ["Discussions","Yes","",P2],
+ ["A review of a pull request by your own model, offline","Copilot, online","",BEY],
+ ["Actions"],
+ ["Checks on each version","Yes","Fabrica's own five checks",NOW],
+ ["Your workflows (.github/workflows) on your own machines","On GitHub's machines, with minutes counted for private repositories, or on machines you add","",P3],
+ ["Every log and every file a run makes, kept with no limit","Kept for a set time (90 days unless changed), within storage limits","",P3],
+ ["Mac, Windows and phones in one run","Yes","",P3],
+ ["Test machines: simulators and emulators","Yes, on GitHub's machines","",P4],
+ ["Releases, wiki, projects"],
+ ["Releases with their files","Yes","Yes; brought from GitHub with their fingerprints",NOW],
+ ["Wiki with each page's history","Yes","Yes",NOW],
+ ["Projects: a board of To do, In progress, Done","Yes","Yes",NOW],
+ ["Release notes written for you from the versions","A list made from the pull requests","",BEY],
+ ["Insight and safety"],
+ ["Insights: activity, contributors","Yes","Yes (Care, Overview)",NOW],
+ ["Secrets left in the code, the parts and their licences","Yes, online","",P2],
+ ["Notifications of what changed","Yes","",P2],
+ ["Open any version as the app itself","","",BEY],
+ ["A second copy on another drive, checked every week","","",BEY],
+ ["Each repository beside its app's folder and conversations","","",BEY],
+ ["Nothing leaves your computer; GitHub stays the backup","","",BEY]];
+var KEYS=[["all","All"],[NOW,NOW],[P2,P2],[P3,P3],[P4,P4],[BEY,BEY]],SEL="all";
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function cls(w){return w===NOW?"now":w===P3?"p3":w===P4?"p4":w===BEY?"bey":"";}
+function paint(){var k=document.getElementById("mapKeys");k.innerHTML="";KEYS.forEach(function(x){var b=document.createElement("button");b.className="tg";b.type="button";b.textContent=x[1];b.setAttribute("aria-pressed",x[0]===SEL?"true":"false");b.onclick=function(){SEL=x[0];paint();};k.appendChild(b);});
+  var R=document.getElementById("mapRows");R.innerHTML="";var grp=null;
+  MAP.forEach(function(r){if(r.length===1){grp=r[0];return;}if(SEL!=="all"&&r[3]!==SEL)return;if(grp){var g=document.createElement("div");g.className="grp";g.textContent=grp;R.appendChild(g);grp=null;}
+    var d=document.createElement("div");d.className="row";d.innerHTML="<b>"+esc(r[0])+"</b><span>GitHub: "+esc(r[1]||"no")+"</span><span>Fabrica: "+esc(r[2]||"not yet")+'</span><span class="ph '+cls(r[3])+'">'+esc(r[3])+"</span>";R.appendChild(d);});}
+var ORDER=[["Next","Your repositories opened from the drive: code, versions, branches, tags, Compare, Blame, and the issues, pull requests and releases brought from GitHub. With it, the drawer's second filter in Folders."],
+  ["Then","Working on the drive: new versions, branches and tags; merge, squash or rebase; comments on a line; milestones and people; rules before main; a second copy on another drive."],
+  ["Then","Ingenium beside you: your model explains a version, reviews a pull request, writes the release notes and the message; search every repository, by meaning too."],
+  ["Phase 3, then phase 4","Your workflows on the Mac mini and the HP laptop, with every log kept; then the test machines."]];
+var O=document.getElementById("mapOrder");ORDER.forEach(function(x){var d=document.createElement("div");d.innerHTML="<b>"+esc(x[0])+"</b>"+esc(x[1]);O.appendChild(d);});
+paint();})();
+</script>

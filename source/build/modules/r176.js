@@ -495,7 +495,7 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '#page-settings .st-pill,#page-settings .st-sw,'+
   /* 6.85: Folders' right-hand pull, which puts the folders in order (modules/r279.js; her words, 12 November 2026: "I approve pf the preview
      with those changes") */
-  '#page-folders .fd-order,'+
+  '#page-folders .fd-order,#page-folders .fd-label.fd-keyed,'+
   /* 6.83: Fabrica brings everything from GitHub (modules/r276.js): the sheet's choices, repositories and drives
      (her words, 11 November 2026: "I like the preview please push it everywhere") */
   '#fb .hb-opt,#fb .hb-pick,#fb .hb-drive,'+

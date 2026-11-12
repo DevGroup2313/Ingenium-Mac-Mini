@@ -13,6 +13,9 @@
    - Your apps: each card's logo is Lector's layered seal, moving as it does on Lector (modules/r107.js, r108.js): it turns slowly in 3D
      with its layers apart, turns toward the pointer, lifts under it and sinks when the card is pressed; the card opens its folder, as
      before. The Offline Project wears its live crest with its quarters moving, as on Lector; any other app its own logo, in the same motion.
+   - 6.86 (her words, 12 November 2026: "Also by "filtered", I meant both options"): the drawer's label is a key too: pressed, the drawer
+     holds only the folders with conversations not read yet (Not read yet), pressed again every folder; kept for next time, and it works
+     with the left pull's word and the right pull's order.
    - An opened folder takes any app's logo: Choose a picture (PNG, JPEG, WebP, GIF, SVG, ICO, AVIF, or a Mac app's icon file, .icns), From
      the app's page (the icon the page names), or either dropped on its cover. A picture that cannot be read is refused, never kept. Its own
      logo again gives back the app's own. Every logo is drawn whole; an app with no logo has a quiet disc, never a letter. */
@@ -31,6 +34,14 @@ body[data-theme="night"] #page-folders.fd-on .fd-dfront .fd-eng,body[data-theme=
 #page-folders.fd-on .fd-dfront .fd-find input::-webkit-search-cancel-button,#page-folders.fd-on .fd-dfront .fd-find input::-webkit-search-decoration{-webkit-appearance:none;display:none}
 #page-folders.fd-on .fd-dfront .fd-find:focus-within,#page-folders.fd-on .fd-dfront .fd-order:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #page-folders.fd-on .fd-dfront .fd-order:focus:not(:focus-visible){outline:0}
+/* 6.86: the label is a key: pressed, only the folders not read yet; it rises and sinks as the pulls do, and wears the accent's ring while it filters */
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .2s ease}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed:hover{transform:translateY(-1.5px)}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed:active{transform:translateY(1px);transition-duration:.06s}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed:focus:not(:focus-visible){outline:0}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--accent),inset 0 2px 4px rgba(40,22,68,.12)}
+#page-folders.fd-on .fd-dfront .fd-label.fd-keyed[aria-pressed="true"] b{color:var(--accent)}
 #page-folders.fd-on.fd-phone .fd-dfront .fd-handle.fd-find,#page-folders.fd-on.fd-phone .fd-dfront .fd-handle.fd-order{width:150px;height:calc(20px / var(--fd-k,1))}
 #page-folders.fd-on.fd-phone .fd-dfront .fd-eng,#page-folders.fd-on.fd-phone .fd-dfront .fd-find input,#page-folders.fd-on.fd-phone .fd-dfront .fd-find input::placeholder{font-size:calc(11px / var(--fd-k,1))}
 /* Your apps: each logo as Lector's layered seal (the same measures as #lx7 .ls in modules/r107.js) */
@@ -64,6 +75,8 @@ body[data-motion="minimal"] #page-folders.fd-on .fd-ls .ls-idle{animation:none !
 if(window.IngFolderView)return;
 var W=window,D=document;
 var ORDERS=[["used","Used last"],["az","A to Z"],["za","Z to A"],["new","Newest"],["old","Oldest"]],FIND="",MAXKEEP=180000;
+/* 6.86: what the drawer holds: every folder, or only those with conversations not read yet (the label's key) */
+var FILTERS=[["all","Your apps"],["unread","Not read yet"]];
 var BAD="That picture could not be read: choose another.",
     KINDS="Choose a picture (PNG, JPEG, WebP, GIF, SVG, ICO or AVIF), a Mac app's icon file (.icns), or the app's own page.";
 function mk(t,c,h){var e=D.createElement(t);if(c)e.className=c;if(h!=null)e.textContent=h;return e;}
@@ -84,22 +97,35 @@ function stamp(c){var s=c.imported?(c.imported.created||c.imported.updated):(c.m
 function made(p){var a=p.app||{},t=+a.made||0;if(t>0)return t;var m=/^pj([0-9a-z]{8})/.exec(String(p.id||""));if(m){var x=parseInt(m[1],36);if(x>1.5e12&&x<4.2e12)return x;}
   var first=0;convs(p).forEach(function(c){var y=stamp(c);if(y&&(!first||y<first))first=y;});return first;}
 function ordIndex(){var o=G().ui.order;for(var i=0;i<ORDERS.length;i++)if(ORDERS[i][0]===o)return i;return 0;}
+function filt(){return G().ui.filter==="unread"?"unread":"all";}
+function unreadN(p){try{return W.IngFolders&&typeof IngFolders.unread==="function"?IngFolders.unread(p).length:0;}catch(e){return 0;}}
 function refresh(){try{if(W.IngFoldersLook&&typeof IngFoldersLook.refresh==="function")IngFoldersLook.refresh();}catch(e){}}
 function repaint(){try{if(W.IngFolders&&typeof IngFolders.paint==="function")IngFolders.paint();}catch(e){}refresh();}
 
 /* ---------- the drawer: which folders stand in it, and in what order (modules/r263.js draws them) ---------- */
 function view(fs,o){o=o||{};var lu=typeof o.lastUsed==="function"?o.lastUsed:function(){return 0;},q=FIND.trim(),ql=q.toLowerCase(),oi=ordIndex(),k=ORDERS[oi][0],all=fs.length;
-  var rows=fs.map(function(p,i){return {p:p,i:i};}).filter(function(x){return !ql||(x.p.name+" "+partsOf(x.p)).toLowerCase().indexOf(ql)>=0;});
+  var fk=filt(),pool=fs.map(function(p,i){return {p:p,i:i};});if(fk==="unread")pool=pool.filter(function(x){return unreadN(x.p)>0;});var base=pool.length;
+  var rows=pool.filter(function(x){return !ql||(x.p.name+" "+partsOf(x.p)).toLowerCase().indexOf(ql)>=0;});
   rows.forEach(function(x){x.t=lu(x.p)||0;x.m=made(x.p)||0;});
   var byName=function(a,b){return String(a.p.name).localeCompare(String(b.p.name),undefined,{sensitivity:"base",numeric:true})||(a.i-b.i);};
   rows.sort(k==="az"?byName:k==="za"?function(a,b){return byName(b,a);}:k==="new"?function(a,b){return (b.m-a.m)||(a.i-b.i);}:k==="old"?function(a,b){return (a.m-b.m)||(a.i-b.i);}:function(a,b){return (b.t-a.t)||(a.i-b.i);});
-  var n=rows.length,label=q?(n?n+" of "+all+" match “"+q+"”":"No folder matches “"+q+"”"):all?all+" folder"+(all===1?"":"s")+", "+ORDERS[oi][1].toLowerCase()+(all>6?", the first six":""):"No folders yet";
-  return {list:rows.map(function(x){return x.p;}),sig:k+"|"+ql,label:label,none:q&&!n?"No folder matches “"+q+"”. Clear the left pull to see them all.":null};}
+  var n=rows.length,ol=ORDERS[oi][1].toLowerCase(),label,none=null;
+  if(fk==="unread"){label=q?(n?n+" of "+base+" not read yet match “"+q+"”":"None not read yet matches “"+q+"”"):base?base+" of "+all+" not read yet, "+ol+(base>6?", the first six":""):"Every folder is read";
+    if(!n)none=q?"No folder not read yet matches “"+q+"”. Clear the left pull, or press the label to see every folder.":"Every conversation in your folders is read. Press the label to see every folder.";}
+  else{label=q?(n?n+" of "+all+" match “"+q+"”":"No folder matches “"+q+"”"):all?all+" folder"+(all===1?"":"s")+", "+ol+(all>6?", the first six":""):"No folders yet";
+    if(q&&!n)none="No folder matches “"+q+"”. Clear the left pull to see them all.";}
+  return {list:rows.map(function(x){return x.p;}),sig:k+"|"+fk+"|"+ql,label:label,none:none};}
 function setFind(t){FIND=String(t==null?"":t).slice(0,80);var i=D.getElementById("fdFindIn");if(i&&i.value!==FIND)i.value=FIND;refresh();}
 function setOrder(k){var i=0;for(;i<ORDERS.length;i++)if(ORDERS[i][0]===k)break;if(i>=ORDERS.length)return false;G().ui.order=k;save();paintOrder();refresh();return true;}
+function setFilter(k){if(k!=="all"&&k!=="unread")return false;G().ui.filter=k;save();paintFilter();refresh();return true;}
+function flip(){var k=filt()==="unread"?"all":"unread";setFilter(k);say(k==="unread"?"The drawer: only the folders with conversations not read yet.":"The drawer: every folder.");}
+function paintFilter(){var lb=D.querySelector("#page-folders .fd-dfront .fd-label.fd-keyed");if(!lb)return;var on=filt()==="unread",b=lb.querySelector("b"),t=on?FILTERS[1][1]:FILTERS[0][1];
+  if(b&&b.textContent!==t)b.textContent=t;var pr=on?"true":"false";if(lb.getAttribute("aria-pressed")!==pr)lb.setAttribute("aria-pressed",pr);
+  var al=(on?"Showing only the folders with conversations not read yet":"Showing every folder")+". Press to "+(on?"show every folder":"show only the folders not read yet")+".";if(lb.getAttribute("aria-label")!==al)lb.setAttribute("aria-label",al);
+  var ti=on?"Show every folder":"Show only the folders with conversations not read yet";if(lb.title!==ti)lb.title=ti;}
 function turn(back){var i=(ordIndex()+(back?ORDERS.length-1:1))%ORDERS.length;setOrder(ORDERS[i][0]);say("The drawer: "+ORDERS[i][1].toLowerCase()+".");}
 function paintOrder(){var b=D.getElementById("fdOrderKey");if(!b)return;var o=ORDERS[ordIndex()][1],t=b.querySelector(".fd-eng");if(t&&t.textContent!==o)t.textContent=o;
-  b.setAttribute("aria-label","The order of the folders: "+o+". Press for the next.");}
+  var al="The order of the folders: "+o+". Press for the next.";if(b.getAttribute("aria-label")!==al)b.setAttribute("aria-label",al);}
 function fitPulls(page){var front=page&&page.querySelector(".fd-drawer > .fd-dfront");if(!front||front.querySelector(".fd-find"))return;
   var hs=front.querySelectorAll(":scope > .fd-handle");if(hs.length!==2)return;front.removeAttribute("aria-hidden");
   var sm=front.querySelector(".fd-label small");if(sm&&!sm.id)sm.id="fdDrawerCount";
@@ -107,6 +133,9 @@ function fitPulls(page){var front=page&&page.querySelector(".fd-drawer > .fd-dfr
   inp.setAttribute("aria-label","Find a folder");if(sm)inp.setAttribute("aria-describedby",sm.id);inp.autocomplete="off";inp.spellcheck=false;inp.value=FIND;fl.appendChild(inp);
   var ob=mk("button","fd-handle fd-order");ob.type="button";ob.id="fdOrderKey";ob.title="Put the folders in order";ob.appendChild(mk("span","fd-eng",ORDERS[ordIndex()][1]));
   front.replaceChild(fl,hs[0]);front.replaceChild(ob,hs[1]);paintOrder();
+  var lab=front.querySelector(".fd-label");if(lab&&!lab.classList.contains("fd-keyed")){lab.classList.add("fd-keyed");lab.setAttribute("role","button");lab.tabIndex=0;
+    lab.addEventListener("click",function(e){e.preventDefault();flip();});
+    lab.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();flip();}});paintFilter();}
   inp.addEventListener("input",function(){FIND=inp.value.slice(0,80);refresh();});
   inp.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();e.stopPropagation();inp.value="";FIND="";refresh();inp.blur();}});
   ob.addEventListener("click",function(e){e.preventDefault();turn(e.shiftKey);});}
@@ -203,10 +232,10 @@ function logoRow(hd){if(!hd||hd.querySelector(":scope > .fd-logorow"))return;var
   oh.addEventListener("drop",function(e){oh.classList.remove("fd-drop");var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(!f)return;e.preventDefault();take(name,f).catch(function(){});});}
 
 /* ---------- after Folders is dressed (modules/r263.js calls this each time) ---------- */
-function dressed(page,body,inside){if(!page||!body)return;fitPulls(page);paintOrder();wire(page);
+function dressed(page,body,inside){if(!page||!body)return;fitPulls(page);paintOrder();paintFilter();wire(page);
   if(inside)logoRow(body.querySelector(".fd-spread .fd-left > .fld-h")||body.querySelector(".fld-h"));else dressCards(body);}
-W.IngFolderView={view:view,dressed:dressed,orders:ORDERS.map(function(o){return o[0];}),setFind:setFind,setOrder:setOrder,readLogo:readLogo,take:take,giveBack:giveBack,icnsPng:icnsPng,
-  state:function(){return {find:FIND,order:ORDERS[ordIndex()][0],orderLabel:ORDERS[ordIndex()][1]};}};
+W.IngFolderView={view:view,dressed:dressed,orders:ORDERS.map(function(o){return o[0];}),filters:FILTERS.map(function(o){return o[0];}),setFind:setFind,setOrder:setOrder,setFilter:setFilter,readLogo:readLogo,take:take,giveBack:giveBack,icnsPng:icnsPng,
+  state:function(){return {find:FIND,order:ORDERS[ordIndex()][0],orderLabel:ORDERS[ordIndex()][1],filter:filt()};}};
 /* Folders drawn before this part arrived: dress it again now */
 refresh();
 try{window.__ingParts["p279"]="running";}catch(_){}
