@@ -144,19 +144,21 @@ function rows(){var pg=$("page-settings");if(!pg)return;
   Object.keys(PILLS).forEach(function(id){var s=$(id);if(!s||s.__r278)return;var l=s.closest("label.field");if(!l)return;s.__r278=1;
     var g=mk("div","st-pills");g.setAttribute("role","radiogroup");var lab=l.querySelector(":scope > span");g.setAttribute("aria-label",lab?lab.childNodes[0].textContent.trim():id);
     [].forEach.call(s.options,function(o){var b=mk("button","st-pill");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-v",o.value);b.textContent=o.textContent;
-      b.addEventListener("click",function(e){e.preventDefault();if(s.value===o.value)return;s.value=o.value;try{s.dispatchEvent(new Event("input",{bubbles:true}));}catch(x){}
-        try{s.dispatchEvent(new Event("change",{bubbles:true}));}catch(x){}sync(s,g);});g.appendChild(b);});
+      /* 6.90: the pill is drawn chosen at once; the change (and the save it makes) follows in the next frame (see r144's afterPaint) */
+      b.addEventListener("click",function(e){e.preventDefault();if(s.value===o.value)return;s.value=o.value;sync(s,g);
+        afterPaint(function(){try{s.dispatchEvent(new Event("input",{bubbles:true}));}catch(x){}try{s.dispatchEvent(new Event("change",{bubbles:true}));}catch(x){}sync(s,g);});});g.appendChild(b);});
     g.addEventListener("keydown",function(e){var k=e.key;if(k!=="ArrowLeft"&&k!=="ArrowRight")return;e.preventDefault();var bs=[].slice.call(g.children),i=bs.indexOf(D.activeElement);if(i<0)return;var j=(i+(k==="ArrowRight"?1:-1)+bs.length)%bs.length;bs[j].click();bs[j].focus();});
     l.appendChild(g);l.classList.add("st-pilled");sync(s,g);
     s.addEventListener("change",function(){sync(s,g);});
     var v=l.querySelector("r172-v");if(v)try{new MutationObserver(function(){sync(s,g);}).observe(v,{childList:true,characterData:true,subtree:true});}catch(x){}});}
+function afterPaint(fn){if(D.hidden||typeof requestAnimationFrame!=="function"){setTimeout(fn,0);return;}requestAnimationFrame(function(){setTimeout(fn,0);});}
 function sync(s,g){[].forEach.call(g.children,function(b){var on=b.getAttribute("data-v")===s.value;if(b.getAttribute("aria-checked")!==(on?"true":"false"))b.setAttribute("aria-checked",on?"true":"false");b.tabIndex=on?0:-1;});}
 /* ---------- Sounds as a switch ---------- */
 function soundSwitch(){var seg=$("setSndOn");if(!seg||seg.__r278)return;var row=seg.closest(".snd-row");if(!row)return;seg.__r278=1;
   var on=seg.querySelector('[data-snd-on="1"]'),off=seg.querySelector('[data-snd-on="0"]');if(!on||!off)return;
   var sw=mk("button","st-sw");sw.type="button";sw.id="setSndSw";sw.setAttribute("role","switch");sw.setAttribute("aria-labelledby","setSndOnL");
   function put(){var v=on.getAttribute("aria-pressed")==="true";if(sw.getAttribute("aria-checked")!==(v?"true":"false"))sw.setAttribute("aria-checked",v?"true":"false");}
-  sw.addEventListener("click",function(){(sw.getAttribute("aria-checked")==="true"?off:on).click();put();});
+  sw.addEventListener("click",function(){var to=sw.getAttribute("aria-checked")==="true"?off:on;sw.setAttribute("aria-checked",to===on?"true":"false");afterPaint(function(){to.click();put();});});  /* 6.90: drawn at once, saved after */
   row.appendChild(sw);row.classList.add("st-sndrow");put();
   try{new MutationObserver(put).observe(seg,{attributes:true,subtree:true,attributeFilter:["aria-pressed"]});}catch(e){}}
 /* ---------- start, and whenever Settings is opened ---------- */

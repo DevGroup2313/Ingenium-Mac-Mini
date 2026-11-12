@@ -469,7 +469,7 @@ D.addEventListener("keydown",function(e){if(!e.isTrusted||(e.key!=="Enter"&&e.ke
    sound choices (Listen must be heard alone), never at the welcome door (it has its own). It never holds back the other
    sounds: a key's press is not counted as the last sound. */
 var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role="tab"],.ib-key,.chip,.menu-btn,.rail-btn,.chat-top-key,.effort-opt,.bk-key,.l-btn,.cs-key,.quick,.src-btn,.cplus-btn,.stage-pill,.fo-k,.rc-k,'+
-  '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act,'+
+  '.hx-app,.c-btn,.c-item,.c-opp,.c-howk,.c-seg button,.ib-act,.c-pill,.cn-aim,.cn-drop,'+  /* 6.90: the counsellor's chips, aims and drop zone (modules/r283.js) */
   /* 6.55: Home's greeting card keys and its rows of recent work, which never had the keys' sound (her words: "I want both the sound and
      animations restored for those buttons"); and the Check with Blend key under a reply */
   '.hx-btn,.hx-item,.blx-chk,'+

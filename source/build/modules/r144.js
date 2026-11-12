@@ -240,8 +240,14 @@ function S(){var st=W.state;if(!st||typeof st!=="object")return {};st.v61=st.v61
 function level(){var l=S().level;return LV[l]?l:null;}
 function lvNow(){return level()||"some";}
 var onLevel=[];
-function setLevel(l){if(!LV[l])return;var s=S(),was=s.level;s.level=l;s.asked=true;save();paintLevels();
-  if(was!==l){announce("Your level is now "+LV[l].name+". "+LV[l].line);onLevel.forEach(function(f){try{f(l);}catch(e){warn(e);}});}}
+/* 6.90: her words (12 November 2026): "when I press on the card buttons, the reaction is delayed, it took a while for the "New to this"
+   button to look pressed after I clicked on it". Measured on 6.89: the press saved the whole of Ingenium's state (saveState) before the
+   card was marked, so the browser could not draw it pressed until the save ended: under 1 ms with an empty state, about 160 ms with
+   18 MB of conversations (rig/t_690_press.js). Now the card is marked at once and drawn; the save and what follows from the new level
+   (the tour drawn again, the help card refilled) come in the next frame, after the browser has drawn it. */
+function afterPaint(fn){if(D.hidden||typeof requestAnimationFrame!=="function"){setTimeout(fn,0);return;}requestAnimationFrame(function(){setTimeout(fn,0);});}
+function setLevel(l){if(!LV[l])return;var s=S(),was=s.level;s.level=l;s.asked=true;paintLevels();
+  afterPaint(function(){save();if(was!==l){announce("Your level is now "+LV[l].name+". "+LV[l].line);onLevel.forEach(function(f){try{f(l);}catch(e){warn(e);}});}});}
 /* a radio group: the arrows move and choose, as a radio group does; the chosen key sits pressed in */
 function levelGroup(label,withLines){var g=mk("div","ih-lv",null,{role:"radiogroup","aria-label":label||"Your level"});
   ORDER.forEach(function(k){var L=LV[k],b=key(null,"ih-lvk wrap",{role:"radio","data-lv":k,"aria-checked":"false"});

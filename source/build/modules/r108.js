@@ -1461,7 +1461,7 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{document.body.cl
 /* a set left under way when the app closed waits, paused, for Go on */
 (function(){try{var j=L7().job;if(j&&(j.status==="reading"||j.status==="writing"))j.status=j.status==="writing"?"writing":"paused";}catch(e){}})();
 ORDER.forEach(function(k){if(L7().brief.apps.indexOf(k)>=0)prepare(k);});
-window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost,
+window.IngLector={render:render,state:L7,go:r7Go,run:r7Run,R7:R7,/* 6.90 */curDoc:curDoc,paper:paper,htmlDoc:htmlDoc,check:check,writeDoc:writeDoc,gather:gather,setKey:setKey,runFor:runFor,staleRun:staleRun,ensureRun:ensureRun,fit:fit,setPanel:setPanel,tables:tables,parsePost:parsePost,
   /* 6.8.3: for the Career Studio (r188), which writes with Lector's model, to Lector's standard */
   plan:modelPlan,styleFix:styleFix,charter:CHARTER,banned:BANNED,wordsChanged:wordsChanged,keepPost:keepPost};
 /* 6.2: for the tests */

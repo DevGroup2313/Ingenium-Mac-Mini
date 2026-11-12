@@ -371,6 +371,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.90 (12 November 2026): two keys that answered late, and the Career Studio as she answered its questionnaire.
+- Settings, Help and the guided tour. Her words: "when I press on the card buttons, the reaction is delayed, it took a while for the
+  "New to this" button to look pressed after I clicked on it". Measured on 6.89 (rig/t_690_press.js): the press saved the whole of
+  Ingenium's state before the card was marked, so the card could not be drawn pressed until the save ended: under 1 ms with an empty
+  state, about 170 ms with 18 MB of conversations. Theme, Motion and Sounds (modules/r278.js) waited the same way. Now each is marked
+  at once and drawn; the save, and what follows from it, comes in the next frame (modules/r144.js setLevel and afterPaint; r278).
+- Home's next step. Her words: "Sometimes the Bring in your model and take the guided tour buttons from the Home page revert back to a
+  wider and chunkier look instead of their new designs", and "The button changes when the LFM model is loaded or pompted to be loaded."
+  Measured (rig/t_690_homekeys.js): the keys keep one size at every width; the base page writes the step's words into the key
+  (renderNextStep), so "Load <model> into the engine" and "Talk to <model>" made it wider than "Bring in your first model", and a long
+  model name wrapped it onto two lines on a phone (51 pixels tall). Now the key says Load your model or Start a chat, the model's name
+  moves into the line above, the full words stay for a screen reader and under the pointer, and both keys are 34 pixels tall
+  (modules/r261.js, shortNext).
+- The Career Studio (modules/r188.js), from her answers to the questionnaire of 12 November 2026: the studio opens on Today; it speaks
+  frankly, as a good recruiter would, and says when a plan or a document is weak (a choice kept in the profile, prefs.tone: frank, warm
+  or measured; sys() adds it to every ask); Paths that fit come as a recommendation with its reason, and one alternative; when the
+  model is a connected service that sends what it reads away (lxCloudLeaves), the profile and documents sent leave out email addresses,
+  telephone numbers, the contact line, the referees (their entries and a CV's Referees section) and pay figures (leaves, noContact,
+  noPay, cvNoRefs); a model on this device or in her home reads everything, as before; From your apps has Copy as CV bullets.
+- Held for her answer to its preview (build/held.json): modules/r283.js, Your counsellor, one path of five stages in the Career Studio's
+  own faces (what you have, all at once and sorted, a zip of documents and a profile file included; your record, each entry found shown
+  to keep or drop, with Keep all the rest; what you want, by chips, with two aims; where you could go, in one run; this week, three
+  things with their minutes), Today's whole picture and what changed while she was away, Suggestions beside the document in Lector,
+  and a second profile as a copy of hers or someone else's. The preview kit is source/previews/counsel (README there).
+- Tests: rig/t_690_press.js 7/7 (4 of its checks fail on 6.89, as they should), rig/t_690_homekeys.js 13/13 (9 fail on 6.89),
+  rig/t_690_guard.js 9/9, rig/t_690_counsel.js 33/33 on the test build (it needs r283). rig/inject_modules.js puts changed modules into
+  a built test page.
+
+    node rig/t_690_press.js <url> <out>       # the Help cards, Theme and Sounds marked as the click returns, with a heavy state
+    node rig/t_690_homekeys.js <url> <out>    # the next step's key through each step, at 1440 and 390
+    node rig/t_690_guard.js <url> <out>       # what a connected model is sent; the voice, the paths, CV bullets, Today first
+    node rig/t_690_counsel.js <url> <out>     # Your counsellor (a test build: r283 is held)
+
 Ingenium 6.89 (12 November 2026): Fabrica, phase 2, second stage, its third part: people and milestones, a comment on any line, and
 templates. Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4, which holds the pieces
 commit 9287840 added): "I approve of the preview, please push it everywhere." Next in that preview: Rules before main, Safety on every

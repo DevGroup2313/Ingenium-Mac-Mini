@@ -1,0 +1,33 @@
+.pv{max-width:1480px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.pv-head h1{font:600 24px/1.15 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;letter-spacing:.03em;margin:0 0 6px;text-wrap:balance}
+.pv-head p{margin:0;color:var(--pv-ink2);max-width:80ch}
+.pv-bar{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--pv-bg);padding:8px 0}
+.pv-stages,.pv-theme{display:flex;gap:6px;flex-wrap:wrap}
+.pv-theme{margin-left:auto}
+.pv-k{border:1px solid var(--pv-hair);border-radius:999px;padding:6px 12px;font:600 12.5px/1.2 inherit;font-family:inherit;color:var(--pv-ink2);background:var(--pv-card);box-shadow:var(--pv-pill);cursor:pointer;transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}
+.pv-k:hover{transform:translateY(-2px)}.pv-k:active{transform:translateY(1px)}
+.pv-k[aria-pressed="true"],.pv-k.on{color:#fff;background:linear-gradient(var(--pv-pa),var(--pv-pb));border-color:var(--pv-pedge)}
+.pv-k:focus-visible{outline:2px solid var(--pv-acc);outline-offset:2px}
+.pv-stage{width:100%;overflow:hidden;border-radius:12px;box-shadow:var(--pv-slab)}
+/* the window: 1440 by 900 as the app was captured, scaled to the width at hand */
+.win{position:relative;width:1440px;height:900px;transform-origin:0 0;overflow:hidden;background:#f5f3f7;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#221a2e}
+body[data-theme="night"] .win{background:#17111f;color:#f3eefb}
+.win img.f-back{position:absolute;left:0;top:0;width:1440px;height:900px}
+.win img.f-top{position:absolute;left:0;top:0;width:1440px;height:var(--T)}
+.win img.f-rail{position:absolute;left:0;top:var(--T);width:var(--L);height:calc(900px - var(--T))}
+.win img.f-right{position:absolute;left:var(--RX);top:var(--T);width:calc(1440px - var(--RX));height:calc(900px - var(--T))}
+.win .main{position:absolute;left:var(--L);top:var(--T);width:calc(var(--RX) - var(--L));height:calc(900px - var(--T));overflow:auto;padding:calc(var(--PY) - var(--T)) 0 24px calc(var(--PX) - var(--L));box-sizing:border-box;scrollbar-width:none}
+.win .main::-webkit-scrollbar{display:none}
+.win .main > .section{width:var(--PW);display:block}
+.win .main > .section > .page-title{display:none}
+.win .pv-toast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:#fff;color:#221a2e;border-radius:14px;padding:10px 16px;font-size:13px;font-weight:600;box-shadow:0 2px 0 rgba(40,22,68,.12),0 10px 24px rgba(40,22,68,.18);max-width:60ch;z-index:9}
+body[data-theme="night"] .win .pv-toast{background:#2a2239;color:#f3eefb;box-shadow:0 2px 0 rgba(0,0,0,.5),0 10px 24px rgba(0,0,0,.5)}
+.pv-notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.pv-note{background:var(--pv-card);border:1px solid var(--pv-hair);border-radius:14px;padding:14px 16px;box-shadow:var(--pv-slab);min-width:0}
+.pv-note h2{font:600 16px/1.3 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;letter-spacing:.02em;margin:0 0 6px}
+.pv-note h2 span{color:var(--pv-acc);font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px}
+.pv-note p,.pv-note li{margin:0 0 6px;color:var(--pv-ink2);font-size:13.5px;line-height:1.5}
+.pv-note ul{margin:0;padding-left:18px}
+.pv-note.wide{grid-column:1/-1}
+.pv-ask{background:var(--pv-accs)}
+@media (prefers-reduced-motion:reduce){.pv-k{transition:none}}

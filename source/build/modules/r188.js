@@ -528,7 +528,7 @@ function CS(){var r=ROOT(),s=r.people.filter(function(p){return p.id===r.cur;})[
   if(typeof P.name!=="string")P.name="";if(typeof P.contact!=="string")P.contact="";
   if(!P.wants||typeof P.wants!=="object")P.wants={looking:"",need:"",avoid:"",where:"",when:""};if(!P.prefs||typeof P.prefs!=="object")P.prefs={spelling:"british"};
   if(!Array.isArray(s.goals))s.goals=[];
-  if(!Array.isArray(s.opps))s.opps=[];if(!s.ui||typeof s.ui!=="object")s.ui={room:"apps",open:null};
+  if(!Array.isArray(s.opps))s.opps=[];if(!s.ui||typeof s.ui!=="object")s.ui={room:"today",open:null};
   return s;}
 function oppById(id){return CS().opps.filter(function(o){return o.id===id;})[0]||null;}
 function american(){return CS().profile.prefs.spelling==="american";}
@@ -588,13 +588,20 @@ function failed(e){var m=String(e&&e.message||e);end();if(m!=="stopped")say("It 
 function banned(){try{return (LXR().banned||[]).join(", ");}catch(e){return "";}}
 function sys(extra,prose){var X="";try{if(prose)X=LXR().charter||"";}catch(e){}
   return (/^You are now /.test(String(extra||""))?"You read and advise on this device for the applicant, in "+english()+": exact, measured and plain, never promotional. ":"You write on this device for the applicant, in the first person as the applicant, in "+english()+": exact, measured and plain, never promotional. ")+"THE RULES. Use only what THE PROFILE shows about me: my posts, studies, dates, skills, results, publications and names. Never invent a skill, a post, a qualification, a date, a figure, a publication, a name, a referee or a quotation, and never stretch what the profile says into more than it says. You may show how what the profile does show answers what is asked (experience that transfers from another setting), naming where it comes from; that is drawing the link, not stretching. Where the posting asks for something the profile does not show, do not claim it. Where a fact is needed and the profile does not give it, write a placeholder in square brackets, such as [the dates]. Do not flatter the reader, the organisation or me."+
-    (banned()?" Words never to use: "+banned()+".":"")+X+(extra?" "+extra:"");}
+    (banned()?" Words never to use: "+banned()+".":"")+X+toneLine()+(extra?" "+extra:"");}
+/* 6.90: how the counsellor speaks (her answer, 12 November 2026: "Frank, like a good recruiter"; "Yes: tell me when a plan or document is weak") */
+function toneLine(){var t=(CS().profile.prefs||{}).tone||"frank";return {frank:" Speak frankly, as a good recruiter would: say plainly when a plan, a document or an answer is weak, and why, then what would mend it; one strength named is no reason to hide a weakness.",
+  warm:" Speak warmly and encouragingly, naming what is strong first; say what is weak plainly too, with what would mend it.",measured:" Speak as a measured academic supervisor would: exact, even, with the evidence for every judgement and what would mend a weakness."}[t]||"";}
 function cut(t,n){t=String(t||"");if(n<=0)return "";if(t.length<=n)return t;var c=t.slice(0,n),p=Math.max(c.lastIndexOf(". "),c.lastIndexOf("\n"));return (p>n*0.6?c.slice(0,p+1):c)+" […]";}
 
 /* ---------------- the profile, as the model reads it ---------------- */
 function itemLine(it){var when=[it.from,it.to].filter(Boolean).join(" to ");return "- "+[it.title,it.place,when].filter(Boolean).join(", ")+(it.text?"\n  "+String(it.text).replace(/\n/g,"\n  "):"");}
-function itemsText(){var P=CS().profile,out=[];
-  SECTS.forEach(function(s){var its=P.items.filter(function(it){return it.sec===s[0]&&(it.src!=="linkedin"||P.use.linkedin);});if(its.length)out.push("## "+s[1]+"\n"+its.map(itemLine).join("\n"));});
+/* 6.90: what never leaves the device (her answer, 12 November 2026): when the model is a connected service that reads what it is sent,
+   the referees are left out, as are pay figures and the contact line; a model on this device or in her home sees everything */
+function leaves(){try{var o=plan();return !!(o&&o.cloud&&typeof lxCloudLeaves==="function"&&lxCloudLeaves());}catch(e){return false;}}
+function noPay(t){return String(t||"").replace(/(?:[£$€]\s?\d[\d,.]*\s?(?:k|K|thousand|million)?|\b\d[\d,.]*\s?(?:GBP|USD|EUR|dollars|pounds|euros)\b)(?:\s*(?:a|per)\s*(?:year|annum|month|hour|day|week))?/g,"[a figure kept on this device]").replace(/\b(salary|pay|stipend|wage)\s*(?:of|:)?\s*\[a figure kept on this device\]/gi,"$1 [kept on this device]");}
+function itemsText(){var P=CS().profile,out=[],away=leaves();
+  SECTS.forEach(function(s){if(away&&s[0]==="referee")return;var its=P.items.filter(function(it){return it.sec===s[0]&&(it.src!=="linkedin"||P.use.linkedin);});if(its.length)out.push("## "+s[1]+"\n"+its.map(function(it){var l=itemLine(it);return away?noContact(noPay(l)):l;}).join("\n"));});
   return out.join("\n\n");}
 function appsWanted(){var P=CS().profile,out=[];if(P.isMe===false)return out;try{lxState().runs.forEach(function(r){if(r.kind==="app"&&r.status==="done"&&P.use.apps[r.app||r.name]!==false&&out.every(function(x){return x.name!==r.name;}))out.push(r);});}catch(e){}return out;}
 function loadText(ref){try{return ref?Promise.resolve(IngBig.load(ref)).then(function(t){return String(t||"");},function(){return "";}):Promise.resolve("");}catch(e){return Promise.resolve("");}}
@@ -610,13 +617,18 @@ function gatherProfile0(o){var P=CS().profile,M=lectorMe(),runs=appsWanted();
       if(!o.cite||!P.use.fontes||P.isMe===false||typeof fontesItems!=="function")return G;var items=[];try{items=fontesItems().slice(0,30);}catch(e){}
       G.sources=items.map(function(c,i){var t="";try{t=fontesPlain(c);}catch(e){t=String(c.title||"");}return {n:i+1,text:t};});return G;});}
 function profileBlock(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.push(wt);
-  parts.push("THE PROFILE (the only source of facts about me):"+(nm?"\nName: "+nm:"")+(G.items?"\n\n"+cut(G.items,Math.floor(R*0.34)):""));
-  if(G.cv)parts.push("MY CV:\n"+cut(G.cv,Math.floor(R*0.24)));
-  if(G.linkedin)parts.push("MY LINKEDIN PROFILE (its headline and summary):\n"+cut(G.linkedin,Math.floor(R*0.05)));
-  if(G.files.length){var per=Math.floor(R*0.16/G.files.length);parts.push("MY DOCUMENTS:\n"+G.files.map(function(f){return "### "+f.name+"\n"+cut(f.text,per);}).join("\n\n"));}
+  var away=leaves(),away_=function(t){return noContact(noPay(t));};parts.push("THE PROFILE (the only source of facts about me):"+(nm?"\nName: "+nm:"")+(G.items?"\n\n"+cut(G.items,Math.floor(R*0.34)):""));
+  if(G.cv)parts.push("MY CV:\n"+cut(away?away_(cvNoRefs(G.cv)):G.cv,Math.floor(R*0.24)));
+  if(G.linkedin)parts.push("MY LINKEDIN PROFILE (its headline and summary):\n"+cut(away?away_(G.linkedin):G.linkedin,Math.floor(R*0.05)));
+  if(G.files.length){var per=Math.floor(R*0.16/G.files.length);parts.push("MY DOCUMENTS:\n"+G.files.map(function(f){return "### "+f.name+"\n"+cut(away?away_(cvNoRefs(f.text)):f.text,per);}).join("\n\n"));}
   if(G.apps.length){var pa=Math.floor(R*0.12/G.apps.length);parts.push("MY APPS, AS LECTOR READ THEM (what I designed and built):\n"+G.apps.map(function(a){return "### "+a.name+"\n"+cut(a.text,pa);}).join("\n\n"));}
   if(G.reading&&G.reading.length){var pr=Math.floor(R*0.1/G.reading.length);parts.push("MY READING NOTES (what the reading page found in works I read for this application: take from them only what they say, never as facts about me):\n"+G.reading.map(function(a){return "### "+a.title+"\n"+cut(a.text,pr);}).join("\n\n"));}
   return parts.join("\n\n");}
+/* 6.90: a CV's referees section, left out when the model is away */
+/* 6.90: and her contact details: email addresses, telephone numbers and the profile's contact line */
+function noContact(t){var c=String((CS().profile||{}).contact||"").trim();t=String(t||"");if(c)t=t.split(c).join("[contact details kept on this device]");
+  return t.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,"[an email kept on this device]").replace(/(?:\+|\b00)\d[\d ()-]{7,}\d|\b0\d{2,4}[ -]?\d{3,4}[ -]?\d{3,4}\b|\(\d{3}\)\s?\d{3}[ -]\d{4}/g,"[a telephone number kept on this device]");}
+function cvNoRefs(t){return String(t||"").replace(/\n\s*(referees?|references)\s*:?\s*\n[\s\S]*?(?=\n\s*[A-Z][A-Za-z ]{2,40}\s*:?\s*\n|$)/i,"\n[Referees: kept on this device]\n");}
 function material(G){return [G.items,G.cv,G.linkedin].concat(G.files.map(function(f){return f.text;})).concat(G.apps.map(function(a){return a.text;})).concat((G.reading||[]).map(function(a){return a.text;})).join("\n");}
 
 /* ---------------- an application: its posting, and the reading of it against the profile ---------------- */
@@ -1343,7 +1355,7 @@ function render(){var root=$("cs");if(!root)return;var S=CS(),room0=S.ui.room||"
   [].forEach.call(root.querySelectorAll(".c-head [data-room]"),function(b){var on=b.getAttribute("data-room")===room0;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;});
   var host=$("csHost"),keepL=null,keepR=null,ol=host.querySelector(".c-list .c-pn-b"),or=host.querySelector(".c-work .c-pn-b");if(ol)keepL=ol.scrollTop;if(or)keepR=or.scrollTop;
   host.innerHTML="";var two=h("div","c-panels"+(LAST_ROOM!==room0?" c-rise":""));host.appendChild(two);var same=LAST_ROOM===room0;LAST_ROOM=room0;
-  if(room0==="today")paintToday(two);else if(room0==="mentor")paintMentor(two);else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="edge")paintEdge(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
+  if(room0==="today")paintToday(two);else if(room0==="mentor"){if(W.IngCounsel)IngCounsel.paint(two);else paintMentor(two);}else if(room0==="people")paintPeople(two);else if(room0==="profile")paintProfile(two);else if(room0==="edge")paintEdge(two);else if(room0==="goals")paintGoals(two);else if(room0==="learn")paintLearn(two);else paintApps(two);
   paintWho();
   root.setAttribute("data-show",S.ui.show==="work"?"work":"list");
   if(same){var nl=host.querySelector(".c-list .c-pn-b"),nr=host.querySelector(".c-work .c-pn-b");if(nl&&keepL!=null)nl.scrollTop=keepL;if(nr&&keepR!=null&&!host.__jump)nr.scrollTop=keepR;}host.__jump=false;
@@ -1977,12 +1989,14 @@ function paintToday(par){var S=CS(),t=todayStr(),act=[],rest=[],wait=[],low=lowD
     R.foot.appendChild(cbtn("pri","Do this now",function(){S.ui.room="apps";S.ui.open=o.id;o.step=nx.step;if(nx.kind){o.sv={kind:nx.kind};o.tab="doc";}show("work");save();render();}));}
   else{R=panel("csWork","Your day",{back:"Today",onBack:function(){show("list");save();render();}});/* 6.46: not Today twice, beside the list of that name */var near=nearestDate(act.concat(rest).map(function(x){return x.o;}));
     var c2=h("div","c-col c-today");c2.appendChild(h("h3","c-today-step",esc(act.length?(act.length===1?"One step for today.":act.length+" steps for today, one for each application."):"Nothing is asked of you today.")));
+    /* 6.90: the whole picture, and what changed while she was away (modules/r283.js draws them) */
+    try{if(W.IngCounsel&&IngCounsel.picture)IngCounsel.picture(c2,S);}catch(e){}
     if(near)c2.appendChild(h("p",null,esc("The nearest date is "+(near.n===0?"today":near.n===1?"tomorrow":"in "+near.n+" days")+", "+dayStr(near.d.at+"T12:00:00")+": "+dateWords(near.d,near.o)+".")));
     if(act.length||CLOCK.ended)c2.appendChild(minutesBox(S,act,low));
     c2.appendChild(h("p","c-note",esc("Choose one on the left. Each says what to do and why; Do this now takes you straight to it, and Not today lets it rest until tomorrow.")));
     /* 6.58: Your mentor's next step, one line, one key */
-    var mx=nextStep(),mt=(MS.filter(function(x){return x[0]===mx;})[0]||["",""])[1];c2.appendChild(h("p","c-td-mentor",esc(mx==="sum"?"Your mentor's summary is ready.":"Your mentor's next step: "+mt+".")));
-    var mk=h("div","c-keys");mk.appendChild(cbtn("sm","Open your mentor",function(){S.ui.room="mentor";MT().step=mx;show("work");save();render();}));c2.appendChild(mk);R.body.appendChild(c2);}
+    var mx=nextStep(),mt=(MS.filter(function(x){return x[0]===mx;})[0]||["",""])[1];var tl=null;try{if(W.IngCounsel&&IngCounsel.todayText)tl=IngCounsel.todayText();}catch(e){}c2.appendChild(h("p","c-td-mentor",esc(tl||(mx==="sum"?"Your mentor's summary is ready.":"Your mentor's next step: "+mt+"."))));
+    var mk=h("div","c-keys");mk.appendChild(cbtn("sm",W.IngCounsel?"Open your counsellor":"Open your mentor",function(){S.ui.room="mentor";MT().step=mx;show("work");save();render();}));c2.appendChild(mk);R.body.appendChild(c2);}
   two(L,R,par);}
 
 /* ---- several profiles (her words, 28 October 2026: "I want the Career Studio to be able to hold multiple profiles"; asked,
@@ -1993,7 +2007,7 @@ function switchTo(id){var r=ROOT();if(!r.people.some(function(p){return p.id===i
   r.cur=id;save();render();say("This is now the profile of "+personLabel(CS())+".");}
 function meFirst(){var r=ROOT();if(CS().profile.isMe!==false)return;var m=r.people.filter(function(p){return !p.profile||p.profile.isMe!==false;})[0];if(m){r.cur=m.id;save();}}
 function copyRef(ref){return loadText(ref).then(function(t){if(!t)return null;var n=IngBig.newId();return Promise.resolve(IngBig.put(n,t)).then(function(){return n;});});}
-function newPerson(kind,name,label){var r=ROOT(),cur=CS(),p={id:uid("pp"),label:String(label||"").trim().slice(0,40),ui:{room:"profile",open:null,ppart:"about"},opps:[],goals:[]};
+function newPerson(kind,name,label){var r=ROOT(),cur=CS(),p={id:uid("pp"),label:String(label||"").trim().slice(0,40),ui:{room:"mentor",open:null,ppart:"about"},opps:[],goals:[]};
   if(kind==="me"){var P=JSON.parse(JSON.stringify(cur.profile));P.isMe=true;delete P.suggested;delete P.own;P.at=Date.now();p.profile=P;
     /* its documents and LinkedIn export are copied, so each profile can change or remove its own */
     var q=Promise.all((P.files||[]).map(function(f){return copyRef(f.ref).then(function(n){f.ref=n;f.id=uid("f");});}));
@@ -2284,7 +2298,7 @@ function docPanel(d){var E=EDGE(),a=E.docs[d.id],R=panel("csWork",d.name);R.body
 function paths(){if(busyNow()||needModel())return;begin(null,"Thinking through paths that fit what you want");
   gatherProfile({}).then(function(G){if(!wantsText()&&!CS().goals.length)throw new Error("say what you are looking for in Your profile first (the work, what you need, what you would rather avoid): the paths start from it");
     return ask(function(sc){var R=room()*sc,tt=targetsText();return [{role:"system",content:sys("You are now a careers guide for someone who has little information about which career to choose and wants a clear direction. You are concrete and honest, and you never invent.")},
-      {role:"user",content:"I want a clear direction. From WHAT I AM LOOKING FOR, my goals and my profile, suggest between two and four paths: a kind of work, and the fields or kinds of organisation where it is found, that fits what I want and what my profile shows. A path may combine work with study when my goals include study. For each path: why it fits my wants (name the want); the evidence in my profile that I could do it; what is missing; a first step I can take this week; the next steps over three months; and how it sits beside my other goals. Never name a particular vacancy or person, and give no salary or market figure; where a point about the world needs checking, say so. Then between three and six questions I should answer before choosing, each with how to find out (a person to ask, a small trial, something to read). In exactly this form, and nothing else:\nPATH: the path | why it fits my wants | the evidence | what is missing | a first step this week | the next three months | beside my other goals\nFIND: a question to answer | how to find out\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,R*0.85)}];},1800,0.4);})
+      {role:"user",content:"I want a clear direction. From WHAT I AM LOOKING FOR, my goals and my profile, suggest between two and four paths: a kind of work, and the fields or kinds of organisation where it is found, that fits what I want and what my profile shows. Put first the path you recommend, and begin its why-it-fits line with the reason it comes first; the second is the alternative you would weigh against it. A path may combine work with study when my goals include study. For each path: why it fits my wants (name the want); the evidence in my profile that I could do it; what is missing; a first step I can take this week; the next steps over three months; and how it sits beside my other goals. Never name a particular vacancy or person, and give no salary or market figure; where a point about the world needs checking, say so. Then between three and six questions I should answer before choosing, each with how to find out (a person to ask, a small trial, something to read). In exactly this form, and nothing else:\nPATH: the path | why it fits my wants | the evidence | what is missing | a first step this week | the next three months | beside my other goals\nFIND: a question to answer | how to find out\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,R*0.85)}];},1800,0.4);})
     .then(function(t){var x=tagged(t,["PATH","FIND"]),list=(x.PATH||[]).map(function(p){return {id:uid("pa"),path:p[0].slice(0,200),fits:p[1]||"",evidence:p[2]||"",gap:p[3]||"",first:p[4]||"",months:p[5]||"",beside:p[6]||""};}),
         find=(x.FIND||[]).map(function(p){return {id:uid("fd"),q:p[0],how:p[1]||"",done:false};});
       if(!list.length){end();say("No paths came back in the form asked. Try again, or say more of what you are looking for in Your profile.");return;}
@@ -2349,6 +2363,7 @@ function appSkillsPanel(r){var S=CS(),E=EDGE(),rec=(E.apps||{})[r.name],label=r.
       if(x.line)k.appendChild(cbtn("sm","Copy the sentence",function(){copyText(x.line);}));
       k.appendChild(cbtn("sm quiet","Drop",function(){rec.list=rec.list.filter(function(y){return y.id!==x.id;});save();render();}));c.appendChild(k);grid.appendChild(c);});
     R.body.appendChild(grid);R.body.appendChild(h("p","c-note c-pad",esc("Read on "+dayStr(rec.at)+" with "+(rec.model||"your model")+(rec.earlier?", beside the earlier copy ("+rec.earlier+")":"")+". Nothing is added to your CV by itself: add what is right, in your own words or with the sentence.")));}
+  if(rec&&rec.list.some(function(x){return x.line;}))R.foot.appendChild(cbtn("","Copy as CV bullets",function(){copyText(rec.list.filter(function(x){return x.line;}).map(function(x){return "- "+x.line;}).join("\n"));},"Every sentence from this reading, as bullets for your CV, a letter or a portfolio"));  /* 6.90 */
   R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",rec?"Look again":"Spot what it adds",function(){spotOne(r);}));return R;}
 
 /* ---- Learn: one lesson at a time ---- */
@@ -2936,6 +2951,12 @@ window.IngCareer={state:CS,render:render,/* 6.58 */ mentor:{state:MT,next:nextSt
   /* 6.9.2 */ datesOf:datesOf,remindAt:remindAt,bellFor:bellFor,estimateOf:estimateOf,exportOpp:exportOpp,exportAll:exportAll,exportFiles:exportFiles,keepToRead:keepToRead,toFontes:toFontes,readWithLector:readWithLector,readingNotes:readingNotes,
   checkAgain:checkAgain,keepRecheck:keepRecheck,addMore:addMore,postText:postText,postOnly:postOnly,makeCheck:makeCheck,lcsUnits:lcsUnits,startMock:startMock,stopMock:stopMock,startClock:startClock,stopClock:stopClock,clock:function(){return CLOCK;},mock:function(){return MOCK;},
   bellRang:bellRang,openPosts:openPosts,postFor:postFor,bringPost:bringPost,wordsChanged:wordsChanged,setRefStatus:setRefStatus,removeOpp:removeOpp,liStatus:liStatus,oppRefs:oppRefs,refsOfPerson:refsOfPerson};
+/* 6.90: the studio's own parts, for the counsellor (modules/r283.js), which draws the mentor's room anew in them */
+IngCareer.ui={h:h,esc:esc,panel:panel,item:item,cbtn:cbtn,chip:chip,empty:empty,two:two,fold:fold,field:field,input:input,select:select,seg:seg,livePanel:livePanel,mList:mList,say:say,save:save,uid:uid,dayStr:dayStr,jump:jump,show:show,fitSoon:fitSoon,
+  SECTS:SECTS,TALK:TALK,MS:MS,MT:MT,stDone:stDone,nextStep:nextStep,talkApply:talkApply,readSources:readSources,edgeAll:edgeAll,cvDoc:cvDoc,EDGE:EDGE,addCv:addCv,addDocs:addDocs,importLinkedIn:importLinkedIn,packRead:packRead,packOpen:packOpen,packPick:packPick,pickFile:pickFile,readFile:readFile,readAsText:readAsText,loadText:loadText,
+  busyNow:busyNow,needModel:needModel,modelReady:modelReady,begin:begin,end:end,failed:failed,ask:ask,gatherProfile:gatherProfile,profileBlock:profileBlock,sys:sys,room:room,tagged:tagged,cut:cut,lectorMe:lectorMe,isMe:isMe,myName:myName,personLabel:personLabel,wantsText:wantsText,modelName:modelName,whereLine:whereLine,appReadings:appReadings,cloudKey:cloudKey,
+  RUN:RUN,lowDay:lowDay,ADV_TAGS:ADV_TAGS,docAdvise:docAdvise,pathsPanel:pathsPanel,edgeDocs:edgeDocs,stopNow:stopNow,waitRun:waitRun,runOne:runOne,setStop:function(v){MSTOP=!!v;},stopped:function(){return MSTOP;},paintMentor:paintMentor,paintWho:paintWho,ICON:ICON,todayStr:todayStr,goalSteps:goalSteps,appSkills:appSkills,suggest:suggest,findSkills:findSkills,ROOT:ROOT,
+  oppById:oppById,sortedOpps:sortedOpps,FINISHED:FINISHED,copyText:copyText,BLW:BLW,leaves:leaves,noPay:noPay,noContact:noContact,cvNoRefs:cvNoRefs,datesOf:datesOf,daysTo:daysTo,nextOf:nextOf};
 })();
 ;try{window.__ingParts["p188"]="running";}catch(_){}
 </script>

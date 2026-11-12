@@ -194,9 +194,29 @@ body[data-motion="minimal"] #page-home #hx.ox-on .oxo-tilt{transform:none}
    (R147, a card narrower than 330 pixels) lays them in one column as wide as the card, and each key filled it. */
 #page-home #hx.ox-on .hx-next .hx-row-top{justify-items:start}
 #page-home #hx.ox-on .hx-next .hx-row-top .hx-btn{justify-self:start;width:auto;max-width:100%}
+/* 6.90: her words (12 November 2026): "Sometimes the Bring in your model and take the guided tour buttons from the Home page revert back to
+   a wider and chunkier look instead of their new designs". Measured on 6.89: the keys keep one size at every width and at first paint;
+   what changes them is the next step's words, written by the base page (renderNextStep) as the step moves on: "Bring in your first
+   model" is 185 pixels wide, "Load Qwen3.5 2B into the engine" 241, "One-time setup: add the engine files" wider still, and a long model
+   name more (the name came inside the key). The tour key also stood 2 pixels taller than the next step (36 against 34). Now the key's
+   words stay as short as the first step's (the model's name moves into the line above it, the full words kept for a screen reader
+   and under the pointer), and the two keys are one height, 34 pixels. */
+#page-home .hx-next .hx-row-top{align-items:center}
+#page-home .hx-next .hx-row-top .hx-btn{min-height:34px;line-height:18px;padding-top:7px;padding-bottom:7px;align-self:center}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p261"]="started";}catch(_){}
 /* R261 · Home as an orrery: see the note at the top of its styles */
+/* 6.90: the next step's key keeps short words (see the note above its last rules) */
+(function shortNext(){var W=window;if(typeof W.renderNextStep!=="function"||W.renderNextStep.__short)return;var orig=W.renderNextStep;
+  var f=function(){var r=orig.apply(this,arguments);try{var b=document.getElementById("heroNext"),note=document.getElementById("heroStepNote");if(!b||!note)return r;
+      var t=String(b.textContent||"").trim(),m,key=null,lead="";
+      if((m=/^Load (.+) into the engine$/.exec(t))){key="Load your model";lead=m[1]+": ";}
+      else if((m=/^Talk to (.+)$/.exec(t))){key="Start a chat";lead=m[1]+" is running. ";}
+      else if(/^One-time setup: add the engine files$/.test(t)){key="Add the engine files";lead="One-time setup. ";}
+      if(key){b.textContent=key;b.setAttribute("aria-label",t);b.title=t;var n=String(note.textContent||""),sm=/^(Step \d of \d) · (.*)$/.exec(n);
+        note.textContent=sm?sm[1]+" · "+lead+sm[2].charAt(0).toUpperCase()+sm[2].slice(1):lead+n;}
+      else{b.removeAttribute("aria-label");b.removeAttribute("title");}}catch(e){}return r;};
+  f.__short=true;W.renderNextStep=f;try{f();}catch(e){}})();
 (function(){"use strict";
 if(window.__r261)return;window.__r261=1;
 var D=document,W=window,SVG="http://www.w3.org/2000/svg";
