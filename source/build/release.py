@@ -121,7 +121,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_keep_666", "_model_later", ("mini", "intel", "win")),
            ("app_lend_681", "_share_pair", ("mini", "intel", "win")),
            ("app_hub_683", "_hub_bring", ("mini", "intel", "win")),
-           ("app_disk_686", "_disk_repo", ("mini", "intel", "win"))]
+           ("app_disk_686", "_disk_repo", ("mini", "intel", "win")),
+           ("app_disk2_687", "_disk_commit", ("mini", "intel", "win"))]
 
 
 def desktop():

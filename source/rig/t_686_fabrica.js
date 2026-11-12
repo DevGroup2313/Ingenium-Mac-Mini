@@ -10,7 +10,7 @@
 //   the work: its name, where it is (the drive line), read only for now; Files with the sizes git gives (9.0 MB, not read whole);
 //   History from the drive; the README in Code; the branch key opens Ingenium's own list (Branches, Tags, All the ideas), and choosing
 //   shows idea, then the tag v0, then main again, each with its own files;
-//   nothing is written on the drive: a commit, a branch, a file put are refused in plain words, and git finds the drive as it was;
+//   reading writes nothing: git finds the drive as it was; a bare repository refuses a file and a commit, saying to make a working copy (6.87);
 //   an object read from the drive is lent, never counted as kept: Harbour Garden keeps its own copy of the same file;
 //   Lumen's issue is attached from its records on the drive;
 //   the Ingenium part: a fourth part with seven cards; the other parts and the footer step aside, and come back; Explain, Release notes
@@ -100,16 +100,16 @@ const call = (n, ...args) => fetch(`http://127.0.0.1:${PORT}/call/${n}`, { metho
       add: !!document.getElementById('fbDiskAdd') }));
     ok(apps.secs.length === 2 && /^On this computer · 2 \| This computer · [\d.]+ [KMGT]?B free · no size limit$/.test(apps.secs[0]) && /^Kept in Ingenium · \d+/.test(apps.secs[1]),
       'Your apps: On this computer, its drive and the room left on it, no size limit; and Kept in Ingenium', apps.secs);
-    ok(apps.drive.length === 2 && apps.drive.every(x => /^(Atelier|Lumen) \| [\d.]+ [KMG]?B$/.test(x)) && apps.kept.indexOf('Harbour Garden') >= 0 && apps.add,
-      'each drive tile says its size; Harbour Garden is kept in Ingenium; Add one from this computer is there', apps);
+    ok(apps.drive.length === 2 && apps.drive.every(x => /^(Atelier|Lumen) \| (Kept · to test|Started · nothing kept yet|\d+ to keep|Tested · ready to ship|Shipped)$/.test(x)) && apps.kept.indexOf('Harbour Garden') >= 0 && apps.add,
+      'each drive tile says its state, as any app\'s (6.87); Harbour Garden is kept in Ingenium; Add one from this computer is there', apps);
     await p.screenshot({ path: path.join(OUT, '1_your_apps.png') });
     // ---------- the work, from the drive ----------
     const AID = added.id;
     await p.evaluate(id => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => x.querySelector('.nm').textContent.trim() === 'Atelier'); t.click(); }, AID);
     await sleep(1800);
     const work = await p.evaluate(() => ({ name: document.getElementById('fbWhName').textContent, line: (document.getElementById('fbDiskLine') || {}).textContent || '', branch: document.getElementById('fbBranchName').textContent }));
-    ok(work.name === 'Atelier' && /^From This computer · [\d.]+ [KMG]?B, every version · no size limit · read only for now$/.test(work.line) && work.branch === 'main',
-      'the work says where it is: its drive, its room, every version, no size limit, read only for now', work);
+    ok(work.name === 'Atelier' && /^From This computer · [\d.]+ [KMG]?B, every version · no size limit · kept on the drive as you work$/.test(work.line) && work.branch === 'main',
+      'the work says where it is: its drive, its room, every version, no size limit, kept on the drive as you work (6.87)', work);
     await p.evaluate(() => { const b = document.querySelector('#fbViews button[data-v="files"]'); b && b.click(); }); await sleep(1600);
     const files = await p.evaluate(() => [...document.querySelectorAll('#fbWorkBody .nm')].map(n => n.textContent + ' | ' + ((n.parentNode.querySelector('.sz') || {}).textContent || '')));
     ok(files.some(x => /^src\/ \| 3 files · 9\.0 MB$/.test(x) || /^photo\.bin \| 9\.0 MB$/.test(x)) || files.some(x => /9\.0 MB/.test(x)), 'Files: the sizes git gives, the 9 MB file too, without reading it whole', files.slice(0, 12));
@@ -136,11 +136,11 @@ const call = (n, ...args) => fetch(`http://127.0.0.1:${PORT}/call/${n}`, { metho
     await pick('main');
     const onMain = await p.evaluate(() => document.getElementById('fbBranchName').textContent);
     ok(onMain === 'main', 'and main again', onMain);
-    // ---------- nothing is written on the drive ----------
-    const writes = await p.evaluate(async id => { const out = {}; for (const [k, f] of [['commit', () => IngRepo.commit(id, 'x')], ['branch', () => IngRepo.branch(id, 'new-idea')], ['put', () => IngRepo.put(id, 'x.txt', 'x')], ['tag', () => IngRepo.tag(id, 'v9')]]) {
-      try { await f(); out[k] = 'written'; } catch (e) { out[k] = String(e.message); } } return out; }, AID);
-    ok(Object.values(writes).every(m => /is read from the drive as it is: in this stage Fabrica shows every version of it and writes nothing on the drive/.test(m)), 'a commit, a branch, a file and a tag are refused in plain words', writes);
-    ok(git(AT, 'rev-parse', 'HEAD').trim() === AT_HEAD && git(AT, 'show-ref') === AT_REFS && git(AT, 'status', '--porcelain') === AT_STATUS && print(AT) === AT_PRINT, 'git finds the drive as it was: the same versions, branches, tags and files; every object and ref file untouched');
+    // ---------- a bare repository takes no file: its files change through a working copy (6.87) ----------
+    const writes = await p.evaluate(async id => { const out = {}; for (const [k, f] of [['commit', () => IngRepo.commit(id, 'x')], ['put', () => IngRepo.put(id, 'x.txt', 'x')]]) {
+      try { await f(); out[k] = 'written'; } catch (e) { out[k] = String(e.message); } } return out; }, lumen.id);
+    ok(Object.values(writes).every(m => /has no folder of files on the drive: make a working copy of it/.test(m)), 'a bare repository: a commit and a file are refused, saying to make a working copy', writes);
+    ok(git(AT, 'rev-parse', 'HEAD').trim() === AT_HEAD && git(AT, 'show-ref') === AT_REFS && print(AT) === AT_PRINT, 'git finds the drive\'s versions, branches and tags as they were: no object or ref file written (6.87: the folder follows the idea chosen, as git checkout does)', git(AT, 'status', '--porcelain'));
     // ---------- an object read from the drive is lent, never counted as kept ----------
     const lent = await p.evaluate(async ({ hg, at, oid }) => { const be = IngRepo.core.be(); await IngRepo.readText(at, 'docs/guide/intro.md'); const c = IngRepo.core.store().cache.get(oid);
       const before = await be.ownRec(oid), hadBefore = await IngRepo.core.store().has(oid); await IngRepo.put(hg, 'docs/same.md', 'Begin here.\n'); await IngRepo.commit(hg, 'The same words as Atelier\'s guide');

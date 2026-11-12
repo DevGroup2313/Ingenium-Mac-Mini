@@ -371,6 +371,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.87 (12 November 2026): Fabrica, phase 2, second stage. Working on the repositories on this computer, right on their drive.
+Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4; its kit in source/previews/fabrica_p2):
+"I approve of the preview, please push it everywhere." This stage is the first of three: working on the drive (6.87); a second copy on
+another drive and Find by what it means come next; then the other chat's pieces of the preview (what changed while she was away, people
+and milestones, comments on a line, Rules before main, Safety on every version).
+- desktop/app_disk2_687.py (new; after app_disk_686.py in release.py's DESKTOP list): for a working copy, disk_repo gives the folder as
+  it is (git's own status, with .gitignore; each changed file's git name read from the file, cached by its size and time), and disk_objs
+  and disk_sizes serve a changed file by its git name (read again and checked). disk_commit keeps every change of the folder as one
+  version (staged as git add would, deletions too; never a submodule), with the repository's own name and address from git's settings,
+  else the name Fabrica uses. disk_put_back restores files from the version kept, after saving what they held in
+  .git/ingenium-put-back/<time>/ (a new file is moved there). disk_write_file, disk_remove_file (moved aside) and disk_move_file change
+  the folder, never outside it, never inside .git, never from a path given from the root. disk_write takes what the page made (objects
+  checked against their git names; each branch or tag moved only if it is where Fabrica read it, with dulwich's compare and swap); the
+  branch worked on, or another one switched to, moves the folder with it only when nothing in it waits to be kept and no new file of
+  hers stands where the other version puts one (a file .gitignore names is moved aside first): files the new version no longer holds
+  are taken away, then git's index and files are built from it. disk_working_copy clones a bare repository into a folder she chooses and
+  lists it. Found and fixed while testing, before release: dulwich 0.22.8's checkout_branch moves to another branch over a change not
+  kept and leaves the file half switched (so Fabrica checks first, and refuses); its hard reset leaves files the new version deleted (so
+  Fabrica takes them away itself); removing a branch with a log message fails inside dulwich (so a removed branch's log is not written,
+  as git drops it anyway); a submodule whose folder is absent showed as removed, and Keep would have deleted it from the repository (so
+  submodules are left out of staging and of the checks).
+- modules/r280.js: Fabrica's writes on a repository on the drive. A working copy's folder is its work: a file saved, taken away or moved
+  in Fabrica goes to the folder; Keep this version, Put it back and a file restored go through the calls above. Ideas, tags (annotated,
+  with their notes), merges, squashes, rebases and versions undone are made by IngRepo as for any repository (the record is its own to
+  change while it writes) and written on the drive: its new objects (those kept in the page, from each moved ref back to what the drive
+  holds), and each ref's move. A merge's step between its joined files and its version is held in memory: only the version reaches the
+  drive; a merge whose ideas changed the same lines is refused, saying so (resolving that on the drive comes later). The repository open
+  is read again from its folder every time, so a change made a moment ago in another program shows at once. A bare repository takes ideas,
+  tags and merges; its files change through a working copy (Make a working copy, on its drive line). The drive line says "kept on the
+  drive as you work"; a drive tile shows Fabrica's own line (2 to keep, Kept · to test), as any app's.
+- modules/r222.js: the news (Fabrica's line, where Fabrica is).
+- Tests: rig/t_687_disk_write.py 41/41 (every write checked by git itself: status, log, fsck, branches, tags, the folder following, the
+  refusals, a submodule, a bare repository and its working copy); rig/t_687_fabrica.js 17/17 and rig/t_686_fabrica.js 36/36 (updated
+  for this stage) on a test build with the computer app's back end.
+
+    python3 -I rig/t_687_disk_write.py <Mac ingenium_app.py> <Windows ingenium_app.py>
+    node rig/t_687_fabrica.js <app folder: patched ingenium_app.py and ingenium.html> <out folder>
+
 Ingenium 6.86 (12 November 2026): Fabrica, phase 2. Every repository on her computer opens in Fabrica straight from its drive, at any size;
 and Ingenium beside her in Test and ship. Her words (12 November 2026): "Please continue working on my requests and deepening and enhancing
 Fabrica and making it my own offline GitHub. I want full and complete parity with GitHub but I want you to go above and beyond that and

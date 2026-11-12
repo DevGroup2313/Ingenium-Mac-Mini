@@ -102,13 +102,21 @@ function frozen(o){try{Object.keys(o).forEach(function(k){if(o[k]&&typeof o[k]==
 /* a copy for IngRepo: small parts copied; the files at HEAD and the refs shared and frozen (a repository brought from GitHub can hold
    thousands of refs, and Fabrica reads the record once for each tag on every refresh; IngRepo writes a new object when it changes them,
    and every write to a repository on the drive is refused before it begins) */
-function copyOf(b){if(b.refs&&!Object.isFrozen(b.refs))Object.freeze(b.refs);return {id:b.id,name:b.name,slug:b.slug,app:b.app||null,desc:b.desc||"",created:b.created,changed:b.changed,head:JSON.parse(JSON.stringify(b.head||{ref:"refs/heads/main"})),
-  refs:b.refs||Object.freeze({}),work:b.work||frozen({}),sizes:b.sizes||{},log:(b.log||[]).slice(),merging:null,fileCount:b.fileCount!=null?b.fileCount:null,disk:b.disk,
-  notes:JSON.parse(JSON.stringify(sideNotes(b.id)))};}
+var WRITING={};/* 6.87: while Fabrica writes on a repository on the drive, its record is its own to change */
+function copyOf(b){var w=!!WRITING[b.id];if(!w&&b.refs&&!Object.isFrozen(b.refs))Object.freeze(b.refs);
+  return {id:b.id,name:b.name,slug:b.slug,app:b.app||null,desc:b.desc||"",created:b.created,changed:b.changed,head:JSON.parse(JSON.stringify(b.head||{ref:"refs/heads/main"})),
+  refs:w?Object.assign({},b.refs||{}):(b.refs||Object.freeze({})),work:w?Object.assign({},b.work||{}):(b.work||frozen({})),sizes:b.sizes||{},log:(b.log||[]).slice(),merging:null,
+  fileCount:b.fileCount!=null?b.fileCount:null,disk:b.disk,changes:b.changes||[],notes:JSON.parse(JSON.stringify(sideNotes(b.id)))};}
 function listDisk(force){var a=A();if(!a)return Promise.resolve([]);if(!force&&LIST&&Date.now()-LISTAT<4000)return Promise.resolve(LIST);if(LISTP)return LISTP;
   LISTP=Promise.resolve(a.disk_list()).then(function(x){LISTP=null;LIST=(x&&x.ok&&x.repos)||[];LISTAT=Date.now();return LIST;},function(){LISTP=null;return LIST||[];});return LISTP;}
-function diskAll(){return listDisk().then(function(l){return l.map(function(x){var d=DK[x.id];return (d&&d.rec&&x.ok)?copyOf(d.rec):light(x);});});}
-function diskRec(id){var d=DK[id]||(DK[id]={});touch(id);
+function diskAll(){return listDisk().then(function(l){return Promise.all(l.map(function(x){var d=DK[x.id];if(d&&d.rec&&x.ok&&!d.at&&!d.over)return diskRec(x.id).then(function(r){return r||light(x);},function(){return light(x);});
+  return (d&&d.rec&&x.ok)?copyOf(d.rec):light(x);}));});}
+/* 6.87: a merge's step between its joined files and its version (r110 merge saves the one, then keeps the other) is held in memory:
+   only the version kept reaches the drive */
+function midCopy(m){return {id:m.id,name:m.name,slug:m.slug,app:m.app||null,desc:m.desc||"",created:m.created,changed:m.changed,head:JSON.parse(JSON.stringify(m.head)),
+  refs:Object.assign({},m.refs),work:Object.assign({},m.work),sizes:m.sizes||{},log:(m.log||[]).slice(),merging:m.merging?JSON.parse(JSON.stringify(m.merging)):null,
+  fileCount:Object.keys(m.work||{}).length,disk:m.disk,changes:[],notes:JSON.parse(JSON.stringify(sideNotes(m.id)))};}
+function diskRec(id){var d=DK[id]||(DK[id]={});touch(id);if(d.mid)return Promise.resolve(midCopy(d.mid));
   if(d.rec&&(d.over||Date.now()-d.at<3000))return Promise.resolve(copyOf(d.rec));
   /* asked again while it is being read: each asker gets a copy of its own (one may switch it while another reads it) */
   if(d.p)return d.p.then(function(r){return r&&d.rec&&!(r.disk&&r.disk.away)?copyOf(d.rec):r;});var a=A();if(!a)return Promise.resolve(d.rec?copyOf(d.rec):null);
@@ -118,16 +126,34 @@ function diskRec(id){var d=DK[id]||(DK[id]={});touch(id);
       /* she moved to another branch or version while it was open: what she looks at stays, unless the drive moved on */
       d.rec=rec;d.at=Date.now();d.over=false;return copyOf(rec);},function(e){d.p=null;throw e;});
   return d.p;}
-function diskPut(rec){var d=DK[rec.id];if(!d||!d.rec)return Promise.reject(refuse(rec.name));var b=d.rec;
-  if(rec.merging||(rec.refs!==b.refs&&JSON.stringify(rec.refs||{})!==JSON.stringify(b.refs||{}))||rec.name!==b.name||(rec.desc||"")!==(b.desc||"")||(rec.app||null)!==(b.app||null))return Promise.reject(refuse(b.name));
-  var moved=JSON.stringify(rec.head)!==JSON.stringify(b.head);
-  if(rec.work!==b.work&&!moved)return Promise.reject(refuse(b.name));
-  var tip=headOid(rec),check=moved&&tip?need(rec.id,tip):Promise.resolve(true);
-  return check.then(function(ok){if(!ok)throw refuse(b.name);
-    if(rec.notes)keepNotes(rec.id,rec.notes);
-    if(moved){var n={};Object.keys(b).forEach(function(k){n[k]=b[k];});n.head=JSON.parse(JSON.stringify(rec.head));n.work=rec.work===b.work?b.work:frozen(rec.work);n.log=(rec.log||[]).slice(-200);
-      n.fileCount=Object.keys(n.work).length;n.sizes=b.sizes;d.rec=n;d.over=true;}
-    return undefined;});}
+/* 6.87: what IngRepo made for a repository on the drive (an idea, a tag, a merge, a squash, a rebase, a version undone, another idea
+   worked on) is written there: its new objects, each checked by its git name on the computer's side, then each branch or tag moved only
+   if it is still where Fabrica read it; for a working copy, the folder follows its branch (only when nothing waits to be kept in it).
+   Showing an older version, or another idea of a bare repository, changes nothing on the drive: it is a view, held for the session. */
+function diskPut(rec){var d=DK[rec.id];if(!d||!d.rec)return Promise.reject(new Error("that repository is no longer on this device"));var b=d.rec;
+  if(rec.merging&&!(rec.merging.conflicts||[]).length){d.mid=midCopy(rec);return Promise.resolve();}
+  if(rec.merging){var cs=(rec.merging.conflicts||[]),n=cs.length;delete d.mid;return Promise.reject(new Error("The two ideas changed the same lines in "+n+" file"+(n===1?"":"s")+(n?": "+cs.slice(0,4).join(", "):"")+
+    ". Fabrica does not resolve that on the drive yet: bring it in with git there, or in a repository kept in Ingenium."));}
+  if(rec.name!==b.name||(rec.desc||"")!==(b.desc||"")||(rec.app||null)!==(b.app||null))return Promise.reject(new Error("“"+b.name+"” is named by its folder on the drive: rename the folder, then add it again."));
+  var updates=[],ks={};Object.keys(b.refs||{}).concat(Object.keys(rec.refs||{})).forEach(function(k){ks[k]=1;});
+  Object.keys(ks).sort().forEach(function(k){var o=(b.refs||{})[k]||null,nw=(rec.refs||{})[k]||null;if(o!==nw)updates.push({ref:k,old:o,new:nw,why:"Fabrica"});});
+  var wtree=!!(b.disk&&b.disk.worktree),bh=b.head||{},rh=rec.head||{},sw=null,view=false;
+  if(rh.oid)view=true;else if(rh.ref&&(rh.ref!==bh.ref||bh.oid)){if(wtree)sw=rh.ref;else view=true;}
+  if(rec.notes)keepNotes(rec.id,rec.notes);
+  /* a view laid over the record as the drive holds it (its ideas and tags as they are), with the version or idea shown */
+  function hold(base){var n={};Object.keys(base).forEach(function(k){n[k]=base[k];});n.head=JSON.parse(JSON.stringify(rh));n.work=rec.work===base.work?base.work:frozen(rec.work);n.log=(rec.log||[]).slice(-200);
+    n.fileCount=Object.keys(n.work).length;n.changes=[];d.rec=n;d.over=true;}
+  if(!updates.length&&!sw){if(view||JSON.stringify(rh)!==JSON.stringify(bh))hold(b);return Promise.resolve();}
+  return newObjects(b,updates).then(function(objs){var w=author();return call("disk_write",[rec.id,{objects:objs,updates:updates,head:sw,name:w.name||null,email:w.email||null}]);})
+    .then(function(x){delete d.mid;d.at=0;d.over=false;LIST=null;if(x.aside)toast("A file .gitignore names stood where that version puts one: it is kept in "+x.aside+", inside its folder.");
+      if(view)return diskRec(rec.id).then(function(){if(d.rec)hold(d.rec);});});}
+function newObjects(b,updates){var st=IR.core.store(),be=IR.core.be(),seen={},out=[];Object.keys(b.refs||{}).forEach(function(k){seen[b.refs[k]]=1;});
+  function visit(oid){if(!oid||seen[oid])return Promise.resolve();seen[oid]=1;
+    return be.ownRec(oid).then(function(r){if(!r)return null;return st.get(oid).then(function(o){if(!o)return null;out.push([oid,o.type,b64(o.body)]);
+      if(o.type==="commit"){var c=IR.core.parseCommit(o.body);return Promise.all([visit(c.tree)].concat((c.parents||[]).map(visit)));}
+      if(o.type==="tree")return Promise.all(IR.core.parseTree(o.body).filter(function(e){return e.mode!=="160000";}).map(function(e){return visit(e.oid);}));
+      if(o.type==="tag"){var m=/^object ([0-9a-f]{40})$/m.exec(new TextDecoder().decode(o.body));return m?visit(m[1]):null;}return null;});});}
+  return Promise.all(updates.map(function(u){return visit(u.new);})).then(function(){return out;});}
 /* that a version is on the drive (a view can move to it; a version made here cannot be written there yet) */
 function need(id,oid){return want(id,oid).then(function(r){return !!r;});}
 function forget(id){var a=A();if(!a)return Promise.reject(new Error("Fabrica can forget a repository on the drive only in the computer app."));
@@ -166,17 +192,61 @@ function Mux(inner){var m={};Object.keys(inner).forEach(function(k){if(typeof in
   m.__r280=true;return m;}
 try{var INNER=IR.core.be();if(INNER&&!INNER.__r280)IR.core.use(Mux(INNER));}catch(e){try{console.warn("r280: the drive's repositories could not be joined to Fabrica",e);}catch(_){}}
 
-/* what writes is refused at once, in plain words, for a repository on the drive; what only looks (another branch, a version, a note) works */
-["put","putMany","del","move","commit","branch","delBranch","tag","delTag","merge","rebase","revert","restore","discard","rename","setRef","stopMerge"].forEach(function(k){
-  var f=IR[k];if(typeof f!=="function")return;IR[k]=function(id){if(isDisk(id)){var d=DK[id];return Promise.reject(refuse(d&&d.rec?d.rec.name:null));}return f.apply(IR,arguments);};});
+/* 6.87: working on the drive (desktop/app_disk2_687.py). A working copy's folder is its work: a file written, taken away or moved in
+   Fabrica goes to the folder; Keep this version keeps the folder's changes as git would, with the repository's own name; Put it back saves
+   what it replaces first. Ideas, tags, merges, squashes, rebases and versions undone are made by IngRepo as for any repository, and
+   written on the drive by diskPut. A bare repository (brought from GitHub) takes ideas, tags and merges; its files change through a
+   working copy, made from it in one press. */
+function ra(id){var d=DK[id];return d&&d.rec?d.rec:null;}
+function wt(id){var r=ra(id);return !!(r&&r.disk&&r.disk.worktree);}
+function call(name,args){var a=A();if(!a||typeof a[name]!=="function")return Promise.reject(new Error("Fabrica works on a repository on the drive in the Mac and Windows apps."));
+  return Promise.resolve(a[name].apply(a,args)).then(function(x){if(x&&x.cancelled)return x;if(!x||!x.ok)throw new Error((x&&x.error)||"It could not be done.");return x;});}
+function stale(id){var d=DK[id];if(d){d.at=0;d.over=false;}LIST=null;}
+function noFolder(id){var r=ra(id);return new Error("“"+(r?r.name:"This repository")+"” has no folder of files on the drive: make a working copy of it (Make a working copy, under its name), and change its files there.");}
+function u8(x){if(x instanceof Uint8Array)return x;if(typeof x==="string")return utf8(x);if(x&&x.buffer)return new Uint8Array(x.buffer,x.byteOffset||0,x.byteLength);return utf8(String(x==null?"":x));}
+function b64(u){var t="",CH=0x8000;for(var i=0;i<u.length;i+=CH)t+=String.fromCharCode.apply(null,u.subarray(i,i+CH));return btoa(t);}
+function ready(id){return diskRec(id).then(function(r){if(!r)throw new Error("that repository is no longer on this device");if(!wt(id))throw noFolder(id);return r;});}
+function under(r,p){return Object.keys(r.work||{}).filter(function(k){return k===p||k.indexOf(p+"/")===0;});}
+function author(){try{return IR.author()||{};}catch(e){return {};}}
+function cp(p){return IR.core.cleanPath(p);}
+var ROUTE={
+  put:function(id,path,data,mode){return ready(id).then(function(){return call("disk_write_file",[id,cp(path),b64(u8(data)),mode||null]);}).then(function(){stale(id);return null;});},
+  putMany:function(id,files,onEach){return ready(id).then(function(){var i=0;return (function next(){if(i>=files.length){stale(id);return files.length;}var f=files[i++];
+    return call("disk_write_file",[id,cp(f.path),b64(u8(f.data)),f.mode||null]).then(function(){if(onEach)onEach(i,files.length,f.path);return next();});})();});},
+  del:function(id,path){return ready(id).then(function(r){var p=cp(path),ps=under(r,p);if(!ps.length)throw new Error("“"+p+"” is not here");
+    return ps.reduce(function(q,x){return q.then(function(){return call("disk_remove_file",[id,x]);});},Promise.resolve()).then(function(){stale(id);toast("Taken away from its folder; kept aside in .git/ingenium-put-back, inside it.");return ps.length;});});},
+  move:function(id,a,b){return ready(id).then(function(r){var pa=cp(a),pb=cp(b),ps=under(r,pa);if(!ps.length)throw new Error("“"+pa+"” is not here");
+    return ps.reduce(function(q,x){return q.then(function(){return call("disk_move_file",[id,x,pb+x.slice(pa.length)]);});},Promise.resolve()).then(function(){stale(id);return ps.length;});});},
+  commit:function(id,msg){return ready(id).then(function(){var w=author();return call("disk_commit",[id,String(msg||""),w.name||null,w.email||null]);}).then(function(x){stale(id);return x.commit;});},
+  discard:function(id,paths){return ready(id).then(function(){return call("disk_put_back",[id,paths?paths.map(cp):null]);}).then(function(x){stale(id);
+    if(x.saved)toast("Put back. What "+(x.saved===1?"it":"they")+" held first is kept in "+x.aside+", inside its folder.");return IR.info(id);});},
+  restore:function(id,path,ref){return ready(id).then(function(){var p=cp(path);return IR.read(id,p,ref).then(function(bb){return bb==null?call("disk_remove_file",[id,p]):call("disk_write_file",[id,p,b64(u8(bb)),null]);});})
+    .then(function(){stale(id);return IR.info(id);});},
+  rename:function(id){var r=ra(id);return Promise.reject(new Error("“"+(r?r.name:"It")+"” is named by its folder on the drive: rename the folder, then add it again."));}
+};
+Object.keys(ROUTE).forEach(function(k){var f=IR[k];if(typeof f!=="function")return;IR[k]=function(id){return isDisk(id)?ROUTE[k].apply(null,arguments):f.apply(IR,arguments);};});
+["branch","delBranch","tag","delTag","merge","rebase","revert","setRef","stopMerge","switchTo"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;
+  IR[k]=function(id){if(!isDisk(id))return f.apply(IR,arguments);var args=arguments;WRITING[id]=(WRITING[id]||0)+1;
+    function done(){WRITING[id]--;var dd=DK[id];if(dd&&!WRITING[id])delete dd.mid;}
+    return Promise.resolve().then(function(){return f.apply(IR,args);}).then(function(x){done();return x;},function(e){done();throw e;});};});
+/* a removed file and a new one holding the same bytes: moved, as r110's changesBetween says it */
+function moves(list){var out=list.map(function(c){return JSON.parse(JSON.stringify(c));}),gone=out.filter(function(c){return c.kind==="removed";}),came=out.filter(function(c){return c.kind==="added";});
+  gone.forEach(function(g){var m=came.filter(function(c){return c.now[1]===g.old[1]&&!c.moved;})[0];if(m){m.kind="moved";m.from=g.path;m.old=g.old;m.moved=true;g.drop=true;}});
+  return out.filter(function(c){return !c.drop;});}
 (function(){var st=IR.status;IR.status=function(id){if(!isDisk(id))return st.apply(IR,arguments);
-  /* on the drive, the files shown are always a version's own: nothing waits to be kept */
-  return diskRec(id).then(function(r){if(!r)throw new Error("that repository is no longer on this device");return {changes:[],clean:true,head:headOid(r),branch:r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):null,merging:null};});};
+  /* 6.87: a working copy's folder, as git sees it (read again for the repository open; the others as last read); a bare repository,
+     or a version shown as it was, has nothing waiting */
+  var d=DK[id],sel=null;try{sel=X().FBS().sel;}catch(e){}
+  /* the repository open is read again from its folder every time: a change made a moment ago in another program shows at once */
+  if(d&&d.rec&&id===sel&&!d.over&&!d.mid&&!WRITING[id]&&d.rec.disk&&d.rec.disk.worktree)d.at=0;
+  var p=(d&&d.rec&&d.at&&id!==sel)?Promise.resolve(copyOf(d.rec)):diskRec(id);
+  return p.then(function(r){if(!r)throw new Error("that repository is no longer on this device");var dd=DK[id],view=!!(dd&&dd.over),ch=(!view&&r.changes&&r.changes.length)?moves(r.changes):[];
+    return {changes:ch,clean:!ch.length,head:headOid(r),branch:r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):null,merging:null};});};
   var nt=IR.notes;IR.notes=function(id,oid){if(!isDisk(id))return nt.apply(IR,arguments);var n=sideNotes(id);return Promise.resolve(oid?JSON.parse(JSON.stringify(n[oid]||{})):JSON.parse(JSON.stringify(n)));};})();
 
 /* ============ Your apps: On this computer, and Kept in Ingenium ============ */
 function repos(){var x=X();return x&&x.C&&x.C.repos?x.C.repos:[];}
-function tileWords(s){var d=s.disk||{};if(d.away)return "drive not connected";return d.size?size(d.size):"on the drive";}/* short, so it is never cut (a tile is narrow) */
+function tileWords(s,line){var d=s.disk||{};if(d.away)return "drive not connected";return line;}/* 6.87: Fabrica's own line, as for any app she works on (short, so never cut) */
 function dressRepos(){var box=$("fbRepos"),rs=repos();if(!box)return;var anyDisk=rs.some(function(r){return isDisk(r.id);});
   var direct=[].filter.call(box.children,function(e){return e.classList&&e.classList.contains("f-repo");});
   if(!anyDisk||direct.length!==rs.length)return;/* only a fresh paint of the tiles, one for each repository in order */
@@ -186,7 +256,7 @@ function dressRepos(){var box=$("fbRepos"),rs=repos();if(!box)return;var anyDisk
   function sec(t,s){return el("div","r280-sec","<b>"+esc(t)+"</b><span>"+esc(s)+"</span>");}
   box.appendChild(sec("On this computer · "+mine.length,(dn.join(", ")||"This computer")+(dn.length===1&&free!=null?" · "+size(free)+" free":"")+" · no size limit"));
   var g1=el("div","f-repos r280-grid");mine.forEach(function(p){var b=p[0],s=p[1],line=b.querySelector(".stl span:last-child"),st=b.querySelector(".stl .st");
-    if(line)line.textContent=tileWords(s);if(st&&s.disk&&s.disk.away){st.className="st new";st.title="Its drive is not connected";}
+    if(line)line.textContent=tileWords(s,line.textContent);if(st&&s.disk&&s.disk.away){st.className="st new";st.title="Its drive is not connected";}
     b.title=(s.disk&&s.disk.path?s.disk.path:s.name)+(s.disk&&s.disk.brought?" · brought from GitHub":"");g1.appendChild(b);});box.appendChild(g1);
   if(kept.length){box.appendChild(sec("Kept in Ingenium · "+kept.length,"made or brought into Fabrica, kept in Ingenium itself"));var g2=el("div","f-repos r280-grid");kept.forEach(function(p){g2.appendChild(p[0]);});box.appendChild(g2);}}
 function addKey(){var a=A();if(!a||typeof a.disk_choose!=="function"||$("fbDiskAdd"))return;var after=$("fbHubBring")||$("fbBring");if(!after||!after.parentNode)return;
@@ -199,10 +269,17 @@ function addKey(){var a=A();if(!a||typeof a.disk_choose!=="function"||$("fbDiskA
 /* ============ the work: where it is, and the branch key's own list ============ */
 function dressWork(){var w=$("fbWork"),head=w&&w.querySelector(".f-pn-h"),x=X(),r=x&&x.cur?x.cur():null,line=$("fbDiskLine");
   if(!head)return;if(!r||!isDisk(r.id)){if(line)line.remove();return;}
-  var d=r.disk||{},sig=r.id+"|"+(d.away?"away":"")+"|"+d.size+"|"+d.drive;if(line&&line.getAttribute("data-sig")===sig)return;
+  var d=r.disk||{},rr0=ra(r.id),sig=r.id+"|"+(d.away?"away":"")+"|"+d.size+"|"+d.drive;if(line&&line.getAttribute("data-sig")===sig+"|"+(rr0&&rr0.disk&&rr0.disk.worktree===false?"bare":"wt"))return;
   if(!line){line=el("div","r280-disk");line.id="fbDiskLine";line.setAttribute("role","note");}line.setAttribute("data-sig",sig);line.classList.toggle("away",!!d.away);
+  var rr=ra(r.id),bare=!!(rr&&rr.disk&&rr.disk.worktree===false);
   line.innerHTML=d.away?'<span class="r280-dot"></span><span>Its drive is not connected now: connect it, and '+esc(r.name)+" opens here as it is on the drive.</span>"
-    :'<span class="r280-dot"></span><span>From <b>'+esc(d.drive||"this computer")+"</b> · "+esc(size(d.size))+", every version"+(d.brought?", brought from GitHub":"")+" · no size limit · read only for now</span>";
+    :'<span class="r280-dot"></span><span>From <b>'+esc(d.drive||"this computer")+"</b> · "+esc(size(d.size))+", every version"+(d.brought?", brought from GitHub":"")+" · no size limit · "+
+      (bare?"its files change through a working copy":"kept on the drive as you work")+"</span>";
+  if(bare&&!d.away){var k=el("button","f-btn sm r280-key","Make a working copy");k.type="button";k.title="A folder of its files, beside it on a drive you choose: Fabrica lists it at once";
+    k.onclick=function(){k.disabled=true;call("disk_working_copy",[r.id]).then(function(x){k.disabled=false;if(!x||x.cancelled)return;LIST=null;var h=X();h.FBS().sel=x.id;h.S.home=false;h.saveSoon();
+      return h.refresh().then(function(){h.paint();toast("A working copy of "+r.name+" is made"+(x.path?" in "+x.path:"")+": change its files there, and keep them as versions.");});},function(e){k.disabled=false;fail(e);});};
+    line.appendChild(k);}
+  line.setAttribute("data-sig",sig+"|"+(bare?"bare":"wt"));
   if(head.nextSibling!==line)head.parentNode.insertBefore(line,head.nextSibling);}
 var POP=null;
 function closePop(){if(!POP)return;var p=POP;POP=null;p.remove();D.removeEventListener("pointerdown",outside,true);D.removeEventListener("keydown",keys,true);W.removeEventListener("resize",closePop);}
