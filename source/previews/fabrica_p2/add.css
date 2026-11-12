@@ -87,3 +87,13 @@
 .win #fb .pv-newsrow i{margin-left:auto;font-style:normal;color:var(--f-ink3);font-size:15px}
 .win #fb .pv-newsrow.pv-read b{color:var(--f-ink2)}
 .win #fb .pv-newsrow.pv-read svg{stroke:var(--f-ink3)}
+/* ---------- the second stage (version 4): find by what it means, a second copy on another drive, a version just kept ---------- */
+.win #fb .pv-how{align-self:flex-start;margin:2px 0 -2px}
+.win #fb .pv-copyrow{display:flex;align-items:center;gap:8px;margin:8px 0 6px;font-size:12.5px;color:var(--f-ink2)}
+.win #fb .pv-copyrow .pv-mk{cursor:pointer;transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .2s}
+.win #fb .pv-copyrow .pv-mk:hover{transform:translateY(-2px);box-shadow:var(--f-pophi)}
+.win #fb .pv-copyrow .pv-mk:active{transform:translateY(1px);transition-duration:.06s}
+.win #fb .pv-when{margin:2px 0 8px}
+.win #fb .pv-copyst{margin:6px 0 0}
+.win #fb .f-cm.pv-just{animation:fbRise .36s cubic-bezier(.34,1.35,.64,1) both}
+.win #fb .f-cm.pv-just .fr-cmh{box-shadow:inset 0 0 0 1.5px var(--f-ring)}

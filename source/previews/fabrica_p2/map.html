@@ -9,13 +9,14 @@
 (function(){
 var NOW="In Fabrica now",P2="Phase 2",P3="Phase 3",P4="Phase 4",BEY="Beyond GitHub";
 var MAP=[["Code and versions"],
- ["Browse the code at any version, with its README","Yes","Yes, for repositories kept in this window",NOW],
+ ["Browse the code at any version, with its README","Yes","Yes, for repositories kept in Ingenium and, since 6.86, every repository on your drive",NOW],
  ["Blame, a file's history, Compare","Yes","Yes",NOW],
  ["Branches and tags","Yes","Yes",NOW],
- ["Repositories of any size, on your own drive","Within GitHub's size guidance","Brought onto the drive since 6.83; opened in Fabrica up to 500 MB",P2],
- ["Large files kept whole in the history","Files over 100 MB only through Git LFS, within its limits","Kept on the drive",P2],
+ ["Repositories of any size, on your own drive","Within GitHub's size guidance","Opened in Fabrica straight from the drive since 6.86, at any size (read only)",NOW],
+ ["Working on the drive: versions, ideas, tags and merges kept there","Yes, on GitHub","Shown in this preview: kept in the repository on the drive, in git's own format",P2],
+ ["Large files kept whole in the history","Files over 100 MB only through Git LFS, within its limits","Kept whole on the drive; listed with their size since 6.86, never read whole",NOW],
  ["Search in the code","Yes","In one repository",NOW],
- ["Search every repository at once, by words or by meaning","By words","",BEY],
+ ["Search every repository at once, by words or by meaning","By words","By words since 6.86; by meaning in this preview",BEY],
  ["A copy to work on apart (a fork), or a template","Yes","Yes: Fork keeps the whole history; Use as a template starts afresh",NOW],
  ["Issues and pull requests"],
  ["Issues with labels and comments","Yes","Yes, and every issue brought from GitHub",NOW],
@@ -24,10 +25,10 @@ var MAP=[["Code and versions"],
  ["Pull requests: conversation, versions, files changed","Yes","Yes",NOW],
  ["Reviews: approve or ask for changes","Yes","Yes",NOW],
  ["Comments on a line of the changes","Yes","",P2],
- ["Merge, squash or rebase","Yes","Merge",P2],
+ ["Merge, squash or rebase","Yes","Yes, since 6.86; on the drive itself in this preview",NOW],
  ["Rules before main (a review, the checks)","Yes","",P2],
  ["Discussions","Yes","",P2],
- ["A review of a pull request by your own model, offline","Copilot, online","",BEY],
+ ["A review of a pull request by your own model, offline","Copilot, online","Since 6.86 (Ingenium, in Test and ship)",BEY],
  ["Actions"],
  ["Checks on each version","Yes","Fabrica's own five checks",NOW],
  ["Your workflows (.github/workflows) on your own machines","On GitHub's machines, with minutes counted for private repositories, or on machines you add","",P3],
@@ -38,14 +39,14 @@ var MAP=[["Code and versions"],
  ["Releases with their files","Yes","Yes; brought from GitHub with their fingerprints",NOW],
  ["Wiki with each page's history","Yes","Yes",NOW],
  ["Projects: a board of To do, In progress, Done","Yes","Yes",NOW],
- ["Release notes written for you from the versions","A list made from the pull requests","",BEY],
+ ["Release notes written for you from the versions","A list made from the pull requests","Since 6.86, by your own model",BEY],
  ["Insight and safety"],
  ["Insights: activity, contributors","Yes","Yes (Care, Overview)",NOW],
  ["Secrets left in the code, the parts and their licences","Yes, online","",P2],
  ["What changed while you were away (notifications)","Yes","",P2],
- ["Open any version as the app itself","","",BEY],
- ["A second copy on another drive, checked every week","","",BEY],
- ["Each repository beside its app's folder and conversations","","",BEY],
+ ["Open any version as the app itself","","Since 6.86 (Any version, live)",BEY],
+ ["A second copy on another drive, checked every week","","In this preview",BEY],
+ ["Each repository beside its app's folder and conversations","","Since 6.86 (Its folder)",BEY],
  ["Nothing leaves your computer; GitHub stays the backup","","",BEY]];
 var KEYS=[["all","All"],[NOW,NOW],[P2,P2],[P3,P3],[P4,P4],[BEY,BEY]],SEL="all";
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -54,9 +55,8 @@ function paint(){var k=document.getElementById("mapKeys");k.innerHTML="";KEYS.fo
   var R=document.getElementById("mapRows");R.innerHTML="";var grp=null;
   MAP.forEach(function(r){if(r.length===1){grp=r[0];return;}if(SEL!=="all"&&r[3]!==SEL)return;if(grp){var g=document.createElement("div");g.className="grp";g.textContent=grp;R.appendChild(g);grp=null;}
     var d=document.createElement("div");d.className="row";d.innerHTML="<b>"+esc(r[0])+"</b><span>GitHub: "+esc(r[1]||"no")+"</span><span>Fabrica: "+esc(r[2]||"not yet")+'</span><span class="ph '+cls(r[3])+'">'+esc(r[3])+"</span>";R.appendChild(d);});}
-var ORDER=[["Next","Your repositories opened from the drive: code, versions, branches, tags, Compare, Blame, and the issues, pull requests and releases brought from GitHub. With it, the drawer's second filter in Folders."],
-  ["Then","Working on the drive: new versions, branches and tags; merge, squash or rebase; comments on a line; milestones and people; rules before main; a second copy on another drive."],
-  ["Then","Ingenium beside you: your model explains a version, reviews a pull request, writes the release notes and the message; search every repository, by meaning too."],
+var ORDER=[["Done in 6.86","Your repositories opened from the drive, at any size, read only: code, versions, branches, tags, Compare, Blame, and the issues brought from GitHub; Ingenium in Test and ship; merge, squash or rebase; the drawer's second filter in Folders."],
+  ["Next (this preview)","Working on the drive: new versions, ideas and tags kept there; merges made there; comments on a line; milestones and people; rules before main; what changed while you were away; a second copy on another drive; search by meaning."],
   ["Phase 3, then phase 4","Your workflows on the Mac mini and the HP laptop, with every log kept; then the test machines."]];
 var O=document.getElementById("mapOrder");ORDER.forEach(function(x){var d=document.createElement("div");d.innerHTML="<b>"+esc(x[0])+"</b>"+esc(x[1]);O.appendChild(d);});
 paint();})();

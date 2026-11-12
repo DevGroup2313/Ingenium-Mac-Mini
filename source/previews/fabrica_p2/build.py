@@ -1,10 +1,11 @@
 """Fabrica's phase 2 preview, built from Fabrica itself: the window's frame (pictures of the app), the real #fb with its captured
 rooms, every style rule and keyframe that draws it, and the phase 2 pieces in its own forms.
-    python3 -I build.py <scratch> <out.html>"""
+    python3 -I build.py <scratch> <out.html> [capture folder in <scratch>, fabcap by default; fabcap686 for the second stage, from 6.86]"""
 import sys, json, re, io, base64
 from PIL import Image
 S, OUT = sys.argv[1:3]
-C = S + '/fabcap/'; F = C + 'frame/'; H = S + '/preview/fabrica_p2/'
+CAP = sys.argv[3] if len(sys.argv) > 3 else 'fabcap'
+C = S + '/' + CAP + '/'; F = S + '/fabcap/frame/'; H = S + '/preview/fabrica_p2/'  # the frame's pictures are the same app's: kept from the first capture
 parts = json.load(open(C + 'parts.json', encoding='utf-8'))
 g = json.load(open(F + 'geometry.json'))['day']
 T, L, RX = g['T'], g['L'], g['RX']
@@ -30,6 +31,7 @@ def fill(html, i, inner):
     return html[:m.end(1)] + inner + html[m.start(2):]
 sk = fill(sk, 0, parts['left']); sk = fill(sk, 1, ''); sk = fill(sk, 2, '')
 views = json.dumps(parts['views']).replace('</', '<\\/'); right = json.dumps(parts['right']).replace('</', '<\\/')
+branch = json.dumps(parts.get('branchList')).replace('</', '<\\/')
 page_css = r'''
 :root{--pg:#e9e6ef;--pgink:#4a4358;--pgink2:#6c6579;--pgline:rgba(34,26,46,.12);--pgkey:#ffffff;--pgacc:#6a3fb5;--pgcard:#faf8fc;--pgok:#2f7a55;--pgoks:rgba(47,122,85,.12);--pgwarn:#9a5a12;--pgwarns:rgba(184,116,46,.12)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pg:#0b0910;--pgink:#d3c9e3;--pgink2:#a99cc1;--pgline:rgba(205,184,240,.14);--pgkey:#211a2d;--pgacc:#b79ce6;--pgcard:#17121f;--pgok:#7fd1a6;--pgoks:rgba(127,209,166,.14);--pgwarn:#e6b26a;--pgwarns:rgba(230,178,106,.14);color-scheme:dark}}
@@ -74,7 +76,7 @@ body{background:var(--pg);color:var(--pgink);font:14px/1.5 -apple-system,BlinkMa
 @media (max-width:760px){.row{grid-template-columns:minmax(0,1fr) auto}.row span{grid-column:1/-1}.row .ph{grid-row:1;grid-column:2}}
 @media (prefers-reduced-motion:reduce){.tg,.win *{transition:none!important;animation:none!important}}
 ''' % {'T': T, 'L': L, 'RX': RX, 'RW': 1440 - RX, 'RH': 900 - T}
-body = '''<div class="bar"><span><b>Ingenium</b> · Fabrica, phase 2: every repository on your own disk (a preview)</span><span class="keys"><button class="tg" id="soundKey" type="button" aria-pressed="true">Sound on</button><button class="tg" id="themeKey" type="button">Night</button><button class="tg" id="againKey" type="button">Start again</button></span></div>
+body = '''<div class="bar"><span><b>Ingenium</b> · Fabrica, phase 2, second stage: working on your own drive (a preview)</span><span class="keys"><button class="tg" id="soundKey" type="button" aria-pressed="true">Sound on</button><button class="tg" id="themeKey" type="button">Night</button><button class="tg" id="againKey" type="button">Start again</button></span></div>
 <div class="stage" id="stage"><div class="fit" id="fit">
 <div class="win" id="win" data-theme="day">
 <script>(function(){try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.getAttribute("data-theme")!=="light")document.getElementById("win").setAttribute("data-theme","night");}catch(e){}})();</script>
@@ -85,11 +87,11 @@ body = '''<div class="bar"><span><b>Ingenium</b> · Fabrica, phase 2: every repo
   <div class="pvf-right" aria-hidden="true"><img class="only-day" alt="" src="%(right_day)s"><img class="only-night" alt="" src="%(right_night)s"></div>
   <div class="pv-toast" id="pvToast" role="status" aria-live="polite"></div>
 </div></div></div>
-<p class="note"><b>A preview, drawn from Fabrica itself.</b> This is Fabrica as it is in the app today, with what phase 2 adds in its own pieces: <b>On this computer</b> in Your apps (your repositories read straight from the drive, at any size); their size and drive beside the name; the branch in Ingenium's own list; in Plans, a pull request brought in by merge, squash or rebase; and a fourth part beside Test, Ship and Copies: <b>Ingenium</b>, your own model reading the repository with no connection. Also new here: <b>what changed while you were away</b>, at the top of Your apps; <b>People and a milestone</b> on an issue or a pull request; a <b>comment on any line</b> of a pull request's Files changed (the + beside a line), with Resolve, and <b>Viewed</b>; <b>Rules before main</b> in Care, Settings, where every section now opens and shuts; and <b>Safety, on every version</b> in Care, Checks. Press the rooms (Now, Story, Plans, Care), their tabs, the pull request and the issue in Plans, the branch, and the parts on the right. The repositories, logos and words are invented; the top bar and the side list are pictures of the app.</p>
+<p class="note"><b>A preview, drawn from Fabrica itself.</b> This is Fabrica as it is in Ingenium 6.86, captured from the app: <b>On this computer</b> in Your apps, the drive line under the work's header, the branch key's own list, a pull request brought in by merge, squash or rebase, and the fourth part beside Test, Ship and Copies, <b>Ingenium</b>. What the second stage adds is shown in those pieces: <b>working on the drive</b> (Now, Changes: the changes in its folder, made here or in any other program; Keep this version keeps it in the repository on the drive, in git's own format, and Story, History shows it at once); new ideas, releases and merges made there too; <b>A second copy</b> on another drive, checked every week by fingerprint (Ingenium part); and <b>Find by what it means</b> beside Find by its words. Also for this stage, from the other chat's additions: <b>what changed while you were away</b>, <b>People and a milestone</b>, a <b>comment on any line</b> of a pull request's Files changed with Resolve and Viewed, <b>Rules before main</b> (Care, Settings) and <b>Safety, on every version</b> (Care, Checks). Press the rooms (Now, Story, Plans, Care), their tabs, Keep this version, the branch, the pull request and the issue, and the parts on the right. The repositories, logos and words are invented; the top bar and the side list are pictures of the app.</p>
 '''
 data = {'fb': sk}; data.update(pic)
 body = body % data
 map_html = open(H + 'map.html', encoding='utf-8').read()
 out = ('<title>Fabrica on Your Disk</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<style>\n' + page_css + '\n' + toks + '\n' + rules + '\n' + frames + '\n' + add + '\n</style>\n' + body + map_html +
-       '<script type="application/json" id="pvViews">' + views + '</script>\n<script type="application/json" id="pvRight">' + right + '</script>\n<script>\n' + open(H + 'app.js', encoding='utf-8').read() + '</script>\n')
+       '<script type="application/json" id="pvViews">' + views + '</script>\n<script type="application/json" id="pvRight">' + right + '</script>\n<script type="application/json" id="pvBranch">' + branch + '</script>\n<script>\n' + open(H + 'app.js', encoding='utf-8').read() + '</script>\n')
 open(OUT, 'w', encoding='utf-8').write(out); print('written', OUT, round(len(out) / 1e6, 2), 'MB')

@@ -33,3 +33,17 @@ Built into Ingenium 6.86 from version 3: modules/r280.js and desktop/app_disk_68
 the app says more than the preview did, it says what is true of the app: a drive tile shows its size alone (the narrow tiles cut
 "· kept"), the apps kept inside Ingenium stand under "Kept in Ingenium" (the preview said "In this window"), the drive line adds "read only
 for now", and A second copy says it comes in the next stage.
+
+Version 4 (12 November 2026, same address): the second stage of phase 2, working on the drive, shown in Fabrica as Ingenium 6.86 draws
+it. Captured from the 6.86 release page by tools/capture_fabrica_686.js (the kit's capture with three additions: changes waiting to be
+kept in quill-notes, the Ingenium part of Test and ship as modules/r280.js draws it, and the branch key's own list), so the drive line, On
+this computer, the branch list, the merge choices and the Ingenium part use the app's own markup and style rules (45 rules of r280).
+What the second stage adds, in those pieces: Now, Changes shows the changes in the repository's folder on the drive, made in Ingenium or
+in any other program, and Keep this version keeps them in the repository on the drive in git's own format (Story, History shows the new
+version at once); new ideas, releases (tags) and merges are made there too; A second copy keeps every version on another drive, chosen in
+Ingenium's own list, checked by fingerprint every day, every Sunday or by hand; Find offers By its words (as 6.86) and By what it means.
+It keeps all of the other chat's additions. The parity map records what 6.86 delivered. To build it:
+    node tools/capture_fabrica_686.js <6.86 page url> <S>/fabcap686 <S>/fabcap/logos.json
+    python3 -I build.py <S> <out.html> fabcap686
+    node tools/check_v4.js <out.html> <out folder>
+Waiting for her answer before any of it is built into Ingenium.

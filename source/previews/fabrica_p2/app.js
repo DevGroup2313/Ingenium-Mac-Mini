@@ -2,6 +2,8 @@
 "use strict";
 var D=document,W=window,win=D.getElementById("win"),fitBox=D.getElementById("fit"),stage=D.getElementById("stage");
 var V=JSON.parse(D.getElementById("pvViews").textContent),R=JSON.parse(D.getElementById("pvRight").textContent);
+/* 6.86's own list for the branch key (modules/r280.js), as the app drew it */
+var BL=(function(){try{return JSON.parse(D.getElementById("pvBranch").textContent);}catch(e){return null;}})();
 var fb=D.getElementById("fb"),P=fb.querySelectorAll(".f-panels > .f-pn"),L=P[0],M=P[1],RT=P[2];
 function el(t,c,h){var e=D.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
 function txt(e){return (e&&e.textContent||"").replace(/\s+/g," ").trim();}
@@ -49,7 +51,7 @@ function openList(anchor,items,cur,onPick){closePop();var r=anchor.getBoundingCl
 /* ---------- the work: rooms and their views, as captured from Fabrica itself ---------- */
 var ROOMS={now:["changes","files","code"],story:["history","compare","releases"],plans:["ideas","issues","pulls","projects","wiki"],care:["checks","overview","settings"]};
 var SUBN={changes:"Changes",files:"Files",code:"Code",history:"History",compare:"Compare",releases:"Releases",ideas:"Ideas",issues:"Issues",pulls:"Pull requests",projects:"Projects",wiki:"Wiki",checks:"Checks",overview:"Overview",settings:"Settings"};
-var cur={repo:"quill",room:"now",sub:"changes",branch:"main",merged:false,how:"Squash and merge"};
+var cur={repo:"quill",room:"now",sub:"changes",branch:"main",merged:false,how:"squash"};
 function key(){return cur.room+"-"+cur.sub;}
 var MK="now-changes";
 function showMid(k){MK=V[k]?k:"now-changes";M.innerHTML=V[k]||V["now-changes"];if(!still())[].forEach.call(M.querySelectorAll(".f-pn-b"),function(b){b.style.animation="none";void b.offsetWidth;b.style.animation="";});
@@ -58,21 +60,23 @@ function chipLike(ref,text,title){var c=ref.cloneNode(false);c.removeAttribute("
 function dressMid(k){var head=M.querySelector(".f-pn-h");
   if(head){var kept=[].filter.call(head.querySelectorAll("button,span"),function(x){return /^Kept$/.test(txt(x));})[0];
     /* where it lives, under the header (the header keeps its own keys, uncrowded) */
-    if(!M.querySelector(".pv-disk")){var dl=el("div","pv-disk",'<span class="pv-dot"></span><span>From <b>Studio SSD</b> · 2.1 GB, every version · no size limit</span>');head.parentNode.insertBefore(dl,head.nextSibling);}
-    var br=[].filter.call(head.querySelectorAll("button,span"),function(x){return /^(main|night-reader)$/.test(txt(x));})[0];
-    if(br){br.setAttribute("data-pv-branch","1");if(txt(br)!==cur.branch)[].forEach.call(br.childNodes,function(n){if(n.nodeType===3&&n.textContent.trim())n.textContent=cur.branch;});
-      br.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();openList(br,["main","night-reader","print-colour","v3.2 (a tag)"],cur.branch,function(v){if(/tag/.test(v)){say("In the app: the code as it was at v3.2 opens beside today's.");return;}cur.branch=v;showMid(key());say("Now showing "+v+": read from the drive as you look.");});});}}
-  if(k==="plans-pr"){var box=M.querySelector("#hPrMergeBox");if(box){var mk=box.querySelector("#hPrMerge");
-      if(cur.merged){box.innerHTML='<b class="h-big">Brought into main</b>On the drive, at once ('+cur.how.toLowerCase()+'). The branch night-reader is kept until you remove it.';}
-      else{var seg=el("div","f-seg");seg.setAttribute("role","group");seg.setAttribute("aria-label","How to bring it in");seg.appendChild(el("span","f-thumb"));
-        ["Merge","Squash and merge","Rebase and merge"].forEach(function(h){var b=el("button",null,h);b.type="button";b.setAttribute("aria-pressed",h===cur.how?"true":"false");
-          b.addEventListener("click",function(){cur.how=h;[].forEach.call(seg.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});thumbs(box);if(mk)mk.textContent=h==="Merge"?"Merge into main":h==="Squash and merge"?"Squash into main":"Rebase onto main";});seg.appendChild(b);});
-        var row=mk&&mk.parentNode;if(row)box.insertBefore(seg,row);if(mk){mk.textContent=cur.how==="Merge"?"Merge into main":cur.how==="Squash and merge"?"Squash into main":"Rebase onto main";
-          mk.addEventListener("click",function(e){e.preventDefault();cur.merged=true;showMid("plans-pr");say("Brought into main on this computer: "+cur.how.toLowerCase()+".");});}
-        var note=el("div","f-hint pv-new","New: squash and rebase, and a rule that main needs your review first.");box.appendChild(note);}}
-    var ap=[].filter.call(M.querySelectorAll("button"),function(x){return txt(x)==="Ask for changes";})[0];
-    if(ap){var ai=ap.cloneNode(true);ai.textContent="Ask Ingenium to review it";ai.classList.add("pv-ask");ap.parentNode.insertBefore(ai,ap.nextSibling);
-      ai.addEventListener("click",function(e){e.preventDefault();openRight("ingenium");ask("review");});}}
+    /* where it lives, under the header: 6.86's own line (modules/r280.js), in the words of the second stage */
+    if(!M.querySelector("#fbDiskLine")){var dl=el("div","r280-disk",'<span class="r280-dot"></span><span>From <b>Studio SSD</b> · 2.1 GB, every version · no size limit · kept on the drive as you work</span>');dl.id="fbDiskLine";dl.setAttribute("role","note");head.parentNode.insertBefore(dl,head.nextSibling);}
+    var br=M.querySelector("#fbBranch");
+    if(br){br.setAttribute("data-pv-branch","1");var bn=br.querySelector("#fbBranchName");if(bn)bn.textContent=cur.branch;
+      br.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();branchList(br);});}
+    var chip=M.querySelector("#fbWorkChip");if(chip&&KEPT){chip.className="f-chip";chip.innerHTML='<span class="d"></span>Kept';}}
+  var says=M.querySelector("#fbRoomSays");if(says&&cur.room==="now")says.textContent="Its folder on the drive as it is now: what changed since the version you last kept, here or in any other program, all its files, and its code to read line by line.";
+  if(k==="now-changes"&&KEPT){var wb=M.querySelector("#fbWorkBody"),wf=M.querySelector("#fbWorkFoot");if(wb)wb.innerHTML='<div class="f-empty"><b>Nothing changed since the last version</b>Every change you make here, or in any program in its folder on the drive, lands here first, file by file. You keep it as a version when it is right.</div>';if(wf)wf.innerHTML="";}
+  if(k==="now-changes"&&!KEPT)dressKeep();
+  if(k==="story-history"&&KEPT)dressNewVersion();
+  if(k==="plans-pr"){var box=M.querySelector("#hPrMergeBox");if(box){var mk=box.querySelector("#hPrMerge"),seg=box.querySelector("#hPrHow"),HOW={merge:"Merge into main",squash:"Squash into main",rebase:"Rebase onto main"},NAME={merge:"Merge",squash:"Squash and merge",rebase:"Rebase and merge"};
+      if(cur.merged){box.innerHTML='<b class="h-big">Brought into main, on the drive</b>'+NAME[cur.how]+', in the repository on the drive itself: any git program sees it. The idea night-reader is kept until you take it away.';}
+      else{if(seg){[].forEach.call(seg.querySelectorAll("button"),function(b){var s0=b.getAttribute("data-s");b.setAttribute("aria-pressed",s0===cur.how?"true":"false");
+            b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();cur.how=s0;[].forEach.call(seg.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});thumbs(box);if(mk)mk.textContent=HOW[s0];});});}
+        if(mk){mk.textContent=HOW[cur.how];mk.disabled=false;mk.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();cur.merged=true;showMid("plans-pr");say("Brought into main on the drive: "+NAME[cur.how].toLowerCase()+".");});}
+        box.appendChild(el("div","f-hint pv-new","In the second stage, the merge is made in the repository on the drive itself; Rules before main (Care, Settings) can hold it until your review."));}}
+    var ai=M.querySelector("#hPrAskIng");if(ai)ai.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();openRight("ingenium");setTimeout(function(){ask("review");},60);});}
   if(/^plans-pr|^plans-issue$/.test(k))dressPeople(k);
   if(k==="plans-pr-files")dressLines();
   if(k==="care-settings"){dressAbout();dressRules();}
@@ -81,6 +85,30 @@ function dressMid(k){var head=M.querySelector(".f-pn-h");
   if(k==="now-files"){var rows=M.querySelectorAll(".f-file,.h-file,.f-fl,li");var last=rows[rows.length-1];if(last&&last.parentNode){var big=last.cloneNode(true);
       [].forEach.call(big.querySelectorAll("*"),function(n){if(n.children.length===0&&/\S/.test(n.textContent)&&!/^\d/.test(n.textContent.trim()))n.textContent="";});
       var tn=[].filter.call(big.querySelectorAll("*"),function(n){return n.children.length===0;})[0];if(tn)tn.textContent="models/quill-base.gguf · 1.4 GB · kept whole, read from the drive when opened";last.parentNode.appendChild(big);}}}
+/* ---------- the second stage: changes kept as a version in the repository on the drive ---------- */
+var KEPT=false,KEPTMSG="";
+function dressKeep(){var w=M.querySelector("#fbWrite"),m=M.querySelector("#fbMsg"),k=M.querySelector("#fbKeep");
+  if(w)w.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(m)m.value="The reader keeps your own choice\n\nThe guide says your notes stay on your computer.";});
+  if(k)k.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();var t=m?m.value.trim():"";if(!t){if(m)m.focus();say("A few words first: what changed?");return;}
+    KEPT=true;KEPTMSG=t.split("\n")[0];var tile=L.querySelector(".f-repo[aria-pressed=\"true\"] .stl span:last-child");if(tile)tile.textContent="Kept · to test";
+    cur.room="story";cur.sub="history";showMid("story-history");say("Kept on the drive as version 4c1d2e7, in git's own format: any git program sees it.");});}
+function dressNewVersion(){var h=M.querySelector(".f-hist");if(!h||h.querySelector(".pv-just"))return;var first=h.querySelector(".f-cm");if(!first)return;var n=first.cloneNode(true);n.classList.add("pv-just");
+  var b=n.querySelector(".fr-cmh > b");if(b)b.textContent=KEPTMSG||"The reader keeps your own choice";var meta=n.querySelector(".meta");
+  if(meta){var sp=meta.querySelectorAll("span");if(sp[0])sp[0].textContent="Just now";var id=meta.querySelector(".id");if(id)id.textContent="4c1d2e7";}
+  [].forEach.call(first.querySelectorAll(".meta .f-chip"),function(c){c.remove();});h.insertBefore(n,first);}
+function branchList(anchor){closePop();if(!BL)return;var wr=win.getBoundingClientRect(),s0=wr.width/1440,r=anchor.getBoundingClientRect(),hold=el("div");hold.innerHTML=BL;var pop=hold.firstChild;
+  pop.style.position="absolute";pop.style.left=Math.round((r.left-wr.left)/s0)+"px";pop.style.top=Math.round((r.bottom-wr.top)/s0+6)+"px";pop.style.zIndex="90";
+  [].forEach.call(pop.querySelectorAll(".r172-opt"),function(o){var t=txt(o);o.classList.toggle("r172-act",t===cur.branch);o.setAttribute("aria-selected",t===cur.branch?"true":"false");
+    o.addEventListener("pointerenter",function(){[].forEach.call(pop.querySelectorAll(".r172-opt"),function(c){c.classList.remove("r172-act");});o.classList.add("r172-act");});
+    o.addEventListener("click",function(){closePop();if(/^All the ideas/.test(t)){cur.room="plans";cur.sub="ideas";showMid("plans-ideas");return;}
+      if(/^v\d/.test(t)){say("Showing quill-notes as it was at "+t+". Nothing is changed.");return;}if(t===cur.branch)return;
+      cur.branch=t;showMid(key());say("Now working on “"+t+"”, in the repository on the drive: your files follow it.");});});
+  win.appendChild(pop);POP=pop;setTimeout(function(){D.addEventListener("pointerdown",outside,true);},0);}
+/* what each key does in the second stage, said as the app would say it */
+var DRIVE={"＋ New idea from here":"A new idea, “night-print”, made in the repository on the drive: any git program sees it.","Work on this":"Now working on “night-reader”, on the drive: your files follow it.",
+  "Bring it into main":"Brought into main on the drive.","Take it away":"In the app: Fabrica asks first, then takes the idea away on the drive; versions already in main stay.",
+  "Mark the version kept now as a release":"v3.3 is kept on the drive as a tag, with its notes: any git program sees it.","Save the whole history (git bundle)":"In the app: the whole history, from the drive, saved as one file.",
+  "Put it back":"Put back in its folder on the drive, as it was in the version kept.","Put this part back":"That part is put back in its folder on the drive."};
 /* ---------- phase 2: people and a milestone on issues and pull requests (Ingenium's own list) ---------- */
 var PEOPLE="Ada",MILE="v3.3";
 function dressPeople(k){var meta=M.querySelector(".h-meta");if(!meta||M.querySelector(".pv-meta2"))return;
@@ -134,6 +162,7 @@ M.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(
   if(b.closest(".pv-lcbox")||b.classList.contains("pv-lc")||b.closest(".pv-safe")||b.closest(".pv-rules")||b.hasAttribute("data-pv-meta"))return;
   if(/All pull requests/.test(t)){cur.sub="pulls";showMid(key());return;}
   if(b.hasAttribute("data-pv")||b.hasAttribute("data-pv-branch")||b.classList.contains("pv-ask")||b.closest("#hPrMergeBox"))return;
+  if(DRIVE[t]){say(DRIVE[t]);return;}
   if(b.tagName==="BUTTON"&&!b.closest(".f-seg"))say("In the app: "+t.toLowerCase()+".");});
 
 /* ---------- your repositories: on this computer, and in this window ---------- */
@@ -147,67 +176,73 @@ function dressNews(){var list=L.querySelector(".f-repos");if(!list||L.querySelec
   list.parentNode.insertBefore(k,list);}
 function dressLeft(){dressNews();var list=L.querySelector(".f-repos");if(!list)return;var tiles=[].slice.call(list.querySelectorAll(".f-repo"));
   var by={};tiles.forEach(function(t){by[txt(t.querySelector(".nm"))]=t;});
-
-  function sec(title,sub){var s=el("div","pv-sec","<b>"+title+"</b><span>"+sub+"</span>");return s;}
-  function st(t,words){var s=t.querySelector(".stl span:last-child");if(s)s.textContent=words;}
+  /* 6.86's own sections (modules/r280.js): On this computer, and Kept in Ingenium */
+  function sec(title,sub){return el("div","r280-sec","<b>"+title+"</b><span>"+sub+"</span>");}
   list.innerHTML="";list.appendChild(sec("On this computer · 2","Studio SSD · 1.8 TB free · no size limit"));
-  var g1=el("div","f-repos pv-grid");["quill-notes","ledger"].forEach(function(n){if(by[n]){g1.appendChild(by[n]);}});list.appendChild(g1);
-  st(by["quill-notes"],"2.1 GB · kept");st(by["ledger"],"1.2 GB · kept");
-  list.appendChild(sec("In this window","small apps made in Fabrica"));var g2=el("div","f-repos pv-grid");if(by["harbour-garden"])g2.appendChild(by["harbour-garden"]);list.appendChild(g2);
+  var g1=el("div","f-repos r280-grid");["quill-notes","ledger"].forEach(function(n){if(by[n])g1.appendChild(by[n]);});list.appendChild(g1);
+  list.appendChild(sec("Kept in Ingenium · 1","made or brought into Fabrica, kept in Ingenium itself"));var g2=el("div","f-repos r280-grid");if(by["harbour-garden"])g2.appendChild(by["harbour-garden"]);list.appendChild(g2);
   tiles.forEach(function(t){t.setAttribute("aria-pressed",txt(t.querySelector(".nm"))==="quill-notes"?"true":"false");
-    t.addEventListener("click",function(){var n=txt(t.querySelector(".nm"));if(n!=="quill-notes"){say("In the app: "+n+" opens the same way, read from "+(n==="ledger"?"the drive":"this window")+".");}});});
-  var foot=L.querySelector(".f-pn-f");if(foot){var any=foot.querySelector("button");if(any){var add=any.cloneNode(true);add.textContent="Add one from this computer";add.removeAttribute("id");
-      add.addEventListener("click",function(){say("In the app: choose any folder that holds a git repository, on any drive.");});foot.insertBefore(add,foot.firstChild);}}}
+    t.addEventListener("click",function(){var n=txt(t.querySelector(".nm"));if(n!=="quill-notes")say("In the app: "+n+" opens the same way, "+(n==="ledger"?"from the drive":"kept in Ingenium")+".");});});
+  var hub=L.querySelector("#fbHubBring"),foot=L.querySelector(".f-pn-f");if(!L.querySelector("#fbDiskAdd")&&(hub||foot)){var add=el("button","f-btn r280-key","Add one from this computer");add.type="button";add.id="fbDiskAdd";
+    add.addEventListener("click",function(){say("In the app: choose any folder that holds a git repository, on any drive.");});if(hub)hub.parentNode.insertBefore(add,hub.nextSibling);else foot.appendChild(add);}}
 
-/* ---------- test and ship, and a fourth part: Ingenium, beyond GitHub ---------- */
+/* ---------- test and ship, with 6.86's fourth part, Ingenium (modules/r280.js), each captured as the app draws it ---------- */
 var part="test";
-function showRight(p){RT.innerHTML=R[p==="ingenium"?"Test":p.charAt(0).toUpperCase()+p.slice(1)]||R.Test;dressRight(p);
+function showRight(p){RT.innerHTML=R[p.charAt(0).toUpperCase()+p.slice(1)]||R.Test;dressRight(p);
   /* a part opens at its top, its tabs in view */
   RT.scrollTop=0;[].forEach.call(RT.querySelectorAll(".f-pn-b,.fr-tabs,[class*=scroll]"),function(x){x.scrollTop=0;});requestAnimationFrame(function(){thumbs(RT);RT.scrollTop=0;});}
 function openRight(p){part=p;showRight(p);}
-function dressRight(p){var tabs=RT.querySelector('[role="tablist"],.f-seg');var copies=RT.querySelector("#fbPart_copies");
-  if(copies&&!RT.querySelector("#fbPart_ingenium")){var ing=copies.cloneNode(true);ing.id="fbPart_ingenium";ing.setAttribute("data-part","ingenium");ing.textContent="Ingenium";copies.parentNode.insertBefore(ing,copies.nextSibling);}
-  [].forEach.call(RT.querySelectorAll(".fr-part"),function(b){var on=b.getAttribute("data-part")===p;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;
-    b.onclick=function(e){e.preventDefault();openRight(b.getAttribute("data-part"));};});
-  if(p==="ingenium"){[].forEach.call(RT.querySelectorAll('[id^="fbPartSec_"]'),function(s){s.hidden=true;});var host=RT.querySelector('[id^="fbPartSec_"]');host=host?host.parentNode:RT.querySelector(".f-pn-b")||RT;
-    var box=el("div","pv-ing");box.innerHTML='<div class="pv-ing-h"><b>Beyond GitHub, with Ingenium</b><span class="f-chip">Offline</span></div>'+
-      '<p class="f-hint">Your model on this Mac, Magister, reads the repository and answers here. Nothing is sent anywhere.</p>';
-    var ICON={explain:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="M14.6 14.6L19 19M8 10.5h5"/>',review:'<path d="M6 3.5h8l4 4v13H6z"/><path d="M9 13.5l2 2 4-4.5"/>',
-      notes:'<path d="M8 7h9M8 12h9M8 17h6"/><circle cx="5" cy="7" r=".9" fill="currentColor"/><circle cx="5" cy="12" r=".9" fill="currentColor"/><circle cx="5" cy="17" r=".9" fill="currentColor"/>',
-      message:'<path d="M5 6.5h14v9H10l-4 3v-3H5z"/><path d="M8.5 10h7M8.5 12.8h4.5"/>',time:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.8 1.8"/>',
-      copy:'<rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M7.5 8h.01M7.5 16h.01"/>',folder:'<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'};
-    function tile(k,title,line,fn){var t=el("div","f-tg");t.setAttribute("role","button");t.tabIndex=0;t.setAttribute("aria-pressed","false");
-      t.innerHTML='<div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+"</svg><b>"+title+"</b></div><small>"+line+"</small>";
-      function go(){[].forEach.call(t.parentNode.children,function(x){x.setAttribute("aria-pressed",x===t?"true":"false");});fn();}
-      t.addEventListener("click",go);t.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});return t;}
-    box.appendChild(el("div","pv-sub","Ask your model"));
-    var keys=el("div","f-targets pv-tiles");[["explain","Explain","the newest version, in plain words"],["review","Review","the open pull request, line by line"],["notes","Release notes","from the versions since v3.2"],["message","A message","for the changes you are keeping"]].forEach(function(a){
-      keys.appendChild(tile(a[0],a[1],a[2],function(){ask(a[0]);}));});box.appendChild(keys);
-    box.appendChild(el("div","pv-ans","<p class=\"f-hint\">Press a key above: the answer is written here.</p>"));
-    var f=el("form","pv-find");f.innerHTML='<input type="search" placeholder="Find in every repository" aria-label="Find in every repository, by words or by meaning"><button class="f-btn" type="submit">Find</button>';
-    f.addEventListener("submit",function(e){e.preventDefault();var q=f.querySelector("input").value.trim();var hits=box.querySelector(".pv-hits");hits.innerHTML="";if(!q){hits.appendChild(el("p","f-hint","Type a word, or what you mean."));return;}
-      [["quill-notes","app/reader.js · line 3","return matchMedia(\"(prefers-color-scheme: dark)\").matches?\"night\":\"day\";"],["harbour-garden","garden.html · line 812","function theme(){ return state.theme || \"day\"; }"],["ledger","docs/backup.md · line 12","A second copy of the accounts on another drive, checked each week."]].forEach(function(h){
-        hits.appendChild(el("div","pv-hit","<b>"+h[0]+"</b> · "+h[1]+"<code>"+h[2].replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];})+"</code>"));});say("3 found in 3 repositories, by what they mean.");});
-    box.appendChild(f);box.appendChild(el("div","pv-hits"));
-    box.appendChild(el("div","pv-sub","Beyond GitHub"));
-    var more=el("div","f-targets pv-tiles");[["time","Any version, live","the app as it was on any day, in its own window"],["copy","A second copy","on another drive, checked every Sunday"],["folder","Its folder","in Folders: its conversations and notes"]].forEach(function(m){
-      more.appendChild(tile(m[0],m[1],m[2],function(){say("In the app: "+m[1].toLowerCase()+", "+m[2]+".");}));});
-    box.appendChild(more);host.appendChild(box);}
-  /* the footer's key belongs to Test, Ship and Copies: the Ingenium part has none */
-  var ft=RT.querySelector(".f-pn-f");if(ft)ft.hidden=(p==="ingenium");}
+function dressRight(p){[].forEach.call(RT.querySelectorAll(".fr-part"),function(b){b.onclick=function(e){e.preventDefault();openRight(b.getAttribute("data-part"));};});
+  if(p!=="ingenium")return;var sec=RT.querySelector("#fbPartSec_ingenium");if(!sec)return;
+  var wh=sec.querySelector(".r280-where");if(wh)wh.textContent="Your model on this computer, Magister, reads the repository and answers here. Nothing is sent anywhere.";
+  [].forEach.call(sec.querySelectorAll(".r280-tile"),function(t){var k=t.getAttribute("data-k");if(k==="copy"){var sm=t.querySelector("small");if(sm)sm.textContent="on another drive, checked every Sunday";}
+    function go(){[].forEach.call(sec.querySelectorAll(".r280-tile"),function(x){x.setAttribute("aria-pressed",x===t?"true":"false");});
+      if(k==="copy")copyScene();else if(k==="time")liveScene();else if(k==="folder")say("In the app: Folders opens, on the folder named quill-notes: its conversations and notes.");else ask(k);}
+    t.addEventListener("click",go);t.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
+  /* find: by its words, as 6.86 does, or by what it means (the second stage) */
+  var f=sec.querySelector(".r280-find"),hits=sec.querySelector(".r280-hits");if(f&&!sec.querySelector(".pv-how")){var seg=el("div","f-seg pv-how");seg.setAttribute("role","group");seg.setAttribute("aria-label","How to find");seg.appendChild(el("span","f-thumb"));
+    [["words","By its words"],["meaning","By what it means"]].forEach(function(x,i){var b=el("button",null,x[1]);b.type="button";b.setAttribute("data-h",x[0]);b.setAttribute("aria-pressed",i===1?"true":"false");
+      b.addEventListener("click",function(){[].forEach.call(seg.querySelectorAll("button"),function(y){y.setAttribute("aria-pressed",y===b?"true":"false");});thumbs(sec);var inp=f.querySelector("input");if(inp)inp.placeholder=x[0]==="meaning"?"Describe what you are looking for":"Find in every repository";});seg.appendChild(b);});
+    f.parentNode.insertBefore(seg,f);var inp=f.querySelector("input");if(inp)inp.placeholder="Describe what you are looking for";
+    f.addEventListener("submit",function(e){e.preventDefault();var q=inp.value.trim(),by=(seg.querySelector('button[aria-pressed="true"]')||{}).getAttribute?seg.querySelector('button[aria-pressed="true"]').getAttribute("data-h"):"meaning";
+      hits.innerHTML="";if(!q){hits.appendChild(el("p","f-hint",by==="meaning"?"Say what you mean, in your own words: where night mode is chosen, how the accounts are kept safe.":"Type a word or a few: every repository is read for them."));return;}
+      var H=by==="meaning"?[["quill-notes","app/reader.js · line 3","return matchMedia(\"(prefers-color-scheme: dark)\").matches?\"night\":\"day\";"],["harbour-garden","garden.html · line 812","function theme(){ return state.theme || \"day\"; }"],["ledger","docs/backup.md · line 12","A second copy of the accounts on another drive, checked each week."]]
+        :[["quill-notes","app/reader.js · line 2","if(state.theme)return state.theme;"],["harbour-garden","garden.html · line 812","function theme(){ return state.theme || \"day\"; }"]];
+      hits.appendChild(el("p","f-hint",(by==="meaning"?H.length+" found in "+H.length+" repositories, by what they mean (the folder search's own engine, on this computer); ":H.length+" found in "+H.length+" repositories, by their words; ")+"58 files read in 3 repositories."));
+      H.forEach(function(h){var b=el("button","r280-hit","<b>"+h[0]+"</b> · "+h[1]+"<code>"+esc(h[2])+"</code>");b.type="button";b.addEventListener("click",function(){say("In the app: "+h[0]+" opens in Code, at "+h[1].replace(" · "," ")+".");});hits.appendChild(b);});});}
+  requestAnimationFrame(function(){thumbs(sec);});}
+/* a second copy on another drive, checked every week (the second stage) */
+function copyScene(){var box=RT.querySelector(".r280-ans");if(!box)return;clearInterval(TYPE);
+  box.innerHTML='<b class="h-big">A second copy of quill-notes</b><div class="r280-out">Every version, idea and tag, kept whole on another drive, and checked against this one by fingerprint.</div>'+
+    '<div class="pv-copyrow"><span>On</span><button class="f-chip pv-mk" type="button" data-pv-drive>Backup SSD · 1.2 TB free</button></div>'+
+    '<div class="f-seg pv-when" role="group" aria-label="When it is checked"><span class="f-thumb"></span><button type="button" aria-pressed="false">Every day</button><button type="button" aria-pressed="true">Every Sunday</button><button type="button" aria-pressed="false">By hand</button></div>'+
+    '<div class="f-row"><button class="f-btn pri r280-key" type="button" data-pv-copy>Make the copy now</button></div><p class="f-hint pv-copyst">Not copied yet.</p>';
+  var drv=box.querySelector("[data-pv-drive]");drv.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();openList(drv,["Backup SSD · 1.2 TB free","Time Capsule · 3.4 TB free","Choose another folder…"],null,function(v){if(/Choose/.test(v)){say("In the app: the system's folder dialog opens, for any drive.");return;}drv.textContent=v;});});
+  var seg=box.querySelector(".pv-when");[].forEach.call(seg.querySelectorAll("button"),function(b){b.addEventListener("click",function(){[].forEach.call(seg.querySelectorAll("button"),function(y){y.setAttribute("aria-pressed",y===b?"true":"false");});thumbs(box);});});
+  var go=box.querySelector("[data-pv-copy]"),st=box.querySelector(".pv-copyst");go.addEventListener("click",function(){go.disabled=true;var done=0,steps=[0.4,0.9,1.5,2.1];
+    (function next(){if(done<steps.length){st.textContent="Copying every version… "+steps[done].toFixed(1)+" of 2.1 GB";done++;setTimeout(next,still()?0:420);return;}
+      var w=(seg.querySelector('button[aria-pressed="true"]')||{}).textContent||"Every Sunday";
+      st.textContent="Copied and checked just now: every version matches, by fingerprint."+(w==="By hand"?" It is checked again when you ask.":w==="Every day"?" Next check: tomorrow.":" Next check: Sunday 15 November.");go.disabled=false;go.textContent="Check it now";say("A second copy of quill-notes, on "+drv.textContent.replace(/ · .*$/,"")+".");})();});
+  requestAnimationFrame(function(){thumbs(box);});}
+/* any version, live: each opens as the app was then, in a window of its own */
+function liveScene(){var box=RT.querySelector(".r280-ans");if(!box)return;clearInterval(TYPE);
+  box.innerHTML='<b class="h-big">Any version, live</b><div class="r280-out">Choose a version: it opens as the app was then, in a window of its own.</div>';var list=el("div","r280-vers");
+  [["4c1d2e7","Just now",KEPT?(KEPTMSG||"The reader keeps your own choice"):null],["e9e105a","Today","Print in colour"],["v3.2","Today","French for the guide"],["1ab9528","Today","The export keeps its fonts"]].forEach(function(v){if(!v[2])return;
+    var row=el("div","r280-ver","<span><b>"+v[0]+"</b> · "+v[1]+" · "+esc(v[2])+"</span>"),k=el("button","f-btn sm r280-key","Open");k.type="button";k.addEventListener("click",function(){say("quill-notes as it was at "+v[0]+" is open in a window of its own.");});row.appendChild(k);list.appendChild(row);});
+  box.appendChild(list);}
 var TYPE=0;
-function ask(k){var box=RT.querySelector(".pv-ans");if(!box)return;clearInterval(TYPE);
+function ask(k){var box=RT.querySelector(".r280-ans");if(!box)return;clearInterval(TYPE);
   var T={explain:["What the newest version changes",["“Night mode reads the system's choice first.” The reader asks the system whether it is night before it uses its own default, and keeps your choice once you make one.","It touches one function in app/reader.js: three lines in, one out. Nothing you saved is affected."]],
     review:["A review of #4, Night mode for the reader",["It does what it says, and the checks passed.","One thing to look at: line 3 asks the system each time a page is drawn; reading it once at start, and again when the system changes, would be lighter.","A test to add: you chose day while the system is at night."]],
     notes:["Version 3.3: the notes",["Night mode follows your system, and keeps your own choice.","The export keeps its fonts.","The guide is in French too."]],
     message:["A message for your changes",["Night mode reads the system's choice first","The reader asks whether it is night before using its default, and keeps your own choice once made."]]}[k];
-  box.innerHTML="<b class=\"h-big\">"+T[0]+"</b>";var ul=el("ul");box.appendChild(ul);box.appendChild(el("p","f-hint","An example of what your model would write. Nothing is sent anywhere."));
+  box.innerHTML="<b class=\"h-big\">"+T[0]+"</b>";var ul=el("ul");box.appendChild(ul);box.appendChild(el("p","f-hint","Written by Magister. Read it before you use it. (In this preview, an example.)"));
   var items=T[1].slice(),li=null,i=0,j=0;if(still()){items.forEach(function(t){ul.appendChild(el("li",null,t));});return;}
   TYPE=setInterval(function(){if(i>=items.length){clearInterval(TYPE);return;}if(!li){li=el("li");ul.appendChild(li);}j+=3;li.textContent=items[i].slice(0,j);if(j>=items[i].length){i++;j=0;li=null;}},16);}
 
 /* the steps at the top (Change, Keep, Test, Ship) answer as in the app */
 [].forEach.call(fb.querySelectorAll(".f-steps button"),function(b){b.addEventListener("click",function(){say("In the app: "+txt(b).replace(/^\d\s*/,"").toLowerCase()+".");});});
-D.getElementById("againKey").addEventListener("click",function(){cur={repo:"quill",room:"now",sub:"changes",branch:"main",merged:false,how:"Squash and merge"};showMid("now-changes");openRight("test");});
+D.getElementById("againKey").addEventListener("click",function(){cur={repo:"quill",room:"now",sub:"changes",branch:"main",merged:false,how:"squash"};KEPT=false;KEPTMSG="";var tile=L.querySelector(".f-repo[aria-pressed=\"true\"] .stl span:last-child");if(tile)tile.textContent="2 to keep";showMid("now-changes");openRight("test");});
 dressLeft();showMid("now-changes");openRight("test");
 W.addEventListener("load",function(){thumbs(fb);});
 })();
