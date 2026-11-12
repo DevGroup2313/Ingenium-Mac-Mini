@@ -15,7 +15,7 @@ fs.writeFileSync(OUT + '_page.html', wrapped);
       await room('plans'); await p.waitForTimeout(500); await sub('Pull requests'); await p.waitForTimeout(500);
       await p.evaluate(() => { const M = document.querySelectorAll('#fb .f-panels > .f-pn')[1]; const b = [...M.querySelectorAll('button,a,[role=button],.h-row,.h-item')].find(x => /Night mode for the reader/.test(x.textContent)); b && b.click(); }); await p.waitForTimeout(700);
       await p.evaluate(() => { const k = document.querySelector('#fbPart_ingenium'); k && k.click(); }); await p.waitForTimeout(400);
-      await p.evaluate(() => { const b = [...document.querySelectorAll('#fb .pv-asks .f-btn')][1]; b && b.click(); }); await p.waitForTimeout(1600);
+      await p.evaluate(() => { const b = [...document.querySelectorAll('#fb .pv-tiles .f-tg')][1]; b && b.click(); }); await p.waitForTimeout(1600);
       await p.evaluate(() => { const b = document.querySelector('#fb [data-pv-branch]'); b && b.click(); }); await p.waitForTimeout(400);
       const st = await p.evaluate(() => ({ seg: !!document.querySelector('#hPrMergeBox .f-seg'), pop: !!document.querySelector('#win .r172-pop'), ans: document.querySelectorAll('#fb .pv-ans li').length,
         tiles: [...document.querySelectorAll('#fb .f-repo .nm')].map(x => x.textContent), secs: [...document.querySelectorAll('#fb .pv-sec b')].map(x => x.textContent), wide: document.documentElement.scrollWidth - innerWidth }));

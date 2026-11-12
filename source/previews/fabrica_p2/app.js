@@ -51,7 +51,8 @@ var ROOMS={now:["changes","files","code"],story:["history","compare","releases"]
 var SUBN={changes:"Changes",files:"Files",code:"Code",history:"History",compare:"Compare",releases:"Releases",ideas:"Ideas",issues:"Issues",pulls:"Pull requests",projects:"Projects",wiki:"Wiki",checks:"Checks",overview:"Overview",settings:"Settings"};
 var cur={repo:"quill",room:"now",sub:"changes",branch:"main",merged:false,how:"Squash and merge"};
 function key(){return cur.room+"-"+cur.sub;}
-function showMid(k){M.innerHTML=V[k]||V["now-changes"];if(!still())[].forEach.call(M.querySelectorAll(".f-pn-b"),function(b){b.style.animation="none";void b.offsetWidth;b.style.animation="";});
+var MK="now-changes";
+function showMid(k){MK=V[k]?k:"now-changes";M.innerHTML=V[k]||V["now-changes"];if(!still())[].forEach.call(M.querySelectorAll(".f-pn-b"),function(b){b.style.animation="none";void b.offsetWidth;b.style.animation="";});
   dressMid(k);requestAnimationFrame(function(){thumbs(M);});}
 function chipLike(ref,text,title){var c=ref.cloneNode(false);c.removeAttribute("id");c.className=ref.className;c.textContent=text;if(title)c.title=title;c.setAttribute("data-pv","1");return c;}
 function dressMid(k){var head=M.querySelector(".f-pn-h");
@@ -72,21 +73,79 @@ function dressMid(k){var head=M.querySelector(".f-pn-h");
     var ap=[].filter.call(M.querySelectorAll("button"),function(x){return txt(x)==="Ask for changes";})[0];
     if(ap){var ai=ap.cloneNode(true);ai.textContent="Ask Ingenium to review it";ai.classList.add("pv-ask");ap.parentNode.insertBefore(ai,ap.nextSibling);
       ai.addEventListener("click",function(e){e.preventDefault();openRight("ingenium");ask("review");});}}
+  if(/^plans-pr|^plans-issue$/.test(k))dressPeople(k);
+  if(k==="plans-pr-files")dressLines();
+  if(k==="care-settings"){dressAbout();dressRules();}
+  if(k==="care-checks")dressSafety();
   if(k==="story-history"){[].forEach.call(M.querySelectorAll(".h-cmt,.f-ver,.f-vrow,[class*=ver]"),function(x){});}
   if(k==="now-files"){var rows=M.querySelectorAll(".f-file,.h-file,.f-fl,li");var last=rows[rows.length-1];if(last&&last.parentNode){var big=last.cloneNode(true);
       [].forEach.call(big.querySelectorAll("*"),function(n){if(n.children.length===0&&/\S/.test(n.textContent)&&!/^\d/.test(n.textContent.trim()))n.textContent="";});
       var tn=[].filter.call(big.querySelectorAll("*"),function(n){return n.children.length===0;})[0];if(tn)tn.textContent="models/quill-base.gguf · 1.4 GB · kept whole, read from the drive when opened";last.parentNode.appendChild(big);}}}
+/* ---------- phase 2: people and a milestone on issues and pull requests (Ingenium's own list) ---------- */
+var PEOPLE="Ada",MILE="v3.3";
+function dressPeople(k){var meta=M.querySelector(".h-meta");if(!meta||M.querySelector(".pv-meta2"))return;
+  var row=el("div","h-meta h-blk pv-meta2");
+  var ICP='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 3.9-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>',
+      ICM='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4h11l-2.5 4L17 12H6"/></svg>';
+  function chip(ic,label,val,items,set){var b=el("button","f-chip pv-mk");b.type="button";b.setAttribute("data-pv-meta","1");b.title=label;b.innerHTML=ic+"<span>"+label+": <b>"+val+"</b></span>";
+    b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();openList(b,items,null,function(v){var w=v.replace(/ · .*$/,"");set(w);b.querySelector("b").textContent=w;say(label+": "+v+". Kept on this computer.");});});return b;}
+  row.appendChild(chip(ICP,"People",PEOPLE,["Ada","Theo","Ada and Theo","No one"],function(v){PEOPLE=v;}));
+  row.appendChild(chip(ICM,"Milestone",MILE,["v3.3 · due 1 December","v3.4 · due 15 January","No milestone"],function(v){MILE=v;}));
+  meta.parentNode.insertBefore(row,meta.nextSibling);}
+/* ---------- phase 2: a comment on any line of the changes, its thread, Resolve ---------- */
+function esc(t){return String(t).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+function dressLines(){var pre=M.querySelector(".f-dcode");if(!pre)return;
+  var head=M.querySelector(".f-diff-h");if(head&&!head.querySelector(".pv-viewed")){var v=el("label","pv-viewed",'<span>Viewed</span><span class="f-sw"><input type="checkbox" aria-label="Viewed"></span>');
+    v.querySelector("input").addEventListener("change",function(){var on=this.checked;pre.classList.toggle("pv-folded",on);say(on?"Marked as viewed: it folds away until it changes again.":"Not viewed yet.");});head.appendChild(v);}
+  [].forEach.call(pre.querySelectorAll(".f-dl:not(.hunk)"),function(line){if(line.querySelector(".pv-lc"))return;var n=(line.querySelector("i")||{}).textContent||"";
+    var plus=el("button","pv-lc","+");plus.type="button";plus.title="Comment on line "+n;plus.setAttribute("aria-label","Comment on line "+n);line.insertBefore(plus,line.firstChild);
+    plus.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();var nx=line.nextElementSibling;if(nx&&nx.classList.contains("pv-lcbox"))return;openBox(line,n);});});}
+function openBox(line,n){var box=el("div","pv-lcbox");box.innerHTML='<textarea class="pv-lcta" rows="2" placeholder="A comment on line '+n+'"></textarea><div class="pv-lck"><button class="f-btn quiet sm" type="button" data-x="no">Cancel</button><button class="f-btn pri sm" type="button" data-x="go">Comment on line '+n+'</button></div>';
+  line.parentNode.insertBefore(box,line.nextSibling);var ta=box.querySelector("textarea");setTimeout(function(){try{ta.focus({preventScroll:true});}catch(e){}},30);
+  box.addEventListener("click",function(e){var x=e.target.closest&&e.target.closest("[data-x]");if(!x)return;e.preventDefault();e.stopPropagation();
+    if(x.getAttribute("data-x")==="no"){box.remove();return;}var t=ta.value.trim()||"Could this read the system's choice once, at start?";
+    var th=el("div","pv-lcbox pv-thread");th.innerHTML='<article class="h-cmt"><div class="h-cmt-h"><b>Ada</b><span>on line '+n+'</span><span>just now</span></div><div class="h-md"><p>'+esc(t)+'</p></div></article><div class="pv-lck"><button class="f-btn quiet sm" type="button" data-r="1">Resolve</button></div>';
+    th.addEventListener("click",function(ev){var r=ev.target.closest&&ev.target.closest("[data-r]");if(!r)return;ev.preventDefault();ev.stopPropagation();th.classList.toggle("pv-done");r.textContent=th.classList.contains("pv-done")?"Unresolve":"Resolve";say(th.classList.contains("pv-done")?"Resolved: the thread folds away, kept with the pull request.":"Open again.");});
+    box.replaceWith(th);say("Your comment is kept with the pull request, on line "+n+".");});}
+/* ---------- phase 2: rules before main (Care, Settings) ---------- */
+function dressAbout(){[].forEach.call(M.querySelectorAll("input"),function(i){var ph=i.getAttribute("placeholder")||"";if(/one line/i.test(ph)&&!i.value)i.value="A notebook for students, offline";if(/notes, offline/i.test(ph)&&!i.value)i.value="notes, offline, students";});}
+function dressRules(){var star=[].filter.call(M.querySelectorAll(".fr-fold"),function(f){return /The main idea/.test(txt(f.querySelector(".fr-fh")));})[0];if(!star||M.querySelector(".pv-rules"))return;
+  var f=el("div","h-box h-blk fr-fold pv-rules");f.innerHTML='<button type="button" class="fr-fh" aria-expanded="true"><b class="h-big">Rules before main</b><span class="fr-chev" aria-hidden="true">'+((star.querySelector(".fr-chev")||{}).innerHTML||"")+'</span></button><div class="fr-fb">What must be true before anything joins main. Fabrica holds to them on this computer, and GitHub does too when you send it there.</div>';
+  var body=f.querySelector(".fr-fb");[["Only through a pull request","no version goes straight into main",true],["Your review first","main waits for an approval",true],["The checks pass first","Fabrica's checks, and your workflows from phase 3",false],["Kept versions stay as they are","no rewriting of main's history",true]].forEach(function(r){
+    var row=el("div","pv-rule",'<div><b>'+r[0]+'</b><small>'+r[1]+'</small></div><label class="f-sw"><input type="checkbox"'+(r[2]?' checked':'')+' aria-label="'+r[0]+'"></label>');
+    row.querySelector("input").addEventListener("change",function(){say(r[0]+": "+(this.checked?"on":"off")+". Kept for main.");});body.appendChild(row);});
+  star.parentNode.insertBefore(f,star.nextSibling);}
+/* ---------- phase 2: what is checked on every version, beside Fabrica's five ---------- */
+function dressSafety(){var first=M.querySelector(".h-box");if(!first||M.querySelector(".pv-safe"))return;
+  var c=el("div","h-box h-blk pv-safe");c.innerHTML='<b class="h-big">Safety, on every version</b>Read on this computer, with nothing sent anywhere.';
+  [["✓","No secrets left in the code","no key, token or password found in the 6 versions"],["✓","The parts it uses, and their licences","3 parts: 2 under MIT, 1 under Apache 2.0, each kept with its notice"],["✓","Large files kept whole","models/quill-base.gguf, 1.4 GB, in every version that holds it"]].forEach(function(r){
+    var row=el("div","f-ck",'<span class="m">'+r[0]+'</span><div>'+r[1]+'<small>'+r[2]+'</small></div>');row.classList.add("pv-ok");c.appendChild(row);});
+  first.parentNode.insertBefore(c,first.nextSibling);}
 M.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button,a,[role=button],.h-row,.h-item");if(!b||!M.contains(b))return;
   if(b.classList.contains("fr-room")){var rm=b.getAttribute("data-room");if(ROOMS[rm]){cur.room=rm;cur.sub=ROOMS[rm][0];showMid(key());}return;}
   var t=txt(b).replace(/\s*\d+$/,"");
   for(var s in SUBN)if(SUBN[s]===t&&ROOMS[cur.room].indexOf(s)>=0){cur.sub=s;showMid(key());return;}
   if(cur.room==="plans"&&cur.sub==="pulls"&&/Night mode for the reader/.test(txt(b))){showMid("plans-pr");return;}
+  /* phase 2 in the preview: the pull request's three tabs, an issue opened, and every fold of Settings opens and shuts */
+  if(/^plans-pr/.test(MK)&&b.hasAttribute("data-s")){var to={conv:"plans-pr",vers:"plans-pr-versions",files:"plans-pr-files"}[b.getAttribute("data-s")];if(to){showMid(to);return;}}
+  if(cur.room==="plans"&&cur.sub==="issues"&&MK!=="plans-issue"&&/Night mode flashes on start/.test(txt(b))){showMid("plans-issue");return;}
+  if(/All issues/.test(t)){cur.sub="issues";showMid(key());return;}
+  if(b.classList.contains("fr-fh")){var fo=b.closest(".fr-fold");if(fo){var shut=fo.classList.toggle("fr-shut");b.setAttribute("aria-expanded",shut?"false":"true");}return;}
+  if(b.closest(".pv-lcbox")||b.classList.contains("pv-lc")||b.closest(".pv-safe")||b.closest(".pv-rules")||b.hasAttribute("data-pv-meta"))return;
   if(/All pull requests/.test(t)){cur.sub="pulls";showMid(key());return;}
   if(b.hasAttribute("data-pv")||b.hasAttribute("data-pv-branch")||b.classList.contains("pv-ask")||b.closest("#hPrMergeBox"))return;
   if(b.tagName==="BUTTON"&&!b.closest(".f-seg"))say("In the app: "+t.toLowerCase()+".");});
 
 /* ---------- your repositories: on this computer, and in this window ---------- */
-function dressLeft(){var list=L.querySelector(".f-repos");if(!list)return;var tiles=[].slice.call(list.querySelectorAll(".f-repo"));
+function dressNews(){var list=L.querySelector(".f-repos");if(!list||L.querySelector(".pv-newsrow"))return;
+  var k=el("button","pv-newsrow");k.type="button";k.setAttribute("data-pv","1");k.title="What changed while you were away";
+  k.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><span><b>3 new</b> while you were away</span><i aria-hidden="true">›</i>';
+  k.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();openList(k,["#3 Night mode flashes on start · Ada wrote","#4 Night mode for the reader · its checks passed","v3.2 · kept as a release"],null,function(v){
+    k.classList.add("pv-read");k.querySelector("span").innerHTML="<b>All read</b>";
+    if(/^#3/.test(v)){cur.room="plans";cur.sub="issues";showMid("plans-issue");}else if(/^#4/.test(v)){cur.room="plans";cur.sub="pulls";showMid("plans-pr");}else{cur.room="story";cur.sub="releases";showMid("story-releases");}
+    say("Opened from what is new for you.");});});
+  list.parentNode.insertBefore(k,list);}
+function dressLeft(){dressNews();var list=L.querySelector(".f-repos");if(!list)return;var tiles=[].slice.call(list.querySelectorAll(".f-repo"));
   var by={};tiles.forEach(function(t){by[txt(t.querySelector(".nm"))]=t;});
 
   function sec(title,sub){var s=el("div","pv-sec","<b>"+title+"</b><span>"+sub+"</span>");return s;}
@@ -102,7 +161,9 @@ function dressLeft(){var list=L.querySelector(".f-repos");if(!list)return;var ti
 
 /* ---------- test and ship, and a fourth part: Ingenium, beyond GitHub ---------- */
 var part="test";
-function showRight(p){RT.innerHTML=R[p==="ingenium"?"Test":p.charAt(0).toUpperCase()+p.slice(1)]||R.Test;dressRight(p);requestAnimationFrame(function(){thumbs(RT);});}
+function showRight(p){RT.innerHTML=R[p==="ingenium"?"Test":p.charAt(0).toUpperCase()+p.slice(1)]||R.Test;dressRight(p);
+  /* a part opens at its top, its tabs in view */
+  RT.scrollTop=0;[].forEach.call(RT.querySelectorAll(".f-pn-b,.fr-tabs,[class*=scroll]"),function(x){x.scrollTop=0;});requestAnimationFrame(function(){thumbs(RT);RT.scrollTop=0;});}
 function openRight(p){part=p;showRight(p);}
 function dressRight(p){var tabs=RT.querySelector('[role="tablist"],.f-seg');var copies=RT.querySelector("#fbPart_copies");
   if(copies&&!RT.querySelector("#fbPart_ingenium")){var ing=copies.cloneNode(true);ing.id="fbPart_ingenium";ing.setAttribute("data-part","ingenium");ing.textContent="Ingenium";copies.parentNode.insertBefore(ing,copies.nextSibling);}
@@ -111,16 +172,26 @@ function dressRight(p){var tabs=RT.querySelector('[role="tablist"],.f-seg');var 
   if(p==="ingenium"){[].forEach.call(RT.querySelectorAll('[id^="fbPartSec_"]'),function(s){s.hidden=true;});var host=RT.querySelector('[id^="fbPartSec_"]');host=host?host.parentNode:RT.querySelector(".f-pn-b")||RT;
     var box=el("div","pv-ing");box.innerHTML='<div class="pv-ing-h"><b>Beyond GitHub, with Ingenium</b><span class="f-chip">Offline</span></div>'+
       '<p class="f-hint">Your model on this Mac, Magister, reads the repository and answers here. Nothing is sent anywhere.</p>';
-    var keys=el("div","pv-asks");[["explain","Explain the newest version"],["review","Review the open pull request"],["notes","Write the release notes"],["message","Write the message for my changes"]].forEach(function(a){
-      var b=el("button","f-btn",a[1]);b.type="button";b.addEventListener("click",function(){ask(a[0]);});keys.appendChild(b);});box.appendChild(keys);
+    var ICON={explain:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="M14.6 14.6L19 19M8 10.5h5"/>',review:'<path d="M6 3.5h8l4 4v13H6z"/><path d="M9 13.5l2 2 4-4.5"/>',
+      notes:'<path d="M8 7h9M8 12h9M8 17h6"/><circle cx="5" cy="7" r=".9" fill="currentColor"/><circle cx="5" cy="12" r=".9" fill="currentColor"/><circle cx="5" cy="17" r=".9" fill="currentColor"/>',
+      message:'<path d="M5 6.5h14v9H10l-4 3v-3H5z"/><path d="M8.5 10h7M8.5 12.8h4.5"/>',time:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.8 1.8"/>',
+      copy:'<rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M7.5 8h.01M7.5 16h.01"/>',folder:'<path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'};
+    function tile(k,title,line,fn){var t=el("div","f-tg");t.setAttribute("role","button");t.tabIndex=0;t.setAttribute("aria-pressed","false");
+      t.innerHTML='<div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+"</svg><b>"+title+"</b></div><small>"+line+"</small>";
+      function go(){[].forEach.call(t.parentNode.children,function(x){x.setAttribute("aria-pressed",x===t?"true":"false");});fn();}
+      t.addEventListener("click",go);t.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});return t;}
+    box.appendChild(el("div","pv-sub","Ask your model"));
+    var keys=el("div","f-targets pv-tiles");[["explain","Explain","the newest version, in plain words"],["review","Review","the open pull request, line by line"],["notes","Release notes","from the versions since v3.2"],["message","A message","for the changes you are keeping"]].forEach(function(a){
+      keys.appendChild(tile(a[0],a[1],a[2],function(){ask(a[0]);}));});box.appendChild(keys);
     box.appendChild(el("div","pv-ans","<p class=\"f-hint\">Press a key above: the answer is written here.</p>"));
-    var f=el("form","pv-find");f.innerHTML='<input type="search" placeholder="Find in every repository, by words or by meaning" aria-label="Find in every repository"><button class="f-btn" type="submit">Find</button>';
+    var f=el("form","pv-find");f.innerHTML='<input type="search" placeholder="Find in every repository" aria-label="Find in every repository, by words or by meaning"><button class="f-btn" type="submit">Find</button>';
     f.addEventListener("submit",function(e){e.preventDefault();var q=f.querySelector("input").value.trim();var hits=box.querySelector(".pv-hits");hits.innerHTML="";if(!q){hits.appendChild(el("p","f-hint","Type a word, or what you mean."));return;}
       [["quill-notes","app/reader.js · line 3","return matchMedia(\"(prefers-color-scheme: dark)\").matches?\"night\":\"day\";"],["harbour-garden","garden.html · line 812","function theme(){ return state.theme || \"day\"; }"],["ledger","docs/backup.md · line 12","A second copy of the accounts on another drive, checked each week."]].forEach(function(h){
         hits.appendChild(el("div","pv-hit","<b>"+h[0]+"</b> · "+h[1]+"<code>"+h[2].replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];})+"</code>"));});say("3 found in 3 repositories, by what they mean.");});
     box.appendChild(f);box.appendChild(el("div","pv-hits"));
-    var more=el("div","pv-more");[["Open any version as the app itself","The app as it was on any day, running in a window of its own, beside today's."],["A second copy on another drive","Kept in step and checked every Sunday: one broken drive loses nothing."],["Its folder in Folders","Its conversations, where you left off and how it was built, one press away."]].forEach(function(m){
-      var b=el("button","f-ck pv-ck",'<span class="m">✦</span><div>'+m[0]+"<small>"+m[1]+"</small></div>");b.type="button";b.addEventListener("click",function(){say("In the app: "+m[0].toLowerCase()+".");});more.appendChild(b);});
+    box.appendChild(el("div","pv-sub","Beyond GitHub"));
+    var more=el("div","f-targets pv-tiles");[["time","Any version, live","the app as it was on any day, in its own window"],["copy","A second copy","on another drive, checked every Sunday"],["folder","Its folder","in Folders: its conversations and notes"]].forEach(function(m){
+      more.appendChild(tile(m[0],m[1],m[2],function(){say("In the app: "+m[1].toLowerCase()+", "+m[2]+".");}));});
     box.appendChild(more);host.appendChild(box);}
   /* the footer's key belongs to Test, Ship and Copies: the Ingenium part has none */
   var ft=RT.querySelector(".f-pn-f");if(ft)ft.hidden=(p==="ingenium");}

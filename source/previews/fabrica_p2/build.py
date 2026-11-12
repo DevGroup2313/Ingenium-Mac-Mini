@@ -48,12 +48,12 @@ body{background:var(--pg);color:var(--pgink);font:14px/1.5 -apple-system,BlinkMa
 .win[data-theme="night"]{background:#16131c;color:#efe9f6}
 .win img{display:block;max-width:none;-webkit-user-drag:none}
 .win .only-night{display:none!important}.win[data-theme="night"] .only-night{display:block!important}.win[data-theme="night"] .only-day{display:none!important}
-.win .back{position:absolute;inset:0;z-index:0}.win .back img{width:1440px;height:900px}
-.win .scroll{position:absolute;inset:0;z-index:1;overflow:hidden}
-.win .page{padding:59px 84px 0 229px}
-.win .top{position:absolute;left:0;top:0;z-index:5;pointer-events:none}.win .top img{width:1440px;height:%(T)dpx}
-.win .rail{position:absolute;left:0;top:%(T)dpx;z-index:5;pointer-events:none}.win .rail img{width:%(L)dpx;height:%(RH)dpx}
-.win .right{position:absolute;left:%(RX)dpx;top:%(T)dpx;z-index:5;pointer-events:none}.win .right img{width:%(RW)dpx;height:%(RH)dpx}
+.win > .pvf-back{position:absolute;inset:0;z-index:0}.win > .pvf-back img{width:1440px;height:900px}
+.win > .pvf-scroll{position:absolute;inset:0;z-index:1;overflow:hidden}
+.win .pvf-page{padding:59px 84px 0 229px}
+.win > .pvf-top{position:absolute;left:0;top:0;z-index:5;pointer-events:none}.win > .pvf-top img{width:1440px;height:%(T)dpx}
+.win > .pvf-rail{position:absolute;left:0;top:%(T)dpx;z-index:5;pointer-events:none}.win > .pvf-rail img{width:%(L)dpx;height:%(RH)dpx}
+.win > .pvf-right{position:absolute;left:%(RX)dpx;top:%(T)dpx;z-index:5;pointer-events:none}.win > .pvf-right img{width:%(RW)dpx;height:%(RH)dpx}
 .win .pv-toast{position:absolute;left:50%%;bottom:26px;z-index:95;transform:translate(-50%%,16px);padding:8px 16px;border-radius:999px;background:#fff;color:#221a2e;box-shadow:inset 0 0 0 1px rgba(34,26,46,.10),0 10px 24px rgba(40,22,68,.18);font-weight:600;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .35s cubic-bezier(.34,1.35,.64,1);max-width:900px}
 .win[data-theme="night"] .pv-toast{background:#231c30;color:#efe9f6;box-shadow:inset 0 0 0 1px rgba(205,184,240,.12),0 10px 24px rgba(0,0,0,.5)}
 .win .pv-toast.on{opacity:1;transform:translate(-50%%,0)}
@@ -78,14 +78,14 @@ body = '''<div class="bar"><span><b>Ingenium</b> · Fabrica, phase 2: every repo
 <div class="stage" id="stage"><div class="fit" id="fit">
 <div class="win" id="win" data-theme="day">
 <script>(function(){try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.getAttribute("data-theme")!=="light")document.getElementById("win").setAttribute("data-theme","night");}catch(e){}})();</script>
-  <div class="back" aria-hidden="true"><img class="only-day" alt="" src="%(back_day)s"><img class="only-night" alt="" src="%(back_night)s"></div>
-  <div class="scroll"><div class="page">%(fb)s</div></div>
-  <div class="top" aria-hidden="true"><img class="only-day" alt="" src="%(top_day)s"><img class="only-night" alt="" src="%(top_night)s"></div>
-  <div class="rail" aria-hidden="true"><img class="only-day" alt="" src="%(rail_day)s"><img class="only-night" alt="" src="%(rail_night)s"></div>
-  <div class="right" aria-hidden="true"><img class="only-day" alt="" src="%(right_day)s"><img class="only-night" alt="" src="%(right_night)s"></div>
+  <div class="pvf-back" aria-hidden="true"><img class="only-day" alt="" src="%(back_day)s"><img class="only-night" alt="" src="%(back_night)s"></div>
+  <div class="pvf-scroll"><div class="pvf-page">%(fb)s</div></div>
+  <div class="pvf-top" aria-hidden="true"><img class="only-day" alt="" src="%(top_day)s"><img class="only-night" alt="" src="%(top_night)s"></div>
+  <div class="pvf-rail" aria-hidden="true"><img class="only-day" alt="" src="%(rail_day)s"><img class="only-night" alt="" src="%(rail_night)s"></div>
+  <div class="pvf-right" aria-hidden="true"><img class="only-day" alt="" src="%(right_day)s"><img class="only-night" alt="" src="%(right_night)s"></div>
   <div class="pv-toast" id="pvToast" role="status" aria-live="polite"></div>
 </div></div></div>
-<p class="note"><b>A preview, drawn from Fabrica itself.</b> This is Fabrica as it is in the app today, with what phase 2 adds in its own pieces: <b>On this computer</b> in Your apps (your repositories read straight from the drive, at any size); their size and drive beside the name; the branch in Ingenium's own list; in Plans, a pull request brought in by merge, squash or rebase; and a fourth part beside Test, Ship and Copies: <b>Ingenium</b>, your own model reading the repository with no connection. Press the rooms (Now, Story, Plans, Care), their tabs, the pull request in Plans, the branch, and the parts on the right. The repositories, logos and words are invented; the top bar and the side list are pictures of the app.</p>
+<p class="note"><b>A preview, drawn from Fabrica itself.</b> This is Fabrica as it is in the app today, with what phase 2 adds in its own pieces: <b>On this computer</b> in Your apps (your repositories read straight from the drive, at any size); their size and drive beside the name; the branch in Ingenium's own list; in Plans, a pull request brought in by merge, squash or rebase; and a fourth part beside Test, Ship and Copies: <b>Ingenium</b>, your own model reading the repository with no connection. Also new here: <b>what changed while you were away</b>, at the top of Your apps; <b>People and a milestone</b> on an issue or a pull request; a <b>comment on any line</b> of a pull request's Files changed (the + beside a line), with Resolve, and <b>Viewed</b>; <b>Rules before main</b> in Care, Settings, where every section now opens and shuts; and <b>Safety, on every version</b> in Care, Checks. Press the rooms (Now, Story, Plans, Care), their tabs, the pull request and the issue in Plans, the branch, and the parts on the right. The repositories, logos and words are invented; the top bar and the side list are pictures of the app.</p>
 '''
 data = {'fb': sk}; data.update(pic)
 body = body % data
