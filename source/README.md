@@ -371,6 +371,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.85 (12 November 2026): Folders' drawer pulls find and order, Your apps' logos move as Lector's, and any app can wear its own
+logo. Her words (12 November 2026): "I want the apps seals on the "your apps" section to be animated and interactive and clickable, I like
+the effect. I also want the 3D folders for the apps at the top of the page to be able to filtered, and reorderd by alphabetical order, and
+date but do no change the existing page design, just build it in as part of the 3D drawer. I want the Folders page to read and accept any
+app icon/logo and not be limited my apps." On the live preview (source/previews/folders/folders_683_template.html): "The animation of the
+apps logos on the "Your apps" section is really weird and not what I asked for. I want you to replicate the same animations from the
+Lector page for these the apps logos on the "Your apps" section, please push this everywhere. I approve pf the preview with those changes."
+- modules/r279.js (new): the drawer's two pulls are keys in the drawer's own grooves (120 by 20, as before): the left finds a folder as she
+  types, by its name or its parts (Escape clears it); the right turns through Used last, A to Z, Z to A, Newest and Oldest (Shift turns
+  back), kept in state.folders.ui.order. A folder's date is its app.made, else the moment in its id, else its first conversation. Your
+  apps: each card's logo is Lector's layered seal with Lector's measures (modules/r107.js .ls): LX7_LAYERS by day and by night, the 7 s
+  sway, the turn toward the pointer, the lift and the sink; the Offline Project its live crest with its quarters moving, as on Lector;
+  any other app its own logo, or a quiet disc, in the same motion. An opened folder takes any app's logo: a picture (PNG, JPEG, WebP, GIF,
+  SVG, ICO, AVIF), a Mac app's .icns (its PNG of 256 pixels or more) or the app's own page, chosen or dropped on its logo; each is drawn
+  once on a canvas of at most 256 pixels, so a picture that cannot be read is refused; Its own logo again gives back the app's own.
+- modules/r277.js: a logo she gives an app herself (own, setOwn, clearOwn) comes first; a page's icon is read in SVG, GIF, ICO and AVIF
+  too (iconOf); every logo drawn whole (the crest is taller than wide, and a circle had cut its shoulders).
+- modules/r263.js: the drawer asks r279 which folders stand in it and in what order (as before without it); a logo of her own comes first;
+  pictures drawn whole. modules/r176.js (the order pull sounds), r222.js (the news), editions.py (r277's text without Lakay, as before).
+- Tests: rig/t_685_folders.js (32); rig/t_669_folders.js and rig/t_683_logos.js follow the quiet disc (6.83) and Lector's logos. On the
+  test build: t_685_folders 32/32, t_669_folders 32/32, t_683_logos 12/12, t_684_settings 20/20, t_62_tour 34/34, t_651_still_keys 25/25.
+
+    node rig/t_685_folders.js <page url> <out folder>
+
 Ingenium 6.84 (12 November 2026): Settings as one console, every card in one anatomy, from the preview she approved after three
 rounds (her words, 11 November 2026: "all of those lone buttons from the Settings page, the tabs could the entire Setting page could use
 a better organising and a slight redesign to keep things looking tidy and cohesive to match the rest of Ingenium"; "It looks exactly the

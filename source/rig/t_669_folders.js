@@ -3,7 +3,8 @@
 // the live preview: "I like this new look, please fix the stretched icons and push it everywhere. I really like this new design."
 // And: "I want the apps seals to switch to their dark mode look when the app is on Dark mode instead of keeping their light mode look."
 //   - the part runs; Folders' own title and lede stand in the head beside a drawer of folders, the one used last in front;
-//   - an app of The Offline Project carries its own seal (r140), by day and by night as the Display is; any other app a coin;
+//   - an app of The Offline Project carries its own seal (r140), by day and by night as the Display is; any other app its own logo, and
+//     one with no logo anywhere a quiet disc, never a letter (6.83, modules/r277.js); on Your apps each logo as Lector's (6.85, r279.js);
 //   - pointing at a folder lifts it and names it; pressing it opens the folder as a spread (cover on the left, papers on the right);
 //   - in the folder every control still works (rename, decisions, back); the index cards carry their seals; a new folder joins the
 //     drawer; the build library is a book, the ways envelopes with orbs, How I work a ruled sheet that still keeps her words;
@@ -44,9 +45,9 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const s2 = await p.evaluate(() => { const ing = [...document.querySelectorAll('#page-folders .fd-file')].find(b => /Ingenium/.test(b.getAttribute('aria-label')));
     const im = ing && ing.querySelector('.fd-front .fd-seal'), q = [...document.querySelectorAll('#page-folders .fd-file')].find(b => /^Quill/.test(b.getAttribute('aria-label')));
     return { key: im && im.getAttribute('data-fd-seal'), day: !!im && im.src === IngSeal.url(['ingenium'], { night: false }), loaded: !!im && im.complete && im.naturalWidth > 0,
-      coin: q ? (q.querySelector('.fd-front .fd-coin') || { getAttribute: () => null }).getAttribute('data-l') : null, name: q ? q.querySelector('.fd-ft b').textContent : null, tab: !!(ing && ing.querySelector('.fd-tab .fd-seal')) }; });
+      coin: q ? !!q.querySelector('.fd-front .fd-coin') : null, disc: q ? !!q.querySelector('.fd-front .ing-logo-wait') : null, name: q ? q.querySelector('.fd-ft b').textContent : null, tab: !!(ing && ing.querySelector('.fd-tab .fd-seal')) }; });
   ok(s2.key === 'ingenium' && s2.day && s2.loaded && s2.tab, "Ingenium's folder carries Ingenium's own seal by day, on its tab and its front", s2);
-  ok(s2.coin === 'Q' && s2.name === 'Quill', 'an app with no seal of its own has a coin with its first letter', s2);
+  ok(s2.coin === false && s2.disc && s2.name === 'Quill', 'an app with no logo anywhere has a quiet disc, never a letter (6.83)', s2);
   await p.screenshot({ path: OUT + '/day_home.png' });
   // 3. pointing at a folder lifts it and names it
   const fb = await p.evaluate(() => { const b = [...document.querySelectorAll('#page-folders .fd-file')].find(x => /^Lantern/.test(x.getAttribute('aria-label'))); const r = b.querySelector('.fd-tab').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
@@ -58,11 +59,11 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const s3b = await st(); ok(s3b.held === null, 'leaving it lowers it again', s3b.held);
   // 4. the catalogue, the book, the envelopes and the sheet
   const s4 = await p.evaluate(() => { const pg = document.getElementById('page-folders');
-    const cards = [...pg.querySelectorAll('.fld-card:not(.fld-new)')].map(c => ({ name: c.querySelector('.fld-name').textContent.trim(), seal: !!c.querySelector('.fd-seal'), coin: !!c.querySelector('.fd-coin') }));
+    const cards = [...pg.querySelectorAll('.fld-card:not(.fld-new)')].map(c => ({ name: c.querySelector('.fld-name').textContent.trim(), seal: !!c.querySelector('.fd-ls,.fd-lscrest,.fd-seal'), disc: !!c.querySelector('.ing-logo-wait'), coin: !!c.querySelector('.fd-coin') }));
     const ways = pg.querySelectorAll('.fld-way').length, envs = pg.querySelectorAll('.fld-way.fd-env > .fdo').length;
     return { cards, book: !!pg.querySelector('.fd-libcard .fd-book'), ways, envs, sheet: !!pg.querySelector('.fd-sheet > #fldHowAll'), wm: !!pg.querySelector('.fd-sheet > .fd-wm'),
       svgHidden: getComputedStyle(pg.querySelector('.fld-card .fld-name > svg')).display === 'none' }; });
-  ok(s4.cards.length === 3 && s4.cards.find(c => c.name === 'Ingenium').seal && s4.cards.find(c => c.name === 'Quill').coin && s4.svgHidden, 'each folder is an index card with its seal or coin', s4.cards);
+  ok(s4.cards.length === 3 && s4.cards.find(c => c.name === 'Ingenium').seal && s4.cards.find(c => c.name === 'Quill').disc && !s4.cards.some(c => c.coin) && s4.svgHidden, 'each folder is an index card with its logo, or a quiet disc', s4.cards);
   ok(s4.book, 'the build library is a bound book', s4);
   ok(s4.ways >= 5 && s4.envs === s4.ways, 'every way of bringing work in is an envelope with its orb', s4);
   ok(s4.sheet && s4.wm, 'How I work is a ruled sheet with the seal in its corner', s4);
@@ -78,7 +79,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.mouse.click(fq.x, fq.y); await p.waitForTimeout(1200);
   const s5 = await p.evaluate(() => { const pg = document.getElementById('page-folders'), L = pg.querySelector('.fd-spread > .fd-left'), R = pg.querySelector('.fd-spread > .fd-right');
     const h = el => el ? [...el.querySelectorAll(':scope > .card > h2')].map(x => x.textContent.trim()) : [];
-    return { open: state.folders.ui.open, st: IngFoldersLook.state(), leftHead: !!(L && L.querySelector(':scope > .fld-h .fd-oh h2')), leftSeal: !!(L && L.querySelector('.fd-oh .fd-coin')),
+    return { open: state.folders.ui.open, st: IngFoldersLook.state(), leftHead: !!(L && L.querySelector(':scope > .fld-h .fd-oh h2')), leftSeal: !!(L && L.querySelector('.fd-oh .ing-logo-wait')),
       left: h(L), right: h(R), convOrbs: pg.querySelectorAll('.fd-right li.fd-conv > .fdo').length, crumb: !!pg.querySelector('#fldBody > .fld-crumb'),
       start: !!(L && [...L.querySelectorAll('.fld-h .btn')].find(k => /^Start a conversation/.test(k.textContent))) }; });
   ok(s5.st.spread && s5.st.inside && s5.crumb, 'pressing a folder opens it as a spread, under its path', s5);
@@ -125,7 +126,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(s10p.on && s10p.phone && s10p.files === 4, 'below 760 pixels the drawer takes its phone layout', s10p);
   await p.setViewportSize({ width: 250, height: 900 }); await p.waitForTimeout(900);
   const s10 = await p.evaluate(() => { const pg = document.getElementById('page-folders'); return { on: pg.classList.contains('fd-on'), head: !!pg.querySelector('.fd-head'), title: !!pg.querySelector(':scope > .page-title'),
-    lede: !!pg.querySelector(':scope > .lede'), cards: pg.querySelectorAll('.fld-card').length, seals: pg.querySelectorAll('.fld-card .fd-seal,.fld-card .fd-coin').length }; });
+    lede: !!pg.querySelector(':scope > .lede'), cards: pg.querySelectorAll('.fld-card').length, seals: pg.querySelectorAll('.fld-card .fd-seal,.fld-card .fd-coin,.fld-card .fd-ls').length }; });
   ok(!s10.on && !s10.head && s10.title && s10.lede && s10.cards === 5 && s10.seals === 0, 'below 260 pixels Folders is as it was', s10);
   await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(900);
   const s10b = await st(); ok(s10b.on && s10b.files.length === 4, 'wide again, the drawer comes back', s10b);

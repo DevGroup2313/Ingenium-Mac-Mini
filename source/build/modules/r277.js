@@ -14,11 +14,12 @@
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.95),rgba(236,229,246,.95) 55%,rgba(214,201,236,.95));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -2px 3px rgba(60,30,110,.12),0 1px 2px rgba(40,22,68,.22);border:1px solid rgba(106,63,181,.18)}
 body[data-theme="night"] .ing-logo-wait{background:radial-gradient(circle at 35% 30%,#3a2f52,#2a2140 60%,#1d1629);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 3px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.5);border-color:rgba(205,184,240,.16)}
-img.ing-logo{display:inline-block;flex:0 0 auto;object-fit:contain;border-radius:50%}
+img.ing-logo{display:inline-block;flex:0 0 auto;object-fit:contain;border-radius:0}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p277"]="started";}catch(_){}
 /* ============ R277 · EVERY APP WEARS ITS OWN LOGO (Ingenium 6.83): see the stylesheet above ============
-   window.IngAppLogo {key(name), el(name, size), find(name), src(name), known} */
+   window.IngAppLogo {key(name), el(name, size), find(name), src(name), norm(name), own(name), setOwn(name, src), clearOwn(name), iconOf(html)}
+   6.85: a logo she gives an app herself (modules/r279.js, on an opened folder) comes first, before the app's seal or a logo found. */
 (function r277(){
 "use strict";
 if(window.IngAppLogo)return;
@@ -30,12 +31,14 @@ function night(){try{return D.body.getAttribute("data-theme")==="night";}catch(e
 function flat(k){try{var s=W.ING_SEALS&&ING_SEALS[k];return s&&s.b64?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
 function kept(){var s=W.state;if(!s||typeof s!=="object")return {};if(!s.appLogos||typeof s.appLogos!=="object")s.appLogos={};return s.appLogos;}
 function lakaySrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.lakayN?"lakayN":"lakay");}
-function src(name){var k=key(name);if(k==="lakay")return lakaySrc();var o=kept()[norm(name)];return o&&o.src||"";}
+function own(name){var o=kept()[norm(name)];return o&&o.own&&o.src?o.src:"";}
+function src(name){var m=own(name);if(m)return m;var k=key(name);if(k==="lakay")return lakaySrc();var o=kept()[norm(name)];return o&&o.src||"";}
 function img(s,size,which){var im=new Image();im.src=s;im.alt="";im.className="ing-logo";im.draggable=false;im.decoding="async";if(size){im.style.width=im.style.height=Math.round(size)+"px";}
   if(which)im.setAttribute("data-applogo",which);return im;}
 function wait(size,name){var d=D.createElement("span");d.className="ing-logo-wait";d.style.setProperty("--s",Math.round(size||28)+"px");d.style.width=d.style.height=Math.round(size||28)+"px";d.setAttribute("data-applogo-wait",norm(name));d.setAttribute("aria-hidden","true");return d;}
 /* the element for an app's logo, now: its own picture when it is known, else a quiet disc that becomes its logo once found */
-function el(name,size){var k=key(name);
+function el(name,size){var k=key(name),mine=own(name);
+  if(mine)return img(mine,size,"own");
   if(k&&k!=="lakay"&&W.IngSeal&&typeof IngSeal.el==="function"){try{var e=IngSeal.el([k],{size:size,alt:""});if(e){e.style.width=Math.round(size)+"px";return e;}}catch(x){}}
   if(k==="lakay"&&lakaySrc())return img(lakaySrc(),size,"lakay");
   if(k==="master"&&flat("master"))return img(flat("master"),size);
@@ -43,7 +46,13 @@ function el(name,size){var k=key(name);
   var d=wait(size,name);find(name).then(function(found){if(!found)return;[].forEach.call(D.querySelectorAll('[data-applogo-wait="'+norm(name).replace(/"/g,"")+'"]'),function(w){
     var sz=parseFloat(w.style.getPropertyValue("--s"))||size,im=img(found,sz);im.className=w.className.replace("ing-logo-wait","ing-logo");w.replaceWith(im);});});return d;}
 /* where an app keeps its logo: its page in Fabrica, its page in the app library, the repository brought from GitHub */
-function iconOf(html){try{return W.IngApk&&typeof IngApk.iconSource==="function"?IngApk.iconSource(html):null;}catch(e){return null;}}
+function iconOf(html){var s=null;try{s=W.IngApk&&typeof IngApk.iconSource==="function"?IngApk.iconSource(html):null;}catch(e){s=null;}if(s)return s;
+  /* any other picture a page names as its icon: SVG (written out or in base64), GIF, ICO, AVIF; the largest it names */
+  try{var head=String(html||"").slice(0,3000000),re=/<link\b[^>]*>/gi,m,best=null,bestN=-1;while((m=re.exec(head))){var tag=m[0];
+      if(!/\brel\s*=\s*["'][^"']*\b(?:icon|apple-touch-icon|mask-icon)\b[^"']*["']/i.test(tag))continue;
+      var h=/\bhref\s*=\s*(["'])(data:image\/(?:svg\+xml|gif|x-icon|vnd\.microsoft\.icon|avif|png|jpeg|webp)[^"']*)\1/i.exec(tag);if(!h)continue;
+      var z=/sizes\s*=\s*["'](\d+)x\d+/i.exec(tag),n=/svg/i.test(h[2])?4096:(z?parseInt(z[1],10):64);if(n>bestN){bestN=n;best=h[2];}}
+    return best;}catch(e){return null;}}
 function fromFabrica(name){if(!W.IngRepo||typeof IngRepo.list!=="function")return Promise.resolve(null);
   return Promise.resolve(IngRepo.list()).then(function(rs){var r=(rs||[]).filter(function(x){return norm(x.name)===norm(name);})[0];if(!r)return null;
     return Promise.resolve(IngRepo.files(r.id)).then(function(fs){var paths=(fs||[]).map(function(f){return typeof f==="string"?f:f.path;}).filter(Boolean);
@@ -59,14 +68,16 @@ function fromGitHub(name){try{var a=typeof W.shellApi==="function"?W.shellApi():
 function find(name){var n=norm(name);if(!n)return Promise.resolve(null);var known=src(name);if(known)return Promise.resolve(known);
   if(FIND[n])return FIND[n];
   FIND[n]=fromFabrica(name).then(function(s){return s||fromLibrary(name);}).then(function(s){return s||fromGitHub(name);}).then(function(s){
-    if(s&&/^data:image\/(png|jpeg|webp);base64,/.test(s)){if(s.length<=MAXKEEP){kept()[n]={src:s,at:Date.now()};try{W.saveState&&saveState();}catch(e){}}return s;}
+    if(s&&/^data:image\/(png|jpeg|webp|gif|avif|svg\+xml|x-icon|vnd\.microsoft\.icon)[;,]/.test(s)){if(s.length<=MAXKEEP&&!own(name)){kept()[n]={src:s,at:Date.now()};try{W.saveState&&saveState();}catch(e){}}return s;}
     delete FIND[n];return null;});
   return FIND[n];}
 /* by night Lakay wears its night picture, and back by day */
 function retheme(){[].forEach.call(D.querySelectorAll('img[data-applogo="lakay"]'),function(im){var s=lakaySrc();if(s&&im.src!==s)im.src=s;});}
 function boot(){try{new MutationObserver(retheme).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}}
 if(D.body)boot();else D.addEventListener("DOMContentLoaded",boot);
-W.IngAppLogo={key:key,el:el,find:find,src:src,norm:norm};
+function setOwn(name,s){var n=norm(name);if(!n||!/^data:image\//.test(String(s||"")))return false;kept()[n]={src:s,at:Date.now(),own:true};delete FIND[n];try{W.saveState&&saveState();}catch(e){}return true;}
+function clearOwn(name){var n=norm(name),o=kept()[n];if(!o||!o.own)return false;delete kept()[n];delete FIND[n];try{W.saveState&&saveState();}catch(e){}return true;}
+W.IngAppLogo={key:key,el:el,find:find,src:src,norm:norm,own:own,setOwn:setOwn,clearOwn:clearOwn,iconOf:iconOf};
 try{window.__ingParts["p277"]="running";}catch(_){}
 })();
 </script>

@@ -29,7 +29,8 @@ const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mNk+M9Qz0A
   const read = () => p.evaluate(() => {
     const out = { coins: document.querySelectorAll('#page-folders .fd-coin,#page-folders [data-l]').length, tabs: {}, cards: {} };
     document.querySelectorAll('#page-folders .fd-tab').forEach(t => { const n = (t.querySelector('.fd-tn') || {}).textContent, s = t.firstElementChild; out.tabs[n] = { tag: s && s.tagName, cls: s && s.className, src: s && s.getAttribute && (s.getAttribute('src') || '').slice(0, 40), which: s && s.getAttribute('data-applogo') }; });
-    document.querySelectorAll('#page-folders .fld-card .fld-name').forEach(nm => { const s = nm.firstElementChild, n = nm.textContent.trim(); out.cards[n] = { tag: s && s.tagName, cls: s && s.className, letter: s && getComputedStyle(s, '::before').content }; });
+    // 6.85: a card's logo is Lector's layered seal (modules/r279.js): its picture is a layer inside it, or a quiet disc
+    document.querySelectorAll('#page-folders .fld-card .fld-name').forEach(nm => { const w = nm.firstElementChild, s = w && w.matches('.fd-ls') ? (w.querySelector('.ls-idle > .ls-l') || w) : w, n = nm.textContent.trim(); out.cards[n] = { tag: s && s.tagName, cls: s && s.className, letter: s && getComputedStyle(s, '::before').content }; });
     return out; });
   let r = await read();
   ok(r.coins === 0, 'no letter coin anywhere on Folders', r.coins);
@@ -40,7 +41,7 @@ const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVR42mNk+M9Qz0A
   // the drawer shows some folders at a time; every folder has its card below it
   await p.waitForFunction(() => !!(state.appLogos && state.appLogos['harbour garden']), null, { timeout: 30000 }).catch(() => {}); await sleep(500);
   r = await read();
-  const C = r.cards, hgc = await p.evaluate(() => { const nm = [...document.querySelectorAll('#page-folders .fld-card .fld-name')].find(x => /Harbour Garden/.test(x.textContent)), s = nm && nm.firstElementChild; return s ? { tag: s.tagName, src: (s.getAttribute('src') || '').slice(0, 40), cls: s.className } : null; });
+  const C = r.cards, hgc = await p.evaluate(() => { const nm = [...document.querySelectorAll('#page-folders .fld-card .fld-name')].find(x => /Harbour Garden/.test(x.textContent)), w = nm && nm.firstElementChild, s = w && w.matches('.fd-ls') ? w.querySelector('.ls-idle > .ls-l') : w; return s ? { tag: s.tagName, src: (s.getAttribute('src') || '').slice(0, 40), cls: s.className } : null; });
   ok(hgc && hgc.tag === 'IMG' && /^data:image\/png;base64,iVBOR/.test(hgc.src), 'Harbour Garden, an app made in Fabrica, wears the logo from its own page', hgc);
   const kept = await p.evaluate(() => !!(state.appLogos && state.appLogos['harbour garden'] && state.appLogos['harbour garden'].src));
   ok(kept, 'and its logo is kept once found, so it shows at once next time', kept);

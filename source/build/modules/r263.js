@@ -101,6 +101,8 @@ body[data-theme="night"] #page-folders.fd-on .fd-handle{background:linear-gradie
 /* ---------- each app's seal, and a coin for an app with no seal of its own ---------- */
 #page-folders.fd-on .fd-seal{flex:0 0 auto;display:block;height:auto;max-width:none;border-radius:50%;filter:drop-shadow(0 2px 3px rgba(40,22,68,.28))}
 body[data-theme="night"] #page-folders.fd-on .fd-seal{filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+/* 6.85: a logo's picture is drawn whole, never cut to a circle (every logo's picture has clear corners; the crest is taller than wide) */
+#page-folders.fd-on img.fd-seal{border-radius:0;object-fit:contain}
 #page-folders.fd-on .fd-coin{flex:0 0 auto;display:grid;place-items:center;width:var(--fs);height:var(--fs);border-radius:50%;color:#fff;font:600 calc(var(--fs) * .46)/1 var(--fd-serif);
   background:radial-gradient(circle at 36% 30%,var(--fd-coin0) 0%,var(--fd-coin1) 32%,var(--fd-coin2) 64%,var(--fd-coin3) 100%);
   box-shadow:inset 0 0 0 calc(var(--fs) * .06) rgba(255,255,255,.3),0 2px 3px rgba(40,22,68,.25)}
@@ -289,7 +291,9 @@ function show(el,where){if(!el)return;try{el.scrollIntoView({block:where||"start
 function sealKey(name){var n=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
   return n==="carpe diem"?"cd":/^(the )?forge$/.test(n)?"forge":n==="ingenium"?"ingenium":n==="inkwell"?"inkwell":null;}
 function seal(name,size){var k=sealKey(name),e=null;
-  if(k&&W.IngSeal&&typeof IngSeal.el==="function"){try{e=IngSeal.el([k],{size:size,alt:""});}catch(x){e=null;}}
+  /* 6.85: a logo she gave the app herself comes first, even over its seal (kept by modules/r277.js, given on an opened folder, modules/r279.js) */
+  if(W.IngAppLogo&&typeof IngAppLogo.own==="function"&&IngAppLogo.own(name)){try{e=IngAppLogo.el(name,size);}catch(x){e=null;}}
+  if(!e&&k&&W.IngSeal&&typeof IngSeal.el==="function"){try{e=IngSeal.el([k],{size:size,alt:""});}catch(x){e=null;}}
   /* 6.83 (her words, 12 November 2026: "I want the Lakay and Offline Project app folders and any future apps folders to show their logo
      icon and not have some randomised letter stand-in"): every other app wears its own logo too, found by modules/r277.js (Lakay's
      Spiral, the Offline Project's master logo, any app's own page), and a quiet disc while it is looked for; never a letter */
@@ -352,9 +356,12 @@ function build(){if(head)return;
 function lift(b,v){if(v){if(held&&held!==b)lift(held,false);held=b;b.classList.add("fd-up");drawer.classList.add("fd-hold");var p=b.__p;
     hint.innerHTML="<b>"+esc(p.name)+"</b>: "+esc(meta(p))+". Press it to open the folder.";}
   else{b.classList.remove("fd-up","fd-dn");if(held===b){held=null;drawer.classList.remove("fd-hold");hint.textContent=files.children.length?HINT:EMPTY;}}}
-function drawFiles(){var fs=folders(),sig=fs.map(function(p){return p.id+"|"+p.name+"|"+meta(p)+"|"+partsOf(p)+"|"+lastUsed(p);}).join("§");
-  if(sig===lastSig&&files.children.length===Math.min(6,fs.length))return;lastSig=sig;held=null;drawer.classList.remove("fd-hold");files.innerHTML="";
-  var shown=fs.map(function(p,i){return {p:p,t:lastUsed(p),i:i};}).sort(function(a,b){return (b.t-a.t)||(a.i-b.i);}).slice(0,6).reverse(),n=shown.length,gap=n>1?Math.min(44,110/(n-1)):0;
+function drawFiles(){var fs=folders(),V=W.IngFolderView,vw=null;
+  /* 6.85: the drawer's pulls (modules/r279.js) find folders and put them in order; the six first in that order stand in the drawer */
+  try{vw=V&&typeof V.view==="function"?V.view(fs,{lastUsed:lastUsed}):null;}catch(e){vw=null;}
+  var sig=fs.map(function(p){return p.id+"|"+p.name+"|"+meta(p)+"|"+partsOf(p)+"|"+lastUsed(p);}).join("§")+(vw?"#"+vw.sig:"");
+  if(sig===lastSig&&files.children.length===Math.min(6,vw?vw.list.length:fs.length))return;lastSig=sig;held=null;drawer.classList.remove("fd-hold");files.innerHTML="";
+  var shown=(vw?vw.list.map(function(p){return {p:p};}):fs.map(function(p,i){return {p:p,t:lastUsed(p),i:i};}).sort(function(a,b){return (b.t-a.t)||(a.i-b.i);})).slice(0,6).reverse(),n=shown.length,gap=n>1?Math.min(44,110/(n-1)):0;
   shown.forEach(function(x,i){var p=x.p,depth=n-1-i,b=mk("button","fd-file");b.type="button";b.__p=p;
     b.style.setProperty("--i",String(i));b.style.setProperty("--t",(150-depth*gap).toFixed(1)+"px");b.style.setProperty("--sc",(1-depth*.035).toFixed(3));
     b.style.setProperty("--l",(26+depth*6)+"px");b.style.setProperty("--w","calc(100% - "+(52+depth*12)+"px)");b.style.setProperty("--tx",TABX[i%3]);
@@ -368,8 +375,8 @@ function drawFiles(){var fs=folders(),sig=fs.map(function(p){return p.id+"|"+p.n
     b.addEventListener("pointerdown",function(){if(!still())b.classList.add("fd-dn");});
     ["pointerup","pointercancel"].forEach(function(t){b.addEventListener(t,function(){b.classList.remove("fd-dn");});});
     b.addEventListener("click",function(e){e.preventDefault();openFolder(p);});files.appendChild(b);});
-  var lb=label.querySelector("small"),all=fs.length;lb.textContent=all?all+" folder"+(all===1?"":"s")+(all>6?", the six used last":""):"No folders yet";
-  hint.textContent=n?HINT:EMPTY;}
+  var lb=label.querySelector("small"),all=fs.length;lb.textContent=vw&&vw.label?vw.label:all?all+" folder"+(all===1?"":"s")+(all>6?", the six used last":""):"No folders yet";
+  hint.textContent=n?HINT:(vw&&vw.none&&all?vw.none:EMPTY);}
 function openFolder(p){var g=G();g.ui.open=p.id;g.ui.adding=false;g.ui.renaming=null;save();if(held)lift(held,false);paintFolders();
   setTimeout(function(){show(page&&(page.querySelector("#fldBody > .fld-crumb")||page.querySelector(".fd-spread"))||body);},40);}
 function home(){var g=G();if(g.ui.open){g.ui.open=null;g.ui.renaming=null;save();paintFolders();}}
@@ -413,7 +420,8 @@ function dressFolder(){var crumb=body.querySelector(":scope > .fld-crumb"),sp=bo
 function dress(){if(!on||!page||!body||busy)return;busy=true;
   try{drawFiles();var inside=!!body.querySelector(":scope > .fld-crumb");page.classList.toggle("fd-inside",inside);
     if(inside)dressFolder();else{lastOpen=null;dressHome();}
-    sheets();rows();}
+    sheets();rows();
+    try{if(W.IngFolderView&&typeof IngFolderView.dressed==="function")IngFolderView.dressed(page,body,inside);}catch(e){try{console.warn("Ingenium: Folders' pulls and logos",e&&e.message||e);}catch(_){}}}
   catch(e){try{console.warn("Ingenium: Folders' new look",e&&e.message||e);}catch(_){}}
   try{if(mo)mo.takeRecords();}catch(e){}busy=false;}
 
