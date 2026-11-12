@@ -105,6 +105,15 @@ with the code (`POST /ingenium/pair`); `share_status` lists the devices by name 
 `share_device_remove(id)` refuses a device (401, removed) until it pairs again with the code.
 Test: `python3 -I rig/t_681_lend_gateway.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (19 checks).
 
+6.92, `app_merge_692.py` (Mac and Windows; after `app_refs_691.py`): a merge whose ideas changed the same lines, resolved on the drive.
+Calls: `disk_merge_begin(rid, payload)` (payload: ours, theirs, from, squash, label, msg, conflicts, files: path to null or {oid, mode,
+b64?}; a file sent whole is checked against its git name, the others read from the repository; refused when the folder moved on, when a
+change waits, when a merge is under way; git's merge files and Fabrica's note `.git/ingenium-merge.json` first, then the files, then git's
+index as git's merge leaves it), `disk_merge_stop(rid)` (as git merge --abort; what the files held first saved aside). `disk_commit` refuses
+while a file holds both versions, and the version has both parents; `disk_repo` gives `merging` ({theirs, label, squash, conflicts, left,
+git}). Every status the 6.87 engine reads goes through `_disk_status_of`, which reads git's marked index entries as the version before the
+merge (in memory). Test: `python3 -I rig/t_692_drive_merge.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (28 checks).
+
 6.91, `app_refs_691.py` (Mac and Windows; after `app_copy_688.py`): `_disk_refs` gives a repository's branches and tags sorted (dulwich
 0.22.8 joins the loose refs and packed-refs in a set, so their order could change from one start of the app to the next).
 

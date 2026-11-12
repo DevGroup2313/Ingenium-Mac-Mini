@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.92 (12 November 2026): Fabrica resolves on the drive a merge whose two ideas changed the same lines. 6.87 refused it ("Fabrica
+does not resolve that on the drive yet"); her list carried it from the 6.89 handoff. modules/r280.js and desktop/app_merge_692.py, with r141:
+- Bringing an idea in (Ideas, or a pull request's merge) into a working copy on the drive: Fabrica's three-way merge (r110, as for an app
+  kept in Ingenium) is left in the folder as git leaves one. The file both ideas changed holds both versions between git's own marks;
+  the rest is as the merge made it; git's index marks the file with its three versions and stages the others; MERGE_HEAD, ORIG_HEAD and
+  MERGE_MSG are written (a squash writes no MERGE_HEAD, as git merge --squash). So git status, git add, git commit and git merge --abort
+  work on it as after git's own merge. Fabrica's work says Bringing in “idea”: both versions are in 1 file, with Stop the merge.
+- Keep this version is refused while a file still holds both versions (named). Resolved in Fabrica or any program, the version has both
+  parents (dulwich 0.22.8 reads MERGE_HEAD); a pull request whose versions are now all in is marked merged. Stop the merge puts every
+  file back as the version before held it, what they held first kept in .git/ingenium-put-back/<time>/.
+- A merge git itself left in the folder (its index marked, which dulwich 0.22.8's status could not read: such a folder read as "could not
+  be read" before) is read, shown with the idea's name from MERGE_MSG, kept or stopped the same way.
+- A bare repository says to make a working copy and bring the idea in there.
+- Two faults found on the way, both since 6.87: a version kept on the drive skipped the hub's step after a version is kept (a pull
+  request was marked merged only when Pull requests was opened again; "fixes #3" in its words closed nothing): it now takes it (r141
+  fbHub.kept); and a merge in which both ideas changed a file over 48 MB (never brought into the page) could merge Fabrica's own words for
+  that file and write them to the drive in its place. Nothing that holds those words is ever written to the drive now; Fabrica says
+  why, and changes nothing.
+Tests: `python3 -I rig/t_692_drive_merge.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (28 checks, against git);
+`node rig/t_692_fabrica_merge.js <app folder> <out>` (14 checks, the page over the app's own back end).
+
 Ingenium 6.91 (12 November 2026): Fabrica holds main to her rules, reads every version for what should not be in it, and says what
 changed while she was away. Her words, on preview version 4 of phase 2 (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, with the pieces
 of commit 9287840): "I approve of the preview, please push it everywhere." modules/r285.js, with hooks in r112 and r141:

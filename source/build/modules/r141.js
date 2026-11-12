@@ -1294,6 +1294,8 @@ var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pul
   md:function(s,o){return md(s,o||{});},exportAll:exportAll,importAll:importAll,record:function(id){return recP(id).then(clone);},forget:forget,
   /* 6.89: people, milestones, comments on a line and templates (modules/r282.js) change the record itself, then keep it */
   live:function(id){return recP(id);},keep:keep,repaint:function(){repaint(true);},
+  /* 6.92: a version kept on the drive (modules/r280.js routes it there) takes the same step after it as any version kept */
+  kept:function(id,oid){return afterKept(id,oid);},
   /* open a view of the chosen app: fbHub.open("issues",{n:3}), fbHub.open("compare",{a:"refs/tags/v1",b:"refs/heads/main"}) */
   open:function(view,o){var x=X();if(!x||!HUB.views[view])return false;var r=x.cur();if(!r)return false;o=o||{};var v=V(r);
     if(view==="compare"){if(o.a)v.cmp.a=o.a;if(o.b)v.cmp.b=o.b;}if(view==="issues"&&o.n!=null)v.iss.open=o.n;if(view==="pulls"&&o.n!=null)v.pr.open=o.n;if(view==="code"){if(o.ref)v.code.ref=o.ref;if(o.file!==undefined)v.code.file=o.file;if(o.line){v.code.line=+o.line;v.code.mode="view";}}show(view);return true;},

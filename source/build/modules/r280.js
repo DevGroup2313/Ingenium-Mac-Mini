@@ -105,7 +105,8 @@ function frozen(o){try{Object.keys(o).forEach(function(k){if(o[k]&&typeof o[k]==
 var WRITING={};/* 6.87: while Fabrica writes on a repository on the drive, its record is its own to change */
 function copyOf(b){var w=!!WRITING[b.id];if(!w&&b.refs&&!Object.isFrozen(b.refs))Object.freeze(b.refs);
   return {id:b.id,name:b.name,slug:b.slug,app:b.app||null,desc:b.desc||"",created:b.created,changed:b.changed,head:JSON.parse(JSON.stringify(b.head||{ref:"refs/heads/main"})),
-  refs:w?Object.assign({},b.refs||{}):(b.refs||Object.freeze({})),work:w?Object.assign({},b.work||{}):(b.work||frozen({})),sizes:b.sizes||{},log:(b.log||[]).slice(),merging:null,
+  refs:w?Object.assign({},b.refs||{}):(b.refs||Object.freeze({})),work:w?Object.assign({},b.work||{}):(b.work||frozen({})),sizes:b.sizes||{},log:(b.log||[]).slice(),
+  merging:b.merging?{theirs:b.merging.theirs||null,label:b.merging.label||"the other idea",conflicts:(b.merging.conflicts||[]).slice(),left:(b.merging.left||[]).slice(),squash:!!b.merging.squash,git:!!b.merging.git}:null,/* 6.92 */
   fileCount:b.fileCount!=null?b.fileCount:null,disk:b.disk,changes:b.changes||[],notes:JSON.parse(JSON.stringify(sideNotes(b.id)))};}
 function listDisk(force){var a=A();if(!a)return Promise.resolve([]);if(!force&&LIST&&Date.now()-LISTAT<4000)return Promise.resolve(LIST);if(LISTP)return LISTP;
   LISTP=Promise.resolve(a.disk_list()).then(function(x){LISTP=null;LIST=(x&&x.ok&&x.repos)||[];LISTAT=Date.now();return LIST;},function(){LISTP=null;return LIST||[];});return LISTP;}
@@ -131,9 +132,11 @@ function diskRec(id){var d=DK[id]||(DK[id]={});touch(id);if(d.mid)return Promise
    if it is still where Fabrica read it; for a working copy, the folder follows its branch (only when nothing waits to be kept in it).
    Showing an older version, or another idea of a bare repository, changes nothing on the drive: it is a view, held for the session. */
 function diskPut(rec){var d=DK[rec.id];if(!d||!d.rec)return Promise.reject(new Error("that repository is no longer on this device"));var b=d.rec;
-  if(rec.merging&&!(rec.merging.conflicts||[]).length){d.mid=midCopy(rec);return Promise.resolve();}
-  if(rec.merging){var cs=(rec.merging.conflicts||[]),n=cs.length;delete d.mid;return Promise.reject(new Error("The two ideas changed the same lines in "+n+" file"+(n===1?"":"s")+(n?": "+cs.slice(0,4).join(", "):"")+
-    ". Fabrica does not resolve that on the drive yet: bring it in with git there, or in a repository kept in Ingenium."));}
+  /* 6.92: a merge already under way in the folder (begun by Fabrica, or left by git) is the drive's: the rest is written as for any change */
+  if(rec.merging&&!b.merging&&!(rec.merging.conflicts||[]).length){d.mid=midCopy(rec);return Promise.resolve();}
+  if(rec.merging&&!b.merging){delete d.mid;
+    if(!wt(rec.id))return Promise.reject(new Error("The two ideas changed the same lines, and “"+b.name+"” has no folder of files to resolve them in: make a working copy of it (Make a working copy, under its name), and bring the idea in there."));
+    return mergeOnDrive(rec,b);}
   if(rec.name!==b.name||(rec.desc||"")!==(b.desc||"")||(rec.app||null)!==(b.app||null))return Promise.reject(new Error("“"+b.name+"” is named by its folder on the drive: rename the folder, then add it again."));
   var updates=[],ks={};Object.keys(b.refs||{}).concat(Object.keys(rec.refs||{})).forEach(function(k){ks[k]=1;});
   Object.keys(ks).sort().forEach(function(k){var o=(b.refs||{})[k]||null,nw=(rec.refs||{})[k]||null;if(o!==nw)updates.push({ref:k,old:o,new:nw,why:"Fabrica"});});
@@ -144,9 +147,17 @@ function diskPut(rec){var d=DK[rec.id];if(!d||!d.rec)return Promise.reject(new E
   function hold(base){var n={};Object.keys(base).forEach(function(k){n[k]=base[k];});n.head=JSON.parse(JSON.stringify(rh));n.work=rec.work===base.work?base.work:frozen(rec.work);n.log=(rec.log||[]).slice(-200);
     n.fileCount=Object.keys(n.work).length;n.changes=[];d.rec=n;d.over=true;}
   if(!updates.length&&!sw){if(view||JSON.stringify(rh)!==JSON.stringify(bh))hold(b);return Promise.resolve();}
-  return newObjects(b,updates).then(function(objs){var w=author();return call("disk_write",[rec.id,{objects:objs,updates:updates,head:sw,name:w.name||null,email:w.email||null}]);})
+  return newObjects(b,updates).then(function(objs){
+      /* 6.92: a file over 48 MB is never in the page (its words there are Fabrica's, not the file's): a version made here that holds those
+         words in its place (both ideas changed it, and the page merged them) is never written to the drive */
+      var bad={};objs.forEach(function(o){if(o[1]!=="blob")return;var t="";try{t=atob(String(o[2]).slice(0,600));}catch(e){}if(/Fabrica keeps a file this large whole on the drive/.test(t))bad[o[0]]=1;});
+      var hit=Object.keys(rec.work||{}).filter(function(k){return bad[(rec.work[k]||[])[1]];});
+      if(Object.keys(bad).length)throw new Error("Both ideas changed "+(hit.length?hit.join(", "):"a file")+", too large for Fabrica to bring into the page: bring this idea in with git, in its folder. Nothing was changed.");
+      var w=author();return call("disk_write",[rec.id,{objects:objs,updates:updates,head:sw,name:w.name||null,email:w.email||null}]);})
     .then(function(x){delete d.mid;d.at=0;d.over=false;LIST=null;if(x.aside)toast("A file .gitignore names stood where that version puts one: it is kept in "+x.aside+", inside its folder.");
-      if(view)return diskRec(rec.id).then(function(){if(d.rec)hold(d.rec);});});}
+      if(view)return diskRec(rec.id).then(function(){if(d.rec)hold(d.rec);});},
+    /* a write refused: the merge held in memory goes with it, so the drive's record is what Fabrica shows */
+    function(e){delete d.mid;d.at=0;throw e;});}
 function newObjects(b,updates){var st=IR.core.store(),be=IR.core.be(),seen={},out=[];Object.keys(b.refs||{}).forEach(function(k){seen[b.refs[k]]=1;});
   function visit(oid){if(!oid||seen[oid])return Promise.resolve();seen[oid]=1;
     return be.ownRec(oid).then(function(r){if(!r)return null;return st.get(oid).then(function(o){if(!o)return null;out.push([oid,o.type,b64(o.body)]);
@@ -192,6 +203,22 @@ function Mux(inner){var m={};Object.keys(inner).forEach(function(k){if(typeof in
   m.__r280=true;return m;}
 try{var INNER=IR.core.be();if(INNER&&!INNER.__r280)IR.core.use(Mux(INNER));}catch(e){try{console.warn("r280: the drive's repositories could not be joined to Fabrica",e);}catch(_){}}
 
+/* 6.92: a merge whose ideas changed the same lines, left in the working copy's folder as git leaves one (desktop/app_merge_692.py): the
+   files that hold both versions between git's marks, the others as the merge made them, git's MERGE_HEAD; she keeps one of each, in
+   Fabrica or in any program, and Keep this version makes the version with both parents; Stop the merge puts the files back */
+function mergeOnDrive(rec,b){var m=rec.merging,be=IR.core.be(),st=IR.core.store(),bw=b.work||{},rw=rec.work||{},files={},seen={},jobs=[],big=[];
+  var ours=b.head&&b.head.ref?(b.refs||{})[b.head.ref]:null;
+  Object.keys(bw).concat(Object.keys(rw)).forEach(function(p){if(seen[p])return;seen[p]=1;var o=bw[p],n=rw[p];if(o&&n&&o[0]===n[0]&&o[1]===n[1])return;
+    if(!n){files[p]=null;return;}var f=files[p]={oid:n[1],mode:n[0]};
+    jobs.push(Promise.resolve(be.ownRec(n[1])).then(function(own){if(!own)return null;return st.get(n[1]).then(function(x){if(!x)return;
+      /* a file the page never holds (over 48 MB, kept whole on the drive) changed by both ideas: its words here are Fabrica's, not the file's */
+      if(/Fabrica keeps a file this large whole on the drive/.test(new TextDecoder().decode(x.body.subarray(0,400))))big.push(p);f.b64=b64(x.body);});}));});
+  /* a squash names no other parent; the other idea's version, for git's index (its three versions of each file both changed) */
+  var lb=m.label||"",from=m.theirs||(b.refs||{})["refs/heads/"+lb]||(b.refs||{})["refs/tags/"+lb]||(/^[0-9a-f]{40}$/.test(lb)?lb:null);
+  return Promise.all(jobs).then(function(){if(big.length)throw new Error("Both ideas changed "+big.join(", ")+", too large for Fabrica to bring into the page: bring this idea in with git, in its folder. Nothing was changed.");
+      return call("disk_merge_begin",[rec.id,{ours:ours,theirs:m.theirs||null,from:from,squash:!m.theirs,label:m.label||"",
+      msg:"Merge branch '"+(m.label||"the other idea")+"'",conflicts:(m.conflicts||[]).slice(),files:files}]);})
+    .then(function(){stale(rec.id);return null;});}
 /* 6.87: working on the drive (desktop/app_disk2_687.py). A working copy's folder is its work: a file written, taken away or moved in
    Fabrica goes to the folder; Keep this version keeps the folder's changes as git would, with the repository's own name; Put it back saves
    what it replaces first. Ideas, tags, merges, squashes, rebases and versions undone are made by IngRepo as for any repository, and
@@ -217,12 +244,17 @@ var ROUTE={
     return ps.reduce(function(q,x){return q.then(function(){return call("disk_remove_file",[id,x]);});},Promise.resolve()).then(function(){stale(id);toast("Taken away from its folder; kept aside in .git/ingenium-put-back, inside it.");return ps.length;});});},
   move:function(id,a,b){return ready(id).then(function(r){var pa=cp(a),pb=cp(b),ps=under(r,pa);if(!ps.length)throw new Error("“"+pa+"” is not here");
     return ps.reduce(function(q,x){return q.then(function(){return call("disk_move_file",[id,x,pb+x.slice(pa.length)]);});},Promise.resolve()).then(function(){stale(id);return ps.length;});});},
-  commit:function(id,msg){return ready(id).then(function(){var w=author();return call("disk_commit",[id,String(msg||""),w.name||null,w.email||null]);}).then(function(x){stale(id);return x.commit;});},
+  commit:function(id,msg){return ready(id).then(function(){var w=author();return call("disk_commit",[id,String(msg||""),w.name||null,w.email||null]);}).then(function(x){stale(id);
+    /* 6.92: as any version kept: a pull request whose versions are all in now is merged, "fixes #3" closes issue 3, the checks run when asked */
+    try{if(W.fbHub&&typeof fbHub.kept==="function")fbHub.kept(id,x.commit);}catch(e){}return x.commit;});},
   discard:function(id,paths){return ready(id).then(function(){return call("disk_put_back",[id,paths?paths.map(cp):null]);}).then(function(x){stale(id);
     if(x.saved)toast("Put back. What "+(x.saved===1?"it":"they")+" held first is kept in "+x.aside+", inside its folder.");return IR.info(id);});},
   restore:function(id,path,ref){return ready(id).then(function(){var p=cp(path);return IR.read(id,p,ref).then(function(bb){return bb==null?call("disk_remove_file",[id,p]):call("disk_write_file",[id,p,b64(u8(bb)),null]);});})
     .then(function(){stale(id);return IR.info(id);});},
-  rename:function(id){var r=ra(id);return Promise.reject(new Error("“"+(r?r.name:"It")+"” is named by its folder on the drive: rename the folder, then add it again."));}
+  rename:function(id){var r=ra(id);return Promise.reject(new Error("“"+(r?r.name:"It")+"” is named by its folder on the drive: rename the folder, then add it again."));},
+  /* 6.92: as git merge --abort; what the files held first is kept aside */
+  stopMerge:function(id){return ready(id).then(function(){return call("disk_merge_stop",[id]);}).then(function(x){stale(id);
+    if(x.saved)toast("The merge is stopped. What its files held is kept in "+x.aside+", inside its folder.");return IR.info(id);});}
 };
 Object.keys(ROUTE).forEach(function(k){var f=IR[k];if(typeof f!=="function")return;IR[k]=function(id){return isDisk(id)?ROUTE[k].apply(null,arguments):f.apply(IR,arguments);};});
 ["branch","delBranch","tag","delTag","merge","rebase","revert","setRef","stopMerge","switchTo"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;
@@ -241,7 +273,8 @@ function moves(list){var out=list.map(function(c){return JSON.parse(JSON.stringi
   if(d&&d.rec&&id===sel&&!d.over&&!d.mid&&!WRITING[id]&&d.rec.disk&&d.rec.disk.worktree)d.at=0;
   var p=(d&&d.rec&&d.at&&id!==sel)?Promise.resolve(copyOf(d.rec)):diskRec(id);
   return p.then(function(r){if(!r)throw new Error("that repository is no longer on this device");var dd=DK[id],view=!!(dd&&dd.over),ch=(!view&&r.changes&&r.changes.length)?moves(r.changes):[];
-    return {changes:ch,clean:!ch.length,head:headOid(r),branch:r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):null,merging:null};});};
+    return {changes:ch,clean:!ch.length,head:headOid(r),branch:r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):null,
+      merging:r.merging?{theirs:r.merging.label,conflicts:(r.merging.conflicts||[]).slice()}:null};});};
   var nt=IR.notes;IR.notes=function(id,oid){if(!isDisk(id))return nt.apply(IR,arguments);var n=sideNotes(id);return Promise.resolve(oid?JSON.parse(JSON.stringify(n[oid]||{})):JSON.parse(JSON.stringify(n)));};})();
 
 /* ============ Your apps: On this computer, and Kept in Ingenium ============ */
