@@ -73,6 +73,9 @@ def skip_modules(ed):
     if not has_lector(ed):
         out |= {"r107.js", "r108.js", "r148.js"}  # Lector, as approved; how it reads; how it writes
         out |= {"r188.js"}  # 6.8.3: the Career Studio, which writes with Lector ("Please keep the Lector page and the new Career Studio page off the demo and its tour")
+        out |= {"r283.js", "r286.js", "r287.js"}  # 6.93: the counsellor, the Career Studio's dial and Lector's fan, where those pages are
+    if not has_fabrica(ed):
+        out |= {"r288.js"}  # 6.93: Fabrica's tree of versions, where there is a Fabrica
     return out
 
 
