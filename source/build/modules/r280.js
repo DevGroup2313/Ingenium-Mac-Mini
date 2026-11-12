@@ -392,7 +392,8 @@ function liveVersions(){var r=cur(),b=say("Any version, live","");if(!b)return;v
         IngShip.onePage(r.id,{ref:c.oid}).then(function(x){k.disabled=false;var w=typeof W.ingOpenApart==="function"?W.ingOpenApart(x.html,r.name+" · "+c.short):null;
           toast(w?r.name+" as it was at "+(c.names[0]||c.short)+" is open in a window of its own.":"This build cannot open a window; Run opens the newest version.");},function(e){k.disabled=false;fail(e);});};row.appendChild(k);list.appendChild(row);});
     b.appendChild(list);},function(e){out.textContent=String(e&&e.message||e);});}
-function secondCopy(){say("A second copy","A second copy on another drive, checked every week, comes with the next stage, with writing on the drive. Nothing is copied yet.");}
+function secondCopy(){if(W.IngCopies&&IngCopies.open)return IngCopies.open();/* 6.88: modules/r281.js */
+  say("A second copy","A second copy on another drive is made by Ingenium's app on this computer.");}
 function itsFolder(){var r=cur();if(!r){say("Its folder","Choose an app first.");return;}var fs=[];try{fs=W.IngFolders&&IngFolders.folders?IngFolders.folders():[];}catch(e){}
   var nm=String(r.name||"").toLowerCase(),f=fs.filter(function(p){return String(p.name||"").toLowerCase()===nm;})[0];
   if(!f){say("Its folder","No folder in Folders is named "+r.name+" yet.");return;}
@@ -411,12 +412,14 @@ function ingPart(){var sp=$("fbShip"),body=sp&&sp.querySelector(".f-pn-b"),row=b
     ["notes","Release notes","from the versions since the last tag",notes],["message","A message","for the changes you are keeping",message]].forEach(function(a){t1.appendChild(tile(a[0],a[1],a[2],a[3]));});sec.appendChild(t1);
   var ans=el("div","r280-ans",'<p class="f-hint">Press a card above: the answer is written here.</p>');ans.setAttribute("aria-live","polite");sec.appendChild(ans);
   var f=el("form","r280-find");f.innerHTML='<input type="search" placeholder="Find in every repository" aria-label="Find in every repository, by its words"><button class="f-btn r280-key" type="submit">Find</button>';
-  var hits=el("div","r280-hits");f.addEventListener("submit",function(e){e.preventDefault();findAll(f.querySelector("input").value,hits);});sec.appendChild(f);sec.appendChild(hits);
+  var hits=el("div","r280-hits");f.addEventListener("submit",function(e){e.preventDefault();var q=f.querySelector("input").value;
+    if(f.getAttribute("data-how")==="meaning"&&W.IngMeaning){IngMeaning.find(q,hits);return;}findAll(q,hits);});sec.appendChild(f);sec.appendChild(hits);
+  if(W.IngMeaning&&IngMeaning.dress)IngMeaning.dress(f);/* 6.88: By its words, or By what it means (modules/r281.js) */
   sec.appendChild(el("div","r280-sub","Beyond GitHub"));
-  var t2=el("div","f-targets r280-tiles");[["time","Any version, live","the app as it was then, in its own window",liveVersions],["copy","A second copy","on another drive: in the next stage",secondCopy],
+  var t2=el("div","f-targets r280-tiles");[["time","Any version, live","the app as it was then, in its own window",liveVersions],["copy","A second copy","on another drive, checked every Sunday",secondCopy],
     ["folder","Its folder","in Folders: its conversations and notes",itsFolder]].forEach(function(a){t2.appendChild(tile(a[0],a[1],a[2],a[3]));});sec.appendChild(t2);
   body.appendChild(sec);
-  function mineOn(on){sec.hidden=!on;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;var ft=sp.querySelector(".f-pn-f");if(ft)ft.hidden=on;if(on){sec.querySelector(".r280-where").textContent=whereSaid();body.scrollTop=0;}}
+  function mineOn(on){sec.hidden=!on;b.setAttribute("aria-selected",on?"true":"false");b.tabIndex=on?0:-1;var ft=sp.querySelector(".f-pn-f");if(ft)ft.hidden=on;if(on){sec.querySelector(".r280-where").textContent=whereSaid();body.scrollTop=0;if(W.IngCopies&&IngCopies.dressTile)IngCopies.dressTile();}}
   b.addEventListener("click",function(){if(W.fbRooms&&fbRooms.part)fbRooms.part("ingenium");mineOn(true);});
   try{new MutationObserver(function(){var other=[].some.call(row.querySelectorAll(".fr-part"),function(x){return x!==b&&x.getAttribute("aria-selected")==="true";});if(other&&!sec.hidden)mineOn(false);})
     .observe(row,{attributes:true,subtree:true,attributeFilter:["aria-selected"]});}catch(e){}}
@@ -439,7 +442,7 @@ function boot(){var fb=$("fb");if(!fb){setTimeout(boot,800);return;}if(fb.__r280
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 /* the computer app's bridge comes after the page: Fabrica reads its list again then, so the drive's repositories show at once */
 W.addEventListener("pywebviewready",function(){LIST=null;var x=X();if(x&&x.refresh&&$("fb"))x.refresh().then(function(){x.paint();},function(){});});
-W.IngDisk={list:function(){return listDisk(true);},open:function(id){return diskRec(id);},isDisk:isDisk,forget:forget,find:findAll,
+W.IngDisk={list:function(){return listDisk(true);},open:function(id){return diskRec(id);},isDisk:isDisk,forget:forget,find:findAll,openList:openList,
   state:function(){return {open:Object.keys(DK),order:ORDER.slice(),pre:PRE.size,list:LIST?LIST.length:null};}};
 })();
 try{window.__ingParts["p280"]="running";}catch(_){}

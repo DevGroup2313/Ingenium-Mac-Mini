@@ -18,7 +18,7 @@
 //   Find in every repository finds a word in a drive repository and in one kept in Ingenium, and a find opens its file;
 //   a pull request kept in Ingenium: Merge, Squash and merge, Rebase and merge; Ask Ingenium to review it reads its own changes; squashed,
 //   it is one version with one parent;
-//   Any version, live lists the versions; A second copy says plainly it comes in the next stage;
+//   Any version, live lists the versions; A second copy opens its view (6.88, modules/r281.js: rig/t_688_fabrica.js tests it);
 //   forgetting Atelier (its dialog says Fabrica only forgets it) leaves the drive as it was; Lumen, brought from GitHub, is not forgotten from here;
 //   at a phone's width nothing is wider than the screen and the cards stand one to a row; no page error.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process'); const os = require('os');
@@ -178,7 +178,9 @@ const call = (n, ...args) => fetch(`http://127.0.0.1:${PORT}/call/${n}`, { metho
     const vers = await p.evaluate(() => document.querySelectorAll('#fbPartSec_ingenium .r280-ver').length);
     ok(/Choose a version/.test(lv) && vers === 4, 'Any version, live: every version of main, each with its Open key', { lv, vers });
     const sc = await card('copy');
-    ok(/comes with the next stage/.test(sc) && /Nothing is copied yet\./.test(sc), 'A second copy says plainly that it comes in the next stage', sc);
+    ok(/^A second copy of Atelier/.test(sc) && /kept whole on another drive/.test(sc) && /Not copied yet\./.test(sc), 'A second copy opens its view (6.88)', sc);
+    /* 6.88: Find chooses By what it means where the folder search's engine is; this test reads By its words */
+    await p.evaluate(() => { const k = document.querySelector('#fbPartSec_ingenium .r281-how button[data-h="words"]'); if (k) k.click(); });
     await p.fill('#fbPartSec_ingenium .r280-find input', 'lighthouse'); await p.click('#fbPartSec_ingenium .r280-find button'); await sleep(4000);
     const hits = await p.evaluate(() => [...document.querySelectorAll('#fbPartSec_ingenium .r280-hit')].map(h => h.querySelector('b').textContent + ' ' + h.childNodes[1].textContent.trim()));
     const hitNote = await p.evaluate(() => (document.querySelector('#fbPartSec_ingenium .r280-hits .f-hint') || {}).textContent || '');

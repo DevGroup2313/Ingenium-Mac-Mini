@@ -104,3 +104,13 @@ reached at; the search (`_share_find`) carries them. A device names itself (`X-I
 with the code (`POST /ingenium/pair`); `share_status` lists the devices by name and kind and the names of the models lent;
 `share_device_remove(id)` refuses a device (401, removed) until it pairs again with the code.
 Test: `python3 -I rig/t_681_lend_gateway.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (19 checks).
+
+6.88, `app_copy_688.py` (Mac and Windows; after `app_disk2_687.py`): Fabrica's second copy of a repository on another drive, kept whole and
+checked by fingerprint every day, every Sunday or by hand. Calls: `copy_places`, `copy_choose`, `copy_list`, `copy_plan(rid, folder, when)`,
+`copy_now`, `copy_check`, `copy_forget`. The copy is a bare repository, `<folder>/Ingenium copies/<name>.git`: every pack (its index last)
+and loose object copied as it is, each under a temporary name and renamed when whole; the branches and tags read first and set after; a
+branch taken away from the repository kept in the copy under `refs/ingenium-kept/<time>/`; objects borrowed through git's alternates
+copied too. The check: refs, every object, each pack's own SHA-1 and its index's, each loose object's name; what it finds faulty is copied
+again next time. A scheduler thread looks a minute after the first call and every half hour. Also a fix for 6.86 and 6.87: a repository
+held open has its packed-refs read again when the file changes (dulwich 0.22.8 reads it once). Test: `python3 -I rig/t_688_copy.py
+<Mac ingenium_app.py> <Windows ingenium_app.py>` (29 checks); with it applied, t_686_disk_engine.py 33/33 and t_687_disk_write.py 41/41.

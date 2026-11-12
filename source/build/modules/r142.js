@@ -362,7 +362,7 @@ function full(o){o=o||{};Q.lastAt=Date.now();var now=Date.now();
 /* ================================================================================================================
    2. IngStore: the stores, measured
    ================================================================================================================ */
-var KNOWN=["ingenium_apps","ingenium_big","ingenium_files","ingenium_keys","ingenium_repos","fabrica_made","ingenium_hub","ingenium_desk","the_foundry_files"];
+var KNOWN=["ingenium_apps","ingenium_big","ingenium_files","ingenium_keys","ingenium_repos","fabrica_made","ingenium_hub","ingenium_desk","the_foundry_files","ingenium_meaning"];
 var LABELS={
   ingenium_apps:["Your app library","The pages of your apps, with their newest versions; older ones may be freed when room runs short"],
   ingenium_big:["Long texts","Files and pages your chats, Lector, Code and Build hold"],
@@ -371,6 +371,8 @@ var LABELS={
   ingenium_repos:["Fabrica's history","Every version of the apps you make in Fabrica"],
   fabrica_made:["Fabrica's packages","Apps and kits Fabrica made, kept to save again"],
   ingenium_hub:["Fabrica's issues and pull requests","What you wrote about your apps in Fabrica"],
+  /* 6.88: Find by what it means (modules/r281.js): numbers only, made again when needed */
+  ingenium_meaning:["Fabrica's finds by meaning","What each file of your repositories means, as numbers the folder search's engine made on this computer; made again if let go"],
   ingenium_desk:["The desk's larger copy","Your desk, when the small store is too full for it"],
   the_foundry_files:["An older store","Left from an earlier version; carried over and then let go"],
   /* 6.56: the speech engine dictation (modules/r254.js) and Scriba share, kept so both work offline */

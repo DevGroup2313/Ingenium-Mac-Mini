@@ -1282,7 +1282,7 @@ var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pul
   md:function(s,o){return md(s,o||{});},exportAll:exportAll,importAll:importAll,record:function(id){return recP(id).then(clone);},forget:forget,
   /* open a view of the chosen app: fbHub.open("issues",{n:3}), fbHub.open("compare",{a:"refs/tags/v1",b:"refs/heads/main"}) */
   open:function(view,o){var x=X();if(!x||!HUB.views[view])return false;var r=x.cur();if(!r)return false;o=o||{};var v=V(r);
-    if(view==="compare"){if(o.a)v.cmp.a=o.a;if(o.b)v.cmp.b=o.b;}if(view==="issues"&&o.n!=null)v.iss.open=o.n;if(view==="pulls"&&o.n!=null)v.pr.open=o.n;if(view==="code"){if(o.ref)v.code.ref=o.ref;if(o.file!==undefined)v.code.file=o.file;}show(view);return true;},
+    if(view==="compare"){if(o.a)v.cmp.a=o.a;if(o.b)v.cmp.b=o.b;}if(view==="issues"&&o.n!=null)v.iss.open=o.n;if(view==="pulls"&&o.n!=null)v.pr.open=o.n;if(view==="code"){if(o.ref)v.code.ref=o.ref;if(o.file!==undefined)v.code.file=o.file;if(o.line){v.code.line=+o.line;v.code.mode="view";}}show(view);return true;},
   /* 6.86: what the chosen app's views show now (modules/r280.js asks which pull request is open, to review it) */
   viewing:function(){var x=X(),r=x&&x.cur();if(!r)return null;var v=V(r);return {view:x.S&&x.S.view,pr:v.pr.open,issue:v.iss.open};},
   scan:function(id){return IngRepo.info(id).then(function(r){return recP(id).then(function(){return scan(r,true);});});},run:function(id,ref){return IngRepo.info(id).then(function(r){return runChecks(r,ref||r.head,"hand");});},

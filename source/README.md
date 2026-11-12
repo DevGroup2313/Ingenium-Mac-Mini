@@ -371,6 +371,52 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.88 (12 November 2026): Fabrica, phase 2, second stage, its second part. A second copy on another drive, checked by fingerprint,
+and Find by what it means. Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4; its kit
+in source/previews/fabrica_p2): "I approve of the preview, please push it everywhere." 6.87 built its first part (working on the drive);
+next come the other chat's pieces of the preview (what changed while she was away, people and milestones, comments on a line, Rules before
+main, Safety on every version).
+- desktop/app_copy_688.py (new; after app_disk2_687.py in release.py's DESKTOP list): copy_places (this computer and each drive, as
+  phase 1 lists them, with the room left), copy_choose (the folder dialog), copy_list, copy_plan(rid, folder, when, label), copy_now,
+  copy_check, copy_forget. The copy is a bare repository, <folder>/Ingenium copies/<name>.git (ingenium-copy.json says whose): the
+  branches and tags are read first; every pack (its index last) and loose object is copied as it is, each under a temporary name and
+  renamed when whole, so only what is new travels the next time; then each branch and tag is set, and HEAD. A branch taken away from the
+  repository stays in the copy under refs/ingenium-kept/<time>/; objects borrowed through git's alternates are copied too, so the copy
+  stands alone. The check: every branch and tag as copied, every object of the repository present, each pack against its own SHA-1
+  (the checksum git writes at its end) and its index's, each loose object against its name; what it finds faulty is taken out and copied
+  again next time. One job at a time, in a background thread; a scheduler looks a minute after the first call and every half hour: every
+  day means a day since the last check, every Sunday means not checked since the last Sunday began (a Sunday missed is made up at the
+  next start); a drive not connected is waited for. Also a fix for 6.86 and 6.87, found while testing: Fabrica holds each repository open,
+  and dulwich 0.22.8 reads packed-refs once and keeps it (its own note: "TODO: invalidate the cache on repacking"), so after git gc or
+  git pack-refs in another program a branch taken away still showed, or branches git had packed could vanish from Fabrica; the file is
+  now read again whenever it changes (its inode, time and size).
+- modules/r281.js (new): A second copy in the Ingenium part of Test and ship, as the preview drew it: "Every version, idea and tag, kept
+  whole on another drive, and checked against this one by fingerprint"; the drive in Ingenium's own list (r280's, r172's look) with
+  Choose another folder; Every day, Every Sunday, By hand; Make the copy now, then Check it now (brings it up to date, then checks); the
+  line under it says how far the copy is while it runs, then "Copied and checked just now: every version matches, by fingerprint. Next
+  check: ..." or what is wrong; Stop keeping a copy (the copy stays on its drive). The card's line says where the copy is and when it is
+  checked. A repository kept in Ingenium itself is told plainly that a second copy is for one on the drive. Find has By its words (6.86)
+  and By what it means: the folder search's own engine on this computer (rag/, bge-small, through IngRag.ready and its embedder) reads
+  each text file of every repository once (passages of up to 1,100 characters, never cut inside a line, each with its path; at most 4,000
+  files a repository, files over 384 KB, vendored folders and lock files left out) and keeps only the numbers and the lines they cover,
+  by the file's git name and the model (IndexedDB "ingenium_meaning", named in Storage), so a file is read once in any repository or
+  version; a search lists the passages nearest in meaning (within 0.1 of the best, at most twelve), each opening in Code at its line, and
+  says how much is read; the reading goes on while Ingenium is open, a pause when the window is hidden, with Stop reading.
+- modules/r280.js: the hooks (the copy card's line and view, the find's choice), IngDisk.openList for r281. modules/r141.js:
+  fbHub.open("code", {file, line}). modules/r142.js: Storage names the new store. modules/r176.js: the drive chip, the times and the
+  find's choice lift, sink and sound. modules/r117.js: the tour's Fabrica card says what Fabrica does now. modules/r222.js: the news.
+- Tests: rig/t_688_copy.py 30/30 (the engine, against repositories git made: a working copy, a bare one, one with alternates; git's own
+  fsck on every copy; a byte changed and the packs removed, found and put right; gc followed; the schedule read in local time; a branch
+  taken away in another program after git packed the refs, gone at once); with it applied, t_686_disk_engine.py 33/33 and
+  t_687_disk_write.py 41/41. rig/t_688_fabrica.js 20/20 on a test build with the computer app's back end and the folder search's real
+  files (rag-vendor.zip, its fingerprint 57db28f7... checked): for "where night mode is chosen", app/palette.js, which shares none of
+  those words, came first (0.506; the other files 0.31 to 0.36) and the words search found nothing. t_686_fabrica.js 36/36 (two checks
+  follow 6.88: A second copy opens its view; Find is set to By its words before searching by words), t_687_fabrica.js 17/17,
+  t_680_old_webview 12/12.
+
+    python3 -I rig/t_688_copy.py <Mac ingenium_app.py> <Windows ingenium_app.py>
+    node rig/t_688_fabrica.js <app folder: patched ingenium_app.py and ingenium.html> <rag vendor folder, or ""> <out folder>
+
 Ingenium 6.87 (12 November 2026): Fabrica, phase 2, second stage. Working on the repositories on this computer, right on their drive.
 Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4; its kit in source/previews/fabrica_p2):
 "I approve of the preview, please push it everywhere." This stage is the first of three: working on the drive (6.87); a second copy on
