@@ -406,8 +406,12 @@ Please make the fixes and then push this preview everywhere, I approve of the de
 - modules/r279.js, r176.js: in Folders, the label between the drawer's pulls is a key: only the folders not read yet (state.folders.ui.filter).
 - modules/r276.js (its note now points to On this computer), r176.js (the new keys sound), r222.js (the news), the specs (dulwich.object_store
   and dulwich.index inside the apps).
-- Tests: rig/t_686_disk_engine.py (the computer app's own functions against repositories git made), rig/t_686_repo_unit.js (squash, rebase
-  and lent objects, with no page), rig/t_686_fabrica.js (the page with the computer app's back end, rig/run_app.py).
+- Tests: rig/t_686_disk_engine.py 33/33 (the computer app's own functions against repositories git made), rig/t_686_repo_unit.js 10/10
+  (squash, rebase and lent objects, with no page), rig/t_686_fabrica.js 36/36 (the release page with the computer app's back end,
+  rig/run_app.py). On the release page: t_61_hub 90/90, t_685_folders 37/37, t_62_tour 34/34, t_651_still_keys 25/25 (run alone),
+  t_666_fabrica 23/23, t_661_fabrica 21/21, t_684_settings 20/20, t_683_hub 17/17, t_680_old_webview 12/12. t_666's two Offline Project
+  checks pass only on a release page (a test build carries no demo edition, and the page says so). t_67_sound fails 8 of its 14 checks
+  on the 6.85 release page too: its expectations predate the sound settings she chose later.
 
     python3 -I rig/t_686_disk_engine.py <Mac ingenium_app.py> <Windows ingenium_app.py>
     node rig/t_686_repo_unit.js
