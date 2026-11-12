@@ -9,7 +9,9 @@
    - The fan: the documents of the reading, as Lector names them in The document (Notes and analysis, Project dossier, Appendix, or the
      ones chosen), each a sheet of paper with its tab, its initial, its title, a few lines, its numeral and its ribbon, the one shown in
      front, the others fanned behind it, sealed with Ingenium's seal. Pointed at, a sheet lifts from the fan; pressed, it opens in The
-     document. The fan sways a little when left alone; minimal motion and the system's reduced motion keep it still. */
+     document. The fan sways when left alone, the seal's star turns as Home's engine turns, the ribbon stirs and the sheets behind
+     breathe open and closed (the owner's words of 12 November 2026: "I want real movement and animation on all of the pages");
+     minimal motion and the system's reduced motion keep it still. */
 #page-lector.hd-on #lx7{--l-h:var(--hd-room,640px) !important}
 #page-lector.hd-on #lx7 .l-head > div:first-child{display:none}
 #page-lector.hd-on #lx7 .l-head{justify-content:flex-end}
@@ -75,10 +77,20 @@ body[data-theme="night"] #page-lector .lf-lines i{background:rgba(205,184,240,.1
 body[data-theme="night"] #page-lector .lf-srim{background:linear-gradient(155deg,#6b5d93,#2f2546 50%,#120d1c)}
 #page-lector .lf-scast{position:absolute;left:12px;top:58px;width:50px;height:12px;border-radius:50%;background:rgba(42,20,80,.3);filter:blur(5px);transform:translateZ(-14px)}
 #page-lector .lf-seal canvas{position:absolute;left:0;top:0;width:72px;height:72px}
-#page-lector .lf-seal canvas.lf-sstar{transform:translateZ(7px)}
-body[data-motion="minimal"] #page-lector .lf-sway,body[data-motion="minimal"] #page-lector .lf-sidle{animation:none}
+#page-lector .lf-seal canvas.lf-sstar{transform:translateZ(7px);animation:lfStar 26s linear infinite}
+@keyframes lfStar{from{transform:translateZ(7px) rotate(0deg)}to{transform:translateZ(7px) rotate(-360deg)}}
+/* the ribbon stirs, and the sheets behind breathe open and closed (where the web view knows rotate; elsewhere they stand still) */
+#page-lector .lf-card.lf-f .lf-ribbon{transform-origin:50% 0;animation:lfRib 5.5s ease-in-out infinite}
+@keyframes lfRib{0%,100%{transform:translateZ(3px) rotate(-2deg)}50%{transform:translateZ(3px) rotate(2.6deg)}}
+#page-lector button.lf-card.lf-l{animation:lfOpenL 9s ease-in-out infinite}
+#page-lector button.lf-card.lf-r{animation:lfOpenR 9s ease-in-out infinite}
+@keyframes lfOpenL{0%,100%{rotate:0deg}50%{rotate:-3deg}}
+@keyframes lfOpenR{0%,100%{rotate:0deg}50%{rotate:3deg}}
+#page-lector .lf.lf-hold button.lf-card,#page-lector .lf.lf-hold .lf-ribbon,#page-lector .lf.lf-hold .lf-sstar{animation-play-state:paused}
+body[data-motion="minimal"] #page-lector .lf-sway,body[data-motion="minimal"] #page-lector .lf-sidle,body[data-motion="minimal"] #page-lector .lf-sstar,
+body[data-motion="minimal"] #page-lector .lf-ribbon,body[data-motion="minimal"] #page-lector button.lf-card{animation:none}
 body[data-motion="minimal"] #page-lector button.lf-card,body[data-motion="minimal"] #page-lector .lf-tilt{transition:none}
-@media (prefers-reduced-motion:reduce){#page-lector .lf-sway,#page-lector .lf-sidle{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
+@media (prefers-reduced-motion:reduce){#page-lector .lf-sway,#page-lector .lf-sidle,#page-lector .lf-sstar,#page-lector .lf-ribbon,#page-lector button.lf-card{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p287"]="started";}catch(_){}
 /* R287 · Lector's head, the documents of your apps: see the note at the top of its styles */
@@ -135,7 +147,8 @@ function build(C){var root=mk("div","lf");root.setAttribute("role","group");root
   C.hintSet(["Point at a document to lift it from the fan; press it to read it."]);drawSeal();}
 function paint(){var C=LF.C;if(!C||!C.on||!LF.cards.length)return;var t=three();fill(LF.cards[0],t[0],"l");fill(LF.cards[1],t[1],"f");fill(LF.cards[2],t[2],"r");
   var go=$("l7BriefF")&&$("l7BriefF").querySelector("button.next"),k=C.keys.start;if(k){H.keyText(k,go&&go.textContent.trim()?go.textContent.trim():"Start reading");}}
-function openDoc(d){if(!d)return;if(d.b&&d.b.isConnected){try{d.b.click();}catch(e){}}try{if(W.IngLector&&IngLector.setPanel)IngLector.setPanel("doc");}catch(e){}if(LF.C)LF.C.toRoom("#lx7");setTimeout(paint,40);}
+function openDoc(d){if(!d)return;var box=$("l7Dtabs"),tab=null;/* The document draws its tabs again on each change: find this one by its name now */
+  if(box)[].some.call(box.querySelectorAll("button"),function(x){if((x.textContent||"").trim()===d.name){tab=x;return true;}return false;});if(tab){try{tab.click();}catch(e){}}try{if(W.IngLector&&IngLector.setPanel)IngLector.setPanel("doc");}catch(e){}if(LF.C)LF.C.toRoom("#lx7");setTimeout(paint,40);}
 function startReading(){var go=$("l7BriefF")&&$("l7BriefF").querySelector("button.next");try{if(W.IngLector&&IngLector.setPanel)IngLector.setPanel("brief");}catch(e){}if(go)go.click();if(LF.C)LF.C.toRoom("#lx7");}
 function addApps(){var bf=$("l7Bf"),b=null;if(bf)[].some.call(bf.querySelectorAll("button"),function(x){if(/Add your apps/.test(x.textContent||"")){b=x;return true;}return false;});
   if(b)b.click();else{try{libPickFiles();}catch(e){}}if(LF.C)LF.C.toRoom("#lx7");}

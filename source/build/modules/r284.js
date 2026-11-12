@@ -18,8 +18,11 @@
    - IngHeads.loop: a scene drawn on a canvas runs only while its page is shown, the window is visible, the head is on screen and
      motion is allowed; left alone, nothing in the page is rewritten (the canvas draws; no element changes).
    - Focus: an armillary sphere on its stand. Its meridian ring holds the day's sphere, which wears Focus's mark; a ring of hours with
-     its small moon goes round it, and a band crosses it. It sways a little and the moon goes round; pointed at, it comes to rest facing
-     you; pressed, it opens Today. Beside it, the time and what the hour is good for. Its keys begin the routine the hour suits, and
+     its small moon goes round it, and a band crosses it. The owner's words on its first live movement (12 November 2026): "For the
+     Focus page, I want to see movement and the sphere spinning." So the sphere turns on its axis as a globe does (its meridians and
+     markings run across its face under a still light), the ring carries its twelve hours round, the band turns about the upright as a
+     gyroscope's does and carries its ticks the other way, the moon goes round, and the whole sways; pointed at, it comes to rest
+     facing you; pressed, it opens Today. Beside it, the time and what the hour is good for. Its keys begin the routine the hour suits, and
      open your routines. Minimal motion and the system's reduced motion keep it still. */
 .hd-on{--hd-page0:#fdfcff;--hd-page1:#efe9f8;--hd-ring:rgba(106,63,181,.12);--hd-ink3:#7b7190;--hd-tag:#2e1764;--hd-card:#ffffff;--hd-hair2:rgba(34,26,46,.07);
   --hd-serif:"Head Cormorant","Home Cormorant","Cormorant Garamond",Cormorant,var(--serif,Georgia),serif;--hd-sans:var(--sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif)}
@@ -189,10 +192,13 @@ function metal(kind){var n=night();
   return n?{dark:"#221a3c",mid:"#5f4f90",light:"#a898d8"}:{dark:"#6c58a6",mid:"#ab98da",light:"#f3eeff"};}
 
 /* ---------- the frame loop: only while it can be seen ---------- */
-function Loop(draw){var raf=0,on=false,last=0;
-  function tick(t){raf=0;if(!on)return;var dt=last?Math.min(64,t-last):16;last=t;var more=true;try{more=draw(dt,t)!==false;}catch(e){on=false;try{console.warn("Ingenium: a head's scene",e&&e.message||e);}catch(_){}return;}
-    if(!more){on=false;last=0;return;}raf=requestAnimationFrame(tick);}
-  return {start:function(){if(on)return;on=true;last=0;raf=requestAnimationFrame(tick);},stop:function(){on=false;last=0;if(raf){cancelAnimationFrame(raf);raf=0;}},running:function(){return on;}};}
+/* a scene is drawn thirty times a second at most: its movements are slow, and every frame drawn is work for the computer */
+function Loop(draw,fps){var raf=0,tmo=0,on=false,last=0,gap=1000/(fps||30);
+  /* between two drawn frames it waits on a timer, so the browser is asked for no frame it does not draw */
+  function next(){var wait=last?Math.max(0,gap-(performance.now()-last)-4):0;if(wait>1)tmo=setTimeout(function(){tmo=0;if(on)raf=requestAnimationFrame(tick);},wait);else raf=requestAnimationFrame(tick);}
+  function tick(t){raf=0;if(!on)return;var dt=last?Math.min(80,t-last):33;last=t;var more=true;try{more=draw(dt,t)!==false;}catch(e){on=false;try{console.warn("Ingenium: a head's scene",e&&e.message||e);}catch(_){}return;}
+    if(!more){on=false;last=0;return;}next();}
+  return {start:function(){if(on)return;on=true;last=0;raf=requestAnimationFrame(tick);},stop:function(){on=false;last=0;if(raf){cancelAnimationFrame(raf);raf=0;}if(tmo){clearTimeout(tmo);tmo=0;}},running:function(){return on;}};}
 
 /* ---------- a sound for a scene's own parts, as the keys sound (modules/r176.js) ---------- */
 function sound(kind){var I=W.IngSound;if(!I||typeof I.voice!=="function")return;try{var c=typeof I.config==="function"?I.config():null,v=kind==="press"?(c&&c.press)||"keyPress":(c&&c.hover)||"keyTouch";I.voice(v);}catch(e){}}
@@ -256,7 +262,7 @@ function mount(cfg){var C={cfg:cfg,on:false,page:null,head:null,words:null,scene
     var lastW=-1,rq=0,onSize=function(){rq=0;var w=p.clientWidth;if(w===lastW&&C.on)return;lastW=w;mountNow();try{cfg.resize&&C.on&&cfg.resize(C);}catch(e){}};
     try{new ResizeObserver(function(){if(!rq)rq=requestAnimationFrame(onSize);}).observe(p);}catch(x){W.addEventListener("resize",mountNow);}
     W.addEventListener("resize",function(){if(C.on){roomVar();try{cfg.resize&&cfg.resize(C);}catch(e){}}});
-    try{new MutationObserver(function(){vis();if(C.on&&p.classList.contains("active"))paint();}).observe(p,{attributes:true,attributeFilter:["class"]});}catch(x){}
+    try{new MutationObserver(function(){vis();if(C.on&&p.classList.contains("active")){roomVar();paint();}}).observe(p,{attributes:true,attributeFilter:["class"]});}catch(x){}
     try{new MutationObserver(function(){if(C.on){try{cfg.theme&&cfg.theme(C);}catch(e){}paint();}}).observe(D.body,{attributes:true,attributeFilter:["data-theme","data-motion"]});}catch(x){}
     D.addEventListener("visibilitychange",vis);
     mountNow();}
@@ -302,6 +308,30 @@ function fxBase(G){var d=dpr(),n=night(),sig=[d,n?1:0].join("|");if(BASE.sig===s
   var fx=rx*.17,fy=ry*.17;g.beginPath();g.ellipse(bx,by,fx,fy,0,0,TAU);g.fillStyle=n?"#3b2f5e":"#cbbde9";g.fill();
   g.strokeStyle=n?"rgba(0,0,0,.4)":"rgba(90,64,150,.3)";g.lineWidth=1;g.stroke();
   BASE.cv=cv;return cv;}
+/* the sphere of the day turns on its axis under a light that stays where it is: its meridians and its markings run across its face
+   and foreshorten toward its rim, as a globe's do; its axis leans toward you a little */
+var SPOTS=[[.5,0,.16,1],[-.2,.9,.22,0],[.15,2.1,.13,1],[-.55,2.9,.18,0],[.62,3.8,.12,0],[-.05,4.6,.2,1],[.35,5.4,.15,0],[-.4,1.6,.11,1]];
+function globe(g,x,y,r,P,spin){var k=r/40,A=44*Math.PI/180,ca=Math.cos(A),sa=Math.sin(A),n=night(),i,j;
+  function pt(px,py){var dx=px-60,dy=py-60;return [x+(dx*ca-dy*sa)*k,y+(dx*sa+dy*ca)*k];}
+  var c=pt(48.8,60),f=pt(36,60),gr=g.createRadialGradient(f[0],f[1],0,c[0],c[1],59.2*k);
+  gr.addColorStop(0,P.c0);gr.addColorStop(.16,P.c1);gr.addColorStop(.52,P.c2);gr.addColorStop(.86,P.c3);gr.addColorStop(1,P.c4);
+  g.save();g.beginPath();g.arc(x,y,r,0,TAU);g.fillStyle=gr;g.fill();g.clip();
+  var tl=20*Math.PI/180,ct=Math.cos(tl),st=Math.sin(tl);
+  function P3(lat,lon){var cl=Math.cos(lat),X=r*cl*Math.sin(lon),Y0=-r*Math.sin(lat),Z0=r*cl*Math.cos(lon);return [x+X,y+Y0*ct-Z0*st,(Y0*st+Z0*ct)/r];}
+  SPOTS.forEach(function(S){var p=P3(S[0],S[1]+spin);if(p[2]<=0)return;var rr=S[2]*r,fx=Math.max(.15,Math.sqrt(Math.max(0,1-Math.pow((p[0]-x)/r,2)))),a=Math.min(1,p[2]*1.6);
+    g.save();g.translate(p[0],p[1]);g.scale(fx,1);var sg=g.createRadialGradient(0,0,0,0,0,rr);sg.addColorStop(0,S[3]?"rgba(255,255,255,"+(.22*a)+")":"rgba(26,8,64,"+(.26*a)+")");sg.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=sg;g.beginPath();g.arc(0,0,rr,0,TAU);g.fill();g.restore();});
+  g.lineWidth=Math.max(.6,r*.012);g.lineCap="round";
+  /* each line drawn in one stroke, as bright as its nearest part faces you */
+  for(i=0;i<10;i++){var lon=i*TAU/10+spin,prev=null,face=0,open=false;g.beginPath();for(j=-12;j<=12;j++){var q=P3(j/12*Math.PI*.5,lon);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);if(q[2]>face)face=q[2];}else open=false;}
+    if(face>0){g.strokeStyle=n?"rgba(236,226,255,"+(.2*face)+")":"rgba(255,255,255,"+(.26*face)+")";g.stroke();}}
+  [[0,.2],[.5,.12],[-.5,.12]].forEach(function(L){var open=false;g.beginPath();for(j=0;j<=36;j++){var q=P3(L[0],j/36*TAU);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);}else open=false;}
+    g.strokeStyle=n?"rgba(236,226,255,"+L[1]+")":"rgba(255,255,255,"+(L[1]*1.2)+")";g.stroke();});
+  var p1=pt(18,60),p2=pt(102,60),tg=g.createLinearGradient(p1[0],p1[1],p2[0],p2[1]);tg.addColorStop(0,rgba(P.csh,0));tg.addColorStop(.4,rgba(P.csh,0));tg.addColorStop(.76,rgba(P.csh,P.ct1));tg.addColorStop(1,rgba(P.csh,P.ct2));
+  g.fillStyle=tg;g.fillRect(x-r,y-r,2*r,2*r);var eg=g.createRadialGradient(x,y,0,x,y,r);eg.addColorStop(0,rgba(P.csh,0));eg.addColorStop(.7,rgba(P.csh,0));eg.addColorStop(.93,rgba(P.csh,P.ce1));eg.addColorStop(1,rgba(P.csh,P.ce2));
+  g.fillStyle=eg;g.fillRect(x-r,y-r,2*r,2*r);ell(g,x,y-r*.66,r*.5,r*.17,"#efe3ff",.18);g.restore();
+  var h=pt(41,60);g.save();g.translate(h[0],h[1]);g.rotate(A);g.scale(9.5*k,13.5*k);var hg=g.createRadialGradient(0,0,0,0,0,1);
+  hg.addColorStop(0,"rgba(255,255,255,.85)");hg.addColorStop(.4,"rgba(255,255,255,.32)");hg.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=hg;g.beginPath();g.arc(0,0,1,0,TAU);g.fill();g.restore();}
 function fxMark(g,x,y,m,a){/* Focus's mark: two rings and a point, standing above the face (a violet and a lavender copy under the white one) */
   var L=[[1.25,1.7,night()?"rgba(20,6,48,.55)":"rgba(46,23,100,.45)"],[.6,.85,"#cdb8ff"],[0,0,"#ffffff"]];
   g.save();g.globalAlpha=a==null?1:a;L.forEach(function(l){var ox=l[0]*m*.06,oy=l[1]*m*.06;g.strokeStyle=l[2];g.fillStyle=l[2];g.lineWidth=m*.085;
@@ -318,24 +348,31 @@ function fxDraw(){var C=FX.C,cv=FX.cv;if(!cv)return;var d=dpr(),Wd=Math.round(FX
   addRing(fxRing(G,1,Math.PI/2,0,turn,96),G.R*.062,M,1);                              /* the meridian, upright, facing you */
   addRing(fxRing(G,.085,Math.PI/2,0,turn,28,[0,1.05,0]),G.R*.04,M,.9);             /* the knot that holds it on the stem */
   var tilt=-7*Math.PI/180;addRing(fxRing(G,1.02,tilt,3*Math.PI/180,turn,96),G.R*.03,Mf,.95);   /* the ring of the hours, nearly level */
-  addRing(fxRing(G,.93,8*Math.PI/180,-26*Math.PI/180,turn,96),G.R*.046,Mb,1);         /* the band that crosses it */
+  var prec=turn+FX.t/48000*TAU;addRing(fxRing(G,.93,8*Math.PI/180,-26*Math.PI/180,prec,96),G.R*.046,Mb,1);   /* the band that crosses it, turning about the upright */
+  /* the marks they carry round: twelve hours on the ring, and the band's fine ticks the other way */
+  function onRing(rad,a,b,tn,u){var ca2=Math.cos(a),sa2=Math.sin(a),cb2=Math.cos(b),sb2=Math.sin(b),x0=rad*Math.cos(u),z0=rad*Math.sin(u),y1=-z0*sa2,z1=z0*ca2;return fxProj(G,x0*cb2-y1*sb2,x0*sb2+y1*cb2,z1,tn);}
+  var hr=FX.t/30000*TAU;for(var hh=0;hh<12;hh++){(function(hh){var p=onRing(1.02,tilt,3*Math.PI/180,turn,hh/12*TAU+hr);items.push({z:p[2]+.001,f:function(){var big=hh%3===0,rr=(big?3.2:2.1)*p[3];
+    var hg=g.createRadialGradient(p[0]-rr*.3,p[1]-rr*.3,0,p[0],p[1],rr);hg.addColorStop(0,"#ffffff");hg.addColorStop(1,night()?"#9a7ad8":"#8a5fd6");g.fillStyle=hg;g.beginPath();g.arc(p[0],p[1],rr,0,TAU);g.fill();}});})(hh);}
+  var br=-FX.t/40000*TAU;for(var bt=0;bt<24;bt++){(function(bt){var u=bt/24*TAU+br,p=onRing(.93,8*Math.PI/180,-26*Math.PI/180,prec,u),q=onRing(.93,8*Math.PI/180,-26*Math.PI/180,prec,u+.02);
+    items.push({z:p[2]+.002,f:function(){g.strokeStyle=night()?"rgba(240,230,255,.75)":"rgba(255,255,255,.95)";g.lineWidth=1.4*p[3];g.lineCap="round";g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke();}});})(bt);}
   /* the moon on the ring of the hours */
-  var mu=FX.t/24000*TAU,ca=Math.cos(tilt),sa=Math.sin(tilt),mx=1.02*Math.cos(mu+2.4),mz=1.02*Math.sin(mu+2.4),my=-mz*sa,mz1=mz*ca,cb=Math.cos(3*Math.PI/180),sb=Math.sin(3*Math.PI/180);
+  var mu=FX.t/12000*TAU,ca=Math.cos(tilt),sa=Math.sin(tilt),mx=1.02*Math.cos(mu+2.4),mz=1.02*Math.sin(mu+2.4),my=-mz*sa,mz1=mz*ca,cb=Math.cos(3*Math.PI/180),sb=Math.sin(3*Math.PI/180);
   var mp=fxProj(G,mx*cb-my*sb,mx*sb+my*cb,mz1,turn);items.push({z:mp[2],f:function(){var r=G.R*.075*mp[3],im=orb(Math.round(r),P,"faint");g.drawImage(im,mp[0]-im.__s/2,mp[1]-im.__s/2,im.__s,im.__s);}});
   /* the sphere of the day, with its mark standing above its face */
   items.push({z:ballZ,f:function(){var r=G.R*.43,lift=FX.lift,bx=G.cx,by=G.cy-lift*4;r*=1+lift*.025-(FX.down?.025:0);
-    cast(g,bx+r*.1,G.cy+r*1.02,r*.7,r*.16,.12);orbPaint(g,bx,by,r,P,"aurora",FX.t/60000);
+    cast(g,bx+r*.1,G.cy+r*1.02,r*.7,r*.16,.12);globe(g,bx,by,r,P,FX.t/14000*TAU);
     var par=Math.sin(turn)*r*.2;fxMark(g,bx+par,by,r*.92,1);}});
   items.sort(function(a,b){return a.z-b.z;});items.forEach(function(it){it.f();});}
-function fxStep(dt){var sp=motion()==="full"?1.35:1,goal=(FX.hold||still())?0:1;
+function fxStep(dt){if(still()){FX.amp=0;FX.sw=0;FX.lift=FX.hover?1:0;fxDraw();return false;}
+  var sp=motion()==="full"?1.35:1,goal=FX.hold?0:1;
   FX.amp+=(goal-FX.amp)*Math.min(1,dt/420);if(Math.abs(goal-FX.amp)<.002)FX.amp=goal;
   if(!FX.hold&&!still()){FX.t+=dt*sp;}
   FX.sw=FX.amp*(14*Math.PI/180)*Math.sin(FX.t/18000*TAU);
   var lg=FX.hover?1:0;FX.lift+=(lg-FX.lift)*Math.min(1,dt/140);if(Math.abs(lg-FX.lift)<.01)FX.lift=lg;
   fxDraw();
   /* keep going while anything moves; a still sphere is drawn once and left */
-  return !(FX.amp===0&&goal===0&&FX.lift===lg&&(FX.hold||still()));}
-function fxRun(){if(!FX.C||!FX.C.shown){if(FX.loop)FX.loop.stop();return;}if(!FX.loop)FX.loop=Loop(fxStep);FX.loop.start();}
+  return !(FX.amp===0&&goal===0&&FX.lift===lg&&FX.hold);}
+function fxRun(){if(!FX.C||!FX.C.shown){if(FX.loop)FX.loop.stop();return;}if(still()){if(FX.loop)FX.loop.stop();fxDraw();return;}if(!FX.loop)FX.loop=Loop(fxStep);FX.loop.start();}
 function fxTick(){/* the time beside the sphere, and what the hour is good for: once a minute, only when it changes */
   var C=FX.C;if(!C||!C.on)return;var rt=routine(),t=clock(),s=rt?"a good moment for "+lower(rname(rt)):partOfDay();C.tagSet(t,s);
   var b=C.keys.begin;if(b){keyText(b,rt?"Begin "+lower(rname(rt)):"Open Today");keyIcon(b,rt?"play":"open");}}

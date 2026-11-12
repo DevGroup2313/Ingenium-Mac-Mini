@@ -1,10 +1,10 @@
 {
   "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
   "modules": [
-    "r283.js",
-    "r284.js",
-    "r286.js",
     "r287.js",
+    "r284.js",
+    "r283.js",
+    "r286.js",
     "r288.js",
     "r289.js"
   ],
@@ -20,5 +20,6 @@
   "released_677": "r259.js (Downloads on the Models page) rides from 6.77 (11 November 2026): she asked for it again on 10 November (\"I also want a section added to the Models page where I can see recently downloaded models and also the ones downloaded for Storage for later use\"), the third time, so it ships in the Models page's look of 6.76 (the turret and its rooms) rather than waiting for a preview of its own. Its cards wear the app's card heading (h2.sec), and a model in many parts folds its parts away behind one key; rig/t_677_downloads.js.",
   "held_690": "r283.js (Your counsellor: one path of five stages in the Career Studio, Today's whole picture, Suggestions beside the document in Lector) waits for her answer to its live preview (her rule: a preview before anything new); rig/t_690_counsel.js passes 33/33 on the test build, which keeps it. Without it the studio reads as 6.89 (Your mentor), with 6.90's changes to r188: the frank voice, the recommended path and one alternative, no contact, referee or pay figure sent to a connected model, CV bullets from an app's reading, and the studio opening on Today.",
   "released_691": "r285.js (Fabrica: Rules before main, Safety on every version, what changed while she was away) rides from 6.91 (12 November 2026), approved on preview version 4 of phase 2 (\"I approve of the preview, please push it everywhere\"); rig/t_691_rules.js 36/36 on the test build.",
-  "held_693": "r284.js (the studios' heads and Focus's armillary), r286.js (the Career Studio's dial), r287.js (Lector's fan of documents), r288.js (Fabrica's tree of versions) and r289.js (Build's prism) wait for the owner's answer to their pictures. The four heads were approved on 12 November 2026 on an earlier session's pictures, but that session's sources were lost; these are drawn again from the pictures (the owner's verdict on the first redrawing: \"ugly and childlike and amateurish\", then \"I want real texture and 3D animation and styling\"), so they ride only once the owner approves the redrawing. r289 is a new design."
+  "held_693": "All the 6.93 heads are held (12 November 2026). r284.js (the shared heads and Focus's armillary) and r287.js (Lector's fan) were approved as designs on their pictures (\"I approve of the Lector and Focus page designs\"), then their movement was refused on the live preview (https://claude.ai/artifact/D4tLB2LZEmpEp31RdmBKEh, private): \"All of these animations are wrong and stiff and rigid. They feel off and smooth and natural. The light through the prism is genuinely horrible. The engine button for the Lector page is stiff and not animated and clickable and the sway is off and rigid. I disliked them all.\" r286.js (the dial) and r288.js (the tree) are paused at the owner's word; r283.js (the counsellor) stays held with the dial; r289.js (Build's prism) waits, its light refused. Nothing of them rides until the owner approves a live preview.",
+  "paused_693": "r286.js (the Career Studio's dial) and r288.js (Fabrica's tree of versions) are paused at the owner's word (12 November 2026): \"Let's pause on the Career Studio and Fabrica pages previews because they are all atrocious and getting worse not better.\" r283.js (the counsellor) stays held with the dial. r289.js (Build's prism) waits for the owner's answer to its live preview (https://claude.ai/artifact/MoQYvFf97LR8qHs2EZS8NY, private): \"I do however like the Build page preview. I want to see it as a live interactive preview with the animation and the 3D visuals before I fully approve.\""
 }

@@ -1,0 +1,189 @@
+<title>Ingenium Page Heads</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* layout: three of Ingenium's pages in miniature (Build, Focus, Lector), one at a time as the app shows them, each with its new head over
+   a small stand-in for the page beneath; the heads' code is the modules that would ship (modules/r284.js, r287.js, r289.js), the keys and
+   colours measured from the built page (Ingenium 6.92) */
+:root{
+  --bg:#f5f3f7;--card:#faf8fc;--ink-1:#221a2e;--ink-2:#4a4358;--ink-3:#6c6579;--accent:#6a3fb5;--accent-deep:#4e2c8a;--hairline:rgba(34,26,46,.10);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --k-face:linear-gradient(#ffffff,#f9f7fc);--k-ink:#221a2e;--k-border:rgba(34,26,46,.10);
+  --k-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
+  --k-sh-up:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --k-sh-down:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --p-face:linear-gradient(#7348be,#5d37a1);--p-border:#4b2a86;
+  --p-sh:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #3a2070,0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16);
+  --p-sh-up:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #3a2070,0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18);
+  --p-sh-down:inset 0 2px 5px rgba(20,8,48,.35),0 1px 1px rgba(40,22,68,.18);
+  --seg-bg:rgba(106,63,181,.08);--field:#ffffff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18;--card:#1c1626;--ink-1:#f3eefb;--ink-2:#d3c9e3;--ink-3:#a99cc1;--accent:#b79ce6;--accent-deep:#9a7ad8;--hairline:rgba(205,184,240,.11);
+  --k-face:linear-gradient(#2a2239,#251e33);--k-ink:#f3eefb;--k-border:rgba(205,184,240,.11);
+  --k-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --k-sh-up:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --k-sh-down:inset 0 2px 5px rgba(0,0,0,.55),0 1px 1px rgba(0,0,0,.4);
+  --p-face:linear-gradient(#7a56c8,#5b3aa1);--p-border:#2c1956;
+  --p-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --p-sh-up:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 #170b30,0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4);
+  --p-sh-down:inset 0 2px 5px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --seg-bg:rgba(205,184,240,.08);--field:#15101f;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18;--card:#1c1626;--ink-1:#f3eefb;--ink-2:#d3c9e3;--ink-3:#a99cc1;--accent:#b79ce6;--accent-deep:#9a7ad8;--hairline:rgba(205,184,240,.11);
+  --k-face:linear-gradient(#2a2239,#251e33);--k-ink:#f3eefb;--k-border:rgba(205,184,240,.11);
+  --k-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --k-sh-up:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --k-sh-down:inset 0 2px 5px rgba(0,0,0,.55),0 1px 1px rgba(0,0,0,.4);
+  --p-face:linear-gradient(#7a56c8,#5b3aa1);--p-border:#2c1956;
+  --p-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --p-sh-up:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 #170b30,0 6px 9px rgba(0,0,0,.52),0 13px 22px rgba(0,0,0,.4);
+  --p-sh-down:inset 0 2px 5px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --seg-bg:rgba(205,184,240,.08);--field:#15101f;color-scheme:dark}
+body{background:var(--bg);color:var(--ink-1);font-family:var(--sans);padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+main.main{max-width:1180px;margin:0 auto}
+main.main > .section{display:none}main.main > .section.active{display:block}
+/* the keys, as the app draws them (measured) */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:8px 14px;border:1px solid var(--k-border);border-radius:9px;background:var(--k-face);color:var(--k-ink);
+  font:600 13px/1 var(--sans);cursor:pointer;box-shadow:var(--k-sh);-webkit-tap-highlight-color:transparent;
+  transition:transform .1s cubic-bezier(.34,1.35,.64,1),box-shadow .12s,background-color .15s,color .15s,border-color .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--k-sh-up)}
+.btn:active{transform:translateY(1px);box-shadow:var(--k-sh-down);transition-duration:.06s}
+.btn.primary{background:var(--p-face);border-color:var(--p-border);color:#ffffff;box-shadow:var(--p-sh)}
+.btn.primary:hover{box-shadow:var(--p-sh-up)}
+.btn.primary:active{box-shadow:var(--p-sh-down)}
+.btn:focus{outline:none}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.small{height:30px;padding:6px 12px;font-size:12.5px}
+.btn[aria-pressed="true"]{background:var(--p-face);border-color:var(--p-border);color:#ffffff;box-shadow:var(--p-sh-down)}
+/* the preview's own bar: what this is, and the two settings that change the head */
+.pv-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;max-width:1180px;margin:0 auto 18px}
+.pv-what{flex:1 1 320px;min-width:0}
+.pv-what b{display:block;font:600 11px/1.3 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+.pv-what span{display:block;margin-top:4px;font-size:13px;line-height:1.5;color:var(--ink-2);max-width:62ch}
+.pv-set{display:flex;align-items:center;gap:8px}
+.pv-set > span{font:600 10.5px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.pv-seg{display:flex;gap:6px;padding:4px;border-radius:12px;background:var(--seg-bg)}
+/* the page under the head: Build's own editor and its running page */
+#page-build > .page-title{margin:0 0 6px;font:700 28px/1.2 var(--serif)}
+#page-build > .lede{margin:0 0 18px;color:var(--ink-2);font-size:14px;line-height:1.55}
+.bp-card{max-width:1180px;margin:0 auto;padding:14px;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hairline),0 8px 22px rgba(40,22,68,.07)}
+.bp-tools{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:12px}
+.bp-toggle{display:inline-flex;align-items:center;gap:7px;font:600 12.5px/1 var(--sans);color:var(--ink-2)}
+.bp-toggle input{width:16px;height:16px;accent-color:var(--accent)}
+.build-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.build-grid{grid-template-columns:minmax(0,1fr)}}
+.bp-pane{min-width:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--hairline)}
+.bp-h{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;font:600 12.5px/1.3 var(--sans);color:var(--ink-1);border-bottom:1px solid var(--hairline)}
+.bp-h span{font-weight:500;color:var(--ink-3)}
+#codeEditor{display:block;width:100%;min-height:300px;flex:1 1 auto;margin:0;padding:12px;border:0;resize:vertical;background:var(--field);color:var(--ink-1);font:12.5px/1.6 var(--mono);white-space:pre;overflow:auto}
+#codeEditor:focus{outline:2px solid var(--accent);outline-offset:-2px}
+#previewFrame{display:block;width:100%;min-height:300px;flex:1 1 auto;border:0;background:#ffffff}
+/* the stand-ins for Focus's parts and Lector's panels, so the heads' keys have something to open */
+.st-card{max-width:1180px;margin:0 auto 14px;padding:16px 18px;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1px var(--hairline),0 8px 22px rgba(40,22,68,.07)}
+.st-card h3{margin:0 0 6px;font:600 17px/1.3 var(--serif);color:var(--ink-1)}
+.st-card p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.fxp-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:1180px;margin:0 auto 14px}
+@media (max-width:760px){.fxp-bar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.fxp-bar button{display:block;text-align:left;height:auto;padding:14px 16px;border-radius:16px;line-height:1.35}
+.fxp-bar button b{display:block;font:600 15px/1.3 var(--serif)}.fxp-bar button span{display:block;margin-top:4px;font-weight:500;font-size:12.5px;color:inherit;opacity:.8}
+.st-rows{display:grid;gap:8px;margin-top:10px}
+.st-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;box-shadow:inset 0 0 0 1px var(--hairline)}
+#page-lector > .lede{display:none}
+#lx7 .l-head{display:flex;justify-content:flex-end;margin:0 auto 12px;max-width:1180px}
+#l7Dtabs{display:flex;flex-wrap:wrap;gap:6px;padding:4px;border-radius:999px;background:var(--seg-bg);width:max-content;max-width:100%}
+#l7Dtabs button .dot{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--ink-3);opacity:.5}
+.lx-doc{margin-top:12px;padding:22px;border-radius:14px;background:var(--field);box-shadow:inset 0 0 0 1px var(--hairline)}
+.lx-doc h4{margin:0 0 8px;font:600 20px/1.2 var(--serif);color:var(--ink-1)}
+/* the heads: their own styles, as they ship */
+/*R284_CSS*/
+/*R287_CSS*/
+/*R289_CSS*/
+</style>
+<script>(function(){var r=document.documentElement,t=r.getAttribute("data-theme"),d=t==="dark"||(t!=="light"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);document.body.setAttribute("data-theme",d?"night":"day");document.body.setAttribute("data-motion","calm");})();</script>
+<div class="pv-bar">
+  <div class="pv-what"><b>Ingenium · three heads, live</b><span>Build, Focus and Lector, each running the code that would ship. Point at a scene to still it; press it to act, as the page's own keys do.</span></div>
+  <div class="pv-set"><span>Page</span><div class="pv-seg" role="group" aria-label="Page"><button class="btn small" type="button" id="pvBuild" data-v="build">Build</button><button class="btn small" type="button" id="pvFocus" data-v="focus">Focus</button><button class="btn small" type="button" id="pvLector" data-v="lector">Lector</button></div></div>
+  <div class="pv-set"><span>Display</span><div class="pv-seg" role="group" aria-label="Display"><button class="btn small" type="button" id="pvDay" data-d="light">Day</button><button class="btn small" type="button" id="pvNight" data-d="dark">Night</button></div></div>
+  <div class="pv-set"><span>Motion</span><div class="pv-seg" role="group" aria-label="Motion"><button class="btn small" type="button" id="pvCalm" data-m="calm">Calm</button><button class="btn small" type="button" id="pvFull" data-m="full">Full</button><button class="btn small" type="button" id="pvMin" data-m="minimal">Minimal</button></div></div>
+</div>
+<main class="main">
+  <section class="section active" id="page-build">
+    <h1 class="page-title">Build</h1>
+    <p class="lede">Write a page and watch it run beside your code. Good for trying an idea, checking a snippet, or letting a model help you fix something. This works fully offline and does not need a model.</p>
+    <div class="bp-card">
+      <div class="bp-tools">
+        <button class="btn primary small" type="button" id="runBtn">Run</button>
+        <label class="bp-toggle"><input type="checkbox" id="autoRun" checked> Run as I type</label>
+        <button class="btn small" type="button" id="sampleBtn">Load a sample</button>
+        <button class="btn small" type="button" id="clearBuild">Clear</button>
+      </div>
+      <div class="build-grid" id="buildGrid">
+        <div class="bp-pane"><div class="bp-h">Your code <span>HTML, CSS and JS in one</span></div><textarea id="codeEditor" spellcheck="false" aria-label="Your code"></textarea></div>
+        <div class="bp-pane"><div class="bp-h">Preview <span id="bpRuns" aria-live="polite"></span></div><iframe id="previewFrame" sandbox="allow-scripts" title="Your page, running"></iframe></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="page-focus">
+    <h1 class="page-title">Focus</h1>
+    <p class="lede">Support that fits how you work: one step at a time, time you can see, a calm screen when you need it, and clear words. Change any of it, or switch it off, here or in Settings, under Support.</p>
+    <div class="fxp-bar" role="tablist" aria-label="Focus's parts">
+      <button class="btn" type="button" role="tab" data-part="today" id="fxTabToday"><b>Today</b><span>What is in front of you now</span></button>
+      <button class="btn" type="button" role="tab" data-part="work"><b>Work</b><span>Steps, a timer and the Inbox</span></button>
+      <button class="btn" type="button" role="tab" data-part="calm"><b>Calm</b><span>Calm look off · text standard</span></button>
+      <button class="btn" type="button" role="tab" data-part="supports"><b>Supports</b><span>6 of 7 on</span></button>
+    </div>
+    <div class="st-card" id="fxPart"><h3>Today</h3><p>What is in front of you now, what today asks of you, and your routines for starting and ending the day.</p></div>
+    <div class="st-card" id="fxRoutinesHost"><h3>Routines</h3><div class="st-rows"><div class="st-row"><span>Start of the day · 4 steps</span><button class="btn small" type="button">Begin</button></div><div class="st-row"><span>End of the day · 3 steps</span><button class="btn small" type="button">Begin</button></div></div></div>
+  </section>
+  <section class="section" id="page-lector">
+    <h1 class="page-title">Lector</h1>
+    <p class="lede">Lector reads your apps and writes their documents.</p>
+    <div id="lxHost"><div id="lx7">
+      <div class="l-head"><div class="pv-seg"><span class="btn small" aria-current="step">1 Choose</span><span class="btn small">2 Read</span><span class="btn small">3 Write</span><span class="btn small">4 Save</span></div></div>
+      <div class="st-card"><h3>The document</h3><div id="l7Dtabs" role="tablist" aria-label="The documents"></div><div class="lx-doc"><h4 id="lxDocName"></h4><p>Written after the reading, section by section, as you watch.</p></div>
+        <div id="l7Bf" style="margin-top:12px"><button class="btn small" type="button">＋ Add your apps</button></div><div id="l7BriefF" style="margin-top:12px"><button class="btn primary small next" type="button">Start reading</button></div></div>
+    </div></div>
+  </section>
+</main>
+<script>window.LX7_FONTS=/*FONTS*/null;</script>
+<script>/*R284_JS*/</script>
+<script>/*R287_JS*/</script>
+<script>/*R289_JS*/</script>
+<script>
+/* the preview's own glue: the Display and Motion settings, and Build's Run, Run as I type, Load a sample and Clear */
+(function(){"use strict";
+var D=document,root=D.documentElement,body=D.body,SAMPLE=/*SAMPLE*/"",ed=D.getElementById("codeEditor"),fr=D.getElementById("previewFrame"),runs=0,t=0;
+function dark(){var a=root.getAttribute("data-theme");if(a==="dark")return true;if(a==="light")return false;try{return matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){return false;}}
+function mark(){var d=dark(),m=body.getAttribute("data-motion")||"calm";
+  [["pvDay",!d],["pvNight",d],["pvCalm",m==="calm"],["pvFull",m==="full"],["pvMin",m==="minimal"]].forEach(function(x){var b=D.getElementById(x[0]);if(b)b.setAttribute("aria-pressed",x[1]?"true":"false");});}
+function sync(){var v=dark()?"night":"day";if(body.getAttribute("data-theme")!==v)body.setAttribute("data-theme",v);mark();}
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",sync);}catch(e){}
+try{new MutationObserver(sync).observe(root,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
+[].forEach.call(D.querySelectorAll("[data-d]"),function(b){b.addEventListener("click",function(){root.setAttribute("data-theme",b.getAttribute("data-d"));sync();});});
+[].forEach.call(D.querySelectorAll("[data-m]"),function(b){b.addEventListener("click",function(){body.setAttribute("data-motion",b.getAttribute("data-m"));mark();});});
+function run(){fr.srcdoc=ed.value;runs++;var s=D.getElementById("bpRuns");if(s)s.textContent=runs===1?"ran once":"ran "+runs+" times";}
+D.getElementById("runBtn").addEventListener("click",run);
+ed.addEventListener("input",function(){if(!D.getElementById("autoRun").checked)return;clearTimeout(t);t=setTimeout(run,500);});
+D.getElementById("sampleBtn").addEventListener("click",function(){ed.value=SAMPLE;ed.dispatchEvent(new Event("input"));run();});
+D.getElementById("clearBuild").addEventListener("click",function(){ed.value="";ed.dispatchEvent(new Event("input"));run();});
+ed.value=SAMPLE;ed.dispatchEvent(new Event("input"));clearTimeout(t);sync();run();
+/* one page at a time, as the app shows them */
+var VIEWS=["build","focus","lector"];
+function view(){var v=(location.hash||"").replace("#","");if(VIEWS.indexOf(v)<0)v="build";VIEWS.forEach(function(k){var s=D.getElementById("page-"+k);if(s)s.classList.toggle("active",k===v);
+    var b=D.getElementById("pv"+k.charAt(0).toUpperCase()+k.slice(1));if(b)b.setAttribute("aria-pressed",k===v?"true":"false");});}
+[].forEach.call(D.querySelectorAll("[data-v]"),function(b){b.addEventListener("click",function(){var v=b.getAttribute("data-v");if(location.hash!=="#"+v)location.hash=v;else view();});});
+window.addEventListener("hashchange",view);view();
+/* Focus's parts: the head's sphere and keys open Today, as IngFocusParts does in the app */
+var part="today",NAMES={today:["Today","What is in front of you now, what today asks of you, and your routines for starting and ending the day."],work:["Work","Steps, a timer and the Inbox."],calm:["Calm","A calm look and clear words."],supports:["Supports","Each support's switch."]};
+function showPart(k){if(k&&NAMES[k])part=k;[].forEach.call(D.querySelectorAll(".fxp-bar [data-part]"),function(b){var on=b.getAttribute("data-part")===part;b.setAttribute("aria-selected",on?"true":"false");b.className="btn"+(on?" primary":"");});
+  var c=D.getElementById("fxPart");c.querySelector("h3").textContent=NAMES[part][0];c.querySelector("p").textContent=NAMES[part][1];D.getElementById("fxRoutinesHost").hidden=part!=="today";return part;}
+window.IngFocusParts={show:function(k){return showPart(k);}};
+[].forEach.call(D.querySelectorAll(".fxp-bar [data-part]"),function(b){b.addEventListener("click",function(){showPart(b.getAttribute("data-part"));});});showPart("today");
+/* Lector's documents: its tabs drawn again on each change, as the app draws them */
+var DOCS=["Notes and analysis","Project dossier","Appendix"],cur=1;
+function tabs(){var box=D.getElementById("l7Dtabs");box.textContent="";DOCS.forEach(function(n,i){var b=D.createElement("button");b.type="button";b.className="btn small";b.setAttribute("role","tab");b.setAttribute("aria-selected",i===cur?"true":"false");
+    if(i===cur)b.className+=" primary";var d=D.createElement("span");d.className="dot";b.appendChild(d);b.appendChild(D.createTextNode(n));b.addEventListener("click",function(){cur=i;tabs();});box.appendChild(b);});
+  D.getElementById("lxDocName").textContent=DOCS[cur];}
+tabs();
+})();
+</script>

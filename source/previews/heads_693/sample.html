@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><style>
+  body{font-family:system-ui,sans-serif;margin:0;display:grid;place-items:center;height:100vh;
+       background:linear-gradient(135deg,#6a3fb5,#b88a3a);color:#fff}
+  .card{background:rgba(255,255,255,.14);padding:28px 34px;border-radius:16px;text-align:center;
+        backdrop-filter:blur(6px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  button{margin-top:14px;padding:9px 16px;border:0;border-radius:10px;cursor:pointer;font-weight:600}
+</style></head>
+<body>
+  <div class="card">
+    <h1 id="t">Hello from the preview</h1>
+    <button onclick="count()">Click me</button>
+  </div>
+  <script>
+    let n=0;
+    function count(){ n++; document.getElementById("t").textContent="Clicked "+n+" time"+(n===1?"":"s"); console.log("clicked",n); }
+    console.log("preview loaded");
+  </script>
+</body>
+</html>
