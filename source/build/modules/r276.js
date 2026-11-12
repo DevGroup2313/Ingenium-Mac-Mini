@@ -234,15 +234,24 @@ function paint4(bd){var j=job()||{repos:[]},sc=scan()||{},by={},br={};((sc.repos
 function b64u8(t){var s=atob(t),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
 function join(parts,n){var u=new Uint8Array(n),at=0;parts.forEach(function(p){u.set(p,at);at+=p.length;});return u;}
 function record(full){var a=A();function J(n){return Promise.resolve(a.hub_hub_json(full,n)).then(function(x){return x&&x.ok?x.data:null;},function(){return null;});}
-  return Promise.all([J("issues"),J("comments"),J("pulls"),J("reviews"),J("labels"),J("repo")]).then(function(x){var iss=x[0]||[],com=x[1]||[],pul=x[2]||[],rev=x[3]||{},lab=x[4]||[],repo=x[5]||{};
+  return Promise.all([J("issues"),J("comments"),J("pulls"),J("reviews"),J("labels"),J("repo"),J("milestones"),J("review_comments")]).then(function(x){var iss=x[0]||[],com=x[1]||[],pul=x[2]||[],rev=x[3]||{},lab=x[4]||[],repo=x[5]||{},mil=x[6]||[],rcs=x[7]||[];
     var byN={},prs={};com.forEach(function(c){var m=/\/issues\/(\d+)$/.exec(c.issue_url||"");if(m)(byN[m[1]]=byN[m[1]]||[]).push({at:Date.parse(c.created_at)||0,by:(c.user&&c.user.login)||"",body:c.body||""});});
     pul.forEach(function(p){prs[p.number]=p;});
     var rec={v:1,next:1,issues:[],pulls:[],labels:lab.map(function(l){return {name:l.name,color:"#"+String(l.color||"8a8296").replace(/^#/,""),desc:l.description||""};}),
-      about:{desc:repo.description||"",site:repo.homepage||"",topics:Array.isArray(repo.topics)?repo.topics:[]},defBranch:repo.default_branch||""};
+      about:{desc:repo.description||"",site:repo.homepage||"",topics:Array.isArray(repo.topics)?repo.topics:[]},defBranch:repo.default_branch||"",
+      /* 6.89: the milestones, and the people of each issue and pull request (modules/r282.js) */
+      milestones:(Array.isArray(mil)?mil:[]).filter(function(m){return m&&m.title;}).map(function(m){return {title:String(m.title),due:Date.parse(m.due_on)||null,state:m.state==="closed"?"closed":"open",desc:m.description||""};}),people:[]};
+    var ppl={};function person(u){var n=u&&u.login;if(n&&!ppl[n]){ppl[n]=1;rec.people.push(n);}return n;}
+    /* 6.89: a comment on a line of a pull request's changes, with the replies under it (GitHub's review comments) */
+    var lines={},byId={};(Array.isArray(rcs)?rcs:[]).forEach(function(c){var m=/\/pulls\/(\d+)$/.exec(c.pull_request_url||"");if(!m||!c.path)return;
+      var o={id:"gh"+c.id,path:c.path,side:c.side==="LEFT"?"old":"new",line:c.line||c.original_line||0,outdated:c.line==null,body:c.body||"",by:person(c.user)||"",at:Date.parse(c.created_at)||0,resolved:false,replies:[]};byId[o.id]=o;
+      var up=c.in_reply_to_id&&byId["gh"+c.in_reply_to_id];if(up)up.replies.push({by:o.by,at:o.at,body:o.body});else (lines[m[1]]=lines[m[1]]||[]).push(o);});
     iss.forEach(function(i){var it={n:i.number,kind:i.pull_request?"pr":"issue",title:i.title||"",body:i.body||"",state:i.state==="closed"?"closed":"open",
-        labels:(i.labels||[]).map(function(l){return typeof l==="string"?l:l.name;}),created:Date.parse(i.created_at)||0,updated:Date.parse(i.updated_at)||0,by:(i.user&&i.user.login)||"",comments:(byN[i.number]||[]).slice(),events:[],refs:[]};
+        labels:(i.labels||[]).map(function(l){return typeof l==="string"?l:l.name;}),created:Date.parse(i.created_at)||0,updated:Date.parse(i.updated_at)||0,by:(i.user&&i.user.login)||"",comments:(byN[i.number]||[]).slice(),events:[],refs:[],
+        people:(i.assignees||(i.assignee?[i.assignee]:[])).map(person).filter(Boolean),milestone:i.milestone&&i.milestone.title?String(i.milestone.title):null};
+      person(i.user);
       if(i.closed_at)it.closedAt=Date.parse(i.closed_at);
-      if(it.kind==="pr"){var p=prs[i.number]||{};it.from=(p.head&&p.head.ref)||"";it.to=(p.base&&p.base.ref)||"";if(p.merged_at)it.merged={at:Date.parse(p.merged_at)};
+      if(it.kind==="pr"){var p=prs[i.number]||{};it.from=(p.head&&p.head.ref)||"";it.to=(p.base&&p.base.ref)||"";if(p.merged_at)it.merged={at:Date.parse(p.merged_at)};it.lines=lines[String(i.number)]||[];
         (rev[String(i.number)]||[]).forEach(function(r){if(r.body||r.state)it.comments.push({at:Date.parse(r.submitted_at)||it.updated,by:(r.user&&r.user.login)||"",body:(r.state?"Review: "+String(r.state).toLowerCase().replace(/_/g," ")+(r.body?"\n\n":""):"")+(r.body||"")});});
         it.comments.sort(function(a,b){return a.at-b.at;});rec.pulls.push(it);}else rec.issues.push(it);
       rec.next=Math.max(rec.next,(+i.number||0)+1);});

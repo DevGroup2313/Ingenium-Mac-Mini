@@ -371,6 +371,31 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.89 (12 November 2026): Fabrica, phase 2, second stage, its third part: people and milestones, a comment on any line, and
+templates. Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4, which holds the pieces
+commit 9287840 added): "I approve of the preview, please push it everywhere." Next in that preview: Rules before main, Safety on every
+version, and what changed while she was away.
+- modules/r282.js (new, IngPlans): under an issue's or a pull request's first line, the chips People and Milestone, each opening
+  Ingenium's own list (r280's, r172's look): the people known in the repository (the author's name, those given issues, those from
+  GitHub), Someone else, No one; the milestones with their day and how many of their issues and pull requests are done, A new milestone
+  (a name and a day), No milestone. Kept in the record (item.people, item.milestone, rec.milestones, rec.people), said in the
+  conversation ("Given to Theo", "Added to the milestone v3.3") and in the lists. In a pull request's Files changed, each line of the
+  changes has a + key (drawn by the style, so a line's text stays the code; shown under the pointer and always on a touch screen): a
+  comment on that line (p.lines: path, side, line, words, who, when, replies, resolved), its thread under the line with Reply and
+  Resolve (a resolved thread folds to its first line), a thread on a line that changed since shown above the file; Viewed folds a file
+  away until its git name changes (p.viewed). A new issue or pull request offers the repository's templates at its newest version
+  (.github/ISSUE_TEMPLATE/*.md, ISSUE_TEMPLATE.md, PULL_REQUEST_TEMPLATE.md in .github/, docs/ or the top, any case; GitHub's front
+  matter name, about, title and labels): one press fills its title, words and labels, a template with words of her own in place asks
+  first in Ingenium's own words, and a single pull request template fills a new pull request at once, as GitHub does.
+- modules/r141.js: fbHub.live, keep and repaint for r282; its hooks in an issue and a pull request, in Files changed, in the two new
+  forms, in the conversation and in the lists. modules/r276.js: a repository brought from GitHub keeps each issue's people (assignees)
+  and milestone, the milestones with their days, and the comments made on lines with their replies (review comments). modules/r176.js:
+  the chips, the + keys and the template chips lift, sink and sound. modules/r222.js: the news (Fabrica's editions only).
+- Tests: rig/t_689_plans.js 22/22 on a test build (an invented app, Quill, and invented people); t_61_hub 90/90 (it found the + key's
+  text in each line at first: the + is drawn by the style since), t_661_fabrica 21/21, t_680_old_webview 12/12.
+
+    node rig/t_689_plans.js <page url> <out folder>
+
 Ingenium 6.88 (12 November 2026): Fabrica, phase 2, second stage, its second part. A second copy on another drive, checked by fingerprint,
 and Find by what it means. Her words, on the preview of this stage (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, version 4; its kit
 in source/previews/fabrica_p2): "I approve of the preview, please push it everywhere." 6.87 built its first part (working on the drive);

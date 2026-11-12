@@ -501,6 +501,8 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '#fb .r280-tile,#fb .r280-key,#fb .r280-hit,.r280-pop .r172-opt,'+
   /* 6.88: a second copy on another drive and Find by what it means (modules/r281.js): the drive chip, when it is checked, how to find */
   '#fb .r281-drive,#fb .r281-when button,#fb .r281-how button,'+
+  /* 6.89: people and milestones, a comment on any line, templates (modules/r282.js) */
+  '#fb .r282-mk,#fb .r282-lc,#fb .r282-tpl .f-chip,'+
   /* 6.83: Fabrica brings everything from GitHub (modules/r276.js): the sheet's choices, repositories and drives
      (her words, 11 November 2026: "I like the preview please push it everywhere") */
   '#fb .hb-opt,#fb .hb-pick,#fb .hb-drive,'+

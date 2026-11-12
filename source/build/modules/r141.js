@@ -798,7 +798,7 @@ function paintIssues(r,w,f){var rec=needRec(r,w,"the issues");if(!rec)return;sca
     rows.forEach(function(x,i){var b=h("button","h-item");b.type="button";b.setAttribute("role","listitem");b.setAttribute("data-n",x.n);b.style.animationDelay=Math.min(i,12)*0.03+"s";
       b.innerHTML=icOf(x)+'<span class="t"></span>'+(x.comments.length?'<span class="c">'+IC.talk+x.comments.length+"</span>":"<span></span>")+'<span class="m"></span>';
       var t=b.querySelector(".t");t.appendChild(document.createTextNode(x.title+" "));x.labels.forEach(function(l){t.appendChild(labChip(rec,l));});
-      b.querySelector(".m").textContent="#"+x.n+" "+(x.state==="open"?"opened "+when(x.created):"closed "+when(x.closedAt)+(x.closedBy&&x.closedBy.kind==="version"?" by version "+x.closedBy.short:x.closedBy&&x.closedBy.kind==="pr"?" by pull request #"+x.closedBy.n:""));
+      b.querySelector(".m").textContent="#"+x.n+" "+(x.state==="open"?"opened "+when(x.created):"closed "+when(x.closedAt)+(x.closedBy&&x.closedBy.kind==="version"?" by version "+x.closedBy.short:x.closedBy&&x.closedBy.kind==="pr"?" by pull request #"+x.closedBy.n:""))+(window.IngPlans&&IngPlans.rowNote?IngPlans.rowNote(x):"");
       b.setAttribute("aria-label","Issue "+x.n+", "+x.state+": "+x.title);b.onclick=function(){v.open=x.n;repaint(true);};list.appendChild(b);});}
   draw();q.oninput=function(){v.q=q.value;draw();};}
 function newItem(rec,kind,o){var n=rec.next++,it={n:n,kind:kind,title:o.title,body:o.body||"",state:"open",labels:o.labels||[],created:Date.now(),updated:Date.now(),by:who(),comments:[],events:[],refs:[]};
@@ -811,6 +811,7 @@ function issueNew(r,rec,v,w,f){sig(r,"issue-new");backBar(w,"All issues",functio
   var tl=h("label");tl.appendChild(T("span",null,"Its title"));var ti=h("input");ti.type="text";ti.id="hIsT";ti.placeholder="What is it, in a few words?";ti.value=v.dT||"";tl.appendChild(ti);form.appendChild(tl);
   var c=composer({id:"hIsB",label:"What happened, or what you would like",value:v.dB||"",r:r,rec:rec,mdo:mdOpts(r,rec,{breaks:true}),rows:7,oninput:function(x){v.dB=x;}});c.el.style.padding="0";form.appendChild(c.el);
   var chosen=v.dL||(v.dL=[]);form.appendChild(T("span","f-hint","Its labels")).style.margin="0";form.appendChild(labelPick(rec,chosen,"Its labels"));w.appendChild(form);
+  try{if(window.IngPlans)IngPlans.templates(r,rec,"issue",form,{title:ti,body:c,labels:chosen,keep:function(t,b){v.dT=t;v.dB=b;}});}catch(e9){try{console.warn("Fabrica plans",e9);}catch(_){}}
   ti.oninput=function(){v.dT=ti.value;};setTimeout(function(){ti.focus();},60);
   f.appendChild(btn("","Cancel",function(){v.open=null;v.dT=v.dB="";v.dL=[];repaint(true);}));
   var go=btn("pri","Open the issue",function(){var t=ti.value.trim();if(!t){ti.focus();toast("A title first: what is it, in a few words?");return;}
@@ -830,6 +831,7 @@ function issueOne(r,rec,it,v,w,f){sig(r,"issue|"+it.n);backBar(w,"All issues",fu
   var lk=btn("quiet sm","Labels",function(){var chosen=it.labels.slice(),sh=X().sheet("The labels of #"+it.n,"Press a label to give it, or to take it away.");sh.box.appendChild(labelPick(rec,chosen));
     var end=h("div","end");end.appendChild(btn("pri","Done",function(){var add=chosen.filter(function(l){return it.labels.indexOf(l)<0;}),del=it.labels.filter(function(l){return chosen.indexOf(l)<0;});
       if(add.length||del.length){it.events.push({at:Date.now(),kind:"labels",add:add,del:del});it.labels=chosen;it.updated=Date.now();keep(rec).then(function(){repaint(true);});}sh.close();}));sh.box.appendChild(end);});lk.id="hIsLabels";meta.appendChild(lk);w.appendChild(meta);
+  try{if(window.IngPlans)IngPlans.meta(r,rec,it,w);}catch(e9){try{console.warn("Fabrica plans",e9);}catch(_){}}
   var tl=h("div","h-tl h-blk");tl.id="hIsTl";
   var first=cmtCard(r,rec,{by:it.by,at:it.created,body:it.body},"","opened it");var eb=btn("quiet sm","Edit",function(){askText("What #"+it.n+" says",null,it.body,function(val){it.body=val;it.updated=Date.now();return keep(rec).then(function(){repaint(true);});},r,rec);});
   eb.classList.add("h-right");first.head.appendChild(eb);tl.appendChild(first.el);
@@ -842,7 +844,8 @@ function issueOne(r,rec,it,v,w,f){sig(r,"issue|"+it.n);backBar(w,"All issues",fu
         else if(ev.by&&ev.by.kind==="pr")e3.insertBefore(prBtn(r,ev.by.n),e3.querySelector("small"));tl.appendChild(e3);return;}
     if(ev.kind==="reopened"){tl.appendChild(evLine("ok","Reopened",ev.at));return;}
     if(ev.kind==="labels"){tl.appendChild(evLine("",esc((ev.add.length?"Labels given: "+ev.add.join(", "):"")+(ev.add.length&&ev.del.length?"; ":"")+(ev.del.length?"taken away: "+ev.del.join(", "):"")),ev.at));return;}
-    if(ev.kind==="title"){tl.appendChild(evLine("","The title was “"+esc(ev.from)+"”",ev.at));}});
+    if(ev.kind==="title"){tl.appendChild(evLine("","The title was “"+esc(ev.from)+"”",ev.at));return;}
+    if(window.IngPlans&&IngPlans.evText){var said=IngPlans.evText(ev);if(said)tl.appendChild(evLine("",esc(said),ev.at));}});
   w.appendChild(tl);
   var men=it.refs.length+prsMentioning(rec,it.n).length;if(men){var mh=T("h3","h-sub h-blk","Mentioned in");w.appendChild(mh);var ml=h("div","h-vers h-blk");ml.id="hIssMent";
     it.refs.forEach(function(x){var row=h("div","h-ver");row.style.cursor="default";row.innerHTML='<span class="t">'+esc(x.title)+'</span><span class="h-id">'+esc(x.short)+"</span><small>a version"+(x.idea?" on "+esc(x.idea):"")+"</small>";row.appendChild(versionBtn(r,x.oid,"","")).textContent="Look";ml.appendChild(row);});
@@ -883,7 +886,7 @@ function paintPulls(r,w,f){var rec=needRec(r,w,"the pull requests");if(!rec)retu
     if(!rows.length){list.appendChild(h("div","f-empty",v.q?"No pull request matches.":v.st==="open"?"<b>Nothing open</b>Every pull request is merged or closed.":"None is merged or closed yet."));return;}
     rows.forEach(function(x,i){var b=h("button","h-item");b.type="button";b.setAttribute("role","listitem");b.setAttribute("data-n",x.n);b.style.animationDelay=Math.min(i,12)*0.03+"s";var rv=reviewState(x);
       b.innerHTML=icOf(x)+'<span class="t">'+esc(x.title)+(rv&&x.state==="open"?' <span class="f-chip '+(rv==="approve"?"ok":"warn")+'" style="font-size:11px;padding:1px 8px">'+(rv==="approve"?"Approved":"Changes asked for")+"</span>":"")+"</span>"+(x.comments.length?'<span class="c">'+IC.talk+x.comments.length+"</span>":"<span></span>")+'<span class="m"></span>';
-      b.querySelector(".m").textContent="#"+x.n+" · "+x.from+" into "+x.to+" · "+(x.state==="open"?"opened "+when(x.created):x.state==="merged"?"merged "+when(x.merged&&x.merged.at):"closed "+when(x.closedAt));
+      b.querySelector(".m").textContent="#"+x.n+" · "+x.from+" into "+x.to+" · "+(x.state==="open"?"opened "+when(x.created):x.state==="merged"?"merged "+when(x.merged&&x.merged.at):"closed "+when(x.closedAt))+(window.IngPlans&&IngPlans.rowNote?IngPlans.rowNote(x):"");
       b.setAttribute("aria-label","Pull request "+x.n+", "+x.state+": "+x.title);b.onclick=function(){v.open=x.n;v.tab="conv";repaint(true);};list.appendChild(b);});}
   draw();q.oninput=function(){v.q=q.value;draw();};}
 function branchOpts(r,skip){return r.branches.slice().sort(function(a,b){return a==="main"?-1:b==="main"?1:a.localeCompare(b);}).filter(function(b){return b!==skip;}).map(function(b){return {v:b,t:b};});}
@@ -910,6 +913,7 @@ function prNew(r,rec,v,w,f){sig(r,"pr-new");backBar(w,"All pull requests",functi
   var tl=h("label");tl.appendChild(T("span",null,"Its title"));var ti=h("input");ti.type="text";ti.id="hPrT";ti.placeholder=defT;ti.value=fm.title;tl.appendChild(ti);form.appendChild(tl);ti.oninput=function(){fm.title=ti.value;};
   var c=composer({id:"hPrB",label:"What it does, and why",value:fm.body,r:r,rec:rec,mdo:mdOpts(r,rec,{breaks:true}),rows:6,oninput:function(x){fm.body=x;},ph:"What it changes, and why. “Fixes #3” here closes issue 3 when it is merged."});c.el.style.padding="0";form.appendChild(c.el);
   w.appendChild(form);
+  try{if(window.IngPlans)IngPlans.templates(r,rec,"pr",form,{title:ti,body:c,keep:function(t,b){fm.title=t;fm.body=b;}});}catch(e9){try{console.warn("Fabrica plans",e9);}catch(_){}}
   f.appendChild(btn("","Cancel",function(){v.open=null;v.form=null;repaint(true);}));
   var go=btn("pri","Open the pull request",function(){if(fm.from===fm.to){toast("Choose two different ideas.");return;}if(dup){toast("Pull request #"+dup.n+" already asks for this.");return;}go.disabled=true;
     (info&&!isErr(info)&&info.ahead?Promise.resolve(info):prInfo(r,fm.from,fm.to)).then(function(inf){if(!inf.base)throw new Error("these two ideas share no version");if(!inf.ahead.length)throw new Error(fm.to+" already has every version of "+fm.from+": there is nothing to bring in");
@@ -929,6 +933,7 @@ function prOne(r,rec,p,v,w,f){sig(r,"pr|"+p.n+"|"+v.tab);
   var meta=h("div","h-meta h-blk");meta.appendChild(T("span",null,p.state==="merged"?(p.merged&&p.merged.by||who())+" merged "+(nv!=null?plural(nv,"version"):"its versions")+" from "+p.from+" into "+p.to+", "+when(p.merged&&p.merged.at):
     (p.by||who())+(p.state==="open"?" wants to bring ":" asked to bring ")+(nv!=null?plural(nv,"version"):"versions")+" from "+p.from+" into "+p.to));
   if(rv)meta.appendChild(h("span","f-chip "+(rv==="approve"?"ok":"warn"),'<span class="d"></span>'+(rv==="approve"?"Approved":"Changes asked for")));w.appendChild(meta);
+  try{if(window.IngPlans)IngPlans.meta(r,rec,p,w);}catch(e9){try{console.warn("Fabrica plans",e9);}catch(_){}}
   var tabs=h("div","h-bar h-blk");tabs.appendChild(segOf("Parts of the pull request",[["conv","Conversation",p.comments.length||null],["vers","Versions",nv],["files","Files changed",null]],v.tab,function(s){v.tab=s;var x=X();if(x)x.S.file=0;repaint(true);}));w.appendChild(tabs);
   if(v.tab==="vers"){if(vers===undefined)return waitBox(w,"Reading its versions…");if(isErr(vers))return errBox(w,vers.__err,gk(r,"prv|"+base+"|"+head));
     if(!vers.length){w.appendChild(h("div","f-empty h-blk",p.state==="merged"?"Its versions are in "+esc(p.to)+".":"No version to bring in."));return;}
@@ -936,7 +941,7 @@ function prOne(r,rec,p,v,w,f){sig(r,"pr|"+p.n+"|"+v.tab);
       b.onclick=function(){var cv=V(r).cmp;cv.a=c.parents[0]||"empty";cv.b=c.oid;cv.focus=null;show("compare");};box.appendChild(b);});w.appendChild(box);return;}
   if(v.tab==="files"){if(!base||!head){if(info===undefined)return waitBox(w,"Looking at both ideas…");w.appendChild(h("div","f-empty h-blk","The ideas this pull request named are no longer both here, so its files cannot be shown."));return;}
     var nt=h("p","h-note2 h-blk");nt.textContent="What "+p.from+" changed since it parted from "+p.to+" (at version "+base.slice(0,7)+"). Press a file to see it line by line.";w.appendChild(nt);
-    X().diffList(r,{from:base,to:head},w,null);return;}
+    X().diffList(r,{from:base,to:head},w,null);try{if(window.IngPlans)IngPlans.files(r,rec,p,w,{base:base,head:head});}catch(e9){try{console.warn("Fabrica plans",e9);}catch(_){}}return;}
   var tl=h("div","h-tl h-blk");tl.id="hPrTl";var first=cmtCard(r,rec,{by:p.by,at:p.created,body:p.body},"","opened it");
   first.head.appendChild(rightOf(btn("quiet sm","Edit",function(){askText("What #"+p.n+" says",null,p.body,function(val){p.body=val;return keep(rec).then(function(){repaint(true);});},r,rec);})));tl.appendChild(first.el);
   var evs=[];p.comments.forEach(function(c){evs.push({at:c.at,c:c});});p.events.forEach(function(e){evs.push({at:e.at,e:e});});
@@ -946,7 +951,8 @@ function prOne(r,rec,p,v,w,f){sig(r,"pr|"+p.n+"|"+v.tab);
     if(e.kind==="conflicts"){tl.appendChild(evLine("bad","The merge found both versions in "+esc(plural(e.files.length,"file"))+": "+esc(e.files.join(", ")),e.at));return;}
     if(e.kind==="stopped"){tl.appendChild(evLine("","The merge was stopped",e.at));return;}
     if(e.kind==="deleted"){tl.appendChild(evLine("","The idea “"+esc(p.from)+"” was deleted",e.at));return;}if(e.kind==="restored"){tl.appendChild(evLine("ok","The idea “"+esc(p.from)+"” was brought back",e.at));return;}
-    if(e.kind==="title"){tl.appendChild(evLine("","The title was “"+esc(e.from)+"”",e.at));}});
+    if(e.kind==="title"){tl.appendChild(evLine("","The title was “"+esc(e.from)+"”",e.at));return;}
+    if(window.IngPlans&&IngPlans.evText){var said=IngPlans.evText(e);if(said)tl.appendChild(evLine("",esc(said),e.at));}});
   w.appendChild(tl);
   w.appendChild(mergeBox(r,rec,p,info));
   if(p.state!=="merged"||true){var c=composer({id:"hPrC",label:"A comment or a review",r:r,rec:rec,mdo:mdOpts(r,rec,{breaks:true}),rows:4,value:v.dC||"",oninput:function(x){v.dC=x;},onSubmit:function(){cm.click();}});c.el.classList.add("h-blk");w.appendChild(c.el);
@@ -1280,6 +1286,8 @@ function importAll(data){try{if(typeof data==="string")data=JSON.parse(data);}ca
 var VIEWS=[["code","Code"],["issues","Issues"],["pulls","Pull requests"],["compare","Compare"],["actions","Actions"],["projects","Projects"],["wiki","Wiki"],["insights","Insights"],["settings","Settings"]];
 var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pulls:paintPulls,compare:paintCompare,actions:paintActions,projects:paintProjects,wiki:paintWiki,insights:paintInsights,settings:paintSettings},
   md:function(s,o){return md(s,o||{});},exportAll:exportAll,importAll:importAll,record:function(id){return recP(id).then(clone);},forget:forget,
+  /* 6.89: people, milestones, comments on a line and templates (modules/r282.js) change the record itself, then keep it */
+  live:function(id){return recP(id);},keep:keep,repaint:function(){repaint(true);},
   /* open a view of the chosen app: fbHub.open("issues",{n:3}), fbHub.open("compare",{a:"refs/tags/v1",b:"refs/heads/main"}) */
   open:function(view,o){var x=X();if(!x||!HUB.views[view])return false;var r=x.cur();if(!r)return false;o=o||{};var v=V(r);
     if(view==="compare"){if(o.a)v.cmp.a=o.a;if(o.b)v.cmp.b=o.b;}if(view==="issues"&&o.n!=null)v.iss.open=o.n;if(view==="pulls"&&o.n!=null)v.pr.open=o.n;if(view==="code"){if(o.ref)v.code.ref=o.ref;if(o.file!==undefined)v.code.file=o.file;if(o.line){v.code.line=+o.line;v.code.mode="view";}}show(view);return true;},
