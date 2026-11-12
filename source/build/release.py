@@ -119,7 +119,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_port_655", "_ingenium_holds_port", ("mini", "intel", "win")),
            ("app_cloud_657", "_cloud_box_dir", ("mini", "intel", "win")),
            ("app_keep_666", "_model_later", ("mini", "intel", "win")),
-           ("app_lend_681", "_share_pair", ("mini", "intel", "win"))]
+           ("app_lend_681", "_share_pair", ("mini", "intel", "win")),
+           ("app_hub_683", "_hub_bring", ("mini", "intel", "win"))]
 
 
 def desktop():

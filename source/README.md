@@ -371,6 +371,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.83 (12 November 2026): Fabrica, phase 1: everything on GitHub brought onto her computer; and every app's folder wears its own
+logo. Her words (11 November 2026): "I want to transfer all of my data and contents from GitHub directly to Ingenium and continue working
+from there without missing a beat, this is really important to me"; "unlike GitHub I don't want any caps on file size"; GitHub stays as a
+backup ("For question 3, yes"); the Mac mini and the HP laptop are her build and test machines (her yes, 11 November). On the preview
+(https://claude.ai/artifact/4E99gkSPJ11A6fHH2nk4Va): "I like the preview please push it everywhere but make sure that all of the apps logos
+are showing instead of the coloured letters". And (12 November 2026): "I want the Lakay and Offline Project app folders and any future apps
+folders to show their logo icon and not have some randomised letter stand-in when they clearly have a logo ... I want that made into the
+standard."
+- desktop/app_hub_683.py (new; Mac and Windows apps): the engine. hub_scan lists every repository the key reaches (with its versions,
+  branches, tags, issues, pull requests, releases and their bytes, and the logo in its own files); hub_bring brings, in the background,
+  into "Ingenium GitHub" on the drive chosen (hub_places, hub_choose_place, hub_set_place; refused before anything is fetched when the
+  drive has no room): every branch, tag and pull request's versions through git's own protocol (dulwich 0.22.8, into <owner>/<name>.git,
+  a bare repository any git program opens), the wiki (<owner>/<name>.wiki.git), and in <owner>/<name>.hub/ the repository's record,
+  issues, pull requests, comments, reviews, review comments, labels, milestones, releases with each file (checked by the fingerprint
+  GitHub gives, fetched from GitHub's file host without the key), workflows and their run records, and check.json (every name, issue and
+  file against GitHub); index.json lists what is here (hub_brought). Pause, carry on, stop; GitHub's request to wait is waited out and
+  said; brought again, only what is new travels. Only reading: nothing on GitHub is changed. hub_git_files, hub_git_read and hub_hub_json
+  let Fabrica open a repository brought. --selftest-hub: the builds prove the git part is inside each app (it fetches a repository it
+  makes), and the Mac and Windows workflows install dulwich==0.22.8 and run it; the specs name it; THIRD_PARTY_NOTICES.txt (11, 12) and
+  licences/dulwich-COPYING.txt.
+- modules/r276.js (new; editions with Fabrica): the sheet as approved, opened by Everything from GitHub beside Bring one in: sign in once
+  (r114's: GitHub's page and a code, or a key), choose (what comes, every repository with its logo, the drive), bring (each repository's
+  progress, pause, stop) and checked; Open in Fabrica brings a repository with up to 500 MB of history into Fabrica (IngRepo.fromGitDir,
+  now public in modules/r110.js) with its issues, pull requests, comments, reviews, labels and description (fbHub.importAll). On a tablet,
+  a phone or in a browser the sheet says it runs in the Mac and Windows apps.
+- modules/r277.js (new): IngAppLogo, the one place an app's logo is found: the four seals and the Offline Project's master logo (IngSeal),
+  Lakay's Spiral by day and by night (ING_SEALS.lakay and lakayN, build_page.py), and for any other app the logo in its own page, found in
+  Fabrica, the app library or a repository brought from GitHub, and kept (state.appLogos); a quiet disc while it is looked for, or when an
+  app has none: never a letter. modules/r263.js uses it for the drawer's tabs, the front folder, the cards and an opened folder.
+- modules/r176.js: the sheet's choices, repositories and drives lift, sink and sound. modules/r222.js: the news.
+- Tests: rig/t_683_hub_engine.py 28/28 (the patched Mac and Windows apps against rig/hub683_mock.py, a stand-in GitHub serving invented
+  repositories through git's own protocol and its API, its file host refusing the key, and one request to wait), rig/t_683_hub.js 17/17
+  (the sheet with the computer app's back-end and the stand-in), rig/t_683_logos.js 12/12.
+
+    python3 -I rig/t_683_hub_engine.py <Mac ingenium_app.py> <Windows ingenium_app.py>
+    node rig/t_683_hub.js <page file> <patched Mac ingenium_app.py> <out folder>
+    node rig/t_683_logos.js <page url> <out folder>
+
 Ingenium 6.82 (11 November 2026): room in the page. The page must stay under 100 MiB (104,857,600 bytes), the most GitHub keeps in
 one file, and 6.81 had 0.85 MB left (104,004,151 bytes); French and Haitian Creole, the next Carpe Diem or any sizeable module would
 not have fitted. Carpe Diem carries its own page, compressed (gzip, level 9) and written in base64, in its block cd-self-src-data:

@@ -205,7 +205,7 @@ else
     say "on this Mac afterwards, so the next run skips this entirely):"
     runlive "$VPY" -m pip install --disable-pip-version-check --upgrade pip || tools_failed
     runlive "$VPY" -m pip install --disable-pip-version-check proxy_tools || tools_failed
-    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake certifi || tools_failed
+    runlive "$VPY" -m pip install --disable-pip-version-check --only-binary=:all: pyinstaller pywebview cmake certifi dulwich==0.22.8 || tools_failed
   fi
 fi
 say "PyInstaller: $("$VPY" -m PyInstaller --version 2>&1)"
@@ -275,7 +275,7 @@ say "put together on this Mac's disk, not on this folder."
 rm -rf "$WORK/sources/build" "$WORK/sources/dist"
 # R77: this build's own number (the version, the day and the time it was
 # built), shown in About and in Finder's Get Info, as the cloud builds show theirs
-BUILD_NO="6.82.$(date +%Y%m%d).$(date +%H%M)"
+BUILD_NO="6.83.$(date +%Y%m%d).$(date +%H%M)"
 if "$VPY" "$SRC/tools/stamp_build.py" "$SRC/ingenium.html" "$BUILD_NO" >>"$LOG" 2>&1; then
   say "Build number: $BUILD_NO"
 else

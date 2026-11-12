@@ -290,7 +290,11 @@ function sealKey(name){var n=String(name||"").trim().toLowerCase().replace(/\s+/
   return n==="carpe diem"?"cd":/^(the )?forge$/.test(n)?"forge":n==="ingenium"?"ingenium":n==="inkwell"?"inkwell":null;}
 function seal(name,size){var k=sealKey(name),e=null;
   if(k&&W.IngSeal&&typeof IngSeal.el==="function"){try{e=IngSeal.el([k],{size:size,alt:""});}catch(x){e=null;}}
-  if(e){e.classList.add("fd-seal");e.setAttribute("aria-hidden","true");e.setAttribute("data-fd-seal",k);return e;}
+  /* 6.83 (her words, 12 November 2026: "I want the Lakay and Offline Project app folders and any future apps folders to show their logo
+     icon and not have some randomised letter stand-in"): every other app wears its own logo too, found by modules/r277.js (Lakay's
+     Spiral, the Offline Project's master logo, any app's own page), and a quiet disc while it is looked for; never a letter */
+  if(!e&&W.IngAppLogo){try{e=IngAppLogo.el(name,size);}catch(x){e=null;}}
+  if(e){e.classList.add("fd-seal");e.setAttribute("aria-hidden","true");e.setAttribute("data-fd-seal",k||(W.IngAppLogo&&IngAppLogo.key(name))||"app");return e;}
   /* the letter is drawn by the sheet, so a folder's name reads as its name alone */
   var c=mk("span","fd-coin");c.setAttribute("data-l",(String(name||"?").trim().charAt(0)||"?").toUpperCase());c.setAttribute("aria-hidden","true");c.style.setProperty("--fs",size+"px");return c;}
 

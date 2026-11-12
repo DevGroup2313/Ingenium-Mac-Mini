@@ -1593,6 +1593,7 @@ _LAKAY_MARK = None
 if editions.carries_apps(ED) and os.environ.get("ING_LEAN") != "1" and os.path.exists(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")):
     _LAKAY_MARK = json.load(open(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")))
     _seals["lakay"] = _LAKAY_MARK["seal"]["day"]
+    _seals["lakayN"] = _LAKAY_MARK["seal"]["night"]  # 6.83: Lakay's Spiral by night too, wherever it is shown (modules/r277.js)
 out = out[:_m.start(2)] + json.dumps(_seals) + out[_m.end(2):]
 
 MARK = '<script>/* R95: every part has now wrapped'

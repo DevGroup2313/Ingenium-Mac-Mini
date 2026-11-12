@@ -156,7 +156,7 @@ jobs:
           python3 tools/prepare_desktop_model.py "$RUNNER_TEMP/models" ${{ matrix.models }}
 
       - name: Install the build tools
-        run: python3 -m pip install --disable-pip-version-check pyinstaller==6.22.3 pywebview==6.2.1 certifi
+        run: python3 -m pip install --disable-pip-version-check pyinstaller==6.22.3 pywebview==6.2.1 certifi dulwich==0.22.8
 
       - name: The edit panel's clipboard (R78), copied and pasted through the app's own code
         continue-on-error: true
@@ -254,7 +254,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="6.82.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="6.83.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -278,7 +278,7 @@ jobs:
           set +e
           WHICH=none; [ -f "dist/${APP_FILE}.app/Contents/Resources/models/builtin.json" ] && WHICH=builtin
           SPD=(); [ -f "$RUNNER_TEMP/speedup.gguf" ] && SPD=(--selftest-drafter "$RUNNER_TEMP/speedup.gguf")
-          "dist/${APP_FILE}.app/Contents/MacOS/${APP_FILE}" --selftest-model "$WHICH" --selftest-out "$RUNNER_TEMP/selftest.json" "${SPD[@]}" --selftest-share
+          "dist/${APP_FILE}.app/Contents/MacOS/${APP_FILE}" --selftest-model "$WHICH" --selftest-out "$RUNNER_TEMP/selftest.json" "${SPD[@]}" --selftest-share --selftest-hub
           code=$?
           set -e
           python3 - "$RUNNER_TEMP/selftest.json" >> "$GITHUB_STEP_SUMMARY" <<'PY'

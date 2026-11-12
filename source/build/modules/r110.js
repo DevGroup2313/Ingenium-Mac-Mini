@@ -737,7 +737,9 @@ return {create:create,list:list,info:info,rename:rename,remove:remove,
   status:status,commit:commit,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,stopMerge:stopMerge,revert:revert,
   setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
-  bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,gc:gc,setAuthor:setAuthor,author:function(){return who;},
+  bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,
+  /* 6.83: a repository's git folder read piece by piece (Fabrica opens a repository brought from GitHub, modules/r276.js) */
+  fromGitDir:fromGitDir,gc:gc,setAuthor:setAuthor,author:function(){return who;},
   core:{sha1:sha1,sha1JS:sha1JS,inflateRaw:inflateRaw,inflateZ:inflateZ,deflateZ:deflateZ,storedZ:storedZ,makeDelta:makeDelta,applyDelta:applyDelta,writePack:writePack,readPack:readPack,
     zip:zip,unzip:unzip,unzipData:unzipData,lineDiff:lineDiff,hunks:hunks,merge3:merge3,unified:unified,splitLines:splitLines,parseTree:parseTree,parseCommit:parseCommit,treeBody:treeBody,
     okRefName:okRefName,cleanPath:cleanPath,crc32:crc32,MemBackend:MemBackend,use:_use,store:store,mirrorNow:mirrorNow,recover:recover,remirror:remirror}};

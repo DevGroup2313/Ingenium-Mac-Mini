@@ -67,6 +67,7 @@ def skip_modules(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
     if not has_fabrica(ed):
         out |= {"r260.js"}  # 6.66: Fabrica's depth and motion, where there is a Fabrica
+        out |= {"r276.js"}  # 6.83: Fabrica brings everything from GitHub, where there is a Fabrica
     if not carries_desk(ed):
         out |= {"r118.js", "r123.js", "r193.js", "r194.js"}  # 6.27: the five apps, the Desk, their stones, a document opened in its app
     if not has_lector(ed):
@@ -608,6 +609,8 @@ def _no_lakay():
         ('  ["6.81","Lector and your app library carry Carpe Diem 1089, its full edition, in place of 1084: Tabula keeps paragraphs and bullet points in good order (1085), a sign-in can protect the copy and seal the work it keeps on the device (1086), each Writing Room has a face of its own (1087), Tabula is offered under Open With for Word, PDF, plain text, web pages and Markdown (1088), and the Guidebook stands in nine sections with a shorter guided tour (1089). Lector measures it and quotes build 1089 with its own figures (49.4 MB and 73,130 lines).","master"],\n', "", "What is new without Carpe Diem 1089", 1),
         # 6.82: nor the master edition's news of Carpe Diem carried without its copy of itself (modules/r275.js)
         ('  ["6.82","Ingenium\'s page is about 19 MB lighter. Carpe Diem rides inside it without the copy of itself that it carries, and Ingenium puts that copy back, letter for letter, when your app library or Fabrica wants it, checked against Carpe Diem\'s own fingerprint. The page has room again for what comes next.","master"],\n', "", "What is new without 6.82's room in the page", 1),
+        # 6.83: nor the master edition's news of Lakay's and the Offline Project's logos on their folders (modules/r277.js)
+        ('  ["6.83","Every app\'s folder wears its own logo, never a letter: Lakay its Spiral and the Offline Project its master logo, by day and by night, and any other app the logo in its own page, found in Fabrica, your app library or GitHub, and kept once found.","master"],\n', "", "What is new without 6.83's logos of her apps", 1),
     ]
 
 
