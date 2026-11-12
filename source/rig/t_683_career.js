@@ -81,6 +81,8 @@ const POST = 'Lecturer in Digital History\nUniversity of Oxbridge\nWe seek a lec
   await p.waitForTimeout(700);
   const rooms = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(x => x.textContent.trim()));
   ok(await p.evaluate(() => document.getElementById('page-career').classList.contains('active')) && rooms.join('|') === 'Today|Your mentor|Applications|People|Your profile|Your edge|Goals and plan|Learn', 'pressed, it opens on its rooms (Today since 6.8.12, People since 6.9.7), in the keys Settings uses for its rooms', rooms.join('|'));
+  /* 6.90: the studio opens on Today (her answer of 12 November 2026: the whole picture first); Applications is one press away */
+  await p.evaluate(() => { const t = document.querySelector('#cs .rm-tabs [data-room="apps"]'); if (t && IngCareer.state().ui.room !== 'apps') t.click(); }); await p.waitForTimeout(400);
   ok(await p.evaluate(() => /not a job board/.test(document.querySelector('#cs .c-list').innerText) && (innerWidth < 900 || /Tell me and I forget\. Teach me and I remember\. Involve me and I learn\./.test(document.querySelector('#cs .c-work').innerText))), 'with nothing brought yet: how it works, her words at its head, and that it is not a job board');
   await fitCheck('Applications, nothing yet'); await shot('intro');
   // 2. the profile: who, what she is looking for, her CV (shared with Lector), an entry, LinkedIn

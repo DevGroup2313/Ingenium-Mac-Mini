@@ -74,8 +74,10 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   // Sounds as a switch
   await room('everyday');
   const snd = await p.evaluate(() => { const sw = document.getElementById('setSndSw'), on = document.querySelector('#setSndOn [data-snd-on="1"]'); const a = { sw: !!sw, seg: getComputedStyle(document.getElementById('setSndOn')).display, was: sw && sw.getAttribute('aria-checked'), onWas: on.getAttribute('aria-pressed') };
-    sw.click(); a.after = sw.getAttribute('aria-checked'); a.onAfter = on.getAttribute('aria-pressed'); sw.click(); a.back = sw.getAttribute('aria-checked'); a.onBack = on.getAttribute('aria-pressed'); return a; });
-  ok(snd.sw && snd.seg === 'none' && snd.was === snd.onWas && snd.after === snd.onAfter && snd.after !== snd.was && snd.back === snd.was, 'Sounds is a switch, and it presses On and Off', snd);
+    /* 6.90: the switch moves at once and its key follows in the next frame (r278's afterPaint), so each reading waits for it */
+    const frame = () => new Promise(r => requestAnimationFrame(() => setTimeout(() => setTimeout(r, 30), 0)));
+    sw.click(); a.now = sw.getAttribute('aria-checked'); return frame().then(() => { a.after = sw.getAttribute('aria-checked'); a.onAfter = on.getAttribute('aria-pressed'); sw.click(); return frame(); }).then(() => { a.back = sw.getAttribute('aria-checked'); a.onBack = on.getAttribute('aria-pressed'); return a; }); });
+  ok(snd.sw && snd.seg === 'none' && snd.was === snd.onWas && snd.after === snd.onAfter && snd.after !== snd.was && snd.now === snd.after && snd.back === snd.was && snd.onBack === snd.back, 'Sounds is a switch, and it presses On and Off (moved at once, its key after the frame)', snd);
   const lv = await p.evaluate(() => { const ks = [...document.querySelectorAll('#ihSetCard .ih-lvk')].map(x => x.getBoundingClientRect().top); return { n: ks.length, sameRow: ks.length === 3 && Math.abs(ks[0] - ks[2]) < 3, cols: getComputedStyle(document.querySelector('#ihSetCard .ih-lv')).gridTemplateColumns.split(' ').length }; });
   ok(lv.sameRow && lv.cols === 3, 'Help\'s three levels stand side by side', lv);
   // icons once, after many room changes
