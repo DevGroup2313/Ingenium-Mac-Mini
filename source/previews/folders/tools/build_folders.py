@@ -40,7 +40,7 @@ for name, key_ in (('cd', 'CD'), ('forge', 'FORGE'), ('ingenium', 'INGENIUM'), (
     html = html.replace('{{SEAL_' + key_ + '}}', 'data:image/webp;base64,' + base64.b64encode(buf.getvalue()).decode())
 seal = [r for r in parts['rules'] if re.search(r'\.isl\b|\.isl-|r175-|\.s4-|seal-spin|seal-heart|seal-counter|seal3d', r.split('{')[0]) and 'ghx-' not in r]
 html = html.replace('{{APP_CSS}}', '\n'.join([scope(r) for r in seal] + parts['frames']))
-key = parts['key'].replace('style="--S: 92px;"', 'style="--S: 96px;"')
+key = re.sub(r'style="--S: \d+px;"', 'style="--S: 96px;"', parts['key'], count=1)  # the seal key at the size the page shows it, whatever size it was captured at
 assert '--S: 96px' in key
 html = html.replace('{{SEAL}}', key)
 left = re.findall(r'\{\{[A-Z0-9_]+\}\}', html)

@@ -23,3 +23,25 @@ To build it: `node tools/capture_frame.js <page url> <folder> folders` (the app'
 `python3 -I tools/extract_seals.py ../../build/modules/r140.js <scratch folder>/appseals`, then
 `python3 -I tools/build_folders.py <scratch folder> folders_template.html <out.html>` (it also reads `real2/parts.json`, made by
 ../home_concepts/tools/capture_v2.js), then `node tools/check_folders.js <out.html> <out prefix>` (absolute paths).
+
+## The drawer's pulls, living logos and any app's logo (12 November 2026), a preview first
+
+Her words (12 November 2026): "I want the apps seals on the "your apps" section to be animated and interactive and clickable, I like
+the effect. I also want the 3D folders for the apps at the top of the page to be able to filtered, and reorderd by alphabetical order,
+and date but do no change the existing page design, just build it in as part of the 3D drawer. I want the Folders page to read and
+accept any app icon/logo and not be limited my apps."
+
+`folders_683_template.html` (made from `folders_template.html`, the approved design, which it leaves as it was):
+- The drawer's two pulls are its keys: the left one finds a folder as she types (by its name or its parts; Escape clears it), the
+  right one turns through Used last, A to Z, Z to A, Newest and Oldest (Shift turns back). The label between them says how many
+  folders there are and in what order, or how many match. The drawer still shows six at a time.
+- Your apps: each card's logo sways on its own, leans toward the pointer, lifts under it, sinks and knocks when pressed, then the
+  folder opens.
+- An opened folder takes any app's logo: Choose a picture (PNG, JPEG, WebP or SVG), From the app's page (the icon its page carries),
+  or either dropped on its cover. A picture that cannot be read is refused. Every logo is drawn whole, never cut to a circle (the
+  Offline Project's crest is taller than wide); an app with no logo has a quiet disc, never a letter. Harbour Garden is an invented
+  app wearing its own logo.
+
+To build it, as before, with two more pictures put in first (Lakay's Spiral from `build/apps/builtin/lakay_mark.json` and the
+master crest from `build/master_seal.json`, by day and by night, for `{{SEAL_LAKAY}}`, `{{SEAL_LAKAYN}}`, `{{SEAL_MASTER}}` and
+`{{SEAL_MASTERN}}`). `tools/build_folders.py` now takes the seal key at whatever size it was captured.
