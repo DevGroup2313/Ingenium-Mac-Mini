@@ -361,7 +361,7 @@ function mapLines(a,b){var m=new Int32Array(b.length).fill(-1),rs=IngRepo.core.l
   rs.forEach(function(r){while(ai<r.a0&&bi<r.b0){m[bi]=ai;ai++;bi++;}ai=r.a1;bi=r.b1;});while(ai<a.length&&bi<b.length){m[bi]=ai;ai++;bi++;}return m;}
 function refLabel(ref){ref=String(ref||"");if(ref==="empty")return "the start";if(ref.indexOf("refs/heads/")===0)return ref.slice(11);if(ref.indexOf("refs/tags/")===0)return ref.slice(10);if(/^[0-9a-f]{40}$/.test(ref))return ref.slice(0,7);return ref;}
 function isBranchRef(ref){return String(ref||"").indexOf("refs/heads/")===0;}
-function defBranch(r,rec){var d=rec&&rec.defBranch;if(d&&r.branches.indexOf(d)>=0)return d;return r.branches.indexOf("main")>=0?"main":(r.branches[0]||r.branch||"main");}
+function defBranch(r,rec){var d=rec&&rec.defBranch;if(d&&r.branches.indexOf(d)>=0)return d;return r.branches.indexOf("main")>=0?"main":r.branches.indexOf("master")>=0?"master":(r.branches[0]||r.branch||"main");}/* 6.91: master before the first idea (the branches now come sorted) */
 /* every version the app holds (each idea and release), newest first */
 function allVersions(r,max){max=max||3000;var tips=r.branches.map(function(b){return "refs/heads/"+b;}).concat(r.tags.map(function(t){return "refs/tags/"+t;}));if(!tips.length&&r.head)tips=[r.head];
   return seq(tips,function(t){return IngRepo.log(r.id,{ref:t,max:max}).catch(function(){return [];});}).then(function(ls){var m={},full=false;ls.forEach(function(l){if(l.length>=max)full=true;l.forEach(function(c){m[c.oid]=c;});});
@@ -981,17 +981,19 @@ function mergeBox(r,rec,p,info){var box=h("div","h-box h-blk");box.id="hPrMergeB
      made again on top), as on GitHub */
   var v=V(r).pr,how=v.how||"merge",HOW={merge:"Merge into ",squash:"Squash into ",rebase:"Rebase onto "};
   if(info.ahead.length){var sg=segOf("How to bring it in",[["merge","Merge"],["squash","Squash and merge"],["rebase","Rebase and merge"]],how,function(k){v.how=k;again();});sg.id="hPrHow";sg.style.margin="10px 0 0";box.appendChild(sg);}
-  var row=h("div","f-row"),mg=btn("pri",HOW[how]+p.to,function(){mergePR(r,rec,p,info,mg);});mg.id="hPrMerge";mg.disabled=!info.ahead.length;row.appendChild(mg);box.appendChild(row);return box;}
+  var row=h("div","f-row"),mg=btn("pri",HOW[how]+p.to,function(){mergePR(r,rec,p,info,mg);});mg.id="hPrMerge";mg.disabled=!info.ahead.length;row.appendChild(mg);box.appendChild(row);
+  try{if(window.IngGuard)IngGuard.mergeNote(r,rec,p,box,mg,info);}catch(e9){try{console.warn("Fabrica rules",e9);}catch(_){}}return box;}
 /* the merge: the working copy moves to the target idea, and the other is brought in by Fabrica's three-way merge */
 function mergePR(r,rec,p,info,k){k.disabled=true;var key=r.id+"|"+p.n;INFLIGHT[key]=1;
-  IngRepo.status(r.id).then(function(st){if(!st.clean)throw new Error("keep or put back the changes under Changes first: a merge starts from files with nothing waiting");if(st.merging)throw new Error("a merge is already under way: finish it under Changes, or stop it");
+  /* 6.91: Rules before main (modules/r285.js) are asked first; the merge is known as this pull request's while it runs */
+  (window.IngGuard&&IngGuard.prOk?IngGuard.prOk(r,rec,p,info):Promise.resolve()).then(function(){window.__ingPrMerge=r.id;return IngRepo.status(r.id);}).then(function(st){if(!st.clean)throw new Error("keep or put back the changes under Changes first: a merge starts from files with nothing waiting");if(st.merging)throw new Error("a merge is already under way: finish it under Changes, or stop it");
     return (!r.detached&&r.branch===p.to)?null:IngRepo.switchTo(r.id,p.to);}).then(function(){return IngRepo.resolve(r.id,"refs/heads/"+p.from);}).then(function(theirs){
     var how=V(r).pr.how||"merge";
     return (how==="rebase"?IngRepo.rebase(r.id,p.from):IngRepo.merge(r.id,p.from,how==="squash"?{squash:true,msg:p.title+" (#"+p.n+")"}:{msg:"Merge pull request #"+p.n+" from "+p.from+"\n\n"+p.title})).then(function(m){
       if(m.kind==="conflicts"){p.pending={theirs:theirs,base:info.base,at:Date.now(),files:m.conflicts||[]};p.events.push({at:Date.now(),kind:"conflicts",files:m.conflicts||[]});
         return keep(rec).then(function(){toast("Both versions are in "+plural((m.conflicts||[]).length,"file")+": keep one of each under Changes, then keep the version.");});}
       return IngRepo.resolve(r.id,"refs/heads/"+p.to).then(function(now){markMerged(rec,p,{commit:m.commit||now,head:theirs,base:info.base});syncBoard(rec);return keep(rec);}).then(function(){toast((how==="squash"?"Squashed into "+p.to+" as one version":how==="rebase"?"Rebased onto "+p.to+": "+(m.count||0)+" version"+(m.count===1?"":"s")+" made again":"Merged into "+p.to)+". You are working on "+p.to+" now.");});});})
-  .then(function(){delete INFLIGHT[key];return again();},function(e){delete INFLIGHT[key];k.disabled=false;fail(e);again();});}
+  .then(function(){window.__ingPrMerge=null;delete INFLIGHT[key];return again();},function(e){window.__ingPrMerge=null;delete INFLIGHT[key];k.disabled=false;fail(e);again();});}
 
 /* ======================= COMPARE: any two versions, ideas or releases (the version comparison tool) ======================= */
 function cmpData(r,a,b){return Promise.all([a==="empty"?Promise.resolve("empty"):IngRepo.resolve(r.id,a),IngRepo.resolve(r.id,b)]).then(function(x){if(!x[1])throw new Error("nothing is kept at "+refLabel(b)+" yet");if(!x[0])throw new Error("nothing is kept at "+refLabel(a)+" yet");
@@ -1047,6 +1049,8 @@ function runWord(x){return !x.page?"No page found":x.ok?"Passed":"Found somethin
 function paintActions(r,w,f){var rec=needRec(r,w,"the runs");if(!rec)return;var v=V(r).act;sig(r,"actions");
   if(typeof IngShip==="undefined"||!IngShip.test){w.appendChild(h("div","f-empty h-blk","<b>No checks in this copy</b>Fabrica's checks are not part of this copy."));return;}
   var intro=h("div","h-box h-blk");intro.innerHTML='<b class="h-big">Fabrica\'s own checks, as runs</b>On each version you choose, Fabrica runs its five checks: the page reads cleanly, every file it names is here, it opens with no errors, its own self-test, and its build number moves forward. Each run is kept here with what it found.';w.appendChild(intro);
+  /* 6.91: Safety, on every version (modules/r285.js) */
+  try{if(window.IngGuard)IngGuard.safety(r,rec,w);}catch(e9){try{console.warn("Fabrica safety",e9);}catch(_){}}
   if(!r.head){w.appendChild(h("div","f-empty h-blk","Keep a first version, then run the checks on it."));return;}
   var bar=h("div","h-bar h-blk"),ref=v.ref||(r.detached?r.head:"refs/heads/"+(r.branch||defBranch(r,rec)));
   bar.appendChild(picker(refOptions(r),ref,"The version to check",function(x){v.ref=x;}));
@@ -1227,6 +1231,8 @@ function paintSettings(r,w,f){var rec=needRec(r,w,"the settings");if(!rec)return
     keep(rec).then(function(){toast(rec.star?r.name+" is starred: it stands first in Your apps.":"The star is taken away.");return again();});});st.id="hSetStar";st.setAttribute("aria-pressed",rec.star?"true":"false");r2.appendChild(st);s2.appendChild(r2);w.appendChild(s2);
   if(r.branches.length>1){var s3=h("div","h-box h-blk");s3.innerHTML='<b class="h-big">The main idea</b>Where pull requests go by default, and where a version that says “fixes #3” closes issue 3.';var r3=h("div","f-row");
     var sel=picker(r.branches.map(function(b){return {v:b,t:b};}),defBranch(r,rec),"The main idea",function(x){rec.defBranch=x;keep(rec).then(function(){toast(x+" is the main idea.");SCANSIG[r.id]="";});});sel.id="hSetDef";r3.appendChild(sel);s3.appendChild(r3);w.appendChild(s3);}
+  /* 6.91: Rules before main (modules/r285.js) */
+  try{if(window.IngGuard)IngGuard.rules(r,rec,w);}catch(e9){try{console.warn("Fabrica rules",e9);}catch(_){}}
   var s4=h("div","h-box h-blk");s4.id="hSetLabels";s4.innerHTML='<b class="h-big">Labels</b>';
   rec.labels.forEach(function(l,i){var row=h("div","h-labrow");var col=h("input","h-col-in");col.type="color";col.value=/^#[0-9a-f]{6}$/i.test(l.color)?l.color:"#8a8296";col.setAttribute("aria-label","The colour of "+l.name);
     var nm=h("input");nm.type="text";nm.value=l.name;nm.setAttribute("aria-label","The label's name");var ds=h("input","h-ld");ds.type="text";ds.value=l.desc||"";ds.placeholder="What it means";ds.setAttribute("aria-label","What "+l.name+" means");

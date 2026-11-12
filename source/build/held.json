@@ -1,7 +1,8 @@
 {
   "why": "Modules still being finished or not yet through their independent review. A release build (release.py page, which sets ING_RELEASE=1) leaves them out; every other build (the builders' and the tests') keeps them in.",
   "modules": [
-    "r283.js"
+    "r283.js",
+    "r285.js"
   ],
   "released_62": "Storage (r142, t_61_storage 81/81), backup and moving (r143, t_61_backup 57/57) and the tour by level with help on every page (r144, t_62_tour 39/39) passed their checks on 22 October 2026 and ride in 6.2.",
   "held_692": "r202.js (the folder search's loader and its Settings card) waits for the end-to-end test of phase 1 and its review; the desktop bridge methods (desktop/app_rag_692.py) ride, unused until then.",
@@ -13,5 +14,6 @@
   "released_674": "r265.js (a new app's logo, solid and pressable, with a picture of her own) rides from 6.74 (11 November 2026): she approved its live preview the same night (\"I approve of the preview, push it everywhere\", asking that the rest of the panel move too); rig/t_674_logo.js 37/37 on the release page (the logo's colours fade together, at her word on the release).",
   "released_676": "r267.js (the Models page's rooms in the turret's design) rides from 6.76 (11 November 2026), after 6.75's turret; rig/t_676_rooms.js 9/9.",
   "released_677": "r259.js (Downloads on the Models page) rides from 6.77 (11 November 2026): she asked for it again on 10 November (\"I also want a section added to the Models page where I can see recently downloaded models and also the ones downloaded for Storage for later use\"), the third time, so it ships in the Models page's look of 6.76 (the turret and its rooms) rather than waiting for a preview of its own. Its cards wear the app's card heading (h2.sec), and a model in many parts folds its parts away behind one key; rig/t_677_downloads.js.",
-  "held_690": "r283.js (Your counsellor: one path of five stages in the Career Studio, Today's whole picture, Suggestions beside the document in Lector) waits for her answer to its live preview (her rule: a preview before anything new); rig/t_690_counsel.js passes 33/33 on the test build, which keeps it. Without it the studio reads as 6.89 (Your mentor), with 6.90's changes to r188: the frank voice, the recommended path and one alternative, no contact, referee or pay figure sent to a connected model, CV bullets from an app's reading, and the studio opening on Today."
+  "held_690": "r283.js (Your counsellor: one path of five stages in the Career Studio, Today's whole picture, Suggestions beside the document in Lector) waits for her answer to its live preview (her rule: a preview before anything new); rig/t_690_counsel.js passes 33/33 on the test build, which keeps it. Without it the studio reads as 6.89 (Your mentor), with 6.90's changes to r188: the frank voice, the recommended path and one alternative, no contact, referee or pay figure sent to a connected model, CV bullets from an app's reading, and the studio opening on Today.",
+  "held_691": "r285.js (Fabrica: Rules before main in Settings, Safety on every version in Checks, and what changed while she was away above Your apps; approved on preview version 4 of phase 2, https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o) waits for its page test, rig/t_691_rules.js, to pass on a test build; its news line (r222) and tour sentence (r117) are added when it ships. The hooks in r112 and r141 call it only when it is there; desktop/app_refs_691.py (the drive's branches and tags given sorted) rides as it is."
 }

@@ -503,6 +503,8 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   '#fb .r281-drive,#fb .r281-when button,#fb .r281-how button,'+
   /* 6.89: people and milestones, a comment on any line, templates (modules/r282.js) */
   '#fb .r282-mk,#fb .r282-lc,#fb .r282-tpl .f-chip,'+
+  /* 6.91: the row of what changed while she was away (modules/r285.js) */
+  '#fb .r285-away,'+
   /* 6.83: Fabrica brings everything from GitHub (modules/r276.js): the sheet's choices, repositories and drives
      (her words, 11 November 2026: "I like the preview please push it everywhere") */
   '#fb .hb-opt,#fb .hb-pick,#fb .hb-drive,'+

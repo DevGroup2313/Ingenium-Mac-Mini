@@ -684,7 +684,7 @@ function paint(){if(!$("fb"))return;
   paintRepos();paintWork();paintShip();paintSteps();thumbs();}
 function paintSteps(){var r=cur(),s=r?stepOf(r):"change",order=["change","keep","test","ship"],i=order.indexOf(s);if(s==="done")i=4;
   [].forEach.call($("fbSteps").querySelectorAll("li[data-s]"),function(li){var j=order.indexOf(li.getAttribute("data-s"));li.className=j<i?"done":j===i?"now":"";});}
-function paintRepos(){var box=$("fbRepos");box.innerHTML="";var rs=C.repos;$("fbAppsChip").textContent=rs.length?rs.length+" kept here":"None yet";
+function paintRepos(){var box=$("fbRepos");box.innerHTML="";try{if(window.IngGuard)IngGuard.away(box);}catch(e){}/* 6.91: what changed while you were away (modules/r285.js) */var rs=C.repos;$("fbAppsChip").textContent=rs.length?rs.length+" kept here":"None yet";
   if(!rs.length){box.appendChild(h("div","f-empty","<b>No app here yet</b>Bring one in: from your app library, a zip, a git bundle or a folder with its history. Or start a new one."));box.style.display="block";return;}
   box.style.display="";var id=FBS().sel;
   rs.forEach(function(r){var b=h("button","f-repo");b.type="button";b.style.setProperty("--app",tintOf(r));b.setAttribute("aria-pressed",r.id===id?"true":"false");
