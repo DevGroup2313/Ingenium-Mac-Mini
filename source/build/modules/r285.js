@@ -102,7 +102,9 @@ var REFS={delBranch:"h",setRef:"r",branch:"h",tag:"t",delTag:"t"};
 function named(k,args){var t=REFS[k],nm=String(args[1]||"");if(!t||!nm)return [];return [t==="h"?"refs/heads/"+nm:t==="t"?"refs/tags/"+nm:(/^refs\//.test(nm)?nm:"refs/heads/"+nm)];}
 ["commit","merge","rebase","revert","delBranch","setRef","branch","tag","delTag"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;var held=k!=="branch"&&k!=="tag"&&k!=="delTag";
   IR[k]=function(id){var args=arguments,names=named(k,args);begin(id);
-    return (held?guard(k,id,args):Promise.resolve()).then(function(){return f.apply(IR,args);}).then(function(v){end(id,names);return v;},function(e){end(id,names);throw e;});};});
+    /* a version kept, merged, rebased or undone goes on the idea she is on as she does it: named now, not when it is followed */
+    var here=names.length?Promise.resolve():IR.info(id).then(function(s){if(!s.detached&&s.branch)names=["refs/heads/"+s.branch];},function(){});
+    return here.then(function(){return held?guard(k,id,args):null;}).then(function(){return f.apply(IR,args);}).then(function(v){end(id,names);return v;},function(e){end(id,names);throw e;});};});
 
 /* ================= safety, on every version ================= */
 var SECRETS=[["an AWS access key",/\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/],["a GitHub token",/\bgh[pousr]_[A-Za-z0-9]{36,255}\b/],["a GitHub token",/\bgithub_pat_[A-Za-z0-9_]{22,255}\b/],
@@ -215,13 +217,13 @@ function stateOf(r){return Promise.all([refsNow(r),itemsNow(r.id)]).then(functio
 /* her own writes: while one runs the repository is not read for news; after it, the ideas and tags it changed are followed */
 var HOLD={},TOUCH={},PEND={};
 function begin(id){HOLD[id]=(HOLD[id]||0)+1;}
-function end(id,names){HOLD[id]=Math.max(0,(HOLD[id]||0)-1);var p=PEND[id]||(PEND[id]={});if(names.length)names.forEach(function(k){p[k]=1;});else p["@here"]=1;
+function end(id,names){HOLD[id]=Math.max(0,(HOLD[id]||0)-1);var p=PEND[id]||(PEND[id]={});names.forEach(function(k){p[k]=1;});
   clearTimeout(TOUCH[id]);TOUCH[id]=setTimeout(function(){follow(id);},300);}
 function busyRepo(id){return !!(HOLD[id]||TOUCH[id]);}
 function follow(id){if(HOLD[id]){TOUCH[id]=setTimeout(function(){follow(id);},300);return;}
   var f=F(),x=X(),ks=Object.keys(PEND[id]||{});delete PEND[id];var was=f?snapOf(f).repos[id]:null;
-  (was&&was.refs?IR.info(id).then(function(s){var want={};ks.forEach(function(k){if(k==="@here"){if(!s.detached&&s.branch)want["refs/heads/"+s.branch]=1;}else want[k]=1;});
-      return Promise.all(Object.keys(want).map(function(k){return IR.resolve(id,k).then(function(o){return [k,o];},function(){return [k,null];});})).then(function(got){
+  (was&&was.refs&&ks.length?Promise.resolve().then(function(){
+      return Promise.all(ks.map(function(k){return IR.resolve(id,k).then(function(o){return [k,o];},function(){return [k,null];});})).then(function(got){
         got.forEach(function(p){if(p[1])was.refs[p[0]]=short(p[1]);else delete was.refs[p[0]];});if(x&&x.saveSoon)x.saveSoon();});}):Promise.resolve())
     .catch(function(){}).then(function(){delete TOUCH[id];AW.items=AW.items.filter(function(it){return !(it.id===id&&(it.kind==="versions"||it.kind==="idea"||it.kind==="release")&&ks.indexOf("refs/"+(it.kind==="release"?"tags/"+it.tag:"heads/"+it.branch))>=0);});
       AW.sig="";var box=D.getElementById("fbRepos");if(box&&box.isConnected)away(box);else draw();});}
@@ -233,7 +235,8 @@ function news(r,was,now){var out=[];
         out.push({kind:"versions",id:r.id,repo:r.name,branch:nm,from:i>=0?l[i].oid:null,what:nm,tail:i<0?"its versions written over":plural(i,"new version")});},function(){});});},Promise.resolve())
     .then(function(){Object.keys(now.full).sort().forEach(function(k){var a=now.full[k],b=was.items?was.items[k]:undefined;if(!a.o||!a.last||(b!=null&&a.o<=b))return;
       out.push({kind:a.k,id:r.id,repo:r.name,n:a.n,what:"#"+a.n+" "+a.t,tail:(b==null&&a.opened?a.opened+" opened it":a.last+" wrote")});});return out;});}
-function compute(){var f=F(),x=X();if(!f||!x||!x.C||AW.busy)return Promise.resolve(AW.items);AW.busy=true;var sn=snapOf(f),rs=(x.C.repos||[]).slice(),found=[];
+function compute(){if(AW.busy)return AW.job.then(function(){return compute();});var f=F(),x=X();if(!f||!x||!x.C)return Promise.resolve(AW.items);AW.busy=true;AW.job=job0();return AW.job;}
+function job0(){var f=F(),x=X();var sn=snapOf(f),rs=(x.C.repos||[]).slice(),found=[];
   return rs.reduce(function(p,r){return p.then(function(){if(busyRepo(r.id))return;return stateOf(r).then(function(now){if(busyRepo(r.id))return;var was=sn.repos[r.id];
       if(!was||!was.refs){sn.repos[r.id]={refs:now.refs,items:now.items};if(x.saveSoon)x.saveSoon();return;}
       return news(r,was,now).then(function(n){found=found.concat(n);});});}).catch(function(){});},Promise.resolve())

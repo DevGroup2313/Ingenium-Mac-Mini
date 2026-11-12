@@ -105,6 +105,9 @@ with the code (`POST /ingenium/pair`); `share_status` lists the devices by name 
 `share_device_remove(id)` refuses a device (401, removed) until it pairs again with the code.
 Test: `python3 -I rig/t_681_lend_gateway.py <Mac ingenium_app.py> <Windows ingenium_app.py>` (19 checks).
 
+6.91, `app_refs_691.py` (Mac and Windows; after `app_copy_688.py`): `_disk_refs` gives a repository's branches and tags sorted (dulwich
+0.22.8 joins the loose refs and packed-refs in a set, so their order could change from one start of the app to the next).
+
 6.88, `app_copy_688.py` (Mac and Windows; after `app_disk2_687.py`): Fabrica's second copy of a repository on another drive, kept whole and
 checked by fingerprint every day, every Sunday or by hand. Calls: `copy_places`, `copy_choose`, `copy_list`, `copy_plan(rid, folder, when)`,
 `copy_now`, `copy_check`, `copy_forget`. The copy is a bare repository, `<folder>/Ingenium copies/<name>.git`: every pack (its index last)

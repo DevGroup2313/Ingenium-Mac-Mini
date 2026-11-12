@@ -371,6 +371,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.91 (12 November 2026): Fabrica holds main to her rules, reads every version for what should not be in it, and says what
+changed while she was away. Her words, on preview version 4 of phase 2 (https://claude.ai/artifact/VNwsz2ywj3XkXaCq8gws1o, with the pieces
+of commit 9287840): "I approve of the preview, please push it everywhere." modules/r285.js, with hooks in r112 and r141:
+- Rules before main, in Care, Settings: Only through a pull request (no version kept, undone or merged straight into main), Your review
+  first (main waits for an approval), The checks pass first (Fabrica's checks, passed on the pull request's newest version), Kept
+  versions stay as they are (main is never moved back or taken away; it may move forward, as GitHub's versions come). Each is off until
+  she turns it on, and is kept with the repository. Fabrica holds to them on this computer: a refusal says why in plain words, and a pull
+  request's merge box says what main still waits for, its key held until then. A program other than Fabrica is not held, and the box
+  says so. Main is the one GitHub named, else main, else master (r141's defBranch now prefers master to the first idea), else the first.
+- Safety, on every version, in Care, Checks: secrets of a known form (cloud, GitHub, Slack, Google, Stripe, Anthropic, OpenAI and Hugging
+  Face keys and tokens, private key blocks, and passwords or keys in an environment file, its example files aside) in every text file
+  each of the 100 newest versions changed, read once each, a version taken away still counted (it stays in the history); never shown
+  whole. The parts made by others it keeps, each licence read from its notice or named in its header (or said to be unnamed), its own
+  licence, and the parts its manifests name (their licences are not in the repository, and it says so). Its large files. Read on this
+  computer with nothing sent anywhere; kept with the version it read, and read again on asking.
+- What changed while she was away: a raised row above Your apps (the preview's), with its list in Ingenium's own look: new versions on
+  an idea, a new idea, a new release, and an issue or pull request someone else opened or wrote in. What she does in Fabrica herself is
+  followed and never counted. A choice opens it (the versions as a comparison from the one she last saw) and marks all as read.
+- desktop/app_refs_691.py (Mac and Windows): the drive's branches and tags are given sorted, so every start shows them in one order.
+Test: `node rig/t_691_rules.js <page url> <out>` (36 checks).
+
 Ingenium 6.90 (12 November 2026): two keys that answered late, and the Career Studio as she answered its questionnaire.
 - Settings, Help and the guided tour. Her words: "when I press on the card buttons, the reaction is delayed, it took a while for the
   "New to this" button to look pressed after I clicked on it". Measured on 6.89 (rig/t_690_press.js): the press saved the whole of
