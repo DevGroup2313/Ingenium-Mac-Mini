@@ -90,7 +90,8 @@ let back = null;
     const info = await IngRepo.info(r.id), rec = await fbHub.record(r.id), i1 = rec.issues.find(x => x.n === 1) || {};
     return { sel: state.fabrica.sel === r.id, branches: info.branches, tags: info.tags, issues: rec.issues.length, pulls: rec.pulls.length, pr: rec.pulls[0] && [rec.pulls[0].from, rec.pulls[0].to, rec.pulls[0].comments.length],
       c1: i1.comments && i1.comments.length, labels: rec.labels.map(l => l.name), desc: rec.about.desc }; });
-  ok(op.sel && JSON.stringify(op.branches) === JSON.stringify(['idea', 'main']) && JSON.stringify((op.tags || []).slice().sort()) === JSON.stringify(['v1.0', 'v1.1']), 'Open in Fabrica: lantern-notes opens with every branch and tag', op);
+  /* 6.89: the drive's refs come in the order git's files give them, which may change between runs: compared as sets */
+  ok(op.sel && JSON.stringify((op.branches || []).slice().sort()) === JSON.stringify(['idea', 'main']) && JSON.stringify((op.tags || []).slice().sort()) === JSON.stringify(['v1.0', 'v1.1']), 'Open in Fabrica: lantern-notes opens with every branch and tag', op);
   ok(op.issues === 130 && op.pulls === 1 && op.pr && op.pr[0] === 'fix' && op.pr[1] === 'main' && op.pr[2] >= 1 && op.c1 >= 1 && op.labels.includes('idea') && op.desc === 'Notes by lamplight',
     'and with its issues, its pull request (fix into main, with its review), comments, labels and description', op);
   await p.screenshot({ path: OUT + '/fabrica_opened.png' });
