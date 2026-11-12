@@ -404,7 +404,13 @@ and milestones, comments on a line, Rules before main, Safety on every version).
 - modules/r222.js: the news (Fabrica's line, where Fabrica is).
 - Tests: rig/t_687_disk_write.py 41/41 (every write checked by git itself: status, log, fsck, branches, tags, the folder following, the
   refusals, a submodule, a bare repository and its working copy); rig/t_687_fabrica.js 17/17 and rig/t_686_fabrica.js 36/36 (updated
-  for this stage) on a test build with the computer app's back end.
+  for this stage) on a test build with the computer app's back end, and again on the release page. On the release page: t_61_hub 90/90,
+  t_685_folders 37/37, t_62_tour 34/34, t_651_still_keys 25/25 (run alone), t_666_fabrica 23/23, t_661_fabrica 21/21, t_684_settings
+  20/20, t_683_hub 17/17, t_680_old_webview 12/12; t_687_disk_write.py 41/41 with the released Mac and Windows apps. t_67_sound fails 8
+  of its 14 checks, as on the 6.85 and 6.86 release pages (its expectations predate the sound settings she chose). The calls this stage
+  makes into dulwich (porcelain's status, reset_file and clone; stage; do_commit; validate_path) were run inside a bundle frozen as the
+  apps are (PyInstaller 6.22.3 and dulwich 0.22.8, as the workflows install them, with the specs' hidden imports), on Linux: PyInstaller
+  packs dulwich.porcelain and what it needs although no spec names it. The Mac and Windows builds themselves were not run here.
 
     python3 -I rig/t_687_disk_write.py <Mac ingenium_app.py> <Windows ingenium_app.py>
     node rig/t_687_fabrica.js <app folder: patched ingenium_app.py and ingenium.html> <out folder>
