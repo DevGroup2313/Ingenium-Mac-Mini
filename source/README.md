@@ -371,6 +371,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.84 (12 November 2026): Settings as one console, every card in one anatomy, from the preview she approved after three
+rounds (her words, 11 November 2026: "all of those lone buttons from the Settings page, the tabs could the entire Setting page could use
+a better organising and a slight redesign to keep things looking tidy and cohesive to match the rest of Ingenium"; "It looks exactly the
+same with the smooth effect and it looks slow and rigid ... the drop down menus are out of template with the rest of the app"; 12
+November: "I approve of the preview, please push it everywhere"). The preview was drawn from the app's own surfaces, measured from the
+built page (the card, the keys, the chosen key, Effort's pills, the top bar's menu), with nothing tilting.
+- modules/r278.js (new): one console holds Find a setting with Show every setting at once beside it, the room keys, and under them the
+  room's line or, in Models and AI and Your data, the section keys with their line (moved there by their ids; nothing copied). Every
+  card's title has a small icon; each choice is a row, its name on the left, Ingenium's own list (r172) at its end; Theme and Motion
+  are pills (the select is set and its change sent); every checkbox that was a box is the app's switch; Sounds is a switch that presses
+  On and Off; Help's levels stand side by side across both columns. Nothing watches the page itself: a room chosen or Settings opened
+  is what draws a card met later.
+- modules/r234.js: the section bar is found by its id (dxB-ai, dxB-data) wherever it stands.
+- modules/r176.js (the pills and switch lift, sink and sound), r222.js (the news).
+- Tests: rig/t_684_settings.js (20); rig/t_633_settings.js finds the section keys by their ids. On the test build: t_684_settings 20/20,
+  t_633_settings 17/17, t_651_still_keys 25/25, t_62_tour 34/34, t_679_memory 23/23, t_646_switch 19/19, t_680_old_webview 12/12,
+  t_683_logos 12/12, t_681_lend (web) 14/14. t_61_backup 44/45 crashes at its computer-app restore, as it does on 6.83 (not of 6.84).
+
+    node rig/t_684_settings.js <page url> <out folder>
+
 Ingenium 6.83 (12 November 2026): Fabrica, phase 1: everything on GitHub brought onto her computer; and every app's folder wears its own
 logo. Her words (11 November 2026): "I want to transfer all of my data and contents from GitHub directly to Ingenium and continue working
 from there without missing a beat, this is really important to me"; "unlike GitHub I don't want any caps on file size"; GitHub stays as a

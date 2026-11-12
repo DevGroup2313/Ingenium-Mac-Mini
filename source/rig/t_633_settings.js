@@ -1,4 +1,5 @@
 // Settings without the long scroll (Ingenium 6.33, modules/r234.js). Her words (5 November 2026): "The "Your data" tab page of the
+// 6.84: the section keys sit in the Settings console (modules/r278.js), found by their ids (#dxB-data, #dxB-ai), no longer inside the room's panel.
 // Settings page needs to be redesigned and reorganised because its still a lot of scrolling on all of its tabs."
 //   node rig/t_633_settings.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
@@ -15,7 +16,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* 1. Your data: four sections, one at a time, each about a window tall (6.28: 2,792, and 3,281 with Moving open) */
   await p.evaluate(() => IngRooms.open('settings', 'data', false)); await p.waitForTimeout(900);
-  const d0 = await p.evaluate(() => ({ tabs: [...document.querySelectorAll('#rmP-settings-data .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()), cur: IngSettingsParts.show('data'),
+  const d0 = await p.evaluate(() => ({ tabs: [...document.querySelectorAll('#dxB-data .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()), cur: IngSettingsParts.show('data'),
     says: (document.getElementById('dxSays-data') || {}).textContent || '' }));
   ok(d0.tabs.join('|') === 'Bring in|Memory|Back up and move|Ingenium Cloud|Storage|Sign-in and reset' && d0.cur === 'in' && /brought in/.test(d0.says), 'Your data has six sections (6.57: Ingenium Cloud; 6.79: Memory, modules/r271.js), opening on Bring in, with its line', d0);
   const DH = {}, DV = {};
@@ -45,7 +46,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* 3. Models and AI: four sections the same way (6.28: 2,945 pixels) */
   await p.evaluate(() => IngRooms.open('settings', 'ai', false)); await p.waitForTimeout(800);
-  const a0 = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-ai .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()));
+  const a0 = await p.evaluate(() => [...document.querySelectorAll('#dxB-ai .dx-tab')].filter(t => !t.hidden).map(t => t.textContent.trim()));
   ok(a0.join('|') === 'Your Ingenium|Connections|Search, eyes and ears|Your devices', 'Models and AI has four sections (6.56: Search, eyes and ears)', a0);
   const AH = {}, AV = {};
   for (const k of ['you', 'conn', 'search', 'devices']) { await p.click('#dxT-ai-' + k); await p.waitForTimeout(450); AH[k] = await p.evaluate(() => document.scrollingElement.scrollHeight);
@@ -79,12 +80,12 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* 7. by night, and on a phone */
   await p.evaluate(() => { document.body.setAttribute('data-theme', 'night'); IngRooms.open('settings', 'data', false); }); await p.waitForTimeout(500);
-  const nt = await p.evaluate(() => getComputedStyle(document.querySelector('#rmP-settings-data .dx-tab[aria-selected="true"]')).color);
+  const nt = await p.evaluate(() => getComputedStyle(document.querySelector('#dxB-data .dx-tab[aria-selected="true"]')).color);
   await p.screenshot({ path: OUT + '/data_night.png' }); await p.evaluate(() => document.body.setAttribute('data-theme', 'day'));
   ok(nt === 'rgb(255, 255, 255)', 'by night the chosen section reads white on amethyst', nt);
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(600);
   const ph = await p.evaluate(async () => { IngRooms.open('settings', 'data', false); await new Promise(r => setTimeout(r, 400)); IngSettingsParts.show('data', 'storage'); await new Promise(r => setTimeout(r, 400));
-    const bar = document.querySelector('#rmP-settings-data .dx-bar').getBoundingClientRect(); const cols = document.querySelector('#stxCard .dx-cols');
+    const bar = document.querySelector('#dxB-data').getBoundingClientRect(); const cols = document.querySelector('#stxCard .dx-cols');
     return { over: document.scrollingElement.scrollWidth - innerWidth, bar: Math.round(bar.right) <= innerWidth + 1, one: cols ? getComputedStyle(cols).gridTemplateColumns.split(' ').length : 0 }; });
   await p.screenshot({ path: OUT + '/phone.png' });
   ok(ph.over <= 1 && ph.bar && ph.one === 1, 'on a phone the sections fit the screen and Storage stacks in one column', ph);

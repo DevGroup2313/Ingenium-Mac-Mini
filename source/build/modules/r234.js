@@ -78,8 +78,8 @@ function keep(){try{W.localStorage.setItem(KEY,JSON.stringify(PREF));}catch(e){}
 var CUR={};
 function panel(r){return $("rmP-settings-"+r);}
 function partFor(r,c){var R=ROOMS[r];for(var i=0;i<R.parts.length;i++){var P=R.parts[i];for(var j=0;j<P.m.length;j++){var m=P.m[j];if(typeof m==="string"?c.id===m:m.test(head(c)))return P.k;}}return R.rest;}
-function bar(r){var pn=panel(r);if(!pn)return null;var b=pn.querySelector(":scope > .dx-bar");if(b)return b;var R=ROOMS[r];
-  b=mk("div","dx-bar");b.setAttribute("role","tablist");b.setAttribute("aria-label",R.label);b.setAttribute("data-room",r);
+function bar(r){var pn=panel(r);if(!pn)return null;var b=$("dxB-"+r)||pn.querySelector(":scope > .dx-bar");if(b)return b;var R=ROOMS[r];   /* 6.84: found by its id, wherever modules/r278.js has set it */
+  b=mk("div","dx-bar");b.id="dxB-"+r;b.setAttribute("role","tablist");b.setAttribute("aria-label",R.label);b.setAttribute("data-room",r);
   R.parts.forEach(function(P){var t=mk("button","dx-tab");t.type="button";t.setAttribute("role","tab");t.id="dxT-"+r+"-"+P.k;t.setAttribute("data-part",P.k);t.innerHTML=P.i;t.appendChild(mk("span",null,P.t));
     t.addEventListener("click",function(){show(r,P.k,true);});b.appendChild(t);});
   b.addEventListener("keydown",function(e){var k=e.key;if(k!=="ArrowLeft"&&k!=="ArrowRight"&&k!=="Home"&&k!=="End")return;var ts=[].slice.call(b.querySelectorAll(".dx-tab")).filter(function(x){return !x.hidden;}),i=ts.indexOf(D.activeElement);if(i<0)return;e.preventDefault();

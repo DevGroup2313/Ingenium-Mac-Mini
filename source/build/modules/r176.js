@@ -490,6 +490,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.81: sharing models between her devices (modules/r274.js): the card's keys, lenses, found computers and switches, and the top bar's rows
      of her computers' models (her words, 11 November 2026: "I approve of the new design, please push it everywhere") */
   '#linkCard .ld-root button,#waPop .ld-sec button,'+
+  /* 6.84: Settings as one console (modules/r278.js): Theme's and Motion's pills and the switches (her words, 12 November 2026: "I approve of
+     the preview, please push it everywhere") */
+  '#page-settings .st-pill,#page-settings .st-sw,'+
   /* 6.83: Fabrica brings everything from GitHub (modules/r276.js): the sheet's choices, repositories and drives
      (her words, 11 November 2026: "I like the preview please push it everywhere") */
   '#fb .hb-opt,#fb .hb-pick,#fb .hb-drive,'+
