@@ -48,18 +48,18 @@ const rot = s => { const m = /matrix(?:3d)?\(([^)]+)\)/.exec(s || ''); if (!m) r
         bezel: ((pg.querySelector('.skc-bezelimg') || {}).src || '').slice(0, 22), inlay: !!pg.querySelector('.skc-dsvg .inl'), cur3: (pg.querySelector('.skc-cart[aria-current="step"]') || {}).getAttribute ? pg.querySelector('.skc-cart[aria-current="step"]').getAttribute('aria-label') : '',
         panels: pg.querySelectorAll('#cs .c-pn').length, csH: Math.round(document.getElementById('cs').getBoundingClientRect().height), vh: innerHeight, title: (h && h.querySelector('.skh-title') || {}).textContent }; });
     ok(dial.on && dial.hero && dial.before === 'cs' && dial.title === 'Vocatio', th + ': the Career Studio opens on its hero, above its panels', dial);
-    ok(dial.stages === 5 && dial.orbs === 5 && dial.index && dial.seal && dial.plate && /^data:image\/png/.test(dial.bezel), th + ': the dial: Blend\'s plate, the turned bezel, the index, the seal at its heart, one setting for each of the five stages', dial);
-    ok(dial.lens.every((l, i) => /^data:image\/png/.test(l.src) && l.w >= 72 && l.num === ['I', 'II', 'III', 'IV', 'V'][i]), th + ': each stage is set in the bezel as the hub is (Blend\'s setting, drawn with the dial\'s light), its numeral on the enamel', dial.lens);
-    ok(dial.lens.every(l => l.anim === 'none' && !l.sko && /^0s/.test(l.tr) && l.shadow === 'none'), th + ': the stages are flat and still: no sway, no lift, no shadow floating over the bezel', dial.lens);
-    ok(dial.cur === 2 && Math.abs(((dial.T % 360) + 360) % 360 - 216) < .5 && /^III\. What you want/.test(dial.cur3), th + ': the stage in hand (III) is turned under the index', dial);
-    ok(Math.abs(((rot(dial.dial) + 360) % 360) - 216) <= 1, th + ': the bezel stands turned by as much', dial.dial);
-    ok(dial.ups.every(u => Math.abs(((rot(u) + 360) % 360) - 144) <= 1), th + ': every numeral is turned back as far, so it stays upright', dial.ups);
-    ok(dial.inlay, th + ': the path walked (I and II) is inlaid in the groove', dial);
+    // 6.95: the compass she chose rides in the dial's place (modules/r293.js turns it on): Vocatio's raised compass, Ingenium's Orrery on its dial
+    const cp = await p.evaluate(() => { const pg = document.getElementById('page-career'), md = [...pg.querySelectorAll('.skv-md')], cur = pg.querySelector('.skv-md[aria-current="step"]'), sp = pg.querySelector('.skv-hx .seal-spin');
+      return { compass: !!pg.querySelector('.skv'), mds: md.length, cur: cur ? cur.getAttribute('aria-label') : '', index: !!pg.querySelector('.skv-index'), key: !!pg.querySelector('.skv-key .isl'), engine: sp ? getComputedStyle(sp).animationName : '', walls: pg.querySelectorAll('.skv-chapwall,.skv-dialwall').length, well: !!pg.querySelector('.skv-well img') }; });
+    ok(cp.compass && cp.mds === 5 && cp.index && cp.key, th + ': the compass: a medallion for each of the five stages on its ring, the index, Home\'s engine button at its heart', cp);
+    ok(cp.walls >= 10 && cp.well, th + ': the raised compass: the chapter ring and the band stand on their walls over a well', cp);
+    ok(/^III\. What you want/.test(cp.cur) && dial.cur === 2 && Math.abs(((dial.T % 360) + 360) % 360 - 216) < .5, th + ': the stage in hand (III) is marked and turned under the index', { cp, T: dial.T, cur: dial.cur });
+    ok(cp.engine === 'skvEngine', th + ': the engine at its heart turns without pause', cp.engine);
     ok(dial.panels === 2 && Math.abs(dial.csH - (dial.vh - 74)) <= 2, th + ': its two panels are kept, as tall as the window', dial);
     let ins = await inside(p, 'career'); ok(ins.bad.length === 0 && ins.out.length >= 1, th + ': the dial\'s names stay inside its hero', ins);
     await p.screenshot({ path: OUT + '/career_' + th + '.png' });
     // press stage IV: the counsellor opens it and the dial turns to it, the short way round
-    await p.evaluate(() => { IngCounsel.next = () => 'want'; }); await p.click('#page-career .skc-cart[aria-label^="IV."]', { force: true }); await p.waitForTimeout(1800);
+    await p.evaluate(() => { IngCounsel.next = () => 'want'; }); await p.click('#page-career .skv-md[aria-label^="IV."]', { force: true }); await p.waitForTimeout(1800);
     const turned = await p.evaluate(() => { const st = IngStudios.state(); return { T: st.T, cur: st.cur, stage: IngCounsel.state().stage, room: IngCareer.state().ui.room, bear: [...document.querySelectorAll('#page-career .skh-label')].map(l => l.textContent).join(' | ') }; });
     ok(turned.stage === 'go' && turned.cur === 3 && Math.abs(turned.T - (dial.T - 72)) < .5 && /IV · Where you could go/.test(turned.bear), th + ': pressing stage IV opens it and turns the dial one stage on, the short way', turned);
     // Lector: the fan deck
@@ -89,14 +89,15 @@ const rot = s => { const m = /matrix(?:3d)?\(([^)]+)\)/.exec(s || ''); if (!m) r
     await p.screenshot({ path: OUT + '/lector_' + th + '.png' });
     if (th === 'day') {
       // the keys: the app's own press and sound (modules/r176.js)
-      const keys = await p.evaluate(() => { const sel = ['.skh-k', '.sks-step', '.skc-cart', '.lf-card']; let s = ''; try { s = KEYSEL; } catch (e) { s = ''; }
+      const keys = await p.evaluate(() => { const sel = ['.skh-k', '.sks-step', '.skv-md', '.lf-card']; let s = ''; try { s = KEYSEL; } catch (e) { s = ''; }
         const src = [...document.querySelectorAll('script')].map(x => x.textContent).find(t => /var KEYSEL=/.test(t)) || ''; return sel.map(k => (s || src).indexOf(k) >= 0); });
       ok(keys.every(Boolean), 'the heads\' keys, step cards, stages and documents are the app\'s keys', keys);
       // Minimal motion stills the turning, the sway and the breath
       await p.evaluate(() => { document.body.setAttribute('data-motion', 'minimal'); go('career'); }); await p.waitForTimeout(500);
-      const still = await p.evaluate(() => { const pg = document.getElementById('page-career'); return { dial: getComputedStyle(pg.querySelector('.skc-dial')).transitionDuration, sway: getComputedStyle(pg.querySelector('.skh-sway')).animationName,
-        spin: getComputedStyle(pg.querySelector('.skc-seat .seal-spin')).animationName }; });
-      ok(/^0s/.test(still.dial) && still.sway === 'none' && still.spin === 'none', 'Minimal motion stills the dial\'s turn, the sway and the seal at its heart', still);
+      await p.waitForTimeout(800);
+      const still = await p.evaluate(() => { const pg = document.getElementById('page-career'); return { tilt: getComputedStyle(pg.querySelector('.skv-tilt')).transform, sway: getComputedStyle(pg.querySelector('.skh-sway')).animationName,
+        spin: getComputedStyle(pg.querySelector('.skv-hx .seal-spin')).animationName }; });
+      ok(still.tilt === 'none' && still.sway === 'none' && still.spin === 'none', 'Minimal motion stills the compass: no sway, no lean, the engine at its heart at rest', still);
     }
     ok(errs.length === 0, th + ': no errors on the page', errs);
     await ctx.close();

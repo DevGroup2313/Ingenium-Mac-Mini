@@ -503,7 +503,7 @@ def _public(ed):
          '<b>Abacus</b> is the reckoning grid: workbooks, formulas, formats, and CSV in and out. With <b>Imago</b> for slides, <b>Scriba</b> for recordings and '
          '<b>Fontes</b> for sources, they are apps of their own, carried whole.</div></div>', '', "Guide: no five apps", 1),
         ("Fabrica chooses no model: it hands work to Chat and Code.", "", "Guide: effort, no Fabrica", 2),
-        ("Lector, the Career Studio and Folders share one writing effort, beside their model, as they share the model:",
+        ("Lector, Vocatio and Folders share one writing effort, beside their model, as they share the model:",
          "Folders has a writing effort of its own, beside its model:", "Guide: effort, Folders alone", 1),
         ("Notes, Tabula, a Word file, or the clipboard", "Notes, a Word file, or the clipboard", "Guide: where a blend goes", 1),
         ('"Apps made here can be kept in Fabrica, with every version.",', '', "help: Code keeps its own apps", 1),
@@ -511,7 +511,7 @@ def _public(ed):
         ("a look-up of a reference, or the speech model the first time you dictate or record (Scriba's, fetched once and kept).",
          "a look-up of a reference, or the speech model the first time you dictate (fetched once and kept).", "Home: what goes online (6.56)", 1),
         # Folders, the Studio (modules/r208.js, r200.js, r201.js)
-        ("Your profile names no apps yet (the Career Studio's entries of projects). Name them here.", "No apps are named yet. Name them here.",
+        ("Your profile names no apps yet (Vocatio's entries of projects). Name them here.", "No apps are named yet. Name them here.",
          "Folders: no Career Studio to read", 1),
         ("your notes on sources, the Tabula page, your sticky notes and your project files", "your notes on sources, your sticky notes and your project files",
          "Data: no Tabula page", 1),
