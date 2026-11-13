@@ -34,9 +34,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // Folders: bring in your work (its card is out of the window: a line says where)
   await open('folders');
   await p.evaluate(() => document.getElementById('fdBringKey').click()); await sleep(1300);
-  const f2 = await p.evaluate(() => { const c = document.querySelector('#page-folders .fd-bring'), r = c && c.getBoundingClientRect(); return { top: document.scrollingElement.scrollTop, said: window.__said.slice(), out: r ? r.top > innerHeight : null }; });
+  const f2 = await p.evaluate(() => { const w = document.querySelector('#page-folders .fd-bwrap'), sh = w && w.querySelector('.fd-bsheet'), r = sh && sh.getBoundingClientRect();
+    return { top: document.scrollingElement.scrollTop, panel: !!w, fixed: w ? getComputedStyle(w).position : null, inWindow: r ? (r.top >= 0 && r.bottom <= innerHeight + 1) : null,
+      ways: w ? w.querySelectorAll('.fd-bway').length : 0, keys: w ? w.querySelectorAll('.fd-bacts .btn').length : 0, title: sh ? (sh.querySelector('h3') || {}).textContent : null }; });
   ok(f2.top === 0, 'Folders: "Bring in your work" leaves the page where it was', f2);
-  ok(!f2.out || f2.said.some(s => /bring in your work are below/.test(s)), 'when its card is out of the window, a line says where it is', f2);
+  // 7.00, her words: "please you should make the "Bring in your work" on Folders open in a panel over the page, the way Fabrica's "New app" does"
+  ok(f2.panel && f2.fixed === 'fixed' && f2.inWindow && f2.ways >= 3 && f2.keys >= f2.ways && f2.title === 'Bring in your work', 'it opens in a panel over the page, in the window, with every way and its keys (7.00)', f2);
+  await p.keyboard.press('Escape'); await sleep(300);
+  const f2b = await p.evaluate(() => ({ panel: !!document.querySelector('#page-folders .fd-bwrap'), top: document.scrollingElement.scrollTop }));
+  ok(!f2b.panel && f2b.top === 0, 'Escape closes the panel, and the page is where it was', f2b);
   // Folders: a folder pressed in the drawer
   await open('folders');
   const f3 = await p.evaluate(() => { const f = document.querySelector('#page-folders .fd-file'); if (!f) return null; f.click(); return true; }); await sleep(1300);

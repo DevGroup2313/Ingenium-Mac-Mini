@@ -263,6 +263,29 @@ body[data-motion="minimal"] #page-folders.fd-on .fd-spread.fd-anim .fd-left{anim
 #page-folders.fd-on.fd-phone .fld-ways.fd-tray,#page-folders.fd-on.fd-phone .fld-grid,#page-folders.fd-on.fd-phone #fldBody > .card.fd-libcard{grid-template-columns:minmax(0,1fr)}
 #page-folders.fd-on.fd-phone .fd-libcard > *{grid-column:1}
 #page-folders.fd-on.fd-phone .fd-libcard > .fd-shelf{grid-row:auto;justify-self:center;margin:6px 0 22px}
+/* 7.00: Bring in your work opens in a panel over the page, as Fabrica's New app does (her words, 13 November 2026: "Yes, please you should
+   make the "Bring in your work" on Folders open in a panel over the page, the way Fabrica's "New app" does.") */
+.fd-bwrap{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:14px;background:rgba(17,13,24,.35);animation:fdbFade .18s ease}
+.fd-bsheet{position:relative;width:min(640px,100%);max-height:calc(100vh - 28px);overflow:auto;box-sizing:border-box;padding:18px 20px 16px;border-radius:16px;background:var(--card-hi,#fff);
+  border:1px solid var(--hairline,rgba(34,26,46,.10));box-shadow:0 1px 0 rgba(40,22,68,.08),0 6px 12px rgba(40,22,68,.10),0 22px 44px rgba(40,22,68,.18);animation:fdbRise .42s cubic-bezier(.34,1.3,.64,1);scrollbar-width:thin}
+body[data-theme="night"] .fd-bsheet{box-shadow:0 1px 0 rgba(0,0,0,.5),0 8px 16px rgba(0,0,0,.4),0 26px 50px rgba(0,0,0,.5)}
+.fd-bsheet h3{margin:0 0 4px;font:600 22px/1.2 var(--fd-serif,var(--serif,Georgia,serif));letter-spacing:.01em;color:var(--ink-1)}
+.fd-bsheet > p{margin:0 0 12px;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.fd-bways{display:grid;gap:10px}
+.fd-bway{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px 14px;border:1px solid var(--hairline,rgba(34,26,46,.10));border-radius:12px;background:var(--bg,transparent)}
+.fd-bway > .fd-bico{grid-row:1 / span 2;width:40px;height:40px;position:relative}
+.fd-bway > .fd-bico > *{position:absolute !important;left:0 !important;top:0 !important;margin:0 !important}
+#page-folders.fd-on .fd-bway > .fd-bico > .fdo{--S:40px}
+.fd-bway > b{font-size:14px;color:var(--ink-1)}
+.fd-bway > p{grid-column:2;margin:0;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
+.fd-bway > p code{font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:var(--card,transparent);border:1px solid var(--hairline,rgba(34,26,46,.10));border-radius:6px;padding:1px 5px;white-space:nowrap}
+.fd-bway > .fd-bacts{grid-column:3;grid-row:1 / span 2;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.fd-bend{display:flex;justify-content:flex-end;margin-top:12px}
+@keyframes fdbFade{from{opacity:0}to{opacity:1}}
+@keyframes fdbRise{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+body[data-motion="minimal"] .fd-bwrap,body[data-motion="minimal"] .fd-bsheet{animation:none}
+@media (prefers-reduced-motion:reduce){.fd-bwrap,.fd-bsheet{animation:none}}
+@media (max-width:700px){.fd-bway{grid-template-columns:auto minmax(0,1fr)}.fd-bway > .fd-bacts{grid-column:1 / -1;grid-row:auto;justify-content:flex-start}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p263"]="started";}catch(_){}
 /* R263 · Folders, a drawer of her apps: see the note at the top of its styles */
@@ -385,7 +408,25 @@ function openFolder(p){var g=G();g.ui.open=p.id;g.ui.adding=false;g.ui.renaming=
 function home(){var g=G();if(g.ui.open){g.ui.open=null;g.ui.renaming=null;save();paintFolders();}}
 function addFolder(){if(!folders().length){home();var m=page&&page.querySelector(".fld-more");if(m){said(m,"Your first folder starts below.");try{m.focus({preventScroll:true});}catch(e){}}return;}
   var g=G();g.ui.open=null;g.ui.adding=true;save();paintFolders();var i=$("fldAddName");if(i){said(i,"Name the new folder below.");try{i.focus({preventScroll:true});}catch(e){}}}
-function bringIn(){home();var c=body&&body.querySelector(".fd-bring");if(c)said(c,"The ways to bring in your work are below, at the foot of the page.");}
+function bringIn(){home();setTimeout(openBring,0);}
+/* 7.00: the ways to bring in your work, in a panel over the page; each key in it presses the page's own key for that way */
+function wayOf(t){var c=body&&body.querySelector(".fd-bring");if(!c)return null;var f=null;[].some.call(c.querySelectorAll(".fld-way"),function(w){var b=w.querySelector(":scope > b");if(b&&b.textContent===t){f=w;return true;}return false;});return f;}
+var ogB=W.go;if(typeof ogB==="function")W.go=function(p){if(p!=="folders")try{closeBring();}catch(e){}return ogB.apply(this,arguments);};
+function closeBring(){[].forEach.call(D.querySelectorAll(".fd-bwrap"),function(n){if(n.parentNode)n.parentNode.removeChild(n);});}
+function openBring(){closeBring();var src=body&&body.querySelector(".fd-bring");if(!src)return;var lead=src.querySelector(":scope > p");
+  var wrap=mk("div","fd-bwrap"),sh=mk("div","fd-bsheet");wrap.setAttribute("role","dialog");wrap.setAttribute("aria-modal","true");wrap.setAttribute("aria-label","Bring in your work");
+  sh.appendChild(mk("h3",null,"Bring in your work"));sh.appendChild(mk("p",null,lead?lead.innerHTML:"Your conversations and your ways of working from elsewhere, brought into Ingenium on this device."));
+  var list=mk("div","fd-bways");
+  [].forEach.call(src.querySelectorAll(".fld-way"),function(w){var tb=w.querySelector(":scope > b"),t=tb?tb.textContent:"",d=w.querySelector(":scope > p"),row=mk("div","fd-bway");
+    var o=w.querySelector(":scope > .fdo");var ic=mk("span","fd-bico");ic.setAttribute("aria-hidden","true");if(o){try{ic.appendChild(o.cloneNode(true));}catch(e){}}row.appendChild(ic);
+    row.appendChild(mk("b",null,esc(t)));if(d)row.appendChild(mk("p",null,d.innerHTML));
+    var acts=mk("div","fd-bacts");[].forEach.call(w.querySelectorAll(".fld-acts > *"),function(b,j){var k=mk("button","btn small"+(b.classList.contains("primary")?" primary":""));k.type="button";k.textContent=(b.textContent||"").trim();
+      k.addEventListener("click",function(){var cur=wayOf(t),bb=cur?cur.querySelectorAll(".fld-acts > *")[j]:null;closeBring();if(bb)bb.click();});acts.appendChild(k);});
+    row.appendChild(acts);list.appendChild(row);});
+  sh.appendChild(list);var end=mk("div","fd-bend"),cl=mk("button","btn small",null);cl.type="button";cl.textContent="Close";cl.addEventListener("click",closeBring);end.appendChild(cl);sh.appendChild(end);
+  wrap.appendChild(sh);wrap.addEventListener("click",function(e){if(e.target===wrap)closeBring();});
+  wrap.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();closeBring();try{var k=D.getElementById("fdBringKey")||null;if(k)k.focus({preventScroll:true});}catch(x){}}});
+  var pg=D.getElementById("page-folders")||D.body;pg.appendChild(wrap);try{(sh.querySelector(".fd-bacts .btn")||cl).focus({preventScroll:true});}catch(e){}}
 
 /* ---------- dressing the page that Folders draws (r208 draws it again on every change; this follows it) ---------- */
 var LEFT=/^(Where we left off|Seen in the conversations|How I work on )/;

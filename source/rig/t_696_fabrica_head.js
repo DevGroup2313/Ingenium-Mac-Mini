@@ -11,7 +11,7 @@
 //   stands in the window without the page moving; the label
 //   names the newest version; a version under the pointer says its words; pressed, it opens what it changed (Compare);
 //   it turns slowly, stills under the pointer, and Minimal motion holds it; by night it is drawn again; the three panels keep the window's
-//   height under the header; on a phone the instrument steps aside as the other heads' do and nothing scrolls sideways; no page error.
+//   height under the header; on a phone the tree stands under the words (7.00) and nothing scrolls sideways; no page error.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 900))); c ? pass++ : fail++; };
@@ -102,7 +102,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.setViewportSize({ width: 390, height: 860 }); await sleep(900);
     const ph = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, obj: getComputedStyle(document.querySelector('#page-fabrica .skh-obj')).display, head: !!document.querySelector('#page-fabrica .skh').offsetParent }));
     await p.screenshot({ path: path.join(OUT, 'phone.png') });
-    ok(ph.sw <= ph.iw && ph.obj === 'none' && ph.head, 'on a phone the header stays, the instrument steps aside as the other heads\' do, and nothing scrolls sideways', ph);
+    ok(ph.sw <= ph.iw && ph.obj === 'block' && ph.head, 'on a phone the header stays, the tree stands under the words (7.00), and nothing scrolls sideways', ph);
     ok(!errs.length, 'no page error', errs);
   } catch (e) { ok(false, 'the test ran to its end', String(e && e.stack || e).slice(0, 900)); }
   finally { await b.close(); console.log(pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0); }

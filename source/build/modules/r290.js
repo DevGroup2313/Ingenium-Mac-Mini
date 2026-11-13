@@ -279,6 +279,8 @@ body[data-theme="night"] #page-lector .lf-cast{background:radial-gradient(closes
    just pasted in together but not really connected or in unison") */
 @keyframes lfSway{0%,100%{transform:rotateY(-7deg) rotateX(2.2deg)}50%{transform:rotateY(7deg) rotateX(-2.2deg)}}
 #page-lector .lf-stamp{position:absolute;left:0;top:0;width:520px;height:460px;transform-style:preserve-3d;transform-origin:262px 380px}
+#page-lector .lf-twin{pointer-events:none}
+#page-lector .lf-twin .lf-seal{pointer-events:auto}
 .skh.is-away .lf-sway{animation-play-state:paused}
 /* a sheet: a key that is a document, standing in the fan with its own thickness */
 #page-lector button.lf-card{position:absolute;left:152px;top:58px;width:216px;height:330px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
@@ -1664,19 +1666,25 @@ function lfBuild(H){var root=mk("div","lf");root.setAttribute("role","group");ro
   stamp.appendChild(LB.cards[0]);stamp.appendChild(LB.cards[2]);stamp.appendChild(LB.cards[1]);
   /* two loose leaves behind the three, so the spread is a sheaf of paper */
   LB.loose=[mk("div","lf-loose l"),mk("div","lf-loose r")];LB.loose.forEach(function(e){e.setAttribute("aria-hidden","true");e.innerHTML='<i class="lf-shade"></i><canvas class="lf-paper"></canvas>';stamp.insertBefore(e,stamp.firstChild);});
-  var sl=mk("div","lf-seal"),sk=lxSealKey(88);sk.__thin=true;LB.seal=sk;sl.appendChild(sk);stamp.appendChild(sl);sway.appendChild(stamp);
+  var sl=mk("div","lf-seal"),sk=lxSealKey(88);sk.__thin=true;LB.seal=sk;sl.appendChild(sk);sway.appendChild(stamp);
+  /* 7.00: the seal in a stack of its own, laid exactly over the documents' (the same tilt, sway and stamp, so it moves with them), and drawn
+     after them: no sheet can be sorted in front of it. In the Mac app a side sheet came in front of it now and then as the stack swayed, so
+     the seal vanished and came back on a loop (her words, 13 November 2026: "the seal is still disappearing intermittently on the page on
+     a loop and it is really annoying") */
+  var tilt2=mk("div","lf-tilt lf-twin"),sway2=mk("div","lf-sway lf-twin"),stamp2=mk("div","lf-stamp lf-twin");stamp2.appendChild(sl);sway2.appendChild(stamp2);tilt2.appendChild(sway2);LB.sealStack=tilt2;
   /* 6.96: the seal is pressed on the sheet in front: pointing at either lifts both, pressing the sheet sinks the seal with it */
   var front=LB.cards[1],onS=false,onF=false;function lift(){sl.classList.toggle("lf-up",onS||onF);front.classList.toggle("lf-ph",onS&&!onF);}
   front.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"){onF=true;lift();}});front.addEventListener("pointerleave",function(){onF=false;lift();});
   sk.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"){onS=true;lift();}});sk.addEventListener("pointerleave",function(){onS=false;lift();});
   front.addEventListener("pointerdown",function(){sl.classList.add("lf-dn");});["pointerup","pointercancel","pointerleave"].forEach(function(t){front.addEventListener(t,function(){sl.classList.remove("lf-dn");});});
   /* a press of the seal stamps the stack: the sheets give under it and spring back, as paper under a seal does, with the seal's own knock */
-  sk.addEventListener("click",function(){if(still()||!stamp.animate)return;try{stamp.animate([{transform:"translateZ(0) scale(1)"},{transform:"translateZ(-7px) scale(.986)",offset:.18},{transform:"translateZ(2px) scale(1.004)",offset:.5},{transform:"translateZ(0) scale(1)"}],{duration:620,easing:"cubic-bezier(.3,.7,.3,1)"});}catch(e){}});
-  tilt.appendChild(sway);root.appendChild(tilt);H.obj.appendChild(root);LB.root=root;
+  sk.addEventListener("click",function(){if(still()||!stamp.animate)return;var kf=[{transform:"translateZ(0) scale(1)"},{transform:"translateZ(-7px) scale(.986)",offset:.18},{transform:"translateZ(2px) scale(1.004)",offset:.5},{transform:"translateZ(0) scale(1)"}],op={duration:620,easing:"cubic-bezier(.3,.7,.3,1)"};
+    try{stamp.animate(kf,op);stamp2.animate(kf,op);}catch(e){}});
+  tilt.appendChild(sway);root.appendChild(tilt);root.appendChild(tilt2);H.obj.appendChild(root);LB.root=root;
   root.style.setProperty("--lf-grain",grainTile(false));root.style.setProperty("--lf-grain-n",grainTile(true));
   root.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=root.getBoundingClientRect();if(!r.width)return;
-    var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;tilt.style.setProperty("--lf-ry",(x*24).toFixed(1)+"deg");tilt.style.setProperty("--lf-rx",(-y*16).toFixed(1)+"deg");},{passive:true});
-  root.addEventListener("pointerleave",function(){tilt.style.removeProperty("--lf-ry");tilt.style.removeProperty("--lf-rx");});}
+    var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;[tilt,tilt2].forEach(function(t){t.style.setProperty("--lf-ry",(x*24).toFixed(1)+"deg");t.style.setProperty("--lf-rx",(-y*16).toFixed(1)+"deg");});},{passive:true});
+  root.addEventListener("pointerleave",function(){[tilt,tilt2].forEach(function(t){t.style.removeProperty("--lf-ry");t.style.removeProperty("--lf-rx");});});}
 function lfOpen(d){if(!d)return;var box=$("l7Dtabs"),tab=null;/* The document draws its tabs again on each change: find this one by its name now */
   if(box)[].some.call(box.querySelectorAll("button"),function(x){if((x.textContent||"").trim()===d.name){tab=x;return true;}return false;});if(tab){try{tab.click();}catch(e){}}
   try{if(W.IngLector&&IngLector.setPanel&&W.innerWidth<900)IngLector.setPanel("doc");}catch(e){}var dp=$("l7Doc");if(dp)scrollTo(dp);setTimeout(paintLector,40);}

@@ -112,7 +112,8 @@ const rot = s => { const m = /matrix(?:3d)?\(([^)]+)\)/.exec(s || ''); if (!m) r
     await p.evaluate(pg => go(pg), pg); await p.waitForTimeout(1200);
     const ph = await p.evaluate((pg) => { const h = document.querySelector('#page-' + pg + ' .skh'); if (!h) return { none: true }; const r = h.getBoundingClientRect();
       return { w: Math.round(r.width), obj: getComputedStyle(h.querySelector('.skh-obj')).display, sw: document.documentElement.scrollWidth, vw: innerWidth }; }, pg);
-    ok(ph.obj === 'none' && ph.w <= ph.vw && ph.sw <= ph.vw + 1, 'phone: ' + pg + ' keeps its words and keys, no object, nothing wider than the screen', ph);
+    // 7.00 (her words, 13 November 2026: "I also want the new pages designs and graphics visible on the Iphone/Ipad and Fire Tablet screens too"): the instrument stands under the words
+    ok(ph.obj === 'block' && ph.w <= ph.vw && ph.sw <= ph.vw + 1, 'phone: ' + pg + ' keeps its words and keys and shows its instrument under them, nothing wider than the screen', ph);
     await p.screenshot({ path: OUT + '/phone_' + pg + '.png' });
   }
   ok(errs.length === 0, 'phone: no errors on the page', errs);
