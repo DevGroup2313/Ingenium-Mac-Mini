@@ -31,9 +31,9 @@ var FALL=[null,{name:"Low",room:2048,mul:0,line:"Quick replies. It thinks little
 function LV(){return (W.IngEffort&&IngEffort.levels)||FALL;}
 function get(){var v=W.state&&state.wEff;return v==="auto"||v==="ultra"||/^[1-5]$/.test(String(v))?String(v):"auto";}
 function set(v){state.wEff=String(v);try{saveState();}catch(e){}paintAll();}
-function says(v){if(v==="auto")return "Auto: reading quickly (Low); writing at High through a connection, and quickly on this device. Shared by Lector, the Career Studio and Folders.";
+function says(v){if(v==="auto")return "Auto: reading quickly (Low); writing at High through a connection, and quickly on this device. Shared by Lector, Vocatio and Folders.";
   if(v==="ultra")return "Ultra: Max, then each piece written is checked against its own material, every name, date, number and claim, and corrected. About twice the time.";
-  var L=LV()[+v];return (L?L.line+" ":"")+"Shared by Lector, the Career Studio and Folders.";}
+  var L=LV()[+v];return (L?L.line+" ":"")+"Shared by Lector, Vocatio and Folders.";}
 
 /* ================= 1. which effort a request is given ================= */
 var READ=/^You are Lector, a careful reader|^You read and advise on this device for the applicant/;
@@ -72,7 +72,7 @@ function shapeOk(draft,fixed){var d=String(draft||"").trim(),f=String(fixed||"")
 
 /* ================= 3. the choice, beside the model, on each page that uses it ================= */
 function control(where){var w=mk("div","wef");w.setAttribute("data-wef",where);var lab=mk("label"),sp=mk("span",null,"Effort");lab.appendChild(sp);
-  var sel=D.createElement("select");sel.setAttribute("aria-label","Writing effort, shared by Lector, the Career Studio and Folders");
+  var sel=D.createElement("select");sel.setAttribute("aria-label","Writing effort, shared by Lector, Vocatio and Folders");
   OPTS.forEach(function(o){var op=D.createElement("option");op.value=o[0];op.textContent=o[1];sel.appendChild(op);});sel.value=get();
   sel.onchange=function(){set(sel.value);};lab.appendChild(sel);w.appendChild(lab);w.appendChild(mk("span","wef-say",says(get())));return w;}
 function paintAll(){var v=get();[].forEach.call(D.querySelectorAll(".wef"),function(w){var s=w.querySelector("select");if(s&&s.value!==v)s.value=v;var t=w.querySelector(".wef-say");if(t)t.textContent=says(v);});}
@@ -88,7 +88,7 @@ var MOS=[];function watch(){["lx7","cs","page-folders"].forEach(function(id){var
 /* ================= 4. the Guide says where effort is chosen now ================= */
 function guide(){var c=$("guideEffortCard");if(!c||c.querySelector("[data-r225]"))return;var dl=c.querySelector("dl")||c.appendChild(mk("dl"));
   var dt=mk("dt",null,"Beyond Chat and Code");dt.setAttribute("data-r225","1");dl.appendChild(dt);
-  dl.appendChild(mk("dd",null,"Blend has its own effort, in its steps. Build has its own, beside How should it work: Auto, Low to Max, or Ultracode. Lector, the Career Studio and Folders share one writing effort, beside their model, as they share the model: Auto reads quickly and writes at High through a connection (quickly on this device); Ultra writes at Max and then checks each piece against its own material, and corrects it. Fabrica chooses no model: it hands work to Chat and Code."));}
+  dl.appendChild(mk("dd",null,"Blend has its own effort, in its steps. Build has its own, beside How should it work: Auto, Low to Max, or Ultracode. Lector, Vocatio and Folders share one writing effort, beside their model, as they share the model: Auto reads quickly and writes at High through a connection (quickly on this device); Ultra writes at Max and then checks each piece against its own material, and corrects it. Fabrica chooses no model: it hands work to Chat and Code."));}
 
 function boot(){try{watch();}catch(e){}try{guide();}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();

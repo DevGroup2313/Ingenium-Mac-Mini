@@ -19,7 +19,7 @@ const OWNERS = /Designed and built by Yannie D\. Forest|© 2026 Yannie D\. Fores
 const NOT = {
   // Scriba and Fontes are also Ingenium's own model house and its reference database (the chat's My sources), which every edition keeps:
   // they count here only in the words that mean the apps of those names
-  public: /\b(Fabrica|Tabula|Abacus|Imago|Scriba for recordings|Scriba \(recordings|Scriba's speech model|Fontes \(sources\) are|Fontes for sources|Lector|Career Studio|Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/,
+  public: /\b(Fabrica|Tabula|Abacus|Imago|Scriba for recordings|Scriba \(recordings|Scriba's speech model|Fontes \(sources\) are|Fontes for sources|Lector|Career Studio|Vocatio|Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/,
   full: /\b(Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/
 };
 async function survey(b, ed, url) {

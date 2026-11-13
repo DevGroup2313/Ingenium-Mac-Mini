@@ -43,10 +43,10 @@ const DRAFT = 'My research asks how field notebooks shaped method in the 1850s. 
   // (b) one posting, two pages: the brief offers the studio's applications
   await p.evaluate(() => { const L = IngLector.state(); L.brief.purpose = 'programme'; L.posts.programme = null; L.posts.job = null; saveState(); go('lector'); IngLector.render(); }); await p.waitForTimeout(900);
   const sel = await p.evaluate(() => { const s = document.querySelector('#l7Bf select.l-sel'); return s ? [...s.options].map(o => o.textContent) : null; });
-  ok(sel && sel[0] === 'From the Career Studio…' && sel[1] === 'DPhil in History of Science · University of Exampleton', "the brief's \"What it is for\" offers the studio's open application as the programme's call", sel);
+  ok(sel && sel[0] === 'From Vocatio…' && sel[1] === 'DPhil in History of Science · University of Exampleton', "the brief's \"What it is for\" offers the studio's open application as the programme's call", sel);
   await p.evaluate(id => { const s = document.querySelector('#l7Bf select.l-sel'); s.value = id; s.dispatchEvent(new Event('change')); }, id); await p.waitForTimeout(700);
-  const post = await p.evaluate(id => { const P = IngLector.state().posts.programme; return P && { from: P.from, title: P.title, org: P.org, closes: P.closes, chars: P.chars, name: P.name, also: [...document.querySelectorAll('#l7Bf button')].some(x => x.textContent === 'Also bring it to the Career Studio'), card: (document.querySelector('#l7Bf .l-card') || {}).innerText || '' }; }, id);
-  ok(post && post.from === 'career:' + id && post.title === 'DPhil in History of Science' && post.org === 'University of Exampleton' && post.chars > 100 && post.name === 'From the Career Studio' && !post.also, 'chosen, the studio\'s posting is the brief\'s, marked as from the studio (so no key offers to bring it back)', post);
+  const post = await p.evaluate(id => { const P = IngLector.state().posts.programme; return P && { from: P.from, title: P.title, org: P.org, closes: P.closes, chars: P.chars, name: P.name, also: [...document.querySelectorAll('#l7Bf button')].some(x => x.textContent === 'Also bring it to Vocatio'), card: (document.querySelector('#l7Bf .l-card') || {}).innerText || '' }; }, id);
+  ok(post && post.from === 'career:' + id && post.title === 'DPhil in History of Science' && post.org === 'University of Exampleton' && post.chars > 100 && post.name === 'From Vocatio' && !post.also, 'chosen, the studio\'s posting is the brief\'s, marked as from the studio (so no key offers to bring it back)', post);
   // the brief with no apps hands cv and cover to the studio: the same application, not a second one
   await p.evaluate(() => { const L = IngLector.state(); L.brief.apps = []; L.brief.docs = { cv: true, cover: true }; saveState(); IngLector.go(); }); await p.waitForTimeout(800); await idle(); await p.waitForTimeout(600);
   const hand = await p.evaluate(id => { const S = IngCareer.state(); return { n: S.opps.length, open: S.ui.open === id, docs: Object.keys(S.opps.find(x => x.id === id).docs).sort().join(), page: document.querySelector('section.active') && document.querySelector('section.active').id }; }, id);
@@ -54,13 +54,13 @@ const DRAFT = 'My research asks how field notebooks shaped method in the 1850s. 
   // a posting kept in the brief, brought to the studio once
   await p.evaluate(() => { go('lector'); IngLector.keepPost('job', 'Archivist\nThe County Record Office\nEssential:\n- Archival research\n- Cataloguing\nThe closing date is 5 December 2026.\n', 'Pasted text'); const L = IngLector.state(); L.brief.purpose = 'job'; }); await p.waitForTimeout(700);
   await p.evaluate(() => IngLector.render()); await p.waitForTimeout(500);
-  const also = await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].filter(x => x.textContent === 'Also bring it to the Career Studio').length);
+  const also = await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].filter(x => x.textContent === 'Also bring it to Vocatio').length);
   ok(also === 1, 'a posting kept in the brief offers "Also bring it to the Career Studio"', also);
-  await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].find(x => x.textContent === 'Also bring it to the Career Studio').click()); await p.waitForTimeout(900);
+  await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].find(x => x.textContent === 'Also bring it to Vocatio').click()); await p.waitForTimeout(900);
   const brought = await p.evaluate(() => { const S = IngCareer.state(), pid = IngLector.state().posts.job.id; return { n: S.opps.filter(o => o.from === 'lector:' + pid).length, all: S.opps.length, title: (S.opps.find(o => o.from === 'lector:' + pid) || {}).title, kind: (S.opps.find(o => o.from === 'lector:' + pid) || {}).kind, page: document.querySelector('section.active').id }; });
   ok(brought.n === 1 && brought.all === 2 && brought.title === 'Archivist' && brought.kind === 'job' && brought.page === 'page-career', 'pressed, the posting is in the studio as an application, and the studio opens', brought);
   await p.evaluate(() => { go('lector'); IngLector.render(); }); await p.waitForTimeout(500);
-  await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].find(x => x.textContent === 'Also bring it to the Career Studio').click()); await p.waitForTimeout(700);
+  await p.evaluate(() => [...document.querySelectorAll('#l7Bf button')].find(x => x.textContent === 'Also bring it to Vocatio').click()); await p.waitForTimeout(700);
   ok(await p.evaluate(() => { const S = IngCareer.state(), pid = IngLector.state().posts.job.id; return S.opps.filter(o => o.from === 'lector:' + pid).length === 1 && S.opps.length === 2; }), 'pressed again, it is there once (the studio knows it by the brief\'s id)');
   ok(await p.evaluate(() => Object.keys(window.__ingParts).every(k => window.__ingParts[k] === 'running')), 'every part of the page ran to its end');
   ok(errs.length === 0, 'no script errors on the page', errs.slice(0, 4).join(' | '));

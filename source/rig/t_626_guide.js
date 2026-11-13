@@ -28,7 +28,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const filedOk = Object.keys(want).every(k => same(R.filed[k], want[k])) && R.filed.start[0] === 'guideTourCard' && (R.filed.more || []).length === 0;
   ok(filedOk, 'every topic is in its room, and nothing is left over in More', R.filed);
   ok(!R.wnInRoom && !R.wnShown, 'What is new is no longer a card on the page', R);
-  ok((career ? /the Career Studio/.test(R.says) : !/Career Studio/.test(R.says)) && (master ? /Author Studio/.test(R.says) : !/Author Studio/.test(R.says)), 'the rooms\' lines name only what this edition carries', R.says);
+  ok((career ? /Vocatio/.test(R.says) : !/Vocatio|Career Studio/.test(R.says)) && (master ? /Author Studio/.test(R.says) : !/Author Studio/.test(R.says)), 'the rooms\' lines name only what this edition carries', R.says);
 
   /* 2. no long document: each room is about a window tall (6.25: 6,408 pixels) */
   const H = {}; for (const r of ['start', 'chatcode', 'models', 'making', 'around']) { await p.click('#rmT-guide-' + r); await p.waitForTimeout(450); H[r] = await p.evaluate(() => document.scrollingElement.scrollHeight); }

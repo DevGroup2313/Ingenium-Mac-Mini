@@ -75,7 +75,7 @@ const DECK = '<slides title="Letters as evidence">\n# Letters as evidence\nWhat 
   const career = await p.evaluate(async () => { await IngCareer.newOpp('phd', 'DPhil in History\nUniversity of Oxford\nWe invite applications. Closing date: 1 December 2026. Applicants should send a cover letter and a CV.', 'pasted');
     const o = IngCareer.state().opps[0]; const ref = IngBig.newId(); await IngBig.put(ref, 'Dear Professor Smith,\n\nI am writing to apply for the DPhil in History.\n\nYours sincerely');
     o.docs.cover = { ref, made: Date.now(), model: 'you', mine: true, chk: { figures: [], fills: 0 } }; o.step = 'send'; o.sv = { kind: 'cover' }; IngCareer.render(); await new Promise(r => setTimeout(r, 900));
-    return { keys: [...document.querySelectorAll('#cs .c-work .c-pn-f .c-btn')].map(x => x.textContent), listed: IngOpenIn.list().filter(it => /Career Studio/.test(it.from)).map(it => it.title) }; });
+    return { keys: [...document.querySelectorAll('#cs .c-work .c-pn-f .c-btn')].map(x => x.textContent), listed: IngOpenIn.list().filter(it => /Vocatio/.test(it.from)).map(it => it.title) }; });
   ok(career.keys.includes('Open in Tabula') && career.keys.includes('Save as Word'), "the studio's document has Open in Tabula beside Save as Word", career.keys);
   ok(career.listed.some(t => /Cover letter|cover/i.test(t) && /DPhil in History/.test(t)), "the studio's documents are in the list for Tabula's From Ingenium", career.listed);
   await p.evaluate(() => [...document.querySelectorAll('#cs .c-work .c-pn-f .c-btn')].find(x => x.textContent === 'Open in Tabula').click());

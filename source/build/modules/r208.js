@@ -153,7 +153,7 @@ function parseNotes(t){var out={summary:"",decisions:[],open:[],how:[]},mode="",
     if(mode==="s")buf.push(line.replace(/\s+$/,""));});
   out.summary=buf.join("\n").replace(/\n{3,}/g,"\n\n").trim();out.decisions=out.decisions.slice(0,20);out.open=out.open.slice(0,12);out.how=out.how.slice(0,6);return out;}
 function bringUp(p){if(RUN.busy){say("Ingenium is already bringing a folder up to date.");return Promise.resolve(null);}
-  if(!modelReady()){say("A model is needed to bring the summary up to date: get one on the Models page, or choose your connected model in Lector or the Career Studio.");return Promise.resolve(null);}
+  if(!modelReady()){say("A model is needed to bring the summary up to date: get one on the Models page, or choose your connected model in Lector or Vocatio.");return Promise.resolve(null);}
   var todo=unread(p);if(!todo.length){say("Nothing new to read: the summary is up to date.");return Promise.resolve(null);}
   RUN.busy=true;RUN.of=p.id;RUN.what="Reading "+todo.length+" conversation"+(todo.length===1?"":"s")+"…";paint();
   var R=room(),per=Math.max(2400,Math.floor(R*0.7/Math.min(todo.length,6))),batches=[],cur=[],size=0,kept=0;
@@ -212,7 +212,7 @@ function status(host){if(!RUN.busy)return;host.appendChild(h("p","fld-status",'<
 function homeView(host){var fs=folders();status(host);
   if(!fs.length){var c=card("Your apps","Ingenium starts from the apps your profile names. Untick any that should have no folder, add any that is missing, then make them. You can add a folder for a new app at any time.");
     var list=profileApps(),pick=h("div","fld-pick"),boxes=[];
-    if(!list.length)pick.appendChild(h("p","small muted",esc("Your profile names no apps yet (the Career Studio's entries of projects). Name them here.")));
+    if(!list.length)pick.appendChild(h("p","small muted",esc("Your profile names no apps yet (Vocatio's entries of projects). Name them here.")));
     list.forEach(function(x){var l=h("label"),cb=h("input");cb.type="checkbox";cb.checked=true;l.appendChild(cb);l.appendChild(h("span",null,"<b>"+esc(x.name)+"</b> <small>"+esc(x.why)+"</small>"));pick.appendChild(l);boxes.push([cb,x.name]);});
     c.appendChild(pick);var more=h("input");more.type="text";more.placeholder="Another app's name";more.setAttribute("aria-label","Another app's name");more.className="fld-more";
     var row=h("div","fld-row");row.appendChild(more);row.appendChild(key("","Add it",function(){var v=more.value.trim();if(!v)return;var l=h("label"),cb=h("input");cb.type="checkbox";cb.checked=true;l.appendChild(cb);l.appendChild(h("span",null,"<b>"+esc(v)+"</b> <small>Added by you</small>"));pick.appendChild(l);boxes.push([cb,v]);more.value="";}));c.appendChild(row);

@@ -58,10 +58,10 @@ const MON = ['IANUARII', 'FEBRUARII', 'MARTII', 'APRILIS', 'MAII', 'IUNII', 'IUL
       const nn = await p.evaluate(() => (document.querySelector('#page-lector .lf-seal .lx-wax') || {}).__k2 || '');
       ok(/^whiten/.test(nn), 'by night the seal is drawn again for the night', nn);
       await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(800);
-      // the Career Studio's compass stays held: the page reads as in 6.93
+      // Vocatio's compass rides from 6.95 (modules/r293.js): the page opens on it
       await p.evaluate(() => go('career')); await p.waitForTimeout(1500);
       const car = await p.evaluate(() => ({ compass: !!document.querySelector('#page-career .skv'), head: !!document.querySelector('#page-career .skh'), on: !!window.ING_COMPASS, switch: !!(window.IngStudios && IngStudios.compassOn), cs: !!document.getElementById('cs') }));
-      ok(!car.compass && !car.head && !car.on && car.switch && car.cs, 'the Career Studio\'s compass stays held (modules/r293.js), so the studio reads as in 6.93', car);
+      ok(car.compass && car.head && car.on && car.switch && car.cs, 'Vocatio\'s compass rides from 6.95 (modules/r293.js): the page opens on it', car);
       // Minimal motion stills the seal
       await p.evaluate(() => { document.body.setAttribute('data-motion', 'minimal'); go('lector'); }); await p.waitForTimeout(600);
       const st = await p.evaluate(() => { const hs = document.querySelector('#page-lector .lf-seal .lx-wax'); return { idle: getComputedStyle(hs.querySelector('.isl-idle')).animationName, beat: getComputedStyle(hs.querySelector('.lxs-heart')).animationName }; });

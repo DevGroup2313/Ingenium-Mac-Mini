@@ -343,7 +343,7 @@ function paint(){var c=$("cloudCard");if(!c)return;if(OPEN===0)OPEN=openFirst();
   if(ready()){var off=btn("Turn the Cloud off on this device");off.style.marginTop="10px";off.onclick=function(){forget().then(paint);};c.appendChild(off);}}
 var PASS="";
 /* what travels, named as this edition has it (the public editions have no Lector, Career Studio or Fabrica) */
-function what(){var a=["conversations","notes","projects","Focus"];if($("page-lector"))a.push("Lector");a.push("Blend");if($("page-career"))a.push("the Career Studio");a.push("Build");if($("page-fabrica"))a.push("Fabrica");
+function what(){var a=["conversations","notes","projects","Focus"];if($("page-lector"))a.push("Lector");a.push("Blend");if($("page-career"))a.push("Vocatio");a.push("Build");if($("page-fabrica"))a.push("Fabrica");
   return a.slice(0,-1).join(", ")+" and "+a[a.length-1];}
 /* a new Cloud is sent at once; a device joining one first brings in what is there (it is asked), and sends its own after */
 function after(r){paint();if(r&&r.fresh&&r.fresh.length){note(r.fresh);return Promise.resolve();}return send().catch(function(){});}

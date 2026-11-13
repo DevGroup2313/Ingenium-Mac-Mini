@@ -401,7 +401,7 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
 
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
-     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Advise" title="Suggestions for this document from the Career Studio: what your record adds, what could go, what a reader will ask">Suggestions</button><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn quiet" id="l7Open" title="Open this document in Tabula, as the Word file it saves, to keep writing it there">Open in Tabula</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
+     '<span style="margin-left:auto;display:flex;gap:6px;align-items:center"><button type="button" class="l-btn quiet" id="l7Advise" title="Suggestions for this document from Vocatio: what your record adds, what could go, what a reader will ask">Suggestions</button><button type="button" class="l-btn quiet" id="l7Copy">Copy</button><button type="button" class="l-btn quiet" id="l7Open" title="Open this document in Tabula, as the Word file it saves, to keep writing it there">Open in Tabula</button><button type="button" class="l-btn pri" id="l7Save">Save</button></span></div></section>'+
    '</div></div>';
   wireFrame();wireMid();return $("lx7");}
 /* 6.2: the middle panel shows the thinking or Ask Lector; the document panel's key opens Ask Lector on the document shown */
@@ -542,15 +542,15 @@ function postCard(p){var wrap=h("div");if(p==="portfolio"){wrap.appendChild(h("p
     var r=h("div","l-row");r.appendChild(h("span",null,esc(P.closes||(fmtBytes(P.chars||0)+" of text, kept on this device"))));var ks=h("span");
     ks.appendChild(btn("quiet","Change",function(){pickPost(p);}));ks.appendChild(btn("quiet","Remove",function(){IngBig.del(P.ref);L7().posts[p]=null;saveSoon();paintBrief();}));
     /* 6.9.2: one posting, two pages: a posting kept here can go to the Career Studio as well, once (it is known there by this id) */
-    if(window.IngCareer&&!/^career:/.test(P.from||""))ks.appendChild(btn("quiet","Also bring it to the Career Studio",function(){try{IngCareer.bringPost(p);}catch(e){}}));
+    if(window.IngCareer&&!/^career:/.test(P.from||""))ks.appendChild(btn("quiet","Also bring it to Vocatio",function(){try{IngCareer.bringPost(p);}catch(e){}}));
     r.appendChild(ks);c.appendChild(r);wrap.appendChild(c);return wrap;}
   var c2=h("div","l-card");c2.appendChild(h("b",null,p==="job"?"Add the posting":"Add the programme's call"));
   c2.appendChild(h("span","org",esc("Lector draws out what they ask for and fits every document to it. A file (Word, PDF, text or a saved web page), or the text pasted in.")));
   var ks2=h("div","l-keys");ks2.appendChild(btn("sm","Choose a file",function(){pickPost(p);}));
   /* 6.9.2: or a posting the Career Studio already keeps */
-  try{var ops=window.IngCareer?IngCareer.openPosts():[];if(ops.length){var cs=document.createElement("select");cs.className="l-sel";cs.setAttribute("aria-label","A posting kept in the Career Studio");
-    var o0=document.createElement("option");o0.value="";o0.textContent="From the Career Studio…";cs.appendChild(o0);ops.forEach(function(x){var op=document.createElement("option");op.value=x.id;op.textContent=x.title+(x.org?" · "+x.org:"");cs.appendChild(op);});
-    cs.onchange=function(){if(!cs.value)return;IngCareer.postFor(cs.value).then(function(x){if(!x||!x.text)return;var ex={from:"career:"+x.id};if(x.title)ex.title=x.title;if(x.org)ex.org=x.org;if(x.closes)ex.closes=x.closes;keepPost(p,x.text,"From the Career Studio",ex);});};ks2.appendChild(cs);}}catch(e){}
+  try{var ops=window.IngCareer?IngCareer.openPosts():[];if(ops.length){var cs=document.createElement("select");cs.className="l-sel";cs.setAttribute("aria-label","A posting kept in Vocatio");
+    var o0=document.createElement("option");o0.value="";o0.textContent="From Vocatio…";cs.appendChild(o0);ops.forEach(function(x){var op=document.createElement("option");op.value=x.id;op.textContent=x.title+(x.org?" · "+x.org:"");cs.appendChild(op);});
+    cs.onchange=function(){if(!cs.value)return;IngCareer.postFor(cs.value).then(function(x){if(!x||!x.text)return;var ex={from:"career:"+x.id};if(x.title)ex.title=x.title;if(x.org)ex.org=x.org;if(x.closes)ex.closes=x.closes;keepPost(p,x.text,"From Vocatio",ex);});};ks2.appendChild(cs);}}catch(e){}
   var ta=null;ks2.appendChild(btn("sm","Paste the text",function(){if(ta){ta.focus();return;}ta=document.createElement("textarea");ta.className="l-paste";ta.placeholder="Paste "+what+" here";c2.appendChild(ta);
     var kp=h("div","l-keys");kp.appendChild(btn("sm pri","Keep it",function(){keepPost(p,ta.value,"Pasted text");}));c2.appendChild(kp);ta.focus();}));
   c2.appendChild(ks2);wrap.appendChild(c2);return wrap;}
@@ -1417,7 +1417,7 @@ function wireFrame(){var U=L7().ui;wireFolds();wireZoom();
   $("l7Save").onclick=save;$("l7Copy").onclick=function(){curDoc().then(function(d){if(d)lxCopy(d.md);else ingToast("There is nothing to copy yet.");});};
   if($("l7Open"))$("l7Open").onclick=openInTabula;
   /* 6.44: the document shown, handed to the Career Studio, which looks at it against her profile with suggestions, never rewriting it */
-  if($("l7Advise"))$("l7Advise").onclick=function(){if(!(window.IngCareer&&IngCareer.adviseDoc)){ingToast("The Career Studio is not part of this copy of Ingenium.");return;}
+  if($("l7Advise"))$("l7Advise").onclick=function(){if(!(window.IngCareer&&IngCareer.adviseDoc)){ingToast("Vocatio is not part of this copy of Ingenium.");return;}
     curDoc().then(function(d){if(!d){ingToast("There is nothing to look at yet: this document is written after the reading.");return;}var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps);
       IngCareer.adviseDoc({name:(name?name+" · ":"")+docLabel(d.kind,apps,curPurpose()),kind:{cv:"cv",cover:"cover",portfolio:"portfolio"}[d.kind]||"",text:d.md,from:"lector"});});};
   /* the mouse wheel moves the rows that scroll sideways, since no bar shows */

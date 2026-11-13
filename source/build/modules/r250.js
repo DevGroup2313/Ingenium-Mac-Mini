@@ -30,7 +30,7 @@ function tour(){try{if(!T())return;
   after(["Effort, beside the model","Choosing the model"],{r250:"who",levels:["new","some","expert"],go:function(){W.go("chat");},ring:"#activeModelPill",
     t:"🗝️ Who answers, from any page",
     b:"The top bar's model key says who answers now, on every page. Press it to choose: a model on this device, or a service you connected. Under Who answers, How it answers sets the effort, the longest reply and how much the model keeps in mind; each model and each service keeps its own, and Ingenium gives them back when you choose it again.",
-    tip:"Lector, the Career Studio, Blend, Build and Code all use what is set here, so you can change it without going back to the chat."});
+    tip:"Lector, Vocatio, Blend, Build and Code all use what is set here, so you can change it without going back to the chat."});
   after("Who answers, from any page",{r250:"connect",go:function(){W.go("chat");},ring:"#chatModelBtn",
     t:"🔌 Connect a service",
     b:"To use Claude, OpenAI, Gemini, Ollama or another service, open the model menu and choose Connect a service: pick the service, paste its key (or the address of your Ollama), and choose a model. The key stays on this device. Find a model, at the top of the menu, finds any model you have, by name.",

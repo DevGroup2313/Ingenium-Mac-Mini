@@ -18,11 +18,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const t = await p.evaluate(() => ({ n: ING_TOUR.length, added: IngTourNow.added(), chaps: tourChapList().map(c => c.chap), env: !!window.IngEnv, ws: !!window.IngWorkshop }));
   const want = ['Chat: Effort, beside the model', 'Chat: Connectors', 'Code: Code: building an app with the model', 'Code: The plan, ticked off', 'Code: The Session column', 'Code: Ultracode',
     'Code: Your GitHub repositories'].concat(t.env ? ['Code: The environment'] : []).concat(['Code: Pointing with @, commands with /', 'Models: Newer models, found online', 'Making things: Ways to blend', 'Folders: Folders', 'Folders: Bringing your work in'])
-    .concat(career ? ['Career Studio: The Career Studio', 'Career Studio: A posting from its link', 'Career Studio: Drafts you review'] : [])
+    .concat(career ? ['Vocatio: Applications and your path', 'Vocatio: A posting from its link', 'Vocatio: Drafts you review'] : [])
     .concat(['Settings: Connectors', 'Settings: Your data, sealed']).concat(t.ws ? ['Settings: The Author Studio'] : []);
   ok(want.every(w => t.added.includes(w)) && t.added.length === want.length, 'the tour carries the ' + want.length + ' new steps of this edition, and no others', t.added);
   const ci = c => t.chaps.indexOf(c);
-  ok(ci('Code') === ci('Chat') + 1 && ci('Folders') === ci('Making things') + 1 && (career ? ci('Career Studio') === ci('Lector') + 1 : ci('Career Studio') < 0 && ci('Lector') < 0),
+  ok(ci('Code') === ci('Chat') + 1 && ci('Folders') === ci('Making things') + 1 && (career ? ci('Vocatio') === ci('Lector') + 1 : ci('Vocatio') < 0 && ci('Lector') < 0),
     'Code follows Chat, Folders follows Making things, and the Career Studio follows Lector where the edition carries them', t.chaps);
   const chatSteps = await p.evaluate(() => ING_TOUR.filter(s => s.chap === 'Chat').map(s => s.t.replace(/^[^A-Za-z]+/, '')));
   ok(chatSteps.indexOf('Effort, beside the model') === chatSteps.indexOf('Choosing the model') + 1 && chatSteps.indexOf('Connectors') === chatSteps.indexOf('The + key') + 1,
@@ -99,7 +99,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* 8. the last card names this copy's chapters */
   const fin = await p.evaluate(() => { tourFinale(); const t = document.querySelector('#ingTour .finale .tour-body').textContent; tourEnd(); return t; });
-  ok(/Code/.test(fin) && /Folders/.test(fin) && (career ? /the Career Studio/.test(fin) : !/Career/.test(fin)) && /Settings\. The best way/.test(fin), 'the tour\'s last card names its chapters, Code and Folders among them', fin);
+  ok(/Code/.test(fin) && /Folders/.test(fin) && (career ? /Vocatio/.test(fin) : !/Vocatio|Career/.test(fin)) && /Settings\. The best way/.test(fin), 'the tour\'s last card names its chapters, Code and Folders among them', fin);
 
   /* 9. at phone width the Code steps fit */
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(300);

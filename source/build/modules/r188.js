@@ -895,7 +895,7 @@ function paperFile(o,kind){var rec=o.docs[kind];if(!rec)return Promise.reject(ne
 function openInTabula(o,kind){if(!W.IngOpenIn){say("Tabula cannot be reached in this copy of the page.");return;}say("Making the Word file for Tabula…");
   paperFile(o,kind).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}});}).then(null,function(e){say("It could not be opened in Tabula: "+(e&&e.message||e));});}
 (function(){(W.__ingOpenInProviders=W.__ingOpenInProviders||[]).push({list:function(){var out=[];try{(ROOT().people||[]).forEach(function(p){(p.opps||[]).forEach(function(o){Object.keys(o.docs||{}).forEach(function(kind){var rec=o.docs[kind];if(!rec||!rec.ref||!DOCS[kind])return;
-      out.push({id:"career:"+o.id+":"+kind,kind:"doc",title:[DOCS[kind][0],to(o)].filter(Boolean).join(" · "),from:"Career Studio",when:rec.made||0,open:function(x){return paperFile(o,kind).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}},x);});}});});});});}catch(e){}return out;}});})();
+      out.push({id:"career:"+o.id+":"+kind,kind:"doc",title:[DOCS[kind][0],to(o)].filter(Boolean).join(" · "),from:"Vocatio",when:rec.made||0,open:function(x){return paperFile(o,kind).then(function(f){return IngOpenIn.open("tabula",{title:f.title,file:{name:f.name,mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",bytes:f.bytes}},x);});}});});});});}catch(e){}return out;}});})();
 function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){say("Copied.");},function(){say("It could not be copied here: select the text and copy it.");});return;}}catch(e){}say("It could not be copied here: select the text and copy it.");}
 
 /* ---------------- practise: her own evidence and her own answers, looked at with her, never rewritten ---------------- */
@@ -1002,7 +1002,7 @@ function packOpen(d){var empty0=packEmpty(),who=String(d.person.name||"").trim()
 function packPick(){pickFile(".json,application/json",false,function(fs){Promise.resolve(readAsText(fs[0])).then(function(t){packOpen(packRead(t));}).then(null,function(e){say(fs[0].name+": "+(e&&e.message||e)+".");});});}
 /* this profile, saved as one file: for another device, for safe keeping, or to begin someone else's */
 function packMake(){var S=CS(),P=S.profile,M=lectorMe();
-  var d={kind:"ingenium-profile",v:1,made:dayStr(Date.now()),about:"A profile from Ingenium's Career Studio: entries, documents and CV. It is its owner's, and Ingenium sends it nowhere.",
+  var d={kind:"ingenium-profile",v:1,made:dayStr(Date.now()),about:"A profile from Vocatio, Ingenium's careers page: entries, documents and CV. It is its owner's, and Ingenium sends it nowhere.",
     person:{name:personName(S),contact:P.contact||"",isMe:P.isMe!==false,spelling:(P.prefs&&P.prefs.spelling)||"british"},
     wants:Object.assign({},P.wants),
     items:P.items.map(function(it){return {sec:it.sec,title:it.title,place:it.place||"",from:it.from||"",to:it.to||"",text:it.text||"",note:it.note||""};}),files:[]};
@@ -2317,7 +2317,7 @@ function pathsPanel(){var S=CS(),Pa=S.paths,R=panel("csWork","Your direction");
   R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("pri",Pa?"Think it through again":"Show me paths that fit",paths));return R;}
 /* ---- the chat's + menu: her career profile, attached to a message, so any conversation can help with it ---- */
 function profileForChat(){return gatherProfile({}).then(function(G){var tt=targetsText(),nm=myName();
-  return "# "+(nm?nm+": ":"")+"my career profile\n\nKept in Ingenium's Career Studio. Use only what it shows about me; never invent a skill, a post, a date or a figure. When I ask for suggestions, say which entry each rests on.\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,60000);});}
+  return "# "+(nm?nm+": ":"")+"my career profile\n\nKept in Vocatio, Ingenium's careers page. Use only what it shows about me; never invent a skill, a post, a date or a figure. When I ask for suggestions, say which entry each rests on.\n\n"+(tt?tt+"\n\n":"")+profileBlock(G,60000);});}
 (function plusHook(){if(typeof W.paintPlus!=="function")return;var orig=W.paintPlus;
   W.paintPlus=function(view){var r=orig.apply(this,arguments);try{if(!view&&$("page-career")&&typeof pmItem==="function"){var mm=$("chatPlusMenu");if(mm&&!mm.querySelector(".pm-career")){
       var it=pmItem(mm,"file","Your career profile","Your entries, CV, wants and goals go with your message, for advice on your documents and direction",function(){profileForChat().then(function(t){if(typeof stageText==="function")stageText("Career profile.md",t,false);try{closePlus();}catch(e){}say("Your career profile goes with your next message. Ask for suggestions on your CV, a letter or your direction.");},function(e){say("It could not be gathered: "+(e&&e.message||e));});});
@@ -2348,9 +2348,9 @@ function spotNext(tries){if(SPOT.on||!SPOT.q.length)return;if(!modelReady())retu
   var id=SPOT.q.shift(),r=null;try{r=lxRun(id);}catch(e){}if(!r||r.kind!=="app"||r.status!=="done"){spotNext(0);return;}
   SPOT.on=true;RUN.req=null;RUN.busy=true;RUN.stop=false;RUN.what="Spotting what "+r.name+" adds to your record";RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=null;
   appSkills(r).then(function(rec){SPOT.on=false;end();var n=rec?rec.list.length:0,nw=rec?rec.list.filter(function(z){return z.fresh;}).length:0;
-      try{if(SPOT.tell)SPOT.tell(r,n?(n+" skill"+(n===1?"":"s")+" or experience in "+r.name+(r.version?" "+r.version:"")+" that your CV and profile do not show yet"+(rec.earlier?" ("+nw+" new since the earlier copy, "+rec.earlier+")":"")+". They are in the Career Studio, Your edge, From your apps: each with its evidence, where it fits and a sentence."):"Nothing in "+r.name+" that your CV and profile do not already show.");}catch(e){}
+      try{if(SPOT.tell)SPOT.tell(r,n?(n+" skill"+(n===1?"":"s")+" or experience in "+r.name+(r.version?" "+r.version:"")+" that your CV and profile do not show yet"+(rec.earlier?" ("+nw+" new since the earlier copy, "+rec.earlier+")":"")+". They are in Vocatio, Your edge, From your apps: each with its evidence, where it fits and a sentence."):"Nothing in "+r.name+" that your CV and profile do not already show.");}catch(e){}
       spotNext(0);},
-    function(e){SPOT.on=false;var m=String(e&&e.message||e);end();if(m!=="stopped")try{if(SPOT.tell)SPOT.tell(r,"What "+r.name+" adds to your record could not be read now ("+m+"). Look again in the Career Studio, Your edge.");}catch(x){}spotNext(0);});}
+    function(e){SPOT.on=false;var m=String(e&&e.message||e);end();if(m!=="stopped")try{if(SPOT.tell)SPOT.tell(r,"What "+r.name+" adds to your record could not be read now ("+m+"). Look again in Vocatio, Your edge.");}catch(x){}spotNext(0);});}
 function spotOne(r){if(busyNow()||needModel())return;begin(null,"Spotting what "+r.name+" adds to your record");appSkills(r).then(function(){end();},failed);}
 function appSkillsPanel(r){var S=CS(),E=EDGE(),rec=(E.apps||{})[r.name],label=r.name+(r.version?" "+r.version:""),R=panel("csWork","From "+label);
   if(!rec)R.body.appendChild(empty("Not looked at yet","What Lector's reading of "+label+" shows that your CV and profile do not show yet: each skill or experience with its evidence in the reading, where it fits (the CV section, and your other documents) and a sentence for them. Lector does this by itself each time it reads an app afresh."));
@@ -2423,8 +2423,8 @@ function paintTemplates(par){var S=CS(),T=W.IngTemplates,ind=S.ui.tplInd||T.indu
 function fromLector(B){meFirst();var kinds=Object.keys(B&&B.docs||{}).filter(function(k){return B.docs[k];}),want=kinds.filter(function(k){return k==="cv"||k==="cover";});if(!want.length)return false;
   var P=null;try{P=B.purpose!=="portfolio"&&LXR().state().posts[B.purpose];}catch(e){}
   var go1=function(o){CS().ui.room="apps";CS().ui.open=o?o.id:"new";CS().ui.show="work";if(o)o.step="send";save();go("career");
-    if(!o){say("A CV or a cover letter needs no apps: bring the posting here, and the Career Studio writes them from your profile.");return;}
-    say("A CV or a cover letter needs no apps: the Career Studio writes them from your profile and the posting.");
+    if(!o){say("A CV or a cover letter needs no apps: bring the posting here, and Vocatio writes them from your profile.");return;}
+    say("A CV or a cover letter needs no apps: Vocatio writes them from your profile and the posting.");
     var q=Promise.resolve();want.forEach(function(k){q=q.then(function(){return writeDoc(o,k);});});q.then(function(){render();});};
   if(!P||!P.ref){go1(null);return true;}
   loadText(P.ref).then(function(t){if(!t||t.length<40){go1(null);return;}var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id||P.from==="career:"+o.id;})[0];if(same){go1(same);return;}
@@ -2599,7 +2599,7 @@ function exportFiles(o,dir,opt){dir=dir?String(dir).replace(/\/?$/,"/"):"";opt=o
     var pr=practiseMd(o);if(pr)files.push({name:dir+"practise.md",data:pr});files.push({name:dir+"notes.md",data:notesMd(o)});
     var q=Promise.resolve(),withDocx=!opt.noDocx&&W.IngDoc&&IngDoc.make&&W.IngLectorPaper;
     if(withDocx)x[2].forEach(function(d){if(!d.text)return;q=q.then(function(){return paperFile(o,d.kind).then(function(f){files.push({name:dir+safeName(DOCS[d.kind][0])+".docx",data:f.bytes});},function(){});});});
-    return q.then(function(){files.push({name:dir+"README.txt",data:"This folder was made by the Career Studio in Ingenium on "+new Date().toString()+", for "+to(o)+".\n\n"+
+    return q.then(function(){files.push({name:dir+"README.txt",data:"This folder was made by Vocatio in Ingenium on "+new Date().toString()+", for "+to(o)+".\n\n"+
       "posting.txt is the posting as it was kept"+(x[1].length?"; particulars/ holds the further documents added to it":"")+".\nreading.md is how it was read against the profile: the band with its rule, each want and each criterion with the evidence.\n"+
       "checklist.md is what it asks to send and do, ticked as it stood.\nEach document is here as the Word file Save as Word gives (.docx) and as the same text in Markdown (.md).\nemails/ holds each email written; practise.md the evidence and answers practised; notes.md the dates, referees, interview, reading list and notes.\n\nNothing here was sent anywhere: the files were made on the device and saved where you chose.\n"});return files;});});}
 function exportOpp(o){if(typeof makeZip!=="function"||typeof saveFileNative!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}say("Making the folder of files…");
@@ -2607,10 +2607,10 @@ function exportOpp(o){if(typeof makeZip!=="function"||typeof saveFileNative!=="f
 function exportAll(){var S=CS(),opps=S.opps.slice();if(!opps.length){say("Nothing to export yet.");return Promise.resolve(null);}if(typeof makeZip!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}
   say("Making a folder for each application…");var files=[],q=Promise.resolve();
   opps.forEach(function(o){q=q.then(function(){return exportFiles(o,safeName(o.title||"application")+"/").then(function(fs){files=files.concat(fs);});});});
-  return q.then(function(){files.push({name:"README.txt",data:"The applications of "+personLabel(S)+", exported from the Career Studio in Ingenium on "+new Date().toString()+": one folder for each, with its posting, its reading, its checklist, its documents (Word and Markdown), its emails, practise and notes.\n"});
-    return Promise.resolve(saveFileNative(safeName("Career Studio - "+personLabel(S))+".zip","application/zip",makeZip(files))).then(function(){say(files.length+" files, one folder for each application.");return files;});},function(e){say("It could not be made: "+(e&&e.message||e));return null;});}
+  return q.then(function(){files.push({name:"README.txt",data:"The applications of "+personLabel(S)+", exported from Vocatio in Ingenium on "+new Date().toString()+": one folder for each, with its posting, its reading, its checklist, its documents (Word and Markdown), its emails, practise and notes.\n"});
+    return Promise.resolve(saveFileNative(safeName("Vocatio - "+personLabel(S))+".zip","application/zip",makeZip(files))).then(function(){say(files.length+" files, one folder for each application.");return files;});},function(e){say("It could not be made: "+(e&&e.message||e));return null;});}
 /* Settings, Export your data: the studio's own line, with each application as readable files and every text kept whole */
-(function(){(W.__ingExportProviders=W.__ingExportProviders||[]).push({id:"exCareer",label:"The Career Studio: each profile's applications as readable files (postings, readings, checklists, documents, notes), and everything it keeps, whole",
+(function(){(W.__ingExportProviders=W.__ingExportProviders||[]).push({id:"exCareer",label:"Vocatio: each profile's applications as readable files (postings, readings, checklists, documents, notes), and everything it keeps, whole",
   files:function(){var people=ROOT().people||[],out=[],q=Promise.resolve(),texts={};
     people.forEach(function(p){var pd="career/"+safeName(personLabel(p))+"/";(p.opps||[]).forEach(function(o){q=q.then(function(){return exportFiles(o,pd+safeName(o.title||"application")+"/",{noDocx:true}).then(function(fs){out=out.concat(fs);},function(){});});});});
     return q.then(function(){var refs=[];people.forEach(function(p){refs=refs.concat(refsOfPerson(p));});
@@ -2774,9 +2774,9 @@ function liDropped(P,k){P.linkedin=P.linkedin||{};P.linkedin.dropped=P.linkedin.
 function openPosts(){return CS().opps.filter(function(o){return !FINISHED[o.stage];}).map(function(o){return {id:o.id,title:o.title||"Untitled",org:o.org||"",closes:o.closes||"",kind:o.kind};});}
 function postFor(id){var o=oppById(id);if(!o)return Promise.resolve(null);return postOnly(o).then(function(t){return {id:o.id,title:o.title||"",org:o.org||"",closes:o.closes||"",kind:o.kind,text:t||""};});}
 function bringPost(p){var P=null;try{P=LXR().state().posts[p];}catch(e){}if(!P||!P.ref){say("Add the posting in the reading page's brief first.");return Promise.resolve(null);}meFirst();
-  var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id;})[0];if(same){CS().ui.room="apps";CS().ui.open=same.id;CS().ui.show="work";save();go("career");say("It is in the Career Studio already.");return Promise.resolve(same);}
+  var same=CS().opps.filter(function(o){return o.from==="lector:"+P.id;})[0];if(same){CS().ui.room="apps";CS().ui.open=same.id;CS().ui.show="work";save();go("career");say("It is in Vocatio already.");return Promise.resolve(same);}
   return loadText(P.ref).then(function(t){if(!t||t.length<40)throw new Error("its text is no longer kept");return newOpp(p==="programme"?"phd":"job",t,"lector:"+P.id);})
-    .then(function(o){o.kindSet=true;if(P.title&&!o.title)o.title=P.title;if(P.org&&!o.org)o.org=P.org;CS().ui.room="apps";save();go("career");say("It is in the Career Studio, under Applications.");return o;},function(e){say("It could not be brought: "+(e&&e.message||e));return null;});}
+    .then(function(o){o.kindSet=true;if(P.title&&!o.title)o.title=P.title;if(P.org&&!o.org)o.org=P.org;CS().ui.room="apps";save();go("career");say("It is in Vocatio, under Applications.");return o;},function(e){say("It could not be brought: "+(e&&e.message||e));return null;});}
 /* the share of words that differ between a draft and its revision, as the reading page counts it */
 function wordsChanged(a,b){var A={},n=0,added=0,left=0;String(a).toLowerCase().split(/\W+/).forEach(function(w){if(w){A[w]=(A[w]||0)+1;n++;}});
   String(b).toLowerCase().split(/\W+/).forEach(function(w){if(!w)return;if(A[w]>0)A[w]--;else added++;});Object.keys(A).forEach(function(w){left+=A[w];});return n?Math.min(1,(added+left)/n):0;}
@@ -2930,7 +2930,7 @@ ICON.mentor='<circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.
 /* ---------------- its place: the page, the menu, go() ---------------- */
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
-  sec.innerHTML='<h1 class="page-title">Career Studio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Career Studio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
+  sec.innerHTML='<h1 class="page-title">Vocatio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Vocatio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
     '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Today"],["mentor","Your mentor"],["apps","Applications"],["people","People"],["profile","Your profile"],["edge","Your edge"],["goals","Goals and plan"],["learn","Learn"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
@@ -2940,8 +2940,8 @@ function install(){if($("page-career"))return;
     /* the arrow keys go from room to room, as in Settings */
     b.addEventListener("keydown",function(e){var k=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(!k)return;e.preventDefault();var n=tabs[(i+k+tabs.length)%tabs.length];n.focus();n.click();});});
   var nb=D.querySelector('.nav-btn[data-page="lector"]');
-  if(nb){var b=h("button","nav-btn");b.type="button";b.setAttribute("data-page","career");b.setAttribute("onclick","go('career')");b.title="Career Studio";
-    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17M11 12.5v1.6h2v-1.6"/></svg>Career';nb.parentNode.insertBefore(b,nb.nextSibling);}
+  if(nb){var b=h("button","nav-btn");b.type="button";b.setAttribute("data-page","career");b.setAttribute("onclick","go('career')");b.title="Vocatio";
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.7M3.5 12.5h17M11 12.5v1.6h2v-1.6"/></svg>Vocatio';nb.parentNode.insertBefore(b,nb.nextSibling);}
   if(W.PAGES&&PAGES.indexOf("career")<0)PAGES.push("career");}
 install();
 try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="career"){render();fitSoon();}}catch(e){try{console.error("R188",e);}catch(_){}}return r;};window.go=go;}catch(e){}

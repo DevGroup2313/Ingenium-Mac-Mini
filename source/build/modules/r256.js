@@ -22,7 +22,7 @@ function can(){return !!(navigator.wakeLock&&typeof navigator.wakeLock.request==
 function working(){var w=[];
   try{if(typeof Engine!=="undefined"&&Engine&&Engine.status==="busy")w.push("a reply");}catch(e){}
   try{if(typeof LX!=="undefined"&&LX&&LX.busy)w.push("Lector");}catch(e){}
-  try{if(W.IngCareer&&IngCareer.run&&IngCareer.run.busy)w.push("the Career Studio");}catch(e){}
+  try{if(W.IngCareer&&IngCareer.run&&IngCareer.run.busy)w.push("Vocatio");}catch(e){}
   try{var bs=D.getElementById("blendStop");if(bs&&!bs.hidden&&bs.getClientRects().length)w.push("Blend");}catch(e){}
   try{if(W.IngEars&&(IngEars.listening()||IngEars.busy()))w.push("dictation");}catch(e){}
   try{if(W.IngCloud&&typeof IngCloud.busy==="function"&&IngCloud.busy())w.push("the Cloud");}catch(e){}
@@ -39,7 +39,7 @@ D.addEventListener("visibilitychange",function(){if(D.visibilityState==="visible
 function card(){var pg=D.getElementById("page-settings");if(!pg||D.getElementById("awakeCard"))return;
   var c=D.createElement("div");c.className="card";c.id="awakeCard";c.setAttribute("role","region");c.setAttribute("aria-labelledby","awakeH");
   var h=D.createElement("h2");h.className="sec";h.id="awakeH";h.textContent="Keep working";c.appendChild(h);
-  var p=D.createElement("p");p.className="small muted";var studios=[D.getElementById("page-lector")?"Lector":"",D.getElementById("page-career")?"the Career Studio":""].filter(Boolean).join(" or ");
+  var p=D.createElement("p");p.className="small muted";var studios=[D.getElementById("page-lector")?"Lector":"",D.getElementById("page-career")?"Vocatio":""].filter(Boolean).join(" or ");
   /* named as this edition has them: the public editions have neither Lector nor the Career Studio */
   p.textContent="While Ingenium is working here (a reply being written, "+(studios?studios+" writing, ":"")+"Blend, dictation, the Cloud), the screen stays on, so a tablet or phone borrowing another computer's model does not stop halfway. It goes back to normal as soon as the work ends. A computer that lends its models or keeps your Cloud already stays awake by itself (its screen may still turn off)."+(can()?"":" This browser cannot keep the screen on: keep it awake in the device's own settings while a long reply is written.");c.appendChild(p);
   var r=D.createElement("div");r.className="ey-row";var t=D.createElement("span"),b=D.createElement("b");b.textContent="Keep the screen on while Ingenium works";t.appendChild(b);r.appendChild(t);

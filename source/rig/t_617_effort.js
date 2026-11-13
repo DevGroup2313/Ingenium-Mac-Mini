@@ -71,7 +71,7 @@ const http = (method, path) => fetch(MOCK + path, { method }).then(r => r.json()
   await p.evaluate(() => go('career')); await p.waitForTimeout(400);
   await p.selectOption('#cs .wef select', '4'); await p.waitForTimeout(200);
   const shared = await p.evaluate(() => { go('lector'); return new Promise(r => setTimeout(() => r({ st: state.wEff, lx: (document.querySelector('#l7Model .wef select') || {}).value, say: (document.querySelector('#l7Model .wef .wef-say') || {}).textContent }), 500)); });
-  ok(shared.st === '4' && shared.lx === '4' && /Shared by Lector, the Career Studio and Folders/.test(shared.say), 'chosen in one, it is the choice in all three, as their model is', shared);
+  ok(shared.st === '4' && shared.lx === '4' && /Shared by Lector, Vocatio and Folders/.test(shared.say), 'chosen in one, it is the choice in all three, as their model is', shared);
   await p.screenshot({ path: OUT + '/lector_effort.png' });
 
   /* 5. Build: an effort of its own, Ultracode among them, carried by every request */

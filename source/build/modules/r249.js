@@ -112,7 +112,7 @@ function section(pop){if(!pop)return;var old=pop.querySelector(".gen");if(old)ol
   cs.addEventListener("change",function(){var o=el("ctlCloudCtx");if(o){o.value=cs.value;try{o.dispatchEvent(new Event("change",{bubbles:true}));}catch(x){}}
     else{try{state.cloud=state.cloud||{};state.cloud.window=+cs.value||0;saveState();}catch(x){}}paintSection();});
   s.appendChild(r3);
-  s.appendChild(mk("p","gen-note","The chat's Controls show the same settings. Lector, the Career Studio, Blend, Build and Code use them too."));
+  s.appendChild(mk("p","gen-note","The chat's Controls show the same settings. Lector, Vocatio, Blend, Build and Code use them too."));
   /* the arrow keys move a slider here, not the menu's focus */
   s.addEventListener("keydown",function(ev){var t=ev.target;if(t&&/^(INPUT|SELECT)$/.test(t.tagName)&&(ev.key==="ArrowUp"||ev.key==="ArrowDown"))ev.stopPropagation();});
   pop.appendChild(s);SEC=s;paintSection();}

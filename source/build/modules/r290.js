@@ -369,10 +369,14 @@ body[data-motion="minimal"] .skh-k,body[data-motion="minimal"] .sks-step,body[da
 @media (max-width:980px){.skh-obj{transform:scale(.66)}.skh-words{width:360px}.skh-title{font-size:40px}}
 @media (max-width:760px){.skh{height:auto;padding:24px 18px 22px}.skh-words{position:static;width:auto}.skh-obj{display:none}.skh-hint{position:static;margin-top:14px}
   .sks-step{width:calc(50% - 8px)}#page-focus.sk-on .fxp-tab{width:calc(50% - 8px)}}
-/* ---------- the dial (Career Studio), 6.94: a vintage pocket compass in silver, pearl and violet, in the Offline Project's layered
-   depth: a cast shadow below, the case's thickness in stacked rims, the dial sunk inside it, the rose raised off the dial in layers that
-   turn in harmony, the medallions and the engine button standing off the dial, the crystal and the case on top. It sways on its own, leans
-   to the pointer on a spring (one clock, in the script), and every part answers a press ---------- */
+/* ---------- the dial (Vocatio, until 6.95 the Career Studio), 6.94 and 6.95: a vintage pocket compass in silver, pearl and violet, in the
+   Offline Project's layered depth: a cast shadow below, the case's thickness in stacked rims, the dial sunk inside it, the rose raised off
+   the dial in layers that turn in harmony, the medallions and the engine button standing off the dial, the crystal and the case on top.
+   6.95, as she chose it on 13 November 2026 ("I choose Ingenium's Orrery for the Career Studio page"; the raised compass): the grey
+   chapter ring and the violet band stand higher off the case, each on its own walls, over a well; Home's engine button at the heart in
+   full (its engine turning counterclockwise without pause, its rim in layers); the white dial engraved with Ingenium's Orrery, Home's
+   six rooms as raised orbs on engraved orbits among the engine's stars. It sways on its own, leans to the pointer on a spring (one clock,
+   in the script), and every part answers a press ---------- */
 .skv{position:absolute;inset:0;transform-style:preserve-3d}
 .skv img{-webkit-user-drag:none;pointer-events:none;display:block}
 .skv-tilt,.skv-idle,.skv-rise{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:260px 232px;pointer-events:none}
@@ -390,12 +394,13 @@ body[data-theme="night"] .skv-side{border-color:#9890aa #5c5670 #1d1a28 #4f4964}
    the one below with its own edge and its shadow (they turn in harmony, in the script) */
 .skv-lay{position:absolute;left:152px;top:124px;width:216px;height:216px;transform-origin:108px 108px;pointer-events:none;will-change:transform}
 .skv-lay svg,.skv-lay img{position:absolute;left:0;top:0;display:block;width:216px;height:216px;overflow:visible}
-.skv-dial{transform:translateZ(6.3px)}
+.skv-dial{transform:translateZ(33px)}
 .skv-lsh{transform:translateZ(calc(var(--z) * 1px))}.skv-led{transform:translateZ(calc(var(--z) * 1px))}.skv-ltop{transform:translateZ(calc(var(--z) * 1px))}
 /* the outer ring inside, raised: the band on its wall above the dial, the chapter ring on its wall above the band, each with its shadow */
 .skv-ring{position:absolute;left:103px;top:75px;width:314px;height:314px;transform-style:preserve-3d;pointer-events:none}
 .skv-band,.skv-chap{position:absolute;left:0;top:0;width:314px;height:314px;transform-style:preserve-3d;pointer-events:none}
-.skv-band{transform:translateZ(10px)}.skv-chap{transform:translateZ(20px)}
+.skv-band{transform:translateZ(28px)}.skv-chap{transform:translateZ(19px)}
+.skv-well{position:absolute;left:0;top:0;width:314px;height:314px;transform:translateZ(8px);pointer-events:none}.skv-well > img{position:absolute;left:0;top:0;width:314px;height:314px}
 .skv-band > img,.skv-chap > img{position:absolute;left:0;top:0;width:314px;height:314px}
 .skv-bandwall,.skv-chapwall{position:absolute;border-radius:50%;box-sizing:border-box;pointer-events:none;transform:translateZ(calc(var(--z) * 1px))}
 .skv-bandwall{left:49.5px;top:49.5px;width:215px;height:215px;border:2.2px solid #3d2780;border-color:#5d45a6 #3a2478 #241452 #3a2478}
@@ -405,9 +410,15 @@ body[data-theme="night"] .skv-bandwall{border-color:#40297d #261552 #120830 #261
 body[data-theme="night"] .skv-chapwall{border-color:#6d6688 #403a58 #1f1b2c #403a58}
 body[data-theme="night"] .skv-chapwall.out{border-color:#7d7798 #463f60 #17131f #463f60}
 .skv-bandsh,.skv-chapsh{position:absolute;border-radius:50%;pointer-events:none}
-.skv-bandsh{left:50px;top:51px;width:216px;height:216px;transform:translateZ(6.6px);box-shadow:2px 3.5px 5px rgba(26,10,58,.4),3px 6px 12px rgba(26,10,58,.16)}
-.skv-chapsh{left:28px;top:31px;width:306px;height:306px;margin:-21px 0 0 -21px;box-sizing:border-box;border:21px solid rgba(26,10,58,.46);filter:blur(5px);transform:translateZ(10.3px)}
-body[data-theme="night"] .skv-bandsh{box-shadow:2px 3.5px 5px rgba(0,0,0,.7),3px 6px 12px rgba(0,0,0,.35)}
+.skv-bandsh{left:51.6px;top:52.8px;width:264px;height:264px;margin:-24px 0 0 -24px;box-sizing:border-box;border:24px solid rgba(26,10,58,.3);filter:blur(1.8px);transform:translateZ(19.3px)}
+.skv-dialsh{position:absolute;border-radius:50%;pointer-events:none;left:51.5px;top:53.5px;width:215px;height:215px;box-shadow:0 0 0 0 transparent,2px 3px 6px rgba(26,10,58,.34);transform:translateZ(28.3px)}
+.skv-dialwall{position:absolute;border-radius:50%;box-sizing:border-box;pointer-events:none;transform:translateZ(calc(var(--z) * 1px));left:49.5px;top:49.5px;width:215px;height:215px;border:1.6px solid #c9c2da;border-color:#f3f0f8 #bdb6cf #8a83a4 #bdb6cf}
+body[data-theme="night"] .skv-dialwall{border-color:#5d5478 #3a3352 #1b1728 #3a3352}
+.skv-chapwall.bside{border-width:2px;border-color:#6a50b8 #45298c #2a1660 #45298c}
+body[data-theme="night"] .skv-chapwall.bside{border-color:#4a3290 #2c1a62 #150a36 #2c1a62}
+body[data-theme="night"] .skv-dialsh{box-shadow:0 0 0 0 transparent,2px 3px 6px rgba(0,0,0,.6)}
+.skv-chapsh{left:27.2px;top:28.6px;width:306px;height:306px;margin:-21px 0 0 -21px;box-sizing:border-box;border:21px solid rgba(26,10,58,.36);filter:blur(3px);transform:translateZ(8.3px)}
+body[data-theme="night"] .skv-bandsh{border-color:rgba(0,0,0,.55)}
 body[data-theme="night"] .skv-chapsh{border-color:rgba(0,0,0,.78)}
 .skv-scale{position:absolute;left:0;top:0;width:314px;height:314px;display:block;overflow:visible;pointer-events:none;text-rendering:geometricPrecision;transform-origin:157px 157px}
 .skv-marks{position:absolute;left:0;top:0;width:314px;height:314px;transform-origin:157px 157px;transform-style:preserve-3d;pointer-events:none}
@@ -427,23 +438,24 @@ body[data-theme="night"] .skv-mdside{background:linear-gradient(150deg,#a59dbb,#
 .skv-md svg{position:absolute;left:0;top:0;width:32px;height:32px;display:block;overflow:visible}
 .skv-md .nmr{font:600 10.6px/1 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;letter-spacing:.04em}
 .skv-md:focus{outline:none}.skv-md:focus-visible{box-shadow:0 0 0 2px #fff,0 0 0 4px #6a3fb5}
-.skv-inner{position:absolute;left:103px;top:75px;width:314px;height:314px;border-radius:50%;transform:translateZ(10.6px);pointer-events:none;
+.skv-inner{position:absolute;left:103px;top:75px;width:314px;height:314px;border-radius:50%;transform:translateZ(8.4px);pointer-events:none;
   box-shadow:inset 2px 3px 4px rgba(26,10,58,.36),inset 5px 9px 14px rgba(26,10,58,.16)}
 body[data-theme="night"] .skv-inner{box-shadow:inset 2px 3px 4px rgba(0,0,0,.62),inset 5px 9px 14px rgba(0,0,0,.32)}
 /* the engine button stands well off the rose, in its silver collar on a polished post (its thickness) */
-.skv-seatsh{position:absolute;left:232px;top:207px;width:64px;height:64px;border-radius:50%;background:rgba(26,10,58,.42);filter:blur(5px);transform:translateZ(17.2px);pointer-events:none}
+.skv-seatsh{position:absolute;left:232px;top:207px;width:64px;height:64px;border-radius:50%;background:rgba(26,10,58,.42);filter:blur(5px);transform:translateZ(43.8px);pointer-events:none}
 body[data-theme="night"] .skv-seatsh{background:rgba(0,0,0,.78)}
 .skv-seatside{position:absolute;left:228.5px;top:200.5px;width:63px;height:63px;border-radius:50%;pointer-events:none;transform:translateZ(calc(var(--z) * 1px));
   background:linear-gradient(150deg,#f1eef6,#a7a0bb 50%,#57506f)}
 body[data-theme="night"] .skv-seatside{background:linear-gradient(150deg,#b0a8c4,#5a5472 50%,#1f1b2c)}
-.skv-seat{position:absolute;left:228px;top:200px;width:64px;height:64px;transform:translateZ(23px);border-radius:50%;pointer-events:none}
+.skv-seat{position:absolute;left:228px;top:200px;width:64px;height:64px;transform:translateZ(52px);border-radius:50%;pointer-events:none}
 .skv-seat .skv-collar{position:absolute;left:-.5px;top:-.5px;width:65px;height:65px}
 .skv-key{position:absolute;left:5px;top:5px;width:54px;height:54px}
 .skv-key .hx-seal{position:absolute;left:0;top:0;width:54px;height:54px;margin:0}
 .skv-key .r175-seal{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer;pointer-events:auto}
 .skv-key .r175-seal:focus{outline:none}.skv-key .r175-seal:focus-visible{outline:2.5px solid #6a3fb5;outline-offset:5px}
 .skv-key .r175-fx{display:block;width:100%;height:100%;pointer-events:none}
-.skv-glass{position:absolute;left:103px;top:75px;width:314px;height:314px;transform:translateZ(30px);pointer-events:none}
+.skv-glass{position:absolute;left:103px;top:75px;width:314px;height:314px;transform:translateZ(33.4px);pointer-events:none}
+.skv-glassart{display:none}
 .skv-glass svg{display:block;width:314px;height:314px}
 .skv-glassart{position:absolute;left:0;top:0;width:314px;height:314px;pointer-events:none}
 .skv-ripples{position:absolute;left:0;top:0;width:314px;height:314px;border-radius:50%;overflow:hidden;pointer-events:none}
@@ -451,22 +463,33 @@ body[data-theme="night"] .skv-seatside{background:linear-gradient(150deg,#b0a8c4
   background:radial-gradient(closest-side,rgba(255,255,255,0) 52%,rgba(255,255,255,.6) 70%,rgba(255,255,255,0) 100%)}
 body[data-theme="night"] .skv-ripple{background:radial-gradient(closest-side,rgba(214,198,255,0) 52%,rgba(214,198,255,.42) 70%,rgba(214,198,255,0) 100%)}
 @keyframes skvRip{0%{transform:scale(.12);opacity:.95}100%{transform:scale(1.6);opacity:0}}
-.skv-case{position:absolute;left:79px;top:51px;width:362px;height:362px;transform:translateZ(31px);pointer-events:none}
+.skv-case{position:absolute;left:79px;top:51px;width:362px;height:362px;transform:translateZ(10px);pointer-events:none}
 .skv-case img{position:absolute;left:0;top:0;width:362px;height:362px}
-.skv-bow{position:absolute;left:232px;top:-14px;width:56px;height:72px;transform:translateZ(31px);pointer-events:none;filter:drop-shadow(.8px 1.6px 1.2px rgba(30,14,60,.32))}
-.skv-bow.skv-bowback{transform:translateZ(25px);filter:brightness(.5)}
+.skv-bow{position:absolute;left:232px;top:-14px;width:56px;height:72px;transform:translateZ(10px);pointer-events:none;filter:drop-shadow(.8px 1.6px 1.2px rgba(30,14,60,.32))}
+.skv-bow.skv-bowback{transform:translateZ(6px);filter:brightness(.5)}
 body[data-theme="night"] .skv-bow{filter:drop-shadow(.8px 1.6px 1.2px rgba(0,0,0,.6))}
 body[data-theme="night"] .skv-bow.skv-bowback{filter:brightness(.45)}
 .skv-bow img{width:56px;height:72px}
-.skv-index{position:absolute;left:251px;top:48px;width:18px;height:27px;transform:translateZ(33px);transform-origin:8px 2px;pointer-events:none;filter:drop-shadow(.6px 1.2px .8px rgba(30,14,60,.38))}
+.skv-index{position:absolute;left:251px;top:48px;width:18px;height:27px;transform:translateZ(12px);transform-origin:8px 2px;pointer-events:none;filter:drop-shadow(.6px 1.2px .8px rgba(30,14,60,.38))}
 body[data-theme="night"] .skv-index{filter:drop-shadow(.6px 1.2px .8px rgba(0,0,0,.65))}
 .skv-index svg{display:block;width:18px;height:27px;overflow:visible}
 .skv-index.tick{animation:skvTick .42s cubic-bezier(.3,1.6,.5,1)}
-@keyframes skvTick{0%{transform:translateZ(33px) rotate(0)}35%{transform:translateZ(33px) rotate(-5deg)}70%{transform:translateZ(33px) rotate(2deg)}100%{transform:translateZ(33px) rotate(0)}}
+@keyframes skvTick{0%{transform:translateZ(12px) rotate(0)}35%{transform:translateZ(12px) rotate(-5deg)}70%{transform:translateZ(12px) rotate(2deg)}100%{transform:translateZ(12px) rotate(0)}}
 /* every part answers a press (found from the compass's own geometry, in the script) */
 .skv{cursor:default}.skv.hov{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.skv-index.tick,.skv-rise{animation:none}}
 body[data-motion="minimal"] .skv-index.tick,body[data-motion="minimal"] .skv-rise{animation:none}
+
+/* the engine button at the heart, as Home's: its engine turning counterclockwise without pause, and its rim of four layers */
+@keyframes skvEngine{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+.skv-hx .seal-spin{animation:skvEngine 9s linear infinite}
+body[data-motion="calm"] .skv-hx .seal-spin{animation-duration:13s}
+body[data-motion="minimal"] .skv-hx .seal-spin{animation:none}
+@media (prefers-reduced-motion:reduce){.skv-hx .seal-spin{animation:none}}
+.skv-hx{--ox-rim0:#ddd2ef;--ox-rim1:#a891d4}
+body[data-theme="night"] .skv-hx{--ox-rim0:#43375e;--ox-rim1:#1d1729}
+.skv-hx .isl .ox-rim{position:absolute;left:2.6%;top:2.6%;width:94.8%;height:94.8%;border-radius:50%;display:block;pointer-events:none;
+  background:linear-gradient(160deg,var(--ox-rim0),var(--ox-rim1));transform:translateZ(calc(var(--S) * -.012 * var(--k)))}
 
 .skh.skv-head .skh-sway{animation:none}
 </style>
@@ -769,7 +792,7 @@ function indexEl(){var e=mk("div","skc-index"),s=svg("svg",{viewBox:"0 0 28 44",
    violet on a pearl (by night violet) enamel dial, and a crystal over it all. The metal is lit as polished silver is photographed: a
    studio's light reflected in it, sharp and bright, never shaded like plastic. Only the chapter ring with the stages turns (its light,
    the room's, stays put, as a turned ring's does), and its medallions are flat and still: they ride the ring and stay upright. */
-var VC={n:0,urls:{}};
+var VC={n:0,urls:{},art:"orrery"};  /* the drawing in the dial: Ingenium's Orrery, her choice of 13 November 2026 */
 var VCL=(function(){var x=-.5,y=-.62,z=.6,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})();
 function vcS(a,b,x){var t=(x-a)/(b-a);t=t<0?0:t>1?1:t;return t*t*(3-2*t);}
 /* the window (a softbox above on the left): a soft-edged rectangle in the room, so its reflections are crisp panes, as in the photographs */
@@ -820,7 +843,7 @@ function vcBaseUrl(nt,part){var k="base"+nt+part;if(VC.urls[k])return VC.urls[k]
   var EN=nt?[.2,.135,.4]:[.27,.18,.5];
   function turned(ph,r,o,dim){var R0=0,G0=0,B0=0,W0=0;for(var q=-3;q<=3;q++){var bt=q*.19,wt=Math.exp(-q*q/4.5);vcN(bt,0,ph,n);vcSilver(n[0],n[1],n[2],nt,cc);R0+=cc[0]*wt;G0+=cc[1]*wt;B0+=cc[2]*wt;W0+=wt;}
     var gr=.95+.1*vcGrain(r);o[0]=R0/W0*gr*dim;o[1]=G0/W0*gr*dim;o[2]=B0/W0*gr*dim;}
-  VC.urls[k]=vcPaint(314,part==="chap"?131.5:107,part==="chap"?152.5:157,function(x,y,r,ph,o){var t,u,a;
+  VC.urls[k]=vcPaint(314,part==="chap"?131.5:part==="well"?131.5:107,part==="chap"?152.5:part==="well"?157:131.9,function(x,y,r,ph,o){var t,u,a;
     if(part==="chap"){
       if(r>=150){t=(152.5-r)/2.5;a=1.15*(1-2*t);vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;}
       if(r>=134){turned(ph,r,o,1-.1*vcS(147,150,r)-.1*vcS(136,134,r));return 1;}
@@ -858,8 +881,6 @@ function vcHex(c){var h=function(v){v=Math.round(Math.max(0,Math.min(1,v))*255);
 function vcRose(nt){var c=108,id="skv"+(++VC.n),f=function(v){return v.toFixed(2);},o=[0,0,0],VI=nt?[.40,.27,.70]:[.45,.30,.78],VN=nt?[.36,.22,.66]:[.40,.24,.72];
   var ink=nt?"rgba(232,224,250,.32)":"rgba(52,30,100,.42)",rings=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"});
   rings.appendChild(svg("circle",{cx:c,cy:c,r:"104",fill:"none",stroke:ink,"stroke-width":".6"}));
-  rings.appendChild(svg("circle",{cx:c,cy:c,r:"88",fill:"none",stroke:ink,"stroke-width":"1.1","stroke-dasharray":".01 3.455","stroke-linecap":"round"}));
-  rings.appendChild(svg("circle",{cx:c,cy:c,r:"85.5",fill:"none",stroke:ink,"stroke-width":".45"}));
   vcDialArt(rings,c,nt);
   function layer(pts){var top=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),df=svg("defs",{}),edge=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),shd=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),df2=svg("defs",{});
     top.appendChild(df);shd.appendChild(df2);var fl=svg("filter",{id:id+"b"+pts.k,x:"-10%",y:"-10%",width:"120%",height:"120%"});fl.appendChild(svg("feGaussianBlur",{stdDeviation:"1.8"}));df2.appendChild(fl);
@@ -878,33 +899,95 @@ function vcRose(nt){var c=108,id="skv"+(++VC.n),f=function(v){return v.toFixed(2
   var out={rings:rings,layers:[layer({k:"a",list:L1}),layer({k:"b",list:L2}),layer({k:"c",list:L3})],nt:nt,VI:VI,VN:VN};
   out.layers.forEach(function(Ly){vcFacets(Ly.top,0,nt,VI,VN);});return out;}
 /* the dial's engraving: Ingenium's own ornament, after the old dials she chose */
-function vcDialArt(g0,c,nt){var f=function(v){return v.toFixed(2);},ink=nt?"rgba(214,200,250,.46)":"rgba(70,40,140,.5)",ink2=nt?"rgba(214,200,250,.3)":"rgba(70,40,140,.3)",
-    sil=nt?"rgba(255,255,255,.12)":"rgba(255,255,255,.85)",vio=nt?"rgba(176,150,236,.55)":"rgba(106,63,181,.55)",i,a,g=svg("g",{}),P=function(r,t){return [c+r*Math.cos(t),c+r*Math.sin(t)];};g0.appendChild(g);
-  /* rules */
-  [[100.6,.5],[93.2,.5],[60.6,.45],[57.8,.35],[33.6,.45]].forEach(function(q){g.appendChild(svg("circle",{cx:c,cy:c,r:q[0],fill:"none",stroke:ink,"stroke-width":q[1]}));});
-  /* the sunburst round the heart: long and short rays, engraved */
-  var sb="";for(i=0;i<96;i++){a=i*Math.PI*2/96;var r1=34.6,r2=i%2?52:56.6,p1=P(r1,a),p2=P(r2,a);sb+="M"+f(p1[0])+" "+f(p1[1])+"L"+f(p2[0])+" "+f(p2[1]);}
-  g.appendChild(svg("path",{d:sb,stroke:ink2,"stroke-width":".42",fill:"none"}));
-  /* a crown of small pointed arches about the heart */
-  var cr="";for(i=0;i<32;i++){var a0=i*Math.PI*2/32,a1=(i+1)*Math.PI*2/32,am=(a0+a1)/2,q0=P(36.2,a0),q1=P(36.2,a1),pk=P(41.6,am),k0=P(40.4,a0+.04),k1=P(40.4,a1-.04);
-    cr+="M"+f(q0[0])+" "+f(q0[1])+"Q"+f(k0[0])+" "+f(k0[1])+" "+f(pk[0])+" "+f(pk[1])+"Q"+f(k1[0])+" "+f(k1[1])+" "+f(q1[0])+" "+f(q1[1]);}
-  g.appendChild(svg("path",{d:cr,stroke:ink,"stroke-width":".5",fill:"none"}));
-  /* eight scrolls of Ingenium's own between the points: a pointed leaf between two curling tendrils, each tendril ending in a small star */
-  for(i=0;i<8;i++){a=(i*45+22.5)*Math.PI/180;var m=svg("g",{transform:"translate("+f(c+73.5*Math.cos(a))+" "+f(c+73.5*Math.sin(a))+") rotate("+f(a*180/Math.PI+90)+")"});
-    var leaf="M0 -10.5C2.6 -6 2.8 -1.5 0 3.5C-2.8 -1.5 -2.6 -6 0 -10.5Z",
-        tR="M1.2 1.8C6 3.6 12.5 2.6 13.4 -2.6C14.1 -6.6 10.6 -8.4 8.6 -6.4C7.1 -4.9 8.4 -2.8 10 -3.6",tL="M-1.2 1.8C-6 3.6 -12.5 2.6 -13.4 -2.6C-14.1 -6.6 -10.6 -8.4 -8.6 -6.4C-7.1 -4.9 -8.4 -2.8 -10 -3.6",
-        stem="M0 3.5C0 6 -.6 7.6 -1.6 8.6M0 3.5C0 6 .6 7.6 1.6 8.6",
-        st=function(x,y,k){return "M"+f(x)+" "+f(y-k)+"Q"+f(x+k*.24)+" "+f(y-k*.24)+" "+f(x+k)+" "+f(y)+"Q"+f(x+k*.24)+" "+f(y+k*.24)+" "+f(x)+" "+f(y+k)+"Q"+f(x-k*.24)+" "+f(y+k*.24)+" "+f(x-k)+" "+f(y)+"Q"+f(x-k*.24)+" "+f(y-k*.24)+" "+f(x)+" "+f(y-k)+"Z";};
-    m.appendChild(svg("path",{d:tR+tL+stem,fill:"none",stroke:sil,"stroke-width":".9",transform:"translate(-.35 -.4)","stroke-linecap":"round"}));
-    m.appendChild(svg("path",{d:tR+tL+stem,fill:"none",stroke:ink,"stroke-width":".72","stroke-linecap":"round"}));
-    m.appendChild(svg("path",{d:leaf,fill:vio,stroke:ink,"stroke-width":".4"}));
-    m.appendChild(svg("path",{d:leaf.replace(/^M0 -10.5C2.6 -6 2.8 -1.5 0 3.5/,"M0 -10.5C1.1 -6 1.2 -1.5 0 3.5"),fill:sil,opacity:".55"}));
-    m.appendChild(svg("path",{d:st(10.1,-3.8,2.2)+st(-10.1,-3.8,2.2),fill:vio}));
-    m.appendChild(svg("circle",{cx:"0",cy:"-13.4",r:".95",fill:vio}));g.appendChild(m);}
-  /* near the edge: Ingenium's four-pointed stars between pearls, between two fine rules */
-  var sr="",pr="";for(i=0;i<36;i++){a=i*Math.PI*2/36;var q=P(96.9,a);if(i%2===0){var k=2.15;sr+="M"+f(q[0])+" "+f(q[1]-k)+"Q"+f(q[0]+k*.24)+" "+f(q[1]-k*.24)+" "+f(q[0]+k)+" "+f(q[1])+"Q"+f(q[0]+k*.24)+" "+f(q[1]+k*.24)+" "+f(q[0])+" "+f(q[1]+k)+"Q"+f(q[0]-k*.24)+" "+f(q[1]+k*.24)+" "+f(q[0]-k)+" "+f(q[1])+"Q"+f(q[0]-k*.24)+" "+f(q[1]-k*.24)+" "+f(q[0])+" "+f(q[1]-k)+"Z";}
-    else pr+="M"+f(q[0]+.85)+" "+f(q[1])+"a.85 .85 0 1 0 -1.7 0a.85 .85 0 1 0 1.7 0Z";}
-  g.appendChild(svg("path",{d:sr,fill:vio}));g.appendChild(svg("path",{d:pr,fill:nt?"rgba(230,222,250,.55)":"rgba(255,255,255,.95)",stroke:ink2,"stroke-width":".3"}));}
+function vcDialArt(g0,c,nt){var f=function(v){return v.toFixed(2);},i,a,k,id="skv"+(++VC.n),P=function(r,t){return [c+r*Math.cos(t),c+r*Math.sin(t)];},D=Math.PI/180,
+    groove=nt?"rgba(208,192,248,.5)":"rgba(66,36,140,.6)",lipc=nt?"rgba(4,1,14,.55)":"rgba(255,255,255,.96)",
+    df=svg("defs",{}),lp=svg("g",{}),eng=svg("g",{}),sh=svg("g",{}),hi=svg("g",{}),body=svg("g",{}),sp=svg("g",{});
+  g0.appendChild(df);[lp,eng,sh,hi,body,sp].forEach(function(e){g0.appendChild(e);});
+  var bl=svg("filter",{id:id+"b",x:"-5%",y:"-5%",width:"110%",height:"110%"});bl.appendChild(svg("feGaussianBlur",{stdDeviation:nt?".55":".45"}));df.appendChild(bl);
+  sh.setAttribute("filter","url(#"+id+"b)");sh.setAttribute("fill",nt?"rgba(0,0,0,.66)":"rgba(40,16,92,.34)");hi.setAttribute("fill",nt?"rgba(255,255,255,.26)":"#ffffff");
+  sp.setAttribute("fill","#ffffff");sp.setAttribute("opacity",nt?".75":".9");
+  var grad=function(n,stops,x1,y1,x2,y2){var gr=svg("linearGradient",{id:id+n,x1:x1,y1:y1,x2:x2,y2:y2});stops.forEach(function(p){gr.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});df.appendChild(gr);return "url(#"+id+n+")";};
+  var vio=grad("v",nt?[["0","#d6c8f8"],["1","#8f70dc"]]:[["0","#8562d8"],["1","#4b2a9f"]],"0","0","1","1"),
+      vStar=grad("t",nt?[["0","#efe8ff"],["1","#a585ea"]]:[["0","#9d7be6"],["1","#4a2797"]],"0","0","1","1"),
+      pearl=nt?"#e9e1fb":"#fbf9ff",pline=nt?"rgba(60,36,120,.4)":"rgba(80,50,150,.35)";
+  var og=svg("radialGradient",{id:id+"o",cx:".5",cy:".5",r:".55"});[["0",nt?"#e6dcfd":"#d9ccfa"],[".55",nt?"#9d7fe6":"#8a66dc"],["1",nt?"#4a2f96":"#45238f"]].forEach(function(p){og.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});df.appendChild(og);
+  /* the tools: a cut, engraved with its lit lip; a piece of raised work with its shadow and lit edge; a pen stroke that swells and tapers */
+  function cut(d,w,op){var o={d:d,fill:"none",stroke:lipc,"stroke-width":f(w*.9+.08)},b={d:d,fill:"none",stroke:groove,"stroke-width":f(w)};if(op!=null){o.opacity=op;b.opacity=op;}lp.appendChild(svg("path",o));eng.appendChild(svg("path",b));}
+  function raise(d,fill,extra){var fr=extra&&extra["fill-rule"],o={d:d};if(fr)o["fill-rule"]=fr;sh.appendChild(svg("path",o));hi.appendChild(svg("path",{d:d,"fill-rule":fr||"nonzero"}));var b={d:d,fill:fill};if(extra)for(var x in extra)b[x]=extra[x];body.appendChild(svg("path",b));}
+  function line(pts){var n=pts.length,o=[];for(var x=0;x<n;x++)o.push(f(pts[x][0])+" "+f(pts[x][1]));return "M"+o.join("L");}
+  function outline(pts,w0,w1,wm,pk){var n=pts.length,L=[],R=[],x;for(x=0;x<n;x++){var p0=pts[Math.max(0,x-1)],p1=pts[Math.min(n-1,x+1)],dx=p1[0]-p0[0],dy=p1[1]-p0[1],l=Math.sqrt(dx*dx+dy*dy)||1,sp2=x/(n-1),w=(w0+(w1-w0)*sp2+wm*Math.pow(Math.sin(Math.PI*Math.pow(sp2,pk||1)),1.15))/2;
+      L.push(f(pts[x][0]-dy/l*w)+" "+f(pts[x][1]+dx/l*w));R.push(f(pts[x][0]+dy/l*w)+" "+f(pts[x][1]-dx/l*w));}return "M"+L.join("L")+"L"+R.reverse().join("L")+"Z";}
+  function bez(segs){var pts=[],N=18;segs.forEach(function(q,si){for(var m=si?1:0;m<=N;m++){var t=m/N,u=1-t;pts.push([u*u*u*q[0]+3*u*u*t*q[2]+3*u*t*t*q[4]+t*t*t*q[6],u*u*u*q[1]+3*u*u*t*q[3]+3*u*t*t*q[5]+t*t*t*q[7]]);}});return pts;}
+  function arc(cx,cy,r,a0,a1,n){var pts=[];for(var m=0;m<=n;m++){var t=(a0+(a1-a0)*m/n)*D;pts.push([cx+r*Math.cos(t),cy+r*Math.sin(t)]);}return pts;}
+  function ring(cx,cy,r){return "M"+f(cx+r)+" "+f(cy)+"a"+f(r)+" "+f(r)+" 0 1 0 "+f(-2*r)+" 0a"+f(r)+" "+f(r)+" 0 1 0 "+f(2*r)+" 0Z";}
+  function star(x,y,k){return "M"+f(x)+" "+f(y-k)+"Q"+f(x+k*.2)+" "+f(y-k*.2)+" "+f(x+k)+" "+f(y)+"Q"+f(x+k*.2)+" "+f(y+k*.2)+" "+f(x)+" "+f(y+k)+"Q"+f(x-k*.2)+" "+f(y+k*.2)+" "+f(x-k)+" "+f(y)+"Q"+f(x-k*.2)+" "+f(y-k*.2)+" "+f(x)+" "+f(y-k)+"Z";}
+  function ticks(r0,r1,n,skip){var d="";for(var m=0;m<n;m++){if(skip&&skip(m))continue;var t=m*2*Math.PI/n,p=P(r0,t),q=P(r1,t);d+="M"+f(p[0])+" "+f(p[1])+"L"+f(q[0])+" "+f(q[1]);}return d;}
+  function estar(x,y,k){raise(star(x,y,k),vStar);raise(ring(x,y,k*.2),pearl);}
+  var style=VC.art||"rose";
+  if(style==="rose"){
+    /* the collar round the heart: two cuts and a string of pearls between */
+    cut(ring(c,c,34.2),.42);cut(ring(c,c,37.6),.32);var bd="";for(i=0;i<64;i++){var bq=P(35.9,i*2*Math.PI/64);bd+=ring(bq[0],bq[1],.42);}raise(bd,pearl);
+    /* the rosette: thirty-six circles cut round the heart, interlaced into lace */
+    var gd="";for(i=0;i<36;i++){var gq=P(58.6,i*2*Math.PI/36);gd+=ring(gq[0],gq[1],21);}cut(gd,.28);
+    var gd2="";for(i=0;i<36;i++){var gq2=P(58.6,(i+.5)*2*Math.PI/36);gd2+=ring(gq2[0],gq2[1],13.2);}cut(gd2,.2,.8);
+    cut(ring(c,c,81.4),.42);cut(ring(c,c,83.5),.26);
+    /* the twisted band: two waves cut against each other, a pearl in every second eye */
+    var w1=[],w2=[];for(i=0;i<=720;i++){var tw=i/720*2*Math.PI;w1.push(P(89.6+2.3*Math.sin(40*tw),tw));w2.push(P(89.6-2.3*Math.sin(40*tw),tw));}cut(line(w1)+"Z"+line(w2)+"Z",.3);
+    var pp="";for(i=0;i<40;i++){var pq=P(89.6,(i*2+.5)*Math.PI/40);pp+=ring(pq[0],pq[1],.62);}raise(pp,pearl,{stroke:pline,"stroke-width":".2"});
+    cut(ring(c,c,95.4),.3);
+    /* the chapter ring: fine cuts, the engine logo's stars at the hours */
+    cut(ticks(96.6,99.4,120,function(m){return m%10===0;}),.24);cut(ticks(96,100,120,function(m){return m%5!==0||m%10===0;}),.34);
+    for(i=0;i<12;i++){var sq=P(98,i*Math.PI/6);estar(sq[0],sq[1],1.75);}
+    cut(ring(c,c,100.6),.45);}
+  else if(style==="orrery"){
+    cut(ring(c,c,34.2),.42);cut(ticks(35.2,37.6,72),.22);
+    /* the orbits, each a double cut; between them a fine dotted path */
+    [50,68,86].forEach(function(r){cut(ring(c,c,r),.42);cut(ring(c,c,r+1.5),.2,.85);});
+    [59,77].forEach(function(r){var dd="";for(i=0;i<120;i++){var dq=P(r,i*3*D);dd+=ring(dq[0],dq[1],.3);}body.appendChild(svg("path",{d:dd,fill:groove,opacity:".75"}));});
+    /* the six rooms, raised as Home's orbs, each with its wake along its orbit and its fine rim */
+    [[50,200,3],[50,20,3],[68,112,3.6],[68,292,3.6],[86,66,4.2],[86,246,4.2]].forEach(function(o){var r=o[0],t=o[1],q=P(r,t*D),rr=o[2];
+      body.appendChild(svg("path",{d:outline(arc(c,c,r+.75,t-38,t-rr*1.2/r/D,26),.05,rr*.95,0,1),fill:nt?"rgba(190,170,245,.38)":"rgba(106,63,181,.28)"}));
+      cut(ring(q[0],q[1],rr+1.5),.22);raise(ring(q[0],q[1],rr),"url(#"+id+"o)");sp.appendChild(svg("path",{d:ring(q[0],q[1],rr*.3)}));});
+    /* two constellations of the engine logo's stars, joined by hairlines, and stars between */
+    var C1=[[61,150,1.7],[66,164,1.2],[74,171,1.5],[79,160,1.1]],C2=[[43,318,1.5],[55,332,1.2],[62,316,1.6]],
+        lone=[[41,75,1],[57,244,1.2],[76,36,1.1],[80,206,1.3],[45,262,.95],[77,96,1],[93.5,128,.9],[94,300,.9],[42,140,.9]];
+    [C1,C2].forEach(function(C){var pts=C.map(function(q){return P(q[0],q[1]*D);});cut(line(pts),.2,.9);});
+    C1.concat(C2,lone).forEach(function(q){var p=P(q[0],q[1]*D);estar(p[0],p[1],q[2]);});
+    /* the edge: a scale of fine cuts, pearls between the long ones */
+    cut(ring(c,c,92.6),.32);cut(ticks(96,99.4,120,function(m){return m%10===0;}),.22);cut(ticks(93.6,100.2,120,function(m){return m%10!==0;}),.36);
+    var ep="";for(i=0;i<12;i++){var eq=P(94.8,(i*30+15)*D);ep+=ring(eq[0],eq[1],.8);}raise(ep,pearl,{stroke:pline,"stroke-width":".2"});cut(ring(c,c,100.6),.45);}
+  else{
+    /* the limb: its scale of cuts and pearls at the hours */
+    cut(ring(c,c,100.6),.45);cut(ring(c,c,96.2),.3);cut(ring(c,c,92.4),.3);cut(ticks(96.2,100.6,72,function(m){return m%6===0;}),.24);cut(ticks(92.4,100.6,72,function(m){return m%6!==0;}),.34);
+    var lp2="";for(i=0;i<12;i++){var lq=P(94.3,(i*30+15)*D);lp2+=ring(lq[0],lq[1],.75);}raise(lp2,pearl,{stroke:pline,"stroke-width":".2"});
+    /* the plate: tropics and equator, the meridian, and the nested circles of altitude, finely cut */
+    var cp=svg("clipPath",{id:id+"p"});cp.appendChild(svg("circle",{cx:c,cy:c,r:"86"}));df.appendChild(cp);
+    cut(ring(c,c,37),.3);cut(ring(c,c,57.6),.26,.85);cut(ring(c,c,86),.34);
+    var al="";for(i=1;i<=9;i++){var rr2=5+i*8.6,cy2=c-36+i*3.4;al+=ring(c,cy2,rr2);}
+    var alg=svg("g",{"clip-path":"url(#"+id+"p)"});lp.appendChild(alg);var alg2=svg("g",{"clip-path":"url(#"+id+"p)"});eng.appendChild(alg2);
+    alg.appendChild(svg("path",{d:al,fill:"none",stroke:lipc,"stroke-width":".26",opacity:".8"}));alg2.appendChild(svg("path",{d:al,fill:"none",stroke:groove,"stroke-width":".2",opacity:".8"}));
+    cut("M"+c+" "+f(c-86)+"L"+c+" "+f(c+86)+"M"+f(c-86)+" "+c+"L"+f(c+86)+" "+c,.22,.7);
+    /* the rete, in violet enamel over the plate: its outer ring, the ecliptic set off-centre with its scale, struts and flame pointers */
+    var ey=c-24.5;raise(ring(c,c,87.8)+ring(c,c,86.2),vio,{"fill-rule":"evenodd"});
+    raise(ring(c,ey,61.2)+ring(c,ey,57.6),vio,{"fill-rule":"evenodd"});
+    var et="";for(i=0;i<72;i++){var ta=i*5*D,r0=i%6===0?58:59.2,qa=[c+r0*Math.cos(ta),ey+r0*Math.sin(ta)],qb=[c+60.8*Math.cos(ta),ey+60.8*Math.sin(ta)];et+="M"+f(qa[0])+" "+f(qa[1])+"L"+f(qb[0])+" "+f(qb[1]);}
+    body.appendChild(svg("path",{d:et,stroke:nt?"rgba(255,255,255,.75)":"rgba(255,255,255,.9)","stroke-width":".28",fill:"none"}));
+    /* struts from the ecliptic down to the outer ring, curling */
+    var st2="";[[1,1],[-1,1]].forEach(function(m){var sx=m[0];
+      st2+=outline(bez([[c+sx*30,ey+54,c+sx*36,ey+68,c+sx*24,ey+82,c+sx*34,c+80.8]]),.95,.7,.35,1);
+      st2+=outline(bez([[c+sx*52,ey+31,c+sx*64,ey+40,c+sx*60,ey+60,c+sx*74,c+41.5]]),.9,.7,.3,1);});
+    st2+=outline(bez([[c,ey+61.2,c+1.8,c+48,c-1.8,c+64,c,c+86.2]]),1,.8,.3,1);raise(st2,vio);
+    /* the flame pointers, each ending at a star's place in a pearl, the engine logo's star at its root */
+    var fl="",roots=[],tips=[];[[c+sx2(1)*30,ey+54,c+sx2(1)*44,c+57]].length;
+    function sx2(v){return v;}
+    [[-1,0],[1,0]].forEach(function(m){var sx=m[0];
+      [[c+sx*33.2,ey+64,c+sx*44,ey+70,c+sx*48,ey+76,c+sx*47.5,ey+86],[c+sx*65.4,ey+46.5,c+sx*72,ey+46,c+sx*76,ey+42,c+sx*80.5,ey+36],
+       [c+sx*48,ey-38,c+sx*44,ey-48,c+sx*48,ey-56,c+sx*38,ey-60],[c+sx*12,ey+59,c+sx*14,ey+70,c+sx*18,ey+76,c+sx*13.5,ey+82],
+       [c+sx*58,ey+20,c+sx*66,ey+16,c+sx*70,ey+8,c+sx*76,ey+6]].forEach(function(q){fl+=outline(bez([q]),1.35,.04,.3,.7);roots.push([q[0],q[1]]);tips.push([q[6],q[7]]);});});
+    raise(fl,vio);roots.forEach(function(q){estar(q[0],q[1],1.7);});var tp="";tips.forEach(function(q){tp+=ring(q[0],q[1],.62);});raise(tp,pearl,{stroke:pline,"stroke-width":".2"});
+    cut(ring(c,c,34.2),.42);}
+  g0.__rel={sh:sh,hi:hi,lp:lp,sp:sp,a:null};}
+
 /* a layer's facets lit as they stand now: turned by A, with the room's light moved by L */
 function vcFacets(sv,A,nt,VI,VN){var r=A*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),o=[0,0,0],F=sv.__fc;
   for(var i=0;i<F.length;i++){var q=F[i],nx=q.nx*c-q.ny*sn,ny=q.nx*sn+q.ny*c,ux=q.u[0]*c-q.u[1]*sn,uy=q.u[0]*sn+q.u[1]*c;
@@ -987,20 +1070,24 @@ function vcAim(st,goal,kick,quiet){st.goal=goal;if(kick)st.v+=kick;if(quiet||sti
 function vcBuild(){var box=mk("div","skc skv"),tilt=mk("div","skv-tilt"),idle=mk("div","skv-idle"),P=mk("div","skv-rise");box.appendChild(tilt);tilt.appendChild(idle);idle.appendChild(P);
   box.setAttribute("role","group");box.setAttribute("aria-label","The dial: your counsellor's stages");
   P.appendChild(mk("i","skv-under"));
-  for(var z=1;z<=30;z+=3){var e=mk("i","skv-side");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);}
+  for(var z=1;z<=9;z+=2.6){var e=mk("i","skv-side");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);}
   var base=mk("div","skv-base");P.appendChild(base);
   var dial=mk("div","skv-dial skv-lay");dial.appendChild(img("skv-dialimg"));P.appendChild(dial);
   /* the outer ring inside, raised: the band stands off the dial and the chapter ring off the band, each on its wall, each casting its shadow */
   var ring=mk("div","skv-ring"),band=mk("div","skv-band"),chap=mk("div","skv-chap");
-  ring.appendChild(mk("i","skv-bandsh"));[7.2,8.1].forEach(function(z){var w=mk("i","skv-bandwall");w.style.setProperty("--z",z);ring.appendChild(w);});
+  var well=mk("div","skv-well");well.appendChild(img("skv-wellimg"));ring.appendChild(well);
+  ring.appendChild(mk("i","skv-chapsh"));
+  [9.8,11.2,12.6,14,15.4,16.8,18.2].forEach(function(z){var w2=mk("i","skv-chapwall out");w2.style.setProperty("--z",z);ring.appendChild(w2);});
+  ring.appendChild(mk("i","skv-bandsh"));[20.2,21.6,23,24.4,25.8,27.2].forEach(function(z){var w=mk("i","skv-chapwall bside");w.style.setProperty("--z",z);ring.appendChild(w);});
+  ring.appendChild(mk("i","skv-dialsh"));[29.2,30.6,32].forEach(function(z){var w=mk("i","skv-dialwall");w.style.setProperty("--z",z);ring.appendChild(w);});
   band.appendChild(img("skv-bandimg"));ring.appendChild(band);
-  ring.appendChild(mk("i","skv-chapsh"));[11.4,13,14.6,16.2,17.8,19.2].forEach(function(z){var w=mk("i","skv-chapwall"),w2=mk("i","skv-chapwall out");w.style.setProperty("--z",z);w2.style.setProperty("--z",z);ring.appendChild(w);ring.appendChild(w2);});
+
   chap.appendChild(img("skv-chapimg"));ring.appendChild(chap);P.appendChild(ring);P.appendChild(mk("i","skv-inner"));
-  var LZ=[9.5,13,16.5],lays=[];
+  var LZ=[36.5,40,43.5],lays=[];
   LZ.forEach(function(z,i){var sh=mk("div","skv-lay skv-lsh"),ed=mk("div","skv-lay skv-led"),tp=mk("div","skv-lay skv-ltop");sh.style.setProperty("--z",(z-2.8));ed.style.setProperty("--z",(z-1.3));tp.style.setProperty("--z",z);
     P.appendChild(sh);P.appendChild(ed);P.appendChild(tp);lays.push({sh:sh,ed:ed,tp:tp});});
   P.appendChild(mk("i","skv-seatsh"));
-  [18.5,20,21.5].forEach(function(z){var e=mk("i","skv-seatside");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);});
+  [46.5,48,49.5,51].forEach(function(z){var e=mk("i","skv-seatside");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);});
   var seat=mk("div","skv-seat"),key=mk("div","skv-key");seat.appendChild(img("skv-collar"));seat.appendChild(key);P.appendChild(seat);
   var gl=mk("div","skv-glass"),gs=mk("div","skv-glassart"),rip=mk("div","skv-ripples");gl.appendChild(gs);gl.appendChild(rip);P.appendChild(gl);
   var bwb=mk("div","skv-bow skv-bowback");bwb.appendChild(img("skv-bowimg"));P.appendChild(bwb);
@@ -1008,7 +1095,7 @@ function vcBuild(){var box=mk("div","skc skv"),tilt=mk("div","skv-tilt"),idle=mk
   var bw=mk("div","skv-bow skv-bowtop");bw.appendChild(img("skv-bowimg"));P.appendChild(bw);
   var ix=mk("div","skv-index");ix.setAttribute("aria-hidden","true");P.appendChild(ix);
   var st={T:0,v:0,goal:0,raf:0,last:0,ups:[],ring:ring,onLand:null,tilt:tilt,h:0,hx:0,hy:0,lx:0,ly:0,vx:0,vy:0,t0:0,mraf:0,
-    kz:0,kv:0,swT:-9,swS:1,shT:-9,box:box,key:key,bandImg:band.firstChild,chapImg:chap.firstChild,band:band,chap:chap,dial:dial,dome:cs.firstChild,glassArt:gs,rip:rip,seat:seat,lays:lays,onSound:null,onPick:null,
+    kz:0,kv:0,swT:-9,swS:1,shT:-9,box:box,key:key,bandImg:band.firstChild,chapImg:chap.firstChild,wellImg:well.firstChild,band:band,chap:chap,dial:dial,dome:cs.firstChild,glassArt:gs,rip:rip,seat:seat,lays:lays,onSound:null,onPick:null,
     /* the inside's harmony: the dial and the great points turn slowly one way and back, the violet points twice as fast the other way, the
        fine points three times; all meet again every ninety seconds. Each: its turn now, its speed, its harmony speed and its symmetry */
     H:[{a:0,v:4,s:4,p:1.8},{a:0,v:-12,s:-12,p:45},{a:0,v:8,s:8,p:90},{a:0,v:-4,s:-4,p:90}],RX:0,RY:0,SW:0,tH:0};box.__vc=st;
@@ -1043,16 +1130,15 @@ function vcOn(st,X,Y,Zp){var M=vcMat(st),m=M.m,O=[260,232,0],E=[260,203.52,1100]
 function vcPick(st,cx,cy){var r=st.box.getBoundingClientRect();if(!r.width)return null;var X=(cx-r.left)/r.width*520,Y=(cy-r.top)/r.height*424,q,d,a,i;
   function at(Z){q=vcOn(st,X,Y,Z);if(!q)return false;d=Math.sqrt(Math.pow(q.x-260,2)+Math.pow(q.y-232,2));a=Math.atan2(q.y-232,q.x-260)*180/Math.PI;return true;}
   function near(base,step,len,w,tol){var k,best=999;for(k=0;k<360/step;k++){var dd=Math.abs(((a-(base+k*step))%360+540)%360-180)*Math.PI/180;if(dd<best)best=dd;}var half=Math.atan2(w*Math.max(0,1-d/len),Math.max(d,1))+tol;return d<len&&best<half;}
-  if(at(31)){if(q.x>=232&&q.x<=288&&q.y>=-14&&q.y<=58&&d>178)return {part:"bow",x:q.x,y:q.y};if(d>=156.5&&d<=181)return {part:"rim",x:q.x,y:q.y};}
-  if(at(30)&&d<156.5){var g={x:q.x,y:q.y};
-    if(at(23)&&d<31.5)return {part:"logo",x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(16.5)&&near(st.H[3].a-90,90,102,13.5,.04))return {part:"lay",i:3,x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(13)&&near(st.H[2].a-45,90,76,9.5,.04))return {part:"lay",i:2,x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(24.5)&&st.ups.length){var n=st.ups.length;for(i=0;i<n;i++){var A=(-90+i*360/n+st.T)*Math.PI/180,mx=260+142*Math.cos(A),my=232+142*Math.sin(A);if(Math.pow(q.x-mx,2)+Math.pow(q.y-my,2)<15*15)return {part:"medal",i:i,x:q.x,y:q.y,gx:g.x,gy:g.y};}}
-    if(at(9.5)&&near(st.H[1].a-67.5,45,60,3.6,.07))return {part:"lay",i:1,x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(20)&&d>=131.5&&d<=152.5)return {part:"ring",x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(10)&&d>=107.5)return {part:"ring",x:q.x,y:q.y,gx:g.x,gy:g.y};
-    if(at(6.3)&&d<108.5)return {part:"lay",i:0,x:q.x,y:q.y,gx:g.x,gy:g.y};}
+  if(at(52)&&d<31.5)return {part:"logo",x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(43.5)&&near(st.H[3].a-90,90,102,13.5,.04))return {part:"lay",i:3,x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(40)&&near(st.H[2].a-45,90,76,9.5,.04))return {part:"lay",i:2,x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(36.5)&&near(st.H[1].a-67.5,45,60,3.6,.07))return {part:"lay",i:1,x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(33)&&d<107.5)return {part:"lay",i:0,x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(28)&&d>=107.5&&d<131.5)return {part:"ring",x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(24)&&st.ups.length){var n=st.ups.length;for(i=0;i<n;i++){var A=(-90+i*360/n+st.T)*Math.PI/180,mx=260+142*Math.cos(A),my=232+142*Math.sin(A);if(Math.pow(q.x-mx,2)+Math.pow(q.y-my,2)<15*15)return {part:"medal",i:i,x:q.x,y:q.y,gx:q.x,gy:q.y};}}
+  if(at(19)&&d>=131.5&&d<=152.5)return {part:"ring",x:q.x,y:q.y,gx:q.x,gy:q.y};
+  if(at(10)){if(q.x>=232&&q.x<=288&&q.y>=-14&&q.y<=58&&d>178)return {part:"bow",x:q.x,y:q.y};if(d>=152.5&&d<=181)return {part:"rim",x:q.x,y:q.y};}
   return null;}
 /* what a press does, part by part */
 function vcPress(st,h){if(still()&&h.part!=="medal")return;var snd=st.snd;vcRipple(st,h);
@@ -1080,7 +1166,7 @@ function vcMove(st){if(st.mraf)return;if(still()){st.tilt.style.transform="";ret
     var now=performance.now(),sw=0,swt=(now-st.swT)/1000;if(swt<4.5)sw=st.swS*7*Math.exp(-swt/1.25)*Math.sin(2*Math.PI*swt/1.35);st.SW=sw;
     st.tilt.style.transform="translateZ("+st.kz.toFixed(2)+"px) rotateX("+RX.toFixed(3)+"deg) rotateY("+RY.toFixed(3)+"deg)"+(sw?" translateY(-220.5px) rotateZ("+sw.toFixed(3)+"deg) translateY(220.5px)":"");
     var L=Math.max(-40,Math.min(40,1.6*RY-1.2*RX)),sht=(now-st.shT)/900,shim=sht>=0&&sht<1?360*(1-Math.pow(1-sht,3)):0;
-    if(st.bandImg)st.bandImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.chapImg)st.chapImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.dome)st.dome.style.transform="rotate("+(L+shim).toFixed(2)+"deg)";if(st.glassArt)st.glassArt.style.transform="rotate("+(L*.55).toFixed(2)+"deg)";
+    if(st.bandImg)st.bandImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.chapImg)st.chapImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.wellImg)st.wellImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.dome)st.dome.style.transform="rotate("+(L+shim).toFixed(2)+"deg)";if(st.glassArt)st.glassArt.style.transform="rotate("+(L*.55).toFixed(2)+"deg)";
     /* the inside in harmony: each layer turns at its harmony speed; a press throws it on, and when it has slowed it falls back into step */
     for(var i=0;i<st.H.length;i++){var Ly=st.H[i],tgt=Ly.s*st.tH;if(Math.abs(Ly.v-Ly.s)>2){Ly.v+=(Ly.s-Ly.v)*Math.min(1,dt/1.5);}
       else{var e=((tgt-Ly.a)%Ly.p+Ly.p*1.5)%Ly.p-Ly.p/2;Ly.v=Ly.s+Math.max(-6,Math.min(6,.9*e));}
@@ -1088,15 +1174,18 @@ function vcMove(st){if(st.mraf)return;if(still()){st.tilt.style.transform="";ret
     vcLayers(st,L);
     st.mraf=requestAnimationFrame(fr);});}
 /* the layers turned, their shadows kept below them on the right, their facets relit when they have turned a degree or the light has moved */
-function vcLayers(st,L){var R=st.rose;var d=st.dial;if(d)d.style.transform="translateZ(6.3px) rotate("+st.H[0].a.toFixed(2)+"deg)";if(!R)return;
+function vcLayers(st,L){var R=st.rose;var d=st.dial;if(d)d.style.transform="translateZ(33px) rotate("+st.H[0].a.toFixed(2)+"deg)";if(!R)return;
+  var rl=R.rings&&R.rings.__rel;if(rl){var A0=st.H[0].a;if(rl.a===null||Math.abs(A0-rl.a)>1.2){rl.a=A0;var t0=-A0*Math.PI/180,c0=Math.cos(t0),s0=Math.sin(t0),
+    put=function(g,x,y){g.setAttribute("transform","translate("+(x*c0-y*s0).toFixed(2)+" "+(x*s0+y*c0).toFixed(2)+")");};put(rl.sh,.42,.62);put(rl.hi,-.3,-.38);if(rl.lp)put(rl.lp,.3,.38);if(rl.sp)put(rl.sp,-1.15,-1.3);}}
   for(var i=0;i<3;i++){var A=st.H[i+1].a,ly=st.lays[i],tx=A.toFixed(2);ly.tp.style.transform="translateZ("+ly.tp.style.getPropertyValue("--z")+"px) rotate("+tx+"deg)";ly.ed.style.transform="translateZ("+ly.ed.style.getPropertyValue("--z")+"px) translate(.5px,.8px) rotate("+tx+"deg)";
     ly.sh.style.transform="translateZ("+ly.sh.style.getPropertyValue("--z")+"px) translate(2px,3.2px) rotate("+tx+"deg)";
     var key=Math.round((A-L)*1.5);if(ly.__k!==key){ly.__k=key;vcFacets(R.layers[i].top,A-L,R.nt,R.VI,R.VN);}}}
 /* the engine button in its seat: Home's own (sealKey), or whatever key the caller makes */
-function vcKey(box,key){var slot=box.querySelector(".skv-key");if(!slot||!key)return;while(slot.firstChild)slot.removeChild(slot.firstChild);slot.appendChild(key);}
+function vcKey(box,key){var slot=box.querySelector(".skv-key");if(!slot||!key)return;while(slot.firstChild)slot.removeChild(slot.firstChild);slot.appendChild(key);
+  var e=key.querySelector(".isl-edge");if(e&&!e.querySelector(".ox-rim"))for(var k=4;k>=1;k--){var r=mk("i","ox-rim");r.setAttribute("aria-hidden","true");r.style.setProperty("--k",String(k));e.insertBefore(r,e.firstChild);}}
 /* the theme's drawing: the metal is drawn once for day and once for night */
 function vcTheme(box,nt){var pk=nt?"n":"d";if(box.__pk===pk)return;box.__pk=pk;var st=box.__vc;
-  box.querySelector(".skv-bandimg").src=vcBaseUrl(nt,"band");box.querySelector(".skv-chapimg").src=vcBaseUrl(nt,"chap");box.querySelector(".skv-dialimg").src=vcDialUrl(nt);box.querySelector(".skv-caseimg").src=vcCaseUrl(nt,"rope");box.querySelector(".skv-domeimg").src=vcCaseUrl(nt,"dome");
+  box.querySelector(".skv-bandimg").src=vcBaseUrl(nt,"band");box.querySelector(".skv-wellimg").src=vcBaseUrl(nt,"well");box.querySelector(".skv-chapimg").src=vcBaseUrl(nt,"chap");box.querySelector(".skv-dialimg").src=vcDialUrl(nt);box.querySelector(".skv-caseimg").src=vcCaseUrl(nt,"rope");box.querySelector(".skv-domeimg").src=vcCaseUrl(nt,"dome");
   [].forEach.call(box.querySelectorAll(".skv-bowimg"),function(e){e.src=vcBowUrl(nt);});box.querySelector(".skv-collar").src=vcCollarUrl(nt,26.5,31.5);
   var R=vcRose(nt),dl=box.querySelector(".skv-dial"),old=dl.querySelector("svg");if(old)dl.removeChild(old);dl.appendChild(R.rings);
   if(st){st.rose=R;st.lays.forEach(function(ly,i){[ly.sh,ly.ed,ly.tp].forEach(function(e){while(e.firstChild)e.removeChild(e.firstChild);});ly.sh.appendChild(R.layers[i].shd);ly.ed.appendChild(R.layers[i].edge);ly.tp.appendChild(R.layers[i].top);ly.__k=null;});}
@@ -1116,7 +1205,7 @@ function vcStages(box,list,nt,onPick,onHover){var st=box.__vc;[st.svg,st.svg2,st
 
 function careerHero(){if(!W.ING_COMPASS)return null;var pg=$("page-career"),cs=$("cs");if(!pg||!cs)return null;if(CP.h&&CP.h.el.isConnected)return CP.h;
   var lede=(cs.querySelector(".c-head p")||{}).textContent||"Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.";
-  var H=hero({title:"Career Studio",eyebrow:"Career Studio · the compass of your path",lede:lede,
+  var H=hero({title:"Vocatio",eyebrow:"Vocatio · the compass of your path",lede:lede,
     keys:[{pri:true,ico:ICO.compass,txt:"Your counsellor",id:"skCareerGo",fn:function(){var S=W.IngCareer.state();S.ui.room="mentor";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}},
       {ico:ICO.plus,txt:"Bring one in",fn:function(){var S=W.IngCareer.state();S.ui.room="apps";S.ui.open="new";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}}],
     says:"Your counsellor's stages, one after another: what you have, your record, what you want, where you could go, and this week.",hint:"Press a stage to turn the compass to it."});

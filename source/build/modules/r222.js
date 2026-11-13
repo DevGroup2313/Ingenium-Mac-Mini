@@ -120,14 +120,14 @@ var S={
   folders2:{r222:1,chap:"Folders",go:function(){goPage("folders");},ring:"#page-folders .fld-ways",
     t:"📥 Bringing your work in",
     b:"Bring in Claude's export (its chats and projects), Claude Code's sessions on this computer (in the computer app), a conversation pasted from Claude Code on the web or from Ollama, and an Ollama Modelfile as a way of working. Each is read on this device; each conversation is sorted into the folder of the app it names, and any can be moved."},
-  career1:{r222:1,chap:"Career Studio",sub:"Applications and people",go:function(){goPage("career");},ring:"#page-career .rm-tabs",
-    t:"💼 The Career Studio",
-    b:"The Career Studio helps with applications for jobs, PhD places, fellowships and grants. Applications keeps each one with its documents and dates; People keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Today shows the single most urgent step.",
+  career1:{r222:1,chap:"Vocatio",sub:"Applications and people",go:function(){goPage("career");},ring:"#page-career .rm-tabs",
+    t:"🧭 Applications and your path",
+    b:"Vocatio helps with applications for jobs, PhD places, fellowships and grants. Applications keeps each one with its documents and dates; People keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Today shows the single most urgent step.",
     tip:"One step at a time: the rest waits, folded, until you ask for it."},
-  career2:{r222:1,chap:"Career Studio",go:function(){goPage("career");},ring:"#csWork",
+  career2:{r222:1,chap:"Vocatio",go:function(){goPage("career");},ring:"#csWork",
     t:"🔗 A posting from its link",
     b:"Paste a job posting's link: Ingenium fetches it once and, with a model ready, reads it against your profile at once. A page behind a sign-in is said so plainly, and its text can be pasted instead. The jobs you saved or applied to on LinkedIn come in from LinkedIn's own copy of your data."},
-  career3:{r222:1,chap:"Career Studio",go:function(){goPage("career");},ring:"#csHowK2",
+  career3:{r222:1,chap:"Vocatio",go:function(){goPage("career");},ring:"#csHowK2",
     t:"✍️ Drafts you review",
     b:"For each application the studio writes the CV, the cover letter and a portfolio in the shape the role calls for, with every fact taken from your profile. Draft an email for me leaves what it does not know in square brackets. You read, change and send everything yourself: Ingenium sends nothing."},
   found:{r222:1,chap:"Models",sub:"Newer models",go:function(){goPage("models");},ring:"#foundCard",
@@ -150,8 +150,8 @@ var S={
     t:"🔐 Your data, sealed",
     b:"An optional sign-in of your own, a name and a password, seals your data on this device. Several ways back in open it: the password, ten words you keep, a key file on a stick or a drive, and a hint. On a Mac or a Windows computer, its own sign-in (Touch ID or Windows Hello) can be one more.",
     tip:"There is no back door: keep the ways back in in different places."}};
-var TEASE={"Code":"Building an app with the model: the plan, the Session column, its environment, Ultracode and GitHub.","Folders":"A folder for each app, and your work brought in from Claude and Ollama.","Career Studio":"Applications, the people you write to, and drafts you review."};
-var CLOSE={"Code":"Code plans, builds, checks and fixes, and keeps every change as a version you can undo.","Folders":"Folders keep how you work, so no conversation starts from nothing.","Career Studio":"The Career Studio keeps every application and person in view, one step at a time."};
+var TEASE={"Code":"Building an app with the model: the plan, the Session column, its environment, Ultracode and GitHub.","Folders":"A folder for each app, and your work brought in from Claude and Ollama.","Vocatio":"Applications, the people you write to, and drafts you review."};
+var CLOSE={"Code":"Code plans, builds, checks and fixes, and keeps every change as a version you can undo.","Folders":"Folders keep how you work, so no conversation starts from nothing.","Vocatio":"Vocatio keeps every application and person in view, one step at a time."};
 
 /* ================= 3. into the tour, where they belong ================= */
 function idx(fn){for(var i=0;i<ING_TOUR.length;i++)if(fn(ING_TOUR[i]))return i;return -1;}
@@ -193,7 +193,7 @@ function engineStep(){if(asking||touring()||!Array.isArray(W.ING_TOUR)||!ING_TOU
     if(!(r&&r.newer&&r.newer.available)||touring()||ING_TOUR.some(function(s){return s.r222e;}))return;
     var at=ING_TOUR.indexOf(S.found);if(at<0)at=lastOf("Models");if(insertAfter(at,[S.engines]))try{tourPaintEntry();}catch(e){}},function(){asking=false;});}
 /* the last card names the chapters this copy's tour has */
-var WORD={"Your devices":"your other devices","Making things":"the making tools","Career Studio":"the Career Studio","Scholarship":"the scholarly sources","The side buttons":"the side buttons","The top bar":"the top bar"};
+var WORD={"Your devices":"your other devices","Making things":"the making tools","Vocatio":"Vocatio","Scholarship":"the scholarly sources","The side buttons":"the side buttons","The top bar":"the top bar"};
 function roomsLine(){var n=[];try{W.tourChapList().forEach(function(c){if(c.chap!=="Welcome")n.push(WORD[c.chap]||c.chap);});}catch(e){return null;}
   if(n.length<2)return null;return "You have seen every room: "+n.slice(0,-1).join(", ")+" and "+n[n.length-1]+". The best way to learn the rest is to try it. Here are three good first steps:";}
 (function wrapFinale(){var o=W.tourFinale;if(typeof o!=="function"||o.__r222)return;
@@ -223,8 +223,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
     tips:{"new":["Start from the apps your profile names: untick any you do not want."],
       some:["Where we left off is brought up to date when you press it: only the conversations not read yet are read."],
       expert:["A conversation that names no app clearly waits under Not sorted yet; move it by hand."]}};
-  if(has("page-career")&&!P.career)P.career={name:"Career Studio",tour:["Career Studio"],
-    what:"The Career Studio helps with applications for jobs, PhD places, fellowships and grants: each application, the people you write to, and Today's step.",
+  if(has("page-career")&&!P.career)P.career={name:"Vocatio",tour:["Vocatio"],
+    what:"Vocatio helps with applications for jobs, PhD places, fellowships and grants: each application, the people you write to, and Today's step.",
     plain:"It drafts from your profile and your notes alone; you read, change and send everything yourself.",
     dos:[["Bring a posting by its link","Paste the link: it is read against your profile at once.","#csWork"],
       ["Applications","Each application with its documents and dates.","#csList"]],
@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["6.95","The Career Studio is now Vocatio, Latin for a calling. Its compass stands raised: the grey chapter ring and the violet band rise off the case, Home's engine button turns at its heart, and its white dial is engraved with Ingenium's Orrery, Home's six rooms as raised orbs on their orbits among the engine's stars. Its keys, and Lector's, now act where they are and no longer move the page.","career"],
   ["6.94","Lector opens on its documents in a fan, with a wax seal of the engine logo at the foot of the one in front: white by day and dark by night, INGENIUM round the top and today's date in Latin round the foot. Press it, as on Home, for one of the seal's flourishes; at rest its pearl beats softly."],
   ["6.93","In the Career Studio, Your counsellor takes you through five stages, one at a time: what you have, your record, what you want, where you could go, and this week. Bring in your CV and documents once, and each stage builds on the last.","career"],
   ["6.93","The Models page now opens on its turret every time, never on its older look first. On Home, each room's orb wears the seal's own finish: its polished rim, its light, and its pearl, and still turns as before."],
@@ -396,7 +397,7 @@ function guide(){var page=$("page-guide");if(!page)return;var added=false;
       ["Bringing your work in","Claude's export (its chats and projects); the exports of ChatGPT, Gemini, Grok, DeepSeek, Le Chat, Copilot and LM Studio; Claude Code's sessions on this computer, in the computer app; a conversation pasted from Claude Code on the web or from Ollama; an Ollama Modelfile as a way of working. Each is read on this device."],
       ["A GitHub repository","Brought into a folder on your press (6.39): its README joins the folder's files and goes with every conversation in it; its text files and its issues, with their comments, are kept in the folder, each with Show and Use in a conversation. It is read from GitHub, the only part of Folders that uses the internet; a private repository needs the token Add from GitHub keeps."],
       ["What it does not do","No model is retrained. A folder gives the model what it should read about your way of working, briefly."]]));page.appendChild(f);added=true;}
-  if(has("page-career")&&!$("csGuide")){var cs=card("csGuide","The Career Studio","Applications for jobs, PhD places, fellowships and grants, one step at a time.");
+  if(has("page-career")&&!$("csGuide")){var cs=card("csGuide","Vocatio","Applications for jobs, PhD places, fellowships and grants, one step at a time.");
     cs.appendChild(dl([["Today","The single most urgent step across your applications and the people you write to; the rest waits, folded."],
       ["Applications and people","Each application with its documents and dates; supervisors, referees, recruiters and hiring managers, each with a status and a date to follow up."],
       ["Drafts","The CV, the cover letter and a portfolio for each application, shaped by templates for 25 roles in 8 fields, with every fact from your profile. Draft an email for me leaves what it does not know in square brackets. You send everything yourself."],

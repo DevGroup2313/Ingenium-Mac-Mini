@@ -408,9 +408,9 @@ function lxPane(d,it){var host=D.getElementById("l7Doc");if(!host)return;var old
   if(getComputedStyle(host).position==="static")host.style.position="relative";
   var p=h("div","cn-lxpane"),hd=h("div","hd");hd.appendChild(h("b",null,esc("Suggestions · "+it.name)));var x=cbtn("sm quiet","Close",function(){p.parentNode&&p.parentNode.removeChild(p);});x.className="l-btn quiet";hd.appendChild(x);p.appendChild(hd);
   var bd=h("div","bd");bd.appendChild(h("p",null,esc("Looking at it with you, from your record"+(U.wantsText()?" and your targets":"")+". It is never rewritten.")));var live=h("div","live");bd.appendChild(live);p.appendChild(bd);
-  var ft=h("div","ft");var ok=cbtn("","Open in the Career Studio",function(){CS().ui.room="edge";CS().ui.esel="d:"+d.id;U.show("work");save();go("career");render();});ok.className="l-btn";ft.appendChild(ok);p.appendChild(ft);host.appendChild(p);
+  var ft=h("div","ft");var ok=cbtn("","Open in Vocatio",function(){CS().ui.room="edge";CS().ui.esel="d:"+d.id;U.show("work");save();go("career");render();});ok.className="l-btn";ft.appendChild(ok);p.appendChild(ft);host.appendChild(p);
   var t=setInterval(function(){if(!p.isConnected){clearInterval(t);return;}if(RUN.busy){live.textContent=(RUN.think?RUN.think.slice(-600)+"\n":"")+(RUN.live||"…");return;}clearInterval(t);
-    var a=U.EDGE().docs[d.id];live.textContent="";if(!a){bd.appendChild(h("p",null,esc("Nothing came back. Try again, or look in the Career Studio, Your edge.")));return;}
+    var a=U.EDGE().docs[d.id];live.textContent="";if(!a){bd.appendChild(h("p",null,esc("Nothing came back. Try again, or look in Vocatio, Your edge.")));return;}
     bd.innerHTML="";U.ADV_TAGS.forEach(function(tg){var rows=a.fb[tg[0]];if(!rows||!rows.length)return;bd.appendChild(h("h4",null,esc(tg[1])));var ul=h("ul");rows.forEach(function(r){var li=h("li");li.appendChild(D.createTextNode(r[0]));if(r[1])li.appendChild(h("small",null,esc(r.slice(1).join(" · "))));ul.appendChild(li);});bd.appendChild(ul);});
     if(a.fb.RAW)bd.appendChild(h("p",null,esc(a.fb.RAW[0][0])));bd.appendChild(h("p",null,esc("Looked at with "+(a.model||"your model")+". Suggestions only: the document is yours.")));},700);}
 var ogo=W.go;if(typeof ogo==="function"){W.go=function(p){var r=ogo.apply(this,arguments);try{if(p==="lector")setTimeout(lectorAdvise,50);}catch(e){}return r;};}

@@ -47,12 +47,12 @@ const CV = '## Education\n**MSt in History, Oxford**, 2020 to 2021\n- Dissertati
   await p.evaluate(post => IngCareer.newOpp('job', 'Archivist\nThe County Record Office\nApply with a CV.\nThe closing date is 5 December 2026.\n' + 'y'.repeat(60), 'pasted'), POST);
   const n2 = await p.evaluate(() => IngCareer.exportAll().then(fs => fs && fs.length));
   const s2 = await p.evaluate(() => window.__saved[1]); const z2 = unzip(Buffer.from(s2.b64, 'base64')); const names2 = Object.keys(z2);
-  ok(/^Career Studio - .*\.zip$/.test(s2.name) && n2 === names2.length && names2.includes('README.txt') && names2.includes('Archivist/posting.txt') && names2.includes('Archivist/notes.md') && names2.includes('DPhil in History of Science/Tailored CV.docx'), 'Export all: one folder for each application, a README at the top', { name: s2.name, n: names2.length });
+  ok(/^Vocatio - .*\.zip$/.test(s2.name) && n2 === names2.length && names2.includes('README.txt') && names2.includes('Archivist/posting.txt') && names2.includes('Archivist/notes.md') && names2.includes('DPhil in History of Science/Tailored CV.docx'), 'Export all: one folder for each application, a README at the top', { name: s2.name, n: names2.length });
   // Settings' Export your data carries the studio
   ok(await p.evaluate(() => (window.__ingExportProviders || []).some(x => x.id === 'exCareer')), 'the studio registers its line for Export your data');
   await p.evaluate(() => openExport()); await p.waitForTimeout(400);
   const modal = await p.evaluate(() => ({ has: !!document.getElementById('exCareer'), checked: document.getElementById('exCareer') && document.getElementById('exCareer').checked, label: (document.getElementById('exCareer') && document.getElementById('exCareer').parentNode.textContent.trim()) || '' }));
-  ok(modal.has && modal.checked && /^The Career Studio: each profile's applications as readable files/.test(modal.label), 'Export your data lists "The Career Studio", ticked', modal);
+  ok(modal.has && modal.checked && /^Vocatio: each profile's applications as readable files/.test(modal.label), 'Export your data lists "The Career Studio", ticked', modal);
   await p.evaluate(() => { ['exChats', 'exChatsJson', 'exNotes', 'exDocs', 'exSources', 'exSettings'].forEach(k => { const c = document.getElementById(k); if (c) c.checked = false; }); document.getElementById('exGo').click(); });
   await p.waitForFunction(() => window.__saved.length >= 3, null, { timeout: 30000 }); await p.waitForTimeout(200);
   const s3 = await p.evaluate(() => window.__saved[2]); const z3 = unzip(Buffer.from(s3.b64, 'base64')); const names3 = Object.keys(z3);
