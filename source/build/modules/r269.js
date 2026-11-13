@@ -271,7 +271,7 @@ function note(n){NOTE=n;paint();}
 /* 6.97: the turret's keys and lenses act where they stand and never move the page. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it."
    A room they open is below; when it is out of the window, a line says which */
 function room(k,el){try{if(W.IngRooms&&typeof IngRooms.open==="function")IngRooms.open("models",k);}catch(e){}
-  setTimeout(function(){var t=el||$("rmBar-models");if(!t)return;var nm=((($("rmT-models-"+k)||{}).textContent)||"").trim();said(t,(nm?nm+" is":"The room is")+" open below.");},60);}
+  setTimeout(function(){var t=el||$("rmBar-models");if(!t)return;var nm=((($("rmT-models-"+k)||{}).textContent)||"").trim();said(t,nm?"Open below: "+nm+".":"The room is open below.");},60);}
 function said(el,say){try{var r=el.getBoundingClientRect(),cy=(r.top+r.bottom)/2;if((cy<0||cy>(W.innerHeight||0))&&typeof W.ingToast==="function")W.ingToast(say);}catch(e){}}
 function addFile(){var dz=$("dropzone");if(dz){try{dz.click();return;}catch(e){}}room("yours");}
 function busyNote(){var e=eng();if(st()==="loading")return {name:"The engine is loading a model",says:"Let it finish first; then press the lens you want.",pc:Math.round(prog()*100)};
