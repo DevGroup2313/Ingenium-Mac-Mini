@@ -371,6 +371,18 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.94 (13 November 2026): Lector's head released, with its wax seal. modules/r290.js rides: Lector opens on the fan of its documents
+she approved, and at its foot the engine logo pressed in wax, as she approved it on its live preview that day ("I approve of the was seal
+design for Lector, please push it everywhere"). The seal is a real vintage stamp, drawn and lit pixel by pixel: a poured, uneven edge, a
+satin grain with the odd bubble, INGENIUM raised round the top and the day's date in Latin round the foot (from the device's clock; it
+turns at midnight), the logo's faceted violet star and its pearl. White wax by day; by night the engine button's own night (deep
+violet-black wax, lavender lettering). It moves as Home's engine button does: it sways, leans and lifts under a mouse, sinks when
+pressed, and each press plays one of Home's flourishes with Home's click; at rest its pearl beats with Home's heartbeat. The Career
+Studio's compass, drawn by the same module, is held: modules/r293.js turns it on and waits in build/held.json for her choice, so the
+Career Studio reads as in 6.93.
+
+    node rig/t_694_lector.js <Ingenium page url> <out dir>   # Lector's head and its seal, by day, by night and on a phone
+
 Ingenium 6.93 (13 November 2026): the Models page opening on its turret every time, Home's orbs matched to the seal, and Your
 counsellor released. The heads of the Career Studio and Lector (modules/r290.js) are written and tested but held (build/held.json) for her
 answer to their next preview: her words that day, "I want to see metal, and not a fake plastic somewhat 3D look. I want a beautiful 3D

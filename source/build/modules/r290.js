@@ -1114,7 +1114,7 @@ function vcStages(box,list,nt,onPick,onHover){var st=box.__vc;[st.svg,st.svg2,st
     b.addEventListener("click",function(e){e.preventDefault();if(onPick)onPick(i);});st.onPick=onPick;up.appendChild(b);sl.appendChild(up);st.marks.appendChild(sl);st.ups.push(up);});
   vcApply(st);}
 
-function careerHero(){var pg=$("page-career"),cs=$("cs");if(!pg||!cs)return null;if(CP.h&&CP.h.el.isConnected)return CP.h;
+function careerHero(){if(!W.ING_COMPASS)return null;var pg=$("page-career"),cs=$("cs");if(!pg||!cs)return null;if(CP.h&&CP.h.el.isConnected)return CP.h;
   var lede=(cs.querySelector(".c-head p")||{}).textContent||"Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.";
   var H=hero({title:"Career Studio",eyebrow:"Career Studio · the compass of your path",lede:lede,
     keys:[{pri:true,ico:ICO.compass,txt:"Your counsellor",id:"skCareerGo",fn:function(){var S=W.IngCareer.state();S.ui.room="mentor";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}},
@@ -1145,7 +1145,7 @@ function paintCompass(){var H=careerHero();if(!H)return;var data=stagesNow(),nt=
   var target=nearest(-cur*(360/n),CP.painted?st.goal:null);
   if(!CP.painted&&!still()){st.T=target+360/n*1.5;st.goal=st.T;st.v=0;vcApply(st);vcAim(st,target);}else vcAim(st,target,0,!CP.painted);
   CP.T=target;CP.painted=true;}
-function dressCareer(){var pg=$("page-career");if(!pg||!$("cs"))return false;pg.classList.add("sk-on");paintCompass();return true;}
+function dressCareer(){if(!W.ING_COMPASS)return false;var pg=$("page-career");if(!pg||!$("cs"))return false;pg.classList.add("sk-on");paintCompass();return true;}
 
 /* ================= THE SEAL KEY: Ingenium's own seal (R104's layers), its pointer and flourishes as Home's (R175), its sound (r176) ================= */
 /* the flourishes, as Home's seal plays them, with the transform each layer already uses (so they play on every browser Ingenium runs in) */
@@ -1372,7 +1372,7 @@ var og=W.go;if(typeof og==="function"&&!og.__r290){var g2=function(p){var r=og.a
 var themeMo=null;try{themeMo=new MutationObserver(function(){CP.key="";LB.key="";try{if($("page-career").classList.contains("active"))paintCompass();if($("page-lector").classList.contains("active"))paintLector();}catch(e){}});
   themeMo.observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 try{hookCareer();dressCareer();}catch(e){}try{dressLector();}catch(e){}
-W.IngStudios={career:dressCareer,lector:dressLector,compass:paintCompass,documents:paintLector,turn:function(T){turnTo(T);},repaint:function(){CP.key="";if(CP.h&&CP.h.dial)CP.h.dial.__pk="";paintCompass();},
+W.IngStudios={compassOn:function(){W.ING_COMPASS=true;CP.key="";try{hookCareer();dressCareer();}catch(e){}},career:dressCareer,lector:dressLector,compass:paintCompass,documents:paintLector,turn:function(T){turnTo(T);},repaint:function(){CP.key="";if(CP.h&&CP.h.dial)CP.h.dial.__pk="";paintCompass();},
   state:function(){return {T:CP.T,cur:CP.cur,n:CP.data?CP.data.list.length:0,cp:CP.key,lb:LB.key};},
   /* what the other heads share with these (Focus, modules/r291.js; Build, modules/r292.js) */
   kit:{hero:hero,label:label,steps:steps,orb:orb,wireOrb:wireOrb,sealKey:sealKey,plateUrl:plateUrl,collarUrl:collarUrl,scrollTo:scrollTo,still:still,night:night,mk:mk,svg:svg,img:img,ICO:ICO,ROMAN:ROMAN,
