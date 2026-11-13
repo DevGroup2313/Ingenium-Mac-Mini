@@ -74,6 +74,22 @@ body[data-theme="night"] .hd-on .hd-card p.hd-warn{color:#f0b65c}
 /* the hours of the day */
 #page-focus.hd-on > .hd-head .hd-tag{right:0;top:58px;max-width:170px}
 #page-focus.hd-on .hd-hit{left:144px;top:108px;width:136px;height:136px}
+/* Lector's seal in sealing wax (the owner's choice, 13 November 2026: "I like the seal as wax seal pressed for Lector"): the seal key's
+   own layers (its ring, its star and its stone), each drawn as wax in relief from a height map and lit as the page is lit, in the ribbon's
+   violet; it lies on the paper, so it does not sway on its own and leans only a little, and its parts stand only just proud of the wax */
+html body .isl.isl-wax .isl-idle{animation:none}
+html body .isl.isl-wax .isl-layer > canvas{display:block;width:100%;height:100%;pointer-events:none}
+html body .isl.isl-wax .isl-ring{--fz:.014;--fk:1}
+html body .isl.isl-wax .isl-star{--fz:.03;--fk:1}
+html body .isl.isl-wax .isl-heart{--fz:.044;--fk:1}
+html body .isl.isl-wax .isl-star > canvas{filter:drop-shadow(calc(var(--S) * .004) calc(var(--S) * .008) calc(var(--S) * .006) rgba(30,8,70,.32))}
+html body .isl.isl-wax .isl-heart > canvas{filter:drop-shadow(calc(var(--S) * .006) calc(var(--S) * .012) calc(var(--S) * .01) rgba(30,8,70,.36))}
+html body .isl.isl-wax .isl-cast{display:none}
+html body .isl.isl-wax.hover{--cdl:calc(var(--S) * -.012)}
+html body .isl.isl-wax.down{--cdl:calc(var(--S) * .018);--cds:.975}
+html body .isl.isl-wax .isl-sheen{position:absolute;left:0;top:0;width:100%;height:100%;display:block;pointer-events:none;transform:translateZ(calc(var(--S) * .05));opacity:0;transition:opacity .35s}
+html body .isl.isl-wax.hover .isl-sheen{opacity:1}
+html body .isl.isl-wax.isl-fl .isl-sheen{opacity:0;transition-duration:.1s}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p284"]="started";}catch(_){}
 /* R284 · the studios' heads, and Focus's armillary: see the note at the top of its styles */
@@ -280,15 +296,93 @@ function copySeal(){var s=doorSeal();if(!s)return null;var c=s.cloneNode(true),k
   var h=c.outerHTML;[].forEach.call(c.querySelectorAll("[id]"),function(n){var id=n.getAttribute("id"),q=id.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
     h=h.replace(new RegExp('id="'+q+'"',"g"),'id="'+k+id+'"').replace(new RegExp("url\\(#"+q+"\\)","g"),"url(#"+k+id+")").replace(new RegExp('href="#'+q+'"',"g"),'href="#'+k+id+'"');});
   var w=mk("div");w.innerHTML=h;var out=w.firstElementChild;[].forEach.call(out.querySelectorAll(".isl-tilt,.isl-idle"),function(n){n.removeAttribute("style");});return out;}
+/* ---------- the seal in sealing wax (Lector's, 13 November 2026) ----------
+   The same layers as the door's seal (isl-back, isl-ring, isl-star, isl-heart, so every flourish, click and ripple of Home's seal plays on
+   it), each a canvas of wax in relief: a height map (in the seal's own 120-unit square) lit from the upper left, as the page is, with a
+   waxy gloss. The blob of wax has a poured, uneven edge, a lip squeezed up by the stamp, a sunken floor, a fine mottle and a few air
+   bubbles; the stamp left the ring, the four-pointed star and the stone standing in it. Made once and kept. */
+var WAXC={};
+function hsh(i,j){var h=Math.imul(i,374761393)+Math.imul(j,668265263)|0;h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967295;}
+function vnoise(x,y){var i=Math.floor(x),j=Math.floor(y),fx=x-i,fy=y-j,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),a=hsh(i,j),b=hsh(i+1,j),c=hsh(i,j+1),d=hsh(i+1,j+1);
+  return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+function smooth(a,b,x){var t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);}
+function n3(x,y,z){var l=Math.sqrt(x*x+y*y+z*z)||1;return [x/l,y/l,z/l];}
+var WAX_RGB=[106,60,192],WAX_L=n3(-.55,-.65,.62);
+/* a height map, measured once: where the wax is (its pixels), how each faces (its normal), how much is there (alpha) and its tone */
+function relief(px,fn,o){o=o||{};var n=px*px,Hh=new Float32Array(n),A=new Float32Array(n),u=120/px,i,j,k,box=o.box||[0,120],ids=[];
+  var i0=Math.max(0,Math.floor(box[0]/u)),i1=Math.min(px,Math.ceil(box[1]/u));
+  for(j=i0;j<i1;j++)for(i=i0;i<i1;i++){var r=fn((i+.5)*u,(j+.5)*u,u);k=j*px+i;Hh[k]=r[0];A[k]=r[1];if(r[1]>0)ids.push(k);}
+  var m=ids.length,N=new Float32Array(m*3),AA=new Float32Array(m),T=new Float32Array(m);
+  for(var q=0;q<m;q++){k=ids[q];i=k%px;j=(k-i)/px;var hl=Hh[k-(i>0?1:0)],hr=Hh[k+(i<px-1?1:0)],hu=Hh[k-(j>0?px:0)],hd=Hh[k+(j<px-1?px:0)];
+    var nn=n3(-(hr-hl)/(2*u),-(hd-hu)/(2*u),1);N[q*3]=nn[0];N[q*3+1]=nn[1];N[q*3+2]=nn[2];AA[q]=A[k];T[q]=o.tone?o.tone(Hh[k]):1;}
+  return {px:px,ids:ids,N:N,A:AA,T:T,ks:o.ks==null?.5:o.ks,shine:o.shine||34};}
+/* lit as the page is, from the upper left; turned by ang (as the layer is turned on screen), the light is turned back by as much, so it
+   stays where it is while the wax goes round */
+function waxPaint(R,g,ang){var px=R.px,im=g.createImageData(px,px),d=im.data,c=Math.cos(ang||0),s=Math.sin(ang||0),L=n3(c*WAX_L[0]+s*WAX_L[1],-s*WAX_L[0]+c*WAX_L[1],WAX_L[2]),
+    Hv=n3(L[0],L[1],L[2]+1),C=WAX_RGB,N=R.N,ids=R.ids,ks=R.ks,sh=R.shine;
+  for(var q=0,m=ids.length;q<m;q++){var nx=N[q*3],ny=N[q*3+1],nz=N[q*3+2],df=nx*L[0]+ny*L[1]+nz*L[2],sp=nx*Hv[0]+ny*Hv[1]+nz*Hv[2];if(df<0)df=0;if(sp<0)sp=0;
+    var spec=Math.pow(sp,sh)*ks+Math.pow(sp,5)*.05,f=(.3+1.05*df)*R.T[q],k=ids[q]*4;
+    d[k]=Math.min(255,C[0]*f+255*spec);d[k+1]=Math.min(255,C[1]*f+255*spec);d[k+2]=Math.min(255,C[2]*f+255*spec);d[k+3]=Math.round(R.A[q]*255);}
+  g.putImageData(im,0,0);}
+/* the body with its own soft shadow on the paper, falling down and to the right of the page whatever way the body is turned */
+function waxBodyPaint(W0,g,ang){var px=W0.px,t=W0.tmp||(W0.tmp=D.createElement("canvas"));t.width=t.height=px;waxPaint(W0.body,t.getContext("2d"),ang);
+  var c=Math.cos(ang||0),s=Math.sin(ang||0);function off(x,y){return [c*x+s*y,-s*x+c*y];}
+  g.clearRect(0,0,px,px);g.save();var o1=off(px*.008,px*.018);g.shadowColor="rgba(34,10,76,.42)";g.shadowBlur=px*.03;g.shadowOffsetX=o1[0];g.shadowOffsetY=o1[1];g.drawImage(t,0,0);
+  var o2=off(0,px*.004);g.shadowColor="rgba(34,10,76,.18)";g.shadowBlur=px*.008;g.shadowOffsetX=o2[0];g.shadowOffsetY=o2[1];g.drawImage(t,0,0);g.restore();}
+var BUBBLES=[[31,74,1.1,.5],[84,33,.8,.4],[93,79,1.2,.55],[42,30,.7,.35],[70,95,.9,.45],[22,52,.6,.3]];
+function waxBody(x,y,u){var dx=x-60,dy=y-60,r=Math.sqrt(dx*dx+dy*dy),th=Math.atan2(dy,dx);
+  var E=56.4+1.5*Math.sin(3*th+.7)+1*Math.sin(5*th+2.1)+.6*Math.sin(8*th+.3)+.35*Math.sin(13*th+1.9);if(r>E+u)return [0,0];
+  var t=clamp((E-r)/6.5,0,1),edge=1-Math.pow(1-t,2.6),lip=5*edge+.8*Math.exp(-Math.pow((r-50.6)/2.4,2))*edge,s=smooth(44.8,48.4,r);
+  var h=(2+.34*(vnoise(x*.22,y*.22)-.5))*(1-s)+lip*s+.05*(vnoise(x*1.3+7,y*1.3+3)-.5)+.018*(vnoise(x*4.2+1,y*4.2+9)-.5);
+  for(var b=0;b<BUBBLES.length;b++){var B=BUBBLES[b],q=Math.sqrt((x-B[0])*(x-B[0])+(y-B[1])*(y-B[1]));if(q<B[2])h-=B[3]*(1-q*q/(B[2]*B[2]));}
+  return [Math.max(0,h),clamp((E-r)/u+.5,0,1)];}
+function waxRing(x,y,u){var r=Math.sqrt((x-60)*(x-60)+(y-60)*(y-60)),q=Math.abs(r-43),w=1.5;if(q>w+u)return [0,0];var z=q/w;return [z<1?1.2*(1-z*z):0,clamp((w-q)/u+.5,0,1)];}
+/* the star's outline, as the door seal's: four points (30 units out) with curved sides, here 0.97 of its size */
+var STAR=null;
+function starPoly(){if(STAR)return STAR;var R=[],L=[],i,t;function bz(p0,p1,p2,p3,t){var m=1-t;return m*m*m*p0+3*m*m*t*p1+3*m*t*t*p2+t*t*t*p3;}
+  for(i=0;i<=14;i++){t=i/14;R.push([bz(60,61.75,65.5,70.69,t),bz(30,37.5,44.125,49.31,t)]);}
+  L=R.map(function(p){return [120-p[0],p[1]];});
+  function rot(p,k){var a=k*Math.PI/2,c=Math.cos(a),s=Math.sin(a),x=p[0]-60,y=p[1]-60;return [60+(x*c-y*s)*.97,60+(x*s+y*c)*.97];}
+  var out=[];for(var k=0;k<4;k++){R.forEach(function(p){out.push(rot(p,k));});L.slice().reverse().forEach(function(p){out.push(rot(p,k+1));});}STAR=out;return out;}
+function waxStar(x,y,u){var P=starPoly(),inside=false,dm=1e9,i,j;
+  for(i=0,j=P.length-1;i<P.length;j=i++){var a=P[i],b=P[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))inside=!inside;
+    var ex=b[0]-a[0],ey=b[1]-a[1],t=clamp(((x-a[0])*ex+(y-a[1])*ey)/(ex*ex+ey*ey||1),0,1),qx=a[0]+ex*t-x,qy=a[1]+ey*t-y,dd=qx*qx+qy*qy;if(dd<dm)dm=dd;}
+  var d=Math.sqrt(dm);return inside?[Math.min(d*.56,3.4),clamp(d/u+.5,0,1)]:[0,clamp(.5-d/u,0,1)];}
+function waxHeart(x,y,u){var r=Math.sqrt((x-60)*(x-60)+(y-60)*(y-60));if(r>7.8+u)return [0,0];
+  return [2.5*Math.sqrt(Math.max(0,1-r*r/60.84))+1.2*Math.sqrt(Math.max(0,1-r*r/19.36)),clamp((7.8-r)/u+.5,0,1)];}
+function waxParts(S){var px=Math.max(96,Math.min(360,Math.round(S*1.6*dpr()))),key=px;if(WAXC[key])return WAXC[key];
+  WAXC[key]={px:px,body:relief(px,waxBody,{tone:function(h){return .9+.1*clamp(h/5,0,1);}}),ring:relief(px,waxRing,{box:[14,106],ks:.55}),
+    star:relief(px,waxStar,{box:[28,92],ks:.6,shine:40}),heart:relief(px,waxHeart,{box:[50,70],ks:.7,shine:44})};return WAXC[key];}
+function angOf(e,own){try{var cs=getComputedStyle(e);if(own){var r=cs.rotate;return r&&r!=="none"?parseFloat(r)*Math.PI/180:0;}
+  var m=/matrix\(([^,]+),([^,]+)/.exec(cs.transform||"");return m?Math.atan2(parseFloat(m[2]),parseFloat(m[1])):0;}catch(x){return 0;}}
+function waxSeal(S){var W0=waxParts(S),root=mk("span","isl isl-wax");root.setAttribute("aria-hidden","true");root.style.setProperty("--S",S+"px");
+  var tilt=mk("span","isl-tilt"),idle=mk("span","isl-idle");tilt.appendChild(idle);root.appendChild(tilt);idle.appendChild(mk("span","isl-cast"));
+  var L={};["back","ring","star","heart"].forEach(function(nm){var l=mk("span","isl-layer isl-"+nm),c=D.createElement("canvas");c.width=c.height=W0.px;l.appendChild(c);idle.appendChild(l);
+    L[nm]={c:c,g:c.getContext("2d"),a:0};});
+  function paint(nm,a){var P=L[nm];P.a=a;if(nm==="back")waxBodyPaint(W0,P.g,a);else waxPaint(W0[nm],P.g,a);}
+  ["back","ring","star","heart"].forEach(function(nm){paint(nm,0);});
+  /* while a flourish turns the seal or a part of it, each part is lit again for the angle it stands at */
+  var until=0,run=false;function now(){return W.performance?performance.now():Date.now();}
+  function frame(){var fxEl=root.parentNode,a0=fxEl?angOf(fxEl,false):0;
+    ["back","ring","star","heart"].forEach(function(nm){var a=a0+(nm==="back"?0:angOf(L[nm].c,true));if(Math.abs(a-L[nm].a)>.006)paint(nm,a);});
+    if(now()<until)(W.requestAnimationFrame||setTimeout)(frame);else{run=false;root.classList.remove("isl-fl");}}
+  root.__relight=function(ms){until=Math.max(until,now()+(ms||1800));root.classList.add("isl-fl");if(!run){run=true;frame();}};
+  /* the gloss that follows the pointer across the wax, from the body's own normals */
+  var sh=mk("canvas","isl-sheen"),pend=null,R=W0.body;sh.width=sh.height=W0.px;idle.appendChild(sh);
+  root.__sheen=function(x,y){if(pend){pend=[x,y];return;}pend=[x,y];(W.requestAnimationFrame||setTimeout)(function(){var q=pend;pend=null;
+    var px=W0.px,g=sh.getContext("2d"),im=g.createImageData(px,px),d=im.data,Lp=n3(-.55+(q[0]-.5)*1.4,-.65+(q[1]-.5)*1.4,.62),Hv=n3(Lp[0],Lp[1],Lp[2]+1),N=R.N;
+    for(var i=0,m=R.ids.length;i<m;i++){var s2=N[i*3]*Hv[0]+N[i*3+1]*Hv[1]+N[i*3+2]*Hv[2];if(s2<=.9)continue;var k=R.ids[i]*4;d[k]=d[k+1]=d[k+2]=255;d[k+3]=Math.min(255,Math.pow(s2,38)*.55*255*R.A[i]);}
+    g.putImageData(im,0,0);});};
+  return root;}
 /* its flourishes, the seal's own (R175): the star spins, the ring pulses, the seal hops, wobbles or twirls, the stone beats */
 function sealKey(o){o=o||{};var box=mk("div","hx-seal hd-seal");box.setAttribute("data-ing-seal",o.sound||"heads");
   var k=mk("button","r175-seal hd-key");k.type="button";k.setAttribute("aria-label",o.label||"Ingenium's seal");
   var gl=mk("span","r175-glow"),rp=mk("span","r175-ripple"),fx=mk("span","r175-fx");gl.setAttribute("aria-hidden","true");rp.setAttribute("aria-hidden","true");
-  var seal=copySeal();if(seal){seal.style.setProperty("--S",(o.size||72)+"px");fx.appendChild(seal);}k.appendChild(gl);k.appendChild(fx);k.appendChild(rp);box.appendChild(k);
+  var seal=o.wax?waxSeal(o.size||72):copySeal();if(seal){seal.style.setProperty("--S",(o.size||72)+"px");fx.appendChild(seal);}var lean=o.lean==null?1:o.lean;k.appendChild(gl);k.appendChild(fx);k.appendChild(rp);box.appendChild(k);
   var busy=false,again=false,last="",n7=0,ends=[];
   function isl(){return k.querySelector(".isl");}
   function anim(e,f,op){if(!e||!e.animate)return null;try{var a=e.animate(f,op);ends.push(a.finished.then(function(){},function(){}));return a;}catch(x){return null;}}
-  function P(){var s=isl();return {fx:fx,glow:gl,ripple:rp,tilt:s&&s.querySelector(".isl-tilt"),cast:s&&s.querySelector(".isl-cast"),ring:s&&s.querySelector(".isl-ring > svg"),star:s&&s.querySelector(".isl-star > svg"),heart:s&&s.querySelector(".isl-heart > svg")};}
+  function P(){var s=isl();return {fx:fx,glow:gl,ripple:rp,tilt:s&&s.querySelector(".isl-tilt"),cast:s&&s.querySelector(".isl-cast"),ring:s&&s.querySelector(".isl-ring > svg,.isl-ring > canvas"),star:s&&s.querySelector(".isl-star > svg,.isl-star > canvas"),heart:s&&s.querySelector(".isl-heart > svg,.isl-heart > canvas")};}
   function glow(p,strong){try{p.glow.getAnimations().forEach(function(a){a.cancel();});}catch(e){}anim(p.glow,[{opacity:0,scale:.82},{opacity:strong?1:.85,scale:1.04,offset:.3},{opacity:0,scale:1.12}],{duration:still()?700:1000,easing:"ease-out"});}
   var SP="cubic-bezier(.2,.8,.25,1)",FL={
     spin:function(p,d){anim(p.star,[{rotate:"0deg"},{rotate:(d*360)+"deg"}],{duration:1150,easing:"cubic-bezier(.25,.9,.3,1)"});anim(p.ring,[{rotate:"0deg"},{rotate:(-d*360)+"deg"}],{duration:1300,easing:"cubic-bezier(.3,.8,.3,1)"});
@@ -307,11 +401,11 @@ function sealKey(o){o=o||{};var box=mk("div","hx-seal hd-seal");box.setAttribute
     try{FL[name](p,d);}catch(e){}var mine=ends.slice();function fin(){busy=false;if(again){again=false;play();}}if(!mine.length)fin();else Promise.all(mine).then(fin);}
   k.addEventListener("pointerenter",function(e){var s=isl();if(s&&e.pointerType==="mouse"&&!still())s.classList.add("hover");});
   k.addEventListener("pointermove",function(e){var s=isl();if(!s||e.pointerType!=="mouse"||still())return;var r=s.getBoundingClientRect();if(!r.width)return;
-    var x=clamp((e.clientX-r.left)/r.width,-.25,1.25),y=clamp((e.clientY-r.top)/r.height,-.25,1.25);s.style.setProperty("--ry",((x-.5)*28).toFixed(1)+"deg");s.style.setProperty("--rx",(-(y-.5)*24).toFixed(1)+"deg");},{passive:true});
+    var x=clamp((e.clientX-r.left)/r.width,-.25,1.25),y=clamp((e.clientY-r.top)/r.height,-.25,1.25);s.style.setProperty("--ry",((x-.5)*28*lean).toFixed(1)+"deg");s.style.setProperty("--rx",(-(y-.5)*24*lean).toFixed(1)+"deg");if(s.__sheen)s.__sheen(x,y);},{passive:true});
   k.addEventListener("pointerleave",function(){var s=isl();if(!s)return;s.classList.remove("hover","down");s.style.setProperty("--rx","0deg");s.style.setProperty("--ry","0deg");});
   k.addEventListener("pointerdown",function(){var s=isl();if(s&&!still())s.classList.add("down");},{passive:true});
   ["pointerup","pointercancel"].forEach(function(t){k.addEventListener(t,function(e){var s=isl();if(!s)return;s.classList.remove("down");if(e.pointerType!=="mouse")s.classList.remove("hover");},{passive:true});});
-  k.addEventListener("click",function(e){e.preventDefault();if(busy){again=true;glow(P());}else play();if(o.press)setTimeout(function(){try{o.press();}catch(x){}},still()?0:280);});
+  k.addEventListener("click",function(e){e.preventDefault();var sw=isl();if(sw&&sw.__relight&&!still())sw.__relight(2600);if(busy){again=true;glow(P());}else play();if(o.press)setTimeout(function(){try{o.press();}catch(x){}},still()?0:280);});
   return {box:box,key:k,play:play};}
 
 W.IngHeads={mount:mount,Spring:Spring,sealKey:sealKey,roomHeight:roomHeight,orb:orb,orbPaint:orbPaint,pal:pal,LOOK:LOOK,cast:cast,tube:tube,tubePath:tubePath,glass:glass,runs:runs,metal:metal,Loop:Loop,sound:sound,icon:icon,key:key,keyText:keyText,keyIcon:keyIcon,
@@ -325,7 +419,7 @@ function lower(s){s=String(s||"");return s.charAt(0).toLowerCase()+s.slice(1);}
 function clock(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),pm=h>=12,hh=h%12||12;
   var t=(hh<10?"0":"")+hh+":"+(m<10?"0":"")+m+" "+(pm?"PM":"AM");try{if(typeof fmtTime==="function"){var f=fmtTime(d);if(f)t=String(f);}}catch(e){}return t;}
 function partOfDay(){var h=new Date().getHours();return h<5?"the quiet hours":h<12?"the morning ahead":h<17?"the afternoon's work":h<21?"the evening":"the end of the day";}
-var FX={tx:0,ty:0,lt:Spring(70,12),le:Spring(70,12),ks:Spring(320,13),rip:0,C:null,cv:null,g:null,t:0,sw:0,amp:1,hold:false,hover:false,down:false,lift:0,loop:null,W:520,H:460,clockT:0,sig:""};
+var FX={tx:0,ty:0,lt:Spring(70,12),le:Spring(70,12),ks:Spring(320,13),rip:0,ka:0,kv:0,C:null,cv:null,g:null,t:0,sw:0,amp:1,hold:false,hover:false,down:false,lift:0,loop:null,W:520,H:460,clockT:0,sig:""};
 function fxGeom(){return {cx:212,cy:176,R:142,e:(9*Math.PI/180)+FX.le.x,F:900};}
 /* a point of the sphere's world (x right, y down, z toward you), turned by the sway about the upright axis, seen from a little above */
 function fxProj(G,x,y,z,turn){var c=Math.cos(turn),s=Math.sin(turn),X=x*c+z*s,Z=-x*s+z*c,ce=Math.cos(G.e),se=Math.sin(G.e),Y=y*ce+Z*se,Z2=-y*se+Z*ce,k=G.F/(G.F-Z2*G.R);
@@ -353,71 +447,92 @@ function fxBase(G){var d=dpr(),n=night(),sig=[d,n?1:0].join("|");if(BASE.sig===s
   var fx=rx*.17,fy=ry*.17;g.beginPath();g.ellipse(bx,by,fx,fy,0,0,TAU);g.fillStyle=n?"#3b2f5e":"#cbbde9";g.fill();
   g.strokeStyle=n?"rgba(0,0,0,.4)":"rgba(90,64,150,.3)";g.lineWidth=1;g.stroke();
   BASE.cv=cv;return cv;}
-/* the sphere of the day turns on its axis under a light that stays where it is: its meridians and its markings run across its face
-   and foreshorten toward its rim, as a globe's do; its axis leans toward you a little */
+/* the sphere of the day turns on the instrument's own upright axis, inside its rings, under a light that stays where it is. Its meridians,
+   its markings and Focus's mark (two rings and a point, inlaid on two opposite faces) lie on its surface: they go round with it, narrow
+   toward its rim and pass behind it, and the whole ball sways with the rings because it is drawn in their frame (BP: a point of the unit
+   ball to the page, with how squarely it faces you) */
 var SPOTS=[[.5,0,.16,1],[-.2,.9,.22,0],[.15,2.1,.13,1],[-.55,2.9,.18,0],[.62,3.8,.12,0],[-.05,4.6,.2,1],[.35,5.4,.15,0],[-.4,1.6,.11,1]];
-function globe(g,x,y,r,P,spin){var k=r/40,A=44*Math.PI/180,ca=Math.cos(A),sa=Math.sin(A),n=night(),i,j;
+var MARK=[[22*Math.PI/180,2.4*Math.PI/180],[12.4*Math.PI/180,2.4*Math.PI/180],[0,4.6*Math.PI/180]];
+function globe(g,x,y,r,P,spin,BP){var k=r/40,A=44*Math.PI/180,ca=Math.cos(A),sa=Math.sin(A),n=night(),i,j;
   function pt(px,py){var dx=px-60,dy=py-60;return [x+(dx*ca-dy*sa)*k,y+(dx*sa+dy*ca)*k];}
   var c=pt(48.8,60),f=pt(36,60),gr=g.createRadialGradient(f[0],f[1],0,c[0],c[1],59.2*k);
   gr.addColorStop(0,P.c0);gr.addColorStop(.16,P.c1);gr.addColorStop(.52,P.c2);gr.addColorStop(.86,P.c3);gr.addColorStop(1,P.c4);
   g.save();g.beginPath();g.arc(x,y,r,0,TAU);g.fillStyle=gr;g.fill();g.clip();
-  var tl=20*Math.PI/180,ct=Math.cos(tl),st=Math.sin(tl);
-  function P3(lat,lon){var cl=Math.cos(lat),X=r*cl*Math.sin(lon),Y0=-r*Math.sin(lat),Z0=r*cl*Math.cos(lon);return [x+X,y+Y0*ct-Z0*st,(Y0*st+Z0*ct)/r];}
-  SPOTS.forEach(function(S){var p=P3(S[0],S[1]+spin);if(p[2]<=0)return;var rr=S[2]*r,fx=Math.max(.15,Math.sqrt(Math.max(0,1-Math.pow((p[0]-x)/r,2)))),a=Math.min(1,p[2]*1.6);
+  function S3(lat,lon){var cl=Math.cos(lat),a=lon+spin;return BP(cl*Math.sin(a),-Math.sin(lat),cl*Math.cos(a));}
+  SPOTS.forEach(function(S){var p=S3(S[0],S[1]);if(p[2]<=0)return;var rr=S[2]*r,fx=Math.max(.15,Math.sqrt(Math.max(0,1-Math.pow((p[0]-x)/r,2)))),a=Math.min(1,p[2]*1.6);
     g.save();g.translate(p[0],p[1]);g.scale(fx,1);var sg=g.createRadialGradient(0,0,0,0,0,rr);sg.addColorStop(0,S[3]?"rgba(255,255,255,"+(.22*a)+")":"rgba(26,8,64,"+(.26*a)+")");sg.addColorStop(1,"rgba(255,255,255,0)");
     g.fillStyle=sg;g.beginPath();g.arc(0,0,rr,0,TAU);g.fill();g.restore();});
   g.lineWidth=Math.max(.6,r*.012);g.lineCap="round";
   /* each line drawn in one stroke, as bright as its nearest part faces you */
-  for(i=0;i<10;i++){var lon=i*TAU/10+spin,prev=null,face=0,open=false;g.beginPath();for(j=-12;j<=12;j++){var q=P3(j/12*Math.PI*.5,lon);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);if(q[2]>face)face=q[2];}else open=false;}
+  for(i=0;i<10;i++){var lon=i*TAU/10,face=0,open=false;g.beginPath();for(j=-12;j<=12;j++){var q=S3(j/12*Math.PI*.5,lon);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);if(q[2]>face)face=q[2];}else open=false;}
     if(face>0){g.strokeStyle=n?"rgba(236,226,255,"+(.2*face)+")":"rgba(255,255,255,"+(.26*face)+")";g.stroke();}}
-  [[0,.2],[.5,.12],[-.5,.12]].forEach(function(L){var open=false;g.beginPath();for(j=0;j<=36;j++){var q=P3(L[0],j/36*TAU);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);}else open=false;}
+  [[0,.2],[.5,.12],[-.5,.12]].forEach(function(L){var open=false;g.beginPath();for(j=0;j<=36;j++){var q=S3(L[0],j/36*TAU);if(q[2]>0){if(!open){g.moveTo(q[0],q[1]);open=true;}else g.lineTo(q[0],q[1]);}else open=false;}
     g.strokeStyle=n?"rgba(236,226,255,"+L[1]+")":"rgba(255,255,255,"+(L[1]*1.2)+")";g.stroke();});
+  /* the mark, on two opposite faces, so one of them is always coming round */
+  [0,Math.PI].forEach(function(lon0){markOn(g,x,y,r,.16,lon0+spin,BP);});
   var p1=pt(18,60),p2=pt(102,60),tg=g.createLinearGradient(p1[0],p1[1],p2[0],p2[1]);tg.addColorStop(0,rgba(P.csh,0));tg.addColorStop(.4,rgba(P.csh,0));tg.addColorStop(.76,rgba(P.csh,P.ct1));tg.addColorStop(1,rgba(P.csh,P.ct2));
   g.fillStyle=tg;g.fillRect(x-r,y-r,2*r,2*r);var eg=g.createRadialGradient(x,y,0,x,y,r);eg.addColorStop(0,rgba(P.csh,0));eg.addColorStop(.7,rgba(P.csh,0));eg.addColorStop(.93,rgba(P.csh,P.ce1));eg.addColorStop(1,rgba(P.csh,P.ce2));
   g.fillStyle=eg;g.fillRect(x-r,y-r,2*r,2*r);ell(g,x,y-r*.66,r*.5,r*.17,"#efe3ff",.18);g.restore();
   var h=pt(41,60);g.save();g.translate(h[0],h[1]);g.rotate(A);g.scale(9.5*k,13.5*k);var hg=g.createRadialGradient(0,0,0,0,0,1);
   hg.addColorStop(0,"rgba(255,255,255,.85)");hg.addColorStop(.4,"rgba(255,255,255,.32)");hg.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=hg;g.beginPath();g.arc(0,0,1,0,TAU);g.fill();g.restore();}
-function fxMark(g,x,y,m,a){/* Focus's mark: two rings and a point, standing above the face (a violet and a lavender copy under the white one) */
-  var L=[[1.25,1.7,night()?"rgba(20,6,48,.55)":"rgba(46,23,100,.45)"],[.6,.85,"#cdb8ff"],[0,0,"#ffffff"]];
-  g.save();g.globalAlpha=a==null?1:a;L.forEach(function(l){var ox=l[0]*m*.06,oy=l[1]*m*.06;g.strokeStyle=l[2];g.fillStyle=l[2];g.lineWidth=m*.085;
-    g.beginPath();g.arc(x+ox,y+oy,m*.42,0,TAU);g.stroke();g.beginPath();g.arc(x+ox,y+oy,m*.235,0,TAU);g.stroke();g.beginPath();g.arc(x+ox,y+oy,m*.085,0,TAU);g.fill();});g.restore();}
+/* Focus's mark laid on the ball: each ring is the band between two small circles of the sphere about the mark's centre (latitude lat,
+   longitude lon), so it narrows as it turns away; a point that has gone round the rim is held on the rim. A violet and a lavender copy sit
+   under the white one, as on the flat mark, nearer when the mark faces you and closing up as it turns away */
+function markOn(g,x,y,r,lat,lon,BP){var cl=Math.cos(lat),sl=Math.sin(lat),co=Math.cos(lon),so=Math.sin(lon);
+  var C=[cl*so,-sl,cl*co],E=[co,0,-so],N=[-sl*so,-cl,-sl*co],fc=BP(C[0],C[1],C[2])[2];if(fc<-.44)return;
+  function circ(rho,nn){var out=[],cr=Math.cos(rho),sr=Math.sin(rho);for(var i=0;i<=nn;i++){var u=i/nn*TAU,cu=Math.cos(u)*sr,su=Math.sin(u)*sr;
+    var q=BP(C[0]*cr+E[0]*cu+N[0]*su,C[1]*cr+E[1]*cu+N[1]*su,C[2]*cr+E[2]*cu+N[2]*su);
+    if(q[2]<0){var dx=q[0]-x,dy=q[1]-y,L=Math.sqrt(dx*dx+dy*dy)||1;q=[x+dx/L*r,y+dy/L*r,q[2]];}out.push(q);}return out;}
+  var shapes=MARK.map(function(m){return m[0]?[circ(m[0]+m[1],40),circ(m[0]-m[1],40)]:[circ(m[1],24)];});
+  function fillAt(ox,oy){g.beginPath();shapes.forEach(function(sh){var o=sh[0],ii;g.moveTo(o[0][0]+ox,o[0][1]+oy);for(ii=1;ii<o.length;ii++)g.lineTo(o[ii][0]+ox,o[ii][1]+oy);g.closePath();
+      if(sh[1]){var q=sh[1];g.moveTo(q[q.length-1][0]+ox,q[q.length-1][1]+oy);for(ii=q.length-2;ii>=0;ii--)g.lineTo(q[ii][0]+ox,q[ii][1]+oy);g.closePath();}});g.fill();}
+  var s=r*.92*.06*.75*(.35+.65*Math.max(0,fc));g.save();g.globalAlpha=clamp(.55+fc,0,1);
+  g.fillStyle=night()?"rgba(20,6,48,.55)":"rgba(46,23,100,.45)";fillAt(1.25*s,1.7*s);g.fillStyle="#cdb8ff";fillAt(.6*s,.85*s);g.fillStyle="#ffffff";fillAt(0,0);g.restore();}
+/* one period gears the whole instrument (PERIOD, a turn of the ball): the moon goes round its ring twice in it, the same way as the ball's
+   face, and the whole sways once in it; nothing else turns on its own */
+var PERIOD=24000;
 function fxDraw(){var C=FX.C,cv=FX.cv;if(!cv)return;var d=dpr(),Wd=Math.round(FX.W*d),Hd=Math.round(FX.H*d);if(cv.width!==Wd||cv.height!==Hd){cv.width=Wd;cv.height=Hd;}
   var g=FX.g||(FX.g=cv.getContext("2d"));g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,FX.W,FX.H);
-  var G=fxGeom(),turn=FX.sw,P=pal("focus"),M=metal(),Mf=metal("fine"),Mb=metal("band"),n=night();
+  var G=fxGeom(),turn=FX.sw,P=pal("focus"),M=metal(),Mf=metal("fine"),Mb=metal("band"),n=night(),spin=FX.t/PERIOD*TAU+FX.ka;
   g.drawImage(fxBase(G),0,0,FX.W,FX.H);
   /* the stem, from the knot under the meridian to the plinth */
   var s0=fxProj(G,0,1.13,0,0),s1=fxProj(G,0,1.6,0,0);tubePath(g,[s0,s1],G.R*.048,M,.9);
+  /* the ball, lifted a little under the pointer and knocked when pressed, in the rings' frame */
+  var lift=FX.lift,sc=1+lift*.03+FX.ks.x*.05-(FX.down?.02:0),br=G.R*.43*sc,bx=G.cx,by=G.cy-lift*4;
+  function BP(x,y,z){var p=fxProj(G,x*.43,y*.43,z*.43,turn);return [bx+(p[0]-G.cx)*sc,by+(p[1]-G.cy)*sc,p[2]/.43];}
   /* everything that turns, sorted far to near */
-  var items=[],ballZ=fxProj(G,0,0,0,turn)[2];
+  var items=[],ballZ=0;
   function addRing(pts,w,Mx,tone){runs(pts,ballZ,true).forEach(function(r){items.push({z:r.z,f:function(){tubePath(g,r.p,w*r.k,Mx,tone);}});});}
   addRing(fxRing(G,1,Math.PI/2,0,turn,96),G.R*.062,M,1);                              /* the meridian, upright, facing you */
   addRing(fxRing(G,.085,Math.PI/2,0,turn,28,[0,1.05,0]),G.R*.04,M,.9);             /* the knot that holds it on the stem */
-  var tilt=-7*Math.PI/180;addRing(fxRing(G,1.02,tilt,3*Math.PI/180,turn,96),G.R*.03,Mf,.95);   /* the ring of the hours, nearly level */
-  var prec=turn+FX.t/48000*TAU;addRing(fxRing(G,.93,8*Math.PI/180,-26*Math.PI/180,prec,96),G.R*.046,Mb,1);   /* the band that crosses it, turning about the upright */
-  /* the marks they carry round: twelve hours on the ring, and the band's fine ticks the other way */
+  var EC=-23.4*Math.PI/180;
+  addRing(fxRing(G,1.02,0,0,turn,96),G.R*.03,Mf,.95);                                 /* the ring of the hours, level */
+  addRing(fxRing(G,.93,0,EC,turn,96),G.R*.046,Mb,1);                                  /* the band of the year, at the slope of the earth's axis */
+  /* the axle the ball turns on, from pole to meridian, above and below it */
+  [-1,1].forEach(function(sd){var a=BP(0,sd,0),b=fxProj(G,0,sd,0,turn),z=(b[2]+a[2]*.43)/2;items.push({z:z,f:function(){tubePath(g,[a,b],G.R*.024,Mf,.95);}});});
+  /* the marks they carry: twelve hours on the ring, and the band's fine ticks */
   function onRing(rad,a,b,tn,u){var ca2=Math.cos(a),sa2=Math.sin(a),cb2=Math.cos(b),sb2=Math.sin(b),x0=rad*Math.cos(u),z0=rad*Math.sin(u),y1=-z0*sa2,z1=z0*ca2;return fxProj(G,x0*cb2-y1*sb2,x0*sb2+y1*cb2,z1,tn);}
-  var hr=FX.t/30000*TAU;for(var hh=0;hh<12;hh++){(function(hh){var p=onRing(1.02,tilt,3*Math.PI/180,turn,hh/12*TAU+hr);items.push({z:p[2]+.001,f:function(){var big=hh%3===0,rr=(big?3.2:2.1)*p[3];
+  for(var hh=0;hh<12;hh++){(function(hh){var p=onRing(1.02,0,0,turn,hh/12*TAU);items.push({z:p[2]+.001,f:function(){var big=hh%3===0,rr=(big?3.2:2.1)*p[3];
     var hg=g.createRadialGradient(p[0]-rr*.3,p[1]-rr*.3,0,p[0],p[1],rr);hg.addColorStop(0,"#ffffff");hg.addColorStop(1,night()?"#9a7ad8":"#8a5fd6");g.fillStyle=hg;g.beginPath();g.arc(p[0],p[1],rr,0,TAU);g.fill();}});})(hh);}
-  var br=-FX.t/40000*TAU;for(var bt=0;bt<24;bt++){(function(bt){var u=bt/24*TAU+br,p=onRing(.93,8*Math.PI/180,-26*Math.PI/180,prec,u),q=onRing(.93,8*Math.PI/180,-26*Math.PI/180,prec,u+.02);
+  for(var bt=0;bt<24;bt++){(function(bt){var u=bt/24*TAU,p=onRing(.93,0,EC,turn,u),q=onRing(.93,0,EC,turn,u+.02);
     items.push({z:p[2]+.002,f:function(){g.strokeStyle=night()?"rgba(240,230,255,.75)":"rgba(255,255,255,.95)";g.lineWidth=1.4*p[3];g.lineCap="round";g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke();}});})(bt);}
-  /* the moon on the ring of the hours */
-  var mu=FX.t/12000*TAU,ca=Math.cos(tilt),sa=Math.sin(tilt),mx=1.02*Math.cos(mu+2.4),mz=1.02*Math.sin(mu+2.4),my=-mz*sa,mz1=mz*ca,cb=Math.cos(3*Math.PI/180),sb=Math.sin(3*Math.PI/180);
-  var mp=fxProj(G,mx*cb-my*sb,mx*sb+my*cb,mz1,turn);items.push({z:mp[2],f:function(){var r=G.R*.075*mp[3],im=orb(Math.round(r),P,"faint");g.drawImage(im,mp[0]-im.__s/2,mp[1]-im.__s/2,im.__s,im.__s);}});
-  /* the sphere of the day, with its mark standing above its face */
-  items.push({z:ballZ,f:function(){var r=G.R*.43,lift=FX.lift,bx=G.cx,by=G.cy-lift*4;r*=1+lift*.03+FX.ks.x*.05-(FX.down?.02:0);
-    cast(g,bx+r*.1,G.cy+r*1.02,r*.7*(1-lift*.08),r*.16,.12+lift*.03);globe(g,bx,by,r,P,FX.t/14000*TAU);
-    /* the knock's ripple, in the sphere's purple, as Home's orbs knock before their room opens */
+  /* the moon on the ring of the hours: twice round in a turn of the ball, passing in front the way the ball's face does */
+  var mu=-2*spin+2.4,mp=onRing(1.02,0,0,turn,mu);items.push({z:mp[2],f:function(){var r=G.R*.075*mp[3],im=orb(Math.round(r),P,"faint");g.drawImage(im,mp[0]-im.__s/2,mp[1]-im.__s/2,im.__s,im.__s);}});
+  /* the sphere of the day */
+  items.push({z:ballZ,f:function(){cast(g,bx+br*.1,G.cy+br*1.02,br*.7*(1-lift*.08),br*.16,.12+lift*.03);globe(g,bx,by,br,P,spin,BP);
+    /* the knock's ripple, in the sphere's purple, as Home's orbs knock */
     if(FX.rip){var kk=(performance.now()-FX.rip)/760;if(kk<1){g.save();g.strokeStyle=night()?"rgba(201,178,242,"+(.6*(1-kk))+")":"rgba(106,63,181,"+(.5*(1-kk))+")";g.lineWidth=2.6*(1-kk)+.4;
-      g.beginPath();g.arc(bx,by,r*(1.04+.85*kk),0,TAU);g.stroke();g.restore();}else FX.rip=0;}
-    var par=Math.sin(turn)*r*.2;fxMark(g,bx+par,by,r*.92,1);}});
+      g.beginPath();g.arc(bx,by,br*(1.04+.85*kk),0,TAU);g.stroke();g.restore();}else FX.rip=0;}}});
   items.sort(function(a,b){return a.z-b.z;});items.forEach(function(it){it.f();});}
-/* it never stops while it can be seen: the sphere turns, the rings and the moon go round, the whole sways on two slow swells; under the
-   pointer it leans toward it on a spring (its sway quietened, not stopped), and comes back when the pointer leaves */
-function fxStep(dt){if(still()){FX.amp=0;FX.sw=0;FX.lift=FX.hover?1:0;FX.le.x=0;fxDraw();return false;}
+/* it never stops while it can be seen: the ball turns, the moon goes round, the whole sways on one slow swell in the same period; under the
+   pointer it leans toward it on a spring (its sway quietened, not stopped) and comes back when the pointer leaves; a press knocks it and
+   flicks the ball round, as a hand would, before it settles back to its pace */
+function fxStep(dt){if(still()){FX.amp=0;FX.sw=0;FX.lift=FX.hover?1:0;FX.le.x=0;FX.kv=0;fxDraw();return false;}
   var sp=motion()==="full"?1.35:1,goal=FX.hold?.35:1;FX.t+=dt*sp;
-  FX.amp+=(goal-FX.amp)*Math.min(1,dt/500);var T=FX.t/1000;
-  var amb=FX.amp*((10*Math.sin(T/19*TAU)+4*Math.sin(T/7.3*TAU+1.3))*Math.PI/180);
-  FX.sw=amb+FX.lt.to(FX.tx*30*Math.PI/180,dt);FX.le.to(FX.ty*7*Math.PI/180,dt);FX.ks.to(0,dt);
+  FX.amp+=(goal-FX.amp)*Math.min(1,dt/500);
+  var amb=FX.amp*9*Math.PI/180*Math.sin(FX.t/PERIOD*TAU);
+  FX.sw=amb+FX.lt.to(FX.tx*22*Math.PI/180,dt);FX.le.to(FX.ty*6*Math.PI/180,dt);FX.ks.to(0,dt);
+  FX.ka+=FX.kv*dt/1000;FX.kv*=Math.exp(-dt/650);if(Math.abs(FX.kv)<.002)FX.kv=0;
   var lg=FX.hover?1:0;FX.lift+=(lg-FX.lift)*Math.min(1,dt/110);
   fxDraw();return true;}
 function fxRun(){if(!FX.C||!FX.C.shown){if(FX.loop)FX.loop.stop();return;}if(still()){if(FX.loop)FX.loop.stop();fxDraw();return;}if(!FX.loop)FX.loop=Loop(fxStep);FX.loop.start();}
@@ -436,13 +551,13 @@ FX.C=mount({page:"page-focus",label:"Focus",eyebrow:"Focus · the hours of your 
     hit.addEventListener("pointerenter",function(e){if(e.pointerType!=="touch"){FX.hover=true;fxRun();}});
     hit.addEventListener("pointerleave",function(){FX.hover=false;FX.down=false;fxRun();});
     hit.addEventListener("pointerdown",function(){FX.down=true;fxRun();});["pointerup","pointercancel"].forEach(function(t){hit.addEventListener(t,function(){FX.down=false;fxRun();});});
-    hit.addEventListener("click",function(e){e.preventDefault();if(!still()){FX.ks.v=-9;FX.rip=performance.now();fxRun();}setTimeout(fxToday,still()?0:280);});
+    hit.addEventListener("click",function(e){e.preventDefault();if(!still()){FX.ks.v=-9;FX.kv+=3.4;FX.rip=performance.now();fxRun();}setTimeout(fxToday,still()?0:280);});
     hit.addEventListener("focus",function(){FX.hold=true;fxRun();});hit.addEventListener("blur",function(){FX.hold=false;fxRun();});
     C.scene.addEventListener("pointerenter",function(e){if(e.pointerType!=="touch"){FX.hold=true;fxRun();}});
     C.scene.addEventListener("pointermove",function(e){if(e.pointerType==="touch")return;var r=C.box.getBoundingClientRect();if(!r.width)return;
       FX.tx=clamp((e.clientX-(r.left+r.width*212/520))/(r.width*.42),-1,1);FX.ty=clamp((e.clientY-(r.top+r.height*176/460))/(r.height*.5),-1,1);},{passive:true});
     C.scene.addEventListener("pointerleave",function(){FX.tx=0;FX.ty=0;if(D.activeElement!==hit){FX.hold=false;fxRun();}});
-    C.hintSet(["Point at the sphere to still it; press it to open Today."]);},
+    C.hintSet(["Point at the sphere and it turns to you; press it to open Today."]);},
   enter:function(C){fxTick();if(!FX.clockT)FX.clockT=setInterval(function(){if(FX.C&&FX.C.shown)fxTick();},20000);},
   leave:function(){if(FX.loop)FX.loop.stop();},
   paint:function(){fxTick();fxDraw();},

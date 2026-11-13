@@ -1,175 +1,461 @@
 <style id="r289-css">
-/* ============ R289 · BUILD'S HEAD: THE PRISM OF YOUR PAGE (Ingenium 6.93, 12 November 2026; held for the owner's live preview) ============
-   The owner's answer (12 November 2026) on what the Build page should get: "A 3D head like the rest". On the light of the first live
-   previews: "I want the light passing through the prism, I want to see that beautiful 3D visual rendering of that"; "The light through the
-   prism is genuinely horrible"; then, choosing: "real glowing light drawn with your computer's graphics chip (soft bloom, light pooling, a
-   true spectrum)". And for every head: movement "like Home's orrery and seal", leaning toward the pointer, never freezing.
-   - Build's head (modules/r284.js IngHeads): its title and words, Run your page (the page's own Run key, pressed for you) and Load a
-     sample, and a line: your code on one side, your page running on the other.
-   - The light is drawn by the graphics chip (WebGL), every pixel of it: a beam of white light, your code, with a soft bloom and pulses
-     running along it; it bends where it enters the glass and where it leaves (Snell's law, at the faces as they stand at that moment),
-     glows as it crosses, and leaves as a true spectrum, red to violet, shimmering with light running outward; light pools on the plinth
-     under the glass, and the points where it enters and leaves flare. Where the web view has no WebGL, a simpler drawing stands in.
-   - The glass is drawn on either side of the light (its far faces behind it, its near faces, edges and a glint over it), standing on a
-     turned plinth. It never stops: it turns gently on two slow swells; under the pointer it leans toward it on a spring, and the
-     spectrum swings with the glass; pressed, it knocks (it dips and springs back) and a bright pulse runs through, and your page runs.
-   - Beside it, how many lines your code has and whether the page runs as you type. Minimal motion and reduced motion keep it still,
-     drawn once. It is drawn only while it can be seen. */
+/* ============ R289 · BUILD'S HEAD: THE PRISM OF YOUR PAGE (Ingenium 6.93; drawn again 13 November 2026, held for the owner's live preview) ============
+   The owner's answer (12 November 2026) on what the Build page should get: "A 3D head like the rest". On the light of the live previews:
+   "I want the light passing through the prism, I want to see that beautiful 3D visual rendering of that"; "The light through the prism
+   is genuinely horrible"; choosing "real glowing light drawn with your computer's graphics chip (soft bloom, light pooling, a true
+   spectrum)"; and on the drawing that followed (13 November 2026): "The prism light is honestly the worst thing that I have seen yet
+   and it is genuinely a truly ugly primitive design and animation". So the whole scene is now one picture drawn by the graphics chip
+   (WebGL), ray by ray, as a camera would see it:
+   - a prism of solid glass (a triangle of 1.6 units a side, 1.04 deep) with rounded edges, standing on a turned plinth: each ray that
+     meets the glass is reflected (Schlick's approximation of Fresnel's equations) and bent at the face it enters and the face it
+     leaves (Snell's law, with total internal reflection where it falls), separately for red, green and blue (so the glass fringes
+     with colour at its edges), and dimmed a little by the glass's own violet tint over the length it travels inside;
+   - a beam of white light that enters the left face, is bent, crosses the glass (glowing faintly inside it) and leaves the right face
+     as a fan: the path is worked out each frame by Snell's law with a refractive index that varies with wavelength (Cauchy's form,
+     its spread widened about five times for the eye), and every point of the fan takes the colour of its own wavelength through the
+     eye's colour matching functions (the CIE 1931 observer, in Wyman, Sloan and Shirley's analytic fit, Journal of Computer Graphics
+     Techniques, 2013), so it runs red to violet without bands; where the fan meets the plinth, the light pools there as a spectrum;
+   - motes of dust drift through the beam and the fan and catch their light; a soft glow surrounds the beam and the points where it
+     enters and leaves. By night the light is added as light; by day it colours what it falls on, so it reads on a pale page;
+   - a turned plinth, its top cut in fine rings with a highlight across them, engraved with a ring of ticks, lit from the upper left,
+     with the glass's lighter shadow and a soft darkening where the glass stands.
+   It never stops: the camera sways round the prism on one slow period of twenty-four seconds (as Focus's instrument), and the beam's
+   angle drifts in the same period, so the spectrum slides across the plinth; under the pointer the view leans toward it on a spring
+   and the light brightens; pressed, it knocks and a pulse of light runs along the beam, through the glass and out across the fan,
+   and your page runs. Beside it, how many lines your code has and whether the page runs as you type. Minimal and reduced motion keep
+   it still, drawn once. It is drawn only while it can be seen, at a resolution that falls if the computer cannot keep up. Where the
+   web view has no WebGL, a simple drawing stands in. */
 #page-build.hd-on > .hd-head .hd-tag{right:6px;top:30px;max-width:200px}
-#page-build.hd-on .hd-hit{left:150px;top:112px;width:220px;height:230px;border-radius:24px}
-#page-build .pr-gl{mix-blend-mode:normal}
-body[data-theme="night"] #page-build .pr-gl{mix-blend-mode:screen}
+#page-build.hd-on .hd-hit{border-radius:24px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p289"]="started";}catch(_){}
 /* R289 · Build's head, the prism of your page: see the note at the top of its styles */
 (function(){"use strict";
 if(window.__r289)return;window.__r289=1;
-var D=document,W=window,TAU=Math.PI*2,H=null;
-var B={C:null,back:null,glc:null,front:null,fb:null,ff:null,t:0,sw:0,amp:1,hold:false,hover:false,down:false,lift:0,loop:null,W:520,H:460,flare:0,tx:0,lt:null,ks:null};
-var G={cx:258,cy:262,e:10*Math.PI/180,F:1200},PY=330;
+var D=document,W=window,TAU=Math.PI*2,H=null,PERIOD=24000;
+var B={C:null,cv:null,t:0,amp:1,hold:false,hover:false,down:false,lift:0,loop:null,W:520,H:460,flare:0,tx:0,ty:0,ly:null,lp:null,kn:null,q:1,slow:0,fast:0,path:null,hit:null};
 function $(id){return D.getElementById(id);}
 function mk(t,c,txt){var e=D.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
-function proj(x,y,z,turn){var c=Math.cos(turn),s=Math.sin(turn),X=x*c+z*s,Z=-x*s+z*c,ce=Math.cos(G.e),se=Math.sin(G.e),Y=y*ce+Z*se,Z2=-y*se+Z*ce,k=G.F/(G.F-Z2);return [G.cx+X*k,G.cy+Y*k,Z2,k];}
-function sz(cv){var d=H.dpr(),w=Math.round(B.W*d),h=Math.round(B.H*d);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}return d;}
-/* ---------- the plinth, drawn once for the Display ---------- */
-var PL={sig:"",cv:null};
-function plinth(){var d=H.dpr(),n=H.night(),sig=d+"|"+(n?1:0);if(PL.sig===sig)return PL.cv;PL.sig=sig;var cv=PL.cv||D.createElement("canvas");cv.width=Math.round(B.W*d);cv.height=Math.round(B.H*d);
-  var g=cv.getContext("2d");g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,B.W,B.H);var bx=G.cx,by=PY,rx=140,ry=rx*Math.sin(G.e)*1.35,th=22,i;
-  H.cast(g,bx+8,by+th+ry*.7,rx*1.15,ry*1.7,n?.24:.16);
-  var sg=g.createLinearGradient(bx-rx,0,bx+rx,0);if(n){sg.addColorStop(0,"#07050c");sg.addColorStop(.24,"#221a34");sg.addColorStop(.44,"#2f2647");sg.addColorStop(.72,"#18121f");sg.addColorStop(1,"#060409");}
-  else{sg.addColorStop(0,"#9c8ac2");sg.addColorStop(.24,"#d9cfee");sg.addColorStop(.44,"#efe9f8");sg.addColorStop(.72,"#c6b8e3");sg.addColorStop(1,"#8f7cb9");}
-  g.beginPath();g.ellipse(bx,by,rx,ry,0,0,Math.PI);g.lineTo(bx-rx,by+th);g.ellipse(bx,by+th,rx,ry,0,Math.PI,0,true);g.closePath();g.fillStyle=sg;g.fill();
-  var vg=g.createLinearGradient(0,by,0,by+th+ry);vg.addColorStop(0,"rgba(255,255,255,0)");vg.addColorStop(1,n?"rgba(0,0,0,.45)":"rgba(70,48,130,.22)");g.fillStyle=vg;g.fill();
-  var fg=g.createRadialGradient(bx-rx*.3,by-ry*.9,rx*.05,bx,by,rx);if(n){fg.addColorStop(0,"#2e2446");fg.addColorStop(.6,"#1d1630");fg.addColorStop(1,"#151025");}else{fg.addColorStop(0,"#ffffff");fg.addColorStop(.6,"#f1edf9");fg.addColorStop(1,"#e2daf1");}
-  g.beginPath();g.ellipse(bx,by,rx,ry,0,0,TAU);g.fillStyle=fg;g.fill();
-  g.save();g.beginPath();g.ellipse(bx,by,rx,ry,0,0,TAU);g.clip();g.lineWidth=.7;for(var f=.16;f<.9;f+=.026){g.beginPath();g.ellipse(bx,by,rx*f,ry*f,0,0,TAU);g.strokeStyle=n?"rgba(205,184,240,.04)":"rgba(90,64,150,.06)";g.stroke();}g.restore();
-  for(i=0;i<96;i++){var u=i/96*TAU,lng=i%8===0;g.beginPath();g.moveTo(bx+Math.cos(u)*rx*(lng?.88:.91),by+Math.sin(u)*ry*(lng?.88:.91));g.lineTo(bx+Math.cos(u)*rx*.955,by+Math.sin(u)*ry*.955);
-    g.strokeStyle=n?"rgba(205,184,240,"+(lng?.4:.22)+")":"rgba(84,60,140,"+(lng?.38:.2)+")";g.lineWidth=lng?1.1:.8;g.stroke();}
-  g.beginPath();g.ellipse(bx,by,rx-.6,ry-.5,0,Math.PI*1.05,Math.PI*1.95);g.strokeStyle=n?"rgba(205,184,240,.2)":"#ffffff";g.lineWidth=1.2;g.stroke();
-  g.beginPath();g.ellipse(bx,by+1.2,rx-.4,ry,0,.05,Math.PI-.05);g.strokeStyle=n?"rgba(205,184,240,.16)":"rgba(255,255,255,.9)";g.lineWidth=1;g.stroke();
-  PL.cv=cv;return cv;}
-/* ---------- the light's path, bent as glass bends it ---------- */
-var TRI=[[0,-136],[-110,58],[110,58]],DEPTH=46,N_RED=1.48,N_VIOLET=1.56;
-function norm(v){var l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];}
-function dot(a,b){return a[0]*b[0]+a[1]*b[1];}
-function refract(d,nOut,eta){var ci=-dot(nOut,d),k=1-eta*eta*(1-ci*ci);if(k<0)return null;var bb=eta*ci-Math.sqrt(k);return norm([eta*d[0]+bb*nOut[0],eta*d[1]+bb*nOut[1]]);}
-function hit(p,d,a,b){var ex=b[0]-a[0],ey=b[1]-a[1],den=d[0]*ey-d[1]*ex;if(Math.abs(den)<1e-6)return null;var t=((a[0]-p[0])*ey-(a[1]-p[1])*ex)/den,u=((a[0]-p[0])*d[1]-(a[1]-p[1])*d[0])/den;
-  if(t<=0||u<0||u>1)return null;return {t:t,u:u,x:p[0]+d[0]*t,y:p[1]+d[1]*t};}
-function outward(a,b,c){var n=norm([b[1]-a[1],-(b[0]-a[0])]),m=[(a[0]+b[0])/2-c[0],(a[1]+b[1])/2-c[1]];return dot(n,m)>0?n:[-n[0],-n[1]];}
-function path(M){var S=[G.cx-292,G.cy+64],u=.52,P1=[M[0][0]+(M[1][0]-M[0][0])*u,M[0][1]+(M[1][1]-M[0][1])*u],din=norm([P1[0]-S[0],P1[1]-S[1]]);
-  var n1=outward(M[0],M[1],M[2]),n2=outward(M[0],M[2],M[1]),tin=refract(din,n1,1/1.52)||din,h2=hit(P1,tin,M[0],M[2])||hit(P1,tin,M[1],M[2]),P2=h2?[h2.x,h2.y]:[M[2][0]-20,M[2][1]-60];
-  var r=refract(tin,[-n2[0],-n2[1]],N_RED),v=refract(tin,[-n2[0],-n2[1]],N_VIOLET)||r;r=r||v||[1,0];v=v||r;
-  /* the true spread of glass is a few degrees; opened about its middle so the eye sees the colours, each keeping its side */
-  var ar=Math.atan2(r[1],r[0]),av=Math.atan2(v[1],v[0]),mid=(ar+av)/2,half=Math.max(.15,Math.abs(av-ar)*3.4)/2,sgn=av>=ar?1:-1;
-  return {S:S,P1:P1,P2:P2,din:din,tin:tin,red:mid-sgn*half,violet:mid+sgn*half};}
-/* ---------- the light, drawn by the graphics chip ---------- */
-var FS=["#ifdef GL_FRAGMENT_PRECISION_HIGH","precision highp float;","#else","precision mediump float;","#endif",
-"uniform vec2 uRes;uniform float uDpr;uniform vec2 uS;uniform vec2 uP1;uniform vec2 uP2;uniform vec2 uA;uniform vec2 uB;uniform vec2 uC;",
-"uniform float uRed;uniform float uViolet;uniform float uTime;uniform float uFlare;uniform float uDay;uniform vec4 uPool;",
-"float seg(vec2 p,vec2 a,vec2 b,out float h){vec2 pa=p-a,ba=b-a;h=clamp(dot(pa,ba)/dot(ba,ba),0.0,1.0);return length(pa-ba*h);}",
-"float side(vec2 p,vec2 a,vec2 b){return (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x);}",
-/* the visible spectrum, 400 to 700 nanometres, in the classic piecewise approximation, softened at its two ends */
-"vec3 spectral(float w){vec3 c=vec3(0.0);",
-" if(w<440.0){c=vec3(-(w-440.0)/60.0,0.0,1.0);}else if(w<490.0){c=vec3(0.0,(w-440.0)/50.0,1.0);}else if(w<510.0){c=vec3(0.0,1.0,-(w-510.0)/20.0);}",
-" else if(w<580.0){c=vec3((w-510.0)/70.0,1.0,0.0);}else if(w<645.0){c=vec3(1.0,-(w-645.0)/65.0,0.0);}else{c=vec3(1.0,0.0,0.0);}",
-" float f=w<420.0?0.35+0.65*(w-380.0)/40.0:(w>650.0?0.35+0.65*(700.0-w)/50.0:1.0);return clamp(c,0.0,1.0)*f;}",
-"void main(){vec2 p=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr;vec3 acc=vec3(0.0);float h;vec3 white=vec3(1.0,0.985,0.97);float fl=1.0+uFlare;",
-/* the beam coming in: a fine bright core, a soft bloom, a wide faint haze; pulses of light running along it */
-" float L1=length(uP1-uS);float d=seg(p,uS,uP1,h);float fi=smoothstep(0.0,0.24,h);",
-" float pulse=0.6+0.4*pow(0.5+0.5*sin((h*L1-uTime*190.0)/24.0),6.0);",
-" acc+=white*fi*(exp(-d*d/1.4)*1.7+exp(-d/4.0)*0.5*pulse+exp(-d/18.0)*0.11)*fl;",
-/* through the glass: only inside its faces */
-" float e1=side(p,uA,uB),e2=side(p,uB,uC),e3=side(p,uC,uA);float inside=((e1<=0.0&&e2<=0.0&&e3<=0.0)||(e1>=0.0&&e2>=0.0&&e3>=0.0))?1.0:0.0;",
-" float d2=seg(p,uP1,uP2,h);acc+=vec3(1.0,0.97,1.0)*inside*(exp(-d2*d2/2.2)*1.35+exp(-d2/6.0)*0.4*(0.8+0.2*sin(uTime*3.1+h*11.0))+exp(-d2/30.0)*0.12)*fl;",
-/* the spectrum leaving the glass: each angle its own wavelength, red the least bent, violet the most; light running outward */
-" vec2 v=p-uP2;float r=length(v);float ang=atan(v.y,v.x);float t=(ang-uRed)/(uViolet-uRed);",
-" float mask=smoothstep(-0.07,0.05,t)*(1.0-smoothstep(0.95,1.07,t))*(1.0-inside);",
-" float w=mix(690.0,405.0,clamp(t,0.0,1.0));float fall=exp(-r/230.0)*smoothstep(0.0,8.0,r);",
-" float rays=0.84+0.16*sin(t*64.0+uTime*1.3)*sin(r*0.045-uTime*2.2);float run=0.72+0.28*pow(0.5+0.5*sin((r-uTime*130.0)/28.0),3.0);",
-" vec3 sp=spectral(w);acc+=sp*mask*fall*rays*run*1.35*(1.0+0.7*uFlare);",
-" acc+=white*mask*exp(-r/38.0)*0.35;",
-/* where it enters and leaves, the glass flares */
-" acc+=white*(exp(-length(p-uP1)/8.0)*0.6+exp(-length(p-uP2)/11.0)*0.85)*fl;",
-/* light pooling on the plinth: a caustic gathered under the glass, and the spectrum spread on the plinth's face beside it */
-" vec2 q=(p-uPool.xy)/uPool.zw;float on=1.0-smoothstep(0.88,1.0,length(q));",
-" vec2 c1=(p-(uPool.xy+vec2(-18.0,-2.0)))/vec2(uPool.z*0.42,uPool.w*0.55);acc+=vec3(0.95,0.9,1.0)*on*exp(-dot(c1,c1)*1.6)*0.55*(0.85+0.15*sin(uTime*2.0))*fl;",
-" vec2 c2=(p-(uPool.xy+vec2(uPool.z*0.42,4.0)))/vec2(uPool.z*0.38,uPool.w*0.5);float tw=clamp(0.5+(p.x-(uPool.x+uPool.z*0.42))/(uPool.z*0.76),0.0,1.0);",
-" acc+=spectral(mix(680.0,410.0,tw))*on*exp(-dot(c2,c2)*1.4)*0.75*(0.8+0.2*sin(uTime*1.7+tw*9.0))*(1.0+0.6*uFlare);",
-/* a soft tone curve, so bright light rolls off as light does; by day the white is laid in lavender so it reads on a light page */
-" vec3 col=1.0-exp(-acc*1.15);float mx=max(col.r,max(col.g,col.b));float wh=min(col.r,min(col.g,col.b))/max(0.001,mx);",
-" col=mix(col,col*vec3(0.62,0.48,0.96),uDay*smoothstep(0.55,0.95,wh));col=mix(col,col*0.86,uDay*(1.0-wh));",
-" mx=max(col.r,max(col.g,col.b));float a=clamp(mx,0.0,1.0);gl_FragColor=vec4(col,a);}"].join("\n");
+/* ---------- the glass and the light's path through it (the same shape the shader draws) ---------- */
+var PX=-0.30,HA=0.80,YB=-0.80,TARGET=[0.14,-0.52,0];
+function nrm(v){var l=Math.sqrt(v.reduce(function(s,x){return s+x*x;},0))||1;return v.map(function(x){return x/l;});}
+function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function dot3(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+/* the glass's index at a wavelength (micrometres): Cauchy's form about 1.522, its spread widened for the eye */
+function nLam(l){return 1.522+0.0238*(1/(l*l)-1/(0.55*0.55));}
+function refr2(d,n,eta){var ci=-(d[0]*n[0]+d[1]*n[1]),k=1-eta*eta*(1-ci*ci);if(k<0)return null;var bb=eta*ci-Math.sqrt(k);return nrm([eta*d[0]+bb*n[0],eta*d[1]+bb*n[1]]);}
+/* the beam enters the left face at a fixed point, at the angle of least deviation plus the drift (degrees) */
+function path(drift){var nL=[-0.8660254,0.5],nR=[0.8660254,0.5],dL=-0.8660254*(PX-HA)+0.5*YB,dR=0.8660254*(PX+HA)+0.5*YB;
+  var yE=-0.40,xE=(0.5*yE-dL)/0.8660254,P1=[xE,yE],ai=(19.46+drift)*Math.PI/180,din=[Math.cos(ai),Math.sin(ai)],S=[P1[0]-din[0]*7,P1[1]-din[1]*7];
+  function through(l){var n=nLam(l),d1=refr2(din,nL,1/n);if(!d1)return null;var t=(dR-(nR[0]*P1[0]+nR[1]*P1[1]))/(nR[0]*d1[0]+nR[1]*d1[1]),P2=[P1[0]+d1[0]*t,P1[1]+d1[1]*t],d2=refr2(d1,[-nR[0],-nR[1]],n);return d2?{P2:P2,d:d2}:null;}
+  var m=through(0.55),r=through(0.70),v=through(0.40);if(!m||!r||!v)return B.path;
+  return {S:S,P1:P1,P2:m.P2,red:Math.atan2(r.d[1],r.d[0]),violet:Math.atan2(v.d[1],v.d[0])};}
+/* the camera: round the prism on its sway and lean, a little above it */
+function camera(yaw,pitch,dist){var cp=Math.cos(pitch),T=TARGET,pos=[T[0]+dist*Math.sin(yaw)*cp,T[1]+dist*Math.sin(pitch),T[2]+dist*Math.cos(yaw)*cp];
+  var F=nrm([T[0]-pos[0],T[1]-pos[1],T[2]-pos[2]]),R=nrm(cross(F,[0,1,0])),U=cross(R,F);return {pos:pos,R:R,U:U,F:F,fov:0.31};}
+function project(c,X){var v=[X[0]-c.pos[0],X[1]-c.pos[1],X[2]-c.pos[2]],z=dot3(v,c.F);return [B.W/2+dot3(v,c.R)/z/(2*c.fov)*B.H,B.H/2-dot3(v,c.U)/z/(2*c.fov)*B.H];}
+var BASE_YAW=-0.42,BASE_PITCH=0.27,DIST=6.2;
+/* ---------- the shader ---------- */
+var FS=[
+"#ifdef GL_FRAGMENT_PRECISION_HIGH",
+"precision highp float;",
+"#else",
+"precision mediump float;",
+"#endif",
+"uniform vec2 uRes;",
+"uniform vec3 uCam;",
+"uniform vec3 uCR;",
+"uniform vec3 uCU;",
+"uniform vec3 uCF;",
+"uniform float uFov;",
+"uniform float uNight;",
+"uniform float uT;",
+"uniform vec3 uS;",
+"uniform vec3 uP1;",
+"uniform vec3 uP2;",
+"uniform vec2 uFan;",
+"uniform float uPulse;",
+"uniform float uGlow;",
+"uniform vec3 uBg0;",
+"uniform vec3 uBg1;",
+"const float PX = -0.30;",
+"const float HA = 0.80;",
+"const float YB = -0.80;",
+"const float DZ = 0.52;",
+"const float RP = 1.72;",
+"const float PH = 0.19;",
+"const float BEV = 0.032;",
+"const float WZ = 0.028;",
+"vec4 plane(int i) {",
+"  if (i == 0) return vec4(0.0, -1.0, 0.0, -YB);",
+"  if (i == 1) return vec4(-0.8660254, 0.5, 0.0, -0.8660254 * (PX - HA) + 0.5 * YB);",
+"  if (i == 2) return vec4(0.8660254, 0.5, 0.0, 0.8660254 * (PX + HA) + 0.5 * YB);",
+"  if (i == 3) return vec4(0.0, 0.0, 1.0, DZ);",
+"  return vec4(0.0, 0.0, -1.0, DZ);",
+"}",
+"bool prismHit(vec3 ro, vec3 rd, out float tn, out vec3 nn) {",
+"  tn = -1e9; float tf = 1e9; nn = vec3(0.0, 1.0, 0.0);",
+"  for (int i = 0; i < 5; i++) {",
+"    vec4 P = plane(i);",
+"    float den = dot(P.xyz, rd), dist = P.w - dot(P.xyz, ro);",
+"    if (abs(den) < 1e-6) { if (dist < 0.0) return false; }",
+"    else {",
+"      float t = dist / den;",
+"      if (den < 0.0) { if (t > tn) { tn = t; nn = P.xyz; } }",
+"      else { if (t < tf) tf = t; }",
+"    }",
+"  }",
+"  return tn < tf && tn > 1e-4;",
+"}",
+"float prismExit(vec3 ro, vec3 rd, out vec3 n) {",
+"  float tf = 1e9; n = vec3(0.0, 1.0, 0.0);",
+"  for (int i = 0; i < 5; i++) {",
+"    vec4 P = plane(i);",
+"    float den = dot(P.xyz, rd);",
+"    if (den > 1e-6) { float t = (P.w - dot(P.xyz, ro)) / den; if (t < tf) { tf = t; n = P.xyz; } }",
+"  }",
+"  return tf;",
+"}",
+"vec3 bevel(vec3 p, vec3 n) {",
+"  vec3 acc = n;",
+"  for (int i = 0; i < 5; i++) {",
+"    vec4 P = plane(i);",
+"    if (dot(P.xyz, n) > 0.99) continue;",
+"    float e = P.w - dot(P.xyz, p);",
+"    float w = 1.0 - smoothstep(0.0, BEV, e);",
+"    acc += P.xyz * w * w * 1.15;",
+"  }",
+"  return normalize(acc);",
+"}",
+"vec3 toLin(vec3 c) { return c * c; }",
+"float g1(float x, float m, float a, float b) { float s = x < m ? a : b; float d = (x - m) / s; return exp(-0.5 * d * d); }",
+"vec3 spectrum(float l) {",
+"  float X = 1.056 * g1(l, 599.8, 37.9, 31.0) + 0.362 * g1(l, 442.0, 16.0, 26.7) - 0.065 * g1(l, 501.1, 20.4, 26.2);",
+"  float Y = 0.821 * g1(l, 568.8, 46.9, 40.5) + 0.286 * g1(l, 530.9, 16.3, 31.1);",
+"  float Z = 1.217 * g1(l, 437.0, 11.8, 36.0) + 0.681 * g1(l, 459.0, 26.0, 13.8);",
+"  vec3 c = vec3(3.2406 * X - 1.5372 * Y - 0.4986 * Z, -0.9689 * X + 1.8758 * Y + 0.0415 * Z, 0.0557 * X - 0.2040 * Y + 1.0570 * Z);",
+"  c += vec3(0.06) * Y;",
+"  return max(c, vec3(0.0));",
+"}",
+"vec3 addLight(vec3 base, vec3 light) {",
+"  if (uNight > 0.5) return base + light;",
+"  float I = max(max(light.r, light.g), light.b);",
+"  if (I < 1e-5) return base;",
+"  float a = 1.0 - exp(-I * 3.0);",
+"  return base * mix(vec3(1.0), light / I, a) * (1.0 - 0.22 * a);",
+"}",
+"vec3 keyDir() { return normalize(vec3(-0.55, 0.78, 0.42)); }",
+"vec3 env(vec3 d) {",
+"  vec3 sky = mix(uBg1, uBg0, smoothstep(-0.35, 0.7, d.y));",
+"  float day = 1.0 - uNight;",
+"  sky = mix(sky, vec3(0.36, 0.31, 0.50), smoothstep(0.02, -0.3, d.y) * day * 0.85);",
+"  float card = exp(-pow((abs(d.x) - 0.80) / 0.16, 2.0)) * smoothstep(-0.25, 0.15, d.y) * (1.0 - smoothstep(0.45, 0.8, d.y));",
+"  sky *= 1.0 - 0.8 * card * day;",
+"  sky = mix(sky, vec3(0.012, 0.008, 0.02), smoothstep(0.05, -0.4, d.y) * uNight * 0.6);",
+"  vec3 L = normalize(vec3(-0.62, 0.62, 0.48));",
+"  vec3 u = normalize(cross(L, vec3(0.0, 1.0, 0.0)));",
+"  vec3 v = cross(u, L);",
+"  float k = dot(d, L);",
+"  vec3 c = sky;",
+"  if (k > 0.0) {",
+"    float a = dot(d, u) / k, b = dot(d, v) / k;",
+"    float box = (1.0 - smoothstep(0.34, 0.46, abs(a))) * (1.0 - smoothstep(0.20, 0.30, abs(b)));",
+"    c += box * mix(vec3(3.2, 3.1, 3.3), vec3(1.7, 1.6, 2.0), uNight);",
+"  }",
+"  vec3 R = normalize(vec3(0.75, 0.25, -0.62));",
+"  vec3 ru = normalize(cross(R, vec3(0.0, 1.0, 0.0)));",
+"  float kr = dot(d, R);",
+"  if (kr > 0.0) {",
+"    float a = dot(d, ru) / kr, b = (d.y - R.y * kr) / kr;",
+"    float strip = (1.0 - smoothstep(0.05, 0.10, abs(a))) * (1.0 - smoothstep(0.55, 0.75, abs(b)));",
+"    c += strip * mix(vec3(1.4, 1.3, 1.6), vec3(1.0, 0.85, 1.5), uNight);",
+"  }",
+"  return c;",
+"}",
+"float plinthHit(vec3 ro, vec3 rd, out vec3 n, out float top) {",
+"  float t = 1e9; top = 0.0; n = vec3(0.0, 1.0, 0.0);",
+"  if (rd.y < 0.0) {",
+"    float tt = (YB - ro.y) / rd.y; vec3 p = ro + rd * tt;",
+"    if (tt > 1e-4 && dot(p.xz, p.xz) < RP * RP) { t = tt; top = 1.0; }",
+"  }",
+"  float a = dot(rd.xz, rd.xz), b = dot(ro.xz, rd.xz), c = dot(ro.xz, ro.xz) - RP * RP, h = b * b - a * c;",
+"  if (h > 0.0) {",
+"    float ts = (-b - sqrt(h)) / a; vec3 p = ro + rd * ts;",
+"    if (ts > 1e-4 && ts < t && p.y < YB && p.y > YB - PH) { t = ts; top = 0.0; n = normalize(vec3(p.x, 0.0, p.z)); }",
+"  }",
+"  return t;",
+"}",
+"vec2 segClose(vec3 ro, vec3 rd, vec3 a, vec3 b, float tmax) {",
+"  vec3 v = b - a, w0 = ro - a;",
+"  float bb = dot(rd, v), cc = dot(v, v), dd = dot(rd, w0), ee = dot(v, w0), den = cc - bb * bb;",
+"  float s = den > 1e-6 ? clamp((ee - bb * dd) / den, 0.0, 1.0) : 0.0;",
+"  float t = clamp(dot(a + v * s - ro, rd), 0.0, tmax);",
+"  vec3 q = a + v * s - (ro + rd * t);",
+"  return vec2(length(q), s);",
+"}",
+"float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }",
+"float motes(vec2 q) {",
+"  vec2 c = floor(q / 0.06); float m = 0.0;",
+"  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {",
+"    vec2 cc = c + vec2(float(i), float(j));",
+"    float h = hash(cc), h2 = hash(cc + 7.3);",
+"    vec2 pos = (cc + vec2(0.5) + 0.38 * vec2(sin(uT * 0.31 + h * 6.28), cos(uT * 0.23 + h2 * 6.28))) * 0.06;",
+"    float d = length(q - pos);",
+"    float tw = 0.5 + 0.5 * sin(uT * (1.3 + h * 2.0) + h2 * 6.28);",
+"    m += step(0.55, h) * exp(-d * d / 0.000045) * tw;",
+"  }",
+"  return m;",
+"}",
+"vec3 beamTint() { return mix(vec3(0.40, 0.22, 0.95), vec3(1.0, 0.97, 1.02), uNight); }",
+"float pulseAt(float s) { if (uPulse < 0.0) return 0.0; float d = s - uPulse * 3.4; return 2.8 * exp(-d * d / 0.09) * (1.0 - uPulse * 0.5); }",
+"vec3 fanLight(vec3 ro, vec3 rd, float tmax) {",
+"  vec3 col = vec3(0.0);",
+"  if (abs(rd.z) > 1e-4) {",
+"    float tz = -ro.z / rd.z;",
+"    if (tz > 0.0 && tz < tmax) {",
+"      vec2 q = (ro + rd * tz).xy;",
+"      vec2 v = q - uP2.xy; float r = length(v);",
+"      float ph = atan(v.y, v.x);",
+"      float f = (ph - uFan.x) / (uFan.y - uFan.x);",
+"      if (f > -0.08 && f < 1.08 && r > 0.0) {",
+"        float sl = sin(ph);",
+"        float land = sl < 0.0 ? (YB - uP2.y) / sl : 1e9;",
+"        float xl = uP2.x + cos(ph) * land;",
+"        bool cut = r > land && abs(xl) < RP;",
+"        if (!cut) {",
+"          float lam = 700.0 - 300.0 * clamp(f, 0.0, 1.0);",
+"          float edge = smoothstep(-0.08, 0.04, f) * (1.0 - smoothstep(0.96, 1.08, f));",
+"          float thick = min(3.0, 1.0 / max(abs(rd.z), 0.05)) * 0.55;",
+"          float fall = 1.1 / (0.22 + r) * exp(-r * 0.25);",
+"          float pulse = pulseAt(1.0 + length(uP2 - uP1) + r);",
+"          vec3 sp = spectrum(lam);",
+"          col += sp * edge * thick * fall * (1.0 + pulse) * (0.9 + 0.25 * uGlow);",
+"          col += sp * edge * motes(q) * 2.2 * exp(-r * 0.4);",
+"        }",
+"      }",
+"    }",
+"  }",
+"  return col;",
+"}",
+"vec3 beamGlow(vec3 ro, vec3 rd, float tmax) {",
+"  vec3 tint = beamTint();",
+"  vec2 a = segClose(ro, rd, uS, uP1, tmax);",
+"  float d = a.x, s = a.y * length(uP1 - uS);",
+"  float I = (1.0 + 0.2 * uGlow) * (exp(-d * d / 0.00012) * 1.6 + exp(-d / 0.05) * 0.22 + exp(-d * d / 0.09) * 0.05) * smoothstep(0.0, 1.2, s);",
+"  I *= 1.0 + pulseAt(s - length(uP1 - uS) + 1.0);",
+"  vec3 col = tint * I;",
+"  if (abs(rd.z) > 1e-4) {",
+"    float tz = -ro.z / rd.z;",
+"    if (tz > 0.0 && tz < tmax) {",
+"      vec3 q = ro + rd * tz; vec3 ab = uP1 - uS; float u = clamp(dot(q - uS, ab) / dot(ab, ab), 0.0, 1.0);",
+"      float dl = length(q - (uS + ab * u));",
+"      col += tint * motes(q.xy) * exp(-dl * dl / 0.0016) * 1.6;",
+"    }",
+"  }",
+"  vec2 f1 = segClose(ro, rd, uP1, uP1, tmax), f2 = segClose(ro, rd, uP2, uP2, tmax);",
+"  col += tint * (exp(-f1.x * f1.x / 0.002) * 0.5 + exp(-f1.x / 0.03) * 0.25);",
+"  col += vec3(1.0, 0.95, 1.0) * mix(0.25, 1.0, uNight) * (exp(-f2.x * f2.x / 0.0015) * 0.45 + exp(-f2.x / 0.035) * 0.18);",
+"  return col;",
+"}",
+"vec3 plinthShade(vec3 p, vec3 n, float top, vec3 rd, float t) {",
+"  vec3 L = keyDir(), V = -rd;",
+"  vec3 baseD = mix(vec3(0.80, 0.74, 0.93), vec3(0.075, 0.06, 0.11), uNight);",
+"  vec3 c;",
+"  float pix = t * 2.0 * uFov / uRes.y;",
+"  if (top > 0.5) {",
+"    float r = length(p.xz);",
+"    vec3 nn = n;",
+"    float rim = smoothstep(RP - 0.045, RP, r);",
+"    nn = normalize(nn + vec3(p.x, 0.0, p.z) / r * rim * 1.4);",
+"    float dif = max(dot(nn, L), 0.0);",
+"    vec3 T = normalize(vec3(-p.z, 0.0, p.x));",
+"    vec3 H = normalize(L + V);",
+"    float th = dot(T, H);",
+"    float aniso = pow(sqrt(max(0.0, 1.0 - th * th)), 70.0);",
+"    float grooves = 0.5 + 0.5 * sin(r * 520.0);",
+"    float gfade = 1.0 - smoothstep(0.004, 0.012, pix);",
+"    c = baseD * (0.42 + 0.62 * dif);",
+"    c += mix(vec3(0.20, 0.18, 0.24), vec3(0.20, 0.16, 0.30), uNight) * aniso * (0.75 + 0.5 * grooves * gfade);",
+"    float ang = atan(p.z, p.x) / 6.2831853 * 72.0;",
+"    float tk = abs(fract(ang) - 0.5) * 6.2831853 / 72.0 * r;",
+"    float major = step(0.5, 1.0 - abs(fract(ang / 6.0 + 0.5 / 6.0) - 0.5 / 6.0) * 6.0 * 1.0);",
+"    float inner = RP - mix(0.10, 0.16, major);",
+"    float tick = (1.0 - smoothstep(0.0025, 0.0025 + pix, tk)) * step(inner, r) * (1.0 - step(RP - 0.035, r));",
+"    c = mix(c, mix(vec3(0.50, 0.44, 0.66), vec3(0.42, 0.36, 0.58), uNight), tick * 0.75);",
+"    float ring = (1.0 - smoothstep(0.0, 0.0025 + pix, abs(r - (RP - 0.175)))) * 0.5;",
+"    c = mix(c, mix(vec3(0.55, 0.49, 0.70), vec3(0.32, 0.27, 0.45), uNight), ring);",
+"    c += mix(vec3(0.9, 0.88, 0.95), vec3(0.55, 0.48, 0.75), uNight) * rim * pow(max(dot(reflect(-L, nn), V), 0.0), 18.0) * 0.8;",
+"    float tn; vec3 sn;",
+"    if (prismHit(p + vec3(0.0, 1e-3, 0.0), L, tn, sn)) c *= 0.62;",
+"    vec2 dq = max(abs(p.xz - vec2(PX, 0.0)) - vec2(HA, DZ), vec2(0.0));",
+"    float ao = 1.0 - 0.32 * exp(-length(dq) / 0.05);",
+"    c *= ao;",
+"    float in2 = step(abs(p.x - PX), HA) * step(abs(p.z), DZ);",
+"    c = addLight(c, beamTint() * 0.05 * in2 * exp(-p.z * p.z / 0.02));",
+"    vec2 v = p.xy - uP2.xy; float rr = length(v); float ph = atan(v.y, v.x);",
+"    float f = (ph - uFan.x) / (uFan.y - uFan.x);",
+"    float zf = exp(-p.z * p.z / (WZ * WZ));",
+"    float zh = exp(-p.z * p.z / 0.03);",
+"    if (f > -0.1 && f < 1.1) {",
+"      float lam = 700.0 - 300.0 * clamp(f, 0.0, 1.0);",
+"      float edge = smoothstep(-0.1, 0.03, f) * (1.0 - smoothstep(0.97, 1.1, f));",
+"      vec3 sp = spectrum(lam);",
+"      float pulse = pulseAt(1.0 + length(uP2 - uP1) + rr);",
+"      c = addLight(c, sp * edge * (zf * 2.4 + zh * 0.35) * (1.0 + pulse) / (0.6 + rr) * (0.9 + 0.25 * uGlow));",
+"    }",
+"  } else {",
+"    float dif = max(dot(n, L), 0.0);",
+"    float band = smoothstep(YB - PH, YB - PH + 0.02, p.y) * (1.0 - smoothstep(YB - 0.012, YB, p.y));",
+"    c = baseD * (0.30 + 0.62 * dif) * mix(0.82, 1.0, band);",
+"    c += mix(vec3(0.20), vec3(0.10, 0.08, 0.16), uNight) * pow(max(dot(reflect(-L, n), V), 0.0), 12.0);",
+"    c *= 1.0 - 0.25 * smoothstep(YB - 0.03, YB - PH, p.y);",
+"  }",
+"  return c;",
+"}",
+"vec3 outside(vec3 ro, vec3 rd, out float hit) {",
+"  vec3 n; float top;",
+"  float t = plinthHit(ro, rd, n, top);",
+"  vec3 c;",
+"  hit = 0.0;",
+"  if (t < 1e8) { c = plinthShade(ro + rd * t, n, top, rd, t); hit = 1.0; }",
+"  else c = env(rd);",
+"  c = addLight(c, beamGlow(ro, rd, min(t, 50.0)) + fanLight(ro, rd, min(t, 50.0)));",
+"  return c;",
+"}",
+"vec3 glassAt(vec3 ro, vec3 rd, float tn, vec3 nn) {",
+"  vec3 p = ro + rd * tn;",
+"  vec3 n = bevel(p, nn);",
+"  float ci = clamp(-dot(rd, n), 0.0, 1.0);",
+"  float F = 0.04 + 0.96 * pow(1.0 - ci, 5.0);",
+"  float hr;",
+"  vec3 rr = reflect(rd, n);",
+"  vec3 refl = env(rr);",
+"  vec3 pn; float pt;",
+"  pt = plinthHit(p + n * 1e-3, rr, pn, hr);",
+"  if (pt < 1e8) refl = plinthShade(p + rr * pt, pn, hr, rr, pt);",
+"  vec3 col = vec3(0.0);",
+"  for (int k = 0; k < 3; k++) {",
+"    float ior = k == 0 ? 1.505 : (k == 1 ? 1.522 : 1.545);",
+"    vec3 d1 = refract(rd, n, 1.0 / ior);",
+"    vec3 m; float te = prismExit(p, d1, m);",
+"    vec3 pe = p + d1 * te;",
+"    vec3 me = bevel(pe, m);",
+"    float len = te;",
+"    vec2 ib = segClose(p, d1, uP1, uP2, te);",
+"    float inner = exp(-ib.x * ib.x / 0.0002) * 1.3 + exp(-ib.x / 0.04) * 0.3 + exp(-ib.x / 0.22) * 0.10;",
+"    inner *= 1.0 + pulseAt(1.0 + ib.y * length(uP2 - uP1));",
+"    vec3 d2 = refract(d1, -me, ior);",
+"    if (dot(d2, d2) < 1e-4) {",
+"      vec3 d1b = reflect(d1, -me);",
+"      vec3 m2; float t2 = prismExit(pe + d1b * 1e-3, d1b, m2);",
+"      vec3 pe2 = pe + d1b * t2;",
+"      len += t2;",
+"      vec3 me2 = bevel(pe2, m2);",
+"      d2 = refract(d1b, -me2, ior);",
+"      if (dot(d2, d2) < 1e-4) d2 = reflect(d1b, -me2);",
+"      pe = pe2;",
+"    }",
+"    float h;",
+"    vec3 bg = outside(pe + d2 * 1e-3, d2, h);",
+"    vec3 absorb = exp(-len * mix(vec3(0.10, 0.16, 0.05), vec3(0.14, 0.24, 0.07), uNight));",
+"    vec3 c = addLight(bg * absorb, beamTint() * inner);",
+"    if (k == 0) col.r = c.r; else if (k == 1) col.g = c.g; else col.b = c.b;",
+"  }",
+"  return col * (1.0 - F) + refl * F;",
+"}",
+"void main() {",
+"  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;",
+"  vec3 rd = normalize(uCF + (uv.x * uCR + uv.y * uCU) * 2.0 * uFov);",
+"  vec3 ro = uCam;",
+"  float tn; vec3 nn;",
+"  vec3 c; float a;",
+"  if (prismHit(ro, rd, tn, nn)) {",
+"    c = glassAt(ro, rd, tn, nn); a = 1.0;",
+"    c = addLight(c, beamGlow(ro, rd, tn) * 0.5);",
+"  } else {",
+"    vec3 n; float top;",
+"    float t = plinthHit(ro, rd, n, top);",
+"    if (t < 1e8) { c = plinthShade(ro + rd * t, n, top, rd, t); a = 1.0; }",
+"    else { c = vec3(0.0); a = 0.0; }",
+"    vec3 gl = beamGlow(ro, rd, min(t, 50.0)) + fanLight(ro, rd, min(t, 50.0));",
+"    if (a < 0.5) {",
+"      if (uNight > 0.5) { vec3 m = 1.0 - exp(-gl * 1.1); vec3 o = sqrt(m); float al = max(max(o.r, o.g), o.b); gl_FragColor = vec4(o, al); }",
+"      else { float I = max(max(gl.r, gl.g), gl.b); vec3 hue = gl / max(I, 1e-4); float al = 1.0 - exp(-I * 1.5); gl_FragColor = vec4(sqrt(clamp(hue * 0.86, 0.0, 1.0)) * al, al); }",
+"      return;",
+"    }",
+"    c = addLight(c, gl);",
+"  }",
+"  c = 1.0 - exp(-c * mix(1.75, 1.45, uNight));",
+"  gl_FragColor = vec4(sqrt(c) * a, a);",
+"}"].join("\n");
+var VS="attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}";
 var GL={gl:null,u:{},failed:false,lost:false};
-function glInit(cv){if(GL.gl||GL.failed)return !!GL.gl;try{var gl=cv.getContext("webgl",{alpha:true,premultipliedAlpha:true,antialias:false,depth:false,stencil:false})||cv.getContext("experimental-webgl");
+function glInit(cv){if(GL.gl||GL.failed)return !!GL.gl;try{var gl=cv.getContext("webgl",{alpha:true,premultipliedAlpha:true,antialias:false,depth:false,stencil:false,preserveDrawingBuffer:false})||cv.getContext("experimental-webgl");
     if(!gl){GL.failed=true;return false;}
-    var sh=function(t,src){var s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s)||"shader");return s;};
-    var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,"attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}"));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
-    if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr)||"link");
-    var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);gl.useProgram(pr);
-    var loc=gl.getAttribLocation(pr,"a");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    ["uRes","uDpr","uS","uP1","uP2","uA","uB","uC","uRed","uViolet","uTime","uFlare","uDay","uPool"].forEach(function(n){GL.u[n]=gl.getUniformLocation(pr,n);});GL.gl=gl;return true;}
-  catch(e){GL.failed=true;try{console.warn("Ingenium: Build's light falls back to a simpler drawing",e&&e.message||e);}catch(_){}return false;}}
-function glLight(Pth,M,T){var gl=GL.gl,cv=B.glc,d=sz(cv),u=GL.u;gl.viewport(0,0,cv.width,cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.uniform2f(u.uRes,cv.width,cv.height);gl.uniform1f(u.uDpr,d);gl.uniform2f(u.uS,Pth.S[0],Pth.S[1]);gl.uniform2f(u.uP1,Pth.P1[0],Pth.P1[1]);gl.uniform2f(u.uP2,Pth.P2[0],Pth.P2[1]);
-  gl.uniform2f(u.uA,M[0][0],M[0][1]);gl.uniform2f(u.uB,M[1][0],M[1][1]);gl.uniform2f(u.uC,M[2][0],M[2][1]);gl.uniform1f(u.uRed,Pth.red);gl.uniform1f(u.uViolet,Pth.violet);
-  gl.uniform1f(u.uTime,T);gl.uniform1f(u.uFlare,B.flare);gl.uniform1f(u.uDay,H.night()?0:1);gl.uniform4f(u.uPool,G.cx,PY,140,140*Math.sin(G.e)*1.35);gl.drawArrays(gl.TRIANGLES,0,3);}
-/* where there is no WebGL: the beam and the fan, drawn simply */
-function flatLight(Pth){var g=B.glc.__g||(B.glc.__g=B.glc.getContext("2d"));if(!g)return;var d=sz(B.glc);g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,B.W,B.H);
-  g.lineCap="round";g.strokeStyle=H.night()?"rgba(255,255,255,.9)":"rgba(120,90,200,.8)";g.lineWidth=3;g.beginPath();g.moveTo(Pth.S[0],Pth.S[1]);g.lineTo(Pth.P1[0],Pth.P1[1]);g.lineTo(Pth.P2[0],Pth.P2[1]);g.stroke();
-  ["#ff3b3b","#ff9f2e","#ffe23d","#4bd463","#3e8bff","#5a4bff","#9a4bff"].forEach(function(c,i,a){var an=Pth.red+(Pth.violet-Pth.red)*i/(a.length-1),ex=Pth.P2[0]+Math.cos(an)*220,ey=Pth.P2[1]+Math.sin(an)*220;
-    var gr=g.createLinearGradient(Pth.P2[0],Pth.P2[1],ex,ey);gr.addColorStop(0,c);gr.addColorStop(1,"rgba(0,0,0,0)");g.strokeStyle=gr;g.lineWidth=4;g.beginPath();g.moveTo(Pth.P2[0],Pth.P2[1]);g.lineTo(ex,ey);g.stroke();});}
-/* ---------- the glass, on either side of the light ---------- */
-function face(g,P,fill){g.beginPath();g.moveTo(P[0][0],P[0][1]);for(var i=1;i<P.length;i++)g.lineTo(P[i][0],P[i][1]);g.closePath();g.fillStyle=fill;g.fill();}
-function edge(g,a,b,col,w){g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.strokeStyle=col;g.lineWidth=w;g.lineCap="round";g.stroke();}
-function draw(){if(!B.back)return;var n=H.night(),T=B.t/1000,turn=B.sw,dy=-B.lift*5+B.ks.x;
-  function V(i,z){return proj(TRI[i][0],TRI[i][1]+dy,z,turn);}
-  var F=[V(0,DEPTH),V(1,DEPTH),V(2,DEPTH)],K=[V(0,-DEPTH),V(1,-DEPTH),V(2,-DEPTH)],M=[V(0,0),V(1,0),V(2,0)],Pth=path(M);
-  var faces=[{p:[F[0],F[1],F[2]],k:"tri"},{p:[K[0],K[2],K[1]],k:"tri"},{p:[F[0],K[0],K[1],F[1]],k:"left"},{p:[F[0],F[2],K[2],K[0]],k:"right"},{p:[F[1],K[1],K[2],F[2]],k:"floor"}];
-  faces.forEach(function(f){f.z=f.p.reduce(function(s,q){return s+q[2];},0)/f.p.length;});faces.sort(function(a,b){return a.z-b.z;});
-  var tint=n?{tri:"rgba(150,120,230,.13)",left:"rgba(190,165,255,.16)",right:"rgba(110,80,200,.20)",floor:"rgba(70,50,140,.30)"}:{tri:"rgba(206,190,248,.20)",left:"rgba(255,255,255,.32)",right:"rgba(170,140,235,.20)",floor:"rgba(120,90,200,.24)"};
-  /* behind the light: the plinth, the glass's shadow and its far faces */
-  var d=sz(B.back),g=B.fb||(B.fb=B.back.getContext("2d"));g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,B.W,B.H);g.drawImage(plinth(),0,0,B.W,B.H);H.cast(g,G.cx+14,PY+4,128,16,n?.3:.14);
-  faces.slice(0,3).forEach(function(f){face(g,f.p,tint[f.k]);});
-  /* the light */
-  if(GL.gl&&!GL.lost)glLight(Pth,M,T);else flatLight(Pth);
-  /* over the light: the near faces, the edges catching the light, a glint crossing as the glass turns */
-  d=sz(B.front);g=B.ff||(B.ff=B.front.getContext("2d"));g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,B.W,B.H);
-  faces.slice(3).forEach(function(f){var fill=tint[f.k];if(f.k==="tri"){var tg=g.createLinearGradient(f.p[1][0],f.p[1][1],f.p[0][0],f.p[0][1]);tg.addColorStop(0,n?"rgba(120,90,210,.18)":"rgba(190,170,245,.22)");tg.addColorStop(1,n?"rgba(210,190,255,.12)":"rgba(255,255,255,.42)");fill=tg;}face(g,f.p,fill);});
-  var eo=n?"rgba(225,212,255,.8)":"rgba(255,255,255,1)",ei=n?"rgba(120,90,210,.6)":"rgba(110,80,190,.5)";
-  [[F[0],F[1]],[F[0],F[2]],[F[1],F[2]],[F[0],K[0]],[F[1],K[1]],[F[2],K[2]],[K[0],K[1]],[K[0],K[2]],[K[1],K[2]]].forEach(function(e,i){var near=i<6;edge(g,e[0],e[1],near?ei:H.rgba(n?"#8a6fd0":"#9a86c8",.3),near?2.2:1.1);if(near)edge(g,[e[0][0]-.6,e[0][1]-.6],[e[1][0]-.6,e[1][1]-.6],eo,.9);});
-  var gp=.5+.5*Math.sin(turn*3.2+T*.35),ga=[F[1][0]+(F[0][0]-F[1][0])*gp,F[1][1]+(F[0][1]-F[1][1])*gp];g.save();g.beginPath();g.moveTo(F[0][0],F[0][1]);g.lineTo(F[1][0],F[1][1]);g.lineTo(F[2][0],F[2][1]);g.closePath();g.clip();
-  g.translate(ga[0]+18,ga[1]+8);g.rotate(Math.atan2(F[0][1]-F[1][1],F[0][0]-F[1][0]));g.scale(1,.16);var sg2=g.createRadialGradient(0,0,0,0,0,58);
-  sg2.addColorStop(0,n?"rgba(255,255,255,.4)":"rgba(255,255,255,.9)");sg2.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=sg2;g.beginPath();g.arc(0,0,58,0,TAU);g.fill();g.restore();
-  B.path=Pth;}
-/* ---------- its movement: two slow swells, a lean toward the pointer on a spring, a knock when pressed ---------- */
-function step(dt){if(H.still()){B.sw=0;B.flare=0;B.lift=B.hover?1:0;B.ks.x=0;draw();return false;}
-  var goal=B.hold?.4:1;B.amp+=(goal-B.amp)*Math.min(1,dt/500);B.t+=dt*(H.motion()==="full"?1.3:1);var T=B.t/1000;
-  var amb=B.amp*((16*Math.sin(T/17*TAU)+6*Math.sin(T/6.7*TAU+1))*Math.PI/180);B.sw=amb+B.lt.to(B.tx*34*Math.PI/180,dt);B.ks.to(0,dt);
-  if(B.flare>0)B.flare=Math.max(0,B.flare-dt/1100);var lg=B.hover?1:0;B.lift+=(lg-B.lift)*Math.min(1,dt/110);draw();return true;}
+    function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;}
+    var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));
+    gl.useProgram(pr);var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    ["uRes","uCam","uCR","uCU","uCF","uFov","uNight","uT","uS","uP1","uP2","uFan","uPulse","uGlow","uBg0","uBg1"].forEach(function(n){GL.u[n]=gl.getUniformLocation(pr,n);});
+    GL.gl=gl;return true;}catch(e){GL.failed=true;GL.err=String(e&&e.message||e).slice(0,300);return false;}}
+function lin(h){return [1,3,5].map(function(i){var v=parseInt(h.substr(i,2),16)/255;return v*v;});}
+var BG={day:[lin("#fdfcff"),lin("#efe9f8")],night:[lin("#1d1529"),lin("#120c1b")]};
+function size(){var d=Math.min(2,Math.max(1,H.dpr()))*B.q,w=Math.round(B.W*d),h=Math.round(B.H*d),cv=B.cv;if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}return d;}
+function view(){var T=B.t,amp=B.amp,ph=T/PERIOD*TAU;
+  return camera(BASE_YAW+amp*0.14*Math.sin(ph)+B.ly.x,BASE_PITCH+amp*0.03*Math.cos(ph)+B.lp.x+B.kn.x*0.02,DIST*(1+B.kn.x*0.03));}
+function draw(){if(!B.cv)return;var c=view(),n=H.night(),drift=1.6*Math.sin(B.t/PERIOD*TAU+Math.PI/2)*B.amp;B.path=path(drift);B.cam=c;var P=B.path;
+  if(GL.gl&&!GL.lost){var gl=GL.gl,u=GL.u;size();gl.viewport(0,0,B.cv.width,B.cv.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(u.uRes,B.cv.width,B.cv.height);gl.uniform3fv(u.uCam,c.pos);gl.uniform3fv(u.uCR,c.R);gl.uniform3fv(u.uCU,c.U);gl.uniform3fv(u.uCF,c.F);gl.uniform1f(u.uFov,c.fov);
+    gl.uniform1f(u.uNight,n?1:0);gl.uniform1f(u.uT,B.t/1000);gl.uniform3f(u.uS,P.S[0],P.S[1],0);gl.uniform3f(u.uP1,P.P1[0],P.P1[1],0);gl.uniform3f(u.uP2,P.P2[0],P.P2[1],0);
+    gl.uniform2f(u.uFan,P.red,P.violet);gl.uniform1f(u.uPulse,B.flare>0?1-B.flare:-1);gl.uniform1f(u.uGlow,B.lift);
+    var bg=n?BG.night:BG.day;gl.uniform3fv(u.uBg0,bg[0]);gl.uniform3fv(u.uBg1,bg[1]);gl.drawArrays(gl.TRIANGLES,0,3);}
+  else flat(c,P,n);}
+/* where there is no WebGL: the plinth, the glass and the light, drawn simply and still */
+function flat(c,P,n){var cv=B.cv,g=cv.__g||(cv.__g=cv.getContext("2d"));if(!g)return;var d=size();g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,B.W,B.H);
+  var i,pts=[];for(i=0;i<=48;i++){var a=i/48*TAU;pts.push(project(c,[1.72*Math.cos(a),YB,1.72*Math.sin(a)]));}
+  g.beginPath();pts.forEach(function(p,j){if(j)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);});g.closePath();g.fillStyle=n?"#241c34":"#e9e3f5";g.fill();g.strokeStyle=n?"rgba(205,184,240,.25)":"rgba(106,63,181,.25)";g.stroke();
+  var s0=project(c,[P.S[0],P.S[1],0]),p1=project(c,[P.P1[0],P.P1[1],0]),p2=project(c,[P.P2[0],P.P2[1],0]);
+  g.lineCap="round";g.strokeStyle=n?"rgba(255,255,255,.9)":"rgba(106,63,181,.8)";g.lineWidth=2;g.beginPath();g.moveTo(s0[0],s0[1]);g.lineTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.stroke();
+  var cols=["#ff3b30","#ff9f0a","#ffd60a","#34c759","#30b0c7","#5856d6","#8e44ad"];cols.forEach(function(col,k){var a=P.red+(P.violet-P.red)*k/6,q=project(c,[P.P2[0]+Math.cos(a)*1.1,P.P2[1]+Math.sin(a)*1.1,0]);
+    g.strokeStyle=col;g.globalAlpha=.75;g.lineWidth=2;g.beginPath();g.moveTo(p2[0],p2[1]);g.lineTo(q[0],q[1]);g.stroke();});g.globalAlpha=1;
+  var V=[[PX-HA,YB],[PX+HA,YB],[PX,YB+HA*2*0.8660254]];[-0.52,0.52].forEach(function(z){var f=V.map(function(v){return project(c,[v[0],v[1],z]);});g.beginPath();f.forEach(function(p,j){if(j)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);});g.closePath();
+    g.fillStyle=n?"rgba(205,184,240,.10)":"rgba(106,63,181,.08)";g.fill();g.strokeStyle=n?"rgba(230,220,255,.55)":"rgba(106,63,181,.45)";g.lineWidth=1.2;g.stroke();});}
+/* the press button lies over the glass as it stands at rest */
+function placeHit(){if(!B.hit)return;var c=camera(BASE_YAW,BASE_PITCH,DIST),xs=[],ys=[];[[PX-HA,YB],[PX+HA,YB],[PX,YB+HA*2*0.8660254]].forEach(function(v){[-0.52,0.52].forEach(function(z){var p=project(c,[v[0],v[1],z]);xs.push(p[0]);ys.push(p[1]);});});
+  var l=Math.min.apply(null,xs)-8,t=Math.min.apply(null,ys)-8,r=Math.max.apply(null,xs)+8,b=Math.max.apply(null,ys)+8,s=B.hit.style;
+  s.left=Math.round(l)+"px";s.top=Math.round(t)+"px";s.width=Math.round(r-l)+"px";s.height=Math.round(b-t)+"px";}
+/* ---------- movement: one period, a lean on springs, a knock and a pulse of light ---------- */
+function step(dt){if(H.still()){B.flare=0;B.lift=B.hover?1:0;B.amp=0;B.ly.x=0;B.lp.x=0;B.kn.x=0;draw();return false;}
+  var goal=B.hold?.4:1;B.amp+=(goal-B.amp)*Math.min(1,dt/500);B.t+=dt*(H.motion()==="full"?1.3:1);
+  B.ly.to(B.tx*0.30,dt);B.lp.to(B.ty*0.07,dt);B.kn.to(0,dt);
+  if(B.flare>0)B.flare=Math.max(0,B.flare-dt/1100);var lg=B.hover?1:0;B.lift+=(lg-B.lift)*Math.min(1,dt/140);
+  /* if the computer cannot keep up, draw fewer pixels; if it has room again, more */
+  if(dt>30){B.slow++;B.fast=0;if(B.slow>40&&B.q>0.62){B.q=Math.max(0.62,B.q-0.12);B.slow=0;}}else if(dt<19){B.fast++;B.slow=0;if(B.fast>240&&B.q<1){B.q=Math.min(1,B.q+0.12);B.fast=0;}}
+  draw();return true;}
 function run(){var C=B.C;if(!C||!C.shown){if(B.loop)B.loop.stop();return;}if(H.still()){if(B.loop)B.loop.stop();draw();return;}if(!B.loop)B.loop=H.Loop(step);B.loop.start();}
 function lines(){var e=$("codeEditor");var v=e?String(e.value||""):"";return v?v.split("\n").length:0;}
 function paint(){var C=B.C;if(!C||!C.on)return;var n=lines(),auto=$("autoRun");C.tagSet(n?n+(n===1?" line":" lines"):"An empty page",auto&&auto.checked?"runs as you type":"runs when you press Run");}
-function runPage(){var r=$("runBtn");if(!H.still()){B.flare=1;B.ks.v=95;}run();setTimeout(function(){if(r)r.click();if(B.C)B.C.toRoom("#buildGrid");},H.still()?0:280);}
+function runPage(){var r=$("runBtn");if(!H.still()){B.flare=1;B.kn.v=-9;}run();setTimeout(function(){if(r)r.click();if(B.C)B.C.toRoom("#buildGrid");},H.still()?0:280);}
 function sample(){var s=$("sampleBtn");if(s)s.click();if(B.C)B.C.toRoom("#buildGrid");}
-function start(){H=W.IngHeads;if(!H||!$("page-build")){if((B.tries=(B.tries||0)+1)<240)setTimeout(start,500);return;}B.lt=H.Spring(60,11);B.ks=H.Spring(300,12);
+function start(){H=W.IngHeads;if(!H||!$("page-build")){if((B.tries=(B.tries||0)+1)<240)setTimeout(start,500);return;}B.ly=H.Spring(60,11);B.lp=H.Spring(60,11);B.kn=H.Spring(300,12);
   B.C=H.mount({page:"page-build",label:"Build",eyebrow:"Build · the prism of your page",cls:"hd-build",
     keys:[{name:"run",id:"hdBuildRun",text:"Run your page",icon:"run",primary:true,click:runPage},{name:"sample",id:"hdBuildSample",text:"Load a sample",icon:"open",click:sample}],
     line:"Your code on one side, your page running on the other: try an idea, check a snippet, or let a model help you fix it.",
-    scene:function(C){B.back=mk("canvas","hd-cv");B.glc=mk("canvas","hd-cv pr-gl");B.front=mk("canvas","hd-cv");[B.back,B.glc,B.front].forEach(function(c){c.setAttribute("aria-hidden","true");C.box.appendChild(c);});
-      sz(B.glc);glInit(B.glc);
-      B.glc.addEventListener("webglcontextlost",function(e){e.preventDefault();GL.lost=true;});B.glc.addEventListener("webglcontextrestored",function(){GL.gl=null;GL.failed=false;GL.lost=false;glInit(B.glc);draw();});
-      var hit=mk("button","hd-hit hd-key");hit.type="button";hit.id="hdBuildPrism";hit.setAttribute("aria-label","Run your page");C.box.appendChild(hit);
+    scene:function(C){B.cv=mk("canvas","hd-cv pr-gl");B.cv.setAttribute("aria-hidden","true");C.box.appendChild(B.cv);size();glInit(B.cv);
+      B.cv.addEventListener("webglcontextlost",function(e){e.preventDefault();GL.lost=true;});B.cv.addEventListener("webglcontextrestored",function(){GL.gl=null;GL.failed=false;GL.lost=false;glInit(B.cv);draw();});
+      var hit=mk("button","hd-hit hd-key");hit.type="button";hit.id="hdBuildPrism";hit.setAttribute("aria-label","Run your page");C.box.appendChild(hit);B.hit=hit;placeHit();
       hit.addEventListener("pointerenter",function(e){if(e.pointerType!=="touch"){B.hover=true;run();}});hit.addEventListener("pointerleave",function(){B.hover=false;B.down=false;run();});
       hit.addEventListener("pointerdown",function(){B.down=true;run();});["pointerup","pointercancel"].forEach(function(t){hit.addEventListener(t,function(){B.down=false;run();});});
       hit.addEventListener("click",function(e){e.preventDefault();runPage();});hit.addEventListener("focus",function(){B.hold=true;run();});hit.addEventListener("blur",function(){B.hold=false;run();});
       C.scene.addEventListener("pointerenter",function(e){if(e.pointerType!=="touch"){B.hold=true;run();}});
-      C.scene.addEventListener("pointermove",function(e){if(e.pointerType==="touch")return;var r=C.box.getBoundingClientRect();if(!r.width)return;B.tx=Math.max(-1,Math.min(1,(e.clientX-(r.left+r.width*G.cx/520))/(r.width*.4)));},{passive:true});
-      C.scene.addEventListener("pointerleave",function(){B.tx=0;if(D.activeElement!==hit){B.hold=false;run();}});
+      C.scene.addEventListener("pointermove",function(e){if(e.pointerType==="touch")return;var r=C.box.getBoundingClientRect();if(!r.width)return;
+        B.tx=Math.max(-1,Math.min(1,(e.clientX-(r.left+r.width*.45))/(r.width*.45)));B.ty=Math.max(-1,Math.min(1,(e.clientY-(r.top+r.height*.5))/(r.height*.5)));},{passive:true});
+      C.scene.addEventListener("pointerleave",function(){B.tx=0;B.ty=0;if(D.activeElement!==hit){B.hold=false;run();}});
       C.hintSet(["Point at the prism and it turns to you; press it to run your page."]);},
-    paint:function(){paint();draw();},theme:function(){PL.sig="";draw();run();},shown:function(C,sh){if(sh){paint();draw();}run();},resize:function(){PL.sig="";draw();}});
-  var ed=$("codeEditor");if(ed)ed.addEventListener("input",function(){clearTimeout(B.q);B.q=setTimeout(paint,400);});var au=$("autoRun");if(au)au.addEventListener("change",paint);}
+    paint:function(){paint();draw();},theme:function(){draw();run();},shown:function(C,sh){if(sh){paint();draw();}run();},resize:function(){draw();}});
+  var ed=$("codeEditor");if(ed)ed.addEventListener("input",function(){clearTimeout(B.q2);B.q2=setTimeout(paint,400);});var au=$("autoRun");if(au)au.addEventListener("change",paint);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",start);else start();
-W.IngHeads&&(W.IngHeads.build={state:function(){var C=B.C;return {on:!!(C&&C.on),running:!!(B.loop&&B.loop.running()),webgl:!!(GL.gl&&!GL.lost),sway:B.sw,flare:B.flare,
+W.IngHeads&&(W.IngHeads.build={state:function(){var C=B.C;return {on:!!(C&&C.on),running:!!(B.loop&&B.loop.running()),webgl:!!(GL.gl&&!GL.lost),err:GL.err||"",q:B.q,flare:B.flare,
   path:B.path?{P1:B.path.P1,P2:B.path.P2,red:B.path.red,violet:B.path.violet}:null,tag:C&&C.tagB?[C.tagB.textContent,C.tagS.textContent]:null};},draw:draw});
 try{window.__ingParts["p289"]="running";}catch(_){}
 })();
