@@ -67,7 +67,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // the stones follow the task in hand (an invented task)
   const task = await p.evaluate(() => { state.tasks = (state.tasks || []).filter(t => t.id !== 't700'); state.tasks.unshift({ id: 't700', title: 'Write the opening of a short story', steps: [{ t: 'Choose a name', done: true }, { t: 'Write the first line' }, { t: 'Read it aloud' }, { t: 'Rest a minute' }] });
     state.activeTask = 't700'; IngStones.paint(); const s1 = IngStones.state(); state.tasks[0].steps.forEach(x => { x.done = true; }); IngStones.paint(); const s2 = IngStones.state(); state.tasks[0].steps.forEach((x, i) => { x.done = i < 1; }); IngStones.paint(); return { s1, s2 }; });
-  ok(task.s1.stones.cnt === 4 && task.s1.stones.cur === 1 && task.s1.label[0] === 'Step 2 of 4' && task.s1.label[1] === 'Write the first line', 'a task of four steps: four stones, the second in the light, "Step 2 of 4"', task.s1);
+  // her words: "The first stone of the Focus page should be lighter and the purple one should be second on dark mode": the step in hand is the first stone
+  ok(task.s1.stones.cnt === 3 && task.s1.stones.cur === 0 && task.s1.label[0] === 'Step 2 of 4' && task.s1.label[1] === 'Write the first line', 'a task of four steps at its second: the step in hand is the first stone, in the light, and the two ahead follow it', task.s1);
   ok(task.s2.stones.cur > 4 && task.s2.label[0] === 'Every step done', 'every step done: every stone is a stone done', task.s2);
   const fk = await p.evaluate(() => { document.getElementById('fcToday').click(); const a = { part: document.getElementById('page-focus').getAttribute('data-fxp'), top: document.scrollingElement.scrollTop }; return a; });
   ok(fk.part === 'today' && fk.top === 0, 'Open Today opens Today below, and the page stays where it was', fk);

@@ -10,8 +10,8 @@
    and horizon for the night mode and a beautiful soft bright with a couple clouds landscape for day mode for the Focus page."
    So Focus opens, as Lector, Vocatio, Fabrica and Build do, on their header (modules/r290.js, IngStudios.kit). Its instrument is the pool:
    it fills the card to the right of the words, a window onto the water and the sky, softened into the card at its left edge only, never
-   darkened at its edges. The stones are the steps of the task in hand (Work, Steps): the step in hand is the pearl stone in the light,
-   the steps done the deeper violet stones behind it, the steps ahead the lavender stones beyond; the label says which step it is. The
+   darkened at its edges. The stones are the steps of the task in hand (Work, Steps): the step in hand is the first stone, pearl, in
+   the light, and the steps ahead follow it, lilac by day and purple by night; the label says which step it is. The
    armillary sphere that stood here before is kept aside (build/aside/r284.js), as she asked. */
 #page-focus.sk-on > .page-title,#page-focus.sk-on > .lede{display:none !important}
 #page-focus.sk-on .skh-stage{display:none}
@@ -40,8 +40,9 @@ var D=document,W=window;
    wet and dark where the water laps it, mirrored in the water with the sky; rings spread from the stone in hand. Drawn by the graphics
    chip: each stone is traced as a smooth pebble, the water's surface is shaped by its swell and by every ring, and its mirror is traced
    again so the stones and the sky show in it. By night the sky is clear, deep violet and full of stars, with the northern lights over the
-   far shore; by day it is soft and bright, lavender overhead and pearl at the horizon, with a few clouds. The steps done are the deeper
-   violet stones behind; the step in hand is pearl and catches the light; the steps ahead are lavender slate. A stone pressed answers in
+   far shore; by day it is soft and bright, lavender overhead and pearl at the horizon, with a few clouds. The step in hand is the first
+   stone, pearl, in the light; the steps ahead follow it, lilac by day and purple by night (her word: "The first stone of the Focus page
+   should be lighter and the purple one should be second on dark mode"); every step done, every stone violet. A stone pressed answers in
    one of its ways, with soft water (r295). It draws only while in view and while the window is shown, thirty frames a second at rest. */
 var Stones=(function(){
   var W0=520,H0=424,OX=0,host,cv,gl,pr,U={},raf=0,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
@@ -100,7 +101,7 @@ var Stones=(function(){
   "vec3 shadeStone(vec3 p,vec3 n,vec3 pl,float id,vec3 rd,float refl){",
   "  float g=vn(pl*9.0+id*7.0)*0.6+vn(pl*23.0+id*3.0)*0.4;n=normalize(n+(vec3(vn(pl*6.0+1.0),vn(pl*6.0+2.0),vn(pl*6.0+3.0))-0.5)*0.22);",
   "  float k=id<uCur-0.5?0.0:(abs(id-uCur)<0.5?1.0:2.0);",
-  "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.38,0.24,0.68),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.84,0.78,0.99),uN):mix(vec3(0.70,0.62,0.92),vec3(0.32,0.29,0.46),uN));",
+  "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.38,0.24,0.68),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.84,0.78,0.99),uN):mix(vec3(0.70,0.62,0.92),vec3(0.46,0.30,0.80),uN));",
   "  al*=0.80+0.40*g;al+=vec3(0.035)*step(0.80,vn(pl*88.0+id))-vec3(0.03)*step(0.82,vn(pl*67.0+id*5.0));",
   "  float wet=1.0-smoothstep(0.0,0.028,p.y);al*=1.0-0.42*wet;",
   "  vec3 L=normalize(vec3(-0.5,0.62,0.35));float di=max(dot(n,L),0.0);vec3 amb=mix(vec3(0.42,0.40,0.52),vec3(0.16,0.12,0.30),uN);float ao=0.50+0.50*smoothstep(-0.65,0.45,n.y);",
@@ -199,7 +200,7 @@ function now(){var t=null,i=-1;try{if(typeof W.taskCur==="function")t=W.taskCur(
   var n=t&&Array.isArray(t.steps)?t.steps.length:0;return {t:t,n:n,i:i};}
 function paint(){if(!tag)return;var s=now(),cnt=5,cur=0,b="One step at a time",sm="Nothing planned yet";
   if(s.n&&s.i<0){cnt=Math.min(5,s.n);cur=99;b="Every step done";sm=short(s.t.title||"Your task",40);}
-  else if(s.n){var s0=Math.max(0,Math.min(s.i-1,s.n-5));cnt=Math.min(5,s.n-s0);cur=s.i-s0;b="Step "+(s.i+1)+" of "+s.n;sm=short((s.t.steps[s.i]||{}).t||"",44);}
+  else if(s.n){var s0=s.i;cnt=Math.min(5,s.n-s0);cur=0;b="Step "+(s.i+1)+" of "+s.n;sm=short((s.t.steps[s.i]||{}).t||"",44);}
   Stones.setSteps(cnt,cur);if(b+"|"+sm===LAST)return;LAST=b+"|"+sm;setText(tag.querySelector("b"),b);setText(tag.querySelector("small"),sm);
   HD.obj.setAttribute("aria-label","Stepping stones across still water. "+b+(sm?": "+sm:"")+".");}
 /* the keys never move the page (her word, 6.95); what they open is said when it is out of sight */
