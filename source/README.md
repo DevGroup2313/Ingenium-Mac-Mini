@@ -378,7 +378,8 @@ Ingenium 6.97 (13 November 2026): the heads' keys never move the page.
   pressed in the drawer, a wheel pressed on Blend, and the Models turret's "Get one of Ingenium's models" (605 px). Each now acts where it
   stands and the page stays: modules/r294.js (the tree; its hint says the comparison opens in the panels below), r263.js (Folders),
   r262.js (Blend) and r269.js (the turret's keys and lenses). When what a key opens is out of the window, a short line (ingToast) says
-  where it is: so far only "Bring in your work", whose card is at the foot of the page. Keys inside the content (a row's Load key, the
+  where it is: at 1440 by 900 only "Bring in your work" needs it, its card being at the foot of the page; on a smaller window
+  others may. Keys inside the content (a row's Load key, the
   build library's book) and the links that take her to another page keep their own movement; they are not the heads'.
 Tests: `node rig/t_697_still.js <page url> <out>` (8: each of these, and every key in the heads of eight pages; it fails on 6.96 in six);
 `node rig/t_696_fabrica_head.js <page url> <out>` (18: a version pressed does not move the page, which fails on 6.96; with an app open,
