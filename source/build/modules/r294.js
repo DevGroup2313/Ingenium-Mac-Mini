@@ -215,7 +215,7 @@ function words2(r,T,wait){if(!HD)return;var K=KIT(),go=D.getElementById("fbtGo")
     (ideas>0?" · "+plural(ideas,"idea"):"")+(tags?" · "+plural(tags,"release"):"")+(wait?". ":".")));
   if(wait){var w=mk("b","fbt-wait",plural(wait,"change")+" not kept yet.");says.appendChild(w);}
   var top=T&&T.trunk&&T.trunk.length?T.trunk[T.trunk.length-1]:null;setTag(top?(top.title||"The newest version"):r.name,top?(top.short+" · the newest on "+(T.main||"main")):"no version kept yet");
-  HD.hint.innerHTML="Point at the tree to still it; <b>press a version</b> to see what it changed.";stage.setAttribute("aria-label","The tree of "+r.name+"'s versions");
+  HD.hint.innerHTML="Point at the tree to still it; <b>press a version</b> to see what it changed, in the panels below.";stage.setAttribute("aria-label","The tree of "+r.name+"'s versions");
 }
 function setTag(a,b){if(!tag)return;var x=tag.querySelector("b"),y=tag.querySelector("small");a=String(a||"");if(a.length>24)a=a.slice(0,23).replace(/\s+\S*$/,"")+"…";setText(x,a);setText(y,b);}
 function refresh(){var x=X();if(!x||!HD)return;paintSteps();var r=x.cur&&x.cur(),st=null;try{st=r&&x.statusOf?x.statusOf(r):null;}catch(e){}

@@ -78,6 +78,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     ok(v && v.view === 'compare', 'pressed, it opens what it changed (Compare)', v);
     // 6.97: her word, no scrolling down the page: a version pressed opens Compare in its sheet, and the page stays where it was
     ok(scA === scB, 'a version pressed does not move the page', { scA, scB });
+    const hint2 = await p.evaluate(() => (document.querySelector('#page-fabrica .skh-hint') || {}).textContent || '');
+    ok(/press a version to see what it changed, in the panels below\./.test(hint2), 'with an app open, the hint says where a version pressed opens: in the panels below', hint2);
     await p.keyboard.press('Escape'); await sleep(500);
     // motion: it turns, stills under the pointer, Minimal motion holds it
     await p.evaluate(() => document.querySelector('#page-fabrica .skh').scrollIntoView({ block: 'start' })); await p.mouse.move(40, 880); await sleep(1500);
