@@ -193,16 +193,49 @@ body[data-theme="night"] .sko-ico .gl{stroke:url(#oxPearlN)}
 body[data-theme="night"] .skc-dsvg .inh{stroke-opacity:.3}
 .skc-slot{position:absolute;width:72px;height:72px;transform-style:preserve-3d;transform:translateZ(13px);pointer-events:none}
 .skc-up{position:absolute;inset:0;transform-style:preserve-3d;transform:rotate(var(--u0,0deg));transition:transform 1.15s cubic-bezier(.3,1.32,.5,1)}
-/* the stages: set into the bezel as the dial's hub is set (Blend's setting: a polished lip of the bezel's own metal round a well of violet
-   enamel, drawn with the dial's own light, its shadow on the bezel), flat and still; the numeral in pearl on the enamel */
-.skc-cart{position:absolute;left:12px;top:12px;width:48px;height:48px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;pointer-events:auto;
-  -webkit-tap-highlight-color:transparent;transition:none}
-.skc-cart img{position:absolute;left:0;top:0;width:48px;height:48px;display:block;-webkit-user-drag:none;pointer-events:none}
-.skc-cart svg.nm{position:absolute;left:0;top:0;width:48px;height:48px;overflow:visible;pointer-events:none}
+/* the stages: lenses set in the bezel, made as the Models turret makes its own, drawn crisp; each sits in a clean cut in the bezel's metal
+   (a fine edge, no soft halo), flat and still; the numeral in pearl on the glass; a stage done carries a small violet mark */
+.skc-cart{position:absolute;left:10px;top:10px;width:52px;height:52px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;pointer-events:auto;
+  -webkit-tap-highlight-color:transparent;transition:none;box-shadow:0 0 0 1.25px rgba(40,20,80,.32),0 .75px .5px 1.25px rgba(40,20,80,.16)}
+body[data-theme="night"] .skc-cart{box-shadow:0 0 0 1.25px rgba(0,0,0,.62),0 .75px .5px 1.25px rgba(0,0,0,.35)}
+.skc-cart canvas{position:absolute;left:0;top:0;width:52px;height:52px;display:block;border-radius:50%}
+.skc-cart svg.nm{position:absolute;left:0;top:0;width:52px;height:52px;overflow:visible;pointer-events:none}
 .skc-cart .nm text{font:600 15.5px/1 var(--sk-serif);letter-spacing:.05em;fill:#fbf8ff;fill:url(#skcPearl)}
 .skc-cart .nm .sh{fill:rgba(16,6,38,.5)}
+.skc-cart .ok{position:absolute;right:-1px;top:-1px;width:13px;height:13px;border-radius:50%;
+  background:#6a3fb5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.2l2 2 4-4.4' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/70% no-repeat;
+  box-shadow:0 0 0 1.25px #fff}
+body[data-theme="night"] .skc-cart .ok{background-color:#8a63d8;box-shadow:0 0 0 1.25px #2a2140}
 .skc-cart:hover,.skc-cart:active{transform:none}
 .skc-cart:focus{outline:none}.skc-cart:focus-visible{box-shadow:0 0 0 2.5px var(--sk-acc),0 0 0 5px var(--sk-hi)}
+.skc-face{position:absolute;left:160px;top:114px;width:200px;height:200px;transform:translateZ(.3px);pointer-events:none;display:none}
+/* the instrument: the case, its side, the bow; the face and the rose */
+.skc-plate{display:none}
+.skc-face{position:absolute;left:160px;top:114px;width:200px;height:200px;transform:translateZ(.3px);pointer-events:none;display:block}
+.skc-face img{width:100%;height:100%;display:block}
+.skc-eng{left:160px;top:114px;width:200px;height:200px;transform:translateZ(.6px)}
+.skc-case{position:absolute;left:64px;top:18px;width:392px;height:392px;transform:translateZ(12px);pointer-events:none}
+.skc-case img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.skc-cside{position:absolute;left:88px;top:42px;width:344px;height:344px;border-radius:50%;pointer-events:none;transform:translateZ(calc(var(--z) * 1px));
+  background:linear-gradient(160deg,#f3f0f8 0%,#bdb5d2 30%,#6f6690 60%,#3d3558 100%);
+  -webkit-mask:radial-gradient(closest-side,transparent 87.3%,#000 88.3%);mask:radial-gradient(closest-side,transparent 87.3%,#000 88.3%)}
+body[data-theme="night"] .skc-cside{background:linear-gradient(160deg,#cfc6e6 0%,#857aa8 30%,#463d66 60%,#211a36 100%)}
+.skc-bow{position:absolute;left:230px;top:-14px;width:60px;height:66px;transform:translateZ(12px);pointer-events:none;filter:drop-shadow(1px 2px 1.5px rgba(30,14,60,.35))}
+.skc-bow svg{width:100%;height:100%;display:block;overflow:visible}
+.skc-index{transform:translateZ(34px)}
+.skc-collarbox{left:210px;top:164px;width:100px;height:100px}
+.skc-seat{left:224px;top:178px;width:72px;height:72px}
+.skc-seat .hx-seal{width:72px;height:72px}
+.skc-seat .isl{--S:72px !important}
+.skc-index .lit{fill:#f4f1fa}.skc-index .shd{fill:#9d93bb}
+body[data-theme="night"] .skc-index .lit{fill:#e9e4f4}body[data-theme="night"] .skc-index .shd{fill:#8a80aa}
+.skc-dsvg .t{stroke:rgba(36,22,70,.55)}.skc-dsvg .T{stroke:rgba(36,22,70,.7)}.skc-dsvg .sep{fill:rgba(36,22,70,.55)}
+body[data-theme="night"] .skc-dsvg .t,body[data-theme="night"] .skc-dsvg .T{stroke:rgba(12,6,28,.75)}
+
+.skc-face img{width:100%;height:100%;display:block}
+.skc.v-b .skc-face{display:block}
+.skc.v-b .skc-eng{--sk-line:rgba(236,226,255,.42);--sk-acc:#efe6ff}
+.skc.v-b .skc-eng .pl{fill-opacity:.12}.skc.v-b .skc-eng .pd{fill-opacity:.22}
 /* the index: one point of the seal's star, lit and shaded as the seal's star is, its pearl where the seal keeps its heart */
 .skc-index{position:absolute;left:246px;top:24px;width:28px;height:44px;transform:translateZ(30px);transform-origin:14px 44px;pointer-events:none}
 .skc-index svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1px .5px rgba(42,20,80,.3)) drop-shadow(0 3px 4px rgba(42,20,80,.18))}
@@ -300,6 +333,33 @@ body[data-theme="night"] #page-lector .lf-lines i{background:rgba(205,184,240,.1
 body[data-motion="minimal"] #page-lector .lf-sway{animation:none}
 body[data-motion="minimal"] #page-lector button.lf-card,body[data-motion="minimal"] #page-lector .lf-tilt{transition:none}
 @media (prefers-reduced-motion:reduce){#page-lector .lf-sway{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
+/* ---------- Lector's seal (6.94): the engine logo pressed in wax, a real vintage stamp, moving as Home's engine button does (its own
+   .isl rules give it Home's sway, lean, lift, sink and knock; its layers stand a little off one another as Home's do) ---------- */
+#page-lector .lf-seal{position:absolute;left:215px;top:343px;width:92px;height:92px;transform-style:preserve-3d;transform:translateZ(34px)}
+.lf-seal .lx-wax{position:absolute;left:2px;top:2px;margin:0}
+.lx-wax{position:relative;display:block;width:var(--S);height:var(--S)}
+.lx-wax .lxs{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lx-wax .lxs:hover,.lx-wax .lxs:active{background:transparent;box-shadow:none;transform:none}
+.lx-wax .lxs:focus{outline:none}.lx-wax .lxs:focus-visible{outline:2.5px solid var(--sk-acc,#6a3fb5);outline-offset:6px}
+.lx-wax .r175-fx{display:block;width:100%;height:100%;pointer-events:none}
+.lxs-isl{width:var(--S);height:var(--S)}
+.lxs-isl .isl-ring{--fz:.02;--fk:.995}.lxs-isl .isl-star{--fz:.05;--fk:.988}.lxs-isl .isl-heart{--fz:.052;--fk:.987}
+.lxs-l img{display:block;width:100%;height:100%;transform-origin:50% 50%;-webkit-user-drag:none;pointer-events:none}
+.lxs-isl .isl-star > img{filter:drop-shadow(calc(var(--S) * .006) calc(var(--S) * .014) calc(var(--S) * .01) rgba(30,10,60,.34))}
+.lxs-isl .isl-heart > img{filter:none}
+/* the pearl at the heart breathes, a soft beat now and then, and its light turns as it does (her words, 13 November 2026: "I want the little
+   circle inside of the wax seal button to be animated") */
+.lxs-isl .isl-heart > img{animation:lxsPearl 4.6s cubic-bezier(.45,0,.3,1) infinite}
+@keyframes lxsPearl{0%,62%,100%{transform:scale(1) rotate(0deg);filter:brightness(1)}70%{transform:scale(1.09) rotate(-8deg);filter:brightness(1.12)}78%{transform:scale(.98) rotate(4deg);filter:brightness(1)}86%{transform:scale(1.05) rotate(-2deg);filter:brightness(1.06)}}
+.isl.hover .lxs-l.isl-heart > img{animation-duration:2.3s}
+@media (prefers-reduced-motion:reduce){.lxs-isl .isl-heart > img{animation:none}}
+body[data-motion="minimal"] .lxs-isl .isl-heart > img{animation:none}
+body[data-theme="night"] .lxs-isl .isl-star > img{filter:drop-shadow(calc(var(--S) * .006) calc(var(--S) * .014) calc(var(--S) * .012) rgba(0,0,0,.6))}
+.lxs-face{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d}
+.lxs-cast{position:absolute;left:5%;top:9%;width:92%;height:92%;border-radius:50%;background:rgba(40,16,80,.26);filter:blur(calc(var(--S) * .055));transform:translateZ(calc(var(--S) * -.1))}
+body[data-theme="night"] .lxs-cast{background:rgba(0,0,0,.72)}
+.lxs-side{position:absolute;left:0;top:0;width:var(--S);height:calc(var(--S) + 4px);transform:translateZ(calc(var(--S) * -.012))}
+.lxs-side svg{position:absolute;left:0;bottom:0}
 /* still */
 body[data-motion="minimal"] .skh-sway,body[data-motion="minimal"] .sko-idle,body[data-motion="minimal"] .sko-ico{animation:none}
 body[data-motion="minimal"] .sko-tilt{transform:none}
@@ -310,6 +370,106 @@ body[data-motion="minimal"] .skh-k,body[data-motion="minimal"] .sks-step,body[da
 @media (max-width:980px){.skh-obj{transform:scale(.66)}.skh-words{width:360px}.skh-title{font-size:40px}}
 @media (max-width:760px){.skh{height:auto;padding:24px 18px 22px}.skh-words{position:static;width:auto}.skh-obj{display:none}.skh-hint{position:static;margin-top:14px}
   .sks-step{width:calc(50% - 8px)}#page-focus.sk-on .fxp-tab{width:calc(50% - 8px)}}
+/* ---------- the dial (Career Studio), 6.94: a vintage pocket compass in silver, pearl and violet, in the Offline Project's layered
+   depth: a cast shadow below, the case's thickness in stacked rims, the dial sunk inside it, the rose raised off the dial in layers that
+   turn in harmony, the medallions and the engine button standing off the dial, the crystal and the case on top. It sways on its own, leans
+   to the pointer on a spring (one clock, in the script), and every part answers a press ---------- */
+.skv{position:absolute;inset:0;transform-style:preserve-3d}
+.skv img{-webkit-user-drag:none;pointer-events:none;display:block}
+.skv-tilt,.skv-idle,.skv-rise{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:260px 232px;pointer-events:none}
+.skv-rise{animation:skvRise .95s cubic-bezier(.2,.9,.25,1) both}
+@keyframes skvRise{0%{opacity:0;transform:translateZ(-40px) scale(.9)}60%{opacity:1;transform:translateZ(4px) scale(1.015)}100%{opacity:1;transform:none}}
+.skv-under{position:absolute;left:58px;top:56px;width:404px;height:404px;border-radius:50%;transform:translateZ(-30px);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(44,22,88,.34),rgba(44,22,88,.2) 55%,rgba(44,22,88,.07) 80%,rgba(44,22,88,0))}
+body[data-theme="night"] .skv-under{background:radial-gradient(closest-side,rgba(0,0,0,.7),rgba(0,0,0,.42) 55%,rgba(0,0,0,.12) 80%,rgba(0,0,0,0))}
+.skv-side{position:absolute;left:80px;top:52px;width:360px;height:360px;box-sizing:border-box;border-radius:50%;pointer-events:none;transform:translateZ(calc(var(--z) * 1px));
+  border:23px solid #8f88a6;border-color:#e4e0ec #aaa4bb #5d5772 #9d97b0}
+body[data-theme="night"] .skv-side{border-color:#9890aa #5c5670 #1d1a28 #4f4964}
+.skv-base{display:none}
+.skv-domeimg,.skv-bandimg,.skv-chapimg,.skv-glassart{will-change:transform}
+/* the inside, raised in layers: the dial, then the sixteen fine points, the four violet points and the four great points, each standing off
+   the one below with its own edge and its shadow (they turn in harmony, in the script) */
+.skv-lay{position:absolute;left:152px;top:124px;width:216px;height:216px;transform-origin:108px 108px;pointer-events:none;will-change:transform}
+.skv-lay svg,.skv-lay img{position:absolute;left:0;top:0;display:block;width:216px;height:216px;overflow:visible}
+.skv-dial{transform:translateZ(4px)}
+.skv-lsh{transform:translateZ(calc(var(--z) * 1px))}.skv-led{transform:translateZ(calc(var(--z) * 1px))}.skv-ltop{transform:translateZ(calc(var(--z) * 1px))}
+/* the outer ring inside, raised: the band on its wall above the dial, the chapter ring on its wall above the band, each with its shadow */
+.skv-ring{position:absolute;left:103px;top:75px;width:314px;height:314px;transform-style:preserve-3d;pointer-events:none}
+.skv-band,.skv-chap{position:absolute;left:0;top:0;width:314px;height:314px;transform-style:preserve-3d;pointer-events:none}
+.skv-band{transform:translateZ(14px)}.skv-chap{transform:translateZ(28px)}
+.skv-band > img,.skv-chap > img{position:absolute;left:0;top:0;width:314px;height:314px}
+.skv-bandwall,.skv-chapwall{position:absolute;border-radius:50%;box-sizing:border-box;pointer-events:none;transform:translateZ(calc(var(--z) * 1px))}
+.skv-bandwall{left:49.5px;top:49.5px;width:215px;height:215px;border:2.4px solid #3d2780;border-color:#5d45a6 #3a2478 #241452 #3a2478}
+.skv-chapwall{left:25.5px;top:25.5px;width:263px;height:263px;border:2.4px solid #8d86a6;border-color:#d6d1e2 #8d86a6 #4f4868 #8d86a6}
+.skv-chapwall.out{left:4.5px;top:4.5px;width:305px;height:305px;border-color:#efecf5 #9c96b2 #3f3958 #9c96b2}
+body[data-theme="night"] .skv-bandwall{border-color:#40297d #261552 #120830 #261552}
+body[data-theme="night"] .skv-chapwall{border-color:#6d6688 #403a58 #1f1b2c #403a58}
+body[data-theme="night"] .skv-chapwall.out{border-color:#7d7798 #463f60 #17131f #463f60}
+.skv-bandsh,.skv-chapsh{position:absolute;border-radius:50%;pointer-events:none}
+.skv-bandsh{left:52px;top:55px;width:258px;height:258px;margin:-21px 0 0 -21px;box-sizing:border-box;border:24px solid rgba(26,10,58,.5);filter:blur(6px);transform:translateZ(4.4px)}
+.skv-chapsh{left:31px;top:36px;width:306px;height:306px;margin:-21px 0 0 -21px;box-sizing:border-box;border:21px solid rgba(26,10,58,.55);filter:blur(8px);transform:translateZ(14.4px)}
+body[data-theme="night"] .skv-bandsh{border-color:rgba(0,0,0,.8)}
+body[data-theme="night"] .skv-chapsh{border-color:rgba(0,0,0,.78)}
+.skv-scale{position:absolute;left:0;top:0;width:314px;height:314px;display:block;overflow:visible;pointer-events:none;text-rendering:geometricPrecision;transform-origin:157px 157px}
+.skv-marks{position:absolute;left:0;top:0;width:314px;height:314px;transform-origin:157px 157px;transform-style:preserve-3d;pointer-events:none}
+.skv-scale .nm{font:700 8.7px/1 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;letter-spacing:1.45px;fill:#efe9fb}
+.skv-scale .nm.cur{fill:#ffffff}
+.skv-scale .sep{fill:#d8d0ea}
+body[data-theme="night"] .skv-scale .nm{fill:#e9e2f8}body[data-theme="night"] .skv-scale .sep{fill:#a99cc8}
+/* the medallions stand off the ring: their own edge beneath and their shadow on the ring */
+.skv-slot{position:absolute;width:32px;height:32px;transform-style:preserve-3d;transform:translateZ(7px);pointer-events:none}
+.skv-up{position:absolute;inset:0;transform-style:preserve-3d}
+.skv-mdsh{position:absolute;left:3px;top:5px;width:28px;height:28px;border-radius:50%;background:rgba(26,10,58,.42);filter:blur(2.2px);transform:translateZ(-4.4px);pointer-events:none}
+body[data-theme="night"] .skv-mdsh{background:rgba(0,0,0,.75)}
+.skv-mdside{position:absolute;left:1.6px;top:1.6px;width:28.8px;height:28.8px;border-radius:50%;background:linear-gradient(150deg,#e9e5f1,#8c84a6 55%,#4b4466);transform:translateZ(-2.4px);pointer-events:none}
+body[data-theme="night"] .skv-mdside{background:linear-gradient(150deg,#a59dbb,#4d4763 55%,#1d1a2a)}
+.skv-md{position:absolute;left:0;top:0;width:32px;height:32px;margin:0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+.skv-md::before{content:"";position:absolute;left:-6px;top:-6px;right:-6px;bottom:-6px;border-radius:50%}
+.skv-md svg{position:absolute;left:0;top:0;width:32px;height:32px;display:block;overflow:visible}
+.skv-md .nmr{font:600 10.6px/1 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;letter-spacing:.04em}
+.skv-md:focus{outline:none}.skv-md:focus-visible{box-shadow:0 0 0 2px #fff,0 0 0 4px #6a3fb5}
+.skv-inner{position:absolute;left:103px;top:75px;width:314px;height:314px;border-radius:50%;transform:translateZ(14.6px);pointer-events:none;
+  box-shadow:inset 2px 3px 4px rgba(26,10,58,.36),inset 5px 9px 14px rgba(26,10,58,.16)}
+body[data-theme="night"] .skv-inner{box-shadow:inset 2px 3px 4px rgba(0,0,0,.62),inset 5px 9px 14px rgba(0,0,0,.32)}
+/* the engine button stands well off the rose, in its silver collar on a polished post (its thickness) */
+.skv-seatsh{position:absolute;left:233px;top:209px;width:64px;height:64px;border-radius:50%;background:rgba(26,10,58,.45);filter:blur(6px);transform:translateZ(22.4px);pointer-events:none}
+body[data-theme="night"] .skv-seatsh{background:rgba(0,0,0,.78)}
+.skv-seatside{position:absolute;left:228.5px;top:200.5px;width:63px;height:63px;border-radius:50%;pointer-events:none;transform:translateZ(calc(var(--z) * 1px));
+  background:linear-gradient(150deg,#f1eef6,#a7a0bb 50%,#57506f)}
+body[data-theme="night"] .skv-seatside{background:linear-gradient(150deg,#b0a8c4,#5a5472 50%,#1f1b2c)}
+.skv-seat{position:absolute;left:228px;top:200px;width:64px;height:64px;transform:translateZ(30px);border-radius:50%;pointer-events:none}
+.skv-seat .skv-collar{position:absolute;left:-.5px;top:-.5px;width:65px;height:65px}
+.skv-key{position:absolute;left:5px;top:5px;width:54px;height:54px}
+.skv-key .hx-seal{position:absolute;left:0;top:0;width:54px;height:54px;margin:0}
+.skv-key .r175-seal{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer;pointer-events:auto}
+.skv-key .r175-seal:focus{outline:none}.skv-key .r175-seal:focus-visible{outline:2.5px solid #6a3fb5;outline-offset:5px}
+.skv-key .r175-fx{display:block;width:100%;height:100%;pointer-events:none}
+.skv-glass{position:absolute;left:103px;top:75px;width:314px;height:314px;transform:translateZ(40px);pointer-events:none}
+.skv-glass svg{display:block;width:314px;height:314px}
+.skv-glassart{position:absolute;left:0;top:0;width:314px;height:314px;pointer-events:none}
+.skv-ripples{position:absolute;left:0;top:0;width:314px;height:314px;border-radius:50%;overflow:hidden;pointer-events:none}
+.skv-ripple{position:absolute;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;pointer-events:none;animation:skvRip .95s cubic-bezier(.2,.7,.3,1) forwards;
+  background:radial-gradient(closest-side,rgba(255,255,255,0) 52%,rgba(255,255,255,.6) 70%,rgba(255,255,255,0) 100%)}
+body[data-theme="night"] .skv-ripple{background:radial-gradient(closest-side,rgba(214,198,255,0) 52%,rgba(214,198,255,.42) 70%,rgba(214,198,255,0) 100%)}
+@keyframes skvRip{0%{transform:scale(.12);opacity:.95}100%{transform:scale(1.6);opacity:0}}
+.skv-case{position:absolute;left:79px;top:51px;width:362px;height:362px;transform:translateZ(42px);pointer-events:none}
+.skv-case img{position:absolute;left:0;top:0;width:362px;height:362px}
+.skv-bow{position:absolute;left:232px;top:-14px;width:56px;height:72px;transform:translateZ(42px);pointer-events:none;filter:drop-shadow(.8px 1.6px 1.2px rgba(30,14,60,.32))}
+.skv-bow.skv-bowback{transform:translateZ(34px);filter:brightness(.5)}
+body[data-theme="night"] .skv-bow{filter:drop-shadow(.8px 1.6px 1.2px rgba(0,0,0,.6))}
+body[data-theme="night"] .skv-bow.skv-bowback{filter:brightness(.45)}
+.skv-bow img{width:56px;height:72px}
+.skv-index{position:absolute;left:251px;top:48px;width:18px;height:27px;transform:translateZ(44px);transform-origin:8px 2px;pointer-events:none;filter:drop-shadow(.6px 1.2px .8px rgba(30,14,60,.38))}
+body[data-theme="night"] .skv-index{filter:drop-shadow(.6px 1.2px .8px rgba(0,0,0,.65))}
+.skv-index svg{display:block;width:18px;height:27px;overflow:visible}
+.skv-index.tick{animation:skvTick .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes skvTick{0%{transform:translateZ(44px) rotate(0)}35%{transform:translateZ(44px) rotate(-5deg)}70%{transform:translateZ(44px) rotate(2deg)}100%{transform:translateZ(44px) rotate(0)}}
+/* every part answers a press (found from the compass's own geometry, in the script) */
+.skv{cursor:default}.skv.hov{cursor:pointer}
+@media (prefers-reduced-motion:reduce){.skv-index.tick,.skv-rise{animation:none}}
+body[data-motion="minimal"] .skv-index.tick,body[data-motion="minimal"] .skv-rise{animation:none}
+
+.skh.skv-head .skh-sway{animation:none}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p290"]="started";}catch(_){}
 /* R290 · the heads of the Career Studio and Lector as Blend, Models, Folders and Home are made: see the note at the top of its styles */
@@ -370,6 +530,7 @@ function mvPlate(size){var P=mvPal(),nt=night(),s=mvScale(),n=Math.ceil(size*s/2
   x.restore();MVC[key]=c;return mvDup(c);}
 var URLS={};
 function plateUrl(size){var k="p"+size+mvTag()+mvScale();if(!URLS[k]){try{URLS[k]=mvPlate(size).toDataURL("image/png");}catch(e){URLS[k]="";}}return URLS[k];}
+function collarSilverUrl(px){var k="cS"+px+mvTag()+mvScale();if(!URLS[k]){try{URLS[k]=mvSetting(px/.64,.64,25,29.6,night()?"#b4aad0":"#e4dff0",night()?"#2a1a52":"#3a2470","cs",true).toDataURL("image/png");}catch(e){URLS[k]="";}}return URLS[k];}
 function collarUrl(px){var k="c"+px+mvTag()+mvScale();if(!URLS[k]){try{var P=mvPal();URLS[k]=mvSetting(px/.64,.64,25,29.6,P.collar,P.floor,"c",true).toDataURL("image/png");}catch(e){URLS[k]="";}}return URLS[k];}
 
 /* ================= Home's orbs (modules/r261.js, refined in 6.92): the same ball, drawn by Home itself (IngOrrery.sphere), the same bevel
@@ -440,15 +601,15 @@ function sealCopy(){var d=$("introSeal"),s=d&&d.querySelector(".isl");if(!s){var
    two edges rounded so each catches the light as a fine bright line where it faces it, a groove where the stages ride, and the soft shadow
    it casts on the plate. It is round, so it is drawn still; what turns on it (its scale, its inlay, its stages) is drawn above it */
 var BZ={day:"#e6def4",night:"#4d4270"};
-function bezelUrl(R1,R2,RG,M){var P=mvPal(),nt=night(),s=mvScale(),n=Math.ceil((R2+M)*2*s/2)*2,key="bz"+n+mvTag();if(URLS[key])return URLS[key];
-  var c=mvCv(n),x=c.getContext("2d"),im=x.createImageData(n,n),o=im.data,c0=n/2,G=mvRgb(nt?BZ.night:BZ.day),K=P.dark,i,j,xx,yy,dx,dy,r,ex,ey,e,a,re=4.2,d,sl,nx,ny,l,E,gr,k,ss,cov;
+function bezelUrl(R1,R2,RG,M){var P=mvPal(),nt=night(),s=mvScale(),n=Math.ceil((R2+M)*2*s/2)*2,key="bz"+n+mvTag()+skcVar();if(URLS[key])return URLS[key];
+  var c=mvCv(n),x=c.getContext("2d"),im=x.createImageData(n,n),o=im.data,c0=n/2,G=mvRgb(skcVar()==="c"?(nt?"#3a2f5c":"#4a3d72"):(nt?BZ.night:BZ.day)),K=P.dark,i,j,xx,yy,dx,dy,r,ex,ey,e,a,re=4.2,d,sl,nx,ny,l,E,gr,k,ss,cov;
   for(yy=0;yy<n;yy++)for(xx=0;xx<n;xx++){dx=(xx+.5-c0)/s;dy=(yy+.5-c0)/s;r=Math.sqrt(dx*dx+dy*dy);if(r>R2+M||r<R1-M)continue;i=yy*n+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;e=ex*MVLX+ey*MVLY;
     if(r>R2+.5){a=(nt?.55:.34)*Math.max(0,e)*Math.exp(-(r-R2)/2.4)+(nt?.22:.1)*Math.exp(-(r-R2)/.9);o[j]=K[0];o[j+1]=K[1];o[j+2]=K[2];o[j+3]=Math.min(1,a)*255;continue;}
     if(r<R1-.5){a=(nt?.5:.3)*Math.max(0,-e)*Math.exp(-(R1-r)/2.6)+(nt?.2:.08)*Math.exp(-(R1-r)/.9);o[j]=K[0];o[j+1]=K[1];o[j+2]=K[2];o[j+3]=Math.min(1,a)*255;continue;}
     nx=0;ny=0;d=r-R1;if(d<re){sl=Math.min(6,(re-d)/Math.sqrt(Math.max(1e-3,re*re-(re-d)*(re-d))));nx=-ex*sl;ny=-ey*sl;}
     d=R2-r;if(d<re){sl=Math.min(6,(re-d)/Math.sqrt(Math.max(1e-3,re*re-(re-d)*(re-d))));nx=ex*sl;ny=ey*sl;}
     d=r-RG;if(Math.abs(d)<1.7){sl=.95*(d<0?1:-1);nx=ex*sl;ny=ey*sl;}
-    l=Math.sqrt(nx*nx+ny*ny+1);E=mvEnv(nx/l,ny/l,1/l);gr=1+.012*Math.sin(r*4.6)+.014*(mvGrain(i)-.5);k=E.d*P.env*gr;ss=E.s*1.1;
+    l=Math.sqrt(nx*nx+ny*ny+1);E=mvEnv(nx/l,ny/l,1/l);gr=1+.012*Math.sin(r*4.6)+.014*(mvGrain(i)-.5);var th=Math.atan2(dy,dx),dl=Math.atan2(-MVLY,-MVLX),aw=Math.abs(Math.atan2(Math.sin(2*(th-dl)),Math.cos(2*(th-dl))))/2,wedge=(nx===0&&ny===0)?Math.exp(-aw*aw/.035)*(nt?.18:.26):0;k=E.d*P.env*gr*(1+wedge)-(nt?.0:.05);ss=E.s*2.2;
     cov=Math.min(1,Math.max(0,r-R1+.5))*Math.min(1,Math.max(0,R2+.5-r));
     o[j]=Math.min(255,G[0]*k+P.spec[0]*ss);o[j+1]=Math.min(255,G[1]*k+P.spec[1]*ss);o[j+2]=Math.min(255,G[2]*k+P.spec[2]*ss);o[j+3]=cov*255;}
   x.putImageData(im,0,0);try{URLS[key]=c.toDataURL("image/png");}catch(err){URLS[key]="";}return URLS[key];}
@@ -476,76 +637,508 @@ function dialSvg(list){var n=list.length,s=svg("svg",{viewBox:"0 0 304 304","cla
     var h0=[c+125.2*Math.cos(a0*Math.PI/180),c+125.2*Math.sin(a0*Math.PI/180)],h1=[c+125.2*Math.cos(a1*Math.PI/180),c+125.2*Math.sin(a1*Math.PI/180)];
     s.appendChild(svg("path",{"class":"inh",d:"M"+h0[0].toFixed(2)+" "+h0[1].toFixed(2)+"A125.2 125.2 0 "+big+" 1 "+h1[0].toFixed(2)+" "+h1[1].toFixed(2)}));}
   return s;}
-/* a stage: Blend's setting (mvSetting) at 48 pixels, its lip in the bezel's own metal, its enamel in Ingenium's violet (deepest for the
-   stage in hand, quieter for the stages ahead), drawn once by day and once by night; its numeral in pearl */
-var ENAMEL={day:{cur:"#5a32a6",done:"#7752c2",ahead:"#9a8cc0"},night:{cur:"#6238b4",done:"#7350bf",ahead:"#5e5287"}};
-function stageUrl(kind){var key="st"+kind+mvTag()+mvScale();if(URLS[key])return URLS[key];var E=ENAMEL[night()?"night":"day"];
-  try{URLS[key]=mvSetting(48/.64,.64,22.6,28.6,night()?BZ.night:BZ.day,E[kind]||E.ahead,"s"+kind,true).toDataURL("image/png");}catch(e){URLS[key]="";}return URLS[key];}
-function cartEl(num,kind){var f=D.createDocumentFragment();f.appendChild(img("",stageUrl(kind)));
-  var s=svg("svg",{"class":"nm",viewBox:"0 0 48 48","aria-hidden":"true"});
-  if(!$("skcPearl")){var df=svg("defs",{}),gr=svg("linearGradient",{id:"skcPearl",gradientUnits:"userSpaceOnUse",x1:"14",y1:"16",x2:"34",y2:"34"});
+/* a stage: a lens set in the bezel, made as the Models turret makes its own (modules/r269.js: a knurled rim, a turned ring, the glass),
+   drawn crisp at this size (fewer, firmer teeth, and a polished collar where it meets the bezel), flat and still; its numeral on the glass.
+   Her words on the first lenses: "I want a variation of this design but I don't want the little fuzy look around the little balls, I want
+   it to look more refined and elevated but still match the look of the rest of the app": no soft halo, a clean cut in the bezel */
+var LENS={cur:"#5d34a8",done:"#7a56c4",ahead:"#9a86c8"},TAU2=Math.PI*2;
+function lensPal(){return night()?{mL:52,mS:12,knL:30,knS:12,hole:"#0d0618"}:{mL:80,mS:12,knL:52,knS:12,hole:"#1d0f38"};}
+function lhex(c){c=String(c).replace("#","");return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)];}
+function lmix(a,b,t){return [0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*t);});}
+function ltones(col){var c=lhex(col);return [lmix(c,[255,255,255],.84),lmix(c,[255,255,255],.4),c,lmix(c,[0,0,0],.56)];}
+function lrgba(c,a){return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")";}
+function lspun(g,cx,cy,r0,r1,l0,sat,light){for(var r=Math.max(.35,r0);r<r1;r+=.7){var n=(Math.sin(r*1.9)+Math.sin(r*.41+1.1)+Math.sin(r*5.3)*.5)/2.5;g.strokeStyle="hsl(268,"+sat+"%,"+(l0+n*4)+"%)";g.lineWidth=1;g.beginPath();g.arc(cx,cy,r,0,TAU2);g.stroke();}
+  if(g.createConicGradient){var cg=g.createConicGradient(-2.2,cx,cy);[[0,.45],[.07,0],[.43,0],[.5,.3],[.57,0],[.93,0],[1,.45]].forEach(function(s){cg.addColorStop(s[0],"rgba(255,255,255,"+(s[1]*(light||1))+")");});
+    g.save();g.beginPath();g.arc(cx,cy,r1,0,TAU2);g.arc(cx,cy,r0,0,TAU2,true);g.fillStyle=cg;g.fill();g.restore();}}
+function lbevel(g,cx,cy,r,w){var lg=g.createLinearGradient(cx-r,cy-r,cx+r,cy+r);lg.addColorStop(0,"rgba(255,255,255,.85)");lg.addColorStop(.5,"rgba(255,255,255,.05)");lg.addColorStop(1,"rgba(46,23,100,.42)");
+  g.strokeStyle=lg;g.lineWidth=w;g.beginPath();g.arc(cx,cy,r,0,TAU2);g.stroke();}
+function stageLens(cv,S,col){var dpr=Math.min(2,W.devicePixelRatio||1),px=Math.round(S*dpr);cv.width=cv.height=px;cv.style.width=cv.style.height=S+"px";var g=cv.getContext("2d");if(!g)return;
+  g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);var c=S/2,R=S/2-.5,Q=lensPal(),N=60,i,nt=night();
+  /* the polished collar where the lens meets the bezel: raised, lit above on the left */
+  var cg=g.createLinearGradient(0,0,S,S);cg.addColorStop(0,nt?"#e6e1f0":"#ffffff");cg.addColorStop(.48,nt?"#8c84a6":"#cfc9dc");cg.addColorStop(1,nt?"#2a2440":"#615a7c");g.fillStyle=cg;g.beginPath();g.arc(c,c,R,0,TAU2);g.fill();
+  /* the knurled rim: firm teeth, each lit on its side toward the light */
+  var R1=R-1.7,R2=R*.84;for(i=0;i<N;i++){var a0=i*TAU2/N,a1=(i+.5)*TAU2/N,lit=.5+.5*Math.cos(a0+2.3);
+    g.beginPath();g.arc(c,c,R1,a0,a1);g.arc(c,c,R2,a1,a0,true);g.closePath();g.fillStyle="hsl(268,"+Q.knS+"%,"+(Q.knL+lit*30)+"%)";g.fill();
+    g.beginPath();g.arc(c,c,R1,a1,a0+TAU2/N);g.arc(c,c,R2,a0+TAU2/N,a1,true);g.closePath();g.fillStyle="hsl(268,"+(Q.knS+6)+"%,"+(Q.knL-10+lit*16)+"%)";g.fill();}
+  lbevel(g,c,c,R1,.9);lspun(g,c,c,R*.64,R2,Q.mL-4,Q.mS,.9);lbevel(g,c,c,R2,.9);lbevel(g,c,c,R*.64,.9);
+  var T=ltones(col);g.strokeStyle=lrgba(T[2],.95);g.lineWidth=R*.04;g.beginPath();g.arc(c,c,R*.74,0,TAU2);g.stroke();
+  g.fillStyle=Q.hole;g.beginPath();g.arc(c,c,R*.62,0,TAU2);g.fill();
+  /* the glass, deep at its edge and lit at its heart, with its inner rings and one highlight */
+  var gl=g.createRadialGradient(c-R*.14,c-R*.16,R*.05,c,c,R*.58);gl.addColorStop(0,lrgba(T[1],1));gl.addColorStop(.5,lrgba(T[2],1));gl.addColorStop(1,lrgba(T[3],1));
+  g.fillStyle=gl;g.beginPath();g.arc(c,c,R*.58,0,TAU2);g.fill();
+  [.48,.36].forEach(function(k,j){g.strokeStyle="rgba(255,255,255,"+(.13-j*.04)+")";g.lineWidth=.8;g.beginPath();g.arc(c,c,R*k,0,TAU2);g.stroke();});
+  g.save();g.beginPath();g.arc(c,c,R*.58,0,TAU2);g.clip();var hx=c-R*.25,hy=c-R*.3,hl=g.createRadialGradient(hx,hy,0,hx,hy,R*.24);hl.addColorStop(0,"rgba(255,255,255,.72)");hl.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=hl;g.beginPath();g.ellipse(hx,hy,R*.22,R*.11,-.7,0,TAU2);g.fill();g.restore();
+  g.strokeStyle=lrgba(T[3],.95);g.lineWidth=1.1;g.beginPath();g.arc(c,c,R*.58,0,TAU2);g.stroke();}
+function cartEl(num,kind){var f=D.createDocumentFragment(),cv=D.createElement("canvas");cv.setAttribute("aria-hidden","true");stageLens(cv,52,LENS[kind]||LENS.ahead);f.appendChild(cv);
+  var s=svg("svg",{"class":"nm",viewBox:"0 0 52 52","aria-hidden":"true"});
+  if(!$("skcPearl")){var df=svg("defs",{}),gr=svg("linearGradient",{id:"skcPearl",gradientUnits:"userSpaceOnUse",x1:"16",y1:"18",x2:"36",y2:"36"});
     [["0","#ffffff"],[".45","#ffffff"],["1","#e2d6f8"]].forEach(function(p){gr.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});df.appendChild(gr);s.appendChild(df);}
-  var sh=svg("text",{"class":"sh",x:"24.3",y:"30.4","text-anchor":"middle"});sh.textContent=num;s.appendChild(sh);var t=svg("text",{x:"24",y:"29.7","text-anchor":"middle"});t.textContent=num;s.appendChild(t);f.appendChild(s);return f;}
+  var sh=svg("text",{"class":"sh",x:"26.3",y:"31.9","text-anchor":"middle"});sh.textContent=num;s.appendChild(sh);var t=svg("text",{x:"26",y:"31.3","text-anchor":"middle"});t.textContent=num;s.appendChild(t);f.appendChild(s);return f;}
+/* the dial's face, for a variant drawn for her choice: a deep violet enamel over a sunburst guilloche (fine rays that catch the light
+   toward the lamp and away from it, as an engine-turned watch dial does), darker where the enamel is thicker at its edge, with one soft
+   gloss of the lamp on its surface; drawn once by day and once by night */
+function faceUrl(R){var M=mvScale(),key="fc"+R+mvTag()+M;if(URLS[key])return URLS[key];var nt=night(),n=Math.ceil(R*2*M/2)*2,c=mvCv(n),x=c.getContext("2d"),im=x.createImageData(n,n),o=im.data,c0=n/2,
+    A=mvRgb(nt?"#4a2896":"#55309f"),B=mvRgb(nt?"#1c0b44":"#26105a"),thL=Math.atan2(-MVLY,-MVLX),i,j,xx,yy,dx,dy,r,th,t,sb,gr,k,gl,cov;
+  for(yy=0;yy<n;yy++)for(xx=0;xx<n;xx++){dx=(xx+.5-c0)/M;dy=(yy+.5-c0)/M;r=Math.sqrt(dx*dx+dy*dy);if(r>R+.6)continue;i=yy*n+xx;j=i*4;th=Math.atan2(dy,dx);t=r/R;
+    sb=Math.pow(Math.abs(Math.cos(th-thL)),4);gr=1+.07*Math.sin(th*300)+.03*Math.sin(th*97+1.3);k=1-.42*Math.pow(t,3);
+    gl=.22*Math.exp(-((dx+R*.38)*(dx+R*.38)+(dy+R*.42)*(dy+R*.42))/(R*R*.09));
+    var mix=.35+.65*sb;cov=Math.min(1,Math.max(0,R+.5-r));
+    o[j]=Math.min(255,(B[0]+(A[0]-B[0])*mix)*gr*k*1.12+255*gl);o[j+1]=Math.min(255,(B[1]+(A[1]-B[1])*mix)*gr*k*1.12+240*gl);o[j+2]=Math.min(255,(B[2]+(A[2]-B[2])*mix)*gr*k*1.12+255*gl);o[j+3]=cov*255;}
+  x.putImageData(im,0,0);try{URLS[key]=c.toDataURL("image/png");}catch(err){URLS[key]="";}return URLS[key];}
+function skcVar(){var v=W.__skcVar||"a";return /^[abc]$/.test(v)?v:"a";}
+/* ---------- the instrument (13 November 2026): her pictures of old compasses "as inspiration for the 3D rendering of the compass",
+   "customise it to Ingenium and its design and colour palette". A real instrument in Ingenium's colours: a heavy case of polished silver
+   with its own thickness, the turning bezel set lower inside it, the dial recessed again in deep violet enamel over a sunburst, a
+   faceted silver rose built on the seal's star, and a pocket compass's bow above. Polished metal is drawn as polished metal is seen:
+   it shows the room round it (a bright window above on the left, a pale ceiling, a dark floor), so its curves carry bright and dark
+   bands and its flat faces stay deep; nothing is pastel. ---------- */
+var IK=(function(){var a=-.5,b=-.66,c=.56,l=Math.sqrt(a*a+b*b+c*c);return [a/l,b/l,c/l];})();
+/* the room a polished surface shows: r is the direction it reflects (screen axes, y down, z toward her) */
+function room(rx,ry,rz){var up=-ry,k=Math.max(0,rx*IK[0]+ry*IK[1]+rz*IK[2]),win=Math.pow(k,18)*1.9+Math.pow(k,4)*.35,
+    sky=up>0?.62+.3*up:.62+.5*up,front=rz>0?.36*rz:0,fill=Math.max(0,rx*.7-ry*.1)*.22;
+  return Math.max(.05,Math.min(2.4,sky*(1-rz*.55)+front+win+fill));}
+function metal(nx,ny,nz,base,P,rough){var rz=2*nz*nz-1,rx=2*nz*nx,ry=2*nz*ny,e=room(rx,ry,rz),d=Math.max(0,nx*IK[0]+ny*IK[1]+nz*IK[2]),v=(1-rough)*e+rough*(.35+.75*d),
+    sp=Math.pow(Math.max(0,rx*IK[0]+ry*IK[1]+rz*IK[2]),60)*(1-rough)*1.4,nt=night(),dim=nt?.78:1;
+  return [Math.min(255,(base[0]*v*.78+255*sp)*dim),Math.min(255,(base[1]*v*.78+250*sp)*dim),Math.min(255,(base[2]*v*.82+255*sp)*dim)];}
+var SILVER={day:"#e2dcee",night:"#b9aed6"};
+/* the case: a domed ring of polished silver from r0 to r1, its inner lip falling to the bezel, and the shadow it casts inward and outward */
+function caseUrl(S,r0,r1){var M=mvScale(),key="cs"+S+r0+r1+mvTag()+M;if(URLS[key])return URLS[key];var nt=night(),n=Math.ceil(S*M/2)*2,c=mvCv(n),x=c.getContext("2d"),im=x.createImageData(n,n),o=im.data,c0=n/2,
+    G=mvRgb(nt?SILVER.night:SILVER.day),rm=(r0+r1)/2,hw=(r1-r0)/2,i,j,xx,yy,dx,dy,r,ex,ey,e,q,sl,nx,ny,nz,l,col,cov,a;
+  for(yy=0;yy<n;yy++)for(xx=0;xx<n;xx++){dx=(xx+.5-c0)/M;dy=(yy+.5-c0)/M;r=Math.sqrt(dx*dx+dy*dy);i=yy*n+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;e=ex*MVLX+ey*MVLY;
+    if(r>r1+.5){a=(nt?.62:.42)*Math.max(0,e+.15)*Math.exp(-(r-r1)/5)+(nt?.3:.16)*Math.exp(-(r-r1)/1.6);if(r>r1+16)continue;o[j]=12;o[j+1]=4;o[j+2]=30;o[j+3]=Math.min(1,a)*255;continue;}
+    if(r<r0-.5){a=(nt?.62:.46)*Math.max(0,-e+.1)*Math.exp(-(r0-r)/3.4)+(nt?.3:.14)*Math.exp(-(r0-r)/1.2);if(r<r0-12)continue;o[j]=12;o[j+1]=4;o[j+2]=30;o[j+3]=Math.min(1,a)*255;continue;}
+    q=Math.max(-.985,Math.min(.985,(r-rm)/hw));sl=q/Math.sqrt(1-q*q)*.9;nx=ex*sl;ny=ey*sl;nz=1;l=Math.sqrt(nx*nx+ny*ny+1);
+    col=metal(nx/l,ny/l,nz/l,G,null,.18);cov=Math.min(1,Math.max(0,r-r0+.5))*Math.min(1,Math.max(0,r1+.5-r));
+    /* two fine turned lines where the lip begins, as a case is finished */
+    var line=(Math.abs(r-(r0+2.2))<.45?.72:1)*(Math.abs(r-(r1-2))<.4?1.15:1);
+    o[j]=Math.min(255,col[0]*line);o[j+1]=Math.min(255,col[1]*line);o[j+2]=Math.min(255,col[2]*line);o[j+3]=cov*255;}
+  x.putImageData(im,0,0);try{URLS[key]=c.toDataURL("image/png");}catch(err){URLS[key]="";}return URLS[key];}
+/* the turning bezel as metal: a flat turned face (two soft wedges of light, as turned metal shows) between rounded edges, its groove */
+function bezelMetalUrl(R1,R2,RG,M){var P=mvPal(),nt=night(),s=mvScale(),n=Math.ceil((R2+M)*2*s/2)*2,key="bzm"+n+mvTag();if(URLS[key])return URLS[key];
+  var c=mvCv(n),x=c.getContext("2d"),im=x.createImageData(n,n),o=im.data,c0=n/2,G=mvRgb(nt?"#beb4da":"#efebf7"),i,j,xx,yy,dx,dy,r,ex,ey,e,a,re=3.2,d,sl,nx,ny,l,col,cov,th,dl=Math.atan2(-MVLY,-MVLX),aw,wedge;
+  for(yy=0;yy<n;yy++)for(xx=0;xx<n;xx++){dx=(xx+.5-c0)/s;dy=(yy+.5-c0)/s;r=Math.sqrt(dx*dx+dy*dy);if(r>R2+M||r<R1-M)continue;i=yy*n+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;e=ex*MVLX+ey*MVLY;
+    if(r>R2+.5){continue;}
+    if(r<R1-.5){a=(nt?.6:.4)*Math.max(0,-e+.1)*Math.exp(-(R1-r)/3)+(nt?.26:.12)*Math.exp(-(R1-r)/1);o[j]=12;o[j+1]=4;o[j+2]=30;o[j+3]=Math.min(1,a)*255;continue;}
+    nx=0;ny=0;d=r-R1;if(d<re){sl=Math.min(5,(re-d)/Math.sqrt(Math.max(1e-3,re*re-(re-d)*(re-d))));nx=-ex*sl;ny=-ey*sl;}
+    d=R2-r;if(d<re){sl=Math.min(5,(re-d)/Math.sqrt(Math.max(1e-3,re*re-(re-d)*(re-d))));nx=ex*sl;ny=ey*sl;}
+    d=r-RG;if(Math.abs(d)<1.6){sl=.95*(d<0?1:-1);nx=ex*sl;ny=ey*sl;}
+    l=Math.sqrt(nx*nx+ny*ny+1);col=metal(nx/l,ny/l,1/l,G,P,nx===0&&ny===0?.34:.12);
+    th=Math.atan2(dy,dx);aw=Math.abs(Math.atan2(Math.sin(2*(th-dl)),Math.cos(2*(th-dl))))/2;wedge=(nx===0&&ny===0)?Math.exp(-aw*aw/.028)*(nt?.42:.5):0;
+    var gr=1+.03*Math.sin(r*4.6)+.02*(mvGrain(i)-.5);cov=Math.min(1,Math.max(0,r-R1+.5))*Math.min(1,Math.max(0,R2+.5-r));
+    o[j]=Math.min(255,col[0]*gr*(1+wedge));o[j+1]=Math.min(255,col[1]*gr*(1+wedge));o[j+2]=Math.min(255,col[2]*gr*(1+wedge));o[j+3]=cov*255;}
+  x.putImageData(im,0,0);try{URLS[key]=c.toDataURL("image/png");}catch(err){URLS[key]="";}return URLS[key];}
+/* the rose, faceted silver on the enamel: four long points cut as the seal's star is (its sides drawn in), four short ones between, and
+   sixteen fine ones; each point a lit half and a shaded half, with a hairline where they meet */
+function roseSvg(){var s=svg("svg",{viewBox:"0 0 200 200","aria-hidden":"true"}),c=100,id="skR"+(++NS),df=svg("defs",{}),f=function(n){return n.toFixed(2);},i;
+  var g1=svg("linearGradient",{id:id+"l",x1:"0",y1:"0",x2:"1",y2:"1"});[["0","#ffffff"],[".55","#e6e0f2"],["1","#b9aed6"]].forEach(function(p){g1.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});
+  var g2=svg("linearGradient",{id:id+"d",x1:"0",y1:"0",x2:"1",y2:"1"});[["0","#a99fc6"],[".5","#7d72a0"],["1","#4c4370"]].forEach(function(p){g2.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});
+  var fl=svg("filter",{id:id+"f",x:"-20%",y:"-20%",width:"140%",height:"140%"});fl.appendChild(svg("feDropShadow",{dx:".8",dy:"1.4",stdDeviation:"1.2","flood-color":"#0c0420","flood-opacity":".55"}));
+  df.appendChild(g1);df.appendChild(g2);df.appendChild(fl);s.appendChild(df);
+  var gAll=svg("g",{filter:"url(#"+id+"f)"});s.appendChild(gAll);
+  function point(ang,L,w,curve,cls){var u=[Math.cos(ang),Math.sin(ang)],v=[-u[1],u[0]],P=[c+L*u[0],c+L*u[1]],B1=[c+w*v[0],c+w*v[1]],B2=[c-w*v[0],c-w*v[1]],K1=[c+.42*L*u[0]+curve*w*v[0],c+.42*L*u[1]+curve*w*v[1]],K2=[c+.42*L*u[0]-curve*w*v[0],c+.42*L*u[1]-curve*w*v[1]];
+    var lit=svg("path",{d:"M"+c+" "+c+"L"+f(B1[0])+" "+f(B1[1])+"Q"+f(K1[0])+" "+f(K1[1])+" "+f(P[0])+" "+f(P[1])+"z",fill:"url(#"+id+"l)"}),shd=svg("path",{d:"M"+c+" "+c+"L"+f(B2[0])+" "+f(B2[1])+"Q"+f(K2[0])+" "+f(K2[1])+" "+f(P[0])+" "+f(P[1])+"z",fill:"url(#"+id+"d)"});
+    var rid=svg("path",{d:"M"+c+" "+c+"L"+f(P[0])+" "+f(P[1]),stroke:"#3a2a66","stroke-opacity":".5","stroke-width":".5",fill:"none"});gAll.appendChild(lit);gAll.appendChild(shd);gAll.appendChild(rid);}
+  for(i=0;i<16;i++){var a=(i*22.5-90)*Math.PI/180;if(i%2===1)point(a,84,4.2,.25);}
+  for(i=0;i<4;i++)point((i*90-45)*Math.PI/180,80,13,.3);
+  for(i=0;i<4;i++)point((i*90-90)*Math.PI/180,97,21,.22);
+  s.appendChild(svg("circle",{cx:c,cy:c,r:"84",fill:"none",stroke:"#e9e1fb","stroke-opacity":".28","stroke-width":".7"}));
+  s.appendChild(svg("circle",{cx:c,cy:c,r:"78",fill:"none",stroke:"#e9e1fb","stroke-opacity":".2","stroke-width":".5","stroke-dasharray":"1 2.6"}));
+  return s;}
+/* the bow: a pocket compass's ring and its knurled crown, polished silver */
+function bowSvg(){var s=svg("svg",{viewBox:"0 0 60 66","aria-hidden":"true"}),id="skB"+(++NS),df=svg("defs",{});
+  var g=svg("linearGradient",{id:id+"m",x1:"0",y1:"0",x2:"1",y2:"1"});[["0","#ffffff"],[".3","#e2dcee"],[".55","#8d83ab"],[".75","#d6cfe6"],["1","#5d547e"]].forEach(function(p){g.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});
+  var k=svg("linearGradient",{id:id+"k",x1:"0",y1:"0",x2:"1",y2:"0"});[["0","#6f6592"],[".3","#f3effa"],[".55","#b7aed0"],["1","#4f4672"]].forEach(function(p){k.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});
+  df.appendChild(g);df.appendChild(k);s.appendChild(df);
+  s.appendChild(svg("ellipse",{cx:"30",cy:"20",rx:"19",ry:"17",fill:"none",stroke:"#2a2046","stroke-opacity":".35","stroke-width":"6.4",transform:"translate(.8 1.4)"}));
+  s.appendChild(svg("ellipse",{cx:"30",cy:"20",rx:"19",ry:"17",fill:"none",stroke:"url(#"+id+"m)","stroke-width":"5.4"}));
+  s.appendChild(svg("ellipse",{cx:"30",cy:"20",rx:"19",ry:"17",fill:"none",stroke:"#ffffff","stroke-opacity":".55","stroke-width":".8",transform:"translate(-.6 -.9)"}));
+  s.appendChild(svg("rect",{x:"23",y:"34",width:"14",height:"13",rx:"2.4",fill:"url(#"+id+"k)"}));
+  for(var i=0;i<6;i++)s.appendChild(svg("line",{x1:(24.6+i*2.2).toFixed(1),y1:"35",x2:(24.6+i*2.2).toFixed(1),y2:"46",stroke:"#3c3360","stroke-opacity":".35","stroke-width":".6"}));
+  s.appendChild(svg("rect",{x:"25.5",y:"46",width:"9",height:"10",rx:"1.6",fill:"url(#"+id+"m)"}));
+  return s;}
 /* the index: one point of the seal's star, pointing at the stage in hand, its pearl where the seal keeps its heart */
 function indexEl(){var e=mk("div","skc-index"),s=svg("svg",{viewBox:"0 0 28 44","aria-hidden":"true"}),id="skcPl"+(++NS),df=svg("defs",{}),rg=svg("radialGradient",{id:id,cx:".38",cy:".34",r:".72"});
   rg.appendChild(svg("stop",{offset:"0","stop-color":"#ffffff"}));var st=svg("stop",{offset:"1"});st.setAttribute("style","stop-color:var(--sk-pearl)");rg.appendChild(st);df.appendChild(rg);s.appendChild(df);
   s.appendChild(svg("path",{"class":"lit",d:"M14 44Q12.4 25 2 14.5L14 7.5z"}));s.appendChild(svg("path",{"class":"shd",d:"M14 44Q15.6 25 26 14.5L14 7.5z"}));
   s.appendChild(svg("circle",{cx:"14",cy:"12.2",r:"4.3",fill:"url(#"+id+")"}));e.appendChild(s);e.setAttribute("aria-hidden","true");return e;}
+/* ================= THE DIAL (Career Studio), 6.94: a vintage pocket compass in Ingenium's silver, pearl and violet =================
+   Her words (13 November 2026), with eight photographs of old pocket compasses: "Use these pictures as inspiration for the 3D rendering
+   of the compass." "Please customise it to Ingenium and its design and colour palette." And of the try before: "synthetic and plastic ...
+   fake and chunky". So the instrument is made as those compasses are: a slim polished case with a reeded edge and a bow, a domed bezel,
+   a turned silver chapter ring engraved with fine degrees, a violet enamel ring with the stages' names, a faceted rose in silver and
+   violet on a pearl (by night violet) enamel dial, and a crystal over it all. The metal is lit as polished silver is photographed: a
+   studio's light reflected in it, sharp and bright, never shaded like plastic. Only the chapter ring with the stages turns (its light,
+   the room's, stays put, as a turned ring's does), and its medallions are flat and still: they ride the ring and stay upright. */
+var VC={n:0,urls:{}};
+var VCL=(function(){var x=-.5,y=-.62,z=.6,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})();
+function vcS(a,b,x){var t=(x-a)/(b-a);t=t<0?0:t>1?1:t;return t*t*(3-2*t);}
+/* the window (a softbox above on the left): a soft-edged rectangle in the room, so its reflections are crisp panes, as in the photographs */
+var VCE1=(function(){var x=-VCL[2],z=VCL[0],l=Math.sqrt(x*x+z*z);return [x/l,0,z/l];})(),VCE2=[VCL[1]*VCE1[2]-VCL[2]*VCE1[1],VCL[2]*VCE1[0]-VCL[0]*VCE1[2],VCL[0]*VCE1[1]-VCL[1]*VCE1[0]];
+function vcWin(x,y,z){if(x*VCL[0]+y*VCL[1]+z*VCL[2]<.6)return 0;var a=Math.abs(x*VCE1[0]+y*VCE1[1]+z*VCE1[2]),b=Math.abs(x*VCE2[0]+y*VCE2[1]+z*VCE2[2]);return (1-vcS(.17,.215,a))*(1-vcS(.25,.3,b));}
+/* the room the silver reflects: a soft sky above, the floor below, the camera straight behind the eye, a large window above on the left
+   and a slim light on the right, as silver is photographed */
+function vcEnv(x,y,z,nt,o){var up=-y,r,g,b,a,f;
+  if(nt){a=.22+.2*vcS(-.2,.85,up);r=a*.92;g=a*.9;b=a*1.22;f=vcS(0,.7,-up);r-=f*.15;g-=f*.14;b-=f*.18;}
+  else{a=.86+.13*vcS(-.2,.9,up);r=a*.985;g=a*.98;b=a;f=vcS(-.05,.65,-up);r-=f*.4;g-=f*.4;b-=f*.36;}
+  var hz=(1-vcS(.1,.28,Math.abs(y)))*(1-vcS(.5,.78,z))*.85,hd=nt?.07:.28;r+=(hd-r)*hz;g+=(hd-g)*hz;b+=(hd*1.12-b)*hz;
+  var cam=vcS(.88,.975,z)*.8,cd=nt?.1:.5;r+=(cd-r)*cam;g+=(cd-g)*cam;b+=(cd*1.08-b)*cam;
+  var k=vcWin(x,y,z);r+=k*1.3;g+=k*1.3;b+=k*1.34;
+  var fs=vcS(.55,.72,x)*(1-vcS(.25,.5,Math.abs(y+.1)));r+=fs*(nt?.55:.6);g+=fs*(nt?.53:.6);b+=fs*(nt?.68:.64);
+  o[0]=r<0?0:r;o[1]=g<0?0:g;o[2]=b<0?0:b;}
+function vcTone(v){return v<.8?(v<0?0:v):.8+.2*(1-Math.exp(-(v-.8)*5));}
+/* polished silver: the room reflected about the surface's normal (the eye looks straight in) */
+function vcSilver(nx,ny,nz,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;ny/=l;nz/=l;var d=2*nz;vcEnv(d*nx,d*ny,d*nz-1,nt,o);
+  o[0]=vcTone(o[0]*.965);o[1]=vcTone(o[1]*.96);o[2]=vcTone(o[2]*.975);}
+/* glossy enamel: its colour lit softly, with the room's light caught in its glaze */
+function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;ny/=l;nz/=l;var dl=nx*VCL[0]+ny*VCL[1]+nz*VCL[2],df=.62+.5*(dl<0?0:dl),d=2*nz;
+  vcEnv(d*nx,d*ny,d*nz-1,nt,o);var fr=.035+.5*Math.pow(1-nz,5),k=vcWin(d*nx,d*ny,d*nz-1);
+  o[0]=vcTone(base[0]*df+o[0]*fr+k*.42);o[1]=vcTone(base[1]*df+o[1]*fr+k*.42);o[2]=vcTone(base[2]*df+o[2]*fr+k*.46);}
+/* a normal from a slope across the ring (a, outward) and along it (b) */
+function vcN(a,b,ph,o){var c=Math.cos(ph),s=Math.sin(ph),sa=Math.sin(a),ca=Math.cos(a),sb=Math.sin(b),cb=Math.cos(b);o[0]=sa*c-sb*s;o[1]=sa*s+sb*c;o[2]=ca*cb;}
+/* paints a round part pixel by pixel (supersampled, so its edges stay fine), once per theme */
+function vcPaint(size,rmin,rmax,shade,ss){var dpr=Math.min(2,Math.max(1,W.devicePixelRatio||1)),N=Math.round(size*dpr),cv=D.createElement("canvas");cv.width=cv.height=N;
+  var g=cv.getContext("2d"),im=g.createImageData(N,N),d=im.data,c=size/2,col=[0,0,0],i,j,si,sj;ss=ss||3;
+  for(j=0;j<N;j++)for(i=0;i<N;i++){var px=(i+.5)/dpr-c,py=(j+.5)/dpr-c,rr=Math.sqrt(px*px+py*py);if(rr>rmax+1||rr<rmin-1)continue;
+    var R0=0,G0=0,B0=0,A0=0;
+    for(sj=0;sj<ss;sj++)for(si=0;si<ss;si++){var x=(i+(si+.5)/ss)/dpr-c,y=(j+(sj+.5)/ss)/dpr-c,r=Math.sqrt(x*x+y*y);if(r>rmax||r<rmin)continue;
+      var w=shade(x,y,r,Math.atan2(y,x),col);if(!w)continue;R0+=col[0];G0+=col[1];B0+=col[2];A0++;}
+    if(!A0)continue;var k=(j*N+i)*4;d[k]=Math.round(R0/A0*255);d[k+1]=Math.round(G0/A0*255);d[k+2]=Math.round(B0/A0*255);d[k+3]=Math.round(A0/(ss*ss)*255);}
+  g.putImageData(im,0,0);try{return cv.toDataURL("image/png");}catch(e){return "";}}
+/* the case's face, from its rim inwards: the reeded edge, a groove, the domed bezel, the chamfer down to the crystal */
+function vcCaseUrl(nt,part){var k="case"+nt+(part||"");if(VC.urls[k])return VC.urls[k];var n=[0,0,0];
+  VC.urls[k]=vcPaint(362,part==="rope"?171.8:156.5,part==="dome"?172.6:180,function(x,y,r,ph,o){var a=0,b=0,ao=1,t,u;
+    if(r>=173){/* a twisted rope, its strands slanting round the rim */t=(180-r)/7;u=1-2*t;a=1.15*(u<0?-Math.pow(-u,.85):Math.pow(u,.85));
+      var q=ph*150/(2*Math.PI)+(r-176.5)*.14;q-=Math.floor(q);var tw=(2*q-1)*.55;a+=tw*-.38;b=tw*.92;ao=(.8+.2*Math.sin(Math.PI*q))*(.88+.12*(1-Math.abs(u)));}
+    else if(r>=171.8){t=(173-r)/1.2;a=-1+2*t;ao=.45+.55*Math.abs(2*t-1);}
+    else if(r>=159.6){t=(171.8-r)/12.2;u=1-2*t;a=.8*(u<0?-Math.pow(-u,1.4):Math.pow(u,1.4));}
+    else{t=(159.6-r)/3.1;a=-.8-.15*t;ao=1-.22*t;}
+    vcN(a,b,ph,n);vcSilver(n[0],n[1],n[2],nt,o);o[0]*=ao;o[1]*=ao;o[2]*=ao;return 1;},3);return VC.urls[k];}
+/* the dial under the crystal (it never turns): the turned silver chapter ring, its beads, the violet enamel ring and the enamel centre */
+var VCG=null;function vcGrain(r){if(!VCG){VCG=[];var s=11;for(var i=0;i<1400;i++){s=(s*1103515245+12345)&2147483647;VCG.push(s/2147483647);}}
+  var p=Math.abs(r)*2.2,i0=Math.floor(p),f=p-i0,a=VCG[i0%1400],b=VCG[(i0+1)%1400];return a+(b-a)*f;}
+function vcBaseUrl(nt,part){var k="base"+nt+part;if(VC.urls[k])return VC.urls[k];var n=[0,0,0],cc=[0,0,0];
+  var EN=nt?[.2,.135,.4]:[.27,.18,.5];
+  function turned(ph,r,o,dim){var R0=0,G0=0,B0=0,W0=0;for(var q=-3;q<=3;q++){var bt=q*.19,wt=Math.exp(-q*q/4.5);vcN(bt,0,ph,n);vcSilver(n[0],n[1],n[2],nt,cc);R0+=cc[0]*wt;G0+=cc[1]*wt;B0+=cc[2]*wt;W0+=wt;}
+    var gr=.95+.1*vcGrain(r);o[0]=R0/W0*gr*dim;o[1]=G0/W0*gr*dim;o[2]=B0/W0*gr*dim;}
+  VC.urls[k]=vcPaint(314,part==="chap"?131.5:107,part==="chap"?152.5:157,function(x,y,r,ph,o){var t,u,a;
+    if(part==="chap"){
+      if(r>=150){t=(152.5-r)/2.5;a=1.15*(1-2*t);vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;}
+      if(r>=134){turned(ph,r,o,1-.1*vcS(147,150,r)-.1*vcS(136,134,r));return 1;}
+      t=(134-r)/2.5;a=1.15*(1-2*t);vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;}
+    if(r>=131.5){/* the well under the chapter ring: turned silver deep in shadow */turned(ph,r,o,(nt?.42:.5)*(1-.25*vcS(154,157,r)));return 1;}
+    if(r>=110){t=(131.5-r)/21.5;u=1-2*t;a=.42*u*u*u;vcN(a,0,ph,n);vcEnamel(n[0],n[1],n[2],EN,nt,o);var sd=1-.25*vcS(112.5,110,r)-.18*vcS(129,131.5,r);o[0]*=sd;o[1]*=sd;o[2]*=sd;return 1;}
+    t=(110-r)/2.5;a=1.15*(1-2*t);vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;},3);return VC.urls[k];}
+/* the dial's enamel, its fine sunray guilloche catching the light along the light's line: a layer of its own, for it turns */
+function vcDialUrl(nt){var k="dial"+nt;if(VC.urls[k])return VC.urls[k];var PE=nt?[.15,.1,.28]:[.955,.94,.98],n=[0,0,0],o2=[0,0,0];
+  /* the cut: a sunburst round the heart, a wave across the middle, fine turning near the edge (its height, from which its light) */
+  function cut(r,ph){if(r<30.2)return 0;if(r<58.5)return .5*Math.cos(ph*120)*vcS(30.2,31.5,r)*(1-vcS(57,58.5,r));
+    if(r<60.8)return 0;if(r<89)return .5*Math.cos(2*Math.PI*r/2.7+2.3*Math.sin(ph*16))*vcS(60.8,62,r)*(1-vcS(87.6,89,r));
+    if(r<91)return 0;return .4*Math.cos(2*Math.PI*r/1.7)*vcS(91,92,r)*(1-vcS(105.5,107.5,r));}
+  VC.urls[k]=vcPaint(216,0,107.8,function(x,y,r,ph,o){var e=.18,h0=cut(r,ph),hr=(cut(r+e,ph)-cut(r-e,ph))/(2*e),ht=(cut(r,ph+e/Math.max(r,1))-cut(r,ph-e/Math.max(r,1)))/(2*e);
+    var c=Math.cos(ph),s2=Math.sin(ph),gx=hr*c-ht*s2,gy=hr*s2+ht*c,nx=-gx*.9,ny=-gy*.9,nz=1,l=Math.sqrt(nx*nx+ny*ny+1);nx/=l;ny/=l;nz/=l;
+    /* under the pearl enamel the cut metal catches the light: a soft diffuse turn and the window's gleam along the grooves that face it */
+    var dl=nx*VCL[0]+ny*VCL[1]+nz*VCL[2],d=2*nz,w=vcWin(d*nx,d*ny,d*nz-1),lift=1+(nt?.05:.02)*(-(x+y)/150),edge=1-(nt?.2:.08)*vcS(100,107.8,r),
+        sh=(nt?.72:.985)+(nt?.5:.16)*(dl-VCL[2]),gl=(nt?.55:.22)*w;
+    o[0]=Math.min(1,PE[0]*sh*lift*edge+gl*(nt?.75:1));o[1]=Math.min(1,PE[1]*sh*lift*edge+gl*(nt?.7:1));o[2]=Math.min(1,PE[2]*sh*lift*edge+gl);return 1;},3);return VC.urls[k];}
+function vcCollarUrl(nt,R0,R1){var k="col"+nt+R0+"_"+R1;if(VC.urls[k])return VC.urls[k];var n=[0,0,0];
+  VC.urls[k]=vcPaint(2*R1+2,R0,R1,function(x,y,r,ph,o){var t=(R1-r)/(R1-R0),a=1.25*(1-2*t);vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;},3);return VC.urls[k];}
+/* the bow: a ring through a knurled crown on a short neck (its own little drawing, lit as the case) */
+function vcBowUrl(nt){var k="bow"+nt;if(VC.urls[k])return VC.urls[k];
+  var w=56,h=72,dpr=Math.min(2,Math.max(1,W.devicePixelRatio||1)),cv=D.createElement("canvas");cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  var g=cv.getContext("2d"),im=g.createImageData(cv.width,cv.height),d=im.data,col=[0,0,0],ss=3,i,j,si,sj,cx=28;
+  function at(x,y,o){var dx,dy,dd,s,u,th,q,sa,ao;
+    if(y>=59&&y<=72&&Math.abs(x-cx)<=5.2){u=(x-cx)/5.2;vcSilver(u,y<61?-.6:0,Math.sqrt(1-u*u),nt,o);ao=y>66?.8:1;o[0]*=ao;o[1]*=ao;o[2]*=ao;return 1;}
+    if(y>=45&&y<=59.4&&Math.abs(x-cx)<=10.2){u=(x-cx)/10.2;th=Math.asin(Math.max(-1,Math.min(1,u)));q=th*15/Math.PI;q-=Math.floor(q);th+=(q<.5?q*4-1:3-q*4)*.24*Math.cos(th);
+      var ny=y<46.6?-.9*(46.6-y)/1.6:(y>57.8?.9*(y-57.8)/1.6:0);vcSilver(Math.sin(th),ny,Math.cos(th),nt,o);return 1;}
+    dx=x-cx;dy=y-45;if(dx*dx+dy*dy<=4.9*4.9&&y<=45){var nz=Math.sqrt(Math.max(0,1-(dx*dx+dy*dy)/(4.9*4.9)));vcSilver(dx/4.9,dy/4.9,nz,nt,o);return 1;}
+    dx=x-cx;dy=y-25.5;dd=Math.sqrt(dx*dx+dy*dy);s=dd-19.5;if(Math.abs(s)<=3.4){sa=s/3.4;var ca=Math.sqrt(1-sa*sa);vcSilver(sa*dx/dd,sa*dy/dd,ca,nt,o);
+      ao=1-.32*vcS(38,45,y);o[0]*=ao;o[1]*=ao;o[2]*=ao;return 1;}
+    return 0;}
+  for(j=0;j<cv.height;j++)for(i=0;i<cv.width;i++){var R0=0,G0=0,B0=0,A0=0;
+    for(sj=0;sj<ss;sj++)for(si=0;si<ss;si++){if(at((i+(si+.5)/ss)/dpr,(j+(sj+.5)/ss)/dpr,col)){R0+=col[0];G0+=col[1];B0+=col[2];A0++;}}
+    if(!A0)continue;var p=(j*cv.width+i)*4;d[p]=Math.round(R0/A0*255);d[p+1]=Math.round(G0/A0*255);d[p+2]=Math.round(B0/A0*255);d[p+3]=Math.round(A0/(ss*ss)*255);}
+  g.putImageData(im,0,0);try{VC.urls[k]=cv.toDataURL("image/png");}catch(e){VC.urls[k]="";}return VC.urls[k];}
+function vcHex(c){var h=function(v){v=Math.round(Math.max(0,Math.min(1,v))*255);return (v<16?"0":"")+v.toString(16);};return "#"+h(c[0])+h(c[1])+h(c[2]);}
+/* the rose: four silver cardinal points (the north in violet enamel, pointing at the stage in hand), four violet points between them and
+   sixteen fine silver ones, each a raised facet pair lit by the same light as the case */
+function vcRose(nt){var c=108,id="skv"+(++VC.n),f=function(v){return v.toFixed(2);},o=[0,0,0],VI=nt?[.40,.27,.70]:[.45,.30,.78],VN=nt?[.36,.22,.66]:[.40,.24,.72];
+  var ink=nt?"rgba(232,224,250,.32)":"rgba(52,30,100,.42)",rings=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"});
+  rings.appendChild(svg("circle",{cx:c,cy:c,r:"104",fill:"none",stroke:ink,"stroke-width":".6"}));
+  rings.appendChild(svg("circle",{cx:c,cy:c,r:"88",fill:"none",stroke:ink,"stroke-width":"1.1","stroke-dasharray":".01 3.455","stroke-linecap":"round"}));
+  rings.appendChild(svg("circle",{cx:c,cy:c,r:"85.5",fill:"none",stroke:ink,"stroke-width":".45"}));
+  vcDialArt(rings,c,nt);
+  function layer(pts){var top=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),df=svg("defs",{}),edge=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),shd=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),df2=svg("defs",{});
+    top.appendChild(df);shd.appendChild(df2);var fl=svg("filter",{id:id+"b"+pts.k,x:"-10%",y:"-10%",width:"120%",height:"120%"});fl.appendChild(svg("feGaussianBlur",{stdDeviation:"1.8"}));df2.appendChild(fl);
+    var sg=svg("g",{filter:"url(#"+id+"b"+pts.k+")",opacity:nt?".72":".34"});shd.appendChild(sg);var FC=[],gi=0;
+    pts.list.forEach(function(P0){var ang=P0[0],len=P0[1],w=P0[2],mat=P0[3],u=[Math.cos(ang),Math.sin(ang)],v=[-u[1],u[0]],P=[c+len*u[0],c+len*u[1]];
+      [1,-1].forEach(function(sd){var B=[c+w*v[0]*sd,c+w*v[1]*sd],sl=.6,nx=Math.sin(sl)*v[0]*sd+.16*u[0],ny=Math.sin(sl)*v[1]*sd+.16*u[1],nz=Math.cos(sl);
+        var gid=id+pts.k+"g"+(gi++),gr=svg("linearGradient",{id:gid,gradientUnits:"userSpaceOnUse",x1:f(c),y1:f(c),x2:f(P[0]),y2:f(P[1])}),s0=svg("stop",{offset:"0"}),s1=svg("stop",{offset:"1"});gr.appendChild(s0);gr.appendChild(s1);df.appendChild(gr);
+        var d="M"+f(c)+" "+f(c)+"L"+f(B[0])+" "+f(B[1])+"L"+f(P[0])+" "+f(P[1])+"z";
+        top.appendChild(svg("path",{d:d,fill:"url(#"+gid+")",stroke:nt?"rgba(8,3,20,.55)":"rgba(30,14,64,.38)","stroke-width":".45","stroke-linejoin":"round"}));
+        edge.appendChild(svg("path",{d:d,fill:mat==="s"?(nt?"#3a3450":"#8c84a6"):(nt?"#241645":"#3e2580")}));sg.appendChild(svg("path",{d:d,fill:"#120626"}));
+        FC.push({s0:s0,s1:s1,nx:nx,ny:ny,nz:nz,u:u,mat:mat});});});
+    top.__fc=FC;return {top:top,edge:edge,shd:shd};}
+  var L1=[],L2=[],L3=[],i;for(i=0;i<16;i++)if(i%2)L1.push([(i*22.5-90)*Math.PI/180,60,3.6,"s"]);
+  for(i=0;i<4;i++)L2.push([(i*90-45)*Math.PI/180,76,9.5,"v"]);
+  for(i=1;i<4;i++)L3.push([(i*90-90)*Math.PI/180,100,13.5,"s"]);L3.push([-Math.PI/2,102,13.5,"n"]);
+  var out={rings:rings,layers:[layer({k:"a",list:L1}),layer({k:"b",list:L2}),layer({k:"c",list:L3})],nt:nt,VI:VI,VN:VN};
+  out.layers.forEach(function(Ly){vcFacets(Ly.top,0,nt,VI,VN);});return out;}
+/* the dial's engraving: Ingenium's own ornament, after the old dials she chose */
+function vcDialArt(g0,c,nt){var f=function(v){return v.toFixed(2);},ink=nt?"rgba(214,200,250,.5)":"rgba(70,40,140,.55)",ink2=nt?"rgba(214,200,250,.24)":"rgba(70,40,140,.26)",
+    vio=nt?"rgba(176,150,236,.75)":"rgba(106,63,181,.8)",i,a,g=svg("g",{}),P=function(r,t){return [c+r*Math.cos(t),c+r*Math.sin(t)];};g0.appendChild(g);
+  /* rules between the fields, each a fine double line */
+  [[107,.55],[100.4,.5],[90.4,.45],[89.6,.3],[60.2,.45],[59.4,.3],[30.2,.5]].forEach(function(q){g.appendChild(svg("circle",{cx:c,cy:c,r:q[0],fill:"none",stroke:ink,"stroke-width":q[1]}));});
+  /* the rosette: twenty-four circles laid round the middle, interlacing as an engine-turned rose does */
+  var ro="";for(i=0;i<24;i++){a=i*Math.PI*2/24;var q=P(45.2,a);ro+="M"+f(q[0]+29.6)+" "+f(q[1])+"a29.6 29.6 0 1 0 -59.2 0a29.6 29.6 0 1 0 59.2 0Z";}
+  var cp=svg("clipPath",{id:"skvRose"+(++VC.n)}),cpp=svg("path",{d:"M"+(c-88.8)+" "+c+"a88.8 88.8 0 1 0 177.6 0a88.8 88.8 0 1 0 -177.6 0ZM"+(c-61)+" "+c+"a61 61 0 1 1 122 0a61 61 0 1 1 -122 0Z","clip-rule":"evenodd"});cp.appendChild(cpp);
+  var df=svg("defs",{});df.appendChild(cp);g.appendChild(df);
+  g.appendChild(svg("path",{d:ro,fill:"none",stroke:ink2,"stroke-width":".42","clip-path":"url(#"+cp.getAttribute("id")+")"}));
+  /* near the edge: Ingenium's four-pointed stars between pearls */
+  var sr="",pr="";for(i=0;i<36;i++){a=i*Math.PI*2/36;var q2=P(95.4,a);if(i%2===0){var k=2.3;sr+="M"+f(q2[0])+" "+f(q2[1]-k)+"Q"+f(q2[0]+k*.24)+" "+f(q2[1]-k*.24)+" "+f(q2[0]+k)+" "+f(q2[1])+"Q"+f(q2[0]+k*.24)+" "+f(q2[1]+k*.24)+" "+f(q2[0])+" "+f(q2[1]+k)+"Q"+f(q2[0]-k*.24)+" "+f(q2[1]+k*.24)+" "+f(q2[0]-k)+" "+f(q2[1])+"Q"+f(q2[0]-k*.24)+" "+f(q2[1]-k*.24)+" "+f(q2[0])+" "+f(q2[1]-k)+"Z";}
+    else pr+="M"+f(q2[0]+.95)+" "+f(q2[1])+"a.95 .95 0 1 0 -1.9 0a.95 .95 0 1 0 1.9 0Z";}
+  g.appendChild(svg("path",{d:sr,fill:vio}));g.appendChild(svg("path",{d:pr,fill:nt?"rgba(236,228,252,.7)":"#ffffff",stroke:ink,"stroke-width":".3"}));}
+/* a layer's facets lit as they stand now: turned by A, with the room's light moved by L */
+function vcFacets(sv,A,nt,VI,VN){var r=A*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),o=[0,0,0],F=sv.__fc;
+  for(var i=0;i<F.length;i++){var q=F[i],nx=q.nx*c-q.ny*sn,ny=q.nx*sn+q.ny*c,ux=q.u[0]*c-q.u[1]*sn,uy=q.u[0]*sn+q.u[1]*c;
+    if(q.mat==="s")vcSilver(nx-.1*ux,ny-.1*uy,q.nz,nt,o);else vcEnamel(nx-.1*ux,ny-.1*uy,q.nz,q.mat==="n"?VN:VI,nt,o);q.s0.setAttribute("stop-color",vcHex(o));
+    if(q.mat==="s")vcSilver(nx+.12*ux,ny+.12*uy,q.nz,nt,o);else vcEnamel(nx+.12*ux,ny+.12*uy,q.nz,q.mat==="n"?VN:VI,nt,o);q.s1.setAttribute("stop-color",vcHex(o));}}
+/* the chapter ring that turns: its engraved degrees, the stages' names in the violet enamel, and the inlay of the stages done */
+function vcRingSvg(list,nt){var n=list.length,c=157,s0=svg("svg",{viewBox:"0 0 314 314","class":"skv-scale","aria-hidden":"true"}),s=svg("g",{"class":"rot"}),i,a,f=function(v){return v.toFixed(2);};s0.appendChild(s);
+  var s1=svg("svg",{viewBox:"0 0 314 314","class":"skv-scale skv-names","aria-hidden":"true"}),sN=svg("g",{"class":"rot"});s1.appendChild(sN);
+  var ang=function(k){return -90+k*360/n;},near=function(deg){for(var k=0;k<n;k++){var dd=Math.abs(((deg-ang(k))%360+540)%360-180);if(dd<6.6)return true;}return false;};
+  var ink=nt?"rgba(232,226,248,.5)":"rgba(34,18,70,.72)",g=svg("g",{stroke:ink,"stroke-linecap":"butt"});s.appendChild(g);
+  for(i=0;i<180;i++){var dg=i*2-90;if(near(dg))continue;a=dg*Math.PI/180;var big=i%5===0,r0=big?142.8:146;
+    g.appendChild(svg("line",{x1:f(c+r0*Math.cos(a)),y1:f(c+r0*Math.sin(a)),x2:f(c+149.2*Math.cos(a)),y2:f(c+149.2*Math.sin(a)),"stroke-width":big?".9":".55"}));}
+  s.appendChild(svg("circle",{cx:c,cy:c,r:"149.7",fill:"none",stroke:ink,"stroke-width":".5"}));
+  /* the inlay: from the first stage to the last one done */
+  var p=0;while(p<n&&list[p].done)p++;
+  if(p>0){var a0=ang(0),a1=p>=n?a0+359.99:ang(p-1),big2=(a1-a0)>180?1:0,R=137.4,P0=[c+R*Math.cos(a0*Math.PI/180),c+R*Math.sin(a0*Math.PI/180)],P1=[c+R*Math.cos(a1*Math.PI/180),c+R*Math.sin(a1*Math.PI/180)];
+    var dd="M"+f(P0[0])+" "+f(P0[1])+"A"+R+" "+R+" 0 "+big2+" 1 "+f(P1[0])+" "+f(P1[1]);
+    s.appendChild(svg("path",{d:dd,fill:"none",stroke:nt?"#2a1650":"#3a2470","stroke-width":"3.2","stroke-linecap":"round","stroke-opacity":".55"}));
+    s.appendChild(svg("path",{d:dd,fill:"none",stroke:nt?"#8f6ce0":"#7b56cc","stroke-width":"2.2","stroke-linecap":"round","class":"inl"}));}
+  /* the names, engraved in the enamel and filled with silver, each under its own medallion */
+  var id="skv"+(++VC.n),df=svg("defs",{});s1.insertBefore(df,sN);
+  for(i=0;i<n;i++){var A=ang(i),a2=(A-62)*Math.PI/180,a3=(A+62)*Math.PI/180,R2=117.6,pid=id+"p"+i;
+    df.appendChild(svg("path",{id:pid,d:"M"+f(c+R2*Math.cos(a2))+" "+f(c+R2*Math.sin(a2))+"A"+R2+" "+R2+" 0 0 1 "+f(c+R2*Math.cos(a3))+" "+f(c+R2*Math.sin(a3))}));
+    var t=svg("text",{"class":"nm"+(list[i].cur?" cur":"")}),tp=svg("textPath",{href:"#"+pid,startOffset:"50%","text-anchor":"middle"});tp.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href","#"+pid);
+    tp.textContent=String(list[i].name||"").toUpperCase();t.appendChild(tp);sN.appendChild(t);
+    /* a small four-pointed star between two names */
+    var B=(A+180/n)*Math.PI/180,sx=c+120.7*Math.cos(B),sy=c+120.7*Math.sin(B),k=3.3,m=.8;
+    sN.appendChild(svg("path",{"class":"sep",d:"M"+f(sx)+" "+f(sy-k)+"Q"+f(sx+m)+" "+f(sy-m)+" "+f(sx+k)+" "+f(sy)+"Q"+f(sx+m)+" "+f(sy+m)+" "+f(sx)+" "+f(sy+k)+"Q"+f(sx-m)+" "+f(sy+m)+" "+f(sx-k)+" "+f(sy)+"Q"+f(sx-m)+" "+f(sy-m)+" "+f(sx)+" "+f(sy-k)+"z"}));}
+  return [s0,s1];}
+/* a stage's medallion: a polished silver setting round a flat enamel face, its numeral raised in silver (pearl enamel ahead, violet done) */
+function vcMedal(num,kind,nt){var s=svg("svg",{viewBox:"0 0 30 30","class":"md","aria-hidden":"true"}),id="skv"+(++VC.n),df=svg("defs",{}),o=[0,0,0],n=[0,0,0];s.appendChild(df);
+  function lg(gid,stops){var g=svg("linearGradient",{id:gid,x1:".15",y1:".1",x2:".85",y2:".9"});stops.forEach(function(p){g.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});df.appendChild(g);}
+  function sil(a,ph){vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return vcHex(o);}
+  var ul=-2.36,dr=.785;/* up-left and down-right */
+  lg(id+"o",[["0",sil(.9,ul)],[".5",sil(.9,-.8)],["1",sil(.9,dr)]]);lg(id+"i",[["0",sil(-.9,ul)],[".5",sil(-.9,-.8)],["1",sil(-.9,dr)]]);
+  var done=kind!=="ahead",E=done?(nt?[.42,.28,.74]:[.44,.29,.77]):(nt?[.86,.83,.93]:[.97,.955,.99]),e0=[0,0,0],e1=[0,0,0];/* violet for a stage done (and the one in hand), pearl for one ahead */
+  vcEnamel(-.12,-.15,1,E,nt,e0);vcEnamel(.12,.15,1,E,nt,e1);lg(id+"e",[["0",vcHex(e0)],["1",vcHex(e1)]]);
+  s.appendChild(svg("circle",{cx:"15",cy:"15",r:"12.1",fill:nt?"rgba(4,1,12,.6)":"rgba(26,12,56,.32)"}));
+  s.appendChild(svg("circle",{cx:"15",cy:"15",r:"11.5",fill:"url(#"+id+"o)"}));
+  s.appendChild(svg("circle",{cx:"15",cy:"15",r:"10.35",fill:"url(#"+id+"i)"}));
+  s.appendChild(svg("circle",{cx:"15",cy:"15",r:"9.4",fill:"url(#"+id+"e)"}));
+  s.appendChild(svg("path",{d:"M8.2 12.4A7.6 7.6 0 0 1 12.6 7.9",fill:"none",stroke:"#fff","stroke-opacity":done?".45":".9","stroke-width":".8","stroke-linecap":"round"}));
+  if(kind==="cur")s.appendChild(svg("circle",{cx:"15",cy:"15",r:"8.3",fill:"none",stroke:nt?"#e6dcfa":"#f1ebfc","stroke-opacity":".75","stroke-width":".55"}));
+  var tc=done?(nt?"#f6f1ff":"#fbf8ff"):(nt?"#3a2470":"#4a2c90"),sc=done?"rgba(14,4,36,.55)":"rgba(255,255,255,.9)";
+  var t0=svg("text",{x:"15",y:"18.6","text-anchor":"middle","class":"nmr",fill:sc,transform:"translate(.35 .45)"});t0.textContent=num;s.appendChild(t0);
+  var t1=svg("text",{x:"15",y:"18.6","text-anchor":"middle","class":"nmr",fill:tc});t1.textContent=num;s.appendChild(t1);return s;}
+/* the index on the bezel: a slim arrow of violet enamel framed in silver, over the stage in hand */
+function vcIndex(nt){var s=svg("svg",{viewBox:"0 0 20 30","aria-hidden":"true"}),id="skv"+(++VC.n),df=svg("defs",{}),o=[0,0,0],n=[0,0,0];s.appendChild(df);
+  function sil(nx,ny){vcSilver(nx,ny,1,nt,o);return vcHex(o);}
+  var g=svg("linearGradient",{id:id+"f",x1:"0",y1:"0",x2:"1",y2:"1"});[["0",sil(-.5,-.6)],[".45",sil(0,-.3)],["1",sil(.6,.6)]].forEach(function(p){g.appendChild(svg("stop",{offset:p[0],"stop-color":p[1]}));});df.appendChild(g);
+  var e0=[0,0,0],e1=[0,0,0];vcEnamel(-.3,-.2,1,nt?[.44,.29,.76]:[.46,.3,.8],nt,e0);vcEnamel(.3,.2,1,nt?[.44,.29,.76]:[.46,.3,.8],nt,e1);
+  var g2=svg("linearGradient",{id:id+"e",x1:"0",y1:"0",x2:"1",y2:"1"});g2.appendChild(svg("stop",{offset:"0","stop-color":vcHex(e0)}));g2.appendChild(svg("stop",{offset:"1","stop-color":vcHex(e1)}));df.appendChild(g2);
+  s.appendChild(svg("path",{d:"M10 29.2L3.2 6.4Q10 3.2 16.8 6.4z",fill:"url(#"+id+"f)",stroke:nt?"rgba(6,2,16,.6)":"rgba(30,14,64,.4)","stroke-width":".5","stroke-linejoin":"round"}));
+  s.appendChild(svg("path",{d:"M10 25.6L5.4 7.9Q10 5.8 14.6 7.9z",fill:"url(#"+id+"e)"}));
+  s.appendChild(svg("path",{d:"M10 25.6L5.4 7.9Q7.4 7 9.4 6.7",fill:"none",stroke:"#fff","stroke-opacity":".5","stroke-width":".5"}));
+  var c0=[0,0,0];vcSilver(-.45,-.5,1,nt,c0);var c1=[0,0,0];vcSilver(.5,.55,1,nt,c1);
+  var g3=svg("radialGradient",{id:id+"r",cx:".35",cy:".3",r:".75"});g3.appendChild(svg("stop",{offset:"0","stop-color":vcHex(c0)}));g3.appendChild(svg("stop",{offset:"1","stop-color":vcHex(c1)}));df.appendChild(g3);
+  s.appendChild(svg("circle",{cx:"10",cy:"4.6",r:"3.1",fill:"url(#"+id+"r)",stroke:nt?"rgba(6,2,16,.6)":"rgba(30,14,64,.35)","stroke-width":".4"}));return s;}
+/* the crystal: a window's reflection, crisp, very faint, and the light caught along its edge */
+function vcGlass(nt){var s=svg("svg",{viewBox:"0 0 314 314","aria-hidden":"true"}),id="skv"+(++VC.n),df=svg("defs",{}),c=157;s.appendChild(df);
+  var g=svg("linearGradient",{id:id+"g",x1:"0",y1:"0",x2:"1",y2:"1"});[["0",nt?".16":".42"],[".45",nt?".05":".14"],[".7","0"]].forEach(function(p){var st=svg("stop",{offset:p[0],"stop-color":"#fff"});st.setAttribute("stop-opacity",p[1]);g.appendChild(st);});df.appendChild(g);
+  var P=function(R,dg){var a=dg*Math.PI/180;return (c+R*Math.cos(a)).toFixed(2)+" "+(c+R*Math.sin(a)).toFixed(2);};
+  s.appendChild(svg("path",{d:"M"+P(152,188)+"A152 152 0 0 1 "+P(152,282)+"Q"+(c-40)+" "+(c-98)+" "+P(152,188)+"z",fill:"url(#"+id+"g)"}));
+  s.appendChild(svg("path",{d:"M"+P(153.5,18)+"A153.5 153.5 0 0 1 "+P(153.5,72),fill:"none",stroke:"#fff","stroke-opacity":nt?".22":".55","stroke-width":".9","stroke-linecap":"round"}));
+  return s;}
+/* the turning: one spring, as Home's keys move (it overshoots a hair and settles), the medallions kept upright as it goes */
+/* while it turns, the ring's engraving turns as one picture (smooth); at rest it is drawn at its angle, so its names stay crisp */
+function vcApply(st){if(!st.ring)return;var T=st.T,tx=T.toFixed(3),i;if(st.marks)st.marks.style.transform="rotate("+tx+"deg)";for(i=0;i<st.ups.length;i++)st.ups[i].style.transform="rotate("+(-T).toFixed(3)+"deg)";
+  [st.svg,st.svg2].forEach(function(sv){var g=sv&&sv.querySelector("g.rot");if(!g)return;
+    if(st.raf){sv.style.transform="rotate("+tx+"deg)";if(g.__r!==0){g.removeAttribute("transform");g.__r=0;}}
+    else{sv.style.transform="";if(g.__r!==tx){g.setAttribute("transform","rotate("+tx+" 157 157)");g.__r=tx;}}});}
+function vcAim(st,goal,kick,quiet){st.goal=goal;if(kick)st.v+=kick;if(quiet||still()){if(st.raf){cancelAnimationFrame(st.raf);st.raf=0;}st.T=goal;st.v=0;vcApply(st);return;}
+  if(!st.raf){st.last=0;st.raf=requestAnimationFrame(function step(ts){var dt=st.last?Math.min(.034,(ts-st.last)/1000):.016;st.last=ts;var a=46*(st.goal-st.T)-10.4*st.v;st.v+=a*dt;st.T+=st.v*dt;vcApply(st);
+    if(Math.abs(st.goal-st.T)<.03&&Math.abs(st.v)<.08){st.T=st.goal;st.v=0;st.raf=0;st.last=0;vcApply(st);if(st.onLand)try{st.onLand();}catch(e){}return;}
+    st.raf=requestAnimationFrame(step);});}}
+/* the instrument's parts, built once, in the depth of the Offline Project's apps (her words, 13 November 2026: "give it the Offline
+   Project's apps' signature layered depth animated popped out 3D look and animation"), as the engine logo is built: a cast shadow
+   beneath, the case's thickness in stacked rims, the dial sunk inside it, the rose, the medallions and the logo standing off the dial,
+   the crystal and the case above. The whole sways on its own as the logo does, leans to the pointer on a spring, rises when it appears */
+function vcBuild(){var box=mk("div","skc skv"),tilt=mk("div","skv-tilt"),idle=mk("div","skv-idle"),P=mk("div","skv-rise");box.appendChild(tilt);tilt.appendChild(idle);idle.appendChild(P);
+  box.setAttribute("role","group");box.setAttribute("aria-label","The dial: your counsellor's stages");
+  P.appendChild(mk("i","skv-under"));
+  for(var z=1;z<=43;z+=3){var e=mk("i","skv-side");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);}
+  var base=mk("div","skv-base");P.appendChild(base);
+  var dial=mk("div","skv-dial skv-lay");dial.appendChild(img("skv-dialimg"));P.appendChild(dial);
+  /* the outer ring inside, raised: the band stands off the dial and the chapter ring off the band, each on its wall, each casting its shadow */
+  var ring=mk("div","skv-ring"),band=mk("div","skv-band"),chap=mk("div","skv-chap");
+  ring.appendChild(mk("i","skv-bandsh"));[5.6,7.4,9.2,11,12.8].forEach(function(z){var w=mk("i","skv-bandwall");w.style.setProperty("--z",z);ring.appendChild(w);});
+  band.appendChild(img("skv-bandimg"));ring.appendChild(band);
+  ring.appendChild(mk("i","skv-chapsh"));[15.6,17.6,19.6,21.6,23.6,25.6,27.2].forEach(function(z){var w=mk("i","skv-chapwall"),w2=mk("i","skv-chapwall out");w.style.setProperty("--z",z);w2.style.setProperty("--z",z);ring.appendChild(w);ring.appendChild(w2);});
+  chap.appendChild(img("skv-chapimg"));ring.appendChild(chap);P.appendChild(ring);P.appendChild(mk("i","skv-inner"));
+  var LZ=[10,16,22],lays=[];
+  LZ.forEach(function(z,i){var sh=mk("div","skv-lay skv-lsh"),ed=mk("div","skv-lay skv-led"),tp=mk("div","skv-lay skv-ltop");sh.style.setProperty("--z",(z-2.8));ed.style.setProperty("--z",(z-1.3));tp.style.setProperty("--z",z);
+    P.appendChild(sh);P.appendChild(ed);P.appendChild(tp);lays.push({sh:sh,ed:ed,tp:tp});});
+  P.appendChild(mk("i","skv-seatsh"));
+  [23.5,25.5,27.5,29].forEach(function(z){var e=mk("i","skv-seatside");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);});
+  var seat=mk("div","skv-seat"),key=mk("div","skv-key");seat.appendChild(img("skv-collar"));seat.appendChild(key);P.appendChild(seat);
+  var gl=mk("div","skv-glass"),gs=mk("div","skv-glassart"),rip=mk("div","skv-ripples");gl.appendChild(gs);gl.appendChild(rip);P.appendChild(gl);
+  var bwb=mk("div","skv-bow skv-bowback");bwb.appendChild(img("skv-bowimg"));P.appendChild(bwb);
+  var cs=mk("div","skv-case");cs.appendChild(img("skv-domeimg"));cs.appendChild(img("skv-caseimg"));P.appendChild(cs);
+  var bw=mk("div","skv-bow skv-bowtop");bw.appendChild(img("skv-bowimg"));P.appendChild(bw);
+  var ix=mk("div","skv-index");ix.setAttribute("aria-hidden","true");P.appendChild(ix);
+  var st={T:0,v:0,goal:0,raf:0,last:0,ups:[],ring:ring,onLand:null,tilt:tilt,h:0,hx:0,hy:0,lx:0,ly:0,vx:0,vy:0,t0:0,mraf:0,
+    kz:0,kv:0,swT:-9,swS:1,shT:-9,box:box,key:key,bandImg:band.firstChild,chapImg:chap.firstChild,band:band,chap:chap,dial:dial,dome:cs.firstChild,glassArt:gs,rip:rip,seat:seat,lays:lays,onSound:null,onPick:null,
+    /* the inside's harmony: the dial and the great points turn slowly one way and back, the violet points twice as fast the other way, the
+       fine points three times; all meet again every ninety seconds. Each: its turn now, its speed, its harmony speed and its symmetry */
+    H:[{a:0,v:4,s:4,p:1.8},{a:0,v:-12,s:-12,p:45},{a:0,v:8,s:8,p:90},{a:0,v:-4,s:-4,p:90}],RX:0,RY:0,SW:0,tH:0};box.__vc=st;
+  function snd(k){}
+  box.addEventListener("pointermove",function(e){var d=st.press;if(d&&d.id===e.pointerId){if(d.hit.part==="logo")vcKeySend(st,"pointermove",e);return;}if(e.pointerType!=="mouse")return;
+    if(!(e.target&&e.target.closest&&e.target.closest(".r175-seal"))){var hk=vcPick(st,e.clientX,e.clientY),on=!!(hk&&hk.part==="logo");if(on!==!!st.overKey){st.overKey=on;vcKeySend(st,on?"pointerenter":"pointerleave",e);}if(on)vcKeySend(st,"pointermove",e);}var r=box.getBoundingClientRect();if(!r.width)return;st.hold=1;box.classList.add("hov");
+    st.hx=Math.max(-.6,Math.min(.6,(e.clientX-r.left)/r.width-.5));st.hy=Math.max(-.6,Math.min(.6,(e.clientY-r.top)/r.height-.5));
+    vcMove(st);},{passive:true});
+  box.addEventListener("pointerleave",function(e){st.hold=0;box.classList.remove("hov");if(st.overKey){st.overKey=false;vcKeySend(st,"pointerleave",e);}});
+  /* a press anywhere on the compass: what was pressed is found from its own geometry, front to back */
+  box.addEventListener("pointerdown",function(e){if(e.button!=null&&e.button!==0)return;if(e.target&&e.target.closest&&e.target.closest(".skv-md,.r175-seal"))return;
+    var hit=vcPick(st,e.clientX,e.clientY);if(!hit)return;st.press={id:e.pointerId,hit:hit,x0:e.clientX,y0:e.clientY,t:performance.now(),moved:0};
+    if(hit.part==="logo")vcKeySend(st,"pointerdown",e);
+    try{box.setPointerCapture(e.pointerId);}catch(x){}if(hit.part!=="medal")e.preventDefault();});
+  function release(e){var d=st.press;if(!d||d.id!==e.pointerId)return;st.press=null;var h=d.hit,moved=Math.sqrt(Math.pow(e.clientX-d.x0,2)+Math.pow(e.clientY-d.y0,2));
+    if(h.part==="logo"){vcKeySend(st,"pointerup",e);if(moved<=12){var k=st.key.querySelector(".r175-seal");if(k)k.click();vcRipple(st,h);}return;}
+    if(moved>8)return;vcPress(st,h);}
+  box.addEventListener("pointerup",release);box.addEventListener("pointercancel",function(e){var d=st.press;st.press=null;if(d&&d.hit.part==="logo")vcKeySend(st,"pointercancel",e);});
+  function knock(el){el.classList.remove("knock");void el.offsetWidth;el.classList.add("knock");}
+  st.knock=knock;st.snd=snd;
+  vcMove(st);return box;}
+/* the compass's own geometry: a point on the screen found on the face of each part, from the front back (the eye 1100px off, as the head's) */
+function vcMat(st){var rx=st.RX*Math.PI/180,ry=st.RY*Math.PI/180,rz=st.SW*Math.PI/180,cx=Math.cos(rx),sx=Math.sin(rx),cy=Math.cos(ry),sy=Math.sin(ry);
+  /* rotateX then rotateY, as written: the matrix is RX * RY */
+  return {m:[[cy,0,sy],[sx*sy,cx,-sx*cy],[-cx*sy,sx,cx*cy]],rz:rz,kz:st.kz};}
+function vcOn(st,X,Y,Zp){var M=vcMat(st),m=M.m,O=[260,232,0],E=[260,203.52,1100],D=[X-E[0],Y-E[1],-E[2]];
+  var n=[m[0][2],m[1][2],m[2][2]],W0=[O[0]+m[0][2]*Zp,O[1]+m[1][2]*Zp,O[2]+m[2][2]*Zp+M.kz],den=n[0]*D[0]+n[1]*D[1]+n[2]*D[2];if(Math.abs(den)<1e-6)return null;
+  var t=(n[0]*(W0[0]-E[0])+n[1]*(W0[1]-E[1])+n[2]*(W0[2]-E[2]))/den,H=[E[0]+t*D[0]-O[0],E[1]+t*D[1]-O[1],E[2]+t*D[2]-O[2]-M.kz];
+  var lx=m[0][0]*H[0]+m[1][0]*H[1]+m[2][0]*H[2],ly=m[0][1]*H[0]+m[1][1]*H[1]+m[2][1]*H[2];
+  if(M.rz){var py=-220.5,yy=ly-py,c=Math.cos(-M.rz),s2=Math.sin(-M.rz),x2=lx*c-yy*s2,y2=lx*s2+yy*c;lx=x2;ly=y2+py;}
+  return {x:260+lx,y:232+ly};}
+function vcPick(st,cx,cy){var r=st.box.getBoundingClientRect();if(!r.width)return null;var X=(cx-r.left)/r.width*520,Y=(cy-r.top)/r.height*424,q,d,a,i;
+  function at(Z){q=vcOn(st,X,Y,Z);if(!q)return false;d=Math.sqrt(Math.pow(q.x-260,2)+Math.pow(q.y-232,2));a=Math.atan2(q.y-232,q.x-260)*180/Math.PI;return true;}
+  function near(base,step,len,w,tol){var k,best=999;for(k=0;k<360/step;k++){var dd=Math.abs(((a-(base+k*step))%360+540)%360-180)*Math.PI/180;if(dd<best)best=dd;}var half=Math.atan2(w*Math.max(0,1-d/len),Math.max(d,1))+tol;return d<len&&best<half;}
+  if(at(42)){if(q.x>=232&&q.x<=288&&q.y>=-14&&q.y<=58&&d>178)return {part:"bow",x:q.x,y:q.y};if(d>=156.5&&d<=181)return {part:"rim",x:q.x,y:q.y};}
+  if(at(40)&&d<156.5){var g={x:q.x,y:q.y};
+    if(at(30)&&d<31.5)return {part:"logo",x:q.x,y:q.y,gx:g.x,gy:g.y};
+    if(at(35)&&st.ups.length){var n0=st.ups.length;for(i=0;i<n0;i++){var A0=(-90+i*360/n0+st.T)*Math.PI/180,mx0=260+142*Math.cos(A0),my0=232+142*Math.sin(A0);if(Math.pow(q.x-mx0,2)+Math.pow(q.y-my0,2)<15*15)return {part:"medal",i:i,x:q.x,y:q.y,gx:g.x,gy:g.y};}}
+    if(at(28)&&d>=131.5&&d<=152.5)return {part:"ring",x:q.x,y:q.y,gx:g.x,gy:g.y};
+    if(at(22)&&near(st.H[3].a-90,90,102,13.5,.04))return {part:"lay",i:3,x:q.x,y:q.y,gx:g.x,gy:g.y};
+    if(at(16)&&near(st.H[2].a-45,90,76,9.5,.04))return {part:"lay",i:2,x:q.x,y:q.y,gx:g.x,gy:g.y};
+
+    if(at(10)&&near(st.H[1].a-67.5,45,60,3.6,.07))return {part:"lay",i:1,x:q.x,y:q.y,gx:g.x,gy:g.y};
+    if(at(14)&&d>=107.5)return {part:"ring",x:q.x,y:q.y,gx:g.x,gy:g.y};
+    if(at(4)&&d<108.5)return {part:"lay",i:0,x:q.x,y:q.y,gx:g.x,gy:g.y};}
+  return null;}
+/* what a press does, part by part */
+function vcPress(st,h){if(still()&&h.part!=="medal")return;var snd=st.snd;vcRipple(st,h);
+  if(h.part==="medal"){if(st.onPick)st.onPick(h.i);return;}
+  if(h.part==="bow"){st.swT=performance.now();st.swS=h.x<260?-1:1;snd("bow");}
+  else if(h.part==="rim"){st.kv=-150;st.shT=performance.now();snd("rim");}
+  else if(h.part==="ring"){var dx=h.x-260,dy=h.y-232;st.v+=(dx>0?1:-1)*(dy<0?1:-1)*150;vcAim(st,st.goal);snd("ring");}
+  else if(h.part==="lay"){var L=st.H[h.i];L.v+=(L.s>0?1:-1)*(h.i===0?120:220);L.kick=1;snd("ring");}
+  vcMove(st);}
+/* turning the logo by hand */
+/* hands a press or a pointer to Home's engine button, as if the browser had found it */
+function vcKeySend(st,type,e){var k=st.key&&st.key.querySelector(".r175-seal");if(!k)return;var o={bubbles:type!=="pointerenter"&&type!=="pointerleave",cancelable:true,clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId||1,pointerType:e.pointerType||"mouse",button:0,buttons:type==="pointerup"?0:1,isPrimary:true};
+  var ev;try{ev=new PointerEvent(type,o);}catch(x){try{ev=new MouseEvent(type.replace("pointer","mouse"),o);}catch(y){return;}}k.dispatchEvent(ev);}
+function vcRipple(st,h){if(h.gx==null||still())return;var r=mk("i","skv-ripple");r.style.left=(h.gx-103).toFixed(1)+"px";r.style.top=(h.gy-75).toFixed(1)+"px";st.rip.appendChild(r);setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r);},1000);}
+/* the motion: one clock. The sway is the logo's (it turns a little to one side and back, and never stops), the lean follows the pointer
+   on a spring and the sway quietens under it; minimal motion and the system's reduced motion leave the instrument still */
+function vcMove(st){if(st.mraf)return;if(still()){st.tilt.style.transform="";return;}
+  st.mraf=requestAnimationFrame(function fr(ts){st.mraf=0;if(!st.t0)st.t0=ts;var dt=st.lt?Math.min(.034,(ts-st.lt)/1000):.016;st.lt=ts;
+    if(still()||!st.tilt.isConnected){st.lt=0;return;}
+    var hd=st.tilt.offsetParent===null||(st.head&&st.head.classList.contains("is-away"));if(hd){st.lt=0;clearTimeout(st.poll);st.poll=setTimeout(function(){vcMove(st);},450);return;}
+    st.tH+=dt;st.h+=((st.hold?1:0)-st.h)*Math.min(1,dt*4);var w=st.tH*2*Math.PI/10,iy=11*Math.sin(w),ix=-4*Math.sin(w);
+    var ty=st.hold?st.hx*28:0,tx=st.hold?-st.hy*20:0;st.vy+=(62*(ty-st.ly)-11*st.vy)*dt;st.ly+=st.vy*dt;st.vx+=(62*(tx-st.lx)-11*st.vx)*dt;st.lx+=st.vx*dt;
+    var k=1-.7*st.h,RX=ix*k+st.lx+9,RY=iy*k+st.ly;st.RX=RX;st.RY=RY;
+    st.kv+=(-190*st.kz-15*st.kv)*dt;st.kz+=st.kv*dt;
+    var now=performance.now(),sw=0,swt=(now-st.swT)/1000;if(swt<4.5)sw=st.swS*7*Math.exp(-swt/1.25)*Math.sin(2*Math.PI*swt/1.35);st.SW=sw;
+    st.tilt.style.transform="translateZ("+st.kz.toFixed(2)+"px) rotateX("+RX.toFixed(3)+"deg) rotateY("+RY.toFixed(3)+"deg)"+(sw?" translateY(-220.5px) rotateZ("+sw.toFixed(3)+"deg) translateY(220.5px)":"");
+    var L=Math.max(-40,Math.min(40,1.6*RY-1.2*(RX-9))),sht=(now-st.shT)/900,shim=sht>=0&&sht<1?360*(1-Math.pow(1-sht,3)):0;
+    if(st.bandImg)st.bandImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.chapImg)st.chapImg.style.transform="rotate("+L.toFixed(2)+"deg)";if(st.dome)st.dome.style.transform="rotate("+(L+shim).toFixed(2)+"deg)";if(st.glassArt)st.glassArt.style.transform="rotate("+(L*.55).toFixed(2)+"deg)";
+    /* the inside in harmony: each layer turns at its harmony speed; a press throws it on, and when it has slowed it falls back into step */
+    for(var i=0;i<st.H.length;i++){var Ly=st.H[i],tgt=Ly.s*st.tH;if(Math.abs(Ly.v-Ly.s)>2){Ly.v+=(Ly.s-Ly.v)*Math.min(1,dt/1.5);}
+      else{var e=((tgt-Ly.a)%Ly.p+Ly.p*1.5)%Ly.p-Ly.p/2;Ly.v=Ly.s+Math.max(-6,Math.min(6,.9*e));}
+      Ly.a+=Ly.v*dt;}
+    vcLayers(st,L);
+    st.mraf=requestAnimationFrame(fr);});}
+/* the layers turned, their shadows kept below them on the right, their facets relit when they have turned a degree or the light has moved */
+function vcLayers(st,L){var R=st.rose;var d=st.dial;if(d)d.style.transform="translateZ(4px) rotate("+st.H[0].a.toFixed(2)+"deg)";if(!R)return;
+  for(var i=0;i<3;i++){var A=st.H[i+1].a,ly=st.lays[i],tx=A.toFixed(2);ly.tp.style.transform="translateZ("+ly.tp.style.getPropertyValue("--z")+"px) rotate("+tx+"deg)";ly.ed.style.transform="translateZ("+ly.ed.style.getPropertyValue("--z")+"px) translate(.5px,.8px) rotate("+tx+"deg)";
+    ly.sh.style.transform="translateZ("+ly.sh.style.getPropertyValue("--z")+"px) translate(2px,3.2px) rotate("+tx+"deg)";
+    var key=Math.round((A-L)*1.5);if(ly.__k!==key){ly.__k=key;vcFacets(R.layers[i].top,A-L,R.nt,R.VI,R.VN);}}}
+/* the engine button in its seat: Home's own (sealKey), or whatever key the caller makes */
+function vcKey(box,key){var slot=box.querySelector(".skv-key");if(!slot||!key)return;while(slot.firstChild)slot.removeChild(slot.firstChild);slot.appendChild(key);}
+/* the theme's drawing: the metal is drawn once for day and once for night */
+function vcTheme(box,nt){var pk=nt?"n":"d";if(box.__pk===pk)return;box.__pk=pk;var st=box.__vc;
+  box.querySelector(".skv-bandimg").src=vcBaseUrl(nt,"band");box.querySelector(".skv-chapimg").src=vcBaseUrl(nt,"chap");box.querySelector(".skv-dialimg").src=vcDialUrl(nt);box.querySelector(".skv-caseimg").src=vcCaseUrl(nt,"rope");box.querySelector(".skv-domeimg").src=vcCaseUrl(nt,"dome");
+  [].forEach.call(box.querySelectorAll(".skv-bowimg"),function(e){e.src=vcBowUrl(nt);});box.querySelector(".skv-collar").src=vcCollarUrl(nt,26.5,31.5);
+  var R=vcRose(nt),dl=box.querySelector(".skv-dial"),old=dl.querySelector("svg");if(old)dl.removeChild(old);dl.appendChild(R.rings);
+  if(st){st.rose=R;st.lays.forEach(function(ly,i){[ly.sh,ly.ed,ly.tp].forEach(function(e){while(e.firstChild)e.removeChild(e.firstChild);});ly.sh.appendChild(R.layers[i].shd);ly.ed.appendChild(R.layers[i].edge);ly.tp.appendChild(R.layers[i].top);ly.__k=null;});}
+  var gl=box.querySelector(".skv-glassart");while(gl.firstChild)gl.removeChild(gl.firstChild);gl.appendChild(vcGlass(nt));
+  var ix=box.querySelector(".skv-index");while(ix.firstChild)ix.removeChild(ix.firstChild);ix.appendChild(vcIndex(nt));}
+/* the ring's markings and medallions for these stages; onPick(i) when one is pressed, onHover(i or -1) for its name tag */
+function vcStages(box,list,nt,onPick,onHover){var st=box.__vc;[st.svg,st.svg2,st.marks].forEach(function(e){if(e&&e.parentNode)e.parentNode.removeChild(e);});st.ups=[];
+  var n=list.length,two=vcRingSvg(list,nt);st.svg=two[0];st.svg2=two[1];st.chap.appendChild(st.svg);st.band.appendChild(st.svg2);st.marks=mk("div","skv-marks");st.chap.appendChild(st.marks);
+  list.forEach(function(s,i){var a=(-90+i*360/n)*Math.PI/180,sl=mk("div","skv-slot"),up=mk("div","skv-up"),b=mk("button","skv-md");
+    sl.style.left=(157+142*Math.cos(a)-16).toFixed(2)+"px";sl.style.top=(157+142*Math.sin(a)-16).toFixed(2)+"px";b.type="button";
+    var kind=s.cur?"cur":s.done?"done":"ahead";b.setAttribute("data-kind",kind);if(s.done)b.classList.add("is-done");
+    b.setAttribute("aria-label",ROMAN[i]+". "+s.name+(s.done?", done":"")+(s.cur?", the stage in hand":s.next?", the next stage":""));if(s.cur)b.setAttribute("aria-current","step");
+    up.appendChild(mk("i","skv-mdsh"));up.appendChild(mk("i","skv-mdside"));b.appendChild(vcMedal(ROMAN[i],kind,nt));
+    if(onHover){b.addEventListener("pointerenter",function(){onHover(i);});b.addEventListener("focus",function(){onHover(i);});b.addEventListener("pointerleave",function(){onHover(-1);});b.addEventListener("blur",function(){onHover(-1);});}
+    b.addEventListener("click",function(e){e.preventDefault();if(onPick)onPick(i);});st.onPick=onPick;up.appendChild(b);sl.appendChild(up);st.marks.appendChild(sl);st.ups.push(up);});
+  vcApply(st);}
+
 function careerHero(){var pg=$("page-career"),cs=$("cs");if(!pg||!cs)return null;if(CP.h&&CP.h.el.isConnected)return CP.h;
   var lede=(cs.querySelector(".c-head p")||{}).textContent||"Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.";
-  var H=hero({title:"Career Studio",eyebrow:"Career Studio · the dial of your path",lede:lede,
+  var H=hero({title:"Career Studio",eyebrow:"Career Studio · the compass of your path",lede:lede,
     keys:[{pri:true,ico:ICO.compass,txt:"Your counsellor",id:"skCareerGo",fn:function(){var S=W.IngCareer.state();S.ui.room="mentor";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}},
       {ico:ICO.plus,txt:"Bring one in",fn:function(){var S=W.IngCareer.state();S.ui.room="apps";S.ui.open="new";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}}],
-    says:"Your counsellor's stages, one after another: what you have, your record, what you want, where you could go, and this week.",hint:"Press a stage to turn the dial to it."});
+    says:"Your counsellor's stages, one after another: what you have, your record, what you want, where you could go, and this week.",hint:"Press a stage to turn the compass to it."});
   var who=cs.querySelector(".c-who");if(who)H.keys.appendChild(who);
-  var box=mk("div","skc");box.setAttribute("role","group");box.setAttribute("aria-label","The dial: your counsellor's stages");
-  box.appendChild(mk("div","skc-under"));var pl=mk("div","skc-plate");[6,4,2].forEach(function(z){var i=mk("i");i.style.setProperty("--z",z);pl.appendChild(i);});pl.appendChild(img("skc-plateimg"));box.appendChild(pl);
-  var eng=mk("div","skc-eng");eng.appendChild(engraving());box.appendChild(eng);
-  [2,4,6].forEach(function(z,i){var b=mk("i","skc-bside"+(i===2?" b2":""));b.style.setProperty("--z",z);b.setAttribute("aria-hidden","true");box.appendChild(b);});
-  var bz=mk("div","skc-bezel");bz.appendChild(img("skc-bezelimg"));box.appendChild(bz);
-  box.appendChild(mk("div","skc-dial"));box.appendChild(indexEl());
-  var cb=mk("div","skc-collarbox");cb.appendChild(img("skc-collar"));box.appendChild(cb);
-  var seat=mk("div","skc-seat"),hs=mk("div","hx-seal");hs.setAttribute("data-ing-seal","career");var k=mk("button","r175-seal");k.type="button";k.setAttribute("aria-label","Ingenium's seal, the engine at the heart of the dial. Press it for fun.");
-  var g=mk("span","r175-glow"),fx=mk("span","r175-fx"),rp=mk("span","r175-ripple");g.setAttribute("aria-hidden","true");rp.setAttribute("aria-hidden","true");var se=sealCopy();if(se)fx.appendChild(se);
-  k.appendChild(g);k.appendChild(fx);k.appendChild(rp);hs.appendChild(k);seat.appendChild(hs);box.appendChild(seat);k.addEventListener("click",function(){sealPlay(box);});
+  var box=vcBuild(),st=box.__vc;st.head=H.el;st.onLand=function(){tick();};H.el.classList.add("skv-head");
+  /* at its heart, Home's own engine button: Home's animation and Home's click (her words, 13 November 2026) */
+  vcKey(box,sealKey("skv-hx","Ingenium's engine button at the heart of the compass. Press it, as on Home.",54));
   H.sway.appendChild(box);H.dial=box;cs.parentNode.insertBefore(H.el,cs);CP.h=H;CP.key="";CP.T=null;CP.painted=false;return H;}
 function scrollTo(el){try{el.scrollIntoView({behavior:still()?"auto":"smooth",block:"start"});}catch(e){}}
 /* pressing the seal: the bezel makes one full turn and settles where it was, the index ticks, the seal glows (its own flourish, R175) */
-function sealPlay(box){var gl=box.querySelector(".r175-glow"),rp=box.querySelector(".r175-ripple");
-  if(!still()&&CP.T!=null){turnTo(CP.T-360,true);setTimeout(function(){tick();},1100);}
-  try{if(gl&&gl.animate)gl.animate([{opacity:0,transform:"scale(.82)"},{opacity:.85,transform:"scale(1.04)",offset:.3},{opacity:0,transform:"scale(1.12)"}],{duration:1000,easing:"ease-out"});
-    if(rp&&rp.animate&&!still())rp.animate([{opacity:.6,transform:"scale(.86)"},{opacity:0,transform:"scale(1.55)"}],{duration:950,easing:"ease-out"});}catch(e){}}
-function tick(){var ix=CP.h&&CP.h.dial.querySelector(".skc-index");if(!ix||still())return;ix.classList.remove("tick");void ix.offsetWidth;ix.classList.add("tick");}
+function sealPlay(box){var k=box&&box.querySelector(".skv-key .r175-seal");if(k)k.click();}
+function tick(){var ix=CP.h&&CP.h.dial&&CP.h.dial.querySelector(".skv-index");if(!ix||still())return;ix.classList.remove("tick");void ix.offsetWidth;ix.classList.add("tick");}
 /* the turn: the bezel and everything on it turn together; each stage turns back by as much, so its numeral stays upright */
-function turnTo(T,quiet){var b=CP.h&&CP.h.dial;if(!b)return;var d=b.querySelector(".skc-dial");if(!d)return;CP.T=T;
-  d.style.transform="translateZ(8.4px) rotate("+T.toFixed(3)+"deg)";[].forEach.call(d.querySelectorAll(".skc-up"),function(u){u.style.transform="rotate("+(-T).toFixed(3)+"deg)";});
-  if(!quiet)setTimeout(tick,820);}
+function turnTo(T,quiet){var b=CP.h&&CP.h.dial;if(!b||!b.__vc)return;CP.T=T;vcAim(b.__vc,T,0,!!quiet);}
 function nearest(T,prev){if(prev==null)return T;while(T-prev>180)T-=360;while(T-prev<-180)T+=360;return T;}
-function tagFor(H,i,s,n){var o=H.obj;[].forEach.call(o.querySelectorAll(".skh-label.tag"),function(l){l.parentNode.removeChild(l);});if(i===CP.cur)return;
-  var th=(angleOf(i,n)+(CP.T||0))*Math.PI/180,x=260+198*Math.cos(th),y=214+198*Math.sin(th);label(o,x,y,Math.cos(th),Math.sin(th),ROMAN[i]+" · "+s.name,s.done?"done":s.next?"next":"","tag");}
-function paintCompass(){var H=careerHero();if(!H)return;var data=stagesNow(),key=JSON.stringify(data)+(night()?"n":"d");if(key===CP.key)return;CP.key=key;var o=H.obj,box=H.dial;
-  var pk=night()?"n":"d";if(box.__pk!==pk){box.__pk=pk;box.querySelector(".skc-plateimg").src=plateUrl(340);box.querySelector(".skc-bezelimg").src=bezelUrl(100,152,126,10);box.querySelector(".skc-collar").src=collarUrl(112);}
-  [].forEach.call(o.querySelectorAll(".skh-label"),function(l){l.parentNode.removeChild(l);});
-  var old=box.querySelector(".skc-dial"),dial=mk("div","skc-dial");if(old)old.parentNode.replaceChild(dial,old);else box.appendChild(dial);
+function tagFor(H,i,s,n){var o=H.obj;[].forEach.call(o.querySelectorAll(".skh-label.tag"),function(l){l.parentNode.removeChild(l);});if(i===CP.cur||i<0)return;
+  var T=H.dial&&H.dial.__vc?H.dial.__vc.goal:(CP.T||0),th=(angleOf(i,n)+T)*Math.PI/180,x=260+204*Math.cos(th),y=232+204*Math.sin(th);label(o,x,y,Math.cos(th),Math.sin(th),ROMAN[i]+" · "+s.name,s.done?"done":s.next?"next":"","tag");}
+function paintCompass(){var H=careerHero();if(!H)return;var data=stagesNow(),nt=night(),key=JSON.stringify(data)+(nt?"n":"d");if(key===CP.key)return;CP.key=key;var o=H.obj,box=H.dial,st=box.__vc;
+  vcTheme(box,nt);[].forEach.call(o.querySelectorAll(".skh-label"),function(l){l.parentNode.removeChild(l);});
   if(!data||!data.list.length)return;var n=data.list.length,cur=0;data.list.forEach(function(s,i){if(s.cur)cur=i;});CP.cur=cur;CP.data=data;
-  dial.appendChild(dialSvg(data.list));
-  data.list.forEach(function(s,i){var a=angleOf(i,n)*Math.PI/180,sl=mk("div","skc-slot"),up=mk("div","skc-up"),b=mk("button","skc-cart");sl.style.left=(152+126*Math.cos(a)-36).toFixed(1)+"px";sl.style.top=(152+126*Math.sin(a)-36).toFixed(1)+"px";
-    b.type="button";b.setAttribute("aria-label",ROMAN[i]+". "+s.name+(s.done?", done":"")+(i===cur?", the stage in hand":s.next?", the next stage":""));if(i===cur)b.setAttribute("aria-current","step");
-    b.appendChild(cartEl(ROMAN[i],i===cur?"cur":s.done?"done":"ahead"));
-    b.addEventListener("pointerenter",function(){tagFor(H,i,s,n);});b.addEventListener("focus",function(){tagFor(H,i,s,n);});
-    b.addEventListener("pointerleave",function(){[].forEach.call(o.querySelectorAll(".skh-label.tag"),function(l){l.parentNode.removeChild(l);});});
-    b.addEventListener("click",function(){var C=W.IngCareer,S=C.state();S.ui.room="mentor";S.ui.show="work";
-      try{if(data.room==="counsellor"&&W.IngCounsel){IngCounsel.go(s.k);}else{C.mentor.state().step=s.k;try{saveState();}catch(e){}C.render();}}catch(e){}});
-    up.appendChild(b);sl.appendChild(up);dial.appendChild(sl);});
-  label(o,284,40,1,0,ROMAN[cur]+" · "+data.list[cur].name,data.list.every(function(x){return x.done;})?"every stage done":data.list[cur].done?"done":"in hand");
-  H.hint.innerHTML="";H.hint.appendChild(D.createTextNode("Your bearing: "));H.hint.appendChild(mk("b",null,ROMAN[cur]+" · "+data.list[cur].name));H.hint.appendChild(D.createTextNode(". Press a stage to turn the dial to it."));
-  var target=nearest(-cur*(360/n),CP.T);
-  if(!CP.painted&&!still()){var pre=target+360/n*1.5;dial.style.transition="none";[].forEach.call(dial.querySelectorAll(".skc-up"),function(u){u.style.transition="none";});CP.T=pre;turnTo(pre,true);void dial.offsetWidth;
-    dial.style.transition="";[].forEach.call(dial.querySelectorAll(".skc-up"),function(u){u.style.transition="";});
-    requestAnimationFrame(function(){requestAnimationFrame(function(){turnTo(target);});});}
-  else{var prev=CP.T;if(prev==null){CP.T=target;}dial.style.transition="none";[].forEach.call(dial.querySelectorAll(".skc-up"),function(u){u.style.transition="none";});turnTo(prev==null?target:prev,true);void dial.offsetWidth;
-    dial.style.transition="";[].forEach.call(dial.querySelectorAll(".skc-up"),function(u){u.style.transition="";});if(prev!=null&&Math.abs(prev-target)>.01)requestAnimationFrame(function(){turnTo(target);});}
-  CP.painted=true;}
+  vcStages(box,data.list,nt,function(i){var s=data.list[i],C=W.IngCareer,S=C.state();S.ui.room="mentor";S.ui.show="work";
+      try{if(data.room==="counsellor"&&W.IngCounsel){IngCounsel.go(s.k);}else{C.mentor.state().step=s.k;try{saveState();}catch(e){}C.render();}}catch(e){}},
+    function(i){if(i<0)[].forEach.call(o.querySelectorAll(".skh-label.tag"),function(l){l.parentNode.removeChild(l);});else tagFor(H,i,data.list[i],n);});
+  label(o,304,14,1,0,ROMAN[cur]+" · "+data.list[cur].name,data.list.every(function(x){return x.done;})?"every stage done":data.list[cur].done?"done":"in hand");
+  H.hint.innerHTML="";H.hint.appendChild(D.createTextNode("Your bearing: "));H.hint.appendChild(mk("b",null,ROMAN[cur]+" · "+data.list[cur].name));H.hint.appendChild(D.createTextNode(". Press a stage to turn the compass to it."));
+  var target=nearest(-cur*(360/n),CP.painted?st.goal:null);
+  if(!CP.painted&&!still()){st.T=target+360/n*1.5;st.goal=st.T;st.v=0;vcApply(st);vcAim(st,target);}else vcAim(st,target,0,!CP.painted);
+  CP.T=target;CP.painted=true;}
 function dressCareer(){var pg=$("page-career");if(!pg||!$("cs"))return false;pg.classList.add("sk-on");paintCompass();return true;}
 
 /* ================= THE SEAL KEY: Ingenium's own seal (R104's layers), its pointer and flourishes as Home's (R175), its sound (r176) ================= */
@@ -592,6 +1185,119 @@ function wireSeal(k){var busy=false,again=false,last="",count=0,downAt=0;
 function sealKey(cls,label,size){var hs=mk("div","hx-seal sk-seal"+(cls?" "+cls:"")),k=mk("button","r175-seal");k.type="button";k.setAttribute("aria-label",label);
   var g=mk("span","r175-glow"),fx=mk("span","r175-fx"),rp=mk("span","r175-ripple");g.setAttribute("aria-hidden","true");rp.setAttribute("aria-hidden","true");
   var se=sealCopy();if(se){se.style.setProperty("--S",(size||58)+"px");fx.appendChild(se);}k.appendChild(g);k.appendChild(fx);k.appendChild(rp);hs.appendChild(k);wireSeal(k);return hs;}
+/* ---------------- Lector's seal (6.94): a real vintage wax stamp of the engine logo ----------------
+   Her words (13 November 2026): "The seal engine needs to look like a real vintage wax stamp, it looked too shiny and sparkly and smooth in
+   the last design, it did not match the layered depth and animated look and effect." "The seal should not say Lector, instead it should
+   read Ingenium at the top and the live latin date of the day at the bottom. It needs to also be animated and work like my own digital
+   fidget spinner button on the page." So: wax poured unevenly and pressed, its edge rolled and wrinkled where the matrix pushed it out, a
+   satin surface with its fine grain and the odd bubble, no gloss and no passing gleam; INGENIUM raised round the top, today's date in Latin
+   round the foot (it changes at midnight), the engine logo's star raised in the middle with its heart. All of it is one height field lit
+   pixel by pixel, so the relief catches the light as wax does. It stands on the page with its thickness and its shadow, sways a little,
+   leans to the pointer, and a press plays one of Home's flourishes with Home's click. */
+var LXS={N:0,urls:{},wax:"violet"};
+var LXWAX={violet:{day:{base:[.7,.6,.92],deep:[.5,.38,.78],ink:[.99,.98,1],star:[.97,.96,1],collar:[.93,.91,.99],pearl:[1,1,1],side0:"#9a82d6",side1:"#7d63bf"},
+                   night:{base:[.4,.27,.66],deep:[.18,.1,.36],ink:[.88,.84,.98],star:[.84,.8,.94],collar:[.8,.76,.92],pearl:[.97,.95,1],side0:"#3b2470",side1:"#1f1240"}},
+           white:{day:{base:[.985,.975,1],deep:[.74,.7,.84],ink:[.36,.21,.66],star:[.46,.31,.8],collar:[.4,.24,.72],pearl:[1,.99,1],side0:"#d9d3e6",side1:"#bfb6d4"},
+                  night:{base:[.27,.23,.36],deep:[.14,.11,.2],ink:[.74,.64,.95],star:[.47,.33,.8],collar:[.42,.27,.76],pearl:[.95,.93,1],side0:"#251f33",side1:"#16121f"}}};
+var LXL=(function(){var x=-.5,y=-.62,z=.6,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})(),LXH=(function(){var x=LXL[0],y=LXL[1],z=LXL[2]+1,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})();
+var LXMONTH=["IANUARII","FEBRUARII","MARTII","APRILIS","MAII","IUNII","IULII","AUGUSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
+function lxRoman(n){var v=[1000,900,500,400,100,90,50,40,10,9,5,4,1],s=["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"],o="",i;for(i=0;i<v.length;i++)while(n>=v[i]){o+=s[i];n-=v[i];}return o;}
+/* today, in Latin, as Inkwell's seal gives its own: the day, the month and the year (XIII · NOVEMBRIS · MMXXVI) */
+function lxDate(d){d=d||new Date();return lxRoman(d.getDate())+" · "+LXMONTH[d.getMonth()]+" · "+lxRoman(d.getFullYear());}
+function lxNoise(x,y){var s=Math.sin(x*12.9898+y*78.233)*43758.5453;return s-Math.floor(s);}
+function lxVN(x,y){var x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0,a=lxNoise(x0,y0),b=lxNoise(x0+1,y0),c=lxNoise(x0,y0+1),d=lxNoise(x0+1,y0+1),u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+/* the poured edge: round, but not quite, with a spill here and there */
+function lxRb(t){return 45.2+.95*(.55*Math.sin(3*t+.7)+.3*Math.sin(5*t+2.1)+.22*Math.sin(8*t+.4)+.12*Math.sin(13*t+1.3))+1.6*Math.max(0,Math.cos(t-2.2))*Math.max(0,Math.cos(3*(t-2.2)))+.9*Math.max(0,Math.cos(2*(t+.6)))*Math.max(0,Math.cos(5*(t+.6)));}
+function lxBlob(r0,amp){var d="",i,t,r;for(i=0;i<=140;i++){t=i/140*Math.PI*2;r=lxRb(t)+(r0-45.2);d+=(i?" L":"M")+(50+r*Math.cos(t)).toFixed(2)+","+(50+r*Math.sin(t)).toFixed(2);}return d+" Z";}
+/* the matrix's face as a mask (white where it is raised): the name round the top, the date round the foot, a fine ring, the star, its heart */
+function lxArc(g,txt,cx,cy,r,mid,px,sp,foot){g.font="600 "+px+"px \"Home Cormorant\",\"Cormorant Garamond\",Cormorant,Georgia,serif";g.textBaseline="alphabetic";
+  var ws=[],W=0,i;for(i=0;i<txt.length;i++){ws.push(g.measureText(txt[i]).width);W+=ws[i]+(i?sp:0);}
+  var acc=0;for(i=0;i<txt.length;i++){var th=foot?mid+(W/2-acc-ws[i]/2)/r:mid-(W/2-acc-ws[i]/2)/r;g.save();g.translate(cx+r*Math.cos(th),cy+r*Math.sin(th));g.rotate(foot?th-Math.PI/2:th+Math.PI/2);g.fillText(txt[i],-ws[i]/2,0);g.restore();acc+=ws[i]+sp;}}
+function lxStarPath(g,cx,cy,L,ri){g.beginPath();for(var i=0;i<4;i++){var A=i*Math.PI/2-Math.PI/2,P=[cx+L*Math.cos(A),cy+L*Math.sin(A)],B=A+Math.PI/4,Wp=[cx+ri*Math.cos(B),cy+ri*Math.sin(B)],A2=A+Math.PI/2,P2=[cx+L*Math.cos(A2),cy+L*Math.sin(A2)];
+    if(!i)g.moveTo(P[0],P[1]);var q1=[cx+.5*(P[0]+Wp[0]-2*cx)*.7,cy+.5*(P[1]+Wp[1]-2*cy)*.7],q2=[cx+.5*(P2[0]+Wp[0]-2*cx)*.7,cy+.5*(P2[1]+Wp[1]-2*cy)*.7];
+    g.quadraticCurveTo(q1[0],q1[1],Wp[0],Wp[1]);g.quadraticCurveTo(q2[0],q2[1],P2[0],P2[1]);}g.closePath();}
+function lxMask(N,what,date){var c=D.createElement("canvas");c.width=c.height=N;var g=c.getContext("2d"),k=N/100;g.fillStyle="#000";g.fillRect(0,0,N,N);g.fillStyle="#fff";g.strokeStyle="#fff";
+  if(what==="ring"){lxArc(g,"INGENIUM",50*k,50*k,31.6*k,-Math.PI/2,8.6*k,2.5*k,false);var fp=date.length>22?4.9:5.4;lxArc(g,date,50*k,50*k,37.4*k,Math.PI/2,fp*k,(date.length>22?.85:1.05)*k,true);
+    g.lineWidth=.8*k;g.beginPath();g.arc(50*k,50*k,28.6*k,0,Math.PI*2);g.stroke();g.beginPath();g.arc(15.4*k,50*k,.95*k,0,Math.PI*2);g.arc(84.6*k,50*k,.95*k,0,Math.PI*2);g.fill();}
+  else if(what==="star"){lxStarPath(g,50*k,50*k,20.6*k,9.2*k);g.fill();}
+  else if(what==="heart"){g.beginPath();g.arc(50*k,50*k,5.6*k,0,Math.PI*2);g.fill();}
+  var d=g.getImageData(0,0,N,N).data,m=new Float32Array(N*N),i;for(i=0;i<N*N;i++)m[i]=d[i*4]/255;return m;}
+function lxBlur(m,N,r){var t=new Float32Array(N*N),o=new Float32Array(N*N),x,y,k,s,w=2*r+1;
+  for(y=0;y<N;y++){s=0;for(k=-r;k<=r;k++)s+=m[y*N+Math.min(N-1,Math.max(0,k))];for(x=0;x<N;x++){t[y*N+x]=s/w;s+=m[y*N+Math.min(N-1,x+r+1)]-m[y*N+Math.max(0,x-r)];}}
+  for(x=0;x<N;x++){s=0;for(k=-r;k<=r;k++)s+=t[Math.min(N-1,Math.max(0,k))*N+x];for(y=0;y<N;y++){o[y*N+x]=s/w;s+=t[Math.min(N-1,y+r+1)*N+x]-t[Math.max(0,y-r)*N+x];}}return o;}
+/* the wax's own height: a rolled edge, a lip wrinkled where the matrix pushed it out, the step down into the pressed field */
+function lxH0(x,y){var dx=x-50,dy=y-50,r=Math.sqrt(dx*dx+dy*dy),t=Math.atan2(dy,dx),d=lxRb(t)-r,h;if(d<0)return -1;
+  if(d<3.4)h=3.3*Math.sin(Math.PI/2*d/3.4);else if(d<6.6){var w=(d-3.4)/3.2;h=3.3+.25*Math.sin(Math.PI*w)+.32*(lxVN(t*9,d*.6)-.5)*Math.sin(Math.PI*w);}
+  else if(d<8.2){var q=(d-6.6)/1.6;h=3.3-1.9*q*q*(3-2*q);}else h=1.4-.25*Math.min(1,(d-8.2)/34);
+  return h+.09*(lxVN(x*1.3,y*1.3)-.5)+.035*(lxVN(x*5.2,y*5.2)-.5);}
+/* the layers, lit as wax: the ring (the wax with its name and date), the star, its heart; each its own picture, so Home's flourishes can turn
+   the star against the ring as they turn Home's */
+function lxWaxUrls(size,dark,date,wax){wax=wax||LXS.wax;var k=wax+(dark?"n":"d")+size+date;if(LXS.urls[k])return LXS.urls[k];var P=LXWAX[wax][dark?"night":"day"],dpr=Math.min(2,Math.max(1,W.devicePixelRatio||1)),N=Math.round(size*dpr*2),u=100/N,i,j;
+  var mR=lxBlur(lxMask(N,"ring",date),N,Math.max(1,Math.round(N/380))),mS=lxBlur(lxMask(N,"star"),N,Math.max(1,Math.round(N/240))),mH=lxBlur(lxMask(N,"heart"),N,Math.max(1,Math.round(N/200)));
+  /* bubbles: a few small pits in the lip and the field */
+  var bub=[];for(i=0;i<9;i++){var a=lxNoise(i*3.1,7.7)*Math.PI*2,rr=12+lxNoise(i*1.7,2.2)*30;bub.push([50+rr*Math.cos(a),50+rr*Math.sin(a),.35+lxNoise(i,4.4)*.5]);}
+  var H=new Float32Array(N*N),Hs=new Float32Array(N*N),Hh=new Float32Array(N*N);
+  for(j=0;j<N;j++)for(i=0;i<N;i++){var x=(i+.5)*u,y=(j+.5)*u,h=lxH0(x,y),p=j*N+i;if(h<0){H[p]=-1;continue;}
+    var dx=x-50,dy=y-50,r=Math.sqrt(dx*dx+dy*dy),inField=r<lxRb(Math.atan2(dy,dx))-8.2;
+    for(var b=0;b<bub.length;b++){var bx=x-bub[b][0],by=y-bub[b][1],bd=bx*bx+by*by,br=bub[b][2];if(bd<br*br)h-=.35*(1-bd/(br*br));}
+    if(inField)h+=1.55*mR[p];H[p]=h;Hs[p]=inField?1.7*mS[p]:0;
+    var hr=Math.sqrt((x-50)*(x-50)+(y-50)*(y-50));Hh[p]=inField&&hr<5.6?(hr<3.7?.5*Math.sqrt(1-hr*hr/13.69)+.25:.25):0;}
+  var Hb=(function(){var t=new Float32Array(N*N);for(var q=0;q<N*N;q++)t[q]=H[q]<0?0:H[q];return lxBlur(t,N,Math.max(2,Math.round(N/70)));})();
+  /* kind: "ring" (the wax, its lettering painted), "star" (the logo's facets), "heart" (the pearl in its collar) */
+  function shade(Hx,alphaOf,kind){var c=D.createElement("canvas");c.width=c.height=N;var g=c.getContext("2d"),im=g.createImageData(N,N),px=im.data,s=1/(2*u);
+    for(j=1;j<N-1;j++)for(i=1;i<N-1;i++){var p=j*N+i,a=alphaOf(p);if(a<=0)continue;
+      var hL=Hx(p-1),hR=Hx(p+1),hU=Hx(p-N),hD=Hx(p+N),c0=Hx(p);if(hL<0)hL=c0;if(hR<0)hR=c0;if(hU<0)hU=c0;if(hD<0)hD=c0;
+      var nx=-(hR-hL)*s*.85,ny=-(hD-hU)*s*.85,nz=1,l=Math.sqrt(nx*nx+ny*ny+1);nx/=l;ny/=l;nz/=l;
+      var x=(i+.5)*u-50,y=(j+.5)*u-50,R,G,B;
+      if(kind==="star"){/* the logo's facets: each point two planes, lit from above on the left, softened at the edge where the wax rounds it */
+        var ph=Math.atan2(y,x),A=Math.round((ph+Math.PI/2)/(Math.PI/2))*(Math.PI/2)-Math.PI/2,dd=Math.atan2(Math.sin(ph-A),Math.cos(ph-A)),sd=dd>0?1:-1,
+            ux=Math.cos(A),uy=Math.sin(A),vx=-uy,vy=ux,fx=Math.sin(.5)*vx*sd+.1*ux,fy=Math.sin(.5)*vy*sd+.1*uy,fz=Math.cos(.5),e=Math.min(1,Math.max(0,(mS[p]-.55)/.4));
+        nx=nx*(1-e)+fx*e;ny=ny*(1-e)+fy*e;nz=nz*(1-e)+fz*e;l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;ny/=l;nz/=l;}
+      var dl=nx*LXL[0]+ny*LXL[1]+nz*LXL[2],df=Math.max(0,(dl+.3)/1.3),nh=Math.max(0,nx*LXH[0]+ny*LXH[1]+nz*LXH[2]),sp=Math.pow(nh,14)*.13,
+          cav=Math.max(0,Math.min(1,(Hb[p]-c0)*.55)),th=Math.min(1,Math.max(0,(c0-1)/2.6)),gr=.93+.14*lxVN(i*.9,j*.9),lt=(.34+.86*df)*gr*(1-.42*cav);
+      R=(P.deep[0]+(P.base[0]-P.deep[0])*(1-.45*th))*lt;G=(P.deep[1]+(P.base[1]-P.deep[1])*(1-.45*th))*lt;B=(P.deep[2]+(P.base[2]-P.deep[2])*(1-.45*th))*lt;
+      if(kind==="ring"){var w=Math.min(1,Math.max(0,(mR[p]-.25)/.5)),pl=(.5+.62*df)*(.96+.06*lxVN(i*.9,j*.9));if(w>0){R+=(P.ink[0]*pl-R)*w;G+=(P.ink[1]*pl-G)*w;B+=(P.ink[2]*pl-B)*w;}}
+      else if(kind==="star"){var fl=.6+.55*Math.max(0,dl);R=P.star[0]*fl;G=P.star[1]*fl;B=P.star[2]*fl;}
+      else if(kind==="heart"){var hr=Math.sqrt(x*x+y*y),pd=.66+.5*Math.max(0,dl);if(hr<3.7){R=P.pearl[0]*pd;G=P.pearl[1]*pd;B=P.pearl[2]*pd;sp*=2.4;}else{var cl=.6+.55*Math.max(0,dl);R=P.collar[0]*cl;G=P.collar[1]*cl;B=P.collar[2]*cl;}}
+      R+=sp;G+=sp;B+=sp;
+      px[p*4]=Math.min(255,R*255);px[p*4+1]=Math.min(255,G*255);px[p*4+2]=Math.min(255,B*255);px[p*4+3]=Math.round(Math.min(1,a)*255);}
+    g.putImageData(im,0,0);var o=D.createElement("canvas");o.width=o.height=Math.round(N/2);var go=o.getContext("2d");go.imageSmoothingEnabled=true;go.drawImage(c,0,0,o.width,o.height);try{return o.toDataURL("image/png");}catch(e){return "";}}
+  var ring=shade(function(p){return H[p];},function(p){if(H[p]<0)return 0;var x=(p%N+.5)*u,y=(Math.floor(p/N)+.5)*u,dx=x-50,dy=y-50,d=lxRb(Math.atan2(dy,dx))-Math.sqrt(dx*dx+dy*dy);return Math.min(1,d/(1.2*u));},"ring");
+  var star=shade(function(p){return H[p]+Hs[p];},function(p){return Hs[p]>.02?Math.min(1,Hs[p]*2.2):0;},"star");
+  var heart=shade(function(p){return H[p]+Hs[p]+Hh[p];},function(p){var x=(p%N+.5)*u-50,y=(Math.floor(p/N)+.5)*u-50,r=Math.sqrt(x*x+y*y);return r<5.6?Math.min(1,(5.6-r)/(1.2*u)):0;},"heart");
+  LXS.urls[k]={ring:ring,star:star,heart:heart};return LXS.urls[k];}
+/* the wax's thickness below its face, a little darker, as a seal stands on the page */
+function lxSideSvg(size,dpx,dark,wax){var P=LXWAX[wax||LXS.wax][dark?"night":"day"],B=lxBlob(45.2,1),d=dpx/size*100,s="",i;
+  for(i=4;i>=0;i--)s+='<path d="'+B+'" transform="translate(0 '+(d*i/4).toFixed(2)+')" fill="'+(i===4?P.side1:P.side0)+'"/>';
+  return '<svg width="'+size+'" height="'+(size+dpx)+'" viewBox="0 0 100 '+(100+d).toFixed(2)+'" aria-hidden="true" focusable="false" style="position:absolute;left:0;bottom:0;overflow:visible">'+s+'</svg>';}
+/* the key: Home's engine button's behaviour (its sway, its lean and lift under a mouse, its sink when pressed and its knock, and one of
+   Home's flourishes on each press with Home's click), dressed as the wax stamp */
+function lxSealKey(size,opt){opt=opt||{};var hs=mk("div","hx-seal lx-wax"),k=mk("button","r175-seal lxs");k.type="button";k.setAttribute("aria-label","Lector's seal: Ingenium's engine logo pressed in wax, with today's date. Press it for fun.");
+  hs.style.setProperty("--S",size+"px");k.style.setProperty("--S",size+"px");
+  k.innerHTML='<span class="r175-glow" aria-hidden="true"></span><span class="r175-fx"><span class="isl lxs-isl"><span class="isl-tilt"><span class="isl-idle"><span class="lxs-cast"></span><span class="lxs-side"></span>'+
+    '<span class="lxs-face"><span class="isl-layer isl-ring lxs-l"><img class="lxs-ring" alt="" draggable="false"></span><span class="isl-layer isl-star lxs-l"><img class="lxs-star" alt="" draggable="false"></span><span class="isl-layer isl-heart lxs-l"><img class="lxs-heart" alt="" draggable="false"></span></span></span></span></span></span>'+
+    '<span class="r175-ripple" aria-hidden="true"></span>';
+  if(opt.wax)hs.__wax=opt.wax;if(opt.night!=null)hs.__nt=opt.night;hs.appendChild(k);lxSealPaint(hs);lxWire(k);return hs;}
+function lxWire(k){var busy=false,again=false,last="",count=0;function isl(){return k.querySelector(".isl");}
+  k.addEventListener("pointerenter",function(e){var s=isl();if(s&&e.pointerType==="mouse"&&!still())s.classList.add("hover");});
+  k.addEventListener("pointermove",function(e){var s=isl();if(!s)return;var r=s.getBoundingClientRect();if(!r.width)return;var x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    if(e.pointerType==="mouse"&&!still()){x=Math.max(-.25,Math.min(1.25,x));y=Math.max(-.25,Math.min(1.25,y));s.style.setProperty("--ry",((x-.5)*28).toFixed(1)+"deg");s.style.setProperty("--rx",(-(y-.5)*24).toFixed(1)+"deg");}},{passive:true});
+  k.addEventListener("pointerleave",function(){var s=isl();if(!s)return;s.classList.remove("hover","down");s.style.setProperty("--rx","0deg");s.style.setProperty("--ry","0deg");});
+  k.addEventListener("pointerdown",function(){var s=isl();if(s&&!still()){s.classList.remove("knock");s.classList.add("down");}},{passive:true});
+  ["pointerup","pointercancel"].forEach(function(t){k.addEventListener(t,function(e){var s=isl();if(!s)return;var was=s.classList.contains("down");s.classList.remove("down");if(e.pointerType!=="mouse")s.classList.remove("hover");
+    if(was&&t==="pointerup"&&!still()){void s.offsetWidth;s.classList.add("knock");clearTimeout(s.__kn);s.__kn=setTimeout(function(){s.classList.remove("knock");},600);}},{passive:true});});
+  function parts(){var s=isl();return {fx:k.querySelector(".r175-fx"),glow:k.querySelector(".r175-glow"),ripple:k.querySelector(".r175-ripple"),isl:s,ring:k.querySelector(".lxs-ring"),star:k.querySelector(".lxs-star"),heart:k.querySelector(".lxs-heart")};}
+  function play(){var P=parts();if(still()){sglow(P,false);return;}busy=true;count++;var name=count%7===0?"grand":(function(){var c=SORDER.filter(function(n){return n!==last;});return c[Math.floor(Math.random()*c.length)];})();
+    last=name;k.setAttribute("data-flourish",name);try{SFL[name](P,Math.random()<.5?-1:1);}catch(e){}sglow(P,name==="beat"||name==="grand");if(name!=="pulse"&&name!=="grand")ripple(P,0);
+    setTimeout(function(){busy=false;if(k.getAttribute("data-flourish")===name)k.removeAttribute("data-flourish");if(again){again=false;play();}},name==="wobble"||name==="grand"?1300:1150);}
+  k.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();try{if(W.IngSound&&IngSound.play)IngSound.play("paper",{el:k});}catch(x){}if(busy){again=true;sglow(parts(),false);return;}play();});
+  k.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!still()){var s=isl();if(s){s.classList.add("down");setTimeout(function(){s.classList.remove("down");},140);}}});}
+/* drawn for the theme and for today; at midnight the date turns over */
+function lxSealPaint(hs){var go=function(){lxSealDraw(hs);};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
+function lxSealDraw(hs){var nt=hs.__nt!=null?hs.__nt:night(),wax=hs.__wax||LXS.wax,S=parseFloat(hs.style.getPropertyValue("--S"))||86,date=lxDate(),key=wax+(nt?"n":"d")+S+date;if(hs.__k2===key)return;hs.__k2=key;
+  var U=lxWaxUrls(S,nt,date,wax);hs.querySelector(".lxs-ring").src=U.ring;hs.querySelector(".lxs-star").src=U.star;hs.querySelector(".lxs-heart").src=U.heart;
+  hs.querySelector(".lxs-side").innerHTML=lxSideSvg(S,Math.max(3,Math.round(S/22)),nt,wax);hs.querySelector(".r175-seal").setAttribute("data-date",date);
+  clearTimeout(hs.__mid);var now=new Date(),mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);hs.__mid=setTimeout(function(){hs.__k2="";if(hs.isConnected)lxSealDraw(hs);},Math.max(1000,mid-now));}
 /* ================= THE DOCUMENTS (Lector): the fan she approved, its seal Ingenium's own seal key ================= */
 var LB={h:null,row:null,key:"",cards:[],root:null};
 var SUBS={choose:"your apps",read:"part by part",write:"the documents",save:"Word, PDF or the web"};
@@ -623,7 +1329,7 @@ function grainTile(dark){var c=D.createElement("canvas");c.width=c.height=96;var
 function lfBuild(H){var root=mk("div","lf");root.setAttribute("role","group");root.setAttribute("aria-label","The documents of this reading");
   var tilt=mk("div","lf-tilt"),sway=mk("div","lf-sway");root.appendChild(mk("i","lf-cast"));LB.cards=[lfCard(),lfCard(),lfCard()];
   sway.appendChild(LB.cards[0]);sway.appendChild(LB.cards[2]);sway.appendChild(LB.cards[1]);
-  var sl=mk("div","lf-seal");sl.appendChild(sealKey("lf-key","Ingenium's seal. Press it for fun.",74));sway.appendChild(sl);
+  var sl=mk("div","lf-seal"),sk=lxSealKey(88);LB.seal=sk;sl.appendChild(sk);sway.appendChild(sl);
   tilt.appendChild(sway);root.appendChild(tilt);H.obj.appendChild(root);LB.root=root;
   root.style.setProperty("--lf-grain",grainTile(false));root.style.setProperty("--lf-grain-n",grainTile(true));
   root.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=root.getBoundingClientRect();if(!r.width)return;
@@ -641,7 +1347,7 @@ function lectorHero(){var pg=$("page-lector"),lx=$("lx7");if(!pg||!lx)return nul
         if(b)b.click();else{try{libPickFiles();}catch(e){}}scrollTo(lx);}}],
     says:"In four steps: choose your apps, read them part by part, write the documents, then save them as Word, PDF or a web page.",hint:"Point at a document to lift it from the fan; press it to read it."});
   lfBuild(H);lx.parentNode.insertBefore(H.el,lx);LB.h=H;LB.key="";return H;}
-function paintLector(){var H=lectorHero();if(!H)return;var lx=$("lx7"),st=lectorState(),t=lfThree(),key=JSON.stringify({s:st.steps,d:t.map(function(d){return d?[d.name,!!d.on,!!d.done,d.i]:null;}),a:lfApps()});if(key===LB.key)return;LB.key=key;
+function paintLector(){var H=lectorHero();if(!H)return;if(LB.seal)lxSealPaint(LB.seal);var lx=$("lx7"),st=lectorState(),t=lfThree(),key=JSON.stringify({s:st.steps,d:t.map(function(d){return d?[d.name,!!d.on,!!d.done,d.i]:null;}),a:lfApps()});if(key===LB.key)return;LB.key=key;
   if(LB.row&&LB.row.parentNode)LB.row.parentNode.removeChild(LB.row);LB.row=steps(st.steps.length?st.steps:[{name:"Choose",sub:SUBS.choose,now:true},{name:"Read",sub:SUBS.read},{name:"Write",sub:SUBS.write},{name:"Save",sub:SUBS.save}],function(i){goStep(i);});
   lx.parentNode.insertBefore(LB.row,lx);
   lfFill(LB.cards[0],t[0],"l");lfFill(LB.cards[1],t[1],"f");lfFill(LB.cards[2],t[2],"r");
@@ -660,7 +1366,7 @@ var og=W.go;if(typeof og==="function"&&!og.__r290){var g2=function(p){var r=og.a
 var themeMo=null;try{themeMo=new MutationObserver(function(){CP.key="";LB.key="";try{if($("page-career").classList.contains("active"))paintCompass();if($("page-lector").classList.contains("active"))paintLector();}catch(e){}});
   themeMo.observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 try{hookCareer();dressCareer();}catch(e){}try{dressLector();}catch(e){}
-W.IngStudios={career:dressCareer,lector:dressLector,compass:paintCompass,documents:paintLector,turn:function(T){turnTo(T);},
+W.IngStudios={career:dressCareer,lector:dressLector,compass:paintCompass,documents:paintLector,turn:function(T){turnTo(T);},repaint:function(){CP.key="";if(CP.h&&CP.h.dial)CP.h.dial.__pk="";paintCompass();},
   state:function(){return {T:CP.T,cur:CP.cur,n:CP.data?CP.data.list.length:0,cp:CP.key,lb:LB.key};},
   /* what the other heads share with these (Focus, modules/r291.js; Build, modules/r292.js) */
   kit:{hero:hero,label:label,steps:steps,orb:orb,wireOrb:wireOrb,sealKey:sealKey,plateUrl:plateUrl,collarUrl:collarUrl,scrollTo:scrollTo,still:still,night:night,mk:mk,svg:svg,img:img,ICO:ICO,ROMAN:ROMAN,
