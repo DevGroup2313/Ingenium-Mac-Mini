@@ -1,0 +1,66 @@
+<div class="wrap">
+  <section class="intro" aria-label="About this page">
+    <div class="eb"><b>Ingenium</b>Models · Blend</div>
+    <h1>The turret and the movement, in the compass's metal</h1>
+    <p class="q">"I also want you to refine and enhance the Models page cartridges and engine design to look more 3D and refined, please match it to the compass design and animation from the Vocatio page, I want to see live interactive previews of variations of it with the silver/charcoal look and the current purple metal look. The same goes for the Blend page's Engine look."</p>
+    <div class="bar"><div class="seg" role="group" aria-label="Day or night"><button type="button" id="thD" aria-pressed="true">Day</button><button type="button" id="thN" aria-pressed="false">Night</button></div>
+      <div class="seg" role="group" aria-label="Motion"><button type="button" id="mvF" aria-pressed="true">Full motion</button><button type="button" id="mvM" aria-pressed="false">Minimal motion</button></div>
+      <div class="seg" role="group" aria-label="The finish"><button type="button" id="fnS" aria-pressed="true">Silver and charcoal</button><button type="button" id="fnP" aria-pressed="false">Purple metal</button></div></div>
+  </section>
+
+  <section class="skh" aria-label="Models' head">
+    <div class="skh-words"><div class="eb"><b>Ingenium</b>Models · the turret</div><h2 class="skh-title">Models</h2>
+      <p class="skh-lede">Bring in model files you have already downloaded, give each a name that suits you, and set how it should run. Ingenium checks each file against this device and warns you before something too heavy is loaded.</p>
+      <div class="keys"><button class="k pri" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Get one of Ingenium's models</button><button class="k" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add a model file</button></div>
+      <p class="says">Press a cartridge's lens: the turret turns it to the engine and loads it. Press the engine button for Home's flourishes.</p></div>
+    <div class="obj" id="mObj"><div class="ikey" id="mKey"></div></div>
+    <div class="lab" id="mLab">Qwen3.5 2B<small>in the engine</small></div>
+    <p class="hint">Point at the turret and it leans toward you; <b>press a lens</b> and the turret brings it to the engine.</p>
+  </section>
+  <section class="note" aria-label="Models: what is new"><h2>Models: the turret, made as the compass is</h2><ul>
+    <li>Drawn on the graphics chip as a real instrument, face on as the compass is: a rope-milled bezel round a polished case, an engraved memory scale, and a turret plate in guilloche that turns on a spring to bring a cartridge under the violet index, into the engine.</li>
+    <li>Five lens cartridges stand out of the plate, each a milled metal barrel with coated glass whose rings turn slowly; the one in the engine glows softly. Each part casts its own soft shadow.</li>
+    <li>Two finishes to choose between: <b>silver and charcoal</b> (silver metal, a charcoal plate) or <b>purple metal</b> (today's violet, in the same detail). Home's own engine button stands at the heart, with Home's flourishes and click.</li></ul></section>
+
+  <section class="skh" aria-label="Blend's head">
+    <div class="skh-words"><div class="eb"><b>Ingenium</b>Blend · the movement of your models</div><h2 class="skh-title">Blend</h2>
+      <p class="skh-lede">Ask two or more of your models the same question and bring their answers together. They answer one after another on this device; each answer appears on the right as it is written, with its thinking, and the blended answer comes last.</p>
+      <div class="keys"><button class="k pri" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New blend</button><button class="k" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>Ready-made</button></div>
+      <p class="says">Make a blend in four steps: choose the models, choose how they work together, ask, then read the answers.</p></div>
+    <div class="obj" id="bObj2"><div class="ikey" id="bKey"></div></div>
+    <div class="lab">The movement<small>three models, in mesh</small></div>
+    <p class="hint">Point at the movement and it leans toward you; <b>press it</b> and it winds.</p>
+  </section>
+  <section class="note" aria-label="Blend: what is new"><h2>Blend: the movement, made as the compass is</h2><ul>
+    <li>A watchmaker's movement in the compass's metal: three gears in mesh, cut with spokes and turned rings, under a silver bridge with violet screws and diamond jewels in their bearings, on a turned plate inside the same rope-milled case.</li>
+    <li>It runs at its own slow pace, leans toward the hand, and winds when pressed (faster for a moment, then settling). Home's engine button sits at the heart of the great wheel.</li>
+    <li>The same two finishes as Models, so the two pages can match.</li></ul></section>
+</div>
+<div id="homeSeal" aria-hidden="true"><div id="brandSealBtn">/*SEALHTML*/</div></div>
+<script>
+var W=window,D=document,NSV="http://www.w3.org/2000/svg",CP={n:0};
+function $(i){return D.getElementById(i);}function mk(t,c,txt){var e=D.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
+function svg(t,a){var e=D.createElementNS(NSV,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function still(){try{return D.documentElement.getAttribute("data-motion")==="minimal"||(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}catch(e){return false;}}
+/*HS_JS*/
+/*SEAL_JS*/
+/*INSTR_JS*/
+(function(){
+  function click(){try{IngSound.play("paper");}catch(e){}}
+  var M=Instrument("turret"),B=Instrument("movement"),NAMES=["Qwen3.5 2B","LFM2.5 1.2B Instruct","Qwen3 4B Thinking","Gemma 3 4B","Qwen3 4B Instruct"];
+  W.onTurret=function(k){$("mLab").innerHTML=NAMES[k]+"<small>in the engine</small>";};
+  function setTheme(n){var r=D.documentElement;r.setAttribute("data-theme",n?"dark":"light");r.setAttribute("data-night",n?"1":"0");D.body.setAttribute("data-theme",n?"night":"day");
+    $("thD").setAttribute("aria-pressed",n?"false":"true");$("thN").setAttribute("aria-pressed",n?"true":"false");M.kick();B.kick();}
+  function setMotion(m){D.documentElement.setAttribute("data-motion",m?"minimal":"full");D.body.setAttribute("data-motion",m?"minimal":"full");$("mvF").setAttribute("aria-pressed",m?"false":"true");$("mvM").setAttribute("aria-pressed",m?"true":"false");M.kick();B.kick();}
+  function setFin(p){M.finish(p?1:0);B.finish(p?1:0);$("fnS").setAttribute("aria-pressed",p?"false":"true");$("fnP").setAttribute("aria-pressed",p?"true":"false");}
+  $("thD").onclick=function(){click();setTheme(false);};$("thN").onclick=function(){click();setTheme(true);};
+  $("mvF").onclick=function(){click();setMotion(false);};$("mvM").onclick=function(){click();setMotion(true);};
+  $("fnS").onclick=function(){click();setFin(false);};$("fnP").onclick=function(){click();setFin(true);};
+  [].forEach.call(D.querySelectorAll(".k"),function(k){k.addEventListener("click",click);});
+  var dark=false;try{dark=matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}
+  function go(){D.body.setAttribute("data-motion","full");M.mount($("mObj"));B.mount($("bObj2"));setFin(false);
+    try{$("mKey").appendChild(sealKey("ikey-hx","Ingenium's engine button at the heart of the turret. Press it, as on Home.",58));$("bKey").appendChild(sealKey("ikey-hx","Ingenium's engine button at the heart of the movement. Press it, as on Home.",54));}catch(e){W.__keyErr=String(e);}
+    setTheme(dark);}
+  try{D.fonts.load('600 40px "Home Cormorant"').then(go,go);}catch(e){go();}
+})();
+</script>

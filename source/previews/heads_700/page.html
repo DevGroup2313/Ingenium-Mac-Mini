@@ -1,0 +1,153 @@
+<title>Build and Focus Heads</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+/*FONTS*/
+/* Layout: a short note with the switches, then each head as Ingenium draws a page's head (r290's .skh: the desk, the words on the left,
+   the instrument on the right), each followed by what is new in it. Keys, colours and shadows as measured from the app. */
+:root{--bg:#f3eff8;--ink1:#221a2e;--ink2:#4a4358;--ink3:#6c6579;--hair:rgba(34,26,46,.10);--acc:#6a3fb5;--accs:rgba(106,63,181,.10);
+  --keyA:#ffffff;--keyB:#f6f2fb;--pa:#7a50c6;--pb:#5d37a1;--pedge:#3a2070;--card:#fff;
+  --key:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --keyhi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --press:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --desk:radial-gradient(ellipse 75% 85% at 72% 42%,#fdfbff 0%,#f4eff9 52%,#e9e1f4 100%);--ring:rgba(106,63,181,.10);
+  --cardsh:inset 0 0 0 1px var(--ring),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.08);
+  --serif:"Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#110d18;--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;--hair:rgba(205,184,240,.12);--acc:#b79ce6;--accs:rgba(183,156,230,.14);
+  --keyA:#2a2239;--keyB:#231c31;--pedge:#170b30;--card:#1f1829;
+  --key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --keyhi:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --desk:radial-gradient(ellipse 75% 85% at 72% 42%,#241a37 0%,#171025 52%,#0d0916 100%);--ring:rgba(205,184,240,.10);--cardsh:inset 0 0 0 1px var(--ring),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#110d18;--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;--hair:rgba(205,184,240,.12);--acc:#b79ce6;--accs:rgba(183,156,230,.14);
+  --keyA:#2a2239;--keyB:#231c31;--pedge:#170b30;--card:#1f1829;
+  --key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --keyhi:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.38);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --desk:radial-gradient(ellipse 75% 85% at 72% 42%,#241a37 0%,#171025 52%,#0d0916 100%);--ring:rgba(205,184,240,.10);--cardsh:inset 0 0 0 1px var(--ring),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4);color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink1);font:15px/1.55 var(--sans);padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.intro{border-radius:28px;padding:28px 32px;background:var(--desk);box-shadow:var(--cardsh)}
+.eb{font:600 11.5px/1.2 var(--sans);letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}.eb b{color:var(--acc);font-weight:600;margin-right:12px}
+h1{margin:10px 0 8px;font:600 clamp(34px,5vw,48px)/1.05 var(--serif);text-wrap:balance}
+.q{margin:8px 0 0;max-width:72ch;font:italic 500 17px/1.45 var(--serif);color:var(--ink3)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--accs);box-shadow:inset 0 0 0 1px var(--hair)}
+.seg button{border:0;background:none;color:var(--ink2);font:600 13px/1 var(--sans);padding:8px 14px;border-radius:999px;cursor:pointer;transition:transform .16s cubic-bezier(.34,1.35,.64,1)}
+.seg button:hover{transform:translateY(-1px)}.seg button:active{transform:translateY(1px)}
+.seg button[aria-pressed="true"]{background:linear-gradient(var(--pa),var(--pb));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pedge)}
+.seg button:focus-visible,.k:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.skh{position:relative;height:470px;border-radius:30px;overflow:hidden;isolation:isolate;background:var(--desk);color:var(--ink1);box-shadow:var(--cardsh)}
+.skh-words{position:absolute;left:40px;top:34px;z-index:5;width:470px;max-width:calc(100% - 80px)}
+.skh-title{margin:12px 0 10px;font:600 48px/1.04 var(--serif)}
+.skh-lede{margin:0 0 16px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.keys{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.k{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:8px 16px;border-radius:12px;border:1px solid var(--hair);background:linear-gradient(var(--keyA),var(--keyB));color:var(--ink1);font:600 13.5px/1 var(--sans);cursor:pointer;box-shadow:var(--key);transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s}
+.k svg{width:16px;height:16px}.k:hover{transform:translateY(-2px);box-shadow:var(--keyhi)}.k:active{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}
+.k.pri{background:linear-gradient(var(--pa),var(--pb));border-color:transparent;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pedge),0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16)}
+.says{margin:12px 0 0;max-width:460px;font-size:12.5px;line-height:1.5;color:var(--ink3)}
+.hint{position:absolute;left:40px;bottom:24px;z-index:6;max-width:470px;margin:0;font:italic 500 16px/1.4 var(--serif);color:var(--ink3)}.hint b{font-style:normal;font-weight:600;color:var(--ink1)}
+.obj{position:absolute;right:36px;top:22px;width:520px;height:424px;z-index:3;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.obj-cv{position:absolute;left:0;top:0;width:520px;height:424px;display:block;transition:transform .3s cubic-bezier(.34,1.35,.64,1)}
+.obj-cv.ov{pointer-events:none}
+.obj-cv.down{transform:scale(.985)}
+.obj[data-nogl]::after{content:"This device's browser cannot draw the stone; Ingenium shows its picture instead.";position:absolute;inset:auto 0 46% 0;text-align:center;font:500 13px/1.4 var(--sans);color:var(--ink3)}
+.lab{position:absolute;right:46px;bottom:28px;z-index:6;text-align:right;font:600 20px/1.1 var(--serif);color:var(--ink1)}.lab small{display:block;margin-top:3px;font:600 11px/1.2 var(--sans);letter-spacing:.04em;color:var(--acc)}
+.note{background:var(--card);border-radius:22px;padding:20px 24px;box-shadow:inset 0 0 0 1px var(--hair),0 6px 16px rgba(40,22,68,.06)}
+.note h2{margin:0 0 6px;font:600 23px/1.2 var(--serif)}.note ul{margin:6px 0 0;padding-left:20px;color:var(--ink2);display:flex;flex-direction:column;gap:5px;max-width:78ch}
+.mini{margin-top:14px}
+.tree-cv{position:absolute;left:30px;top:-18px;width:460px;height:460px;transform:scale(.92);transform-origin:50% 50%;cursor:grab;touch-action:none}
+.tip{position:absolute;z-index:8;pointer-events:none;padding:7px 11px;border-radius:10px;background:var(--card);box-shadow:var(--key);font:500 12.5px/1.35 var(--sans);color:var(--ink1);opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;max-width:260px}
+.tip.on{opacity:1;transform:none}.tip small{display:block;color:var(--ink3);font-size:11.5px;margin-top:2px}
+@media (max-width:1040px){.obj{right:50%;transform:translateX(50%) scale(.82);top:auto;bottom:-30px}.skh{height:760px}.lab{bottom:20px}.hint{display:none}}
+@media (max-width:600px){.skh{height:auto;padding-bottom:330px}.skh-words{position:relative;left:auto;top:auto;padding:26px 22px 0;width:auto;max-width:none}.skh-title{font-size:40px}.obj{transform:translateX(50%) scale(.62);bottom:-70px}.intro{padding:22px 20px}}
+</style>
+<div class="wrap">
+  <section class="intro" aria-label="About this page">
+    <div class="eb"><b>Ingenium</b>Build · Focus · Fabrica</div>
+    <h1>The diamond, the stepping stones and the tree</h1>
+    <p class="q">"For the Build page, I want you to build the diamond, refined ... I want a ray of light passing through the diamond and sparkles with nothern lights hues and effects but only the violet and purple-ish aura colours to match Ingenium."</p>
+    <p class="q">"For the Focus page, I want the Stepping stones ... I want it to look like real stones on water. I want to see the water ripple, I want the calm soothing sounds associated with it."</p>
+    <p class="q">"For Fabrica, I want the tree design but I want it refined and elevated to match the Vocatio's compass, and the other designs inside of Ingenium."</p>
+    <div class="bar"><div class="seg" role="group" aria-label="Day or night"><button type="button" id="thD" aria-pressed="true">Day</button><button type="button" id="thN" aria-pressed="false">Night</button></div>
+      <div class="seg" role="group" aria-label="Motion"><button type="button" id="mvF" aria-pressed="true">Full motion</button><button type="button" id="mvM" aria-pressed="false">Minimal motion</button></div>
+      <div class="seg" role="group" aria-label="The light out of the diamond"><button type="button" id="fiS" aria-pressed="true">Light: spectrum</button><button type="button" id="fiV" aria-pressed="false">Light: violets only</button></div></div>
+  </section>
+
+  <section class="skh" aria-label="Build's head">
+    <div class="skh-words"><div class="eb"><b>Ingenium</b>Build · code in, a page out</div><h2 class="skh-title">Build</h2>
+      <p class="skh-lede">Write a page and watch it run beside your code. Good for trying an idea, checking a snippet, or letting a model help you fix something. This works fully offline and does not need a model.</p>
+      <div class="keys"><button class="k pri" type="button" id="bRun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l11 7-11 7z"/></svg>Run your page</button><button class="k" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Load a sample</button></div>
+      <p class="says">Your code on one side, your page running on the other: try an idea, check a snippet, or let a model help you fix it.</p></div>
+    <div class="obj" id="bObj"></div>
+    <div class="lab">21 lines<small>runs as you type</small></div>
+    <p class="hint">Point at the diamond and it turns to you; <b>press it</b> and the light runs through it.</p>
+  </section>
+  <section class="note" aria-label="Build: what is new"><h2>Build: the diamond, drawn as a real stone</h2><ul>
+    <li>A true round brilliant, traced by the graphics chip: each ray that meets it reflects, refracts in, bounces inside up to six times and leaves split into its colours, so it flashes and throws fire as a cut stone does. It turns once in 36 seconds and rises and settles on Home's seven seconds.</li>
+    <li>A ray of white light enters its crown and leaves as a fan: across the room, back to the left, and down onto the plinth, where it lays a small spectrum. Press the stone and the light runs through it brighter. <b>Light: violets only</b> keeps the fan in Ingenium's violets.</li>
+    <li>Behind it, an aurora in violet and purple only, drawn into the stone's own reflections too; its sparkles are Ingenium's four-pointed star, where a facet sends the light to your eye. The plinth is turned silver, as the compass case is: fine turnings, an engraved scale of 72 cuts, a milled edge.</li>
+    <li>Sound: a press plays Home's own click and nothing else. It draws only while it is in view and the window is shown, at thirty frames a second when still, and at a lower resolution on a slower device.</li></ul></section>
+
+  <section class="skh" aria-label="Focus's head">
+    <div class="skh-words"><div class="eb"><b>Ingenium</b>Focus · one step at a time</div><h2 class="skh-title">Focus</h2>
+      <p class="skh-lede">Support that fits how you work: one step at a time, time you can see, a calm screen when you need it, and clear words. Change any of it, or switch it off, here or in Settings, under Support.</p>
+      <div class="keys"><button class="k pri" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H4zM20 5h-4a2 2 0 0 0-2 2"/></svg>Open Today</button><button class="k" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Your routines</button></div>
+      <p class="says">Time you can see, the day's steps one at a time, and a calm sound when you need it.</p>
+      <div class="seg mini" role="group" aria-label="The sound of the water"><button type="button" id="wOff" aria-pressed="true">Quiet</button><button type="button" id="wSt" aria-pressed="false">A stream</button><button type="button" id="wRn" aria-pressed="false">Soft rain</button></div></div>
+    <div class="obj" id="fObj"></div>
+    <div class="lab" id="fLab">Step 2 of 5<small>Look at your step: just look</small></div>
+    <p class="hint">The stone in the light is your step; the darker ones behind are done. <b>Press one</b> and the water answers.</p>
+  </section>
+  <section class="note" aria-label="Focus: what is new"><h2>Focus: stones on water, after your photographs</h2><ul>
+    <li>Smooth river stones cross a still pool toward the far bank, each half in the water: wet and dark where the water laps it, matte where it is dry, and mirrored in the water with the sky. No numerals.</li>
+    <li>The water moves as a pool does: a slow swell, small rings lapping round every stone, and every seven seconds a ring spreading from your step. The far water fades into mist and soft points of light.</li>
+    <li>The step in hand catches the light; the steps behind you are darker, washed with violet; the steps ahead are plain slate. Point at a stone and it lifts; press it and it dips, a ring spreads, and you hear a drop.</li>
+    <li><b>A stream</b>: water running over stones, made of many small bubbles over a soft, low body of water, in a little echo; <b>Soft rain</b>: single drops on leaves and water. Both are made in the app (nothing is fetched), each rendered once as a seamless loop, so they cost almost nothing to play. They stop when Focus is out of view. Your sphere with the little globe is kept as the backup design, untouched.</li></ul></section>
+
+  <section class="skh" aria-label="Fabrica's head">
+    <div class="skh-words"><div class="eb"><b>Ingenium</b>Fabrica · the tree of your versions</div><h2 class="skh-title">Fabrica</h2>
+      <p class="skh-lede">Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here. Every idea grows from its trunk, and nothing leaves this device unless you send it.</p>
+      <div class="keys"><button class="k pri" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New app</button><button class="k" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Bring one in</button></div>
+      <p class="says">Quill Notes · main · 12 versions · 2 releases · 1 change not kept yet. (An invented app, for this preview.)</p></div>
+    <div class="obj" id="xObj"><div class="tip" id="xTip"></div></div>
+    <div class="lab">Quill Notes<small>v1.1 · the newest release</small></div>
+    <p class="hint">Point at the tree to still it; <b>press a version</b> to see what it changed, in the panels below. Drag to turn it.</p>
+  </section>
+  <section class="note" aria-label="Fabrica: what is new"><h2>Fabrica: your tree, in the compass's silver and glass</h2><ul>
+    <li>The same tree as now: main is the trunk, each version a bead, an idea brought in an arch back to the trunk, an idea still open a branch, each release a collar with its name, the change not kept yet a bead waiting above the newest. It turns once in 52 seconds, stills under the pointer and turns under a drag.</li>
+    <li>Drawn again in the light that paints Vocatio's compass: the trunk and every branch polished silver, shaded across each rod; each version a bead of violet glass with its window, the light gathered inside it and a pearl rim (an idea brought in is pearl glass, an idea still open a lighter violet); the newest larger, with Ingenium's star inlaid; each release a silver collar.</li>
+    <li>The plinth is turned silver with a violet enamel band, an engraved scale of 72 cuts and the app's name, the foot of the trunk turned to match. Beads, foot and plinth are painted once and reused, so it costs no more than the tree it replaces.</li></ul></section>
+</div>
+<script>
+var W=window,D=document;
+/*HS_JS*/
+/*DIAMOND_JS*/
+/*STONES_JS*/
+/*VCLIGHT_JS*/
+/*TREE_JS*/
+(function(){
+  function click(){try{IngSound.play("paper");}catch(e){}}
+  function setTheme(n){var r=D.documentElement;r.setAttribute("data-theme",n?"dark":"light");r.setAttribute("data-night",n?"1":"0");
+    D.getElementById("thD").setAttribute("aria-pressed",n?"false":"true");D.getElementById("thN").setAttribute("aria-pressed",n?"true":"false");Build.theme();Focus.theme();Tree.theme();}
+  function setMotion(m){D.documentElement.setAttribute("data-motion",m?"minimal":"full");D.getElementById("mvF").setAttribute("aria-pressed",m?"false":"true");D.getElementById("mvM").setAttribute("aria-pressed",m?"true":"false");Build.kick();Focus.kick();Tree.kick();}
+  D.getElementById("thD").onclick=function(){click();setTheme(false);};D.getElementById("thN").onclick=function(){click();setTheme(true);};
+  D.getElementById("mvF").onclick=function(){click();setMotion(false);};D.getElementById("mvM").onclick=function(){click();setMotion(true);};
+  D.getElementById("fiS").onclick=function(){click();Build.fire(false);this.setAttribute("aria-pressed","true");D.getElementById("fiV").setAttribute("aria-pressed","false");};
+  D.getElementById("fiV").onclick=function(){click();Build.fire(true);this.setAttribute("aria-pressed","true");D.getElementById("fiS").setAttribute("aria-pressed","false");};
+  function snd(id){["wOff","wSt","wRn"].forEach(function(k){D.getElementById(k).setAttribute("aria-pressed",k===id?"true":"false");});}
+  D.getElementById("wSt").onclick=function(){Water.start("stream");snd("wSt");};D.getElementById("wRn").onclick=function(){Water.start("rain");snd("wRn");};
+  D.getElementById("wOff").onclick=function(){Water.stop();snd("wOff");};
+  [].forEach.call(D.querySelectorAll(".k"),function(k){k.addEventListener("click",click);});
+  var STEP=["Settle in: sit, breathe once","Look at your step: just look","Do the first small part","Check it, then rest","Write what is next"];
+  var dark=false;try{dark=matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}
+  function go(){D.documentElement.setAttribute("data-night",dark?"1":"0");Build.mount(D.getElementById("bObj"));
+    Focus.mount(D.getElementById("fObj"),function(i){Focus.setCur(i);D.getElementById("fLab").innerHTML="Step "+(i+1)+" of 5<small>"+STEP[i]+"</small>";});
+    var tip=D.getElementById("xTip");Tree.mount(D.getElementById("xObj"),function(b,B,pressed){if(!b){tip.classList.remove("on");return;}
+      tip.innerHTML="<b>"+((b.c&&b.c.title)||(b.wait?"A change not kept yet":"A version"))+"</b><small>"+(pressed?"Its changes open in the panels below.":(b.kind==="arch"?"from an idea brought in":b.kind==="branch"?"on the idea \u201c"+b.idea+"\u201d":b.wait?"Keep it to set the bead":"on main"))+"</small>";
+      var x=B.x*0.92+30+18+18,y=B.y*0.92-18-30;tip.style.left=Math.min(330,Math.max(0,x))+"px";tip.style.top=Math.max(0,y)+"px";tip.classList.add("on");});setTheme(dark);}
+  try{D.fonts.load('600 40px "Home Cormorant"').then(go,go);}catch(e){go();}
+})();
+</script>

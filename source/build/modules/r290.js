@@ -569,6 +569,15 @@ body[data-motion="minimal"] .skv-index.tick,body[data-motion="minimal"] .skv-ris
 body[data-motion="calm"] .skv-hx .seal-spin{animation-duration:13s}
 body[data-motion="minimal"] .skv-hx .seal-spin{animation:none}
 @media (prefers-reduced-motion:reduce){.skv-hx .seal-spin{animation:none}}
+/* the seal's thin ring, inside the compass (her words, 13 November 2026: "The thin little circle inside of the engine button of the compass is
+   out of sync with engine and looks smaller and keeps on rotating everywhere in every corner"): it lies in the seal's own plane, so it no
+   longer slides about inside the silver collar as the button sways; it sits just inside the collar; and it turns with the engine */
+.skv-hx .isl .isl-ring{--fz:0;--fk:1}
+@keyframes skvRing{from{transform:rotate(0deg) scale(1.1)}to{transform:rotate(-360deg) scale(1.1)}}
+.skv-hx .seal-counter{animation:skvRing 9s linear infinite}
+body[data-motion="calm"] .skv-hx .seal-counter{animation-duration:13s}
+body[data-motion="minimal"] .skv-hx .seal-counter{animation:none;transform:scale(1.1)}
+@media (prefers-reduced-motion:reduce){.skv-hx .seal-counter{animation:none;transform:scale(1.1)}}
 .skv-hx{--ox-rim0:#ddd2ef;--ox-rim1:#a891d4}
 body[data-theme="night"] .skv-hx{--ox-rim0:#43375e;--ox-rim1:#1d1729}
 .skv-hx .isl .ox-rim{position:absolute;left:2.6%;top:2.6%;width:94.8%;height:94.8%;border-radius:50%;display:block;pointer-events:none;

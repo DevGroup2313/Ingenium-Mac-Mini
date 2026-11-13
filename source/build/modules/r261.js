@@ -178,8 +178,8 @@ body[data-motion="minimal"] #page-home #hx.ox-on .oxo-tilt{transform:none}
      pointer a little, as the seal's sheen does; the surface fades a little towards the ball's edge, as it turns away from the eye;
    - the seal's pearl: each mark white at its top and the seal's pearl at its foot;
    - the seal's tilt under a mouse (26 and 22 degrees). Minimal motion and the system's reduced motion still the sheen. ---------- */
-#page-home #hx.ox-on .oxo{--cr0:#efe8fb;--cr1:#a891d4;--cr2:#55309a;--crop:.95}
-body[data-theme="night"] #page-home #hx.ox-on .oxo{--cr0:#e2d5fa;--cr1:#9a7ad8;--cr2:#472b7f;--crop:.7}
+#page-home #hx.ox-on .oxo{--cr0:#efe8fb;--cr1:#a891d4;--cr2:#55309a;--crop:0}
+body[data-theme="night"] #page-home #hx.ox-on .oxo{--cr0:#e2d5fa;--cr1:#9a7ad8;--cr2:#472b7f;--crop:0}
 #page-home #hx.ox-on .hx-head .oxo-ico svg,#page-home #hx.ox-on .hx-head .oxo-ico svg [stroke="currentColor"]{stroke:url(#oxPearl)}
 #page-home #hx.ox-on .hx-head .oxo-ico svg [fill="currentColor"]{fill:url(#oxPearl)}
 body[data-theme="night"] #page-home #hx.ox-on .hx-head .oxo-ico svg,body[data-theme="night"] #page-home #hx.ox-on .hx-head .oxo-ico svg [stroke="currentColor"]{stroke:url(#oxPearlN)}
