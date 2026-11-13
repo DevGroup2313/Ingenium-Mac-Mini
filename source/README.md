@@ -381,7 +381,8 @@ Ingenium 6.97 (13 November 2026): the heads' keys never move the page.
   where it is: so far only "Bring in your work", whose card is at the foot of the page. Keys inside the content (a row's Load key, the
   build library's book) and the links that take her to another page keep their own movement; they are not the heads'.
 Tests: `node rig/t_697_still.js <page url> <out>` (8: each of these, and every key in the heads of eight pages; it fails on 6.96 in six);
-`node rig/t_696_fabrica_head.js <page url> <out>` (17: a version pressed does not move the page; it fails on 6.96).
+`node rig/t_696_fabrica_head.js <page url> <out>` (18: a version pressed does not move the page, which fails on 6.96; with an app open,
+the hint says the comparison opens in the panels below).
 
 Ingenium 6.96 (13 November 2026): Lector's sealed dossier, and Fabrica's header.
 - Lector. Her words: "The Lector header looks bad on the latest build and I need it properly refined and deepened. I want it redesigned to
