@@ -26,7 +26,7 @@ const note = (m) => console.log('     ' + m);
   await p.evaluate(() => { try { tourEnd && tourEnd(); } catch (e) {} go('fabrica'); }); await p.waitForTimeout(1500);
   const ty = (sel) => p.evaluate((s) => { const e = document.querySelector(s); if (!e) return null; const t = getComputedStyle(e).transform; if (!t || t === 'none') return 0; const m = new DOMMatrix(t); return Math.round(m.m42 * 10) / 10; }, sel);
   const centre = (sel) => p.evaluate((s) => { const r = document.querySelector(s).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, sel);
-  const hoverLift = async (sel, label) => { const c = await centre(sel); await p.mouse.move(c[0], c[1]); await p.waitForTimeout(450); const up = await ty(sel);
+  const hoverLift = async (sel, label) => { await p.evaluate((s) => { const e = document.querySelector(s); if (e) e.scrollIntoView({ block: 'center' }); }, sel); await p.waitForTimeout(250); const c = await centre(sel); await p.mouse.move(c[0], c[1]); await p.waitForTimeout(450); const up = await ty(sel);
     await p.mouse.down(); await p.waitForTimeout(160); const down = await ty(sel); await p.mouse.move(5, 5); await p.mouse.up(); await p.waitForTimeout(350);
     ok(up < -0.9 && down > up, label + ': lifts on the pointer and sinks on a press', { up, down }); return { up, down }; };
 

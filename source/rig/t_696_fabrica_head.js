@@ -7,7 +7,8 @@
 //   Lector's are (Change, Keep, Test, Ship, as Fabrica's own steps stand); its own title row gives way (its Back to the work key stays);
 //   with no app: the line says so and the tree waits, faded;
 //   with an app: the tree reads its history (the trunk, an idea brought in as an arch, two ideas open as branches, two releases as collars,
-//   a change not kept as a bead not yet set); the line names the app and what it holds; the first key becomes Keep this version; the label
+//   a change not kept as a bead not yet set); the line names the app and what it holds; the first key stays New app, and the sheet it opens
+//   stands in the window without the page moving; the label
 //   names the newest version; a version under the pointer says its words; pressed, it opens what it changed (Compare);
 //   it turns slowly, stills under the pointer, and Minimal motion holds it; by night it is drawn again; the three panels keep the window's
 //   height under the header; on a phone the instrument steps aside as the other heads' do and nothing scrolls sideways; no page error.
@@ -54,7 +55,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       return { state: IngTree.state(), says: h.querySelector('.skh-says').textContent, key: h.querySelector('.skh-k.pri').textContent.trim(), label: lab ? [lab.querySelector('b').textContent, lab.querySelector('small').textContent] : null }; });
     ok(h1.state.tree && h1.state.tree.trunk >= 6 && h1.state.tree.arches === 1 && h1.state.tree.branches === 2 && h1.state.tree.tags === 2 && h1.state.tree.waiting === 1,
       'the tree reads the app: its trunk, the idea brought in as an arch, the two ideas open as branches, two releases, a change not kept', h1.state);
-    ok(/^Quill Notes · main · \d+ versions · 3 ideas · 2 releases\. 1 change not kept yet\.$/.test(h1.says) && h1.key === 'Keep this version', 'the line names the app and what it holds, and the first key becomes Keep this version', h1);
+    ok(/^Quill Notes · main · \d+ versions · 3 ideas · 2 releases\. 1 change not kept yet\.$/.test(h1.says) && h1.key === 'New app', 'the line names the app, what it holds and the change not kept yet; the first key stays New app', h1);
+    // the head's keys do not scroll the page (as r290's do not); the sheet New app opens stands in the window
+    const sc0 = await p.evaluate(() => { const m = document.scrollingElement; let el = document.getElementById('page-fabrica'); while (el && el.scrollHeight <= el.clientHeight) el = el.parentElement; return (el || m).scrollTop; });
+    await p.evaluate(() => document.getElementById('fbtGo').click()); await sleep(700);
+    const sh = await p.evaluate(() => { const w = document.querySelector('#fb .f-sheet-wrap'), s = w && w.querySelector('.f-sheet'); if (!s) return null; const r = s.getBoundingClientRect(); let el = document.getElementById('page-fabrica'); while (el && el.scrollHeight <= el.clientHeight) el = el.parentElement;
+      return { pos: getComputedStyle(w).position, top: r.top, bottom: r.bottom, ih: innerHeight, scroll: (el || document.scrollingElement).scrollTop }; });
+    ok(sh && sh.pos === 'fixed' && sh.top >= 0 && sh.bottom <= sh.ih && sh.scroll === sc0, 'New app opens its sheet in the window, and the page does not move', { sh, sc0 });
+    await p.keyboard.press('Escape'); await sleep(400); await p.evaluate(() => { const w = document.querySelector('#fb .f-sheet-wrap'); if (w) w.remove(); });
     ok(h1.label && h1.label[0].length <= 24 && /…$/.test(h1.label[0]) && /^[0-9a-f]{7} · the newest on main$/.test(h1.label[1]), 'the label names the newest version, shortened when long', h1.label);
     await p.screenshot({ path: path.join(OUT, 'quill_day.png') });
     // a version under the pointer, and pressed

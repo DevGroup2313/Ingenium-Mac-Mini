@@ -29,6 +29,9 @@ body[data-theme="night"] #page-fabrica.sk-on .skh-says b.fbt-wait{color:#f0b65c}
    work key stays, for the library of apps) and its steps to the four under the head */
 #page-fabrica.sk-on #fb{--f-h:max(420px,calc(100vh - 74px)) !important}
 #page-fabrica.sk-on #fb .f-head > div:not(.f-steps),#page-fabrica.sk-on #fb .f-head > .f-steps{display:none}
+/* a sheet Fabrica opens (New app, Bring one in, and the others) stands in the window, wherever the page is scrolled: the head above the
+   panels must never leave one opening out of sight, and the head's keys do not scroll the page (her word in 6.95 on r290's keys) */
+#page-fabrica.sk-on #fb .f-sheet-wrap{position:fixed;inset:0;z-index:60;border-radius:0}
 @media (prefers-reduced-motion:reduce){#page-fabrica.sk-on .fbt-tip{transition:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p294"]="started";}catch(_){}
@@ -179,7 +182,6 @@ function panels(){try{var fb=D.getElementById("fb");if(fb)fb.scrollIntoView({beh
 
 /* ---------- the header, made as Lector's and Vocatio's are ---------- */
 var BRING='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>';
-var KEEP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.3l2.5 2.5 4.9-5.2"/></svg>';
 function build(){var K=KIT();page=D.getElementById("page-fabrica");var host=D.getElementById("fbHost");if(!K||!page||!host)return false;if(HD&&HD.el.isConnected)return true;
   HD=K.hero({title:"Fabrica",eyebrow:"Fabrica · the tree of your versions",
     lede:"Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here. Every idea grows from its trunk, and nothing leaves this device unless you send it.",
@@ -191,7 +193,8 @@ function build(){var K=KIT();page=D.getElementById("page-fabrica");var host=D.ge
   /* out of view the tree rests (r290's watch marks the head away); back in view it turns again */
   try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)kick();});},{threshold:0}).observe(HD.el);}catch(e){}
   return true;}
-function primary(){var x=X();if(TREE&&TREE.waiting&&x){x.S.view="changes";x.paint();panels();setTimeout(function(){var m=D.getElementById("fbMsg");if(m)m.focus();},400);return;}var k=D.getElementById("fbNew");if(k)k.click();}
+/* the head's keys do not scroll the page, as r290's do not (her word in 6.95); a sheet they open stands in the window (above) */
+function primary(){var k=D.getElementById("fbNew");if(k)k.click();}
 /* the four steps, as Fabrica's own (Change, Keep, Test, Ship) stand now */
 var STEPS=[["Change","its files"],["Keep","a version"],["Test","its checks"],["Ship","to your devices"]];
 function paintSteps(){var K=KIT(),host=D.getElementById("fbHost");if(!K||!HD||!host)return;var li=[].slice.call(D.querySelectorAll("#fbSteps li[data-s]")),now=-1,done=[];
@@ -199,7 +202,7 @@ function paintSteps(){var K=KIT(),host=D.getElementById("fbHost");if(!K||!HD||!h
   var key=now+"|"+done.join(",");if(key===ROWKEY&&row&&row.isConnected)return;ROWKEY=key;
   if(row&&row.parentNode)row.parentNode.removeChild(row);
   row=K.steps(STEPS.map(function(s,i){return {name:s[0],sub:s[1],now:i===now,done:done.indexOf(i)>=0||(now>=0&&i<now)};}),function(i){var x=X();if(!x)return;
-    if(i<2){x.S.view="changes";x.paint();}else if(x.one&&x.one()&&x.setPanel)x.setPanel("ship");panels();});
+    if(i<2){x.S.view="changes";x.paint();}else if(x.one&&x.one()&&x.setPanel)x.setPanel("ship");});
   host.parentNode.insertBefore(row,host);}
 function plural(n,a,b){return n+" "+(n===1?a:(b||a+"s"));}
 function setText(e,s){if(e&&e.textContent!==s)e.textContent=s;}
@@ -212,7 +215,7 @@ function words2(r,T,wait){if(!HD)return;var K=KIT(),go=D.getElementById("fbtGo")
   if(wait){var w=mk("b","fbt-wait",plural(wait,"change")+" not kept yet.");says.appendChild(w);}
   var top=T&&T.trunk&&T.trunk.length?T.trunk[T.trunk.length-1]:null;setTag(top?(top.title||"The newest version"):r.name,top?(top.short+" · the newest on "+(T.main||"main")):"no version kept yet");
   HD.hint.innerHTML="Point at the tree to still it; <b>press a version</b> to see what it changed.";stage.setAttribute("aria-label","The tree of "+r.name+"'s versions");
-  if(go){var ico=go.querySelector("svg");var want=wait?"Keep this version":"New app";if(go.lastChild&&go.lastChild.textContent!==want){go.lastChild.textContent=want;if(ico)ico.outerHTML=wait?KEEP:K.ICO.plus;}}}
+}
 function setTag(a,b){if(!tag)return;var x=tag.querySelector("b"),y=tag.querySelector("small");a=String(a||"");if(a.length>24)a=a.slice(0,23).replace(/\s+\S*$/,"")+"…";setText(x,a);setText(y,b);}
 function refresh(){var x=X();if(!x||!HD)return;paintSteps();var r=x.cur&&x.cur(),st=null;try{st=r&&x.statusOf?x.statusOf(r):null;}catch(e){}
   var wait=st&&st.changes?st.changes.length:0,sig=r?[r.id,r.head,(r.branches||[]).join(","),(r.tags||[]).join(","),wait,night()?1:0].join("|"):"none|"+(night()?1:0);
@@ -224,6 +227,11 @@ var og=W.go;if(typeof og==="function")W.go=function(p){var r=og.apply(this,argum
 /* Fabrica paints often: the head follows what it shows, read again only when the app, its versions or its changes move */
 (function(){var x=X();if(!x||!x.paint)return;var op=x.paint;x.paint=function(){var r=op.apply(this,arguments);try{if(HD&&page&&page.offsetParent)refresh();}catch(e){}return r;};})();
 try{new MutationObserver(function(){SIG="";refresh();draw();}).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
+/* the sheets now stand in the window, so a press begun inside one and let go outside it would land on its backdrop and close it: a press
+   that begins inside a sheet never closes it; one that begins on the backdrop still does, as before */
+(function(){var inSheet=false;
+  D.addEventListener("pointerdown",function(e){var t=e.target;inSheet=!!(t&&t.closest&&t.closest("#page-fabrica.sk-on #fb .f-sheet"));},true);
+  D.addEventListener("click",function(e){var t=e.target;if(inSheet&&t&&t.classList&&t.classList.contains("f-sheet-wrap")&&t.closest("#page-fabrica.sk-on")){e.stopPropagation();}inSheet=false;},true);})();
 W.IngTree={on:on,refresh:function(){SIG="";refresh();},state:function(){return {tree:TREE?{trunk:TREE.trunk.length,arches:TREE.arches.length,branches:TREE.branches.length,tags:TREE.tags.length,waiting:TREE.waiting}:null,angle:ANG,beads:BEADS.length,head:!!(HD&&HD.el.isConnected)};},draw:draw};
 try{window.__ingParts["p294"]="running";}catch(_){}
 })();

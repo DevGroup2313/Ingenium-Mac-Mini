@@ -393,7 +393,8 @@ Ingenium 6.96 (13 November 2026): Lector's sealed dossier, and Fabrica's header.
   bead of violet glass, the newest with Ingenium's star; each idea open a branch from where it parted; each idea brought in an arch back to
   its merge; each release a collar with its name; a change not kept a bead not yet set above the newest). It turns once in 52 seconds,
   stills under the pointer, turns under a drag; a version under the pointer says its words and, pressed, opens what it changed (Compare).
-  The first key is New app, or Keep this version while changes wait. Out of view it rests; Minimal motion holds it. (r286 and r287 were
+  Its keys do not scroll the page (as r290's do not, at her word in 6.95), and a sheet Fabrica opens (New app, Bring one in and the
+  others) now stands in the window, wherever the page is scrolled. Out of view the tree rests; Minimal motion holds it. (r286 and r287 were
   used and removed in the other chat; this takes the next free number.)
 Tests: `node rig/t_694_lector.js <page url> <out>` (23); `node rig/t_696_fabrica_head.js <page url> <out>` (15).
 
