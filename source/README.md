@@ -371,6 +371,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.96 (13 November 2026): Lector's sealed dossier, and Fabrica's header.
+- Lector. Her words: "The Lector header looks bad on the latest build and I need it properly refined and deepened. I want it redesigned to
+  match this look instead but remove the black dot/shadow that shows up behind the wax seal on the header", with the page of the other
+  chat's unshipped work (Lector_Sealed_Dossier.html: 6.95's r290 and the work it marked 6.96). modules/r290.js is that version: the sheets
+  drawn as the seal is drawn (one canvas each, the paper, its tab and its printing, under the seal's light); two loose sheets behind the
+  three; the bow gone at her word ("Please remove the bow, I hate it and it cheapens the look of the design"); a band round the dossier in
+  front, with the seal at its heart and the ribbon's two tails under it; the stack and its seal swaying as one piece on Home's engine
+  button's clock (7 seconds; her words: "right now they just pasted in together but not really connected or in unison"). Every line 6.95
+  added to r290 is in it (checked line by line), and only r290 and r176 differed from 6.95's page (6.95's r176 is the newer one, kept). The
+  dark dot: the seal's cast shadow, a disc of near black by night (rgba 0,0,0,.72) softened only by a CSS blur inside the seal's 3D frame;
+  where a web view draws that blur badly a hard dark dot stands behind the wax. The seal casts none on the paper now (#page-lector .lf-seal
+  .lxs-cast); its lit edge and side wall stand it off the sheet. rig/t_694_lector.js follows: the seal sways with the stack, its own sway
+  stilled, and no shadow behind it (23 checks).
+- Fabrica. Her words: "I also want the Fabrica page to get the same makeover as the others. I want everything inside of the 3 panel view
+  look but I think that it is missing its header card with the nice 3D animation", then "I also want you to commit and push the Fabrica
+  redesign please." modules/r294.js builds Fabrica's header with r290's shared kit (IngStudios.kit: the same slab on Blend's desk, eyebrow,
+  title, keys, line, hint and label; r290's colour tokens now name #page-fabrica.sk-on too), the four steps under it as Lector's are
+  (Change, Keep, Test, Ship, as Fabrica's own steps stand), and its three panels below at the window's height. Its instrument: the open
+  app's versions as a tree on a plinth of spun metal, drawn on one canvas as the turret is (main's first parents the trunk, each version a
+  bead of violet glass, the newest with Ingenium's star; each idea open a branch from where it parted; each idea brought in an arch back to
+  its merge; each release a collar with its name; a change not kept a bead not yet set above the newest). It turns once in 52 seconds,
+  stills under the pointer, turns under a drag; a version under the pointer says its words and, pressed, opens what it changed (Compare).
+  The first key is New app, or Keep this version while changes wait. Out of view it rests; Minimal motion holds it. (r286 and r287 were
+  used and removed in the other chat; this takes the next free number.)
+Tests: `node rig/t_694_lector.js <page url> <out>` (23); `node rig/t_696_fabrica_head.js <page url> <out>` (15).
+
+Ingenium 6.95 (13 November 2026, from the other chat's commits, which wrote no note here): Vocatio. The Career Studio renamed at the
+owner's word in every word on screen (the menu, the page's title, the tour, help, the Guide, Settings, Lector's keys, the exports); the
+page's id, its data and the code keep "career", and the search still finds it by its old name. Its compass rides (r293 out of
+build/held.json): the raised compass she chose, with Ingenium's Orrery engraved on its white dial, carried into r290. r290's keys no longer
+scroll the page; r176 sounds the compass's stage medallions (.skv-md); editions.py names Vocatio. rig/t_693_studios.js 43/43.
+
 Ingenium 6.94 (13 November 2026): Lector's head released, with its wax seal. modules/r290.js rides: Lector opens on the fan of its documents
 she approved, and at its foot the engine logo pressed in wax, as she approved it on its live preview that day ("I approve of the was seal
 design for Lector, please push it everywhere"). The seal is a real vintage stamp, drawn and lit pixel by pixel: a poured, uneven edge, a

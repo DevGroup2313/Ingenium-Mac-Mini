@@ -31,7 +31,7 @@
    Every key lifts, sinks and sounds (r176); left alone, nothing is drawn again; Minimal motion and the system's reduced motion still
    every movement. Focus's head is its own module (r291). The heads drawn in another session (r284, r286 to r289, on its own branch)
    are not these. */
-#page-career.sk-on,#page-lector.sk-on,#page-focus.sk-on{--sk-ink1:#221a2e;--sk-ink2:#4a4358;--sk-ink3:#6c6579;--sk-hair:rgba(34,26,46,.10);--sk-hair2:rgba(34,26,46,.06);--sk-acc:#6a3fb5;
+#page-career.sk-on,#page-lector.sk-on,#page-focus.sk-on,#page-fabrica.sk-on{--sk-ink1:#221a2e;--sk-ink2:#4a4358;--sk-ink3:#6c6579;--sk-hair:rgba(34,26,46,.10);--sk-hair2:rgba(34,26,46,.06);--sk-acc:#6a3fb5;
   --sk-hi:#ffffff;--sk-lo:#faf8fc;--sk-keyA:#ffffff;--sk-keyB:#f6f2fb;--sk-pa:#7a50c6;--sk-pb:#5d37a1;--sk-pedge:#3a2070;
   --sk-slab:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 rgba(40,22,68,.10),0 3px 0 rgba(40,22,68,.05),0 6px 12px rgba(40,22,68,.07),0 18px 36px rgba(40,22,68,.08);
   --sk-key:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
@@ -42,7 +42,7 @@
   --sk-serif:"Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;
   --sk-paper:#fdfbf8;--sk-paper2:#f3eef8;--sk-rule:rgba(106,63,181,.08);--sk-tab:#fbf9fd;--sk-paperink:#2f2640;
   --sk-band0:#f4effb;--sk-band1:#c9b6ee;--sk-band2:#9068d6;--sk-stem0:#efe9f8;--sk-stem1:#b8afd0;--sk-bez-ink:rgba(70,44,120,.3);--sk-pearl:#dccff4;--sk-frame:rgba(106,63,181,.16);--sk-txt:rgba(34,26,46,.09)}
-body[data-theme="night"] #page-career.sk-on,body[data-theme="night"] #page-lector.sk-on,body[data-theme="night"] #page-focus.sk-on{--sk-ink1:#f3eefb;--sk-ink2:#d3c9e3;--sk-ink3:#a99cc1;--sk-hair:rgba(205,184,240,.12);--sk-hair2:rgba(205,184,240,.07);--sk-acc:#b79ce6;
+body[data-theme="night"] #page-career.sk-on,body[data-theme="night"] #page-lector.sk-on,body[data-theme="night"] #page-focus.sk-on,body[data-theme="night"] #page-fabrica.sk-on{--sk-ink1:#f3eefb;--sk-ink2:#d3c9e3;--sk-ink3:#a99cc1;--sk-hair:rgba(205,184,240,.12);--sk-hair2:rgba(205,184,240,.07);--sk-acc:#b79ce6;
   --sk-hi:#211a2d;--sk-lo:#1b1526;--sk-keyA:#2a2239;--sk-keyB:#231c31;--sk-pedge:#170b30;
   --sk-slab:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
   --sk-key:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
@@ -273,8 +273,12 @@ body[data-theme="night"] #page-lector .lf-cast{background:radial-gradient(closes
 /* it leans toward the pointer as Home's orbs do (the same quick, soft settling) and sways as one piece, as the Career Studio's dial and
    Blend's plate sway, never halting: the sheets stand at their own depths, so they slide past one another as it turns */
 #page-lector .lf-tilt{transform:rotateX(var(--lf-rx,0deg)) rotateY(var(--lf-ry,0deg));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
-#page-lector .lf-sway{animation:lfSway 11s ease-in-out infinite}
-@keyframes lfSway{0%,100%{transform:rotateY(-8deg) rotateX(3deg)}50%{transform:rotateY(8deg) rotateX(-3deg)}}
+#page-lector .lf-sway{animation:lfSway 7s ease-in-out infinite}
+/* 6.96: the documents and their seal sway as one piece, on the clock and the curve of Home's engine button (R104's islSway, 7 seconds),
+   gentler, as a stack of paper would; the seal no longer sways on its own on the paper (her words, 13 November 2026: "right now they
+   just pasted in together but not really connected or in unison") */
+@keyframes lfSway{0%,100%{transform:rotateY(-7deg) rotateX(2.2deg)}50%{transform:rotateY(7deg) rotateX(-2.2deg)}}
+#page-lector .lf-stamp{position:absolute;left:0;top:0;width:520px;height:460px;transform-style:preserve-3d;transform-origin:262px 380px}
 .skh.is-away .lf-sway{animation-play-state:paused}
 /* a sheet: a key that is a document, standing in the fan with its own thickness */
 #page-lector button.lf-card{position:absolute;left:152px;top:58px;width:216px;height:330px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
@@ -335,7 +339,45 @@ body[data-motion="minimal"] #page-lector button.lf-card,body[data-motion="minima
 @media (prefers-reduced-motion:reduce){#page-lector .lf-sway{animation:none}#page-lector button.lf-card,#page-lector .lf-tilt{transition:none}}
 /* ---------- Lector's seal (6.94): the engine logo pressed in wax, a real vintage stamp, moving as Home's engine button does (its own
    .isl rules give it Home's sway, lean, lift, sink and knock; its layers stand a little off one another as Home's do) ---------- */
-#page-lector .lf-seal{position:absolute;left:215px;top:343px;width:92px;height:92px;transform-style:preserve-3d;transform:translateZ(34px)}
+#page-lector .lf-seal{position:absolute;left:214px;top:245px;width:92px;height:92px;transform-style:preserve-3d;transform:translate3d(0,0,3px);transition:transform .5s cubic-bezier(.34,1.3,.64,1)}
+/* 6.96: the seal is pressed on the sheet in front: it rises with it under the pointer and sinks with it when pressed, its own sway stilled
+   (the stack sways it), its lean toward the pointer a third of Home's, as wax on paper leans */
+#page-lector .lf-seal.lf-up{transform:translate3d(0,-16px,29px)}
+#page-lector .lf-seal.lf-dn{transform:translate3d(0,0,-1px);transition-duration:.08s}
+#page-lector .lf-seal .lxs-isl .isl-idle{animation:none}
+/* 6.96, her words (13 November 2026): "remove the black dot/shadow that shows up behind the wax seal on the header". It was the seal's cast
+   shadow, a disc of near black by night (rgba 0,0,0,.72), softened only by a blur inside the seal's 3D frame; where the window's web view
+   draws that blur badly, a hard dark dot stands behind the wax. The seal casts none on the paper now: its own lit edge and side wall stand it
+   off the sheet. */
+#page-lector .lf-seal .lxs-cast{display:none}
+#page-lector .lf-seal .lxs-isl .isl-tilt{transform:rotateX(calc(var(--rx) * .35)) rotateY(calc(var(--ry) * .35)) translateY(var(--cdl)) scale(var(--cds))}
+/* the ribbon that binds the three: its two tails come out from under the seal, below the sheet, in the seal's violet silk */
+#page-lector .lf-tails{position:absolute;left:0;top:0;width:92px;height:92px;transform-style:preserve-3d;transform:translateZ(-1px);pointer-events:none}
+#page-lector .lf-tails i{position:absolute;left:38px;top:50px;width:16px;height:70px;transform-origin:50% 0;
+  background:linear-gradient(90deg,#4b2a8e 0%,#7a52cc 22%,#a789ea 46%,#8460d8 60%,#5b36a6 82%,#3f2378 100%);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 85%,0 100%);box-shadow:inset 0 -1px 0 rgba(30,10,70,.3)}
+#page-lector .lf-tails i.a{animation:lfTailA 7s ease-in-out infinite}#page-lector .lf-tails i.b{height:62px;animation:lfTailB 7s ease-in-out infinite}
+@keyframes lfTailA{0%,100%{transform:rotate(25deg)}50%{transform:rotate(29deg)}}
+@keyframes lfTailB{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(-16.5deg)}}
+body[data-theme="night"] #page-lector .lf-tails i{background:linear-gradient(90deg,#2f1a5c 0%,#5a3aa6 22%,#8a6ad8 46%,#6a48c0 60%,#41267e 82%,#24133f 100%)}
+body[data-motion="minimal"] #page-lector .lf-tails i{animation:none}
+@media (prefers-reduced-motion:reduce){#page-lector .lf-tails i{animation:none}}
+/* the sheets drawn as the seal is drawn (6.96): one canvas each, the paper, its tab and its printing, under the seal's own light */
+#page-lector .lf-paper{position:absolute;left:0;top:-34px;width:226px;height:374px;display:block;pointer-events:none}
+/* the drawn pages stand for the leaves, and no ribbon is tied to them (her words, 13 November 2026: "Please remove the bow, I hate it and it
+   cheapens the look of the design"); the seal closes the band round the dossier in front */
+#page-lector .lf-card.lf-drawn .lf-leaf,#page-lector .lf-card.lf-drawn .lf-ribbon{display:none}
+#page-lector .lf-loose{position:absolute;left:152px;top:58px;width:216px;height:330px;transform-style:preserve-3d;transform-origin:50% 100%;pointer-events:none}
+#page-lector .lf-loose.l{transform:translate3d(-74px,42px,-70px) rotate(-21deg) scale(.93)}
+#page-lector .lf-loose.r{transform:translate3d(74px,42px,-70px) rotate(21deg) scale(.93)}
+#page-lector .lf-loose .lf-shade{position:absolute;left:0;top:0;width:216px;height:330px;border-radius:14px;background:rgba(42,20,80,.12);filter:blur(10px);transform:translateZ(-10px) translateY(8px)}
+body[data-theme="night"] #page-lector .lf-loose .lf-shade{background:rgba(0,0,0,.5)}
+#page-lector .lf-sheet.lf-drawn{background:none !important;box-shadow:none !important;overflow:visible}
+#page-lector .lf-sheet.lf-drawn > span{visibility:hidden}
+#page-lector .lf-card.lf-drawn > .lf-tab{visibility:hidden}
+#page-lector .lf-card.lf-drawn .lf-leaf{background:linear-gradient(170deg,#f1edf6,#e2dbee);box-shadow:inset 0 0 0 1px rgba(106,63,181,.10)}
+body[data-theme="night"] #page-lector .lf-card.lf-drawn .lf-leaf{background:linear-gradient(170deg,#2a2039,#1c1529);box-shadow:inset 0 0 0 1px rgba(205,184,240,.09)}
+#page-lector .lf-card.lf-drawn .lf-ribbon{background:linear-gradient(90deg,#4b2a8e 0%,#7a52cc 22%,#a789ea 46%,#8460d8 60%,#5b36a6 82%,#3f2378 100%)}
 .lf-seal .lx-wax{position:absolute;left:2px;top:2px;margin:0}
 .lx-wax{position:relative;display:block;width:var(--S);height:var(--S)}
 .lx-wax .lxs{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1393,7 +1435,7 @@ function lxWire(k){var busy=false,again=false,last="",count=0;function isl(){ret
 function lxSealPaint(hs){var go=function(){lxSealDraw(hs);};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
 function lxSealDraw(hs){var nt=hs.__nt!=null?hs.__nt:night(),wax=hs.__wax||"white",S=parseFloat(hs.style.getPropertyValue("--S"))||86,date=lxDate(),key=wax+(nt?"n":"d")+S+date;if(hs.__k2===key)return;hs.__k2=key;
   var U=lxWaxUrls(S,nt,date,wax);hs.querySelector(".lxs-ring").src=U.ring;hs.querySelector(".lxs-star").src=U.star;hs.querySelector(".lxs-heart").src=U.heart;
-  hs.querySelector(".lxs-side").innerHTML=lxSideSvg(S,Math.max(3,Math.round(S/22)),nt,wax);hs.querySelector(".r175-seal").setAttribute("data-date",date);
+  hs.querySelector(".lxs-side").innerHTML=lxSideSvg(S,hs.__thin?1.5:Math.max(3,Math.round(S/22)),nt,wax);hs.querySelector(".r175-seal").setAttribute("data-date",date);
   clearTimeout(hs.__mid);var now=new Date(),mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);hs.__mid=setTimeout(function(){hs.__k2="";if(hs.isConnected)lxSealDraw(hs);},Math.max(1000,mid-now));}
 /* ================= THE DOCUMENTS (Lector): the fan she approved, its seal Ingenium's own seal key ================= */
 var LB={h:null,row:null,key:"",cards:[],root:null};
@@ -1408,25 +1450,126 @@ function lfThree(){var d=lfDocs(),f=0;d.forEach(function(x,i){if(x.on)f=i;});if(
   return [d[(f-1+d.length)%d.length],d[f],d[(f+1)%d.length]];}
 /* a sheet: a key that is a document, standing in the fan with its own thickness (its leaves behind it) */
 function lfCard(){var b=mk("button","lf-card");b.type="button";
-  b.innerHTML='<i class="lf-shade"></i><i class="lf-leaf c"></i><i class="lf-leaf b"></i><i class="lf-leaf a"></i><span class="lf-sheet"><span class="lf-cap"></span><span class="lf-ttl"></span><span class="lf-sub"></span>'+
+  b.innerHTML='<i class="lf-shade"></i><i class="lf-leaf c"></i><i class="lf-leaf b"></i><i class="lf-leaf a"></i><span class="lf-sheet"><canvas class="lf-paper" aria-hidden="true"></canvas><span class="lf-cap"></span><span class="lf-ttl"></span><span class="lf-sub"></span>'+
     '<span class="lf-lines"><i style="width:92%"></i><i style="width:84%"></i><i style="width:88%"></i><i style="width:58%"></i><i class="gap"></i><i style="width:90%"></i><i style="width:80%"></i><i style="width:64%"></i></span>'+
     '<span class="lf-rule"></span><span class="lf-num"></span></span><span class="lf-tab"></span><span class="lf-ribbon"></span>';
   b.addEventListener("pointerdown",function(e){if(e.button!=null&&e.button!==0)return;b.classList.add("lf-down");});
   ["pointerup","pointercancel","pointerleave","blur"].forEach(function(t){b.addEventListener(t,function(){b.classList.remove("lf-down");});});
   b.addEventListener("click",function(e){e.preventDefault();lfOpen(b.__d);});return b;}
 function lfSet(e,s){if(e&&e.textContent!==s)e.textContent=s;}
-function lfFill(b,d,pos){b.__d=d;var cls="lf-card lf-"+pos+(d&&d.done?" is-done":"");if(b.className!==cls)b.className=cls;b.hidden=!d;if(!d)return;
+function lfFill(b,d,pos){b.__d=d;var cls="lf-card lf-"+pos+(d&&d.done?" is-done":"")+(b.classList.contains("lf-drawn")?" lf-drawn":"")+(b.classList.contains("lf-ph")?" lf-ph":"");if(b.className!==cls)b.className=cls;b.hidden=!d;if(!d)return;lpPaint(b,d,{band:pos==="f"});
   var n=d.name,cap=(n.replace(/^(Master|The)\s+/i,"").charAt(0)||"·").toUpperCase(),a=lfApps(),sub=a?"from the "+(a===1?"app":a+" apps")+" you chose":"from the apps you choose";
   lfSet(b.querySelector(".lf-tab"),n);lfSet(b.querySelector(".lf-cap"),cap);lfSet(b.querySelector(".lf-ttl"),n);lfSet(b.querySelector(".lf-sub"),sub);lfSet(b.querySelector(".lf-num"),ROMAN[d.i]||String(d.i+1));
   var lab=n+(pos==="f"?", shown in The document":"")+". Press to read it.";if(b.getAttribute("aria-label")!==lab)b.setAttribute("aria-label",lab);}
+/* ---------- 6.96: each sheet drawn as the seal is drawn ----------
+   Her words (13 November 2026): "Please refine and improve the drawings of the documents on the Lector page header so that they can better
+   match the seal logo and its texture, design and animation, right now they just pasted in together but not really connected or in
+   unison." So each sheet, with its tab, is a height map lit by the seal's own light (LXL, LXH) in the seal's own colours (the white wax by
+   day, the engine button's night by night): laid paper, its fibre and its chain lines, its edges deckled; its initial, its title, its
+   numeral and its tab's name pressed into it by letterpress in the seal's violet ink, its text printed small, and the engine's star in
+   it as a watermark. Drawn once for a document and a theme, and kept. */
+var LP={c:{}};
+var LPTEXT={"notes and analysis":"What the reading found, part by part: what each part does, how it is built, what it decides, and what it shows of your work and the way you think.",
+  "project dossier":"Each app you chose, set out for a reader: its purpose and its parts, its methods and its decisions, the evidence for each, and what it shows of you.",
+  "appendix":"The detail behind the dossier: every part that was read, the sources it names, each quotation with its line, and the notes made on the way."};
+var LPC={day:{paper:[.988,.982,.996],deep:[.9,.87,.96],ink:[.36,.21,.66],soft:[.55,.47,.72],amb:.74,dif:.3},
+         night:{paper:[.205,.152,.315],deep:[.1,.068,.17],ink:[.8,.7,.99],soft:[.58,.51,.74],amb:.5,dif:.62}};
+function lpBox(a,W,H,r){var t=new Float32Array(W*H),o=new Float32Array(W*H),x,y,s,w=2*r+1,row;
+  for(y=0;y<H;y++){row=y*W;s=0;for(x=-r;x<=r;x++)s+=a[row+Math.min(W-1,Math.max(0,x))];for(x=0;x<W;x++){t[row+x]=s/w;s+=a[row+Math.min(W-1,x+r+1)]-a[row+Math.max(0,x-r)];}}
+  for(x=0;x<W;x++){s=0;for(y=-r;y<=r;y++)s+=t[Math.min(H-1,Math.max(0,y))*W+x];for(y=0;y<H;y++){o[y*W+x]=s/w;s+=t[Math.min(H-1,y+r+1)*W+x]-t[Math.max(0,y-r)*W+x];}}
+  return o;}
+function lpMask(W,H,k,draw){var c=D.createElement("canvas");c.width=W;c.height=H;var g=c.getContext("2d");g.fillStyle="#000";g.fillRect(0,0,W,H);g.setTransform(k,0,0,k,0,0);g.fillStyle="#fff";g.strokeStyle="#fff";
+  try{draw(g);}catch(e){}var d=g.getImageData(0,0,W,H).data,m=new Float32Array(W*H);for(var i=0;i<W*H;i++)m[i]=d[i*4]/255;return m;}
+function lpRound(g,x,y,w,h,r,top){g.beginPath();g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);if(top){g.lineTo(x+w,y+h);g.lineTo(x,y+h);}
+  else{g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);}g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath();}
+function lpWrap(g,txt,w){var words=String(txt).split(/\s+/),lines=[],cur="";words.forEach(function(wd){var t=cur?cur+" "+wd:wd;if(cur&&g.measureText(t).width>w){lines.push(cur);cur=wd;}else cur=t;});if(cur)lines.push(cur);return lines;}
+var LPF='"Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif';
+/* a document drawn as a dossier: its top sheet over a few pages (their edges seen under it, each a step lower, lit as paper edges are), its
+   tab, its printing; the one in front bound by a band of the same paper, lettered INGENIUM and LECTOR, which the seal closes; a loose leaf
+   is paper and printing alone. opt: {band, leaf, pages} */
+function lpDraw(cv,d,nt,opt){opt=opt||{};var leaf=!!opt.leaf,band=!!opt.band,pages=opt.pages==null?4:opt.pages,name=d.name,cap=(name.replace(/^(Master|The)\s+/i,"").charAt(0)||"·").toUpperCase(),a=lfApps(),
+    sub=a?"from the "+(a===1?"app":a+" apps")+" you chose":"from the apps you choose",num=ROMAN[d.i]||String(d.i+1),
+    txt=LPTEXT[name.toLowerCase()]||("The "+name.toLowerCase()+" of this reading, written from the apps you chose, each statement with its evidence and its place in the code."),
+    k=Math.min(2,Math.max(1.5,W.devicePixelRatio||1)),SW=216,SH=330,CW=SW+10,CH=34+SH+10,TY=34,NW=Math.round(CW*k),NH=Math.round(CH*k),P=LPC[nt?"night":"day"],i,j,q,L;
+  cv.width=NW;cv.height=NH;var g0=cv.getContext("2d");
+  g0.font="600 13.5px "+LPF;var tw=Math.min(158,Math.max(96,Math.ceil(g0.measureText(name).width)+40));
+  /* the layers of paper, the top sheet first: L[0] the top sheet (and its tab), L[1..] the pages under it, each a little lower and to the right */
+  var LAY=[];for(L=0;L<=pages;L++)(function(L){LAY.push(lpMask(NW,NH,k,function(g){var ox=L*1.45,oy=L*1.85;lpRound(g,.5+ox,TY+oy,SW-1,SH,11);g.fill();if(!L&&!leaf){lpRound(g,20,TY-31,tw,34,10,true);g.fill();}}));})(L);
+  var mP=new Float32Array(NW*NH),top=new Int8Array(NW*NH);for(q=0;q<NW*NH;q++){var t=-1;for(L=0;L<LAY.length;L++)if(LAY[L][q]>.5){t=L;break;}top[q]=t;var mx=0;for(L=0;L<LAY.length;L++)if(LAY[L][q]>mx)mx=LAY[L][q];mP[q]=mx;}
+  var BY0=TY+215,BY1=TY+251,BCX=SW/2,BCY=TY+233;
+  var mB=band?lpMask(NW,NH,k,function(g){g.fillRect(-4,BY0,SW+16,BY1-BY0);}):null;
+  var mI=leaf?new Float32Array(NW*NH):lpMask(NW,NH,k,function(g){g.textBaseline="alphabetic";g.font="600 54px "+LPF;g.fillText(cap,20,TY+64);var cw=g.measureText(cap).width;
+    g.font="600 21px "+LPF;var tl=lpWrap(g,name,Math.max(70,180-(30+cw)));tl.slice(0,2).forEach(function(l,n){g.fillText(l,20+cw+10,TY+40+n*22);});
+    g.font="600 19px "+LPF;g.fillText(num,22,TY+SH-22);g.font="600 13.5px "+LPF;g.fillText(name.length>20?name.slice(0,19)+"…":name,20+26,TY-11);
+    g.beginPath();g.arc(20+14,TY-16,3.4,0,Math.PI*2);g.fill();
+    /* the band's two words, each centred in its half, clear of the seal (which covers the middle 92 of its 216) */
+    if(band){g.font="600 6.3px "+LPF;var wd=function(str){var w=0;for(var c=0;c<str.length;c++)w+=g.measureText(str[c]).width+(c?2.3:0);return w;},
+      sp=function(str,cx,y){var x=cx-wd(str)/2;for(var c=0;c<str.length;c++){g.fillText(str[c],x,y);x+=g.measureText(str[c]).width+2.3;}};
+      sp("INGENIUM",(6+(SW/2-50))/2,BCY+2.2);sp("LECTOR",(SW-6+(SW/2+50))/2,BCY+2.2);}});
+  var mS=lpMask(NW,NH,k,function(g){g.textBaseline="alphabetic";var y=TY+(leaf?40:124);
+    if(!leaf){g.font="italic 500 13.5px "+LPF;var sl=lpWrap(g,sub,170);g.fillText(sl[0]||"",22,TY+96);}
+    g.font="500 7.6px "+LPF;var paras=[txt,"Its parts are named in the order they were read, so each can be found again in the app it came from, with the line it was read at and the note made there.",
+      "Nothing in it is invented: every statement points to the part it rests on, and every quotation keeps its words."],lim=band?BY0-10:TY+SH-58;
+    paras.forEach(function(pt,pi){if(pi)y+=7;lpWrap(g,pt,SW-44).forEach(function(l){if(y<=lim){g.fillText(l,22,y);y+=12.5;}});});
+    g.lineWidth=.9;lpRound(g,9.5,TY+9.5,SW-19,SH-19,6);g.stroke();g.lineWidth=.5;lpRound(g,12.5,TY+12.5,SW-25,SH-25,4);g.stroke();
+    if(!leaf){g.lineWidth=.8;g.beginPath();g.moveTo(22,TY+SH-48);g.lineTo(SW-22,TY+SH-48);g.stroke();}
+    if(band){g.lineWidth=.45;g.beginPath();g.moveTo(4,BY0+3.6);g.lineTo(SW-4,BY0+3.6);g.moveTo(4,BY1-3.6);g.lineTo(SW-4,BY1-3.6);g.stroke();}});
+  var mW=(band||leaf)?new Float32Array(NW*NH):lpMask(NW,NH,k,function(g){var cx=SW/2,cy=TY+240;g.lineWidth=2.2;g.beginPath();g.arc(cx,cy,30,0,Math.PI*2);g.stroke();g.lineWidth=.9;g.beginPath();g.arc(cx,cy,26,0,Math.PI*2);g.stroke();lxStarPath(g,cx,cy,22,5.5);g.fill();g.beginPath();g.arc(cx,cy,3.4,0,Math.PI*2);g.fill();});
+  var pS=lpBox(mP,NW,NH,Math.max(1,Math.round(k*1.2))),pW=lpBox(mP,NW,NH,Math.max(2,Math.round(k*2.6))),iB=lpBox(mI,NW,NH,1),sB=lpBox(mS,NW,NH,1),wB=lpBox(mW,NW,NH,Math.max(2,Math.round(k*2.2)));
+  var bB=band?lpBox(mB,NW,NH,Math.max(1,Math.round(k*1.1))):null,bW2=band?lpBox(mB,NW,NH,Math.max(2,Math.round(k*2.4))):null,
+      bSh=band?lpBox((function(){var o=new Float32Array(NW*NH),dy=Math.round(2.6*k),dx=Math.round(1.2*k);for(q=dy*NW+dx;q<NW*NH;q++)o[q]=mB[q-dy*NW-dx];return o;})(),NW,NH,Math.max(2,Math.round(k*3.2))):null;
+  /* the wax: a thin pool where it was poured and spread under the stamp, its edge uneven and thin, round the seal at the band's middle */
+  function poolR(t){return 45.5+2.4*Math.sin(2*t+1.1)+1.7*Math.sin(3*t+.4)+1.1*Math.sin(5*t+2.3)+.6*Math.sin(9*t+.8)+4.2*Math.pow(Math.max(0,Math.cos(t-1.95)),6)+3*Math.pow(Math.max(0,Math.cos(t+.35)),9)+2.2*Math.pow(Math.max(0,Math.cos(t-3.6)),10);}
+  var BAND=nt?[.33,.26,.47]:[.935,.918,.968],WAX=nt?LXWAX.white.night:LXWAX.white.day;
+  /* the pages under the top sheet stand a step lower each; their soft edges come from each page's own mask */
+  var tops=[];for(L=0;L<LAY.length;L++)tops.push(lpBox(LAY[L],NW,NH,Math.max(1,Math.round(k*.9))));
+  var H=new Float32Array(NW*NH),A=new Float32Array(NW*NH),BP=new Float32Array(NW*NH),PP=new Float32Array(NW*NH),u=1/k;
+  for(j=0;j<NH;j++)for(i=0;i<NW;i++){q=j*NW+i;var x=i*u,y=j*u,n0=(lxVN(x*.55,y*.55)-.5),dk=pS[q]+(n0*.42+(lxVN(x*2.1,y*2.1)-.5)*.24)*Math.min(1,pW[q]*4)*(1-pW[q]);
+    var al=Math.min(1,Math.max(0,(dk-.36)/.2));A[q]=al;if(al<=0){H[q]=0;continue;}
+    /* the height of the paper here: the highest layer that covers it, a step of .3 for each page down, softened at each page's edge */
+    var h=0;for(L=LAY.length-1;L>=0;L--){var hl=(1.4-.3*L)*Math.min(1,tops[L][q]*1.25);if(hl>h)h=hl;}
+    var cm=x%26,ch=-.05*Math.exp(-(cm-13)*(cm-13)/1.1),onTop=top[q]===0;
+    h+=.08*n0+.04*(lxVN(x*3.1,y*3.1)-.5)+.014*Math.sin(y*Math.PI)+(onTop?ch-.44*iB[q]-.28*sB[q]-.07*wB[q]:0);
+    var bp=0,pp=0;if(band){var be=bB[q]+((lxVN(x*.9,y*1.7)-.5)*.5+(lxVN(x*3.2,y*2.6)-.5)*.22)*Math.min(1,bW2[q]*4)*(1-bW2[q]);bp=Math.min(1,Math.max(0,(be-.38)/.18));
+      h+=bp*(.95*Math.min(1,bW2[q]*1.35)+.05*(lxVN(x*.35,y*4.2)-.5));
+      var px0=x-BCX,py0=y-BCY,rr=Math.sqrt(px0*px0+py0*py0);if(rr<56){var pr=poolR(Math.atan2(py0,px0))*.88,dd=pr-rr;if(dd>0){pp=Math.min(1,dd/1.3);h+=.55*Math.min(1,dd/5)*(.9+.2*(lxVN(x*1.1,y*1.1)-.5));}}}
+    H[q]=h;BP[q]=bp;PP[q]=pp;}
+  var im=g0.createImageData(NW,NH),px=im.data,s2=k/2;
+  for(j=1;j<NH-1;j++)for(i=1;i<NW-1;i++){q=j*NW+i;var al2=A[q];if(al2<=0)continue;
+    var nx=-(H[q+1]-H[q-1])*s2,ny=-(H[q+NW]-H[q-NW])*s2,nz=1,l=Math.sqrt(nx*nx+ny*ny+1);nx/=l;ny/=l;nz/=l;
+    var dl=nx*LXL[0]+ny*LXL[1]+nz*LXL[2],df=Math.max(0,(dl+.3)/1.3),sp=Math.pow(Math.max(0,nx*LXH[0]+ny*LXH[1]+nz*LXH[2]),18)*.06,fib=.97+.06*lxVN(i*.7,j*.7),
+        lay=top[q]<0?0:top[q],dim=1-.035*lay,lt=(P.amb+P.dif*df)*fib*dim,wm=Math.min(1,wB[q]*1.4)*(nt?.16:.11),
+        R=(P.paper[0]+(P.deep[0]-P.paper[0])*wm)*lt,G=(P.paper[1]+(P.deep[1]-P.paper[1])*wm)*lt,B=(P.paper[2]+(P.deep[2]-P.paper[2])*wm)*lt;
+    if(band){var bq=BP[q],sh=(1-bq)*bSh[q]*(nt?.42:.26);R*=1-sh;G*=1-sh;B*=1-sh;
+      if(bq>0){var fb=.97+.06*lxVN(i*.3,j*1.6);R+=(BAND[0]*lt*fb-R)*bq;G+=(BAND[1]*lt*fb-G)*bq;B+=(BAND[2]*lt*fb-B)*bq;}
+      var pq=PP[q];if(pq>0){var wl=(WAX.amb+WAX.dif*df),wa=pq*(.55+.45*Math.min(1,pq*1.4));R+=(WAX.base[0]*wl-R)*wa;G+=(WAX.base[1]*wl-G)*wa;B+=(WAX.base[2]*wl-B)*wa;sp+=Math.pow(Math.max(0,nx*LXH[0]+ny*LXH[1]+nz*LXH[2]),26)*.16*pq;}}
+    if(top[q]===0||band&&BP[q]>.5){var ie=Math.min(1,Math.max(0,(mI[q]-.2)/.55)),se=Math.min(1,Math.max(0,(mS[q]-.15)/.55))*.85,il=.62+.5*df;
+      if(se>0){R+=(P.soft[0]*il-R)*se;G+=(P.soft[1]*il-G)*se;B+=(P.soft[2]*il-B)*se;}
+      if(ie>0){R+=(P.ink[0]*il-R)*ie;G+=(P.ink[1]*il-G)*ie;B+=(P.ink[2]*il-B)*ie;}}
+    var e=1-Math.min(1,pW[q]*1.6);R*=1-.1*e;G*=1-.1*e;B*=1-.08*e;
+    px[q*4]=Math.min(255,(R+sp)*255);px[q*4+1]=Math.min(255,(G+sp)*255);px[q*4+2]=Math.min(255,(B+sp)*255);px[q*4+3]=Math.round(al2*255);}
+  g0.putImageData(im,0,0);}
+/* a sheet is drawn again only when its document, its numeral or the theme changes; the fonts are waited for, as the seal's are */
+function lpPaint(b,d,opt){if(!d)return;opt=opt||{};var cv=b.querySelector(".lf-paper"),nt=night(),key=[d.name,d.i,nt?1:0,lfApps(),opt.band?1:0,opt.leaf?1:0].join("|");if(!cv||cv.__k===key)return;cv.__k=key;
+  var go=function(){if(cv.__k!==key)return;try{lpDraw(cv,d,nt,opt);b.classList.add("lf-drawn");b.querySelector(".lf-sheet").classList.add("lf-drawn");}catch(e){}};
+  try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
 /* the paper's tooth: a small tile of grain, made once */
 function grainTile(dark){var c=D.createElement("canvas");c.width=c.height=96;var g=c.getContext("2d"),im=g.createImageData(96,96),s=7;
   for(var i=0;i<im.data.length;i+=4){s=(s*1103515245+12345)&2147483647;var v=s/2147483647;im.data[i]=dark?205:90;im.data[i+1]=dark?184:64;im.data[i+2]=dark?240:150;im.data[i+3]=Math.round(v*v*(dark?20:16));}
   g.putImageData(im,0,0);try{return 'url("'+c.toDataURL("image/png")+'")';}catch(e){return "none";}}
 function lfBuild(H){var root=mk("div","lf");root.setAttribute("role","group");root.setAttribute("aria-label","The documents of this reading");
-  var tilt=mk("div","lf-tilt"),sway=mk("div","lf-sway");root.appendChild(mk("i","lf-cast"));LB.cards=[lfCard(),lfCard(),lfCard()];
-  sway.appendChild(LB.cards[0]);sway.appendChild(LB.cards[2]);sway.appendChild(LB.cards[1]);
-  var sl=mk("div","lf-seal"),sk=lxSealKey(88);LB.seal=sk;sl.appendChild(sk);sway.appendChild(sl);
+  var tilt=mk("div","lf-tilt"),sway=mk("div","lf-sway"),stamp=mk("div","lf-stamp");root.appendChild(mk("i","lf-cast"));LB.cards=[lfCard(),lfCard(),lfCard()];
+  stamp.appendChild(LB.cards[0]);stamp.appendChild(LB.cards[2]);stamp.appendChild(LB.cards[1]);
+  /* two loose leaves behind the three, so the spread is a sheaf of paper */
+  LB.loose=[mk("div","lf-loose l"),mk("div","lf-loose r")];LB.loose.forEach(function(e){e.setAttribute("aria-hidden","true");e.innerHTML='<i class="lf-shade"></i><canvas class="lf-paper"></canvas>';stamp.insertBefore(e,stamp.firstChild);});
+  var sl=mk("div","lf-seal"),sk=lxSealKey(88);sk.__thin=true;LB.seal=sk;sl.appendChild(sk);stamp.appendChild(sl);sway.appendChild(stamp);
+  /* 6.96: the seal is pressed on the sheet in front: pointing at either lifts both, pressing the sheet sinks the seal with it */
+  var front=LB.cards[1],onS=false,onF=false;function lift(){sl.classList.toggle("lf-up",onS||onF);front.classList.toggle("lf-ph",onS&&!onF);}
+  front.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"){onF=true;lift();}});front.addEventListener("pointerleave",function(){onF=false;lift();});
+  sk.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse"){onS=true;lift();}});sk.addEventListener("pointerleave",function(){onS=false;lift();});
+  front.addEventListener("pointerdown",function(){sl.classList.add("lf-dn");});["pointerup","pointercancel","pointerleave"].forEach(function(t){front.addEventListener(t,function(){sl.classList.remove("lf-dn");});});
+  /* a press of the seal stamps the stack: the sheets give under it and spring back, as paper under a seal does, with the seal's own knock */
+  sk.addEventListener("click",function(){if(still()||!stamp.animate)return;try{stamp.animate([{transform:"translateZ(0) scale(1)"},{transform:"translateZ(-7px) scale(.986)",offset:.18},{transform:"translateZ(2px) scale(1.004)",offset:.5},{transform:"translateZ(0) scale(1)"}],{duration:620,easing:"cubic-bezier(.3,.7,.3,1)"});}catch(e){}});
   tilt.appendChild(sway);root.appendChild(tilt);H.obj.appendChild(root);LB.root=root;
   root.style.setProperty("--lf-grain",grainTile(false));root.style.setProperty("--lf-grain-n",grainTile(true));
   root.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=root.getBoundingClientRect();if(!r.width)return;
@@ -1448,6 +1591,8 @@ function paintLector(){var H=lectorHero();if(!H)return;if(LB.seal)lxSealPaint(LB
   if(LB.row&&LB.row.parentNode)LB.row.parentNode.removeChild(LB.row);LB.row=steps(st.steps.length?st.steps:[{name:"Choose",sub:SUBS.choose,now:true},{name:"Read",sub:SUBS.read},{name:"Write",sub:SUBS.write},{name:"Save",sub:SUBS.save}],function(i){goStep(i);});
   lx.parentNode.insertBefore(LB.row,lx);
   lfFill(LB.cards[0],t[0],"l");lfFill(LB.cards[1],t[1],"f");lfFill(LB.cards[2],t[2],"r");
+  (LB.loose||[]).forEach(function(e,n){var cv=e.querySelector(".lf-paper"),nt=night(),key="loose|"+n+"|"+(nt?1:0);if(cv.__k===key)return;cv.__k=key;
+    var go=function(){if(cv.__k!==key)return;try{lpDraw(cv,{name:n?"Notes on the reading":"Drafts of the documents",i:n},nt,{leaf:true,pages:1});}catch(x){}};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(x){}go();});
   var go=$("l7BriefF")&&$("l7BriefF").querySelector("button.next"),k=H.keys.querySelector("#skLectorGo");if(k&&go){var tx=(go.textContent||"").trim();if(tx&&k.lastChild&&k.lastChild.nodeType===3&&k.lastChild.textContent!==tx)k.lastChild.textContent=tx;}}
 function goStep(i){try{if(W.IngLector&&IngLector.setPanel&&W.innerWidth<900)IngLector.setPanel(["brief","read","doc","doc"][i]||"brief");}catch(e){}var p=$(["l7Brief","l7Read","l7Doc","l7Doc"][i]);if(!p)return;scrollTo($("lx7"));
   if(!still()&&p.animate)try{p.animate([{boxShadow:"0 0 0 0 rgba(106,63,181,0)"},{boxShadow:"0 0 0 3px rgba(106,63,181,.45)"},{boxShadow:"0 0 0 0 rgba(106,63,181,0)"}],{duration:1100,delay:250});}catch(e){}}

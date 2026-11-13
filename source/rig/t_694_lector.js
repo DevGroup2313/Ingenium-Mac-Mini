@@ -6,7 +6,8 @@
 // one colour? and why is the little engine circle sticking out like that"; "the middle circle animation at rest from the Home page".
 // Checks, by day and by night at 1440 by 900, and on a phone (390): Lector opens on its head, the fan of three documents; at its foot the
 // wax seal, drawn for the theme and for today (its date in Latin, as the device's clock gives it), in three lit layers (the wax with its
-// lettering, the star, the pearl); it sways as Home's engine button does, its pearl beats at rest with Home's heartbeat; under a mouse it
+// lettering, the star, the pearl); (6.96) it sways with the stack of documents as one piece, casts no shadow behind it on the paper, and
+// its pearl beats at rest with Home's heartbeat; under a mouse it
 // leans and lifts, pressed it sinks, let go it knocks and plays one of Home's flourishes with Home's click, and nothing else happens; by
 // night it is drawn again for the night; Minimal motion stills it; the Career Studio's compass stays held (modules/r293.js), so that page
 // reads as in 6.93; no errors. The person is invented.
@@ -31,12 +32,17 @@ const MON = ['IANUARII', 'FEBRUARII', 'MARTII', 'APRILIS', 'MAII', 'IUNII', 'IUL
       const homeBeat = (() => { const e = document.querySelector('#page-home .seal-heart'); return e ? getComputedStyle(e).animationDuration : ''; })();
       return { on: pg.classList.contains('sk-on'), hero: !!h, before: !!(h && document.getElementById('lx7') && (h.compareDocumentPosition(document.getElementById('lx7')) & 4)), homeBeat, docs: docs.length, front: docs.filter(d => d.classList.contains('lf-f')).length,
         seal: !!hs, key: !!k, date: k ? k.getAttribute('data-date') : '', drawn: hs ? hs.__k2 : '', ring: im('.lxs-ring').slice(0, 22), star: im('.lxs-star').slice(0, 22), heart: im('.lxs-heart').slice(0, 22),
-        idle: hs ? getComputedStyle(hs.querySelector('.isl-idle')).animationName : '', beat: hs ? getComputedStyle(hs.querySelector('.lxs-heart')).animationName + ' ' + getComputedStyle(hs.querySelector('.lxs-heart')).animationDuration : '',
+        idle: hs ? getComputedStyle(hs.querySelector('.isl-idle')).animationName : '', stack: (function () { const w = pg.querySelector('.lf-sway'); return w ? getComputedStyle(w).animationName + ' ' + getComputedStyle(w).animationDuration : ''; })(),
+        cast: (function () { const c = pg.querySelector('.lf-seal .lxs-cast'); return c ? getComputedStyle(c).display : 'gone'; })(), beat: hs ? getComputedStyle(hs.querySelector('.lxs-heart')).animationName + ' ' + getComputedStyle(hs.querySelector('.lxs-heart')).animationDuration : '',
         panels: pg.querySelectorAll('#lx7 .l-pn').length }; });
     ok(lec.on && lec.hero && lec.before && lec.docs === 3 && lec.front === 1, th + ': Lector opens on its head, the fan of three documents, above its panels', lec);
     ok(lec.seal && lec.key && lec.date === latin, th + ': at its foot the wax seal, with today\'s date in Latin (' + latin + ')', lec);
     ok([lec.ring, lec.star, lec.heart].every(s => /^data:image\/png/.test(s)) && new RegExp('^white' + (th === 'night' ? 'n' : 'd')).test(lec.drawn || ''), th + ': its three lit layers are drawn for the ' + th + ' (white wax by day, the engine button\'s night by night)', lec);
-    ok(lec.idle === 'islSway' && lec.beat === 'sealBeat ' + (lec.homeBeat || '3.2s'), th + ': it sways as Home\'s engine button does, and its pearl beats at rest with Home\'s heartbeat, at Home\'s pace (' + lec.homeBeat + ')', lec);
+    // 6.96: the seal is pressed on the sheet in front and sways with the stack as one piece, on Home's engine button's clock (7 seconds), its
+    // own sway stilled; its pearl still beats with Home's heartbeat; and it casts no shadow on the paper (her words, 13 November 2026:
+    // "remove the black dot/shadow that shows up behind the wax seal on the header")
+    ok(lec.idle === 'none' && lec.stack === 'lfSway 7s' && lec.beat === 'sealBeat ' + (lec.homeBeat || '3.2s'), th + ': the seal sways with the stack as one piece, on Home\'s engine button\'s clock (7s), and its pearl beats at rest with Home\'s heartbeat, at Home\'s pace (' + lec.homeBeat + ')', lec);
+    ok(lec.cast === 'none' || lec.cast === 'gone', th + ': no shadow behind the wax seal (6.96)', lec.cast);
     const before = await p.evaluate(() => { window.__snd = []; if (window.IngSound && !IngSound.__spy) { const o = IngSound.play; IngSound.play = function (r, x) { __snd.push(r); return o.apply(this, arguments); }; IngSound.__spy = 1; }
       const c = document.querySelector('#page-lector .lf-card.lf-f'); return { page: [...document.querySelectorAll('[id^="page-"].active')].map(x => x.id).join(), cur: c ? c.getAttribute('aria-label') : '', y: Math.round(window.scrollY) }; });
     const key = await p.$('#page-lector .lf-seal .r175-seal'); const bb = await key.boundingBox();
