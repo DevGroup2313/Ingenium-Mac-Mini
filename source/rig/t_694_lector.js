@@ -43,6 +43,19 @@ const MON = ['IANUARII', 'FEBRUARII', 'MARTII', 'APRILIS', 'MAII', 'IUNII', 'IUL
     // "remove the black dot/shadow that shows up behind the wax seal on the header")
     ok(lec.idle === 'none' && lec.stack === 'lfSway 7s' && lec.beat === 'sealBeat ' + (lec.homeBeat || '3.2s'), th + ': the seal sways with the stack as one piece, on Home\'s engine button\'s clock (7s), and its pearl beats at rest with Home\'s heartbeat, at Home\'s pace (' + lec.homeBeat + ')', lec);
     ok(lec.cast === 'none' || lec.cast === 'gone', th + ': no shadow behind the wax seal (6.96)', lec.cast);
+    // 6.99, her words: "there is a clear bug that keeps on disappearing the wax seal. I hate that." Pressing the sheet in front, lifted under
+    // the pointer, sent the seal behind it; now the seal stands off the paper in every state: at rest, lifted, pressed
+    const zOf = () => p.evaluate(() => { const z = t => { const m = /matrix3d\(([^)]+)\)/.exec(t || ''); return m ? +m[1].split(',')[14] : 0; };
+      return { seal: z(getComputedStyle(document.querySelector('#page-lector .lf-seal')).transform), card: z(getComputedStyle(document.querySelector('#page-lector .lf-card.lf-f')).transform) }; });
+    const fc = await (await p.$('#page-lector .lf-card.lf-f')).boundingBox();
+    await p.mouse.move(5, 5); await p.waitForTimeout(700); const zr = await zOf();
+    await p.mouse.move(fc.x + fc.width * .5, fc.y + fc.height * .2, { steps: 4 }); await p.waitForTimeout(700); const zu = await zOf();
+    await p.mouse.down(); await p.waitForTimeout(250); const zd = await zOf(); await p.mouse.move(5, 5, { steps: 3 }); await p.mouse.up(); await p.waitForTimeout(700);
+    ok([zr, zu, zd].every(z => z.seal - z.card >= 3) && zd.card < zu.card, th + ': the seal stays in front of the paper at rest, lifted and pressed; a press sinks the sheet and the seal with it', { zr, zu, zd });
+    // 6.99, her words: "please remove the weird dark shadow that is showing on the left top corner of the seal and documents". No blur or
+    // drop shadow filter inside the stack's 3D frame, which the Mac's web view (Safari's engine) can set down out of place
+    const filt = await p.evaluate(() => [...document.querySelectorAll('#page-lector .lf-tilt, #page-lector .lf-tilt *')].filter(e => e.getClientRects().length > 0).map(e => getComputedStyle(e).filter).filter(f => f && f !== 'none'));
+    ok(filt.length === 0, th + ': no blur or drop shadow filter inside the stack\'s 3D frame; its shadows are painted soft without one', filt.slice(0, 6));
     const before = await p.evaluate(() => { window.__snd = []; if (window.IngSound && !IngSound.__spy) { const o = IngSound.play; IngSound.play = function (r, x) { __snd.push(r); return o.apply(this, arguments); }; IngSound.__spy = 1; }
       const c = document.querySelector('#page-lector .lf-card.lf-f'); return { page: [...document.querySelectorAll('[id^="page-"].active')].map(x => x.id).join(), cur: c ? c.getAttribute('aria-label') : '', y: Math.round(window.scrollY) }; });
     const key = await p.$('#page-lector .lf-seal .r175-seal'); const bb = await key.boundingBox();

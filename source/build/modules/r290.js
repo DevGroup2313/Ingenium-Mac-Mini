@@ -372,6 +372,28 @@ body[data-motion="minimal"] #page-lector .lf-tails i{animation:none}
 #page-lector .lf-loose.r{transform:translate3d(74px,42px,-70px) rotate(21deg) scale(.93)}
 #page-lector .lf-loose .lf-shade{position:absolute;left:0;top:0;width:216px;height:330px;border-radius:14px;background:rgba(42,20,80,.12);filter:blur(10px);transform:translateZ(-10px) translateY(8px)}
 body[data-theme="night"] #page-lector .lf-loose .lf-shade{background:rgba(0,0,0,.5)}
+/* 6.99: the seal never goes behind the paper. Her words (13 November 2026): "there is a clear bug that keeps on disappearing the wax seal.
+   I hate that." Pressing the sheet in front sent the seal to its resting depth (-1 px) while the sheet's lift under the pointer outweighed
+   its press (26 px): the seal stood 27 px behind the paper until the press ended. A press now sinks the sheet from where it stands, lifted
+   or at rest, and the seal with it; and the seal stands 6 px off the paper in every state, so its lean toward the pointer never meets it */
+#page-lector button.lf-card.lf-f.lf-down:hover,#page-lector button.lf-card.lf-f.lf-down.lf-ph{--ly:-16px;--lz:18px;--ls:1}
+#page-lector button.lf-card.lf-l.lf-down:hover{--lx:-84px;--ly:4px;--lz:-14px;--lr:-15deg;--ls:.98}
+#page-lector button.lf-card.lf-r.lf-down:hover{--lx:84px;--ly:4px;--lz:-14px;--lr:15deg;--ls:.98}
+#page-lector .lf-seal{transform:translate3d(0,0,6px)}
+#page-lector .lf-seal.lf-up{transform:translate3d(0,-16px,32px)}
+#page-lector .lf-seal.lf-dn{transform:translate3d(0,0,2px)}
+#page-lector .lf-seal.lf-up.lf-dn{transform:translate3d(0,-16px,24px)}
+/* 6.99: no blur filter inside the stack's 3D frame. Her words (13 November 2026): "please remove the weird dark shadow that is showing on
+   the left top corner of the seal and documents for the Lector drawing, it detracts from the page." Each sheet's shadow was a dark sheet
+   blurred by a filter, and the star in the wax cast one by a filter too; the Mac's web view (Safari's engine) draws a filter inside a 3D
+   frame in a layer of its own and can set that layer down out of place, a dark patch at the top left. The shadows are now painted soft by
+   box-shadow, as part of their own sheet (a sheet 20 px smaller each way, spread back by 20 px and softened by 20 px: the same blur of 10 px),
+   and the star casts none */
+#page-lector .lf-shade,#page-lector .lf-loose .lf-shade{filter:none;left:20px;top:20px;width:176px;height:290px;border-radius:0;background:rgba(42,20,80,.16);box-shadow:0 0 20px 20px rgba(42,20,80,.16)}
+#page-lector .lf-loose .lf-shade{background:rgba(42,20,80,.12);box-shadow:0 0 20px 20px rgba(42,20,80,.12)}
+body[data-theme="night"] #page-lector .lf-shade{background:rgba(0,0,0,.6);box-shadow:0 0 20px 20px rgba(0,0,0,.6)}
+body[data-theme="night"] #page-lector .lf-loose .lf-shade{background:rgba(0,0,0,.5);box-shadow:0 0 20px 20px rgba(0,0,0,.5)}
+#page-lector .lf-seal .lxs-isl .isl-star > img,body[data-theme="night"] #page-lector .lf-seal .lxs-isl .isl-star > img{filter:none}
 #page-lector .lf-sheet.lf-drawn{background:none !important;box-shadow:none !important;overflow:visible}
 #page-lector .lf-sheet.lf-drawn > span{visibility:hidden}
 #page-lector .lf-card.lf-drawn > .lf-tab{visibility:hidden}

@@ -86,6 +86,9 @@ body[data-theme="night"] #fb{
 #fb .f-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:linear-gradient(var(--f-a),var(--f-b));border:1px solid var(--f-hair);color:var(--f-ink2);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;box-shadow:var(--f-pill);line-height:1.4}
 #fb .f-chip.ok{color:var(--f-ok)} #fb .f-chip.warn{color:var(--f-warn)} #fb .f-chip.live{color:var(--f-acc);border-color:var(--f-ring)}
 #fb .f-chip .d{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+/* 6.99: a chip with nothing to say is not drawn. Her words (13 November 2026): "there is bug on the page": with no app chosen, the work, test
+   and ship chips stood as three empty grey capsules (their padding, fill and border with no words) */
+#fb .f-chip:empty{display:none}
 #fb .f-sw{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--f-ink2);cursor:pointer;user-select:none}
 #fb .f-sw input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:var(--f-wellbg);border:1px solid var(--f-hair);box-shadow:var(--f-well);position:relative;cursor:pointer;margin:0;flex:0 0 auto;transition:background .25s}
 #fb .f-sw input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);transition:transform .35s var(--f-spring)}

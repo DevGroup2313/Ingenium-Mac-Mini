@@ -371,6 +371,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.99 (13 November 2026): Lector's seal stays on the paper, its shadows drawn without a blur; Fabrica's empty chips hidden.
+- Her words (13 November 2026): "there is a clear bug that keeps on disappearing the wax seal. I hate that." Pressing the sheet in front of
+  Lector's fan sent the seal to its resting depth (-1 px, modules/r290.js .lf-seal.lf-dn) while the sheet's lift under the pointer (26 px)
+  outweighed its own press (.lf-down lost to :hover on specificity): the seal stood 27 px behind the paper for as long as the press lasted.
+  A press now sinks the sheet from where it stands (18 px when lifted, -4 px at rest) and the seal with it; the seal stands 6 px off the
+  paper in every state, so its lean toward the pointer never meets the paper.
+- With her Lector_Sealed_Dossier.html once more (the same file as for 6.96): "I want you to use this design for Lector just please remove
+  the weird dark shadow that is showing on the left top corner of the seal and documents for the Lector drawing, it detracts from the
+  page." The design is that file's; the shadows under the five sheets were dark sheets blurred by a filter inside the stack's 3D frame, and
+  the star in the wax cast one by a filter too. The Mac's web view (Safari's engine) draws a filter inside a 3D frame in a layer of its own
+  and can set it down out of place, a dark patch at the top left. They are now painted soft by box-shadow, as part of their own sheet (a
+  sheet 20 px smaller each way, spread back by 20 px, softened by 20 px: the same blur of 10 px), and the star casts none. Seen here in
+  Chromium only: this environment has no WebKit, so the Mac's own drawing could not be watched; what could be checked is that no filter is
+  left inside the frame.
+- Fabrica, her words: "there is bug on the page". With no app chosen, its work, test and ship chips stood as three empty grey capsules (their
+  padding, fill and border with no words): a chip with nothing to say is no longer drawn (modules/r112.js). Her verdict on the design ("The
+  Fabrica page looks ridiculous and needs to be redone, the design looks ulgy") waits for a new design on a live preview.
+Tests: `node rig/t_694_lector.js <page url> <out>` (27: the seal in front at rest, lifted and pressed; no filter inside the frame; both fail on 6.98).
+
 Ingenium 6.98 (13 November 2026): Vocatio's medallions, as the compass is made.
 - Her words (12 November 2026): "I want the balls inside of the compass on the Career Studio to be refined and elevated to match the
   texture and look of the compass but I still want to be animated match the page and the rest of Ingenium." She approved the live preview
