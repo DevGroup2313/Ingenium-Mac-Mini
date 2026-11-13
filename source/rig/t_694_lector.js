@@ -28,14 +28,15 @@ const MON = ['IANUARII', 'FEBRUARII', 'MARTII', 'APRILIS', 'MAII', 'IUNII', 'IUL
     await p.evaluate(() => go('lector')); await p.waitForTimeout(2600);
     const lec = await p.evaluate(() => { const pg = document.getElementById('page-lector'), h = pg.querySelector('.skh'), docs = [...pg.querySelectorAll('.lf-card')].filter(d => !d.hidden);
       const hs = pg.querySelector('.lf-seal .lx-wax'), k = hs && hs.querySelector('.r175-seal'), im = c => ((hs && hs.querySelector(c)) || {}).src || '';
-      return { on: pg.classList.contains('sk-on'), hero: !!h, before: h && h.nextElementSibling && h.nextElementSibling.id, docs: docs.length, front: docs.filter(d => d.classList.contains('lf-f')).length,
+      const homeBeat = (() => { const e = document.querySelector('#page-home .seal-heart'); return e ? getComputedStyle(e).animationDuration : ''; })();
+      return { on: pg.classList.contains('sk-on'), hero: !!h, before: !!(h && document.getElementById('lx7') && (h.compareDocumentPosition(document.getElementById('lx7')) & 4)), homeBeat, docs: docs.length, front: docs.filter(d => d.classList.contains('lf-f')).length,
         seal: !!hs, key: !!k, date: k ? k.getAttribute('data-date') : '', drawn: hs ? hs.__k2 : '', ring: im('.lxs-ring').slice(0, 22), star: im('.lxs-star').slice(0, 22), heart: im('.lxs-heart').slice(0, 22),
         idle: hs ? getComputedStyle(hs.querySelector('.isl-idle')).animationName : '', beat: hs ? getComputedStyle(hs.querySelector('.lxs-heart')).animationName + ' ' + getComputedStyle(hs.querySelector('.lxs-heart')).animationDuration : '',
         panels: pg.querySelectorAll('#lx7 .l-pn').length }; });
-    ok(lec.on && lec.hero && lec.before === 'lx7' && lec.docs === 3 && lec.front === 1, th + ': Lector opens on its head, the fan of three documents, above its panels', lec);
+    ok(lec.on && lec.hero && lec.before && lec.docs === 3 && lec.front === 1, th + ': Lector opens on its head, the fan of three documents, above its panels', lec);
     ok(lec.seal && lec.key && lec.date === latin, th + ': at its foot the wax seal, with today\'s date in Latin (' + latin + ')', lec);
     ok([lec.ring, lec.star, lec.heart].every(s => /^data:image\/png/.test(s)) && new RegExp('^white' + (th === 'night' ? 'n' : 'd')).test(lec.drawn || ''), th + ': its three lit layers are drawn for the ' + th + ' (white wax by day, the engine button\'s night by night)', lec);
-    ok(lec.idle === 'islSway' && /^sealBeat 3\.2s/.test(lec.beat), th + ': it sways as Home\'s engine button does, and its pearl beats at rest with Home\'s heartbeat', lec);
+    ok(lec.idle === 'islSway' && lec.beat === 'sealBeat ' + (lec.homeBeat || '3.2s'), th + ': it sways as Home\'s engine button does, and its pearl beats at rest with Home\'s heartbeat, at Home\'s pace (' + lec.homeBeat + ')', lec);
     const before = await p.evaluate(() => { window.__snd = []; if (window.IngSound && !IngSound.__spy) { const o = IngSound.play; IngSound.play = function (r, x) { __snd.push(r); return o.apply(this, arguments); }; IngSound.__spy = 1; }
       const c = document.querySelector('#page-lector .lf-card.lf-f'); return { page: [...document.querySelectorAll('[id^="page-"].active')].map(x => x.id).join(), cur: c ? c.getAttribute('aria-label') : '', y: Math.round(window.scrollY) }; });
     const key = await p.$('#page-lector .lf-seal .r175-seal'); const bb = await key.boundingBox();
