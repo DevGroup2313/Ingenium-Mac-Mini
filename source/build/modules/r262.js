@@ -524,8 +524,12 @@ function role(name,i,n){var w=wayName(),wr=writerName();if(wr&&name&&wr.toLowerC
 function near(s,v){if(v){if(held&&held!==s)near(held,false);held=s;head.classList.add("bx-hold");if(s.__lb)s.__lb.classList.add("bx-near");ramp(0,650);rest(true);var x=s.__bx;
     if(x)count.innerHTML="<b>"+esc(x.name)+"</b>, "+(x.cloud?"connected":"on this device")+(x.sub?": "+esc(x.sub):"")+". In this blend it "+x.role+". Press it to see it in step I.";}
   else{if(s.__lb)s.__lb.classList.remove("bx-near");if(held===s){held=null;head.classList.remove("bx-hold");count.textContent=countText;ramp(1,900);rest(false);}}}
+/* 6.97: the page stays where it is. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it."
+   A wheel pressed opens step I at its row, which glows; when the row is out of the window, a line says where it is */
 function goStep1(row){try{var b=page.querySelector('.rm-step[data-step="1"]');if(b)b.click();}catch(e){}
-  if(row){row.classList.add("bx-seen");try{row.scrollIntoView({block:"center",behavior:still()?"auto":"smooth"});}catch(e){}setTimeout(function(){row.classList.remove("bx-seen");},1600);try{var c=row.querySelector("input");if(c)c.focus({preventScroll:true});}catch(e){}}}
+  if(row){row.classList.add("bx-seen");setTimeout(function(){row.classList.remove("bx-seen");},1600);try{var c=row.querySelector("input");if(c)c.focus({preventScroll:true});}catch(e){}
+    var nm=((row.querySelector(".bl-mn")||{}).textContent||"").trim();said(row,"Step I is open below"+(nm?", at "+nm:"")+".");}}
+function said(el,say){try{var r=el.getBoundingClientRect(),cy=(r.top+r.bottom)/2;if((cy<0||cy>(W.innerHeight||0))&&typeof W.ingToast==="function")W.ingToast(say);}catch(e){}}
 /* the movement: Ingenium's wheel at the centre of the plate holding the seal key; the chosen models' wheels meshing with it, each a key;
    places wait, as wheels too, while fewer than two are chosen. Drawn again only when something changes */
 var lastSig="";

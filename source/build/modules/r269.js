@@ -268,8 +268,11 @@ function turnTo(i,sound){if(!disc)return;var step=360/P,d=((-i*step-TURN)%360+54
 
 /* ---------- loading and unloading, as the engine's own keys do ---------- */
 function note(n){NOTE=n;paint();}
+/* 6.97: the turret's keys and lenses act where they stand and never move the page. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it."
+   A room they open is below; when it is out of the window, a line says which */
 function room(k,el){try{if(W.IngRooms&&typeof IngRooms.open==="function")IngRooms.open("models",k);}catch(e){}
-  setTimeout(function(){var t=el||$("rmBar-models");if(!t)return;try{t.scrollIntoView({block:"start",behavior:still()?"auto":"smooth"});}catch(e){try{t.scrollIntoView();}catch(_){}}},60);}
+  setTimeout(function(){var t=el||$("rmBar-models");if(!t)return;var nm=((($("rmT-models-"+k)||{}).textContent)||"").trim();said(t,(nm?nm+" is":"The room is")+" open below.");},60);}
+function said(el,say){try{var r=el.getBoundingClientRect(),cy=(r.top+r.bottom)/2;if((cy<0||cy>(W.innerHeight||0))&&typeof W.ingToast==="function")W.ingToast(say);}catch(e){}}
 function addFile(){var dz=$("dropzone");if(dz){try{dz.click();return;}catch(e){}}room("yours");}
 function busyNote(){var e=eng();if(st()==="loading")return {name:"The engine is loading a model",says:"Let it finish first; then press the lens you want.",pc:Math.round(prog()*100)};
   return {name:"The engine is writing",says:"Let it finish, or stop it first; then press the lens you want.",pc:100,acts:[["Stop",function(){try{if(e)e.abort();}catch(x){}}]]};}
@@ -400,11 +403,9 @@ function arm(el,id,col,name,house){var cv=el.querySelector("canvas");if(!cv)retu
   if(el.getAttribute("aria-label")!==lab)el.setAttribute("aria-label",lab);}
 function pressRoom(el){var id=el.getAttribute("data-model");
   if(!id){/* not on this device yet: its own key gets it, so nothing large starts unasked */var t=el.closest(".lu-tile"),k=t&&(t.querySelector(".btn.primary")||t.querySelector(".btn"));
-    if(k){try{k.scrollIntoView({block:"nearest",behavior:still()?"auto":"smooth"});}catch(e){}try{k.focus();}catch(e){}}
+    if(k){try{k.focus({preventScroll:true});}catch(e){}}
     try{ingToast((el.getAttribute("aria-label")||"").split(":")[0]+" is not on this device yet. Its key below gets it.");}catch(e){}return;}
-  var m=byId(id);if(!m)return;press(m);
-  /* the turret turns and its card says what the engine does, as the rows' Load key shows it (modules/r267.js) */
-  try{head.scrollIntoView({block:"start",behavior:still()?"auto":"smooth"});}catch(e){}}
+  var m=byId(id);if(!m)return;press(m);}
 function wireRooms(){if(!page||page.__tmk)return;page.__tmk=1;var cur=null,raf=0,pt={x:0,y:0};
   function draw(el,tx,ty){var cv=el.querySelector("canvas");if(!cv)return;var S=parseFloat(cv.style.width)||cv.clientWidth||56;drawLens(cv,S,el.getAttribute("data-col")||"#6a3fb5",tx,ty,"lens");}
   function off(el){if(!el)return;el.classList.remove("tm-ph","tm-pd");el.style.removeProperty("--lx");el.style.removeProperty("--ly");draw(el,0,0);}

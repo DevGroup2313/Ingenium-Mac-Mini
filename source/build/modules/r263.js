@@ -286,6 +286,9 @@ function when(c){var s=c.imported?(c.imported.updated||c.imported.created):(c.up
 function lastUsed(p){var t=+((p.app&&p.app.briefAt)||0)||0;convs(p).forEach(function(c){var x=when(c);if(x>t)t=x;});return t;}
 function paintFolders(){try{IngFolders.paint();}catch(e){}}
 function show(el,where){if(!el)return;try{el.scrollIntoView({block:where||"start",behavior:still()?"auto":"smooth"});}catch(e){try{el.scrollIntoView();}catch(_){}}}
+/* 6.97: the head's keys and the drawer's folders act where they stand and never move the page. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it."
+   What they open is below; when it is out of the window, a line says where */
+function said(el,say){if(!el)return;try{var r=el.getBoundingClientRect(),cy=(r.top+r.bottom)/2;if((cy<0||cy>(W.innerHeight||0))&&typeof W.ingToast==="function")W.ingToast(say);}catch(e){}}
 
 /* ---------- each app's own seal (r140's, by day or by night as the Display is), and a coin for any other app ---------- */
 function sealKey(name){var n=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
@@ -378,11 +381,11 @@ function drawFiles(){var fs=folders(),V=W.IngFolderView,vw=null;
   var lb=label.querySelector("small"),all=fs.length;lb.textContent=vw&&vw.label?vw.label:all?all+" folder"+(all===1?"":"s")+(all>6?", the six used last":""):"No folders yet";
   hint.textContent=n?HINT:(vw&&vw.none&&all?vw.none:EMPTY);}
 function openFolder(p){var g=G();g.ui.open=p.id;g.ui.adding=false;g.ui.renaming=null;save();if(held)lift(held,false);paintFolders();
-  setTimeout(function(){show(page&&(page.querySelector("#fldBody > .fld-crumb")||page.querySelector(".fd-spread"))||body);},40);}
+  setTimeout(function(){said(page&&(page.querySelector("#fldBody > .fld-crumb")||page.querySelector(".fd-spread"))||body,(p&&p.name?p.name:"The folder")+" is open below.");},40);}
 function home(){var g=G();if(g.ui.open){g.ui.open=null;g.ui.renaming=null;save();paintFolders();}}
-function addFolder(){if(!folders().length){home();var m=page&&page.querySelector(".fld-more");if(m){show(m,"center");try{m.focus({preventScroll:true});}catch(e){m.focus();}}return;}
-  var g=G();g.ui.open=null;g.ui.adding=true;save();paintFolders();var i=$("fldAddName");if(i){show(i,"center");try{i.focus({preventScroll:true});}catch(e){i.focus();}}}
-function bringIn(){home();var c=body&&body.querySelector(".fd-bring");if(c)show(c);}
+function addFolder(){if(!folders().length){home();var m=page&&page.querySelector(".fld-more");if(m){said(m,"Your first folder starts below.");try{m.focus({preventScroll:true});}catch(e){}}return;}
+  var g=G();g.ui.open=null;g.ui.adding=true;save();paintFolders();var i=$("fldAddName");if(i){said(i,"Name the new folder below.");try{i.focus({preventScroll:true});}catch(e){}}}
+function bringIn(){home();var c=body&&body.querySelector(".fd-bring");if(c)said(c,"The ways to bring in your work are below, at the foot of the page.");}
 
 /* ---------- dressing the page that Folders draws (r208 draws it again on every change; this follows it) ---------- */
 var LEFT=/^(Where we left off|Seen in the conversations|How I work on )/;

@@ -71,9 +71,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     for (let yy = 120; yy < 380 && !found; yy += 6) { await p.mouse.move(beads.x + 230 * beads.k, beads.y + yy * beads.k); await sleep(60);
       found = await p.evaluate(() => { const t = document.querySelector('#page-fabrica .fbt-tip'); return t && t.classList.contains('fbt-show') ? t.textContent : null; }); }
     ok(!!found && /[0-9a-f]{7}/.test(found), 'a version under the pointer says its words', found);
+    const sc = () => p.evaluate(() => { let el = document.getElementById('page-fabrica'); while (el && el.scrollHeight <= el.clientHeight) el = el.parentElement; return (el || document.scrollingElement).scrollTop; });
+    const scA = await sc();
     if (found) { await p.mouse.down(); await p.mouse.up(); await sleep(1600); }
-    const v = await p.evaluate(() => fbHub.viewing());
+    const v = await p.evaluate(() => fbHub.viewing()), scB = await sc();
     ok(v && v.view === 'compare', 'pressed, it opens what it changed (Compare)', v);
+    // 6.97: her word, no scrolling down the page: a version pressed opens Compare in its sheet, and the page stays where it was
+    ok(scA === scB, 'a version pressed does not move the page', { scA, scB });
+    await p.keyboard.press('Escape'); await sleep(500);
     // motion: it turns, stills under the pointer, Minimal motion holds it
     await p.evaluate(() => document.querySelector('#page-fabrica .skh').scrollIntoView({ block: 'start' })); await p.mouse.move(40, 880); await sleep(1500);
     const a0 = await p.evaluate(() => IngTree.state().angle); await sleep(1500); const a1 = await p.evaluate(() => IngTree.state().angle);

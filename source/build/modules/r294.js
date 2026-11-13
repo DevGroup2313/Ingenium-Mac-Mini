@@ -163,7 +163,7 @@ function loop(t){RAF=0;if(!page||!page.offsetParent||D.hidden||!HD||HD.el.classL
 function kick(){if(!RAF){LAST=0;RAF=requestAnimationFrame(loop);}}
 function at(e){var r=stage.getBoundingClientRect(),k=r.width/460;return {x:(e.clientX-r.left)/k,y:(e.clientY-r.top)/k};}
 function hit(p){var best=null,bd=1e9;BEADS.forEach(function(B){var d=Math.hypot(B.x-p.x,B.y-p.y);if(d<Math.max(9,B.r+4)&&d<bd){bd=d;best=B;}});return best;}
-function words(b){if(b.wait)return "<b>Not kept yet</b>"+(TREE&&TREE.waiting?TREE.waiting+" change"+(TREE.waiting===1?"":"s")+" waiting: press to keep them":"");
+function words(b){if(b.wait)return "<b>Not kept yet</b>"+(TREE&&TREE.waiting?TREE.waiting+" change"+(TREE.waiting===1?"":"s")+" waiting: press to open them in the panels below, ready to keep":"");
   var c=b.c||{},when=c.when?new Date(c.when).toLocaleDateString("en-GB",{day:"numeric",month:"long"}):"";
   return "<b>"+esc(c.title||"A version")+"</b><code>"+esc(c.short||"")+"</code>"+(b.idea?" · on "+esc(b.idea):b.kind==="arch"?" · brought in":" · on "+esc(TREE.main))+(when?" · "+when:"");}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -176,9 +176,10 @@ function bind(){stage.addEventListener("pointerenter",function(){TARGET=0;kick()
   stage.addEventListener("pointerup",function(e){var d=DRAG;DRAG=null;stage.classList.remove("fbt-drag");try{stage.releasePointerCapture(e.pointerId);}catch(_){}
     if(d&&d.moved)return;var B=hit(at(e));if(B)press(B.b);});}
 function press(b){var x=X();if(!x||!TREE||TREE.demo)return;if(W.IngSound&&IngSound.play)try{IngSound.play("keyTouch");}catch(e){}
-  if(b.wait){x.S.view="changes";x.paint();panels();return;}var c=b.c||{};if(!c.oid)return;
-  if(W.fbHub&&fbHub.open){fbHub.open("compare",{a:(c.parents&&c.parents[0])||"empty",b:c.oid});panels();}}
-function panels(){try{var fb=D.getElementById("fb");if(fb)fb.scrollIntoView({behavior:still()?"auto":"smooth",block:"start"});}catch(e){}}
+  /* 6.97: the page stays where it is. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else.
+     I dislike it." Compare opens in its sheet in the window; the changes waiting open in the panels below, as the steps' keys do */
+  if(b.wait){x.S.view="changes";x.paint();return;}var c=b.c||{};if(!c.oid)return;
+  if(W.fbHub&&fbHub.open)fbHub.open("compare",{a:(c.parents&&c.parents[0])||"empty",b:c.oid});}
 
 /* ---------- the header, made as Lector's and Vocatio's are ---------- */
 var BRING='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>';
@@ -186,7 +187,7 @@ function build(){var K=KIT();page=D.getElementById("page-fabrica");var host=D.ge
   HD=K.hero({title:"Fabrica",eyebrow:"Fabrica · the tree of your versions",
     lede:"Your workshop, on this device: each of your apps kept with every version, changed, tested and shipped from here. Every idea grows from its trunk, and nothing leaves this device unless you send it.",
     keys:[{pri:true,ico:K.ICO.plus,txt:"New app",id:"fbtGo",fn:primary},{ico:BRING,txt:"Bring one in",id:"fbtBring",fn:function(){var k=D.getElementById("fbBring");if(k)k.click();}}],
-    says:" ",hint:"Point at the tree to still it; press a version to see what it changed."});
+    says:" ",hint:"Point at the tree to still it; press a version to see what it changed, in the panels below."});
   stage=mk("div","fbt-stage");stage.setAttribute("role","img");cv=D.createElement("canvas");cv.className="fbt-cv";stage.appendChild(cv);tip=mk("div","fbt-tip");stage.appendChild(tip);
   HD.obj.appendChild(stage);tag=K.label(HD.obj,352,44,1,0,"","","fbt-label");says=HD.words.querySelector(".skh-says");
   host.parentNode.insertBefore(HD.el,host);bind();
