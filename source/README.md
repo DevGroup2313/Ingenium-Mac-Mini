@@ -371,6 +371,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.98 (13 November 2026): Vocatio's medallions, as the compass is made.
+- Her words (12 November 2026): "I want the balls inside of the compass on the Career Studio to be refined and elevated to match the
+  texture and look of the compass but I still want to be animated match the page and the rest of Ingenium." She approved the live preview
+  (13 November 2026): "I approve of the medallion preview, please push it everywhere." modules/r290.js: each stage medallion is painted
+  pixel by pixel through the case's own light (vcSilver, vcEnamel), as the case's rope and bezel are (vcMedalUrl): a milled silver edge of
+  44 ribs, a polished bevel, a sunken groove, and a domed face of enamel over an engine-turned guilloche; its numeral (Cormorant, from a
+  mask) raised in polished silver on violet or inlaid in violet on pearl, with a fine engraved edge; the stage in hand ringed in a fine
+  silver wire. Violet for a stage done and the one in hand, pearl for one ahead, as before. A glint crosses each dome in turn (7 seconds on
+  the stage in hand, Home's engine button's clock; 14 on the others; 2.2 under the pointer); Minimal motion and reduced motion hold it.
+  The night paints them again in the night's metal. The flat drawing (vcMedal) stays in the module, unused.
+- As on the preview, the medallion under the pointer lifts, its glint quickens, its stage's name shows and it sounds; pressed, it sinks
+  and sounds. The compass's 3D layers hide the medallions from the pointer (a hit test at a medallion's centre finds the compass), so
+  the compass finds the medallion from its own geometry (vcPick) and marks it (.md-over, .md-down: vcMdOver, vcMdDown); when the pointer
+  does reach a medallion, its own :hover and the key sounds do the same.
+- The Guide's 6.97 news is now two lines, so the editions without Fabrica do not name it (t_627_editions caught it on 6.97's editions,
+  which were not committed: 6.98's take their place).
+Tests: `node rig/t_698_medallions.js <page url> <out>` (27, by day and by night).
+
 Ingenium 6.97 (13 November 2026): the heads' keys never move the page.
 - Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it." 6.95 stilled r290's keys
   (Vocatio, Lector, Focus); 6.96 had kept one in Fabrica's own header and four other pages still moved. Measured on 6.96 at 1440 by 900:
