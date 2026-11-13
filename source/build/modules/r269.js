@@ -359,6 +359,13 @@ function layout(w){var set=function(c,v){if(page.classList.contains(c)!==v)page.
   if(page.style.getPropertyValue("--tr-k")!==k){if(k)page.style.setProperty("--tr-k",k);else page.style.removeProperty("--tr-k");}}
 function mount(){try{page=$("page-models");if(!page)return;var w=page.clientWidth;if(!w)return;
     if(w>=260){layout(w);if(!on)enter();}else if(on)leave();}catch(e){try{console.warn("Ingenium: the Models turret",e&&e.message||e);}catch(_){}}}
+/* 6.93: her words (12 November 2026): "the Models page always reverts back to its previosu design everytime I open the page". Measured on
+   6.92 (rig/t_693_models_open.js): the turret was built only when the page was first shown (a change of width seen by the observer and
+   answered a frame later), so the page's former head was painted first: two frames at the least, and longer on a slower computer with a
+   heavier page. Now the turret is built as soon as Ingenium starts, the page still hidden (its width taken from the page in front), and
+   opening the page lays it out in the same frame, before anything is painted (go, wrapped below). */
+function premount(){try{if(on||!page)return;var a=D.querySelector('[id^="page-"].active')||D.querySelector("main")||D.body,w=a?a.clientWidth:0;
+    if(!w)w=Math.max(0,(W.innerWidth||0)-300);if(w>=260){layout(w);enter();}}catch(e){try{console.warn("Ingenium: the Models turret, built early",e&&e.message||e);}catch(_){}}}
 function boot(){if(booted)return;page=$("page-models");var e=eng();if(!page||!e||typeof e.on!=="function"||!W.state){setTimeout(boot,700);return;}booted=true;
   e.on("status",onStatus);
   /* only a change of width matters, answered in the next frame, so the turret's own height never loops the observer */
@@ -368,7 +375,9 @@ function boot(){if(booted)return;page=$("page-models");var e=eng();if(!page||!e|
   try{new MutationObserver(function(){if(on){SIG="";BSIG="";schedule();}}).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(x){}
   /* the page drawing its models again (added, renamed, recoloured, removed, chosen): the turret follows */
   var ml=$("modelList");if(ml){try{new MutationObserver(function(){if(on)schedule();}).observe(ml,{childList:true});}catch(x){}}
-  mount();}
+  mount();premount();
+  var og=W.go;if(typeof og==="function"&&!og.__r269){var g=function(p){var r=og.apply(this,arguments);try{if(p==="models")mount();}catch(x){}return r;};
+    try{Object.keys(og).forEach(function(k){g[k]=og[k];});}catch(x){}g.__r269=1;W.go=g;}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.IngModelsTurret={state:function(){return {on:on,ports:PORTS.map(function(p){return {i:p.i,kind:p.kind,id:p.m?p.m.id:null,name:p.m?nm(p.m):"",pressed:p.el.getAttribute("aria-pressed"),label:p.el.getAttribute("aria-label")};}),
     names:NAMES.map(function(t){return t.textContent;}),count:P,turn:TURN,at:AT,target:target(),card:{name:nowName?nowName.textContent:"",says:nowSays?nowSays.textContent:"",acts:acts?[].slice.call(acts.querySelectorAll("button")).map(function(b){return b.textContent;}):[]},
