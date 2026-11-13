@@ -371,6 +371,53 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 6.94 (13 November 2026): Lector's head released, with its wax seal. modules/r290.js rides: Lector opens on the fan of its documents
+she approved, and at its foot the engine logo pressed in wax, as she approved it on its live preview that day ("I approve of the was seal
+design for Lector, please push it everywhere"). The seal is a real vintage stamp, drawn and lit pixel by pixel: a poured, uneven edge, a
+satin grain with the odd bubble, INGENIUM raised round the top and the day's date in Latin round the foot (from the device's clock; it
+turns at midnight), the logo's faceted violet star and its pearl. White wax by day; by night the engine button's own night (deep
+violet-black wax, lavender lettering). It moves as Home's engine button does: it sways, leans and lifts under a mouse, sinks when
+pressed, and each press plays one of Home's flourishes with Home's click; at rest its pearl beats with Home's heartbeat. The Career
+Studio's compass, drawn by the same module, is held: modules/r293.js turns it on and waits in build/held.json for her choice, so the
+Career Studio reads as in 6.93.
+
+    node rig/t_694_lector.js <Ingenium page url> <out dir>   # Lector's head and its seal, by day, by night and on a phone
+
+Ingenium 6.93 (13 November 2026): the Models page opening on its turret every time, Home's orbs matched to the seal, and Your
+counsellor released. The heads of the Career Studio and Lector (modules/r290.js) are written and tested but held (build/held.json) for her
+answer to their next preview: her words that day, "I want to see metal, and not a fake plastic somewhat 3D look. I want a beautiful 3D
+metal and vintage design that has a sleek elegant look", and of Lector, "I want the seal logo button to match Inkwell's seal logo 3D look
+and animation". What they are, as written:
+- The heads (modules/r290.js, held). Her words (12 November 2026): "I want to redesign the Focus, Lector page and the Career Studio to match the
+  rest of the app ... but I do like their 3 panel views so I want that preserved"; "I want regal and elevated to match these pages ...
+  refined, elevated and elegant while being 3D ... theme related without being on the nose"; "I like and approve of all of the
+  previews, please commit and push them everywhere"; and after 6.92, "push my approved design of the Career Studio and the Lector". Each
+  page opens on a head measured from Blend's (modules/r262.js): its desk, its words, two raised keys, an italic hint, and the page's own
+  object on Blend's stage. The panels below are kept as they were (the Career Studio's two, Lector's three), as tall as the window.
+  - The Career Studio: a dial. Blend's frosted plate (its renderer copied) with the seal's star engraved as its rose; a turned bezel
+    drawn with Blend's light; the counsellor's five stages set into the bezel as the hub is set (Blend's setting: a polished lip of the
+    bezel's own metal round violet enamel), flat and still, each with its numeral in pearl (her words on the first stages: "I want the
+    balls to just be flat and there with no animation"; on the lenses tried next: "still look ugly ... fake and pasted on the page"); the
+    path walked inlaid in violet; an index cut as one point of the seal's star; the seal at the hub turning as Home's engine turns. The
+    bezel turns with a spring to bring the stage in hand under the index; pressing a stage opens it.
+  - Lector: the fan she approved (drawn in another session from her pictures, modules/r287.js on claude/relaxed-hopper-nz4ert), carried
+    as it was: grained sheets standing on their leaves, tabs, initials, titles, lines and numerals, the one shown in front with its
+    ribbon. It sways as one piece and leans toward the pointer. At its foot, Ingenium's own seal key (R104's layers, R175's flourishes,
+    r176's sound): it sways, leans, lifts, sinks, knocks, ripples and plays Home's flourishes, and opens nothing (her words: "I just
+    want to use it as a fidget button on the page for my amusement"). A wax seal tried first was dark and is gone ("The seal is way too
+    dark"; "you've massively regressed it from my approved design").
+- The Models page (modules/r269.js). Her words: "the Models page always reverts back to its previosu design everytime I open the page".
+  Measured on 6.92 (rig/t_693_models_open.js): the turret was built only when the page was first shown, a frame after its width changed,
+  so the former head was painted first. Now it is built as Ingenium starts and laid out in the very frame the page opens.
+- Home's orbs (modules/r261.js). Her words: "I also want the orbs from the Home page to be refined and have the whole graphics of the orbs
+  pages and the engine logo button be better matched design and animation-wise ... please do not change the design". Each orb now wears
+  the seal's polished rim, a highlight lit as the seal's face is that follows the pointer, a surface fading to the edge, and the seal's
+  pearl on its mark. Its picture keeps the six parts 6.72's r264 turns, so each planet still turns under its light.
+- Your counsellor (modules/r283.js), held since 6.90 for her answer, rides on its own; the dial, when it rides, turns through its stages.
+  editions.py keeps r283 and r290 out of the editions without Lector.
+- The keys of the heads lift, sink and sound as every key does (modules/r176.js). Tested: rig/t_693_models_open.js on the release page;
+  rig/t_693_studios.js (49 of 49) on a test build, which keeps the held heads.
+
 Ingenium 6.92 (12 November 2026): Fabrica resolves on the drive a merge whose two ideas changed the same lines. 6.87 refused it ("Fabrica
 does not resolve that on the drive yet"); her list carried it from the 6.89 handoff. modules/r280.js and desktop/app_merge_692.py, with r141:
 - Bringing an idea in (Ideas, or a pull request's merge) into a working copy on the drive: Fabrica's three-way merge (r110, as for an app

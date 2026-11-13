@@ -167,6 +167,25 @@ body[data-motion="minimal"] #page-home #hx.ox-on .oxo-tilt{transform:none}
 @media (prefers-reduced-motion:reduce){#page-home #hx.ox-on .oxo-idle,#page-home #hx.ox-on .ox-stars i,#page-home #hx.ox-on .hx-next{animation:none}
   #page-home #hx.ox-on .oxo-tilt{transition:none}}
 @media (forced-colors:active){#page-home #hx.ox-on .hx-head{border:1px solid CanvasText}}
+/* ---------- 6.93: the orbs and the engine as one family (her words, 12 November 2026: "I also want the orbs from the Home page to be
+   refined and have the whole graphics of the orbs pages and the engine logo button be better matched design and animation-wise ... I want
+   the visuals to look more refined and cohesive, please do not change the design, I really like it"; approved on its preview the same
+   day). Nothing of the design moves: the same planets in the same purples, the same marks, the same orbit, the same turning (6.72's r264
+   still parts each ball into its body, its turning surface and its light, so the ball keeps its six parts). Each orb takes its finish
+   from the seal (R104, its own drawing):
+   - the seal's polished rim, a hairline round each ball in the seal's rim colours, lit above on the left as the seal's is;
+   - the seal's light: the highlight drawn as the seal's face is lit, a crisp core in a broad soft sheen, and under a mouse it follows the
+     pointer a little, as the seal's sheen does; the surface fades a little towards the ball's edge, as it turns away from the eye;
+   - the seal's pearl: each mark white at its top and the seal's pearl at its foot;
+   - the seal's tilt under a mouse (26 and 22 degrees). Minimal motion and the system's reduced motion still the sheen. ---------- */
+#page-home #hx.ox-on .oxo{--cr0:#efe8fb;--cr1:#a891d4;--cr2:#55309a;--crop:.95}
+body[data-theme="night"] #page-home #hx.ox-on .oxo{--cr0:#e2d5fa;--cr1:#9a7ad8;--cr2:#472b7f;--crop:.7}
+#page-home #hx.ox-on .hx-head .oxo-ico svg,#page-home #hx.ox-on .hx-head .oxo-ico svg [stroke="currentColor"]{stroke:url(#oxPearl)}
+#page-home #hx.ox-on .hx-head .oxo-ico svg [fill="currentColor"]{fill:url(#oxPearl)}
+body[data-theme="night"] #page-home #hx.ox-on .hx-head .oxo-ico svg,body[data-theme="night"] #page-home #hx.ox-on .hx-head .oxo-ico svg [stroke="currentColor"]{stroke:url(#oxPearlN)}
+body[data-theme="night"] #page-home #hx.ox-on .hx-head .oxo-ico svg [fill="currentColor"]{fill:url(#oxPearlN)}
+#page-home #hx.ox-on .oxo-ball .oxs-sheen{transform:translate(var(--hx,0px),var(--hy,0px));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){#page-home #hx.ox-on .oxo-ball .oxs-sheen{transition:none}}
 /* ---------- 6.71: on a phone, narrower than 760 pixels (her words, 10 November 2026: "The Iphone app does not have the new pages designs, I want them visible on the new Ios apps, I hate that they still have the old design and not the new one, I want that fixed now please"): the same orrery,
    stacked: the greeting, then the rooms turning round the seal at a phone's size on a gentler tilt, then the next step; each part placed
    where the heights above it say (layout) ---------- */
@@ -246,7 +265,10 @@ function surface(k){
     '<circle cx="50" cy="80" r="5" fill="#fff" opacity=".07"/><circle cx="86" cy="36" r="4" fill="#1a0840" opacity=".10"/>';
   if(k==="faint")return wave(52,"#fff",.09,5,-3)+wave(74,"#1a0840",.12,4,3);
   return "";}
-/* the ball: its body, its surface, the side away from the light, its edge, and one soft highlight (no glow, no glare) */
+/* the ball: its body, its surface, the side away from the light, its edge, and one soft highlight (no glow, no glare). From 6.93 the
+   surface fades a little towards the edge (its clip holds the fade, so the surface still turns under it, r264), the edge wears the seal's
+   polished rim (a hairline in the seal's rim colours, lit above on the left as the seal's is), and the highlight is lit as the seal's
+   face is: a crisp core in a broad soft sheen. Still six parts: defs, body, surface, shade, edge, highlight */
 var NS=0;
 function sphere(look){var id="oxs"+(++NS),R=' transform="rotate(44 60 60)"',c=function(n,o){return ' style="stop-color:var(--'+n+')'+(o?';stop-opacity:var(--'+o+')':'')+'"';};
   return '<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs>'+
@@ -254,12 +276,21 @@ function sphere(look){var id="oxs"+(++NS),R=' transform="rotate(44 60 60)"',c=fu
     '<linearGradient id="'+id+'t" x1="0" y1="0" x2="1" y2="0"><stop offset=".4" stop-opacity="0"'+c('csh')+'/><stop offset=".76"'+c('csh','ct1')+'/><stop offset="1"'+c('csh','ct2')+'/></linearGradient>'+
     '<radialGradient id="'+id+'e" cx=".5" cy=".5" r=".5"><stop offset=".7" stop-opacity="0"'+c('csh')+'/><stop offset=".93"'+c('csh','ce1')+'/><stop offset="1"'+c('csh','ce2')+'/></radialGradient>'+
     '<radialGradient id="'+id+'s" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".4" stop-color="#fff" stop-opacity=".32"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+    '<radialGradient id="'+id+'h" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".45" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+    '<radialGradient id="'+id+'m" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff"/><stop offset=".72" stop-color="#fff"/><stop offset="1" stop-color="#555"/></radialGradient>'+
+    '<mask id="'+id+'f" maskUnits="userSpaceOnUse" x="18" y="18" width="84" height="84"><circle cx="60" cy="60" r="40" fill="url(#'+id+'m)"/></mask>'+
+    '<linearGradient id="'+id+'r" x1="0" y1="0" x2="1" y2="1"><stop offset="0"'+c('cr0')+'/><stop offset=".5"'+c('cr1')+'/><stop offset="1"'+c('cr2')+'/></linearGradient>'+
     '<clipPath id="'+id+'c"><circle cx="60" cy="60" r="40"/></clipPath></defs>'+
     '<g'+R+'><circle cx="60" cy="60" r="40" fill="url(#'+id+'b)"/></g>'+
-    '<g clip-path="url(#'+id+'c)">'+surface(look[1])+'</g>'+
+    '<g clip-path="url(#'+id+'c)" mask="url(#'+id+'f)">'+surface(look[1])+'</g>'+
     '<g'+R+'><g clip-path="url(#'+id+'c)"><rect x="18" y="18" width="84" height="84" fill="url(#'+id+'t)"/></g></g>'+
-    '<circle cx="60" cy="60" r="40" fill="url(#'+id+'e)"/>'+
-    '<g'+R+'><ellipse cx="41" cy="60" rx="9.5" ry="13.5" fill="url(#'+id+'s)"/></g></svg>';}
+    '<g><circle cx="60" cy="60" r="40" fill="url(#'+id+'e)"/><circle cx="60" cy="60" r="39.55" fill="none" stroke="url(#'+id+'r)" stroke-width=".9" style="stroke-opacity:var(--crop,.85)"/></g>'+
+    '<g class="oxs-sheen"><g'+R+'><ellipse cx="43" cy="60" rx="15" ry="22" fill="url(#'+id+'s)" opacity=".42"/><ellipse cx="40.6" cy="60" rx="6.4" ry="10.4" fill="url(#'+id+'h)"/></g></g></svg>';}
+/* the seal's pearl for the marks (6.93): white into the seal's own pearl (R104's sdPearl), drawn once for the page */
+function pearlDefs(){if($("oxPearlDefs"))return;var d=D.createElement("div");d.id="oxPearlDefs";d.setAttribute("aria-hidden","true");
+  d.style.cssText="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none";
+  var g=function(id,pl){return '<linearGradient id="'+id+'" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21"><stop offset="0" stop-color="#ffffff"/><stop offset=".42" stop-color="#ffffff"/><stop offset="1" stop-color="'+pl+'"/></linearGradient>';};
+  d.innerHTML='<svg width="0" height="0" focusable="false"><defs>'+g("oxPearl","#dccff4")+g("oxPearlN","#e4d9f8")+'</defs></svg>';(D.body||D.documentElement).appendChild(d);}
 
 /* each orb answers the pointer as the seal does (R104, R175): it tilts to follow a mouse and lifts under it; pressed, it sinks */
 var on=false;
@@ -267,13 +298,14 @@ function wireOrb(k,o){
   k.addEventListener("pointerenter",function(e){if(on&&e.pointerType==="mouse"&&!still())o.classList.add("hover");});
   k.addEventListener("pointermove",function(e){if(!on||e.pointerType!=="mouse"||still())return;var r=o.getBoundingClientRect();if(!r.width)return;
     var x=Math.max(-.25,Math.min(1.25,(e.clientX-r.left)/r.width)),y=Math.max(-.25,Math.min(1.25,(e.clientY-r.top)/r.height));
-    o.style.setProperty("--ry",((x-.5)*28).toFixed(1)+"deg");o.style.setProperty("--rx",(-(y-.5)*24).toFixed(1)+"deg");},{passive:true});
-  k.addEventListener("pointerleave",function(){o.classList.remove("hover","down");o.style.setProperty("--rx","0deg");o.style.setProperty("--ry","0deg");});
+    o.style.setProperty("--ry",((x-.5)*26).toFixed(1)+"deg");o.style.setProperty("--rx",(-(y-.5)*22).toFixed(1)+"deg");
+    o.style.setProperty("--hx",((x-.5)*7).toFixed(2)+"px");o.style.setProperty("--hy",((y-.5)*7).toFixed(2)+"px");},{passive:true});
+  k.addEventListener("pointerleave",function(){o.classList.remove("hover","down");o.style.setProperty("--rx","0deg");o.style.setProperty("--ry","0deg");o.style.setProperty("--hx","0px");o.style.setProperty("--hy","0px");});
   k.addEventListener("pointerdown",function(){if(on&&!still())o.classList.add("down");},{passive:true});
   ["pointerup","pointercancel"].forEach(function(t){k.addEventListener(t,function(e){o.classList.remove("down");if(e.pointerType!=="mouse")o.classList.remove("hover");},{passive:true});});
   k.addEventListener("keydown",function(e){if(!on||still())return;if(e.key==="Enter"||e.key===" "){o.classList.add("down");setTimeout(function(){o.classList.remove("down");},140);}});
   k.addEventListener("blur",function(){o.classList.remove("hover","down");});}
-function dress(k,i){var o=k.querySelector(".oxo");if(o)return o;var j=k.querySelector(".hx-jewel");if(!j)return null;
+function dress(k,i){var o=k.querySelector(".oxo");if(o)return o;var j=k.querySelector(".hx-jewel");if(!j)return null;try{pearlDefs();}catch(e){}
   var look=LOOK[k.getAttribute("data-go")||""]||LOOK.chat,ico=j.querySelector("svg"),T=look[0];
   o=D.createElement("span");o.className="oxo";o.setAttribute("aria-hidden","true");o.style.setProperty("--od",(-i*1.17).toFixed(2)+"s");
   [mix(T[0],"#ffffff",.5),T[0],T[1],T[2],mix(T[2],"#000000",.42)].forEach(function(v,n){o.style.setProperty("--n"+n,v);});
@@ -352,7 +384,7 @@ function boot(){mount();var h=$("hx");if(!h){setTimeout(boot,700);return;}
   setInterval(function(){var x=$("hx");if(!on){if(x&&x.clientWidth>=300)mount();return;}if(x&&x.clientWidth<760)layout(x.clientWidth);
     if(x!==hx||!head||!head.isConnected||box.parentNode!==head||!box.querySelector(".ox-world")){mount();return;}rim();row();},2000);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
-W.IngOrrery={state:function(){var s=spin?getComputedStyle(spin):null;return {on:on,R:R0,keys:keys.length,hold:hold?hold.el.getAttribute("data-go"):null,motion:motion(),
+W.IngOrrery={sphere:function(look){return sphere([null,look||"bands"]);},pearl:function(){try{pearlDefs();}catch(e){}},state:function(){var s=spin?getComputedStyle(spin):null;return {on:on,R:R0,keys:keys.length,hold:hold?hold.el.getAttribute("data-go"):null,motion:motion(),
     turning:!!(s&&s.animationName!=="none"&&s.animationPlayState==="running"),period:s?s.animationDuration:null};},refresh:mount};
 try{window.__ingParts["p261"]="running";}catch(_){}
 })();
