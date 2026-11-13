@@ -483,7 +483,7 @@ body[data-theme="night"] .skv-mdside{background:linear-gradient(150deg,#a59dbb,#
 /* 6.97: the medallion drawn as the case is (vcMedalUrl), and its glint, crossing the dome on Home's engine button's clock */
 .skv-md .md2{position:absolute;left:0;top:0;width:32px;height:32px;display:block;pointer-events:none}
 .skv-md .md2-img{position:absolute;left:0;top:0;width:32px;height:32px;display:block;-webkit-user-drag:none;user-select:none}
-.skv-md .md2-glint{position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;overflow:hidden;pointer-events:none;mix-blend-mode:screen}
+.skv-md .md2-glint{position:absolute;left:6.4px;top:6.4px;width:19.2px;height:19.2px;border-radius:50%;overflow:hidden;pointer-events:none;mix-blend-mode:screen}
 .skv-md .md2-glint::before{content:"";position:absolute;left:-75%;top:-75%;width:250%;height:250%;
   background:linear-gradient(118deg,rgba(255,255,255,0) 43%,rgba(255,255,255,.62) 50%,rgba(255,255,255,0) 57%);transform:translateX(-62%);
   animation:skvGlint 14s cubic-bezier(.45,0,.2,1) infinite;animation-delay:var(--md-d,0s)}
@@ -1113,7 +1113,11 @@ function vcMaskAt(M,x,y){var u=x*M.Z+M.N/2-.5,v=y*M.Z+M.N/2-.5,i=Math.floor(u),j
 function vcMedalUrl(num,kind,nt){var key="md2|"+num+"|"+kind+"|"+(nt?1:0);if(VC.urls[key])return VC.urls[key];var ready=vcFontIn();
   var M=vcMask(num),n=[0,0,0],fc=[0,0,0],nc=[0,0,0],done=kind!=="ahead",E=done?(nt?[.42,.28,.74]:[.44,.29,.77]):(nt?[.86,.83,.93]:[.97,.955,.99]),V=nt?[.5,.36,.86]:[.4,.25,.74];
   var R=15.6,EDGE=14.4,BEZ=12.8,GRV=12.2,WIRE0=10.9,WIRE1=11.6;
-  VC.urls[key]=vcPaint(32,0,R,function(x,y,r,ph,o){var t,a,q,b,k;
+  /* 6.98: painted at the medallions' original size, at her word: "I want the size of the little balls inside of Vocatio's compass to be
+     remain smaller in their original sizes, they look really odd bigger." 6.96's medallion was 11.5 of its 30 units across its silver rim,
+     drawn into 32 px: 12.27 px. The whole design is drawn in its own units (R 15.6) and scaled by SC, so it keeps every proportion */
+  var SC=11.5*32/30/R;
+  VC.urls[key]=vcPaint(32,0,R*SC,function(x,y,r,ph,o){var t,a,q,b,k;x/=SC;y/=SC;r/=SC;
     if(r>=EDGE){t=(R-r)/(R-EDGE);a=1.05*(1-2*t);q=ph*44/(2*Math.PI);q-=Math.floor(q);b=(2*q-1)*.75;vcN(a,b,ph,n);vcSilver(n[0],n[1],n[2],nt,o);
       k=.8+.2*Math.sin(Math.PI*q);o[0]*=k;o[1]*=k;o[2]*=k;return 1;}
     if(r>=BEZ){t=(EDGE-r)/(EDGE-BEZ);a=.95*(1-2*t)+.12;vcN(a,0,ph,n);vcSilver(n[0],n[1],n[2],nt,o);return 1;}

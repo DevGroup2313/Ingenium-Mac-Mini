@@ -378,7 +378,10 @@ Ingenium 6.98 (13 November 2026): Vocatio's medallions, as the compass is made.
   pixel by pixel through the case's own light (vcSilver, vcEnamel), as the case's rope and bezel are (vcMedalUrl): a milled silver edge of
   44 ribs, a polished bevel, a sunken groove, and a domed face of enamel over an engine-turned guilloche; its numeral (Cormorant, from a
   mask) raised in polished silver on violet or inlaid in violet on pearl, with a fine engraved edge; the stage in hand ringed in a fine
-  silver wire. Violet for a stage done and the one in hand, pearl for one ahead, as before. A glint crosses each dome in turn (7 seconds on
+  silver wire, all at the medallions' original size (her word, 13 November 2026: "I want the size of the little balls inside of Vocatio's
+  compass to be remain smaller in their original sizes, they look really odd bigger"): the design is drawn in its own units and scaled so
+  its silver edge ends where 6.96's rim did, 12.27 px from the centre of its 32 px box. Violet for a stage done and the one in hand, pearl
+  for one ahead, as before. A glint crosses each dome in turn (7 seconds on
   the stage in hand, Home's engine button's clock; 14 on the others; 2.2 under the pointer); Minimal motion and reduced motion hold it.
   The night paints them again in the night's metal. The flat drawing (vcMedal) stays in the module, unused.
 - As on the preview, the medallion under the pointer lifts, its glint quickens, its stage's name shows and it sounds; pressed, it sinks
@@ -387,7 +390,7 @@ Ingenium 6.98 (13 November 2026): Vocatio's medallions, as the compass is made.
   does reach a medallion, its own :hover and the key sounds do the same.
 - The Guide's 6.97 news is now two lines, so the editions without Fabrica do not name it (t_627_editions caught it on 6.97's editions,
   which were not committed: 6.98's take their place).
-Tests: `node rig/t_698_medallions.js <page url> <out>` (27, by day and by night).
+Tests: `node rig/t_698_medallions.js <page url> <out>` (29, by day and by night, the size among them).
 
 Ingenium 6.97 (13 November 2026): the heads' keys never move the page.
 - Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else. I dislike it." 6.95 stilled r290's keys

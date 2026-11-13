@@ -25,14 +25,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.evaluate(() => document.fonts && document.fonts.ready); await sleep(400);
     const md = await p.evaluate(() => { const pg = document.getElementById('page-career');
       return [...pg.querySelectorAll('.skv-md')].map((k, i) => { const im = k.querySelector('.md2 > img.md2-img'), gl = k.querySelector('.md2 > .md2-glint'), g = gl ? getComputedStyle(gl, '::before') : null;
-        let face = null, rim = null;
+        let face = null, rim = null, size = null;
         if (im && im.complete && im.naturalWidth) { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
           const s = c.width / 32, at = (u, v) => [...x.getImageData(Math.round(u * s), Math.round(v * s), 1, 1).data];
-          face = at(16 + 8.5, 16 + 4); rim = at(16 + 14.2, 16); }
+          face = at(16 + 6.5, 16 + 3); rim = at(16 + 11.2, 16);
+          const row = x.getImageData(0, Math.floor(16 * s), c.width, 1).data; let last = -1; for (let i = Math.floor(16 * s); i < c.width; i++) if (row[i * 4 + 3] > 127) last = i; size = { edge: Math.round(((last + 1) / s - 16) * 100) / 100 }; }
         return { kind: k.getAttribute('data-kind'), label: (k.getAttribute('aria-label') || '').slice(0, 30), src: im ? (im.getAttribute('src') || '').slice(0, 22) : '', w: im ? im.naturalWidth : 0,
-          flat: k.querySelectorAll('svg.md').length, glint: !!gl, anim: g ? g.animationName : '', dur: g ? g.animationDuration : '', delay: g ? g.animationDelay : '', face, rim, srcFull: im ? im.getAttribute('src') : '' }; }); });
+          flat: k.querySelectorAll('svg.md').length, size, glint: !!gl, anim: g ? g.animationName : '', dur: g ? g.animationDuration : '', delay: g ? g.animationDelay : '', face, rim, srcFull: im ? im.getAttribute('src') : '' }; }); });
     ok(md.length === 5 && md.every(m => m.src.startsWith('data:image/png') && m.w >= 32 && m.flat === 0), th + ': five medallions on the ring, each painted through the case\'s light, none of the flat drawing left', md.map(m => ({ src: m.src, w: m.w, flat: m.flat })));
     ok(md.map(m => m.kind).join() === 'done,done,cur,ahead,ahead', th + ': I and II done, III in hand, IV and V ahead', md.map(m => m.kind));
+    // her word (13 November 2026): "I want the size of the little balls inside of Vocatio's compass to be remain smaller in their original
+    // sizes, they look really odd bigger": 6.96's silver rim reached 12.27 px from the centre of its 32 px box; so does this one, no further
+    ok(md.every(m => m.size && Math.abs(m.size.edge - 12.27) <= 0.6), th + ': at their original size: the silver edge ends where 6.96\'s rim did, 12.3 px from the centre', md.map(m => m.size));
     const violet = c => c && c[2] > c[1] + 40 && c[0] > c[1], pearl = c => c && Math.min(c[0], c[1], c[2]) > (th === 'day' ? 170 : 120) && Math.abs(c[0] - c[1]) < 40;
     ok(md.slice(0, 3).every(m => violet(m.face)) && md.slice(3).every(m => pearl(m.face)), th + ': violet enamel for the stages done and the one in hand, pearl for those ahead', md.map(m => m.face));
     ok(md.every(m => m.rim && m.rim[3] > 200 && Math.abs(m.rim[0] - m.rim[2]) < 70), th + ': each in a milled silver edge', md.map(m => m.rim));
