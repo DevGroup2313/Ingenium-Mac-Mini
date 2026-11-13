@@ -347,11 +347,10 @@ body[data-motion="minimal"] #page-lector button.lf-card,body[data-motion="minima
 .lxs-l img{display:block;width:100%;height:100%;transform-origin:50% 50%;-webkit-user-drag:none;pointer-events:none}
 .lxs-isl .isl-star > img{filter:drop-shadow(calc(var(--S) * .006) calc(var(--S) * .014) calc(var(--S) * .01) rgba(30,10,60,.34))}
 .lxs-isl .isl-heart > img{filter:none}
-/* the pearl at the heart breathes, a soft beat now and then, and its light turns as it does (her words, 13 November 2026: "I want the little
-   circle inside of the wax seal button to be animated") */
-.lxs-isl .isl-heart > img{animation:lxsPearl 4.6s cubic-bezier(.45,0,.3,1) infinite}
-@keyframes lxsPearl{0%,62%,100%{transform:scale(1) rotate(0deg);filter:brightness(1)}70%{transform:scale(1.09) rotate(-8deg);filter:brightness(1.12)}78%{transform:scale(.98) rotate(4deg);filter:brightness(1)}86%{transform:scale(1.05) rotate(-2deg);filter:brightness(1.06)}}
-.isl.hover .lxs-l.isl-heart > img{animation-duration:2.3s}
+/* the pearl at the heart beats at rest exactly as Home's engine button's heart does (Home's sealBeat, its pace and its calm pace) */
+.lxs-isl .isl-heart > img{animation:sealBeat 3.2s ease-in-out infinite}
+body[data-motion="calm"] .lxs-isl .isl-heart > img{animation-duration:5s}
+@keyframes sealBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.18)}28%{transform:scale(1.04)}42%{transform:scale(1.12)}56%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.lxs-isl .isl-heart > img{animation:none}}
 body[data-motion="minimal"] .lxs-isl .isl-heart > img{animation:none}
 body[data-theme="night"] .lxs-isl .isl-star > img{filter:drop-shadow(calc(var(--S) * .006) calc(var(--S) * .014) calc(var(--S) * .012) rgba(0,0,0,.6))}
@@ -1202,10 +1201,10 @@ function sealKey(cls,label,size){var hs=mk("div","hx-seal sk-seal"+(cls?" "+cls:
    pixel by pixel, so the relief catches the light as wax does. It stands on the page with its thickness and its shadow, sways a little,
    leans to the pointer, and a press plays one of Home's flourishes with Home's click. */
 var LXS={N:0,urls:{},wax:"violet"};
-var LXWAX={violet:{day:{base:[.7,.6,.92],deep:[.5,.38,.78],ink:[.99,.98,1],star:[.97,.96,1],collar:[.93,.91,.99],pearl:[1,1,1],side0:"#9a82d6",side1:"#7d63bf"},
+var LXWAX={violet:{day:{base:[.45,.31,.72],deep:[.22,.13,.43],ink:[.95,.93,1],star:[.9,.88,.97],collar:[.86,.83,.95],pearl:[1,.99,1],side0:"#4a2f86",side1:"#2f1b5e"},
                    night:{base:[.4,.27,.66],deep:[.18,.1,.36],ink:[.88,.84,.98],star:[.84,.8,.94],collar:[.8,.76,.92],pearl:[.97,.95,1],side0:"#3b2470",side1:"#1f1240"}},
-           white:{day:{base:[.985,.975,1],deep:[.74,.7,.84],ink:[.36,.21,.66],star:[.46,.31,.8],collar:[.4,.24,.72],pearl:[1,.99,1],side0:"#d9d3e6",side1:"#bfb6d4"},
-                  night:{base:[.27,.23,.36],deep:[.14,.11,.2],ink:[.74,.64,.95],star:[.47,.33,.8],collar:[.42,.27,.76],pearl:[.95,.93,1],side0:"#251f33",side1:"#16121f"}}};
+           white:{day:{base:[1,.995,1],deep:[.9,.87,.96],ink:[.36,.21,.66],star:[.46,.31,.8],collar:[.4,.24,.72],pearl:[1,.99,1],side0:"#ebe6f4",side1:"#dcd4ea",amb:.7,dif:.34,cavK:.22},
+                  night:{base:[.25,.185,.38],deep:[.1,.068,.17],ink:[.8,.7,.99],star:[.52,.37,.88],collar:[.45,.3,.82],pearl:[.97,.95,1],side0:"#2b2142",side1:"#171226",amb:.46,dif:.68,cavK:.36}}};
 var LXL=(function(){var x=-.5,y=-.62,z=.6,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})(),LXH=(function(){var x=LXL[0],y=LXL[1],z=LXL[2]+1,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})();
 var LXMONTH=["IANUARII","FEBRUARII","MARTII","APRILIS","MAII","IUNII","IULII","AUGUSTI","SEPTEMBRIS","OCTOBRIS","NOVEMBRIS","DECEMBRIS"];
 function lxRoman(n){var v=[1000,900,500,400,100,90,50,40,10,9,5,4,1],s=["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"],o="",i;for(i=0;i<v.length;i++)while(n>=v[i]){o+=s[i];n-=v[i];}return o;}
@@ -1261,7 +1260,7 @@ function lxWaxUrls(size,dark,date,wax){wax=wax||LXS.wax;var k=wax+(dark?"n":"d")
             ux=Math.cos(A),uy=Math.sin(A),vx=-uy,vy=ux,fx=Math.sin(.5)*vx*sd+.1*ux,fy=Math.sin(.5)*vy*sd+.1*uy,fz=Math.cos(.5),e=Math.min(1,Math.max(0,(mS[p]-.55)/.4));
         nx=nx*(1-e)+fx*e;ny=ny*(1-e)+fy*e;nz=nz*(1-e)+fz*e;l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;ny/=l;nz/=l;}
       var dl=nx*LXL[0]+ny*LXL[1]+nz*LXL[2],df=Math.max(0,(dl+.3)/1.3),nh=Math.max(0,nx*LXH[0]+ny*LXH[1]+nz*LXH[2]),sp=Math.pow(nh,14)*.13,
-          cav=Math.max(0,Math.min(1,(Hb[p]-c0)*.55)),th=Math.min(1,Math.max(0,(c0-1)/2.6)),gr=.93+.14*lxVN(i*.9,j*.9),lt=(.34+.86*df)*gr*(1-.42*cav);
+          cav=Math.max(0,Math.min(1,(Hb[p]-c0)*.55)),th=Math.min(1,Math.max(0,(c0-1)/2.6)),gr=.95+.1*lxVN(i*.9,j*.9),lt=((P.amb!=null?P.amb:.34)+(P.dif!=null?P.dif:.86)*df)*gr*(1-(P.cavK!=null?P.cavK:.42)*cav);
       R=(P.deep[0]+(P.base[0]-P.deep[0])*(1-.45*th))*lt;G=(P.deep[1]+(P.base[1]-P.deep[1])*(1-.45*th))*lt;B=(P.deep[2]+(P.base[2]-P.deep[2])*(1-.45*th))*lt;
       if(kind==="ring"){var w=Math.min(1,Math.max(0,(mR[p]-.25)/.5)),pl=(.5+.62*df)*(.96+.06*lxVN(i*.9,j*.9));if(w>0){R+=(P.ink[0]*pl-R)*w;G+=(P.ink[1]*pl-G)*w;B+=(P.ink[2]*pl-B)*w;}}
       else if(kind==="star"){var fl=.6+.55*Math.max(0,dl);R=P.star[0]*fl;G=P.star[1]*fl;B=P.star[2]*fl;}
@@ -1301,7 +1300,7 @@ function lxWire(k){var busy=false,again=false,last="",count=0;function isl(){ret
   k.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!still()){var s=isl();if(s){s.classList.add("down");setTimeout(function(){s.classList.remove("down");},140);}}});}
 /* drawn for the theme and for today; at midnight the date turns over */
 function lxSealPaint(hs){var go=function(){lxSealDraw(hs);};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
-function lxSealDraw(hs){var nt=hs.__nt!=null?hs.__nt:night(),wax=hs.__wax||LXS.wax,S=parseFloat(hs.style.getPropertyValue("--S"))||86,date=lxDate(),key=wax+(nt?"n":"d")+S+date;if(hs.__k2===key)return;hs.__k2=key;
+function lxSealDraw(hs){var nt=hs.__nt!=null?hs.__nt:night(),wax=hs.__wax||"white",S=parseFloat(hs.style.getPropertyValue("--S"))||86,date=lxDate(),key=wax+(nt?"n":"d")+S+date;if(hs.__k2===key)return;hs.__k2=key;
   var U=lxWaxUrls(S,nt,date,wax);hs.querySelector(".lxs-ring").src=U.ring;hs.querySelector(".lxs-star").src=U.star;hs.querySelector(".lxs-heart").src=U.heart;
   hs.querySelector(".lxs-side").innerHTML=lxSideSvg(S,Math.max(3,Math.round(S/22)),nt,wax);hs.querySelector(".r175-seal").setAttribute("data-date",date);
   clearTimeout(hs.__mid);var now=new Date(),mid=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,5);hs.__mid=setTimeout(function(){hs.__k2="";if(hs.isConnected)lxSealDraw(hs);},Math.max(1000,mid-now));}
