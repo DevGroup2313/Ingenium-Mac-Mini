@@ -103,7 +103,13 @@ function demo(){var t=[],now=Date.now();for(var i=0;i<7;i++)t.push({oid:"",short
    larger, with Ingenium's star inlaid), set in a fine silver bezel with four claws; each release a silver collar with its name and a small
    diamond, Build's own, set beneath it; the plinth turned silver with a violet enamel band and an engraved scale; a silver wire twisted
    up the trunk; and every seven seconds (Home's clock) a soft light rises up the trunk to the newest version. Beads, foot, plinth and
-   diamonds are painted once and then only placed, and the turn is drawn at most about thirty times a second. */
+   diamonds are painted once and then only placed, and the turn is drawn at most about thirty times a second.
+   7.00, her words (13 November 2026): "There is also a weird glitching movement happening up and down Fabrica's tree, the drawing seems to
+   be glitching as it spins, please also fix that." Found (with the other session): the silver wire twisted round the trunk seemed to crawl
+   up and down as the tree turned and flickered where its front and back met; the light rising up the trunk every seven seconds read the
+   same way; the silver of each rod jumped every 3.75 degrees; the small diamonds jumped between their eight frames. Now: fine silver
+   bands between the beads in place of the wire, no rising light, the rods' silver in steps of a quarter of a degree, the diamonds
+   blended between frames. */
 var SH=null,DEMO=null,GEMS=[];
 /* the 2D drawing on the tree's canvas */
 function hex(c){var h=function(v){v=Math.round(Math.max(0,Math.min(1,v))*255);return (v<16?"0":"")+v.toString(16);};return "#"+h(c[0])+h(c[1])+h(c[2]);}
@@ -126,7 +132,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
   vcEnv(d*nx,d*ny,d*nz-1,nt,o);var fr=.035+.5*Math.pow(1-nz,5),k=vcWin(d*nx,d*ny,d*nz-1);
   o[0]=vcTone(base[0]*df+o[0]*fr+k*.42);o[1]=vcTone(base[1]*df+o[1]*fr+k*.42);o[2]=vcTone(base[2]*df+o[2]*fr+k*.46);}
   /* ---------- silver, shaded across a rod: the colours across its width for a rod lying along a screen direction ---------- */
-  var RAMP={};function ramp(ang,nt){var b=Math.round(((ang%Math.PI)+Math.PI)%Math.PI/Math.PI*48)%48,key=(nt?"n":"d")+b;if(RAMP[key])return RAMP[key];
+  var RAMP={};function ramp(ang,nt){var b=Math.round(((ang%Math.PI)+Math.PI)%Math.PI/Math.PI*720)%720,key=(nt?"n":"d")+b;if(RAMP[key])return RAMP[key];
     var a=b/48*Math.PI,nx=-Math.sin(a),ny=Math.cos(a),o=[0,0,0],out=[];for(var i=0;i<=8;i++){var th=(i/8*2-1)*1.36;vcSilver(Math.sin(th)*nx,Math.sin(th)*ny,Math.cos(th),nt,o);
       var e=1-0.32*Math.pow(Math.abs(i/8*2-1),3),lf=nt?0.07:0;out.push(hex([o[0]*e+lf,o[1]*e+lf,o[2]*e+lf*1.3]));}return RAMP[key]=out;}
   function tube(g,q,w,P,kind){if(q.length<2)return;var k=0;q.forEach(function(p){k+=p.k;});k/=q.length;var ww=w*k,nt=night();
@@ -223,8 +229,8 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     var g4=[];GR.forEach(function(x){g4.push(x[0],x[1],x[2],x[3]);});gl.uniform4fv(gl.getUniformLocation(pr,"uG[0]"),new Float32Array(g4));gl.uniform1f(gl.getUniformLocation(pr,"uN"),nt?1:0);var uY=gl.getUniformLocation(pr,"uY");
     var out=[];gl.viewport(0,0,N,N);for(var f=0;f<8;f++){gl.uniform1f(uY,f/8*Math.PI/4);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);var cc=D.createElement("canvas");cc.width=cc.height=N;cc.getContext("2d").drawImage(c,0,0);out.push(cc);}
     try{var ext=gl.getExtension("WEBGL_lose_context");if(ext)ext.loseContext();}catch(e){}return GEM[key]=out;}
-  var GEMS=[];function gemAt(g,x,y,size,phase){var fr=gemFrames(night());if(!fr)return;var k=Math.floor(((ANG*2.2+phase)%(Math.PI/4)+Math.PI/4)%(Math.PI/4)/(Math.PI/32))%8;
-    g.drawImage(fr[k],x-size,y-size*0.95,size*2,size*2);GEMS.push([x,y,size,phase]);}
+  var GEMS=[];function gemAt(g,x,y,size,phase){var fr=gemFrames(night());if(!fr)return;var gu=(((ANG*2.2+phase)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/32),k=Math.floor(gu)%8,gf=gu-Math.floor(gu),ga=g.globalAlpha;
+    g.drawImage(fr[k],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga*gf;g.drawImage(fr[(k+1)%8],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga;GEMS.push([x,y,size,phase]);}
   /* ---------- a silver setting round a bead: a fine bezel and four claws ---------- */
   function setting(g,x,y,R){var nt=night(),gr=g.createLinearGradient(x-R,y-R,x+R,y+R);gr.addColorStop(0,nt?"#f2eefb":"#ffffff");gr.addColorStop(0.5,nt?"#8c86a6":"#c9c4d8");gr.addColorStop(1,nt?"#3c3652":"#7d7695");
     g.strokeStyle=gr;g.lineWidth=Math.max(0.8,R*0.075);g.beginPath();g.arc(x,y,R*1.04,0,TAU);g.stroke();g.fillStyle=gr;for(var i=0;i<4;i++){var a=i*Math.PI/2+Math.PI/4;g.beginPath();g.arc(x+Math.cos(a)*R*1.02,y+Math.sin(a)*R*1.02,Math.max(0.8,R*0.09),0,TAU);g.fill();}}
@@ -253,7 +259,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     try{var ext=gl.getExtension("WEBGL_lose_context");if(ext)ext.loseContext();}catch(e){}return GLS[key]=cc;}
   /* ---------- the light of your history: every seven seconds (Home's clock) a soft light rises up the silver trunk from the root to your
      newest version, lighting each glass bead from within as it passes, and settles in the newest bead ---------- */
-  var RISE=null;function rise(){if(still()||!SH)return null;var t=performance.now()/1000,f=(t%7)/2.6;if(f>1.3)return null;var hb=SH.beads.filter(function(b){return b.head;})[0];if(!hb)return null;
+  var RISE=null;function rise(){return null;/* 7.00: gone; it read as a glitch running up and down the tree */if(still()||!SH)return null;var t=performance.now()/1000,f=(t%7)/2.6;if(f>1.3)return null;var hb=SH.beads.filter(function(b){return b.head;})[0];if(!hb)return null;
     return {h:Math.min(f,1)*hb.p[1],a:f<0.08?f/0.08:(f<1?1:Math.max(0,(1.3-f)/0.3)),end:f>=1?Math.min(1,(f-1)/0.1)*Math.max(0,(1.3-f)/0.3):0};}
   function riseTrunk(g,ang){var P=RISE;if(!P||P.a<=0||P.h<=0)return;var q=proj([0,P.h,0],ang),nt=night(),R=34*q.k;g.save();g.globalCompositeOperation=nt?"lighter":"screen";g.translate(q.x,q.y);g.scale(0.34,1);
     var gr=g.createRadialGradient(0,0,0,0,0,R);gr.addColorStop(0,nt?"rgba(232,220,255,"+(0.7*P.a)+")":"rgba(255,255,255,"+(0.9*P.a)+")");gr.addColorStop(0.45,nt?"rgba(170,130,250,"+(0.26*P.a)+")":"rgba(226,212,255,"+(0.34*P.a)+")");gr.addColorStop(1,"rgba(150,110,240,0)");
@@ -274,10 +280,10 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     g.save();g.beginPath();g.ellipse(CX,cy,rx*0.985,ry*0.985,0,0,TAU);g.clip();g.globalAlpha=nt?0.15:0.12;var pR=function(p){return proj([p[0],-p[1]*0.94,p[2]],ang);};
     S.tubes.forEach(function(t){tube(g,t.pts.map(pR),t.w,null,t.kind);});S.beads.forEach(function(b){var gs=glassSprite(b.kind,nt,!!b.head);if(!gs)return;var q=pR(b.p),R=b.r*q.k;g.drawImage(gs,q.x-R,q.y-R,R*2,R*2);});g.restore();
     var fq=proj([0,0,0],ang);g.drawImage(footImg(nt),fq.x-40,fq.y-50,80,80);
-    /* the silver wire: two strands twisted up the trunk, behind it and before it, with diamonds set on it */
-    var hb0=S.beads.filter(function(b){return b.head;})[0],top=hb0?hb0.p[1]-20:0;[0,Math.PI].forEach(function(ph0,si){var pts=[];for(var yy=6;yy<=top;yy+=3)pts.push([11.5*Math.cos(yy/52*TAU+ph0),yy,11.5*Math.sin(yy/52*TAU+ph0)]);
-      var q=pts.map(function(p){return proj(p,ang);});var run=[q[0]],back=q[0].z>0;for(var i2=1;i2<q.length;i2++){var bk=q[i2].z>0;run.push(q[i2]);
-        if(bk!==back||i2===q.length-1){prims.push({z:back?1:0.2,f:function(rr){return function(){tube(g,rr,3.4,null,"wire");};}(run.slice())});run=[q[i2]];back=bk;}}});
+    /* fine silver bands round the trunk between its beads (a still ring cannot seem to crawl as the tree turns) */
+    var mains=S.beads.filter(function(b){return b.kind==="main";}).map(function(b){return b.p[1];}).sort(function(a,b){return a-b;});
+    for(var mb=1;mb<mains.length;mb++){(function(hh){var q=proj([0,hh,0],ang),rx3=10.6*q.k,ry3=rx3*Math.sin(PITCH)+0.8;
+      prims.push({z:q.z+0.45,f:function(){collar(g,q.x,q.y,rx3,ry3,Math.PI,TAU,2.3);}});prims.push({z:q.z-0.45,f:function(){collar(g,q.x,q.y,rx3,ry3,0,Math.PI,2.3);}});})((mains[mb-1]+mains[mb])/2);}
     S.tubes.forEach(function(t){var q=t.pts.map(function(p){return proj(p,ang);});
       if(t.kind==="trunk"){prims.push({z:0.4,f:function(){tube(g,q,t.w,null,t.kind);riseTrunk(g,ang);}});return;}
       var run=[q[0]],back=q[0].z>0;for(var i=1;i<q.length;i++){var bk=q[i].z>0;run.push(q[i]);

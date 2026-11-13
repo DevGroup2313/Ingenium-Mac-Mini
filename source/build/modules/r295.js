@@ -6,7 +6,7 @@
    Waterfall, Waves, Birds, Night and Wind, and the volume. Each place is made on this device the first time it is chosen (nothing is
    fetched or stored), as a seamless loop, and then only played, so it costs nearly nothing; switching fades one into the next, and it
    keeps playing from page to page until Quiet is chosen. Ingenium never starts one by itself: after a restart it is quiet, and the menu
-   remembers the last place and the volume. The stones of Focus answer a touch with soft water, under Ingenium's own sound switch. */
+   remembers the last place and the volume. The stones of Focus answer a touch with the sound of a stone meeting water, under Ingenium's own sound switch. */
 .cl-key#natureBtn .nat-dot{display:inline-block;width:6px;height:6px;margin-left:1px;border-radius:50%;background:var(--accent,#6a3fb5);vertical-align:middle}
 .cl-key#natureBtn:not(.nat-on) .nat-dot{display:none}
 .pres-menu.nat-menu{min-width:270px}
@@ -29,7 +29,7 @@ var WAIT="";function said(kind){WAIT="";paintKey();paintMenu();try{if(typeof W.o
 var Nature=(function(){var ac=null,mst=null,tb=null,mode="off",src={},buf={},vol=0.85;
   function ctx(){var C=W.AudioContext||W.webkitAudioContext;if(!C)return null;if(!ac){ac=new C();mst=ac.createGain();mst.gain.value=0.0001;var cmp=ac.createDynamicsCompressor();cmp.threshold.value=-18;cmp.ratio.value=2.5;mst.connect(cmp);cmp.connect(ac.destination);
       /* the touches' own bus: dry, and a little room */
-      tb=ac.createGain();tb.gain.value=1;var cv=ac.createConvolver(),wet=ac.createGain();cv.buffer=room(ac,1.6,3.2);wet.gain.value=0.35;tb.connect(ac.destination);tb.connect(cv);cv.connect(wet);wet.connect(ac.destination);}
+      tb=ac.createGain();tb.gain.value=1;var cv=ac.createConvolver(),wet=ac.createGain();cv.buffer=room(ac,1.2,3.6);wet.gain.value=0.20;tb.connect(ac.destination);tb.connect(cv);cv.connect(wet);wet.connect(ac.destination);}
     if(ac.state!=="running"){try{ac.resume();}catch(e){}}return ac;}
   function room(c,sec,decay){var n=Math.floor(c.sampleRate*sec),b=c.createBuffer(2,n,c.sampleRate);for(var ch=0;ch<2;ch++){var d=b.getChannelData(ch);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,decay)*0.5;}return b;}
   /* ---------- a small kit for making sound sample by sample ---------- */
@@ -114,22 +114,33 @@ var Nature=(function(){var ac=null,mst=null,tb=null,mode="off",src={},buf={},vol
   function play(kind){var c=ctx();if(!c)return;mode=kind;Object.keys(src).forEach(function(k){if(k!==kind)fade(k);});mst.gain.cancelScheduledValues(c.currentTime);mst.gain.setTargetAtTime(vol,c.currentTime,0.6);
     get(kind,function(b){if(mode!==kind||src[kind])return;var s=c.createBufferSource();s.buffer=b;s.loop=true;var g=c.createGain();g.gain.value=0.0001;s.connect(g);g.connect(mst);s.start();g.gain.setTargetAtTime(1,c.currentTime,1.0);src[kind]={s:s,g:g};said(kind);});}
   function stop(){mode="off";Object.keys(src).forEach(fade);said("off");}
-  /* a touch on a stone: soft water against it, never a chirp; a little different for each of the stone's ways */
-  function touch(name,i){try{if(W.IngSound&&typeof IngSound.allowed==="function"&&!IngSound.allowed())return;}catch(x){}var c=ctx();if(!c)return;var t=c.currentTime+0.01,pan=i==null?0:(i-2)*0.22;
-    function pn(node){if(c.createStereoPanner){var p=c.createStereoPanner();p.pan.value=pan;node.connect(p);p.connect(tb);}else node.connect(tb);}
-    function lap(t0,dur,fc,amp){var n=c.createBufferSource(),len=Math.floor(c.sampleRate*(dur+0.1)),b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0),l=0;for(var k=0;k<len;k++){l=0.97*l+0.03*(Math.random()*2-1);d[k]=l*5;}n.buffer=b;
-      var f=c.createBiquadFilter();f.type="lowpass";f.Q.value=0.4;f.frequency.setValueAtTime(fc*0.5,t0);f.frequency.linearRampToValueAtTime(fc,t0+dur*0.3);f.frequency.linearRampToValueAtTime(fc*0.4,t0+dur);
-      var g=c.createGain();g.gain.setValueAtTime(0.0001,t0);g.gain.linearRampToValueAtTime(amp,t0+dur*0.28);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);n.connect(f);f.connect(g);pn(g);n.start(t0);n.stop(t0+dur+0.05);}
-    function blub(t0,f0,amp){var o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f0*1.12,t0+0.10);g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(amp,t0+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.18);o.connect(g);pn(g);o.start(t0);o.stop(t0+0.22);}
-    if(name==="double"){lap(t,0.6,650,0.05);lap(t+0.30,0.55,560,0.035);}
-    else if(name==="hop"){lap(t+0.42,0.7,720,0.06);blub(t+0.45,190,0.02);}
-    else if(name==="swirl"){lap(t,1.5,480,0.045);}
-    else if(name==="glint"){lap(t,0.55,600,0.035);var o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=1318.5;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.008,t+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+1.8);o.connect(g);pn(g);o.start(t);o.stop(t+1.9);}
-    else if(name==="chain"){for(var k=0;k<5;k++)lap(t+k*0.32,0.55,560+k*30,0.03);}
-    else if(name==="bloom"){lap(t,0.9,560,0.06);blub(t+0.03,170,0.02);}
-    else{lap(t,0.7,680,0.055);blub(t+0.02,180,0.016);}}
+  /* a touch on a stone: the sound of a stone meeting water. Her words (13 November 2026): "they are supposed to sound like stone touching
+     water or falling on water or being dropped or even being skipped on water and not this heavy woosh sound". So each sound is made only of
+     what a stone in water really makes: the small slap where it meets the surface, the round note of the air it pulls under (a bubble's note
+     rises as it closes, and fades), and the drops that fall back afterwards; a skipped stone is a run of light slaps, each nearer the last
+     and softer, then a small plunk. No rushing noise at all. Each of the stone's ways has its own: set down, dropped in, tapped twice,
+     lifted and landed, bubbles circling, skipped away across the water, and the whole path touched in turn. */
+  var NZ=null;function nz(c){if(NZ&&NZ.sampleRate===c.sampleRate&&NZ.__c===c)return NZ;var n=Math.floor(c.sampleRate*0.5),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var k=0;k<n;k++)d[k]=Math.random()*2-1;b.__c=c;return NZ=b;}
+  function voice(c,out,t,name,pan){var R=Math.random;
+    function pn(node,p){if(c.createStereoPanner){var s=c.createStereoPanner();s.pan.value=Math.max(-1,Math.min(1,p));node.connect(s);s.connect(out);}else node.connect(out);}
+    function slap(t0,amp,fc,dur,p){var n=c.createBufferSource();n.buffer=nz(c);var f=c.createBiquadFilter();f.type="bandpass";f.frequency.value=fc;f.Q.value=0.9;var h=c.createBiquadFilter();h.type="highpass";h.frequency.value=700;
+      var g=c.createGain();g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(amp,t0+0.002);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);n.connect(f);f.connect(h);h.connect(g);pn(g,p);n.start(t0,R()*0.4);n.stop(t0+dur+0.02);}
+    function bub(t0,f0,rise,tau,amp,p){var o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f0*rise,t0+tau*3.2);
+      g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(amp,t0+0.003);g.gain.exponentialRampToValueAtTime(0.0001,t0+tau*5.0);o.connect(g);pn(g,p);o.start(t0);o.stop(t0+tau*5.0+0.03);}
+    function drops(t0,n,amp,p){for(var k=0;k<n;k++){var tk=t0+0.06+R()*0.32,f=900+R()*1300;bub(tk,f,1.35+R()*0.3,0.010+R()*0.008,amp*(0.5+R()*0.6),p+(R()-0.5)*0.5);if(R()<0.5)slap(tk,amp*0.25,3200,0.012,p);}}
+    function setDown(t0,p,k){slap(t0,0.020*k,2400,0.022,p);bub(t0+0.004,520+R()*160,1.7,0.020,0.045*k,p);}
+    function plunk(t0,p,k){slap(t0,0.030*k,1900,0.035,p);bub(t0+0.006,240+R()*60,1.9,0.034,0.070*k,p);bub(t0+0.012,610+R()*120,1.5,0.012,0.020*k,p);drops(t0,3,0.018*k,p);}
+    function skip(t0,p,n){var dt=0.20,a=1.0,tk=t0,pp=p;for(var k=0;k<n;k++){slap(tk,0.022*a,2700,0.016,pp);bub(tk+0.003,700+k*60,1.5,0.010,0.022*a,pp);tk+=dt;dt*=0.78;a*=0.78;pp+=0.16;}plunk(tk,pp,0.55);}
+    if(name==="double"){setDown(t,pan,1.0);setDown(t+0.30,pan,0.8);}
+    else if(name==="hop"){setDown(t,pan,0.45);plunk(t+0.43,pan,1.0);}
+    else if(name==="swirl"){for(var k=0;k<5;k++)bub(t+k*0.16+R()*0.04,380+k*45,1.6,0.024,0.024*(1-k*0.12),pan+Math.sin(k*1.3)*0.35);}
+    else if(name==="glint"){skip(t,pan-0.25,5);}
+    else if(name==="chain"){for(var k2=0;k2<5;k2++)setDown(t+k2*0.32,(k2-2)*0.30,0.9-k2*0.08);}
+    else if(name==="bloom"){plunk(t,pan,1.15);}
+    else{plunk(t,pan,0.85);}}
+  function touch(name,i){try{if(W.IngSound&&typeof IngSound.allowed==="function"&&!IngSound.allowed())return;}catch(x){}var c=ctx();if(!c)return;voice(c,tb,c.currentTime+0.01,name,i==null?0:(i-2)*0.22);}
   return {start:function(k){play(k||"stream");},stop:stop,mode:function(){return mode;},on:function(){return mode!=="off";},touch:touch,volume:function(v){vol=v;if(ac&&mst&&mode!=="off")mst.gain.setTargetAtTime(v,ac.currentTime,0.3);},
-    hush:function(){},drop:function(s,i){touch("ring",i);}};})();
+    hush:function(){},drop:function(s,i){touch("ring",i);},voice:voice};})();
 Nature.volume(PREF.vol);
 var PLACES=[["off","Quiet","No sound"],["stream","Stream","Small bubbles over a soft, low body of water"],["rain","Rain","Soft rain, near and far"],["waterfall","Waterfall","Falling water, deep and steady"],
   ["waves","Waves","Waves coming in on a beach"],["birds","Birds","Birdsong in the morning"],["night","Night","A summer night: crickets, and a frog now and then"],["wind","Wind","Wind in the trees"]];

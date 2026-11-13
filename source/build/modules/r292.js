@@ -80,14 +80,25 @@ var Diamond=(function(){
   "float h1(float n){return fract(sin(n)*43758.5453);}",
   "float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);float n=i.x+i.y*57.0;return mix(mix(h1(n),h1(n+1.0),f.x),mix(h1(n+57.0),h1(n+58.0),f.x),f.y);}",
   /* the day: a white studio with a few deep panels; the night: the violet room with the aurora in it */
-  "vec3 envD(vec3 w){float up=w.y;vec3 c=mix(vec3(1.70,1.72,1.86),vec3(3.0,3.0,3.1),smoothstep(-0.2,0.7,up));",
-  "  c=mix(c,vec3(0.70,0.80,1.10)*1.7,smoothstep(0.05,-0.5,up)*0.6);",
-  "  float dk=sbox(w,normalize(vec3(0.97,0.05,-0.22)),vec2(0.18,0.75),0.3)+sbox(w,normalize(vec3(-0.94,0.0,-0.34)),vec2(0.17,0.7),0.3)",
-  "    +sbox(w,normalize(vec3(0.30,0.12,-0.95)),vec2(0.13,0.30),0.3)+sbox(w,normalize(vec3(-0.30,0.10,-0.95)),vec2(0.12,0.25),0.3)+0.95*sbox(w,normalize(vec3(0.0,0.30,1.0)),vec2(0.18,0.13),0.3)+0.8*sbox(w,normalize(vec3(0.55,-0.2,-0.8)),vec2(0.10,0.18),0.3);",
-  "  c=mix(c,vec3(0.02,0.03,0.08),clamp(dk,0.0,1.0));",
-  "  c=mix(c,vec3(0.30,0.46,0.86)*1.5,sbox(w,normalize(vec3(-0.6,-0.35,0.7)),vec2(0.26,0.2),0.5)*0.85);",
-  "  c=mix(c,vec3(0.36,0.52,0.92)*1.4,sbox(w,normalize(vec3(0.7,-0.25,0.6)),vec2(0.18,0.16),0.5)*0.6);",
-  "  c+=sbox(w,normalize(vec3(-0.55,0.66,0.52)),vec2(0.20,0.32),0.22)*12.0+sbox(w,normalize(vec3(0.05,1.0,0.12)),vec2(0.32,0.32),0.3)*5.0+sbox(w,normalize(vec3(0.78,0.30,0.55)),vec2(0.07,0.40),0.3)*6.0+sbox(w,normalize(vec3(-0.85,0.12,-0.5)),vec2(0.05,0.30),0.3)*4.0;return c;}",
+  /* clear crystal by day, after her picture of the clear diamond on white: white light above, a ring of dark cards round the horizon with
+     white between them (so the facets near the girdle read black and white, as a real stone's do), a cool steel-blue floor, the dark card
+     behind the eye, crisp key lights */
+  "vec3 envC(vec3 w){float up=w.y;float az=atan(w.x,-w.z);vec3 c=mix(vec3(1.9,1.92,2.0),vec3(3.0,3.0,3.1),smoothstep(0.0,0.7,up));",
+  "  float ring=1.0-smoothstep(0.16,0.30,abs(up-0.02));float cards=1.0-smoothstep(0.05,0.12,abs(fract(az/6.2832*6.0+0.1)-0.5)-0.16);c=mix(c,vec3(0.03,0.04,0.10),ring*cards*0.95);",
+  "  c=mix(c,mix(vec3(0.55,0.68,1.0)*1.6,vec3(0.10,0.14,0.30),smoothstep(-0.2,-0.9,up)),smoothstep(0.02,-0.25,up));",
+  "  c=mix(c,vec3(0.02,0.03,0.07),sbox(w,normalize(vec3(0.0,0.30,1.0)),vec2(0.16,0.12),0.15)*0.95);",
+  "  c+=sbox(w,normalize(vec3(-0.55,0.66,0.52)),vec2(0.18,0.30),0.12)*14.0+sbox(w,normalize(vec3(0.05,1.0,0.12)),vec2(0.30,0.30),0.15)*6.0+sbox(w,normalize(vec3(0.78,0.30,0.55)),vec2(0.06,0.40),0.12)*8.0+sbox(w,normalize(vec3(-0.85,0.12,-0.5)),vec2(0.05,0.30),0.12)*5.0;return c;}",
+  /* purple by day: the night's violet room made lighter, with the night's bright lights (her words: "a lighter purple version of the Night
+     mode diamond for the day mode look") */
+  "vec3 envV(vec3 w){float up=w.y;vec3 c=mix(vec3(0.30,0.18,0.56),vec3(0.94,0.80,1.24),smoothstep(-0.25,0.85,up));c*=mix(1.0,0.58,smoothstep(0.02,-0.45,up));",
+  "  float dk=sbox(w,normalize(vec3(0.97,0.05,-0.22)),vec2(0.17,0.75),0.5)+sbox(w,normalize(vec3(-0.94,0.0,-0.34)),vec2(0.15,0.7),0.5)",
+  "    +sbox(w,normalize(vec3(0.30,0.12,-0.95)),vec2(0.15,0.30),0.5)+sbox(w,normalize(vec3(-0.30,0.10,-0.95)),vec2(0.13,0.25),0.5)+0.9*sbox(w,normalize(vec3(0.0,0.30,1.0)),vec2(0.12,0.10),0.5);",
+  "  c=mix(c,vec3(0.09,0.04,0.22),clamp(dk,0.0,1.0)*0.9);",
+  "  float az=atan(w.x,-w.z);float bk=smoothstep(-0.1,0.55,-w.z);float yc=0.24+0.07*sin(az*2.6+uT*0.12)+0.03*sin(az*6.3-uT*0.2);",
+  "  float band=exp(-pow((up-yc)/0.12,2.0))*bk;float rays=0.55+0.45*sin(az*30.0+2.0*sin(az*5.0+uT*0.25));",
+  "  c+=mix(vec3(0.56,0.32,1.0),vec3(0.92,0.56,1.0),0.5+0.5*sin(az*1.7+uT*0.07))*band*rays*1.2;",
+  "  c+=sbox(w,normalize(vec3(-0.55,0.66,0.52)),vec2(0.20,0.32),0.22)*9.0+sbox(w,normalize(vec3(0.05,1.0,0.12)),vec2(0.32,0.32),0.3)*4.2+sbox(w,normalize(vec3(0.78,0.30,0.55)),vec2(0.07,0.40),0.3)*5.5+sbox(w,normalize(vec3(-0.85,0.12,-0.5)),vec2(0.05,0.30),0.3)*3.6;return c;}",
+  "vec3 envD(vec3 w){return uLv<0.5?envC(w):envV(w);}",
   "vec3 envP(vec3 w){float up=w.y;vec3 c=mix(vec3(0.80,0.74,0.94),vec3(1.03,0.99,1.08),smoothstep(-0.25,0.85,up));c*=mix(1.0,0.72,smoothstep(0.02,-0.45,up));",
   "  c+=sbox(w,normalize(vec3(-0.55,0.66,0.52)),vec2(0.20,0.32),0.22)*6.0+sbox(w,normalize(vec3(0.05,1.0,0.12)),vec2(0.32,0.32),0.3)*2.6+sbox(w,normalize(vec3(0.78,0.30,0.55)),vec2(0.07,0.40),0.3)*3.2;return c;}",
   "vec3 envN(vec3 w,float aw){float up=w.y;vec3 c=mix(vec3(0.035,0.028,0.07),vec3(0.17,0.13,0.29),smoothstep(-0.25,0.85,up));c*=mix(1.0,0.35,smoothstep(0.02,-0.45,up));",
@@ -107,7 +118,7 @@ var Diamond=(function(){
   "  float b=dot(ro,rd),c=dot(ro,ro)-1.04,h=b*b-c;if(h<0.0)return vec3(0.0);",
   "  float tn,tf;vec3 nn,nf;cvx(ro,rd,tn,tf,nn,nf);if(!(tn<tf&&tn>0.0))return vec3(0.0);hit=1.0;th=tn;",
   "  vec3 p=ro+rd*tn;float F=fr(-dot(rd,nn));vec3 col=F*env(toW(reflect(rd,nn)));vec3 d=refract(rd,nn,1.0/IOR);vec3 thr=vec3(1.0-F);",
-  "  vec3 io=uN>0.5?vec3(2.37,2.42,2.48):vec3(2.33,2.42,2.53);",
+  "  vec3 io=uN>0.5?vec3(2.37,2.42,2.48):(uLv<0.5?vec3(2.395,2.42,2.455):vec3(2.33,2.42,2.53));",
   "  for(int k=0;k<6;k++){cvx(p+d*0.0005,d,tn,tf,nn,nf);p=p+d*tf;vec3 m=nf;vec3 oc=vec3(0.0);",
   "    vec3 t1=refract(d,-m,io.r);if(dot(t1,t1)>0.0)oc.r=(1.0-fr(dot(t1,m)))*env(toW(t1)).r;",
   "    vec3 t2=refract(d,-m,io.g);if(dot(t2,t2)>0.0)oc.g=(1.0-fr(dot(t2,m)))*env(toW(t2)).g;",
@@ -116,7 +127,7 @@ var Diamond=(function(){
   "    if(max(thr.r,max(thr.g,thr.b))<0.03)break;}",
   "  col+=thr*env(toW(d))*0.5;",
   /* by night the fire is the spectrum and Ingenium's violets together */
-  "  if(uN>0.5){float l=dot(col,vec3(0.3,0.5,0.2));col=mix(col,mix(vec3(l),vec3(0.62,0.40,1.0)*l*1.35,0.75),0.32);}",
+  "  if(uN>0.5){float l=dot(col,vec3(0.3,0.5,0.2));col=mix(col,mix(vec3(l),vec3(0.62,0.40,1.0)*l*1.35,0.75),0.32);}else if(uLv>0.5){float l=dot(col,vec3(0.3,0.5,0.2));col=mix(col,vec3(0.78,0.60,1.0)*l*1.25,0.28*(1.0-smoothstep(1.2,2.6,l)));}",
   "  return col;}",
   "float plinth(vec3 ro,vec3 rd,out vec3 n,out vec3 p,out float side){float Rp=1.8,H=0.24,t=1e9;side=0.0;n=vec3(0.0,1.0,0.0);p=vec3(0.0);",
   "  if(rd.y<0.0){float tt=-ro.y/rd.y;vec3 q=ro+rd*tt;if(dot(q.xz,q.xz)<Rp*Rp){t=tt;p=q;}}",
@@ -191,18 +202,11 @@ var Diamond=(function(){
   "    col+=vec3(1.0,0.96,1.0)*beam(ro,rd,E,P1,0.020,1e9,s1,0.25,0.0,1.6*on1)+hue(0.35)*beam(ro,rd,P1,P2,0.020,1e9,s2,0.25,0.0,1.4*on2);",
   "    col=tm(col);}",
   "  else if(tp<1e8){col=plinthCol(pp,pn,rd,side,glow);a=1.0;th=tp;}",
-  "  else{vec4 au=aurora(v);float ai=uN>0.5?0.95:0.45;vec4 bk=bokeh(v);float bi=uN>0.5?0.16:0.34;col=au.rgb*ai+bk.rgb*bi;a=clamp(au.a*ai+bk.a*bi,0.0,1.0);",
-  "    vec2 hc=(v-vec2(0.5,0.62))*vec2(uAsp,1.0);float halo=exp(-dot(hc,hc)/0.05)*mix(0.30,0.26,uN);col+=mix(vec3(0.92,0.88,1.0),vec3(0.55,0.36,0.95),uN)*halo;a=max(a,halo);}",
+  "  else{vec4 au=aurora(v);float ai=uN>0.5?0.95:0.45;col=au.rgb*ai;a=clamp(au.a*ai,0.0,1.0);",
+  "    vec2 hc=(v-vec2(0.5,0.62))*vec2(uAsp,1.0);float halo=exp(-dot(hc,hc)/0.05)*mix(0.08,0.26,uN);col+=vec3(0.55,0.36,0.95)*halo;a=max(a,halo);}",
   /* the ray in, the three fans out (the falling one glances off the plinth), each with its pulse */
   "  float I=mix(0.36,0.52,uN);vec3 E=rotA(uDC+vec3(-0.30,0.24,0.25),laz);vec3 L=vec3(0.0);float sw=sin(uT*0.37)*0.4+sin(uT*0.17+1.3)*0.25;",
   "  vec3 S0=rotA(vec3(-3.3+0.4*sw,3.85-0.35*sw,1.0+0.2*sw),laz);L+=vec3(1.0,0.98,1.0)*beam(ro,rd,S0,E,0.014,th,sIn,0.10,bs,2.8*onIn)*I;",
-  "  vec3 X0=rotA(uDC+vec3(0.36,-0.40,0.22),laz);vec2 k0=kp();vec3 P0=vec3(k0.x,0.0,k0.y);",
-  "  for(int i=0;i<5;i++){float h=float(i)/4.0;vec3 e1=P0+vec3(0.08*(h-0.5),0.0,0.07*(h-0.5));L+=hue(h)*beam(ro,rd,X0,e1,0.011,th,sOut,0.16,bs,2.4*onOut)*I*0.7;",
-  "    vec3 rf=reflect(normalize(e1-X0),vec3(0.0,1.0,0.0));L+=hue(h)*beam(ro,rd,e1,e1+rf*1.15,0.009,th,clamp(sOut*1.6-0.6,0.0,1.0),0.2,0.35*bs,1.6*onOut)*I*0.3;}",
-  "  for(int g=1;g<3;g++){float fg=float(g);vec3 X=rotA(uDC+(g==1?vec3(0.80,0.06,0.18):vec3(-0.78,-0.02,0.30)),laz);",
-  "    float az=(g==1?0.30:2.85)+0.30*sin(uY+fg*2.0)+0.06*sin(uT*0.31+fg);float el=(g==1?0.34:0.13)+0.04*sin(uT*0.23+fg*1.7);float k=g==1?0.55:0.40;",
-  "    for(int i=0;i<5;i++){float h=float(i)/4.0;float a2=az+(h-0.5)*0.07;vec3 dir=rotV(normalize(vec3(cos(a2),el+(h-0.5)*0.03,0.35*sin(a2)+0.15)),laz);",
-  "      L+=hue(h)*beam(ro,rd,X,X+dir*3.4,0.012+0.003*fg,th,sOut,0.10,bs,2.6*onOut)*I*k;}}",
   "  float eb=smoothstep(0.0,0.10,v.x)*smoothstep(1.0,0.90,v.x)*smoothstep(0.0,0.08,v.y)*smoothstep(1.0,0.88,v.y);vec3 Lt=tm(L)*eb;",
   "  col=col+Lt*(1.0-0.35*a);a=max(a,clamp(max(Lt.r,max(Lt.g,Lt.b))*1.15,0.0,1.0));gl_FragColor=vec4(min(col,vec3(a)),a);}"].join("\n");
   function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
@@ -240,8 +244,8 @@ var Diamond=(function(){
     var hitA=Math.exp(-Math.pow((f-0.095)/0.025,2)),outA=Math.exp(-Math.pow((f-0.175)/0.03,2));
     var e0=rotXZ([-0.30,0.24,0.25],az),en=proj([DC[0]+e0[0],DC[1]+e0[1],DC[2]+e0[2]]);star(en[0],en[1],8+16*hitA,(MV?0.0:0.25)+(MV?1.0:0.75)*hitA,nt);
     [[0.36,-0.40,0.22],[0.80,0.06,0.18],[-0.78,-0.02,0.30]].forEach(function(e){var r=rotXZ(e,az),p=proj([DC[0]+r[0],DC[1]+r[1],DC[2]+r[2]]);star(p[0],p[1],6+12*outA,outA*0.9,nt);});
-    /* with her changes, the whole stone sparkles as the light passes through it: facets flash, never the same ones twice running */
-    if(MV){var cyc=Math.floor(t/PER),fl=Math.exp(-Math.pow((f-0.14)/0.08,2));if(fl>0.02)for(var k=0;k<SPK.length;k++){var hk=Math.sin((k+1)*12.9898+cyc*78.233)*43758.5453;hk-=Math.floor(hk);if(hk<0.6)continue;
+    /* the whole stone sparkles as the light passes through it: facets flash, never the same ones twice running */
+    {var cyc=Math.floor(t/PER),fl=Math.exp(-Math.pow((f-0.14)/0.08,2));if(fl>0.02)for(var k=0;k<SPK.length;k++){var hk=Math.sin((k+1)*12.9898+cyc*78.233)*43758.5453;hk-=Math.floor(hk);if(hk<0.6)continue;
       var sk=SPK[k],Pk=mv(M,sk.p);Pk=[Pk[0]+DC[0],Pk[1]+DC[1],Pk[2]+DC[2]];var Nk=mv(M,gN(sk));if(dot(Nk,nrm(sub(CP,Pk)))<=0.0)continue;var xyk=proj(Pk),ak=fl*Math.exp(-Math.pow((f-0.10-hk*0.12)/0.05,2));star(xyk[0],xyk[1],4+9*ak,ak,nt);}}
     /* motes of light in the air, drifting slowly, each twinkling now and then */
     for(var j=0;j<MOTES.length;j++){var m=MOTES[j],x=40+m[0]*440,y=40+((m[1]-t*0.006*m[2])%1+1)%1*300,tw=Math.pow(0.5+0.5*Math.sin(t*1.3*m[2]+m[3]),6);
@@ -252,7 +256,7 @@ var Diamond=(function(){
   /* the light, as it was in her preview, every animation kept, with the four still rays gone. Her words (13 November 2026): "revert the
      Build page's light animation back"; "Just remove the 4 still light rays that look like strings holding the diamond but keep all of
      the animations." (MV 1, kept for a later choice and off: the paths turning slowly round the stone, the light a third faster.) */
-  var MV=0,SP=1.35,LV=0;
+  var MV=0,SP=1.35,LV=1;
   function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,busy=over||t-press<2.5,gap=busy?16:33;
     if(ts-lastDraw<gap){raf=requestAnimationFrame(frame);return;}var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(lastDraw){var took=ts-lastDraw;if(took>gap*1.9)slowN++;else slowN=Math.max(0,slowN-1);if(slowN>12&&q>0.7&&!W.__keepQ){q=Math.max(0.7,q*0.85);slowN=0;size();}}
