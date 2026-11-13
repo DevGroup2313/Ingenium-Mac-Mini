@@ -48,8 +48,14 @@ async function press(p, text, scope) { const b = p.locator((scope || '#cs') + ' 
   await p.waitForTimeout(600);
   // 1. the room and its steps
   const tabs = await p.evaluate(() => [...document.querySelectorAll('#cs .rm-tabs [data-room]')].map(t => t.textContent.trim()));
-  ok(tabs[1] === 'Your mentor', 'the Career Studio has a room Your mentor, second after Today', tabs);
   const steps = await p.evaluate(() => [...document.querySelectorAll('#cs .c-list .c-item b')].map(x => x.textContent.trim()));
+  /* 6.93: where Your counsellor rides (modules/r283.js), it takes the mentor's room and its work; rig/t_690_counsel.js tests it whole */
+  if (await p.evaluate(() => !!window.IngCounsel)) {
+    ok(tabs[1] === 'Your counsellor', 'the Career Studio has a room Your counsellor, second after Today, in the mentor\'s place', tabs);
+    ok(steps.length === 5 && /^1\. What you have/.test(steps[0]) && /^5\. This week/.test(steps[4]), 'its five stages are in view (the mentor\'s steps are the counsellor\'s now; rig/t_690_counsel.js tests them)', steps);
+    await b.close(); console.log(`\n${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
+  }
+  ok(tabs[1] === 'Your mentor', 'the Career Studio has a room Your mentor, second after Today', tabs);
   ok(steps.length === 7 && /^1\. What I can read about you/.test(steps[0]) && /^7\. Your mentor/.test(steps[6]), 'its seven steps are in view', steps);
   // 2. step 1: the CV through the page's own file picker
   const [fc] = await Promise.all([p.waitForEvent('filechooser'), press(p, 'Add', '#csWork')]);
