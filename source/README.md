@@ -387,6 +387,14 @@ page, I think the violet hues look better on the Build page without the full spe
   about a quarter of the time), faster under the pointer, drawn only on facets turned toward the eye; still under Minimal motion.
 - The northern lights stay violet. For a while that day they ran through the full spectrum, as Focus's do; at her word they are back to
   their violet hues on Build, and the full spectrum stays on Focus only. No page was released with them.
+- Starbursts (her words: "There is still not even sparkles or glittering effect for the diamond on the Build page. The build page's
+  diamond is desperately needing its shimmering and glittering effect, it looks slightly dull without it"). Measured in the app (7.03),
+  the sparkle layer was on screen and drawing (about 425 lit pixels a frame), but its sparkles were four-pointed stars a few pixels
+  across and did not read as glitter. Now every sparkle of 4.5 pixels or more carries long fine rays (a cross 2.6 times its size and a
+  diagonal cross 1.4 times), white by night and white over violet by day so they show on the light sky; the specks and glittering
+  points are a little larger (2.4 to 7 and 2.6 to 6.6 pixels across their radius), so more of them carry rays. A scintillation of the
+  facets in the stone's own shader was tried the same hour and taken out at her word ("Please remove the shimmers from the diamond,
+  too much will cheapen the look of the diamond"); no page was released with it.
 
 Ingenium 7.03 (14 November 2026): the build library adds what is brought in. Her words that day: "I want you to make the app be able
 to receive new nopes or recipes without wiping all stored notes please". Until 7.02 a zip brought into the build library
