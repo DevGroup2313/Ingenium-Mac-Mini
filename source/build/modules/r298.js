@@ -49,9 +49,14 @@
 #fb .r298-lcard .f-row{display:flex;gap:8px;flex-wrap:wrap}
 #fb .r298-show{animation:r298Show 1.6s ease-in-out 2}
 @keyframes r298Show{0%,100%{box-shadow:var(--f-pop)}50%{box-shadow:var(--f-pophi),0 0 0 4px var(--f-accs)}}
-.r298-cap{position:fixed;z-index:2147483000;pointer-events:none;padding:4px 9px;border-radius:8px;background:#221a2e;color:#fff;font:600 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 6px 16px rgba(20,10,40,.28);opacity:0;transform:translateY(3px);transition:opacity .25s,transform .25s;max-width:320px}
-.r298-cap.on{opacity:1;transform:none}.r298-cap span{display:block;font-weight:500;opacity:.78}
-html[data-theme="dark"] .r298-cap,body.dark .r298-cap{background:#efe9f6;color:#221a2e}
+/* Learning mode's caption, in Ingenium's own purple and raised as its pressed keys are (her words, 14 November 2026: "Please make that
+   black little popup card card purple or white or a different colour in Ingenium's colour palette, the black colour detracts from the
+   page"); by night a pale violet card */
+.r298-cap{position:fixed;z-index:2147483000;pointer-events:none;padding:5px 10px 6px;border-radius:9px;background:linear-gradient(180deg,#7d55d0,#5c35a8);color:#fff;border:1px solid rgba(255,255,255,.26);
+  font:600 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -1.5px 0 rgba(40,16,90,.25),0 1px 0 rgba(60,30,120,.3),0 6px 14px rgba(74,40,140,.28);
+  opacity:0;transform:translateY(3px);transition:opacity .3s ease,transform .3s ease;max-width:320px}
+.r298-cap.on{opacity:1;transform:none}.r298-cap span{display:block;font-weight:500;opacity:.86}
+body[data-theme="night"] .r298-cap{background:linear-gradient(180deg,#f3eefb,#e2d8f5);color:#2a1d48;border-color:rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 0 rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.45)}
 /* ---------- Runs ---------- */
 #fb .r298-rb{display:flex;flex-direction:column;gap:8px}
 #fb .r298-run{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:3px 10px;align-items:center;width:100%;text-align:left;padding:10px 11px;margin:0 0 8px;border:1px solid var(--f-hair);border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);color:inherit;font:inherit;cursor:pointer;transition:transform .18s var(--f-spring),box-shadow .18s;animation:r298Open .45s cubic-bezier(.22,.8,.3,1) both}

@@ -438,7 +438,11 @@ Ingenium as you continue working."
   it), Make it for a device not made yet, Make the missing ones. Needs you, at the top of Your apps: failed runs not yet seen, runs
   going, milestones due within a week, pull requests waiting, versions ready to ship. Learn in every room (what it is, its names on
   GitHub and in git, why it matters, Show me), Every word side by side, and Learning mode (a key's names beside it). Ship says where each
-  package is made. Every new surface has its depth, as her second rule asks.
+  package is made. Every new surface has its depth, as her second rule asks. Learning mode's caption is Ingenium's purple, raised as its
+  pressed keys are, and a pale violet card by night (her words, 14 November 2026: "Please make that black little popup card card purple
+  or white or a different colour in Ingenium's colour palette, the black colour detracts from the page, please make that fix for any
+  black card popups inside of the app in Day mode that has the same issue"). The app's other popups by day were measured on the page:
+  its tooltip takes the paper of the surface under it (white), and its notices are white; none is dark.
 - Vocatio's compass (`build/modules/r290.js`). Her words (14 November 2026): "The little thin purple inner circle inside of the engine
   button is smaller inside of Vocatio's 3D compass and keeps on moving out of sync with the compass ... the Blend page's engine button
   had the same issue but its fixed now". Measured on 7.07: the button swayed in 3D on a clock of its own inside the compass, and its ring
