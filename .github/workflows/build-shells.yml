@@ -57,7 +57,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: Tools on this Mac
         run: |
@@ -200,7 +200,7 @@ jobs:
 
       - name: Keep the picture and the log with this run
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0, runs on Node.js 24
         with:
           name: shell-check
           path: |
@@ -230,7 +230,7 @@ jobs:
             gpu: swiftshader
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: Let the emulator use hardware acceleration
         run: |
@@ -239,7 +239,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Make the APKs and open them in the emulator
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d  # v2.38.0, runs on Node.js 24
         with:
           api-level: ${{ matrix.api }}
           target: ${{ matrix.target }}
@@ -281,7 +281,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: Build the shell (one program for both kinds of Mac, sealed ad hoc)
         run: |
@@ -299,7 +299,7 @@ jobs:
 
       - name: Hand the shell and what was seen to the next jobs
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0, runs on Node.js 24
         with:
           name: mac-shell
           path: |
@@ -314,10 +314,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: The shell the job before built
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # v7.0.0, runs on Node.js 24
         with:
           name: mac-shell
           path: ${{ runner.temp }}/got
@@ -333,7 +333,7 @@ jobs:
 
       - name: Hand what was seen to the next job
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0, runs on Node.js 24
         with:
           name: mac-intel-checks
           path: ${{ runner.temp }}/checks/mac-*
@@ -346,10 +346,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: The shell and what both Macs saw
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # v7.0.0, runs on Node.js 24
         with:
           path: ${{ runner.temp }}/got
 
@@ -389,7 +389,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Get the sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: Build the shell (64-bit, WebView2's loader and the C++ runtime inside)
         shell: pwsh
@@ -437,7 +437,7 @@ jobs:
 
       - name: Keep the pictures and logs with this run
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0, runs on Node.js 24
         with:
           name: windows-shell-check
           path: |

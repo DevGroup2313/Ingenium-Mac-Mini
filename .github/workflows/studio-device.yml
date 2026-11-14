@@ -47,15 +47,15 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0, runs on Node.js 24
         with:
           python-version: '3.12'
 
       - name: The engine, from the Mac build's cache
         id: engine
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25  # v5.1.0, runs on Node.js 24
         with:
           path: engine/${{ matrix.plat }}
           key: engine-${{ matrix.plat }}-b11321-portable-v1
@@ -68,7 +68,7 @@ jobs:
 
       - name: The trainer, from the Mac build's cache
         id: trainer
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25  # v5.1.0, runs on Node.js 24
         with:
           path: engine-trainer/${{ matrix.plat }}
           key: trainer-${{ matrix.plat }}-b11321-v1
@@ -106,9 +106,9 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0, runs on Node.js 24
         with:
           python-version: '3.12'
 
@@ -135,7 +135,7 @@ jobs:
 
       - name: The trainer, from the build cache when it was compiled before
         id: trainer
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25  # v5.1.0, runs on Node.js 24
         with:
           path: engine-trainer/windows-x64
           key: trainer-windows-x64-b11321-v1

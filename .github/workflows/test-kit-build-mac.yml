@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 80
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0, runs on Node.js 24
 
       - name: Lay out the folder as the Mac kit gives it
         run: |
@@ -76,7 +76,7 @@ jobs:
           tail -n 60 "$KIT/build_log.txt" || true
           mkdir -p "$RUNNER_TEMP/out" && cp "$KIT/build_log.txt" "$RUNNER_TEMP/out/" 2>/dev/null || true
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0, runs on Node.js 24
         if: always()
         with:
           name: kit-build-log
