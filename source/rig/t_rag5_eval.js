@@ -86,7 +86,12 @@ function sampler(root) {
     const NAMES = ['household_papers', 'lab_notes', 'historian_archive'];
     await bridgePost('/admin/dialog', { answers: NAMES.map((n) => path.join(FIX, n)) });
     const ids = REUSE ? await p.evaluate(async () => { const o = {}; for (const f of await IngRag.folders()) o[f.name] = f.id; return o; }) : await p.evaluate(async (n) => { const o = {}; for (let i = 0; i < n; i++) { const a = await IngRag.addFolder(); o[a.folder.name] = a.folder.id; } return o; }, NAMES.length);
-    if (REUSE) note('the index is reused: ' + JSON.stringify(ids));
+    if (REUSE) {   // the bridge was started afresh (its chosen folders forgotten): choose the three again, and take the earlier run's copy out
+      await bridgePost('/admin/dialog', { answers: NAMES.map((n) => path.join(FIX, n)) });
+      for (let i = 0; i < NAMES.length; i++) await bridgePost('/call/rag_choose_folder', []);
+      if (ids.household_copy) { await p.evaluate((id) => IngRag.removeFolder(id), ids.household_copy); delete ids.household_copy; }
+      note('the index is reused: ' + JSON.stringify(ids));
+    }
     mem.phase = 'reading'; const tr = Date.now();
     for (const n of NAMES) { note('reading ' + n); const sm = await p.evaluate((id) => IngRag.indexFolder(id).then((s) => ({ files: s.files, chunks: s.chunks })), ids[n]); note(n + ': ' + JSON.stringify(sm)); }
     mem.phase = 'after';
@@ -117,7 +122,7 @@ function sampler(root) {
       for (const it of GOLD.items) {
         const t = Date.now(); const a = await ask(it.question); const ps = (a.rag && a.rag.passages) || [];
         const g = E.grounded(a.text, ps); const correct = E.answerHas(a.text, it);
-        const gd = E.guarded(a.text, ps); gd.correct = E.answerHas(gd.text, it);   // 7.07: the reply as the detail check would show it
+        const gd = E.guarded(a.text, ps, it.question); gd.correct = E.answerHas(gd.text, it);   // 7.07: the reply as the detail check would show it
         items.push({ id: it.id, text: a.text, recheck: (a.rag && a.rag.recheck) || null, draft: (a.rag && a.rag.draft) || null, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, guarded: gd, seconds: Math.round((Date.now() - t) / 1000) });
         note(it.id + ' (' + Math.round((Date.now() - t) / 1000) + ' s): ' + (g.notFound ? 'NOT_FOUND' : (g.ok ? 'grounded' : 'flagged')) + (a.rag && a.rag.recheck ? ', checked again: ' + a.rag.recheck : '') + (correct ? ', names the fact' : '') + ' :: ' + String(a.text).replace(/\s+/g, ' ').slice(0, 160));
       }

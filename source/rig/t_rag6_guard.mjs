@@ -23,6 +23,8 @@ ok(d1.nums.includes('14') && d1.nums.includes('412') && d1.cal.includes('februar
 const d2 = P.details('It cost £2,140 and three masts, on 1784-02-11.');
 ok(d2.nums.includes('2140') && d2.nums.includes('3') && d2.nums.includes('1784') && d2.nums.includes('11') && d2.cal.includes('february'), 'details: thousands joined, number words as digits, an ISO date read out', d2);
 ok(P.details('Strain FX-208 came from Hayley Wood.').codes.includes('fx-208'), 'details: a code such as FX-208');
+const d3 = P.details('The letter is from Mr. Tobias Wren to Capt. Carew.');
+ok(d3.names.includes('tobias') && d3.names.includes('carew'), 'details: a name after a title (Mr., Capt.) is a name', d3);
 
 // supports
 ok(P.supports(P_LETTER, 'The Mary Ann cleared Kingston on the 14th of February with 412 hogsheads of sugar.').ok, 'supports: the letter holds the sugar and its date');
@@ -60,8 +62,23 @@ const g12 = P.guard('Capt. Carew was well satisfied with the stowage [1]. The ru
 ok(g12.ok && g12.kept === 2 && !g12.removed.length, 'guard: a title (Capt.) does not end a sentence; two supported sentences stay', g12);
 const g13 = P.guard('The letter is from Mr. Tobias Wren to Mr. Alexander Grieve [1]. The Mary Ann carried 412 hogsheads of sugar [1].', [P_LETTER, P_LETTER_END]);
 ok(g13.ok && g13.kept === 1 && g13.removed.length === 1 && /Alexander/.test(g13.removed[0].text), 'guard: H01 (run 2): the name the letter does not have is taken out', g13);
+// what the 2B's answers of 14 November 2026 taught (the 7.06 page): the question's own details, the passage's label, a mark mid-sentence
+const P_Q2 = { folder: 'lab_notes', file: 'reports/quarterly_report.pdf', text: 'Consumables. Spending on consumables in the quarter came to £14,206.50, which is 8% under the budget set in January.' };
+const g14 = P.guard('The lab spent £14,206.50 on consumables in the second quarter of 2026, which is 8% under budget [1].', [P_Q2], 'What did the lab spend on consumables in the second quarter of 2026?');
+ok(g14.ok && g14.kept === 1 && !g14.removed.length, 'guard: a year the question states is given, not claimed (L08)', g14);
+const g14b = P.guard('The lab spent £14,206.50 on consumables in the second quarter of 2026, which is 8% under budget [1].', [P_Q2]);
+ok(g14b.notFound, 'guard: without the question, 2026 is a claim its passage lacks', g14b);
+const P_WAGES = { folder: 'historian_archive', file: 'ledgers/wages_roll_hester_1788.csv', text: 'Name,Rank,Monthly wage,Signed\nSilas Pennock,Boatswain,£3 15s 0d,S. Pennock\nJohn Ide,Cook,£2 10s 0d,J. Ide\nAmos Webb,Carpenter,£3 5s 0d,A. Webb\nPeter Lusk,Seaman,£1 15s 0d,P. Lusk' };
+const g15 = P.guard('Pennock is listed in the wages roll of the Hester for 1788 [1].', [P_WAGES]);
+ok(g15.ok && g15.kept === 1 && !g15.repaired.length, 'guard: a passage is its label too: the ship and the year are in its file name (H07)', g15);
+const g16 = P.guard('The firm owed Joaquim da Cunha £1,386 11s 4d, which is stated in [2] as a debt not to be cleared before the next vintage.', [{ folder: 'historian_archive', file: 'chapters/chapter3_the_cooper_trade.docx', text: 'By the winter of 1790 the firm owed the Lisbon wine merchant Joaquim da Cunha £1,386 11s 4d, a debt Hollis privately thought could not be cleared before the next vintage.' }, P_LETTER]);
+ok(g16.ok && /stated in \[1\] as a debt/.test(g16.text) && g16.repaired.length === 1, 'guard: a wrong mark mid-sentence is renumbered where it stands (H08)', g16.text);
+const P_MEET = { folder: 'lab_notes', file: 'meetings/lab_meeting_2026-06-18.html', text: 'Second centrifuge. After the demonstrations the group chose the Hettich Rotanta 460, quoted at £6,480 plus VAT.' };
+const g17 = P.guard('The lab decided to buy the Hettich Rotanta 460, quoted at £6,480 plus VAT [1]. This decision was made on 18 June 2026. [1]', [P_MEET], 'Which second centrifuge did the lab decide to buy on 18 June 2026, and at what price?');
+ok(g17.ok && g17.kept === 2 && !g17.removed.length, 'guard: a sentence that only repeats the question\'s date, cited, is kept (L11)', g17);
+
 // every kept reply passes the grounding check
-for (const [k, g] of Object.entries({ g1, g2, g3, g4, g6, g7, g8, g10, g12, g13 })) ok(P.checkGrounded(g.text, 2).ok, 'guard: ' + k + '\'s reply passes checkGrounded', g.text);
+for (const [k, g] of Object.entries({ g1, g2, g3, g4, g6, g7, g8, g10, g12, g13, g14, g15, g16, g17 })) ok(P.checkGrounded(g.text, 2).ok, 'guard: ' + k + '\'s reply passes checkGrounded', g.text);
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

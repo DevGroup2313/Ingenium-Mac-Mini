@@ -76,8 +76,8 @@ export function grounded(answer, passages, opts = {}) {
 
 /** 7.07, phase 6: the reply as the detail check would show it (rag/prompt.js guard), judged as a reply is: -> {text, notFound, ok,
  *  cited, removed, repaired, unsupported}. ok: every sentence cited, every citation to a passage given, no sentence to read. */
-export function guarded(answer, passages, opts = {}) {
-  const g = guard(answer, passages);
+export function guarded(answer, passages, question, opts = {}) {
+  const g = guard(answer, passages, question);
   const j = grounded(g.text, passages, opts);
   return { text: g.text, notFound: g.notFound, ok: g.notFound || j.ok, cited: g.notFound || (!j.flagged.length && !j.badRefs.length && j.sentences.length > 0), removed: g.removed, repaired: g.repaired, unsupported: j.unsupported || [], flagged: j.flagged || [] };
 }
