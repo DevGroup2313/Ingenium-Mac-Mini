@@ -1722,6 +1722,10 @@ W.IngStudios={compassOn:function(){W.ING_COMPASS=true;CP.key="";try{hookCareer()
   state:function(){return {T:CP.T,cur:CP.cur,n:CP.data?CP.data.list.length:0,cp:CP.key,lb:LB.key};},
   /* what the other heads share with these (Focus, modules/r291.js; Build, modules/r292.js) */
   kit:{hero:hero,label:label,steps:steps,orb:orb,wireOrb:wireOrb,sealKey:sealKey,plateUrl:plateUrl,collarUrl:collarUrl,scrollTo:scrollTo,still:still,night:night,mk:mk,svg:svg,img:img,ICO:ICO,ROMAN:ROMAN,
+    /* 7.01: the compass's Orrery for Build's holder (modules/r292.js): its enamel dial and its engraving, as the compass draws them */
+    dial:function(nt){var c=108,ink=nt?"rgba(232,224,250,.32)":"rgba(52,30,100,.42)",rings=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"}),a0=VC.art;
+      rings.appendChild(svg("circle",{cx:c,cy:c,r:"104",fill:"none",stroke:ink,"stroke-width":".6"}));VC.art="orrery";try{vcDialArt(rings,c,nt);}finally{VC.art=a0;}
+      return {url:vcDialUrl(nt),rings:rings};},
     mv:{pal:mvPal,tag:mvTag,scale:mvScale,cv:mvCv,rgb:mvRgb,grain:mvGrain,env:mvEnv,ring:mvRingPx,setting:mvSetting,plate:mvPlate,LX:MVLX,LY:MVLY}}};
 try{window.__ingParts["p290"]="running";}catch(_){}
 })();

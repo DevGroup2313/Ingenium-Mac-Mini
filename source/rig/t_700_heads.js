@@ -39,7 +39,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   ok(bd.state && bd.state.label && /^\d+ lines?$/.test(bd.state.label[0]) && /runs (as you type|when you press Run)/.test(bd.state.label[1]), 'beside it, the lines of code and how the page runs', bd.state);
-  ok(/press it/.test(bd.hint) && /light shoots through it/.test(bd.hint), 'the hint says what a press does', bd.hint);
+  ok(/press it/i.test(bd.hint) && /holder/.test(bd.hint) && /engine logo/.test(bd.hint), 'the hint says what a press does, on the diamond and on any part of its holder', bd.hint);
   // its keys act where they stand: Run your page presses Run; the page stays where it was
   const run = await p.evaluate(() => { let n = 0; const rb = document.getElementById('runBtn'); const f = () => n++; rb.addEventListener('click', f); document.getElementById('bdRun').click(); rb.removeEventListener('click', f); return { n, top: document.scrollingElement.scrollTop }; });
   ok(run.n === 1 && run.top === 0, 'Run your page runs the page, and the page stays where it was', run);
@@ -50,6 +50,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => { window.__snd = []; const o = IngSound.play; IngSound.play = function (r) { window.__snd.push(r); return o.apply(this, arguments); }; });
   await p.mouse.move(ob.x, ob.y); await sleep(300); await p.mouse.down(); await sleep(120); await p.mouse.up(); await sleep(300);
   const snd = await p.evaluate(() => window.__snd.slice()); ok(snd.indexOf('paper') >= 0, 'a press on the diamond plays Ingenium\'s own sound', snd);
+  // 7.00 (14 November 2026): the holder carries Vocatio's own Orrery, handed over by the compass (r290), with the engine logo at its heart
+  // ("I specifically said that I want the ingenium orrery design from the compass"; "the engine logo needs to be drawn to fit the middle of
+  // the holder"); a press on the middle of the holder reaches the logo, with the same sound
+  const kd = await p.evaluate(() => { try { const d = IngStudios.kit.dial(false); return { url: /^data:image\//.test(d.url), rings: !!(d.rings && d.rings.querySelectorAll('path').length > 100) }; } catch (e) { return { err: String(e) }; } });
+  ok(kd.url && kd.rings, 'the compass hands the holder its Orrery: its enamel dial and its engraving', kd);
+  const lg = await p.evaluate(() => { const r = document.querySelector('#page-build .skh-obj').getBoundingClientRect(); return { x: r.left + r.width * 0.5, y: r.top + r.height * (301 / 424) }; });
+  await p.evaluate(() => { window.__snd = []; }); await p.mouse.move(lg.x, lg.y); await sleep(300); await p.mouse.down(); await sleep(120); await p.mouse.up(); await sleep(300);
+  const lp = await p.evaluate(() => ({ part: document.querySelector('#page-build .skh-obj').getAttribute('data-part'), snd: window.__snd.slice() }));
+  ok(lp.part === 'logo' && lp.snd.indexOf('paper') >= 0, 'a press on the middle of the holder reaches the engine logo, with Ingenium\'s own sound', lp);
   await p.mouse.move(5, 300);
 
   }

@@ -13,12 +13,13 @@
    yet set above the newest. Pointing at the tree stills it; dragging turns it; a version lifts under the pointer and says its words;
    pressing it shows what it changed (Plans, Compare). Read from the app as it is; nothing is written. By night it takes the night's
    metal and glass; Motion set to minimal, or a system that asks for less motion, holds it still. */
-/* the tree stands where the other heads' instruments stand (r290's .skh-obj, 520 by 424), at 92 per cent of its 460 */
-#page-fabrica.sk-on .fbt-stage{position:absolute;left:48px;top:0;width:460px;height:460px;transform-origin:0 0;transform:scale(.92);cursor:grab;touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+/* the tree stands where the other heads' instruments stand (r290's .skh-obj, 520 by 424), at 92 per cent of its 460: drawn at that
+   size in the canvas itself (7.01), not shrunk on screen, so its fine lines are never resampled as they move */
+#page-fabrica.sk-on .fbt-stage{position:absolute;left:48px;top:0;width:423.2px;height:423.2px;cursor:grab;touch-action:pan-y;-webkit-tap-highlight-color:transparent}
 #page-fabrica.sk-on .fbt-stage.fbt-drag{cursor:grabbing}
 #page-fabrica.sk-on .skh-stage{display:none}
 #page-fabrica.sk-on .fbt-stage.fbt-on-bead{cursor:pointer}
-#page-fabrica.sk-on .fbt-cv{position:absolute;left:0;top:0;width:460px;height:460px}
+#page-fabrica.sk-on .fbt-cv{position:absolute;left:0;top:0;width:423.2px;height:423.2px}
 #page-fabrica.sk-on .fbt-tip{position:absolute;z-index:8;max-width:220px;padding:7px 10px;border-radius:10px;pointer-events:none;opacity:0;transform:translateY(4px);
   background:var(--sk-keyA,#fff);box-shadow:inset 0 0 0 1px var(--sk-hair),0 6px 16px rgba(40,22,68,.16);transition:opacity .15s ease,transform .15s ease;font-size:12px;line-height:1.35;color:var(--sk-ink2)}
 #page-fabrica.sk-on .fbt-tip.fbt-show{opacity:1;transform:none}
@@ -139,9 +140,9 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     g.lineCap="round";g.lineJoin="round";g.beginPath();g.moveTo(q[0].x,q[0].y);for(var i=1;i<q.length;i++)g.lineTo(q[i].x,q[i].y);
     g.strokeStyle=nt?"rgba(4,2,12,.55)":"rgba(46,23,100,.30)";g.lineWidth=ww+1.4;g.stroke();
     /* each piece of the rod, shaded across its width; the joints filled with the piece's own colours */
-    for(var j=0;j<q.length-1;j++){var A=q[j],B=q[j+1],dx=B.x-A.x,dy=B.y-A.y,L=Math.sqrt(dx*dx+dy*dy);if(L<0.01)continue;var nx=-dy/L,ny=dx/L,hw=ww/2;
-      var r=ramp(Math.atan2(dy,dx),nt),gr=g.createLinearGradient(A.x-nx*hw,A.y-ny*hw,A.x+nx*hw,A.y+ny*hw);for(var s=0;s<r.length;s++)gr.addColorStop(s/(r.length-1),r[s]);
-      g.fillStyle=gr;g.beginPath();g.moveTo(A.x-nx*hw,A.y-ny*hw);g.lineTo(B.x-nx*hw,B.y-ny*hw);g.lineTo(B.x+nx*hw,B.y+ny*hw);g.lineTo(A.x+nx*hw,A.y+ny*hw);g.closePath();g.fill();
+    for(var j=0;j<q.length-1;j++){var A=q[j],B=q[j+1],dx=B.x-A.x,dy=B.y-A.y,L=Math.sqrt(dx*dx+dy*dy);if(L<0.01)continue;var nx=-dy/L,ny=dx/L,hw=ww/2,an=Math.atan2(dy,dx),am=((an%Math.PI)+Math.PI)%Math.PI,gx=-Math.sin(am),gy=Math.cos(am),ox=dx/L*0.5,oy=dy/L*0.5;
+      var r=ramp(an,nt),gr=g.createLinearGradient(A.x-gx*hw,A.y-gy*hw,A.x+gx*hw,A.y+gy*hw);for(var s=0;s<r.length;s++)gr.addColorStop(s/(r.length-1),r[s]);
+      g.fillStyle=gr;g.beginPath();g.moveTo(A.x-nx*hw-ox,A.y-ny*hw-oy);g.lineTo(B.x-nx*hw+ox,B.y-ny*hw+oy);g.lineTo(B.x+nx*hw+ox,B.y+ny*hw+oy);g.lineTo(A.x+nx*hw-ox,A.y+ny*hw-oy);g.closePath();g.fill();
       if(j<q.length-2){g.beginPath();g.arc(B.x,B.y,hw*0.98,0,TAU);g.fill();}}
     if(kind!=="trunk"){var e=q[q.length-1];var cap=g.createRadialGradient(e.x-ww*0.18,e.y-ww*0.2,0,e.x,e.y,ww*0.55);cap.addColorStop(0,nt?"#e8e2f6":"#ffffff");cap.addColorStop(1,nt?"#5a5470":"#a8a2bd");g.fillStyle=cap;g.beginPath();g.arc(e.x,e.y,ww*0.5,0,TAU);g.fill();}}
   /* ---------- glass beads, painted once for each size and kind ---------- */
@@ -268,7 +269,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     var gr=g.createRadialGradient(q.x+R*0.12,q.y+R*0.22,0,q.x,q.y,R*0.95);gr.addColorStop(0,"rgba(246,238,255,"+(0.6*k)+")");gr.addColorStop(0.5,"rgba(190,150,255,"+(0.26*k)+")");gr.addColorStop(1,"rgba(150,110,240,0)");
     g.fillStyle=gr;g.beginPath();g.arc(q.x,q.y,R*0.95,0,TAU);g.fill();g.restore();}
   /* ---------- a frame: back to front, as before ---------- */
-  function draw(){if(!cv)return;var d=dpr(),px=Math.round(460*d);if(cv.width!==px){cv.width=px;cv.height=px;}var g=cv.getContext("2d");if(!g)return;g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,460,460);
+  function draw(){if(!cv)return;var d=dpr(),px=Math.round(423.2*d);if(cv.width!==px){cv.width=px;cv.height=px;}var g=cv.getContext("2d");if(!g)return;g.setTransform(d*0.92,0,0,d*0.92,0,0);g.clearRect(0,0,460,460);
     var nt=night(),T=TREE||DEMO||(DEMO=demo()),S=T._shape||(T._shape=shape(T)),ang=ANG,prims=[];SH=S;BEADS=[];GEMS=[];RISE=rise();
     var halo=g.createRadialGradient(CX,200,10,CX,220,230);halo.addColorStop(0,nt?"rgba(183,156,230,.14)":"rgba(255,255,255,.7)");halo.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=halo;g.fillRect(0,0,460,460);
     var cy=BASEY+6,rx=136,ry=rx*Math.sin(PITCH)+4;var sh=g.createRadialGradient(CX,cy+30,10,CX,cy+30,rx*1.2);sh.addColorStop(0,nt?"rgba(0,0,0,.55)":"rgba(46,23,100,.22)");sh.addColorStop(1,"rgba(0,0,0,0)");
@@ -312,7 +313,7 @@ function words(b){if(b.wait)return "<b>Not kept yet</b>"+(TREE&&TREE.waiting?TRE
   var c=b.c||{},when=c.when?new Date(c.when).toLocaleDateString("en-GB",{day:"numeric",month:"long"}):"";
   return "<b>"+esc(c.title||"A version")+"</b><code>"+esc(c.short||"")+"</code>"+(b.idea?" · on "+esc(b.idea):b.kind==="arch"?" · brought in":" · on "+esc(TREE.main))+(when?" · "+when:"");}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
-function showTip(B){if(!B){tip.classList.remove("fbt-show");return;}tip.innerHTML=words(B.b);var x=B.x+B.r+10,y=B.y-14;if(x>300)x=B.x-B.r-10-200;tip.style.left=Math.max(0,x)+"px";tip.style.top=Math.max(0,y)+"px";tip.classList.add("fbt-show");}
+function showTip(B){if(!B){tip.classList.remove("fbt-show");return;}tip.innerHTML=words(B.b);var x=B.x+B.r+10,y=B.y-14;if(x>300)x=B.x-B.r-10-200;tip.style.left=(Math.max(0,x)*0.92).toFixed(1)+"px";tip.style.top=(Math.max(0,y)*0.92).toFixed(1)+"px";tip.classList.add("fbt-show");}
 function bind(){stage.addEventListener("pointerenter",function(){TARGET=0;kick();});
   stage.addEventListener("pointerleave",function(){TARGET=1;HOVER=null;showTip(null);stage.classList.remove("fbt-on-bead");kick();});
   stage.addEventListener("pointerdown",function(e){var p=at(e);DRAG={x:p.x,a:ANG,moved:false,id:e.pointerId};try{stage.setPointerCapture(e.pointerId);}catch(_){}stage.classList.add("fbt-drag");});

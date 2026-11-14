@@ -103,6 +103,7 @@ var Stones=(function(){
   "  float g=vn(pl*9.0+id*7.0)*0.6+vn(pl*23.0+id*3.0)*0.4;n=normalize(n+(vec3(vn(pl*6.0+1.0),vn(pl*6.0+2.0),vn(pl*6.0+3.0))-0.5)*0.22);",
   "  float k=id<uCur-0.5?0.0:(abs(id-uCur)<0.5?1.0:2.0);",
   "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.84,0.78,0.99),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.38,0.24,0.68),uN):mix(vec3(0.70,0.62,0.92),vec3(0.32,0.29,0.46),uN));",
+  "  if(uN>0.5)al=id<0.5?vec3(0.84,0.78,0.99):(id<1.5?vec3(0.38,0.24,0.68):vec3(0.32,0.29,0.46));",
   "  al*=0.80+0.40*g;al+=vec3(0.035)*step(0.80,vn(pl*88.0+id))-vec3(0.03)*step(0.82,vn(pl*67.0+id*5.0));",
   "  float wet=1.0-smoothstep(0.0,0.028,p.y);al*=1.0-0.42*wet;",
   "  vec3 L=normalize(vec3(-0.5,0.62,0.35));float di=max(dot(n,L),0.0);vec3 amb=mix(vec3(0.42,0.40,0.52),vec3(0.16,0.12,0.30),uN);float ao=0.50+0.50*smoothstep(-0.65,0.45,n.y);",
