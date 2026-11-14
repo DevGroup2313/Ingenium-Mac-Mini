@@ -440,6 +440,15 @@ instead of being limited to a square".
     node rig/t_700_heads.js http://127.0.0.1:8150/ingenium.html <out>      # the heads, the holder's logo, the full-card skies
     node rig/t_696_fabrica_head.js http://127.0.0.1:8150/ingenium.html <out>
 
+Ingenium 7.00 (14 November 2026), on this line (the page 87b9d42, 07:06 UTC): Build's diamond on its holder as she approved it
+(e2978ed; 7.01 above carries it further), on the 7.00 sources both lines share (8667f6e, 4d0f150, 6d346d4). The other chat's notes for
+those sources (claude/relaxed-hopper-nz4ert): Focus opens on stepping stones across still water (modules/r291.js), a stone pressed
+sounds like a stone meeting water; nature sounds in the top bar on every page (r295); Fabrica's tree in silver and glass (r294); the
+studios' instruments under the words on a phone (r296); Lector's seal in a stack of its own, drawn above the sheets (r290); Bring in
+your work in a panel over the Folders page (r263). Released first here too: Home's spheres without their white line, and the compass
+button's thin ring in step with the engine (94a2861). The other chat's own 7.00 (ec0ab68, 53fb60b) held Build's diamond; this one
+released it. Every build of it succeeded. Tests: `node rig/t_700_heads.js <page url> <out>`.
+
 Ingenium 6.99 (13 November 2026): Lector's seal stays on the paper, its shadows drawn without a blur; Fabrica's empty chips hidden.
 - Her words (13 November 2026): "there is a clear bug that keeps on disappearing the wax seal. I hate that." Pressing the sheet in front of
   Lector's fan sent the seal to its resting depth (-1 px, modules/r290.js .lf-seal.lf-dn) while the sheet's lift under the pointer (26 px)
