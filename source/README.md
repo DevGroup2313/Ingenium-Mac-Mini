@@ -2,6 +2,27 @@
 
 `ingenium.html` in the four Ingenium repositories is built, not written by hand. These are its sources.
 
+## Ingenium's own rules (keep every one)
+
+Every change to Ingenium keeps these. The owner gave each one; the master edition also carries them in Ingenium's folder on the Folders
+page (`build/modules/r297.js`), so every conversation about Ingenium there carries them to the model.
+
+- **Pages may grow** (her words, 14 November 2026: "I don't want Fabrica or any other page inside of Ingenium to be limited to only tabs
+  and just one page, Fabrica can have other pages apart from the main page to further develop it and achieve full parity with Github if
+  necessary, please add that rule to the app and its folders. You don't have to squish everything into one page, we can create more
+  space, pages, tabs and sections as needed as long as it does not ruin the design and template of the app and can be done tastefully to
+  further enhance the app and its capabilities."). Fabrica, and every other page, is never limited to one page and its tabs: a page may
+  have pages of its own beyond its main one, and more tabs and sections, wherever the work needs the room. Nothing is squeezed onto one
+  page. Each new page, tab or section keeps the app's design and template, and is made tastefully.
+- A live interactive preview before any new look or anything new, drawn from the app's own measured surfaces; built only on her word.
+- Every key lifts, sinks and sounds (Home's click); every surface raised, never flat; nothing on a page is rewritten while it is left
+  alone; every motion gentle and smooth, never brusque.
+- Nothing Chrome 83 lacks (no `Element.replaceChildren`, no `:has()`): the Fire tablet's web view (`rig/t_680_old_webview.js`).
+- The four repositories are public: no profile, document, plan or private note of hers in any of them; tests use invented people.
+- Never release a version number another branch has used, even without a build.
+
+## The sources
+
 - `build/base312.html.gz`: Ingenium 3.12 as it was released, the base of every 4.0 build.
 - `build/build_page.py`: applies the exact-match edits listed in it (each must match the base once) and inserts
   the parts in `build/modules/` (r101 onwards, in name order) before the page's last script.

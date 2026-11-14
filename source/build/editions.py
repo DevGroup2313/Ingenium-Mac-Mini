@@ -63,6 +63,7 @@ def skip_modules(ed):
     out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
     out |= {"r275.js"}  # 6.82: puts back the copy of itself an app carried inside the page leaves out; only the master carries the apps
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
+    out |= {"r297.js"}  # 7.07: Ingenium's own rules in Ingenium's folder, the master's alone (her rules for building Ingenium)
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
     if not has_fabrica(ed):

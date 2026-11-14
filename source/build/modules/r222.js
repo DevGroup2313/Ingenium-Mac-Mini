@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.07", "Ingenium's folder on the Folders page now holds Ingenium's own rules, built in at your word, and every conversation in that folder carries them: the first, Pages may grow, says that Fabrica and every other page may have pages of their own, and more tabs and sections, wherever the work needs the room, kept in the app's design.", "master"],
   ["7.06", "Fabrica's header follows the app you open: pressing an app's card in Your apps names it in the header and grows its tree of versions at once.", "fabrica"],
   ["7.06", "The Offline Project can be made again from this copy of Ingenium: a part of the page that holds only blank space no longer stops it.", "master"],
   ["7.05", "Build's sky is a starry night: soft stars behind the violet northern lights, each twinkling slowly, a star falling now and then, and a few fine sparkles drifting through the air; by day a few sparkles drift across the light sky. The diamond is as it was.", "career"],
