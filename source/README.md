@@ -377,6 +377,22 @@ effect should be preserved". In `modules/r292.js`: the ring that spread round th
 violet glow behind it (its shader term and its uniform, uGW, with them). The press itself is as in 7.02: Home's click, the sink while
 held, the spring back when let go, and one of the engine button's flourishes (spin, pulse, hop, twirl, heartbeat; every seventh press
 the grand one). Seen on the live preview first (frames of a press: no ring at any moment).
+- The holder without its ripple (her words: "I want that ripple effect like I am touching glass or liquid to be removed but the clickable
+  effect and the orrerry spinning effect to be preserved on the Holder of the diamond as well"): a press on the Orrery no longer sends
+  a ring of light across its face (HO.rip and its shader term are gone); it still spins on, the holder still lifts its face, and Home's
+  click sounds. A press on the engine logo at its heart plays its flourish and glow without the two rings that spread across the
+  Orrery. Vocatio's compass is unchanged (she asked that it be left alone).
+- The sparkles restored (her words: "I need you to add the sparkles back to the diamond, I am not sure when or why you removed them. I
+  want the sparkles restored!", and "more sparkles on both day mode and night mode especially when I click on it or hover over it, it
+  needs to shine more, right now it is missing it on day mode especially"). 7.01 had made the specks fewer and slower (3 a second, up
+  to 10, each fading over half a second to a second) and dimmed the light's own stars; 7.02 took away a press's burst and its light.
+  Now the specks twinkle as in her design (a fifth to half a second each): 8 a second at rest, 18 while the light crosses, 16 under
+  the pointer, 28 for a moment after a press, up to 18 at once (24 in a press), a quarter larger under the pointer and in a press,
+  some with a faint rose, ice blue or lilac fire; the glints come from a wider angle under the pointer and in a press; the light's own
+  stars are as in her design; a press sends the light again when it has not just crossed; the light comes every 16 to 28 seconds; by
+  day each sparkle has a small violet glow under its white star, so it shows against the light sky. Measured with the page's clock
+  slowed tenfold (the test browser draws about three frames a second): lit sparkle pixels under the pointer 161 to 269 by day and 3
+  to 55 by night; after a press 117 to 437 by day and 18 to 468 by night.
 
 Ingenium 7.02 (14 November 2026): Build's diamond presses as Fabrica's balls do. Her words that day: "I want the same sound and
 effect of the balls from Fabrica's tree to be applied to the diamond button, right now it sounds too brusque". In `modules/r292.js`:
