@@ -371,6 +371,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.05 (14 November 2026): Build's starry night. Her words that day: "I want it to be a starry night in the landscape with the
+northern lights"; "I want sparkles and shimmering lights throughout the landscape not just concentrated on the diamond. Use the fictional
+city of Velaris from the Court of Thorns and Roses as inspiration for this"; "I want the sparkles added to the atmosphere in a light and
+enchanting manner and I want a beautiful starry night"; on the first version: "The sparkles and stars look a bit too much here, please
+reduce it a little to give it a more natural and fairytale-like vibe instead"; then "I approve of everything from this preview, please
+commit and push it everywhere!". In `modules/r292.js`, on the sky's own canvas only (its shader, BGFS; the diamond's drawing unchanged):
+- by night, stars over the card above the horizon: about one in four of the 20 pixel cells holds one, mostly faint (brightness cubed),
+  each with its own size and a white, lilac, ice blue or pale rose tint, twinkling slowly on its own clock; only the very brightest have
+  a small four-pointed glint; fainter behind the words and toward the horizon;
+- a star falling slowly now and then on two paths (every 21 and 30 seconds, each fall 2.8 seconds), with a soft tail;
+- a few fine sparkles drifting through the air, each twinkling briefly with a small glint (by night white; by day white over a soft violet
+  glow, fewer);
+- Velaris lent the mood only (a city of starlight, stars falling slowly); the colours stay Ingenium's, with no gold.
+
 Ingenium 7.04 (14 November 2026): the engine logo on Build's holder, by night, in deep indigo. Her words that day: "Please also remove
 the charcoal inside of the engine logo on the diamond's holder and make it a different colour that complements the design better without
 removing the logo engine symbol from the Holder. I want to see it before I fully approve of it. I only want this done to the dark mode look

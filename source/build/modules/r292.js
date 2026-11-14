@@ -445,6 +445,15 @@ var Diamond=(function(){
   "uniform float uT,uN,uAsp;uniform vec2 uRes;uniform vec4 uBox;",
   "float h1(float n){return fract(sin(n)*43758.5453);}",
   "float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);float n=i.x+i.y*57.0;return mix(mix(h1(n),h1(n+1.0),f.x),mix(h1(n+57.0),h1(n+58.0),f.x),f.y);}",
+  "float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
+  /* a sky of stars, and the air's sparkles (cs: the cell; dn: how many cells hold one; sh: how sharp the twinkle) */
+  "vec4 stars(vec2 P,float cs,float dn,float sh,float drift){vec3 s=vec3(0.0);float al=0.0;P.x+=uT*drift;vec2 c=floor(P/cs);",
+  "  for(int i=-1;i<=1;i++){for(int j=-1;j<=1;j++){vec2 cc=c+vec2(float(i),float(j));if(h2(cc)>dn)continue;",
+  "    vec2 sp=(cc+vec2(0.15+0.7*h2(cc+1.7),0.15+0.7*h2(cc+3.1)))*cs;float b=pow(h2(cc+5.3),3.0);float ph=h2(cc+9.1)*6.2832,sw=0.4+1.2*h2(cc+7.7);",
+  "    float tw=sh>1.5?pow(max(sin(uT*sw*1.2+ph),0.0),sh):0.74+0.26*sin(uT*sw*0.7+ph);vec2 d=P-sp;float rad=0.9+1.2*b;",
+  "    float g=exp(-dot(d,d)/(rad*rad))*(0.32+0.68*b)*tw;if(b>0.80||sh>1.5){vec2 ad=abs(d);g+=(exp(-ad.x*0.7)*exp(-ad.y*0.20)+exp(-ad.y*0.7)*exp(-ad.x*0.20))*0.18*max(b,0.5)*tw;}",
+  "    float hh=h2(cc+11.3);vec3 tc=hh<0.6?vec3(1.0):(hh<0.75?vec3(0.86,0.82,1.0):(hh<0.9?vec3(0.80,0.90,1.0):vec3(1.0,0.86,0.95)));s+=tc*g;al=max(al,g);}}",
+  "  return vec4(s,al);}",
   /* the stone's own northern lights (aurora() in its shader), faded at the card's edges rather than at the stone's box */
   "vec4 aurora(vec2 v,float hx){vec3 col=vec3(0.0);float acc=0.0;",
   "  for(int L=0;L<3;L++){float fl=float(L);float x=v.x*(1.5+fl*0.45)+fl*3.1;",
@@ -470,6 +479,18 @@ var Diamond=(function(){
   "    mA=max(mA,(uN>0.5?0.55:0.6)*(0.25+0.75*tw)*(1.0-smoothstep(rr-0.6,rr+0.6,dd)));",
   "    if(tw>0.7){vec2 ad=abs(d);float st=exp(-ad.x*0.6)*exp(-ad.y*0.16)+exp(-ad.y*0.6)*exp(-ad.x*0.16);sA=max(sA,(tw-0.7)*1.6*st*exp(-dd*0.10));}}}",
   "  col=mix(col,mc*max(mA,a),mA);a=max(a,mA);col+=vec3(1.0,0.97,1.0)*sA*0.7;a=max(a,sA*0.7);",
+  /* 7.05, her words (14 November 2026): "I want the sparkles added to the atmosphere in a light and enchanting manner and I want a beautiful
+     starry night": by night stars, a star falling now and then, and sparkles in the air; by day the sparkles in the air, fewer */
+  "  float hor=uRes.y*0.66;float edge=smoothstep(0.0,0.03,v.x)*smoothstep(1.0,0.97,v.x);float calm=mix(0.5,1.0,smoothstep(0.30,0.50,v.x));",
+  "  if(uN>0.5){vec4 st=stars(P,20.0,0.27,0.0,0.0);float sm=smoothstep(hor,hor-uRes.y*0.40,P.y)*edge*calm;col+=st.rgb*sm*0.62;a=max(a,st.a*sm*0.62);",
+  "    for(int k=0;k<2;k++){float fk=float(k);float per=21.0+fk*9.0;float ph=uT/per+fk*0.43;float cyc=floor(ph);float u=fract(ph)*per;if(u<2.8){",
+  "      vec2 h0=vec2((0.30+0.62*h1(cyc*3.1+fk*7.3))*uRes.x,(0.04+0.20*h1(cyc*5.7+fk*1.9))*uRes.y);vec2 dir=normalize(vec2(-0.45-0.35*h1(cyc*2.3+fk),1.0));",
+  "      float prog=u/2.8;vec2 head=h0+dir*uRes.y*0.22*prog;vec2 rel=P-head;float along=dot(rel,-dir);float across=abs(rel.x*dir.y-rel.y*dir.x);",
+  "      float tl=(along>0.0&&along<70.0)?exp(-along/24.0)*exp(-across*across/1.2):0.0;float fd=sin(3.14159*prog);float fg=(exp(-dot(rel,rel)/3.0)*0.7+tl*0.38)*fd*smoothstep(hor,hor-24.0,P.y)*edge;",
+  "      col+=vec3(0.96,0.93,1.0)*fg;a=max(a,fg);}}",
+  "    vec4 ai=stars(P+vec2(0.0,uT*2.0),40.0,0.20,10.0,3.0);float am=edge*calm*0.55;col+=ai.rgb*am;a=max(a,ai.a*am);}",
+  "  else{vec4 ai=stars(P+vec2(0.0,uT*2.0),34.0,0.26,6.0,3.0);float am=edge*calm*smoothstep(uRes.y*0.98,uRes.y*0.70,P.y);vec3 vio=vec3(0.48,0.32,0.86);",
+  "    col+=(vio*0.60+ai.rgb*0.40)*ai.a*am*1.25;a=max(a,ai.a*am);}",
   "  gl_FragColor=vec4(min(col,vec3(a)),a);}"].join("\n");
   function bgInit(card){if(!card)return;var c=D.createElement("canvas");c.className="bd-bg";c.setAttribute("aria-hidden","true");var g=null;
     try{g=c.getContext("webgl",{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:"low-power"});}catch(e){g=null;}if(!g)return;
