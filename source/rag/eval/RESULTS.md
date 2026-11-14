@@ -71,3 +71,43 @@ still not met to the letter. The page names the uncited sentences and the citati
   other tests ran); the first search with it also loaded it (8 to 15 s).
 - With it on, test-b still got no passage of household_papers; a copy of the app without its files keeps the fusion's order and says so
   under the reply.
+
+## Run 4 (14 November 2026): the 7.06 page, Qwen3.5 2B, and the detail check (phase 6)
+
+The same evaluation (`rig/t_rag5_eval.js`) on the 7.06 page, in headless Chromium on Linux (4 processors, 15 GB), llama.cpp built
+from its public source that day, Qwen3.5 2B Q4_K_M (SHA-256 aaf42c8b..., as the lineup pins it), context 8,192, thinking off, CPU;
+one reading-model worker. Started 18:35 UTC, 43.6 minutes.
+
+| criterion | her threshold | run 4 (7.06 page, 2B) |
+| --- | --- | --- |
+| 1. Recall@5, file level | at least 0.8 | **18 of 20 (0.90)**; H11 and L05 missed, as before |
+| 2. every sentence cited, every citation to a passage given | every answer | 15 of 20 answers, as the model gave them (the second pass of 6.65 asked again in 10 and kept the second answer in 6) |
+| 3. ACL | none; 4 of 4 NOT_FOUND | **0 of 4 questions; 4 of 4 NOT_FOUND** |
+| 4. memory, the whole corpus | under 2 GB | **1,465 MB** (PSS 1,110 MB), 35.4 minutes to read |
+| 5. reindex | reflects; calls equal new or changed | **reflects; 3 calls, 3 passages** |
+
+### The detail check (rag/prompt.js guard, 7.07, not yet used by the chat)
+
+Each reply judged as the check would show it: a sentence must cite a passage that holds its exact details (numbers, dates,
+weekdays, months, names, codes), standing together where they must (a table's row, two sentences of prose); a missing or wrong
+citation is mended when one passage holds them all; what no passage supports is taken out; nothing left gives NOT_FOUND.
+
+The first version, run inside the evaluation, took out five sentences, and four of them were true: they repeated details the
+question gave ("on 18 June 2026", "the second quarter of 2026", "February 1784") or the passage's file name gave
+("wages_roll_hester_1788"). It also mended a citation by deleting the "[2]" in "as stated in [2] as a debt", leaving no sentence.
+So: what the question states is given, not claimed; a passage is its label too (folder, file, heading, page); a mark is renumbered
+where it stands; a sentence whose every detail is the question's own is kept when it cites a passage; a name after a title (Mr.,
+Capt.) is a name. Re-scored on run 4's stored answers (the passages as the report keeps them, up to 2,000 characters):
+
+- every sentence cited and every citation to a passage given: **20 of 20** (15 of 20 before the check);
+- answers naming the fact: 14 of 20, as before the check (none lost); NOT_FOUND: 1 (H11, the model's own);
+- citations mended: 9 (among them H08's [2] to [1], the passage that holds the debt: the misattribution of run 1);
+- taken out: 1, H12's echo of its passage's label (the stored passages lack the chunk number and page the label gives).
+
+Read by a person against the passages, the checked answers hold one claim the check cannot see: H07's first sentence says the crew
+petitioned "stating that the stewards sold part of the stores at Cork as the master has been a just man"; the petition says they
+do not complain of the master, "who has been a just man, but of the steward, who sold part of the stores at Cork". A true detail
+in a false relation; the sentence does not touch the question's answer (£3 15s 0d, cited). So with the 2B and the check, criterion
+2's form is met in every answer, and one claim of relation remains for a person to see.
+
+Tests: `rig/t_rag6_guard.mjs` 43/43 (the run's lessons among them), `rig/t_rag5_prompt.mjs` 15/15.
