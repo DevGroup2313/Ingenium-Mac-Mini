@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.08", "Answers from your folders are checked against the passages they were given: a sentence whose numbers, dates, names or codes its passage does not hold is taken out and listed under the answer, beside the answer as it was, and a citation that names the wrong passage is mended. Folders for the chat, in Settings, Models and AI, can make it only mark them."],
+  ["7.08", "With Your folders on, Ingenium asks each time who answers: this computer's model, its larger one, or a connection you keep, with what leaves this computer named beside each, and the strongest recommended. Not now sends nothing; the sheet can stop asking."],
+  ["7.08", "In each app's folder, How it was built is a card drawer: each part of the notes is a drawer of index cards that rise out of it under the pointer, show their first lines, and open the note when pressed; the pull opens and shuts it.", "master"],
+  ["7.08", "Ingenium's own rules hold a second rule at your word: no flat or plain surfaces anywhere in Ingenium.", "master"],
   ["7.07", "Lakay is up to date: Ingenium now carries Lakay Build 14 (14 November 2026), with its logo as it was and its own periwinkle, in place of Build 6, in your apps and in Fabrica's app library.", "master"],
   ["7.07", "Ingenium's folder on the Folders page now holds Ingenium's own rules, built in at your word, and every conversation in that folder carries them: the first, Pages may grow, says that Fabrica and every other page may have pages of their own, and more tabs and sections, wherever the work needs the room, kept in the app's design.", "master"],
   ["7.06", "Fabrica's header follows the app you open: pressing an app's card in Your apps names it in the header and grows its tree of versions at once.", "fabrica"],

@@ -96,6 +96,9 @@ const fakeModel = (p) => p.evaluate(() => {
   state.models = state.models || []; if (!state.models.some((m) => m.id === 'rag-test')) state.models.push({ id: 'rag-test', customName: 'Stand-in (test)', fileState: 'ready', sizeBytes: 1, effort: 3, tokens: 1024, ctx: 32768 });
   state.activeModelId = 'rag-test'; Engine.modelId = 'rag-test'; Engine.status = 'ready'; Engine.adapter = { hasImageInput: false };
   state.chatSource = 'local'; if (state.cloud) state.cloud.on = false; state.thinking = false;
+  // 7.08: phases 3 to 5 are checked as they were: the sentences without a citation marked, not taken out, and no one asked who answers
+  // (rig/t_708_rag6.js checks the detail check and the chooser)
+  state.rag = state.rag || {}; state.rag.strict = false; state.rag.ask = false;
   document.getElementById('ctlCtx').value = '32768';
   window.__sent = [];
   Engine.generate = function (o) {
@@ -241,7 +244,10 @@ const plusItems = (p) => p.evaluate(() => { const b = document.getElementById('c
     // carries no citation to a passage given
     ok(r.rag.ok === false && r.rag.flagged.length === 2 && /comes from nowhere/.test(r.rag.flagged[0]) && /\[9\]/.test(r.rag.flagged[1]) && r.rag.badRefs.join() === '9' && r.rag.cited.length === 1, 'the sentence without a citation, and the one citing a passage it was not given, are found', { flagged: r.rag.flagged, bad: r.rag.badRefs });
     const fl = await p.evaluate(() => { const d = [...document.querySelectorAll('#chatScroll .msg')].pop(); const f = d.querySelector('.rag-flag'); return f ? f.textContent : null; });
-    ok(fl && /Check these 2 sentences/.test(fl) && /comes from nowhere/.test(fl) && /cites \[9\], which is not among the passages/.test(fl), 'both are named under the reply, and [9] is said to be no passage given', fl);
+    // 7.08: with the detail check marking them, its note under the reply names both, with their reasons and the [9]
+    const ck = await p.evaluate(() => { const ds = [...document.querySelectorAll('.msg')]; const d = ds[ds.length - 1]; const c = d.querySelector('.rag-check'); return c ? c.textContent : null; });
+    const named = fl || ck;
+    ok(named && /comes from nowhere/.test(named) && /It is also in \[9\]|cites \[9\]/.test(named) && /cites \[9\], which is not among the passages/.test(named), 'both are named under the reply, and [9] is said to be no passage given', named);
 
     // ------------------------------------------------------------------------------------------ 6b. the second pass (6.65, her choice)
     note('6b. the second pass: the model is asked once more to cite every sentence');
@@ -257,7 +263,7 @@ const plusItems = (p) => p.evaluate(() => { const b = document.getElementById('c
     ok(r.rag.recheck === 'better' && r.rag.ok === true && !r.rag.flagged.length && !/comes from nowhere/.test(r.text) && /comes from nowhere/.test(r.rag.draft || '') && /\[1\]|\[2\]|\[3\]|\[4\]|\[5\]/.test(r.text), 'the better second answer is kept, every sentence cited, and the first is kept beside it', { text: r.text, recheck: r.rag.recheck });
     const ui6 = await p.evaluate(() => { const d = [...document.querySelectorAll('#chatScroll .msg')].pop(); return { note: [...d.querySelectorAll('.rag-note')].map((x) => x.textContent).join(' | '), draft: !!d.querySelector('details.rag-draft'), flag: !!d.querySelector('.rag-flag'), advice: (d.querySelector('.rag-advice') || {}).textContent || '' }; });
     ok(/Checked again/.test(ui6.note) && ui6.draft && !ui6.flag, 'under the reply: "Checked again", the first answer in a fold, no flags', ui6);
-    ok(/Qwen3\.5 9B cited every sentence in 16 of 20/.test(ui6.advice) && /Models page|Use /.test(ui6.advice), 'a small model is told that a larger one cites more carefully, with a key to it', ui6.advice);
+    ok(/Qwen3\.5 9B cited every sentence in 20 of 20/.test(ui6.advice) && /Models page|Use /.test(ui6.advice), 'a small model is told that a larger one cites more carefully, with a key to it', ui6.advice);
     await p.evaluate(() => { state.rag.recheck = false; saveState(); window.__recheck = ''; });
     s0 = await sentCount(p);
     r = await send(p, fact('R09').question);

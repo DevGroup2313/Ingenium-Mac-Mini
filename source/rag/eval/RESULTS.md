@@ -111,3 +111,26 @@ in a false relation; the sentence does not touch the question's answer (£3 15s 
 2's form is met in every answer, and one claim of relation remains for a person to see.
 
 Tests: `rig/t_rag6_guard.mjs` 43/43 (the run's lessons among them), `rig/t_rag5_prompt.mjs` 15/15.
+
+## Run 5 (14 November 2026): the 7.06 page, Qwen3.5 9B, on run 4's index
+
+The same evaluation with `REUSE_INDEX=1` on a copy of run 4's browser profile (the corpus already read, so criterion 4 is run 4's),
+Qwen3.5 9B Q4_K_M (SHA-256 03b74727..., as the lineup pins it), llama.cpp, context 8,192, thinking off, CPU. 29.0 minutes.
+
+| criterion | her threshold | run 5 (9B) |
+| --- | --- | --- |
+| 1. Recall@5 | at least 0.8 | **18 of 20 (0.90)** |
+| 2. every sentence cited, every citation to a passage given | every answer | **20 of 20 answers**, as the model gave them (the second pass asked again in 9 and kept the second answer each time) |
+| 3. ACL | none; 4 of 4 NOT_FOUND | **0 of 4; 4 of 4 NOT_FOUND** |
+| 5. reindex | reflects; calls equal new or changed | **reflects; 3 calls, 3 passages** |
+
+With the detail check: 20 of 20, nothing taken out, one citation mended (L01's [4] to [1]: all five passages are from the protocol, and [1] is the one that holds
+24.5 °C and 72 hours together); 15 answers name the fact, as before. The evaluation's own word-share flag listed four sentences to read (H07, L01, L08, R01):
+each states its passage's figure; they are paraphrases, not inventions.
+
+Read by a person, one claim the passages do not support: L05 adds "Incubator B was checked before a run and showed no drift against
+the reference"; the notebook says it of the laminar flow cabinet. Every word is in the passage; the subject is carried in from another
+sentence. A stricter rule tried that day (each name must stand where the rest of the sentence comes from) took out true sentences
+(a strain's code and its origin stand on different lines of the registry) and still missed this one (the notebook's title names
+Incubator B), so it was not kept. With the 9B and the check, criterion 2's form is met in every answer, and one subject slip remains
+for a person to see; with the 2B, one relation.

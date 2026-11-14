@@ -14,6 +14,9 @@ page (`build/modules/r297.js`), so every conversation about Ingenium there carri
   further enhance the app and its capabilities."). Fabrica, and every other page, is never limited to one page and its tabs: a page may
   have pages of its own beyond its main one, and more tabs and sections, wherever the work needs the room. Nothing is squeezed onto one
   page. Each new page, tab or section keeps the app's design and template, and is made tastefully.
+- **No flat or plain surfaces** (her words, 14 November 2026: "Please make sure that there aren't any flat and plain surfaces on Ingenium
+  as you continue working."). Every card, note, sheet, key and field has its depth, by day and by night; raised never means heavier or
+  thicker. Built into Ingenium's own rules too (`build/modules/r297.js`).
 - A live interactive preview before any new look or anything new, drawn from the app's own measured surfaces; built only on her word.
 - Every key lifts, sinks and sounds (Home's click); every surface raised, never flat; nothing on a page is rewritten while it is left
   alone; every motion gentle and smooth, never brusque.
@@ -391,6 +394,31 @@ storage and do not show the card.
 
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
+
+Ingenium 7.08 (14 November 2026): the folder search's detail check and who answers; Folders' card drawer. Her words that day, on the two
+live previews: "I approve of your recommendations for both of the Folders previews and choose the "card drawer" preview design";
+"For the Folder search, I agree with your recommendation"; and "Please make sure that there aren't any flat and plain surfaces on
+Ingenium as you continue working."
+- The folder search, phase 6 (`rag/prompt.js` guard; `build/modules/r257.js`): every answer from her folders is checked against the
+  passages it was given, after the second pass. A sentence must cite a passage that holds its exact details (numbers, dates, weekdays,
+  months, names, codes), standing together where they must; what the question states is given; a passage is its label too; a missing or
+  wrong citation is mended where it stands; what no passage supports is taken out and listed under the answer, open, with the reason
+  and the answer before the check beside it (Settings can make it only mark them); nothing left gives NOT_FOUND. With Your folders on,
+  sending first asks who answers (`#ragWho`): this computer's model, its larger one when ready (Magister), and each connection she keeps
+  (`state.cxKept`), the strongest recommended, what leaves the computer named beside a connection; Not now sends nothing and says so;
+  Ask me each time can be turned off in the sheet or in Settings. The reply says who answered. `build/modules/r202.js`: the two switches
+  in Folders for the chat. Measured (`rag/eval/RESULTS.md`, runs 4 and 5): with the 2B, every sentence cited in 15 of 20 answers as
+  given and 20 of 20 after the check; with the 9B, 20 of 20 as given; no right answer lost to the check. What it cannot see, kept on
+  record: a true detail in a false relation, and a name carried into the wrong sentence.
+- Folders, How it was built as a card drawer (`build/modules/r258.js`, the master edition's): each part of an app's notes is a drawer
+  of index cards, its name and count on a label in a silver frame, a silver pull to open and shut it; a card rises out of the drawer
+  under the pointer and shows its first lines, sinks with Ingenium's key sound when pressed, and is drawn out as its note opens; the
+  front card shows its first lines; the finder sunk, its finds raised. Written for the Fire tablet's web view (no inset, no flex gap;
+  hover and keyboard focus in rules of their own).
+- Ingenium's own rules (`build/modules/r297.js`): No flat or plain surfaces, with her words.
+- Tests: `rig/t_708_rag6.js` (the check and the chooser in the chat, with a stand-in model and a stand-in connection), `rig/t_708_drawer.js`
+  (the drawer, with an invented library), `rig/t_rag6_guard.mjs` (47), and `rig/t_rag3_chat.js`, `rig/t_665_buildlib.js`, `rig/t_707_rules.js`
+  brought up to date.
 
 Ingenium 7.07 (14 November 2026): Lakay brought up to date, and Ingenium's own rules built in. Her words that day: "the Lakay app has
 been updated to a later build, please update Ingenium's copy to bring it up to date."

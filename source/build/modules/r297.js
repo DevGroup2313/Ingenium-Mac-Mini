@@ -28,6 +28,11 @@ var D=document,W=window;
 var RULES=[{name:"Pages may grow",
   rule:"Fabrica, and every other page of Ingenium, is never limited to one page and its tabs. A page may have pages of its own beyond its main one, and more tabs and sections, wherever the work needs the room, as Fabrica does to reach full parity with GitHub. Nothing is squeezed onto one page. Each new page, tab or section keeps the app's design and template, and is made tastefully, to enhance the app and what it can do.",
   words:"I don't want Fabrica or any other page inside of Ingenium to be limited to only tabs and just one page, Fabrica can have other pages apart from the main page to further develop it and achieve full parity with Github if necessary, please add that rule to the app and its folders. You don't have to squish everything into one page, we can create more space, pages, tabs and sections as needed as long as it does not ruin the design and template of the app and can be done tastefully to further enhance the app and its capabilities.",
+  day:"14 November 2026"},
+  /* 7.08: her words on the Folders previews (14 November 2026) */
+  {name:"No flat or plain surfaces",
+  rule:"Every surface of Ingenium is raised, layered or sunk with care, never flat or plain: every card, note, sheet, key and field has its depth (its edge, its light and its shadow, by day and by night), and every key lifts, sinks and sounds. A new page, card or sheet is made so from the start, and a flat one found is raised. Raised does not mean heavier or thicker: it keeps the app's own measured surfaces.",
+  words:"Please make sure that there aren't any flat and plain surfaces on Ingenium as you continue working.",
   day:"14 November 2026"}];
 function master(){try{return typeof ING_EDITION==="undefined"||ING_EDITION==="master";}catch(e){return true;}}
 function isIngenium(p){return !!(p&&p.kind==="app"&&/^\s*ingenium\b/i.test(String(p.name||"")));}

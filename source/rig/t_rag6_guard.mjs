@@ -77,8 +77,20 @@ const P_MEET = { folder: 'lab_notes', file: 'meetings/lab_meeting_2026-06-18.htm
 const g17 = P.guard('The lab decided to buy the Hettich Rotanta 460, quoted at £6,480 plus VAT [1]. This decision was made on 18 June 2026. [1]', [P_MEET], 'Which second centrifuge did the lab decide to buy on 18 June 2026, and at what price?');
 ok(g17.ok && g17.kept === 2 && !g17.removed.length, 'guard: a sentence that only repeats the question\'s date, cited, is kept (L11)', g17);
 
+const P_NB = { folder: 'lab_notes', file: 'notebook/2026-05-17_incubator_alarm.txt', text: F('lab_notes/notebook/2026-05-17_incubator_alarm.txt') };
+const g18 = P.guard('Tom was contacted by the porter and came in at once [1]. Additionally, Incubator B was checked before a run and showed no drift against the reference [1].', [P_NB], 'What happened to Incubator B on the night of 17 May 2026?');
+// what the check cannot see (the 9B, 14 November 2026): every word of the second sentence is in the passage, but the notebook says it
+// of the laminar flow cabinet. A name carried into the wrong sentence is left for a person to read: a stricter rule took out true
+// sentences ("Strain FX-208 was isolated from ...", whose code and origin stand on different lines of the registry).
+ok(g18.kept === 2 && !g18.removed.length, 'guard: a subject carried in from another sentence is NOT seen (its limit, kept on record)', g18);
+const g19 = P.guard('The overnight alarm on Incubator B went off at about three in the morning [1]. The laminar flow cabinet was checked before the run and showed no drift against the reference [1].', [P_NB]);
+ok(g19.ok && g19.kept === 2 && !g19.removed.length, 'guard: the same sentences, true to their passage, are kept', g19);
+
+const g20 = P.guard('The Mary Ann cleared Kingston with 412 hogsheads of sugar [1]. This part comes from nowhere in particular. It is also in [9].', [P_LETTER]);
+ok(g20.ok && g20.kept === 1 && g20.removed.length === 2 && !g20.repaired.length && !/\[9\]|nowhere/.test(g20.text), 'guard: a sentence of no content citing no passage given is taken out, never mended', g20);
+
 // every kept reply passes the grounding check
-for (const [k, g] of Object.entries({ g1, g2, g3, g4, g6, g7, g8, g10, g12, g13, g14, g15, g16, g17 })) ok(P.checkGrounded(g.text, 2).ok, 'guard: ' + k + '\'s reply passes checkGrounded', g.text);
+for (const [k, g] of Object.entries({ g1, g2, g3, g4, g6, g7, g8, g10, g12, g13, g14, g15, g16, g17, g19 })) ok(P.checkGrounded(g.text, 2).ok, 'guard: ' + k + '\'s reply passes checkGrounded', g.text);
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

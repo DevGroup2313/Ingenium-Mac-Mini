@@ -113,7 +113,7 @@ function sampler(root) {
     ok(leaks === 0 && searchLeaks === 0, '3. ACL: retrieve() and both searches give test-b no passage of ' + restricted + ' for its ' + onlyX.length + ' questions', { leaks, searchLeaks });
     // ------------------------------------------------------------------ 2. groundedness, and 3's end-to-end half, with the real model
     if (!SKIP_MODEL) {
-      await p.evaluate(([base, name]) => { state.cloud = { provider: 'lmstudio', base: base, key: '', model: name, models: [name], on: true }; state.chatSource = 'cloud'; state.thinking = false; saveState(); IngRagChat.setOn(true); }, [LLM, 'local']);
+      await p.evaluate(([base, name]) => { state.cloud = { provider: 'lmstudio', base: base, key: '', model: name, models: [name], on: true }; state.chatSource = 'cloud'; state.thinking = false; state.rag = state.rag || {}; state.rag.strict = false; state.rag.ask = false; saveState(); IngRagChat.setOn(true); }, [LLM, 'local']);   // 7.08: the model's own answers are measured; the detail check is measured beside them
       const ask = async (q) => { await p.evaluate(() => { const c = { id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title: 'New conversation', messages: [] }; state.chats.push(c); state.activeChat = c.id; saveState(); renderChat(); });
         await p.fill('#chatInput', q); await p.evaluate(() => sendChat());
         await p.waitForFunction(() => { const m = curMsgs(); const l = m[m.length - 1]; return l && l.role === 'bot' && !l.live && (typeof liveBot === 'undefined' || !liveBot) && (!l.rag || l.rag.done || l.rag.called === false); }, null, { timeout: 900000 });

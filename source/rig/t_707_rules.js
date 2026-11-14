@@ -24,8 +24,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
       const s = c.querySelector('.r297-rule'); return { inPapers: !!c.closest('.fd-right'), title: (c.querySelector('h2') || {}).textContent || '', slips: c.querySelectorAll('.r297-rule').length,
         name: s ? s.querySelector('b').textContent : '', rule: s ? s.querySelector('small').textContent : '', wordsHidden: s ? s.querySelector('.r297-words').hidden : null }; });
     if (MASTER) {
-      ok(c1 && /Ingenium's own rules/.test(c1.title) && c1.slips === 1 && c1.name === 'Pages may grow' && /never limited to one page/.test(c1.rule) && c1.wordsHidden === true,
-        'Ingenium\'s folder holds Ingenium\'s own rules: Pages may grow, its words folded', c1);
+      ok(c1 && /Ingenium's own rules/.test(c1.title) && c1.slips === 2 && c1.name === 'Pages may grow' && /never limited to one page/.test(c1.rule) && c1.wordsHidden === true,
+        'Ingenium\'s folder holds Ingenium\'s own rules: Pages may grow first (7.08: and No flat or plain surfaces), its words folded', c1);
       ok(c1 && c1.inPapers, 'the card stands among the folder\'s papers (the drawer\'s right page)', c1);
       await p.screenshot({ path: path.join(OUT, 'ingenium_folder.png'), fullPage: false });
       const box = await p.evaluate(() => { const s = document.querySelector('#page-folders .r297-rule'); s.scrollIntoView({ block: 'center' }); const r = s.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 20 }; });
@@ -39,7 +39,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     const ctx = await p.evaluate(ids => { const c = curChat(); const prev = c.projectId; const out = {};
       c.projectId = ids.ing; out.ing = String(chatSystemPrompt(8000) || ''); c.projectId = ids.quill; out.quill = String(chatSystemPrompt(8000) || ''); c.projectId = prev; return out; }, ids);
     if (MASTER) {
-      ok(/INGENIUM'S OWN RULES/.test(ctx.ing) && /Pages may grow: Fabrica, and every other page of Ingenium/.test(ctx.ing), 'a conversation in Ingenium\'s folder carries the rules to the model', ctx.ing.slice(-400));
+      ok(/INGENIUM'S OWN RULES/.test(ctx.ing) && /Pages may grow: Fabrica, and every other page of Ingenium/.test(ctx.ing) && /No flat or plain surfaces: Every surface of Ingenium/.test(ctx.ing), 'a conversation in Ingenium\'s folder carries the rules to the model', ctx.ing.slice(-400));
       ok(/MY FOLDER FOR INGENIUM/.test(ctx.ing) && ctx.ing.indexOf('MY FOLDER FOR INGENIUM') < ctx.ing.indexOf("INGENIUM'S OWN RULES") || /MY FOLDER FOR INGENIUM/.test(ctx.ing), 'the folder\'s own notes still go with it', ctx.ing.slice(-600));
     }
     ok(!/INGENIUM'S OWN RULES/.test(ctx.quill), 'a conversation in another folder does not carry them', ctx.quill.slice(-300));

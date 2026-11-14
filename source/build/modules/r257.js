@@ -21,6 +21,41 @@
 body[data-theme="night"] #modalBox .rag-vtext mark{background:rgba(255,196,70,.26)}
 #modalBox .rag-vtext .rag-vcut{display:block;color:var(--ink-3);font-size:12px;font-style:italic;margin:2px 0}
 #modalBox .rag-vacts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+/* 7.08 (phase 6, her choice of 14 November 2026: "I agree with your recommendation"): the detail check's note under an answer, raised as
+   every surface of Ingenium is, and the sheet that asks her who answers from her folders, each choice a raised key */
+.msg .rag-check{display:block;margin:9px 0 0;padding:9px 12px 8px;border-radius:12px;font-size:12.5px;line-height:1.5;color:var(--ink-2);
+  background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f3eef9));box-shadow:inset 0 0 0 1px var(--hairline),0 1px 2px rgba(40,22,68,.10),0 6px 14px rgba(40,22,68,.07)}
+body[data-theme="night"] .msg .rag-check{box-shadow:inset 0 0 0 1px var(--hairline),0 1px 2px rgba(0,0,0,.4),0 8px 18px rgba(0,0,0,.3)}
+.msg .rag-check > summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline}
+.msg .rag-check > summary::-webkit-details-marker{display:none}
+.msg .rag-check .rc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:#3f9a72;box-shadow:0 0 0 3px rgba(63,154,114,.16);transform:translateY(1px)}
+.msg .rag-check.cut .rc-dot{background:#d29b2c;box-shadow:0 0 0 3px rgba(210,155,44,.18)}
+.msg .rag-check ul{margin:7px 0 2px;padding-left:18px}
+.msg .rag-check li{margin:4px 0}
+.msg .rag-check del{color:var(--ink-3)}
+.msg .rag-check .rc-why{display:block;color:var(--ink-3);font-size:12px}
+.msg .rag-check .rc-before{margin:8px 0 0}
+.msg .rag-check .rc-before > summary{cursor:pointer;color:var(--ink-3);font-size:12px}
+.msg .rag-check .rc-before > div{margin:5px 0 0;padding:8px 10px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.08),inset 0 0 0 1px var(--hairline)}
+#ragWho{position:fixed;z-index:9000;width:min(460px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:12px 12px 10px;border-radius:16px;
+  background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f3eef9));box-shadow:inset 0 0 0 1px var(--hairline),0 2px 4px rgba(40,22,68,.12),0 24px 48px rgba(40,22,68,.22);
+  transform-origin:80% 100%;animation:ragWhoIn .42s cubic-bezier(.2,.8,.2,1)}
+body[data-theme="night"] #ragWho{box-shadow:inset 0 0 0 1px var(--hairline),0 2px 4px rgba(0,0,0,.45),0 24px 48px rgba(0,0,0,.5)}
+#ragWho h4{margin:2px 4px 2px;font:700 10.5px/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+#ragWho .rw-q{margin:0 4px 10px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+#ragWho .btn.rw-opt{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;width:100%;text-align:left;margin:0 0 7px;padding:10px 12px;border-radius:12px;height:auto;min-height:0;white-space:normal;font-weight:400;line-height:1.35}
+#ragWho .rw-ic{grid-row:span 3;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:700 11px var(--sans);color:#fff;background:linear-gradient(180deg,#8a62d6,#55309a);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 4px rgba(40,22,68,.25)}
+#ragWho .rw-ic.cl{background:linear-gradient(180deg,#d6a07a,#b0705a)}
+#ragWho .rw-name{font-weight:650;font-size:13.5px;color:var(--ink-1)}
+#ragWho .rw-note{grid-column:2;color:var(--ink-3);font-size:12px;line-height:1.4}
+#ragWho .rw-away{grid-column:2;color:#9a6a1e;font-size:11.5px;line-height:1.4}
+body[data-theme="night"] #ragWho .rw-away{color:#e7c27d}
+#ragWho .rw-badge{grid-row:span 3;font:700 9.5px/1 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--accent);padding:4px 7px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--accent)}
+#ragWho .rw-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 4px 0;font-size:12.5px;color:var(--ink-2)}
+#ragWho .rw-foot label{display:flex;gap:7px;align-items:center;cursor:pointer}
+@keyframes ragWhoIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#ragWho{animation:none}}
+body[data-motion="minimal"] #ragWho{animation:none}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p257"]="started";}catch(_){}
 /* ============ R257 · THE CHAT ANSWERS FROM YOUR FOLDERS (Ingenium 6.59, 8 November 2026) ============
@@ -117,6 +152,7 @@ function prepareWrap(o){return function(rec,bot){var self=this,args=arguments;
       if(!bot.live)return null;
       var g=r.prompt.ground(res,q,budget());
       bot.rag={v:1,q:q,at:Date.now(),found:res.passages.length,given:g.passages.length,dropped:g.dropped,ms:Math.round(res.ms||0),passages:g.passages.map(slim)};
+      if(rec.ragWho)bot.rag.who=String(rec.ragWho);
       if(res.reason)bot.rag.reason=res.reason;if(res.reranked)bot.rag.reranked=true;if(res.rerankNote)bot.rag.rerankNote=res.rerankNote;
       if(g.notFound){bot.status="";bot.text=NOT_FOUND;bot.rag.notFound=true;bot.rag.called=false;delete bot.live;return whyNone(r,bot).then(function(){return null;});}
       bot.rag.called=true;bot.status="";try{renderChatLive(bot);}catch(e){}
@@ -177,7 +213,7 @@ function recheck(m,c1){var g=m.rag,r=R();if(!r)return Promise.resolve("error");
     m.text=t2;apply(g,c2);return "better";});}
 function runCheck(m,c1,tries){var g=m.rag;
   if(!idle()&&(tries||0)<80){setTimeout(function(){runCheck(m,c1,(tries||0)+1);},150);return;}
-  var end=function(res){delete g.checking;g.recheck=res;g.done=1;try{if(ACTIVE)ACTIVE.delete(m);}catch(e){}try{saveState();}catch(e){}try{renderChat();}catch(e){}};
+  var end=function(res){delete g.checking;g.recheck=res;try{guardMsg(m);}catch(e){}g.done=1;try{if(ACTIVE)ACTIVE.delete(m);}catch(e){}try{saveState();}catch(e){}try{renderChat();}catch(e){}};
   if(!idle()||!canAsk()){end("skipped");return;}
   recheck(m,c1).then(end,function(){end("stopped");});}
 function finish(m){var g=m.rag;if(g.done)return;
@@ -187,7 +223,7 @@ function finish(m){var g=m.rag;if(g.done)return;
   /* 6.63: a reply that says the NOT_FOUND sentence and cites no passage given is exactly NOT_FOUND (her contract: "respond exactly") */
   if(typeof P.declaresNotFound==="function"?P.declaresNotFound(t,(g.passages||[]).length):P.isNotFound(t)){m.text=NOT_FOUND;g.notFound=true;g.done=1;return;}
   var c=P.checkGrounded(t,(g.passages||[]).length);apply(g,c);
-  if(c.ok||!recheckOn()||g.recheck||!canAsk()||!ACTIVE){g.done=1;return;}
+  if(c.ok||!recheckOn()||g.recheck||!canAsk()||!ACTIVE){guardMsg(m);g.done=1;return;}
   g.checking=1;g.draft=t;ACTIVE.add(m);
   setTimeout(function(){runCheck(m,c,0);},0);}
 function finishAll(){var ch=false;try{curMsgs().forEach(function(m){if(m&&m.role==="bot"&&m.rag&&!m.live&&!m.rag.done&&!(m.rag.checking&&ACTIVE&&ACTIVE.has(m))){finish(m);ch=true;}});}catch(e){}
@@ -222,7 +258,7 @@ function paint(d,mm){
   if(mm.role==="me"){if(mm.ragAsk===true&&!d.querySelector(":scope > .rag-tag")){var tg=mk("span","web-tag rag-tag","📂 your folders");d.insertBefore(tg,d.firstChild);}return;}
   if(mm.role!=="bot"||!mm.rag||mm.live)return;
   var g=mm.rag,ps=g.passages||[];
-  [].slice.call(d.querySelectorAll(":scope > .rag-sources, :scope > .rag-note, :scope > .rag-flag, :scope > .rag-draft, :scope > .rag-advice")).forEach(function(x){x.remove();});
+  [].slice.call(d.querySelectorAll(":scope > .rag-sources, :scope > .rag-note, :scope > .rag-flag, :scope > .rag-draft, :scope > .rag-advice, :scope > .rag-check")).forEach(function(x){x.remove();});
   var md=d.querySelector(":scope > .md");if(md&&ps.length)linkify(md,mm);
   if(ps.length){var so=mk("div","msg-sources rag-sources");so.appendChild(mk("b",null,g.notFound?"Looked at in your folders":"From your folders"));var ol=mk("ol");
     ps.forEach(function(p,i){var li=mk("li"),a=mk("a",null,pathOf(p));a.href="#";a.setAttribute("data-rag-n",String(i+1));a.title="Open this passage in its file";
@@ -240,8 +276,11 @@ function paint(d,mm){
   else if(g.recheck==="notfound")notes.push("Checked again: asked to cite every sentence, the model found that your folders do not hold the answer.");
   else if(g.recheck==="stopped")notes.push("The second check was stopped, so this is the model's first answer.");
   if(g.dropped>0)notes.push("The model's memory took "+g.given+" of the "+g.found+" passages found; the others were left out.");
+  if(g.who)notes.unshift("Answered by "+g.who+", as you chose.");
   notes.forEach(function(t){beforeActs(d,mk("span","rag-note",t));});
-  if(!g.notFound&&g.done&&((g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))){var f=mk("div","msg-unchecked rag-flag");f.setAttribute("role","note");f.appendChild(mk("span","mu-mark","!"));
+  /* 7.08, phase 6: the detail check, under the answer */
+  if(g.guarded&&g.done&&(!g.notFound||g.guarded.before))paintCheck(d,g.guarded);
+  if(!g.notFound&&g.done&&((g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))&&!(g.guarded&&g.guarded.removed&&g.guarded.removed.length)){var f=mk("div","msg-unchecked rag-flag");f.setAttribute("role","note");f.appendChild(mk("span","mu-mark","!"));
     var body=mk("span");var nf=(g.flagged||[]).length;
     body.appendChild(D.createTextNode((nf?("Check "+(nf===1?"this sentence":"these "+nf+" sentences")+": "+(nf===1?"it names":"they name")+" no passage of your folders."):"")+((g.badRefs||[]).length?(nf?" ":"")+"The reply cites "+g.badRefs.map(function(n){return "["+n+"]";}).join(", ")+", which "+(g.badRefs.length===1?"is":"are")+" not among the passages it was given.":"")));
     if(nf){var ul=mk("ul");g.flagged.forEach(function(s){ul.appendChild(mk("li",null,"“"+(s.length>220?s.slice(0,218)+"…":s)+"”"));});body.appendChild(ul);}
@@ -250,10 +289,84 @@ function paint(d,mm){
   /* 6.65: a larger model, when a small one answered and something is still unchecked or had to be asked again */
   if(!g.notFound&&g.done&&g.called&&(g.recheck||(g.flagged&&g.flagged.length)||(g.badRefs&&g.badRefs.length))){var bm=bigModel();
     if(bm){var ad=mk("div","rag-advice");ad.setAttribute("role","note");
-      ad.appendChild(mk("span",null,"A larger model cites its sources more carefully: in Ingenium's own test of answers from folders, Qwen3.5 9B cited every sentence in 16 of 20 answers and Qwen3.5 2B in 10 of 20. For answers from your folders, "+bm.name+" is the stronger model for this computer."));
+      ad.appendChild(mk("span",null,"A larger model cites its sources more carefully: in Ingenium's own test of answers from folders (14 November 2026), Qwen3.5 9B cited every sentence in 20 of 20 answers and Qwen3.5 2B in 15 of 20, before the check took out what no passage holds. For answers from your folders, "+bm.name+" is the stronger model for this computer."));
       var kb=mk("button","btn small",bm.ready?"Use "+bm.name:"Get "+bm.name+" on the Models page");kb.type="button";
       kb.onclick=function(e){e.stopPropagation();try{if(bm.ready){lineupUse("magister");toast(bm.name+" answers from now on.");}else go("models");}catch(_){}};
       ad.appendChild(kb);beforeActs(d,ad);}}}
+
+/* ---------------------------------------------------------------- 7.08, phase 6: the detail check and who answers
+   Her criterion 2 (an unsupported claim is a blocker) and her choices of 14 November 2026 ("I agree with your recommendation"):
+   each answer is checked against the passages it was given (rag/prompt.js guard): a sentence must cite a passage that holds its exact
+   details; a missing or wrong citation is mended when one passage holds them all; what no passage supports is taken out and listed
+   under the answer (or only marked, when she turns that off); nothing left gives NOT_FOUND. And, with Your folders on, Ingenium asks
+   each time who answers: this computer's model, its larger one when it is there, or a connection she keeps, with what leaves the
+   computer named beside each; the strongest is recommended. Settings, Models and AI, Folders for the chat holds both switches. */
+function strictOn(){try{return !(state.rag&&state.rag.strict===false);}catch(e){return true;}}
+function askOn(){try{return !(state.rag&&state.rag.ask===false);}catch(e){return true;}}
+function whyPlain(ms){ms=(ms||[]).map(String);
+  if(!ms.length)return "No passage given holds it.";
+  if(ms.some(function(x){return /^no citation/.test(x);}))return "It named no passage, and no passage given holds it.";
+  if(ms.some(function(x){return /^names no passage/.test(x);}))return "It names no passage.";
+  if(ms.some(function(x){return /^wording/.test(x);}))return "Its passage does not say it.";
+  var tog=ms.filter(function(x){return /^together: /.test(x);});
+  if(tog.length)return "Its numbers and dates ("+tog[0].slice(10)+") do not stand together in its passage.";
+  return "Its passage does not hold "+ms.slice(0,5).join(", ")+".";}
+function guardMsg(m){var g=m&&m.rag;if(!g||g.guarded||g.notFound||g.error||g.called===false)return;
+  var r=R(),P=r&&r.prompt;if(!P||typeof P.guard!=="function")return;
+  var t=String(m.text||"");if(!t.trim())return;var ps=g.passages||[],x;
+  try{x=P.guard(t,ps,g.q);}catch(e){return;}
+  var c0=null;try{c0=P.checkGrounded(t,ps.length);}catch(e){}
+  var G={mode:strictOn()?"strict":"mark",mended:x.repaired.length,badRefs:(c0&&c0.badRefs||[]).slice(0,8),removed:x.removed.slice(0,12).map(function(s){return {text:String(s.text||"").slice(0,400),why:whyPlain(s.missing)};})};
+  g.guarded=G;
+  if(G.mode!=="strict")return;
+  if(x.notFound){if(t!==NOT_FOUND)G.before=t;m.text=NOT_FOUND;g.notFound=true;return;}
+  if(x.text!==t){G.before=t;m.text=x.text;}
+  try{apply(g,P.checkGrounded(m.text,ps.length));}catch(e){}}
+function paintCheck(d,G){var cut=(G.removed||[]).length,box=mk("details","rag-check"+(cut?" cut":""));box.setAttribute("role","note");
+  var sm=mk("summary");sm.appendChild(mk("span","rc-dot"));var line;
+  if(G.mode==="strict")line=cut?("Checked against your passages: "+(cut===1?"one sentence was":cut+" sentences were")+" taken out, as no passage given holds "+(cut===1?"it":"them")+"."):"Checked against your passages: every sentence holds.";
+  else line=cut?("Checked against your passages: "+(cut===1?"one sentence holds":cut+" sentences hold")+" a detail its passage does not. "+(cut===1?"It is":"They are")+" marked here, not taken out."):"Checked against your passages: every sentence holds.";
+  if(G.mended)line+=" "+(G.mended===1?"One citation was":G.mended+" citations were")+" mended to the passage that holds it.";
+  if(G.badRefs&&G.badRefs.length)line+=" The reply cites "+G.badRefs.map(function(n){return "["+n+"]";}).join(", ")+", which "+(G.badRefs.length===1?"is":"are")+" not among the passages it was given.";
+  sm.appendChild(mk("span",null,line));box.appendChild(sm);
+  if(cut){var ul=mk("ul");G.removed.forEach(function(s){var li=mk("li");li.appendChild(mk(G.mode==="strict"?"del":"span",null,"\u201c"+(s.text.length>220?s.text.slice(0,218)+"\u2026":s.text)+"\u201d"));li.appendChild(mk("span","rc-why",s.why));ul.appendChild(li);});box.appendChild(ul);box.open=true;}
+  if(G.before){var bf=mk("details","rc-before");bf.appendChild(mk("summary",null,"The answer before the check"));bf.appendChild(mk("div",null,G.before));box.appendChild(bf);}
+  beforeActs(d,box);}
+/* who may answer: this computer's model, its larger one when it is there, and every connection she keeps (the strongest recommended) */
+function whoOptions(){var out=[],lm=localModel(),C=W.IngConnections,ks=[];
+  try{ks=C?C.kept().filter(function(k){return k&&k.provider;}):[];}catch(e){ks=[];}
+  if(lm)out.push({kind:"device",name:"This computer: "+(lm.customName||lm.name||"its model"),note:"Stays on this computer."});
+  var bm=null;try{bm=bigModel();}catch(e){bm=null;}
+  if(bm&&bm.ready)out.push({kind:"magister",name:"This computer: "+bm.name,note:"Stays on this computer. Larger and more careful with its sources; it loads first."});
+  ks.forEach(function(k){var nm;try{nm=C.label(k);}catch(e){nm=String(k.provider);}
+    out.push({kind:"conn",k:k,name:nm+(k.model?": "+k.model:""),note:"A model on "+nm+"\u2019s own computers.",away:"For this answer, your question and the passages found in your folders go to "+nm+". Nothing else does."});});
+  var rank=function(o){if(o.kind!=="conn")return o.kind==="magister"?1:0;var p=String(o.k.provider||""),md=String(o.k.model||"");
+    return 10+(p==="anthropic"?(/opus/i.test(md)?9:/sonnet/i.test(md)?7:5):p==="openai"?(/gpt-5/i.test(md)?8:5):p==="gemini"?(/pro/i.test(md)?7:4):3);};
+  var best=null;out.forEach(function(o){if(!best||rank(o)>rank(best))best=o;});if(best)best.rec=true;
+  return out;}
+var WHO=null;
+function closeWho(v){if(!WHO)return;var w=WHO;WHO=null;try{w.el.remove();}catch(e){}try{D.removeEventListener("keydown",w.key,true);}catch(e){}w.done(v);}
+function placeWho(s){var box=$("chatInput"),r=box&&box.offsetParent?box.getBoundingClientRect():null,w=s.offsetWidth,h=s.offsetHeight;
+  var left=r?Math.min(W.innerWidth-w-12,Math.max(12,r.right-w)):Math.max(12,(W.innerWidth-w)/2);
+  var top=r?Math.max(12,r.top-h-12):Math.max(12,W.innerHeight-h-24);s.style.left=Math.round(left)+"px";s.style.top=Math.round(top)+"px";}
+function askWho(opts){return new Promise(function(res){if(WHO)closeWho(null);
+  var s=mk("div");s.id="ragWho";s.setAttribute("role","dialog");s.setAttribute("aria-label","Who answers from your folders");
+  s.appendChild(mk("h4",null,"Who answers from your folders"));s.appendChild(mk("p","rw-q","Your question is answered only from the passages Ingenium finds in your folders."));
+  var keys=[];opts.forEach(function(o){var b=mk("button","btn rw-opt");b.type="button";
+    b.appendChild(mk("span","rw-ic"+(o.kind==="conn"?" cl":""),o.kind==="conn"?String(o.name).charAt(0).toUpperCase():(o.kind==="magister"?"M":"\u2302")));
+    b.appendChild(mk("span","rw-name",o.name));b.appendChild(o.rec?mk("span","rw-badge","Recommended"):mk("span"));b.appendChild(mk("span","rw-note",o.note));if(o.away)b.appendChild(mk("span","rw-away",o.away));
+    b.onclick=function(){closeWho(o);};s.appendChild(b);keys.push(b);});
+  var f=mk("div","rw-foot"),lab=mk("label"),cb=mk("input");cb.type="checkbox";cb.checked=askOn();
+  cb.onchange=function(){try{if(!state.rag||typeof state.rag!=="object")state.rag={};state.rag.ask=cb.checked;saveState();}catch(e){}};
+  lab.appendChild(cb);lab.appendChild(D.createTextNode("Ask me each time"));f.appendChild(lab);
+  var no=mk("button","btn small","Not now");no.type="button";no.onclick=function(){closeWho(null);};f.appendChild(no);s.appendChild(f);
+  D.body.appendChild(s);placeWho(s);
+  var key=function(e){if(!WHO)return;if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeWho(null);return;}
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();var i=keys.indexOf(D.activeElement);i=e.key==="ArrowDown"?Math.min(keys.length-1,i+1):Math.max(0,i-1);try{keys[i].focus();}catch(_){}}};
+  D.addEventListener("keydown",key,true);WHO={el:s,key:key,done:res};
+  var first=keys[Math.max(0,opts.findIndex(function(o){return o.rec;}))];setTimeout(function(){try{first.focus({preventScroll:true});}catch(e){}},30);});}
+function useWho(o){try{if(o.kind==="conn"){if(W.IngWho&&IngWho.useConn)IngWho.useConn(o.k);}
+  else{if(o.kind==="magister"&&typeof lineupUse==="function")lineupUse("magister");if(W.IngWho&&IngWho.useDevice)IngWho.useDevice(true);else{state.chatSource="local";saveState();}}}catch(e){}}
 
 /* ---------------------------------------------------------------- 4. the viewer */
 var opener=null;
@@ -302,7 +415,13 @@ function view(mm,i,from){var ps=(mm.rag&&mm.rag.passages)||[],p=ps[i],box=$("mod
 /* ---------------------------------------------------------------- joined to the chat */
 function wrap(name,make){var o=W[name];if(typeof o!=="function"||o.__r257)return;var n=keepMarks(make(o),o);n.__r257=1;W[name]=n;}
 function hook(){
-  wrap("sendRec",function(o){return function(rec){try{decide(rec);}catch(e){}return o.apply(this,arguments);};});
+  wrap("sendRec",function(o){return function(rec){var self=this,args=arguments;try{decide(rec);}catch(e){}
+    /* 7.08: with Your folders on, who answers is asked first, when more than one can */
+    if(rec&&rec.ragAsk===true&&askOn()&&!rec.ragWho){var opts=[];try{opts=whoOptions();}catch(e){opts=[];}
+      if(opts.length>1)return askWho(opts).then(function(ch){
+        if(!ch){try{curMsgs().push({role:"bot",preview:true,text:"Not sent to a model: no one was chosen to answer from your folders. Send it again when you are ready."});trimChat();saveState();renderChat();}catch(e){}return null;}
+        rec.ragWho=ch.name;useWho(ch);return o.apply(self,args);});}
+    return o.apply(self,args);};});
   wrap("chatPrepare",prepareWrap);
   wrap("chatHistory",historyWrap);
   wrap("ingChatContextText",contextWrap);
@@ -315,7 +434,7 @@ if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",hook);
 W.addEventListener("load",function(){hook();setTimeout(hook,1600);setTimeout(hook,2400);});
 /* the folder search arrives a moment after the page (r202 imports it): the chip shows then */
 (function wait(n){if(R()){try{if(on())paintChips();}catch(e){}return;}if(n>0)setTimeout(function(){wait(n-1);},600);})(60);
-W.IngRagChat={NOT_FOUND:NOT_FOUND,on:on,usable:usable,setOn:setOn,decide:decide,view:view,finish:finish,
+W.IngRagChat={NOT_FOUND:NOT_FOUND,on:on,usable:usable,setOn:setOn,decide:decide,view:view,finish:finish,whoOptions:whoOptions,closeWho:closeWho,
   _as:function(n){USER=n?String(n):"me";return USER;}};
 })();
 ;try{window.__ingParts["p257"]="running";}catch(_){}

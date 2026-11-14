@@ -313,6 +313,9 @@ export function guard(answer, passages, question) {
     // kept when it cites a passage given
     if (!exact && d0.codes.length + d0.names.length + d0.nums.length + d0.cal.length && cites.length) { kept++; return sent; }
     if (META.test(body) && !exact) { if (cites.length) return sent; removed.push({ text: sent.trim(), missing: ['names no passage'] }); return ''; }
+    // 7.08: a sentence with no detail and almost no words of its own ("It is also in [9].") is no claim: kept when it cites a passage
+    // given, else taken out; never mended to a passage it did not name
+    if (!exact && d.words.length < 2 && !(d0.codes.length + d0.names.length + d0.nums.length + d0.cal.length)) { if (cites.length) return sent; removed.push({ text: sent.trim(), missing: ['names no passage'] }); return ''; }
     if (cites.length && cites.some((n) => supports(ps[n - 1], body, d).ok)) { kept++; return sent; }
     // the passage that holds every detail, and most of the wording, mends the citation
     let best = 0, bestShare = -1;
