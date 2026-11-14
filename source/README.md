@@ -371,6 +371,62 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.01 (14 November 2026): Build's diamond rides, on the holder she chose; Focus's landscape fills the whole card; Fabrica's
+tree stands for every app, and every part of it answers a press.
+- Build (modules/r292.js, out of build/held.json). Her words: "I like this preview and the holder design with the seal button, I want you
+  to push it everywhere but please refine the light animations and the other animations of the page, they are too brusque and intense,
+  they are fast and curt and detract from the smooth visuals of the page." The holder is the one on the other session's preview
+  (Ingenium_Heads_-_3.html): a round silver case traced on the graphics chip, Ingenium's Orrery engraved on its face, the engine
+  button's seal at its heart, a bezel, a band of small set jewels and a milled rim. The stone and its light are this session's: one ray
+  at a time, slower and softer than before, sent through now and then on its own (every 16 to 26 seconds) as well as on a press ("The
+  light can periodically fire through the diamond not just limited to when I click on it").
+- "I need the diamond and the holder to be clickable and animated", and "I want the diamond to feel like a clickable button and have
+  vaious effects and animations similar to the animations and effects of the engine button throughout Ingenium's pages." The stone
+  answers a press as Home's engine button does: it sinks under the press, then plays one of the button's flourishes (spin, pulse, hop,
+  twirl or beat, never the same twice running, and every seventh press the grand one), with a ring of light round it and Home's click.
+  Pointed at, it turns to the pointer, lifts a little and brightens.
+- "I want the orrerry to be spinning inside of the diamond holder when I click on the surface the same way that it does on the compass
+  from Vocatio, I want matching animations." The Orrery is the compass's own dial, handed over by the kit (IngStudios.kit.dial in
+  modules/r290.js), so Build draws it without Vocatio having been opened. It turns at the compass's pace (4 degrees a second); a press
+  on the face adds the compass's burst (120 degrees a second, slowing over about a second and a half) and a ripple from the point
+  pressed, as on the compass. The seal plays one of the engine button's flourishes; the bezel and the band of jewels turn, with a light
+  running round them; the rim rings as if knocked. Every press plays Home's click.
+- Lighter to run (her words: "The entire page is runnign slow and lagging as well"): on a retina screen the stone starts at 85 per cent
+  of the screen's resolution and lowers it further when frames come slowly; at rest it draws 30 frames a second, and it stops drawing
+  while its page is hidden or scrolled away. This environment draws in software, so the gain on a real graphics chip was not measured.
+- Focus (modules/r291.js). "I also don't want half of the Focus header card to be black or have this dark shadow, I want the whole card
+  to be filled with the purple landscape design and animation." The pool now fills the whole card, behind the words, which stand on the
+  sky and the water; the stones keep their place, as the view is shifted (its lens, uOx) so that what 7.00 showed stands where it stood.
+  By night the water's glint of the low light ahead is softened under the words (uWx): no moon explains it, and it lit a white streak
+  behind the hint. The stones' side keeps the night she approved.
+- "The lighter stone should be first on the Focus page on Night mode and the purple stone should be second", and "For the Focus page,
+  the darker purple stone should be the first stone on Day mode." The stones' colours now go by their place on the path, whatever step
+  is in hand (the step in hand keeps its light and its rings): by night light, purple, then slate; by day a deeper violet, pearl, then
+  lilac.
+- Fabrica (modules/r294.js). "The tree from Fabrica is missing and its surface are not clickable, especially the seal button." An app
+  with one version drew its only bead on the plinth itself, and one with two a stub of a trunk: the versions now spread over at least
+  150 of the trunk's height, the newest at the top, and the plinth says "1 VERSION" in the singular. The tree is drawn at its true size
+  (423.2 px) rather than at 460 px and shrunk to 92 per cent by the page, which blurred it. The rods' silver is read at the right angle of
+  the light (7.00 read it at fifteen times the angle), its shading runs across each piece of a rod the same way whichever way the piece
+  points, and the pieces overlap by half a pixel, so no seam or hairline shows between them.
+- Every part of the tree answers a press, with Ingenium's own sound: a version's bead swells and lifts with a ring of light (the star at
+  the top of the trunk too, the seal she named); the trunk and the plinth turn the tree, the plinth the more, and a light runs once round
+  its violet band; pointed at, they show a hand. A version pressed still opens what it changed in the panels below, and the page stays
+  where it is. The example tree's words no longer fail when no app is chosen.
+- The Guide's news has three 7.01 lines (modules/r222.js): Build's and Focus's are shown where Vocatio is (those heads are drawn with
+  its kit, r290), Fabrica's where Fabrica is.
+Tests: `node rig/t_701_heads.js <page url> <out>` (22: the holder's five parts found by the module's own hit test and each pressed with the
+pointer; the Orrery's turn at rest and pressed; the stones' colours read at their own places by day and by night; the brightness under
+Focus's hint by night, 0.53 on 7.00 and 0.27 now; the tree at its true size, pressed on its star, trunk and plinth, and for apps of one
+and two versions). rig/t_700_heads.js now expects the 7.01 hint and the pool over the whole card. Read-only hooks for these checks:
+IngDiamond.part(x, y), IngDiamond.holder().da, IngStones.state().stones.pos, IngTree.state().pressed and knockedPart.
+
+Ingenium 7.00 (14 November 2026; the other session's sources, 6d346d4 and before, released from this one): Focus opens on stepping stones
+across still water (modules/r291.js; stars and the northern lights by night, a soft bright sky by day), a stone pressed sounds like a stone
+meeting water; nature sounds in the top bar on every page (r295); Fabrica's tree in silver and glass, never faded (r294); the studios'
+instruments under the words on a phone (r296); Lector's seal in a stack of its own, drawn above the sheets (r290); Bring in your work in a
+panel over the Folders page (r263). Build's diamond (r292) was held for her verdict. Tests: `node rig/t_700_heads.js <page url> <out>` (18).
+
 Ingenium 6.99 (13 November 2026): Lector's seal stays on the paper, its shadows drawn without a blur; Fabrica's empty chips hidden.
 - Her words (13 November 2026): "there is a clear bug that keeps on disappearing the wax seal. I hate that." Pressing the sheet in front of
   Lector's fan sent the seal to its resting depth (-1 px, modules/r290.js .lf-seal.lf-dn) while the sheet's lift under the pointer (26 px)

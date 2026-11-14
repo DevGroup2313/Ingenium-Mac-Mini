@@ -992,6 +992,11 @@ function vcRose(nt){var c=108,id="skv"+(++VC.n),f=function(v){return v.toFixed(2
   for(i=1;i<4;i++)L3.push([(i*90-90)*Math.PI/180,100,13.5,"s"]);L3.push([-Math.PI/2,102,13.5,"n"]);
   var out={rings:rings,layers:[layer({k:"a",list:L1}),layer({k:"b",list:L2}),layer({k:"c",list:L3})],nt:nt,VI:VI,VN:VN};
   out.layers.forEach(function(Ly){vcFacets(Ly.top,0,nt,VI,VN);});return out;}
+/* 7.01: the compass's dial as Build's holder carries it (her words, 14 November 2026: "I specifically said that I want the ingenium orrery design
+   from the compass"): the enamel picture (vcDialUrl) and, over it, the engraved rings with Ingenium's Orrery (vcDialArt), the very drawing
+   the compass makes; Build turns them into one picture for its holder's seat */
+function vcDialPic(nt){var c=108,ink=nt?"rgba(232,224,250,.32)":"rgba(52,30,100,.42)",rings=svg("svg",{viewBox:"0 0 216 216","aria-hidden":"true"});
+  rings.appendChild(svg("circle",{cx:c,cy:c,r:"104",fill:"none",stroke:ink,"stroke-width":".6"}));vcDialArt(rings,c,nt);return {url:vcDialUrl(nt),rings:rings};}
 /* the dial's engraving: Ingenium's own ornament, after the old dials she chose */
 function vcDialArt(g0,c,nt){var f=function(v){return v.toFixed(2);},i,a,k,id="skv"+(++VC.n),P=function(r,t){return [c+r*Math.cos(t),c+r*Math.sin(t)];},D=Math.PI/180,
     groove=nt?"rgba(208,192,248,.5)":"rgba(66,36,140,.6)",lipc=nt?"rgba(4,1,14,.55)":"rgba(255,255,255,.96)",
@@ -1722,6 +1727,8 @@ W.IngStudios={compassOn:function(){W.ING_COMPASS=true;CP.key="";try{hookCareer()
   state:function(){return {T:CP.T,cur:CP.cur,n:CP.data?CP.data.list.length:0,cp:CP.key,lb:LB.key};},
   /* what the other heads share with these (Focus, modules/r291.js; Build, modules/r292.js) */
   kit:{hero:hero,label:label,steps:steps,orb:orb,wireOrb:wireOrb,sealKey:sealKey,plateUrl:plateUrl,collarUrl:collarUrl,scrollTo:scrollTo,still:still,night:night,mk:mk,svg:svg,img:img,ICO:ICO,ROMAN:ROMAN,
+    /* 7.01: the compass's dial for Build's holder (modules/r292.js): its enamel picture and its engraved rings with Ingenium's Orrery, by day or night */
+    dial:vcDialPic,
     mv:{pal:mvPal,tag:mvTag,scale:mvScale,cv:mvCv,rgb:mvRgb,grain:mvGrain,env:mvEnv,ring:mvRingPx,setting:mvSetting,plate:mvPlate,LX:MVLX,LY:MVLY}}};
 try{window.__ingParts["p290"]="running";}catch(_){}
 })();

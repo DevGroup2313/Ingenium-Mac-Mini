@@ -39,7 +39,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   ok(bd.state && bd.state.label && /^\d+ lines?$/.test(bd.state.label[0]) && /runs (as you type|when you press Run)/.test(bd.state.label[1]), 'beside it, the lines of code and how the page runs', bd.state);
-  ok(/press it/.test(bd.hint) && /light shoots through it/.test(bd.hint), 'the hint says what a press does', bd.hint);
+  // 7.01: the holder answers a press too (rig/t_701_heads.js checks each part)
+  ok(/Press it/.test(bd.hint) && /any part of its holder/.test(bd.hint), 'the hint says what a press does', bd.hint);
   // its keys act where they stand: Run your page presses Run; the page stays where it was
   const run = await p.evaluate(() => { let n = 0; const rb = document.getElementById('runBtn'); const f = () => n++; rb.addEventListener('click', f); document.getElementById('bdRun').click(); rb.removeEventListener('click', f); return { n, top: document.scrollingElement.scrollTop }; });
   ok(run.n === 1 && run.top === 0, 'Run your page runs the page, and the page stays where it was', run);
@@ -60,9 +61,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     const w = h && h.querySelector('.skh-words').getBoundingClientRect(), vis = e => !!e && getComputedStyle(e).display !== 'none';
     return { head: !!h, eyebrow: h ? h.querySelector('.skh-eyebrow').textContent : '', keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [],
       ownTitle: vis(pg.querySelector(':scope > .page-title')), pool: o ? o.classList.contains('fc-pool') : false, fills: r && hr ? Math.abs(r.right - hr.right) < 2 && Math.abs(r.top - hr.top) < 2 && Math.abs(r.bottom - hr.bottom) < 2 : false,
-      right: r && w ? r.left >= w.left + 300 : false, cv: o ? o.querySelectorAll('canvas.fc-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__stonesErr || null, state: window.IngStones && IngStones.state(), numerals: /[IVX]{2,}/.test(o ? o.textContent : '') }; });
+      whole: r && hr ? Math.abs(r.left - hr.left) < 2 : false, cv: o ? o.querySelectorAll('canvas.fc-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__stonesErr || null, state: window.IngStones && IngStones.state(), numerals: /[IVX]{2,}/.test(o ? o.textContent : '') }; });
   ok(fc.head && /Focus · one step at a time/.test(fc.eyebrow) && JSON.stringify(fc.keys) === JSON.stringify(['Open Today', 'Your routines']) && !fc.ownTitle, 'Focus opens on its head: Open Today and Your routines', fc);
-  ok(fc.pool && fc.fills && fc.right && fc.cv === 1 && fc.nogl === null && !fc.err, 'the pool fills the card to the right of the words, drawn by the graphics chip', fc);
+  // 7.01, her words (14 November 2026): "I want the whole card to be filled with the purple landscape design and animation": the pool fills
+  // the whole card now, behind the words (it stood to the right of them in 7.00)
+  ok(fc.pool && fc.fills && fc.whole && fc.cv === 1 && fc.nogl === null && !fc.err, 'the pool fills the whole card, behind the words, drawn by the graphics chip', fc);
   ok(fc.state && fc.state.stones && fc.state.stones.ok && fc.state.stones.cnt === 5 && fc.state.label[0] === 'One step at a time' && fc.state.label[1] === 'Nothing planned yet' && !fc.numerals, 'with no task, five stones and "One step at a time"; no numerals', fc.state);
   // the stones follow the task in hand (an invented task)
   const task = await p.evaluate(() => { state.tasks = (state.tasks || []).filter(t => t.id !== 't700'); state.tasks.unshift({ id: 't700', title: 'Write the opening of a short story', steps: [{ t: 'Choose a name', done: true }, { t: 'Write the first line' }, { t: 'Read it aloud' }, { t: 'Rest a minute' }] });

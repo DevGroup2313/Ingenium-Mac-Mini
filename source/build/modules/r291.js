@@ -16,15 +16,20 @@
 #page-focus.sk-on > .page-title,#page-focus.sk-on > .lede{display:none !important}
 #page-focus.sk-on .skh-stage{display:none}
 #page-focus.sk-on .skh{margin-bottom:14px}
-#page-focus.sk-on .skh-obj.fc-pool{left:440px;right:0;top:0;bottom:0;width:auto;height:auto;transform:none;z-index:2;overflow:hidden;touch-action:manipulation}
+/* 7.01, her words (14 November 2026): "I also don't want half of the Focus header card to be black or have this dark shadow, I want the whole
+   card to be filled with the purple landscape design and animation." The pool now fills the whole card, behind the words; the stones keep
+   their place on the right (the pool is framed from --fc-frame, where its left edge was), and the words stand on the sky.
+   By night the water's glint of the low light ahead is softened under the words (uWx, the words' share of the card), where no moon
+   explains it and the hint would sit on a white streak; the stones' side keeps the night she approved. */
+#page-focus.sk-on .skh-obj.fc-pool{--fc-frame:440px;left:0;right:0;top:0;bottom:0;width:auto;height:auto;transform:none;z-index:1;overflow:hidden;touch-action:manipulation}
 #page-focus.sk-on .fc-cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 #page-focus.sk-on .fc-label{position:absolute;left:auto;right:30px;bottom:24px;top:auto;z-index:7;transform:none;text-align:right;pointer-events:none}
 #page-focus.sk-on .fc-label b{font-size:20px;text-shadow:0 1px 2px rgba(255,255,255,.75)}
 #page-focus.sk-on .fc-label small{font-size:11px;letter-spacing:.04em;text-shadow:0 1px 2px rgba(255,255,255,.75)}
 body[data-theme="night"] #page-focus.sk-on .fc-label b,body[data-theme="night"] #page-focus.sk-on .fc-label small{text-shadow:0 1px 3px rgba(4,2,12,.7)}
 body[data-theme="night"] #page-focus.sk-on .fc-label small{color:#cdb8f6}
-@media (max-width:1180px){#page-focus.sk-on .skh-obj.fc-pool{left:400px;transform:none}}
-@media (max-width:980px){#page-focus.sk-on .skh-obj.fc-pool{left:350px;transform:none}}
+@media (max-width:1180px){#page-focus.sk-on .skh-obj.fc-pool{--fc-frame:400px;left:0;transform:none}}
+@media (max-width:980px){#page-focus.sk-on .skh-obj.fc-pool{--fc-frame:350px;left:0;transform:none}}
 /* a phone or a narrow window: the pool under the words, the card's width and a little taller than half of it */
 @media (max-width:760px){#page-focus.sk-on .skh-obj.fc-pool{display:block !important;position:relative;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:270px;margin:14px -18px 0;border-radius:0}
   #page-focus.sk-on .fc-label{right:18px;bottom:14px}}
@@ -46,7 +51,7 @@ var D=document,W=window;
    second on dark mode") and approved on the other session's preview. A stone pressed answers in
    one of its ways, with soft water (r295). It draws only while in view and while the window is shown, thirty frames a second at rest. */
 var Stones=(function(){
-  var W0=520,H0=424,OX=0,host,cv,gl,pr,U={},raf=0,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
+  var W0=520,H0=424,OX=0,WX=0,host,cv,gl,pr,U={},raf=0,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
       lift=[0,0,0,0,0],dip=[0,0,0,0,0],rips=[],lastRing=-9;
   var CP=[0.12,1.12,5.7],TG=[0.32,0.55,-1.0],FOV=31*Math.PI/180;
   function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
@@ -56,7 +61,7 @@ var Stones=(function(){
   var S=[[-0.50,1.62,0.35,0.265,0.118,0.35],[0.02,0.36,0.33,0.25,0.112,-0.25],[0.52,-0.96,0.32,0.24,0.108,0.55],[0.94,-2.34,0.31,0.235,0.105,-0.1],[1.24,-3.75,0.30,0.23,0.102,0.4]],REST=0.5;
   var VS="attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
   var FS=["precision highp float;varying vec2 v;",
-  "uniform float uT,uN,uAsp,uTan,uOx;uniform vec3 uCP;uniform mat3 uCM;uniform vec4 uS[5];uniform vec4 uS2[5];uniform vec4 uRp[6];uniform vec4 uSw;uniform vec4 uGl;uniform float uCur,uOver;",
+  "uniform float uT,uN,uAsp,uTan,uOx,uWx;uniform vec3 uCP;uniform mat3 uCM;uniform vec4 uS[5];uniform vec4 uS2[5];uniform vec4 uRp[6];uniform vec4 uSw;uniform vec4 uGl;uniform float uCur,uOver;",
   "float h1(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}",
   "float vn(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);",
   "  return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}",
@@ -102,7 +107,13 @@ var Stones=(function(){
   "vec3 shadeStone(vec3 p,vec3 n,vec3 pl,float id,vec3 rd,float refl){",
   "  float g=vn(pl*9.0+id*7.0)*0.6+vn(pl*23.0+id*3.0)*0.4;n=normalize(n+(vec3(vn(pl*6.0+1.0),vn(pl*6.0+2.0),vn(pl*6.0+3.0))-0.5)*0.22);",
   "  float k=id<uCur-0.5?0.0:(abs(id-uCur)<0.5?1.0:2.0);",
-  "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.84,0.78,0.99),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.38,0.24,0.68),uN):mix(vec3(0.70,0.62,0.92),vec3(0.32,0.29,0.46),uN));",
+  "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.38,0.24,0.68),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.84,0.78,0.99),uN):mix(vec3(0.70,0.62,0.92),vec3(0.32,0.29,0.46),uN));",
+  /* 7.01, her words (14 November 2026): "The lighter stone should be first on the Focus page on Night mode and the purple stone should be
+     second", and "the darker purple stone should be the first stone on Day mode": the stones' colours go by their place on the path,
+     whatever step is in hand (the step in hand still has the light and the rings): by night light, purple, then slate; by day a deeper
+     violet, pearl, then lilac */
+  "  if(uN>0.5)al=id<0.5?vec3(0.84,0.78,0.99):(id<1.5?vec3(0.38,0.24,0.68):vec3(0.32,0.29,0.46));",
+  "  else al=id<0.5?vec3(0.42,0.28,0.76):(id<1.5?vec3(0.93,0.90,0.99):vec3(0.70,0.62,0.92));",
   "  al*=0.80+0.40*g;al+=vec3(0.035)*step(0.80,vn(pl*88.0+id))-vec3(0.03)*step(0.82,vn(pl*67.0+id*5.0));",
   "  float wet=1.0-smoothstep(0.0,0.028,p.y);al*=1.0-0.42*wet;",
   "  vec3 L=normalize(vec3(-0.5,0.62,0.35));float di=max(dot(n,L),0.0);vec3 amb=mix(vec3(0.42,0.40,0.52),vec3(0.16,0.12,0.30),uN);float ao=0.50+0.50*smoothstep(-0.65,0.45,n.y);",
@@ -130,7 +141,7 @@ var Stones=(function(){
   "    float F=0.02+0.98*pow(1.0-max(dot(-rd,wn),0.0),5.0);vec3 deep=mix(vec3(0.50,0.48,0.76),vec3(0.03,0.025,0.08),uN);",
   "    float ao=1.0;for(int i=0;i<5;i++){if(uS2[i].x<-1.0)continue;float yk=uS2[i].x/uS2[i].y;float wl=sqrt(max(0.05,1.0-yk*yk));float rr=length((p.xz-uS[i].xy)/vec2(uS[i].z,uS[i].w));ao*=mix(0.5,1.0,smoothstep(wl,wl+0.5,rr));}",
   "    col=mix(deep*ao,rc,clamp(F*2.4+mix(0.42,0.12,uN),0.0,1.0))*mix(1.0,ao,0.5);",
-  "    vec3 L=normalize(vec3(-0.5,0.35,-0.8));col+=pow(max(dot(r,L),0.0),140.0)*mix(vec3(1.0),vec3(0.85,0.78,1.0),uN)*1.4;",
+  "    vec3 L=normalize(vec3(-0.5,0.35,-0.8));float wm=uWx>0.01?mix(1.0-0.85*uN,1.0,smoothstep(uWx*0.80,uWx*1.25,v.x)):1.0;col+=pow(max(dot(r,L),0.0),140.0)*mix(vec3(1.0),vec3(0.85,0.78,1.0),uN)*1.4*wm;",
   "    {float age=uT-uGl.z;if(age>0.0&&age<3.0){vec2 d=p.xz-uGl.xy;float rr=length(d);float g=exp(-pow((rr-0.3-age*0.85)/0.05,2.0))*exp(-age*0.9)*(0.55+0.45*sin(atan(d.y,d.x)*18.0+age*3.0));col+=mix(vec3(1.0,0.98,0.95),vec3(0.86,0.78,1.0),uN)*g*0.55;}}",
   "    float dist=tw;col=mix(col,mistC(),mist(p)*mix(0.03,0.16,smoothstep(1.0,5.0,dist)));float fog=1.0-exp(-max(0.0,dist-3.0)*0.085);col=mix(col,fogC(),fog);",
   "    a=1.0;}",
@@ -141,10 +152,11 @@ var Stones=(function(){
     try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));}catch(e){W.__stonesErr=String(e);return false;}
     gl.useProgram(pr);var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
     var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    ["uT","uN","uAsp","uTan","uOx","uCP","uCM","uCur","uOver","uSw","uGl"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uS=gl.getUniformLocation(pr,"uS[0]");U.uS2=gl.getUniformLocation(pr,"uS2[0]");U.uRp=gl.getUniformLocation(pr,"uRp[0]");
-    gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);return true;}
-  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424);if(w===W0&&h===H0)return false;W0=w;H0=h;OX=-0.24*(W0/H0)*TAN;
-    if(gl){gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);}return true;}
+    ["uT","uN","uAsp","uTan","uOx","uWx","uCP","uCM","uCur","uOver","uSw","uGl"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uS=gl.getUniformLocation(pr,"uS[0]");U.uS2=gl.getUniformLocation(pr,"uS2[0]");U.uRp=gl.getUniformLocation(pr,"uRp[0]");
+    gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);gl.uniform1f(U.uWx,WX);return true;}
+  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424),L=0;try{L=parseFloat(W.getComputedStyle(host).getPropertyValue("--fc-frame"))||0;}catch(e){}if(host.offsetLeft>40||w<L+200)L=0;
+    var ox=-(0.24*w+0.76*L)/h*TAN;if(w===W0&&h===H0&&ox===OX)return false;W0=w;H0=h;OX=ox;WX=L>0?L/w:0;
+    if(gl){gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);gl.uniform1f(U.uWx,WX);}return true;}
   function size(){var d=Math.min(Math.min(2,Math.max(1,W.devicePixelRatio||1)),Math.sqrt(900000/(W0*H0)))*q;var w=Math.round(W0*d),h=Math.round(H0*d);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}}
   function proj(P){var vv=sub(P,CP),z=dot(vv,CF);var x=(dot(vv,CR)/z-OX)/TAN/(W0/H0),y=dot(vv,CU)/z/TAN;return [(x+1)/2*W0,(1-(y+1)/2)*H0,z];}
   function night(){return D.body.getAttribute("data-theme")==="night";}
@@ -184,7 +196,7 @@ var Stones=(function(){
     try{new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis)kick();}).observe(host);}catch(e){}
     D.addEventListener("visibilitychange",function(){shown=!D.hidden;if(shown)kick();});kick();}
   return {mount:mount,theme:kick,kick:kick,resize:function(){if(measure()){size();}kick();},q:function(){return q;},
-    setSteps:function(n,c){n=Math.max(1,Math.min(N,n|0));if(n===cnt&&c===cur)return;cnt=n;cur=c;kick();},state:function(){return {cnt:cnt,cur:cur,w:W0,h:H0,q:q,ok:ok};}};})();
+    setSteps:function(n,c){n=Math.max(1,Math.min(N,n|0));if(n===cnt&&c===cur)return;cnt=n;cur=c;kick();},state:function(){var pos=[];try{for(var i=0;i<cnt&&i<S.length;i++){var P=proj([S[i][0],S[i][4]*0.8,S[i][1]]);pos.push([Math.round(P[0]),Math.round(P[1])]);}}catch(e){}return {cnt:cnt,cur:cur,w:W0,h:H0,q:q,ok:ok,pos:pos};}};})();
 
 
 
