@@ -543,17 +543,11 @@ var Diamond=(function(){
   function gN(s){var b=GROUPS[s.g],n=[b[0],b[1],b[2]];for(var k=0;k<s.k;k++){n=[0.70710678*(n[0]-n[2]),n[1],0.70710678*(n[0]+n[2])];}return n;}
   function mv(M,p){return [M[0][0]*p[0]+M[0][1]*p[1]+M[0][2]*p[2],M[1][0]*p[0]+M[1][1]*p[1]+M[1][2]*p[2],M[2][0]*p[0]+M[2][1]*p[1]+M[2][2]*p[2]];}
   function proj(P){var v=sub(P,CP),z=dot(v,CF);var x=dot(v,CR)/z/TAN/(W0/H0),y=dot(v,CU)/z/TAN;return [(x+1)/2*W0,(1-(y+1)/2)*H0];}
-  /* 7.04: a sparkle's rays, long and thin, white by night, white over violet by day */
-  function spath(L,k){og.beginPath();og.moveTo(0,-L);og.quadraticCurveTo(k,-k,L,0);og.quadraticCurveTo(k,k,0,L);og.quadraticCurveTo(-k,k,-L,0);og.quadraticCurveTo(-k,-k,0,-L);}
-  function ray(x,y,L,nt,rot){var k=L*0.028;og.save();og.translate(x,y);if(rot)og.rotate(rot);
-    if(!nt){var gv=og.createRadialGradient(0,0,0,0,0,L);gv.addColorStop(0,"rgba(106,63,181,.45)");gv.addColorStop(1,"rgba(106,63,181,0)");og.fillStyle=gv;spath(L,k*2.4);og.fill();}
-    var gw=og.createRadialGradient(0,0,0,0,0,L);gw.addColorStop(0,"rgba(255,255,255,.95)");gw.addColorStop(.35,"rgba(255,255,255,.45)");gw.addColorStop(1,"rgba(255,255,255,0)");og.fillStyle=gw;spath(L,k);og.fill();og.restore();}
   function star(x,y,r,a,nt,c){if(a<=0.01)return;og.save();og.globalAlpha=Math.min(1,a);og.globalCompositeOperation=nt?"lighter":"source-over";
     if(!nt){var hl=og.createRadialGradient(x,y,0,x,y,r*1.1);hl.addColorStop(0,"rgba(106,63,181,.40)");hl.addColorStop(.5,"rgba(122,84,204,.16)");hl.addColorStop(1,"rgba(150,120,230,0)");og.fillStyle=hl;og.beginPath();og.arc(x,y,r*1.1,0,6.2832);og.fill();}
     var tn=c==null||c<0.55?"":(c<0.7?"255,214,240":(c<0.85?"212,234,255":"232,216,255"));
     var gr=og.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,"rgba(255,255,255,1)");gr.addColorStop(.2,tn?"rgba("+tn+",.88)":(nt?"rgba(222,206,255,.8)":"rgba(255,255,255,.85)"));gr.addColorStop(1,nt?"rgba(150,110,240,0)":"rgba(190,170,240,0)");
     og.fillStyle=gr;og.beginPath();var k=r*.12;og.moveTo(x,y-r);og.quadraticCurveTo(x+k,y-k,x+r,y);og.quadraticCurveTo(x+k,y+k,x,y+r);og.quadraticCurveTo(x-k,y+k,x-r,y);og.quadraticCurveTo(x-k,y-k,x,y-r);og.fill();
-    if(r>=4.5){ray(x,y,r*2.6,nt,0);ray(x,y,r*1.4,nt,0.7854);}
     var h=og.createRadialGradient(x,y,0,x,y,r*.5);h.addColorStop(0,nt?"rgba(200,170,255,.55)":"rgba(160,130,230,.25)");h.addColorStop(1,"rgba(160,130,230,0)");og.fillStyle=h;og.beginPath();og.arc(x,y,r*.5,0,Math.PI*2);og.fill();og.restore();}
   var MOTES=[];for(var mi=0;mi<22;mi++)MOTES.push([Math.random(),Math.random(),0.3+Math.random()*0.7,Math.random()*6.28]);
   /* specks: tiny glints that now and then catch on a facet (her words: "little specs of sparkles to occasionally reflect off the diamond's
@@ -563,25 +557,22 @@ var Diamond=(function(){
       a=i*45;FAC.push({g:6,k:i,p:[0.55*Math.cos(a*D2R),-0.35,0.55*Math.sin(a*D2R)]});a=11.25+i*45;FAC.push({g:7,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});a=33.75+i*45;FAC.push({g:8,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});}
     for(i=0;i<6;i++){a=i*60+15;FAC.push({g:-1,k:0,p:[0.32*Math.cos(a*D2R),0.31,0.32*Math.sin(a*D2R)]});}})();
   var SPECK=[],lastSp=-1;
-  /* 7.04: glittering lights (her words, 14 November 2026: "more sparkles and glittering lights"): points on the facets, each on its own clock */
-  var GLIT=(function(){var a=[];for(var i=0;i<44;i++){var f=FAC[(i*7+3)%FAC.length],j=[(Math.random()-0.5)*0.12,(Math.random()-0.5)*0.05,(Math.random()-0.5)*0.12];a.push({f:f,p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],w:2.5+Math.random()*2.3,ph:Math.random()*6.2832,r:2.6+Math.random()*4.0,c:Math.random()});}return a;})();
-  function glitter(t,M,DC,nt){for(var gi=0;gi<GLIT.length;gi++){var g=GLIT[gi],tw=Math.sin(t*g.w*(over?1.6:1)+g.ph);if(tw<=0.74)continue;var ga=Math.pow((tw-0.74)/0.26,1.6);var GP=mvS(M,g.p);GP=[GP[0]+DC[0],GP[1]+DC[1],GP[2]+DC[2]];var GN=g.f.g<0?mv(M,[0,1,0]):mv(M,gN(g.f));if(dot(GN,nrm(sub(CP,GP)))<0.05)continue;var gxy=proj(GP);star(gxy[0],gxy[1],g.r*(0.8+0.4*ga)*(over?1.15:1),ga,nt,g.c);}}
-  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=16.0+(u>=0&&u<1.4?10.0:0)+hb*14.0+pb*30.0;
-    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?40:32)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
-      SPECK.push({p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],f:f,t0:t,life:0.22+Math.random()*0.33,r:(2.4+Math.random()*4.6)*(hb||pb?1.25:1),c:Math.random()});}
+  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=8.0+(u>=0&&u<1.4?10.0:0)+hb*8.0+pb*20.0;
+    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?24:18)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
+      SPECK.push({p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],f:f,t0:t,life:0.22+Math.random()*0.33,r:(1.8+Math.random()*3.8)*(hb||pb?1.25:1),c:Math.random()});}
     for(var i=SPECK.length-1;i>=0;i--){var s=SPECK[i],age=(t-s.t0)/s.life;if(age>=1||age<0){SPECK.splice(i,1);continue;}
       var P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P)),N=s.f.g<0?mv(M,[0,1,0]):mv(M,gN(s.f));var hz=nrm([N[0],0.0001,N[2]]);
       if(dot(N,V)<0.05&&dot(hz,[V[0],0,V[2]])<0.25)continue;var xy=proj(P),a=Math.pow(Math.sin(Math.PI*age),2);star(xy[0],xy[1],s.r*(0.7+0.5*a),a,nt,s.c);}}
   function sparkle(t,M,DC,nt){og.setTransform(dpr(),0,0,dpr(),0,0);og.clearRect(0,0,W0,H0);
     for(var i=0;i<SPK.length;i++){var s=SPK[i],N=mv(M,gN(s)),P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P));if(dot(N,V)<=0.05)continue;
-      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.91:0.93;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(6+11*a)*(over?1.15:1),Math.min(1,a*1.25),nt);}
+      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.93:0.95;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(5+9*a)*(over?1.15:1),Math.min(1,a*0.95),nt);}
     var f=(t-PL.s)/PER;if(f>=0&&f<0.5){var A=PL.a,cA=Math.cos(A),sA=Math.sin(A),b1=A+Math.PI-0.95,b2=A+Math.PI+1.05;
       var hitA=Math.exp(-Math.pow((f-0.03)/0.014,2)),outA=Math.exp(-Math.pow((f-0.06)/0.02,2));
       var en=proj([DC[0]+cA*0.30,DC[1]+0.24,DC[2]+sA*0.30]);star(en[0],en[1],8+16*hitA,hitA,nt);
       [[-cA*0.55,-0.42,-sA*0.55]].forEach(function(e){var p=proj([DC[0]+e[0],DC[1]+e[1],DC[2]+e[2]]);star(p[0],p[1],6+12*outA,outA*0.9,nt);});
       for(var k=0;k<SPK.length;k++){var hk=Math.sin((k+1)*12.9898+PL.n*78.233)*43758.5453;hk-=Math.floor(hk);if(hk<0.45)continue;var gk=Math.exp(-Math.pow((f-0.05-hk*0.07)/0.022,2));if(gk<0.03)continue;
         var sk=SPK[k],Pk=mvS(M,sk.p);Pk=[Pk[0]+DC[0],Pk[1]+DC[1],Pk[2]+DC[2]];if(dot(mv(M,gN(sk)),nrm(sub(CP,Pk)))<=0.0)continue;var xyk=proj(Pk);star(xyk[0],xyk[1],4+9*gk,gk*0.9,nt);}}
-    specks(t,M,DC,nt,(t-PL.s)/TT);if(!still())glitter(t,M,DC,nt);
+    specks(t,M,DC,nt,(t-PL.s)/TT);
     /* motes of light in the air, drifting slowly, each twinkling now and then (on the card's own canvas when it has one) */
     if(!BG.ok)for(var j=0;j<MOTES.length;j++){var m=MOTES[j],x=40+m[0]*440,y=40+((m[1]-t*0.006*m[2])%1+1)%1*300,tw=Math.pow(0.5+0.5*Math.sin(t*0.75*m[2]+m[3]),6);
       og.globalAlpha=(nt?0.55:0.6)*(0.25+0.75*tw);og.fillStyle=nt?"rgba(226,212,255,1)":"rgba(132,96,220,1)";og.beginPath();og.arc(x,y,0.7+0.9*m[2],0,Math.PI*2);og.fill();if(tw>0.7)star(x,y,3+5*tw,(tw-0.7)*1.6,nt);}

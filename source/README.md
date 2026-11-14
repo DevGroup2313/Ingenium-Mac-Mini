@@ -371,30 +371,18 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.04 (14 November 2026): Build's diamond sparkles more; its holder's logo by night in deep indigo. Her words that day:
-"Please also remove the charcoal inside of the engine logo on the diamond's holder and make it a different colour that complements the
-design better without removing the logo engine symbol from the Holder ... I only want this done to the dark mode look only"; "I approve
-of the deep indigo face, please add more sparkles to the diamond, it could use some more sparkles and glittering lights and commit and
-push it everywhere"; "I want more sparkly effect and please revert the full spectrum northern lights and only leave them in the Focus
-page, I think the violet hues look better on the Build page without the full spectrum". All in `modules/r292.js`:
-- The engine logo at the holder's heart: by night its face is a deep indigo enamel (#3e2f86 to #17113a) instead of the charcoal
-  (#372d4d to #1a1524). Four violets and a plum were rendered against the night Orrery; the deep indigo sits with the Orrery's enamel
-  and keeps the star about as clear as the charcoal did (screen contrast between the star's lit side and the face about 5 to 1, the
-  charcoal about 5.5 to 1). The symbol (rim, ring, star, heart) and the day look are unchanged.
-- More sparkles: the specks 16 a second at rest (7.03: 8), 26 while the light crosses, 30 under the pointer, 46 for a moment after a
-  press, up to 32 at once (40 in a press); the glints from a wider angle (0.93 at rest, 0.91 under the pointer and in a press), a fifth
-  larger and brighter. New, glittering lights: 44 points on the facets, each twinkling on its own clock (every 1.3 to 2.5 seconds, bright
-  about a quarter of the time), faster under the pointer, drawn only on facets turned toward the eye; still under Minimal motion.
-- The northern lights stay violet. For a while that day they ran through the full spectrum, as Focus's do; at her word they are back to
-  their violet hues on Build, and the full spectrum stays on Focus only. No page was released with them.
-- Starbursts (her words: "There is still not even sparkles or glittering effect for the diamond on the Build page. The build page's
-  diamond is desperately needing its shimmering and glittering effect, it looks slightly dull without it"). Measured in the app (7.03),
-  the sparkle layer was on screen and drawing (about 425 lit pixels a frame), but its sparkles were four-pointed stars a few pixels
-  across and did not read as glitter. Now every sparkle of 4.5 pixels or more carries long fine rays (a cross 2.6 times its size and a
-  diagonal cross 1.4 times), white by night and white over violet by day so they show on the light sky; the specks and glittering
-  points are a little larger (2.4 to 7 and 2.6 to 6.6 pixels across their radius), so more of them carry rays. A scintillation of the
-  facets in the stone's own shader was tried the same hour and taken out at her word ("Please remove the shimmers from the diamond,
-  too much will cheapen the look of the diamond"); no page was released with it.
+Ingenium 7.04 (14 November 2026): the engine logo on Build's holder, by night, in deep indigo. Her words that day: "Please also remove
+the charcoal inside of the engine logo on the diamond's holder and make it a different colour that complements the design better without
+removing the logo engine symbol from the Holder. I want to see it before I fully approve of it. I only want this done to the dark mode look
+only"; then "I approve of the deep indigo face". In `modules/r292.js`: by night the logo's face is a deep indigo enamel (#3e2f86 to
+#17113a) instead of the charcoal (#372d4d to #1a1524). Four violets and a plum were rendered against the night Orrery; the deep indigo
+sits with the Orrery's enamel and keeps the star about as clear as the charcoal did (screen contrast between the star's lit side and the
+face about 5 to 1, the charcoal about 5.5 to 1). The symbol (rim, ring, star, heart) and the day look are unchanged.
+
+Everything else about the diamond is exactly as in 7.03. The same afternoon, on the live preview only, the diamond was given more and
+larger sparkles, glittering points, starburst rays and a shimmer on its facets, and its sky the full spectrum and then a starry night;
+at her words ("The sparkles and shimmers on the diamond is too much, I already told you to reduce and remove them"; "The whole thing
+looks horrible, revert it back") all of it was reverted, and none of it was released.
 
 Ingenium 7.03 (14 November 2026): the build library adds what is brought in. Her words that day: "I want you to make the app be able
 to receive new nopes or recipes without wiping all stored notes please". Until 7.02 a zip brought into the build library
