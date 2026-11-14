@@ -16,15 +16,15 @@
 #page-focus.sk-on > .page-title,#page-focus.sk-on > .lede{display:none !important}
 #page-focus.sk-on .skh-stage{display:none}
 #page-focus.sk-on .skh{margin-bottom:14px}
-#page-focus.sk-on .skh-obj.fc-pool{left:440px;right:0;top:0;bottom:0;width:auto;height:auto;transform:none;z-index:2;overflow:hidden;touch-action:manipulation}
+#page-focus.sk-on .skh-obj.fc-pool{left:0;right:0;top:0;bottom:0;width:auto;height:auto;transform:none;z-index:2;overflow:hidden;touch-action:manipulation}
 #page-focus.sk-on .fc-cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 #page-focus.sk-on .fc-label{position:absolute;left:auto;right:30px;bottom:24px;top:auto;z-index:7;transform:none;text-align:right;pointer-events:none}
 #page-focus.sk-on .fc-label b{font-size:20px;text-shadow:0 1px 2px rgba(255,255,255,.75)}
 #page-focus.sk-on .fc-label small{font-size:11px;letter-spacing:.04em;text-shadow:0 1px 2px rgba(255,255,255,.75)}
 body[data-theme="night"] #page-focus.sk-on .fc-label b,body[data-theme="night"] #page-focus.sk-on .fc-label small{text-shadow:0 1px 3px rgba(4,2,12,.7)}
 body[data-theme="night"] #page-focus.sk-on .fc-label small{color:#cdb8f6}
-@media (max-width:1180px){#page-focus.sk-on .skh-obj.fc-pool{left:400px;transform:none}}
-@media (max-width:980px){#page-focus.sk-on .skh-obj.fc-pool{left:350px;transform:none}}
+@media (max-width:1180px){#page-focus.sk-on .skh-obj.fc-pool{left:0;transform:none}}
+@media (max-width:980px){#page-focus.sk-on .skh-obj.fc-pool{left:0;transform:none}}
 /* a phone or a narrow window: the pool under the words, the card's width and a little taller than half of it */
 @media (max-width:760px){#page-focus.sk-on .skh-obj.fc-pool{display:block !important;position:relative;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:270px;margin:14px -18px 0;border-radius:0}
   #page-focus.sk-on .fc-label{right:18px;bottom:14px}}
@@ -127,16 +127,16 @@ var Stones=(function(){
   "  if(ts<tw){vec3 p=ro+rd*ts;col=shadeStone(p,n,pl,id,rd,1.0);float dist=ts;col=mix(col,mistC(),mist(p)*mix(0.03,0.16,smoothstep(1.0,5.0,dist)));col=mix(col,fogC(),1.0-exp(-max(0.0,dist-5.0)*0.10));}",
   "  else if(tw<1e8){vec3 p=ro+rd*tw;float e=0.012;float hx=wh(p.xz+vec2(e,0.0))-wh(p.xz-vec2(e,0.0)),hz=wh(p.xz+vec2(0.0,e))-wh(p.xz-vec2(0.0,e));",
   "    vec3 wn=normalize(vec3(-hx/(2.0*e),1.0,-hz/(2.0*e)));vec3 r=reflect(rd,wn);",
-  "    vec3 n2,pl2;float id2;float t2=hitStones(p+wn*0.002,r,n2,pl2,id2);vec3 rc=t2<1e8?shadeStone(p+r*t2,n2,pl2,id2,r,0.9):sky(r);",
+  "    vec3 n2,pl2;float id2;float t2=hitStones(p+wn*0.002,r,n2,pl2,id2);vec3 rc=t2<1e8?shadeStone(p+r*t2,n2,pl2,id2,r,0.9):sky(r);float uw=uN*(1.0-smoothstep(0.30,0.50,v.x))*(1.0-smoothstep(0.50,0.72,v.y));rc*=1.0-0.5*uw;",
   "    float F=0.02+0.98*pow(1.0-max(dot(-rd,wn),0.0),5.0);vec3 deep=mix(vec3(0.50,0.48,0.76),vec3(0.03,0.025,0.08),uN);",
   "    float ao=1.0;for(int i=0;i<5;i++){if(uS2[i].x<-1.0)continue;float yk=uS2[i].x/uS2[i].y;float wl=sqrt(max(0.05,1.0-yk*yk));float rr=length((p.xz-uS[i].xy)/vec2(uS[i].z,uS[i].w));ao*=mix(0.5,1.0,smoothstep(wl,wl+0.5,rr));}",
   "    col=mix(deep*ao,rc,clamp(F*2.4+mix(0.42,0.12,uN),0.0,1.0))*mix(1.0,ao,0.5);",
-  "    vec3 L=normalize(vec3(-0.5,0.35,-0.8));col+=pow(max(dot(r,L),0.0),140.0)*mix(vec3(1.0),vec3(0.85,0.78,1.0),uN)*1.4;",
+  "    vec3 L=normalize(vec3(-0.5,0.35,-0.8));col+=pow(max(dot(r,L),0.0),140.0)*mix(vec3(1.0),vec3(0.85,0.78,1.0),uN)*1.4*(1.0-0.8*uw);",
   "    {float age=uT-uGl.z;if(age>0.0&&age<3.0){vec2 d=p.xz-uGl.xy;float rr=length(d);float g=exp(-pow((rr-0.3-age*0.85)/0.05,2.0))*exp(-age*0.9)*(0.55+0.45*sin(atan(d.y,d.x)*18.0+age*3.0));col+=mix(vec3(1.0,0.98,0.95),vec3(0.86,0.78,1.0),uN)*g*0.55;}}",
   "    float dist=tw;col=mix(col,mistC(),mist(p)*mix(0.03,0.16,smoothstep(1.0,5.0,dist)));float fog=1.0-exp(-max(0.0,dist-3.0)*0.085);col=mix(col,fogC(),fog);",
   "    a=1.0;}",
   "  else{col=sky(rd);a=1.0;}",
-  "  col=tm(col);float fe=smoothstep(0.0,0.26,v.x);gl_FragColor=vec4(col*fe,fe);}"].join("\n");
+  "  col=tm(col);gl_FragColor=vec4(col,1.0);}"].join("\n");
   function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
   function init(){try{gl=cv.getContext("webgl",{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:"low-power"})||cv.getContext("experimental-webgl");}catch(e){gl=null;}if(!gl)return false;
     try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));}catch(e){W.__stonesErr=String(e);return false;}
@@ -144,7 +144,7 @@ var Stones=(function(){
     var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
     ["uT","uN","uAsp","uTan","uOx","uCP","uCM","uCur","uOver","uSw","uGl"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uS=gl.getUniformLocation(pr,"uS[0]");U.uS2=gl.getUniformLocation(pr,"uS2[0]");U.uRp=gl.getUniformLocation(pr,"uRp[0]");
     gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);return true;}
-  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424);if(w===W0&&h===H0)return false;W0=w;H0=h;OX=-0.24*(W0/H0)*TAN;
+  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424);if(w===W0&&h===H0)return false;W0=w;H0=h;var vw=W.innerWidth||1440,L0=vw<=980?350:(vw<=1180?400:440);if((!(W.matchMedia&&matchMedia("(max-width:760px)").matches))&&W0>L0+200){var cx=L0+0.62*(W0-L0),s0=(cx-W0/2)/(W0/2);OX=-s0*(W0/H0)*TAN;}else OX=-0.24*(W0/H0)*TAN;
     if(gl){gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);}return true;}
   function size(){var d=Math.min(Math.min(2,Math.max(1,W.devicePixelRatio||1)),Math.sqrt(900000/(W0*H0)))*q;var w=Math.round(W0*d),h=Math.round(H0*d);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}}
   function proj(P){var vv=sub(P,CP),z=dot(vv,CF);var x=(dot(vv,CR)/z-OX)/TAN/(W0/H0),y=dot(vv,CU)/z/TAN;return [(x+1)/2*W0,(1-(y+1)/2)*H0,z];}

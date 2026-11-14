@@ -38,6 +38,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(bd.head && bd.before && bd.on && /Build · code in, a page out/.test(bd.eyebrow), 'Build opens on its head, before the page\'s card, made as the other studios\' are', bd);
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
+  // 7.01, her words (14 November 2026): "I also want the landscape of the Build page diamond to fill the card on both day and night mode"
+  const bgc = await p.evaluate(() => { const h = document.querySelector('#page-build .skh'), c = h && h.querySelector('canvas.bd-bg'), r = c && c.getBoundingClientRect(), hr = h && h.getBoundingClientRect();
+    return { has: !!c, covers: r && hr ? Math.abs(r.left - hr.left) < 2 && Math.abs(r.right - hr.right) < 2 && Math.abs(r.top - hr.top) < 2 && Math.abs(r.bottom - hr.bottom) < 2 : false, w: c ? c.width : 0 }; });
+  ok(bgc.has && bgc.covers && bgc.w > 0, 'the sky and its northern lights fill the whole card, behind the words and the stone', bgc);
   ok(bd.state && bd.state.label && /^\d+ lines?$/.test(bd.state.label[0]) && /runs (as you type|when you press Run)/.test(bd.state.label[1]), 'beside it, the lines of code and how the page runs', bd.state);
   ok(/press it/i.test(bd.hint) && /holder/.test(bd.hint) && /engine logo/.test(bd.hint), 'the hint says what a press does, on the diamond and on any part of its holder', bd.hint);
   // its keys act where they stand: Run your page presses Run; the page stays where it was
@@ -69,9 +73,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     const w = h && h.querySelector('.skh-words').getBoundingClientRect(), vis = e => !!e && getComputedStyle(e).display !== 'none';
     return { head: !!h, eyebrow: h ? h.querySelector('.skh-eyebrow').textContent : '', keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [],
       ownTitle: vis(pg.querySelector(':scope > .page-title')), pool: o ? o.classList.contains('fc-pool') : false, fills: r && hr ? Math.abs(r.right - hr.right) < 2 && Math.abs(r.top - hr.top) < 2 && Math.abs(r.bottom - hr.bottom) < 2 : false,
-      right: r && w ? r.left >= w.left + 300 : false, cv: o ? o.querySelectorAll('canvas.fc-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__stonesErr || null, state: window.IngStones && IngStones.state(), numerals: /[IVX]{2,}/.test(o ? o.textContent : '') }; });
+      whole: r && hr ? Math.abs(r.left - hr.left) < 2 : false, cv: o ? o.querySelectorAll('canvas.fc-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__stonesErr || null, state: window.IngStones && IngStones.state(), numerals: /[IVX]{2,}/.test(o ? o.textContent : '') }; });
   ok(fc.head && /Focus · one step at a time/.test(fc.eyebrow) && JSON.stringify(fc.keys) === JSON.stringify(['Open Today', 'Your routines']) && !fc.ownTitle, 'Focus opens on its head: Open Today and Your routines', fc);
-  ok(fc.pool && fc.fills && fc.right && fc.cv === 1 && fc.nogl === null && !fc.err, 'the pool fills the card to the right of the words, drawn by the graphics chip', fc);
+  // 7.01, her words (14 November 2026): "I want the whole card to be filled with the purple landscape design and animation"
+  ok(fc.pool && fc.fills && fc.whole && fc.cv === 1 && fc.nogl === null && !fc.err, 'the pool fills the whole card, behind the words, drawn by the graphics chip', fc);
   ok(fc.state && fc.state.stones && fc.state.stones.ok && fc.state.stones.cnt === 5 && fc.state.label[0] === 'One step at a time' && fc.state.label[1] === 'Nothing planned yet' && !fc.numerals, 'with no task, five stones and "One step at a time"; no numerals', fc.state);
   // the stones follow the task in hand (an invented task)
   const task = await p.evaluate(() => { state.tasks = (state.tasks || []).filter(t => t.id !== 't700'); state.tasks.unshift({ id: 't700', title: 'Write the opening of a short story', steps: [{ t: 'Choose a name', done: true }, { t: 'Write the first line' }, { t: 'Read it aloud' }, { t: 'Rest a minute' }] });

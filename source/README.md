@@ -371,6 +371,51 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.01 (14 November 2026): Build's diamond on its silver holder, gentle and light to run; Build's and Focus's landscapes
+over their whole header cards; Fabrica's tree for every app, every part of it answering a press.
+
+Her words (14 November 2026): "This is the design that I want for the Build page, this is the one"; "I approve of this design,
+please push it everywhere"; "please refine the light animations and the other animations of the page, they are too brusque and
+intense"; "The entire page is runnign slow and lagging"; "I need the diamond and the holder to be clickable and animated"; "The
+lighter stone should be first on the Focus page on Night mode and the purple stone should be second"; "The tree from Fabrica is
+missing and its surface are not clickable, especially the seal button"; "I want the whole card to be filled with the purple
+landscape design and animation"; "I also want the landscape of the Build page diamond to fill the card on both day and night mode
+instead of being limited to a square".
+
+- Build (`modules/r292.js`, out of build/held.json): her design (the file she sent that day) with the holder's silver deeper by
+  day; no glass, Vocatio's own Orrery in its seat, handed over by the compass (`IngStudios.kit.dial`, r290) and turning as the
+  compass's dial does; Ingenium's engine logo at its heart, drawn from the base page's own seal in its four layers, each at its own
+  height, moving as the logo moves and playing Home's flourishes when pressed; every part of the holder glowing softly under the
+  pointer and answering a press; a press on the diamond turns it, with a burst of sparkles. The sky (the northern lights, the
+  day's glows, the motes) is drawn on a canvas of its own across the whole card, at half sharpness and half the frames.
+- Gentler: the light crosses the stone more slowly and softly; the holder's lights travel slowly, rising and fading; presses turn
+  its parts gently and they settle over two or three seconds; the springs are softer.
+- Lighter: the stone traced twice a pixel on a sharp screen instead of four times; thirty frames a second at rest and sixty only
+  while the stone answers on a machine that keeps up; the drawing coarser only while frames fall behind; the holder's seat found
+  by one sum, its surface read from its profile, the old glass case's code gone. In the test browser a frame costs about 2.5
+  times less work than before.
+- Focus (`modules/r291.js`): the pool fills the whole card behind the words with no fade at its side; the view moved so the
+  stones stand where they stood; by night the stones' colours go by their place: the lighter stone first, the purple second.
+  It draws within the same budget of pixels as before, so filling the card costs no more; by night the water's reflection
+  is softened under the words.
+- Fabrica (`modules/r294.js`): the tree from the other chat's 7.01 sources (claude/relaxed-hopper-nz4ert, 46f4769): it stands for
+  an app of one or two versions (their newest bead had sat on the plinth), at its true size, its silver's shading never flipping;
+  its beads, trunk and plinth answer a press; and here the engine star at the top of the trunk turns as the engine logo does and
+  spins when pressed.
+- Fabrica's glitch (her words: "remove the glitch from Fabrica's tree, I think its a bug"): the plinth and the trunk's rings
+  were drawn as seen from a little above, but a point off the trunk rose as it came toward the eye and sank as it went away, as
+  if seen from below, so the branches swung up and down across the frame as the tree turned (its highest point travelled 112
+  pixels; now 11). A point now rises as it goes away and sinks as it comes near; the trunk and every size are unchanged.
+- Measured on every page (rig-free, with Chrome's own counters): no head keeps drawing once its page is left, and a plain page
+  rests at about two per cent of the main thread; the work is in the heads while they are shown, where 7.01 lightens Build.
+- The Guide (`modules/r222.js`): the news for 7.01, and the other chat's 7.00 fix (bede809): the Folders line no longer names
+  Fabrica, which the gift and demo editions do not have.
+- The numbering: another chat released 7.00 on claude/relaxed-hopper-nz4ert (ec0ab68, 53fb60b); this line's page commit
+  87b9d42 of the same day says 7.00 too, with different content. 7.01 on claude/tender-fermat-3f415n follows both, at her word.
+
+    node rig/t_700_heads.js http://127.0.0.1:8150/ingenium.html <out>      # the heads, the holder's logo, the full-card skies
+    node rig/t_696_fabrica_head.js http://127.0.0.1:8150/ingenium.html <out>
+
 Ingenium 6.99 (13 November 2026): Lector's seal stays on the paper, its shadows drawn without a blur; Fabrica's empty chips hidden.
 - Her words (13 November 2026): "there is a clear bug that keeps on disappearing the wax seal. I hate that." Pressing the sheet in front of
   Lector's fan sent the seal to its resting depth (-1 px, modules/r290.js .lf-seal.lf-dn) while the sheet's lift under the pointer (26 px)
