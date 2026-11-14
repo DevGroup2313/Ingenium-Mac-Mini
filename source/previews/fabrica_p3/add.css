@@ -1,0 +1,144 @@
+/* Fabrica, phase 3: the new pieces, drawn only with Fabrica's own tokens (--f-*, measured from the 7.06 page), so each takes its look by
+   day and by night as the rest of Fabrica does. Keys are Fabrica's own .f-btn, chips its .f-chip, cards its .f-tg; what is new here is
+   only how they are arranged. Every motion is slow and soft (her words, 14 November 2026: "please refine the light animations and the
+   other animations of the page, they are too brusque and intense"). */
+#fb .p3-hide{display:none!important}
+/* the app hides Fabrica's own title and steps under its header card (r294, a rule that names the page); the window does the same */
+.win #fb .f-head > div:not(.f-steps),.win #fb .f-head > .f-steps{display:none}
+/* five rooms in the work's narrow panel: the same keys, a little closer (a class the script sets, as Chrome 83 has no :has) */
+#fb .fr-rooms.p3-five{gap:5px}#fb .fr-rooms.p3-five .fr-room{padding:6px 9px 6px 7px;gap:5px;font-size:12.5px}
+#fb .fr-rooms.p3-five .fr-room .fr-n{min-width:15px;height:15px;padding:0 4px;font-size:10px}
+/* the new rooms' content keeps the inner margin of Fabrica's own lists (.f-files: 12 px) */
+#fb .p3-pad{padding:2px 12px 14px}
+/* ---------- Needs you, at the top of Your apps ---------- */
+#fb .p3-needs{margin:8px 10px 6px;padding:9px 9px 7px;border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));border:1px solid var(--f-hair);box-shadow:var(--f-pop)}
+#fb .p3-needs .t{display:flex;align-items:center;gap:8px;font:600 13.5px/1.3 var(--f-serif);color:var(--f-ink1);letter-spacing:.02em;margin:0 0 6px}
+#fb .p3-needs .t .f-chip{font-family:var(--f-sans)}
+#fb .p3-need{display:flex;align-items:flex-start;gap:9px;width:100%;text-align:left;padding:7px 8px;margin:0 0 3px;border:0;border-radius:9px;background:transparent;color:inherit;font:inherit;cursor:pointer;transition:background .25s,transform .25s var(--f-spring)}
+#fb .p3-need:hover{background:var(--f-accs);transform:translateY(-1px)}
+#fb .p3-need:active{transform:translateY(1px)}
+#fb .p3-need .d{flex:0 0 auto;width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--f-acc)}
+#fb .p3-need .d.bad{background:var(--f-del)}#fb .p3-need .d.due{background:var(--f-warn)}#fb .p3-need .d.ok{background:var(--f-ok)}
+#fb .p3-need > span:last-child{min-width:0;flex:1}
+#fb .p3-need b{display:block;font-size:12.5px;font-weight:600;color:var(--f-ink1);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fb .p3-need small{display:block;font-size:11.5px;color:var(--f-ink3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fb .p3-needs .more{display:block;margin:2px 0 0 8px;padding:2px 0;border:0;background:none;color:var(--f-acc);font:600 12px var(--f-sans);cursor:pointer}
+#fb .p3-needs .more:hover{text-decoration:underline}
+/* ---------- Learn, in every room ---------- */
+#fb .p3-learnk{display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 9px 2px 7px;border-radius:999px;border:1px solid var(--f-hair);background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pill);color:var(--f-acc);font:600 11.5px/1.5 var(--f-sans);cursor:pointer;vertical-align:1px;transition:transform .2s var(--f-spring),box-shadow .2s}
+#fb .p3-learnk:hover{transform:translateY(-2px)}#fb .p3-learnk:active{transform:translateY(1px);box-shadow:var(--f-press)}
+#fb .p3-learnk svg{width:13px;height:13px}
+#fb .p3-lcard{margin:8px 0 10px;padding:11px 13px 10px;border-radius:12px;background:var(--f-card);border:1px solid var(--f-hair);box-shadow:var(--f-well);animation:p3Open .45s cubic-bezier(.22,.8,.3,1) both}
+@keyframes p3Open{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+#fb .p3-lcard h4{margin:0 0 6px;font:600 14px/1.3 var(--f-serif);color:var(--f-ink1);letter-spacing:.02em}
+#fb .p3-lcard p{margin:0 0 7px;font-size:12.5px;line-height:1.55;color:var(--f-ink2)}
+#fb .p3-lcard dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0 0 8px;font-size:12.5px}
+#fb .p3-lcard dt{color:var(--f-ink3);font-weight:600}#fb .p3-lcard dd{margin:0;color:var(--f-ink1)}
+#fb .p3-lcard code{font:12px/1.4 var(--f-mono);background:var(--f-code);color:var(--f-codeink);padding:1px 5px;border-radius:5px;border:1px solid var(--f-hair2)}
+#fb .p3-lcard .f-row{display:flex;gap:8px;flex-wrap:wrap}
+#fb .p3-show{animation:p3Show 1.6s ease-in-out 2}
+@keyframes p3Show{0%,100%{box-shadow:var(--f-pop)}50%{box-shadow:var(--f-pophi),0 0 0 4px var(--f-accs)}}
+.win .p3-cap{position:absolute;z-index:96;pointer-events:none;padding:4px 9px;border-radius:8px;background:#221a2e;color:#fff;font:600 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-shadow:0 6px 16px rgba(20,10,40,.28);opacity:0;transform:translateY(3px);transition:opacity .25s,transform .25s;max-width:320px}
+.win .p3-cap.on{opacity:1;transform:none}.win .p3-cap span{display:block;font-weight:500;opacity:.78}
+.win[data-theme="night"] .p3-cap{background:#efe9f6;color:#221a2e}
+/* ---------- Runs ---------- */
+#fb .p3-rb{display:flex;flex-direction:column;gap:8px}
+#fb .p3-run{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:3px 10px;align-items:center;width:100%;text-align:left;padding:10px 11px;border:1px solid var(--f-hair);border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);color:inherit;font:inherit;cursor:pointer;transition:transform .18s var(--f-spring),box-shadow .18s}
+#fb .p3-run:hover{transform:translateY(-2px);box-shadow:var(--f-pophi)}#fb .p3-run:active{transform:translateY(1px);box-shadow:var(--f-press)}
+#fb .p3-run .m,#fb .p3-job .m,#fb .p3-step .m{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--f-wellbg);box-shadow:var(--f-well);color:var(--f-ink3)}
+#fb .p3-run .m.ok,#fb .p3-job .m.ok,#fb .p3-step .m.ok{color:var(--f-ok);background:var(--f-oks);box-shadow:none}
+#fb .p3-run .m.bad,#fb .p3-job .m.bad,#fb .p3-step .m.bad{color:var(--f-del);background:var(--f-delbg);box-shadow:none}
+#fb .p3-run .m.run,#fb .p3-job .m.run,#fb .p3-step .m.run{color:var(--f-acc);background:var(--f-accs);box-shadow:none}
+#fb .p3-run .m.run::after,#fb .p3-job .m.run::after,#fb .p3-step .m.run::after{content:"";width:10px;height:10px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:p3Turn 1.6s linear infinite}
+@keyframes p3Turn{to{transform:rotate(360deg)}}
+#fb .p3-run b{font-size:13px;font-weight:600;color:var(--f-ink1)}
+#fb .p3-run small{grid-column:2;font-size:11.5px;color:var(--f-ink3)}
+#fb .p3-run .w{grid-row:1/3;grid-column:3;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:11.5px;color:var(--f-ink3)}
+#fb .p3-run .w .f-chip{font-size:11px;padding:2px 8px}
+#fb .p3-bar{grid-column:1/-1;height:4px;border-radius:999px;background:var(--f-wellbg);box-shadow:var(--f-well);overflow:hidden;margin-top:4px}
+#fb .p3-bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--f-pb),var(--f-pa));transition:width 1.2s ease-in-out}
+#fb .p3-runhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0 10px}
+#fb .p3-runhead h4{margin:0;font:600 15px/1.3 var(--f-serif);color:var(--f-ink1);letter-spacing:.02em}
+#fb .p3-runhead small{display:block;font-size:11.5px;color:var(--f-ink3);margin-top:2px}
+#fb .p3-runhead .k{display:flex;gap:6px;flex-wrap:wrap}
+#fb .p3-jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 10px;position:relative}
+#fb .p3-job{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 9px;align-items:center;text-align:left;padding:9px 10px;border:1px solid var(--f-hair);border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);color:inherit;font:inherit;cursor:pointer;transition:transform .18s var(--f-spring),box-shadow .18s,border-color .2s}
+#fb .p3-job:hover{transform:translateY(-2px);box-shadow:var(--f-pophi)}#fb .p3-job:active{transform:translateY(1px);box-shadow:var(--f-press)}
+#fb .p3-job[aria-pressed="true"]{border-color:var(--f-ring);box-shadow:var(--f-pophi),inset 0 0 0 1px var(--f-ring)}
+#fb .p3-job b{font-size:12.5px;font-weight:600;color:var(--f-ink1)}#fb .p3-job small{grid-column:2;font-size:11px;color:var(--f-ink3);line-height:1.35}
+#fb .p3-job.after{grid-column:1/-1}
+#fb .p3-steps{display:flex;flex-direction:column;gap:3px;margin:0 0 10px}
+#fb .p3-step{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px;padding:3px 2px;color:var(--f-ink2)}
+#fb .p3-step .m{width:20px;height:20px;border-radius:6px;font-size:11px}
+#fb .p3-step time{font-size:11px;color:var(--f-ink3);font-variant-numeric:tabular-nums}
+#fb .p3-log{position:relative;margin:0 0 10px;border-radius:12px;background:var(--f-code);border:1px solid var(--f-hair);box-shadow:var(--f-well);overflow:hidden}
+#fb .p3-log .lh{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--f-hair2);font-size:11.5px;color:var(--f-ink3)}
+#fb .p3-log .lh input{flex:1;min-width:0;border:1px solid var(--f-hair);border-radius:8px;padding:3px 8px;background:var(--f-hi);color:var(--f-ink1);font:12px var(--f-sans)}
+#fb .p3-log pre{margin:0;max-height:178px;overflow:auto;padding:8px 0;font:11.5px/1.6 var(--f-mono);color:var(--f-codeink);white-space:pre-wrap;overflow-wrap:anywhere}
+#fb .p3-log pre span{display:block;padding:0 10px 0 44px;text-indent:-44px;animation:p3Line .5s ease both}
+@keyframes p3Line{from{opacity:0}to{opacity:1}}
+#fb .p3-log pre i{display:inline-block;width:34px;margin-right:10px;text-align:right;color:var(--f-com);font-style:normal;user-select:none}
+#fb .p3-log pre span.bad{background:var(--f-delbg);color:var(--f-del)}#fb .p3-log pre span.ok{color:var(--f-ok)}#fb .p3-log pre span.hit{background:var(--f-accs)}
+#fb .p3-explain{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--f-accs);color:var(--f-ink1);font-size:12.5px;line-height:1.55}
+#fb .p3-explain b{display:block;font:600 13.5px/1.3 var(--f-serif);margin-bottom:4px}
+#fb .p3-arts{display:flex;flex-direction:column;gap:6px}
+#fb .p3-art{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:8px 10px;border-radius:10px;border:1px solid var(--f-hair2);background:var(--f-card)}
+#fb .p3-art b{font-size:12.5px;font-weight:600;color:var(--f-ink1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#fb .p3-art small{grid-column:1;font-size:11px;color:var(--f-ink3)}
+#fb .p3-art .k{grid-row:1/3;grid-column:2;display:flex;gap:6px}
+/* ---------- Workflows ---------- */
+#fb .p3-wfs{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#fb .p3-wf{display:flex;flex-direction:column;gap:5px;padding:10px 11px;border:1px solid var(--f-hair);border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop)}
+#fb .p3-wf .top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+#fb .p3-wf b{font-size:13px;font-weight:600;color:var(--f-ink1)}
+#fb .p3-wf code{font:11px var(--f-mono);color:var(--f-ink3)}
+#fb .p3-wf small{font-size:11.5px;color:var(--f-ink3);line-height:1.45}
+#fb .p3-wf .on{display:flex;gap:5px;flex-wrap:wrap}
+#fb .p3-wf .on .f-chip{font-size:11px;padding:2px 8px}
+/* ---------- Machines ---------- */
+#fb .p3-mcs{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#fb .p3-mc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:10px 11px;border:1px solid var(--f-hair);border-radius:12px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop)}
+#fb .p3-mc .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--f-accs);color:var(--f-acc)}
+#fb .p3-mc .ic svg{width:20px;height:20px}
+#fb .p3-mc b{font-size:13px;font-weight:600;color:var(--f-ink1)}#fb .p3-mc small{display:block;font-size:11.5px;color:var(--f-ink3)}
+#fb .p3-mc .st{font-size:11px}
+#fb .p3-tools{grid-column:2/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 10px;margin-top:4px}
+#fb .p3-tools.miss{grid-template-columns:minmax(0,1fr);margin-top:2px}
+#fb .p3-tool{display:flex;align-items:baseline;gap:6px;font-size:11.5px;color:var(--f-ink2);line-height:1.45}
+#fb .p3-tool i{font-style:normal;font-weight:700;width:12px}#fb .p3-tool.ok i{color:var(--f-ok)}#fb .p3-tool.no i{color:var(--f-warn)}
+#fb .p3-tool.no{color:var(--f-ink3)}
+#fb .p3-mc .can{grid-column:2/-1;font-size:11.5px;color:var(--f-ink2);margin-top:3px}
+#fb .p3-mc .can b{font-size:11.5px}
+#fb .p3-mc .k{grid-column:2/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#fb .p3-mc.sleep{opacity:.82}
+/* ---------- Releases: every device ---------- */
+#fb .p3-rel{border:1px solid var(--f-hair);border-radius:14px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);padding:12px 12px 10px;margin:0 0 10px}
+#fb .p3-rel .rh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 4px}
+#fb .p3-rel .rh h4{margin:0;font:600 15px/1.3 var(--f-serif);color:var(--f-ink1);letter-spacing:.02em}
+#fb .p3-rel .tag{font:600 11px var(--f-mono);padding:2px 7px;border-radius:6px;background:var(--f-accs);color:var(--f-acc)}
+#fb .p3-rel .meta{font-size:11.5px;color:var(--f-ink3);margin:0 0 6px}
+#fb .p3-rel ul{margin:0 0 8px 18px;padding:0;font-size:12.5px;color:var(--f-ink2);line-height:1.5}
+#fb .p3-dev{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;padding:9px 2px;border-top:1px solid var(--f-hair2)}
+#fb .p3-dev .ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--f-wellbg);box-shadow:var(--f-well);color:var(--f-ink2)}
+#fb .p3-dev .ic svg{width:17px;height:17px}
+#fb .p3-dev > b{align-self:center;font-size:13px;font-weight:600;color:var(--f-ink1)}
+#fb .p3-assets{grid-column:2;display:flex;flex-direction:column;gap:5px}
+#fb .p3-asset{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:7px 9px 8px;border-radius:9px;background:var(--f-card);border:1px solid var(--f-hair2)}
+#fb .p3-asset b{font-size:12px;font-weight:600;color:var(--f-ink1)}
+#fb .p3-asset small{grid-column:1;font-size:11px;color:var(--f-ink3);line-height:1.4}
+#fb .p3-asset .k{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+#fb .p3-asset .f-btn{padding:4px 9px;font-size:11.5px;border-radius:8px}
+#fb .p3-asset.miss{background:transparent;border-style:dashed}
+#fb .p3-rel .foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+/* ---------- Ship: where it is made ---------- */
+#fb .p3-where{margin:0 0 10px}
+#fb .p3-mchips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+#fb .p3-mchips .f-chip{font-size:10.5px;padding:1px 7px}
+/* ---------- the sheets of phase 3 ---------- */
+#fb .p3-pick{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
+#fb .p3-pick .f-opt[aria-pressed="true"]{border-color:var(--f-ring);box-shadow:var(--f-pophi),inset 0 0 0 1px var(--f-ring)}
+#fb .p3-gloss{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,.8fr) minmax(0,1.4fr);gap:0;margin:4px 0 10px;font-size:12.5px;border:1px solid var(--f-hair);border-radius:12px;overflow:hidden;max-height:420px;overflow-y:auto}
+#fb .p3-gloss > *{padding:6px 10px;border-bottom:1px solid var(--f-hair2)}
+#fb .p3-gloss .h{font:700 10.5px/1.4 var(--f-sans);letter-spacing:.08em;text-transform:uppercase;color:var(--f-ink3);background:var(--f-card);position:sticky;top:0}
+#fb .p3-gloss b{font-weight:600;color:var(--f-ink1)}#fb .p3-gloss code{font:11.5px var(--f-mono);color:var(--f-ink2)}#fb .p3-gloss span{color:var(--f-ink2)}
+@media (prefers-reduced-motion:reduce){#fb .p3-lcard,#fb .p3-log pre span{animation:none}#fb .p3-run .m.run::after{animation:none}#fb .p3-bar i{transition:none}}

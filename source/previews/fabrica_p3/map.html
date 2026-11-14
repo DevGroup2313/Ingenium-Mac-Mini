@@ -1,0 +1,65 @@
+<section class="map" aria-labelledby="mapH">
+  <h2 id="mapH">Parity with GitHub, and beyond it</h2>
+  <p>What GitHub does, what Fabrica does in Ingenium 7.06, and what phases 3 and 4 add. Fabrica's column is read from its own code on 14 November 2026. GitHub's column is from my own knowledge of GitHub, which may have changed since: GitHub's own documentation holds its current limits and prices. Each phase is shown as a preview first, and built only on your word.</p>
+  <div class="mk" id="mapKeys" role="group" aria-label="Show"></div>
+  <div id="mapRows"></div>
+  <div class="order" id="mapOrder"></div>
+</section>
+<script>
+(function(){
+var NOW="In Fabrica now",P3="Phase 3",P4="Phase 4",LATER="Later",BEY="Beyond GitHub";
+var MAP=[["Code and versions"],
+ ["Browse the code at any version, with its README","Yes","Yes, kept in Ingenium or straight from your drive",NOW],
+ ["Blame, a file's history, Compare","Yes","Yes",NOW],
+ ["Branches and tags","Yes","Yes",NOW],
+ ["Repositories of any size","Within GitHub's size guidance","Any size on your own drive (6.86), worked on there (6.87)",NOW],
+ ["Large files kept whole in the history","Files over 100 MB only through Git LFS, within its limits","Kept whole on the drive; no cap but the drive itself",NOW],
+ ["Search every repository at once, by words or by meaning","By words","By words and by what it means (6.88)",BEY],
+ ["Fork, or use as a template","Yes","Yes",NOW],
+ ["Issues and pull requests"],
+ ["Issues with labels, people and milestones","Yes","Yes (6.89)",NOW],
+ ["Templates for new issues and pull requests","Yes","Yes (6.89)",NOW],
+ ["Pull requests: conversation, versions, files changed, a comment on any line","Yes","Yes (6.89)",NOW],
+ ["Merge, squash or rebase, on the drive itself","Yes","Yes (6.86, 6.92)",NOW],
+ ["Rules before main","Yes","Yes (6.91)",NOW],
+ ["A review by your own model, offline","Copilot, online","Yes (6.86)",BEY],
+ ["Discussions","Yes","",LATER],
+ ["Actions: workflows and runs"],
+ ["Fabrica's own checks on each version","Status checks","Five checks, and Safety (6.91)",NOW],
+ ["Your workflows (.github/workflows), the same files, run on your own Mac mini and HP laptop","Only on machines you register as self-hosted runners","In this preview: Runs, on Machines you choose",P3],
+ ["The same workflows run on GitHub's own machines, their logs and files brought back","Yes; minutes are counted for private repositories","In this preview: GitHub's machines beside yours, with your sign-in",P3],
+ ["Every log and every file a run makes, kept with no expiry","Kept for a set time (90 days unless changed), within storage limits","In this preview: kept until you remove them, on your drive",P3],
+ ["Mac, Windows, the Fire tablet and the iPhone in one run","Yes","In this preview: Build every device",P3],
+ ["A failed step explained in plain words","","In this preview: Explain this error, by your own model",BEY],
+ ["Releases"],
+ ["Releases with their files","Yes","Yes; brought from GitHub with their fingerprints",NOW],
+ ["Every device in one release: Mac app, Windows installer, APK, IPA, Home Screen app, build kits","Whatever your workflows upload","In this preview: one row per device, made here or built on a machine",P3],
+ ["A Windows app that installs for you, appears in Settings, Apps, and uninstalls","Whatever your workflow makes","In this preview; made in Fabrica with no tools",P3],
+ ["Install on this Mac or PC, or send to the Fire tablet, from the release","","In this preview",BEY],
+ ["Build kits that build in your terminal, in Ingenium, or on GitHub, with no Ingenium file in them","","In this preview (every app; The Forge, Carpe Diem and Inkwell already ship their own)",P3],
+ ["Release notes written for you","A list made from the pull requests","By your own model (6.86)",BEY],
+ ["Test machines"],
+ ["Simulators and emulators: iPhone, iPad, the Fire tablet","On GitHub's machines","Shown in this preview under Machines; built in phase 4",P4],
+ ["Open a version on each test device and keep its pictures","","Phase 4",P4],
+ ["Learning and finding your way"],
+ ["What each room is, its name on GitHub and in git, and why it matters","Documentation, elsewhere","In this preview: Learn, in every room, and Learning mode",BEY],
+ ["What needs you across all your apps: failed runs, dates due, reviews waiting, versions ready to ship","Notifications","In this preview: Needs you, at the top of Your apps",BEY],
+ ["Wiki, projects, insights"],
+ ["Wiki with each page's history; a board of To do, In progress, Done; activity","Yes","Yes",NOW],
+ ["Secrets left in the code, the parts and their licences","Yes, online","Yes, on every version (6.91)",NOW],
+ ["What changed while you were away","Notifications","Yes (6.91)",NOW],
+ ["A second copy on another drive, checked by fingerprint","","Yes (6.88)",BEY],
+ ["Nothing leaves your computer unless you send it; GitHub is optional","","Yes",BEY]];
+var KEYS=[["all","All"],[NOW,NOW],[P3,P3],[P4,P4],[LATER,LATER],[BEY,BEY]],SEL="all";
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function cls(w){return w===NOW?"now":w===P3?"p3":w===P4?"p4":w===BEY?"bey":"";}
+function paint(){var k=document.getElementById("mapKeys");k.innerHTML="";KEYS.forEach(function(x){var b=document.createElement("button");b.className="tg";b.type="button";b.textContent=x[1];b.setAttribute("aria-pressed",x[0]===SEL?"true":"false");b.onclick=function(){SEL=x[0];paint();};k.appendChild(b);});
+  var R=document.getElementById("mapRows");R.innerHTML="";var grp=null;
+  MAP.forEach(function(r){if(r.length===1){grp=r[0];return;}if(SEL!=="all"&&r[3]!==SEL)return;if(grp){var g=document.createElement("div");g.className="grp";g.textContent=grp;R.appendChild(g);grp=null;}
+    var d=document.createElement("div");d.className="row";d.innerHTML="<b>"+esc(r[0])+"</b><span><span class=\"lb\">GitHub </span>"+esc(r[1]||"No")+"</span><span><span class=\"lb\">Fabrica </span>"+esc(r[2]||"Not yet")+'</span><span class="ph '+cls(r[3])+'">'+esc(r[3])+"</span>";R.appendChild(d);});}
+var ORDER=[["Done, up to 7.06","Your repositories at any size on your drive and worked on there; issues, pull requests, reviews, rules, line comments, templates, people and milestones; Safety on every version; a second copy; Find by meaning; Ingenium in Test and ship; ready-made apps for every device made here."],
+  ["Phase 3 (this preview)","Runs: your workflows on your own Mac mini and HP laptop, and on GitHub's machines, every log and file kept; Machines; every device in one release, with a Windows app that installs and uninstalls; build kits clean for every app; Learn as you go; Needs you."],
+  ["Phase 4, then later","The test machines (simulators and emulators on your Mac mini, your HP laptop as a Windows test machine); then Discussions, and Find anything in Fabrica."]];
+var O=document.getElementById("mapOrder");ORDER.forEach(function(x){var d=document.createElement("div");d.innerHTML="<b>"+esc(x[0])+"</b>"+esc(x[1]);O.appendChild(d);});
+paint();})();
+</script>
