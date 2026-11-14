@@ -53,7 +53,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const ob = await p.evaluate(() => { const r = document.querySelector('#page-build .skh-obj').getBoundingClientRect(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.36 }; });
   await p.evaluate(() => { window.__snd = []; const o = IngSound.play; IngSound.play = function (r) { window.__snd.push(r); return o.apply(this, arguments); }; });
   await p.mouse.move(ob.x, ob.y); await sleep(300); await p.mouse.down(); await sleep(120); await p.mouse.up(); await sleep(300);
-  const snd = await p.evaluate(() => window.__snd.slice()); ok(snd.indexOf('paper') >= 0, 'a press on the diamond plays Ingenium\'s own sound', snd);
+  // 7.01, her words (14 November 2026): "give the diamond a sound effect for when I press it, I want it to have that weighted click like a real button"
+  const clk = await p.evaluate(() => +document.querySelector('#page-build .skh-obj').getAttribute('data-click') || 0); ok(clk >= 2, 'a press on the diamond gives its own weighted click, down and back up', clk);
   // 7.00 (14 November 2026): the holder carries Vocatio's own Orrery, handed over by the compass (r290), with the engine logo at its heart
   // ("I specifically said that I want the ingenium orrery design from the compass"; "the engine logo needs to be drawn to fit the middle of
   // the holder"); a press on the middle of the holder reaches the logo, with the same sound

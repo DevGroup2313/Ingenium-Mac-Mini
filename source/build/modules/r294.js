@@ -182,7 +182,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
      clickable and have the same effect as the engine button from the Home page"): at rest each beats softly with the button's heartbeat, out
      of step with the others; pressed, one of the button's flourishes (r175, r290's SFL: spin, pulse, hop, twirl, beat; every seventh press
      the grand one), with its glow and its ripple, at the button's own pace */
-  var FL2={b:null,n:"",d:1,t:-1e9,count:0,last:""},FORD=["spin","pulse","hop","twirl","beat"];
+  var DN=null,KB={b:null,t:-1e9},FL2={b:null,n:"",d:1,t:-1e9,count:0,last:""},FORD=["spin","pulse","hop","twirl","beat"];
   function startFl(b){var n=FL2.count+1,nm=n%7===0?"grand":(function(){var c=FORD.filter(function(x){return x!==FL2.last;});return c[Math.floor(Math.random()*c.length)];})();
     FL2={b:b,n:nm,d:Math.random()<0.5?-1:1,t:performance.now(),count:n,last:nm};}
   function kf(F,x){if(x<=F[0][0])return F[0][1];for(var i=1;i<F.length;i++){if(x<=F[i][0]){var a=F[i-1],c=F[i],u=(x-a[0])/((c[0]-a[0])||1);return a[1]+(c[1]-a[1])*u;}}return F[F.length-1][1];}
@@ -190,6 +190,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
   function segE(F,x){for(var i=1;i<F.length;i++){if(x<=F[i][0]){var a=F[i-1],c=F[i],u=(x-a[0])/((c[0]-a[0])||1);return a[1]+(c[1]-a[1])*EIO(u);}}return F[F.length-1][1];}
   function ballFx(b,bi,now){var f={sc:1,lift:0,rot:0,sx:1,sy:1,glowA:0,glowS:1,rips:[]};if(still())return f;
     var cyc=D.body.getAttribute("data-motion")==="calm"?5:3.2,ph=(((now/1000)+bi*0.61*cyc)%cyc)/cyc;f.sc=1+(segE([[0,1],[.14,1.18],[.28,1.04],[.42,1.12],[.56,1],[1,1]],ph)-1)*0.2;
+    if(DN&&DN.b===b)f.sc*=1-0.10*Math.min(1,(now-DN.t)/80);if(KB.b===b){var ke=(now-KB.t)/600;if(ke>=0&&ke<1)f.sc*=kf([[0,0.9],[.25,1.1],[.5,.96],[.75,1.03],[1,1]],ke);}
     if(FL2.b===b){var e=(now-FL2.t)/1000,d=FL2.d,n=FL2.n,R=b.r;if(e>2.2)return f;
       if(n==="spin"||n==="grand"){f.rot+=d*TAU*sbez(.25,.9,.3,1,e/1.15);f.sc*=kf([[0,1],[.35,1.14],[1,1]],EIO(e/0.9));}
       if(n==="pulse")f.sc*=kf([[0,1],[.28,1.13],[.6,.97],[.8,1.03],[1,1]],EOU(e/0.95));
@@ -351,7 +352,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
 /* ---------- motion: a slow turn, stilled under the pointer, turned by a drag ---------- */
 function loop(t){RAF=0;if(!page||!page.offsetParent||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(LAST&&t-LAST<30){RAF=requestAnimationFrame(loop);return;}var dt=Math.min(64,t-(LAST||t));LAST=t;
   if(!still()){SPIN+=(TARGET-SPIN)*Math.min(1,dt/260);if(!DRAG)ANG+=SPIN*dt*TAU/52000+TV*dt/1000;TV*=Math.exp(-dt/1500);}else TV=0;
-  var busy=performance.now()-Math.max(PR.t,FL2.t)<2300||performance.now()-KN.t<1600;
+  var busy=!!DN||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600;
   draw();if(!still()||(TREE&&TREE.waiting)||busy)RAF=requestAnimationFrame(loop);}
 function kick(){if(!RAF){LAST=0;RAF=requestAnimationFrame(loop);}}
 function at(e){var r=stage.getBoundingClientRect(),k=r.width/460;return {x:(e.clientX-r.left)/k,y:(e.clientY-r.top)/k};}
@@ -365,13 +366,13 @@ function words(b){if(b.wait)return "<b>Not kept yet</b>"+(TREE&&TREE.waiting?TRE
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function showTip(B){if(!B){tip.classList.remove("fbt-show");return;}tip.innerHTML=words(B.b);var x=B.x+B.r+10,y=B.y-14;if(x>300)x=B.x-B.r-10-200;tip.style.left=Math.max(0,x*0.92)+"px";tip.style.top=Math.max(0,y*0.92)+"px";tip.classList.add("fbt-show");}
 function bind(){stage.addEventListener("pointerenter",function(){TARGET=0;kick();});
-  stage.addEventListener("pointerleave",function(){TARGET=1;HOVER=null;showTip(null);stage.classList.remove("fbt-on-bead");kick();});
-  stage.addEventListener("pointerdown",function(e){var p=at(e);DRAG={x:p.x,a:ANG,moved:false,id:e.pointerId};try{stage.setPointerCapture(e.pointerId);}catch(_){}stage.classList.add("fbt-drag");});
+  stage.addEventListener("pointerleave",function(){if(DN){KB={b:DN.b,t:performance.now()};DN=null;}TARGET=1;HOVER=null;showTip(null);stage.classList.remove("fbt-on-bead");kick();});
+  stage.addEventListener("pointerdown",function(e){var p=at(e);DRAG={x:p.x,a:ANG,moved:false,id:e.pointerId};var Bd=hit(p);DN=Bd&&!still()?{b:Bd.b,t:performance.now()}:null;if(DN)kick();try{stage.setPointerCapture(e.pointerId);}catch(_){}stage.classList.add("fbt-drag");});
   stage.addEventListener("pointermove",function(e){var p=at(e);if(DRAG){var dx=p.x-DRAG.x;if(Math.abs(dx)>3)DRAG.moved=true;if(DRAG.moved){ANG=DRAG.a+dx*0.012;HOVER=null;showTip(null);kick();return;}}
     var B=hit(p),b=B?B.b:null;if(b!==HOVER){HOVER=b;showTip(B);stage.classList.toggle("fbt-on-bead",!!b);kick();}stage.classList.toggle("fbt-on-part",!b&&!!part(p));});
   stage.addEventListener("pointerup",function(e){var d=DRAG;DRAG=null;stage.classList.remove("fbt-drag");try{stage.releasePointerCapture(e.pointerId);}catch(_){}
-    if(d&&d.moved)return;var p=at(e),B=hit(p);try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(_){}
-    if(B){PR={b:B.b,t:performance.now(),d:Math.random()<0.5?-1:1};if(!still())startFl(B.b);kick();press(B.b);return;}var k=part(p);if(k){KN.t=performance.now();KN.k=k;TV+=k==="plinth"?2.6:1.6;kick();}});}
+    var dn=DN;DN=null;if(d&&d.moved){kick();return;}var p=at(e),B=hit(p);try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(_){}
+    if(B){PR={b:B.b,t:performance.now(),d:Math.random()<0.5?-1:1};if(!still()){KB={b:B.b,t:performance.now()};startFl(B.b);}kick();press(B.b);return;}if(dn&&!still())KB={b:dn.b,t:performance.now()};var k=part(p);if(k){KN.t=performance.now();KN.k=k;TV+=k==="plinth"?2.6:1.6;kick();}});}
 function press(b){var x=X();if(!x||!TREE||TREE.demo)return;
   /* 6.97: the page stays where it is. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else.
      I dislike it." Compare opens in its sheet in the window; the changes waiting open in the panels below, as the steps' keys do */

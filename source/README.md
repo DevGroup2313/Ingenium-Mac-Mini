@@ -412,9 +412,19 @@ instead of being limited to a square".
   engine button from the Home page"): at rest each beats softly with the engine button's heartbeat, out of step with the others;
   pressed, one of the button's flourishes (r175, r290's SFL: spin, pulse, hop, twirl, beat; every seventh press the grand one),
   with its glow and its ripple, at the button's own pace; under the pointer it lifts with a soft glow.
-- Focus's stones (her words: "The stones animation is supposed to sound like stones skipping on water or falling on water"),
-  `modules/r295.js`: every way is now a stone falling in or skipping; the circling bubbles follow a stone dropped in, and the
-  whole path is a stone skipped across it.
+- Focus's stones' sounds (her words: "The stones animation is supposed to sound like stones skipping on water or falling on
+  water"; then "The stones water sounds sound horrible please redo"), `modules/r295.js`: made again from the stream's own palette
+  (the stream she liked): a soft splash of low-passed brown noise with a gentle attack, the deep round plunk of the water closing
+  over the stone (a low tone rising a little), a few small bubbles made as the stream's are, everything under 2.6 kilohertz, in the
+  stream's room; every way is a stone falling in or skipping. Rendered and measured: the sounds' centre fell from about 1.6 to 2.1
+  kilohertz to about 0.3 to 0.5, and nothing is left above 2 kilohertz.
+- Focus's northern lights (her words: "I want the full colour spectrum northern lights on the landscape and horizon of the Focus
+  page 3D header instead of the purple shade of the lights only"), `modules/r291.js`: each curtain runs from a rose fringe through
+  green, teal and blue to violet at its top, its hue drifting along the horizon; the water mirrors them.
+- Build's diamond click (her words: "give the diamond a sound effect for when I press it, I want it to have that weighted click
+  like a real button"), `modules/r292.js`: pressed, a dry tick over a low, weighted body falling in pitch; let go, a lighter tick.
+- Fabrica's balls press as a button does (her words: "they have no bounce back when I click on them"), `modules/r294.js`: a ball
+  sinks while held and springs back when let go, before its flourish.
 - The Guide (`modules/r222.js`): the news for 7.01, and the other chat's 7.00 fix (bede809): the Folders line no longer names
   Fabrica, which the gift and demo editions do not have.
 - The numbering: another chat released 7.00 on claude/relaxed-hopper-nz4ert (ec0ab68, 53fb60b); this line's page commit
