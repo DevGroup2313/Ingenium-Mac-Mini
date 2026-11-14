@@ -371,6 +371,17 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.02 (14 November 2026): Build's diamond presses as Fabrica's balls do. Her words that day: "I want the same sound and
+effect of the balls from Fabrica's tree to be applied to the diamond button, right now it sounds too brusque". In `modules/r292.js`:
+a press plays Home's own click (the weighted click of 7.01 is gone); the diamond sinks while held (to 90 per cent in 80 milliseconds)
+and springs back when let go (1.10, 0.96, 1.03, 1.00 over 0.6 seconds), then plays one of Home's engine button's flourishes at the
+button's own pace (a spin, here a whole turn about its own axis; a pulse with two ripples; a hop; a twirl; a heartbeat; every seventh
+press the grand one), with the button's violet glow behind it and its ripple round it. The stone is scaled about its centre in its
+own shader (its sparkles ride with it). The press no longer sends the light or a burst of sparkles; the light still comes now and
+then on its own.
+
+    node rig/t_700_heads.js http://127.0.0.1:8150/ingenium.html <out>      # the diamond's press plays Home's click
+
 Ingenium 7.01 (14 November 2026): Build's diamond on its silver holder, gentle and light to run; Build's and Focus's landscapes
 over their whole header cards; Fabrica's tree for every app, every part of it answering a press.
 
