@@ -371,26 +371,22 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.04 (14 November 2026): Build's diamond glitters more; its northern lights in the full spectrum; its holder's logo by night
-in deep indigo. Her words that day: "Please also remove the charcoal inside of the engine logo on the diamond's holder and make it a
-different colour that complements the design better without removing the logo engine symbol from the Holder ... I only want this done
-to the dark mode look only"; "I approve of the deep indigo face, please add more sparkles to the diamond, it could use some more
-sparkles and glittering lights and commit and push it everywhere"; "I also want the full spectrum of the northern lights to be used for
-the Build page in the landscape for the diamond, please use all of the colours of the spectrum and not just the purple hues for the
-Build page". All in `modules/r292.js`:
+Ingenium 7.04 (14 November 2026): Build's diamond sparkles more; its holder's logo by night in deep indigo. Her words that day:
+"Please also remove the charcoal inside of the engine logo on the diamond's holder and make it a different colour that complements the
+design better without removing the logo engine symbol from the Holder ... I only want this done to the dark mode look only"; "I approve
+of the deep indigo face, please add more sparkles to the diamond, it could use some more sparkles and glittering lights and commit and
+push it everywhere"; "I want more sparkly effect and please revert the full spectrum northern lights and only leave them in the Focus
+page, I think the violet hues look better on the Build page without the full spectrum". All in `modules/r292.js`:
 - The engine logo at the holder's heart: by night its face is a deep indigo enamel (#3e2f86 to #17113a) instead of the charcoal
   (#372d4d to #1a1524). Four violets and a plum were rendered against the night Orrery; the deep indigo sits with the Orrery's enamel
-  and keeps the star about as clear as the charcoal did (its lit side about 5 to 1 against the face, the charcoal about 5.5 to 1). The
-  symbol (rim, ring, star, heart) and the day look are unchanged.
-- More sparkles: the specks 12 a second at rest (7.03: 8), 22 while the light crosses, 22 under the pointer, 36 for a moment after a
-  press, up to 26 at once (32 in a press); the glints from a wider angle (0.94 at rest, 0.92 under the pointer and in a press) and
-  brighter. New, glittering lights: 28 points on the facets, each twinkling on its own clock (every 1.3 to 2.5 seconds, a quarter to
-  half a second each), faster under the pointer, drawn only on facets turned toward the eye; still under Minimal motion.
-- The northern lights in the full spectrum, as Focus's since 7.01: each curtain from a rose fringe at its foot through green, teal and
-  blue to violet at its top, its hue drifting along the horizon; by night in full colour, by day softened a little toward white and drawn
-  a third stronger so the colours read on the light sky. Both places Build draws them change alike (the sky's canvas across the card,
-  and the stone's shader where that canvas is missing). The note at the top of the module ("the northern lights in violet and purple
-  only") records her earlier wish; this is her newer one.
+  and keeps the star about as clear as the charcoal did (screen contrast between the star's lit side and the face about 5 to 1, the
+  charcoal about 5.5 to 1). The symbol (rim, ring, star, heart) and the day look are unchanged.
+- More sparkles: the specks 16 a second at rest (7.03: 8), 26 while the light crosses, 30 under the pointer, 46 for a moment after a
+  press, up to 32 at once (40 in a press); the glints from a wider angle (0.93 at rest, 0.91 under the pointer and in a press), a fifth
+  larger and brighter. New, glittering lights: 44 points on the facets, each twinkling on its own clock (every 1.3 to 2.5 seconds, bright
+  about a quarter of the time), faster under the pointer, drawn only on facets turned toward the eye; still under Minimal motion.
+- The northern lights stay violet. For a while that day they ran through the full spectrum, as Focus's do; at her word they are back to
+  their violet hues on Build, and the full spectrum stays on Focus only. No page was released with them.
 
 Ingenium 7.03 (14 November 2026): the build library adds what is brought in. Her words that day: "I want you to make the app be able
 to receive new nopes or recipes without wiping all stored notes please". Until 7.02 a zip brought into the build library

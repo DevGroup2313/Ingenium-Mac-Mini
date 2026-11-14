@@ -327,8 +327,8 @@ var Diamond=(function(){
   "    float dy=v.y-base;float ry=vn(vec2(x*16.0+uT*(0.20+fl*0.07),fl*7.0+uT*0.05));ry=pow(ry,1.6);",
   "    float wave=0.5+0.5*sin(x*2.2-uT*0.55+fl*1.7);wave=0.45+0.55*wave*wave;",
   "    float edge=smoothstep(-0.018,0.004,dy)*exp(-max(dy,0.0)/(0.09+0.03*fl));float a=edge*(0.30+0.70*ry)*wave*(0.62-fl*0.14);",
-  "    float hh=0.33+0.42*smoothstep(0.010,0.200,dy)+0.09*sin(x*0.35+uT*0.03+fl*2.1);vec3 c=0.58+0.42*cos(6.2831853*(vec3(hh)-vec3(0.0,0.3333,0.6667)));c=mix(vec3(1.0,0.50,0.86),c,smoothstep(0.0,0.014,dy));",
-  "    if(uN<0.5)c=mix(c,vec3(1.0,0.97,1.0),0.12);col+=c*a;acc+=a;}",
+  "    vec3 c;if(uN>0.5){c=mix(vec3(0.92,0.52,0.98),vec3(0.46,0.26,0.96),smoothstep(0.0,0.10,dy));c=mix(c,vec3(0.30,0.16,0.72),smoothstep(0.08,0.24,dy));}",
+  "    else{c=mix(vec3(1.0,0.56,0.88),vec3(0.64,0.44,1.0),smoothstep(0.0,0.09,dy));c=mix(c,vec3(0.50,0.58,1.0),smoothstep(0.08,0.24,dy));}col+=c*a;acc+=a;}",
   "  float ex=smoothstep(0.0,0.14,v.x)*smoothstep(1.0,0.86,v.x)*smoothstep(1.0,0.84,v.y)*smoothstep(0.34,0.56,v.y);return vec4(col*ex,clamp(acc*ex,0.0,1.0));}",
   "vec3 tm(vec3 c){return uN>0.5?1.0-exp(-c*1.06):1.0-exp(-c*1.30);}",
   "void main(){vec2 sp=(v*2.0-1.0)*vec2(uAsp,1.0)*uTan;vec3 rd=normalize(uCM*vec3(sp,-1.0)),ro=uCP;",
@@ -452,12 +452,12 @@ var Diamond=(function(){
   "    float dy=v.y-base;float ry=vn(vec2(x*16.0+uT*(0.20+fl*0.07),fl*7.0+uT*0.05));ry=pow(ry,1.6);",
   "    float wave=0.5+0.5*sin(x*2.2-uT*0.55+fl*1.7);wave=0.45+0.55*wave*wave;",
   "    float edge=smoothstep(-0.018,0.004,dy)*exp(-max(dy,0.0)/(0.09+0.03*fl));float a=edge*(0.30+0.70*ry)*wave*(0.62-fl*0.14);",
-  "    float hh=0.33+0.42*smoothstep(0.010,0.200,dy)+0.09*sin(x*0.35+uT*0.03+fl*2.1);vec3 c=0.58+0.42*cos(6.2831853*(vec3(hh)-vec3(0.0,0.3333,0.6667)));c=mix(vec3(1.0,0.50,0.86),c,smoothstep(0.0,0.014,dy));",
-  "    if(uN<0.5)c=mix(c,vec3(1.0,0.97,1.0),0.12);col+=c*a;acc+=a;}",
+  "    vec3 c;if(uN>0.5){c=mix(vec3(0.92,0.52,0.98),vec3(0.46,0.26,0.96),smoothstep(0.0,0.10,dy));c=mix(c,vec3(0.30,0.16,0.72),smoothstep(0.08,0.24,dy));}",
+  "    else{c=mix(vec3(1.0,0.56,0.88),vec3(0.64,0.44,1.0),smoothstep(0.0,0.09,dy));c=mix(c,vec3(0.50,0.58,1.0),smoothstep(0.08,0.24,dy));}col+=c*a;acc+=a;}",
   "  float ex=hx*smoothstep(1.06,0.86,v.y)*smoothstep(0.34,0.56,v.y);return vec4(col*ex,clamp(acc*ex,0.0,1.0));}",
   "void main(){vec2 P=vec2(v.x*uRes.x,(1.0-v.y)*uRes.y);vec2 vb=vec2((P.x-uBox.x)/uBox.z,1.0-(P.y-uBox.y)/uBox.w);",
   "  float hx=smoothstep(0.0,0.04,v.x)*smoothstep(1.0,0.96,v.x)*mix(0.78,1.0,smoothstep(0.20,0.55,v.x));",
-  "  vec4 au=aurora(vb,hx);float ai=uN>0.5?0.95:1.3;vec3 col=au.rgb*ai;float a=clamp(au.a*ai,0.0,1.0);",
+  "  vec4 au=aurora(vb,hx);float ai=uN>0.5?0.95:1.0;vec3 col=au.rgb*ai;float a=clamp(au.a*ai,0.0,1.0);",
   /* the day's soft glows behind the stone, as its canvas drew them, now free to fall away across the card */
   "  if(uN<0.5){vec2 wc=(vb-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(vb.x*0.8+vb.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);",
   "    vec2 gc=(vb-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
@@ -558,17 +558,17 @@ var Diamond=(function(){
     for(i=0;i<6;i++){a=i*60+15;FAC.push({g:-1,k:0,p:[0.32*Math.cos(a*D2R),0.31,0.32*Math.sin(a*D2R)]});}})();
   var SPECK=[],lastSp=-1;
   /* 7.04: glittering lights (her words, 14 November 2026: "more sparkles and glittering lights"): points on the facets, each on its own clock */
-  var GLIT=(function(){var a=[];for(var i=0;i<28;i++){var f=FAC[(i*7+3)%FAC.length],j=[(Math.random()-0.5)*0.12,(Math.random()-0.5)*0.05,(Math.random()-0.5)*0.12];a.push({f:f,p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],w:2.5+Math.random()*2.3,ph:Math.random()*6.2832,r:1.6+Math.random()*2.6,c:Math.random()});}return a;})();
-  function glitter(t,M,DC,nt){for(var gi=0;gi<GLIT.length;gi++){var g=GLIT[gi],tw=Math.sin(t*g.w*(over?1.6:1)+g.ph);if(tw<=0.82)continue;var ga=Math.pow((tw-0.82)/0.18,2);var GP=mvS(M,g.p);GP=[GP[0]+DC[0],GP[1]+DC[1],GP[2]+DC[2]];var GN=g.f.g<0?mv(M,[0,1,0]):mv(M,gN(g.f));if(dot(GN,nrm(sub(CP,GP)))<0.05)continue;var gxy=proj(GP);star(gxy[0],gxy[1],g.r*(0.8+0.4*ga)*(over?1.15:1),ga*(over?1.0:0.85),nt,g.c);}}
-  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=12.0+(u>=0&&u<1.4?10.0:0)+hb*10.0+pb*24.0;
-    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?32:26)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
+  var GLIT=(function(){var a=[];for(var i=0;i<44;i++){var f=FAC[(i*7+3)%FAC.length],j=[(Math.random()-0.5)*0.12,(Math.random()-0.5)*0.05,(Math.random()-0.5)*0.12];a.push({f:f,p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],w:2.5+Math.random()*2.3,ph:Math.random()*6.2832,r:2.0+Math.random()*3.0,c:Math.random()});}return a;})();
+  function glitter(t,M,DC,nt){for(var gi=0;gi<GLIT.length;gi++){var g=GLIT[gi],tw=Math.sin(t*g.w*(over?1.6:1)+g.ph);if(tw<=0.74)continue;var ga=Math.pow((tw-0.74)/0.26,1.6);var GP=mvS(M,g.p);GP=[GP[0]+DC[0],GP[1]+DC[1],GP[2]+DC[2]];var GN=g.f.g<0?mv(M,[0,1,0]):mv(M,gN(g.f));if(dot(GN,nrm(sub(CP,GP)))<0.05)continue;var gxy=proj(GP);star(gxy[0],gxy[1],g.r*(0.8+0.4*ga)*(over?1.15:1),ga,nt,g.c);}}
+  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=16.0+(u>=0&&u<1.4?10.0:0)+hb*14.0+pb*30.0;
+    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?40:32)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
       SPECK.push({p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],f:f,t0:t,life:0.22+Math.random()*0.33,r:(1.8+Math.random()*3.8)*(hb||pb?1.25:1),c:Math.random()});}
     for(var i=SPECK.length-1;i>=0;i--){var s=SPECK[i],age=(t-s.t0)/s.life;if(age>=1||age<0){SPECK.splice(i,1);continue;}
       var P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P)),N=s.f.g<0?mv(M,[0,1,0]):mv(M,gN(s.f));var hz=nrm([N[0],0.0001,N[2]]);
       if(dot(N,V)<0.05&&dot(hz,[V[0],0,V[2]])<0.25)continue;var xy=proj(P),a=Math.pow(Math.sin(Math.PI*age),2);star(xy[0],xy[1],s.r*(0.7+0.5*a),a,nt,s.c);}}
   function sparkle(t,M,DC,nt){og.setTransform(dpr(),0,0,dpr(),0,0);og.clearRect(0,0,W0,H0);
     for(var i=0;i<SPK.length;i++){var s=SPK[i],N=mv(M,gN(s)),P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P));if(dot(N,V)<=0.05)continue;
-      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.92:0.94;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(5+9*a)*(over?1.15:1),Math.min(1,a*1.1),nt);}
+      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.91:0.93;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(6+11*a)*(over?1.15:1),Math.min(1,a*1.25),nt);}
     var f=(t-PL.s)/PER;if(f>=0&&f<0.5){var A=PL.a,cA=Math.cos(A),sA=Math.sin(A),b1=A+Math.PI-0.95,b2=A+Math.PI+1.05;
       var hitA=Math.exp(-Math.pow((f-0.03)/0.014,2)),outA=Math.exp(-Math.pow((f-0.06)/0.02,2));
       var en=proj([DC[0]+cA*0.30,DC[1]+0.24,DC[2]+sA*0.30]);star(en[0],en[1],8+16*hitA,hitA,nt);
