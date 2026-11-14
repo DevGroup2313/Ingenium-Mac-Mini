@@ -119,7 +119,7 @@ var Nature=(function(){var ac=null,mst=null,tb=null,mode="off",src={},buf={},vol
      what a stone in water really makes: the small slap where it meets the surface, the round note of the air it pulls under (a bubble's note
      rises as it closes, and fades), and the drops that fall back afterwards; a skipped stone is a run of light slaps, each nearer the last
      and softer, then a small plunk. No rushing noise at all. Each of the stone's ways has its own: set down, dropped in, tapped twice,
-     lifted and landed, bubbles circling, skipped away across the water, and the whole path touched in turn. */
+     lifted and landed, dropped in with its bubbles circling up, skipped away across the water, and skipped along the whole path. */
   var NZ=null;function nz(c){if(NZ&&NZ.sampleRate===c.sampleRate&&NZ.__c===c)return NZ;var n=Math.floor(c.sampleRate*0.5),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var k=0;k<n;k++)d[k]=Math.random()*2-1;b.__c=c;return NZ=b;}
   function voice(c,out,t,name,pan){var R=Math.random;
     function pn(node,p){if(c.createStereoPanner){var s=c.createStereoPanner();s.pan.value=Math.max(-1,Math.min(1,p));node.connect(s);s.connect(out);}else node.connect(out);}
@@ -133,9 +133,11 @@ var Nature=(function(){var ac=null,mst=null,tb=null,mode="off",src={},buf={},vol
     function skip(t0,p,n){var dt=0.20,a=1.0,tk=t0,pp=p;for(var k=0;k<n;k++){slap(tk,0.022*a,2700,0.016,pp);bub(tk+0.003,700+k*60,1.5,0.010,0.022*a,pp);tk+=dt;dt*=0.78;a*=0.78;pp+=0.16;}plunk(tk,pp,0.55);}
     if(name==="double"){setDown(t,pan,1.0);setDown(t+0.30,pan,0.8);}
     else if(name==="hop"){setDown(t,pan,0.45);plunk(t+0.43,pan,1.0);}
-    else if(name==="swirl"){for(var k=0;k<5;k++)bub(t+k*0.16+R()*0.04,380+k*45,1.6,0.024,0.024*(1-k*0.12),pan+Math.sin(k*1.3)*0.35);}
+    /* 7.01, her words (14 November 2026): "The stones animation is supposed to sound like stones skipping on water or falling on water": every
+       way is now a stone falling in or skipping; the circling bubbles follow a stone dropped in, and the whole path is a stone skipped across it */
+    else if(name==="swirl"){plunk(t,pan,0.9);for(var k=0;k<5;k++)bub(t+0.20+k*0.16+R()*0.04,380+k*45,1.6,0.024,0.020*(1-k*0.12),pan+Math.sin(k*1.3)*0.35);}
     else if(name==="glint"){skip(t,pan-0.25,5);}
-    else if(name==="chain"){for(var k2=0;k2<5;k2++)setDown(t+k2*0.32,(k2-2)*0.30,0.9-k2*0.08);}
+    else if(name==="chain"){skip(t,-0.62,7);}
     else if(name==="bloom"){plunk(t,pan,1.15);}
     else{plunk(t,pan,0.85);}}
   function touch(name,i){try{if(W.IngSound&&typeof IngSound.allowed==="function"&&!IngSound.allowed())return;}catch(x){}var c=ctx();if(!c)return;voice(c,tb,c.currentTime+0.01,name,i==null?0:(i-2)*0.22);}

@@ -174,12 +174,38 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
   function bead(g,q,r,o,kind,head){var R=r*q.k*(o.grow||1),x=q.x,y=q.y-(o.lift||0),nt=night();
     g.save();g.globalAlpha=o.far?0.5:0.4;g.fillStyle=nt?"rgba(0,0,0,.6)":"rgba(46,23,100,.30)";g.beginPath();g.ellipse(x+R*0.2,y+R*0.5,R*0.9,R*0.45,0,0,TAU);g.fill();g.restore();
     var gs=glassSprite(kind,nt,false);if(o.far)g.globalAlpha=0.9;if(o.alpha!=null)g.globalAlpha=o.alpha;
-    if(gs)g.drawImage(gs,x-R,y-R,R*2,R*2);else{var sp=sprite(Math.max(6,Math.round(r*(o.grow||1)*2)/2),kind,nt,head),s=(sp.__R/(r*(o.grow||1)))*R;g.drawImage(sp,x-s,y-s,s*2,s*2);}g.globalAlpha=1;if(head&&gs)sealStar(g,x,y,R,nt);if(kind!=="wait")setting(g,x,y,R);}
+    if(gs){if(o.rot||(o.sx&&o.sx!==1)||(o.sy&&o.sy!==1)){g.save();g.translate(x,y);g.rotate(o.rot||0);g.scale(o.sx||1,o.sy||1);g.drawImage(gs,-R,-R,R*2,R*2);g.restore();}else g.drawImage(gs,x-R,y-R,R*2,R*2);}else{var sp=sprite(Math.max(6,Math.round(r*(o.grow||1)*2)/2),kind,nt,head),s=(sp.__R/(r*(o.grow||1)))*R;g.drawImage(sp,x-s,y-s,s*2,s*2);}g.globalAlpha=1;if(head&&gs)sealStar(g,x,y,R,nt,o.rot||0);if(kind!=="wait")setting(g,x,y,R);}
   /* the engine star on the newest version's bead: Home's sealEngine (four eased quarter turns in nine seconds), and a whole turn when pressed */
   function sbez(x1,y1,x2,y2,x){function B(a,b,u){return 3*a*u*(1-u)*(1-u)+3*b*u*u*(1-u)+u*u*u;}if(x<=0)return 0;if(x>=1)return 1;var lo=0,hi=1,u=x;for(var i=0;i<22;i++){u=(lo+hi)/2;if(B(x1,x2,u)<x)lo=u;else hi=u;}return B(y1,y2,u);}
-  function sealAngle(){if(still())return 0;var now=performance.now()/1000,cy=D.body.getAttribute("data-motion")==="calm"?13:9,f=(now%cy)/cy,k=Math.min(4,Math.floor(f/0.22)),a=f>=0.88?TAU:(k+sbez(.45,.05,.55,.95,(f-k*0.22)/0.22))*TAU/4;
-    var pe=(performance.now()-PR.t)/1700;if(PR.b&&PR.b.head&&pe>=0&&pe<1)a+=(PR.d||1)*TAU*sbez(.25,.9,.3,1,pe);return a;}
-  function sealStar(g,x,y,R,nt){var s2=0.58,d=dpr()*0.92;g.save();g.translate(x,y);g.rotate(sealAngle());g.scale(R,R);g.fillStyle=nt?"#f4eeff":"#ffffff";
+  function sealAngle(){if(still())return 0;var now=performance.now()/1000,cy=D.body.getAttribute("data-motion")==="calm"?13:9,f=(now%cy)/cy,k=Math.min(4,Math.floor(f/0.22)),a=f>=0.88?TAU:(k+sbez(.45,.05,.55,.95,(f-k*0.22)/0.22))*TAU/4;return a;}
+  /* the balls answer as Home's engine button does (her words, 14 November 2026: "I want the balls on Fabrica's tree to be animated and
+     clickable and have the same effect as the engine button from the Home page"): at rest each beats softly with the button's heartbeat, out
+     of step with the others; pressed, one of the button's flourishes (r175, r290's SFL: spin, pulse, hop, twirl, beat; every seventh press
+     the grand one), with its glow and its ripple, at the button's own pace */
+  var FL2={b:null,n:"",d:1,t:-1e9,count:0,last:""},FORD=["spin","pulse","hop","twirl","beat"];
+  function startFl(b){var n=FL2.count+1,nm=n%7===0?"grand":(function(){var c=FORD.filter(function(x){return x!==FL2.last;});return c[Math.floor(Math.random()*c.length)];})();
+    FL2={b:b,n:nm,d:Math.random()<0.5?-1:1,t:performance.now(),count:n,last:nm};}
+  function kf(F,x){if(x<=F[0][0])return F[0][1];for(var i=1;i<F.length;i++){if(x<=F[i][0]){var a=F[i-1],c=F[i],u=(x-a[0])/((c[0]-a[0])||1);return a[1]+(c[1]-a[1])*u;}}return F[F.length-1][1];}
+  function EIO(x){return sbez(.42,0,.58,1,x);}function EOU(x){return sbez(0,0,.58,1,x);}
+  function segE(F,x){for(var i=1;i<F.length;i++){if(x<=F[i][0]){var a=F[i-1],c=F[i],u=(x-a[0])/((c[0]-a[0])||1);return a[1]+(c[1]-a[1])*EIO(u);}}return F[F.length-1][1];}
+  function ballFx(b,bi,now){var f={sc:1,lift:0,rot:0,sx:1,sy:1,glowA:0,glowS:1,rips:[]};if(still())return f;
+    var cyc=D.body.getAttribute("data-motion")==="calm"?5:3.2,ph=(((now/1000)+bi*0.61*cyc)%cyc)/cyc;f.sc=1+(segE([[0,1],[.14,1.18],[.28,1.04],[.42,1.12],[.56,1],[1,1]],ph)-1)*0.2;
+    if(FL2.b===b){var e=(now-FL2.t)/1000,d=FL2.d,n=FL2.n,R=b.r;if(e>2.2)return f;
+      if(n==="spin"||n==="grand"){f.rot+=d*TAU*sbez(.25,.9,.3,1,e/1.15);f.sc*=kf([[0,1],[.35,1.14],[1,1]],EIO(e/0.9));}
+      if(n==="pulse")f.sc*=kf([[0,1],[.28,1.13],[.6,.97],[.8,1.03],[1,1]],EOU(e/0.95));
+      if(n==="hop"||n==="grand"){var hx=EIO(e/0.9);f.lift+=-kf([[0,0],[.12,.03],[.42,-.18],[.7,0],[.85,-.03],[1,0]],hx)*2*R;
+        f.sx*=kf([[0,1],[.12,1.06],[.42,.97],[.7,1.05],[.85,1],[1,1]],hx);f.sy*=kf([[0,1],[.12,.92],[.42,1.04],[.7,.94],[.85,1],[1,1]],hx);}
+      if(n==="twirl"){var tw=sbez(.2,.8,.25,1,e/1.1);f.rot+=d*TAU*kf([[0,0],[.45,.5],[.8,1],[1,1]],tw);f.sc*=kf([[0,1],[.45,.9],[.8,1.04],[1,1]],tw);}
+      if(n==="beat")f.sc*=kf([[0,1],[.14,1.3],[.3,1.04],[.46,1.24],[.7,1],[1,1]],EIO(e/1.1));
+      if(e<1.0){var gk=EOU(e);f.glowA=kf([[0,0],[.3,(n==="beat"||n==="grand")?1:.85],[1,0]],gk);f.glowS=kf([[0,.82],[.3,1.04],[1,1.12]],gk);}
+      var rip=function(t0,du,s1,a0){var x=(e-t0)/du;if(x>=0&&x<1){var k=EOU(x);f.rips.push([.86+(s1-.86)*k,a0*(1-k)]);}};
+      if(n==="pulse"){rip(0,.95,1.55,.6);rip(.22,.95,1.55,.6);}else if(n==="grand")rip(0,1.1,1.7,.65);else rip(0,.95,1.55,.6);}
+    return f;}
+  function ballGlow(g,x,y,R,f,on,nt){var a=Math.max(f.glowA,on?0.4:0);if(a<=0.002)return;var RR=R*1.32*(f.glowA>0.002?f.glowS:1),c=nt?"201,178,242":"106,63,181",al=(nt?0.36:0.34)*a;
+    var gr=g.createRadialGradient(x,y,0,x,y,RR);gr.addColorStop(0,"rgba("+c+","+al+")");gr.addColorStop(1,"rgba("+c+",0)");g.fillStyle=gr;g.beginPath();g.arc(x,y,RR,0,TAU);g.fill();}
+  function ballRipples(g,x,y,R,f,nt){for(var i=0;i<f.rips.length;i++){var s=f.rips[i][0],a=f.rips[i][1];if(a<=0.002)continue;g.save();g.strokeStyle=nt?"rgba(201,178,242,"+a+")":"rgba(106,63,181,"+a+")";
+    g.lineWidth=Math.max(1.2,R*0.08);g.beginPath();g.arc(x,y,R*0.94*s,0,TAU);g.stroke();g.restore();}}
+  function sealStar(g,x,y,R,nt,extra){var s2=0.58,d=dpr()*0.92;g.save();g.translate(x,y);g.rotate(sealAngle()+(extra||0));g.scale(R,R);g.fillStyle=nt?"#f4eeff":"#ffffff";
     g.shadowColor="rgba(30,10,70,.45)";g.shadowBlur=Math.max(1,R*0.06*d);g.shadowOffsetY=R*0.02*d;g.beginPath();
     g.moveTo(0,-s2);g.quadraticCurveTo(s2*.16,-s2*.16,s2,0);g.quadraticCurveTo(s2*.16,s2*.16,0,s2);g.quadraticCurveTo(-s2*.16,s2*.16,-s2,0);g.quadraticCurveTo(-s2*.16,-s2*.16,0,-s2);g.fill();
     g.shadowColor="transparent";g.fillStyle=nt?"#8e6be0":"#7a50c6";g.beginPath();g.arc(0,0,s2*0.16,0,TAU);g.fill();g.restore();}
@@ -315,9 +341,8 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     S.tubes.forEach(function(t){if(t.kind==="trunk")return;var e=t.kind==="arch"?t.pts[Math.floor(t.pts.length/2)]:t.pts[t.pts.length-1];if(t.kind==="branch"){var e0=t.pts[t.pts.length-2];e=[e[0]+(e[0]-e0[0])*2.2,e[1]+(e[1]-e0[1])*2.2+10,e[2]+(e[2]-e0[2])*2.2];}
       var gq=proj(e,ang);prims.push({z:gq.z-0.02,f:function(){gemAt(g,gq.x,gq.y-(t.kind==="arch"?11*gq.k:0),(t.kind==="arch"?12:13)*gq.k,t.kind==="arch"?2.1:3.3);}});});
     var NOW=performance.now();
-    S.beads.forEach(function(b){var q=proj(b.p,ang),on=HOVER===b,pe=(NOW-PR.t)/700,pb=PR.b===b&&pe>=0&&pe<1?Math.sin(Math.PI*pe)*(1-0.35*pe):0,o={grow:(on?1.22:1)*(1+0.30*pb),lift:(on?3:0)+5*pb,far:q.z>40};
-      BEADS.push({b:b,x:q.x,y:q.y-(on?3:0),r:b.r*q.k*(on?1.22:1)});prims.push({z:q.z-0.01,f:function(){bead(g,q,b.r,o,b.kind,!!b.head);if(b.kind==="main")riseBead(g,q,b);
-        if(PR.b===b&&pe>=0&&pe<1.6){var k=Math.min(1,pe/1.6),RR=b.r*q.k*(1.15+1.4*(1-Math.pow(1-k,3)));g.save();g.strokeStyle=nt?"rgba(214,198,255,"+(0.5*(1-k))+")":"rgba(120,80,210,"+(0.42*(1-k))+")";g.lineWidth=1.6;g.beginPath();g.arc(q.x,q.y-o.lift,RR,0,TAU);g.stroke();g.restore();}}});});
+    S.beads.forEach(function(b,bi){var q=proj(b.p,ang),on=HOVER===b,fx=ballFx(b,bi,NOW),o={grow:(on?1.22:1)*fx.sc,lift:(on?3:0)+fx.lift,far:q.z>40,rot:fx.rot,sx:fx.sx,sy:fx.sy};
+      BEADS.push({b:b,x:q.x,y:q.y-(on?3:0),r:b.r*q.k*(on?1.22:1)});prims.push({z:q.z-0.01,f:function(){var R0=b.r*q.k*(on?1.22:1);ballGlow(g,q.x,q.y-o.lift,R0,fx,on,nt);bead(g,q,b.r,o,b.kind,!!b.head);if(b.kind==="main")riseBead(g,q,b);ballRipples(g,q.x,q.y-o.lift,R0,fx,nt);}});});
     if(T.waiting){var hb=S.beads.filter(function(b){return b.head;})[0];if(hb){var q=proj([0,hb.p[1]+52,0],ang),tt=(Date.now()%2400)/2400,R=11*q.k;
       prims.push({z:q.z,f:function(){var tq=proj([0,hb.p[1]+24,0],ang);g.setLineDash([2,3]);g.strokeStyle=nt?"rgba(236,228,250,.55)":"rgba(106,63,181,.55)";g.lineWidth=1.2;g.beginPath();g.moveTo(tq.x,tq.y);g.lineTo(q.x,q.y+R);g.stroke();g.setLineDash([]);
         bead(g,q,11,{alpha:0.5+0.14*Math.sin(tt*TAU)},"wait",false);g.setLineDash([3,3]);g.strokeStyle=nt?"rgba(236,228,250,.6)":"rgba(106,63,181,.55)";g.lineWidth=1.3;g.beginPath();g.arc(q.x,q.y,R*1.3,0,TAU);g.stroke();g.setLineDash([]);}});
@@ -326,7 +351,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
 /* ---------- motion: a slow turn, stilled under the pointer, turned by a drag ---------- */
 function loop(t){RAF=0;if(!page||!page.offsetParent||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(LAST&&t-LAST<30){RAF=requestAnimationFrame(loop);return;}var dt=Math.min(64,t-(LAST||t));LAST=t;
   if(!still()){SPIN+=(TARGET-SPIN)*Math.min(1,dt/260);if(!DRAG)ANG+=SPIN*dt*TAU/52000+TV*dt/1000;TV*=Math.exp(-dt/1500);}else TV=0;
-  var busy=performance.now()-PR.t<1800||performance.now()-KN.t<1600;
+  var busy=performance.now()-Math.max(PR.t,FL2.t)<2300||performance.now()-KN.t<1600;
   draw();if(!still()||(TREE&&TREE.waiting)||busy)RAF=requestAnimationFrame(loop);}
 function kick(){if(!RAF){LAST=0;RAF=requestAnimationFrame(loop);}}
 function at(e){var r=stage.getBoundingClientRect(),k=r.width/460;return {x:(e.clientX-r.left)/k,y:(e.clientY-r.top)/k};}
@@ -346,7 +371,7 @@ function bind(){stage.addEventListener("pointerenter",function(){TARGET=0;kick()
     var B=hit(p),b=B?B.b:null;if(b!==HOVER){HOVER=b;showTip(B);stage.classList.toggle("fbt-on-bead",!!b);kick();}stage.classList.toggle("fbt-on-part",!b&&!!part(p));});
   stage.addEventListener("pointerup",function(e){var d=DRAG;DRAG=null;stage.classList.remove("fbt-drag");try{stage.releasePointerCapture(e.pointerId);}catch(_){}
     if(d&&d.moved)return;var p=at(e),B=hit(p);try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(_){}
-    if(B){PR={b:B.b,t:performance.now(),d:Math.random()<0.5?-1:1};kick();press(B.b);return;}var k=part(p);if(k){KN.t=performance.now();KN.k=k;TV+=k==="plinth"?2.6:1.6;kick();}});}
+    if(B){PR={b:B.b,t:performance.now(),d:Math.random()<0.5?-1:1};if(!still())startFl(B.b);kick();press(B.b);return;}var k=part(p);if(k){KN.t=performance.now();KN.k=k;TV+=k==="plinth"?2.6:1.6;kick();}});}
 function press(b){var x=X();if(!x||!TREE||TREE.demo)return;
   /* 6.97: the page stays where it is. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else.
      I dislike it." Compare opens in its sheet in the window; the changes waiting open in the panels below, as the steps' keys do */

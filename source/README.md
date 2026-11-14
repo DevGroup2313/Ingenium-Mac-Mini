@@ -408,6 +408,13 @@ instead of being limited to a square".
   pixels; now 11). A point now rises as it goes away and sinks as it comes near; the trunk and every size are unchanged.
 - Measured on every page (rig-free, with Chrome's own counters): no head keeps drawing once its page is left, and a plain page
   rests at about two per cent of the main thread; the work is in the heads while they are shown, where 7.01 lightens Build.
+- Fabrica's balls (her words: "I want the balls on Fabrica's tree to be animated and clickable and have the same effect as the
+  engine button from the Home page"): at rest each beats softly with the engine button's heartbeat, out of step with the others;
+  pressed, one of the button's flourishes (r175, r290's SFL: spin, pulse, hop, twirl, beat; every seventh press the grand one),
+  with its glow and its ripple, at the button's own pace; under the pointer it lifts with a soft glow.
+- Focus's stones (her words: "The stones animation is supposed to sound like stones skipping on water or falling on water"),
+  `modules/r295.js`: every way is now a stone falling in or skipping; the circling bubbles follow a stone dropped in, and the
+  whole path is a stone skipped across it.
 - The Guide (`modules/r222.js`): the news for 7.01, and the other chat's 7.00 fix (bede809): the Folders line no longer names
   Fabrica, which the gift and demo editions do not have.
 - The numbering: another chat released 7.00 on claude/relaxed-hopper-nz4ert (ec0ab68, 53fb60b); this line's page commit
