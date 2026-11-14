@@ -327,8 +327,8 @@ var Diamond=(function(){
   "    float dy=v.y-base;float ry=vn(vec2(x*16.0+uT*(0.20+fl*0.07),fl*7.0+uT*0.05));ry=pow(ry,1.6);",
   "    float wave=0.5+0.5*sin(x*2.2-uT*0.55+fl*1.7);wave=0.45+0.55*wave*wave;",
   "    float edge=smoothstep(-0.018,0.004,dy)*exp(-max(dy,0.0)/(0.09+0.03*fl));float a=edge*(0.30+0.70*ry)*wave*(0.62-fl*0.14);",
-  "    vec3 c;if(uN>0.5){c=mix(vec3(0.92,0.52,0.98),vec3(0.46,0.26,0.96),smoothstep(0.0,0.10,dy));c=mix(c,vec3(0.30,0.16,0.72),smoothstep(0.08,0.24,dy));}",
-  "    else{c=mix(vec3(1.0,0.56,0.88),vec3(0.64,0.44,1.0),smoothstep(0.0,0.09,dy));c=mix(c,vec3(0.50,0.58,1.0),smoothstep(0.08,0.24,dy));}col+=c*a;acc+=a;}",
+  "    float hh=0.33+0.42*smoothstep(0.010,0.200,dy)+0.09*sin(x*0.35+uT*0.03+fl*2.1);vec3 c=0.58+0.42*cos(6.2831853*(vec3(hh)-vec3(0.0,0.3333,0.6667)));c=mix(vec3(1.0,0.50,0.86),c,smoothstep(0.0,0.014,dy));",
+  "    if(uN<0.5)c=mix(c,vec3(1.0,0.97,1.0),0.12);col+=c*a;acc+=a;}",
   "  float ex=smoothstep(0.0,0.14,v.x)*smoothstep(1.0,0.86,v.x)*smoothstep(1.0,0.84,v.y)*smoothstep(0.34,0.56,v.y);return vec4(col*ex,clamp(acc*ex,0.0,1.0));}",
   "vec3 tm(vec3 c){return uN>0.5?1.0-exp(-c*1.06):1.0-exp(-c*1.30);}",
   "void main(){vec2 sp=(v*2.0-1.0)*vec2(uAsp,1.0)*uTan;vec3 rd=normalize(uCM*vec3(sp,-1.0)),ro=uCP;",
@@ -397,14 +397,15 @@ var Diamond=(function(){
      the compass itself once it has been drawn, by day and by night, and put under the glass as a picture */
   /* the engine logo at the heart of the seat (her words, 14 November 2026: "the engine logo needs to be drawn to fit the middle of the
      holder not this randomised symbol"): Ingenium's own seal as the app draws it, the base page's #introSeal svg.seal3d (R71, approved on
-     7 October 2026) in R104's four layers, with the base page's .seal3d colours by day and by night */
+     7 October 2026) in R104's four layers, with the base page's .seal3d colours by day and by night; by night its face is a deep indigo enamel, not the charcoal (her words, 14
+     November 2026: "remove the charcoal inside of the engine logo"; "I approve of the deep indigo face") */
   var LOGO={defs:'<defs><linearGradient id="sdRim" x1="0" y1="0" x2="1" y2="1"><stop class="s4-r0" offset="0"/><stop class="s4-r1" offset="0.5"/><stop class="s4-r2" offset="1"/></linearGradient><linearGradient id="sdSpec" x1="0" y1="0" x2="1" y2="1"><stop class="s4-sp" offset="0" stop-opacity="0.95"/><stop class="s4-sp" offset="0.42" stop-opacity="0"/></linearGradient><linearGradient id="sdFace" x1="0" y1="0" x2="1" y2="1"><stop class="s4-f0" offset="0"/><stop class="s4-f1" offset="1"/></linearGradient><linearGradient id="sdWell" x1="0" y1="0" x2="1" y2="1"><stop class="s4-w0" offset="0"/><stop class="s4-w0" offset="0.38" stop-opacity="0"/><stop class="s4-w1" offset="0.62" stop-opacity="0"/><stop class="s4-w1" offset="1"/></linearGradient><linearGradient id="sdFade" x1="0" y1="0" x2="1" y2="0"><stop class="s4-fd" offset="0" stop-opacity="0.55"/><stop class="s4-fd" offset="0.55" stop-opacity="0.55"/><stop class="s4-fd" offset="1" stop-opacity="0.08"/></linearGradient><radialGradient id="sdStone" cx=".36" cy=".32" r=".75"><stop class="s4-st0" offset="0"/><stop class="s4-st1" offset="1"/></radialGradient><radialGradient id="sdPearl" cx=".38" cy=".34" r=".72"><stop offset="0" stop-color="#ffffff"/><stop class="s4-pl" offset="1"/></radialGradient></defs>',
     back:'<circle cx="60" cy="60" r="56.2" fill="url(#sdFace)"/><circle cx="60" cy="60" r="54.50" fill="none" stroke="url(#sdWell)" stroke-width="1.40"/><circle cx="60" cy="60" r="56" fill="none" stroke="url(#sdRim)" stroke-width="1.40"/><circle cx="60" cy="60" r="56.50" fill="none" stroke="url(#sdSpec)" stroke-width="0.70"/>',
     ring:'<g class="seal-counter"><circle cx="60" cy="60" r="50" fill="none" stroke="url(#sdFade)" stroke-width="1.20"/></g>',
     star:'<g class="seal-spin"><g transform="rotate(0 60 60)"><path class="s4-lit" d="M60 60 L60 30 C58.25 37.5, 54.5 44.125, 49.31 49.31 Z"/><path class="s4-shade" d="M60 60 L60 30 C61.75 37.5, 65.5 44.125, 70.69 49.31 Z"/></g><g transform="rotate(90 60 60)"><path class="s4-lit" d="M60 60 L60 30 C58.25 37.5, 54.5 44.125, 49.31 49.31 Z"/><path class="s4-shade" d="M60 60 L60 30 C61.75 37.5, 65.5 44.125, 70.69 49.31 Z"/></g><g transform="rotate(180 60 60)"><path class="s4-lit" d="M60 60 L60 30 C58.25 37.5, 54.5 44.125, 49.31 49.31 Z"/><path class="s4-shade" d="M60 60 L60 30 C61.75 37.5, 65.5 44.125, 70.69 49.31 Z"/></g><g transform="rotate(270 60 60)"><path class="s4-lit" d="M60 60 L60 30 C58.25 37.5, 54.5 44.125, 49.31 49.31 Z"/><path class="s4-shade" d="M60 60 L60 30 C61.75 37.5, 65.5 44.125, 70.69 49.31 Z"/></g></g>',
     heart:'<g class="seal-heart"><circle cx="60" cy="60" r="9" fill="url(#sdStone)"/><circle cx="60" cy="60" r="5.2" fill="url(#sdPearl)"/><circle cx="58.28" cy="58.18" r="1.25" fill="#ffffff" opacity=".9"/></g>'},
     LCSS={d:'.s4-r0{stop-color:#b39bea}.s4-r1{stop-color:#6a3fb5}.s4-r2{stop-color:#472b7f}.s4-sp{stop-color:#ffffff}.s4-f0{stop-color:#ffffff}.s4-f1{stop-color:#efe8f8}.s4-w0{stop-color:#3b2066;stop-opacity:.14}.s4-w1{stop-color:#ffffff;stop-opacity:.7}.s4-fd{stop-color:#6a3fb5}.s4-lit{fill:#9275d8}.s4-shade{fill:#7853c3}.s4-st0{stop-color:#8f68d8}.s4-st1{stop-color:#4b2a86}.s4-pl{stop-color:#dccff4}',
-      n:'.s4-r0{stop-color:#e2d5fa}.s4-r1{stop-color:#9a7ad8}.s4-r2{stop-color:#3d2572}.s4-sp{stop-color:#ffffff}.s4-f0{stop-color:#372d4d}.s4-f1{stop-color:#1a1524}.s4-w0{stop-color:#000000;stop-opacity:.35}.s4-w1{stop-color:#cdb8f0;stop-opacity:.45}.s4-fd{stop-color:#b79ce6}.s4-lit{fill:#a68ce6}.s4-shade{fill:#8360cf}.s4-st0{stop-color:#9f7ae6}.s4-st1{stop-color:#4b2a86}.s4-pl{stop-color:#e4d9f8}'},LOGOK="",LOGON=0,LOGOOK=0,tx3=null;
+      n:'.s4-r0{stop-color:#e2d5fa}.s4-r1{stop-color:#9a7ad8}.s4-r2{stop-color:#3d2572}.s4-sp{stop-color:#ffffff}.s4-w0{stop-color:#000000;stop-opacity:.35}.s4-w1{stop-color:#cdb8f0;stop-opacity:.45}.s4-fd{stop-color:#b79ce6}.s4-lit{fill:#a68ce6}.s4-shade{fill:#8360cf}.s4-st0{stop-color:#9f7ae6}.s4-st1{stop-color:#4b2a86}.s4-pl{stop-color:#e4d9f8}.s4-f0{stop-color:#3e2f86}.s4-f1{stop-color:#17113a}'},LOGOK="",LOGON=0,LOGOOK=0,tx3=null;
   function logoTex(){var k=night()?"n":"d";if(LOGOK===k||!gl||!tx3)return;LOGOK=k;var tok=++LOGON,c=D.createElement("canvas"),S=1024;c.width=c.height=S;var x=c.getContext("2d"),left=4;
     function put(){if(tok!==LOGON)return;gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,tx3);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
       gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
@@ -451,12 +452,12 @@ var Diamond=(function(){
   "    float dy=v.y-base;float ry=vn(vec2(x*16.0+uT*(0.20+fl*0.07),fl*7.0+uT*0.05));ry=pow(ry,1.6);",
   "    float wave=0.5+0.5*sin(x*2.2-uT*0.55+fl*1.7);wave=0.45+0.55*wave*wave;",
   "    float edge=smoothstep(-0.018,0.004,dy)*exp(-max(dy,0.0)/(0.09+0.03*fl));float a=edge*(0.30+0.70*ry)*wave*(0.62-fl*0.14);",
-  "    vec3 c;if(uN>0.5){c=mix(vec3(0.92,0.52,0.98),vec3(0.46,0.26,0.96),smoothstep(0.0,0.10,dy));c=mix(c,vec3(0.30,0.16,0.72),smoothstep(0.08,0.24,dy));}",
-  "    else{c=mix(vec3(1.0,0.56,0.88),vec3(0.64,0.44,1.0),smoothstep(0.0,0.09,dy));c=mix(c,vec3(0.50,0.58,1.0),smoothstep(0.08,0.24,dy));}col+=c*a;acc+=a;}",
+  "    float hh=0.33+0.42*smoothstep(0.010,0.200,dy)+0.09*sin(x*0.35+uT*0.03+fl*2.1);vec3 c=0.58+0.42*cos(6.2831853*(vec3(hh)-vec3(0.0,0.3333,0.6667)));c=mix(vec3(1.0,0.50,0.86),c,smoothstep(0.0,0.014,dy));",
+  "    if(uN<0.5)c=mix(c,vec3(1.0,0.97,1.0),0.12);col+=c*a;acc+=a;}",
   "  float ex=hx*smoothstep(1.06,0.86,v.y)*smoothstep(0.34,0.56,v.y);return vec4(col*ex,clamp(acc*ex,0.0,1.0));}",
   "void main(){vec2 P=vec2(v.x*uRes.x,(1.0-v.y)*uRes.y);vec2 vb=vec2((P.x-uBox.x)/uBox.z,1.0-(P.y-uBox.y)/uBox.w);",
   "  float hx=smoothstep(0.0,0.04,v.x)*smoothstep(1.0,0.96,v.x)*mix(0.78,1.0,smoothstep(0.20,0.55,v.x));",
-  "  vec4 au=aurora(vb,hx);float ai=uN>0.5?0.95:1.0;vec3 col=au.rgb*ai;float a=clamp(au.a*ai,0.0,1.0);",
+  "  vec4 au=aurora(vb,hx);float ai=uN>0.5?0.95:1.3;vec3 col=au.rgb*ai;float a=clamp(au.a*ai,0.0,1.0);",
   /* the day's soft glows behind the stone, as its canvas drew them, now free to fall away across the card */
   "  if(uN<0.5){vec2 wc=(vb-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(vb.x*0.8+vb.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);",
   "    vec2 gc=(vb-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
@@ -556,22 +557,25 @@ var Diamond=(function(){
       a=i*45;FAC.push({g:6,k:i,p:[0.55*Math.cos(a*D2R),-0.35,0.55*Math.sin(a*D2R)]});a=11.25+i*45;FAC.push({g:7,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});a=33.75+i*45;FAC.push({g:8,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});}
     for(i=0;i<6;i++){a=i*60+15;FAC.push({g:-1,k:0,p:[0.32*Math.cos(a*D2R),0.31,0.32*Math.sin(a*D2R)]});}})();
   var SPECK=[],lastSp=-1;
-  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=8.0+(u>=0&&u<1.4?10.0:0)+hb*8.0+pb*20.0;
-    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?24:18)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
+  /* 7.04: glittering lights (her words, 14 November 2026: "more sparkles and glittering lights"): points on the facets, each on its own clock */
+  var GLIT=(function(){var a=[];for(var i=0;i<28;i++){var f=FAC[(i*7+3)%FAC.length],j=[(Math.random()-0.5)*0.12,(Math.random()-0.5)*0.05,(Math.random()-0.5)*0.12];a.push({f:f,p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],w:2.5+Math.random()*2.3,ph:Math.random()*6.2832,r:1.6+Math.random()*2.6,c:Math.random()});}return a;})();
+  function glitter(t,M,DC,nt){for(var gi=0;gi<GLIT.length;gi++){var g=GLIT[gi],tw=Math.sin(t*g.w*(over?1.6:1)+g.ph);if(tw<=0.82)continue;var ga=Math.pow((tw-0.82)/0.18,2);var GP=mvS(M,g.p);GP=[GP[0]+DC[0],GP[1]+DC[1],GP[2]+DC[2]];var GN=g.f.g<0?mv(M,[0,1,0]):mv(M,gN(g.f));if(dot(GN,nrm(sub(CP,GP)))<0.05)continue;var gxy=proj(GP);star(gxy[0],gxy[1],g.r*(0.8+0.4*ga)*(over?1.15:1),ga*(over?1.0:0.85),nt,g.c);}}
+  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=12.0+(u>=0&&u<1.4?10.0:0)+hb*10.0+pb*24.0;
+    for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?32:26)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
       SPECK.push({p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],f:f,t0:t,life:0.22+Math.random()*0.33,r:(1.8+Math.random()*3.8)*(hb||pb?1.25:1),c:Math.random()});}
     for(var i=SPECK.length-1;i>=0;i--){var s=SPECK[i],age=(t-s.t0)/s.life;if(age>=1||age<0){SPECK.splice(i,1);continue;}
       var P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P)),N=s.f.g<0?mv(M,[0,1,0]):mv(M,gN(s.f));var hz=nrm([N[0],0.0001,N[2]]);
       if(dot(N,V)<0.05&&dot(hz,[V[0],0,V[2]])<0.25)continue;var xy=proj(P),a=Math.pow(Math.sin(Math.PI*age),2);star(xy[0],xy[1],s.r*(0.7+0.5*a),a,nt,s.c);}}
   function sparkle(t,M,DC,nt){og.setTransform(dpr(),0,0,dpr(),0,0);og.clearRect(0,0,W0,H0);
     for(var i=0;i<SPK.length;i++){var s=SPK[i],N=mv(M,gN(s)),P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P));if(dot(N,V)<=0.05)continue;
-      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.93:0.95;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(5+9*a)*(over?1.15:1),Math.min(1,a*0.95),nt);}
+      var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);var c0=(over||t-press<1.6)?0.92:0.94;if(c<c0)continue;var a=Math.pow((c-c0)/(1-c0),2.2),xy=proj(P);star(xy[0],xy[1],(5+9*a)*(over?1.15:1),Math.min(1,a*1.1),nt);}
     var f=(t-PL.s)/PER;if(f>=0&&f<0.5){var A=PL.a,cA=Math.cos(A),sA=Math.sin(A),b1=A+Math.PI-0.95,b2=A+Math.PI+1.05;
       var hitA=Math.exp(-Math.pow((f-0.03)/0.014,2)),outA=Math.exp(-Math.pow((f-0.06)/0.02,2));
       var en=proj([DC[0]+cA*0.30,DC[1]+0.24,DC[2]+sA*0.30]);star(en[0],en[1],8+16*hitA,hitA,nt);
       [[-cA*0.55,-0.42,-sA*0.55]].forEach(function(e){var p=proj([DC[0]+e[0],DC[1]+e[1],DC[2]+e[2]]);star(p[0],p[1],6+12*outA,outA*0.9,nt);});
       for(var k=0;k<SPK.length;k++){var hk=Math.sin((k+1)*12.9898+PL.n*78.233)*43758.5453;hk-=Math.floor(hk);if(hk<0.45)continue;var gk=Math.exp(-Math.pow((f-0.05-hk*0.07)/0.022,2));if(gk<0.03)continue;
         var sk=SPK[k],Pk=mvS(M,sk.p);Pk=[Pk[0]+DC[0],Pk[1]+DC[1],Pk[2]+DC[2]];if(dot(mv(M,gN(sk)),nrm(sub(CP,Pk)))<=0.0)continue;var xyk=proj(Pk);star(xyk[0],xyk[1],4+9*gk,gk*0.9,nt);}}
-    specks(t,M,DC,nt,(t-PL.s)/TT);
+    specks(t,M,DC,nt,(t-PL.s)/TT);if(!still())glitter(t,M,DC,nt);
     /* motes of light in the air, drifting slowly, each twinkling now and then (on the card's own canvas when it has one) */
     if(!BG.ok)for(var j=0;j<MOTES.length;j++){var m=MOTES[j],x=40+m[0]*440,y=40+((m[1]-t*0.006*m[2])%1+1)%1*300,tw=Math.pow(0.5+0.5*Math.sin(t*0.75*m[2]+m[3]),6);
       og.globalAlpha=(nt?0.55:0.6)*(0.25+0.75*tw);og.fillStyle=nt?"rgba(226,212,255,1)":"rgba(132,96,220,1)";og.beginPath();og.arc(x,y,0.7+0.9*m[2],0,Math.PI*2);og.fill();if(tw>0.7)star(x,y,3+5*tw,(tw-0.7)*1.6,nt);}
