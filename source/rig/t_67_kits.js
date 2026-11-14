@@ -108,8 +108,10 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     // ---------- 1. Fabrica: The Forge from the app library ----------
     await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
     await p.evaluate(() => document.getElementById('fbBring').click()); await p.waitForTimeout(500);
-    await p.evaluate(() => [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /From your app library/.test(x.textContent)).click()); await p.waitForTimeout(500);
-    await p.evaluate(() => [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /^♦?\s*The Forge/.test(x.textContent.trim()) || /The Forge \d/.test(x.textContent)).click());
+    /* 6.61 on: the Bring an app in sheet shows the app library as tiles (r112 sheetBring); before, a list of options */
+    await p.evaluate(() => { const t = [...document.querySelectorAll('.f-sheet .f-tile')].find(x => /^The Forge/.test((x.querySelector('b') || x).textContent.trim()));
+      if (t) { t.click(); return; } [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /From your app library/.test(x.textContent)).click(); }); await p.waitForTimeout(500);
+    await p.evaluate(() => { const o = [...document.querySelectorAll('.f-sheet .f-opt')].find(x => /^♦?\s*The Forge/.test(x.textContent.trim()) || /The Forge \d/.test(x.textContent)); if (o) o.click(); });
     await p.waitForFunction(() => { const r = IngRepo && document.querySelector('#fbRepos .f-repo.on, #fbRepos .f-repo[aria-current="true"]'); return !!r && /The Forge/.test(r.textContent); }, null, { timeout: 120000 }).catch(() => {});
     await p.waitForTimeout(1500);
     await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /The Forge/.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(1500);

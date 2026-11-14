@@ -371,6 +371,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.06 (14 November 2026): two faults found on 7.05, mended. Her request that day: "Please continue working on expanding the
+Fabrica page and continue with the rest of my requests"; checking Fabrica's shipping and the Offline Project before building on them
+found both.
+- Fabrica's header did not follow an app opened by pressing its card in Your apps: it kept saying "No app chosen yet" and showed the
+  example tree. The header (`modules/r294.js`) wrapped only `window.fbHubHost.paint`, and a press inside Fabrica calls Fabrica's own
+  paint, never the exported one. `modules/r112.js` now tells the listeners in `window.fbAfterPaint` after every paint, however it is
+  asked for, and r294 listens there. `rig/t_696_fabrica_head.js` presses the card itself (7.05's test set the choice and called the
+  exported paint, so it passed).
+- The Offline Project could not be made from 7.00 to 7.05 ("A part of Ingenium (r158-css) is not in this copy's page"): the demo
+  edition's recipe names r158-css, a style block whose rules were all comments and which now holds only a line break, and
+  `modules/r268.js` refused any part whose text was blank. A part is now taken as it is and checked by its length, as the recipe
+  records it. Checked on a copy of the 7.05 page with only this change: the Offline Project is made whole.
+- `rig/t_67_kits.js` finds the app library's apps as tiles in the Bring an app in sheet (6.61 on), and as a list before.
+
 Ingenium 7.05 (14 November 2026): Build's starry night. Her words that day: "I want it to be a starry night in the landscape with the
 northern lights"; "I want sparkles and shimmering lights throughout the landscape not just concentrated on the diamond. Use the fictional
 city of Velaris from the Court of Thorns and Roses as inspiration for this"; "I want the sparkles added to the atmosphere in a light and

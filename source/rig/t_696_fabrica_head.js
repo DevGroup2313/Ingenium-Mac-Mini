@@ -98,6 +98,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     // the panels keep the window's height under the header
     const fh = await p.evaluate(() => ({ h: document.getElementById('fb').offsetHeight, ih: innerHeight }));
     ok(Math.abs(fh.h - Math.max(420, fh.ih - 74)) <= 2, 'the three panels keep the window\'s height under the header', fh);
+    // 7.06: an app opened as she opens it, by pressing its card in Your apps (Fabrica's own paint, never the exported one): the header follows
+    await p.setViewportSize({ width: 1440, height: 1000 }); await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await sleep(600);
+    await p.evaluate(async () => { const enc = s => new TextEncoder().encode(s); const r = await IngRepo.fromFiles([{ path: 'index.html', data: enc('<!doctype html><title>Ledger</title>') }], { name: 'ledger' });
+      await IngRepo.put(r.id, 'a.txt', enc('1')); await IngRepo.commit(r.id, 'Household accounts, a second version'); await fbHubHost.refresh(); fbHubHost.paint(); });
+    await sleep(1200);
+    const pressed = await p.evaluate(() => { const c = [...document.querySelectorAll('#fb .f-repo')].find(x => /ledger/.test(x.textContent)); if (!c) return null; c.click(); return true; });
+    await sleep(2500);
+    const fol = await p.evaluate(() => ({ says: document.querySelector('#page-fabrica .skh-says').textContent, tree: IngTree.state().tree, open: (fbHubHost.cur() || {}).name || null }));
+    ok(pressed && fol.open === 'ledger' && /^ledger · main · 2 versions/.test(fol.says) && fol.tree && fol.tree.trunk === 2, 'an app opened by pressing its card in Your apps: the header names it and grows its tree (7.06)', fol);
     // a phone
     await p.setViewportSize({ width: 390, height: 860 }); await sleep(900);
     const ph = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth, obj: getComputedStyle(document.querySelector('#page-fabrica .skh-obj')).display, head: !!document.querySelector('#page-fabrica .skh').offsetParent }));

@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.06", "Fabrica's header follows the app you open: pressing an app's card in Your apps names it in the header and grows its tree of versions at once.", "fabrica"],
+  ["7.06", "The Offline Project can be made again from this copy of Ingenium: a part of the page that holds only blank space no longer stops it.", "master"],
   ["7.05", "Build's sky is a starry night: soft stars behind the violet northern lights, each twinkling slowly, a star falling now and then, and a few fine sparkles drifting through the air; by day a few sparkles drift across the light sky. The diamond is as it was.", "career"],
   ["7.04", "By night the engine logo at the heart of Build's holder has a deep indigo face instead of charcoal, in tune with the Orrery round it.", "career"],
   ["7.03", "Your build library in Folders now takes in more notes or recipes without losing any: what you bring in is added to the notes you keep, a note with the same name is updated, and nothing else is removed.", "master"],

@@ -679,7 +679,11 @@ var tt=null;function toast(m){var root=$("fb");if(!root)return;var old=root.quer
 function fail(e){var m=e&&e.message?e.message:String(e);toast(m.charAt(0).toUpperCase()+m.slice(1));try{console.warn("Fabrica",e);}catch(_){}}
 
 /* ---------- painting ---------- */
-function paint(){if(!$("fb"))return;
+/* 7.06: every paint, however it is asked for (a press inside Fabrica calls this function itself, never window.fbHubHost.paint), tells
+   the parts that follow Fabrica, such as the tree in its header (modules/r294.js), which listen in window.fbAfterPaint. Before 7.06
+   the header followed only the exported paint, so an app opened by pressing its card left the header saying no app was chosen. */
+function paint(){paint0();var L=window.fbAfterPaint;if(L&&L.length)for(var i=0;i<L.length;i++){try{L[i]();}catch(e){}}}
+function paint0(){if(!$("fb"))return;
   /* another part of Ingenium chose an app while the library was showing: its work is shown */
   if(S.home&&FBS().sel&&FBS().sel!==S.seenSel)S.home=false;S.seenSel=FBS().sel;
   if(S.appPg&&FBS().sel!==S.appPg)S.appPg=false;

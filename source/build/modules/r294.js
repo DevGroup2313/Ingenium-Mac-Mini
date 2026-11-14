@@ -424,7 +424,9 @@ function refresh(){var x=X();if(!x||!HD)return;paintSteps();var r=x.cur&&x.cur()
 function on(){page=D.getElementById("page-fabrica");if(!page||!KIT())return;page.classList.add("sk-on");if(!build())return;SIG="";ROWKEY="";refresh();kick();try{if(W.IngHeadsFit)W.IngHeadsFit();}catch(e){}}
 var og=W.go;if(typeof og==="function")W.go=function(p){var r=og.apply(this,arguments);try{if(p==="fabrica")setTimeout(on,0);}catch(e){}return r;};
 /* Fabrica paints often: the head follows what it shows, read again only when the app, its versions or its changes move */
-(function(){var x=X();if(!x||!x.paint)return;var op=x.paint;x.paint=function(){var r=op.apply(this,arguments);try{if(HD&&page&&page.offsetParent)refresh();}catch(e){}return r;};})();
+/* 7.06: it listens after every paint of Fabrica's (modules/r112.js, window.fbAfterPaint), the presses inside Fabrica included; before, it
+   wrapped only the exported paint, which a press on an app's card in Your apps never calls, so the header kept saying no app was chosen */
+(W.fbAfterPaint=W.fbAfterPaint||[]).push(function(){if(HD&&page&&page.offsetParent)refresh();});
 try{new MutationObserver(function(){SIG="";refresh();draw();kick();}).observe(D.body,{attributes:true,attributeFilter:["data-theme","data-motion"]});}catch(e){}
 /* the sheets now stand in the window, so a press begun inside one and let go outside it would land on its backdrop and close it: a press
    that begins inside a sheet never closes it; one that begins on the backdrop still does, as before */

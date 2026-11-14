@@ -90,7 +90,10 @@ function ingenium(){return once("ingenium",function(){
     rec.srcs.forEach(function(s,i){p=p.then(function(){
       if(!s.id)return byPrint(s);
       if(!el(s.id))throw new Error("Ingenium's demo edition needs a part this copy's page does not hold ("+s.id+"). The phone and tablet apps leave the engine and the kit store out of their page: make it in the computer app, or from the page in a browser.");
-      return blockText(s.id,"A part of Ingenium ("+s.id+")").then(function(tx){if(tx.length!==s.len)throw stale();return enc.encode(tx);});}).then(function(b){bytes[i]=b;});});
+      /* 7.01: a part may hold only blank space (a style block whose rules were all comments keeps its line break, r158-css): its length is
+         what counts, so it is taken as it is, never refused as missing (7.00 could not make the Offline Project for this) */
+      return Promise.resolve(typeof W.ingFill==="function"?W.ingFill(s.id):null).then(function(){var tx=el(s.id).textContent;if(tx.length!==s.len)throw stale();return enc.encode(tx);},
+        function(x){throw new Error("A part of Ingenium ("+s.id+") could not be read from this copy ("+(x&&x.message||x)+").");});}).then(function(b){bytes[i]=b;});});
     return p.then(function(){var out=new Uint8Array(rec.size),at=0;codes=null;
       rec.ops.forEach(function(op){var b=typeof op==="string"?enc.encode(op):bytes[op[0]].subarray(op[1],op[1]+op[2]);
         if(at+b.length>out.length)throw new Error("Ingenium's demo edition did not come back whole.");out.set(b,at);at+=b.length;});
