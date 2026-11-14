@@ -16,6 +16,8 @@
 //   - in every other edition given: not Lakay's name, its page, its mark or its build;
 //   - no errors on the page.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
+// 7.07: Lakay's colour is the one its carried build has (#6f78d8 at Build 6, #5f67cc since Build 14), read from the record of the carried apps
+const LAKAY_COLOUR = JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'build', 'apps', 'builtin', 'builtin.json'), 'utf8')).lakay.color;
 const args = process.argv.slice(2); const OTHERS = args.filter(a => a.startsWith('other=')).map(a => a.slice(6)); const [URL_, OUT] = args.filter(a => !a.startsWith('other='));
 fs.mkdirSync(OUT, { recursive: true });
 let pass = 0, fail = 0; function ok(c, m, d) { if (c) { pass++; console.log('ok   ' + m); } else { fail++; console.log('FAIL ' + m + (d !== undefined ? ' :: ' + JSON.stringify(d).slice(0, 900) : '')); } }
@@ -66,7 +68,7 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   await p.waitForFunction(() => window.__ingBuiltin, null, { timeout: 180000 }).catch(() => {});
   const lk = await p.evaluate(() => { const m = libState().apps.lakay || {}; return { st: window.__ingBuiltin && __ingBuiltin.states.lakay, keys: libKeys(), title: m.title, version: m.version, source: m.source, color: m.color, seal: !!(window.ING_SEALS && ING_SEALS.lakay), layers: window.LX7_LAYERS && LX7_LAYERS.lakay ? LX7_LAYERS.lakay.length : 0, night: window.LX7_LAYERS && LX7_LAYERS.lakayN ? LX7_LAYERS.lakayN.length : 0 }; });
   ok(lk.st === 'kept' || lk.st === 'same', 'Lakay is kept on first start from inside Ingenium, checked against its fingerprint', lk);
-  ok(lk.title === 'Lakay' && /^\d+$/.test(lk.version || '') && lk.source === 'built in' && lk.color === '#6f78d8', 'it is kept as Lakay, by its build number, in its own colour', lk);
+  ok(lk.title === 'Lakay' && /^\d+$/.test(lk.version || '') && lk.source === 'built in' && lk.color === LAKAY_COLOUR, 'it is kept as Lakay, by its build number, in its own colour (' + LAKAY_COLOUR + ', as builtin.json records it)', lk);
   ok(lk.keys.slice(0, 4).join() === 'cd,forge,inkwell,ingenium' && lk.keys.indexOf('lakay') === 4, 'it is listed with her apps, after the four', lk.keys);
   ok(lk.seal && lk.layers === 16 && lk.night === 16, 'its seal and its mark in its planes (Build 6: sixteen), by day and by night', lk);
   await p.evaluate(() => go('lector')); await p.waitForTimeout(2500);

@@ -113,7 +113,8 @@ function sampler(root) {
       for (const it of GOLD.items) {
         const t = Date.now(); const a = await ask(it.question); const ps = (a.rag && a.rag.passages) || [];
         const g = E.grounded(a.text, ps); const correct = E.answerHas(a.text, it);
-        items.push({ id: it.id, text: a.text, recheck: (a.rag && a.rag.recheck) || null, draft: (a.rag && a.rag.draft) || null, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, seconds: Math.round((Date.now() - t) / 1000) });
+        const gd = E.guarded(a.text, ps); gd.correct = E.answerHas(gd.text, it);   // 7.07: the reply as the detail check would show it
+        items.push({ id: it.id, text: a.text, recheck: (a.rag && a.rag.recheck) || null, draft: (a.rag && a.rag.draft) || null, passages: ps.map((x) => ({ folder: x.folder, file: x.file, text: String(x.text || '').slice(0, 2000) })), notFound: g.notFound, cited: g.notFound || (!g.flagged.length && !g.badRefs.length && g.sentences.length > 0), flagged: g.flagged, badRefs: g.badRefs, unsupported: g.unsupported, correct, guarded: gd, seconds: Math.round((Date.now() - t) / 1000) });
         note(it.id + ' (' + Math.round((Date.now() - t) / 1000) + ' s): ' + (g.notFound ? 'NOT_FOUND' : (g.ok ? 'grounded' : 'flagged')) + (a.rag && a.rag.recheck ? ', checked again: ' + a.rag.recheck : '') + (correct ? ', names the fact' : '') + ' :: ' + String(a.text).replace(/\s+/g, ' ').slice(0, 160));
       }
       R.grounded = { model: LLM_NAME, items };
@@ -121,6 +122,7 @@ function sampler(root) {
       ok(cited === items.length, '2. groundedness: every sentence cited and every citation to a passage given in ' + cited + ' of ' + items.length + ' answers', items.filter((x) => !x.cited).map((x) => x.id + ': ' + x.flagged.concat(x.badRefs.map((n) => '[' + n + ']')).join(' | ')));
       ok(unsup === 0, '2. groundedness: no cited sentence whose words are mostly missing from its passage (' + unsup + ' to read)', items.filter((x) => x.unsupported.length).map((x) => x.id + ': ' + x.unsupported.map((u) => u.text + ' (' + u.share + ')').join(' | ')));
       note('answers that name the fact: ' + items.filter((x) => x.correct).length + ' of ' + items.length);
+      note('with the detail check (7.07): every sentence cited in ' + items.filter((x) => x.guarded.cited).length + ' of ' + items.length + '; NOT_FOUND ' + items.filter((x) => x.guarded.notFound).length + '; naming the fact ' + items.filter((x) => x.guarded.correct).length + '; mended ' + items.reduce((a, x) => a + x.guarded.repaired.length, 0) + '; taken out ' + items.reduce((a, x) => a + x.guarded.removed.length, 0));
       await p.evaluate(() => IngRagChat._as('test-b'));
       let nf = 0; const other = [];
       for (const it of onlyX) { const a = await ask(it.question); if (a.text === E.NOT_FOUND) nf++; else other.push(it.id + ': ' + a.text); note('test-b, ' + it.id + ': ' + String(a.text).slice(0, 160)); }

@@ -392,6 +392,15 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.07 (14 November 2026): Lakay brought up to date, and Ingenium's own rules built in. Her words that day: "the Lakay app has
+been updated to a later build, please update Ingenium's copy to bring it up to date."
+- Lakay Build 14 (14 November 2026, the same page in Lakay-Windows, Lakay-Mac and Lakay-Apps, SHA-256 cbc77d33...) replaces Build 6 in
+  `build/apps/builtin` (`apps/update_builtin.py`). Its mark is unchanged: `apps/lakay_mark.py` on Lakay-Windows' sources (the one
+  repository that carries `src/`) gives the same sixteen planes by day and by night and the same seal. Its own colour is now #5f67cc
+  (#6f78d8 in Build 6), read from the page as before; `rig/t_655_fixes.js` now reads the colour from `builtin.json` instead of naming it.
+- Ingenium's own rules in Ingenium's folder (`modules/r297.js`, the master edition's alone), from the other session's sources:
+  `rig/t_707_rules.js`.
+
 Ingenium 7.06 (14 November 2026): two faults found on 7.05, mended. Her request that day: "Please continue working on expanding the
 Fabrica page and continue with the rest of my requests"; checking Fabrica's shipping and the Offline Project before building on them
 found both.

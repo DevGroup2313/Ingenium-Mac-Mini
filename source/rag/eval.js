@@ -19,7 +19,7 @@
 //   answerHas(answer, item)          -> the answer names the item's key facts (its numbers and its needle's rarer words)
 //   markdown(report)                 -> the report as plain Markdown
 
-import { checkGrounded, isNotFound, NOT_FOUND } from './prompt.js';
+import { checkGrounded, isNotFound, NOT_FOUND, guard } from './prompt.js';
 
 export const K = 5;
 export { NOT_FOUND };
@@ -74,6 +74,14 @@ export function grounded(answer, passages, opts = {}) {
   return Object.assign({}, c, { unsupported, ok: c.ok && !unsupported.length });
 }
 
+/** 7.07, phase 6: the reply as the detail check would show it (rag/prompt.js guard), judged as a reply is: -> {text, notFound, ok,
+ *  cited, removed, repaired, unsupported}. ok: every sentence cited, every citation to a passage given, no sentence to read. */
+export function guarded(answer, passages, opts = {}) {
+  const g = guard(answer, passages);
+  const j = grounded(g.text, passages, opts);
+  return { text: g.text, notFound: g.notFound, ok: g.notFound || j.ok, cited: g.notFound || (!j.flagged.length && !j.badRefs.length && j.sentences.length > 0), removed: g.removed, repaired: g.repaired, unsupported: j.unsupported || [], flagged: j.flagged || [] };
+}
+
 /** True when no passage comes from the folder named. */
 export function aclClean(passages, folderName) { return (passages || []).every((p) => folderOf(p) !== folderName); }
 
@@ -103,6 +111,12 @@ export function markdown(r) {
       L.push('- ' + x.id + (x.flagged.length ? ': without a citation: ' + x.flagged.map((s) => '"' + s + '"').join('; ') : '') + (x.badRefs.length ? '; cites passages not given: ' + x.badRefs.map((n) => '[' + n + ']').join(', ') : '') + (x.unsupported.length ? '; to read (few of its words in its passage): ' + x.unsupported.map((s) => '"' + s.text + '" (' + s.share + ')').join('; ') : ''));
     });
     L.push('');
+    if (g.items.some((x) => x.guarded)) {
+      const G = g.items.filter((x) => x.guarded);
+      L.push('### With the detail check (7.07, phase 6)', '', 'Each reply as the check would show it: a sentence whose exact details (numbers, dates, weekdays, months, names, codes) its passage does not hold is taken out, a missing or wrong citation is mended when one passage holds them all, and a reply left with nothing becomes NOT_FOUND.', '', '- Every sentence cited and every citation to a passage given: **' + G.filter((x) => x.guarded.cited).length + ' of ' + G.length + '**; NOT_FOUND: ' + G.filter((x) => x.guarded.notFound).length + '; naming the fact: ' + G.filter((x) => x.guarded.correct).length + '; citations mended: ' + G.reduce((a, x) => a + x.guarded.repaired.length, 0) + '; sentences taken out: ' + G.reduce((a, x) => a + x.guarded.removed.length, 0) + '.', '');
+      G.forEach((x) => { if (x.guarded.removed.length || x.guarded.repaired.length || x.guarded.unsupported.length) L.push('- ' + x.id + (x.guarded.removed.length ? ': taken out: ' + x.guarded.removed.map((s) => '"' + s.text + '" (' + s.missing.join(', ') + ')').join('; ') : '') + (x.guarded.repaired.length ? '; citation mended: ' + x.guarded.repaired.map((s) => '"' + s.text + '" to [' + s.to + ']').join('; ') : '') + (x.guarded.unsupported.length ? '; to read: ' + x.guarded.unsupported.map((s) => '"' + s.text + '"').join('; ') : '')); });
+      L.push('');
+    }
   }
   if (r.acl) L.push('## 3. ACL', '', '- retrieve() for ' + r.acl.user + ', who may not read ' + r.acl.folder + ': passages from it in ' + r.acl.leaks + ' of ' + r.acl.n + ' questions (and in the two searches: ' + r.acl.searchLeaks + ')', '- End to end: ' + r.acl.e2eNotFound + ' of ' + r.acl.n + ' responses equal NOT_FOUND' + (r.acl.e2eOther.length ? '; the others: ' + r.acl.e2eOther.map((s) => '"' + s.slice(0, 160) + '"').join('; ') : ''), '');
   if (r.memory) L.push('## 4. Memory', '', '- The whole corpus (' + r.memory.files + ' files, ' + r.memory.passages + ' passages, the 4 MB logbook included) read in ' + r.memory.minutes + ' minutes with ' + r.memory.workers + ' reading-model worker(s).', '- Peak, the resident memory (RSS) of every Chromium process added up, sampled every 250 ms: **' + r.memory.peakMB + ' MB**; proportional (PSS, shared pages counted once): ' + r.memory.pssMB + ' MB. Method: ' + r.memory.method, '');
@@ -110,4 +124,4 @@ export function markdown(r) {
   return L.join('\n');
 }
 
-export default { K, recall, grounded, aclClean, answerHas, markdown, NOT_FOUND, isNotFound };
+export default { K, recall, grounded, guarded, aclClean, answerHas, markdown, NOT_FOUND, isNotFound };
