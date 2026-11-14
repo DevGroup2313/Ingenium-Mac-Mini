@@ -716,7 +716,8 @@ function paintWork(){var r=cur(),w=$("fbWorkBody"),f=$("fbWorkFoot");w.innerHTML
   if(S.view==="files")return paintFiles(r,w,f);
   if(S.view==="history")return paintHistory(r,w,f);
   if(S.view==="ideas")return paintIdeas(r,w,f);
-  if(S.view==="releases")return paintReleases(r,w,f);
+  /* 7.08: every device in one release (modules/r298.js) draws Releases where it is; this one where it is not */
+  if(S.view==="releases")return (window.fbHub&&fbHub.views&&typeof fbHub.views.releases==="function"?fbHub.views.releases:paintReleases)(r,w,f);
   /* 6.1 · the views of GitHub's own (R140): code at any version, issues, pull requests, compare, actions, projects, wiki, insights, settings */
   if(window.fbHub&&fbHub.views&&fbHub.views[S.view])return fbHub.views[S.view](r,w,f);}
 
@@ -1380,6 +1381,8 @@ window.fbRender=render;window.fbSync=syncFromCode;
 window.fbHubHost={S:S,C:C,cur:cur,FBS:FBS,saveSoon:saveSoon,h:h,esc:esc,btn:btn,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,busy:busy,unbusy:unbusy,
   refresh:refresh,paint:paint,paintWork:paintWork,thumbs:thumbs,diffList:diffList,openEditor:openEditor,saveBytes:saveBytes,mimeOf:mimeOf,notesOf:notesOf,statusOf:statusOf,setPanel:setPanel,one:one,
   pkgOf:pkgOf,appOf:appOf,sealEl:sealEl,draftMessage:draftMessage,
+  /* 7.08: what Releases for every device (modules/r298.js) makes and keeps with */
+  makeOne:makeOne,targetHere:targetHere,TARGETS:TARGETS,headTag:headTag,keepMade:keepMade,stepOf:stepOf,
   /* 6.61: the library page and the three panels (the tests, and the parts that open an app) */
   closeX:closeX,openWork:function(id){if(id)FBS().sel=id;S.home=false;S.seenSel=FBS().sel;paint();},openApp:openApp2,openLibrary:goHome,openPage:openPage,paintLib:paintLib};
 /* R114: Code opened on an app, with something to say once it is open */

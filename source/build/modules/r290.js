@@ -571,15 +571,16 @@ body[data-motion="minimal"] .skv-index.tick,body[data-motion="minimal"] .skv-ris
 body[data-motion="calm"] .skv-hx .seal-spin{animation-duration:13s}
 body[data-motion="minimal"] .skv-hx .seal-spin{animation:none}
 @media (prefers-reduced-motion:reduce){.skv-hx .seal-spin{animation:none}}
-/* the seal's thin ring, inside the compass (her words, 13 November 2026: "The thin little circle inside of the engine button of the compass is
-   out of sync with engine and looks smaller and keeps on rotating everywhere in every corner"): it lies in the seal's own plane, so it no
-   longer slides about inside the silver collar as the button sways; it sits just inside the collar; and it turns with the engine */
-.skv-hx .isl .isl-ring{--fz:0;--fk:1}
-@keyframes skvRing{from{transform:rotate(0deg) scale(1.1)}to{transform:rotate(-360deg) scale(1.1)}}
-.skv-hx .seal-counter{animation:skvRing 9s linear infinite}
-body[data-motion="calm"] .skv-hx .seal-counter{animation-duration:13s}
-body[data-motion="minimal"] .skv-hx .seal-counter{animation:none;transform:scale(1.1)}
-@media (prefers-reduced-motion:reduce){.skv-hx .seal-counter{animation:none;transform:scale(1.1)}}
+/* the seal's thin ring, inside the compass. Her words (13 November 2026): "The thin little circle inside of the engine button of the compass is
+   out of sync with engine and looks smaller and keeps on rotating everywhere in every corner"; and again (14 November 2026): "The little
+   thin purple inner circle inside of the engine button is smaller inside of Vocatio's 3D compass and keeps on moving out of sync with the
+   compass ... the Blend page's engine button had the same issue but its fixed now". The cause, measured on 7.07: the button swayed in 3D on
+   a clock of its own (islSway, 7 s) inside a compass that moves on its own clock, and its ring lay lower than its star, so the ring slid
+   up to 2.4 pixels about the star and the collar. So it is held as Blend's is in its wheel (modules/r262.js): no sway and no tilt of its
+   own, its ring, star and heart at Blend's heights, and the ring turning as the base page turns it; it moves only with the compass. */
+.skv-hx .isl .isl-ring{--fz:.08;--fk:.98}.skv-hx .isl .isl-star{--fz:.17;--fk:.9575}.skv-hx .isl .isl-heart{--fz:.3;--fk:.925}
+.skv-hx .isl .isl-idle{animation:none !important}
+.skv-hx .isl .isl-tilt{transform:none !important}
 .skv-hx{--ox-rim0:#ddd2ef;--ox-rim1:#a891d4}
 body[data-theme="night"] .skv-hx{--ox-rim0:#43375e;--ox-rim1:#1d1729}
 .skv-hx .isl .ox-rim{position:absolute;left:2.6%;top:2.6%;width:94.8%;height:94.8%;border-radius:50%;display:block;pointer-events:none;

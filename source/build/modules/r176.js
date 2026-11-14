@@ -342,7 +342,7 @@ function bind(root){
 function ensureDisplay(){var p=$("displayPanel");if(!p||$("dpSound"))return;
   var sec=mk("div","dp-sec","Sound");sec.id="dpSoundSec";
   var w=mk("div");w.id="dpSound";
-  w.innerHTML='<div class="dp-row"><div class="dp-label" id="dpSndOnL">Sounds</div><div class="seg" role="group" aria-labelledby="dpSndOnL" id="dpSndOn">'
+  w.innerHTML='<div class="dp-row"><div class="dp-label" id="dpSndOnL">Ingenium\'s sounds</div><div class="seg" role="group" aria-labelledby="dpSndOnL" id="dpSndOn">'
     +'<button type="button" class="seg-btn" data-snd-on="1" aria-pressed="false">On</button><button type="button" class="seg-btn" data-snd-on="0" aria-pressed="false">Off</button></div></div>'
     +'<div class="dp-row"><label class="dp-label" for="dpSndVol">Volume</label><div class="snd-vol"><input type="range" id="dpSndVol" data-snd-vol min="0" max="100" step="5" value="60">'
     +'<span class="snd-word" aria-hidden="true" data-snd-word></span></div></div>'
@@ -356,7 +356,7 @@ function ensureCard(){var pg=$("page-settings");if(!pg||$("ingSoundCard"))return
   var card=mk("div","card");card.id="ingSoundCard";
   card.innerHTML='<h2 class="sec" id="ingSoundH">Sound</h2>'
     +'<p class="snd-lede">Small, warm sounds: entering Ingenium, moving between pages, touching and pressing a key, a card opening, keeping something, and a reminder. Each one is made on this device as it plays, so nothing is downloaded.</p>'
-    +'<div class="snd-row"><span class="snd-lab" id="setSndOnL">Sounds</span><div class="seg" role="group" aria-labelledby="setSndOnL" id="setSndOn">'
+    +'<div class="snd-row"><span class="snd-lab" id="setSndOnL">Ingenium\'s sounds</span><div class="seg" role="group" aria-labelledby="setSndOnL" id="setSndOn">'
     +'<button type="button" class="seg-btn" data-snd-on="1" aria-pressed="false">On</button><button type="button" class="seg-btn" data-snd-on="0" aria-pressed="false">Off</button></div></div>'
     +'<div class="snd-row"><label class="snd-lab" for="setSndVol">Volume</label><div class="snd-vol"><input type="range" id="setSndVol" data-snd-vol min="0" max="100" step="5" value="60">'
     +'<span class="snd-word" aria-hidden="true" data-snd-word></span></div></div>'
@@ -500,6 +500,8 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.86: Fabrica's phase 2 (modules/r280.js): the Ingenium part's cards, its keys, the search's finds and the branch key's own list
      (her words, 12 November 2026: "I approve, please push it everywhere") */
   '#fb .r280-tile,#fb .r280-key,#fb .r280-hit,.r280-pop .r172-opt,'+
+  /* 7.08: Fabrica's runs, Needs you and Learn (modules/r298.js) */
+  '#fb .r298-run,#fb .r298-job,#fb .r298-need,#fb .r298-learnk,#fb .r298-more,'+
   /* 6.88: a second copy on another drive and Find by what it means (modules/r281.js): the drive chip, when it is checked, how to find */
   '#fb .r281-drive,#fb .r281-when button,#fb .r281-how button,'+
   /* 6.89: people and milestones, a comment on any line, templates (modules/r282.js) */

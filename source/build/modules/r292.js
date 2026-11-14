@@ -512,14 +512,23 @@ var Diamond=(function(){
   var DDN=null,DKB=-1e9,DFL={n:"",d:1,t:-1e9,count:0,last:""},DFX={sc:1,lift:0,yaw:0},DSC=1,YF=0,DORD=["spin","pulse","hop","twirl","beat"];
   function startDFl(t){var n=DFL.count+1,nm=n%7===0?"grand":(function(){var c=DORD.filter(function(x){return x!==DFL.last;});return c[Math.floor(Math.random()*c.length)];})();
     DFL={n:nm,d:Math.random()<0.5?-1:1,t:t,count:n,last:nm};}
-  function dfx(t){var f={sc:1,lift:0,yaw:0};if(still())return f;var T2=2*Math.PI;
-    if(DDN!=null)f.sc*=1-0.10*Math.min(1,(t-DDN)/0.08);var ke=(t-DKB)/0.6;if(ke>=0&&ke<1)f.sc*=lin([[0,0.9],[.25,1.1],[.5,.96],[.75,1.03],[1,1]],ke);
-    var e=t-DFL.t,d=DFL.d,n=DFL.n;if(e<0||e>2.2)return f;
-    if(n==="spin"||n==="grand"){f.yaw+=d*T2*ESP(e/1.15);f.sc*=lin([[0,1],[.35,1.14],[1,1]],EIO(e/0.9));}
-    if(n==="pulse")f.sc*=lin([[0,1],[.28,1.13],[.6,.97],[.8,1.03],[1,1]],EO(e/0.95));
-    if(n==="hop"||n==="grand")f.lift=-lin([[0,0],[.12,.03],[.42,-.18],[.7,0],[.85,-.03],[1,0]],EIO(e/0.9))*1.17;
-    if(n==="twirl"){var tw=ETW(e/1.1);f.yaw+=d*T2*lin([[0,0],[.45,.5],[.8,1],[1,1]],tw);f.sc*=lin([[0,1],[.45,.9],[.8,1.04],[1,1]],tw);}
-    if(n==="beat")f.sc*=lin([[0,1],[.14,1.3],[.3,1.04],[.46,1.24],[.7,1],[1,1]],EIO(e/1.1));
+  /* 7.08: the press at Ingenium's own pace. Her words (14 November 2026): "The animation of the diamond on the Build page is way too fast,
+     please slow it down and give it a more natural speed, please match it to the rest of the app's animations to stay in sync and cohesive
+     with Ingenium's other pages"; then "I meant the animation of the diamond when I click on it on the page not when it is at rest on the
+     page, please don't change anything there, just on the animations after I click on the diamond button on the Build page". The flourishes
+     were the engine button's (a turn in 1.15 s, most of it in its first third), right for a seal a few centimetres wide; the stone fills the
+     head, so its facets crossed it at some 800 degrees a second. Each now takes the time a stone of its size would, on the engine's own clock
+     (its 9 s turn: a turn in a third of it, a beat in a quarter), eased in and out, with lighter swells; Calm stretches them as it stretches
+     the engine (13 s to 9), and Minimal keeps the stone still. Its rest is as it was. */
+  var EGL=bez(.42,0,.2,1);function PK(){return D.body.getAttribute("data-motion")==="calm"?13/9:1;}
+  function dfx(t){var f={sc:1,lift:0,yaw:0};if(still())return f;var T2=2*Math.PI,k=PK();
+    if(DDN!=null)f.sc*=1-0.07*EIO(Math.min(1,(t-DDN)/0.22));var ke=(t-DKB)/(1.1*k);if(ke>=0&&ke<1)f.sc*=seg([[0,0.93],[.3,1.045],[.56,.985],[.8,1.01],[1,1]],ke,EIO);
+    var e=(t-DFL.t)/k,d=DFL.d,n=DFL.n;if(e<0||e>3.4)return f;
+    if(n==="spin"||n==="grand"){f.yaw+=d*T2*EGL(Math.min(1,e/3.0));f.sc*=lin([[0,1],[.4,1.07],[1,1]],EIO(Math.min(1,e/2.6)));}
+    if(n==="pulse")f.sc*=lin([[0,1],[.3,1.08],[.62,.985],[.82,1.015],[1,1]],EIO(Math.min(1,e/2.0)));
+    if(n==="hop"||n==="grand")f.lift=-lin([[0,0],[.12,.03],[.42,-.18],[.7,0],[.85,-.03],[1,0]],EIO(Math.min(1,e/1.9)))*1.17;
+    if(n==="twirl"){var tw=EGL(Math.min(1,e/3.0));f.yaw+=d*T2*lin([[0,0],[.45,.5],[.8,1],[1,1]],tw);f.sc*=lin([[0,1],[.45,.94],[.8,1.02],[1,1]],tw);}
+    if(n==="beat")f.sc*=lin([[0,1],[.16,1.12],[.32,1.02],[.48,1.09],[.72,1],[1,1]],EIO(Math.min(1,e/2.25)));
     return f;}
   function mvS(M,p){var r=mv(M,p);return [r[0]*DSC,r[1]*DSC,r[2]*DSC];}
   function orrery(){var nt=night(),k=nt?"n":"d";if(DIALK===k||!gl)return;var K=W.IngStudios&&IngStudios.kit,src=null,sv=null;if(K&&K.dial){try{var dd=K.dial(nt);src=dd.url;sv=dd.rings;}catch(e){src=null;}}
@@ -578,7 +587,7 @@ var Diamond=(function(){
       a=i*45;FAC.push({g:6,k:i,p:[0.55*Math.cos(a*D2R),-0.35,0.55*Math.sin(a*D2R)]});a=11.25+i*45;FAC.push({g:7,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});a=33.75+i*45;FAC.push({g:8,k:i,p:[0.84*Math.cos(a*D2R),-0.12,0.84*Math.sin(a*D2R)]});}
     for(i=0;i<6;i++){a=i*60+15;FAC.push({g:-1,k:0,p:[0.32*Math.cos(a*D2R),0.31,0.32*Math.sin(a*D2R)]});}})();
   var SPECK=[],lastSp=-1;
-  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<1.6||t-DKB<1.2)?1:0,rate=8.0+(u>=0&&u<1.4?10.0:0)+hb*8.0+pb*20.0;
+  function specks(t,M,DC,nt,u){var dt=lastSp<0?0:Math.min(0.1,Math.max(0,t-lastSp));lastSp=t;var hb=over?1:0,pb=(t-press<2.4||t-DKB<2.2)?1:0,rate=8.0+(u>=0&&u<1.4?10.0:0)+hb*8.0+pb*10.0;
     for(var sp2=0;sp2<2;sp2++)if(Math.random()<rate*dt*0.5&&SPECK.length<(pb?24:18)){var f=FAC[Math.floor(Math.random()*FAC.length)],j=[(Math.random()-0.5)*0.10,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.10];
       SPECK.push({p:[f.p[0]+j[0],f.p[1]+j[1],f.p[2]+j[2]],f:f,t0:t,life:0.22+Math.random()*0.33,r:(1.8+Math.random()*3.8)*(hb||pb?1.25:1),c:Math.random()});}
     for(var i=SPECK.length-1;i>=0;i--){var s=SPECK[i],age=(t-s.t0)/s.life;if(age>=1||age<0){SPECK.splice(i,1);continue;}
@@ -600,7 +609,7 @@ var Diamond=(function(){
     og.globalAlpha=1;}
   function night(){return D.body.getAttribute("data-theme")==="night";}
   function still(){return D.body.getAttribute("data-motion")==="minimal"||(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<0.8||t-DFL.t<2.3||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),gap=(over||t-press<2.5)&&FAST?16:33;
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),gap=(over||t-press<2.5)&&FAST?16:33;
     if(ts-lastDraw<gap){raf=requestAnimationFrame(frame);return;}var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
       var QMIN=Math.max(0.45,0.9/dpr());if(!W.__keepQ){if(EW>1.3&&t-QT>1.2&&q>QMIN){QCAP=q*0.95;q=Math.max(QMIN,q*0.85);QT=t;EW=1;size();}else if(EW<1.05&&t-QT>8&&q<QCAP){q=Math.min(QCAP,q*1.08);QT=t;size();}else if(EW<1.05&&t-QT>25&&QCAP<1){QCAP=Math.min(1,QCAP*1.05);QT=t;}}}}

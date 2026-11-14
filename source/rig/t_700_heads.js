@@ -117,24 +117,32 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(up.up && up.at === 'seal', 'pointed at, the seal lifts and is the thing under the pointer', up);
   await p.mouse.move(5, 300);
 
-  // ---------- Sounds: in the top bar on every page ----------
+  // ---------- 7.08: Nature sounds in the Display panel and in Settings, beside Ingenium's sounds; no key in the top bar ----------
+  // (her words, 14 November 2026: "The new "Sounds" button on the top bar should be added to the Settings page as well as to the display
+  // panel and should be removed from the top bar, however there is already another "Sounds" button inside of the Display panel")
   await open('home');
-  const nk = await p.evaluate(() => { const k = document.getElementById('natureBtn'), d = document.getElementById('displayBtn'); return { key: !!k, cls: k ? k.className : '', next: !!(k && d && k.nextElementSibling === d), text: k ? k.textContent.trim() : '', inBar: !!(k && k.closest('#topTools')) }; });
-  ok(nk.key && nk.inBar && nk.next && /cl-key/.test(nk.cls) && nk.text === 'Sounds', 'Sounds sits in the top bar, beside Display', nk);
-  await p.click('#natureBtn'); await sleep(400);
-  const mn = await p.evaluate(() => { const m = document.querySelector('.nat-menu'); return m ? { rows: [...m.querySelectorAll('.pres-row')].map(r => r.querySelector('.pres-name').textContent), on: (m.querySelector('.pres-row.on .pres-name') || {}).textContent, vol: !!m.querySelector('.nat-vol input[type=range]') } : null; });
-  ok(mn && JSON.stringify(mn.rows) === JSON.stringify(['Quiet', 'Stream', 'Rain', 'Waterfall', 'Waves', 'Birds', 'Night', 'Wind']) && mn.on === 'Quiet' && mn.vol, 'its menu offers Quiet, Stream, Rain, Waterfall, Waves, Birds, Night and Wind, and the volume', mn);
-  await p.click('.nat-menu .pres-row[data-k="rain"]'); await sleep(2500);
-  const pl = await p.evaluate(() => ({ mode: IngNature.mode(), key: document.getElementById('natureBtn').textContent.trim(), on: document.getElementById('natureBtn').classList.contains('nat-on'), err: window.__natureErr || null, last: IngNature.last() }));
-  ok(pl.mode === 'rain' && pl.key === 'Rain' && pl.on && !pl.err && pl.last === 'rain', 'Rain plays, and the key says so', pl);
+  const bar = await p.evaluate(() => ({ key: !!document.getElementById('natureBtn'), sounds: [...document.querySelectorAll('#topTools button')].filter(b => b.offsetParent && /^\s*Sounds\s*$/.test(b.textContent)).length }));
+  ok(!bar.key && bar.sounds === 0, 'the top bar keeps no Sounds key', bar);
+  await p.evaluate(() => { const k = document.getElementById('displayBtn'); if (k) k.click(); }); await sleep(500);
+  const dpn = await p.evaluate(() => { const s = document.getElementById('dpSound'), b = s && s.querySelector('[data-nat="dp"]');
+    return b ? { places: [...b.querySelectorAll('[data-nat-k]')].map(x => x.textContent.trim()), on: (b.querySelector('[data-nat-k][aria-pressed="true"]') || {}).textContent, vol: !!b.querySelector('input[type=range][aria-label="Volume of the nature sounds"]'),
+      labels: [...s.querySelectorAll('.dp-label')].map(x => x.textContent.trim()), named: [...document.querySelectorAll('#displayPanel .dp-label,#displayPanel .dp-sec')].filter(x => /^\s*Sounds\s*$/.test(x.textContent)).length } : null; });
+  ok(dpn && JSON.stringify(dpn.places) === JSON.stringify(['Quiet', 'Stream', 'Rain', 'Waterfall', 'Waves', 'Birds', 'Night', 'Wind']) && dpn.on === 'Quiet' && dpn.vol,
+    'the Display panel offers the nature sounds: Quiet, Stream, Rain, Waterfall, Waves, Birds, Night and Wind, and their volume', dpn);
+  ok(dpn && dpn.labels.indexOf("Ingenium's sounds") >= 0 && dpn.labels.indexOf('Nature sounds') >= 0 && dpn.named === 0, "one Sound section, its two kinds named apart (Ingenium's sounds, Nature sounds), nothing else called Sounds", dpn && dpn.labels);
+  await p.click('#dpSound [data-nat-k="rain"]'); await sleep(2500);
+  const pl = await p.evaluate(() => ({ mode: IngNature.mode(), on: (document.querySelector('#dpSound [data-nat-k][aria-pressed="true"]') || {}).textContent, note: (document.querySelector('#dpSound [data-nat-note]') || {}).textContent, err: window.__natureErr || null, last: IngNature.last() }));
+  ok(pl.mode === 'rain' && /Rain/.test(pl.on) && /Rain is playing/.test(pl.note) && !pl.err && pl.last === 'rain', 'Rain plays, and the panel says so', pl);
   await p.keyboard.press('Escape'); await sleep(200);
   await open('focus'); await open('lector');
-  const kept = await p.evaluate(() => ({ mode: IngNature.mode(), key: document.getElementById('natureBtn').textContent.trim() }));
-  ok(kept.mode === 'rain' && kept.key === 'Rain', 'it keeps playing from page to page', kept);
-  await p.click('#natureBtn'); await sleep(300); await p.click('.nat-menu .pres-row[data-k="off"]'); await sleep(300);
-  const q = await p.evaluate(() => ({ mode: IngNature.mode(), key: document.getElementById('natureBtn').textContent.trim() }));
-  ok(q.mode === 'off' && q.key === 'Sounds', 'Quiet stops it', q);
-  await p.keyboard.press('Escape');
+  const kept = await p.evaluate(() => ({ mode: IngNature.mode() }));
+  ok(kept.mode === 'rain', 'it keeps playing from page to page', kept);
+  await open('settings'); await sleep(600);
+  const st = await p.evaluate(() => { const c = document.getElementById('ingSoundCard'), b = c && c.querySelector('[data-nat="set"]'); return b ? { on: (b.querySelector('[data-nat-k][aria-pressed="true"]') || {}).textContent, labels: [...c.querySelectorAll('.snd-lab')].map(x => x.textContent.trim()) } : null; });
+  ok(st && /Rain/.test(st.on) && st.labels.indexOf("Ingenium's sounds") >= 0 && st.labels.indexOf('Nature sounds') >= 0, 'Settings holds them too, in its Sound card, with Rain chosen', st);
+  await p.click('#ingSoundCard [data-nat-k="off"]'); await sleep(300);
+  const q = await p.evaluate(() => ({ mode: IngNature.mode(), on: (document.querySelector('#ingSoundCard [data-nat-k][aria-pressed="true"]') || {}).textContent }));
+  ok(q.mode === 'off' && /Quiet/.test(q.on), 'Quiet stops it', q);
 
   // ---------- night: the heads take the night's look ----------
   if (hasDiamond) {

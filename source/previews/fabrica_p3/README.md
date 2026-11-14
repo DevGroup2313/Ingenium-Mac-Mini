@@ -25,4 +25,6 @@ To build it (S is a scratch folder; the page served at a local address; logos.js
     node tools/capture_head.js <page url> <S>/fabcap706/head <S>/fabcap705/logos.json
     python3 -I build.py <S> <out.html>
     node tools/check_p3.js <out.html url> <out folder>          (17 checks)
-Version 1: https://claude.ai/artifact/GKVKb3isARMrB1NtBytnTp (private). Waiting for her answer before any of it is built into Ingenium.
+Version 1: https://claude.ai/artifact/GKVKb3isARMrB1NtBytnTp (private). Approved (her words, 14 November 2026: "I approve of the Fabrica
+on Every Device preview, please commit and push it everywhere"); its first stage is built into Ingenium 7.08 (build/modules/r298.js,
+build/desktop/app_runs_708.py).

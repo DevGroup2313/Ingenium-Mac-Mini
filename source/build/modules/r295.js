@@ -7,8 +7,15 @@
    fetched or stored), as a seamless loop, and then only played, so it costs nearly nothing; switching fades one into the next, and it
    keeps playing from page to page until Quiet is chosen. Ingenium never starts one by itself: after a restart it is quiet, and the menu
    remembers the last place and the volume. The stones of Focus answer a touch with the sound of a stone meeting water, under Ingenium's own sound switch. */
-.cl-key#natureBtn .nat-dot{display:inline-block;width:6px;height:6px;margin-left:1px;border-radius:50%;background:var(--accent,#6a3fb5);vertical-align:middle}
-.cl-key#natureBtn:not(.nat-on) .nat-dot{display:none}
+/* 7.08 (her words, 14 November 2026): "The new "Sounds" button on the top bar should be added to the Settings page as well as to the display
+   panel and should be removed from the top bar, however there is already another "Sounds" button inside of the Display panel, please fix
+   this as well." So the places are chosen in the one Sound section the Display panel and Settings hold (modules/r176.js), under their own
+   name, Nature sounds, below Ingenium's sounds; the top bar keeps no key for them. */
+.nat-block{margin-top:6px;padding-top:10px;border-top:1px solid var(--hairline,rgba(34,26,46,.08))}
+.nat-block .nat-seg{display:flex;flex-wrap:wrap;gap:6px}
+.nat-block .nat-seg .seg-btn{display:inline-flex;align-items:center;gap:6px}
+.nat-block .nat-seg .seg-btn svg{width:15px;height:15px;flex:0 0 auto}
+.nat-block .nat-seg .seg-btn.nat-wait{opacity:.8}
 .pres-menu.nat-menu{min-width:270px}
 .nat-menu .pres-row .nat-ico{width:22px;height:22px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;color:var(--accent,#6a3fb5);background:var(--accent-soft,rgba(106,63,181,.10))}
 .nat-menu .pres-row .nat-ico svg{width:15px;height:15px}
@@ -151,39 +158,46 @@ var ICO={off:'<path d="M5 10v4h3l4 3.5V6.5L8 10z"/><path d="M16 9.5l5 5M21 9.5l-
 function svg(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICO[k]||ICO.stream)+'</svg>';}
 function mk(t,c,txt){var e=D.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
 function nameOf(k){for(var i=0;i<PLACES.length;i++)if(PLACES[i][0]===k)return PLACES[i][1];return "Sounds";}
-/* ---------- the key in the top bar ---------- */
+/* ---------- 7.08: in the Display panel and in Settings, beside Ingenium's own sounds (the top bar keeps no key for them) ---------- */
 var key=null,menu=null;
-function paintKey(){if(!key)return;var m=Nature.mode(),on=m!=="off",t=on?nameOf(m):"Sounds",kl=key.querySelector(".kl");if(kl&&kl.textContent!==t)kl.textContent=t;
-  key.classList.toggle("nat-on",on);key.setAttribute("aria-label",on?"Nature sounds: "+t+" playing":"Nature sounds");key.title=on?t+" is playing. Press to change it, or choose Quiet":"Nature sounds: a stream, rain, waves and more, made on this device";}
-function place(){var tools=D.getElementById("topTools");if(!tools)return false;if(key&&key.isConnected)return true;
-  key=mk("button","cl-key");key.type="button";key.id="natureBtn";key.setAttribute("aria-haspopup","menu");
-  key.innerHTML='<svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 9c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/><path d="M3 14.5c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/></svg><span class="kl">Sounds</span><span class="nat-dot" aria-hidden="true"></span>';
-  var at=D.getElementById("displayBtn");if(at&&at.parentNode===tools)tools.insertBefore(key,at);else tools.appendChild(key);
-  key.addEventListener("click",function(e){e.preventDefault();if(menu&&menu.isConnected)close();else open();});paintKey();return true;}
+/* the same words as Ingenium's own sounds (modules/r176.js) */
+function volWord(v){var p=Math.round(v*100);return p<=0?"Silent":p<15?"Quiet":p<35?"Gentle":p<65?"Clear":"Full";}
+function paintKey(){paintBoxes();}
+function natBlock(where){var dp=where==="dp",w=mk("div","nat-block");w.setAttribute("data-nat",where);
+  var row=mk("div",dp?"dp-row":"snd-row"),lab=mk(dp?"div":"span",dp?"dp-label":"snd-lab","Nature sounds");lab.id=where+"NatL";row.appendChild(lab);
+  var seg=mk("div","seg nat-seg");seg.setAttribute("role","radiogroup");seg.setAttribute("aria-labelledby",lab.id);
+  PLACES.forEach(function(P){var b=mk("button","seg-btn nat-pl");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-nat-k",P[0]);b.setAttribute("aria-checked","false");b.setAttribute("aria-pressed","false");b.title=P[1]+": "+P[2];
+    b.innerHTML=svg(P[0])+"<span>"+P[1]+"</span>";b.addEventListener("click",function(){choose(P[0]);});seg.appendChild(b);});
+  row.appendChild(seg);w.appendChild(row);
+  var vr=mk("div",dp?"dp-row":"snd-row"),vl=mk("label",dp?"dp-label":"snd-lab","Their volume");vl.setAttribute("for",where+"NatVol");vr.appendChild(vl);
+  var vb=mk("div","snd-vol"),rg=mk("input");rg.type="range";rg.id=where+"NatVol";rg.min="0";rg.max="100";rg.step="1";rg.value=String(Math.round(PREF.vol*100));rg.setAttribute("data-nat-vol","");rg.setAttribute("aria-label","Volume of the nature sounds");
+  rg.addEventListener("input",function(){PREF.vol=Math.max(0,Math.min(1,(+rg.value||0)/100));Nature.volume(PREF.vol);keep();paintBoxes();});
+  vb.appendChild(rg);var wd=mk("span","snd-word");wd.setAttribute("aria-hidden","true");wd.setAttribute("data-nat-word","");vb.appendChild(wd);vr.appendChild(vb);w.appendChild(vr);
+  var note=mk(dp?"div":"p",dp?"dp-note":"snd-note");note.setAttribute("data-nat-note","");note.setAttribute("role","status");note.setAttribute("aria-live","polite");w.appendChild(note);
+  return w;}
+function paintBoxes(){var m=Nature.mode();
+  [].forEach.call(D.querySelectorAll("[data-nat-k]"),function(b){var k=b.getAttribute("data-nat-k"),on=k===m;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false");b.setAttribute("aria-checked",on?"true":"false");b.classList.toggle("nat-wait",WAIT===k);});
+  [].forEach.call(D.querySelectorAll("[data-nat-vol]"),function(r){var v=String(Math.round(PREF.vol*100));if(r.value!==v)r.value=v;r.setAttribute("aria-valuetext",volWord(PREF.vol)+", "+Math.round(PREF.vol*100)+" percent");});
+  [].forEach.call(D.querySelectorAll("[data-nat-word]"),function(x){var t=volWord(PREF.vol);if(x.textContent!==t)x.textContent=t;});
+  var P=PLACES.filter(function(x){return x[0]===m;})[0],say=WAIT?"Making "+nameOf(WAIT)+" on this device\u2026":m==="off"?"A stream, rain, waves and more, made on this device: nothing is fetched. A place keeps playing from page to page until you choose Quiet.":
+    nameOf(m)+" is playing: "+(P?P[2].charAt(0).toLowerCase()+P[2].slice(1):"")+". It keeps playing from page to page until you choose Quiet.";
+  [].forEach.call(D.querySelectorAll("[data-nat-note]"),function(n){if(n.textContent!==say)n.textContent=say;});}
+function mount(){var a=D.getElementById("dpSound"),c=D.getElementById("ingSoundCard"),did=false;
+  if(a&&!a.querySelector('[data-nat="dp"]')){a.appendChild(natBlock("dp"));did=true;}
+  if(c&&!c.querySelector('[data-nat="set"]')){var n=c.querySelector("#setSndNote");var b=natBlock("set");if(n&&n.parentNode===c)c.insertBefore(b,n.nextSibling);else c.appendChild(b);did=true;}
+  if(did)paintBoxes();return did;}
+function place(){var old=D.getElementById("natureBtn");if(old&&old.parentNode)old.parentNode.removeChild(old);mount();return true;}
 function close(){var b=D.querySelector(".pres-back.nat-back");if(b&&b.parentNode)b.parentNode.removeChild(b);menu=null;try{if(typeof W.refreshLayerState==="function")W.refreshLayerState();}catch(e){}}
 function paintMenu(){if(!menu||!menu.isConnected)return;var m=Nature.mode();
   [].forEach.call(menu.querySelectorAll(".pres-row[data-k]"),function(r){var k=r.getAttribute("data-k"),on=k===m||(k==="off"&&m==="off");r.classList.toggle("on",on);r.setAttribute("aria-checked",on?"true":"false");
     var tk=r.querySelector(".pres-tick");if(on&&!tk)r.appendChild(mk("span","pres-tick","\u2713"));if(!on&&tk)r.removeChild(tk);
     var tp=r.querySelector(".pres-tip"),P=PLACES.filter(function(x){return x[0]===k;})[0],w=WAIT===k;if(tp){var s=w?"Making it on this device\u2026":P[2];if(tp.textContent!==s)tp.textContent=s;tp.classList.toggle("nat-wait",w);}});}
 function choose(k){if(k==="off"){Nature.stop();WAIT="";}else{if(Nature.mode()===k)return;WAIT=k;PREF.last=k;keep();Nature.start(k);}paintKey();paintMenu();}
-function open(){close();try{if(typeof W.closePresenceMenu==="function")W.closePresenceMenu();}catch(e){}
-  var back=mk("div","pres-back nat-back");back.addEventListener("click",function(e){if(e.target===back)close();});
-  menu=mk("div","pres-menu nat-menu");menu.setAttribute("role","menu");menu.setAttribute("aria-label","Nature sounds");
-  var r=key.getBoundingClientRect();menu.style.top=Math.round(r.bottom+8)+"px";menu.style.right=Math.max(12,Math.round(W.innerWidth-r.right))+"px";
-  menu.appendChild(mk("div","pres-head","Nature sounds"));
-  menu.appendChild(mk("div","pres-sub","Made on this device, nothing fetched. A place keeps playing from page to page until you choose Quiet."));
-  PLACES.forEach(function(P){var row=mk("button","pres-row");row.type="button";row.setAttribute("role","menuitemradio");row.setAttribute("data-k",P[0]);
-    var ic=mk("span","nat-ico");ic.innerHTML=svg(P[0]);row.appendChild(ic);var col=mk("span","pres-col");col.appendChild(mk("span","pres-name",P[1]));col.appendChild(mk("span","pres-tip",P[2]));row.appendChild(col);
-    row.addEventListener("pointerdown",function(){try{if(W.IngSound)IngSound.play("keys");}catch(e){}});
-    row.addEventListener("click",function(){choose(P[0]);});menu.appendChild(row);
-    if(P[0]==="off")menu.appendChild(mk("div","pres-rule"));});
-  menu.appendChild(mk("div","pres-rule"));
-  var vol=mk("label","nat-vol");vol.appendChild(mk("span",null,"Volume"));var rg=mk("input");rg.type="range";rg.min="0";rg.max="100";rg.step="1";rg.value=String(Math.round(PREF.vol*100));rg.setAttribute("aria-label","Volume of the nature sounds");
-  rg.addEventListener("input",function(){PREF.vol=Math.max(0,Math.min(1,(+rg.value||0)/100));Nature.volume(PREF.vol);keep();});vol.appendChild(rg);menu.appendChild(vol);
-  menu.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();close();try{key.focus();}catch(x){}}});
-  back.appendChild(menu);D.body.appendChild(back);paintMenu();try{if(typeof W.refreshLayerState==="function")W.refreshLayerState();}catch(e){}
-  var first=menu.querySelector(".pres-row.on")||menu.querySelector(".pres-row");if(first)try{first.focus({preventScroll:true});}catch(e){}}
-function start(){if(!place())setTimeout(function(){place();},600);}
+/* opened from elsewhere: the Display panel, at its nature sounds */
+function open(){var p=D.getElementById("displayPanel"),shown=p&&p.offsetParent!==null;if(!shown){var k=D.getElementById("displayBtn");if(k)k.click();}
+  setTimeout(function(){mount();var b=D.querySelector('#dpSound [data-nat="dp"]');if(b){try{b.scrollIntoView({block:"nearest"});}catch(e){}var on=b.querySelector(".nat-pl.on")||b.querySelector(".nat-pl");if(on)try{on.focus({preventScroll:true});}catch(e){}}},80);}
+function start(){place();var T=0;try{new MutationObserver(function(){if(T)return;T=setTimeout(function(){T=0;var a=D.getElementById("dpSound"),c=D.getElementById("ingSoundCard");
+      if((a&&!a.querySelector('[data-nat="dp"]'))||(c&&!c.querySelector('[data-nat="set"]')))mount();},120);}).observe(D.body,{childList:true,subtree:true});}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",start);else start();
 W.IngNature={start:function(k){choose(k||"stream");},stop:function(){choose("off");},mode:function(){return Nature.mode();},on:function(){return Nature.on();},touch:Nature.touch,
   volume:function(v){if(v==null)return PREF.vol;PREF.vol=Math.max(0,Math.min(1,+v||0));Nature.volume(PREF.vol);keep();},open:open,close:close,places:function(){return PLACES.map(function(p){return p[0];});},last:function(){return PREF.last;}};

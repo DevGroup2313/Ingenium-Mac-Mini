@@ -78,6 +78,7 @@ def skip_modules(ed):
         out |= {"r293.js"}  # 6.94: the Career Studio's compass, turned on (held), where that page is
     if not has_fabrica(ed):
         out |= {"r288.js"}  # 6.93: Fabrica's tree of versions (held, paused), where there is a Fabrica
+        out |= {"r298.js"}  # 7.08: Fabrica's runs, workflows, machines, every device in a release, Needs you and Learn, where there is a Fabrica
     return out
 
 

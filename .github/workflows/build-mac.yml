@@ -301,6 +301,13 @@ jobs:
           if sh: print("* Lending its models to other devices (R74): %s; reached at %s (%s); wrong code refused: %s; reply `%s`, first word after %.2f s%s" % (
               "works" if sh.get("ok") else "FAILED", sh.get("address"), "over the network" if sh.get("over_network") else "on this machine only",
               sh.get("refuses_wrong_code"), sh.get("reply"), sh.get("first_word_seconds") or 0, (" (" + sh["error"] + ")") if sh.get("error") else ""))
+          ru = (r.get("runs") or {}).get("runs") or {}
+          if ru:
+              ins = ru.get("install") or {}
+              print("* Fabrica's runs on this Mac (7.08): a run of two jobs %s; its log read: %s; its file kept: %s; a tiny app put in Applications and taken away: %s" % (
+                  "behaved as it should" if (ru.get("one") == "ok" and ru.get("two") == "bad") else "did NOT behave", ru.get("said"), ", ".join(ru.get("kept") or []) or "none",
+                  "yes" if ins.get("ok") else ("no: %s" % (ins.get("error") or ins) if ins else "not tried")))
+              print("* This Mac's tools for Fabrica: %s" % ", ".join("%s %s" % (k, "yes" if v else "no") for k, v in sorted((ru.get("tools") or {}).items())))
           if r.get("error"): print("* Error: %s" % r["error"])
           PY
           if [ "$code" != 0 ]; then cat "$RUNNER_TEMP/selftest.json"; echo "::error::the app's engine did not answer correctly"; exit 1; fi

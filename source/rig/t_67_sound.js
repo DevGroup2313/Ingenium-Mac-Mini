@@ -242,9 +242,9 @@ const lastPan = p => p.evaluate(() => { const a = window.__snd.pans; return a.le
     return { sec: sec && sec.textContent.trim(), secs, last: secs[secs.length - 1], inPanel: !!(s && s.closest('#displayPanel')) }; });
   ok(dp.inPanel && dp.sec === 'Sound' && dp.last === 'Sound' && dp.secs.indexOf('Feel') >= 0, 'the Display panel has a Sound section at its foot, after Feel', dp.secs);
   const names = { on: await p.locator('#dpSound').getByRole('button', { name: 'On', exact: true }).count(), off: await p.locator('#dpSound').getByRole('button', { name: 'Off', exact: true }).count(),
-    group: await p.locator('#dpSound').getByRole('group', { name: 'Sounds' }).count(), vol: await p.locator('#dpSound').getByRole('slider', { name: 'Volume' }).count(),
+    group: await p.locator('#dpSound').getByRole('group', { name: "Ingenium's sounds", exact: true }).count(), vol: await p.locator('#dpSound').getByRole('slider', { name: 'Volume', exact: true }).count(),
     more: await p.locator('#dpSound').getByRole('button', { name: 'More sound choices' }).count(), test: await p.locator('#dpSound').getByRole('button', { name: 'Test the sounds' }).count() };
-  ok(Object.values(names).every(n => n === 1), 'each is named for a screen reader: the Sounds group with On and Off, the Volume slider, More sound choices, Test the sounds', names);
+  ok(Object.values(names).every(n => n === 1), 'each is named for a screen reader: the Ingenium\'s sounds group with On and Off, the Volume slider, More sound choices, Test the sounds', names);
   const aria = await p.evaluate(() => ({ on: document.querySelector('#dpSound [data-snd-on="1"]').getAttribute('aria-pressed'), off: document.querySelector('#dpSound [data-snd-on="0"]').getAttribute('aria-pressed'),
     vt: document.getElementById('dpSndVol').getAttribute('aria-valuetext'), word: document.querySelector('#dpSound [data-snd-word]').textContent, note: document.getElementById('dpSndNote').textContent, live: document.getElementById('dpSndNote').getAttribute('aria-live') }));
   ok(aria.on === 'true' && aria.off === 'false' && aria.vt === 'Gentle, 25 percent' && aria.word === 'Gentle' && aria.live === 'polite', 'On is pressed; the volume is told in words (Gentle, 25 percent) to the eye and the ear', aria);

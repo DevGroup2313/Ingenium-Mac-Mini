@@ -419,6 +419,48 @@ Ingenium as you continue working."
 - Tests: `rig/t_708_rag6.js` (the check and the chooser in the chat, with a stand-in model and a stand-in connection), `rig/t_708_drawer.js`
   (the drawer, with an invented library), `rig/t_rag6_guard.mjs` (47), and `rig/t_rag3_chat.js`, `rig/t_665_buildlib.js`, `rig/t_707_rules.js`
   brought up to date.
+- Fabrica, phase 3, its first stage (`build/modules/r298.js`, `build/desktop/app_runs_708.py`), built from the live preview she approved
+  (`previews/fabrica_p3`; her words, 14 November 2026: "I approve of the Fabrica on Every Device preview, please commit and push it
+  everywhere"). Runs, a fifth room between Plans and Care (GitHub's Actions), with its tabs Runs, Workflows and Machines. Workflows reads
+  the app's own `.github/workflows` files as GitHub reads them (a YAML reader that gives what a standard one gives on Ingenium's own 23
+  workflow files; GitHub's expressions, matrices, needs, inputs, `if:`, env and defaults), with when each runs and its jobs. Run it now
+  asks where each job runs (each on the system it names; on a Mac, Linux jobs here too; every job here) and the workflow's own inputs.
+  In the Mac and Windows apps the run happens on this computer: each job in a folder of its own, the app's files at the version kept
+  (from the drive itself for a repository on the drive, sent by the page for an app kept in Ingenium), every step and its whole log as
+  it grows, Find in the log, `GITHUB_ENV`, `GITHUB_PATH`, `GITHUB_OUTPUT` and the step summary as GitHub gives them, checkout, the setup
+  actions (this computer's own Python, Java and Node), upload-artifact and download-artifact; a job for another system says why it did
+  not run; Stop, Run it again, Re-run the failed jobs, Remove this run; the files a run made kept with it (Save, Add to its release, Show
+  in Finder or Explorer); Explain this error by her own model, on this computer; every run kept, numbered for each app, with no expiry.
+  Recipes write a workflow file as a change to keep. Machines: this computer and its tools, checked (Python, PyInstaller, Java, the
+  Android tools, Xcode, Inno Setup, WebView2, git, Node), what each builds and where to get what is missing; her Mac mini and HP laptop,
+  and GitHub's machines, said to come next. Story, Releases: every device on its own row, Install on this Mac (into Applications, or her
+  own Applications folder) and Install on this PC (her programs folder, the Start menu and the desktop, and Settings, Apps to uninstall
+  it), Make it for a device not made yet, Make the missing ones. Needs you, at the top of Your apps: failed runs not yet seen, runs
+  going, milestones due within a week, pull requests waiting, versions ready to ship. Learn in every room (what it is, its names on
+  GitHub and in git, why it matters, Show me), Every word side by side, and Learning mode (a key's names beside it). Ship says where each
+  package is made. Every new surface has its depth, as her second rule asks.
+- Vocatio's compass (`build/modules/r290.js`). Her words (14 November 2026): "The little thin purple inner circle inside of the engine
+  button is smaller inside of Vocatio's 3D compass and keeps on moving out of sync with the compass ... the Blend page's engine button
+  had the same issue but its fixed now". Measured on 7.07: the button swayed in 3D on a clock of its own inside the compass, and its ring
+  lay lower than its star, so the ring slid up to 2.4 pixels about the star. It is now held as Blend's is in its wheel (`r262.js`): no
+  sway or tilt of its own, its ring, star and heart at Blend's heights, the ring turned as the base page turns it. The ring now keeps
+  within 0.11 pixels of the centre (Blend's within 0.16), at Blend's proportions.
+- Build's diamond (`build/modules/r292.js`), its press only. Her words (14 November 2026): "The animation of the diamond on the Build page
+  is way too fast, please slow it down and give it a more natural speed, please match it to the rest of the app's animations"; then "I
+  meant the animation of the diamond when I click on it ... please don't change anything there [at rest]". The flourishes were the engine
+  button's, made for a seal a few centimetres wide; on the stone a spin turned it at up to 1,126 degrees a second. Each now takes the
+  time a stone of its size would, on the engine's own clock: a spin in 3 s (334 degrees a second at most), a twirl in 3 s, a pulse in
+  2 s, a hop in 1.9 s, a beat in 2.25 s, with lighter swells (8 to 10 percent, from 23 to 26) and a softer press and spring; Calm
+  stretches them as it stretches the engine (13 to 9); Minimal keeps the stone still. Its resting motion is unchanged.
+- The nature sounds (`build/modules/r295.js`, `r176.js`). Her words (14 November 2026): "The new "Sounds" button on the top bar should
+  be added to the Settings page as well as to the display panel and should be removed from the top bar, however there is already another
+  "Sounds" button inside of the Display panel, please fix this as well." The top bar keeps no Sounds key. The Display panel and Settings
+  hold one Sound section with its two kinds named apart: Ingenium's sounds (the keys, cards and reminders, as before) and Nature sounds
+  (Quiet, Stream, Rain, Waterfall, Waves, Birds, Night and Wind, their volume, and a note of what plays); both places show the same
+  choice. Nothing else is called Sounds.
+- Tests: `rig/t_708_core.js` (the workflow reader, GitHub's expressions and the run's plan, in Node), `rig/t_708_runs.py` (the computer
+  app's runs on Linux), `rig/t_708_fabrica_runs.js` (the Runs room with the computer app's own back end); `rig/t_700_heads.js` and
+  `rig/t_67_sound.js` brought up to date.
 
 Ingenium 7.07 (14 November 2026): Lakay brought up to date, and Ingenium's own rules built in. Her words that day: "the Lakay app has
 been updated to a later build, please update Ingenium's copy to bring it up to date."
