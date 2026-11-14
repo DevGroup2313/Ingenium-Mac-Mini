@@ -371,6 +371,15 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.03 (14 November 2026): the build library adds what is brought in. Her words that day: "I want you to make the app be able
+to receive new nopes or recipes without wiping all stored notes please". Until 7.02 a zip brought into the build library
+(`modules/r258.js`) took the place of the whole library: save() cleared the store before keeping the zip's notes, so a zip of a few
+notes, such as a recipe, would have taken away every other note. Now the zip's notes are added to those kept: a note at the same place
+(its app, its folder and its name) is replaced by the newer one, and every other note stays; the line said afterwards gives how many were
+added and updated. The library's card says so, and its key reads "Bring in more notes"; Remove it from this device still takes the whole
+library away. `rig/t_665_buildlib.js` brings in a second, smaller zip and checks that the two new notes join the nine, the shared note
+is updated and every other note stays.
+
 Ingenium 7.03 (14 November 2026): Build's diamond keeps its press, without the circle. Her words that day: "I like that the diamond
 is a pressable button now but I want the effect where a circle is shown when I click on the diamond to be removed but the clicking
 effect should be preserved". In `modules/r292.js`: the ring that spread round the stone after a press is gone, and so is the soft

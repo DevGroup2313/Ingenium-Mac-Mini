@@ -25,6 +25,10 @@ const NOTES = {
   '__MACOSX/._junk.md': 'not a note',
   'Quill/picture.png': 'not a note either'
 };
+// 7.03: a second zip, as a recipe would come: two new notes, and one note that is also in the library, newer
+const MORE = { 'Ingenium/3D header recipe/00 How I build a 3D header.md': '# How I build a 3D header\n\nThe words on the left, the instrument on the right.\n', 'Ingenium/3D header recipe/Home, the orrery.md': '# Home, the orrery\n\nThe rooms ride one orbit.\n', 'Quill/Footnotes_history.md': '# Footnotes (Quill): its history in the build notes\n\nThe footnotes are saved with the main text. Marmalade is named here, newer.\n' };
+const MOREZIP = path.join(OUTA, 'invented_recipe.zip');
+cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loads(sys.stdin.read())\nz=zipfile.ZipFile(sys.argv[1],"w",zipfile.ZIP_DEFLATED)\n[z.writestr(k,v) for k,v in notes.items()]\nz.close()', MOREZIP], { input: JSON.stringify(MORE) });
 const ZIP = path.join(OUTA, 'invented_build_library.zip'); const BAD = path.join(OUTA, 'no_notes.zip'); const NOTZIP = path.join(OUTA, 'not_a_zip.zip');
 cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loads(sys.stdin.read())\nz=zipfile.ZipFile(sys.argv[1],"w",zipfile.ZIP_DEFLATED)\n[z.writestr(k,v) for k,v in notes.items()]\nz.close()\nz=zipfile.ZipFile(sys.argv[2],"w");z.writestr("a.txt","no notes here");z.close()\nopen(sys.argv[3],"w").write("plain words, not a zip")', ZIP, BAD, NOTZIP], { input: JSON.stringify(NOTES) });
 
@@ -38,7 +42,7 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loa
   await start();
   const text = () => p.evaluate(() => (document.getElementById('page-folders') || {}).innerText || '');
   const toasts = () => p.evaluate(() => window.__toasts.join(' | '));
-  const give = async (file) => { const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.evaluate(() => { const k = [...document.querySelectorAll('#page-folders button')].find(x => /^Bring in (the build library|a newer copy)$/.test(x.textContent.trim())); k.click(); })]); await fc.setFiles(file); };
+  const give = async (file) => { const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.evaluate(() => { const k = [...document.querySelectorAll('#page-folders button')].find(x => /^Bring in (the build library|more notes)$/.test(x.textContent.trim())); k.click(); })]); await fc.setFiles(file); };
 
   if (MODE === 'absent') {
     ok(await p.evaluate(() => typeof window.IngBuildLib === 'undefined'), 'this edition carries no build library');
@@ -134,9 +138,14 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loa
   const api = await p.evaluate(() => IngBuildLib.find('sunset').then(r => r.map(x => x.app + '/' + x.title)));
   ok(api.join('|') === 'Lantern/Reading room', 'IngBuildLib.find answers for other parts of the page', api);
 
-  // 8. a newer copy replaces the old one; removing it leaves the folders alone
+  // 8. the same zip brought in again updates its notes where they are; removing the library leaves the folders alone
   await give(ZIP); await p.waitForFunction(() => /notes kept for/.test(window.__toasts.join(' ')), null, { timeout: 20000 }).catch(() => {}); await p.waitForTimeout(600);
-  ok((await p.evaluate(() => IngBuildLib.load().then(L => L.notes.length))) === 9 && !/folders made for/.test(await toasts()), 'a newer copy takes the place of the old one, and no folder is made twice', await toasts());
+  ok((await p.evaluate(() => IngBuildLib.load().then(L => L.notes.length))) === 9 && !/folders made for/.test(await toasts()), 'the same zip brought in again updates its nine notes where they are, and no folder is made twice', await toasts());
+  // 8b. 7.03, her words (14 November 2026): "I want you to make the app be able to receive new nopes or recipes without wiping all stored notes please"
+  await p.evaluate(() => { window.__toasts = []; });
+  await give(MOREZIP); await p.waitForFunction(() => /notes kept for/.test(window.__toasts.join(' ')), null, { timeout: 20000 }).catch(() => {}); await p.waitForTimeout(600);
+  const mg = await p.evaluate(() => IngBuildLib.load().then(L => ({ n: L.notes.length, lantern: L.notes.filter(x => x.app === 'Lantern').length, pages: !!L.notes.find(x => /Pages_history/.test(x.path)), foot: (L.notes.find(x => /Footnotes_history/.test(x.path)) || {}).text || '', rec: L.notes.filter(x => x.app === 'Ingenium' && x.group === '3D header recipe').length, meta: L.meta && L.meta.count })));
+  ok(mg.n === 11 && mg.meta === 11 && mg.rec === 2 && mg.lantern === 2 && mg.pages && /Marmalade/.test(mg.foot) && /2 new notes and 1 updated/.test(await toasts()), 'a zip with a few notes or a recipe is added to the library: its two new notes join the nine, the note it shares is updated, and every other note stays', { mg, t: await toasts() });
   p.once('dialog', d => d.accept());
   await p.evaluate(() => { [...document.querySelectorAll('#page-folders button')].find(x => x.textContent.trim() === 'Remove it from this device').click(); }); await p.waitForTimeout(900);
   t = await text(); const still = await p.evaluate(() => IngFolders.folders().map(f => f.name));

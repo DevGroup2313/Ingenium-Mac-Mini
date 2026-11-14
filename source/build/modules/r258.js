@@ -84,19 +84,27 @@ function bring(file){if(!file)return Promise.resolve(null);
     var td=new TextDecoder(),notes=[];
     return names.reduce(function(p,n){return p.then(function(){return libZipData(u8,ents[n]).then(function(d){notes.push(noteOf(n.replace(/^\.\//,""),td.decode(d)));});});},Promise.resolve())
       .then(function(){return notes;});})
-  .then(function(notes){var apps={};notes.forEach(function(n){if(n.app)apps[n.app]=(apps[n.app]||0)+1;});
-    var meta={at:Date.now(),count:notes.length,apps:apps,name:String(file.name||"").slice(0,120)};
-    return save(notes,meta).then(function(){var made=[];
+  .then(function(notes){return load().then(function(L){return {notes:notes,had:(L&&L.notes)||[]};},function(){return {notes:notes,had:[]};});})
+  .then(function(x){var notes=x.notes,apps={};notes.forEach(function(n){if(n.app)apps[n.app]=(apps[n.app]||0)+1;});
+    /* 7.03 (her words, 14 November 2026: "receive new nopes or recipes without wiping all stored notes"): the zip's notes are added to the
+       ones kept; a note at the same place in the zip (its app, its folder, its name) is replaced by the newer one, and every other stays */
+    var byPath={},had=x.had.length,added=0,updated=0;x.had.forEach(function(n){var c={};for(var k in n)if(k!=="low")c[k]=n[k];byPath[n.path]=c;});
+    notes.forEach(function(n){if(byPath[n.path])updated++;else added++;byPath[n.path]=n;});
+    var all=Object.keys(byPath).map(function(k){return byPath[k];}),allApps={};all.forEach(function(n){if(n.app)allApps[n.app]=(allApps[n.app]||0)+1;});
+    var meta={at:Date.now(),count:all.length,apps:allApps,name:String(file.name||"").slice(0,120)};
+    return save(all,meta).then(function(){var made=[];
       try{var have=(W.IngFolders&&IngFolders.folders?IngFolders.folders():[]).map(function(p){return norm(p.name);});
         /* her order of the apps (8 November 2026), then the rest by name; a folder is made with its name only: the parts' names (Scriba,
            Fontes, Focus ...) also name parts of Ingenium, and as a folder's words they would sort other conversations into it */
         var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','offline project'];
         Object.keys(apps).sort(function(x,y){var i=ORDER.indexOf(norm(x)),j=ORDER.indexOf(norm(y));i=i<0?99:i;j=j<0?99:j;return i-j||x.localeCompare(y);})
           .forEach(function(a){if(have.indexOf(norm(a))<0&&W.IngFolders&&IngFolders.make(a))made.push(a);});}catch(e){}
-      return {meta:meta,made:made};});});}
+      return {meta:meta,made:made,had:had,added:added,updated:updated};});});}
 function pick(then){var i=el("input");i.type="file";i.accept=".zip,application/zip";i.style.display="none";D.body.appendChild(i);
   i.addEventListener("change",function(){var f=i.files&&i.files[0];i.remove();if(!f)return;say("Reading the build library…");
-    bring(f).then(function(r){say(r.meta.count+" notes kept for "+Object.keys(r.meta.apps).length+" apps"+(r.made.length?"; folders made for "+r.made.join(", "):"")+".");if(then)then(r);},
+    bring(f).then(function(r){var na=Object.keys(r.meta.apps).length,fm=r.made.length?"; folders made for "+r.made.join(", "):"";
+      if(r.had)say(r.added+" new note"+(r.added===1?"":"s")+" and "+r.updated+" updated: "+r.meta.count+" notes kept for "+na+" app"+(na===1?"":"s")+fm+". The others are kept as they were.");
+      else say(r.meta.count+" notes kept for "+na+" apps"+fm+".");if(then)then(r);},
       function(e){say("The build library could not be read: "+(e&&e.message||e)+".");});});
   i.click();}
 function repaint(){try{IngFolders.paint();}catch(e){}}
@@ -156,11 +164,11 @@ function home(host,U){var c=U.card("Your build library",null);host.appendChild(c
   load().then(function(L){var m=L.meta;
     if(!m||!L.notes.length){c.appendChild(el("p","small muted","How each of your apps was built, filed by app and by part, kept on this device. Bring in your build library (the zip of notes) and each app's notes appear in its folder."));
       var r=el("div","fld-row");r.appendChild(btn("primary","Bring in the build library",function(){pick(repaint);}));c.appendChild(r);}
-    else{var apps=Object.keys(m.apps||{});c.appendChild(el("p","small muted",m.count+" notes for "+apps.length+" app"+(apps.length===1?"":"s")+(m.at?", ":". ")+(m.at?"brought in on "+day(m.at)+". ":"")+"They are kept on this device and go with your backups and with Ingenium Cloud; each app's notes are in its folder, under How it was built."));
+    else{var apps=Object.keys(m.apps||{});c.appendChild(el("p","small muted",m.count+" notes for "+apps.length+" app"+(apps.length===1?"":"s")+(m.at?", ":". ")+(m.at?"brought in on "+day(m.at)+". ":"")+"They are kept on this device and go with your backups and with Ingenium Cloud; each app's notes are in its folder, under How it was built. More notes or recipes brought in are added to these: a note with the same name in the same place is updated, and nothing else is removed."));
       var ap=el("div","bl-apps");apps.forEach(function(a){ap.appendChild(el("span",null,a+" · "+m.apps[a]));});c.appendChild(ap);
       var top=L.notes.filter(function(n){return !n.app;});if(top.length)c.appendChild(list(top));
       finder(c,L.notes,"Find a word in your build library",true);
-      var r2=el("div","fld-row");r2.style.marginTop="10px";r2.appendChild(btn("","Bring in a newer copy",function(){pick(repaint);}));
+      var r2=el("div","fld-row");r2.style.marginTop="10px";r2.appendChild(btn("","Bring in more notes",function(){pick(repaint);}));
       r2.appendChild(btn("ghost","Remove it from this device",function(){if(!confirm("Remove the build library from this device? Your zip and your folders are not touched."))return;save([],null).then(function(){say("The build library was removed from this device.");repaint();});}));c.appendChild(r2);}});}
 /* an app's folder: How it was built */
 function folder(p,host,U){var c=U.card("How it was built",null);c.hidden=true;host.appendChild(c);
