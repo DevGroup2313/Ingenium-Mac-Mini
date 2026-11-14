@@ -371,6 +371,13 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.03 (14 November 2026): Build's diamond keeps its press, without the circle. Her words that day: "I like that the diamond
+is a pressable button now but I want the effect where a circle is shown when I click on the diamond to be removed but the clicking
+effect should be preserved". In `modules/r292.js`: the ring that spread round the stone after a press is gone, and so is the soft
+violet glow behind it (its shader term and its uniform, uGW, with them). The press itself is as in 7.02: Home's click, the sink while
+held, the spring back when let go, and one of the engine button's flourishes (spin, pulse, hop, twirl, heartbeat; every seventh press
+the grand one). Seen on the live preview first (frames of a press: no ring at any moment).
+
 Ingenium 7.02 (14 November 2026): Build's diamond presses as Fabrica's balls do. Her words that day: "I want the same sound and
 effect of the balls from Fabrica's tree to be applied to the diamond button, right now it sounds too brusque". In `modules/r292.js`:
 a press plays Home's own click (the weighted click of 7.01 is gone); the diamond sinks while held (to 90 per cent in 80 milliseconds)

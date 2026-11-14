@@ -84,7 +84,7 @@ var Diamond=(function(){
     function mul(A,B){var C=[[0,0,0],[0,0,0],[0,0,0]];for(var i=0;i<3;i++)for(var j=0;j<3;j++)for(var k=0;k<3;k++)C[i][j]+=A[i][k]*B[k][j];return C;}return mul(Rz,mul(Rx,Ry));}
   var VS="attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
   var FS=["precision highp float;varying vec2 v;",
-  "uniform float uT,uN,uV,uAsp,uTan,uY,uDial;uniform vec2 uPx;uniform sampler2D uTx2;uniform vec3 uCP,uDC;uniform mat3 uCM,uR;uniform vec4 uG[9];uniform float uTab;uniform vec4 uL;uniform vec2 uHT;uniform sampler2D uTx;uniform vec4 uHA,uHB,uHC;uniform float uAA,uBG,uSc;uniform vec4 uGW;uniform vec4 uHV;uniform sampler2D uTx3;uniform float uLogo;uniform vec4 uLG,uLH,uLR,uLQ;",
+  "uniform float uT,uN,uV,uAsp,uTan,uY,uDial;uniform vec2 uPx;uniform sampler2D uTx2;uniform vec3 uCP,uDC;uniform mat3 uCM,uR;uniform vec4 uG[9];uniform float uTab;uniform vec4 uL;uniform vec2 uHT;uniform sampler2D uTx;uniform vec4 uHA,uHB,uHC;uniform float uAA,uBG,uSc;uniform vec4 uHV;uniform sampler2D uTx3;uniform float uLogo;uniform vec4 uLG,uLH,uLR,uLQ;",
   "const float IOR=2.42;",
   "float sbox(vec3 w,vec3 ax,vec2 hs,float sf){float d=dot(w,ax);if(d<=0.05)return 0.0;vec3 u=normalize(cross(vec3(0.0,1.0,0.0),ax)+vec3(0.0,0.0,1e-4));vec3 vv=cross(ax,u);",
   "  vec2 p=vec2(dot(w,u),dot(w,vv))/d;vec2 q=1.0-smoothstep(hs*(1.0-sf),hs,abs(p));return q.x*q.y;}",
@@ -353,7 +353,6 @@ var Diamond=(function(){
   "    if(uN<0.5&&uBG<0.5){vec2 wc=(v-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(v.x*0.8+v.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);vec2 gc=(v-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
   "      vec2 fc=(v-vec2(0.52,0.22))*vec2(uAsp,1.6);float fg=exp(-dot(fc,fc)/0.12);col+=vec3(0.78,0.62,1.0)*fg*0.34;a=max(a,fg*0.34);}",
   /* the holder's own soft shadow beneath it, so it seems to float */
-  "    if(uGW.w>0.001){vec2 gq=(v-uGW.xy)*vec2(uAsp,1.0);float gd=length(gq)/uGW.z;if(gd<1.0){vec3 gcl=uN>0.5?vec3(0.788,0.698,0.949):vec3(0.416,0.247,0.710);float ga=(uN>0.5?0.36:0.34)*uGW.w*(1.0-gd);col+=gcl*ga;a=max(a,ga);}}",
   "    if(rd.y<0.0){float tf=(-0.37-ro.y)/rd.y;vec3 f=ro+rd*tf;float r=length(f.xz);float sa=mix(0.20,0.42,uN)*exp(-pow(max(r-1.30,0.0)/0.42,2.0))*smoothstep(2.6,1.8,r);vec3 scl=uN>0.5?vec3(0.0):vec3(0.20,0.15,0.34)*sa;col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}}",
   /* the ray in, the three fans out (the falling one glances off the holder), each with its pulse and a quick afterglow, then gone */
   /* her words (14 November 2026): "I want only or two rays shooting through the diamond and at diagonal or opposite angles so that it looks
@@ -375,7 +374,7 @@ var Diamond=(function(){
       if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));}catch(e){W.__diamondErr=String(e);return false;}
     gl.useProgram(pr);var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
     var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    ["uT","uN","uV","uAsp","uTan","uY","uPx","uDial","uCP","uDC","uCM","uR","uTab","uL","uHT","uHA","uHB","uHC","uLogo","uLG","uLH","uLR","uLQ","uAA","uHV","uBG","uSc","uGW"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uG=gl.getUniformLocation(pr,"uG[0]");
+    ["uT","uN","uV","uAsp","uTan","uY","uPx","uDial","uCP","uDC","uCM","uR","uTab","uL","uHT","uHA","uHB","uHC","uLogo","uLG","uLH","uLR","uLQ","uAA","uHV","uBG","uSc"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uG=gl.getUniformLocation(pr,"uG[0]");
     var g=[];GROUPS.forEach(function(x){g.push(x[0],x[1],x[2],x[3]);});gl.uniform4fv(U.uG,new Float32Array(g));gl.uniform1f(U.uTab,HT);
     gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));
     gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);
@@ -489,11 +488,12 @@ var Diamond=(function(){
     g.uniform2f(BG.U.uRes,BG.w,BG.h);g.uniform4f(BG.U.uBox,BG.box[0],BG.box[1],BG.box[2],BG.box[3]);g.drawArrays(g.TRIANGLE_STRIP,0,4);}
   /* the diamond pressed as Fabrica's balls are (her words, 14 November 2026: "I want the same sound and effect of the balls from Fabrica's
      tree to be applied to the diamond button"): it sinks while held, springs back when let go, and plays one of Home's engine button's
-     flourishes, with the button's glow behind it and its ripple round it */
-  var DDN=null,DKB=-1e9,DFL={n:"",d:1,t:-1e9,count:0,last:""},DFX={sc:1,lift:0,yaw:0,glowA:0,glowS:1,rips:[]},DSC=1,YF=0,DORD=["spin","pulse","hop","twirl","beat"];
+     flourishes. No circle round it (her words, 14 November 2026: "I want the effect where a circle is shown when I click on the diamond
+     to be removed but the clicking effect should be preserved"): no ripple ring and no glow disc */
+  var DDN=null,DKB=-1e9,DFL={n:"",d:1,t:-1e9,count:0,last:""},DFX={sc:1,lift:0,yaw:0},DSC=1,YF=0,DORD=["spin","pulse","hop","twirl","beat"];
   function startDFl(t){var n=DFL.count+1,nm=n%7===0?"grand":(function(){var c=DORD.filter(function(x){return x!==DFL.last;});return c[Math.floor(Math.random()*c.length)];})();
     DFL={n:nm,d:Math.random()<0.5?-1:1,t:t,count:n,last:nm};}
-  function dfx(t){var f={sc:1,lift:0,yaw:0,glowA:0,glowS:1,rips:[]};if(still())return f;var T2=2*Math.PI;
+  function dfx(t){var f={sc:1,lift:0,yaw:0};if(still())return f;var T2=2*Math.PI;
     if(DDN!=null)f.sc*=1-0.10*Math.min(1,(t-DDN)/0.08);var ke=(t-DKB)/0.6;if(ke>=0&&ke<1)f.sc*=lin([[0,0.9],[.25,1.1],[.5,.96],[.75,1.03],[1,1]],ke);
     var e=t-DFL.t,d=DFL.d,n=DFL.n;if(e<0||e>2.2)return f;
     if(n==="spin"||n==="grand"){f.yaw+=d*T2*ESP(e/1.15);f.sc*=lin([[0,1],[.35,1.14],[1,1]],EIO(e/0.9));}
@@ -501,9 +501,6 @@ var Diamond=(function(){
     if(n==="hop"||n==="grand")f.lift=-lin([[0,0],[.12,.03],[.42,-.18],[.7,0],[.85,-.03],[1,0]],EIO(e/0.9))*1.17;
     if(n==="twirl"){var tw=ETW(e/1.1);f.yaw+=d*T2*lin([[0,0],[.45,.5],[.8,1],[1,1]],tw);f.sc*=lin([[0,1],[.45,.9],[.8,1.04],[1,1]],tw);}
     if(n==="beat")f.sc*=lin([[0,1],[.14,1.3],[.3,1.04],[.46,1.24],[.7,1],[1,1]],EIO(e/1.1));
-    if(e<1.0){var gk=EO(e);f.glowA=lin([[0,0],[.3,(n==="beat"||n==="grand")?1:.85],[1,0]],gk);f.glowS=lin([[0,.82],[.3,1.04],[1,1.12]],gk);}
-    var rip=function(t0,du,s1,a0){var x=(e-t0)/du;if(x>=0&&x<1){var k=EO(x);f.rips.push([.86+(s1-.86)*k,a0*(1-k)]);}};
-    if(n==="pulse"){rip(0,.95,1.55,.6);rip(.22,.95,1.55,.6);}else if(n==="grand")rip(0,1.1,1.7,.65);else rip(0,.95,1.55,.6);
     return f;}
   function mvS(M,p){var r=mv(M,p);return [r[0]*DSC,r[1]*DSC,r[2]*DSC];}
   function orrery(){var nt=night(),k=nt?"n":"d";if(DIALK===k||!gl)return;var K=W.IngStudios&&IngStudios.kit,src=null,sv=null;if(K&&K.dial){try{var dd=K.dial(nt);src=dd.url;sv=dd.rings;}catch(e){src=null;}}
@@ -567,7 +564,6 @@ var Diamond=(function(){
       var P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P)),N=s.f.g<0?mv(M,[0,1,0]):mv(M,gN(s.f));var hz=nrm([N[0],0.0001,N[2]]);
       if(dot(N,V)<0.05&&dot(hz,[V[0],0,V[2]])<0.25)continue;var xy=proj(P),a=Math.pow(Math.sin(Math.PI*age),2);star(xy[0],xy[1],s.r*(0.7+0.5*a),a*(nt?0.95:0.9),nt);}}
   function sparkle(t,M,DC,nt){og.setTransform(dpr(),0,0,dpr(),0,0);og.clearRect(0,0,W0,H0);
-    for(var ri=0;ri<DFX.rips.length;ri++){var rs=DFX.rips[ri][0],ra=DFX.rips[ri][1];if(ra<=0.002||!DFX.R)continue;og.save();og.strokeStyle=nt?"rgba(201,178,242,"+ra+")":"rgba(106,63,181,"+ra+")";og.lineWidth=Math.max(1.5,DFX.R*0.035);og.beginPath();og.arc(DFX.cx,DFX.cy,DFX.R*0.94*rs,0,Math.PI*2);og.stroke();og.restore();}
     for(var i=0;i<SPK.length;i++){var s=SPK[i],N=mv(M,gN(s)),P=mvS(M,s.p);P=[P[0]+DC[0],P[1]+DC[1],P[2]+DC[2]];var V=nrm(sub(CP,P));if(dot(N,V)<=0.05)continue;
       var nl=dot(N,KL),Rl=[2*nl*N[0]-KL[0],2*nl*N[1]-KL[1],2*nl*N[2]-KL[2]],c=dot(Rl,V);if(c<0.95)continue;var a=Math.pow((c-0.95)/0.05,2.2),xy=proj(P);star(xy[0],xy[1],5+9*a,a*0.8,nt);}
     var f=(t-PL.s)/PER;if(f>=0&&f<0.5){var A=PL.a,cA=Math.cos(A),sA=Math.sin(A),b1=A+Math.PI-0.95,b2=A+Math.PI+1.05;
@@ -597,7 +593,7 @@ var Diamond=(function(){
        hair and settles */
     var sw=st?0:2*Math.PI*tt/10,hx0=st?0:0.030*Math.sin(sw),hz0=st?0:0.018*Math.sin(sw+1.3),lx=over?mY*0.05:0,lz=over?-mX*0.06:0;
     HV.x+=(22*(lx-HV.lx)-8.6*HV.x)*dt;HV.lx+=HV.x*dt;HV.z+=(22*(lz-HV.lz)-8.6*HV.z)*dt;HV.lz+=HV.z*dt;
-    holderTick(tt,dt,st);gl.uniform2f(U.uHT,HT2[0],HT2[1]);gl.uniform4f(U.uHA,HO.ot,HO.bz,HO.ba,HT2[2]);gl.uniform4f(U.uHB,HO.rip[0],HO.rip[1],HO.rip[2],HO.chase);gl.uniform4f(U.uHC,HO.beat,HO.sweep,Math.min(1,HO.boost),HO.da);if(DIAL)orrery();gl.uniform1f(U.uDial,DIAL&&DIALK?1:0);logoTex();var LV=logoVals(t,st,dt);gl.uniform1f(U.uLogo,LOGOOK?1:0);gl.uniform1f(U.uAA,AAN);gl.uniform1f(U.uSc,DSC);{var pc=proj(DC),pr2=proj([1,DC[1],0]);var RPX=Math.abs(pr2[0]-pc[0])*DSC;DFX.cx=pc[0];DFX.cy=pc[1];DFX.R=RPX;gl.uniform4f(U.uGW,pc[0]/W0,1-pc[1]/H0,RPX*1.32*DFX.glowS/H0,DFX.glowA);}gl.uniform1f(U.uBG,BG.ok?1:0);gl.uniform4f(U.uHV,HO.hv[0],HO.hv[1],HO.hv[2],HO.hv[3]);gl.uniform4f(U.uLG,LV[0][0],LV[0][1],LV[0][2],LV[0][3]);gl.uniform4f(U.uLH,LV[1][0],LV[1][1],LV[1][2],LV[1][3]);gl.uniform4f(U.uLR,LV[2][0],LV[2][1],LV[2][2],LV[2][3]);gl.uniform4f(U.uLQ,LV[3][0],LV[3][1],LV[3][2],LV[3][3]);gl.uniform2f(U.uPx,2.0*TAN*(W0/H0)/cv.width,2.0*TAN/cv.height);
+    holderTick(tt,dt,st);gl.uniform2f(U.uHT,HT2[0],HT2[1]);gl.uniform4f(U.uHA,HO.ot,HO.bz,HO.ba,HT2[2]);gl.uniform4f(U.uHB,HO.rip[0],HO.rip[1],HO.rip[2],HO.chase);gl.uniform4f(U.uHC,HO.beat,HO.sweep,Math.min(1,HO.boost),HO.da);if(DIAL)orrery();gl.uniform1f(U.uDial,DIAL&&DIALK?1:0);logoTex();var LV=logoVals(t,st,dt);gl.uniform1f(U.uLogo,LOGOOK?1:0);gl.uniform1f(U.uAA,AAN);gl.uniform1f(U.uSc,DSC);gl.uniform1f(U.uBG,BG.ok?1:0);gl.uniform4f(U.uHV,HO.hv[0],HO.hv[1],HO.hv[2],HO.hv[3]);gl.uniform4f(U.uLG,LV[0][0],LV[0][1],LV[0][2],LV[0][3]);gl.uniform4f(U.uLH,LV[1][0],LV[1][1],LV[1][2],LV[1][3]);gl.uniform4f(U.uLR,LV[2][0],LV[2][1],LV[2][2],LV[2][3]);gl.uniform4f(U.uLQ,LV[3][0],LV[3][1],LV[3][2],LV[3][3]);gl.uniform2f(U.uPx,2.0*TAN*(W0/H0)/cv.width,2.0*TAN/cv.height);
     gl.uniformMatrix3fv(U.uR,false,new Float32Array([M[0][0],M[0][1],M[0][2],M[1][0],M[1][1],M[1][2],M[2][0],M[2][1],M[2][2]]));
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)raf=requestAnimationFrame(frame);}
   function kick(){if(!raf)raf=requestAnimationFrame(frame);}
