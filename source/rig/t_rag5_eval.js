@@ -65,7 +65,10 @@ function sampler(root) {
   const E = await import('file://' + path.join(SRC, 'rag', 'eval.js'));
   await ensureServers();
   await bridgePost('/admin/state', { dir: null });
-  const profile = path.join(OUTA, 'profile'); fs.rmSync(profile, { recursive: true, force: true });
+  // 7.07: REUSE_INDEX=1 keeps a profile whose index is already read (copied from an earlier run's out folder), so a second model is
+  // measured without reading the corpus again (criterion 4, memory, is then left out and said so)
+  const REUSE = process.env.REUSE_INDEX === '1';
+  const profile = path.join(OUTA, 'profile'); if (!REUSE) fs.rmSync(profile, { recursive: true, force: true });
   const ctx = await pw.chromium.launchPersistentContext(profile, { headless: true, viewport: { width: 1280, height: 900 } }); ctx.setDefaultTimeout(120000);
   const external = [], errors = [];
   await ctx.route((u) => !(u.origin === ORIGIN || u.origin === BRIDGE_ORIGIN || u.origin === LLM_ORIGIN || /^(data|blob|about):/.test(u.protocol)), (r) => { external.push(r.request().url()); r.abort(); });
@@ -82,14 +85,15 @@ function sampler(root) {
     // ------------------------------------------------------------------ 4. memory, reading the whole corpus
     const NAMES = ['household_papers', 'lab_notes', 'historian_archive'];
     await bridgePost('/admin/dialog', { answers: NAMES.map((n) => path.join(FIX, n)) });
-    const ids = await p.evaluate(async (n) => { const o = {}; for (let i = 0; i < n; i++) { const a = await IngRag.addFolder(); o[a.folder.name] = a.folder.id; } return o; }, NAMES.length);
+    const ids = REUSE ? await p.evaluate(async () => { const o = {}; for (const f of await IngRag.folders()) o[f.name] = f.id; return o; }) : await p.evaluate(async (n) => { const o = {}; for (let i = 0; i < n; i++) { const a = await IngRag.addFolder(); o[a.folder.name] = a.folder.id; } return o; }, NAMES.length);
+    if (REUSE) note('the index is reused: ' + JSON.stringify(ids));
     mem.phase = 'reading'; const tr = Date.now();
     for (const n of NAMES) { note('reading ' + n); const sm = await p.evaluate((id) => IngRag.indexFolder(id).then((s) => ({ files: s.files, chunks: s.chunks })), ids[n]); note(n + ': ' + JSON.stringify(sm)); }
     mem.phase = 'after';
     const st = await p.evaluate(async () => { const s = await IngRag.stats(); const e = IngRag._embedder ? await IngRag._embedder.info() : {}; return { files: s.files, passages: s.passages, workers: IngRag._embedder ? IngRag._embedder.workers : null }; });
     R.memory = { files: st.files, passages: st.passages, workers: st.workers, minutes: +((Date.now() - tr) / 60000).toFixed(1), peakMB: Math.round(mem.maxKB / 1024), pssMB: Math.round(mem.pssMaxKB / 1024), phase: mem.atPhase,
       method: 'ps, every 250 ms, the RSS of the browser process and all its children added up (shared pages counted in each process, so an upper bound), and PSS from /proc/<pid>/smaps_rollup every second; performance.measureUserAgentSpecificMemory needs cross-origin isolation, which the app does not have' };
-    ok(st.files === 72 && R.memory.peakMB < 2048, '4. memory: the whole corpus (' + st.files + ' files, ' + st.passages + ' passages) read; peak ' + R.memory.peakMB + ' MB RSS (PSS ' + R.memory.pssMB + ' MB), under 2 GB', R.memory);
+    if (REUSE) note('4. memory: left out (the index was read in an earlier run); files ' + st.files + ', passages ' + st.passages); else ok(st.files === 72 && R.memory.peakMB < 2048, '4. memory: the whole corpus (' + st.files + ' files, ' + st.passages + ' passages) read; peak ' + R.memory.peakMB + ' MB RSS (PSS ' + R.memory.pssMB + ' MB), under 2 GB', R.memory);
     // ------------------------------------------------------------------ 1. Recall@5
     const results = {};
     for (const it of GOLD.items) results[it.id] = await p.evaluate((q) => IngRag.retrieve(q, 'me', { k: 5 }).then((r) => r.passages.map((x) => ({ folderName: x.folderName, filePath: x.filePath, text: x.text }))), it.question);
