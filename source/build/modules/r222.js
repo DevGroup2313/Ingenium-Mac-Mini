@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.09", "Lakay is up to date: Ingenium now carries Lakay Build 17 (14 November 2026), in place of Build 14, with its Learning: a lesson for each part of the work, a guided tour that does the work in front of you, two questions to finish each lesson and a tip in every room. Its logo and its own periwinkle are as they were.", "master"],
   ["7.08", "Fabrica has a fifth room, Runs, as GitHub has Actions: the workflows of an app's .github/workflows folder, read as GitHub reads them, run here on your Mac or PC with Run it now, each job in a folder of its own, every step and its whole log kept, with the files each run made. Explain this error asks your own model, on this computer.", "fabrica"],
   ["7.08", "Fabrica's Machines tab shows this computer and its tools, what each one builds and where to get what is missing. Releases now give each device its own row, and Install on this Mac or Install on this PC puts an app Fabrica made in its place, with its icon, ready to open or to uninstall.", "fabrica"],
   ["7.08", "Needs you, at the top of Fabrica's Your apps, gathers what waits for you: a run that failed, a run going, a milestone due, a pull request, a version ready to ship. Learn, in every room, says what the room is and its names on GitHub and in git; Learning mode shows them beside any key you point at, on a card in Ingenium's purple.", "fabrica"],

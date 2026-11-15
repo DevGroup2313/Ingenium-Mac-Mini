@@ -656,6 +656,37 @@ def edits(ed):
     return E
 
 
+_NEWS_ENTRY = re.compile(r'\[\s*"\d+\.\d+(?:\.\d+)?"\s*,\s*"(?:[^"\\]|\\.)*"((?:\s*,\s*"[a-z]+")*)\s*\]')
+
+
+def _no_master_news(out, ed):
+    """7.09 (15 November 2026): a What is new line marked "master" is shown in the master edition alone (modules/r222.js, newNow, asks
+    for IngWorkshop, which only the master edition carries), so no other edition carries one, even unseen: several name her other apps
+    (Lakay, Carpe Diem, The Forge, Inkwell, the Offline Project), which no edition but the master names. Before 7.09 each such line was
+    taken out by its own words (the lines of 6.55 to 6.83 above, which still run first); 7.07's line of Lakay Build 14 and eleven older
+    ones were missed and travelled, unseen, in the full, gift and demo editions of 7.07 and 7.08. Each line is taken out whole, entry
+    by entry (one physical line can hold several), and the list is put together again with the lines kept, in their order."""
+    if out.count("var NEW=[") != 1:
+        sys.exit("edition %s: the Guide's What is new list (var NEW=[) found %d times, not once" % (ed, out.count("var NEW=[")))
+    a = out.index("var NEW=[") + len("var NEW=[")
+    b = out.find("];", a)
+    block = out[a:b]
+    pieces, pos = [], 0
+    for m in _NEWS_ENTRY.finditer(block):
+        if block[pos:m.start()].strip(", \n\t\r"):
+            sys.exit("edition %s: something other than a news line in What is new, near %r" % (ed, block[pos:m.start()][:80]))
+        flags = re.findall(r'"([a-z]+)"', m.group(1))
+        pieces.append((m.group(0), bool(flags) and flags[0] == "master"))
+        pos = m.end()
+    if block[pos:].strip(", \n\t\r") or not pieces:
+        sys.exit("edition %s: What is new does not end with a news line (%r)" % (ed, block[pos:][:80]))
+    kept = [text for text, master in pieces if not master]
+    if not kept:
+        sys.exit("edition %s: every line of What is new is marked for the master edition" % ed)
+    lead = block[:len(block) - len(block.lstrip())]
+    return out[:a] + lead + ",\n  ".join(kept) + out[b:]
+
+
 def apply(out, ed):
     for old, new, label, times in edits(ed):
         if isinstance(old, tuple):  # ("CUT", first, last): from the first text to the last, both included
@@ -684,4 +715,6 @@ def apply(out, ed):
                 out = out[:ls] + out[le:]
         else:
             out = out.replace(old, new)
+    if ed != "master":
+        out = _no_master_news(out, ed)
     return cut_parts(out, ed)

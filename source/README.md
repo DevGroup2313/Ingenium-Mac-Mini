@@ -395,6 +395,22 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.09 (15 November 2026): Lakay brought up to date again, and no edition but the master carries the master's own news. Her words
+that day, sent again: "the Lakay app has been updated to a later build, please update Ingenium's copy to bring it up to date."
+- Lakay Build 17 (14 November 2026, "Learning, with a lesson for each part of the work, a guided tour that does the work in front of the
+  person, two questions to finish each lesson, and a tip in every room"; the same page in Lakay-Windows, Lakay-Mac and Lakay-Apps,
+  1,557,498 bytes, SHA-256 c4e2305704ea8f50...) replaces Build 14 in `build/apps/builtin` (`apps/update_builtin.py`). Its mark is
+  unchanged: `apps/lakay_mark.py` on Lakay-Windows' sources writes `builtin/lakay_mark.json` byte for byte as before (sixteen planes by
+  day and by night, ten on the still seal). Its own colour is still #5f67cc.
+- A fault found on the way: 7.07's master-only line of What is new ("Lakay is up to date ... Lakay Build 14") was never added to
+  `editions.py`'s list of lines taken out, so the full, gift and demo editions of 7.07 and 7.08 carried it in their pages, unseen (no
+  edition but the master shows a line marked "master"), and so did eleven older master lines naming her other apps (Carpe Diem, The
+  Forge, Inkwell, the Offline Project). `editions.py` now takes every line marked "master" out of every other edition (`_no_master_news`,
+  entry by entry, the rest of the list kept in its order; the build stops if the list holds anything but news lines). On the 7.08 gift
+  edition: 26 lines out, 151 kept, "Lakay" twice before and nowhere after, nothing else in the page changed.
+- `rig/t_627_editions.js`: two checks for each edition but the master, on the page's own text: no What is new line marked "master",
+  and the word Lakay nowhere.
+
 Ingenium 7.08 (14 November 2026): the folder search's detail check and who answers; Folders' card drawer. Her words that day, on the two
 live previews: "I approve of your recommendations for both of the Folders previews and choose the "card drawer" preview design";
 "For the Folder search, I agree with your recommendation"; and "Please make sure that there aren't any flat and plain surfaces on

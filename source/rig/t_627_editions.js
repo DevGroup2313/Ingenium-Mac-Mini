@@ -58,6 +58,15 @@ async function survey(b, ed, url) {
       while ((m = g.exec(t)) && mentions.length < 400) { if (m[1] === 'Scriba' && HOUSE.test(t.slice(Math.max(0, m.index - 45), m.index + 45))) continue; mentions.push(k + ': …' + t.slice(Math.max(0, m.index - 70), m.index + 60) + '…'); } }
     fs.writeFileSync(OUT + '/' + ed + '.json', JSON.stringify(Object.assign({}, r, { mentions }), null, 1));
     if (process.env.SURVEY) { console.log('==== ' + ed + ' (' + r.ed + ')\n nav: ' + r.nav.join(' ') + '\n groups: ' + r.groups.join(' ') + '\n stray routes: ' + r.stray.join(' ') + '\n name card: ' + r.nameCard + ', owner key: ' + r.ownerKey + ', workshop: ' + r.workshop + ', desk apps carried: ' + r.desk.join(' ') + '\n library: ' + r.carried.join(', ') + '\n errors: ' + JSON.stringify(r.errs.slice(0, 5)) + '\n mentions: ' + mentions.length); const by = {}; mentions.forEach(x => { const k = x.split(':')[0]; by[k] = (by[k] || 0) + 1; }); console.log(' by place: ' + JSON.stringify(by)); mentions.slice(0, 60).forEach(x => console.log('   ' + x)); continue; }
+    if (kind !== 'master') {
+      // 7.09: a What is new line marked "master" is shown in the master edition alone, so no other edition carries one, even unseen:
+      // several named her other apps (7.07's line of Lakay Build 14 travelled so in the full, gift and demo editions of 7.07 and 7.08)
+      const src = await (await fetch(url)).text(), i = src.indexOf('var NEW=['), j = i < 0 ? -1 : src.indexOf('];', i);
+      const marked = i < 0 ? ['no What is new list'] : (src.slice(i, j).match(/\[\s*"\d+\.\d+(?:\.\d+)?"\s*,\s*"(?:[^"\\]|\\.)*"\s*,\s*"master"\s*\]/g) || []);
+      ok(marked.length === 0, ed + ': no What is new line marked for the master edition is carried in the page', marked.map(x => x.slice(0, 100)));
+      const lakay = (src.match(/Lakay/g) || []).length;
+      ok(lakay === 0, ed + ': the page names Lakay nowhere, not even unseen (Lakay is carried in the master edition alone)', lakay);
+    }
     if (kind === 'public') {
       ok(r.ed === ed && JSON.stringify(r.nav) === JSON.stringify(PUBLIC_PAGES), ed + ': the side bar holds only Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings', r.nav);
       ok(!r.groups.some(g => /apps/i.test(g)) && r.desk.length === 0, ed + ': no Apps group, and none of the five apps carried in the page', { groups: r.groups, desk: r.desk });

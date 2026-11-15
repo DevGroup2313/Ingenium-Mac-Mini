@@ -32,12 +32,12 @@
  "lakay": {
   "key": "lakay",
   "title": "Lakay",
-  "version": "14",
+  "version": "17",
   "build": "",
   "date": "2026-11-14",
   "color": "#5f67cc",
-  "size": 1336247,
-  "sha256": "cbc77d330e52bd854f88a3f65951c4be8a709a7d0db6adb22e86f678389fe9ed",
+  "size": 1557498,
+  "sha256": "c4e2305704ea8f50de10f49d9f822ab34c36f00d0eae5f17bf7b40cbfa47d19e",
   "name": "Lakay.html"
  }
 }
