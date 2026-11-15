@@ -51,7 +51,7 @@ function lensFor(m,S){var cv=mk("canvas");try{W.IngTurret.lens(cv,S,m,false);}ca
 /* a row of Your models carries no id of its own: it is found by the model's name, in the order the page draws them */
 function dressRows(){var list=D.getElementById("modelList");if(!list||!W.IngTurret||!IngTurret.lens)return;var rows=[].slice.call(list.querySelectorAll(":scope > .model-row"));
   var ms=((W.state&&state.models)||[]),loaded=IngTurret.loaded();
-  rows.forEach(function(row,i){var m=ms[i];if(!m)return;var sig=m.id+"|"+(m.color||"")+"|"+(loaded===m.id)+"|"+(D.body.getAttribute("data-theme")||"");if(row.__tm===sig)return;row.__tm=sig;
+  rows.forEach(function(row,i){var m=ms[i];if(!m)return;var sig=m.id+"|"+(m.color||"")+"|"+(loaded===m.id)+"|"+(D.body.getAttribute("data-theme")||"")+"|"+(D.body.getAttribute("data-turret")||"");if(row.__tm===sig)return;row.__tm=sig;
     var ic=row.querySelector(":scope > .tm-ic");if(!ic){ic=mk("span","tm-ic");row.insertBefore(ic,row.firstChild);}ic.innerHTML="";ic.appendChild(lensFor(m,56));
     var nm=row.querySelector(".mname");if(nm){var old=nm.querySelector(".tm-in");if(old)old.remove();if(loaded===m.id)nm.appendChild(mk("span","tm-in","In the engine"));}
     var sa=[].slice.call(row.querySelectorAll("button")).filter(function(x){return /^(Set active|Active)$/.test((x.textContent||"").trim());})[0],acts=sa&&sa.parentNode;if(!acts)return;var k=acts.querySelector(".tm-load");if(!k){k=mk("button","btn small tm-load");k.type="button";acts.insertBefore(k,acts.firstChild);}
@@ -60,14 +60,14 @@ function dressRows(){var list=D.getElementById("modelList");if(!list||!W.IngTurr
 /* Ingenium's models: each house's card with its lens */
 var HOUSE={velox:"#7458c6",scriba:"#6a3fb5",magister:"#8641b8",faber:"#4d3db0"};
 function dressHouses(){var g=D.getElementById("lineupGrid");if(!g||!W.IngTurret||!IngTurret.lens)return;
-  [].forEach.call(g.querySelectorAll(".lu-tile"),function(t){var id=((t.className.match(/\blu-(velox|scriba|magister|faber)\b/)||[])[1])||"";var sig=id+"|"+(D.body.getAttribute("data-theme")||"");if(t.__tm===sig)return;t.__tm=sig;
+  [].forEach.call(g.querySelectorAll(".lu-tile"),function(t){var id=((t.className.match(/\blu-(velox|scriba|magister|faber)\b/)||[])[1])||"";var sig=id+"|"+(D.body.getAttribute("data-theme")||"")+"|"+(D.body.getAttribute("data-turret")||"");if(t.__tm===sig)return;t.__tm=sig;
     var st=t.querySelector(":scope > .tm-stage");if(!st){st=mk("span","tm-stage");st.setAttribute("aria-hidden","true");t.insertBefore(st,t.firstChild);}st.innerHTML="";st.appendChild(lensFor({color:HOUSE[id]||"#6a3fb5"},84));});}
 function dress(){try{dressRows();}catch(e){}try{dressHouses();}catch(e){}}
 var tries=0;
 function boot(){var pg=D.getElementById("page-models");if(!pg||!W.IngTurret){if(++tries<200)setTimeout(boot,600);return;}
   dress();try{new MutationObserver(function(){dress();}).observe(pg,{childList:true,subtree:true});}catch(e){}
   try{Engine.on("status",function(){setTimeout(dress,0);});}catch(e){}
-  try{new MutationObserver(function(){D.querySelectorAll("#page-models .model-row,#page-models .lu-tile").forEach(function(x){x.__tm=null;});dress();}).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}}
+  try{new MutationObserver(function(){D.querySelectorAll("#page-models .model-row,#page-models .lu-tile").forEach(function(x){x.__tm=null;});dress();}).observe(D.body,{attributes:true,attributeFilter:["data-theme","data-turret"]});}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.IngTurretRooms={dress:dress};
 try{window.__ingParts["p267"]="running";}catch(_){}

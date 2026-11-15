@@ -38,6 +38,17 @@ body[data-theme="night"] #page-models{--tu-slab0:#1d1529;--tu-slab1:#120c1b;--tu
    I want the button to stay purple when selected instead of just having the purple outline around the button": the line and its key
    go where the turret stands (the Studio keeps its own room key), and the room shown keeps the rooms' own purple (modules/r173.js) */
 #page-models.tr-on #rmStudioHint{display:none !important}
+/* 7.13: the names round the turret on its metal (data-turret on <body>): dark on silver by day, white on violet and by night */
+body[data-turret="metal"] #page-models.tr-on{--tr-tag:#1b1230}
+body[data-turret="metal"] #page-models.tr-on .tr-tag.tr-e,body[data-turret="metal"] #page-models.tr-on .tr-index b{color:#3b3150}
+body[data-turret="purple"] #page-models.tr-on{--tr-tag:#fbf7ff;--tr-tagGlow:0 0 3px rgba(20,4,48,.95),0 1px 2px rgba(0,0,0,.55)}
+body[data-turret="purple"] #page-models.tr-on .tr-tag.tr-e,body[data-turret="purple"] #page-models.tr-on .tr-index b{color:#f6f0ff}
+body[data-turret="purple"] #page-models.tr-on .tr-index b{text-shadow:0 0 3px rgba(20,4,48,.95),0 1px 2px rgba(0,0,0,.5)}
+body[data-turret="purple"] #page-models.tr-on .tr-index path{fill:#f6f0ff;stroke:rgba(30,8,70,.7);stroke-width:1px}
+body[data-turret][data-theme="night"] #page-models.tr-on{--tr-tag:#f3ecff}
+body[data-turret][data-theme="night"] #page-models.tr-on .tr-tag.tr-e,body[data-turret][data-theme="night"] #page-models.tr-on .tr-index b{color:#e6dcf7}
+body[data-turret] #page-models.tr-on .tr-turret{-webkit-filter:drop-shadow(0 12px 20px rgba(40,22,68,.2)) drop-shadow(0 2px 4px rgba(40,22,68,.14));filter:drop-shadow(0 12px 20px rgba(40,22,68,.2)) drop-shadow(0 2px 4px rgba(40,22,68,.14))}
+body[data-turret][data-theme="night"] #page-models.tr-on .tr-turret{-webkit-filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)) drop-shadow(0 3px 6px rgba(0,0,0,.4));filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)) drop-shadow(0 3px 6px rgba(0,0,0,.4))}
 /* her words (11 November 2026): "I want you to remove the black squares arounf the little catridges and leave the coloured catridges without
    them but make them 3D popped out animated and make them react to my mouse when I hover over them and clickable, the same as the the ones
    from inside the turret": the lenses of the rooms (Your models and Ingenium's models, modules/r267.js) stand on no dark square; each is a
@@ -168,9 +179,152 @@ function spun(g,cx,cy,r0,r1,l0,sat,light){/* turned metal: fine concentric rings
 function bevel(g,cx,cy,r,w){var lg=g.createLinearGradient(cx-r,cy-r,cx+r,cy+r);lg.addColorStop(0,"rgba(255,255,255,.8)");lg.addColorStop(.5,"rgba(255,255,255,.05)");lg.addColorStop(1,"rgba(46,23,100,.40)");
   g.strokeStyle=lg;g.lineWidth=w;g.beginPath();g.arc(cx,cy,r,0,TAU);g.stroke();}
 function dprOf(){return Math.min(2,W.devicePixelRatio||1);}
+/* ---------- 7.13: the turret in metal, lit as Vocatio's compass is ----------
+   Her words (15 November 2026): "I want the turret to be refined and gain the same depth and definition that Vocatio's compass or
+   Ingenium's other pages", then "I want to see a version of the turret in metal and another one in the purple metal look". So the
+   turret's metal is drawn as the compass's is (modules/r290.js): polished metal shows the room it stands in (a bright window above on
+   the left, a pale ceiling, a darker floor), pixel by pixel; its case is domed, with two fine turned lines; its face is turned (fine
+   rings and two soft wedges of light that stay with the window); the case casts its shadow on the face; the ports are sunk into the
+   plate, each with a chamfer lit on the side facing the light and the shadow of its rim; the hub is domed, with three slotted screws;
+   the lenses sit in knurled bezels; the scale is engraved (a dark cut and its lit lower edge). Two finishes: "metal" (polished silver)
+   and "purple" (anodised violet, its highlights tinted by its colour). Each layer is drawn once for its size, finish and theme (the plate
+   for its turn too, since the plate turns under a light that does not) and kept; the scale's fill, the names and the glass are drawn
+   over them as before. data-turret on <body> (or window.ING_TURRET) names the finish; without one the turret is drawn as in 6.77. */
+var FIN={metal:{day:[229,231,239],night:[176,180,196],tint:.06,face:.92,ink:["rgba(30,24,46,.80)","rgba(30,24,46,.46)","rgba(255,255,255,.62)"],inkN:["rgba(236,232,248,.90)","rgba(236,232,248,.58)","rgba(0,0,0,.62)"],acc:"#6a3fb5",accN:"#c8b2f6",warn:"#9a5b06",warnN:"#f0b65c"},
+  purple:{day:[128,98,182],night:[96,72,148],tint:.55,face:.95,ink:["rgba(238,231,252,.88)","rgba(238,231,252,.56)","rgba(22,8,52,.34)"],inkN:["rgba(228,220,246,.86)","rgba(228,220,246,.52)","rgba(0,0,0,.45)"],acc:"#e6dafb",accN:"#d9caf6",warn:"#f3c98a",warnN:"#efc27e"}};
+function finish(){var f="";try{f=D.body.getAttribute("data-turret")||W.ING_TURRET||"";}catch(e){}return FIN[f]?f:"";}
+/* the window's light: from above on the left, toward her; on the screen it travels to the lower right */
+var ML=(function(){var x=-.48,y=-.66,z=.58,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})(),MLX=.6,MLY=.8,MDL=Math.atan2(-.8,-.6);
+function sst(a,b,x){var t=(x-a)/(b-a);t=t<0?0:t>1?1:t;return t*t*(3-2*t);}
+function envL(rx,ry,rz,nt){var up=-ry,k=Math.max(0,rx*ML[0]+ry*ML[1]+rz*ML[2]),k2=k*k,k4=k2*k2,k16=k4*k4*k4*k4,win=k16*k4*k2*2.1+k4*k*.3,
+    sky=nt?.26+.22*sst(-.2,.9,up):.72+.24*sst(-.2,.9,up),floor=sst(-.05,.7,-up)*(nt?.1:.42),front=rz>0?(nt?.08:.18)*rz:0;
+  return Math.max(.03,sky-floor+front+win);}
+/* a surface whose normal is (nx,ny,nz) (screen axes, y down, z toward her), in finish F; ro: how rough (0 a mirror, 1 matte) */
+function lit(nx,ny,nz,F,nt,ro){var rx=2*nz*nx,ry=2*nz*ny,rz=2*nz*nz-1,e=envL(rx,ry,rz,nt),d=Math.max(0,nx*ML[0]+ny*ML[1]+nz*ML[2]),b=nt?F.night:F.day,
+    h=Math.max(0,rx*ML[0]+ry*ML[1]+rz*ML[2]),h2=h*h,h4=h2*h2,h8=h4*h4,h16=h8*h8,h32=h16*h16,v=(1-ro)*e+ro*(.32+.78*d),sp=h32*h32*(1-ro)*1.5,t=F.tint,dim=nt?.86:1;
+  return [(b[0]*v*.8+(255*(1-t)+b[0]*t)*sp)*dim,(b[1]*v*.8+(255*(1-t)+b[1]*t)*sp)*dim,(b[2]*v*.84+(255*(1-t)+b[2]*t)*sp)*dim];}
+function gn(i){return ((Math.imul(i^61,2654435761)^(i>>>15))>>>0)/4294967296;}
+var MC={},MCK=[];
+function mcv(n){var c=D.createElement("canvas");c.width=n;c.height=n;return c;}
+function keep(key,cv){MC[key]=cv;MCK.push(key);while(MCK.length>24){var k=MCK.shift();if(k!==key)delete MC[k];}return cv;}
+function put(o,j,c,a){o[j]=c[0]>255?255:c[0];o[j+1]=c[1]>255?255:c[1];o[j+2]=c[2]>255?255:c[2];o[j+3]=a*255;}
+/* the turned face: rings and two soft wedges of light along the window's direction (th: the pixel's angle on the screen) */
+var FACEC={};
+function turned(F,nt,i,r,sx,sy,u){var fk=(F===FIN.metal?"m":"p")+(nt?1:0),c=FACEC[fk]||(FACEC[fk]=lit(0,0,1,F,nt,.36)),q=.8*sx-.6*sy,wedge=Math.exp(-q*q/.03)*(nt?.34:.4),
+    g=1+.03*Math.sin(r*4.4/u)+.022*(gn(i)-.5),m=F.face*g*(1+wedge);return [c[0]*m,c[1]*m,c[2]*m];}
+/* a domed band from r0 to r1: its normal leans outward beyond the middle and inward before it */
+function dome(F,nt,ex,ey,r,r0,r1,ro){var rm=(r0+r1)/2,hw=(r1-r0)/2,q=Math.max(-.985,Math.min(.985,(r-rm)/hw)),sl=q/Math.sqrt(1-q*q)*.9,nx=ex*sl,ny=ey*sl,l=Math.sqrt(nx*nx+ny*ny+1);
+  return lit(nx/l,ny/l,1/l,F,nt,ro);}
+/* the base: the domed case round the scale, and the turned face it holds, in the case's shadow on the side the light comes from */
+function baseLayer(Wd){var f=finish(),nt=night(),key="b"+Wd+f+(nt?1:0);if(MC[key])return MC[key];var F=FIN[f],cv=mcv(Wd),x=cv.getContext("2d"),im=x.createImageData(Wd,Wd),o=im.data,
+    c0=Wd/2,u=Wd/460,R=Wd*.49,r0=Wd*.452,xx,yy,dx,dy,r,i,j,ex,ey,col,e,sh;
+  for(yy=0;yy<Wd;yy++)for(xx=0;xx<Wd;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*Wd+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;
+    if(r>=r0){col=dome(F,nt,ex,ey,r,r0,R,.12);var ln=(Math.abs(r-(r0+2.2*u))<.5*u?.74:1)*(Math.abs(r-(R-1.8*u))<.45*u?1.12:1);col=[col[0]*ln,col[1]*ln,col[2]*ln];}
+    else{col=turned(F,nt,i,r,ex,ey,u);e=ex*MLX+ey*MLY;sh=(nt?.55:.42)*Math.max(0,-e+.12)*Math.exp(-(r0-r)/(5*u))+(nt?.25:.14)*Math.exp(-(r0-r)/(1.4*u));
+      sh=1-Math.min(.8,sh);col=[col[0]*sh,col[1]*sh,col[2]*sh];}
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);return keep(key,cv);}
+/* the plate, turned by ang (its light stays with the window): a turned face with a domed edge, its ports sunk with a lit chamfer and
+   the shadow of their rims, the hub domed in the hub's own shadow */
+function plateLayer(Wd,ports,ang){var f=finish(),nt=night(),a10=Math.round(ang*1800/Math.PI)%3600,key="p"+Wd+ports+f+(nt?1:0)+"@"+a10;if(MC[key])return MC[key];
+  var F=FIN[f],cv=mcv(Wd),x=cv.getContext("2d"),im=x.createImageData(Wd,Wd),o=im.data,c0=Wd/2,u=Wd/340,R=Wd*.497,edge=Wd*.034,hub=Wd*.09,rs=Math.min(58,RAD*Math.sin(Math.PI/ports)-2)*(Wd/340),ca=Math.cos(ang),sa=Math.sin(ang),S=[],k,xx,yy,dx,dy,r,i,j,ex,ey,lx,ly,col,e,best,bd,sx,sy,d,q;
+  for(k=0;k<ports;k++){var a=-Math.PI/2+k*TAU/ports;S.push([c0+Math.cos(a)*RAD*u,c0+Math.sin(a)*RAD*u]);}
+  var SC=[];for(k=0;k<3;k++){var b=k*TAU/3+.3;SC.push([Math.cos(b)*Wd*.05,Math.sin(b)*Wd*.05]);}
+  for(yy=0;yy<Wd;yy++)for(xx=0;xx<Wd;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*Wd+xx;j=i*4;lx=r?dx/r:0;ly=r?dy/r:0;ex=lx*ca-ly*sa;ey=lx*sa+ly*ca;
+    best=0;bd=1e9;for(k=0;k<S.length;k++){sx=xx+.5-S[k][0];sy=yy+.5-S[k][1];d=sx*sx+sy*sy;if(d<bd){bd=d;best=k;}}bd=Math.sqrt(bd);
+    if(r>R-edge){q=(r-(R-edge))/edge;var sl=Math.min(4,q/Math.sqrt(Math.max(.02,1-q*q))),nx=ex*sl,ny=ey*sl,l=Math.sqrt(nx*nx+ny*ny+1);col=lit(nx/l,ny/l,1/l,F,nt,.14);}
+    else if(r<hub){q=r/hub;col=lit(ex*q*.9,ey*q*.9,Math.sqrt(Math.max(.05,1-q*q*.82)),F,nt,.12);
+      for(k=0;k<3;k++){var scx=dx-SC[k][0],scy=dy-SC[k][1],sr=Math.sqrt(scx*scx+scy*scy),sw=Wd*.013;
+        if(sr<sw){var qq=sr/sw,vx=scx/sw*.9,vy=scy/sw*.9;col=lit(vx*ca-vy*sa,vx*sa+vy*ca,Math.sqrt(Math.max(.05,1-qq*qq)),F,nt,.16);col=[col[0]*.9,col[1]*.9,col[2]*.9];}}}
+    else{col=turned(F,nt,i,r,ex,ey,u);e=ex*MLX+ey*MLY;var hs=(nt?.5:.36)*Math.max(0,e+.1)*Math.exp(-(r-hub)/(3*u));col=[col[0]*(1-hs),col[1]*(1-hs),col[2]*(1-hs)];}
+    if(bd<rs+2*u&&r<R-edge){sx=xx+.5-S[best][0];sy=yy+.5-S[best][1];var qx=sx/(bd||1),qy=sy/(bd||1),exs=qx*ca-qy*sa,eys=qx*sa+qy*ca;
+      if(bd>rs-1.6*u){var nx2=-exs*.85,ny2=-eys*.85,l2=Math.sqrt(nx2*nx2+ny2*ny2+1);col=lit(nx2/l2,ny2/l2,1/l2,F,nt,.18);}
+      else{col=turned(F,nt,i,bd,exs,eys,u);e=exs*MLX+eys*MLY;
+        var ps=(nt?.6:.5)*Math.max(0,-e+.1)*Math.exp(-(rs-bd)/(5*u))+(nt?.3:.18)*Math.exp(-(rs-bd)/(1.4*u));ps=.8*(1-Math.min(.85,ps));col=[col[0]*ps,col[1]*ps,col[2]*ps];}}
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);
+  /* the screws' slots, cut across them (the cut's lit edge toward the lower right of the screen, wherever the plate stands) */
+  var ox=(.6*ca+.8*sa)*.9*u,oy=(-.6*sa+.8*ca)*.9*u;
+  for(k=0;k<3;k++){var sx2=c0+SC[k][0],sy2=c0+SC[k][1],w2=Wd*.009;x.lineCap="round";
+    x.strokeStyle=nt?"rgba(0,0,0,.7)":"rgba(20,12,40,.62)";x.lineWidth=1.6*u;x.beginPath();x.moveTo(sx2-w2,sy2);x.lineTo(sx2+w2,sy2);x.stroke();
+    x.strokeStyle="rgba(255,255,255,"+(nt?.18:.5)+")";x.lineWidth=.7*u;x.beginPath();x.moveTo(sx2-w2+ox,sy2+oy);x.lineTo(sx2+w2+ox,sy2+oy);x.stroke();}
+  return keep(key,cv);}
+/* a lens's bezel: the knurled outer ring, the domed bezel inside it and the dark hole (or a cap's turned face, or the empty port's floor) */
+function rimLayer(px,kind){var f=finish(),nt=night(),key="l"+px+kind+f+(nt?1:0);if(MC[key])return MC[key];var F=FIN[f],cv=mcv(px),x=cv.getContext("2d"),im=x.createImageData(px,px),o=im.data,
+    c0=px/2,R=px/2-2*(px/112),u=px/112,xx,yy,dx,dy,r,i,j,ex,ey,col,th,N=90,q;
+  for(yy=0;yy<px;yy++)for(xx=0;xx<px;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*px+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;th=Math.atan2(dy,dx);
+    if(r>R*.86){/* the knurl: ninety ridges round a rounded rim */
+      var kn=Math.sin(th*N),tx=-ey,ty=ex;q=Math.max(-.95,Math.min(.95,(r-R*.93)/(R*.07)));var sl=q/Math.sqrt(1-q*q)*.7,nx=ex*sl+tx*kn*.55,ny=ey*sl+ty*kn*.55,l=Math.sqrt(nx*nx+ny*ny+1);
+      col=lit(nx/l,ny/l,1/l,F,nt,.2);var gr=.9+.1*Math.abs(kn);col=[col[0]*gr,col[1]*gr,col[2]*gr];}
+    else if(kind==="cap"){if(r>R*.8)col=dome(F,nt,ex,ey,r,R*.8,R*.86,.14);else{col=turned(F,nt,i,r,ex,ey,u*.6);if(Math.abs(r-R*.42)<.6*u)col=[col[0]*.78,col[1]*.78,col[2]*.78];}}
+    else if(r>R*.66)col=dome(F,nt,ex,ey,r,R*.66,R*.86,.12);
+    else if(kind==="empty"){if(r>R*.62){col=nt?[10,4,22]:[24,12,48];}else{col=turned(F,nt,i,r,ex,ey,u*.6);var es=.62*(1-sst(R*.2,R*.62,r))+.25;col=[col[0]*es,col[1]*es,col[2]*es];}}
+    else continue;
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);return keep(key,cv);}
+/* 7.13, the purple turret, refined. Her words (15 November 2026): "I prefer the purple look for the turret but still think that it
+   looks still too plain"; then, of a richer one set with polished silver, enamel, studs and a jewel: "too flashy and gaudy and not at
+   all elevated and refined". So restraint: one family of violets in a satin finish (a soft sheen, never a mirror), its depth made by
+   soft shadows and the turn of each surface, and pale lilac used only as hairlines: the scale's engraving and one fine line at each
+   edge. No chrome, no studs, no jewel. The case is a satin violet with a fine reeded edge; inside it a deeper band carries the scale;
+   the plate is turned violet with a soft rounded edge; the ports are sunk with a hairline at their rims; the hub is a plain satin dome;
+   the bezels are knurled in the same violet, a shade deeper inside. */
+var PLUM={day:[128,98,182],night:[96,72,148],tint:.55,face:.95},DEEP={day:[82,58,130],night:[58,40,98],tint:.5,face:1},PEARL={day:[236,230,250],night:[206,198,228],tint:.2,face:1};
+function satin(F,nt,i,r,sx,sy,u){var fk="sa"+(F===DEEP?"d":"p")+(nt?1:0),c=FACEC[fk]||(FACEC[fk]=lit(0,0,1,F,nt,.42)),q=.8*sx-.6*sy,wedge=Math.exp(-q*q/.05)*(nt?.16:.2),
+    g=1+.012*Math.sin(r*4.4/u)+.01*(gn(i)-.5),m=F.face*g*(1+wedge);return [c[0]*m,c[1]*m,c[2]*m];}
+/* a hairline: an even pale lilac, a little brighter on the side that faces the window */
+function hair(nt,ex,ey,k){var b=nt?[176,166,204]:[226,218,244],t=-(ex*MLX+ey*MLY),f=k*(.82+.18*(t<-1?-1:t>1?1:t));return [b[0]*f,b[1]*f,b[2]*f];}
+function shade(c,k){return [c[0]*k,c[1]*k,c[2]*k];}
+function baseLayerP(Wd){var nt=night(),key="bP"+Wd+(nt?1:0);if(MC[key])return MC[key];var cv=mcv(Wd),x=cv.getContext("2d"),im=x.createImageData(Wd,Wd),o=im.data,c0=Wd/2,u=Wd/460,
+    R=Wd*.49,rc=Wd*.452,rs=Wd*.446,re=Wd*.372,xx,yy,dx,dy,r,i,j,ex,ey,col,e,sh,q,sl,nx,ny,l,th,kn;
+  for(yy=0;yy<Wd;yy++)for(xx=0;xx<Wd;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*Wd+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;
+    if(r>=rc){col=dome(PLUM,nt,ex,ey,r,rc,R,.34);
+      if(r>R-2.6*u){th=Math.atan2(dy,dx);kn=Math.sin(th*240);q=Math.max(-.95,Math.min(.95,(r-(R-1.3*u))/(1.3*u)));sl=q/Math.sqrt(1-q*q)*.6;nx=ex*sl-ey*kn*.22;ny=ey*sl+ex*kn*.22;l=Math.sqrt(nx*nx+ny*ny+1);
+        col=lit(nx/l,ny/l,1/l,PLUM,nt,.34);}
+      if(r<rc+1.1*u)col=hair(nt,ex,ey,1);}
+    else if(r>=rs){col=shade(dome(DEEP,nt,ex,ey,r,rs,rc,.4),.62);}
+    else if(r>=re){q=(r-(re+rs)/2)/((rs-re)/2);sl=q*.1;nx=ex*sl;ny=ey*sl;l=Math.sqrt(nx*nx+ny*ny+1);col=lit(nx/l,ny/l,1/l,DEEP,nt,.4);
+      var g=1+.012*Math.sin(r*3.6/u);col=shade(col,g);
+      e=ex*MLX+ey*MLY;sh=(nt?.5:.42)*Math.max(0,e+.2)*Math.exp(-(r-re)/(7*u))+(nt?.25:.16)*Math.exp(-(r-re)/(2*u));sh=Math.min(.8,sh);col=shade(col,1-sh);
+      var lp=(nt?.3:.24)*Math.max(0,-e+.15)*Math.exp(-(rs-r)/(3*u));col=shade(col,1-lp);}
+    else{col=nt?[18,8,34]:[40,24,70];}
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);return keep(key,cv);}
+function plateLayerP(Wd,ports,ang){var nt=night(),a10=Math.round(ang*1800/Math.PI)%3600,key="pP"+Wd+ports+(nt?1:0)+"@"+a10;if(MC[key])return MC[key];
+  var cv=mcv(Wd),x=cv.getContext("2d"),im=x.createImageData(Wd,Wd),o=im.data,c0=Wd/2,u=Wd/340,R=Wd*.497,edge=Wd*.024,hub=Wd*.085,rp=Math.min(58,RAD*Math.sin(Math.PI/ports)-2)*u,
+    ca=Math.cos(ang),sa=Math.sin(ang),S=[],k,xx,yy,dx,dy,r,i,j,ex,ey,lx,ly,col,e,best,bd,sx,sy,d,q;
+  for(k=0;k<ports;k++){var a=-Math.PI/2+k*TAU/ports;S.push([c0+Math.cos(a)*RAD*u,c0+Math.sin(a)*RAD*u]);}
+  for(yy=0;yy<Wd;yy++)for(xx=0;xx<Wd;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*Wd+xx;j=i*4;lx=r?dx/r:0;ly=r?dy/r:0;ex=lx*ca-ly*sa;ey=lx*sa+ly*ca;
+    best=0;bd=1e9;for(k=0;k<S.length;k++){sx=xx+.5-S[k][0];sy=yy+.5-S[k][1];d=sx*sx+sy*sy;if(d<bd){bd=d;best=k;}}bd=Math.sqrt(bd);
+    if(r>R-edge){col=dome(PLUM,nt,ex,ey,r,R-edge,R,.3);if(r>R-edge&&r<R-edge+1*u)col=hair(nt,ex,ey,.9);}
+    else if(r<hub){q=r/hub;col=lit(ex*q*.7,ey*q*.7,Math.sqrt(Math.max(.05,1-q*q*.6)),PLUM,nt,.34);if(Math.abs(r-hub*.55)<.7*u)col=shade(col,.8);}
+    else{col=satin(PLUM,nt,i,r,ex,ey,u);e=ex*MLX+ey*MLY;var hs=(nt?.4:.3)*Math.max(0,e+.1)*Math.exp(-(r-hub)/(3.4*u));col=shade(col,1-hs);
+      if(Math.abs(r-hub)<.8*u)col=hair(nt,ex,ey,.85);}
+    if(bd<rp+1.2*u&&r<R-edge&&r>=hub+1*u){sx=xx+.5-S[best][0];sy=yy+.5-S[best][1];var qx=sx/(bd||1),qy=sy/(bd||1),exs=qx*ca-qy*sa,eys=qx*sa+qy*ca;
+      if(bd>rp-.9*u){col=hair(nt,-exs,-eys,.9);}
+      else{col=satin(DEEP,nt,i,bd,exs,eys,u);e=exs*MLX+eys*MLY;
+        var ps=(nt?.55:.46)*Math.max(0,-e+.1)*Math.exp(-(rp-bd)/(6*u))+(nt?.28:.18)*Math.exp(-(rp-bd)/(1.6*u));col=shade(col,1-Math.min(.8,ps));}}
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);return keep(key,cv);}
+function rimLayerP(px,kind){var nt=night(),key="lP"+px+kind+(nt?1:0);if(MC[key])return MC[key];var cv=mcv(px),x=cv.getContext("2d"),im=x.createImageData(px,px),o=im.data,
+    c0=px/2,R=px/2-2*(px/112),u=px/112,xx,yy,dx,dy,r,i,j,ex,ey,col,th,N=90,q;
+  for(yy=0;yy<px;yy++)for(xx=0;xx<px;xx++){dx=xx+.5-c0;dy=yy+.5-c0;r=Math.sqrt(dx*dx+dy*dy);if(r>R+1)continue;i=yy*px+xx;j=i*4;ex=r?dx/r:0;ey=r?dy/r:0;
+    if(r>R*.865){th=Math.atan2(dy,dx);var kn=Math.sin(th*N),tx=-ey,ty=ex;q=Math.max(-.95,Math.min(.95,(r-R*.93)/(R*.07)));var sl=q/Math.sqrt(1-q*q)*.6,nx=ex*sl+tx*kn*.3,ny=ey*sl+ty*kn*.3,l=Math.sqrt(nx*nx+ny*ny+1);
+      col=lit(nx/l,ny/l,1/l,PLUM,nt,.3);}
+    else if(r>R*.85){col=hair(nt,ex,ey,.88);}
+    else if(kind==="cap"){col=satin(PLUM,nt,i,r,ex,ey,u*.6);if(Math.abs(r-R*.42)<.6*u)col=shade(col,.82);}
+    else if(r>R*.665){col=dome(DEEP,nt,ex,ey,r,R*.665,R*.85,.36);}
+    else if(r>R*.645){col=hair(nt,ex,ey,.75);}
+    else if(kind==="empty"){col=satin(DEEP,nt,i,r,ex,ey,u*.6);col=shade(col,.42+.3*sst(R*.1,R*.62,R*.62-r));}
+    else continue;
+    put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
+  x.putImageData(im,0,0);return keep(key,cv);}
 /* a lens (kind "lens"), the empty port ("empty") or a cap on an unused port ("cap") */
 function drawLens(cv,S,col,tx,ty,kind){var dpr=dprOf(),px=Math.round(S*dpr);if(cv.width!==px){cv.width=px;cv.height=px;}cv.style.width=S+"px";cv.style.height=S+"px";
   var g=cv.getContext("2d");if(!g)return;g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);var c=S/2,R=S/2-2,Q=PAL(),N=90,i;
+  if(finish()){g.setTransform(1,0,0,1,0,0);g.drawImage(finish()==="purple"?rimLayerP(px,kind):rimLayer(px,kind),0,0);g.setTransform(dpr,0,0,dpr,0,0);if(kind==="cap"||kind==="empty")return;
+    var T0=tones(col);g.strokeStyle=rgba(T0[2],.95);g.lineWidth=R*.03;g.beginPath();g.arc(c,c,R*.76,0,TAU);g.stroke();
+    g.fillStyle=night()?"#06020e":"#120824";g.beginPath();g.arc(c,c,R*.64,0,TAU);g.fill();glass(g,c,R,col,tx,ty,true);return;}
   for(i=0;i<N;i++){var a0=i*TAU/N,a1=(i+.5)*TAU/N,lit=.5+.5*Math.cos(a0+2.3);g.beginPath();g.arc(c,c,R,a0,a1);g.arc(c,c,R*.86,a1,a0,true);g.closePath();g.fillStyle="hsl(268,"+Q.knS+"%,"+(Q.knL+lit*34)+"%)";g.fill();
     g.beginPath();g.arc(c,c,R,a1,a1+TAU/N/2);g.arc(c,c,R*.86,a1+TAU/N/2,a1,true);g.closePath();g.fillStyle="hsl(268,"+(Q.knS+6)+"%,"+(Q.knL-12+lit*18)+"%)";g.fill();}
   bevel(g,c,c,R-.5,1.2);
@@ -180,7 +334,8 @@ function drawLens(cv,S,col,tx,ty,kind){var dpr=dprOf(),px=Math.round(S*dpr);if(c
   g.strokeStyle=kind==="empty"?Q.inkSoft:rgba(T[2],.9);g.lineWidth=R*.035;g.beginPath();g.arc(c,c,R*.76,0,TAU);g.stroke();
   g.fillStyle=Q.hole;g.beginPath();g.arc(c,c,R*.64,0,TAU);g.fill();
   if(kind==="empty"){spun(g,c,c,0,R*.6,Q.mL-14,Q.mS,.6);g.fillStyle=Q.dot;g.beginPath();g.arc(c,c,R*.08,0,TAU);g.fill();return;}
-  /* the glass: deep at its edge, lit at its heart, with its inner elements */
+  glass(g,c,R,col,tx,ty,false);}
+function glass(g,c,R,col,tx,ty,metal){var T=tones(col);
   var gl=g.createRadialGradient(c-R*.12+tx*R*.1,c-R*.14+ty*R*.1,R*.05,c,c,R*.6);gl.addColorStop(0,rgba(T[1],1));gl.addColorStop(.5,rgba(T[2],1));gl.addColorStop(1,rgba(T[3],1));
   g.fillStyle=gl;g.beginPath();g.arc(c,c,R*.6,0,TAU);g.fill();
   [.5,.38,.26].forEach(function(k,j){g.strokeStyle="rgba(255,255,255,"+(.16-j*.03)+")";g.lineWidth=1;g.beginPath();g.arc(c+tx*R*.03*(j+1),c+ty*R*.03*(j+1),R*k,0,TAU);g.stroke();});
@@ -191,29 +346,39 @@ function drawLens(cv,S,col,tx,ty,kind){var dpr=dprOf(),px=Math.round(S*dpr);if(c
   var hx=c-R*(.26-tx*.12),hy=c-R*(.3-ty*.12),hl=g.createRadialGradient(hx,hy,0,hx,hy,R*.24);hl.addColorStop(0,"rgba(255,255,255,.8)");hl.addColorStop(1,"rgba(255,255,255,0)");
   g.fillStyle=hl;g.beginPath();g.ellipse(hx,hy,R*.24,R*.13,-.7,0,TAU);g.fill();
   g.fillStyle="rgba(255,255,255,.95)";g.beginPath();g.arc(hx-R*.05,hy-R*.02,Math.max(1.2,R*.025),0,TAU);g.fill();g.restore();
-  g.strokeStyle=rgba(T[3],.9);g.lineWidth=1.5;g.beginPath();g.arc(c,c,R*.6,0,TAU);g.stroke();}
+  g.strokeStyle=rgba(T[3],.9);g.lineWidth=1.5;g.beginPath();g.arc(c,c,R*.6,0,TAU);g.stroke();
+  if(metal){var e2=g.createRadialGradient(c+R*.1,c+R*.13,R*.44,c,c,R*.62);e2.addColorStop(0,"rgba(0,0,0,0)");e2.addColorStop(1,"rgba(0,0,0,"+(night()?.5:.38)+")");
+    g.save();g.beginPath();g.arc(c,c,R*.6,0,TAU);g.clip();g.fillStyle=e2;g.fillRect(c-R,c-R,2*R,2*R);g.restore();}}
 function fmtGB(x){return Math.abs(x-Math.round(x))<.05?String(Math.round(x)):x.toFixed(1);}
 function labelStep(A){var c=[1,2,4,5,8,10,16,20,25,32,40,50,64,80,100,128,160,200,256,320,400,512,1024];for(var i=0;i<c.length;i++)if(A/c[i]<=6)return c[i];return 2048;}
 /* how far the engine's memory is taken: by the model in it, or by the share of a load that has come in */
 function fillNow(){var A=usable(),s=st(),m=null,f=0;if(s==="ready"||s==="busy")m=byId(loadedId());else if(s==="loading")m=byId(loadingId());
   if(m&&A){var n=need(m);if(n){f=n/A;if(s==="loading")f*=prog();}}return {A:A,f:f};}
-function drawBase(){if(!base)return;var F=fillNow(),k=[night()?1:0,F.A?F.A.toFixed(2):"-",F.f.toFixed(3),dprOf()].join("|");if(k===BSIG)return;BSIG=k;
+function drawBase(){if(!base)return;var F=fillNow(),k=[night()?1:0,finish(),F.A?F.A.toFixed(2):"-",F.f.toFixed(3),dprOf()].join("|");if(k===BSIG)return;BSIG=k;
   var dpr=dprOf(),Wd=Math.round(460*dpr);if(base.width!==Wd){base.width=Wd;base.height=Wd;}
   var g=base.getContext("2d");if(!g)return;var c=Wd/2,s=Wd/460,Q=PAL();g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,Wd,Wd);
-  var stg=g.createRadialGradient(c,c*.8,Wd*.05,c,c,Wd*.5);stg.addColorStop(0,Q.st0);stg.addColorStop(1,Q.st1);g.fillStyle=stg;g.beginPath();g.arc(c,c,Wd*.49,0,TAU);g.fill();
+  var FF=finish()?FIN[finish()]:null,K=FF?(night()?FF.inkN:FF.ink):null;
+  if(FF){Q={ink:K[0],inkSoft:K[1],acc:night()?FF.accN:FF.acc,warn:night()?FF.warnN:FF.warn};g.drawImage(finish()==="purple"?baseLayerP(Wd):baseLayer(Wd),0,0);}
+  /* engraved: each cut drawn twice, its lit lower edge first, then the cut itself */
+  var cut=function(fn){if(!FF){fn(null);return;}g.save();g.translate(.8*s,1*s);fn(K[2]);g.restore();fn(null);};
+  if(FF){var a0f=-Math.PI/2-1.05,a1f=-Math.PI/2+1.05;cut(function(h){g.strokeStyle=h||Q.inkSoft;g.lineWidth=2*s;g.beginPath();g.arc(c,c,Wd*.432,a0f,a1f);g.stroke();});}
+  else{
+    var stg=g.createRadialGradient(c,c*.8,Wd*.05,c,c,Wd*.5);stg.addColorStop(0,Q.st0);stg.addColorStop(1,Q.st1);g.fillStyle=stg;g.beginPath();g.arc(c,c,Wd*.49,0,TAU);g.fill();
   spun(g,c,c,Wd*.455,Wd*.49,Q.mL-6,Q.mS,.7);bevel(g,c,c,Wd*.49,2*s);
-  var a0=-Math.PI/2-1.05,a1=-Math.PI/2+1.05;g.save();g.strokeStyle=Q.inkSoft;g.lineWidth=2*s;g.beginPath();g.arc(c,c,Wd*.432,a0,a1);g.stroke();
+  g.strokeStyle=Q.inkSoft;g.lineWidth=2*s;g.beginPath();g.arc(c,c,Wd*.432,-Math.PI/2-1.05,-Math.PI/2+1.05);g.stroke();}
+  var a0=-Math.PI/2-1.05,a1=-Math.PI/2+1.05;g.save();
   if(F.A){var L=labelStep(F.A),sm=L/4;
     for(var j=0;j*sm<=F.A+1e-9;j++){var gb=j*sm,a=a0+(a1-a0)*gb/F.A,isB=j%2===0,isL=j%4===0,r0=Wd*(isB?.418:.424),r1=Wd*.44;
-      g.strokeStyle=isB?Q.ink:Q.inkSoft;g.lineWidth=(isB?1.6:1)*s;g.beginPath();g.moveTo(c+Math.cos(a)*r0,c+Math.sin(a)*r0);g.lineTo(c+Math.cos(a)*r1,c+Math.sin(a)*r1);g.stroke();
-      if(isL){g.save();g.translate(c+Math.cos(a)*Wd*.398,c+Math.sin(a)*Wd*.398);g.rotate(a+Math.PI/2);g.fillStyle=Q.ink;g.font="600 "+(11*s)+"px "+SANS;g.textAlign="center";g.fillText(fmtGB(gb),0,4*s);g.restore();}}
+      (function(a,r0,r1,isB,isL,gb){cut(function(h){g.strokeStyle=h||(isB?Q.ink:Q.inkSoft);g.lineWidth=(isB?1.6:1)*s;g.beginPath();g.moveTo(c+Math.cos(a)*r0,c+Math.sin(a)*r0);g.lineTo(c+Math.cos(a)*r1,c+Math.sin(a)*r1);g.stroke();
+        if(isL){g.save();g.translate(c+Math.cos(a)*Wd*.398,c+Math.sin(a)*Wd*.398);g.rotate(a+Math.PI/2);g.fillStyle=h||Q.ink;g.font="600 "+(11*s)+"px "+SANS;g.textAlign="center";g.fillText(fmtGB(gb),0,4*s);g.restore();}});})(a,r0,r1,isB,isL,gb);}
     if(F.f>0){var af=a0+(a1-a0)*Math.min(1,F.f);g.strokeStyle=F.f>1?Q.warn:Q.acc;g.lineWidth=4*s;g.lineCap="round";g.beginPath();g.arc(c,c,Wd*.432,a0,af);g.stroke();}}
-  g.restore();g.fillStyle=Q.inkSoft;g.font="600 "+(9.5*s)+"px "+SANS;g.textAlign="center";
+  g.restore();g.font="600 "+(9.5*s)+"px "+SANS;g.textAlign="center";
   try{g.letterSpacing=(1.6*s)+"px";}catch(e){}
-  g.fillText(F.A?(fmtGB(F.A)+" GB FOR A MODEL"):"MEMORY NOT REPORTED",c,c+Wd*.432);
+  cut(function(h){g.fillStyle=h||Q.inkSoft;g.fillText(F.A?(fmtGB(F.A)+" GB FOR A MODEL"):"MEMORY NOT REPORTED",c,c+Wd*.432);});
   base.setAttribute("data-fill",F.f.toFixed(3));base.setAttribute("data-gb",F.A?F.A.toFixed(1):"");}
-function drawPlate(){if(!plate)return;var dpr=dprOf(),Wd=Math.round(340*dpr);if(plate.width!==Wd){plate.width=Wd;plate.height=Wd;}
+function drawPlate(){if(!plate)return;var dpr=dprOf(),Wd=Math.round((finish()?(plate.offsetWidth||340):340)*dpr);if(plate.width!==Wd){plate.width=Wd;plate.height=Wd;}
   var g=plate.getContext("2d");if(!g)return;var c=Wd/2,s=Wd/340,Q=PAL(),i;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,Wd,Wd);
+  if(finish()){g.drawImage(finish()==="purple"?plateLayerP(Wd,P,TURN*Math.PI/180):plateLayer(Wd,P,TURN*Math.PI/180),0,0);return;}
   spun(g,c,c,Wd*.06,Wd*.5,Q.mL,Q.mS,1);bevel(g,c,c,Wd*.497,3*s);
   for(i=0;i<P;i++){var a=-Math.PI/2+i*TAU/P,x=c+Math.cos(a)*RAD*s,y=c+Math.sin(a)*RAD*s;g.fillStyle=Q.seat;g.beginPath();g.arc(x+1.5*s,y+2.5*s,Wd*.19,0,TAU);g.fill();}
   spun(g,c,c,0,Wd*.09,Q.mL+4,Q.mS,1);bevel(g,c,c,Wd*.09,2*s);
@@ -221,7 +386,7 @@ function drawPlate(){if(!plate)return;var dpr=dprOf(),Wd=Math.round(340*dpr);if(
     g.strokeStyle="hsl(268,30%,"+(Q.mL-44)+"%)";g.lineWidth=2*s;g.beginPath();g.moveTo(sx-Wd*.008,sy);g.lineTo(sx+Wd*.008,sy);g.stroke();}}
 
 /* ---------- the ports ---------- */
-function sig(){var ms=chosen();return [night()?1:0,dprOf(),ms.length,ms.map(function(m){return m.id+"\u0001"+nm(m)+"\u0001"+(m.color||"")+"\u0001"+(m.sizeBytes||0);}).join("\u0002")].join("|");}
+function sig(){var ms=chosen();return [night()?1:0,finish(),dprOf(),ms.length,ms.map(function(m){return m.id+"\u0001"+nm(m)+"\u0001"+(m.color||"")+"\u0001"+(m.sizeBytes||0);}).join("\u0002")].join("|");}
 function rebuild(){var ms=chosen();P=Math.max(5,Math.min(HOLD+1,ms.length+1));
   PORTS.forEach(function(p){if(p.el.parentNode)p.el.parentNode.removeChild(p.el);});PORTS=[];drawPlate();
   for(var i=0;i<P;i++){var kind=i<ms.length?"lens":(i===P-1?"empty":"cap");PORTS.push(port(i,kind,kind==="lens"?ms[i]:null));}
@@ -263,8 +428,14 @@ function ticks(n){var I=W.IngSound;if(!I||typeof I.voice!=="function")return;var
 function turnTo(i,sound){if(!disc)return;var step=360/P,d=((-i*step-TURN)%360+540)%360-180,steps=Math.round(Math.abs(d)/step);AT=i;if(Math.abs(d)<.01){nameAll();return;}
   TURN+=d;var tf="rotate("+TURN.toFixed(3)+"deg)",tb="rotate("+(-TURN).toFixed(3)+"deg)";disc.style.transform=tf;PORTS.forEach(function(p){p.lift.style.transform=tb;});
   if(sound&&steps)ticks(steps);
-  clearTimeout(NAMET);if(still()||!head.offsetParent){nameAll();return;}
-  turret.classList.add("tr-turning");NAMET=setTimeout(function(){nameAll();turret.classList.remove("tr-turning");},900);}
+  clearTimeout(NAMET);if(still()||!head.offsetParent){nameAll();if(finish())drawPlate();return;}
+  turret.classList.add("tr-turning");NAMET=setTimeout(function(){nameAll();turret.classList.remove("tr-turning");replate();},900);}
+/* 7.13: the plate turns under a light that does not: once it stands, its light is drawn again where the window is, the plate as it was
+   fading out over it */
+function replate(){if(!finish()||!plate||!plate.parentNode)return;try{var old=D.createElement("canvas");old.width=plate.width;old.height=plate.height;old.getContext("2d").drawImage(plate,0,0);
+    old.className=plate.className;old.setAttribute("aria-hidden","true");old.style.cssText=(plate.getAttribute("style")||"")+";pointer-events:none;transition:opacity .45s ease";
+    plate.parentNode.insertBefore(old,plate.nextSibling);drawPlate();requestAnimationFrame(function(){requestAnimationFrame(function(){old.style.opacity="0";});});
+    setTimeout(function(){if(old.parentNode)old.parentNode.removeChild(old);},700);}catch(e){drawPlate();}}
 
 /* ---------- loading and unloading, as the engine's own keys do ---------- */
 function note(n){NOTE=n;paint();}
@@ -375,7 +546,7 @@ function boot(){if(booted)return;page=$("page-models");var e=eng();if(!page||!e|
   var lastW=-1,rq=0,onSize=function(){rq=0;var w=page?page.clientWidth:0;if(w===lastW)return;lastW=w;mount();};
   try{new ResizeObserver(function(){if(!rq)rq=requestAnimationFrame(onSize);}).observe(page);}catch(x){W.addEventListener("resize",mount);}
   /* day and night: the metal, the glass and the scale are drawn again in the Display's colours */
-  try{new MutationObserver(function(){if(on){SIG="";BSIG="";schedule();}}).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(x){}
+  try{new MutationObserver(function(){if(on){SIG="";BSIG="";schedule();}}).observe(D.body,{attributes:true,attributeFilter:["data-theme","data-turret"]});}catch(x){}
   /* the page drawing its models again (added, renamed, recoloured, removed, chosen): the turret follows */
   var ml=$("modelList");if(ml){try{new MutationObserver(function(){if(on)schedule();}).observe(ml,{childList:true});}catch(x){}}
   mount();premount();
