@@ -395,6 +395,54 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.12 (15 November 2026): every app's kits are its own. Her list for Fabrica (7.05) asked that another app's kits never
+carry Ingenium's own files or logo, that each app have its own icons and no errors, and that each device's kit build in the terminal as
+well as on GitHub. Fabrica's audit of 14 November 2026 found that an app whose page carries no packaging templates of its own (every app
+but The Forge: Carpe Diem, Inkwell, the apps made in Build) was shipped from Ingenium's own repositories, renamed (modules/r178.js,
+ownKit): its Fire tablet kit held Ingenium's model engine (Bridge.java, NativeEngine.java, ModelLibrary.java, the JNI glue and the
+native engine), its iPhone and iPad kit Ingenium's Swift engine and bridge, its Mac kit Ingenium's key tool.
+- `build/kits/family_templates.py` (new) reads The Forge's own templates (`apps/builtin/forge.html.gz`, its `<script id="cd-pkg-src">`)
+  and makes them the family's: the owner becomes `__APP_OWNER__` and the year `__APP_YEAR__`; the Fire project's Java package
+  `__APP_NS__` (its folder `__APP_NS_PATH__`); The Forge's seal and Carpe Diem's licence and terms are dropped; the guides speak of the
+  app itself and say "Made by Fabrica" (each change must find its text exactly as many times as it says, or the script stops; the
+  Windows guide's CRLF line endings are kept); it refuses to write a template that names the owner or Ingenium anywhere. It adds Gradle's
+  own wrapper (`kits/gradle`: gradlew, gradlew.bat and gradle-wrapper.jar, as Gradle made them, Apache 2.0), a terminal build of the APK
+  for a Mac and for Windows (`kits/family/fire`: "Build the APK.command", "Build the APK (Windows).bat" with `build_apk.ps1`: Java 17
+  to 21, Android Studio's own when no other fits; the Android tools; the permanent key made in the folder "signing" as GitHub's first
+  build makes it; `gradlew :app:assembleRelease`; the APK beside READ ME FIRST.txt), a terminal build of the Windows program and its
+  installer (`kits/family/windows`: "Build __APP_TITLE__ (Windows).bat" with `build_windows.ps1`: Python 3.12, the build tools pinned
+  as GitHub's recipe pins them, PyInstaller, then Inno Setup 6 with the same defines as the recipe; without Inno Setup the program
+  folder alone), a part in each guide on building on her own computer, and a .gitignore for the Windows project. The .bat and .ps1
+  files have Windows line endings, the .ps1 a byte order mark (Windows PowerShell 5.1 then reads an accented name as written). It
+  writes `modules/r299.js` (new, every edition): the templates compressed (670,445 bytes, 213,675 compressed), unpacked once with
+  Fabrica's own inflater (IngRepo.core.inflateZ, in every edition), else the browser's DecompressionStream; `IngFamilyKit`.
+- `modules/r178.js`: an app with no templates of its own, other than Ingenium, is shipped from the family's packaging exactly as an
+  app is shipped from its own (`templated`): its name, file stem and id, its icons drawn from its own picture (`ownPicture`: its page's
+  icon, else its seal, else its initials on its colour), its owner (`ownerName`: Lector's author, so the profile's name, and in the
+  master edition its author; else the app's own name; letters, digits, spaces, full stops and hyphens only) and the year; the Fire
+  project's Java package (`nsFor`: the activity name an earlier package of the app kept, from Fabrica's table of the family's apps,
+  so a home screen icon still points to it; else the app's id; a word Java keeps for itself is given an underscore). Ingenium's own
+  page (or Fabrica's repository of it) keeps Ingenium's own projects, which alone carry the model engine; another app is never given
+  them, and a kit that cannot be made from the family's packaging is refused with the reason. The web kit (the Build page's,
+  Download as an app's and Fabrica's web app card) comes from the family's packaging too; the old Build page's rows name the packages
+  it makes; gradlew and every .command or .sh file is kept as a program in the zip; a kit kept before 7.12 is let go once
+  (`ing:r178:since712`).
+- Proved here: the Fire kit of an invented app ("Tide Clock", com.example.tideclock, by an invented "Ada Example"), unzipped, built
+  by its own "Build the APK.command" on Linux with Java 21 and Google's command-line tools (16111833): exit 0 in about a minute,
+  tide-clock.apk, package com.example.tideclock, label Tide Clock, launchable activity com.example.tideclock.MainActivity, minimum
+  Android 22 and target 34, signed "CN=Tide Clock, O=Ada Example", its launcher icon its own initials on its own colour, no file
+  naming Ingenium. `.github/workflows/kits-proof.yml` (new) builds the six kits of that app (`rig/kits_proof`) on GitHub's machines,
+  each by the build its kit gives: the APK on Linux and Windows, the Mac app on Apple silicon (the Mac mini kit) and Intel (the
+  MacBook kit), the iPhone and iPad app by its Xcode project, and the Windows program and installer, then installed and removed
+  silently (the program, its Start menu entry and its entry in Settings, Apps, then none of them).
+- Tests: `rig/t_712_kits.js` 52/52 (new): every device's kit of the invented app from the family's packaging, with no file of
+  Ingenium's and no text naming it, no placeholder left, the owner and the year in its licence; its icons its own (its initials on
+  #3a7bd5; a page's own icon when it names one); the Fire project's own Java package, Gradle's wrapper byte for byte with gradlew a
+  program, both terminal builds making the key in the app's and the owner's names; the Windows terminal build with the pinned tools;
+  a family app's earlier Java package kept; an app's own templates still first; Ingenium's own page still its own projects; the web
+  kits; the app's own name as owner when the profile has none (as in a public edition); a refusal when the family's packaging cannot
+  be read; the six packages saved.
+
 Ingenium 7.11 (15 November 2026): Fabrica's runs on Windows no longer fail at random.
 - Found by GitHub's Windows build of 7.10 (run 43665002267), which failed its own self-test: the self-test's run ended "bad" with its
   second job's second step still "queued" (it should be "skipped"). The engine itself answered. Cause: a run's record

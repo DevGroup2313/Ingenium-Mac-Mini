@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.12", "Every build kit for an app of your own is the app's own: its name, id and icons on every device, your name in its licence, and none of Ingenium's own files. Each kit is made from the family's packaging, the projects, recipes and guides the family's apps are built with."],
+  ["7.12", "The Fire tablet kit now builds on your own Mac or PC as well as on GitHub: in its project, double-click Build the APK. The Windows kit makes the program and its installer on your PC the same way. Each kit's guide says what to install first."],
+  ["7.12", "A kit kept in Releases from before 7.12 is made again the next time you ask for it, so none of the old kind is ever saved again.", "fabrica"],
+  ["7.12", "Carpe Diem's and Inkwell's kits in Fabrica come from the same family's packaging, and a Fire tablet kit keeps the Java package its earlier builds had, so the icon on the tablet's home screen still opens the app.", "master"],
   ["7.11", "On a Windows PC, Fabrica's runs no longer fail at random: a run's record is read and written one at a time, so a job never stops halfway because the page was reading it at that moment.", "fabrica"],
   ["7.10", "Folders no longer runs on and on: your apps stand in one row, the ways of bringing in your work are six small envelopes whose instructions open in a raised sheet when you press one, and the parts below sit side by side."],
   ["7.10", "A folder you open starts near the top of the window: the drawer of your apps folds to its front (press it to see them all), and each of the folder's papers has a divider of its own, so one paper shows at a time and none pushes the others out of reach."],

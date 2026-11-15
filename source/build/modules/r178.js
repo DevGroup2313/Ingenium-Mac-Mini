@@ -28,7 +28,16 @@
       Releases cannot save it again in place of the app's own.
    modules/r112.js and r139.js wait for a kit that is still being drawn (two lines each); r139.js reads a page's title as far
    into its head as an app's own packager does (the Forge's title is past the first 400,000 characters, so Chat and Code
-   named it from its file); this module does the rest. */
+   named it from its file); this module does the rest.
+   7.12: the generic kit of point 2 still held Ingenium's own engine (Fabrica's audit of 14 November 2026: for the Fire tablet
+   its Java bridge, native engine and JNI glue; for the iPhone and iPad its Swift engine and bridge; for the Mac its key tool).
+   Now an app with no templates of its own, other than Ingenium, is shipped from the family's packaging (modules/r299.js, The
+   Forge's templates made neutral), exactly as point 1 ships an app from its own: its name, file stem, app id, icons drawn from
+   its own picture (its page's icon, else its seal, else its initials on its colour), its owner and year in its licence and
+   build files (the person's profile; in the master edition the author Lector names), and for the Fire tablet its own Java
+   package (the activity name an earlier package of the app kept, so a home screen icon still points to it, else its id).
+   Ingenium itself keeps its own projects (point 2), as only it carries the model engine. A kit kept from before 7.12 is let
+   go once, as in point 4, so Releases cannot save an old one again. */
 (function r178(){
 "use strict";
 if(window.__ingR178)return;window.__ingR178=true;
@@ -82,7 +91,11 @@ function mapOf(idt){var title=idt.title,base=slug(title),dash=base.replace(/_/g,
     __APP_ZIPMAC__:title.replace(/\s+/g,"-")+"-Mac.zip",__APP_ZIPWIN__:title.replace(/\s+/g,"-")+"-Windows.zip",__APP_IPA__:ios+".ipa",
     __APP_PASS__:idt.pass,__APP_DATE__:idt.date,__APP_BUILD__:idt.stamp||idt.pass,
     __APP_TODAY__:dt.getDate()+" "+MONTHS[dt.getMonth()]+" "+dt.getFullYear(),
-    __APP_PROJ__:base+"_android_project",__APP_APK_NAME__:dash};}
+    __APP_PROJ__:base+"_android_project",__APP_APK_NAME__:dash,
+    /* 7.12: the family's packaging (modules/r299.js) also names its owner, the year, the Fire project's Java package and the
+       Windows installer; an app's own templates name none of them */
+    __APP_OWNER__:idt.owner||title,__APP_YEAR__:String(dt.getFullYear()),__APP_NS__:idt.ns||String(idt.id),
+    __APP_NS_PATH__:String(idt.ns||idt.id).replace(/\./g,"/"),__APP_SETUP__:title.replace(/\s+/g,"-")+"-Windows-Setup.exe"};}
 function fill(str,map){return String(str).replace(/__APP_[A-Z0-9_]+?__/g,function(k){return Object.prototype.hasOwnProperty.call(map,k)?map[k]:k;});}
 function fillText(str,map){var has=Object.prototype.hasOwnProperty,src=String(str).split("\n"),out=[];
   function rep(ch,n){return new Array(n+1).join(ch);}
@@ -164,7 +177,7 @@ function webify(h){var inject='<link rel="manifest" href="manifest.webmanifest">
 function entriesOf(T,kind,html,idt){var src=sourceOf(T,kind);if(!src||T.v!==2)return Promise.resolve(null);
   var map=mapOf(idt),h=pageText(html);
   return iconsOf(h,T).then(function(icons){var out=[];
-    Object.keys(src).forEach(function(n){var v=src[n],name=fill(n,map),mode=/\.command$/.test(name)?493:0;
+    Object.keys(src).forEach(function(n){var v=src[n],name=fill(n,map),mode=/\.command$|\.sh$|(^|\/)gradlew$/.test(name)?493:0;
       if(v==="@@html")out.push({name:name,text:h});
       else if(v==="@@web")out.push({name:name,text:webify(h)});
       else if(v==="@@manifest")out.push({name:name,text:manifestOf(map,idt,T)});
@@ -184,8 +197,23 @@ function identityOf(html,who){who=who||{};var det=detect(html);
   var title=cleanTitle(who.title||who.name||det.htmlTitle||pkgTitle(who.base||"my_app"))||"My App",key=slug(title);
   var dt=new Date(),iso=dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate());
   var ver=String(who.version||"").replace(/^v/,"");
-  return {key:key,title:title,id:idOk(who.id)?String(who.id):idFor(key),macId:"",pass:det.pass||(/^\d{1,9}$/.test(ver)?ver:iso.replace(/-/g,"")),
-    date:det.date||iso,stamp:det.stamp||"",theme:det.theme||"#1B6B93"};}
+  var id=idOk(who.id)?String(who.id):idFor(key);
+  return {key:key,title:title,id:id,macId:"",pass:det.pass||(/^\d{1,9}$/.test(ver)?ver:iso.replace(/-/g,"")),
+    date:det.date||iso,stamp:det.stamp||"",theme:det.theme||"#1B6B93",owner:ownerName(who,title),ns:nsFor(who,id)};}
+/* 7.12: whose app it is, as its licence and build files say: the person's own name (Lector's author: the profile's name, and in
+   the master edition its author), else the app's own name; only letters, digits, spaces, full stops and hyphens, so that a key
+   certificate, a Python string and an installer line all take it as it is */
+function ownerName(who,title){var n="";try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
+  if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}
+  try{n=n.replace(new RegExp("[^\\p{L}\\p{N} .\\-]+","gu")," ");}catch(e){n=n.replace(/[^A-Za-z0-9\u00c0-\u024f .\-]+/g," ");}
+  n=n.replace(/\s+/g," ").trim().slice(0,60);return n||title||"My App";}
+/* the Fire project's Java package: the one an earlier package of this app kept (its activity's name, from Fabrica's table of the
+   family's apps or the package details), so a home screen icon still points to it; else the app's own id. A word Java keeps for
+   itself is given an underscore. */
+var JAVA_WORDS=" abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while true false null var record yield sealed permits non ";
+function nsFor(who,id){var K={};try{K=(window.fbKnown||{})[who&&who.app]||{};}catch(e){}
+  var a=String((who&&who.alias)||K.alias||""),m=/^(.+)\.MainActivity$/.exec(a),ns=m&&idOk(m[1])?m[1]:String(id||"app.ingenium.app");
+  return ns.split(".").map(function(w){w=w.replace(/[^A-Za-z0-9_]/g,"_");if(!/^[A-Za-z_]/.test(w))w="a"+w;return JAVA_WORDS.indexOf(" "+w+" ")>=0?w+"_":w;}).join(".");}
 function zipOf(entries){var R=window.IngRepo&&IngRepo.core&&IngRepo.core.zip;
   if(typeof R==="function")return R(entries.map(function(e){return {name:e.name,data:u8(e.data),mode:0x8000|((e.mode||420)&0x1ff)};}));
   return Promise.resolve(makeZip(entries));}
@@ -324,19 +352,45 @@ function ownKit(store,kitId,who,page){
     if(wf)out.push({name:root+"/build_file_copy/"+kit.workflow.split("/").pop()+".txt",data:wf.data,mode:420});
     return {zip:k.zip,entries:out,fileCount:out.filter(function(e){return e.name.indexOf(pre)===0;}).length,own:true,renamed:RN.filter(function(r){return k.entries.some(function(e){return e.name===pre+r[0];});})};});}
 
+/* ---------- 4b. the family's packaging, for every app but Ingenium (7.12) ---------- */
+/* Ingenium's own page (the marks every Ingenium page carries: its edition's variable and the parts' register) or Fabrica's
+   repository of it: the one app shipped from its own projects, which alone carry the model engine */
+function isIngenium(who,page){if(who&&who.app==="ingenium")return true;var h=pageText(page);return h.indexOf("var ING_EDITION")>=0&&h.indexOf("__ingParts")>=0;}
+function familyHere(){return !!(window.IngFamilyKit&&typeof IngFamilyKit.templates==="function");}
+/* the family's templates for this app: its own picture as the seal every icon is drawn from (when its page names no icon of its
+   own), and the licence's owner and year filled, which the web manifest reads */
+function familyOf(page,who){if(!familyHere())return Promise.resolve(null);
+  return IngFamilyKit.templates().then(function(T0){
+    return loadImage(ownPicture(page,who||{})).then(function(img){return bytesB64(png(draw(img,512)));},function(){return "";}).then(function(seal){
+      var T={},title=identityOf(page,who).title,owner=ownerName(who,title),year=String(new Date().getFullYear());
+      Object.keys(T0).forEach(function(k){T[k]=T0[k];});
+      T.icons=seal?{seal512:seal}:{};T.texts={};
+      Object.keys(T0.texts||{}).forEach(function(k){T.texts[k]=String(T0.texts[k]).split("__APP_OWNER__").join(owner).split("__APP_YEAR__").join(year);});
+      return T;});});}
+function viaFamily(kind,page,who){if(isIngenium(who,page)||!familyHere())return Promise.resolve(null);
+  return familyOf(page,who).then(function(F){return canTemplate(F,kind)?templated(F,kind,page,who):null;});}
+
 /* ---------- 5. where they are used ---------- */
 var baseAssemble=typeof kitAssemble==="function"?kitAssemble:null;
 function assemble(store,kitId,who,page){
   if(!who||!who.isNew||!baseAssemble)return baseAssemble.apply(this,arguments);
-  var T=templatesOf(page),kind=KIND[kitId];
-  return Promise.resolve(canTemplate(T,kind)?templated(T,kind,page,who):null).then(function(k){return k||ownKit(store,kitId,who,page);});}
+  var T=templatesOf(page),kind=KIND[kitId],why=null;
+  return Promise.resolve(canTemplate(T,kind)?templated(T,kind,page,who):null)
+    .then(function(k){return k||viaFamily(kind,page,who).then(null,function(e){why=e;return null;});})
+    .then(function(k){if(k)return k;
+      /* only Ingenium is shipped from its own projects: another app is never given them, even when the family's packaging
+         could not be read (Fabrica's audit: they carry Ingenium's engine) */
+      if(!isIngenium(who,page)&&familyHere())throw new Error("The kit for "+(who.title||who.name||"this app")+" could not be made from the family's packaging"+(why?" ("+String(why&&why.message||why)+")":"")+".");
+      return ownKit(store,kitId,who,page);});}
 if(baseAssemble){kitAssemble=assemble;window.kitAssemble=assemble;}
 /* the web kit of the Build page: from the templates when the app carries them */
 var baseWeb=typeof kitWebEntries==="function"?kitWebEntries:null;
 /* without templates, its icons are its own picture (they were Ingenium's seal) */
 function ownWeb(who,page){var k=baseWeb(who,page);if(!who||!who.isNew)return k;
   return loadImage(ownPicture(page,who)).then(function(img){k.entries.forEach(function(e){var m=/\/icon-(\d+)\.png$/.exec(e.name);if(m)e.data=png(draw(img,+m[1]));});return k;},function(){return k;});}
-if(baseWeb){var web=function(who,page){var T=templatesOf(page);if(canTemplate(T,"web"))return templated(T,"web",page,who).then(function(k){return k||ownWeb(who,page);});return ownWeb(who,page);};
+if(baseWeb){var web=function(who,page){var T=templatesOf(page);if(canTemplate(T,"web"))return templated(T,"web",page,who).then(function(k){return k||ownWeb(who,page);});
+    if(who&&who.isNew)return viaFamily("web",page,who).then(function(k){return k||ownWeb(who,page);},function(){return ownWeb(who,page);});
+    return ownWeb(who,page);};
   kitWebEntries=web;window.kitWebEntries=web;}
 /* the old Build page: a package from the app's own templates opens with its own READ ME FIRST */
 var lastTpl="";
@@ -358,20 +412,23 @@ if(baseTitleOf){var titleOf=function(){var held=!(document.getElementById("codeE
   kitTitleOfEditor=titleOf;window.kitTitleOfEditor=titleOf;}
 /* the old Build page: its rows name the packages the templates make */
 var baseRender=typeof shipRender==="function"?shipRender:null;
-if(baseRender){var render=function(){var r=baseRender.apply(this,arguments);try{var who=kitIdentity();if(!who.isNew)return r;var page=editorPage(),T=templatesOf(page);if(!T)return r;
+if(baseRender){var render=function(){var r=baseRender.apply(this,arguments);try{var who=kitIdentity();if(!who.isNew)return r;var page=editorPage(),T=templatesOf(page);
+    var fam=!T&&familyHere()&&!isIngenium(who,page);if(!T&&!fam)return r;
     var idt=identityOf(page,who),rows=document.querySelectorAll("#shipList .ship-row");
-    KIT_ROWS.forEach(function(d,i){var kind=KIND[d[0]],z=rows[i]&&rows[i].querySelector(".ship-zip");if(z&&canTemplate(T,kind))z.textContent=zipName(kind,idt);});}catch(e){}return r;};
+    KIT_ROWS.forEach(function(d,i){var kind=KIND[d[0]],z=rows[i]&&rows[i].querySelector(".ship-zip");if(z&&kind&&(fam||canTemplate(T,kind)))z.textContent=zipName(kind,idt);});}catch(e){}return r;};
   shipRender=render;window.shipRender=render;}
 /* Fabrica's web app card: an app with templates gets its own web package (as Fabrica's Build kits get its own projects) */
 if(window.IngShip&&typeof IngShip.webApp==="function"&&!IngShip.webApp.__r178){var baseWebApp=IngShip.webApp;
   IngShip.webApp=function(id,opt){var self=this,args=arguments;opt=opt||{};
-    return IngShip.onePage(id,{quiet:true,ref:opt.ref}).then(function(x){var T=templatesOf(x.html);if(!canTemplate(T,"web"))return baseWebApp.apply(self,args);
-      var P=opt.pkg||{};return IngRepo.info(id).then(function(info){return templated(T,"web",x.html,{title:P.title||(info&&info.name)||"",id:P.id,version:P.version,base:info&&info.slug});})
+    return IngShip.onePage(id,{quiet:true,ref:opt.ref}).then(function(x){var T=templatesOf(x.html),own=canTemplate(T,"web");
+      if(!own&&(!familyHere()||isIngenium(null,x.html)))return baseWebApp.apply(self,args);
+      var P=opt.pkg||{};return IngRepo.info(id).then(function(info){var who={isNew:true,title:P.title||(info&&info.name)||"",id:P.id,version:P.version,base:info&&info.slug,app:P.app,alias:P.alias};
+          return own?templated(T,"web",x.html,who):viaFamily("web",x.html,who);})
         .then(function(k){if(!k)return baseWebApp.apply(self,args);
           return IngRepo.setNote(id,x.commit,"webApp",{at:Date.now(),size:k.bytes.length,files:k.entries.length}).then(function(){return {bytes:k.bytes,name:k.zip,files:k.entries.length,commit:x.commit,templated:true};});});});};
   IngShip.webApp.__r178=true;}
 /* Download as an app's web row, and anything else that asks */
-function make(kind,html,who){var T=templatesOf(html);if(!canTemplate(T,kind))return Promise.resolve(null);return templated(T,kind,html,who);}
+function make(kind,html,who){var T=templatesOf(html);if(canTemplate(T,kind))return templated(T,kind,html,who);return viaFamily(kind,html,who||{});}
 
 /* ---------- 6. kits kept from before ---------- */
 /* Fabrica keeps what it made beside each version (IndexedDB fabrica_made, modules/r112.js) and its Releases save a kept file
@@ -393,9 +450,13 @@ function forgetOldKits(before){if(!before||!window.indexedDB)return Promise.reso
           if(m.kind==="kits"&&(+m.at||0)<before&&!/^Ingenium-/.test(String(m.name||""))){bytes.delete(c.key);c.delete();n++;}c.continue();};
         t.oncomplete=function(){try{d.close();}catch(e){}res(n);};t.onerror=t.onabort=function(){try{d.close();}catch(e){}res(0);};}
       catch(e){try{d.close();}catch(_){}res(0);}};});});}
-setTimeout(function(){forgetOldKits(since).catch(function(){});},1500);
+/* 7.12: and once more for the kits kept before the family's packaging first ran on this device (r178's generic kit gave another
+   app Ingenium's engine); Ingenium's own kits stay */
+var SINCE712_KEY="ing:r178:since712",since712=0;
+try{since712=+localStorage.getItem(SINCE712_KEY)||0;if(!since712){since712=Date.now();localStorage.setItem(SINCE712_KEY,String(since712));}}catch(e){since712=0;}
+setTimeout(function(){forgetOldKits(familyHere()?Math.max(since,since712):since).catch(function(){});},1500);
 
-window.IngKits={templates:templatesOf,identity:identityOf,make:make,kinds:KIND,zipName:zipName,
+window.IngKits={templates:templatesOf,identity:identityOf,make:make,kinds:KIND,zipName:zipName,family:familyOf,isIngenium:isIngenium,
   _:{map:mapOf,fill:fill,fillText:fillText,iconSource:iconSource,icons:iconsOf,source:sourceOf,entries:entriesOf,manifest:manifestOf,webify:webify,ownKit:ownKit,redrawIcon:redrawIcon,
     forgetOldKits:forgetOldKits,since:function(){return since;}}};
 
