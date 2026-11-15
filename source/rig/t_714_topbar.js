@@ -22,7 +22,7 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 240000 }); await p.waitForTimeout(700);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); });
   await p.waitForTimeout(400); await p.evaluate(() => { try { tourEnd && tourEnd(); } catch (e) {} go('home'); }); await p.waitForTimeout(600);
-  ok(await p.evaluate(() => !!document.getElementById('r301-css') && !!window.IngTopBar), 'r301 is on the page');
+  ok(await p.evaluate(() => !!document.getElementById('r301-css') && !!window.__ingParts && window.__ingParts.p301 === 'running'), 'r301 is on the page (from 7.15 it has no object of its own: nothing is joined, nothing is marked)');
   const table = [];
   for (const model of ['No model', LONG]) for (const w of WIDTHS) {
     await p.setViewportSize({ width: w, height: 800 });

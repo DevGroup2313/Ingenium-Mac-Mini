@@ -241,10 +241,10 @@ var CONF={
       ids:["guideEffortCard","cnGuide","envGuide","ghxGuide"]},
     {k:"models",t:"Models and devices",i:"yours",says:"Your models and the engines that run them, how much each device carries, and Ingenium on every device.",
       ids:["mdGuide",/^how much model/,/^ingenium as an app/]},
-    {k:"making",t:"Making and study",i:"making",says:function(){return "Blend, Folders, "+($("page-career")?"Vocatio, ":"")+"and Focus, the support that fits how you work.";},ids:["blxGuide","fdGuide","csGuide",/^focus/]},
+    {k:"making",t:"Making and study",i:"making",says:function(){return "Blend, Folders, "+($("page-career")?"Vocatio, ":"")+"and Focus, the support that fits how you work.";},ids:["blxGuide","fdGuide","csGuide",/^(focus|vesta)\b/]},  /* 7.15: Focus is Vesta (build/names.py), and its topic is found by either name */
     {k:"around",t:"Around the app",i:"around",says:function(){return "The right rail and the instruments"+(W.IngWorkshop?", and your Author Studio.":".");},ids:[/^the right rail/,/^the instruments/,"wsGuide"]}],
     words:[[/tour|what ingenium|limit/,"start"],[/chat|code|effort|ultracode|connector|environment|github/,"chatcode"],[/model|engine|device|lend/,"models"],
-      [/blend|folder|career|vocatio|focus|fabrica|build|study/,"making"],[/rail|instrument|author|workshop|setting/,"around"]]},
+      [/blend|concordia|folder|ingenia|career|vocatio|focus|vesta|fabrica|build|adamas|study/,"making"],[/rail|instrument|author|workshop|setting/,"around"]]},
   blend:{label:"Blend, in rooms",view:true,rooms:[
     {k:"new",t:"New blend",i:"fresh",says:"Make a blend in four steps: choose the models, choose how they work together, ask, then read the answers."},
     {k:"ready",t:"Ready-made",i:"ready",says:"Blends ready to use. One press sets the models and how they work together."},
@@ -270,7 +270,7 @@ var KEYS=[
   ["blxGuide","blend blending several models one answer judge"],
   ["fdGuide","folders folder apps projects bring in import claude ollama github repository readme issues"],
   ["csGuide","vocatio career studio jobs job applications application cv resume cover letter phd grant"],
-  [/^focus/,"focus support adhd autism autistic calm routines time steps"],
+  [/^(focus|vesta)\b/,"focus vesta support adhd autism autistic calm routines time steps"],
   [/^the right rail/,"rail notes notepad hourglass timer side buttons"],
   [/^the instruments/,"instruments schedae clepsydra notes timer custodia"],
   ["wsGuide","author studio workshop check errors layers fix troubleshoot rename name app name title called"],

@@ -160,7 +160,7 @@ var IC={
   book:svg('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15.5H5.5A1.5 1.5 0 0 0 4 21z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15.5h5.5A1.5 1.5 0 0 1 20 21z"/>')};
 /* each topic's mark, by its id, then by the words of its title */
 var MARKS=[["guideEffortCard","gauge"],["cnGuide","plug"],["envGuide","cloud"],["ghxGuide","branch"],["mdGuide","layers"],["blxGuide","blend"],["fdGuide","folder"],
-  ["csGuide","brief"],["wsGuide","pen"],[/^what ingenium is/,"star"],[/^honest limits/,"limits"],[/^focus/,"focus"],[/^ingenium as an app/,"devices"],
+  ["csGuide","brief"],["wsGuide","pen"],[/^what ingenium is/,"star"],[/^honest limits/,"limits"],[/^(focus|vesta)\b/,"focus"],[/^ingenium as an app/,"devices"],
   [/^how much model/,"device"],[/^the right rail/,"rail"],[/^the instruments/,"dial"],[/effort|ultracode/,"gauge"],[/connector/,"plug"],[/environment/,"cloud"],
   [/github/,"branch"],[/model|engine/,"layers"],[/blend/,"blend"],[/folder/,"folder"],[/career/,"brief"],[/author|workshop/,"pen"]];
 function markOf(c,title){var t=String(title||"").toLowerCase();for(var i=0;i<MARKS.length;i++){var m=MARKS[i][0];if(typeof m==="string"?c.id===m:m.test(t))return MARKS[i][1];}return "book";}

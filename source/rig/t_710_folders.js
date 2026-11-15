@@ -12,6 +12,7 @@
 //   5. a paper chosen stays chosen when Folders draws the folder again (a decision added)
 //   6. by night the dividers keep their depth; nothing on the page is rewritten while it is left alone; below 760 pixels none of it
 //      applies and nothing is wider than the screen; no page error
+//   0. (7.15) the page, now Ingenia, opens in divider tabs, one part showing; a tab pressed shows its part; the View key turns it compact
 //   node rig/t_710_folders.js <Ingenium page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process');
 const [URL_, OUT] = process.argv.slice(2);
@@ -39,6 +40,25 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loa
       await fc.setFiles(ZIP); await p.waitForFunction(() => IngBuildLib.load().then((L) => L.notes.length >= 144), null, { timeout: 30000 }).catch(() => {}); }
     else await p.evaluate((apps) => { apps.forEach((n) => { try { IngFolders.add ? IngFolders.add(n) : null; } catch (e) {} }); }, APPS);
     await p.waitForTimeout(1500); await p.evaluate(() => { document.querySelectorAll('.ing-toast,#ingToast').forEach((t) => t.remove()); document.scrollingElement.scrollTop = 0; });
+    // 0. (7.15) the Ingenia page, until 7.15 Folders, opens in divider tabs: one part at a time under its own tab, and a View key turns
+    //    it to the compact page and back. Her words (15 November 2026): "Instead of the Compact look ... give it the Divider tabs design
+    //    from your live preview instead ... add a button on the page that seamlessly lets me toggle between both views."
+    const tv = await p.evaluate(() => { const pg = document.getElementById('page-folders'), vis = (e) => e && e.offsetParent !== null;
+      const tabs = [...pg.querySelectorAll('.fw-hdividers .fw-div')].filter(vis), keys = [...pg.querySelectorAll('.fw-viewsw .fw-viewkey')].filter(vis);
+      return { st: IngFoldersCompact.state(), view: IngFoldersCompact.view(), tabs: tabs.map((t) => t.textContent.trim()), keys: keys.map((k) => k.textContent.trim()),
+        shown: [...pg.querySelectorAll('#fldBody>.card')].filter(vis).length, screens: +(document.scrollingElement.scrollHeight / innerHeight).toFixed(2) }; });
+    ok(tv.view === 'tabs' && tv.st.hometabs && !tv.st.home, 'the page opens in divider tabs (fw-hometabs), the view she chose', tv);
+    ok(tv.tabs.length >= 3 && tv.shown === 1, 'its parts stand under divider tabs, one part showing', tv);
+    ok(tv.keys.join('|') === 'Divider tabs|Compact', 'a View key offers Divider tabs and Compact', tv);
+    ok(tv.screens <= 2.0, 'in divider tabs the page is under two screens tall (' + tv.screens + ' screens)', tv);
+    await p.screenshot({ path: OUTA + '/0_tabs.png' });
+    const t2 = await p.evaluate(async () => { const pg = document.getElementById('page-folders'), tabs = [...pg.querySelectorAll('.fw-hdividers .fw-div')], before = IngFoldersCompact.state().homePart;
+      tabs[1].click(); await new Promise((r) => setTimeout(r, 500)); const vis = [...pg.querySelectorAll('#fldBody>.card')].filter((e) => e.offsetParent !== null);
+      return { before, after: IngFoldersCompact.state().homePart, shown: vis.length, on: tabs[1].classList.contains('fw-on') || tabs[1].getAttribute('aria-selected') === 'true' }; });
+    ok(t2.after === 1 && t2.before !== t2.after && t2.shown === 1, 'a divider tab pressed shows its own part, one at a time', t2);
+    await p.evaluate(() => { const k = [...document.querySelectorAll('#page-folders .fw-viewsw .fw-viewkey')].find((x) => x.textContent.trim() === 'Compact'); k.click(); document.scrollingElement.scrollTop = 0; }); await p.waitForTimeout(700);
+    const cv = await p.evaluate(() => ({ st: IngFoldersCompact.state(), view: IngFoldersCompact.view(), kept: localStorage.getItem('ing:r300:homeView') }));
+    ok(cv.view === 'compact' && cv.st.home && !cv.st.hometabs && cv.kept === 'compact', 'the View key turns it to the compact page, and the choice is kept', cv);
     // 1. the Folders page, compact
     const home = await p.evaluate(() => { const pg = document.getElementById('page-folders'), top = (e) => Math.round(e.getBoundingClientRect().top), vis = (e) => e.offsetParent !== null;
       const cards = [...pg.querySelectorAll('.fld-grid>.fld-card')].filter(vis), envs = [...pg.querySelectorAll('.fd-env')].filter(vis), libc = pg.querySelector('#fldBody>.fd-libcard'), how = pg.querySelector('#fldBody>.fw-how');

@@ -35,7 +35,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [], ownTitle: vis(pg.querySelector(':scope > .page-title')), ownLede: vis(pg.querySelector(':scope > .lede')),
       cv: o ? o.querySelectorAll('canvas.bd-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__diamondErr || null, state: window.IngDiamond && IngDiamond.state(),
       obj: r ? [Math.round(r.width), Math.round(r.height)] : null, inHead: r && hr ? r.right <= hr.right + 1 && r.top >= hr.top - 1 : false, hint: h ? h.querySelector('.skh-hint').textContent : '' }; });
-  ok(bd.head && bd.before && bd.on && /(Adamas|Build) · code in, a page out/.test(bd.eyebrow), 'Build (Adamas from 7.12) opens on its head, before the page\'s card, made as the other studios\' are', bd);
+  ok(bd.head && bd.before && bd.on && bd.eyebrow === 'Code in, a page out', 'Build (Adamas from 7.12) opens on its head, before the page\'s card, made as the other studios\' are; its line says only what the page is for (7.15)', bd);
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   // 7.01, her words (14 November 2026): "I also want the landscape of the Build page diamond to fill the card on both day and night mode"
@@ -75,7 +75,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     return { head: !!h, eyebrow: h ? h.querySelector('.skh-eyebrow').textContent : '', keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [],
       ownTitle: vis(pg.querySelector(':scope > .page-title')), pool: o ? o.classList.contains('fc-pool') : false, fills: r && hr ? Math.abs(r.right - hr.right) < 2 && Math.abs(r.top - hr.top) < 2 && Math.abs(r.bottom - hr.bottom) < 2 : false,
       whole: r && hr ? Math.abs(r.left - hr.left) < 2 : false, cv: o ? o.querySelectorAll('canvas.fc-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__stonesErr || null, state: window.IngStones && IngStones.state(), numerals: /[IVX]{2,}/.test(o ? o.textContent : '') }; });
-  ok(fc.head && /Focus · one step at a time/.test(fc.eyebrow) && JSON.stringify(fc.keys) === JSON.stringify(['Open Today', 'Your routines']) && !fc.ownTitle, 'Focus opens on its head: Open Today and Your routines', fc);
+  ok(fc.head && fc.eyebrow === 'One step at a time' && JSON.stringify(fc.keys) === JSON.stringify(['Open Today', 'Your routines']) && !fc.ownTitle, 'Vesta (Focus until 7.15) opens on its head: Open Today and Your routines; its line says only what the page is for', fc);
   // 7.01, her words (14 November 2026): "I want the whole card to be filled with the purple landscape design and animation"
   ok(fc.pool && fc.fills && fc.whole && fc.cv === 1 && fc.nogl === null && !fc.err, 'the pool fills the whole card, behind the words, drawn by the graphics chip', fc);
   ok(fc.state && fc.state.stones && fc.state.stones.ok && fc.state.stones.cnt === 5 && fc.state.label[0] === 'One step at a time' && fc.state.label[1] === 'Nothing planned yet' && !fc.numerals, 'with no task, five stones and "One step at a time"; no numerals', fc.state);

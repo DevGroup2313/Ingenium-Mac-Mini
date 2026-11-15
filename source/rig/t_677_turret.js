@@ -38,7 +38,7 @@ const fakeEngine = () => { window.__loads = []; Engine.load = function (m) { con
     return { part: window.__ingParts && window.__ingParts.p269, first: pg.firstElementChild === h, eyebrow: h ? h.querySelector('.tr-eyebrow').textContent : '', title: !!(w && w.querySelector(':scope > .page-title')),
       lede: !!(w && w.querySelector(':scope > .lede')), keys: [...h.querySelectorAll('.tr-keys .btn')].map(x => x.textContent), turret: !!h.querySelector('#trTurret canvas.tr-base'),
       side: (() => { const a = w.getBoundingClientRect(), t = h.querySelector('.tr-scene').getBoundingClientRect(); return t.left >= a.right - 1; })(), st: window.IngModelsTurret ? window.IngModelsTurret.state() : null }; });
-  ok(s0.part === 'running' && s0.first && s0.eyebrow === 'IngeniumModels · the turret' && s0.title && s0.lede && s0.turret && s0.side, 'the page opens on its head: the eyebrow, its own title and words, and the turret beside them', s0);
+  ok(s0.part === 'running' && s0.first && s0.eyebrow === 'The turret' && s0.title && s0.lede && s0.turret && s0.side, 'the page opens on its head: the eyebrow, its own title and words, and the turret beside them', s0);
   ok(s0.keys.join('|') === "Get one of Ingenium's models|Add a model file", 'its keys: Get one of Ingenium\'s models, and Add a model file', s0.keys);
   // her words (11 November 2026): "I want the "Open the Studio" button to be removed since it seem superfluous from the new Models page but I want the
   // button to stay purple when selected instead of just having the purple outline around the button"
@@ -73,7 +73,7 @@ const fakeEngine = () => { window.__loads = []; Engine.load = function (m) { con
   else console.log('     (sound is off on this desk, so the key sound is not heard here)');
   await p.waitForTimeout(1600);
   const s3 = await p.evaluate(T);
-  ok(s3.card.name === 'Magister is in the engine' && /^It uses about [\d.]+ of [\d.]+ GB\. Chat, Blend and Lector use it now\./.test(s3.card.says) && +s3.fill > 0 && s3.ports[2].pressed === 'true' && /in the engine: press to unload it$/.test(s3.ports[2].label) && s3.names[0] === 'Magister',
+  ok(s3.card.name === 'Magister is in the engine' && /^It uses about [\d.]+ of [\d.]+ GB\. Chat, (Blend|Concordia) and Lector use it now\./.test(s3.card.says) && +s3.fill > 0 && s3.ports[2].pressed === 'true' && /in the engine: press to unload it$/.test(s3.ports[2].label) && s3.names[0] === 'Magister',
     'loaded: the card says so with the memory it takes, the scale fills that far, the lens says it is in the engine and its name stands at the top', s3);
   await p.screenshot({ path: OUT + '/2_loaded.png' });
   // ---------------- pressed again: it unloads ----------------
