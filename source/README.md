@@ -395,6 +395,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.13 (15 November 2026): Blend becomes Concordia, Build becomes Adamas (7.12 was taken by the other session the same
+night, for every app's kits). Her words that day: "I am thinking of renaming the
+Focus, Folders, Blend and Build pages since their names seem so basic and without an identity." Her choices: "Concordia (Recommended)"
+for Blend; for Build, "I'll try Adamas for now and the Build name as backup" (her vision: "the diamond is there to signify a diamond in
+the rough beign chiseled away in code by the artist and being refined into brillance"); Focus and Folders keep their names.
+- `build/names.py` (new): the pages' names on screen in one place, 71 exact phrases (35 for Blend, 33 for Build, 3 holding both), each
+  required in the master edition (the build stops otherwise); `build_page.py` applies it to every edition after `editions.apply` and
+  `editions.strip`, so the editions' own exact edits still meet their words. The page ids, data and code keep blend and build. What is
+  new keeps its history as written. To go back to Build (her backup), take its phrases out of names.py.
+- Found by reading every on-screen text, tooltip, label and tour, help and Guide line of the 7.11 page in a browser, then every
+  occurrence in the built page (153 places; comments are already out of a release page). Left as they are, the ordinary word: Build
+  your own AI, Build kits for your devices, Build an app with the model (Code), build numbers, Build my record, Build Mac App.command.
+- Tests: `rig/t_700_heads.js` and `rig/t_62_apart.js` accept the new names; `rig/t_626_guide.js`'s version check no longer expects a
+  version beginning with 6 (it had failed on every 7.x page; the Guide's foot says "You are running Version 7.11" correctly).
 Ingenium 7.12 (15 November 2026): every app's kits are its own. Her list for Fabrica (7.05) asked that another app's kits never
 carry Ingenium's own files or logo, that each app have its own icons and no errors, and that each device's kit build in the terminal as
 well as on GitHub. Fabrica's audit of 14 November 2026 found that an app whose page carries no packaging templates of its own (every app

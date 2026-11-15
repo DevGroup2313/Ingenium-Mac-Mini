@@ -1896,6 +1896,8 @@ blob = editions.assets(ED) + blob  # 6.2: without Lector's modules, the seals' l
 out = out.replace(MARK, blob + MARK)
 out = editions.apply(out, ED)  # 6.2: the edition's own changes (editions.py)
 out = editions.strip(out, ED)  # 6.3: every edition without the code's comments (6.2: and, without Lector, nothing of it left)
+import names as _names  # 7.12: the pages' names on screen, Concordia and Adamas, in one place (names.py); What is new left as written
+out = _names.rename(out, ED)
 if ED != "master":  # 6.8.1: and stores under its own name, first of all its scripts (storage_shim.py)
     import storage_shim as _ss
     _hi = out.lower().find('<meta charset="utf-8">')

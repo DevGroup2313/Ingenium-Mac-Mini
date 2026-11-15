@@ -56,7 +56,7 @@ const isolated = g => g && g.ran && g.ls === 0 && g.compat === 'CSS1Compat' && /
       seen.cp = !!cp; seen.cpEdited = /\$\("cpOpen"\)\.onclick=function\(\)\{if\(!window\._chatPreviewHtml\)return;ingOpenApart\(/.test([...document.scripts].map(s => s.textContent).join('\n'));
       go('build'); await new Promise(r => setTimeout(r, 400)); document.getElementById('codeEditor').value = '<p>build'; document.getElementById('openPreview').click();
       window.ingOpenApart = real; return { seen, cp: seen.cp, cpEdited: seen.cpEdited }; });
-    ok(calls.seen.length === 2 + (calls.cp ? 1 : 0) && calls.seen.includes('stage.html') && calls.seen.includes('Build') && (!calls.cp || calls.seen.includes('Preview')) && calls.cpEdited,
+    ok(calls.seen.length === 2 + (calls.cp ? 1 : 0) && calls.seen.includes('stage.html') && (calls.seen.includes('Adamas') || calls.seen.includes('Build')) && (!calls.cp || calls.seen.includes('Preview')) && calls.cpEdited,
       'the stage\'s, the chat preview\'s and Build\'s own-window keys open the page apart', calls);
     const fab = await p.evaluate(() => { const t = [...document.scripts].map(s => s.textContent).join('\n'); return { apart: /ingOpenApart\(html,r\.name\)/.test(t), blobWin: /window\.open\(u,"_blank"\)/.test(t) }; });
     ok(fab.apart && !fab.blobWin, 'Fabrica\'s Run opens the app apart too, and no key opens a page from a blob: address any more', fab);

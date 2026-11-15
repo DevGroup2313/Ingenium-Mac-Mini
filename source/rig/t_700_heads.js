@@ -35,7 +35,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [], ownTitle: vis(pg.querySelector(':scope > .page-title')), ownLede: vis(pg.querySelector(':scope > .lede')),
       cv: o ? o.querySelectorAll('canvas.bd-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__diamondErr || null, state: window.IngDiamond && IngDiamond.state(),
       obj: r ? [Math.round(r.width), Math.round(r.height)] : null, inHead: r && hr ? r.right <= hr.right + 1 && r.top >= hr.top - 1 : false, hint: h ? h.querySelector('.skh-hint').textContent : '' }; });
-  ok(bd.head && bd.before && bd.on && /Build · code in, a page out/.test(bd.eyebrow), 'Build opens on its head, before the page\'s card, made as the other studios\' are', bd);
+  ok(bd.head && bd.before && bd.on && /(Adamas|Build) · code in, a page out/.test(bd.eyebrow), 'Build (Adamas from 7.12) opens on its head, before the page\'s card, made as the other studios\' are', bd);
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   // 7.01, her words (14 November 2026): "I also want the landscape of the Build page diamond to fill the card on both day and night mode"

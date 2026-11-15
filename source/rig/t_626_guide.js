@@ -91,7 +91,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       restShut: gs.slice(1).every(g => !g.classList.contains('open')), earlier: !!pop.querySelector('.gd-earlier'), focus: pop.contains(document.activeElement), run: (pop.querySelector('.gd-run') || {}).textContent || '',
       dot: k.querySelector('.gd-dot').hidden, seen: localStorage.getItem('ing.guide.seen.v1'), v0: (gs[0] && gs[0].querySelector('b') || {}).textContent }; });
   ok(P.shown && P.role === 'dialog' && P.exp === 'true' && P.groups >= 10 && P.first && P.firstItems >= 1 && P.restShut && P.earlier && P.focus, 'pressed, a card springs out: the newest version open, every earlier one a line of its own, the focus inside', P);
-  ok(/^You are running Version 6\.\d+/.test(P.run) && P.dot && P.seen === P.v0, 'its foot says which version is running, and the gold dot goes once it has been opened', P);
+  ok(/^You are running Version \d+\.\d+/.test(P.run) && P.dot && P.seen === P.v0, 'its foot says which version is running, and the gold dot goes once it has been opened', P);
   await p.screenshot({ path: OUT + '/whats_new.png' });
   const g2 = await p.evaluate(async () => { const g = document.querySelectorAll('#gdNewPop .gd-v')[2]; g.querySelector('.gd-vh').click(); await new Promise(r => setTimeout(r, 300));
     return { open: g.classList.contains('open'), exp: g.querySelector('.gd-vh').getAttribute('aria-expanded'), li: Math.round(g.querySelector('li').getBoundingClientRect().height) }; });

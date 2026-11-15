@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.13", "Blend is now called Concordia, and Build is now Adamas: the same pages, with names of their own. Concordia, for the models whose answers come into agreement, as the wheels of its movement mesh; Adamas, the diamond, for work cut from the rough and refined into brilliance. Everything in them stays as it was."],
   ["7.12", "Every build kit for an app of your own is the app's own: its name, id and icons on every device, your name in its licence, and none of Ingenium's own files. Each kit is made from the family's packaging, the projects, recipes and guides the family's apps are built with."],
   ["7.12", "The Fire tablet kit now builds on your own Mac or PC as well as on GitHub: in its project, double-click Build the APK. The Windows kit makes the program and its installer on your PC the same way. Each kit's guide says what to install first."],
   ["7.12", "A kit kept in Releases from before 7.12 is made again the next time you ask for it, so none of the old kind is ever saved again.", "fabrica"],
