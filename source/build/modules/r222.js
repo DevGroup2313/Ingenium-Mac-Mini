@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.11", "On a Windows PC, Fabrica's runs no longer fail at random: a run's record is read and written one at a time, so a job never stops halfway because the page was reading it at that moment.", "fabrica"],
   ["7.10", "Folders no longer runs on and on: your apps stand in one row, the ways of bringing in your work are six small envelopes whose instructions open in a raised sheet when you press one, and the parts below sit side by side."],
   ["7.10", "A folder you open starts near the top of the window: the drawer of your apps folds to its front (press it to see them all), and each of the folder's papers has a divider of its own, so one paper shows at a time and none pushes the others out of reach."],
   ["7.10", "In How it was built, one drawer stands open at a time and shows about eight cards; the wheel flips through the rest inside the drawer.", "master"],

@@ -126,7 +126,7 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_copy_688", "_copy_now", ("mini", "intel", "win")),
            ("app_refs_691", "# 6.91: sorted, so every start of the app gives the same order", ("mini", "intel", "win")),
            ("app_merge_692", "_disk_merge_begin", ("mini", "intel", "win")),
-           ("app_runs_708", "_runs_new", ("mini", "intel", "win"))]
+           ("app_runs_708", "_runs_new", ("mini", "intel", "win")), ("app_runs_710", "_runs_io", ("mini", "intel", "win"))]
 
 
 def desktop():

@@ -395,6 +395,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.11 (15 November 2026): Fabrica's runs on Windows no longer fail at random.
+- Found by GitHub's Windows build of 7.10 (run 43665002267), which failed its own self-test: the self-test's run ended "bad" with its
+  second job's second step still "queued" (it should be "skipped"). The engine itself answered. Cause: a run's record
+  (runs/<id>/run.json) is put in place with os.replace while the page, and the self-test, read it every 0.3 s from other threads; on
+  Windows a file another handle holds open cannot be replaced (PermissionError, "Access is denied"); the exception left the job's step
+  loop at once, its later steps unmarked, and the job ended bad. A good run on the HP laptop could fail so at random; 7.08 and 7.09's
+  Windows builds passed by timing alone.
+- `desktop/app_runs_710.py` (new; release.py's DESKTOP list, after app_runs_708.py; mark `_runs_io`): one lock around every read and
+  write of a run's record in the computer app, and a replace or a read that meets PermissionError tries again for up to two seconds
+  (a scanner such as Windows Defender can hold a new file for a moment), then raises, so a lasting fault is not hidden.
+- Tests: `rig/t_711_runs_io.py` 5/5 on the Mac and the Windows app (Windows' rule imitated on Linux: 7.10's code refused 399 and 400
+  times in 2,000 calls of a writer and four readers; with the fix none, every read whole; refused twice then put in place; refused
+  for good it raises after 2.0 s); `rig/t_708_runs.py` 32/32 on both (dulwich 0.22.8 installed for it).
+
 Ingenium 7.10 (15 November 2026): Folders without endless scrolling. Her words that day: "The Folders page and the apps pages inside of
 the Folders page are really long and I have to scroll endlessly, please fix that as you continue working on my requests"; then "I
 approve of the compact page design for the Folders page, I want you to give any other long pages inside of Ingenium the same treament
