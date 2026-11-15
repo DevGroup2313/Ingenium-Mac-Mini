@@ -395,6 +395,31 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.10 (15 November 2026): Folders without endless scrolling. Her words that day: "The Folders page and the apps pages inside of
+the Folders page are really long and I have to scroll endlessly, please fix that as you continue working on my requests"; then "I
+approve of the compact page design for the Folders page, I want you to give any other long pages inside of Ingenium the same treament
+that would significantly improve the app's visuals and accessibility design"; and on the live preview
+(https://claude.ai/artifact/4m4wnK9mduJpf7XazDLVH7, version 1, drawn from the 7.09 page's own markup and styles): "I approve of your
+recommendation for rge Folders Without Scrolling preview, please push it everywhere."
+- `modules/r300.js` (new, every edition): on the Folders page (fw-home), Your apps in one row without the "+ A folder for another app"
+  card (the head holds that key), the build library and How I work side by side, the six envelopes in one row, each one's instructions
+  in a raised sheet in the window when pressed (no film; the sheet's keys press the envelope's own keys, so Bring in the .zip opens the
+  file window); with a folder open (fw-open), the drawer of apps folded to its front (pressing it unfolds), divider tabs on the
+  folder's papers with one paper at a time (role tab and tabpanel, the arrow keys move between them), and in How it was built one drawer
+  open at a time, an open drawer capped at 372 px and flipped through with the wheel, its scroll bar hidden. The paper and drawer chosen
+  are kept for the session when r208 draws the folder again. Its marks go inside the papers, never among #fldBody's own children, which
+  r263 watches; it watches #fldBody for nodes added or taken away (r258 builds the drawers a moment after a folder is drawn), gathers one
+  moment's changes into one dressing and drops the records of its own marks; every class and attribute is written only when it changes,
+  so nothing is rewritten while the page is left alone. On a phone (r263's fd-phone, since 6.71) the envelopes stand two to a row.
+- Measured at 1440 by 900 with an invented library (six apps, 144 notes): the Folders page 2.04 screens (2.9 on 7.09); a folder of 24
+  notes, open, under two (4.8 on 7.09); the head 159 px with a folder open (480).
+- Tests: `rig/t_710_folders.js` 21/21 (new); `rig/t_708_drawer.js` 11/11 (its pull check now accepts a drawer that begins shut, as one
+  drawer stands open at a time); t_669_folders 32/32, t_665_buildlib 38/38, t_685_folders 37/37, t_680_old_webview 12/12 on a 7.09 page
+  with r300 put in (`rig/inject_modules.js`).
+- Other long pages measured on 7.09 (fresh profile, 1440 by 900), for the same treatment, each with a live preview first: the Models
+  page's rooms Ingenium's models 4.8 screens, More models 4.4, Downloads 2.9; Build 3.0; Settings and the studios' rooms to be measured
+  one at a time with invented data.
+
 Ingenium 7.09 (15 November 2026): Carpe Diem 1091 with its needle points, Lakay brought up to date again, and no edition but the master
 carries the master's own news. Her words, sent again that day: "the Lakay app has been updated to a later build, please update
 Ingenium's copy to bring it up to date"; and, asked how to go ahead with the needle fix, "New Carpe Diem build".

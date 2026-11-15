@@ -58,13 +58,13 @@ cp.execFileSync('python3', ['-I', '-c', 'import sys,json,zipfile\nnotes=json.loa
     await p.evaluate(() => { try { closeModal(); } catch (e) {} }); await p.waitForTimeout(500);
     // 4. the pull
     const pull = p.locator('#page-folders .cdw').nth(2).locator('.cdw-pull');
-    const h0 = await p.evaluate(() => document.querySelectorAll('#page-folders .cdw-box')[2].getBoundingClientRect().height);
-    await pull.click(); await p.waitForTimeout(1200);
-    const shut = await p.evaluate(() => { const d = document.querySelectorAll('#page-folders .cdw')[2]; return { open: d.getAttribute('data-open'), h: d.querySelector('.cdw-box').getBoundingClientRect().height, exp: d.querySelector('.cdw-pull').getAttribute('aria-expanded') }; });
-    ok(shut.open === '0' && shut.h < 50 && h0 > 150 && shut.exp === 'false', '4. the pull shuts the drawer', { h0, shut });
-    await pull.click(); await p.waitForTimeout(1400);
-    const opened = await p.evaluate(() => { const d = document.querySelectorAll('#page-folders .cdw')[2]; return { open: d.getAttribute('data-open'), h: d.querySelector('.cdw-box').getBoundingClientRect().height }; });
-    ok(opened.open === '1' && opened.h > 150, 'and opens it again', opened);
+    // 7.10 (r300): one drawer stands open at a time, so this drawer may begin shut; each press of the pull turns it over, either way
+    const pullLook = () => p.evaluate(() => { const ds = [...document.querySelectorAll('#page-folders .cdw')], d = ds[2]; return { open: d.getAttribute('data-open'), h: d.querySelector('.cdw-box').getBoundingClientRect().height, exp: d.querySelector('.cdw-pull').getAttribute('aria-expanded'), opened: ds.filter((x) => x.getAttribute('data-open') === '1').length, one: !!(window.IngFoldersCompact && IngFoldersCompact.state().one) }; });
+    const s0 = await pullLook(); await pull.click(); await p.waitForTimeout(1300); const s1 = await pullLook(); await pull.click(); await p.waitForTimeout(1400); const s2 = await pullLook();
+    const shut = s0.open === '1' ? s1 : s2, opened = s0.open === '1' ? s2 : s1;
+    ok(shut.open === '0' && shut.h < 50 && shut.exp === 'false', '4. the pull shuts the drawer', { s0, s1, s2 });
+    ok(opened.open === '1' && opened.h > 150 && opened.exp === 'true' && (!opened.one || opened.opened === 1), 'and opens it again (with r300, as the one drawer standing open)', { s0, s1, s2 });
+    if (s0.open !== '1') { await pull.click(); await p.waitForTimeout(1300); }
     await p.screenshot({ path: path.join(OUTA, 'drawer_day.png') });
     // 5. by night
     await p.evaluate(() => { state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(700);

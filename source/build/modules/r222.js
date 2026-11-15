@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.10", "Folders no longer runs on and on: your apps stand in one row, the ways of bringing in your work are six small envelopes whose instructions open in a raised sheet when you press one, and the parts below sit side by side."],
+  ["7.10", "A folder you open starts near the top of the window: the drawer of your apps folds to its front (press it to see them all), and each of the folder's papers has a divider of its own, so one paper shows at a time and none pushes the others out of reach."],
+  ["7.10", "In How it was built, one drawer stands open at a time and shows about eight cards; the wheel flips through the rest inside the drawer.", "master"],
   ["7.09", "Lector and your app library carry Carpe Diem 1091, its full edition, in place of 1089: the Library's Thread shows its needle points again, the gold knots on the thread beside the books' spines growing in and twinkling as they were made to. The Offline Project's Public sample is Carpe Diem 1091's too.", "master"],
   ["7.09", "Lakay is up to date: Ingenium now carries Lakay Build 17 (14 November 2026), in place of Build 14, with its Learning: a lesson for each part of the work, a guided tour that does the work in front of you, two questions to finish each lesson and a tip in every room. Its logo and its own periwinkle are as they were.", "master"],
   ["7.08", "Fabrica has a fifth room, Runs, as GitHub has Actions: the workflows of an app's .github/workflows folder, read as GitHub reads them, run here on your Mac or PC with Run it now, each job in a folder of its own, every step and its whole log kept, with the files each run made. Explain this error asks your own model, on this computer.", "fabrica"],
