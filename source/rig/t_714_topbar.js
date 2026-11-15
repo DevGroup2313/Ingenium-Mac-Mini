@@ -56,7 +56,7 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
     const gap = (a, c) => Math.round(g(c).left - g(a).right);
     const ch = getComputedStyle(document.getElementById('topChevron')), pl = getComputedStyle(document.getElementById('brandSealBtn'));
     return { chevW: g('topChevron').width, chevH: g('topChevron').height, chevR: parseFloat(ch.borderTopLeftRadius), g1: gap('topChevron', 'statusPill'), gCap: gap('statusPill', 'enginePill'),
-      gSep: gap('clockPill', 'displayBtn'), gAct: [gap('displayBtn', 'auTopKey'), gap('auTopKey', 'aboutBtn'), gap('aboutBtn', 'ingHelpKey')], plate: pl.boxShadow !== 'none' && pl.backgroundImage !== 'none',
+      gSep: gap('clockPill', 'displayBtn'), gAct: (function () { const a = ['displayBtn', 'auTopKey', 'aboutBtn', 'ingHelpKey'].filter((id) => document.getElementById(id)); const o = []; for (let i = 1; i < a.length; i++) o.push(gap(a[i - 1], a[i])); return o; })(), plate: pl.boxShadow !== 'none' && pl.backgroundImage !== 'none',
       clockLast: document.getElementById('clockPill').classList.contains('tb-seg-last'), font: getComputedStyle(document.getElementById('displayBtn')).fontSize, gapProp: getComputedStyle(document.getElementById('topTools')).columnGap };
   });
   ok(d.chevW === 28 && d.chevH === 28 && d.chevR >= 14, '1440: the hide key a round 28 px key ' + JSON.stringify([d.chevW, d.chevH, d.chevR]));
@@ -82,11 +82,13 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
   await p.evaluate(() => document.body.setAttribute('data-theme', 'day')); await p.waitForTimeout(500);
   // a phone, with the long name: Studio's pencil alone, still named Studio; the clock hidden, the model's reading closing the capsule
   await p.setViewportSize({ width: 390, height: 844 }); await p.evaluate((m) => { document.getElementById('activeModelName').textContent = m; }, LONG); await p.waitForTimeout(600);
-  const ph = await p.evaluate(() => { const s = document.getElementById('auTopKey'), q = s.getBoundingClientRect(); return { w: Math.round(q.width), h: Math.round(q.height), icons: document.documentElement.classList.contains('ing-tb-icons'),
+  // (Studio is the master edition's alone: in another edition its checks are skipped)
+  const hasStudio = await p.evaluate(() => !!document.getElementById('auTopKey'));
+  const ph = await p.evaluate(() => { const s = document.getElementById('auTopKey') || document.getElementById('aboutBtn'), q = s.getBoundingClientRect(); return { w: Math.round(q.width), h: Math.round(q.height), icons: document.documentElement.classList.contains('ing-tb-icons'),
     clockHidden: document.getElementById('clockPill').hidden, modelLast: document.getElementById('activeModelPill').classList.contains('tb-seg-last') }; });
   const studioNamed = await p.getByRole('button', { name: 'Studio', exact: false }).count();
-  ok(ph.icons && ph.w === 28 && ph.h === 28, '390: Studio shows its pencil alone, a 28 px circle ' + JSON.stringify(ph));
-  ok(studioNamed >= 1, '390: Studio still named "Studio" for a screen reader');
+  if (hasStudio) { ok(ph.icons && ph.w === 28 && ph.h === 28, '390: Studio shows its pencil alone, a 28 px circle ' + JSON.stringify(ph));
+    ok(studioNamed >= 1, '390: Studio still named "Studio" for a screen reader'); }
   ok(ph.clockHidden && ph.modelLast, '390: the clock hidden, the model\'s reading closes the capsule');
   await p.screenshot({ path: OUT + '/bar_390_name.png', clip: { x: 0, y: 0, width: 390, height: 56 } });
   for (const w of [820, 600, 430, 360]) { await p.setViewportSize({ width: w, height: 800 }); await p.waitForTimeout(450); await p.screenshot({ path: OUT + '/bar_' + w + '_name.png', clip: { x: 0, y: 0, width: w, height: 56 } }); }
