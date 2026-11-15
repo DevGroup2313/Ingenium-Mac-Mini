@@ -238,8 +238,9 @@ var NEW=[
   ["7.15", "The line above each page's title now says only what the page is for (for example: The movement of your models), no longer Ingenium and the page's name again, and it stays on one line."],
   ["7.15", "Folders is now called Ingenia, and Focus is now Vesta: the same pages, with names of their own. Ingenia, the talents and inventions of Ingenium, keeps all your apps and how they were made; Vesta kept the hearth's flame, as the page keeps your attention, one step at a time."],
   ["7.15", "Ingenia opens in divider tabs, one part at a time: Your apps, Your build library, Bring in your work and How I work. The View switch beside the tabs turns it to the compact page and back, and Ingenia remembers your choice on this device."],
-  ["7.15", "Schedae's keys are Ingenium's own: Pin, Send to Tabula, the note's menu and Delete are raised keys like every other, and New note is the purple key."],
-  ["7.15", "In Schedae, Tabula and Abacus are their own cut stones again, charcoal and green, as in the side list.", "desk"],
+  ["7.15", "Schedae's keys are Ingenium's own: Pin, the note's menu and Delete are raised keys like every other, and New note is the purple key."],
+  /* desk only: the editions without Tabula and Abacus never name them (rig/t_627_editions.js) */
+  ["7.15", "In Schedae, Send to Tabula is a raised key like every other, and Tabula and Abacus are their own cut stones again, charcoal and green, as in the side list.", "desk"],
   ["7.14", "The top bar is tidied: every key has the same height and the same round shape, evenly spaced. Where you are, the engine, the model and the clock now sit together in one raised capsule, set apart from Display, Studio, About and Help, and the INGENIUM name stands on a raised plate that lifts under the pointer."],
   ["7.14", "On a phone or in a narrow window, the seal no longer slides under the first key. When the bar is short of room, the engine's long words give way to its coloured dot first, then the keys show their signs (Studio its pencil), and a long model's name shortens with an ellipsis instead of pushing the seal aside."],
   ["7.14", "The Who answers menu, opened from the model's key, now opens whole inside the screen on a small phone and on a phone held sideways."],
