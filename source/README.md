@@ -395,8 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.09 (15 November 2026): Lakay brought up to date again, and no edition but the master carries the master's own news. Her words
-that day, sent again: "the Lakay app has been updated to a later build, please update Ingenium's copy to bring it up to date."
+Ingenium 7.09 (15 November 2026): Carpe Diem 1091 with its needle points, Lakay brought up to date again, and no edition but the master
+carries the master's own news. Her words, sent again that day: "the Lakay app has been updated to a later build, please update
+Ingenium's copy to bring it up to date"; and, asked how to go ahead with the needle fix, "New Carpe Diem build".
+- Carpe Diem 1091 (14 November 2026, 528171091; DevGroup2313/Carpe-Diem-Gift, branch claude/carpe-diem-security-build-fixes-cdaoxj,
+  commit 29ad064, `Mac project/carpe_diem.html`, 49,370,671 bytes, SHA-256 943d91f1...) replaces 1089 in `build/apps/builtin`
+  (`apps/update_builtin.py`). It was made by the session that wrote the 7.08 handoff, after it, and never carried until now: its one
+  change is the Library's Thread showing its needle points again (her words, 14 November 2026: "The needle or thread, should be the
+  visuals on the Thread tab inside of the library, its the golden thread with the needle points on the left side of the page next to
+  the books' spines."). Pass 1070's resting step judged an element drawn at no size as unseen, so a knot that grows from nothing was
+  held still at nothing; 1091 judges such an element by the place of the nearest element around it that has a size. Carpe Diem's own
+  test, `source/carpe_diem_1091/tests/t_needle.js`, run here on 15 November: 4/4 on 1091 (3 of 3 knots in view grown and moving, 6 of
+  6 twinkles shown, what cannot be seen held still, no page error), and with `--expect-bug` 2/2 on the 1089 Ingenium carried (3 knots
+  held at nothing). Pictures of the Thread by day and by night were sent to her, never committed.
+- The Offline Project's Public sample is Carpe Diem 1091's (DevGroup2313/Carpe-DIem-Demo, `index.html` at e77bbea, 12,212,116 bytes,
+  SHA-256 04221fde...), in place of 1081's (`apps/demos/make_demos.py`, then `make_cd_demo.py`: 12,171 runs of 1091 and 8,359,987
+  bytes of its own text; The Forge's demonstration came out byte for byte as before). Lector's measured record (`recipe/recipe.json`):
+  49.4 MB and 73,140 lines (1091), counted as the page counts them (`text.split("\n").length`). `rig/t_709_cd1091.js` (t_681_cd1089
+  checks 1089 and no longer applies).
+- Not done: the committee demonstration (Carpe-Diem-Offline) stays at 1090 until it is sealed again with its access code, which no
+  repository holds; Carpe Diem's iPhone and iPad repository (Offline-ios, `iphone-ipad/`) holds a build of 19 October 2026 by its
+  BUILD_INFO, and stays so until she says to bring it to 1091 (Carpe Diem's `release.py notes.json ios REPO FULL_PAGE.html`).
 - Lakay Build 17 (14 November 2026, "Learning, with a lesson for each part of the work, a guided tour that does the work in front of the
   person, two questions to finish each lesson, and a tip in every room"; the same page in Lakay-Windows, Lakay-Mac and Lakay-Apps,
   1,557,498 bytes, SHA-256 c4e2305704ea8f50...) replaces Build 14 in `build/apps/builtin` (`apps/update_builtin.py`). Its mark is

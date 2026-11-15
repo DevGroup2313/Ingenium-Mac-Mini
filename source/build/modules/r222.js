@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.09", "Lector and your app library carry Carpe Diem 1091, its full edition, in place of 1089: the Library's Thread shows its needle points again, the gold knots on the thread beside the books' spines growing in and twinkling as they were made to. The Offline Project's Public sample is Carpe Diem 1091's too.", "master"],
   ["7.09", "Lakay is up to date: Ingenium now carries Lakay Build 17 (14 November 2026), in place of Build 14, with its Learning: a lesson for each part of the work, a guided tour that does the work in front of you, two questions to finish each lesson and a tip in every room. Its logo and its own periwinkle are as they were.", "master"],
   ["7.08", "Fabrica has a fifth room, Runs, as GitHub has Actions: the workflows of an app's .github/workflows folder, read as GitHub reads them, run here on your Mac or PC with Run it now, each job in a folder of its own, every step and its whole log kept, with the files each run made. Explain this error asks your own model, on this computer.", "fabrica"],
   ["7.08", "Fabrica's Machines tab shows this computer and its tools, what each one builds and where to get what is missing. Releases now give each device its own row, and Install on this Mac or Install on this PC puts an app Fabrica made in its place, with its icon, ready to open or to uninstall.", "fabrica"],
