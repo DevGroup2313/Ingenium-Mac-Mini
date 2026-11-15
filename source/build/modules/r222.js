@@ -234,6 +234,13 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.16", "The Models page is now called Mentes, the minds: the same page, with a name of its own beside Concordia, Ingenia and Vesta."],
+  ["7.16", "Mentes opens on the turret as a toy: press any part of it, turn it by hand, or flick it and let it spin. It loads nothing, so a model is never loaded by accident; a model loads from the Load key beside it in Your models. The pale ring round the turret's plate is gone, by day and by night, and no cartridge blinks out of view while the turret spins."],
+  ["7.16", "Mentes without endless scrolling: opening a room folds the turret to a band (press the band to unfold it); Ingenium's four houses stand in one row, with one house's models on a shelf below them; More models opens in divider tabs, Downloads in a drawer, and a model's description in a raised sheet."],
+  ["7.16", "On a phone or a tablet, Adamas's diamond answers a finger's tap again, as it answers a mouse."],
+  ["7.16", "On a phone or a tablet, Lector's sheets answer a finger's tap wherever it lands.", "lector"],
+  ["7.16", "Lighter to run, with every animation kept: a page's 3D header stands still while it is scrolled out of sight and carries on where it stopped when you come back, and the turret draws half as often while only its slow sway moves, with the same motion."],
+  ["7.16", "Vocatio's compass draws half as often while only its slow sway and its rings move, with the same motion, and choosing Minimal motion now stills it at rest instead of leaving it tilted.", "career"],
   ["7.15", "The top bar is back as you had it before 7.14: the seal and the name INGENIUM stand apart again, with no plate behind them, and every key has its old size, face and raised, animated depth. It is only organised: the keys evenly spaced, the readings a little apart from the actions, and the hide key round and as tall as its neighbours."],
   ["7.15", "The line above each page's title now says only what the page is for (for example: The movement of your models), no longer Ingenium and the page's name again, and it stays on one line."],
   ["7.15", "Folders is now called Ingenia, and Focus is now Vesta: the same pages, with names of their own. Ingenia, the talents and inventions of Ingenium, keeps all your apps and how they were made; Vesta kept the hearth's flame, as the page keeps your attention, one step at a time."],

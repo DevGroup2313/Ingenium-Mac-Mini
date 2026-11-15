@@ -281,6 +281,12 @@ body[data-theme="night"] #page-lector .lf-cast{background:radial-gradient(closes
 #page-lector .lf-stamp{position:absolute;left:0;top:0;width:520px;height:460px;transform-style:preserve-3d;transform-origin:262px 380px}
 #page-lector .lf-twin{pointer-events:none}
 #page-lector .lf-twin .lf-seal{pointer-events:auto}
+/* 7.16 (her words: "All of the 3D headers of Ingenium's pages need to be clickable and animated when I press on them on my phone or Fire
+   tablet"): the stack's 3D holders are flat, unseen boxes at its depth, and a sheet set a little behind that depth was covered by them, so a
+   press there met nothing. A mouse's hover lifts the sheet in front first; a finger has no hover. The holders now let a press through to
+   the sheets and the seal, wherever a finger lands */
+#page-lector .lf-tilt,#page-lector .lf-sway,#page-lector .lf-stamp{pointer-events:none}
+#page-lector .lf-tilt button.lf-card,#page-lector .lf-tilt .lf-seal{pointer-events:auto}
 .skh.is-away .lf-sway{animation-play-state:paused}
 /* a sheet: a key that is a document, standing in the fan with its own thickness */
 #page-lector button.lf-card{position:absolute;left:152px;top:58px;width:216px;height:330px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
@@ -1306,9 +1312,9 @@ function vcKeySend(st,type,e){var k=st.key&&st.key.querySelector(".r175-seal");i
 function vcRipple(st,h){if(h.gx==null||still())return;var r=mk("i","skv-ripple");r.style.left=(h.gx-103).toFixed(1)+"px";r.style.top=(h.gy-75).toFixed(1)+"px";st.rip.appendChild(r);setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r);},1000);}
 /* the motion: one clock. The sway is the logo's (it turns a little to one side and back, and never stops), the lean follows the pointer
    on a spring and the sway quietens under it; minimal motion and the system's reduced motion leave the instrument still */
-function vcMove(st){if(st.mraf)return;if(still()){st.tilt.style.transform="";return;}
+function vcMove(st){if(st.mraf===-1&&st.idle){clearTimeout(st.idle);st.idle=0;st.mraf=0;}if(st.mraf)return;if(still()){st.tilt.style.transform="";return;}
   st.mraf=requestAnimationFrame(function fr(ts){st.mraf=0;if(!st.t0)st.t0=ts;var dt=st.lt?Math.min(.034,(ts-st.lt)/1000):.016;st.lt=ts;
-    if(still()||!st.tilt.isConnected){st.lt=0;return;}
+    if(still()||!st.tilt.isConnected){st.lt=0;if(still())st.tilt.style.transform="";return;}   /* 7.16: Minimal motion chosen while the compass moves: it stands still at rest, not tilted where it stopped */
     var hd=st.tilt.offsetParent===null||(st.head&&st.head.classList.contains("is-away"));if(hd){st.lt=0;clearTimeout(st.poll);st.poll=setTimeout(function(){vcMove(st);},450);return;}
     st.tH+=dt;st.h+=((st.hold?1:0)-st.h)*Math.min(1,dt*4);var w=st.tH*2*Math.PI/10,iy=11*Math.sin(w),ix=-4*Math.sin(w);
     var ty=st.hold?st.hx*28:0,tx=st.hold?-st.hy*20:0;st.vy+=(62*(ty-st.ly)-11*st.vy)*dt;st.ly+=st.vy*dt;st.vx+=(62*(tx-st.lx)-11*st.vx)*dt;st.lx+=st.vx*dt;
@@ -1323,7 +1329,14 @@ function vcMove(st){if(st.mraf)return;if(still()){st.tilt.style.transform="";ret
       else{var e=((tgt-Ly.a)%Ly.p+Ly.p*1.5)%Ly.p-Ly.p/2;Ly.v=Ly.s+Math.max(-6,Math.min(6,.9*e));}
       Ly.a+=Ly.v*dt;}
     vcLayers(st,L);
-    st.mraf=requestAnimationFrame(fr);});}
+    /* 7.16 (her words, 15 November 2026: "Ingenium is possibly overheating my phone ... I want my 3D graphics and animations to be preserved
+       and run smoothly"): at rest only the sway (about 7 degrees a second at most) and the rings' own turning (4 to 12) move, and they are
+       drawn thirty times a second instead of every frame the screen offers: the same motion for half the work; a pointer, a press or a
+       swing is drawn at the full rate at once */
+    var rest=!st.hold&&st.h<.01&&!st.press&&!sw&&!shim&&Math.abs(st.kv)<.4&&Math.abs(st.kz)<.05&&Math.abs(st.vx)<.05&&Math.abs(st.vy)<.05;
+    for(var j=0;rest&&j<st.H.length;j++)if(Math.abs(st.H[j].v-st.H[j].s)>1)rest=false;
+    if(rest){st.mraf=-1;st.idle=setTimeout(function(){st.idle=0;if(st.mraf===-1)st.mraf=requestAnimationFrame(fr);},24);}
+    else st.mraf=requestAnimationFrame(fr);});}
 /* the layers turned, their shadows kept below them on the right, their facets relit when they have turned a degree or the light has moved */
 function vcLayers(st,L){var R=st.rose;var d=st.dial;if(d)d.style.transform="translateZ(33px) rotate("+st.H[0].a.toFixed(2)+"deg)";if(!R)return;
   var rl=R.rings&&R.rings.__rel;if(rl){var A0=st.H[0].a;if(rl.a===null||Math.abs(A0-rl.a)>1.2){rl.a=A0;var t0=-A0*Math.PI/180,c0=Math.cos(t0),s0=Math.sin(t0),

@@ -139,6 +139,10 @@ function setText(e,s){if(e&&e.textContent!==s)e.textContent=s;}
 function setAttr(e,a,v){if(e&&e.getAttribute(a)!==v)e.setAttribute(a,v);}
 function night(){try{return D.body.getAttribute("data-theme")==="night";}catch(e){return false;}}
 function still(){var m="calm";try{m=D.body.getAttribute("data-motion")||"calm";}catch(e){}try{if(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)m="minimal";}catch(e){}return m==="minimal";}
+/* 7.16: the turret a toy (modules/r304.js, the design she approved: "I don't want the cartridges to do anything when I click on them ... The
+   loading of the models and everything else should happen elsewhere"). Once the toy stands in the head, this turret's own drawing rests,
+   hidden and undrawn; the rooms' cartridges are drawn as the toy's lenses are and load nothing; Your models' Load key loads (r267). */
+function toyOn(){try{return !!(W.IngTurretToy&&page&&page.classList.contains("tq-on"));}catch(e){return false;}}
 
 /* ---------- the page's own engine and models ---------- */
 function eng(){try{return typeof Engine!=="undefined"&&Engine?Engine:null;}catch(e){return null;}}
@@ -320,7 +324,9 @@ function rimLayerP(px,kind){var nt=night(),key="lP"+px+kind+(nt?1:0);if(MC[key])
     put(o,j,col,Math.min(1,Math.max(0,R+.5-r)));}
   x.putImageData(im,0,0);return keep(key,cv);}
 /* a lens (kind "lens"), the empty port ("empty") or a cap on an unused port ("cap") */
-function drawLens(cv,S,col,tx,ty,kind){var dpr=dprOf(),px=Math.round(S*dpr);if(cv.width!==px){cv.width=px;cv.height=px;}cv.style.width=S+"px";cv.style.height=S+"px";
+function drawLens(cv,S,col,tx,ty,kind){if(kind!=="empty"&&toyOn()&&W.IngTurretToy.cartridge){var tk=[col,S,night()?1:0,W.devicePixelRatio||1].join("|");
+    if(cv.__tq!==tk){cv.__tq=tk;try{W.IngTurretToy.cartridge(cv,"sun",night(),col,S);}catch(e){cv.__tq="";}}return;}
+var dpr=dprOf(),px=Math.round(S*dpr);if(cv.width!==px){cv.width=px;cv.height=px;}cv.style.width=S+"px";cv.style.height=S+"px";
   var g=cv.getContext("2d");if(!g)return;g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,S,S);var c=S/2,R=S/2-2,Q=PAL(),N=90,i;
   if(finish()){g.setTransform(1,0,0,1,0,0);g.drawImage(finish()==="purple"?rimLayerP(px,kind):rimLayer(px,kind),0,0);g.setTransform(dpr,0,0,dpr,0,0);if(kind==="cap"||kind==="empty")return;
     var T0=tones(col);g.strokeStyle=rgba(T0[2],.95);g.lineWidth=R*.03;g.beginPath();g.arc(c,c,R*.76,0,TAU);g.stroke();
@@ -483,7 +489,12 @@ function onStatus(s){NOTE=null;ASK=null;var e=eng();
   if(on)schedule();}
 
 /* ---------- what the card says ---------- */
-function card(){var e=eng(),s=st(),ld=byId(loadedId()),lg=byId(loadingId()),A=usable();
+function card(){var c=card0();if(!toyOn())return c;var s=st();
+  if(!models().length)return {name:c.name,says:"Get one of Ingenium's models, or add a model file you already have. Then load it from Your models below.",pc:0};
+  if(s==="ready"){var ld=byId(loadedId()),n=need(ld),A=usable();return {name:c.name,says:(n&&A?"It uses about "+fmtGB(n)+" of "+fmtGB(A)+" GB. ":"")+"Chat, Blend and Lector use it now. Its Unload key in Your models below takes it out.",pc:100};}
+  if(c.name==="Nothing in the engine")return {name:c.name,says:"Load a model from Your models below. It is then ready for Chat, Blend and Lector.",pc:0};
+  return c;}
+function card0(){var e=eng(),s=st(),ld=byId(loadedId()),lg=byId(loadingId()),A=usable();
   if(!models().length)return {name:"No model yet",says:"Get one of Ingenium's models, or add a model file you already have. Then press its lens to load it.",pc:0};
   if(s==="loading")return {name:"Loading "+(lg?nm(lg):"a model"),says:"Reading it into memory · "+Math.round(prog()*100)+"%",pc:Math.round(prog()*100)};
   if(s==="busy")return {name:(ld?nm(ld):"The model")+" is writing",says:"It is answering now. Let it finish, or stop it.",pc:100,acts:[["Stop",function(){try{if(e)e.abort();}catch(x){}}]]};
@@ -495,14 +506,15 @@ function labels(){var ld=loadedId(),lm=byId(ld);PORTS.forEach(function(p){if(p.k
   var inE=!!(p.m&&p.m.id===ld),z=size(p.m);setAttr(el,"aria-pressed",inE?"true":"false");
   setAttr(el,"aria-label",inE?nm(p.m)+", in the engine: press to unload it":nm(p.m)+(z?", "+z:"")+": press to load it into the engine");});}
 function schedule(){if(RQ)return;try{RQ=requestAnimationFrame(function(){RQ=0;paint();});}catch(e){RQ=0;paint();}}
-function paint(){if(!on||!head)return;var s=sig();if(s!==SIG){SIG=s;rebuild();}
-  var t=target();if(t!==AT)turnTo(t,false);
+function paint(){if(!on||!head)return;var s=sig(),toy=toyOn();if(s!==SIG){SIG=s;if(!toy)rebuild();}
+  if(!toy){var t=target();if(t!==AT)turnTo(t,false);}
   var c=NOTE||card();CUR=c;setText(nowName,c.name);setText(nowSays,c.says||"");var w=Math.max(0,Math.min(100,c.pc||0))+"%";if(bar.style.width!==w)bar.style.width=w;
   var ak=(c.acts||[]).map(function(a){return a[0];}).join("\u0001");
   if(ak!==ACTS){ACTS=ak;while(acts.firstChild)acts.removeChild(acts.firstChild);
     (c.acts||[]).forEach(function(a,ix){var b=mk("button","btn small"+(ix===0?" primary":""),a[0]);b.type="button";
       b.addEventListener("click",function(ev){ev.preventDefault();var x=CUR&&CUR.acts&&CUR.acts[ix];if(x)x[1]();});acts.appendChild(b);});}
-  labels();drawBase();if(!ARMQ&&page&&page.__tmk)ARMQ=requestAnimationFrame(armRooms);}
+  if(!toy){labels();drawBase();}if(!ARMQ&&page&&page.__tmk)ARMQ=requestAnimationFrame(armRooms);
+  try{var hk=W.IngModelsTurret&&W.IngModelsTurret.onPaint;if(typeof hk==="function")hk();}catch(x){}}
 
 /* ---------- the head, mounted on the page ---------- */
 function build(){if(head)return;
@@ -553,7 +565,7 @@ function boot(){if(booted)return;page=$("page-models");var e=eng();if(!page||!e|
   var og=W.go;if(typeof og==="function"&&!og.__r269){var g=function(p){var r=og.apply(this,arguments);try{if(p==="models")mount();}catch(x){}return r;};
     try{Object.keys(og).forEach(function(k){g[k]=og[k];});}catch(x){}g.__r269=1;W.go=g;}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
-W.IngModelsTurret={state:function(){return {on:on,ports:PORTS.map(function(p){return {i:p.i,kind:p.kind,id:p.m?p.m.id:null,name:p.m?nm(p.m):"",pressed:p.el.getAttribute("aria-pressed"),label:p.el.getAttribute("aria-label")};}),
+W.IngModelsTurret={chosen:function(){try{return chosen().map(function(m){return {id:m.id,name:nm(m),color:m.color||"#6a3fb5"};});}catch(e){return [];}},state:function(){return {on:on,ports:PORTS.map(function(p){return {i:p.i,kind:p.kind,id:p.m?p.m.id:null,name:p.m?nm(p.m):"",pressed:p.el.getAttribute("aria-pressed"),label:p.el.getAttribute("aria-label")};}),
     names:NAMES.map(function(t){return t.textContent;}),count:P,turn:TURN,at:AT,target:target(),card:{name:nowName?nowName.textContent:"",says:nowSays?nowSays.textContent:"",acts:acts?[].slice.call(acts.querySelectorAll("button")).map(function(b){return b.textContent;}):[]},
     fill:base?base.getAttribute("data-fill"):null,gb:base?base.getAttribute("data-gb"):null,stack:!!(page&&page.classList.contains("tr-stack")),phone:!!(page&&page.classList.contains("tr-phone")),
     k:page?page.style.getPropertyValue("--tr-k"):"",night:night()};},
@@ -571,8 +583,9 @@ function arm(el,id,col,name,house){var cv=el.querySelector("canvas");if(!cv)retu
   if(el.getAttribute("data-model")!==id)el.setAttribute("data-model",id);if(el.getAttribute("data-col")!==col)el.setAttribute("data-col",col);if(house&&el.getAttribute("data-house")!==house)el.setAttribute("data-house",house);
   if(!el.classList.contains("tm-key")){el.classList.add("tm-key");el.setAttribute("role","button");el.setAttribute("tabindex","0");el.removeAttribute("aria-hidden");}
   var lab=!id?name+": not on this device yet; press to find its Install key":(id===loadedId()?name+", in the engine: press to unload it":name+": press to load it into the engine");
+  if(toyOn())lab=!id?name+": not on this device yet":(id===loadedId()?name+", in the engine":name);
   if(el.getAttribute("aria-label")!==lab)el.setAttribute("aria-label",lab);}
-function pressRoom(el){var id=el.getAttribute("data-model");
+function pressRoom(el){if(toyOn())return;var id=el.getAttribute("data-model");
   if(!id){/* not on this device yet: its own key gets it, so nothing large starts unasked */var t=el.closest(".lu-tile"),k=t&&(t.querySelector(".btn.primary")||t.querySelector(".btn"));
     if(k){try{k.focus({preventScroll:true});}catch(e){}}
     try{ingToast((el.getAttribute("aria-label")||"").split(":")[0]+" is not on this device yet. Its key below gets it.");}catch(e){}return;}

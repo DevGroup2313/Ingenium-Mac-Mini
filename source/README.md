@@ -395,6 +395,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.16 (15 November 2026): the turret as a toy and the compact Models page (her approved design), Mentes, a finger in the
+heads, lighter at rest. Her words that day, sending version 15 of the turret's live preview as "the approved turret redesign": "remove
+the white outline that is around the big circle of the turret's surface, it is detracting from the overall look of the 3D design
+especially on Night mode", then "Please make the edits that I requested and commit and push the approved design."; "The Models page has
+been renamed to Mentes"; "The diamon and the overall 3D display of the Adamas page is not clickable on my iphone ... All of the 3D headers
+of Ingenium's pages need to be clickable and animated when I press on them on my phone or Fire tablet"; and "Ingenium is possibly
+overheating my phone ... I want my 3D graphics and animations to be preserved and run smoothly as well".
+- `build/modules/r304.js` (new, every edition): IngTurretToy, version 15 of the preview without the pale ring the plate's face drew at its
+  edge (read from its pixels: by day 1.33 times as bright as the face inside it, by night 2.29; now 1.03, the grain), standing in r269's
+  head in place of the turret's drawing; it loads nothing. The compact layer of the same preview on the page's own markup (a room opened
+  folds the head to a band; the four houses in a row, a house's models on one shelf, its keys passing each press to the row the page drew;
+  More models in divider tabs; Downloads in a drawer; sheets in the window), put back after every redrawing of the lists; margins in place
+  of gap in flex rows (Chrome 83). The toy draws only on screen, at thirty frames a second while only its sway moves; on a touch screen a
+  finger moving up or down scrolls past it (touch-action pan-y).
+  Her words the same evening: "the purple catridge disappears or rather seems to glitch in and out of view from the turret when I click
+  to spin it": each cartridge's floor, ball and ring stood 0.4 and 0.6 px apart in 3D inside the turning plate, which Safari's engine sorts
+  by depth at every frame; each cartridge is drawn flat now (transform-style flat on .tq-lens), in the page's order, the same picture
+  (still, by night no pixel differs by more than 22 of 255, by day 28 of 846,400 by up to 34); Chrome showed every ball in every frame of
+  310 recorded while spinning, before and after. Safari's engine is not on this machine.
+- `build/modules/r269.js`: with the toy in place it draws nothing of its own turret, draws the rooms' cartridges as the toy's lenses (once
+  for their colour, size and theme), makes them load nothing, says so to a screen reader, tells the toy after each paint
+  (IngModelsTurret.onPaint, IngModelsTurret.chosen), and its card says a model loads from Your models.
+- `build/names.py`: the Models page becomes Mentes (her choice): 33 exact phrases, the tour's chapter, the tables keyed by it
+  (XLINE, the teasers, insertAfterChap, lastOf) and the help's name included; ordinary uses stay (Models and AI, Models and devices, Models
+  kept for a stronger computer, the catalogue's group label, Who answers' list, Models on this device, the papers' titles).
+- A finger in the heads (rig/t_716_touch_heads.js, a phone's screen, a finger's taps against a mouse's presses on 7.15): Adamas answered a
+  finger in 1 of 5 places against a mouse's 5 (r292: whether a press was on the stone was read from the hover a mouse leaves; a finger's
+  press is placed where it lands now: 5 of 5); Lector's sheets 1 of 5 against 3 (r290: the stack's 3D holders, flat boxes at its depth,
+  covered sheets set behind it until a hover lifted them; they let a press through now: 4 of 5). The other heads answer a finger as they
+  answer a mouse. Safari's engine (the iPhone's) is not on this machine.
+- Lighter at rest (rig/t_716_rest.js: a phone's screen at three pixels to the point, the processor slowed four times):
+  `build/modules/r305.js` (new) holds a head's endless animations while it is out of sight and lets them go on where they stood (Home
+  scrolled to its foot: 121 running animations, now 20; Concordia 22, now 12; Vocatio 22, now 12); r290: Vocatio's compass draws thirty
+  frames a second while only its sway and rings move (32 frames a second asked for at rest, now 19 under the slowed processor), and
+  Minimal motion stills it at rest (it stayed tilted, also on 7.15). Found, not changed: the seal's turning parts and Home's orbs are
+  animated on SVG shapes, which keeps the main thread drawing every frame (on Home 30 ms a second of style and 19 of layers at its foot).
+- r144: the help's Models topic says where a model loads; r222: the 7.16 news.
+
 Ingenium 7.15 (15 November 2026): the top bar as before 7.14, the headers said once, Ingenia and Vesta, Ingenia in divider tabs,
 Schedae's keys. Her words that day, on 7.14: "I hate the conneted raised bar that holds Ingenium's engine button logo and the Ingenium
 title ... I dislike it and want it removed and the old separated look of the engine button logo and the title. As far as the top bar

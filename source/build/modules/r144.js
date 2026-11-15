@@ -481,6 +481,7 @@ var PG={
     what:"Models holds the models that write the answers: Ingenium's own, in four houses, and any you bring.",
     plain:"A model is one large file. Bigger ones know more but need more memory; the page says which suit this device.",
     dos:[["Get one of Ingenium's models","Choose a size, then get it.","#lineupGrid"],
+      ["Load a model","Press Load beside it in Your models. The turret at the top is a toy: play with it; it loads nothing.","#modelList"],
       ["Bring your own","Drop a .gguf file on the page, or press to choose one.","#dropzone"],
       ["Check a model's health","Compare each listed model's file size with its listing, and see how fast it ran here.","#healthBox"],
       ["Build your own AI","A model with its own instructions and name.","#aiCard"]],

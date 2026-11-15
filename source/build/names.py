@@ -23,6 +23,10 @@ C, A = "Concordia", "Adamas"   # Blend, Build
 # Vesta, please keep Ancora as a backup" (focus is Latin for hearth; Vesta kept the hearth's flame that must never go out). To go back,
 # or to Ancora, change I or V below (or take their phrases out of PHRASES).
 I, V = "Ingenia", "Vesta"      # Folders, Focus
+# 7.16: the Models page. Asked on 15 November 2026, with Minerva recommended beside Mentes, Musae and Machina, her answer: "Mentes" (the
+# minds: the models that think and answer in Ingenium); then, on 15 November 2026: "The Models page has been renamed to Mentes, it was
+# supposed to ship with the last session that got interrupted." To go back, change N below (or take its phrases out of PHRASES).
+N = "Mentes"                   # Models
 
 # (the exact phrase in the built page, the phrase on screen now); grouped by the page they name
 _BLEND = [
@@ -168,6 +172,44 @@ _VESTA = [
     ('[\'.nav-btn[data-page="focus"]\',"Focus",', '[\'.nav-btn[data-page="focus"]\',"%s",'),
     ('"and Focus, the support that fits how you work."', '"and %s, the support that fits how you work."'),
 ]
+_MENTES = [
+    # every phrase met after the renames above (so "Home, Chat, Models, Vesta" with Vesta in it); ordinary uses stay: Models and AI,
+    # Models and devices, Models kept for a stronger computer, the catalogue's group label Models, Who answers' list label, Models on
+    # this device, Models and engine, and every sentence about models in general (and the titles of the papers the Guide cites)
+    ('</svg>Models</button>', '</svg>%s</button>'),                                   # the side list (base page)
+    ('<h1 class="page-title">Models</h1>', '<h1 class="page-title">%s</h1>'),         # its title
+    ('tr-head tu-head");head.setAttribute("aria-label","Models");', 'tr-head tu-head");head.setAttribute("aria-label","%s");'),   # its head (r269)
+    ('models:{label:"Models, in rooms",', 'models:{label:"%s, in rooms",'),           # its rooms (r173)
+    ('Tap to open Models.', 'Tap to open %s.'),                                       # the top bar's engine and model keys
+    ('Press it to open Models.', 'Press it to open %s.'),
+    ('btn("Relink on Models",', 'btn("Relink on %s",'),
+    ('"bk-key sm","Open Models")', '"bk-key sm","Open %s")'),
+    ('btn("Open Models","primary",', 'btn("Open %s","primary",'),
+    ('Models:"Drop any .gguf file', '%s:"Drop any .gguf file'),                       # the tour's extra lines, keyed by its chapters
+    ('chap:"Models"', 'chap:"%s"'),                                                   # the tour: its chapter, and the tables keyed by it
+    ('insertAfterChap("Models",', 'insertAfterChap("%s",'),
+    ('lastOf("Models")', 'lastOf("%s")'),
+    ('"Models":"The models are the minds behind the answers', '"%s":"The models are the minds behind the answers'),
+    ('"Models":"The four houses of models', '"%s":"The four houses of models'),
+    ('You have seen every room: Home, Chat, Models, Vesta,', 'You have seen every room: Home, Chat, %s, Vesta,'),   # after Focus's rename
+    ('[\'.nav-btn[data-page="models"]\',"Models",', '[\'.nav-btn[data-page="models"]\',"%s",'),
+    ('models:{name:"Models",tour:["Models"],', 'models:{name:"%s",tour:["%s"],'),     # the Guide and help
+    ('what:"Models holds the models', 'what:"%s holds the models'),
+    ('card("mdGuide","Models: newer ones, and two engines",', 'card("mdGuide","%s: newer ones, and two engines",'),
+    ('the Models page', 'the %s page'),                                              # every sentence that names it
+    ('The Models page', 'The %s page'),
+    ('(Models page)', '(%s page)'),
+    ('(Models, Magister)', '(%s, Magister)'),
+    ('(Models, or the model key beside the chat', '(%s, or the model key beside the chat'),
+    ('(Models, or the model key at the top)', '(%s, or the model key at the top)'),
+    ('Models, Health, has more.', '%s, Health, has more.'),
+    ('. Models, Health, has every reply.', '. %s, Health, has every reply.'),
+    ('Models, Your AIs holds it.', '%s, Your AIs holds it.'),
+    ('fetch the models again in Models: Restore', 'fetch the models again in %s: Restore'),
+    ('Models suggests those that fit.', '%s suggests those that fit.'),
+    ('After restoring, fetch them in Models.', 'After restoring, fetch them in %s.'),
+    ('To have a model write them, choose one in Models.', 'To have a model write them, choose one in %s.'),
+]
 # both names in one phrase
 _BOTH = [
     ('"Build, Blend, ', '"%s, %s, '),                  # the tour's teasers and closers (A, C)
@@ -176,7 +218,8 @@ _BOTH = [
 ]
 # what every edition holds: the side list and the titles
 CORE = {'</svg>Blend</button>', '<h1 class="page-title">Blend</h1>', '</svg>Build</button>', '<h1 class="page-title">Build</h1>',
-        '<h1 class="page-title">Folders</h1>', 'b.title="Folders";', '<h1 class="page-title">Focus</h1>', 'fill="currentColor"/></svg>Focus</button>'}
+        '<h1 class="page-title">Folders</h1>', 'b.title="Folders";', '<h1 class="page-title">Focus</h1>', 'fill="currentColor"/></svg>Focus</button>',
+        '</svg>Models</button>', '<h1 class="page-title">Models</h1>'}
 
 
 def phrases():
@@ -186,6 +229,8 @@ def phrases():
     out.append((_BOTH[2][0], _BOTH[2][1] % (C, A)))
     # 7.15: after Blend's and Build's, since some of their phrases are met again here with the new names in them
     out += [(o, n.replace("%s", I)) for o, n in _INGENIA] + [(o, n.replace("%s", V)) for o, n in _VESTA]
+    # 7.16: Mentes last, since some of its phrases are met with the names above in them
+    out += [(o, n.replace("%s", N)) for o, n in _MENTES]
     return out
 
 
