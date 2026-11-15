@@ -10,7 +10,10 @@
       of the notch and the home bar and under the top bar, and scroll inside themselves when they are taller.
    3. The row of pages under the top bar scrolls sideways on a phone: a soft fade at its edge says there is more, and the
       page that is open is always brought into view.
-   And the status list, a menu, names each of its keys as one (axe-core found its time report key a plain button there). */
+   And the status list, a menu, names each of its keys as one (axe-core found its time report key a plain button there).
+   7.14 (15 November 2026, with r301, the top bar tidied): a step between the seal and the signs, the engine's words first
+   (ing-tb-eng); the bar's right margin counts as the edge; a bar whose keys wrap counts as short of room; and Who answers, the
+   model key's menu, is fitted inside the window and its safe areas like the other panels. */
 
 /* the thought cloud is centred by its own width: it keeps clear of the notch when the phone is held sideways */
 html body .tc-cloud{max-width:calc(100vw - var(--sal,0px) - var(--sar,0px) - 16px) !important}
@@ -60,12 +63,21 @@ function barBottom(){var t=D.querySelector(".topbar");if(!t||!shown(t))return 0;
 /* ---------- 1. the top bar ---------- */
 function topFit(){try{
   var bar=D.querySelector(".topbar"),tools=$("topTools"),wm=$("brandName"),nm=$("activeModelName");if(!bar)return;
-  root.classList.remove("ing-tb-seal","ing-tb-icons","ing-tb-dot");
+  root.classList.remove("ing-tb-seal","ing-tb-eng","ing-tb-icons","ing-tb-dot");
   var narrow=(window.innerWidth||0)<=760,edge=(window.innerWidth||0)-safe().r-2;
-  function over(){return bar.scrollWidth>bar.clientWidth+1||(tools&&tools.getBoundingClientRect().right>edge);}
+  /* 7.14: the bar's own right margin counts as part of the edge, so the keys never run into it; and since 7.14 (r301) the seal
+     never shrinks to make room, so a bar short of room is seen here and takes the next step (until 7.13 the seal was squeezed
+     under the first key instead: on a 390 pixel phone with a model's name, 7 pixels off the edge and 9 under the key) */
+  function over(){var e2=edge;try{var br=bar.getBoundingClientRect();e2=Math.min(edge,br.right-(parseFloat(getComputedStyle(bar).paddingRight)||0)+1);}catch(x){}
+    return bar.scrollWidth>bar.clientWidth+1||(tools&&tools.getBoundingClientRect().right>e2)||rows()>1;}
+  /* 7.14: a bar whose keys wrap (a touch phone under 360 pixels) is short of room too: the steps come first, the second row last */
+  function rows(){if(!tools)return 1;var t=[];[].forEach.call(tools.children,function(e){var r=e.getBoundingClientRect();if(!(r.width>0&&r.height>0))return;
+    var m=r.top+r.height/2;if(!t.some(function(x){return Math.abs(x-m)<6;}))t.push(m);});return t.length||1;}
   /* the name is cut (a phone upright, or held sideways with the keys' words showing), or the bar is wider than the window:
      the seal alone */
   if((wm&&shown(wm)&&wm.scrollWidth>wm.clientWidth+1)||over())root.classList.add("ing-tb-seal");
+  /* 7.14: still too wide: the engine's long words give way to its coloured dot first (r301), so the other keys keep theirs */
+  if(over())root.classList.add("ing-tb-eng");
   /* still too wide (a phone held sideways shows the keys' words): the keys show their signs only */
   if(over())root.classList.add("ing-tb-icons");
   /* the model's name only when it can be read whole, or nearly (a long name ends in an ellipsis), and the keys still fit */
@@ -73,7 +85,9 @@ function topFit(){try{
 }catch(e){}}
 
 /* ---------- 2. panels inside the window and its safe areas ---------- */
-var PANELS=".pres-menu,#displayPanel,#ihPanel,#schedaePanel,.park-pop,#tourMenu,.ctx-panel,#remPanel,#bellPanel";
+/* 7.14: and Who answers (r244), the menu of the model's key, which ran past the foot of a small phone and into the notch of a
+   phone held sideways */
+var PANELS=".pres-menu,#displayPanel,#ihPanel,#schedaePanel,.park-pop,#tourMenu,.ctx-panel,#remPanel,#bellPanel,#waPop";
 /* what this part wrote on a panel is undone before it measures again, and the panel's own values (the status list is placed
    under its key by the page) come back, so a second look gives the same answer and the panel never jumps; a value the page
    wrote since is the page's and stays */

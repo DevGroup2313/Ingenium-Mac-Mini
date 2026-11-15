@@ -395,6 +395,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.14 (15 November 2026): the top bar, tidied. Her words that day: "I need you to neaten and tidy up the top bar and its
+buttons, it might slightly" (the message ended there). On the live preview (https://claude.ai/artifact/Ewwa5ypsZWVGAkYDm5mYd4,
+version 1), which recommended one capsule for the readings, 28 pixel keys and the INGENIUM plate raised: "I approve of your
+recommendations, please push it everywhere and continue working on my requests."
+- Measured on 7.13 in a browser: at 1440 and 1280 pixels one bar held three heights (30, 20, 21 px), three corners (9 px, 5 px, round)
+  and three type sizes (13.3, 13, 11 px), 2 to 4 px apart; when the bar was short of room the seal was squeezed under the first key
+  (with a model's name filling its key, on a 390 pixel phone 7 px off the left edge and 9 px under the key; with no model, at 360 px;
+  in a 720 px window 4.5 px off the edge), because r174's fitting only saw a bar wider than the window, and the shrinking seal kept it
+  from ever being wider. On a 320 pixel touch phone the keys wrapped to two rows.
+- `build/modules/r301.js` (new, every edition): every key 28 px tall, round (the hide key too), 12 px type (11.5 at 1100 px and less),
+  6 px apart (4 at 1100 and less), spaced by margins (Chrome 83 has no gap in a flex row); the four readings joined in one raised capsule
+  (its first and last shown reading marked by the script, so the capsule closes on whichever is hidden); 16 px between the readings and
+  the actions; the seal never shrinks; on a phone Studio shows its pencil alone (its word stays for screen readers); a long model's
+  name shortens with an ellipsis before r174 shows its dot alone; the INGENIUM plate raised, lifting and sinking.
+- `build/modules/r174.js`: a new step between the seal and the signs, the engine's words first (ing-tb-eng); the bar's right margin
+  counts as the edge; a bar whose keys wrap counts as short of room (so a 320 px touch phone keeps one row, 43 px instead of 75); and
+  Who answers (r244), the model key's menu, is fitted inside the window and its safe areas like the other panels (on 7.13 it ran past
+  the foot of a 320 px phone and into the notch of a phone held sideways: 8 failures in the test below, none now).
+- Tests: `rig/t_714_topbar.js` (new, 280 checks: nineteen widths from 1440 to 360, with no model and with a long invented model name,
+  nothing past the edge or the bar's margin, no key over another, the seal whole and clear, every key 28 px, a model's name readable or
+  its dot, the capsule closed; the spaces, the round hide key, the plate, night, a reading rising, Studio's name, the clock; 320 px
+  touch in one row). `rig/t_68_phone.js`: the model's key opens Who answers since 6.46 (the test still waited for Models and left the
+  menu open over the next key, so it stopped at 320 px); it now checks that menu inside the window and closes it. Its 4 failures in
+  Guide and Settings at 375 px (an icon 1 or 2 px past the left edge) are the same on 7.13.
 Ingenium 7.13 (15 November 2026): Blend becomes Concordia, Build becomes Adamas (7.12 was taken by the other session the same
 night, for every app's kits). Her words that day: "I am thinking of renaming the
 Focus, Folders, Blend and Build pages since their names seem so basic and without an identity." Her choices: "Concordia (Recommended)"

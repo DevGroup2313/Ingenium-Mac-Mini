@@ -82,7 +82,9 @@ function inPage(opts) {
 const PANELS = [
   { id: 'statusPill', key: '#statusPill', panel: '.pres-menu', close: () => { try { closePresenceMenu(); } catch (e) { } } },
   { id: 'enginePill', key: '#enginePill', panel: null, close: () => { } },
-  { id: 'activeModelPill', key: '#activeModelPill', panel: null, close: () => { } },
+  // 7.14: since 6.46 (r244) the model's key opens Who answers, a menu under the key, not the Models page; it closes on a press
+  // outside it (until 7.14 this test still waited for Models, and left the menu open over the next key)
+  { id: 'activeModelPill', key: '#activeModelPill', panel: '#waPop', close: () => { const w = document.getElementById('waPop'); if (w && !w.hidden) document.body.click(); } },
   { id: 'displayBtn', key: '#displayBtn', panel: '#displayPanel', close: () => { const d = document.getElementById('displayPanel'); if (d) d.setAttribute('hidden', ''); } },
   { id: 'aboutBtn', key: '#aboutBtn', panel: '#modalBox', close: () => { try { closeModal(); } catch (e) { } } },
   { id: 'ingHelpKey', key: '#ingHelpKey', panel: '#ihPanel', close: () => { const x = document.querySelector('#ihPanel .ih-x'); if (x && !document.getElementById('ihPanel').hidden) x.click(); } },

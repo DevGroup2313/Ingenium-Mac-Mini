@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.14", "The top bar is tidied: every key has the same height and the same round shape, evenly spaced. Where you are, the engine, the model and the clock now sit together in one raised capsule, set apart from Display, Studio, About and Help, and the INGENIUM name stands on a raised plate that lifts under the pointer."],
+  ["7.14", "On a phone or in a narrow window, the seal no longer slides under the first key. When the bar is short of room, the engine's long words give way to its coloured dot first, then the keys show their signs (Studio its pencil), and a long model's name shortens with an ellipsis instead of pushing the seal aside."],
+  ["7.14", "The Who answers menu, opened from the model's key, now opens whole inside the screen on a small phone and on a phone held sideways."],
   ["7.13", "Blend is now called Concordia, and Build is now Adamas: the same pages, with names of their own. Concordia, for the models whose answers come into agreement, as the wheels of its movement mesh; Adamas, the diamond, for work cut from the rough and refined into brilliance. Everything in them stays as it was."],
   ["7.12", "Every build kit for an app of your own is the app's own: its name, id and icons on every device, your name in its licence, and none of Ingenium's own files. Each kit is made from the family's packaging, the projects, recipes and guides the family's apps are built with."],
   ["7.12", "The Fire tablet kit now builds on your own Mac or PC as well as on GitHub: in its project, double-click Build the APK. The Windows kit makes the program and its installer on your PC the same way. Each kit's guide says what to install first."],
