@@ -16,12 +16,18 @@ they were written for."""
 import sys
 
 C, A = "Concordia", "Adamas"   # Blend, Build
+# 7.15: Folders and Focus. Her words (15 November 2026), on Folders: "It is the home where all of my apps and all of the information of
+# how they were contructed and made to come to life. It is the library and archive of all of my work and achievements, the storage
+# place of all of my accrued skills and knowledge"; her choice: "Ingenia" (the plural of ingenium: talents and inventions, the works of
+# Ingenium). On Focus, from what the page does rather than its stones: "I am torn between Vesta and Ancora but I am leaning more towards
+# Vesta, please keep Ancora as a backup" (focus is Latin for hearth; Vesta kept the hearth's flame that must never go out). To go back,
+# or to Ancora, change I or V below (or take their phrases out of PHRASES).
+I, V = "Ingenia", "Vesta"      # Folders, Focus
 
 # (the exact phrase in the built page, the phrase on screen now); grouped by the page they name
 _BLEND = [
     ('</svg>Blend</button>', '</svg>%s</button>'),                          # the side list
     ('<h1 class="page-title">Blend</h1>', '<h1 class="page-title">%s</h1>'),
-    ('Blend · the movement of your models', '%s · the movement of your models'),   # its head (r262)
     ('head.setAttribute("aria-label","Blend")', 'head.setAttribute("aria-label","%s")'),
     ('on the Models page to use Blend.', 'on the Models page to use %s.'),
     ('String(r.task||"Blend")', 'String(r.task||"%s")'),
@@ -90,6 +96,78 @@ _BUILD = [
     ('in its steps. Build has its own,', 'in its steps. %s has its own,'),
     ('K.hero({title:"Build",', 'K.hero({title:"%s",'),
 ]
+_INGENIA = [
+    ('<h1 class="page-title">Folders</h1>', '<h1 class="page-title">%s</h1>'),   # its title (r208)
+    ('b.title="Folders";', 'b.title="%s";'),                                       # the side list (r208)
+    ('+"Folders";nb.parentNode', '+"%s";nb.parentNode'),
+    ('h("button","fld-crumbk","Folders")', 'h("button","fld-crumbk","%s")'),       # the way back to all the folders
+    ('head=mk("section","fd-head");head.setAttribute("aria-label","Folders");', 'head=mk("section","fd-head");head.setAttribute("aria-label","%s");'),
+    ('Its folder on the Folders page keeps', 'Its folder on the %s page keeps'),
+    ('kept on the Folders page and searchable', 'kept on the %s page and searchable'),
+    ('"Open its folder":"Open Folders"', '"Open its folder":"Open %s"'),
+    ('make one on the Folders page, and its notes stay', 'make one on the %s page, and its notes stay'),
+    ('brought in on the Folders page"]', 'brought in on the %s page"]'),
+    ('Bring in your work on the Folders page, or start one here.', 'Bring in your work on the %s page, or start one here.'),
+    ('make one on the Folders page, then press this again.', 'make one on the %s page, then press this again.'),
+    ('No folder in Folders is named ', 'No folder in %s is named '),
+    ('"in Folders: its conversations and notes"', '"in %s: its conversations and notes"'),
+    ('the only part of Folders that uses the internet', 'the only part of %s that uses the internet'),
+    ('Shared by Lector, Vocatio and Folders.', 'Shared by Lector, Vocatio and %s.'),
+    ('Writing effort, shared by Lector, Vocatio and Folders', 'Writing effort, shared by Lector, Vocatio and %s'),
+    ('Lector, Vocatio and Folders share one writing effort', 'Lector, Vocatio and %s share one writing effort'),
+    ('chap:"Folders"', 'chap:"%s"'),                                               # the tour: its chapter, and the tables keyed by it
+    ('t:"🗂️ Folders"', 't:"🗂️ %s"'),
+    ('b:"Folders keeps a folder for each of your apps', 'b:"%s keeps a folder for each of your apps'),
+    ('"Folders":"A folder for each app, and your work', '"%s":"A folder for each app, and your work'),
+    ('"Folders":"Folders keep how you work', '"%s":"%s keeps how you work'),
+    ('?"Folders":"Making things"', '?"%s":"Making things"'),
+    ('P.folders={name:"Folders",tour:["Folders"],', 'P.folders={name:"%s",tour:["%s"],'),   # the Guide and help
+    ('what:"Folders keeps a folder for each of your apps', 'what:"%s keeps a folder for each of your apps'),
+    ('card("fdGuide","Folders",', 'card("fdGuide","%s",'),
+    ('return "Concordia, Folders, "+', 'return "Concordia, %s, "+'),                # after Blend's rename
+]
+_VESTA = [
+    ('<h1 class="page-title">Focus</h1>', '<h1 class="page-title">%s</h1>'),       # its title (base page)
+    ('fill="currentColor"/></svg>Focus</button>', 'fill="currentColor"/></svg>%s</button>'),   # the side list
+    ('<span class="qh">Focus</span>', '<span class="qh">%s</span>'),               # Home's key
+    ('{k:"focus",t:"Focus",', '{k:"focus",t:"%s",'),                               # Home's room
+    ('K.hero({title:"Focus",eyebrow:"Focus \\u00b7 one step at a time"', 'K.hero({title:"%s",eyebrow:"%s \\u00b7 one step at a time"'),   # its head (r291)
+    ('"aria-label","Focus, in parts"', '"aria-label","%s, in parts"'),
+    ('title="The time. Tap to open Focus."', 'title="The time. Tap to open %s."'),   # the clock
+    ('". Tap to open Focus."', '". Tap to open %s."'),
+    ('The time of day. Press it to open Focus.', 'The time of day. Press it to open %s.'),
+    ('<h2 class="sec">Focus: support that fits how you work</h2>', '<h2 class="sec">%s: support that fits how you work</h2>'),
+    ('The Focus page holds the tools', 'The %s page holds the tools'),
+    ('It waits in the Inbox, on the Focus page.', 'It waits in the Inbox, on the %s page.'),
+    ('decoding a message) are on the Focus page.', 'decoding a message) are on the %s page.'),
+    ('onclick="go(\'focus\')">Open Focus</button>', 'onclick="go(\'focus\')">Open %s</button>'),
+    ('It waits on the Focus page until you are ready.', 'It waits on the %s page until you are ready.'),
+    ('" waiting on the Focus page."', '" waiting on the %s page."'),
+    ('The Inbox is switched off. Focus, Your supports, turns it back on.', 'The Inbox is switched off. %s, Your supports, turns it back on.'),
+    ('Look at your step in Focus: just look', 'Look at your step in %s: just look'),
+    ('The Steps card on Focus, with', 'The Steps card on %s, with'),
+    ('the Inbox card on Focus."', 'the Inbox card on %s."'),
+    ('in the Inbox and on Focus. Inside Ingenium only', 'in the Inbox and on %s. Inside Ingenium only'),
+    ('It waits in the Inbox in Focus.', 'It waits in the Inbox in %s.'),
+    ('so Focus fits how you work.', 'so %s fits how you work.'),
+    ('["conversations","notes","projects","Focus"]', '["conversations","notes","projects","%s"]'),
+    ('chap:"Focus"', 'chap:"%s"'),                                                 # the tour: its chapter, and the tables keyed by it
+    ('if(s.chap==="Focus")at=k;', 'if(s.chap==="%s")at=k;'),
+    ('t:"🎯 Focus: your support room",b:"Focus holds supports', 't:"🎯 %s: your support room",b:"%s holds supports'),
+    ('b:"Every part of Focus can be switched', 'b:"Every part of %s can be switched'),
+    ('Focus then shows only what is essential', '%s then shows only what is essential'),
+    ('"Focus":"Focus is yours to shape', '"%s":"%s is yours to shape'),
+    ('"Focus":"Support built for attention', '"%s":"Support built for attention'),
+    ('Focus:"Enter in the Inbox box', '%s:"Enter in the Inbox box'),
+    ('You have seen every room: Home, Chat, Models, Focus,', 'You have seen every room: Home, Chat, Models, %s,'),
+    ('bring in a model, chat, Focus and Adamas. The Focus button also shows', 'bring in a model, chat, %s and Adamas. The %s button also shows'),   # after Build's rename
+    ('Chat, Code, Adamas, Fabrica, Lector and Focus each have a key.', 'Chat, Code, Adamas, Fabrica, Lector and %s each have a key.'),
+    ('focus:{name:"Focus",tour:["Focus"],', 'focus:{name:"%s",tour:["%s"],'),      # the Guide and help
+    ('what:"Focus is your support room', 'what:"%s is your support room'),
+    ('Write what you need to do and Focus breaks it', 'Write what you need to do and %s breaks it'),
+    ('[\'.nav-btn[data-page="focus"]\',"Focus",', '[\'.nav-btn[data-page="focus"]\',"%s",'),
+    ('"and Focus, the support that fits how you work."', '"and %s, the support that fits how you work."'),
+]
 # both names in one phrase
 _BOTH = [
     ('"Build, Blend, ', '"%s, %s, '),                  # the tour's teasers and closers (A, C)
@@ -97,7 +175,8 @@ _BOTH = [
     ('Blend, Build and Code', '%s, %s and Code'),      # (C, A)
 ]
 # what every edition holds: the side list and the titles
-CORE = {'</svg>Blend</button>', '<h1 class="page-title">Blend</h1>', '</svg>Build</button>', '<h1 class="page-title">Build</h1>'}
+CORE = {'</svg>Blend</button>', '<h1 class="page-title">Blend</h1>', '</svg>Build</button>', '<h1 class="page-title">Build</h1>',
+        '<h1 class="page-title">Folders</h1>', 'b.title="Folders";', '<h1 class="page-title">Focus</h1>', 'fill="currentColor"/></svg>Focus</button>'}
 
 
 def phrases():
@@ -105,6 +184,8 @@ def phrases():
     out.append((_BOTH[0][0], _BOTH[0][1] % (A, C)))
     out.append((_BOTH[1][0], _BOTH[1][1] % (A, C)))
     out.append((_BOTH[2][0], _BOTH[2][1] % (C, A)))
+    # 7.15: after Blend's and Build's, since some of their phrases are met again here with the new names in them
+    out += [(o, n.replace("%s", I)) for o, n in _INGENIA] + [(o, n.replace("%s", V)) for o, n in _VESTA]
     return out
 
 

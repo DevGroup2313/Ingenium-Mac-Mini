@@ -507,7 +507,7 @@ function paint(){if(!on||!head)return;var s=sig();if(s!==SIG){SIG=s;rebuild();}
 /* ---------- the head, mounted on the page ---------- */
 function build(){if(head)return;
   head=mk("section","tr-head tu-head");head.setAttribute("aria-label","Models");
-  words=mk("div","tr-words");var eb=mk("div","tr-eyebrow");eb.appendChild(mk("b",null,"Ingenium"));eb.appendChild(mk("span",null,"Models · the turret"));eb.setAttribute("aria-hidden","true");words.appendChild(eb);
+  words=mk("div","tr-words");var eb=mk("div","tr-eyebrow");eb.appendChild(mk("span",null,"The turret"));eb.setAttribute("aria-hidden","true");words.appendChild(eb);
   words.appendChild(mk("p","tr-how","Press a model's lens: the turret turns it to the engine and loads it. Press it again, or the empty port, to unload it."));
   var keys=mk("div","tr-keys"),kg=mk("button","btn primary","Get one of Ingenium's models"),ka=mk("button","btn","Add a model file");kg.type="button";ka.type="button";kg.id="trGet";ka.id="trAdd";
   kg.addEventListener("click",function(e){e.preventDefault();room("get");});ka.addEventListener("click",function(e){e.preventDefault();addFile();});

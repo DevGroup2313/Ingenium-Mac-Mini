@@ -1,4 +1,7 @@
 // node rig/t_714_topbar.js <page url> <out dir>
+// 7.15: as 7.13's keys again (her words on 7.14: the keys made "flat" and "wider and longer", a plate behind the seal and the name she
+// hated): every key 21 px tall (28 px at 760 px and less, the app's narrow layout), each its own raised key, nothing joined, no plate;
+// organised only: 3 px between keys, 9 px between the readings and the actions. Kept from 7.14: the checks of room, overlap and the seal.
 // 7.14 (r301, r174): the top bar, tidied. On the real page, at nineteen widths from 1440 to 360 pixels, with no model chosen and with a
 // long model's name (invented): nothing runs past the bar's edge or the window, no key lies over another, the seal keeps its whole room
 // and stays clear of the first key, every key of the bar is 28 pixels tall, a model's name shows at least 56 pixels or its dot alone,
@@ -33,7 +36,7 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
       for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i], c = all[j]; if (a.x < c.x + c.w - 1 && c.x < a.x + a.w - 1 && a.y < c.y + c.h - 1 && c.y < a.y + a.h - 1) over.push(a.id + '/' + c.id); }
       const nm = document.getElementById('activeModelName'), nr = nm.getBoundingClientRect(), nshown = getComputedStyle(nm).position !== 'absolute' && nr.width > 2;
       const reads = ['statusPill', 'enginePill', 'activeModelPill', 'clockPill'].map((id) => document.getElementById(id)).filter((e) => e && vis(e));
-      const capOk = reads.every((e, i) => e.classList.contains('tb-seg') && e.classList.contains('tb-seg-first') === (i === 0) && e.classList.contains('tb-seg-last') === (i === reads.length - 1));
+      const capOk = reads.every((e) => !e.classList.contains('tb-seg') && getComputedStyle(e).borderTopRightRadius === getComputedStyle(e).borderTopLeftRadius && parseFloat(getComputedStyle(e).borderTopLeftRadius) >= 10 && getComputedStyle(e).boxShadow !== 'none');
       const padR = parseFloat(getComputedStyle(bar).paddingRight) || 0, toolsR = Math.max(...keys.map((k) => k.x + k.w));
       return { fit: document.documentElement.className.replace(/ing-tb-/g, '').trim() || '-', overflow: bar.scrollWidth > bar.clientWidth + 1, pageWide: document.scrollingElement.scrollWidth > innerWidth + 1,
         intoMargin: toolsR > br.right - padR + 1.5, spare: Math.round(innerWidth - toolsR), over, sealOut: seal.left < brand.left - 1 || seal.right > brand.right + 1 || seal.left < 0, sealHit: keys.length && seal.right > keys[0].x - 2,
@@ -44,9 +47,9 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
     ok(!r.intoMargin, tag + ': the keys stay out of the bar\'s right margin (' + r.spare + ' px to spare)');
     ok(r.over.length === 0, tag + ': no key over another ' + r.over.join(','));
     ok(!r.sealOut && !r.sealHit, tag + ': the seal keeps its room, clear of the first key');
-    ok(r.heights.length === 1 && r.heights[0] === 28, tag + ': every key 28 px tall ' + JSON.stringify(r.heights));
+    ok(r.heights.length === 1 && r.heights[0] === (w > 760 ? 21 : 28), tag + ': every key ' + (w > 760 ? 21 : 28) + ' px tall, as in 7.13 ' + JSON.stringify(r.heights));
     ok(!r.nshown || r.nameW >= 56 || !r.ncut, tag + ': the model\'s name readable (' + r.nameW + ' px) or its dot alone');
-    ok(r.capOk, tag + ': one capsule, closed at its first and last reading ' + r.reads.join(','));
+    ok(r.capOk, tag + ': each reading its own round raised key, nothing joined ' + r.reads.join(','));
     table.push(tag.padEnd(9) + ' fit[' + r.fit + ']'.padEnd(2) + ' spare ' + r.spare + ' name ' + (r.nshown ? r.nameW + (r.ncut ? '…' : '') : 'dot'));
   }
   // at 1440, by day, no model: the spaces, the round hide key, the raised plate, the clock last
@@ -59,12 +62,12 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
       gSep: gap('clockPill', 'displayBtn'), gAct: (function () { const a = ['displayBtn', 'auTopKey', 'aboutBtn', 'ingHelpKey'].filter((id) => document.getElementById(id)); const o = []; for (let i = 1; i < a.length; i++) o.push(gap(a[i - 1], a[i])); return o; })(), plate: pl.boxShadow !== 'none' && pl.backgroundImage !== 'none',
       clockLast: document.getElementById('clockPill').classList.contains('tb-seg-last'), font: getComputedStyle(document.getElementById('displayBtn')).fontSize, gapProp: getComputedStyle(document.getElementById('topTools')).columnGap };
   });
-  ok(d.chevW === 28 && d.chevH === 28 && d.chevR >= 14, '1440: the hide key a round 28 px key ' + JSON.stringify([d.chevW, d.chevH, d.chevR]));
-  ok(d.g1 === 6 && d.gCap <= 0 && d.gSep === 16 && d.gAct.every((x) => x === 6), '1440: 6 px between keys, the capsule joined, 16 px between readings and actions ' + JSON.stringify(d));
+  ok(d.chevW === 21 && d.chevH === 21 && d.chevR >= 10, '1440: the hide key a round 21 px key, as tall as its neighbours ' + JSON.stringify([d.chevW, d.chevH, d.chevR]));
+  ok(d.g1 === 3 && d.gCap === 3 && d.gSep === 9 && d.gAct.every((x) => x === 3), '1440: 3 px between keys, 9 px between the readings and the actions ' + JSON.stringify(d));
   ok(d.gapProp === 'normal' || d.gapProp === '0px', '1440: spaced by margins, not by gap (Chrome 83) ' + d.gapProp);
-  ok(d.plate, '1440: the INGENIUM plate raised');
-  ok(d.clockLast, '1440: the clock closes the capsule');
-  ok(d.font === '12px', '1440: the keys\' type 12 px ' + d.font);
+  ok(!d.plate, '1440: no plate behind the seal and the name (as 7.13)');
+  ok(!d.clockLast, '1440: nothing marks the readings as joined');
+  ok(d.font === '11px', '1440: the keys\' type 11 px, as 7.13 ' + d.font);
   await p.screenshot({ path: OUT + '/bar_1440_day.png', clip: { x: 0, y: 0, width: 1440, height: 56 } });
   // a reading under the pointer rises out of the capsule
   await p.hover('#enginePill'); await p.waitForTimeout(350);
@@ -85,9 +88,9 @@ function ok(c, what) { if (c) pass++; else { fail++; lines.push('FAIL ' + what);
   // (Studio is the master edition's alone: in another edition its checks are skipped)
   const hasStudio = await p.evaluate(() => !!document.getElementById('auTopKey'));
   const ph = await p.evaluate(() => { const s = document.getElementById('auTopKey') || document.getElementById('aboutBtn'), q = s.getBoundingClientRect(); return { w: Math.round(q.width), h: Math.round(q.height), icons: document.documentElement.classList.contains('ing-tb-icons'),
-    clockHidden: document.getElementById('clockPill').hidden, modelLast: document.getElementById('activeModelPill').classList.contains('tb-seg-last') }; });
+    clockHidden: document.getElementById('clockPill').hidden, modelLast: true }; });
   const studioNamed = await p.getByRole('button', { name: 'Studio', exact: false }).count();
-  if (hasStudio) { ok(ph.icons && ph.w === 28 && ph.h === 28, '390: Studio shows its pencil alone, a 28 px circle ' + JSON.stringify(ph));
+  if (hasStudio) { ok(ph.icons && ph.w === 30 && ph.h === 28, '390: Studio shows its pencil alone, as wide as Display and About (30 by 28) ' + JSON.stringify(ph));
     ok(studioNamed >= 1, '390: Studio still named "Studio" for a screen reader'); }
   ok(ph.clockHidden && ph.modelLast, '390: the clock hidden, the model\'s reading closes the capsule');
   await p.screenshot({ path: OUT + '/bar_390_name.png', clip: { x: 0, y: 0, width: 390, height: 56 } });

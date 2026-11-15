@@ -34,6 +34,22 @@
 #page-folders.fd-on.fw-open .fw-unfoldnote{display:block;position:absolute;left:0;right:0;bottom:-24px;text-align:center;font-family:inherit;font-size:11.5px;font-weight:500;line-height:1.3;letter-spacing:.02em;color:var(--ink-3,#6c6579);pointer-events:none}
 #page-folders.fd-on.fw-open.fw-unfold .fw-unfoldnote{visibility:hidden}
 /* 2. a folder open: divider tabs, one paper at a time */
+/* 7.15, her words (15 November 2026): "Instead of the Compact look that I initially chose for the Folders page, I want you to redesign it
+   and give it the Divider tabs design from your live preview instead, I think it is a neater and better look than everything compressed
+   together. I want you to add a button on the page that seamlessly lets me toggle between both views of the page so that I can have the
+   option to see both if I choose to." So the page (fw-hometabs) shows one of its four parts at a time under its own divider tab (Your
+   apps, Your build library, Bring in your work, How I work), each at its full, natural size; a switch beside the tabs (Divider tabs,
+   Compact) turns it to the compact page (fw-home) and back, and the choice is kept on this device (localStorage ing:r300:homeView). */
+#page-folders .fw-homebar{display:none}
+#page-folders.fd-on.fw-hometabs .fw-homebar,#page-folders.fd-on.fw-home .fw-homebar{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;margin:0 0 16px}
+#page-folders .fw-hdividers{display:none}
+#page-folders.fd-on.fw-hometabs .fw-hdividers{display:flex;flex:1 1 auto;flex-wrap:wrap;align-items:flex-end;min-width:0;padding:8px 4px 0;margin-right:14px;border-bottom:1.5px solid var(--fd-margin,rgba(106,63,181,.28))}
+#page-folders.fd-on.fw-hometabs .fw-hdividers .fw-div{margin:0 6px 0 0}
+#page-folders.fd-on.fw-home .fw-homebar{justify-content:flex-end}
+#page-folders .fw-viewsw{display:flex;align-items:center;margin-bottom:6px}
+#page-folders .fw-viewsw > span{font:600 10.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3,#6c6579);margin-right:8px}
+#page-folders.fd-on.fw-hometabs #fldBody > .card:not(.fw-on){display:none}
+#page-folders.fd-on.fw-hometabs #fldBody > .card.fw-on{-webkit-animation:fwPaper .42s cubic-bezier(.22,1,.36,1);animation:fwPaper .42s cubic-bezier(.22,1,.36,1)}
 #page-folders .fw-dividers{display:none}
 #page-folders.fd-on.fw-tabs .fw-dividers{display:flex;flex-wrap:wrap;align-items:flex-end;margin:-4px -4px 16px;padding:8px 4px 0;border-bottom:1.5px solid var(--fd-margin,rgba(106,63,181,.28))}
 #page-folders .fw-div{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;line-height:1.2;color:var(--ink-2,#4a4358);
@@ -105,6 +121,22 @@ function pg(){return D.getElementById("page-folders");}
 function cls(e,c,on){if(e&&e.classList.contains(c)!==!!on)e.classList.toggle(c,!!on);}
 function att(e,a,v){if(e&&e.getAttribute(a)!==v)e.setAttribute(a,v);}
 function kids(n,cls){return [].filter.call(n.children,function(c){return c.classList.contains(cls);});}
+var HP=0;
+function view(){try{var v=localStorage.getItem("ing:r300:homeView");return v==="compact"?"compact":"tabs";}catch(e){return "tabs";}}
+function setView(v){try{localStorage.setItem("ing:r300:homeView",v);}catch(e){}}
+function homeBar(p,b){var bar=null;[].forEach.call(p.children,function(c){if(c.classList.contains("fw-homebar"))bar=c;});
+  if(!bar){bar=el("div","fw-homebar");var tabs=el("div","fw-hdividers");tabs.setAttribute("role","tablist");tabs.setAttribute("aria-label","The parts of the page");bar.appendChild(tabs);
+    var sw=el("div","fw-viewsw");sw.appendChild(el("span",null,"View"));var seg=el("div","seg");seg.setAttribute("role","group");seg.setAttribute("aria-label","How the page is laid out");
+    [["tabs","Divider tabs"],["compact","Compact"]].forEach(function(o){var k=el("button","seg-btn fw-viewkey",o[1]);k.type="button";k.setAttribute("data-view",o[0]);seg.appendChild(k);});
+    sw.appendChild(seg);bar.appendChild(sw);p.insertBefore(bar,b);}
+  var row=bar.querySelector(".fw-hdividers"),cards=kids(b,"card");
+  if(row.children.length!==cards.length){while(row.firstChild)row.removeChild(row.firstChild);
+    cards.forEach(function(c,i){var h=c.querySelector("h2"),t=(h&&h.textContent||"").replace(/\s+/g," ").trim().replace(/, on every app$/,""),k=el("button","fw-div",t||("Part "+(i+1)));
+      k.type="button";k.setAttribute("role","tab");k.setAttribute("data-i",String(i));row.appendChild(k);});}
+  if(HP>=cards.length)HP=0;var tv=view()==="tabs";
+  cards.forEach(function(c,j){cls(c,"fw-on",j===HP);if(tv)att(c,"role","tabpanel");});
+  [].forEach.call(row.querySelectorAll(".fw-div"),function(k){var on=+k.getAttribute("data-i")===HP;att(k,"aria-selected",String(on));att(k,"tabindex",on?"0":"-1");});
+  [].forEach.call(bar.querySelectorAll(".fw-viewkey"),function(k){var on=k.getAttribute("data-view")===view();cls(k,"active",on);att(k,"aria-pressed",String(on));});}
 function key(){try{return String((W.state&&state.folders&&state.folders.ui&&state.folders.ui.open)||"");}catch(e){return "";}}
 function click(){try{if(W.IngSound&&IngSound.play)IngSound.play("keys");}catch(e){}}
 function shortName(h){var t=(h&&h.textContent||"").replace(/\s+/g," ").trim(),m=/^(.*?)\s*\((\d+)\)$/.exec(t),name=m?m[1]:t;
@@ -127,11 +159,11 @@ function drawers(p,right,k){var ds=[].slice.call(right.querySelectorAll(".cdw"))
 function dress(){var p=pg();if(!p)return;var on=p.classList.contains("fd-on"),spread=on?p.querySelector(".fd-spread"):null,k=key();
   cls(p,"fw-open",!!spread);
   if(!spread||k!==lastKey)cls(p,"fw-unfold",false);lastKey=k;
-  cls(p,"fw-home",on&&!spread);
+  var tv=view()==="tabs";cls(p,"fw-home",on&&!spread&&!tv);cls(p,"fw-hometabs",on&&!spread&&tv);
   var drw=p.querySelector(".fd-head .fd-drawer");if(drw&&!drw.querySelector(".fw-unfoldnote"))drw.appendChild(el("div","fw-unfoldnote","Press the drawer to see all your apps"));
   if(spread){var right=spread.querySelector(".fd-right");if(right){paper(p,right,k);drawers(p,right,k);}}
   else{cls(p,"fw-tabs",false);cls(p,"fw-one",false);
-    var b=p.querySelector("#fldBody");if(b)kids(b,"card").forEach(function(c){var h=c.querySelector("h2");if(h&&/^How I work, on every app/.test(h.textContent.trim()))cls(c,"fw-how",true);});
+    var b=p.querySelector("#fldBody");if(b){kids(b,"card").forEach(function(c){var h=c.querySelector("h2");if(h&&/^How I work, on every app/.test(h.textContent.trim()))cls(c,"fw-how",true);});if(on)homeBar(p,b);}
     [].forEach.call(p.querySelectorAll(".fd-env"),function(e){if(!e.querySelector(".fw-how2"))e.appendChild(el("span","fw-how2","Press for how"));});}}
 function closeSheet(){var s=D.querySelector(".fw-sheet");if(s&&s.parentNode)s.parentNode.removeChild(s);}
 function sheet(env){closeSheet();var t=env.querySelector("b"),s=el("div","fw-sheet");s.setAttribute("role","dialog");s.setAttribute("aria-label",t?t.textContent:"How to bring it in");
@@ -143,6 +175,8 @@ function sheet(env){closeSheet();var t=env.querySelector("b"),s=el("div","fw-she
 D.addEventListener("click",function(e){var t=e.target,p=pg();if(!p||!t||!t.closest)return;
   if(D.querySelector(".fw-sheet")&&!t.closest(".fw-sheet"))closeSheet();
   if(!p.contains(t)||!p.classList.contains("fd-on"))return;
+  var hv=t.closest(".fw-hdividers .fw-div");if(hv){HP=+hv.getAttribute("data-i");dress();return;}
+  var vk=t.closest(".fw-viewsw .fw-viewkey");if(vk){var v=vk.getAttribute("data-view");if(v!==view()){setView(v);click();dress();}return;}
   var dv=t.closest(".fw-dividers .fw-div");if(dv){var k=key();papers[k]=+dv.getAttribute("data-i");var right=dv.closest(".fd-right");
     kids(right,"card").forEach(function(c){cls(c,"fw-new",false);});var cards=kids(right,"card"),c=cards[papers[k]];cls(c,"fw-new",true);paper(p,right,k);flips();return;}
   var fr=t.closest(".fd-right .cdw-front");if(fr&&p.classList.contains("fw-one")){var d=fr.closest(".cdw"),right2=d.closest(".fd-right"),ds=[].slice.call(right2.querySelectorAll(".cdw")),i=ds.indexOf(d),k2=key();
@@ -161,7 +195,7 @@ function hook(){var p=pg();body=p&&p.querySelector("#fldBody");if(!body){setTime
   try{new MutationObserver(function(){dress();}).observe(p,{attributes:true,attributeFilter:["class"]});}catch(e){}
   dress();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){setTimeout(hook,0);});else setTimeout(hook,0);
-W.IngFoldersCompact={dress:dress,state:function(){var p=pg();return {home:!!p&&p.classList.contains("fw-home"),open:!!p&&p.classList.contains("fw-open"),unfold:!!p&&p.classList.contains("fw-unfold"),
+W.IngFoldersCompact={dress:dress,view:view,setView:function(v){setView(v==="compact"?"compact":"tabs");dress();},state:function(){var p=pg();return {home:!!p&&p.classList.contains("fw-home"),hometabs:!!p&&p.classList.contains("fw-hometabs"),homePart:HP,open:!!p&&p.classList.contains("fw-open"),unfold:!!p&&p.classList.contains("fw-unfold"),
   tabs:!!p&&p.classList.contains("fw-tabs"),one:!!p&&p.classList.contains("fw-one"),paper:papers[key()]||0,drawer:(key() in chosen)?chosen[key()]:0};}};
 try{window.__ingParts["p300"]="running";}catch(_){}
 })();

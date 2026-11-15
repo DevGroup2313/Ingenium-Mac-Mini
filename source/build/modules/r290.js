@@ -679,7 +679,11 @@ function wireOrb(k,o){
 var IO=null;
 function watch(h){if(!h||h.__io||typeof IntersectionObserver!=="function")return;h.__io=1;if(!IO)IO=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle("is-away",!e.isIntersecting);});},{threshold:0});IO.observe(h);}
 function hero(o){var h=mk("section","skh"),w=mk("div","skh-words"),eb=mk("div","skh-eyebrow");h.setAttribute("aria-label",o.title);eb.setAttribute("aria-hidden","true");
-  eb.appendChild(mk("b",null,"Ingenium"));eb.appendChild(mk("span",null,o.eyebrow));w.appendChild(eb);
+  /* 7.15, her words (15 November 2026): "Ingenium's pages headers always repeats both the app's title and the pages' titles on their
+     3D header cards which isn't always necessary and can read as superfluous, please tidy that up and make it read better": the line
+     above the title says only what the page is for (the name Ingenium is in the top bar, the page's name is the title below it) */
+  var ey=String(o.eyebrow||""),tp=String(o.title||"")+" \u00b7 ";if(ey.indexOf(tp)===0)ey=ey.slice(tp.length);
+  eb.appendChild(mk("span",null,ey.charAt(0).toUpperCase()+ey.slice(1)));w.appendChild(eb);
   var t=mk("h2","skh-title",o.title);t.setAttribute("aria-hidden","true");w.appendChild(t);w.appendChild(mk("p","skh-lede",o.lede));
   var keys=mk("div","skh-keys");(o.keys||[]).forEach(function(k){var b=mk("button","skh-k"+(k.pri?" pri":""));b.type="button";if(k.ico)b.innerHTML=k.ico;b.appendChild(D.createTextNode(k.txt));if(k.id)b.id=k.id;
     b.addEventListener("click",function(e){e.preventDefault();k.fn(b);});keys.appendChild(b);});w.appendChild(keys);

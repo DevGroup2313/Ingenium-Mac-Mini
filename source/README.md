@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.15 (15 November 2026): the top bar as before 7.14, the headers said once, Ingenia and Vesta, Ingenia in divider tabs,
+Schedae's keys. Her words that day, on 7.14: "I hate the conneted raised bar that holds Ingenium's engine button logo and the Ingenium
+title ... I dislike it and want it removed and the old separated look of the engine button logo and the title. As far as the top bar
+itself, you made all of the buttons flat which I hate and made then wider and longer ... I only wanted the top bad tidied up and be more
+organised ... restore the animated popped out 3D look of the top bar's buttons." (Rule kept: tidying is organising, never larger, wider,
+longer or flatter.)
+- `build/modules/r301.js` (rewritten): every key back to its 7.13 size, face, depth and motion; no capsule (the readings' shadows had been
+  clipped), no plate behind the seal; organised only: 3 px between keys, 9 px before the actions (8 on a phone), spaced by margins
+  (Chrome 83), the hide key round, 21 px (28 at 760 px and less, with the keys). Kept from 7.14: the seal never squeezed, r174's steps.
+- The headers (her words: "Ingenium's pages headers always repeats both the app's title and the pages' titles on their 3D header cards
+  which isn't always necessary and can read as superfluous, please tidy that up and make it read better"): the line above each title
+  says only what the page is for. r262 (Concordia), r263 (Ingenia), r269 (Models), r290's hero (Vocatio, Lector, Vesta, Adamas,
+  Fabrica: the page's name taken off the front); `build/modules/r302.js` (new) keeps Home's h1 (Ingenium) for screen readers only.
+- `build/names.py`: Folders becomes Ingenia (her choice) and Focus becomes Vesta (her choice; Ancora the backup): 28 and 39 exact
+  phrases, the tour's chapter names and the tables keyed by them included; the page ids, data and code keep folders and focus; the
+  ordinary words stay (Folders for the chat, the Focus room, the timer's Focus phase, Focus and time, Calm and focus).
+- `build/modules/r300.js`: the Ingenia page in divider tabs (her choice of the 7.10 preview's other design), one of its four parts at a
+  time at its full size, with a View switch (Divider tabs, Compact) kept on this device (localStorage ing:r300:homeView).
+- `build/modules/r303.js` (new): Schedae's keys made Ingenium's own (her words: "The purple keys inside of Schedae's panels look really
+  glossy and buttery and have a different texture and animation"): .btn, .btn.danger and .btn.primary in place of the Forge's recipe;
+  Tabula and Abacus as their own cut stones (.gem-go.tabula, .gem-go.abacus), as she asked.
+- Tests: `rig/t_714_topbar.js` follows 7.15 (21 px keys, nothing joined, no plate, 3 and 9 px).
+
 Ingenium 7.14 (15 November 2026): the top bar, tidied. Her words that day: "I need you to neaten and tidy up the top bar and its
 buttons, it might slightly" (the message ended there). On the live preview (https://claude.ai/artifact/Ewwa5ypsZWVGAkYDm5mYd4,
 version 1), which recommended one capsule for the readings, 28 pixel keys and the INGENIUM plate raised: "I approve of your

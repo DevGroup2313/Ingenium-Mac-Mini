@@ -369,7 +369,7 @@ var HINT="Point at a folder to lift it out of the drawer; press it to open it.",
 var TABX=["6%","36%","64%"];
 function build(){if(head)return;
   head=mk("section","fd-head");head.setAttribute("aria-label","Folders");
-  words=mk("div","fd-words");var eb=mk("div","fd-eyebrow","<b>Ingenium</b><span>Folders · a drawer of your apps</span>");eb.setAttribute("aria-hidden","true");words.appendChild(eb);
+  words=mk("div","fd-words");var eb=mk("div","fd-eyebrow","<span>A drawer of your apps</span>");eb.setAttribute("aria-hidden","true");words.appendChild(eb);
   var keys=mk("div","fd-keys"),kn=mk("button","btn primary","A folder for another app"),kb=mk("button","btn","Bring in your work");kn.type="button";kb.type="button";kn.id="fdNewKey";kb.id="fdBringKey";
   kn.addEventListener("click",function(e){e.preventDefault();addFolder();});kb.addEventListener("click",function(e){e.preventDefault();bringIn();});keys.appendChild(kn);keys.appendChild(kb);words.appendChild(keys);
   var holds=mk("div","fd-holds",'<span>What a folder holds</span><ol><li><i>1</i>Where we left off</li><li><i>2</i>How I work on it</li><li><i>3</i>How it was built</li>'+

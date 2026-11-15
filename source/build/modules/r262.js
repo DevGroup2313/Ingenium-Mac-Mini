@@ -595,7 +595,7 @@ function wirePop(){page.addEventListener("pointerover",function(e){if(!on||e.poi
 
 function build(){if(head)return;
   head=mk("section","bx-head");head.setAttribute("aria-label","Blend");
-  words=mk("div","bx-words");var eb=mk("div","bx-eyebrow",'<b>Ingenium</b><span>Blend · the movement of your models</span>');eb.setAttribute("aria-hidden","true");words.appendChild(eb);head.appendChild(words);
+  words=mk("div","bx-words");var eb=mk("div","bx-eyebrow",'<span>The movement of your models</span>');eb.setAttribute("aria-hidden","true");words.appendChild(eb);head.appendChild(words);
   moveBox=mk("div","bx-move");head.appendChild(moveBox);SEALBOX=engine();
   legend=mk("div","bx-legend");legend.setAttribute("aria-hidden","true");head.appendChild(legend);
   try{new IntersectionObserver(function(es){seen(es[es.length-1].isIntersecting);}).observe(moveBox);}catch(e){}
