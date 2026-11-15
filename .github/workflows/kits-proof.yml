@@ -1,0 +1,263 @@
+# Ingenium 7.12: the proof that the kits Fabrica makes for an app other than Ingenium build, as they are, on GitHub's own
+# machines. The kits in source/rig/kits_proof are those of an invented app, "Tide Clock" by an invented "Ada Example", made by
+# the page's own code (modules/r178.js with the family's packaging, modules/r299.js) in rig/t_712_kits.js. Each job unzips one
+# kit and runs the build that kit gives the person: its own terminal build where it has one (the Fire tablet, the Mac, Windows),
+# or the commands its own recipe runs (the iPhone and iPad). Nothing here is published.
+name: Prove the kits Fabrica makes
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'source/rig/kits_proof/**'
+      - '.github/workflows/kits-proof.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kits-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fire-on-linux:
+    name: Fire tablet APK, by the kit's terminal build (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip the Fire tablet kit
+        run: |
+          mkdir -p "$RUNNER_TEMP/kit" && cd "$RUNNER_TEMP/kit"
+          unzip -q "$GITHUB_WORKSPACE"/source/rig/kits_proof/*_fire_*.zip
+          ls -la */"Fire tablet project"
+          test -x */"Fire tablet project/gradlew" && test -x */"Fire tablet project/Build the APK.command"
+      - name: Build the APK with "Build the APK.command"
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"Fire tablet project"
+          bash "./Build the APK.command" < /dev/null
+      - name: Check the APK
+        run: |
+          A=$(ls "$RUNNER_TEMP"/kit/*/*.apk)
+          ls -la "$A"
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
+          "$BT/apksigner" verify --print-certs "$A" | head -n 4
+          "$BT/aapt2" dump badging "$A" | grep -E "^package:|^application-label:|^launchable-activity:"
+          {
+            echo "### Fire tablet APK built by the kit's own terminal build (Linux)"
+            echo '```'
+            "$BT/aapt2" dump badging "$A" | grep -E "^package:|^application-label:|^launchable-activity:"
+            "$BT/apksigner" verify --print-certs "$A" | head -n 1
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the APK and the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fire-linux
+          path: |
+            ${{ runner.temp }}/kit/*/*.apk
+            ${{ runner.temp }}/kit/*/Fire tablet project/build_log.txt
+          if-no-files-found: warn
+
+  fire-on-windows:
+    name: Fire tablet APK, by the kit's terminal build (Windows)
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip the Fire tablet kit
+        run: |
+          $z = Get-ChildItem "$env:GITHUB_WORKSPACE\source\rig\kits_proof\*_fire_*.zip" | Select-Object -First 1
+          Expand-Archive -LiteralPath $z.FullName -DestinationPath "$env:RUNNER_TEMP\kit"
+          Get-ChildItem "$env:RUNNER_TEMP\kit\*\Fire tablet project" | Format-Table Name, Length
+      - name: Build the APK with "Build the APK (Windows).bat"
+        shell: cmd
+        run: |
+          for /d %%D in ("%RUNNER_TEMP%\kit\*") do call "%%D\Fire tablet project\Build the APK (Windows).bat"
+      - name: Check the APK
+        run: |
+          $a = Get-ChildItem "$env:RUNNER_TEMP\kit\*\*.apk" | Select-Object -First 1
+          if (-not $a) { Write-Error "No APK was made."; exit 1 }
+          $a | Format-List FullName, Length
+          "### Fire tablet APK built by the kit's own terminal build (Windows): $($a.Name), $($a.Length) bytes" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+      - name: Keep the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fire-windows-log
+          path: ${{ runner.temp }}/kit/*/Fire tablet project/build_log.txt
+          if-no-files-found: warn
+
+  mac-apple-silicon:
+    name: Mac app, by the kit's terminal build (Mac mini kit, Apple silicon)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip the Mac mini kit
+        run: |
+          mkdir -p "$RUNNER_TEMP/kit" && cd "$RUNNER_TEMP/kit"
+          unzip -q "$GITHUB_WORKSPACE"/source/rig/kits_proof/*_mac_mini_*.zip
+          test -x */"Mac project/Build Mac App.command"
+      - name: Build the app with "Build Mac App.command"
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"Mac project"
+          bash "./Build Mac App.command" < /dev/null || true
+          test -d dist/*.app || { tail -n 40 build_log.txt; exit 1; }
+      - name: Check the app
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"Mac project/dist"
+          APP=$(ls -d *.app | head -n 1)
+          /usr/libexec/PlistBuddy -c "Print :CFBundleName" -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist"
+          lipo -archs "$APP/Contents/MacOS/"* | head -n 1
+          echo "### Mac app built by the kit's own terminal build on Apple silicon: $APP ($(lipo -archs "$APP/Contents/MacOS/"* | head -n 1))" >> "$GITHUB_STEP_SUMMARY"
+
+  mac-intel:
+    name: Mac app, by the kit's terminal build (MacBook kit, Intel)
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip the MacBook kit
+        run: |
+          mkdir -p "$RUNNER_TEMP/kit" && cd "$RUNNER_TEMP/kit"
+          unzip -q "$GITHUB_WORKSPACE"/source/rig/kits_proof/*_mac_3*.zip
+          test -x */"Mac project/Build Mac App.command"
+      - name: Build the app with "Build Mac App.command"
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"Mac project"
+          bash "./Build Mac App.command" < /dev/null || true
+          test -d dist/*.app || { tail -n 40 build_log.txt; exit 1; }
+      - name: Check the app
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"Mac project/dist"
+          APP=$(ls -d *.app | head -n 1)
+          /usr/libexec/PlistBuddy -c "Print :CFBundleName" -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist"
+          echo "### Mac app built by the kit's own terminal build on Intel: $APP ($(lipo -archs "$APP/Contents/MacOS/"* | head -n 1))" >> "$GITHUB_STEP_SUMMARY"
+
+  iphone-ipad:
+    name: iPhone and iPad app, by the kit's Xcode project (unsigned)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip the iPhone and iPad kit
+        run: |
+          mkdir -p "$RUNNER_TEMP/kit" && cd "$RUNNER_TEMP/kit"
+          unzip -q "$GITHUB_WORKSPACE"/source/rig/kits_proof/*_ios_*.zip
+      - name: Build it as the kit's own recipe does
+        run: |
+          cd "$RUNNER_TEMP"/kit/*/"iPhone and iPad project/iphone-ipad"
+          P=$(ls -d *.xcodeproj | head -n 1); N="${P%.xcodeproj}"
+          xcodebuild -version
+          xcodebuild -project "$P" -target "$N" -configuration Release -sdk iphoneos SYMROOT="$RUNNER_TEMP/build" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > "$RUNNER_TEMP/build-log.txt" 2>&1 || { grep -n "error:" "$RUNNER_TEMP/build-log.txt" | head -n 30; tail -n 40 "$RUNNER_TEMP/build-log.txt"; exit 1; }
+          APP="$RUNNER_TEMP/build/Release-iphoneos/$N.app"
+          ls "$APP/www"
+          cmp -s "$APP/www/"*.html "$N/www/"*.html && echo "The app inside is byte for byte the kit's page."
+          echo "### iPhone and iPad app built from the kit's Xcode project: $N.app" >> "$GITHUB_STEP_SUMMARY"
+
+  windows:
+    name: Windows program and installer, by the kit's terminal build; installed and removed
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Python 3.12, as the kit's guide asks
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inno Setup 6, as the kit's guide asks
+        run: |
+          $iscc = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Inno Setup*\ISCC.exe", "$env:ProgramFiles\Inno Setup*\ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $iscc) { choco install innosetup -y --no-progress | Out-Null }
+      - name: Unzip the Windows kit
+        run: |
+          $z = Get-ChildItem "$env:GITHUB_WORKSPACE\source\rig\kits_proof\*_windows_*.zip" | Select-Object -First 1
+          Expand-Archive -LiteralPath $z.FullName -DestinationPath "$env:RUNNER_TEMP\kit"
+      - name: Build it with the kit's "Build ... (Windows).bat"
+        shell: cmd
+        run: |
+          for /d %%D in ("%RUNNER_TEMP%\kit\*") do for %%B in ("%%D\Windows project\Build *(Windows).bat") do call "%%B"
+      - name: Install it, check it, then remove it, silently
+        run: |
+          $setup = Get-ChildItem "$env:RUNNER_TEMP\kit\*\*-Setup.exe" | Select-Object -First 1
+          if (-not $setup) { Write-Error "No installer was made."; exit 1 }
+          "Installer: $($setup.Name), $($setup.Length) bytes"
+          $title = 'Tide Clock'
+          $p = Start-Process -FilePath $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/LOG=$env:RUNNER_TEMP\setup-log.txt" -PassThru
+          $null = $p.Handle
+          if (-not $p.WaitForExit(600000)) { Write-Error "The installer did not finish."; exit 1 }
+          if ($p.ExitCode -ne 0) { Write-Error "The installer failed ($($p.ExitCode))."; exit 1 }
+          $dir = Join-Path $env:LOCALAPPDATA "Programs\$title"
+          if (-not (Test-Path "$dir\$title.exe")) { Write-Error "The program is not in $dir."; exit 1 }
+          $lnk = Join-Path ([Environment]::GetFolderPath('Programs')) "$title.lnk"
+          if (-not (Test-Path $lnk)) { Write-Error "No Start menu entry."; exit 1 }
+          $key = Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Where-Object { $_.PSChildName -like 'com.example.tideclock.windows*' }
+          if (-not $key) { Write-Error "No entry in Settings, Apps."; exit 1 }
+          $v = (Get-Item "$dir\$title.exe").VersionInfo
+          "Installed: $dir; Start menu entry; Settings, Apps entry $($key.PSChildName); publisher '$($v.CompanyName)', product '$($v.ProductName)'"
+          $un = Get-ChildItem "$dir\unins*.exe" | Select-Object -First 1
+          $q = Start-Process -FilePath $un.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$env:RUNNER_TEMP\uninstall-log.txt" -PassThru
+          $null = $q.Handle
+          if (-not $q.WaitForExit(300000)) { Write-Error "The uninstaller did not finish."; exit 1 }
+          Start-Sleep -Seconds 5
+          $gone = -not (Test-Path "$dir\$title.exe") -and -not (Test-Path $lnk) -and -not (Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Where-Object { $_.PSChildName -like 'com.example.tideclock.windows*' })
+          if (-not $gone) { Write-Error "Something was left after removing it."; exit 1 }
+          "Removed: the program, its Start menu entry and its entry in Settings, Apps."
+          "### Windows: the kit's terminal build made $($setup.Name); it installed (program, Start menu, Settings, Apps; publisher '$($v.CompanyName)') and removed itself cleanly" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+      - name: Keep the logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-logs
+          path: |
+            ${{ runner.temp }}/kit/*/Windows project/build_log.txt
+            ${{ runner.temp }}/setup-log.txt
+            ${{ runner.temp }}/uninstall-log.txt
+          if-no-files-found: warn
+
+  web:
+    name: Web app kit, checked
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Get the kits only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: source/rig/kits_proof
+          filter: blob:none
+      - name: Unzip and check the web kit
+        run: |
+          mkdir -p "$RUNNER_TEMP/kit" && cd "$RUNNER_TEMP/kit"
+          unzip -q "$GITHUB_WORKSPACE"/source/rig/kits_proof/*_web_*.zip
+          cd */
+          test -s index.html && test -s sw.js && test -s icons/icon-512.png && test -s favicon.ico
+          python3 -c "import json;m=json.load(open('manifest.webmanifest'));print(m['name'],m['start_url'],len(m['icons']),'icons');assert m['name']=='Tide Clock'"
+          grep -q 'rel="manifest"' index.html
+          echo "### Web app kit: manifest, service worker and icons in place" >> "$GITHUB_STEP_SUMMARY"
