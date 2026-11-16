@@ -395,6 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.19 (16 November 2026): a narrow head stacked as on a phone (her approved preview). Her words that day, on the live preview
+https://claude.ai/artifact/JjCSYt2uj824FQjzXpW16g (Ingenium Tablet Headers, version 1): "I approve of the preview and your
+recommendations, please commit and push it everywhere and continue working on my requests."
+- `build/modules/r307.js` (new, every edition): a head (.skh) narrower than 640 px takes the class skh-narrow, watched by a ResizeObserver
+  (a window resize where there is none), and the rules the preview used, word for word: a phone's arrangement (r290, r296, r291's rules
+  for a screen up to 760 px) for that head alone. On an iPad (heads 531 px) and on the Fire tablet upright with the menu open (497 px),
+  the objects of Adamas, Lector, Vocatio, Fabrica and Vesta stood partly under their words (found on 7.16 to 7.18); they stand whole
+  beneath them now. A wider head (a computer, a tablet held sideways, the menu closed) keeps its words and its object side by side.
+  When a head changes, the window is told once (a resize event), as the heads that frame their pictures listen for it.
+- `build/modules/r291.js`: Vesta's pool is framed as on a phone when its head is stacked (it read only the window's width).
+- Checked (rig/t_719_narrow.js; Safari's engine at an iPad's size, Chrome at the Fire tablet's and a computer's): each head stacked by
+  itself with the preview's own height, to the pixel (Adamas 782 and 805, Lector 760, Vocatio 783, Fabrica 782, Vesta 630), its object
+  beneath its words; at 1440 px each side by side as before; the pictures against the preview's, pair by pair.
+- r222: the 7.19 news.
+
 Ingenium 7.18 (16 November 2026): every seal and Home's orbs turned by the graphics chip in Safari's engine. Her words that day, on
 7.17: "Yes, fix the larger seals the same way next and continue working on my requests."
 - `build/modules/r306.js`: every seal of r104's kind (`.isl`), not the top bar's alone: Home's (132 px), Concordia's (70) and Vocatio's
