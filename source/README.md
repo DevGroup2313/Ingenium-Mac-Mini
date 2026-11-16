@@ -421,7 +421,8 @@ Ingenium 7.18 (16 November 2026): every seal and Home's orbs turned by the graph
   a ResizeObserver note), rig/t_718_orbs.js 7 of 7, rig/t_717_seal_gc.js 13 of 13 (its theme check
   now reads the shadows' colours; its turning check two seconds apart, as the engine rests at each full turn). Chrome's web views keep
   every seal and orb as they were.
-- r222: the 7.18 news.
+- r222: the 7.18 news (its Vocatio part a line of its own, flagged career, as the gift and demo editions have no Vocatio: rig/t_627_editions
+  found it on the first 7.18 page, and the page was built again).
 
 Ingenium 7.17 (16 November 2026): no cartridge blinks in Safari's engine, the empty cups deep, the top bar's seal on the graphics chip.
 Her words that day, on 7.16: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices, please fix this
