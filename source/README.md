@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.24 (16 November 2026): every Windows app Fabrica makes is its own installer.
+Her approved preview (https://claude.ai/artifact/Jp4R4qFP3HXXJG5P1MCbHc, version 6) and her words (16 November 2026): "I approve of the
+preview, please push it everywhere and continue working on my requests." Before, Fabrica's Windows app was a portable program in a zip.
+- `shells/windows/shell.cpp`: opened as "<App> Setup.exe", the program shows the installer's page Fabrica put in it (__setup/index.html) in
+  a window drawn by the page alone (its bar, minimise and close; rounded by Windows 11, its shadow cast). For everyone on this PC (the
+  default: Program Files; without an administrator's rights a copy of the program is started through Windows' administrator question) or
+  Just for me (%LOCALAPPDATA%\Programs); a desktop shortcut, ticked; Open without installing (--run). Installed: the program under the
+  app's own name with installed.txt beside it (which makes it open as the app), Start menu and desktop shortcuts named as the app with its
+  taskbar identity, and the Uninstall key (HKLM or HKCU) with its name, version, publisher, icon, folder, size and day. An update goes where
+  the app is. Settings' Uninstall opens the same page from a copy of the program in %TEMP%; the saved work stays unless ticked. From the
+  command line: --install [--scope=all|me] [--desktop=1|0], --uninstall --silent [--remove-data] [--from=<folder>]. A program without the
+  installer's page (made before 7.24) opens as the app, as before.
+- `build/modules/r170.js`: setupPage writes the installer's page in the approved look (the preview's own colours by day and by night, raised
+  tiles, the chosen one lifted, ringed and glowing, live keys and ticks, the seal swaying and leaning to the pointer, a progress well, no
+  scroll bar); makeWin makes "<App> Setup.exe" (o.setup false still makes the zip); shell.txt gains name and publisher; the publisher, when
+  there is one, is the program's company.
+- `build/modules/r112.js`, `r139.js`: the Windows app is saved as "<App> Setup.exe" and called an installer; `r298.js`: Install on this PC
+  opens the installer (`build/desktop/app_setup_724.py`, applied by release.py, puts it in %TEMP% and opens it).
+- `shells/test/ci_windows.ps1` (GitHub's Windows machine, build-shells.yml, which can now build the Windows shell alone when started by
+  hand): the page pressed through as a person would (installed just for me and for everyone, updated, uninstalled with the saved work kept
+  and removed), each screen pictured and its window checked as drawn, and everything read back. `rig/verify_desktop_app.py` reads a Setup
+  file; `rig/t_723_ready_made.js` expects one.
+
 Ingenium 7.23 (16 November 2026): the ready-made apps name their own version and their owner, and a family app is known by its name.
 Her words (16 November 2026): "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of the Forge or
 Carpe Diem or Inkwell or any future app that I choose to make. I want Ingenium to actually build and create ready-made apps and build kits for
