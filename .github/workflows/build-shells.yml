@@ -25,7 +25,9 @@
 # 6.5: the Windows shell (source/shells/windows), 64-bit, with Microsoft's WebView2, built here and kept at
 #   source/shells/out/win-shell.exe and win-shell.json
 # and checked as Fabrica fills it: the app's own icon on the file, two starts with the storage kept, one copy at a time,
-# a file saved, and The Forge's 13 MB page.
+# a file saved, and The Forge's 13 MB page. 7.24: and as the app's own installer ("<App> Setup.exe"): installed just for
+# me and for everyone through its page, opened, updated, uninstalled with the saved work kept and removed, each read back
+# (source/shells/test/ci_windows.ps1).
 #
 # It runs only when the shells' own sources change (never for a new page), so it
 # never starts the app builds, and it never publishes anything: its one result is
@@ -41,7 +43,13 @@ on:
       - 'source/build/modules/r136.js'
       - 'source/build/modules/r170.js'
       - '.github/workflows/build-shells.yml'
-  workflow_dispatch: {}
+  # 7.24: started by hand, it can build one family of shells alone (the others stay as they are kept)
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Which shells to build and check: all, ios, android, mac or windows'
+        required: false
+        default: all
 
 permissions:
   contents: write
@@ -53,6 +61,7 @@ concurrency:
 jobs:
   ios:
     name: iPhone and iPad shell (build, simulator check, keep)
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'ios' }}
     runs-on: macos-15
     timeout-minutes: 60
     steps:
@@ -210,6 +219,7 @@ jobs:
 
   android:
     name: Android shell, filled as Fabrica fills it (emulator, Android ${{ matrix.api }})
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'android' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
@@ -277,6 +287,7 @@ jobs:
 
   mac:
     name: Mac shell (build for Apple silicon and Intel, fill as Fabrica does, open on Apple silicon)
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'mac' }}
     runs-on: macos-15
     timeout-minutes: 45
     steps:
@@ -309,6 +320,7 @@ jobs:
 
   mac-intel:
     name: Mac shell, filled as Fabrica fills it (open on Intel)
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'mac' }}
     needs: mac
     runs-on: macos-15-intel
     timeout-minutes: 30
@@ -341,6 +353,7 @@ jobs:
 
   mac-keep:
     name: Keep the Mac shell in this branch
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'mac' }}
     needs: [mac, mac-intel]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -385,6 +398,7 @@ jobs:
 
   windows:
     name: Windows shell (build, fill as Fabrica does, open, keep)
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == 'windows' }}
     runs-on: windows-2025
     timeout-minutes: 40
     steps:

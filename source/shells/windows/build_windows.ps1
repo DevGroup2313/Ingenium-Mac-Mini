@@ -1,7 +1,7 @@
 # INGENIUM  |  Copyright (c) 2026 Yannie D. Forest. All rights reserved.
 # NO LICENCE IS GRANTED. See LICENCE.txt.
 #
-# Builds the Windows shell Fabrica fills (Ingenium 6.5), on Windows with Visual Studio's C++ tools: Shell.exe (64-bit,
+# Builds the Windows shell Fabrica fills (Ingenium 6.5; from 7.24 also its own installer, which needs dwmapi.lib for its window's rounded corners), on Windows with Visual Studio's C++ tools: Shell.exe (64-bit,
 # Windows 10 and 11), its stand-in icon with room kept for each app's own (make_ico.py), Microsoft's WebView2 loader
 # linked in (the SDK from NuGet, the version below), and the C++ runtime inside, so it needs nothing installed but the
 # WebView2 runtime Windows carries. On the device Fabrica writes an app's icon and files into a copy (modules/r170.js).
@@ -42,7 +42,7 @@ try {
   & cl.exe /nologo /O2 /EHsc /std:c++17 /MT /W3 /DUNICODE /D_UNICODE /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00 "/I$inc" `
       (Join-Path $here 'shell.cpp') shell.res /Fe:Shell.exe /link /SUBSYSTEM:WINDOWS /MANIFEST:EMBED `
       "/MANIFESTINPUT:$(Join-Path $here 'shell.manifest')" $lib `
-      user32.lib ole32.lib shell32.lib shlwapi.lib advapi32.lib crypt32.lib comdlg32.lib version.lib uuid.lib
+      user32.lib ole32.lib shell32.lib shlwapi.lib advapi32.lib crypt32.lib comdlg32.lib version.lib uuid.lib dwmapi.lib
   if ($LASTEXITCODE) { throw "cl failed" }
 } finally { Pop-Location }
 Copy-Item (Join-Path $w 'Shell.exe') (Join-Path $Out 'win-shell.exe') -Force

@@ -260,29 +260,255 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
   var page=String(o.page||"index.html").replace(/^\/+/,"").replace(/[^\w.\-\/]+/g,"_")||"index.html";if(!/\.html?$/i.test(page))page+=".html";
   var html=typeof o.html==="string"?utf8(o.html):o.html;if(!html||!html.length)return Promise.reject(new Error("there is no page to put in the app"));
   var title=String(o.title||"My app").slice(0,60).replace(/[\r\n]+/g," "),name=winName(title),exeName=name+".exe";
+  /* 7.24: an installer, "<App> Setup.exe" (her approved preview), unless the portable program alone is asked for (o.setup false) */
+  var setup=o.setup!==false,vn=String(o.versionName||"1.0").replace(/[\r\n]+/g," "),publisher=String(o.publisher!=null?o.publisher:ownerOnly()).replace(/[\r\n]+/g," ").trim().slice(0,80);
   var bridges=(o.bridges||["CarpeNative"]).filter(function(b){return /^[A-Za-z_][A-Za-z0-9_]*$/.test(b);});
   step("Opening the shell");
   return (o.shell?Promise.resolve(o.shell):winShellExe()).then(function(shell){var exe=bareShell(shell).slice();
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
     step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,ownerLine(title));
     step("Putting its files in");
-    var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+String(o.versionName||"1.0").replace(/[\r\n]+/g," "),"made=Ingenium Fabrica",""].join("\n")),store:true},
+    var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+vn,"name="+name,"publisher="+publisher,"made=Ingenium Fabrica",""].join("\n")),store:true},
       {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];
-    (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"").replace(/[^\w.\-\/]+/g,"_");if(!p||p===page||p==="shell.json"||p==="shell.txt"||/(^|\/)\.\.(\/|$)/.test(p))return;files.push({name:p,data:typeof f.data==="string"?utf8(f.data):f.data,store:true});});
+    (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"").replace(/[^\w.\-\/]+/g,"_");if(!p||p===page||p==="shell.json"||p==="shell.txt"||/^__setup\//.test(p)||/(^|\/)\.\.(\/|$)/.test(p))return;files.push({name:p,data:typeof f.data==="string"?utf8(f.data):f.data,store:true});});
     files.push({name:page,data:html,store:true});
+    if(setup){step("Writing its installer");var ic=(o.icons||{})[256]||(o.icons||{})[64];
+      files.push({name:"__setup/index.html",data:utf8(setupPage({title:title,icon:ic?"data:image/png;base64,"+C.b64e(ic):"",font:(typeof LX7_FONTS!=="undefined"&&LX7_FONTS&&LX7_FONTS["cormorant-600-normal"])||""})),store:true});}
     return C.zipBuild(files).then(function(zz){var plen=zz.local.length+zz.cd.length+zz.eocd.length,out=new Uint8Array(exe.length+plen+16),dv=new DataView(out.buffer);
       out.set(exe,0);out.set(zz.local,exe.length);out.set(zz.cd,exe.length+zz.local.length);out.set(zz.eocd,exe.length+zz.local.length+zz.cd.length);
       dv.setUint32(exe.length+plen,plen%4294967296,true);dv.setUint32(exe.length+plen+4,Math.floor(plen/4294967296),true);out.set(TRAILER,exe.length+plen+8);
+      if(setup)return C.sha256(out).then(function(h){var nm=name+" Setup.exe";
+        return {bytes:out,size:out.length,sha256:C.hex(h),exe:nm,exeSha256:C.hex(h),exeSize:out.length,id:id,title:title,icons:nIcons,kind:"setup",fileName:nm,mime:"application/vnd.microsoft.portable-executable"};});
       step("Packing it");
       return C.zipBuild([{name:exeName,data:out},{name:"How to open "+name+".txt",data:utf8(WIN_HOWTO(title,exeName))}]).then(function(z2){
         var bytes=new Uint8Array(z2.local.length+z2.cd.length+z2.eocd.length);bytes.set(z2.local,0);bytes.set(z2.cd,z2.local.length);bytes.set(z2.eocd,z2.local.length+z2.cd.length);
-        return Promise.all([C.sha256(bytes),C.sha256(out)]).then(function(h){return {bytes:bytes,size:bytes.length,sha256:C.hex(h[0]),exe:exeName,exeSha256:C.hex(h[1]),exeSize:out.length,id:id,title:title,icons:nIcons};});});});});}
+        return Promise.all([C.sha256(bytes),C.sha256(out)]).then(function(h){return {bytes:bytes,size:bytes.length,sha256:C.hex(h[0]),exe:exeName,exeSha256:C.hex(h[1]),exeSize:out.length,id:id,title:title,icons:nIcons,kind:"portable",mime:"application/zip"};});});});});}
+
+/* ============ 7.24 · THE WINDOWS INSTALLER'S PAGE ============
+   Her approved preview (16 November 2026: "I approve of the preview, please push it everywhere"): an app made for Windows is
+   its own installer, "<App> Setup.exe"; the Windows shell (shells/windows/shell.cpp) shows this page in a window of its own when
+   the program opens as one, and again from Settings, Apps to uninstall it. In Ingenium's look, as approved: the window's own bar,
+   its minimise and close keys lifting under the pointer (the close turning violet); the app's seal swaying and leaning to the
+   pointer, its shadow cast below; the two ways to install as raised tiles, the chosen one lifted, ringed and glowing; the
+   desktop tick and Open without installing as live keys; a progress well with its sheen; no scroll bar anywhere. The shell
+   tells the page about the app and the install (window.SetupHost.info) and does the work it is asked for (SetupHost.send). */
+var SETUP_CSS=[
+  ":root{--card:#faf8fc;--hi:#fff;--lo:#eee8f4;--ink1:#221a2e;--ink2:#4a4358;--ink3:#6c6579;--hair:rgba(34,26,46,.10);--acc:#6a3fb5;--accs:rgba(106,63,181,.12);",
+  "--ring:rgba(106,63,181,.5);--pa:#7348be;--pb:#5d37a1;--pledge:#3a2070;--glow1:rgba(183,140,240,.22);--glow2:rgba(240,170,220,.14);",
+  "--pop:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);",
+  "--pophi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);",
+  "--press:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);--well:inset 0 1px 2.5px rgba(40,22,68,.08);--wellbg:rgba(34,26,46,.035);",
+  "--psh:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pledge),0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16);",
+  "--pshhi:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 var(--pledge),0 6px 9px rgba(40,22,68,.26),0 13px 22px rgba(40,22,68,.18);--castc:rgba(40,22,68,.28);",
+  "--f-title:\"Setup Serif\",\"Iowan Old Style\",\"Palatino Linotype\",Palatino,Georgia,serif;--f-ui:\"Segoe UI Variable Text\",\"Segoe UI\",system-ui,sans-serif}",
+  "@media (prefers-color-scheme:dark){:root{--card:#1c1626;--hi:#201a2b;--lo:#2a2239;--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;--hair:rgba(205,184,240,.11);",
+  "--acc:#b79ce6;--accs:rgba(183,156,230,.16);--ring:rgba(183,156,230,.45);--pa:#7a56c8;--pb:#5b3aa1;--pledge:#170b30;--glow1:rgba(122,86,200,.20);--glow2:rgba(180,90,170,.10);",
+  "--pop:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.50),0 9px 14px rgba(0,0,0,.36);",
+  "--pophi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.40);",
+  "--press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);--well:inset 0 1px 3px rgba(0,0,0,.4);--wellbg:rgba(10,6,18,.35);",
+  "--psh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--pledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.3);",
+  "--pshhi:inset 0 1px 0 rgba(255,255,255,.16),0 3px 0 var(--pledge),0 6px 9px rgba(0,0,0,.55),0 13px 22px rgba(0,0,0,.35);--castc:rgba(0,0,0,.5);color-scheme:dark}}",
+  "*{box-sizing:border-box}[hidden]{display:none !important}",
+  /* her rule for Ingenium and every app: no scroll bar shows, and everything still scrolls */
+  "html,body,*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}",
+  "html,body{margin:0;height:100%;overflow:hidden;background:var(--card)}",
+  "body{color:var(--ink1);font:15px/1.55 var(--f-ui);-webkit-user-select:none;user-select:none;cursor:default}",
+  ".inst{position:relative;min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(520px 260px at 8% -12%,var(--glow1),transparent 70%),",
+  "radial-gradient(420px 220px at 104% 6%,var(--glow2),transparent 70%),var(--card)}",
+  ".inst.measure{min-height:0}",
+  ".bar{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 16px;font:500 12.5px var(--f-ui);color:var(--ink3);background:linear-gradient(var(--hi),var(--card));",
+  "border-bottom:1px solid var(--hair);cursor:grab;flex:none}",
+  ".bar .mini{width:18px;height:18px;flex:none;background:var(--icon) center/contain no-repeat}",
+  ".bar .bt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar .x{margin-left:auto;display:flex;gap:6px}",
+  ".wc{all:unset;box-sizing:border-box;width:32px;height:28px;border-radius:10px;display:grid;place-items:center;color:var(--ink3);cursor:pointer;font-size:14px;",
+  "transition:transform .18s cubic-bezier(.34,1.35,.64,1),background .18s ease,color .18s ease,box-shadow .18s ease}",
+  ".wc:hover{transform:translateY(-2px);background:linear-gradient(var(--hi),var(--card));color:var(--acc);box-shadow:var(--pop)}",
+  ".wc:active{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}",
+  ".wc.close:hover{color:#fff;background:linear-gradient(var(--pa),var(--pb));box-shadow:var(--psh)}",
+  ".wc:focus-visible{outline:2px solid var(--ring);outline-offset:2px}.wc:disabled{opacity:.4;pointer-events:none}",
+  ".head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;padding:22px 24px 6px;animation:rise .45s cubic-bezier(.22,1,.36,1)}",
+  ".eye{font:600 11px/1 var(--f-ui);letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}",
+  "h3{font:600 34px/1.05 var(--f-title);margin:6px 0 2px;overflow-wrap:anywhere}",
+  ".sub{color:var(--ink2);font-size:13.5px;overflow-wrap:anywhere}",
+  ".body{padding:14px 24px 22px;display:grid;gap:12px;align-content:start;flex:1 1 auto;animation:rise .45s cubic-bezier(.22,1,.36,1)}",
+  ".body:empty{padding:4px}",
+  ".foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center;padding:16px 24px;background:linear-gradient(var(--card),var(--lo));",
+  "border-top:1px solid var(--hair);flex:none}",
+  ".lnk{all:unset;box-sizing:border-box;margin-right:auto;color:var(--acc);font:500 13.5px var(--f-ui);cursor:pointer;text-decoration:underline;",
+  "text-decoration-thickness:1px;text-underline-offset:3px;display:inline-block;transition:transform .18s cubic-bezier(.34,1.35,.64,1),",
+  "text-decoration-thickness .18s ease,text-underline-offset .18s ease,color .18s ease}",
+  ".lnk:hover{transform:translateY(-2px);text-decoration-thickness:2px;text-underline-offset:5px;color:var(--pa)}.lnk:active{transform:translateY(1px)}",
+  ".lnk:focus-visible{outline:2px solid var(--ring);outline-offset:3px;border-radius:4px}",
+  ".key{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:12px;",
+  "background:linear-gradient(var(--hi),var(--card));color:var(--ink1);font:500 14px/1.2 var(--f-ui);box-shadow:var(--pop);",
+  "transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s ease}",
+  ".key:hover{transform:translateY(-2px);box-shadow:var(--pophi)}.key:active{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}",
+  ".key.pri{background:linear-gradient(var(--pa),var(--pb));color:#fff;box-shadow:var(--psh)}.key.pri:hover{box-shadow:var(--pshhi)}.key.pri:active{box-shadow:var(--press)}",
+  ".key:focus-visible{outline:2px solid var(--ring);outline-offset:3px}.key:disabled{opacity:.55;cursor:default;pointer-events:none}",
+  /* the seal: the app's icon in layers, swaying, leaning to the pointer, its shadow cast below */
+  ".seal{position:relative;width:76px;height:76px;perspective:400px;flex:none}",
+  ".seal .tilt{position:absolute;top:0;right:0;bottom:0;left:0;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.22,1,.36,1)}",
+  ".seal .idle{position:absolute;top:0;right:0;bottom:0;left:0;animation:sway 7s ease-in-out infinite;transform-style:preserve-3d}",
+  ".seal .face{position:absolute;top:0;right:0;bottom:0;left:0;background:var(--icon) center/contain no-repeat;",
+  "filter:drop-shadow(0 6px 8px rgba(40,22,68,.28)) drop-shadow(0 1px 0 rgba(0,0,0,.18))}",
+  ".seal .shine{position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(140deg,rgba(255,255,255,.45),rgba(255,255,255,0) 45%);",
+  "mix-blend-mode:soft-light;transform:translateZ(6px);-webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}",
+  ".seal .cast{position:absolute;left:12%;right:12%;bottom:-14px;height:12px;border-radius:50%;background:radial-gradient(closest-side,var(--castc),transparent);",
+  "animation:castb 7s ease-in-out infinite}",
+  "@keyframes sway{0%,100%{transform:rotateX(4deg) rotateY(-7deg) translateY(0)}50%{transform:rotateX(-3deg) rotateY(7deg) translateY(-3px)}}",
+  "@keyframes castb{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.9);opacity:.75}}",
+  "@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}",
+  /* the ways to install: raised tiles; the chosen one lifts, ringed and glowing */
+  ".opts{display:grid;gap:12px}",
+  ".opt{position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;padding:14px 16px;border-radius:16px;background:linear-gradient(var(--hi),var(--card));",
+  "box-shadow:var(--pop);cursor:pointer;transition:transform .18s cubic-bezier(.34,1.35,.64,1),box-shadow .18s ease}",
+  ".opt:hover{transform:translateY(-2px);box-shadow:var(--pophi)}",
+  ".opt.on{transform:translateY(-3px);box-shadow:var(--pophi),0 0 0 2px var(--ring),0 12px 26px var(--accs);animation:chosen .5s cubic-bezier(.34,1.56,.64,1)}",
+  ".opt.on:hover{transform:translateY(-4px)}.opt.fixed{cursor:default}.opt.fixed:hover{transform:translateY(-3px)}",
+  ".opt.on::after{content:\"\";position:absolute;top:-2px;right:-2px;bottom:-2px;left:-2px;border-radius:18px;pointer-events:none;box-shadow:0 0 18px 2px var(--accs);",
+  "animation:breathe 4.5s ease-in-out infinite}",
+  ".opt:focus-visible{outline:2px solid var(--ring);outline-offset:3px}",
+  ".opt .gem{width:20px;height:20px;border-radius:50%;margin-top:2px;background:var(--lo);box-shadow:var(--well);display:grid;place-items:center;",
+  "transition:transform .2s cubic-bezier(.34,1.56,.64,1)}.opt:hover .gem{transform:scale(1.08)}",
+  ".opt.on .gem::after{content:\"\";width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c9b3f2,var(--pa) 55%,var(--pb));",
+  "box-shadow:0 1px 2px rgba(40,22,68,.4);animation:pip .35s cubic-bezier(.34,1.56,.64,1)}",
+  ".opt b{font-weight:600}.opt small{display:block;color:var(--ink3);font-size:12.5px;margin-top:2px;overflow-wrap:anywhere}",
+  "@keyframes chosen{0%{transform:translateY(0) scale(.985)}55%{transform:translateY(-5px) scale(1.012)}100%{transform:translateY(-3px) scale(1)}}",
+  "@keyframes breathe{0%,100%{opacity:.35}50%{opacity:1}}@keyframes pip{from{transform:scale(.2)}to{transform:scale(1)}}",
+  /* the ticks: a raised box that lifts, sinks when pressed, its tick popping in */
+  ".chk{display:flex;gap:12px;align-items:center;font-size:14px;cursor:pointer;justify-self:start;border-radius:10px}",
+  ".chk:focus-visible{outline:2px solid var(--ring);outline-offset:4px}",
+  ".chk .c{width:22px;height:22px;flex:none;border-radius:7px;background:linear-gradient(var(--hi),var(--card));box-shadow:var(--pop);display:grid;place-items:center;",
+  "color:#fff;font-size:13px;transition:transform .18s cubic-bezier(.34,1.35,.64,1),box-shadow .18s ease}",
+  ".chk:hover .c{transform:translateY(-2px);box-shadow:var(--pophi)}.chk:active .c{transform:translateY(1px);box-shadow:var(--press);transition-duration:.06s}",
+  ".chk .c.on{background:linear-gradient(var(--pa),var(--pb));box-shadow:var(--psh);animation:tick .4s cubic-bezier(.34,1.56,.64,1)}.chk:hover .c.on{box-shadow:var(--pshhi)}",
+  "@keyframes tick{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}",
+  /* the work: a well filling, with its sheen, and its steps ticked as each is done */
+  ".well{height:12px;border-radius:999px;background:var(--wellbg);box-shadow:var(--well);overflow:hidden}",
+  ".well i{display:block;height:100%;width:3%;border-radius:999px;background:linear-gradient(90deg,var(--pb),var(--pa));position:relative;overflow:hidden;",
+  "transition:width .35s ease}",
+  ".well i::after{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.45) 50%,transparent 80%);",
+  "animation:sheen 1.6s linear infinite}@keyframes sheen{from{transform:translateX(-100%)}to{transform:translateX(100%)}}",
+  ".ticks{display:grid;gap:6px;font-size:13.5px;color:var(--ink2)}.ticks .t{display:flex;gap:10px;align-items:center}",
+  ".ticks .d{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:11px;background:var(--accs);color:var(--acc);",
+  "transition:background .25s ease,color .25s ease}",
+  ".ticks .t.done .d{background:linear-gradient(var(--pa),var(--pb));color:#fff;animation:tick .4s cubic-bezier(.34,1.56,.64,1)}",
+  ".err{padding:10px 14px;border-radius:14px;background:var(--wellbg);box-shadow:var(--well);color:var(--acc);font-size:13.5px;overflow-wrap:anywhere}",
+  ".note{color:var(--ink3);font-size:13px}",
+  "@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}"].join("");
+var SETUP_HTML='<div class="inst" id="inst" data-screen=""><div class="bar" id="bar"><span class="mini"></span><span class="bt" id="bt"></span><span class="x">'+
+  '<button type="button" class="wc" id="wMin" title="Minimise" aria-label="Minimise">&#8211;</button>'+
+  '<button type="button" class="wc close" id="wClose" title="Close" aria-label="Close">&#10005;</button></span></div>'+
+  '<div class="head"><div class="seal" aria-hidden="true"><div class="tilt" id="tilt"><div class="idle"><div class="face"></div><div class="shine"></div></div></div><div class="cast"></div></div>'+
+  '<div><div class="eye" id="eye"></div><h3 id="ttl"></h3><div class="sub" id="sub"></div></div></div>'+
+  '<div class="body" id="body"></div><div class="foot" id="foot"></div></div>';
+/* the installer's own script: it runs in the installer's window (never in Ingenium), from this function's text */
+function setupMain(){"use strict";
+  var D=document,W=window,H=W.SetupHost||{info:{},send:function(){}},I=H.info||{},T=String(I.title||"App"),ins=I.installed||null,UNI=I.mode==="uninstall";
+  var send=function(){try{H.send.apply(H,arguments);}catch(e){}};
+  function $(id){return D.getElementById(id);}
+  function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function cmp(a,b){var x=String(a||"").split(/[^0-9]+/),y=String(b||"").split(/[^0-9]+/);for(var i=0;i<Math.max(x.length,y.length);i++){var p=parseInt(x[i]||"0",10)||0,q=parseInt(y[i]||"0",10)||0;if(p!==q)return p<q?-1:1;}return 0;}
+  var same=!!ins&&cmp(ins.version,I.version)===0,newer=!!ins&&cmp(ins.version,I.version)>0,wasIn=!!ins;
+  var S={screen:UNI?"uninstall":"choose",scope:ins?(ins.all?"all":"me"):"all",desk:ins?!!ins.desktop:true,open:true,removeData:false,pct:0,step:0,asking:false,err:"",code:0};
+  function where(){if(ins&&(!!ins.all)===(S.scope==="all"))return ins.dir;var d=I.dirs||{};return S.scope==="all"?d.all:d.me;}
+  function act(){return UNI?"Uninstall":same?"Reinstall":newer?"Install this version":wasIn?"Update":"Install";}
+  function busy(){return S.screen==="installing"||S.screen==="uninstalling";}
+  function why(c){
+    if(c===3)return T+" is open. Close it, then press "+act()+" again.";
+    if(c===4)return "A file could not be written in "+(where()||"its folder")+". Check the drive has room, then try again.";
+    if(c===5)return UNI?"Removing it needs an administrator, as it was installed for everyone on this PC.":"Installing for everyone needs an administrator. Choose Just for me, or ask an administrator to install it.";
+    if(c===6)return "Its entry in Settings, Apps could not be "+(UNI?"removed":"written")+".";
+    if(c===7)return "Its shortcuts could not be made.";
+    if(c===8)return "This folder holds no installed copy of "+T+".";
+    if(c===9)return "Its program could not be removed. Close "+T+", then try again.";
+    if(c===10)return "Windows' administrator question was declined, so nothing changed."+(!UNI&&!wasIn?" Just for me needs no administrator.":"");
+    if(c===11)return "Windows could not ask for an administrator."+(!UNI&&!wasIn?" Just for me needs none.":"");
+    if(c===12)return "Some of its saved work could not be removed: it is still in "+(I.data||"its folder")+".";
+    return "It stopped before the end (code "+c+").";}
+  function head(eye,ttl,sub){$("eye").textContent=eye;$("ttl").textContent=ttl;$("sub").textContent=sub;}
+  function opt(k,on,t1,t2,fixed){return '<div class="opt'+(on?" on":"")+(fixed?" fixed":"")+'" data-scope="'+k+'" role="radio" aria-checked="'+on+'"'+(fixed?' aria-disabled="true"':' tabindex="0"')+
+    '><span class="gem"></span><div><b>'+t1+'</b><small>'+esc(t2)+'</small></div></div>';}
+  function chk(k,on,label){return '<div class="chk" data-'+k+'="1" role="checkbox" aria-checked="'+on+'" tabindex="0"><span class="c'+(on?" on":"")+'">'+(on?"&#10003;":"")+'</span>'+esc(label)+'</div>';}
+  function err(){return '<div class="err" id="err" role="alert"'+(S.err?"":" hidden")+'>'+esc(S.err)+'</div>';}
+  function tick(i,label){var d=S.step>i;return '<div class="t'+(d?" done":"")+'"><span class="d">'+(d?"&#10003;":(i+1))+'</span>'+esc(label)+'</div>';}
+  function ticks(){return UNI?tick(0,"Its shortcuts")+tick(1,"Its entry in Settings, Apps")+tick(2,"The program")+(S.removeData?tick(3,"Its saved work"):"")
+    :tick(0,"The program copied")+tick(1,"Its Start menu entry"+(S.desk?" and desktop shortcut":""))+tick(2,"Its entry in Settings, Apps");}
+  function paint(){var s=S.screen,b="",f="",v="Version "+(I.version||"1.0")+(I.publisher?" · from "+I.publisher:"");
+    $("inst").setAttribute("data-screen",s);$("bt").textContent=T+" Setup";D.title=T+" Setup";$("wClose").disabled=busy();
+    if(s==="choose"){head(same?"Installed already":newer?"A newer version is installed":wasIn?"Update":"Install",T,v+(wasIn?" · installed: "+(ins.version||"?"):""));
+      b='<div class="opts" role="radiogroup" aria-label="Install it">'+(wasIn?opt(ins.all?"all":"me",true,ins.all?"For everyone on this PC":"Just for me","Installed in "+ins.dir+". It goes there again; your saved work stays.",true)
+        :opt("all",S.scope==="all","For everyone on this PC","Into Program Files, for every account. Windows asks for an administrator first.")+
+         opt("me",S.scope==="me","Just for me","Into your own apps folder. No administrator needed."))+'</div>'+chk("desk",S.desk,"Put a shortcut on the desktop")+err();
+      f='<button type="button" class="lnk" id="goTry">Open without installing</button><button type="button" class="key" id="wCancel">Cancel</button>'+
+        '<button type="button" class="key pri" id="goInstall">'+act()+'</button>';}
+    else if(s==="installing"){head(wasIn?"Updating":"Installing",T,S.asking?"Windows asks for an administrator first.":"Into "+(where()||""));
+      b='<div class="well"><i id="fill" style="width:'+Math.max(3,S.pct)+'%"></i></div><div class="ticks" id="ticks">'+ticks()+'</div>';
+      f='<button type="button" class="key" disabled>Cancel</button>';}
+    else if(s==="installed"){head(wasIn?"Updated":"Installed",T+" is ready","Find it in the Start menu"+(S.desk?" and on your desktop":"")+", and in Settings, Apps to uninstall it.");
+      b=chk("open",S.open,"Open "+T+" now");f='<button type="button" class="key pri" id="wFinish">Finish</button>';}
+    else if(s==="uninstall"){head("Uninstall","Remove "+T+"?","Its program, its shortcuts and its entry in Settings go.");
+      b=chk("keep",S.removeData,"Also remove its saved work")+'<div class="note">'+(S.removeData?"Your saved work goes with it. Untick to keep it.":"Your saved work stays on this PC, so it is there if you install "+esc(T)+" again.")+'</div>'+err();
+      f='<button type="button" class="key" id="wCancel">Cancel</button><button type="button" class="key pri" id="goUninstall">Uninstall</button>';}
+    else if(s==="uninstalling"){head("Uninstalling",T,S.asking?"Windows asks for an administrator first.":"From "+(ins?ins.dir:""));
+      b='<div class="well"><i id="fill" style="width:'+Math.max(3,S.pct)+'%"></i></div><div class="ticks" id="ticks">'+ticks()+'</div>';
+      f='<button type="button" class="key" disabled>Cancel</button>';}
+    else if(s==="uninstalled"){head("Uninstalled",T+" is removed",S.removeData?(S.err?"":"Its saved work is removed too."):"Your saved work stays on this PC.");b=err();
+      f='<button type="button" class="key pri" id="wDone">Close</button>';}
+    else {head(UNI?"Not removed":"Not installed",T,why(S.code));
+      f='<button type="button" class="key" id="goBack">Back</button><button type="button" class="key pri" id="wClose2">Close</button>';}
+    $("body").innerHTML=b;$("foot").innerHTML=f;wire();fit();}
+  function on(id,fn){var e=$(id);if(e)e.addEventListener("click",fn);}
+  function tog(sel,fn){var e=D.querySelector(sel);if(!e)return;e.addEventListener("click",fn);e.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();fn();}});}
+  function wire(){
+    [].forEach.call(D.querySelectorAll(".opt[data-scope]:not(.fixed)"),function(o){var pick=function(){S.scope=o.getAttribute("data-scope");S.err="";paint();var n=D.querySelector('.opt[data-scope="'+S.scope+'"]');if(n)n.focus();};
+      o.addEventListener("click",pick);o.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pick();}});});
+    tog("[data-desk]",function(){S.desk=!S.desk;paint();var n=D.querySelector("[data-desk]");if(n)n.focus();});
+    tog("[data-open]",function(){S.open=!S.open;paint();var n=D.querySelector("[data-open]");if(n)n.focus();});
+    tog("[data-keep]",function(){S.removeData=!S.removeData;paint();var n=D.querySelector("[data-keep]");if(n)n.focus();});
+    on("goTry",function(){send("run");});
+    on("wCancel",function(){send("close");});on("wClose2",function(){send("close");});on("wDone",function(){send("close");});
+    on("wFinish",function(){send(S.open?"open":"close");});
+    on("goBack",function(){S.screen=UNI?"uninstall":"choose";S.err="";paint();});
+    on("goInstall",function(){S.err="";S.pct=0;S.step=0;S.asking=false;S.screen="installing";paint();send("install",S.scope,S.desk?1:0);});
+    on("goUninstall",function(){S.err="";S.pct=0;S.step=0;S.asking=false;S.screen="uninstalling";paint();send("uninstall",S.removeData?1:0);});}
+  /* the shell's news: how far the work is, Windows asking, the end */
+  function hear(m){if(!m||typeof m!=="object")return;
+    if(m.type==="progress"){S.asking=false;S.pct=m.pct|0;S.step=m.step|0;var f=$("fill"),t=$("ticks");if(f)f.style.width=Math.max(3,S.pct)+"%";if(t)t.innerHTML=ticks();
+      var sb=$("sub");if(sb&&busy())sb.textContent=(UNI?"From ":"Into ")+(UNI?(ins?ins.dir:""):(where()||""));return;}
+    if(m.type==="asking"){S.asking=true;$("sub").textContent="Windows asks for an administrator first.";return;}
+    if(m.type==="finished"){var c=m.code|0;S.asking=false;
+      if(!UNI){if(c===0){S.screen="installed";}else if(c===3||c===5||c===10||c===11){S.screen="choose";S.err=why(c);}else{S.code=c;S.screen="failed";}}
+      else{if(c===0||c===12){S.screen="uninstalled";S.err=c===12?why(12):"";}else if(c===3||c===5||c===10||c===11){S.screen="uninstall";S.err=why(c);}else{S.code=c;S.screen="failed";}}
+      paint();}}
+  try{W.chrome.webview.addEventListener("message",function(e){hear(e.data);});}catch(e){}
+  /* the window's own bar: pressed, the window follows the pointer; its keys minimise and close */
+  $("bar").addEventListener("mousedown",function(e){if(e.button!==0||e.target.closest(".wc"))return;e.preventDefault();send("drag");});
+  on("wMin",function(){send("min");});on("wClose",function(){if(!busy())send("close");});
+  D.addEventListener("keydown",function(e){if(e.key==="Escape"&&!busy()){e.preventDefault();send("close");}
+    else if(e.key==="Enter"&&!(e.target&&e.target.closest&&e.target.closest("button,[role=radio],[role=checkbox]"))){var k=$("goInstall")||$("goUninstall")||$("wFinish")||$("wDone");if(k){e.preventDefault();k.click();}}});
+  /* the seal leans to the pointer */
+  var tilt=$("tilt");$("inst").addEventListener("pointermove",function(e){var r=tilt.getBoundingClientRect(),x=(e.clientX-(r.left+r.width/2))/Math.max(160,r.width*3),y=(e.clientY-(r.top+r.height/2))/Math.max(160,r.height*3);
+    tilt.style.transform="rotateY("+(Math.max(-1,Math.min(1,x))*16).toFixed(1)+"deg) rotateX("+(Math.max(-1,Math.min(1,-y))*13).toFixed(1)+"deg)";});
+  $("inst").addEventListener("pointerleave",function(){tilt.style.transform="";});
+  /* the window takes the page's height: once at first, then only to grow, so it never jumps smaller under the pointer */
+  var lastH=0;function fit(){var n=$("inst");n.classList.add("measure");var h=Math.ceil(n.getBoundingClientRect().height);n.classList.remove("measure");if(h>lastH){lastH=h;send("fit",540,h);}}
+  paint();try{if(D.fonts&&D.fonts.ready)D.fonts.ready.then(fit);}catch(e){}
+}
+function setupEsc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+/* the page: o.title, o.icon (the app's icon as a data address), o.font (a woff2 data address for the titles, else the system's serif) */
+function setupPage(o){var css=(o.font&&/^data:/.test(o.font)?'@font-face{font-family:"Setup Serif";src:url('+o.font+') format("woff2");font-weight:600;font-style:normal;font-display:block}':"")+
+    (o.icon&&/^data:image\//.test(o.icon)?":root{--icon:url("+o.icon+")}":"")+SETUP_CSS;
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+setupEsc(o.title)+' Setup</title><style>'+css+
+    '</style></head><body>'+SETUP_HTML+'<script>('+setupMain.toString()+')();<\/script></body></html>';}
+/* the owner's name alone (the profile's author, else the name in Settings), or nothing */
+function ownerOnly(){var n=ownerLine("");return n;}
 
 root.IngMac={make:makeMac,iconsFor:iconsFor,sizes:MAC_SIZES,folder:macFolder,exeName:macExe,
   core:{icns:icns,codeResources:codeResources,resign:resign,slices:slices,plistDict:plistDict},
   has:function(){if(root.__ingMacShell)return true;var e=typeof document!=="undefined"&&document.getElementById("ing-mac-shell");return !!(e&&e.textContent.trim());}};
 root.IngWin={make:makeWin,iconsFor:winIconsFor,sizes:WIN_SIZES,fileName:winName,
-  core:{peIcons:peIcons,iconsInto:winIconsInto,nameInto:winNameInto,slots:WIN_SLOTS,bare:bareShell,TRAILER:TRAILER},
+  core:{peIcons:peIcons,iconsInto:winIconsInto,nameInto:winNameInto,slots:WIN_SLOTS,bare:bareShell,TRAILER:TRAILER,setupPage:setupPage},
   has:function(){if(root.__ingWinShell)return true;var e=typeof document!=="undefined"&&document.getElementById("ing-win-shell");return !!(e&&e.textContent.trim());}};
 })(typeof window!=="undefined"?window:globalThis);
 ;try{window.__ingParts["p91"]="running";}catch(_){}
