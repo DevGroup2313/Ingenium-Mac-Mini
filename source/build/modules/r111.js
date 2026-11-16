@@ -63,7 +63,13 @@ function checkNames(id,snap,page,html){var refs=namedBy(html).refs,missing=[],se
     var n=Object.keys(seen).length;return missing.length?{state:"fail",detail:"not here: "+missing.slice(0,5).join(", ")+(missing.length>5?" and "+(missing.length-5)+" more":"")}:{state:"ok",detail:n?n+" file"+(n>1?"s":"")+" named, all here":"it names no other file"};});}
 /* the build number: the page's ingenium-build, else the recipe's version, else its manifest's */
 function numberOf(html,rec){var m=/<meta\s+name=["']ingenium-build["']\s+content=["']([^"']*)["']/i.exec(html||"");if(m&&m[1])return m[1];if(rec&&rec.version)return String(rec.version);
-  var v=/<meta\s+name=["'](?:version|app-version)["']\s+content=["']([^"']*)["']/i.exec(html||"");return v?v[1]:"";}
+  var v=/<meta\s+name=["'](?:version|app-version)["']\s+content=["']([^"']*)["']/i.exec(html||"");if(v&&v[1])return v[1];
+  /* 7.23: the family's own marks, as apps/update_builtin.py reads them (Fabrica's audit of 16 November 2026 found The Forge 656, Carpe
+     Diem 1091 and Inkwell 7.52 each made as version 1.0): The Forge and Carpe Diem name theirs in window.CD_BUILD (pass), Inkwell in its
+     BUILD constant, Lakay in its lakay-build meta */
+  var s=String(html||""),cd=/window\.CD_BUILD=\{date:"[^"]*",pass:"(\d+)"/.exec(s);if(cd)return cd[1];
+  var ik=/const BUILD='\s*([\d.]+)/.exec(s);if(ik&&/<title>Inkwell\b/.test(s.slice(0,20000)))return ik[1];
+  var lk=/<meta name="lakay-build" content="(\d+)"/.exec(s.slice(0,40000));return lk?lk[1]:"";}
 function cmpVer(a,b){var x=String(a).split(/[^0-9]+/).filter(Boolean).map(Number),y=String(b).split(/[^0-9]+/).filter(Boolean).map(Number);
   for(var i=0;i<Math.max(x.length,y.length);i++){var p=x[i]||0,q=y[i]||0;if(p!==q)return p<q?-1:1;}return 0;}
 

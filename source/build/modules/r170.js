@@ -113,7 +113,14 @@ function resign(exe,slots){var dv=new DataView(exe.buffer,exe.byteOffset,exe.byt
       exe.set(h[0].subarray(0,j.hsize),j.at-1*j.hsize);exe.set(h[1].subarray(0,j.hsize),j.at-3*j.hsize);});})).then(function(){return jobs.length;});}
 
 /* ---------- the app ---------- */
-var HOWTO=function(title,folder){return [title,"","Made with Ingenium Fabrica, for a Mac (Apple silicon or Intel, macOS 12 or newer).","",
+/* 7.23, her words (16 November 2026): "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of
+   the Forge or Carpe Diem or Inkwell or any future app that I choose to make." Fabrica's audit found Ingenium named where a person sees it
+   in an app made here: the Mac app's copyright (Get Info, its About window), the Windows program's company (its Details) and the first
+   line of these notes. Each now names the app's owner (Lector's author, else the name in Settings, else the app itself). */
+function ownerLine(title){var n="";try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
+  if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}
+  n=n.replace(/[^0-9A-Za-z\u00c0-\u024f .'\-]+/g," ").replace(/\s+/g," ").trim().slice(0,60);return n||String(title||"");}
+var HOWTO=function(title,folder){return [title,"","For a Mac (Apple silicon or Intel, macOS 12 or newer).","",
   "1. Drag "+folder+" into your Applications folder.",
   "2. The first time, Control-click it (or right-click) and choose Open, then Open again.",
   "   On macOS 15 and newer: open it once, then open System Settings, Privacy and Security,",
@@ -139,7 +146,7 @@ function makeMac(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
       step("Writing its name, id and version");
       var vn=String(o.versionName||"1.0").replace(/[^0-9.]/g,"")||"1.0";
       t=plistSet(t,"CFBundleIdentifier",id);t=plistSet(t,"CFBundleDisplayName",title);t=plistSet(t,"CFBundleName",title.slice(0,15));t=plistSet(t,"CFBundleExecutable",exe);
-      t=plistSet(t,"CFBundleShortVersionString",vn);t=plistSet(t,"CFBundleVersion",String(o.build||o.versionName||"1").replace(/[^0-9.]/g,"")||"1");
+      t=plistSet(t,"CFBundleShortVersionString",vn);t=plistSet(t,"NSHumanReadableCopyright","\u00a9 "+new Date().getFullYear()+" "+ownerLine(title));t=plistSet(t,"CFBundleVersion",String(o.build||o.versionName||"1").replace(/[^0-9.]/g,"")||"1");
       t=plistSet(t,"NSMicrophoneUsageDescription",title+" uses the microphone only while you ask it to listen, for dictation or a recording.");
       t=plistSet(t,"NSCameraUsageDescription",title+" uses the camera only while you ask it to, for a picture or a recording.");
       t=plistSet(t,"NSSpeechRecognitionUsageDescription","Dictation turns your speech into text inside "+title+".");
@@ -230,13 +237,16 @@ function winNameInto(exe,o){var dv=new DataView(exe.buffer,exe.byteOffset,exe.by
   var sig=findAt(exe,new Uint8Array([0xBD,0x04,0xEF,0xFE]));
   if(sig>=0){var ms=(n[0]<<16|n[1])>>>0,ls=(n[2]<<16|n[3])>>>0;dv.setUint32(sig+8,ms,true);dv.setUint32(sig+12,ls,true);dv.setUint32(sig+16,ms,true);dv.setUint32(sig+20,ls,true);}
   return found.length;}
+function winCompanyInto(exe,who){try{var room="Made with Ingenium Fabrica",p=findAt(exe,u16le(room));if(p<0)return false;var dv=new DataView(exe.buffer,exe.byteOffset,exe.byteLength);
+  var key=u16le("CompanyName\u0000"),kp=findAt(exe,key,p-key.length-4,p);if(kp<0)return false;var hdr=kp-6,vl=dv.getUint16(hdr+2,true);if(vl!==room.length&&vl!==room.length+1)return false;
+  var v=String(who||"").slice(0,room.length);if(!v)return false;exe.fill(0,p,p+2*room.length);exe.set(u16le(v),p);dv.setUint16(hdr+2,v.length+1,true);return true;}catch(e){return false;}}
 function winIcons(src){if(typeof document==="undefined")return Promise.reject(new Error("icons are drawn in a window"));
   return new Promise(function(res,rej){var im=new Image();im.onload=function(){res(im);};im.onerror=function(){rej(new Error("the app's icon could not be read"));};im.src=src;}).then(function(im){
     return Promise.all(WIN_SIZES.map(function(z){var c=document.createElement("canvas");c.width=z;c.height=z;var x=c.getContext("2d");x.imageSmoothingEnabled=true;try{x.imageSmoothingQuality="high";}catch(e){}
       x.drawImage(im,0,0,z,z);return new Promise(function(r2){c.toBlob(function(b){b.arrayBuffer().then(function(ab){r2(new Uint8Array(ab));});},"image/png");});})).then(function(list){
       var o={};WIN_SIZES.forEach(function(z,i){o[z]=list[i];});return o;});});}
 function winIconsFor(html,title,colour,fallback){var A=root.IngApk;var src=(A&&A.iconSource&&A.iconSource(html))||fallback||letterIcon(title,colour);return winIcons(src);}
-var WIN_HOWTO=function(title,exe){return [title,"","Made with Ingenium Fabrica, for Windows 10 and 11 (64-bit).","",
+var WIN_HOWTO=function(title,exe){return [title,"","For Windows 10 and 11 (64-bit).","",
   "1. Move "+title+" where you keep your apps (your Desktop, or a folder of its own).",
   "   Windows shows it by its name, "+title+". Only where a PC shows the endings of file names does its file read "+exe+".",
   "2. Double-click it. The first time, Windows may say it protected your PC:",
@@ -254,7 +264,7 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
   step("Opening the shell");
   return (o.shell?Promise.resolve(o.shell):winShellExe()).then(function(shell){var exe=bareShell(shell).slice();
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
-    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");
+    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,ownerLine(title));
     step("Putting its files in");
     var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+String(o.versionName||"1.0").replace(/[\r\n]+/g," "),"made=Ingenium Fabrica",""].join("\n")),store:true},
       {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];

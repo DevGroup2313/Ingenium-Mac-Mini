@@ -101,7 +101,7 @@ function key(cls,text,fn){var b=mk("button",cls||"f-btn");b.type="button";b.text
 
 /* ---------- each repository's own logo: never a coloured letter ---------- */
 function famKey(name){var n=String(name||"").toLowerCase();
-  if(/carpe[-_ ]?diem/.test(n))return "cd";if(/forge/.test(n))return "forge";if(/ingenium/.test(n))return "ingenium";if(/ink[-_ ]?well|inwell/.test(n))return "inkwell";
+  if(/carpe[-_ ]?diem/.test(n))return "cd";if(/(^|[^a-z])forge([^a-z]|$)/.test(n))return "forge";if(/(^|[^a-z])ingenium([^a-z]|$)/.test(n))return "ingenium";if(/(^|[^a-z])(ink[-_ ]?well|inwell)([^a-z]|$)/.test(n))return "inkwell";  /* 7.23: whole words (a repository named forget-me-not is not The Forge) */
   if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}
 function flat(k){try{var s=W.ING_SEALS&&ING_SEALS[k];return s&&s.b64?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
 function logo(r,size){size=size||28;var k=famKey(r&&(r.name||r.full)),src="";

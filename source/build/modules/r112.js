@@ -504,7 +504,10 @@ var APPS={cd:{name:"Carpe Diem",color:"#1B6B93"},forge:{name:"The Forge",color:"
 var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
 /* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
 try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!APPS.lakay){APPS.lakay={name:LIB_NAMES.lakay,color:"#5c63c6"};DELAY.lakay=6.8;}}catch(e){}
-function appOf(r){return r&&r.app&&APPS[r.app]?r.app:null;}
+/* 7.23: a repository is known as one of the family's apps by its record, else by its name, as r276 knows one brought from GitHub (a
+   repository opened from the drive, or brought in from a file, carried no record of it, and an Inkwell made there wore a gold I) */
+function famOf(name){var n=String(name||"").toLowerCase();if(/carpe[-_ ]?diem/.test(n))return "cd";if(/(^|[^a-z])forge([^a-z]|$)/.test(n))return "forge";if(/(^|[^a-z])ingenium([^a-z]|$)/.test(n))return "ingenium";if(/(^|[^a-z])ink[-_ ]?well([^a-z]|$)/.test(n))return "inkwell";return null;}  /* whole words: an app named Forget Me Not is not The Forge */
+function appOf(r){if(!r)return null;if(r.app&&APPS[r.app])return r.app;var k=famOf(r.name);return k&&APPS[k]?k:null;}
 function colorOf(r){var k=appOf(r);return k?APPS[k].color:"#b88a3a";}
 /* 6.40: the Offline Project wears its own crest here, as each of the four apps wears its seal. Her words (6 November 2026): "I want the
    Offline Project seal to be shown inside of Fabrica the same way that the other apps icons are shown inside of Fabrica, I don't want it

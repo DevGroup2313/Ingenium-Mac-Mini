@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.23", "The apps Fabrica makes carry their own version, read from the app itself, so a ready-made app is no longer numbered 1.0.", "fabrica"],
+  ["7.23", "The Forge, Carpe Diem, Inkwell and Lakay are read by their own marks: The Forge 656, Carpe Diem 1091 and Inkwell 7.52 are made as themselves.", "master"],
+  ["7.23", "A Mac app made in Fabrica gives its owner's name as its copyright, and a Windows program its owner as its company; neither names Ingenium any longer, nor does its note on how to open it.", "fabrica"],
+  ["7.23", "A repository opened from your drive or brought in from a file is known as one of the family's apps by its name, so it wears that app's own seal and ids; names are matched as whole words, so an app named Forget Me Not is not taken for The Forge.", "master"],
   ["7.22", "Adamas draws its scene twenty times a second at rest instead of thirty, and ten while Ingenium is not the window in use or after two minutes untouched, back at once on your next touch; every frame as sharp as before, so the graphics chip, and the fan, work less."],
   ["7.22", "Home keeps its size when you come back to it: its header no longer shows small for a moment and then grows. No page slides up as it comes in now; each only fades in."],
   ["7.22", "On a tablet held upright, the 3D object of a stacked header stands in the middle of its card, as wide as the card, with no empty space beneath it."],

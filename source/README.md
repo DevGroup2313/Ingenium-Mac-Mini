@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.23 (16 November 2026): the ready-made apps name their own version and their owner, and a family app is known by its name.
+Her words (16 November 2026): "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of the Forge or
+Carpe Diem or Inkwell or any future app that I choose to make. I want Ingenium to actually build and create ready-made apps and build kits for
+all of my devices accurately and without errors, bugs, or missing files or documents. I want the apps produced with their icons and logos as
+proper apps with no issues." Fabrica's audit on 7.22 (every package of an invented app and of The Forge 656, Inkwell 7.52 and Carpe Diem 1091,
+through fbHubHost.makeOne, opened file by file in a scratch folder): no file of Ingenium's and no picture but the app's own in any package or kit;
+each ready-made app numbered 1.0; Ingenium named in a Mac app's copyright and a Windows program's company; a repository not known as its family
+app unless its record said so.
+- `build/modules/r111.js`: numberOf reads the family's marks, as apps/update_builtin.py does: window.CD_BUILD's pass (The Forge, Carpe Diem),
+  Inkwell's BUILD constant, Lakay's lakay-build meta (after ingenium-build, a recipe's version and a version or app-version meta).
+- `build/modules/r170.js`: ownerLine (Lector's author, else the name in Settings, else the app's title) is the Mac app's copyright
+  (NSHumanReadableCopyright, set before the seal) and the Windows program's CompanyName (written in place of the shell's own words, which an
+  other shell need not keep); the notes on how to open the app begin "For a Mac" or "For Windows", without the credit.
+- `build/modules/r112.js`: appOf knows a repository by its record, else by its name (famOf: Carpe Diem, The Forge, Ingenium, Inkwell, as whole
+  words); `build/modules/r276.js`'s famKey (GitHub) takes whole words too (a repository named forget-me-not is not The Forge).
+- rig: `t_723_ready_made.js` (new; invented apps, an invented owner): the marks read, the names known, a Mac app and a Windows program made with
+  version 2.3.1 and the owner's lines, read by rig/verify_desktop_app.py. On the family's real apps (scratch, not committed): The-Forge-656,
+  Inkwell-7.52, Carpe-Diem-1091 for every device, each Mac seal and Windows program without a fault, Inkwell's seal where a gold I would have been.
+- Left as they are: shell.json's "made", the shells' own code names; the Android signing key's name ("Ingenium, on this device"), since a new
+  name is a new key and Android installs an update only with the same key; an app's id begins com.yannieforest (slugId) whoever owns the copy.
+
 Ingenium 7.22 (16 November 2026): Adamas cooler, Home still, the stacked heads centred, the theme at once, the turret's names readable.
 Her words (16 November 2026): "Adamas does make my mac warm, the fan of the computer gets really loud as well, like it is suddenly working
 overtime or something. The home page's 3D header card and its "Your next step" card keep on resizing and lifitng slight higher on the page,
