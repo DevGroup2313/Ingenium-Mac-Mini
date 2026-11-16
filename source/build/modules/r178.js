@@ -203,8 +203,11 @@ function identityOf(html,who){who=who||{};var det=detect(html);
 /* 7.12: whose app it is, as its licence and build files say: the person's own name (Lector's author: the profile's name, and in
    the master edition its author), else the app's own name; only letters, digits, spaces, full stops and hyphens, so that a key
    certificate, a Python string and an installer line all take it as it is */
-function ownerName(who,title){var n="";try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
-  if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}
+/* 7.25: the publishing name (modules/r309.js) when one is chosen; with none, the app's own name, as a licence needs one */
+function ownerName(who,title){var n="",P=window.IngPublisher;
+  if(P&&P.decided&&P.decided())n=String(P.name()||"");
+  else{try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
+    if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}}
   try{n=n.replace(new RegExp("[^\\p{L}\\p{N} .\\-]+","gu")," ");}catch(e){n=n.replace(/[^A-Za-z0-9\u00c0-\u024f .\-]+/g," ");}
   n=n.replace(/\s+/g," ").trim().slice(0,60);return n||title||"My App";}
 /* the Fire project's Java package: the one an earlier package of this app kept (its activity's name, from Fabrica's table of the

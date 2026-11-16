@@ -395,6 +395,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.25 (16 November 2026): the publishing name, built in only in the master edition, asked for in the others.
+Her words (16 November 2026): "As far as Fabrica, only keep the built by "Yannie D. Forest" line built-in only on my master edition as the
+owner since that make things easier for me but also build into the app the option for me to edit the name in case I choose to publish
+another name in the future. For the other editions, I want you to strip theirs of that since my apps are not built into their editions and
+I want it to be a blank slate for them and and have Ingenium and its pages ask them how they would like to proceed and under what copyrights
+name if any and have them type it in and save it. They should aslo have the option to go back and edit the name and change it if they
+chooose."
+- `build/modules/r309.js` (new, IngPublisher): one publishing name kept with Ingenium's settings (state.publisher, saved with saveState).
+  The master edition starts with the owner's name until it is changed; the other editions start with none (`build/editions.py` takes the
+  built-in name out of the module) and Fabrica asks, the first time it opens there, under what name its apps are published, or none
+  ("Under what name do you publish?": the name and Save, or No name), and asks again next time if the sheet is closed unanswered. Fabrica's
+  Ship room shows "Published as ..." (or "Published with no name", or "No publishing name chosen yet") with Change. It uses Fabrica's own
+  sheet, field and keys. Its notes avoid the word the editions' comment stripper keeps in every edition.
+- `build/modules/r170.js` ownerLine and `build/modules/r178.js` ownerName read it: a Mac app's rights line (NSHumanReadableCopyright), a
+  Windows program's company and its installer's publisher, the build kits' owner. With no name, the Mac line, the company and the publisher
+  are empty (the company never keeps the shell's own words); a kit's licence, which needs a name, takes the app's. Before a name is chosen
+  in an edition that asks, they do as before 7.25.
+- `build/modules/r250.js`: Fabrica's Guide topic has a row for it; `build/modules/r222.js`: the news.
+- `rig/t_725_publisher.js` (new): the master edition (the owner's name, nothing asked, Change, another name kept and carried by a Mac app
+  and a Windows app, No name carried as none), another edition emulated (ING_EDITION "full", nothing kept: asked, asked again after a
+  close, the answer kept); `rig/t_723_ready_made.js` sets the publishing name.
+
 Ingenium 7.24 (16 November 2026): every Windows app Fabrica makes is its own installer.
 Her approved preview (https://claude.ai/artifact/Jp4R4qFP3HXXJG5P1MCbHc, version 6) and her words (16 November 2026): "I approve of the
 preview, please push it everywhere and continue working on my requests." Before, Fabrica's Windows app was a portable program in a zip.

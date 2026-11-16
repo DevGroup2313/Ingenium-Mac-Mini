@@ -112,6 +112,8 @@ def _personal():
     E.append(('if(!n&&typeof ING_EDITION!=="undefined"&&ING_EDITION==="master")n="Yannie D. Forest";return n;}',
               'return n;}', "Lector's author: the persona's name only", 1))
     E.append(('var who={name:"Yannie D. Forest",email:""};', 'var who={name:"",email:""};', "Git: no author until one is set", 1))
+    # 7.25: the publishing name (modules/r309.js) starts with none outside the master edition, and Fabrica asks for one
+    E.append(('var BUILT_IN="Yannie D. Forest";', 'var BUILT_IN="";', "the publishing name: none built in", 1))
     # a key made on this device names whoever this copy belongs to, never the owner
     E.append(('UTF8S("Yannie D. Forest")',
               'UTF8S((function(){try{return String(personaGet().name||"").trim();}catch(e){return "";}})()||cn||"Ingenium")',

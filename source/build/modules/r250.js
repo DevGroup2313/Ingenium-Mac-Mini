@@ -96,6 +96,7 @@ function guide(){try{
     ["Every version kept.","Fabrica keeps each of your apps as a real git repository on this device: every version, line by line, with branches, tags and undo by a new version. Nothing leaves the device unless you send it."],
     ["The tree.","Its header shows the open app as a tree: main the trunk, each idea a branch, each release a collar. Press a version to see what it changed, in the panels below."],
     ["Test and ship.","Test runs the app's own checks; Ship makes the one-page app, the web app and the installers from the version you choose. Checks reads each version for secrets left in the code, the parts it uses and their licences."],
+    ["Your publishing name.","Ship shows the name your apps are published under: a Mac app's rights line, a Windows app's publisher and the build kits carry it. Change sets another, or no name; where none is chosen yet, Fabrica asks the first time it opens."],
     ["On this computer.","In the Mac and Windows apps, On this computer opens every repository on your drives, and you work on it right there."],
     ["GitHub, when you want it.","Sign in on GitHub's own page, or with a token, and each repository can be sent to GitHub and brought back, version for version. Without a token, Fabrica works entirely on this device."]]);
   if($("page-tabula"))topic("appsGuide","The apps, as in Carpe Diem",[

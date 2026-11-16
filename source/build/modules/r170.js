@@ -117,9 +117,13 @@ function resign(exe,slots){var dv=new DataView(exe.buffer,exe.byteOffset,exe.byt
    the Forge or Carpe Diem or Inkwell or any future app that I choose to make." Fabrica's audit found Ingenium named where a person sees it
    in an app made here: the Mac app's rights line (Get Info, its About window), the Windows program's company (its Details) and the first
    line of these notes. Each now names the app's owner (the profile's author, else the name in Settings, else the app itself). */
-function ownerLine(title){var n="";try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
-  if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}
-  n=n.replace(/[^0-9A-Za-z\u00c0-\u024f .'\-]+/g," ").replace(/\s+/g," ").trim().slice(0,60);return n||String(title||"");}
+/* 7.25: the publishing name (modules/r309.js, IngPublisher) when one is chosen, and then only it: a name, or none (""), never the
+   app's title in its place; before one is chosen (an edition that asks, not yet answered), as before */
+function ownerLine(title){var n="",P=root.IngPublisher,chosen=!!(P&&P.decided&&P.decided());
+  if(chosen)n=String(P.name()||"");
+  else{try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
+    if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}}
+  n=n.replace(/[^0-9A-Za-z\u00c0-\u024f .'\-]+/g," ").replace(/\s+/g," ").trim().slice(0,60);return chosen?n:(n||String(title||""));}
 var HOWTO=function(title,folder){return [title,"","For a Mac (Apple silicon or Intel, macOS 12 or newer).","",
   "1. Drag "+folder+" into your Applications folder.",
   "2. The first time, Control-click it (or right-click) and choose Open, then Open again.",
@@ -146,7 +150,7 @@ function makeMac(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
       step("Writing its name, id and version");
       var vn=String(o.versionName||"1.0").replace(/[^0-9.]/g,"")||"1.0";
       t=plistSet(t,"CFBundleIdentifier",id);t=plistSet(t,"CFBundleDisplayName",title);t=plistSet(t,"CFBundleName",title.slice(0,15));t=plistSet(t,"CFBundleExecutable",exe);
-      t=plistSet(t,"CFBundleShortVersionString",vn);t=plistSet(t,"NSHumanReadableCopyright","\u00a9 "+new Date().getFullYear()+" "+ownerLine(title));t=plistSet(t,"CFBundleVersion",String(o.build||o.versionName||"1").replace(/[^0-9.]/g,"")||"1");
+      t=plistSet(t,"CFBundleShortVersionString",vn);var ow=ownerLine(title);t=plistSet(t,"NSHumanReadableCopyright",ow?"\u00a9 "+new Date().getFullYear()+" "+ow:"");t=plistSet(t,"CFBundleVersion",String(o.build||o.versionName||"1").replace(/[^0-9.]/g,"")||"1");
       t=plistSet(t,"NSMicrophoneUsageDescription",title+" uses the microphone only while you ask it to listen, for dictation or a recording.");
       t=plistSet(t,"NSCameraUsageDescription",title+" uses the camera only while you ask it to, for a picture or a recording.");
       t=plistSet(t,"NSSpeechRecognitionUsageDescription","Dictation turns your speech into text inside "+title+".");
@@ -239,7 +243,7 @@ function winNameInto(exe,o){var dv=new DataView(exe.buffer,exe.byteOffset,exe.by
   return found.length;}
 function winCompanyInto(exe,who){try{var room="Made with Ingenium Fabrica",p=findAt(exe,u16le(room));if(p<0)return false;var dv=new DataView(exe.buffer,exe.byteOffset,exe.byteLength);
   var key=u16le("CompanyName\u0000"),kp=findAt(exe,key,p-key.length-4,p);if(kp<0)return false;var hdr=kp-6,vl=dv.getUint16(hdr+2,true);if(vl!==room.length&&vl!==room.length+1)return false;
-  var v=String(who||"").slice(0,room.length);if(!v)return false;exe.fill(0,p,p+2*room.length);exe.set(u16le(v),p);dv.setUint16(hdr+2,v.length+1,true);return true;}catch(e){return false;}}
+  var v=String(who||"").slice(0,room.length);exe.fill(0,p,p+2*room.length);if(v)exe.set(u16le(v),p);dv.setUint16(hdr+2,v.length+1,true);return true;}catch(e){return false;}}
 function winIcons(src){if(typeof document==="undefined")return Promise.reject(new Error("icons are drawn in a window"));
   return new Promise(function(res,rej){var im=new Image();im.onload=function(){res(im);};im.onerror=function(){rej(new Error("the app's icon could not be read"));};im.src=src;}).then(function(im){
     return Promise.all(WIN_SIZES.map(function(z){var c=document.createElement("canvas");c.width=z;c.height=z;var x=c.getContext("2d");x.imageSmoothingEnabled=true;try{x.imageSmoothingQuality="high";}catch(e){}
@@ -266,7 +270,7 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
   step("Opening the shell");
   return (o.shell?Promise.resolve(o.shell):winShellExe()).then(function(shell){var exe=bareShell(shell).slice();
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
-    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,publisher||ownerLine(title));
+    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,o.publisher!=null?publisher:ownerLine(title));
     step("Putting its files in");
     var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+vn,"name="+name,"publisher="+publisher,"made=Ingenium Fabrica",""].join("\n")),store:true},
       {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];
