@@ -1,12 +1,15 @@
-// Ingenium 7.25: the publishing name (modules/r309.js). Her request of 16 November 2026 (her words in source/README.md, 7.25): her own
-// name built in only in the master edition, which she can change; the other editions start with none, and Ingenium asks under what name,
-// if any, their apps are published, keeps the answer and lets it be changed. Invented owners and an invented app here. Checks:
-//   - the master edition: the owner's name to begin with, Fabrica asks nothing, its Ship room says "Published as" with Change;
-//   - Change: the sheet with the name in it; another name saved, kept after the page is opened again; a Mac app and a Windows app made
-//     with it (the Mac app's rights line, the Windows program's company, its installer's publisher), read as those systems read them;
-//   - No name: the Ship room says so; the Mac app's rights line empty, the Windows program's company empty, no publisher;
-//   - another edition (ING_EDITION set to "full", nothing kept): Fabrica asks the first time it opens, the field empty; closed without an
-//     answer it asks again the next time; a name typed and saved is kept and shown;
+// Ingenium 7.25 and 7.26: the publishing name (modules/r309.js). Her requests of 16 November 2026 (her words in source/README.md, 7.25 and
+// 7.26): her own name built in only in the master edition, the other editions starting with none; and Fabrica asking every time, in every
+// edition, never assuming, the name kept so far in its field, with a choice not to be asked again. Invented owners and an invented app.
+// Checks:
+//   - the master edition: the owner's name to begin with, asked each time (nothing asked on opening Fabrica); its Ship part says so;
+//   - a make asks, the owner's name in the field; another name used; the next make asks again, that name in the field; a Mac app and a
+//     Windows app made with it, read as macOS and Windows read them; kept after the page is opened again;
+//   - the question closed unanswered: nothing is made;
+//   - No name: a Mac app and a Windows app that name no one;
+//   - Don't ask me again: the next make asks nothing and uses the name; Change shows the choice, and unticked there, the asking returns;
+//   - another edition (ING_EDITION "full", nothing kept): no name, and a make asks with the field empty;
+//   - Download as an app shows the publishing name in its dialog;
 //   - no page error.
 //   node rig/t_725_publisher.js <page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const { execFileSync } = require('child_process');
@@ -15,11 +18,11 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => { const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
-  let dir = path.join(OUT, 'named'); fs.mkdirSync(dir, { recursive: true }); const saving = [];
+  let dir = path.join(OUT, 'a'); const saving = [];
   p.on('download', d => saving.push(d.saveAs(path.join(dir, d.suggestedFilename())).catch(() => {})));
   const open = async () => { await p.goto(U, { timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await p.waitForTimeout(1500);
     await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} }); };
-  // Fabrica opened, with an invented app (Harbour Garden 2.3.1) open in its Ship room, where the line is
+  // Fabrica opened, with an invented app (Harbour Garden 2.3.1) open in the Ship part of its Ship room, where the line is
   const fab = async () => { await p.evaluate(() => { go('home'); }); await sleep(600); await p.evaluate(() => { go('fabrica'); }); await sleep(2600);
     await p.evaluate(async () => { const H = window.fbHubHost; let rec = (await IngRepo.list()).find(x => x.name === 'Harbour Garden');
       if (!rec) { const html = '<!doctype html><html><head><meta charset="utf-8"><title>Harbour Garden</title><meta name="version" content="2.3.1"></head><body><h1>Harbour Garden</h1></body></html>';
@@ -27,62 +30,66 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       await H.refresh(); H.FBS().sel = rec.id; H.paint(); try { H.setPanel('ship'); } catch (e) {} H.paint(); });
     await sleep(1200); if (await p.$('#fbPart_ship') && !(await p.$('.f-sheet-wrap'))) { await p.click('#fbPart_ship'); await sleep(500); } };
   const line = () => p.evaluate(() => { const L = document.getElementById('r309Line'); return L ? L.textContent.replace(/\s+/g, ' ').trim() : null; });
-  const asking = () => p.evaluate(() => { const s = document.querySelector('[data-r309]'); return s ? { kind: s.getAttribute('data-r309'), value: (document.getElementById('r309Name') || {}).value } : null; });
-  await open();
-  // 1. the master edition
-  const m0 = await p.evaluate(() => ({ ed: typeof ING_EDITION !== 'undefined' ? ING_EDITION : '', has: !!window.IngPublisher, decided: IngPublisher.decided(), name: IngPublisher.name(), kept: !!(state.publisher) }));
-  ok(m0.ed === 'master' && m0.has && m0.decided && m0.name === 'Yannie D. Forest' && !m0.kept, 'the master edition begins with the owner\'s name, built in, nothing kept yet', m0);
-  await fab();
-  const a0 = await asking(), l0 = await line();
-  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Change$/.test(l0 || ''), 'in the master edition Fabrica asks nothing, and its Ship room says Published as the owner, with Change', { asking: a0, line: l0 });
-  // 2. Change: another name, kept
-  await p.click('#r309Change'); await sleep(500);
-  const a1 = await asking();
-  ok(a1 && a1.kind === 'edit' && a1.value === 'Yannie D. Forest', 'Change opens the sheet with the name in its field', a1);
-  await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Save'); await sleep(600);
-  const l1 = await line(), s1 = await p.evaluate(() => ({ name: IngPublisher.name(), kept: state.publisher }));
-  ok(/^Published as Ada Quill/.test(l1 || '') && s1.name === 'Ada Quill' && s1.kept && s1.kept.name === 'Ada Quill' && s1.kept.decided === true, 'saved: the Ship room and Ingenium\'s settings hold the new name', { line: l1, s: s1 });
-  await open();
-  const s2 = await p.evaluate(() => ({ name: IngPublisher.name(), decided: IngPublisher.decided() }));
-  ok(s2.name === 'Ada Quill' && s2.decided, 'opened again, the name is kept', s2);
-  // a Mac app and a Windows app made with it
-  const make = () => p.evaluate(async () => { const H = window.fbHubHost; const rec = (await IngRepo.list()).find(x => x.name === 'Harbour Garden');
-    const out = []; for (const w of ['mac', 'win']) { try { await H.makeOne(rec, w, { quiet: true }); out.push(w); } catch (e) { out.push(w + ' failed: ' + e.message); } } return out; });
-  await fab();
-  const mk1 = await make(); await sleep(1500); await Promise.all(saving.splice(0));
-  const read = (d) => { const files = fs.readdirSync(d), mac = files.find(f => /-mac-2\.3\.1\.zip$/.test(f)), win = files.find(f => /Setup\.exe$/.test(f)); const o = { files };
+  const asking = () => p.evaluate(() => { const s = document.querySelector('[data-r309]'); return s ? { kind: s.getAttribute('data-r309'), value: (document.getElementById('r309Name') || {}).value, quiet: (document.getElementById('r309Quiet') || {}).getAttribute && document.getElementById('r309Quiet').getAttribute('aria-pressed') } : null; });
+  // a make begun without waiting (as a press does); the question answered in between; then its end awaited
+  const begin = (what) => p.evaluate((what) => { window.__made = null; const H = window.fbHubHost; IngRepo.list().then(l => { const rec = l.find(x => x.name === 'Harbour Garden'); return H.makeOne(rec, what, { quiet: true }); }).then(v => { window.__made = v === false ? 'not made' : 'made'; }, e => { window.__made = 'failed: ' + e.message; }); }, what);
+  const ended = async () => { for (let i = 0; i < 240; i++) { const v = await p.evaluate(() => window.__made); if (v) return v; await sleep(500); } return 'timeout'; };
+  const read = (d) => { const files = fs.existsSync(d) ? fs.readdirSync(d) : [], mac = files.find(f => /-mac-2\.3\.1\.zip$/.test(f)), win = files.find(f => /Setup\.exe$/.test(f)); const o = { files };
     if (mac) o.mac = JSON.parse(execFileSync('python3', ['-I', '-c', 'import zipfile,plistlib,sys,json;z=zipfile.ZipFile(sys.argv[1]);n=[x for x in z.namelist() if x.endswith("Contents/Info.plist")][0];p=plistlib.loads(z.read(n));print(json.dumps({"c":p.get("NSHumanReadableCopyright")}))', path.join(d, mac)]).toString());
     if (win) { try { o.win = JSON.parse(execFileSync('python3', ['-I', path.join(__dirname, 'verify_desktop_app.py'), 'win', path.join(d, win)]).toString()); } catch (e) { try { o.win = JSON.parse(String(e.stdout)); } catch (x) { o.win = { faults: ['unreadable'] }; } } }
     return o; };
+  const into = (name) => { dir = path.join(OUT, name); fs.mkdirSync(dir, { recursive: true }); };
+  await open();
+  // 1. the master edition
+  const m0 = await p.evaluate(() => ({ ed: typeof ING_EDITION !== 'undefined' ? ING_EDITION : '', decided: IngPublisher.decided(), name: IngPublisher.name(), quiet: IngPublisher.quiet() }));
+  ok(m0.ed === 'master' && m0.decided && m0.name === 'Yannie D. Forest' && !m0.quiet, 'the master edition begins with the owner\'s name, and asks', m0);
+  await fab();
+  const a0 = await asking(), l0 = await line();
+  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Asked each time an app is made/.test(l0 || '') && /Change$/.test(l0 || ''), 'opening Fabrica asks nothing; its Ship part says the name and that it is asked each time, with Change', { asking: a0, line: l0 });
+  // 2. a make asks, the owner's name in the field
+  into('named'); await begin('mac'); await sleep(900);
+  const a1 = await asking();
+  ok(a1 && a1.kind === 'make' && a1.value === 'Yannie D. Forest' && a1.quiet === 'false', 'making a Mac app asks under what name, the owner\'s name in its field, Don\'t ask me again unticked', a1);
+  await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Save');
+  const e1 = await ended(); await sleep(800);
+  await begin('win'); await sleep(900);
+  const a2 = await asking();
+  ok(e1 === 'made' && a2 && a2.kind === 'make' && a2.value === 'Ada Quill', 'the next make asks again, the name used last in its field', { first: e1, asking: a2 });
+  await p.click('#r309Save'); const e2 = await ended(); await sleep(1500); await Promise.all(saving.splice(0));
   const r1 = read(dir);
-  ok(mk1.join() === 'mac,win' && r1.mac && /^© \d{4} Ada Quill$/.test(r1.mac.c) && r1.win && r1.win.faults.length === 0 && r1.win.names.CompanyName === 'Ada Quill' && r1.win.publisher === 'Ada Quill',
-    'made with it: the Mac app\'s rights line, the Windows program\'s company and its installer\'s publisher are Ada Quill', { made: mk1, mac: r1.mac, company: r1.win && r1.win.names && r1.win.names.CompanyName, publisher: r1.win && r1.win.publisher, faults: r1.win && r1.win.faults });
-  // 3. No name
-  await p.click('#r309Change'); await sleep(500); await p.click('#r309None'); await sleep(600);
-  const l3 = await line(), s3 = await p.evaluate(() => ({ name: IngPublisher.name(), decided: IngPublisher.decided() }));
-  ok(/^Published with no name/.test(l3 || '') && s3.decided && s3.name === '', 'No name: chosen, kept, and the Ship room says so', { line: l3, s: s3 });
-  dir = path.join(OUT, 'none'); fs.mkdirSync(dir, { recursive: true });
-  const mk2 = await make(); await sleep(1500); await Promise.all(saving.splice(0));
+  ok(e2 === 'made' && r1.mac && /^© \d{4} Ada Quill$/.test(r1.mac.c) && r1.win && r1.win.faults.length === 0 && r1.win.names.CompanyName === 'Ada Quill' && r1.win.publisher === 'Ada Quill',
+    'made with it: the Mac app\'s rights line, the Windows program\'s company and its installer\'s publisher are Ada Quill', { mac: r1.mac, company: r1.win && r1.win.names && r1.win.names.CompanyName, publisher: r1.win && r1.win.publisher, faults: r1.win && r1.win.faults });
+  // 3. closed unanswered: nothing made
+  into('closed'); await begin('mac'); await sleep(900); await p.keyboard.press('Escape');
+  const e3 = await ended(); await sleep(800);
+  ok(e3 === 'not made' && read(dir).files.length === 0, 'the question closed unanswered: nothing is made', { ended: e3, files: read(dir).files });
+  // 4. No name
+  into('none'); await begin('mac'); await sleep(900); await p.click('#r309None'); const e4a = await ended();
+  await begin('win'); await sleep(900); const a4 = await asking(); await p.click('#r309None'); const e4b = await ended(); await sleep(1500); await Promise.all(saving.splice(0));
   const r2 = read(dir);
-  ok(mk2.join() === 'mac,win' && r2.mac && r2.mac.c === '' && r2.win && r2.win.faults.length === 0 && r2.win.names.CompanyName === '' && r2.win.publisher === '',
-    'made with no name: the Mac app\'s rights line, the Windows program\'s company and the publisher are all empty, never Ingenium\'s words', { made: mk2, mac: r2.mac, company: r2.win && r2.win.names && r2.win.names.CompanyName, publisher: r2.win && r2.win.publisher, faults: r2.win && r2.win.faults });
-  // 4. another edition, nothing kept: Fabrica asks
-  await p.evaluate(() => { window.ING_EDITION = 'full'; delete state.publisher; try { saveState(); } catch (e) {} go('home'); });
-  await sleep(800);
-  const e0 = await p.evaluate(() => ({ decided: IngPublisher.decided(), name: IngPublisher.name(), builtIn: IngPublisher.builtIn() }));
-  ok(!e0.decided && e0.name === '' && e0.builtIn === '', 'another edition begins with no name and nothing chosen', e0);
-  await p.evaluate(() => { go('fabrica'); }); await sleep(2600);
-  const a4 = await asking(), l4 = await line();
-  ok(a4 && a4.kind === 'ask' && a4.value === '' && /^No publishing name chosen yet/.test(l4 || ''), 'Fabrica asks the first time it opens there, its field empty, and its Ship room says none is chosen yet', { asking: a4, line: l4 });
-  await p.keyboard.press('Escape'); await sleep(500);
-  const a5 = await asking();
+  ok(e4a === 'made' && e4b === 'made' && a4 && a4.value === '' && r2.mac && r2.mac.c === '' && r2.win && r2.win.faults.length === 0 && r2.win.names.CompanyName === '' && r2.win.publisher === '',
+    'No name: asked again with the field empty, and a Mac app and a Windows app that name no one, never Ingenium\'s words', { mac: r2.mac, company: r2.win && r2.win.names && r2.win.names.CompanyName, publisher: r2.win && r2.win.publisher, asked: a4 });
+  // 5. Don't ask me again
+  into('quiet'); await begin('mac'); await sleep(900); await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Quiet'); await p.click('#r309Save'); const e5a = await ended();
+  await begin('mac'); await sleep(1200); const a5 = await asking(); const e5b = await ended(); await fab(); const l5 = await line();
+  ok(e5a === 'made' && !a5 && e5b === 'made' && /Not asked again/.test(l5 || ''), 'Don\'t ask me again: the next make asks nothing and uses the name; the Ship part says it is not asked', { asking: a5, line: l5 });
+  await p.click('#r309Change'); await sleep(500); const a6 = await asking();
+  await p.click('#r309Quiet'); await p.click('#r309Save'); await sleep(500);
+  await begin('mac'); await sleep(900); const a7 = await asking(); await p.click('#r309Save'); await ended();
+  ok(a6 && a6.kind === 'edit' && a6.quiet === 'true' && a7 && a7.kind === 'make' && a7.value === 'Ada Quill', 'Change shows the choice ticked; unticked and saved, the next make asks again', { change: a6, next: a7 });
+  await open();
+  const s8 = await p.evaluate(() => ({ name: IngPublisher.name(), quiet: IngPublisher.quiet(), decided: IngPublisher.decided() }));
+  ok(s8.name === 'Ada Quill' && !s8.quiet && s8.decided, 'opened again, the name and the choice are kept', s8);
+  // 6. another edition, nothing kept
+  await p.evaluate(() => { window.ING_EDITION = 'full'; delete state.publisher; try { saveState(); } catch (e) {} });
   await fab();
-  const a6 = await asking();
-  ok(!a5 && a6 && a6.kind === 'ask', 'closed without an answer, it asks again the next time Fabrica opens', { closed: a5, again: a6 });
-  await p.fill('#r309Name', 'Ben Okafor'); await p.click('#r309Save'); await sleep(600);
-  const l6 = await line(), s6 = await p.evaluate(() => ({ name: IngPublisher.name(), decided: IngPublisher.decided(), kept: state.publisher && state.publisher.name }));
-  await fab();
-  const a7 = await asking();
-  ok(s6.decided && s6.name === 'Ben Okafor' && s6.kept === 'Ben Okafor' && /^Published as Ben Okafor/.test(l6 || '') && !a7, 'its answer is saved and shown, and Fabrica asks no more', { s: s6, line: l6, asking: a7 });
+  const e0 = await p.evaluate(() => ({ decided: IngPublisher.decided(), name: IngPublisher.name(), builtIn: IngPublisher.builtIn() })), l9 = await line(), a9o = await asking();
+  into('full'); await begin('win'); await sleep(900); const a9 = await asking(); await p.fill('#r309Name', 'Ben Okafor'); await p.click('#r309Save'); const e9 = await ended();
+  ok(!e0.decided && e0.name === '' && e0.builtIn === '' && /^No publishing name chosen yet/.test(l9 || '') && !a9o && a9 && a9.kind === 'make' && a9.value === '' && e9 === 'made' && (await p.evaluate(() => IngPublisher.name())) === 'Ben Okafor',
+    'another edition: no name built in, and a make asks with the field empty; the answer is kept', { e0, line: l9, asking: a9, ended: e9 });
+  // 7. Download as an app
+  const dl = await p.evaluate(async () => { await IngDownload.open({ html: '<!doctype html><html><head><title>Harbour Garden</title></head><body><h1>Harbour Garden</h1></body></html>' }); await new Promise(r => setTimeout(r, 800));
+    const i = document.querySelector('.dl-app .dl-wp'); const v = i ? i.value : null; try { closeModal(); } catch (e) {} return v; });
+  ok(dl === 'Ben Okafor', 'Download as an app shows the publishing name in its dialog', dl);
   ok(errs.length === 0, 'no page errors', errs);
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0); })().catch((e) => { console.error(String(e).slice(0, 600)); process.exit(2); });

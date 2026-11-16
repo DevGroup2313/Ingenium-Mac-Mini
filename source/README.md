@@ -395,6 +395,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.26 (16 November 2026): Fabrica asks under what name, every time, in every edition.
+Her words (16 November 2026): "I want for Fabrica to still ask me for the copyrights and publishing name even on my master edition, I want the
+option to change the default name just in case I want to change it, that way I don't have to search through my settings to make the change.
+I want it to ask everytime and to never assume but I want the option built for me to select for it to not ask me again."
+- `build/modules/r309.js`: before anything that carries the name is made (a Mac, Windows or web app, build kits), Fabrica asks "Under
+  what name do you publish <app>?", the name kept so far in the field (the owner's in the master edition, to begin with): Use this name,
+  No name, or the sheet closed, which makes nothing. "Don't ask me again" (an empty box until ticked) stops the asking; Change, in the
+  Ship part, edits the name and that choice. Nothing is asked on opening Fabrica any more (7.25 asked there in the other editions).
+- `build/modules/r112.js` makeOne asks first (opt.named skips it); Make the chosen asks once for all; `build/modules/r298.js` Make the
+  missing ones asks once; `build/modules/r139.js` Download as an app has a "Publishing name" field, filled in each time it opens (not
+  shown once she chose not to be asked), which its Mac, Windows, web and kit rows save before they make.
+- `rig/t_725_publisher.js` rewritten for it; `rig/t_723_ready_made.js`, `rig/t_67_kits.js` and `rig/t_v6.js` choose a name and not to be
+  asked, so their makes do not wait on the question.
+
 Ingenium 7.25 (16 November 2026): the publishing name, built in only in the master edition, asked for in the others.
 Her words (16 November 2026): "As far as Fabrica, only keep the built by "Yannie D. Forest" line built-in only on my master edition as the
 owner since that make things easier for me but also build into the app the option for me to edit the name in case I choose to publish

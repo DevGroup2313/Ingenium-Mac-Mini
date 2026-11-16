@@ -147,6 +147,9 @@ function open(opt){opt=opt||{};
     var idb=box.querySelector(".dl-id");
     function field(label,cls,val,ph){var l=E("label");l.appendChild(document.createTextNode(label));var i=E("input",cls);i.type="text";i.value=val;i.spellcheck=false;i.autocapitalize="off";if(ph)i.placeholder=ph;l.appendChild(i);idb.appendChild(l);return i;}
     var fT=field("Name under the icon","dl-wt",P.title),fI=field("App id","dl-wid",P.id,"com.yourname.myapp"),fV=field("Version","dl-wv",P.version);
+    /* 7.26: the publishing name, asked each time the dialog opens (modules/r309.js), the name kept so far in its field; empty, no name;
+       not shown once she has chosen not to be asked again */
+    var fP=window.IngPublisher&&!IngPublisher.quiet()?field("Publishing name (empty for none)","dl-wp",IngPublisher.name(),"Your name, or your studio's"):null;
     var kl=E("label");kl.appendChild(document.createTextNode("Signing key (Android)"));var ks=E("select");kl.appendChild(ks);idb.appendChild(kl);
     var note=E("p","dl-note","Keep the id the same for every version of an app: the tablet and the iPhone take a new id as a different app. "+(K.note||""));idb.appendChild(note);
     if(window.IngApk&&IngApk.keys&&IngApk.keys.list)IngApk.keys.list().then(function(list){if(!list.some(function(k){return k.id==="device";}))list.unshift({id:"device",label:"Made on this device"});
@@ -173,7 +176,7 @@ function open(opt){opt=opt||{};
     function say(d,t,cls){var r=rows[d.k];r.st.textContent=t;r.st.className="dl-st"+(cls?" "+cls:"");}
     function lock(on){busy=on;DEV.forEach(function(d){var r=rows[d.k];r.b.disabled=on||!here(d);r.mk.disabled=on||!here(d);});allB.disabled=on;}
     function run(d,alt){var r=rows[d.k];r.row.classList.add("busy");r.row.classList.remove("done");say(d,"Making…","run");
-      return Promise.resolve().then(function(){read();return make(d,P,html,function(t){say(d,t,"run");},alt);}).then(function(files){var q=Promise.resolve(),names=[];
+      return Promise.resolve().then(function(){read();if(fP&&IngPublisher.carries(d.kind))IngPublisher.set(fP.value);return make(d,P,html,function(t){say(d,t,"run");},alt);}).then(function(files){var q=Promise.resolve(),names=[];
           files.forEach(function(f){q=q.then(function(){say(d,"Saving "+f.name+"…","run");return save(f).then(function(){names.push(f.name+" · "+kb(f.bytes.length));if(typeof opt.onMade==="function"){try{return opt.onMade(alt?"kits":d.k,f.name,f.mime,f.bytes,f.info||null);}catch(e){}}});});});
           return q.then(function(){r.row.classList.remove("busy");r.row.classList.add("done");say(d,"Saved: "+names.join(", "),"ok");return true;});})
         .catch(function(e){r.row.classList.remove("busy");var m=e&&e.message?e.message:String(e);try{if(window.IngErr)m=IngErr.say(e);}catch(_){}say(d,m.charAt(0).toUpperCase()+m.slice(1),"bad");return false;});}

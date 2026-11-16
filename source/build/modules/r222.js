@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.26", "Fabrica asks under what name you publish every time it makes a Mac, Windows or web app or build kits, in every edition, with the name kept so far already in its field. Don't ask me again stops the asking; Change, in the Ship part, edits the name and that choice.", "fabrica"],
+  ["7.26", "Download as an app shows the publishing name in its dialog each time, ready to change; left empty, the app names no one."],
   ["7.25", "Fabrica keeps one publishing name for the apps it makes: a Mac app's rights line, a Windows app's publisher and its installer, and the build kits carry it. Ship shows it, with a key to change it or to publish with no name; where none is chosen yet, Fabrica asks the first time it opens.", "fabrica"],
   ["7.25", "Your own name is the publishing name to begin with, as before, and Fabrica's Ship room now lets you change it.", "master"],
   ["7.24", "A Windows app made in Fabrica is now its own installer, one file named for the app with Setup after it, in Ingenium's look: for everyone on this PC or just for you, a shortcut on the desktop if you like, or open it without installing.", "fabrica"],

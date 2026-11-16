@@ -15,7 +15,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   p.on('download', d => saving.push(d.saveAs(path.join(OUT, d.suggestedFilename())).catch(() => {})));
   await p.goto(U, { timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await p.waitForTimeout(1500);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {}
-    state.persona = Object.assign({}, state.persona || {}, { name: 'Ada Quill' }); if (window.IngPublisher) IngPublisher.set('Ada Quill'); go('fabrica'); });   // 7.25: the publishing name (r309)
+    state.persona = Object.assign({}, state.persona || {}, { name: 'Ada Quill' }); if (window.IngPublisher) IngPublisher.set('Ada Quill', true); go('fabrica'); });   // 7.25: the publishing name (r309)
   await p.waitForTimeout(2500);
   const r = await p.evaluate(async () => { const N = IngShip._.numberOf, o = {};
     o.cd = N('<html><head><title>Tidewater</title></head><body><script>window.CD_BUILD={date:"2026-11-16",pass:"42",stamp:"zz1"};</script></body></html>', {});

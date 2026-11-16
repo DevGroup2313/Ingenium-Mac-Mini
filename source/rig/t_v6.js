@@ -41,7 +41,7 @@ function unzipList(file) { try { return cp.execFileSync('unzip', ['-Z1', file]).
   await p.setViewportSize({ width: 3440, height: 1440 }); await p.waitForTimeout(500);
   const wide = await p.evaluate(() => { const r = {}; ['home', 'fabrica', 'lector', 'chat'].forEach(pg => { go(pg); const s = document.querySelector('.section.active'); const m = document.querySelector('.main'); r[pg] = [Math.round(s.getBoundingClientRect().width), Math.round(m.getBoundingClientRect().width)]; }); return r; });
   ok(Object.values(wide).every(([s, m]) => s >= m - 40), 'at 3440 by 1440 each page takes the whole width (it stood at 1,680)', JSON.stringify(wide));
-  await p.evaluate(() => go('fabrica')); await p.waitForTimeout(900); await p.screenshot({ path: OUT + '/v6-wide-fabrica.png' });
+  await p.evaluate(() => { if (window.IngPublisher) IngPublisher.set(IngPublisher.name(), true); go('fabrica'); }); await p.waitForTimeout(900);   // 7.26: not asked (r309) await p.screenshot({ path: OUT + '/v6-wide-fabrica.png' });
   await p.setViewportSize({ width: 1600, height: 1000 }); await p.waitForTimeout(500);
 
   // ---- Fabrica: an app with an icon of its own, kept and tested

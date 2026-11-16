@@ -918,7 +918,12 @@ function testNow(){var r=cur();if(!r||!r.head)return;S.testing={id:r.id,checks:[
 function making(r,what,v){if(!S.making||S.making.id!==r.id)S.making={id:r.id,prog:{},say:{}};if(v==null){delete S.making.prog[what];delete S.making.say[what];if(!Object.keys(S.making.prog).length)S.making=null;}else S.making.prog[what]=v;paintShip();}
 function say(r,what,t){if(S.making&&S.making.id===r.id){S.making.say[what]=t;paintShip();}}
 /* one package, made and saved; the saving is waited for, so packages made one after another never cross */
-function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();making(r,what,5);
+function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();
+  /* 7.26 (modules/r309.js): under what name, asked before anything that carries it is made, unless she chose not to be asked again;
+     closed unanswered, nothing is made */
+  if(!opt.named&&window.IngPublisher&&IngPublisher.carries&&IngPublisher.carries(what))return new Promise(function(res){
+    IngPublisher.confirm(what,pkgOf(r).title,function(){opt.named=true;res(makeOne(r,what,opt));},function(){if(!opt.quiet)toast("Nothing was made: no publishing name was chosen.");res(false);});});
+  making(r,what,5);
   var p;
   if(what==="page")p=IngShip.onePage(r.id).then(function(x){var name=x.name||(r.slug+".html");return saveBytes(name,"text/html",x.bytes).then(function(){return keepMade(r,x.commit,what,name,"text/html",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="web")p=IngShip.webApp(r.id,{pkg:pkgOf(r)}).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
@@ -948,10 +953,13 @@ function makeDevice(r,what){var P=pkgOf(r),said=function(t){say(r,what,t);};
   .then(function(o){said("Saving "+o.name+"…");making(r,what,90);return saveBytes(o.name,o.mime,o.bytes).then(function(){return keepMade(r,o.commit,what,o.name,o.mime,o.bytes);}).then(function(){return IngRepo.setNote(r.id,o.commit,NOTE[what],o.info);}).then(function(){return o.bytes.length;});});}
 /* the chosen ones, one after another */
 function makeChosen(){var r=cur();if(!r||!r.head)return;var list=shipPrefs(r).chosen.filter(targetHere);if(!list.length){toast("Choose what to make: press a card above.");return;}
-  var q=Promise.resolve(),done=[],bad=[];
-  list.forEach(function(w){q=q.then(function(){return makeOne(r,w,{quiet:true}).then(function(){done.push(w);},function(e){bad.push([w,e&&e.message||String(e)]);});});});
+  /* 7.26: the publishing name asked once for all the chosen (modules/r309.js) */
+  var P=window.IngPublisher,ask=P&&P.carries&&list.some(function(w){return P.carries(w);});
+  var go=function(){var q=Promise.resolve(),done=[],bad=[];
+  list.forEach(function(w){q=q.then(function(){return makeOne(r,w,{quiet:true,named:true}).then(function(){done.push(w);},function(e){bad.push([w,e&&e.message||String(e)]);});});});
   q.then(function(){var nm=function(w){return TARGETS.filter(function(t){return t[0]===w;})[0][1];};
-    toast(bad.length?(done.length?done.map(nm).join(", ")+" made; ":"")+nm(bad[0][0])+" was not: "+bad[0][1]:done.length+" made and saved: "+done.map(nm).join(", ")+". Each is kept under Releases too.");});}
+    toast(bad.length?(done.length?done.map(nm).join(", ")+" made; ":"")+nm(bad[0][0])+" was not: "+bad[0][1]:done.length+" made and saved: "+done.map(nm).join(", ")+". Each is kept under Releases too.");});};
+  if(ask)P.confirm(null,pkgOf(r).title,go,function(){toast("Nothing was made: no publishing name was chosen.");});else go();}
 /* the build kits: the devices chosen, one zip each, saved one after another */
 function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds everything needed to build the app for one device, with a guide to every step: the Fire tablet, iPhone and iPad apps are built online from theirs, and the Mac and Windows kits build on the computer itself. Choose the devices.");
   var picked=pref.kits.slice();

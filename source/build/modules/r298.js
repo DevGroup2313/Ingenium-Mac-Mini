@@ -787,9 +787,13 @@ function paintReleases(r,w,f){var x=X(),C=x.C,MADE=W.fbMade;
   if(!ht)f.appendChild(key("","Mark the version kept now as a release",function(){x.sheetName("Mark a release","A name for this version, as a release: v1, 6.0, autumn.",function(name){return IngRepo.tag(r.id,name,{target:r.head}).then(function(){toast("Release "+name+" marked.");C.log={};return x.refresh();}).then(x.paint);});}));
   var headIt=have.filter(function(y){return y.c.oid===r.head;})[0],miss=[];
   (x.TARGETS||[]).forEach(function(t3){var k3=t3[0];if(x.targetHere&&x.targetHere(k3)&&!(headIt&&headIt.made.some(function(m){return m.kind===k3;})))miss.push(k3);});
-  if(miss.length&&x.makeOne)f.appendChild(key("pri","Make the missing ones",function(e,b){b.disabled=true;var q=Promise.resolve(),done=0,bad=[];
-    miss.forEach(function(k4){q=q.then(function(){return Promise.resolve(x.makeOne(r,k4,{quiet:true})).then(function(){done++;},function(er){bad.push(k4+": "+(er&&er.message||er));});});});
-    q.then(function(){delete C.log[ck];x.paintWork();toast(done+" made"+(bad.length?"; not made: "+bad.join("; "):"")+". Each is kept here, under its device.");});}));
+  if(miss.length&&x.makeOne)f.appendChild(key("pri","Make the missing ones",function(e,b){b.disabled=true;
+    /* 7.26: the publishing name asked once for all of them (modules/r309.js); closed unanswered, nothing is made */
+    var P=W.IngPublisher,ask=P&&P.carries&&miss.some(function(k){return P.carries(k);});
+    var go=function(){var q=Promise.resolve(),done=0,bad=[];
+    miss.forEach(function(k4){q=q.then(function(){return Promise.resolve(x.makeOne(r,k4,{quiet:true,named:true})).then(function(){done++;},function(er){bad.push(k4+": "+(er&&er.message||er));});});});
+    q.then(function(){delete C.log[ck];x.paintWork();toast(done+" made"+(bad.length?"; not made: "+bad.join("; "):"")+". Each is kept here, under its device.");});};
+    if(ask)P.confirm(null,(x.pkgOf?x.pkgOf(r).title:r.name)||r.name,go,function(){b.disabled=false;toast("Nothing was made: no publishing name was chosen.");});else go();}));
   else f.appendChild(key(ht?"":"quiet","Make its packages",function(){x.S.panel="ship";if(x.one&&x.one())x.setPanel("ship");try{if(W.fbRooms)W.fbRooms.part("ship");}catch(er){}var e2=$("fbTargets");if(e2)e2.scrollIntoView({block:"nearest",behavior:"smooth"});}));}
 /* ---------- Install on this Mac, Install on this PC ---------- */
 function installSheet(r,m,kind){var x=X(),P=x.pkgOf?x.pkgOf(r):{title:r.name,id:""},title=P.title||r.name,setup=kind==="win"&&/\.exe$/i.test(m.name||"");

@@ -106,7 +106,8 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       return r; }
 
     // ---------- 1. Fabrica: The Forge from the app library ----------
-    await p.evaluate(() => go('fabrica')); await p.waitForTimeout(1500);
+    // 7.26: the publishing name kept as it is and not asked again (modules/r309.js), so no make waits on the question
+    await p.evaluate(() => { if (window.IngPublisher) IngPublisher.set(IngPublisher.name(), true); go('fabrica'); }); await p.waitForTimeout(1500);
     await p.evaluate(() => document.getElementById('fbBring').click()); await p.waitForTimeout(500);
     /* 6.61 on: the Bring an app in sheet shows the app library as tiles (r112 sheetBring); before, a list of options */
     await p.evaluate(() => { const t = [...document.querySelectorAll('.f-sheet .f-tile')].find(x => /^The Forge/.test((x.querySelector('b') || x).textContent.trim()));
