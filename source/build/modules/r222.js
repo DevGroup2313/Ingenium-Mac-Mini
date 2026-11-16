@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.21", "Adamas's holder is always drawn at the screen's full sharpness. A computer that fell behind drew it at fewer pixels, down to under half on a Retina screen, which blurred the turned lines, the knurled foot and the engraved face; now it draws fewer frames a second instead, down to fifteen at rest."],
   ["7.21", "The Guide has two new topics, Home and Adamas, each with its own mark, in the tour's own words."],
   ["7.21", "The Guide has a topic for Lector: how it reads and writes, the model it chooses, and your sources cited.", "lector"],
   ["7.21", "The Guide has a topic for Fabrica, your apps kept as repositories.", "fabrica"],

@@ -395,7 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.21 (16 November 2026): the Guide and the tour brought up to every page, in every edition (her request of 15 November:
+Ingenium 7.21 (16 November 2026): Adamas's holder kept sharp, and the Guide and the tour brought up to every page.
+- Her words (16 November 2026), with a picture of 7.20 on her Mac: "The holder of Adamas' diamond still look really blurry on build
+  7.20, it does not look more defined or refined. It looks like a generated drawingn that does not look crisp. It still looks crappy
+  even though you made me spend ages waiting for you to do what I asked and claim to have done it." Found: r292 drew the scene at a
+  fraction of the screen's sharpness once frames came late (more than 1.3 times their 33 ms), down to 0.45 on a Retina screen
+  (max(0.45, 0.9/dpr)), stretched to fit; the 7.20 preview's pictures were taken with that drop held off (window.__keepQ), so they
+  showed what her Mac did not draw. Drawn here at 0.45, the turned lines and the knurled foot vanish and the face smears, as in her
+  picture; with every animation frame delayed to 60 ms the 7.21 page first built fell from 1040 by 848 pixels to 884 by 721. Not
+  measured on her Mac: which sharpness it reached there is inferred from the code and the likeness of the pictures.
+- `build/modules/r292.js`: the scene is always drawn at the screen's full sharpness; a computer that falls behind draws fewer frames a
+  second instead (the frame gap at rest from 33 ms up to 66 ms, and back as it keeps up). The cost of a frame at full sharpness is
+  higher, so a slow graphics chip works harder per frame than before (her heat request, item 11, applies).
+- rig: `t_721_holder_sharp.js` (new): with frames 60 ms apart for 40 s the holder keeps every pixel.
+
+The Guide and the tour, for 7.21: brought up to every page, in every edition (her request of 15 November:
 "The guided tour, its demonstrations and the Guide brought up to date with every page (Ingenia, Vesta, Concordia, Adamas, Mentes,
 Fabrica ...), in every edition and demo"). Surveyed on 7.19 and 7.20: the tour's chapters reached every main page already; the Guide
 had no topic for Home, Adamas, Lector, Fabrica's own workshop or the apps; the tour's step on Home's keys named the keys of an earlier

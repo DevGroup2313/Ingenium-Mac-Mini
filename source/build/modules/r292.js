@@ -68,7 +68,7 @@ var D=document,W=window;
    streaks; no ray stands in the air. A press sends one at once. Behind: the northern lights in violet and purple only. It draws only while
    in view and while the window is shown, thirty frames a second at rest, at a lower resolution on a slower device. */
 var Diamond=(function(){
-  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,vis=true,shown=true,ok=false,U={},q=1,lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
+  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,vis=true,shown=true,ok=false,U={},q=1,SLOW=1,lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
       yaw=0,tx=0,tz=0,gx=0,gz=0,over=false,press=-99,mX=0,mY=0,VAR=-1;
   var CP=[0,1.62,6.9],TG=[0,0.80,0],FOV=30*Math.PI/180,PER=9.0,TT=1.2;
   function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
@@ -622,10 +622,15 @@ var Diamond=(function(){
     og.globalAlpha=1;}
   function night(){return D.body.getAttribute("data-theme")==="night";}
   function still(){return D.body.getAttribute("data-motion")==="minimal"||(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),gap=(over||t-press<2.5)&&FAST?16:33;
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),gap=(over||t-press<2.5)&&FAST?16:Math.round(33*SLOW);
     if(ts-lastDraw<gap){raf=requestAnimationFrame(frame);return;}var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
-      var QMIN=Math.max(0.45,0.9/dpr());if(!W.__keepQ){if(EW>1.3&&t-QT>1.2&&q>QMIN){QCAP=q*0.95;q=Math.max(QMIN,q*0.85);QT=t;EW=1;size();}else if(EW<1.05&&t-QT>8&&q<QCAP){q=Math.min(QCAP,q*1.08);QT=t;size();}else if(EW<1.05&&t-QT>25&&QCAP<1){QCAP=Math.min(1,QCAP*1.05);QT=t;}}}}
+      /* 7.21, her words (16 November 2026): "The holder of Adamas' diamond still look really blurry on build 7.20, it does not look more
+         defined or refined. It looks like a generated drawingn that does not look crisp." A computer that fell behind drew the scene
+         at fewer pixels (down to 0.45 of the screen's sharpness on a Retina screen, stretched to fit), which smeared the turned lines,
+         the knurled foot and the engraved face that 7.20 cut. The scene is now always drawn at the screen's full sharpness; a computer
+         that falls behind draws fewer frames a second instead (down to 15 at rest), and more again once it keeps up. */
+      if(EW>1.3&&t-QT>1.2&&SLOW<2){SLOW=Math.min(2,SLOW*1.25);QT=t;EW=1;}else if(EW<1.05&&t-QT>8&&SLOW>1){SLOW=Math.max(1,SLOW/1.1);QT=t;}}}
     lastDraw=ts;if(!st){if(!over)yaw+=dt*(Math.PI*2/36);yaw+=dt*YV;}YV*=Math.exp(-dt/1.8);
     gx+=((over?mX*0.22:0)-gx)*Math.min(1,dt*2.8);gz+=((over?-mY*0.16:0)-gz)*Math.min(1,dt*2.8);tx=gz;tz=-gx*0.6;
     var tt=st?1.0:(W.__tFix!=null?W.__tFix:t);if(W.__tFix!=null&&W.__pFix){PL.a=W.__pFix[0];PL.e=W.__pFix[1];PL.s=W.__pFix[2];PL.n=W.__pFix[3]||1;}
