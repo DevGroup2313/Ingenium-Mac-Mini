@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.21", "The Guide has two new topics, Home and Adamas, each with its own mark, in the tour's own words."],
+  ["7.21", "The Guide has a topic for Lector, and the tour now says that Lakay travels inside Ingenium too, beside The Forge, Inkwell and Carpe Diem.", "lector"],
+  ["7.21", "The Guide has a topic for Fabrica, your apps kept as repositories.", "fabrica"],
+  ["7.21", "The Guide has a topic for the apps, as in Carpe Diem: Tabula, Abacus, Imago, Scriba and Fontes.", "desk"],
   ["7.20", "Adamas's holder is refined, as in the preview you approved: every edge is cut crisp and catches a fine line of light, the flared rim carries fine turned lines and the foot is knurled. By day its reflections are crisp; by night its violet room has softer lights, so no evenly spaced blocks run round its edges, and it stays dark purple."],
   ["7.20", "On a phone or a tablet, Adamas's 3D scene is now drawn at the screen's full sharpness, as on a computer; it still stops whenever Adamas is out of sight."],
   ["7.19", "On an iPad, and on the Fire tablet held upright with the menu open, a page's 3D header now stands its words first and its picture whole beneath them, as on a phone, whenever the header is narrower than 640 pixels; a wider header keeps its words and its picture side by side, as before."],

@@ -236,12 +236,12 @@ var CONF={
   /* 6.26: the Guide in rooms (modules/r230.js folds each topic into a tile and puts What is new in a key) */
   guide:{label:"The Guide, in rooms",find:true,all:true,findLabel:"Find in the guide",findHint:"effort, connectors, lend",found:["topic","topics"],
     allLabels:["Show the whole guide at once","Show the guide in rooms","For those who prefer one long page","Back to one room at a time"],rooms:[
-    {k:"start",t:"Start here",i:"start",says:"The guided tour, what Ingenium is, and its honest limits.",ids:["guideTourCard",/^what ingenium is/,/^honest limits/]},
+    {k:"start",t:"Start here",i:"start",says:"The guided tour, what Ingenium is, its honest limits, and Home.",ids:["guideTourCard",/^what ingenium is/,/^honest limits/,"homeGuide"]},  /* 7.21: Home's topic */
     {k:"chatcode",t:"Chat and Code",i:"chat",says:"Talking with models and building apps with them: effort and Ultracode, connectors, a session's environment, and GitHub.",
       ids:["guideEffortCard","cnGuide","envGuide","ghxGuide"]},
     {k:"models",t:"Models and devices",i:"yours",says:"Your models and the engines that run them, how much each device carries, and Ingenium on every device.",
       ids:["mdGuide",/^how much model/,/^ingenium as an app/]},
-    {k:"making",t:"Making and study",i:"making",says:function(){return "Blend, Folders, "+($("page-career")?"Vocatio, ":"")+"and Focus, the support that fits how you work.";},ids:["blxGuide","fdGuide","csGuide",/^(focus|vesta)\b/]},  /* 7.15: Focus is Vesta (build/names.py), and its topic is found by either name */
+    {k:"making",t:"Making and study",i:"making",says:function(){return "Blend, Folders, "+($("page-career")?"Vocatio, ":"")+"and Focus, the support that fits how you work.";},ids:["blxGuide","fdGuide","csGuide",/^(focus|vesta)\b/,"adGuide","lxGuide","fbGuide","appsGuide"]},  /* 7.15: Focus is Vesta (build/names.py), and its topic is found by either name */
     {k:"around",t:"Around the app",i:"around",says:function(){return "The right rail and the instruments"+(W.IngWorkshop?", and your Author Studio.":".");},ids:[/^the right rail/,/^the instruments/,"wsGuide"]}],
     words:[[/tour|what ingenium|limit/,"start"],[/chat|code|effort|ultracode|connector|environment|github/,"chatcode"],[/model|engine|device|lend/,"models"],
       [/blend|concordia|folder|ingenia|career|vocatio|focus|vesta|fabrica|build|adamas|study/,"making"],[/rail|instrument|author|workshop|setting/,"around"]]},
@@ -274,6 +274,12 @@ var KEYS=[
   [/^the right rail/,"rail notes notepad hourglass timer side buttons"],
   [/^the instruments/,"instruments schedae clepsydra notes timer custodia"],
   ["wsGuide","author studio workshop check errors layers fix troubleshoot rename name app name title called"],
+  /* 7.21: the Guide's new topics */
+  ["homeGuide","home start next step doors begin first model load chat"],
+  ["adGuide","adamas build page pages web app small apps code preview html diamond holder offline"],
+  ["lxGuide","lector read reading documents dossier portfolio cover letter appendix recipe measure check update word sources cite references"],
+  ["fbGuide","fabrica repository repositories git versions branches tags tree test ship installers github checks licences secrets"],
+  ["appsGuide","apps tabula abacus imago scriba fontes writing tables slides recordings notes sources desk floating window thesis"],
   ["mdPlaceCard","drive drives external hard disk usb ssd storage folder where kept move space room free"],
   [/^look and feel/,"look theme dark night day light mode colour color colours appearance motion animation movement"],
   ["ingSoundCard","sound sounds audio volume chime click clicks quiet mute noise"],

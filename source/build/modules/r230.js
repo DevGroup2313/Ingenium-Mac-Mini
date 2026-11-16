@@ -157,9 +157,13 @@ var IC={
   rail:svg('<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M15.5 4v16M17.8 8h.4M17.8 12h.4M17.8 16h.4"/>'),
   dial:svg('<circle cx="12" cy="13" r="7.5"/><path d="M12 13V9M12 3.5v2M8.2 4.6l.9 1.6M15.8 4.6l-.9 1.6"/>'),
   pen:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
-  book:svg('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15.5H5.5A1.5 1.5 0 0 0 4 21z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15.5h5.5A1.5 1.5 0 0 1 20 21z"/>')};
+  book:svg('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15.5H5.5A1.5 1.5 0 0 0 4 21z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15.5h5.5A1.5 1.5 0 0 1 20 21z"/>'),
+  /* 7.21: marks for the Guide's new topics, in the same thin line: Home's house, Adamas's cut stone, the apps' four tiles */
+  home:svg('<path d="M4 11.5L12 4.5l8 7"/><path d="M6.5 10v9.5h11V10"/><path d="M10 19.5v-5h4v5"/>'),
+  gem:svg('<path d="M7 4.5h10l3.5 5L12 20 3.5 9.5z"/><path d="M3.5 9.5h17M9.5 4.5L8 9.5l4 10.5 4-10.5-1.5-5"/>'),
+  apps:svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>')};
 /* each topic's mark, by its id, then by the words of its title */
-var MARKS=[["guideEffortCard","gauge"],["cnGuide","plug"],["envGuide","cloud"],["ghxGuide","branch"],["mdGuide","layers"],["blxGuide","blend"],["fdGuide","folder"],
+var MARKS=[["homeGuide","home"],["adGuide","gem"],["lxGuide","book"],["fbGuide","branch"],["appsGuide","apps"],["guideEffortCard","gauge"],["cnGuide","plug"],["envGuide","cloud"],["ghxGuide","branch"],["mdGuide","layers"],["blxGuide","blend"],["fdGuide","folder"],
   ["csGuide","brief"],["wsGuide","pen"],[/^what ingenium is/,"star"],[/^honest limits/,"limits"],[/^(focus|vesta)\b/,"focus"],[/^ingenium as an app/,"devices"],
   [/^how much model/,"device"],[/^the right rail/,"rail"],[/^the instruments/,"dial"],[/effort|ultracode/,"gauge"],[/connector/,"plug"],[/environment/,"cloud"],
   [/github/,"branch"],[/model|engine/,"layers"],[/blend/,"blend"],[/folder/,"folder"],[/career/,"brief"],[/author|workshop/,"pen"]];

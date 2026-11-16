@@ -24,8 +24,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   // 7.17: the lists brought up to the Guide as it is: r250's cards (who answers, context, thinking; the Offline Project's where the page
   // carries it) and Focus's new name, Vesta (7.15); the check itself unchanged (each room as a set, nothing left over in More)
   const withOp = await p.evaluate(() => !!(window.IngOffline && typeof window.IngOffline === 'object'));
-  const want = { start: ['guideTourCard', 'What Ingenium is', 'Honest limits'], chatcode: ['guideEffortCard', 'cnGuide', 'ghxGuide', 'envGuide', 'ctxGuide', 'thinkGuide'], models: ['mdGuide', 'How much model eac', 'Ingenium as an app', 'whoGuide'],
-    making: ['blxGuide', 'fdGuide'].concat(career ? ['csGuide'] : []).concat(['Vesta: support tha']).concat(withOp ? ['opGuide'] : []), around: ['The right rail', 'The instruments'].concat(master ? ['wsGuide'] : []) };
+  // 7.21: Home's topic in Start here; Adamas's in Making and study in every edition, Lector's, Fabrica's and the apps' where those pages are
+  const want = { start: ['guideTourCard', 'What Ingenium is', 'Honest limits', 'homeGuide'], chatcode: ['guideEffortCard', 'cnGuide', 'ghxGuide', 'envGuide', 'ctxGuide', 'thinkGuide'], models: ['mdGuide', 'How much model eac', 'Ingenium as an app', 'whoGuide'],
+    making: ['blxGuide', 'fdGuide'].concat(career ? ['csGuide'] : []).concat(['Vesta: support tha']).concat(withOp ? ['opGuide'] : []).concat(['adGuide']).concat(career ? ['lxGuide', 'fbGuide', 'appsGuide'] : []), around: ['The right rail', 'The instruments'].concat(master ? ['wsGuide'] : []) };
   // which of two cards added by modules lands first in a room depends on which module adds it first, so each room is compared as a set
   const same = (a, b) => JSON.stringify((a || []).slice().sort()) === JSON.stringify(b.slice().sort());
   const filedOk = Object.keys(want).every(k => same(R.filed[k], want[k])) && R.filed.start[0] === 'guideTourCard' && (R.filed.more || []).length === 0;

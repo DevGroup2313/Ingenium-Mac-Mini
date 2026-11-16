@@ -70,6 +70,31 @@ function guide(){try{
     ["How long it thinks.","In the effort key's menu: Brief, Standard, Deep or Open, for a model on this device. A model that goes round in circles is stopped and answers."],
     ["Only when it helps.","The model skips thinking for an easy question and thinks for a hard one."],
     ["Sources when you ask.","Replies give sources and citations when you ask for them (\"with sources\", \"cite\"), not every time."]],"ctxGuide");
+  /* 7.21 (her words, 15 November 2026: "The guided tour, its demonstrations and the Guide brought up to date with every page"): topics for the
+     pages the Guide did not yet name, in the tour's own words and the pages' own; each only where its page exists in this edition */
+  topic("homeGuide","Home: where Ingenium opens",[
+    ["Your next step.","The large button always shows your next useful step: getting your first model, loading it, or starting a chat."],
+    ["The doors.","Its buttons open the main rooms: bring in a model, chat, Vesta and Adamas. The Vesta button also shows the step you are working on, so it is waiting when you come back."]],"guideTourCard");
+  if($("page-build"))topic("adGuide","Adamas: pages and small apps",[
+    ["Code in, a page out.","Describe what you want and a model writes it, or write it yourself; the preview beside it runs as you type. It works fully offline and does not need a model."],
+    ["An app for your devices.","A finished page can become an app for your devices."],
+    ["The diamond.","Point at the diamond and it turns to you. Press it, or any part of its holder (the engine logo, the Orrery, the bezel, the band of brilliants, the rim), and it answers."]]);
+  if($("page-lector"))topic("lxGuide","Lector: your apps read, your documents written",[
+    ["It reads, then writes.","Lector reads one of your apps or a long document from end to end, thinks aloud as it goes, and writes the documents you need from it: a dossier, a portfolio piece, a cover letter, an appendix. It works on this device, or with your other computer's model when you have linked one."],
+    ["Your apps, carried inside.","The Forge, Inkwell, Carpe Diem and Lakay travel inside Ingenium and are kept on this device on its first start, each checked against its fingerprint. A newer copy you add yourself always stays."],
+    ["The recipe.","Measure opens each of your apps in a frame that refuses every request to another address and reads its figures; Check then finds the figures an update has changed in your own words, and Update changes your Word file itself, keeping the version before."],
+    ["The model, and a second pass.","Lector names the model it will use and says when a larger one is ready on this device. Examine each section, on by default, strikes or marks what the material does not support."],
+    ["Your sources, cited.","With Cite my sources on, Lector cites the sources kept in Fontes, numbered, and ends with a References list in your chosen style; no source that is not yours is ever invented."]]);
+  if($("page-fabrica"))topic("fbGuide","Fabrica: your apps as repositories",[
+    ["Every version kept.","Fabrica keeps each of your apps as a real git repository on this device: every version, line by line, with branches, tags and undo by a new version. Nothing leaves the device unless you send it."],
+    ["The tree.","Its header shows the open app as a tree: main the trunk, each idea a branch, each release a collar. Press a version to see what it changed, in the panels below."],
+    ["Test and ship.","Test runs the app's own checks; Ship makes the one-page app, the web app and the installers from the version you choose. Checks reads each version for secrets left in the code, the parts it uses and their licences."],
+    ["On this computer.","In the Mac and Windows apps, On this computer opens every repository on your drives, and you work on it right there."],
+    ["GitHub, when you want it.","Sign in on GitHub's own page, or with a token, and each repository can be sent to GitHub and brought back, version for version. Without a token, Fabrica works entirely on this device."]]);
+  if($("page-tabula"))topic("appsGuide","The apps, as in Carpe Diem",[
+    ["Five apps, whole.","Tabula (writing), Abacus (tables), Imago (slides), Scriba (recordings and notes) and Fontes (sources). Each opens full width with the Desk bar at the top; Desk brings Ingenium back."],
+    ["Floating windows.","The arrow on the side column floats an app into a window you can move, size from any edge or fill the screen with. Each floating window keeps a tab on the Desk bar: the minus folds it into its tab, the tab brings it back, and its cross closes it."],
+    ["Long documents.","Tabula holds a thesis of 100,000 words."]]);
   if(W.IngOffline&&typeof W.IngOffline==="object")topic("opGuide","The Offline Project, made in Fabrica",[
     ["Brought in.","Fabrica's Bring one in offers it: all four apps, or without Inkwell, made from the copy of each app your library keeps now. It is then an app in Your apps beside the others, with its crest, versions and ships; making it again adds a version."],
     ["Open or save.","Bring one in's third choice opens its own card: each app's copy, Make and open, and Save the app, one file that opens on any device with no connection."],

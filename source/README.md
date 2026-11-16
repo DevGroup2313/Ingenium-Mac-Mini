@@ -395,6 +395,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.21 (16 November 2026): the Guide brought up to every page (her request of 15 November: "The guided tour, its
+demonstrations and the Guide brought up to date with every page (Ingenia, Vesta, Concordia, Adamas, Mentes, Fabrica ...), in every edition
+and demo"). Surveyed on 7.19: the tour's chapters reached every main page already; the Guide had no topic for Home, Adamas, Lector,
+Fabrica's own workshop or the apps.
+- `build/modules/r250.js`: five topics, their words taken from the tour's own steps and the pages' own hints: Home (in Start here),
+  Adamas (in every edition), and, only where the page exists, Lector, Fabrica and the apps (Tabula, Abacus, Imago, Scriba, Fontes).
+- `build/modules/r173.js`: each filed in its room by its id (Home in Start here, the others in Making and study), and its search words;
+  `build/modules/r230.js`: three marks in the same thin line, a house, a cut stone and four tiles (Lector keeps the book, Fabrica
+  takes the branch).
+- `build/modules/r120.js`: the tour's step on the apps carried inside names Lakay too (Build 17 travels inside since 7.09).
+- rig: t_626_guide.js's room lists with the new topics, by edition; rig/inject_modules.js now replaces a module that has no style block
+  (it appended a second copy, which stood aside for the first).
+- r222: the 7.21 news, each line only where its page is.
+
 Ingenium 7.20 (16 November 2026): Adamas's holder refined (her approved preview). Her words of 15 November: "I want you to refine and
 sharp, crisps edges for the holder of the diamons on the Adamas page, it still looks fake on the side and generated and not refined enough
 with the proper 3D look and definition"; on the live preview https://claude.ai/artifact/AwAEqd9S2QbZKtDbmZ8sFJ (Adamas Holder Finish,

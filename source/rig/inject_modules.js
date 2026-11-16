@@ -12,6 +12,8 @@ for (const mp of mods) {
   const endMark = 'try{window.__ingParts["p' + p + '"]="running";}catch(_){}';
   const styleMark = '<style id="' + name + '-css">';
   let start = page.indexOf(styleMark);
+  if (start < 0) { // a module with no style block: its own first script, found by its start mark (the comment above promised this; 7.21)
+    const sm = '__ingParts=window.__ingParts||{})["p' + p + '"]="started"'; const at = page.indexOf(sm); if (at >= 0) start = page.lastIndexOf('<script', at); }
   const endAt = page.indexOf(endMark);
   if (start >= 0 && endAt > start) {
     let end = page.indexOf('</script>', endAt); end += '</script>'.length;
