@@ -415,7 +415,7 @@ t_717_* checks below use it.
   day halfway between the dark well (as before) and the plate, by night between the plate and the dark well (0.45 of the way), in a
   satin finish so it neither flares white by day nor falls to black by night. Each change was shown to her in pictures first.
   Heat: the loop no longer writes four values on the turret's root each frame (that restyled all its hundred parts); each layer's shift
-  is written on it alone, only when it has moved. Measured in Chrome at rest after the first-start work (below): Mentes 131 to 124 ms of
+  is written on it alone, only when it has moved. Measured in Chrome at rest after the first start's work (below): Mentes 131 to 124 ms of
   the main thread a second, its layouts 60 to 33 a second, its restyles 90 to 61.
 - `build/modules/r306.js` (new, every edition; at work only in Safari's engine): the top bar's seal turned by the graphics chip. Measured on
   7.16 in WebKit (rig/t_717_wk_heat.js: the share of each second the page's main thread is taken, against an empty page), the seal's four
