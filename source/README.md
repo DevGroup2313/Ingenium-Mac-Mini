@@ -440,7 +440,16 @@ t_717_* checks below use it.
   keeps the apps it carries (Carpe Diem, The Forge, Inkwell, Lakay): about a minute of work once (r120's seed; later starts only count
   what is kept). The heads' own seals (Home 132 px, Concordia 71, Vocatio 53) and Home's six orbs still move inside their drawings; the
   WebGL heads (Adamas, Vesta) cannot be measured here (no graphics chip).
-- rig: t_717_wk_spin.js and .py, t_717_seal_cmp.js and .py, t_717_seal_gc.js, t_717_wk_heat.js. r222: the 7.17 news.
+- `build/modules/r290.js`, a finger on the Fire tablet (rig/t_716_touch_heads.js found it on 7.16 as well as here): on its screen in
+  portrait with the menu open a head is about 500 px wide and its words lie over its object; Adamas's diamond answered a finger in 1
+  place of 5. On a touch screen (hover: none) the words let a finger through to the head beneath, except on their keys and links: 5 of
+  5, the test 26 of 26. Nothing is drawn differently. Found, not changed: at that width (and on an iPad, 531 px) the objects of Adamas,
+  Lector, Vocatio and Fabrica stand partly under their words; a narrow arrangement is a new look, for a preview first.
+- The 3D heads on an iPhone's and an iPad's screen, in Safari's engine (Playwright's iPhone 15 Pro and iPad Pro 11): all nine are drawn
+  and stand within the screen's width (Adamas's diamond needs a few seconds to appear on this machine's software graphics).
+- rig: t_717_wk_spin.js and .py, t_717_seal_cmp.js and .py, t_717_seal_gc.js, t_717_wk_heat.js; t_626_guide.js's room lists brought up
+  to the Guide as it is (r250's four cards, Vesta's name), its check unchanged (it failed on 7.16 for the old lists alone). r222: the
+  7.17 news.
 
 Ingenium 7.16 (15 November 2026): the turret as a toy and the compact Models page (her approved design), Mentes, a finger in the
 heads, lighter at rest. Her words that day, sending version 15 of the turret's live preview as "the approved turret redesign": "remove

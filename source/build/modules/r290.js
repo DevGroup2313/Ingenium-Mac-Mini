@@ -593,6 +593,14 @@ body[data-theme="night"] .skv-hx{--ox-rim0:#43375e;--ox-rim1:#1d1729}
   background:linear-gradient(160deg,var(--ox-rim0),var(--ox-rim1));transform:translateZ(calc(var(--S) * -.012 * var(--k)))}
 
 .skh.skv-head .skh-sway{animation:none}
+/* 7.17 (found on 7.16 with rig/t_716_touch_heads.js, her words of 15 November 2026: "All of the 3D headers of Ingenium's pages need to
+   be clickable and animated when I press on them on my phone or Fire tablet"): on the Fire tablet's screen in portrait, with the menu
+   open, a head is about 500 px wide and its words lie over its object; Adamas's diamond answered a finger in 1 place of 5, the words
+   taking the rest. On a touch screen the words now let a finger through to the head beneath, except on their keys and links; nothing
+   is drawn differently. */
+@media (hover:none){html body .skh .skh-words{pointer-events:none}
+  html body .skh .skh-words a,html body .skh .skh-words button,html body .skh .skh-words input,html body .skh .skh-words select,
+  html body .skh .skh-words textarea,html body .skh .skh-words label,html body .skh .skh-words [role="button"],html body .skh .skh-words [tabindex]{pointer-events:auto}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p290"]="started";}catch(_){}
 /* R290 · the heads of the Career Studio and Lector as Blend, Models, Folders and Home are made: see the note at the top of its styles */
