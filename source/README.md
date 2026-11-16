@@ -403,7 +403,9 @@ recommendations, please commit and push it everywhere and continue working on my
   for a screen up to 760 px) for that head alone. On an iPad (heads 531 px) and on the Fire tablet upright with the menu open (497 px),
   the objects of Adamas, Lector, Vocatio, Fabrica and Vesta stood partly under their words (found on 7.16 to 7.18); they stand whole
   beneath them now. A wider head (a computer, a tablet held sideways, the menu closed) keeps its words and its object side by side.
-  When a head changes, the window is told once (a resize event), as the heads that frame their pictures listen for it.
+  When a head changes, the window is told once (a resize event), as the heads that frame their pictures listen for it. The class is set
+  on the next frame, not inside the observer's own call (Safari reported "ResizeObserver loop completed with undelivered notifications"
+  on the first 7.19 page), and a head made later (Lector makes its own when its page first opens) is found as it is added.
 - `build/modules/r291.js`: Vesta's pool is framed as on a phone when its head is stacked (it read only the window's width).
 - Checked (rig/t_719_narrow.js; Safari's engine at an iPad's size, Chrome at the Fire tablet's and a computer's): each head stacked by
   itself with the preview's own height, to the pixel (Adamas 782 and 805, Lector 760, Vocatio 783, Fabrica 782, Vesta 630), its object

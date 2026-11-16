@@ -18,9 +18,16 @@ var D=document,W=window,NARROW=640,ro=null,kick=0;
 function set(h){var n=h.offsetWidth>0&&h.offsetWidth<NARROW;if(n===h.classList.contains("skh-narrow"))return false;h.classList.toggle("skh-narrow",n);return true;}
 function told(){if(kick)return;kick=setTimeout(function(){kick=0;try{W.dispatchEvent(new Event("resize"));}catch(e){}},60);}
 function scan(){var ch=false;[].forEach.call(D.querySelectorAll(".skh"),function(h){if(set(h))ch=true;if(ro&&!h.__r307){h.__r307=1;try{ro.observe(h);}catch(e){}}});if(ch)told();}
-if(typeof W.ResizeObserver==="function"){ro=new ResizeObserver(function(es){var ch=false;es.forEach(function(e){if(set(e.target))ch=true;});if(ch)told();});}
+/* the class is set on the next frame, not inside the observer's own call: a head that changes its height there leaves the observer
+   notes it cannot deliver in that frame, which Safari reports as an error ("ResizeObserver loop completed with undelivered notifications") */
+var due=[],raf=0;function later(){raf=0;var ch=false,l=due;due=[];l.forEach(function(h){if(set(h))ch=true;});if(ch)told();}
+if(typeof W.ResizeObserver==="function"){ro=new ResizeObserver(function(es){es.forEach(function(e){if(due.indexOf(e.target)<0)due.push(e.target);});if(!raf)raf=(W.requestAnimationFrame||setTimeout)(later);});}
 else W.addEventListener("resize",function(){scan();});
 scan();[400,1500,4000,9000].forEach(function(ms){setTimeout(scan,ms);});
+/* a head made later (Lector makes its own when its page first opens, after its sets are read) is found as it is added */
+var sraf=0;function soon(){if(!sraf)sraf=(W.requestAnimationFrame||setTimeout)(function(){sraf=0;scan();});}
+try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var a=ms[i].addedNodes;for(var j=0;j<a.length;j++){var n=a[j];
+    if(n.nodeType===1&&(n.classList.contains("skh")||(n.firstElementChild&&n.querySelector(".skh")))){soon();return;}}}}).observe(D.body,{childList:true,subtree:true});}catch(e){}
 var og=W.go;if(typeof og==="function"&&!og.__r307){var g=function(){var r=og.apply(this,arguments);try{setTimeout(scan,60);setTimeout(scan,1200);}catch(x){}return r;};
   try{Object.keys(og).forEach(function(k){g[k]=og[k];});}catch(x){}g.__r307=1;W.go=g;}
 W.IngNarrowHeads={scan:scan,width:NARROW,state:function(){return [].map.call(D.querySelectorAll(".skh"),function(h){return {w:h.offsetWidth,narrow:h.classList.contains("skh-narrow")};});}};
