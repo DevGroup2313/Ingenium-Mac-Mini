@@ -115,8 +115,8 @@ function resign(exe,slots){var dv=new DataView(exe.buffer,exe.byteOffset,exe.byt
 /* ---------- the app ---------- */
 /* 7.23, her words (16 November 2026): "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of
    the Forge or Carpe Diem or Inkwell or any future app that I choose to make." Fabrica's audit found Ingenium named where a person sees it
-   in an app made here: the Mac app's copyright (Get Info, its About window), the Windows program's company (its Details) and the first
-   line of these notes. Each now names the app's owner (Lector's author, else the name in Settings, else the app itself). */
+   in an app made here: the Mac app's rights line (Get Info, its About window), the Windows program's company (its Details) and the first
+   line of these notes. Each now names the app's owner (the profile's author, else the name in Settings, else the app itself). */
 function ownerLine(title){var n="";try{if(typeof lxhAuthor==="function")n=String(lxhAuthor()||"");}catch(e){}
   if(!n.trim()){try{n=String((typeof personaGet==="function"&&personaGet()||{}).name||"");}catch(e){}}
   n=n.replace(/[^0-9A-Za-z\u00c0-\u024f .'\-]+/g," ").replace(/\s+/g," ").trim().slice(0,60);return n||String(title||"");}
