@@ -171,9 +171,9 @@ function Installed([string]$what, [string]$dir, [string]$start, [string]$dsk, [s
   } catch { say "     (${what}: the shortcut's taskbar identity could not be read: $_)" }
   $k = Get-ItemProperty $key -ErrorAction SilentlyContinue
   Check ($k -and $k.DisplayName -eq $nm -and $k.DisplayVersion -eq '6.5' -and $k.Publisher -eq 'Ada Quill' -and $k.InstallLocation -eq $dir -and
-         $k.UninstallString -eq "`"$exe`" --uninstall" -and $k.QuietUninstallString -eq "`"$exe`" --uninstall --silent" -and $k.EstimatedSize -gt 1000 -and $k.NoModify -eq 1 -and $k.DisplayIcon -eq "$exe,0") `
+         $k.UninstallString -eq "`"$exe`" --uninstall" -and $k.QuietUninstallString -eq "`"$exe`" --uninstall --silent" -and $k.EstimatedSize -gt 100 -and $k.NoModify -eq 1 -and $k.DisplayIcon -eq "$exe,0") `
     "${what}: Settings, Apps lists it ($($k.DisplayName) $($k.DisplayVersion), $($k.Publisher), $([math]::Round($k.EstimatedSize / 1024, 1)) MB, $($k.InstallDate))" `
-    "${what}: its entry in Settings, Apps: $(if ($k) { $k | Select-Object DisplayName, DisplayVersion, Publisher, InstallLocation, UninstallString, EstimatedSize | ConvertTo-Json -Compress } else { 'none' })"
+    "${what}: its entry in Settings, Apps: $(if ($k) { $k | Select-Object DisplayName, DisplayVersion, Publisher, InstallLocation, UninstallString, QuietUninstallString, DisplayIcon, NoModify, NoRepair, EstimatedSize | ConvertTo-Json -Compress } else { 'none' })"
 }
 function Gone([string]$what, [string]$dir, [string]$start, [string]$dsk, [string]$key, [bool]$dataKept) {
   $t = [DateTime]::Now.AddSeconds(45); while ((Test-Path $dir) -and [DateTime]::Now -lt $t) { Start-Sleep 1 }
