@@ -234,7 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
-  ["7.26", "Before Fabrica makes a Mac, Windows or web app or build kits, it asks \u201cPublish it as\u2026\u201d, in every edition: the name kept so far on a raised plate, where it shows, and three choices: as it is, with a new name, or with no name. Don't ask me again stops the asking; Change, in the Ship part, edits the name and that choice.", "fabrica"],
+  ["7.26", "Before Fabrica makes a Mac, Windows or web app or build kits, it asks \u201cPublish it as\u2026\u201d, in every edition: the name kept so far on a raised plate, where it shows, and three choices: as it is, with a new name, or with no name. Don't ask me again stops the asking. The Ship room shows the name on the same \u201cPublished as\u201d plate, and its Change edits the name and that choice.", "fabrica"],
   ["7.26", "Download as an app shows the publishing name on the same plate, with Change; it names the Windows app by the file it saves, the app's installer."],
   ["7.25", "Fabrica keeps one publishing name for the apps it makes: a Mac app's rights line, a Windows app's publisher and its installer, and the build kits carry it. Ship shows it, with a key to change it or to publish with no name; where none is chosen yet, Fabrica asks the first time it opens.", "fabrica"],
   ["7.25", "Your own name is the publishing name to begin with, as before, and Fabrica's Ship room now lets you change it.", "master"],

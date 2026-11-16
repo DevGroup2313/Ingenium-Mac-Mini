@@ -29,7 +29,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         const made = await IngRepo.fromFiles([{ path: 'index.html', data: html }], { name: 'Harbour Garden', msg: 'Harbour Garden 2.3.1' }); rec = (await IngRepo.list()).find(x => x.id === made.id); }
       await H.refresh(); H.FBS().sel = rec.id; H.paint(); try { H.setPanel('ship'); } catch (e) {} H.paint(); });
     await sleep(1200); if (await p.$('#fbPart_ship') && !(await p.$('.f-sheet-wrap'))) { await p.click('#fbPart_ship'); await sleep(500); } };
-  const line = () => p.evaluate(() => { const L = document.getElementById('r309Line'); return L ? L.textContent.replace(/\s+/g, ' ').trim() : null; });
+  // the Ship part's plate (7.26): its label and name, its note, its key
+  const line = () => p.evaluate(() => { const L = document.getElementById('r309Line'); if (!L) return null; const g = s => ((L.querySelector(s) || {}).textContent || '').replace(/\s+/g, ' ').trim();
+    return (L.classList.contains('r309-pl') ? g('.r309-lab') + ' ' : '') + g('.r309-nm') + ' | ' + g('.r309-note') + ' | ' + g('#r309Change'); });
   // the question as it stands: which sheet, the name on its plate (its field's text while a new name is typed), the choice, the tick
   const asking = () => p.evaluate(() => { const s = document.querySelector('[data-r309]'); if (!s) return null; const i = document.getElementById('r309Name'), n = s.querySelector('.r309-nm'), on = s.querySelector('.r309-opt.on'), q = document.getElementById('r309Quiet');
     return { kind: s.getAttribute('data-r309'), title: (s.querySelector('.r309-t') || {}).textContent, value: i ? i.value : (n ? n.textContent : null), choice: on ? on.getAttribute('data-c') : null, quiet: q ? q.getAttribute('aria-checked') : null,
@@ -49,7 +51,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(m0.ed === 'master' && m0.decided && m0.name === 'Yannie D. Forest' && !m0.quiet, 'the master edition begins with the owner\'s name, and asks', m0);
   await fab();
   const a0 = await asking(), l0 = await line();
-  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Fabrica asks each time an app is made/.test(l0 || '') && /Change$/.test(l0 || ''), 'opening Fabrica asks nothing; its Ship part says the name and that it is asked each time, with Change', { asking: a0, line: l0 });
+  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Fabrica asks each time an app is made/.test(l0 || '') && /Change$/.test(l0 || ''), 'opening Fabrica asks nothing; its Ship part shows the Published as plate with the name, that it is asked each time, and Change', { asking: a0, line: l0 });
   // 2. a make asks, the owner's name in the field
   into('named'); await begin('mac'); await sleep(900);
   const a1 = await asking();
@@ -90,7 +92,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await fab();
   const e0 = await p.evaluate(() => ({ decided: IngPublisher.decided(), name: IngPublisher.name(), builtIn: IngPublisher.builtIn() })), l9 = await line(), a9o = await asking();
   into('full'); await begin('win'); await sleep(900); const a9 = await asking(); await p.fill('#r309Name', 'Ben Okafor'); await p.click('#r309Save'); const e9 = await ended();
-  ok(!e0.decided && e0.name === '' && e0.builtIn === '' && /^No name yet/.test(l9 || '') && !a9o && a9 && a9.kind === 'make' && a9.value === '' && a9.choice === 'new' && e9 === 'made' && (await p.evaluate(() => IngPublisher.name())) === 'Ben Okafor',
+  ok(!e0.decided && e0.name === '' && e0.builtIn === '' && /^Published as No name yet/.test(l9 || '') && !a9o && a9 && a9.kind === 'make' && a9.value === '' && a9.choice === 'new' && e9 === 'made' && (await p.evaluate(() => IngPublisher.name())) === 'Ben Okafor',
     'another edition: no name built in, and a make asks with the field empty; the answer is kept', { e0, line: l9, asking: a9, ended: e9 });
   // 7. Download as an app
   const dl = await p.evaluate(async () => { await IngDownload.open({ html: '<!doctype html><html><head><title>Harbour Garden</title></head><body><h1>Harbour Garden</h1></body></html>' }); await new Promise(r => setTimeout(r, 800));

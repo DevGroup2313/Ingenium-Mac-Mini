@@ -402,13 +402,15 @@ I want it to ask everytime and to never assume but I want the option built for m
 Then, of the first question (16 November 2026): "I don't liek the way this is worded or presented, please redo it." A live preview
 (https://claude.ai/artifact/BPunHpyUHFr3uJMJoyYqmq), and her word on it: "I approve of this preview, release it everywhere but I want the
 "Publish with a new name" added to it and please make the "Published As" card on the "Download as an app" page." She chose the wording
-"Publish it as..." and the name plate.
+"Publish it as..." and the name plate. Then (16 November 2026): "I approve of the preview, publish it everywhere. I also want the published
+card that has my name on the Ship room and the Download as an app room."
 - `build/modules/r309.js`: before anything that carries the name is made (a Mac, Windows or web app, build kits), Fabrica asks, in the
   approved look: "Before <app> is made", "Publish <app> as...", the app's seal, the name kept so far on a raised plate that tilts toward
   the pointer (Change turns it into a field), three tiles for where it shows (a Mac's rights line, Windows' publisher, the build kits),
   three choices (Publish as the name, Publish with a new name, Publish with no name), "Don't ask me again" (a raised box, empty until
-  ticked) and the keys Cancel and "Make <app>". Cancel or the cross makes nothing. Change, in the Ship part's chip, opens the same sheet
-  to edit the name and that choice. Nothing is asked on opening Fabrica any more (7.25 asked there in the other editions).
+  ticked) and the keys Cancel and "Make <app>". Cancel or the cross makes nothing. The Ship room's Ship part shows the same
+  "Published as" plate (the name, or "No name" / "No name yet", with "Fabrica asks each time an app is made." or "Used each time, without
+  asking."), and its Change opens the same sheet to edit the name and that choice. Nothing is asked on opening Fabrica any more (7.25 asked there in the other editions).
 - `build/modules/r112.js` makeOne asks first (opt.named skips it); Make the chosen asks once for all; `build/modules/r298.js` Make the
   missing ones asks once; `build/modules/r139.js` Download as an app shows the same "Published as" plate below its fields, with Change;
   its Mac, Windows, web and kit rows keep what is on it before they make; its Windows row now names the file it saves, "<app> Setup.exe"

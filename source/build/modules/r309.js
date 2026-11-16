@@ -83,14 +83,13 @@ body[data-theme="night"] .r309-lnk:hover,body[data-theme="night"] #fb .r309-lnk:
 .r309-sheet .r309-chk .r309-c.on{background:linear-gradient(var(--f-pa),var(--f-pb));box-shadow:var(--f-psh);animation:r309tick .4s cubic-bezier(.34,1.56,.64,1)}
 .r309-sheet .r309-chk small{display:block;color:var(--f-ink3);font-size:12.5px}
 @keyframes r309tick{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-/* the Ship part's line, as a raised chip */
-.r309-line{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:12px 0 2px;padding:12px 14px;border-radius:16px;background:linear-gradient(var(--f-hi),var(--f-card));box-shadow:var(--f-pop)}
-.r309-line .r309-who2{font-size:13.5px;color:var(--f-ink1);min-width:0;margin-right:10px}
-.r309-line .r309-who2 b{font:600 18px "Home Cormorant","Cormorant Garamond",Cormorant,Georgia,serif}
-.r309-line .r309-who2 small{display:block;color:var(--f-ink3);font-size:12.5px}
+/* the Ship part's plate, and its note */
+.r309-ship{margin:12px 0 2px}
+.r309-pl .r309-note{margin-top:6px;font:400 12.5px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:#6c6579}
+body[data-theme="night"] .r309-pl .r309-note{color:#a99cc1}
 /* Download as an app: the same plate below its fields */
 .r309-dl{margin:0 0 12px}
-@media (prefers-reduced-motion: reduce){.r309-sheet *,.r309-pl,.r309-pl::after,.r309-line{animation:none !important;transition:none !important}}
+@media (prefers-reduced-motion: reduce){.r309-sheet *,.r309-pl,.r309-pl::after{animation:none !important;transition:none !important}}
 </style>
 <style id="r309-focus">
 .r309-sheet .r309-opt:focus-visible,.r309-sheet .r309-chk:focus-visible,.r309-lnk:focus-visible{outline:2px solid #6a3fb5;outline-offset:3px}
@@ -172,13 +171,14 @@ function confirm(what,title,then,cancel,r){if(what&&!CARRIES[what]){then();retur
   if(quiet()){then();return;}
   if(D.querySelector('[data-r309="make"]')){if(cancel)cancel();return;}
   sheet({make:clean(title)||"this app",rec:r||null,then:then,cancel:cancel});}
-/* the Ship part's line: the name, whether it is asked, and a key to change it */
+/* the Ship part: the same "Published as" plate as in Download as an app (her word on the preview: "I also want the published card that
+   has my name on the Ship room and the Download as an app room"), with Change, and whether Fabrica asks */
 function paintLine(){var x=X(),pk=D.getElementById("fbPkg");if(!x||!pk||!pk.parentNode)return;
-  var L=D.getElementById("r309Line");if(!L){L=D.createElement("div");L.id="r309Line";L.className="r309-line";pk.parentNode.insertBefore(L,pk.nextSibling);}
+  var L=D.getElementById("r309Line");if(!L){L=D.createElement("div");L.id="r309Line";L.className="r309-pl r309-ship";pk.parentNode.insertBefore(L,pk.nextSibling);tilt(L);}
   var n=name(),dec=decided(),qu=quiet();
-  L.innerHTML='<span class="r309-who2">'+(dec&&n?"Published as <b>"+esc(n)+"</b>":dec?"Published with <b>no name</b>":"<b>No name yet</b>")+
-    "<small>"+(qu?"Used each time, without asking.":"Fabrica asks each time an app is made.")+"</small></span>";
-  var k=x.btn("","Change",function(){sheet({});});k.id="r309Change";L.appendChild(k);}
+  L.innerHTML='<div class="r309-lab">Published as</div><div class="r309-who"><span class="r309-nm'+(n?"":" none")+'">'+(n?esc(n):dec?"No name":"No name yet")+'</span>'+
+    '<button type="button" class="r309-lnk" id="r309Change">Change</button></div><div class="r309-note">'+(qu?"Used each time, without asking.":"Fabrica asks each time an app is made.")+"</div>";
+  var k=L.querySelector("#r309Change");if(k)k.onclick=function(){sheet({});};}
 /* Download as an app (r139): the same plate below its fields; Change turns it into a field in place. value() is what is on it. */
 function plateFor(){var cur=name(),editing=false,typed=cur;var el=D.createElement("div");el.className="r309-pl r309-dl";el.id="r309DlPlate";
   function paint(){el.innerHTML=editing?'<div class="r309-lab">Published as</div><input id="r309DlName" type="text" maxlength="80" autocomplete="name" placeholder="Your name, or your studio’s (empty: no name)" value="'+esc(typed)+'"><div class="r309-end"><button type="button" class="r309-lnk" id="r309DlDone">Done</button></div>':
