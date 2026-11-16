@@ -395,6 +395,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.20 (16 November 2026): Adamas's holder refined (her approved preview). Her words of 15 November: "I want you to refine and
+sharp, crisps edges for the holder of the diamons on the Adamas page, it still looks fake on the side and generated and not refined enough
+with the proper 3D look and definition"; on the live preview https://claude.ai/artifact/AwAEqd9S2QbZKtDbmZ8sFJ (Adamas Holder Finish,
+version 1), 16 November 2026: "I approve ofthe preview, please push it everywhere and continue working on my requests."
+- `build/modules/r292.js`, found: the holder is one turned outline traced in the shader, every corner rounded by the same radius (sdCase
+  took 0.010 off), so no edge caught a crisp line of light; its rim, flare and foot were plain mirrors; by day each reflection was three
+  tilted ones blended (a deliberate blur); by night the violet room's three strip lights had hard edges, and they reflected round the ring
+  bevels as evenly spaced bright blocks (found by test: without the northern lights band the blocks stayed, with a plain room they went);
+  and on a touch screen the scene was drawn at three quarters of the screen's sharpness.
+- Changed, as the preview recommended: the rounding 0.0025; fine turned lines on the flared rim and its edge (520 to a unit along the
+  outline) and a knurled foot (300 round), each fading where a pixel spans a line; by day one sharp reflection; by night the strip lights
+  and the floor light with soft edges and less strength, the northern lights' thirty stripes calmed (0.86+0.14 from 0.55+0.45), the
+  holder dark purple still (the compass's own night studio, tried, turned it grey: against her rule); a touch screen starts at full
+  sharpness (q 1, not 0.75), a device that falls behind lowering it as before. The module equals the approved variant (scratchpad
+  holder/var/BR) apart from its notes and the touch line (compared with the notes set aside).
+- Checked (rig/t_720_holder.js, Chrome and Safari's engine, a computer and a touch screen): the scene compiles and draws, and is drawn
+  at full sharpness, with no page or shader error.
+- r222: the 7.20 news.
+
 Ingenium 7.19 (16 November 2026): a narrow head stacked as on a phone (her approved preview). Her words that day, on the live preview
 https://claude.ai/artifact/JjCSYt2uj824FQjzXpW16g (Ingenium Tablet Headers, version 1): "I approve of the preview and your
 recommendations, please commit and push it everywhere and continue working on my requests."

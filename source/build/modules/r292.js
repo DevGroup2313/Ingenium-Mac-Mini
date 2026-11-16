@@ -154,7 +154,12 @@ var Diamond=(function(){
   "  V[6]=vec2(1.47,-0.10);V[7]=vec2(1.47,-0.16);V[8]=vec2(1.505,-0.175);V[9]=vec2(1.56,-0.235);V[10]=vec2(1.575,-0.30);V[11]=vec2(1.51,-0.355);V[12]=vec2(1.40,-0.39);V[13]=vec2(0.0,-0.39);",
   "  float d=dot(p-V[0],p-V[0]);float sg=1.0;vec2 pv=V[13];for(int i=0;i<14;i++){vec2 vi=V[i];vec2 e=pv-vi;vec2 w=p-vi;vec2 b=w-e*clamp(dot(w,e)/dot(e,e),0.0,1.0);d=min(d,dot(b,b));",
   "    bvec3 c=bvec3(p.y>=vi.y,p.y<pv.y,e.x*w.y>e.y*w.x);if(all(c)||all(not(c)))sg=-sg;pv=vi;}return sg*sqrt(d);}",
-  "float sdCase(vec3 p){return sdPoly(vec2(length(p.xz),p.y))-0.010;}",
+  /* 7.20 (the holder refined; her words, 15 November 2026: "I want you to refine and sharp, crisps edges for the holder of the diamons on the Adamas page, it still
+     looks fake on the side and generated and not refined enough with the proper 3D look and definition"; on the live preview
+     https://claude.ai/artifact/AwAEqd9S2QbZKtDbmZ8sFJ (Adamas Holder Finish), 16 November 2026: "I approve ofthe preview, please push it
+     everywhere and continue working on my requests."): every edge cut crisp: the outline is rounded by 0.0025, no longer 0.010, so
+     each edge catches a fine line of light as a machined edge does, where all of them had melted into soft gradients */
+  "float sdCase(vec3 p){return sdPoly(vec2(length(p.xz),p.y))-0.0025;}",
   "vec2 polyN(vec2 p){vec2 V[14];V[0]=vec2(0.0,-0.02);V[1]=vec2(1.22,-0.02);V[2]=vec2(1.24,0.0);V[3]=vec2(1.44,0.0);V[4]=vec2(1.50,-0.045);V[5]=vec2(1.505,-0.085);",
   "  V[6]=vec2(1.47,-0.10);V[7]=vec2(1.47,-0.16);V[8]=vec2(1.505,-0.175);V[9]=vec2(1.56,-0.235);V[10]=vec2(1.575,-0.30);V[11]=vec2(1.51,-0.355);V[12]=vec2(1.40,-0.39);V[13]=vec2(0.0,-0.39);",
   "  float d=1e9;vec2 bb=vec2(0.0,1.0);float sg=1.0;vec2 pv=V[13];for(int i=0;i<14;i++){vec2 vi=V[i];vec2 e=pv-vi;vec2 w=p-vi;vec2 b=w-e*clamp(dot(w,e)/dot(e,e),0.0,1.0);float bd=dot(b,b);if(bd<d){d=bd;bb=b;}",
@@ -194,7 +199,10 @@ var Diamond=(function(){
   "  float d1=smoothstep(0.13,0.15,up)*(1.0-smoothstep(0.20,0.22,up)),d2=smoothstep(0.34,0.36,up)*(1.0-smoothstep(0.43,0.45,up)),d3=smoothstep(0.60,0.62,up)*(1.0-smoothstep(0.70,0.72,up));float dk=max(max(d1,d2),d3)*bk;",
   "  float fl=smoothstep(-0.17,-0.14,up)*(1.0-smoothstep(-0.10,-0.07,up));",
   "  if(uN>0.5){c=mix(vec3(0.02,0.015,0.04),vec3(0.10,0.08,0.18),smoothstep(-0.6,-0.05,up));c=mix(c,vec3(0.22,0.17,0.38),smoothstep(-0.05,0.10,up));",
-  "    c+=vec3(0.72,0.62,1.0)*dk*0.85+vec3(0.45,0.36,0.75)*fl*0.6;float band=exp(-pow((up-0.52-0.02*sin(az*2.6+uT*0.12))/0.05,2.0))*bk;float rays=0.55+0.45*sin(az*30.0+2.0*sin(az*5.0+uT*0.25));",
+  /* 7.20: by night the violet room's three strip lights and its floor light have soft edges and less strength, and the northern lights'
+     thirty stripes are calmed (0.86+0.14, from 0.55+0.45): their hard edges had reflected round the holder's ring bevels as evenly spaced
+     bright blocks; the holder stays dark purple. (The compass's own night studio, tried, turned it grey.) */
+  "    float s1=smoothstep(0.07,0.17,up)*(1.0-smoothstep(0.20,0.30,up)),s2=smoothstep(0.28,0.38,up)*(1.0-smoothstep(0.43,0.53,up)),s3=smoothstep(0.54,0.64,up)*(1.0-smoothstep(0.70,0.80,up));float dks=max(max(s1,s2),s3)*bk,fls=smoothstep(-0.22,-0.14,up)*(1.0-smoothstep(-0.10,-0.02,up));c+=vec3(0.72,0.62,1.0)*dks*0.45+vec3(0.45,0.36,0.75)*fls*0.35;float band=exp(-pow((up-0.52-0.02*sin(az*2.6+uT*0.12))/0.05,2.0))*bk;float rays=0.86+0.14*sin(az*30.0+2.0*sin(az*5.0+uT*0.25));",
   "    c+=mix(vec3(0.42,0.22,0.92),vec3(0.80,0.42,0.97),0.5+0.5*sin(az*1.7+uT*0.07))*band*rays*0.8;}",
   "  else{c=mix(vec3(0.22,0.22,0.28),vec3(0.46,0.46,0.53),smoothstep(-0.6,-0.05,up));c=mix(c,vec3(1.08,1.08,1.13),smoothstep(-0.05,0.10,up));c=mix(c,vec3(0.24,0.15,0.40),dk*0.85);c+=vec3(1.0)*fl*0.8;c+=vec3(0.9,0.9,0.95)*vWin(toV(w))*0.9;}",
   "  c+=sbox(w,normalize(vec3(-0.50,0.50,-0.70)),vec2(0.16,0.08),0.4)*mix(2.4,0.9,uN)+sbox(w,normalize(vec3(0.86,0.30,-0.42)),vec2(0.05,0.32),0.35)*mix(1.6,0.6,uN);",
@@ -278,8 +286,9 @@ var Diamond=(function(){
   "float caseAO(vec3 p,vec3 n){float a=0.0;a+=clamp(sdCase(p+n*0.02)/0.02,0.0,1.0)*0.5;a+=clamp(sdCase(p+n*0.05)/0.05,0.0,1.0)*0.3;a+=clamp(sdCase(p+n*0.10)/0.10,0.0,1.0)*0.2;return a;}",
   /* the case: polished silver in the compass's own light, a hair of satin, darker in its coves; the polished face engine turned in fine
      rings; the enamel band in a deep, quiet violet with a silver scale cut into it and twelve small brilliants set round it */
+  /* 7.20: by day one sharp reflection of the compass's studio, where three tilted ones were blended (a deliberate blur) */
   "vec3 silverC(vec3 rd,vec3 nn,float sh){if(uN>0.5)return vTone(hEnv(hW(reflect(rd,nn)))*vec3(0.965,0.96,0.985))*sh;",
-  "  vec3 a=vEnv(cmpR(nn)),b=vEnv(cmpR(normalize(nn+vec3(0.0,0.06,0.0)))),c=vEnv(cmpR(normalize(nn-vec3(0.0,0.06,0.0))));return vTone((a*0.5+b*0.25+c*0.25)*vec3(0.965,0.96,0.975))*sh;}",
+  "  return vTone(vEnv(cmpR(nn))*vec3(0.965,0.96,0.975))*sh;}",
   "vec3 holderCol(vec3 p,vec3 n,vec3 rd,float part,float glow){vec3 nn=n;vec3 col;float r=length(p.xz),an=atan(p.z,p.x);vec3 o=vec3(cos(an),0.0,sin(an)),tg=vec3(-sin(an),0.0,cos(an)),up=vec3(0.0,1.0,0.0);",
   "  float aa=0.002+0.0012*length(p-uCP);",
   /* (the crystal that once covered the Orrery is gone, and with it its sums) */
@@ -305,7 +314,11 @@ var Diamond=(function(){
   "        float tk=(1.0-smoothstep(0.0016,0.0016+aaf,dq))*smoothstep(lg>0.5?1.27:1.30,lg>0.5?1.275:1.305,r)*(1.0-smoothstep(lg>0.5?1.40:1.37,lg>0.5?1.405:1.375,r));sh*=(1.0-0.55*tk)*(1.0+0.14*uHV.y);",
   "        float pk=floor(bz/0.5235988)+0.5;float pa=pk*0.5235988+uHA.y;vec2 pc=vec2(cos(pa),sin(pa))*1.34;vec2 dq2=p.xz-pc;float pd=length(dq2);",
   "        if(pd<0.017){nq=normalize(vec3(dq2.x,sqrt(0.017*0.017-pd*pd)*0.9,dq2.y));sh=1.0;}else if(pd<0.024)sh*=0.80;}",
-  "      col=silverC(rd,nq,sh)*ao*(y<-0.17?1.0+0.12*uHV.w:1.0);",
+  /* 7.20: the flared rim and its edge turned on a lathe (fine lines along the outline, 520 to a unit), and the foot knurled (300 round);
+     each fades where a pixel spans a line, so neither shimmers as the holder turns */
+  "      if(y<-0.17&&y>-0.357){float fp2=uPx.y*length(p-uCP)/max(abs(dot(rd,nn)),0.15);float K=520.0;float gA2=1.0-smoothstep(0.28,0.46,fp2*K/6.2831853);vec3 tp=normalize(cross(tg,nn));float g2=sin(dot(p,tp)*K)*gA2;nq=normalize(nq+tp*0.07*g2);sh*=0.975+0.025*g2;}",
+"      if(y<-0.357){float fp3=uPx.y*length(p-uCP)/max(abs(dot(rd,nn)),0.15);float N=300.0;float kA=1.0-smoothstep(0.28,0.46,fp3*N/(6.2831853*max(r,0.1)));float k3=sin(an*N)*kA;nq=normalize(nq+tg*0.22*k3);sh*=0.94+0.06*k3;}",
+"      col=silverC(rd,nq,sh)*ao*(y<-0.17?1.0+0.12*uHV.w:1.0);",
   /* a light running round the rim and the foot, now and then, and when the case is knocked */
   "      float sa=uT-uHC.y;if(sa>0.0&&sa<5.6&&y<-0.17){float ang=1.5708+sa*1.15;float dA=abs(mod(an-ang+3.14159,6.2831853)-3.14159);col+=vec3(1.0,0.97,1.0)*exp(-dA*dA/0.05)*sin(3.14159*sa/5.6)*0.26;}",
   "      }}",
@@ -628,7 +641,8 @@ var Diamond=(function(){
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)raf=requestAnimationFrame(frame);}
   function kick(){if(!raf)raf=requestAnimationFrame(frame);}
   function mount(el){host=el;cv=D.createElement("canvas");cv.className="bd-cv";ov=D.createElement("canvas");ov.className="bd-cv ov";host.appendChild(cv);host.appendChild(ov);og=ov.getContext("2d");
-    if(W.matchMedia&&matchMedia("(pointer: coarse)").matches)q=0.75;size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
+    /* 7.20: a touch screen starts at full sharpness, as a computer does (it started at three quarters, the picture stretched to fit);
+       a device that falls behind still lowers it, as before */size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
     function at(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*W0,y:(e.clientY-r.top)/r.height*H0};}
     var C=proj([0,1.22,0]);
     function hitPart(p){var sx=((p.x/W0)*2-1)*(W0/H0)*TAN,sy=((1-p.y/H0)*2-1)*TAN,d=nrm([CR[0]*sx+CU[0]*sy+CF[0],CR[1]*sx+CU[1]*sy+CF[1],CR[2]*sx+CU[2]*sy+CF[2]]);
