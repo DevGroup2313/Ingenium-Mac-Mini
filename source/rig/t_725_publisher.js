@@ -30,7 +30,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       await H.refresh(); H.FBS().sel = rec.id; H.paint(); try { H.setPanel('ship'); } catch (e) {} H.paint(); });
     await sleep(1200); if (await p.$('#fbPart_ship') && !(await p.$('.f-sheet-wrap'))) { await p.click('#fbPart_ship'); await sleep(500); } };
   const line = () => p.evaluate(() => { const L = document.getElementById('r309Line'); return L ? L.textContent.replace(/\s+/g, ' ').trim() : null; });
-  const asking = () => p.evaluate(() => { const s = document.querySelector('[data-r309]'); return s ? { kind: s.getAttribute('data-r309'), value: (document.getElementById('r309Name') || {}).value, quiet: (document.getElementById('r309Quiet') || {}).getAttribute && document.getElementById('r309Quiet').getAttribute('aria-pressed') } : null; });
+  // the question as it stands: which sheet, the name on its plate (its field's text while a new name is typed), the choice, the tick
+  const asking = () => p.evaluate(() => { const s = document.querySelector('[data-r309]'); if (!s) return null; const i = document.getElementById('r309Name'), n = s.querySelector('.r309-nm'), on = s.querySelector('.r309-opt.on'), q = document.getElementById('r309Quiet');
+    return { kind: s.getAttribute('data-r309'), title: (s.querySelector('.r309-t') || {}).textContent, value: i ? i.value : (n ? n.textContent : null), choice: on ? on.getAttribute('data-c') : null, quiet: q ? q.getAttribute('aria-checked') : null,
+      options: [...s.querySelectorAll('.r309-opt')].map(o => o.getAttribute('data-c')).join(','), seal: !!s.querySelector('.r309-seal'), make: (document.getElementById('r309Save') || {}).textContent }; });
+  const pick = (c) => p.click('.r309-opt[data-c="' + c + '"]');
   // a make begun without waiting (as a press does); the question answered in between; then its end awaited
   const begin = (what) => p.evaluate((what) => { window.__made = null; const H = window.fbHubHost; IngRepo.list().then(l => { const rec = l.find(x => x.name === 'Harbour Garden'); return H.makeOne(rec, what, { quiet: true }); }).then(v => { window.__made = v === false ? 'not made' : 'made'; }, e => { window.__made = 'failed: ' + e.message; }); }, what);
   const ended = async () => { for (let i = 0; i < 240; i++) { const v = await p.evaluate(() => window.__made); if (v) return v; await sleep(500); } return 'timeout'; };
@@ -45,16 +49,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(m0.ed === 'master' && m0.decided && m0.name === 'Yannie D. Forest' && !m0.quiet, 'the master edition begins with the owner\'s name, and asks', m0);
   await fab();
   const a0 = await asking(), l0 = await line();
-  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Asked each time an app is made/.test(l0 || '') && /Change$/.test(l0 || ''), 'opening Fabrica asks nothing; its Ship part says the name and that it is asked each time, with Change', { asking: a0, line: l0 });
+  ok(!a0 && /^Published as Yannie D\. Forest/.test(l0 || '') && /Fabrica asks each time an app is made/.test(l0 || '') && /Change$/.test(l0 || ''), 'opening Fabrica asks nothing; its Ship part says the name and that it is asked each time, with Change', { asking: a0, line: l0 });
   // 2. a make asks, the owner's name in the field
   into('named'); await begin('mac'); await sleep(900);
   const a1 = await asking();
-  ok(a1 && a1.kind === 'make' && a1.value === 'Yannie D. Forest' && a1.quiet === 'false', 'making a Mac app asks under what name, the owner\'s name in its field, Don\'t ask me again unticked', a1);
-  await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Save');
+  ok(a1 && a1.kind === 'make' && a1.title === 'Publish Harbour Garden as\u2026' && a1.value === 'Yannie D. Forest' && a1.choice === 'name' && a1.options === 'name,new,none' && a1.quiet === 'false' && a1.make === 'Make Harbour Garden',
+    'making a Mac app asks "Publish Harbour Garden as…": the owner\'s name on the plate, three choices (as it, a new name, no name), Don\'t ask me again unticked, Make Harbour Garden', a1);
+  await pick('new'); await sleep(300); await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Save');
   const e1 = await ended(); await sleep(800);
   await begin('win'); await sleep(900);
   const a2 = await asking();
-  ok(e1 === 'made' && a2 && a2.kind === 'make' && a2.value === 'Ada Quill', 'the next make asks again, the name used last in its field', { first: e1, asking: a2 });
+  ok(e1 === 'made' && a2 && a2.kind === 'make' && a2.value === 'Ada Quill' && a2.choice === 'name', 'Publish with a new name: kept, and the next make asks again with it on the plate', { first: e1, asking: a2 });
   await p.click('#r309Save'); const e2 = await ended(); await sleep(1500); await Promise.all(saving.splice(0));
   const r1 = read(dir);
   ok(e2 === 'made' && r1.mac && /^© \d{4} Ada Quill$/.test(r1.mac.c) && r1.win && r1.win.faults.length === 0 && r1.win.names.CompanyName === 'Ada Quill' && r1.win.publisher === 'Ada Quill',
@@ -64,19 +69,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const e3 = await ended(); await sleep(800);
   ok(e3 === 'not made' && read(dir).files.length === 0, 'the question closed unanswered: nothing is made', { ended: e3, files: read(dir).files });
   // 4. No name
-  into('none'); await begin('mac'); await sleep(900); await p.click('#r309None'); const e4a = await ended();
-  await begin('win'); await sleep(900); const a4 = await asking(); await p.click('#r309None'); const e4b = await ended(); await sleep(1500); await Promise.all(saving.splice(0));
+  into('none'); await begin('mac'); await sleep(900); await pick('none'); await sleep(300); await p.click('#r309Save'); const e4a = await ended();
+  await begin('win'); await sleep(900); const a4 = await asking(); await pick('none'); await sleep(300); await p.click('#r309Save'); const e4b = await ended(); await sleep(1500); await Promise.all(saving.splice(0));
   const r2 = read(dir);
-  ok(e4a === 'made' && e4b === 'made' && a4 && a4.value === '' && r2.mac && r2.mac.c === '' && r2.win && r2.win.faults.length === 0 && r2.win.names.CompanyName === '' && r2.win.publisher === '',
-    'No name: asked again with the field empty, and a Mac app and a Windows app that name no one, never Ingenium\'s words', { mac: r2.mac, company: r2.win && r2.win.names && r2.win.names.CompanyName, publisher: r2.win && r2.win.publisher, asked: a4 });
+  ok(e4a === 'made' && e4b === 'made' && a4 && a4.value === '' && a4.choice === 'new' && a4.options === 'new,none' && r2.mac && r2.mac.c === '' && r2.win && r2.win.faults.length === 0 && r2.win.names.CompanyName === '' && r2.win.publisher === '',
+    'No name: asked again with the plate empty and two choices, and a Mac app and a Windows app that name no one, never Ingenium\'s words', { mac: r2.mac, company: r2.win && r2.win.names && r2.win.names.CompanyName, publisher: r2.win && r2.win.publisher, asked: a4 });
   // 5. Don't ask me again
-  into('quiet'); await begin('mac'); await sleep(900); await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Quiet'); await p.click('#r309Save'); const e5a = await ended();
+  into('quiet'); await begin('mac'); await sleep(900); await p.fill('#r309Name', 'Ada Quill'); await p.click('#r309Quiet'); await sleep(300); await p.click('#r309Save'); const e5a = await ended();
   await begin('mac'); await sleep(1200); const a5 = await asking(); const e5b = await ended(); await fab(); const l5 = await line();
-  ok(e5a === 'made' && !a5 && e5b === 'made' && /Not asked again/.test(l5 || ''), 'Don\'t ask me again: the next make asks nothing and uses the name; the Ship part says it is not asked', { asking: a5, line: l5 });
+  ok(e5a === 'made' && !a5 && e5b === 'made' && /Used each time, without asking/.test(l5 || ''), 'Don\'t ask me again: the next make asks nothing and uses the name; the Ship part says it is not asked', { asking: a5, line: l5 });
   await p.click('#r309Change'); await sleep(500); const a6 = await asking();
-  await p.click('#r309Quiet'); await p.click('#r309Save'); await sleep(500);
+  await p.click('#r309Quiet'); await sleep(300); await p.click('#r309Save'); await sleep(500);
   await begin('mac'); await sleep(900); const a7 = await asking(); await p.click('#r309Save'); await ended();
-  ok(a6 && a6.kind === 'edit' && a6.quiet === 'true' && a7 && a7.kind === 'make' && a7.value === 'Ada Quill', 'Change shows the choice ticked; unticked and saved, the next make asks again', { change: a6, next: a7 });
+  ok(a6 && a6.kind === 'edit' && a6.quiet === 'true' && a6.make === 'Save' && a7 && a7.kind === 'make' && a7.value === 'Ada Quill', 'Change shows the choice ticked; unticked and saved, the next make asks again', { change: a6, next: a7 });
   await open();
   const s8 = await p.evaluate(() => ({ name: IngPublisher.name(), quiet: IngPublisher.quiet(), decided: IngPublisher.decided() }));
   ok(s8.name === 'Ada Quill' && !s8.quiet && s8.decided, 'opened again, the name and the choice are kept', s8);
@@ -85,11 +90,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await fab();
   const e0 = await p.evaluate(() => ({ decided: IngPublisher.decided(), name: IngPublisher.name(), builtIn: IngPublisher.builtIn() })), l9 = await line(), a9o = await asking();
   into('full'); await begin('win'); await sleep(900); const a9 = await asking(); await p.fill('#r309Name', 'Ben Okafor'); await p.click('#r309Save'); const e9 = await ended();
-  ok(!e0.decided && e0.name === '' && e0.builtIn === '' && /^No publishing name chosen yet/.test(l9 || '') && !a9o && a9 && a9.kind === 'make' && a9.value === '' && e9 === 'made' && (await p.evaluate(() => IngPublisher.name())) === 'Ben Okafor',
+  ok(!e0.decided && e0.name === '' && e0.builtIn === '' && /^No name yet/.test(l9 || '') && !a9o && a9 && a9.kind === 'make' && a9.value === '' && a9.choice === 'new' && e9 === 'made' && (await p.evaluate(() => IngPublisher.name())) === 'Ben Okafor',
     'another edition: no name built in, and a make asks with the field empty; the answer is kept', { e0, line: l9, asking: a9, ended: e9 });
   // 7. Download as an app
   const dl = await p.evaluate(async () => { await IngDownload.open({ html: '<!doctype html><html><head><title>Harbour Garden</title></head><body><h1>Harbour Garden</h1></body></html>' }); await new Promise(r => setTimeout(r, 800));
-    const i = document.querySelector('.dl-app .dl-wp'); const v = i ? i.value : null; try { closeModal(); } catch (e) {} return v; });
-  ok(dl === 'Ben Okafor', 'Download as an app shows the publishing name in its dialog', dl);
+    const pl = document.getElementById('r309DlPlate'); const v = pl ? { lab: (pl.querySelector('.r309-lab') || {}).textContent, name: (pl.querySelector('.r309-nm') || {}).textContent, change: !!document.getElementById('r309DlChange') } : null; try { closeModal(); } catch (e) {} return v; });
+  ok(dl && dl.lab === 'Published as' && dl.name === 'Ben Okafor' && dl.change, 'Download as an app shows the Published as plate, with the name and Change', dl);
   ok(errs.length === 0, 'no page errors', errs);
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0); })().catch((e) => { console.error(String(e).slice(0, 600)); process.exit(2); });
