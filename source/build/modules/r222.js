@@ -472,7 +472,9 @@ var NEW=[
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
 /* x[2]: "career" where the Career Studio is, "nocareer" where it is not (the same news in the words of an edition without it), "fabrica" where
    Fabrica is (6.33), "master" in the master edition alone */
-function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
+/* 7.24: Fabrica's lines are known by Fabrica's own module (window.fbHubHost, set as it loads, before this one), not by its page, which
+   it adds later: on 7.24's first page the list was written before the page existed and left out every line of 7.24 (all Fabrica's) */
+function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||!!W.fbHubHost||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;
