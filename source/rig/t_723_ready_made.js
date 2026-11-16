@@ -23,7 +23,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     o.lakay = N('<html><head><meta name="lakay-build" content="9"><title>Lakay</title></head></html>', {});
     o.meta = N('<html><head><meta name="version" content="2.3.1"></head></html>', {}); o.none = N('<html><head><title>Plain</title></head></html>', {});
     const H = window.fbHubHost; o.names = {};
-    for (const n of ['The Forge', 'carpe-diem-offline', 'Forget Me Not', 'Harbour Garden']) { const made = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><title>' + n + '</title><p>' + n + '</p>' }], { name: n, msg: 'first' });
+    for (const n of ['The Forge', 'carpe-diem-offline', 'Forget Me Not', 'Harbour Garden', 'The Offline Project (without Inkwell)']) { const made = await IngRepo.fromFiles([{ path: 'index.html', data: '<!doctype html><title>' + n + '</title><p>' + n + '</p>' }], { name: n, msg: 'first' });
       const rec = (await IngRepo.list()).find(x => x.id === made.id); o.names[n] = H.pkgOf(rec).app; }
     const html = '<!doctype html><html><head><meta charset="utf-8"><title>Harbour Garden</title><meta name="version" content="2.3.1"></head><body><h1>Harbour Garden</h1></body></html>';
     const made = await IngRepo.fromFiles([{ path: 'index.html', data: html }], { name: 'Harbour Garden', msg: 'Harbour Garden 2.3.1' }); const rec = (await IngRepo.list()).find(x => x.id === made.id);
@@ -32,7 +32,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     return o; });
   await Promise.all(saving);
   ok(r.cd === '42' && r.ink === '3.14' && r.lakay === '9' && r.meta === '2.3.1' && r.none === '', 'the version is read from the family\'s marks and a version meta', r);
-  ok(r.names['The Forge'] === 'forge' && r.names['carpe-diem-offline'] === 'cd' && r.names['Forget Me Not'] === null && r.names['Harbour Garden'] === null, 'a repository is known as a family app by its name, as whole words only', r.names);
+  ok(r.names['The Forge'] === 'forge' && r.names['carpe-diem-offline'] === 'cd' && r.names['Forget Me Not'] === null && r.names['Harbour Garden'] === null && r.names['The Offline Project (without Inkwell)'] === null, 'a repository is known as a family app by its name, as whole words only, and the Offline Project as none of them', r.names);
   ok(r.made.join() === 'mac,win', 'Fabrica made the Mac app and the Windows app', r.made);
   const files = fs.readdirSync(OUT); const mac = files.find(f => /-mac-2\.3\.1\.zip$/.test(f)), win = files.find(f => /-windows-2\.3\.1\.zip$/.test(f));
   ok(!!mac && !!win, 'each is named with the app\'s version, 2.3.1', files);
