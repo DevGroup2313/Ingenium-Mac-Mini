@@ -235,9 +235,11 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
   ["7.21", "The Guide has two new topics, Home and Adamas, each with its own mark, in the tour's own words."],
-  ["7.21", "The Guide has a topic for Lector, and the tour now says that Lakay travels inside Ingenium too, beside The Forge, Inkwell and Carpe Diem.", "lector"],
+  ["7.21", "The Guide has a topic for Lector: how it reads and writes, the model it chooses, and your sources cited.", "lector"],
   ["7.21", "The Guide has a topic for Fabrica, your apps kept as repositories.", "fabrica"],
-  ["7.21", "The Guide has a topic for the apps, as in Carpe Diem: Tabula, Abacus, Imago, Scriba and Fontes.", "desk"],
+  ["7.21", "The Guide has a topic for the apps: Tabula, Abacus, Imago, Scriba and Fontes.", "desk"],
+  ["7.21", "The tour and the Guide name the apps this copy carries from the copy itself, so Lakay is named beside The Forge, Inkwell and Carpe Diem, and Lector's recipe is described where it is.", "master"],
+  ["7.21", "What is new no longer lists a change to a page this copy does not have, and the tour's tip on who answers, like the note in its menu, names only the pages here.", "nocareer"],
   ["7.20", "Adamas's holder is refined, as in the preview you approved: every edge is cut crisp and catches a fine line of light, the flared rim carries fine turned lines and the foot is knurled. By day its reflections are crisp; by night its violet room has softer lights, so no evenly spaced blocks run round its edges, and it stays dark purple."],
   ["7.20", "On a phone or a tablet, Adamas's 3D scene is now drawn at the screen's full sharpness, as on a computer; it still stops whenever Adamas is out of sight."],
   ["7.19", "On an iPad, and on the Fire tablet held upright with the menu open, a page's 3D header now stands its words first and its picture whole beneath them, as on a phone, whenever the header is narrower than 640 pixels; a wider header keeps its words and its picture side by side, as before."],
@@ -455,7 +457,7 @@ var NEW=[
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
 /* x[2]: "career" where the Career Studio is, "nocareer" where it is not (the same news in the words of an edition without it), "fabrica" where
    Fabrica is (6.33), "master" in the master edition alone */
-function newNow(){return NEW.filter(function(x){return (x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
+function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;

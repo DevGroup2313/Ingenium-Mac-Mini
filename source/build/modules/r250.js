@@ -72,19 +72,26 @@ function guide(){try{
     ["Sources when you ask.","Replies give sources and citations when you ask for them (\"with sources\", \"cite\"), not every time."]],"ctxGuide");
   /* 7.21 (her words, 15 November 2026: "The guided tour, its demonstrations and the Guide brought up to date with every page"): topics for the
      pages the Guide did not yet name, in the tour's own words and the pages' own; each only where its page exists in this edition */
+  /* Home's keys as this copy shows them (Fabrica and Lector are not in every edition): the tour's step said "bring in a model,
+     chat, Vesta and Adamas", the keys of an earlier Home; the Guide and the tour now read them from Home itself */
+  var doors=(function(){try{var k=(W.IngHome&&IngHome.keys)?IngHome.keys():[],n=k.map(function(x){return x.t;}),f=k.filter(function(x){return x.k==="focus";})[0];
+    if(n.length<2)return "";return "open the main rooms: "+n.slice(0,-1).join(", ")+" and "+n[n.length-1]+", each with a line saying what it is for."+(f?" The "+f.t+" key also shows the step you are working on, so it is waiting when you come back.":"")+
+      " Further down, Bring in a model opens Mentes, where you get a model or bring your own.";}catch(e){return "";}})();
+  if(doors&&W.ING_TOUR)ING_TOUR.forEach(function(s){if(s.ring==="#homeFocusQuick")s.b="These keys "+doors;});
   topic("homeGuide","Home: where Ingenium opens",[
     ["Your next step.","The large button always shows your next useful step: getting your first model, loading it, or starting a chat."],
-    ["The doors.","Its buttons open the main rooms: bring in a model, chat, Vesta and Adamas. The Vesta button also shows the step you are working on, so it is waiting when you come back."]],"guideTourCard");
+    doors?["The doors.","Its keys "+doors]:null].filter(Boolean),"guideTourCard");
   if($("page-build"))topic("adGuide","Adamas: pages and small apps",[
     ["Code in, a page out.","Describe what you want and a model writes it, or write it yourself; the preview beside it runs as you type. It works fully offline and does not need a model."],
     ["An app for your devices.","A finished page can become an app for your devices."],
     ["The diamond.","Point at the diamond and it turns to you. Press it, or any part of its holder (the engine logo, the Orrery, the bezel, the band of brilliants, the rim), and it answers."]]);
+  var carried=(function(){try{var m=(W.IngBuiltin&&IngBuiltin.meta)||{},o=["forge","inkwell","cd"],k=Object.keys(m).sort(function(a,b){var i=o.indexOf(a),j=o.indexOf(b);return (i<0?9:i)-(j<0?9:j);}),n=k.map(function(x){return m[x].title||x;});return n.length>1?n.slice(0,-1).join(", ")+" and "+n[n.length-1]+" travel":n.length?n[0]+" travels":"";}catch(e){return "";}})();
   if($("page-lector"))topic("lxGuide","Lector: your apps read, your documents written",[
     ["It reads, then writes.","Lector reads one of your apps or a long document from end to end, thinks aloud as it goes, and writes the documents you need from it: a dossier, a portfolio piece, a cover letter, an appendix. It works on this device, or with your other computer's model when you have linked one."],
-    ["Your apps, carried inside.","The Forge, Inkwell, Carpe Diem and Lakay travel inside Ingenium and are kept on this device on its first start, each checked against its fingerprint. A newer copy you add yourself always stays."],
-    ["The recipe.","Measure opens each of your apps in a frame that refuses every request to another address and reads its figures; Check then finds the figures an update has changed in your own words, and Update changes your Word file itself, keeping the version before."],
+    carried?["Your apps, carried inside.",carried+" inside Ingenium and are kept on this device on its first start, each checked against its fingerprint. A newer copy you add yourself always stays."]:null,
+    W.IngRecipe?["The recipe.","Measure opens each of your apps in a frame that refuses every request to another address and reads its figures; Check then finds the figures an update has changed in your own words, and Update changes your Word file itself, keeping the version before."]:null,
     ["The model, and a second pass.","Lector names the model it will use and says when a larger one is ready on this device. Examine each section, on by default, strikes or marks what the material does not support."],
-    ["Your sources, cited.","With Cite my sources on, Lector cites the sources kept in Fontes, numbered, and ends with a References list in your chosen style; no source that is not yours is ever invented."]]);
+    ["Your sources, cited.","With Cite my sources on, Lector cites the sources kept in Fontes, numbered, and ends with a References list in your chosen style; no source that is not yours is ever invented."]].filter(Boolean));
   if($("page-fabrica"))topic("fbGuide","Fabrica: your apps as repositories",[
     ["Every version kept.","Fabrica keeps each of your apps as a real git repository on this device: every version, line by line, with branches, tags and undo by a new version. Nothing leaves the device unless you send it."],
     ["The tree.","Its header shows the open app as a tree: main the trunk, each idea a branch, each release a collar. Press a version to see what it changed, in the panels below."],

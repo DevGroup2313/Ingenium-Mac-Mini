@@ -589,7 +589,8 @@ try{var og=go;go=function(p){var r=og.apply(this,arguments);try{if(p==="home"||P
 try{Engine.on("status",function(){if(shown())paintModels();});}catch(e){}
 /* the wallpapers part may come later than this one: its key shows once it is there */
 setTimeout(paintHead,1500);setTimeout(paintHead,6000);
-window.IngHome={refresh:onShow,fill:fillAll,state:S,drawCrest:drawCrest,buildMs:buildMs};
+window.IngHome={refresh:onShow,fill:fillAll,state:S,drawCrest:drawCrest,buildMs:buildMs,
+  keys:function(){return KEYS.map(function(k){return {k:k.k,t:k.t};});}};  /* 7.21: the keys this copy shows, named as on screen, for the tour and the Guide */
 })();
 ;try{window.__ingParts["p68"]="running";}catch(_){}
 </script>

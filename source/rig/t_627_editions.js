@@ -37,7 +37,7 @@ async function survey(b, ed, url) {
     for (const pg of nav) { if (/^(tabula|abacus|slides|scriba|fontes)$/.test(pg)) continue; try { go(pg); } catch (e) {} await new Promise(r => setTimeout(r, 900)); const sec = document.getElementById('page-' + pg) || document.querySelector('.section.active') || document.querySelector('main'); words[pg] = text(own(sec)); }
     go('home'); await new Promise(r => setTimeout(r, 400));
     words.topbar = text(document.querySelector('.topbar') || document.body); words.rail = text(document.querySelector('nav') || document.body);
-    words.tour = (window.ING_TOUR || []).map(s => (s.chap || '') + ': ' + (s.t || '') + ' ' + (s.b || '')).join(' | ');
+    words.tour = (window.ING_TOUR || []).map(s => (s.chap || '') + ': ' + (s.t || '') + ' ' + (s.b || '') + ' ' + (s.tip || '')).join(' | ');  // 7.21: and its tips
     try { words.help = JSON.stringify(window.IngHelp && IngHelp.pages ? IngHelp.pages() : ''); } catch (e) { words.help = ''; }
     const stray = ['fabrica', 'tabula', 'abacus', 'slides', 'scriba', 'fontes', 'lector', 'career'].filter(x => { try { go(x); return document.querySelector('.section.active') && document.querySelector('.section.active').id === 'page-' + x; } catch (e) { return false; } });
     go('home');

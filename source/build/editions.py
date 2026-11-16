@@ -258,6 +258,7 @@ def _blank(ed="gift"):
         ('" is part of Carpe Diem, not of Ingenium."', '" is not part of this Ingenium."', "an app this copy does not hold", 1),
         (" Carpe Diem and the Forge carry the same supports, in their own colours.", "", "Focus: the supports", 1),
         ('"📚 The apps, as in Carpe Diem"', '"📚 The apps"', "tour: the apps", 1),
+        ('topic("appsGuide","The apps, as in Carpe Diem",[', 'topic("appsGuide","The apps",[', "Guide: the apps", 1),  # 7.21: in every edition's page
         ("are Carpe Diem's own apps, whole.", "are apps of their own, whole.", "tour: the apps, whole", 1),
         ("Build, Blend, and Carpe Diem's five apps.", "Build, Blend, and the five apps.", "tour: making things", 1),
         ("Build, Blend and Carpe Diem's five apps turn answers", "Build, Blend and the five apps turn answers", "tour: making things, again", 1),
@@ -495,6 +496,10 @@ def _public(ed):
         (("These apps open on the Desk; the instruments open over this page." if blank else "Carpe Diem's own apps open on the Desk; the instruments open over this page."),
          "The instruments open over this page: loose notes, and sprints of focus.", "Home: what the instruments do", 1),
         # the words of the Guide, the tour and the help
+        # 7.21: the tour's tip on who answers (modules/r250.js) and the note in its menu (modules/r249.js) named Lector and Vocatio,
+        # which these editions do not have (the tour's tips were not read by rig/t_627_editions.js before 7.21)
+        ("Lector, Vocatio, Blend, Build and Code all use what is set here,", "Blend, Build and Code all use what is set here,", "tour: who answers, its pages", 1),
+        ("Lector, Vocatio, Blend, Build and Code use them too.", "Blend, Build and Code use them too.", "who answers: its pages", 1),
         ("Sort it later: to a note, to Tabula, into steps, to the chat, to a reminder, or done.",
          "Sort it later: to a note, into steps, to the chat, to a reminder, or done.", "Guide: the Inbox", 1),
         ("goes where it belongs: to a note, to Tabula, into steps, to the chat, to a reminder, or done.",

@@ -395,19 +395,33 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.21 (16 November 2026): the Guide brought up to every page (her request of 15 November: "The guided tour, its
-demonstrations and the Guide brought up to date with every page (Ingenia, Vesta, Concordia, Adamas, Mentes, Fabrica ...), in every edition
-and demo"). Surveyed on 7.19: the tour's chapters reached every main page already; the Guide had no topic for Home, Adamas, Lector,
-Fabrica's own workshop or the apps.
+Ingenium 7.21 (16 November 2026): the Guide and the tour brought up to every page, in every edition (her request of 15 November:
+"The guided tour, its demonstrations and the Guide brought up to date with every page (Ingenia, Vesta, Concordia, Adamas, Mentes,
+Fabrica ...), in every edition and demo"). Surveyed on 7.19 and 7.20: the tour's chapters reached every main page already; the Guide
+had no topic for Home, Adamas, Lector, Fabrica's own workshop or the apps; the tour's step on Home's keys named the keys of an earlier
+Home; and the public editions named pages they do not have in two places the editions test did not read.
 - `build/modules/r250.js`: five topics, their words taken from the tour's own steps and the pages' own hints: Home (in Start here),
   Adamas (in every edition), and, only where the page exists, Lector, Fabrica and the apps (Tabula, Abacus, Imago, Scriba, Fontes).
-- `build/modules/r173.js`: each filed in its room by its id (Home in Start here, the others in Making and study), and its search words;
-  `build/modules/r230.js`: three marks in the same thin line, a house, a cut stone and four tiles (Lector keeps the book, Fabrica
-  takes the branch).
-- `build/modules/r120.js`: the tour's step on the apps carried inside names Lakay too (Build 17 travels inside since 7.09).
-- rig: t_626_guide.js's room lists with the new topics, by edition; rig/inject_modules.js now replaces a module that has no style block
-  (it appended a second copy, which stood aside for the first).
-- r222: the 7.21 news, each line only where its page is.
+  Lector's topic names the apps this copy carries from the copy itself (r120's list, empty in every edition but the master) and its
+  recipe only where the recipe is (r126, the master's alone).
+- Home's keys: `build/modules/r147.js` gives `IngHome.keys()`, the keys as Home shows them; the tour's step "The doors from Home" and
+  the Guide's Home topic name them from it (Chat, Code, Adamas, Fabrica, Lector and Vesta in the master and full editions; Chat, Code,
+  Adamas and Vesta in the gift and demo), where the step said "bring in a model, chat, Vesta and Adamas".
+- `build/modules/r120.js`: the tour's step on the apps carried inside names them from the copy itself, so Lakay is named beside The
+  Forge, Inkwell and Carpe Diem (carried since 6.55, at Build 17 since 7.09), and no edition's page holds a name it does not carry.
+- `build/modules/r173.js`: each topic filed in its room by its id (Home in Start here, the others in Making and study), and its search
+  words; `build/modules/r230.js`: three marks in the same thin line, a house, a cut stone and four tiles (Lector keeps the book,
+  Fabrica takes the branch).
+- What is new (`build/modules/r222.js`): a line marked "lector" is now shown only where Lector is (newNow knew "career", "fabrica",
+  "desk" and "master", not "lector": the gift and demo editions listed 7.16's line on Reader's sheets). The 7.21 lines are marked for
+  the editions they concern.
+- `build/editions.py`: in the gift and demo editions, the tour's tip on who answers and the note in its menu (r250, r249) name
+  Concordia, Adamas and Code only (they named Lector and Vocatio, which those editions do not have); in the full, gift and demo
+  editions the Guide's topic of the apps is called "The apps", as the tour's step is there.
+- rig: `t_627_editions.js` reads the tour's tips too; `t_626_guide.js`'s room lists with the new topics, by edition;
+  `inject_modules.js` replaces a module that has no style block (it appended a second copy, which stood aside for the first).
+- Checked and left as they are: Concordia's eight ways and Ingenium chooses (eight and one, as the tour says); twelve publishers for
+  newer models (r217's list); the hourglass's ring, gold (#c8951f) as the tour says (a change of colour is a change of look).
 
 Ingenium 7.20 (16 November 2026): Adamas's holder refined (her approved preview). Her words of 15 November: "I want you to refine and
 sharp, crisps edges for the holder of the diamons on the Adamas page, it still looks fake on the side and generated and not refined enough

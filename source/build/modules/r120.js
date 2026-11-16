@@ -150,8 +150,10 @@ function later(){var go=function(){if(LIB.busy){setTimeout(later,15000);return;}
    describe the latest versions of the apps". The tour names the apps Ingenium carries, where Lector keeps them. */
 (function tourCard(){try{if(!BI||!Object.keys(BI).length||!Array.isArray(ING_TOUR)||ING_TOUR.some(function(s){return s.r125;}))return;  /* 6.2: only where the apps are carried */var at=-1;
   ING_TOUR.forEach(function(s,i){if(s.chap==="Lector"&&s.sub==="The brief")at=i;});if(at<0)return;
+  function names(){var o=["forge","inkwell","cd"],k=Object.keys(BI).sort(function(a,b){var i=o.indexOf(a),j=o.indexOf(b);return (i<0?9:i)-(j<0?9:j);}),n=k.map(function(x){return BI[x].title||x;});
+    return n.length>1?n.slice(0,-1).join(", ")+" and "+n[n.length-1]+" travel":n[0]+" travels";}
   ING_TOUR.splice(at+1,0,{r125:1,chap:"Lector",sub:"Your apps",go:function(){go("lector");},ring:[".l-apps"],
-    t:"📦 Your apps, carried inside",b:"Your apps, on Lector's page, holds the family's apps. The Forge, Inkwell, Carpe Diem and Lakay travel inside Ingenium and are kept on this device on its first start, each checked against its fingerprint, beside a copy of this Ingenium itself. Lector reads any of them from end to end, and Fabrica opens them as repositories. A newer copy you add yourself always stays.",
+    t:"📦 Your apps, carried inside",b:"Your apps, on Lector's page, holds the family's apps. "+names()+" inside Ingenium and are kept on this device on its first start, each checked against its fingerprint, beside a copy of this Ingenium itself. Lector reads any of them from end to end, and Fabrica opens them as repositories. A newer copy you add yourself always stays.",
     tip:"Nothing needs downloading: each version of Ingenium brings the builds of its sister apps that it was made with."});}catch(e){}})();
 window.IngBuiltin={lectorLine:lectorLine,meta:BI,standing:standing,seed:seed,keep:keep,unpack:unpack,use:useBuiltin,cmp:cmp,states:function(){return DONE;},
   self:{version:selfVersion,standing:selfStanding,keep:keepSelf,seed:selfSeed,state:function(){return SELF;},namedVersion:namedVersion}};
