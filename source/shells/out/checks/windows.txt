@@ -1,18 +1,62 @@
 
 Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 156.0.4314.58
-{"out":"D:\\a\\_temp\\wintest\\test.zip","size":236998,"sha256":"f0ed0d24e405f8cf105f96a1aceb59a15af2a15a25bf8f6ab80ff26c33dbc884","exe":"Shell Test.exe","exeSize":798115,"exeSha256":"bc5d64f4b6d5ca9fc27a86c3843f6201a409a413488ef38781af5f2f4bba5219","id":"com.yannieforest.shelltest.win","icons":6,"ms":640}
-{"out":"D:\\a\\_temp\\wintest\\forge.zip","size":5354848,"sha256":"0ba5dee9066d4664a8dba1280660e3ae3f42934da8f2887c471076ef4517616b","exe":"The Forge.exe","exeSize":15142180,"exeSha256":"21abd9e866c4656819f1daed196a2437fc10e442496dae5995a3fa56078dea7b","id":"com.yannieforest.theforge.wintest","icons":6,"ms":387}
-PASS a test page in the Windows app Fabrica made: Windows reads its own name (Shell Test, version 6.5), not its file name
-     Shell Test.exe: 0.8 MB, how to open: 1 file
+{"out":"D:\\a\\_temp\\wintest\\Shell Test Setup.exe","kind":"setup","size":953977,"sha256":"39ad2f7a77990075e6fbf69fbc849e7f1d2361f878b2ef0fc965164325d486a2","exe":"Shell Test Setup.exe","exeSize":953977,"exeSha256":"39ad2f7a77990075e6fbf69fbc849e7f1d2361f878b2ef0fc965164325d486a2","id":"com.yannieforest.shelltest.win","icons":6,"ms":377}
+{"out":"D:\\a\\_temp\\wintest\\The Forge Setup.exe","kind":"setup","size":15298040,"sha256":"927f6a702e8c36eab503c8f1fb0ea4e9e34c8ea9bd6fc2c76ebe9bb21101deb9","exe":"The Forge Setup.exe","exeSize":15298040,"exeSha256":"927f6a702e8c36eab503c8f1fb0ea4e9e34c8ea9bd6fc2c76ebe9bb21101deb9","id":"com.yannieforest.theforge.wintest","icons":6,"ms":71}
+PASS a test page in the Windows app Fabrica made: Windows reads its own name (Shell Test, version 6.5, company Ada Quill), not its file name
+     Shell Test Setup.exe: 0.9 MB, one file: the app and its installer
 PASS a test page in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
 PASS a test page in the Windows app Fabrica made: a second start brings the open window forward and ends (one copy running)
 PASS a test page in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS a test page in the Windows app Fabrica made: the clipboard, written and read back
 PASS a test page in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
-PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1794396875417","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
-PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows reads its own name (The Forge, version 6.5), not its file name
-     The Forge.exe: 14.4 MB, how to open: 1 file
+PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1794857291011","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows reads its own name (The Forge, version 6.5, company Ada Quill), not its file name
+     The Forge Setup.exe: 14.6 MB, one file: the app and its installer
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
 PASS The Forge (13 MB page) in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"The Forge","text":6173,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/the_forge.html"}
 PASS The Forge (13 MB page) in the Windows app Fabrica made: the clipboard, written and read back
 PASS The Forge (13 MB page) in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
+the installer: this account is an administrator: True
+     me, screen choose: {"screen":"choose","eye":"Install","title":"Shell Test","sub":"Version 6.5 · from Ada Quill","err":"","scope":"all","desk":true,"removeData":null,"open":null,"tryit":true,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+     me, screen chosen: {"screen":"choose","eye":"Install","title":"Shell Test","sub":"Version 6.5 · from Ada Quill","err":"","scope":"me","desk":true,"removeData":null,"open":null,"tryit":true,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+     me, screen after: {"screen":"installed","eye":"Installed","title":"Shell Test is ready","sub":"Find it in the Start menu and on your desktop, and in Settings, Apps to uninstall it.","err":"","scope":null,"desk":null,"removeData":null,"open":true,"tryit":false,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+PASS the installer opens on For everyone on this PC, the desktop shortcut ticked, Open without installing offered, no scroll bar, no page error
+PASS Just for me, pressed through the page: installed, and the page says so
+PASS the installer's window is drawn: its violet keys and ring are on the screen (455 samples)
+PASS just for me: the program and installed.txt in C:\Users\runneradmin\AppData\Local\Programs\Shell Test
+PASS just for me: the Start menu shortcut, named Shell Test, opens C:\Users\runneradmin\AppData\Local\Programs\Shell Test\Shell Test.exe
+PASS just for me: the desktop shortcut, named Shell Test
+PASS just for me: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
+PASS just for me: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS the installed program opens as the app (Shell Test)
+PASS the Setup file opens the installer (Shell Test Setup), the app being installed
+PASS an update over it, from the command line (exit 0)
+PASS the update: the program and installed.txt in C:\Users\runneradmin\AppData\Local\Programs\Shell Test
+PASS the update: the Start menu shortcut, named Shell Test, opens C:\Users\runneradmin\AppData\Local\Programs\Shell Test\Shell Test.exe
+PASS the update: no desktop shortcut, as chosen
+PASS the update: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
+PASS the update: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS the update leaves one program and installed.txt
+PASS the app's saved work is there before uninstalling (C:\Users\runneradmin\AppData\Local\com.yannieforest.shelltest.win)
+     uninstall-me, screen uninstall: {"screen":"uninstall","eye":"Uninstall","title":"Remove Shell Test?","sub":"Its program, its shortcuts and its entry in Settings go.","err":"","scope":null,"desk":null,"removeData":false,"open":null,"tryit":false,"bar":"Shell Test Setup","w":540,"h":307,"sh":307,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+     uninstall-me, screen after: {"screen":"uninstalled","eye":"Uninstalled","title":"Shell Test is removed","sub":"Your saved work stays on this PC.","err":"","scope":null,"desk":null,"removeData":null,"open":null,"tryit":false,"bar":"Shell Test Setup","w":540,"h":352,"sh":352,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+PASS uninstalled through the page, from a copy in %TEMP%
+PASS uninstalled for me: its folder is gone (C:\Users\runneradmin\AppData\Local\Programs\Shell Test)
+PASS uninstalled for me: its shortcuts are gone
+PASS uninstalled for me: its entry in Settings, Apps is gone
+PASS uninstalled for me: the saved work is kept (C:\Users\runneradmin\AppData\Local\com.yannieforest.shelltest.win)
+PASS the uninstaller's copy in %TEMP% is gone after
+     all, screen choose: {"screen":"choose","eye":"Install","title":"Shell Test","sub":"Version 6.5 · from Ada Quill","err":"","scope":"all","desk":true,"removeData":null,"open":null,"tryit":true,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+     all, screen chosen: {"screen":"choose","eye":"Install","title":"Shell Test","sub":"Version 6.5 · from Ada Quill","err":"","scope":"all","desk":true,"removeData":null,"open":null,"tryit":true,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+     all, screen after: {"screen":"installed","eye":"Installed","title":"Shell Test is ready","sub":"Find it in the Start menu and on your desktop, and in Settings, Apps to uninstall it.","err":"","scope":null,"desk":null,"removeData":null,"open":true,"tryit":false,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
+PASS For everyone on this PC, pressed through the page: installed
+PASS for everyone: the program and installed.txt in C:\Program Files\Shell Test
+PASS for everyone: the Start menu shortcut, named Shell Test, opens C:\Program Files\Shell Test\Shell Test.exe
+PASS for everyone: the desktop shortcut, named Shell Test
+PASS for everyone: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
+PASS for everyone: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS uninstalled for everyone from the quiet command (exit 0)
+PASS uninstalled for everyone: its folder is gone (C:\Program Files\Shell Test)
+PASS uninstalled for everyone: its shortcuts are gone
+PASS uninstalled for everyone: its entry in Settings, Apps is gone
+PASS uninstalled for everyone: the saved work is removed, as ticked
