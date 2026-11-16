@@ -15,13 +15,13 @@ const [U, eng] = process.argv.slice(2); let pass = 0, fail = 0; const ok = (c, m
     ok(await p.evaluate(() => document.querySelectorAll('#brandSealBtn .isl-gc').length === 0), 'Chromium: no added layers'); }
   else {
     let s = await st(); ok(s && s.applied && s.ring.moving === 1 && s.star.moving === 4 && s.heart.moving === 1 && s.glow.moving === 1, 'WebKit: applied, four parts carried (star with its three shadows): ' + JSON.stringify(s));
-    const h1 = await host(); await p.waitForTimeout(700); const h2 = await host(); ok(h1[0] !== h2[0] && h1[1] !== h2[1], 'WebKit: ring and engine turn (' + h1[1] + ' -> ' + h2[1] + ')');
+    /* the engine rests at each full turn for about a tenth of its cycle (sealEngine 88% to 100%): two seconds apart */ const h1 = await host(); await p.waitForTimeout(2000); const h2 = await host(); ok(h1[0] !== h2[0] && h1[1] !== h2[1], 'WebKit: ring and engine turn (' + h1[1] + ' -> ' + h2[1] + ')');
     ok(await p.evaluate(() => document.querySelectorAll('#brandSealBtn .isl-star > svg.isl-gc-sh').length === 3 && document.querySelectorAll('#brandSealBtn .isl-back > svg.isl-gc').length === 1), 'WebKit: three shadow layers and one glow layer');
     ok(await p.evaluate(() => { const v = document.querySelector('#brandSealBtn .isl-back > svg:not(.isl-gc) .s4-breath'); return v && getComputedStyle(v).visibility === 'hidden'; }), 'WebKit: the old glow hidden under the new');
-    const shown = () => p.evaluate(() => [...document.querySelectorAll('#brandSealBtn .isl-gc-sh g[class]')].filter((g) => getComputedStyle(g).display !== 'none').map((g) => g.getAttribute('class')).join(','));
-    await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(300); const sd = await shown();
-    await p.evaluate(() => { state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(300); const sn = await shown();
-    ok(/^gc-d,gc-d$/.test(sd) && /^gc-n,gc-n$/.test(sn), 'WebKit: day shadows by day (' + sd + '), night shadows by night (' + sn + ')');
+    const floods = () => p.evaluate(() => [...document.querySelectorAll('#brandSealBtn .isl-gc-sh feFlood[flood-color]')].map((f) => f.getAttribute('flood-color')).join(' / '));
+    await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(400); const sd = await floods();
+    await p.evaluate(() => { state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(400); const sn = await floods();
+    ok(/42, 20, 80/.test(sd) && !/0, 0, 0\b/.test(sd) && /0, 0, 0/.test(sn) && !/42, 20, 80/.test(sn), 'WebKit: the shadows drawn again with the theme, from the seal\'s own style (day ' + sd + '; night ' + sn + ')');
     const was = await p.evaluate(() => document.body.getAttribute('data-motion'));
     await p.evaluate(() => document.body.setAttribute('data-motion', 'minimal')); await p.waitForTimeout(800); s = await st();
     ok(s.ring.moving === 0 && s.star.moving === 0 && s.heart.moving === 0, 'WebKit: minimal motion stills the parts: ' + JSON.stringify(s));

@@ -395,6 +395,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.18 (16 November 2026): every seal and Home's orbs turned by the graphics chip in Safari's engine. Her words that day, on
+7.17: "Yes, fix the larger seals the same way next and continue working on my requests."
+- `build/modules/r306.js`: every seal of r104's kind (`.isl`), not the top bar's alone: Home's (132 px), Concordia's (70) and Vocatio's
+  (53), and any other. Each seal's shadows are read from its own style (the drop shadows its head sets, in px of the drawing's own box)
+  and its own light filter (the cast's blur and offset), and drawn again when the theme changes. A press on those seals plays a flourish
+  that turns or beats the same layers through their rotate and scale (r175, r262, r290's SFL): each layer's animate is watched, and for
+  as long as a flourish plays the part is handed back to its own drawing, exactly as before, and taken up again when it ends. A part's
+  own animation starting or stopping (a head turned on or off, a page shown or hidden) is answered at once (animationstart,
+  animationcancel). Home's six orbs: the bands slide behind a round cut and a soft round mask inside each drawing (oxsTurn, 600 steps a
+  minute); the cut and the mask go to a wrapper (CSS clip-path and mask-image, read from the drawing: the circle, the mask's gradient as
+  alpha from its luminance, in percentages), the bands to a drawing of their own slid by the graphics chip with the same steps; only that
+  plain case is taken. Measured in WebKit (rig/t_717_wk_heat.js with PACEAB=1, everything as it was against rebuilt, two readings):
+  Home 620 to 196 and 182, Concordia 512 to 150 and 178, Vocatio 413 to 221 and 250, chat 440 to 303 and 251, Settings 378 to 134 and
+  183, the Guide 387 to 138 and 135. No endless animation inside a drawing is left on any page (tools listing them per page). Compared
+  frame by frame (rig/t_718_seal_cmp.js): Home's seal a mean difference under 0.3 per cent of the range, the engine a little crisper;
+  Home's whole head 0.02 to 0.07 of 255; one orb's face drawn flat and large (rig/t_718_orb_flat.js) at most 4 of 255, by day and by
+  night. rig/t_718_seal_heads.js 21 of 22 (the one: a page error 7.17 raises too for the same presses, no speaker on this machine and a
+  ResizeObserver note; the test now sets those two aside), rig/t_718_orbs.js 7 of 7, rig/t_717_seal_gc.js 13 of 13 (its theme check
+  now reads the shadows' colours; its turning check two seconds apart, as the engine rests at each full turn). Chrome's web views keep
+  every seal and orb as they were.
+- r222: the 7.18 news.
+
 Ingenium 7.17 (16 November 2026): no cartridge blinks in Safari's engine, the empty cups deep, the top bar's seal on the graphics chip.
 Her words that day, on 7.16: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices, please fix this
 issue. The purple catridge disappears or rather seems to glitch in and out of view from the turret when I click to spin it ... Right
