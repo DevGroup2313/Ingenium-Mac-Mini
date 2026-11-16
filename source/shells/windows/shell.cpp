@@ -94,10 +94,9 @@ static std::wstring g_tempDir;                  // the installer's own folder in
 static std::wstring g_from;                     // uninstalling: the folder the app is installed in
 static std::wstring g_openExe;                  // installed: the program that "Open it now" starts
 static std::wstring g_removeAfter;              // uninstalled from its own folder: that folder, emptied once this program ends
-static bool g_setupTest = false, g_setupTestSent = false, g_busy = false, g_shown = false;
+static bool g_setupTest = false, g_setupTestSent = false, g_busy = false, g_fitted = false;
 #define WM_APP_SETUP (WM_APP + 2)               // news for the page from the work: wp 1 progress, 2 finished, 4 Windows asks
 #define WM_APP_DRAG (WM_APP + 3)
-#define SHOW_TIMER 7
 static const wchar_t* MARK = L"installed.txt";
 
 /* ------------------------------------------------------------------ words */
@@ -782,13 +781,8 @@ static std::wstring setupTestScript() {
 )JS" L"})(" + jsonStr(v) + L");";
 }
 
-static void showSetup() {
-    if (g_shown || !g_hwnd) return;
-    g_shown = true; KillTimer(g_hwnd, SHOW_TIMER);
-    ShowWindow(g_hwnd, SW_SHOW); SetForegroundWindow(g_hwnd);
-    if (g_controller) g_controller->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);
-}
-/* the page measures itself and the window takes its size: in the middle of the screen the first time, then where it is */
+/* the page measures itself and the window takes its size: kept in the middle of the screen the first time, then where it is.
+   The window is shown from the start (GitHub's Windows check of 7.24 found a window kept hidden until then left blank by WebView2) */
 static void fitSetup(int cssW, int cssH) {
     if (cssW < 320 || cssW > 1200 || cssH < 240 || cssH > 1600) return;
     UINT dpi = GetDpiForWindow(g_hwnd); if (!dpi) dpi = 96;
@@ -796,10 +790,11 @@ static void fitSetup(int cssW, int cssH) {
     RECT wa = mi.rcWork, r = {}; GetWindowRect(g_hwnd, &r);
     int w = std::min<int>(MulDiv(cssW, dpi, 96), wa.right - wa.left - 16), h = std::min<int>(MulDiv(cssH, dpi, 96), wa.bottom - wa.top - 16);
     int x = r.left, y = r.top;
-    if (!g_shown) { x = wa.left + (wa.right - wa.left - w) / 2; y = wa.top + (wa.bottom - wa.top - h) / 2; }
+    if (!g_fitted) { x = wa.left + (wa.right - wa.left - w) / 2; y = wa.top + (wa.bottom - wa.top - h) / 2; }
     else if (y + h > wa.bottom) y = std::max<int>(wa.top, wa.bottom - h);
+    g_fitted = true;
     SetWindowPos(g_hwnd, nullptr, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
-    showSetup();
+    if (g_controller) g_controller->NotifyParentWindowPositionChanged();
 }
 
 /* the installer's page speaks: setup\n<what>\n<its words> */
@@ -1012,9 +1007,6 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
             testLog(L"SHELL_SETUPTEST FINISHED " + std::to_wstring(code));
         }
         return 0;
-    case WM_TIMER:
-        if (wp == SHOW_TIMER) { showSetup(); return 0; }
-        break;
     case WM_CLOSE:
         if (g_mode != Mode::App) { if (!g_busy) DestroyWindow(hwnd); return 0; }   // never while it installs or uninstalls
         keepPlace(); DestroyWindow(hwnd); return 0;
@@ -1025,7 +1017,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     return DefWindowProcW(hwnd, msg, wp, lp);
 }
 
-/* the installer's window: no frame but the page's own, rounded by Windows 11, its shadow cast; shown once the page has its size */
+/* the installer's window: no frame but the page's own, rounded by Windows 11, its shadow cast; it takes the page's height once drawn */
 static int runSetupWindow(HINSTANCE inst) {
     if (!goodId(g_id)) { MessageBoxW(nullptr, L"This installer's app id cannot name a folder, so it cannot install.", g_title.c_str(), MB_OK | MB_ICONWARNING); return 2; }
     std::wstring cls = L"IngeniumSetup:" + g_id;
@@ -1051,12 +1043,12 @@ static int runSetupWindow(HINSTANCE inst) {
     POINT pt = {}; GetCursorPos(&pt);
     MONITORINFO mi = {sizeof(mi)}; GetMonitorInfoW(MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY), &mi);
     UINT dpi = GetDpiForSystem(); if (!dpi) dpi = 96;
-    int w = MulDiv(540, dpi, 96), h = MulDiv(520, dpi, 96);
+    int w = MulDiv(540, dpi, 96), h = MulDiv(g_mode == Mode::Uninstall ? 320 : 450, dpi, 96);   // about the page's own height
     int x = mi.rcWork.left + (mi.rcWork.right - mi.rcWork.left - w) / 2, y = mi.rcWork.top + (mi.rcWork.bottom - mi.rcWork.top - h) / 2;
     g_hwnd = CreateWindowExW(WS_EX_APPWINDOW, cls.c_str(), (g_title + L" Setup").c_str(), WS_POPUP | WS_SYSMENU | WS_MINIMIZEBOX, x, y, w, h, nullptr, nullptr, inst, nullptr);
     if (!g_hwnd) return 1;
     DWORD round = 2; DwmSetWindowAttribute(g_hwnd, 33, &round, sizeof(round));   // DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND (Windows 11)
-    SetTimer(g_hwnd, SHOW_TIMER, 2500, nullptr);   // shown at the latest after this, measured or not
+    ShowWindow(g_hwnd, SW_SHOWNORMAL); UpdateWindow(g_hwnd); SetForegroundWindow(g_hwnd);
     startWebView();
     MSG m;
     while (GetMessageW(&m, nullptr, 0, 0)) { TranslateMessage(&m); DispatchMessageW(&m); }

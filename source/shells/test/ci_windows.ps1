@@ -154,6 +154,13 @@ function SetupUi([string]$exe, [string]$argline, [string]$do, [string]$tag) {
   Start-Sleep 3
   return @(if (Test-Path $log) { Get-Content $log -Encoding utf8 } else { @() })
 }
+# the installer's window drawn, not blank: its violet keys, ring and pip counted in the picture (sampled every 3 pixels)
+function Violet([string]$png) {
+  if (-not (Test-Path $png)) { return -1 }
+  $bm = New-Object System.Drawing.Bitmap $png; $n = 0
+  for ($y = 0; $y -lt $bm.Height; $y += 3) { for ($x = 0; $x -lt $bm.Width; $x += 3) { $c = $bm.GetPixel($x, $y); if ($c.R -gt 80 -and $c.B -gt $c.R + 40 -and $c.B -gt $c.G + 60) { $n++ } } }
+  $bm.Dispose(); return $n
+}
 function Lines([object[]]$lines, [string]$like) { return @($lines | Where-Object { $_ -like $like }) }
 function Check([bool]$ok, [string]$pass, [string]$fail) { if ($ok) { say "PASS $pass" } else { say "FAIL $fail"; $script:fail = 1 } }
 # an install read back: the program and installed.txt, its shortcuts, its taskbar identity, its entry in Settings, Apps
@@ -198,6 +205,8 @@ Check ($first -match '"scope":"all"' -and $first -match '"desk":true' -and $firs
   "the installer opens on For everyone on this PC, the desktop shortcut ticked, Open without installing offered, no scroll bar, no page error" "the installer's first screen: $first"
 Check ((Lines $l 'SHELL_SETUPTEST FINISHED 0').Count -eq 1 -and (Lines $l 'SHELL_SETUPTEST DONE *' | Select-Object -Last 1) -match '"screen":"installed"') `
   "Just for me, pressed through the page: installed, and the page says so" "Just for me through the page: $((Lines $l 'SHELL_SETUPTEST *') -join ' | ')"
+$v = Violet (Join-Path $Out 'setup-me-choose.png')
+Check ($v -gt 200) "the installer's window is drawn: its violet keys and ring are on the screen ($v samples)" "the installer's window looks blank in its picture ($v violet samples)"
 Installed 'just for me' $meDir $progs $desk $keyMe $true
 # 2. the installed copy opens as the app, the Setup file as the installer
 $t1 = Title (Join-Path $meDir "$nm.exe") ''
