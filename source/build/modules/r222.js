@@ -234,6 +234,13 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.22", "Adamas draws its scene twenty times a second at rest instead of thirty, and ten while Ingenium is not the window in use or after two minutes untouched, back at once on your next touch; every frame as sharp as before, so the graphics chip, and the fan, work less."],
+  ["7.22", "Home keeps its size when you come back to it: its header no longer shows small for a moment and then grows. No page slides up as it comes in now; each only fades in."],
+  ["7.22", "On a tablet held upright, the 3D object of a stacked header stands in the middle of its card, as wide as the card, with no empty space beneath it."],
+  ["7.22", "The theme turns from day to night, and back, all at once, every part of the page in the same moment."],
+  ["7.22", "By day the turret's model names stand in a soft white glow, readable at any turn; a name at the foot stands clear of the rim's engraving, and a long name stays inside its card."],
+  ["7.22", "A finger that rests on a key of the side list, or on a page's title, is no longer taken for a selection, and a tap leaves no flash."],
+  ["7.22", "Lector opens at once on a slower tablet: its seal and its sheets are made just after the page shows, one at a time, so a touch is answered meanwhile.", "lector"],
   ["7.21", "Adamas's holder is always drawn at the screen's full sharpness. A computer that fell behind drew it at fewer pixels, down to under half on a Retina screen, which blurred the turned lines, the knurled foot and the engraved face; now it draws fewer frames a second instead, down to fifteen at rest."],
   ["7.21", "The Guide has two new topics, Home and Adamas, each with its own mark, in the tour's own words."],
   ["7.21", "The Guide has a topic for Lector: how it reads and writes, the model it chooses, and your sources cited.", "lector"],

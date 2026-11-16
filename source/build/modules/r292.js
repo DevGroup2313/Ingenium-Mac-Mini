@@ -68,7 +68,7 @@ var D=document,W=window;
    streaks; no ray stands in the air. A press sends one at once. Behind: the northern lights in violet and purple only. It draws only while
    in view and while the window is shown, thirty frames a second at rest, at a lower resolution on a slower device. */
 var Diamond=(function(){
-  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,vis=true,shown=true,ok=false,U={},q=1,SLOW=1,lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
+  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,vis=true,shown=true,ok=false,U={},q=1,SLOW=1,LASTIN=performance.now(),lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
       yaw=0,tx=0,tz=0,gx=0,gz=0,over=false,press=-99,mX=0,mY=0,VAR=-1;
   var CP=[0,1.62,6.9],TG=[0,0.80,0],FOV=30*Math.PI/180,PER=9.0,TT=1.2;
   function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
@@ -622,8 +622,17 @@ var Diamond=(function(){
     og.globalAlpha=1;}
   function night(){return D.body.getAttribute("data-theme")==="night";}
   function still(){return D.body.getAttribute("data-motion")==="minimal"||(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),gap=(over||t-press<2.5)&&FAST?16:Math.round(33*SLOW);
-    if(ts-lastDraw<gap){raf=requestAnimationFrame(frame);return;}var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
+  /* 7.22, her words (16 November 2026): "Adamas does make my mac warm, the fan of the computer gets really loud as well, like it is
+     suddenly working overtime or something." Measured (rig/t_722_adamas_pace.js; this machine's software drawing, whose proportions
+     hold on a graphics chip): a frame of the scene at a Retina screen's full sharpness costs about 2.2 s here, the holder a third of it
+     and the stone most of the rest; the second sample on the stone's edges, a ninth. The look keeps every sample; the scene draws less
+     often instead: 20 frames a second at rest (it turns 10 degrees a second), 30 while the light runs through the stone or a press
+     plays out, 60 under the pointer as before, and 10 while Ingenium is not the window in use or after two minutes with no touch,
+     click or key, back at once on the next. */
+  ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(n){try{D.addEventListener(n,function(){var w=performance.now()-LASTIN>120000;LASTIN=performance.now();if(w)kick();},{passive:true,capture:true});}catch(e){}});
+  W.addEventListener("focus",function(){LASTIN=performance.now();kick();});
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000,gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
+    if(ts-lastDraw<gap*0.85){raf=requestAnimationFrame(frame);return;}  /* a little slack, so a frame that falls a hair early is not put off a whole frame */var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
       /* 7.21, her words (16 November 2026): "The holder of Adamas' diamond still look really blurry on build 7.20, it does not look more
          defined or refined. It looks like a generated drawingn that does not look crisp." A computer that fell behind drew the scene

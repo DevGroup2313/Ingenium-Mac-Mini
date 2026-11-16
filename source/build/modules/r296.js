@@ -13,8 +13,15 @@
 "use strict";
 if(window.__r296)return;window.__r296=1;
 var D=document,W=window,T=0;
-function fit(){T=0;var narrow=W.innerWidth<=760;
-  [].forEach.call(D.querySelectorAll(".skh > .skh-obj:not(.fc-pool)"),function(o){var h=o.parentNode;
+/* 7.22, her words (16 November 2026): "Lector's 3D documents looks weird on the Fire Tablet screen, its skewed to the left and placed
+   directly unde the Lector header title and its two buttons and looks significantly smaller on the card ... it would look better in the
+   middle of the card if it is stacked up on a smaller screen. It is the same for Vocatio's compass ... I have the same complaint for
+   Adamas' diamond and Fabrica's tree on the Fire Tablet." A head stacked by r307 (narrower than 640 px, as on the Fire tablet upright
+   with the menu open, the window 800 px wide) was not fitted here, since this asked the window's width alone: its object kept the 0.66
+   of r290's rule for a window under 980 px, from its left edge, over a box still 424 px tall (144 px empty beneath it). A stacked head
+   is now fitted as a phone's is: its object as wide as the head's inside, in the middle, with no empty band below. */
+function fit(){T=0;var small=W.innerWidth<=760;
+  [].forEach.call(D.querySelectorAll(".skh > .skh-obj:not(.fc-pool)"),function(o){var h=o.parentNode,narrow=small||!!(h&&h.classList&&h.classList.contains("skh-narrow"));
     if(!narrow){if(o.__fit){o.style.transform="";o.style.marginBottom="";o.style.marginLeft="";o.__fit=0;}return;}
     if(!h||!h.offsetParent)return;var cs=W.getComputedStyle(h),w=h.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);if(w<=0)return;
     var k=Math.max(0.35,Math.min(1,w/520)),tr="scale("+k.toFixed(4)+")",mb=(-424*(1-k)).toFixed(1)+"px",ml=Math.max(0,(w-520*k)/2).toFixed(1)+"px";

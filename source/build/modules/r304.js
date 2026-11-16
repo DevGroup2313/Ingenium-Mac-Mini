@@ -599,7 +599,11 @@ var CSS=[
 ".tq-index{left:217px;top:24px;transform:translateY(var(--iy,0px))}",
 ".tq-names{position:absolute;left:0;top:0;width:460px;height:460px;pointer-events:none}",
 ".tq-tag{position:absolute;transform:translate(-50%,-50%);font:600 10.5px/1.15 "+SANS+";letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:auto;cursor:pointer;",
-"  color:#2e1764;text-shadow:0 1px 0 rgba(255,255,255,.6);transition:opacity .3s ease}",
+/* 7.22, her words (16 November 2026): "The models names are hard to read on the turret on Day mode, the colour of the text blends in with
+   the turret. It looks fine on Night mode but on Day mode no matter how I spin it, I can't always make out the names". By day the names (dark
+   violet, a faint white edge) sat on the lavender bezel among its ticks and its engraving; each letter now stands in a soft white glow,
+   which keeps the lavender and the engraving off it at any turn. Night is as it was. */
+"  color:#22104c;text-shadow:0 0 1px #fff,0 0 2px #fff,0 0 3px #fff,0 0 5px rgba(255,255,255,.95),0 0 9px rgba(255,255,255,.75);transition:opacity .3s ease}",
 ".tq.tq-night .tq-tag{color:#e6dcfa;text-shadow:0 1px 0 rgba(0,0,0,.65)}",
 ".tq.tq-moving .tq-tag{opacity:0;pointer-events:none;transition-duration:.12s}",
 ".tq-plate.tq-grab{cursor:grabbing}",
@@ -699,7 +703,12 @@ function mount(scene,opts){addCss();opts=opts||{};
     T.ports.forEach(function(pt){var a=(-90+pt.i*step())*Math.PI/180;pt.el.style.transform="translate("+(Math.cos(a)*102).toFixed(2)+"px,"+(Math.sin(a)*102).toFixed(2)+"px)";
       pt.up.style.transform="rotate("+(-t).toFixed(3)+"deg)";});}
   function names_(){T.ports.forEach(function(pt){if(!pt.tag)return;var a=(-90+pt.i*step()+T.turn)*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),top=sa<-.93;
-      pt.tag.style.display=top?"none":"";var rr=188;pt.tag.style.left=(230+ca*rr).toFixed(1)+"px";pt.tag.style.top=(230+sa*rr).toFixed(1)+"px";});}
+      pt.tag.style.display=top?"none":"";var rr=sa>.78?234:188;  /* 7.22: a name at the foot stands at the rim's outer edge, clear of its engraving (the memory line) */pt.tag.style.left=(230+ca*rr).toFixed(1)+"px";pt.tag.style.top=(230+sa*rr).toFixed(1)+"px";});inCard();inCardSoon();}
+  /* 7.22: a long name beside the turret stays inside its card (it ran past the card's edge on a wide window), 12 px from each side */
+  var icT=0;function inCardSoon(){clearTimeout(icT);icT=setTimeout(function(){if(!T.moving)inCard();},450);}  /* again once the page has settled (a head stacked, a page shown) */
+  function inCard(){try{var hd=root.closest(".tr-head");if(!hd)return;var hb=hd.getBoundingClientRect();if(hb.width<50)return;var L=hb.left+12,R=hb.right-12;
+    T.ports.forEach(function(pt){var tg=pt.tag;if(!tg||tg.style.display==="none")return;tg.style.marginLeft="";var r=tg.getBoundingClientRect(),k=tg.offsetWidth?r.width/tg.offsetWidth:1,dx=0;
+      if(r.right>R)dx=R-r.right;if(r.left+dx<L)dx=L-r.left;if(dx&&k>0)tg.style.marginLeft=(dx/k).toFixed(1)+"px";});}catch(e){}}
   /* the engine star: drawn over the medallion when the centre is the engine; it turns as the logo's engine does and spins once when pressed */
   var cEng=null,engSpin=null;
   function engSet(){var kk0=KS;KS=T.kDrawn||measure();try{engSet0();}finally{KS=kk0;}}
@@ -846,7 +855,7 @@ function mount(scene,opts){addCss();opts=opts||{};
   var over=scene.closest(".tr-head")||scene;
   over.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse")return;var r=stage.getBoundingClientRect();T.hx=Math.max(-.6,Math.min(.6,(e.clientX-(r.left+r.width/2))/r.width));T.hy=Math.max(-.6,Math.min(.6,(e.clientY-(r.top+r.height/2))/r.height));T.hold=1;wake();});
   over.addEventListener("pointerleave",function(){T.hold=0;});
-  var rzT=0;function rescale(){clearTimeout(rzT);rzT=setTimeout(function(){if(!root.isConnected)return;var k=measure();if(T.kDrawn&&Math.abs(k-T.kDrawn)/T.kDrawn>.04)drawAll();},180);}
+  var rzT=0;function rescale(){clearTimeout(rzT);rzT=setTimeout(function(){if(!root.isConnected)return;var k=measure();if(T.kDrawn&&Math.abs(k-T.kDrawn)/T.kDrawn>.04)drawAll();if(!T.moving){inCard();inCardSoon();}},180);}
   W.addEventListener("resize",rescale);try{if(W.ResizeObserver)new ResizeObserver(rescale).observe(scene);}catch(e){}
   build();names_();wake();
   return {el:root,set:function(o){var re=false;if(o.finish&&FIN[o.finish]&&o.finish!==T.finish){T.finish=o.finish;re=true;}if(o.night!=null&&!!o.night!==T.night){T.night=!!o.night;re=true;}

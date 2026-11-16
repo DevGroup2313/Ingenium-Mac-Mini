@@ -380,8 +380,11 @@ function mount(){try{
 
 function boot(){mount();var h=$("hx");if(!h){setTimeout(boot,700);return;}
   try{new ResizeObserver(function(){mount();}).observe(h);}catch(e){W.addEventListener("resize",mount);}
+  /* 7.22, her words (16 November 2026): "The home page's 3D header card and its "Your next step" card keep on resizing and lifitng slight
+     higher on the page". While another page showed, this look laid the Orrery out for a width of 0 (Home hidden), marking it narrow and
+     its header 408 px tall; back on Home the header showed so, then jumped to 700 px. A hidden Home (width 0) is now left as it is. */
   /* Home's parts may be redrawn by other parts later (the seal key, the wallpapers key): looked at again, cheaply, writing nothing when all is in place */
-  setInterval(function(){var x=$("hx");if(!on){if(x&&x.clientWidth>=300)mount();return;}if(x&&x.clientWidth<760)layout(x.clientWidth);
+  setInterval(function(){var x=$("hx");if(!on){if(x&&x.clientWidth>=300)mount();return;}if(x&&x.clientWidth>0&&x.clientWidth<760)layout(x.clientWidth);
     if(x!==hx||!head||!head.isConnected||box.parentNode!==head||!box.querySelector(".ox-world")){mount();return;}rim();row();},2000);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.IngOrrery={sphere:function(look){return sphere([null,look||"bands"]);},pearl:function(){try{pearlDefs();}catch(e){}},state:function(){var s=spin?getComputedStyle(spin):null;return {on:on,R:R0,keys:keys.length,hold:hold?hold.el.getAttribute("data-go"):null,motion:motion(),

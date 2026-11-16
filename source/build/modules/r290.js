@@ -1566,7 +1566,13 @@ function lxWire(k){var busy=false,again=false,last="",count=0;function isl(){ret
   k.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();try{if(W.IngSound&&IngSound.play)IngSound.play("paper",{el:k});}catch(x){}if(busy){again=true;sglow(parts(),false);return;}play();});
   k.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!still()){var s=isl();if(s){s.classList.add("down");setTimeout(function(){s.classList.remove("down");},140);}}});}
 /* drawn for the theme and for today; at midnight the date turns over */
-function lxSealPaint(hs){var go=function(){lxSealDraw(hs);};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
+/* 7.22, her words (16 November 2026): "the app is moving really slow on the Fire Tablet as well, it does not always register my click to go to
+   a different on the navigation bar". Measured with Chrome slowed four times at the Fire tablet's size: Lector's first opening held the
+   page for 5.3 s before it was drawn, nearly all of it this seal's wax (lxWaxUrls) and its sheets (lpDraw), made pixel by pixel. They
+   are now made after the page is drawn, one at a time, so a touch is answered between them. */
+var LQ=[],LQT=0;function afterPaint(fn){LQ.push(fn);if(LQT)return;LQT=1;(W.requestAnimationFrame||setTimeout)(function(){setTimeout(lqRun,0);});}
+function lqRun(){var f=LQ.shift();if(f){try{f();}catch(e){}}if(LQ.length)setTimeout(lqRun,0);else LQT=0;}
+function lxSealPaint(hs){var go=function(){afterPaint(function(){lxSealDraw(hs);});};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
 function lxSealDraw(hs){var nt=hs.__nt!=null?hs.__nt:night(),wax=hs.__wax||"white",S=parseFloat(hs.style.getPropertyValue("--S"))||86,date=lxDate(),key=wax+(nt?"n":"d")+S+date;if(hs.__k2===key)return;hs.__k2=key;
   var U=lxWaxUrls(S,nt,date,wax);hs.querySelector(".lxs-ring").src=U.ring;hs.querySelector(".lxs-star").src=U.star;hs.querySelector(".lxs-heart").src=U.heart;
   hs.querySelector(".lxs-side").innerHTML=lxSideSvg(S,hs.__thin?1.5:Math.max(3,Math.round(S/22)),nt,wax);hs.querySelector(".r175-seal").setAttribute("data-date",date);
@@ -1685,7 +1691,7 @@ function lpDraw(cv,d,nt,opt){opt=opt||{};var leaf=!!opt.leaf,band=!!opt.band,pag
   g0.putImageData(im,0,0);}
 /* a sheet is drawn again only when its document, its numeral or the theme changes; the fonts are waited for, as the seal's are */
 function lpPaint(b,d,opt){if(!d)return;opt=opt||{};var cv=b.querySelector(".lf-paper"),nt=night(),key=[d.name,d.i,nt?1:0,lfApps(),opt.band?1:0,opt.leaf?1:0].join("|");if(!cv||cv.__k===key)return;cv.__k=key;
-  var go=function(){if(cv.__k!==key)return;try{lpDraw(cv,d,nt,opt);b.classList.add("lf-drawn");b.querySelector(".lf-sheet").classList.add("lf-drawn");}catch(e){}};
+  var go=function(){afterPaint(function(){if(cv.__k!==key)return;try{lpDraw(cv,d,nt,opt);b.classList.add("lf-drawn");b.querySelector(".lf-sheet").classList.add("lf-drawn");}catch(e){}});};
   try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(e){}go();}
 /* the paper's tooth: a small tile of grain, made once */
 function grainTile(dark){var c=D.createElement("canvas");c.width=c.height=96;var g=c.getContext("2d"),im=g.createImageData(96,96),s=7;
@@ -1732,7 +1738,7 @@ function paintLector(){var H=lectorHero();if(!H)return;if(LB.seal)lxSealPaint(LB
   lx.parentNode.insertBefore(LB.row,lx);
   lfFill(LB.cards[0],t[0],"l");lfFill(LB.cards[1],t[1],"f");lfFill(LB.cards[2],t[2],"r");
   (LB.loose||[]).forEach(function(e,n){var cv=e.querySelector(".lf-paper"),nt=night(),key="loose|"+n+"|"+(nt?1:0);if(cv.__k===key)return;cv.__k=key;
-    var go=function(){if(cv.__k!==key)return;try{lpDraw(cv,{name:n?"Notes on the reading":"Drafts of the documents",i:n},nt,{leaf:true,pages:1});}catch(x){}};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(x){}go();});
+    var go=function(){afterPaint(function(){if(cv.__k!==key)return;try{lpDraw(cv,{name:n?"Notes on the reading":"Drafts of the documents",i:n},nt,{leaf:true,pages:1});}catch(x){}});};try{if(D.fonts&&D.fonts.load){D.fonts.load('600 12px "Home Cormorant"').then(go,go);return;}}catch(x){}go();});
   var go=$("l7BriefF")&&$("l7BriefF").querySelector("button.next"),k=H.keys.querySelector("#skLectorGo");if(k&&go){var tx=(go.textContent||"").trim();if(tx&&k.lastChild&&k.lastChild.nodeType===3&&k.lastChild.textContent!==tx)k.lastChild.textContent=tx;}}
 function goStep(i){try{if(W.IngLector&&IngLector.setPanel&&W.innerWidth<900)IngLector.setPanel(["brief","read","doc","doc"][i]||"brief");}catch(e){}var p=$(["l7Brief","l7Read","l7Doc","l7Doc"][i]);if(!p)return;scrollTo($("lx7"));
   if(!still()&&p.animate)try{p.animate([{boxShadow:"0 0 0 0 rgba(106,63,181,0)"},{boxShadow:"0 0 0 3px rgba(106,63,181,.45)"},{boxShadow:"0 0 0 0 rgba(106,63,181,0)"}],{duration:1100,delay:250});}catch(e){}}

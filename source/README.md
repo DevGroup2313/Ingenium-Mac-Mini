@@ -395,6 +395,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.22 (16 November 2026): Adamas cooler, Home still, the stacked heads centred, the theme at once, the turret's names readable.
+Her words (16 November 2026): "Adamas does make my mac warm, the fan of the computer gets really loud as well, like it is suddenly working
+overtime or something. The home page's 3D header card and its "Your next step" card keep on resizing and lifitng slight higher on the page,
+please fix that. Lector's 3D documents looks weird on the Fire Tablet screen, its skewed to the left and placed directly unde the Lector
+header title and its two buttons and looks significantly smaller on the card ... It is the same for Vocatio's compass ... I have the same
+complaint for Adamas' diamond and Fabrica's tree on the Fire Tablet. Also, the app is moving really slow on the Fire Tablet as well, it does
+not always register my click ... it just selects the page's title instead with a blue fade ... Its the same with changing the app from Day
+mode to Night mode ... it does not happen all at once like it is supposed to"; then "The models names are hard to read on the turret on Day
+mode, the colour of the text blends in with the turret."
+- Adamas (`build/modules/r292.js`): measured in software drawing (rig, a frame read back): a frame of the scene at a Retina screen's full
+  sharpness about 2.2 s here, the holder a third of it, the stone most of the rest, the stone's second sample a ninth (kept: one sample
+  showed speckle on the facets). The scene now draws 20 times a second at rest (30 in 7.21), 30 while the light runs or a press plays, 60
+  under the pointer, and 10 while Ingenium is not the window in use or after two minutes with no touch, click or key; each gap with 15 per
+  cent of slack, so a frame a hair early is not put off a whole frame. rig/t_722_adamas_pace.js (the drawing skipped, the draws counted).
+- Home (`build/modules/r261.js`): the Orrery's check every 2 s laid Home out for a width of 0 while another page showed, so back on Home its
+  header showed 408 px tall, then 700. A hidden Home is left alone. `build/modules/r308.js` (new): every page came in sliding up 6 px (the
+  base's fadeIn); a page now only fades in.
+- The stacked heads (`build/modules/r296.js`): a head stacked by r307 (narrower than 640 px, the window wider than 760 px: the Fire tablet
+  upright with the menu open) was not fitted, so its object kept r290's 0.66 from its left edge over a box 424 px tall (144 px empty). It is
+  now fitted as a phone's: as wide as the head's inside, in the middle, no band. Heads at the Fire tablet's size: Lector 712 px, Vocatio 735,
+  Fabrica 734 (7.19: 760, 783, 782). rig/t_719_narrow.js now asks for the object in the middle, filling the head, at most 40 px to the hint.
+- The theme (`build/modules/r308.js`): 860 parts eased their colours on a change, each in turn on a slow device; transitions are held for two
+  frames while the theme turns (applyTheme wrapped; a MutationObserver for any other setter). rig/t_722_home_theme.js.
+- The Fire tablet's touches (`build/modules/r308.js`): the side list's keys and the pages' titles cannot be selected by a resting finger, no
+  tap flash, touch-action: manipulation on keys. `build/modules/r290.js`: Lector's seal and sheets are made after the page is drawn, one at
+  a time (with Chrome slowed four times at the Fire tablet's size, Lector first drawn after 0.8 s, 6.9 s in 7.21). Not changed: the theme's
+  own restyling of the whole page (about 1.5 s to the first frame in that slowed Chrome), and Vesta's first opening (about 1 s there).
+- The turret's names (`build/modules/r304.js`): by day each letter stands in a soft white glow (dark violet on the lavender bezel before); a
+  name at the foot stands at the rim's outer edge, clear of the memory line engraved there; a long name stays inside its card, 12 px from
+  each side (checked at 1440, 1000 and 800 px wide with invented models).
+
 Ingenium 7.21 (16 November 2026): Adamas's holder kept sharp, and the Guide and the tour brought up to every page.
 - Her words (16 November 2026), with a picture of 7.20 on her Mac: "The holder of Adamas' diamond still look really blurry on build
   7.20, it does not look more defined or refined. It looks like a generated drawingn that does not look crisp. It still looks crappy
