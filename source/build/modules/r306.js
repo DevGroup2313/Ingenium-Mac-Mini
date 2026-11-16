@@ -82,7 +82,14 @@ function shadowSvg(spin,s){var v=el("svg",{viewBox:"0 0 120 120","class":"seal3d
   var g=el("g",{filter:"url(#"+px+"f)"});[].forEach.call(spin.childNodes,function(c){g.appendChild(c.cloneNode(true));});v.appendChild(g);return v;}
 
 /* a seal taken in hand: each part dressed for the graphics chip (or undressed: as r104 drew it), and its motion carried, or handed back */
-function make(w){var st={w:w,parts:{}},ok=true;
+/* a seal copied from one already taken in hand (r175, r262 and r290 copy the door's seal to make their own) carries its layers: they go,
+   and its engine's light filter gets its cast back, so every seal starts as r104 drew it */
+function clean(w){[].forEach.call(w.querySelectorAll("svg.isl-gc"),function(v){if(v.parentNode)v.parentNode.removeChild(v);});
+  [].forEach.call(w.querySelectorAll(".isl-star > svg.isl-gcb"),function(v){v.classList.remove("isl-gcb");});
+  [].forEach.call(w.querySelectorAll(".isl-star > svg filter"),function(f){var m=f.querySelector("feMerge"),c=f.querySelector("[result='cast']");
+    if(m&&c&&!m.querySelector("feMergeNode[in='cast']")){var n=D.createElementNS(NS,"feMergeNode");n.setAttribute("in","cast");m.insertBefore(n,m.firstChild);}});
+  [].forEach.call(w.querySelectorAll(".isl-back > svg .s4-breath"),function(c){if(c.style.visibility==="hidden")c.style.visibility="";});}
+function make(w){clean(w);var st={w:w,parts:{}},ok=true;
   PARTS.forEach(function(p){var e=w.querySelector(p.sel);if(!e&&p.k!=="glow")ok=false;st.parts[p.k]={p:p,el:e,A:null,M:[],hosts:[],fl:0,dressed:false,st:st};});
   if(!ok)return null;var P=st.parts;
   P.ring.hosts=[w.querySelector(".isl-ring > svg")];P.heart.hosts=[w.querySelector(".isl-heart > svg")];
@@ -96,7 +103,9 @@ function make(w){var st={w:w,parts:{}},ok=true;
   return st;}
 function shadowsBuild(q){var star=q.svg;q.shadows.forEach(function(v){if(v.parentNode)v.parentNode.removeChild(v);});q.shadows=[];
   var was=star.classList.contains("isl-gcb");if(was)star.classList.remove("isl-gcb");var list=shadowsOf(star,q.filter);if(was)star.classList.add("isl-gcb");
-  q.shadows=list.map(function(s){var v=shadowSvg(q.el,s);star.parentNode.appendChild(v);return v;});q.hosts=[star].concat(q.shadows);}
+  q.shadows=list.map(function(s){var v=shadowSvg(q.el,s);star.parentNode.appendChild(v);return v;});q.hosts=[star].concat(q.shadows);
+  q.built=(star.parentNode&&star.parentNode.offsetWidth)>0;}   /* read on a hidden page (no size), its drop shadows are read again once it is shown */
+function reshadow(q){var t=q.M.length?q.M[0].currentTime:null,A=q.A;shadowsBuild(q);if(A){carry(q,A);if(t!=null)q.M.forEach(function(m){m.currentTime=t;});}}
 function dress(q){if(q.dressed)return;q.dressed=true;
   if(q.p.k==="star"){shadowsBuild(q);var cn=q.filter?q.filter.querySelector("feMergeNode[in='cast']"):null;if(cn){q.cn=cn;q.cnp=cn.parentNode;q.cnx=cn.nextSibling;cn.parentNode.removeChild(cn);}q.svg.classList.add("isl-gcb");}
   if(q.p.k==="glow"&&q.gl){q.el.style.visibility="hidden";q.gl.classList.remove("isl-gc-off");}}
@@ -118,7 +127,8 @@ function watchHost(h,q){if(h.__gcw)return;h.__gcw=1;
     var a=ANIM.apply(h,arguments),done=false,end=function(){if(done)return;done=true;q.fl=Math.max(0,q.fl-1);if(!q.fl&&q.st.on&&ON){dress(q);check(q.st);}};
     try{a.finished.then(end,end);}catch(e){setTimeout(end,3000);}return a;};}
 function check(st){if(!st.on)return;
-  PARTS.forEach(function(p){var q=st.parts[p.k];if(!q.el||q.fl)return;if(!q.dressed)dress(q);var A=cssAnim(q.el);
+  PARTS.forEach(function(p){var q=st.parts[p.k];if(!q.el||q.fl)return;if(!q.dressed)dress(q);
+    if(p.k==="star"&&!q.built&&q.svg.parentNode&&q.svg.parentNode.offsetWidth>0)reshadow(q);var A=cssAnim(q.el);
     if(!A){if(q.M.length)drop(q,false);q.A=null;if(q.gl)q.gl.style.opacity=getComputedStyle(q.el).opacity;return;}
     if(q.gl)q.gl.style.opacity="";
     if(A!==q.A||A.playState==="running")carry(q,A);
@@ -170,7 +180,7 @@ function release(st){st.on=false;PARTS.forEach(function(p){var q=st.parts[p.k];i
 function off(){ON=false;ALL.forEach(release);DR.forEach(driftOff);}
 function start(){if(!ON)return;ALL=ALL.filter(function(st){if(st.w.isConnected)return true;release(st);st.w.__gc=null;return false;});
   [].forEach.call(D.querySelectorAll(".isl"),function(w){if(!w.__gc)apply(w);});ALL.forEach(check);drifts();}
-function theme(){ALL.forEach(function(st){var q=st.parts.star;if(st.on&&q.dressed&&!q.fl){var t=q.M.length?q.M[0].currentTime:null,A=q.A;shadowsBuild(q);if(A){carry(q,A);if(t!=null)q.M.forEach(function(m){m.currentTime=t;});}}});}
+function theme(){ALL.forEach(function(st){var q=st.parts.star;if(st.on&&q.dressed&&!q.fl)reshadow(q);});}
 start();[300,1500,4000,9000].forEach(function(ms){setTimeout(start,ms);});setInterval(start,3000);
 try{new MutationObserver(function(ms){var th=ms.some(function(m){return m.attributeName==="data-theme";});setTimeout(function(){if(th)theme();start();},40);}).observe(D.body,{attributes:true,attributeFilter:["data-motion","data-theme","class"]});}catch(e){}
 /* a part's own animation started or stopped (a head turned on or off, a page shown or hidden): taken in hand at once, so a part never

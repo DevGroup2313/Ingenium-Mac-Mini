@@ -411,8 +411,14 @@ Ingenium 7.18 (16 November 2026): every seal and Home's orbs turned by the graph
   183, the Guide 387 to 138 and 135. No endless animation inside a drawing is left on any page (tools listing them per page). Compared
   frame by frame (rig/t_718_seal_cmp.js): Home's seal a mean difference under 0.3 per cent of the range, the engine a little crisper;
   Home's whole head 0.02 to 0.07 of 255; one orb's face drawn flat and large (rig/t_718_orb_flat.js) at most 4 of 255, by day and by
-  night. rig/t_718_seal_heads.js 21 of 22 (the one: a page error 7.17 raises too for the same presses, no speaker on this machine and a
-  ResizeObserver note; the test now sets those two aside), rig/t_718_orbs.js 7 of 7, rig/t_717_seal_gc.js 13 of 13 (its theme check
+  night. Found while testing the first 7.18 page, and fixed before release: a seal taken in hand on a hidden page (no size) had only its
+  light's cast as a shadow until a press (Vocatio's), and a seal copied from one already taken in hand (r175, r262 and r290 copy the
+  door's seal) carried that seal's layers (Concordia's had six shadows of three): r306 reads a seal's shadows again once it is shown,
+  and cleans a copied seal (its layers taken off, its light filter's cast put back) before taking it in hand. Compared again with the
+  whole page held at each moment: Concordia's seal 0.46 to 0.64 of 255, Vocatio's like it (the compass rose round it is turned by its
+  own script between the two pictures). rig/t_718_seal_heads.js 22 of 22 (it now counts each seal's shadows against what its style
+  and light ask, before any press, and sets aside two page errors 7.17 raises as well for the same presses: no speaker on this machine,
+  a ResizeObserver note), rig/t_718_orbs.js 7 of 7, rig/t_717_seal_gc.js 13 of 13 (its theme check
   now reads the shadows' colours; its turning check two seconds apart, as the engine rests at each full turn). Chrome's web views keep
   every seal and orb as they were.
 - r222: the 7.18 news.

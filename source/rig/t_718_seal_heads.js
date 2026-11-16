@@ -15,7 +15,9 @@ const HEADS = [['home', '#hxSeal .isl'], ['blend', '.bx-seat .isl'], ['career', 
     ok(s.applied && parts.every((k) => s[k].moving >= 1), pg + ': its seal taken in hand: ' + JSON.stringify(s));
     const ang = () => p.evaluate((sel) => { const w = document.querySelector(sel); const g = (q) => { const e = w.querySelector(q); return e ? getComputedStyle(e).rotate : null; }; return [g('.isl-ring > svg'), g('.isl-star > svg')]; }, sel);
     const a1 = await ang(); await p.waitForTimeout(600); const a2 = await ang(); ok(a1[1] !== a2[1] || a1[0] !== a2[0], pg + ': it turns (' + a1.join(' ') + ' -> ' + a2.join(' ') + ')');
-    const nsh = await p.evaluate((sel) => document.querySelectorAll(sel + ' .isl-star > svg.isl-gc-sh').length, sel); ok(nsh >= 1, pg + ': the engine\'s shadows as layers (' + nsh + ')');
+    const nsh = await p.evaluate((sel) => document.querySelectorAll(sel + ' .isl-star > svg.isl-gc-sh').length, sel);
+    const want = await p.evaluate((sel) => [...document.querySelectorAll(sel)].map((w) => { const s = w.querySelector('.isl-star > svg'); s.classList.remove('isl-gcb'); const n = (getComputedStyle(s).filter.match(/drop-shadow/g) || []).length; s.classList.add('isl-gcb'); return n + 1; }).reduce((a, b) => a + b, 0), sel);
+    ok(nsh === want, pg + ': the engine\'s shadows as layers, as many as its style and light ask, before any press (' + nsh + ' of ' + want + ')');
     if (pg !== 'chat') {
       const key = await p.evaluate((sel) => { const w = document.querySelector(sel); const k = w.closest('button,[role="button"]'); if (!k) return null; k.scrollIntoView({ block: 'center' }); const r = k.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel);
       if (!key) { ok(false, pg + ': no key round the seal'); continue; }
