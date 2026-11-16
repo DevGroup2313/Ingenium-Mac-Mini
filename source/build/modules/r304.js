@@ -379,9 +379,10 @@ function wellLayer(F,nt,N,wr,kind){var key="w"+N+F.label+nt+wr+(kind||"");if(CAC
    lathe: a narrow crisp bevel at each edge and between them a flat face, very slightly crowned, so it reads even all round; a crisp finish
    (one sharp highlight, no glossy glow); and every edge drawn with nine samples where it falls inside a pixel, so the circles are smooth
    and true at the screen's own resolution. A ball's holder has inside it a flat satin seat and a narrow lip down to the glass. */
-function bezelLayer(F,nt,N,kind){var key="b2"+N+F.label+nt+kind;if(CACHE[key])return CACHE[key];var c=cv(N),g=c.getContext("2d"),im=g.createImageData(N,N),px=im.data,u=N/LENS,c0=N/2,
+function cupM(F){if(!F.cupM){var C=F.capM||F.plateM;F.cupM={d:mix(F.wellM.d,C.d,.5),n:mix(F.plateM.n,F.wellM.n,.45),t:C.t};}return F.cupM;}
+function bezelLayer(F,nt,N,kind){var key="b3"+N+F.label+nt+kind;if(CACHE[key])return CACHE[key];var c=cv(N),g=c.getContext("2d"),im=g.createImageData(N,N),px=im.data,u=N/LENS,c0=N/2,
     R=(LENS/2-2)*u,n=[0,0,1],col=[0,0,0],x,y,dx,dy,r,j;
-  var bw=1.15*u,qA=R*.86,qB=qA+bw,qC=R-bw,seat=R*.68,lip=R*.64,B=kind==="cap"?[qA,qB,qC]:[lip,seat,qA,qB,qC];
+  var bw=1.15*u,qA=R*.86,qB=qA+bw,qC=R-bw,seat=R*.68,lip=R*.64,B=[lip,seat,qA,qB,qC];
   function at(sx,sy,o){var rr=Math.sqrt(sx*sx+sy*sy),ex=rr?sx/rr:0,ey=rr?sy/rr:0;
     if(rr>R)return false;
     if(rr>=qC){slope(ex,ey,1,n);shade(n[0],n[1],n[2],F.bezelM,F.bezelRo,nt,o,1);}
@@ -389,9 +390,18 @@ function bezelLayer(F,nt,N,kind){var key="b2"+N+F.label+nt+kind;if(CACHE[key])re
       if(F.knurl){var th=Math.atan2(sy,sx),kn=Math.sin(th*F.knurl);n[0]+=-ey*kn*.3;n[1]+=ex*kn*.3;var l=Math.sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);n[0]/=l;n[1]/=l;n[2]/=l;}
       shade(n[0],n[1],n[2],F.bezelM,F.bezelRo,nt,o,1);}
     else if(rr>=qA){slope(ex,ey,-1,n);shade(n[0],n[1],n[2],F.bezelM,F.bezelRo,nt,o,1);}
-    else if(kind==="cap"){shade(0,0,1,F.plateM,F.plateRo,nt,o);}
+    
     else if(rr>=seat){shade(0,0,1,F.bezelM,.42,nt,o,1);}
     else if(rr>=lip){slope(ex,ey,-1.6,n);shade(n[0],n[1],n[2],F.bezelM,.06,nt,o,1);}
+    /* 7.17 (her words, 16 November 2026: "The empty cartridges look flat and their rims are very different from the filled ones that are deep
+       and hold the coloured balls, please fix this discrepancy"): an empty cartridge has the full one's ring, seat and lip, and inside them an
+       empty cup, concave, shaded as a bowl is (in shadow under the lip on the window's side, catching the light across from it) */
+    /* and (her words, 16 November 2026: "The inside of the empty catridge cup should be lighter on Day mode and darker on Night mode, right
+       now it looks a little off and unatural"): the cup's own metal, by day halfway between the dark well (as it was) and the plate (her words, the same day: "You've made the inside
+       of the cup too light on Day mode now, please fix that"), by night
+       between the plate and the dark well (it was the plate's); a gentler bowl in a satin finish, so it neither flares white by day nor
+       falls to black by night */
+    else if(kind==="cap"){var qq=rr/lip;slope(ex,ey,-.75*qq*qq,n);shade(n[0],n[1],n[2],cupM(F),.5,nt,o,1);}
     else return false;
     return true;}
   var acc=[0,0,0],SUB=[-1/3,0,1/3];
@@ -544,50 +554,58 @@ function indexDraw(canvas,F,nt){var S=26,p=dpr(),N=Math.round(S*p);canvas.width=
 var CSS=[
 ".tq{position:relative;width:calc(460px * var(--tq-k,1));height:calc(460px * var(--tq-k,1));-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none}",
 ".tq-stage{position:absolute;left:0;top:0;width:460px;height:460px;transform-origin:0 0;transform:scale(var(--tq-k,1));perspective:1150px;perspective-origin:50% 46%}",
-".tq-tilt,.tq-platez,.tq-plate,.tq-port,.tq-up{position:absolute;transform-style:preserve-3d}",
+/* 7.17 (her words, 16 November 2026: "The purple catridge disappears or rather seems to glitch in and out of view from the turret when I
+   click to spin it ... the third purple cartridge is not very consistent on the turret"). Safari's engine (on the Mac and the iPhone)
+   orders 3D layers by the depth of each one's middle: as the turret swayed, a lens off to one side sank below the middle of the plate's
+   light, a layer the size of the plate, and was drawn under it, then above it again, so it blinked as it turned (seen in WebKit 26.6 here,
+   and gone with that layer hidden). So the turret is one 3D plane, its tilt, and everything inside it is flat, stacked in the page's own
+   order: the case, the plate and its light, the ripples, the cartridges, the centre, the index, the names. Each keeps its height as a
+   small shift that follows the tilt (--zx, --zy: the sine of the lean), so the layers still slide past one another as they did. It is
+   also fewer layers for the graphics chip. */
+".tq-tilt{position:absolute;transform-style:flat}",".tq-platez,.tq-plate,.tq-port,.tq-up{position:absolute;transform-style:flat}",
 ".tq-tilt{left:0;top:0;width:460px;height:460px;will-change:transform}",
-".tq-rise{position:absolute;left:0;top:0;width:460px;height:460px;transform-style:preserve-3d;animation:tqRise 1s cubic-bezier(.2,.9,.25,1) both}",
-"@keyframes tqRise{0%{opacity:0;transform:translateZ(-50px) scale(.9)}60%{opacity:1;transform:translateZ(4px) scale(1.012)}100%{opacity:1;transform:none}}",
+".tq-rise{position:absolute;left:0;top:0;width:460px;height:460px;transform-style:flat;animation:tqRise 1s cubic-bezier(.2,.9,.25,1) both}",
+"@keyframes tqRise{0%{opacity:0;transform:scale(.9)}60%{opacity:1;transform:scale(1.012)}100%{opacity:1;transform:none}}",
 ".tq canvas{display:block;position:absolute;pointer-events:none}",
-".tq-shadow{position:absolute;left:28px;top:40px;width:420px;height:420px;border-radius:50%;transform:translateZ(-30px);pointer-events:none;",
+".tq-shadow{position:absolute;left:28px;top:40px;width:420px;height:420px;border-radius:50%;pointer-events:none;",
 "  background:radial-gradient(closest-side,rgba(52,26,104,.36),rgba(52,26,104,.2) 55%,rgba(52,26,104,.06) 82%,rgba(52,26,104,0))}",
 ".tq.tq-night .tq-shadow{background:radial-gradient(closest-side,rgba(0,0,0,.72),rgba(0,0,0,.42) 55%,rgba(0,0,0,.12) 82%,rgba(0,0,0,0))}",
 ".tq-case{left:5px;top:5px;width:450px;height:450px}",
-".tq-platez{left:60px;top:60px;width:340px;height:340px;transform:translateZ(8px)}",
+".tq-platez{left:60px;top:60px;width:340px;height:340px}",
 ".tq-plate{left:0;top:0;width:340px;height:340px;will-change:transform}",
 ".tq-face{left:0;top:0;width:340px;height:340px}",
-".tq-light{left:0;top:0;width:340px;height:340px;transform:translateZ(.6px)}",
+".tq-light{left:0;top:0;width:340px;height:340px}",
 ".tq-port{left:170px;top:170px;width:0;height:0}",
 ".tq-up{left:0;top:0;width:0;height:0}",
-".tq-well{transform:translate(-59px,-59px) translateZ(1.2px)}",
+".tq-well{transform:translate(-59px,-59px)}",
 ".tq-lens{position:absolute;left:-56px;top:-56px;width:112px;height:112px;padding:0;margin:0;border:0;border-radius:50%;background:none;cursor:pointer;outline:none;",
-"  transform:translateZ(11px) translateY(var(--ty,0px)) scale(var(--ts,1));transition:transform .32s cubic-bezier(.34,1.4,.64,1);transform-style:flat}",
-".tq-lens.tq-cap{cursor:grab;transform:translateZ(3px)}",
+"  transform:translateY(var(--ty,0px)) scale(var(--ts,1));transition:transform .32s cubic-bezier(.34,1.4,.64,1);transform-style:flat}",
+".tq-lens.tq-cap{cursor:grab}",
 ".tq-lens canvas{left:0;top:0}",
-".tq-lens canvas.tq-bez{transform:translateZ(.6px)}",".tq-lens canvas.tq-floor{left:0;top:0;transform:translateZ(-.4px)}",
+".tq-lens canvas.tq-bez{transform:none}",".tq-lens canvas.tq-floor{left:0;top:0;transform:none}",
 ".tq-ball{position:absolute;left:0;top:0;width:112px;height:112px;pointer-events:none;transform:translate(var(--px,0px),var(--py,0px))}",
 ".tq-ballw{position:absolute;border-radius:50%;overflow:hidden;pointer-events:none}",".tq-ballw canvas.tq-body{transform:translate(var(--bx,0px),var(--by,0px))}",".tq-lens canvas.tq-edge{left:0;top:0}",
-".tq-lens canvas.tq-spark{left:22px;top:20px;transform:translate(var(--gx,0px),var(--gy,0px)) translateZ(.5px)}",
+".tq-lens canvas.tq-spark{left:22px;top:20px}",
 ".tq-lens:hover{--ty:-3px;--ts:1.05}",
 ".tq-lens.tq-down{--ty:1px;--ts:.94;transition-duration:.07s}",
 ".tq-lens:focus-visible{box-shadow:0 0 0 3px #6a3fb5}",
 ".tq-hub{position:absolute;left:192px;top:192px;width:76px;height:76px;padding:0;margin:0;border:0;border-radius:50%;background:none;cursor:pointer;outline:none;",
-"  transform:translateZ(20px) translateY(var(--ty,0px)) scale(var(--ts,1));transition:transform .32s cubic-bezier(.34,1.4,.64,1)}",
+"  transform:translateY(var(--ty,0px)) scale(var(--ts,1));transition:transform .32s cubic-bezier(.34,1.4,.64,1)}",
 ".tq-hub canvas{left:0;top:0}",
-".tq-hub.tq-flat{transform:translateZ(9px)}",".tq-hub.tq-flat:hover,.tq-hub.tq-flat.tq-down{--ty:0px;--ts:1}",
-".tq-hub canvas.tq-estar{transform:translateZ(.6px) rotate(var(--ea,0deg))}",
+".tq-hub.tq-flat{transform:none}",".tq-hub.tq-flat:hover,.tq-hub.tq-flat.tq-down{--ty:0px;--ts:1}",
+".tq-hub canvas.tq-estar{transform:rotate(var(--ea,0deg))}",
 ".tq-hub:hover{--ty:-2px;--ts:1.04}.tq-hub.tq-down{--ty:1px;--ts:.93;transition-duration:.07s}",
 ".tq-hub:focus-visible{box-shadow:0 0 0 3px #6a3fb5}",
-".tq-index{left:217px;top:24px;transform:translateZ(14px) translateY(var(--iy,0px))}",
-".tq-names{position:absolute;left:0;top:0;width:460px;height:460px;transform:translateZ(16px);pointer-events:none}",
+".tq-index{left:217px;top:24px;transform:translateY(var(--iy,0px))}",
+".tq-names{position:absolute;left:0;top:0;width:460px;height:460px;pointer-events:none}",
 ".tq-tag{position:absolute;transform:translate(-50%,-50%);font:600 10.5px/1.15 "+SANS+";letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:auto;cursor:pointer;",
 "  color:#2e1764;text-shadow:0 1px 0 rgba(255,255,255,.6);transition:opacity .3s ease}",
 ".tq.tq-night .tq-tag{color:#e6dcfa;text-shadow:0 1px 0 rgba(0,0,0,.65)}",
 ".tq.tq-moving .tq-tag{opacity:0;pointer-events:none;transition-duration:.12s}",
 ".tq-plate.tq-grab{cursor:grabbing}",
 /* the runs of light round the rim and the band, and the rings of light where a press lands (Vocatio's compass's ripple) */
-".tq-fx{left:0;top:0;transform:translateZ(.4px)}",
-".tq-rips{position:absolute;left:5px;top:5px;width:450px;height:450px;border-radius:50%;overflow:hidden;pointer-events:none;transform:translateZ(17px)}",
+".tq-fx{left:0;top:0}",
+".tq-rips{position:absolute;left:-55px;top:-55px;width:450px;height:450px;border-radius:50%;overflow:hidden;pointer-events:none}",
 ".tq-ripple{position:absolute;width:210px;height:210px;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,255,255,0) 52%,rgba(250,246,255,.5) 70%,rgba(255,255,255,0) 100%);animation:tqRip .9s cubic-bezier(.2,.7,.3,1) both}",
 ".tq.tq-night .tq-ripple{background:radial-gradient(closest-side,rgba(214,198,255,0) 52%,rgba(214,198,255,.34) 70%,rgba(214,198,255,0) 100%)}",
 "@keyframes tqRip{0%{transform:scale(.12);opacity:.95}100%{transform:scale(1.6);opacity:0}}",
@@ -642,8 +660,8 @@ function mount(scene,opts){addCss();opts=opts||{};
   var hub=D.createElement("button");hub.type="button";hub.className="tq-hub";hub.setAttribute("aria-label","Spin the turret round");var cHub=D.createElement("canvas");hub.appendChild(cHub);
   var cIdx=D.createElement("canvas");cIdx.className="tq-index";var names=D.createElement("div");names.className="tq-names";names.setAttribute("aria-hidden","true");
   var rips=D.createElement("div");rips.className="tq-rips";rips.setAttribute("aria-hidden","true");
-  plate.appendChild(cFace);platez.appendChild(plate);platez.appendChild(cLight);
-  rise.appendChild(shadow);rise.appendChild(cCase);rise.appendChild(cFx);rise.appendChild(platez);rise.appendChild(cIdx);rise.appendChild(hub);rise.appendChild(names);rise.appendChild(rips);
+  plate.appendChild(cFace);plate.appendChild(cLight);plate.appendChild(rips);platez.appendChild(plate);
+  rise.appendChild(shadow);rise.appendChild(cCase);rise.appendChild(cFx);rise.appendChild(platez);rise.appendChild(cIdx);rise.appendChild(hub);rise.appendChild(names);
   tilt.appendChild(rise);stage.appendChild(tilt);root.appendChild(stage);scene.appendChild(root);
   function F(){return FIN[T.finish];}
   function step(){return 360/T.P;}
@@ -677,7 +695,7 @@ function mount(scene,opts){addCss();opts=opts||{};
     T.ports.forEach(function(pt){if(pt.kind!=="lens")return;var tg=D.createElement("span");tg.className="tq-tag";tg.textContent=pt.name;tg.__pt=pt;names.appendChild(tg);pt.tag=tg;});
     place();drawAll();}
   /* where things stand: the plate turned, each port upright, the names beside their lenses */
-  function place(){var t=T.turn;plate.style.transform="rotate("+t.toFixed(3)+"deg)";
+  function place(){var t=T.turn;plate.style.transform="rotate("+t.toFixed(3)+"deg)";var ct="rotate("+(-t).toFixed(3)+"deg)";cLight.style.transform=ct;rips.style.transform=ct;
     T.ports.forEach(function(pt){var a=(-90+pt.i*step())*Math.PI/180;pt.el.style.transform="translate("+(Math.cos(a)*102).toFixed(2)+"px,"+(Math.sin(a)*102).toFixed(2)+"px)";
       pt.up.style.transform="rotate("+(-t).toFixed(3)+"deg)";});}
   function names_(){T.ports.forEach(function(pt){if(!pt.tag)return;var a=(-90+pt.i*step()+T.turn)*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),top=sa<-.93;
@@ -719,13 +737,22 @@ function mount(scene,opts){addCss();opts=opts||{};
       T.vy+=(62*(ty-T.ly)-11*T.vy)*dt;T.ly+=T.vy*dt;T.vx+=(62*(tx-T.lx)-11*T.vx)*dt;T.lx+=T.vx*dt;var k=1-.7*T.h,RX=ix*k+T.lx,RY=iy*k+T.ly;
       /* the wobble of a coin settling: its low side runs round, faster as it calms */
       if(T.wA>.03){T.wT+=dt;var q=1-T.wA/T.wA0,env=sst(0,.16,T.wT);T.wP+=TAU*(.9+1.5*q)*dt;T.wA*=Math.exp(-dt/.95);RX+=-T.wA*env*Math.sin(T.wP);RY+=T.wA*env*Math.cos(T.wP);}else T.wA=0;
-      tilt.style.transform="translateZ("+T.kz.toFixed(2)+"px) rotateX("+RX.toFixed(3)+"deg) rotateY("+RY.toFixed(3)+"deg)";shadow.style.transform="translateZ("+(-30-T.kz).toFixed(2)+"px)";
-      root.style.setProperty("--gx",(RY*.45).toFixed(2)+"px");root.style.setProperty("--gy",(-RX*.45).toFixed(2)+"px");
+      tilt.style.transform="translateZ("+T.kz.toFixed(2)+"px) rotateX("+RX.toFixed(3)+"deg) rotateY("+RY.toFixed(3)+"deg)";
+      depth(RX,RY);
       if(T.runs.length||T.fxOn)drawRuns(dt);engFrame(false);ballFrame(dt);}
-    else{tilt.style.transform="";shadow.style.transform="";engFrame(true);}
+    else{tilt.style.transform="";depth(0,0);engFrame(true);}
     if(visible()&&(!st||T.mode!=="rest"||Math.abs(T.ivy)>.01)){if(!st&&calm()){T.idle=setTimeout(function(){T.idle=0;if(!T.raf&&visible())T.raf=requestAnimationFrame(loop);},24);}
       else T.raf=requestAnimationFrame(loop);}else T.lt=0;}
-  function visible(){return root.isConnected&&root.offsetParent!==null&&T.seen!==false&&!D.hidden;}
+  /* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
+  /* each layer's height as a small shift with the tilt (and each ball's glint with the lean), written on that layer alone and only when it
+     has moved a tenth of a pixel: one value on the turret's root restyled all its hundred parts every frame. The shift uses the translate
+     property (Safari 14.1, Chrome 104 and later); where it is unknown (an older web view) the stack simply has no shift. */
+  var DL=null;function depth(RX,RY){var zx=Math.sin(RY*Math.PI/180),zy=-Math.sin(RX*Math.PI/180),gx=RY*.45,gy=-RX*.45;
+    if(DL&&Math.abs(DL[0]-zx)<.002&&Math.abs(DL[1]-zy)<.002&&Math.abs(DL[2]-T.kz)<.05)return;DL=[zx,zy,T.kz];
+    function sh(el,z){if(el)el.style.translate=(zx*z).toFixed(2)+"px "+(zy*z).toFixed(2)+"px";}
+    sh(platez,8);sh(names,16);sh(cIdx,14);sh(hub,T.centre==="star"?9:20);sh(shadow,-30-T.kz);
+    T.ports.forEach(function(pt){sh(pt.btn,11);if(pt.spark)pt.spark.style.transform="translate("+gx.toFixed(2)+"px,"+gy.toFixed(2)+"px)";});}
+  function visible(){return root.isConnected&&T.seen!==false&&!D.hidden&&(T.io||root.offsetParent!==null);}
   /* 7.16 (her words, 15 November 2026: "Ingenium is possibly overheating my phone ... I want my 3D graphics and animations to be preserved and
      run smoothly"): the toy draws only while it is on screen and the window is shown (it is told when it comes back, instead of looking
      every 0.6 s), and while nothing but its slow sway moves (about 4 degrees a second at most) it draws thirty frames a second instead of
@@ -734,7 +761,7 @@ function mount(scene,opts){addCss();opts=opts||{};
   function calm(){if(G||T.over||T.hold||T.h>.01||T.mode!=="rest"||T.wA>0||T.runs.length||T.fxOn||engSpin||Math.abs(T.kv)>.4||Math.abs(T.kz)>.05||Math.abs(T.ivy)>.3||
       Math.abs(T.vx)>.05||Math.abs(T.vy)>.05)return false;
     for(var i=0;i<T.ports.length;i++){var pt=T.ports[i];if(pt.hov||Math.abs(pt.bvx||0)+Math.abs(pt.bvy||0)>.05||Math.abs(pt.bx||0)+Math.abs(pt.by||0)>.02)return false;}return true;}
-  try{if(W.IntersectionObserver)new IntersectionObserver(function(es){T.seen=es[es.length-1].isIntersecting;if(T.seen)wake();}).observe(root);}catch(e){}
+  try{if(W.IntersectionObserver){T.io=1;}if(W.IntersectionObserver)new IntersectionObserver(function(es){T.seen=es[es.length-1].isIntersecting;if(T.seen)wake();}).observe(root);}catch(e){}
   D.addEventListener("visibilitychange",function(){if(!D.hidden)wake();});
   function moving(on){if(T.moving!==on){T.moving=on;root.classList.toggle("tq-moving",on);}}
   function settle(){moving(false);names_();}

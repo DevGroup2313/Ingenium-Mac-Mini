@@ -350,7 +350,9 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
       BEADS.push({b:{wait:true},x:q.x,y:q.y,r:R});}}
     prims.sort(function(a,b){return b.z-a.z;});prims.forEach(function(p){p.f();});}
 /* ---------- motion: a slow turn, stilled under the pointer, turned by a drag ---------- */
-function loop(t){RAF=0;if(!page||!page.offsetParent||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(LAST&&t-LAST<30){RAF=requestAnimationFrame(loop);return;}var dt=Math.min(64,t-(LAST||t));LAST=t;
+/* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
+var PSEEN=true,PIO=0;function pageSeen(){if(!PIO&&page){PIO=-1;if(W.IntersectionObserver){try{new IntersectionObserver(function(es){PSEEN=es[es.length-1].isIntersecting;if(PSEEN)kick();}).observe(page);PIO=1;}catch(e){PIO=-1;}}}return PIO===1?PSEEN:!!(page&&page.offsetParent);}
+function loop(t){RAF=0;if(!page||!pageSeen()||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(LAST&&t-LAST<30){RAF=requestAnimationFrame(loop);return;}var dt=Math.min(64,t-(LAST||t));LAST=t;
   if(!still()){SPIN+=(TARGET-SPIN)*Math.min(1,dt/260);if(!DRAG)ANG+=SPIN*dt*TAU/52000+TV*dt/1000;TV*=Math.exp(-dt/1500);}else TV=0;
   var busy=!!DN||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600;
   draw();if(!still()||(TREE&&TREE.waiting)||busy)RAF=requestAnimationFrame(loop);}

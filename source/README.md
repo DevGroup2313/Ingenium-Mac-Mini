@@ -395,6 +395,53 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.17 (16 November 2026): no cartridge blinks in Safari's engine, the empty cups deep, the top bar's seal on the graphics chip.
+Her words that day, on 7.16: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices, please fix this
+issue. The purple catridge disappears or rather seems to glitch in and out of view from the turret when I click to spin it ... Right
+now, the third purple cartridge is not very consistent on the turret."; "The empty cartridges look flat and their rims are very
+different from the filled ones that are deep and hold the coloured balls, please fix this discrepancy in the 3D turret please."; "The
+inside of the empty catridge cup should be lighter on Day mode and darker on Night mode, right now it looks a little off and unatural.";
+and, on the first try: "You've made the inside of the cup too light on Day mode now, please fix that."
+Safari's engine was run for the first time (Playwright's WebKit 26.6 build, its own libraries, outside the repository): the rig's
+t_717_* checks below use it.
+- `build/modules/r304.js`: the blink, found in WebKit. WebKit sorts the layers of a 3D scene by the depth of their middles; as the turret
+  swayed, a cartridge toward one side sank below the plate's light (.tq-light, the plate's size), which then covered its ball for a frame
+  or several. 7.16's flat cartridges did not reach it. The turret is now one 3D plane (.tq-tilt) and everything inside it is flat, drawn
+  in the page's order; each part's height is a small shift that follows the tilt (sin of the lean, written on that part's own translate
+  property), so the depth still shows. Spun in WebKit (rig/t_717_wk_spin.js, 18 frames): every ball whole in every frame (three readings
+  under the check's line were its point on the rim; the frames were looked at); rig/t_716_turret_toy.js 28 of 28 in Chrome. Where the
+  translate property is unknown (Chrome before 104) the parts keep no shift and nothing blinks.
+  The empty cups: an empty cartridge has a full one's ring, seat and lip, and inside them a concave cup shaded as a bowl is; its metal by
+  day halfway between the dark well (as before) and the plate, by night between the plate and the dark well (0.45 of the way), in a
+  satin finish so it neither flares white by day nor falls to black by night. Each change was shown to her in pictures first.
+  Heat: the loop no longer writes four values on the turret's root each frame (that restyled all its hundred parts); each layer's shift
+  is written on it alone, only when it has moved. Measured in Chrome at rest after the first-start work (below): Mentes 131 to 124 ms of
+  the main thread a second, its layouts 60 to 33 a second, its restyles 90 to 61.
+- `build/modules/r306.js` (new, every edition; at work only in Safari's engine): the top bar's seal turned by the graphics chip. Measured on
+  7.16 in WebKit (rig/t_717_wk_heat.js: the share of each second the page's main thread is taken, against an empty page), the seal's four
+  parts that move inside its drawings (engine, ring, heart, glow) were drawn again by the processor every frame on every page, with their
+  blurred light and shadows; holding them took a plain page to about half (chat 491 to 279), taking off only their light and shadows
+  349 to 241, and holding every other animation changed almost nothing. Each part is now moved whole by the graphics chip (the rotate,
+  scale and opacity of its drawing, by the browser's own Web Animations, with the keyframes read from the page's style sheet and the
+  timing and easing from the browser); the engine's three shadows are layers of their own, each turned about its own offset, so they
+  fall as before while the light stands still. After, in WebKit: chat 431 to 160 and 210, Settings 334 to 186 and 260, the Guide 437 to
+  219 and 254, Ingenia 415 to 220 and 304 (two readings each). Frame by frame against the seal as it was (rig/t_717_seal_cmp.js, eight
+  moments by day and by night, twice the pixels): a mean difference under half a per cent; the engine is a little crisper, as the chip
+  turns it whole where WebKit drew its light softly. Minimal motion and reduced motion still it, and let it go again
+  (rig/t_717_seal_gc.js, 13 of 13 in WebKit). In Chrome without a graphics chip the same change cost more (all processes 0.33 to 2.1 s of
+  processor a second; with Chrome's software graphics chip both 3.6), so Chrome's web views (the Windows laptop, the Fire tablet) keep
+  the seal as it was (3 of 3), as does Safari before 14.1.
+- `build/modules/r290.js`: a head's facets are given a new colour only when it changed; whether a head is on screen is kept by an
+  IntersectionObserver, not read from the layout every frame. `build/modules/r294.js`: the same for Fabrica's tree. Measured in Chrome:
+  Vocatio 181 to 177, Fabrica 264 to 265, that is no change; Fabrica's 60 layouts a second come from the seal's parts, not the tree.
+- Tried and taken out: moving the seal's parts by script thirty times a second (Chrome then restyled 150 times a second: chat 23 to 94,
+  Home 55 to 252; no gain in WebKit); drawing Fabrica's tree off the page (Chrome then drew it on the main thread: its script 51 to 140).
+- Found, not changed: the first start of a new version reads Ingenium's own page back (about 87 MB), fingerprints it and keeps it, and
+  keeps the apps it carries (Carpe Diem, The Forge, Inkwell, Lakay): about a minute of work once (r120's seed; later starts only count
+  what is kept). The heads' own seals (Home 132 px, Concordia 71, Vocatio 53) and Home's six orbs still move inside their drawings; the
+  WebGL heads (Adamas, Vesta) cannot be measured here (no graphics chip).
+- rig: t_717_wk_spin.js and .py, t_717_seal_cmp.js and .py, t_717_seal_gc.js, t_717_wk_heat.js. r222: the 7.17 news.
+
 Ingenium 7.16 (15 November 2026): the turret as a toy and the compact Models page (her approved design), Mentes, a finger in the
 heads, lighter at rest. Her words that day, sending version 15 of the turret's live preview as "the approved turret redesign": "remove
 the white outline that is around the big circle of the turret's surface, it is detracting from the overall look of the 3D design

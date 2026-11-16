@@ -1096,8 +1096,10 @@ function vcDialArt(g0,c,nt){var f=function(v){return v.toFixed(2);},i,a,k,id="sk
 /* a layer's facets lit as they stand now: turned by A, with the room's light moved by L */
 function vcFacets(sv,A,nt,VI,VN){var r=A*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),o=[0,0,0],F=sv.__fc;
   for(var i=0;i<F.length;i++){var q=F[i],nx=q.nx*c-q.ny*sn,ny=q.nx*sn+q.ny*c,ux=q.u[0]*c-q.u[1]*sn,uy=q.u[0]*sn+q.u[1]*c;
-    if(q.mat==="s")vcSilver(nx-.1*ux,ny-.1*uy,q.nz,nt,o);else vcEnamel(nx-.1*ux,ny-.1*uy,q.nz,q.mat==="n"?VN:VI,nt,o);q.s0.setAttribute("stop-color",vcHex(o));
-    if(q.mat==="s")vcSilver(nx+.12*ux,ny+.12*uy,q.nz,nt,o);else vcEnamel(nx+.12*ux,ny+.12*uy,q.nz,q.mat==="n"?VN:VI,nt,o);q.s1.setAttribute("stop-color",vcHex(o));}}
+    if(q.mat==="s")vcSilver(nx-.1*ux,ny-.1*uy,q.nz,nt,o);else vcEnamel(nx-.1*ux,ny-.1*uy,q.nz,q.mat==="n"?VN:VI,nt,o);var h0=vcHex(o);if(q.h0!==h0){q.h0=h0;q.s0.setAttribute("stop-color",h0);}
+    if(q.mat==="s")vcSilver(nx+.12*ux,ny+.12*uy,q.nz,nt,o);else vcEnamel(nx+.12*ux,ny+.12*uy,q.nz,q.mat==="n"?VN:VI,nt,o);var h1=vcHex(o);if(q.h1!==h1){q.h1=h1;q.s1.setAttribute("stop-color",h1);}}}
+/* 7.17 (heat): a facet's colour stop is written only when its colour has changed; every write made the browser restyle and redraw the
+   facets' drawing, and most of them came out the same as before */
 /* the chapter ring that turns: its engraved degrees, the stages' names in the violet enamel, and the inlay of the stages done */
 function vcRingSvg(list,nt){var n=list.length,c=157,s0=svg("svg",{viewBox:"0 0 314 314","class":"skv-scale","aria-hidden":"true"}),s=svg("g",{"class":"rot"}),i,a,f=function(v){return v.toFixed(2);};s0.appendChild(s);
   var s1=svg("svg",{viewBox:"0 0 314 314","class":"skv-scale skv-names","aria-hidden":"true"}),sN=svg("g",{"class":"rot"});s1.appendChild(sN);
@@ -1315,7 +1317,9 @@ function vcRipple(st,h){if(h.gx==null||still())return;var r=mk("i","skv-ripple")
 function vcMove(st){if(st.mraf===-1&&st.idle){clearTimeout(st.idle);st.idle=0;st.mraf=0;}if(st.mraf)return;if(still()){st.tilt.style.transform="";return;}
   st.mraf=requestAnimationFrame(function fr(ts){st.mraf=0;if(!st.t0)st.t0=ts;var dt=st.lt?Math.min(.034,(ts-st.lt)/1000):.016;st.lt=ts;
     if(still()||!st.tilt.isConnected){st.lt=0;if(still())st.tilt.style.transform="";return;}   /* 7.16: Minimal motion chosen while the compass moves: it stands still at rest, not tilted where it stopped */
-    var hd=st.tilt.offsetParent===null||(st.head&&st.head.classList.contains("is-away"));if(hd){st.lt=0;clearTimeout(st.poll);st.poll=setTimeout(function(){vcMove(st);},450);return;}
+    /* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
+    if(!st.io&&W.IntersectionObserver){st.seen=true;try{st.io=new IntersectionObserver(function(es){st.seen=es[es.length-1].isIntersecting;if(st.seen)vcMove(st);});st.io.observe(st.tilt);}catch(e){st.io=null;}}
+    var hd=(st.io?st.seen===false:st.tilt.offsetParent===null)||(st.head&&st.head.classList.contains("is-away"));if(hd){st.lt=0;clearTimeout(st.poll);st.poll=setTimeout(function(){vcMove(st);},450);return;}
     st.tH+=dt;st.h+=((st.hold?1:0)-st.h)*Math.min(1,dt*4);var w=st.tH*2*Math.PI/10,iy=11*Math.sin(w),ix=-4*Math.sin(w);
     var ty=st.hold?st.hx*28:0,tx=st.hold?-st.hy*20:0;st.vy+=(62*(ty-st.ly)-11*st.vy)*dt;st.ly+=st.vy*dt;st.vx+=(62*(tx-st.lx)-11*st.vx)*dt;st.lx+=st.vx*dt;
     var k=1-.7*st.h,RX=ix*k+st.lx,RY=iy*k+st.ly;st.RX=RX;st.RY=RY;

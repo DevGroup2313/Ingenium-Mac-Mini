@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.17", "No cartridge blinks out of view on the turret in Safari any more, on a Mac, an iPhone or an iPad: the whole turret now tilts as one surface, each part keeping its depth by a small shift as it tilts, so the purple cartridge stays whole in every frame while the turret spins."],
+  ["7.17", "An empty cartridge on the turret now has the same deep ring, seat and lip as a full one, with an empty cup inside them: lighter than before by day, darker by night."],
+  ["7.17", "Lighter to run in Safari, on a Mac, an iPhone and an iPad: the top bar's seal is now turned by the graphics chip, with the same motion and an engine drawn a little crisper. Measured in Safari's engine, a page at rest now takes between a fifth and three fifths less of the processor's time."],
+  ["7.17", "The turret on Mentes asks less of the browser while it sways: the page is laid out half as often as before."],
   ["7.16", "The Models page is now called Mentes, the minds: the same page, with a name of its own beside Concordia, Ingenia and Vesta."],
   ["7.16", "Mentes opens on the turret as a toy: press any part of it, turn it by hand, or flick it and let it spin. It loads nothing, so a model is never loaded by accident; a model loads from the Load key beside it in Your models. The pale ring round the turret's plate is gone, by day and by night, and no cartridge blinks out of view while the turret spins."],
   ["7.16", "Mentes without endless scrolling: opening a room folds the turret to a band (press the band to unfold it); Ingenium's four houses stand in one row, with one house's models on a shelf below them; More models opens in divider tabs, Downloads in a drawer, and a model's description in a raised sheet."],
