@@ -8,7 +8,8 @@ maker, so the two can disagree:
   win: the icon table names each picture with its true size, and each picture is a PNG of that size; the files after the
        program read back (shell.txt, shell.json, the page); (6.70) its version resource gives the app's own name as its
        FileDescription and ProductName and its file as OriginalFilename, so Windows names it by its name, not "Name.exe".
-    python verify_desktop_app.py mac|win <made.zip> [id] [title]     -> prints one JSON line; exit 1 when anything is wrong"""
+    python verify_desktop_app.py mac|win <made.zip> [id] [title]     -> prints one JSON line; exit 1 when anything is wrong
+    python verify_desktop_app.py win "<App> Setup.exe" [id] [title]  (7.24: the app's own installer, one file)"""
 import hashlib, io, json, plistlib, struct, sys, zipfile
 
 try:
@@ -132,7 +133,14 @@ def win(zf, want_id, want_title):
     name = exes[0]
     if want_title:
         check(name == want_title + ".exe", "the program is named for the app (%s)" % name)
-    b = zf.read(name)
+    return win_program(name, zf.read(name), want_id, want_title, False)
+
+
+def win_program(name, b, want_id, want_title, setup):
+    """7.24: the program itself; setup when it is the app's own installer, "<App> Setup.exe" (its own name the app's, "<App>.exe")"""
+    own = name[:-len(" Setup.exe")] + ".exe" if setup and name.endswith(" Setup.exe") else name
+    if setup and want_title:
+        check(name == want_title + " Setup.exe", "the installer is named for the app (%s)" % name)
     check(b[:2] == b"MZ", "a Windows program")
     e = struct.unpack("<I", b[0x3C:0x40])[0]
     check(b[e:e + 4] == b"PE\0\0", "a PE program")
@@ -201,7 +209,7 @@ def win(zf, want_id, want_title):
         if want_title:
             check(strings.get("FileDescription") == want_title, "Windows names the program by the app's name (FileDescription %r)" % strings.get("FileDescription"))
             check(strings.get("ProductName") == want_title, "its product name is the app's name (%r)" % strings.get("ProductName"))
-        check(strings.get("OriginalFilename") == name, "its original file name is its file's (%r)" % strings.get("OriginalFilename"))
+        check(strings.get("OriginalFilename") == own, "its original file name is the app's program's (%r)" % strings.get("OriginalFilename"))
     check(b[-8:] == b"INGWWW01", "the app's files follow the program, with their mark")
     n, = struct.unpack("<Q", b[-16:-8])
     pz = zipfile.ZipFile(io.BytesIO(b[-16 - n:-16]))
@@ -212,17 +220,26 @@ def win(zf, want_id, want_title):
         check(conf.get("title") == want_title, "shell.txt names the app (%s)" % conf.get("title"))
     check(conf.get("page") in pz.namelist(), "the page shell.txt names is there (%s)" % conf.get("page"))
     check(all(i.compress_type == 0 for i in pz.infolist()), "the app's files are stored as they are (the shell reads them so)")
+    if setup:   # 7.24: the installer's page, and what it is told: the app's file name and its publisher
+        check("__setup/index.html" in pz.namelist(), "the installer's page is inside (__setup/index.html)")
+        if "__setup/index.html" in pz.namelist():
+            sp = pz.read("__setup/index.html").decode("utf-8")
+            check(want_title == "" or ("<title>%s Setup</title>" % want_title) in sp, "the installer's page names the app")
+        check(conf.get("name") == own[:-4], "shell.txt names the program's file (%s)" % conf.get("name"))
     return {"program": name, "bytes": len(b), "icons": seen, "id": conf.get("id"), "page": conf.get("page"), "names": strings,
-            "page_bytes": len(pz.read(conf["page"])) if conf.get("page") in pz.namelist() else 0, "files": pz.namelist()}
+            "page_bytes": len(pz.read(conf["page"])) if conf.get("page") in pz.namelist() else 0, "files": pz.namelist(),
+            "publisher": conf.get("publisher", ""), "setup": setup}
 
 
 if __name__ == "__main__":
     kind, path = sys.argv[1], sys.argv[2]
     want_id = sys.argv[3] if len(sys.argv) > 3 else ""
     want_title = sys.argv[4] if len(sys.argv) > 4 else ""
-    zf = zipfile.ZipFile(path)
     try:
-        out = (mac if kind == "mac" else win)(zf, want_id, want_title)
+        if kind == "win" and path.lower().endswith(".exe"):   # 7.24: the installer, one file
+            out = win_program(path.replace("\\", "/").split("/")[-1], open(path, "rb").read(), want_id, want_title, True)
+        else:
+            out = (mac if kind == "mac" else win)(zipfile.ZipFile(path), want_id, want_title)
     except Exception as e:   # anything unreadable is a fault in what was made
         out = {}
         bad.append("could not be read: %r" % e)

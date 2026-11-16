@@ -54,7 +54,7 @@ function kb(n){try{return fmtBytes(n);}catch(e){return n+" bytes";}}
 /* the devices, as the Forge shows them; a kit is the project GitHub (or the computer) builds into the app */
 var DEV=[
   {k:"mac",e:"🍎",t:"Mac (MacBook and Mac mini)",d:"The app itself, made here: one app for Apple silicon (your Mac mini) and Intel (your MacBook), macOS 12 or newer. Drag it to Applications; the first time, Control-click it and choose Open.",kind:"mac",alt:{label:"Or the Mac projects",kits:["mac","macarm"]}},
-  {k:"windows",e:"🪟",t:"Windows",d:"The app itself, made here: one program that opens as it is on Windows 10 and 11, with nothing to install. The first time, Windows may ask: More info, then Run anyway.",kind:"win",alt:{label:"Or the Windows project",kits:["windows"]}},
+  {k:"windows",e:"🪟",t:"Windows",d:"The app itself, made here: its own installer for Windows 10 and 11, for everyone on this PC or just for you, or opened without installing. The first time, Windows may ask: More info, then Run anyway.",kind:"win",alt:{label:"Or the Windows project",kits:["windows"]}},
   {k:"ipa",e:"📱",t:"iPhone and iPad",d:"The app itself (.ipa), made here. Sideloadly or AltStore installs it from a computer with your Apple ID (seven days with a free Apple ID, a year with a paid one).",kind:"ipa",alt:{label:"Or the Xcode projects",kits:["iphone","ipad"]}},
   {k:"apk",e:"🔥",t:"Fire and Android",d:"The app itself (.apk), made and signed here: open it on the tablet to install it. Signed with the same key, each new one installs over the last and keeps your work.",kind:"apk",alt:{label:"Or the Android project",kits:["fire"]}},
   {k:"web",e:"🌐",t:"Web",d:"An installable site: the page, its manifest, its offline worker and its icons, for any web host (https). On iPhone and iPad, Add to Home Screen.",kind:"web"},
@@ -120,7 +120,8 @@ function make(d,P,html,said,alt){var bytes=te.encode(html),page=P.page||"index.h
   if(d.kind==="mac"||d.kind==="win"){var M=d.kind==="mac"?IngMac:IngWin,vm=String(P.version||"1.0").replace(/^v(?=\d)/,"");said("Drawing its icon…");
     return M.iconsFor(html,P.title,"#6a3fb5",P.app&&window.ING_SEALS&&ING_SEALS[P.app]?"data:image/png;base64,"+ING_SEALS[P.app].b64:null).then(function(icons){
       return M.make({html:bytes,page:page,title:P.title,id:P.id,versionName:vm,build:String(IngApk.versionCodeNow()),icons:icons,bridges:P.ios,onStep:said});})
-      .then(function(a){return [{name:stem(P.title)+"-"+(d.kind==="mac"?"mac":"windows")+"-"+stem(vm)+".zip",mime:"application/zip",bytes:a.bytes,info:a}];});}
+      .then(function(a){if(a.kind==="setup")return [{name:a.fileName,mime:a.mime,bytes:a.bytes,info:a}];   /* 7.24: "<App> Setup.exe" */
+        return [{name:stem(P.title)+"-"+(d.kind==="mac"?"mac":"windows")+"-"+stem(vm)+".zip",mime:"application/zip",bytes:a.bytes,info:a}];});}
   said("Drawing its icons…");
   return IngApk.iconsFor(html,P.title,"#6a3fb5",P.app&&window.ING_SEALS&&ING_SEALS[P.app]?"data:image/png;base64,"+ING_SEALS[P.app].b64:null).then(function(icons){var vn=String(P.version||"1.0").replace(/^v(?=\d)/,"");
     if(d.kind==="apk")return IngApk.make({html:bytes,page:page,title:P.title,id:P.id,versionName:vn,icons:icons.android,background:"#ffffff",bridges:P.and,alias:P.alias,keyId:P.keyId||"device",onStep:said})

@@ -840,7 +840,8 @@ var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android dev
   ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],
   ["mac","Mac app","For a MacBook or a Mac mini (Apple silicon and Intel in one): drag it to Applications and open it"],
   /* 6.70: no "(.exe)" in its name (her words, 10 November 2026: "I want the "exe" to be removed from the app's name") */
-  ["win","Windows app","For a Windows 10 or 11 PC: one file that opens as it is, with nothing to install"],
+  /* 7.24: its own installer (her approved preview, 16 November 2026) */
+  ["win","Windows app","For a Windows 10 or 11 PC: its own installer, for everyone on this PC or just for you, or opened without installing"],
   ["web","Web app (.zip)","Installs from a browser and works offline; on iPhone and iPad, Add to Home Screen"],
   ["page","One page (.html)","The whole app in one file, for any browser"],
   ["kits","Build kits (.zip)","Projects to build the apps on a computer or online: you choose the devices"]];
@@ -935,6 +936,8 @@ function makeDevice(r,what){var P=pkgOf(r),said=function(t){say(r,what,t);};
       return M.iconsFor(x.html,P.title,colorOf(r),flatSrc(P.app)||null).then(function(icons){making(r,what,45);
         return M.make({html:x.bytes,page:x.page.split("/").pop(),title:P.title,id:P.id,versionName:vn,build:String(IngApk.versionCodeNow()),icons:icons,bridges:P.ios,onStep:said});})
         .then(function(a){var stem=(P.title.replace(/[^\w.-]+/g,"-").replace(/^-+|-+$/g,"")||"app")+"-"+(what==="mac"?"mac":"windows")+"-"+vn.replace(/[^\w.-]+/g,"");
+          /* 7.24: the Windows app is its own installer, saved under the name Windows shows: "<App> Setup.exe" */
+          if(a.kind==="setup")return {name:a.fileName,mime:a.mime,bytes:a.bytes,commit:x.commit,info:{at:Date.now(),size:a.size,sha256:a.sha256,id:a.id,setup:true}};
           return {name:stem+".zip",mime:"application/zip",bytes:a.bytes,commit:x.commit,info:{at:Date.now(),size:a.size,sha256:a.sha256,id:a.id}};});}
     return IngApk.iconsFor(x.html,P.title,colorOf(r),flatSrc(P.app)||null).then(function(icons){var page=x.page.split("/").pop(),stem=(P.title.replace(/[^\w.-]+/g,"-").replace(/^-+|-+$/g,"")||"app")+"-"+vn.replace(/[^\w.-]+/g,"");
       making(r,what,45);

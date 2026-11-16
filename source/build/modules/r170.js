@@ -266,7 +266,7 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
   step("Opening the shell");
   return (o.shell?Promise.resolve(o.shell):winShellExe()).then(function(shell){var exe=bareShell(shell).slice();
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
-    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,ownerLine(title));
+    step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,publisher||ownerLine(title));
     step("Putting its files in");
     var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+vn,"name="+name,"publisher="+publisher,"made=Ingenium Fabrica",""].join("\n")),store:true},
       {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];

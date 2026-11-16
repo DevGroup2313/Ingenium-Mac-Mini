@@ -775,7 +775,7 @@ function paintReleases(r,w,f){var x=X(),C=x.C,MADE=W.fbMade;
       if(!mine.length&&!missing.length)return;var row=el("div","r298-dev");row.innerHTML='<span class="ic">'+ICON[dv[2]]+"</span><b>"+esc(dv[1])+"</b>";var as=el("div","r298-assets");
       mine.forEach(function(m){var a=el("div","r298-asset","<b>"+esc(m.name)+"</b><small>"+esc(kb(m.size)+" · made "+ago(m.at))+"</small>"),k=el("div","k");
         if(A()&&m.kind==="mac"&&os==="macOS")k.appendChild(key("sm pri","Install on this Mac",function(){installSheet(r,m,"mac");},"Into Applications, where Launchpad and Spotlight find it"));
-        if(A()&&m.kind==="win"&&os==="Windows")k.appendChild(key("sm pri","Install on this PC",function(){installSheet(r,m,"win");},"Into your programs, the Start menu and the desktop, and Settings, Apps to uninstall it"));
+        if(A()&&m.kind==="win"&&os==="Windows")k.appendChild(key("sm pri","Install on this PC",function(){installSheet(r,m,"win");},/\.exe$/i.test(m.name)?"Opens its installer: for everyone on this PC or just for you":"Into your programs, the Start menu and the desktop, and Settings, Apps to uninstall it"));
         k.appendChild(key("sm quiet","Save",function(e,b){b.disabled=true;MADE.bytes(m.key).then(function(u){if(!u)throw new Error("it is no longer kept here: make it again");return x.saveBytes(m.name,m.mime,u);}).then(function(){b.disabled=false;toast("Saved: "+m.name+".");},function(er){b.disabled=false;fail(er);});}));
         k.appendChild(key("sm quiet","Remove",function(){MADE.del([m.key]).then(function(){delete C.log[ck];x.paintWork();toast(m.name+" is no longer kept here.");},fail);}));a.appendChild(k);as.appendChild(a);});
       missing.forEach(function(kd){var t2=(x.TARGETS||[]).filter(function(y){return y[0]===kd;})[0];var a=el("div","r298-asset miss","<b>"+esc(t2?t2[1]:kd)+": not made yet</b><small>"+esc(t2?t2[2]:"")+"</small>"),k=el("div","k");
@@ -792,8 +792,10 @@ function paintReleases(r,w,f){var x=X(),C=x.C,MADE=W.fbMade;
     q.then(function(){delete C.log[ck];x.paintWork();toast(done+" made"+(bad.length?"; not made: "+bad.join("; "):"")+". Each is kept here, under its device.");});}));
   else f.appendChild(key(ht?"":"quiet","Make its packages",function(){x.S.panel="ship";if(x.one&&x.one())x.setPanel("ship");try{if(W.fbRooms)W.fbRooms.part("ship");}catch(er){}var e2=$("fbTargets");if(e2)e2.scrollIntoView({block:"nearest",behavior:"smooth"});}));}
 /* ---------- Install on this Mac, Install on this PC ---------- */
-function installSheet(r,m,kind){var x=X(),P=x.pkgOf?x.pkgOf(r):{title:r.name,id:""},title=P.title||r.name;
+function installSheet(r,m,kind){var x=X(),P=x.pkgOf?x.pkgOf(r):{title:r.name,id:""},title=P.title||r.name,setup=kind==="win"&&/\.exe$/i.test(m.name||"");
+  /* 7.24: a Windows app made from 7.24 is its own installer ("<App> Setup.exe"), which asks how to install it itself */
   var sh=x.sheet(kind==="mac"?"Install "+title+" on this Mac":"Install "+title+" on this PC",kind==="mac"?"It goes into Applications, where Launchpad and Spotlight find it, with its own icon; a copy there already is replaced.":
+    setup?"Its own installer opens: for everyone on this PC (Windows asks for an administrator first) or just for you, with a shortcut on the desktop if you like. It makes its Start menu entry and its entry in Settings, Apps, where Uninstall takes it away again. Its work stays on this PC.":
     "It is installed for you alone, with no administrator password: in your programs folder, in the Start menu and on the desktop, and in Settings, Apps, where Uninstall takes it all away again. Its work stays on this PC.");
   var where="all",pick=el("div","r298-pick");
   if(kind==="mac"){[["all","▣","Into Applications","Every account on this Mac can open it; if macOS asks, the one for your own account is used"],["mine","⌂","Into my own Applications folder","Only you; nothing is asked"]].forEach(function(it){var b=el("button","f-opt");b.type="button";
@@ -801,11 +803,11 @@ function installSheet(r,m,kind){var x=X(),P=x.pkgOf?x.pkgOf(r):{title:r.name,id:
       b.addEventListener("click",function(){where=it[0];[].forEach.call(pick.children,function(c){c.setAttribute("aria-pressed",c===b?"true":"false");});});pick.appendChild(b);});sh.box.appendChild(pick);
     sh.box.appendChild(el("p","f-hint","Made here, on this Mac, it opens as it is. A copy carried in from another computer is asked about once by macOS: Control-click it, then Open."));}
   else sh.box.appendChild(el("p","f-hint","The program is not signed with a certificate, so the first time Windows may ask: choose More info, then Run anyway."));
-  var end=el("div","end"),k=key("pri","Install and open it",function(){k.disabled=true;var tok=null;
+  var end=el("div","end"),k=key("pri",setup?"Open its installer":"Install and open it",function(){k.disabled=true;var tok=null;
     W.fbMade.bytes(m.key).then(function(u){if(!u)throw new Error("it is no longer kept here: make it again");return call("runs_install_begin",[m.name,u.length]).then(function(b){tok=b.token;var CH=2*1024*1024,q=Promise.resolve();
         for(var i=0;i<u.length;i+=CH)(function(i){q=q.then(function(){return call("runs_install_put",[tok,b64(u.subarray(i,i+CH))]);});})(i);return q;});})
     .then(function(){return call("runs_install_go",[tok,{title:title,id:P.id||"",version:P.version||"",where:where,publisher:""}]);})
-    .then(function(res){sh.close();toast(title+" is installed in "+(res.where||"its place")+", and open.");},function(e){k.disabled=false;fail(e);});});
+    .then(function(res){sh.close();toast(res&&res.setup?title+"'s installer is open: choose how to install it there.":title+" is installed in "+(res.where||"its place")+", and open.");},function(e){k.disabled=false;fail(e);});});
   end.appendChild(k);sh.box.appendChild(end);}
 /* ---------- Needs you, at the top of Your apps ---------- */
 function needs(force){var x=X();if(!x||!x.C)return;if(!force&&ST.needs&&Date.now()-ST.needsAt<15000){drawNeeds();return;}ST.needsAt=Date.now();
@@ -878,7 +880,7 @@ var LMODE=false,CAP=null;
 var CAPS={room:{now:["Now","GitHub: the Code tab and your uncommitted changes"],story:["Story","GitHub: Commits, Compare and Releases"],plans:["Plans","GitHub: Branches, Issues, Pull requests, Projects and the Wiki"],runs:["Runs","GitHub: Actions"],care:["Care","GitHub: Checks, Insights and Settings"]},
   part:{test:["Test","GitHub: status checks · Fabrica's own, on this device"],ship:["Ship","GitHub: a release's assets · an app for each device"],copies:["Copies","git: clone, bundle · GitHub: download, fork"],ingenium:["Ingenium","GitHub: Copilot · here your own model, offline"]},
   text:{"Keep this version":"git commit","Put back":"git restore","Run it now":"GitHub: Run workflow (workflow_dispatch)","Re-run the failed jobs":"GitHub: Re-run failed jobs","Run it again":"GitHub: Re-run all jobs",
-    "Explain this error":"your own model reads the log","Install on this Mac":"copies the app into Applications","Install on this PC":"installs it for you, with Settings, Apps to uninstall","Make the missing ones":"a release's assets, made here",
+    "Explain this error":"your own model reads the log","Install on this Mac":"copies the app into Applications","Install on this PC":"opens its installer: for everyone on this PC or just for you","Make the missing ones":"a release's assets, made here",
     "Mark the version kept now as a release":"git tag","New workflow, from a recipe":"GitHub: New workflow","Stop":"GitHub: Cancel workflow","Remove this run":"GitHub: Delete workflow run","The workflow's file":"GitHub: View workflow file","Add to its release":"GitHub: upload a release asset"}};
 function setLM(on){LMODE=!!on;var x=X();if(x&&x.FBS){x.FBS().learning=LMODE;x.saveSoon&&x.saveSoon();}if(!LMODE&&CAP)CAP.classList.remove("on");if(LMODE)toast("Learning mode: point at any key in Fabrica to see its names on GitHub and in git.");}
 function capFor(b){if(b.classList.contains("fr-room"))return CAPS.room[b.getAttribute("data-room")];if(b.classList.contains("fr-part"))return CAPS.part[b.getAttribute("data-part")];
@@ -893,7 +895,7 @@ D.addEventListener("pointerout",function(e){if(CAP&&(!e.relatedTarget||!$("fb")|
 function dressShip(){var sec=$("fbPartSec_ship")||(function(){var tg=$("fbTargets");return tg&&tg.closest(".f-sec");})();if(!sec||sec.querySelector(".r298-where"))return;var tg=$("fbTargets");if(!tg)return;
   var p=el("p","f-hint r298-where","Made here, in seconds, with nothing to install: Ingenium carries the part of each app that needs a compiler. Each is kept under Releases, on its device's row"+(A()?"; the Mac and Windows apps install from there, on this computer":"")+". A workflow of the app's own runs under Runs, with every step and log kept.");
   tg.parentNode.insertBefore(p,tg);
-  if(A()&&ST.here==="Windows"){var wc=tg.querySelector('.f-tg[data-k="win"] small');if(wc)wc.textContent="One file that opens as it is; under Releases, Install on this PC puts it in the Start menu and in Settings, Apps, to uninstall.";}}
+  if(A()&&ST.here==="Windows"){var wc=tg.querySelector('.f-tg[data-k="win"] small');if(wc)wc.textContent="Its own installer, one file; under Releases, Install on this PC opens it, for everyone on this PC or just for you.";}}
 /* ---------- moving between the views ----------
    nav(v): the room of the view chosen (its tabs shown), then the view; a run opened stays open (the rooms may press the room's last tab
    on the way, and the Runs tab pressed by hand shows the list, as GitHub's Actions tab does) */
