@@ -234,13 +234,13 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.24", "A Windows app made in Fabrica is now its own installer, one file named for the app with Setup after it, in Ingenium's look: for everyone on this PC or just for you, a shortcut on the desktop if you like, or open it without installing.", "fabrica"],
+  ["7.24", "Installed, it has its own Start menu and desktop shortcuts and an entry in Settings, Apps with its version and publisher; Uninstall there removes it and keeps its saved work unless you tick to remove that too. An update goes where it already is.", "fabrica"],
+  ["7.24", "Under Releases, Install on this PC now opens the app's installer, which asks how to install it.", "fabrica"],
   ["7.23", "The apps Fabrica makes carry their own version, read from the app itself, so a ready-made app is no longer numbered 1.0.", "fabrica"],
   ["7.23", "The Forge, Carpe Diem, Inkwell and Lakay are read by their own marks: The Forge 656, Carpe Diem 1091 and Inkwell 7.52 are made as themselves.", "master"],
   ["7.23", "A Mac app made in Fabrica gives its owner's name as its copyright, and a Windows program its owner as its company; neither names Ingenium any longer, nor does its note on how to open it.", "fabrica"],
   ["7.23", "A repository opened from your drive or brought in from a file is known as one of the family's apps by its name, so it wears that app's own seal and ids; names are matched as whole words, so an app named Forget Me Not is not taken for The Forge.", "master"],
-  ["7.24", "A Windows app made in Fabrica is now its own installer, one file named for the app with Setup after it, in Ingenium's look: for everyone on this PC or just for you, a shortcut on the desktop if you like, or open it without installing.", "fabrica"],
-  ["7.24", "Installed, it has its own Start menu and desktop shortcuts and an entry in Settings, Apps with its version and publisher; Uninstall there removes it and keeps its saved work unless you tick to remove that too. An update goes where it already is.", "fabrica"],
-  ["7.24", "Under Releases, Install on this PC now opens the app's installer, which asks how to install it.", "fabrica"],
   ["7.22", "Adamas draws its scene twenty times a second at rest instead of thirty, and ten while Ingenium is not the window in use or after two minutes untouched, back at once on your next touch; every frame as sharp as before, so the graphics chip, and the fan, work less."],
   ["7.22", "Home keeps its size when you come back to it: its header no longer shows small for a moment and then grows. No page slides up as it comes in now; each only fades in."],
   ["7.22", "On a tablet held upright, the 3D object of a stacked header stands in the middle of its card, as wide as the card, with no empty space beneath it."],
@@ -472,8 +472,8 @@ var NEW=[
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
 /* x[2]: "career" where the Career Studio is, "nocareer" where it is not (the same news in the words of an edition without it), "fabrica" where
    Fabrica is (6.33), "master" in the master edition alone */
-/* 7.24: Fabrica's lines are known by Fabrica's own module (window.fbHubHost, set as it loads, before this one), not by its page, which
-   it adds later: on 7.24's first page the list was written before the page existed and left out every line of 7.24 (all Fabrica's) */
+/* 7.24: Fabrica's lines are also known by Fabrica's own module (window.fbHubHost, set as it loads, before this one), so they never
+   depend on when its page is added. (7.24's first page showed 7.23 on the key for another reason: its lines were put after 7.23's.) */
 function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||!!W.fbHubHost||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
