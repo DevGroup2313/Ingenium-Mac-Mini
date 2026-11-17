@@ -20,3 +20,11 @@ Published (private): https://claude.ai/artifact/55kQPJwfrgahiHc6GkrbJG (version 
 - adamas_diamond_colours.html: the preview as published.
 When approved: r314v2.js becomes build/modules/r314.js (rig/t_729_diamond_colours.js then follows the corner key, the stones without
 keys, and the switch .dmc-sw in place of .eswitch).
+
+Version 4 (her words: "The diamonds and everything inside of the panel still look very flat and 2D and not very animated and popped
+out 3D like the main diamond for Adamas"): r314v3.js. Each stone is Adamas's diamond itself: tools/cap_all.js draws it with r292 on a
+transparent ground (a copy of r292 with a hook, W.__yawFix, to hold its turn; Minimal motion, __tFix) in each look and each jewel,
+24 frames through 45 degrees (the cut's symmetry, so the turn loops), and the holder with each band; tools/cut.py cuts them into
+stones.json (640 KB). r314v3.js holds __SPRITES__, filled from stones.json; a colour of her own outside the eight is the clear stone
+tinted on a canvas; By the hour and Any colour change stone at the end of each turn; the stones stand on a glass shelf with their
+reflection; the panel leans toward the pointer.

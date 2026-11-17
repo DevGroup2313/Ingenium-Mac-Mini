@@ -30,7 +30,7 @@ html body{background:var(--pv-bg) !important;color:var(--pv-ink);font:400 15px/1
 .pv-stage .pv-hidden{display:none !important}
 .pv-gems{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
 .pv-gem{display:grid;justify-items:center;gap:6px;padding:12px 6px 10px;background:var(--pv-plate);border:1px solid var(--pv-line);border-radius:14px;box-shadow:var(--pv-shadow);font-size:12.5px;color:var(--pv-ink2);text-align:center}
-.pv-gem .dmc-t svg{width:58px;height:58px;overflow:visible;filter:drop-shadow(0 3px 3px rgba(30,10,60,.3))}.pv-gem .dmc-t{perspective:200px}
+.pv-gem .dmc-st{--sw:92px}.pv-gem .dmc-hd{--hw:96px;margin:10px 0 6px}.pv-gem{min-height:120px;align-content:end}
 .pv-pics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (max-width:820px){.pv-pics{grid-template-columns:minmax(0,1fr)}}
 .pv-pics figure{margin:0;background:var(--pv-plate);border:1px solid var(--pv-line);border-radius:14px;overflow:hidden;box-shadow:var(--pv-shadow)}
@@ -66,8 +66,8 @@ html body{background:var(--pv-bg) !important;color:var(--pv-ink);font:400 15px/1
   </div>
 
   <section style="display:grid;gap:12px">
-    <h2>Every diamond, cut as the 3D one is</h2>
-    <p>Each is a brilliant seen from the side, as Adamas's diamond is: its table, six crown facets, four pavilion facets and the girdle, lit from the upper left, white where facets meet, with Ingenium's four-pointed glint. By the hour carries the four looks in its facets. The holder's band is shown on a small holder.</p>
+    <h2>Every stone is the 3D diamond itself</h2>
+    <p>Each stone here is Adamas's diamond, drawn by its own renderer in that colour and turning through an eighth of a turn (the cut repeats itself every eighth), twenty-four pictures a turn; each stands on a glass shelf with its reflection. By the hour passes through its four looks, one each turn. The band is the real holder with that band.</p>
     <div class="pv-gems" id="pvGems"></div>
   </section>
 
@@ -111,9 +111,9 @@ function applyTheme(){document.body.setAttribute("data-theme",state.theme);docum
   [].forEach.call(D.querySelectorAll(".pv-seg"),function(seg){seg.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var k=seg.getAttribute("data-k"),v=b.getAttribute("data-v");pick(seg,v);
     if(k==="theme"){state.theme=v;applyTheme();try{IngDiamond.kick();}catch(x){}}else{var o={};o[k]=v;try{IngDiamondColours.layout(o);}catch(x){}}});});
   D.getElementById("pvOpen").addEventListener("click",function(){try{IngDiamondColours.open();}catch(x){}});
-  function gems(){var G=window.IngDiamondColours;if(!G||!G.gem){setTimeout(gems,200);return;}var box=D.getElementById("pvGems"),items=[["By the hour",G.gem(["#dfe9f7","#b9a0ee","#7a4bd6","#3c2878"])],["Clear crystal",G.gem("#dfe9f7")],["Lavender",G.gem("#b9a0ee")],["Purple",G.gem("#7a4bd6")],["Night stone",G.gem("#3c2878")]];
-    G.jewels().forEach(function(j){items.push([j.name,G.gem(j.hex)]);});
-    items.forEach(function(it,ix){var d=D.createElement("div");d.className="pv-gem";d.style.setProperty("--i",String(ix));d.innerHTML='<span class="dmc-t">'+it[1]+"</span>";var s=D.createElement("span");s.textContent=it[0];d.appendChild(s);box.appendChild(d);});}
+  function gems(){var G=window.IngDiamondColours;if(!G||!G.stone){setTimeout(gems,200);return;}var box=D.getElementById("pvGems"),items=[["Clear crystal",G.stone("clear",1)],["Lavender",G.stone("lavender",2)],["Purple",G.stone("purple",3)],["Night stone",G.stone("night",4)]];
+    G.jewels().forEach(function(j,ix){items.push([j.name,G.stone(j.hex,ix+5)]);});items.push(["The band: Ingenium's violet",G.holder(null,1)]);items.push(["The band: Sapphire",G.holder("#2f5bd3",2)]);
+    items.forEach(function(it,ix){var d=D.createElement("div");d.className="pv-gem";d.style.setProperty("--i",String(ix));d.innerHTML=it[1];var s=D.createElement("span");s.textContent=it[0];d.appendChild(s);box.appendChild(d);});}
   gems();
 })();
 </script>
