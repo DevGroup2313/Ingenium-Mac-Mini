@@ -395,6 +395,17 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.32 (17 November 2026): the day's clear crystal at night.
+Her words (17 November 2026): "I also want a clear or silver diamond crytsal look option in Night mode too. Basically, I want to see the
+day mode clear crystal made also available on night mode."
+- `build/modules/r292.js`: a night look may be the day's clear crystal (family() n.cd): by night the stone alone is lit by the day's room
+  and drawn with the day's tone curve as the clear crystal is by day, while the room around it stays the night's, under northern lights in
+  every colour.
+- `build/modules/r314.js`: At night has a fourth choice, Clear crystal (its picture the day's clear crystal stone), whatever the stone by
+  day; the note and Settings' tile say so.
+- What is new (r222). rig: `t_731_diamond_families.js` checks it (Ruby by day, the clear crystal by night, the brightest of the night
+  looks).
+
 Ingenium 7.31 (17 November 2026): the diamond's colours in families of gemstones, each with a night of its own; the northern lights in
 the stone's colour.
 Her words (17 November 2026): "I want the light blue pastel shade that I love from Carpe Diem's sticky notes to be among the diamond colour

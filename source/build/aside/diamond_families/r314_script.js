@@ -40,7 +40,9 @@ var SRC=__SRC__,AURH=1.9,CLEARN_G=1.15;
    please also add it as an option for Night mode look for the diamond"): the family's own night, or, whatever the stone by day, the
    black diamond or the silver diamond (the clear crystal's night lifted, as she saw it on its first picture), under northern lights in
    every colour */
-var NIGHTS=[["own","Its own"],["black","Black diamond"],["silver","Silver diamond"]],NIGHT_G={black:CLEARN_G,silver:.72};
+/* and (her words, the same day: "I also want a clear or silver diamond crytsal look option in Night mode too. Basically, I want to see the
+   day mode clear crystal made also available on night mode") the day's clear crystal itself, by night */
+var NIGHTS=[["own","Its own"],["black","Black diamond"],["silver","Silver diamond"],["clear","Clear crystal"]],NIGHT_G={black:CLEARN_G,silver:.72};
 /* Carpe Diem and Inkwell are named only in the master edition (the others carry neither app: rig/t_627_editions.js) */
 var MASTER=(function(){try{return typeof ING_EDITION==="undefined"||ING_EDITION==="master";}catch(e){return true;}})();
 var SAYF={purple:"Ingenium's own: <b>lavender</b>, the day <b>purple</b> and the <b>night stone</b>, as it has always been.",
@@ -83,7 +85,7 @@ function ownPal(h){var q=yqh(h),C=Math.sqrt(q[1]*q[1]+q[2]*q[2]),f=Math.max(.1,M
   return [[h,.25,1.5*f,g(yP,0)],[h,.25,1.8*f,g(yM,1)],[h,.25,1.7*f,g(yD,2)],[h,.25,1.5*f,1]];}
 function palOf(fam,own){return fam==="own"?ownPal(own):(PAL[fam]||null);}
 function medOf(fam,own){return fam==="purple"?"#7a4bd6":fam==="clear"?"#b8c4d6":fam==="own"?own:PAL[fam][1][0];}
-function nightOf(fam,night){return night==="black"&&fam!=="clear"||night==="silver"?{s:{h:[0,0,1,1],g:NIGHT_G[night]},cn:true,aur:"spectrum"}:null;}
+function nightOf(fam,night){if(night==="clear")return {s:null,cn:true,cd:true,aur:"spectrum"};return night==="black"&&fam!=="clear"||night==="silver"?{s:{h:[0,0,1,1],g:NIGHT_G[night]},cn:true,aur:"spectrum"}:null;}
 function famObj(fam,own,night){var n=nightOf(fam,night);
   if(fam==="purple")return n?{s:[null,null,null,null],cp:false,aur:null,n:n}:null;var t=palOf(fam,own);if(!t)return null;
   var s=t.map(function(x,i){return x?{h:[hueOf(SRC[i]),hueOf(x[0]),x[1],x[2]],g:x[3]}:null;});
@@ -114,7 +116,7 @@ function srcImg(k){var im=SRCIMG[k];if(!im){im=SRCIMG[k]=new Image();im.addEvent
   return im.complete&&im.naturalWidth?im:null;}
 function c255(v){v=Math.round(v*255);return v<0?0:v>255?255:v;}
 /* the silver diamond: the black diamond's frames, lifted (the same curve as the renderer's, on the curve the black one already has) */
-function nightSrc(fam,own,night){if(night==="black"||(night==="own"&&fam==="clear"))return SPR.img.stone_clearN;
+function nightSrc(fam,own,night){if(night==="clear")return SPR.img.stone_clear;if(night==="black"||(night==="own"&&fam==="clear"))return SPR.img.stone_clearN;
   if(night==="silver"){var key="silver";if(REC[key])return REC[key];var im=srcImg("clearN");if(!im)return SPR.img.stone_clearN;
     try{var c=D.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;var g=c.getContext("2d");g.drawImage(im,0,0);var id=g.getImageData(0,0,c.width,c.height),p=id.data,gm=NIGHT_G.silver/NIGHT_G.black;
       for(var j=0;j<p.length;j+=4){if(!p[j+3])continue;var r=p[j]/255,gg=p[j+1]/255,b=p[j+2]/255,Y=.299*r+.587*gg+.114*b,dY=Math.pow(Y>0?Y:0,gm)-Y;p[j]=c255(r+dY);p[j+1]=c255(gg+dY);p[j+2]=c255(b+dY);}
@@ -152,7 +154,7 @@ function sayOf(d){var f=famName(d.fam),fl=d.fam==="own"?"your colour":d.fam==="c
     :"From 5:00 the <b>clear crystal</b>, from 11:00 "+fl+"'s <b>pastel</b>, from 14:00 its <b>medium</b>, from 18:00 its <b>deep</b> shade. With the night theme on, its <b>night</b> shade.";
   var one=d.fam==="purple"?{pastel:"<b>Lavender</b> all day.",medium:"The day <b>purple</b> all day.",deep:"The <b>night stone</b> by day, all day."}[d.shade]
     :"Its <b>"+shadeName(d.shade).toLowerCase()+"</b> shade all day.";
-  var nt=d.night==="silver"?" At night, whatever the hour, the <b>silver diamond</b>, under northern lights in every colour.":d.night==="black"&&d.fam!=="clear"?" At night, whatever the hour, the <b>black diamond</b>, under northern lights in every colour.":"";
+  var nt=d.night==="clear"?" At night, whatever the hour, the day's <b>clear crystal</b>, under northern lights in every colour.":d.night==="silver"?" At night, whatever the hour, the <b>silver diamond</b>, under northern lights in every colour.":d.night==="black"&&d.fam!=="clear"?" At night, whatever the hour, the <b>black diamond</b>, under northern lights in every colour.":"";
   return (SAYF[d.fam]||"")+" "+(d.shade==="auto"?hour:one+" With the night theme on, its night shade shows instead"+(MASTER?", as a sticky note in Carpe Diem turns to its night paper.":"."))+nt;}
 
 var SEQ=0,PANELS=[];

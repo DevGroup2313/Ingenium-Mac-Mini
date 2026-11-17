@@ -2,12 +2,12 @@
 /* ---------- Settings, Everyday: "The diamond on Adamas" ---------- */
 function card(){if(D.getElementById("dmcCard"))return D.getElementById("dmcCard");var pg=D.getElementById("page-settings");if(!pg)return null;
   var c=mk("section","card");c.id="dmcCard";c.setAttribute("aria-labelledby","dmcCardH");var h2=mk("h2","sec");h2.id="dmcCardH";var ic=mk("span","st-ic");ic.setAttribute("aria-hidden","true");ic.innerHTML=KEYGEM;h2.appendChild(ic);h2.appendChild(D.createTextNode("The diamond on Adamas"));c.appendChild(h2);
-  c.appendChild(mk("p","small muted","The diamond at the head of Adamas: its stone, from a family of gemstones or a colour of your own, in four shades (by the hour, pastel, medium, deep) with a night shade of its own for the night theme, or the black or the silver diamond at night; the northern lights behind it take its colour; the holder's band; the light that passes through it. The same choices open from the small diamond key in the corner of Adamas's head."));
+  c.appendChild(mk("p","small muted","The diamond at the head of Adamas: its stone, from a family of gemstones or a colour of your own, in four shades (by the hour, pastel, medium, deep) with a night shade of its own for the night theme, or the black diamond, the silver diamond or the day's clear crystal at night; the northern lights behind it take its colour; the holder's band; the light that passes through it. The same choices open from the small diamond key in the corner of Adamas's head."));
   var P=panel("settings");P.keep=true;c.appendChild(P.el);
   var place=null;try{place=pg.querySelector("#rmP-settings-everyday");}catch(e){}
   if(place)place.appendChild(c);else pg.appendChild(c);return c;}
 /* the line a tile in Settings shows for it (modules/r313.js) */
-function says(){var d=get(),a=(d.fam==="own"?"Your colour":famName(d.fam))+", "+shadeName(d.shade).toLowerCase()+(d.night==="silver"?", silver at night":d.night==="black"&&d.fam!=="clear"?", black at night":"");
+function says(){var d=get(),a=(d.fam==="own"?"Your colour":famName(d.fam))+", "+shadeName(d.shade).toLowerCase()+(d.night==="clear"?", clear crystal at night":d.night==="silver"?", silver at night":d.night==="black"&&d.fam!=="clear"?", black at night":"");
   return [a,"band: "+(d.band?nameOf(d.band).replace(/ \(#.*$/,""):"Ingenium's violet"),"light "+(d.light?"on":"off")].join(" · ");}
 
 function boot(){try{card();}catch(e){}try{apply();}catch(e){}}

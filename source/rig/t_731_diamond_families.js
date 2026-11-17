@@ -79,8 +79,8 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
     return { fams: fams.map(x => (x.querySelector('.dmc-n') || {}).textContent), shades: shades.map(x => (x.querySelector('.dmc-n') || {}).textContent), nights: nts.map(x => (x.querySelector('.dmc-n') || {}).textContent), nightsReal: nts.every(real),
       real: fams.concat(shades).every(real), keyBehind: fams.concat(shades).some(x => { const cs = getComputedStyle(x); return cs.backgroundImage !== 'none' || !/rgba\(0, 0, 0, 0\)/.test(cs.backgroundColor) || cs.boxShadow !== 'none'; }),
       checked: [...d.querySelectorAll('.dmc-c[aria-checked="true"]')].map(x => (x.querySelector('.dmc-n') || {}).textContent), note: d.querySelector('.dmc-note').textContent.slice(0, 120) }; });
-  ok(st.fams.join() === "Ingenium's purple,Sky blue,Sapphire,Aqua,Emerald,Citrine,Amber,Rose,Ruby,Clear crystal,Your own colour" && st.shades.join() === 'By the hour,Pastel,Medium,Deep' && st.nights.join() === 'Its own,Black diamond,Silver diamond' && st.nightsReal && st.real && !st.keyBehind,
-    'the stone: eleven families; the shade: four; at night: its own, the black diamond or the silver diamond; every one the real diamond, turning, no key behind', st);
+  ok(st.fams.join() === "Ingenium's purple,Sky blue,Sapphire,Aqua,Emerald,Citrine,Amber,Rose,Ruby,Clear crystal,Your own colour" && st.shades.join() === 'By the hour,Pastel,Medium,Deep' && st.nights.join() === 'Its own,Black diamond,Silver diamond,Clear crystal' && st.nightsReal && st.real && !st.keyBehind,
+    'the stone: eleven families; the shade: four; at night: its own, the black diamond, the silver diamond or the clear crystal; every one the real diamond, turning, no key behind', st);
   ok(st.checked.join() === "Ingenium's purple,By the hour,Its own,Ingenium's violet", 'at first: Ingenium\'s purple, by the hour, Ingenium\'s violet band', st.checked);
   await p.screenshot({ path: path.join(OUT, 'panel_open.png') });
   // the toy, as 7.30
@@ -125,6 +125,12 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   const sSpread = Math.max(...silver.slice(0, 3)) - Math.min(...silver.slice(0, 3)), lum = c => c[0] + c[1] + c[2];  /* the stone's own pixels */
   ok(sv && sv.n && sv.n.cn === true && sv.n.aur === 'spectrum' && Math.abs(sv.n.s.g - 0.72) < 1e-9 && sSpread < 16 && lum(silver) > lum(clearNight) + 12 && /silver at night/.test(sv.says),
     'At night, Silver diamond: Sky blue by day, a colourless silver diamond by night, brighter than the black one, under lights in every colour', { silver, black: clearNight, n: sv && sv.n, says: sv && sv.says });
+  // the day's clear crystal by night (her words: "I want to see the day mode clear crystal made also available on night mode")
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'ruby', shade: 'medium', night: 'clear' })); const clearDay = fg(path.join(OUT, (await stoneShot('stone_7_ruby_clear_night'), 'stone_7_ruby_clear_night') + '.png'));
+  const cd = await p.evaluate(() => { const f = IngDiamond.fam(); return f && { n: f.n, look: IngDiamond.look(), says: IngDiamondColours.says() }; });
+  const cSpread = Math.max(...clearDay.slice(0, 3)) - Math.min(...clearDay.slice(0, 3));
+  ok(cd && cd.n && cd.n.cd === true && cd.n.aur === 'spectrum' && cSpread < 22 && lum(clearDay) > lum(silver) && /clear crystal at night/.test(cd.says),
+    'At night, Clear crystal: Ruby by day, the day\'s clear crystal by night, the brightest of the night looks (its own pixels, measured)', { clear: clearDay, silver, n: cd && cd.n, says: cd && cd.says });
   await p.evaluate(() => IngDiamondColours.set({ night: 'own' }));
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(600);
   // her own colour, the band and the light

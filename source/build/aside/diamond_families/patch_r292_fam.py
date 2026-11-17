@@ -32,12 +32,12 @@ GAT = ('"vec3 yiq(vec3 c){return vec3(dot(c,vec3(0.299,0.587,0.114)),dot(c,vec3(
        '  "vec3 rainbow(float h){return clamp(vec3(abs(h*6.0-3.0)-1.0,2.0-abs(h*6.0-2.0),2.0-abs(h*6.0-4.0)),0.0,1.0);}",\n'
        '  "vec3 aurx(vec3 c,float t){if(uAo<0.5)return c;if(uAo>1.5){vec3 q=yiq(c);float a=6.2831853*t,cs=cos(a),sn=sin(a);return max(rgbq(vec3(q.x,1.3*(q.y*cs-q.z*sn),1.3*(q.y*sn+q.z*cs))),0.0);}return max(gat(c,uAh,1.0),0.0);}",\n')
 # the stone's shader
-rep('uniform vec4 uCu,uEn;', 'uniform vec4 uCu,uEn,uFh,uAh;uniform vec2 uFm;uniform float uAo,uCl;')
+rep('uniform vec4 uCu,uEn;', 'uniform vec4 uCu,uEn,uFh,uAh;uniform vec2 uFm;uniform float uAo,uCl,uCd;')
 rep('  "const float IOR=2.42;",\n', '  "const float IOR=2.42;",\n  ' + GAT +
     '  "vec3 fam(vec3 c){return uFm.x<0.5?c:clamp(gat(c,uFh,uFm.y),0.0,1.0);}",\n')
 rep('"vec3 hue(float h){vec3 s=spec(h*0.83);', '"vec3 hue0(float h){vec3 s=spec(h*0.83);if(uCl>0.5)return s;')
 rep('"vec3 toH(vec3 w){', '"vec3 hue(float h){return fam(hue0(h));}",\n  "vec3 toH(vec3 w){')
-rep('col=tm(col);}', 'col=fam(tm(col));}')
+rep('col=tm(col);}', 'col=fam(uCd>0.5?1.0-exp(-col*1.30):tm(col));}')
 rep('c+=mix(vec3(0.42,0.22,0.92),vec3(0.80,0.42,0.97),0.5+0.5*sin(az*1.7+uT*0.07))*band*rays*0.8;}',
     'c+=aurx(mix(vec3(0.42,0.22,0.92),vec3(0.80,0.42,0.97),0.5+0.5*sin(az*1.7+uT*0.07)),az*0.159+0.5)*band*rays*0.8;}')
 rep('col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}}', 'col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}col=aurx(col,v.x+uT*0.004);}')
@@ -47,10 +47,13 @@ rep(':mix(vec3(0.42,0.22,0.92),vec3(0.80,0.42,0.97),0.5+0.5*sin(az*1.7+uT*0.07))
     ':(uCl>0.5?mix(rainbow(fract(az*0.159+0.5+uT*0.004)),vec3(1.0),0.2):mix(vec3(0.42,0.22,0.92),vec3(0.80,0.42,0.97),0.5+0.5*sin(az*1.7+uT*0.07))))*band*rays*1.7*aw;')
 rep('else if(uN>0.5||uV>2.5)col=mix(col,mix(vec3(l),vec3(0.62,0.40,1.0)*l*1.35,0.75),0.32);', 'else if(uCl<0.5&&(uN>0.5||uV>2.5))col=mix(col,mix(vec3(l),vec3(0.62,0.40,1.0)*l*1.35,0.75),0.32);')
 rep('else if(uV>1.5)col=mix(col,vec3(0.68,0.42,1.0)*l*1.3,0.18);', 'else if(uCl<0.5&&uV>1.5)col=mix(col,vec3(0.68,0.42,1.0)*l*1.3,0.18);')
-rep('"uT","uN","uV","uCu","uEn",', '"uT","uN","uV","uCu","uEn","uFh","uFm","uAh","uAo","uCl",')
-rep('gl.uniform1f(U.uV,CU4[3]>0?0:Math.max(0,VAR));', 'gl.uniform1f(U.uV,CU4[3]>0?0:vNow());')
+rep('"uT","uN","uV","uCu","uEn",', '"uT","uN","uV","uCu","uEn","uFh","uFm","uAh","uAo","uCl","uCd",')
+# the day's clear crystal by night (cd): the stone lit by the day's room and its tone curve, the night all around it
+rep('"vec3 env(vec3 w){return uN>0.5?envN(w,1.0):envDay(w);}"', '"vec3 env(vec3 w){return (uN>0.5&&uCd<0.5)?envN(w,1.0):envDay(w);}"')
+rep('vec3 io=uN>0.5?', 'vec3 io=(uN>0.5&&uCd<0.5)?')
+rep('gl.uniform1f(U.uV,CU4[3]>0?0:Math.max(0,VAR));', 'gl.uniform1f(U.uV,CU4[3]>0?0:vNow(nt));')
 rep('gl.uniform4fv(U.uEn,new Float32Array(EN4));',
-    'gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow(nt);gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,clNow(nt)?1:0);')
+    'gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow(nt);gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,clNow(nt)?1:0);gl.uniform1f(U.uCd,cdNow(nt)?1:0);')
 # the sky's own canvas
 rep('"uniform float uT,uN,uAsp;uniform vec2 uRes;uniform vec4 uBox;",',
     '"uniform float uT,uN,uAsp;uniform vec2 uRes;uniform vec4 uBox;uniform vec4 uAh;uniform float uAo;",\n  ' + GAT.rstrip('\n').rstrip(',') + ',')
@@ -75,10 +78,12 @@ rep('  function byHour(d){',
   function au1(a){return a==="spectrum"?"spectrum":a&&a.length===4?a.slice():null;}
   function family(o){if(!o||!o.s||o.s.length<4){FAM=null;}else{FAM={cp:!!o.cp,cn:!!o.cn,aur:au1(o.aur),s:o.s.map(sh1),
       /* a night look of its own choosing (her words: "I like the silver diamond look on dark mode too ... please also add it as an option
-         for Night mode look for the diamond"): the black or the silver diamond by night, whatever the stone by day */
-      n:o.n?{s:sh1(o.n.s),cn:!!o.n.cn,aur:au1(o.n.aur)}:null};}
+         for Night mode look for the diamond"): the black or the silver diamond by night, whatever the stone by day; and ("I want to
+         see the day mode clear crystal made also available on night mode") the day's clear crystal itself (cd) */
+      n:o.n?{s:sh1(o.n.s),cn:!!o.n.cn,cd:!!o.n.cd,aur:au1(o.n.aur)}:null};}
     if(!(CU4[3]>0))HALO=FAM&&o.halo&&o.halo.length===2?o.halo.slice():["106,63,181","122,84,204"];kick();}
-  function vNow(){var v=Math.max(0,VAR);return FAM&&FAM.cp&&v===1?0:v;}
+  function vNow(nt){var v=Math.max(0,VAR);if(cdNow(nt))return 0;return FAM&&FAM.cp&&v===1?0:v;}
+  function cdNow(nt){return !!(FAM&&nt&&FAM.n&&FAM.n.cd&&!(CU4[3]>0));}
   function famNow(nt){if(!FAM||CU4[3]>0)return null;if(nt)return FAM.n?FAM.n.s:FAM.s[3];var v=vNow();return v?FAM.s[v-1]:null;}
   function aurNow(nt){return FAM&&!(CU4[3]>0)?(nt&&FAM.n?FAM.n.aur:FAM.aur):null;}
   function clNow(nt){return !!(FAM&&nt&&!(CU4[3]>0)&&(FAM.n?FAM.n.cn:FAM.cn));}

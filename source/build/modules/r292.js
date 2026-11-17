@@ -84,7 +84,7 @@ var Diamond=(function(){
     function mul(A,B){var C=[[0,0,0],[0,0,0],[0,0,0]];for(var i=0;i<3;i++)for(var j=0;j<3;j++)for(var k=0;k<3;k++)C[i][j]+=A[i][k]*B[k][j];return C;}return mul(Rz,mul(Rx,Ry));}
   var VS="attribute vec2 p;varying vec2 v;void main(){v=p*0.5+0.5;gl_Position=vec4(p,0.0,1.0);}";
   var FS=["precision highp float;varying vec2 v;",
-  "uniform float uT,uN,uV,uAsp,uTan,uY,uDial;uniform vec4 uCu,uEn,uFh,uAh;uniform vec2 uFm;uniform float uAo,uCl;uniform vec2 uPx;uniform sampler2D uTx2;uniform vec3 uCP,uDC;uniform mat3 uCM,uR;uniform vec4 uG[9];uniform float uTab;uniform vec4 uL;uniform vec2 uHT;uniform sampler2D uTx;uniform vec4 uHA,uHB,uHC;uniform float uAA,uBG,uSc;uniform vec4 uHV;uniform sampler2D uTx3;uniform float uLogo;uniform vec4 uLG,uLH,uLR,uLQ;",
+  "uniform float uT,uN,uV,uAsp,uTan,uY,uDial;uniform vec4 uCu,uEn,uFh,uAh;uniform vec2 uFm;uniform float uAo,uCl,uCd;uniform vec2 uPx;uniform sampler2D uTx2;uniform vec3 uCP,uDC;uniform mat3 uCM,uR;uniform vec4 uG[9];uniform float uTab;uniform vec4 uL;uniform vec2 uHT;uniform sampler2D uTx;uniform vec4 uHA,uHB,uHC;uniform float uAA,uBG,uSc;uniform vec4 uHV;uniform sampler2D uTx3;uniform float uLogo;uniform vec4 uLG,uLH,uLR,uLQ;",
   "const float IOR=2.42;",
   "vec3 yiq(vec3 c){return vec3(dot(c,vec3(0.299,0.587,0.114)),dot(c,vec3(0.596,-0.274,-0.322)),dot(c,vec3(0.211,-0.523,0.312)));}",
   "vec3 rgbq(vec3 q){return vec3(q.x+0.956171*q.y+0.621433*q.z,q.x-0.272689*q.y-0.646813*q.z,q.x-1.103744*q.y+1.700623*q.z);}",
@@ -127,7 +127,7 @@ var Diamond=(function(){
      light), lifted and tinted: the clear crystal neutral and a little brighter, lavender, purple; the night stone by day as it is */
   "vec3 envDay(vec3 w){vec3 n=envN(w,0.55);float l=dot(n,vec3(0.3,0.5,0.2));if(uV<0.5)return vec3(l)*vec3(0.96,0.99,1.06)*2.1+vec3(0.20,0.22,0.28);",
   "  if(uV<1.5)return mix(vec3(l),n,0.35)*vec3(1.02,0.94,1.12)*1.8+vec3(0.16,0.12,0.24);if(uV<2.5)return n*vec3(1.05,0.85,1.15)*1.45+vec3(0.06,0.03,0.11);return n*1.4+vec3(0.10,0.08,0.18);}",
-  "vec3 env(vec3 w){return uN>0.5?envN(w,1.0):envDay(w);}",
+  "vec3 env(vec3 w){return (uN>0.5&&uCd<0.5)?envN(w,1.0):envDay(w);}",
   "void cvx(vec3 ro,vec3 rd,out float tn,out float tf,out vec3 nn,out vec3 nf){tn=-1e9;tf=1e9;nn=vec3(0.0,1.0,0.0);nf=nn;",
   "  {vec3 n=vec3(0.0,1.0,0.0);float dn=rd.y;float ds=uTab-ro.y;if(abs(dn)>1e-6){float t=ds/dn;if(dn<0.0){if(t>tn){tn=t;nn=n;}}else if(t<tf){tf=t;nf=n;}}else if(ds<0.0)tn=1e9;}",
   "  for(int g=0;g<9;g++){vec3 n=uG[g].xyz;float d=uG[g].w;for(int k=0;k<8;k++){float dn=dot(n,rd);float ds=d-dot(n,ro);",
@@ -139,7 +139,7 @@ var Diamond=(function(){
   "  float b=dot(ro,rd),c=dot(ro,ro)-1.04,h=b*b-c;if(h<0.0)return vec3(0.0);",
   "  float tn,tf;vec3 nn,nf;cvx(ro,rd,tn,tf,nn,nf);if(!(tn<tf&&tn>0.0))return vec3(0.0);hit=1.0;th=tn*uSc;",
   "  vec3 p=ro+rd*tn;float F=fr(-dot(rd,nn));vec3 col=F*env(toW(reflect(rd,nn)));vec3 d=refract(rd,nn,1.0/IOR);vec3 thr=vec3(1.0-F);",
-  "  vec3 io=uN>0.5?vec3(2.37,2.42,2.48):vec3(2.355,2.42,2.505);",
+  "  vec3 io=(uN>0.5&&uCd<0.5)?vec3(2.37,2.42,2.48):vec3(2.355,2.42,2.505);",
   "  for(int k=0;k<6;k++){cvx(p+d*0.0005,d,tn,tf,nn,nf);p=p+d*tf;vec3 m=nf;vec3 oc=vec3(0.0);",
   "    vec3 t1=refract(d,-m,io.r);if(dot(t1,t1)>0.0)oc.r=(1.0-fr(dot(t1,m)))*env(toW(t1)).r;",
   "    vec3 t2=refract(d,-m,io.g);if(dot(t2,t2)>0.0)oc.g=(1.0-fr(dot(t2,m)))*env(toW(t2)).g;",
@@ -366,7 +366,7 @@ var Diamond=(function(){
   "  if(hs>0.5&&ts<tp){col=sc;a=1.0;th=ts;col*=1.0+mix(0.22,0.46,uN)*glow;",
   "    float s1=clamp((f-0.028)/0.012,0.0,1.0),s2=clamp((f-0.040)/0.012,0.0,1.0);float on1=step(0.026,f)*step(f,0.075),on2=step(0.038,f)*step(f,0.085);",
   "    vec3 Xi=uDC-dA*0.55+vec3(0.0,-0.42,0.0);if(f<0.7)col+=vec3(1.0,0.96,1.0)*beam(ro,rd,E,Xi,0.022,1e9,s1,0.30,0.0,1.2*on1);",
-  "    col=fam(tm(col));}",
+  "    col=fam(uCd>0.5?1.0-exp(-col*1.30):tm(col));}",
   "  else if(tp<1e8){vec3 hc=holderCol(pp,pn,rdL,part,lit);col=uN>0.5?tm(hc):min(hc,vec3(1.0));a=1.0;th=tp;}",
   "  else{if(uBG<0.5){vec4 au=aurora(v);float ai=uN>0.5?0.95:1.0;col=au.rgb*ai;a=clamp(au.a*ai,0.0,1.0);}",
   "    if(uN<0.5&&uBG<0.5){vec2 wc=(v-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(v.x*0.8+v.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);vec2 gc=(v-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
@@ -393,7 +393,7 @@ var Diamond=(function(){
       if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));}catch(e){W.__diamondErr=String(e);return false;}
     gl.useProgram(pr);var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
     var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    ["uT","uN","uV","uCu","uEn","uFh","uFm","uAh","uAo","uCl","uAsp","uTan","uY","uPx","uDial","uCP","uDC","uCM","uR","uTab","uL","uHT","uHA","uHB","uHC","uLogo","uLG","uLH","uLR","uLQ","uAA","uHV","uBG","uSc"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uG=gl.getUniformLocation(pr,"uG[0]");
+    ["uT","uN","uV","uCu","uEn","uFh","uFm","uAh","uAo","uCl","uCd","uAsp","uTan","uY","uPx","uDial","uCP","uDC","uCM","uR","uTab","uL","uHT","uHA","uHB","uHC","uLogo","uLG","uLH","uLR","uLQ","uAA","uHV","uBG","uSc"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uG=gl.getUniformLocation(pr,"uG[0]");
     var g=[];GROUPS.forEach(function(x){g.push(x[0],x[1],x[2],x[3]);});gl.uniform4fv(U.uG,new Float32Array(g));gl.uniform1f(U.uTab,HT);
     gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));
     gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);
@@ -614,10 +614,12 @@ var Diamond=(function(){
   function au1(a){return a==="spectrum"?"spectrum":a&&a.length===4?a.slice():null;}
   function family(o){if(!o||!o.s||o.s.length<4){FAM=null;}else{FAM={cp:!!o.cp,cn:!!o.cn,aur:au1(o.aur),s:o.s.map(sh1),
       /* a night look of its own choosing (her words: "I like the silver diamond look on dark mode too ... please also add it as an option
-         for Night mode look for the diamond"): the black or the silver diamond by night, whatever the stone by day */
-      n:o.n?{s:sh1(o.n.s),cn:!!o.n.cn,aur:au1(o.n.aur)}:null};}
+         for Night mode look for the diamond"): the black or the silver diamond by night, whatever the stone by day; and ("I want to
+         see the day mode clear crystal made also available on night mode") the day's clear crystal itself (cd) */
+      n:o.n?{s:sh1(o.n.s),cn:!!o.n.cn,cd:!!o.n.cd,aur:au1(o.n.aur)}:null};}
     if(!(CU4[3]>0))HALO=FAM&&o.halo&&o.halo.length===2?o.halo.slice():["106,63,181","122,84,204"];kick();}
-  function vNow(){var v=Math.max(0,VAR);return FAM&&FAM.cp&&v===1?0:v;}
+  function vNow(nt){var v=Math.max(0,VAR);if(cdNow(nt))return 0;return FAM&&FAM.cp&&v===1?0:v;}
+  function cdNow(nt){return !!(FAM&&nt&&FAM.n&&FAM.n.cd&&!(CU4[3]>0));}
   function famNow(nt){if(!FAM||CU4[3]>0)return null;if(nt)return FAM.n?FAM.n.s:FAM.s[3];var v=vNow();return v?FAM.s[v-1]:null;}
   function aurNow(nt){return FAM&&!(CU4[3]>0)?(nt&&FAM.n?FAM.n.aur:FAM.aur):null;}
   function clNow(nt){return !!(FAM&&nt&&!(CU4[3]>0)&&(FAM.n?FAM.n.cn:FAM.cn));}
@@ -689,7 +691,7 @@ var Diamond=(function(){
     gx+=((over?mX*0.22:0)-gx)*Math.min(1,dt*2.8);gz+=((over?-mY*0.16:0)-gz)*Math.min(1,dt*2.8);tx=gz;tz=-gx*0.6;
     var tt=st?1.0:(W.__tFix!=null?W.__tFix:t);if(W.__tFix!=null&&W.__pFix){PL.a=W.__pFix[0];PL.e=W.__pFix[1];PL.s=W.__pFix[2];PL.n=W.__pFix[3]||1;}
     DFX=dfx(t);DSC=DFX.sc;YF=DFX.yaw;var M=rotM(),bob=st?0:Math.sin(tt*2*Math.PI/7)*0.035,DC=[0,1.22+bob+DFX.lift,0],nt=night();
-    gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U.uT,tt);gl.uniform1f(U.uN,nt?1:0);gl.uniform1f(U.uV,CU4[3]>0?0:vNow());gl.uniform4fv(U.uCu,new Float32Array(CU4));gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow(nt);gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,clNow(nt)?1:0);gl.uniform1f(U.uY,yaw);gl.uniform3fv(U.uDC,new Float32Array(DC));
+    gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U.uT,tt);gl.uniform1f(U.uN,nt?1:0);gl.uniform1f(U.uV,CU4[3]>0?0:vNow(nt));gl.uniform4fv(U.uCu,new Float32Array(CU4));gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow(nt);gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,clNow(nt)?1:0);gl.uniform1f(U.uCd,cdNow(nt)?1:0);gl.uniform1f(U.uY,yaw);gl.uniform3fv(U.uDC,new Float32Array(DC));
     gl.uniform4fv(U.uL,new Float32Array([PL.a,PL.e,st?-99:PL.s,PL.n%2?0:1]));
     /* the case moves as the compass does: a sway of its own, ten seconds round, and a lean toward the pointer on a spring that overshoots a
        hair and settles */

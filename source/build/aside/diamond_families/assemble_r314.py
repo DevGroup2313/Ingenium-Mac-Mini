@@ -39,7 +39,7 @@ css = rep(css, "/* her own colour: eight cut stones and any colour, in a well; h
           "body[data-theme=\"night\"] .dmc-fams.dmc-shelf::after{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,0,0,.4),0 6px 12px rgba(0,0,0,.3)}\n"
           ".dmc-shades{grid-template-columns:repeat(4,minmax(0,1fr))}\n"
           ".dmc-l2{margin-top:6px}\n"
-          ".dmc-nights{grid-template-columns:repeat(3,minmax(0,92px));justify-content:start;gap:2px 8px}\n"
+          ".dmc-nights{grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 0}\n"
           ".dmc-night[hidden]{display:none}\n"
           ".dmc-night .dmc-g{border-radius:16px;background:radial-gradient(120% 90% at 50% 40%,#2c2142,#120c1e 72%);box-shadow:inset 0 1px 3px rgba(0,0,0,.5),inset 0 -1px 0 rgba(255,255,255,.06),0 1px 0 rgba(255,255,255,.55)}\n"
           "body[data-theme=\"night\"] .dmc-night .dmc-g{background:radial-gradient(120% 90% at 50% 40%,#231a36,#0b0714 72%);box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05)}\n"
