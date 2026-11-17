@@ -12,3 +12,9 @@ Test and ship), with:
 - Teach me as I go (T): the next step read from the app's state (keep, test, look at a failed run, ship); a short lesson over each part
   (what it is, what GitHub calls it, Show me where, Got it); the parts learned counted in the head; keys G then N, S, P, R, C for the rooms.
 The app, its versions, plans and runs in the preview are examples.
+
+Version 3 (her words, 17 November 2026: "I have said this MANY TIMES, no new section, page or tab inside of Ingenium should be flat, stiff
+and unresponsive when I hover over it ... The "Your apps" entire panel is flat with no animation, and so many more buttons and cards, I
+HATE THAT."): every panel, card, row, chip, check and key is raised, lifts under the pointer (the app cards lift and grow, their mark
+turns), sinks when pressed, and rises in when its view opens; the panels, the head, the path and the next step lean toward the pointer.
+Minimal or reduced motion keeps them still. When built, Fabrica's own panels get the same.
