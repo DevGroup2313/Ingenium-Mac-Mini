@@ -335,11 +335,12 @@ function makeApk(o){var step=o.onStep||function(){};var id=cleanId(o.id);if(!id)
     var files=[{name:"AndroidManifest.xml",data:axml(manifest({id:id,versionCode:vc,versionName:vn,title:title,alias:o.alias||"",allowBackup:!!o.allowBackup}))},{name:"classes.dex",data:dex},
       {name:"resources.arsc",data:arsc(id),store:true,align:4}];
     DENSITIES.forEach(function(d){var png=o.icons&&o.icons[d[0]];if(!png)throw new Error("the "+d[0]+" icon is missing");files.push({name:iconPath(d),data:png,store:true,align:4});});
-    files.push({name:"assets/shell.json",data:utf8(JSON.stringify({page:page,background:o.background||"#ffffff",bridges:bridges,title:title,made:"Ingenium Fabrica"}))});
+/* 7.29: her apps carry no credit naming Ingenium (her words, 17 November 2026: "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of the Forge or Carpe Diem or Inkwell or any future app"). The audit of that day (rig/t_729_family_real.js) found "Ingenium Fabrica" in each ready-made app's shell.json and shell.txt, and in an APK's signature files (Created-By); no shell reads it. It says "Fabrica" now, as the kits' guides do. */
+    files.push({name:"assets/shell.json",data:utf8(JSON.stringify({page:page,background:o.background||"#ffffff",bridges:bridges,title:title,made:"Fabrica"}))});
     (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"");if(!p||p===page||/^shell\.json$/.test(p))return;files.push({name:"assets/"+p,data:typeof f.data==="string"?utf8(f.data):f.data});});
     files.push({name:"assets/"+page,data:html});
     step("Signing it (v1)");
-    return signV1(files,key,"Ingenium Fabrica").then(function(v1){var all=[{name:"META-INF/MANIFEST.MF",data:v1.mf},{name:"META-INF/CERT.SF",data:v1.sf},{name:"META-INF/CERT.RSA",data:v1.rsa}].concat(files);
+    return signV1(files,key,"Fabrica").then(function(v1){var all=[{name:"META-INF/MANIFEST.MF",data:v1.mf},{name:"META-INF/CERT.SF",data:v1.sf},{name:"META-INF/CERT.RSA",data:v1.rsa}].concat(files);
       step("Packing it");return zipBuild(all);}).then(function(z){step("Signing it (v2)");return signV2(z,key);}).then(function(apk){
       return Promise.all([sha256(apk),describe(key)]).then(function(h){return {bytes:apk,size:apk.length,sha256:hex(h[0]),id:id,versionCode:vc,versionName:vn,title:title,key:h[1]};});});});}
 
@@ -371,7 +372,7 @@ function makeIpa(o){var step=o.onStep||function(){};var id=cleanId(o.id);if(!id)
           out.push({name:dest,data:data,mode:e.mode||0o100644,madeBy:3});});});},Promise.resolve()).then(function(){
       if(!out.some(function(f){return /\.app\/Info\.plist$/.test(f.name);}))throw new Error("the shell has no Info.plist");
       var www="Payload/"+folder+"/www/";if(!out.some(function(f){return f.name===www;}))out.push({name:www,dir:true,mode:0o40755,madeBy:3});
-      out.push({name:www+"shell.json",data:utf8(JSON.stringify({page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Ingenium Fabrica"})),mode:0o100644,madeBy:3});
+      out.push({name:www+"shell.json",data:utf8(JSON.stringify({page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Fabrica"})),mode:0o100644,madeBy:3});
       (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"");if(!p||p===page||p==="shell.json")return;out.push({name:www+p,data:typeof f.data==="string"?utf8(f.data):f.data,mode:0o100644,madeBy:3});});
       out.push({name:www+page,data:html,mode:0o100644,madeBy:3});
       out.unshift({name:"Payload/",dir:true,mode:0o40755,madeBy:3});

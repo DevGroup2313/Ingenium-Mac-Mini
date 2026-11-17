@@ -395,6 +395,55 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.29 (17 November 2026): the diamond's colours within reach; her apps' packages without a word of Ingenium; Adamas's chosen
+tab readable; Open Storage reaching Storage.
+Her words (17 November 2026), in this session: "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new
+version of the Forge or Carpe Diem or Inkwell or any future app that I choose to make. I want Ingenium to actually build and create
+ready-made apps and build kits for all of my devices accurately and without errors, bugs, or missing files or documents" (asked where she
+last saw them: "An older build"; asked where Windows showed ".exe": "Not checked lately"); "The selected tab on the Adamas page is
+translucent and white and ineligible, please fix that as well" (with a picture); "I want a clear way to edit Adamas' diamond and change
+the colours as I please, I can't locate the settings for it. Please make it accessible and visible for me"; "You changed the strip
+around the diamond holder on Adamas, please revert it back" (it had not changed: see below); and on the live preview
+(https://claude.ai/artifact/TXUHDygwqMQWmnFCkLvb9v, source/previews/diamond_colours): "I approve of the preview, please commit and push
+it everywhere and continue working on my requests."
+- Her apps' packages, read apart from the page that made them (`rig/t_729_family_real.js`, new): Carpe Diem, Inkwell and Lakay brought
+  in from the app library as she would, each one's five build kits (Fabrica's Build kits, all six devices) and five ready-made apps
+  (Android, iPhone and iPad, Mac, Windows, web). On 7.28: 120 checks passed and 14 failed. Their icons, names, guides and pages were their
+  own, the Windows apps their own installers ("Carpe Diem Setup.exe": the program "Carpe Diem.exe", Windows' names and Settings, Apps
+  without ".exe", the owner as publisher), the Mac apps sealed; but six small files still said "Ingenium Fabrica": an APK's signature
+  (META-INF/MANIFEST.MF and CERT.SF, Created-By) and the shell.json (and on Windows shell.txt) each Android, iPhone, iPad, Mac and Windows
+  app keeps about itself. No shell reads it. `build/modules/r136.js` and `build/modules/r170.js` write "Fabrica" now. The other failures
+  were the test's own (an APK's name is in its manifest, where Android reads it; a web app's page is the app's page with its manifest,
+  icons and offline helper linked in, nothing taken out). On the corrected copy: 137 passed, 0 failed. The Forge (its own templates):
+  `rig/t_67_kits.js` 147 passed on 7.28. Left as they are, never shown: names inside the compiled shells (the Android shell's Java classes,
+  the Windows shell's window classes, manifest identity and a stand-in page used only if an app's own files were missing, the iPhone
+  program's build paths); the Windows shell's placeholder company, "Made with Ingenium Fabrica", is overwritten with the publishing
+  name, or blanked when there is none, as since 7.23.
+- Adamas's chosen tab: Adamas has had tabs since 7.27 (`build/modules/r311.js`, r173's CONF.build), but `build/modules/r173.js` gave its
+  tab colours (--rm-pa and the rest) only to Settings, Mentes, Concordia and the Guide, so the chosen tab drew white words on no colour;
+  the same list kept where() from opening Adamas's other tab for a part in it. Adamas is named in both now, and in the accent colour of
+  her own (`build/modules/r236.js`, with Career Studio, missing there too). `rig/t_729_adamas_tabs.js` (new): 5 of 11 failed on 7.28;
+  11 passed.
+- The diamond's colours (`build/modules/r314.js`, new; `build/modules/r292.js`): there was no setting to find (the diamond's looks
+  followed the hour; IngDiamond.variant existed but nothing called it). A Diamond colours key on Adamas's head opens a raised panel over
+  the head's words, the diamond in full view beside it (under the keys on a narrow screen): the stone By the hour (as before), Clear
+  crystal, Lavender, Purple, Night stone, or a colour of her own (Ruby, Rose, Amber, Citrine, Emerald, Aqua, Sapphire, Amethyst, or any
+  colour, Faint to Deep); the holder's band in Ingenium's violet or her own colour; the light through it on or off; Back to Ingenium's
+  own. The same panel in Settings, Everyday ("The diamond on Adamas", a tile with a gem and a line such as "By the hour · band: Ingenium's
+  violet · light on"; `build/modules/r313.js`, `build/modules/r173.js`), found by Find a setting, with Show me on Adamas; What is this?
+  names both (`build/modules/r144.js`), and the Guide's diamond entry (`build/modules/r250.js`). Kept in state.diamond, so backups and
+  Ingenium Cloud carry it. In the shader: her colour filters the light through the stone as a coloured gem does (a blend over white read
+  as dusty in the first pictures), the colours it splits into lean to it, the night stone's lights and room take it (neutral, not violet),
+  the band's enamel takes hers; with nothing chosen, every value is as before. The strip around the holder: she saw a test picture with an
+  Amber band; the default diamond held still (Minimal motion, the same instant, random sparkles seeded) is identical, pixel for pixel, by
+  night and by day, from 7.28's sources and 7.29's. `rig/t_729_diamond_colours.js` (new): 15 passed (in software WebGL).
+- Open Storage from the full-storage notice: the first time in a session the Storage card is made just then, and the reveal came before
+  Your data's sections (`build/modules/r234.js`) had filed it, so a moment later they showed the section kept before (Bring in), hid the
+  card and its heading lost the focus (`rig/t_61_storage.js`, failing since 7.27). `build/modules/r142.js` asks for the Storage section by
+  name and opens its tile before scrolling and focusing, and once more when the rooms settle. t_61_storage: 75 passed, the 2 left the
+  test machine's own (the quota it asks for is not emulated in this Chromium; libFromZip, as on 7.27).
+- What is new (`build/modules/r222.js`): four lines for 7.29, the kits' one marked fabrica.
+
 Ingenium 7.28 (17 November 2026): Settings, raised: its long sections as tiles that open, its controls raised and moving, the chosen
 level lifted.
 Her words (17 November 2026): "The Settings page needs to be redesigned, a lot of its tab page are poorly organised and have a very long

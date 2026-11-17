@@ -158,7 +158,8 @@ function makeMac(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
       var prog=files["MacOS/"+oldExe].slice();delete files["MacOS/"+oldExe];delete modes["MacOS/"+oldExe];files["MacOS/"+exe]=prog;modes["MacOS/"+exe]=0o100755;
       files["Resources/AppIcon.icns"]=icon;modes["Resources/AppIcon.icns"]=0o100644;
       var www="Resources/www/";
-      files[www+"shell.json"]=utf8(JSON.stringify({page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Ingenium Fabrica"}));
+/* 7.29: her apps carry no credit naming Ingenium (her words, 17 November 2026: "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of the Forge or Carpe Diem or Inkwell or any future app"). The audit of that day (rig/t_729_family_real.js) found "Ingenium Fabrica" in each ready-made app's shell.json and shell.txt, and in an APK's signature files (Created-By); no shell reads it. It says "Fabrica" now, as the kits' guides do. */
+      files[www+"shell.json"]=utf8(JSON.stringify({page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Fabrica"}));
       (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"").replace(/[^\w.\-\/]+/g,"_");if(!p||p===page||p==="shell.json"||/(^|\/)\.\.(\/|$)/.test(p))return;files[www+p]=typeof f.data==="string"?utf8(f.data):f.data;});
       files[www+page]=html;
       Object.keys(files).forEach(function(r){if(/^Resources\/www\//.test(r))modes[r]=0o100644;});
@@ -272,8 +273,8 @@ function makeWin(o){var C=core(),step=o.onStep||function(){};var id=root.IngApk.
     step("Drawing its icon in");var nIcons=winIconsInto(exe,o.icons||{});
     step("Giving it its name");if(!winNameInto(exe,{title:title,name:name,version:String(o.versionName||"1.0").replace(/[\r\n]+/g," ")}))step("This Windows shell keeps no room for a name, so Windows will show the app by its file name");winCompanyInto(exe,o.publisher!=null?publisher:ownerLine(title));
     step("Putting its files in");
-    var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+vn,"name="+name,"publisher="+publisher,"made=Ingenium Fabrica",""].join("\n")),store:true},
-      {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Ingenium Fabrica"})),store:true}];
+    var files=[{name:"shell.txt",data:utf8(["page="+page,"title="+title,"id="+id,"bridges="+bridges.join(","),"version="+vn,"name="+name,"publisher="+publisher,"made=Fabrica",""].join("\n")),store:true},
+      {name:"shell.json",data:utf8(JSON.stringify({page:page,bridges:bridges,title:title,id:id,made:"Fabrica"})),store:true}];
     (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"").replace(/[^\w.\-\/]+/g,"_");if(!p||p===page||p==="shell.json"||p==="shell.txt"||/^__setup\//.test(p)||/(^|\/)\.\.(\/|$)/.test(p))return;files.push({name:p,data:typeof f.data==="string"?utf8(f.data):f.data,store:true});});
     files.push({name:page,data:html,store:true});
     if(setup){step("Writing its installer");var ic=(o.icons||{})[256]||(o.icons||{})[64];

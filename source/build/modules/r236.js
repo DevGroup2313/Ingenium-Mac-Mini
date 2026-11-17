@@ -236,7 +236,7 @@ function lookCss(L){var css="";var ac=hexRgb(L.accent);
   if(ac){var deep=rgbHex(mix(ac,[0,0,0],0.26)),bright=rgbHex(mix(ac,[255,255,255],0.22)),night=rgbHex(mix(ac,[255,255,255],0.45)),nightDeep=rgbHex(mix(ac,[255,255,255],0.25)),rgb=ac.join(",");
     css+=":root{--accent:"+L.accent+";--accent-deep:"+deep+";--accent-bright:"+bright+";--accent-soft:rgba("+rgb+",0.14);--accent-softer:rgba("+rgb+",0.06);--accent-line-rgb:"+rgb+";--fill-hi:"+bright+";--fill-mid:"+L.accent+";--fill-lo:"+deep+"}\n";
     css+="body[data-theme=\"night\"]{--accent:"+night+";--accent-deep:"+nightDeep+";--accent-bright:"+night+"}\n";
-    css+="#page-settings,#page-models,#page-blend,#page-guide,#page-focus{--rm-pa:"+bright+";--rm-pb:"+deep+";--rm-pedge:"+rgbHex(mix(ac,[0,0,0],0.4))+"}\n";}
+    css+="#page-settings,#page-models,#page-blend,#page-guide,#page-focus,#page-build,#page-career{--rm-pa:"+bright+";--rm-pb:"+deep+";--rm-pedge:"+rgbHex(mix(ac,[0,0,0],0.4))+"}\n";}
   if(L.serif){var s=L.serif==="sans"?"var(--sans)":STACK[L.serif];if(s)css+=":root{--serif:"+s+"}\n";}
   if(L.sans&&STACK[L.sans])css+=":root{--sans:"+STACK[L.sans]+"}\nbody{font-family:var(--sans)}\n";
   /* 6.46: Ingenium's own keys are elevated and refined (modules/r244.js); Soft is lighter still, a fine outline and a faint lift,

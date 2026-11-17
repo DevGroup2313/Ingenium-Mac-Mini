@@ -706,6 +706,9 @@ var WHAT=[
   ["#tourGo","Take the tour","Starts the guided tour, at your level."],
   [".tour-entry-chap","A chapter","Opens the tour at this chapter."],
   [".tip-fold-btn","A short note","Opens a short note; press again to fold it."],
+  /* 7.29: the diamond's colours (modules/r314.js) */
+  ["#bdColours","Diamond colours","Opens the diamond's colours beside it: by the hour, one of its looks, or a colour of your own, the holder's band and the light through it."],
+  ["#dmcCard","The diamond on Adamas","The same choices for Adamas's diamond as its Diamond colours key, kept with your settings."],
   /* 7.28: Settings, raised (modules/r313.js) */
   ["#page-settings .st-th, #page-settings .st-memk","A tile","A part of Settings, with what it holds in one line. Press it to open it; the one open before folds."],
   ["#ihSetCard","Help and the guided tour","Your level: how much the tour shows and how help is worded."],

@@ -636,10 +636,20 @@ function wire(){
 /* ================================================================================================================
    4. Settings, Storage
    ================================================================================================================ */
+/* 7.29: Open Storage reached Settings but not Storage when the card was made just then (the first time in a session, as from the
+   full-storage notice): the reveal came before Your data's sections (modules/r234.js) had filed the new card, so a moment later they
+   showed the section kept before (Bring in, at first), the card was hidden and its heading lost the focus (rig/t_61_storage.js, failing
+   since 7.27). Storage's section is now asked for by name, and its tile opened (r313), before the card is scrolled to and focused; and
+   once more when the rooms have settled, if anything hid it again. */
+function storageInView(){var c=$i("stxCard"),h=$i("stxH");if(!c)return;
+  try{if(W.IngSettingsParts)W.IngSettingsParts.show("data","storage",false);}catch(e){}
+  try{if(W.IngRooms&&W.IngRooms.current("settings")!=="data")W.IngRooms.open("settings","data");}catch(e){}
+  try{if(W.IngSettingsRaised)W.IngSettingsRaised.open(c);}catch(e){}
+  try{c.scrollIntoView({block:"start",behavior:reduced()?"auto":"smooth"});}catch(e){c.scrollIntoView();}
+  try{h.focus({preventScroll:true});}catch(e){try{h.focus();}catch(_){}}}
 function openStorage(){try{if(typeof W.go==="function")W.go("settings");}catch(e){}
-  setTimeout(function(){ensureCard();var c=$i("stxCard"),h=$i("stxH");if(!c)return;
-    try{c.scrollIntoView({block:"start",behavior:reduced()?"auto":"smooth"});}catch(e){c.scrollIntoView();}
-    try{h.focus({preventScroll:true});}catch(e){try{h.focus();}catch(_){}}openedSettings();},60);}
+  setTimeout(function(){ensureCard();var c=$i("stxCard");if(!c)return;storageInView();openedSettings();
+    setTimeout(function(){var c2=$i("stxCard"),h2=$i("stxH");if(!c2)return;if(!c2.offsetParent||D.activeElement!==h2)storageInView();},400);},60);}
 function ensureCard(){if($i("stxCard"))return $i("stxCard");var page=$i("page-settings");if(!page)return null;
   var c=D.createElement("section");c.className="card stx-card";c.id="stxCard";c.setAttribute("aria-labelledby","stxH");
   c.innerHTML='<h2 class="sec" id="stxH" tabindex="-1">Storage</h2>'

@@ -22,11 +22,14 @@
    words of its heading, or in a last room, More, shown only when it holds something. A room with nothing in it (a card
    absent from an edition) hides its tab. Anything that scrolls to, focuses or rings a card in another room opens that room
    first (IngRooms.reveal, and quietly from scrollIntoView, focus, the tour's ring and Help's Show me). */
-#page-settings,#page-models,#page-blend,#page-guide{--rm-pa:#7348be;--rm-pb:#5d37a1;--rm-pedge:#4b2a86;--rm-pledge:#3a2070;
+/* 7.29 (her words, 17 November 2026: "The selected tab on the Adamas page is translucent and white and ineligible"): Adamas has
+   had tabs since 7.27 (CONF.build, r311), but its page was never named here, so its chosen tab drew white words on no colour; it is
+   named here now, by day and by night, and in where() below, so a card in its other tab opens that tab first. */
+#page-settings,#page-models,#page-blend,#page-guide,#page-build{--rm-pa:#7348be;--rm-pb:#5d37a1;--rm-pedge:#4b2a86;--rm-pledge:#3a2070;
   --rm-psh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 8px 14px rgba(52,24,100,.12);
   --rm-well:inset 0 1px 2.5px rgba(40,22,68,.09);--rm-wellbg:rgba(34,26,46,.035);--rm-ring:rgba(106,63,181,.55);--rm-ok:#2a7444;--rm-oks:rgba(45,154,82,.14);
   --rm-focus:var(--accent,#6a3fb5);--rm-flash:rgba(106,63,181,.42)}
-body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,body[data-theme="night"] #page-blend,body[data-theme="night"] #page-guide{--rm-pa:#7a56c8;--rm-pb:#5b3aa1;--rm-pedge:#2c1956;--rm-pledge:#170b30;
+body[data-theme="night"] #page-settings,body[data-theme="night"] #page-models,body[data-theme="night"] #page-blend,body[data-theme="night"] #page-guide,body[data-theme="night"] #page-build{--rm-pa:#7a56c8;--rm-pb:#5b3aa1;--rm-pedge:#2c1956;--rm-pledge:#170b30;
   --rm-psh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
   --rm-well:inset 0 1px 3px rgba(0,0,0,.42);--rm-wellbg:rgba(10,6,18,.35);--rm-ring:rgba(201,178,242,.6);--rm-ok:#8fdcaa;--rm-oks:rgba(92,200,130,.16);
   --rm-focus:var(--accent-bright,#c9b2f2);--rm-flash:rgba(201,178,242,.4)}
@@ -209,7 +212,7 @@ var CHEV='<i aria-hidden="true">'+svg('<path d="M6 9l6 6 6-6"/>')+'</i>';
 var CONF={
   settings:{label:"Settings, in rooms",find:true,all:true,rooms:[
     {k:"everyday",t:"Everyday",i:"day",says:"Everyday things: day or night, sound, and help. A refresh key is here too, for when the app glitches.",
-      ids:["ing-refresh-card",/^name$/,/^look and feel/,"ingSoundCard",/^sounds?\b/,"ihSetCard"]},
+      ids:["ing-refresh-card",/^name$/,/^look and feel/,"ingSoundCard",/^sounds?\b/,"ihSetCard","dmcCard"]},  /* 7.29: the diamond on Adamas (r314) */
     {k:"calm",t:"Calm and focus",i:"calm",says:"Support for focus, time and a calmer screen. One group opens at a time.",ids:["supCard"]},
     {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search, Ingenium's eyes and its ears (dictation) are here too.",
       ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ingEarsCard","ragCard","awakeCard"]},
@@ -575,7 +578,7 @@ function answers(R,how){if(R.cur!=="new"&&R.cur!=="earlier")show(R,"new",{keep:!
 function blendWhere(R,el){if(el.closest("#blPresets"))return {k:"ready"};if(el.closest("#bhBox"))return {k:"houses"};if(el.closest("#blendEarlier"))return {k:"earlier"};
   var s=el.closest("[data-rm-step]");if(s&&s.parentNode===R.setup)return {k:"new",step:+s.getAttribute("data-rm-step")};
   if(el.closest("#blendOut"))return {k:R.cur==="earlier"?"earlier":"new"};return null;}
-function where(el){if(!el||el.nodeType!==1||!el.closest)return null;var sec=el.closest("#page-settings,#page-models,#page-blend,#page-guide");if(!sec||!sec.__rm)return null;var R=sec.__rm,w;
+function where(el){if(!el||el.nodeType!==1||!el.closest)return null;var sec=el.closest("#page-settings,#page-models,#page-blend,#page-guide,#page-build");if(!sec||!sec.__rm)return null;var R=sec.__rm,w;
   if(R.view)w=blendWhere(R,el);else{var p=el.closest(".rm-panel");w=p&&p.parentNode===sec?{k:p.getAttribute("data-room")}:null;}
   if(w)w.R=R;return w;}
 /* quietly, for scrollIntoView, focus, the tour's ring and Help's Show me: the room opens, and nothing else changes */

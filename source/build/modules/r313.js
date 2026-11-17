@@ -251,6 +251,7 @@ var CARDS=[
     var n=c.querySelector('.nat-seg [aria-checked="true"]');return "Ingenium's sounds "+(x?"on":"off")+(n?" · nature sounds: "+low(words(n)):"");}},
   {id:"ihSetCard",o:3,st:function(c){var k=c.querySelector('.ih-lvk[aria-checked="true"]');if(!k)return "Your level: not chosen yet";
     return (words(k.querySelector(".ih-lvi"))+" "+words(k.querySelector(".ih-lvn"))).trim();}},
+  {id:"dmcCard",o:5,st:function(){try{return W.IngDiamondColours?IngDiamondColours.says():"";}catch(e){return "";}}},  /* 7.29 (r314) */
   {id:"ing-refresh-card",o:4,t:"#ing-refresh-h",mark:"refresh",st:function(){return "Refresh the app: it starts again in a few seconds, your work saved first";}},
   {m:/^connect a cloud/,o:1,st:function(){var k=$("cxKept"),n=k&&!k.hidden?k.querySelectorAll(".cxk-row").length:0;
     return n?(n===1?"One connection kept":n+" connections kept"):"Claude, OpenAI, Gemini and others, in three steps";}},

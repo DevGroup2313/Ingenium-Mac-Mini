@@ -1,0 +1,113 @@
+<title>Diamond Colours</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column of plates, each plate a real picture from Ingenium with its caption; the violet of Ingenium's keys as the accent */
+:root{
+  --bg:#f6f3fa; --plate:#ffffff; --ink:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --line:rgba(34,26,46,.12);
+  --acc:#6a3fb5; --acc2:#5d37a1; --accsoft:rgba(106,63,181,.10); --ok:#2a7444; --oksoft:rgba(45,154,82,.12);
+  --shadow:0 1px 0 rgba(40,22,68,.06),0 10px 28px rgba(40,22,68,.10);
+  --serif:"Cormorant Garamond","Iowan Old Style",Palatino,Georgia,serif; --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15111d; --plate:#211a2d; --ink:#f1ecfa; --ink2:#d3c9e3; --ink3:#a99cc1; --line:rgba(205,184,240,.14);
+  --acc:#c9b2f2; --acc2:#a98ae6; --accsoft:rgba(183,156,230,.14); --ok:#8fdcaa; --oksoft:rgba(92,200,130,.14);
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15111d; --plate:#211a2d; --ink:#f1ecfa; --ink2:#d3c9e3; --ink3:#a99cc1; --line:rgba(205,184,240,.14);
+  --acc:#c9b2f2; --acc2:#a98ae6; --accsoft:rgba(183,156,230,.14); --ok:#8fdcaa; --oksoft:rgba(92,200,130,.14);
+  --shadow:0 1px 0 rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.4); color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-block:36px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+header{display:grid;gap:10px}
+.eye{font:600 11.5px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--ink3)}
+h1{font:600 clamp(34px,6vw,52px)/1.04 var(--serif);margin:0;letter-spacing:.005em;text-wrap:balance}
+h2{font:600 clamp(24px,3.6vw,30px)/1.15 var(--serif);margin:0;text-wrap:balance}
+p{margin:0;max-width:68ch;color:var(--ink2)}
+.quote{border-left:3px solid var(--acc);padding:4px 0 4px 14px;font-style:italic;color:var(--ink2)}
+section{display:grid;gap:14px}
+.plate{background:var(--plate);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.plate img{display:block;width:100%;height:auto}
+.cap{padding:12px 16px 14px;font-size:14px;color:var(--ink2)}
+.cap b{color:var(--ink);font-weight:600}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.tag{display:inline-block;margin-right:6px;padding:2px 9px;border-radius:999px;background:var(--accsoft);color:var(--acc);font:600 11.5px/1.6 var(--sans);letter-spacing:.02em}
+.same{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px}
+@media (max-width:760px){.same{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.same figure{margin:0;display:grid;gap:6px}
+.same img{border-radius:10px;border:1px solid var(--line)}
+.same figcaption{font-size:12.5px;color:var(--ink3);text-align:center}
+.verdict{display:flex;gap:10px;align-items:flex-start;margin:0 14px 14px;padding:10px 12px;border-radius:12px;background:var(--oksoft);color:var(--ok);font-weight:500;font-size:14px}
+ul.list{margin:0;padding-left:20px;color:var(--ink2);display:grid;gap:6px;max-width:72ch}
+ul.list b{color:var(--ink)}
+.ask{background:var(--plate);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px 20px;display:grid;gap:10px}
+.ask ol{margin:0;padding-left:20px;display:grid;gap:8px;color:var(--ink2)}
+.ask ol b{color:var(--ink)}
+.note{font-size:13px;color:var(--ink3)}
+@media (prefers-reduced-motion:no-preference){.plate{transition:transform .2s ease}.plate:hover{transform:translateY(-2px)}}
+</style>
+<div class="wrap">
+  <header>
+    <div class="eye">Ingenium 7.29 · a preview for your word</div>
+    <h1>The diamond's colours, within reach</h1>
+    <p class="quote">"I want a clear way to edit Adamas' diamond and change the colours as I please, I can't locate the settings for it. Please make it accessible and visible for me."</p>
+    <p>What I found: there was no setting to find. Since 7.01 the diamond has changed colour by itself through the day (the clear crystal from 5:00, lavender from 11:00, purple from 14:00, the night stone from 18:00, and the night stone whenever the night theme is on). The code could switch looks, but nothing on screen called it. Every picture below is taken from Ingenium itself, built from the new sources.</p>
+  </header>
+
+  <section>
+    <h2>Where you find it</h2>
+    <div class="plate"><img alt="Adamas's head by day, with a new key, Diamond colours, under Run your page and Load a sample" src="{{key}}" width="{{key_w}}" height="{{key_h}}"><div class="cap"><b>A key on Adamas's head, Diamond colours,</b> beside Run your page and Load a sample. It sits on a second row because the three keys are a little wider than the words' column.</div></div>
+    <div class="plate"><img alt="Settings, Everyday, a tile named The diamond on Adamas with its choices" src="{{settings}}" width="{{settings_w}}" height="{{settings_h}}"><div class="cap"><b>The same choices in Settings, Everyday,</b> as a raised tile named "The diamond on Adamas", whose line says what is chosen. Find a setting finds it (try "diamond" or "colour"), and <b>Show me on Adamas</b> opens the head's panel.</div></div>
+  </section>
+
+  <section>
+    <h2>The panel, beside the diamond</h2>
+    <div class="plate"><img alt="The panel open over the words of the head, the diamond in full view to the right" src="{{panel}}" width="{{panel_w}}" height="{{panel_h}}"><div class="cap">The panel opens over the head's words, so the diamond stays in full view and changes the moment you choose. <b>The stone:</b> By the hour (as now), Clear crystal, Lavender, Purple, Night stone, or Your own colour. <b>The holder's band:</b> Ingenium's violet (as now) or your own colour. <b>The light</b> that shoots through it, on or off. <b>Back to Ingenium's own</b> undoes everything. Escape or × closes it. On a phone it opens under the keys instead.</div></div>
+  </section>
+
+  <section>
+    <h2>A colour of your own</h2>
+    <p>Eight jewel colours (Ruby, Rose, Amber, Citrine, Emerald, Aqua, Sapphire, Amethyst), or any colour from your system's colour picker, with a slider from Faint to Deep. The stone filters light through your colour, as a real coloured gem does. These four are test choices I made to check it.</p>
+    <div class="grid2">
+      <div class="plate"><img alt="A deep ruby stone by day" src="{{ruby}}" width="{{ruby_w}}" height="{{ruby_h}}"><div class="cap"><span class="tag">test</span><b>Ruby, deep,</b> by day. Band: Ingenium's violet.</div></div>
+      <div class="plate"><img alt="An emerald stone by day with a sapphire band" src="{{emerald}}" width="{{emerald_w}}" height="{{emerald_h}}"><div class="cap"><span class="tag">test</span><b>Emerald,</b> two thirds deep, by day. Band: Sapphire.</div></div>
+      <div class="plate"><img alt="A faint aqua stone by day" src="{{aqua}}" width="{{aqua_w}}" height="{{aqua_h}}"><div class="cap"><span class="tag">test</span><b>Aqua, faint,</b> close to the clear crystal.</div></div>
+      <div class="plate"><img alt="A rose stone by night with an amber band, the panel closed" src="{{rose}}" width="{{rose_w}}" height="{{rose_h}}"><div class="cap"><span class="tag">test</span><b>Rose,</b> by night, lit as the night stone is. Band: Amber. This is the picture with the gold strip you saw: the band was set to Amber to test that option.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>With nothing chosen, nothing changes</h2>
+    <p>You asked me to put the strip around the holder back. It was never changed: the gold strip came from my test choice above. To prove it, here is the diamond with nothing chosen, held still at one instant, from 7.28's sources and from the new ones.</p>
+    <div class="plate">
+      <div class="same">
+        <figure><img alt="Night, 7.28" src="{{before_night}}" width="{{before_night_w}}" height="{{before_night_h}}"><figcaption>By night, 7.28</figcaption></figure>
+        <figure><img alt="Night, new" src="{{after_night}}" width="{{after_night_w}}" height="{{after_night_h}}"><figcaption>By night, new</figcaption></figure>
+        <figure><img alt="Day, 7.28" src="{{before_day}}" width="{{before_day_w}}" height="{{before_day_h}}"><figcaption>By day, 7.28</figcaption></figure>
+        <figure><img alt="Day, new" src="{{after_day}}" width="{{after_day_w}}" height="{{after_day_h}}"><figcaption>By day, new</figcaption></figure>
+      </div>
+      <div class="verdict">Compared pixel by pixel (220,480 pixels each): no pixel differs, by night or by day. The violet band is exactly as it was.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What else this release holds</h2>
+    <ul class="list">
+      <li><b>Adamas's chosen tab</b> (Your page, Download as an app) is a solid violet key with white words again, as in Settings, by day and by night.</li>
+      <li><b>Your apps' packages:</b> I made every kit and every ready-made app of Carpe Diem, Inkwell and Lakay and read each one. Their icons, names and pages were their own, but six small hidden files still said "Ingenium Fabrica" (the Android app's signature, and the file each Android, iPhone, iPad, Mac and Windows app keeps about itself). They now say "Fabrica". 137 checks pass; The Forge's 147 checks passed already.</li>
+      <li><b>Open Storage</b> from the "storage is full" notice now reaches the Storage section with its heading ready.</li>
+    </ul>
+  </section>
+
+  <div class="ask">
+    <h2>Your word</h2>
+    <ol>
+      <li><b>Approve the diamond's colours</b> as shown, and I build them into 7.29 with the fixes above.</li>
+      <li><b>The holder's band option:</b> keep it (violet unless you choose otherwise), or take it out so only the stone's colour can change?</li>
+      <li>Anything to change: the key's name or place, the eight jewel colours, the wording.</li>
+    </ol>
+    <p class="note">Pictures were drawn in a cloud computer's software graphics, not on your devices; your Mac's graphics chip draws the same scene with more detail.</p>
+  </div>
+</div>
