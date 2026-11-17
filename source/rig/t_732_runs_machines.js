@@ -61,7 +61,7 @@ const WF = ['name: Build', 'on: [workflow_dispatch]', 'jobs:', '  linux:', '    
   await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Tide Clock/.test(x.textContent)); if (t) t.click(); }); await p.waitForTimeout(1500);
   const view = async (pg, v) => { await pg.evaluate(v => { const x = window.fbHubHost; x.S.view = v; x.paintWork(); }, v); await pg.waitForTimeout(1500); };
   await view(p, 'machines'); await p.waitForTimeout(2500); await view(p, 'machines');
-  const mc = await p.evaluate(n => { const cards = [...document.querySelectorAll('#fbWorkBody .r298-mc')]; const c = cards.find(x => x.textContent.includes(n)); return { cards: cards.map(x => x.querySelector('b') && x.querySelector('b').textContent), ready: c ? c.querySelector('.f-chip.st').textContent : null, tools: c ? c.querySelectorAll('.r298-tool').length : 0, add: !![...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Add a machine') }; }, pr.name);
+  const mc = await p.evaluate(n => { const cards = [...document.querySelectorAll('#fbWorkBody .r298-mc')]; const c = cards.find(x => (x.querySelector('b') && x.querySelector('b').textContent.trim() === n)); return { cards: cards.map(x => x.querySelector('b') && x.querySelector('b').textContent), ready: c ? c.querySelector('.f-chip.st').textContent : null, tools: c ? c.querySelectorAll('.r298-tool').length : 0, add: !![...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Add a machine') }; }, pr.name);
   ok(mc.ready === 'Ready' && mc.tools > 0 && mc.add, 'Machines: the other computer, Ready, with its tools; Add a machine', mc);
   await p.screenshot({ path: path.join(OUT, 'machines.png') });
   // the run sheet
@@ -111,8 +111,8 @@ const WF = ['name: Build', 'on: [workflow_dispatch]', 'jobs:', '  linux:', '    
   ok(can === true && rb && rb.state === 'ok', 'a device with no computer app runs its workflow on the other computer', { can, state: rb && rb.state });
   // the other computer's runs switched off
   await api(B.port, 'share_runs_set', [false]); await p.waitForTimeout(800); await view(p, 'machines');
-  await p.evaluate(n => { const c = [...document.querySelectorAll('#fbWorkBody .r298-mc')].find(x => x.textContent.includes(n)); [...c.querySelectorAll('button')].find(x => x.textContent.trim() === 'Check it again').click(); }, pr.name); await p.waitForTimeout(3000); await view(p, 'machines');
-  const off = await p.evaluate(n => { const c = [...document.querySelectorAll('#fbWorkBody .r298-mc')].find(x => x.textContent.includes(n)); return c ? (c.querySelector('.f-chip.st') || {}).textContent : null; }, pr.name);
+  await p.evaluate(n => { const c = [...document.querySelectorAll('#fbWorkBody .r298-mc')].find(x => (x.querySelector('b') && x.querySelector('b').textContent.trim() === n)); [...c.querySelectorAll('button')].find(x => x.textContent.trim() === 'Check it again').click(); }, pr.name); await p.waitForTimeout(3000); await view(p, 'machines');
+  const off = await p.evaluate(n => { const c = [...document.querySelectorAll('#fbWorkBody .r298-mc')].find(x => (x.querySelector('b') && x.querySelector('b').textContent.trim() === n)); return c ? (c.querySelector('.f-chip.st') || {}).textContent : null; }, pr.name);
   ok(off === 'Runs off there' || off === 'Asleep', 'its runs switched off there: Machines says so after Check it again', off);
   ok(errs.length === 0, 'no page errors', errs);
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); A.pr.kill(); B.pr.kill(); process.exit(fail ? 1 : 0);
