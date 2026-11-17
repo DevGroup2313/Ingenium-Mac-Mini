@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.34", "Opening an app from Fabrica in Code again reads only the files that changed since, not all of them; and a change made in Fabrica is no longer undone by Code's older copy when you come back to Fabrica.", "fabrica"],
   ["7.33", "Schedae's keys look as they did before 7.15: New note the amethyst stone with its gold rim, Pin, Send to Tabula and Delete their own glossy lavender and red keys, now lifting under the pointer. The two keys under its title, to Tabula and to Abacus, are gone: both are still in the side list.", "desk"],
   ["7.33", "Fabrica is easier to find your way in. Above its panels: where you are (Fabrica, the app, the room, the part) with what GitHub calls the part; the next step for your app (keep, test, ship); Go to anything (the slash key) for any room, part, issue, app or thing to do; the map of all of Fabrica (M), and Teach me as I go, a short lesson on each part with its GitHub and git names. The rooms show what waits in them. Every chip, card, row and key in Fabrica now lifts under the pointer, and the fold keys pop out only then.", "fabrica"],
   ["7.32", "At night, under the diamond's colours, has a fourth choice: the Clear crystal, the day's clear crystal shining in the night, under northern lights in every colour, whatever the stone by day."],

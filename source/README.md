@@ -395,6 +395,23 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.34 (in progress, 17 November 2026): Code reads only an app's changed files.
+One of the workshop's open ends (7.27: "opening an app in Code still reads all its files").
+- Found (read in the code): r112's openInCode read every file of the app from Fabrica each time it opened the app in Code (IngRepo.read,
+  one file after another), though IngRepo.files already gives each file's fingerprint (its git object id). Its syncFromCode, which runs
+  each time Fabrica is opened on the app, read every file again from Fabrica to compare with Code's. And it took Code's copy back over a
+  newer one in Fabrica even when Code had not changed it: a change made in Fabrica (a version kept from Chat, Fabrica's own editor) was
+  undone the next time Fabrica was opened, if the app had been opened in Code before (shown by rig/t_734 on the 7.33 page: the style
+  changed in Fabrica to teal came back as Code's navy).
+- `build/modules/r112.js`: the fingerprints last given to Code are kept (state.fabrica.codeOids, per app). Opening the app again reads
+  only the files whose fingerprint changed, or that Code no longer has; a file Code cannot take (a picture, a file too large) is
+  remembered and not read again until it changes. syncFromCode compares Code's files by fingerprint, reading from Fabrica only a file
+  that differs (then word for word, as before); a file Code has not changed since it was given it no longer comes back over Fabrica's.
+  The first opening reads every file, as before.
+- rig: `t_734_code_reads_changed.js` (new, 15 checks, an invented app of three text files and a picture; Fabrica's reads counted by
+  wrapping IngRepo.read and IngRepo.readText). On the 7.33 page it fails 11 of them, as it should.
+- Not done yet: a GitHub session in Code keeping a copy in Fabrica (a design to show her first).
+
 Ingenium 7.33 (17 November 2026): Fabrica, easier to find your way, and nothing stiff.
 Her words (17 November 2026), on the live preview (https://claude.ai/artifact/NdgRNGS3yvtan8RH3rmBSE, source/previews/fabrica_nav): "I
 approve of your preview, please commit and push it everywhere continue working on my requests. The "4 kept here" button from Fabrica's

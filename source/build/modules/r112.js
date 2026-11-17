@@ -1357,20 +1357,42 @@ function paintReleases(r,w,f){if(!r.head){w.appendChild(h("div","f-empty","<b>No
 /* ---------- Code and Fabrica keep the same files ---------- */
 function projFor(r){var id=FBS().links[r.id];if(!id)return null;try{return (state.projects||[]).filter(function(p){return p.id===id;})[0]||null;}catch(e){return null;}}
 function isText(path,u8){if(/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|wasm|mp3|mp4|m4a|ogg|wav|webm|avif|jks|keystore|p12)$/i.test(path))return false;var n=Math.min(u8.length,4096);for(var i=0;i<n;i++)if(u8[i]===0)return false;return true;}
+/* 7.34: Code reads only what changed. Each file in Fabrica has its fingerprint (its git object id, from IngRepo.files); the fingerprints
+   last given to Code are kept (state.fabrica.codeOids[app]), so opening an app again reads only the files whose fingerprint changed since,
+   or that Code no longer has; a file Code could not take (a picture, or a file too large) is remembered as such ("~" before its
+   fingerprint) and not read again until it changes. The first opening reads every file, as before. Her words: Code reading only an app's
+   changed files (the workshop's open ends, 7.27). */
+function codeOids(){var F=FBS();if(!F.codeOids||typeof F.codeOids!=="object")F.codeOids={};return F.codeOids;}
+function blobOid(text){var te=new TextEncoder(),b=te.encode(text),h=te.encode("blob "+b.length+"\0"),u=new Uint8Array(h.length+b.length);u.set(h,0);u.set(b,h.length);return Promise.resolve(IngRepo.core.sha1(u));}
 function openInCode(r,path){if(typeof ccMakeProject!=="function"||typeof ccNewSession!=="function"){toast("Code is not in this build.");return;}
-  busy("Opening "+r.name+" in Code…");var pr=projFor(r);
-  IngRepo.files(r.id).then(function(list){var td=new TextDecoder(),chain=Promise.resolve(),files=[];
-    list.forEach(function(f){chain=chain.then(function(){return IngRepo.read(r.id,f.path).then(function(b){if(b&&isText(f.path,b)&&b.length<(window.ingFabMB?window.ingFabMB.text:40)*1048576)files.push({name:f.path,text:td.decode(b)});});});});
-    return chain.then(function(){return files;});}).then(function(files){
-    if(!pr){var main=path||(files.filter(function(f){return /\.html?$/i.test(f.name)&&f.name.indexOf("/")<0;})[0]||files[0]||{}).name||"";return ccMakeProject(r.name,files,main).then(function(p){FBS().links[r.id]=p.id;saveSoon();return p;});}
-    return ccLoadAll(pr).then(function(){var have={};(pr.files||[]).forEach(function(f){have[f.name]=f;});var q=Promise.resolve();
-      files.forEach(function(f){var x=have[f.name];if(x){if(x.text!==f.text)q=q.then(function(){return ccPut(x,f.text);});}else{var nf={name:f.name,ref:null,size:0};pr.files.push(nf);q=q.then(function(){return ccPut(nf,f.text);});}});
-      if(path&&have[path])pr.main=path;return q.then(function(){return pr;});});}).then(function(p){unbusy();FBS().linksBack=FBS().linksBack||{};FBS().linksBack[p.id]=r.id;saveSoon();ccNewSession(p);go("code");},function(e){unbusy();fail(e);});}
-/* what Code changed comes back here as changes to keep */
+  busy("Opening "+r.name+" in Code…");var pr=projFor(r),known=pr?(codeOids()[r.id]||null):null,td=new TextDecoder(),lim=(window.ingFabMB?window.ingFabMB.text:40)*1048576;
+  Promise.all([IngRepo.files(r.id),pr?ccLoadAll(pr):null]).then(function(res){var list=res[0]||[],have={};if(pr)(pr.files||[]).forEach(function(f){have[f.name]=f;});
+    var need=list.filter(function(f){if(!known)return true;var k=known[f.path];if(k==="~"+f.oid)return false;return k!==f.oid||!have[f.path];});
+    var chain=Promise.resolve(),files=[],skip={};
+    need.forEach(function(f){chain=chain.then(function(){return IngRepo.read(r.id,f.path).then(function(b){if(b&&isText(f.path,b)&&b.length<lim)files.push({name:f.path,text:td.decode(b)});else skip[f.path]=1;});});});
+    return chain.then(function(){var m={};list.forEach(function(f){m[f.path]=(skip[f.path]||(known&&known[f.path]==="~"+f.oid))?"~"+f.oid:f.oid;});
+      try{window.__fbCodeRead={app:r.id,files:list.length,read:need.length};}catch(e){}
+      return {files:files,have:have,oids:m};});}).then(function(o){var files=o.files;
+    if(!pr){var main=path||(files.filter(function(f){return /\.html?$/i.test(f.name)&&f.name.indexOf("/")<0;})[0]||files[0]||{}).name||"";return ccMakeProject(r.name,files,main).then(function(p){FBS().links[r.id]=p.id;codeOids()[r.id]=o.oids;saveSoon();return p;});}
+    var have=o.have,q=Promise.resolve();
+    files.forEach(function(f){var x=have[f.name];if(x){if(x.text!==f.text)q=q.then(function(){return ccPut(x,f.text);});}else{var nf={name:f.name,ref:null,size:0};pr.files.push(nf);q=q.then(function(){return ccPut(nf,f.text);});}});
+    if(path&&have[path])pr.main=path;return q.then(function(){codeOids()[r.id]=o.oids;return pr;});}).then(function(p){unbusy();FBS().linksBack=FBS().linksBack||{};FBS().linksBack[p.id]=r.id;saveSoon();ccNewSession(p);go("code");},function(e){unbusy();fail(e);});}
+/* what Code changed comes back here as changes to keep. 7.34: each of Code's files is compared by its fingerprint with Fabrica's, so only a
+   file whose fingerprint differs is read from Fabrica (and compared word for word, as before, so that a file Code only decoded, such as
+   one with a byte-order mark, is not counted as changed); and a file Code has not changed since it was given it does not come back over
+   a newer one in Fabrica */
 function syncFromCode(r){var pr=r&&projFor(r);if(!pr||typeof ccLoadAll!=="function")return Promise.resolve(false);
-  return ccLoadAll(pr).then(function(){var fs=(pr.files||[]).filter(function(f){return typeof f.text==="string";}),q=Promise.resolve(),puts=[];
-    fs.forEach(function(f){q=q.then(function(){return IngRepo.readText(r.id,f.name).then(function(t){if(t!==f.text)puts.push({path:f.name,data:f.text});});});});
-    return q.then(function(){if(!puts.length)return false;return IngRepo.putMany(r.id,puts).then(function(){C.diff={};C.files={};return true;});});}).then(function(changed){
+  return Promise.all([ccLoadAll(pr),IngRepo.files(r.id)]).then(function(res){var oid={};(res[1]||[]).forEach(function(f){oid[f.path]=f.oid;});
+    var fs=(pr.files||[]).filter(function(f){return typeof f.text==="string";}),q=Promise.resolve(),puts=[],same={};
+    var k=codeOids()[r.id]||null;
+    fs.forEach(function(f){q=q.then(function(){return blobOid(f.text).then(function(o){if(oid[f.name]&&o===oid[f.name]){same[f.name]=o;return;}
+      /* Code's copy is still the one Fabrica gave it: Code did not change it, Fabrica did since (a version kept from Chat, Fabrica's own
+         editor); Fabrica's is kept, and Code is given it when the app is opened there again. Before 7.34 Code's older copy was taken back
+         over Fabrica's newer one. */
+      if(k&&k[f.name]===o)return;
+      return IngRepo.readText(r.id,f.name).then(function(t){if(t!==f.text)puts.push({path:f.name,data:f.text,oid:o});});});});});
+    return q.then(function(){if(!puts.length)return false;return IngRepo.putMany(r.id,puts.map(function(x){return {path:x.path,data:x.data};})).then(function(){
+      var k=codeOids()[r.id];if(k)puts.forEach(function(x){k[x.path]=x.oid;});C.diff={};C.files={};return true;});});}).then(function(changed){
       /* what came back from Code is shown at once, as changes to keep */
       if(changed)return refresh().then(function(){if(cur()&&cur().id===r.id&&S.view!=="changes"){S.view="changes";S.cmp=null;S.file=0;}paint();return true;});return false;}).catch(function(){return false;});}
 
