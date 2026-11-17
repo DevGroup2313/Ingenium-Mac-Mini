@@ -76,7 +76,7 @@ const WF = ['name: Build', 'on: [workflow_dispatch]', 'jobs:', '  linux:', '    
   let rec = null; for (let i = 0; i < 240; i++) { await p.waitForTimeout(500); rec = await p.evaluate(async id => { const l = await IngLend.request(id, 'GET', '/ingenium/runs/list'); return (l.runs || [])[0] || null; }, pr.id).catch(() => null); if (rec && /ok|bad|stopped/.test(rec.state)) break; }
   ok(rec && rec.state === 'ok' && (rec.jobs || []).some(j => j.key === 'linux' && j.state === 'ok') && (rec.jobs || []).some(j => j.key === 'win' && j.state === 'skipped'), 'Only on the other computer: it ran there, the Linux job well, the Windows job not (another system)', rec && { state: rec.state, jobs: (rec.jobs || []).map(j => [j.key, j.state]) });
   await p.waitForTimeout(4000); await view(p, 'runs');
-  const rl = await p.evaluate(() => [...document.querySelectorAll('#fbWorkBody .r298-run')].map(x => x.textContent));
+  const rl = await p.evaluate(() => [...document.querySelectorAll('#fbWorkBody .r298-run, #fbWorkBody .r298-runhead')].map(x => x.textContent));  /* the run started opens its own page; the list shows it otherwise */
   ok(rl.some(t => t.includes(pr.name) || /kept here too/.test(t)), 'the Runs list says where it ran', rl);
   // its log and its file, read here
   const lg = await p.evaluate(async ([id, r]) => { const g = await IngLend.request(id, 'GET', '/ingenium/runs/log?rid=' + encodeURIComponent(r) + '&job=linux&offset=0'); return g.text || ''; }, [pr.id, rec.id]);
