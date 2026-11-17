@@ -395,6 +395,14 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.35 (in progress, 17 November 2026).
+- rig: `t_641_logos.js` 11/11 again (10/11 since 7.22). Its check that the pointer turns an app's logo moved the pointer to the Ledger
+  Lamp row at 1,152 points in a window 900 high: the parts above Your apps grew after 7.22, and the row lay below the window, where no
+  pointer reaches. The row is now brought into view first. The logos' tilt itself was never at fault (r112's pointermove).
+- The iPhone four ways: a live preview (source/previews/iphone_ways, https://claude.ai/artifact/HMXfpBF7MfUwg9Q8Z2yNRP), waiting
+  for her word. Her answers (17 November 2026): a paid developer account "Not yet, but plan to"; the Home Screen app "Mac first,
+  GitHub backup"; inside Ingenium "Both" (paired devices, and a file).
+
 Ingenium 7.34 (17 November 2026): the workshop's two open ends. Code reads only an app's changed files; a GitHub session keeps a
 linked copy in Fabrica, with its history.
 The two open ends of 7.27: "opening an app in Code still reads all its files" and "a GitHub session in Code keeping a copy in Fabrica".

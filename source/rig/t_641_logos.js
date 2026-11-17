@@ -61,7 +61,8 @@ const rowOf = (p, n) => p.evaluate((n) => { const b = [...document.querySelector
   const wh = await p.evaluate(() => { const s = document.getElementById('fbWhSeal'); return { name: (document.getElementById('fbWhName') || {}).textContent, logo: !!(s && s.classList.contains('logo')), size: s ? Math.round(s.getBoundingClientRect().width) : 0 }; });
   ok(wh.name === 'Tide Clock' && wh.logo && wh.size === 34, 'chosen, the work panel\'s head shows the app\'s logo at its size', wh);
   // the pointer turns it and lifts it, as it does the seals
-  const box = await p.evaluate(() => { const b = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => (x.querySelector('.nm') || {}).textContent === 'Ledger Lamp'); const r = b.querySelector('.f-ls').getBoundingClientRect(); return { x: r.left + r.width * .85, y: r.top + r.height * .3 }; });
+  /* the row is brought into view first: since 7.22 the parts above Your apps grew, and its row lay below the window, where no pointer reaches */
+  const box = await p.evaluate(() => { const b = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => (x.querySelector('.nm') || {}).textContent === 'Ledger Lamp'); b.scrollIntoView({ block: 'center' }); const r = b.querySelector('.f-ls').getBoundingClientRect(); return { x: r.left + r.width * .85, y: r.top + r.height * .3 }; });
   await p.mouse.move(box.x - 20, box.y); await p.mouse.move(box.x, box.y, { steps: 4 }); await p.waitForTimeout(300);
   const tilt = await p.evaluate(() => { const b = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => (x.querySelector('.nm') || {}).textContent === 'Ledger Lamp'); const ls = b.querySelector('.f-ls'); return { hov: ls.classList.contains('hov'), ry: ls.style.getPropertyValue('--ry') }; });
   ok(tilt.hov && /deg/.test(tilt.ry) && parseFloat(tilt.ry) !== 0, 'the pointer turns it toward itself and lifts it, as it does the seals', tilt);
