@@ -1042,7 +1042,9 @@ function boot(){if(!hook()){setTimeout(boot,300);return;}addRoom();(W.fbAfterPai
   setTimeout(function(){if(others().length)list(true).then(function(){watch();counts();needs(true);},function(){});},4000);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("pywebviewready",function(){tools(false).catch(function(){});list(true).then(function(){watch();counts();needs(true);});});
-W.IngRuns={core:CORE,state:function(){return {open:ST.open,job:ST.job,here:ST.here,runs:ST.runs.length,needs:(ST.needs||[]).map(function(n){return n.t;}),lmode:LMODE};},list:list,tools:tools,start:start,recipeText:recipeText,needs:needs};
+W.IngRuns={core:CORE,state:function(){return {open:ST.open,job:ST.job,here:ST.here,runs:ST.runs.length,needs:(ST.needs||[]).map(function(n){return n.t;}),lmode:LMODE};},list:list,tools:tools,start:start,recipeText:recipeText,needs:needs,
+  /* 7.33: Fabrica's lessons and its way to open a view, for the path, the map and Teach me as I go (modules/r315.js) */
+  learn:LEARN,caps:CAPS,roomOf:ROOMOF,nav:function(v){if(v==="runs"||v==="workflows"||v==="machines")go(v);else nav(v);}};
 try{window.__ingParts["p298"]="running";}catch(_){}
 })();
 </script>
