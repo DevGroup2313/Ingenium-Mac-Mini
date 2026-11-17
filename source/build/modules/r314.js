@@ -78,8 +78,22 @@ body[data-theme="night"] .skh .dmc-ck:hover,body[data-theme="night"] .skh .dmc-c
 body[data-theme="night"] .dmc-top{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0))}
 /* the chosen stone at the top, standing alone, turning (her word on the approved preview, 17 November 2026: "remove the white circle
    that is around the diamond at the top of the panel") */
-.dmc-setting{position:relative;display:grid;place-items:center;width:60px;height:46px}
-.dmc-setting .dmc-st{--sw:58px;-webkit-box-reflect:below 1px linear-gradient(transparent 55%,rgba(255,255,255,.25));filter:drop-shadow(0 2px 2px rgba(30,10,60,.22))}
+.dmc-setting{position:relative;display:grid;place-items:center;width:60px;height:46px;margin:0;padding:0;border:0;border-radius:14px;background:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .5s cubic-bezier(.3,1.9,.45,1)}
+.dmc-setting .dmc-st{--sw:58px;-webkit-box-reflect:below 1px linear-gradient(transparent 55%,rgba(255,255,255,.25));filter:drop-shadow(0 2px 2px rgba(30,10,60,.22));animation:dmcFloat 4.6s ease-in-out infinite}
+/* a toy, as the main diamond is (her words, 17 November 2026: "The little diamond on the top left of the diamond's colours panel need to
+   be animated and clickable, it does not need to do anything, just be a fun animated clickable toy like the main diamond"): it floats and
+   turns; under the pointer it leans; pressed it sinks with the main diamond's own sound (IngSound "paper"), and let go it springs back,
+   whirls and throws a burst of Ingenium's four-pointed sparkles. It changes nothing. Minimal motion keeps only the sound and the press. */
+.dmc-setting:hover{transform:translateY(-2px) rotate(-5deg)}
+.dmc-setting.dmc-down{transform:translateY(2px) scale(.86);transition:transform .08s ease-out}
+.dmc-setting.dmc-whirl .dmc-st img{animation-duration:.34s}
+.dmc-setting.dmc-whirl .dmc-st{filter:drop-shadow(0 0 8px rgba(255,255,255,.8)) drop-shadow(0 0 14px rgba(170,130,250,.55))}
+.dmc-setting:focus-visible{outline:2.5px solid var(--dmc-acc);outline-offset:3px}
+.dmc-burst{position:absolute;left:50%;top:44%;width:0;height:0;pointer-events:none;z-index:3}
+.dmc-burst i{position:absolute;left:-6px;top:-6px;width:12px;height:12px;background:radial-gradient(circle,#ffffff 0 30%,#e6d9ff 60%,#b89af0);
+  clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);opacity:0;animation:dmcBurst .78s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes dmcBurst{0%{opacity:0;transform:translate(0,0) scale(.2) rotate(0deg)}18%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(120deg)}}
 .dmc-top b{display:block;font:600 22px/1.1 var(--sk-serif,"Home Cormorant","Cormorant Garamond",Georgia,serif);letter-spacing:.005em;color:var(--dmc-ink1)}
 .dmc-top small{display:block;margin-top:3px;font-size:11.8px;line-height:1.4;color:var(--dmc-ink3)}
 .dmc-x{width:30px;height:30px;border-radius:50%;border:1px solid var(--dmc-hair);background:var(--dmc-key);box-shadow:var(--dmc-keysh);color:var(--dmc-ink2);
@@ -278,7 +292,7 @@ var KEYGEM='<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path 
 var SEQ=0,PANELS=[];
 /* one panel: painted from the settings whenever anything changes, so the head's and Settings' panels agree */
 function panel(where){var id="dmc"+(++SEQ),p=mk("div","dmc");p.setAttribute("role","group");p.setAttribute("aria-label","The diamond's colours");p.setAttribute("data-where",where);
-  var top=mk("div","dmc-top"),setg=mk("span","dmc-setting"),tw=mk("div");tw.appendChild(mk("b",null,"The diamond's colours"));
+  var top=mk("div","dmc-top"),setg=mk("button","dmc-setting"),tw=mk("div");setg.type="button";setg.setAttribute("aria-label","The little diamond, to press for fun");toy(setg);tw.appendChild(mk("b",null,"The diamond's colours"));
   tw.appendChild(mk("small",null,"Each choice shows on the diamond at once, and is kept with your settings and your backups."));top.appendChild(setg);top.appendChild(tw);
   if(where==="head"){var x=mk("button","dmc-x","×");x.type="button";x.setAttribute("aria-label","Close the diamond's colours");x.addEventListener("click",function(){closeHead(true);});top.appendChild(x);}
   p.appendChild(top);var sc=mk("div","dmc-scroll");p.appendChild(sc);
@@ -313,6 +327,18 @@ function panel(where){var id="dmc"+(++SEQ),p=mk("div","dmc");p.setAttribute("rol
     paintSw(own,d.look==="own"?d.stone:null,swn1,"Your stone");bv.setAttribute("aria-checked",String(!d.band));bo.setAttribute("aria-checked",String(!!d.band));
     own2.hidden=!d.band;paintSw(own2,d.band,swn2,"Your band");sw.setAttribute("aria-checked",String(d.light!==false));}};
   PANELS.push(P);P.paint();return P;}
+/* the little diamond at the top: a toy (see the style above) */
+function stillNow(){try{return W.matchMedia("(prefers-reduced-motion: reduce)").matches||D.body.getAttribute("data-motion")==="minimal";}catch(e){return false;}}
+function burst(el){var b=mk("span","dmc-burst");for(var i=0;i<8;i++){var s=mk("i"),a=(i/8)*Math.PI*2+Math.random()*.45,r=24+Math.random()*16;
+    s.style.setProperty("--dx",(Math.cos(a)*r).toFixed(1)+"px");s.style.setProperty("--dy",(Math.sin(a)*r*.75).toFixed(1)+"px");s.style.animationDelay=(i*0.018).toFixed(3)+"s";b.appendChild(s);}
+  el.appendChild(b);setTimeout(function(){try{b.remove();}catch(e){}},1000);}
+function toy(el){function down(){el.classList.add("dmc-down");try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(x){}}
+  function up(){if(!el.classList.contains("dmc-down"))return;el.classList.remove("dmc-down");if(stillNow())return;el.classList.add("dmc-whirl");burst(el);
+    clearTimeout(el.__w);el.__w=setTimeout(function(){el.classList.remove("dmc-whirl");},1100);}
+  el.addEventListener("pointerdown",function(e){if(e.button>0)return;down();});el.addEventListener("pointerup",up);
+  el.addEventListener("pointerleave",function(){el.classList.remove("dmc-down");});el.addEventListener("pointercancel",function(){el.classList.remove("dmc-down");});
+  el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();if(e.repeat)return;down();setTimeout(up,110);}});
+  el.addEventListener("click",function(e){e.preventDefault();});}
 function nameOf(h){var j=JEWELS.filter(function(J){return J[1]===h;})[0];return j?j[0]:"a colour of your own ("+h+")";}
 function swatches(id,pick,what){var w=mk("div","dmc-sw8");w.setAttribute("role","radiogroup");w.setAttribute("aria-label",what==="band"?"The band's colour":"The stone's colour");
   JEWELS.forEach(function(J,ix){var b=mk("button","dmc-s");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-label",J[0]);b.title=J[0];b.setAttribute("data-hex",J[1]);b.style.setProperty("--i",String(ix));b.innerHTML=stone(J[0].toLowerCase(),ix);

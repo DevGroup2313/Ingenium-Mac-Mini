@@ -424,8 +424,12 @@ diamond at the top of the panel, everything else looks great, please commit and 
   - the band: the real holder with each band, two small choices; the light: Ingenium's own switch (.dmc-sw); the panel leans toward the
     pointer; no scroll bar in view (scrollbar-width none and ::-webkit-scrollbar), the scrolling kept; the stone at the top stands alone,
     without the silver setting she asked to remove; the panel's title in Ingenium's own head serif (--sk-serif, Home Cormorant).
+  - the little diamond at the top is a toy (her words: "The little diamond on the top left of the diamond's colours panel need to be
+    animated and clickable, it does not need to do anything, just be a fun animated clickable toy like the main diamond"): it floats and
+    turns; pressed, it sinks with the main diamond's own sound, and let go it springs back, whirls and throws a burst of Ingenium's
+    four-pointed sparkles; it changes nothing; Minimal motion keeps only the sound and the press.
 - What is this? (r144), the Guide's diamond entry (r250) and What is new (r222) say where the key is now.
-- rig: `t_730_diamond_colours.js` (new, 20 checks) supersedes `t_729_diamond_colours.js`; `t_700_heads.js` expects Adamas's row of two
+- rig: `t_730_diamond_colours.js` (new, 21 checks, the toy among them) supersedes `t_729_diamond_colours.js`; `t_700_heads.js` expects Adamas's row of two
   keys and the key in the corner.
 
 Ingenium 7.29 (17 November 2026): the diamond's colours within reach; her apps' packages without a word of Ingenium; Adamas's chosen

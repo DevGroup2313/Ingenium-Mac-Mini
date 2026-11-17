@@ -14,7 +14,8 @@
 //     the band's two choices are the real holder; the light is Ingenium's switch (.dmc-sw);
 //   - each choice reaches the diamond (IngDiamond.look, IngDiamond.tinted) and is kept (state.diamond); a deep ruby turns the stone red;
 //     Escape closes and gives the key its focus; kept after the page opens again; Back to Ingenium's own; Settings, Everyday, Find a setting,
-//     Show me on Adamas; on a phone's width the panel stands below, within the screen; no page error.
+//     Show me on Adamas; on a phone's width the panel stands below, within the screen; no page error;
+//   - the little diamond at the top of the panel is a toy (her words: "just be a fun animated clickable toy like the main diamond").
 //   node rig/t_730_diamond_colours.js <page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process');
 const [U, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -47,7 +48,11 @@ const mean = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', MEAN, 
   const violet = await stoneShot('stone_0_by_hour');
   // pressed: beside the diamond
   const before = await p.evaluate(() => { const c = document.querySelector('#page-build .skh-obj canvas').getBoundingClientRect(); return Math.round(c.left + c.width / 2); });
-  await p.click('#bdColours'); await p.waitForTimeout(1400);
+  await p.click('#bdColours'); await p.waitForTimeout(600);
+  /* the words fade and the diamond glides from the next frame (0.32 s and 0.62 s); in software WebGL a frame can take a second: awaited */
+  await p.evaluate(async () => { const h = document.querySelector('#page-build > .skh'); const els = [h.querySelector('.skh-words'), h.querySelector('.skh-obj')];
+    await Promise.race([Promise.all([].concat.apply([], els.map(e => e.getAnimations())).map(a => a.finished.catch(() => {}))), new Promise(r => setTimeout(r, 8000))]); });
+  await p.waitForTimeout(300);
   const pn = await p.evaluate(() => { const d = document.querySelector('#page-build .dmc'), h = document.querySelector('#page-build > .skh'), c = document.querySelector('#page-build .skh-obj canvas'); if (!d) return null;
     const a = d.getBoundingClientRect(), cr = c.getBoundingClientRect(), w = h.querySelector('.skh-words'), sc = d.querySelector('.dmc-scroll'), set = d.querySelector('.dmc-setting'), cs = getComputedStyle(set);
     return { side: d.classList.contains('dmc-side'), left: Math.round(a.left), diamondMid: Math.round(cr.left + cr.width / 2), stoneRight: Math.round(cr.left + cr.width * 0.68), words: getComputedStyle(w).opacity,
@@ -63,6 +68,14 @@ const mean = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', MEAN, 
   ok(st.n === 6 && st.names.join() === 'By the hour,Clear crystal,Lavender,Purple,Night stone,Your own colour' && st.real && st.turning && !st.keyBehind, 'the stones are the real diamond, turning, each with its name beneath and no key behind it', st);
   ok(st.band.length === 2 && st.band.every(x => x.holder && x.w <= 100) && st.sw && st.swOn === 'true' && st.checked.join() === "By the hour,Ingenium's violet", 'the band: two small real holders, no long keys; the light: Ingenium\'s switch; at first, Ingenium\'s own', st);
   await p.screenshot({ path: path.join(OUT, 'panel_open.png') });
+  // the little diamond at the top: a toy that answers a press and changes nothing
+  const before0 = await p.evaluate(() => JSON.stringify(state.diamond || null));
+  await p.click('#page-build .dmc .dmc-setting'); await p.waitForTimeout(150);
+  const ty = await p.evaluate(() => { const t = document.querySelector('#page-build .dmc .dmc-setting'); return { tag: t.tagName, label: t.getAttribute('aria-label'), whirl: t.classList.contains('dmc-whirl'), sparks: t.querySelectorAll('.dmc-burst i').length, kept: JSON.stringify(state.diamond || null), turning: t.querySelector('.dmc-st img').getAnimations().length > 0 }; });
+  await p.waitForTimeout(1400);
+  const ty2 = await p.evaluate(() => { const t = document.querySelector('#page-build .dmc .dmc-setting'); return { whirl: t.classList.contains('dmc-whirl'), sparks: t.querySelectorAll('.dmc-burst').length, open: !!document.querySelector('#page-build .dmc') }; });
+  ok(ty.tag === 'BUTTON' && /press it for fun|to press for fun/.test(ty.label) && ty.whirl && ty.sparks === 8 && ty.turning && ty.kept === before0 && !ty2.whirl && ty2.sparks === 0 && ty2.open,
+    'the little diamond at the top is a toy: pressed, it whirls and throws its sparkles, then settles; nothing chosen changes', { ty, ty2 });
   // choices reach the diamond and are kept
   await p.click('#page-build .dmc .dmc-c[data-look="lavender"]'); await p.waitForTimeout(400);
   const lv = await p.evaluate(() => ({ look: IngDiamond.look(), auto: IngDiamond.auto(), kept: state.diamond && state.diamond.look }));
