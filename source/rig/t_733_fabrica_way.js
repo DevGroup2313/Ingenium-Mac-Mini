@@ -90,11 +90,22 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const seen = {}, stiff = [];
   for (const [rm, vs] of Object.entries(rooms)) for (const v of vs) {
     await p.evaluate(v => IngRuns.nav(v), v); await p.waitForTimeout(800);
+    /* Fabrica paints a room again once its records come in: wait until it has been still for 600 ms (at most 5 s), so the keys hovered are
+       the ones on show (a key painted over between being chosen and being hovered read as stiff, though it lifts) */
+    await p.evaluate(() => new Promise(res => { let t = setTimeout(done, 600); const o = new MutationObserver(() => { clearTimeout(t); t = setTimeout(done, 600); }); const end = setTimeout(done, 5000); function done() { o.disconnect(); clearTimeout(end); res(); } o.observe(document.getElementById('fb'), { childList: true, subtree: true }); }));
     const cands = await p.evaluate(() => { const out = []; document.querySelectorAll('#fb *').forEach((e, i) => { if (!e.offsetParent || typeof e.className !== 'string' || !e.className) return; const cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (r.width < 14 || r.height < 14) return;
       if (!(cs.boxShadow !== 'none' || (cs.borderStyle !== 'none' && parseFloat(cs.borderWidth) > 0 && cs.borderRadius !== '0px') || e.tagName === 'BUTTON')) return; e.setAttribute('data-t733s', String(i)); out.push([String(i), e.tagName + '.' + e.className.split(/\s+/).slice(0, 2).join('.')]); }); return out; });
     for (const [i, k] of cands) { if (seen[k] || LEAVE.test(k)) continue; seen[k] = 1; const h = await p.$('[data-t733s="' + i + '"]'); if (!h) continue;
       const a = await h.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow].join('|')); try { await h.hover({ timeout: 1500 }); } catch (e) { continue; } await p.waitForTimeout(320);
-      const z = await h.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow].join('|')); if (a === z) stiff.push(k + ' (' + rm + '/' + v + ')'); await p.mouse.move(2, 2); }
+      const z = await h.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow, e.isConnected].join('|'));
+      let az = [a + '|true', z];
+      if (/\|false$/.test(z)) {   /* painted over while hovered: the same kind of key, found again on show, is judged instead */
+        await p.mouse.move(2, 2); await p.waitForTimeout(300);
+        const h2 = await p.evaluateHandle(k => { const [tag, ...cl] = k.split('.'); return [...document.querySelectorAll('#fb ' + tag.toLowerCase() + cl.map(c => '.' + CSS.escape(c)).join(''))].find(e => e.offsetParent) || null; }, k);
+        const el = h2.asElement(); if (!el) { stiff.push(k + ' (' + rm + '/' + v + ': gone before it could be judged)'); continue; }
+        const a2 = await el.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow].join('|')); try { await el.hover({ timeout: 1500 }); } catch (e) { continue; } await p.waitForTimeout(320);
+        az = [a2 + '|true', await el.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow, e.isConnected].join('|'))]; }
+      if (az[0] === az[1]) stiff.push(k + ' (' + rm + '/' + v + ')'); await p.mouse.move(2, 2); }
   }
   ok(stiff.length === 0, 'every kind of card, tile, row and key in every room answers the pointer (' + Object.keys(seen).length + ' kinds hovered)', stiff);
   ok(errs.length === 0, 'no page errors', errs);
