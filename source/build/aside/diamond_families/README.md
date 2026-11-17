@@ -1,4 +1,4 @@
-# The diamond's colour families and the northern lights in their colour (for 7.31): drafts, not built yet
+# The diamond's colour families and the northern lights in their colour: applied in 7.31
 
 Her words (17 November 2026): "I want the light blue pastel shade that I love from Carpe Diem's sticky notes to be among the diamond
 colour choices. The current aqua colour loosk still too greenish. I want that other colour added. I like want them to look like true
@@ -22,3 +22,7 @@ colour and a night one of its own; the light blue is Inkwell, sky blue by day (#
 - cap_purple.js: the purple stone's five looks (24 frames each) and the bands, from the patched renderer; cut with
   ../../../previews/diamond_colours_v2/tools/cut.py. famsheet.py: a contact sheet of every family's four shades (palette.json).
   fam_try.js: the head by day and by night with families set.
+
+Applied in 7.31 (17 November 2026): the five looks and the bands captured with cap_purple.js, the clear crystal's night (a black diamond, her
+word) with cap_clearN.js, cut with previews/diamond_colours_v2/tools/cut.py (stones.json, 435 KB, written into r314), the looks' mean
+colours measured with measure_src.py (src.json), r314 made with assemble_r314.py from 7.30's, and patch_r292_fam.py applied to r292.
