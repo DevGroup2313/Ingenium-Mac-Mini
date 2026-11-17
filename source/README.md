@@ -429,7 +429,11 @@ she answered: "Bring the old look back with the gold jewelled new note button an
 `build/modules/r303.js` no longer changes Pin, Send to Tabula, Delete, a note's menu rows or New note: they are the base page's own keys
 again (.sch-btn and .menu-btn, glossy, lavender and red; New note the amethyst stone with its gold rim), as in 7.14, by day and by night
 (compared side by side). Shown that, she asked: "Revert the Tabula and Abacus buttons too, they look entirely too big and hideous
-this way." So Tabula and Abacus are again the small "→ Tabula" and "→ Abacus" keys of 7.14, not the 7.15 stones. One thing is mended: the keys'
+this way." So Tabula and Abacus became again the small "→ Tabula" and "→ Abacus" keys of 7.14. Then: "Please remove the arrows to
+Tabula and Abacus buttons that are directly under the Schedae title on the panel"; asked whether she meant the arrows or both keys, she
+chose to remove both keys. They are gone (r303 hides .sch-go before it is painted and takes it away); Tabula and Abacus are still in
+the side list, and Send to Tabula is still on every note. Its 7.33 line in What is new is marked for the desk, as Tabula and Abacus are
+only in the master and full editions (t_627_editions caught it naming them in the gift and demo). One thing is mended: the keys'
 rising-in (animation fill both) held them still afterwards, so their own hover lift (three points) never showed; it shows now.
 
 Ingenium 7.32 (17 November 2026): the day's clear crystal at night.

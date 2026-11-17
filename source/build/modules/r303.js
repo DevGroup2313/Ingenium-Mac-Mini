@@ -21,11 +21,12 @@
 /* 7.33: Schedae's own keys, as they were in 7.14 (her words, 17 November 2026: "I want you to restore the colours of the buttons on the
    Schedae panel ..."; then, shown 7.14's panel beside the test copy: "Bring the old look back with the gold jewelled new note button and
    the glossy look. They looked better that way."). New note is the amethyst stone with its gold rim again, and Pin, Send to Tabula,
-   Delete and a note's menu rows their own glossy keys (the base page's .gem-go.newnote, .sch-btn and .menu-btn, untouched); Tabula and
-   Abacus their own keys too (her words: "Revert the Tabula and Abacus buttons too, they look entirely too big and hideous this way").
+   Delete and a note's menu rows their own glossy keys (the base page's .gem-go.newnote, .sch-btn and .menu-btn, untouched). The two
+   keys under the title (→ Tabula, → Abacus) are taken away, as she asked (see dressPanel).
    One thing only is mended: the keys' rising-in (fill both) held them
    still afterwards, so the lift their own hover gives never showed; it shows now. */
 #schedaePanel .sch-btn,.sn-menu .menu-btn{animation-fill-mode:backwards}
+#schedaePanel .sch-go{display:none}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p303"]="started";}catch(_){}
 /* R303 · Schedae's keys, Ingenium's own: see the note at the top of its styles */
@@ -36,8 +37,10 @@ function swap(el,from,to){if(!el)return;from.forEach(function(c){el.classList.re
 /* the panel: its title's key, the two stones, each note's keys */
 function dressPanel(p){if(!p||p.__r303)return;p.__r303=1;
   /* 7.33: New note stays the amethyst stone (.gem-go.newnote), as in 7.14 */
-  /* 7.33: Tabula and Abacus stay their own keys (→ Tabula, → Abacus), as in 7.14 (her words: "Revert the Tabula and Abacus buttons too,
-     they look entirely too big and hideous this way") */
+  /* 7.33: the two keys under the title (→ Tabula, → Abacus) are gone (her words, 17 November 2026: "Please remove the arrows to Tabula
+     and Abacus buttons that are directly under the Schedae title on the panel"; asked which, she chose to remove both keys). Tabula and
+     Abacus are still reached from the side list, and a note still goes to Tabula with its own Send to Tabula. */
+  var go=p.querySelector(".sch-go");if(go)go.remove();
   /* 7.33: Pin, Send to Tabula and Delete keep their own keys (.sch-btn), less glossy and more 3D (see the style above) */}
 /* a note's menu: its rows */
 function dressMenu(m){if(!m||m.__r303)return;m.__r303=1;
