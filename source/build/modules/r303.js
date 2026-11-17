@@ -19,6 +19,16 @@
 #schedaePanel .sch-acts > .btn.danger{margin-left:auto}
 .sn-menu .sn-row{display:flex;width:100%;justify-content:flex-start;text-align:left;margin-top:6px;box-sizing:border-box}
 .sn-menu .sn-row:first-of-type{margin-top:8px}
+/* 7.33: the colours given back (her words, 17 November 2026: "I want you to restore the colours of the buttons on the Schedae panel, I
+   only asked for the texture to be fixed not to strip the buttons of all colours and leave the panel flat and looking plain"). Before
+   7.15, Pin, Send to Tabula and a note's menu rows wore a lavender face (--accent-soft) with violet words (--accent); they wear it again,
+   on Ingenium's key (its depth, its lift, its press, all kept from .btn); Delete keeps its red words, New note its purple key. */
+#schedaePanel .btn.sch-tint,.sn-menu .btn.sch-tint{background-color:var(--accent-soft,rgba(106,63,181,.12));
+  background-image:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.08));border-color:var(--accent-soft,rgba(106,63,181,.16));color:var(--accent,#6a3fb5)}
+#schedaePanel .btn.sch-tint:hover,.sn-menu .btn.sch-tint:hover{background-image:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.14));color:var(--accent,#6a3fb5)}
+body[data-theme="night"] #schedaePanel .btn.sch-tint,body[data-theme="night"] .sn-menu .btn.sch-tint{background-color:rgba(160,120,240,.22);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0));border-color:rgba(201,178,242,.26);color:#d9c8fb}
+body[data-theme="night"] #schedaePanel .btn.sch-tint:hover,body[data-theme="night"] .sn-menu .btn.sch-tint:hover{background-color:rgba(170,130,250,.30);color:#ece2ff}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p303"]="started";}catch(_){}
 /* R303 · Schedae's keys, Ingenium's own: see the note at the top of its styles */
@@ -32,10 +42,10 @@ function dressPanel(p){if(!p||p.__r303)return;p.__r303=1;
   [].forEach.call(p.querySelectorAll(".sch-go > button"),function(b){var t=(b.textContent||"").replace(/^\s*→\s*/,"").trim();
     if(/^Tabula$/i.test(t)){swap(b,["btn","xs"],["gem-go","tabula"]);b.textContent="Tabula";b.setAttribute("aria-label","Open Tabula");}
     else if(/^Abacus$/i.test(t)){swap(b,["btn","xs"],["gem-go","abacus"]);b.textContent="Abacus";b.setAttribute("aria-label","Open Abacus");}});
-  [].forEach.call(p.querySelectorAll(".sch-acts .sch-btn"),function(b){var del=b.classList.contains("del");swap(b,["sch-btn","del"],del?["btn","xs","danger"]:["btn","xs"]);});}
+  [].forEach.call(p.querySelectorAll(".sch-acts .sch-btn"),function(b){var del=b.classList.contains("del");swap(b,["sch-btn","del"],del?["btn","xs","danger"]:["btn","xs","sch-tint"]);});}
 /* a note's menu: its rows */
 function dressMenu(m){if(!m||m.__r303)return;m.__r303=1;
-  [].forEach.call(m.querySelectorAll(".menu-btn"),function(b){var del=b.classList.contains("danger");swap(b,["menu-btn","danger"],del?["btn","small","danger","sn-row"]:["btn","small","sn-row"]);});}
+  [].forEach.call(m.querySelectorAll(".menu-btn"),function(b){var del=b.classList.contains("danger");swap(b,["menu-btn","danger"],del?["btn","small","danger","sn-row"]:["btn","small","sn-row","sch-tint"]);});}
 function look(n){if(!n||n.nodeType!==1)return;
   if(n.id==="schedaePanel")dressPanel(n);else{var p=n.querySelector&&n.querySelector("#schedaePanel");if(p)dressPanel(p);}
   if(n.classList&&n.classList.contains("sn-menu"))dressMenu(n);else{var m=n.querySelector&&n.querySelector(".sn-menu");if(m)dressMenu(m);}}
