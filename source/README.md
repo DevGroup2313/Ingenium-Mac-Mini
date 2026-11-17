@@ -395,7 +395,7 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them.
+Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them; Adamas in two tabs, its code and its page given the window's height.
 Her words (17 November 2026): "The diamond on Adamas' page is still overheats my computer and my fan is still loud, not as much as before
 but it is loud, the same for the Vesta page and Lector and Fabrica."
 Measured in Chrome at 1440 by 900, Retina sharpness, the WebGL drawing skipped and counted (rig/t_727_rest.js, rig/t_727_paint.js); WebKit,
@@ -422,6 +422,27 @@ the engine of the Mac app, was not available in this container, so nothing here 
   At the top, watched, the Adamas scene still draws 20 frames a second at a Retina screen's full sharpness, as since 7.22: its look is
   unchanged, so its cost while she watches it is unchanged.
 - rig: `t_727_pace.js` (new, 15 checks), `t_727_rest.js` and `t_727_paint.js` (new probes); `t_722_adamas_pace.js` 5 passed.
+Her words on Adamas (17 November 2026): "Why is everything so squished together on the Adamas page in Ingenium, the code panel and the
+live preview panel look compacted in and it looks ugly, please fix it"; of a live preview that stacked the two panels on a narrow window:
+"I just want Adamas code panel and its live preview panel to be restored to their original sides and not be compacted and squished in. I
+am not interested in changing its look for a new design ... I want it done right"; then "I want you to split the Adamas
+page into tabs and have the download as an app feature be in a different tab or apply the same fix as the Forge and make that section
+collapsible from view instead of being a really long list."
+- Measured (Chrome, the released pages of 3.4, 7.04, 7.08, 7.10, 7.12, 7.13, 7.15, 7.17, 7.19 and 7.26 at 1280 by 800 and 1000 by 625):
+  the two panels have had the same widths since 3.4 (at 1280 the code 395 points and its page 536; at 1000, 280 and 376), side by side
+  above a window 920 points wide, the code 42 per cent of the row as the base page set it. What filled them since is height: line
+  numbers, the code's two rows of keys and Glossa's box, the preview's second row of keys and its console, in the same row of at least
+  480 points. Nothing in a release narrowed them.
+- `build/modules/r311.js` (new): their sides and widths stay as they were; the row they share reaches the foot of the window (at least
+  480 points, as before; at 1280 by 800, 650), so the code shows more lines and its page runs in a taller frame. Each kit's name no longer
+  runs into its file's name ("Fire tabletIngenium-Fire-Tablet-Kit.zip"). The kits' choice "The app in the editor above" says "The app in
+  Your page"; picking it from elsewhere (Chat's Make it an app does) opens Adamas on the kits' tab.
+- `build/modules/r173.js` (CONF.build): Adamas in two tabs, as Settings, Mentes and the Guide have them: "Your page" (the code, the
+  preview and Ask a model) and "Download as an app" (the build kits), the tab chosen kept. A room's card may be named by a test of the card
+  (the work card has no heading); a page's head (.skh) is never filed in a room, and the tabs stand under it. `build/modules/r292.js`:
+  Adamas's head goes above the tabs when they are there first.
+- rig: `t_727_adamas.js` (new, 19 checks: the tabs under the head, each card in its tab, the widths of 3.4, the row's height, the kits'
+  tab, the parted names, the tab kept, the kits' choice from elsewhere, the diamond in its head, no page error).
 
 Ingenium 7.26 (16 November 2026): Fabrica asks under what name, every time, in every edition.
 Her words (16 November 2026): "I want for Fabrica to still ask me for the copyrights and publishing name even on my master edition, I want the

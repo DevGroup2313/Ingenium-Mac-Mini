@@ -82,8 +82,8 @@ function guide(){try{
     ["Your next step.","The large button always shows your next useful step: getting your first model, loading it, or starting a chat."],
     doors?["The doors.","Its keys "+doors]:null].filter(Boolean),"guideTourCard");
   if($("page-build"))topic("adGuide","Adamas: pages and small apps",[
-    ["Code in, a page out.","Describe what you want and a model writes it, or write it yourself; the preview beside it runs as you type. It works fully offline and does not need a model."],
-    ["An app for your devices.","A finished page can become an app for your devices."],
+    ["Code in, a page out.","In the tab Your page, describe what you want and a model writes it, or write it yourself; the preview beside it runs as you type. It works fully offline and does not need a model."],
+    ["An app for your devices.","A finished page can become an app for your devices: Download as an app, Adamas's second tab, makes a build kit for each device, or every kit at once."],
     ["The diamond.","Point at the diamond and it turns to you. Press it, or any part of its holder (the engine logo, the Orrery, the bezel, the band of brilliants, the rim), and it answers."]]);
   var carried=(function(){try{var m=(W.IngBuiltin&&IngBuiltin.meta)||{},o=["forge","inkwell","cd"],k=Object.keys(m).sort(function(a,b){var i=o.indexOf(a),j=o.indexOf(b);return (i<0?9:i)-(j<0?9:j);}),n=k.map(function(x){return m[x].title||x;});return n.length>1?n.slice(0,-1).join(", ")+" and "+n[n.length-1]+" travel":n.length?n[0]+" travels":"";}catch(e){return "";}})();
   if($("page-lector"))topic("lxGuide","Lector: your apps read, your documents written",[

@@ -694,7 +694,7 @@ function label(){if(!tag)return;var n=lines(),a=$("autoRun"),auto=!a||a.checked;
   var k=n?(n===1?"1 line":n+" lines"):"No code yet",s=n?(auto?"runs as you type":"runs when you press Run"):"write, or load a sample";
   if(k+s===LAST)return;LAST=k+s;setText(tag.querySelector("b"),k);setText(tag.querySelector("small"),s);}
 function build(){var K=KIT();page=$("page-build");if(!K||!page)return false;if(HD&&HD.el.isConnected)return true;
-  var card=page.querySelector(":scope > .card")||null,ld=page.querySelector(":scope > .lede");
+  var card=page.querySelector(":scope > .rm-bar")||page.querySelector(":scope > .card")||null,ld=page.querySelector(":scope > .lede");  /* 7.27: above Adamas's tabs (modules/r173.js) */
   var lede=(ld&&ld.textContent.trim())||"Write a page and watch it run beside your code. Good for trying an idea, checking a snippet, or letting a model help you fix something. This works fully offline and does not need a model.";
   HD=K.hero({title:"Build",eyebrow:"Build · code in, a page out",lede:lede,
     keys:[{pri:true,ico:K.ICO.begin,txt:"Run your page",id:"bdRun",fn:function(){click("runBtn");}},{ico:K.ICO.plus,txt:"Load a sample",id:"bdSample",fn:function(){click("sampleBtn");setTimeout(label,0);}}],
@@ -703,7 +703,7 @@ function build(){var K=KIT();page=$("page-build");if(!K||!page)return false;if(H
   HD.hint.innerHTML="Point at the diamond and it turns to you. <b>Press it</b>, or any part of its holder (the engine logo, the Orrery, the bezel, the band of brilliants, the rim), and it answers.";
   HD.obj.setAttribute("role","img");HD.obj.setAttribute("aria-label","A diamond turning slowly over its silver holder, Ingenium's Orrery open in the holder's seat with the engine logo at its heart; the light shoots through the diamond now and then");
   tag=K.label(HD.obj,352,44,1,0,"","","bd-label");
-  if(card)page.insertBefore(HD.el,card);else page.appendChild(HD.el);
+  HD.el.setAttribute("data-rm-skip","");if(card)page.insertBefore(HD.el,card);else page.appendChild(HD.el);
   var ed=$("codeEditor"),au=$("autoRun");if(ed)ed.addEventListener("input",label);if(au)au.addEventListener("change",label);return true;}
 function on(){page=$("page-build");if(!page||!KIT())return;page.classList.add("sk-on");if(!build())return;
   if(!MOUNTED){MOUNTED=true;Diamond.mount(HD.obj);}label();try{if(W.IngHeadsFit)W.IngHeadsFit();}catch(e){}Diamond.kick();}

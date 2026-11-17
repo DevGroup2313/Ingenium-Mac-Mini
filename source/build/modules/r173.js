@@ -187,7 +187,7 @@ var IC={
   author:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
   yours:svg('<path d="M12 3.5l8.5 4.3-8.5 4.3-8.5-4.3z"/><path d="M3.5 12.2l8.5 4.3 8.5-4.3"/><path d="M3.5 16.4l8.5 4.3 8.5-4.3"/>'),
-  kept:svg('<rect x="3.5" y="4" width="17" height="5.5" rx="1.5"/><path d="M5 9.5v9A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-9"/><path d="M12 12v5M9.6 14.8l2.4 2.4 2.4-2.4"/>'),
+  code:svg('<path d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5"/>'),kept:svg('<rect x="3.5" y="4" width="17" height="5.5" rx="1.5"/><path d="M5 9.5v9A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-9"/><path d="M12 12v5M9.6 14.8l2.4 2.4 2.4-2.4"/>'),
   get:svg('<path d="M4 10.8L12 4.3l8 6.5V20H4z"/><path d="M12 9.8v6.4M9.4 13.7l2.6 2.6 2.6-2.6"/>'),
   newer:svg('<path d="M11 5.5v9M7.4 11.1l3.6 3.6 3.6-3.6"/><path d="M4.5 18.5h13"/><path d="M18.3 3.4l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
   cat:svg('<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>'),
@@ -245,6 +245,13 @@ var CONF={
     {k:"around",t:"Around the app",i:"around",says:function(){return "The right rail and the instruments"+(W.IngWorkshop?", and your Author Studio.":".");},ids:[/^the right rail/,/^the instruments/,"wsGuide"]}],
     words:[[/tour|what ingenium|limit/,"start"],[/chat|code|effort|ultracode|connector|environment|github/,"chatcode"],[/model|engine|device|lend/,"models"],
       [/blend|concordia|folder|ingenia|career|vocatio|focus|vesta|fabrica|build|adamas|study/,"making"],[/rail|instrument|author|workshop|setting/,"around"]]},
+  /* 7.27, her words (17 November 2026): "I want you to split the Adamas page into tabs and have the download as an app feature be in a
+     different tab". Adamas (page-build) in two rooms: the page she works on, and the build kits for her devices. Its head stays above the
+     tabs (modules/r292.js); the work card has no heading, so it is known by the editor it holds. */
+  build:{label:"Adamas, in rooms",rooms:[
+    {k:"page",t:"Your page",i:"code",says:"Your code on one side and your page running on the other, with a model to change it.",ids:[function(c){return !!c.querySelector("#editorPane");}]},
+    {k:"apps",t:"Download as an app",i:"kept",says:"Build kits for your devices: one zip for each, with a guide to every step.",ids:["shipCard"]}],
+    words:[[/kit|device|download|install|package/,"apps"],[/code|page|preview|model/,"page"]]},
   blend:{label:"Blend, in rooms",view:true,rooms:[
     {k:"new",t:"New blend",i:"fresh",says:"Make a blend in four steps: choose the models, choose how they work together, ask, then read the answers."},
     {k:"ready",t:"Ready-made",i:"ready",says:"Blends ready to use. One press sets the models and how they work together."},
@@ -349,13 +356,14 @@ var NT=0;function nudge(R){if(!R.sec.classList.contains("active"))return;cancelA
 var MINE=/(^|\s)rm-(bar|panel|hint|roomh|steps|stepnav)(\s|$)/;
 function isCard(e){if(!e||e.nodeType!==1)return false;if(/^(H1|STYLE|SCRIPT|TEMPLATE|LINK|META|INPUT|NOSCRIPT)$/.test(e.tagName))return false;
   if(e.hasAttribute("data-rm-skip"))return false;  /* 6.26: a part of the page that is not a card (the Guide's What's new key) */
+  if(e.classList.contains("skh"))return false;  /* 7.27: a page's head (modules/r290.js) stays above the rooms */
   var c=typeof e.className==="string"?e.className:"";if(MINE.test(c))return false;
   if(e.classList.contains("page-title")||e.classList.contains("lede"))return false;
   return e.classList.contains("card")||!!e.querySelector("h2,h3");}
 function headEl(c){return c.querySelector("h2,h3,[id$='-h'],b,strong");}
 function headText(c){var h=headEl(c);return h?clean(h.textContent):"";}
 function ruleOf(R,c){var h=norm(headText(c)),rs=R.c.rooms,i,j,s;
-  for(i=0;i<rs.length;i++){var ids=rs[i].ids||[];for(j=0;j<ids.length;j++){s=ids[j];if(typeof s==="string"?c.id===s:s.test(h))return {k:rs[i].k,rank:j};}}
+  for(i=0;i<rs.length;i++){var ids=rs[i].ids||[];for(j=0;j<ids.length;j++){s=ids[j];if(typeof s==="string"?c.id===s:typeof s==="function"?s(c):s.test(h))return {k:rs[i].k,rank:j};}}
   var ws=R.c.words||[];for(i=0;i<ws.length;i++)if(ws[i][0].test(h))return {k:ws[i][1],rank:500};
   return {k:"more",rank:500};}
 function fileCard(R,c){var r=ruleOf(R,c),p=R.panels[r.k];c.__rmRank=r.rank;if(!p||c.parentNode===p)return false;
@@ -408,6 +416,8 @@ function buildMove(pk){var sec=$("page-"+pk);if(!sec)return null;if(sec.__rm)ret
   var c=CONF[pk],R={pk:pk,c:c,sec:sec,tabs:{},panels:{},heads:{},rooms:c.rooms.filter(function(rm){try{return !rm.when||rm.when();}catch(e){return true;}}).concat([MORE]),cur:null,all:false,view:false};sec.__rm=R;P[pk]=R;
   if(pk==="models")studioHint(R);
   var bar=makeBar(R);afterLede(sec,bar);R.bar=bar;
+  /* 7.27: a head that stands after the page's own title and line (Adamas's) keeps the tabs under it */
+  var hd0=sec.querySelector(":scope > .skh");if(hd0&&(hd0.compareDocumentPosition(bar)&2))sec.insertBefore(bar,hd0.nextSibling);
   var ref=bar.nextSibling;
   R.rooms.forEach(function(rm){var t=R.tabs[rm.k];t.setAttribute("aria-controls","rmP-"+pk+"-"+rm.k);
     var p=att(mk("div","rm-panel"),{role:"tabpanel",id:"rmP-"+pk+"-"+rm.k,"aria-labelledby":t.id,"aria-describedby":R.says.id,"data-room":rm.k});p.hidden=true;
