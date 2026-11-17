@@ -14,6 +14,7 @@
 //     lavender look dressed in sky blue; the night theme: the stone is its night shade, deep and blue, and the northern lights turn from
 //     violet to blue (both measured on their pictures);
 //   - the Clear crystal: by night a black diamond (not the purple night stone) under northern lights in every colour;
+//   - At night, the silver diamond (or the black), whatever the stone by day;
 //   - her own colour, picked; the band and the light as before; kept, and opened again; Back to Ingenium's own; the settings 7.29 and 7.30
 //     kept are read as families and shades; Settings, Everyday; Show me on Adamas; a phone's width; no page error;
 //   - with a second page (7.30's) given: Ingenium's purple drawn pixel for pixel as 7.30 drew it (a still frame, Minimal motion, sparkles
@@ -69,14 +70,14 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
       circle: { bg: cs.backgroundImage, shadow: cs.boxShadow }, bar: sc.offsetWidth - sc.clientWidth, scrolls: sc.scrollHeight > sc.clientHeight, top: sc.scrollTop }; });
   ok(pn && pn.side && pn.stoneRight <= pn.left && pn.diamondMid < before - 40 && pn.words === '0' && pn.circle.bg === 'none' && /none/.test(pn.circle.shadow) && pn.bar === 0,
     'pressed, the panel opens beside the diamond, no circle at its top, no scroll bar in view (it scrolls: ' + (pn && pn.scrolls) + ')', pn);
-  const st = await p.evaluate(() => { const d = document.querySelector('#page-build .dmc'); const fams = [...d.querySelectorAll('.dmc-c[data-fam]')], shades = [...d.querySelectorAll('.dmc-c[data-shade]')], nt = d.querySelector('.dmc-night');
+  const st = await p.evaluate(() => { const d = document.querySelector('#page-build .dmc'); const fams = [...d.querySelectorAll('.dmc-c[data-fam]')], shades = [...d.querySelectorAll('.dmc-c[data-shade]')], nts = [...d.querySelectorAll('.dmc-c[data-night]')];
     const real = x => { const i = x.querySelector('.dmc-st img'); return !!i && /^data:image\/(webp|png)/.test(i.src) && i.naturalWidth > i.naturalHeight * 10 && i.getAnimations().length > 0; };
-    return { fams: fams.map(x => (x.querySelector('.dmc-n') || {}).textContent), shades: shades.map(x => (x.querySelector('.dmc-n') || {}).textContent), night: nt && { n: (nt.querySelector('.dmc-n') || {}).textContent, tag: nt.tagName, role: nt.getAttribute('role'), real: real(nt) },
+    return { fams: fams.map(x => (x.querySelector('.dmc-n') || {}).textContent), shades: shades.map(x => (x.querySelector('.dmc-n') || {}).textContent), nights: nts.map(x => (x.querySelector('.dmc-n') || {}).textContent), nightsReal: nts.every(real),
       real: fams.concat(shades).every(real), keyBehind: fams.concat(shades).some(x => { const cs = getComputedStyle(x); return cs.backgroundImage !== 'none' || !/rgba\(0, 0, 0, 0\)/.test(cs.backgroundColor) || cs.boxShadow !== 'none'; }),
       checked: [...d.querySelectorAll('.dmc-c[aria-checked="true"]')].map(x => (x.querySelector('.dmc-n') || {}).textContent), note: d.querySelector('.dmc-note').textContent.slice(0, 120) }; });
-  ok(st.fams.join() === "Ingenium's purple,Sky blue,Sapphire,Aqua,Emerald,Citrine,Amber,Rose,Ruby,Clear crystal,Your own colour" && st.shades.join() === 'By the hour,Pastel,Medium,Deep' && st.night && st.night.n === 'At night' && st.night.tag !== 'BUTTON' && st.night.real && st.real && !st.keyBehind,
-    'the stone: eleven families; the shade: four, and the night\'s own beside them (not pressable); every one the real diamond, turning, no key behind', st);
-  ok(st.checked.join() === "Ingenium's purple,By the hour,Ingenium's violet", 'at first: Ingenium\'s purple, by the hour, Ingenium\'s violet band', st.checked);
+  ok(st.fams.join() === "Ingenium's purple,Sky blue,Sapphire,Aqua,Emerald,Citrine,Amber,Rose,Ruby,Clear crystal,Your own colour" && st.shades.join() === 'By the hour,Pastel,Medium,Deep' && st.nights.join() === 'Its own,Black diamond,Silver diamond' && st.nightsReal && st.real && !st.keyBehind,
+    'the stone: eleven families; the shade: four; at night: its own, the black diamond or the silver diamond; every one the real diamond, turning, no key behind', st);
+  ok(st.checked.join() === "Ingenium's purple,By the hour,Its own,Ingenium's violet", 'at first: Ingenium\'s purple, by the hour, Ingenium\'s violet band', st.checked);
   await p.screenshot({ path: path.join(OUT, 'panel_open.png') });
   // the toy, as 7.30
   const before0 = await p.evaluate(() => JSON.stringify(state.diamond || null));
@@ -113,6 +114,14 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   ok(cf && cf.cn === true && cf.aur === 'spectrum' && spread < 14 && Math.abs(clearNight[2] - purpleNight[2]) + Math.abs(clearNight[0] - purpleNight[0]) > 4,
     'the Clear crystal turns to a black diamond at night: colourless, not the purple night stone (its picture, measured)', { clear: clearNight, purple: purpleNight, fam: cf });
   ok(hc[3] > 50 && hc[0] > 0.1 && hc[1] > 0.1 && hc[2] > 0.1 && hp[1] < 0.05, 'its northern lights run through every colour: red, green and blue all lead somewhere (Ingenium\'s purple: hardly any green)', { clear: hc, purple: hp });
+  // the silver diamond at night (her words: "I like the silver diamond look on dark mode too from your previous clear Night mode look, please
+  // also add it as an option for Night mode look for the diamond"), here for Sky blue: whatever the stone by day
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'sky', shade: 'medium', night: 'silver' })); const silver = await stoneShot('stone_6_sky_silver_night');
+  const sv = await p.evaluate(() => { const f = IngDiamond.fam(); return f && { n: f.n, says: IngDiamondColours.says() }; });
+  const sSpread = Math.max(...silver.slice(0, 3)) - Math.min(...silver.slice(0, 3)), lum = c => c[0] + c[1] + c[2];
+  ok(sv && sv.n && sv.n.cn === true && sv.n.aur === 'spectrum' && Math.abs(sv.n.s.g - 0.72) < 1e-9 && sSpread < 14 && lum(silver) > lum(clearNight) + 6 && /silver at night/.test(sv.says),
+    'At night, Silver diamond: Sky blue by day, a colourless silver diamond by night, brighter than the black one, under lights in every colour', { silver, black: clearNight, n: sv && sv.n, says: sv && sv.says });
+  await p.evaluate(() => IngDiamondColours.set({ night: 'own' }));
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(600);
   // her own colour, the band and the light
   await p.evaluate(() => IngDiamondColours.open()); await p.waitForTimeout(900);

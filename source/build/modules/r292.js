@@ -530,7 +530,7 @@ var Diamond=(function(){
     BG.w=cr.width;BG.h=cr.height;BG.box=[hr.left-cr.left,hr.top-cr.top,Math.max(10,hr.width),Math.max(10,hr.height)];var k=dpr()*0.5,w=Math.round(BG.w*k),h=Math.round(BG.h*k);
     if(BG.cv.width!==w||BG.cv.height!==h){BG.cv.width=w;BG.cv.height=h;}}
   function bgDraw(t,nt){if(!BG.ok)return;if(BG.n%30===0)bgSize();var g=BG.gl;g.viewport(0,0,BG.cv.width,BG.cv.height);g.uniform1f(BG.U.uT,t);g.uniform1f(BG.U.uN,nt?1:0);g.uniform1f(BG.U.uAsp,W0/H0);
-    g.uniform2f(BG.U.uRes,BG.w,BG.h);g.uniform4f(BG.U.uBox,BG.box[0],BG.box[1],BG.box[2],BG.box[3]);var au=aurNow();g.uniform1f(BG.U.uAo,au?(au==="spectrum"?2:1):0);g.uniform4fv(BG.U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));g.drawArrays(g.TRIANGLE_STRIP,0,4);}
+    g.uniform2f(BG.U.uRes,BG.w,BG.h);g.uniform4f(BG.U.uBox,BG.box[0],BG.box[1],BG.box[2],BG.box[3]);var au=aurNow(nt);g.uniform1f(BG.U.uAo,au?(au==="spectrum"?2:1):0);g.uniform4fv(BG.U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));g.drawArrays(g.TRIANGLE_STRIP,0,4);}
   /* the diamond pressed as Fabrica's balls are (her words, 14 November 2026: "I want the same sound and effect of the balls from Fabrica's
      tree to be applied to the diamond button"): it sinks while held, springs back when let go, and plays one of Home's engine button's
      flourishes. No circle round it (her words, 14 November 2026: "I want the effect where a circle is shown when I click on the diamond
@@ -610,11 +610,17 @@ var Diamond=(function(){
      in every colour ("spectrum").
      Set by modules/r314.js; with none, every look and the sky are as before. */
   var FAM=null;
-  function family(o){if(!o||!o.s||o.s.length<4){FAM=null;}else{FAM={cp:!!o.cp,cn:!!o.cn,aur:o.aur==="spectrum"?"spectrum":o.aur&&o.aur.length===4?o.aur.slice():null,s:o.s.map(function(x){return x&&x.h&&x.h.length===4?{h:x.h.slice(),g:+x.g||1}:null;})};}
+  function sh1(x){return x&&x.h&&x.h.length===4?{h:x.h.slice(),g:+x.g||1}:null;}
+  function au1(a){return a==="spectrum"?"spectrum":a&&a.length===4?a.slice():null;}
+  function family(o){if(!o||!o.s||o.s.length<4){FAM=null;}else{FAM={cp:!!o.cp,cn:!!o.cn,aur:au1(o.aur),s:o.s.map(sh1),
+      /* a night look of its own choosing (her words: "I like the silver diamond look on dark mode too ... please also add it as an option
+         for Night mode look for the diamond"): the black or the silver diamond by night, whatever the stone by day */
+      n:o.n?{s:sh1(o.n.s),cn:!!o.n.cn,aur:au1(o.n.aur)}:null};}
     if(!(CU4[3]>0))HALO=FAM&&o.halo&&o.halo.length===2?o.halo.slice():["106,63,181","122,84,204"];kick();}
   function vNow(){var v=Math.max(0,VAR);return FAM&&FAM.cp&&v===1?0:v;}
-  function famNow(nt){if(!FAM||CU4[3]>0)return null;if(nt)return FAM.s[3];var v=vNow();return v?FAM.s[v-1]:null;}
-  function aurNow(){return FAM&&!(CU4[3]>0)?FAM.aur:null;}
+  function famNow(nt){if(!FAM||CU4[3]>0)return null;if(nt)return FAM.n?FAM.n.s:FAM.s[3];var v=vNow();return v?FAM.s[v-1]:null;}
+  function aurNow(nt){return FAM&&!(CU4[3]>0)?(nt&&FAM.n?FAM.n.aur:FAM.aur):null;}
+  function clNow(nt){return !!(FAM&&nt&&!(CU4[3]>0)&&(FAM.n?FAM.n.cn:FAM.cn));}
   function byHour(d){var h=(d||new Date()).getHours();return h>=5&&h<11?0:(h>=11&&h<14?1:(h>=14&&h<18?2:3));}
   function pulse(t){PL.n++;var k=PL.n,side=k%2?0:Math.PI;PL.a=side+(((k*0.6180339)%1)-0.5)*1.9;PL.e=0.08+0.22*((k*0.4142136)%1);PL.s=t;}
   /* sparkles: where a crown facet sends the key light to the eye; where the light enters and leaves; a wave of glints across the facets as
@@ -683,7 +689,7 @@ var Diamond=(function(){
     gx+=((over?mX*0.22:0)-gx)*Math.min(1,dt*2.8);gz+=((over?-mY*0.16:0)-gz)*Math.min(1,dt*2.8);tx=gz;tz=-gx*0.6;
     var tt=st?1.0:(W.__tFix!=null?W.__tFix:t);if(W.__tFix!=null&&W.__pFix){PL.a=W.__pFix[0];PL.e=W.__pFix[1];PL.s=W.__pFix[2];PL.n=W.__pFix[3]||1;}
     DFX=dfx(t);DSC=DFX.sc;YF=DFX.yaw;var M=rotM(),bob=st?0:Math.sin(tt*2*Math.PI/7)*0.035,DC=[0,1.22+bob+DFX.lift,0],nt=night();
-    gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U.uT,tt);gl.uniform1f(U.uN,nt?1:0);gl.uniform1f(U.uV,CU4[3]>0?0:vNow());gl.uniform4fv(U.uCu,new Float32Array(CU4));gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow();gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,FAM&&FAM.cn&&nt&&!(CU4[3]>0)?1:0);gl.uniform1f(U.uY,yaw);gl.uniform3fv(U.uDC,new Float32Array(DC));
+    gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U.uT,tt);gl.uniform1f(U.uN,nt?1:0);gl.uniform1f(U.uV,CU4[3]>0?0:vNow());gl.uniform4fv(U.uCu,new Float32Array(CU4));gl.uniform4fv(U.uEn,new Float32Array(EN4));var fm=famNow(nt),au=aurNow(nt);gl.uniform2fv(U.uFm,new Float32Array(fm?[1,fm.g]:[0,1]));gl.uniform4fv(U.uFh,new Float32Array(fm?fm.h:[0,0,1,1]));gl.uniform1f(U.uAo,au?(au==="spectrum"?2:1):0);gl.uniform4fv(U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));gl.uniform1f(U.uCl,clNow(nt)?1:0);gl.uniform1f(U.uY,yaw);gl.uniform3fv(U.uDC,new Float32Array(DC));
     gl.uniform4fv(U.uL,new Float32Array([PL.a,PL.e,st?-99:PL.s,PL.n%2?0:1]));
     /* the case moves as the compass does: a sway of its own, ten seconds round, and a lean toward the pointer on a spring that overshoots a
        hair and settles */

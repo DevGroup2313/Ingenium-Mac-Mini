@@ -37,8 +37,10 @@ css = rep(css, "/* her own colour: eight cut stones and any colour, in a well; h
           ".dmc-fams.dmc-shelf::after{content:\"\";position:absolute;left:6px;right:6px;top:118px;height:8px;border-radius:4px;pointer-events:none;\n"
           "  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 1px 0 rgba(60,40,100,.06)}\n"
           "body[data-theme=\"night\"] .dmc-fams.dmc-shelf::after{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 rgba(0,0,0,.4),0 6px 12px rgba(0,0,0,.3)}\n"
-          ".dmc-shades{grid-template-columns:repeat(5,minmax(0,1fr))}\n"
-          ".dmc-night{cursor:default}\n"
+          ".dmc-shades{grid-template-columns:repeat(4,minmax(0,1fr))}\n"
+          ".dmc-l2{margin-top:6px}\n"
+          ".dmc-nights{grid-template-columns:repeat(3,minmax(0,92px));justify-content:start;gap:2px 8px}\n"
+          ".dmc-night[hidden]{display:none}\n"
           ".dmc-night .dmc-g{border-radius:16px;background:radial-gradient(120% 90% at 50% 40%,#2c2142,#120c1e 72%);box-shadow:inset 0 1px 3px rgba(0,0,0,.5),inset 0 -1px 0 rgba(255,255,255,.06),0 1px 0 rgba(255,255,255,.55)}\n"
           "body[data-theme=\"night\"] .dmc-night .dmc-g{background:radial-gradient(120% 90% at 50% 40%,#231a36,#0b0714 72%);box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05)}\n"
           ".dmc-night .dmc-g::after{display:none}\n"
@@ -50,7 +52,7 @@ css = rep(css, "/* her own colour: eight cut stones and any colour, in a well; h
           "#dmcCard .dmc-fams{grid-template-columns:repeat(6,minmax(0,110px))}\n"
           "/* beside the diamond the panel's lower edge fades, so it shows there is more; choosing a family glides it down to its shades */\n"
           ".skh .dmc .dmc-scroll{position:relative;padding-bottom:22px;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}\n"
-          "#dmcCard .dmc-shades{grid-template-columns:repeat(5,minmax(0,110px))}\n"
+          "#dmcCard .dmc-shades{grid-template-columns:repeat(4,minmax(0,110px))}\n"
           "/* the band's own colour: eight cut stones and any colour, in a well */")
 # the depth slider is gone
 lines = css.split("\n")
