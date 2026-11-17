@@ -395,6 +395,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.30 (17 November 2026): the diamond's colours, refined, as her approved live preview has them.
+Her words on 7.29's panel and on the live preview (https://claude.ai/artifact/55kQPJwfrgahiHc6GkrbJG, source/previews/diamond_colours_v2),
+in order: "I want the panel to open beside the diamond and for the controls button to be a little button on the top right side of the
+3D header of the Adamas page in the same format as Ingenium's introduction door ... I also want the diamonds emojis to actually look like
+real diamond emojis and look more refined and actually match the 3D diamond from the Adamas page ... I want the graphics and 3D design of
+the panel to be refined and elevated"; "I want the diamond button to match the sign-in button from the introduction door and be in the
+same sleek and understated design and implementation. I don't want it to be sticking out"; "I want the crystals diamonds to be animated
+and be 3D alone without the acrylic button and the names written together on the same button. I also want the check mark to be
+Ingenium's colour instead of blue and I really hate seeing scroll bars in view ... no scroll bar should ever be in view unless stated
+otherwise. Also, I hate long wide buttons, please fix the The Holder's Band buttons"; "I don't want any purple shading over the button
+when I hover over it"; "The diamonds and everything inside of the panel still look very flat and 2D and not very animated and popped out
+3D like the main diamond for Adamas"; and "I approve of everything except I want you to remove the white circle that is around the
+diamond at the top of the panel, everything else looks great, please commit and push it everywhere and continue working on my requests."
+- `build/modules/r314.js`, refined (what each choice does, state.diamond and Settings' card are as in 7.29):
+  - the key: in the head's top-right corner, the welcome door's sign-in key value for value (modules/r197.js #introProtect as Chrome
+    draws it on the 7.29 page: a well 37 by 32 points, 15 from the top, a key 29 by 24, its icon 12.6 points in a 1.5 stroke, the app's
+    quiet grey); a cut diamond in line in place of the lock; under the pointer and while open only its icon deepens a shade, no tint;
+    the head's row of keys is Run your page and Load a sample again;
+  - the panel opens beside the diamond: the head's words step aside, the diamond glides toward the middle of the room left to it (the CSS
+    translate property, measured as it opens), the panel unfolds from the key down the head's right side; on a narrow head it stands in
+    the head's flow; Escape and the cross close it;
+  - each stone is Adamas's diamond itself: drawn by r292 on a transparent ground in each look and each jewel, 24 frames through 45 degrees
+    (the cut's own symmetry, so the turn loops), cut into strips of the stone alone (source/previews/diamond_colours_v2/tools: cap_all.js,
+    cut.py; stones.json, 640 KB, written into the module); By the hour and Any colour change stone at the end of each turn; a colour of
+    her own outside the eight is the clear stone tinted on a canvas; they stand on a glass shelf with their reflection, their names
+    beneath, no key behind them; the chosen one floats higher in a soft light, its name in Ingenium's violet over a dot;
+  - the band: the real holder with each band, two small choices; the light: Ingenium's own switch (.dmc-sw); the panel leans toward the
+    pointer; no scroll bar in view (scrollbar-width none and ::-webkit-scrollbar), the scrolling kept; the stone at the top stands alone,
+    without the silver setting she asked to remove; the panel's title in Ingenium's own head serif (--sk-serif, Home Cormorant).
+- What is this? (r144), the Guide's diamond entry (r250) and What is new (r222) say where the key is now.
+- rig: `t_730_diamond_colours.js` (new, 20 checks) supersedes `t_729_diamond_colours.js`; `t_700_heads.js` expects Adamas's row of two
+  keys and the key in the corner.
+
 Ingenium 7.29 (17 November 2026): the diamond's colours within reach; her apps' packages without a word of Ingenium; Adamas's chosen
 tab readable; Open Storage reaching Storage.
 Her words (17 November 2026), in this session: "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new

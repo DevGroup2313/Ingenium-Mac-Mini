@@ -1,3 +1,5 @@
+// SUPERSEDED in 7.30 by rig/t_730_diamond_colours.js: the key moved to the head's corner and the panel beside the diamond (her approved
+// preview, source/previews/diamond_colours_v2). Kept as 7.29's test; it fails on 7.30 by design.
 // Ingenium 7.29: the diamond's colours, within reach (modules/r314.js, with modules/r292.js). Her words (17 November 2026): "I want a
 // clear way to edit Adamas' diamond and change the colours as I please, I can't locate the settings for it. Please make it accessible
 // and visible for me." Checks, in Chromium (software WebGL), at 1440 by 900 and on a phone's width:

@@ -38,8 +38,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       cv: o ? o.querySelectorAll('canvas.bd-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__diamondErr || null, state: window.IngDiamond && IngDiamond.state(),
       obj: r ? [Math.round(r.width), Math.round(r.height)] : null, inHead: r && hr ? r.right <= hr.right + 1 && r.top >= hr.top - 1 : false, hint: h ? h.querySelector('.skh-hint').textContent : '' }; });
   ok(bd.head && bd.before && bd.on && bd.eyebrow === 'Code in, a page out', 'Build (Adamas from 7.12) opens on its head, before the page\'s card (since 7.27 its tabs come between, the card in the first), made as the other studios\' are; its line says only what the page is for (7.15)', bd);
-  /* 7.29: a third key, Diamond colours (modules/r314.js) */
-  ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample', 'Diamond colours']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page, Load a sample and Diamond colours (7.29); the page\'s own title and lede give way to it', bd);
+  /* 7.30: the diamond's colours open from a small key in the head's corner (modules/r314.js), so its row is Run your page and Load a sample */
+  const corner = await p.evaluate(() => { const k = document.getElementById('bdColours'); return !!(k && k.closest('.dmc-corner') && k.closest('#page-build > .skh')); });
+  ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && corner && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample, the diamond\'s key in its corner (7.30); the page\'s own title and lede give way to it', { keys: bd.keys, corner });
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   // 7.01, her words (14 November 2026): "I also want the landscape of the Build page diamond to fill the card on both day and night mode"
   const bgc = await p.evaluate(() => { const h = document.querySelector('#page-build .skh'), c = h && h.querySelector('canvas.bd-bg'), r = c && c.getBoundingClientRect(), hr = h && h.getBoundingClientRect();
