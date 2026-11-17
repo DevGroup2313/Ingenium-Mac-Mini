@@ -25,6 +25,9 @@ const [U, OUT, U730] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: tru
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 600))); c ? pass++ : fail++; };
 const MEAN = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=list(im.getdata());n=len(px);print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3)))';
 const mean = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', MEAN, f]).toString().trim().split(',').map(Number);
+/* the stone's own pixels: the ground behind it (the picture's commonest colour, and what lies near it) left out */
+const FG = 'import sys;from PIL import Image;from collections import Counter;im=Image.open(sys.argv[1]).convert("RGB");px=list(im.getdata());g=Counter(px).most_common(1)[0][0];st=[p for p in px if max(abs(p[i]-g[i]) for i in range(3))>14] or px;n=len(st);print(",".join(str(round(sum(p[i] for p in st)/n,1)) for i in range(3))+","+str(n))';
+const fg = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', FG, f]).toString().trim().split(',').map(Number);
 /* the bright, coloured pixels' mean colour (the northern lights against the night sky; white words and stars left out) */
 const BRIGHT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150 and max(p)-min(p)>40];n=max(1,len(px));print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3))+","+str(len(px)))';
 const bright = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', BRIGHT, f]).toString().trim().split(',').map(Number);
@@ -43,7 +46,7 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   await p.evaluate(() => { const h = document.querySelector('#page-build > .skh'); h.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); }); await p.waitForTimeout(800);
   /* the stone alone: the sky's own canvas (.bd-bg, the northern lights) is hidden while it is pictured, so its colours are the stone's */
   const stoneShot = async (name) => { await p.evaluate(() => document.querySelectorAll('#page-build canvas.bd-bg').forEach(c => c.style.visibility = 'hidden')); await p.waitForTimeout(2400);
-    const r = await p.evaluate(() => { const c = document.querySelector('#page-build .skh-obj canvas').getBoundingClientRect(); return { x: c.left + c.width * 0.36, y: c.top + c.height * 0.18, width: c.width * 0.28, height: c.height * 0.16 }; });
+    const r = await p.evaluate(() => { const c = document.querySelector('#page-build .skh-obj canvas').getBoundingClientRect(); return { x: c.left + c.width * 0.36, y: c.top + c.height * 0.18, width: c.width * 0.28, height: c.height * 0.30 }; });
     const f = path.join(OUT, name + '.png'); await p.screenshot({ path: f, clip: r }); await p.evaluate(() => document.querySelectorAll('#page-build canvas.bd-bg').forEach(c => c.style.visibility = '')); return mean(f); };
   /* the sky above the stone: the head's upper band, where the northern lights run */
   const skyShot = async (name) => { await p.evaluate(() => { try { IngDiamond.kick(); } catch (e) {} }); await p.waitForTimeout(4500);   /* the sky draws at half the frames; slow in software WebGL */
@@ -103,24 +106,24 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   // the night theme: the night shade, and the northern lights
   await p.evaluate(() => { IngDiamondColours.close(); state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(800);
   const skyNight = await stoneShot('stone_3_sky_night'); const auSky = await skyShot('lights_sky_night');
-  await p.evaluate(() => IngDiamondColours.set({ fam: 'purple' })); const purpleNight = await stoneShot('stone_4_purple_night'); const auPurple = await skyShot('lights_purple_night');
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'purple' })); const purpleNight = fg(path.join(OUT, (await stoneShot('stone_4_purple_night'), 'stone_4_purple_night') + '.png')); const auPurple = await skyShot('lights_purple_night');
   ok(skyNight[2] > skyNight[0] + 8 && (skyNight[0] + skyNight[1] + skyNight[2]) < (pastel[0] + pastel[1] + pastel[2]), 'with the night theme, Sky blue shows its night shade: deep and blue', { night: skyNight, pastel });
   ok(auSky[3] > 50 && auPurple[3] > 50 && auSky[2] > auSky[0] + 20 && auPurple[0] > auSky[0] + 20, 'the northern lights take the stone\'s colour: blue for Sky blue, violet for Ingenium\'s purple (bright pixels, measured)', { sky: auSky, purple: auPurple });
   // the clear crystal's own night (her words: "I also want the option to keep the clear crystal and have its own Night mode look. It should
   // have the full colour spectrum for the Northern lights since that makes the most sense"; then "No I prefer the stone as a black diamond on
   // Night mode, it is the best look for it and its natural opposite")
-  await p.evaluate(() => IngDiamondColours.set({ fam: 'clear', shade: 'pastel' })); const clearNight = await stoneShot('stone_5_clear_night'); await skyShot('lights_clear_night');
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'clear', shade: 'pastel' })); const clearNight = fg(path.join(OUT, (await stoneShot('stone_5_clear_night'), 'stone_5_clear_night') + '.png')); await skyShot('lights_clear_night');
   const hc = hues(path.join(OUT, 'lights_clear_night.png')), hp = hues(path.join(OUT, 'lights_purple_night.png')), cf = await p.evaluate(() => { const f = IngDiamond.fam(); return f && { cn: f.cn, aur: f.aur, look: IngDiamond.look() }; });
   const spread = Math.max(...clearNight.slice(0, 3)) - Math.min(...clearNight.slice(0, 3));
-  ok(cf && cf.cn === true && cf.aur === 'spectrum' && spread < 14 && Math.abs(clearNight[2] - purpleNight[2]) + Math.abs(clearNight[0] - purpleNight[0]) > 4,
+  ok(cf && cf.cn === true && cf.aur === 'spectrum' && spread < 16 && purpleNight[2] - purpleNight[1] > spread + 8,
     'the Clear crystal turns to a black diamond at night: colourless, not the purple night stone (its picture, measured)', { clear: clearNight, purple: purpleNight, fam: cf });
   ok(hc[3] > 50 && hc[0] > 0.1 && hc[1] > 0.1 && hc[2] > 0.1 && hp[1] < 0.05, 'its northern lights run through every colour: red, green and blue all lead somewhere (Ingenium\'s purple: hardly any green)', { clear: hc, purple: hp });
   // the silver diamond at night (her words: "I like the silver diamond look on dark mode too from your previous clear Night mode look, please
   // also add it as an option for Night mode look for the diamond"), here for Sky blue: whatever the stone by day
-  await p.evaluate(() => IngDiamondColours.set({ fam: 'sky', shade: 'medium', night: 'silver' })); const silver = await stoneShot('stone_6_sky_silver_night');
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'sky', shade: 'medium', night: 'silver' })); const silver = fg(path.join(OUT, (await stoneShot('stone_6_sky_silver_night'), 'stone_6_sky_silver_night') + '.png'));
   const sv = await p.evaluate(() => { const f = IngDiamond.fam(); return f && { n: f.n, says: IngDiamondColours.says() }; });
-  const sSpread = Math.max(...silver.slice(0, 3)) - Math.min(...silver.slice(0, 3)), lum = c => c[0] + c[1] + c[2];
-  ok(sv && sv.n && sv.n.cn === true && sv.n.aur === 'spectrum' && Math.abs(sv.n.s.g - 0.72) < 1e-9 && sSpread < 14 && lum(silver) > lum(clearNight) + 6 && /silver at night/.test(sv.says),
+  const sSpread = Math.max(...silver.slice(0, 3)) - Math.min(...silver.slice(0, 3)), lum = c => c[0] + c[1] + c[2];  /* the stone's own pixels */
+  ok(sv && sv.n && sv.n.cn === true && sv.n.aur === 'spectrum' && Math.abs(sv.n.s.g - 0.72) < 1e-9 && sSpread < 16 && lum(silver) > lum(clearNight) + 12 && /silver at night/.test(sv.says),
     'At night, Silver diamond: Sky blue by day, a colourless silver diamond by night, brighter than the black one, under lights in every colour', { silver, black: clearNight, n: sv && sv.n, says: sv && sv.says });
   await p.evaluate(() => IngDiamondColours.set({ night: 'own' }));
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(600);
@@ -177,7 +180,7 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
     const still = async (url, name) => { const c = await b.newContext({ viewport: { width: 1440, height: 900 } });
       await c.addInitScript(() => { let s = 7; Math.random = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; });
       const pg = await c.newPage(); pg.setDefaultTimeout(180000); await open(pg, url);
-      await pg.evaluate(() => { try { IngDiamondColours.reset(); } catch (e) {} state.motion = 'minimal'; try { applyMotion(); } catch (e) {} document.body.setAttribute('data-motion', 'minimal'); window.__tFix = 3.2;
+      await pg.evaluate(() => { try { IngDiamondColours.reset(); } catch (e) {} state.motion = 'minimal'; try { applyMotion(); } catch (e) {} document.body.setAttribute('data-motion', 'minimal'); window.__tFix = 3.2; try { IngDiamond.light(false); } catch (e) {}   /* the light that passes through comes when it will */
         const h = document.querySelector('#page-build > .skh'); h.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); });
       await pg.mouse.move(5, 5); await pg.waitForTimeout(4000);
       const r = await pg.evaluate(() => { const c = document.querySelector('#page-build .skh-obj canvas').getBoundingClientRect(); return { x: c.left, y: c.top, width: c.width, height: c.height }; });
