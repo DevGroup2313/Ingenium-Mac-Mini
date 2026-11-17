@@ -175,7 +175,11 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   ok(pp && pp.flow && pp.left >= 0 && pp.right <= pp.width && pp.page, 'on a phone\'s width the panel stands in the head\'s flow, within the screen', pp);
   await q.evaluate(() => document.querySelector('#page-build .dmc').scrollIntoView({ block: 'start' })); await q.waitForTimeout(500); await q.screenshot({ path: path.join(OUT, 'phone_panel.png') });
   await ph.close();
-  // Ingenium's purple, pixel for pixel as 7.30 drew it
+  const de = await p.evaluate(() => IngDiamond.state().err);
+  ok(errs.length === 0 && !de, 'no page errors, and no error from the diamond\'s drawing', { errs, diamond: de });
+  /* Ingenium's purple, pixel for pixel as 7.30 drew it: with the test's own page closed first (while it still turned, the two still frames
+     were caught at different points of the stone's turn: the same colours, another angle) */
+  await ctx.close();
   if (U730) {
     const still = async (url, name) => { const c = await b.newContext({ viewport: { width: 1440, height: 900 } });
       await c.addInitScript(() => { let s = 7; Math.random = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; });
@@ -189,7 +193,5 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
     const n = +cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', DIFF, a, z]).toString().trim();
     ok(n === 0, 'Ingenium\'s purple, with nothing chosen, is drawn pixel for pixel as 7.30 drew it (a still frame)', { differing: n });
   }
-  const de = await p.evaluate(() => IngDiamond.state().err);
-  ok(errs.length === 0 && !de, 'no page errors, and no error from the diamond\'s drawing', { errs, diamond: de });
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);
 })().catch(e => { console.error(String(e && e.stack || e).slice(0, 1200)); process.exit(2); });
