@@ -428,7 +428,8 @@ really different"; "They still do not look like the original buttons." Shown 7.1
 she answered: "Bring the old look back with the gold jewelled new note button and the glossy look. They looked better that way."
 `build/modules/r303.js` no longer changes Pin, Send to Tabula, Delete, a note's menu rows or New note: they are the base page's own keys
 again (.sch-btn and .menu-btn, glossy, lavender and red; New note the amethyst stone with its gold rim), as in 7.14, by day and by night
-(compared side by side). Tabula and Abacus stay the charcoal and green stones she asked for in 7.15. One thing is mended: the keys'
+(compared side by side). Shown that, she asked: "Revert the Tabula and Abacus buttons too, they look entirely too big and hideous
+this way." So Tabula and Abacus are again the small "→ Tabula" and "→ Abacus" keys of 7.14, not the 7.15 stones. One thing is mended: the keys'
 rising-in (animation fill both) held them still afterwards, so their own hover lift (three points) never showed; it shows now.
 
 Ingenium 7.32 (17 November 2026): the day's clear crystal at night.

@@ -11,9 +11,6 @@
    with Ingenium's face, depth and motion; Tabula and Abacus become their own cut stones (.gem-go.tabula, .gem-go.abacus: charcoal and
    green, with the sparkle at their corners), as the side list's apps are. What each key does is unchanged. */
 #schedaePanel .sch-head .btn.sch-new{flex:0 0 auto}
-#schedaePanel .sch-go{gap:0}
-#schedaePanel .sch-go > .gem-go{flex:1 1 0;min-width:0;height:34px;display:flex;align-items:center;justify-content:center;padding:0 12px}
-#schedaePanel .sch-go > .gem-go + .gem-go{margin-left:8px}
 #schedaePanel .sch-acts{gap:0}
 #schedaePanel .sch-acts > .btn + .btn{margin-left:6px}
 #schedaePanel .sch-acts > .btn.danger{margin-left:auto}
@@ -25,7 +22,8 @@
    Schedae panel ..."; then, shown 7.14's panel beside the test copy: "Bring the old look back with the gold jewelled new note button and
    the glossy look. They looked better that way."). New note is the amethyst stone with its gold rim again, and Pin, Send to Tabula,
    Delete and a note's menu rows their own glossy keys (the base page's .gem-go.newnote, .sch-btn and .menu-btn, untouched); Tabula and
-   Abacus stay the charcoal and green stones she asked for in 7.15. One thing only is mended: the keys' rising-in (fill both) held them
+   Abacus their own keys too (her words: "Revert the Tabula and Abacus buttons too, they look entirely too big and hideous this way").
+   One thing only is mended: the keys' rising-in (fill both) held them
    still afterwards, so the lift their own hover gives never showed; it shows now. */
 #schedaePanel .sch-btn,.sn-menu .menu-btn{animation-fill-mode:backwards}
 </style>
@@ -38,9 +36,8 @@ function swap(el,from,to){if(!el)return;from.forEach(function(c){el.classList.re
 /* the panel: its title's key, the two stones, each note's keys */
 function dressPanel(p){if(!p||p.__r303)return;p.__r303=1;
   /* 7.33: New note stays the amethyst stone (.gem-go.newnote), as in 7.14 */
-  [].forEach.call(p.querySelectorAll(".sch-go > button"),function(b){var t=(b.textContent||"").replace(/^\s*→\s*/,"").trim();
-    if(/^Tabula$/i.test(t)){swap(b,["btn","xs"],["gem-go","tabula"]);b.textContent="Tabula";b.setAttribute("aria-label","Open Tabula");}
-    else if(/^Abacus$/i.test(t)){swap(b,["btn","xs"],["gem-go","abacus"]);b.textContent="Abacus";b.setAttribute("aria-label","Open Abacus");}});
+  /* 7.33: Tabula and Abacus stay their own keys (→ Tabula, → Abacus), as in 7.14 (her words: "Revert the Tabula and Abacus buttons too,
+     they look entirely too big and hideous this way") */
   /* 7.33: Pin, Send to Tabula and Delete keep their own keys (.sch-btn), less glossy and more 3D (see the style above) */}
 /* a note's menu: its rows */
 function dressMenu(m){if(!m||m.__r303)return;m.__r303=1;
