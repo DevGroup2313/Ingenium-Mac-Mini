@@ -1,4 +1,4 @@
-# Fabrica's runs on her other computers, stage 2 (the page's side): drafts, not applied yet
+# Fabrica's runs on her other computers, stage 2 (the page's side): applied in 7.31 (the comments it writes say 7.31 there)
 
 Written on 17 November 2026 against the 7.29 modules, as the approved phase 3 preview has it (source/previews/fabrica_p3: MACHINES,
 machines(), runSheet()). Both scripts were dry-run on copies (they apply, and the scripts parse); nothing was tested in a browser yet.

@@ -432,6 +432,25 @@ colour and a night one of its own; her light blue is Inkwell, sky blue by day (#
   Carpe Diem and Inkwell are named only in the master edition.
 - What is this? (r144), the Guide's diamond entry (r250) and What is new (r222) say so.
 - rig: `t_731_diamond_families.js` (new) supersedes `t_730_diamond_colours.js`.
+Fabrica's runs on her other computers, stage 2, the page's side (the approved phase 3 preview, source/previews/fabrica_p3: MACHINES,
+machines(), runSheet(); stage 1, the computer's side, came in 7.28), from source/build/aside/runs_stage2:
+- `build/modules/r274.js` (sharing with her devices): a computer that runs Fabrica's jobs but lends no models pairs too, and is kept as
+  one that runs jobs; IngLend.request() sends a request to a paired computer with its code and this device's name, at each address it
+  gave until one answers; the lending computer's card in Settings, Your devices, has the switch Run Fabrica's jobs for my devices
+  (share_runs_set), off until she turns it on, shown even while it lends nothing.
+- `build/modules/r298.js` (Fabrica's Runs, Workflows and Machines): her paired computers that run jobs are machines (their tools, Ready,
+  Asleep, Runs off there or Type its code again; Check it again; How to add what is missing; Add a machine says how to pair one). The run
+  sheet: As the workflow says (each job on a computer of the system it names, this one first, a job's needs kept with it; a job no
+  computer of hers runs now is said), Only on this computer, Only on one of her computers, and Only on GitHub's machines (not yet, shown
+  but not pressable). A run on another computer goes through the same calls as a run here, sent to that computer; it is known here as
+  m:<computer>:<run>, so every view follows it there, and says where it ran. A device with no computer app (the Fire tablet, the iPhone,
+  the iPad, a browser) sends its runs to her computers. Once a run there ends, the computer apps keep a copy here (its record, every log
+  and every file), and the copy stands for it in the list.
+- rig: `t_732_runs_machines.js` (new, 18 checks): two computer apps in this container (the second running jobs for her devices), a page
+  pairing with it and running a workflow there, following its log and file, keeping a copy; As the workflow says; a browser with no
+  computer app sending a run; the runs switched off there. Two first failures were the test's own (a run just started opens its own page;
+  both computers are named vm here, so the test found this computer's card), and were fixed in the test.
+- What is this? (r144) explains the switch; What is new (r222) says so (in the editions with Fabrica).
 
 Ingenium 7.30 (17 November 2026): the diamond's colours, refined, as her approved live preview has them.
 Her words on 7.29's panel and on the live preview (https://claude.ai/artifact/55kQPJwfrgahiHc6GkrbJG, source/previews/diamond_colours_v2),

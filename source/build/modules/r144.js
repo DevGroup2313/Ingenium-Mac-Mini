@@ -715,6 +715,7 @@ var WHAT=[
   ["#supCard","Support","Switches for the supports: reminders, timers, text size and more."],
   ["#lkConnect","Connect","Connects to another computer's models with its address and code."],
   ["#linkCard","Your models on every device","Use a stronger computer's models from another device at home."],
+  ["#ldRuns","Run Fabrica's jobs for my devices","On this computer: your other devices can run their Fabrica workflows here, each seeing only its own runs. Off until you turn it on."],
   ["#psCustom","Your own instructions","Standing instructions every reply follows, such as British spelling."],
   ["#personaCard","Your Ingenium","How Ingenium writes to you: your name, the length, the tone, and your own instructions."],
   ["#cxProvider","A cloud or server model","Optional: connect a model run elsewhere. With None, everything stays offline."],

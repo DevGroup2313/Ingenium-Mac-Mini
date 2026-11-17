@@ -134,7 +134,9 @@ body[data-theme="night"] .r298-cap{background:linear-gradient(180deg,#f3eefb,#e2
 #fb .r298-tool.no{color:var(--f-ink3)}
 #fb .r298-mc .can{grid-column:2/-1;font-size:11.5px;color:var(--f-ink2);margin-top:3px}
 #fb .r298-mc .can b{font-size:11.5px}
-#fb .r298-mc .k{grid-column:2/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#fb .r298-steps{margin:4px 0 12px;padding-left:20px;display:grid;gap:8px;font-size:13.5px;line-height:1.5}
+.r298-steps b{display:block}
+.r298-mc .k{grid-column:2/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 #fb .r298-mc.later{opacity:.86}
 /* ---------- Releases: every device ---------- */
 #fb .r298-rel{border:1px solid var(--f-hair);border-radius:14px;background:linear-gradient(var(--f-a),var(--f-b));box-shadow:var(--f-pop);padding:12px 12px 10px;margin:0 0 10px;animation:r298Open .45s cubic-bezier(.22,.8,.3,1) both}
@@ -483,16 +485,55 @@ function took(a,b){if(!a)return "";var s=Math.max(0,Math.round(((b||Date.now()/1
 /* ---------- the computer app's side (build/desktop/app_runs_708.py) ---------- */
 function A(){try{var a=typeof W.shellApi==="function"?W.shellApi():null;if(!a&&W.pywebview&&W.pywebview.api)a=W.pywebview.api;return a&&typeof a.runs_new==="function"?a:null;}catch(e){return null;}}
 var NOHERE="Runs happen in Ingenium's Mac and Windows apps: this copy of Ingenium cannot start programs on this device.";
-function call(name,args){var a=A();if(!a||typeof a[name]!=="function")return Promise.reject(new Error(NOHERE));
-  return Promise.resolve(a[name].apply(a,args||[])).then(function(x){if(!x||x.ok===false)throw new Error((x&&x.error)||"It could not be done.");return x;});}
+/* 7.31: a call goes here (the computer app) or, for a run on another of her computers, to that computer (modules/r274.js,
+   IngLend.request; build/desktop/app_runs_728.py). A run there is known here as "m:<computer>:<run>". */
+function call(name,args,mid){args=args||[];
+  if(!mid&&isRemote(args[0])){var sp=split(args[0]);mid=sp.mid;args=[sp.rid].concat(args.slice(1));}
+  if(mid&&mid!=="here")return remote(mid,name,args).then(function(x){return tag(x,mid,name);});
+  var a=A();if(!a||typeof a[name]!=="function")return Promise.reject(new Error(NOHERE));
+  return Promise.resolve(a[name].apply(a,args)).then(function(x){if(!x||x.ok===false)throw new Error((x&&x.error)||"It could not be done.");return x;});}
+/* ---------- 7.31: her other computers, paired in Settings, Your devices, each running Fabrica's jobs for her devices ---------- */
+var MC={};
+function LEND(){return W.IngLend&&typeof W.IngLend.request==="function"?W.IngLend:null;}
+function others(){var l=LEND();if(!l)return [];try{return (l.state().computers||[]).filter(function(c){return c.runs;});}catch(e){return [];}}
+function paired(){var l=LEND();if(!l)return [];try{return l.state().computers||[];}catch(e){return [];}}
+function byMid(mid){var a=paired();for(var i=0;i<a.length;i++)if(a[i].id===mid)return a[i];return {id:mid,name:"your other computer",kind:"laptop"};}
+function canRun(){return !!A()||others().length>0;}
+function isRemote(id){return typeof id==="string"&&id.indexOf("m:")===0;}
+function rid0(mid,rid){return "m:"+encodeURIComponent(mid)+":"+rid;}
+function split(id){var s=String(id).slice(2),i=s.indexOf(":");return {mid:decodeURIComponent(s.slice(0,i)),rid:s.slice(i+1)};}
+function enc(v){return encodeURIComponent(v==null?"":String(v));}
+var RQ={runs_tools:function(a){return ["GET","/ingenium/runs/tools"+(a[0]?"?fresh=1":"")];},runs_list:function(){return ["GET","/ingenium/runs/list"];},
+  runs_get:function(a){return ["GET","/ingenium/runs/get?rid="+enc(a[0])];},runs_log:function(a){return ["GET","/ingenium/runs/log?rid="+enc(a[0])+"&job="+enc(a[1])+"&offset="+(+a[2]||0)];},
+  runs_file:function(a){return ["GET","/ingenium/runs/file?rid="+enc(a[0])+"&art="+enc(a[1])+"&path="+enc(a[2])+"&offset="+(+a[3]||0)+"&size="+(+a[4]||4194304)];},
+  runs_new:function(a){return ["POST","/ingenium/runs/new",{spec:a[0]}];},runs_put:function(a){return ["POST","/ingenium/runs/put",{rid:a[0],path:a[1],b64:a[2],mode:a[3],append:!!a[4]}];},
+  runs_go:function(a){return ["POST","/ingenium/runs/go",{rid:a[0]}];},runs_stop:function(a){return ["POST","/ingenium/runs/stop",{rid:a[0]}];},runs_forget:function(a){return ["POST","/ingenium/runs/forget",{rid:a[0]}];}};
+function remote(mid,name,args){var l=LEND(),f=RQ[name];if(!l)return Promise.reject(new Error("This copy of Ingenium cannot reach your other computers."));
+  if(!f)return Promise.reject(new Error("That is done on the computer that ran it, "+byMid(mid).name+"."));var q=f(args);
+  return l.request(mid,q[0],q[1],q[2],name==="runs_put"||name==="runs_file"?180:40).then(function(x){if(!x||x.ok===false)throw new Error((x&&x.error)||"It could not be done.");if(MC[mid])MC[mid].s="ok";return x;},
+    function(e){mcFail(mid,e);throw e;});}
+function tag(x,mid,name){var m=byMid(mid);function t(run){if(run&&run.id&&!isRemote(run.id)){run.id=rid0(mid,run.id);run.remote={id:mid,computer:m.name,kind:m.kind};}return run;}
+  if(x&&x.run)t(x.run);if(x&&Array.isArray(x.runs))x.runs.forEach(t);if(name==="runs_new"&&x&&x.id&&!isRemote(x.id))x.id=rid0(mid,x.id);return x;}
+function mcFail(mid,e){var st=e&&e.status,m=MC[mid]||(MC[mid]={});m.at=Date.now();m.msg=String(e&&e.message||e||"");
+  m.s=st===403?"off":st===401?"code":st?"err":"away";}
+function rtools(mid,fresh){var m=MC[mid];if(!fresh&&m&&m.tools&&m.s==="ok"&&Date.now()-m.at<120000)return Promise.resolve(m.tools);
+  return call("runs_tools",[!!fresh],mid).then(function(t){MC[mid]={tools:t,s:"ok",at:Date.now(),msg:""};return t;});}
 function b64(u){var t="",CH=0x8000;for(var i=0;i<u.length;i+=CH)t+=String.fromCharCode.apply(null,u.subarray(i,i+CH));return btoa(t);}
 function unb64(s){var t=atob(s),u=new Uint8Array(t.length);for(var i=0;i<t.length;i++)u[i]=t.charCodeAt(i);return u;}
 var ST={runs:[],here:"",listAt:0,tools:null,toolsAt:0,open:null,job:null,logs:{},runCache:{},wf:{},timer:0,busy:false,lopen:{},needs:null,needsAt:0};
 function seen(){var x=X(),f=x&&x.FBS?x.FBS():{};if(!f.runsSeen||typeof f.runsSeen!=="object")f.runsSeen={};return f.runsSeen;}
 function markSeen(id){var s=seen();if(!s[id]){s[id]=1;var x=X();if(x&&x.saveSoon)x.saveSoon();}}
-function list(force){if(!A())return Promise.resolve([]);if(!force&&Date.now()-ST.listAt<1500)return Promise.resolve(ST.runs);
-  return call("runs_list").then(function(x){ST.runs=x.runs||[];ST.here=x.here||ST.here;ST.listAt=Date.now();return ST.runs;},function(){return ST.runs;});}
-function tools(fresh){if(!A())return Promise.resolve(null);if(!fresh&&ST.tools&&Date.now()-ST.toolsAt<120000)return Promise.resolve(ST.tools);
+function list(force){if(!canRun())return Promise.resolve([]);if(!force&&Date.now()-ST.listAt<1500)return Promise.resolve(ST.runs);
+  ST.rem=ST.rem||{};
+  var loc=A()?call("runs_list").then(function(x){ST.here=x.here||ST.here;ST.loc=x.runs||[];return ST.loc;},function(){return ST.loc||[];}):Promise.resolve([]);
+  var rem=others().filter(function(c){var m=MC[c.id];return !m||m.s==="ok"||Date.now()-(m.at||0)>60000;}).map(function(c){
+    return call("runs_list",[],c.id).then(function(x){ST.rem[c.id]=x.runs||[];if(!MC[c.id])MC[c.id]={s:"ok",at:Date.now()};return ST.rem[c.id];},function(){return ST.rem[c.id]||[];});});
+  return Promise.all([loc].concat(rem)).then(function(all){var local=all[0]||[],kept={};
+    /* a run kept here from another computer stands for it there */
+    local.forEach(function(x){if(x.remote&&x.remote.rid)kept[x.remote.id+"|"+x.remote.rid]=1;});
+    var far=[];Object.keys(ST.rem).forEach(function(k){(ST.rem[k]||[]).forEach(function(x){var sp=split(x.id);if(!kept[sp.mid+"|"+sp.rid])far.push(x);});});
+    ST.runs=local.concat(far).sort(function(a,b){return (b.started||b.at||0)-(a.started||a.at||0);});ST.listAt=Date.now();keepCopies();return ST.runs;});}
+function tools(fresh){if(!A())return Promise.resolve(null);   /* this computer's own; rtools(mid) for another's */if(!fresh&&ST.tools&&Date.now()-ST.toolsAt<120000)return Promise.resolve(ST.tools);
   return call("runs_tools",[!!fresh]).then(function(t){ST.tools=t;ST.toolsAt=Date.now();ST.here=t.os||ST.here;return t;});}
 function going(rs){return (rs||ST.runs).filter(function(r){return r.state==="running"||r.state==="ready";});}
 function runsOf(r){return ST.runs.filter(function(x){return x.repo===r.id;});}
@@ -528,15 +569,15 @@ function counts(){var vb=$("fbViews"),r=X()&&X().cur?X().cur():null;if(!vb)retur
 /* ---------- Runs ---------- */
 function mark(s){var c=s==="ok"?"ok":s==="bad"?"bad":s==="running"?"run":"";return '<span class="r298-m '+c+'" aria-hidden="true">'+(s==="ok"?"✓":s==="bad"?"!":s==="running"?"":s==="stopped"?"■":"○")+"</span>";}
 var SAY={ready:"Waiting",running:"Running",ok:"Passed",bad:"Failed",stopped:"Stopped",skipped:"Not run",warn:"Passed, with a warning",queued:"Waiting"};
-function where(run){var m=run&&run.machine||{};return "this computer"+(m.os?" ("+m.os+")":"");}
+function where(run){var m=run&&run.machine||{},rm=run&&run.remote;if(rm)return (rm.computer||"your other computer")+(m.os?" ("+m.os+")":"")+(rm.kept?", kept here too":"");return "this computer"+(m.os?" ("+m.os+")":"");}
 function progress(run){var all=0,done=0;(run.jobs||[]).forEach(function(j){if(j.state==="skipped")return;all++;if(j.state!=="running"&&j.state!=="queued")done++;});return all?Math.round(100*done/all):0;}
 function paintRuns(r,w,f){var x=X();var body=el("div","r298-pad");w.appendChild(body);
-  if(!A()){body.appendChild(el("div","f-empty","<b>Runs happen on a computer</b>"+esc(NOHERE)+" Your workflows are under Workflows, to read here."));
-    f.appendChild(key("","Workflows",function(){go("workflows");}));return;}
+  if(!canRun()){body.appendChild(el("div","f-empty","<b>Runs happen on a computer</b>"+esc(NOHERE)+" Pair one of your computers under Machines, Add a machine, and this device sends its runs there. Your workflows are under Workflows, to read here."));
+    f.appendChild(key("pri","Machines",function(){go("machines");}));f.appendChild(key("","Workflows",function(){go("workflows");}));return;}
   if(ST.open){var rid=ST.open,rec=ST.runCache[rid];if(!rec){body.appendChild(el("div","f-empty","Reading the run…"));call("runs_get",[rid]).then(function(g){ST.runCache[rid]=g.run;repaint();},function(e){ST.open=null;fail(e);repaint();});return;}
     return detail(r,body,f,rec);}
   var mine=runsOf(r);
-  if(!mine.length){body.appendChild(el("div","f-empty","<b>No runs yet</b>A run is one time a workflow ran: its jobs, their steps, the whole log and the files it made. Choose a workflow under Workflows and press Run it now; it runs here, on this computer."));
+  if(!mine.length){body.appendChild(el("div","f-empty","<b>No runs yet</b>A run is one time a workflow ran: its jobs, their steps, the whole log and the files it made. Choose a workflow under Workflows and press Run it now; it runs here, or on another of your computers, as you choose."));
     f.appendChild(key("pri","Workflows",function(){go("workflows");}));f.appendChild(key("","Machines",function(){go("machines");}));return;}
   var box=el("div","r298-rb");
   mine.forEach(function(run,i){var b=el("button","r298-run");b.type="button";b.style.animationDelay=Math.min(i,8)*0.04+"s";var st=run.state;
@@ -546,7 +587,7 @@ function paintRuns(r,w,f){var x=X();var body=el("div","r298-pad");w.appendChild(
       (st==="running"?'<span class="r298-bar"><i style="width:'+progress(run)+'%"></i></span>':"");
     b.addEventListener("click",function(){ST.open=run.id;ST.job=null;markSeen(run.id);delete ST.runCache[run.id];repaint();});box.appendChild(b);});
   body.appendChild(box);
-  body.appendChild(el("p","f-hint","Every run is kept with its whole log and every file it made, on this computer, until you remove it: no expiry, and no minutes counted."));
+  body.appendChild(el("p","f-hint","Every run is kept with its whole log and every file it made, on the computer that ran it and, in the computer apps, here too, until you remove it: no expiry, and no minutes counted."));
   f.appendChild(key("pri","Run a workflow",function(){go("workflows");}));f.appendChild(key("","Machines",function(){go("machines");}));}
 function detail(r,body,f,run){var x=X();markSeen(run.id);
   var head=el("div","r298-runhead");head.innerHTML="<div><h4>"+esc(run.workflow||"A workflow")+(run.n?" · #"+run.n:"")+"</h4><small>"+esc((run.why||"by you")+" · "+where(run)+" · "+ago((run.started||run.at)*1000)+(run.ended?" · "+took(run.started||run.at,run.ended):"")+(run.version?" · "+String(run.version).slice(0,7):""))+"</small></div>";
@@ -597,7 +638,7 @@ function follow(run,j,pre){clearTimeout(ST.timer);var key2=run.id+"|"+j.key,L=ST
   step();}
 function stateOf(run){return run?[run.state,(run.jobs||[]).map(function(j){return j.state+(j.steps||[]).map(function(s){return s.state;}).join("");}).join(","),(run.artifacts||[]).length]:null;}
 /* a quiet watch of every run going, so Needs you and the room's number follow it, with no page open */
-var WATCH=0;function watch(){clearTimeout(WATCH);if(!A())return;var g=going();if(!g.length)return;WATCH=setTimeout(function(){list(true).then(function(rs){if(!going(rs).length||D.hidden){needs(true);counts();}else{needs(true);counts();}
+var WATCH=0;function watch(){clearTimeout(WATCH);if(!canRun())return;var g=going();if(!g.length)return;WATCH=setTimeout(function(){list(true).then(function(rs){if(!going(rs).length||D.hidden){needs(true);counts();}else{needs(true);counts();}
       var x=X();if(x&&x.S&&x.S.view==="runs"&&!ST.open&&$("fb")&&$("fb").offsetParent)repaint();watch();});},3000);}
 function saveArt(run,a){var x=X();var files=a.files||[];
   function read(path,size){var parts=[],off=0;function next(){return call("runs_file",[run.id,a.name,path,off,4194304]).then(function(p){parts.push(unb64(p.b64));off=p.offset;if(off<p.size)return next();
@@ -649,15 +690,29 @@ function paintWorkflows(r,w,f){var body=el("div","r298-pad");w.appendChild(body)
     c.innerHTML='<div class="top"><b>'+esc(p?p.name:o.path)+'</b>'+(last?'<span class="f-chip'+(last.state==="ok"?" ok":last.state==="bad"?" warn":"")+'">'+esc((last.n?"#"+last.n+" ":"")+(SAY[last.state]||last.state).toLowerCase())+"</span>":"")+"</div><code>"+esc(o.path)+"</code>"+
       "<small>When: "+esc(p&&p.when.length?p.when.join("; "):"no trigger named")+"</small>";
     if(p){var on=el("div","on");p.jobs.forEach(function(j){var chip=el("span","f-chip",esc(j.name+" · "+(j.runsOn||"any machine")));chip.title=j.skip?"Not run on this computer: "+j.skip:"Runs on this computer";if(j.skip)chip.style.opacity=".6";on.appendChild(chip);});c.appendChild(on);}
-    var kk=el("div","k");kk.appendChild(key("sm pri","Run it now",function(){runSheet(r,o);},A()?"Runs here, on this computer, at the version kept last":NOHERE));if(!A())kk.lastChild.disabled=true;
+    var kk=el("div","k");kk.appendChild(key("sm pri","Run it now",function(){runSheet(r,o);},canRun()?(others().length?"Runs here or on another of your computers, at the version kept last":"Runs here, on this computer, at the version kept last"):NOHERE+" Pair one of your computers under Machines."));if(!canRun())kk.lastChild.disabled=true;
     kk.appendChild(key("sm quiet","Its file",function(){openFile(o.path);}));c.appendChild(kk);box.appendChild(c);});
   body.appendChild(box);
   body.appendChild(el("p","f-hint","These are plain GitHub Actions files: GitHub runs them as written when the app is on GitHub, and Fabrica runs each job here, on this computer, with every log and file kept."));
   f.appendChild(key("pri","New workflow, from a recipe",function(){recipes(r);}));}
 function openFile(path){var hub=H();if(hub&&hub.open&&hub.open("code",{file:path}))return;toast(path+" is under Now, Code.");}
 /* the run sheet: where each job runs, and the workflow's own inputs */
-function runSheet(r,o){var x=X();if(!A()){toast(NOHERE);return;}var p0=null;try{p0=CORE.plan(o.doc,{os:ST.here||"macOS",file:o.path});}catch(e){fail(e);return;}
-  var sh=x.sheet("Run "+p0.name,"It runs here, on this computer, at the version you kept last"+(r.head?" ("+String(r.head).slice(0,7)+")":"")+": each job in a folder of its own, every step and the whole log kept.");
+/* 7.31: her computers are checked first (a minute's knowledge is enough), so the sheet knows which are ready */
+function runSheet(r,o){var os=others();if(!os.length||os.every(function(c){return MC[c.id]&&Date.now()-(MC[c.id].at||0)<60000;}))return runSheet0(r,o);
+  var x=X();x.busy&&x.busy("Checking your computers…");Promise.all(os.map(function(c){return rtools(c.id,false).catch(function(){return null;});})).then(function(){x.unbusy&&x.unbusy();runSheet0(r,o);});}
+function runSheet0(r,o){var x=X();if(!canRun()){toast(NOHERE+" Pair one of your computers under Machines, Add a machine.");return;}var p0=null;try{p0=CORE.plan(o.doc,{os:ST.here||"macOS",file:o.path});}catch(e){fail(e);return;}
+  var sh=x.sheet("Run "+p0.name,"It runs at the version you kept last"+(r.head?" ("+String(r.head).slice(0,7)+")":"")+": each job in a folder of its own, every step and the whole log kept, on the computer that runs it.");
+  /* 7.31: where it runs, as her approved preview has it: as the workflow says, only here, only on one of her computers, or (later) GitHub's */
+  var ready=others().filter(function(c){return MC[c.id]&&MC[c.id].s==="ok";}),target=ready.length?"auto":(A()?"here":"");
+  if(others().length){var wp=el("div","r298-pick");sh.box.appendChild(el("span","f-lab","Where it runs"));
+    var wopts=[["auto","▣","As the workflow says","Each job on one of your computers with the system it names"+(ready.length?": "+(A()?"this computer, ":"")+ready.map(function(c){return c.name;}).join(", "):"")+". Your own machines count no minutes."]];
+    if(A())wopts.push(["here","⌂","Only on this computer","Every job here, as before"]);
+    others().forEach(function(c){var m=MC[c.id]||{};wopts.push([c.id,"◆","Only on "+c.name,m.s==="ok"?((m.tools&&m.tools.os)||"Ready")+", on your Wi-Fi":m.s==="off"?"Its runs are off there: turn on Run Fabrica's jobs for my devices on it":m.s==="code"?"Type its code again, in Settings, Your devices":"Asleep or away: it runs once it is awake with Ingenium open"]);});
+    wopts.push(["gh","◇","Only on GitHub's machines","In a coming release: GitHub's macOS, Windows and Linux machines, with your sign-in"]);
+    wopts.forEach(function(it){var b=el("button","f-opt");b.type="button";b.innerHTML='<span class="ic">'+it[1]+"</span><span><b>"+esc(it[2])+"</b><small>"+esc(it[3])+"</small></span>";
+      var off=it[0]==="gh"||(it[0]!=="auto"&&it[0]!=="here"&&!(MC[it[0]]&&MC[it[0]].s==="ok"))||(it[0]==="auto"&&!ready.length);if(off){b.disabled=true;b.setAttribute("aria-disabled","true");}
+      b.setAttribute("aria-pressed",it[0]===target?"true":"false");b.addEventListener("click",function(){if(off)return;target=it[0];[].forEach.call(wp.children,function(c){c.setAttribute("aria-pressed",c===b?"true":"false");});});wp.appendChild(b);});
+    sh.box.appendChild(wp);sh.box.appendChild(el("span","f-lab","A job for another system"));}
   var here=ST.here||"macOS",opts=[["exact","Each job on the system it names","A job for "+(here==="Windows"?"macOS or Linux":here==="macOS"?"Windows or Linux":"macOS or Windows")+" waits for that system (on GitHub, or on your other computers)"]];
   if(here==="macOS")opts.push(["unix","Linux jobs here too","A job for Linux (ubuntu-latest) runs on this Mac with bash; most of them work as they are"]);
   opts.push(["all","Every job here, whatever its system","Each job is tried on this computer, as it is"]);
@@ -672,27 +727,69 @@ function runSheet(r,o){var x=X();if(!A()){toast(NOHERE);return;}var p0=null;try{
       else{inp=D.createElement("input");inp.type="text";inp.value=CORE.str(d["default"]);vals[k]=function(){return inp.value;};}
       inp.setAttribute("aria-label",d.description||k);lab.appendChild(inp);ib.appendChild(lab);});sh.box.appendChild(ib);}
   var end=el("div","end"),go1=key("pri","Run it now",function(){var inputs={};Object.keys(vals).forEach(function(k){inputs[k]=vals[k]();});go1.disabled=true;
-    start(r,o,{anyway:chosen==="exact"?false:chosen,inputs:inputs,why:"by you, by hand"}).then(function(){sh.close();},function(e){go1.disabled=false;fail(e);});});
+    if(!target){go1.disabled=false;toast("None of your computers is ready now: wake one with Ingenium open, then Check it again under Machines.");return;}
+    var how={anyway:chosen==="exact"?false:chosen,inputs:inputs,why:"by you, by hand"};if(target!=="here"&&target!=="auto")how.machine=target;
+    (target==="auto"?startAuto(r,o,how):start(r,o,how)).then(function(){sh.close();},function(e){go1.disabled=false;fail(e);});});
   end.appendChild(go1);sh.box.appendChild(end);}
 /* a run: the workflow made into jobs and steps for this computer, the app's files at the version put in its folder, then started */
-function start(r,o,opt){opt=opt||{};var x=X();
-  return Promise.all([tools(),list(true)]).then(function(z){var t=z[0]||{},have={},need={};(t.tools||[]).forEach(function(k){if(k.ok)have[k.key]=k.version||true;need[k.key]=k.need;});
-    var n=1;ST.runs.forEach(function(y){if(y.repo===r.id&&y.n>=n)n=y.n+1;});
+function start(r,o,opt){opt=opt||{};var x=X(),mid=opt.machine&&opt.machine!=="here"?opt.machine:null,mname=mid?byMid(mid).name:"";
+  return Promise.all([mid?rtools(mid,false):tools(),list(true)]).then(function(z){var t=z[0]||{},have={},need={};(t.tools||[]).forEach(function(k){if(k.ok)have[k.key]=k.version||true;need[k.key]=k.need;});
+    var n=opt.n||1;if(!opt.n)ST.runs.forEach(function(y){if(y.repo===r.id&&y.n>=n)n=y.n+1;});
     var p=CORE.plan(o.doc,{os:t.os||ST.here||"macOS",arch:/arm|aarch/i.test(t.arch||"")?"ARM64":"X64",sha:r.head,branch:r.branch||"main",repo:r.name,n:n,inputs:opt.inputs,anyway:opt.anyway,tools:have,need:need,file:o.path});
     if(opt.only)p.jobs.forEach(function(j){if(opt.only.indexOf(j.key)<0&&!j.skip)j.skip="it passed in run #"+opt.from;});
     if(opt.anyway==="unix")p.jobs.forEach(function(j){if(/it runs on Linux/.test(j.skip||"")&&(t.os||ST.here)==="macOS")j.skip="";});
-    var disk=IngRepo.isDisk&&IngRepo.isDisk(r.id);
-    var spec={app:r.name,repo:r.id,version:r.head,label:r.branch||"",workflow:p.name,file:o.path,why:opt.why||"by you",n:n,event:"workflow_dispatch",disk:disk?r.id:"",jobs:p.jobs.map(function(j){return {key:j.key,name:j.name,needs:j.needs,skip:j.skip,env:j.env,timeout:j.timeout,
+    /* 7.31: as the workflow says, the jobs another computer runs are not run here, and a job whose needs run elsewhere says so */
+    if(opt.away){p.jobs.forEach(function(j){if(opt.away[j.key]&&!j.skip)j.skip=opt.away[j.key];});
+      p.jobs.forEach(function(j){if(j.skip)return;var far=(j.needs||[]).filter(function(k){return opt.away[k];});if(far.length)j.steps.unshift({name:"Its needs run elsewhere",kind:"note",done:true,text:"This job needs "+far.join(", ")+", which run"+(far.length>1?"":"s")+" on another of your computers; here it starts without waiting for "+(far.length>1?"them":"it")+"."});});}
+    var disk=!mid&&IngRepo.isDisk&&IngRepo.isDisk(r.id);
+    var spec={app:r.name,repo:r.id,version:r.head,label:r.branch||"",workflow:p.name,file:o.path,why:opt.why||"by you",n:n,event:"workflow_dispatch",disk:disk?r.id:"",group:opt.group||"",jobs:p.jobs.map(function(j){return {key:j.key,name:j.name,needs:j.needs,skip:j.skip,env:j.env,timeout:j.timeout,
         steps:j.steps.map(function(s){return {name:s.name,kind:s.kind,run:s.run||"",shell:s.shell||"",env:s.env||{},cwd:s.cwd||"",timeout:s.timeout||0,continue:!!s.continue,paths:s.paths||[],art:s.art||"",text:s.text||"",when:s.when||"success",sid:s.sid||"",done:!!s.done,into:s.into||"",need:s.need||""};})};})};
     if(p.notes.length)spec.jobs.forEach(function(j){if(!j.skip&&j.steps.length)j.steps.unshift({name:"What Fabrica noticed in this workflow",kind:"note",done:true,text:p.notes.join("\n  ")});});
-    return call("runs_new",[spec]).then(function(made){var rid=made.id;if(disk)return rid;
-      x.busy&&x.busy("Putting the app's files in the run's folder…");
+    if(!p.jobs.some(function(j){return !j.skip;}))throw new Error((mid?mname:"This computer")+" runs none of its jobs: "+(p.jobs[0]&&p.jobs[0].skip||"each names another system")+".");
+    return call("runs_new",[spec],mid).then(function(made){var rid=made.id;if(disk)return rid;
+      x.busy&&x.busy(mid?"Sending the app's files to "+mname+"…":"Putting the app's files in the run's folder…");
       return IngRepo.files(r.id,r.head).then(function(fs){var q=Promise.resolve();fs.forEach(function(fl){q=q.then(function(){return IngRepo.read(r.id,fl.path,r.head).then(function(u){u=u||new Uint8Array(0);
             var mode=typeof fl.mode==="string"?parseInt(fl.mode,8):fl.mode,CH=3*1024*1024,parts=Math.max(1,Math.ceil(u.length/CH)),q2=Promise.resolve();
             for(var i=0;i<parts;i++)(function(i){q2=q2.then(function(){return call("runs_put",[rid,fl.path,b64(u.subarray(i*CH,(i+1)*CH)),mode||null,i>0]);});})(i);return q2;});});});return q;})
         .then(function(){x.unbusy&&x.unbusy();return rid;},function(e){x.unbusy&&x.unbusy();call("runs_forget",[rid]).catch(function(){});throw e;});})
       .then(function(rid){return call("runs_go",[rid]).then(function(){return rid;});})
-      .then(function(rid){ST.open=rid;ST.job=null;markSeen(rid);return list(true).then(function(){nav("runs");watch();needs(true);counts();toast(p.name+": run #"+n+" started here, on this computer.");});});});}
+      .then(function(rid){if(opt.quiet)return {rid:rid,n:n,name:p.name,jobs:p.jobs.filter(function(j){return !j.skip;}).map(function(j){return j.name;})};
+        ST.open=rid;ST.job=null;markSeen(rid);return list(true).then(function(){nav("runs");watch();needs(true);counts();toast(p.name+": run #"+n+" started "+(mid?"on "+mname+".":"here, on this computer."));return rid;});});});}
+/* 7.31: as the workflow says: each job on one of her computers whose system it names (this one first), a job with the jobs it needs where
+   that computer can run it; one run on each computer used, under one number; a job no computer of hers runs now is said */
+function startAuto(r,o,opt){opt=opt||{};var ms=(A()?[{id:"here",name:"this computer"}]:[]).concat(others().filter(function(c){return MC[c.id]&&MC[c.id].s==="ok";}).map(function(c){return {id:c.id,name:c.name};}));
+  return Promise.all(ms.map(function(m){return (m.id==="here"?tools():rtools(m.id,false)).then(function(t){m.t=t||{};return m;},function(){return null;});})).then(function(ms){ms=ms.filter(Boolean);
+    if(!ms.length)throw new Error("None of your computers can run it now: pair one under Machines, or wake one with Ingenium open.");
+    ms.forEach(function(m){var t=m.t,have={},need={};(t.tools||[]).forEach(function(k){if(k.ok)have[k.key]=k.version||true;need[k.key]=k.need;});m.unix=t.os==="macOS";
+      m.p=CORE.plan(o.doc,{os:t.os||"macOS",arch:/arm|aarch/i.test(t.arch||"")?"ARM64":"X64",sha:r.head,branch:r.branch||"main",repo:r.name,n:1,inputs:opt.inputs,anyway:m.unix?"unix":false,tools:have,need:need,file:o.path});
+      if(m.unix)m.p.jobs.forEach(function(j){if(/it runs on Linux/.test(j.skip||""))j.skip="";});});
+    var at={},jobs=ms[0].p.jobs,runs=function(m,key){var pj=m.p.jobs.filter(function(x){return x.key===key;})[0];return pj&&!pj.skip;};
+    /* a Linux job goes to a Linux computer before a Mac running it with bash */
+    jobs.forEach(function(j){var with_=(j.needs||[]).map(function(k){return at[k];}).filter(Boolean)[0],cand=ms.filter(function(m){return runs(m,j.key);});
+      var exact=cand.filter(function(m){var pj=m.p.jobs.filter(function(x){return x.key===j.key;})[0];return !(m.unix&&/linux|ubuntu/i.test(String(pj&&pj.runsOn||"")));});
+      at[j.key]=(with_&&runs(with_,j.key))?with_:(exact[0]||cand[0]||null);});
+    var used=ms.filter(function(m){return jobs.some(function(j){return at[j.key]===m;});});
+    var none=jobs.filter(function(j){return !at[j.key];});
+    if(!used.length)throw new Error("None of your computers runs its jobs now: "+(jobs[0]&&ms[0].p.jobs[0].skip||"each names another system")+".");
+    var n=1;ST.runs.forEach(function(y){if(y.repo===r.id&&y.n>=n)n=y.n+1;});var gid=String(Date.now().toString(36))+Math.random().toString(36).slice(2,6),done=[],q=Promise.resolve();
+    used.forEach(function(m){var away={};jobs.forEach(function(j){if(at[j.key]!==m)away[j.key]=at[j.key]?"it runs on "+at[j.key].name+" (the same run, #"+n+")":"no computer of yours runs it now";});
+      q=q.then(function(){return start(r,o,{machine:m.id==="here"?null:m.id,n:n,group:gid,inputs:opt.inputs,why:opt.why,anyway:m.unix?"unix":false,away:away,quiet:true}).then(function(x){done.push([m,x]);});});});
+    return q.then(function(){var first=done[0]&&done[0][1];ST.open=first?first.rid:null;ST.job=null;if(first)markSeen(first.rid);
+      return list(true).then(function(){nav("runs");watch();needs(true);counts();
+        toast(o.doc&&first?first.name+": run #"+n+" started: "+done.map(function(d){return d[1].jobs.join(", ")+" on "+(d[0].id==="here"?"this computer":d[0].name);}).join("; ")+"."+(none.length?" Not run: "+none.map(function(j){return j.name;}).join(", ")+" (no computer of yours runs its system now).":""):"Started.");});});});}
+/* 7.31: a run on another of her computers, once ended, kept here too (its record, every log and every file), in a computer app */
+var KEEP={};
+function keepCopies(){var a=A();if(!a||typeof a.runs_keep_copy!=="function")return;
+  ST.runs.forEach(function(run){if(!isRemote(run.id)||run.state==="running"||run.state==="ready"||KEEP[run.id])return;KEEP[run.id]=1;keepOne(run).then(function(){return list(true);}).then(function(){repaint();},function(){delete KEEP[run.id];});});}
+function keepOne(run){var a=A(),sp=split(run.id),m=byMid(sp.mid);
+  return call("runs_get",[run.id]).then(function(g){var rec=JSON.parse(JSON.stringify(g.run));rec.id=sp.rid;delete rec.remote;
+    return Promise.resolve(a.runs_keep_copy(rec,{id:m.id,name:m.name,kind:m.kind})).then(function(k){if(!k||!k.ok)throw new Error((k&&k.error)||"not kept");var kid=k.id,q=Promise.resolve();
+      (rec.jobs||[]).forEach(function(j){var off=0,first=true;function more(){return call("runs_log",[run.id,j.key,off]).then(function(lg){var t=lg.text||"",ap=!first;first=false;off=lg.offset||0;
+          return Promise.resolve(a.runs_keep_log(kid,j.key,t,ap)).then(function(){if(t&&off<(lg.size||0))return more();});});}q=q.then(more);});
+      (rec.artifacts||[]).forEach(function(art){(art.files||[]).forEach(function(fl){var path=fl.path||fl,off=0,first=true;
+        function more(){return call("runs_file",[run.id,art.name,path,off,4194304]).then(function(pp){var ap=!first;first=false;off=pp.offset;
+            return Promise.resolve(a.runs_keep_file(kid,art.name,path,pp.b64||"",ap)).then(function(){if(off<pp.size)return more();});});}q=q.then(more);});});
+      return q;});});}
 function again(r,run,failedOnly){var path=run.file;if(!path){toast("This run's workflow is not known.");return;}
   readWf(r,path).then(function(o){if(o.err)throw new Error(path+": "+o.err);var only=null;
     if(failedOnly)only=(run.jobs||[]).filter(function(j){return j.state==="bad"||j.state==="stopped";}).map(function(j){return j.key;});
@@ -736,7 +833,7 @@ function recipes(r){var x=X();var sh=x.sheet("A new workflow","Start from a reci
   end.appendChild(mk);sh.box.appendChild(end);}
 /* ---------- Machines ---------- */
 function paintMachines(r,w,f){var body=el("div","r298-pad");w.appendChild(body);var box=el("div","r298-mcs");body.appendChild(box);
-  if(!A()){box.appendChild(el("div","f-empty","<b>This device runs no workflows</b>"+esc(NOHERE)));}
+  if(!A()){box.appendChild(el("div","f-empty","<b>This device runs no workflows itself</b>"+esc(NOHERE)+(others().length?" It sends its runs to your computers below.":" Pair one of your computers (Add a machine, below), and this device sends its runs there.")));}
   else if(!ST.tools){box.appendChild(el("div","f-empty","Checking this computer's tools…"));tools(false).then(repaint,function(e){fail(e);});}
   else{var t=ST.tools,os=t.os,c=el("div","r298-mc");var ic=os==="Windows"?ICON.win:os==="Linux"?ICON.linux:ICON.mac;
     var sub=os+(t.release?" "+t.release:"")+(t.arch?" · "+(/arm|aarch/i.test(t.arch)?"Apple silicon or ARM ("+t.arch+")":t.arch):"")+" · you are at it";if(os==="macOS"&&/arm/i.test(t.arch||""))sub=os+" "+t.release+" · Apple silicon · you are at it";
@@ -746,11 +843,34 @@ function paintMachines(r,w,f){var body=el("div","r298-pad");w.appendChild(body);
     c.appendChild(ok);if(miss.children.length)c.appendChild(miss);
     c.appendChild(el("div","can","<b>Builds here:</b> "+esc(builds(t))));
     var k=el("div","k");k.appendChild(key("sm","Check it again",function(e,b){b.disabled=true;tools(true).then(function(){repaint();toast("Every tool checked again just now.");},function(er){b.disabled=false;fail(er);});}));c.appendChild(k);box.appendChild(c);}
-  var later=el("div","r298-mc later");later.innerHTML='<span class="ic">'+ICON.mac+'</span><div><b>Your other computers</b><small>Your Mac mini and your HP laptop</small></div><span class="f-chip st">Coming next</span>';
-  later.appendChild(el("div","can","Each pairs once with a code this computer shows, as your devices do for models, and runs the jobs for its own system, with every log kept here. They join in a coming release."));box.appendChild(later);
+  /* 7.31: her other computers, each as the computer it is: its tools, and whether it is ready now */
+  others().forEach(function(cp){box.appendChild(machineCard(cp));});
+  paired().filter(function(cp){return !cp.runs;}).forEach(function(cp){var c=el("div","r298-mc later");c.innerHTML='<span class="ic">'+ICON.mac+"</span><div><b>"+esc(cp.name||"Your computer")+"</b><small>Paired for its models</small></div>"+'<span class="f-chip st">Runs off there</span>';
+    c.appendChild(el("div","can","To run your workflows on it: on that computer, Settings, Your devices, turn on Run Fabrica's jobs for my devices. It shows here as Ready."));box.appendChild(c);});
+  if(!paired().length){var later=el("div","r298-mc later");later.innerHTML='<span class="ic">'+ICON.mac+'</span><div><b>Your other computers</b><small>Your Mac mini, your HP laptop, any computer of yours with Ingenium</small></div><span class="f-chip st">Not paired yet</span>';
+    later.appendChild(el("div","can","Each pairs once with the code it shows, as your devices do for models, and runs the jobs for its own system: a Mac job on a Mac, a Windows job on the HP laptop. Add a machine says how."));box.appendChild(later);}
   var gh=el("div","r298-mc later");gh.innerHTML='<span class="ic">'+ICON.gh+'</span><div><b>GitHub\'s machines</b><small>macOS, Windows and Linux, with your GitHub sign-in</small></div><span class="f-chip st">Coming next</span>';
   gh.appendChild(el("div","can","The same workflow files run on GitHub's machines when the app is on GitHub; Fabrica will start them from here and bring their logs and files back, in a coming release. GitHub counts the minutes of a private repository's runs."));box.appendChild(gh);
-  f.appendChild(key("","Workflows",function(){go("workflows");}));}
+  f.appendChild(key("pri","Add a machine",function(){addMachine();}));f.appendChild(key("","Workflows",function(){go("workflows");}));}
+function machineCard(cp){var m=MC[cp.id],c=el("div","r298-mc"),t=m&&m.tools;
+  if(!m||(!t&&m.s==="ok")){rtools(cp.id,false).then(repaint,function(){repaint();});}
+  var os=t&&t.os,ic=os==="Windows"?ICON.win:os==="Linux"?ICON.linux:ICON.mac,st=!m?"Checking":m.s==="ok"?"Ready":m.s==="off"?"Runs off there":m.s==="code"?"Type its code again":m.s==="err"?"It answered with an error":"Asleep";
+  var sub=t?(os+(t.release?" "+t.release:"")+(t.arch?" · "+(/arm|aarch/i.test(t.arch)?"Apple silicon or ARM":t.arch):"")+" · on your Wi-Fi"):(m&&m.s==="away"?"Not answering: asleep, away, Ingenium closed there, or its runs switched off":"Paired with this device");
+  c.innerHTML='<span class="ic">'+ic+"</span><div><b>"+esc(cp.name||"Your computer")+"</b><small>"+esc(sub)+'</small></div><span class="f-chip st'+(m&&m.s==="ok"?" ok":"")+'">'+esc(st)+"</span>";
+  if(t){var ok=el("div","r298-tools"),miss=el("div","r298-tools miss");(t.tools||[]).forEach(function(k){var d=el("div","r298-tool "+(k.ok?"ok":"no"));d.innerHTML="<i>"+(k.ok?"✓":"○")+"</i><span>"+esc(k.name+(k.ok&&k.version?" "+String(k.version).replace(/^v/,""):""))+(k.ok?"":": for "+esc(k["for"])+"; "+esc(k.need))+"</span>";d.title="For "+k["for"];(k.ok?ok:miss).appendChild(d);});
+    c.appendChild(ok);if(miss.children.length)c.appendChild(miss);c.appendChild(el("div","can","<b>Builds there:</b> "+esc(builds(t))));}
+  if(m&&m.s!=="ok"&&m.msg)c.appendChild(el("div","can",esc(m.s==="away"?"A computer runs jobs only while it is awake with Ingenium open; its screen may sleep. Runs sent to it wait for it here.":m.msg)));
+  var k=el("div","k");k.appendChild(key("sm","Check it again",function(e,b){b.disabled=true;rtools(cp.id,true).then(function(){repaint();toast(cp.name+": every tool checked again just now.");},function(er){b.disabled=false;repaint();toast(cp.name+": "+(er&&er.message||er));});}));
+  if(t&&(t.tools||[]).some(function(x){return !x.ok;}))k.appendChild(key("sm quiet","How to add what is missing",function(){toast((t.tools||[]).filter(function(x){return !x.ok;}).map(function(x){return x.name+": "+x.need;}).join(". ")+".");}));
+  c.appendChild(k);return c;}
+/* 7.31: Add a machine, as her approved preview says, with the switch stage 1 gave the computer */
+function addMachine(){var x=X(),sh=x.sheet("Add a machine","Your Mac mini, your HP laptop or any computer of yours with Ingenium's app runs your workflows for this device, once paired.");
+  var ol=el("ol","r298-steps");[["On that computer","Open Ingenium: Settings, Models and AI, Your devices. Turn on Run Fabrica's jobs for my devices. It shows its code (and lends its models too, if you like)."],
+    ["Here","Settings, Your devices: Find my computers (or type its address), then type that code, once. Ingenium Cloud carries the pairing to your other devices."],
+    ["Then","It shows under Machines with its tools, checked, and the run sheet offers it. It runs jobs while it is awake with Ingenium open; its screen may sleep."]].forEach(function(s){var li=el("li",null,"<b>"+esc(s[0])+"</b> "+esc(s[1]));ol.appendChild(li);});
+  sh.box.appendChild(ol);var end=el("div","end");end.appendChild(key("pri","Open Your devices",function(){sh.close();try{go0("settings");}catch(e){}setTimeout(function(){var c=D.getElementById("linkCard");try{if(W.IngRooms&&c)W.IngRooms.reveal(c,{scroll:true,flash:true});}catch(e){}},200);}));
+  end.appendChild(key("","Done",function(){sh.close();}));sh.box.appendChild(end);}
+function go0(p){if(typeof W.go==="function")W.go(p);}
 function builds(t){var h={};(t.tools||[]).forEach(function(k){h[k.key]=k.ok;});var out=[];
   if(t.os==="macOS"&&h.python&&h.pyinstaller)out.push("the Mac app, from its kit");if(t.os==="Windows"&&h.python&&h.pyinstaller)out.push("the Windows app, from its kit");
   if(h.java&&h.android)out.push("the Fire tablet's APK, with Gradle");if(h.xcode)out.push("the iPhone and iPad app, with Xcode");
@@ -818,8 +938,8 @@ function needs(force){var x=X();if(!x||!x.C)return;if(!force&&ST.needs&&Date.now
   var reps=(x.C.repos||[]).slice(0,24),out=[],hub=H();
   var q=list(false).then(function(rs){var sn=seen();
     rs.forEach(function(run){var rp=reps.filter(function(y){return y.id===run.repo;})[0];if(!rp)return;
-      if(run.state==="running"||run.state==="ready")out.push({k:"run",o:0,t:rp.name+": "+(run.workflow||"a workflow")+" is running",s:(run.n?"#"+run.n+" · ":"")+"on this computer · "+ago((run.started||run.at)*1000),go:function(){openRun(rp,run.id);}});
-      else if(run.state==="bad"&&!sn[run.id]){var fj=(run.jobs||[]).filter(function(j){return j.state==="bad";})[0];out.push({k:"bad",o:1,t:rp.name+": "+(run.workflow||"a workflow")+" failed",s:(run.n?"#"+run.n+" · ":"")+(fj?fj.name+", ":"")+"on this computer",go:function(){openRun(rp,run.id);}});}});});
+      if(run.state==="running"||run.state==="ready")out.push({k:"run",o:0,t:rp.name+": "+(run.workflow||"a workflow")+" is running",s:(run.n?"#"+run.n+" · ":"")+"on "+where(run)+" · "+ago((run.started||run.at)*1000),go:function(){openRun(rp,run.id);}});
+      else if(run.state==="bad"&&!sn[run.id]){var fj=(run.jobs||[]).filter(function(j){return j.state==="bad";})[0];out.push({k:"bad",o:1,t:rp.name+": "+(run.workflow||"a workflow")+" failed",s:(run.n?"#"+run.n+" · ":"")+(fj?fj.name+", ":"")+"on "+where(run),go:function(){openRun(rp,run.id);}});}});});
   q=q.then(function(){if(!hub||!hub.record)return;return Promise.all(reps.map(function(rp){return hub.record(rp.id).then(function(rec){if(!rec)return;var now=Date.now(),week=7*864e5;
       (rec.milestones||[]).forEach(function(ms){if(ms.state==="closed"||!ms.due||ms.due-now>week)return;var open=(rec.issues||[]).filter(function(is){return is.milestone===ms.title&&is.state!=="closed";}).length;if(!open)return;
         out.push({k:"due",o:2,t:rp.name+": "+ms.title+(ms.due<now?" was due "+day(ms.due):" is due "+day(ms.due)),s:open+" issue"+(open===1?"":"s")+" of it still open",go:function(){openView(rp,"issues");}});});
@@ -917,7 +1037,9 @@ function boot(){if(!hook()){setTimeout(boot,300);return;}addRoom();(W.fbAfterPai
   /* the rooms' line is written again when a room is chosen: the Learn key is put back at its end */
   try{new MutationObserver(function(){var s=$("fbRoomSays");if(s&&!s.__r298){s.__r298=1;new MutationObserver(function(){if(!s.querySelector(".r298-learnk"))dressLearn();}).observe(s,{childList:true,characterData:true,subtree:true});}
       if($("fbViews")&&!$("fbViews").querySelector('button[data-v="runs"]'))addTabs();}).observe(D.body,{childList:true,subtree:true});}catch(e){}
-  if(A()){tools(false).catch(function(){});list(true).then(function(){watch();counts();});}}
+  if(A()){tools(false).catch(function(){});list(true).then(function(){watch();counts();});}
+  /* 7.31: her other computers are known once Settings' pairing has loaded (modules/r274.js) */
+  setTimeout(function(){if(others().length)list(true).then(function(){watch();counts();needs(true);},function(){});},4000);}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("pywebviewready",function(){tools(false).catch(function(){});list(true).then(function(){watch();counts();needs(true);});});
 W.IngRuns={core:CORE,state:function(){return {open:ST.open,job:ST.job,here:ST.here,runs:ST.runs.length,needs:(ST.needs||[]).map(function(n){return n.t;}),lmode:LMODE};},list:list,tools:tools,start:start,recipeText:recipeText,needs:needs};
