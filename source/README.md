@@ -395,6 +395,33 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.33 (17 November 2026): Fabrica, easier to find your way, and nothing stiff.
+Her words (17 November 2026), on the live preview (https://claude.ai/artifact/NdgRNGS3yvtan8RH3rmBSE, source/previews/fabrica_nav): "I
+approve of your preview, please commit and push it everywhere continue working on my requests. The "4 kept here" button from Fabrica's
+"Your apps" section, the "Kept" button little button and the "Waiting" and "Not tested yet" buttons should all be animated and clickable
+and be responsive and move when I hover my mouse on them. I dislike how the collapsible button on the panels on the Fabrica page get a
+purple shading when I hover over it, I want that removed and I want it to get Ingenium's signature 3D look and animation instead. There
+area lot of sections and buttons inside of the Fabrica page that are stiff and rigid upon hover and do not animate, please make the
+necessary fixes to them as well." Then: "I only want the collapsible buttons of Fabrica's panel to pop out when I hover it with my mouse
+and not while they are at rest", and "I also didn't want the Kept and Waiting buttons and the other buttons to have a different look and
+design, I just wanted them to animate when I hover over it, please revert them to their original look". And, on the preview, said many
+times: "no new section, page or tab inside of Ingenium should be flat, stiff and unresponsive when I hover over it."
+- `build/modules/r315.js` (new):
+  - nothing stiff: 70 kinds of chip, card, tile, row, column, input and key in Fabrica's rooms were hovered one by one on the 7.32 page,
+    and 41 did not answer the pointer; each keeps its own look at rest and now lifts, slides or leans under the pointer and sinks when
+    pressed (the version rows of History had their lift held by a broader rule, now overridden); the panels lean toward the pointer; the
+    fold keys keep their look at rest and pop out under the pointer as Ingenium's raised key, with no violet wash; the chips "kept here",
+    "Kept" or "not kept", "Waiting" and "Not tested yet" do something when pressed (the app's chip opens Changes; the test's opens Test and
+    lights Test this version);
+  - as the approved preview: Where you are (Fabrica › the app › the room › the part, with GitHub's name for the part); the next step read
+    from the app (keep a change, test, look at a failed test, ship); counts on the rooms (a change not kept, open issues and pull
+    requests, a failed run, a test to look at) with GitHub's name on each room; Go to anything (/ or Ctrl K): rooms and parts, things to
+    do, the app's issues and pull requests by title, your apps; the map (M) of every room and its parts; Teach me as I go (T): a lesson
+    over each part, in the words of Fabrica's own lessons (modules/r298.js: what it is, GitHub's name, the git command, why), Show me where,
+    Got it, the parts learned counted (kept on this device); G then N, S, P, R or C for the rooms; ? for the keys.
+- `build/modules/r298.js` shares its lessons and its way to open a view (IngRuns.learn, caps, roomOf, nav).
+- What is new (r222, in the editions with Fabrica). rig: `t_733_fabrica_way.js` (new).
+
 Ingenium 7.32 (17 November 2026): the day's clear crystal at night.
 Her words (17 November 2026): "I also want a clear or silver diamond crytsal look option in Night mode too. Basically, I want to see the
 day mode clear crystal made also available on night mode."

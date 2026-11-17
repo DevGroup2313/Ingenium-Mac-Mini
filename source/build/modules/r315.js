@@ -9,8 +9,8 @@
    It is important that the newly added pages, tabs, sections and all of their buttons remain cohesive and consistent with Ingenium's 3D
    look and animation." And, on the preview, said many times: "no new section, page or tab inside of Ingenium should be flat, stiff and
    unresponsive when I hover over it."
-   1. Nothing stiff: every chip, card, tile, row, column, input and fold key of Fabrica that did not answer the pointer (41 kinds, found by
-      hovering each one on the 7.32 page) is raised in Ingenium's own key values and lifts, leans or slides under the pointer, sinks when
+   1. Nothing stiff: every chip, card, tile, row, column, input and fold key of Fabrica that did not answer the pointer (41 of 70 kinds,
+      found by hovering each one on the 7.32 page) is raised in Ingenium's own key values and lifts, leans or slides under the pointer, sinks when
       pressed; the fold keys lose their violet wash for the raised key; the four chips she named are keys that do something.
    2. Where you are, Go to anything, the map, counts on the rooms, and Teach me as I go (the next step and a lesson on each part, from
       Fabrica's own lessons in modules/r298.js), as the preview has them, in Fabrica's own panels.
@@ -54,6 +54,7 @@ body[data-theme="night"] #fb{--r315-key:linear-gradient(180deg,#352a4b,#271f37);
 #fb .h-box:hover,#fb .h-stat:hover,#fb .r298-mc:hover,#fb .f-pkg:hover,#fb .r280-ans:hover,#fb .h-colm:hover{transform:translateY(-3px);box-shadow:var(--r315-cardhi)}
 #fb .h-stat:hover{transform:translateY(-3px) scale(1.02)}
 #fb .fr-cmh:hover,#fb .h-line:hover{transform:translateX(3px);box-shadow:var(--r315-cardhi)}
+#fb button.fr-cmh:hover:not(:disabled){transform:translateX(3px)!important}   /* the versions in History: a broader rule on Fabrica's keys held them still */
 #fb .h-dblk:hover,#fb .f-diff:hover{transform:translateY(-2px);box-shadow:var(--r315-cardhi)}
 #fb .fr-fh:hover{transform:translateX(3px);color:var(--r315-acc)}
 #fb .fr-fh:hover .fr-chev{transform:rotate(90deg)}
