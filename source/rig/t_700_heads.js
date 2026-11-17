@@ -30,12 +30,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   else {
   await open('build'); await sleep(2500);
   const bd = await p.evaluate(() => { const pg = document.getElementById('page-build'), h = pg.querySelector('.skh'), o = h && h.querySelector('.skh-obj'), r = o && o.getBoundingClientRect(), hr = h && h.getBoundingClientRect();
-    const card = pg.querySelector(':scope > .card'), vis = e => !!e && getComputedStyle(e).display !== 'none';
-    return { head: !!h, before: !!(h && card && h.nextElementSibling === card), on: pg.classList.contains('sk-on'), eyebrow: h ? h.querySelector('.skh-eyebrow').textContent : '',
+    const card = pg.querySelector(':scope > .card') || (document.getElementById('editorPane') || { closest: () => null }).closest('.card'), vis = e => !!e && getComputedStyle(e).display !== 'none';
+    /* 7.27: Adamas has tabs (r173 CONF.build): the head, then the tabs, then the room that holds the card */
+    const nx = h && h.nextElementSibling, tabsNext = !!(nx && nx.classList.contains('rm-bar') && card && nx.nextElementSibling && nx.nextElementSibling.contains(card));
+    return { head: !!h, before: !!(h && card && (h.nextElementSibling === card || tabsNext)), on: pg.classList.contains('sk-on'), eyebrow: h ? h.querySelector('.skh-eyebrow').textContent : '',
       keys: h ? [...h.querySelectorAll('.skh-k')].map(k => k.textContent.trim()) : [], ownTitle: vis(pg.querySelector(':scope > .page-title')), ownLede: vis(pg.querySelector(':scope > .lede')),
       cv: o ? o.querySelectorAll('canvas.bd-cv').length : 0, nogl: o ? o.getAttribute('data-nogl') : 'none', err: window.__diamondErr || null, state: window.IngDiamond && IngDiamond.state(),
       obj: r ? [Math.round(r.width), Math.round(r.height)] : null, inHead: r && hr ? r.right <= hr.right + 1 && r.top >= hr.top - 1 : false, hint: h ? h.querySelector('.skh-hint').textContent : '' }; });
-  ok(bd.head && bd.before && bd.on && bd.eyebrow === 'Code in, a page out', 'Build (Adamas from 7.12) opens on its head, before the page\'s card, made as the other studios\' are; its line says only what the page is for (7.15)', bd);
+  ok(bd.head && bd.before && bd.on && bd.eyebrow === 'Code in, a page out', 'Build (Adamas from 7.12) opens on its head, before the page\'s card (since 7.27 its tabs come between, the card in the first), made as the other studios\' are; its line says only what the page is for (7.15)', bd);
   ok(JSON.stringify(bd.keys) === JSON.stringify(['Run your page', 'Load a sample']) && !bd.ownTitle && !bd.ownLede, 'its keys are Run your page and Load a sample; the page\'s own title and lede give way to it', bd);
   ok(bd.cv === 2 && bd.nogl === null && !bd.err && bd.state && bd.state.mounted, 'the diamond is drawn by the graphics chip (its canvas and the sparkles\' over it)', bd);
   // 7.01, her words (14 November 2026): "I also want the landscape of the Build page diamond to fill the card on both day and night mode"
