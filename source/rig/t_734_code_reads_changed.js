@@ -48,7 +48,9 @@ function ok(c, name, info) { if (c) pass++; else fail++; console.log((c ? 'PASS 
     }, id);
   }
   const o1 = await open();
-  ok(o1.read.length === 4 && o1.count && o1.count.read === 4, 'the first opening reads every file (4)', o1.read);
+  /* the page's own count (window.__fbCodeRead) is openInCode's; the wrapped reads may also hold another part's read of the same app (on a
+     release page Fabrica reads the app's picture for its card while Code opens it), so the files are counted once each */
+  ok(new Set(o1.read).size === 4 && o1.count && o1.count.read === 4, 'the first opening reads every file (4)', { read: o1.read, count: o1.count });
   ok(o1.code.length === 3 && o1.code.some(([n, t]) => n === 'style.css' && t === 'h1{color:navy}'), 'Code has the three text files (not the picture)', o1.code.map(x => x[0]));
   const o2 = await open();
   ok(o2.read.length === 0 && o2.count && o2.count.read === 0 && o2.count.files === 4, 'opened again with nothing changed, nothing is read', { read: o2.read, count: o2.count });

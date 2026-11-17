@@ -96,6 +96,9 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     const cands = await p.evaluate(() => { const out = []; document.querySelectorAll('#fb *').forEach((e, i) => { if (!e.offsetParent || typeof e.className !== 'string' || !e.className) return; const cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (r.width < 14 || r.height < 14) return;
       if (!(cs.boxShadow !== 'none' || (cs.borderStyle !== 'none' && parseFloat(cs.borderWidth) > 0 && cs.borderRadius !== '0px') || e.tagName === 'BUTTON')) return; e.setAttribute('data-t733s', String(i)); out.push([String(i), e.tagName + '.' + e.className.split(/\s+/).slice(0, 2).join('.')]); }); return out; });
     for (const [i, k] of cands) { if (seen[k] || LEAVE.test(k)) continue; seen[k] = 1; const h = await p.$('[data-t733s="' + i + '"]'); if (!h) continue;
+      /* at rest first: the pointer away and the key settled (a key inside the part hovered just before had not yet returned from its lift, so
+         its resting reading was its lifted one, and it read as stiff) */
+      await p.mouse.move(2, 2); await p.waitForTimeout(350);
       const a = await h.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow].join('|')); try { await h.hover({ timeout: 1500 }); } catch (e) { continue; } await p.waitForTimeout(320);
       const z = await h.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow, e.isConnected].join('|'));
       let az = [a + '|true', z];
@@ -105,7 +108,10 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
         const el = h2.asElement(); if (!el) { stiff.push(k + ' (' + rm + '/' + v + ': gone before it could be judged)'); continue; }
         const a2 = await el.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow].join('|')); try { await el.hover({ timeout: 1500 }); } catch (e) { continue; } await p.waitForTimeout(320);
         az = [a2 + '|true', await el.evaluate(e => [getComputedStyle(e).transform, getComputedStyle(e).boxShadow, e.isConnected].join('|'))]; }
-      if (az[0] === az[1]) stiff.push(k + ' (' + rm + '/' + v + ')'); await p.mouse.move(2, 2); }
+      if (az[0] === az[1]) { const why = await p.evaluate(i => { const e = document.querySelector('[data-t733s="' + i + '"]'); if (!e) return 'gone'; const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          return { dis: e.disabled, hov: e.matches(':hover'), cls: e.className, top: t ? (t === e || e.contains(t) ? 'itself' : t.tagName + '.' + String(t.className).slice(0, 40)) : null, y: Math.round(r.y), h: Math.round(r.height), vh: innerHeight }; }, i);
+        stiff.push(k + ' (' + rm + '/' + v + ') ' + JSON.stringify(why) + ' ' + az[0].slice(0, 60)); }
+      await p.mouse.move(2, 2); }
   }
   ok(stiff.length === 0, 'every kind of card, tile, row and key in every room answers the pointer (' + Object.keys(seen).length + ' kinds hovered)', stiff);
   ok(errs.length === 0, 'no page errors', errs);
