@@ -41,12 +41,13 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
     await pg.waitForFunction(() => !!document.getElementById('bdColours'), null, { timeout: 20000 }).catch(() => {}); await pg.waitForTimeout(1500); };
   await open(p);
   await p.evaluate(() => { const h = document.querySelector('#page-build > .skh'); h.scrollIntoView({ block: 'start' }); window.scrollBy(0, -70); }); await p.waitForTimeout(800);
-  const stoneShot = async (name) => { await p.waitForTimeout(1800);
+  /* the stone alone: the sky's own canvas (.bd-bg, the northern lights) is hidden while it is pictured, so its colours are the stone's */
+  const stoneShot = async (name) => { await p.evaluate(() => document.querySelectorAll('#page-build canvas.bd-bg').forEach(c => c.style.visibility = 'hidden')); await p.waitForTimeout(2400);
     const r = await p.evaluate(() => { const c = document.querySelector('#page-build .skh-obj canvas').getBoundingClientRect(); return { x: c.left + c.width * 0.36, y: c.top + c.height * 0.18, width: c.width * 0.28, height: c.height * 0.16 }; });
-    const f = path.join(OUT, name + '.png'); await p.screenshot({ path: f, clip: r }); return mean(f); };
+    const f = path.join(OUT, name + '.png'); await p.screenshot({ path: f, clip: r }); await p.evaluate(() => document.querySelectorAll('#page-build canvas.bd-bg').forEach(c => c.style.visibility = '')); return mean(f); };
   /* the sky above the stone: the head's upper band, where the northern lights run */
-  const skyShot = async (name) => { await p.waitForTimeout(2200);
-    const r = await p.evaluate(() => { const h = document.querySelector('#page-build > .skh').getBoundingClientRect(); return { x: h.left + 20, y: h.top + 30, width: Math.min(560, h.width * 0.45), height: 120 }; });
+  const skyShot = async (name) => { await p.evaluate(() => { try { IngDiamond.kick(); } catch (e) {} }); await p.waitForTimeout(4500);   /* the sky draws at half the frames; slow in software WebGL */
+    const r = await p.evaluate(() => { const h = document.querySelector('#page-build > .skh').getBoundingClientRect(); return { x: h.left + 20, y: h.top + 30, width: h.width - 40, height: 120 }; });
     const f = path.join(OUT, name + '.png'); await p.screenshot({ path: f, clip: r }); return bright(f); };
 
   // the key, in the corner, as the welcome door's sign-in key (as 7.30)
