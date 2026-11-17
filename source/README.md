@@ -421,15 +421,15 @@ times: "no new section, page or tab inside of Ingenium should be flat, stiff and
     Got it, the parts learned counted (kept on this device); G then N, S, P, R or C for the rooms; ? for the keys.
 - `build/modules/r298.js` shares its lessons and its way to open a view (IngRuns.learn, caps, roomOf, nav).
 - What is new (r222, in the editions with Fabrica). rig: `t_733_fabrica_way.js` (new).
-Schedae's own keys brought back. Her words (17 November 2026): "I want you to restore the colours of the buttons on the Schedae panel, I
-only asked for the texture to be fixed not to strip the buttons of all colours and leave the panel flat and looking plain"; on the first
-try (the lavender put on Ingenium's white key): "The colours still look off and really different. Please bring back the other buttons back
-and just make them less glossy and more 3D and remove the light effect when I hover over them." In 7.15 (r303) Pin, Send to Tabula,
-Delete and a note's menu rows had been made Ingenium's white key. `build/modules/r303.js` now leaves them their own keys (the base page's
-.sch-btn and .menu-btn: lavender face, violet words, Delete's red, their size and corners), less glossy (no bright white lip along the top,
-no inner glow) and more 3D (a solid edge under each and a deeper fall, as Ingenium's keys have); under the pointer they lift two points
-and sink when pressed, with no light (their rising-in had held them still afterwards; it no longer does). New note keeps Ingenium's
-purple key, Tabula and Abacus their stones.
+Schedae's keys, as they were in 7.14. Her words (17 November 2026): "I want you to restore the colours of the buttons on the Schedae panel,
+I only asked for the texture to be fixed not to strip the buttons of all colours and leave the panel flat and looking plain." Two tries
+followed (the lavender on Ingenium's white key; then the keys matte with a solid edge), and of each: "The colours still look off and
+really different"; "They still do not look like the original buttons." Shown 7.14's panel beside the test copy, and asked which keys,
+she answered: "Bring the old look back with the gold jewelled new note button and the glossy look. They looked better that way."
+`build/modules/r303.js` no longer changes Pin, Send to Tabula, Delete, a note's menu rows or New note: they are the base page's own keys
+again (.sch-btn and .menu-btn, glossy, lavender and red; New note the amethyst stone with its gold rim), as in 7.14, by day and by night
+(compared side by side). Tabula and Abacus stay the charcoal and green stones she asked for in 7.15. One thing is mended: the keys'
+rising-in (animation fill both) held them still afterwards, so their own hover lift (three points) never showed; it shows now.
 
 Ingenium 7.32 (17 November 2026): the day's clear crystal at night.
 Her words (17 November 2026): "I also want a clear or silver diamond crytsal look option in Night mode too. Basically, I want to see the
