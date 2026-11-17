@@ -1,3 +1,5 @@
+// SUPERSEDED in 7.31 by rig/t_731_diamond_families.js: the stone is chosen as a family and a shade (its looks and its depth are gone); the
+// key, the panel beside the diamond, the toy, the band and the light are checked there too.
 // Ingenium 7.30: the diamond's colours, refined (modules/r314.js, with modules/r292.js), as her approved live preview has them
 // (source/previews/diamond_colours_v2, version 4), with her one change: no circle around the stone at the top of the panel. Her words
 // (17 November 2026): the key "a little button on the top right side of the 3D header of the Adamas page in the same format as

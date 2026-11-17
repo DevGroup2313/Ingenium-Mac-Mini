@@ -395,6 +395,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.31 (17 November 2026): the diamond's colours in families of gemstones, each with a night of its own; the northern lights in
+the stone's colour.
+Her words (17 November 2026): "I want the light blue pastel shade that I love from Carpe Diem's sticky notes to be among the diamond colour
+choices. The current aqua colour loosk still too greenish. I want that other colour added. I like want them to look like true gemstones
+and have their light pastel colours, their medium colours and their dark, and night mode dressing that is a variation of the current dark
+deep purple colour of that the current crystal has for Night mode. I want for every colour shade to come with their 4 variations so that
+the diamond has a proper night mode look to match and accompany it if I choose to change the colour from purple to another colour. I want
+you to give the diamond, the same treatment as the sticky notes in that regard. Please make the necessary changes and continue working on
+my requests." And, while it was being made: "I also want the northern lights to change colours to better complement the new diamond
+colours when they are selected on the page, instead of only using the purple hues for every shade."
+Carpe Diem's sticky notes (build/apps/builtin/cd.html.gz: STICKY_COLORS and the script cd-sn-night-paper) have six papers, each with a day
+colour and a night one of its own; her light blue is Inkwell, sky blue by day (#dcefff to #b6e0ff) and midnight blue by night.
+- `build/modules/r292.js`: IngDiamond.family(). A family is Ingenium's purple stone dressed in another colour: its four looks (lavender,
+  the day purple, the night stone by day, the night stone of the night theme) are drawn exactly as before, then, in the display's own
+  colours after the tone curve, each facet's hue is gathered toward the family's (it keeps a quarter of its own play of colour, so white
+  light stays white and the fire still flickers), its chroma scaled and its brightness curved, one setting per shade; a plain turn of the
+  colour wheel was tried first and turned the stone's bluish facets green (the cast she disliked in Aqua). The northern lights (the sky's
+  own canvas, the sky drawn in the stone's canvas where that canvas is missing, and the lights mirrored in the holder's silver by night)
+  are gathered the same way toward the family's hue, their brightness kept. With no family set, neither step runs.
+- `build/modules/r314.js`: the stone is chosen as a family (Ingenium's purple, Sky blue, Sapphire, Aqua, Emerald, Citrine, Amber, Rose,
+  Ruby, Clear crystal, Your own colour) and a shade (By the hour: from 5:00 the clear crystal, then pastel, medium and deep; Pastel;
+  Medium; Deep); the night theme shows the family's night shade by itself, shown beside the four as At night. Each family's settings were
+  tuned on the renderer's own frames (source/build/aside/diamond_families: famsheet.py, palette.json). The panel's stones are the purple
+  stone's frames (24 of each look, from the renderer: cap_purple.js, cut.py) recoloured in the page by the same sums, so each matches the
+  diamond; a colour of her own gets its four shades and its night from its own hue, chroma and brightness. Choosing a family glides the
+  panel down to its shades; beside the diamond its lower edge fades to show there is more. The settings kept by 7.29 and 7.30 are read as
+  families and shades (a look as Ingenium's purple at that shade; one of the eight jewels as its family; any other colour as her own).
+  Carpe Diem and Inkwell are named only in the master edition.
+- What is this? (r144), the Guide's diamond entry (r250) and What is new (r222) say so.
+- rig: `t_731_diamond_families.js` (new) supersedes `t_730_diamond_colours.js`.
+
 Ingenium 7.30 (17 November 2026): the diamond's colours, refined, as her approved live preview has them.
 Her words on 7.29's panel and on the live preview (https://claude.ai/artifact/55kQPJwfrgahiHc6GkrbJG, source/previews/diamond_colours_v2),
 in order: "I want the panel to open beside the diamond and for the controls button to be a little button on the top right side of the

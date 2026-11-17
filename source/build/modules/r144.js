@@ -707,7 +707,7 @@ var WHAT=[
   [".tour-entry-chap","A chapter","Opens the tour at this chapter."],
   [".tip-fold-btn","A short note","Opens a short note; press again to fold it."],
   /* 7.29: the diamond's colours (modules/r314.js) */
-  ["#bdColours","The diamond's colours","The small diamond key in the corner of Adamas's head: it opens the diamond's colours beside the diamond: by the hour, one of its looks, or a colour of your own, the holder's band and the light through it."],
+  ["#bdColours","The diamond's colours","The small diamond key in the corner of Adamas's head: it opens the diamond's colours beside the diamond: a family of gemstones (Sky blue among them) or a colour of your own, in four shades (by the hour, pastel, medium, deep) with a night shade of its own for the night theme; the northern lights take its colour; the holder's band and the light through it."],
   ["#dmcCard","The diamond on Adamas","The same choices for Adamas's diamond as its Diamond colours key, kept with your settings."],
   /* 7.28: Settings, raised (modules/r313.js) */
   ["#page-settings .st-th, #page-settings .st-memk","A tile","A part of Settings, with what it holds in one line. Press it to open it; the one open before folds."],
