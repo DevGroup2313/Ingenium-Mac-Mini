@@ -25,11 +25,11 @@ const [U, OUT, U730] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: tru
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 600))); c ? pass++ : fail++; };
 const MEAN = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=list(im.getdata());n=len(px);print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3)))';
 const mean = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', MEAN, f]).toString().trim().split(',').map(Number);
-/* the bright pixels' mean colour (the northern lights against the night sky) */
-const BRIGHT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150];n=max(1,len(px));print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3))+","+str(len(px)))';
+/* the bright, coloured pixels' mean colour (the northern lights against the night sky; white words and stars left out) */
+const BRIGHT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150 and max(p)-min(p)>40];n=max(1,len(px));print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3))+","+str(len(px)))';
 const bright = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', BRIGHT, f]).toString().trim().split(',').map(Number);
 /* the bright pixels by their strongest channel (red, green, blue): northern lights in every colour show all three */
-const HUES = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150];n=max(1,len(px));c=[0,0,0]\nfor p in px: c[p.index(max(p))]+=1\nprint(",".join(str(round(v/n,3)) for v in c)+","+str(len(px)))';
+const HUES = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150 and max(p)-min(p)>40];n=max(1,len(px));c=[0,0,0]\nfor p in px: c[p.index(max(p))]+=1\nprint(",".join(str(round(v/n,3)) for v in c)+","+str(len(px)))';
 const hues = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', HUES, f]).toString().trim().split(',').map(Number);
 const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv[1]).convert("RGB");b=Image.open(sys.argv[2]).convert("RGB");print(sum(1 for p in ImageChops.difference(a,b).getdata() if max(p)>0) if a.size==b.size else -1)';
 (async () => {
