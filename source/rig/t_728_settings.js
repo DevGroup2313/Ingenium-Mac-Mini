@@ -23,7 +23,10 @@ function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === und
   // 1. Everyday
   await room('everyday');
   let t = await tiles('#rmP-settings-everyday > .st-tile');
-  ok(t.length === 4 && t.map((x) => x.name).join('|') === 'Look and feel|Sound|Help and the guided tour|If the app glitches or stops answering', 'Everyday: its four cards as tiles, in the preview\'s order', t.map((x) => x.name));
+  /* 7.29: a fifth card, The diamond on Adamas (modules/r314.js), after the four; the order is the tiles' own (their CSS order), read
+     apart from where a tile stands while the others still move into place */
+  const ord = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-everyday > .st-tile')].sort((a, b) => (+a.style.order || 0) - (+b.style.order || 0)).map((x) => ((x.querySelector(':scope > .st-th .st-nm') || {}).textContent || '').trim()));
+  ok(t.length === 5 && ord.join('|') === 'Look and feel|Sound|Help and the guided tour|If the app glitches or stops answering|The diamond on Adamas', 'Everyday: its five cards as tiles, the preview\'s four in its order, then the diamond on Adamas (7.29)', ord);
   ok(t.filter((x) => x.open).length === 1 && t[0].open && t[0].exp === 'true' && t.slice(1).every((x) => x.shut && x.exp === 'false'), 'one tile open (Look and feel, the first), the others folded and said so', t);
   const order = await p.evaluate(() => [...document.querySelectorAll('#rmP-settings-everyday > .st-tile')].map((c) => c.id || 'look'));
   ok(order[0] === 'ing-refresh-card', 'the cards themselves stay where they were in the page (only drawn in another order)', order);
@@ -37,7 +40,8 @@ function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === und
   ok(snd && snd.n > n0 && snd.last && snd.last.role === 'keys', "pressing a tile's head sounds as Ingenium's keys do", snd);
   t = await tiles('#rmP-settings-everyday > .st-tile');
   t.sort((a, b) => ['Look and feel', 'Sound', 'Help and the guided tour', 'If the app glitches or stops answering'].indexOf(a.name) - ['Look and feel', 'Sound', 'Help and the guided tour', 'If the app glitches or stops answering'].indexOf(b.name));
-  ok(t[1].open && !t[0].open && t.filter((x) => x.open).length === 1, 'pressing Sound opens it and folds Look and feel', t.map((x) => [x.name, x.open]));
+  const nm = (n) => t.filter((x) => x.name === n)[0] || {};   // 7.29: by name, not by place
+  ok(nm('Sound').open && !nm('Look and feel').open && t.filter((x) => x.open).length === 1, 'pressing Sound opens it and folds Look and feel', t.map((x) => [x.name, x.open]));
   const kept = await p.evaluate(() => JSON.parse(localStorage.getItem('ing.settings.tiles.v1') || '{}'));
   ok(kept['c:everyday/'] === 'ingSoundCard', 'the tile left open is kept on this device', kept);
   await p.keyboard.press('Tab'); // the head is a key: Enter opens it

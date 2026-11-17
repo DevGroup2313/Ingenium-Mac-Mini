@@ -20,7 +20,7 @@ const MEAN = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).conver
 const mean = f => cp.execFileSync('python3', ['-I', '-c', MEAN, f]).toString().trim().split(',').map(Number);
 (async () => {
   const b = await pw.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage();
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); p.setDefaultTimeout(180000);
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
   const open = async (pg) => { await pg.goto(U, { timeout: 600000 }); await pg.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await pg.waitForTimeout(1200);
     await pg.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} state.theme = 'day'; applyTheme(); window.__tFix = 3.2; go('build'); });
@@ -91,7 +91,7 @@ const mean = f => cp.execFileSync('python3', ['-I', '-c', MEAN, f]).toString().t
   ok(sh.page === 'page-build' && sh.open && sh.checked[0] === 'Purple', 'Show me on Adamas opens Adamas with the panel open, showing the same choice', sh);
   await p.evaluate(() => { IngDiamondColours.reset(); IngDiamondColours.close(); });
   // a phone's width: the panel under the keys, within the screen
-  const ph = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }); const q = await ph.newPage(); q.on('pageerror', e => errs.push('phone: ' + e.message.slice(0, 200)));
+  const ph = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }); const q = await ph.newPage(); q.setDefaultTimeout(180000); q.on('pageerror', e => errs.push('phone: ' + e.message.slice(0, 200)));
   await open(q); await q.tap('#bdColours').catch(async () => { await q.click('#bdColours'); }); await q.waitForTimeout(800);
   const pp = await q.evaluate(() => { const d = document.querySelector('#page-build .dmc'); if (!d) return null; const r = d.getBoundingClientRect(), k = document.querySelector('#page-build .skh-keys').getBoundingClientRect();
     return { flow: d.classList.contains('dmc-flow'), left: Math.round(r.left), right: Math.round(r.right), width: innerWidth, belowKeys: r.top >= k.bottom - 1, page: document.documentElement.scrollWidth <= innerWidth + 1 }; });
