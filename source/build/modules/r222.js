@@ -234,7 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
-  ["7.27", "Adamas's diamond, Vesta's stones and Fabrica's tree now sleep between their frames instead of waking the page 60 times a second, and stop drawing once less than a third of them shows, as when you work in Adamas's code below the diamond. Vesta and the tree draw 20 frames a second at rest (30 before), and all three 10 while you type in a field. Their look is unchanged."],
+  ["7.27", "Adamas's diamond and Vesta's stones now sleep between their frames instead of waking the page 60 times a second, and stop drawing once less than a third of them shows, as when you work in Adamas's code below the diamond. Vesta draws 20 frames a second at rest (30 before), and both draw 10 while you type in a field. Their look is unchanged."],
+  ["7.27", "Fabrica's tree rests the same way: it sleeps between its frames, draws 20 a second at rest (30 before) and 10 while you type, and stops once its head is scrolled away.", "fabrica"],
   ["7.27", "Lector's two swaying documents now rest with its head when you scroll down; they swayed on until the head was fully out of sight."],
   ["7.27", "Chat's app card has Keep in Fabrica: it keeps the page in Fabrica as a new app or a new version, then Ship it takes you to its Ship part. Code's start window has From Fabrica, and a Code session on an app has Keep in Fabrica and Make it an app among its keys. The + menu has One of your apps in Fabrica.", "fabrica"],
   ["7.27", "Adamas is in two tabs: Your page (your code and your page running beside it, with a model to change it) and Download as an app (the build kits for your devices). Your code and its page keep their sides and widths, and their row now reaches the foot of the window, so you see more of both."],
