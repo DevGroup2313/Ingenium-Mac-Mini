@@ -395,6 +395,34 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them.
+Her words (17 November 2026): "The diamond on Adamas' page is still overheats my computer and my fan is still loud, not as much as before
+but it is loud, the same for the Vesta page and Lector and Fabrica."
+Measured in Chrome at 1440 by 900, Retina sharpness, the WebGL drawing skipped and counted (rig/t_727_rest.js, rig/t_727_paint.js); WebKit,
+the engine of the Mac app, was not available in this container, so nothing here was measured in it:
+- Adamas's scene, Vesta's stones and Fabrica's tree each asked for a frame at every refresh of the screen (about 60 a second) and drew in
+  one of two or three; on Vesta each of those wakes made the page restyle and repaint its moving seals (60 times a second, 8 on Chat).
+- Each kept drawing while any part of it showed: Adamas scrolled to its code (the code panel 210 points from the top, as in her picture),
+  the lowest 114 points of the scene still showed, 40 of them under the top bar, and it drew 14 times a second; Fabrica scrolled down,
+  the tree drew 30 times a second (it followed the whole Fabrica page, not its head).
+- Vesta and the tree drew 30 frames a second at rest; Adamas 20 since 7.22.
+- Lector's two swaying documents never rested with its head: the rule that pauses them (".skh.is-away .lf-sway") lost to the rule that
+  starts them ("#page-lector .lf-sway").
+- `build/modules/r310.js` (new, IngPace): idle() (Ingenium not the window in use, or two minutes with no touch, click or key) and typing()
+  (a key pressed in a field or the code editor in the last five seconds).
+- `build/modules/r291.js`, `r292.js`, `r294.js`: each sleeps until its next frame is due (a timer, then one frame; the frame its timer asks
+  for is drawn); each draws only while three tenths of it show below the top bar; Vesta and the tree draw 20 a second at rest, and all
+  three 10 while idle() or typing(). Under the pointer, in a press, a drag or a flourish, each runs as before. The tree's own watcher now
+  hears each tenth of its head, so it starts again when the head comes back from a strip.
+- `build/modules/r290.js`: a head counts as away with less than three tenths of it in view below the top bar (it took the whole head
+  leaving before); Lector's rule names its page, so its documents rest with the head.
+- Results, the same probe before and after: Adamas at rest 16 wakes a second (60), scrolled to its code no drawing and 2 wakes (14 draws,
+  58 wakes, 302 ms of the main thread a second; now 43 ms); while she types, 10 draws a second; Vesta 20 draws and 22 wakes (30 and 62),
+  main thread 79 ms a second (224); Fabrica 20 draws and 22 wakes (30 and 60), 302 ms (576), scrolled down nothing (504 ms before, 38 now).
+  At the top, watched, the Adamas scene still draws 20 frames a second at a Retina screen's full sharpness, as since 7.22: its look is
+  unchanged, so its cost while she watches it is unchanged.
+- rig: `t_727_pace.js` (new, 15 checks), `t_727_rest.js` and `t_727_paint.js` (new probes); `t_722_adamas_pace.js` 5 passed.
+
 Ingenium 7.26 (16 November 2026): Fabrica asks under what name, every time, in every edition.
 Her words (16 November 2026): "I want for Fabrica to still ask me for the copyrights and publishing name even on my master edition, I want the
 option to change the default name just in case I want to change it, that way I don't have to search through my settings to make the change.

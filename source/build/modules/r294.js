@@ -43,7 +43,7 @@ body[data-theme="night"] #page-fabrica.sk-on .skh-says b.fbt-wait{color:#f0b65c}
 if(window.__r294)return;window.__r294=1;
 var D=document,W=window,TAU=Math.PI*2,IR=W.IngRepo;
 var page=null,HD=null,cv=null,stage=null,tag=null,tip=null,says=null,row=null,ROWKEY="";
-var TREE=null,SIG="",ANG=-0.6,SPIN=1,TARGET=1,LAST=0,RAF=0,HOVER=null,DRAG=null,BEADS=[],LOADING=0,PR={b:null,t:-1e9},KN={t:-1e9},TV=0,PARTS=null;
+var TREE=null,SIG="",ANG=-0.6,SPIN=1,TARGET=1,LAST=0,RAF=0,TMO=0,DUE=false,HOVER=null,DRAG=null,BEADS=[],LOADING=0,PR={b:null,t:-1e9},KN={t:-1e9},TV=0,PARTS=null;
 function X(){return W.fbHubHost||null;}
 function KIT(){return W.IngStudios&&IngStudios.kit||null;}
 function mk(t,c,txt){var e=D.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e;}
@@ -352,11 +352,15 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
 /* ---------- motion: a slow turn, stilled under the pointer, turned by a drag ---------- */
 /* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
 var PSEEN=true,PIO=0;function pageSeen(){if(!PIO&&page){PIO=-1;if(W.IntersectionObserver){try{new IntersectionObserver(function(es){PSEEN=es[es.length-1].isIntersecting;if(PSEEN)kick();}).observe(page);PIO=1;}catch(e){PIO=-1;}}}return PIO===1?PSEEN:!!(page&&page.offsetParent);}
-function loop(t){RAF=0;if(!page||!pageSeen()||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(LAST&&t-LAST<30){RAF=requestAnimationFrame(loop);return;}var dt=Math.min(64,t-(LAST||t));LAST=t;
+function loop(t){RAF=0;if(!page||!pageSeen()||D.hidden||!HD||HD.el.classList.contains("is-away"))return;var gp=(!!DN||!!HOVER||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600)?30:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);
+  /* 7.27 (modules/r310.js): at rest 20 frames a second (30 before), 10 while Ingenium is not the window in use, after two minutes with no
+     touch, or while she types; under the pointer, in a drag, a press or a knock 30, as before; asleep between frames */
+  if(!DUE&&LAST&&t-LAST<gp*0.85){later(gp);return;}DUE=false;var dt=Math.min(120,t-(LAST||t));LAST=t;
   if(!still()){SPIN+=(TARGET-SPIN)*Math.min(1,dt/260);if(!DRAG)ANG+=SPIN*dt*TAU/52000+TV*dt/1000;TV*=Math.exp(-dt/1500);}else TV=0;
   var busy=!!DN||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600;
-  draw();if(!still()||(TREE&&TREE.waiting)||busy)RAF=requestAnimationFrame(loop);}
-function kick(){if(!RAF){LAST=0;RAF=requestAnimationFrame(loop);}}
+  draw();if(!still()||(TREE&&TREE.waiting)||busy)later(gp);}
+function later(gp){var wl=gp*0.85-(performance.now()-LAST);if(gp>=40&&wl>4){RAF=-1;TMO=setTimeout(function(){TMO=0;DUE=true;RAF=requestAnimationFrame(loop);},wl);}else RAF=requestAnimationFrame(loop);}
+function kick(){if(RAF===-1){clearTimeout(TMO);TMO=0;RAF=requestAnimationFrame(loop);return;}if(!RAF){LAST=0;RAF=requestAnimationFrame(loop);}}
 function at(e){var r=stage.getBoundingClientRect(),k=r.width/460;return {x:(e.clientX-r.left)/k,y:(e.clientY-r.top)/k};}
 function hit(p){var best=null,bd=1e9;BEADS.forEach(function(B){var d=Math.hypot(B.x-p.x,B.y-p.y);if(d<Math.max(9,B.r+4)&&d<bd){bd=d;best=B;}});return best;}
 /* 7.01, her words (14 November 2026): "its surface are not clickable, especially the seal button": every part answers a press now */
@@ -392,7 +396,7 @@ function build(){var K=KIT();page=D.getElementById("page-fabrica");var host=D.ge
   HD.obj.appendChild(stage);tag=K.label(HD.obj,352,44,1,0,"","","fbt-label");says=HD.words.querySelector(".skh-says");
   host.parentNode.insertBefore(HD.el,host);bind();
   /* out of view the tree rests (r290's watch marks the head away); back in view it turns again */
-  try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)kick();});},{threshold:0}).observe(HD.el);}catch(e){}
+  try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)kick();});},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(HD.el);}catch(e){}/* 7.27: heard at each tenth, so the tree starts again when its head comes back from a strip (modules/r310.js) */
   return true;}
 /* the head's keys do not scroll the page, as r290's do not (her word in 6.95); a sheet they open stands in the window (above) */
 function primary(){var k=D.getElementById("fbNew");if(k)k.click();}

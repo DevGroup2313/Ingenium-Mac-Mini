@@ -68,7 +68,7 @@ var D=document,W=window;
    streaks; no ray stands in the air. A press sends one at once. Behind: the northern lights in violet and purple only. It draws only while
    in view and while the window is shown, thirty frames a second at rest, at a lower resolution on a slower device. */
 var Diamond=(function(){
-  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,vis=true,shown=true,ok=false,U={},q=1,SLOW=1,LASTIN=performance.now(),lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
+  var W0=520,H0=424,host,cv,gl,pr,ov,og,tx2=null,DIAL=1,DIALK="",raf=0,TMO=0,DUE=false,vis=true,shown=true,ok=false,U={},q=1,SLOW=1,LASTIN=performance.now(),lastDraw=0,slowN=0,FIRST=-1,YV=0,AAN=1,EW=1,QT=0,QCAP=1,FAST=true,F16=16,FASTT=-99,t0=performance.now(),
       yaw=0,tx=0,tz=0,gx=0,gz=0,over=false,press=-99,mX=0,mY=0,VAR=-1;
   var CP=[0,1.62,6.9],TG=[0,0.80,0],FOV=30*Math.PI/180,PER=9.0,TT=1.2;
   function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
@@ -631,8 +631,8 @@ var Diamond=(function(){
      click or key, back at once on the next. */
   ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(n){try{D.addEventListener(n,function(){var w=performance.now()-LASTIN>120000;LASTIN=performance.now();if(w)kick();},{passive:true,capture:true});}catch(e){}});
   W.addEventListener("focus",function(){LASTIN=performance.now();kick();});
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000,gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
-    if(ts-lastDraw<gap*0.85){raf=requestAnimationFrame(frame);return;}  /* a little slack, so a frame that falls a hair early is not put off a whole frame */var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000||!!(W.IngPace&&IngPace.typing()),gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
+    if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;  /* 7.27: the next frame is waited for asleep, not at every refresh of the screen */  /* a little slack, so a frame that falls a hair early is not put off a whole frame */var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
       /* 7.21, her words (16 November 2026): "The holder of Adamas' diamond still look really blurry on build 7.20, it does not look more
          defined or refined. It looks like a generated drawingn that does not look crisp." A computer that fell behind drew the scene
@@ -652,8 +652,9 @@ var Diamond=(function(){
     HV.x+=(22*(lx-HV.lx)-8.6*HV.x)*dt;HV.lx+=HV.x*dt;HV.z+=(22*(lz-HV.lz)-8.6*HV.z)*dt;HV.lz+=HV.z*dt;
     holderTick(tt,dt,st);gl.uniform2f(U.uHT,HT2[0],HT2[1]);gl.uniform4f(U.uHA,HO.ot,HO.bz,HO.ba,HT2[2]);gl.uniform4f(U.uHB,0,0,0,HO.chase);gl.uniform4f(U.uHC,HO.beat,HO.sweep,Math.min(1,HO.boost),HO.da);if(DIAL)orrery();gl.uniform1f(U.uDial,DIAL&&DIALK?1:0);logoTex();var LV=logoVals(t,st,dt);gl.uniform1f(U.uLogo,LOGOOK?1:0);gl.uniform1f(U.uAA,AAN);gl.uniform1f(U.uSc,DSC);gl.uniform1f(U.uBG,BG.ok?1:0);gl.uniform4f(U.uHV,HO.hv[0],HO.hv[1],HO.hv[2],HO.hv[3]);gl.uniform4f(U.uLG,LV[0][0],LV[0][1],LV[0][2],LV[0][3]);gl.uniform4f(U.uLH,LV[1][0],LV[1][1],LV[1][2],LV[1][3]);gl.uniform4f(U.uLR,LV[2][0],LV[2][1],LV[2][2],LV[2][3]);gl.uniform4f(U.uLQ,LV[3][0],LV[3][1],LV[3][2],LV[3][3]);gl.uniform2f(U.uPx,2.0*TAN*(W0/H0)/cv.width,2.0*TAN/cv.height);
     gl.uniformMatrix3fv(U.uR,false,new Float32Array([M[0][0],M[0][1],M[0][2],M[1][0],M[1][1],M[1][2],M[2][0],M[2][1],M[2][2]]));
-    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)raf=requestAnimationFrame(frame);}
-  function kick(){if(!raf)raf=requestAnimationFrame(frame);}
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)later(gap);}
+  function later(gap){var wl=gap*0.85-(performance.now()-lastDraw);if(gap>=40&&wl>4){raf=-1;TMO=setTimeout(function(){TMO=0;raf=0;DUE=true;kick();},wl);}else raf=requestAnimationFrame(frame);}  /* the frame its own timer asks for is drawn: the browser may stamp it a little before the time is up */
+  function kick(){if(raf===-1){clearTimeout(TMO);TMO=0;raf=0;}if(!raf)raf=requestAnimationFrame(frame);}
   function mount(el){host=el;cv=D.createElement("canvas");cv.className="bd-cv";ov=D.createElement("canvas");ov.className="bd-cv ov";host.appendChild(cv);host.appendChild(ov);og=ov.getContext("2d");
     /* 7.20: a touch screen starts at full sharpness, as a computer does (it started at three quarters, the picture stretched to fit);
        a device that falls behind still lowers it, as before */size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
@@ -678,7 +679,7 @@ var Diamond=(function(){
     host.addEventListener("pointerdown",function(e){var t=(performance.now()-t0)/1000;touchAt(e);if(!over){var hp=hitPart(at(e));if(!hp)return;holdPress(hp.k,t,hp.x,hp.z);host.setAttribute("data-part",hp.k);try{if(W.IngSound)IngSound.play("paper");}catch(x){}kick();return;}press=t;if(!still()){DDN=t;if(LIGHT&&t-PL.s>PER*0.3){pulse(t);NEXT=Math.max(NEXT,t+16+Math.random()*12);}}try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(x){}kick();});
     host.addEventListener("pointerup",function(e){if(DDN!=null){var tu=(performance.now()-t0)/1000;DDN=null;DKB=tu;startDFl(tu);kick();}touchOff(e);});
     host.addEventListener("pointercancel",function(e){if(e.pointerType&&e.pointerType!=="mouse"&&DDN!=null){DDN=null;DKB=(performance.now()-t0)/1000;}touchOff(e);});
-    try{new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis)kick();}).observe(host);}catch(e){}
+    try{new IntersectionObserver(function(es){var e=es[es.length-1];var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);vis=sn;if(vis)kick();},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(host);}catch(e){}/* 7.27: the scene draws while three tenths of it are in view below the top bar (modules/r310.js) */
     D.addEventListener("visibilitychange",function(){shown=!D.hidden;if(shown)kick();});kick();}
   return {mount:mount,kick:kick,theme:kick,fire:function(){},q:function(){return q;},variant:function(v){if(v==="auto"){AUTO=true;VAR=byHour();}else{AUTO=false;var i=LOOKS.indexOf(v);VAR=i<0?0:i;}var t=(performance.now()-t0)/1000;if(!still()&&LIGHT)pulse(t);kick();},light:function(on){LIGHT=!!on;if(LIGHT)NEXT=(performance.now()-t0)/1000+1.2;else PL.s=-99;kick();},look:function(){return LOOKS[VAR<0?byHour():VAR];},auto:function(){return AUTO;},dial:function(v){if(v==null)return DIAL?"orrery":"engine";DIAL=v==="orrery"?1:0;kick();},press:function(k,x,z){holdPress(k,(performance.now()-t0)/1000,x,z);kick();},holder:function(){return {ot:HO.ot,bz:HO.bz,ba:HO.ba,tilt:HT2[0],lean:HT2[1]};}};})();
 

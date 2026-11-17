@@ -46,7 +46,7 @@ var D=document,W=window;
    second on dark mode") and approved on the other session's preview. A stone pressed answers in
    one of its ways, with soft water (r295). It draws only while in view and while the window is shown, thirty frames a second at rest. */
 var Stones=(function(){
-  var W0=520,H0=424,OX=0,host,cv,gl,pr,U={},raf=0,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
+  var W0=520,H0=424,OX=0,host,cv,gl,pr,U={},raf=0,TMO=0,DUE=false,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
       lift=[0,0,0,0,0],dip=[0,0,0,0,0],rips=[],lastRing=-9;
   var CP=[0.12,1.12,5.7],TG=[0.32,0.55,-1.0],FOV=31*Math.PI/180;
   function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
@@ -165,7 +165,9 @@ var Stones=(function(){
     else if(name==="bloom"){dip[i]=0.032;ring(i,0.012,t);setTimeout(function(){ring(i,0.006,now());},180);}
     else{for(var k=0;k<cnt;k++)(function(k){setTimeout(function(){dip[k]=0.018;ring(k,0.010,now());},Math.abs(k-i)*320);})(k);}
     try{if(W.IngNature)W.IngNature.touch(name,i);}catch(x){}host.setAttribute("data-flourish",name);kick();}
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still(),gap=(overI>=0||t-Math.max(SW[2],GL[2],Math.max.apply(null,hop))<3)?16:33;if(ts-lastDraw<gap){raf=requestAnimationFrame(frame);return;}
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still(),gap=(overI>=0||t-Math.max(SW[2],GL[2],Math.max.apply(null,hop))<3)?16:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;
+    /* 7.27 (modules/r310.js): at rest 20 frames a second (30 before), as Adamas since 7.22; 10 while Ingenium is not the window in use, after
+       two minutes with no touch, or while she types; under the pointer and in a flourish 60, as before; asleep between frames */
     if(lastDraw){if(ts-lastDraw>gap*1.9)slowN++;else slowN=Math.max(0,slowN-1);if(slowN>12&&q>0.7&&!W.__keepQ){q=Math.max(0.7,q*0.85);slowN=0;size();}}lastDraw=ts;
     /* the step in hand sends out a ring every seven seconds, Home's clock */
     if(!st&&t-lastRing>7){lastRing=t;ring(Math.max(0,Math.min(cnt-1,cur)),0.013,t);}
@@ -174,8 +176,9 @@ var Stones=(function(){
     for(var j=0;j<6;j++){var R=rips[j];if(R)r.push(R[0],R[1],R[2],R[3]);else r.push(0,0,-99,0);}
     gl.viewport(0,0,cv.width,cv.height);gl.uniform1f(U.uT,st?2.0:t);gl.uniform1f(U.uN,night()?1:0);gl.uniform1f(U.uCur,cur);gl.uniform1f(U.uOver,overI);
     gl.uniform4fv(U.uS,new Float32Array(a));gl.uniform4fv(U.uS2,new Float32Array(b));gl.uniform4fv(U.uRp,new Float32Array(r));gl.uniform4fv(U.uSw,new Float32Array(SW));gl.uniform4fv(U.uGl,new Float32Array(GL));gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-    if(!st||overI>=0||dip.some(function(x){return x>0.002;}))raf=requestAnimationFrame(frame);}
-  function kick(){if(!raf)raf=requestAnimationFrame(frame);}
+    if(!st||overI>=0||dip.some(function(x){return x>0.002;}))later(gap);}
+  function later(gap){var wl=gap*0.85-(performance.now()-lastDraw);if(gap>=40&&wl>4){raf=-1;TMO=setTimeout(function(){TMO=0;raf=0;DUE=true;kick();},wl);}else raf=requestAnimationFrame(frame);}  /* the frame its own timer asks for is drawn: the browser may stamp it a little before the time is up */
+  function kick(){if(raf===-1){clearTimeout(TMO);TMO=0;raf=0;}if(!raf)raf=requestAnimationFrame(frame);}
   function hit(p){for(var i=0;i<cnt;i++){var my=S[i][4]*(REST+0.3),c=proj([S[i][0],my,S[i][1]]),e=proj([S[i][0]+S[i][2],my,S[i][1]]),rw=Math.abs(e[0]-c[0])*1.05+6,rh=rw*0.52;
       var u=(p.x-c[0])/rw,vv=(p.y-c[1])/rh;if(u*u+vv*vv<1)return i;}return -1;}
   function mount(el){host=el;cv=D.createElement("canvas");cv.className="fc-cv";host.appendChild(cv);if(W.matchMedia&&matchMedia("(pointer: coarse)").matches)q=0.75;measure();size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}
@@ -184,7 +187,7 @@ var Stones=(function(){
     host.addEventListener("pointermove",function(e){var i=hit(at(e));if(i!==overI){overI=i;cv.style.cursor=i>=0?"pointer":"default";kick();}});
     host.addEventListener("pointerleave",function(){overI=-1;kick();});
     host.addEventListener("pointerdown",function(e){var i=hit(at(e));if(i<0)return;if(e.pointerType!=="mouse"){overI=i;setTimeout(function(){overI=-1;kick();},420);}flourish(i);});
-    try{new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis)kick();}).observe(host);}catch(e){}
+    try{new IntersectionObserver(function(es){var e=es[es.length-1];var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);vis=sn;if(vis)kick();},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(host);}catch(e){}/* 7.27: the scene draws while three tenths of it are in view below the top bar (modules/r310.js) */
     D.addEventListener("visibilitychange",function(){shown=!D.hidden;if(shown)kick();});kick();}
   return {mount:mount,theme:kick,kick:kick,resize:function(){if(measure()){size();}kick();},q:function(){return q;},
     setSteps:function(n,c){n=Math.max(1,Math.min(N,n|0));if(n===cnt&&c===cur)return;cnt=n;cur=c;kick();},state:function(){return {cnt:cnt,cur:cur,w:W0,h:H0,q:q,ok:ok};}};})();

@@ -287,7 +287,7 @@ body[data-theme="night"] #page-lector .lf-cast{background:radial-gradient(closes
    the sheets and the seal, wherever a finger lands */
 #page-lector .lf-tilt,#page-lector .lf-sway,#page-lector .lf-stamp{pointer-events:none}
 #page-lector .lf-tilt button.lf-card,#page-lector .lf-tilt .lf-seal{pointer-events:auto}
-.skh.is-away .lf-sway{animation-play-state:paused}
+#page-lector .skh.is-away .lf-sway{animation-play-state:paused}/* 7.27: it named no page, so "#page-lector .lf-sway" above won and the documents swayed on while the head was away */
 /* a sheet: a key that is a document, standing in the fan with its own thickness */
 #page-lector button.lf-card{position:absolute;left:152px;top:58px;width:216px;height:330px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;
   -webkit-tap-highlight-color:transparent;transform-style:preserve-3d;transform-origin:50% 100%;
@@ -691,7 +691,7 @@ function wireOrb(k,o){
 
 /* ================= the hero ================= */
 var IO=null;
-function watch(h){if(!h||h.__io||typeof IntersectionObserver!=="function")return;h.__io=1;if(!IO)IO=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle("is-away",!e.isIntersecting);});},{threshold:0});IO.observe(h);}
+function watch(h){if(!h||h.__io||typeof IntersectionObserver!=="function")return;h.__io=1;if(!IO)IO=new IntersectionObserver(function(es){es.forEach(function(e){var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);e.target.classList.toggle("is-away",!sn);});},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"});/* 7.27: a head counts as shown with three tenths of it in view below the top bar (modules/r310.js) */IO.observe(h);}
 function hero(o){var h=mk("section","skh"),w=mk("div","skh-words"),eb=mk("div","skh-eyebrow");h.setAttribute("aria-label",o.title);eb.setAttribute("aria-hidden","true");
   /* 7.15, her words (15 November 2026): "Ingenium's pages headers always repeats both the app's title and the pages' titles on their
      3D header cards which isn't always necessary and can read as superfluous, please tidy that up and make it read better": the line
