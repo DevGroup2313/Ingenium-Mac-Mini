@@ -62,6 +62,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(v => { const g = document.querySelector('#setMotion').closest('label').querySelector('.st-pills'); [...g.children].find(x => x.getAttribute('data-v') === v).click(); }, m1.was);
   // a longer choice keeps Ingenium's own list, as a row
   await room('ai'); await p.evaluate(() => document.getElementById('dxT-ai-you').click()); await p.waitForTimeout(400);
+  await p.evaluate(() => { if (window.IngSettingsRaised) IngSettingsRaised.reveal(document.getElementById('psLength')); }); await p.waitForTimeout(400);   // 7.28: its tile opened
   const l1 = await p.evaluate(() => { const l = document.getElementById('psLength').closest('label'); const cb = document.getElementById('psLength-dd'); const lr = l.getBoundingClientRect(), cr = cb.getBoundingClientRect(), sp = l.querySelector('span').getBoundingClientRect();
     return { row: l.classList.contains('st-row'), disp: getComputedStyle(l).display, cb: getComputedStyle(cb).display, rightEnd: Math.round(lr.right - cr.right), side: cr.left > sp.left + 60, pills: !!l.querySelector('.st-pills') }; });
   ok(l1.row && l1.disp === 'flex' && l1.cb !== 'none' && l1.side && l1.rightEnd < 4 && !l1.pills, 'a longer choice (Answers) is a row: its name on the left, Ingenium\'s own list at its end', l1);
@@ -69,7 +70,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const w1 = await p.evaluate(() => { const i = document.getElementById('psCloud'); const cs = getComputedStyle(i); const was = i.checked; i.click(); const now = i.checked; i.click(); return { app: cs.appearance || cs.webkitAppearance, w: cs.width, was, now, back: i.checked }; });
   ok(w1.app === 'none' && w1.w === '40px' && w1.now !== w1.was && w1.back === w1.was, 'Your Ingenium\'s checkboxes are switches, and still turn their setting', w1);
   await room('calm');
-  const w2 = await p.evaluate(() => { const i = document.querySelector('#supRows label.fx-sw input'); const cs = getComputedStyle(i); const l = i.closest('label'); const ir = i.getBoundingClientRect(), lr = l.getBoundingClientRect(); return { app: cs.appearance, w: cs.width, right: Math.round(lr.right - ir.right) }; });
+  const w2 = await p.evaluate(() => { const i = document.querySelector('#supRows label.fx-sw input'); const cs = getComputedStyle(i); const l = i.closest('label'); const ir = i.getBoundingClientRect(), lr = l.getBoundingClientRect(); return { app: cs.appearance, w: cs.width, right: Math.round(lr.right - parseFloat(getComputedStyle(l).paddingRight) - ir.right) }; });   // 7.28: the row a plate, measured inside its padding
   ok(w2.app === 'none' && w2.w === '40px' && w2.right < 4, 'Support\'s checkboxes are switches at the row\'s end', w2);
   // Sounds as a switch
   await room('everyday');

@@ -200,6 +200,8 @@ async function raised(p, sel) {
     await p.evaluate(() => go('settings')); await p.waitForTimeout(600);
     const st = await p.evaluate(() => { const c = document.getElementById('ihSetCard'); return c ? { radios: c.querySelectorAll('[role=radio]').length, checked: (c.querySelector('[aria-checked=true]') || {}).getAttribute && c.querySelector('[aria-checked=true]').getAttribute('data-lv') } : null; });
     ok(st && st.radios === 3 && st.checked === 'new', 'Settings holds the level (three choices, the one in use checked)', st);
+    // 7.28 (modules/r313.js): Help and the guided tour is a tile in Everyday, opened first, as she would (Playwright's focus runs apart from the page's own)
+    await p.evaluate(() => { if (window.IngSettingsRaised) IngSettingsRaised.open(document.getElementById('ihSetCard')); }); await p.waitForTimeout(300);
     await p.focus('#ihSetCard [aria-checked=true]'); await p.keyboard.press('ArrowRight'); await p.waitForTimeout(300);
     ok((await p.evaluate(() => IngHelp.level())) === 'some', 'the arrow keys move the level as a radio group does');
     const axS = await axeOn(p, '#ihSetCard', 'the Settings card');

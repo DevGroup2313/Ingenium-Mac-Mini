@@ -494,6 +494,9 @@ var KEYSEL='.btn,.seg-btn,.tc-key,.nav-btn,.hx-key,.f-btn,.cl-chev,.cl-key,[role
   /* 6.84: Settings as one console (modules/r278.js): Theme's and Motion's pills and the switches (her words, 12 November 2026: "I approve of
      the preview, please push it everywhere") */
   '#page-settings .st-pill,#page-settings .st-sw,'+
+  /* 7.28: Settings, raised (modules/r313.js): each tile's head, Memory's switches and How it works, Calm's groups (her words, 17 November
+     2026: "I approve of the raised Settings preview, please continue working on my requests") */
+  '#page-settings .st-th,#page-settings .st-memk,#page-settings .st-howk,#supRows .rm-fold,'+
   /* 6.85: Folders' right-hand pull, which puts the folders in order (modules/r279.js; her words, 12 November 2026: "I approve pf the preview
      with those changes") */
   '#page-folders .fd-order,#page-folders .fd-label.fd-keyed,'+

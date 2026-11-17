@@ -706,6 +706,8 @@ var WHAT=[
   ["#tourGo","Take the tour","Starts the guided tour, at your level."],
   [".tour-entry-chap","A chapter","Opens the tour at this chapter."],
   [".tip-fold-btn","A short note","Opens a short note; press again to fold it."],
+  /* 7.28: Settings, raised (modules/r313.js) */
+  ["#page-settings .st-th, #page-settings .st-memk","A tile","A part of Settings, with what it holds in one line. Press it to open it; the one open before folds."],
   ["#ihSetCard","Help and the guided tour","Your level: how much the tour shows and how help is worded."],
   ["#supCard","Support","Switches for the supports: reminders, timers, text size and more."],
   ["#lkConnect","Connect","Connects to another computer's models with its address and code."],

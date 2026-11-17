@@ -60,6 +60,8 @@ const TONAL = ['firstLight', 'evensong', 'studyChime', 'handBell', 'inkDrop', 's
     const n1 = await p.evaluate(() => IngSound.count()); const l = await p.evaluate(() => IngSound.last());
     await p.mouse.move(4, 600); await p.mouse.up(); await p.waitForTimeout(400); return { n: n1 - n0, last: l }; };   // let go away from the key: it sounds, nothing is done
   await p.evaluate(() => go('settings')); await p.waitForTimeout(900);
+  // 7.28 (modules/r313.js): Everyday's cards are tiles that open; the Sound tile is opened, as she would
+  await p.evaluate(() => { IngRooms.open('settings', 'everyday'); if (window.IngSettingsRaised) IngSettingsRaised.open(document.getElementById('ingSoundCard')); }); await p.waitForTimeout(500);
   let k = await pressed('#page-settings .btn, #page-settings .seg-btn');
   ok(k && k.n === 1 && k.last && k.last.role === 'keys' && k.last.voice === 'keyPress', 'a raised key pressed with the pointer sounds as a key goes down (the key press)', JSON.stringify(k));
   // 6.8.5: the pointer coming onto a key ticks, as in Carpe Diem and the Forge; the same key does not tick twice in a row (as in

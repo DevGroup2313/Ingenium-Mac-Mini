@@ -142,6 +142,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await open('settings'); await sleep(600);
   const stg = await p.evaluate(() => { const c = document.getElementById('ingSoundCard'), b = c && c.querySelector('[data-nat="set"]'); return b ? { on: (b.querySelector('[data-nat-k][aria-pressed="true"]') || {}).textContent, labels: [...c.querySelectorAll('.snd-lab')].map(x => x.textContent.trim()) } : null; });
   ok(stg && /Rain/.test(stg.on) && stg.labels.indexOf("Ingenium's sounds") >= 0 && stg.labels.indexOf('Nature sounds') >= 0, 'Settings holds them too, in its Sound card, with Rain chosen', stg);
+  await p.evaluate(() => { IngRooms.open('settings', 'everyday'); if (window.IngSettingsRaised) IngSettingsRaised.open(document.getElementById('ingSoundCard')); }); await sleep(400);   // 7.28: its tile opened (modules/r313.js)
   await p.click('#ingSoundCard [data-nat-k="off"]'); await sleep(300);
   const q = await p.evaluate(() => ({ mode: IngNature.mode(), on: (document.querySelector('#ingSoundCard [data-nat-k][aria-pressed="true"]') || {}).textContent }));
   ok(q.mode === 'off' && /Quiet/.test(q.on), 'Quiet stops it', q);

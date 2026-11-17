@@ -25,7 +25,9 @@ function alike(list) { if (!list || list.length !== 3) return false; const w = l
       const read = (sel) => p.evaluate((sel) => [...document.querySelectorAll(sel)].filter(k => k.offsetParent).map(k => { const r = k.getBoundingClientRect(), c = getComputedStyle(k);
         const card = k.closest('.card, #guideTour, #ingTour'); const cr = card ? card.getBoundingClientRect() : r;
         return { lv: k.getAttribute('data-lv'), w: +r.width.toFixed(1), h: +r.height.toFixed(1), left: Math.round(r.left), justify: c.justifyContent, cardW: Math.round(cr.width) }; }), sel);
-      await p.evaluate(() => go('settings')); await p.waitForTimeout(1200); const set = await read(PLACES.settings);
+      // 7.28 (modules/r313.js): Help and the guided tour is a tile in Everyday; it is opened first
+      const openHelp = () => p.evaluate(() => { IngRooms.open('settings', 'everyday'); const c = document.getElementById('ihSetCard'); if (window.IngSettingsRaised && c) IngSettingsRaised.reveal(c.querySelector('.ih-lvk') || c); });
+      await p.evaluate(() => go('settings')); await p.waitForTimeout(1200); await openHelp(); await p.waitForTimeout(500); const set = await read(PLACES.settings);
       await p.evaluate(() => go('guide')); await p.waitForTimeout(1200); const gd = await read(PLACES.guide);
       await p.evaluate(() => tourStart(0)); await p.waitForTimeout(900); const tp = await read(PLACES.tour);
       const tag = W + ' ' + theme;
@@ -33,16 +35,18 @@ function alike(list) { if (!list || list.length !== 3) return false; const w = l
       ok(alike(gd), tag + ': the Guide\'s Start here: one width and one height', gd);
       ok(alike(tp), tag + ': the tour\'s first card: one width and one height', tp);
       if (W === 1440 && theme === 'day') {
-        ok(set.length === 3 && set[0].w <= 260.5 && gd.length === 3 && gd[0].w <= 270.5, 'narrower: 260 pixels at most on Settings and 270 in the Guide', { settings: set.map(x => x.w), guide: gd.map(x => x.w) });
-        ok(set.concat(tp).every(x => /flex-start|start|left/.test(x.justify)) && new Set(set.map(x => x.left)).size === 1, 'their words sit at the left, the three cards in one column', set.concat(tp).map(x => x.justify + ' ' + x.left));
+        // 6.84 (modules/r278.js) set Settings' three side by side, one size each; the Guide keeps them in one column, 270 pixels at most
+        ok(set.length === 3 && new Set(set.map(x => x.left)).size === 3 && gd.length === 3 && gd[0].w <= 270.5 && new Set(gd.map(x => x.left)).size === 1, 'Settings: the three side by side (6.84); the Guide: 270 pixels at most, in one column', { settings: set.map(x => x.w + '@' + x.left), guide: gd.map(x => x.w + '@' + x.left) });
+        ok(set.concat(tp).every(x => /flex-start|start|left/.test(x.justify)), 'their words sit at the left', set.concat(tp).map(x => x.justify + ' ' + x.left));
         await p.keyboard.press('Escape'); await p.waitForTimeout(400); await p.evaluate(() => { try { if (typeof tourEnd === 'function') tourEnd(); } catch (e) {} });
-        await p.evaluate(() => go('settings')); await p.waitForTimeout(900);
+        await p.evaluate(() => go('settings')); await p.waitForTimeout(900); await openHelp(); await p.waitForTimeout(400);
         await p.click('#ihSetCard .ih-lvk[data-lv="expert"]'); await p.waitForTimeout(400);
         const chosen = await p.evaluate(() => ({ level: IngHelp.level(), checked: document.querySelector('#ihSetCard .ih-lvk[data-lv="expert"]').getAttribute('aria-checked') }));
         ok(chosen.level === 'expert' && chosen.checked === 'true', 'a press on a card still chooses that level', chosen);
         await p.focus('#ihSetCard .ih-lvk[data-lv="expert"]'); await p.keyboard.press('ArrowUp'); await p.waitForTimeout(300);
         const moved = await p.evaluate(() => (document.activeElement && document.activeElement.getAttribute('data-lv')) || '');
         ok(moved === 'some', 'the arrow keys still move between the three', moved);
+        await p.waitForTimeout(700);   // 7.28: the chosen one springs up for half a second (modules/r313.js); measured at rest
         const after = await read(PLACES.settings); ok(alike(after), 'with a level chosen, the three stay one size', after);
         const card = await p.$('#ihSetCard'); if (card) await card.screenshot({ path: OUT + '/650_settings.png' });
       }

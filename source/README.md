@@ -395,6 +395,52 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.28 (17 November 2026): Settings, raised: its long sections as tiles that open, its controls raised and moving, the chosen
+level lifted.
+Her words (17 November 2026): "The Settings page needs to be redesigned, a lot of its tab page are poorly organised and have a very long
+page and I have to scroll down endlessly ... I don't like the way that the "Help and the guided tour" section's selected button look so
+flat, please fix that, the same for the "Your level" section on the Guide page ... a lot of sections and tab pages on the Settings page
+that are entirely out of format are flat and stiff, nothing moves and the popped out animated 3D look and effect is entirely missing".
+A live preview with switches and recommendations (https://claude.ai/artifact/RaBy13C9zefPiaVkj9bfv2), and her word on it: "I approve of
+the raised Settings preview, please continue working on my requests."
+- Measured on 7.27 in Chrome at 1280 by 800, in a copy holding little (the height of the Settings page, in points, before and after):
+  Everyday 1,058 and 651; Calm and focus 895 and 892; Your Ingenium 1,142 and 830; Connections 691 and 600; Search, eyes and ears 1,297
+  and 759; Your devices 1,028 and 953; Memory 1,515 and 809; Storage 1,736 and 849; Sign-in and reset 698 and 550. Bring in (528), Ingenium
+  Cloud (936), Ownership (778) and the Author Studio (398) are unchanged; Back up and move is 9 points taller (975, now 984), its three
+  choices now raised plates. A copy holding more runs longer, before as after.
+- `build/modules/r313.js` (new): in a section of two cards or more, each card is a raised tile: its mark, its name and its state in one
+  line (Day · motion calm; Describing pictures on · reading their words on; Sign-in off), a chip and a chevron. Pressed, a tile opens
+  across the section and the one open before folds; the folded ones stand two to a row. Storage opens by five groups (Room used, What takes
+  the room, Your limit, Old copies, Your app library) and Your Ingenium by four (Who you are, How you want answers, Your own instructions,
+  Ingenium's own instructions, its switch now beside its ten rules); every part keeps its id. Memory's four switches fold under one head
+  whose line says all four, and How it works folds; the groups of Calm and focus are raised tiles, two to a row when folded. The tile left
+  open is kept for each section on this device (ing.settings.tiles.v1). A head is a key (Enter or Space opens it) and sounds as one
+  (`build/modules/r176.js`); What is this? explains it (`build/modules/r144.js`).
+- Find a setting finds a setting in a folded tile and opens it (a folded tile is marked rm-shut, which modules/r173.js already looks
+  inside); the tour, Help and any focus or scroll to a part of Settings open its tile the same way, through r173's reveal hook. Show every
+  setting at once shows every setting open, as before. What takes the room is measured when its tile opens (it was measured when it came
+  into sight, and stays so).
+- Raised and moving controls, in Settings: a switch off is a well, on a lit violet key, its knob springing across and glowing; a strip
+  (Theme, Motion, Nature sounds, the supports' choices) is a well whose chosen part is a raised key sliding under the choice (drawn as the
+  strip's own ::before, so the strips' scripts, which walk their keys, never meet it; when the app pauses every transition to apply a new
+  theme or motion, the key slides again once that moment ends); fields are lit wells; each setting's row with a switch is a raised plate
+  that lifts under the pointer; the tiles rise in one after another. Minimal motion, the calm look and the system's reduced motion keep
+  them still.
+- The chosen level (New to this, Some experience, Expert) is lifted, ringed and glowing, its own mark lit as a jewel, wherever the levels
+  are: Settings, the Guide's Your level and the tour. Measured at rest, the three stay one size.
+- rig: `t_728_settings.js` (new, 37 checks). Brought up to the tiles, each opening a tile as she would before using what is inside:
+  `t_633_settings.js` (17 passed), `t_684_settings.js` (20), `t_650_levels.js` (18; two of its checks, a single column of levels at most 260
+  points wide, had failed since 6.84 set them side by side, and now check 6.84's layout), `t_61_storage.js` (74, the same three failures as
+  on 7.27), `t_682_sounds.js` (111), `t_61_refresh.js` (21, the same crash as on 7.27), `t_62_tour.js` (34), `t_700_heads.js` (32).
+  Unchanged and passed: `t_614_connectors.js`, `t_626_guide.js`, `t_633_reset.js`, `t_638_reset.js`, `t_639_keys_disk.js`, `t_679_memory.js`,
+  `t_690_counsel.js`, `t_690_press.js`, `t_700_lock.js`, `t_700d_lock_backup.js`. Failing as on 7.27, not by this change: `t_63_look.js`
+  (three, outside Settings), `t_643_side.js`, `t_656_ears.js`, `t_67_rooms.js`, `t_67_select.js`, `t_67_sound.js`. WebKit, the Mac app's
+  engine, is not in this container; nothing here was measured in it.
+Fabrica's runs on her other computers, the computer app's side (stage 1 of the approved phase 3): `build/desktop/app_runs_728.py` lets a
+computer run Fabrica's jobs for her paired devices while its switch is on (off until she turns it on), each device seeing only the runs it
+sent, and keeps a copy of a run made elsewhere with where it ran (rig/t_728_runs_devices.py, 21 checks). The page's side (the switch in
+Settings, the computers in Fabrica's Machines) is the next stage; nothing of it shows yet.
+
 Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them; Adamas in two tabs, its code and its page given the window's height;
 Chat and Code send their apps to Fabrica and Adamas, and Code opens Fabrica's apps.
 Her words (17 November 2026): "The diamond on Adamas' page is still overheats my computer and my fan is still loud, not as much as before

@@ -69,6 +69,8 @@ async function enter(p) {
   await p.screenshot({ path: path.join(OUT, 'r61-display-panel.png') });
   await p.evaluate(() => document.getElementById('dpClose').click());
   await p.evaluate(() => go('settings')); await p.waitForTimeout(400);
+  // 7.28 (modules/r313.js): Everyday's cards are tiles that open; this one is opened, as she would
+  await p.evaluate(() => { IngRooms.open('settings', 'everyday'); if (window.IngSettingsRaised) IngSettingsRaised.open(document.getElementById('ing-refresh-card')); }); await p.waitForTimeout(400);
   const crd = await p.evaluate(() => { const c = document.getElementById('ing-refresh-card'); const pg = document.getElementById('page-settings'); return c ? { text: c.innerText.replace(/\s+/g, ' ').trim(), first: pg.querySelector('.card') === c } : null; });
   ok(crd && crd.first && /If the app glitches or stops answering/.test(crd.text) && /Refresh the app/.test(crd.text), 'Settings opens with a large "Refresh the app" key, first of its cards', crd);
   await p.evaluate(() => go('home'));

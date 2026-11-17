@@ -93,6 +93,9 @@ const PAGE_HELPERS = () => {
 
   // ================= 1 · Settings, Storage =================
   await p.evaluate(() => go('settings')); await p.waitForTimeout(500);
+  // 7.28 (modules/r313.js): Storage's groups are tiles that open; each is opened before what is inside it is used, as she would
+  const showIn = (id) => p.evaluate((id) => { const e = document.getElementById(id); if (window.IngSettingsRaised && e) IngSettingsRaised.reveal(e); }, id);
+  await showIn('stxKinds'); await p.waitForTimeout(300);
   await p.evaluate(() => document.getElementById('stxCard').scrollIntoView()); await p.waitForTimeout(400);
   // measuring 88 MB of stores takes about a second; a busy machine may take longer, so the test waits for it to be done
   await p.waitForFunction(() => { const m = document.getElementById('stxMeasured'); return !!(m && m.textContent.trim()); }, null, { timeout: 30000 }).catch(() => { });
@@ -159,7 +162,7 @@ const PAGE_HELPERS = () => {
 
   // what takes the room, measured again: real sizes
   // (the new measurement is waited for, not a fixed time: a busy machine may take longer than the 1.8 s once allowed)
-  await p.evaluate(() => { window.__m0 = IngStore._.last().measure; document.getElementById('stxMeasure').click(); });
+  await showIn('stxMeasure'); await p.evaluate(() => { window.__m0 = IngStore._.last().measure; document.getElementById('stxMeasure').click(); });
   await p.waitForFunction(() => { const m = IngStore._.last().measure; return !!m && m !== window.__m0; }, null, { timeout: 60000 }).catch(() => { });
   await p.waitForTimeout(300);
   const s2 = await p.evaluate(() => { const rows = {}; document.querySelectorAll('#stxKinds li').forEach(l => rows[l.getAttribute('data-db')] = { t: l.textContent }); return { rows, last: IngStore._.last().measure.dbs }; });
@@ -170,14 +173,14 @@ const PAGE_HELPERS = () => {
   ok(!!s2.rows.r142_probe && /Another store: r142_probe/.test(s2.rows.r142_probe.t), 'a store Ingenium does not know is listed too, by its name', s2.rows.r142_probe && s2.rows.r142_probe.t);
 
   // ================= 3 · Keep always, from the page =================
-  await p.evaluate(() => { const b = [...document.querySelectorAll('#stxApps button[data-pin]')].find(x => /Carpe Diem 2002/.test(x.getAttribute('aria-label'))); b.scrollIntoView({ block: 'center' }); });
-  await p.click('#stxApps button[aria-label="Keep always: Carpe Diem 2002"]'); await p.waitForTimeout(300);
+  await showIn('stxApps'); await p.evaluate(() => { const b = [...document.querySelectorAll('#stxApps button[data-pin]')].find(x => /Carpe Diem 2002/.test(x.getAttribute('aria-label'))); b.scrollIntoView({ block: 'center' }); });
+  await showIn('stxApps'); await p.click('#stxApps button[aria-label="Keep always: Carpe Diem 2002"]'); await p.waitForTimeout(300);
   const s3 = await p.evaluate(() => { const b = document.querySelector('#stxApps button[aria-label="Keep always: Carpe Diem 2002"]'); return { pressed: b.getAttribute('aria-pressed'), chip: b.parentNode.querySelector('.stx-chip').textContent, focus: document.activeElement === b, chain: __t.chain('cd'),
     chips: [...document.querySelectorAll('#stxApps .stx-app')].find(a => /Carpe Diem/.test(a.querySelector('h4').textContent)).querySelectorAll('.stx-chip').length }; });
   ok(s3.pressed === 'true' && s3.chip === 'Kept by you' && s3.chain[3].pin && s3.focus, 'Keep always marks a version (a pressed key, read as such), and it is kept', s3);
   const s3b = await p.evaluate(() => [...document.querySelectorAll('#stxApps .stx-app')].find(a => /Carpe Diem/.test(a.querySelector('h4').textContent)).textContent);
   ok(/Newest/.test(s3b) && /Among your newest 3/.test(s3b) && /Goes when room runs short/.test(s3b), 'each version says whether it stays (newest, among the newest N, kept by her) or may go', s3b.slice(0, 300));
-  await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300);
+  await showIn('stxApps'); await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300);
   await shot(p, 's3-library-day');
 
   // ================= 4 · the plan: exactly what may go, and the proof =================
@@ -195,8 +198,8 @@ const PAGE_HELPERS = () => {
   ok(plan.proof && plan.proof.by && plan.proof.by.chats && plan.proof.by.lectorDocs && plan.proof.by.askVers && plan.proof.by.lectorRuns && plan.proof.by.code && plan.proof.by.shelf && plan.proof.by.stores, 'the proof read every place that names stored texts', plan.proof);
 
   // the preview: the exact list, then one press
-  await p.evaluate(() => document.getElementById('stxClean').scrollIntoView({ block: 'center' }));
-  await p.click('#stxClean'); await p.waitForSelector('#modalBox .stx-pv-list', { timeout: 15000 }); await p.waitForTimeout(250);
+  await showIn('stxClean'); await p.evaluate(() => document.getElementById('stxClean').scrollIntoView({ block: 'center' }));
+  await showIn('stxClean'); await p.click('#stxClean'); await p.waitForSelector('#modalBox .stx-pv-list', { timeout: 15000 }); await p.waitForTimeout(250);
   const pv = await p.evaluate(() => { const box = document.getElementById('modalBox'); return { role: box.getAttribute('role'), lab: box.getAttribute('aria-labelledby'), lis: [...box.querySelectorAll('.stx-pv-list li')].map(l => l.textContent),
     groups: [...box.querySelectorAll('.stx-pv-list h4')].map(h => h.textContent), total: box.querySelector('.stx-pv-total').textContent, yes: [...box.querySelectorAll('button')].map(b => b.textContent), proof: (box.querySelector('.stx-proof') || {}).textContent, focus: document.activeElement.textContent }; });
   ok(pv.lis.length === expected.length && pv.role === 'dialog' && pv.lab === 'stxPvH', 'Clean the library opens a preview (a dialog) listing exactly what would go, one line each', pv.lis);
@@ -214,14 +217,14 @@ const PAGE_HELPERS = () => {
   ok(after.chain.map(x => x.v).join(',') === '2005,2004,2003,2002' && after.chain[3].pin && after.ink.length === 1 + builtin.inkwell.length && after.made.length === 5, 'the newest three of Carpe Diem and the one kept always stay, Inkwell\'s two stay, the newest packages stay', { cd: after.chain.map(x => x.v), made: after.made.length });
   ok(ownerIds.every(x => after.big.indexOf(x) >= 0) && after.big.indexOf(seed.young) >= 0, "every text the owner's work names is still in the store", ownerIds.filter(x => after.big.indexOf(x) < 0));
   ok(after.log && after.log.why === 'clean' && after.log.items.length === expected.length, 'the log records it', after.log && { why: after.log.why, n: after.log.items.length });
-  await p.evaluate(() => { document.getElementById('stxLogBox').open = true; document.getElementById('stxLogBox').scrollIntoView({ block: 'start' }); }); await p.waitForTimeout(250);
+  await showIn('stxLogBox'); await p.evaluate(() => { document.getElementById('stxLogBox').open = true; document.getElementById('stxLogBox').scrollIntoView({ block: 'start' }); }); await p.waitForTimeout(250);
   const logT = await p.evaluate(() => document.getElementById('stxLog').textContent);
   ok(new RegExp('You cleaned the library · ' + expected.length + ' copies removed, .* freed\\..*Carpe Diem 2001').test(logT), 'the log reads plainly: when, why, what, how much', logT.slice(0, 200));
   await shot(p, 's4-log');
 
   // ================= 5 · old copies go on their own when the limit is near, keeping the newest N =================
-  await p.evaluate(() => document.getElementById('stxKeep').scrollIntoView({ block: 'center' }));
-  await p.fill('#stxKeep', '2'); await p.press('#stxKeep', 'Tab'); await p.waitForTimeout(200);
+  await showIn('stxKeep'); await p.evaluate(() => document.getElementById('stxKeep').scrollIntoView({ block: 'center' }));
+  await showIn('stxKeep'); await p.fill('#stxKeep', '2'); await p.press('#stxKeep', 'Tab'); await p.waitForTimeout(200);
   await p.evaluate(async () => { await __t.keep('cd', 'Carpe Diem', '2006', 66000); });
   const s5 = await p.evaluate(async () => { const st = await IngStore.status(); IngStore.set({ limit: Math.ceil(st.usage / 0.93) }); const r = await IngStore.check(); await new Promise(z => setTimeout(z, 300));
     return { keepN: IngStore.settings().keepN, chain: __t.chain('cd'), made: (await __t.keys('fabrica_made', 'meta')).sort(), log: IngStore.log()[0], note: __t.noteText(), st: r && { pct: r.pct, level: r.level } }; });
@@ -252,13 +255,13 @@ const PAGE_HELPERS = () => {
   await p.waitForTimeout(400); await shot(p, 's6-warn-95');
   // the limit set from the page, in GB or MB, and cleared
   await p.evaluate(() => IngErr.closeNotice());
-  await p.fill('#stxLimit', '300'); await p.selectOption('#stxUnit', '1048576'); await p.press('#stxLimit', 'Tab'); await p.waitForTimeout(500);
+  await showIn('stxLimit'); await p.fill('#stxLimit', '300'); await p.selectOption('#stxUnit', '1048576'); await p.press('#stxLimit', 'Tab'); await p.waitForTimeout(500);
   const w3 = await p.evaluate(() => ({ lim: IngStore.settings().limit, of: document.getElementById('stxOf').textContent, warn: document.getElementById('stxWarn').hidden }));
   ok(w3.lim === 300 * 1048576 && /of 300 MB, the limit you set/.test(w3.of) && w3.warn, 'the owner sets her own limit on the page (300 MB here), and the warning goes when there is room', w3);
-  await p.fill('#stxLimit', '9000'); await p.selectOption('#stxUnit', '1073741824'); await p.press('#stxLimit', 'Tab'); await p.waitForTimeout(500);
+  await showIn('stxLimit'); await p.fill('#stxLimit', '9000'); await p.selectOption('#stxUnit', '1073741824'); await p.press('#stxLimit', 'Tab'); await p.waitForTimeout(500);
   const w4 = await p.evaluate(() => ({ lim: IngStore.settings().limit, of: document.getElementById('stxOf').textContent, note: document.getElementById('stxLimitNote').textContent }));
   ok(w4.lim === 9000 * 1073741824 && /the room the browser gives Ingenium here/.test(w4.of) && /Your limit is more than the browser gives Ingenium here .*, so the browser's room is the one that counts/.test(w4.note), 'a limit above what the browser gives is said to be so, and the browser\'s room counts', w4);
-  await p.click('#stxLimitClear'); await p.waitForTimeout(300);
+  await showIn('stxLimitClear'); await p.click('#stxLimitClear'); await p.waitForTimeout(300);
   ok(await p.evaluate(() => IngStore.settings().limit === null && document.getElementById('stxLimit').value === ''), 'No limit of my own clears it');
 
   // ================= 7 · damaged zips: which file, and what =================
@@ -323,13 +326,15 @@ const PAGE_HELPERS = () => {
   ok(fin.repos.indexOf('Lumen') >= 0 && fin.newest && fin.pinned && fin.keys === seed.keysBefore, "Fabrica's apps, the newest version of every app, the version kept always, and the signing keys are all still here", { repos: fin.repos, keys: fin.keys });
 
   // ================= 11 · keyboard, screen readers =================
-  await p.evaluate(() => { IngErr.closeNotice(); document.getElementById('stxClean').scrollIntoView({ block: 'center' }); document.getElementById('stxClean').focus(); });
+  await showIn('stxClean'); await p.evaluate(() => { IngErr.closeNotice(); document.getElementById('stxClean').scrollIntoView({ block: 'center' }); document.getElementById('stxClean').focus(); });
   await p.keyboard.press('Enter'); await p.waitForSelector('#modalBox .stx-pv-keys button', { timeout: 15000 }); await p.waitForTimeout(150);
   const k1 = await p.evaluate(() => ({ open: document.getElementById('modalRoot').classList.contains('open'), focus: document.activeElement.textContent }));
   await p.keyboard.press('Escape'); await p.waitForTimeout(300);
   const k2 = await p.evaluate(() => ({ open: document.getElementById('modalRoot').classList.contains('open'), focus: document.activeElement && document.activeElement.id, role: document.getElementById('modalBox').getAttribute('role') }));
   ok(k1.open && /Not now|Close/.test(k1.focus) && !k2.open && k2.focus === 'stxClean' && !k2.role, 'by keyboard: Enter opens the preview with the focus inside, Escape closes it and the focus comes back', { k1, k2 });
-  const tabbable = await p.evaluate(() => { const c = document.getElementById('stxCard'); return [...c.querySelectorAll('button,input,select,summary')].filter(x => x.offsetParent && !x.disabled && x.tabIndex >= 0).map(x => x.id || x.textContent.trim().slice(0, 20)); });
+  // 7.28: a key inside a folded tile is reached by Tab through its tile's head, which Enter opens
+  const tabbable = await p.evaluate(() => { const c = document.getElementById('stxCard'); const reach = (x) => !!x.offsetParent && x.tabIndex >= 0;
+    return [...c.querySelectorAll('button,input,select,summary')].filter(x => !x.disabled && x.tabIndex >= 0 && (reach(x) || (() => { const t = x.closest('.st-itile.rm-shut'), h = t && t.querySelector(':scope > .st-th'); return !!h && reach(h); })())).map(x => x.id || x.textContent.trim().slice(0, 20)); });
   ok(['stxPersistAsk', 'stxMeasure', 'stxLimit', 'stxLimitClear', 'stxAuto', 'stxKeep', 'stxClean'].filter(id => tabbable.indexOf(id) < 0 && !(id === 'stxPersistAsk')).length === 0 && tabbable.filter(x => /^Keep always/.test(x)).length >= 2, 'every key, switch and field of the section is reached by Tab', tabbable);
   const names = await p.evaluate(() => { const c = document.getElementById('stxCard'); const un = [...c.querySelectorAll('button,input,select')].filter(x => { const n = x.getAttribute('aria-label') || x.getAttribute('aria-labelledby') || (x.id && document.querySelector('label[for="' + x.id + '"]')) || x.textContent.trim(); return !n; }); return un.map(x => x.outerHTML.slice(0, 80)); });
   ok(names.length === 0, 'each has a name a screen reader reads', names);
@@ -339,7 +344,7 @@ const PAGE_HELPERS = () => {
   const ax2 = await axe(p, ['#stxNote']);
   if (ax2) ok(ax2.length === 0, 'and nothing in the notice', ax2); else console.log('NOTE no axe.min.js given: ' + 'and nothing in the notice' + ' was not checked');
   await p.evaluate(() => IngErr.closeNotice());
-  await p.click('#stxClean'); await p.waitForSelector('#modalBox .stx-pv-keys button', { timeout: 15000 }); await p.waitForTimeout(200);
+  await showIn('stxClean'); await p.click('#stxClean'); await p.waitForSelector('#modalBox .stx-pv-keys button', { timeout: 15000 }); await p.waitForTimeout(200);
   const ax3 = await axe(p, ['#modalBox']);
   if (ax3) ok(ax3.length === 0, 'nor in the preview', ax3); else console.log('NOTE no axe.min.js given: ' + 'nor in the preview' + ' was not checked');
   await p.evaluate(() => closeModal());
@@ -349,7 +354,7 @@ const PAGE_HELPERS = () => {
   await shot(p, 's12-night');
   const ax4 = await axe(p, ['#stxCard']);
   if (ax4) ok(ax4.length === 0, 'axe-core finds nothing in the section by night either', ax4); else console.log('NOTE no axe.min.js given: ' + 'axe-core finds nothing in the section by night either' + ' was not checked');
-  await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300); await shot(p, 's12-night-library');
+  await showIn('stxApps'); await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300); await shot(p, 's12-night-library');
   await p.evaluate(() => IngErr.notice({ kind: 'warn', title: 'Storage is getting full', text: 'Ingenium has used 82 % of the limit you set (1.6 GB of 2.0 GB). Nothing needs doing yet.', keys: [['Open Storage', () => { }, true]] })); await p.waitForTimeout(500);
   await shot(p, 's12-night-note'); await p.evaluate(() => IngErr.closeNotice());
   await p.evaluate(() => document.body.setAttribute('data-theme', 'day'));
@@ -360,7 +365,7 @@ const PAGE_HELPERS = () => {
       return { sw: document.documentElement.scrollWidth, vw: innerWidth, over }; });
     ok(lay.sw <= lay.vw && lay.over.length === 0, 'on a ' + n + ' (' + w + ' pixels) nothing spills sideways', lay);
     await shot(p, 's12-' + n);
-    if (n === 'phone') { await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300); await shot(p, 's12-phone-library'); }
+    if (n === 'phone') { await showIn('stxApps'); await p.evaluate(() => document.getElementById('stxApps').scrollIntoView({ block: 'start' })); await p.waitForTimeout(300); await shot(p, 's12-phone-library'); }
   }
   await p.setViewportSize({ width: 1440, height: 900 });
   ok(errs.length === 0, 'no page errors along the way', errs.slice(0, 5));
