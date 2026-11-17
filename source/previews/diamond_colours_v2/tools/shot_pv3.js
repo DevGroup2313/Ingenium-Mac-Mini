@@ -1,0 +1,11 @@
+const pw = require('/opt/node-tools/node_modules/playwright');
+(async () => { const [U, OUT] = process.argv.slice(2); const b = await pw.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const p = await (await b.newContext({ viewport: { width: 1300, height: 900 }, deviceScaleFactor: 2 })).newPage(); p.setDefaultTimeout(180000); const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
+  await p.goto(U); await p.waitForTimeout(6000);
+  const clip = () => p.evaluate(() => { const r = document.querySelector('.dmc.dmc-side').getBoundingClientRect(); return { x: r.left - 10, y: r.top - 10, width: r.width + 20, height: r.height + 20 }; });
+  await p.click('#pvOpen'); await p.waitForTimeout(1800); await p.screenshot({ path: OUT + '_1.png', clip: await clip() });
+  await p.evaluate(() => { IngDiamondColours.set({ look: 'own', stone: '#1f9d63', depth: .8, band: '#2f5bd3' }); }); await p.waitForTimeout(1200);
+  await p.evaluate(() => { document.querySelector('.dmc-scroll').scrollTop = 140; }); await p.waitForTimeout(600); await p.screenshot({ path: OUT + '_2.png', clip: await clip() });
+  await p.click('.pv-seg[data-k="theme"] button[data-v="night"]'); await p.waitForTimeout(1500); await p.screenshot({ path: OUT + '_3.png', clip: await clip() });
+  const sb = await p.evaluate(() => { const sc = document.querySelector('.dmc-scroll'); return { scrollbarGap: sc.offsetWidth - sc.clientWidth, scrolls: sc.scrollHeight > sc.clientHeight, pageGap: innerWidth - document.documentElement.clientWidth }; });
+  console.log(JSON.stringify(sb), 'errors', JSON.stringify(errs)); await b.close(); })();

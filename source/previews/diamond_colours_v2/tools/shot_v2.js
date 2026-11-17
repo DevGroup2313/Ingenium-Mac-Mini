@@ -1,0 +1,10 @@
+const pw = require('/opt/node-tools/node_modules/playwright');
+(async () => { const [U, OUT] = process.argv.slice(2); const b = await pw.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }); const p = await (await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 })).newPage(); p.setDefaultTimeout(180000);
+  const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
+  await p.goto(U); await p.waitForTimeout(6000); await p.evaluate(() => { window.__tFix = 3.2; });
+  const clip = async () => p.evaluate(() => { const r = document.querySelector('#page-build > .skh').getBoundingClientRect(); return { x: r.left - 6, y: r.top - 6, width: r.width + 12, height: r.height + 12 }; });
+  await p.screenshot({ path: OUT + '_1_key.png', clip: await clip() });
+  await p.click('#bdColours'); await p.waitForTimeout(1600); await p.screenshot({ path: OUT + '_2_open.png', clip: await clip() });
+  await p.evaluate(() => IngDiamondColours.set({ look: 'own', stone: '#c8143c', depth: .9 })); await p.waitForTimeout(1500); await p.screenshot({ path: OUT + '_3_ruby.png', clip: await clip() });
+  await p.evaluate(() => { IngDiamondColours.set({ look: 'own', stone: '#2f5bd3', depth: .8, band: '#e8962a' }); state.theme = 'night'; applyTheme(); }); await p.waitForTimeout(2000); await p.screenshot({ path: OUT + '_4_night.png', clip: await clip() });
+  console.log('errors', JSON.stringify(errs), JSON.stringify(await p.evaluate(() => IngDiamond.state().err))); await b.close(); })();

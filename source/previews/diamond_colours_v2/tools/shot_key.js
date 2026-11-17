@@ -1,0 +1,10 @@
+const pw = require('/opt/node-tools/node_modules/playwright');
+(async () => { const [U, OUT] = process.argv.slice(2); const b = await pw.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const p = await (await b.newContext({ viewport: { width: 1300, height: 900 }, deviceScaleFactor: 2 })).newPage(); p.setDefaultTimeout(180000);
+  await p.goto(U); await p.waitForTimeout(6000);
+  const clip = () => p.evaluate(() => { const r = document.querySelector('.dmc-pill').getBoundingClientRect(); return { x: r.left - 20, y: r.top - 20, width: r.width + 40, height: r.height + 40 }; });
+  await p.screenshot({ path: OUT + '_day.png', clip: await clip() });
+  await p.hover('#bdColours'); await p.waitForTimeout(400); await p.screenshot({ path: OUT + '_day_hover.png', clip: await clip() });
+  await p.mouse.move(5, 5); await p.click('.pv-seg[data-k="theme"] button[data-v="night"]'); await p.waitForTimeout(1200); await p.screenshot({ path: OUT + '_night.png', clip: await clip() });
+  const box = await p.evaluate(() => { const pl = document.querySelector('.dmc-pill').getBoundingClientRect(), h = document.querySelector('#page-build > .skh').getBoundingClientRect(); return { pill: [Math.round(pl.width), Math.round(pl.height)], top: Math.round(pl.top - h.top), right: Math.round(h.right - pl.right) }; });
+  console.log(JSON.stringify(box)); await b.close(); })();
