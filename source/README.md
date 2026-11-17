@@ -395,8 +395,9 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.34 (in progress, 17 November 2026): Code reads only an app's changed files.
-One of the workshop's open ends (7.27: "opening an app in Code still reads all its files").
+Ingenium 7.34 (17 November 2026): the workshop's two open ends. Code reads only an app's changed files; a GitHub session keeps a
+linked copy in Fabrica, with its history.
+The two open ends of 7.27: "opening an app in Code still reads all its files" and "a GitHub session in Code keeping a copy in Fabrica".
 - Found (read in the code): r112's openInCode read every file of the app from Fabrica each time it opened the app in Code (IngRepo.read,
   one file after another), though IngRepo.files already gives each file's fingerprint (its git object id). Its syncFromCode, which runs
   each time Fabrica is opened on the app, read every file again from Fabrica to compare with Code's. And it took Code's copy back over a
@@ -410,7 +411,21 @@ One of the workshop's open ends (7.27: "opening an app in Code still reads all i
   The first opening reads every file, as before.
 - rig: `t_734_code_reads_changed.js` (new, 15 checks, an invented app of three text files and a picture; Fabrica's reads counted by
   wrapping IngRepo.read and IngRepo.readText). On the 7.33 page it fails 11 of them, as it should.
-- Not done yet: a GitHub session in Code keeping a copy in Fabrica (a design to show her first).
+- A GitHub session keeping a copy. Asked what Keep in Fabrica should make of a Code session opened From GitHub (a plain copy, as it
+  was: an app of its own with no link and none of GitHub's history; a linked copy of the files only; or a linked copy with its
+  history), she answered: "Linked, with history". `build/modules/r312.js` (ghKeep): Fabrica makes the app on the session's branch,
+  links it to the repository (r114 link), brings the branch's versions from GitHub (r114 bring, with her GitHub sign-in: reading only),
+  then keeps what the session changed since it began (r219 changes: added, changed, removed) as a new version on top. GitHub's versions
+  keep their own git ids, so Fabrica's GitHub part sees the app one version ahead and Send works at once; files the session never read
+  (pictures, files left out) are kept as GitHub has them. The sheet says so before ("With its versions from GitHub (owner/repo,
+  branch), linked to it") and after (how many versions came, how many files changed on top). An app already linked to the same
+  repository is chosen first, and only what the session changed goes there. Without a GitHub sign-in the copy is the plain one, as
+  before, and the sheet says to sign in; if GitHub does not answer, the files are kept as a copy of their own, linked, and the sheet
+  says why and that Bring from GitHub can try again.
+- rig: `t_734_github_keep.js` (new, 17 checks). GitHub is stood in for inside the test's browser (an invented repository of two
+  versions with real git ids, computed as git does); nothing reaches the real GitHub. The session is opened as Code opens one.
+- rig: `inject_modules.js` now replaces a module that has a style block but no part marks (r312) instead of adding it a second time
+  (the page's own copy, first behind the same guard, went on running; a test copy of a changed r312 tested the old one).
 
 Ingenium 7.33 (17 November 2026): Fabrica, easier to find your way, and nothing stiff.
 Her words (17 November 2026), on the live preview (https://claude.ai/artifact/NdgRNGS3yvtan8RH3rmBSE, source/previews/fabrica_nav): "I

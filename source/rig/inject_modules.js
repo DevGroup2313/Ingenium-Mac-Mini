@@ -18,6 +18,12 @@ for (const mp of mods) {
   if (start >= 0 && endAt > start) {
     let end = page.indexOf('</script>', endAt); end += '</script>'.length;
     page = page.slice(0, start) + src.trim() + page.slice(end); console.log('replaced', name, 'part', p);
+  } else if (start >= 0 && page.indexOf(styleMark) === start && endAt < 0) {
+    // 7.34: a module with a style block but no part marks (r312): replaced through as many script blocks as it has itself. Before, it
+    // was added a second time, and the page's own copy (first, behind the same guard) went on running.
+    const n = (src.match(/<script\b/g) || []).length; let end = start;
+    for (let i = 0; i < n; i++) { const so = page.indexOf('<script', end); if (so < 0) throw new Error(name + ': its scripts were not found in the page'); end = page.indexOf('</script>', so) + '</script>'.length; }
+    page = page.slice(0, start) + src.trim() + page.slice(end); console.log('replaced', name, '(by its style block and ' + n + ' script' + (n === 1 ? '' : 's') + ')');
   } else {
     // new: after the last module block (the last "running" line's </script>)
     const re = /try\{window\.__ingParts\["p\d+"\]="running";\}catch\(_\)\{\}[\s\S]*?<\/script>/g; let m, last = null; while ((m = re.exec(page))) last = m;

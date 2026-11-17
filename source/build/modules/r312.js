@@ -60,20 +60,46 @@ function keepSheet(o){if(!here()){toast("Fabrica is not in this copy of Ingenium
       b.onclick=function(){pick(k);};list.appendChild(b);rows.push(b);return b;}
     function pick(k){choice=k;rows.forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-k")===k));});var isNew=k==="new";nm.hidden=!isNew;nl.hidden=!isNew;
       go.textContent=isNew?"Keep it as a new app":"Keep it as a new version";}
-    row("new","A new app in Fabrica","Its first version, under the name below");
-    rs.forEach(function(r){row(r.id,"A new version of "+r.name,o.linked===r.id?"Linked to this work: what changed goes there":"Its page replaced by this one");});
+    var G=ghOf(o),gl=G&&ghReady()?ghLinkedTo(G):null;
+    row("new","A new app in Fabrica",G?(ghReady()?"With its versions from GitHub ("+G.owner+"/"+G.repo+", "+(G.branch||"main")+"), linked to it; what this session changed on top":"Its first version, under the name below (sign in to GitHub in Fabrica to bring its versions too)"):"Its first version, under the name below");
+    rs.forEach(function(r){row(r.id,"A new version of "+r.name,o.linked===r.id?"Linked to this work: what changed goes there":(gl===r.id?"Linked to "+G.owner+"/"+G.repo+" on GitHub: what this session changed goes there":"Its page replaced by this one"));});
     nm.value=o.title||"My app";msg.value=o.msg||"";
-    var pre=o.linked&&rs.some(function(r){return r.id===o.linked;})?o.linked:(rs.filter(function(r){return same(r.name,o.title);})[0]||{}).id||"new";pick(pre);
+    var pre=o.linked&&rs.some(function(r){return r.id===o.linked;})?o.linked:(gl&&rs.some(function(r){return r.id===gl;})?gl:((rs.filter(function(r){return same(r.name,o.title);})[0]||{}).id||"new"));pick(pre);
     box.querySelector("#r312X").onclick=function(){W.closeModal();};
     msg.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();go.click();}});
     go.onclick=function(){var m=msg.value.trim()||o.msg||"A new version";var n=nm.value.trim()||o.title||"My app";go.disabled=true;go.textContent="Keeping it…";
-      keep(o,choice,n,m).then(function(res){stale();done(box,o,res);},function(e){go.disabled=false;pick(choice);toast("Fabrica did not keep it: "+(e&&e.message||e));});};
+      keep(o,choice,n,m,function(t){go.textContent=t;}).then(function(res){stale();done(box,o,res);},function(e){go.disabled=false;pick(choice);toast("Fabrica did not keep it: "+(e&&e.message||e));});};
     setTimeout(function(){try{msg.focus();msg.select();}catch(e){}},60);}).catch(warn);}
-function keep(o,choice,name,m){
+/* 7.34: a GitHub session's copy, linked and with its history. Her answer (17 November 2026), asked what Keep in Fabrica should make of a
+   Code session opened From GitHub: "Linked, with history". Fabrica makes the app on the session's branch, links it to the repository
+   (modules/r114.js link), brings the branch's versions from GitHub (r114 bring, with her GitHub sign-in: reading only, nothing is sent),
+   then keeps what the session changed since it began (modules/r219.js changes: the files added, changed and removed against the
+   version the session started from) as a new version on top. Fabrica's GitHub part (Send, releases, builds, issues) then works on it at
+   once. Without a GitHub sign-in, or if GitHub cannot be reached, the files are kept as before, as an app of their own, and she is told. */
+function ghOf(o){var pr=o&&o.project;return pr&&pr.gh&&pr.gh.owner&&pr.gh.repo?pr.gh:null;}
+function ghReady(){try{return !!(W.fbGitHub&&W.IngGitHubCode&&W.state&&state.github&&state.github.token);}catch(e){return false;}}
+function ghLinkedTo(G){var f=W.state&&state.fabrica,R=f&&f.remote||{},out=null;Object.keys(R).forEach(function(id){var L=R[id];if(L&&same(L.owner,G.owner)&&same(L.repo,G.repo)&&!out)out=id;});return out;}
+/* what the session changed since it began, put into the app (only those files; the rest are GitHub's, as brought) */
+function ghApply(id,o){return W.IngGitHubCode.changes(o.project).then(function(ch){var puts=[],dels=[];(ch&&ch.files||[]).forEach(function(c){if(c.how==="removed")dels.push(c.path);else if(c.e&&typeof c.e.text==="string")puts.push({path:c.path,data:c.e.text});});
+  var q=puts.length?IngRepo.putMany(id,puts):Promise.resolve();dels.forEach(function(pth){q=q.then(function(){return IngRepo.del(id,pth).catch(function(){});});});
+  return q.then(function(){return {put:puts.length,removed:dels.length};});});}
+function ghKeep(o,name,m,prog){var G=ghOf(o),FG=W.fbGitHub,brought=null,why=null;
+  return IngRepo.create({name:name,branch:G.branch||"main"}).then(function(r0){var id=r0.id;
+    return FG.link(r0,G.owner,G.repo,G.branch).then(function(L){return IngRepo.info(id).then(function(r){return FG.bring(r,L,prog);});})
+      .then(function(b){brought=b;},function(e){why=String(e&&e.message||e).replace(/[.\s]+$/,"");})
+      .then(function(){prog("Keeping what this session changed…");
+        /* brought: only what changed since the session began; not brought: every file, as a copy of its own */
+        return brought?ghApply(id,o):IngRepo.putMany(id,o.files).then(function(){return {put:o.files.length,removed:0,all:true};});})
+      .then(function(ap){return IngRepo.commit(id,m).then(function(oid){return {oid:oid,ap:ap};},function(e){if(/nothing has changed/i.test(String(e&&e.message||e)))return IngRepo.info(id).then(function(r){return {oid:r.head||null,ap:ap,same:true};});throw e;});})
+      .then(function(x){link(id,o.project.id);
+        return {id:id,name:name,oid:x.oid,main:o.main||mainOf(o.files),fresh:true,msg:m,gh:{full:G.owner+"/"+G.repo,branch:G.branch||"main",brought:brought?brought.brought:0,files:x.ap.put+x.ap.removed,nothing:!!x.same,why:why}};});});}
+function keep(o,choice,name,m,prog){prog=prog||function(){};
+  if(choice==="new"&&ghOf(o)&&ghReady())return ghKeep(o,name,m,prog);
   if(choice==="new")return IngRepo.fromFiles(o.files,{name:name,msg:m}).then(function(r){if(o.project)link(r.id,o.project.id);return {id:r.id,name:name,oid:r.commit,main:o.main||mainOf(o.files),fresh:true,msg:m};});
   return IngRepo.list().then(function(rs){var r=rs.filter(function(x){return x.id===choice;})[0];if(!r)throw new Error("that app is no longer in Fabrica");
     var put;
     if(o.project&&o.linked===r.id&&typeof W.fbSync==="function")put=W.fbSync(r);  /* Fabrica's own way back from Code: the files that changed */
+    else if(o.project&&ghOf(o)&&ghReady()&&ghLinkedTo(ghOf(o))===r.id)put=ghApply(r.id,o).then(function(){link(r.id,o.project.id);});  /* 7.34: the app is GitHub's same repository: only what the session changed */
     else if(o.project)put=IngRepo.putMany(r.id,o.files).then(function(){link(r.id,o.project.id);});
     else put=IngRepo.files(r.id).then(function(list){var p=mainOf(list)||"index.html";o.main=p;return IngRepo.putMany(r.id,[{path:p,data:o.files[0].data}]);});
     return Promise.resolve(put).then(function(){return IngRepo.commit(r.id,m);}).then(function(oid){return {id:r.id,name:r.name,oid:oid,main:o.main||"",msg:m};},
@@ -81,6 +107,10 @@ function keep(o,choice,name,m){
 function done(box,o,res){var w=box.querySelector("#r312Sheet");if(!w)return;
   w.innerHTML='<h3>Kept in Fabrica</h3><p class="r312-done"></p><div class="ing-ask-keys"></div>';
   w.querySelector("p").textContent=res.same?(res.name+" in Fabrica already holds this as it is: nothing new to keep."):(res.name+(res.fresh?", a new app in Fabrica: ":", a new version: ")+res.msg+(res.oid?" ("+String(res.oid).slice(0,7)+")":"")+". Test it and ship it from there.");
+  if(res.gh){var g=res.gh,t;
+    if(g.why)t="Its versions could not be brought from GitHub ("+g.why+"), so it is kept as a copy of its own, linked to "+g.full+": Bring from GitHub, in Fabrica's GitHub part, can try again.";
+    else t="Linked to "+g.full+" ("+g.branch+") on GitHub, with its "+g.brought+" version"+(g.brought===1?"":"s")+" from there"+(g.nothing?"; this session had changed nothing yet.":"; on top, what this session changed ("+g.files+" file"+(g.files===1?"":"s")+").");
+    var p2=mk("p","r312-done",t);w.insertBefore(p2,w.querySelector(".ing-ask-keys"));}
   var k=w.querySelector(".ing-ask-keys");
   function key(t,cls,fn){var b=mk("button","btn "+cls,t);b.type="button";b.onclick=fn;k.appendChild(b);return b;}
   key("Close","ghost",function(){W.closeModal();});
