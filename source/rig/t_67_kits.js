@@ -10,10 +10,10 @@
 //     Forge's seal and far from Ingenium's; the Forge's page is inside, whole; its installer script, build recipe and
 //     manifest name The Forge and its id; no path names Ingenium; the Windows and Mac apps carry the Forge's icon and name
 //     (rig/verify_desktop_app.py reads them as Windows and macOS do);
-//   - a plain app with no templates (Tide Clock) gets the generic kits made its own: its icon in every icon file, its names
-//     and id in app.json, the installer script, the build recipes, the build and run files and the guide, the files that
-//     carry its identity renamed for it, every file a build file names present in the zip, and no Ingenium file name in
-//     the desktop kits; Ingenium's own kit is still Ingenium's;
+//   - a plain app with no templates (Tide Clock): since 7.12 its five kits come from the family's packaging (rig/t_712_kits.js checks
+//     every file); here, each is named for it, holds its own icon and no path or text naming Ingenium, and its guide names it;
+//     before 7.12 they were Ingenium's generic kits renamed for it. Ingenium's own kit is still Ingenium's;
+//   - since 7.24 a Windows app is its installer, "<App> Setup.exe", with the program inside (rig/kit_check.py reads it);
 //   - through the Windows desktop app's own saving (ingenium_app.py's save_file, rig/t_67_winsave.py) each package lands
 //     under its own name with exactly the bytes made, one after another, never one in place of another;
 //   - no page errors.
@@ -144,8 +144,9 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     const fwin = await collect('fabrica_win', () => p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="win"]'); eval(kf)(e).click(); }, keyOf), 1);
     const vfw = fwin[0] ? verify('win', fwin[0], R.id, 'The Forge') : { faults: ['nothing saved'] };
     const kfw = fwin[0] ? kc(fwin[0], { app_ref: SEAL, ing_refs: ING, ing_icon_sha256: ING_SHA, page_sha256: PAGE_SHA }) : {};
-    ok(fwin[0] && /^The-Forge-windows-.*\.zip$/.test(path.basename(fwin[0])) && !vfw.faults.length && vfw.program === 'The Forge.exe' && vfw.id === R.id,
-      'Fabrica\'s Windows app card makes The Forge.exe, named for the Forge with its id, read as Windows reads it', { saved: fwin[0] && path.basename(fwin[0]), verify: vfw });
+    /* 7.27: since 7.24 the Windows app is its installer, "The Forge Setup.exe" (the program, The Forge.exe, inside it) */
+    ok(fwin[0] && path.basename(fwin[0]) === 'The Forge Setup.exe' && !vfw.faults.length && vfw.program === 'The Forge Setup.exe' && (vfw.names || {}).OriginalFilename === 'The Forge.exe' && (vfw.names || {}).ProductName === 'The Forge' && vfw.id === R.id,
+      'Fabrica\'s Windows app card makes The Forge Setup.exe (its installer since 7.24; The Forge.exe inside), named for the Forge with its id, read as Windows reads it', { saved: fwin[0] && path.basename(fwin[0]), verify: vfw });
     ok(kfw.icons && kfw.icons.length === 6 && iconsOk(kfw, 6) && (kfw.page_entries || []).length === 1 && kfw.ing_paths.length === 0,
       'the program carries the Forge\'s seal at every size of its icon, and the Forge\'s page whole', { icons: (kfw.icons || []).map(i => i.pic + ' ' + i.d_app + '/' + i.d_ing), page: kfw.page_entries, ing: kfw.ing_paths });
     await p.waitForTimeout(1500);
@@ -183,8 +184,8 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     if (dlweb.f[0]) forgePackage(dlweb.f[0], 'Download as an app, web');
     const dlx = await pressDl('dl_windows_app', 'Windows', 'Make and save', 1);
     const vdx = dlx.f[0] ? verify('win', dlx.f[0], R.id, 'The Forge') : { faults: ['nothing saved'] }, kdx = dlx.f[0] ? kc(dlx.f[0], { app_ref: SEAL, ing_refs: ING, ing_icon_sha256: ING_SHA, page_sha256: PAGE_SHA }) : {};
-    ok(dlx.f[0] && /^The-Forge-windows-.*\.zip$/.test(path.basename(dlx.f[0])) && !vdx.faults.length && vdx.program === 'The Forge.exe' && vdx.id === R.id && iconsOk(kdx, 6) && (kdx.page_entries || []).length === 1 && kdx.ing_paths.length === 0,
-      'Download as an app: the Windows row makes The Forge.exe with the Forge\'s seal in its icon and its page inside', { f: dlx.f.map(x => path.basename(x)), faults: vdx.faults, icons: iconSay(kdx) });
+    ok(dlx.f[0] && path.basename(dlx.f[0]) === 'The Forge Setup.exe' && !vdx.faults.length && vdx.program === 'The Forge Setup.exe' && (vdx.names || {}).OriginalFilename === 'The Forge.exe' && vdx.id === R.id && iconsOk(kdx, 6) && (kdx.page_entries || []).length === 1 && kdx.ing_paths.length === 0,
+      'Download as an app: the Windows row makes The Forge Setup.exe (since 7.24) with the Forge\'s seal in its icon and its page inside', { f: dlx.f.map(x => path.basename(x)), faults: vdx.faults, icons: iconSay(kdx), page: kdx.page_entries });
     const dlapk = await pressDl('dl_apk', 'Fire', 'Make and save', 1);
     const kap = dlapk.f[0] ? kc(dlapk.f[0], { app_ref: SEAL, ing_refs: ING, ing_icon_sha256: ING_SHA, page_sha256: PAGE_SHA }) : {};
     ok(dlapk.f[0] && /^The-Forge-.*\.apk$/.test(path.basename(dlapk.f[0])) && iconsOk(kap, 5) && (kap.page_entries || []).length === 1 && kap.ing_paths.length === 0,
@@ -251,44 +252,20 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
     const tk = await collect('tide_kits', async () => { await p.evaluate(kf => { const e = document.querySelector('#fbTargets .f-tg[data-k="kits"]'); eval(kf)(e).click(); }, keyOf); await p.waitForTimeout(600);
       await p.evaluate(() => { const s = [...document.querySelectorAll('.f-sheet')].pop(); s.querySelectorAll('.f-opt').forEach(o => { if (o.getAttribute('aria-pressed') !== 'true') o.click(); }); [...s.querySelectorAll('button')].find(x => /^Make kits for \d+ devices?$/.test(x.textContent)).click(); }); }, 6);
     const tnames = tk.map(x => path.basename(x)).sort();
-    ok(tnames.join() === ['TideClock-Fire-Tablet-Kit.zip', 'TideClock-Mac-Apple-Silicon-Kit.zip', 'TideClock-Mac-Kit.zip', 'TideClock-Windows-Kit.zip', 'TideClock-iPad-Kit.zip', 'TideClock-iPhone-Kit.zip'].join(), 'a plain app\'s Build kits: six kits, named for the app', tnames);
-    const KITID = { 'TideClock-Windows-Kit.zip': 'windows', 'TideClock-Mac-Kit.zip': 'mac', 'TideClock-Mac-Apple-Silicon-Kit.zip': 'macarm', 'TideClock-Fire-Tablet-Kit.zip': 'fire', 'TideClock-iPhone-Kit.zip': 'iphone', 'TideClock-iPad-Kit.zip': 'ipad' };
-    const OLD = ['ingenium.html', 'ingenium_app.py', 'ingenium_win.spec', 'ingenium.spec', 'ingenium.ico', 'ingenium.icns', 'ingenium.png', 'Ingenium.iss', 'make_ingenium_icon.py', 'Build Ingenium (Windows).bat', 'Run Ingenium (Windows).bat', 'Ingenium-Setup.exe', 'ingenium_android_project', 'ingenium_ios_project'];
-    // the shell's and engine's own sources keep their makers' names (the Java package and its native calls, the iPhone target's folder)
-    const SHELL_SRC = /\/java\/com\/[^/]+\/ingenium\/|\/cpp\/ingenium_jni\.cpp$|\/native\/ingenium_engine\.(cpp|h)$|_ios_project\/Ingenium\//;
-    for (const f of tk) { const id = KITID[path.basename(f)]; if (!id) continue; const desk = /windows|mac/.test(id);
-      const origNames = tide.orig[id].names.map(n => n.split('/').slice(2).join('/')).filter(Boolean);
-      const r = kc(f, { app_ref: TIDE, ing_refs: ING, ing_icon_sha256: ING_SHA, orig_names: origNames, old_names: OLD,
-        build_globs: ['\\.github/workflows/', '\\.spec$', '\\.iss$', '\\.bat$', '\\.command$', '\\.gradle$', 'project\\.yml$', 'make_[^/]*_icon\\.py$', 'tools/app_name\\.py$'],
-        read: ['/app\\.json$', '\\.iss$', '_win\\.spec$', '[^/]\\.spec$', '\\.github/workflows/build-[^/]*\\.yml$', '/START_HERE\\.txt$', 'Info\\.plist$', 'WINDOWS_README\\.txt$', 'project\\.yml$', '_app\\.py$'], read_max: 60000 });
+    /* 7.27: since 7.12 a plain app's kits come from the family's packaging (modules/r299.js), named <file stem>_<device>_<stamp>.zip,
+       one kit for the iPhone and the iPad; rig/t_712_kits.js checks their every file (52 checks). Here: the five kits, each the app's
+       own (its icon in every icon file, none of Ingenium's), no path or text naming Ingenium, and its guide naming the app. */
+    const TK = ['fire', 'ios', 'mac', 'mac_mini', 'windows'];
+    ok(tnames.length === 5 && tnames.every(n => /^tide_clock_(fire|ios|mac|mac_mini|windows)_\d{8}\.zip$/.test(n)) && TK.every(k => tnames.some(n => kindOf(n) === k)),
+      'a plain app\'s Build kits: five kits from the family\'s packaging (one for iPhone and iPad), named for the app', tnames);
+    for (const f of tk) { const kind = kindOf(path.basename(f)); if (!kind) continue;
+      const r = kc(f, { app_ref: TIDE, ing_refs: ING, ing_icon_sha256: ING_SHA, read: ['READ ME FIRST\\.txt$'], read_max: 20000 });
       checked.push(['plain app', path.basename(f), r]);
-      const rd = k => ((r.read || {})[k] || {}).text || '';
-      let aj = {}; try { aj = JSON.parse(rd('/app\\.json$')); } catch (e) {}
-      ok(aj.name === 'Tide Clock' && aj.app_id === 'com.yannieforest.tideclock' && aj.file_name === 'TideClock', path.basename(f) + ': app.json names the app, its id and its file stem', aj);
-      const iconFiles = [...new Set((r.icons || []).map(i => i.name))];
-      ok(iconFiles.length >= tide.orig[id].icons && iconsOk(r, tide.orig[id].icons), path.basename(f) + ': every icon file (as many as Ingenium\'s own kit has: ' + tide.orig[id].icons + ') holds the app\'s own icon, in the same formats and sizes, and none is Ingenium\'s', { files: iconFiles.map(n => n.split('/').pop()), ...iconSay(r) });
-      const badPaths = (r.ing_paths || []).filter(n => !SHELL_SRC.test(n));
-      ok(badPaths.length === 0, path.basename(f) + ': no file name carries Ingenium' + (desk ? '' : ' (the shell\'s Java package, native calls and iPhone target folder keep their makers\' names)'), badPaths.slice(0, 8));
-      ok(r.refs && r.refs.missing.length === 0 && r.refs.old.length === 0, path.basename(f) + ': every file its build files name is in it, and no file still names an old one', r.refs);
-      if (id === 'windows') { const iss = rd('\\.iss$'), spec = rd('_win\\.spec$'), wf = rd('\\.github/workflows/build-[^/]*\\.yml$'), sh = rd('/START_HERE\\.txt$'), rm = rd('WINDOWS_README\\.txt$');
-        ok(/#define AppName "Tide Clock"/.test(iss) && /#define AppFile "TideClock"/.test(iss) && /#define AppIdent "com\.yannieforest\.tideclock"/.test(iss) && /SetupIconFile=\{#RepoDir\}\\tideclock\.ico/.test(iss) && ((r.read || {})['\\.iss$'] || {}).name.endsWith('installer/TideClock.iss'),
-          'the Windows kit: its installer script (installer/TideClock.iss) names the app, its file stem, its id and its icon', iss.split('\n').filter(l => /define App(Name|File|Ident) |SetupIconFile/.test(l)).join(' | '));
-        ok(/icon='tideclock\.ico'/.test(spec) && /\('tideclock\.html', '\.'\)/.test(spec) && /\['tideclock_app\.py'\]/.test(spec) && /^name: Build Tide Clock for Windows$/m.test(wf) && /tideclock_win\.spec/.test(wf) && /installer\\TideClock\.iss/.test(wf),
-          'the Windows kit: its build recipe (tideclock_win.spec) and build file name the app\'s own icon, page and shell, and the build file is named for it', { spec: /icon='[^']*'/.exec(spec), wf: /^name: .*$/m.exec(wf) });
-        ok(!/Build Ingenium|Ingenium\.iss|ingenium\.html|Ingenium-Setup|Ingenium\.exe/.test(sh) && /Build Tide Clock[\s\S]{0,4}\(Windows\)\.bat/.test(sh) && /^Tide Clock for Windows/.test(rm) && !/Ingenium/.test(rm),
-          'the Windows kit: its guide and the read-me installed with it name the app\'s own files, not Ingenium\'s', { guide: (sh.match(/Build [A-Z][a-z]+[^\n]{0,30}/) || [])[0], readme: rm.split('\n')[0] }); }
-      if (id === 'mac') { const spec = rd('[^/]\\.spec$'), wf = rd('\\.github/workflows/build-[^/]*\\.yml$');
-        ok(/'tideclock\.icns'/.test(spec) && /\['tideclock_app\.py'\]/.test(spec) && /Tide Clock uses the home network/.test(spec) && /^name: Build Tide Clock for Mac$/m.test(wf) && ((r.read || {})['[^/]\\.spec$'] || {}).name.endsWith('/tideclock.spec'),
-          'the Mac kit: its build recipe (tideclock.spec) names the app\'s icon and shell, and what macOS shows names the app', /NSLocalNetworkUsageDescription'?: '[^']{0,40}/.exec(spec)); }
-      if (id === 'iphone') ok(/<key>CFBundleDisplayName<\/key>\s*<string>Tide Clock<\/string>/.test(rd('Info\\.plist$')) && /Tide Clock uses your home network/.test(rd('Info\\.plist$')), 'the iPhone kit: the name under its icon is the app\'s', /CFBundleDisplayName<\/key>\s*<string>[^<]*/.exec(rd('Info\\.plist$')));
-      // (6.7, after review: the iPhone and iPad app's target, product and program, and the cloud build that makes it, take the app's
-      // name; the Windows and Mac shells write their crash report and diagnosis under the app's name)
-      if (id === 'iphone' || id === 'ipad') { const yml = rd('project\\.yml$'), wf = rd('\\.github/workflows/build-[^/]*\\.yml$');
-        ok(/^name: TideClock$/m.test(yml) && /^  TideClock:$/m.test(yml) && /^\s+PRODUCT_NAME: TideClock$/m.test(yml) && /-project TideClock\.xcodeproj -scheme TideClock\b/.test(wf) && /Release-iphoneos\/TideClock\.app Payload\//.test(wf) && !/Ingenium\.app|Ingenium\.xcodeproj|-scheme Ingenium|PRODUCT_NAME: Ingenium|^name: Ingenium$/m.test(yml + '\n' + wf),
-          path.basename(f) + ': the Xcode project, its target, its program and the cloud build that makes them are named for the app', { yml: (yml.match(/^(name|  [A-Za-z]+:$|\s+PRODUCT_NAME:).*$/mg) || []).slice(0, 4), wf: (wf.match(/xcodebuild[^\n]*|cp -R [^\n]*/g) || []).slice(0, 2) }); }
-      if (desk) { const app = rd('_app\\.py$'), guide = rd('/START_HERE\\.txt$');
-        ok(/tideclock_crash\.log/.test(app) && /tideclock_diag\.txt/.test(app) && !/ingenium_crash\.log|ingenium_diag\.txt/.test(app + guide),
-          path.basename(f) + ': the shell writes its crash report and diagnosis under the app\'s name, and the guide names them so', (app.match(/[a-z_]+_(crash\.log|diag\.txt)/g) || []).slice(0, 4)); }
+      const guide = (((r.read || {})['READ ME FIRST\\.txt$']) || {}).text || '';
+      const iconFiles = [...new Set((r.icons || []).map(x => x.name))];
+      ok(iconFiles.length >= 1 && iconsOk(r, 1) && !(r.ing_icon_bytes || []).length, path.basename(f) + ': every icon file holds the app\'s own icon, and none is Ingenium\'s', { files: iconFiles.map(n => n.split('/').pop()).slice(0, 8), ...iconSay(r) });
+      ok((r.ing_paths || []).length === 0 && !Object.keys(r.texts_naming_ingenium || {}).length, path.basename(f) + ': no file name and no text in it names Ingenium', { paths: (r.ing_paths || []).slice(0, 6), texts: Object.keys(r.texts_naming_ingenium || {}).slice(0, 6) });
+      ok(/Tide Clock/.test(guide) && (r.top || []).length === 1 && /^Tide Clock for /.test(r.top[0]), path.basename(f) + ': one folder named for the app, and its guide names the app', { top: r.top, guide: guide.split('\n')[0] });
     }
 
     // ---------- 8b. a kit Fabrica kept from before this version is let go, once ----------
@@ -332,7 +309,7 @@ const kindOf = n => (/_(mac_mini|mac|windows|ios|fire|web)_[^_]+\.zip$/.exec(n) 
       await p.waitForFunction(() => window.__winSaves.length >= 7, null, { timeout: 300000 }).catch(() => {}); await p.waitForTimeout(1500);
       const ws = await p.evaluate(() => window.__winSaves.map(s => ({ name: s.name, made: s.made, size: s.size, path: s.saved.path, offered: s.saved.offered, onDisk: s.saved.sha256, diskSize: s.saved.size })));
       const want = ['the_forge_fire_' + FS + '.zip', 'the_forge_ios_' + FS + '.zip', 'the_forge_mac_' + FS + '.zip', 'the_forge_mac_mini_' + FS + '.zip', 'the_forge_windows_' + FS + '.zip'];
-      ok(ws.length === 7 && want.every(n => ws.some(s => s.name === n)) && /^The-Forge-windows-.*\.zip$/.test(ws[5].name) && ws[6].name === 'TideClock-Windows-Kit.zip',
+      ok(ws.length === 7 && want.every(n => ws.some(s => s.name === n)) && ws[5].name === 'The Forge Setup.exe' && /^tide_clock_windows_\d{8}\.zip$/.test(ws[6].name),
         'through the Windows app\'s saving: the Forge\'s five packages, its Windows app and the plain app\'s Windows kit are each saved', ws.map(s => s.name));
       ok(ws.length && ws.every(s => s.offered === s.name && path.basename(s.path || '') === s.name && s.made === s.onDisk && s.size === s.diskSize),
         'each lands under its own name (the name the save dialog was offered), with exactly the bytes made (SHA-256 on disk = SHA-256 made)', ws.map(s => s.name + ' ' + (s.made === s.onDisk ? 'same' : 'DIFFERENT') + ' ' + s.size));

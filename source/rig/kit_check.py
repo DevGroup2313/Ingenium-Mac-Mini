@@ -1,7 +1,7 @@
 """Ingenium 6.7 · reads a kit or package zip that Ingenium made for an app other than itself (modules/r178.js), apart from the
 page that made it, so the two can disagree. Used by rig/t_67_kits.js.
 
-    python3 -I rig/kit_check.py <made.zip> <spec.json>      -> prints one JSON line
+    python3 -I rig/kit_check.py <made.zip or Setup.exe> <spec.json>      -> prints one JSON line
 
 spec.json (every key optional):
   app_ref      a PNG of the app's own picture; each icon in the zip is compared with it, drawn as the packagers draw
@@ -25,10 +25,16 @@ from PIL import Image
 
 zpath, spath = sys.argv[1], sys.argv[2]
 spec = json.load(open(spath, encoding="utf-8"))
-zf = zipfile.ZipFile(zpath)
-infos = [i for i in zf.infolist() if not i.filename.endswith("/")]
-data = {i.filename: zf.read(i) for i in infos}
-rep = {"zip": zpath.split("/")[-1], "entries": [[i.filename, i.file_size, hashlib.sha256(data[i.filename]).hexdigest(), (i.external_attr >> 16) & 0o7777] for i in infos]}
+if zpath.lower().endswith(".exe"):
+    # 7.27: since 7.24 a Windows app is one installer, "<App> Setup.exe" (the shell, its icon, the app's files after it): read as one entry
+    raw = open(zpath, "rb").read()
+    data = {zpath.split("/")[-1]: raw}
+    rep = {"zip": zpath.split("/")[-1], "entries": [[zpath.split("/")[-1], len(raw), hashlib.sha256(raw).hexdigest(), 0o755]]}
+else:
+    zf = zipfile.ZipFile(zpath)
+    infos = [i for i in zf.infolist() if not i.filename.endswith("/")]
+    data = {i.filename: zf.read(i) for i in infos}
+    rep = {"zip": zpath.split("/")[-1], "entries": [[i.filename, i.file_size, hashlib.sha256(data[i.filename]).hexdigest(), (i.external_attr >> 16) & 0o7777] for i in infos]}
 rep["top"] = sorted({n.split("/")[0] for n in data})
 rep["ing_paths"] = [n for n in data if re.search("ingenium", n, re.I)]
 

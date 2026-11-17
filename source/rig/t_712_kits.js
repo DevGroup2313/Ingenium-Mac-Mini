@@ -14,7 +14,8 @@
 //     installer's publisher; the Mac kit's terminal build a program
 //   - an app's own templates still come first; Ingenium's own page keeps Ingenium's own projects
 //   - the web kit, by the Build page and by Download as an app, comes from the family's packaging
-//   - with no name in the profile (as in a public edition), the owner is the app's own name
+//   - with no name in the profile and none to publish under (as in a public edition), the owner is the app's own name
+//   (7.27: the invented owner is set as the publishing name too, since 7.25 the name kits are published under)
 //   - when the family's packaging cannot be read, another app's kit is refused, never made from Ingenium's projects
 //   - the kits of the invented app are saved in <out dir> (for the proof on GitHub's machines); no page errors
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const crypto = require('crypto');
@@ -33,6 +34,9 @@ const APP = '<!doctype html><html><head><meta charset="utf-8"><title>Tide Clock<
   const r = await p.evaluate(async ({ APP }) => {
     const out = { authorFn: typeof lxhAuthor, family: !!(window.IngFamilyKit && IngFamilyKit.has()), kits: {}, saved: {} };
     window.lxhAuthor = function () { return 'Ada Example'; };   // an invented person in place of the profile's name
+    /* 7.27: since 7.25 a kit's owner is the publishing name (modules/r309.js), the master edition's own until changed: the invented
+       owner is set as the publishing name too, chosen quietly, so no make asks */
+    if (window.IngPublisher) IngPublisher.set('Ada Example', true);
     const store = await kitStore(); const TD = new TextDecoder('utf-8');
     const toB64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
     const bytesOf = e => typeof e.data === 'string' ? new TextEncoder().encode(e.data) : e.data;
@@ -69,7 +73,8 @@ const APP = '<!doctype html><html><head><meta charset="utf-8"><title>Tide Clock<
       try { const k = await kitAssemble(store, 'fire', Object.assign({}, who, { name: 'Ingenium', title: 'Ingenium', id: 'com.example.ingeniumcopy', file: 'Ingenium' }), own); out.ingenium = { own: !!k.own, templated: !!k.templated, files: k.entries.length }; } catch (e) { out.ingenium = { error: String(e && e.message || e) }; } }
     // no name in the profile, as in a public edition: the owner is the app's own name
     { const keep = window.lxhAuthor, keepP = window.personaGet; window.lxhAuthor = function () { return ''; }; window.personaGet = function () { return { name: '' }; };
-      try { const k = await kitAssemble(store, 'windows', who, APP); out.noName = (k.entries.find(e => /Windows project\/LICENCE\.txt$/.test(e.name)) || {}).data; } finally { window.lxhAuthor = keep; window.personaGet = keepP; } }
+      if (window.IngPublisher) IngPublisher.set('', true);  /* 7.27: and no publishing name (Publish with no name) */
+      try { const k = await kitAssemble(store, 'windows', who, APP); out.noName = (k.entries.find(e => /Windows project\/LICENCE\.txt$/.test(e.name)) || {}).data; } finally { window.lxhAuthor = keep; window.personaGet = keepP; if (window.IngPublisher) IngPublisher.set('Ada Example', true); } }
     // the family's packaging unreadable: refused, never Ingenium's projects
     { const keep = IngFamilyKit.templates; IngFamilyKit.templates = function () { return Promise.reject(new Error('unreadable (test)')); };
       try { const k = await kitAssemble(store, 'fire', who, APP); out.refused = { made: true, own: !!k.own }; } catch (e) { out.refused = { error: String(e && e.message || e) }; } finally { IngFamilyKit.templates = keep; } }
