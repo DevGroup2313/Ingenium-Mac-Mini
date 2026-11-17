@@ -13,7 +13,12 @@
    So the stone is chosen as a family and a shade. Each family is Ingenium's purple stone dressed in its colour (modules/r292.js, family()):
    its pastel is the lavender look, its medium the day purple, its deep the night stone by day, and its night the night stone of the night
    theme, each gathered to the family's hue; the night theme shows the family's night shade by itself, as a sticky note changes paper;
-   the northern lights behind the stone take the family's hue. Ingenium's purple is drawn exactly as before. */
+   the northern lights behind the stone take the family's hue. Ingenium's purple is drawn exactly as before.
+   And (her words, the same day): "I also want the option to keep the clear crystal and have its own Night mode look. It should have the
+   full colour spectrum for the Northern lights since that makes the most sense." So the Clear crystal family keeps the clear crystal (its
+   Pastel, and By the hour's morning) and has a night of its own: by night a black diamond, colourless with its fire kept (her words: "No
+   I prefer the stone as a black diamond on Night mode, it is the best look for it and its natural opposite"), under northern lights of
+   every colour (r292 family() cn and "spectrum"); it was the night stone, purple, in 7.29 and 7.30. */
 var FAMS=[["purple","Ingenium's purple"],["sky","Sky blue"],["sapphire","Sapphire"],["aqua","Aqua"],["emerald","Emerald"],["citrine","Citrine"],
   ["amber","Amber"],["rose","Rose"],["ruby","Ruby"],["clear","Clear crystal"],["own","Your own colour"]];
 var SHADES=[["auto","By the hour"],["pastel","Pastel"],["medium","Medium"],["deep","Deep"]];
@@ -28,11 +33,13 @@ var PAL={sky:[["#7cc4ff",.25,1.7,.6],["#4aa0f0",.25,1.7,.78],["#2f6fd0",.25,1.6,
   amber:[["#f0b060",.25,1.5,.55],["#e8902a",.25,2,.68],["#c86818",.25,1.9,.95],["#d88030",.25,1.5,1]],
   rose:[["#f08ab8",.25,1.5,.65],["#e8649a",.25,1.7,.82],["#c83c7c",.25,1.7,1.05],["#e0609a",.25,1.5,1]],
   ruby:[["#f06080",.25,1.5,.75],["#d81040",.25,2,.92],["#b0102e",.25,2,1.15],["#d01848",.25,1.6,1]],
-  clear:[null,["#8cc8ff",.25,.1,.8],["#8cc8ff",.25,.1,1.1],["#8cc8ff",.25,.12,1]]};
+  clear:[null,["#8cc8ff",.25,.1,.8],["#8cc8ff",.25,.1,1.1],null]};   /* the clear crystal's night is its own (r292 cn), not a colour */
 /* the purple stone's own mean colour in its four looks (measured on the renderer's frames), and the northern lights' own hue */
-var SRC=__SRC__,AURH=1.9;
+var SRC=__SRC__,AURH=1.9,CLEARN_G=1.15;
+/* Carpe Diem and Inkwell are named only in the master edition (the others carry neither app: rig/t_627_editions.js) */
+var MASTER=(function(){try{return typeof ING_EDITION==="undefined"||ING_EDITION==="master";}catch(e){return true;}})();
 var SAYF={purple:"Ingenium's own: <b>lavender</b>, the day <b>purple</b> and the <b>night stone</b>, as it has always been.",
-  sky:"The light <b>sky blue</b> of Carpe Diem's Inkwell sticky note, then a clear blue and a deep one; by night, <b>midnight blue</b>.",
+  sky:(MASTER?"The light <b>sky blue</b> of Carpe Diem's Inkwell sticky note":"A light <b>sky blue</b>")+", then a clear blue and a deep one; by night, <b>midnight blue</b>.",
   sapphire:"A soft cornflower, then <b>royal blue</b> and a deeper one; by night, <b>navy</b>.",
   aqua:"Aquamarine's <b>sea blue green</b>, light to deep; by night, <b>deep teal</b>.",
   emerald:"A pale green, then <b>emerald</b> and a deep one; by night, <b>forest green</b>.",
@@ -40,7 +47,7 @@ var SAYF={purple:"Ingenium's own: <b>lavender</b>, the day <b>purple</b> and the
   amber:"A light honey, then <b>amber</b> and cognac; by night, <b>dark cognac</b>.",
   rose:"A pale pink, then <b>rose</b> and a deep raspberry; by night, <b>plum rose</b>.",
   ruby:"A light coral red, then <b>ruby</b> and garnet; by night, <b>dark garnet</b>.",
-  clear:"The <b>clear crystal</b>, then silver smoke and graphite; by night, a <b>black diamond</b>.",
+  clear:"The <b>clear crystal</b>, then silver smoke and graphite; by night, a <b>black diamond</b>, its fire kept, under northern lights in <b>every colour</b>.",
   own:"Any colour you pick, in the same four shades, with a night shade of its own."};
 var JOLD={"#c8143c":"ruby","#e8649a":"rose","#e8962a":"amber","#e7cc3e":"citrine","#1f9d63":"emerald","#2fb7c7":"aqua","#2f5bd3":"sapphire"};
 var OLD={auto:["purple","auto"],clear:["clear","pastel"],lavender:["purple","pastel"],purple:["purple","medium"],night:["purple","deep"]};
@@ -72,8 +79,11 @@ function palOf(fam,own){return fam==="own"?ownPal(own):(PAL[fam]||null);}
 function medOf(fam,own){return fam==="purple"?"#7a4bd6":fam==="clear"?"#b8c4d6":fam==="own"?own:PAL[fam][1][0];}
 function famObj(fam,own){if(fam==="purple")return null;var t=palOf(fam,own);if(!t)return null;
   var s=t.map(function(x,i){return x?{h:[hueOf(SRC[i]),hueOf(x[0]),x[1],x[2]],g:x[3]}:null;});
+  /* the clear crystal's night: a black diamond (her words: "No I prefer the stone as a black diamond on Night mode, it is the best look for it
+     and its natural opposite"): colourless, its fire kept as it is (no hue gathered), its body deepened a little */
+  if(fam==="clear")s[3]={h:[0,0,1,1],g:CLEARN_G};
   var q=yqh(fam==="clear"?"#8cc8ff":medOf(fam,own)),C=Math.sqrt(q[1]*q[1]+q[2]*q[2]),m=rgb(medOf(fam,own));
-  return {s:s,cp:fam==="clear",aur:[AURH,Math.atan2(q[2],q[1]),.4,fam==="clear"?.45:Math.max(.3,Math.min(1,C/.3))],
+  return {s:s,cp:fam==="clear",cn:fam==="clear",aur:fam==="clear"?"spectrum":[AURH,Math.atan2(q[2],q[1]),.4,Math.max(.3,Math.min(1,C/.3))],
     halo:[Math.round(m[0]*.8)+","+Math.round(m[1]*.8)+","+Math.round(m[2]*.8),m.join(",")]};}
 var LASTLOOK=null,LASTLIGHT=null,LASTFAM=null;
 function apply(){var d=get(),G=W.IngDiamond;if(!G)return;
@@ -95,7 +105,7 @@ function paintSoon(){if(PAINTQ)return;PAINTQ=setTimeout(function(){PAINTQ=0;pain
 function srcImg(k){var im=SRCIMG[k];if(!im){im=SRCIMG[k]=new Image();im.addEventListener("load",paintSoon,{once:true});im.src=SPR.img["stone_"+k];}
   return im.complete&&im.naturalWidth?im:null;}
 function c255(v){v=Math.round(v*255);return v<0?0:v>255?255:v;}
-function shadeSrc(fam,own,i){if(fam==="purple")return SPR.img["stone_"+SKEY[i]];if(fam==="clear"&&i===0)return SPR.img.stone_clear;
+function shadeSrc(fam,own,i){if(fam==="purple")return SPR.img["stone_"+SKEY[i]];if(fam==="clear"&&i===0)return SPR.img.stone_clear;if(fam==="clear"&&i===3)return SPR.img.stone_clearN;
   var t=palOf(fam,own),x=t&&t[i];if(!x)return SPR.img["stone_"+SKEY[i]];var key=fam+"|"+(fam==="own"?own:"")+"|"+i;if(REC[key])return REC[key];
   var im=srcImg(SKEY[i]);if(!im)return SPR.img["stone_"+SKEY[i]];
   try{var c=D.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;var g=c.getContext("2d");g.drawImage(im,0,0);var id=g.getImageData(0,0,c.width,c.height),p=id.data;
@@ -127,7 +137,7 @@ function sayOf(d){var f=famName(d.fam),fl=d.fam==="own"?"your colour":d.fam==="c
     :"From 5:00 the <b>clear crystal</b>, from 11:00 "+fl+"'s <b>pastel</b>, from 14:00 its <b>medium</b>, from 18:00 its <b>deep</b> shade. With the night theme on, its <b>night</b> shade.";
   var one=d.fam==="purple"?{pastel:"<b>Lavender</b> all day.",medium:"The day <b>purple</b> all day.",deep:"The <b>night stone</b> by day, all day."}[d.shade]
     :"Its <b>"+shadeName(d.shade).toLowerCase()+"</b> shade all day.";
-  return (SAYF[d.fam]||"")+" "+(d.shade==="auto"?hour:one+" With the night theme on, its night shade shows instead, as a sticky note in Carpe Diem turns to its night paper.");}
+  return (SAYF[d.fam]||"")+" "+(d.shade==="auto"?hour:one+" With the night theme on, its night shade shows instead"+(MASTER?", as a sticky note in Carpe Diem turns to its night paper.":"."));}
 
 var SEQ=0,PANELS=[];
 /* one panel: painted from the settings whenever anything changes, so the head's and Settings' panels agree */
@@ -140,7 +150,7 @@ function panel(where){var id="dmc"+(++SEQ),p=mk("div","dmc");p.setAttribute("rol
   var s1=mk("div","dmc-sec"),l1=mk("div","dmc-l","The stone");l1.id=id+"s";s1.appendChild(l1);var ch=mk("div","dmc-chips dmc-fams");ch.setAttribute("role","radiogroup");ch.setAttribute("aria-labelledby",l1.id);
   var fk={};FAMS.forEach(function(F,ix){var b=mk("button","dmc-c");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-fam",F[0]);b.setAttribute("aria-label",F[1]);b.style.setProperty("--i",String(ix));
     var gw=mk("span","dmc-g"),g=mk("span");g.style.display="contents";gw.appendChild(g);b.appendChild(gw);b.appendChild(mk("span","dmc-n",F[1]));
-    b.addEventListener("click",function(){set({fam:F[0]});});ch.appendChild(b);fk[F[0]]={b:b,g:g};});
+    b.addEventListener("click",function(){set({fam:F[0]});toShades();});ch.appendChild(b);fk[F[0]]={b:b,g:g};});
   ch.classList.add("dmc-shelf");s1.appendChild(ch);
   /* her own colour: any colour, picked */
   var own=mk("div","dmc-own dmc-pick"),pa=mk("label","dmc-any");pa.title="Pick any colour";var pin=mk("input");pin.type="color";pin.setAttribute("aria-label","Pick any colour for the stone");
@@ -153,6 +163,9 @@ function panel(where){var id="dmc"+(++SEQ),p=mk("div","dmc");p.setAttribute("rol
     b.addEventListener("click",function(){set({shade:S[0]});});ch4.appendChild(b);sk[S[0]]={b:b,g:g};});
   var nb=mk("div","dmc-c dmc-night");nb.setAttribute("role","img");nb.style.setProperty("--i","7");var ngw=mk("span","dmc-g"),ng=mk("span");ng.style.display="contents";ngw.appendChild(ng);nb.appendChild(ngw);nb.appendChild(mk("span","dmc-n","At night"));ch4.appendChild(nb);
   ch4.classList.add("dmc-shelf");s4.appendChild(ch4);var note=mk("p","dmc-note");s4.appendChild(note);sc.appendChild(s4);
+  /* beside the diamond: a family chosen, the panel glides down until its shades are in view */
+  function toShades(){if(where!=="head")return;setTimeout(function(){try{var d=ch4.getBoundingClientRect().bottom-sc.getBoundingClientRect().bottom+30;
+    if(d>0)sc.scrollBy({top:d,behavior:stillNow()?"auto":"smooth"});}catch(e){}},60);}
   /* the holder's band */
   var s2=mk("div","dmc-sec"),l2=mk("div","dmc-l","The holder's band");l2.id=id+"b";s2.appendChild(l2);var ch2=mk("div","dmc-chips two");ch2.setAttribute("role","radiogroup");ch2.setAttribute("aria-labelledby",l2.id);
   var bv=mk("button","dmc-c");bv.type="button";bv.setAttribute("role","radio");bv.setAttribute("aria-label","Ingenium's violet");bv.style.setProperty("--i","1");bv.innerHTML='<span class="dmc-g">'+holderImg(null,1)+"</span>";bv.appendChild(mk("span","dmc-n","Ingenium's violet"));bv.addEventListener("click",function(){set({band:null});});
@@ -172,7 +185,7 @@ function panel(where){var id="dmc"+(++SEQ),p=mk("div","dmc");p.setAttribute("rol
     FAMS.forEach(function(F){fk[F[0]].b.setAttribute("aria-checked",String(d.fam===F[0]));});SHADES.forEach(function(S){sk[S[0]].b.setAttribute("aria-checked",String(d.shade===S[0]));});
     if(P.last!==key||force){P.last=key;setg.innerHTML=gemFor(d);if(d.shade==="auto")cycler(setg,hourList(d.fam,d.own));
       FAMS.forEach(function(F){var g=fk[F[0]].g;if(F[0]==="own"&&d.fam!=="own"){g.innerHTML=strip(shadeSrc("ruby",null,1),10);cycler(g,ANY);}
-        else g.innerHTML=strip(famSrc(F[0],d.own,d.shade),F[0]==="own"?10:FAMS.indexOf(F));});
+        else g.innerHTML=strip(famSrc(F[0],d.own,F[0]==="clear"&&d.shade==="auto"?"pastel":d.shade),F[0]==="own"?10:FAMS.indexOf(F));});
       SHADES.forEach(function(S,ix){var g=sk[S[0]].g;g.innerHTML=strip(famSrc(d.fam,d.own,S[0]==="auto"?"auto":S[0]),ix+2);if(S[0]==="auto")cycler(g,hourList(d.fam,d.own));});
       ng.innerHTML=strip(shadeSrc(d.fam,d.own,3),7);nb.setAttribute("aria-label","At night, with the night theme: "+famName(d.fam)+", its night shade");
       pw.innerHTML=strip(shadeSrc("own",d.own,1),11);bog.innerHTML=holderImg(d.band,3);}

@@ -404,7 +404,10 @@ deep purple colour of that the current crystal has for Night mode. I want for ev
 the diamond has a proper night mode look to match and accompany it if I choose to change the colour from purple to another colour. I want
 you to give the diamond, the same treatment as the sticky notes in that regard. Please make the necessary changes and continue working on
 my requests." And, while it was being made: "I also want the northern lights to change colours to better complement the new diamond
-colours when they are selected on the page, instead of only using the purple hues for every shade."
+colours when they are selected on the page, instead of only using the purple hues for every shade." And: "I also want the option to
+keep the clear crystal and have its own Night mode look. It should have the full colour spectrum for the Northern lights since that
+makes the most sense." Then: "No I prefer the stone as a black diamond on Night mode, it is the best look for it and its natural
+opposite."
 Carpe Diem's sticky notes (build/apps/builtin/cd.html.gz: STICKY_COLORS and the script cd-sn-night-paper) have six papers, each with a day
 colour and a night one of its own; her light blue is Inkwell, sky blue by day (#dcefff to #b6e0ff) and midnight blue by night.
 - `build/modules/r292.js`: IngDiamond.family(). A family is Ingenium's purple stone dressed in another colour: its four looks (lavender,
@@ -413,10 +416,14 @@ colour and a night one of its own; her light blue is Inkwell, sky blue by day (#
   light stays white and the fire still flickers), its chroma scaled and its brightness curved, one setting per shade; a plain turn of the
   colour wheel was tried first and turned the stone's bluish facets green (the cast she disliked in Aqua). The northern lights (the sky's
   own canvas, the sky drawn in the stone's canvas where that canvas is missing, and the lights mirrored in the holder's silver by night)
-  are gathered the same way toward the family's hue, their brightness kept. With no family set, neither step runs.
+  are gathered the same way toward the family's hue, their brightness kept. The clear crystal has a night of its own: by night a black
+  diamond (the night room without its violet, no violet laid over the stone, its body deepened a little, its fire kept) under northern
+  lights in every colour, the sky's own lights turned through the spectrum across its width and drifting slowly; by day its glows are the spectrum's too.
+  (In 7.29 and 7.30 the clear crystal turned into the purple night stone at night.) With no family set, none of it runs.
 - `build/modules/r314.js`: the stone is chosen as a family (Ingenium's purple, Sky blue, Sapphire, Aqua, Emerald, Citrine, Amber, Rose,
   Ruby, Clear crystal, Your own colour) and a shade (By the hour: from 5:00 the clear crystal, then pastel, medium and deep; Pastel;
-  Medium; Deep); the night theme shows the family's night shade by itself, shown beside the four as At night. Each family's settings were
+  Medium; Deep); the night theme shows the family's night shade by itself, shown beside the four as At night. The Clear crystal keeps
+  the clear crystal (its pastel, and By the hour's morning), then silver smoke and graphite, and by night a black diamond. Each family's settings were
   tuned on the renderer's own frames (source/build/aside/diamond_families: famsheet.py, palette.json). The panel's stones are the purple
   stone's frames (24 of each look, from the renderer: cap_purple.js, cut.py) recoloured in the page by the same sums, so each matches the
   diamond; a colour of her own gets its four shades and its night from its own hue, chroma and brightness. Choosing a family glides the

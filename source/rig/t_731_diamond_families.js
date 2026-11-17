@@ -13,6 +13,7 @@
 //   - Sky blue: the family reaches the diamond (IngDiamond.fam), the stone turns blue, the panel glides down to its shades; Pastel: the
 //     lavender look dressed in sky blue; the night theme: the stone is its night shade, deep and blue, and the northern lights turn from
 //     violet to blue (both measured on their pictures);
+//   - the Clear crystal: by night a black diamond (not the purple night stone) under northern lights in every colour;
 //   - her own colour, picked; the band and the light as before; kept, and opened again; Back to Ingenium's own; the settings 7.29 and 7.30
 //     kept are read as families and shades; Settings, Everyday; Show me on Adamas; a phone's width; no page error;
 //   - with a second page (7.30's) given: Ingenium's purple drawn pixel for pixel as 7.30 drew it (a still frame, Minimal motion, sparkles
@@ -26,6 +27,9 @@ const mean = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', MEAN, 
 /* the bright pixels' mean colour (the northern lights against the night sky) */
 const BRIGHT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150];n=max(1,len(px));print(",".join(str(round(sum(p[i] for p in px)/n,1)) for i in range(3))+","+str(len(px)))';
 const bright = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', BRIGHT, f]).toString().trim().split(',').map(Number);
+/* the bright pixels by their strongest channel (red, green, blue): northern lights in every colour show all three */
+const HUES = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");px=[p for p in im.getdata() if sum(p)>150];n=max(1,len(px));c=[0,0,0]\nfor p in px: c[p.index(max(p))]+=1\nprint(",".join(str(round(v/n,3)) for v in c)+","+str(len(px)))';
+const hues = f => cp.execFileSync('python3', ['-I', '-W', 'ignore', '-c', HUES, f]).toString().trim().split(',').map(Number);
 const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv[1]).convert("RGB");b=Image.open(sys.argv[2]).convert("RGB");print(sum(1 for p in ImageChops.difference(a,b).getdata() if max(p)>0) if a.size==b.size else -1)';
 (async () => {
   const b = await pw.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -100,6 +104,15 @@ const DIFF = 'import sys;from PIL import Image, ImageChops;a=Image.open(sys.argv
   await p.evaluate(() => IngDiamondColours.set({ fam: 'purple' })); const purpleNight = await stoneShot('stone_4_purple_night'); const auPurple = await skyShot('lights_purple_night');
   ok(skyNight[2] > skyNight[0] + 8 && (skyNight[0] + skyNight[1] + skyNight[2]) < (pastel[0] + pastel[1] + pastel[2]), 'with the night theme, Sky blue shows its night shade: deep and blue', { night: skyNight, pastel });
   ok(auSky[3] > 50 && auPurple[3] > 50 && auSky[2] > auSky[0] + 20 && auPurple[0] > auSky[0] + 20, 'the northern lights take the stone\'s colour: blue for Sky blue, violet for Ingenium\'s purple (bright pixels, measured)', { sky: auSky, purple: auPurple });
+  // the clear crystal's own night (her words: "I also want the option to keep the clear crystal and have its own Night mode look. It should
+  // have the full colour spectrum for the Northern lights since that makes the most sense"; then "No I prefer the stone as a black diamond on
+  // Night mode, it is the best look for it and its natural opposite")
+  await p.evaluate(() => IngDiamondColours.set({ fam: 'clear', shade: 'pastel' })); const clearNight = await stoneShot('stone_5_clear_night'); await skyShot('lights_clear_night');
+  const hc = hues(path.join(OUT, 'lights_clear_night.png')), hp = hues(path.join(OUT, 'lights_purple_night.png')), cf = await p.evaluate(() => { const f = IngDiamond.fam(); return f && { cn: f.cn, aur: f.aur, look: IngDiamond.look() }; });
+  const spread = Math.max(...clearNight.slice(0, 3)) - Math.min(...clearNight.slice(0, 3));
+  ok(cf && cf.cn === true && cf.aur === 'spectrum' && spread < 14 && Math.abs(clearNight[2] - purpleNight[2]) + Math.abs(clearNight[0] - purpleNight[0]) > 4,
+    'the Clear crystal turns to a black diamond at night: colourless, not the purple night stone (its picture, measured)', { clear: clearNight, purple: purpleNight, fam: cf });
+  ok(hc[3] > 50 && hc[0] > 0.1 && hc[1] > 0.1 && hc[2] > 0.1 && hp[1] < 0.05, 'its northern lights run through every colour: red, green and blue all lead somewhere (Ingenium\'s purple: hardly any green)', { clear: hc, purple: hp });
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await p.waitForTimeout(600);
   // her own colour, the band and the light
   await p.evaluate(() => IngDiamondColours.open()); await p.waitForTimeout(900);
