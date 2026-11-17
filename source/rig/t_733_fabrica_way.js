@@ -28,7 +28,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Tide Clock/.test(x.textContent)); if (t) t.click(); });
   await p.waitForTimeout(2000);
   /* an open issue, through Fabrica's own record */
-  await p.evaluate(async () => { const r = fbHubHost.cur(); const rec = await fbHub.live(r.id); rec.issues.push({ n: rec.next++, title: 'The tide is an hour late in March', state: 'open', body: '', made: Date.now(), talk: [], labels: [], people: [] }); fbHub.keep(rec); });
+  await p.evaluate(async () => { const r = fbHubHost.cur(); const rec = await fbHub.live(r.id); rec.issues.push({ n: rec.next++, kind: 'issue', title: 'The tide is an hour late in March', body: '', state: 'open', labels: [], created: Date.now(), updated: Date.now(), by: 'Me', comments: [], events: [], refs: [], people: [] });  /* as Fabrica's own newItem makes one */ fbHub.keep(rec); });
   await p.waitForTimeout(3500); await p.evaluate(() => IngRuns.nav('changes')); await p.waitForTimeout(1500);
   const w = await p.evaluate(() => { const b = document.querySelector('#fb .r315-path'); return b && { crumbs: [...b.querySelectorAll('.r315-crumb')].map(x => x.textContent), gh: (b.querySelector('.r315-gh') || {}).textContent, next: (document.querySelector('#fb .r315-next strong') || {}).textContent,
     counts: Object.fromEntries([...document.querySelectorAll('#fb .fr-room')].map(x => [x.getAttribute('data-room'), (x.querySelector('.r315-n') || {}).textContent || ''])), title: (document.querySelector('#fb .fr-room[data-room="plans"]') || {}).title }; });
@@ -72,7 +72,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     const z = await h.evaluate(e => ({ t: getComputedStyle(e).transform, s: getComputedStyle(e).boxShadow, c: getComputedStyle(e).cursor, text: e.textContent.trim() })); return { before: a, after: z.t, shadow: z.s !== 'none', cursor: z.c, text: z.text }; };
   const kept = await chipLift('#fb .f-libk2'), wait = await p.evaluate(() => { const c = [...document.querySelectorAll('#fbShip .f-chip')].find(x => x.offsetParent); if (c) c.setAttribute('data-t733', 'ship'); return !!c; }) && await chipLift('#fbShip .f-chip[data-t733="ship"]');
   const notk = await p.evaluate(() => { const c = [...document.querySelectorAll('#fbWork .f-chip')].find(x => x.offsetParent && !x.closest('#fbWorkBody')); if (c) c.setAttribute('data-t733', 'work'); return !!c; }) && await chipLift('#fbWork .f-chip[data-t733="work"]');
-  ok([kept, wait, notk].every(x => x && x.before !== x.after && x.shadow && x.cursor === 'pointer'), 'the chips "kept here", "Waiting" (or the test\'s word) and "not kept" are raised keys that lift under the pointer', { kept, wait, notk });
+  ok([kept, wait, notk].every(x => x && x.before !== x.after && x.shadow && x.cursor === 'pointer'), 'the chips "kept here", "Waiting" (or the test\'s word) and "not kept" keep their look and lift under the pointer', { kept, wait, notk });
   await p.click('#fbWork .f-chip[data-t733="work"]'); await p.waitForTimeout(900);
   const c1 = await p.evaluate(() => fbHubHost.S.view);
   await p.click('#fbShip .f-chip[data-t733="ship"]'); await p.waitForTimeout(900);
@@ -80,10 +80,10 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(c1 === 'changes' && (c2.part === 'test' || c2.glow), 'pressed: the app\'s chip opens Changes; the test\'s chip opens Test and lights its key', { c1, c2 });
   /* the fold keys */
   const fold = await p.$('#fb .f-fold'); await p.mouse.move(2, 2); await p.waitForTimeout(300);
-  const f0 = await fold.evaluate(e => ({ bg: getComputedStyle(e).backgroundImage, t: getComputedStyle(e).transform }));
+  const f0 = await fold.evaluate(e => ({ bg: getComputedStyle(e).backgroundImage, t: getComputedStyle(e).transform, s: getComputedStyle(e).boxShadow }));
   await fold.hover(); await p.waitForTimeout(400);
   const f1 = await fold.evaluate(e => ({ bg: getComputedStyle(e).backgroundImage, bgc: getComputedStyle(e).backgroundColor, t: getComputedStyle(e).transform, s: getComputedStyle(e).boxShadow }));
-  ok(f1.t !== f0.t && /linear-gradient\(rgb\(255, 255, 255\)/.test(f1.bg) && !/rgba?\(1[0-2]\d, [4-9]\d, 1[89]\d/.test(f1.bgc) && /0px 3px 0px/.test(f1.s), 'the fold keys: the raised key, lifting under the pointer, no violet wash', { f0, f1 });
+  ok(f1.t !== f0.t && /linear-gradient\(rgb\(255, 255, 255\)/.test(f1.bg) && !/rgba?\(1[0-2]\d, [4-9]\d, 1[89]\d/.test(f1.bgc) && /0px 3px 0px/.test(f1.s), 'the fold keys: as they were at rest; under the pointer the raised key pops out and lifts, no violet wash', { f0, f1 });
   /* every kind surveyed, in every room */
   const rooms = { now: ['changes', 'files', 'code'], story: ['history', 'compare', 'releases'], plans: ['ideas', 'issues', 'pulls', 'projects', 'wiki'], runs: ['runs', 'workflows', 'machines'], care: ['actions', 'insights', 'settings'] };
   const LEAVE = /^(SECTION\.skh|DIV\.f-pn-h|DIV\.f-seg|DIV\.fr-parts|DIV\.f-steps|SPAN\.r315-n|SPAN\.tick|SPAN\.m|SPAN\.id|SPAN\.h-id|SPAN\.ic|SPAN\.f-ls|SPAN\.fr-chev|DIV\.r315-|SPAN\.r315-|BUTTON\.r315-|P\.f-hint)/;

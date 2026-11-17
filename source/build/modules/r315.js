@@ -30,14 +30,14 @@ body[data-theme="night"] #fb{--r315-key:linear-gradient(180deg,#352a4b,#271f37);
 /* ---------- 1. nothing stiff ---------- */
 #fb .f-chip,#fb .f-fold,#fb .f-repo,#fb .fr-room,#fb .fr-part,#fb .f-seg button,#fb .fr-cmh,#fb .h-line,#fb .h-box,#fb .h-stat,#fb .h-colm,#fb .h-dblk,#fb .f-diff,
 #fb .r298-mc,#fb .f-pkg,#fb .r280-ans,#fb .fr-fh,#fb .f-libk,#fb .h-grow,#fb select,#fb .f-pn,.sks .sks-step,#fb .r315-tile{transition:transform .26s cubic-bezier(.2,.9,.25,1.2),box-shadow .26s ease,border-color .2s,color .2s,background-color .2s}
-/* the chips: small raised keys that lift */
-#fb .f-chip{background:var(--r315-key);border:1px solid var(--r315-bd);box-shadow:var(--r315-sh);cursor:pointer}
-#fb .f-chip:hover{transform:translateY(-2px);box-shadow:var(--r315-hi)}
-#fb .f-chip:active{transform:translateY(1px);box-shadow:var(--r315-dn)}
-#fb .f-chip.ok,#fb .f-chip.warn,#fb .f-chip.bad,#fb .f-chip.live{background-image:none}
-/* the fold keys: no violet wash; the raised key, lifting and turning a little */
-#fb .f-fold{background:var(--r315-key)!important;border:1px solid var(--r315-bd)!important;box-shadow:var(--r315-sh)!important;color:var(--r315-ink2)!important}
-#fb .f-fold:hover{background:var(--r315-key)!important;transform:translateY(-2px);box-shadow:var(--r315-hi)!important;color:var(--r315-ink)!important}
+/* her words: "I also didn't want the Kept and Waiting buttons and the other buttons to have a different look and design, I just wanted
+   them to animate when I hover over it": every part keeps its own look at rest; under the pointer it lifts, and sinks when pressed */
+#fb .f-chip{cursor:pointer}
+#fb .f-chip:hover{transform:translateY(-2px);box-shadow:0 3px 0 rgba(40,22,68,.14),0 6px 12px rgba(40,22,68,.14)}
+#fb .f-chip:active{transform:translateY(1px);box-shadow:none}
+/* the fold keys: as they were at rest (her words: "I only want the collapsible buttons of Fabrica's panel to pop out when I hover it with
+   my mouse and not while they are at rest"); under the pointer, no violet wash but the raised key, popping out and lifting */
+#fb .f-fold:hover,#fb .f-fold:focus-visible{background:var(--r315-key)!important;border-color:var(--r315-bd)!important;transform:translateY(-2px);box-shadow:var(--r315-hi)!important;color:var(--r315-ink)!important}
 #fb .f-fold:hover svg,#fb .f-fold:hover i{transform:translateX(-1px)}
 #fb .f-fold:active{transform:translateY(1px);box-shadow:var(--r315-dn)!important}
 /* the app cards lift and grow; the chosen one too */
@@ -51,7 +51,6 @@ body[data-theme="night"] #fb{--r315-key:linear-gradient(180deg,#352a4b,#271f37);
 #fb .fr-room:active,#fb .fr-part:active{transform:translateY(1px)}
 #fb .f-seg button:not([aria-selected="true"]):not(.on):hover{transform:translateY(-1px);color:var(--r315-ink)}
 /* cards, tiles, rows, columns and blocks: raised, lifting under the pointer */
-#fb .h-box,#fb .h-stat,#fb .r298-mc,#fb .f-pkg,#fb .r280-ans,#fb .h-colm{box-shadow:var(--r315-card)}
 #fb .h-box:hover,#fb .h-stat:hover,#fb .r298-mc:hover,#fb .f-pkg:hover,#fb .r280-ans:hover,#fb .h-colm:hover{transform:translateY(-3px);box-shadow:var(--r315-cardhi)}
 #fb .h-stat:hover{transform:translateY(-3px) scale(1.02)}
 #fb .fr-cmh:hover,#fb .h-line:hover{transform:translateX(3px);box-shadow:var(--r315-cardhi)}
@@ -72,8 +71,8 @@ body[data-theme="night"] #fb .f-pn:hover{box-shadow:0 2px 0 rgba(0,0,0,.45),0 20
 #fb .f-checks li:hover,#fb .f-tests li:hover,#fb .r315-row:hover{transform:translateX(3px);background-color:var(--r315-soft)}
 /* the quiet keys, the hints, the checks' rows and the steps' ticks answer too */
 #fb .f-btn.quiet,#fb .fp-hint,#fb :is(li,div):has(> .m),.sks .tick{transition:transform .22s cubic-bezier(.2,.9,.25,1.2),box-shadow .22s ease,background-color .2s,color .2s}
-#fb .f-btn.quiet:hover{transform:translateY(-2px);box-shadow:var(--r315-hi);background:var(--r315-key);color:var(--r315-ink)}
-#fb .f-btn.quiet:active{transform:translateY(1px);box-shadow:var(--r315-dn)}
+#fb .f-btn.quiet:hover:not(:disabled){transform:translateY(-2px)}   /* its own look kept (the underline, modules/r112.js); it lifts */
+#fb .f-btn.quiet:active:not(:disabled){transform:translateY(1px)}
 #fb .fp-hint:hover{transform:translateY(-2px);box-shadow:var(--r315-card)}
 #fb :is(li,div):has(> .m){border-radius:10px}
 #fb :is(li,div):has(> .m):hover{transform:translateX(3px);background-color:var(--r315-soft)}
