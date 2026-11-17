@@ -395,7 +395,8 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them; Adamas in two tabs, its code and its page given the window's height.
+Ingenium 7.27 (17 November 2026): the scenes rest when nobody watches them; Adamas in two tabs, its code and its page given the window's height;
+Chat and Code send their apps to Fabrica and Adamas, and Code opens Fabrica's apps.
 Her words (17 November 2026): "The diamond on Adamas' page is still overheats my computer and my fan is still loud, not as much as before
 but it is loud, the same for the Vesta page and Lector and Fabrica."
 Measured in Chrome at 1440 by 900, Retina sharpness, the WebGL drawing skipped and counted (rig/t_727_rest.js, rig/t_727_paint.js); WebKit,
@@ -443,6 +444,25 @@ collapsible from view instead of being a really long list."
   Adamas's head goes above the tabs when they are there first.
 - rig: `t_727_adamas.js` (new, 19 checks: the tabs under the head, each card in its tab, the widths of 3.4, the row's height, the kits'
   tab, the parted names, the tab kept, the kits' choice from elsewhere, the diamond in its head, no page error).
+Her words (16 November 2026): "I want to be able to send the apps that I am working on straight from Ingeniun's chat or coding to Fabrica
+or Adamas so that I can commit and ship it as an app. I want the option to connect a repository from GitHub the same way that I do on Claude
+but I also want to be able to connect to Fabrica's repositories as well and have it built into Ingenium. I want Ingenium to wort as one
+ecosystem and have it all be integrated seamlessly to facilitate working on the app and further enhance its overall performance."
+- Found (read in the code): Chat's app card had Run, Save page and Make it an app (to Adamas), nothing to Fabrica; Code's start window
+  offered a new app, a file, a folder, the app library and From GitHub (r219, 6.13), not Fabrica's own repositories; Fabrica opened an
+  app in Code (r112 openInCode, linked both ways), but what Code changed went back only when Fabrica was opened on that app again, and Code
+  had no key to send it; Adamas kept a Fabrica page with its Keep in Fabrica.
+- `build/modules/r312.js` (new), with Ingenium's own parts only (her word of 17 November: no new design): Chat's app card has Keep in
+  Fabrica after Make it an app, with Fabrica's mark; a sheet asks where (a new app, named from the page's title, or a new version of an
+  app there; an app of the same name, or the app the work is linked to, chosen first) and in a few words what the version is; Keep it
+  makes the version (a commit) and offers Ship it (Fabrica, that app, its Ship part), Open in Fabrica and Make it an app (Adamas, linked
+  back). Code's start window has From Fabrica after From GitHub: an app in Fabrica opened as Fabrica's Open it in Code does. A Code
+  session on an app has Keep in Fabrica and Make it an app among its keys: Keep in Fabrica sends the files that changed to the app it is
+  linked to (or makes a new app and links it); Make it an app opens its page in Adamas, or, for an app of several files, keeps it in
+  Fabrica to ship from there. Chat's + menu has One of your apps in Fabrica: an app's page goes with the next message. Only where
+  Fabrica is; nothing leaves the device. `build/modules/r112.js` lends Fabrica's openInCode (window.fbOpenInCode).
+- Not done: a GitHub session in Code keeping a copy in Fabrica too; opening an app in Code still reads all its files.
+- rig: `t_727_workshop.js` (new, 15 checks, an invented app).
 
 Ingenium 7.26 (16 November 2026): Fabrica asks under what name, every time, in every edition.
 Her words (16 November 2026): "I want for Fabrica to still ask me for the copyrights and publishing name even on my master edition, I want the

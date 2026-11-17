@@ -1391,7 +1391,7 @@ try{new MutationObserver(function(){if($("fb")&&$("page-fabrica").classList.cont
 /* the engine's author line: her name on every version */
 try{var nm=(state&&state.profile&&state.profile.name)||(state&&state.userName)||"";if(nm)IngRepo.setAuthor({name:nm});}catch(e){}
 try{if($("page-fabrica").classList.contains("active")){document.body.classList.add("fb-on");render();}}catch(e){}
-window.fbRender=render;window.fbSync=syncFromCode;
+window.fbRender=render;window.fbSync=syncFromCode;window.fbOpenInCode=openInCode;/* 7.27: Code's From Fabrica opens an app as Fabrica does (modules/r312.js) */
 /* 6.1 · what R140 (GitHub's own views) works with */
 window.fbHubHost={S:S,C:C,cur:cur,FBS:FBS,saveSoon:saveSoon,h:h,esc:esc,btn:btn,kb:kb,when:when,toast:toast,fail:fail,sheet:sheet,sheetName:sheetName,busy:busy,unbusy:unbusy,
   refresh:refresh,paint:paint,paintWork:paintWork,thumbs:thumbs,diffList:diffList,openEditor:openEditor,saveBytes:saveBytes,mimeOf:mimeOf,notesOf:notesOf,statusOf:statusOf,setPanel:setPanel,one:one,
