@@ -1,0 +1,288 @@
+<title>iPhone Four Ways</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Fabrica's Test and ship panel as it is (left), and the iPhone card's new sheet beside it (right); one column on a phone.
+   Every value below is Ingenium's own, read from the 7.34 page (day and night). */
+:root{
+  --bg:#f5f3f7; --panel:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --ok:#2f7a55; --warn:#9a5a12;
+  --card-bg:linear-gradient(#ffffff,#f9f7fc); --card-line:rgba(34,26,46,.1); --card-on:rgba(106,63,181,.5);
+  --card-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --card-hi:0 2px 0 rgba(60,40,100,.08),0 12px 24px rgba(70,44,130,.16);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc); --key-line:rgba(34,26,46,.1);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #3a2070,0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16);
+  --chip-sh:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1.5px 0 rgba(40,20,70,.1),0 1px 0 rgba(40,20,70,.12),0 3px 4px rgba(40,20,70,.09),0 7px 10px rgba(40,20,70,.06);
+  --panel-sh:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 rgba(40,22,68,.1),0 3px 0 rgba(40,22,68,.05),0 6px 12px rgba(40,22,68,.07),0 18px 36px rgba(40,22,68,.08);
+  --sheet-sh:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -2px 0 rgba(40,22,68,.06),0 0 0 1px rgba(107,79,160,.1),0 2px 0 rgba(40,22,68,.12),0 6px 0 rgba(40,22,68,.05),0 14px 26px rgba(40,22,68,.16),0 34px 70px rgba(40,22,68,.22);
+  --well:#f6f3fa; --ok-soft:rgba(47,122,85,.1); --warn-soft:rgba(154,90,18,.1);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --panel:#201a2b; --ink1:#f3eefb; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a;
+  --card-bg:linear-gradient(#2a2239,#251e33); --card-line:rgba(205,184,240,.11); --card-on:rgba(183,156,230,.45);
+  --card-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --card-hi:0 2px 0 rgba(0,0,0,.45),0 14px 28px rgba(0,0,0,.45);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-line:rgba(205,184,240,.11);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --chip-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
+  --panel-sh:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
+  --sheet-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.4),0 0 0 1px rgba(205,184,240,.14),0 2px 0 rgba(0,0,0,.7),0 6px 0 rgba(0,0,0,.35),0 14px 26px rgba(0,0,0,.5),0 34px 70px rgba(0,0,0,.55);
+  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --panel:#201a2b; --ink1:#f3eefb; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a;
+  --card-bg:linear-gradient(#2a2239,#251e33); --card-line:rgba(205,184,240,.11); --card-on:rgba(183,156,230,.45);
+  --card-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --card-hi:0 2px 0 rgba(0,0,0,.45),0 14px 28px rgba(0,0,0,.45);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-line:rgba(205,184,240,.11);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 #170b30,0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --chip-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
+  --panel-sh:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
+  --sheet-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.4),0 0 0 1px rgba(205,184,240,.14),0 2px 0 rgba(0,0,0,.7),0 6px 0 rgba(0,0,0,.35),0 14px 26px rgba(0,0,0,.5),0 34px 70px rgba(0,0,0,.55);
+  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12); color-scheme:dark}
+
+/* no scroll bar in view, scrolling kept */
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink1);font:14px/1.5 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.top h1{font:600 22px/1.2 var(--serif);margin:0;text-wrap:balance}
+.top p{margin:4px 0 0;color:var(--ink2);max-width:62ch}
+.stage{display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:minmax(0,1fr)}}
+
+/* the keys, Ingenium's own */
+button{font:inherit;color:inherit;cursor:pointer}
+.key{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--key-line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);
+  font:600 12.5px/1.3 var(--sans);padding:5px 11px;border-radius:999px;white-space:nowrap;transition:transform .16s var(--bounce),box-shadow .16s;animation:rise .32s var(--spring) backwards}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.key:active{transform:translateY(1px);box-shadow:inset 0 1px 2px rgba(40,22,68,.2)}
+.key.pri{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff;border-radius:10px;padding:7px 13px;font-size:13px}
+.key.pri:hover{transform:translateY(-2px);box-shadow:var(--pri-sh),0 10px 18px rgba(40,22,68,.22)}
+.key.quiet{background:none;border-color:transparent;box-shadow:none;color:var(--acc);padding:5px 10px}
+.key.quiet:hover{background:var(--key-bg);border-color:var(--key-line);box-shadow:var(--key-sh);transform:translateY(-2px)}
+.key:focus-visible,.tg:focus-visible,.way-h:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;font:600 11px/1.4 var(--sans);padding:2px 8px;border-radius:999px;border:1px solid var(--key-line);background:var(--key-bg);box-shadow:var(--chip-sh);color:var(--ink2);white-space:nowrap;transition:transform .26s var(--spring)}
+.chip:hover{transform:translateY(-1.5px)}
+.chip.ok{color:var(--ok)} .chip.warn{color:var(--warn)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+
+/* the panel: Test and ship, its Ship part, as it is */
+.panel{background:var(--panel);border:1px solid var(--card-line);border-radius:18px;box-shadow:var(--panel-sh);padding:16px 14px 14px;transition:transform .26s var(--spring),box-shadow .26s}
+.panel:hover{transform:translateY(-2px)}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ph h2{font:600 17px/1.2 var(--serif);margin:0}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--well);border:1px solid var(--card-line);margin:12px 0 10px;width:max-content;max-width:100%}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:999px;font:600 13px/1.2 var(--sans);color:var(--ink2);transition:transform .2s var(--spring)}
+.seg button:hover{transform:translateY(-1.5px)}
+.seg button[aria-selected="true"]{background:var(--pri-bg);color:#fff;box-shadow:var(--pri-sh)}
+.sh3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sh3 h3{font:600 15px/1.2 var(--serif);margin:0}
+.lede{color:var(--ink2);font-size:13px;margin:8px 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+.tg{position:relative;border:1px solid var(--card-line);background:var(--card-bg);box-shadow:var(--card-sh);border-radius:12px;padding:10px 11px 42px;
+  transition:transform .18s var(--bounce),box-shadow .18s,border-color .2s;animation:rise .34s var(--spring) backwards}
+.tg:hover{transform:translateY(-3px) scale(1.012);box-shadow:var(--card-sh),var(--card-hi)}
+.tg[aria-pressed="true"]{border-color:var(--card-on);box-shadow:var(--card-sh),inset 0 0 0 1px var(--card-on)}
+.tg .t{display:flex;align-items:flex-start;gap:7px}
+.tg svg{flex:0 0 20px;width:20px;height:20px;color:var(--acc);margin-top:1px}
+.tg b{font:600 14px/1.3 var(--sans);flex:1;min-width:0}
+.tg .tick{flex:0 0 20px;height:20px;border-radius:6px;border:1px solid var(--card-line);background:var(--well);display:grid;place-items:center;font-size:12px;color:transparent}
+.tg[aria-pressed="true"] .tick{background:var(--pri-bg);color:#fff;border-color:var(--pri-line)}
+.tg small{display:block;color:var(--ink2);font-size:12.5px;line-height:1.45;margin-top:5px}
+.tg .foot{margin-top:8px;display:flex;justify-content:center}
+.tg .mk{position:absolute;right:8px;bottom:6px}
+.tg.new{border-color:var(--card-on)}
+.tg.new::after{content:"Changed";position:absolute;top:-9px;right:12px;font:700 10px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--pri-bg);padding:4px 7px;border-radius:999px;box-shadow:var(--pri-sh)}
+.glow{animation:glow 1.4s ease-out 1}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(106,63,181,.45),var(--sheet-sh)}100%{box-shadow:0 0 0 16px rgba(106,63,181,0),var(--sheet-sh)}}
+
+/* the sheet: Fabrica's own */
+.sheet{background:var(--panel);border-radius:16px;box-shadow:var(--sheet-sh);padding:16px 18px 18px;transition:transform .26s var(--spring);animation:rise .4s var(--spring) backwards}
+.sheet h3{font:600 18px/1.25 var(--serif);margin:0 30px 4px 0;text-wrap:balance}
+.sheet > p{color:var(--ink2);font-size:13.5px;margin:0 0 12px;max-width:68ch}
+.ways{display:flex;flex-direction:column;gap:10px}
+.way{border:1px solid var(--card-line);background:var(--card-bg);box-shadow:var(--card-sh);border-radius:12px;transition:transform .18s var(--bounce),box-shadow .18s,border-color .2s;animation:rise .36s var(--spring) backwards}
+.way:nth-child(2){animation-delay:.05s}.way:nth-child(3){animation-delay:.1s}.way:nth-child(4){animation-delay:.15s}
+.way:hover{transform:translateY(-2px);box-shadow:var(--card-sh),var(--card-hi)}
+.way[aria-expanded="true"]{border-color:var(--card-on)}
+.way-h{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:11px 12px;border-radius:12px}
+.way-h .ic{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--key-bg);border:1px solid var(--key-line);box-shadow:var(--chip-sh);color:var(--acc);transition:transform .3s var(--spring)}
+.way-h:hover .ic{transform:rotate(-6deg) scale(1.06)}
+.way-h .ic svg{width:19px;height:19px}
+.way-h .tx{flex:1;min-width:0}
+.way-h .tx b{display:block;font:600 14.5px/1.3 var(--sans)}
+.way-h .tx span{display:block;font-size:12.5px;color:var(--ink2);line-height:1.4}
+.way-h .chev{flex:0 0 auto;color:var(--ink3);transition:transform .25s var(--spring)}
+.way[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.way-b{padding:0 12px 12px 56px;display:flex;flex-direction:column;gap:10px}
+@media (max-width:520px){.way-b{padding-left:12px}}
+.opt{border:1px solid var(--card-line);border-radius:10px;background:var(--well);padding:10px 11px;display:flex;flex-direction:column;gap:7px;transition:transform .2s var(--spring),box-shadow .2s}
+.opt:hover{transform:translateY(-1.5px);box-shadow:var(--card-hi)}
+.opt .oh{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.opt .oh b{font:600 13.5px/1.3 var(--sans)}
+.opt p{margin:0;color:var(--ink2);font-size:12.5px;line-height:1.5}
+.opt ol{margin:0;padding-left:18px;color:var(--ink2);font-size:12.5px;line-height:1.55}
+.opt ol li::marker{color:var(--acc);font-weight:700}
+.keys{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dev{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;background:var(--panel);border:1px solid var(--card-line);transition:transform .2s var(--spring)}
+.dev:hover{transform:translateX(3px)}
+.dev b{font:600 13px/1.2 var(--sans);flex:1;min-width:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+.dot.off{background:var(--ink3);box-shadow:0 0 0 3px var(--well)}
+.addr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.addr code{font:600 12.5px/1.4 var(--mono);color:var(--ink1);background:var(--panel);border:1px solid var(--card-line);border-radius:8px;padding:6px 8px;overflow-wrap:anywhere;min-width:0}
+.qr{width:96px;height:96px;border-radius:10px;background:#fff;padding:6px;border:1px solid var(--card-line);box-shadow:var(--chip-sh);flex:0 0 auto;transition:transform .25s var(--spring)}
+.qr:hover{transform:scale(1.05) rotate(-2deg)}
+.qr svg{width:100%;height:100%;display:block}
+.facts{display:flex;gap:6px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--ink3);margin:0}
+.mark{font:600 10.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--panel);color:var(--ink1);border:1px solid var(--card-line);box-shadow:var(--key-hi);border-radius:12px;padding:9px 14px;font-weight:600;transition:all .3s var(--spring);pointer-events:none;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.ex{font-size:12px;color:var(--ink3)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Your app on the iPhone and iPad, four ways</h1>
+      <p>A live preview for Fabrica's Ship part. Only the iPhone card changes; the other cards stay as they are. Its key opens the sheet on the right. The app, devices and addresses are examples.</p>
+    </div>
+    <button class="key" id="themeKey" type="button">Night</button>
+  </div>
+
+  <div class="stage">
+    <!-- Fabrica's Test and ship panel, its Ship part -->
+    <section class="panel" aria-label="Test and ship">
+      <div class="ph"><h2>Test and ship</h2><span class="chip">Waiting</span></div>
+      <div class="seg" role="tablist"><button role="tab" type="button" aria-selected="false">Test</button><button role="tab" type="button" aria-selected="true">Ship</button><button role="tab" type="button" aria-selected="false">Copies</button><button role="tab" type="button" aria-selected="false">Ingenium</button></div>
+      <div class="sh3"><h3>Ship to your devices</h3><span class="chip">After its test</span></div>
+      <p class="lede">Made here, in seconds, with nothing to install. Each is kept under Releases, on its device's row.</p>
+      <div class="grid">
+        <div class="tg" role="button" tabindex="0" aria-pressed="true"><div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10 18.5h4"/><path d="M9 8.5l3 3 3-3M12 11.5V5.5"/></svg><b>Android app (APK)</b><span class="tick">✓</span></div><small>For the Fire tablet and any Android device: signed here, it installs as it is</small><div class="foot"><span class="chip">After its test</span></div><button class="key quiet mk" type="button" data-say="Made and saved under Releases (an example).">Make and save</button></div>
+        <div class="tg new" role="button" tabindex="0" aria-pressed="false" id="iphoneCard"><div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="5.5" y="2.5" width="13" height="19" rx="3"/><path d="M10.5 5.3h3"/><circle cx="12" cy="18.2" r=".9"/></svg><b>iPhone and iPad</b><span class="tick">✓</span></div><small>Four ways: inside Ingenium, on the Home Screen, or as an app of its own with your Apple ID or a developer account</small><div class="foot"><span class="chip">After its test</span></div><button class="key quiet mk" type="button" id="chooseKey">Choose a way</button></div>
+        <div class="tg" role="button" tabindex="0" aria-pressed="false"><div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="4.5" width="16" height="11" rx="1.6"/><path d="M2 19.5h20M9.5 19.5l.6-2h3.8l.6 2"/></svg><b>Mac app</b><span class="tick">✓</span></div><small>For a MacBook or a Mac mini (Apple silicon and Intel in one)</small><div class="foot"><span class="chip">After its test</span></div><button class="key quiet mk" type="button" data-say="Made and saved under Releases (an example).">Make and save</button></div>
+        <div class="tg" role="button" tabindex="0" aria-pressed="false"><div class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="4" width="18" height="15" rx="1.8"/><path d="M3 8h18M6 6h.01M8.5 6h.01"/></svg><b>Windows app</b><span class="tick">✓</span></div><small>For a Windows 10 or 11 PC: its own installer</small><div class="foot"><span class="chip">After its test</span></div><button class="key quiet mk" type="button" data-say="Made and saved under Releases (an example).">Make and save</button></div>
+      </div>
+    </section>
+
+    <!-- the iPhone card's sheet -->
+    <section class="sheet" id="sheet" aria-labelledby="sheetH">
+      <h3 id="sheetH">Tide Clock on your iPhone and iPad</h3>
+      <p>Four ways. The first two need nothing from Apple. The last two make an app of its own, with its own icon, signed with an Apple ID.</p>
+      <div class="ways" id="ways">
+
+        <div class="way" aria-expanded="true">
+          <button class="way-h" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l7.5 4.3v9.8L12 21.2l-7.5-4.3V7.1z"/><path d="M8.5 12l2.4 2.4 4.6-4.8"/></svg></span>
+            <span class="tx"><b>Inside Ingenium</b><span>It opens in Ingenium's app library, on any iPhone or iPad with Ingenium. Nothing to install.</span></span><span class="chip ok">Nothing from Apple</span><span class="chev">›</span></button>
+          <div class="way-b">
+            <div class="opt"><div class="oh"><b>Send to my devices</b><span class="chip">Paired on Wi-Fi</span></div>
+              <p>Your devices paired with this computer, as for lending models. The app goes to Ingenium there and stays, offline too.</p>
+              <div class="dev"><span class="dot"></span><b>iPhone</b><span class="ex">Ready</span><button class="key sm" type="button" data-say="Sent: Tide Clock is in Ingenium on the iPhone (an example).">Send</button></div>
+              <div class="dev"><span class="dot off"></span><b>iPad</b><span class="ex">Asleep</span><button class="key sm" type="button" data-say="It will go when the iPad wakes (an example).">Send when it wakes</button></div>
+            </div>
+            <div class="opt"><div class="oh"><b>Or as a file</b><span class="chip">Anywhere</span></div>
+              <p>One file with the whole app. Send it by AirDrop, Messages or Files, then open it with Ingenium: Your apps, Add from a file.</p>
+              <div class="keys"><button class="key" type="button" data-say="Made: Tide Clock.html, kept under Releases (an example).">Make the file</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="way" aria-expanded="false">
+          <button class="way-h" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><rect x="7.5" y="6.5" width="3.5" height="3.5" rx="1"/><rect x="13" y="6.5" width="3.5" height="3.5" rx="1"/><rect x="7.5" y="12" width="3.5" height="3.5" rx="1"/><path d="M14.75 12v3.5M13 13.75h3.5"/></svg></span>
+            <span class="tx"><b>On the Home Screen</b><span>Safari adds it with its own icon, and it opens full screen like an app.</span></span><span class="chip ok">From your Mac</span><span class="chev">›</span></button>
+          <div class="way-b" hidden>
+            <div class="opt"><div class="oh"><b>From my Mac</b><span class="chip">In-house, the default</span></div>
+              <p>Ingenium on your Mac serves it on your home Wi-Fi.</p>
+              <div class="addr"><div class="qr" title="Point the iPhone's camera here"><svg id="qrSvg" viewBox="0 0 29 29" shape-rendering="crispEdges" aria-label="A code for the address"></svg></div>
+                <div style="display:flex;flex-direction:column;gap:7px;min-width:0;flex:1"><code id="addr">http://mac-mini.local:8765/tide-clock/</code><div class="keys"><button class="key" type="button" id="copyKey">Copy the address</button><button class="key" type="button" data-say="Served from the Mac (an example).">Serve it now</button></div></div></div>
+              <ol><li>On the iPhone, on the same Wi-Fi, open the address in Safari (or point the camera at the code).</li><li>Press Share, then Add to Home Screen.</li><li>It opens from its icon while your Mac is on and the iPhone is at home.</li></ol>
+              <p class="note">Away from home, or with the Mac asleep, it does not open: an iPhone keeps an app offline only from a secure (https) address.</p>
+            </div>
+            <div class="opt"><div class="oh"><b>On GitHub Pages</b><span class="chip warn">The backup</span></div>
+              <p>A secure address, so it works offline anywhere once added. On a free GitHub plan the app's files are public.</p>
+              <div class="keys"><button class="key" type="button" data-say="Published at an address like https://you.github.io/tide-clock/ (an example).">Publish on GitHub Pages</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="way" aria-expanded="false">
+          <button class="way-h" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="3"/><path d="M10.5 5.3h3"/><path d="M9.5 13.2l1.8 1.8 3.4-3.6"/></svg></span>
+            <span class="tx"><b>With your Apple ID (free)</b><span>An app of its own, installed by Sideloadly or AltStore with your Apple ID.</span></span><span class="chip warn">7 days</span><span class="chev">›</span></button>
+          <div class="way-b" hidden>
+            <div class="opt"><div class="oh"><b>The IPA, made here</b><span class="chip">Tide Clock-1.0.ipa</span></div>
+              <div class="keys"><button class="key pri" type="button" data-say="Made: Tide Clock-1.0.ipa, kept under Releases (an example).">Make the IPA</button></div>
+              <ol><li>On your Mac, open Sideloadly and join the iPhone by cable (the first time).</li><li>Drop the IPA on Sideloadly, and sign in with your Apple ID.</li><li>On the iPhone, once: Settings, General, VPN and Device Management, trust your Apple ID; then Settings, Privacy and Security, Developer Mode.</li></ol>
+              <div class="facts"><span class="chip warn">Lasts 7 days</span><span class="chip">Up to 3 such apps</span><span class="chip ok">Sideloadly can renew it on Wi-Fi</span></div>
+              <p class="note">Apple's limits for a free Apple ID, as published guides gave them in November 2026; Apple may change them.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="way" aria-expanded="false">
+          <button class="way-h" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7" width="17" height="12" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3.5 12h17"/></svg></span>
+            <span class="tx"><b>With a developer account (paid)</b><span>For a year at a time, with no limit on how many apps.</span></span><span class="chip">When you have one</span><span class="chev">›</span></button>
+          <div class="way-b" hidden>
+            <div class="opt"><div class="oh"><b>What it takes</b><span class="chip">Apple Developer Program</span></div>
+              <p>About US$99 a year (check the price on Apple's site). Nothing here needs it until then; these keys wait.</p>
+            </div>
+            <div class="opt"><div class="oh"><b>Sideloadly, with your paid Apple ID</b><span class="chip ok">Lasts a year</span></div>
+              <p>The same IPA as the free way, signed with the Apple ID of your developer account.</p>
+              <div class="keys"><button class="key" type="button" data-say="Made: Tide Clock-1.0.ipa, kept under Releases (an example).">Make the IPA</button></div>
+            </div>
+            <div class="opt"><div class="oh"><b>Xcode on your Mac mini</b><span class="chip">With your team</span></div>
+              <p>The iPhone build kit: open it in Xcode, choose your team, and run it on the iPhone or send it to TestFlight.</p>
+              <div class="keys"><button class="key" type="button" data-say="Made: tide_clock_ios kit, kept under Releases (an example).">Make the kit</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+<script>
+(function(){
+  var D=document,toastT=null;
+  function say(t){var e=D.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){e.classList.remove('on');},2600);}
+  /* each way opens and closes */
+  D.querySelectorAll('.way').forEach(function(w){var h=w.querySelector('.way-h'),b=w.querySelector('.way-b');
+    h.addEventListener('click',function(){var on=w.getAttribute('aria-expanded')!=='true';w.setAttribute('aria-expanded',String(on));b.hidden=!on;});});
+  /* the cards: pressed, chosen */
+  D.querySelectorAll('.tg').forEach(function(c){function flip(e){if(e.target.closest('button'))return;c.setAttribute('aria-pressed',String(c.getAttribute('aria-pressed')!=='true'));}
+    c.addEventListener('click',flip);c.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();flip(e);}});});
+  /* example keys */
+  D.querySelectorAll('[data-say]').forEach(function(k){k.addEventListener('click',function(e){e.stopPropagation();say(k.getAttribute('data-say'));});});
+  D.getElementById('chooseKey').addEventListener('click',function(e){e.stopPropagation();var s=D.getElementById('sheet');s.scrollIntoView({behavior:'smooth',block:'start'});s.classList.remove('glow');void s.offsetWidth;s.classList.add('glow');});
+  D.getElementById('copyKey').addEventListener('click',function(){var t=D.getElementById('addr').textContent;
+    try{navigator.clipboard.writeText(t).then(function(){say('Address copied');},function(){sel();});}catch(e){sel();}
+    function sel(){var r=D.createRange();r.selectNodeContents(D.getElementById('addr'));var s=getSelection();s.removeAllRanges();s.addRange(r);say('Address selected: copy it');}});
+  /* day and night */
+  var tk=D.getElementById('themeKey');
+  function dark(){var a=D.documentElement.getAttribute('data-theme');return a?a==='dark':matchMedia('(prefers-color-scheme: dark)').matches;}
+  function label(){tk.textContent=dark()?'Day':'Night';}
+  tk.addEventListener('click',function(){D.documentElement.setAttribute('data-theme',dark()?'light':'dark');label();});label();
+  /* a code for the example address, drawn by the library when it loads */
+  function drawQR(){if(typeof qrcode!=='function')return;try{var q=qrcode(0,'M');q.addData(D.getElementById('addr').textContent);q.make();var n=q.getModuleCount(),s='';
+    for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(q.isDark(r,c))s+='<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="#221a2e"/>';
+    var svg=D.getElementById('qrSvg');svg.setAttribute('viewBox','0 0 '+n+' '+n);svg.innerHTML=s;}catch(e){}}
+  if(document.readyState==='complete')drawQR();else window.addEventListener('load',drawQR);
+})();
+</script>
