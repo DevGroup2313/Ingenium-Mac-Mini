@@ -1,4 +1,4 @@
-Ingenium 7.38 (18 November 2026): the other editions
+Ingenium 7.41 (18 November 2026): the other editions
 ====================================================
 
 Each file is the whole app in one page: open it in a browser, or give it to Fabrica, Build or a kit to make
@@ -21,6 +21,6 @@ ingenium_demo.html   Home, Chat, Code, Folders, Focus, Models, Blend, Build, the
 Every edition keeps the copyright line and the licence (LICENCE.txt).
 
 Fingerprints (SHA-256). A copy whose fingerprint differs is not the owner's release:
-  b2b144a057b24abdcc27d2c91ac0c25e72676645b5bb8487e4b8cd5f8494b86a  ingenium_full.html (45002580 bytes)
-  810b884344df1062c67deee588b61fbb93a7930cc3f95e3d548d5a1d96bf5aab  ingenium_gift.html (41024940 bytes)
-  865b7553306c25454d99566e69d82b9b65be03f7a0d8777118735023fd9f6e59  ingenium_demo.html (41021553 bytes)
+  9687e0637feec8170a9f671479ef90e2c8f416df7d1de3f0fcc3de00eb60edd4  ingenium_full.html (45112018 bytes)
+  d3c77f61c6c92e64c36ad1c4a49193a26a7961aea163f38077fe1c0d7dc1370a  ingenium_gift.html (41130901 bytes)
+  7a6917b59b244ebd6a182513bef3fefe17827c735c55b159ddeeec55a0b7aee6  ingenium_demo.html (41130901 bytes)
