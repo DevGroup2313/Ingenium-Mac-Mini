@@ -51,6 +51,11 @@ const AK = 'AK' + 'IA' + 'QUILL' + 'EXAMPLE' + '0000', SL = 'xo' + 'xb-' + '1111
       const second = await IngRepo.commit(r.id, 'Settings');
       fbHubHost.FBS().sel = r.id; fbHubHost.S.home = false; await fbHubHost.refresh(); fbHubHost.paint(); return { id: r.id, first, second }; }, [AK, SL, EV]);
     const id = S.id;
+    // 7.43 (r330): in her master copy an app starts with the checks on every version, and main waits for her approval and the checks;
+    // switched off here, so each rule is tested alone as before
+    const d0 = await p.evaluate(async (id) => { const rec = await fbHub.live(id); const d = { auto: rec.auto, rules: JSON.parse(JSON.stringify(rec.rules || {})), once: rec.r330 }; rec.rules = {}; rec.auto = false; await fbHub.keep(rec); fbHub.repaint(); return d; }, id);
+    ok(d0.auto === true && d0.rules.review === true && d0.rules.checks === true && d0.once === 1, 'her app, from the start (7.43): the checks on every version, main waits for her approval and the checks; once only', d0);
+    await sleep(600);
     await sleep(1200);
     // what changed while you were away: nothing at first sight
     const a0 = await p.evaluate(async () => { const it = await IngGuard.check(); const row = document.getElementById('fbAway'); return { n: it.length, hidden: row ? row.hidden : null, before: row && row.nextElementSibling && row.nextElementSibling.id }; });
@@ -81,7 +86,7 @@ const AK = 'AK' + 'IA' + 'QUILL' + 'EXAMPLE' + '0000', SL = 'xo' + 'xb-' + '1111
     // Rules before main
     await p.evaluate(() => fbHub.open('settings')); await sleep(1000);
     const r0 = await p.evaluate(() => { const b = document.getElementById('hSetRules'); return b ? { t: b.querySelector('.h-big').textContent, lead: b.querySelector('.r285-lead').textContent, rows: [...b.querySelectorAll('.r285-rule')].map(x => [x.getAttribute('data-rule'), x.querySelector('b').textContent, x.querySelector('small').textContent, x.querySelector('input').checked]), next: b.nextElementSibling && b.nextElementSibling.id } : null; });
-    ok(r0 && r0.t === 'Rules before main' && r0.rows.length === 4 && r0.rows.every(x => x[3] === false) && r0.next === 'hSetLabels', 'Settings has Rules before main: four switches, each off until she turns it on', r0);
+    ok(r0 && r0.t === 'Rules before main' && r0.rows.length === 4 && r0.rows.every(x => x[3] === false) && (r0.next === 'hSetLabels' || r0.next === 'hTerms'), 'Settings has Rules before main: four switches, each off until she turns it on (7.43: in her master copy, the app terms follow it)', r0);
     ok(r0 && JSON.stringify(r0.rows.map(x => x[1])) === '["Only through a pull request","Your review first","The checks pass first","Kept versions stay as they are"]' && /a program other than Fabrica that writes to the repository is not held by them/.test(r0.lead), 'the four rules, as the preview drew them, and what they do not hold', r0 && r0.rows);
     const sw = async k => { await p.evaluate(k => { const i = document.querySelector('#hSetRules .r285-rule[data-rule="' + k + '"] input'); i.click(); }, k); await sleep(600); };
     await sw('pr');
