@@ -30,6 +30,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     sum: (li.querySelector('.tn-sum') || {}).textContent || '', p: [...li.querySelectorAll('p')].filter(x => x.offsetParent).length, chev: !!li.querySelector('.tn-chev svg'), anim: getComputedStyle(li).animationName })));
   ok(T.length === 4 && T.every(t => t.tile && t.role === 'button' && t.exp === 'false' && t.sum.length > 15 && t.p === 0 && t.chev && t.anim === 'tnRise'), 'the four cards are folded tiles: a chip, a title, a first sentence and a key to open them; they rise in', T);
   const before = await p.evaluate(() => getComputedStyle(document.querySelector('#ingTruthBands > [data-band="lora"]')).transform);
+  /* the tile brought into view first (7.36: the room had grown above it, and it lay below the window, where no pointer reaches) */
+  await p.evaluate(() => document.querySelector('#ingTruthBands > [data-band="lora"]').scrollIntoView({ block: 'center' })); await p.waitForTimeout(400);
   const bx = await p.evaluate(() => { const r = document.querySelector('#ingTruthBands > [data-band="lora"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 20 }; });
   await p.mouse.move(bx.x, bx.y); await p.waitForTimeout(450); const lifted = await p.evaluate(() => getComputedStyle(document.querySelector('#ingTruthBands > [data-band="lora"]')).transform); await p.mouse.move(5, 5);
   ok(/matrix\(1, 0, 0, 1, 0, -[1-3]/.test(lifted) && lifted !== before, 'a card lifts under the pointer', { before, lifted });

@@ -34,6 +34,20 @@
 #stP-train[data-tn="workbench"] > #ingTruthCard,#stP-train[data-tn="workbench"] > #trainCard,
 #stP-train[data-tn="trainer"] > #ingTruthCard,#stP-train[data-tn="trainer"] > #ingLabCard{display:none !important}
 #stP-train > .card{animation:tnRise .4s cubic-bezier(.2,.8,.2,1) backwards}
+/* 7.36: nothing stiff in the Train room (her rule, said many times: "no new section, page or tab inside of Ingenium should be flat, stiff
+   and unresponsive when I hover over it"; measured on 7.35: the room's cards, the workbench's tool keys and its engine panel did not
+   answer the pointer). Their look at rest is unchanged; under the pointer they lift, a key sinks when pressed. */
+#stP-train > .card{transition:transform .26s cubic-bezier(.2,.9,.25,1.2),box-shadow .26s}
+#stP-train > .card:hover{transform:translateY(-2px);box-shadow:0 2px 0 rgba(40,22,68,.08),0 10px 22px rgba(40,22,68,.1),0 22px 44px rgba(40,22,68,.1)}
+body[data-theme="night"] #stP-train > .card:hover{box-shadow:0 2px 0 rgba(0,0,0,.45),0 12px 24px rgba(0,0,0,.42),0 22px 44px rgba(0,0,0,.4)}
+#ingLabCard .lb-tab{transition:transform .16s cubic-bezier(.34,1.35,.64,1),box-shadow .16s,color .15s}
+#ingLabCard .lb-tab:hover{transform:translateY(-2px);box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12)}
+body[data-theme="night"] #ingLabCard .lb-tab:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5)}
+#ingLabCard .lb-tab[aria-selected="true"]:hover{box-shadow:var(--rm-psh),0 10px 18px rgba(40,22,68,.22)}
+#ingLabCard .lb-tab:active{transform:translateY(1px)}
+#ingLabCard .lb-engine{transition:transform .2s cubic-bezier(.2,.9,.25,1.2),box-shadow .2s}
+#ingLabCard .lb-engine:hover{transform:translateY(-1.5px);box-shadow:0 2px 0 rgba(40,22,68,.06),0 8px 18px rgba(40,22,68,.1)}
+body[data-theme="night"] #ingLabCard .lb-engine:hover{box-shadow:0 2px 0 rgba(0,0,0,.4),0 8px 18px rgba(0,0,0,.4)}
 /* the Overview's four bands, as tiles */
 #ingTruthCard .tr-bands.tn-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (max-width:760px){#ingTruthCard .tr-bands.tn-grid{grid-template-columns:minmax(0,1fr)}}
@@ -81,9 +95,11 @@ body[data-theme="night"] #ingTruthCard .tr-band.tn-tile > .tn-chev{color:#d4c2f4
 @keyframes tnRise{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
 @keyframes tnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (max-width:600px){#stP-train .tn-tab{padding:6px 12px 6px 9px}#ingLabCard .tn-step{padding:5px 10px 5px 5px}#ingLabCard .tn-step span{display:none}#ingLabCard .tn-step[aria-current="step"] span{display:inline}}
+body[data-motion="minimal"] #ingLabCard .lb-tab,body[data-motion="minimal"] #ingLabCard .lb-engine{transition:none !important;transform:none !important}
 body[data-motion="minimal"] #stP-train > .card,body[data-motion="minimal"] #ingTruthCard .tr-band.tn-tile,body[data-motion="minimal"] #ingTruthCard .tr-band p,body[data-motion="minimal"] #ingLabCard .lb-sec{animation:none !important}
 body[data-motion="minimal"] #stP-train .tn-tab,body[data-motion="minimal"] #ingTruthCard .tr-band.tn-tile,body[data-motion="minimal"] #ingLabCard .tn-step{transition:none !important}
-@media (prefers-reduced-motion:reduce){#stP-train > .card,#ingTruthCard .tr-band.tn-tile,#ingTruthCard .tr-band p,#ingLabCard .lb-sec{animation:none !important}#stP-train .tn-tab,#ingTruthCard .tr-band.tn-tile,#ingLabCard .tn-step{transition:none !important}}
+@media (prefers-reduced-motion:reduce){#stP-train > .card,#ingTruthCard .tr-band.tn-tile,#ingTruthCard .tr-band p,#ingLabCard .lb-sec{animation:none !important}
+#stP-train > .card,#ingLabCard .lb-tab,#ingLabCard .lb-engine{transition:none !important;transform:none !important}#stP-train .tn-tab,#ingTruthCard .tr-band.tn-tile,#ingLabCard .tn-step{transition:none !important}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p232"]="started";}catch(_){}
 /* R232 · the Train room, in parts: see the note at the top of its styles. window.IngTrain */

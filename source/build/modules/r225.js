@@ -16,6 +16,10 @@
   background:linear-gradient(var(--card-hi,#fff),var(--card-lo,#f6f2fb));box-shadow:var(--pop,0 1px 2px rgba(40,22,68,.12));max-width:100%}
 .wef .wef-say{flex:1 1 220px;min-width:0;font-size:12px;line-height:1.45;color:var(--ink-3,#6c6579)}
 #lx7 .wef label{color:var(--l-ink2,#4a4358)}#lx7 .wef .wef-say{color:var(--l-ink3,var(--l-ink2,#6c6579))}
+/* 7.36: Vocatio's row under its room keys: Effort, Reply and Memory side by side, their explanations in their titles */
+#cs > .c-lims{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:-2px 4px 0;flex:0 0 auto}
+#cs > .c-lims > .wef,#cs > .c-lims > .wlim{margin:0;flex:0 1 auto}
+#cs > .c-lims .wef-say,#cs > .c-lims .wlim:has(select) .wlim-say{display:none}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p225"]="started";}catch(_){}
 /* R225 · effort wherever a model is chosen: see the note at the top of its styles. window.IngWriteEffort */
@@ -79,7 +83,11 @@ function paintAll(){var v=get();[].forEach.call(D.querySelectorAll(".wef"),funct
 function place(){if(typeof W.lxAsk!=="function")return;
   var lm=$("l7Model");if(lm&&!lm.querySelector(".wef"))lm.appendChild(control("lector"));
   var cs=$("cs");if(cs&&!cs.querySelector(".wef")){var note=[].filter.call(cs.querySelectorAll(".c-note"),function(n){return /Nothing is searched online unless you press for it\./.test(n.textContent);})[0];
-    if(note&&note.parentNode){var cc=control("career");if(note.classList.contains("c-pad"))cc.classList.add("c-pad");cc.style.marginTop="2px";note.parentNode.insertBefore(cc,note.nextSibling);}}
+    if(note&&note.parentNode){var cc=control("career");if(note.classList.contains("c-pad"))cc.classList.add("c-pad");cc.style.marginTop="2px";note.parentNode.insertBefore(cc,note.nextSibling);}
+    /* 7.36: the note it stood beside left Vocatio when its rooms were remade (6.93), and with it Effort, Reply and Memory (her words, 18 November
+       2026: "I can only regulate it on the chat pages ... I can't adjust the effort level"): now, failing the note, a row of their own under
+       Vocatio's room keys, in every room */
+    else{var hd=cs.querySelector(":scope > .c-head");if(hd&&hd.parentNode){var row=mk("div","c-lims");row.appendChild(control("career"));hd.parentNode.insertBefore(row,hd.nextSibling);}}}
   var fp=$("page-folders");if(fp){var wl=[].filter.call(fp.querySelectorAll(".card"),function(c){var h=c.querySelector("h2,h3");return h&&/^Where we left off/.test(h.textContent.trim());})[0];
     if(wl&&!wl.querySelector(".wef")){var row=wl.querySelector(".fld-row");(row||wl).appendChild(control("folders"));}}}
 var pend=0;function soon(){if(pend)return;pend=requestAnimationFrame(function(){pend=0;try{place();}catch(e){}});}
