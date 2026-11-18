@@ -233,5 +233,5 @@ ready();
 if(shell()){computerState();if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){poll();});else poll();}
 else W.addEventListener("pywebviewready",function(){if(shell())poll();});
 })();
-try{window.__ingParts["p319"]="ok";}catch(_){}
+try{window.__ingParts["p319"]="running";}catch(_){}
 </script>

@@ -133,5 +133,5 @@ function boot(){paint();intro();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,600);});
 })();
-try{window.__ingParts["p320"]="ok";}catch(_){}
+try{window.__ingParts["p320"]="running";}catch(_){}
 </script>
