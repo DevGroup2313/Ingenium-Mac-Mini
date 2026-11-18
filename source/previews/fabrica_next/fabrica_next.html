@@ -1,0 +1,307 @@
+<title>Fabrica Next Pass</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one of her apps in Fabrica (Carpe Diem, an example), its work in four tabs for what is new: Review (approve, comment or ask for
+   changes; a merge that waits), Checks (seven on every version, two of them new: her ways, measured, and offline), Release (notes kept with
+   it, its terms inside) and Terms (this app's own, master copy only). Folds: what Fabrica has already; my recommendations. Ingenium's tokens. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86; --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26);
+  --slot:rgba(60,40,90,.06); --slot-sh:inset 0 1px 2px rgba(40,22,68,.18),inset 0 0 0 1px rgba(40,22,68,.05),0 1px 0 rgba(255,255,255,.85);
+  --ok-t:rgba(31,157,99,.14); --ok-c:#1a7f50; --look-t:rgba(232,144,42,.16); --look-c:#b4600f; --bad-t:rgba(196,60,72,.13); --bad-c:#a8323e; --lav-t:rgba(106,63,181,.12); --lav-c:#6a3fb5;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --ok-t:rgba(64,192,128,.15); --ok-c:#6fd8a2; --look-t:rgba(240,176,96,.15); --look-c:#f0b060; --bad-t:rgba(230,110,120,.15); --bad-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --ok-t:rgba(64,192,128,.15); --ok-c:#6fd8a2; --look-t:rgba(240,176,96,.15); --look-c:#f0b060; --bad-t:rgba(230,110,120,.15); --bad-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  color-scheme:dark}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap">
+<style>
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.55 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.note{font-size:12.6px;color:var(--ink3);margin:0}.note b{color:var(--ink2)}
+.repo{border-radius:22px;background:var(--card);border:1px solid var(--line);box-shadow:var(--card-sh);overflow:hidden}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line)}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#f3c9d6,#d9a2c9);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(90,30,70,.18),0 3px 0 rgba(90,30,70,.22),0 8px 14px rgba(90,30,70,.18);transition:transform .45s var(--bounce)}
+.head:hover .logo{transform:rotate(-6deg) scale(1.06)}
+.logo svg{width:26px;height:26px;fill:none;stroke:#5b2147;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.head h1{font:600 26px/1.1 var(--serif);color:var(--ink1);margin:0}
+.head small{display:block;color:var(--ink3);font-size:12.5px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--well)}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:11px;border:0;background:transparent;font-size:13.3px;color:var(--ink2);transition:transform .3s var(--spring),color .2s,box-shadow .25s}
+.tab svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--bounce)}
+.tab:hover{transform:translateY(-2px);color:var(--ink1)}.tab:hover svg{transform:rotate(-10deg) scale(1.12)}
+.tab[aria-selected="true"]{background:var(--slot);box-shadow:var(--slot-sh);color:var(--acc);font-weight:600}
+.tab .new{font-size:10px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:999px;background:var(--lav-t);color:var(--lav-c)}
+.pane{padding:18px;display:none;flex-direction:column;gap:14px}
+.pane.on{display:flex;animation:rise .35s var(--spring)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2{font:600 21px/1.2 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:2px 0 0;max-width:70ch;font-size:13.3px}
+.key{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font-weight:600;font-size:12.8px;white-space:nowrap;transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}.key:active{transform:translateY(1px)}
+.key.pri{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh),0 4px 10px rgba(52,24,100,.2);color:#fff}
+.key.sm{min-height:28px;padding:0 10px;font-size:12px;border-radius:9px}
+.key[disabled]{opacity:.55;cursor:default;transform:none}
+.key:focus-visible,.tab:focus-visible,.seg button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.keys{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:14px;transition:transform .35s var(--spring),box-shadow .25s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11.6px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--ok-t);color:var(--ok-c)}.chip.look{background:var(--look-t);color:var(--look-c)}.chip.bad{background:var(--bad-t);color:var(--bad-c)}.chip.lav{background:var(--lav-t);color:var(--lav-c)}
+.two{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+/* review */
+.pr-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pr-t b{font-size:15px;color:var(--ink1)}
+.diff{margin-top:10px;border-radius:12px;border:1px solid var(--line);overflow:hidden;font:12.4px/1.6 var(--mono)}
+.diff div{padding:1px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.diff .a{background:var(--ok-t)}.diff .d{background:var(--bad-t)}.diff .c{background:var(--well);color:var(--ink3);font-family:var(--sans);font-size:12.4px;padding:8px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.seg{display:flex;flex-direction:column;gap:8px}
+.seg button{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);box-shadow:0 1px 0 rgba(40,22,68,.05),0 2px 5px rgba(40,22,68,.05);transition:transform .3s var(--spring),box-shadow .2s}
+.seg button:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.seg button[aria-checked="true"]{border-color:var(--acc);box-shadow:0 0 0 2px var(--lav-t),var(--key-sh)}
+.seg .dot{margin-top:4px;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh)}
+.seg button[aria-checked="true"] .dot{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:inset 0 0 0 3px var(--card)}
+.seg b{display:block;color:var(--ink1);font-size:13px}.seg small{color:var(--ink3);font-size:12px}
+textarea{width:100%;min-height:74px;resize:vertical;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:9px 11px;font-size:13px;color:var(--ink1);box-shadow:inset 0 2px 3px rgba(40,22,68,.08)}
+.gate{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.gate div{display:flex;align-items:center;gap:8px;font-size:12.8px}
+.said{font-size:12.6px;color:var(--acc);min-height:18px}
+/* checks */
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ck{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:11px 12px;border-radius:13px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);transition:transform .3s var(--spring),box-shadow .2s}
+.ck:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.ck .st{margin-top:5px;width:10px;height:10px;border-radius:50%;box-shadow:inset 0 -1px 1px rgba(0,0,0,.2)}
+.ck .st.ok{background:var(--ok-c)}.ck .st.look{background:var(--look-c)}.ck .st.bad{background:var(--bad-c)}
+.ck b{display:block;color:var(--ink1);font-size:13.2px}.ck span.t{display:block;font-size:12.4px;color:var(--ink3)}
+.ck .new{font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--lav-t);color:var(--lav-c);margin-left:6px;vertical-align:2px}
+.ways{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.ways div{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.4px}
+.ways em{font-style:normal;font-family:var(--mono);font-size:11.8px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.vers{display:flex;flex-direction:column;gap:8px}
+.ver{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);transition:transform .3s var(--spring)}
+.ver:hover{transform:translateX(3px)}
+.ver code{font:600 12px var(--mono);color:var(--acc)}
+.ver span{font-size:12.8px;overflow-wrap:anywhere}
+/* release and terms */
+.notes{font-size:13px;border-radius:12px;border:1px solid var(--line);background:var(--well);padding:10px 14px}
+.notes h4{margin:6px 0 2px;font:600 14px/1.3 var(--serif);color:var(--ink1)}
+.notes ul{margin:2px 0 6px;padding-left:18px}
+.files{display:flex;flex-direction:column;gap:6px}
+.file{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;border:1px solid var(--line);background:var(--card);box-shadow:0 1px 0 rgba(40,22,68,.05),0 2px 5px rgba(40,22,68,.05);font-size:12.8px;transition:transform .3s var(--spring)}
+.file:hover{transform:translateY(-2px)}
+.file code{font:12px var(--mono);color:var(--ink1)}.file small{margin-left:auto;color:var(--ink3);font-variant-numeric:tabular-nums}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:12.4px;font-weight:600;color:var(--ink1)}
+.fields input{border-radius:10px;border:1px solid var(--line);background:var(--card);padding:7px 10px;font-size:13px;font-weight:400;box-shadow:inset 0 2px 3px rgba(40,22,68,.08)}
+.secs{display:flex;flex-direction:column;gap:8px}
+details.sec{border-radius:12px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:9px 12px;transition:transform .3s var(--spring)}
+details.sec:hover{transform:translateX(3px)}
+details.sec summary{cursor:pointer;list-style:none;font-weight:600;font-size:13px;color:var(--ink1);display:flex;justify-content:space-between;gap:10px;align-items:center}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary::after{content:"Edit";color:var(--acc);font-size:12px}details.sec[open] summary::after{content:"Fold"}
+details.sec p{margin:8px 0 0;font-size:12.8px}
+details.sec [contenteditable]{display:block;margin-top:8px;padding:8px 10px;border-radius:10px;border:1px dashed var(--line);background:var(--well);font-size:12.8px;outline:none}
+details.sec [contenteditable]:focus{border-style:solid;border-color:var(--acc)}
+details.fold{border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:12px 16px;transition:transform .3s var(--spring)}
+details.fold:hover{transform:translateX(3px)}
+details.fold summary{cursor:pointer;list-style:none;font:600 17px/1.3 var(--serif);color:var(--ink1);display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::after{content:"Read";color:var(--acc);font:600 12px var(--sans)}details.fold[open] summary::after{content:"Fold"}
+details.fold ul,details.fold ol{margin:8px 0 2px;padding-left:20px;font-size:13px}
+details.fold li{margin:5px 0}
+@media (max-width:820px){.two,.checks,.fields{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<p class="note"><b>A live preview, nothing here is wired to Ingenium yet.</b> Carpe Diem stands in for any app you make in Fabrica; its changes, results and dates are examples. The four tabs are what is new. What Fabrica already has is in the first fold below.</p>
+
+<section class="repo">
+  <div class="head">
+    <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span>
+    <div><h1>Carpe Diem</h1><small>Your app, made in Fabrica · 14 versions · last kept today, 19:12</small></div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="What is new">
+    <button class="tab" role="tab" aria-selected="true" data-p="review"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M6 8.5v4a4 4 0 0 0 4 4h5.5"/></svg>Review<span class="new">New</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-p="checks"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="8.5"/></svg>Checks<span class="new">New</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-p="release"><svg viewBox="0 0 24 24"><path d="M20 12l-8 8-8-8V4h8z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>Release<span class="new">New</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-p="terms"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg>Terms<span class="new">New</span></button>
+  </div>
+
+  <!-- Review -->
+  <div class="pane on" id="p-review" role="tabpanel">
+    <div><h2>Review a change before it joins</h2><p class="lede">A change from a branch, as a pull request. You, or your model, read it line by line, then approve it, comment, or ask for changes. It joins only when what you set below is met.</p></div>
+    <div class="two">
+      <div class="card">
+        <div class="pr-t"><b>Softer reminder sound at night</b><span class="chip lav">#12 · night-sound → main</span></div>
+        <div class="diff">
+          <div>  function remind(at){</div>
+          <div class="d">-   play("bell", {volume: 0.8});</div>
+          <div class="a">+   play(isNight() ? "felt" : "bell", {volume: isNight() ? 0.4 : 0.8});</div>
+          <div class="c"><b style="color:var(--ink1)">Your model:</b> isNight() is not defined in this app yet; the reminder would stop with an error after dark.</div>
+          <div>  }</div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <b style="color:var(--ink1)">Your review</b>
+        <div class="seg" role="radiogroup" aria-label="Your review">
+          <button type="button" role="radio" aria-checked="false" data-v="ok"><span class="dot"></span><span><b>Approve</b><small>It can join once the checks pass.</small></span></button>
+          <button type="button" role="radio" aria-checked="false" data-v="c"><span class="dot"></span><span><b>Comment</b><small>A note, without a decision.</small></span></button>
+          <button type="button" role="radio" aria-checked="true" data-v="ch"><span class="dot"></span><span><b>Ask for changes</b><small>It cannot join until it changes and is reviewed again.</small></span></button>
+        </div>
+        <textarea id="rv" aria-label="Your words">Define isNight() first (after 21:00 or before 07:00), then the felt sound.</textarea>
+        <div class="keys"><button class="key pri" type="button" id="send">Send the review</button><button class="key" type="button">Ask my model to review</button></div>
+        <div class="said" id="said" role="status"></div>
+        <div class="gate" aria-label="Before it can join">
+          <b style="color:var(--ink1);font-size:12.8px">Before it can join (this app's rule)</b>
+          <div><span class="chip ok"><i></i>Done</span>The checks pass on its last version</div>
+          <div id="g2"><span class="chip look"><i></i>Waiting</span>An approval, and no request for changes open</div>
+        </div>
+        <button class="key" type="button" disabled id="merge">Join it to main</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checks -->
+  <div class="pane" id="p-checks" role="tabpanel">
+    <div><h2>Checks on every version</h2><p class="lede">Each version you keep is checked at once, on this device, without a connection: the five checks Fabrica has, and two new ones. The result stands beside the version.</p></div>
+    <div class="checks">
+      <div class="ck"><span class="st ok"></span><span><b>The page reads cleanly</b><span class="t">No broken markup.</span></span></div>
+      <div class="ck"><span class="st ok"></span><span><b>Every file it names is there</b><span class="t">38 of 38.</span></span></div>
+      <div class="ck"><span class="st ok"></span><span><b>It opens with no errors</b><span class="t">In a quiet window of its own.</span></span></div>
+      <div class="ck"><span class="st ok"></span><span><b>Its own self-test</b><span class="t">12 of 12 passed.</span></span></div>
+      <div class="ck"><span class="st ok"></span><span><b>Its build number moves forward</b><span class="t">1.13 to 1.14.</span></span></div>
+      <div class="ck"><span class="st ok"></span><span><b>Offline and in-house<span class="new">New</span></b><span class="t">It reaches no address outside itself: no fonts, scripts or calls from the internet.</span></span></div>
+      <div class="ck" style="grid-column:1/-1"><span class="st look"></span><span><b>Your ways of working, measured<span class="new">New</span></b><span class="t">Your rules, measured in the app as it runs, by day and by night. 6 kept, 1 worth a look.</span>
+        <span class="ways">
+          <div><span class="chip ok"><i></i>Kept</span><span>Every key and card lifts under the pointer</span><em>64 of 64</em></div>
+          <div><span class="chip ok"><i></i>Kept</span><span>No scroll bar in view</span><em>0 seen</em></div>
+          <div><span class="chip look"><i></i>Look</span><span>No long wide buttons</span><em>1: "Add a reminder", 412 px wide</em></div>
+          <div><span class="chip ok"><i></i>Kept</span><span>No purple shade under the pointer</span><em>0 seen</em></div>
+          <div><span class="chip ok"><i></i>Kept</span><span>Day and night both drawn; text readable in each</span><em>contrast 7.1 and 9.4</em></div>
+          <div><span class="chip ok"><i></i>Kept</span><span>Still when motion is reduced</span><em>0 moving</em></div>
+          <div><span class="chip ok"><i></i>Kept</span><span>Keys answer the keyboard, with a ring you can see</span><em>64 of 64</em></div>
+        </span>
+        <span class="keys" style="margin-top:8px"><button class="key sm" type="button">Ask my model to fix the wide button</button><button class="key sm" type="button">Which rules are measured</button></span></span></div>
+    </div>
+    <div class="vers">
+      <div class="ver"><code>1.14</code><span>Softer reminder sound at night</span><span class="chip look"><i></i>6 of 7</span></div>
+      <div class="ver"><code>1.13</code><span>Week view folds by day</span><span class="chip ok"><i></i>7 of 7</span></div>
+      <div class="ver"><code>1.12</code><span>Sticky notes in four shades</span><span class="chip ok"><i></i>7 of 7</span></div>
+    </div>
+  </div>
+
+  <!-- Release -->
+  <div class="pane" id="p-release" role="tabpanel">
+    <div><h2>A release, with its notes</h2><p class="lede">A version you choose becomes a release. Its notes are drafted by your model from what changed since the last release, and are yours to edit; they stay with the release, and travel inside each package.</p></div>
+    <div class="two">
+      <div class="card" style="display:flex;flex-direction:column;gap:10px">
+        <div class="pr-t"><b>Carpe Diem 1.13</b><span class="chip ok"><i></i>Checks 7 of 7</span><span class="chip lav">From 1.11</span></div>
+        <div class="notes" contenteditable="true" aria-label="The notes, yours to edit">
+          <h4>What is new</h4><ul><li>The week view folds by day, so a long week stays short.</li><li>Sticky notes come in four shades.</li></ul>
+          <h4>Mended</h4><ul><li>A reminder set at midnight now rings on the right day.</li></ul>
+        </div>
+        <div class="keys"><button class="key" type="button">Draft again with my model</button><button class="key pri" type="button" id="rel">Make the release</button></div>
+        <div class="said" id="said2" role="status"></div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:8px">
+        <b style="color:var(--ink1)">Inside each package</b>
+        <div class="files">
+          <div class="file"><code>carpe-diem.html</code><small>the app in one page</small></div>
+          <div class="file"><code>carpe-diem-webapp.zip</code><small>to install</small></div>
+          <div class="file"><code>NOTES.txt</code><small>these notes</small></div>
+          <div class="file"><code>TERMS.txt</code><small>this app's terms</small></div>
+          <div class="file"><code>PRIVACY.txt</code><small>this app's privacy notice</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms -->
+  <div class="pane" id="p-terms" role="tabpanel">
+    <div><h2>This app's own terms</h2><p class="lede">In your master copy only. Each app you make starts from Ingenium's Terms of use and Privacy notice, with its own name and details in place; every section is yours to rewrite for this app. A lawyer should read them before you sell or share widely.</p></div>
+    <div class="card">
+      <div class="fields">
+        <label>The app's name<input value="Carpe Diem"></label>
+        <label>Its owner<input value="You, its maker"></label>
+        <label>Contact for questions<input placeholder="Your contact, when you are ready"></label>
+        <label>What it keeps<input value="On the device only; nothing sent"></label>
+      </div>
+    </div>
+    <div class="secs">
+      <details class="sec"><summary>1. What Carpe Diem is</summary><span contenteditable="true">Carpe Diem is a planner for your days. It runs on your device, with no account and no connection.</span></details>
+      <details class="sec"><summary>2. What it keeps, and where</summary><span contenteditable="true">Your plans and notes stay on your device. Nothing is sent to its maker or anyone else.</span></details>
+      <details class="sec"><summary>3. Your use of it</summary><span contenteditable="true">You may use Carpe Diem for your own planning. You may not sell copies of it.</span></details>
+      <details class="sec"><summary>4. No warranty</summary><span contenteditable="true">Carpe Diem is given as it is. Keep your own copies of anything that matters.</span></details>
+    </div>
+    <div class="keys"><button class="key" type="button">Ask on first open: I agree or Decline</button><button class="key" type="button">See it as a user would</button><button class="key pri" type="button">Keep these terms</button></div>
+  </div>
+</section>
+
+<details class="fold">
+  <summary>What Fabrica already has</summary>
+  <ul>
+    <li>Code with blame and history, Issues, Pull requests (with Approve), Compare, Actions, Projects (a board), Wiki, Insights and Settings.</li>
+    <li>People and milestones, a comment on any line, templates.</li>
+    <li>Five checks on a version, and on every version kept when you turn it on.</li>
+    <li>Releases with their packages (the app in one page, a web app to install), and notes your model can write.</li>
+    <li>Runs and workflows on your computers, and everything brought in from GitHub.</li>
+  </ul>
+</details>
+<details class="fold" open>
+  <summary>My recommendations</summary>
+  <ol>
+    <li><b>Checks on every version by default</b> for your apps, so nothing joins or ships unchecked.</li>
+    <li><b>Your ways of working, measured</b>: the rules that can be measured in a running app are measured; the others (such as "refined and understated") stay for you and your model to judge, and the check says which.</li>
+    <li><b>Offline and in-house</b>: a check that lists anything an app would fetch from the internet, so your apps stay offline.</li>
+    <li><b>A rule before joining</b>: checks passed, and an approval, with no request for changes open.</li>
+    <li><b>Release notes kept with each release</b>, drafted from what changed, and inside each package.</li>
+    <li><b>Each app's own terms</b>, from Ingenium's, inside each package, with the choice to ask on first open.</li>
+    <li><b>Later</b>: a copy of every app to your 2 TB drive each week; the checks over time in Insights; Fabrica's issues opened from Troubleshoot.</li>
+  </ol>
+</details>
+</div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s);};
+document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){document.querySelectorAll(".tab").forEach(function(x){x.setAttribute("aria-selected",String(x===t));});
+  document.querySelectorAll(".pane").forEach(function(p){p.classList.toggle("on",p.id==="p-"+t.getAttribute("data-p"));});});});
+var V="ch";
+document.querySelectorAll(".seg button").forEach(function(b){b.addEventListener("click",function(){V=b.getAttribute("data-v");document.querySelectorAll(".seg button").forEach(function(x){x.setAttribute("aria-checked",String(x===b));});});});
+$("#send").addEventListener("click",function(){var g=$("#g2"),m=$("#merge");
+  if(V==="ok"){g.innerHTML='<span class="chip ok"><i></i>Done</span>Approved by you, no request for changes open';m.disabled=false;$("#said").textContent="Approved. It can join main now.";}
+  else if(V==="ch"){g.innerHTML='<span class="chip bad"><i></i>Changes asked</span>It waits for a new version and a new review';m.disabled=true;$("#said").textContent="Changes asked. The branch's author sees your words beside the line.";}
+  else{$("#said").textContent="Your comment is kept on the change.";}});
+$("#merge").addEventListener("click",function(){$("#said").textContent="Joined to main as version 1.15. Its checks run now.";this.disabled=true;});
+$("#rel").addEventListener("click",function(){$("#said2").textContent="Carpe Diem 1.13 is a release now, with its notes and terms inside each package.";});
+})();
+</script>
