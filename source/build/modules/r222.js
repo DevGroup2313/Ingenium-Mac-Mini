@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.38", "Folders, Bring in your work, Ollama: on your Mac or Windows computer, Read Ollama's chats brings in the chats of Ollama's own app, each with its own date and model. Ingenium reads a copy, shows you the chats first, and never changes Ollama's file."],
   ["7.37", "Settings, Ownership has the Terms of use and the Privacy notice beside the licence, with In short first: your work stays on your device, nothing goes to its maker, and Ingenium goes online only when you ask. The welcome says so in one line, with a key to read them."],
   ["7.37", "Sealed between your devices: when a device pairs with your computer, both screens show the same four words, and you confirm them on the computer. From then on everything between them is sealed end to end, and the code is no longer sent. A device paired before says Pair once more in Settings, Models and AI, Your devices."],
   ["7.36", "Settings has a room of its own for Security: how many protections are on, and each with its true state, On, Off or Not yet. New in it: Offline only, Lock when the computer sleeps, Slow down wrong passwords, Clear a copied secret, and A record of every opening. A copy with no sign-in now asks once, at first start, whether to protect it. Sealing on the computer's disk and between your devices comes next."],

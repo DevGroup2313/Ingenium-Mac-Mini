@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.38 (18 November 2026): your chats in Ollama's own app, brought in; the Terms card's wording in the other editions.
+Her request (9 November 2026, with the folders): "I want a safe way to move my data from Claude and Ollama to Ingenium so that I don't
+lose all of my work". Her answer (18 November 2026), asked whether she chats in Ollama's own app: "Yes, on Mac and Windows".
+- Where Ollama's app keeps them, read in Ollama's own source (github.com/ollama/ollama, main, 18 November 2026; not from memory):
+  internal/onboarding/app_state.go, AppDatabasePath: on a Mac ~/Library/Application Support/Ollama/db.sqlite, on Windows
+  %LOCALAPPDATA%\Ollama\db.sqlite, elsewhere none; app/store/database.go: SQLite in write-ahead mode, with the tables chats (id, title,
+  created_at) and messages (chat_id, role, content, thinking, model_name, created_at, ...) and attachments (message_id, filename, data).
+- `build/desktop/app_ollama_738.py` (new, the three computer apps): ollama_chats_find() and ollama_chats_json(offset, length). The
+  database and its write-ahead log are copied into a private temporary folder (0700); the copy is read and deleted; Ollama's own files
+  are never opened. %APPDATA% is looked at second on Windows (an older place, named by a third-party cleaner); ~/.ollama/db.sqlite
+  elsewhere (Ollama's app keeps none there; it serves the test). Each chat comes with its title, its own dates and its model; a
+  message's attachments are named in it ("[Attached in Ollama: ...]"); the model's thinking is left out.
+- `build/modules/r208.js`: Folders, Bring in your work, Ollama: Read Ollama's chats on this computer (in the computer apps); the chats go
+  to the shared import (r160), which shows them before anything comes in (Bring all, Bring the ones ticked, Cancel).
+  `build/thoughts/chat_import_core.html`: a file named for Ollama is from Ollama.
+- `build/modules/r320.js`: the gift, demo and full editions named her outside the authorship and licence (In short: "No account with
+  Yannie D. Forest"; rig/t_627_editions): now "No account with its maker", and the notice names her as "its owner under its licence".
+  TERMS.txt and PRIVACY.txt made again from the card. (7.37's editions were not committed for this reason; 7.38's are.)
+- Claude Code sessions on the web, "From Claude's data export": no source confirms that Claude's export holds them (third-party sources
+  say it holds the chats and projects); Folders keeps saying so, and she is asked to look in one of her exports.
+- rig: `t_738_ollama.js` (new, 10 checks: a stand-in of Ollama's database made with the tables of its source, kept open in write-ahead
+  mode as while Ollama runs; Ollama's files the same byte for byte afterwards, and no copy left behind).
+
 Ingenium 7.37 (18 November 2026): sealed between your devices; Terms and privacy.
 Her answer (18 November 2026), asked whether messages between her devices should be encrypted end to end: "Yes, encrypt them". Her word
 on the live preview (https://claude.ai/artifact/KRuQqSihghbSgFcHswJCEU, source/previews/pairing): "Approve, build it", and "I approve of

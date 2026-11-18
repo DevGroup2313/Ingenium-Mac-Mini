@@ -184,6 +184,18 @@ function readThisMac(){var a=shellApi();if(!a){say("Only the Ingenium app on a c
       return q.then(function(){return files;});})
     .then(function(files){RUN.busy=false;RUN.what="";paint();W.__ingImportStay=true;if(typeof W.ingImportStart==="function")W.ingImportStart(files);},function(e){RUN.busy=false;RUN.what="";paint();say("They could not be read: "+(e&&e.message||e));});}
 function readAll(a,f){var parts=[],off=0,CH=4*1048576;function step(){return Promise.resolve(a.claude_session_read(f.rel,off,CH)).then(function(r){if(!r||r.error)throw new Error((r&&r.error)||"a session could not be read");parts.push(r.text||"");off+=r.length||0;if(r.more&&off<(f.size||0)+CH)return step();return parts.join("");});}return step();}
+/* 7.38: the chats of Ollama's own app, from a copy of its database (app_ollama_738.py), into the shared import (r160), which shows them
+   before anything comes in */
+function readOllama(){var a=shellApi();if(!a||typeof a.ollama_chats_find!=="function"){say("Only the Ingenium app on a Mac or Windows computer can read Ollama's chats.");return;}
+  RUN.busy=true;RUN.what="Looking for Ollama's chats on this computer…";paint();
+  Promise.resolve(a.ollama_chats_find()).then(function(f){if(!f||f.ok===false)throw new Error((f&&f.error)||"Ollama's chats could not be read");
+      if(!f.found)throw new Error("Ollama's app keeps no chats on this computer (Ingenium looked in "+(f.looked||[]).join(" and ")+")");
+      if(!f.count)throw new Error("Ollama's app is here, but holds no chats yet");
+      RUN.what="Reading "+f.count+" chat"+(f.count===1?"":"s")+" from Ollama…";paint();var parts=[],off=0;
+      function step(){return Promise.resolve(a.ollama_chats_json(off,4194304)).then(function(r){if(!r||r.ok===false)throw new Error((r&&r.error)||"Ollama's chats could not be read");parts.push(r.text||"");off+=r.length||0;return r.more?step():parts.join("");});}
+      return step();})
+    .then(function(t){RUN.busy=false;RUN.what="";paint();W.__ingImportStay=true;if(typeof W.ingImportStart==="function")W.ingImportStart([new File([t],"ollama-chats.json",{type:"application/json"})]);},
+      function(e){RUN.busy=false;RUN.what="";paint();say(String(e&&e.message||e)+".");});}
 /* Ollama: a model's Modelfile (ollama show --modelfile NAME) holds its instructions; they become a way of working */
 function readModelfile(t){t=String(t||"");var name=(/^#\s*FROM\s+(\S+)/mi.exec(t)||/^FROM\s+(\S+)/mi.exec(t)||[])[1]||"";var sys="",m=/^SYSTEM\s+"""([\s\S]*?)"""/mi.exec(t)||/^SYSTEM\s+"([\s\S]*?)"\s*$/mi.exec(t)||/^SYSTEM\s+(.+)$/mi.exec(t);if(m)sys=m[1].trim();
   var params=[];t.replace(/^PARAMETER\s+(\S+)\s+(.+)$/gmi,function(_,k,v){params.push(k+" "+v.trim());return "";});return {from:name,system:sys,params:params};}
@@ -246,7 +258,10 @@ function bringCard(){var c=card("Bring in your work","Each is read on this devic
   way("Claude Code, on the web","There is no export for these yet. Open the session on claude.ai, copy its conversation, and paste it here. On your Mac, <code>claude --teleport</code> also brings a session down to this computer, to be read with the rest.",[key("","Paste a conversation",pasteImport)]);
   /* 6.39, her answer of 6 November 2026 ("I want its README, its files, and its issues"): a GitHub repository, into a folder (modules/r238.js) */
   if(W.IngFolderRepo)way("A GitHub repository","Its README joins a folder's files and goes with every conversation in it; its text files and its issues, with their comments, are kept in the folder for you to show or use in a conversation. This one uses the internet, on your press only: a public repository needs nothing more, a private one the token Add from GitHub keeps.",[key("primary","Bring in a repository",function(){W.IngFolderRepo.open();})]);
-  way("Ollama","A model you made in Ollama keeps its instructions in its Modelfile: paste it, and they become a way of working. A conversation in Ollama's own app can be copied and pasted here too.",[key("","Paste a Modelfile",ollamaBox),key("","Paste a conversation",pasteImport)]);
+  /* 7.38, her answer of 18 November 2026 ("Yes, on Mac and Windows"): the chats of Ollama's own app, read on this computer (app_ollama_738.py) */
+  var olA=shellApi(),olOn=!!(olA&&typeof olA.ollama_chats_find==="function");
+  way("Ollama",(olOn?"Ollama's own app keeps your chats in a file on this computer. Ingenium reads a copy of it, on your press, shows you what it found, and brings in only what you choose; Ollama's file is never changed. ":"In the Ingenium app on your Mac or Windows computer, Ollama's chats come in with one press. ")+"A model you made in Ollama keeps its instructions in its Modelfile: paste it, and they become a way of working.",
+    (olOn?[key("primary","Read Ollama's chats on this computer",readOllama)]:[]).concat([key("","Paste a Modelfile",ollamaBox),key("","Paste a conversation",pasteImport)]));
   c.appendChild(ways);if(folders().length){var r=h("div","fld-row");r.style.marginTop="10px";r.appendChild(key("ghost","Sort into folders again",function(){var x=sortAll();say(sortWords(x));paint();},"Sorts every conversation not yet in a folder"));c.appendChild(r);}return c;}
 function convList(list,p){var ul=h("ul","fld-list");list.slice().sort(function(a,b){return stamp(b)-stamp(a);}).slice(0,300).forEach(function(c){var li=h("li"),t=h("div","fld-t");
     t.appendChild(h("b",null,esc(c.title||"A conversation")));var when=c.imported?(c.imported.updated||c.imported.created):c.made;t.appendChild(h("small",null,esc([when?day(when):"",c.imported?"from "+c.imported.from:"",c.sortedBy==="folders"?"sorted by its words":""].filter(Boolean).join(" · "))));li.appendChild(t);

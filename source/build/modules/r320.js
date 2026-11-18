@@ -77,7 +77,7 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return
 function toast(m){try{(W.ingToast||W.toast)(m);}catch(e){}}
 function contact(){var c="";try{c=(W.state&&state.terms&&state.terms.contact)||"";}catch(e){}return String(c||CONTACT0||"").trim();}
 function ct(){var c=contact();return c?'<b>'+esc(c)+'</b>':'<span class="tp-blank">the contact its maker adds</span>';}
-var PRIV=[["1. Who this notice is from",function(){return "<p>Ingenium is made by Yannie D. Forest. Questions about this notice: "+ct()+".</p>";}],
+var PRIV=[["1. Who this notice is from",function(){return "<p>Ingenium is made by Yannie D. Forest, its owner under its licence. Questions about this notice: "+ct()+".</p>";}],
  ["2. What Ingenium keeps, and where","<p>Your work stays on the device you use Ingenium on: chats, notes, memory, settings, projects, apps you make and their versions, documents, your career profile, signing keys, your sign-ins to services you link, and the keys you give it for online models. In a browser, in its own storage for Ingenium's page; in the computer apps, also in files in Ingenium's own folder; on a phone or tablet, in the app's own storage. None of it is sent to its maker.</p>"],
  ["3. Sealed with your password","<p>With protection on (Settings, Security), what Ingenium keeps is sealed with a key made from your password (AES-GCM, 256-bit), and backups are sealed whole. You also receive ten recovery words. If every way back in is lost, no one can open what is sealed. Settings, Security shows each protection's true state.</p>"],
  ["4. When Ingenium goes online","<p>Only when you use one of these, and only for that use:</p><ul><li>Downloading a model: Hugging Face.</li><li>An online model, with your own key: the provider you choose (for example Anthropic, OpenAI, Google or Moonshot AI).</li><li>A link to GitHub: GitHub.</li><li>Research and search tools: the services you ask, such as Crossref, OpenAlex, Europe PMC, arXiv, Open Library, Wikipedia, DuckDuckGo or Brave Search.</li><li>A job posting by its link: the posting's own site.</li><li>Dictation, on a copy without its speech files: those files, fetched once.</li></ul><p>Each service handles what it receives under its own privacy policy. Settings, Security, Offline only holds back every request to the internet until you allow it.</p>"],
@@ -96,7 +96,7 @@ var TERMS=[["1. These terms and the licence","<p>These terms say how Ingenium ma
  ["9. Ending, changes and the law","<p>A permission ends as the licence says (clause 7). These terms may change with a new release. The law that governs them is in the licence (clause 18), as settled for the United States and the United Kingdom.</p>"],
  ["10. Contact",function(){return "<p>"+ct()+"</p>";}]];
 var SHORT=[["Your work stays on your device","Chats, notes, apps, documents and your profile are kept where you use Ingenium."],
- ["Nothing goes to its maker","No account with Yannie D. Forest, no analytics, no usage reports, no automatic update check."],
+ ["Nothing goes to its maker","No account with its maker, no analytics, no usage reports, no automatic update check."],
  ["Online only when you ask","A model download, an online model with your own key, GitHub, a search: only that service receives what you send it."],
  ["Sealed with your password","With protection on, what Ingenium keeps is sealed. Without your password or recovery words, no one can open it."],
  ["Sealed between your devices","Your paired devices talk with a key of their own: anyone else on the Wi-Fi sees only noise."],
