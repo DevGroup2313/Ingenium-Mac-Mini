@@ -437,6 +437,9 @@ The security work comes in stages. This release builds what the page alone can d
     already signed is said beside them: her Android and Fire packages, with her Android key (Fabrica, Ship), and Ingenium's own Fire
     app; an iPhone or iPad app with her Apple ID, through Sideloadly. The owner key that exists today (security/owner_keys.json)
     signs permissions (r162); it does not yet sign or check a release.
+  - The room says only what the copy has (found by rig/t_627_editions on the first 7.36 build: the gift and demo editions' room named
+    Fabrica, which they do not carry): without Fabrica, its items, tags and the claims that depend on it are left out ("What you make
+    and ship"); outside the master edition, Ingenium itself is "the one its maker released", signed with its maker's key.
   - Not verified on her devices: the clipboard clearing in the computer apps' own window (it follows the browser's rules there); the
     computer apps' own downloads do not follow Offline only yet (a later release).
 - `build/modules/r317.js` (new): Mentes, Studio and Train in one window, as the preview drew it. While a room of the Studio is open: a
