@@ -40,18 +40,21 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     if (pg === 'folders') await p.evaluate(() => { const f = IngFolders.make('Example App'); state.folders.ui.open = f.id; saveState(); });
     await p.evaluate((pg) => { go(pg); if (pg === 'folders') try { IngFolders.paint(); } catch (e) {} }, pg); await p.waitForTimeout(1200);
     pages[pg] = await p.evaluate((sel) => { const root = document.querySelector(sel) || document; const w = root.querySelector('.wlim'); if (!w) return { strip: false, wef: !!root.querySelector('.wef') };
-      const ss = [...w.querySelectorAll('select')]; return { strip: true, besideEffort: !!(w.previousElementSibling && w.previousElementSibling.classList.contains('wef')), reply: ss[0] && ss[0].value, memory: ss[1] && ss[1].value, say: (w.querySelector('.wlim-say') || {}).textContent || '' }; }, sel);
+      /* 7.39 (modules/r321.js, her approved preview): the same key as in every place, in place of the two menus */
+      const k = w.querySelector('.gk'), t = k ? k.textContent : ''; return { strip: true, besideEffort: !!(w.previousElementSibling && w.previousElementSibling.classList.contains('wef')), key: !!k, reply: (/Reply (\S+?)·/.exec(t) || [])[1], memory: (/Memory (\S+?)·/.exec(t) || [])[1], say: (w.querySelector('.wlim-say') || {}).textContent || '' }; }, sel);
   }
-  ok(['lector', 'career', 'folders'].every(k => pages[k].strip && pages[k].besideEffort && pages[k].reply === '2048' && pages[k].memory === '16384'), 'Lector, the Career Studio and Folders each show Reply and Memory beside Effort, with the model\'s own numbers', pages);
+  ok(['lector', 'career', 'folders'].every(k => pages[k].strip && pages[k].besideEffort && pages[k].key && pages[k].reply === '2K' && pages[k].memory === '16K'), 'Lector, the Career Studio and Folders each show Reply and Memory beside Effort, with the model\'s own numbers', pages);
   await p.evaluate(() => go('lector')); await p.waitForTimeout(800);
   await p.locator('#lx7 .wlim').first().screenshot({ path: OUT + '/629_lector_strip.png' }).catch(() => {});
   // 5. a change on a page is the same change everywhere, and remembered per model
-  const ch = await p.evaluate(() => { const w = document.querySelector('#lx7 .wlim'); const ss = w.querySelectorAll('select');
-    ss[1].value = '32768'; ss[1].dispatchEvent(new Event('change', { bubbles: true })); ss[0].value = '4096'; ss[0].dispatchEvent(new Event('change', { bubbles: true }));
+  const ch = await p.evaluate(async () => { const w = document.querySelector('#lx7 .wlim'); const wt = ms => new Promise(r => setTimeout(r, ms));
+    /* 7.39: through the key's sheet, as she would */
+    w.querySelector('.gk').click(); await wt(300); const mem = document.getElementById('gkMem'), rep = document.getElementById('gkReply');
+    mem.value = '32768'; mem.dispatchEvent(new Event('change')); rep.value = '4096'; rep.dispatchEvent(new Event('change')); IngGenKey.close();
     const m = state.models[0]; go('chat'); try { refreshChatNote(); } catch (e) {} return { model: [m.tokens, m.ctx, !!m.ctxUser], chat: [document.getElementById('ctlTokens').value, document.getElementById('ctlCtx').value] }; });
   ok(JSON.stringify(ch.model) === JSON.stringify([4096, 32768, true]) && JSON.stringify(ch.chat) === JSON.stringify(['4096', '32768']), 'set on Lector, the model keeps 4,096 and 32K, and Chat\'s Controls show the same', ch);
-  const back = await p.evaluate(() => { go('career'); return new Promise(r => setTimeout(() => { const w = document.querySelector('#cs .wlim'); const ss = w ? w.querySelectorAll('select') : []; r(ss.length ? [ss[0].value, ss[1].value] : null); }, 900)); });
-  ok(JSON.stringify(back) === JSON.stringify(['4096', '32768']), 'and the Career Studio shows the same numbers', back);
+  const back = await p.evaluate(() => { go('career'); return new Promise(r => setTimeout(() => { const w = document.querySelector('#cs .wlim'); const t = w && w.querySelector('.gk') ? w.querySelector('.gk').textContent : ''; r(t ? [(/Reply (\S+?)·/.exec(t) || [])[1], (/Memory (\S+?)·/.exec(t) || [])[1]] : null); }, 900)); });
+  ok(JSON.stringify(back) === JSON.stringify(['4K', '32K']), 'and the Career Studio shows the same numbers', back);
   await p.reload(); await p.waitForFunction(() => window.__ingReady === true && window.IngLimits, null, { timeout: 300000 }); await p.waitForTimeout(1200);
   const kept = await p.evaluate(() => [state.models[0].tokens, state.models[0].ctx]);
   ok(JSON.stringify(kept) === JSON.stringify([4096, 32768]), 'after a reload they are still 4,096 and 32,768', kept);

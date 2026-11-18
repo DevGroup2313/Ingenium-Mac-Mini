@@ -194,7 +194,7 @@ function flushLog(){if(!PEND.length||(lockActive()&&!lockOn()))return;var p=PEND
 var ICON={lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',disk:'<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M7 15h.01M10 15h7"/>',
   wifi:'<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a5 5 0 0 1 6.4 0"/><circle cx="12" cy="19.2" r="1.2"/>',code:'<path d="M8.5 8L4.5 12l4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/>',
   self:'<path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/>',more:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/>'};
-var NEXT="7.38";
+var NEXT="7.40";
 /* 7.36: the room says only what this copy has: Fabrica and Vocatio are not in the gift and demo editions, and Ingenium itself is the
    owner's own build only in the master edition (rig/t_627_editions) */
 function hasPg(id){return !!D.getElementById("page-"+id);}

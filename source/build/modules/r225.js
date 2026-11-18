@@ -33,8 +33,12 @@ var FALL=[null,{name:"Low",room:2048,mul:0,line:"Quick replies. It thinks little
   {name:"High",room:8192,mul:1,line:"Careful work. It thinks before it answers. The usual choice."},{name:"Extra",room:16384,mul:2,line:"Hard problems. It thinks longer and may write longer replies."},
   {name:"Max",room:32768,mul:4,line:"The most thinking and the longest replies the model allows. The slowest."}];
 function LV(){return (W.IngEffort&&IngEffort.levels)||FALL;}
-function get(){var v=W.state&&state.wEff;return v==="auto"||v==="ultra"||/^[1-5]$/.test(String(v))?String(v):"auto";}
-function set(v){state.wEff=String(v);try{saveState();}catch(e){}paintAll();}
+/* 7.39: a level (Low to Max) is the model's own, kept in its one record (modules/r249.js) with its Reply and Memory; Auto and Ultra
+   stay one choice for these pages */
+function pkey(){try{return W.IngLimits&&typeof IngLimits.pageKey==="function"?IngLimits.pageKey():"none";}catch(e){return "none";}}
+function get(){var v=W.state&&state.wEff;v=v==="auto"||v==="ultra"||/^[1-5]$/.test(String(v))?String(v):"auto";
+  if(/^[1-5]$/.test(v)){try{var r=W.IngGen&&IngGen.rec?IngGen.rec(pkey()):null;if(r&&r.effort>=1&&r.effort<=5)return String(r.effort);}catch(e){}}return v;}
+function set(v){state.wEff=String(v);if(/^[1-5]$/.test(String(v))){try{if(W.IngGen&&IngGen.note)IngGen.note(pkey(),"effort",+v);}catch(e){}}try{saveState();}catch(e){}paintAll();}
 function says(v){if(v==="auto")return "Auto: reading quickly (Low); writing at High through a connection, and quickly on this device. Shared by Lector, Vocatio and Folders.";
   if(v==="ultra")return "Ultra: Max, then each piece written is checked against its own material, every name, date, number and claim, and corrected. About twice the time.";
   var L=LV()[+v];return (L?L.line+" ":"")+"Shared by Lector, Vocatio and Folders.";}

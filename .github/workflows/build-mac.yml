@@ -254,7 +254,7 @@ jobs:
         run: |
           # the build number: the version, the day and this repository's run number;
           # the app shows it in About (stamped into the page) and macOS in Get Info
-          V="7.38.$(date -u +%Y%m%d).${{ github.run_number }}"
+          V="7.39.$(date -u +%Y%m%d).${{ github.run_number }}"
           echo "INGENIUM_VERSION=$V" >> "$GITHUB_ENV"
           python3 tools/stamp_build.py ingenium.html "$V"
           echo "Fingerprint (SHA-256) of the page inside this app ($INGENIUM_CHIP): $(shasum -a 256 ingenium.html | cut -d' ' -f1)" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -405,6 +405,15 @@ jobs:
           # first time it opens. The copy with the models is for a Mac without internet.
           # 6.58: the copy with the models leaves the speech models out: with them it is over GitHub's limit of 2 GB for one file
           # (2.18 GB in 6.57's run); there dictation fetches its model once. The app alone, the main download, keeps them.
+          # 7.39: a log the self-tests left inside the app (7.38's Intel repository stopped here: "In subcomponent: ...
+          # Contents/MacOS/ingenium_crash.log") is shown in this log and taken out, so the app's signature holds. From 7.39 the app
+          # writes its logs to ~/Library/Logs/Ingenium on a Mac (build/desktop/app_logs_739.py), so this should find nothing.
+          for f in "dist/${APP_FILE}.app/Contents/MacOS/ingenium_crash.log" "dist/${APP_FILE}.app/Contents/MacOS/ingenium_diag.txt"; do
+            if [ -f "$f" ]; then echo "::warning::the self-tests left $(basename "$f") inside the app; it reads:"; cat "$f"; rm -f "$f"; fi
+          done
+          for f in "$HOME/Library/Logs/Ingenium/ingenium_crash.log" "$HOME/Library/Logs/Ingenium/ingenium_diag.txt"; do
+            if [ -f "$f" ]; then echo "::warning::the self-tests noted a problem in $(basename "$f"):"; cat "$f"; fi
+          done
           rm -rf "$RUNNER_TEMP/full" && mkdir -p "$RUNNER_TEMP/full"
           ditto "dist/${APP_FILE}.app" "$RUNNER_TEMP/full/${APP_FILE}.app"
           rm -rf "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Resources/speech" "$RUNNER_TEMP/full/${APP_FILE}.app/Contents/Frameworks/speech"

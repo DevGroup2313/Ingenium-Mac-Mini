@@ -395,7 +395,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.39 (in progress): dictation in-house on every device.
+Ingenium 7.39 (18 November 2026): one setting for each model, in every place; dictation in-house on every device; a Mac app's logs
+outside the app.
+
+One setting for each model. Her words: the Tokens and Context controls reset to zero, are "out whack all over the app", and can be set
+only on the chat pages, with no effort level elsewhere. Asked what to do (18 November 2026): "Both" (one setting everywhere, and a
+record of changes). Her approval of the live preview (https://claude.ai/artifact/1Pi8wWFGkSGt71bAekYcUP, previews/model_limits): "I
+approve of the preview".
+- Measured on 7.38: three stores disagreed. Chat's Controls kept a record per model (r249, state.gen.by); Lector, Vocatio and Folders
+  wrote Reply and Memory on the model only (r233, setLimit), so the next change of who answers put the older record back (Reply 2,048
+  set in Lector came back as 8,192); their Effort was one value for the three pages (r225, state.wEff).
+- `build/modules/r249.js`: IngGen.note(key, field, value, place) is the one way a value is set: the record, the model's own numbers and
+  Chat's Controls (when it is Chat's model) at once. A zero or broken value is never taken; the last good one is kept and a reset
+  caught is recorded with the place that asked. A lost value found at a change of model is mended to its last good one, and recorded.
+  Every change is recorded (state.gen.log, the newest 200) with the model and the place. Chat's Controls record only the control
+  moved, so a level Auto chose for one message is not kept as hers.
+- `build/modules/r233.js`: setLimit writes through IngGen.note; mend() takes the record's last good value before the defaults, and
+  records it; IngLimits.pageKey() names the model a page writes with. Lector, Vocatio and Folders show the key in place of their two
+  menus.
+- `build/modules/r225.js`: a level (Low to Max) set in Lector, Vocatio or Folders is the model's own; Auto and Ultra stay one choice
+  for the three pages.
+- `build/modules/r321.js` (new): the key beside the model (Reply, Memory, Effort) in Chat and Code, Lector, Vocatio, Folders and Fabrica;
+  pressed, a small sheet with Reply and Memory sliders and Low to Max; Escape, a press outside or a change of page closes it. In
+  Settings, Models and AI, Your Ingenium: each model with its key, and every change and any reset, newest first (r173, r234 place it).
+- rig: `t_739_limits.js` (new, 20 checks); `t_629_limits.js` reads the key instead of the two menus (12/12).
+
+A Mac app's logs outside the app. The 7.38 build for the Intel Mac repository (its Apple silicon copy) stopped at signing: during
+its self-tests the app had noted a problem and wrote ingenium_crash.log beside its program, inside the app, which breaks the app's
+signature (on her Mac too, where /Applications is writable for an administrator).
+- `build/desktop/app_logs_739.py` (new, the three computer apps): on a Mac, a built app writes ingenium_crash.log and ingenium_diag.txt to
+  ~/Library/Logs/Ingenium; elsewhere nothing changes.
+- `.github/workflows/build-mac.yml` (Mac mini and Intel repositories): before signing, a log left inside the app is shown in the build's
+  log and taken out, and a log in ~/Library/Logs/Ingenium is shown.
+
+Dictation in-house on every device.
 Her words (18 November 2026): "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead sending
 it outside of the app to another provider. I want everything kept in-house where possible."
 - Measured: dictation already writes in the message box with Scriba's own models, on the device (6.56, r254). The Mac and Windows apps

@@ -35,10 +35,12 @@ function save(){try{saveState();}catch(e){}}
 function trained(m){return num(m&&(m.ctxTrain||m.ctxLen))||0;}
 function defaults(m){var c=DEF_C,t=trained(m);if(t>0)c=Math.min(c,t);return {tokens:DEF_T,ctx:c,effort:3};}
 /* only a missing, zero, negative or broken number is mended: a small model's own small memory (a trained 256) is kept */
-function mend(m){if(!m)return false;var d=defaults(m),ch=false;
-  if(!(num(m.tokens)>0)){m.tokens=d.tokens;ch=true;}
-  if(!(num(m.ctx)>0)){m.ctx=d.ctx;ch=true;}
-  var e=num(m.effort);if(!(e>=1&&e<=5)){m.effort=d.effort;ch=true;}
+/* 7.39: mended to its own last good value where the record keeps one (modules/r249.js), and the record says so when a value it had was lost */
+function mend(m){if(!m)return false;var d=defaults(m),ch=false,G=W.IngGen&&IngGen.rec?IngGen:null,r=G?G.rec("m:"+m.id):null;
+  function fix(f,bad,to){if(G&&G.caught&&bad!==undefined&&bad!==null)try{G.caught("m:"+m.id,f,bad,to,null,"a lost value");}catch(e){}m[f]=to;ch=true;}
+  if(!(num(m.tokens)>0))fix("tokens",m.tokens,r&&r.tokens>0?r.tokens:d.tokens);
+  if(!(num(m.ctx)>0))fix("ctx",m.ctx,r&&r.ctx>0?r.ctx:d.ctx);
+  var e=num(m.effort);if(!(e>=1&&e<=5))fix("effort",m.effort,r&&r.effort>=1&&r.effort<=5?r.effort:d.effort);
   return ch;}
 function mendAll(){var n=0;models().forEach(function(m){if(mend(m))n++;});if(n)save();return n;}
 function ctxMax(m){var x=0;try{if(typeof W.ingCtxMax==="function")x=num(W.ingCtxMax(m));}catch(e){}return x>=1024?x:32768;}
@@ -76,6 +78,10 @@ function say(m){var lc=loadedCtx(m),cv=num(m.ctx);
   return s;}
 function strip(where){var w=D.createElement("div");w.className="wlim";w.setAttribute("data-wlim",where);paintStrip(w);return w;}
 function paintStrip(w){var pm=pageModel();w.innerHTML="";
+  /* 7.39 (modules/r321.js): the same key as in every other place, in place of the two menus */
+  if(W.IngGenKey&&typeof IngGenKey.chip==="function"&&(pm.m||pm.link)){w.classList.add("gk-on");if(pm.m&&mend(pm.m))save();w.appendChild(IngGenKey.chip(pageKey,null));
+    var ts=D.createElement("span");ts.className="wlim-say";ts.textContent=pm.m?say(pm.m):"For your connected model, here and in Chat.";w.appendChild(ts);return;}
+  w.classList.remove("gk-on");
   if(pm.link){var t=D.createElement("span");t.className="wlim-say";t.textContent="Reply length and memory follow your connected model.";w.appendChild(t);return;}
   var m=pm.m;if(!m){var t2=D.createElement("span");t2.className="wlim-say";t2.textContent="Reply length and memory are set once a model is ready.";w.appendChild(t2);return;}
   if(mend(m))save();
@@ -86,7 +92,9 @@ function paintStrip(w){var pm=pageModel();w.innerHTML="";
   sel("Reply up to","Longest reply, in tokens, for "+(m.customName||"this model"),RS,tv,Math.max(replyMax(m),tv),function(v){return fmt(v)+" tokens";},function(v){setLimit(m,"tokens",v);});
   sel("Memory","Memory (context window), in tokens, for "+(m.customName||"this model"),CS,cv,Math.max(ctxMax(m),cv),function(v){return kay(v);},function(v){setLimit(m,"ctx",v);});
   var t3=D.createElement("span");t3.className="wlim-say";t3.textContent=say(m);w.appendChild(t3);}
-function setLimit(m,k,v){if(!m||!(v>0))return;m[k]=v;if(k==="ctx"){m.ctxUser=true;delete m.ctxAuto;}save();
+/* 7.39: written through the one record (modules/r249.js), so a change here is the change in every place and is not undone later */
+function setLimit(m,k,v){if(!m)return;if(W.IngGen&&typeof IngGen.note==="function"){IngGen.note("m:"+m.id,k,v);try{paintAll();}catch(e){}return;}
+  if(!(v>0))return;m[k]=v;if(k==="ctx"){m.ctxUser=true;delete m.ctxAuto;}save();
   /* the same numbers in Chat's Controls when this is Chat's model too */
   try{if(m.id===state.activeModelId&&typeof W.refreshChatNote==="function")W.refreshChatNote();}catch(e){}
   try{paintAll();}catch(e){}}
@@ -112,7 +120,10 @@ if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boo
 (function later(){var n=0;(function wait(){if(W.__ingReady===true){boot();setTimeout(boot,2500);return;}if(++n<400)setTimeout(wait,500);})();})();
 (function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r233)return;var ng=function(p){var r=og.apply(this,arguments);try{if(/^(lector|career|folders)$/.test(p)){watch();setTimeout(paintAll,0);}}catch(e){}return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r233=1;W.go=ng;})();
-W.IngLimits={mend:mend,mendAll:mendAll,defaults:defaults,fitDialog:fitDialog,paintAll:paintAll,place:place,pageModel:pageModel};
+/* 7.39: the record's key for the model a page writes with (a model on this device, or the connected one) */
+function pageKey(){var pm=pageModel();if(pm.m)return "m:"+pm.m.id;
+  if(pm.link){try{var c=state.cloud||{};if(c.provider)return "c:"+String(c.provider||"")+"|"+String(c.model||"");}catch(e){}}return "none";}
+W.IngLimits={mend:mend,mendAll:mendAll,defaults:defaults,fitDialog:fitDialog,paintAll:paintAll,place:place,pageModel:pageModel,setLimit:setLimit,pageKey:pageKey};
 })();
 ;try{window.__ingParts["p233"]="running";}catch(_){}
 </script>
