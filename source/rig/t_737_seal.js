@@ -125,12 +125,12 @@ const LEGACY = 'legacy-hp-laptop-01';
   const d3 = (st3.devices || []).find(d => d.id === (pr3 && pr3.id ? null : 'x')) ;
   ok(pr3.id && st3.seal.legacy === 2 && st3.seal.sealed === 1, 'allowed, it is paired, unsealed, as an older device', { pr3, seal: st3.seal });
 
-  /* the marks on the Mac, and the Security room (the list of devices shows while the Mac lends its models, as before 7.37) */
-  await api(A.port, 'share_set', [true]);
+  /* the marks on the Mac, and the Security room (7.39: the list of devices shows whenever sharing runs; here only Fabrica's runs are on) */
   await p.evaluate(async () => { go('settings'); await new Promise(r => setTimeout(r, 800)); const c = document.getElementById('linkCard'); try { IngRooms.reveal(c, {}); } catch (e) {} try { IngLend.refresh(); } catch (e) {} try { IngLend.paint(); } catch (e) {} });
   await p.waitForTimeout(4500);
   const rows = await p.evaluate(() => [...document.querySelectorAll('#linkCard .ld-user')].map(r => [r.querySelector('b').textContent, (r.querySelector('.sl-chip') || {}).textContent || '', (r.querySelector('.sl-key.amb') || {}).textContent || '']));
-  ok(rows.some(r => r[1] === 'Sealed end to end') && rows.some(r => r[0] === 'HP laptop' && r[2] === 'Pair once more'), "the Mac's list: the iPhone Sealed end to end, the HP laptop Pair once more", rows);
+  const label = await p.evaluate(() => [...document.querySelectorAll('#linkCard .ld-lbl')].map(x => x.textContent));
+  ok(rows.some(r => r[1] === 'Sealed end to end') && rows.some(r => r[0] === 'HP laptop' && r[2] === 'Pair once more') && label.includes('Devices that reach this computer') && !label.includes('The models it lends'), "the Mac's list, with sharing on for Fabrica's runs only (7.39): Devices that reach this computer; the iPhone Sealed end to end, the HP laptop Pair once more", { rows, label });
   await p.screenshot({ path: OUT + '/mac_devices.png' });
   const room = async (pg) => { await pg.evaluate(() => { go('settings'); IngRooms.open('settings', 'security', true); IngSecurity.view('wifi'); }); await pg.waitForTimeout(900);
     return pg.evaluate(() => { const it = [...document.querySelectorAll('#secCard .sc-it')].find(x => /Sealed between your devices/.test(x.textContent)); const sec = [...document.querySelectorAll('#secCard .sc-p')].find(x => /Sealed between your devices/.test(x.textContent));

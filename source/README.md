@@ -409,6 +409,10 @@ it outside of the app to another provider. I want everything kept in-house where
   (https://huggingface.co/<model>/resolve/main/<file>, read in transformers.js 3.8.1's own code: caches "transformers-cache"). The line
   under the message box says so: "The speech model came from <computer>, over your home network, and is kept here". IngEars.from()
   names the computer.
+- `build/modules/r274.js`: her answer (18 November 2026), asked when the computer's list of devices should show: "Whenever sharing runs".
+  The code and the devices (each Sealed end to end or Pair once more) show whenever the server runs (lending, Fabrica's runs, apps,
+  the Cloud), as "Devices that reach this computer" when it does not lend; the models plate only while it lends. rig/t_737_seal checks
+  it with only Fabrica's runs on (26/26).
 - rig: `t_739_speech.js` (new, 9 checks: a real computer app with the speech files; a device page with none, the internet closed to it;
   the engine and the English model came in 30 sealed requests and loaded in about 6 seconds; reopened with the computer away, it
   loaded from what it kept).
