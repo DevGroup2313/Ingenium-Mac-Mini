@@ -136,7 +136,7 @@ function worker(){if(WK)return WK;
   WK=new Worker(URL.createObjectURL(new Blob([WSRC],{type:"text/javascript"})),{type:"module"});
   WK.onmessage=function(ev){var m=ev.data||{};
     if(m.type==="progress"){if(m.file&&m.loaded)FILES[m.file]=m.loaded;var tot=0;for(var k in FILES)tot+=FILES[k];
-      if(m.status!=="done"&&m.status!=="ready"&&tot>1048576)line("Getting the speech model ready, once: <b>"+Math.round(tot/1048576)+" MB</b>. After that it works offline, and your voice never leaves this device.",true);return;}
+      if(m.status!=="done"&&m.status!=="ready"&&tot>1048576)line(FROM.computer?"The speech model came from <b>"+esc(FROM.computer)+"</b>, over your home network, and is kept here: it works offline from now on, and your voice never leaves this device.":"Getting the speech model ready, once: <b>"+Math.round(tot/1048576)+" MB</b>. After that it works offline, and your voice never leaves this device.",true);return;}
     if(m.type==="model"){MODEL_ID=m.id;return;}
     var w=WAIT[m.id];if(!w)return;delete WAIT[m.id];
     if(m.type==="error")w.no(new Error(m.message||"the speech model failed"));else w.ok(m);};
@@ -146,12 +146,44 @@ function worker(){if(WK)return WK;
 function ask(msg,transfer){return new Promise(function(ok,no){var id=++SEQ;msg.id=id;WAIT[id]={ok:ok,no:no};worker().postMessage(msg,transfer||[]);});}
 /* the model is let go after ten minutes unused, so its memory returns to the computer; it comes back from this device's copy */
 function idle(){clearTimeout(IDLE);IDLE=setTimeout(function(){if(REC||BUSY||Q.length)return idle();if(WK){try{WK.terminate();}catch(e){}WK=null;READY_KEY="";MODEL_ID="";}},600000);}
-function job(l){return Promise.all([libUrls(function(){line("Getting the speech engine, once (about "+SIZE.runtime+" MB). After that it works offline.",true);}),localModels()]).then(function(x){
+/* 7.39 (app_speech_739.py): a device without the speech files takes them from its paired computer, once, over the home network (sealed
+   since 7.37), before the internet: the engine into Scriba's store, the model into transformers.js's own cache under the address it
+   asks for (https://huggingface.co/<model>/resolve/main/<file>, read in transformers.js 3.8.1's own code), so the rest runs as before */
+var HF="https://huggingface.co/",VIA=null;
+function viaComputer(l){if(VIA)return VIA;
+  VIA=localModels().then(function(loc){var ids=modelsFor(l);if(loc&&loc.models&&ids.some(function(id){return loc.models[id];}))return false;
+      var Ld=W.IngLend;if(!Ld||typeof Ld.request!=="function"||!Ld.state)return false;
+      var comps=(Ld.state().computers||[]).filter(function(c){return c&&c.id&&!/^addr:/.test(c.id);});if(!comps.length)return false;
+      return rtGet(CD_RT.key+"runtime/"+RT_VER+"/"+RT_FILES[2][0]).then(function(eng){
+        return cacheIf("transformers-cache").then(function(c){return c?c.keys():[];}).then(function(ks){var urls=ks.map(function(r){return String(r.url||"");});
+          var haveModel=ids.some(function(id){return urls.some(function(u){return u.indexOf(HF+id+"/")===0&&/\.onnx$/.test(u);});});
+          if(eng&&haveModel)return false;
+          var i=0;function next(){if(i>=comps.length)return false;var c=comps[i++];
+            return Promise.resolve(Ld.request(c.id,"GET","/ingenium/speech",null,30)).then(function(j){if(!j||!j.have)return next();
+              var id=ids.filter(function(x){return j.models&&j.models[x];})[0];if(!id&&eng)return next();
+              line("Getting the speech models from "+esc(c.name||"your computer")+", over your home network, once. After that they work offline here.",true);
+              var jobs=[];
+              if(!eng)(j.runtime&&j.runtime.files||[]).forEach(function(f){var t=(RT_FILES.filter(function(x){return x[0]===f;})[0]||[f,"application/octet-stream"])[1];
+                jobs.push(function(){return parts(Ld,c.id,"runtime/"+f).then(function(buf){return rtPut(CD_RT.key+"runtime/"+RT_VER+"/"+f,buf,t);});});});
+              if(id&&!haveModel)(j.models[id].files||[]).forEach(function(f){jobs.push(function(){return parts(Ld,c.id,"models/"+id+"/"+f).then(function(buf){
+                  return caches.open("transformers-cache").then(function(cc){return cc.put(HF+id+"/resolve/main/"+f,new Response(buf,{headers:{"content-type":/\.json$/.test(f)?"application/json":"application/octet-stream","content-length":String(buf.byteLength)}}));});});});});
+              return jobs.reduce(function(p,fn){return p.then(fn);},Promise.resolve()).then(function(){if(!eng)FROM.runtime="computer";if(id)FROM.models="computer";FROM.computer=c.name||"";return true;});},
+              function(){return next();});}
+          return next();});});})
+    .catch(function(){return false;}).then(function(v){VIA=null;return v;});
+  return VIA;}
+function parts(Ld,cid,rel){var out=[],off=0,n=0;
+  function step(){return Promise.resolve(Ld.request(cid,"GET","/ingenium/speech/part?f="+encodeURIComponent(rel)+"&off="+off+"&len="+(4<<20),null,180)).then(function(j){
+      if(!j||!j.ok)throw new Error("a speech file could not be read from the computer");var b=atob(j.b64||""),u=new Uint8Array(b.length);for(var k=0;k<b.length;k++)u[k]=b.charCodeAt(k);
+      out.push(u);n+=u.length;off+=u.length;return j.more&&u.length?step():null;});}
+  return step().then(function(){var all=new Uint8Array(n),k=0;out.forEach(function(u){all.set(u,k);k+=u.length;});return all.buffer;});}
+function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function job(l){return viaComputer(l).then(function(){return Promise.all([libUrls(function(){line("Getting the speech engine, once (about "+SIZE.runtime+" MB). After that it works offline.",true);}),localModels()]).then(function(x){
   var ms=modelsFor(l),local=x[1],has=ms.some(function(id){return local.models&&local.models[id];});
-  return {lib:x[0],models:ms,local:has?local.base:"",lang:l};});}
+  return {lib:x[0],models:ms,local:has?local.base:"",lang:l};});});}
 function ready(l){return job(l).then(function(j){var key=j.models.join("|")+"|"+j.local;
   if(READY_KEY===key&&WK)return j;
-  return ask({type:"load",lib:j.lib,models:j.models,local:j.local,remote:true}).then(function(m){READY_KEY=key;MODEL_ID=m.model||MODEL_ID;FROM.models=j.local?"beside":"device or internet";return j;});});}
+  return ask({type:"load",lib:j.lib,models:j.models,local:j.local,remote:true}).then(function(m){READY_KEY=key;MODEL_ID=m.model||MODEL_ID;FROM.models=j.local?"beside":(FROM.models==="computer"?"computer":"device or internet");return j;});});}
 function write(f32,l){return ready(l).then(function(j){idle();return ask({type:"run",lib:j.lib,models:j.models,local:j.local,remote:true,lang:l,audio:f32},[f32.buffer]);})
   .then(function(m){return clean(m.text);});}
 /* what a speech model writes for silence or noise is not words */
@@ -286,7 +318,7 @@ function init(){try{wire();}catch(e){}try{card();}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",init);else init();
 D.addEventListener("click",function(e){var t=e.target&&e.target.closest&&e.target.closest('.nav-btn[data-page="settings"]');if(t)setTimeout(card,0);},true);
 W.IngEars={deviceOk:deviceOk,browserChosen:browserChosen,lang:lang,ready:ready,write:write,start:startListening,stop:stopListening,
-  listening:function(){return !!REC;},busy:function(){return BUSY||Q.length>0;},from:function(){return {runtime:FROM.runtime,models:FROM.models,model:MODEL_ID};},
+  listening:function(){return !!REC;},busy:function(){return BUSY||Q.length>0;},from:function(){return {runtime:FROM.runtime,models:FROM.models,model:MODEL_ID,computer:FROM.computer||""};},
   status:function(){return new Promise(function(r){status(r);});},clean:clean,to16k:to16k,resample:resample};
 })();
 ;try{window.__ingParts["p254"]="running";}catch(_){}

@@ -395,6 +395,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.39 (in progress): dictation in-house on every device.
+Her words (18 November 2026): "I want for Scriba and its speech models to be wired into the Chats pages compose text box instead sending
+it outside of the app to another provider. I want everything kept in-house where possible."
+- Measured: dictation already writes in the message box with Scriba's own models, on the device (6.56, r254). The Mac and Windows apps
+  carry the speech engine and models beside the page; the Fire, Android, iPhone and iPad apps did not (their workflows have no speech
+  step), so a first use there fetched them once from the internet (cdn.jsdelivr.net, huggingface.co).
+- `build/desktop/app_speech_739.py` (new, the three computer apps): the lending server offers the speech files to her paired devices
+  (GET /ingenium/speech, GET /ingenium/speech/part, base64 pieces of up to 8 MB, only under speech/runtime and speech/models); hello says
+  speech: 1.
+- `build/modules/r254.js`: before the internet, a device without the files takes them from its paired computer (through IngLend.request,
+  so sealed since 7.37): the engine into Scriba's store, the model into transformers.js's own cache under the address it asks for
+  (https://huggingface.co/<model>/resolve/main/<file>, read in transformers.js 3.8.1's own code: caches "transformers-cache"). The line
+  under the message box says so: "The speech model came from <computer>, over your home network, and is kept here". IngEars.from()
+  names the computer.
+- rig: `t_739_speech.js` (new, 9 checks: a real computer app with the speech files; a device page with none, the internet closed to it;
+  the engine and the English model came in 30 sealed requests and loaded in about 6 seconds; reopened with the computer away, it
+  loaded from what it kept).
+
 Ingenium 7.38 (18 November 2026): your chats in Ollama's own app, brought in; the Terms card's wording in the other editions.
 Her request (9 November 2026, with the folders): "I want a safe way to move my data from Claude and Ollama to Ingenium so that I don't
 lose all of my work". Her answer (18 November 2026), asked whether she chats in Ollama's own app: "Yes, on Mac and Windows".
