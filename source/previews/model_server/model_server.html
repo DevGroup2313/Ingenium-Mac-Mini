@@ -1,0 +1,144 @@
+<title>Who Serves Your Models</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Settings, Models and AI, Your devices: the computers that serve your models, in order (the Mac mini first, the two HP laptops
+   after it); each with its state and where its models are kept; a key to try "the Mac mini is away"; beside, what each of your devices
+   does, and a plain word on drives and memory. Tokens as Ingenium's. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86; --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26);
+  --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --lav-t:rgba(106,63,181,.12); --lav-c:#6a3fb5; --gry-t:rgba(34,26,46,.07); --gry-c:#6c6579;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --gry-t:rgba(233,227,243,.08); --gry-c:#a99cc1;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --gry-t:rgba(233,227,243,.08); --gry-c:#a99cc1;
+  color-scheme:dark}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap">
+<style>
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.55 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+h1{font:600 30px/1.15 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:6px 0 0;max-width:66ch}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.key{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font:600 12.8px/1 var(--sans);transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}.key:active{transform:translateY(1px)}
+.key[aria-pressed="true"]{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff}
+.key:focus-visible,.mini button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--card-sh);padding:18px;min-width:0;transition:transform .2s var(--bounce),box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.card h2{font:600 23px/1.2 var(--serif);color:var(--ink1);margin:0}
+.sub{margin:4px 0 0;color:var(--ink3);font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11.5px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.on{background:var(--emr-t);color:var(--emr-c)}.chip.away{background:var(--gry-t);color:var(--gry-c)}.chip.ans{background:var(--lav-t);color:var(--lav-c)}.chip.amb{background:var(--amb-t);color:var(--amb-c)}
+.order{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.srv{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--well);
+  box-shadow:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.06);transition:transform .3s var(--spring),box-shadow .2s,opacity .3s}
+.srv:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.srv.answering{border-color:var(--acc);box-shadow:0 0 0 2px var(--lav-t),0 8px 18px rgba(40,22,68,.12)}
+.srv.is-away{opacity:.72}
+.srv .n{font:600 22px/1 var(--serif);color:var(--acc);min-width:20px;text-align:center}
+.dev{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--key-bg);box-shadow:var(--key-sh);color:var(--acc);transition:transform .45s var(--spring)}
+.srv:hover .dev{transform:rotate(-6deg) scale(1.05)}
+.dev svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.who b{display:block;color:var(--ink1);font-size:14px}
+.who small{display:block;color:var(--ink3);font-size:12.3px;line-height:1.45}
+.who .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.mini{display:flex;flex-direction:column;gap:4px}
+.mini button{width:30px;height:28px;border-radius:9px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);font:600 12px/1 var(--sans);color:var(--ink2);transition:transform .25s var(--bounce)}
+.mini button:hover{transform:translateY(-2px)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.said{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:var(--well);border:1px solid var(--line);font-size:13px;color:var(--ink1)}
+.devs{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.d{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--well);transition:transform .3s var(--spring)}
+.d:hover{transform:translateX(3px)}
+.d b{color:var(--ink1);font-size:13px}.d small{display:block;color:var(--ink3);font-size:12.3px;line-height:1.45}
+.d .dev{width:34px;height:34px;border-radius:10px}.d .dev svg{width:19px;height:19px}
+.fine{margin:10px 0 0;color:var(--ink3);font-size:12.5px;line-height:1.5}
+details.why{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--well);padding:9px 12px;transition:transform .3s var(--spring)}
+details.why:hover{transform:translateX(3px)}
+details.why summary{cursor:pointer;list-style:none;font:600 13px var(--sans);color:var(--ink1);display:flex;justify-content:space-between}
+details.why summary::-webkit-details-marker{display:none}
+details.why summary::after{content:"Read";color:var(--acc);font-size:12px}details.why[open] summary::after{content:"Fold"}
+details.why p{margin:8px 0 0;font-size:12.8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div><h1>Who serves your models</h1><p class="lede">A preview for Settings, Models and AI, Your devices. Your weaker devices use the strongest computer that is on: the Mac mini first; when it is away, a 16 GB HP laptop. You change the order; Ingenium does the rest, and says which one answered.</p></div>
+    <button type="button" class="key" id="theme">Night</button>
+  </div>
+  <div class="grid">
+    <section class="card">
+      <h2>In this order</h2>
+      <p class="sub">The first one that answers serves the model. Each is paired once, sealed between your devices.</p>
+      <div class="order" id="order"></div>
+      <div class="row"><span class="sub" style="margin:0">Try it:</span><button type="button" class="key" id="away" aria-pressed="false">The Mac mini is away</button><button type="button" class="key" id="send">Send a message from the MacBook Pro</button></div>
+      <p class="said" id="said">Nothing sent yet.</p>
+    </section>
+    <section class="card">
+      <h2>Your devices</h2>
+      <p class="sub">What each one does with your models.</p>
+      <div class="devs" id="devs"></div>
+      <details class="why"><summary>Drives, flash drives and memory</summary><p>A drive holds more models; it does not add memory. A model runs in a computer's memory (RAM), so the 2 TB drive lets the Mac mini keep many models and load the one you ask for, while your 8 GB MacBook Pro uses them from the Mac mini instead of running them itself. Flash drives are slow to load from: they are best for carrying models from one computer to another. The Fire tablet's SD card can keep its own small models.</p></details>
+      <p class="fine">Nothing here goes online: your devices find each other on your home Wi-Fi, sealed. The models named here are examples.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var IC={mini:'<svg viewBox="0 0 24 24"><rect x="3.5" y="9" width="17" height="7" rx="2.2"/><path d="M7 12.5h.01M17 12.5h.01"/></svg>',
+    laptop:'<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="10" rx="1.6"/><path d="M3 18.5h18"/></svg>',
+    tab:'<svg viewBox="0 0 24 24"><rect x="5.5" y="3.5" width="13" height="17" rx="2"/><path d="M11 17.5h2"/></svg>',
+    phone:'<svg viewBox="0 0 24 24"><rect x="7.5" y="3" width="9" height="18" rx="2"/><path d="M11 18h2"/></svg>'};
+  var S=[{id:"mini",name:"Mac mini",icon:"mini",spec:"Apple silicon, 16 GB · models on the 2 TB drive",models:"Qwen3.5 9B, Magister, Faber and 6 more",away:false},
+    {id:"hpA",name:"HP laptop (the first)",icon:"laptop",spec:"16 GB · models on its own disk",models:"Qwen3.5 9B, Magister",away:false},
+    {id:"hpB",name:"HP laptop (the second)",icon:"laptop",spec:"16 GB · models on its own disk",models:"Qwen3.5 9B",away:true}];
+  var ANS=null;
+  function first(){return S.filter(function(s){return !s.away;})[0]||null;}
+  function paint(){var o=$("order");o.innerHTML="";var f=first();
+    S.forEach(function(s,i){var d=document.createElement("div");d.className="srv"+(s.away?" is-away":"")+(ANS&&ANS===s.id?" answering":"");
+      d.innerHTML='<span class="n">'+(i+1)+'</span><span class="dev">'+IC[s.icon]+'</span><span class="who"><b>'+s.name+'</b><small>'+s.spec+'</small><small>'+s.models+'</small><span class="chips">'
+        +(s.away?'<span class="chip away"><i></i>Away</span>':'<span class="chip on"><i></i>On</span>')+(f&&f.id===s.id?'<span class="chip ans">Serves your models now</span>':'')+(i===0?'<span class="chip amb">Your default</span>':'')+'</span></span>'
+        +'<span class="mini"><button type="button" aria-label="Move up" data-a="u">&#8593;</button><button type="button" aria-label="Move down" data-a="d">&#8595;</button></span>';
+      [].forEach.call(d.querySelectorAll("[data-a]"),function(b){b.onclick=function(){var j=b.getAttribute("data-a")==="u"?i-1:i+1;if(j<0||j>=S.length)return;var t=S[i];S[i]=S[j];S[j]=t;paint();};});o.appendChild(d);});
+    var D=[["laptop","MacBook Pro","8 GB · uses the models of the computer that serves them; its Passport drive keeps copies for when it is on its own"],
+      ["laptop","Windows laptops (6 GB)","Use the served models; run only small ones on their own"],["tab","Fire tablet","Uses the served models at home; keeps small ones on its SD card"],
+      ["phone","iPhone and iPad","Use the served models at home, sealed"]];
+    $("devs").innerHTML=D.map(function(x){return '<div class="d"><span class="dev">'+IC[x[0]]+'</span><span><b>'+x[1]+'</b><small>'+x[2]+'</small></span></div>';}).join("");}
+  $("away").onclick=function(){var m=S.filter(function(s){return s.id==="mini";})[0];m.away=!m.away;this.setAttribute("aria-pressed",String(m.away));ANS=null;paint();$("said").textContent=m.away?"The Mac mini is away: the next one in the order serves your models.":"The Mac mini is back: it serves your models again.";};
+  $("send").onclick=function(){var f=first();ANS=f?f.id:null;paint();$("said").textContent=f?"Answered by the "+f.name+(f.id==="mini"?"":" (the Mac mini was away)")+". The chat says so under the answer.":"No computer is on: the MacBook Pro answers with a small model of its own.";};
+  paint();
+  var root=document.documentElement;function dark(){var t=root.getAttribute("data-theme");return t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;}
+  var tb=$("theme");function lab(){tb.textContent=dark()?"Day":"Night";}tb.onclick=function(){root.setAttribute("data-theme",dark()?"light":"dark");lab();};lab();
+})();
+</script>
