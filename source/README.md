@@ -413,9 +413,11 @@ Pass preview, please commit and push it everywhere." Measured before building: r
   - Release notes kept with each release (a note on the version), in Releases;
   - this app's terms (master copy, Care, Settings): its name, owner, contact and what it keeps; the Terms of use (7 sections) and the
     Privacy notice (5), each to rewrite; Ask on first open. A starting point, not legal advice.
-- r111: a web app package carries NOTES.txt, TERMS.txt and PRIVACY.txt, and the terms sheet on first open when asked. The one-page
-  package and the device packages do not carry them yet.
-- r141: the defaults, the two checks and the terms, by their hooks. r298: the notes on each release card.
+- Every web app package (r111's own, or r178's from her apps' family, which replaces r111's when her templates are here): r330 wraps
+  IngShip.webApp, opens the finished zip, adds NOTES.txt, TERMS.txt and PRIVACY.txt, puts the sheet in the main page when asked, and
+  zips it again; her app's own terms also stand in a kit's TERMS.md. The one-page package and the device packages do not carry them yet.
+- r141: the defaults (once for each app, marked rec.r330, because the record is normalised with auto false), the two checks and the
+  terms, by their hooks. r298: the notes on each release card.
 - rig/t_743_fabrica.js.
 
 Ingenium 7.42 (18 November 2026): who serves your models, your computers in your order.

@@ -159,12 +159,10 @@ function webApp(id,opt){opt=opt||{};return snapshot(id,opt.ref).then(function(sn
           "self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim())); });\n"+
           "self.addEventListener('fetch', e => { if (e.request.method !== 'GET') return; e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request))); });\n"});
         html=html.replace(/<\/body>/i,"<script>if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(function(){});<\/script>\n</body>");}
-      var out=[],EX={files:[]},top=slug+"-web-"+ver.replace(/[^\w.-]/g,"")+"/";
-      /* 7.43 (modules/r330.js): NOTES.txt, TERMS.txt, PRIVACY.txt, and the terms sheet on first open when the app's owner asks */
-      var chain=(window.IngShipExtra?Promise.resolve().then(function(){return IngShipExtra(id,snap.commit);}).catch(function(){return null;}):Promise.resolve(null)).then(function(x){if(x)EX=x;if(EX.body)html=/<\/body>/i.test(html)?html.replace(/<\/body>(?![\s\S]*<\/body>)/i,EX.body+"\n</body>"):html+EX.body;});
+      var out=[],chain=Promise.resolve(),top=slug+"-web-"+ver.replace(/[^\w.-]/g,"")+"/";
       files.forEach(function(f){chain=chain.then(function(){if(f.path===page){out.push({name:top+f.path,data:te.encode(html),mode:parseInt(f.mode,8)});return;}
         return IngRepo.read(id,f.path,snap.commit).then(function(b){out.push({name:top+f.path,data:b,mode:parseInt(f.mode,8)});});});});
-      return chain.then(function(){extra.forEach(function(x){out.push({name:top+x.name,data:te.encode(x.data)});});(EX.files||[]).forEach(function(x){out.push({name:top+x.name,data:typeof x.data==="string"?te.encode(x.data):x.data});});
+      return chain.then(function(){extra.forEach(function(x){out.push({name:top+x.name,data:te.encode(x.data)});});
         out.push({name:top+"README.txt",data:te.encode(name+" "+ver+"\n\nOpen "+page+" in a browser, or put this folder on any web host (https) and open it there: it installs as an app and works with no connection.\nMade by Ingenium from version "+snap.commit+".\n")});
         return IngRepo.core.zip(out,{comment:snap.commit});}).then(function(z){return IngRepo.setNote(id,snap.commit,"webApp",{at:Date.now(),size:z.length,files:out.length}).then(function(){return {bytes:z,name:top.slice(0,-1)+".zip",files:out.length,commit:snap.commit};});});});});});});}
 

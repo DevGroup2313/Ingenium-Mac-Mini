@@ -15,14 +15,15 @@
      pointer, a night look drawn, still when motion is reduced, a ring for the keyboard. The others (refined, understated) stay for her.
      Measured from the app's own styles: the check does not move a pointer.
    - Release notes kept with each release (a note on the version, yours to edit; Draft with my model asks the model in Lector's place, as
-     r280 does) and, with the release's terms, inside its web app package: NOTES.txt, TERMS.txt, PRIVACY.txt.
+     r280 does) and, with the release's terms, inside its web app package (r111's or r178's: the finished zip is opened, given NOTES.txt,
+     TERMS.txt, PRIVACY.txt, and closed again).
    - This app's terms (her master copy, Care, Settings): its name, owner, contact and what it keeps; the Terms of use and the Privacy notice
      in sections, every one hers to rewrite; Ask on first open puts a sheet in its web app (I agree or Decline, kept on that device).
      A starting point, not legal advice: the card says a lawyer should read them before the app is sold or shared widely. */
 #fb .r330-box .r330-rows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-#fb .r330-way{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.6px;color:var(--f-ink2);padding:6px 8px;border-radius:10px;transition:transform .3s var(--f-spring,cubic-bezier(.2,.9,.25,1.2)),background .2s}
+#fb .r330-way{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 8px;align-items:center;font-size:12.6px;color:var(--f-ink2);padding:6px 8px;border-radius:10px;transition:transform .3s var(--f-spring,cubic-bezier(.2,.9,.25,1.2)),background .2s}
 #fb .r330-way:hover{transform:translateX(3px);background:var(--f-wellbg)}
-#fb .r330-way em{font-style:normal;font:11.8px/1.3 var(--f-mono,ui-monospace,monospace);color:var(--f-ink3);text-align:right;overflow-wrap:anywhere}
+#fb .r330-way em{grid-column:2;font-style:normal;font:11.8px/1.3 var(--f-mono,ui-monospace,monospace);color:var(--f-ink3);overflow-wrap:anywhere}
 #fb .r330-tag{font:700 10.5px/1 var(--f-sans);padding:4px 8px;border-radius:999px;white-space:nowrap}
 #fb .r330-tag.ok{background:rgba(31,157,99,.14);color:#1a7f50}#fb .r330-tag.look{background:rgba(232,144,42,.16);color:#b4600f}#fb .r330-tag.off{background:var(--f-wellbg);color:var(--f-ink3)}
 body[data-theme="night"] #fb .r330-tag.ok{background:rgba(64,192,128,.15);color:#6fd8a2}body[data-theme="night"] #fb .r330-tag.look{background:rgba(240,176,96,.15);color:#f0b060}
@@ -42,7 +43,7 @@ body[data-theme="night"] #fb .r330-tag.ok{background:rgba(64,192,128,.15);color:
 #fb .r330-terms details.r330-sec summary::-webkit-details-marker{display:none}
 #fb .r330-terms details.r330-sec summary::after{content:"Edit";color:var(--f-acc);font-size:12px}#fb .r330-terms details.r330-sec[open] summary::after{content:"Fold"}
 #fb .r330-terms h4{margin:12px 0 0;font:600 15px/1.3 var(--f-serif,Georgia,serif);color:var(--f-ink1)}
-@media (max-width:700px){#fb .r330-terms .r330-fields{grid-template-columns:1fr}#fb .r330-way{grid-template-columns:auto minmax(0,1fr)}#fb .r330-way em{grid-column:2;text-align:left}}
+@media (max-width:700px){#fb .r330-terms .r330-fields{grid-template-columns:1fr}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p330"]="started";}catch(_){}
 /* R330 · Fabrica's next pass: see the note at the top of its styles. window.IngFabNext */
@@ -63,7 +64,10 @@ function row(state,mark,title,small){var e=el("div","f-ck "+state);e.innerHTML='
 function plural(n,one,many){return n+" "+(n===1?one:(many||one+"s"));}
 
 /* ================= 1. her apps: checks on every version, and main waits, from the start ================= */
-function defaults(rec){if(!rec||!master())return rec;if(rec.auto===undefined)rec.auto=true;if(rec.rules===undefined)rec.rules={review:true,checks:true};return rec;}
+/* once for each app (rec.r330): its record is normalised with auto false whether or not she chose it, so "never set" cannot be told
+   from "off"; after this once, what she sets stands */
+function defaults(rec){if(!rec||!master()||rec.r330)return rec;rec.r330=1;rec.auto=true;var rs=rec.rules;if(!rs||!(rs.pr||rs.review||rs.checks||rs.keep))rec.rules=Object.assign({},rs||{},{review:true,checks:true});
+  setTimeout(function(){keep(rec).catch(function(){});},0);return rec;}
 
 /* ================= 2. offline and in-house ================= */
 var TXT=/\.(html?|m?js|cjs|css|svg|json|webmanifest)$/i;
@@ -109,7 +113,7 @@ var PROBE=function(nonce){function send(o){try{parent.postMessage({ingWays:nonce
     var bases=[].concat.apply([],lifts);
     var keys=[].slice.call(document.querySelectorAll('button,[role="button"],input[type="button"],input[type="submit"],summary,a.btn,a.button,.btn,.button,.card')).filter(shown);
     var still=keys.filter(function(e){return !bases.some(function(b){try{return e.matches(b)||!!e.closest(b);}catch(x){return false;}});});
-    var wide=keys.filter(function(e){var r=e.getBoundingClientRect();return r.width>320&&r.width/r.height>6;}).map(function(e){return {t:(e.textContent||"").trim().slice(0,40),w:Math.round(e.getBoundingClientRect().width)};});
+    var wide=keys.filter(function(e){if(e.matches(".card")&&!e.matches("button,[role=button],.btn,.button"))return false;var r=e.getBoundingClientRect();return r.width>320&&r.width/r.height>6;}).map(function(e){return {t:(e.textContent||"").trim().slice(0,40),w:Math.round(e.getBoundingClientRect().width)};});
     var hideBars=R.some(function(r){return /::-webkit-scrollbar/.test(r.sel)&&(r.st.display==="none"||r.st.width==="0px"||r.st.width==="0");});
     var bars=[].slice.call(document.querySelectorAll("*")).concat([document.documentElement]).filter(function(e){var c=getComputedStyle(e),o=c.overflowY+" "+c.overflowX;if(!/auto|scroll/.test(o)&&e!==document.documentElement)return false;
       var over=e.scrollHeight>e.clientHeight+1||e.scrollWidth>e.clientWidth+1;if(!over)return false;return !(c.scrollbarWidth==="none"||hideBars);}).length;
@@ -181,7 +185,7 @@ function termsBox(r,rec,w){if(!master()||!rec)return;var t=rec.appTerms||T0(r);v
   ks.appendChild(btn("","Start again from Ingenium's",function(){rec.appTerms=T0(r);keep(rec).then(function(){var x=X();if(x&&x.paintWork)x.paintWork();});}));box.appendChild(ks);w.appendChild(box);}
 /* the sheet an app shows on its first open, when its owner asks for it (kept on that device) */
 function gate(t){var data=JSON.stringify({app:t.app,terms:textOf(t,"terms"),privacy:textOf(t,"privacy"),k:"terms-agreed-"+String(t.app).replace(/\W+/g,"-").toLowerCase()+"-"+(t.at||0)}).replace(/</g,"\\u003c");
-  return '<scr'+'ipt>(function(T){try{if(localStorage.getItem(T.k))return;}catch(e){return;}function go(){var v=document.createElement("div");v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");v.setAttribute("aria-label",T.app+": terms");'+
+  return '<scr'+'ipt>(function(T){try{if(localStorage.getItem(T.k))return;}catch(e){}function go(){var v=document.createElement("div");v.setAttribute("role","dialog");v.setAttribute("aria-modal","true");v.setAttribute("aria-label",T.app+": terms");'+
     'v.style.cssText="position:fixed;inset:0;z-index:2147483647;background:rgba(20,14,30,.55);display:grid;place-items:center;padding:16px;font:14px/1.5 system-ui,sans-serif";'+
     'var c=document.createElement("div");c.style.cssText="max-width:640px;width:100%;max-height:86vh;display:flex;flex-direction:column;gap:10px;background:#fff;color:#221a2e;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)";'+
     'var h=document.createElement("b");h.textContent="Before you use "+T.app;h.style.fontSize="18px";var p=document.createElement("pre");p.textContent=T.terms+"\\n"+T.privacy;p.style.cssText="white-space:pre-wrap;overflow:auto;flex:1;margin:0;font:13px/1.5 system-ui,sans-serif;scrollbar-width:none";'+
@@ -194,6 +198,26 @@ function extra(id,commit){return Promise.all([live(id),notesText(id,commit)]).th
   if(master()&&rec&&rec.appTerms){var t=rec.appTerms;files.push({name:"TERMS.txt",data:textOf(t,"terms")});files.push({name:"PRIVACY.txt",data:textOf(t,"privacy")});if(t.ask)body=gate(t);}
   return {files:files,body:body};});}
 W.IngShipExtra=extra;
+/* every web app package, however it was made (r111's own, or r178's from her apps' family): opened, given its notes and terms (and the
+   sheet in its main page when asked), and closed again. When this app's own terms are kept they also stand in a kit's general TERMS.md,
+   so a package never carries two sets of terms. */
+function addTo(res,id){if(!res||!res.bytes||!W.IngRepo||!IngRepo.core||!IngRepo.core.unzip)return Promise.resolve(res);
+  return extra(id,res.commit).then(function(x){if(!x||(!x.files.length&&!x.body))return res;var C=IngRepo.core,z=C.unzip(res.bytes),es=z.entries||[];
+    var top=(function(){var f=es.map(function(e){return e.name;}).filter(function(n){return n.indexOf("/")>0;});if(!f.length)return "";var t=f[0].split("/")[0]+"/";return f.every(function(n){return n.indexOf(t)===0;})?t:"";})();
+    var pages=es.filter(function(e){return /\.html?$/i.test(e.name)&&e.name.slice(top.length).indexOf("/")<0;}),main=pages.filter(function(e){return /(^|\/)index\.html?$/i.test(e.name);})[0]||pages[0];
+    var own=master()&&x.files.some(function(f){return f.name==="TERMS.txt";}),termsTxt=own?x.files.filter(function(f){return f.name==="TERMS.txt";})[0].data:null;
+    var out=[],chain=Promise.resolve();
+    es.forEach(function(e){chain=chain.then(function(){return C.unzipData(res.bytes,e).then(function(d){var name=e.name;
+      if(x.files.some(function(f){return top+f.name===name;}))return;   /* written below */
+      if(own&&/(^|\/)TERMS\.md$/i.test(name)){out.push({name:name,data:te.encode(termsTxt)});return;}
+      if(x.body&&main&&e===main){var h=td.decode(d);h=/<\/body>/i.test(h)?h.replace(/<\/body>(?![\s\S]*<\/body>)/i,x.body+"\n</body>"):h+x.body;out.push({name:name,data:te.encode(h),mode:e.mode});return;}
+      out.push({name:name,data:d,mode:e.mode});});});});
+    return chain.then(function(){x.files.forEach(function(f){out.push({name:top+f.name,data:typeof f.data==="string"?te.encode(f.data):f.data});});
+      return C.zip(out,{comment:z.comment||res.commit});}).then(function(b){var r2={};Object.keys(res).forEach(function(k){r2[k]=res[k];});r2.bytes=b;r2.files=out.length;r2.carries=x.files.map(function(f){return f.name;});return r2;});})
+    .catch(function(e){try{console.warn("Fabrica: the notes and terms could not be added",e);}catch(_){}return res;});}
+(function wrap(n){if(W.IngShip&&typeof IngShip.webApp==="function"&&IngShip.webApp.__r178!==undefined||n>40){if(W.IngShip&&typeof IngShip.webApp==="function"&&!IngShip.webApp.__r330){var base=IngShip.webApp;
+    var w=function(id){var self=this,a=arguments;return Promise.resolve(base.apply(self,a)).then(function(res){return addTo(res,id);});};Object.keys(base).forEach(function(k){w[k]=base[k];});w.__r330=true;IngShip.webApp=w;}return;}
+  setTimeout(function(){wrap(n+1);},250);})(0);
 W.IngFabNext={version:1,defaults:defaults,checks:checks,offline:offline,ways:ways,measure:measure,relNotes:relNotes,terms:termsBox,extra:extra,textOf:textOf,blank:T0,_rows:waysRows};
 try{window.__ingParts["p330"]="running";}catch(_){}
 })();

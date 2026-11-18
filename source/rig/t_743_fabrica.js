@@ -52,13 +52,15 @@ button:focus-visible{outline:3px solid #6a3fb5}
   await p.evaluate(() => fbHub.open('settings')); await sleep(1200);
   const t0 = await p.evaluate(() => { const b = document.getElementById('hTerms'); return b ? { secs: b.querySelectorAll('details.r330-sec').length, name: b.querySelector('input[data-k="app"]').value, afterRules: !!(b.previousElementSibling && /hSetRules|r285/.test(b.previousElementSibling.id + ' ' + b.previousElementSibling.className)) } : null; });
   ok(t0 && t0.secs === 12 && t0.name === 'Quill', "this app's terms: its name in place, the Terms of use and the Privacy notice in twelve sections, each to rewrite", t0);
+  const fold = await p.evaluate(() => { const f = document.querySelector('#hTerms [id^="fr"]'); const k = f && document.querySelector('[aria-controls="' + f.id + '"]'); const t = k ? k.textContent.trim().slice(0, 60) : null; if (k && getComputedStyle(f).display === 'none') k.click(); return { key: t }; }); await sleep(600);
+  ok(fold.key !== null, "the terms card folds like Fabrica's other boxes, and opens with its key", fold);
   await p.fill('#hTerms input[data-k="contact"]', 'quill@example.invalid');
   await p.evaluate(() => { const d = document.querySelector('#hTerms details.r330-sec'); d.open = true; });
   await p.fill('#hTerms details.r330-sec textarea >> nth=0', 'Quill is a notebook made by {owner}. It runs on your device.');
   await p.check('#hTermsAsk'); await p.locator('#hTerms button', { hasText: 'Keep these terms' }).click(); await sleep(600);
   // 5. release notes, kept with the release, and the web app package carries notes and terms
   await p.evaluate(async (id) => { const r = (await IngRepo.list()).find(x => x.id === id); await IngRepo.setNote(id, r.head, 'relNotes', { text: 'What is new\n- The first notebook.', at: Date.now() }); }, S.id);
-  const pk = await p.evaluate(async (id) => { const z = await IngShip.webApp(id, {}); const es = IngRepo.core.unzip(z.bytes); const td = new TextDecoder();
+  const pk = await p.evaluate(async (id) => { const z = await IngShip.webApp(id, {}); const es = IngRepo.core.unzip(z.bytes).entries; const td = new TextDecoder();
     const get = async (re) => { const e = es.find(x => re.test(x.name)); return e ? td.decode(await IngRepo.core.unzipData(z.bytes, e)) : ''; };
     const terms = await get(/TERMS\.txt$/), notes = await get(/NOTES\.txt$/), priv = await get(/PRIVACY\.txt$/), page = await get(/index\.html$/);
     return { names: es.map(e => e.name.split('/').pop()), notes: /The first notebook/.test(notes), terms: !!terms, priv: /Privacy notice/.test(priv), gate: /Before you use/.test(page), mine: /Quill is a notebook made by its maker/.test(terms), contact: /quill@example\.invalid/.test(terms) }; }, S.id);
@@ -70,7 +72,7 @@ button:focus-visible{outline:3px solid #6a3fb5}
   ok(g1.open && /Before you use Quill/.test(g1.text) && /Privacy notice/.test(g1.text), 'the packaged app asks first: its terms and privacy notice, I agree or Decline', g1.text.slice(0, 80));
   await q.locator('button', { hasText: 'I agree' }).click(); ok(await q.evaluate(() => !document.querySelector('[role=dialog]')), 'I agree: the sheet closes, kept on that device');
   // the release card holds the notes
-  await p.evaluate(() => fbHub.open('releases')); await sleep(2500);
+  await p.evaluate(async (id) => { await IngRepo.tag(id, 'v1.0'); await fbHubHost.refresh(); fbHub.open('releases'); }, S.id); await sleep(3000);
   const rn = await p.evaluate(() => { const d = document.querySelector('.r330-notes'); return d ? { sum: d.querySelector('summary').textContent, text: d.querySelector('textarea').value } : null; });
   ok(rn && /What is new/.test(rn.text) && /2 lines/.test(rn.sum), 'Releases: the notes are kept with the release, to read and edit', rn);
   ok(errs.length === 0, 'no page errors', errs);
