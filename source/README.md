@@ -415,6 +415,12 @@ lose all of my work". Her answer (18 November 2026), asked whether she chats in 
   TERMS.txt and PRIVACY.txt made again from the card. (7.37's editions were not committed for this reason; 7.38's are.)
 - Claude Code sessions on the web, "From Claude's data export": no source confirms that Claude's export holds them (third-party sources
   say it holds the chats and projects); Folders keeps saying so, and she is asked to look in one of her exports.
+- `build/desktop/app_seal2_738.py` (new, the three computer apps): the 7.37 builds for Windows and the Intel Mac stopped at the app's own
+  self-test of lending ("sharing with other devices: HTTP Error 401"): it asked with the code alone, naming no device, which 7.37 refuses.
+  The self-test now names itself as a device paired before 7.37, and then pairs sealed as a phone would (its key pair, the code, the
+  four words confirmed, the model list through /ingenium/sealed, opened and compared with the plain one, and the code alone refused for
+  it). A build without the encryption library now fails its self-test, so every published app is proved to carry it. Tried here against
+  a real gateway: 3 sealed frames, status 200, the code alone refused.
 - rig: `t_738_ollama.js` (new, 10 checks: a stand-in of Ollama's database made with the tables of its source, kept open in write-ahead
   mode as while Ollama runs; Ollama's files the same byte for byte afterwards, and no copy left behind).
 

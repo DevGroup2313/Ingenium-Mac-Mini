@@ -131,6 +131,7 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_setup_724", "_runs_install_setup", ("mini", "intel", "win")), ("app_runs_728", "_runs_dev_get", ("mini", "intel", "win")),
            ("app_apps_735", "_apps_serve", ("mini", "intel", "win")),
            ("app_seal_737", "_seal_serve", ("mini", "intel", "win")),
+           ("app_seal2_738", "_seal_selftest", ("mini", "intel", "win")),
            ("app_ollama_738", "_ollama_chats_find", ("mini", "intel", "win"))]
 
 
