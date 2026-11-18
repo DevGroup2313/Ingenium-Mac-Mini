@@ -216,7 +216,7 @@ var CONF={
       ids:["ing-refresh-card",/^name$/,/^look and feel/,"ingSoundCard",/^sounds?\b/,"ihSetCard","dmcCard"]},  /* 7.29: the diamond on Adamas (r314) */
     {k:"calm",t:"Calm and focus",i:"calm",says:"Support for focus, time and a calmer screen. One group opens at a time.",ids:["supCard"]},
     {k:"ai",t:"Models and AI",i:"ai",says:"How Ingenium writes to you, and the models it may use. Web search, Ingenium's eyes and its ears (dictation) are here too.",
-      ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ingEarsCard","ragCard","awakeCard","genLogCard","waysCard"]},  /* 7.39: Reply, Memory and Effort for each model (r321) */
+      ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","srvCard","ingEyesCard","ingEarsCard","ragCard","awakeCard","genLogCard","waysCard"]},  /* 7.39: Reply, Memory and Effort for each model (r321) */
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
       ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
     /* 7.36: Security (modules/r318.js), her approved preview (18 November 2026, https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ) */
@@ -302,6 +302,7 @@ var KEYS=[
   [/^connect a cloud/,"cloud server online remote api key token address connect connection"],
   [/^web search/,"web search internet online sources scholar academic peer reviewed"],
   ["linkCard","devices phone tablet computer share sharing every device link"],
+  ["srvCard","who serves your models order mac mini first default fallback away answers computers drive drives memory"],
   ["awakeCard","awake sleep screen keep on wake lock background working tablet phone fire lending borrowing"],
   ["ingEyesCard","eyes pictures picture images photos vision see"],
   ["ingEarsCard","dictation dictate microphone mic speech voice speak talk ears scriba whisper moonshine transcribe language french creole offline"],

@@ -395,6 +395,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.42 (18 November 2026): who serves your models, your computers in your order.
+
+Her answer (18 November 2026): "I want the Mac mini as the default with the 2 TB drive but also if its not available or near, I want to use
+the HP 16GB laptops." Her approval of the live preview (https://claude.ai/artifact/9YgFwK1uKce3NXHgD4xRzt, previews/model_server): "I approve
+of the preview, please commit and push it everywhere and continue working on my requests."
+
+- build/modules/r328.js (window.IngServe), in Settings, Models and AI, Your devices, after the pairing card (#srvCard; r234 and r173 name
+  it): her paired computers in her order (state.lend.order; one not in it yet comes after, a computer without a screen, such as the Mac mini,
+  first among them), each with its state (On, Looking, Away), its models, Your default on the first and Serves your models now on the one in
+  use; Move up and Move down; a switch, The first that answers serves your models (state.lend.autoServe, on); Ask them now; Use the first
+  that answers; and, folded, Drives, flash drives and memory (a drive adds room for models, not memory).
+- Before a message, with the switch on and two or more computers paired: every computer is asked at once (r274's check, at the addresses
+  it gave); the first in her order that answers serves, keeping the model she chose (IngLend.use); when none answers there, they are looked
+  for on the Wi-Fi, one by one, by the apps that can. The answer then carries a line, "Answered by Mac mini." or "Answered by HP laptop:
+  Mac mini was away." (msgNode wrapped; the message keeps it as srv). Off: as before (r274), the chosen computer answers.
+- Not measured: how long a computer that is switched off or out of reach takes to count as away on her own network (each address waits up
+  to 4 s, as in r274; a computer that refuses the connection counts at once).
+- rig/t_742_serve.js: two stand-in computers (rig/lend681_mock.py); 16 checks.
+
 Ingenium 7.41 (18 November 2026): the controls key; agreeing to the terms, in full; your ways of working.
 
 Her approval of the live preview (https://claude.ai/artifact/S7Rwqc72usWw7Ly138jeSz, previews/v741), with her changes: "I approve of the
