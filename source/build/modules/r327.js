@@ -121,7 +121,7 @@ function body(host,inSettings){var w=S();if(!w)return;host.innerHTML="";
   var ab=mk("button",null,"Add");ab.type="button";function addIt(){var v=inp.value.trim();if(!v)return;w.list.push({id:uid(),t:v,from:"Added by you",at:Date.now()});inp.value="";save();}
   ab.addEventListener("click",addIt);inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();addIt();}});add.appendChild(inp);add.appendChild(ab);host.appendChild(add);
   host.appendChild(mk("h3",null,"Where they apply"));var wh=mk("div","wy-where");
-  [["models","Every model reads them","Chat, Lector, Vocatio and the rest: with Ingenium's own instructions and yours"],
+  [["models","Every model reads them",(D.getElementById("page-career")?"Chat, Lector, Vocatio and the rest":"Chat, Lector and the rest")+": with Ingenium's own instructions and yours"],
    ["work","When a model works on your apps",(D.getElementById("page-fabrica")?"A Code session, Fabrica and Build":"A Code session and Build")+", even when the first is off"],
    ["settings","Shown in Settings, Your Ingenium","Beside your own instructions for every chat"]].forEach(function(x){var row=mk("div","wy-sw"),l=mk("span",null,x[1]);l.appendChild(mk("small",null,x[2]));row.appendChild(l);
     var tg=mk("button","wy-tg");tg.type="button";tg.setAttribute("role","switch");tg.setAttribute("aria-checked",String(!!w[x[0]]));tg.setAttribute("aria-label",x[1]);
