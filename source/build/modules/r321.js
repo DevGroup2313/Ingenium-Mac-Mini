@@ -206,9 +206,12 @@ function keys(){var out=[],seen={};function add(k){if(k&&k!=="none"&&!seen[k]){s
 function card(){var c=$("genLogCard");if(c)return c;var page=$("page-settings");if(!page)return null;
   c=mk("div","card");c.id="genLogCard";var host=$("awakeCard")||$("ragCard")||$("ingEarsCard")||$("personaCard");
   if(host&&host.parentNode)host.parentNode.insertBefore(c,host.nextSibling);else page.appendChild(c);return c;}
+/* the places this copy has (the gift and demo editions carry no Vocatio and no Fabrica) */
+function placesText(){var a=["Chat","Code"];[["page-lector","Lector"],["page-career","Vocatio"],["page-folders","Folders"],["page-fabrica","Fabrica"]].forEach(function(x){if($(x[0]))a.push(x[1]);});
+  return a.slice(0,-1).join(", ")+" and "+a[a.length-1];}
 function paintCard(){var c=card();if(!c)return;var g=G();
   c.innerHTML='<div class="gl-head"><span class="gl-coin" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg></span>'
-    +'<div><h2 class="sec" style="margin:0">Reply, Memory and Effort</h2><p class="gl-sub">One setting for each model, the same in Chat, Code, Lector, Vocatio, Folders and Fabrica. Press a model\'s key to change it.</p></div></div>';
+    +'<div><h2 class="sec" style="margin:0">Reply, Memory and Effort</h2><p class="gl-sub">One setting for each model, the same in '+placesText()+'. Press a model\'s key to change it.</p></div></div>';
   c.appendChild(mk("h3",null,"Each model"));var ml=mk("div","gl-models"),ks=keys();
   if(!ks.length)ml.appendChild(mk("p","gl-none","No model is ready yet. Once one is, its key is here."));
   ks.forEach(function(k){var row=mk("div","gl-m");row.appendChild(mk("span",null,g?g.name(k):k));row.appendChild(chip(function(){return k;},"Settings"));ml.appendChild(row);});

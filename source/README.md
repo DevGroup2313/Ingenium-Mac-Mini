@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.40 (18 November 2026): your DPhil plan in Vocatio; the 7.39 texts right in every edition.
+
+Your DPhil plan. Her answers (18 November 2026): the DPhil in Information, Communication and the Social Sciences at the Oxford Internet
+Institute; "Funded DPhil + full time remote work alongside it"; October 2027 (apply by 7 January); fee status International; "Show me both
+side by side". Her word on the live preview (https://claude.ai/artifact/V3xHzY7HeVJ5j6s5unwqiY, previews/dphil_plan): "I approve of the
+preview but the page is too long and needs to be restructured ... the lists are very long and should be foldable or have a 'click here
+to see more' button"; on the restructured preview: "I approve of the preview".
+- `build/modules/r323.js` (new, window.IngDPhil): in Your counsellor, 4. Where you could go, her own profile only, a card (the days to
+  7 January, her lean, the next step) and Open the plan: a sheet with the deadline counting down and three tabs. Two ways: three
+  deciding rows, the other four behind 4 more rows; her lean kept (state.career, the profile's dphil). The weeks: the next three of
+  seven steps, all behind All 7 steps; the steps are one goal in Goals and plan (ticked in either, the same tick). What was checked: each
+  source folded. Facts: read on the OII's page on 18 November 2026; from summaries (to check); not read (fees, documents, their lengths:
+  Oxford's admissions pages refuse automated reading). Nothing about her nationality is assumed.
+- rig: `t_740_dphil.js` (new, 14 checks).
+
+The 7.39 texts in every edition. rig/t_627_editions found the gift and demo editions naming Vocatio and Fabrica, which they do not have,
+in the new model settings card and in What is new (24/26). 7.39's editions were not committed; its device builds went ahead (the page
+for her devices is the master's).
+- `build/modules/r321.js`: the card names only the places the copy has. `build/modules/r222.js`: the 7.39 line in two forms, one for
+  copies with Vocatio and Fabrica, one for those without.
+
 Ingenium 7.39 (18 November 2026): one setting for each model, in every place; raised sliders; dictation in-house on every device; a
 Mac app's logs outside the app.
 
