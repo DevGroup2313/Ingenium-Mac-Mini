@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.43 (18 November 2026): Fabrica's next pass.
+
+Her approval of the live preview (https://claude.ai/artifact/2aHjSvn6yc7JSusyQn3aqo, previews/fabrica_next): "I approve of the Fabrica Next
+Pass preview, please commit and push it everywhere." Measured before building: reviews that ask for changes (r141) and Rules before main
+(r285) were there already, off until turned on; the preview showed them as new, and this was said to her.
+
+- build/modules/r330.js (window.IngFabNext; window.IngShipExtra):
+  - her apps (master copy): the checks on every version kept, and main waits for the checks and her approval, from the start, where she
+    has never set them (r141's record, as it is first read);
+  - Offline and in-house, beside Safety in Care, Checks: what the version would load or call from outside itself, by file and line;
+    plain links and the device's own addresses are not counted; kept as a note on the version;
+  - Your ways of working, measured (master copy): the version runs in a sandboxed quiet window and a probe reads its own styles and
+    layout: keys and cards that answer the pointer, scroll bars in view, long wide buttons (over 320 px and six times as wide as tall),
+    a purple shade under the pointer, a night look, motion reduced, a focus ring. It does not move a pointer: hover is read from the
+    styles. Refined and understated are not measured;
+  - Release notes kept with each release (a note on the version), in Releases;
+  - this app's terms (master copy, Care, Settings): its name, owner, contact and what it keeps; the Terms of use (7 sections) and the
+    Privacy notice (5), each to rewrite; Ask on first open. A starting point, not legal advice.
+- r111: a web app package carries NOTES.txt, TERMS.txt and PRIVACY.txt, and the terms sheet on first open when asked. The one-page
+  package and the device packages do not carry them yet.
+- r141: the defaults, the two checks and the terms, by their hooks. r298: the notes on each release card.
+- rig/t_743_fabrica.js.
+
 Ingenium 7.42 (18 November 2026): who serves your models, your computers in your order.
 
 Her answer (18 November 2026): "I want the Mac mini as the default with the 2 TB drive but also if its not available or near, I want to use

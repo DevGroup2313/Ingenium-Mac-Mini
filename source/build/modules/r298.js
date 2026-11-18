@@ -902,6 +902,7 @@ function paintReleases(r,w,f){var x=X(),C=x.C,MADE=W.fbMade;
         k.appendChild(key("sm","Make it",function(e,b){b.disabled=true;Promise.resolve(x.makeOne(r,kd,{})).then(function(){delete C.log[ck];x.paintWork();},function(){b.disabled=false;});}));a.appendChild(k);as.appendChild(a);});
       row.appendChild(as);card.appendChild(row);});
     if(!it.made.length&&!isHead)card.appendChild(el("p","f-hint","No package of this version is kept on this device."));
+    try{if(W.IngFabNext&&(tags.length||isHead))IngFabNext.relNotes(r,c,card);}catch(e9){}
     body.appendChild(card);});
   var ht=x.headTag?x.headTag(r):"";
   if(!ht)f.appendChild(key("","Mark the version kept now as a release",function(){x.sheetName("Mark a release","A name for this version, as a release: v1, 6.0, autumn.",function(name){return IngRepo.tag(r.id,name,{target:r.head}).then(function(){toast("Release "+name+" marked.");C.log={};return x.refresh();}).then(x.paint);});}));

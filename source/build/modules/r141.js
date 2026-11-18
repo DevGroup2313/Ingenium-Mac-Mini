@@ -328,7 +328,7 @@ function norm(x,id){var f=fresh(id||(x&&x.id));if(!x||typeof x!=="object")return
 var REC={},RECP={},RECERR={},SAVEQ={};
 /* the record of an app, if it is read already; otherwise it is read now and the view painted again */
 function recOf(r){if(REC[r.id])return REC[r.id];if(!RECP[r.id]&&!RECERR[r.id]){RECP[r.id]=recP(r.id).then(function(){delete RECP[r.id];repaint();},function(e){delete RECP[r.id];RECERR[r.id]=e;repaint();});}return null;}
-function recP(id){if(REC[id])return Promise.resolve(REC[id]);return getRec(id).then(function(x){if(!REC[id])REC[id]=norm(x||fresh(id),id);return REC[id];});}
+function recP(id){if(REC[id])return Promise.resolve(REC[id]);return getRec(id).then(function(x){if(!REC[id]){REC[id]=norm(x||fresh(id),id);try{if(window.IngFabNext)IngFabNext.defaults(REC[id]);}catch(e9){}}return REC[id];});}
 function keep(rec){rec.changed=Date.now();REC[rec.id]=rec;badges(rec);var job=(SAVEQ[rec.id]||Promise.resolve()).then(function(){return putRec(rec);});SAVEQ[rec.id]=job.catch(function(){});
   return job.catch(function(e){fail(new Error("this could not be kept on the device ("+(e&&e.message||e)+")"));throw e;});}
 function forget(id){delete REC[id];delete VS[id];var st=hs();var i=st.stars.indexOf(id);if(i>=0){st.stars.splice(i,1);stSave();}return delRec(id).catch(function(){});}
@@ -1051,6 +1051,8 @@ function paintActions(r,w,f){var rec=needRec(r,w,"the runs");if(!rec)return;var 
   var intro=h("div","h-box h-blk");intro.innerHTML='<b class="h-big">Fabrica\'s own checks, as runs</b>On each version you choose, Fabrica runs its five checks: the page reads cleanly, every file it names is here, it opens with no errors, its own self-test, and its build number moves forward. Each run is kept here with what it found.';w.appendChild(intro);
   /* 6.91: Safety, on every version (modules/r285.js) */
   try{if(window.IngGuard)IngGuard.safety(r,rec,w);}catch(e9){try{console.warn("Fabrica safety",e9);}catch(_){}}
+  /* 7.43: offline and in-house, and her ways of working measured (modules/r330.js) */
+  try{if(window.IngFabNext)IngFabNext.checks(r,rec,w);}catch(e9){try{console.warn("Fabrica next",e9);}catch(_){}}
   if(!r.head){w.appendChild(h("div","f-empty h-blk","Keep a first version, then run the checks on it."));return;}
   var bar=h("div","h-bar h-blk"),ref=v.ref||(r.detached?r.head:"refs/heads/"+(r.branch||defBranch(r,rec)));
   bar.appendChild(picker(refOptions(r),ref,"The version to check",function(x){v.ref=x;}));
@@ -1233,6 +1235,8 @@ function paintSettings(r,w,f){var rec=needRec(r,w,"the settings");if(!rec)return
     var sel=picker(r.branches.map(function(b){return {v:b,t:b};}),defBranch(r,rec),"The main idea",function(x){rec.defBranch=x;keep(rec).then(function(){toast(x+" is the main idea.");SCANSIG[r.id]="";});});sel.id="hSetDef";r3.appendChild(sel);s3.appendChild(r3);w.appendChild(s3);}
   /* 6.91: Rules before main (modules/r285.js) */
   try{if(window.IngGuard)IngGuard.rules(r,rec,w);}catch(e9){try{console.warn("Fabrica rules",e9);}catch(_){}}
+  /* 7.43: this app's terms, her master copy (modules/r330.js) */
+  try{if(window.IngFabNext)IngFabNext.terms(r,rec,w);}catch(e9){try{console.warn("Fabrica terms",e9);}catch(_){}}
   var s4=h("div","h-box h-blk");s4.id="hSetLabels";s4.innerHTML='<b class="h-big">Labels</b>';
   rec.labels.forEach(function(l,i){var row=h("div","h-labrow");var col=h("input","h-col-in");col.type="color";col.value=/^#[0-9a-f]{6}$/i.test(l.color)?l.color:"#8a8296";col.setAttribute("aria-label","The colour of "+l.name);
     var nm=h("input");nm.type="text";nm.value=l.name;nm.setAttribute("aria-label","The label's name");var ds=h("input","h-ld");ds.type="text";ds.value=l.desc||"";ds.placeholder="What it means";ds.setAttribute("aria-label","What "+l.name+" means");
