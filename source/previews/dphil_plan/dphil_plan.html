@@ -1,0 +1,251 @@
+<title>Your DPhil Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Vocatio's head (the deadline counting down), then the two paths side by side, row for row, then the weeks to 7 January as a
+   ladder of steps with what Ingenium does at each, then what was checked and what is still to check. Tokens as Ingenium's own. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86; --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 8px 14px rgba(52,24,100,.12);
+  --head:linear-gradient(160deg,#ece5f7,#f7f3fc 55%,#efe8f9);
+  --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --sky-t:rgba(74,160,240,.16); --sky-c:#2f6fd0; --rub-t:rgba(200,20,60,.1); --rub-c:#b8433f; --lav-t:rgba(106,63,181,.12); --lav-c:#6a3fb5;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --head:linear-gradient(160deg,#241a33,#1b1526 55%,#221830);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --head:linear-gradient(160deg,#241a33,#1b1526 55%,#221830);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  color-scheme:dark}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap">
+<style>
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.55 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+@keyframes rise{from{opacity:.4;transform:translateY(6px)}}
+.key{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font:600 12.5px/1 var(--sans);transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)} .key:active{transform:translateY(1px)}
+.key[aria-pressed="true"]{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff}
+.key:focus-visible,.step:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{background:var(--emr-t);color:var(--emr-c)} .chip.chk{background:var(--amb-t);color:var(--amb-c)} .chip.no{background:var(--rub-t);color:var(--rub-c)} .chip.sky{background:var(--sky-t);color:var(--sky-c)} .chip.lav{background:var(--lav-t);color:var(--lav-c)}
+/* the head */
+.head{background:var(--head);border:1px solid var(--line);border-radius:22px;box-shadow:var(--card-sh);padding:22px 24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;transition:transform .26s var(--spring),box-shadow .26s}
+.head:hover{transform:translateY(-1.5px);box-shadow:var(--card-hi)}
+@media (max-width:720px){.head{grid-template-columns:minmax(0,1fr)}}
+.eyebrow{font:700 10.5px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3)}
+h1{font:600 38px/1.1 var(--serif);color:var(--ink1);margin:8px 0 6px;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--ink2)}
+.count{display:flex;gap:10px;align-items:stretch}
+.tile{min-width:86px;padding:12px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--key-sh);text-align:center;transition:transform .3s var(--bounce),box-shadow .2s}
+.tile:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:var(--key-hi)}
+.tile b{display:block;font:600 34px/1 var(--serif);color:var(--ink1);font-variant-numeric:lining-nums tabular-nums;margin-bottom:4px}
+.tile span{font:600 11px/1.2 var(--sans);color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+.due{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--ink2)}
+/* the two paths */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--card-sh);padding:18px;min-width:0;transition:transform .2s var(--bounce),box-shadow .2s;animation:rise .4s var(--spring) backwards}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.card h2{font:600 24px/1.2 var(--serif);color:var(--ink1);margin:0}
+.sub{margin:4px 0 0;color:var(--ink3);font-size:13px}
+.cmp{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr);gap:0;margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.cmp > div{padding:11px 13px;border-top:1px solid var(--line);min-width:0;transition:background .2s}
+.cmp > .hd{border-top:0;background:var(--well);font:600 13px/1.35 var(--sans);color:var(--ink1);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.cmp > .hd .nm{font:600 20px/1.15 var(--serif)}
+.cmp > .lab{font:600 12.5px/1.35 var(--sans);color:var(--ink2);background:var(--well)}
+.cmp .v{color:var(--ink2);font-size:13.2px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.cmp .v b{color:var(--ink1);font-weight:650}
+.cmp [data-row]:hover{background:var(--lav-t)}
+.cmp .lean{outline:2px solid var(--acc);outline-offset:-2px}
+@media (max-width:760px){.cmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.cmp > .lab{grid-column:1/-1;border-top:1px solid var(--line)}.cmp > .hd.corner{display:none}.cmp > .lab + div,.cmp > .lab + div + div{border-top:0}}
+.leans{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+.leans span{font-size:13px;color:var(--ink3)}
+/* the weeks */
+.grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.bar{height:10px;border-radius:999px;background:var(--well);box-shadow:inset 0 2px 3px rgba(40,22,68,.2);overflow:hidden;margin:12px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--pri-bg);border-radius:999px;transition:width .5s var(--spring)}
+.prog{font-size:12.5px;color:var(--ink3)}
+.steps{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.step{display:grid;grid-template-columns:auto 92px minmax(0,1fr);gap:12px;align-items:start;text-align:left;width:100%;padding:11px 13px;border-radius:13px;border:1px solid var(--line);background:var(--well);transition:transform .3s var(--spring),box-shadow .2s}
+.step:hover{transform:translateX(3px);box-shadow:var(--key-sh)}
+.tick{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);display:grid;place-items:center;color:#fff;font:700 13px/1 var(--sans);margin-top:1px}
+.step[aria-pressed="true"] .tick{background:var(--pri-bg);border-color:var(--pri-line)}
+.step[aria-pressed="true"] .what{text-decoration:line-through;text-decoration-color:var(--ink3)}
+.when{font:600 12px/1.35 var(--sans);color:var(--ink3);font-variant-numeric:tabular-nums}
+.when.now{color:var(--amb-c)}
+.what{font:600 13.5px/1.4 var(--sans);color:var(--ink1)}
+.how{display:block;font-weight:400;font-size:12.6px;color:var(--ink3);margin-top:3px}
+@media (max-width:420px){.step{grid-template-columns:auto minmax(0,1fr)}.when{grid-column:2}}
+.src{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.s{padding:10px 12px;border-radius:12px;background:var(--well);border:1px solid var(--line);display:flex;flex-direction:column;align-items:flex-start;gap:5px;transition:transform .3s var(--spring)}
+.s:hover{transform:translateX(3px)}
+.s b{color:var(--ink1);font-size:13px}
+.s small{color:var(--ink3);font-size:12.2px;line-height:1.45}
+.fine{margin:10px 0 0;color:var(--ink3);font-size:12.3px;line-height:1.5}
+.top{display:flex;justify-content:flex-end}
+/* 2: one part at a time under three tabs; long lists open on their first rows, the rest behind a key */
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink2);font:600 13px/1.25 var(--sans);padding:7px 14px;border-radius:11px;transition:transform .16s var(--bounce),box-shadow .16s}
+.tab:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.tab[aria-selected="true"]{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff}
+.tab .n{font:700 10.5px/1 var(--sans);padding:3px 6px;border-radius:999px;background:var(--lav-t);color:var(--lav-c)}
+.tab[aria-selected="true"] .n{background:rgba(255,255,255,.22);color:#fff}
+.tab:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+[data-more-row].folded{display:none}
+.more{margin-top:12px}
+.s summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.s summary::-webkit-details-marker{display:none}
+.s summary::after{content:"Show";font:600 11.5px/1 var(--sans);color:var(--acc)}
+.s[open] summary::after{content:"Hide"}
+.s summary b{flex:1 1 auto}
+.s small{margin-top:6px;display:block}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top"><button type="button" class="key" id="theme">Night</button></div>
+
+  <section class="head">
+    <div>
+      <div class="eyebrow">Vocatio · Your counsellor · Where you could go</div>
+      <h1>Your DPhil plan</h1>
+      <p class="lede">The DPhil in Information, Communication and the Social Sciences at the Oxford Internet Institute, from October 2027. The two ways Oxford offers, side by side, and the weeks to the deadline.</p>
+    </div>
+    <div class="count" aria-label="Time left to the deadline">
+      <div class="tile"><b id="dLeft">50</b><span>days</span></div>
+      <div class="tile"><b id="wLeft">7</b><span>weeks</span></div>
+    </div>
+    <div class="due"><span class="chip chk">Deadline</span> 12 noon (UK time) on Thursday 7 January 2027, for October 2027. Complete applications only, references included.</div>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Your DPhil plan">
+    <button type="button" class="tab" role="tab" data-tab="ways" aria-selected="true">Two ways</button>
+    <button type="button" class="tab" role="tab" data-tab="weeks" aria-selected="false">The weeks <span class="n" id="tabN">0 of 7</span></button>
+    <button type="button" class="tab" role="tab" data-tab="facts" aria-selected="false">What was checked</button>
+  </div>
+
+  <section class="card" data-panel="ways">
+    <h2>Two ways, side by side</h2>
+    <p class="sub">Fee status: International. Green: read on the OII's page. Amber: check on Oxford's pages first.</p>
+    <div class="cmp" id="cmp">
+      <div class="hd corner"></div>
+      <div class="hd" data-col="ft"><span class="nm">Full-time, funded</span><span class="chip sky">Funding first</span></div>
+      <div class="hd" data-col="pt"><span class="nm">Part-time, beside a full-time job</span><span class="chip lav">Your job first</span></div>
+
+      <div class="lab" data-row>How long</div>
+      <div class="v" data-col="ft" data-row><b>3 to 4 years</b><span class="chip ok">OII page</span></div>
+      <div class="v" data-col="pt" data-row><b>6 to 8 years</b><span>Another part of the page says 5 to 6.</span><span class="chip chk">Check which</span></div>
+
+      <div class="lab" data-row>Your full-time remote job</div>
+      <div class="v" data-col="ft" data-row><b>Does not fit</b><span>Beyond Oxford's guideline, a Student visa allows at most 20 hours of work a week in term.</span><span class="chip no">Not alongside</span></div>
+      <div class="v" data-col="pt" data-row><b>Fits</b><span>This way is made for study beside work.</span><span class="chip ok">Alongside</span></div>
+
+      <div class="lab" data-row>Funding named by the OII</div>
+      <div class="v" data-col="ft" data-row><b>Clarendon · ESRC Grand Union DTP · Academic Futures · OII Shirley Scholarships</b><span>For Grand Union, choose it in the application.</span><span class="chip ok">OII page</span></div>
+      <div class="v" data-col="pt" data-row><b>OII Shirley Scholarships</b><span>Named for full-time and part-time. Whether the others fund part-time study, check each one.</span><span class="chip chk">Check each</span></div>
+
+      <div class="lab" data-row data-more-row>Time it asks</div>
+      <div class="v" data-col="ft" data-row data-more-row><b>Study as your main work</b><span>Oxford's guideline: paid work should still leave at least 40 hours a week of study, for 44 weeks a year.</span><span class="chip chk">From a summary: check</span></div>
+      <div class="v" data-col="pt" data-row data-more-row><b>About 20 hours a week</b><span>And at least 30 days a year in Oxford.</span><span class="chip chk">From a summary: check</span></div>
+
+      <div class="lab" data-row data-more-row>Where you live</div>
+      <div class="v" data-col="ft" data-row data-more-row><b>In Oxford, on a Student visa</b><span>As an international student.</span><span class="chip chk">Check the visa terms</span></div>
+      <div class="v" data-col="pt" data-row data-more-row><b>Where you are, with visits</b><span>Whether a part-time DPhil needs a visa for its days in Oxford, and which one, I could not confirm.</span><span class="chip chk">Ask Oxford's Student Immigration team</span></div>
+
+      <div class="lab" data-row data-more-row>Fees</div>
+      <div class="v" data-col="ft" data-row data-more-row><b>International fee, full-time</b><span>The amount is on Oxford's course page, which cannot be read from here.</span><span class="chip chk">Check the amount</span></div>
+      <div class="v" data-col="pt" data-row data-more-row><b>International fee, part-time</b><span>The same: on Oxford's course page.</span><span class="chip chk">Check the amount</span></div>
+
+      <div class="lab" data-row data-more-row>Against your answer</div>
+      <div class="v" data-col="ft" data-row data-more-row><b>Gives the funding, not the job</b><span>Your words: "Funded DPhil + full time remote work alongside it".</span></div>
+      <div class="v" data-col="pt" data-row data-more-row><b>Gives the job; less funding open to it</b><span>A narrower list of funders, and twice the years.</span></div>
+    </div>
+    <button type="button" class="key more" id="moreRows" aria-expanded="false">4 more rows</button>
+    <div class="leans"><span>You lean toward:</span><button type="button" class="key" data-lean="ft" aria-pressed="false">Full-time, funded</button><button type="button" class="key" data-lean="pt" aria-pressed="false">Part-time, with my job</button><button type="button" class="key" data-lean="" aria-pressed="true">Not decided</button></div>
+    <p class="fine">Leaning marks a way and changes nothing else. One application form serves both, so the weeks are the same either way.</p>
+  </section>
+
+  <section class="card" data-panel="weeks" hidden>
+      <h2>The weeks to 7 January</h2>
+      <p class="sub">The next steps first. Tick a step when it is done.</p>
+      <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+      <div class="prog" id="prog">0 of 7 done</div>
+      <div class="steps" id="steps"></div>
+      <button type="button" class="key more" id="moreSteps" aria-expanded="false">All 7 steps</button>
+  </section>
+  <section class="card" data-panel="facts" hidden>
+      <h2>What was checked</h2>
+      <p class="sub">Read on 18 November 2026. Things change: Ingenium asks you to look again before each step that depends on them.</p>
+      <div class="src">
+        <details class="s"><summary><span class="chip ok">Read on the page</span><b>The OII's DPhil page</b></summary><small>October 2027; 12 noon on Thursday 7 January 2027; complete applications with references by then; full-time 3 to 4 years; part-time 6 to 8 years in its header.</small></details>
+        <details class="s"><summary><span class="chip chk">From summaries</span><b>Part-time hours, paid work, visa hours</b></summary><small>About 20 hours a week and 30 days a year in Oxford (part-time); at least 40 hours a week for 44 weeks of study; at most 20 hours of work a week in term on a Student visa. Oxford's own pages refused to be read from here.</small></details>
+        <details class="s"><summary><span class="chip chk">Not read</span><b>Fees, documents and their lengths</b></summary><small>The research proposal's length, the number of references, transcripts and the international fee are on Oxford's course page. Look there first.</small></details>
+      </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var DUE=Date.UTC(2027,0,7,12,0,0);   /* 12 noon in Oxford on 7 January is 12:00 UTC (GMT in winter) */
+  function left(){var ms=DUE-Date.now(),d=Math.max(0,Math.ceil(ms/864e5));document.getElementById("dLeft").textContent=d;document.getElementById("wLeft").textContent=Math.max(0,Math.floor(d/7));}
+  left();setInterval(left,60000);
+  var STEPS=[
+    ["2026-11-22","Choose a way, or ask whether you may apply for both","Read the two ways above. Lector drafts the email to Oxford's admissions team for you to send."],
+    ["2026-11-29","Ask your referees","Give them five weeks and the Christmas break. Vocatio keeps who you asked, when, and whether their letter is in."],
+    ["2026-12-06","Look up the documents and their lengths","On Oxford's course page: the proposal's length, references, transcripts, the fee. Ingenium keeps the list you bring back."],
+    ["2026-12-13","Turn your research idea into a proposal","You have a clear idea. Lector writes with you, from your notes and sources, and reviews it the way you choose: gentle, kind or examiner."],
+    ["2026-12-20","Your academic CV and statement","From your CV, LinkedIn and your apps in Fabrica. Each claim is tied to its evidence."],
+    ["2027-01-03","Final read and the funding boxes","Every document against Oxford's list; Grand Union chosen in the form if you want it; references received."],
+    ["2027-01-05","Submit, two days early","Leaves room for an upload that fails. The deadline is 12 noon on 7 January."]];
+  var ALL=false;
+  var done=[];try{done=JSON.parse(localStorage.getItem("dphil.done")||"[]");}catch(e){}
+  var box=document.getElementById("steps");
+  function fmt(s){var d=new Date(s+"T12:00:00Z");return "By "+d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",timeZone:"UTC"});}
+  function paint(){box.innerHTML="";var now=Date.now(),first=-1;
+    STEPS.forEach(function(s,i){if(first<0&&done.indexOf(i)<0)first=i;});
+    var start=Math.max(0,first<0?STEPS.length-3:first);
+    STEPS.forEach(function(s,i){if(!ALL&&(i<start||i>=start+3))return;var b=document.createElement("button");b.type="button";b.className="step";var on=done.indexOf(i)>=0;b.setAttribute("aria-pressed",String(on));
+      b.innerHTML='<span class="tick" aria-hidden="true">'+(on?"✓":"")+'</span><span class="when'+(i===first?" now":"")+'">'+(i===first?"Next · ":"")+fmt(s[0])+'</span><span class="what">'+s[1]+'<span class="how">'+s[2]+'</span></span>';
+      b.onclick=function(){var k=done.indexOf(i);if(k>=0)done.splice(k,1);else done.push(i);try{localStorage.setItem("dphil.done",JSON.stringify(done));}catch(e){}paint();};box.appendChild(b);});
+    document.getElementById("barFill").style.width=(done.length/STEPS.length*100)+"%";document.getElementById("prog").textContent=done.length+" of "+STEPS.length+" done";
+    document.getElementById("tabN").textContent=done.length+" of "+STEPS.length;
+    var ms=document.getElementById("moreSteps");ms.textContent=ALL?"Fewer steps":"All "+STEPS.length+" steps";ms.setAttribute("aria-expanded",String(ALL));}
+  document.getElementById("moreSteps").onclick=function(){ALL=!ALL;paint();};
+  var rowsOpen=false,mr=document.getElementById("moreRows");
+  function rows(){[].forEach.call(document.querySelectorAll("[data-more-row]"),function(r){r.classList.toggle("folded",!rowsOpen);});
+    mr.textContent=rowsOpen?"Fewer rows":"4 more rows";mr.setAttribute("aria-expanded",String(rowsOpen));}
+  mr.onclick=function(){rowsOpen=!rowsOpen;rows();};rows();
+  [].forEach.call(document.querySelectorAll("[data-tab]"),function(t){t.onclick=function(){var k=t.getAttribute("data-tab");
+    [].forEach.call(document.querySelectorAll("[data-tab]"),function(x){x.setAttribute("aria-selected",String(x===t));});
+    [].forEach.call(document.querySelectorAll("[data-panel]"),function(p){p.hidden=p.getAttribute("data-panel")!==k;});};});
+  paint();
+  [].forEach.call(document.querySelectorAll("[data-lean]"),function(k){k.onclick=function(){var v=k.getAttribute("data-lean");
+    [].forEach.call(document.querySelectorAll("[data-lean]"),function(x){x.setAttribute("aria-pressed",String(x===k));});
+    [].forEach.call(document.querySelectorAll("#cmp [data-col]"),function(c){c.classList.toggle("lean",!!v&&c.getAttribute("data-col")===v&&c.classList.contains("hd"));});};});
+  var root=document.documentElement;function dark(){var t=root.getAttribute("data-theme");return t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;}
+  var tb=document.getElementById("theme");function lab(){tb.textContent=dark()?"Day":"Night";}tb.onclick=function(){root.setAttribute("data-theme",dark()?"light":"dark");lab();};lab();
+})();
+</script>
