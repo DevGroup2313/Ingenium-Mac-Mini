@@ -21,6 +21,9 @@
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
   --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+  --lav-t:rgba(106,63,181,.14); --lav-c:#6a3fb5; --sky-t:rgba(74,160,240,.16); --sky-c:#2f6fd0; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50;
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -3px 5px rgba(60,30,90,.16),0 1px 1px rgba(40,20,70,.3),0 3px 4px rgba(40,20,70,.24),0 6px 9px rgba(40,20,70,.18),0 12px 20px rgba(40,20,70,.12);
+  --ck-hi:inset 0 1.5px 0 #fff,inset 0 -3px 5px rgba(60,30,90,.14),0 3px 4px rgba(40,20,70,.24),0 9px 16px rgba(40,20,70,.2),0 16px 26px rgba(40,20,70,.14);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#110d18; --panel:#201a2b; --ink1:#f3eefb; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a;
@@ -35,7 +38,11 @@
   --chip-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
   --panel-sh:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
   --sheet-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.4),0 0 0 1px rgba(205,184,240,.14),0 2px 0 rgba(0,0,0,.7),0 6px 0 rgba(0,0,0,.35),0 14px 26px rgba(0,0,0,.5),0 34px 70px rgba(0,0,0,.55);
-  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12); color-scheme:dark}}
+  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2;
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#110d18; --panel:#201a2b; --ink1:#f3eefb; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a;
   --card-bg:linear-gradient(#2a2239,#251e33); --card-line:rgba(205,184,240,.11); --card-on:rgba(183,156,230,.45);
@@ -49,7 +56,11 @@
   --chip-sh:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1.5px 0 rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.4),0 8px 12px rgba(0,0,0,.3);
   --panel-sh:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.6),0 3px 0 rgba(0,0,0,.28),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);
   --sheet-sh:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.4),0 0 0 1px rgba(205,184,240,.14),0 2px 0 rgba(0,0,0,.7),0 6px 0 rgba(0,0,0,.35),0 14px 26px rgba(0,0,0,.5),0 34px 70px rgba(0,0,0,.55);
-  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12); color-scheme:dark}
+  --well:#1c1626; --ok-soft:rgba(127,209,166,.12); --warn-soft:rgba(230,178,106,.12);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2;
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  color-scheme:dark}
 
 /* no scroll bar in view, scrolling kept */
 html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
@@ -70,6 +81,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .key:active{transform:translateY(1px);box-shadow:inset 0 1px 2px rgba(40,22,68,.2)}
 .key.pri{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff;border-radius:10px;padding:7px 13px;font-size:13px}
 .key.pri:hover{transform:translateY(-2px);box-shadow:var(--pri-sh),0 10px 18px rgba(40,22,68,.22)}
+.key.lav,.key.sky,.key.amb,.key.emr{border-radius:7px;box-shadow:var(--ck-sh);transition:transform .16s var(--bounce),box-shadow .16s}
+.key.lav{background:var(--lav-t);border-color:var(--lav-t);color:var(--lav-c)}
+.key.sky{background:var(--sky-t);border-color:var(--sky-t);color:var(--sky-c)}
+.key.amb{background:var(--amb-t);border-color:var(--amb-t);color:var(--amb-c)}
+.key.emr{background:var(--emr-t);border-color:var(--emr-t);color:var(--emr-c)}
+.key.lav:hover,.key.sky:hover,.key.amb:hover,.key.emr:hover{transform:translateY(-3px);box-shadow:var(--ck-hi)}
+.key.lav:active,.key.sky:active,.key.amb:active,.key.emr:active{transform:translateY(1px);box-shadow:inset 0 1px 3px rgba(40,22,68,.22)}
 .key.quiet{background:none;border-color:transparent;box-shadow:none;color:var(--acc);padding:5px 10px}
 .key.quiet:hover{background:var(--key-bg);border-color:var(--key-line);box-shadow:var(--key-sh);transform:translateY(-2px)}
 .key:focus-visible,.tg:focus-visible,.way-h:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
@@ -162,7 +180,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <h1>Your app on the iPhone and iPad, four ways</h1>
       <p>A live preview for Fabrica's Ship part. Only the iPhone card changes; the other cards stay as they are. Its key opens the sheet on the right. The app, devices and addresses are examples.</p>
     </div>
-    <button class="key" id="themeKey" type="button">Night</button>
+    <button class="key lav" id="themeKey" type="button">Night</button>
   </div>
 
   <div class="stage">
@@ -192,12 +210,12 @@ button{font:inherit;color:inherit;cursor:pointer}
           <div class="way-b">
             <div class="opt"><div class="oh"><b>Send to my devices</b><span class="chip">Paired on Wi-Fi</span></div>
               <p>Your devices paired with this computer, as for lending models. The app goes to Ingenium there and stays, offline too.</p>
-              <div class="dev"><span class="dot"></span><b>iPhone</b><span class="ex">Ready</span><button class="key sm" type="button" data-say="Sent: Tide Clock is in Ingenium on the iPhone (an example).">Send</button></div>
-              <div class="dev"><span class="dot off"></span><b>iPad</b><span class="ex">Asleep</span><button class="key sm" type="button" data-say="It will go when the iPad wakes (an example).">Send when it wakes</button></div>
+              <div class="dev"><span class="dot"></span><b>iPhone</b><span class="ex">Ready</span><button class="key lav" type="button" data-say="Sent: Tide Clock is in Ingenium on the iPhone (an example).">Send</button></div>
+              <div class="dev"><span class="dot off"></span><b>iPad</b><span class="ex">Asleep</span><button class="key lav" type="button" data-say="It will go when the iPad wakes (an example).">Send when it wakes</button></div>
             </div>
             <div class="opt"><div class="oh"><b>Or as a file</b><span class="chip">Anywhere</span></div>
               <p>One file with the whole app. Send it by AirDrop, Messages or Files, then open it with Ingenium: Your apps, Add from a file.</p>
-              <div class="keys"><button class="key" type="button" data-say="Made: Tide Clock.html, kept under Releases (an example).">Make the file</button></div>
+              <div class="keys"><button class="key lav" type="button" data-say="Made: Tide Clock.html, kept under Releases (an example).">Make the file</button></div>
             </div>
           </div>
         </div>
@@ -209,13 +227,13 @@ button{font:inherit;color:inherit;cursor:pointer}
             <div class="opt"><div class="oh"><b>From my Mac</b><span class="chip">In-house, the default</span></div>
               <p>Ingenium on your Mac serves it on your home Wi-Fi.</p>
               <div class="addr"><div class="qr" title="Point the iPhone's camera here"><svg id="qrSvg" viewBox="0 0 29 29" shape-rendering="crispEdges" aria-label="A code for the address"></svg></div>
-                <div style="display:flex;flex-direction:column;gap:7px;min-width:0;flex:1"><code id="addr">http://mac-mini.local:8765/tide-clock/</code><div class="keys"><button class="key" type="button" id="copyKey">Copy the address</button><button class="key" type="button" data-say="Served from the Mac (an example).">Serve it now</button></div></div></div>
+                <div style="display:flex;flex-direction:column;gap:7px;min-width:0;flex:1"><code id="addr">http://mac-mini.local:8765/tide-clock/</code><div class="keys"><button class="key sky" type="button" id="copyKey">Copy the address</button><button class="key sky" type="button" data-say="Served from the Mac (an example).">Serve it now</button></div></div></div>
               <ol><li>On the iPhone, on the same Wi-Fi, open the address in Safari (or point the camera at the code).</li><li>Press Share, then Add to Home Screen.</li><li>It opens from its icon while your Mac is on and the iPhone is at home.</li></ol>
               <p class="note">Away from home, or with the Mac asleep, it does not open: an iPhone keeps an app offline only from a secure (https) address.</p>
             </div>
             <div class="opt"><div class="oh"><b>On GitHub Pages</b><span class="chip warn">The backup</span></div>
               <p>A secure address, so it works offline anywhere once added. On a free GitHub plan the app's files are public.</p>
-              <div class="keys"><button class="key" type="button" data-say="Published at an address like https://you.github.io/tide-clock/ (an example).">Publish on GitHub Pages</button></div>
+              <div class="keys"><button class="key amb" type="button" data-say="Published at an address like https://you.github.io/tide-clock/ (an example).">Publish on GitHub Pages</button></div>
             </div>
           </div>
         </div>
@@ -242,11 +260,11 @@ button{font:inherit;color:inherit;cursor:pointer}
             </div>
             <div class="opt"><div class="oh"><b>Sideloadly, with your paid Apple ID</b><span class="chip ok">Lasts a year</span></div>
               <p>The same IPA as the free way, signed with the Apple ID of your developer account.</p>
-              <div class="keys"><button class="key" type="button" data-say="Made: Tide Clock-1.0.ipa, kept under Releases (an example).">Make the IPA</button></div>
+              <div class="keys"><button class="key emr" type="button" data-say="Made: Tide Clock-1.0.ipa, kept under Releases (an example).">Make the IPA</button></div>
             </div>
             <div class="opt"><div class="oh"><b>Xcode on your Mac mini</b><span class="chip">With your team</span></div>
               <p>The iPhone build kit: open it in Xcode, choose your team, and run it on the iPhone or send it to TestFlight.</p>
-              <div class="keys"><button class="key" type="button" data-say="Made: tide_clock_ios kit, kept under Releases (an example).">Make the kit</button></div>
+              <div class="keys"><button class="key emr" type="button" data-say="Made: tide_clock_ios kit, kept under Releases (an example).">Make the kit</button></div>
             </div>
           </div>
         </div>
