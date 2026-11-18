@@ -79,6 +79,7 @@ def skip_modules(ed):
     if not has_fabrica(ed):
         out |= {"r288.js"}  # 6.93: Fabrica's tree of versions (held, paused), where there is a Fabrica
         out |= {"r298.js"}  # 7.08: Fabrica's runs, workflows, machines, every device in a release, Needs you and Learn, where there is a Fabrica
+        out |= {"r316.js"}  # 7.35: your app on the iPhone and iPad, four ways (Fabrica's Ship part), where there is a Fabrica
     return out
 
 

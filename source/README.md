@@ -395,13 +395,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.35 (in progress, 17 November 2026).
+Ingenium 7.35 (18 November 2026): your app on the iPhone and iPad, four ways.
+Her request (16 November 2026): iPhone and iPad "all four ways" (inside Ingenium; a Home Screen web app; an IPA signed with a free Apple
+ID through Sideloadly or AltStore; an IPA signed with a paid developer account). Her answers (17 November 2026): a paid account "Not yet,
+but plan to"; the Home Screen app "Mac first, GitHub backup"; inside Ingenium "Both" (paired devices, and a file). Her word on the live
+preview (18 November 2026, https://claude.ai/artifact/HMXfpBF7MfUwg9Q8Z2yNRP, source/previews/iphone_ways): "I approve of the preview,
+please just add some colours to the buttons because they all look very plain all in white. Please commit and push it everywhere and
+continue working on my requests."
+- `build/modules/r112.js`: the Ship part's iPhone card reads "iPhone and iPad" and its four ways; its key is Choose a way (the card
+  stays chosen for Make the chosen, which still makes the IPA). It stands even where the page carries no iPhone shell, as two of the
+  ways need none.
+- `build/modules/r316.js` (new): the sheet, as the preview drew it. Inside Ingenium: Send to my devices (on a computer app: her devices
+  paired with it, as for lending models, each with Send, then Waiting for it and Kept there), or Make the file (the one page; on the
+  device, Fabrica, Your apps, Bring one in). On the device, what waits on its paired computer is offered above Your apps (Keep it here,
+  Not now): a new app, or a new version of the app of that name; Run it opens it. (The preview said "Ingenium's app library"; the app
+  is kept in Fabrica's Your apps, where Ingenium runs an app of hers.) On the Home Screen: From my Mac (Serve it now: the web app served
+  on the home Wi-Fi at http://<computer>.local:<port>/apps/<name>/, with a code for the camera, Copy the address, Serve this version,
+  Stop serving) or On GitHub Pages (the web app's files on the linked repository's branch gh-pages, with .nojekyll, through GitHub's
+  own interface: blobs, a tree, a commit, the branch made or moved; Pages switched on for it; its address shown). With your Apple ID
+  (free): Make the IPA (R136) and the steps in Sideloadly; Lasts 7 days, Up to 3 such apps. With a developer account (paid): about
+  US$99 a year; Make the IPA (Sideloadly, a year); Make the kit (the iPhone and iPad build kit for Xcode). The keys wear Ingenium's
+  own colours in the recipe of its coloured keys (lavender, Carpe Diem's sky blue, amber, emerald; Make the IPA Ingenium's violet), by
+  day and by night; every way, well, row and key lifts under the pointer, with no wash; Minimal or reduced motion keeps them still.
+  The codes for the camera are drawn by qrcode-generator 1.4.4 (Kazuhiko Arase, MIT licence, its notice kept; build/vendor), carried
+  in the page. Only where Fabrica is (editions.py).
+- `build/desktop/app_apps_735.py` (new, the three computer apps): Ingenium/apps/served and Ingenium/apps/outbox beside Ingenium/runs;
+  apps_serve, apps_unserve, apps_served, apps_send, apps_outbox, apps_unsend; GET /apps/<name>/<path> to any browser on the home
+  network without the code (only what she chose to serve; a path that leaves its folder is refused); GET /ingenium/apps/outbox,
+  /ingenium/apps/get and POST /ingenium/apps/got for her paired devices (the code, and a device that names itself). The lending server
+  runs while anything is served or waiting, and stops when nothing is lent, served or waiting.
+- Not verified on her devices: Safari's Add to Home Screen from the Mac's address (an http address on the home network: from what I
+  found, an iPhone keeps an app offline only from a secure, https, address, so it opens while the Mac is on and the iPhone is home);
+  GitHub Pages on her real account (a private repository on a free plan cannot have Pages: GitHub's own answer is shown).
+- rig: `t_735_iphone_ways.js` (new, 24 checks): a real computer app (rig/run_app.py) as the Mac, a browser paired with it as the iPhone,
+  a stand-in GitHub in the browser.
 - rig: `t_641_logos.js` 11/11 again (10/11 since 7.22). Its check that the pointer turns an app's logo moved the pointer to the Ledger
   Lamp row at 1,152 points in a window 900 high: the parts above Your apps grew after 7.22, and the row lay below the window, where no
   pointer reaches. The row is now brought into view first. The logos' tilt itself was never at fault (r112's pointermove).
-- The iPhone four ways: a live preview (source/previews/iphone_ways, https://claude.ai/artifact/HMXfpBF7MfUwg9Q8Z2yNRP), waiting
-  for her word. Her answers (17 November 2026): a paid developer account "Not yet, but plan to"; the Home Screen app "Mac first,
-  GitHub backup"; inside Ingenium "Both" (paired devices, and a file).
 
 Ingenium 7.34 (17 November 2026): the workshop's two open ends. Code reads only an app's changed files; a GitHub session keeps a
 linked copy in Fabrica, with its history.

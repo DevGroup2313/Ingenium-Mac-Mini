@@ -837,7 +837,8 @@ var ICONS={apk:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M1
   mac:'<rect x="4" y="4.5" width="16" height="11" rx="1.6"/><path d="M2 19.5h20M9.5 19.5l.6-2h3.8l.6 2"/>',
   win:'<rect x="3" y="4" width="18" height="15" rx="1.8"/><path d="M3 8h18M6 6h.01M8.5 6h.01"/>'};
 var TARGETS=[["apk","Android app (APK)","For the Fire tablet and any Android device: signed here, it installs as it is"],
-  ["ipa","iPhone and iPad app (IPA)","Signed with your Apple ID as Sideloadly or AltStore installs it"],
+  /* 7.35: four ways (her approved preview, 18 November 2026, https://claude.ai/artifact/HMXfpBF7MfUwg9Q8Z2yNRP; modules/r316.js) */
+  ["ipa","iPhone and iPad","Four ways: inside Ingenium, on the Home Screen, or as an app of its own with your Apple ID or a developer account"],
   ["mac","Mac app","For a MacBook or a Mac mini (Apple silicon and Intel in one): drag it to Applications and open it"],
   /* 6.70: no "(.exe)" in its name (her words, 10 November 2026: "I want the "exe" to be removed from the app's name") */
   /* 7.24: its own installer (her approved preview, 16 November 2026) */
@@ -879,7 +880,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
   tc.innerHTML=!r?"":live?"Testing…":ok?'<span class="d"></span>Passed':t?(t.page?"Faults found":"No page found"):(!r.head?"Nothing to test yet":statusOf(r).clean?"Not tested yet":"Keep first, then test");
   var tb=$("fbTest");tb.disabled=!r||!r.head||!!live;tb.className="f-btn"+(r&&stepOf(r)==="test"?" pri next":"");tb.textContent=t?"Test it again":"Test this version";
   var tg=$("fbTargets");tg.innerHTML="";var mk=S.making&&r&&S.making.id===r.id?S.making:null,pref=r?shipPrefs(r):null;
-  TARGETS.forEach(function(x){var k=x[0],note=n[NOTE[k]],here=targetHere(k),prog=mk?mk.prog[k]:null,chosen=!!(pref&&here&&pref.chosen.indexOf(k)>=0);
+  TARGETS.forEach(function(x){var k=x[0],note=n[NOTE[k]],here=targetHere(k)||(k==="ipa"&&!!window.IngIphone),prog=mk?mk.prog[k]:null,chosen=!!(pref&&here&&pref.chosen.indexOf(k)>=0);
     var e=h("div","f-tg"+(note?" done":"")+(here?"":" off"));e.setAttribute("role","button");e.tabIndex=0;e.setAttribute("aria-pressed",chosen?"true":"false");e.setAttribute("data-k",k);
     e.title=!here?whyNot(k):chosen?"Chosen: made with the others you chose. Press to leave it out.":"Press to choose it for Make the chosen";
     e.innerHTML='<div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">'+ICONS[k]+"</svg><b>"+esc(x[1])+'</b><span class="tick" aria-hidden="true">✓</span></div><small>'+esc(here?x[2]:whyNot(k))+"</small>"+(typeof prog==="number"?'<div class="bar"><i style="width:'+prog+'%"></i></div>':"")+'<div class="foot"></div>';
@@ -887,7 +888,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
     if(typeof prog==="number"){if(mk.say&&mk.say[k])ft.appendChild(h("span","f-hint",esc(mk.say[k])));}
     else{if(note)ft.appendChild(h("span","f-chip ok",'<span class="d"></span>Made · '+kb(note.size||0)));
       else ft.appendChild(h("span","f-chip",!r?"":!r.head?"After a first version":tested(r)?"Ready to make":"After its test"));
-      if(r&&r.head&&here)ft.appendChild(btn("quiet sm",note?"Make and save again":"Make and save",function(ev){ev.stopPropagation();if(k==="kits")sheetKits(r);else makeOne(r,k);}));}
+      if(r&&r.head&&here)ft.appendChild(btn("quiet sm",k==="ipa"&&window.IngIphone?"Choose a way":note?"Make and save again":"Make and save",function(ev){ev.stopPropagation();if(k==="kits")sheetKits(r);else if(k==="ipa"&&window.IngIphone)IngIphone.open(r);else makeOne(r,k);}));}
     function toggle(){if(!r)return;if(!here){toast(whyNot(k));return;}var i=pref.chosen.indexOf(k);if(i>=0)pref.chosen.splice(i,1);else pref.chosen.push(k);saveSoon();paintShip();}
     e.onclick=toggle;e.onkeydown=function(ev){if(ev.target!==e)return;if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();toggle();}};
     tg.appendChild(e);});

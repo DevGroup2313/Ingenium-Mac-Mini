@@ -128,7 +128,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_refs_691", "# 6.91: sorted, so every start of the app gives the same order", ("mini", "intel", "win")),
            ("app_merge_692", "_disk_merge_begin", ("mini", "intel", "win")),
            ("app_runs_708", "_runs_new", ("mini", "intel", "win")), ("app_runs_710", "_runs_io", ("mini", "intel", "win")),
-           ("app_setup_724", "_runs_install_setup", ("mini", "intel", "win")), ("app_runs_728", "_runs_dev_get", ("mini", "intel", "win"))]
+           ("app_setup_724", "_runs_install_setup", ("mini", "intel", "win")), ("app_runs_728", "_runs_dev_get", ("mini", "intel", "win")),
+           ("app_apps_735", "_apps_serve", ("mini", "intel", "win"))]
 
 
 def desktop():
