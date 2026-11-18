@@ -1,0 +1,325 @@
+<title>Author Studio Troubleshoot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: the Author Studio (master copy only): its rail on the left with a new first room, Troubleshoot; in it, one key and an
+   analogue gauge (everything checked at once), the checks in four groups that unfold to say why and what to do, what went wrong
+   (each error with Ask a model), and a box to say a problem in her own words. Tokens as Ingenium's (as the approved previews). */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --rail:#efeaf6; --slot:rgba(60,40,90,.06); --slot-sh:inset 0 1px 2px rgba(40,22,68,.18),inset 0 0 0 1px rgba(40,22,68,.05),0 1px 0 rgba(255,255,255,.85);
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86; --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26);
+  --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --red-t:rgba(196,60,72,.13); --red-c:#a8323e; --lav-t:rgba(106,63,181,.12); --lav-c:#6a3fb5;
+  --dial-face:radial-gradient(circle at 50% 38%,#ffffff 0 40%,#f3eff9 75%,#e6dff0 100%); --dial-rim:#d9d0e6; --needle:#3a2a55;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --rail:#171221; --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --red-t:rgba(230,110,120,.15); --red-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  --dial-face:radial-gradient(circle at 50% 38%,#2c2440 0 40%,#231c33 75%,#1a1427 100%); --dial-rim:#3a3050; --needle:#e9e0f7;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --rail:#171221; --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --red-t:rgba(230,110,120,.15); --red-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  --dial-face:radial-gradient(circle at 50% 38%,#2c2440 0 40%,#231c33 75%,#1a1427 100%); --dial-rim:#3a3050; --needle:#e9e0f7;
+  color-scheme:dark}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap">
+<style>
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.55 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.note{max-width:1180px;margin:0 auto 14px;font-size:12.6px;color:var(--ink3)}
+.note b{color:var(--ink2)}
+.studio{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:210px minmax(0,1fr);gap:0;border-radius:22px;background:var(--card);box-shadow:var(--card-sh);border:1px solid var(--line);overflow:hidden}
+/* the studio's top bar */
+.bar{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.bar h1{font:600 24px/1.1 var(--serif);color:var(--ink1);margin:0;flex:1 1 auto}
+.bar .kept{font-size:12.5px;color:var(--ink3)}
+/* the rail */
+.rail{background:var(--rail);padding:12px 10px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.rail button{display:flex;align-items:center;gap:10px;text-align:left;padding:9px 11px;border-radius:11px;border:0;background:transparent;font-size:13.5px;color:var(--ink2);
+  transition:transform .3s var(--spring),color .2s,box-shadow .25s}
+.rail button svg{transition:transform .35s var(--bounce)}
+/* under the pointer: it glides and its icon tilts; no fill, no white key, no purple shade */
+.rail button:hover{transform:translateX(4px);color:var(--ink1)}
+.rail button:hover svg{transform:rotate(-10deg) scale(1.12)}
+.rail button:active{transform:translateX(4px) translateY(1px)}
+/* the room you are in: pressed into the rail, an engraved slot in the rail's own tone */
+.rail button[aria-current="page"]{color:var(--acc);font-weight:600;background:var(--slot);box-shadow:var(--slot-sh)}
+.rail button[aria-current="page"]:hover{transform:translateX(2px)}
+.rail svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.rail .new{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--lav-t);color:var(--lav-c)}
+.rail .sep{height:1px;background:var(--line);margin:4px 6px}
+/* the room */
+.room{padding:18px 20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.room h2{font:600 26px/1.15 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:4px 0 0;max-width:68ch;font-size:13.5px}
+.sec{font:600 19px/1.2 var(--serif);color:var(--ink1);margin:6px 0 0;display:flex;align-items:baseline;gap:10px}
+.sec small{font:400 12.5px/1.4 var(--sans);color:var(--ink3)}
+/* keys: raised, short, lifting under the pointer, sinking when pressed */
+.key{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font-weight:600;font-size:12.8px;white-space:nowrap;
+  transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.key:active{transform:translateY(1px);box-shadow:var(--key-sh)}
+.key.pri{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh),0 4px 10px rgba(52,24,100,.2);color:#fff}
+.key.pri:hover{box-shadow:var(--pri-sh),0 8px 16px rgba(52,24,100,.26)}
+.key.sm{min-height:28px;padding:0 10px;font-size:12px;border-radius:9px}
+.key[disabled]{opacity:.6;cursor:default;transform:none}
+.key:focus-visible,.rail button:focus-visible,.row:focus-visible,textarea:focus-visible,.tick:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* the summary: one key and an analogue gauge */
+.sum{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--well);box-shadow:var(--card-sh);transition:transform .35s var(--spring),box-shadow .25s}
+.sum:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.dial{position:relative;width:150px;height:92px}
+.dial svg{width:150px;height:92px;overflow:visible}
+.dial .face{fill:var(--card);stroke:var(--dial-rim);stroke-width:1.5}
+.dial .tick-m{stroke:var(--ink3);stroke-width:1.2}
+.dial .arc-ok{stroke:var(--emr-c);stroke-width:5;fill:none;opacity:.55}
+.dial .arc-look{stroke:var(--amb-c);stroke-width:5;fill:none;opacity:.55}
+.dial .arc-bad{stroke:var(--red-c);stroke-width:5;fill:none;opacity:.55}
+.dial .needle{stroke:var(--needle);stroke-width:2.4;stroke-linecap:round;transform-origin:75px 80px;transition:transform 1.1s cubic-bezier(.3,1.4,.5,1)}
+.dial .hub{fill:var(--needle)}
+.dial .lab{font:600 9.5px/1 var(--sans);fill:var(--ink3);letter-spacing:.05em}
+.sum-r{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tally{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11.8px/1 var(--sans);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--emr-t);color:var(--emr-c)} .chip.look{background:var(--amb-t);color:var(--amb-c)} .chip.bad{background:var(--red-t);color:var(--red-c)} .chip.lav{background:var(--lav-t);color:var(--lav-c)}
+.when{font-size:12.4px;color:var(--ink3)}
+.sum-keys{display:flex;gap:8px;flex-wrap:wrap}
+/* the checks, in four groups */
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grp{border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:12px;display:flex;flex-direction:column;gap:6px;transition:transform .35s var(--spring),box-shadow .25s}
+.grp:hover{transform:translateY(-3px) rotateX(1deg);box-shadow:var(--card-hi)}
+.grp h3{margin:0 0 4px;font:600 16px/1.2 var(--serif);color:var(--ink1);display:flex;align-items:center;gap:8px}
+.grp h3 svg{width:18px;height:18px;fill:none;stroke:var(--acc);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:11px;border:1px solid transparent;background:transparent;text-align:left;width:100%;
+  transition:transform .3s var(--spring),box-shadow .2s,background .2s,border-color .2s}
+.row:hover{transform:translateY(-1px);background:var(--well);border-color:var(--line);box-shadow:0 1px 0 rgba(40,22,68,.05),0 4px 10px rgba(40,22,68,.07)}
+.row .st{margin-top:5px;width:10px;height:10px;border-radius:50%;box-shadow:inset 0 -1px 1px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.15)}
+.row .st.ok{background:var(--emr-c)} .row .st.look{background:var(--amb-c)} .row .st.bad{background:var(--red-c)} .row .st.wait{background:var(--line);animation:pulse 1s infinite ease-in-out}
+@keyframes pulse{50%{opacity:.35}}
+.row b{display:block;color:var(--ink1);font-size:13.3px}
+.row span.t{display:block;font-size:12.4px;color:var(--ink3);overflow-wrap:anywhere}
+.row .open{font-size:11.5px;font-weight:600;color:var(--acc);margin-top:3px}
+.why{display:none;margin:2px 0 4px 30px;padding:10px 12px;border-radius:11px;background:var(--well);border:1px solid var(--line);font-size:12.6px}
+.why p{margin:0 0 6px}
+.why .acts{display:flex;gap:6px;flex-wrap:wrap}
+.row[aria-expanded="true"]+.why{display:block;animation:rise .3s var(--spring)}
+@keyframes rise{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+/* what went wrong */
+.errs{display:flex;flex-direction:column;gap:8px}
+.err{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:13px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);transition:transform .3s var(--spring),box-shadow .2s}
+.err:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.err time{font:600 12px/1.2 var(--mono);color:var(--ink3);font-variant-numeric:tabular-nums}
+.err b{display:block;color:var(--ink1);font-size:13px;overflow-wrap:anywhere}
+.err code{display:block;font:12px/1.4 var(--mono);color:var(--ink3);overflow-wrap:anywhere}
+.err .acts{display:flex;gap:6px}
+/* say it in your own words */
+.ask{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--well);box-shadow:var(--card-sh);transition:transform .35s var(--spring),box-shadow .25s}
+.ask:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.ask textarea{width:100%;min-height:104px;resize:vertical;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:10px 12px;font-size:13.3px;line-height:1.5;color:var(--ink1);
+  box-shadow:inset 0 2px 3px rgba(40,22,68,.08)}
+.with{display:flex;flex-direction:column;gap:6px}
+.with b{font-size:12.6px;color:var(--ink1)}
+.tick{display:flex;align-items:center;gap:9px;text-align:left;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);box-shadow:0 1px 0 rgba(40,22,68,.05),0 2px 5px rgba(40,22,68,.05);font-size:12.6px;cursor:pointer;
+  transition:transform .3s var(--spring),box-shadow .2s}
+.tick:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.tick .bx{width:16px;height:16px;border-radius:5px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);display:grid;place-items:center;flex:0 0 auto}
+.tick[aria-checked="true"] .bx{background:var(--pri-bg);border-color:var(--pri-line)}
+.tick[aria-checked="true"] .bx::after{content:"";width:7px;height:4px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translateY(-1px)}
+.ask .go{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.ask .go small{font-size:12px;color:var(--ink3)}
+.said{min-height:20px;font-size:12.6px;color:var(--acc)}
+.fold{border-radius:14px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:10px 14px;transition:transform .3s var(--spring)}
+.fold:hover{transform:translateX(3px)}
+.fold summary{cursor:pointer;list-style:none;font-weight:600;font-size:13.3px;color:var(--ink1);display:flex;justify-content:space-between;gap:10px}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::after{content:"Read";color:var(--acc);font-size:12px}
+.fold[open] summary::after{content:"Fold"}
+.fold ul{margin:8px 0 2px;padding-left:18px;font-size:12.8px}
+.fold li{margin:3px 0}
+@media (max-width:860px){.studio{grid-template-columns:1fr}.rail{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.rail button{flex:0 0 auto}.rail .sep{display:none}
+  .groups{grid-template-columns:1fr}.ask{grid-template-columns:1fr}.sum{grid-template-columns:1fr;justify-items:start}}
+@media (max-width:520px){.err{grid-template-columns:1fr}.err .acts{justify-content:flex-start}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+
+<p class="note"><b>A live preview, nothing here is wired to your Ingenium yet.</b> The results are examples. In your master copy only, this would be the first room of the Author Studio. The checks it adds to the ones you have (Check Ingenium) are named under "What is new here", at the bottom.</p>
+
+<div class="studio">
+  <div class="bar">
+    <h1>Author Studio</h1>
+    <span class="kept">All changes kept · 12</span>
+    <button class="key sm" type="button" id="snd" aria-pressed="true">Sound on</button>
+    <button class="key sm" type="button">Close</button>
+  </div>
+  <nav class="rail" aria-label="Rooms">
+    <button type="button" aria-current="page"><svg viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17v3h3l5.2-5.2a4 4 0 0 0 5.3-5.3l-2.4 2.4-2.6-.6-.6-2.6z"/></svg>Troubleshoot<span class="new">New</span></button>
+    <div class="sep"></div>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>The Editor</button>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h10M5 18h7"/></svg>Words</button>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>Names</button>
+    <button type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/></svg>Look</button>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Additions</button>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="8"/></svg>Change log</button>
+  </nav>
+
+  <main class="room">
+    <div>
+      <h2>Troubleshoot</h2>
+      <p class="lede">Find what is wrong, see why, and fix it with a model, one step at a time. Every check runs on this device; nothing leaves it unless you hand it to a model you chose.</p>
+    </div>
+
+    <section class="sum" aria-label="Check everything">
+      <div class="dial" aria-hidden="true">
+        <svg viewBox="0 0 150 92">
+          <path class="face" d="M8 80a67 67 0 0 1 134 0z"/>
+          <path class="arc-ok" d="M17 80a58 58 0 0 1 32.4-52"/>
+          <path class="arc-look" d="M52 26.2a58 58 0 0 1 46 0"/>
+          <path class="arc-bad" d="M100.6 28a58 58 0 0 1 32.4 52"/>
+          <g id="ticks"></g>
+          <text class="lab" x="16" y="90">FINE</text><text class="lab" x="62" y="14">LOOK</text><text class="lab" x="112" y="90">WRONG</text>
+          <line class="needle" id="needle" x1="75" y1="80" x2="75" y2="30" style="transform:rotate(-80deg)"/>
+          <circle class="hub" cx="75" cy="80" r="5"/>
+        </svg>
+      </div>
+      <div class="sum-r">
+        <div class="tally" id="tally"><span class="chip lav">Not checked yet in this preview</span></div>
+        <div class="when" id="when">Checks the app, its storage, your models and computers, and this device, in about two seconds.</div>
+        <div class="sum-keys">
+          <button class="key pri" type="button" id="run">Check everything</button>
+          <button class="key" type="button" id="copy">Copy the report</button>
+        </div>
+      </div>
+    </section>
+
+    <h3 class="sec">The checks <small>Press a line to see why, and what to do.</small></h3>
+    <div class="groups" id="groups"></div>
+
+    <h3 class="sec">What went wrong <small>Every error since Ingenium started, newest first (examples).</small></h3>
+    <div class="errs" id="errs"></div>
+
+    <h3 class="sec">Say it in your own words <small>For what a check cannot see.</small></h3>
+    <section class="ask">
+      <div>
+        <label for="prob" style="font-size:12.6px;font-weight:600;color:var(--ink1)">What happened?</label>
+        <textarea id="prob">On my HP laptop with the weaker graphics, Adamas froze for a moment and then the app closed.</textarea>
+        <div class="go">
+          <button class="key pri" type="button" id="hand">Hand to a model in Code</button>
+          <small>Ingenium's own page opens in Code with this message ready. You read it before you send it.</small>
+        </div>
+        <div class="said" id="said" role="status"></div>
+      </div>
+      <div class="with">
+        <b>Sent with it</b>
+        <button class="tick" type="button" role="checkbox" aria-checked="true"><span class="bx"></span>The report of the checks</button>
+        <button class="tick" type="button" role="checkbox" aria-checked="true"><span class="bx"></span>The last ten errors</button>
+        <button class="tick" type="button" role="checkbox" aria-checked="true"><span class="bx"></span>This device: graphics, memory, at rest</button>
+        <button class="tick" type="button" role="checkbox" aria-checked="false"><span class="bx"></span>The model settings record</button>
+      </div>
+    </section>
+
+    <details class="fold">
+      <summary>Fixing safely</summary>
+      <ul>
+        <li>Every change a model makes is a version you can undo, in Your page (as now).</li>
+        <li>A changed page counts as working once it reports in; if it does not within half a minute, Ingenium goes back to the last version that worked, and says so.</li>
+        <li>The built page is always one choice away.</li>
+      </ul>
+    </details>
+    <details class="fold">
+      <summary>What is new here</summary>
+      <ul>
+        <li>One room for troubleshooting, first in the rail. Check Ingenium, Errors and Find and fix with a model move here from Checks and additions, which becomes Additions.</li>
+        <li>Checks added: the graphics mode Adamas chose and why; whether Ingenium is at rest; your computers in order and which one serves; sealing between your devices; the model settings record (any value reset); the memory and storage this device reports.</li>
+        <li>Each line unfolds to say why it is so and what to do, with a key to ask a model about that line alone.</li>
+        <li>Say it in your own words: for what no check can see. You choose what goes with it.</li>
+        <li>An analogue gauge for the whole result; a soft click on each key, which Sound turns off.</li>
+      </ul>
+    </details>
+  </main>
+</div>
+
+<script>
+(function(){
+var $=function(id){return document.getElementById(id);};
+var IC={app:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 9h16"/>',store:'<ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/>',
+  models:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',dev:'<rect x="5" y="5" width="14" height="10" rx="1.6"/><path d="M3 18.5h18"/>'};
+/* example results, marked as examples on the page */
+var G=[
+ {k:"app",t:"The app",rows:[
+  ["ok","Parts","All 328 parts running.","Every part of Ingenium reported in as it started.","",[]],
+  ["ok","Pages","Every page opens.","Each page was opened out of sight and drew without an error.","",[]],
+  ["ok","Version","Ingenium 7.42, the master copy.","This is the page your computers carry.","",[]]]},
+ {k:"store",t:"Storage",rows:[
+  ["ok","The large store","Writes and reads back.","A small test was written and read back in the large store (your files, models' records, apps).","",[]],
+  ["ok","The small store","Writes and reads back; your desk is about 3.1 MB.","The small store holds your settings and desk.","",[]],
+  ["look","Room on this device","About 2.4 GB free of the room the browser offers.","Room is low for a new model. A model of 5 GB would not fit here.","Keep models on your Mac mini and use them from here, or free room in Mentes.",["Open Mentes"]]]},
+ {k:"models",t:"Your models and computers",rows:[
+  ["ok","The engine","Loaded; Qwen3.5 9B ready.","The engine answered a short test.","",[]],
+  ["look","Who serves your models","Mac mini away; HP laptop serves.","Your Mac mini did not answer at either address it gave. Your HP laptop answers instead, as you set.","Check the Mac mini is awake and on the same Wi-Fi. Nothing to change here.",["Ask them now"]],
+  ["bad","Model settings record","Memory for Qwen3.5 9B went back to its default.","On 18 November at 19:02 Memory for Qwen3.5 9B was 16,384 and is now 4,096, with no change made by you in between.","Restore it, then ask a model why it was reset.",["Restore 16,384","Ask a model about this"]],
+  ["ok","Sealed between your devices","3 devices sealed end to end.","Every request between them is sealed; the code alone is refused.","",[]]]},
+ {k:"dev",t:"This device",rows:[
+  ["look","Graphics","Too slow for the moving stone: still mode.","Adamas timed three frames on this graphics card: about 2.7 s for a full frame. It shows the stone still, from its own strip, so the app does not freeze or close.","Nothing to do: the still stone is chosen for you. You can try the moving stone once from Adamas, Look.",["Ask a model about this"]],
+  ["ok","At rest","Rests after 30 s; nothing moves at rest.","Scenes and animations pause when you leave Ingenium alone, so the device stays cool.","",[]],
+  ["ok","Connections","Offline; no connection in use.","Ingenium needs none of them.","",[]]]}];
+var tallyN={ok:0,look:0,bad:0};
+function chipFor(s){return s==="ok"?"Fine":s==="look"?"Worth a look":s==="bad"?"Wrong":"Checking";}
+function draw(state){var host=$("groups");host.innerHTML="";tallyN={ok:0,look:0,bad:0};
+  G.forEach(function(g){var c=document.createElement("section");c.className="grp";c.innerHTML='<h3><svg viewBox="0 0 24 24">'+IC[g.k]+'</svg>'+g.t+'</h3>';
+    g.rows.forEach(function(r){var s=state==="wait"?"wait":r[0];if(state!=="wait")tallyN[r[0]]++;
+      var b=document.createElement("button");b.type="button";b.className="row";b.setAttribute("aria-expanded","false");
+      b.innerHTML='<span class="st '+s+'" title="'+chipFor(s)+'"></span><span><b>'+r[1]+'</b><span class="t">'+(state==="wait"?"Checking…":r[2])+'</span></span><span class="open">'+(state==="wait"?"":"Why")+'</span>';
+      var w=document.createElement("div");w.className="why";w.innerHTML='<p>'+r[3]+'</p>'+(r[4]?'<p><b style="color:var(--ink1)">What to do:</b> '+r[4]+'</p>':'')+
+        '<div class="acts">'+r[5].map(function(a){return '<button class="key sm" type="button">'+a+'</button>';}).join("")+'<button class="key sm" type="button">Copy this line</button></div>';
+      b.addEventListener("click",function(){if(state==="wait")return;var o=b.getAttribute("aria-expanded")==="true";b.setAttribute("aria-expanded",String(!o));b.querySelector(".open").textContent=o?"Why":"Fold";click();});
+      c.appendChild(b);c.appendChild(w);});
+    host.appendChild(c);});}
+function needle(){var tot=tallyN.ok+tallyN.look+tallyN.bad||1;var score=(tallyN.look*1+tallyN.bad*3)/(tot*1.0);var a=-80+Math.min(160,score*240);$("needle").style.transform="rotate("+a+"deg)";}
+function tally(){$("tally").innerHTML='<span class="chip ok"><i></i>'+tallyN.ok+' fine</span><span class="chip look"><i></i>'+tallyN.look+' worth a look</span><span class="chip bad"><i></i>'+tallyN.bad+' wrong</span><span class="chip lav">Examples</span>';
+  var d=new Date();$("when").textContent="Checked at "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+". Press a line to see why.";}
+/* ticks on the gauge */
+(function(){var g=$("ticks"),s="";for(var i=0;i<=10;i++){var a=Math.PI*(1-i/10),x1=75+52*Math.cos(a),y1=80-52*Math.sin(a),x2=75+46*Math.cos(a),y2=80-46*Math.sin(a);
+  s+='<line class="tick-m" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'"/>';}g.innerHTML=s;})();
+/* a soft mechanical click: a short filtered noise, only after a press, and off with Sound */
+var AC=null,SND=true;
+function click(){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var n=AC.sampleRate*0.03,buf=AC.createBuffer(1,n,AC.sampleRate),d=buf.getChannelData(0);
+  for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,6);var src=AC.createBufferSource();src.buffer=buf;var f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=2400;f.Q.value=1.4;
+  var g=AC.createGain();g.gain.value=0.22;src.connect(f);f.connect(g);g.connect(AC.destination);src.start();}catch(e){}}
+document.addEventListener("click",function(e){var k=e.target.closest(".key,.rail button,.tick");if(k)click();if(e.target.closest(".tick")){var t=e.target.closest(".tick");t.setAttribute("aria-checked",String(t.getAttribute("aria-checked")!=="true"));}});
+$("snd").addEventListener("click",function(){SND=!SND;this.setAttribute("aria-pressed",String(SND));this.textContent=SND?"Sound on":"Sound off";});
+$("run").addEventListener("click",function(){var k=this;k.disabled=true;k.textContent="Checking…";draw("wait");$("needle").style.transform="rotate(-80deg)";
+  setTimeout(function(){draw("done");needle();tally();k.disabled=false;k.textContent="Check everything";},1400);});
+$("copy").addEventListener("click",function(){var t="Ingenium 7.42 (example report)\n"+G.map(function(g){return g.t+"\n"+g.rows.map(function(r){return "  "+chipFor(r[0])+": "+r[1]+": "+r[2];}).join("\n");}).join("\n");
+  var b=this;function done(m){b.textContent=m;setTimeout(function(){b.textContent="Copy the report";},1600);}
+  try{navigator.clipboard.writeText(t).then(function(){done("Copied");},function(){done("Copy not allowed here");});}catch(e){done("Copy not allowed here");}});
+$("hand").addEventListener("click",function(){$("said").textContent="In Ingenium, Code would open with Ingenium's own page, your words and what you ticked, ready to read. Nothing is sent until you press Send.";});
+/* the errors (examples) */
+var E=[["19:41","Adamas","The stone's scene was too slow; the still stone shown","IngDiamond: probe 2687 ms per full frame"],
+       ["18:02","Chat","Your Mac mini did not answer","IngLend: no answer at 192.168.1.20:8199 in 4 s"],
+       ["17:15","Fabrica","A preview did not load","preview frame: net::ERR_ABORTED"]];
+$("errs").innerHTML=E.map(function(e){return '<div class="err"><time>'+e[0]+'</time><span><b>'+e[1]+': '+e[2]+'</b><code>'+e[3]+'</code></span><span class="acts"><button class="key sm" type="button">Ask a model to fix</button><button class="key sm" type="button">Copy</button></span></div>';}).join("");
+draw("done");needle();tally();$("when").textContent="Example results. Press Check everything to see it run.";
+})();
+</script>

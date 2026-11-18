@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.42", "Troubleshoot, the Author Studio's first room: check everything at once, see why each line is so and what to do, the errors since Ingenium started, and a box to say a problem in your own words. Each can go to a model in Code, ready for you to read first.", "master"],
   ["7.42", "Who serves your models: your paired computers in your order, in Settings, Your devices. The first one that answers serves your models; when it is away, the next one does, and the chat says under the answer which computer answered."],
   ["7.41", "One small round key for Reply, Memory and Effort: beside Vocatio's Learn tab, beside Fabrica's Bring one in, and beside Lector's and Ingenia's titles. Press it to set them for that page's model.", "fabrica"],
   ["7.41", "One small round key for Reply, Memory and Effort, beside the page's title. Press it to set them for that page's model.", "nocareer"],

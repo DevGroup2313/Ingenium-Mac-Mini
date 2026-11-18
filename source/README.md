@@ -414,6 +414,20 @@ of the preview, please commit and push it everywhere and continue working on my 
   to 4 s, as in r274; a computer that refuses the connection counts at once).
 - rig/t_742_serve.js: two stand-in computers (rig/lend681_mock.py); 16 checks.
 
+Troubleshoot, the Author Studio's first room (the master edition only). Her approval of the live preview
+(https://claude.ai/artifact/Fw3N7GZMX2JE1ShEjWi7Cn, previews/troubleshoot): "I approve of everything from the Author Studio except for the
+the white acrylic button look of the navigation bar, please fix it and then commit and push it everywhere."
+
+- build/modules/r329.js (window.IngTrouble; editions.py keeps it to the master): Check everything (r226's own check, as before, and the
+  checks added: the graphics mode Adamas chose, with its crash mark as it stood at the start; at rest; this device's memory as the browser
+  rounds it; who serves your models; sealed between your devices; the model settings record, any value refused in the last seven days),
+  in four groups with an analogue gauge; each line unfolds to say why and what to do, with Ask a model about this (r226's fix); what went
+  wrong (r226's error list, newest first); say it in your own words, with what she ticks. Keys click with IngSound "keys".
+- r236: Troubleshoot first in the rail (marked New); Checks and additions becomes Additions (your layers and your page; the check and the
+  errors are hidden there, shown in Troubleshoot). The rail: the chosen room pressed into the rail, no white key; under the pointer a room
+  glides and its icon tilts, with no purple shade (the rule she gave earlier, which the old hover broke).
+- rig/t_742_trouble.js: 13 checks.
+
 Ingenium 7.41 (18 November 2026): the controls key; agreeing to the terms, in full; your ways of working.
 
 Her approval of the live preview (https://claude.ai/artifact/S7Rwqc72usWw7Ly138jeSz, previews/v741), with her changes: "I approve of the

@@ -59,6 +59,7 @@ def skip_modules(ed):
     out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
     out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
+    out |= {"r329.js"}  # 7.42: Troubleshoot, the Author Studio's first room, the master's alone
     out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
     out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
     out |= {"r275.js"}  # 6.82: puts back the copy of itself an app carried inside the page leaves out; only the master carries the apps
