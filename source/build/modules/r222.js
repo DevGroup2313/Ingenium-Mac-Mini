@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.40", "Calmer and cooler: after a short while with nothing touched (12 seconds on a phone or tablet, 30 on a computer), every moving part holds still and the scenes stop drawing; the first touch brings them back. A phone stays cool, and a laptop has its power for your work."],
+  ["7.40", "Adamas measures the graphics card before it draws its diamond in full: a computer that cannot keep up shows the stone still, turning by its own pictures, instead of freezing or closing."],
+  ["7.40", "Vesta: by day the darker purple stone comes first. Fabrica: your apps' logos keep their depth, turning toward the pointer in layers as in Lector."],
   ["7.40", "Vocatio, Your counsellor, Where you could go: your DPhil plan for the Oxford Internet Institute, October 2027. The days left to 7 January, the two ways (full-time funded, or part-time beside your job) side by side, the weeks as seven steps that are also a goal in Goals and plan, and where each fact came from.", "career"],
   ["7.39", "Raised sliders: every slider in Ingenium is now a groove filled with violet up to its value, held by a pearl that rises under your pointer. Effort's five levels show as stops under its slider in a model's settings, named Low to Max as everywhere else."],
   ["7.39", "One setting for each model: beside the model in Chat, Code, Lector, Vocatio, Folders and Fabrica, the same key shows its Reply, Memory and Effort. Press it to change them; a change in one place is the change everywhere, and none is ever set to zero. Settings, Models and AI keeps every change and any reset caught, with the place that made it.", "fabrica"],

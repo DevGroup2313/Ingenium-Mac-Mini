@@ -43,7 +43,10 @@ var D=document,W=window;
    far shore; by day it is soft and bright, lavender overhead and pearl at the horizon, with a few clouds. By day the step done is the
    violet stone before, the step in hand pearl, in the light, the steps ahead lilac; by night the step done is the light stone, the step in
    hand purple and the steps ahead slate, as she asked ("The first stone of the Focus page should be lighter and the purple one should be
-   second on dark mode") and approved on the other session's preview. A stone pressed answers in
+   second on dark mode") and approved on the other session's preview. 7.40, her words (18 November 2026): "I want the darker purple stone to be the
+   first stone on Day mode on the Vesta page, I asked for this to be done a while ago but clearly it was never done". By day the colours
+   followed the steps, so with nothing planned the first stone was the step in hand, pearl. Now by day, as by night, the colours keep
+   their places: the darker purple stone first, the pearl stone second, the lilac stones beyond. A stone pressed answers in
    one of its ways, with soft water (r295). It draws only while in view and while the window is shown, thirty frames a second at rest. */
 var Stones=(function(){
   var W0=520,H0=424,OX=0,host,cv,gl,pr,U={},raf=0,TMO=0,DUE=false,vis=true,shown=true,ok=false,q=1,lastDraw=0,slowN=0,t0=performance.now(),cur=0,N=5,cnt=5,overI=-1,
@@ -105,6 +108,7 @@ var Stones=(function(){
   "  float k=id<uCur-0.5?0.0:(abs(id-uCur)<0.5?1.0:2.0);",
   "  vec3 al=k<0.5?mix(vec3(0.50,0.38,0.80),vec3(0.84,0.78,0.99),uN):(k<1.5?mix(vec3(0.93,0.90,0.99),vec3(0.38,0.24,0.68),uN):mix(vec3(0.70,0.62,0.92),vec3(0.32,0.29,0.46),uN));",
   "  if(uN>0.5)al=id<0.5?vec3(0.84,0.78,0.99):(id<1.5?vec3(0.38,0.24,0.68):vec3(0.32,0.29,0.46));",
+  "  else al=id<0.5?vec3(0.50,0.38,0.80):(id<1.5?vec3(0.93,0.90,0.99):vec3(0.70,0.62,0.92));",   /* 7.40: by day the darker purple stone first, pearl second, lilac beyond (her words below) */
   "  al*=0.80+0.40*g;al+=vec3(0.035)*step(0.80,vn(pl*88.0+id))-vec3(0.03)*step(0.82,vn(pl*67.0+id*5.0));",
   "  float wet=1.0-smoothstep(0.0,0.028,p.y);al*=1.0-0.42*wet;",
   "  vec3 L=normalize(vec3(-0.5,0.62,0.35));float di=max(dot(n,L),0.0);vec3 amb=mix(vec3(0.42,0.40,0.52),vec3(0.16,0.12,0.30),uN);float ao=0.50+0.50*smoothstep(-0.65,0.45,n.y);",
@@ -165,7 +169,8 @@ var Stones=(function(){
     else if(name==="bloom"){dip[i]=0.032;ring(i,0.012,t);setTimeout(function(){ring(i,0.006,now());},180);}
     else{for(var k=0;k<cnt;k++)(function(k){setTimeout(function(){dip[k]=0.018;ring(k,0.010,now());},Math.abs(k-i)*320);})(k);}
     try{if(W.IngNature)W.IngNature.touch(name,i);}catch(x){}host.setAttribute("data-flourish",name);kick();}
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still(),gap=(overI>=0||t-Math.max(SW[2],GL[2],Math.max.apply(null,hop))<3)?16:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;if(W.IngStill&&IngStill.on()){IngStill.wake(kick);return;}  /* 7.40: at rest, still (modules/r324.js) */
+  var t=(ts-t0)/1000,st=still(),gap=(overI>=0||t-Math.max(SW[2],GL[2],Math.max.apply(null,hop))<3)?16:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;
     /* 7.27 (modules/r310.js): at rest 20 frames a second (30 before), as Adamas since 7.22; 10 while Ingenium is not the window in use, after
        two minutes with no touch, or while she types; under the pointer and in a flourish 60, as before; asleep between frames */
     if(lastDraw){if(ts-lastDraw>gap*1.9)slowN++;else slowN=Math.max(0,slowN-1);if(slowN>12&&q>0.7&&!W.__keepQ){q=Math.max(0.7,q*0.85);slowN=0;size();}}lastDraw=ts;

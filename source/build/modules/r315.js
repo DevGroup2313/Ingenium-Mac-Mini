@@ -43,8 +43,14 @@ body[data-theme="night"] #fb{--r315-key:linear-gradient(180deg,#352a4b,#271f37);
 /* the app cards lift and grow; the chosen one too */
 #fb .f-repo:hover{transform:translateY(-3px) scale(1.025)}
 #fb .f-repo:active{transform:translateY(1px) scale(.98)}
-#fb .f-repo .f-ls,#fb .f-repo img{transition:transform .5s cubic-bezier(.3,1.7,.45,1)}
-#fb .f-repo:hover .f-ls,#fb .f-repo:hover img{transform:rotate(-6deg) scale(1.08)}
+/* 7.40: the apps' logos keep their own depth and movement, as Lector's do. Her words (18 November 2026): "The apps logos on Fabrica need to
+   have the same popped out 3D look and animation as the rest of the app. I want them to be just as clickable and thick and weighted as
+   the ones on the Lector page. Right now they seem flat and shallow and have a completely different animations." These two rules (7.33)
+   turned the whole logo, and every picture in it, flat by a few degrees under the pointer: the picture rule took each layer's depth
+   (its translateZ), so the four layers fell into one. The logo now answers as Lector's: it turns toward the pointer in depth, lifts,
+   and sinks when pressed (r112's own handling); a picture outside the logo still turns as before. */
+#fb .f-repo img:not(.f-ls img){transition:transform .5s cubic-bezier(.3,1.7,.45,1)}
+#fb .f-repo:hover img:not(.f-ls img){transform:rotate(-6deg) scale(1.08)}
 #fb .f-libk:hover{transform:translateY(-1px);color:var(--r315-acc)}
 /* the rooms and parts: the chosen one, pressed in, still answers */
 #fb .fr-room:hover,#fb .fr-part:hover{transform:translateY(-2px)}

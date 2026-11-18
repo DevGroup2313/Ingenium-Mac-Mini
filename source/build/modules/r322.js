@@ -89,7 +89,7 @@ try{new MutationObserver(function(ms){for(var a=0;a<ms.length;a++){var n=ms[a].a
   if(x.tagName==="INPUT")show(x);else if(x.querySelector&&x.querySelector('input[type="range"]'))[].forEach.call(x.querySelectorAll('input[type="range"]'),show);}}})
   .observe(D.documentElement,{childList:true,subtree:true});}catch(e){}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",all);else all();
-setInterval(function(){if(!D.hidden)all();},1500);
+setInterval(function(){if(!D.hidden&&!(W.IngStill&&IngStill.on()))all();},1500);   /* 7.40: not at rest (r324) */
 W.addEventListener("resize",all);
 W.IngSliders={version:1,show:show,all:all};
 })();

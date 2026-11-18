@@ -1323,7 +1323,8 @@ function vcRipple(st,h){if(h.gx==null||still())return;var r=mk("i","skv-ripple")
 /* the motion: one clock. The sway is the logo's (it turns a little to one side and back, and never stops), the lean follows the pointer
    on a spring and the sway quietens under it; minimal motion and the system's reduced motion leave the instrument still */
 function vcMove(st){if(st.mraf===-1&&st.idle){clearTimeout(st.idle);st.idle=0;st.mraf=0;}if(st.mraf)return;if(still()){st.tilt.style.transform="";return;}
-  st.mraf=requestAnimationFrame(function fr(ts){st.mraf=0;if(!st.t0)st.t0=ts;var dt=st.lt?Math.min(.034,(ts-st.lt)/1000):.016;st.lt=ts;
+  st.mraf=requestAnimationFrame(function fr(ts){st.mraf=0;if(W.IngStill&&IngStill.on()){st.lt=0;IngStill.wake(function(){vcMove(st);});return;}  /* 7.40: at rest, still (modules/r324.js) */
+    if(!st.t0)st.t0=ts;var dt=st.lt?Math.min(.034,(ts-st.lt)/1000):.016;st.lt=ts;
     if(still()||!st.tilt.isConnected){st.lt=0;if(still())st.tilt.style.transform="";return;}   /* 7.16: Minimal motion chosen while the compass moves: it stands still at rest, not tilted where it stopped */
     /* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
     if(!st.io&&W.IntersectionObserver){st.seen=true;try{st.io=new IntersectionObserver(function(es){st.seen=es[es.length-1].isIntersecting;if(st.seen)vcMove(st);});st.io.observe(st.tilt);}catch(e){st.io=null;}}

@@ -352,7 +352,8 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
 /* ---------- motion: a slow turn, stilled under the pointer, turned by a drag ---------- */
 /* 7.17 (her words, 16 November 2026: "Ingenium is still overheating and lagging and still move a bit too slowly on my devices"): whether it is shown is kept by the browser (IntersectionObserver) instead of being read from the layout every frame, which made the page lay itself out again 30 to 60 times a second while nothing moved but this */
 var PSEEN=true,PIO=0;function pageSeen(){if(!PIO&&page){PIO=-1;if(W.IntersectionObserver){try{new IntersectionObserver(function(es){PSEEN=es[es.length-1].isIntersecting;if(PSEEN)kick();}).observe(page);PIO=1;}catch(e){PIO=-1;}}}return PIO===1?PSEEN:!!(page&&page.offsetParent);}
-function loop(t){RAF=0;if(!page||!pageSeen()||D.hidden||!HD||HD.el.classList.contains("is-away"))return;var gp=(!!DN||!!HOVER||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600)?30:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);
+function loop(t){RAF=0;if(!page||!pageSeen()||D.hidden||!HD||HD.el.classList.contains("is-away"))return;if(W.IngStill&&IngStill.on()){IngStill.wake(kick);return;}  /* 7.40: at rest, still (modules/r324.js) */
+  var gp=(!!DN||!!HOVER||performance.now()-Math.max(PR.t,FL2.t,KB.t)<2300||performance.now()-KN.t<1600)?30:(W.IngPace&&(IngPace.idle()||IngPace.typing())?100:50);
   /* 7.27 (modules/r310.js): at rest 20 frames a second (30 before), 10 while Ingenium is not the window in use, after two minutes with no
      touch, or while she types; under the pointer, in a drag, a press or a knock 30, as before; asleep between frames */
   if(!DUE&&LAST&&t-LAST<gp*0.85){later(gp);return;}DUE=false;var dt=Math.min(120,t-(LAST||t));LAST=t;

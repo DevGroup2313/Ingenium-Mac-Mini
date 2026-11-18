@@ -58,7 +58,7 @@ body[data-theme="night"] #termsCard{--sc-lav-t:rgba(183,156,230,.15);--sc-lav-c:
 #termsCard .tp-field label{font:600 12px/1.2 var(--sans,system-ui);color:var(--ink-2,#4a4358)}
 #termsCard .tp-field input{font:14px/1.4 var(--sans,system-ui);padding:9px 12px;border-radius:11px;border:1px solid var(--sc-line);background:var(--card-hi,#fff);color:var(--ink-1,#221a2e);box-shadow:inset 0 2px 5px rgba(40,22,68,.08)}
 #termsCard .tp-keys{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-#introTerms{margin:10px 0 0;font-size:12.5px;line-height:1.5;opacity:.85}
+#introTerms{display:none}
 #introTerms button{all:unset;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-weight:600}
 #introTerms button:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:3px}
 body.ing-minimal #termsCard *{transition:none!important}
@@ -124,14 +124,17 @@ function paint(){var c=card();if(!c)return;
 function show(v){VIEW=v||"privacy";try{go("settings");}catch(e){}try{IngRooms.open("settings","own",true);}catch(e){}paint();
   setTimeout(function(){var c=D.getElementById("termsCard");if(c)try{c.scrollIntoView({block:"start",behavior:"smooth"});}catch(e){}},300);}
 /* the welcome: one line, with a key to read them */
-function intro(){var d=D.getElementById("introDoor");if(!d||D.getElementById("introTerms"))return;var anchor=D.getElementById("introEnter");
-  var p=D.createElement("p");p.id="introTerms";p.innerHTML='By using Ingenium you accept its terms. <button type="button">Read them</button>';
-  p.querySelector("button").onclick=function(){var k=D.getElementById("introEnter");if(k)k.click();setTimeout(function(){show("short");},400);};
-  var row=anchor&&anchor.parentNode;if(row&&row.parentNode)row.parentNode.insertBefore(p,row.nextSibling);else d.appendChild(p);}
+/* 7.40: no line on the welcome door. Her words (18 November 2026): "I am not sure that the Terms and Conditions should be added to the
+   introduction door"; she chose a sheet after Enter, once, with I agree and Decline (to be shown as a live preview first). Until then
+   the terms stay in Settings, Ownership; a line left on the door by 7.37 to 7.39 is taken away. */
+function intro(){var p=D.getElementById("introTerms");if(p&&p.parentNode)p.parentNode.removeChild(p);}
 W.IngTerms={paint:paint,show:show,contact:contact,version:VERSION};
 function boot(){paint();intro();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,600);});
+/* 7.40: each time the door opens (the logo opens it again), the line is put back in its card */
+(function watchDoor(n){var d=D.getElementById("introDoor");if(!d){if(n<40)setTimeout(function(){watchDoor(n+1);},500);return;}
+  try{new MutationObserver(function(){if(!d.hidden)intro();}).observe(d,{attributes:true,attributeFilter:["hidden","class"]});}catch(e){}})(0);
 })();
 try{window.__ingParts["p320"]="running";}catch(_){}
 </script>

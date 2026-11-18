@@ -52,6 +52,13 @@ body[data-theme="night"] #page-build.sk-on{--sk-ink1:#f3eefb;--sk-ink2:#d3c9e3;-
 body[data-motion="minimal"] #page-build.sk-on .bd-cv{transition:none}
 @media (prefers-reduced-motion:reduce){#page-build.sk-on .bd-cv{transition:none}}
 /* a phone or a narrow window: the diamond under the words, scaled to the width there is (modules/r296.js) */
+/* 7.40: the still stone, where the graphics card cannot draw the scene (see GPU in the script) */
+.bd-still{position:absolute;left:50%;top:44%;width:min(46%,250px);aspect-ratio:1/.5769;transform:translate(-50%,-50%);overflow:hidden;pointer-events:none;
+  filter:drop-shadow(0 14px 18px rgba(60,30,110,.28)) drop-shadow(0 3px 4px rgba(60,30,110,.22))}
+.bd-still img{display:block;height:100%;width:2400%;max-width:none;animation:bdStillTurn 9s steps(24) infinite}
+@keyframes bdStillTurn{to{transform:translateX(-100%)}}
+body[data-motion="minimal"] .bd-still img{animation:none}
+@media (prefers-reduced-motion: reduce){.bd-still img{animation:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p292"]="started";}catch(_){}
 /* R292 · Build's header, the diamond: see the note at the top of its styles */
@@ -387,10 +394,19 @@ var Diamond=(function(){
   "    L+=vec3(1.0,0.98,1.0)*beam(ro,rd,S2,E2,0.012,th,sIn,0.06,0.55*aft,1.4*onIn)*I*0.6;L+=mix(vec3(1.0,0.98,1.0),hue(0.25),0.35)*beam(ro,rd,X2,X2+normalize(X2-E2)*2.6,0.010,th,sOut,0.10,0.55*aft,1.3*onOut)*I*0.5;}}",
   "  float eb=smoothstep(0.0,0.10,v.x)*smoothstep(1.0,0.90,v.x)*smoothstep(0.0,0.08,v.y)*smoothstep(1.0,0.88,v.y);vec3 Lt=tm(L)*eb;",
   "  col=col+Lt*(1.0-0.35*a);a=max(a,clamp(max(Lt.r,max(Lt.g,Lt.b))*1.15,0.0,1.0));gl_FragColor=vec4(min(col,vec3(a)),a);}"].join("\n");
-  function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
+  /* 7.40: the shader is compiled while the page goes on (KHR_parallel_shader_compile, where the browser has it): asking for its status at
+     once held the page while a graphics driver compiled it, 2.6 seconds on a processor four times slower; the link's own status still
+     reports a fault */
+  var PEXT=null,PENDING=false;
+  function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!PEXT&&!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
   function init(){try{gl=cv.getContext("webgl",{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:"low-power"})||cv.getContext("experimental-webgl");}catch(e){gl=null;}
-    if(!gl)return false;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);
-      if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(pr));}catch(e){W.__diamondErr=String(e);return false;}
+    if(!gl)return false;try{PEXT=gl.getExtension("KHR_parallel_shader_compile");}catch(e){PEXT=null;}
+    try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);}catch(e){W.__diamondErr=String(e);return false;}
+    if(PEXT){var done=false;try{done=gl.getProgramParameter(pr,PEXT.COMPLETION_STATUS_KHR);}catch(e){done=true;}
+      if(!done){PENDING=true;(function poll(){if(gl.isContextLost()){PENDING=false;goStill("lost");return;}var d=true;try{d=gl.getProgramParameter(pr,PEXT.COMPLETION_STATUS_KHR);}catch(e){}
+        if(!d){setTimeout(poll,60);return;}PENDING=false;if(!init2()){goStill("nogl");return;}kick();})();return true;}}
+    return init2();}
+  function init2(){if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){W.__diamondErr=String(gl.getProgramInfoLog(pr));return false;}
     gl.useProgram(pr);var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
     var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
     ["uT","uN","uV","uCu","uEn","uFh","uFm","uAh","uAo","uCl","uCd","uAsp","uTan","uY","uPx","uDial","uCP","uDC","uCM","uR","uTab","uL","uHT","uHA","uHB","uHC","uLogo","uLG","uLH","uLR","uLQ","uAA","uHV","uBG","uSc"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uG=gl.getUniformLocation(pr,"uG[0]");
@@ -678,7 +694,8 @@ var Diamond=(function(){
      click or key, back at once on the next. */
   ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(n){try{D.addEventListener(n,function(){var w=performance.now()-LASTIN>120000;LASTIN=performance.now();if(w)kick();},{passive:true,capture:true});}catch(e){}});
   W.addEventListener("focus",function(){LASTIN=performance.now();kick();});
-  function frame(ts){raf=0;if(!vis||!shown||!ok)return;var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000||!!(W.IngPace&&IngPace.typing()),gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
+  function frame(ts){raf=0;if(!vis||!shown||!ok)return;if(PENDING){return;}if(W.IngStill&&IngStill.on()){IngStill.wake(kick);return;}  /* 7.40: at rest, still (modules/r324.js) */
+  var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000||!!(W.IngPace&&IngPace.typing()),gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
     if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;  /* 7.27: the next frame is waited for asleep, not at every refresh of the screen */  /* a little slack, so a frame that falls a hair early is not put off a whole frame */var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
       /* 7.21, her words (16 November 2026): "The holder of Adamas' diamond still look really blurry on build 7.20, it does not look more
@@ -699,12 +716,43 @@ var Diamond=(function(){
     HV.x+=(22*(lx-HV.lx)-8.6*HV.x)*dt;HV.lx+=HV.x*dt;HV.z+=(22*(lz-HV.lz)-8.6*HV.z)*dt;HV.lz+=HV.z*dt;
     holderTick(tt,dt,st);gl.uniform2f(U.uHT,HT2[0],HT2[1]);gl.uniform4f(U.uHA,HO.ot,HO.bz,HO.ba,HT2[2]);gl.uniform4f(U.uHB,0,0,0,HO.chase);gl.uniform4f(U.uHC,HO.beat,HO.sweep,Math.min(1,HO.boost),HO.da);if(DIAL)orrery();gl.uniform1f(U.uDial,DIAL&&DIALK?1:0);logoTex();var LV=logoVals(t,st,dt);gl.uniform1f(U.uLogo,LOGOOK?1:0);gl.uniform1f(U.uAA,AAN);gl.uniform1f(U.uSc,DSC);gl.uniform1f(U.uBG,BG.ok?1:0);gl.uniform4f(U.uHV,HO.hv[0],HO.hv[1],HO.hv[2],HO.hv[3]);gl.uniform4f(U.uLG,LV[0][0],LV[0][1],LV[0][2],LV[0][3]);gl.uniform4f(U.uLH,LV[1][0],LV[1][1],LV[1][2],LV[1][3]);gl.uniform4f(U.uLR,LV[2][0],LV[2][1],LV[2][2],LV[2][3]);gl.uniform4f(U.uLQ,LV[3][0],LV[3][1],LV[3][2],LV[3][3]);gl.uniform2f(U.uPx,2.0*TAN*(W0/H0)/cv.width,2.0*TAN/cv.height);
     gl.uniformMatrix3fv(U.uR,false,new Float32Array([M[0][0],M[0][1],M[0][2],M[1][0],M[1][1],M[1][2],M[2][0],M[2][1],M[2][2]]));
-    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)later(gap);}
+    var gT=GPU.st==="probe"?performance.now():0;
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    if(GPU.st==="probe"){try{gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,PX1);}catch(e){}GPU.n++;if(GPU.n>1)GPU.ms+=performance.now()-gT;if(GPU.n>=3){decide();if(GPU.st==="still")return;}}
+    else if(GPU.good<3&&++GPU.good===3)trying(false);
+    sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)later(gap);}
+  /* 7.40: the graphics card measured first, and a still stone where it cannot keep up. Her words (18 November 2026): "the Adamas page has
+     consistently crashed the app everytime that I have tried to go on the page" (her HP laptops, one with weaker graphics). Measured on
+     7.39 (rig/t_740_adamas.js): the scene is one ray-traced picture drawn at the screen's full sharpness; on a weak graphics chip one frame
+     can outlast the two seconds Windows allows before it resets the graphics driver, which ends the app's display. Now the first three frames
+     are drawn at a third of the sharpness and each is timed on the graphics card (one pixel read back, which waits for the frame); from them, the cost of a full
+     frame: up to 55 ms, full sharpness as before (7.21); up to 220 ms, fewer pixels and fewer frames; up to 900 ms, half sharpness at 15
+     frames a second at most; beyond, or when the graphics card is lost, or when the app stopped while the scene was being tried (a mark
+     kept on this device until three frames have been drawn), the stone is shown still, as its colours' panel draws it, and the sky behind
+     it is not drawn. localStorage "ing.gpu.diamond": "full" or "still" chooses by hand (the tests use it). */
+  var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35;
+  function trying(on){try{if(on)localStorage.setItem("ing.diamond.trying","1");else localStorage.removeItem("ing.diamond.trying");}catch(e){}}
+  function decide(){var full=GPU.ms/Math.max(1,GPU.n-1)/(PQ*PQ);GPU.est=Math.round(full);
+    if(full<=55){q=1;GPU.st="full";}else if(full<=220){q=Math.max(0.6,Math.min(1,Math.sqrt(55/full)));GPU.st="lite";SLOW=Math.max(SLOW,1.25);}
+    else if(full<=900){q=0.5;GPU.st="low";SLOW=2;}else{goStill("slow");return;}size();}
+  function goStill(why){GPU.st="still";GPU.why=why;ok=false;if(raf===-1){clearTimeout(TMO);TMO=0;}else if(raf)cancelAnimationFrame(raf);raf=0;trying(false);
+    try{cv.style.visibility="hidden";}catch(e){}try{if(BG.cv&&BG.cv.parentNode)BG.cv.parentNode.removeChild(BG.cv);}catch(e){}BG.ok=false;
+    if(host)host.setAttribute("data-still",why);stillDraw();}
+  function stillDraw(){if(GPU.st!=="still"||!host)return;var C=W.IngDiamondColours,src=null,nt=night();
+    try{var d=C.get(),i=nt?3:(AUTO?byHour():(VAR>=0?VAR:2));src=C.drawn(d.fam,d.own,i);}catch(e){src=null;}if(!src)return;
+    /* the stone's own turning strip (24 frames through 45 degrees, as its colours' panel shows it), stepped by the browser: no drawing */
+    var w=host.querySelector(".bd-still");if(!w){w=D.createElement("div");w.className="bd-still";w.setAttribute("aria-hidden","true");var im=D.createElement("img");im.alt="";im.decoding="async";w.appendChild(im);host.appendChild(w);}
+    var img=w.firstChild;if(img.getAttribute("src")!==src)img.src=src;}
   function later(gap){var wl=gap*0.85-(performance.now()-lastDraw);if(gap>=40&&wl>4){raf=-1;TMO=setTimeout(function(){TMO=0;raf=0;DUE=true;kick();},wl);}else raf=requestAnimationFrame(frame);}  /* the frame its own timer asks for is drawn: the browser may stamp it a little before the time is up */
   function kick(){if(raf===-1){clearTimeout(TMO);TMO=0;raf=0;}if(!raf)raf=requestAnimationFrame(frame);}
   function mount(el){host=el;cv=D.createElement("canvas");cv.className="bd-cv";ov=D.createElement("canvas");ov.className="bd-cv ov";host.appendChild(cv);host.appendChild(ov);og=ov.getContext("2d");
     /* 7.20: a touch screen starts at full sharpness, as a computer does (it started at three quarters, the picture stretched to fit);
-       a device that falls behind still lowers it, as before */size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
+       a device that falls behind still lowers it, as before */size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}
+    (function(){var force="",crashed=false;try{force=localStorage.getItem("ing.gpu.diamond")||"";crashed=localStorage.getItem("ing.diamond.trying")==="1";}catch(e){}
+      cv.addEventListener("webglcontextlost",function(e){e.preventDefault();goStill("lost");});
+      if(force==="still"||(crashed&&force!=="full")){GPU.st="still";ok=false;setTimeout(function(){goStill(crashed?"stopped":"chosen");},0);return;}
+      if(force==="full"){GPU.st="full";return;}
+      GPU.st="probe";q=PQ;size();trying(true);})();try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
     function at(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*W0,y:(e.clientY-r.top)/r.height*H0};}
     var C=proj([0,1.22,0]);
     function hitPart(p){var sx=((p.x/W0)*2-1)*(W0/H0)*TAN,sy=((1-p.y/H0)*2-1)*TAN,d=nrm([CR[0]*sx+CU[0]*sy+CF[0],CR[1]*sx+CU[1]*sy+CF[1],CR[2]*sx+CU[2]*sy+CF[2]]);
@@ -728,7 +776,7 @@ var Diamond=(function(){
     host.addEventListener("pointercancel",function(e){if(e.pointerType&&e.pointerType!=="mouse"&&DDN!=null){DDN=null;DKB=(performance.now()-t0)/1000;}touchOff(e);});
     try{new IntersectionObserver(function(es){var e=es[es.length-1];var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);vis=sn;if(vis)kick();},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(host);}catch(e){}/* 7.27: the scene draws while three tenths of it are in view below the top bar (modules/r310.js) */
     D.addEventListener("visibilitychange",function(){shown=!D.hidden;if(shown)kick();});kick();}
-  return {mount:mount,kick:kick,theme:kick,tint:tint,family:family,fam:function(){return FAM?JSON.parse(JSON.stringify(FAM)):null;},tinted:function(){return {stone:CU4.slice(),band:EN4.slice()};},fire:function(){},q:function(){return q;},variant:function(v){if(v==="auto"){AUTO=true;VAR=byHour();}else{AUTO=false;var i=LOOKS.indexOf(v);VAR=i<0?0:i;}var t=(performance.now()-t0)/1000;if(!still()&&LIGHT)pulse(t);kick();},light:function(on){LIGHT=!!on;if(LIGHT)NEXT=(performance.now()-t0)/1000+1.2;else PL.s=-99;kick();},look:function(){return LOOKS[VAR<0?byHour():VAR];},auto:function(){return AUTO;},dial:function(v){if(v==null)return DIAL?"orrery":"engine";DIAL=v==="orrery"?1:0;kick();},press:function(k,x,z){holdPress(k,(performance.now()-t0)/1000,x,z);kick();},holder:function(){return {ot:HO.ot,bz:HO.bz,ba:HO.ba,tilt:HT2[0],lean:HT2[1]};}};})();
+  return {gpu:function(){return {st:GPU.st,est:GPU.est,why:GPU.why,q:q,slow:SLOW,n:GPU.n,ms:Math.round(GPU.ms),ok:ok,vis:vis,shown:shown};},stillDraw:function(){stillDraw();},mount:mount,kick:kick,theme:kick,tint:tint,family:family,fam:function(){return FAM?JSON.parse(JSON.stringify(FAM)):null;},tinted:function(){return {stone:CU4.slice(),band:EN4.slice()};},fire:function(){},q:function(){return q;},variant:function(v){if(v==="auto"){AUTO=true;VAR=byHour();}else{AUTO=false;var i=LOOKS.indexOf(v);VAR=i<0?0:i;}var t=(performance.now()-t0)/1000;if(!still()&&LIGHT)pulse(t);kick();},light:function(on){LIGHT=!!on;if(LIGHT)NEXT=(performance.now()-t0)/1000+1.2;else PL.s=-99;kick();},look:function(){return LOOKS[VAR<0?byHour():VAR];},auto:function(){return AUTO;},dial:function(v){if(v==null)return DIAL?"orrery":"engine";DIAL=v==="orrery"?1:0;kick();},press:function(k,x,z){holdPress(k,(performance.now()-t0)/1000,x,z);kick();},holder:function(){return {ot:HO.ot,bz:HO.bz,ba:HO.ba,tilt:HT2[0],lean:HT2[1]};}};})();
 
 /* ---------- the header, made as Lector's, Vocatio's and Fabrica's are ---------- */
 var page=null,HD=null,tag=null,MOUNTED=false,LAST="";
@@ -758,7 +806,7 @@ var og=W.go;if(typeof og==="function")W.go=function(p){var r=og.apply(this,argum
 function first(){try{var p=$("page-build");if(p&&p.classList.contains("active"))on();}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",function(){setTimeout(first,0);});else setTimeout(first,0);
 try{new MutationObserver(function(){if(MOUNTED)Diamond.kick();}).observe(D.body,{attributes:true,attributeFilter:["data-theme","data-motion"]});}catch(e){}
-W.IngDiamond={on:on,variant:function(v){Diamond.variant(v);},tint:function(o){Diamond.tint(o);},family:function(o){Diamond.family(o);},fam:function(){return Diamond.fam();},tinted:function(){return Diamond.tinted();},light:function(on){Diamond.light(on);},look:function(){return Diamond.look();},auto:function(){return Diamond.auto();},dial:function(v){return Diamond.dial(v);},state:function(){return {head:!!(HD&&HD.el.isConnected),mounted:MOUNTED,q:Diamond.q(),look:Diamond.look(),auto:Diamond.auto(),err:W.__diamondErr||"",label:tag?[tag.querySelector("b").textContent,tag.querySelector("small").textContent]:null};},kick:function(){Diamond.kick();}};
+W.IngDiamond={gpu:function(){return Diamond.gpu?Diamond.gpu():null;},on:on,variant:function(v){Diamond.variant(v);},tint:function(o){Diamond.tint(o);},family:function(o){Diamond.family(o);},fam:function(){return Diamond.fam();},tinted:function(){return Diamond.tinted();},light:function(on){Diamond.light(on);},look:function(){return Diamond.look();},auto:function(){return Diamond.auto();},dial:function(v){return Diamond.dial(v);},state:function(){return {head:!!(HD&&HD.el.isConnected),mounted:MOUNTED,q:Diamond.q(),look:Diamond.look(),auto:Diamond.auto(),err:W.__diamondErr||"",label:tag?[tag.querySelector("b").textContent,tag.querySelector("small").textContent]:null};},kick:function(){Diamond.kick();}};
 try{window.__ingParts["p292"]="running";}catch(_){}
 })();
 </script>

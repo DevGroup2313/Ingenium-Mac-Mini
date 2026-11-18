@@ -17,6 +17,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await pw.chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+  await p.addInitScript(() => { try { localStorage.setItem('ing.gpu.diamond', 'full'); } catch (e) {} });   // 7.40: the full scene, as a capable graphics card draws it (this browser draws in software, where Adamas shows its still stone)
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300)));
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 240000 }); await sleep(700);
   await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (b) b.click(); }); await sleep(400);

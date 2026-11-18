@@ -85,6 +85,12 @@ body[data-theme="night"] .gk-r input[type=range]{accent-color:#b79ce6}
 body[data-theme="night"] #genLogCard .gl-coin{color:#b79ce6;background:linear-gradient(#2a2239,#251e33);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45)}
 body[data-theme="night"] #genLogCard .gl-e.amb{background:rgba(240,176,96,.15)}
 body[data-theme="night"] #genLogCard .gl-e.amb b{color:#f0b060}
+/* 7.40: taken off the pages, her words (18 November 2026): "The Tokens and Effort levels need to be folded away into one discreet button,
+   right now they are cluttering the pages designs and layout, especially the Vocatio and Fabrica page, please remove these buttons from
+   where they are currently placed". Gone from Vocatio (its Effort row and key under the room keys), Lector, Folders, Fabrica's head and the
+   chat box; they stay in the model's name in the top bar and in Settings, Models and AI, until she chooses the one discreet button's
+   place on its live preview (the top bar, or a small key by each page's title). */
+#cs > .c-lims,.wef,.wlim,#chatGenKey,#fbGenRow{display:none!important}
 @media (prefers-reduced-motion: reduce){.gk,.gk-seg button,#genLogCard .gl-m,#genLogCard .gl-e,#genLogCard .gl-coin{transition:none}.gk:hover,.gk-seg button:hover,#genLogCard .gl-m:hover,#genLogCard .gl-e:hover{transform:none}.gk-pop{animation:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p321"]="started";}catch(_){}
@@ -224,13 +230,13 @@ function paintCard(){var c=card();if(!c)return;var g=G();
 function paintCardSoon(){var c=$("genLogCard");if(!c||!c.isConnected){paintCard();return;}if(c.offsetParent!==null)paintCard();else c.__dirty=1;}
 
 /* ---------- start, and kept in step ---------- */
-function all(){try{placeChat();}catch(e){}try{placeFabrica();}catch(e){}try{if(!$("genLogCard"))paintCard();}catch(e){}paintChips();}
+function all(){try{if(!$("genLogCard"))paintCard();}catch(e){}paintChips();}   /* 7.40: no key in the chat box or under Fabrica's head */
 W.addEventListener("ing-gen",function(){paintChips();try{paintCardSoon();}catch(e){}});
 W.addEventListener("ing-gen-set",function(){paintChips();});
 function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r321)return;var ng=function(p){close();var r=og.apply(this,arguments);setTimeout(function(){all();if(p==="settings")try{paintCard();}catch(e){}},0);return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r321=1;W.go=ng;}
 (function wait(n){if(W.__ingReady===true&&W.state&&G()){try{wrapGo();all();setTimeout(all,2500);}catch(e){}
-    setInterval(function(){if(D.hidden)return;try{if(POP&&!(POP.__for&&POP.__for.isConnected&&POP.__for.offsetParent))close();placeChat();paintChips();}catch(e){}},1500);return;}
+    setInterval(function(){if(D.hidden||(W.IngStill&&IngStill.on()))return;try{if(POP&&!(POP.__for&&POP.__for.isConnected&&POP.__for.offsetParent))close();paintChips();}catch(e){}},1500);return;}
   if(n<240)setTimeout(function(){wait(n+1);},250);})(0);
 W.IngGenKey={version:1,chip:chip,paint:paintChips,open:open,close:close,card:paintCard,pageKey:pageKeyFn,line:line};
 })();

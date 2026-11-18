@@ -395,7 +395,44 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.40 (18 November 2026): your DPhil plan in Vocatio; the 7.39 texts right in every edition.
+Ingenium 7.40 (18 November 2026): your DPhil plan in Vocatio; the 7.39 texts right in every edition; Adamas no longer freezes or
+closes the app; at rest, still (cooler phones, quicker laptops); the terms off the welcome door; Vesta's darker stone first by day;
+Fabrica's logos in depth; the model keys off the pages.
+
+Her message (18 November 2026, with four screenshots): the terms line "is sort of behind the introduction door and skews the introduction
+door to the left side"; "Ingenium is running really slow on my HP laptops and the Adamas page has consistently crashed the app everytime
+that I have tried to go on the page"; the Tokens and Effort levels "cluttering the pages designs and layout, especially the Vocatio and
+Fabrica page, please remove these buttons from where they are currently placed"; "Ingenium still heats up my phone"; "I want the darker
+purple stone to be the first stone on Day mode on the Vesta page"; Fabrica's app logos "flat and shallow" with "a completely different
+animations" from Lector's.
+- The welcome door (`r320`): the line sat after the door's card, a second item in the door's centring box, which pushed the card left.
+  She then wrote: "I am not sure that the Terms and Conditions should be added to the introduction door"; asked, she chose a sheet after
+  Enter, once, with I agree and Decline (a live preview first). 7.40 takes the line off the door; the terms stay in Settings, Ownership.
+- Adamas (`r292`), measured with a processor slowed four times (rig/t_740_adamas.js): opening it held the page 11.7 s in all (3 s at
+  once), then about 2 frames a second; nearly all of it the graphics card reading every frame back (WebGL ReadPixels). The scene is one
+  ray-traced picture at full sharpness; on a weak graphics chip one frame can outlast the two seconds Windows allows before it resets the
+  graphics driver, which ends the app's display. Now the first three frames are drawn at a third of the sharpness and timed on the
+  graphics card (one pixel read back); from them: full sharpness (a full frame up to 55 ms), fewer pixels and frames (up to 220 ms), half
+  sharpness at 15 frames a second (up to 900 ms), else the stone still, its own 24-frame strip stepping (no WebGL drawing; the sky behind
+  is not drawn). A lost graphics card, or an app that stopped while the scene was being tried (a mark kept until three frames are drawn),
+  shows the still stone. The shader compiles while the page goes on where the browser offers parallel compiling (not this test's
+  browser, where one stretch of about 2 s remains). localStorage "ing.gpu.diamond" ("full" or "still") chooses by hand. Measured after:
+  2.8 s in all, 2.0 s at most.
+- At rest, still (`r324`, window.IngStill): measured on 7.39, a phone's screen, nothing touched for 8 s, the share of one processor core
+  in use: Adamas 138 per cent, Vesta 98, Home 35 (121 animations running for ever), Fabrica 22, Vocatio 15. Now, after 12 s untouched on
+  a phone or tablet (30 s on a computer), or at once when Ingenium is not the window in use, every animation holds where it is and the
+  scenes (r290 the compass, r291 the stones, r292 the diamond, r294 the tree) stop drawing; the first touch, key, scroll or pointer
+  movement brings them back. Not while a model writes or loads. After: every page under 2 per cent (rig/t_740_rest.js).
+- Vesta (`r291`): by day the stones' colours followed the steps, so with nothing planned the first stone was pearl; now by day, as by
+  night, they keep their places: the darker purple stone first, pearl second, lilac beyond.
+- Fabrica (`r315`): a 7.33 rule turned the whole logo and every picture in it flat by a few degrees under the pointer, which took each
+  layer's depth; the logos now turn toward the pointer in layers, lift and sink as Lector's do.
+- The model keys (`r321`): gone from Vocatio (its Effort row and key), Lector, Folders, Fabrica's head and the chat box; they stay in the
+  model's name in the top bar and in Settings, Models and AI until she chooses the discreet button's place on its live preview.
+- `tools/publish_release.sh` (all four repositories): GitHub's network dropped during 7.39's Intel job ("Could not resolve host"), after
+  both files were uploaded; the tag and the release notes are now tried again, and notes that cannot be written are a warning.
+- rig: `t_740_adamas.js` (new, 9 checks), `t_740_rest.js` (new, 4); `t_739_limits.js` opens the sheet from Settings (20);
+  `t_700_heads.js` asks for the full scene (this test's browser draws in software).
 
 Your DPhil plan. Her answers (18 November 2026): the DPhil in Information, Communication and the Social Sciences at the Oxford Internet
 Institute; "Funded DPhil + full time remote work alongside it"; October 2027 (apply by 7 January); fee status International; "Show me both
