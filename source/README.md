@@ -395,8 +395,18 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.39 (18 November 2026): one setting for each model, in every place; dictation in-house on every device; a Mac app's logs
-outside the app.
+Ingenium 7.39 (18 November 2026): one setting for each model, in every place; raised sliders; dictation in-house on every device; a
+Mac app's logs outside the app.
+
+Raised sliders. Her words (18 November 2026): "I want the sliders to be 3D and not look so flat." Her approval of the live preview
+(https://claude.ai/artifact/Le3ujQHWeH9srAcrJ9T3kr, previews/sliders_3d): "I approve of the preview".
+- Found: every slider was the browser's own (input type=range) in Ingenium's violet; no module styled one.
+- `build/modules/r322.js` (new, window.IngSliders): every slider is a groove shaded inside, a violet fill lit along its top edge, and a
+  pearl with a small violet jewel that rises under the pointer and presses in when held; day and night (body[data-theme=night]). The
+  fill follows the value when she moves it, when the page sets it (the value, min and max setters, kept as they were, then the fill),
+  when a slider appears, and in a slow sweep. The Models page's settings: Effort's five stops under its slider, and its level named
+  Low to Max as everywhere else (it said "Very light" to "Very careful").
+- rig: `t_739_sliders.js` (new, 10 checks).
 
 One setting for each model. Her words: the Tokens and Context controls reset to zero, are "out whack all over the app", and can be set
 only on the chat pages, with no effort level elsewhere. Asked what to do (18 November 2026): "Both" (one setting everywhere, and a

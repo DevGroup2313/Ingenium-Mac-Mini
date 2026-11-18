@@ -1,0 +1,169 @@
+<title>Raised Sliders</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a header with the theme key; a row that sets a flat slider beside the raised one; then the three places Ingenium shows
+   sliders (the model's key, Chat's Controls with Effort's five stops, Sound), all in the raised style. Tokens as Ingenium's own. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f;
+  /* the raised slider */
+  --groove:linear-gradient(#e4dced,#efe9f5);
+  --groove-sh:inset 0 2px 3px rgba(40,22,68,.28),inset 0 -1px 0 rgba(255,255,255,.9),0 1px 0 rgba(255,255,255,.95);
+  --gel-a:#8d66d6; --gel-b:#5d37a1;
+  --gel-sh:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(30,10,60,.3),0 1px 2px rgba(52,24,100,.35);
+  --pearl:radial-gradient(circle at 36% 30%,#ffffff 0 18%,#f4f0fa 40%,#ddd3ec 78%,#c9bcdf 100%);
+  --pearl-line:rgba(60,30,90,.22);
+  --pearl-sh:inset 0 -2px 3px rgba(60,30,90,.18),0 1px 1px rgba(40,20,70,.35),0 3px 5px rgba(40,20,70,.25),0 7px 12px rgba(40,20,70,.16);
+  --pearl-hi:inset 0 -2px 3px rgba(60,30,90,.16),0 2px 2px rgba(40,20,70,.3),0 6px 10px rgba(40,20,70,.26),0 13px 20px rgba(40,20,70,.18);
+  --jewel:radial-gradient(circle at 50% 50%,#b79ce6 0 1.2px,#6a3fb5 2.6px,rgba(106,63,181,0) 3.6px);
+  --stop:rgba(40,22,68,.28);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060;
+  --groove:linear-gradient(#120d1a,#1b1526);
+  --groove-sh:inset 0 2px 4px rgba(0,0,0,.7),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.06);
+  --gel-a:#9a76de; --gel-b:#5b3aa1;
+  --gel-sh:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.6);
+  --pearl:radial-gradient(circle at 36% 30%,#f2ecfb 0 14%,#cfc2e6 42%,#9d8cbd 80%,#7d6c9e 100%);
+  --pearl-line:rgba(0,0,0,.45);
+  --pearl-sh:inset 0 -2px 3px rgba(0,0,0,.3),0 1px 1px rgba(0,0,0,.7),0 3px 5px rgba(0,0,0,.55),0 7px 12px rgba(0,0,0,.4);
+  --pearl-hi:inset 0 -2px 3px rgba(0,0,0,.28),0 2px 2px rgba(0,0,0,.65),0 6px 10px rgba(0,0,0,.55),0 13px 20px rgba(0,0,0,.42);
+  --jewel:radial-gradient(circle at 50% 50%,#e1d3fb 0 1.2px,#7a56c8 2.6px,rgba(122,86,200,0) 3.6px);
+  --stop:rgba(233,227,243,.3);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060;
+  --groove:linear-gradient(#120d1a,#1b1526);
+  --groove-sh:inset 0 2px 4px rgba(0,0,0,.7),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.06);
+  --gel-a:#9a76de; --gel-b:#5b3aa1;
+  --gel-sh:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.6);
+  --pearl:radial-gradient(circle at 36% 30%,#f2ecfb 0 14%,#cfc2e6 42%,#9d8cbd 80%,#7d6c9e 100%);
+  --pearl-line:rgba(0,0,0,.45);
+  --pearl-sh:inset 0 -2px 3px rgba(0,0,0,.3),0 1px 1px rgba(0,0,0,.7),0 3px 5px rgba(0,0,0,.55),0 7px 12px rgba(0,0,0,.4);
+  --pearl-hi:inset 0 -2px 3px rgba(0,0,0,.28),0 2px 2px rgba(0,0,0,.65),0 6px 10px rgba(0,0,0,.55),0 13px 20px rgba(0,0,0,.42);
+  --jewel:radial-gradient(circle at 50% 50%,#e1d3fb 0 1.2px,#7a56c8 2.6px,rgba(122,86,200,0) 3.6px);
+  --stop:rgba(233,227,243,.3);
+  color-scheme:dark}
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.5 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font:600 25px/1.4 var(--serif);color:var(--ink1);margin:0;text-wrap:balance}
+.lede{margin:4px 0 0;color:var(--ink2);max-width:68ch}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+button{font:inherit;color:inherit;cursor:pointer}
+.key{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font:600 12.5px/1 var(--sans);transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)} .key:active{transform:translateY(1px)}
+.key:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--card-sh);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0;transition:transform .2s var(--bounce),box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.card h2{font:600 16.5px/1.35 var(--serif);color:var(--ink1);margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;font:600 11.5px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.chip.now{background:var(--amb-t);color:var(--amb-c)} .chip.new{background:var(--emr-t);color:var(--emr-c)}
+.fine{margin:0;color:var(--ink3);font-size:12.3px;line-height:1.5}
+.row{display:grid;grid-template-columns:96px minmax(0,1fr) 72px;gap:12px;align-items:center}
+.row label{font:600 12.5px/1.2 var(--sans);color:var(--ink2)}
+.row output{font:600 13px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink1);text-align:right}
+@media (max-width:420px){.row{grid-template-columns:72px minmax(0,1fr) 58px;gap:8px}}
+
+/* ---------- today's flat slider, as Ingenium has it ---------- */
+input.flat{width:100%;margin:0;accent-color:var(--acc)}
+
+/* ---------- the raised slider: a groove pressed into the card, a violet gel filling it, a pearl to hold ---------- */
+input.r3{-webkit-appearance:none;appearance:none;width:100%;height:26px;margin:0;background:transparent;cursor:pointer;--p:50%}
+input.r3:focus{outline:none}
+input.r3::-webkit-slider-runnable-track{height:10px;border-radius:999px;box-shadow:var(--groove-sh);
+  background:linear-gradient(180deg,var(--gel-a),var(--gel-b)) 0 0/var(--p) 100% no-repeat,var(--groove)}
+input.r3::-moz-range-track{height:10px;border-radius:999px;background:var(--groove);box-shadow:var(--groove-sh)}
+input.r3::-moz-range-progress{height:10px;border-radius:999px;background:linear-gradient(180deg,var(--gel-a),var(--gel-b));box-shadow:var(--gel-sh)}
+input.r3::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-6px;border-radius:50%;border:1px solid var(--pearl-line);
+  background:var(--jewel),var(--pearl);box-shadow:var(--pearl-sh);transition:transform .25s var(--bounce),box-shadow .2s}
+input.r3::-moz-range-thumb{width:22px;height:22px;border-radius:50%;border:1px solid var(--pearl-line);
+  background:var(--jewel),var(--pearl);box-shadow:var(--pearl-sh);transition:transform .25s var(--bounce),box-shadow .2s}
+input.r3:hover::-webkit-slider-thumb{transform:translateY(-1.5px) scale(1.1);box-shadow:var(--pearl-hi)}
+input.r3:hover::-moz-range-thumb{transform:translateY(-1.5px) scale(1.1);box-shadow:var(--pearl-hi)}
+input.r3:active::-webkit-slider-thumb{transform:scale(.96);box-shadow:var(--pearl-sh)}
+input.r3:active::-moz-range-thumb{transform:scale(.96);box-shadow:var(--pearl-sh)}
+input.r3:focus-visible::-webkit-slider-thumb{outline:3px solid var(--acc);outline-offset:2px}
+input.r3:focus-visible::-moz-range-thumb{outline:3px solid var(--acc);outline-offset:2px}
+/* Effort's five stops, set into the groove's edge below it */
+.stops{position:relative;height:16px;margin:-2px 11px 0}
+.stops i{position:absolute;top:2px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--stop)}
+.stops span{position:absolute;top:7px;transform:translateX(-50%);font:600 10.5px/1 var(--sans);color:var(--ink3);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div><h1>Raised sliders</h1><p class="lede">A preview for Ingenium. Every slider becomes a groove pressed into the card, filled with violet up to its value, and held by a pearl that rises under your pointer. At rest they keep this look; only the pearl moves when you point at it.</p></div>
+    <button type="button" class="key" id="theme">Night</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Today <span class="chip now">Flat</span></h2>
+      <div class="row"><label for="f1">Reply</label><input class="flat" id="f1" type="range" min="256" max="32768" step="256" value="4096"><output data-for="f1"></output></div>
+      <div class="row"><label for="f2">Memory</label><input class="flat" id="f2" type="range" min="2048" max="131072" step="1024" value="16384"><output data-for="f2"></output></div>
+      <p class="fine">The browser's own slider in Ingenium's violet: a thin line and a plain circle.</p>
+    </section>
+    <section class="card">
+      <h2>Raised <span class="chip new">New</span></h2>
+      <div class="row"><label for="n1">Reply</label><input class="r3" id="n1" type="range" min="256" max="32768" step="256" value="4096"><output data-for="n1"></output></div>
+      <div class="row"><label for="n2">Memory</label><input class="r3" id="n2" type="range" min="2048" max="131072" step="1024" value="16384"><output data-for="n2"></output></div>
+      <p class="fine">The groove is shaded inside, as if cut into the card. The violet fill is lit along its top edge. The pearl casts a shadow and carries a small violet jewel at its centre.</p>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Chat's Controls</h2>
+      <div class="row"><label for="c1">Longest reply</label><input class="r3" id="c1" type="range" min="256" max="16384" step="256" value="8192"><output data-for="c1"></output></div>
+      <div class="row"><label for="c2">Context</label><input class="r3" id="c2" type="range" min="2048" max="32768" step="1024" value="8192"><output data-for="c2"></output></div>
+      <div>
+        <div class="row"><label for="c3">Effort</label><input class="r3" id="c3" type="range" min="1" max="5" step="1" value="3"><output data-for="c3"></output></div>
+        <div class="row" aria-hidden="true"><span></span><div class="stops" id="stops"></div><span></span></div>
+      </div>
+      <p class="fine">Effort's five levels sit as small stops under its groove, so each level can be found by eye.</p>
+    </section>
+    <section class="card">
+      <h2>Settings, Everyday, Sound</h2>
+      <div class="row"><label for="s1">Volume</label><input class="r3" id="s1" type="range" min="0" max="100" step="1" value="60"><output data-for="s1"></output></div>
+      <p class="fine">The same in every place: the model's key, Chat's Controls, the Models page, Settings and the apps that have a slider.</p>
+      <p class="fine">Try it: point at a pearl to see it rise, and drag it. The keyboard's arrow keys move it too.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  var EFF=["Low","Medium","High","Extra","Max"];
+  function fmt(n){return Number(n).toLocaleString("en-GB");}
+  function show(i){var v=+i.value,mn=+i.min||0,mx=+i.max||100;i.style.setProperty("--p",((v-mn)/(mx-mn)*100)+"%");
+    var o=document.querySelector('output[data-for="'+i.id+'"]');if(!o)return;
+    o.textContent=i.id==="c3"?EFF[v-1]:i.id==="s1"?v+"%":fmt(v);}
+  [].forEach.call(document.querySelectorAll('input[type=range]'),function(i){show(i);i.addEventListener("input",function(){show(i);});});
+  var st=document.getElementById("stops");EFF.forEach(function(n,k){var x=(k/4*100)+"%";var d=document.createElement("i");d.style.left=x;st.appendChild(d);var s=document.createElement("span");s.style.left=x;s.textContent=n;st.appendChild(s);});
+  var root=document.documentElement;function dark(){var t=root.getAttribute("data-theme");return t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;}
+  var b=document.getElementById("theme");function lab(){b.textContent=dark()?"Day":"Night";}b.onclick=function(){root.setAttribute("data-theme",dark()?"light":"dark");lab();};lab();
+})();
+</script>

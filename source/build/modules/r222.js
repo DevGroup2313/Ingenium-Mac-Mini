@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.39", "Raised sliders: every slider in Ingenium is now a groove filled with violet up to its value, held by a pearl that rises under your pointer. Effort's five levels show as stops under its slider in a model's settings, named Low to Max as everywhere else."],
   ["7.39", "One setting for each model: beside the model in Chat, Code, Lector, Vocatio, Folders and Fabrica, the same key shows its Reply, Memory and Effort. Press it to change them; a change in one place is the change everywhere, and none is ever set to zero. Settings, Models and AI keeps every change and any reset caught, with the place that made it."],
   ["7.39", "Dictation stays in-house: on a phone or tablet paired with your computer, the speech model comes from the computer, sealed, over your home network, and is kept on the device."],
   ["7.38", "Folders, Bring in your work, Ollama: on your Mac or Windows computer, Read Ollama's chats brings in the chats of Ollama's own app, each with its own date and model. Ingenium reads a copy, shows you the chats first, and never changes Ollama's file."],
