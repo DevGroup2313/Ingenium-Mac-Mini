@@ -10,6 +10,7 @@
 //   - the computer's disk: every file under the test's home folder (the app's own folder of data), also inflated where it can be.
 // Each place is reported as sealed (no mark) or open (the mark readable), with what holds it. It is a survey: it lists, and fails only
 // where the lock's own promise is broken (a store r197 says it seals, holding the mark in clear).
+// 7.36: also her Android signing key, made before protection: no private key may stay readable on the disk once protection is on.
 //   node rig/t_736_leak_hunt.js <folder holding ingenium_app.py and ingenium.html> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process'); const zlib = require('zlib');
 const [APP, OUT] = process.argv.slice(2); fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
@@ -48,6 +49,9 @@ function hasMark(buf) { if (!buf || !buf.length) return false; if (buf.includes(
   await p.goto('http://127.0.0.1:' + ia.page_port + '/ingenium.html', { timeout: 600000 });
   await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await p.waitForTimeout(1200);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} }); await p.waitForTimeout(800);
+  /* 7.36: her Android signing key, made before protection is turned on (as on a copy used for a while): its copy goes to the disk plain */
+  const key0 = await p.evaluate(async () => { try { const k = await IngApk.keys.device(); return k && k.pkcs8 ? k.pkcs8.length : 0; } catch (e) { return String(e); } }); await p.waitForTimeout(1500);
+  const keyPlain0 = (function scan(d) { let n = 0, ents = []; try { ents = fs.readdirSync(d, { withFileTypes: true }); } catch (e) { return 0; } for (const e of ents) { const f = path.join(d, e.name); if (e.isDirectory()) n += scan(f); else if (e.isFile() && fs.readFileSync(f).includes('"pkcs8":"')) n++; } return n; })(A.home);
   await protect(p);
   ok(await p.evaluate(() => !!(window.IngLock && IngLock.on())), 'protection is on, turned on as she would (Settings, Your data, Protect this copy)');
   /* the mark, into every kind of thing she makes */
@@ -90,7 +94,7 @@ function hasMark(buf) { if (!buf || !buf.length) return false; if (buf.includes(
     return out; }, MARK);
   /* the computer's disk: every file under the test's home folder */
   const disk = []; (function walk(d) { let ents = []; try { ents = fs.readdirSync(d, { withFileTypes: true }); } catch (e) { return; }
-    for (const e of ents) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else if (e.isFile()) { let st; try { st = fs.statSync(f); } catch (x) { continue; } if (st.size > 200 << 20) continue; const r = hasMark(fs.readFileSync(f)); disk.push({ where: path.relative(A.home, f), size: st.size, open: r ? 1 : 0, how: r || '' }); } } })(A.home);
+    for (const e of ents) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else if (e.isFile()) { let st; try { st = fs.statSync(f); } catch (x) { continue; } if (st.size > 200 << 20) continue; const buf = fs.readFileSync(f), r = hasMark(buf); disk.push({ where: path.relative(A.home, f), size: st.size, key: buf.includes('"pkcs8":"') ? 1 : 0, open: r ? 1 : 0, how: r || '' }); } } })(A.home);
   fs.writeFileSync(path.join(OUT, 'stores.json'), JSON.stringify({ made, pageStores, disk }, null, 1));
   const openPage = pageStores.filter(x => x.open), openDisk = disk.filter(x => x.open);
   console.log('\nTHE PAGE\'S STORES (' + pageStores.length + '): open, with the mark readable:');
@@ -101,6 +105,8 @@ function hasMark(buf) { if (!buf || !buf.length) return false; if (buf.includes(
   /* what r197 promises to seal must hold no mark */
   const PROMISED = /^localStorage ingenium_v4|^IndexedDB (ingenium_big|ingenium_claude|ingenium_keys|ingenium_hub|ingenium_apps|ingenium_repos|fabrica_made) \//;
   const broken = openPage.filter(x => PROMISED.test(x.where)).concat(openDisk.filter(x => /desk\.json$|(^|\/)big\//.test(x.where)));
+  const keyPlain = disk.filter(x => x.key).map(x => x.where);
+  ok(key0 > 600 && keyPlain0 >= 1 && keyPlain.length === 0, 'her signing key, copied to the disk before protection: sealed in place when protection is turned on (no private key readable on the disk)', { key0, keyPlain0, keyPlain });
   ok(broken.length === 0, 'what the lock promises to seal holds no readable mark (the desk, the long texts, the stores it names; desk.json and big/ on the disk)', broken);
   ok(errs.length === 0, 'no page errors', errs);
   console.log('\n' + pass + ' passed, ' + fail + ' failed'); await b.close(); A.pr.kill(); process.exit(fail ? 1 : 0);

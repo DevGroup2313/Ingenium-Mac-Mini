@@ -606,7 +606,7 @@ function lockKey(pw,salt,iter){var s=subtle();return s.importKey("raw",TE.encode
   .then(function(b){return s.deriveKey({name:"PBKDF2",salt:salt,iterations:iter||ITER,hash:"SHA-256"},b,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);});}
 function keyRecords(){return openExisting("ingenium_keys").then(function(d){if(!d)return [];if(!d.objectStoreNames.contains("k")){d.close();return [];}return getAll(d,"k").then(function(a){d.close();return (window.IngLock&&window.IngLock.openValues)?window.IngLock.openValues("ingenium_keys","k",a):a;},function(){d.close();return [];});})
   .then(function(a){var api=shell();if(!api||a.some(function(r){return r&&r.id==="device";}))return a;
-    return Promise.resolve().then(function(){return api.big_get("signing_device");}).then(function(r){if(r&&r.ok){var x=JSON.parse(r.text);a.push({id:x.id,label:x.label,source:x.source,made:x.made,pkcs8:b64d(x.pkcs8),cert:b64d(x.cert)});}return a;},function(){return a;});});}
+    return Promise.resolve().then(function(){return api.big_get("big_sgndevice");}).then(function(r){return (r&&r.ok)?r:api.big_get("signing_device");}).then(function(r){if(r&&r.ok){var x=JSON.parse(r.text);a.push({id:x.id,label:x.label,source:x.source,made:x.made,pkcs8:b64d(x.pkcs8),cert:b64d(x.cert)});}return a;},function(){return a;});});}
 
 /* ======================= reading a backup ======================= */
 function open(file,o){o=o||{};var say=o.onProgress||function(){};
@@ -804,7 +804,11 @@ function apply(b,o){o=o||{};var mode=o.mode==="merge"?"merge":"replace",say=o.on
       if(!sec||!sec.keys)return;prog(0.9,"The signing keys");
       return ensureDb("ingenium_keys",1,[{name:"k",keyPath:null}]).then(function(d){if(!d){report.problems.push("The signing keys could not be put back here.");return;}
         return (mode==="replace"?clearStore(d,"k"):Promise.resolve()).then(function(){return writeRecs(d,"k",sec.keys.map(function(r){return {k:r.id,v:r};}),"replace");})
-          .then(function(){d.close();if(api)sec.keys.forEach(function(r){try{api.big_put("signing_"+r.id,JSON.stringify({id:r.id,label:r.label,source:r.source,made:r.made,pkcs8:b64e(toU8(r.pkcs8)),cert:b64e(toU8(r.cert))}));}catch(e){}});},function(e){d.close();throw e;});});})
+          .then(function(){d.close();if(!api)return;/* 7.36: the copies' names since 6.39 (modules/r136.js, diskId and its index), not "signing_<id>", which the app never kept */
+            var dn=function(id){return "big_sgn"+String(id).toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,36);};
+            return seq(sec.keys,function(r){return Promise.resolve(api.big_put(dn(r.id),JSON.stringify({id:r.id,label:r.label,source:r.source,made:r.made,pkcs8:b64e(toU8(r.pkcs8)),cert:b64e(toU8(r.cert))}))).catch(function(){});})
+              .then(function(){return Promise.resolve(api.big_get("big_sgnindex")).then(function(x){var l=[];try{l=x&&x.ok?JSON.parse(x.text):[];}catch(e){l=[];}if(!Array.isArray(l))l=[];
+                sec.keys.forEach(function(r){if(r&&r.id&&l.indexOf(r.id)<0)l.push(r.id);});return api.big_put("big_sgnindex",JSON.stringify(l));});}).catch(function(){});},function(e){d.close();throw e;});});})
     .then(function(){/* 7. the computer app writes its disk copy of Fabrica's apps again, from what is now in the store */
       if(!api||b.kind!=="zip"||!window.IngRepo||!IngRepo.core||typeof IngRepo.core.remirror!=="function")return;prog(0.93,"Fabrica's apps, on this computer's disk");
       return IngRepo.core.remirror().catch(function(){report.problems.push("Fabrica's apps are back in this device's store; their copy on this computer's disk is written again when an app next changes.");});})

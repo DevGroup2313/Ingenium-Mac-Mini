@@ -395,6 +395,64 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.36 (18 November 2026): Security, a room in Settings; Mentes, Studio and Train in one window; Vocatio's Effort row back.
+Her security request (18 November 2026): "I want you to upgrade and enhance Ingenium's security system and embedded software protection.
+I really want everything to be encrypted and protected ... my data is protected and also my code is protected and anything that I build
+inside of Ingenium with my local models and all of my current apps." Her answers: the lock "Ask at first start"; the computer's disk,
+"All of them" sealed; between her devices, "Yes, encrypt them"; her code, "All of the above and any additional features that will further
+protect me and encrypt Ingenium and all of its content". Her word on both live previews (18 November 2026; Security,
+https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ, source/previews/security; the Train room, https://claude.ai/artifact/37W6KrMVaDst5bRBxqmEAw,
+source/previews/train_room): "I approve of the preview, please commit and push it everywhere and continue working on my requests", and,
+asked which, "Both".
+The security work comes in stages. This release builds what the page alone can do, and says plainly what is not built yet.
+- First, a survey (rig/t_736_leak_hunt.js, on 7.35, a real computer app with the sign-in on and a mark written into every kind of thing
+  she makes): where her data can still be read without her password. Every store of the page held the mark only sealed (21 stores read),
+  and so did the desk and the long texts on the computer's disk. Open on the disk: the apps waiting for her devices (Ingenium/apps/outbox)
+  and the apps served for the Home Screen (Ingenium/apps/served), plain. These, and what passes between her devices, are the next stage.
+- Found while checking rig/t_700c_lock_stores (3 of its checks missed on 7.35 as on this release's first copy): her Android signing keys'
+  copies on a computer app's disk have been named "big_sgn<id>" since 6.39 (r136), but `build/modules/r197.js` sealed in place, when
+  protection is turned on, only the name of before, "signing_<id>", which the app never kept. So a key copied to the disk before she
+  turned protection on stayed readable there (written after, it was sealed, as every write is). Now both names and the keys' index are
+  sealed in place, and opened again when protection is turned off. `build/modules/r143.js` (Backup and moving) used the old name too:
+  a key found only on the disk is read by its own name now, and a restored key's copy is written there under it, with the index. The
+  test read the old name as well (fixed), and rig/t_736_leak_hunt now makes her signing key before protection and fails if any private
+  key stays readable on the disk.
+- `build/modules/r318.js` (new): Settings, Security (listed by `build/modules/r173.js`, between Your data and Ownership, with its shield
+  and the words "security", "protect", "encrypt", "seal", "lock", "offline", "privacy" for the search). How many protections are on, then
+  each with its true state: On, Off, or Not yet (with the release planned). The count is of those built ("2 of 8 protections on" on a
+  fresh copy). Seven parts: Everything, This device, The computer's disk, Between your devices, Your code and apps, Ingenium itself, More
+  protection.
+  - Sealed on this device: the sign-in of 6.9.x (r197), read from its own record; its ways back in; Lock now. Backups sealed whole while
+    it is on (r197).
+  - At first start: a copy with no sign-in asks once ("Protect your work first": Protect it opens r197's own steps; Not now), after the
+    welcome and the tour. Not in the demonstration edition.
+  - More protection, new in this release: Offline only (off until she turns it on; a request from the page to anything but this device
+    and her home network is held back, with a note: Allow for an hour, Allow once, Keep it offline; Ingenium's own way out, netFetch,
+    follows it too); Lock when the computer sleeps (a pause in time longer than 90 seconds locks it); Slow down wrong passwords (after
+    three, each try waits longer, up to five minutes; nothing is wiped); Clear a copied secret (a password, recovery word or pairing code
+    copied from Ingenium is cleared from the clipboard after a minute, where the browser lets a page do so); A record of every opening
+    (when Ingenium opened, every wrong password and every sign-in, kept in the desk, so sealed with it).
+  - Not yet, said so: sealing on the computer's disk and between her devices (planned for 7.37); her apps signed when shipped, their code
+    scrambled, an owner key on her apps, Ingenium itself signed and checked, asking before each export (planned after). What is
+    already signed is said beside them: her Android and Fire packages, with her Android key (Fabrica, Ship), and Ingenium's own Fire
+    app; an iPhone or iPad app with her Apple ID, through Sideloadly. The owner key that exists today (security/owner_keys.json)
+    signs permissions (r162); it does not yet sign or check a release.
+  - Not verified on her devices: the clipboard clearing in the computer apps' own window (it follows the browser's rules there); the
+    computer apps' own downloads do not follow Offline only yet (a later release).
+- `build/modules/r317.js` (new): Mentes, Studio and Train in one window, as the preview drew it. While a room of the Studio is open: a
+  slimmer band (the turret as a coin, the engine's state as a chip, Show the turret to bring the whole head back, kept on this device);
+  the rooms' lines said in the keys' titles; the Studio's rooms in one row; Train's three parts as a rail beside its card; the workbench's
+  four tools as raised cards with an icon and a line each, beside its steps; what it is and its engine folded into About it. Every id and
+  handler stays.
+- `build/modules/r232.js`: the Train room's cards, the workbench's tool keys and its engine panel lift under the pointer (their look at
+  rest unchanged; Minimal or reduced motion keeps them still).
+- `build/modules/r225.js`: Vocatio's Effort, Reply and Memory are back, in a row of their own under its room keys (lost in 6.93 when its
+  rooms were remade: r225 placed Effort beside a note that was no longer there, so r233's Reply and Memory had nothing to follow). Their
+  explanations are in their titles.
+- rig: `t_736_security.js` (new, 14 checks): the room's true states; the first start's ask; Offline only (held back, the note, Allow
+  once, this device still answers); protection on; a pause of two minutes locks it; three wrong passwords, then a wait; the record; a
+  copied secret cleared; every row, way and key lifts; no page errors. `t_628_train.js` brings the tile into view before pointing at it.
+
 Ingenium 7.35 (18 November 2026): your app on the iPhone and iPad, four ways.
 Her request (16 November 2026): iPhone and iPad "all four ways" (inside Ingenium; a Home Screen web app; an IPA signed with a free Apple
 ID through Sideloadly or AltStore; an IPA signed with a paid developer account). Her answers (17 November 2026): a paid account "Not yet,

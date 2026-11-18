@@ -1,4 +1,6 @@
 // node rig/t_700c_lock_stores.js <Ingenium page url> <out dir>
+// 7.36: the key's copy on the disk is read by its name since 6.39, big_sgndevice (modules/r136.js, diskId). The test still read
+// signing_device, a name not written since, so three of its checks missed; and the lock sealed in place only that old name (r197 fixed).
 // Ingenium 6.9.x (31 October 2026): the sign-in and the seal (modules/r197.js) in the other stores of the larger store: the
 // conversations brought in from elsewhere (IndexedDB "ingenium_claude", r131), the signing keys ("ingenium_keys", r136, and their copies
 // on the computer apps' disk) and Fabrica's issues and pages ("ingenium_hub", r141). With a stand-in of the computer apps' bridge
@@ -67,7 +69,7 @@ async function protect(p) {
     return { convs: r.convs, msgs: r.msgs, keyHash: await sha(k.pkcs8), keyLen: k.pkcs8.length, certLen: k.cert.length, hub: h.apps }; }, { conv: conv('t700-c1', TITLE, CM1, CM2), hub: hubApp('app_t700', HM1), sha });
   ok(seeded.convs === 1 && seeded.msgs === 2 && seeded.keyLen > 600 && seeded.hub === 1, 'before the lock: a conversation is brought in, the device\'s signing key is made, an issue is kept in Fabrica\'s pages', seeded);
   await p.waitForTimeout(800);
-  const disk0 = await p.evaluate(() => window.__t700cdisk()['big:signing_device'] || null);
+  const disk0 = await p.evaluate(() => window.__t700cdisk()['big:big_sgndevice'] || null);
   const c0 = await raw(p, 'ingenium_claude', 'conv'), m0 = await raw(p, 'ingenium_claude', 'meta'), k0 = await raw(p, 'ingenium_keys', 'k'), h0 = await raw(p, 'ingenium_hub', 'apps');
   ok(c0 && c0.length === 1 && !c0[0].sealed && c0[0].json.includes('IMPORTED-MARK-ONE') && m0 && m0.some(r => r.k === 'list' && !r.sealed && r.json.includes('TITLE-MARK')) && k0 && k0.length === 1 && !k0[0].sealed && k0[0].json.includes('"u8"') && h0 && h0.length === 1 && !h0[0].sealed && h0[0].json.includes('HUB-MARK-ONE') && disk0 && disk0.indexOf('{"id"') === 0,
     'before the lock every record is plain, as it always was (the conversation, its list, the key, the issue, the key\'s copy on the stand-in disk)', { c0: c0 && c0.map(r => r.json.slice(0, 40)), k0: k0 && k0.map(r => r.json.slice(0, 60)), disk0: disk0 && disk0.slice(0, 30) });
@@ -79,7 +81,7 @@ async function protect(p) {
   const all1 = JSON.stringify([c1, m1, k1, h1]);
   ok(c1 && c1.every(r => r.sealed) && m1 && m1.length >= 2 && m1.every(r => r.sealed) && k1 && k1.length === 1 && k1[0].sealed && h1 && h1.length === 1 && h1[0].sealed, 'every record is a sealed record now: the conversation, its list, the key and the issue', { c1: c1 && c1.map(r => r.sealed), m1: m1 && m1.map(r => r.k + ':' + r.sealed), k1: k1 && k1.map(r => r.sealed), h1: h1 && h1.map(r => r.sealed) });
   ok(!/IMPORTED-MARK|TITLE-MARK|HUB-MARK|Abbot Hugh|"u8"/.test(all1), 'nothing of the conversation, its title, the key or the issue is to be read in the stores', all1.slice(0, 200));
-  const disk1 = await p.evaluate(() => window.__t700cdisk()['big:signing_device'] || null);
+  const disk1 = await p.evaluate(() => window.__t700cdisk()['big:big_sgndevice'] || null);
   ok(disk1 && /^ING1g?\./.test(disk1) && !disk1.includes('pkcs8'), 'the key\'s copy on the stand-in disk is sealed too (it was sealed in place)', disk1 && disk1.slice(0, 30));
   const read1 = await p.evaluate(async (a) => { const sha = eval(a.sha); const l = await IngClaude.list(); const c = await IngClaude.get(l[0].id); const k = await IngApk.keys.get('device'); const ks = await IngApk.keys.list(); const inf = await IngClaude.info();
     return { title: l[0].title, n: l.length, m0: c.msgs[0].t, m1: c.msgs[1].t, keyHash: await sha(k.pkcs8), keyLen: k.pkcs8.length, certLen: k.cert.length, listed: ks.length, fp: ks[0] && ks[0].fingerprint && ks[0].fingerprint.length, infoConvs: inf && inf.convs }; }, { sha });
@@ -118,7 +120,7 @@ async function protect(p) {
   await p.waitForFunction(() => /Protection is off/.test((document.querySelector('#ingLockDoor h2') || {}).textContent || ''), null, { timeout: 90000 });
   await p.click('#ingLockDoor #ildDone'); await p.waitForTimeout(800);
   const c3 = await raw(p, 'ingenium_claude', 'conv'), m3 = await raw(p, 'ingenium_claude', 'meta'), k3 = await raw(p, 'ingenium_keys', 'k'), h3 = await raw(p, 'ingenium_hub', 'apps');
-  const disk3 = await p.evaluate(() => window.__t700cdisk()['big:signing_device'] || null);
+  const disk3 = await p.evaluate(() => window.__t700cdisk()['big:big_sgndevice'] || null);
   ok(c3 && c3.length === 2 && c3.every(r => !r.sealed) && c3.some(r => r.json.includes('IMPORTED-MARK-ONE')) && m3 && m3.every(r => !r.sealed) && k3 && k3.length === 1 && !k3[0].sealed && k3[0].json.includes('"u8"') && h3 && h3.length === 2 && h3.every(r => !r.sealed) && h3.some(r => r.json.includes('HUB-MARK-TWO')) && disk3 && disk3.indexOf('{"id"') === 0,
     'protection turned off writes it all back as plain records, and the key\'s copy on the disk as plain text', { c3: c3 && c3.map(r => r.sealed), k3: k3 && k3.map(r => r.sealed), h3: h3 && h3.map(r => r.sealed), disk3: disk3 && disk3.slice(0, 20) });
   const read3 = await p.evaluate(async (a) => { const sha = eval(a.sha); const k = await IngApk.keys.get('device'); const l = await IngClaude.list(); const c = await IngClaude.get(l.find(x => x.title === a.title).id); return { keyHash: await sha(k.pkcs8), m0: c && c.msgs[0].t }; }, { sha, title: TITLE });

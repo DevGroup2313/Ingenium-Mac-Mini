@@ -186,6 +186,7 @@ var IC={
   calm:svg('<path d="M5 19.5c0-8.4 5.2-13.6 14.5-14.5-.9 9.3-6.1 14.5-14.5 14.5z"/><path d="M5 19.5l7.5-7.5"/>'),
   ai:svg('<path d="M10.5 3.5l1.6 4.6 4.6 1.6-4.6 1.6-1.6 4.6-1.6-4.6-4.6-1.6 4.6-1.6z"/><path d="M17.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/>'),
   data:svg('<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/>'),
+  security:svg('<path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/>'),
   own:svg('<circle cx="8" cy="15.5" r="4"/><path d="M11 12.5l8.5-8.5M16.2 7.3l2.4 2.4M13.8 9.7l1.8 1.8"/>'),
   author:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
@@ -218,12 +219,14 @@ var CONF={
       ids:["personaCard",/^connect a cloud/,/^web search/,"linkCard","ingEyesCard","ingEarsCard","ragCard","awakeCard"]},
     {k:"data",t:"Your data",i:"data",says:"Your chats, your backups, and the room Ingenium takes on this device.",
       ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
+    /* 7.36: Security (modules/r318.js), her approved preview (18 November 2026, https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ) */
+    {k:"security",t:"Security",i:"security",says:"Everything Ingenium does to keep your work yours: sealed on this device, between your devices, and in what you ship. What is on, what is off, and what comes next.",ids:["secCard"]},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
     {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
       when:function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}}}],
     words:[[/sound|audio|volume|look|theme|appearance|name|help|tour|refresh/,"everyday"],[/support|calm|focus|sensory|routine/,"calm"],
-      [/model|cloud|server|search|eyes|persona|device/,"ai"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
+      [/model|cloud|server|search|eyes|persona|device/,"ai"],[/secur|protect|encrypt|seal|lock|offline|privacy|sign-?in|signature|scrambl/,"security"],[/data|backup|storage|import|export|chats|moving/,"data"],[/licen|permission|owner/,"own"]]},
   models:{label:"Models, in rooms",rooms:[
     {k:"yours",t:"Your models",i:"yours",says:"The models on this device and how well they run. Add a model file you already have.",ids:["healthBox","yourModelsCard","mdPlaceCard",/^add a model/]},
     /* 6.66: Downloads (modules/r259.js): a model kept for a stronger computer, the kept ones, and what was downloaded lately */

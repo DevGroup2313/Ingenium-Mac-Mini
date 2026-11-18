@@ -359,11 +359,16 @@ function swapRec(d,sn,k,from,to){var hit=false;
 function oneRec(d,db,sn,k,dir){return rtx(d,sn,"readonly",function(s){return s.get(k);}).then(function(v){if(v==null)return false;
   if(dir==="seal"){if(isRecEnv(v))return false;return sealRec(db,sn,k,v).then(function(w){return w===v?false:swapRec(d,sn,k,v,w);});}
   if(!isRecEnv(v))return false;return openRec(db,sn,v).then(function(p){return p==null?false:swapRec(d,sn,k,v,p);});});}
-/* the signing keys' copies on the computer apps' disk (signing_<id>), by the shell's own bridge (the part that wrote them wrote plain text before the lock) */
+/* the signing keys' copies on the computer apps' disk, by the shell's own bridge (the part that wrote them wrote plain text before the lock).
+   7.36: since 6.39 the copies are "big_sgn<id>" with an index "big_sgnindex" (modules/r136.js, diskId); this looked only for the name of
+   before, "signing_<id>", which the app never kept, so a key copied to the disk before protection was turned on stayed plain there. Both
+   names now, and the index. */
 function diskSigning(dir){var sh=rawShell(),api=api0();if(!sh||!api||typeof sh.big_get!=="function"||typeof sh.big_put!=="function")return Promise.resolve(0);
   return existingDb("ingenium_keys").then(function(d){if(!d)return 0;if(!d.objectStoreNames.contains("k")){d.close();return 0;}
     return rtx(d,"k","readonly",function(s){return s.getAllKeys();}).then(function(keys){try{d.close();}catch(e){}var n=0;
-      return seq((keys||[]).filter(function(k){return typeof k==="string";}),function(k){var id="signing_"+k;
+      var ids=["big_sgnindex"];(keys||[]).filter(function(k){return typeof k==="string";}).forEach(function(k){var nw="big_sgn"+String(k).toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,36);
+        [nw,"signing_"+k].forEach(function(x){if(ids.indexOf(x)<0)ids.push(x);});});if(ids.indexOf("big_sgndevice")<0)ids.push("big_sgndevice");
+      return seq(ids,function(id){
         return Promise.resolve().then(function(){return sh.big_get.call(api,id);}).then(function(r){if(!(r&&r.ok&&typeof r.text==="string"))return;
           if(dir==="seal"){if(sealed(r.text))return;return sealText(r.text,"big:"+id).then(function(env){return sh.big_put.call(api,id,env);}).then(function(){n++;});}
           if(!sealed(r.text))return;return openText(r.text,"big:"+id).then(function(t){return sh.big_put.call(api,id,t);}).then(function(){n++;},function(){});},function(){});}).then(function(){return n;});},
