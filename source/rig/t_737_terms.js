@@ -12,10 +12,12 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 200)));
   await p.goto(URL_, { timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await p.waitForTimeout(1500);
   const line = await p.evaluate(() => { const l = document.getElementById('introTerms'); const d = document.getElementById('introDoor'); return { text: l && l.textContent, inDoor: !!(l && d && d.contains(l)), shown: !!(l && l.offsetParent) }; });
-  ok(line.text === 'By using Ingenium you accept its terms. Read them' && line.inDoor && line.shown, 'the welcome: "By using Ingenium you accept its terms", with Read them', line);
-  await p.click('#introTerms button'); await p.waitForTimeout(1500); try { await p.evaluate(() => { try { tourEnd(); } catch (e) {} }); } catch (e) {}
+  /* 7.40, her words: "I am not sure that the Terms and Conditions should be added to the introduction door": the line is off the door (the
+     agreement sheet after Enter follows in 7.41) */
+  ok(line.text === null && !line.inDoor, 'the welcome door carries no terms line (7.40)', line);
+  await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); IngTerms.show('short'); }); await p.waitForTimeout(1500);   // 7.40: Settings, Ownership opened from inside the app try { await p.evaluate(() => { try { tourEnd(); } catch (e) {} }); } catch (e) {}
   const opened = await p.evaluate(() => { const c = document.getElementById('termsCard'); const r = c && c.getBoundingClientRect(); return { shown: !!(c && c.offsetParent), inView: r ? r.top < innerHeight && r.bottom > 0 : false, tab: [...document.querySelectorAll('#page-settings .rm-tab[aria-selected="true"],#page-settings .rm-tab.on')].map(x => x.textContent.trim()) }; });
-  ok(opened.shown && opened.inView, 'Read them opens Settings, Ownership, at the card', opened);
+  ok(opened.shown && opened.inView, 'IngTerms.show opens Settings, Ownership, at the card', opened);
   const c1 = await p.evaluate(() => { const c = document.getElementById('termsCard'), lic = document.getElementById('ingPermitCard');
     return { after: !!(lic && c && (lic.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING)), title: c.querySelector('h2').textContent, chips: [...c.querySelectorAll('.tp-chips .sc-chip')].map(x => x.textContent), parts: [...c.querySelectorAll('.tp-parts .sc-sub')].map(x => x.textContent), tiles: c.querySelectorAll('.tp-short').length }; });
   ok(c1.after && c1.title === 'Terms and privacy' && c1.parts.join('|') === 'In short|Privacy notice|Terms of use|Your contact' && c1.tiles === 6 && c1.chips.includes('Draft: a lawyer reads it before it is final'), 'Ownership: the card after the licence; In short, Privacy notice, Terms of use, Your contact; six tiles; Draft in the master edition', c1);

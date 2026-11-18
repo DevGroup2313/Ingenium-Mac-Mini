@@ -36,7 +36,9 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(sizes.h === 26 && sizes.w > 100, "Chat's Controls keep their sliders' width, each 26 pixels high", sizes);
   await p.screenshot({ path: OUT + '/chat_controls_day.png' });
   await p.hover('#ctlTokens'); await p.waitForTimeout(400); await t.screenshot({ path: OUT + '/slider_hover_day.png' }).catch(() => {});
-  await p.click('#chatGenKey'); await p.waitForTimeout(500); await p.screenshot({ path: OUT + '/key_sheet_day.png' });
+  /* 7.40: the model's key lives in Settings, Models and AI (no longer in the chat box) */
+  await p.evaluate(() => { go('settings'); try { IngRooms.open('settings', 'ai', true); } catch (e) {} try { IngSettingsParts.show('ai', 'you'); } catch (e) {} }); await p.waitForTimeout(900);
+  await p.locator('#genLogCard .gl-m .gk').first().scrollIntoViewIfNeeded(); await p.locator('#genLogCard .gl-m .gk').first().click(); await p.waitForTimeout(500); await p.screenshot({ path: OUT + '/key_sheet_day.png' });
   const sheet = await p.evaluate(() => [...document.querySelectorAll('.gk-pop input[type=range]')].map(i => [getComputedStyle(i).appearance, i.style.getPropertyValue('--r3-p')]));
   ok(sheet.length === 2 && sheet.every(s => s[0] === 'none' && /%$/.test(s[1])), "the model's key sheet has the raised sliders", sheet);
   await p.keyboard.press('Escape');

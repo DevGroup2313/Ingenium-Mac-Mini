@@ -49,8 +49,9 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   // 5. a change on a page is the same change everywhere, and remembered per model
   const ch = await p.evaluate(async () => { const w = document.querySelector('#lx7 .wlim'); const wt = ms => new Promise(r => setTimeout(r, ms));
     /* 7.39: through the key's sheet, as she would */
-    w.querySelector('.gk').click(); await wt(300); const mem = document.getElementById('gkMem'), rep = document.getElementById('gkReply');
-    mem.value = '32768'; mem.dispatchEvent(new Event('change')); rep.value = '4096'; rep.dispatchEvent(new Event('change')); IngGenKey.close();
+    /* 7.40: the pages no longer show the key (her words: "please remove these buttons from where they are currently placed"): the same
+       one record, as the sheet writes it */
+    const m0 = state.models[0]; IngLimits.setLimit(m0, 'ctx', 32768); IngLimits.setLimit(m0, 'tokens', 4096); await wt(300);
     const m = state.models[0]; go('chat'); try { refreshChatNote(); } catch (e) {} return { model: [m.tokens, m.ctx, !!m.ctxUser], chat: [document.getElementById('ctlTokens').value, document.getElementById('ctlCtx').value] }; });
   ok(JSON.stringify(ch.model) === JSON.stringify([4096, 32768, true]) && JSON.stringify(ch.chat) === JSON.stringify(['4096', '32768']), 'set on Lector, the model keeps 4,096 and 32K, and Chat\'s Controls show the same', ch);
   const back = await p.evaluate(() => { go('career'); return new Promise(r => setTimeout(() => { const w = document.querySelector('#cs .wlim'); const t = w && w.querySelector('.gk') ? w.querySelector('.gk').textContent : ''; r(t ? [(/Reply (\S+?)·/.exec(t) || [])[1], (/Memory (\S+?)·/.exec(t) || [])[1]] : null); }, 900)); });
