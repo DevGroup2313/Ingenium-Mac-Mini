@@ -1,0 +1,314 @@
+<title>Ingenium Security Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: Settings as it is (its title, its tabs), with a new tab, Security: an overview of every protection, then one card for each,
+   that opens; beside it, the first start's ask. Values are Ingenium's own, read from the 7.35 page by day and by night. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --body:#2b2438; --acc:#6a3fb5; --ok:#2f7a55; --warn:#9a5a12; --bad:#b8433f;
+  --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 8px 14px rgba(52,24,100,.12);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -3px 5px rgba(60,30,90,.16),0 1px 1px rgba(40,20,70,.3),0 3px 4px rgba(40,20,70,.24),0 6px 9px rgba(40,20,70,.18),0 12px 20px rgba(40,20,70,.12);
+  --ck-hi:inset 0 1.5px 0 #fff,inset 0 -3px 5px rgba(60,30,90,.14),0 3px 4px rgba(40,20,70,.24),0 9px 16px rgba(40,20,70,.2),0 16px 26px rgba(40,20,70,.14);
+  --lav-t:rgba(106,63,181,.14); --lav-c:#6a3fb5; --sky-t:rgba(74,160,240,.16); --sky-c:#2f6fd0; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --rub-t:rgba(200,20,60,.1); --rub-c:#b8433f;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --body:#e8e0f3; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a; --bad:#f08a86;
+  --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --body:#e8e0f3; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a; --bad:#f08a86;
+  --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86;
+  color-scheme:dark}
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--bg);color:var(--body);font:14px/1.5 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font:600 25px/1.5 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:-6px 0 0;color:var(--ink2);max-width:70ch}
+.note-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+button{font:inherit;color:inherit;cursor:pointer}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+/* tabs, as Settings has them */
+.bar{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--card-sh);padding:14px 16px;display:flex;flex-direction:column;gap:12px;transition:transform .26s var(--spring),box-shadow .26s}
+.bar:hover{transform:translateY(-1.5px);box-shadow:var(--card-hi)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink2);font:600 13px/1.25 var(--sans);padding:7px 14px 7px 11px;border-radius:11px;transition:transform .16s var(--bounce),box-shadow .16s}
+.tab:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.tab[aria-selected="true"]{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff}
+.tab.sub{font-size:12.8px;border-radius:12px;padding:6px 14px 6px 10px}
+.tab svg{width:15px;height:15px}
+.new{font:700 9.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;background:var(--amb-t);color:var(--amb-c);padding:3px 6px;border-radius:999px}
+.tab[aria-selected="true"] .new{background:rgba(255,255,255,.22);color:#fff}
+.hint{margin:0;color:var(--ink3);font-size:13px}
+/* the room */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--card-sh);padding:16px;transition:transform .2s var(--bounce),box-shadow .2s;animation:rise .36s var(--spring) backwards}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.card h2{font:600 16.5px/1.4 var(--serif);color:var(--ink1);margin:0}
+.card h3{font:600 15px/1.4 var(--serif);color:var(--ink1);margin:0}
+.card p{margin:0;color:var(--ink2);font-size:13px;line-height:1.55}
+.chip{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:5px 9px;border-radius:999px;background:var(--lav-t);color:var(--lav-c);white-space:nowrap;transition:transform .22s var(--spring)}
+.chip:hover{transform:translateY(-1.5px)}
+.chip.ok{background:var(--emr-t);color:var(--emr-c)} .chip.warn{background:var(--amb-t);color:var(--amb-c)} .chip.off{background:var(--rub-t);color:var(--rub-c)} .chip.plain{background:var(--well);color:var(--ink3);border:1px solid var(--line)}
+.key{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;font:600 12.5px/1.3 var(--sans);padding:6px 11px;border-radius:7px;white-space:nowrap;box-shadow:var(--ck-sh);transition:transform .16s var(--bounce),box-shadow .16s;animation-fill-mode:backwards}
+.key:hover{transform:translateY(-3px);box-shadow:var(--ck-hi)} .key:active{transform:translateY(1px);box-shadow:inset 0 1px 3px rgba(40,22,68,.22)}
+.key.lav{background:var(--lav-t);border-color:var(--lav-t);color:var(--lav-c)} .key.sky{background:var(--sky-t);border-color:var(--sky-t);color:var(--sky-c)}
+.key.amb{background:var(--amb-t);border-color:var(--amb-t);color:var(--amb-c)} .key.emr{background:var(--emr-t);border-color:var(--emr-t);color:var(--emr-c)} .key.rub{background:var(--rub-t);border-color:var(--rub-t);color:var(--rub-c)}
+.key.pri{background:var(--pri-bg);border-color:var(--pri-line);color:#fff;border-radius:10px;padding:8px 14px;box-shadow:var(--pri-sh)}
+.key.pri:hover{box-shadow:var(--pri-sh),0 10px 18px rgba(40,22,68,.22)}
+.key.quiet{background:none;box-shadow:none;color:var(--acc)} .key.quiet:hover{background:var(--key-bg);border-color:var(--line);box-shadow:var(--key-sh)}
+.key:focus-visible,.tab:focus-visible,.ph:focus-visible,.sw:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.keys{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* the overview */
+.over{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+@media (max-width:560px){.over{grid-template-columns:minmax(0,1fr)}}
+.shield{width:120px;height:136px;position:relative;transition:transform .5s var(--spring);transform-style:preserve-3d}
+.shield:hover{transform:rotateY(14deg) rotateX(-6deg) scale(1.04)}
+.shield svg{width:100%;height:100%;filter:drop-shadow(0 10px 14px rgba(40,22,68,.28))}
+.meter{display:flex;flex-direction:column;gap:8px}
+.meter .big{font:600 22px/1.2 var(--serif);color:var(--ink1)}
+.bars{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
+.bars i{height:9px;border-radius:5px;background:var(--well);border:1px solid var(--line);transition:transform .2s var(--spring)}
+.bars i.on{background:linear-gradient(#7348be,#5d37a1);border-color:transparent;box-shadow:0 2px 0 rgba(58,32,112,.5)}
+.bars i:hover{transform:translateY(-2px)}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.it{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--well);border:1px solid var(--line);font-size:12.8px;color:var(--ink1);transition:transform .2s var(--spring),box-shadow .2s;text-align:left}
+.it:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.it .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--emr-t);flex:0 0 auto}
+.it .dot.w{background:var(--warn);box-shadow:0 0 0 3px var(--amb-t)} .it .dot.o{background:var(--bad);box-shadow:0 0 0 3px var(--rub-t)}
+.it > span:not(.chip){flex:1;min-width:0}
+/* each protection: a card that opens */
+.p{padding:0;overflow:hidden}
+.ph{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:14px 16px;text-align:left}
+.ph .ic{flex:0 0 38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--pri-bg);box-shadow:var(--pri-sh);transition:transform .35s var(--spring)}
+.ph:hover .ic{transform:rotate(-8deg) scale(1.08)}
+.ph .ic svg{width:19px;height:19px}
+.ph .tx{flex:1;min-width:0} .ph .tx small{display:block;color:var(--ink3);font-size:12.5px}
+.ph .chev{color:var(--ink3);transition:transform .25s var(--spring);font-size:18px}
+.p[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.pb{padding:0 16px 16px 66px;display:flex;flex-direction:column;gap:10px}
+@media (max-width:560px){.pb{padding-left:16px}}
+.well{border:1px solid var(--line);border-radius:11px;background:var(--well);padding:10px 12px;display:flex;flex-direction:column;gap:7px;transition:transform .2s var(--spring),box-shadow .2s}
+.well:hover{transform:translateY(-1.5px);box-shadow:var(--card-hi)}
+.well .wh{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.well .wh b{color:var(--ink1);font-size:13.5px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px 10px;text-align:left;transition:transform .2s var(--spring),box-shadow .2s;width:100%}
+.sw:hover{transform:translateX(3px);box-shadow:var(--card-hi)}
+.sw .t{flex:1;min-width:0} .sw .t b{display:block;color:var(--ink1);font-size:13px} .sw .t small{display:block;color:var(--ink3);font-size:12px;line-height:1.45}
+.sw .tr{flex:0 0 40px;height:24px;border-radius:999px;background:var(--well);border:1px solid var(--line);position:relative;transition:background .2s}
+.sw .tr::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3),0 2px 4px rgba(40,22,68,.2);transition:transform .25s var(--bounce)}
+.sw[aria-checked="true"] .tr{background:linear-gradient(#7348be,#5d37a1);border-color:transparent}
+.sw[aria-checked="true"] .tr::after{transform:translateX(16px)}
+.dev{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;background:var(--card);border:1px solid var(--line);transition:transform .2s var(--spring)}
+.dev:hover{transform:translateX(3px)} .dev b{flex:1;min-width:0;font-size:13px;color:var(--ink1)}
+.fine{font-size:12px;color:var(--ink3)}
+/* the first start's ask, as the lock's own door */
+.door{background:linear-gradient(180deg,#ffffff,#f7f5fa 62%,#efeaf4);color:#221a2e;border-radius:22px;padding:24px 22px 20px;box-shadow:inset 0 2px 0 rgba(255,255,255,.45),inset -2px 0 0 #d3cbe0,inset 0 -3px 0 #d3cbe0,0 0 0 1px rgba(40,22,68,.1),0 9px 12px -7px rgba(40,22,68,.18),0 22px 40px -14px rgba(40,22,68,.26);display:flex;flex-direction:column;gap:10px;transition:transform .3s var(--spring);animation:rise .4s var(--spring) backwards}
+.door:hover{transform:translateY(-3px) rotate(-.4deg)}
+:root[data-theme="dark"] .door{background:linear-gradient(180deg,#342a4c,#2c2341 62%,#241c36);color:#ece6f6;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),inset -2px 0 0 #140e1c,inset 0 -3px 0 #140e1c,0 0 0 1px rgba(0,0,0,.4),0 22px 40px -14px rgba(0,0,0,.6)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .door{background:linear-gradient(180deg,#342a4c,#2c2341 62%,#241c36);color:#ece6f6;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),inset -2px 0 0 #140e1c,inset 0 -3px 0 #140e1c,0 0 0 1px rgba(0,0,0,.4),0 22px 40px -14px rgba(0,0,0,.6)}}
+.door .eye{font:700 10.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);text-align:center}
+.door h2{font:700 22px/1.2 var(--serif);text-align:center;margin:0}
+.door p{margin:0;font-size:13.5px;color:inherit;opacity:.8;text-align:center}
+.door label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;opacity:.85}
+.door input{font:inherit;font-size:15px;padding:9px 11px;border-radius:11px;border:1px solid rgba(91,70,144,.3);background:rgba(255,255,255,.8);color:#221a2e;box-shadow:inset 0 1px 3px rgba(0,0,0,.08)}
+:root[data-theme="dark"] .door input{background:#1d1728;color:#ece6f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .door input{background:#1d1728;color:#ece6f6}}
+.door .keys{justify-content:flex-end;margin-top:4px}
+.limits{border-left:0;background:var(--well)}
+.limits ul{margin:0;padding-left:18px;color:var(--ink2);font-size:12.8px;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--card);color:var(--ink1);border:1px solid var(--line);box-shadow:var(--key-hi);border-radius:12px;padding:9px 14px;font-weight:600;transition:all .3s var(--spring);pointer-events:none;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="note-top">
+    <div><h1>Settings</h1><p class="lede">A live preview of a new room in Settings, Security, for your request of 18 November. What is on, off or waiting is an example; the names are examples too.</p></div>
+    <button class="key lav" id="themeKey" type="button">Night</button>
+  </div>
+  <div class="bar">
+    <div class="row" role="tablist">
+      <button class="tab" type="button">Everyday</button><button class="tab" type="button">Calm and focus</button><button class="tab" type="button">Models and AI</button><button class="tab" type="button">Your data</button>
+      <button class="tab" type="button" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/></svg>Security <span class="new">New</span></button>
+      <button class="tab" type="button">Ownership</button><button class="tab" type="button">Author Studio</button>
+    </div>
+    <div class="row" role="tablist" id="subs">
+      <button class="tab sub" type="button" aria-selected="true" data-v="all">Everything</button><button class="tab sub" type="button" data-v="device">This device</button><button class="tab sub" type="button" data-v="disk">The computer's disk</button><button class="tab sub" type="button" data-v="wifi">Between your devices</button><button class="tab sub" type="button" data-v="code">Your code and apps</button><button class="tab sub" type="button" data-v="self">Ingenium itself</button><button class="tab sub" type="button" data-v="more">More protection</button>
+    </div>
+    <p class="hint">Everything Ingenium does to keep your work yours: sealed on every device, between your devices, and in what you ship.</p>
+  </div>
+
+  <div class="stage">
+    <div class="col" id="room">
+      <!-- the overview -->
+      <section class="card" data-in="all">
+        <div class="over">
+          <div class="shield" title="Your shield"><svg viewBox="0 0 120 136" aria-hidden="true"><defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a62d6"/><stop offset=".55" stop-color="#5d37a1"/><stop offset="1" stop-color="#3a2070"/></linearGradient><linearGradient id="sh" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+            <path d="M60 4l50 18v38c0 32-21 58-50 72C31 118 10 92 10 60V22z" fill="url(#sg)"/><path d="M60 4l50 18v38c0 32-21 58-50 72z" fill="#000" opacity=".16"/><path d="M60 12l42 15v33c0 27-17 49-42 61C35 109 18 87 18 60V27z" fill="none" stroke="#d7c3ff" stroke-opacity=".55" stroke-width="2"/>
+            <path d="M60 4l50 18v18C80 36 40 50 10 40V22z" fill="url(#sh)"/><path d="M42 66l13 13 25-27" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="meter">
+            <div class="big">7 of 8 protections on</div>
+            <div class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+            <p>One waits for you: the Fire tablet pairs once more, so its messages are sealed too.</p>
+          </div>
+        </div>
+        <div class="list" style="margin-top:14px">
+          <button class="it" data-go="device"><i class="dot"></i><span>Sealed on this device</span><span class="chip ok">On</span></button>
+          <button class="it" data-go="disk"><i class="dot"></i><span>Sealed on the computer's disk</span><span class="chip ok">On</span></button>
+          <button class="it" data-go="wifi"><i class="dot w"></i><span>Sealed between your devices</span><span class="chip warn">2 of 3</span></button>
+          <button class="it" data-go="code"><i class="dot"></i><span>Your apps signed when shipped</span><span class="chip ok">On</span></button>
+          <button class="it" data-go="code"><i class="dot"></i><span>Your apps' code scrambled</span><span class="chip ok">On</span></button>
+          <button class="it" data-go="self"><i class="dot"></i><span>Ingenium itself, signed and checked</span><span class="chip ok">Checked</span></button>
+          <button class="it" data-go="device"><i class="dot"></i><span>Backups sealed whole</span><span class="chip ok">On</span></button>
+          <button class="it" data-go="more"><i class="dot"></i><span>Offline only</span><span class="chip ok">On</span></button>
+        </div>
+        <div class="keys" style="margin-top:12px"><button class="key pri" type="button" data-say="Locked. Ingenium opens again with your password, your words or Touch ID (an example).">Lock now</button><button class="key lav" type="button" data-say="Every protection checked: all hold (an example).">Check everything</button></div>
+      </section>
+
+      <!-- 1. this device -->
+      <section class="card p" data-in="all device" aria-expanded="true">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><span class="tx"><h2>Sealed on this device</h2><small>Your sign-in, and everything you make, sealed with your password</small></span><span class="chip ok">On</span><span class="chev">›</span></button>
+        <div class="pb">
+          <div class="well"><div class="wh"><b>What is sealed</b><span class="chip plain">AES-GCM, 256-bit</span></div>
+            <div class="tags"><span class="chip">Chats</span><span class="chip">Notes</span><span class="chip">Memory</span><span class="chip">Settings</span><span class="chip">Projects</span><span class="chip">Code</span><span class="chip">Fabrica's apps and versions</span><span class="chip">Packages</span><span class="chip">App library</span><span class="chip">Documents</span><span class="chip">Career</span><span class="chip">Signing keys</span><span class="chip">Your GitHub sign-in</span><span class="chip">Backups, sealed whole</span></div>
+            <p>Opened only while you are signed in; the key lives in memory, never on the disk. It locks by itself after 15 minutes away.</p></div>
+          <div class="well"><div class="wh"><b>Your ways back in</b><span class="chip ok">3 set</span></div>
+            <p>Your password, your ten recovery words, and Touch ID on this Mac. A recovery key file kept on a memory stick is a fourth.</p>
+            <div class="keys"><button class="key lav" type="button" data-say="Change your password: the old one first (an example).">Change the password</button><button class="key lav" type="button" data-say="New recovery words (an example).">New recovery words</button><button class="key sky" type="button" data-say="Touch ID opens Ingenium on this Mac (an example).">Touch ID</button></div></div>
+          <div class="well"><div class="wh"><b>At first start</b><span class="chip">New</span></div><p>Every new copy asks you to protect it before anything else (the door beside). A demonstration copy may skip it.</p></div>
+        </div>
+      </section>
+
+      <!-- 2. the computer's disk -->
+      <section class="card p" data-in="all disk" aria-expanded="false">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M7 15h.01M10 15h7"/></svg></span><span class="tx"><h2>Sealed on the computer's disk</h2><small>What the computer apps keep in files of their own</small></span><span class="chip ok">On</span><span class="chev">›</span></button>
+        <div class="pb" hidden>
+          <div class="well"><div class="wh"><b>Sealed with the same password</b><span class="chip ok">5 of 5</span></div>
+            <div class="tags"><span class="chip">Fabrica's runs and their logs</span><span class="chip">Apps waiting for your devices</span><span class="chip">Fabrica apps kept on a drive</span><span class="chip">The folder search's index</span><span class="chip">Texts for training</span></div>
+            <p>While you are signed in, the computer app holds the key in its memory only, and drops it when Ingenium locks. A run still runs on plain files while it runs; its files are sealed when it ends.</p>
+            <div class="keys"><button class="key emr" type="button" data-say="Sealing what is still plain: 0 files left (an example).">Seal them now</button></div></div>
+          <div class="well"><div class="wh"><b>Kept readable, on purpose</b><span class="chip plain">2</span></div>
+            <p>An app you serve for the Home Screen (Safari has to read it), and your model files (large, and the same for everyone who downloads them). A Fabrica app on a drive can be given a plain copy for git or another tool: Export a plain copy.</p></div>
+        </div>
+      </section>
+
+      <!-- 3. between devices -->
+      <section class="card p" data-in="all wifi" aria-expanded="false">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a5 5 0 0 1 6.4 0"/><circle cx="12" cy="19.2" r="1.2"/></svg></span><span class="tx"><h2>Sealed between your devices</h2><small>Every message on your Wi-Fi, sealed end to end</small></span><span class="chip warn">2 of 3</span><span class="chev">›</span></button>
+        <div class="pb" hidden>
+          <p>When two of your devices pair, they agree on a key of their own; every message between them (models lent, apps sent, runs and logs) is sealed with it. Anyone else on the Wi-Fi sees only noise.</p>
+          <div class="dev"><span class="chip ok">Sealed</span><b>iPhone</b><span class="fine">Paired 18 November</span></div>
+          <div class="dev"><span class="chip ok">Sealed</span><b>HP laptop</b><span class="fine">Paired 18 November</span></div>
+          <div class="dev"><span class="chip warn">Pair once more</span><b>Fire tablet</b><button class="key amb" type="button" data-say="Type this computer's code on the Fire tablet once (an example).">Pair it again</button></div>
+          <p class="fine">A device paired before this change pairs once more, with the code, to agree its key.</p>
+        </div>
+      </section>
+
+      <!-- 4. your code and apps -->
+      <section class="card p" data-in="all code" aria-expanded="false">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 8L4.5 12l4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg></span><span class="tx"><h2>Your code and apps</h2><small>What Fabrica ships, and your sources in it</small></span><span class="chip ok">On</span><span class="chev">›</span></button>
+        <div class="pb" hidden>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Signed with your key</b><small>Every package carries your signature; a changed file is caught, and the app refuses to open and says so.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Scrambled code</b><small>The shipped code is shrunk and its names scrambled, so it is much slower to read or copy. Your sources in Fabrica stay as you wrote them.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="false"><span class="t"><b>Opens only with your owner key</b><small>For an app meant for you alone: it opens fully only on a device that holds your owner key, as the master edition does.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Sources sealed in Fabrica</b><small>Every app's files and versions sealed with your password (true whenever your sign-in is on).</small></span><span class="tr"></span></button>
+          <p class="fine">Per app, too: each app's Package details can turn these on or off for that app alone.</p>
+        </div>
+      </section>
+
+      <!-- 5. Ingenium itself -->
+      <section class="card p" data-in="all self" aria-expanded="false">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/></svg></span><span class="tx"><h2>Ingenium itself, signed and checked</h2><small>The copy you run is the one you built</small></span><span class="chip ok">Checked</span><span class="chev">›</span></button>
+        <div class="pb" hidden>
+          <div class="well"><div class="wh"><b>Checked at every start</b><span class="chip ok">7.36 · your signature</span></div>
+            <p>Each release is signed with your owner key; the computer apps and the iPhone, iPad and Fire apps check the signature before Ingenium opens. A copy changed by anyone else refuses to open, and says which file changed.</p>
+            <div class="keys"><button class="key emr" type="button" data-say="Signature checked: this copy is the one you built (an example).">Check it now</button></div></div>
+          <div class="well"><div class="wh"><b>Its code, as shipped</b><span class="chip">Scrambled</span></div>
+            <p>The gift and demonstration editions ship scrambled, as now; the master edition stays yours to read and change in the Author Studio.</p></div>
+        </div>
+      </section>
+
+      <!-- 6. more protection -->
+      <section class="card p" data-in="all more" aria-expanded="false">
+        <button class="ph" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/></svg></span><span class="tx"><h2>More protection</h2><small>For a workspace that is truly your own</small></span><span class="chip ok">5 on</span><span class="chev">›</span></button>
+        <div class="pb" hidden>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Offline only</b><small>Nothing leaves this device but what goes to your own devices. Connected services, GitHub and downloads wait until you allow them, each time or for a while.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Lock when the computer sleeps or the lid closes</b><small>Besides the lock after 15 minutes away.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Slow down wrong passwords</b><small>Each wrong try waits longer before the next; your data is never wiped by it.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>Clear a copied secret</b><small>A password, key or recovery word copied from Ingenium is cleared from the clipboard after a minute.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="true"><span class="t"><b>A record of every opening</b><small>When Ingenium was opened, from which device, and every wrong password, kept sealed for you to read.</small></span><span class="tr"></span></button>
+          <button class="sw" type="button" role="switch" aria-checked="false"><span class="t"><b>Ask before each export</b><small>A plain copy (a backup without its seal, a plain export of an app) asks for your password first.</small></span><span class="tr"></span></button>
+        </div>
+      </section>
+    </div>
+
+    <!-- beside: the first start, and the limits -->
+    <div class="col">
+      <div class="door" aria-label="At first start">
+        <div class="eye">At first start</div>
+        <h2>Protect your work first</h2>
+        <p>Ingenium seals everything you make with your password, on this device and between your devices.</p>
+        <label>Your name<input type="text" value="Yannie" autocomplete="off"></label>
+        <label>A password<input type="password" value="example-password" autocomplete="off"></label>
+        <div class="keys"><button class="key quiet" type="button" data-say="Ingenium opens unprotected; Settings, Security asks again (an example).">Not now</button><button class="key pri" type="button" data-say="Next: your ten recovery words, written down once (an example).">Protect it</button></div>
+      </div>
+      <section class="card limits">
+        <h3>What no lock can do</h3>
+        <ul>
+          <li>Someone who knows your password, or holds your recovery words, can open everything: keep them apart from the device.</li>
+          <li>A computer already taken over by a harmful program can read what you see on the screen while you work.</li>
+          <li>Code shipped to other people can always be read by someone determined; scrambling makes it slow, signing makes changes show.</li>
+          <li>Lose the password, the words and every other way back in, and the sealed data cannot be opened by anyone, me included.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  var D=document,tT=null;
+  function say(t){var e=D.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){e.classList.remove('on');},2600);}
+  D.querySelectorAll('[data-say]').forEach(function(k){k.addEventListener('click',function(e){e.stopPropagation();say(k.getAttribute('data-say'));});});
+  D.querySelectorAll('.p').forEach(function(c){var h=c.querySelector('.ph'),b=c.querySelector('.pb');h.addEventListener('click',function(){var on=c.getAttribute('aria-expanded')!=='true';c.setAttribute('aria-expanded',String(on));b.hidden=!on;});});
+  D.querySelectorAll('.sw').forEach(function(s){s.addEventListener('click',function(){s.setAttribute('aria-checked',String(s.getAttribute('aria-checked')!=='true'));});});
+  function show(v){D.querySelectorAll('#subs .tab').forEach(function(t){t.setAttribute('aria-selected',String(t.getAttribute('data-v')===v));});
+    D.querySelectorAll('#room > section').forEach(function(s){var ins=(s.getAttribute('data-in')||'').split(' ');s.hidden=ins.indexOf(v)<0;
+      if(v!=='all'&&s.classList.contains('p')){s.setAttribute('aria-expanded','true');s.querySelector('.pb').hidden=false;}});}
+  D.querySelectorAll('#subs .tab').forEach(function(t){t.addEventListener('click',function(){show(t.getAttribute('data-v'));});});
+  D.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.getAttribute('data-go'));});});
+  var tk=D.getElementById('themeKey');
+  function dark(){var a=D.documentElement.getAttribute('data-theme');return a?a==='dark':matchMedia('(prefers-color-scheme: dark)').matches;}
+  function label(){tk.textContent=dark()?'Day':'Night';}
+  tk.addEventListener('click',function(){D.documentElement.setAttribute('data-theme',dark()?'light':'dark');label();});label();
+})();
+</script>
