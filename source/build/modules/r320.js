@@ -128,7 +128,9 @@ function show(v){VIEW=v||"privacy";try{go("settings");}catch(e){}try{IngRooms.op
    introduction door"; she chose a sheet after Enter, once, with I agree and Decline (to be shown as a live preview first). Until then
    the terms stay in Settings, Ownership; a line left on the door by 7.37 to 7.39 is taken away. */
 function intro(){var p=D.getElementById("introTerms");if(p&&p.parentNode)p.parentNode.removeChild(p);}
-W.IngTerms={paint:paint,show:show,contact:contact,version:VERSION};
+/* 7.41: the full terms and notice, for the agreement sheet (modules/r326.js), so everyone can read every section before agreeing */
+W.IngTerms={paint:paint,show:show,contact:contact,version:VERSION,mine:mine,edition:ed,
+  docs:function(){return {shorts:SHORT.map(function(x){return [x[0],x[1]];}),terms:docHtml(TERMS),privacy:docHtml(PRIV)};}};
 function boot(){paint();intro();}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);else boot();
 W.addEventListener("load",function(){setTimeout(boot,600);});

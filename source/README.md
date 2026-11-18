@@ -395,6 +395,31 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.41 (18 November 2026): the controls key; agreeing to the terms, in full; your ways of working.
+
+Her approval of the live preview (https://claude.ai/artifact/S7Rwqc72usWw7Ly138jeSz, previews/v741), with her changes: "I approve of the
+preview, please commit and push it everywhere. I also want the full version of the Terms and Conditions to be shown when I click the button
+to see it and not only see the short version. It is very important that every user is able to read the full Terms and Conditions to
+properly agree or decline. The 'Where They Apply' section is flat and stiff, please fix that. Please put the controls button next to the
+Learn button on the Vocatio page. You can put it next to the 'Bring one in' button on the Fabrica page."
+- `build/modules/r325.js` (new, window.IngModelKey): one small round key (a slider's mark) for Reply, Memory and Effort: beside Vocatio's
+  Learn tab, beside Fabrica's Bring one in, beside Lector's and Ingenia's titles; it opens r321's sheet for that page's model (a page with no
+  model of its own: Chat's). Chat keeps its own Controls key. `r321.js`: a round key keeps its mark; its title says the numbers.
+- `build/modules/r326.js` (new, window.IngTermsGate): a copy that is not her master copy and has not agreed to this version of the terms
+  is asked once the welcome door has opened (or at start where it is skipped): In short, the full Terms of use (all ten sections) and the
+  full Privacy notice (all eight), a tick and I agree, or Decline (Ingenium stays closed; nothing changed or sent; the terms can be read
+  again). Nothing behind the sheet can be reached; Escape does not close it; Tab stays in it. The version, date and time and copy are kept
+  in the device's data only and shown in Settings, Ownership; a new version asks again. `r320.js`: IngTerms.docs() gives the full texts.
+  Not legal advice: a lawyer in the US and in the UK should read the final wording.
+- `build/modules/r327.js` (new, window.IngWays): her ways of working, seeded with her nine rules in her master copy only (other copies
+  start empty and their owners write their own): in Ingenia (folded under the page's keys, its count on its key) and in Settings, Your
+  Ingenium (r173, r234 place it); add, move up and down, remove; where they apply (every model; a model working on her apps, a Code session,
+  Fabrica and Build, even when the first is off; shown in Settings), every row and switch raised and lifting under the pointer. Given to
+  models after Ingenium's instructions and hers (ingPersonLayer). Fabrica's measured checks of the rules come later.
+- rig: `t_741.js` (new, 22 checks).
+- `r222.js`: the 7.40 line naming Fabrica shows only in copies that have it (rig/t_627_editions found it in the gift and demo editions; 7.40's
+  editions were not committed). From 7.41 the editions are made and checked before the page is pushed.
+
 Ingenium 7.40 (18 November 2026): your DPhil plan in Vocatio; the 7.39 texts right in every edition; Adamas no longer freezes or
 closes the app; at rest, still (cooler phones, quicker laptops); the terms off the welcome door; Vesta's darker stone first by day;
 Fabrica's logos in depth; the model keys off the pages.

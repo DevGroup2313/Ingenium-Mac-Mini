@@ -126,15 +126,15 @@ function paintChip(b){var kf=b.__gkKey,k="none";try{k=kf();}catch(e){}b.__gkK=k;
   if(!k||k==="none"){if(!b.hidden)b.hidden=true;return;}if(b.hidden)b.hidden=false;
   var v=vals(k),au=autoName(placeOf(b)),mem=isCloud(k)?(cloudWin()>0?kay(cloudWin()):"its own"):kay(v.ctx);
   var sig=v.tokens+"|"+mem+"|"+v.effort+"|"+au;if(b.__gkSig===sig)return;b.__gkSig=sig;
-  b.innerHTML="";function part(l,x){var s=mk("span");s.appendChild(D.createTextNode(l+" "));s.appendChild(mk("b",null,x));b.appendChild(s);}
-  part("Reply",kay(v.tokens));b.appendChild(mk("span","gk-s","·"));part("Memory",mem);b.appendChild(mk("span","gk-s","·"));part("Effort",au||EFL[v.effort-1]);
+  if(!b.__gkIcon){b.innerHTML="";function part(l,x){var s=mk("span");s.appendChild(D.createTextNode(l+" "));s.appendChild(mk("b",null,x));b.appendChild(s);}
+  part("Reply",kay(v.tokens));b.appendChild(mk("span","gk-s","·"));part("Memory",mem);b.appendChild(mk("span","gk-s","·"));part("Effort",au||EFL[v.effort-1]);}   /* 7.41: a round key (r325) keeps its mark; its title says the numbers */
   var g=G(),nm=g?g.name(k):"this model";b.title="Reply, Memory and Effort for "+nm+": the same in every place";
   b.setAttribute("aria-label","Reply "+fmt(v.tokens)+" tokens, Memory "+(isCloud(k)&&cloudWin()<=0?"the model's own":fmt(isCloud(k)?cloudWin():v.ctx)+" tokens")+", Effort "+(au||EFL[v.effort-1])+", for "+nm+". Press to change.");}
-function chip(keyFn,place){var b=mk("button","gk");b.type="button";b.__gkKey=typeof keyFn==="function"?keyFn:function(){return String(keyFn||"none");};
+function chip(keyFn,place,opts){var b=mk("button","gk");if(opts&&opts.icon)b.__gkIcon=true;b.type="button";b.__gkKey=typeof keyFn==="function"?keyFn:function(){return String(keyFn||"none");};
   if(place)b.setAttribute("data-gk-place",place);b.setAttribute("aria-haspopup","dialog");b.setAttribute("aria-expanded","false");
   b.addEventListener("click",function(ev){ev.preventDefault();ev.stopPropagation();if(POP&&POP.__for===b){close();return;}open(b);});
   paintChip(b);return b;}
-function paintChips(){[].forEach.call(D.querySelectorAll(".gk"),function(b){try{paintChip(b);}catch(e){}});}
+function paintChips(){[].forEach.call(D.querySelectorAll(".gk,.mk3"),function(b){try{if(b.__gkKey)paintChip(b);}catch(e){}});}   /* 7.41: the round keys too (r325) */
 
 /* ---------- the small sheet ---------- */
 var POP=null,TM=null;
