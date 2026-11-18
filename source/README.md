@@ -428,6 +428,14 @@ the white acrylic button look of the navigation bar, please fix it and then comm
   glides and its icon tilts, with no purple shade (the rule she gave earlier, which the old hover broke).
 - rig/t_742_trouble.js: 13 checks.
 
+Her two changes (18 November 2026): "I want you to remove the controls button from next to the Lector and Ingenia page titles and place them
+in their appropriate places" and "move the second stone from the Vesta page on Day mode to the last position and move the third stone and
+the others up a stone that way it looks from darkest to lightest".
+
+- r325: Lector's key after Add your apps, Ingenia's after Bring in your work, in the row of each page's own keys, as Fabrica's after Bring
+  one in (rig/t_741.js checks it).
+- r291: by day the darker purple stone first, the lilac stones next, the pearl stone last.
+
 Ingenium 7.41 (18 November 2026): the controls key; agreeing to the terms, in full; your ways of working.
 
 Her approval of the live preview (https://claude.ai/artifact/S7Rwqc72usWw7Ly138jeSz, previews/v741), with her changes: "I approve of the

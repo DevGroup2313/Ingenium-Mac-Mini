@@ -38,8 +38,13 @@ function pageKey(){var k="none";try{k=W.IngLimits&&IngLimits.pageKey?IngLimits.p
 var PLACES=[
   {pg:"career",id:"mk3Vocatio",place:"Vocatio",key:pageKey,find:function(s){var row=s.querySelector(".rm-tabs");return row?{after:row.lastElementChild,row:row}:null;}},
   {pg:"fabrica",id:"mk3Fabrica",place:"Fabrica",key:chatKey,find:function(s){var row=s.querySelector(".skh-keys");if(!row)return null;var k=[].filter.call(row.children,function(x){return /Bring one in/.test(x.textContent);})[0]||row.lastElementChild;return {after:k,row:row};}},
-  {pg:"lector",id:"mk3Lector",place:"Lector",key:pageKey,find:title},
-  {pg:"folders",id:"mk3Ingenia",place:"Folders",key:pageKey,find:title}];
+  /* 7.42 (her words, 18 November 2026): "remove the controls button from next to the Lector and Ingenia page titles and place them in their
+     appropriate places": in the row of the page's own keys, as on Fabrica: after Add your apps (Lector) and after Bring in your work (Ingenia) */
+  {pg:"lector",id:"mk3Lector",place:"Lector",key:pageKey,find:function(s){return keysRow(s,/Add your apps/);}},
+  {pg:"folders",id:"mk3Ingenia",place:"Folders",key:pageKey,find:function(s){return keysRow(s,/Bring in your work/);}}];
+function keysRow(s,re){var k=[].filter.call(s.querySelectorAll(".skh-keys button,.skh-keys a"),function(x){return re.test(x.textContent)&&x.offsetParent;})[0];
+  if(!k){var all=[].filter.call(s.querySelectorAll("button"),function(x){return re.test(x.textContent.trim())&&x.offsetParent;});k=all[0];}
+  if(!k||!k.parentNode)return null;return {after:k,row:k.parentNode};}
 function title(s){var t=s.querySelector(".skh-title")||s.querySelector("h1.page-title");if(!t||!t.offsetParent)t=[].filter.call(s.querySelectorAll(".skh-title,h1"),function(x){return !!x.offsetParent;})[0];
   return t?{title:t}:null;}
 function make(P){var b=null;
@@ -47,6 +52,7 @@ function make(P){var b=null;
   else{b=D.createElement("button");b.type="button";b.className="mk3";}
   b.id=P.id;b.innerHTML=SVG;b.title="Reply, Memory and Effort";b.setAttribute("aria-label","Reply, Memory and Effort for this page's model");return b;}
 function placeOne(P){var s=D.getElementById("page-"+P.pg);if(!s)return;var b=D.getElementById(P.id);var f=P.find(s);if(!f)return;
+  if(b&&!f.title&&b.parentNode&&b.parentNode.classList&&b.parentNode.classList.contains("mk3-title")){b.parentNode.classList.remove("mk3-title");}
   if(f.title){var t=f.title;if(b&&b.parentNode===t)return;if(!b)b=make(P);t.classList.add("mk3-title");t.appendChild(b);return;}
   if(b&&b.parentNode===f.row&&b.previousElementSibling===f.after)return;if(!b)b=make(P);
   if(f.after&&f.after.parentNode===f.row)f.row.insertBefore(b,f.after.nextSibling);else f.row.appendChild(b);}

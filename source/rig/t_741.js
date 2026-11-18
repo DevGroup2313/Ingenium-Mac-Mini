@@ -17,7 +17,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
       return { id: k.id, beside: pr ? pr.textContent.trim() : '', inTitle: !!k.closest('.mk3-title'), title: (k.closest('.mk3-title') || {}).textContent ? k.closest('.mk3-title').textContent.trim() : '' }; }); }
   ok(at.career && at.career.beside === 'Learn', 'Vocatio: the controls key stands beside the Learn tab', at.career);
   ok(at.fabrica && /Bring one in/.test(at.fabrica.beside), 'Fabrica: the controls key stands beside Bring one in', at.fabrica);
-  ok(at.lector && at.lector.inTitle && /Lector/.test(at.lector.title) && at.folders && at.folders.inTitle && /Ingenia/.test(at.folders.title), 'Lector and Ingenia: beside the page title', { lector: at.lector, folders: at.folders });
+  ok(at.lector && !at.lector.inTitle && /Add your apps/.test(at.lector.beside) && at.folders && !at.folders.inTitle && /Bring in your work/.test(at.folders.beside), 'Lector and Ingenia (7.42, her words): not by the title; after Add your apps and after Bring in your work', { lector: at.lector, folders: at.folders });
   await p.evaluate(() => go('career')); await p.waitForTimeout(1200); const key = p.locator('#mk3Vocatio');
   const t0 = await key.evaluate(e => getComputedStyle(e).transform); await key.hover(); await p.waitForTimeout(450); const t1 = await key.evaluate(e => getComputedStyle(e).transform);
   ok(t0 === 'none' && t1 !== 'none', 'the key keeps its look at rest and lifts under the pointer', { t0, t1 });
