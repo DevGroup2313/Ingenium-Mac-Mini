@@ -63,6 +63,10 @@ spec = importlib.util.spec_from_file_location("ingenium_app", copies["mac"])
 mod = importlib.util.module_from_spec(spec)
 sys.modules["ingenium_app"] = mod
 spec.loader.exec_module(mod)
+# 7.37: this test checks lending as it was before sealing, so the computer runs as a build without the sealing library (a path the
+# patch keeps: pairing and requests with the code, as before); sealing itself is rig/t_737_seal.js.
+if hasattr(mod, "_SEAL"):
+    mod._SEAL["lib"] = False
 mod._share_cfg_save({"on": True, "code": "ABCD-2345"})
 mod._share_apply()
 PORT = mod._SHARE["port"]

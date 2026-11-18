@@ -27,6 +27,10 @@ spec = importlib.util.spec_from_file_location("ia", os.path.join(OUT, "ingenium_
 ia = importlib.util.module_from_spec(spec)
 sys.argv = ["x"]
 spec.loader.exec_module(ia)
+# 7.37: this test checks runs for her devices as it was before sealing, so the computer runs as a build without the sealing library (a path the
+# patch keeps: pairing and requests with the code, as before); sealing itself is rig/t_737_seal.js.
+if hasattr(ia, "_SEAL"):
+    ia._SEAL["lib"] = False
 P = F = 0
 
 

@@ -39,9 +39,12 @@ for _f in ('ingenium.icns', 'ingenium.png'):
     if os.path.isfile(os.path.join(SPECPATH, _f)):
         _own.append((_f, '.'))
 ICON = 'ingenium.icns' if os.path.isfile(os.path.join(SPECPATH, 'ingenium.icns')) else None
-for _f in ('app.json', 'THIRD_PARTY_NOTICES.txt', 'LICENCE.txt'):
+for _f in ('app.json', 'THIRD_PARTY_NOTICES.txt', 'LICENCE.txt', 'TERMS.txt', 'PRIVACY.txt'):   # 7.37: the terms and the privacy notice
     if os.path.isfile(os.path.join(SPECPATH, _f)):
         _own.append((_f, '.'))
+# 7.37: the licences THIRD_PARTY_NOTICES.txt points to travel beside it
+if os.path.isdir(os.path.join(SPECPATH, 'licences')):
+    _own.append(('licences', 'licences'))
 
 # 6.57: the speech models dictation writes with (modules/r254.js), beside the page, when the build fetched them (build-mac.yml)
 if os.path.isdir(os.path.join(SPECPATH, 'speech')):
@@ -60,7 +63,8 @@ extra_hidden = []
 # data and binaries together, and a package that is absent is simply skipped.
 # certifi travels too: its cacert.pem is a DATA file (hidden imports alone do
 # not bring it), and the relay verifies https calls against it.
-for _pkg in ('webview', 'proxy_tools', 'objc', 'Foundation', 'WebKit', 'certifi'):
+# 7.37: cryptography (app_seal_737.py) seals what passes between her devices; its compiled part (_rust, with OpenSSL) travels whole
+for _pkg in ('webview', 'proxy_tools', 'objc', 'Foundation', 'WebKit', 'certifi', 'cryptography'):
     try:
         _d, _b, _h = collect_all(_pkg)
         extra_datas += _d
@@ -85,6 +89,9 @@ a = Analysis(
         'dulwich', 'dulwich.client', 'dulwich.repo', 'dulwich.objects', 'dulwich.pack', 'dulwich.protocol', 'urllib3',
         # 6.86: Fabrica reads every repository on this computer from the drive (app_disk_686.py)
         'dulwich.object_store', 'dulwich.index',
+        # 7.37 (app_seal_737.py): sealed between her devices
+        'cryptography', 'cryptography.hazmat.primitives.asymmetric.ec', 'cryptography.hazmat.primitives.ciphers.aead',
+        'cryptography.hazmat.primitives.kdf.hkdf', 'cryptography.hazmat.primitives.serialization', 'cryptography.hazmat.primitives.hashes',
         'objc',
         'Foundation',
         'AppKit',

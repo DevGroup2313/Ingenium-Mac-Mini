@@ -166,8 +166,13 @@ const step = m => { if (process.env.STEPS) console.log('.. ' + m); };
   const h1 = await s.evaluate(() => ({ tiles: [...document.querySelectorAll('#linkCard .ld-tile')].map(x => x.textContent).join(''), on: document.getElementById('ldShare').getAttribute('aria-checked'), lend: !!document.querySelector('#linkCard details.ld-fix #lkLend') }));
   ok(h0.sw && h1.on === 'true' && h1.tiles === String(st.code).replace('-', '') && st.on && h1.lend, "the computer's own card: one switch; its code in raised tiles; How this computer lends kept", { h0, h1, code: st.code });
   const gp = st.port; const dh = { 'Authorization': 'Bearer ' + st.code, 'X-Ingenium-Device': 'id=fire-tab01;kind=tablet;name=Fire%20tablet' };
-  const pr = await post(gp, '/ingenium/pair', {}, dh);
-  await s.evaluate(() => IngLend.refresh()); await s.waitForTimeout(1500);
+  // 7.37 (app_seal_737.py, modules/r319.js): a new device no longer pairs with the code alone. This stand-in tablet sends no key (as a
+  // device that cannot seal), so the computer asks her whether to allow it with the code alone; she allows it on the computer's sheet.
+  const ask = await post(gp, '/ingenium/pair2', { id: 'fire-tab01', kind: 'tablet', name: 'Fire tablet' }, dh); const rid = (JSON.parse(ask.body || '{}') || {}).rid;
+  await s.waitForSelector('#sealAsk .sl-key.pri', { timeout: 30000 }); await s.click('#sealAsk .sl-key.pri'); await s.waitForTimeout(800);
+  const pr = await getj(gp, '/ingenium/pair2/state?rid=' + encodeURIComponent(rid || ''), dh);
+  ok(ask.status === 200 && pr.status === 200 && JSON.parse(pr.body).state === 'ok' && JSON.parse(pr.body).sealed === false, 'a device that cannot seal asks, and she allows it on the computer (7.37)', { ask: ask.status, pr: pr.body.slice(0, 120) });
+  await s.evaluate(() => IngLend.refresh()); await s.waitForTimeout(2500);
   const u1 = await s.evaluate(() => [...document.querySelectorAll('#linkCard .ld-user')].map(x => x.textContent.trim() + '|' + (x.querySelector('svg') ? 'icon' : '')));
   ok(pr.status === 200 && u1.length === 1 && /Fire tablet/.test(u1[0]) && /tablet/.test(u1[0]) && /icon$/.test(u1[0]), 'a device that pairs is listed by its name, with its own icon', { pr: pr.status, u1 });
   await s.screenshot({ path: OUT + '/7_lender.png' });

@@ -70,7 +70,10 @@ async function github(route) {
   const s0 = await api(A.port, 'share_runs_set', [true]); const code = s0.code;
   const ci = await b.newContext({ viewport: { width: 1180, height: 820 } }); const q = await ci.newPage(); q.setDefaultTimeout(180000); q.on('pageerror', e => errs.push('iphone: ' + e.message.slice(0, 200)));
   await q.goto('http://127.0.0.1:' + ia.page_port + '/ingenium.html', { timeout: 600000 }); await enter(q);
-  const pq = await q.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); return { id: c.id, name: c.name, me: IngLend.state().me }; } catch (e) { return { err: String(e && e.message || e) }; } }, [s0.port, code]);
+  // 7.37 (r319): both screens show four words, and she presses They match on the Mac
+  const [pq] = await Promise.all([q.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); return { id: c.id, name: c.name, me: IngLend.state().me }; } catch (e) { return { err: String(e && e.message || e) }; } }, [s0.port, code]),
+    (async () => { await p.waitForSelector('#sealAsk .sl-key.pri', { timeout: 60000 }); await p.click('#sealAsk .sl-key.pri'); })()]);
+  await q.waitForTimeout(3000);
   ok(pq.id, 'the iPhone pairs with the Mac', { id: pq.id, name: pq.name });
   await api(A.port, 'share_runs_set', [false]);
   const s1 = await api(A.port, 'share_status', []);
@@ -83,6 +86,7 @@ async function github(route) {
   const keys = await p.evaluate(() => [...document.querySelectorAll('.f-sheet.r316 button.f-btn')].filter(x => x.offsetParent).map(x => ({ t: x.textContent, c: x.className.replace(/^f-btn ?/, ''), bg: getComputedStyle(x).backgroundColor, bgi: getComputedStyle(x).backgroundImage })));
   const coloured = keys.filter(k => !/quiet/.test(k.c));
   ok(coloured.length >= 7 && coloured.every(k => /c-(lav|sky|amb|emr)|pri/.test(k.c) && !/rgb\(255, 255, 255\)|rgba\(0, 0, 0, 0\)/.test(k.bg) || (/pri/.test(k.c) && /linear-gradient/.test(k.bgi))), 'every key in a colour of Ingenium\'s own, none plain white', keys.map(k => k.t + ':' + k.c));
+  await p.mouse.move(2, 2); await p.waitForTimeout(400);   // 7.37: the pointer rests where They match was pressed; away first, then the resting look
   const lift = await p.evaluate(async () => { const w = document.querySelectorAll('.f-sheet.r316 .r316-way')[1], k = document.querySelector('.f-sheet.r316 .f-btn.c-sky');
     const a = [getComputedStyle(w).transform, getComputedStyle(k).transform, getComputedStyle(k).backgroundColor]; return { a, kr: k.getBoundingClientRect().toJSON(), wr: w.getBoundingClientRect().toJSON() }; });
   await p.mouse.move(lift.kr.x + lift.kr.width / 2, lift.kr.y + lift.kr.height / 2); await p.waitForTimeout(450);

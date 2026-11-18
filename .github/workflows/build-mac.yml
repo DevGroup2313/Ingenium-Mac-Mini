@@ -156,7 +156,7 @@ jobs:
           python3 tools/prepare_desktop_model.py "$RUNNER_TEMP/models" ${{ matrix.models }}
 
       - name: Install the build tools
-        run: python3 -m pip install --disable-pip-version-check pyinstaller==6.22.3 pywebview==6.2.1 certifi dulwich==0.22.8
+        run: python3 -m pip install --disable-pip-version-check pyinstaller==6.22.3 pywebview==6.2.1 certifi dulwich==0.22.8 cryptography==48.0.1
 
       - name: The edit panel's clipboard (R78), copied and pasted through the app's own code
         continue-on-error: true

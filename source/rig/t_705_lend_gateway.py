@@ -52,6 +52,10 @@ spec = importlib.util.spec_from_file_location("ingenium_app", APP)
 mod = importlib.util.module_from_spec(spec)
 sys.modules["ingenium_app"] = mod
 spec.loader.exec_module(mod)
+# 7.37: this test checks lending as it was before sealing, so the computer runs as a build without the sealing library (a path the
+# patch keeps: pairing and requests with the code, as before); sealing itself is rig/t_737_seal.js.
+if hasattr(mod, "_SEAL"):
+    mod._SEAL["lib"] = False
 
 pass_n = fail_n = 0
 

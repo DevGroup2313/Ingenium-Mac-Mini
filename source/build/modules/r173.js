@@ -221,7 +221,7 @@ var CONF={
       ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
     /* 7.36: Security (modules/r318.js), her approved preview (18 November 2026, https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ) */
     {k:"security",t:"Security",i:"security",says:"Everything Ingenium does to keep your work yours: sealed on this device, between your devices, and in what you ship. What is on, what is off, and what comes next.",ids:["secCard"]},
-    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, and the permissions kept on this device.",ids:["ingPermitCard"]},
+    {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, the permissions kept on this device, and its terms and privacy.",ids:["ingPermitCard","termsCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
     {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
       when:function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}}}],

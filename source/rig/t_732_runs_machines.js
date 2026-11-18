@@ -52,7 +52,11 @@ const WF = ['name: Build', 'on: [workflow_dispatch]', 'jobs:', '  linux:', '    
   await p.evaluate(() => document.getElementById('ldRuns').click()); await p.waitForTimeout(1500);
   const swOff = await api(A.port, 'share_status', []); ok(swOff.runs_on === false, 'pressed again, off', { runs_on: swOff.runs_on });
   // pairing a computer that runs jobs and lends no models
-  const pr = await p.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); const s = IngLend.state().computers.filter(x => x.id === c.id)[0]; return { id: c.id, name: c.name, runs: s && s.runs }; } catch (e) { return { err: String(e && e.message || e) }; } }, [bport, code]);
+  // 7.37 (app_seal_737.py, r319): the other computer is asked to confirm the four words; it has no window open here, so its own
+  // functions answer (seal_pending, then seal_answer), as its sheet would
+  const confirmOn = async (port) => { for (let i = 0; i < 120; i++) { const r = await api(port, 'seal_pending', []); if (r.asks && r.asks.length) return api(port, 'seal_answer', [r.asks[0].rid, true]); await new Promise(r => setTimeout(r, 500)); } throw new Error('no pairing ask arrived'); };
+  const [pr] = await Promise.all([p.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); const s = IngLend.state().computers.filter(x => x.id === c.id)[0]; return { id: c.id, name: c.name, runs: s && s.runs }; } catch (e) { return { err: String(e && e.message || e) }; } }, [bport, code]), confirmOn(B.port)]);
+  await p.waitForTimeout(3000);
   ok(pr.id && pr.runs === 1, 'a computer that runs jobs and lends no models pairs, kept with runs', pr);
   // a repository with a workflow
   const rid = await p.evaluate(async (wf) => { const r = await IngRepo.create({ name: 'Tide Clock' }); await IngRepo.put(r.id, 'index.html', '<!doctype html><title>Tide Clock</title><h1>High water at six</h1>');
@@ -98,7 +102,8 @@ const WF = ['name: Build', 'on: [workflow_dispatch]', 'jobs:', '  linux:', '    
   // a device with no computer app (the Fire tablet, the iPhone, the iPad, a browser)
   const cb = await b.newContext({ viewport: { width: 1180, height: 820 } }); const q = await cb.newPage(); q.setDefaultTimeout(180000); q.on('pageerror', e => errs.push('browser: ' + e.message.slice(0, 200)));
   await q.goto('http://127.0.0.1:' + ia.page_port + '/ingenium.html', { timeout: 600000 }); await enter(q);
-  const pq = await q.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); return { id: c.id, name: c.name }; } catch (e) { return { err: String(e && e.message || e) }; } }, [bport, code]);
+  const [pq] = await Promise.all([q.evaluate(async ([port, code]) => { try { const c = await IngLend.pair('127.0.0.1:' + port, code); return { id: c.id, name: c.name }; } catch (e) { return { err: String(e && e.message || e) }; } }, [bport, code]), confirmOn(B.port)]);
+  await q.waitForTimeout(3000);
   ok(pq.id, 'a browser pairs with the other computer too', pq);
   const rq = await q.evaluate(async (wf) => { const r = await IngRepo.create({ name: 'Harbour Garden' }); await IngRepo.put(r.id, 'index.html', '<!doctype html><title>Harbour Garden</title>'); await IngRepo.put(r.id, '.github/workflows/build.yml', wf); await IngRepo.commit(r.id, 'First'); return r.id; }, WF);
   await q.evaluate(() => { go('fabrica'); }); await q.waitForTimeout(1500); await q.evaluate(() => { const t = [...document.querySelectorAll('#fbRepos .f-repo')].find(x => /Harbour Garden/.test(x.textContent)); if (t) t.click(); }); await q.waitForTimeout(1500);

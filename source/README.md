@@ -395,6 +395,62 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.37 (18 November 2026): sealed between your devices; Terms and privacy.
+Her answer (18 November 2026), asked whether messages between her devices should be encrypted end to end: "Yes, encrypt them". Her word
+on the live preview (https://claude.ai/artifact/KRuQqSihghbSgFcHswJCEU, source/previews/pairing): "Approve, build it", and "I approve of
+the preview, please commit and push it everywhere and continue working on my requests."
+- Found first (7.36, read in the code): her devices talked to the lending computer in plain HTTP on the home network, every request
+  carrying the pairing code in clear ("Authorization: Bearer <code>"). The code has 40 bits (8 of 32 letters): enough against guessing
+  over the network (wrong tries are slowed), too little to be the only secret behind encryption, since a recorded pairing could be tried
+  offline. So the two devices agree on a key of their own, and four words on both screens show that no one in between swapped the keys.
+- `build/desktop/app_seal_737.py` (new, the three computer apps): this computer's key pair (ECDH P-256, seal_key.pem, 0600) and its
+  sealed devices (seal.json, 0600) beside share.json. POST /ingenium/pair2 (with the code): a device's public key; the answer carries
+  this computer's, a request id and the four words (32 bits from SHA-256 of both public keys, from a list of 256 words). She confirms
+  them on the computer (seal_pending, seal_answer); GET /ingenium/pair2/state then gives the device what /ingenium/pair gave. The key:
+  ECDH, then HKDF-SHA-256 (salt from both public keys), AES-GCM 256-bit. POST /ingenium/sealed: the device's id, an IV and the sealed
+  request (method, path, headers, body, its time and a random id); it is opened, checked (ten minutes either way; never twice), and run
+  through the server's own routes as that device's request; every byte of the answer (status line, headers, body, streams included)
+  comes back sealed, one base64 line per frame, each frame's number bound in, an end frame last. With the code alone, 7.37 allows only a
+  device paired before 7.37 (seal.json "legacy", taken from share.json at the first start), a computer calling in, or the sealed pairing
+  itself; a sealed device or a new one is refused. A device that cannot seal sends no key, and she is asked on the computer whether to
+  allow it with the code alone (it is then an older device). hello says seal: 1; share_status carries seal; each device says sealed or
+  legacy; Remove forgets its key. Needs the Python package cryptography: the Mac and Windows builds install cryptography==48.0.1 (its
+  last release with wheels for Intel Macs: from 49.0.0, macOS wheels are for Apple silicon only), and the specs collect it whole.
+  Without it the computer seals nothing and pairing works as before.
+- `build/modules/r319.js` (new): window.IngSealing. On a device: its key pair (the private half not exportable) and one AES-GCM key per
+  computer (not exportable), in IndexedDB "ingenium_seal" (cleared by Reset everything). netFetch is wrapped: pairing with a computer
+  that seals becomes the sealed pairing (the device's sheet: the four words, Waiting for the computer, Stop pairing; then Paired with …,
+  Sealed end to end, or Not paired, and why); every later request to that computer, at any of its addresses, goes sealed, without the
+  code. On a computer: a sheet when a device asks ("… asks to pair": the four words, They match, They do not match; for a device that
+  cannot seal: Allow it with the code alone, Refuse). Marks: on the computer, each device Sealed end to end or Pair once more; on a
+  device, each computer. Every sheet, word and key lifts under the pointer; Minimal or reduced motion keeps them still.
+- `build/modules/r274.js`: the hooks for the marks; a refused, unanswered or stopped pairing is said as it is (not "Could not reach").
+- `build/modules/r318.js`: Sealed between your devices shows its true state (On or Off, and why: how many devices are sealed, how many
+  still use the code alone); the disk's sealing is planned for 7.38.
+- Not sealed yet, said so in the room: a computer calling in to another (call-ins), Python to Python, still uses the code.
+- Not verified on her devices: whether the iPhone and iPad app (its page at ingenium://app/, a custom scheme) is a secure context, so
+  whether it can seal; if not, it pairs only if she allows it with the code alone, and the room says so.
+- Third-party notices (all four repositories): 13. QR Code Generator 1.4.4 (MIT; carried since 7.35 and missing from the list until
+  now); 14. cryptography 48.0.1 (Apache-2.0 or BSD-3-Clause; its wheels carry OpenSSL, Apache-2.0); licences/cryptography-LICENSE.*.txt;
+  the licences folder now travels inside the computer apps.
+- rig: `t_737_seal.js` (new, 26 checks: a real computer app as the Mac, browsers as her devices). Brought up to 7.37: t_735, t_732
+  (the four words confirmed), t_681_lend.js (a device that cannot seal, allowed on the computer), t_736_security (Sealed between your
+  devices On); t_681_lend_gateway, t_705_lend_gateway, t_728_runs_devices, t_67_app_sec run the computer as a build without the library.
+
+Terms and privacy (her request of 18 November 2026: "I want Ingenium to have a Terms and Conditions and a Privacydiclosure or something of
+that nature to protect me and my app and future company and anything else that it might be needing."; her answers: her own name, "Both the
+US and the UK.", the contact filled in later inside the app; her word on the live preview, https://claude.ai/artifact/1kH45upUM246ucJN89phJm,
+source/previews/terms: "I approve of the preview, please commit and push it everywhere.")
+- `build/modules/r320.js` (new): Settings, Ownership (listed by r173), after the licence: Terms and privacy, Version 1, 18 November 2026,
+  in parts: In short (six tiles), the Privacy notice (8 parts), the Terms of use (10), and in the master edition Your contact (kept in the
+  desk, shown in both; the other editions carry it from the release made after she gives it). Every statement in the notice was checked
+  against the code (what is kept and where, when it goes online and to whom, the sealing). The master edition says Draft: it is not legal
+  advice, and a lawyer in the US and the UK reads it before it is final (the law and courts of the licence's clause 18, one US state, the
+  minimum age, which stays a blank). The welcome: "By using Ingenium you accept its terms. Read them". Settings, Security: Read the
+  Privacy notice (r318). window.IngTerms.
+- TERMS.txt and PRIVACY.txt (made from r320's own text) beside LICENCE.txt in the four repositories, and inside the computer apps.
+- rig: `t_737_terms.js` (new, 10 checks).
+
 Ingenium 7.36 (18 November 2026): Security, a room in Settings; Mentes, Studio and Train in one window; Vocatio's Effort row back.
 Her security request (18 November 2026): "I want you to upgrade and enhance Ingenium's security system and embedded software protection.
 I really want everything to be encrypted and protected ... my data is protected and also my code is protected and anything that I build

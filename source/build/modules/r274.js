@@ -197,6 +197,7 @@ function infoOf(list){var info={};list.forEach(function(m){try{info[m.name]=type
 function bestOf(list){try{var b=typeof W.lkBestAdvised==="function"?W.lkBestAdvised(list):"";if(b)return b;}catch(e){}try{if(typeof W.lkBest==="function")return W.lkBest(list);}catch(e){}return (list[0]||{}).name||"";}
 function why(e,b){var m=String(e&&e.message||e||"");if(e&&e.status===401)return e.removed?"This device was removed on that computer. Type its code again.":"The code is not the one that computer shows. Check it there, in Settings, Your devices.";
   if(e&&e.status===429)return "Too many wrong codes were tried from this device. Wait ten minutes, then try again.";
+  if(e&&(e.status===403||e.status===408||e.status===499)&&m)return m;   /* 7.37 (r319): the words refused, no answer, or pairing stopped: said as it is */
   try{if(typeof W.lkWhy0==="function")return W.lkWhy0(e,b);}catch(x){}return m||"It could not be reached.";}
 
 /* ---------- finding the computers on this Wi-Fi ---------- */
@@ -334,7 +335,7 @@ function lenderCol(col){var a=shell();if(!(a&&typeof a.share_status==="function"
   var u=mk("div","ld-plate mr-c3 mr-pop");u.appendChild(mk("div","ld-lbl","Devices using its models"));var ul=mk("div","ld-users");var devs=st.devices||[];
   if(!devs.length)ul.appendChild(mk("div","mr-empty","None yet. A device that pairs shows here by its name, and you can remove it."));
   devs.forEach(function(d){var row=mk("div","ld-user mr-pop"),tx=mk("div");tx.append(mk("b",null,d.name||KIND_WORD[d.kind]||"A device"),mk("small",null,[KIND_WORD[d.kind]||"",ago(d.last)].filter(Boolean).join(" · ")));
-    row.append(coin(ICON[d.kind]?d.kind:"browser",true),tx);if(typeof a.share_device_remove==="function")row.appendChild(key("Remove","",function(){Promise.resolve().then(function(){return a.share_device_remove(d.id);}).then(function(s){LS=s;paint();toast((d.name||"That device")+" is removed. It needs the code again to use this computer's models.");});},"Remove "+(d.name||"this device")));
+    row.append(coin(ICON[d.kind]?d.kind:"browser",true),tx);if(W.IngSealing)W.IngSealing.mark(row,d);/* 7.37: sealed, or Pair once more (r319) */if(typeof a.share_device_remove==="function")row.appendChild(key("Remove","",function(){Promise.resolve().then(function(){return a.share_device_remove(d.id);}).then(function(s){LS=s;paint();toast((d.name||"That device")+" is removed. It needs the code again to use this computer's models.");});},"Remove "+(d.name||"this device")));
     ul.appendChild(row);});u.appendChild(ul);col.appendChild(u);
   /* 6.9.3's settings (r205): memory for lent models, graphics, which models suit this computer, before lending from a laptop */
   var lb=$("lkLend");if(lb){var dl=mk("details","ld-fix mr-c3 mr-pop");dl.appendChild(mk("summary",null,"How this computer lends"));var hold=mk("div","ld-old");hold.appendChild(lb);dl.appendChild(hold);col.appendChild(dl);}}
@@ -357,7 +358,7 @@ function borrowerCol(col){var d=me(),head=mk("div","ld-head");head.append(coin(d
   var act=active();
   comps().forEach(function(comp){var s=(ST[comp.id]||{}).s||"",box=mk("div","ld-comp mr-c3 mr-pop");box.setAttribute("data-lean",".5");var h=mk("div","ld-comp-h"),tx=mk("div");
     tx.append(mk("b",null,comp.name),mk("small",null,plural((comp.models||[]).length,"model","models")+" · "+(KIND_WORD[comp.kind]||"computer")));h.append(coin(comp.kind,true),tx,key("Forget","",function(){forget(comp);},"Forget "+comp.name));box.appendChild(h);
-    var r=mk("div","ld-row");r.appendChild(chip(comp));if(s==="away"||s==="off")r.appendChild(key("Look again","",function(){check(comp,{find:true,loud:true});}));box.appendChild(r);
+    var r=mk("div","ld-row");r.appendChild(chip(comp));if(W.IngSealing)W.IngSealing.markComp(r,comp,function(){doPair(comp.id,comp.base,comp.code,comp.id);});/* 7.37 (r319) */if(s==="away"||s==="off")r.appendChild(key("Look again","",function(){check(comp,{find:true,loud:true});}));box.appendChild(r);
     if(s==="code")box.appendChild(codeRow(comp.id,"Type the code "+comp.name+" shows (Settings, Your devices). You type it once.",function(v){doPair(comp.id,comp.base,v,comp.id);}));
     else if((comp.models||[]).length){var ls=mk("div","ld-lenses");comp.models.slice(0,12).forEach(function(n){ls.appendChild(lensEl(n,comp,act===comp&&(W.state.cloud||{}).model===n));});box.appendChild(ls);}
     col.appendChild(box);});
@@ -408,7 +409,7 @@ function paint(){var c=card();if(!c)return;c.classList.add("ld-on");var root=c.q
   while(root.firstChild)root.removeChild(root.firstChild);   /* 6.80: an older web view has no replaceChildren */root.appendChild(mk("p","ld-say","Pair a device once with your computer's code. From then on it finds the computer by itself, at any address, and Claude or any other service stays as it is."));
   var cols=mk("div","ld-cols"),A=mk("div","ld-col"),B=mk("div","ld-col");if(shell()&&typeof shell().share_status==="function"){lenderCol(A);cols.appendChild(A);}borrowerCol(B);cols.appendChild(B);root.appendChild(cols);
   if(focus){var f=$(focus);if(f)try{f.focus({preventScroll:true});}catch(e){}}}
-function lenderRefresh(){var a=shell();if(!(a&&typeof a.share_status==="function"))return;Promise.resolve().then(function(){return a.share_status();}).then(function(st){var s=JSON.stringify(st&&[st.on,st.code,st.addresses,st.model_names,(st.devices||[]).map(function(d){return [d.id,d.name,d.kind,ago(d.last)];}),st.firewall,st.error]);
+function lenderRefresh(){var a=shell();if(!(a&&typeof a.share_status==="function"))return;Promise.resolve().then(function(){return a.share_status();}).then(function(st){var s=JSON.stringify(st&&[st.on,st.code,st.addresses,st.model_names,(st.devices||[]).map(function(d){return [d.id,d.name,d.kind,ago(d.last),d.sealed,d.legacy];}),st.firewall,st.error]);
   LS=st;if(s!==LSIG){LSIG=s;try{if(typeof W.lkHostPaint==="function")W.lkHostPaint(st);}catch(e){}paint();}},function(){});}
 
 /* ---------- the top bar's menu: the paired computers' models, as rows ---------- */

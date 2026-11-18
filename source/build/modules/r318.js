@@ -194,14 +194,14 @@ function flushLog(){if(!PEND.length||(lockActive()&&!lockOn()))return;var p=PEND
 var ICON={lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',disk:'<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M7 15h.01M10 15h7"/>',
   wifi:'<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a5 5 0 0 1 6.4 0"/><circle cx="12" cy="19.2" r="1.2"/>',code:'<path d="M8.5 8L4.5 12l4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/>',
   self:'<path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/>',more:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/>'};
-var NEXT="7.37";
+var NEXT="7.38";
 /* 7.36: the room says only what this copy has: Fabrica and Vocatio are not in the gift and demo editions, and Ingenium itself is the
    owner's own build only in the master edition (rig/t_627_editions) */
 function hasPg(id){return !!D.getElementById("page-"+id);}
 function mine(){return edition()==="master";}
 function items(){var c=cfg(),on=lockOn();
   return [{k:"device",t:"Sealed on this device",s:on?"on":"off"},{k:"device",t:"Backups sealed whole",s:on?"on":"off"},
-    {k:"disk",t:"Sealed on the computer's disk",s:"soon"},{k:"wifi",t:"Sealed between your devices",s:"soon"},
+    {k:"disk",t:"Sealed on the computer's disk",s:"soon"},{k:"wifi",t:"Sealed between your devices",s:W.IngSealing?IngSealing.state():"soon"},
     ].concat(hasPg("fabrica")?[{k:"code",t:"Your apps' sources sealed in Fabrica",s:on?"on":"off"}]:[],[{k:"code",t:"Your apps signed when shipped",s:"soon"},{k:"code",t:"Your apps' code scrambled",s:"soon"},
     {k:"self",t:"Ingenium itself, signed and checked",s:"soon"},
     {k:"more",t:"Offline only",s:c.offline?"on":"off"},{k:"more",t:"Lock when the computer sleeps",s:c.sleep&&on?"on":"off"},{k:"more",t:"Slow down wrong passwords",s:c.slow&&lockActive()?"on":"off"},
@@ -216,7 +216,7 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".sc-body");if(
   var h='<div class="sc-subs" role="tablist">'+subs.map(function(s){return '<button type="button" class="sc-sub" role="tab" data-v="'+s[0]+'" aria-selected="'+(VIEW===s[0])+'">'+esc(s[1])+'</button>';}).join("")+'</div>';
   if(VIEW==="all"){h+='<div class="sc-over"><div class="sc-shield" aria-hidden="true"><svg viewBox="0 0 120 136"><defs><linearGradient id="scg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a62d6"/><stop offset=".55" stop-color="#5d37a1"/><stop offset="1" stop-color="#3a2070"/></linearGradient><linearGradient id="sch" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><path d="M60 4l50 18v38c0 32-21 58-50 72C31 118 10 92 10 60V22z" fill="url(#scg)"/><path d="M60 4l50 18v38c0 32-21 58-50 72z" fill="#000" opacity=".16"/><path d="M60 4l50 18v18C80 36 40 50 10 40V22z" fill="url(#sch)"/><path d="M42 66l13 13 25-27" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
       +'<div><div class="sc-big">'+nOn+' of '+(it.length-nSoon)+' protections on</div><div class="sc-bars">'+it.map(function(x){return '<i class="'+(x.s==="on"?"on":x.s==="soon"?"soon":"")+'" title="'+esc(x.t)+'"></i>';}).join("")+'</div>'
-      +'<p class="sc-fine">'+(lockOn()?"":"Your sign-in is off: turn it on, and most of the rest turns on with it. ")+nSoon+' more come in the next releases, from '+NEXT+'; each says Not yet until it is here.</p></div></div>'
+      +'<p class="sc-fine">'+(lockOn()?"":"Your sign-in is off: turn it on, and most of the rest turns on with it. ")+nSoon+' more come in the next releases, from '+NEXT+'; each says Not yet until it is here.</p>'+(W.IngTerms?'<div class="sc-keys"><button type="button" class="sc-key lav" data-a="privacy">Read the Privacy notice</button></div>':'')+'</div></div>'
       +'<div class="sc-list">'+it.map(function(x){return '<button type="button" class="sc-it" data-go="'+x.k+'"><i class="sc-dot'+(x.s==="on"?"":x.s==="soon"?" soon":" off")+'"></i><span>'+esc(x.t)+'</span>'+chip(x.s)+'</button>';}).join("")+'</div>'
       +'<div class="sc-keys" style="margin-top:12px">'+(lockOn()?'<button type="button" class="sc-key pri" data-a="lock">Lock now</button>':'<button type="button" class="sc-key pri" data-a="protect">Protect this copy</button>')+'<button type="button" class="sc-key lav" data-a="check">Check everything</button></div>';}
   var P=function(k,ic,t,sub,st,body){return '<section class="sc-p" data-k="'+k+'" aria-expanded="'+(VIEW!=="all"?"true":"false")+'"><button type="button" class="sc-ph"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ICON[ic]+'</svg></span><span class="tx"><b>'+esc(t)+'</b><small>'+esc(sub)+'</small></span>'+st+'<span class="chev">›</span></button><div class="sc-pb"'+(VIEW!=="all"?"":" hidden")+'>'+body+'</div></section>';};
@@ -230,7 +230,7 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".sc-body");if(
     +'<div class="sc-well"><div class="sc-wh"><b>At first start</b><span class="sc-chip ok">On</span></div><p>Every new copy asks you to protect it, after the welcome and the tour. A demonstration copy does not ask.</p></div>'));
   sections.push(P("disk","disk","Sealed on the computer's disk","What the computer apps keep in files of their own",chip("soon"),
     '<p>'+(hasPg("fabrica")?"Fabrica\'s runs and their logs, apps waiting for your devices, Fabrica apps kept on a drive, the folder search\'s index and texts for training":"The folder search\'s index and texts for training")+': sealed with the same password, opened only in the computer app\'s memory while you are signed in. Planned for '+NEXT+': the computer apps need an encryption library they do not carry yet.</p><p class="sc-fine">Kept readable on purpose, then too: an app you serve for the Home Screen (Safari has to read it), and your model files.</p>'));
-  sections.push(P("wifi","wifi","Sealed between your devices","Every message on your Wi-Fi, sealed end to end",chip("soon"),
+  sections.push(P("wifi","wifi","Sealed between your devices","Every message on your Wi-Fi, sealed end to end",chip(W.IngSealing?IngSealing.state():"soon"),W.IngSealing?(IngSealing.describe().map(function(t){return "<p>"+esc(t)+"</p>";}).join("")+'<p class="sc-fine">Sealed with AES-GCM (256-bit), under a key the two devices agreed on (ECDH P-256) and never sent; the four words show that no one in between swapped the keys. Not sealed yet: a computer calling in to another (call-ins), which still uses the code.</p>'):
     '<p>When two of your devices pair, they will agree on a key of their own, and every message between them ('+(hasPg("fabrica")?"models lent, apps sent, runs and logs":"models lent and borrowed")+') is sealed with it. Planned for '+NEXT+'; until then the pairing code alone guards them, as before, and a device paired before then pairs once more.</p>'));
   var FB=hasPg("fabrica");
   sections.push(P("code","code","Your code and apps",FB?"What Fabrica ships, and your sources in it":"What you make and ship",FB?chip(lockOn()?"on":"off"):chip("soon"),
@@ -264,7 +264,7 @@ function wire(b){[].forEach.call(b.querySelectorAll(".sc-sub"),function(t){t.onc
 function openLock(){try{W.go("settings");}catch(e){}try{if(W.IngRooms)IngRooms.open("settings","data",true);}catch(e){}try{if(W.IngSettingsParts)IngSettingsParts.show("data","lock");}catch(e){}
   setTimeout(function(){var c=$("ingLockCard");if(c)try{c.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}},300);}
 function protect(){openLock();setTimeout(function(){var k=[].filter.call(D.querySelectorAll("#ingLockCard button"),function(b){return /Protect this copy/.test(b.textContent);})[0];if(k)k.click();},500);}
-function act(a){if(a==="lock"){try{L().lockNow("press");}catch(e){}return;}if(a==="protect"){protect();return;}if(a==="open"){openLock();return;}
+function act(a){if(a==="lock"){try{L().lockNow("press");}catch(e){}return;}if(a==="protect"){protect();return;}if(a==="open"){openLock();return;}if(a==="privacy"){try{W.IngTerms.show("privacy");}catch(e){}return;}
   if(a==="check"){var it=items(),on=it.filter(function(x){return x.s==="on";}).length,off=it.filter(function(x){return x.s==="off";}).map(function(x){return x.t;});
     toast(on+" protections on"+(off.length?"; off: "+off.join(", ")+".":", none off.")+" "+it.filter(function(x){return x.s==="soon";}).length+" come in the next releases.");}}
 
