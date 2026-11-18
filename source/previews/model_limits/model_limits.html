@@ -1,0 +1,183 @@
+<title>Ingenium Model Settings</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one model, five places that run it (Chat, Code, Lector, Vocatio, Fabrica), each with the same small key beside the model;
+   pressed, it opens Reply, Memory and Effort; beside, the record of every change and of any reset. Values as the approved previews. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --body:#2b2438; --acc:#6a3fb5; --ok:#2f7a55; --warn:#9a5a12; --bad:#b8433f;
+  --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86;
+  --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 8px 14px rgba(52,24,100,.12);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -3px 5px rgba(60,30,90,.16),0 1px 1px rgba(40,20,70,.3),0 3px 4px rgba(40,20,70,.24),0 6px 9px rgba(40,20,70,.18),0 12px 20px rgba(40,20,70,.12);
+  --ck-hi:inset 0 1.5px 0 #fff,inset 0 -3px 5px rgba(60,30,90,.14),0 3px 4px rgba(40,20,70,.24),0 9px 16px rgba(40,20,70,.2),0 16px 26px rgba(40,20,70,.14);
+  --lav-t:rgba(106,63,181,.14); --lav-c:#6a3fb5; --sky-t:rgba(74,160,240,.16); --sky-c:#2f6fd0; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --rub-t:rgba(200,20,60,.1); --rub-c:#b8433f;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --body:#e8e0f3; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a; --bad:#f08a86;
+  --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --body:#e8e0f3; --acc:#b79ce6; --ok:#7fd1a6; --warn:#e6b26a; --bad:#f08a86;
+  --line:rgba(205,184,240,.11); --well:#1c1626;
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33);
+  --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.3);
+  --ck-sh:inset 0 1.5px 0 rgba(255,255,255,.16),inset 0 -3px 5px rgba(0,0,0,.45),0 1px 1px rgba(0,0,0,.65),0 3px 4px rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.45),0 12px 20px rgba(0,0,0,.32);
+  --ck-hi:inset 0 1.5px 0 rgba(255,255,255,.2),inset 0 -3px 5px rgba(0,0,0,.4),0 3px 4px rgba(0,0,0,.6),0 9px 16px rgba(0,0,0,.5),0 16px 26px rgba(0,0,0,.4);
+  --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6; --sky-t:rgba(124,196,255,.15); --sky-c:#7cc4ff; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --rub-t:rgba(240,120,120,.14); --rub-c:#f08a86;
+  color-scheme:dark}
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{background:var(--bg);color:var(--body);font:14px/1.5 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font:600 25px/1.5 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:-6px 0 0;color:var(--ink2);max-width:70ch}
+.note-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+button{font:inherit;color:inherit;cursor:pointer}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+/* tabs, as Settings has them */
+.bar{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--card-sh);padding:14px 16px;display:flex;flex-direction:column;gap:12px;transition:transform .26s var(--spring),box-shadow .26s}
+.bar:hover{transform:translateY(-1.5px);box-shadow:var(--card-hi)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink2);font:600 13px/1.25 var(--sans);padding:7px 14px 7px 11px;border-radius:11px;transition:transform .16s var(--bounce),box-shadow .16s}
+.tab:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.tab[aria-selected="true"]{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh);color:#fff}
+.tab.sub{font-size:12.8px;border-radius:12px;padding:6px 14px 6px 10px}
+.tab svg{width:15px;height:15px}
+.new{font:700 9.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;background:var(--amb-t);color:var(--amb-c);padding:3px 6px;border-radius:999px}
+.tab[aria-selected="true"] .new{background:rgba(255,255,255,.22);color:#fff}
+.hint{margin:0;color:var(--ink3);font-size:13px}
+/* the room */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+@media (max-width:980px){.stage{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--card-sh);padding:16px;transition:transform .2s var(--bounce),box-shadow .2s;animation:rise .36s var(--spring) backwards}
+.card:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.card h2{font:600 16.5px/1.4 var(--serif);color:var(--ink1);margin:0}
+.card h3{font:600 15px/1.4 var(--serif);color:var(--ink1);margin:0}
+.chip{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:5px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{background:var(--emr-t);color:var(--emr-c)} .chip.sky{background:var(--sky-t);color:var(--sky-c)} .chip.amb{background:var(--amb-t);color:var(--amb-c)} .chip.lav{background:var(--lav-t);color:var(--lav-c)}
+.head{display:flex;gap:12px;align-items:flex-start}
+.coin{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:var(--key-bg);box-shadow:var(--ck-sh);color:var(--acc);transition:transform .45s var(--spring)}
+.coin:hover{transform:rotate(-6deg) scale(1.05)}
+.coin svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.key{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font:600 12.5px/1 var(--sans);transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)} .key:active{transform:translateY(1px)}
+.key:focus-visible,.tab:focus-visible,.mk:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* the page, as each place shows its model */
+.place{display:grid;gap:12px}
+.bar2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:var(--well);border:1px solid var(--line)}
+.model{display:inline-flex;align-items:center;gap:8px;font:600 13px/1.2 var(--sans);color:var(--ink1);padding:7px 12px;border-radius:10px;background:var(--key-bg);box-shadow:var(--key-sh);transition:transform .3s var(--bounce)}
+.model:hover{transform:translateY(-2px)}
+.model i{width:8px;height:8px;border-radius:50%;background:var(--emr-c)}
+.mk{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--lav-t);border-radius:10px;padding:6px 11px;background:linear-gradient(var(--lav-t),var(--lav-t)),var(--key-bg);color:var(--lav-c);font:600 12.3px/1.2 var(--sans);box-shadow:var(--key-sh);transition:transform .3s var(--bounce),box-shadow .2s;cursor:pointer}
+.mk:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.mk b{font-weight:700;color:inherit;font-variant-numeric:tabular-nums}
+.mk span.sep{opacity:.5}
+.ask{border-radius:14px;padding:12px 14px;background:var(--card);border:1px solid var(--line);color:var(--ink3);font-size:13px}
+/* the small sheet */
+.pop{border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-hi);padding:14px;display:grid;gap:12px;max-width:440px;animation:rise .3s var(--spring) both}
+.pop h3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.row3{display:grid;grid-template-columns:76px minmax(0,1fr) 74px;gap:10px;align-items:center}
+.row3.eff{grid-template-columns:76px minmax(0,1fr)}
+.row3 label{font:600 12.5px/1.2 var(--sans);color:var(--ink2)}
+.row3 output{font:600 13px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink1);text-align:right}
+.row3 input[type=range]{width:100%;accent-color:var(--acc)}
+.fine{margin:0;color:var(--ink3);font-size:12.3px;line-height:1.5}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);border-radius:9px;padding:6px 10px;font:600 12px/1 var(--sans);color:var(--ink2);transition:transform .25s var(--bounce)}
+.seg button:hover{transform:translateY(-2px)}
+.seg button[aria-pressed="true"]{background:var(--pri-bg);border-color:var(--pri-line);color:#fff;box-shadow:var(--pri-sh)}
+/* the record */
+.log{display:grid;gap:8px}
+.ent{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;padding:9px 11px;border-radius:12px;background:var(--well);border:1px solid var(--line);transition:transform .3s var(--spring)}
+.ent:hover{transform:translateX(3px)}
+.ent time{font:600 11.5px/1.4 var(--sans);color:var(--ink3);font-variant-numeric:tabular-nums}
+.ent b{color:var(--ink1);font-weight:650}
+.ent small{grid-column:2;color:var(--ink3);font-size:12px}
+.ent.amb{background:var(--amb-t);border-color:transparent}
+.ent.amb b{color:var(--amb-c)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="note-top">
+    <div><h1>One setting for each model</h1><p class="lede">A preview for Ingenium 7.39. Each model keeps one Reply, Memory and Effort. Every place that runs it shows the same small key beside it, and a change made in one place is the change everywhere. A record keeps every change and catches any reset, with the place that made it.</p></div>
+    <div class="row"><button type="button" class="key" id="theme">Night</button><button type="button" class="key" id="again">Start again</button></div>
+  </div>
+
+  <div class="bar">
+    <div class="row" role="tablist" aria-label="Places that run a model" id="places"></div>
+    <p class="hint" id="placeHint"></p>
+  </div>
+
+  <div class="stage">
+    <div class="col">
+      <div class="card place">
+        <div class="bar2"><span class="model"><i></i>Qwen3.5 9B</span><button type="button" class="mk" id="mk" aria-expanded="false" title="Reply, Memory and Effort for Qwen3.5 9B"><span>Reply <b id="mkR"></b></span><span class="sep">·</span><span>Memory <b id="mkM"></b></span><span class="sep">·</span><span>Effort <b id="mkE"></b></span></button></div>
+        <div class="pop" id="pop" hidden>
+          <h3><span>Qwen3.5 9B</span><span class="chip ok">The same in every place</span></h3>
+          <div class="row3"><label for="r">Reply</label><input id="r" type="range" min="256" max="32768" step="256"><output id="rO"></output></div>
+          <p class="fine">The longest answer it may write, in tokens. A task that needs more still gets what it needs.</p>
+          <div class="row3"><label for="m">Memory</label><input id="m" type="range" min="2048" max="131072" step="1024"><output id="mO"></output></div>
+          <p class="fine">How much of the conversation it holds at once (its context), up to what the model was trained for: 131,072 here. A new memory takes effect when the model next loads.</p>
+          <div class="row3 eff"><label>Effort</label><div class="seg" id="eff"></div></div>
+          <p class="fine">Kept on this device for this model, over restarts and updates. Never set to zero: a lost or broken value is mended to its last good one, and the record says so.</p>
+        </div>
+        <div class="ask" id="ask"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card"><h3>Every change, and any reset</h3><p class="fine" style="margin:4px 0 10px">Settings, Models and AI, beside each model. The newest first.</p><div class="log" id="log"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var PLACES=[["Chat","the message box"],["Code","a coding session"],["Lector","reading and writing"],["Vocatio","an application"],["Fabrica","the workshop's assistant"]];
+  var EFF=["Low","Medium","High","Extra","Max"];
+  var S,LOG,here;
+  function fmt(n){return n.toLocaleString("en-GB");}
+  function now(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);}
+  function reset(){S={r:4096,m:16384,e:2};here=0;LOG=[{t:"09:12",a:true,b:"A reset caught",s:"Code asked for Reply 0. It was put back to 4,096, the last good value."},{t:"09:05",b:"Memory 8,192 to 16,384",s:"in Lector"}];paint();}
+  function paint(){
+    $("places").innerHTML=PLACES.map(function(p,i){return '<button type="button" class="tab sub" role="tab" aria-selected="'+(i===here)+'" data-i="'+i+'">'+p[0]+'</button>';}).join("");
+    [].forEach.call(document.querySelectorAll("#places .tab"),function(t){t.onclick=function(){here=+t.getAttribute("data-i");paint();};});
+    $("placeHint").textContent=PLACES[here][0]+": the model, and the same key beside it, as in every other place.";
+    $("ask").textContent="Here, "+PLACES[here][1]+" runs Qwen3.5 9B with Reply "+fmt(S.r)+", Memory "+fmt(S.m)+" and Effort "+EFF[S.e]+".";
+    $("mkR").textContent=fmt(S.r);$("mkM").textContent=fmt(S.m);$("mkE").textContent=EFF[S.e];
+    $("r").value=S.r;$("rO").textContent=fmt(S.r);$("m").value=S.m;$("mO").textContent=fmt(S.m);
+    $("eff").innerHTML=EFF.map(function(x,i){return '<button type="button" aria-pressed="'+(i===S.e)+'" data-e="'+i+'">'+x+'</button>';}).join("");
+    [].forEach.call(document.querySelectorAll("#eff button"),function(b){b.onclick=function(){var v=+b.getAttribute("data-e");if(v!==S.e){note("Effort "+EFF[S.e]+" to "+EFF[v]);S.e=v;paint();}};});
+    $("log").innerHTML=LOG.map(function(x){return '<div class="ent'+(x.a?" amb":"")+'"><time>'+x.t+'</time><b>'+x.b+'</b><small>'+x.s+'</small></div>';}).join("");}
+  function note(b){LOG.unshift({t:now(),b:b,s:"in "+PLACES[here][0]+", and so in every place"});}
+  var tm=null;
+  $("r").oninput=function(){var v=+this.value;$("rO").textContent=fmt(v);clearTimeout(tm);tm=setTimeout(function(){if(v!==S.r){note("Reply "+fmt(S.r)+" to "+fmt(v));S.r=v;paint();}},350);};
+  $("m").oninput=function(){var v=+this.value;$("mO").textContent=fmt(v);clearTimeout(tm);tm=setTimeout(function(){if(v!==S.m){note("Memory "+fmt(S.m)+" to "+fmt(v));S.m=v;paint();}},350);};
+  $("mk").onclick=function(){var p=$("pop");p.hidden=!p.hidden;this.setAttribute("aria-expanded",String(!p.hidden));};
+  $("again").onclick=reset;
+  var root=document.documentElement;function dark(){var t=root.getAttribute("data-theme");return t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches;}
+  function lab(){$("theme").textContent=dark()?"Day":"Night";}$("theme").onclick=function(){root.setAttribute("data-theme",dark()?"light":"dark");lab();};lab();
+  reset();$("pop").hidden=false;$("mk").setAttribute("aria-expanded","true");
+})();
+</script>
