@@ -395,7 +395,8 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.46 (19 November 2026): no film behind a panel or a popup, and the profile key in the left menu.
+Ingenium 7.46 (19 November 2026): no film behind a panel or a popup, the profile key in the left menu, Fabrica's stage 1, and none of her apps
+outside her own profile of the master edition.
 
 Her words (19 November 2026): "Please remove the weird film that covers the background when a panel or popup is opened, I don't like how
 it looks. I have made similar requests in the past regarding Fabrica, please make the fix. I also want the profile toggle entirely removed
@@ -419,6 +420,30 @@ appropriate." And: "Do not change anything that I haven't asked you to change, o
   Fabrica; the model's tools fabrica_status, fabrica_diff, keep_version, fabrica_pull_request; Chat reads a repository (repo_files,
   repo_read) and Continue in Code changes it. Code's start cards and Chat's + menu rows raised and lifting, no violet wash.
   `rig/t_746_repo_work.js` 17/17, `rig/t_746_session_app.py` 15/15.
+- None of her apps outside her own profile of the master edition. Her words (19 November 2026): "Ingenium is still built into the app library
+  for the full edition, this is unacceptable. I do not want any of my apps built-in any editions outside of the master edition. Ingenium
+  itself is not exempt from that ... They should be starting the app fresh as a new user and none of my apps (Ingenium included) should be
+  coming up on there unless I upload them on there. If they aren't me then Ingenium or any of them should [not] show up on the "Your apps"
+  section in Fabrica. For some reason Carpe Diem and Inkwell are showing up on the Folders page in the "Your apps" section, the same for the
+  chat pages and any other pages with that issue on Ingenium."
+  Found, in the running pages: the full edition kept a copy of its own page in the app library on first start (r120's keepSelf, "Lector and
+  the app library know Ingenium alone" since 6.27), so Ingenium was listed on Home, in Fabrica, Lector and the chat's + menu; that menu's
+  One of your apps named "Carpe Diem, the Forge, Inkwell, Ingenium" while the library was empty; Folders' Your apps offered the projects a
+  CV names and the apps Lector read, which, for work brought in from the master (7.45), are hers; and another person's profile on her
+  master copy (R331, meant to be the full edition) showed her four apps on Home's plaque, in Lector, Code's start window and the + menu.
+  Now: `modules/r120.js` keeps nothing outside the master, itself included; `editions.py` `_full_apps`: LIB_KEYS and Lector's ORDER empty;
+  `modules/r240.js`: Lakay listed by name in the master only; `modules/r208.js`: outside the master, Folders offers only the apps added in
+  that copy (its library and Fabrica), with words for each edition; `build_page.py`: the + menu names her apps in her own profile only
+  (and `editions.py` takes those words out of the other editions); `modules/r108.js` (Lector's list), `modules/r147.js` (Home's plaque:
+  Ingenium's seal and name) and `modules/r222.js` (What is new: no line naming her apps) in another person's profile; `modules/r336.js`
+  (`editions.GUEST_ONLY`, left out of the other editions, never owner-only): in another person's profile, the library knows no app by
+  name and every sentence that names her apps is said as the full edition says it, never in what the person writes. A page the person adds
+  is listed, whatever app it is (modules/r240.js). Her own work brought into the full edition stays hers (7.45); only her apps' lists go.
+  `rig/t_746_no_apps.js`: a fresh start, work brought in from the master, and a page added, on each edition and in another person's profile,
+  with her own profile as the control.
+- Held for her preview: `build/modules/r335.js`, Code's start window in Vocatio's raised drop zone (her words: "give the new Code panel for
+  Fabrica the same raised 3D effect as the "Drop your files" section of the Vocatio page"): the drop zone's own values (r283, r188's tokens)
+  on each card, by day and by night (held.json "held_747").
 
 Ingenium 7.45 (19 November 2026): the full edition without the owner's material, bringing in the master's work, and the editions' Windows installers.
 

@@ -51,11 +51,18 @@ def name():
     return e
 
 
+# 7.46: the modules for another person's profile on her master copy only (R331: that profile is the full edition, but its page is hers,
+# which names her apps where the other editions' pages do not). Every other edition leaves them out, its own page already saying it so;
+# build_page.py runs them in every profile (they act only in another person's), never as the owner's own (_OWNER_ONLY)
+GUEST_ONLY = {"r336.js"}  # 7.46: another person's profile names none of her apps
+
+
 # the modules an edition leaves out
 def skip_modules(ed):
     if ed == "master":
         return {"r231.js"}  # 6.27: the public editions' own pages
-    out = {"r126.js"}  # Lector's recipe: the owner's rules, verified sources and kinds of document
+    out = set(GUEST_ONLY)
+    out |= {"r126.js"}  # Lector's recipe: the owner's rules, verified sources and kinds of document
     out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
     out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
@@ -274,6 +281,9 @@ def _blank(ed="gift"):
          "Guide: the 6.69 news, Ingenium's seal alone", 1),
         ('return n==="carpe diem"?"cd":/^(the )?forge$/.test(n)?"forge":n==="ingenium"?"ingenium":n==="inkwell"?"inkwell":null;}',
          'return n==="ingenium"?"ingenium":null;}', "Folders: Ingenium's seal alone", 1),
+        # 7.46: the chat's + menu, One of your apps, with nothing kept yet (build_page.py chooses at run time; here the master's words go)
+        ('n?(n+" kept on this device"):(ING_EDITION==="master"?"Carpe Diem, the Forge, Inkwell, Ingenium":"None kept yet: add yours in Lector")',
+         'n?(n+" kept on this device"):"None kept yet: add yours in Lector"', "the + menu: no app of hers named", 1),
     ]
     if not desk:  # their words left the page with the apps (modules r118 and r123)
         E = [e for e in E if e[2] not in ("Tabula: what it is", "Abacus: what it is", "Tabula and Abacus: what they are",
@@ -470,12 +480,17 @@ def _fixed_name():
 
 
 def _full_apps():
-    """6.27, the full edition: none of the owner's other apps by name. Lector and the app library know Ingenium alone (her words:
-    "it will not have any of the apps from the Offline Project built in and it will not have their skills and information")."""
+    """6.27, the full edition: none of the owner's other apps by name (her words: "it will not have any of the apps from the Offline
+    Project built in and it will not have their skills and information"). Until 7.45 Lector and the app library knew Ingenium alone,
+    and the library kept a copy of the page itself on first start. 7.46, her words (19 November 2026): "Ingenium is still built into
+    the app library for the full edition, this is unacceptable. I do not want any of my apps built-in any editions outside of the
+    master edition. Ingenium itself is not exempt from that ... none of my apps (Ingenium included) should be coming up on there unless
+    I upload them on there." So the library and Lector know no app by name, and keep none on first start (modules/r120.js keeps
+    nothing outside the master): a page the person adds, whatever app it is, is kept as any other app (modules/r240.js)."""
     return [
-        ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=["ingenium"],', "the app library: Ingenium alone", 1),
-        # 6.42: any other app the person adds follows Ingenium in Lector (r108's syncApps, modules/r240.js)
-        ('var ORDER=["cd","forge","ingenium","inkwell"];\n/* 6.42: any app, not only her four.', 'var ORDER=["ingenium"];\n/* 6.42: any app, not only her four.', "Lector's apps: Ingenium alone (r108; r140's seals keep all four)", 1),
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=[],', "the app library: no app built in, Ingenium included", 1),
+        # 6.42: any app the person adds is listed in Lector (r108's syncApps, modules/r240.js)
+        ('var ORDER=["cd","forge","ingenium","inkwell"];\n/* 6.42: any app, not only her four.', 'var ORDER=[];\n/* 6.42: any app, not only her four.', "Lector's apps: none built in (r108; r140's seals keep all four)", 1),
     ]
 
 

@@ -95,7 +95,22 @@ function makeFolder(name,parts){name=String(name||"").trim().slice(0,80);if(!nam
   var p={id:"pj"+uid(""),name:name,instructions:"",files:[],kind:"app",app:{words:[name].concat((parts||[]).filter(Boolean)),how:"",brief:"",briefAt:0,model:"",read:{},decisions:[],open:[],sugg:[],made:Date.now()}};
   projects().push(p);save();return p;}
 /* the apps her profile names: the Career Studio's entries of projects (their place, "Carpe Diem and The Forge"), and the apps Lector has read */
+function mineEd(){try{return typeof ING_EDITION!=="string"||ING_EDITION==="master";}catch(e){return true;}}
+/* the Your apps card's words: in the master, from her profile; elsewhere, from what is added in this copy (and no word of Fabrica where there is none) */
+function appsWords(){var fab=false;try{fab=typeof ING_HAS==="function"&&ING_HAS("fabrica");}catch(e){}
+  if(mineEd())return {lead:"Ingenium starts from the apps your profile names. Untick any that should have no folder, add any that is missing, then make them. You can add a folder for a new app at any time.",
+    none:"Your profile names no apps yet (Vocatio's entries of projects). Name them here."};
+  if(fab)return {lead:"Ingenium starts from the apps you have added here, in your app library and in Fabrica. Untick any that should have no folder, add any that is missing, then make them. You can add a folder for a new app at any time.",
+    none:"No app is added here yet. Name yours here, or add one in Fabrica first."};
+  return {lead:"Name each app you work on, then make its folder. You can add a folder for a new app at any time.",none:"No apps are named yet. Name them here."};}
 function profileApps(){var out=[],seen={};function add(n,why){n=String(n||"").replace(/\s+/g," ").trim().replace(/^the\s+(?=[A-Z])/,"The ");if(!n||n.length>60||/^\[|\]$/.test(n))return;var k=n.toLowerCase();if(seen[k])return;seen[k]=1;out.push({name:n,why:why});}
+  /* 7.46, her words (19 November 2026): "For some reason Carpe Diem and Inkwell are showing up on the Folders page in the "Your apps"
+     section ... none of my apps (Ingenium included) should be coming up on there unless I upload them on there." Outside the master
+     edition (and in another person's profile), the apps offered are only those added in this copy: its app library and Fabrica. Not the
+     projects a CV names, nor what Lector read before this copy (brought in from the master, they named her apps). */
+  if(!mineEd()){try{(typeof W.libApps==="function"?W.libApps():[]).forEach(function(m){add(m.title||m.key,"In your app library");});}catch(e){}
+    try{((W.fbHubHost&&W.fbHubHost.C&&W.fbHubHost.C.repos)||[]).forEach(function(r){add(r.name,"In Fabrica");});}catch(e){}
+    return out;}
   try{var r=W.state.career,P=r&&r.people&&r.people.filter(function(x){return x.id===r.cur;})[0];P=P&&P.profile;
     (P&&P.items||[]).forEach(function(it){if(it.sec!=="project")return;String(it.place||"").split(/\s*,\s*|\s+and\s+|\s*&\s*/).forEach(function(n){add(n,"In your profile: "+(it.title||"a project")+(it.from?", "+it.from+(it.to?" to "+it.to:""):""));});});}catch(e){}
   try{(W.lxState&&W.lxState().runs||[]).forEach(function(rn){if(rn.kind==="app"&&rn.name)add(rn.name,"Read by Lector");});}catch(e){}
@@ -222,9 +237,9 @@ function paint(){var host=$("fldBody");if(!host)return;var G=F(),open=G.ui.open?
   if(open)folderView(open,host);else homeView(host);}
 function status(host){if(!RUN.busy)return;host.appendChild(h("p","fld-status",'<i class="fld-spin" aria-hidden="true"></i>'+esc(RUN.what)));}
 function homeView(host){var fs=folders();status(host);
-  if(!fs.length){var c=card("Your apps","Ingenium starts from the apps your profile names. Untick any that should have no folder, add any that is missing, then make them. You can add a folder for a new app at any time.");
+  if(!fs.length){var aw=appsWords(),c=card("Your apps",aw.lead);
     var list=profileApps(),pick=h("div","fld-pick"),boxes=[];
-    if(!list.length)pick.appendChild(h("p","small muted",esc("Your profile names no apps yet (Vocatio's entries of projects). Name them here.")));
+    if(!list.length)pick.appendChild(h("p","small muted",esc(aw.none)));
     list.forEach(function(x){var l=h("label"),cb=h("input");cb.type="checkbox";cb.checked=true;l.appendChild(cb);l.appendChild(h("span",null,"<b>"+esc(x.name)+"</b> <small>"+esc(x.why)+"</small>"));pick.appendChild(l);boxes.push([cb,x.name]);});
     c.appendChild(pick);var more=h("input");more.type="text";more.placeholder="Another app's name";more.setAttribute("aria-label","Another app's name");more.className="fld-more";
     var row=h("div","fld-row");row.appendChild(more);row.appendChild(key("","Add it",function(){var v=more.value.trim();if(!v)return;var l=h("label"),cb=h("input");cb.type="checkbox";cb.checked=true;l.appendChild(cb);l.appendChild(h("span",null,"<b>"+esc(v)+"</b> <small>Added by you</small>"));pick.appendChild(l);boxes.push([cb,v]);more.value="";}));c.appendChild(row);

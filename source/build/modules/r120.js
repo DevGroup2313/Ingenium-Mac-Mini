@@ -19,6 +19,12 @@
 var BI=/*R120_BUILTIN*/null;
 /* 7.44 (r331): another person's profile carries none of her built-in apps, as the full edition carries none */
 if(window.__ingGuest)BI=null;
+/* 7.46, her words (19 November 2026): "Ingenium is still built into the app library for the full edition, this is unacceptable. I do
+   not want any of my apps built-in any editions outside of the master edition. Ingenium itself is not exempt from that ... They should
+   be starting the app fresh as a new user and none of my apps (Ingenium included) should be coming up on there unless I upload them on
+   there." So no edition but the master keeps anything in the app library on first start, not even a copy of itself: the library of
+   the full edition holds only the pages the person adds. */
+if(typeof ING_EDITION==="string"&&ING_EDITION!=="master")BI=null;
 if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
 var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay */
 

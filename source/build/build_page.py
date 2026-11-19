@@ -1358,6 +1358,14 @@ edit('var ING_EDITION="master";\nvar ING_HAS=',
      'var ING_EDITION="master";\nif(window.__ingGuest&&ING_EDITION==="master")ING_EDITION="full";  /* R331: another person\'s profile is the full edition */\nvar ING_HAS=',
      "R331 another person's profile in the master copy is the full edition")
 
+# ---- 7.46 (19 November 2026): the chat's + menu, One of your apps, names her apps only in her own profile of the master edition. Her
+#      words: "none of my apps (Ingenium included) should be coming up on there unless I upload them on there ... the same for the chat
+#      pages". With nothing kept yet, another person's profile (the full edition, R331) says how to add one; editions.py takes the
+#      master's words out of the other editions' page altogether ----
+edit('n?(n+" kept on this device"):"Carpe Diem, the Forge, Inkwell, Ingenium"',
+     'n?(n+" kept on this device"):(ING_EDITION==="master"?"Carpe Diem, the Forge, Inkwell, Ingenium":"None kept yet: add yours in Lector")',
+     "7.46 the + menu's One of your apps names her apps in her own profile only")
+
 # ---- 6.32 (6 November 2026): the app library sealed with the lock. Her words: "I want you to encrypt Ingenium and everything inside
 #      of it." With the lock on (modules/r197.js), a page kept in the library's store (IndexedDB ingenium_apps) is sealed as bytes
 #      before it is written (while the page is locked, the write waits for the sign-in), and opened as it is read; a plain page and a
@@ -1830,7 +1838,7 @@ mods = [m for m in mods if os.path.basename(m) not in editions.skip_modules(ED)]
 # workshop and page, Lector's recipe, the Offline Project and its demonstrations, her build library, Ingenium's own rules) run in her
 # own profile only. Each of their scripts is kept as text and run by the small script after it, in its place, unless another person's
 # profile is open (boot/profiles_boot.js), so the page reads in the same order as before for her.
-_OWNER_ONLY = (editions.skip_modules("full") - editions.skip_modules("master")) if ED == "master" else set()
+_OWNER_ONLY = (editions.skip_modules("full") - editions.skip_modules("master") - editions.GUEST_ONLY) if ED == "master" else set()  # 7.46: not the guest-only ones
 _OWNER_RUN = ('<script>(function(){var s=document.currentScript,p=s&&s.previousElementSibling;'
               'if(window.__ingGuest||!p||p.type!=="text/ing-owner")return;var n=document.createElement("script");n.text=p.textContent;'
               's.parentNode.insertBefore(n,s);})();</script>')

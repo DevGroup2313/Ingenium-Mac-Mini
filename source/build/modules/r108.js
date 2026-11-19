@@ -63,6 +63,10 @@ var ORDER=["cd","forge","ingenium","inkwell"];
    and the colours of several apps' sections (OWN) gain each other app in its own colour. The Offline Project's names (all four, a trio, a
    duo), its crests and the master seal stay hers alone (four, ofFour); a set with another app in it is "two apps together", and so on. */
 var BASE=ORDER.slice(),FOUR=["cd","forge","ingenium","inkwell"];
+/* 7.46, her words (19 November 2026): "If they aren't me then Ingenium or any of them should [not] show up". Another person's profile on
+   her master copy is the full edition (R331), so Lector lists no app of hers there, as the full edition's own page does (build/editions.py):
+   only the apps that person adds (modules/r240.js, modules/r336.js) */
+if(window.__ingGuest){ORDER.length=0;BASE.length=0;}
 function four(a){a=a||[];return a.length===4&&FOUR.every(function(k){return a.indexOf(k)>=0;});}
 function ofFour(a){return (a||[]).every(function(k){return FOUR.indexOf(k)>=0;});}
 function tint(hex,f){try{return window.libShade?libShade(hex,f):hex;}catch(e){return hex;}}

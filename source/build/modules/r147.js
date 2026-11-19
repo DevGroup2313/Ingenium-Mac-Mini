@@ -416,6 +416,8 @@ function build(){
   var ln=mk("p","hx-line");ln.id="hxLine";
   ["Carpe Diem","The Forge","Ingenium","Inkwell"].forEach(function(n,i){if(i)ln.appendChild(document.createTextNode(" · "));ln.appendChild(mk("span",null,n));});
   pl.appendChild(ln);side.appendChild(pl);
+  /* 7.46: another person's profile is the full edition (R331): its plaque is Ingenium's own, as the full edition's page has it (build/editions.py) */
+  if(window.__ingGuest){ph.textContent="Ingenium";side.setAttribute("aria-label","Ingenium, your models and this device");ln.textContent="";ln.appendChild(mk("span",null,"Ingenium"));}
   /* the models and the engine */
   var ms=mk("section","hx-models hx-slab");ms.setAttribute("aria-labelledby","hxModelsH");
   var mh=mk("div","hx-sech");var mh2=mk("h2",null,"Models and engine");mh2.id="hxModelsH";mh.appendChild(mh2);ms.appendChild(mh);
@@ -438,6 +440,7 @@ function font(){if(fontDone)return;fontDone=true;try{var u=FONTS&&FONTS["cormora
   st.textContent='@font-face{font-family:"Home Cormorant";font-style:italic;font-weight:500;font-display:swap;src:url('+u+') format("woff2")}';document.head.appendChild(st);}catch(e){}}
 function drawSeal(){if(!R.seal||R.seal.firstChild||!window.IngSeal)return;try{var e=IngSeal.el(["ingenium"],{live:true,size:92,alt:"The logo of Ingenium"});if(e)R.seal.appendChild(e);}catch(e){}}
 function drawCrest(){if(!R.crest||R.crest.firstChild)return;font();
+  if(window.__ingGuest){try{var g=window.IngSeal?IngSeal.el(["ingenium"],{night:"auto",live:true,size:300}):null;if(g)R.crest.appendChild(g);}catch(x){}return;}  /* 7.46: Ingenium's seal alone there */
   try{var e=window.IngSeal?IngSeal.el(["cd","forge","ingenium","inkwell"],{night:"auto",live:true,size:300}):null;
     if(e){R.crest.appendChild(e);return;}}catch(x){}
   /* without the seals part: the master seal's own picture, if this copy has it */

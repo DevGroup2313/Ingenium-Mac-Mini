@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.46", "A copy that is not the owner's, and another person's profile, start empty: nothing is kept in the app library on first start, not even Ingenium itself, and the app library, Lector, Folders, Fabrica and the chat list only the apps added there. A page you add is listed, whatever app it is."],
   ["7.46", "Chat and Code work on a repository in one way, as Claude does on GitHub: A repository, in Code's start window and Chat's + menu, lists your apps in Fabrica and your GitHub repositories. Code works on the branch you choose, on a branch of its own; Review and keep shows each changed file in Fabrica's own Changes view; Create pull request opens one in Fabrica that waits for your yes. A conversation can read a repository, and Continue in Code changes it.", "fabrica"],
   ["7.46", "No film behind a panel or a popup: when a sheet, a list or a panel opens, the page behind it keeps its own colours, with nothing tinted or blurred over it."],
   ["7.46", "The profile key has left the top bar: it is the last row of the left menu now, with the profile's tile and name, and its menu (Who is using Ingenium, Lock Ingenium, Manage profiles) opens above it."],
@@ -528,7 +529,9 @@ var NEW=[
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
 /* x[2]: "career" where the Career Studio is, "nocareer" where it is not (the same news in the words of an edition without it), "fabrica" where
    Fabrica is (6.33), "master" in the master edition alone */
-function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="desk"||!!W.IngDesk);});}
+/* 7.46: in another person's profile (the full edition, R331) no line names her apps, as the full edition's page carries none (build/editions.py) */
+var HERS=/\b(Carpe Diem|The Forge|the Forge|Inkwell|Lakay|Offline Project)\b/;
+function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(!W.__ingGuest||!HERS.test(x[1]))&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;
