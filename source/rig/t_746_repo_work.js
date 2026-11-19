@@ -79,6 +79,10 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     await p.click('#modalBox .cc-start [data-a="fabrica"]'); await p.waitForSelector('.fbx.r333x #r333List .f-opt', { timeout: 15000 }); await p.waitForTimeout(500);
     const e7b = await p.evaluate(() => { const s = document.querySelector('.fbx.r333x .f-sheet'); return { h: s.querySelector('h3').textContent, tabs: [...s.querySelectorAll('.f-seg [data-t]')].map((x) => x.textContent), rows: [...s.querySelectorAll('#r333List .f-opt b')].map((x) => x.textContent) }; });
     ok(e7b.h === 'A repository' && e7b.tabs.join('|') === 'Fabrica|GitHub' && e7b.rows.indexOf('tide-clock') >= 0, '   A repository, in Fabrica\'s own sheet: Fabrica and GitHub, the apps listed', e7b);
+    // 7.46: the sheet lies over the window, in view, without scrolling the page (r333's frame; a copied rule once swallowed it, and the sheet lay at the page's foot)
+    const e7f = await p.evaluate(() => { const root = document.querySelector('.fbx.r333x'), s = root.querySelector('.f-sheet'), r = s.getBoundingClientRect(), mid = document.elementFromPoint(r.left + r.width / 2, r.top + 12);
+      return { pos: getComputedStyle(root).position, top: Math.round(r.top), bottom: Math.round(r.bottom), h: innerHeight, scroll: Math.round(document.scrollingElement.scrollTop), onTop: !!(mid && s.contains(mid)) }; });
+    ok(e7f.pos === 'fixed' && e7f.top >= 0 && e7f.bottom <= e7f.h && e7f.onTop, '   the sheet lies over the window, in view, on top of the page', e7f);
     const r0 = await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);
     await p.hover('#r333List .f-opt'); await p.waitForTimeout(450);
     const r1 = await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);

@@ -419,7 +419,11 @@ appropriate." And: "Do not change anything that I haven't asked you to change, o
   for a frame of the same kind, .fbx); Create pull request in Fabrica (`fbHub.newPull` in r141), waiting for her yes; Update from
   Fabrica; the model's tools fabrica_status, fabrica_diff, keep_version, fabrica_pull_request; Chat reads a repository (repo_files,
   repo_read) and Continue in Code changes it. Code's start cards and Chat's + menu rows raised and lifting, no violet wash.
-  `rig/t_746_repo_work.js` 17/17, `rig/t_746_session_app.py` 15/15.
+  Found before release: the sheet's copy of Fabrica's rules split each selector at every comma, so Fabrica's "#fb :is(li,div):has(> .m)"
+  (r315) came out with an open bracket that swallowed 150 of the 1,377 copied rules, the sheet's own frame among them, and the sheet lay
+  at the foot of the page instead of over it; the tests passed because a test browser scrolls to what it presses. Now selectors are
+  split only at their own commas, the frame has a style of its own, and `rig/t_746_repo_work.js` checks the sheet lies over the window.
+  `rig/t_746_repo_work.js` 18/18, `rig/t_746_session_app.py` 15/15.
 - None of her apps outside her own profile of the master edition. Her words (19 November 2026): "Ingenium is still built into the app library
   for the full edition, this is unacceptable. I do not want any of my apps built-in any editions outside of the master edition. Ingenium
   itself is not exempt from that ... They should be starting the app fresh as a new user and none of my apps (Ingenium included) should be

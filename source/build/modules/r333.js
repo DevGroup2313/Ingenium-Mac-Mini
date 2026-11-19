@@ -82,22 +82,28 @@ function okBranch(v){try{return IngRepo.core.okRefName(v);}catch(e){return /^[A-
    Fabrica's own rules are taken from the page as they stand, once, for a frame of the same kind (.fbx), and the panels are built with
    Fabrica's own parts and markup (f-sheet-wrap, f-sheet, f-x, f-opt, f-seg, f-field, f-files, f-frow, f-diff, f-dcode, f-dl, f-btn). */
 var FBX=false;
-function fbxStyles(){if(FBX)return;FBX=true;var out=[];
-  function rw(sel){return sel.split(",").filter(function(x){return x.indexOf("#fb")>=0;}).map(function(x){return x.replace(/#fb(?![\w-])/g,".fbx");}).join(",");}
+function fbxStyles(){if(FBX)return;FBX=true;var out=[],frame=[];
+  /* 7.46: a selector is split only at its own commas, never at those inside :is(), :where(), :not() or [ ]; split at every comma, a rule of
+     Fabrica's such as "#fb :is(li,div):has(> .m)" (modules/r315.js) came out as ".fbx :is(li{...}", and that open bracket swallowed the
+     rules after it, the frame's own among them: the sheet then lay at the foot of the page instead of over it */
+  function parts(sel){var o=[],d=0,cur="";for(var i=0;i<sel.length;i++){var ch=sel.charAt(i);if(ch==="("||ch==="[")d++;else if((ch===")"||ch==="]")&&d>0)d--;
+      if(ch===","&&d===0){o.push(cur);cur="";}else cur+=ch;}o.push(cur);return o;}
+  function rw(sel){return parts(sel).filter(function(x){return x.indexOf("#fb")>=0;}).map(function(x){return x.replace(/#fb(?![\w-])/g,".fbx");}).join(",");}
   function walk(list,wrap){for(var i=0;i<list.length;i++){var r=list[i];
       if(r.type===4||r.type===12){var t=r.cssText;walk(r.cssRules,wrap.concat([t.slice(0,t.indexOf("{")).trim()]));continue;}
       if(r.type!==1||!r.selectorText||r.selectorText.indexOf("#fb")<0)continue;var s=rw(r.selectorText);if(!s)continue;
       var c=s+"{"+r.style.cssText+"}";for(var j=wrap.length-1;j>=0;j--)c=wrap[j]+"{"+c+"}";out.push(c);}}
   [].forEach.call(D.styleSheets,function(sh){try{walk(sh.cssRules,[]);}catch(e){}});
-  /* the frame itself lies over the window, with no film, and holds only the sheet */
-  out.push("html body .fbx.r333x{position:fixed!important;inset:0!important;z-index:2147481000!important;display:block!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:hidden}");
-  out.push("html body .fbx.r333x .f-sheet-wrap{position:absolute;inset:0;border-radius:0;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}");
-  out.push("html body .fbx.r333x .f-sheet{width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 48px)}");
-  out.push("html body .fbx.r333x .r333-list{display:flex;flex-direction:column;gap:0;margin:10px 0 4px}");
-  out.push("html body .fbx.r333x .r333-keys{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}");
-  out.push("html body .fbx.r333x .f-seg{margin:6px 0 4px}");
-  out.push("html body .fbx.r333x .f-note:empty{display:none}");
-  var st=D.createElement("style");st.id="r333-fbx";st.textContent=out.join("\n");D.head.appendChild(st);}
+  /* the frame itself lies over the window, with no film, and holds only the sheet (7.46: in a style of its own, which no copied rule can touch) */
+  frame.push("html body .fbx.r333x{position:fixed!important;inset:0!important;z-index:2147481000!important;display:block!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:hidden}");
+  frame.push("html body .fbx.r333x .f-sheet-wrap{position:absolute;inset:0;border-radius:0;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}");
+  frame.push("html body .fbx.r333x .f-sheet{width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 48px)}");
+  frame.push("html body .fbx.r333x .r333-list{display:flex;flex-direction:column;gap:0;margin:10px 0 4px}");
+  frame.push("html body .fbx.r333x .r333-keys{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}");
+  frame.push("html body .fbx.r333x .f-seg{margin:6px 0 4px}");
+  frame.push("html body .fbx.r333x .f-note:empty{display:none}");
+  var st=D.createElement("style");st.id="r333-fbx";st.textContent=out.join("\n");D.head.appendChild(st);
+  var fr=D.createElement("style");fr.id="r333-fbx-frame";fr.textContent=frame.join("\n");D.head.appendChild(fr);}
 function fsheet(title,lead){fbxStyles();var old=D.querySelector(".fbx.r333x");if(old)old.remove();
   var root=mk("div","fbx r333x"),wrap=mk("div","f-sheet-wrap"),s=mk("div","f-sheet");s.setAttribute("role","dialog");s.setAttribute("aria-modal","true");
   s.innerHTML="<h3>"+esc(title)+"</h3>"+(lead?"<p>"+esc(lead)+"</p>":"");wrap.appendChild(s);root.appendChild(wrap);
