@@ -17,6 +17,8 @@
    by hand is never replaced. Where the page was opened as a file and cannot read itself, the card says so. */
 (function r120(){
 var BI=/*R120_BUILTIN*/null;
+/* 7.44 (r331): another person's profile carries none of her built-in apps, as the full edition carries none */
+if(window.__ingGuest)BI=null;
 if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
 var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay */
 

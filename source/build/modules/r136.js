@@ -181,7 +181,7 @@ function importPkcs8(pk){return subtle().importKey("pkcs8",pk,RSA,false,["sign"]
 function makeKeyPair(cn){var s=subtle();return s.generateKey({name:"RSASSA-PKCS1-v1_5",modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:"SHA-256"},true,["sign","verify"]).then(function(kp){
     return Promise.all([s.exportKey("spki",kp.publicKey),s.exportKey("pkcs8",kp.privateKey)]).then(function(x){var spki=new Uint8Array(x[0]),pk8=new Uint8Array(x[1]);
       var now=new Date(),later=new Date(now.getTime()+36500*864e5),serial=new Uint8Array(16);(root.crypto||crypto).getRandomValues(serial);serial[0]&=0x7f;
-      var name=SEQ(SET(SEQ(OID(OIDS.cn),UTF8S(cn||"Ingenium"))),SET(SEQ(OID(OIDS.o),UTF8S("Yannie D. Forest"))));
+      var name=SEQ(SET(SEQ(OID(OIDS.cn),UTF8S(cn||"Ingenium"))),SET(SEQ(OID(OIDS.o),UTF8S(window.__ingGuest?((function(){try{return String(personaGet().name||"").trim();}catch(e){return "";}})()||cn||"Ingenium"):"Yannie D. Forest"))));
       var alg=SEQ(OID(OIDS.sha256rsa),NUL),tbs=SEQ(CTX(0,INT(2)),INTb(serial),alg,name,SEQ(timeDER(now),timeDER(later)),name,spki);
       return s.sign(RSA,kp.privateKey,tbs).then(function(sig){return {pkcs8:pk8,cert:SEQ(tbs,alg,BIT(new Uint8Array(sig))),made:Date.now()};});});});}
 /* PKCS #12, as keytool makes it today (PBES2: PBKDF2 with HMAC-SHA-256, AES-CBC); the integrity MAC is not checked:

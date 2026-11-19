@@ -876,7 +876,7 @@ W_.IngLock={active:active,on:on,locked:function(){return active()&&!canOpen();},
   /* 6.32: what a part writes to a sealed store waits for the keys while the page is locked, so nothing is written there in clear */
   sealFor:function(db,sn,k,v){return active()?ready().then(function(){return sealRec(db,sn,k,v);}):Promise.resolve(v);},
   deskWrite:deskWrite,isDeskEnvelope:isDeskEnv,openDesk:openDesk,adoptRaw:adoptRaw,lockedNow:adoptRaw,openRecs:openRecs,sealRecs:sealRecs,sealRec:sealRec,openRec:openRec,openValues:openValues,lockNow:lockNow,
-  setup:function(){setup({});},user:function(){return REC?REC.user:null;},words:WORDS.slice(),
+  setup:function(o){setup(o||{});},user:function(){return REC?REC.user:null;},words:WORDS.slice(),
   _test:{idle:function(ms){IDLE_MS=ms;startIdle();},selfTest:selfTest,record:readRec,flush:flushSync,pending:function(){return W.seq-W.committed;},seal:function(){return W.seq;}}};
 try{boot();}catch(e){warn(e);}
 })();

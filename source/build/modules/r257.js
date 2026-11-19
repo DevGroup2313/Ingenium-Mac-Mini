@@ -88,7 +88,7 @@ body[data-motion="minimal"] #ragWho{animation:none}
 if(window.__r257)return;window.__r257=1;
 var W=window,D=document;
 var NOT_FOUND="I could not find that in the selected folders.";   /* rag/prompt.js, NOT_FOUND */
-var USER="me";   /* the one user now (rag/main.js PRINCIPAL); the tests ask as their second user with IngRagChat._as */
+var USER=(window.__ingProfile&&window.__ingProfile.owner===false)?"p:"+window.__ingProfile.id:"me";   /* the one user now (rag/main.js PRINCIPAL); the tests ask as their second user with IngRagChat._as */
 var ICON='<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2.5"/><path d="M3 7v10a2 2 0 0 0 2 2h6.5"/><circle cx="16.5" cy="15.5" r="3.5"/><path d="M19.1 18.1L21.5 20.5"/>';
 function $(id){return D.getElementById(id);}
 function mk(tag,cls,text){var n=D.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}

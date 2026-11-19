@@ -117,7 +117,7 @@ def _personal():
     # 7.25: the publishing name (modules/r309.js) starts with none outside the master edition, and Fabrica asks for one
     E.append(('var BUILT_IN="Yannie D. Forest";', 'var BUILT_IN="";', "the publishing name: none built in", 1))
     # a key made on this device names whoever this copy belongs to, never the owner
-    E.append(('UTF8S("Yannie D. Forest")',
+    E.append(('UTF8S(window.__ingGuest?((function(){try{return String(personaGet().name||"").trim();}catch(e){return "";}})()||cn||"Ingenium"):"Yannie D. Forest")',
               'UTF8S((function(){try{return String(personaGet().name||"").trim();}catch(e){return "";}})()||cn||"Ingenium")',
               "signing certificate: the person's own name", 1))
     # 6.5: two more, the example in the Mac and Windows makers' "cannot be an app id" (modules/r170.js)

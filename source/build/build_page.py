@@ -1341,6 +1341,23 @@ edit('var ING_EDITION="master";\n',
      'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
      "6.27 what each edition carries")
 
+# ---- R331 (Ingenium 7.44, 19 November 2026): local profiles (boot/profiles_boot.js, modules/r331.js, desktop/app_profiles_744.py). Her
+#      words, on the live preview she approved ("I approve of the preview ... Just add it to the damn app and let's move on. Put the drop down
+#      menu of version 3 of the preview"): a profile key beside the seal, the owner deciding for each profile whether it needs a password,
+#      each person's things kept apart, the models shared. 1. The boot script is the first script of the page, before anything reads a
+#      store: in another person's profile every store the page names is that profile's own. 2. In another person's profile the master
+#      copy is the full edition, as she defined it for another person (her partner's gift): Lector, Vocatio and Fabrica, but not the Author
+#      Studio, her owner key, her rules, her terms or her built-in apps. ----
+_PBOOT = open(os.path.join(HERE, "boot", "profiles_boot.js"), encoding="utf-8").read().strip()
+if "</script" in _PBOOT.lower() or "<!--" in _PBOOT:
+    sys.exit("boot/profiles_boot.js: it must not hold </script or <!--")
+edit('<head>\n<meta charset="utf-8">\n<script>(function(){try{var m=window.IngeniumNativeMsg',
+     '<head>\n<meta charset="utf-8">\n<script id="ing-profiles-boot">' + _PBOOT + '</script>\n<script>(function(){try{var m=window.IngeniumNativeMsg',
+     "R331 local profiles: each profile's stores its own, before any script reads one")
+edit('var ING_EDITION="master";\nvar ING_HAS=',
+     'var ING_EDITION="master";\nif(window.__ingGuest&&ING_EDITION==="master")ING_EDITION="full";  /* R331: another person\'s profile is the full edition */\nvar ING_HAS=',
+     "R331 another person's profile in the master copy is the full edition")
+
 # ---- 6.32 (6 November 2026): the app library sealed with the lock. Her words: "I want you to encrypt Ingenium and everything inside
 #      of it." With the lock on (modules/r197.js), a page kept in the library's store (IndexedDB ingenium_apps) is sealed as bytes
 #      before it is written (while the page is locked, the write waits for the sign-in), and opened as it is read; a plain page and a
@@ -1809,6 +1826,19 @@ if _kb:
         print("the kit store: no signing key (%s left out)" % ", ".join(_gone))
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 mods = [m for m in mods if os.path.basename(m) not in editions.skip_modules(ED)]  # 6.2: what an edition leaves out
+# R331 (7.44): in the master page, the modules the full edition leaves out (the owner's own: the Author Studio, Troubleshoot, her
+# workshop and page, Lector's recipe, the Offline Project and its demonstrations, her build library, Ingenium's own rules) run in her
+# own profile only. Each of their scripts is kept as text and run by the small script after it, in its place, unless another person's
+# profile is open (boot/profiles_boot.js), so the page reads in the same order as before for her.
+_OWNER_ONLY = (editions.skip_modules("full") - editions.skip_modules("master")) if ED == "master" else set()
+_OWNER_RUN = ('<script>(function(){var s=document.currentScript,p=s&&s.previousElementSibling;'
+              'if(window.__ingGuest||!p||p.type!=="text/ing-owner")return;var n=document.createElement("script");n.text=p.textContent;'
+              's.parentNode.insertBefore(n,s);})();</script>')
+def _owner_only(t):
+    out, i = [], 0
+    for m in re.finditer(r'<script>(.*?)</script>', t, re.S):
+        out.append(t[i:m.start()]); out.append('<script type="text/ing-owner">' + m.group(1) + '</script>' + _OWNER_RUN); i = m.end()
+    out.append(t[i:]); return "".join(out)
 # 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
 # those still being finished, or not yet through their independent review. Every other build keeps them in.
 if os.environ.get("ING_RELEASE") == "1" and os.path.exists(os.path.join(HERE, "held.json")):
@@ -1820,6 +1850,8 @@ if os.environ.get("ING_RELEASE") == "1" and os.path.exists(os.path.join(HERE, "h
 #      just before Ingenium's part of it (modules/r121.js) ----
 def _modtext(m):
     t = open(m, encoding="utf-8").read().rstrip("\n")
+    if os.path.basename(m) in _OWNER_ONLY:  # R331: the owner's own modules, run in her profile only
+        t = _owner_only(t)
     if os.path.basename(m) == "r119.js":
         t = open(os.path.join(HERE, "thoughts", "thought_cloud.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r121.js":  # R121: the shared support module, before Ingenium's own part of it

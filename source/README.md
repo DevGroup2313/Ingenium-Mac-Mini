@@ -395,6 +395,56 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.44 (19 November 2026): local profiles.
+
+Her words (14 November 2026), on my recommendations: "I am saying yes to your recommendations, please proceed": a profile key in the top bar
+beside the seal, managed in Settings; the owner decides for each profile whether it needs a password (hers always, while the sign-in is on);
+kept apart for each person: conversations and memory, folders and the folder search, Lector and Vocatio records and Folders' notes, Display
+and sounds, connections and their keys; shared: the models. On the live preview (https://claude.ai/artifact/B3SYtEftUUgisz6kAuSNAE,
+previews/profiles): "I approve of the preview ... Just add it to the damn app and let's move on. Put the drop down menu of version 3 of the
+preview and let's move on!"
+
+- `build/boot/profiles_boot.js`, the first script of the page (`build_page.py`, before any script reads a store). The owner's profile keeps
+  every name the page has always used, so nothing of hers moves. In another person's profile every localStorage key and sessionStorage key
+  and every IndexedDB database the page names carries "@" and its id (`ingenium_v4@p1abc`), so its desk, its sign-in (r197's lock record and
+  data key), its long texts, keys, apps, Fabrica and build library are its own from the first read. Shared by the device: the list of
+  profiles (`ingenium_profiles`), the models' record (`ingenium_models_shared`), the models' files and the engine (`ingenium_files`), the
+  pairing (`ingenium_seal`), the training lab's models, the graphics measure and the device's security settings. In the owner's profile the
+  other profiles' stores are not listed (a backup or the Storage page never sweeps them up). Every call into the computer app waits, once,
+  until the app holds this profile (`profile_current`, `profile_use`); in another person's profile an app older than profiles is not used.
+- In another person's profile the master copy is the full edition, as she defined it for another person: Lector, Vocatio and Fabrica, but
+  not the Author Studio, her owner key, her rules, her terms or her built-in apps (`ING_EDITION` is "full" there). The ten modules the full
+  edition leaves out (`editions.skip_modules`) are kept as text in the master page and run in her own profile only (`build_page.py`
+  `_owner_only`: each script is run by the small script after it, in its place, so the page reads in the same order as before for her).
+  `r120.js`: none of her built-in apps; `r110.js`: a repository has no author until one is set; `r136.js` (and `editions.py`'s match): a
+  signing key names that person, never her.
+- `build/modules/r331.js` (window.IngProfiles): the key beside the seal (version 3's: a raised pill, the profile's pastel tile, its name, a
+  chevron) and its menu (Who is using Ingenium, each profile with its tile, how it opens and In use; Lock Ingenium and Manage profiles), with
+  Ingenium's own sounds (r176's keys widened to these, a card lifting as the menu opens, keeping when a profile is added). Profiles on this
+  device in Settings, Security (with Everything and This device; `r173.js` names `profCard`): the profiles, how each opens, Remove; Add a
+  profile, only with the owner's sign-in on; What each profile keeps apart; Said plainly. Moving to another profile saves everything, tells
+  the computer app, and opens Ingenium again in that profile, so nothing of one session is left for the next. A profile with its own
+  password asks that person to choose it the first time it opens (r197's own door, `IngLock.setup(o)` now takes a way back), and shows them
+  its ten words, so nobody else can open it, the owner included; it is then marked sealed. Lock Ingenium: a profile with a sign-in locks as
+  the sign-in does, and the sign-in's door offers Someone else? Choose a profile; one without opens the door Who is using Ingenium. Removing
+  a profile takes its stores, its folders on the computer's disk and its folders in the folder search. The models' record is kept once
+  for the device and read into each profile's desk. One change from the preview, said to her: the person, not the owner, chooses a
+  profile's password, so the profile is sealed even from the owner.
+- The folder search (`rag/main.js`, `r257.js`): each profile is its own reader, "p:" and its id; hers stays "me". The search applies who may
+  read each folder inside both searches (rag/retriever.js), so another profile's passages never reach an answer.
+- `build/desktop/app_profiles_744.py` (registered in `release.py`; Mini, Intel, Windows): `profile_current`, `profile_use`, `profile_drop` on
+  both bridges; in another person's profile the desk (with its kept copies and long texts beside it), the keys box, Fabrica's hub, drives,
+  second copy and runs, the apps waiting for devices, the pages and the training texts each live in `profiles/<id>/` beside the owner's;
+  `profile_current.json` beside the models keeps the profile across restarts; Claude Code's sessions and Ollama's chats on the computer are
+  found empty; the app's own sign-in key is named for the profile. The models, the engine, the speech models, the pairing, the window and
+  the folder search's list of chosen folders stay shared.
+- Not yet: the files Ingenium keeps in the browser's private file system (the folder search's index, model caches) are shared, as before,
+  and the folder search's passages are read only through each profile's own permissions; the model files' store (`ingenium_files`) also
+  holds files added to chats, reachable only from the profile that added them. Sealing those apart is Security's next stage.
+- Tests: `rig/t_744_profiles.js` (18 checks, Chromium, invented people: the key and its menu, the owner's sign-in before Add, a profile without
+  a password kept apart and in the full edition, back to the owner, a profile choosing its own password, Lock Ingenium and Someone else, a
+  profile removed with its stores); `rig/t_744_profiles_app.py` (17 checks, the computer app's side on a copy of `ingenium_app.py`).
+
 Ingenium 7.43 (18 November 2026): Fabrica's next pass.
 
 Her approval of the live preview (https://claude.ai/artifact/2aHjSvn6yc7JSusyQn3aqo, previews/fabrica_next): "I approve of the Fabrica Next

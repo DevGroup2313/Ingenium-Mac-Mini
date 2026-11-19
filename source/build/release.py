@@ -134,7 +134,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_seal2_738", "_seal_selftest", ("mini", "intel", "win")),
            ("app_ollama_738", "_ollama_chats_find", ("mini", "intel", "win")),
            ("app_speech_739", "_speech_dev_get", ("mini", "intel", "win")),
-           ("app_logs_739", "_mac_logs_dir", ("mini", "intel", "win"))]
+           ("app_logs_739", "_mac_logs_dir", ("mini", "intel", "win")),
+           ("app_profiles_744", "_profile_use", ("mini", "intel", "win"))]
 
 
 def desktop():

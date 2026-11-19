@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.44", "Local profiles: each person who uses Ingenium on a device has a profile of their own. The key beside the seal shows who is using Ingenium and moves to another profile; Settings, Security, This device keeps Profiles on this device, where the owner adds or removes profiles and chooses for each whether it opens with its own password. Each profile keeps its own conversations and memory, folders and their search, records, look and sounds, connections and keys; the models are shared, and nothing about a profile leaves the device."],
   ["7.43", "Fabrica checks each version for anything it would load from the internet (Offline and in-house), and keeps release notes with each release, inside its web app.", "fabrica"],
   ["7.43", "Fabrica measures your ways of working in each version of your apps, gives each app its own terms to rewrite (inside its web app, asked on first open if you choose), and from the start runs the checks on every version and waits for your approval before main.", "master"],
   ["7.42", "Troubleshoot, the Author Studio's first room: check everything at once, see why each line is so and what to do, the errors since Ingenium started, and a box to say a problem in your own words. Each can go to a model in Code, ready for you to read first.", "master"],

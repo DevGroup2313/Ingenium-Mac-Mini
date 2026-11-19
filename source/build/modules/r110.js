@@ -408,7 +408,7 @@ function backend(){if(!BE){BE=(typeof indexedDB!=="undefined")?IdbBackend():MemB
 function store(){backend();return ST;}
 function newId(){return "repo_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 function slug(n){return String(n||"repository").normalize("NFKD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9._-]+/g,"-").replace(/^[-.]+|[-.]+$/g,"").slice(0,60)||"repository";}
-var who={name:"Yannie D. Forest",email:""};
+var who={name:"Yannie D. Forest",email:""};if(window.__ingGuest)who={name:"",email:""};
 function setAuthor(a){if(a&&a.name)who={name:String(a.name),email:String(a.email||"")};return who;}
 /* one at a time for each repository: no two changes cross */
 var locks={};

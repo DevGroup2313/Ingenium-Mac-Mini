@@ -1,0 +1,330 @@
+<title>Ingenium Local Profiles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap">
+<style>
+/* Layout: Settings, Security, as Ingenium 7.43 has it: the room's rail on the left (This device, where the sign-in is), and in it the new
+   card Profiles on this device; above it, the top bar's strip with the profile key that stands after Ingenium's seal. Tokens and parts
+   as her approved previews (Troubleshoot, Fabrica Next Pass): raised short keys, cards that rise, rows that glide, one mechanical click. */
+:root{
+  --bg:#f5f3f7; --card:#ffffff; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579; --acc:#6a3fb5; --line:rgba(34,26,46,.1); --well:#faf8fc;
+  --rail:#efeaf6; --slot:rgba(60,40,90,.06); --slot-sh:inset 0 1px 2px rgba(40,22,68,.18),inset 0 0 0 1px rgba(40,22,68,.05),0 1px 0 rgba(255,255,255,.85);
+  --card-sh:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);
+  --card-hi:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12);
+  --key-bg:linear-gradient(#ffffff,#f9f7fc);
+  --key-sh:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.1);
+  --key-hi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --pri-bg:linear-gradient(#7348be,#5d37a1); --pri-line:#4b2a86; --pri-sh:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26);
+  --emr-t:rgba(31,157,99,.14); --emr-c:#1a7f50; --amb-t:rgba(232,144,42,.16); --amb-c:#b4600f; --red-t:rgba(196,60,72,.13); --red-c:#a8323e; --lav-t:rgba(106,63,181,.12); --lav-c:#6a3fb5;
+  --tile-dim:1;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --bounce:cubic-bezier(.34,1.35,.64,1); --spring:cubic-bezier(.2,.9,.25,1.2);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --rail:#171221; --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --red-t:rgba(230,110,120,.15); --red-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  --tile-dim:.8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18; --card:#201a2b; --ink1:#f6f1fd; --ink2:#d3c9e3; --ink3:#a99cc1; --acc:#b79ce6; --line:rgba(205,184,240,.11); --well:#1c1626;
+  --rail:#171221; --slot:rgba(0,0,0,.28); --slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34); --card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --key-bg:linear-gradient(#2a2239,#251e33); --key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --pri-bg:linear-gradient(#7a56c8,#5b3aa1); --pri-line:#2c1956; --pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --emr-t:rgba(64,192,128,.15); --emr-c:#6fd8a2; --amb-t:rgba(240,176,96,.15); --amb-c:#f0b060; --red-t:rgba(230,110,120,.15); --red-c:#f0939c; --lav-t:rgba(183,156,230,.15); --lav-c:#b79ce6;
+  --tile-dim:.8; color-scheme:dark}
+
+html,body,*{scrollbar-width:none} ::-webkit-scrollbar{display:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink2);font:14px/1.55 var(--sans);margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.note{max-width:1180px;margin:0 auto 14px;font-size:12.6px;color:var(--ink3)}
+.note b{color:var(--ink2)}
+
+/* the top bar's strip: the profile key after the seal */
+.strip{max-width:1180px;margin:0 auto 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 12px;border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);position:relative;z-index:10;
+  transition:transform .35s var(--spring),box-shadow .25s}
+.strip:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.strip .where{font-size:12.4px;color:var(--ink3)}
+.strip .where b{font:600 15px/1 var(--serif);letter-spacing:.2em;color:var(--ink1);margin-right:8px}
+.strip .end{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pkey{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 12px 0 4px;border-radius:999px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);font-weight:600;font-size:12.8px;color:var(--ink1);
+  transition:transform .3s var(--bounce),box-shadow .2s}
+.pkey:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.pkey:active{transform:translateY(1px);box-shadow:var(--key-sh)}
+.pkey .chev{width:12px;height:12px;fill:none;stroke:var(--ink3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--bounce)}
+.pkey[aria-expanded="true"] .chev{transform:rotate(180deg)}
+
+/* the marks: each profile's raised tile, in soft pastel by day, deeper by night, as Fabrica's app tile */
+.mk{--s:30px;width:var(--s);height:var(--s);flex:0 0 auto;border-radius:calc(var(--s)*.3);display:grid;place-items:center;background:linear-gradient(145deg,var(--a),var(--b));color:var(--c);
+  font:700 calc(var(--s)*.56)/1 var(--serif);filter:brightness(var(--tile-dim));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(40,22,68,.16),0 3px 0 rgba(40,22,68,.2),0 8px 14px rgba(40,22,68,.16);transition:transform .45s var(--bounce)}
+.mk.round{border-radius:50%}
+.pkey:hover .mk,.prow:hover .mk,.who:hover .mk,.door button:hover .mk,.swatch:hover .mk{transform:rotate(-6deg) scale(1.06)}
+.mk.tap{animation:tap .5s var(--bounce)}
+@keyframes tap{40%{transform:rotate(8deg) scale(.92)}}
+
+/* the chooser under the key */
+.pop{position:absolute;top:calc(100% + 8px);left:12px;z-index:5;width:min(340px,calc(100% - 24px));padding:10px;border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-hi);
+  display:flex;flex-direction:column;gap:4px;animation:rise .3s var(--spring)}
+.pop h4{margin:4px 6px 6px;font:600 16px/1.2 var(--serif);color:var(--ink1)}
+.who{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:11px;border:1px solid transparent;background:transparent;text-align:left;width:100%;
+  transition:transform .3s var(--spring),box-shadow .2s,background .2s,border-color .2s}
+.who:hover{transform:translateY(-1px);background:var(--well);border-color:var(--line);box-shadow:0 1px 0 rgba(40,22,68,.05),0 4px 10px rgba(40,22,68,.07)}
+.who[aria-current="true"]{background:var(--slot);box-shadow:var(--slot-sh)}
+.who b{display:block;color:var(--ink1);font-size:13.3px}
+.who span.t{display:block;font-size:12.2px;color:var(--ink3)}
+.pop .foot{display:flex;gap:8px;flex-wrap:wrap;padding:8px 6px 2px;border-top:1px solid var(--line);margin-top:4px}
+
+/* Settings, Security */
+.studio{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:210px minmax(0,1fr);border-radius:22px;background:var(--card);box-shadow:var(--card-sh);border:1px solid var(--line);overflow:hidden}
+.bar{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.bar h1{font:600 24px/1.1 var(--serif);color:var(--ink1);margin:0;flex:1 1 auto}
+.bar .in{font-size:12.5px;color:var(--ink3)}
+.rail{background:var(--rail);padding:12px 10px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.rail button{display:flex;align-items:center;gap:10px;text-align:left;padding:9px 11px;border-radius:11px;border:0;background:transparent;font-size:13.5px;color:var(--ink2);transition:transform .3s var(--spring),color .2s,box-shadow .25s}
+.rail button svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--bounce)}
+.rail button:hover{transform:translateX(4px);color:var(--ink1)}
+.rail button:hover svg{transform:rotate(-10deg) scale(1.12)}
+.rail button:active{transform:translateX(4px) translateY(1px)}
+.rail button[aria-current="page"]{color:var(--acc);font-weight:600;background:var(--slot);box-shadow:var(--slot-sh)}
+.rail button[aria-current="page"]:hover{transform:translateX(2px)}
+.rail .new{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--lav-t);color:var(--lav-c)}
+.room{padding:18px 20px 24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.room h2{font:600 26px/1.15 var(--serif);color:var(--ink1);margin:0}
+.lede{margin:4px 0 0;max-width:68ch;font-size:13.5px}
+.sec{font:600 19px/1.2 var(--serif);color:var(--ink1);margin:6px 0 0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec small{font:400 12.5px/1.4 var(--sans);color:var(--ink3)}
+
+.key{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);color:var(--ink1);font-weight:600;font-size:12.8px;white-space:nowrap;
+  transition:transform .3s var(--bounce),box-shadow .2s}
+.key:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.key:active{transform:translateY(1px);box-shadow:var(--key-sh)}
+.key.pri{background:var(--pri-bg);border-color:var(--pri-line);box-shadow:var(--pri-sh),0 4px 10px rgba(52,24,100,.2);color:#fff}
+.key.pri:hover{box-shadow:var(--pri-sh),0 8px 16px rgba(52,24,100,.26)}
+.key.sm{min-height:28px;padding:0 10px;font-size:12px;border-radius:9px}
+.key.warn{color:var(--red-c)}
+.key:focus-visible,.rail button:focus-visible,.who:focus-visible,.pkey:focus-visible,.opt:focus-visible,.swatch:focus-visible,input:focus-visible,.door button:focus-visible,.part:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11.8px/1 var(--sans);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--emr-t);color:var(--emr-c)} .chip.look{background:var(--amb-t);color:var(--amb-c)} .chip.lav{background:var(--lav-t);color:var(--lav-c)}
+
+/* the sign-in row, as Security's This device has it */
+.sum{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:var(--well);box-shadow:var(--card-sh);transition:transform .35s var(--spring),box-shadow .25s}
+.sum:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.sum svg{width:22px;height:22px;fill:none;stroke:var(--acc);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sum b{display:block;color:var(--ink1);font-size:13.5px}
+.sum span.t{font-size:12.4px;color:var(--ink3)}
+
+/* the profiles */
+.list{display:flex;flex-direction:column;gap:8px}
+.prow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:13px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);
+  transition:transform .3s var(--spring),box-shadow .2s}
+.prow:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.prow b{color:var(--ink1);font-size:13.5px}
+.prow .t{display:block;font-size:12.4px;color:var(--ink3)}
+.prow .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.confirm{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-radius:11px;background:var(--well);border:1px solid var(--line);font-size:12.6px;animation:rise .3s var(--spring)}
+.confirm span{flex:1 1 260px}
+.opts{display:inline-flex;gap:6px;flex-wrap:wrap}
+.opt{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:12.2px;color:var(--ink2);
+  box-shadow:0 1px 0 rgba(40,22,68,.05),0 2px 5px rgba(40,22,68,.05);transition:transform .3s var(--spring),box-shadow .2s}
+.opt:hover{transform:translateY(-2px);box-shadow:var(--key-hi)}
+.opt:active{transform:translateY(1px)}
+.opt .dot{width:13px;height:13px;border-radius:50%;border:1px solid var(--line);background:var(--key-bg);box-shadow:var(--key-sh);display:grid;place-items:center}
+.opt[aria-checked="true"]{color:var(--ink1);font-weight:600;border-color:var(--acc)}
+.opt[aria-checked="true"] .dot::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}
+
+/* add a profile */
+.add{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--well);box-shadow:var(--card-sh);transition:transform .35s var(--spring),box-shadow .25s}
+.add:hover{transform:translateY(-2px);box-shadow:var(--card-hi)}
+.add label,.add .lab{display:flex;flex-direction:column;gap:6px;font-size:12.6px;font-weight:600;color:var(--ink1)}
+.add input{border-radius:10px;border:1px solid var(--line);background:var(--card);padding:8px 10px;font-size:13px;font-weight:400;color:var(--ink1);box-shadow:inset 0 2px 3px rgba(40,22,68,.08);max-width:280px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{border:0;background:none;padding:3px;border-radius:12px;transition:transform .3s var(--spring),box-shadow .2s}
+.swatch:hover{transform:translateY(-2px)}
+.swatch[aria-checked="true"]{box-shadow:0 0 0 2px var(--acc)}
+.add .go{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.said{font-size:12.6px;color:var(--acc);min-height:18px}
+.err{font-size:12.6px;color:var(--red-c);min-height:18px}
+
+/* what each profile keeps apart */
+.parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.part{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;text-align:left;padding:11px 12px;border-radius:13px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);
+  transition:transform .35s var(--spring),box-shadow .25s}
+.part:hover{transform:translateY(-3px) rotateX(1deg);box-shadow:var(--card-hi)}
+.part svg{width:18px;height:18px;margin-top:1px;fill:none;stroke:var(--acc);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--bounce)}
+.part:hover svg{transform:rotate(-10deg) scale(1.12)}
+.part b{display:block;color:var(--ink1);font-size:13px}
+.part span{display:block;font-size:12.2px;color:var(--ink3)}
+.part.shared{background:var(--well)}
+
+/* the door: locked, who is using Ingenium */
+.door{display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 16px;border-radius:18px;border:1px solid var(--line);background:var(--well);box-shadow:var(--card-sh);text-align:center;animation:rise .35s var(--spring)}
+.door h3{margin:0;font:600 24px/1.15 var(--serif);color:var(--ink1)}
+.door .who4{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.door button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);min-width:112px;
+  transition:transform .35s var(--spring),box-shadow .25s}
+.door button:hover{transform:translateY(-3px);box-shadow:var(--card-hi)}
+.door button:active{transform:translateY(1px)}
+.door button b{font-size:13px;color:var(--ink1)}
+.door button span{font-size:11.6px;color:var(--ink3)}
+.pw{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:320px}
+.pw input{width:100%;text-align:center;border-radius:10px;border:1px solid var(--line);background:var(--card);padding:9px 10px;font-size:14px;color:var(--ink1);box-shadow:inset 0 2px 3px rgba(40,22,68,.08)}
+.pw .go{display:flex;gap:8px;justify-content:center}
+
+details.fold{border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--card-sh);padding:12px 16px;transition:transform .3s var(--spring)}
+details.fold:hover{transform:translateX(3px)}
+details.fold summary{cursor:pointer;list-style:none;font-weight:600;font-size:13.3px;color:var(--ink1);display:flex;justify-content:space-between;gap:10px}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::after{content:"Read";color:var(--acc);font-size:12px}
+details.fold[open] summary::after{content:"Fold"}
+details.fold ul{margin:8px 0 2px;padding-left:18px;font-size:12.8px}
+details.fold li{margin:4px 0}
+@keyframes rise{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (max-width:860px){.studio{grid-template-columns:1fr}.rail{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.rail button{flex:0 0 auto}
+  .parts{grid-template-columns:1fr}.add{grid-template-columns:1fr}.prow{grid-template-columns:auto minmax(0,1fr)}.prow .acts{grid-column:1/-1;justify-content:flex-start}.sum{grid-template-columns:auto minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+
+<p class="note"><b>A live preview, nothing here is wired to your Ingenium yet.</b> The names, folders and figures are examples. In Ingenium, the profile key stands in the top bar after the seal, on every page, and the profiles are kept in Settings, Security, This device, beside your sign-in. Press the key to switch: Elias asks for a password (any four letters open it here); Guest and Test open without one.</p>
+
+<div class="strip" id="strip">
+  <span class="where"><b>INGENIUM</b>the top bar, after the seal</span>
+  <button class="pkey" id="pkey" type="button" aria-haspopup="true" aria-expanded="false"></button>
+  <span class="end"><span class="chip lav" id="inuse"></span><button class="key sm" id="snd" type="button" aria-pressed="true">Sound on</button></span>
+</div>
+
+<section class="studio">
+  <div class="bar"><h1>Settings</h1><span class="in">Security · This device</span></div>
+  <nav class="rail" aria-label="Security">
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/></svg>Everything</button>
+    <button type="button" aria-current="page"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M10 17h4"/></svg>This device<span class="new">New</span></button>
+    <button type="button"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/></svg>The computer's disk</button>
+    <button type="button"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="9" height="7" rx="1.5"/><rect x="14" y="10" width="7" height="9" rx="1.5"/><path d="M7.5 13v3h6.5"/></svg>Between your devices</button>
+    <button type="button"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg>Your code and apps</button>
+    <button type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l2.5 2"/></svg>More protection</button>
+  </nav>
+  <div class="room" id="room"></div>
+</section>
+
+<script>
+(function(){
+"use strict";
+var D=document,$=function(id){return D.getElementById(id);};
+var TINT=[["#dccbf3","#bfa6e6","#3b2266"],["#cfe0f7","#a9c4ec","#1e3a66"],["#cfe9dc","#a8d4bf","#1d4d38"],["#f3c9d6","#d9a2c9","#5b2147"],["#f6e7b8","#e9cf86","#5a4310"],["#f1eef6","#ddd7e6","#4a4358"]];
+function fresh(){return [
+  {id:"owner",name:"Yannie",kind:"The owner",t:0,pw:"always"},
+  {id:"elias",name:"Elias",kind:"A profile",t:1,pw:"own"},
+  {id:"guest",name:"Guest",kind:"A guest",t:5,pw:"none"},
+  {id:"test",name:"Test",kind:"A profile for trying things",t:2,pw:"none"}];}
+var S={ps:fresh(),cur:"owner",pop:false,locked:false,ask:null,rm:null,add:{name:"",t:3,pw:"own"},said:""};
+function P(id){for(var i=0;i<S.ps.length;i++)if(S.ps[i].id===id)return S.ps[i];return null;}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function mk(p,s,round){var c=TINT[p.t];return '<span class="mk'+(round?' round':'')+'" style="--s:'+(s||30)+'px;--a:'+c[0]+';--b:'+c[1]+';--c:'+c[2]+'" aria-hidden="true">'+esc((p.name||"?").charAt(0).toUpperCase())+'</span>';}
+function opens(p){return p.pw==="always"?"Always your password, while the sign-in is on":p.pw==="own"?"Its own password":"Opens without a password";}
+var ICON={chat:'<path d="M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3V6a1 1 0 0 1 1-1z"/>',folder:'<path d="M3.5 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/>',
+  book:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>',
+  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/>'};
+function ic(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>';}
+
+/* a soft mechanical click: a short filtered noise, only after a press, and off with Sound (as the approved previews) */
+var AC=null,SND=true;
+function click(){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var n=AC.sampleRate*0.03,buf=AC.createBuffer(1,n,AC.sampleRate),d=buf.getChannelData(0);
+  for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,6);var src=AC.createBufferSource();src.buffer=buf;var f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=2400;f.Q.value=1.4;
+  var g=AC.createGain();g.gain.value=0.22;src.connect(f);f.connect(g);g.connect(AC.destination);src.start();}catch(e){}}
+
+function paintKey(){var p=P(S.cur);
+  $("pkey").innerHTML=mk(p,26,true)+'<span>'+esc(p.name)+'</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  $("pkey").setAttribute("aria-expanded",String(S.pop));$("pkey").setAttribute("aria-label","In use: "+p.name+". Press to switch profile");
+  $("inuse").textContent=S.locked?"Locked":"In use: "+p.name;
+  var old=$("pop");if(old)old.remove();
+  if(S.pop){var d=D.createElement("div");d.className="pop";d.id="pop";d.setAttribute("role","menu");
+    d.innerHTML='<h4>Who is using Ingenium</h4>'+S.ps.map(function(q){return '<button class="who" type="button" role="menuitem" data-who="'+q.id+'"'+(q.id===S.cur?' aria-current="true"':'')+'>'+mk(q,30,true)+'<span><b>'+esc(q.name)+'</b><span class="t">'+opens(q)+'</span></span>'+(q.id===S.cur?'<span class="chip lav">In use</span>':'')+'</button>';}).join("")
+     +'<div class="foot"><button class="key sm" type="button" id="lockNow">Lock Ingenium</button>'+(S.cur==="owner"?'<button class="key sm" type="button" id="manage">Manage profiles</button>':'')+'</div>';
+    $("strip").appendChild(d);}}
+
+function room(){var me=P(S.cur),own=me.id==="owner",h="";
+  h+='<div><h2>This device</h2><p class="lede">Who opens Ingenium here, and how. Your sign-in seals what you make with your password; each profile below is kept apart from the others in the same way.</p></div>';
+  h+='<div class="sum">'+ic("lock")+'<span><b>Sealed on this device</b><span class="t">Your sign-in, and everything you make, sealed with your password</span></span><span class="chip ok"><i></i>On</span></div>';
+  if(S.locked){h+=door();return h;}
+  h+='<div class="sec">Profiles on this device<small>'+(own?"Only you, the owner, add, remove or change them.":"Only the owner adds, removes or changes them.")+'</small></div><div class="list">';
+  S.ps.forEach(function(p){h+='<div class="prow">'+mk(p,38)+'<span><b>'+esc(p.name)+'</b>'+(p.id===S.cur?' <span class="chip lav" style="margin-left:6px">In use</span>':'')+'<span class="t">'+p.kind+'</span></span><span class="acts">';
+    if(p.pw==="always")h+='<span class="chip lav">'+opens(p)+'</span>';
+    else if(own)h+='<span class="opts" role="radiogroup" aria-label="How '+esc(p.name)+' opens">'+[["own","Its own password"],["none","Opens without one"]].map(function(o){return '<button class="opt" type="button" role="radio" data-pw="'+p.id+':'+o[0]+'" aria-checked="'+(p.pw===o[0])+'"><span class="dot"></span>'+o[1]+'</button>';}).join("")+'</span><button class="key sm warn" type="button" data-rm="'+p.id+'">Remove</button>';
+    else h+='<span class="chip lav">'+opens(p)+'</span>';
+    h+='</span>';
+    if(own&&S.rm===p.id)h+='<div class="confirm"><span>Remove '+esc(p.name)+'\'s profile? Its conversations, memory, folders, records, settings and keys on this device go with it. This cannot be undone.</span><button class="key sm warn" type="button" data-rmyes="'+p.id+'">Remove '+esc(p.name)+'</button><button class="key sm" type="button" data-rmno="1">Keep it</button></div>';
+    h+='</div>';});
+  h+='</div>';
+  if(own){var a=S.add;
+    h+='<div class="sec">Add a profile<small>For another person, a guest, or a test.</small></div><form class="add" id="addf" autocomplete="off">'
+     +'<label for="addName">Their name<input id="addName" maxlength="24" placeholder="A first name" value="'+esc(a.name)+'"></label>'
+     +'<div class="lab">Their tile<div class="swatches" role="radiogroup" aria-label="Their tile">'+TINT.map(function(c,i){return '<button class="swatch" type="button" role="radio" data-t="'+i+'" aria-checked="'+(a.t===i)+'" aria-label="Tile '+(i+1)+'">'+mk({name:a.name||"?",t:i},30)+'</button>';}).join("")+'</div></div>'
+     +'<div class="lab">How it opens<span class="opts" role="radiogroup">'+[["own","Its own password"],["none","Opens without one"]].map(function(o){return '<button class="opt" type="button" role="radio" data-addpw="'+o[0]+'" aria-checked="'+(a.pw===o[0])+'"><span class="dot"></span>'+o[1]+'</button>';}).join("")+'</span></div>'
+     +(a.pw==="own"?'<label for="addPw">Its password (they can change it later)<input id="addPw" type="password" placeholder="At least four letters"></label>':'<div class="lab" style="font-weight:400;color:var(--ink3)">Not sealed: anyone at this device can open it. It suits a guest or a test.</div>')
+     +'<div class="go"><button class="key pri" type="submit">Add the profile</button><span class="err" id="addErr"></span><span class="said">'+esc(S.said)+'</span></div></form>';}
+  h+='<div class="sec">What each profile keeps apart<small>Press one to see what it holds for '+esc(me.name)+'.</small></div><div class="parts">'
+   +[["chat","Conversations and memory","Its own chats, and what Ingenium remembers from them."],["folder","Folders and the folder search","Its folders in Ingenia; the search reads only these."],["book","Lector and Vocatio records","With its notes in Ingenia's folders."],["sun","Display and sounds","Day or night, motion, Ingenium's sounds, nature sounds."],["link","Connections and their keys","Its own keys, so nobody spends another's."],["chip","Shared: the models","Kept once, in Mentes, for every profile."]]
+     .map(function(x,i){return '<button class="part'+(i===5?' shared':'')+'" type="button" data-part="'+i+'">'+ic(x[0])+'<span><b>'+x[1]+'</b><span>'+x[2]+'</span></span></button>';}).join("")+'</div>'
+   +'<div class="said" id="partSaid"></div>';
+  h+='<details class="fold"><summary>Said plainly</summary><ul>'
+   +'<li>A profile with its own password is sealed with it, as your sign-in seals your data today. No other profile can read it, yours included. If its password is forgotten, the ten words made with it open it again; without them, the profile can only be removed.</li>'
+   +'<li>A profile that opens without a password is not sealed: anyone at this device can open it.</li>'
+   +'<li>Profiles need the sign-in to be on, so your own profile is guarded by your password.</li>'
+   +'<li>The folder search already records who may read each folder and applies it inside the search, so another profile\'s passages never reach an answer.</li>'
+   +'<li>Profiles live on one device. They are not accounts on the internet, and nothing about them leaves the device.</li></ul></details>';
+  return h;}
+
+function door(){var h='<div class="door"><h3>Who is using Ingenium?</h3>';
+  if(S.ask){var p=P(S.ask);h+=mk(p,58,true)+'<b style="color:var(--ink1)">'+esc(p.name)+'</b><form class="pw" id="pwf" autocomplete="off"><input id="pwIn" type="password" placeholder="'+(p.id==="owner"?"Your password":esc(p.name)+"'s password")+'" aria-label="Password"><span class="err" id="pwErr"></span><span class="go"><button class="key pri" type="submit">Open</button><button class="key" type="button" id="pwBack">Back</button></span></form><span style="font-size:12px;color:var(--ink3)">Forgotten? The ten words made with this password open it.</span>';}
+  else h+='<div class="who4">'+S.ps.map(function(p){return '<button type="button" data-door="'+p.id+'">'+mk(p,48,true)+'<b>'+esc(p.name)+'</b><span>'+(p.pw==="none"?"Opens without a password":"Needs its password")+'</span></button>';}).join("")+'</div>';
+  return h+'</div>';}
+
+function paint(){paintKey();$("room").innerHTML=room();if(S.ask){var i=$("pwIn");if(i)setTimeout(function(){i.focus();},40);}}
+function choose(id){var p=P(id);S.pop=false;if(p.pw==="none"){S.cur=id;S.locked=false;S.ask=null;paint();return;}if(id===S.cur){paint();return;}S.locked=true;S.ask=id;paint();}
+
+D.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.closest(".key,.rail,.pkey,.who,.opt,.swatch,.part,.door")||b.classList.contains("pkey"))click();
+  var m=b.querySelector(".mk");if(m){m.classList.remove("tap");void m.offsetWidth;m.classList.add("tap");}
+  if(b.id==="pkey"){S.pop=!S.pop;paintKey();return;}
+  if(b.id==="snd"){SND=!SND;b.setAttribute("aria-pressed",String(SND));b.textContent=SND?"Sound on":"Sound off";return;}
+  if(b.hasAttribute("data-who")){choose(b.getAttribute("data-who"));return;}
+  if(b.hasAttribute("data-door")){var p=P(b.getAttribute("data-door"));if(p.pw==="none"){S.cur=p.id;S.locked=false;S.ask=null;paint();}else{S.ask=p.id;paint();}return;}
+  if(b.id==="pwBack"){S.ask=null;paint();return;}
+  if(b.id==="lockNow"){S.pop=false;S.locked=true;S.ask=null;paint();return;}
+  if(b.id==="manage"){S.pop=false;paint();$("room").scrollIntoView({behavior:"smooth",block:"start"});return;}
+  if(b.hasAttribute("data-pw")){var a=b.getAttribute("data-pw").split(":");P(a[0]).pw=a[1];paint();return;}
+  if(b.hasAttribute("data-rm")){S.rm=b.getAttribute("data-rm");paint();return;}
+  if(b.hasAttribute("data-rmno")){S.rm=null;paint();return;}
+  if(b.hasAttribute("data-rmyes")){var id=b.getAttribute("data-rmyes");S.ps=S.ps.filter(function(q){return q.id!==id;});S.rm=null;paint();return;}
+  if(b.hasAttribute("data-t")){keep();S.add.t=+b.getAttribute("data-t");paint();return;}
+  if(b.hasAttribute("data-addpw")){keep();S.add.pw=b.getAttribute("data-addpw");paint();return;}
+  if(b.hasAttribute("data-part")){var me=P(S.cur),k=+b.getAttribute("data-part"),EX={owner:["12 conversations, 41 things remembered","2 folders: Research papers (1,204 passages), Household papers (312)","6 Lector documents, 3 Vocatio applications","Day, Calm motion, Ingenium's sounds on","2 connections, each with its key"],elias:["2 conversations, 5 things remembered","1 folder: Garden notes (88 passages)","1 Lector document","Night, Full motion, sounds off","None yet"]};
+    var row=(EX[me.id]||["Nothing yet","No folder yet","No records yet","As this device is set","None yet"]);$("partSaid").textContent=k===5?"Scriba, Magister and 2 more models, in Mentes: the same for every profile.":me.name+": "+row[k]+" (an example).";return;}
+});
+function keep(){var n=$("addName");if(n)S.add.name=n.value;}
+D.addEventListener("input",function(e){if(e.target.id==="addName"){S.add.name=e.target.value;[].forEach.call(D.querySelectorAll(".swatch .mk"),function(m){m.textContent=(e.target.value||"?").charAt(0).toUpperCase();});}});
+D.addEventListener("submit",function(e){e.preventDefault();
+  if(e.target.id==="pwf"){if($("pwIn").value.length<4){$("pwErr").textContent="That password does not open it. Try again, or use the ten words.";return;}click();S.cur=S.ask;S.ask=null;S.locked=false;paint();return;}
+  if(e.target.id==="addf"){keep();var a=S.add,nm=(a.name||"").trim(),er=$("addErr");
+    if(!nm){er.textContent="Give the profile a name first.";return;}
+    if(S.ps.some(function(q){return q.name.toLowerCase()===nm.toLowerCase();})){er.textContent="There is a profile of that name already.";return;}
+    if(a.pw==="own"&&(!$("addPw")||$("addPw").value.length<4)){er.textContent="Its password needs at least four letters.";return;}
+    click();S.ps.push({id:"p"+Date.now().toString(36),name:nm,kind:"A profile",t:a.t,pw:a.pw});S.said=nm+"'s profile is ready"+(a.pw==="own"?", sealed with its own password.":", and opens without one.");S.add={name:"",t:(a.t+1)%TINT.length,pw:"own"};paint();}});
+D.addEventListener("keydown",function(e){if(e.key==="Escape"&&S.pop){S.pop=false;paintKey();$("pkey").focus();}});
+D.addEventListener("pointerdown",function(e){if(S.pop&&!e.target.closest("#pop")&&!e.target.closest("#pkey")){S.pop=false;paintKey();}});
+paint();
+})();
+</script>
