@@ -228,6 +228,8 @@ var ICON={chat:'<path d="M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3V6a1 1 0 0
   link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>'};
 function ic(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>';}
+/* the gift and demo editions have no Lector or Vocatio: the list names only what this edition has (rig/t_627_editions) */
+function hasLV(){try{return typeof ING_HAS!=="function"||!!ING_HAS("lector");}catch(e){return true;}}
 function holds(i){try{var s=W.state||{};
   if(i===0)return ((s.chats||[]).length)+" conversations kept here";
   if(i===1)return "Read only for this profile";
@@ -256,7 +258,7 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".r331-body");i
       +'<div class="r331-go"><button class="r331-k pri" type="submit">Add the profile</button><span class="r331-err" id="profAddErr"></span><span class="r331-said" id="profSaid">'+esc(UI.said)+'</span></div></form>';}
   else h+='<div class="r331-said" id="profSaid"></div>';
   h+='<div class="r331-sec">What each profile keeps apart<small>Press one to see what it holds for '+esc(M.name)+'.</small></div><div class="r331-parts">'
-    +[["chat","Conversations and memory","Its own chats, and what Ingenium remembers from them."],["folder","Folders and the folder search","Its folders in Ingenia; the search reads only these."],["book","Lector and Vocatio records","With its notes in Ingenia's folders."],["sun","Display and sounds","Day or night, motion, Ingenium's sounds, nature sounds."],["link","Connections and their keys","Its own keys, so nobody spends another's."],["chip","Shared: the models","Kept once, in Mentes, for every profile."]]
+    +[["chat","Conversations and memory","Its own chats, and what Ingenium remembers from them."],["folder","Folders and the folder search","Its folders in Ingenia; the search reads only these."],(hasLV()?["book","Lector and Vocatio records","With its notes in Ingenia's folders."]:["book","Notes in its folders","Its own notes in Ingenia's folders."]),["sun","Display and sounds","Day or night, motion, Ingenium's sounds, nature sounds."],["link","Connections and their keys","Its own keys, so nobody spends another's."],["chip","Shared: the models","Kept once, in Mentes, for every profile."]]
      .map(function(x,i){return '<button class="r331-part'+(i===5?' shared':'')+'" type="button" data-part="'+i+'">'+ic(x[0])+'<span><b>'+x[1]+'</b><span>'+(UI.part===i?esc(holds(i)):x[2])+'</span></span></button>';}).join("")+'</div>';
   h+='<details><summary>Said plainly</summary><ul>'
     +'<li>A profile with its own password is sealed with it, as your sign-in seals your data. No other profile can read it, yours included. If its password is forgotten, the ten words made with it open it again; without them, the profile can only be removed.</li>'
