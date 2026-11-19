@@ -62,7 +62,9 @@ function watch(){if(mo||!D.body)return;sweep(D.body);
     else for(var j=0;j<r.addedNodes.length;j++)sweep(r.addedNodes[j]);}});
   mo.observe(D.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});}
 if(D.body)watch();else D.addEventListener("DOMContentLoaded",watch);
-W.IngNotHers={say:say,sweep:sweep};
+/* What is new (r222) asks this of each line, in that profile only */
+var HERS=/\b(Carpe Diem|The Forge|the Forge|Inkwell|Lakay|Offline Project)\b/;
+W.IngNotHers={say:say,sweep:sweep,hers:function(t){return HERS.test(String(t||""));}};
 })();
 ;try{window.__ingParts["p336"]="running";}catch(_){}
 </script>
