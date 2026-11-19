@@ -395,6 +395,34 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.45 (19 November 2026): the full edition without the owner's material, bringing in the master's work, and the editions' Windows installers.
+
+Her words (19 November 2026): "I want to be able to download and install the Gift and Full editions of Ingenium on my HP Windows computer";
+"I will only have one edition per device"; "I don't want my data and my past chats to be lost when I replace my master edition of
+Ingenium with the new Full edition on my HP laptop ... Please allow for my data to be transferred to this new one and then you can seal
+everything and keep everything after"; and "I also really want the Full edition to be rid of my information and all of my apps and be a
+real full version of Ingenium but without my Author access and owner administrative functions".
+
+- Found: the full, gift and demo editions of 7.44 and before carried, in their text, her DPhil plan (modules/r323.js, from 7.40), her own
+  list of ways of working (r327's HERS, seeded in the master alone but carried) and her own devices named in Fabrica's, the Cloud's and the
+  lending's words. rig/t_627_editions reads what the pages show, so it did not see them. Now `editions.py`: r323 is the master's alone
+  (`skip_modules`), and `_no_owner_material` empties HERS and says her devices as anyone's in every edition but the master; the 7.40 news
+  line of the DPhil plan is marked "master". `rig/t_745_owner_free.js` reads each edition's whole text and refuses her plan, her ways, her
+  devices, the master's own parts, and her name outside authorship, copyright and the licence; it reports her other apps' names left in
+  code that cannot run in that edition (95 in the full edition), for the next pass.
+- Bringing in the master's work (`modules/r332.js`, window.IngCarry; `storage_shim.py`): the full edition keeps its stores under "ing-full:"
+  (6.8.1), so on a device where the master kept her work at the same address (the computer apps serve every edition from one address) it
+  opened empty beside it. Now it asks once, on the Security room's own first-start sheet (r318's look): Bring it in, or Start empty. Bring it
+  in sets "ing.carry.v1" to "adopt" and opens again; from then on the full edition's store script passes the master's names through as the
+  master does, so nothing is copied and nothing can be half copied, and sealed work stays sealed with the same sign-in. Where it was not
+  sealed, the Security room's Protect your work first asks at the next start. Not asked in another person's profile, in a fresh copy, or
+  where this copy has work of its own. `rig/t_745_to_full.js`.
+- The Windows build (Ingenium-HPWindows, `.github/workflows/build-windows.yml`, `tools/get_editions.py`) also makes Ingenium-Full-Setup.exe
+  (Ingenium itself: the same name, program folder, data folder and id, so it replaces the master edition in place) and
+  Ingenium-Gift-Setup.exe (its own data folder and id, IngeniumGift, so it never opens an owner's work). The pages come from this
+  repository's editions/ at the same branch, each checked against the fingerprint editions/README.txt lists. Push the page commit and the
+  editions commit separately: a push whose last commit says [skip ci] starts no build (7.44's Mac mini build was started by hand for this).
+
 Ingenium 7.44 (19 November 2026): local profiles.
 
 Her words (14 November 2026), on my recommendations: "I am saying yes to your recommendations, please proceed": a profile key in the top bar

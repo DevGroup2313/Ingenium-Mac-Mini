@@ -65,6 +65,7 @@ def skip_modules(ed):
     out |= {"r275.js"}  # 6.82: puts back the copy of itself an app carried inside the page leaves out; only the master carries the apps
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     out |= {"r297.js"}  # 7.07: Ingenium's own rules in Ingenium's folder, the master's alone (her rules for building Ingenium)
+    out |= {"r323.js"}  # 7.45: her DPhil plan in Vocatio (7.40), the master's alone: her plans, her answers and her deadline
     if has_fabrica(ed) and carries_desk(ed):
         out |= {"r231.js"}  # 6.27: only the public editions take away what they do not have
     if not has_fabrica(ed):
@@ -726,4 +727,39 @@ def apply(out, ed):
             out = out.replace(old, new)
     if ed != "master":
         out = _no_master_news(out, ed)
+        out = _no_owner_material(out, ed)
     return cut_parts(out, ed)
+
+
+# 7.45 (19 November 2026), her words: "I also really want the Full edition to be rid of my information and all of my apps and be a real
+# full version of Ingenium but without my Author access and owner administrative functions like I have made clear many times." Read in
+# the full and gift editions' text (not only what their pages show): her DPhil plan (modules/r323.js, now the master's alone), her own
+# list of ways of working written into r327 (seeded in the master alone, but carried), and her own devices named in the words of
+# Fabrica's machines, the Cloud, the lending and Ship. Each edition but the master carries none of them: her ways list is empty there
+# (each person writes their own), and her devices are said as any person's computers, tablets and phones.
+_HER_WAYS = re.compile(r"var HERS=\[\[.*?\]\];", re.S)
+_HER_DEVICES = (
+    ("one app for Apple silicon (your Mac mini) and Intel (your MacBook), macOS 12 or newer", "one app for Apple silicon and Intel Macs, macOS 12 or newer"),
+    ("choose this on your Mac mini at home, or on the computer you take with you", "choose this on the computer that stays at home, or on the one you take with you"),
+    ("Open Fabrica in Ingenium on your Mac mini or your HP laptop to do it.", "Open Fabrica in Ingenium on one of your computers to do it."),
+    ("Your Mac mini, your HP laptop, any computer of yours with Ingenium", "Any computer of yours with Ingenium"),
+    ("a Mac job on a Mac, a Windows job on the HP laptop", "a Mac job on a Mac, a Windows job on a Windows computer"),
+    ("Your Mac mini, your HP laptop or any computer of yours with Ingenium's app runs", "Any computer of yours with Ingenium's app runs"),
+    ("Xcode on your Mac mini", "Xcode on your Mac"),
+    ("Pair your Mac mini (and your other computers) in Your devices", "Pair your computers in Your devices"),
+    ("on your computers, your Fire tablet, your iPhone and your iPad", "on your computers, tablets and phones"),
+)
+
+
+def _no_owner_material(out, ed):
+    n = len(_HER_WAYS.findall(out))
+    if n != 1:
+        sys.exit("edition %s: her ways of working (var HERS in modules/r327.js) found %d times, not once" % (ed, n))
+    out = _HER_WAYS.sub("var HERS=[];", out)
+    for old, new in _HER_DEVICES:
+        if old not in out:
+            if ed == "full":  # every one of these parts is in the full edition; the gift and demo editions leave several out
+                sys.exit("edition %s: the words %r were not found (her devices); see editions._HER_DEVICES" % (ed, old[:60]))
+            continue
+        out = out.replace(old, new)
+    return out
