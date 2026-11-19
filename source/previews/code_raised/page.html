@@ -1,0 +1,123 @@
+<title>Code Start, Raised</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the two scenes drawn by Ingenium itself on a raised stage, the switches beside them. Tokens are Ingenium's own (7.46). */
+:root{
+  --bg:#f5f3f7; --glow:rgba(106,63,181,.07); --card:#ffffff; --pane:#faf8fc; --head1:#ffffff; --head2:#f6f2fb; --ink1:#221a2e; --ink2:#4a4358; --ink3:#6c6579;
+  --hair:rgba(34,26,46,.10); --acc:#6a3fb5; --accs:rgba(106,63,181,.14); --ring:rgba(106,63,181,.5); --pa:#7348be; --pb:#5d37a1; --pledge:#3a2070;
+  --wellbg:rgba(34,26,46,.04); --well:inset 0 1px 2.5px rgba(40,22,68,.10);
+  --pop:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
+  --pophi:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12);
+  --press:inset 0 2px 5px rgba(40,22,68,.22),0 1px 1px rgba(40,22,68,.18);
+  --psh:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 var(--pledge),0 4px 6px rgba(40,22,68,.24),0 9px 16px rgba(40,22,68,.16);
+  --stage:inset 0 1px 0 rgba(255,255,255,.85),0 1px 0 rgba(40,22,68,.10),0 6px 12px rgba(40,22,68,.07),0 18px 36px rgba(40,22,68,.08);
+  --f-title:"Cormorant Garamond","Iowan Old Style",Georgia,serif; --f-ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#110d18;--glow:rgba(106,63,181,.10);--card:#201a2b;--pane:#1c1626;--head1:#2a2239;--head2:#231c31;--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;
+  --hair:rgba(205,184,240,.11);--acc:#b79ce6;--accs:rgba(183,156,230,.16);--ring:rgba(183,156,230,.45);--pa:#7a56c8;--pb:#5b3aa1;--pledge:#170b30;
+  --wellbg:rgba(10,6,18,.35);--well:inset 0 1px 3px rgba(0,0,0,.45);
+  --pop:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --pophi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --psh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--pledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --stage:inset 0 1px 0 rgba(255,255,255,.06),0 1px 0 rgba(0,0,0,.6),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110d18;--glow:rgba(106,63,181,.10);--card:#201a2b;--pane:#1c1626;--head1:#2a2239;--head2:#231c31;--ink1:#f3eefb;--ink2:#d3c9e3;--ink3:#a99cc1;
+  --hair:rgba(205,184,240,.11);--acc:#b79ce6;--accs:rgba(183,156,230,.16);--ring:rgba(183,156,230,.45);--pa:#7a56c8;--pb:#5b3aa1;--pledge:#170b30;
+  --wellbg:rgba(10,6,18,.35);--well:inset 0 1px 3px rgba(0,0,0,.45);
+  --pop:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5),0 9px 14px rgba(0,0,0,.36);
+  --pophi:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.75),0 6px 8px rgba(0,0,0,.52),0 13px 20px rgba(0,0,0,.4);
+  --press:inset 0 2px 6px rgba(0,0,0,.6),0 1px 1px rgba(0,0,0,.4);
+  --psh:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 var(--pledge),0 4px 6px rgba(0,0,0,.5),0 9px 16px rgba(0,0,0,.36);
+  --stage:inset 0 1px 0 rgba(255,255,255,.06),0 1px 0 rgba(0,0,0,.6),0 6px 12px rgba(0,0,0,.35),0 18px 36px rgba(0,0,0,.4);color-scheme:dark}
+*{box-sizing:border-box}
+html,body,*{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none;width:0;height:0}
+body{background:var(--bg);color:var(--ink1);font:15px/1.55 var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 40px;
+  background-image:radial-gradient(1100px 600px at 8% -10%,var(--glow),transparent 62%),radial-gradient(900px 600px at 104% 110%,var(--glow),transparent 58%);background-attachment:fixed}
+.wrap{max-width:1360px;margin:0 auto;display:grid;gap:18px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+.eye{font:600 11.5px/1 var(--f-ui);letter-spacing:.3em;text-transform:uppercase;color:var(--ink3)}
+header.top h1{font:600 38px/1.05 var(--f-title);margin:6px 0 0;text-wrap:balance}
+header.top p{margin:0;color:var(--ink2);max-width:64ch;font-size:14px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr)}}
+.scenes{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1100px){.scenes{grid-template-columns:minmax(0,1fr)}}
+.stage{border-radius:24px;padding:14px;box-shadow:var(--stage);background:radial-gradient(ellipse 80% 70% at 50% 30%,var(--card),var(--pane) 70%);min-width:0;animation:rise .45s cubic-bezier(.22,1,.36,1) backwards}
+.stage+.stage{animation-delay:.07s}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+.cap{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;margin:2px 6px 10px;font-size:13px;color:var(--ink3)}
+.cap b{color:var(--ink1);font-weight:600}
+.frame{display:block;width:100%;border:0;border-radius:16px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--hair)}
+.side{display:grid;gap:14px;min-width:0}
+.slab{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--stage);min-width:0}
+.slab h2{font:600 11px/1 var(--f-ui);letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);margin:2px 0 12px}
+.srow{display:grid;gap:7px}.srow+.srow{margin-top:14px}
+.srow label{font-size:12.5px;color:var(--ink3)}
+.swg{display:flex;flex-wrap:wrap;gap:7px}
+.k{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:12px;background:linear-gradient(var(--head1),var(--head2));box-shadow:var(--pop);
+  font:600 12.5px/1.2 var(--f-ui);color:var(--ink1);cursor:pointer;white-space:nowrap;transition:transform .18s cubic-bezier(.34,1.35,.64,1),box-shadow .18s ease}
+.k:hover{transform:translateY(-2px);box-shadow:var(--pophi)}.k:active{transform:translateY(1px);box-shadow:var(--press)}
+.k:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
+.k[aria-pressed="true"]{background:linear-gradient(var(--pa),var(--pb));color:#fff;box-shadow:var(--psh)}
+.k .r{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.rec{display:grid;gap:9px;font-size:13.5px;color:var(--ink2)}.rec p{margin:0}.rec b{color:var(--acc);font-weight:600}
+.note{font-size:12.5px;color:var(--ink3);margin:0}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div><div class="eye">Code's start window · held for your word</div><h1>Code, raised</h1></div>
+    <p>Your words (19 November): "give the new Code panel for Fabrica the same raised 3D effect as the "Drop your files" section of the Vocatio page, it looks that much better than the 3d button cards." Both are drawn here by Ingenium 7.46 itself, with its own style rules. Point at a card: it lifts; press it: it sinks.</p>
+  </header>
+  <div class="main">
+    <div class="scenes">
+      <section class="stage" aria-label="Code's start window">
+        <div class="cap"><span><b>Code's start window</b></span><span id="capL"></span></div>
+        <iframe class="frame" id="fCode" title="Code's start window" style="height:660px"></iframe>
+      </section>
+      <section class="stage" aria-label="Vocatio's drop zone">
+        <div class="cap"><span><b>Vocatio · Drop your files here</b></span><span>for comparison</span></div>
+        <iframe class="frame" id="fDrop" title="Vocatio's drop zone" style="height:430px"></iframe>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="slab"><h2>Switches</h2>
+        <div class="srow"><label id="lCards">The six cards</label><div class="swg" role="group" aria-labelledby="lCards" data-k="cards">
+          <button class="k" data-v="now">As now (7.46)</button><button class="k" data-v="raised">Raised as the drop zone <span class="r">rec.</span></button></div></div>
+        <div class="srow"><label id="lTheme">Theme</label><div class="swg" role="group" aria-labelledby="lTheme" data-k="th">
+          <button class="k" data-v="day">Day</button><button class="k" data-v="night">Night</button></div></div>
+      </div>
+      <div class="slab rec"><h2>What changes</h2>
+        <p><b>Raised as the drop zone</b>: each card takes the drop zone's dashed lilac edge, its lilac light falling from the top and its rounder corners, raised at rest as the drop zone is under your pointer; under your pointer it lifts two points with the drop zone's deeper shadow and spring, and it sinks when pressed. By night, the same in the drop zone's night colours.</p>
+        <p>Each card keeps its words, their type and their order. Nothing else in Code or Fabrica changes. Minimal motion keeps them still.</p>
+        <p class="note">The cards here do nothing when pressed: they are drawn, not run.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+var D=/*__DATA__*/null;
+var S={cards:"raised",th:"day"};
+try{var sv=JSON.parse(localStorage.getItem("r335prev")||"null");if(sv){if(sv.cards)S.cards=sv.cards;if(sv.th)S.th=sv.th;}}catch(e){}
+function doc(key){var sc=D.scenes[key];if(!sc)return "<p>Not captured.</p>";var attrs=sc.body.map(function(a){return a[0]+'="'+String(a[1]).replace(/"/g,"&quot;")+'"';}).join(" ");
+  var ground=key.slice(-5)==="night"?"#110d18":"#f5f3f7";
+  return '<!doctype html><html><head><meta charset="utf-8"><style>'+D.css+'</style><style>html{background:'+ground+' !important}</style><style id="r335" media="not all">'+D.r335+'</style></head><body '+attrs+'>'+sc.html+'</body></html>';}
+function apply(f){try{var d=f.contentDocument,st=d&&d.getElementById("r335");if(st)st.media=S.cards==="raised"?"all":"not all";}catch(e){}}
+function load(){var fc=document.getElementById("fCode"),fd=document.getElementById("fDrop");
+  fc.onload=function(){apply(fc);};fc.srcdoc=doc("code_"+S.th);
+  fd.onload=function(){try{var z=fd.contentDocument.querySelector(".cn-drop");if(z)fd.contentWindow.scrollTo(0,Math.max(0,z.getBoundingClientRect().top-90));}catch(e){}};fd.srcdoc=doc("drop_"+S.th);}
+function paint(){[].forEach.call(document.querySelectorAll(".swg"),function(g){var k=g.getAttribute("data-k");[].forEach.call(g.querySelectorAll(".k"),function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-v")===S[k]));});});
+  document.getElementById("capL").textContent=(S.cards==="raised"?"raised as the drop zone":"as now, 7.46")+" · "+(S.th==="day"?"by day":"by night");}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".swg .k");if(!b)return;var k=b.parentNode.getAttribute("data-k"),v=b.getAttribute("data-v");if(S[k]===v)return;S[k]=v;
+  try{localStorage.setItem("r335prev",JSON.stringify(S));}catch(x){}paint();if(k==="th")load();else apply(document.getElementById("fCode"));});
+paint();load();
+})();
+</script>
