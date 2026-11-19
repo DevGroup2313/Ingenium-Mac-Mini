@@ -410,8 +410,15 @@ appropriate." And: "Do not change anything that I haven't asked you to change, o
 - `build/modules/r331.js`: the profile key is the last row of the left menu (nav.dock, one of its own nav-btn rows: the profile's tile
   where a row's icon sits, its name, a small chevron), pinned to its foot; under the pointer it lifts, with no violet wash (her rule); its
   menu (version 3's) opens above it. Nothing of it is left in the top bar. `rig/t_744_profiles.js` checks it there; `rig/t_746_film_key.js`.
-- Held, not in this release: Fabrica's stage 1 (modules/r333.js, held.json "held_746"), for her answer to its preview; its computer-app
-  side (desktop/app_session_746.py) is left out of release.py's list until then.
+- Fabrica's plan, stage 1 (recommendations 1 to 4 of the audit), approved on its preview drawn with Fabrica's own parts ("I approve of the
+  new previews from your pictures, please commit and push it everywhere"): `build/modules/r333.js` (window.IngRepoWork). A repository, in
+  Code's start window and Chat's + menu (Fabrica's apps, and GitHub when signed in); Code on a Fabrica app from the branch she chooses, its
+  work kept on a branch of its own (`IngRepo.commitTo` in r110; for a repository on a drive, r280's ROUTE.commitTo and
+  `desktop/app_session_746.py`, the folder never touched); Review and keep in Fabrica's own sheet and Changes view (Fabrica's rules taken
+  for a frame of the same kind, .fbx); Create pull request in Fabrica (`fbHub.newPull` in r141), waiting for her yes; Update from
+  Fabrica; the model's tools fabrica_status, fabrica_diff, keep_version, fabrica_pull_request; Chat reads a repository (repo_files,
+  repo_read) and Continue in Code changes it. Code's start cards and Chat's + menu rows raised and lifting, no violet wash.
+  `rig/t_746_repo_work.js` 17/17, `rig/t_746_session_app.py` 15/15.
 
 Ingenium 7.45 (19 November 2026): the full edition without the owner's material, bringing in the master's work, and the editions' Windows installers.
 

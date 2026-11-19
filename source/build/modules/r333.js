@@ -1,20 +1,4 @@
 <style id="r333-css">
-/* R333: the rows of A repository and of an app's branches, raised and alive as Fabrica's own rows are (r315's key values), never a violet
-   wash under the pointer; still when motion is minimal or reduced. Only these sheets: Code's own lists keep their look. */
-.ing-ask.r333 .cc-plist{display:flex;flex-direction:column;gap:8px;padding:2px 2px 6px}
-.ing-ask.r333 .cc-prow,.ing-ask.r312 .cc-prow{align-items:center;border:1px solid rgba(34,26,46,.10);background:linear-gradient(180deg,#ffffff,#f6f2fb);
-  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
-  transition:transform .22s cubic-bezier(.34,1.45,.64,1),box-shadow .22s ease}
-.ing-ask.r333 .cc-prow:hover,.ing-ask.r312 .cc-prow:hover{background:linear-gradient(180deg,#ffffff,#f6f2fb);transform:translateY(-3px) rotate(-.25deg);
-  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12)}
-.ing-ask.r333 .cc-prow:active,.ing-ask.r312 .cc-prow:active{transform:translateY(1px) scale(.995);box-shadow:inset 0 -1px 0 rgba(40,22,68,.13),0 1px 0 rgba(40,22,68,.25),0 2px 3px rgba(40,22,68,.14);transition-duration:.08s}
-.ing-ask.r333 .cc-prow b,.ing-ask.r312 .cc-prow b{font-weight:600}
-body[data-theme="night"] .ing-ask.r333 .cc-prow,body[data-theme="night"] .ing-ask.r312 .cc-prow{border-color:rgba(255,255,255,.08);background:linear-gradient(180deg,#3a3050,#2f2742);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1.5px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.55),0 4px 6px rgba(0,0,0,.40),0 9px 14px rgba(0,0,0,.30)}
-body[data-theme="night"] .ing-ask.r333 .cc-prow:hover,body[data-theme="night"] .ing-ask.r312 .cc-prow:hover{background:linear-gradient(180deg,#3f3557,#322a47);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1.5px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.42),0 13px 20px rgba(0,0,0,.32)}
-body[data-motion="minimal"] .ing-ask.r333 .cc-prow,body[data-motion="minimal"] .ing-ask.r312 .cc-prow{transition:none!important;transform:none!important}
-@media (prefers-reduced-motion:reduce){.ing-ask.r333 .cc-prow,.ing-ask.r312 .cc-prow{transition:none!important;transform:none!important}}
 /* Code's start window (where A repository begins) and Chat's + menu (A repository, The repository): raised and alive as Ingenium's keys,
    never a violet wash under the pointer. Her words on the stage 1 preview (19 November 2026): "I hate the purple shading, I want the
    animated popped out 3D look and animation of Ingenium to be consistent throughout". */
@@ -59,8 +43,8 @@ body[data-motion="minimal"] #modalBox .cc-start .cc-card,body[data-motion="minim
       Fabrica brings newer work on that branch into the files she has not changed, and names those she has.
    3. The model's own tools, as r219 gives them for GitHub: fabrica_status, fabrica_diff, keep_version (onto the session's branch, never the
       branch it began from) and open_pull_request (which always asks her first).
-   4. Review and keep, before anything is kept: r219's own sheet (its look and keys), each changed file with its lines added and taken away,
-      Show for its differences, the branch, the message.
+   4. Review and keep, before anything is kept: Fabrica's own Changes view in Fabrica's own sheet (her words on the preview: "use Fabrica's
+      actual template and designs for this panel"), each changed file with its lines added and taken away, the branch, the message.
    5. Chat on a repository: A repository in Chat's + menu ties the conversation to it; the model reads its file list and its files with two
       tools that only read (repo_files, repo_read), and Continue in Code opens a Code session on it, on a branch of its own.
    Repositories on a drive (r280) work the same way: the computer app keeps the session's version on its branch (desktop/app_session_746.py,
@@ -91,37 +75,73 @@ function blobOid(text){var b=te.encode(String(text)),h=te.encode("blob "+b.lengt
 function slug(t){return String(t||"").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,40)||"session";}
 function okBranch(v){try{return IngRepo.core.okRefName(v);}catch(e){return /^[A-Za-z0-9._\/-]+$/.test(v);}}
 
+/* ================= 0. Fabrica's own sheet, outside Fabrica ================= */
+/* Her words on the stage 1 preview (19 November 2026): "I want you to actually use Fabrica's actual template and designs for this panel so
+   that everything stays cohesive and consistent." Fabrica's look is written for its frame, #fb (its tokens by day and by night, its sheet,
+   option rows, keys, segmented rows, fields, its Changes view and diff). These panels open over Code and Chat, outside that frame, so
+   Fabrica's own rules are taken from the page as they stand, once, for a frame of the same kind (.fbx), and the panels are built with
+   Fabrica's own parts and markup (f-sheet-wrap, f-sheet, f-x, f-opt, f-seg, f-field, f-files, f-frow, f-diff, f-dcode, f-dl, f-btn). */
+var FBX=false;
+function fbxStyles(){if(FBX)return;FBX=true;var out=[];
+  function rw(sel){return sel.split(",").filter(function(x){return x.indexOf("#fb")>=0;}).map(function(x){return x.replace(/#fb(?![\w-])/g,".fbx");}).join(",");}
+  function walk(list,wrap){for(var i=0;i<list.length;i++){var r=list[i];
+      if(r.type===4||r.type===12){var t=r.cssText;walk(r.cssRules,wrap.concat([t.slice(0,t.indexOf("{")).trim()]));continue;}
+      if(r.type!==1||!r.selectorText||r.selectorText.indexOf("#fb")<0)continue;var s=rw(r.selectorText);if(!s)continue;
+      var c=s+"{"+r.style.cssText+"}";for(var j=wrap.length-1;j>=0;j--)c=wrap[j]+"{"+c+"}";out.push(c);}}
+  [].forEach.call(D.styleSheets,function(sh){try{walk(sh.cssRules,[]);}catch(e){}});
+  /* the frame itself lies over the window, with no film, and holds only the sheet */
+  out.push("html body .fbx.r333x{position:fixed!important;inset:0!important;z-index:2147481000!important;display:block!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:hidden}");
+  out.push("html body .fbx.r333x .f-sheet-wrap{position:absolute;inset:0;border-radius:0;background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}");
+  out.push("html body .fbx.r333x .f-sheet{width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 48px)}");
+  out.push("html body .fbx.r333x .r333-list{display:flex;flex-direction:column;gap:0;margin:10px 0 4px}");
+  out.push("html body .fbx.r333x .r333-keys{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}");
+  out.push("html body .fbx.r333x .f-seg{margin:6px 0 4px}");
+  out.push("html body .fbx.r333x .f-note:empty{display:none}");
+  var st=D.createElement("style");st.id="r333-fbx";st.textContent=out.join("\n");D.head.appendChild(st);}
+function fsheet(title,lead){fbxStyles();var old=D.querySelector(".fbx.r333x");if(old)old.remove();
+  var root=mk("div","fbx r333x"),wrap=mk("div","f-sheet-wrap"),s=mk("div","f-sheet");s.setAttribute("role","dialog");s.setAttribute("aria-modal","true");
+  s.innerHTML="<h3>"+esc(title)+"</h3>"+(lead?"<p>"+esc(lead)+"</p>":"");wrap.appendChild(s);root.appendChild(wrap);
+  try{if(D.body.getAttribute("data-theme"))root.setAttribute("data-theme",D.body.getAttribute("data-theme"));}catch(e){}
+  D.body.appendChild(root);
+  var sh={root:root,wrap:wrap,box:s,close:function(){root.remove();}};
+  var x=mk("button","f-x","✕");x.type="button";x.title="Close";x.setAttribute("aria-label","Close");x.onclick=function(){sh.close();};s.appendChild(x);
+  wrap.onclick=function(e){if(e.target===wrap)sh.close();};wrap.tabIndex=-1;wrap.addEventListener("keydown",function(e){if(e.key==="Escape"){e.stopPropagation();sh.close();}});
+  setTimeout(function(){try{wrap.focus({preventScroll:true});}catch(e){}},30);return sh;}
+function fopt(ic,title,small,on){var b=mk("button","f-opt");b.type="button";b.innerHTML='<span class="ic">'+esc(ic)+'</span><span><b>'+esc(title)+'</b><small>'+esc(small)+'</small></span>';b.onclick=on;return b;}
+function fbtn(cls,label,on){var b=mk("button","f-btn"+(cls?" "+cls:""),label);b.type="button";b.onclick=on;return b;}
+function fseg(names,cur,on){var g=mk("div","f-seg");g.setAttribute("role","tablist");var th=mk("span","f-thumb");g.appendChild(th);
+  names.forEach(function(n){var b=mk("button",null,n[1]);b.type="button";b.setAttribute("role","tab");b.setAttribute("data-t",n[0]);b.onclick=function(){set(n[0]);on(n[0]);};g.appendChild(b);});
+  function set(t){[].forEach.call(g.querySelectorAll("button"),function(b){var y=b.getAttribute("data-t")===t;b.setAttribute("aria-selected",y?"true":"false");if(y){b.classList.add("on");setTimeout(function(){th.style.left=b.offsetLeft+"px";th.style.width=b.offsetWidth+"px";},0);}else b.classList.remove("on");});}
+  setTimeout(function(){set(cur);},0);return g;}
+function ffield(label,el){var f=mk("label","f-field");f.appendChild(mk("span",null,label));f.appendChild(el);return f;}
+function letter(n){return String(n||"?").replace(/^[^A-Za-z0-9]+/,"").charAt(0).toUpperCase()||"⑂";}
+
 /* ================= 1. the picker: A repository ================= */
 function ghSigned(){try{return !!(W.state&&state.github&&state.github.token);}catch(e){return false;}}
 function ghRepos(){if(!ghSigned()||!W.IngGitHubCode||typeof IngGitHubCode.api!=="function")return Promise.resolve(null);
   return IngGitHubCode.api("/user/repos?per_page=100&sort=updated&affiliation=owner,collaborator").then(function(x){var d=x&&x.data;return Array.isArray(d)?d:[];},function(){return null;});}
 function pick(o){o=o||{};var into=o.into||"code";
-  var box=W.modalOpen('<div class="ing-ask r333"><h3>A repository</h3><p>'+(into==="chat"?"This conversation reads it: its files, as the model needs them. Continue in Code makes changes, on a branch of their own.":"Code works on it on a branch of its own. Nothing joins the branch it starts from until you say yes to a pull request.")+'</p>'
-    +'<div class="ing-ask-keys r333-tabs" role="tablist" style="justify-content:flex-start"><button class="btn small" type="button" data-t="fabrica" role="tab">Fabrica</button><button class="btn small ghost" type="button" data-t="github" role="tab">GitHub</button></div>'
-    +'<div class="cc-plist" id="r333List"></div><div class="ing-ask-keys"><button class="btn ghost" type="button" id="r333X">Close</button></div></div>');
-  var list=box.querySelector("#r333List"),tabs=[].slice.call(box.querySelectorAll(".r333-tabs [data-t]"));box.querySelector("#r333X").onclick=function(){W.closeModal();};
-  function tab(t){tabs.forEach(function(b){var on=b.getAttribute("data-t")===t;b.className="btn small"+(on?"":" ghost");b.setAttribute("aria-selected",on?"true":"false");});list.innerHTML="";
-    if(t==="fabrica")fabRows(list,into);else ghRows(list,into);}
-  tabs.forEach(function(b){b.onclick=function(){tab(b.getAttribute("data-t"));};});tab(o.tab||"fabrica");return box;}
-function fabRows(host,into){host.appendChild(mk("div","small muted","Reading Fabrica…"));IngRepo.list().then(function(rs){host.innerHTML="";rs=rs||[];
-    if(!rs.length){host.appendChild(mk("div","small muted","No apps in Fabrica yet. Start one there, or keep one from Chat or Code with Keep in Fabrica."));return;}
-    rs.forEach(function(r){var b=mk("button","cc-prow");b.type="button";b.appendChild(mk("b",null,r.name));
-      b.appendChild(mk("span","small muted",(IngRepo.isDisk(r.id)?"On your drive":"Kept in Ingenium")+(r.branch?" · "+r.branch:"")+(r.branches&&r.branches.length>1?" · "+r.branches.length+" branches":"")));
-      b.onclick=function(){branchSheet(r,into);};host.appendChild(b);});}).catch(function(e){host.innerHTML="";host.appendChild(mk("div","small muted",String(e&&e.message||e)));});}
-function ghRows(host,into){if(!ghSigned()){host.appendChild(mk("div","small muted","Sign in to GitHub once, with a token made on GitHub; it is kept on this device and sent only to GitHub."));
-    var k=mk("button","btn small","Sign in to GitHub");k.type="button";k.onclick=function(){W.closeModal();try{IngGitHubCode.connect();}catch(e){toast("GitHub is not in this copy.");}};host.appendChild(k);return;}
-  host.appendChild(mk("div","small muted","Reading your repositories on GitHub…"));
-  ghRepos().then(function(rs){host.innerHTML="";if(!rs){host.appendChild(mk("div","small muted","GitHub could not be reached just now."));return;}
-    rs.forEach(function(g){var b=mk("button","cc-prow");b.type="button";b.appendChild(mk("b",null,g.full_name));b.appendChild(mk("span","small muted",(g.private?"Private":"Public")+" · "+(g.default_branch||"main")));
-      b.onclick=function(){W.closeModal();if(into==="chat"){tieChat({kind:"github",full:g.full_name,owner:g.owner&&g.owner.login,repo:g.name,branch:g.default_branch||"main"});return;}
-        /* Code on GitHub: r219's own way, its sheet with the branch to choose */
-        try{IngGitHubCode.connect({owner:g.owner&&g.owner.login,repo:g.name});}catch(e){try{IngGitHubCode.connect();}catch(_){}}};host.appendChild(b);});}).catch(warn);}
+  var sh=fsheet("A repository",into==="chat"?"This conversation reads it: its files, as the model needs them. Continue in Code makes changes, on a branch of their own.":"Code works on it on a branch of its own. Nothing joins the branch it starts from until you say yes to a pull request.");
+  sh.root.classList.add("r333-pick");var list=mk("div","r333-list");list.id="r333List";
+  sh.box.appendChild(fseg([["fabrica","Fabrica"],["github","GitHub"]],o.tab||"fabrica",function(t){list.innerHTML="";if(t==="fabrica")fabRows(list,into);else ghRows(list,into);}));
+  sh.box.appendChild(list);if((o.tab||"fabrica")==="fabrica")fabRows(list,into);else ghRows(list,into);return sh;}
+function fabRows(host,into){host.appendChild(mk("div","f-empty","Reading Fabrica…"));IngRepo.list().then(function(rs){host.innerHTML="";rs=rs||[];
+    if(!rs.length){host.appendChild(mk("div","f-empty","No apps in Fabrica yet. Start one there, or keep one from Chat or Code with Keep in Fabrica."));return;}
+    rs.forEach(function(r){host.appendChild(fopt(letter(r.name),r.name,(IngRepo.isDisk(r.id)?"On your drive":"Kept in Ingenium")+(r.branch?" · "+r.branch:"")+(r.branches&&r.branches.length>1?" · "+r.branches.length+" branches":""),function(){branchSheet(r,into);}));});})
+  .catch(function(e){host.innerHTML="";host.appendChild(mk("div","f-empty",String(e&&e.message||e)));});}
+function ghRows(host,into){if(!ghSigned()){host.appendChild(mk("div","f-empty","Sign in to GitHub once, with a token made on GitHub; it is kept on this device and sent only to GitHub."));
+    var k=mk("div","r333-keys");k.appendChild(fbtn("pri","Sign in to GitHub",function(){var s=D.querySelector(".fbx.r333x");if(s)s.remove();try{IngGitHubCode.connect();}catch(e){toast("GitHub is not in this copy.");}}));host.appendChild(k);return;}
+  host.appendChild(mk("div","f-empty","Reading your repositories on GitHub…"));
+  ghRepos().then(function(rs){host.innerHTML="";if(!rs){host.appendChild(mk("div","f-empty","GitHub could not be reached just now."));return;}
+    rs.forEach(function(g){host.appendChild(fopt(letter(g.name),g.full_name,(g.private?"Private":"Public")+" · "+(g.default_branch||"main"),function(){var s=D.querySelector(".fbx.r333x");if(s)s.remove();
+        if(into==="chat"){tieChat({kind:"github",full:g.full_name,owner:g.owner&&g.owner.login,repo:g.name,branch:g.default_branch||"main"});return;}
+        try{IngGitHubCode.connect({owner:g.owner&&g.owner.login,repo:g.name});}catch(e){try{IngGitHubCode.connect();}catch(_){}}}));});}).catch(warn);}
 function branchSheet(r,into){IngRepo.info(r.id).then(function(info){var bs=(info.branches||[]).slice().sort(function(a,b){return a===info.branch?-1:b===info.branch?1:a.localeCompare(b);});
-  var box=W.modalOpen('<div class="ing-ask r333"><h3>'+esc(info.name)+'</h3><p>Start from the branch'+(into==="chat"?" this conversation reads.":" the session begins from. Its work goes to a branch of its own.")+'</p><div class="cc-plist" id="r333Br"></div><div class="ing-ask-keys"><button class="btn ghost" type="button" id="r333Back">Back</button></div></div>');
-  var host=box.querySelector("#r333Br");box.querySelector("#r333Back").onclick=function(){pick({into:into});};
-  bs.forEach(function(b){var row=mk("button","cc-prow");row.type="button";row.appendChild(mk("b",null,b));row.appendChild(mk("span","small muted",b===info.branch?"Out in Fabrica now":"A branch"));
-    row.onclick=function(){W.closeModal();if(into==="chat")tieChat({kind:"fabrica",repo:r.id,name:info.name,branch:b});
-      else openFab(r.id,b);};host.appendChild(row);});}).catch(function(e){toast(String(e&&e.message||e));});}
+  var sh=fsheet(info.name,into==="chat"?"Start from the branch this conversation reads.":"Start from the branch the session begins from. Its work goes to a branch of its own.");
+  var host=mk("div","r333-list");host.id="r333Br";sh.box.appendChild(host);
+  bs.forEach(function(b){host.appendChild(fopt("⑂",b,b===info.branch?"Out in Fabrica now":"A branch",function(){sh.close();if(into==="chat")tieChat({kind:"fabrica",repo:r.id,name:info.name,branch:b});else openFab(r.id,b);}));});
+  var k=mk("div","r333-keys");k.appendChild(fbtn("quiet","Back",function(){pick({into:into});}));sh.box.appendChild(k);}).catch(function(e){toast(String(e&&e.message||e));});}
+
 
 /* ================= 2. Code on a Fabrica app, on a branch of its own ================= */
 function readBranch(id,branch){return IngRepo.files(id,branch).then(function(list){var files=[],left=[],map={},chain=Promise.resolve();
@@ -169,30 +189,36 @@ function update(pr){var F=pr.fab;return IngRepo.resolve(F.repo,F.base).then(func
       if(e)q=q.then(function(){return W.ccPut(e,f.text);});else{var nf={name:f.name,ref:null,size:0};pr.files.push(nf);q=q.then(function(){return W.ccPut(nf,f.text);});}});
     return q.then(function(){if(!F.head){F.baseOid=now;var m={},p;for(p in x[1].map)m[p]=x[1].map[p];kept.forEach(function(k){if(F.map[k])m[k]=F.map[k];});F.map=m;}save();return {came:came,kept:kept};});});});}
 
-/* ================= 4. Review and keep: r219's own sheet ================= */
-function colour(t){return esc(t).split("\n").map(function(l){return l.charAt(0)==="+"&&l.indexOf("+++")!==0?'<span class="p">'+l+'</span>':l.charAt(0)==="-"&&l.indexOf("---")!==0?'<span class="m">'+l+'</span>':l;}).join("\n");}
+/* ================= 4. Review and keep: Fabrica's own Changes view (f-files, f-frow, f-diff), in Fabrica's sheet ================= */
+function hunksOf(was,now){try{var C=IngRepo.core;return C.hunks(C.splitLines(was),C.splitLines(now));}catch(e){return [];}}
+function diffEl(path,how,was,now){var dv=mk("div","f-diff");dv.innerHTML='<div class="f-diff-h"><b>'+esc(path)+'</b><span>'+esc(how==="taken away"?"taken away":how==="new"?"a new file":"what changed")+"</span></div>";
+  var pre=mk("pre","f-dcode"),hs=hunksOf(was,now);if(!hs.length)pre.appendChild(mk("div","f-dl hunk","No lines differ."));
+  hs.forEach(function(hk){pre.appendChild(mk("div","f-dl hunk","lines "+(hk.b0+1).toLocaleString("en-GB")+" to "+(hk.b0+hk.bN).toLocaleString("en-GB")));var la=hk.a0,lb=hk.b0;
+    hk.lines.forEach(function(l){var d=mk("div","f-dl"+(l[0]==="+"?" add":l[0]==="-"?" del":""));var num=l[0]==="-"?(++la):(++lb);if(l[0]===" ")la++;d.innerHTML="<i>"+num.toLocaleString("en-GB")+"</i><s>"+(l[0]===" "?"":l[0]==="+"?"+":"−")+"</s>"+esc(l[1]);pre.appendChild(d);});});
+  dv.appendChild(pre);return dv;}
 function keepSheet(pr){var F=pr.fab;changes(pr).then(function(ch){if(!ch.length){toast("Nothing to keep: every change is already on "+(F.work||F.base)+".");return;}
-  var box=W.modalOpen('<div class="ghx-sheet r333"><h3>Review and keep</h3><p class="small muted" style="margin-top:0">'+ch.length+' file'+(ch.length===1?"":"s")+' go to the branch <b>'+esc(F.work||workBranch(pr))+'</b> of '+esc(F.name)+', as one version. <b>'+esc(F.base)+'</b> itself is not changed.</p>'
-    +'<ul class="ghx-files" id="r333F"></ul><pre class="ghx-diff" id="r333D" hidden></pre>'
-    +(F.work?'':'<label class="field"><span>The branch it goes to (new)</span><input type="text" id="r333Br" class="ghx-br" maxlength="120"></label>')
-    +'<label class="field"><span>What this version is</span><textarea id="r333Msg"></textarea></label><div class="ghx-note" id="r333Say" role="status"></div>'
-    +'<div class="ghx-keys"><button class="btn ghost" type="button" id="r333No">Cancel</button><button class="btn primary" type="button" id="r333Go">Keep this version</button></div></div>');
-  var s=box,ul=s.querySelector("#r333F"),pre=s.querySelector("#r333D"),msg=s.querySelector("#r333Msg"),say=s.querySelector("#r333Say"),go=s.querySelector("#r333Go"),bn=s.querySelector("#r333Br");
-  var c=chat();msg.value=(c&&c.title&&c.title!=="New session"?c.title:"Work from Code")+"\n\n"+ch.map(function(x){return "- "+x.how+": "+x.path;}).join("\n");if(bn)bn.value=workBranch(pr);
-  ch.forEach(function(t){var li=mk("li");li.appendChild(mk("b",null,t.path));var n=mk("span",null,t.how);li.appendChild(n);
-    diffOf(pr,t.path).then(function(d){n.innerHTML=esc(t.how)+' <span class="a">+'+d.add+'</span> <span class="d">−'+d.del+'</span>';var v=mk("button","btn small ghost","Show");v.type="button";v.onclick=function(){pre.hidden=false;pre.innerHTML=colour(d.text);};li.appendChild(v);});ul.appendChild(li);});
-  s.querySelector("#r333No").onclick=function(){W.closeModal();};
-  go.onclick=function(){var br=null;if(bn){br=bn.value.trim();if(!okBranch(br)){say.textContent="A branch name has letters, digits, dots, dashes and slashes, with no spaces, and does not start or end with a slash.";bn.focus();return;}
+  var sh=fsheet("Review and keep",ch.length+" file"+(ch.length===1?"":"s")+" go to the branch "+(F.work||workBranch(pr))+" of "+F.name+", as one version. "+F.base+" itself is not changed.");sh.root.classList.add("r333-keep");
+  var list=mk("div","f-files");list.id="r333F";var hold=mk("div");sh.box.appendChild(list);sh.box.appendChild(hold);var texts={};
+  function show(i){[].forEach.call(list.children,function(r,j){r.setAttribute("aria-pressed",j===i?"true":"false");});var c=ch[i],t=texts[c.path]||{was:"",now:""};hold.innerHTML="";hold.appendChild(diffEl(c.path,c.how,t.was,t.now));}
+  Promise.all(ch.map(function(c){var e=(pr.files||[]).filter(function(f){return f.name===c.path;})[0];return baseText(pr,c.path).then(function(was){texts[c.path]={was:was,now:e&&typeof e.text==="string"?e.text:""};});})).then(function(){
+    ch.forEach(function(c,i){var t=texts[c.path],add=0,del=0;hunksOf(t.was,t.now).forEach(function(hk){hk.lines.forEach(function(l){if(l[0]==="+")add++;else if(l[0]==="-")del++;});});
+      var row=mk("button","f-frow");row.type="button";row.innerHTML='<span class="p">'+esc(c.path)+'</span><span class="k '+(c.how==="new"?"added":c.how==="taken away"?"removed":"modified")+'">'+esc(c.how)+'</span><span class="c"><span class="a">+'+add+'</span> <span class="r">−'+del+'</span></span>';
+      row.onclick=function(){show(i);};list.appendChild(row);});show(0);});
+  var bn=null;if(!F.work){bn=mk("input");bn.type="text";bn.id="r333Br";bn.maxLength=120;bn.value=workBranch(pr);sh.box.appendChild(ffield("The branch it goes to (new)",bn));}
+  var msg=mk("textarea");msg.id="r333Msg";var c=chat();msg.value=(c&&c.title&&c.title!=="New session"?c.title:"Work from Code")+"\n\n"+ch.map(function(x){return "- "+x.how+": "+x.path;}).join("\n");sh.box.appendChild(ffield("What this version is",msg));
+  var say=mk("div","f-note");say.id="r333Say";say.setAttribute("role","status");sh.box.appendChild(say);
+  var keys=mk("div","r333-keys"),go=fbtn("pri","Keep this version",function(){var br=null;if(bn){br=bn.value.trim();if(!okBranch(br)){say.textContent="A branch name has letters, digits, dots, dashes and slashes, with no spaces, and does not start or end with a slash.";bn.focus();return;}
       if(br===F.base){say.textContent="Keep it on a branch of its own, not on "+F.base+" itself.";bn.focus();return;}}
-    go.disabled=true;say.textContent="Keeping the version…";keep(pr,msg.value,{branch:br}).then(function(r){W.closeModal();toast("Kept "+r.files.length+" file"+(r.files.length===1?"":"s")+" on "+r.branch+" ("+short(r.oid)+").");
-      if(!F.pr)setTimeout(function(){prSheet(pr);},150);},function(e){go.disabled=false;say.textContent=e&&e.message||String(e);});};}).catch(function(e){toast(String(e&&e.message||e));});}
+    go.disabled=true;say.textContent="Keeping the version…";keep(pr,msg.value,{branch:br}).then(function(r){sh.close();toast("Kept "+r.files.length+" file"+(r.files.length===1?"":"s")+" on "+r.branch+" ("+short(r.oid)+").");
+      if(!F.pr)setTimeout(function(){prSheet(pr);},150);},function(e){go.disabled=false;say.textContent=e&&e.message||String(e);});});go.id="r333Go";keys.appendChild(go);sh.box.appendChild(keys);}).catch(function(e){toast(String(e&&e.message||e));});}
 function prSheet(pr){var F=pr.fab;if(!F.head){toast("Keep the work first.");return;}var c=chat();
-  var box=W.modalOpen('<div class="ghx-sheet r333"><h3>Create pull request</h3><p class="small muted" style="margin-top:0">Asks '+esc(F.name)+' to bring <b>'+esc(F.work)+'</b> into <b>'+esc(F.base)+'</b>. It waits in Fabrica, under your Rules before main, until you say yes there.</p>'
-    +'<label class="field"><span>Title</span><input type="text" id="r333T" maxlength="240"></label><label class="field"><span>What it does and why</span><textarea id="r333B"></textarea></label><div class="ghx-note" id="r333S2" role="status"></div>'
-    +'<div class="ghx-keys"><button class="btn ghost" type="button" id="r333N2">Not now</button><button class="btn primary" type="button" id="r333G2">Create pull request</button></div></div>');
-  var t=box.querySelector("#r333T"),b=box.querySelector("#r333B"),say=box.querySelector("#r333S2"),go=box.querySelector("#r333G2");t.value=(c&&c.title&&c.title!=="New session"?c.title:"Work from "+F.work);b.value="Made in a Code session, on "+F.work+".";
-  box.querySelector("#r333N2").onclick=function(){W.closeModal();};
-  go.onclick=function(){go.disabled=true;say.textContent="Opening it in Fabrica…";pullRequest(pr,{title:t.value,body:b.value}).then(function(it){W.closeModal();toast("Pull request #"+it.n+" waits for you in Fabrica.");},function(e){go.disabled=false;say.textContent=e&&e.message||String(e);});};}
+  var sh=fsheet("Create pull request","Asks "+F.name+" to bring "+F.work+" into "+F.base+". It waits in Fabrica, under your Rules before main, until you say yes there.");sh.root.classList.add("r333-pr");
+  var t=mk("input");t.type="text";t.id="r333T";t.maxLength=240;t.value=(c&&c.title&&c.title!=="New session"?c.title:"Work from "+F.work);sh.box.appendChild(ffield("Title",t));
+  var b=mk("textarea");b.id="r333B";b.value="Made in a Code session, on "+F.work+".";sh.box.appendChild(ffield("What it does and why",b));
+  var say=mk("div","f-note");say.setAttribute("role","status");sh.box.appendChild(say);
+  var keys=mk("div","r333-keys"),go=fbtn("pri","Create pull request",function(){go.disabled=true;say.textContent="Opening it in Fabrica…";pullRequest(pr,{title:t.value,body:b.value}).then(function(it){sh.close();toast("Pull request #"+it.n+" waits for you in Fabrica.");},function(e){go.disabled=false;say.textContent=e&&e.message||String(e);});});
+  go.id="r333G2";keys.appendChild(go);sh.box.appendChild(keys);}
+
 function openPr(pr){var F=pr.fab;if(!F||!F.pr)return;try{W.go("fabrica");}catch(e){}setTimeout(function(){try{if(W.fbSelect)W.fbSelect(F.repo);}catch(e){}try{fbHub.open("pulls",{n:F.pr.n});}catch(e){}},400);}
 
 /* ================= the Environment row and the session's top keys ================= */
@@ -240,11 +266,12 @@ function wrapPlus(){var o=W.paintPlus;if(typeof o!=="function"||o.__r333)return;
 /* ================= 5. Chat on a repository ================= */
 function tieChat(R){var c=chat();if(!c){toast("Open a conversation first.");return;}if(isCode(c)){toast("In Code, a repository is opened from its start window.");return;}
   c.repo=R;save();toast("This conversation reads "+(R.full||R.name)+", "+R.branch+". Continue in Code, from the + menu, to change it.");}
-function repoSheet(c){var R=c.repo;var box=W.modalOpen('<div class="ing-ask r333"><h3>'+esc(R.full||R.name)+'</h3><p>This conversation reads it, on '+esc(R.branch)+'. The model looks at its files as it needs them, and changes nothing. Continue in Code opens a Code session on it, whose work goes to a branch of its own.</p>'
-    +'<div class="ing-ask-keys"><button class="btn ghost" type="button" id="r333Un">Let it go</button><button class="btn ghost" type="button" id="r333Ch">Another one</button><button class="btn primary" type="button" id="r333Co">Continue in Code</button></div></div>');
-  box.querySelector("#r333Un").onclick=function(){delete c.repo;save();W.closeModal();toast("This conversation no longer reads a repository.");};
-  box.querySelector("#r333Ch").onclick=function(){W.closeModal();pick({into:"chat"});};
-  box.querySelector("#r333Co").onclick=function(){W.closeModal();if(R.kind==="fabrica")openFab(R.repo,R.branch);else{try{IngGitHubCode.connect({owner:R.owner,repo:R.repo,branch:R.branch});}catch(e){toast("GitHub is not in this copy.");}}};}
+function repoSheet(c){var R=c.repo;var sh=fsheet(R.full||R.name,"This conversation reads it, on "+R.branch+". The model looks at its files as it needs them, and changes nothing. Continue in Code opens a Code session on it, whose work goes to a branch of its own.");
+  var host=mk("div","r333-list");sh.box.appendChild(host);
+  host.appendChild(fopt("‹›","Continue in Code","A Code session on "+R.branch+", its work on a branch of its own",function(){sh.close();if(R.kind==="fabrica")openFab(R.repo,R.branch);else{try{IngGitHubCode.connect({owner:R.owner,repo:R.repo,branch:R.branch});}catch(e){toast("GitHub is not in this copy.");}}}));
+  host.appendChild(fopt("⑂","Another repository","Fabrica or GitHub",function(){pick({into:"chat"});}));
+  host.appendChild(fopt("✕","Let it go","This conversation no longer reads a repository",function(){delete c.repo;save();sh.close();toast("This conversation no longer reads a repository.");}));}
+
 function chatRepo(){var c=chat();return c&&!isCode(c)&&c.repo?c.repo:null;}
 function repoList(R){if(R.kind==="fabrica")return IngRepo.files(R.repo,R.branch).then(function(l){return (l||[]).map(function(f){return {path:f.path,size:f.size};});});
   return IngGitHubCode.api("/repos/"+encodeURIComponent(R.owner)+"/"+encodeURIComponent(R.repo)+"/git/trees/"+encodeURIComponent(R.branch)+"?recursive=1").then(function(x){x=x&&x.data;return ((x&&x.tree)||[]).filter(function(t){return t.type==="blob";}).map(function(t){return {path:t.path,size:t.size};});});}

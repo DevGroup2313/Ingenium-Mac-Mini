@@ -28,7 +28,7 @@ TITLES = {
 }
 # the key each step is about: pressing it goes on, as it does in Ingenium
 NEXT = {
-    "a-start": '#modalBox [data-a="fabrica"]', "b-pick": "#r333List .cc-prow", "c-branch": "#r333Br .cc-prow",
+    "a-start": '#modalBox [data-a="fabrica"]', "b-pick": "#r333List .f-opt", "c-branch": "#r333Br .f-opt",
     "d-session": "#r333Top", "e-review": "#r333Go", "f-pr": "#r333G2", "g-session-pr": "#r333Top",
     "h-fabrica": None, "i-chat-plus": ".r333-pm", "j-chat-repo": None,
 }
@@ -41,7 +41,7 @@ sound_js = pick("Ingenium's own sound engine")
 seal_js = pick("Ingenium's own seal, cut into its layers")
 webkit_js = pick("in Safari's engine")
 # r176's keys widened to this preview's keys (its own list stays, these come first)
-sound_js, n = re.subn(r"KEYSEL='", "KEYSEL='.cc-prow,.cc-card,.pm-item,.ghx-keys .btn,.ghx-files .btn,#r333Top,.r333-tabs .btn,.pv-step,.pv-k,", sound_js, count=1)
+sound_js, n = re.subn(r"KEYSEL='", "KEYSEL='.f-opt,.f-frow,.f-btn,.f-x,.f-seg button,.cc-prow,.cc-card,.pm-item,.ghx-keys .btn,.ghx-files .btn,#r333Top,.r333-tabs .btn,.pv-step,.pv-k,", sound_js, count=1)
 assert n == 1, "r176's KEYSEL"
 
 css = "\n".join(P["rules"]) + "\n" + "\n".join(P["frames"])
@@ -111,7 +111,7 @@ function show(i,quiet){at=Math.max(0,Math.min(ORDER.length-1,i));var k=ORDER[at]
   [].forEach.call(D.querySelectorAll(".pv-step"),function(b,j){if(j===at)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");});
   note.textContent=(at+1)+" of "+ORDER.length+" · "+TITLES[k][1]+". "+s.note+".";
   D.getElementById("pvPrev").disabled=at===0;D.getElementById("pvNext").textContent=at===ORDER.length-1?"From the start":"Next";
-  var sel=NEXT[k],t=null;if(sel){var all=[].slice.call(win.querySelectorAll(sel));t=k==="b-pick"?all.filter(function(x){return /tide-clock/.test(x.textContent);})[0]:k==="c-branch"?all.filter(function(x){return /^main/.test(x.textContent.trim());})[0]:all[0];}
+  var sel=NEXT[k],t=null;if(sel){var all=[].slice.call(win.querySelectorAll(sel));t=k==="b-pick"?all.filter(function(x){return /tide-clock/.test(x.textContent);})[0]:k==="c-branch"?all.filter(function(x){return /^\\u2442?\\s*main/.test(x.textContent.replace(/^\W+/,'').trim());})[0]:all[0];}
   if(t)t.classList.add("pv-next");
   if(k==="h-fabrica"){var pg=win.querySelector(".pv-page"),pr=[].filter.call(win.querySelectorAll("#fb h2,#fb h3,#fb .h-title,#fb b"),function(x){return /Half-hour tides|half-hour/i.test(x.textContent);})[0];if(pr&&pg)pg.scrollTop=Math.max(0,pr.getBoundingClientRect().top-pg.getBoundingClientRect().top-120);}
   if(!quiet)snd(s.modal?"cards":"keys");}

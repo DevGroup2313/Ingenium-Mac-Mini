@@ -19,7 +19,7 @@ const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true }
     window.__cap = { a: a.id, g: g.id }; try { saveState(); } catch (e) {} go('code'); });
   await p.waitForTimeout(1500);
   const MATCHED = new Set(), scenes = {};
-  const collect = () => p.evaluate(() => { const roots = [document.querySelector('.topbar'), document.querySelector('.page.active,section.page:not([hidden]).active') || null, document.getElementById('modalRoot'), document.getElementById('chatPlusMenu')]
+  const collect = () => p.evaluate(() => { const roots = [document.querySelector('.fbx.r333x'), document.querySelector('.topbar'), document.querySelector('.page.active,section.page:not([hidden]).active') || null, document.getElementById('modalRoot'), document.getElementById('chatPlusMenu')]
       .concat([...document.querySelectorAll('[id^="page-"]')].filter((x) => x.offsetParent || getComputedStyle(x).display !== 'none')).filter(Boolean);
     const els = []; roots.forEach((r) => { els.push(r); r.querySelectorAll('*').forEach((e) => els.push(e)); }); els.push(document.body, document.documentElement);
     const DYN = /::?(?:hover|active|focus-visible|focus-within|focus|visited|before|after|placeholder|selection|marker|-webkit-[a-z-]+|-moz-[a-z-]+)(?![a-z-])/g;
@@ -28,31 +28,31 @@ const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true }
     for (const sh of document.styleSheets) { try { walk(sh.cssRules); } catch (e) {} } return keys; }).then((ks) => ks.forEach((k) => MATCHED.add(k)));
   /* one scene: the top bar, the page in view, the sheet over it (if any), each as the page draws it now */
   const grab = async (key, note) => { await p.waitForTimeout(900); await collect();
-    scenes[key] = await p.evaluate((note) => { const strip = (el) => { if (!el) return ''; const c = el.cloneNode(true); c.querySelectorAll('script,iframe,canvas,video,audio,object,embed,template').forEach((x) => x.remove());
+    scenes[key] = await p.evaluate((note) => { const strip = (el) => { if (!el) return ''; el.querySelectorAll('input,textarea').forEach((f) => { if (f.tagName === 'TEXTAREA') f.textContent = f.value; else f.setAttribute('value', f.value); }); const c = el.cloneNode(true); c.querySelectorAll('script,iframe,canvas,video,audio,object,embed,template').forEach((x) => x.remove());
         c.querySelectorAll('*').forEach((x) => { [...x.attributes].forEach((at) => { if (/^on/i.test(at.name)) x.removeAttribute(at.name); }); });
         return c.outerHTML; };
       const page = [...document.querySelectorAll('[id^="page-"]')].filter((x) => x.offsetParent)[0];
       const mr = document.getElementById('modalRoot'); const open = mr && getComputedStyle(mr).display !== 'none' && mr.querySelector('#modalBox') && mr.querySelector('#modalBox').children.length;
       const pm = document.getElementById('chatPlusMenu'); const pmOpen = pm && pm.offsetParent;
-      return { note, top: strip(document.querySelector('.topbar')), page: strip(page), pageId: page && page.id, modal: open ? strip(mr) : '', plus: pmOpen ? strip(pm) : '', plusRect: pmOpen ? (() => { const r = pm.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width }; })() : null,
+      const fx = document.querySelector('.fbx.r333x'); return { note, top: strip(document.querySelector('.topbar')), page: strip(page), pageId: page && page.id, modal: (open ? strip(mr) : '') + (fx ? strip(fx) : ''), plus: pmOpen ? strip(pm) : '', plusRect: pmOpen ? (() => { const r = pm.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width }; })() : null,
         bodyClass: document.body.className, bodyAttrs: [...document.body.attributes].filter((a) => a.name !== 'class' && a.name !== 'style').map((a) => [a.name, a.value]), htmlClass: document.documentElement.className }; }, note);
     await p.screenshot({ path: path.join(OUT, 's_' + key + '.png') }); };
   // A. Code's start window
   await p.evaluate(() => ccWelcome()); await grab('a-start', "Code's start window: From Fabrica works on a branch of its own");
   // B. A repository
-  await p.click('#modalBox .cc-start [data-a="fabrica"]'); await p.waitForSelector('#r333List .cc-prow', { timeout: 15000 }); await grab('b-pick', 'A repository: your apps in Fabrica, and GitHub');
+  await p.click('#modalBox .cc-start [data-a="fabrica"]'); await p.waitForSelector('#r333List .f-opt', { timeout: 15000 }); await grab('b-pick', 'A repository: your apps in Fabrica, and GitHub');
   // C. the branches
-  await p.evaluate(() => [...document.querySelectorAll('#r333List .cc-prow')].find((x) => /tide-clock/.test(x.textContent)).click()); await p.waitForSelector('#r333Br .cc-prow', { timeout: 15000 }); await grab('c-branch', 'Its branches: the session begins from the one you choose');
+  await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).click()); await p.waitForSelector('#r333Br .f-opt', { timeout: 15000 }); await grab('c-branch', 'Its branches: the session begins from the one you choose');
   // D. the session, after the model changed two files
-  await p.evaluate(() => [...document.querySelectorAll('#r333Br .cc-prow')].find((x) => /^main/.test(x.textContent.trim())).click()); await p.waitForTimeout(3000);
+  await p.evaluate(() => [...document.querySelectorAll('#r333Br .f-opt')].find((x) => /^⑂?\s*main/.test(x.textContent.trim())).click()); await p.waitForTimeout(3000);
   await p.evaluate(async () => { const pr = ccProj(), f = pr.files.filter((x) => x.name === 'app/tide.js')[0];
     await ccPut(f, '// the next high tide, in hours from now, from the harbour\'s own table\nvar TABLE = { next: 6.5 };\nfunction next(){\n  return Math.round(TABLE.next * 10) / 10;\n}\ndocument.getElementById("next").textContent = "High tide in " + next() + " hours";\n');
     const nf = { name: 'app/tides.json', ref: null, size: 0 }; pr.files.push(nf); await ccPut(nf, '{ "harbour": "Kingsbridge", "next": 6.5 }\n');
     const c = curChat(); c.title = 'Half-hour tides'; try { saveState(); ccPaintHead(); IngRepoWork.paint(); } catch (e) {} });
   await p.waitForTimeout(4500); await grab('d-session', 'The session works on main, on a branch of its own; Review and keep shows 2');
   // E. Review and keep, a file's differences shown
-  await p.evaluate(() => IngRepoWork.keepSheet(ccProj())); await p.waitForSelector('#r333F li .btn', { timeout: 15000 }); await p.evaluate(() => document.querySelector('#r333F li .btn').click());
-  await p.fill('#r333Br', 'ingenium/half-hour-tides'); await grab('e-review', 'Review and keep: each file, its lines, the branch of its own');
+  await p.evaluate(() => IngRepoWork.keepSheet(ccProj())); await p.waitForSelector('#r333F .f-frow', { timeout: 15000 }); await p.evaluate(() => document.querySelector('#r333F .f-frow').click());
+  await p.fill('input#r333Br', 'ingenium/half-hour-tides'); await grab('e-review', 'Review and keep: each file, its lines, the branch of its own');
   // F. Create pull request
   await p.click('#r333Go'); await p.waitForSelector('#r333G2', { timeout: 15000 }); await grab('f-pr', 'Create pull request: it waits in Fabrica for your yes');
   await p.click('#r333G2'); await p.waitForTimeout(2200); await p.evaluate(() => { try { IngRepoWork.paint(); } catch (e) {} }); await p.waitForTimeout(1500); await grab('g-session-pr', 'The session follows its pull request');

@@ -43,22 +43,22 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     await p.evaluate(async () => { const pr = ccProj(), f = pr.files.filter((x) => x.name === 'app/tide.js')[0]; await ccPut(f, 'function next(){\n  return 6.5;\n}\n'); pr.files.push({ name: 'app/moon.js', ref: null, size: 0 }); await ccPut(pr.files[pr.files.length - 1], 'function moon(){ return "full"; }\n'); });
     const e3 = await p.evaluate(async () => { const ch = await IngRepoWork.changes(ccProj()); return ch.map((x) => x.how + ' ' + x.path); });
     ok(e3.length === 2 && e3.indexOf('changed app/tide.js') >= 0 && e3.indexOf('new app/moon.js') >= 0, '3. what changed is known file by file', e3);
-    await p.evaluate(() => IngRepoWork.keepSheet(ccProj())); await p.waitForSelector('.ghx-sheet.r333 #r333F li', { timeout: 15000 }); await p.waitForTimeout(900);
-    const e3b = await p.evaluate(() => { const s = document.querySelector('.ghx-sheet.r333'); return { h: s.querySelector('h3').textContent, files: [...s.querySelectorAll('#r333F li b')].map((x) => x.textContent), nums: [...s.querySelectorAll('#r333F li .a')].map((x) => x.textContent), br: (s.querySelector('#r333Br') || {}).value, go: s.querySelector('#r333Go').textContent }; });
-    ok(e3b.h === 'Review and keep' && e3b.files.length === 2 && e3b.nums.length === 2 && /^ingenium\//.test(e3b.br || '') && e3b.go === 'Keep this version', '   Review and keep (r219\'s own sheet): its files with their lines, the branch of its own, Keep this version', e3b);
-    const lift = await p.evaluate(() => { const k = document.querySelector('.ghx-sheet.r333 #r333Go'); return k.getBoundingClientRect().top; }); await p.hover('.ghx-sheet.r333 #r333Go'); await p.waitForTimeout(450);
-    const lift2 = await p.evaluate(() => document.querySelector('.ghx-sheet.r333 #r333Go').getBoundingClientRect().top);
+    await p.evaluate(() => IngRepoWork.keepSheet(ccProj())); await p.waitForSelector('.fbx.r333x #r333F .f-frow', { timeout: 15000 }); await p.waitForTimeout(900);
+    const e3b = await p.evaluate(() => { const s = document.querySelector('.fbx.r333x .f-sheet'); return { h: s.querySelector('h3').textContent, files: [...s.querySelectorAll('#r333F .f-frow .p')].map((x) => x.textContent), nums: [...s.querySelectorAll('#r333F .f-frow .a')].map((x) => x.textContent), br: (s.querySelector('input#r333Br') || {}).value, go: s.querySelector('#r333Go').textContent, diff: !!s.querySelector('.f-diff .f-dcode .f-dl.add') }; });
+    ok(e3b.h === 'Review and keep' && e3b.files.length === 2 && e3b.nums.length === 2 && /^ingenium\//.test(e3b.br || '') && e3b.go === 'Keep this version' && e3b.diff, '   Review and keep, in Fabrica\'s own sheet and Changes view: its files with their lines, the diff, the branch of its own, Keep this version', e3b);
+    const lift = await p.evaluate(() => { const k = document.querySelector('.fbx.r333x #r333Go'); return k.getBoundingClientRect().top; }); await p.hover('.fbx.r333x #r333Go'); await p.waitForTimeout(450);
+    const lift2 = await p.evaluate(() => document.querySelector('.fbx.r333x #r333Go').getBoundingClientRect().top);
     ok(lift - lift2 >= 1, '   its key lifts under the pointer', { lift: lift - lift2 });
     await p.screenshot({ path: path.join(OUT, 'review_and_keep.png') });
-    await p.fill('.ghx-sheet.r333 #r333Br', 'ingenium/half-tides'); await p.click('.ghx-sheet.r333 #r333Go'); await p.waitForTimeout(2500);
+    await p.fill('.fbx.r333x input#r333Br', 'ingenium/half-tides'); await p.click('.fbx.r333x #r333Go'); await p.waitForTimeout(2500);
     // ---------------------------------------------------------------- 4. kept on the session's branch
     const e4 = await p.evaluate(async () => { const id = window.__t746, F = ccProj().fab; const info = await IngRepo.info(id);
       return { work: F.work, head: !!F.head, onBr: await IngRepo.readText(id, 'app/moon.js', 'ingenium/half-tides'), onMain: await IngRepo.readText(id, 'app/tide.js', 'main'), out: info.branch, st: (await IngRepo.status(id)).changes.length, left: (await IngRepoWork.changes(ccProj())).length,
-        pr: !!document.querySelector('.ghx-sheet.r333 #r333G2') }; });
+        pr: !!document.querySelector('.fbx.r333x #r333G2') }; });
     ok(e4.work === 'ingenium/half-tides' && e4.head && /full/.test(e4.onBr || '') && /return 6;/.test(e4.onMain || '') && e4.out === 'evening' && e4.st === 1 && e4.left === 0, '4. kept on ingenium/half-tides; main, the branch out and its working copy unchanged; nothing left to keep', e4);
     // ---------------------------------------------------------------- 5. the pull request in Fabrica
     ok(e4.pr, '5. then Create pull request is offered at once');
-    await p.click('.ghx-sheet.r333 #r333G2'); await p.waitForTimeout(1800);
+    await p.click('.fbx.r333x #r333G2'); await p.waitForTimeout(1800);
     const e5 = await p.evaluate(async () => { const rec = await fbHub.live(window.__t746); const it = (rec.pulls || []).filter((x) => x.from === 'ingenium/half-tides')[0]; return { it: it && { n: it.n, to: it.to, state: it.state, head: !!it.lastHead }, pr: ccProj().fab.pr }; });
     ok(e5.it && e5.it.to === 'main' && e5.it.state === 'open' && e5.it.head && e5.pr && e5.pr.n === e5.it.n, '   a pull request in Fabrica, from the session\'s branch into main, open and waiting for her yes', e5);
     // ---------------------------------------------------------------- 6. the model's tools
@@ -76,16 +76,16 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     await p.evaluate(() => ccWelcome()); await p.waitForTimeout(700);
     const e7 = await p.evaluate(() => { const f = document.querySelector('#modalBox .cc-start [data-a="fabrica"]'), g = document.querySelector('#modalBox .cc-start [data-a="github"]'); return { fab: f && f.textContent, gh: !!g }; });
     ok(/branch of its own/.test(e7.fab || '') && e7.gh, '7. Code\'s start window: From Fabrica works on a branch of its own, beside From GitHub', e7);
-    await p.click('#modalBox .cc-start [data-a="fabrica"]'); await p.waitForSelector('.ing-ask.r333 #r333List .cc-prow', { timeout: 15000 }); await p.waitForTimeout(500);
-    const e7b = await p.evaluate(() => { const s = document.querySelector('.ing-ask.r333'); return { h: s.querySelector('h3').textContent, tabs: [...s.querySelectorAll('.r333-tabs [data-t]')].map((x) => x.textContent), rows: [...s.querySelectorAll('#r333List .cc-prow b')].map((x) => x.textContent) }; });
-    ok(e7b.h === 'A repository' && e7b.tabs.join('|') === 'Fabrica|GitHub' && e7b.rows.indexOf('tide-clock') >= 0, '   A repository: Fabrica and GitHub, the apps listed', e7b);
-    const r0 = await p.evaluate(() => [...document.querySelectorAll('#r333List .cc-prow')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);
-    await p.hover('#r333List .cc-prow'); await p.waitForTimeout(450);
-    const r1 = await p.evaluate(() => [...document.querySelectorAll('#r333List .cc-prow')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);
+    await p.click('#modalBox .cc-start [data-a="fabrica"]'); await p.waitForSelector('.fbx.r333x #r333List .f-opt', { timeout: 15000 }); await p.waitForTimeout(500);
+    const e7b = await p.evaluate(() => { const s = document.querySelector('.fbx.r333x .f-sheet'); return { h: s.querySelector('h3').textContent, tabs: [...s.querySelectorAll('.f-seg [data-t]')].map((x) => x.textContent), rows: [...s.querySelectorAll('#r333List .f-opt b')].map((x) => x.textContent) }; });
+    ok(e7b.h === 'A repository' && e7b.tabs.join('|') === 'Fabrica|GitHub' && e7b.rows.indexOf('tide-clock') >= 0, '   A repository, in Fabrica\'s own sheet: Fabrica and GitHub, the apps listed', e7b);
+    const r0 = await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);
+    await p.hover('#r333List .f-opt'); await p.waitForTimeout(450);
+    const r1 = await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).getBoundingClientRect().top);
     await p.screenshot({ path: path.join(OUT, 'a_repository.png') });
-    await p.evaluate(() => [...document.querySelectorAll('#r333List .cc-prow')].find((x) => /tide-clock/.test(x.textContent)).click()); await p.waitForSelector('#r333Br .cc-prow', { timeout: 15000 });
-    const e7c = await p.evaluate(() => [...document.querySelectorAll('#r333Br .cc-prow')].map((x) => x.textContent.replace(/\s+/g, ' ').trim()));
-    ok(r0 - r1 >= 1 && e7c.length === 4 && /^evening ?Out in Fabrica now/.test(e7c[0]), '   each row lifts under the pointer; the app\'s branches, the one out first', { lift: r0 - r1, e7c });
+    await p.evaluate(() => [...document.querySelectorAll('#r333List .f-opt')].find((x) => /tide-clock/.test(x.textContent)).click()); await p.waitForSelector('#r333Br .f-opt', { timeout: 15000 });
+    const e7c = await p.evaluate(() => [...document.querySelectorAll('#r333Br .f-opt')].map((x) => x.textContent.replace(/\s+/g, ' ').trim()));
+    ok(r0 - r1 >= 1 && e7c.length === 4 && /^⑂?\s*evening ?Out in Fabrica now/.test(e7c[0]), '   each row lifts under the pointer; the app\'s branches, the one out first', { lift: r0 - r1, e7c });
     await p.evaluate(() => { try { closeModal(); } catch (e) {} go('chat'); document.getElementById('chatNew').click(); }); await p.waitForTimeout(500);
     const e7d = await p.evaluate(() => { try { paintPlus(); } catch (e) {} const m = document.getElementById('chatPlusMenu'); const it = m && m.querySelector('.r333-pm'); return it ? it.textContent.replace(/\s+/g, ' ').trim() : null; });
     ok(/A repository/.test(e7d || ''), '   Chat\'s + menu offers A repository', e7d);

@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.46", "Chat and Code work on a repository in one way, as Claude does on GitHub: A repository, in Code's start window and Chat's + menu, lists your apps in Fabrica and your GitHub repositories. Code works on the branch you choose, on a branch of its own; Review and keep shows each changed file in Fabrica's own Changes view; Create pull request opens one in Fabrica that waits for your yes. A conversation can read a repository, and Continue in Code changes it.", "fabrica"],
   ["7.46", "No film behind a panel or a popup: when a sheet, a list or a panel opens, the page behind it keeps its own colours, with nothing tinted or blurred over it."],
   ["7.46", "The profile key has left the top bar: it is the last row of the left menu now, with the profile's tile and name, and its menu (Who is using Ingenium, Lock Ingenium, Manage profiles) opens above it."],
   ["7.45", "The full edition, opened on a device that holds your work from Ingenium's master edition, asks once to bring it in: everything comes as it was, sealed work stays sealed with the same password, and Start empty leaves it untouched. On Windows, Ingenium-Full-Setup.exe installs in Ingenium's own place, and Ingenium-Gift-Setup.exe in a place of its own."],
