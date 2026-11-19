@@ -281,6 +281,10 @@ def _blank(ed="gift"):
          "Guide: the 6.69 news, Ingenium's seal alone", 1),
         ('return n==="carpe diem"?"cd":/^(the )?forge$/.test(n)?"forge":n==="ingenium"?"ingenium":n==="inkwell"?"inkwell":null;}',
          'return n==="ingenium"?"ingenium":null;}', "Folders: Ingenium's seal alone", 1),
+        # 7.46: the app library knows no app of hers by name in any edition but the master, Ingenium included (until 7.46 the full edition knew
+        # Ingenium, and the gift and demo editions, which have no library to show, still knew all four: work brought in from a master backup
+        # would have listed them); a page the person adds is kept as any other app (modules/r240.js)
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=[],', "the app library: no app built in, Ingenium included", 1),
         # 7.46: the chat's + menu, One of your apps, with nothing kept yet (build_page.py chooses at run time; here the master's words go)
         ('n?(n+" kept on this device"):(ING_EDITION==="master"?"Carpe Diem, the Forge, Inkwell, Ingenium":"None kept yet: add yours in Lector")',
          'n?(n+" kept on this device"):"None kept yet: add yours in Lector"', "the + menu: no app of hers named", 1),
@@ -488,7 +492,6 @@ def _full_apps():
     I upload them on there." So the library and Lector know no app by name, and keep none on first start (modules/r120.js keeps
     nothing outside the master): a page the person adds, whatever app it is, is kept as any other app (modules/r240.js)."""
     return [
-        ('var LIB_KEYS=["cd","forge","inkwell","ingenium"],', 'var LIB_KEYS=[],', "the app library: no app built in, Ingenium included", 1),
         # 6.42: any app the person adds is listed in Lector (r108's syncApps, modules/r240.js)
         ('var ORDER=["cd","forge","ingenium","inkwell"];\n/* 6.42: any app, not only her four.', 'var ORDER=[];\n/* 6.42: any app, not only her four.', "Lector's apps: none built in (r108; r140's seals keep all four)", 1),
     ]
