@@ -48,10 +48,10 @@ const violet = (v) => { const m = String(v).match(/rgba?\((\d+), (\d+), (\d+)(?:
     const has333 = await p.evaluate(() => !!window.IngRepoWork);
     if (has333) {
       await p.evaluate(() => { go('code'); }); await p.waitForTimeout(700); await p.evaluate(() => ccWelcome()); await p.waitForTimeout(800);
-      const c0 = await p.evaluate(() => { const c = document.querySelector('#modalBox .cc-start .cc-card'); const cs = getComputedStyle(c); return { top: c.getBoundingClientRect().top, sh: cs.boxShadow !== 'none' }; });
+      const c0 = await p.evaluate(() => { const c = document.querySelector('#modalBox .cc-start .cc-card'); const cs = getComputedStyle(c); return { top: c.getBoundingClientRect().top, sh: cs.boxShadow !== 'none', flat: cs.boxShadow === 'none' && cs.borderTopStyle === 'dashed' }; });   // 7.47 (r335): flat at rest in the drop zone's dashed edge, at her word
       await p.hover('#modalBox .cc-start .cc-card'); await p.waitForTimeout(500);
       const c1 = await p.evaluate(() => { const c = document.querySelector('#modalBox .cc-start .cc-card'); const cs = getComputedStyle(c); return { top: c.getBoundingClientRect().top, bg: cs.backgroundColor, img: cs.backgroundImage }; });
-      ok(c0.sh && c0.top - c1.top >= 2 && !violet(c1.bg) && !/accent/.test(c1.img), '3. Code\'s start cards: raised, lifting under the pointer, no violet wash', { lift: c0.top - c1.top, bg: c1.bg, img: c1.img.slice(0, 80) });
+      ok((c0.sh || c0.flat) && c0.top - c1.top >= 2 && !violet(c1.bg) && !/accent/.test(c1.img), '3. Code\'s start cards: raised, lifting under the pointer, no violet wash', { lift: c0.top - c1.top, bg: c1.bg, img: c1.img.slice(0, 80) });
       await p.screenshot({ path: path.join(OUT, 'code_start.png') });
       await p.evaluate(() => { try { closeModal(); } catch (e) {} go('chat'); document.getElementById('chatNew').click(); }); await p.waitForTimeout(600);
       await p.click('#chatImgBtn'); await p.waitForTimeout(700);
