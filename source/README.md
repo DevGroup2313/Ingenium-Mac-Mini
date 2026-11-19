@@ -395,6 +395,23 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.48 (20 November 2026): Fabrica's plan, stage 2, one ecosystem.
+
+Her word on its pictures (19 November 2026): "I approve of the preview, please commit and push it everywhere" (the audit's recommendations
+5 to 7, approved in full the same day). Its first preview, a live page made of whole captured pages, "is glitching and makes no sense to me":
+the new parts were off screen and live parts came out blank; it was replaced by pictures of the real app, the new part ringed, one sentence
+each (`previews/fabrica_stage2`: capture_pics.js, compose_pics.py).
+
+- `build/modules/r337.js`: a Code session on an app works with that app's folder (the folder of the same name): its notes go with every turn
+  (r208's chatSystemPrompt asks `IngCodeFolder`), and Its folder stands in Code's top row (#ccCodeBar), or Make its folder where there is
+  none. The folder shows its repository in Fabrica (the branch it is on, its newest version, the open pull requests, the last run of the
+  checks) with All in one place, Open in Fabrica and Open in Code (r208 asks `IngFolderFab.card`); Fabrica writes a dated line under the
+  folder's Where we left off when a pull request is merged or closed, a release is made (a tag) or the checks fail, and the lines go to the
+  model with the folder's notes (`IngFolderFab.lines`, `.left`). All in one place, on Fabrica's own sheet (r333's, now shared as
+  `IngRepoWork.ui`): where we left off, its repository, its releases, its conversations, and Open the folder, Open in Fabrica, Open in
+  Adamas (r138's `bdOpenRepo`), Open in Code; reached from the folder's head, Fabrica's app page, Code, Chat (its top row, beside Controls)
+  and Adamas. In the gift and demo editions, which have no Fabrica, only the folder in Code is kept.
+  `rig/t_748_ecosystem.js` 15/15.
 Ingenium 7.47 (19 November 2026): Code's start window in Vocatio's drop zone, flat until the pointer is on it.
 Her words (19 November 2026), with a picture of Vocatio's "Drop your files here" and one of Code's start window: "I want you to give the
 new Code panel for Fabrica the same raised 3D effect as the "Drop your files" section of the Vocatio page, it looks that much better than

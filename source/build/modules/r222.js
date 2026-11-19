@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.48", "One ecosystem: a Code session on an app works with that app's folder (Its folder in its top row; your notes go with every message), a folder shows its repository in Fabrica and what happened there, dated, under Where we left off, and All in one place gathers an app (where you left off, its repository, its releases, its conversations) from Folders, Fabrica, Code, Chat and Adamas.", "fabrica"],
   ["7.47", "Code's start window looks like Vocatio's Drop your files here: each card has its dashed lilac edge, its lilac light and rounder corners, and lies flat until you point at it; under the pointer it rises and lifts, and it sinks when pressed. By night, in the drop zone's night colours.", "career"],
   ["7.47", "Code's start window is lighter: each card has a dashed lilac edge, a lilac light and rounder corners, and lies flat until you point at it; under the pointer it rises and lifts, and it sinks when pressed.", "nocareer"],
   ["7.46", "A copy that is not the owner's, and another person's profile, start empty: nothing is kept in the app library on first start, not even Ingenium itself, and the app library, Lector, Folders, Fabrica and the chat list only the apps added there. A page you add is listed, whatever app it is.", "fabrica"],

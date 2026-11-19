@@ -329,7 +329,7 @@ function wrapConn(){var C=W.IngConnectors;if(!C||typeof C.activeFor!=="function"
 function boot(){if(!here())return;try{wrapConn();}catch(e){warn(e);}try{wrapWelcome();}catch(e){warn(e);}try{wrapHead();}catch(e){warn(e);}try{wrapPlus();}catch(e){warn(e);}try{addTools();}catch(e){warn(e);}watch();}
 boot();if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",boot);
 (function later(){var n=0;(function wait(){if(W.__ingReady===true){boot();return;}if(++n<400)setTimeout(wait,500);})();})();
-W.IngRepoWork={version:1,pick:pick,openFab:openFab,changes:changes,diff:diffOf,keep:keep,pullRequest:pullRequest,update:update,keepSheet:keepSheet,prSheet:prSheet,paint:paint,tieChat:tieChat,repoList:repoList,repoRead:repoRead};
+W.IngRepoWork={version:1,ui:{fsheet:fsheet,fopt:fopt,fbtn:fbtn,fseg:fseg,ffield:ffield},pick:pick,openFab:openFab,changes:changes,diff:diffOf,keep:keep,pullRequest:pullRequest,update:update,keepSheet:keepSheet,prSheet:prSheet,paint:paint,tieChat:tieChat,repoList:repoList,repoRead:repoRead};
 try{window.__ingParts["p333"]="running";}catch(_){}
 })();
 </script>

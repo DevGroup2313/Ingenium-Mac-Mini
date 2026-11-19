@@ -173,6 +173,8 @@ function openPicker(){var box=modalOpen('<h3>Open an app in Build</h3><p class="
       if(f.size>maxMB()*1048576){rej(new Error("it is "+Math.round(f.size/1048576)+" MB; Build opens a page of up to "+maxMB()+" MB on this device"));return;}
       f.text().then(function(t){closeModal();open({name:f.name,text:t,title:f.name.replace(/\.html?$/i,"")});res();},function(e){rej(new Error("it could not be read on this device ("+(e&&e.message||e)+")"));});};i.click();});});
     if(!lib.length&&!rs.length)host.insertBefore(E("div","small muted","No app is kept on this device yet: add yours in Lector (Add your apps) or bring one into Fabrica."),host.firstChild);});}
+/* 7.48: a Fabrica app opened in Adamas from elsewhere (modules/r337.js, All in one place), as the picker opens one */
+window.bdOpenRepo=function(id){return IngRepo.info(id).then(function(info){return IngRepo.files(id).then(function(list){var p=(list.filter(function(f){return /\.html?$/i.test(f.path)&&f.path.indexOf("/")<0;})[0]||list.filter(function(f){return /\.html?$/i.test(f.path);})[0]||{}).path;if(!p)throw new Error("there is no page in it");return IngRepo.readText(id,p).then(function(t){open({name:p.split("/").pop(),text:t||"",repo:id,path:p,title:info.name});});});}).catch(function(e){try{toast("Adamas could not open it: "+(e&&e.message||e));}catch(x){}});};
 (function(){var s=$("sampleBtn");if(!s||$("bdOpenBtn"))return;var b=E("button","btn small","Open an app…");b.id="bdOpenBtn";b.type="button";b.title="Your apps, Ingenium itself, an app in Fabrica, or a page from this device";b.onclick=openPicker;s.parentNode.insertBefore(b,s);})();
 
 /* ---------- Edit in Build, from the stage: no page is too large now ---------- */

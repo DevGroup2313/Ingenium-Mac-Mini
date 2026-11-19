@@ -135,9 +135,11 @@ function contextFor(p){if(!p||p.kind!=="app"||!p.app)return "";var a=p.app,G=F()
   if((a.brief||"").trim())parts.push("Where we left off on "+p.name+" (a summary of the earlier conversations, kept by Ingenium"+(a.briefAt?", brought up to date "+day(a.briefAt):"")+"; ask me before relying on any detail it does not give):\n"+clip(a.brief,CAP.brief));
   if(a.decisions&&a.decisions.length)parts.push("Decisions so far on "+p.name+":\n"+a.decisions.slice(0,20).map(function(x){return "- "+clip(x,CAP.item);}).join("\n"));
   if(a.open&&a.open.length)parts.push("Open next on "+p.name+":\n"+a.open.slice(0,12).map(function(x){return "- "+clip(x,CAP.item);}).join("\n"));
+  try{var fl=W.IngFolderFab&&typeof W.IngFolderFab.lines==="function"?W.IngFolderFab.lines(p):"";if(fl)parts.push(fl);}catch(e){}  /* 7.48: what happened in Fabrica (modules/r337.js) */
   var out=parts.join("\n\n");return out?clip("THIS CONVERSATION IS IN MY FOLDER FOR "+p.name.toUpperCase()+".\n\n"+out,CAP.ctx):"";}
 function wrapPrompt(){if(typeof W.chatSystemPrompt!=="function"||W.chatSystemPrompt.__r208)return;var o=W.chatSystemPrompt;
-  W.chatSystemPrompt=function(budget){var r=o.apply(this,arguments);try{var p=typeof W.chatProject==="function"?W.chatProject():null,ctx=contextFor(p);if(!ctx)ctx=everyApp();if(ctx)r=(r?r+"\n\n":"")+ctx;}catch(e){}return r;};W.chatSystemPrompt.__r208=1;}
+  W.chatSystemPrompt=function(budget){var r=o.apply(this,arguments);try{var p=typeof W.chatProject==="function"?W.chatProject():null;try{if(p&&p.kind!=="app"&&typeof W.IngCodeFolder==="function"){var fp=W.IngCodeFolder(p);if(fp)p=fp;}}catch(e){}  /* 7.48: the folder of a Code session's app (modules/r337.js) */
+    var ctx=contextFor(p);if(!ctx)ctx=everyApp();if(ctx)r=(r?r+"\n\n":"")+ctx;}catch(e){}return r;};W.chatSystemPrompt.__r208=1;}
 /* 6.18: How I work, on every app goes with every Code session too, not only those in a folder, so every app she builds follows it (her
    words, 4 November 2026: "add that to the folders inside Ingenium as well for all future apps") */
 function everyApp(){try{var c=typeof W.curChat==="function"?W.curChat():null;if(!c||typeof W.ccIsCode!=="function"||!W.ccIsCode(c))return "";var h=(F().how||"").trim();return h?"How I work, on every app (in my own words):\n"+clip(h,CAP.how):"";}catch(e){return "";}}
@@ -298,9 +300,11 @@ function folderView(p,host){var a=p.app;
   /* where we left off */
   var u=unread(p),wl=card("Where we left off",a.briefAt?"Brought up to date "+day(a.briefAt)+(a.model?" with "+((W.ingPrettyModels||String)(a.model)):"")+". "+(u.length?u.length+" conversation"+(u.length===1?"":"s")+" not read yet.":"Every conversation in this folder is read."):"No summary yet. Ingenium reads the conversations in this folder once, and writes where things stand: what is done, the decisions, and what is open.");
   if(a.brief)wl.appendChild(h("div","fld-brief",esc(a.brief)));
+  try{if(W.IngFolderFab&&typeof W.IngFolderFab.left==="function")W.IngFolderFab.left(p,wl);}catch(e){}  /* 7.48: what happened in Fabrica (modules/r337.js) */
   var r=h("div","fld-row");r.style.marginTop="10px";var up=key(u.length?"primary":"",u.length?"Bring it up to date ("+u.length+")":"Up to date",function(){bringUp(p);},"Reads only the conversations not read yet, once");if(!u.length||RUN.busy)up.disabled=true;r.appendChild(up);wl.appendChild(r);host.appendChild(wl);
   if(a.sugg&&a.sugg.length){var sg=card("Seen in the conversations: how you like to work","Keep the ones that are right, in How I work on "+p.name+"; drop the rest."),ul=h("ul","fld-list fld-sugg");
     a.sugg.forEach(function(s,i){var li=h("li");li.appendChild(h("div","fld-t","<b>"+esc(s)+"</b>"));li.appendChild(key("small","Keep",function(){a.how=((a.how||"").trim()+"\n- "+s).trim().slice(0,CAP.how);a.sugg.splice(i,1);save();paint();}));li.appendChild(key("small ghost","Drop",function(){a.sugg.splice(i,1);save();paint();}));ul.appendChild(li);});sg.appendChild(ul);host.appendChild(sg);}
+  try{if(W.IngFolderFab&&typeof W.IngFolderFab.card==="function")W.IngFolderFab.card(p,host,{card:card,key:key});}catch(e){}  /* 7.48: its repository in Fabrica (modules/r337.js) */
   /* how I work here */
   var hw=card("How I work on "+p.name,"In your own words. It goes with every conversation in this folder, after How I work on every app.");var ta=h("textarea","fld-ta");ta.value=a.how||"";ta.setAttribute("aria-label","How I work on "+p.name);
   ta.addEventListener("change",function(){a.how=ta.value.slice(0,CAP.how);save();say("Kept for every conversation in "+p.name+".");});hw.appendChild(ta);host.appendChild(hw);
@@ -332,7 +336,7 @@ function start(){install();wrapPrompt();
   try{if($("page-folders")&&$("page-folders").classList.contains("active"))paint();}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",start);else start();
 W.addEventListener("load",function(){wrapPrompt();});
-W.IngFolders={everyApp:everyApp,folders:folders,make:makeFolder,sortAll:sortAll,contextFor:contextFor,bringUp:bringUp,parseNotes:parseNotes,profileApps:profileApps,readModelfile:readModelfile,paint:paint,unread:unread,run:RUN};
+W.IngFolders={start:startIn,everyApp:everyApp,folders:folders,make:makeFolder,sortAll:sortAll,contextFor:contextFor,bringUp:bringUp,parseNotes:parseNotes,profileApps:profileApps,readModelfile:readModelfile,paint:paint,unread:unread,run:RUN};
 })();
 ;try{window.__ingParts["p208"]="running";}catch(_){}
 </script>
