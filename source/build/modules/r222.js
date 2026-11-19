@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.47", "Code's start window looks like Vocatio's Drop your files here: each card has its dashed lilac edge, its lilac light and rounder corners, and lies flat until you point at it; under the pointer it rises and lifts, and it sinks when pressed. By night, in the drop zone's night colours.", "career"],
+  ["7.47", "Code's start window is lighter: each card has a dashed lilac edge, a lilac light and rounder corners, and lies flat until you point at it; under the pointer it rises and lifts, and it sinks when pressed.", "nocareer"],
   ["7.46", "A copy that is not the owner's, and another person's profile, start empty: nothing is kept in the app library on first start, not even Ingenium itself, and the app library, Lector, Folders, Fabrica and the chat list only the apps added there. A page you add is listed, whatever app it is.", "fabrica"],
   ["7.46", "Chat and Code work on a repository in one way, as Claude does on GitHub: A repository, in Code's start window and Chat's + menu, lists your apps in Fabrica and your GitHub repositories. Code works on the branch you choose, on a branch of its own; Review and keep shows each changed file in Fabrica's own Changes view; Create pull request opens one in Fabrica that waits for your yes. A conversation can read a repository, and Continue in Code changes it.", "fabrica"],
   ["7.46", "No film behind a panel or a popup: when a sheet, a list or a panel opens, the page behind it keeps its own colours, with nothing tinted or blurred over it."],

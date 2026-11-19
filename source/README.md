@@ -395,6 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.47 (19 November 2026): Code's start window in Vocatio's drop zone, flat until the pointer is on it.
+Her words (19 November 2026), with a picture of Vocatio's "Drop your files here" and one of Code's start window: "I want you to give the
+new Code panel for Fabrica the same raised 3D effect as the "Drop your files" section of the Vocatio page, it looks that much better than
+the 3d button cards." On its live preview (https://claude.ai/artifact/KqvAsVp9Q87ZtDvYhbKCZz, source/previews/code_raised: the start window
+and the drop zone taken out of the running 7.46 page): "I approve of the preview but I only want the area to be raised when I hover over
+it, it can be flat on rest mode. Please commit and push it everywhere."
+- `build/modules/r335.js` (held in 7.46, out of build/held.json now): each card of Code's start window (New app, From GitHub, From Fabrica,
+  Open an app file, Open a folder, Your apps) takes the drop zone's own values (modules/r283.js #cs .cn-drop, modules/r188.js's tokens): the
+  dashed lilac edge, the lilac light falling from the top, the rounder corners; flat at rest, as the drop zone is (the preview had them
+  raised at rest; changed at her word); under the pointer it lifts two pixels with the drop zone's shadow and spring, and pressed it
+  sinks. By night the drop zone's night edge and light, with dark shadows. Each card keeps its words, their type and their order.
+  Minimal or reduced motion keeps them still.
+- What is new (r222): one line where Vocatio is (tag career), and one without its name in the editions without it (nocareer).
+- rig: `t_747_code_raised.js` (new, 12 checks).
+
 Ingenium 7.46 (19 November 2026): no film behind a panel or a popup, the profile key in the left menu, Fabrica's stage 1, and none of her apps
 outside her own profile of the master edition.
 
