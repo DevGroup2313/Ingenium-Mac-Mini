@@ -1298,6 +1298,12 @@ var HUB=window.fbHub={version:"6.1",views:{code:paintCode,issues:paintIssues,pul
   md:function(s,o){return md(s,o||{});},exportAll:exportAll,importAll:importAll,record:function(id){return recP(id).then(clone);},forget:forget,
   /* 6.89: people, milestones, comments on a line and templates (modules/r282.js) change the record itself, then keep it */
   live:function(id){return recP(id);},keep:keep,repaint:function(){repaint(true);},
+  /* 7.46 (modules/r333.js): a pull request opened for a Code or Chat session, from its own branch into the branch it began from, as the
+     Pull requests view opens one (newItem), with the two versions it was opened between; it waits for her yes there, under her rules */
+  newPull:function(id,o){o=o||{};return recP(id).then(function(rec){return Promise.all([IngRepo.resolve(id,o.to),IngRepo.resolve(id,o.from)]).then(function(x){
+    var dup=(rec.pulls||[]).filter(function(p){return p.state==="open"&&p.from===o.from&&p.to===o.to;})[0];if(dup)return dup;
+    var it=newItem(rec,"pr",{title:String(o.title||"").slice(0,240)||("Work from "+o.from),body:o.body||"",from:o.from,to:o.to,base:x[0]||null,head:x[1]||null,labels:o.labels||[]});
+    if(o.session)it.session=o.session;return keep(rec).then(function(){repaint(true);return it;});});});},
   /* 6.92: a version kept on the drive (modules/r280.js routes it there) takes the same step after it as any version kept */
   kept:function(id,oid){return afterKept(id,oid);},
   /* open a view of the chosen app: fbHub.open("issues",{n:3}), fbHub.open("compare",{a:"refs/tags/v1",b:"refs/heads/main"}) */

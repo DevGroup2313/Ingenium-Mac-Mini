@@ -498,6 +498,28 @@ function commit(id,msg,opt){opt=opt||{};return locked(id,function(){return load(
       return chk.then(function(empty){if(empty)throw new Error("nothing has changed since the last commit");
         var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d)),parents=parent?[parent]:[];if(r.merging&&r.merging.theirs)parents.push(r.merging.theirs);
         return store().put("commit",commitBody({tree:tree,parents:parents,author:a,msg:msg+"\n"})).then(function(oid){moveHead(r,oid,r.merging?"merge "+r.merging.label:"commit");r.merging=null;return save(r).then(function(){return oid;});});});});}});});}
+/* 7.46 (modules/r333.js): a version kept on a branch that is not the one out, as a Code or Chat session keeps its work on a branch of its
+   own (ingenium/...), so the working copy Fabrica shows is never touched. changes: [{path, data}] ({path, data:null} takes a file away);
+   the branch is made from opt.from (a branch, a tag or a version; the one out when none is named) the first time. */
+function commitTo(id,name,changes,msg,opt){opt=opt||{};return locked(id,function(){return load(id).then(function(r){
+  if(isDisk(id))throw new Error("a repository on a drive keeps its versions through Ingenium's computer app");
+  if(!okRefName(name))throw new Error("“"+name+"” cannot be a branch's name");var k="refs/heads/"+name;
+  if(r.head&&r.head.ref===k)throw new Error("“"+name+"” is the branch out in Fabrica: keep the work there");
+  if(r.merging)throw new Error("finish or stop the merge first");
+  msg=String(msg||"").replace(/\r\n/g,"\n").trim();if(!msg)throw new Error("a commit needs a few words to say what it changes");
+  var old=r.refs[k]||null;
+  return (old?Promise.resolve(old):resolve(r,opt.from||"HEAD")).then(function(tip){if(!tip)throw new Error("make a first commit before a branch");
+    return treeFiles(tip).then(function(files){var next={},p;for(p in files)next[p]=files[p];r.sizes=r.sizes||{};var chain=Promise.resolve();
+      (changes||[]).forEach(function(c){chain=chain.then(function(){var q=cleanPath(c.path);if(!q)throw new Error("a file needs a name");
+        if(c.data==null){delete next[q];return;}var b=u8of(c.data),was=next[q],m=c.mode?String(c.mode):(was?was[0]:(execByName(q)?"100755":"100644"));
+        if(!/^(100644|100755|120000)$/.test(m))throw new Error("not a mode a file can have");
+        Object.keys(next).forEach(function(x){if(x!==q&&(x.indexOf(q+"/")===0||q.indexOf(x+"/")===0))throw new Error("“"+x+"” is in the way of “"+q+"”");});
+        return store().put("blob",b,was?was[1]:null).then(function(oid){next[q]=[m,oid];r.sizes[oid]=b.length;});});});
+      return chain.then(function(){return writeTrees(store(),next);}).then(function(tree){return commitOf(tip).then(function(pc){
+        if(pc.tree===tree&&!opt.allowEmpty)throw new Error("nothing has changed since the last commit");
+        var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d));
+        return store().put("commit",commitBody({tree:tree,parents:[tip],author:a,msg:msg+"\n"})).then(function(oid){r.refs[k]=oid;
+          r.log=(r.log||[]).concat([{at:Date.now(),from:old,to:oid,why:"commit on "+name}]).slice(-200);return save(r).then(function(){return oid;});});});});});});});});}
 function log(id,opt){opt=opt||{};return load(id).then(function(r){var refsAt={};
   /* 6.86: a tag kept as an object of its own (an annotated tag, as most repositories brought from GitHub or read from the drive have) names
      the version it points to, so the history shows it there; before, only a tag naming the version itself was shown */
@@ -770,7 +792,7 @@ function headOf(id){return load(id).then(function(r){return headOid(r);});}
 function _use(be){BE=be;ST=new Store(be);ST.onPut=function(oid){if(mshell())MIR.fresh.add(oid);};locks={};recovered=null;}
 return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
-  status:status,commit:commit,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
+  status:status,commit:commit,commitTo:commitTo,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,rebase:rebase,stopMerge:stopMerge,revert:revert,isDisk:isDisk,
   setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,

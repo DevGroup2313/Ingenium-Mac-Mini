@@ -244,6 +244,10 @@ var ROUTE={
     return ps.reduce(function(q,x){return q.then(function(){return call("disk_remove_file",[id,x]);});},Promise.resolve()).then(function(){stale(id);toast("Taken away from its folder; kept aside in .git/ingenium-put-back, inside it.");return ps.length;});});},
   move:function(id,a,b){return ready(id).then(function(r){var pa=cp(a),pb=cp(b),ps=under(r,pa);if(!ps.length)throw new Error("“"+pa+"” is not here");
     return ps.reduce(function(q,x){return q.then(function(){return call("disk_move_file",[id,x,pb+x.slice(pa.length)]);});},Promise.resolve()).then(function(){stale(id);return ps.length;});});},
+  /* 7.46 (modules/r333.js, desktop/app_session_746.py): a Code session's version, kept on a branch of its own; the folder's files untouched */
+  commitTo:function(id,name,changes,msg,opt){opt=opt||{};return ready(id).then(function(){var w=author();
+      return call("disk_commit_to",[id,String(name||""),(changes||[]).map(function(c){return {path:cp(c.path),b64:c.data==null?null:b64(u8(c.data))};}),String(msg||""),opt.from||null,w.name||null,w.email||null]);})
+    .then(function(x){stale(id);return x.commit;});},
   commit:function(id,msg){return ready(id).then(function(){var w=author();return call("disk_commit",[id,String(msg||""),w.name||null,w.email||null]);}).then(function(x){stale(id);
     /* 6.92: as any version kept: a pull request whose versions are all in now is merged, "fixes #3" closes issue 3, the checks run when asked */
     try{if(W.fbHub&&typeof fbHub.kept==="function")fbHub.kept(id,x.commit);}catch(e){}return x.commit;});},
