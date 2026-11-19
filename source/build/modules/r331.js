@@ -27,17 +27,23 @@ body[data-theme="night"]{--p3-card:#201a2b;--p3-ink1:#f6f1fd;--p3-ink2:#d3c9e3;-
   --p3-key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
   --p3-pri-bg:linear-gradient(#7a56c8,#5b3aa1);--p3-pri-line:#2c1956;--p3-pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
   --p3-lav-t:rgba(183,156,230,.15);--p3-lav-c:#b79ce6;--p3-emr-t:rgba(64,192,128,.15);--p3-emr-c:#6fd8a2;--p3-red-c:#f0939c;--p3-dim:.8}
-/* the key, beside the seal */
-html body .topbar #profKey{display:inline-flex;align-items:center;gap:8px;min-height:34px;margin:0 0 0 6px;padding:0 12px 0 4px;border-radius:999px;border:1px solid var(--p3-line);
-  background:var(--p3-key-bg);box-shadow:var(--p3-key-sh);font:600 12.8px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--p3-ink1);
-  flex:0 0 auto;cursor:pointer;white-space:nowrap;transition:transform .3s var(--p3-bounce),box-shadow .2s}
-html body .topbar #profKey:hover{transform:translateY(-2px);box-shadow:var(--p3-key-hi)}
-html body .topbar #profKey:active{transform:translateY(1px);box-shadow:var(--p3-key-sh)}
-html body .topbar #profKey:focus-visible{outline:3px solid var(--p3-acc);outline-offset:2px}
-html body .topbar #profKey .r331-chev{width:12px;height:12px;fill:none;stroke:var(--p3-ink3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--p3-bounce)}
-html body .topbar #profKey[aria-expanded="true"] .r331-chev{transform:rotate(180deg)}
-html.ing-tb-icons body .topbar #profKey .r331-nm,html.ing-tb-icons body .topbar #profKey .r331-chev{display:none}
-html.ing-tb-icons body .topbar #profKey{padding:0 4px}
+/* the key, at the foot of the left menu (7.46). Her words (19 November 2026): "I also want the profile toggle entirely removed from
+   Ingenium's top header area, it looks hideous and I hate how it is destroying the look of the app, put it somewhere else more appropriate.
+   I don't like the look of it at all." So it is one of the menu's own rows (nav-btn, its look kept), the profile's tile where a row's icon
+   sits, its name, a small chevron; its menu (version 3's) opens upward from it. */
+nav.dock #profKey{margin-top:auto;display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;flex:0 0 auto}
+nav.dock #profKey .r331-mk{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 0 rgba(40,22,68,.16),0 2px 0 rgba(40,22,68,.18),0 4px 8px rgba(40,22,68,.14)}
+nav.dock #profKey .r331-nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+nav.dock #profKey .r331-chev{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:currentColor;opacity:.6;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--p3-bounce)}
+nav.dock #profKey[aria-expanded="true"] .r331-chev{transform:rotate(180deg)}
+nav.dock #profKey:focus-visible{outline:3px solid var(--p3-acc);outline-offset:2px}
+/* under the pointer it lifts out of the menu, never a violet wash (her rule) */
+html body nav.dock #profKey{transition:transform .24s var(--p3-bounce),box-shadow .24s ease,background .18s ease}
+html body nav.dock #profKey:hover,html body nav.dock #profKey[aria-expanded="true"]{background:linear-gradient(180deg,#ffffff,#f6f2fb)!important;transform:translateY(-2px);
+  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.12),0 2px 0 rgba(40,22,68,.20),0 5px 9px rgba(40,22,68,.14)}
+html body nav.dock #profKey:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(40,22,68,.2);transition-duration:.08s}
+html body[data-theme="night"] nav.dock #profKey:hover,html body[data-theme="night"] nav.dock #profKey[aria-expanded="true"]{background:linear-gradient(180deg,#3f3557,#322a47)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1.5px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.5),0 5px 9px rgba(0,0,0,.36)}
 /* each profile's tile: soft pastel by day, deeper by night, raised, as Fabrica's app tile */
 .r331-mk{--s:30px;width:var(--s);height:var(--s);flex:0 0 auto;border-radius:calc(var(--s)*.3);display:inline-grid;place-items:center;background:linear-gradient(145deg,var(--a),var(--b));color:var(--c);
   font:700 calc(var(--s)*.56)/1 var(--p3-serif);filter:brightness(var(--p3-dim));
@@ -181,20 +187,22 @@ function switchTo(id,note){var r=reg(),t=null;r.list.forEach(function(p){if(p.id
     r.cur=id;X.save(r);try{sessionStorage.setItem("ing.profile.entered","1");}catch(e){}location.reload();});},250);}
 function say(where,t){var s=where||$("profSaid");if(s)s.textContent=t;else try{if(typeof W.toast==="function")W.toast(t);}catch(e){}}
 /* ---------- the key, beside the seal ---------- */
-function key(){var k=$("profKey");if(k)return k;var seal=$("brandSealBtn");if(!seal||!seal.parentNode)return null;
-  k=D.createElement("button");k.id="profKey";k.type="button";k.setAttribute("aria-haspopup","true");k.setAttribute("aria-expanded","false");
-  seal.parentNode.insertBefore(k,seal.nextSibling);k.addEventListener("click",function(){var p=$("profPop");if(p&&!p.hidden)closePop();else openPop();});return k;}
+function key(){var k=$("profKey");if(k)return k;var dock=D.querySelector("nav.dock");if(!dock)return null;
+  k=D.createElement("button");k.id="profKey";k.className="nav-btn";k.type="button";k.setAttribute("aria-haspopup","true");k.setAttribute("aria-expanded","false");
+  dock.appendChild(k);k.addEventListener("click",function(){var p=$("profPop");if(p&&!p.hidden)closePop();else openPop();});return k;}
 function keepOwnerName(){if(!P0.owner)return;var r=X.reg()||null,n=ownerName();if(r&&n&&r.ownerName!==n){r.ownerName=n;X.save(r);}}
 function paintKey(){keepOwnerName();var k=key();if(!k)return;var p=me();
-  k.innerHTML=tile(p,26,true)+'<span class="r331-nm">'+esc(p.name)+'</span><svg class="r331-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  k.innerHTML=tile(p,22,true)+'<span class="r331-nm">'+esc(p.name)+'</span><svg class="r331-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
   k.title="Who is using Ingenium: "+p.name;k.setAttribute("aria-label","Profile in use: "+p.name+". Press to switch");}
-/* ---------- the menu under the key (version 3) ---------- */
+/* ---------- the key's menu (version 3), opening upward from the foot of the left menu ---------- */
 function pop(){var d=$("profPop");if(d)return d;d=D.createElement("div");d.id="profPop";d.setAttribute("role","menu");d.setAttribute("aria-label","Who is using Ingenium");d.hidden=true;D.body.appendChild(d);
   d.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;tap(b);
     if(b.hasAttribute("data-who")){var id=b.getAttribute("data-who");if(id===(P0.owner?"owner":P0.id)){closePop();return;}closePop();switchTo(id);return;}
     if(b.id==="profLock"){closePop();lockNow();return;}
     if(b.id==="profManage"){closePop();manage();}});return d;}
-function place(){var d=$("profPop"),k=$("profKey");if(!d||d.hidden||!k)return;var r=k.getBoundingClientRect();d.style.top=Math.round(r.bottom+8)+"px";d.style.left=Math.round(Math.max(12,Math.min(r.left-6,innerWidth-d.offsetWidth-12)))+"px";}
+/* above the key, at the foot of the left menu; below it only where there is no room above */
+function place(){var d=$("profPop"),k=$("profKey");if(!d||d.hidden||!k)return;var r=k.getBoundingClientRect(),h=d.offsetHeight,top=r.top-h-8;if(top<12)top=Math.min(r.bottom+8,innerHeight-h-12);
+  d.style.top=Math.round(Math.max(12,top))+"px";d.style.left=Math.round(Math.max(12,Math.min(r.left,innerWidth-d.offsetWidth-12)))+"px";}
 function openPop(){var d=pop(),cur=P0.owner?"owner":P0.id;
   d.innerHTML='<h4>Who is using Ingenium</h4>'+list().map(function(p){return '<button class="r331-who" type="button" role="menuitem" data-who="'+esc(p.id)+'"'+(p.id===cur?' aria-current="true"':'')+'>'+tile(p,30,true)
      +'<span><b>'+esc(p.name)+'</b><span class="r331-t">'+opens(p)+'</span></span>'+(p.id===cur?'<span class="r331-chip">In use</span>':'')+'</button>';}).join("")

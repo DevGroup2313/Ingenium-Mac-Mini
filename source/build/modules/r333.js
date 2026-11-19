@@ -15,6 +15,28 @@ body[data-theme="night"] .ing-ask.r333 .cc-prow:hover,body[data-theme="night"] .
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1.5px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.55),0 6px 9px rgba(0,0,0,.42),0 13px 20px rgba(0,0,0,.32)}
 body[data-motion="minimal"] .ing-ask.r333 .cc-prow,body[data-motion="minimal"] .ing-ask.r312 .cc-prow{transition:none!important;transform:none!important}
 @media (prefers-reduced-motion:reduce){.ing-ask.r333 .cc-prow,.ing-ask.r312 .cc-prow{transition:none!important;transform:none!important}}
+/* Code's start window (where A repository begins) and Chat's + menu (A repository, The repository): raised and alive as Ingenium's keys,
+   never a violet wash under the pointer. Her words on the stage 1 preview (19 November 2026): "I hate the purple shading, I want the
+   animated popped out 3D look and animation of Ingenium to be consistent throughout". */
+html body #modalBox .cc-start .cc-card,html body #modalBox .cc-start .cc-new{border:1px solid rgba(34,26,46,.10);background:linear-gradient(180deg,#ffffff,#f6f2fb);
+  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
+  transition:transform .24s cubic-bezier(.34,1.45,.64,1),box-shadow .24s ease}
+html body #modalBox .cc-start .cc-card:hover,html body #modalBox .cc-start .cc-new:hover{background:linear-gradient(180deg,#ffffff,#f6f2fb);transform:translateY(-4px) rotate(-.35deg);
+  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 4px 0 rgba(40,22,68,.24),0 8px 10px rgba(40,22,68,.18),0 16px 24px rgba(40,22,68,.13)}
+html body #modalBox .cc-start .cc-card:active,html body #modalBox .cc-start .cc-new:active{transform:translateY(1px) scale(.99);transition-duration:.08s;
+  box-shadow:inset 0 -1px 0 rgba(40,22,68,.13),0 1px 0 rgba(40,22,68,.25),0 2px 3px rgba(40,22,68,.14)}
+html body #chatPlusMenu .pm-item{transition:transform .22s cubic-bezier(.34,1.45,.64,1),box-shadow .22s ease,background .18s ease}
+html body #chatPlusMenu .pm-item:hover,html body #chatPlusMenu .pm-item:focus-visible{background:linear-gradient(180deg,#ffffff,#f6f2fb);transform:translateY(-2px);
+  box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.12),0 2px 0 rgba(40,22,68,.20),0 5px 9px rgba(40,22,68,.14)}
+html body #chatPlusMenu .pm-item:active{transform:translateY(1px);transition-duration:.08s;box-shadow:0 1px 0 rgba(40,22,68,.2)}
+html body[data-theme="night"] #modalBox .cc-start .cc-card,html body[data-theme="night"] #modalBox .cc-start .cc-new{border-color:rgba(255,255,255,.08);background:linear-gradient(180deg,#3a3050,#2f2742);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1.5px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.55),0 4px 6px rgba(0,0,0,.40),0 9px 14px rgba(0,0,0,.30)}
+html body[data-theme="night"] #modalBox .cc-start .cc-card:hover,html body[data-theme="night"] #modalBox .cc-start .cc-new:hover{background:linear-gradient(180deg,#3f3557,#322a47);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1.5px 0 rgba(0,0,0,.45),0 4px 0 rgba(0,0,0,.55),0 8px 10px rgba(0,0,0,.42),0 16px 24px rgba(0,0,0,.32)}
+html body[data-theme="night"] #chatPlusMenu .pm-item:hover,html body[data-theme="night"] #chatPlusMenu .pm-item:focus-visible{background:linear-gradient(180deg,#3f3557,#322a47);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1.5px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.5),0 5px 9px rgba(0,0,0,.36)}
+body[data-motion="minimal"] #modalBox .cc-start .cc-card,body[data-motion="minimal"] #modalBox .cc-start .cc-new,body[data-motion="minimal"] #chatPlusMenu .pm-item{transition:none!important;transform:none!important}
+@media (prefers-reduced-motion:reduce){#modalBox .cc-start .cc-card,#modalBox .cc-start .cc-new,#chatPlusMenu .pm-item{transition:none!important;transform:none!important}}
 /* a key of Code's top row that is hidden stays hidden: .chat-top-key's display:flex outweighed the hidden attribute, so a key set aside
    (r219's GitHub key in a session that is not on GitHub, r312's Keep in Fabrica in a session on a branch of its own) showed as an empty pill */
 .chat-top-key[hidden]{display:none!important}

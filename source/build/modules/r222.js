@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.46", "No film behind a panel or a popup: when a sheet, a list or a panel opens, the page behind it keeps its own colours, with nothing tinted or blurred over it."],
+  ["7.46", "The profile key has left the top bar: it is the last row of the left menu now, with the profile's tile and name, and its menu (Who is using Ingenium, Lock Ingenium, Manage profiles) opens above it."],
   ["7.45", "The full edition, opened on a device that holds your work from Ingenium's master edition, asks once to bring it in: everything comes as it was, sealed work stays sealed with the same password, and Start empty leaves it untouched. On Windows, Ingenium-Full-Setup.exe installs in Ingenium's own place, and Ingenium-Gift-Setup.exe in a place of its own."],
   ["7.45", "The full and gift editions carry nothing of their owner's own: no personal plans, no list of ways of working (each person writes their own), and no owner's devices named in their words."],
   ["7.44", "Local profiles: each person who uses Ingenium on a device has a profile of their own. The key beside the seal shows who is using Ingenium and moves to another profile; Settings, Security, This device keeps Profiles on this device, where the owner adds or removes profiles and chooses for each whether it opens with its own password. Each profile keeps its own conversations and memory, folders and their search, records, look and sounds, connections and keys; the models are shared, and nothing about a profile leaves the device."],

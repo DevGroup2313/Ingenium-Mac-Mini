@@ -64,7 +64,7 @@ html,body{margin:0;background:var(--bg,#f4f1f8)}
 .pv-step{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(34,26,46,.10);border-radius:12px;padding:7px 12px;cursor:pointer;font:600 12.5px/1.2 inherit;color:inherit;
   background:linear-gradient(180deg,#ffffff,#f6f2fb);box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 2px 0 rgba(40,22,68,.25),0 4px 5px rgba(40,22,68,.16),0 9px 14px rgba(40,22,68,.10);
   transition:transform .22s cubic-bezier(.34,1.45,.64,1),box-shadow .22s ease}
-.pv-step b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#efe8fa;color:#6a3fb5;font-size:11px}
+.pv-step b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#f3f0f6;color:#4b3a6e;font-size:11px;box-shadow:inset 0 -1px 0 rgba(40,22,68,.12)}
 .pv-step:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:inset 0 -1.5px 0 rgba(40,22,68,.13),0 3px 0 rgba(40,22,68,.25),0 6px 8px rgba(40,22,68,.18),0 13px 20px rgba(40,22,68,.12)}
 .pv-step:active{transform:translateY(1px) scale(.98)}
 .pv-step[aria-current="step"]{background:linear-gradient(180deg,#7348be,#5d37a1);border-color:#4b2a86;color:#fff}
@@ -82,10 +82,9 @@ html,body{margin:0;background:var(--bg,#f4f1f8)}
 .pv-toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);opacity:0;transition:opacity .25s,transform .25s;z-index:2147483000;
   background:#2b2238;color:#fff;border-radius:12px;padding:9px 14px;font:13px/1.4 inherit;pointer-events:none}
 .pv-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.pv-next{outline:2.5px solid rgba(106,63,181,.55);outline-offset:3px;border-radius:12px;animation:pvGlow 2.4s ease-in-out infinite}
-@keyframes pvGlow{0%,100%{outline-color:rgba(106,63,181,.25)}50%{outline-color:rgba(106,63,181,.7)}}
-body[data-motion="minimal"] .pv-next,body[data-motion="minimal"] .pv-step,body[data-motion="minimal"] .pv-k{animation:none!important;transition:none!important}
-@media (prefers-reduced-motion:reduce){.pv-next{animation:none}.pv-step,.pv-k{transition:none}.pv-step:hover,.pv-k:hover{transform:none}}
+/* the key a step is about is marked for the preview's own script only: no outline, no tint (her words: no purple shading) */
+body[data-motion="minimal"] .pv-step,body[data-motion="minimal"] .pv-k{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.pv-step,.pv-k{transition:none}.pv-step:hover,.pv-k:hover{transform:none}}
 @media (max-width:640px){.pv h1{font-size:21px}.pv-step span{display:none}}
 </style>
 <div class="pv">

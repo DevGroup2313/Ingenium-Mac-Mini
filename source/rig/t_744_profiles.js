@@ -37,8 +37,8 @@ async function chooseFromKey(p, name) { await p.click('#profKey'); await p.waitF
     // ---------------------------------------------------------------- 1. the owner's profile
     await p.goto(URL_); await boot(p); await inside(p);
     const k1 = await p.evaluate(() => { const k = document.getElementById('profKey'), s = document.getElementById('brandSealBtn'); const g = k && getComputedStyle(k);
-      return { name: (k && k.querySelector('.r331-nm') || {}).textContent, owner: window.__ingProfile && window.__ingProfile.owner, beside: !!(k && s && k.previousElementSibling === s), tile: !!(k && k.querySelector('.r331-mk.round')), raised: g && g.boxShadow !== 'none', ed: ING_EDITION }; });
-    ok(k1.owner && k1.beside && k1.tile && k1.raised && k1.ed === 'master' && k1.name === 'Yannie', '1. the owner\'s profile: the key stands beside the seal, raised, with her tile and her name as Home greets her', k1);
+      return { name: (k && k.querySelector('.r331-nm') || {}).textContent, owner: window.__ingProfile && window.__ingProfile.owner, beside: !!(k && k.parentElement && k.parentElement.matches('nav.dock') && !document.querySelector('.topbar #profKey')), tile: !!(k && k.querySelector('.r331-mk.round')), raised: !!(k && k.classList.contains('nav-btn')), ed: ING_EDITION }; });
+    ok(k1.owner && k1.beside && k1.tile && k1.raised && k1.ed === 'master' && k1.name === 'Yannie', '1. the owner\'s profile: the key stands at the foot of the left menu (not in the top bar), with her tile and her name as Home greets her', k1);
     const y0 = await p.evaluate(() => document.getElementById('profKey').getBoundingClientRect().top); await p.hover('#profKey'); await p.waitForTimeout(500);
     const y1 = await p.evaluate(() => document.getElementById('profKey').getBoundingClientRect().top);
     await p.click('#profKey'); await p.waitForTimeout(700);

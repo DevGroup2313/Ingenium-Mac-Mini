@@ -395,6 +395,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.46 (19 November 2026): no film behind a panel or a popup, and the profile key in the left menu.
+
+Her words (19 November 2026): "Please remove the weird film that covers the background when a panel or popup is opened, I don't like how
+it looks. I have made similar requests in the past regarding Fabrica, please make the fix. I also want the profile toggle entirely removed
+from Ingenium's top header area, it looks hideous and I hate how it is destroying the look of the app, put it somewhere else more
+appropriate." And: "Do not change anything that I haven't asked you to change, only do as you are told."
+
+- `build/modules/r334.js`: every layer laid over the whole window behind a panel or a popup with a tint or a blur (found in the running
+  page: #modalRoot, #secAsk, .ing-dlg-root, .r172-scrim, .chat-drawer-scrim, .r2-scrim, .schedae-back, .cust-back, .tour-menu-back,
+  Fabrica's .f-sheet-wrap and .hb-wrap, Folders' .fd-bwrap, .r315-veil, .sl-veil, .dp-veil, .tg-veil, #lxRx, #ingSoundChoices, #profDoor)
+  keeps its place, so a press outside still closes the sheet, and loses its tint and blur. The panels themselves keep their own look; the
+  welcome door's glass and the sign-in door are doors and stay as they were.
+- `build/modules/r331.js`: the profile key is the last row of the left menu (nav.dock, one of its own nav-btn rows: the profile's tile
+  where a row's icon sits, its name, a small chevron), pinned to its foot; under the pointer it lifts, with no violet wash (her rule); its
+  menu (version 3's) opens above it. Nothing of it is left in the top bar. `rig/t_744_profiles.js` checks it there; `rig/t_746_film_key.js`.
+- Held, not in this release: Fabrica's stage 1 (modules/r333.js, held.json "held_746"), for her answer to its preview; its computer-app
+  side (desktop/app_session_746.py) is left out of release.py's list until then.
+
 Ingenium 7.45 (19 November 2026): the full edition without the owner's material, bringing in the master's work, and the editions' Windows installers.
 
 Her words (19 November 2026): "I want to be able to download and install the Gift and Full editions of Ingenium on my HP Windows computer";

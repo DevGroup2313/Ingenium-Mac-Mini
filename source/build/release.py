@@ -135,8 +135,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_ollama_738", "_ollama_chats_find", ("mini", "intel", "win")),
            ("app_speech_739", "_speech_dev_get", ("mini", "intel", "win")),
            ("app_logs_739", "_mac_logs_dir", ("mini", "intel", "win")),
-           ("app_profiles_744", "_profile_use", ("mini", "intel", "win")),
-           ("app_session_746", "_disk_commit_to", ("mini", "intel", "win"))]
+           ("app_profiles_744", "_profile_use", ("mini", "intel", "win"))]
+# held with modules/r333.js until she approves Fabrica's stage 1 (held.json "held_746"): ("app_session_746", "_disk_commit_to", ("mini", "intel", "win"))
 
 
 def desktop():
