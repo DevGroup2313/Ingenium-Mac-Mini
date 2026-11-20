@@ -28,7 +28,7 @@ async function setupLock(p, name, pwd) { await p.waitForSelector('#ingLockDoor #
 async function signIn(p, pwd) { await p.waitForSelector('#ingLockDoor:not([hidden]) #ildPw', { timeout: 60000 }); await p.fill('#ingLockDoor #ildPw', pwd); await p.click('#ingLockDoor #ildGo');
   await p.waitForFunction(() => window.__ingReady === true && !(document.querySelector('#ingLockDoor') && !document.querySelector('#ingLockDoor').hidden), null, { timeout: 120000 }); await p.waitForTimeout(1500); }
 // 7.48 (r338): the profile key is inside the Status panel (the top bar's status key), at its foot: Who is using Ingenium
-async function openWho(p) { await p.click('#statusPill'); await p.waitForSelector('.pres-menu .r338-who', { timeout: 10000 }); }
+async function openWho(p) { await p.evaluate(() => { try { closePresenceMenu(); } catch (e) {} }); await p.click('#statusPill'); /* 7.48: an open Status panel's backdrop covers the page (a press there closes it), so it is closed first */ await p.waitForSelector('.pres-menu .r338-who', { timeout: 10000 }); }
 async function chooseFromKey(p, name) { await openWho(p);
   const id = await p.evaluate((n) => { const rows = [...document.querySelectorAll('.pres-menu .r338-who[data-who]')]; const b = n === null ? rows.find((x) => x.getAttribute('data-who') === 'owner') : rows.find((x) => x.querySelector('.pres-name').textContent === n); return b ? b.getAttribute('data-who') : null; }, name);
   await Promise.all([p.waitForNavigation({ timeout: 120000 }).catch(() => {}), p.click('.pres-menu .r338-who[data-who="' + id + '"]')]); return id; }
