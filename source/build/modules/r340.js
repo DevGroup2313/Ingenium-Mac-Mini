@@ -9,6 +9,9 @@
      locks, it is dropped (disk_key_drop). A page opened locked drops it too, so a refresh never leaves it behind.
    - When she turns her sign-in off, everything sealed on the disk is opened again first (disk_unseal_all), as the stores are.
    - Settings, Security, The computer's disk says what is sealed and what is not yet, with Seal them now.
+   - 7.50 (20 November 2026; desktop/app_disk_750.py): the records too (an app waiting for her devices, under a name that says nothing; a
+     run's record once it ends) and texts for training. The room says what the computer app itself reports it seals (disk_status's kinds),
+     so an app of 7.49 is never said to seal more than it does; a copy without a computer app names what this release's apps seal.
    window.IngDiskSeal: state(), describe(hasFabrica), status(), sealNow() */
 (function r340(){"use strict";
 if(window.IngDiskSeal)return;
@@ -21,7 +24,7 @@ var ST={held:false,files:0,sealed:0,lib:true,asked:0},BUSY=false;
 function repaint(){try{if(W.IngSecurity&&IngSecurity.paint)IngSecurity.paint();}catch(e){}}
 /* the computer app's own count, asked at most every four seconds and only where there is a computer app; the room is painted again only
    when the answer changed (the room asks for its words as it paints, so asking and painting must never feed each other) */
-function sig(x){return [x.held,x.files,x.sealed,x.lib].join("/");}
+function sig(x){return [x.held,x.files,x.sealed,x.lib,(x.kinds||[]).join(",")].join("/");}
 function status(){var a=api();if(!a)return Promise.resolve(ST);ST.asked=Date.now();
   return Promise.resolve(a.disk_status()).then(function(s){if(s&&s.ok){var was=sig(ST);s.asked=ST.asked;ST=s;ST.changed=was!==sig(ST);}return ST;},function(){return ST;});}
 function hold(){var a=api(),l=L();if(!a||!l||!l.diskKey||!l.active||!l.active())return Promise.resolve(false);
@@ -39,18 +42,25 @@ function state(){var a=api(),l=L();if(!a)return "off";if(!l||!l.active||!l.activ
 function sealNow(btn){var a=api();if(!a||BUSY)return;BUSY=true;if(btn)btn.disabled=true;
   Promise.resolve(a.disk_seal_now()).then(function(s){BUSY=false;if(s&&s.ok){ST=s;try{W.ingToast&&ingToast(s.now?(s.now===1?"One file sealed just now.":s.now+" files sealed just now."):"Everything was sealed already.");}catch(e){}}
     else{try{W.ingToast&&ingToast((s&&s.error)||"It could not be sealed now.");}catch(e){}}repaint();},function(e){BUSY=false;warn(e);repaint();});}
+/* 7.50: in the middle of a sentence the first letter is lowered, never a name's (7.49 wrote "fabrica's runs") */
+function mid(x){return /^Fabrica/.test(x)?x:x.charAt(0).toLowerCase()+x.slice(1);}
 function describe(fab){var a=api(),l=L(),on=!!(l&&l.active&&l.active());
   if(a&&Date.now()-ST.asked>4000)status().then(function(x){if(x&&x.changed){x.changed=false;repaint();}});
-  var what=fab?"Fabrica's runs and their logs, and the apps waiting for your devices":"The apps waiting for your devices";
-  var later=fab?"Fabrica apps kept on a drive, the folder search's index and texts for training":"the folder search's index and texts for training";
+  var tr=!a||(ST.kinds||[]).indexOf("training")>=0;   /* 7.50: what this computer app says it seals */
+  var what=fab?(tr?"Fabrica's runs with their records and logs, the apps waiting for your devices, and texts for training":"Fabrica's runs and their logs, and the apps waiting for your devices")
+    :(tr?"Texts for training":"");   /* 7.50: an edition without Fabrica sends no app to the devices (r316 is Fabrica's), so it names none */
+  var later=fab?(tr?"Fabrica apps kept on a drive, and the folder search's index":"Fabrica apps kept on a drive, the folder search's index and texts for training")
+    :(tr?"the folder search's index":"the folder search's index and texts for training");
   var h="";
-  if(!a)h='<p>This copy runs without a computer app, so nothing of it is kept in files on a computer\'s disk. In the Mac and Windows apps, '+esc(what.charAt(0).toLowerCase()+what.slice(1))+' are sealed with your password.</p>';
-  else if(!on)h='<p>Off: the computer app\'s own files are plain, as they always were. Turn on your sign-in (This device) and '+esc(what.charAt(0).toLowerCase()+what.slice(1))+' are sealed with its password.</p>';
+  if(!a)h='<p>This copy runs without a computer app, so nothing of it is kept in files on a computer\'s disk. In the Mac and Windows apps, '+esc(mid(what))+' are sealed with your password.</p>';
+  else if(!on)h='<p>Off: the computer app\'s own files are plain, as they always were.'+(what?' Turn on your sign-in (This device) and '+esc(mid(what))+' are sealed with its password.':'')+'</p>';
+  else if(!what)h='<p>On. This computer app seals none of its own files yet.</p>';
   else h='<p>On. '+esc(what)+': sealed with the same password. '+(ST.held?'The computer app holds the key in its memory only while you are signed in, and drops it when Ingenium locks.':'Locked now: they open when you sign in.')
-    +' A run still runs on plain files while it runs; its log and its files are sealed when it ends.</p>'
+    +(tr?(fab?' A run or a training still works on plain files while it runs; they are sealed when it ends.</p>':' A training still reads its text plain while it trains; it is sealed when it ends.</p>')
+      :' A run still runs on plain files while it runs; its log and its files are sealed when it ends.</p>')
     +'<p>'+(ST.files?(ST.sealed===ST.files?(ST.files===1?"Its one file is sealed.":"All "+ST.files+" of its files are sealed."):ST.sealed+" of "+ST.files+" files sealed."):"Nothing of these is on the disk yet.")+'</p>'
     +'<div class="sc-keys"><button type="button" class="sc-key pri" data-a="disk-seal"'+(ST.held?'':' disabled')+'>Seal them now</button></div>';
-  h+='<p class="sc-fine">Not sealed yet, the next stage: '+esc(later)+'. Kept readable on purpose: an app you serve for the Home Screen (Safari has to read it), and your model files.</p>';
+  h+='<p class="sc-fine">Not sealed yet, the next stage: '+esc(later)+'. Kept readable on purpose: '+(fab?'an app you serve for the Home Screen (Safari has to read it), and your model files':'your model files')+'.</p>';
   return h;}
 D.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest('#secCard [data-a="disk-seal"]');if(b){e.preventDefault();sealNow(b);}});
 /* at start: signed in, the key is handed over; opened locked, any key the app still held is dropped */

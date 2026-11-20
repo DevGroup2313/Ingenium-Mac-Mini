@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.50", "Sealed on the computer's disk, more of it: in the Mac and Windows apps, with your sign-in on, the record kept beside each app waiting for your devices (its name, under a file name that now says nothing) and each of Fabrica's runs once it ends (its steps' commands and the values they were given), and texts for training, left waiting or kept for a training cut short, are sealed with your password too. A run or a training still works on plain files while it runs. Fabrica apps kept on a drive and the folder search's index come next.", "fabrica"],
+  ["7.50", "Sealed on the computer's disk: in the Mac and Windows apps, with your sign-in on, texts for training, left waiting or kept for a training cut short, are sealed with your password. A training still reads its text plain while it trains. Settings, Security, The computer's disk says what is sealed; the folder search's index comes next.", "nofabrica"],
   ["7.49", "Fabrica's pull requests ask for reviews: beside People and Milestone, the chip Reviewers asks a person known in the repository, someone else or your own model, and each one asked has a pill saying what they did since: waiting, approved, asked for changes or commented. Your model's review is kept as a comment; a model never approves.", "fabrica"],
   ["7.49", "Code owners: a CODEOWNERS file is read as GitHub reads it (.github/CODEOWNERS, then CODEOWNERS, then docs/CODEOWNERS). The owners of the files a pull request changes are asked for a review, each with the line that named them, and the merge box says who owns what and whether one of them has approved.", "fabrica"],
   ["7.49", "Suggested changes: a comment on a line of a pull request can Suggest a change. Its thread shows the change with Commit suggestion and Add suggestion to batch, and a batch is kept as one version that names who suggested each change. A suggestion whose line has changed since is out of date and is never applied.", "fabrica"],
@@ -536,11 +538,11 @@ var NEW=[
   ["6.9.2","An optional sign-in, with your data sealed on this device."],
   ["6.9.1","A longer memory: more of each conversation kept in view."]];
 /* x[2]: "career" where the Career Studio is, "nocareer" where it is not (the same news in the words of an edition without it), "fabrica" where
-   Fabrica is (6.33), "master" in the master edition alone */
+   Fabrica is (6.33), "nofabrica" where it is not (7.50, as "nocareer"), "master" in the master edition alone */
 /* 7.46: in another person's profile (the full edition, R331) no line names her apps, as the full edition's page carries none
    (build/editions.py); which line names one is known to modules/r336.js alone, which only her master copy carries */
 function hersLine(t){try{return !!(W.IngNotHers&&typeof W.IngNotHers.hers==="function"&&W.IngNotHers.hers(t));}catch(e){return false;}}
-function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(!W.__ingGuest||!hersLine(x[1]))&&(x[2]!=="desk"||!!W.IngDesk);});}
+function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="nofabrica"||!has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(!W.__ingGuest||!hersLine(x[1]))&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;

@@ -395,6 +395,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.50 (20 November 2026): sealed on the computer's disk, the second stage's first part: the records too, and texts for training.
+Her answer for the computer's disk (18 November 2026): "All of them" sealed; her word (20 November 2026): "I approve of everything, please
+commit and push it everywhere and continue working on my requests."
+- Found on 7.49 by `rig/t_736_leak_hunt.js` (a real computer app, protection on, a mark written into everything, every file read raw): an
+  app waiting for her devices was sealed, but the small record beside it (Ingenium/apps/outbox/<id>.json: its name, version, size and
+  devices) was plain, and its file name began with the app's short name; a run's record (its name, its steps' commands, the values each
+  step was given) stayed plain after the run ended; a run the app's closing cut short kept "running" in its record, so nothing of it was
+  ever sealed. The 7.49 entry below says the apps waiting for her devices are sealed: their pages were, their names were not.
+- `build/desktop/app_disk_750.py` (new, in release.py's list after app_disk_749): an app sent to her devices is kept under a name that says
+  nothing (a, ten random hexadecimal digits, a dash, the time), its record sealed with its page; one kept before under its short name takes
+  such a name when the sweep seals it; a newer version still replaces the one waiting, found by its sealed record. A device asking while the
+  computer is locked is told so (423), when it lists, gets or says it got an app, never that nothing waits. A run's record is sealed when
+  the run ends (the run's own thread seals it as it finishes); while it runs it stays plain (the run writes it at every step, and a run goes
+  on when Ingenium locks); a run the app's closing cut short counts as ended. Locked, Fabrica's list says how many it could not read, and
+  a paired device asking about its runs is told the computer is locked (423). Texts for training: a text handed over and left for a
+  quarter of an hour (models/training-in/incoming.txt) is sealed, and so are the text and the plan of a training cut short
+  (models/training/<id>/text.txt, plan.json); a training and a measurement open their text first and read it plain while they run; a
+  piece added to a sealed text opens it first; nothing in use is ever sealed, and Open everything again opens a sealed text even while a
+  training runs. The trained models and their checkpoints are model files, kept readable on purpose.
+- Found while testing it, before any release: Open everything again (her sign-in turned off) left a training's sealed text sealed if a
+  training was running at that moment, so it could never be opened again; a sealed text is now always opened.
+- `build/modules/r340.js`: Settings, Security, The computer's disk names what the computer app itself reports it seals (disk_status's
+  kinds), so a computer app of 7.49 is never said to seal more than it does; a copy without a computer app names what this release's
+  apps seal. An edition without Fabrica (gift, demo) sends no app to the devices (r316 is Fabrica's), so it names texts for training only,
+  and only the model files as kept readable. Found: 7.49's room wrote "fabrica's runs" in the middle of a sentence; only the first letter
+  of a phrase that is not a name is lowered now.
+- What is new (r222): a line where Fabrica is, and one where it is not (a new tag, "nofabrica", as "nocareer").
+- rig: `t_750_disk_more.py` (new, 35 checks, on a copy of the real computer app, Mac and Windows alike), `t_750_disk_page.js` (new, 12
+  checks: no computer app, a computer app of 7.50 and of 7.49, an edition without Fabrica).
+
 Ingenium 7.49 (20 November 2026): Fabrica's plan, stage 3, part one (reviewers, code owners, suggested changes); sealed on the computer's
 disk, first stage.
 Fabrica's plan, stage 3, part one: the audit's recommendations 9 and 10 (approved in full, 19 November 2026: "I want them all implemented

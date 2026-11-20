@@ -137,7 +137,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_logs_739", "_mac_logs_dir", ("mini", "intel", "win")),
            ("app_profiles_744", "_profile_use", ("mini", "intel", "win")),
            ("app_session_746", "_disk_commit_to", ("mini", "intel", "win")),  # Fabrica's stage 1 (modules/r333.js), approved 19 November 2026
-           ("app_disk_749", "_disk_key_hold", ("mini", "intel", "win"))]  # 7.49: sealed on the computer's disk (Security; her answer "All of them")
+           ("app_disk_749", "_disk_key_hold", ("mini", "intel", "win")),  # 7.49: sealed on the computer's disk (Security; her answer "All of them")
+           ("app_disk_750", "_disk_more_750", ("mini", "intel", "win"))]  # 7.50: their records too, and texts for training
 
 
 def desktop():
