@@ -8,7 +8,13 @@ let page = fs.readFileSync(IN, 'utf8');
 function partOf(src, name) { const m = /__ingParts\)\["p(\d+)"\]="started"|__ingParts\[\"p(\d+)\"\]="running"/.exec(src); return m ? (m[1] || m[2]) : name.replace(/^r/, ''); }
 let lastEnd = -1;
 for (const mp of mods) {
-  const src = fs.readFileSync(mp, 'utf8'); const name = path.basename(mp, '.js'); const p = partOf(src, name);
+  let src = fs.readFileSync(mp, 'utf8'); const name = path.basename(mp, '.js'); const p = partOf(src, name);
+  // 7.55: the record r345 carries, written in as build_page.py writes it (source/docs/ingenium_record/*.md, each named by its first heading)
+  if (src.indexOf('/*R345_RECORD*/null') >= 0) {
+    const dir = path.join(__dirname, '..', 'docs', 'ingenium_record');
+    const rec = fs.readdirSync(dir).filter((f) => f.endsWith('.md')).sort().map((f) => { const t = fs.readFileSync(path.join(dir, f), 'utf8'); return { name: t.split('\n', 1)[0].replace(/^#+/, '').trim() + '.md', text: t }; });
+    src = src.replace('/*R345_RECORD*/null', () => JSON.stringify(rec).replace(/<\//g, '<\\/').replace(/<!--/g, '<\\u0021--'));
+  }
   const endMark = 'try{window.__ingParts["p' + p + '"]="running";}catch(_){}';
   const styleMark = '<style id="' + name + '-css">';
   let start = page.indexOf(styleMark);

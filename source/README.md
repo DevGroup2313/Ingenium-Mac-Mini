@@ -395,6 +395,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles and design, in Ingenium's folder.
+- Her words (20 November 2026): "I want you to document the sign-in and sign-out functions of Ingenium and its entire security system and
+  structure, as well as the different profiles and and data storage per profiles and everything associated with it into Ingenia's folders
+  for Ingenium ... so that I can replicated them again later and add them to my other apps ... I want any local model or even frontier
+  models that I am using to have that information available to them in the Folders from the Ingenia".
+- `docs/ingenium_record/` (new): eleven Markdown files, written from 7.54's sources, each statement checked against the module it names:
+  00 Read me first; 01 the security system at a glance; 02 the sign-in and the sealed desk; 03 Sign out; 04 profiles, and what each keeps
+  apart; 05 where every piece of data lives; 06 the other protections; 07 how she likes to work, and how Ingenium looks; 08 carrying the
+  sign-in, Sign out and profiles into another app (the order of the parts, the contract the app must keep, the names to choose, the steps,
+  what went wrong in Ingenium, notes on Carpe Diem, Lakay, Inkwell and The Forge); 09 tests and checks; 10 words and functions. Each file's
+  first line is its title, "# Ingenium record NN · …".
+- `build/modules/r345.js` (new, the master's alone: `build/editions.py` leaves it out of every other edition, and `_OWNER_ONLY` keeps it
+  out of another person's profile): in her master copy, in her own profile, once her desk is open, the record's files are put into
+  Ingenium's folder on the Ingenia page (the folder r297 knows; made if there is none) as that folder's files (`ccPut`, in the larger
+  store, sealed there while her sign-in is on), so every conversation in that folder carries them as a folder's files go. A file is
+  replaced when the record changes, unless she changed her copy (hers stays; the new text goes beside it, dated); a file she removed comes
+  back only when the record changes. No new part is drawn. `build/build_page.py` writes the files in (`/*R345_RECORD*/`), and stops the build
+  if a file lacks its title or the record has fewer than eleven files; `rig/inject_modules.js` writes them into a test page the same way.
+- What is new (r222): one line, for the master edition.
+- Tests: `rig/t_755_record.js` 10/10 on a test build (7.54's release page with r345 put in); `rig/t_745_owner_free.js` refuses the record
+  and r345 in the other editions. Pictures of the folder: `previews/record` (the scripts; the pictures stay out of the repository).
+
 Ingenium 7.54 (20 November 2026): Sign out; her rule on underlined purple words added to her ways of working.
 - Sign out. Her words (20 November 2026): "I want to be able to log out of Ingenium and not only be able to login. I want to be able to
   sign out of my profile and out of the app and have my data and chats and evrything else sealed until I login again into Igenium."

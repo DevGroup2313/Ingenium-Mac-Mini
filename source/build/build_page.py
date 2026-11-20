@@ -1909,6 +1909,22 @@ if "/*R118_DARK*/null" in blob:
 if "/*R123_INJECT*/null" in blob:  # R123: Carpe Diem's dress for the apps' frames (apps/harvest_cd_dress.js)
     _inj = json.dumps(json.load(open(os.path.join(HERE, "apps", "cd_inject.json"), encoding="utf-8")), separators=(",", ":"))
     blob = blob.replace("/*R123_INJECT*/null", _inj.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
+if "/*R345_RECORD*/null" in blob:  # 7.55 (R345): the record of Ingenium's security, profiles and design (source/docs/ingenium_record/*.md),
+    # put into Ingenium's folder in her master copy; each file named by its first heading, in the order of its number
+    _rec_dir = os.path.normpath(os.path.join(HERE, "..", "docs", "ingenium_record"))
+    _rec = []
+    for _fn in sorted(os.listdir(_rec_dir)):
+        if not _fn.endswith(".md"):
+            continue
+        _txt = open(os.path.join(_rec_dir, _fn), encoding="utf-8").read()
+        _h = _txt.split("\n", 1)[0].lstrip("#").strip()
+        if not _h.startswith("Ingenium record "):
+            sys.exit("docs/ingenium_record/" + _fn + ": its first line must be its title, \"# Ingenium record NN · …\"")
+        _rec.append({"name": _h + ".md", "text": _txt})
+    if len(_rec) < 11:
+        sys.exit("docs/ingenium_record: %d files, not the eleven of the record" % len(_rec))
+    _rj = json.dumps(_rec, ensure_ascii=False, separators=(",", ":"))
+    blob = blob.replace("/*R345_RECORD*/null", _rj.replace("</", "<\\/").replace("<!--", "<\\u0021--"))
 if "/*R126_RECIPE*/null" in blob:  # R126: Lector's recipe (recipe/recipe.json, written by gen_recipe.py): her rules, the verified sources, her kinds of document
     _rx = json.dumps(json.load(open(os.path.join(HERE, "recipe", "recipe.json"), encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))
     blob = blob.replace("/*R126_RECIPE*/null", _rx.replace("</", "<\\/").replace("<!--", "<\\u0021--"))

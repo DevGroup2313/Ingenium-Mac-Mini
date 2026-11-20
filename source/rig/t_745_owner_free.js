@@ -14,7 +14,9 @@ const REFUSED = [
   ['her DPhil plan', /IngDPhil|Your DPhil plan|Internet Institute|Shirley Scholarships|Funded DPhil|Grand Union DTP|apply by 12 noon/],
   ['her ways of working', /Software that looks and feels alive|From Fabrica, 18 November 2026|The animated, popped-out 3D look and effect/],
   ['her devices', /\b[Yy]our (Mac mini|MacBook|HP laptop|Fire tablet)\b|on the HP laptop/],
-  ['the master\'s own parts', /\["p(126|226|227|236|329|246|268|275|258|297|323)"\]/],
+  ['the master\'s own parts', /\["p(126|226|227|236|329|246|268|275|258|297|323|345)"\]/],
+  // 7.55: the record of Ingenium's security, profiles and design, put into her Ingenium folder (modules/r345.js), the master's alone
+  ['the record put into her Ingenium folder', /Ingenium record 0\d · |IngRecord=|R345_RECORD/],
 ];
 const AUTHORSHIP = /Copyright \(c\) 2026 Yannie D\. Forest|Designed and built by Yannie D\. Forest|© 2026 Yannie D\. Forest|&copy; 2026 Yannie D\. Forest|"name": "Yannie D\. Forest"|OWNER="Yannie D\. Forest"|Ingenium belongs to Yannie D\. Forest|\\?"The owner\\?" means Yannie D\. Forest|made by Yannie D\. Forest, its owner under its licence|carries it\. Yannie D\. Forest\./g;
 const APPS = /Carpe Diem|The Forge|Inkwell|Offline Project|Lakay/g;
